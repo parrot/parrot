@@ -1,25 +1,56 @@
 #! perl -w
 # $Id$
 
+# Mike Lambert stole parrot/t/harness for perl6/t/harness
+# Leo Toetsch stole perl6/t/harness for imcc/t/harness
+# Bernhard Schmalhofer merged imcc/t/harness back into parrot/t/harness
+
 use strict;
-use lib 'lib';
+use lib qw(lib imcc);
+
+use Getopt::Std;
 use Test::Harness qw(runtests);
 
-#
-# Suck the switches into the TEST_PROG_ARGS evar:
-#
-
+# handle the long options
 $ENV{RUNNING_MAKE_TEST} = grep { $_ eq '--running-make-test' } @ARGV;
 @ARGV = grep { $_ ne '--running-make-test' } @ARGV;
+$ENV{PARROT_QUICKTEST} = grep { $_ eq 'quick' } @ARGV;
+@ARGV = grep { $_ ne 'quick' } @ARGV;
+my $gc_debug = grep { $_ eq '--gc-debug' } @ARGV;
+@ARGV = grep { $_ ne '--gc-debug' } @ARGV;
+my $run_pbc = grep { $_ eq '--run-pbc' } @ARGV;
+@ARGV = grep { $_ ne '--run-pbc' } @ARGV;
 
-$ENV{TEST_PROG_ARGS} = join(' ', grep { /^-/ } @ARGV);
-@ARGV = grep { ! /^-/ } @ARGV;
+# Suck the short options into the TEST_PROG_ARGS evar:
+my %opts;
+getopts('wgjPSbvdr?hO:', \%opts);
+if ($opts{'?'} || $opts{h}) {
+	print <<"EOF";
+perl t/harness [options] [testfiles]
+        -w ... warnings on
+	-g ... disable CGoto
+	-j ... run JIT
+	-P ... run Prederef or CGP
+	-S ... run Switched
+	-b ... run bounds checked
+	-v ... run verbose
+	-d ... run debug
+	-r ... assemble to PBC run PBC
+	-O[012] optimize
+EOF
+	exit;
+}
 
-$ENV{PARROT_QUICKTEST} = grep $_ eq 'quick', @ARGV;
-@ARGV = grep $_ ne 'quick', @ARGV;
+my $args = join(' ', map { "-$_" } keys %opts );
+$args =~ s/-O/-O$opts{O}/ if ($opts{O});
+$args .= ' --gc-debug'    if $gc_debug;
+$args .= ' --run-pbc'     if $run_pbc;
+$ENV{TEST_PROG_ARGS} = $args;
 
 # Pass in a list of tests to run on the command line, else run all the tests.
-my @tests = @ARGV
-            ? map { glob $_ } @ARGV
-            : map { glob( "t/$_/*.t" ) } qw(src op pmc native_pbc) ;
+my @default_tests = ( ( map { glob( "t/$_/*.t" ) } qw(op pmc native_pbc) ),
+                      glob( "imcc/t/*/*.t" ),
+                      glob( "t/src/*.t" ),
+                    );
+my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
 runtests(@tests);

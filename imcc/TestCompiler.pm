@@ -90,15 +90,17 @@ sub generate_functions {
 	my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
 	my $s = $PConfig{slash};
 	my $exe = $PConfig{exe};
-	my $PARROT = $ENV{PARROT} || "..${s}parrot$exe";	# XXX
+	#my $PARROT = $ENV{PARROT} || "..${s}parrot$exe";	# XXX
+	my $PARROT = $ENV{PARROT} || "parrot$exe";	# XXX
 
 	if ($gen_pasm) {
 	    system("$PARROT $opt -o $out_f $by_f");
 	}
-	elsif ($TEST_PROG_ARGS =~ /-r/) {
+	elsif ($TEST_PROG_ARGS =~ /-r /) {
 	    my $pbc_f = per_test('.pbc',$count);
-	    $TEST_PROG_ARGS =~ s/-r//;
-	    Parrot::Test::_run_command("$PARROT ${TEST_PROG_ARGS} -o $pbc_f -r -r $by_f",
+	    $TEST_PROG_ARGS =~ s/--run-pbc / /;
+	    $TEST_PROG_ARGS =~ s/-r/ /;
+	    Parrot::Test::_run_command("$PARROT ${TEST_PROG_ARGS} -o $pbc_f -r $by_f",
 		STDOUT => $out_f, STDERR => $out_f);
 	}
 	else {
