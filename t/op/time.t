@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 output_is(<<'CODE', <<'OUTPUT', "time_i");
 	time	I0
@@ -41,5 +41,27 @@ OK_ALL:
 CODE
 ok, (!= 1970) Grateful Dead not
 ok, (now>before) timelords need not apply
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "sleep");
+	print	"start\\n"
+
+	time	I1
+
+	sleep	1
+	set	I0, 1
+	sleep	I0
+
+	time	I0
+
+	gt	I0, I1, ALLOK
+	print	"no, sleeping made time go the wrong way "
+
+ALLOK:	
+	print	"done\\n"
+	end
+CODE
+start
+done
 OUTPUT
 1;
