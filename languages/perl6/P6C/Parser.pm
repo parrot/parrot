@@ -704,7 +704,7 @@ rule:	 	  rx_mod(s?) start_block rx_alt '}'
 			{ mark_end('block', $text);1; } ''
 
 pattern:	  <rulevar:$cdelim>
-pattern:	  /m|qr/ <commit> rx_mod(s?) <skip:''> /$RXODELIM/o
+pattern:	  /(?:m|qr)\b/ <commit> rx_mod(s?) <skip:''> /$RXODELIM/o
 			<skip:$item[-2]> rx_alt
 			{ $item[-2] =~ s/^\s*//;
 			  $cdelim = $CDELIM{$item[-2]} || $item[-2] } "$cdelim"
@@ -738,13 +738,15 @@ rx_repeat:	  _rx_repeat /\??/
 _rx_repeat:	  '<' <commit> /!?/ _rx_repspec '>'
 		| /[*+?]/
 
-_rx_repspec:	  scalar_var <commit> ',' scalar_var
-		| /\d+/ ',' /\d+/
+_rx_repitem:	  scalar_var
+		| /\d+/
+
+_rx_repspec:	  _rx_repitem ',' _rx_repitem
 		| /\d+/
 
 rx_assertion:	  variable
 		| '.'
-		| /~?'(?:[^']|\\.)*'/
+		| /'(?:[^']|\\.)*'/
 		| '(' <commit> expr ')'
 		| '{' <commit> expr '}'
 		| rx_call

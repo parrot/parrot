@@ -215,12 +215,15 @@
 	    - examples: life, mandel, life-ar (Leo).
 	    - examples/qsort.p6
 	    - $::RD_NO_HITEM and $::RD_NO_TRACE on by default
+	    - t/rx -- regex tests (basic.t for now)
+	    - '!~' to go with '=~'
 
 	* Fixes:
 	    - make sure keywords don't match prefixes of sub names.
 	    - better handling of returns to various contexts using
 	      standard functions (TYPE_in_context()).
 	    - tidied up examples.
+	    - repetition specifiers can be mixed vars and literals.
 	
 	* Test-failures:
 	    - none.  That's right.  None (on Linux/PPC, w/imcc patch).

@@ -890,10 +890,10 @@ sub P6C::rx_element::tree {
 sub P6C::rx_atom::tree {
     my $x = shift;
     my ($atom, $capture);
-    if (@$x == 4) {
+    if (@$x == 5) {
 	if ($x->[1] =~ /\[\(/) {
 	    # group, capturing or otherwise.
-	    $atom = $x->[2]->tree;
+	    $atom = $x->[3]->tree;
 	    $capture = $x->[1] eq '(';
 	} else {
 	    # modifiers
@@ -931,6 +931,15 @@ sub P6C::rx_mod::tree {
     return $ret;
 }
 
+sub repspec_item {
+    my $i = shift;
+    if (ref $i) {
+	return $i->tree;
+    } else {
+	return $i;
+    }
+}
+
 sub P6C::rx_repeat::tree {
     my $x = shift;
     my $greedy = length($x->[2]) == 0;
@@ -946,18 +955,14 @@ sub P6C::rx_repeat::tree {
 	    $min = 0; $max = 1;	    
 	}
     } else {
-	my $repspec = $x->[1][3];
-	if (@$repspec == 5) {
-	    # two scalar vars
-	    $min = $repspec->[1]->tree;
-	    $max = $repspec->[4]->tree;
-	} elsif (@$repspec == 4) {
-	    # two numbers
-	    $min = 0 + $repspec->[1];
-	    $max = 0 + $repspec->[3];
+	my $repspec = $x->[1][4];
+	if (@$repspec == 4) {
+	    # two items
+	    $min = repspec_item($repspec->[1][1]);
+	    $max = repspec_item($repspec->[3][1]);
 	} else {
 	    # one number
-	    $min = $max = $repspec->[1];
+	    $min = $max = 0 + $repspec->[1];
 	}
     }
     return new P6C::rx_repeat min => $min, max => $max, greedy => $greedy;
@@ -1021,7 +1026,7 @@ sub P6C::rx_call::tree {
 
 sub P6C::rx_cc_neg::tree {
     my $x = shift;
-    my $neg = @{$x->[1]} > 0;
+    my $neg = $x->[1] eq '-';
     my $class = $x->[2];
     if (@$class == 4) {
 	# Bracketed assertion
@@ -1039,7 +1044,7 @@ sub P6C::rx_cc_neg::tree {
     } else {
 	# enumerated class
 	return new P6C::rx_oneof
-	    rep => substr($x->[1], 1, length($x->[1]) - 2),
+	    rep => substr($class, 1, length($class) - 2),
 	    negated => $neg;
     }
 }

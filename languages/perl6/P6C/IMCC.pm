@@ -1069,6 +1069,14 @@ sub do_array {
     return $vallist->val;
 }
 
+sub do_reverse_match {
+     my $v = do_smartmatch($_[0]->l, $_[0]->r, $_[0]->{ctx});
+     code(<<END);
+	$v = ! $v
+END
+    return $v;
+}
+
 # Binary infix operators.
 use vars '%ops';
 BEGIN {
@@ -1098,6 +1106,7 @@ BEGIN {
  'x'	=> \&do_repeat,
  '..'	=> \&do_range,
  '=~'	=> sub { do_smartmatch($_[0]->l, $_[0]->r, $_[0]->{ctx}) },
+ '!~'   => \&do_reverse_match,
 );
 }
 

@@ -233,7 +233,7 @@ END
 
 sub do_var_repeat {
     my ($x, $ctx) = @_;
-    my $n = $x->min->val;
+    my $n = ref($x->min) ? $x->min->val : $x->min;
     my ($bt, $btfirst);
     my $loop = genlabel 'fixrep';
     my $succ = $ctx->{succ};
@@ -260,8 +260,7 @@ $mindone:
 	rx_pushmark
 	$itmp = $n
 END
-    my $m = $x->max->val;	# REMEMBER: labels can't come between
-                                # this and its use.
+    my $m = ref($x->max) ? $x->max->val : $x->max;
     code(<<END);
 	$count = $m
 	$count = $count - $itmp
@@ -291,8 +290,9 @@ sub do_frugal_rep {
     # XXX: need to add failatom here...
     my $bt = genlabel 'frugal_bt';
     my $needend;
-    if (ref($x->min) && ref($x->max)) {
+    if (ref($x->min) || ref($x->max)) {
 	# variables.
+	unimp 'variable frugal rep';
     } elsif (!defined($x->max)) {
 	# *? or +?
 	unless (defined $ctx->{succ}) {
@@ -327,7 +327,16 @@ END
 	# XXX: backtracking is completely hosed here (and below...)
 	my $n = $x->min;
 	my $loop = genlabel 'fixrep';
-	my $mindone = ($n == $x->max ? $ctx->{succ} : genlabel('max'));
+	my $mindone;
+	if ($n == $x->max) {
+	    unless (defined $ctx->{succ}) {
+		$needend = 1;
+		$ctx->{succ} = genlabel('frugal');
+	    }
+	    $mindone = $ctx->{succ};
+	} else {
+	    $mindone = genlabel('max');
+	}
 	my $count = gentmp 'int';
 	code(<<END);
 	rx_pushmark
