@@ -38,7 +38,7 @@ END
 
     close OUT;
 
-    copy_if_diff("$file.tmp", $file);
+    move_if_diff("$file.tmp", $file);
 }
 
 sub generate_c {
@@ -93,7 +93,7 @@ END
 
     close OUT;
 
-    copy_if_diff("$file.tmp", $file);
+    move_if_diff("$file.tmp", $file);
 }
 
 sub generate_pm {
@@ -129,7 +129,7 @@ END
 
     close OUT;
 
-    copy_if_diff("$file.tmp", $file);
+    move_if_diff("$file.tmp", $file);
 }
 
 1;

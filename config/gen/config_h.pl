@@ -37,7 +37,7 @@ sub runstep {
   
   close HH;
 
-  copy_if_diff("$hh.tmp", $hh);
+  move_if_diff("$hh.tmp", $hh);
 }
 
 1;

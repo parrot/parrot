@@ -9,13 +9,13 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @EXPORT=();
 
-@EXPORT_OK=qw(prompt genfile copy_if_diff
+@EXPORT_OK=qw(prompt genfile copy_if_diff move_if_diff
               cc_gen cc_build cc_run cc_clean cc_run_capture);
 
 %EXPORT_TAGS=(
 	inter => ['prompt'],
 	auto  => [qw(cc_gen cc_build cc_run cc_clean cc_run_capture)],
-	gen   => [qw(genfile copy_if_diff)]
+	gen   => [qw(genfile copy_if_diff move_if_diff)]
 );
 
 my $redir_err = (($ENV{COMSPEC} || "")=~ /command\.com/i) ? "" : "2>&1";
@@ -76,6 +76,12 @@ sub copy_if_diff {
     utime $now, $now, $to;
 }
 
+sub move_if_diff {
+    my ($from, $to, $ignorePattern) = @_;
+    copy_if_diff($from, $to, $ignorePattern);
+    unlink $from;
+}
+
 sub genfile {
 	my($source, $target, %options)=@_;
 
@@ -121,7 +127,7 @@ sub genfile {
 	close IN  or die "Can't close $source: $!";
 	close OUT or die "Can't close $target: $!";
 
-        copy_if_diff("$target.tmp", $target, $options{ignorePattern});
+        move_if_diff("$target.tmp", $target, $options{ignorePattern});
 }
 
 sub cc_gen {
