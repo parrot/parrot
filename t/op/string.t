@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_sc" );
 	set	S4, "JAPH\n"
@@ -117,3 +117,35 @@ output_is( <<'CODE', <<OUTPUT, "concat" );
 CODE
 fishbone
 OUTPUT
+
+SKIP: { skip("TODO: printing empty string reg segfaults",1);
+output_is(<<"CODE", <<'OUTPUT', "clear_s");
+@{[ set_str_regs( sub {"BOO $_[0]\\n"} ) ]}
+	clear_s
+@{[ print_str_regs() ]}
+	print "done\\n"
+	end
+CODE
+done
+OUTPUT
+}
+
+# Set all string registers to values given by &$_[0](reg num)
+sub set_str_regs {
+  my $code = shift;
+  my $rt;
+  for (0..31) {
+    $rt .= "\tset S$_, \"".&$code($_)."\"\n";
+  }
+  return $rt;
+}
+# print string registers, no additional prints
+sub print_str_regs {
+  my $rt;
+  for (0..31) {
+    $rt .= "\tprint S$_\n";
+  }
+  return $rt;
+}
+
+1;

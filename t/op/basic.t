@@ -1,6 +1,22 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 5;
+
+# It would be very embarrassing if these didn't work...
+output_is(<<'CODE', '', "noop, end");
+	noop
+	end
+CODE
+
+output_is(<<'CODE', '1', "print 1");
+	print	1
+	end
+CODE
+
+output_is(<<'CODE', 'Parrot flies', "print string");
+	print "Parrot flies"
+	end
+CODE
 
 output_is( <<'CODE', '42', "branch_ic" );
 	set	I4, 42
