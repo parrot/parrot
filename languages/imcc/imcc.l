@@ -28,7 +28,7 @@ DIGIT           [0-9]
 DOT		[.]
 LETTERDIGIT     [a-zA-Z0-9_]
 SIGN            [-+]
-STRINGCONSTANT  \"[^"\n]*["\n]
+STRINGCONSTANT  \"(\\.|[^"\n]*)*["\n]
 CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
 
