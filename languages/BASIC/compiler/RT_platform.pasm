@@ -15,9 +15,6 @@ PLATFORM_SETUP:
 SCREEN_CLEAR:
 	set I14, 0	# Column position for tab()
 	sysinfo S0, 4
-	print "Sysinfo says '"
-	print S0
-	print "'\n"
 	eq S0, "MSWin32", WIN32_SCREEN_CLEAR
 	branch ANSI_SCREEN_CLEAR
 
