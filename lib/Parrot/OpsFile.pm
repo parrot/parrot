@@ -87,7 +87,7 @@ sub read_ops
   my $count = 0;
 
   my ($name, $footer);
-  
+
   my $type;
   my $body;
   my $short_name;
@@ -124,7 +124,7 @@ sub read_ops
       $self->{PREAMBLE} .= $_ unless $seen_pod or $count; # Lines up to first op def.
       next;
     }
-  
+
     die "No 'VERSION = ...;' line found before beginning of ops in file '$orig'!\n"
       unless defined $self->version;
 
@@ -230,7 +230,7 @@ sub read_ops
 
       next;
     }
-  
+
     #
     # Accummulate the code into the op's body:
     #
@@ -326,21 +326,21 @@ sub make_op
                     $body =~ s/\bHALT\(\)/{{=0}}/mg;
 
       $branch   ||= $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg;
-                    $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
+      $next     ||= $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
 
                     $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
       if ($ENV{PARROT_NO_LINE}) {
-        $op->body($body); 
+        $op->body($body);
       } else {
-        $op->body(qq{#line $line "$file"\n}.$body); 
+        $op->body(qq{#line $line "$file"\n}.$body);
       }
 
       $jumps |= 1 if ($branch);
       $jumps |= 2 if ($absolute);
       $jumps |= 4 if ($pop);
       $jumps |= 8 if ($next);
-      # I'm assuming the op branches to the value in the last argument.  
+      # I'm assuming the op branches to the value in the last argument.
       $jumps |= 16 if (($jumps) && ($fixedargs[@fixedargs - 1]) && ($fixedargs[@fixedargs - 1] eq 'i'));
       $op->jump($jumps);
 

@@ -976,11 +976,29 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 }
 
+extern void Parrot_end_jit(Parrot_jit_info_t *, struct Parrot_Interp * );
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
+    char *jmp_ptr, *sav_ptr;
+
     Parrot_jit_normal_op(jit_info, interpreter);
+    /* test eax, if zero (e.g after restart), return from JIT */
+    emit_andl_r_r(jit_info->native_ptr, emit_EAX, emit_EAX);
+    /* remember PC */
+    jmp_ptr = jit_info->native_ptr;
+    /* emit jump past exit code, dummy offset
+     * this assumes exit code is in reach of a short jump (126 bytes) */
+    emitm_jxs(jit_info->native_ptr, emitm_jnz, 0);
+    /* emit exit code */
+    Parrot_end_jit(jit_info, interpreter);
+    /* fixup above jump */
+    sav_ptr = jit_info->native_ptr;
+    jit_info->native_ptr = jmp_ptr;
+    emitm_jxs(jit_info->native_ptr, emitm_jnz, (long)(sav_ptr - jmp_ptr) - 2);
+    /* restore PC */
+    jit_info->native_ptr = sav_ptr;
 
     /* This calculates (INDEX into op_map * 4) */
     emitm_subl_i_r(jit_info->native_ptr, interpreter->code->byte_code,emit_EAX);
