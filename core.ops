@@ -2023,7 +2023,11 @@ AUTO_OP runinterp(p, i|ic) {
 =item B<new>(p, i)
 
 Create a new PMC of class C<i>; look in F<pmc.h> for the base
-vtable types.
+vtable types. The assembler allows you to specify PMCs by type
+name as well as by integer - you should do this for compatibility,
+to avoid problems if the base types get reassigned. For example:
+
+    new P0, PerlScalar
 
 =cut
 
