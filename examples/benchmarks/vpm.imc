@@ -5,33 +5,36 @@
 
 .sub main
 
-$S0 = "just another perl hacker"
+.sym string _string
+_string = "just another perl hacker"
 
 $I0 = 0
+
+$I1 = length _string
+$I2 = $I1 + 1
 loop0:
+	.sym pmc _str
+	.sym pmc _f
+	split _str, "", _string
 
-	.sym pmc str
-	split str, "", $S0
+       # you can't shift from the type of array that split returns. Do a
+       # two step.
+       _f = _str[0]
+       delete _str[0]
 
-	$I1 = 0
-	$S1 = str[$I1]
-	loop1:
-		$I2 = $I1 + 1
-		$S2 = str[$I2]
-		str[$I1] = $S2
-		inc $I1
-	if $I1 < 23 goto loop1
-	str[$I1] = $S1
+       # you can't push onto the type of array that split returns. Do a 
+       # two step.
+       _str = $I2
+       _str[$I1] = _f
 
-	join $S0, "", str
-
+       _string = join "", _str
 	inc $I0
 if  $I0 <= 99999 goto loop0
 
 print $I0
-print "\n"
+print ";\n"
 
-print $S0
+print _string
 print "\n"
 
 end
