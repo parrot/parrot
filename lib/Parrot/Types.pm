@@ -19,6 +19,7 @@ use Parrot::Config;
     &pack_sv
     &pack_op
     &pack_arg
+    &pack_key
 
     &unpack_byte
     &unpack_intval
