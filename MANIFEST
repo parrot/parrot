@@ -1477,6 +1477,7 @@ languages/imcc/t/syn/file.t
 languages/imcc/t/syn/labels.t
 languages/imcc/t/syn/namespace.t
 languages/imcc/t/syn/scope.t
+languages/jako/Curses.jako
 languages/jako/docs/future.pod
 languages/jako/docs/jako.pod
 languages/jako/elem.jako
@@ -1492,6 +1493,7 @@ languages/jako/examples/life.jako
 languages/jako/examples/mandelbrot.jako
 languages/jako/examples/mandelzoom.jako
 languages/jako/examples/mops.jako
+languages/jako/examples/nci.jako
 languages/jako/examples/primes.jako
 languages/jako/examples/queens.jako
 languages/jako/examples/queens_array.jako
@@ -1509,6 +1511,7 @@ languages/jako/lib/Jako/Construct/Block/Loop.pm
 languages/jako/lib/Jako/Construct/Block/Loop/Continue.pm
 languages/jako/lib/Jako/Construct/Block/Loop/Until.pm
 languages/jako/lib/Jako/Construct/Block/Loop/While.pm
+languages/jako/lib/Jako/Construct/Block/Module.pm
 languages/jako/lib/Jako/Construct/Block/Sub.pm
 languages/jako/lib/Jako/Construct/Declaration.pm
 languages/jako/lib/Jako/Construct/Declaration/Constant.pm
@@ -1787,7 +1790,7 @@ register.c
 res_lea.c
 resources.c
 runops_cores.c
-runtime/parropt/include/README
+runtime/parrot/include/README
 rx.c
 rx.ops
 rxstacks.c
