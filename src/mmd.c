@@ -81,14 +81,21 @@ mmd_dispatch_pmc(Interp *interpreter,
             right_type + left_type;
         real_function = (pmc_mmd_f)*(interpreter->binop_mmd_funcs->mmd_funcs[function] + offset);
     }
-    if (real_function) {
+    if ((UINTVAL)real_function & 1) {
+        sub = (PMC*)((UINTVAL)real_function & ~1);
+        Parrot_runops_fromc_args_save(interpreter, sub, "vPPP",
+                left, right, dest);
+    }
+    else
         (*real_function)(interpreter, left, right, dest);
+#if 0
     } else {
         /* Didn't find it. Go look for a bytecode version */
         offset = interpreter->binop_mmd_funcs->x[function] *
             right_type + left_type;
         sub = (void*)((pmc_mmd_f)*(interpreter->bytecode_binop_mmd_funcs->mmd_funcs[function] + offset));
     }
+#endif
 }
 
 /*
@@ -473,6 +480,16 @@ mmd_register(Interp *interpreter,
 
     offset = interpreter->binop_mmd_funcs->x[type] * right_type + left_type;
     *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset) = funcptr;
+}
+
+void
+mmd_register_sub(Interp *interpreter,
+             INTVAL type,
+             INTVAL left_type, INTVAL right_type,
+             PMC *sub)
+{
+    PMC *fake = (PMC*)((UINTVAL) sub | 1);
+    mmd_register(interpreter, type, left_type, right_type, D2FPTR(fake));
 }
 
 /*
