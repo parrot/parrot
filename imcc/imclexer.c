@@ -2444,6 +2444,8 @@ YY_RULE_SETUP
 	    YYCHOP();
             YYCHOP();
 
+            if (!frames || !frames->label)
+                fataly(EX_SOFTWARE, sourcefile, line, "missing space?");
 	    label = mem_sys_allocate(yyleng+10);
 	    sprintf(label, "%s%d", yytext, frames->label);
 
@@ -2455,12 +2457,16 @@ YY_RULE_SETUP
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 342 "imcc/imcc.l"
+#line 344 "imcc/imcc.l"
 {
         char *label;
 
 	if (valp) {
 	    YYCHOP();
+
+            /* #32421   if$I0 is parsed as if$ I0 */
+            if (!frames || !frames->label)
+                fataly(EX_SOFTWARE, sourcefile, line, "missing space?");
 
 	    label = mem_sys_allocate(yyleng+10);
 	    sprintf(label, "%s%d", yytext, frames->label);
@@ -2473,12 +2479,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 357 "imcc/imcc.l"
+#line 363 "imcc/imcc.l"
 return(COMMA);
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 359 "imcc/imcc.l"
+#line 365 "imcc/imcc.l"
 {
 	YYCHOP();  /* trim last ':' */
 	DUP_AND_RET(valp,LABEL);
@@ -2486,7 +2492,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 364 "imcc/imcc.l"
+#line 370 "imcc/imcc.l"
 {
         int type = pmc_type(interp, string_from_cstring(interp, yytext+1, 0));
 
@@ -2505,7 +2511,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 380 "imcc/imcc.l"
+#line 386 "imcc/imcc.l"
 {
 	if (!is_def) {
 		SymReg *r = find_sym(yytext);
@@ -2549,27 +2555,27 @@ YY_RULE_SETUP
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 421 "imcc/imcc.l"
+#line 427 "imcc/imcc.l"
 DUP_AND_RET(valp, FLOATC);
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 422 "imcc/imcc.l"
+#line 428 "imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 423 "imcc/imcc.l"
+#line 429 "imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 424 "imcc/imcc.l"
+#line 430 "imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 426 "imcc/imcc.l"
+#line 432 "imcc/imcc.l"
 {
 	valp->s = str_dup(yytext);
         valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
@@ -2578,7 +2584,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 432 "imcc/imcc.l"
+#line 438 "imcc/imcc.l"
 {
 	valp->s = str_dup(yytext);
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
@@ -2586,7 +2592,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 437 "imcc/imcc.l"
+#line 443 "imcc/imcc.l"
 {
         char *p = strchr(yytext, '"');
 	valp->s = str_dup(p);    /* enc:"..." */
@@ -2596,7 +2602,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 443 "imcc/imcc.l"
+#line 449 "imcc/imcc.l"
 {
         valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
@@ -2604,39 +2610,39 @@ YY_RULE_SETUP
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 448 "imcc/imcc.l"
+#line 454 "imcc/imcc.l"
 DUP_AND_RET(valp, IREG);
 	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 449 "imcc/imcc.l"
+#line 455 "imcc/imcc.l"
 DUP_AND_RET(valp, NREG);
 	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 450 "imcc/imcc.l"
+#line 456 "imcc/imcc.l"
 DUP_AND_RET(valp, SREG);
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 451 "imcc/imcc.l"
+#line 457 "imcc/imcc.l"
 DUP_AND_RET(valp, PREG);
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 453 "imcc/imcc.l"
+#line 459 "imcc/imcc.l"
 /* skip */;
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 455 "imcc/imcc.l"
+#line 461 "imcc/imcc.l"
 {
         /* catch all except for state macro */
         return yytext[0];
     }
 	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 460 "imcc/imcc.l"
+#line 466 "imcc/imcc.l"
 {
         BEGIN (INITIAL);
         if (pasm_file) {
@@ -2647,17 +2653,17 @@ case YY_STATE_EOF(emit):
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 469 "imcc/imcc.l"
+#line 475 "imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 471 "imcc/imcc.l"
+#line 477 "imcc/imcc.l"
 DUP_AND_RET(valp, ENDM);
 	YY_BREAK
 case 128:
 YY_RULE_SETUP
-#line 473 "imcc/imcc.l"
+#line 479 "imcc/imcc.l"
 {
         line++;
         DUP_AND_RET(valp, '\n');
@@ -2665,12 +2671,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 478 "imcc/imcc.l"
+#line 484 "imcc/imcc.l"
 return LABEL;
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 479 "imcc/imcc.l"
+#line 485 "imcc/imcc.l"
 {
         char *label;
 	char *name = macros[num_macros].name;
@@ -2692,7 +2698,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 498 "imcc/imcc.l"
+#line 504 "imcc/imcc.l"
 {
         char *label;
 	char *name = macros[num_macros].name;
@@ -2709,39 +2715,39 @@ YY_RULE_SETUP
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 512 "imcc/imcc.l"
+#line 518 "imcc/imcc.l"
 /* skip leading ws */;
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 513 "imcc/imcc.l"
+#line 519 "imcc/imcc.l"
 DUP_AND_RET(valp, ' ');
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 514 "imcc/imcc.l"
+#line 520 "imcc/imcc.l"
 DUP_AND_RET(valp, IDENTIFIER);
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 515 "imcc/imcc.l"
+#line 521 "imcc/imcc.l"
 DUP_AND_RET(valp, MACRO);
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
-#line 516 "imcc/imcc.l"
+#line 522 "imcc/imcc.l"
 DUP_AND_RET(valp, yytext[0]);
 	YY_BREAK
 case YY_STATE_EOF(macro):
-#line 517 "imcc/imcc.l"
+#line 523 "imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 519 "imcc/imcc.l"
+#line 525 "imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 2745 "imcc/imclexer.c"
+#line 2751 "imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -3634,7 +3640,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 519 "imcc/imcc.l"
+#line 525 "imcc/imcc.l"
 
 
 #ifdef yywrap
