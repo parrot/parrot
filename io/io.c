@@ -469,7 +469,7 @@ PIO_parse_open_flags(const char *flagstr)
 
 /*
  * General purpose interface for manipulation of IO objects and
- * layer attributes. 
+ * layer attributes.
  *
  * Refer to PIOCTL* values in io.h
  *
@@ -494,11 +494,11 @@ PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)
 
        case PIOCTL_CMDSETBUFTYPE:
             if(arg == PIOCTL_NONBUF)
-               return PIO_setbuf(interpreter, pmc, 0); 
+               return PIO_setbuf(interpreter, pmc, 0);
             else if(arg == PIOCTL_LINEBUF)
-               return PIO_setlinebuf(interpreter, pmc); 
+               return PIO_setlinebuf(interpreter, pmc);
             else if(arg == PIOCTL_BLKBUF)
-               return PIO_setbuf(interpreter, pmc, PIO_UNBOUND); 
+               return PIO_setbuf(interpreter, pmc, PIO_UNBOUND);
             else return -3;
 
        case PIOCTL_CMDGETBUFTYPE:
@@ -823,7 +823,7 @@ Parrot_IOData_mark(theINTERP, ParrotIOData *piodata)
         }
     }
 
-    /* XXX boe: If piodata has children which needs marking too, 
+    /* XXX boe: If piodata has children which needs marking too,
      *          we have to call
      * trace_children(interpreter, interpreter->piodata->table[0]);
      */

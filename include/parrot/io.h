@@ -324,6 +324,7 @@ extern PMC *PIO_STDERR(theINTERP);
  * pioctl argument constants. These don't have to
  * be unique across io commands.
  */
+#define PIOCTL_NONBUF              0
 #define PIOCTL_LINEBUF             1
 #define PIOCTL_BLKBUF              2
 
