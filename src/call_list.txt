@@ -1,7 +1,9 @@
 # Copyright: 2002-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-# Function signature declarations for NCI
+# Function signature declarations for Parrot Native Call Interface.
+# The first alphanumeric is the type of the return value,
+# the other alphanumerics denote the input parameter types.
 
 # Types
 
@@ -54,7 +56,6 @@
 # Y - sub PMC to call back into
 # Z - Single PMC parameter to pass into sub Y
 
-#Return params
 c                # t/pmc/nci.t
 c	p
 c	pi
@@ -71,7 +72,7 @@ f	is
 f	v
 
 i
-i       b        # t/pmc/nci.t
+i	b        # t/pmc/nci.t
 i	d
 i	i
 i	ii
@@ -195,6 +196,7 @@ v	ii
 v	illllllll
 v	l
 v	p
+v	pbip     # for libsyck
 v	pi
 v	piiii
 v	pl
@@ -265,9 +267,9 @@ i	pt33
 i	IPP
 
 #required for mod_parrot
-i   tp
-v   tiiiptt
-i   Pip
+i	tp
+v	tiiiptt
+i	Pip
 
 # PyBuiltins
 P	IOPP
