@@ -21,111 +21,83 @@ it puts things into Integer, Float, or String PMCs as appropriate
 
 #include "parrot/parrot.h"
 
-/*
- * need this as long this hack is using qsort
- */
-static Interp* the_interp;
-static PMC* sort_cmp_pmc;
-
-static int
-sort_compare(void *a, void *b)
+static void
+swap(void **x, void **y)
 {
-    PMC *pa = *(PMC**)a;
-    PMC *pb = *(PMC**)b;
-    return mmd_dispatch_i_pp(the_interp, pa, pb, MMD_CMP);
+    void *t = *x;
+    *x = *y;
+    *y = t;
 }
 
-static int
-sort_ext_compare(void *a, void *b)
+typedef INTVAL (*sort_func_t)(Interp *, void*, void*);
+
+static INTVAL
+COMPARE(Interp *interpreter, void *a, void *b, PMC *cmp)
 {
-    PMC *pa = *(PMC**)a;
-    PMC *pb = *(PMC**)b;
-    return Parrot_runops_fromc_args_reti(the_interp,
-        sort_cmp_pmc, "IPP", pa, pb);
+    if (!cmp)
+        return mmd_dispatch_i_pp(interpreter, a, b, MMD_CMP);
+    if (cmp->vtable->base_type == enum_class_NCI) {
+        sort_func_t f = (sort_func_t)D2FPTR(PMC_struct_val(cmp));
+        return f(interpreter, a, b);
+    }
+    return Parrot_runops_fromc_args_reti(interpreter, cmp, "IPP", a, b);
+}
+
+static void
+quicksort(Interp *interpreter, void **data, UINTVAL n, PMC *cmp)
+{
+    UINTVAL i, j, ln, rn;
+
+    while (n > 1) {
+        swap(&data[0], &data[n/2]);
+        for (i = 0, j = n; ; ) {
+            do
+                --j;
+            while (COMPARE(interpreter, data[j], data[0], cmp) > 0);
+            do
+                ++i;
+            while (i < j && COMPARE(interpreter, data[i], data[0], cmp) < 0);
+            if (i >= j)
+                break;
+            swap(&data[i], &data[j]);
+        }
+        swap(&data[j], &data[0]);
+        ln = j;
+        rn = n - ++j;
+        if (ln < rn) {
+            quicksort(interpreter, data, ln, cmp);
+            data += j;
+            n = rn;
+        }
+        else {
+            quicksort(interpreter, data + j, rn, cmp);
+            n = ln;
+        }
+    }
 }
 
 pmclass FixedPMCArray need_ext does array {
 
 /*
 
-=item C<void* sort(PMC* cmp_func)>
+=item C<METHOD void sort(PMC* cmp_func)>
 
 Sort this array, optionally using the provided cmp_func
 
 =cut
 
 */
-METHOD void sort(PMC *cmp_func) {
-    int (*func)(void*, void*);
-    PMC *first;
-    INTVAL type;
-    PMC *s;
 
-    the_interp = INTERP;
-    if (REG_INT(3) == 0) {
-        first = ((PMC**)PMC_data(SELF))[0];
-        /* XXX simulate MMD inheritance: Int isa TT */
-        type = first->vtable->base_type - 1;
-        s = mmd_vtfind(INTERP, MMD_CMP, type, 0);
-        /* cmp was overriden ? */
-        if (s->vtable->base_type == enum_class_Sub) {
-            cmp_func = s;
-            goto use_sub;
-        }
-default_sort:
-        func = sort_compare;
-use_func:
-        qsort(PMC_data(SELF), PMC_int_val(SELF), sizeof(PMC *),
-                (int (*)(const void*, const void*))func);
-    }
-    else {
-        void *regs;
-        int run_core;
-        /*
-         * cmp_func is a PASM PMC
-         * TODO check, if it's NCI
-         */
-use_sub:
-        run_core = INTERP->run_core;
-        if (PMC_IS_NULL(cmp_func) ||
-                cmp_func == Parrot_base_vtables[enum_class_None]->class) {
-            /* a NULL or None PMC was passed
-            */
-            goto default_sort;
-        }
-        else {
-            if (cmp_func->vtable->base_type == enum_class_NCI) {
-                /* the C function inside is at struct_val
-                 * hopefully this function does compare
-                 */
-                func = (int (*)(void*, void*)) PMC_struct_val(cmp_func);
-                /*
-                 * XXX not yet -cmp doesn't take an interpreter arg
-                 */
-                /* goto use_func; */
-                goto default_sort;
-            }
-        }
-        /*
-         * save registers once, as the compare function will be called
-         * repeatedly
-         */
-        func = sort_ext_compare;
-        sort_cmp_pmc = cmp_func;
-        /*
-         * TODO fix errors with JIT or prederefed core
-         */
-        if (run_core == PARROT_JIT_CORE) {
-#ifdef HAVE_COMPUTED_GOTO
-            INTERP->run_core = PARROT_CGOTO_CORE;
-#else
-            INTERP->run_core = PARROT_FAST_CORE;
-#endif
-        }
-        qsort(PMC_data(SELF), PMC_int_val(SELF), sizeof(PMC *),
-                (int (*)(const void*, const void*))func);
-        INTERP->run_core = run_core;
-    }
+METHOD void sort(PMC *cmp_func) {
+    UINTVAL n;
+
+
+    n = (UINTVAL) PMC_int_val(SELF);
+    if (n <= 1)
+        return;
+    if (REG_INT(3) == 0)
+        cmp_func = NULL;
+    quicksort(interpreter, PMC_data(SELF), n, cmp_func);
 }
 
 /*

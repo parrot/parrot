@@ -663,10 +663,13 @@ static PMC* mmd_arg_tuple_inline(Interp *, STRING *signature, va_list args);
 static PMC* mmd_arg_tuple_func(Interp *, STRING *signature, va_list args);
 static PMC* mmd_search_default(Interp *, STRING *meth, PMC *arg_tuple);
 static PMC* mmd_search_scopes(Interp *, STRING *meth, PMC *arg_tuple);
+static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_search_lexical(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_search_package(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_search_global(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
+static int  mmd_maybe_candidate(Interp *, PMC *pmc, PMC *arg_tuple, PMC *cl);
+static void mmd_sort_candidates(Interp *, PMC *arg_tuple, PMC *cl);
 
 /*
 
@@ -705,7 +708,9 @@ Parrot_MMD_search_default_inline(Interp *interpreter, STRING *meth,
     va_start(args, signature);
     arg_tuple = mmd_arg_tuple_inline(interpreter, signature, args);
     va_end(args);
-
+    /*
+     * default search policy
+     */
     return mmd_search_default(interpreter, meth, arg_tuple);
 }
 
@@ -778,10 +783,104 @@ result
 static PMC*
 mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
 {
-    PMC *candidate_list;
+    PMC *candidate_list, *pmc;
+    INTVAL i, n;
+    STRING *_sub;
 
+    /*
+     * 2) create a list of matching functions
+     */
     candidate_list = mmd_search_scopes(interpreter, meth, arg_tuple);
-    return NULL;
+    /*
+     * 3) if list is empty fail
+     *    if the first found function is a plain Sub: finito
+     */
+    n = VTABLE_elements(interpreter, candidate_list);
+    if (!n)
+        return NULL;
+    pmc = VTABLE_get_pmc_keyed_int(interpreter, candidate_list, 0);
+    _sub = CONST_STRING(interpreter, "Sub");
+
+    if (VTABLE_isa(interpreter, pmc, _sub)) {
+        return pmc;
+    }
+    /*
+     * 4) first is a MultiSub - go through all found MultiSubs and check
+     *    the first arguments MRO, add all MultiSubs and plain methods,
+     *    where the first argument matches
+     */
+    mmd_search_classes(interpreter, meth, arg_tuple, candidate_list);
+    /*
+     * 5) sort the list
+     */
+    mmd_sort_candidates(interpreter, arg_tuple, candidate_list);
+    /*
+     * 6) Uff, return first one
+     */
+    pmc = VTABLE_get_pmc_keyed_int(interpreter, candidate_list, 0);
+    return pmc;
+}
+
+/*
+
+=item C<static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+
+Search all the classes in all MultiSubs of the candidates C<cl> and return
+a list of all candidates.
+
+*/
+
+static void
+mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
+{
+    PMC *pmc, *mro, *class;
+    INTVAL i, n, type1;
+    STRING *namespace_name;
+
+    /*
+     * get the class of the first argument
+     */
+    type1 = VTABLE_get_integer_keyed_int(interpreter, arg_tuple, 0);
+    if (type1 < 0) {
+        internal_exception(1, "unimplemted native MMD type");
+        /* TODO create some class namespace */
+    }
+    else {
+        mro = Parrot_base_vtables[type1]->mro;
+        n = VTABLE_elements(interpreter, mro);
+        for (i = 0; i < n; ++i) {
+            class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
+            namespace_name = VTABLE_namespace_name(interpreter, class);
+            pmc = Parrot_find_global(interpreter, namespace_name, meth);
+            if (pmc) {
+                /*
+                 * mmd_is_hidden would consider all previous candidates
+                 * XXX pass current n so that only candidates from this
+                 *     mro are used?
+                 */
+                if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
+                    break;
+            }
+        }
+    }
+    return cl;
+}
+
+/*
+
+=item C<static void mmd_sort_candidates(Interp *, PMC *arg_tuple, PMC *cl)>
+
+Sort the candidate list C<cl> by Manhattan Distance
+
+*/
+
+static void
+mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
+{
+    INTVAL n;
+
+    n = VTABLE_elements(interpreter, cl);
+
 }
 
 /*
@@ -862,6 +961,7 @@ mmd_maybe_candidate(Interp *interpreter, PMC *pmc, PMC *arg_tuple, PMC *cl)
     if (VTABLE_isa(interpreter, pmc, _sub)) {
         /* a plain sub stops outer searches */
         /* TODO check arity of sub */
+
         VTABLE_push_pmc(interpreter, cl, pmc);
         return 1;
     }
