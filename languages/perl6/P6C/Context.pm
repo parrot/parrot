@@ -105,7 +105,7 @@ parameters of particular types.
 
 use strict;
 use P6C::Util qw(diag unimp same_type);
-use Class::Struct P6C::Context => { qw(type $ flatten $ hype $) };
+use Class::Struct 'P6C::Context' => { qw(type $ flatten $ hype $) };
 
 our %CONTEXT;
 

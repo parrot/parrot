@@ -512,9 +512,8 @@ Emit a complete function body, minus the C<.sub> directive.
 =cut
 
 package P6C::IMCC::Sub;
-use Class::Struct P6C::IMCC::Sub
-    => { code => '$',		# function body (w/o decls and initialization)
-	 scopes => '@',		# scope stack
+use Class::Struct 'P6C::IMCC::Sub'
+    => { scopes => '@',		# scope stack
 	 args => '@'		# arguments, in order passed
        };
 #	{scopelevel}		# current scope number

@@ -1,5 +1,8 @@
 package P6C::TestCompiler;
 
+my $PARROT = '../..';
+my $PERL = $ENV{PERL} || 'perl';
+
 sub import {
     my $pkg = caller;
     for (qw(output_is)) {
@@ -32,9 +35,9 @@ sub output_is {
 	ok(0, "$desc: parse: $!");
 	return;
     }
-    (mysystem("../languages/imcc/imcc a.imc a.pasm 2>/dev/null", $desc)
-     && mysystem("perl ../assemble.pl a.pasm > a.pbc", $desc)
-     && mysystem("../parrot a.pbc > a.output", $desc))
+    (mysystem("$PARROT/languages/imcc/imcc a.imc a.pasm 2>/dev/null", $desc)
+     && mysystem("$PERL $PARROT/assemble.pl a.pasm > a.pbc", $desc)
+     && mysystem("$PARROT/parrot a.pbc > a.output", $desc))
 	or return 0;
     open(I, 'a.output');
     my $result = join '', <I>;
