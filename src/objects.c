@@ -566,6 +566,11 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
     INTVAL current_size;
     INTVAL already_in = 0;
 
+    if (!PObj_is_class_TEST(current_class_obj))
+        internal_exception(1, "Class isn't a ParrotClass");
+    if (!PObj_is_class_TEST(add_on_class_obj))
+        internal_exception(1, "Parent isn't a ParrotClass");
+
     /* Grab the useful stuff from the guts of the class PMC */
     current_class = PMC_data(current_class_obj);
 
@@ -1049,20 +1054,19 @@ PMC *
 Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
 {
     SLOTTYPE *attrib_array;
-    if (PObj_is_object_TEST(object)) {
-        INTVAL attrib_count;
-        attrib_array = PMC_data(object);
-        attrib_count = ATTRIB_COUNT(object);
-        if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
-            internal_exception(OUT_OF_BOUNDS, "No such attribute");
-        }
-        return get_attrib_num(attrib_array, attrib);
+    INTVAL attrib_count;
+
+    /*
+     * this is called from ParrotObject's vtable now, so
+     * their is no need for checking object being a valid
+     * object PMC
+     */
+    attrib_array = PMC_data(object);
+    attrib_count = ATTRIB_COUNT(object);
+    if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
+        internal_exception(OUT_OF_BOUNDS, "No such attribute");
     }
-    else {
-        internal_exception(INTERNAL_NOT_IMPLEMENTED,
-                "Can't get non-core object attribs yet");
-    }
-    return NULL;
+    return get_attrib_num(attrib_array, attrib);
 }
 
 static INTVAL
@@ -1120,19 +1124,14 @@ Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object,
         INTVAL attrib, PMC *value)
 {
     SLOTTYPE *attrib_array;
-    if (PObj_is_object_TEST(object)) {
-        INTVAL attrib_count;
-        attrib_array = PMC_data(object);
-        attrib_count = ATTRIB_COUNT(object);
-        if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
-            internal_exception(OUT_OF_BOUNDS, "No such attribute");
-        }
-        set_attrib_num(attrib_array, attrib, value);
+    INTVAL attrib_count;
+
+    attrib_array = PMC_data(object);
+    attrib_count = ATTRIB_COUNT(object);
+    if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
+        internal_exception(OUT_OF_BOUNDS, "No such attribute");
     }
-    else {
-        internal_exception(INTERNAL_NOT_IMPLEMENTED,
-                "Can't set non-core object attribs yet");
-    }
+    set_attrib_num(attrib_array, attrib, value);
 }
 
 void
@@ -1153,6 +1152,8 @@ Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
     INTVAL offset;
     HashBucket *b;
 
+    if (!PObj_is_object_TEST(object))
+        internal_exception(1, "Not an object");
     class_pmc = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
     offset_hash = get_attrib_num((SLOTTYPE *)PMC_data(class_pmc),
                                  PCD_ATTRIB_OFFS);

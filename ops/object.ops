@@ -291,6 +291,9 @@ Get the class name for the class in $2 and put it in $1.
 inline op classname(out STR, in PMC) :object_base {
   PMC* classname_pmc;
 
+  if (!(PObj_get_FLAGS($2) & (PObj_is_class_FLAG|PObj_is_object_FLAG))) {
+      internal_exception(NO_CLASS, "PMC is neither class nor object");
+  }
   classname_pmc = get_attrib_num((Buffer *)PMC_data($2), PCD_CLASS_NAME);
   if (classname_pmc) {
       $1 = VTABLE_get_string(interpreter, classname_pmc);
