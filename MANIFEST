@@ -21,6 +21,7 @@ VERSION                                           [main]doc
 build_tools/build_nativecall.pl                   []
 build_tools/fingerprint_c.pl                      []
 build_tools/jit2h.pl                              []
+build_tools/list_unjitted.pl			  []
 build_tools/ops2c.pl                              [devel]
 build_tools/ops2pm.pl                             [devel]
 build_tools/pbc2c.pl                              [devel]
