@@ -21,6 +21,7 @@ my %builtin_ops = (
 );
 
 my %builtins = (
+    AssertionError => 1,
     callable => 1,
     chr => 1,
     dict => 'v',
@@ -28,6 +29,7 @@ my %builtins = (
     enumerate => 1,
     filter => 1,
     list => 'v',
+    long => 'v',
     map => 1,
     max => 'v',
     min => 'v',
@@ -129,7 +131,7 @@ sub get_source {
 }
 
 my ($code_l, %params, %lexicals, %names, %def_args, %arg_count,
-    @code, %globals, %classes, @loops);
+    @code, %globals, %classes, @loops, %def_arg_names);
 
 sub decode_line {
     my $l = shift;
@@ -158,6 +160,13 @@ sub decode_line {
 		my @args = split(/,/, $args);
 		my $n = @args;
 		$arg_count{$f} = $n;
+		for (my $i = 0; $i < $n; $i++) {
+		    my ($a, $def) = split(/=/, $args[$i]);
+		    $a =~ s/\s//g;
+		    $a = "'$a'";   # quote argument
+		    $def_arg_names{$f}{$a} = $i;
+		    # print STDERR "def $f($a = $i)\n";
+		}
 		push @code, [$line, $pc, "ARG_count", $n, $f, $source];
 	    }
 	}
@@ -221,11 +230,12 @@ EOC
 }
 
 sub ARG_count {
-    my ($n, $c) = @_;
+    my ($n, $c, $cmt) = @_;
     print <<EOC;
-	# $c($n)
+	# $c($n) $cmt
 EOC
 }
+
 my (@stack, $temp, $make_f, %pir_functions);
 
 sub gen_code {
@@ -827,17 +837,34 @@ EOC
 	return;
     }
     # arguments = $n & 0xff
-    # named args: = $n >> 8 *2 TODO
-    $n =  ($n & 0xff) + 2*($n >> 8);	# XXX ???
-    for (my $i = 0; $i < $n; $i++) {
+    # named args: = ($n >> 8) *2
+    my $nfix =  ($n & 0xff);
+    for (my $i = 0; $i < $nfix; $i++) {
 	my $arg = pop @stack;
 	unshift @args, promote($arg);
     }
+    my $nk =  2*($n >> 8);
+    my ($i, $j, $arg_name);
+    my $name = $stack[-1 - $nk]->[0];
+    my $pushed_args = scalar @args;
+    #
+    # that's wrong, works only for all or none named arguments
+    #
+    for ($i = 0; $i < $nk; $i+=2,) {
+	my $val = pop @stack;
+	my $arg = pop @stack;
+	my $arg_name = $arg->[1];
+	$val = $val;
+	$j = $def_arg_names{$name}{$arg_name};
+	print <<EOC;
+	# func $name named arg $j name $arg_name val $val->[1]
+EOC
+	$args[$pushed_args + $j] = promote($val);
+    $n = $nfix + $nk/2;}
     my $tos = pop @stack;
     my $args = join ', ', @args;
     my $t;
     my $func = $tos->[1];
-    my $name = $tos->[0];
     if ($builtins{$name} && $builtins{$name} eq 'v') {
 	my $ar = temp('P');
 	print <<"EOC";
@@ -994,6 +1021,10 @@ sub RAISE_VARARGS
     my $throw;
     if ($n == 0) {
 	$throw = 'rethrow P5';
+    }
+    elsif ($n == 1) {
+	my $x = (pop @stack)->[1];
+	$throw = "throw $x $cmt";
     }
     else {
 	$throw = 'throw P5 # TODO create, args';

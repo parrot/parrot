@@ -690,6 +690,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
 
                             /* STRINGS */
                         case 's':
+                        case 'r':        /* Python repr??? */
                           CASE_s:
                             string = obj->getstring
                                 (interpreter, info.type, obj);

@@ -348,20 +348,30 @@ Divides the string by C<*value> and returns the result in C<*dest>.
 Calculates the string C<mod> C<*value> and returns the result in
 C<*dest>.
 
+When Python mode is enabled does sprintf :(
+
 =cut
 
 */
 
     void modulus (PMC* value, PMC* dest) {
-        if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
+        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
+            /*
+             * SELF is formatstring, value = argument array
+             */
+            VTABLE_set_string_native(INTERP, dest,
+                    Parrot_psprintf(INTERP, PMC_str_val(SELF), value));
+            return;
+        }
+        if (value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             VTABLE_set_integer_native(INTERP, dest,
-                VTABLE_get_integer(INTERP, SELF) %
-                PMC_int_val(value)
-            );
+                    VTABLE_get_integer(INTERP, SELF) %
+                    PMC_int_val(value)
+                    );
         }
         else {
-        internal_exception(INVALID_OPERATION,
-            "modulus() not implemented for PerlString\n");
+            internal_exception(INVALID_OPERATION,
+                    "modulus() not implemented for PerlString\n");
         }
     }
 

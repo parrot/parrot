@@ -149,6 +149,35 @@ parrot_py_list(Interp *interpreter, PMC *argv)
     return list;
 }
 
+static PMC *
+parrot_py_long(Interp *interpreter, PMC *argv)
+{
+    PMC *arg;
+    PMC *val;
+    PMC *radix, *res;
+    INTVAL i, base;
+    STRING *num;
+    if ((i = VTABLE_elements(interpreter, argv)) == 0)
+        return pmc_new(interpreter, enum_class_PerlInt);
+    val = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
+    if (i == 2) {
+        radix  = VTABLE_get_pmc_keyed_int(interpreter, argv, 1);
+        base = VTABLE_get_integer(interpreter, radix);
+        /* val must be a STRING */
+    }
+    else
+        base = 10;
+    res = pmc_new(interpreter, enum_class_BigInt);
+    num = VTABLE_get_string(interpreter, val);
+    if (val->vtable->base_type == enum_class_BigInt) {
+        /* then L is appened - chop that */
+        string_chopn(interpreter, num, 1);
+    }
+    VTABLE_set_string_keyed_int(interpreter, res, base, num);
+    return res;
+
+}
+
 #define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
 static PMC *
 parrot_py_max(Interp *interpreter, PMC *argv)
@@ -467,6 +496,18 @@ parrot_py_tuple(Interp *interpreter, PMC *pmc)
     return NULL;
 }
 
+static PMC *
+parrot_py_assert_e(Interp *interpreter, PMC *pmc)
+{
+    PMC *ex = interpreter->exception_list[E_AssertionError];
+    /*
+     * these are "static" - should we dup the exception?
+     */
+    VTABLE_set_string_keyed_int(interpreter, ex, 0,
+            VTABLE_get_string(interpreter, pmc));
+    return ex;
+}
+
 static void
 parrot_py_global(Interp *interpreter, void *func,
         STRING *name, STRING *sig)
@@ -492,6 +533,7 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *pipp   =   CONST_STRING(interpreter, "PIPP");
     STRING *pippp   =  CONST_STRING(interpreter, "PIPPP");
 
+    STRING *assert_e = CONST_STRING(interpreter, "AssertionError");
     STRING *callable = CONST_STRING(interpreter, "callable");
     STRING *chr      = CONST_STRING(interpreter, "chr");
     STRING *dict     = CONST_STRING(interpreter, "dict");
@@ -499,6 +541,7 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *filter   = CONST_STRING(interpreter, "filter");
     STRING *hash     = CONST_STRING(interpreter, "hash");
     STRING *list     = CONST_STRING(interpreter, "list");
+    STRING *longf    = CONST_STRING(interpreter, "long");
     STRING *map      = CONST_STRING(interpreter, "map");
     STRING *max      = CONST_STRING(interpreter, "max");
     STRING *min      = CONST_STRING(interpreter, "min");
@@ -506,6 +549,7 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *reduce   = CONST_STRING(interpreter, "reduce");
     STRING *tuple    = CONST_STRING(interpreter, "tuple");
 
+    parrot_py_global(interpreter, F2DPTR(parrot_py_assert_e), assert_e, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_chr), chr, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_dict), dict, pip);
@@ -513,6 +557,7 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_long), longf, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_max), max, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_min), min, pip);

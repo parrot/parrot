@@ -53,8 +53,8 @@ bigint_set_double(Interp *interpreter, PMC *self, double value) {
 }
 
 static void
-bigint_set_str(Interp *interpreter, PMC *self, char* value) {
-    mpz_set_str(BN(self), value, 10);
+bigint_set_str(Interp *interpreter, PMC *self, char* value, int base) {
+    mpz_set_str(BN(self), value, base);
 }
 
 static BIGNUM*
@@ -177,7 +177,7 @@ bigint_set_double(Interp *interpreter, PMC *self, double value) {
     internal_exception(1, "no bigint lib loaded");
 }
 static void
-bigint_set_str(Interp *interpreter, PMC *self, char* value) {
+bigint_set_str(Interp *interpreter, PMC *self, char* value, int base) {
     internal_exception(1, "no bigint lib loaded");
 }
 static void
@@ -312,16 +312,25 @@ Sets the value of the bigint to C<value>.
 Sets the value of the integer to the result of converting C<*value> to a
 number.
 
+=item C<void set_string_keyed_int(INTVAL base, STRING* value)>
+
+Same assume number base C<base>.
+
 =cut
 
 */
 
     void set_string_native(STRING* value) {
         char *s = string_to_cstring(INTERP, value);
-        bigint_set_str(INTERP, SELF, s);
+        bigint_set_str(INTERP, SELF, s, 10);
         string_cstring_free(s);
     }
 
+    void set_string_keyed_int(INTVAL base, STRING* value) {
+        char *s = string_to_cstring(INTERP, value);
+        bigint_set_str(INTERP, SELF, s, base);
+        string_cstring_free(s);
+    }
 /*
 
 =item C<void set_pmc(PMC *value)>

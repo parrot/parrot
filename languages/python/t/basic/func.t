@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 31;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -267,5 +267,17 @@ if __name__ == '__main__':
 	print min([1,2])
 	print min([1,2,3,4,5])
 	print min("bcaBCA")
+CODE
+
+test(<<'CODE', 'named arguments 1');
+def f(i=0, j=1):
+	print i, j
+
+if __name__ == '__main__':
+	f(j=4, i=20)
+	f(i=4, j=20)
+	f()
+	#f(j=4)
+	#f(17, j=4)
 CODE
 
