@@ -54,6 +54,7 @@ static void quicksort(Interp* interpreter, List *list, PMC *cmpsub,
                 REG_INT(3) = 2;
                 REG_PMC(5) = temp;
                 REG_PMC(6) = pivot;
+                REG_STR(0) = VTABLE_name(interpreter, cmpsub);
                 bp = Parrot_PyClass_runops_fromc(interpreter, cmpsub);
                 cmp = VTABLE_get_integer(interpreter, BP_REG_PMC(bp,5));
             }

@@ -42,6 +42,11 @@ Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 
     bp_save = interpreter->ctx.bp;
 
+    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+        PIO_eprintf(interpreter, "# Invoking %Ss on %Ss\n",
+           REG_STR(0), REG_PMC(2)->vtable->whoami); 
+    }
+
     dest = VTABLE_invoke(interpreter, sub, NULL);
 
     bp_new = interpreter->ctx.bp;

@@ -103,6 +103,11 @@ Invoke the real method
         INTERP->ctx.current_object = REG_PMC(2) =  REG_PMC(5) = 
             VTABLE_getprop(INTERP, proxy, PROXY);
 
+        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+            PIO_eprintf(interpreter, "# Invoking %Ss on %Ss via proxy\n",
+               REG_STR(0), REG_PMC(2)->vtable->whoami); 
+        }
+
         return VTABLE_invoke(INTERP, (PMC*)PMC_struct_val(SELF), next);
     }
 

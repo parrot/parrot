@@ -138,7 +138,8 @@ initializers with arguments to be run.
             struct Parrot_Context ctx;
             save_context(interpreter, &ctx);
             INTERP->ctx.current_object = SELF;
-            REG_PMC(5) = SELF;
+            REG_PMC(2) = REG_PMC(5) = SELF;
+            REG_STR(0) = NEW;
             bp = Parrot_PyClass_runops_fromc(INTERP, new);
             object = BP_REG_PMC(bp,5);
             restore_context(interpreter, &ctx);
@@ -159,7 +160,8 @@ initializers with arguments to be run.
             struct Parrot_Context ctx;
             save_context(interpreter, &ctx);
             INTERP->ctx.current_object = proxy;
-            REG_PMC(5) = proxy;
+            REG_PMC(2) = REG_PMC(5) = proxy;
+            REG_STR(0) = INIT;
             Parrot_PyClass_runops_fromc(INTERP, init);
             restore_context(interpreter, &ctx);
         }

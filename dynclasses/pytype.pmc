@@ -88,7 +88,15 @@ Looks up the method for C<*method_name> and returns it.
         PMC *parent;
 
         PMC *method = VTABLE_getprop(INTERP, SELF, method_name);
-        if (method && VTABLE_defined(INTERP, method)) return method;
+        if (method && VTABLE_defined(INTERP, method)) {
+            if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+                PIO_eprintf(interpreter, "# Found %Ss method %Ss on %Ss\n",
+                   method->vtable->whoami, method_name, 
+                   VTABLE_name(INTERP, SELF));
+            }
+
+            return method;
+        }
 
         parent = VTABLE_getprop(INTERP, SELF, BASES);
         if (parent && VTABLE_defined(INTERP, parent)) {
@@ -157,7 +165,8 @@ Pythonic object constructor.
             struct Parrot_Context ctx;
             save_context(interpreter, &ctx);
             INTERP->ctx.current_object = SELF;
-            REG_PMC(5) = SELF;
+            REG_PMC(2) = REG_PMC(5) = SELF;
+            REG_STR(0) = NEW;
             bp = Parrot_PyClass_runops_fromc(INTERP, new);
             object = BP_REG_PMC(bp,5);
             restore_context(interpreter, &ctx);
@@ -172,7 +181,8 @@ Pythonic object constructor.
             struct Parrot_Context ctx;
             save_context(interpreter, &ctx);
             INTERP->ctx.current_object = object;
-            REG_PMC(5) = object;
+            REG_PMC(2) = REG_PMC(5) = object;
+            REG_STR(0) = INIT;
             Parrot_PyClass_runops_fromc(INTERP, init);
             restore_context(interpreter, &ctx);
         }
