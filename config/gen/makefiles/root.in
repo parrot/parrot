@@ -9,10 +9,9 @@ INCLUDEDIR = $(EXEC_PREFIX)/include
 
 # imcc dir
 IMCC_DIR = languages${slash}imcc
-IMCC_DIR_SL = $(IMCC_DIR)${slash}
 
 # file containing main
-PARROT_MAIN = $(IMCC_DIR_SL)main
+PARROT_MAIN = $(IMCC_DIR)/main
 
 
 # programs and utils used for build
@@ -110,33 +109,33 @@ FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES) $(INC
 
 # these are private to the imcc subsystem
 IMCC_H_FILES = \
-	$(IMCC_DIR_SL)imc.h 	\
-	$(IMCC_DIR_SL)stacks.h 	\
-	$(IMCC_DIR_SL)cfg.h 	\
-	$(IMCC_DIR_SL)instructions.h 	\
-	$(IMCC_DIR_SL)debug.h 	\
-	$(IMCC_DIR_SL)sets.h 	\
-	$(IMCC_DIR_SL)symreg.h 	\
-	$(IMCC_DIR_SL)pbc.h 	\
-	$(IMCC_DIR_SL)optimizer.h 	\
-	$(IMCC_DIR_SL)parser.h 	\
-	$(IMCC_DIR_SL)imcparser.h
+	$(IMCC_DIR)/imc.h 	\
+	$(IMCC_DIR)/stacks.h 	\
+	$(IMCC_DIR)/cfg.h 	\
+	$(IMCC_DIR)/instructions.h 	\
+	$(IMCC_DIR)/debug.h 	\
+	$(IMCC_DIR)/sets.h 	\
+	$(IMCC_DIR)/symreg.h 	\
+	$(IMCC_DIR)/pbc.h 	\
+	$(IMCC_DIR)/optimizer.h 	\
+	$(IMCC_DIR)/parser.h 	\
+	$(IMCC_DIR)/imcparser.h
 
 IMCC_O_FILES = \
-	$(IMCC_DIR_SL)imcparser$(O) 	\
-	$(IMCC_DIR_SL)imclexer$(O) 	\
-	$(IMCC_DIR_SL)imc$(O) 	\
-	$(IMCC_DIR_SL)stacks$(O) 	\
-	$(IMCC_DIR_SL)symreg$(O) 	\
-	$(IMCC_DIR_SL)instructions$(O) 	\
-	$(IMCC_DIR_SL)cfg$(O) 	\
-	$(IMCC_DIR_SL)sets$(O) 	\
-	$(IMCC_DIR_SL)debug$(O) 	\
-	$(IMCC_DIR_SL)optimizer$(O) 	\
-	$(IMCC_DIR_SL)pbc$(O) 	\
-	$(IMCC_DIR_SL)parser_util$(O)	\
-	$(IMCC_DIR_SL)jit$(O) 	\
-	$(IMCC_DIR_SL)pcc$(O)
+	$(IMCC_DIR)/imcparser$(O) 	\
+	$(IMCC_DIR)/imclexer$(O) 	\
+	$(IMCC_DIR)/imc$(O) 	\
+	$(IMCC_DIR)/stacks$(O) 	\
+	$(IMCC_DIR)/symreg$(O) 	\
+	$(IMCC_DIR)/instructions$(O) 	\
+	$(IMCC_DIR)/cfg$(O) 	\
+	$(IMCC_DIR)/sets$(O) 	\
+	$(IMCC_DIR)/debug$(O) 	\
+	$(IMCC_DIR)/optimizer$(O) 	\
+	$(IMCC_DIR)/pbc$(O) 	\
+	$(IMCC_DIR)/parser_util$(O)	\
+	$(IMCC_DIR)/jit$(O) 	\
+	$(IMCC_DIR)/pcc$(O)
 
 GENERAL_H_FILES = $(NONGEN_HEADERS) $(GEN_HEADERS) ${cg_h}
 
@@ -595,17 +594,17 @@ exec_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h jit/${jitcpuarch}/core.ji
 # Note that YACC or LEX may be null commands, so we must `touch` all the
 # target files, instead of just the .flag files.
 
-$(IMCC_DIR_SL)imcc.y.flag $(IMCC_DIR_SL)imcparser.c $(IMCC_DIR_SL)imcparser.h: $(IMCC_DIR_SL)imcc.y
-	$(YACC) $(IMCC_DIR_SL)imcc.y -d -o $(IMCC_DIR_SL)imcparser.c
-	$(TOUCH) $(IMCC_DIR_SL)imcc.y.flag $(IMCC_DIR_SL)imcparser.c $(IMCC_DIR_SL)imcparser.h
+$(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h: $(IMCC_DIR)/imcc.y
+	$(YACC) $(IMCC_DIR)/imcc.y -d -o $(IMCC_DIR)/imcparser.c
+	$(TOUCH) $(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h
 
-$(IMCC_DIR_SL)imcc.l.flag $(IMCC_DIR_SL)imclexer.c: $(IMCC_DIR_SL)imcc.l
-	$(LEX) -o$(IMCC_DIR_SL)imclexer.c $(IMCC_DIR_SL)imcc.l
-	$(TOUCH) $(IMCC_DIR_SL)imcc.l.flag $(IMCC_DIR_SL)imclexer.c
+$(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c: $(IMCC_DIR)/imcc.l
+	$(LEX) -o$(IMCC_DIR)/imclexer.c $(IMCC_DIR)/imcc.l
+	$(TOUCH) $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c
 
 $(IMCC_O_FILES) : $(IMCC_H_FILES) $(ALL_H_FILES)
 
-$(IMCC_DIR_SL)%${o} : $(IMCC_DIR_SL)%.c
+$(IMCC_DIR)/%${o} : $(IMCC_DIR)/%.c
 	$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) -I$(IMCC_DIR) $(CFLAGS) ${cc_o_out}$@ -c $<
 
 ################ docs, test and maintainer targets
