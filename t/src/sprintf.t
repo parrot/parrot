@@ -65,7 +65,7 @@ int do_test(struct Parrot_Interp* interpreter) {
     printf("%u %s", (unsigned) uval, string_to_cstring(interpreter, S));
 
     fval = 0.5;
-    S = Parrot_sprintf_c(interpreter, "== %f\n", fval);
+    S = Parrot_sprintf_c(interpreter, "== %vf\n", fval);
     printf("%f %s", fval, string_to_cstring(interpreter, S));
 
     dval = 0.5;
@@ -81,25 +81,25 @@ int do_test(struct Parrot_Interp* interpreter) {
     printf("%g %s", dval, string_to_cstring(interpreter, S));
 
     fltval = 0.5;
-    S = Parrot_sprintf_c(interpreter, "== %3.3g\n", fltval);
+    S = Parrot_sprintf_c(interpreter, "== %3.3vg\n", fltval);
     printf("%3.3g %s", (double) fltval, string_to_cstring(interpreter, S));
 
     ival = 32;
-    S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %#vx\n", ival);
     printf("0x%x %s", (int) ival, string_to_cstring(interpreter, S));
 
     /* test several flags */
         ival = 25;
-    S = Parrot_sprintf_c(interpreter, "== % 5d\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== % 5vd\n", ival);
     printf("% 5d %s", (int) ival,
            string_to_cstring(interpreter, S));
-    S = Parrot_sprintf_c(interpreter, "== %-5d|\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %-5vd|\n", ival);
     printf("%-5d %s", (int) ival,
            string_to_cstring(interpreter, S));
-    S = Parrot_sprintf_c(interpreter, "== %05d\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %05vd\n", ival);
     printf("%05d %s", (int) ival,
            string_to_cstring(interpreter, S));
-    S = Parrot_sprintf_c(interpreter, "== %2d\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %2vd\n", ival);
     printf("%2d %s", (int) ival,
            string_to_cstring(interpreter, S));
 
@@ -167,7 +167,7 @@ int main ()
     Parrot_init(interp, (void*) &i);
 
     for (i=0; i<10000; i++) {
-         PIO_printf(interp, "%x", i);
+         PIO_printf(interp, "%vx", i);
     }
 
     PIO_printf(interp, "\nok\n");
