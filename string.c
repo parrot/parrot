@@ -359,7 +359,8 @@ string_transcode(struct Parrot_Interp *interpreter,
 INTVAL
 string_compute_strlen(STRING *s)
 {
-    s->strlen = s->encoding->characters(s->bufstart, s->bufused) - ((UINTVAL)s->strstart - (UINTVAL)s->bufstart);
+    s->strlen = s->encoding->characters(s->bufstart, s->bufused) - 
+        ((UINTVAL)s->strstart - (UINTVAL)s->bufstart);
     return s->strlen;
 }
 
@@ -933,7 +934,7 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 
     unmake_COW(interpreter, s);
 
-	if (s->buflen == s->bufused) {
+    if (s->buflen == s->bufused) {
         string_grow(interpreter, s, 1);
     }
 
