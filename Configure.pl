@@ -141,7 +141,7 @@ END
 
 	$text =~ s/#DUMPER OUTPUT HERE/$dd->Dump()/eg;
 
-	mkdir("Parrot") or ( $! =~ /File exists/i or die "Can't make directory ./Parrot: $!");
+	mkdir("Parrot", 0777) or ( $! =~ /File exists/i or die "Can't make directory ./Parrot: $!");
 	open(OUT, ">Parrot/Config.pm") or die "Can't open file Parrot/Config.pm: $!";
 	print OUT $text;
 	close(OUT) or die "Can't close file Parrot/Config.pm: $!";
