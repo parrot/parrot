@@ -512,20 +512,12 @@ ppc_sync_cache (void *_start, void *_end)
     
     for (_sync = start; _sync < end; _sync += CACHELINESIZE) {
         __asm__ __volatile__ (
-/* for 601, do nothing: */
-        "
-        dcbst 0,%0
-        sync
-        dcbf 0,%0
-        sync
-        icbi 0,%0
-        sync
-        isync
-        "
+        "dcbf 0,%0"
         :
         : "r" ((long)_sync)
         );  
     }
+    __asm__ __volatile__ ("sync");
 }
 
 #endif
