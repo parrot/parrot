@@ -732,9 +732,11 @@ sub output_bytecode {
     
     my %const_table = constant_table($self);
 
+    my $byteorder = (substr($PConfig{'byteorder'},0,1) == 1) ? 0 : 1;
+
     my $packfile_header = {
         wordsize    => $wordsize, # unsigned char wordsize
-        byteorder   => 0x00, # unsigned char byteorder
+        byteorder   => $byteorder, # unsigned char byteorder
         major       => 0x00, # unsigned char major
         minor       => 0x00, # unsigned char minor
 
