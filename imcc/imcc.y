@@ -249,6 +249,9 @@ itcall_sub(SymReg* sub)
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
 %token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
+%token <t> PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN
+%token <t> BAND_ASSIGN BOR_ASSIGN BXOR_ASSIGN
+%token <t> SHR_ASSIGN SHL_ASSIGN SHR_U_ASSIGN
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV OBJECTV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <t> GLOBAL GLOBALOP ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
@@ -271,7 +274,7 @@ itcall_sub(SymReg* sub)
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub
 %type <t> pcc_proto pcc_sub_proto proto
-%type <i> instruction assignment if_statement labeled_inst opt_label
+%type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> opt_invocant
 %type <sr> target reg const var string
 %type <sr> key keylist _keylist
@@ -867,6 +870,30 @@ assignment:
            itcall_sub($6);
            current_call = NULL;
          }
+   | op_assign
+   ;
+
+op_assign:
+     target PLUS_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "add", 2, $1, $3); }
+   | target MINUS_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "sub", 2, $1, $3); }
+   | target MUL_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "mul", 2, $1, $3); }
+   | target DIV_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "div", 2, $1, $3); }
+   | target BAND_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "band", 2, $1, $3); }
+   | target BOR_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "bor", 2, $1, $3); }
+   | target BXOR_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "bxor", 2, $1, $3); }
+   | target SHR_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "shr", 2, $1, $3); }
+   | target SHL_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "shl", 2, $1, $3); }
+   | target SHR_U_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "lsr", 2, $1, $3); }
    ;
 
 the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }

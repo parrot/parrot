@@ -255,6 +255,16 @@ SP              [ ]
 "->"            return(POINTY);
 {WS}+"."{WS}+   return(CONCAT);
 "."             return(DOT);
+"+="            return(PLUS_ASSIGN);
+"-="            return(MINUS_ASSIGN);
+"*="            return(MUL_ASSIGN);
+"/="            return(DIV_ASSIGN);
+"&="            return(BAND_ASSIGN);
+"|="            return(BOR_ASSIGN);
+"~="            return(BXOR_ASSIGN);
+">>="           return(SHR_ASSIGN);
+"<<="           return(SHL_ASSIGN);
+">>>="          return(SHR_U_ASSIGN);
 
 <emit,INITIAL>".macro" {
         return read_macro(valp, interp);
