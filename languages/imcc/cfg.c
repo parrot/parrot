@@ -316,7 +316,7 @@ int blocks_are_connected(Basic_block *from, Basic_block *to)
 }
 
 
-void
+static void
 bb_add_edge(Parrot_Interp interpreter, Basic_block *from, Basic_block *to) {
 
     Edge *e;
@@ -519,7 +519,7 @@ free_life_info(Parrot_Interp interpreter, SymReg *r)
  * the var is alive.
  */
 
-void
+static void
 analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r) {
     Instruction* ins, *special;
     Life_range* l;
@@ -961,7 +961,7 @@ void clear_basic_blocks(Parrot_Interp interpreter) {
     free_loops(interpreter);
 }
 
-Basic_block*
+static Basic_block*
 make_basic_block(Parrot_Interp interpreter, Instruction* ins) {
     Basic_block *bb;
     int n;

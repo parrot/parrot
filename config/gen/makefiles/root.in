@@ -22,7 +22,7 @@ RANLIB = ${ranlib}
 LINK = ${link}
 LD = ${ld}
 LD_SHARED = ${ld_shared}
-TOUCH  = $(PERL) -e ${PQ}open(A,q{>>},$$_) or die foreach @ARGV${PQ}
+TOUCH  = $(PERL) -e ${PQ}open(A,q{>>$$_}) or die foreach @ARGV${PQ}
 YACC = ${yacc}
 LEX = ${lex}
 
