@@ -39,3 +39,9 @@ basic_opcodes$(O): $(H_FILES) basic_opcodes.c
 
 basic_opcodes.c: basic_opcodes.ops
 	perl process_opfunc.pl basic_opcodes.ops
+
+op.h: opcode_table
+	perl make_op_header.pl opcode_table > op.h
+
+clean:
+	rm -f *.o *.s interp_guts.h test_prog basic_opcodes.c
