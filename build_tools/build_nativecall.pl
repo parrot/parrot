@@ -243,6 +243,9 @@ build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
      return Parrot_jit_build_call_func(interpreter, pmc_nci, signature);
 
 #else
+	STRING *ns;
+	STRING *message;
+	char   *c;
     /* And in here is the platform-independent way. Which is to say
        "here there be hacks" */
     UNUSED(pmc_nci);
