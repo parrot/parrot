@@ -35,10 +35,9 @@ mops           = ops_per_sec / 1000000.0;
 print("Iterations:    $num_iter\n");
 print("Start time:    $start_time\n");
 print("End time:      $end_time\n");
+print("Elapsed time:  $elapsed_time\n");
 print("Count:         $loop_counter\n");
-print("Elapsed time:  $elapsed_time\n");
 print("Estimated ops: $num_ops\n");
-print("Elapsed time:  $elapsed_time\n");
 print("op/s:          $ops_per_sec\n");
 print("Mop/s:         $mops\n");
 
