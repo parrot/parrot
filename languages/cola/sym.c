@@ -252,19 +252,19 @@ AST * new_statement(int stmnttype, AST * left, AST * right) {
     return p;    
 }
 
-AST * new_expression(int exprtype, AST * left, AST * right) {
+AST * new_expr(int exprtype, AST * left, AST * right) {
     AST * p = new_ast(KIND_EXPRESSION, exprtype, left, right);
     return p;    
 }
 
 /* Specific type of expression (A b C) where b is an operator */
-AST * new_op_expression(AST * left, int op, AST * right) {
+AST * new_op_expr(AST * left, int op, AST * right) {
     AST * p = new_ast(KIND_EXPRESSION, ASTT_OP, left, right);
     p->op = op;
     return p;    
 }
 
-AST * new_logical_expression(AST * left, int op, AST * right) {
+AST * new_logical_expr(AST * left, int op, AST * right) {
     AST * p = new_ast(KIND_EXPRESSION, ASTT_LOGICAL, left, right);
     p->op = op;
     return p;    
@@ -341,7 +341,7 @@ Symbol * lookup_symbol_scope(SymbolTable * tab, const char * name, int scope_lev
 
 Symbol * store_symbol(SymbolTable * tab, Symbol * sym) {
     unsigned int index = hash_str(sym->name) % HASH_SIZE;
-#if 1
+#if 0
     printf("#store_symbol(%s)\n", sym->name);
     if(sym->table && sym->table == tab) {
         printf("Internal error, namespace->symbol table loop.\n");

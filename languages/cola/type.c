@@ -14,12 +14,41 @@
 #include "cola.h"
 #include "parser.h"
 
+Type        *t_object,
+            *t_void,
+            *t_string,
+            *t_bool,
+            *t_sbyte,
+            *t_byte,
+            *t_char,
+            *t_int32,
+            *t_uint32,
+            *t_int64,
+            *t_uint64,
+            *t_short,
+            *t_ushort,
+            *t_float,
+            *t_double,
+            *t_decimal;
+
 
 void init_builtin_types() {
-    t_void = store_type("void", 4);
-    t_string = store_type("string", 4);    
-    t_int = store_type("int", 4);
-    t_float = store_type("float", 4);
+    t_object    = store_type("object", 4);
+    t_void      = store_type("void", 4);
+    t_string    = store_type("string", 4);    
+    t_bool      = store_type("bool", 1);    
+    t_sbyte     = store_type("sbyte", 1);
+    t_byte      = store_type("byte", 1);
+    t_char      = store_type("char", 2);
+    t_int32     = store_type("int", 4);
+    t_uint32    = store_type("uint", 4);
+    t_int64     = store_type("long", 8);
+    t_uint64    = store_type("ulong", 8);
+    t_short     = store_type("short", 2);
+    t_ushort    = store_type("ushort", 2);
+    t_float     = store_type("float", 4);
+    t_double    = store_type("double", 8);
+    t_decimal   = store_type("decimal", 8);
 }
 
 /* size is bytes or elements, depending on if type is variable or array */

@@ -96,7 +96,7 @@ CHARCONSTANT    \'[^'\n]*\'
 
 {SIGN}?{DIGIT}+             {    
                                 Symbol * s = new_symbol(LITERAL, yytext);
-                                s->type = t_int;
+                                s->type = t_int32;
                                 yylval.sym = s; 
                                 return(LITERAL);
                             }

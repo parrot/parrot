@@ -11,7 +11,7 @@
 #ifndef _COLA_H
 #define _COLA_H
 
-#define COLA_VERSION "0.0.4.4"
+#define COLA_VERSION "0.0.4.5"
 
 
 void abort(void);
@@ -209,11 +209,22 @@ extern Symbol       *namespace_stack;
 extern Symbol       *current_namespace;
 extern int          scope;
 /* Pointers to the builtin type entries in the symbol table */
-extern Type         *t_void,
-                    *t_string,
-                    *t_int,
-                    *t_float,
-                    *t_method;
+extern Type *t_object,
+            *t_void,
+            *t_string,
+            *t_bool,
+            *t_sbyte,
+            *t_byte,
+            *t_char,
+            *t_int32,
+            *t_uint32,
+            *t_int64,
+            *t_uint64,
+            *t_short,
+            *t_ushort,
+            *t_float,
+            *t_double,
+            *t_decimal;
 
 void                assert(void * p);
 
@@ -272,9 +283,9 @@ Symbol              *check_id_decl(SymbolTable * table, const char * name);
 void                unshift_ast(AST ** list, AST * p);
 AST                 *new_ast(enum ASTKIND kind, int type, AST * left, AST * right);
 AST                 *new_statement(int type, AST * left, AST * right);
-AST                 *new_expression(int type, AST * left, AST * right);
-AST                 *new_op_expression(AST * left, int op, AST * right);
-AST                 *new_logical_expression(AST * left, int op, AST * right);
+AST                 *new_expr(int type, AST * left, AST * right);
+AST                 *new_op_expr(AST * left, int op, AST * right);
+AST                 *new_logical_expr(AST * left, int op, AST * right);
 AST                 *new_if(AST * condition, AST * then_part, AST * else_part);
 AST                 *new_while(AST * condition, AST * block);
 AST                 *new_for(AST * init, AST * condition, AST * increment, AST * block);

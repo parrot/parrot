@@ -24,10 +24,6 @@ int         indent;
 AST         *ast_start = NULL;
 
 /* Pointers to the builtin type entries in the symbol table */
-Type        *t_void,
-            *t_string,
-            *t_int,
-            *t_float;
 
 %}
 
@@ -71,19 +67,18 @@ Type        *t_void,
 %type <ast> local_var_decl
 %type <ast> method_header method_body
 %type <ast> block labeled_statement embedded_statement
-%type <ast> expression_statement selection_statement if_statement
+%type <ast> expr_statement selection_statement if_statement
 %type <ast> iteration_statement while_statement for_statement
-%type <ast> qualified_identifier_expr
-%type <ast> expression_list expression statement_expression assignment
-%type <ast> primary_expression boolean_expression equality_expression element_access
-%type <ast> paren_expression primary_expression_no_paren element_access
+%type <ast> expr_list expr statement_expr assignment
+%type <ast> primary_expr boolean_expr equality_expr element_access
+%type <ast> element_access
 %type <ast> post_inc_expr post_dec_expr pre_inc_expr pre_dec_expr
-%type <ast> postfix_expression new_expression new_object_expression
-%type <ast> conditional_expression conditional_or_expression
-%type <ast> conditional_and_expression inclusive_or_expression and_expression
-%type <ast> shift_expression exclusive_or_expression relational_expression
-%type <ast> unary_expression unary_expression_not_plusminus add_expression mult_expression
-%type <ast> equality_expression relational_expression
+%type <ast> new_expr new_object_expr
+%type <ast> conditional_expr conditional_or_expr
+%type <ast> conditional_and_expr inclusive_or_expr and_expr
+%type <ast> shift_expr exclusive_or_expr relational_expr
+%type <ast> unary_expr add_expr mult_expr
+%type <ast> equality_expr relational_expr
 %type <ast> call arg arg_list member_access
 %type <ival> relational_op
 %type <p> rank_specifiers
@@ -162,7 +157,7 @@ qualified_identifier:
     IDENTIFIER
         {
             $$ = $1;
-            fprintf(stderr, "qualified_identifier -> IDENTIFIER(%s)\n", NAME($1));
+            fprintf(stderr, "qualified_identifier <- IDENTIFIER(%s)\n", NAME($1));
         }
     |   qualified_identifier '.' IDENTIFIER
         {
@@ -172,23 +167,6 @@ qualified_identifier:
         }
     ;
 
-qualified_identifier_expr:
-    qualified_identifier
-        {
-            Symbol * orig;
-            orig = check_id_decl(current_symbol_table, $1->name);
-            if(orig == NULL)
-                orig = check_id_decl(global_symbol_table, $1->name);
-            if(orig == NULL) {
-                printf("error (line %ld): undeclared identifier %s.\n", line, $1->name);
-                exit(0);
-            }
-
-            $$ = new_expression(ASTT_IDENTIFIER, NULL, NULL);
-            $$->sym = orig;
-        }
-    ;
-      
 namespace_body:
     '{' using_directives namespace_member_decls '}'
         {
@@ -250,7 +228,7 @@ class_scope_start:
                 printf("Error, redefinition of type [%s]\n", $2->name);
                 exit(0);
             }
-            printf("class_scope_start\n");
+            fprintf(stderr, "\nclass_scope_start <- CLASS IDENTIFIER (%s)\n", $2->name);
             c = new_class($2);
             push_namespace(c);
             push_scope();
@@ -304,24 +282,26 @@ block_scope:
 embedded_statement:
     block
         {$$ = $1;}
-    |   expression_statement
-        { $$ = $1; }
+    |   expr_statement
+        { fprintf(stderr, "##End of expr_statement\n\n"); $$ = $1; }
     |   selection_statement
-        { $$ = $1;}
+        { fprintf(stderr, "##End of selection_statement\n\n"); $$ = $1; }
     |   iteration_statement
-        { $$ = $1;}
+        { fprintf(stderr, "##End of iteration_statement\n\n"); $$ = $1; }
     |   jump_statement
-        { $$ = $1;}
+        { fprintf(stderr, "##End of jump_statement\n\n"); $$ = $1; }
     |   return_statement
-        { $$ = $1; }
+        { fprintf(stderr, "##End of return_statement\n\n"); $$ = $1; }
     |   asm_block
         { $$ = $1; }
     ;
 
 statement:
     embedded_statement
-    |    decl_statement
-    |    labeled_statement
+    |   decl_statement
+        { fprintf(stderr, "##End of decl_statement\n\n"); $$ = $1; }
+    |   labeled_statement
+        { fprintf(stderr, "##End of labeled_statement\n\n"); $$ = $1; }
     ;
 
 statement_list:
@@ -341,18 +321,9 @@ labeled_statement:
         { $$ = $3; $$->sym = $1; }
     ;
 
-expression_statement:
-    statement_expression ';'
+expr_statement:
+    statement_expr ';'
         { $$ = $1; }
-    ;
-
-statement_expression:
-    call
-    |   assignment
-    |   post_inc_expr
-    |   post_dec_expr
-    |   pre_inc_expr
-    |   pre_dec_expr
     ;
 
 jump_statement:
@@ -369,7 +340,7 @@ jump_statement:
     ;
 
 return_statement:
-    RETURN expression ';'
+    RETURN expr ';'
         {    $$ = new_statement(ASTT_RETURN, $2, NULL); }
     |   RETURN ';'
         {    $$ = new_statement(ASTT_RETURN, NULL, NULL); }
@@ -378,32 +349,6 @@ return_statement:
 asm_block:
     ASM '(' LITERAL ')' ';'
     { $$ = NULL; }
-    ;
-
-call:
-    primary_expression_no_paren '(' arg_list ')'
-        {
-            $$ = new_expression(ASTT_CALL, $1, $3);
-            fprintf(stderr, "call -> primary_expression\n");
-        }
-    |   qualified_identifier '(' arg_list ')'
-        {
-            Symbol * orig;
-            AST * id;
-            orig = check_id_decl(current_symbol_table, $1->name);
-            if(orig == NULL)
-                orig = check_id_decl(global_symbol_table, $1->name);
-            if(orig == NULL) {
-                printf("error (line %ld): undeclared identifier %s.\n", line, $1->name);
-                exit(0);
-            }
-
-            id = new_expression(ASTT_IDENTIFIER, NULL, NULL);
-            id->sym = orig;
-        
-            $$ = new_expression(ASTT_CALL, id, $3);
-            fprintf(stderr, "call -> qualified_identifier(%s)\n", NAME($1));
-        }
     ;
 
 arg_list:
@@ -417,8 +362,8 @@ arg_list:
     
 arg:
         { $$ = NULL; }
-    |   expression
-        { fprintf(stderr, "arg -> expression\n"); $$ = $1;    }
+    |   expr
+        { fprintf(stderr, " arg <- expr\n"); $$ = $1;    }
     |   REF
         { $$ = NULL; }
     |   OUT
@@ -430,12 +375,12 @@ selection_statement:
     ;
 
 if_statement:
-    IF '(' boolean_expression ')' embedded_statement
+    IF '(' boolean_expr ')' embedded_statement
     ELSE embedded_statement
         {
             $$ = new_if($3, $5, $7);
         }
-    |   IF '(' boolean_expression ')' embedded_statement
+    |   IF '(' boolean_expr ')' embedded_statement
         {
             $$ = new_if($3, $5, NULL);
         }
@@ -447,14 +392,14 @@ iteration_statement:
     ;
     
 while_statement:
-    WHILE '(' boolean_expression ')' embedded_statement
+    WHILE '(' boolean_expr ')' embedded_statement
         {
             $$ = new_while($3, $5);
         }
     ;
     
 for_statement:
-    FOR '(' statement_expression ';' boolean_expression ';' statement_expression ')'
+    FOR '(' statement_expr ';' boolean_expr ';' statement_expr ')'
     embedded_statement
         {
             if($3 == NULL) {
@@ -487,7 +432,7 @@ type_name:
     IDENTIFIER
         {
             Type * t;
-            fprintf(stderr, "type_name -> IDENTIFIER (%s)\n", $1->name);
+            fprintf(stderr, " type_name <- IDENTIFIER (%s)\n", $1->name);
             t = lookup_type($1->name);
             if(t != NULL) {
                 fprintf(stderr, "Kind [%s] found in type list.\n", t->sym->name);
@@ -504,12 +449,10 @@ type:
     array_type
         {
             $$ = $1;
-            fprintf(stderr, "type -> array_type\n");
         }
     |   non_array_type
         {
             $$ = $1;
-            fprintf(stderr, "type -> non_array_type\n");
         }
     ;
 
@@ -526,10 +469,6 @@ primitive_type:
     
 struct_type:
     type_name
-    {
-        $$ = $1;
-        fprintf(stderr, "struct_type -> type_name\n");
-    }
     |   simple_type
     ;
 
@@ -544,21 +483,10 @@ simple_type:
     ;
     
 array_type:
-/*
-        array_type rank_specifiers
-    |
-*/
         simple_type rank_specifiers
         {
             $$ = (void *)new_array($1, $2);
-            fprintf(stderr, "array_type: array of %s\n", type_name($1));
-        }
-    |   qualified_identifier rank_specifiers
-        {
-            Type * t;
-            t = lookup_type($1->name);
-            $$ = (void *)new_array(t, $2);
-            fprintf(stderr, "array_type: array of %s\n", type_name(t));
+            fprintf(stderr, " array_type: array of %s\n", type_name($1));
         }
     ;
         
@@ -566,7 +494,7 @@ non_array_type:
     simple_type
         {
             $$ = $1;
-            fprintf(stderr, "non_array_type -> simple_type\n");
+            fprintf(stderr, " non_array_type <- simple_type\n");
         }
     |   type_name
     ;
@@ -576,7 +504,7 @@ rank_specifiers:
         {
             /* $1 is the dimension of the current rank */
             $$ = (void *)new_rank($1);
-            fprintf(stderr, "rank_spec %d\n", $1);
+            fprintf(stderr, " rank_spec %d\n", $1);
         }
     |   rank_specifiers rank_specifier
         {
@@ -588,11 +516,11 @@ rank_specifiers:
 rank_specifier:
     '[' dim_separators ']'
         {   $$ = $2 + 1;
-            fprintf(stderr, "rank_spec([ dim_separators ])\n");
+            fprintf(stderr, " rank_spec([ dim_separators ])\n");
         }
     |   '[' ']'
         {   $$ = 1;
-            fprintf(stderr, "rank_spec([])\n");
+            fprintf(stderr, " rank_spec([])\n");
         }
     ;
 
@@ -602,121 +530,105 @@ dim_separators:
     |   dim_separators ','
         { $$ = $1 + 1; }
     ; 
-    
+
+/*
+ * Expressions
+ */ 
+statement_expr:
+    call
+    |   assignment
+    |   post_inc_expr
+    |   post_dec_expr
+    |   pre_inc_expr
+    |   pre_dec_expr
+    ;
+
 assignment:
-    unary_expression '=' expression
-        {   $$ = new_expression(ASTT_ASSIGN, $1, $3);   }
+    unary_expr '=' expr
+        {   $$ = new_expr(ASTT_ASSIGN, $1, $3);   }
     /*
-    |   unary_expression compound_assign_op expression
+    |   unary_expr compound_assign_op expr
         {
-            $$ = new_expression(ASTT_ASSIGN, $1, new_op_expression($1, $2, $3));
+            $$ = new_expr(ASTT_ASSIGN, $1, new_op_expr($1, $2, $3));
         }
     */
     ;
 
-/*
-compound_assign_op:
-
-    ;
-*/
-  
 member_access:
-    primary_expression '.' IDENTIFIER
+    primary_expr '.' IDENTIFIER
 /*
     |   predefined_type '.' IDENTIFIER
 */
     ;
 
-postfix_expression:
-        primary_expression
-    |   qualified_identifier_expr
-    |   post_inc_expr
-    |   post_dec_expr
-    ;
-
 pre_inc_expr:
-    INC unary_expression
+    INC unary_expr
         {
-            $$ = new_expression(ASTT_PREINC, $2, NULL);
+            $$ = new_expr(ASTT_PREINC, $2, NULL);
             $$->op = INC;
         }
     ;
 
 pre_dec_expr:
-    DEC unary_expression
+    DEC unary_expr
         {
-            $$ = new_expression(ASTT_PREINC, $2, NULL);
+            $$ = new_expr(ASTT_PREINC, $2, NULL);
             $$->op = DEC;
         }
     ;
 
 post_inc_expr:
-    postfix_expression INC
+    primary_expr INC
         {
-            $$ = new_expression(ASTT_POSTINC, $1, NULL);
+            $$ = new_expr(ASTT_POSTINC, $1, NULL);
             $$->op = INC;
         }
     ;
 
 post_dec_expr:
-    postfix_expression DEC
+    primary_expr DEC
         {
-            $$ = new_expression(ASTT_POSTINC, $1, NULL);
+            $$ = new_expr(ASTT_POSTINC, $1, NULL);
             $$->op = DEC;
         }
     ;
 
-new_expression:
-    new_object_expression
 /*
-    | new_array_expression
-    | new_delegate_expression
-*/
-    ;
-
-new_object_expression:
-    NEW type '(' arg_list ')'
-        {
-            $$ = new_expression(ASTT_NEW_OBJECT, $4, NULL);
-            $$->type = $2;
-        }
-    ;
-
-primary_expression:
-        paren_expression
-    |   primary_expression_no_paren
-    ;
-     
-primary_expression_no_paren:
-        LITERAL
-        {
-            $$ = new_expression(ASTT_LITERAL, NULL, NULL); $$->sym = $1;
-            fprintf(stderr, "primary_expression(%s)\n", $1->name);
-        }
-    |   element_access
-    |   call
+postfix_expr:
+        primary_expr
+    |   qualified_identifier
     |   post_inc_expr
     |   post_dec_expr
-    |   new_expression
-    |   member_access
     ;
-    
-paren_expression:
-    '(' expression ')'
-        {   $$ = $2;    }
-    ;
-    
-element_access:
-        primary_expression '[' expression ']'
+*/
+
+expr:
+    conditional_expr
         {
-            $$ = new_expression(ASTT_INDEX, $1, $3);
-            $$->op = INDEX;
-            fprintf(stderr, "primary-expression(pex[ex])\n");
+            $$ = $1;
+            fprintf(stderr, " expr <- conditional_expr\n");
+        } 
+    |   assignment
+    ;
+
+expr_list:
+    expr
+    |    expr_list ',' expr
+    ;
+
+boolean_expr:
+    expr
+    ;
+
+primary_expr:
+        LITERAL
+        {
+            $$ = new_expr(ASTT_LITERAL, NULL, NULL); $$->sym = $1;
+            fprintf(stderr, " primary_expr <- LITERAL(%s)\n", $1->name);
         }
-    |   qualified_identifier '[' expression ']'
+    |   qualified_identifier
         {
             Symbol * orig;
-            AST * id;
             orig = check_id_decl(current_symbol_table, $1->name);
             if(orig == NULL)
                 orig = check_id_decl(global_symbol_table, $1->name);
@@ -725,84 +637,101 @@ element_access:
                 exit(0);
             }
 
-            id = new_expression(ASTT_IDENTIFIER, NULL, NULL);
-            id->sym = orig;
-            $$ = new_expression(ASTT_INDEX, id, $3);
-            $$->op = INDEX;
-            fprintf(stderr, "primary-expression(%s)\n", NAME(orig));
+            $$ = new_expr(ASTT_IDENTIFIER, NULL, NULL);
+            $$->sym = orig;
+            fprintf(stderr, "primary_expr <- qualified_identifier_expr\n");
         }
-    ;
-    
-expression:
-    conditional_expression
+    |   '(' expr ')'
         {
-            $$ = $1;
-            fprintf(stderr, "conditional_expression\n");
-        } 
-    |   assignment
+            $$ = $2;
+        }
+    |   element_access
+    |   call
+    |   post_inc_expr
+    |   post_dec_expr
+    |   new_expr
+    |   member_access
     ;
-
-boolean_expression:
-    expression
-/*    {
-        $$ = new_expression(ASTT_BOOLEAN, $1, NULL);
-    }
-*/
-    ;
-
-unary_expression_not_plusminus:
-    postfix_expression
-    |   '!' unary_expression
-        { $$ = $2; $$->op = '!'; }
-    |   '~' unary_expression
-        { $$ = $2; $$->op = '~'; }
-    ;
-    
-unary_expression:
-    unary_expression_not_plusminus
+ 
+unary_expr:
+    primary_expr 
         { $$ = $1; }
-    |   qualified_identifier
-        { $$ =  new_expression(ASTT_IDENTIFIER, NULL, NULL); $$->sym = $1; }
-    |   '+' unary_expression
+    |   '+' unary_expr
         { $$ = $2; $$->op = '+'; }
-    |   '-' unary_expression
+    |   '-' unary_expr
         { $$ = $2; $$->op = '-'; }
+    |   '!' unary_expr
+        { $$ = $2; $$->op = '!'; }
+    |   '~' unary_expr
+        { $$ = $2; $$->op = '~'; }
     |   pre_inc_expr
     |   pre_dec_expr
     ;
 
-
-mult_expression:
-    unary_expression
-    |   mult_expression '*' unary_expression
+call:
+    primary_expr '(' arg_list ')'
         {
-            $$ = new_op_expression($1, '*', $3);
-        }
-    |   mult_expression '/' unary_expression
-        {
-            $$ = new_op_expression($1, '/', $3);
-        }
-    |   mult_expression '%' unary_expression
-        {
-            $$ = new_op_expression($1, '%', $3);
+            $$ = new_expr(ASTT_CALL, $1, $3);
+            fprintf(stderr, " call <- primary_expr ( arg_list )\n");
         }
     ;
 
-add_expression:
-    mult_expression
-    |   add_expression '+' mult_expression
+element_access:
+        primary_expr '[' expr ']'
         {
-            $$ = new_op_expression($1, '+', $3);
+            $$ = new_expr(ASTT_INDEX, $1, $3);
+            $$->op = INDEX;
+            fprintf(stderr, " element_access <- primary-expr(pex[ex])\n");
         }
-    |   add_expression '-' mult_expression
+    ;
+    
+new_expr:
+    new_object_expr
+/*
+    | new_array_expr
+    | new_delegate_expr
+*/
+    ;
+
+new_object_expr:
+    NEW type '(' arg_list ')'
         {
-            $$ = new_op_expression($1, '-', $3);
+            $$ = new_expr(ASTT_NEW_OBJECT, $4, NULL);
+            $$->type = $2;
         }
     ;
 
-conditional_expression:
-    conditional_or_expression
-    |   conditional_or_expression '?' expression ':' expression
+mult_expr:
+    unary_expr
+    |   mult_expr '*' unary_expr
+        {
+            $$ = new_op_expr($1, '*', $3);
+        }
+    |   mult_expr '/' unary_expr
+        {
+            $$ = new_op_expr($1, '/', $3);
+        }
+    |   mult_expr '%' unary_expr
+        {
+            $$ = new_op_expr($1, '%', $3);
+        }
+    ;
+
+add_expr:
+    mult_expr
+    |   add_expr '+' mult_expr
+        {
+            $$ = new_op_expr($1, '+', $3);
+        }
+    |   add_expr '-' mult_expr
+        {
+            $$ = new_op_expr($1, '-', $3);
+        }
+    ;
+
+conditional_expr:
+    conditional_or_expr
+    |   conditional_or_expr '?' expr ':' expr
     {
         /* Ternary is just a if/then/else statement which can return a value */
         $$ = new_if($1, $3, $5);
@@ -810,43 +739,43 @@ conditional_expression:
     }
     ;
 
-conditional_and_expression:
-    inclusive_or_expression
-    |   conditional_and_expression LOGICAL_AND inclusive_or_expression
+conditional_and_expr:
+    inclusive_or_expr
+    |   conditional_and_expr LOGICAL_AND inclusive_or_expr
     {
-        $$ = new_logical_expression($1, LOGICAL_AND, $3);
+        $$ = new_logical_expr($1, LOGICAL_AND, $3);
     }
     ;
 
-conditional_or_expression:
-    conditional_and_expression
-    |   conditional_or_expression LOGICAL_OR conditional_and_expression
+conditional_or_expr:
+    conditional_and_expr
+    |   conditional_or_expr LOGICAL_OR conditional_and_expr
     {
-        $$ = new_logical_expression($1, LOGICAL_OR, $3);
+        $$ = new_logical_expr($1, LOGICAL_OR, $3);
     }
     ;
 
-and_expression:
-    equality_expression
-    |   and_expression '&' equality_expression
+and_expr:
+    equality_expr
+    |   and_expr '&' equality_expr
         {
-            $$ = new_op_expression($1, '&', $3);
+            $$ = new_op_expr($1, '&', $3);
         }
     ;
 
-exclusive_or_expression:
-    and_expression
-    |   exclusive_or_expression '^' and_expression
+exclusive_or_expr:
+    and_expr
+    |   exclusive_or_expr '^' and_expr
         {
-            $$ = new_op_expression($1, '^', $3);
+            $$ = new_op_expr($1, '^', $3);
         }
     ;
 
-inclusive_or_expression:
-    exclusive_or_expression
-    |   inclusive_or_expression '|' exclusive_or_expression
+inclusive_or_expr:
+    exclusive_or_expr
+    |   inclusive_or_expr '|' exclusive_or_expr
         {
-            $$ = new_op_expression($1, '|', $3);
+            $$ = new_op_expr($1, '|', $3);
         }
     ;
 
@@ -861,44 +790,39 @@ relational_op:
         {$$ = LOGICAL_GTE;}
     ;
 
-relational_expression:
-    shift_expression
-    |   relational_expression relational_op shift_expression
+relational_expr:
+    shift_expr
+    |   relational_expr relational_op shift_expr
         {
-            $$ = new_expression(ASTT_COMPARISON, $1, $3);
+            $$ = new_expr(ASTT_COMPARISON, $1, $3);
             $$->op = $2;
         }
     ;
 
-equality_expression:
-    relational_expression
-    |   equality_expression LOGICAL_EQ relational_expression
+equality_expr:
+    relational_expr
+    |   equality_expr LOGICAL_EQ relational_expr
         {
-            $$ = new_expression(ASTT_COMPARISON, $1, $3);
+            $$ = new_expr(ASTT_COMPARISON, $1, $3);
             $$->op = LOGICAL_EQ;
         }
-    |   equality_expression LOGICAL_NE relational_expression
+    |   equality_expr LOGICAL_NE relational_expr
         {
-            $$ = new_expression(ASTT_COMPARISON, $1, $3);
+            $$ = new_expr(ASTT_COMPARISON, $1, $3);
             $$->op = LOGICAL_NE;
         }
     ;        
 
-shift_expression:
-    add_expression
-    |   shift_expression LEFT_SHIFT add_expression
+shift_expr:
+    add_expr
+    |   shift_expr LEFT_SHIFT add_expr
         {
-            $$ = new_op_expression($1, LEFT_SHIFT, $3);
+            $$ = new_op_expr($1, LEFT_SHIFT, $3);
         }  
-    |   shift_expression RIGHT_SHIFT add_expression
+    |   shift_expr RIGHT_SHIFT add_expr
         {
-            $$ = new_op_expression($1, RIGHT_SHIFT, $3);
+            $$ = new_op_expr($1, RIGHT_SHIFT, $3);
         }  
-    ;
-
-expression_list:
-    expression
-    |    expression_list ',' expression
     ;
 
 decl_statement:
@@ -923,7 +847,7 @@ local_var_decl:
     type var_declarators
         {
             /* Insert symbols into symbol table, collect any initializer
-             * statement expressions, then discard symbol list.
+             * statement exprs, then discard symbol list.
              */
             Symbol * sym;
             AST * init_exprs = NULL;
@@ -942,9 +866,9 @@ local_var_decl:
                 /* Collect intializer statements */
                 if(sym->init_expr) {
                     AST *id, * init_expr;
-                    id = new_expression(ASTT_IDENTIFIER, NULL, NULL);
+                    id = new_expr(ASTT_IDENTIFIER, NULL, NULL);
                     id->sym = sym;
-                    init_expr = new_expression(ASTT_ASSIGN, id, sym->init_expr);
+                    init_expr = new_expr(ASTT_ASSIGN, id, sym->init_expr);
                     unshift_ast(&init_exprs, init_expr);
                 }
             }
@@ -965,11 +889,12 @@ var_declarator:
     IDENTIFIER
     {
         $$ = $1;
-        fprintf(stderr, "var_declarator(%s)\n", $1->name);
+        fprintf(stderr, " var_declarator <- IDENTIFIER(%s)\n", $1->name);
     }
-    |   IDENTIFIER '=' expression
+    |   IDENTIFIER '=' expr
         {
             $$ = $1; $$->init_expr = $3;
+            fprintf(stderr, " var_declarator <- IDENTIFER(%s)=init_expr\n", $1->name);
         }
 /*
     |   IDENTIFIER '=' array_initializer
@@ -1039,7 +964,7 @@ fixed_params:
 fixed_param:
     type IDENTIFIER
         {
-            fprintf(stderr, "fixed_param -> type IDENTIFIER\n");
+            fprintf(stderr, " fixed_param <- type IDENTIFIER(%s)\n", $2->name);
             $2->type = $1;
             $$ = $2;
         }
@@ -1059,7 +984,7 @@ param_array:
 member_name:
     IDENTIFIER
         {
-            fprintf(stderr, "member_name -> IDENTIFIER (%s)\n", $1->name);
+            fprintf(stderr, " member_name <- IDENTIFIER (%s)\n", $1->name);
             $$ = $1;
             check_id_redecl(current_symbol_table, $1->name);
             if(lookup_symbol(current_symbol_table, $1->name)) {
@@ -1108,10 +1033,10 @@ int main(int argc, char * argv[])
         store_identifier(current_symbol_table, "putf", METHOD, t_void);
         store_identifier(current_symbol_table, "gets", METHOD, t_string);
         store_identifier(current_symbol_table, "substr", METHOD, t_string);
-        store_identifier(current_symbol_table, "strlen", METHOD, t_int);
+        store_identifier(current_symbol_table, "strlen", METHOD, t_int32);
         store_identifier(current_symbol_table, "strchop", METHOD, t_string);
         store_identifier(current_symbol_table, "strrep", METHOD, t_string);
-        store_identifier(current_symbol_table, "ord", METHOD, t_int);
+        store_identifier(current_symbol_table, "ord", METHOD, t_int32);
         store_identifier(current_symbol_table, "sleep", METHOD, t_void);
     }
 
@@ -1143,7 +1068,7 @@ int main(int argc, char * argv[])
     return 0;
 }
 
-int yyerror( char * s )
+int yyerror(char * s)
 {
     fprintf(stderr, "last token = [%s]\n", yytext); 
     fprintf(stderr, "(error) line %ld: %s\n", line, s );

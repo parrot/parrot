@@ -282,7 +282,7 @@ void gen_assign(AST * ast) {
                 gen_expr(deref->arg1, NULL, NULL);
             /* Require array subscript to be int */
             if(!eval_expr(deref->arg2))
-                gen_expr(deref->arg2, NULL, t_int);
+                gen_expr(deref->arg2, NULL, t_int32);
 
 #if 0
             /* If destination indirection uses a variable, copy it to a
@@ -356,7 +356,6 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
     /* Expression is a simple identifier or literal */
     if(p->asttype == ASTT_IDENTIFIER ||
         p->asttype == ASTT_LITERAL) {
-        /*p->targ = p->sym;*/
         if(lval)
             p->targ = lval;
         else
@@ -375,7 +374,6 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
     /* Expression is a new() expression */
     if(p->asttype == ASTT_NEW_OBJECT) {
         printf("\t# new()\n");
-        /*p->targ = make_rval(REFERENCE);*/
         if(lval != NULL)
             p->targ = lval;
         else 
@@ -442,24 +440,10 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
         return;
     }
   
-/* 
-    if(p->arg1->asttype == ASTT_IDENTIFIER ||
-        p->arg1->asttype == ASTT_LITERAL) {
-        p->arg1->targ = p->arg1->sym;
-    }
-    else
-*/
     if(!eval_expr(p->arg1))
         gen_expr(p->arg1, NULL, NULL);
 
     if(p->arg2) {
-/*
-        if(p->arg2->asttype == ASTT_IDENTIFIER ||
-            p->arg2->asttype == ASTT_LITERAL) {
-            p->arg2->targ = p->arg2->sym;
-        }
-        else
-*/
         if(!eval_expr(p->arg2))
             gen_expr(p->arg2, NULL, NULL);
     }
@@ -476,7 +460,7 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
 #ifdef DEBUG
             printf("# gen_expr: index operator\n");
 #endif
-            if(type2 != t_int) {
+            if(type2 != t_int32) {
                 fprintf(stderr, "Array subscript expression must be type integer.\n");    
                 exit(0);
             }
@@ -782,7 +766,7 @@ void gen_boolean(AST * p, const char * true_label, const char * false_label, int
 void coerce_operands(Type ** t1, Type ** t2) {
     if(*t1 == *t2)
         return;
-    if(*t1 == t_int) {
+    if(*t1 == t_int32) {
         if(*t2 == t_float)
             *t1 = t_float;
         else {
@@ -791,7 +775,7 @@ void coerce_operands(Type ** t1, Type ** t2) {
         } 
     }
     else if(*t1 == t_float) {
-        if(*t2 == t_int)
+        if(*t2 == t_int32)
             *t2 = t_float;
         else {
             printf("Can't coerce types (float, %s)\n", type_name(*t2));
