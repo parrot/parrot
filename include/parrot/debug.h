@@ -130,6 +130,9 @@ void
 PDB_skip_breakpoint(struct Parrot_Interp *interpreter,
                     long i);
 
+char *
+PDB_escape(const char *);
+
 void
 PDB_disassemble(struct Parrot_Interp *,
                 const char *);

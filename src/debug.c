@@ -153,7 +153,8 @@ PDB_run_command(struct Parrot_Interp *interpreter,
             PDB_run_command(interpreter,pdb->last_command);
             break;
         default:
-            fprintf(stderr,"Undefined command: \"%s\".  Try \"help\".", command);
+            fprintf(stderr,"Undefined command: \"%s\".  Try \"help\".",
+                                                                 command);
             break;
     }
 }
@@ -229,6 +230,12 @@ PDB_set_break(struct Parrot_Interp *interpreter,
     PDB_line_t *line;
     long ln,i;
 
+    /* If the source is not loaded (or disassembled) return */
+    if (!(pdb->state & PDB_SRC_LOADED))
+    {
+        fprintf(stderr,"Source not loaded. Try \"help\".");
+        return;
+    }
     /* If no line number was specified set it at the current line */
     if (command && *command)
     {
@@ -237,7 +244,8 @@ PDB_set_break(struct Parrot_Interp *interpreter,
         line = pdb->file->line;
         for (i = 1; ((i < ln) && (line->next)); i++)
             line = line->next;
-    } else {
+    }
+    else {
         /* Update cur_line */
         line = pdb->file->line;
         while (line->opcode != pdb->cur_opcode)
@@ -298,7 +306,8 @@ PDB_set_break(struct Parrot_Interp *interpreter,
             i++;
         }
         sbreak->next = newbreak;
-    } else {
+    }
+    else {
         pdb->breakpoint = newbreak;
     }
 
@@ -317,14 +326,14 @@ PDB_run(struct Parrot_Interp *interpreter,
     KEY key;
     STRING *arg;
     struct PackFile *code;
-    unsigned long i;
+    unsigned long i,j = 1;
     char c[256];
     
     /* The bytecode is readonly, right? */
     code = interpreter->code;
     /* Destroy the old interpreter FIXME */
     free(interpreter);
-    /* Get a new one */
+    /* Get a new interpreter */
     interpreter = make_interpreter(NO_FLAGS);
     interpreter->code = code;
     interpreter->pdb = pdb;
@@ -341,10 +350,12 @@ PDB_run(struct Parrot_Interp *interpreter,
         i = 0;
         while (command[i] && !isspace(command[i]))
             c[i] = command[i++];
+        c[i] = '\0';
         na(command);
 
-        arg = string_make(interpreter, c, i, NULL, 0, NULL);
-        key.atom.val.int_val = i;
+        arg = string_make(interpreter, c, i, NULL, 
+                          BUFFER_external_FLAG, NULL);
+        key.atom.val.int_val = j++;
         userargv->vtable->set_string_keyed(interpreter, userargv, &key, arg);
     }
 
@@ -490,6 +501,49 @@ PDB_break(struct Parrot_Interp *interpreter)
     return 0;
 }
 
+/* PDB_escape
+ * escapes \r \n \t \a and \\
+ */
+char *
+PDB_escape(const char *string)
+{
+    char *new,*fill;
+
+    fill = new = (char *)mem_sys_allocate(strlen(string) * 2);
+
+    for ( ; *string; string++)
+    {
+        switch (*string)
+        {
+            case '\n':
+                *(fill++) = '\\';
+                *(fill++) = 'n';
+                break;
+            case '\r':
+                *(fill++) = '\\';
+                *(fill++) = 'r';
+                break;
+            case '\t':
+                *(fill++) = '\\';
+                *(fill++) = 't';
+                break;
+            case '\a':
+                *(fill++) = '\\';
+                *(fill++) = 'a';
+                break;
+            case '\\':
+                *(fill++) = '\\';
+                *(fill++) = '\\';
+                break;
+            default:
+                *(fill++) = *string;
+                break;
+        }
+    }
+    *fill = '\0';
+    return new;
+}
+                
 /* PDB_disassemble
  * Disassemble the bytecode
  */
@@ -506,7 +560,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter,
     FLOATVAL f;
     unsigned long size = 0, label_count = 0;
     char buf[256];
-    char *ptr;
+    char *ptr,*escaped;
     int neg = 0, j;
     long i;
 
@@ -599,11 +653,15 @@ PDB_disassemble(struct Parrot_Interp *interpreter,
                     break;
                 case PARROT_ARG_SC:
                     pfile->source[pfile->size++] = '"';
-                    strcpy(&pfile->source[pfile->size],
-                           interpreter->code->const_table->
-                           constants[pc[j]]->string->bufstart);
-                    pfile->size += interpreter->code->const_table->
-                                    constants[pc[j]]->string->strlen;
+                    if (interpreter->code->const_table->
+                        constants[pc[j]]->string->strlen)
+                    {
+                        escaped = PDB_escape(interpreter->code->const_table->
+                                         constants[pc[j]]->string->bufstart);
+                        strcpy(&pfile->source[pfile->size],escaped);
+                        pfile->size += strlen(escaped);
+                        mem_sys_free(escaped);
+                    }
                     pfile->source[pfile->size++] = '"';
                     break;
                 default:
@@ -677,7 +735,8 @@ PDB_add_label(PDB_file_t *file,
             label = label->next;
         new->number = label->number + 1;
         label->next = new;
-    } else {
+    }
+    else {
         file->label = new;
         new->number = 1;
     }
@@ -738,7 +797,7 @@ PDB_load_source(struct Parrot_Interp *interpreter,
 
         if (c == '\n')
         {
-            /* If the line has on opcode move to the next one,
+            /* If the line has an opcode move to the next one,
                otherwise leave it with NULL to skip it. */
             if (PDB_hasinstruction(pfile->source + pline->source_offset))
             {
@@ -769,7 +828,7 @@ PDB_hasinstruction(char *c)
     char h = 0;
 
     while (*c && *c != '#' && *c != '\n') {
-        if (*c > 'A' && *c < 'z')
+        if (isalnum(*c) || *c == '"')
             h = 1;
         else if (*c == ':')
             h = 0;
@@ -802,7 +861,6 @@ PDB_list(struct Parrot_Interp *interpreter,
     if (isdigit(*command))
     {
         n = atol(command);
-        fprintf(stderr,"%li\n",n);
         na(command);
     }
 
@@ -1147,7 +1205,8 @@ PDB_print_string(struct Parrot_Interp *interpreter,
             fprintf(stderr,"\tFlags   =\t%12ld\n",s->flags);
             fprintf(stderr,"\tBufused =\t%12ld\n",s->bufused);
             fprintf(stderr,"\tStrlen  =\t%12ld\n",s->strlen);
-            fprintf(stderr,"\tString  =\t%s\n",string_to_cstring(interpreter, s));
+            fprintf(stderr,"\tString  =\t%s\n",
+                            string_to_cstring(interpreter, s));
         }
     }
 }
