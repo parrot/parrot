@@ -156,10 +156,7 @@ $jitarchname              =~ s/-(net|free|open)bsd$/-bsd/i;
 $jitcapable               = 0;
 
 if (-e "lib/Parrot/Jit/$jitarchname.pm") {
-    my $objdump_test = `objdump -V`;
-    if(defined($objdump_test)){
-       $jitcapable = 1 if($objdump_test =~ /GNU\s+objdump/)
-    }
+    $jitcapable = 1;
 }
 
 $jitcapable = $opt_defines{jitcapable} if exists $opt_defines{jitcapable};

@@ -146,7 +146,9 @@ sub write_as($$) {
 	my $out = new IO::File "> $target"
 		or die "Could not write to $target: $!";
 
-    print $out <<END;
+    print $out <<'END';
+.globl main
+        .type    main,@function
 main:
 END
     print $out $code;
@@ -172,7 +174,7 @@ sub disassemble($$$$) {
 	my $objdump = new IO::File $Parrot::Jit::OBJDUMP." $obj |"
 		or die "Could not run ".$Parrot::Jit::OBJDUMP." $obj: $!";
 
-	while (<$objdump>) { last if /<main>:$/ }
+	while (<$objdump>) { last if /main/ }
 
     $ln = 0;
 	while (<$objdump>) {

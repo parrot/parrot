@@ -8,7 +8,7 @@ package Parrot::Jit;
 
 use base qw(Parrot::Jit::sun4Generic);
 
-$OBJDUMP = "objdump -w -d";
+$OBJDUMP = "/usr/ccs/bin/dis";
 $AS      = "as";
 
 $OP_ARGUMENT_SIZE = 1;
