@@ -320,9 +320,7 @@ scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad,
     }
 
     if (!lex || position < 0 || position >= list_length(interp, lex->values)) {
-        internal_exception(-1, "Lexical '%s' not found",
-                           (name == NULL) ? "???"
-                           : string_to_cstring(interp, name));
+        return NULL;
     }
 
     return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);

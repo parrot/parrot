@@ -171,7 +171,7 @@ op find_lex(out PMC, in STR) {
     PMC * lex = $1 = scratchpad_get(interpreter, pad, $2, 0);
     opcode_t *resume = expr NEXT();
     if (!lex)
-        resume = real_exception(interpreter, LEX_NOT_FOUND, resume,
+        real_exception(interpreter, resume, LEX_NOT_FOUND,
 	    "Lexical '%s' not found",
                            ($2 == NULL) ? "???"
                            : string_to_cstring(interpreter, $2));
@@ -180,20 +180,34 @@ op find_lex(out PMC, in STR) {
 
 op find_lex(out PMC, in INT) {
     PMC * pad = scratchpad_get_current(interpreter);
-    $1 = scratchpad_get(interpreter, pad, NULL, $2);
-    goto NEXT();
+    PMC * lex = $1 = scratchpad_get(interpreter, pad, NULL, $2);
+    opcode_t *resume = expr NEXT();
+    if (!lex)
+        real_exception(interpreter, resume, LEX_NOT_FOUND,
+	    "Lexical #'%d' not found", (int) $2);
+    restart ADDRESS(resume);
 }
 
 op find_lex(out PMC, in INT, in STR) {
     PMC * pad = scratchpad_get_current(interpreter);
-    $1 = scratchpad_get_index(interpreter, pad, $2, $3, 0);
-    goto NEXT();
+    PMC * lex = $1 = scratchpad_get_index(interpreter, pad, $2, $3, 0);
+    opcode_t *resume = expr NEXT();
+    if (!lex)
+        real_exception(interpreter, resume, LEX_NOT_FOUND,
+	    "Lexical '%s' not found",
+                           ($3 == NULL) ? "???"
+                           : string_to_cstring(interpreter, $3));
+    restart ADDRESS(resume);
 }
 
 op find_lex(out PMC, in INT, in INT) {
     PMC * pad = scratchpad_get_current(interpreter);
-    $1 = scratchpad_get_index(interpreter, pad, $2, NULL, $3);
-    goto NEXT();
+    PMC *lex = $1 = scratchpad_get_index(interpreter, pad, $2, NULL, $3);
+    opcode_t *resume = expr NEXT();
+    if (!lex)
+        real_exception(interpreter, resume, LEX_NOT_FOUND,
+	    "Lexical #'%d' not found", (int) $3);
+    restart ADDRESS(resume);
 }
 
 =back

@@ -254,12 +254,31 @@ handle_exception(Parrot_Interp interpreter)
 }
 
 /*
+ * do_exception:
+ * - called from interrupt code
+ * - does a longjmp in front of the runloop, which calls
+ * - handle_exception(): returning the handler address
+ * - where execution then resumes
+ */
+void
+do_exception(exception_severity severity, long error)
+{
+    the_exception.error = error;
+    the_exception.severity = severity;
+    the_exception.msg = NULL;
+    the_exception.resume = NULL;
+    longjmp(the_exception.destination, 1);
+}
+#endif
+
+/*
  * instead of internal_exception this throws a real exception
  */
-void *
-real_exception(struct Parrot_Interp *interpreter,
-        int exitcode, void *ret_addr, const char *format, ...)
+void
+real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
+        int exitcode,  const char *format, ...)
 {
+#ifdef HAS_HEADER_SETJMP
     STRING *msg;
     opcode_t *dest;     /* absolute address of handler */
 
@@ -286,25 +305,16 @@ real_exception(struct Parrot_Interp *interpreter,
      * reenter runloop
      */
     longjmp(the_exception.destination, 1);
-}
-/*
- * do_exception:
- * - called from interrupt code
- * - does a longjmp in front of the runloop, which calls
- * - handle_exception(): returning the handler address
- * - where execution then resumes
- */
-void
-do_exception(exception_severity severity, long error)
-{
-    the_exception.error = error;
-    the_exception.severity = severity;
-    the_exception.msg = NULL;
-    the_exception.resume = NULL;
-    longjmp(the_exception.destination, 1);
-}
-
+#else
+    va_list arglist;
+    UNUSED(interpreter);
+    UNUSED(ret_addr);
+    va_start(arglist, format);
+    vfprintf(stderr, format, arglist);
+    va_end(arglist);
+    Parrot_exit(exitcode);
 #endif
+}
 
 /*
  * Local variables:
