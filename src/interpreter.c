@@ -473,7 +473,8 @@ void
 runops_int(struct Parrot_Interp *interpreter, size_t offset)
 {
     int lo_var_ptr;
-    opcode_t *(*core) (struct Parrot_Interp *, opcode_t *);
+    opcode_t *(*core) (struct Parrot_Interp *, opcode_t *) =
+        (opcode_t *(*) (struct Parrot_Interp *, opcode_t *)) 0;
 
     interpreter->resume_offset = offset;
     interpreter->resume_flag = 1;
@@ -1252,7 +1253,7 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
         size_t n_old, size_t n_new, oplib_init_f init_func)
 {
     op_lib_t *cg_lib;
-    void **ops_addr;
+    void **ops_addr = NULL;
     size_t i, n_tot;
 
     n_tot = n_old + n_new;

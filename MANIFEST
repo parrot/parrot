@@ -280,6 +280,8 @@ examples/benchmarks/arriter.imc                   [main]doc
 examples/benchmarks/arriter.pl                    [main]doc
 examples/benchmarks/arriter_o1.imc                [main]doc
 examples/benchmarks/bench_newp.pasm               [main]doc
+examples/benchmarks/fib.imc                       [main]doc
+examples/benchmarks/fib.pl                        [main]doc
 examples/benchmarks/gc_alloc_new.pasm             [main]doc
 examples/benchmarks/gc_alloc_reuse.pasm           [main]doc
 examples/benchmarks/gc_generations.pasm           [main]doc
