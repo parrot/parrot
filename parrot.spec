@@ -23,7 +23,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 %build
 perl Configure.pl --optimize
 make CC="ccache gcc" parrot pdb pdump
-make -C languages/imcc
+make -C imcc
 perl tools/dev/mk_manifests.pl --prefix=%{prefix} --exec-prefix=%{exec_prefix} --bindir=%{bindir} --libdir=%{libdir} --includedir=%{includedir} MANIFEST.detailed
 
 %install

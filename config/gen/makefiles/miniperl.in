@@ -7,7 +7,7 @@
 PERL=${perl}
 DIR=languages/miniperl
 TOOL_DIR=../..
-IMCC=../imcc/imcc${exe}
+IMCC=../../parrot${exe}
 ASM=$(IMCC) -a --output-pbc
 MINIPERLC=$(PERL) miniperlc
 INTERP=./${test_prog}

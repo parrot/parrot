@@ -10,7 +10,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>.
 
 Please note, that this document refers to PASM assembler only. The PIR
 assembler has a more HLL-like syntax for Parrot Calling Conventions.
-S. F<languages/imcc/docs/calling_conventions.pod>
+S. F<imcc/docs/calling_conventions.pod>
 
 =head2 Class Tree
 
@@ -147,7 +147,7 @@ F<classes/coroutine.pmc>, F<sub.c>, F<t/pmc/sub.t>
 =head1 SEE ALSO
 
 F<docs/pdds/pdd03_calling_conventions.pod>
-F<languages/imcc/docs/calling_conventions.pod>
+F<imcc/docs/calling_conventions.pod>
 
 =head1 AUTHOR
 

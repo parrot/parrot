@@ -93,7 +93,7 @@
 	* Much better key support, generally
 	* splice()
 	* Restructured PMC hierarchy with better functionality inheritance
-	* IMCC: many, many improvements. See languages/imcc/ChangeLog
+	* IMCC: many, many improvements. See imcc/ChangeLog
 	* Perl6: index map grep join reverse defined
 	* Scheme with functions!
 	

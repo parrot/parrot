@@ -10,7 +10,7 @@
 # $ sh tools/dev/mk_native_pbc
 
 make -s progclean
-make -s -C languages/imcc clean
+make -s -C imcc clean
 perl Configure.pl --debugging --floatval="long double" --nomanicheck
 tail myconfig
 make -s
@@ -18,7 +18,7 @@ make -s
 mv n.pbc t/native_pbc/number_2.pbc
 
 make -s progclean
-make -s -C languages/imcc clean
+make -s -C imcc clean
 perl Configure.pl --debugging --floatval=double --nomanicheck
 tail myconfig
 make -s
