@@ -302,7 +302,7 @@ C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
 
     void set_integer_keyed (PMC* key, INTVAL value) {
         if (key_type(INTERP, key) == KEY_integer_FLAG) {
-            return SELF.set_integer_keyed_int(PMC_int_val(key), value);
+            SELF.set_integer_keyed_int(PMC_int_val(key), value);
         } else {
             STRING* s = VTABLE_get_string(INTERP, key);
             DYNSELF.set_integer_keyed_str(s, value);
