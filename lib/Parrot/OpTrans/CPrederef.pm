@@ -25,15 +25,10 @@ sub defines
 #define REL_PC ((size_t)(cur_opcode - interpreter->prederef_code))
 #define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
-#ifdef _MSC_VER
-#define inline __inline
-typedef int ssize_t;
-#endif
-
 static INLINE opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
                                            void** prederef_addr)
 {
-    ssize_t offset_in_ops;
+    INTVAL offset_in_ops;
     if (prederef_addr == NULL) return NULL;
     offset_in_ops = prederef_addr - interpreter->prederef_code;
     return (opcode_t*) interpreter->code->byte_code + offset_in_ops;
@@ -42,7 +37,7 @@ static INLINE opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
 static INLINE void** opcode_to_prederef(struct Parrot_Interp* interpreter,
                                         opcode_t* opcode_addr)
 {
-    ssize_t offset_in_ops;
+    INTVAL offset_in_ops;
     if (opcode_addr == NULL) return NULL;
     offset_in_ops = opcode_addr - (opcode_t*) interpreter->code->byte_code;
     return interpreter->prederef_code + offset_in_ops;
