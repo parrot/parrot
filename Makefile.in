@@ -40,7 +40,7 @@ ${make_set_make}
 .c$(O):
 	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
 
-all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe} docs
+all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe} examples/mops/mops${exe} docs
 
 #XXX This target is not portable to Win32
 
@@ -77,6 +77,9 @@ examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 
 examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
 	$(CC) $(CFLAGS) -o examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
+
+examples/mops/mops${exe}: examples/mops/mops$(O) platform$(O)
+	$(CC) $(CFLAGS) -o examples/mops/mops${exe} examples/mops/mops$(O) platform$(O) $(C_LIBS)
 
 global_setup$(O): $(H_FILES)
 
@@ -165,6 +168,7 @@ clean:
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
 	$(RM_F) examples/assembly/mops${exe} examples/assembly/mops.c
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
+	$(RM_F) examples/mops/mops$(O) examples/mops/mops${exe}
 	$(RM_F) Parrot/OpLib/core.pm
 	$(RM_F) Parrot/Jit.pm
 	$(RM_F) include/parrot/jit_struct.h
