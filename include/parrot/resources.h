@@ -82,6 +82,16 @@ struct Stash {
     struct Stash *parent_stash;
 };
 
+#define TOTAL_MEM_ALLOC 1
+#define DOD_RUNS 2
+#define COLLECT_RUNS 3
+#define ACTIVE_PMCS 4
+#define ACTIVE_BUFFERS 5
+#define TOTAL_PMCS 6
+#define TOTAL_BUFFERS 7
+#define HEADERS_ALLOC_SINCE_COLLECT 8
+#define MEM_ALLOCS_SINCE_COLLECT 9
+
 
 #endif /* PARROT_RESOURCES_H */
 
@@ -94,3 +104,5 @@ struct Stash {
  *
  * vim: expandtab shiftwidth=4:
 */
+
+

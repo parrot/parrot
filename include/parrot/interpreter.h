@@ -87,8 +87,34 @@ struct Parrot_Interp {
                                            * source */
     void *current_file;                   /* The file we're currently in */
     void *current_package;                /* The package we're currently in */
-    UINTVAL string_count;
-    UINTVAL pmc_count;
+
+    /* Some counters for the garbage collector.xs */
+    UINTVAL dod_runs;                     /* Number of times we've
+                                             done a DOD sweep */
+    UINTVAL collect_runs;                 /* Number of times we've
+                                             done a memory compaction
+                                          */
+    UINTVAL mem_allocs_since_last_collect; /* The number of memory
+                                              allocations from the
+                                              system since the last
+                                              compaction run */
+    UINTVAL header_allocs_since_last_collect; /* The number of header
+                                                 allocs from the
+                                                 system since the last
+                                                 DOD run */
+    UINTVAL active_PMCs;                  /* The number of live PMCs */
+    UINTVAL active_Buffers;               /* The number of live
+                                             Buffers */
+    UINTVAL total_PMCs;                   /* The total number of PMCs
+                                             allocated */
+    UINTVAL total_Buffers;                /* The total number of
+                                             buffers allocated */
+    UINTVAL memory_allocated;             /* The total amount of
+                                             allocatable memory
+                                             allocated. Doesn't count
+                                             memory for headers or
+                                             internal structures or
+                                             anything */
 };
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))

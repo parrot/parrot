@@ -11,14 +11,14 @@
 	# If true, we don't print
 	set I12, 1
 	set S0,  "               "
-	set S1,  "    *          "
-	set S2,  "    *      *   "
-	set S3,  "    **    * *  "
-        set S4,  "    *   * * *  "
-        set S5,  "   ***   ***   "
-	set S6,  "               "
-	set S7,  "               "
-	set S8,  "               "
+	set S1,  "               "
+	set S2,  "               "
+	set S3,  "      ***      "
+        set S4,  "               "
+        set S5,  "               "
+	set S6,  "         *     "
+	set S7,  "         *     "
+	set S8,  "         *     "
 	set S9,  "     *         "
 	set S10, "     *         "
 	set S11, "     *         "
@@ -61,6 +61,32 @@ getout:	time N6
 	div N1, N8, N7
 	print N1
 	print " generations/sec\n"
+
+	interpinfo I1, 1
+	print "A total of "
+	print I1
+	print " bytes were allocated\n"
+
+	interpinfo I1, 2
+	print "A total of "
+	print I1
+	print " DOD runs were made\n"
+
+	interpinfo I1, 3
+	print "A total of "
+	print I1
+	print " collection runs were made\n"
+
+	interpinfo I1, 5
+	print "There are "
+	print I1
+	print " active Buffer structs\n"
+
+	interpinfo I1, 7
+	print "There are "
+	print I1
+	print " total Buffer structs\n"
+
 
 	end
 
@@ -171,10 +197,13 @@ done:
 # S15 has the incoming string, S0 is scratch
 dump:
 	if I12, dumpend
+	print "\f"
 	save I0
 	save I1
 	print "\n\n\n\n\n\n\n\n\n\n\n"
-	print "----------------------\n"
+	print "------------- generation "
+	print I0
+	print " -------------\n"
 	set I0, 0
 	set I1, 14
 printloop:
@@ -186,5 +215,6 @@ printloop:
 	ge I1, 0 printloop
 	restore I1
 	restore I0
+	sleep 1
 dumpend:
 	ret

@@ -455,6 +455,18 @@ make_interpreter(INTVAL flags) {
     struct Parrot_Interp *interpreter;
     /* Get an empty interpreter from system memory */
     interpreter = mem_sys_allocate((UINTVAL)sizeof(struct Parrot_Interp));
+
+    /* zero our counters */
+    interpreter->dod_runs = 0;
+    interpreter->collect_runs = 0;
+    interpreter->mem_allocs_since_last_collect = 0;
+    interpreter->header_allocs_since_last_collect = 0;
+    interpreter->active_PMCs = 0;
+    interpreter->active_Buffers = 0;
+    interpreter->total_PMCs = 0;
+    interpreter->total_Buffers = 0;
+    interpreter->memory_allocated = 0;
+
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
@@ -469,9 +481,6 @@ make_interpreter(INTVAL flags) {
     interpreter->warns = mem_sys_allocate(sizeof(struct warnings_t));
     memset(interpreter->warns, 0, sizeof(struct warnings_t));
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
-
-    interpreter->pmc_count = 0;
-    interpreter->string_count = 0;
 
     /* Set up defaults for line/package/file */
     interpreter->current_line = 0;

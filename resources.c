@@ -61,6 +61,8 @@ static void add_header_to_free(struct Parrot_Interp *interpreter,
   *temp_ptr = to_add;
   pool->entries_in_pool++;
   
+  /* Note the numbers */
+  interpreter->active_Buffers--;
 }
 
 /* Mark all the PMCs as not in use.
@@ -206,6 +208,9 @@ do_dod_run(struct Parrot_Interp *interpreter) {
   /* And unused buffers on the free list */
   free_unused_buffers(interpreter);
 
+  /* Note it */
+  interpreter->dod_runs++;
+
   return;
 }
 
@@ -240,6 +245,13 @@ static void alloc_more_string_headers(struct Parrot_Interp *interpreter) {
 
   interpreter->arena_base->last_STRING_Arena = new_arena;
 
+  /* Note it in our stats */
+  interpreter->total_Buffers += STRING_HEADERS_PER_ALLOC;
+  /* Yeah, this is skanky. They're not really active, but
+     add_header_to_free assumes that it's adding an active header to
+     the free list */
+  interpreter->active_Buffers += STRING_HEADERS_PER_ALLOC;
+
   cur_string = new_arena->start_STRING;
   for (i = 0; i < STRING_HEADERS_PER_ALLOC; i++) {
     add_header_to_free(interpreter,
@@ -265,7 +277,6 @@ STRING *new_string_header(struct Parrot_Interp *interpreter) {
     alloc_more_string_headers(interpreter);
   }
 
-
   /* Okay, we do this the long, drawn-out, hard way. Otherwise I get
      really confused and things crash. This, generally, is a Bad
      Thing. */
@@ -284,8 +295,11 @@ STRING *new_string_header(struct Parrot_Interp *interpreter) {
       interpreter->arena_base->string_header_pool->entries_in_pool;
     /* Dereference the buffer pointer to get the real string pointer */
     return_me = *foo;
-    /* Return it */
+    /* Count that we've allocated it */
+    interpreter->active_Buffers++;
+    /* Mark it live */
     return_me->flags = BUFFER_live_FLAG;
+    /* Return it */
     return return_me;
   }
 }
@@ -325,6 +339,10 @@ go_collect(struct Parrot_Interp *interpreter) {
   char *cur_spot;		/* Where we're currently copying to */
   UINTVAL cur_size;	/* How big our chunk is going to be */
   struct STRING_Arena *cur_arena; /* The string arena we're working on */
+
+  /* We're collecting */
+  interpreter->mem_allocs_since_last_collect = 0;
+  interpreter->collect_runs++;
 
   /* Find out how much memory we've used so far. We're guaranteed to
      use no more than this in our collection run */
@@ -386,6 +404,8 @@ go_collect(struct Parrot_Interp *interpreter) {
     cur_pool = interpreter->arena_base->memory_pool;
     while (cur_pool) {
       next_pool = cur_pool->prev;
+      /* Note that we don't have it any more */
+      interpreter->memory_allocated -= cur_pool->size;
       /* We know the pool body and pool header are a single chunk, so
 	 this is enough to get rid of 'em both */
       mem_sys_free(cur_pool);
@@ -431,6 +451,9 @@ Parrot_alloc_new_block(struct Parrot_Interp *interpreter,
   new_pool->start = (char *)new_pool + sizeof(struct Memory_Pool);
   new_pool->top = new_pool->start;
 
+  /* Note that we've allocated it */
+  interpreter->memory_allocated += alloc_size;
+
   /* If this is a public pool, add it to the list of pools for this
      interpreter */
   if (public) {
@@ -474,6 +497,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, UINTVAL size) {
     else {
       /* Allocate a new block, then */
       Parrot_alloc_new_block(interpreter, size, 1);
+      interpreter->mem_allocs_since_last_collect++;
       /* Was *that* enough? */
       if (interpreter->arena_base->memory_pool->free >= size) {
 	return_val = interpreter->arena_base->memory_pool->top;

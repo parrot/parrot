@@ -26,6 +26,7 @@ Parrot's core library of ops.
 
 =cut
 
+# ' for emacs
 
 ###############################################################################
 
@@ -1220,7 +1221,7 @@ inline op inc(inout NUM, in NUM) {
 =item B<mod>(out INT, in INT, in INT)
 
 NOTE: This "corrected mod" algorithm is based on the C code on page 70
-of [1]. Assuming correct behavior of C's built-in mod operator (%) with
+of [1]. Assuming correct behavior of the built-in mod operator (%) with
 positive arguments, this algorithm implements a mathematically convenient
 version of mod, defined thus:
 
@@ -1413,7 +1414,7 @@ These operations operate on STRINGs.
 
 Remove $2 characters from the end of the string in $1.
 
-TODO: Create a three-argument version of this? Don't force in-place modification.
+TODO: Create a three-argument version of this? Don't force in-place modification.'
 
 =cut
 
@@ -1986,7 +1987,7 @@ inline op xor(out INT, in INT, in INT) {
 
 =head2 Interpreter flag modification operations
 
-These operations modify the interpreter's internal flags, affecting its
+These operations modify the internal interpreter flags, affecting its
 subsequent operation.
 
 =over 4
@@ -2409,6 +2410,41 @@ Opcodes which need to be sorted into better categories.
 =over 4
 
 =cut
+
+########################################
+
+=item B<interpinfo>(out INT, in INT)
+
+Fetch some piece of information about the interpreter and put it in $1
+
+=cut
+ 
+op interpinfo(out INT, in INT) {
+  switch ($2) {
+    case TOTAL_MEM_ALLOC: $1 = interpreter->memory_allocated;
+                          break;
+    case DOD_RUNS:        $1 = interpreter->dod_runs;
+                          break;
+    case COLLECT_RUNS:    $1 = interpreter->collect_runs;
+                          break;
+    case ACTIVE_PMCS:     $1 = interpreter->active_PMCs;
+                          break;
+    case ACTIVE_BUFFERS:  $1 = interpreter->active_Buffers;
+                          break;
+    case TOTAL_PMCS:      $1 = interpreter->total_PMCs;
+                          break;
+    case TOTAL_BUFFERS:   $1 = interpreter->total_Buffers;
+                          break;
+    case HEADERS_ALLOC_SINCE_COLLECT:
+    $1 = interpreter->mem_allocs_since_last_collect;
+    break;
+    case MEM_ALLOCS_SINCE_COLLECT:
+    $1 = interpreter->header_allocs_since_last_collect;
+    break;
+  }
+  goto NEXT();
+}
+
 
 ########################################
 
