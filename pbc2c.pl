@@ -13,6 +13,7 @@
 
 use strict;
 
+use lib 'lib';
 use Parrot::Types;
 use Parrot::PackFile;
 use Parrot::PackFile::ConstTable;
