@@ -564,7 +564,7 @@ AUTO_OP and_i {
 
 /* NOT_i */
 AUTO_OP not_i {
-  INT_REG(P1) = ! INT_REG(P2);
+  INT_REG(P1) = ~ INT_REG(P2);
 }
 
 /* OR_i */
