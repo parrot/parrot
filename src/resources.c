@@ -15,7 +15,7 @@
 #include "parrot/parrot.h"
 
 PMC *new_pmc_header(struct Parrot_Interp *interpreter) {
-  return mem_allocate_aligned(sizeof(PMC));
+  return mem_sys_allocate(sizeof(PMC));
 }
 
 void free_pmc(PMC *pmc) {
@@ -23,7 +23,7 @@ void free_pmc(PMC *pmc) {
 }
 
 STRING *new_string_header(struct Parrot_Interp *interpreter) {
-  return mem_allocate_aligned(sizeof(STRING));
+  return mem_sys_allocate(sizeof(STRING));
 }
 
 void free_string(STRING *string) {
