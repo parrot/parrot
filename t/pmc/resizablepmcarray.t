@@ -341,7 +341,7 @@ ok 3
 ok 4
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
 .sub test @MAIN
     .local pmc pmc1

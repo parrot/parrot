@@ -1239,7 +1239,7 @@ ok
 OUT
 
 {
-  # The result of the code should depend on wether we run parrot with the
+  # The result of the code should depend on whether we run parrot with the
   # "-o code.pbc -r -r" command line params.
   # Strangely, the same output is written
   my $output = $ENV{TEST_PROG_ARGS} =~ m/-r / ?

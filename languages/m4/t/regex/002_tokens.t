@@ -209,7 +209,7 @@ my %regex = ( word          => q{^(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w
               simple        => q{^[^`#_a-zA-Z]},
               comment       => q{^#[^\n]*\n},
             );
-# Test wether words are recognised
+# Test whether words are recognised
 {
   foreach my $target ( q{foo}, q{_tmp}, q{name} )
   {
@@ -217,9 +217,9 @@ my %regex = ( word          => q{^(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w
   }
 }
 
-# TODO: Test wether non-words are not recognised
+# TODO: Test whether non-words are not recognised
 
-# Test wether quoted strings are recognised
+# Test whether quoted strings are recognised
 {
   foreach my $target ( q{`quoted'}, q{`'} )
   {
@@ -233,12 +233,12 @@ OUTPUT
 }
 }
 
-# TODO: Test wether non-quoted are not recognised
+# TODO: Test whether non-quoted are not recognised
 
-# TODO: Test wether comments are recognised
+# TODO: Test whether comments are recognised
 
-# TODO: Test wether non-comments are not recognised
+# TODO: Test whether non-comments are not recognised
 
-# TODO: Test wether simple tokens are recognised
+# TODO: Test whether simple tokens are recognised
 
-# TODO: Test wether non-simple tokens are not recognised
+# TODO: Test whether non-simple tokens are not recognised
