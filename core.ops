@@ -521,6 +521,11 @@ inline op set(out NUM, in INT) {
   goto NEXT();
 }
 
+inline op set(out NUM, in STR) {
+  $1 = string_to_num($2);
+  goto NEXT();
+}
+
 inline op set(out NUM, in PMC) {
   $1 = $2->vtable->get_number(interpreter, $2);
   goto NEXT();
