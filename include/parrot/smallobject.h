@@ -30,9 +30,9 @@ struct Small_Object_Pool {
     /* allocates more objects */
     void  (*alloc_objects)(struct Parrot_Interp *,
                            struct Small_Object_Pool *);
-    /* makes more objects available. can call alloc_more_objects */
+    /* makes more objects available. can call alloc_objects */
     void  (*more_objects)(struct Parrot_Interp *,
-                              struct Small_Object_Pool *);
+                          struct Small_Object_Pool *);
     void *mem_pool;
     size_t start_arena_memory;
     size_t end_arena_memory;
@@ -55,8 +55,9 @@ void add_free_object(struct Parrot_Interp *,
                      struct Small_Object_Pool *, void *);
 void *get_free_object(struct Parrot_Interp *,
                       struct Small_Object_Pool *);
-void alloc_more_objects(struct Parrot_Interp *,
-                        struct Small_Object_Pool *);
+
+void alloc_objects(struct Parrot_Interp *, struct Small_Object_Pool *);
+
 struct Small_Object_Pool * new_small_object_pool(struct Parrot_Interp *,
                                                  size_t, size_t);
 
