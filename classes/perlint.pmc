@@ -443,7 +443,7 @@ Subtracts C<value> from the integer and returns the result in C<*dest>.
 =cut
 
 */
-    void subtract_int (INTVAL value, PMC* dest) {
+    void subtract_int (INTVAL b, PMC* dest) {
         INTVAL a = PMC_int_val(SELF);
         INTVAL c = a - b;
         if ((c^a) >= 0 || (c^~b) >= 0)
