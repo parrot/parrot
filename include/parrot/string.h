@@ -16,17 +16,23 @@
 #include "parrot/config.h"
 #include "parrot/encoding.h"
 #include "parrot/chartype.h"
-#include "parrot/parrot.h"
-typedef struct {
+
+struct parrot_string_t {
     void *bufstart;
-    UINTVAL buflen;
-    UINTVAL flags;
-    UINTVAL bufused;
-    UINTVAL strlen;
-    const ENCODING *encoding;
-    const CHARTYPE *type;
-    INTVAL language;
-} STRING;
+    Parrot_UInt buflen;
+    Parrot_UInt flags;
+    Parrot_UInt bufused;
+    Parrot_UInt strlen;
+    const Parrot_Encoding encoding;
+    const Parrot_CharType type;
+    Parrot_Int language;
+};
+
+#define Parrot_String struct parrot_string_t *
+
+#ifdef PARROT_IN_CORE
+
+#include "parrot/parrot.h"
 
 /* Generic buffer header. Enough to GC */
 typedef struct {
@@ -49,6 +55,10 @@ typedef enum BUFFER_flag {
     /* Mark the buffer as pointing to system memory */
     BUFFER_sysmem_FLAG		= 2 << 4
 } BUFFER_flags;
+
+#define STRING struct parrot_string_t
+
+#endif
 
 #endif
 

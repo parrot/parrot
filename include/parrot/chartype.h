@@ -13,22 +13,33 @@
 #if !defined(PARROT_CHARTYPE_H_GUARD)
 #define PARROT_CHARTYPE_H_GUARD
 
-typedef UINTVAL (*CHARTYPE_TRANSCODER)(UINTVAL c);
+typedef Parrot_UInt (*Parrot_CharType_Transcoder)(Parrot_UInt c);
 
-typedef struct {
+struct parrot_chartype_t {
     const char *name;
     const char *default_encoding;
-    CHARTYPE_TRANSCODER (*transcode_from)(const char *from);
-    CHARTYPE_TRANSCODER (*transcode_to)(const char *to);
-    BOOLVAL (*is_digit)(UINTVAL c);
-    INTVAL (*get_digit)(UINTVAL c);
-} CHARTYPE;
+    Parrot_CharType_Transcoder (*transcode_from)(const char *from);
+    Parrot_CharType_Transcoder (*transcode_to)(const char *to);
+    Parrot_Bool (*is_digit)(Parrot_UInt c);
+    Parrot_Int (*get_digit)(Parrot_UInt c);
+};
 
-const CHARTYPE *
-chartype_lookup(const char *name);
+#define Parrot_CharType struct parrot_chartype_t *
+
+const Parrot_CharType
+Parrot_chartype_lookup(const char *name);
+
+#ifdef PARROT_IN_CORE
+
+#define CHARTYPE struct parrot_chartype_t
+typedef Parrot_CharType_Transcoder CHARTYPE_TRANSCODER;
+
+#define chartype_lookup Parrot_chartype_lookup
 
 CHARTYPE_TRANSCODER
 chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to);
+
+#endif
 
 #endif
 

@@ -67,17 +67,12 @@ typedef ${iv} Parrot_Int;
 typedef unsigned ${iv} Parrot_UInt;
 typedef ${nv} Parrot_Float;
 typedef ${opcode_t} Parrot_Opcode;
+typedef unsigned char Parrot_Bool;
+typedef void * Parrot_Pointer;
+typedef void * Parrot_Sync;
 
-/* The need for these next few makes me wonder if we should split config.h into several files */
-
-struct STRING;
-struct PMC;
-struct Parrot_Interp;
-struct PackFile;
-
-typedef struct STRING			* Parrot_String;
-typedef struct PMC				* Parrot_PMC; /* Or Parrot_Object? How do we do vtable calls? */
-typedef struct Parrot_Interp	* Parrot;
-typedef struct PackFile			* Parrot_PackFile;
+/* These are temporary until we put them in the proper places. */
+struct Parrot_Interp;  typedef struct Parrot_Interp	* Parrot;
+struct PackFile;		typedef struct PackFile * Parrot_PackFile;
 
 #endif

@@ -22,25 +22,22 @@ typedef int Parrot_flag;
 typedef int Parrot_warnclass;
 typedef void * Parrot_flag_val;
 
+Parrot Parrot_new(void);
 
-/* These two are basically Magic Cookies to the outside world. */
-struct Parrot_Interp;
-struct PackFile;
+void Parrot_init(Parrot);
 
-struct Parrot_Interp *Parrot_new(void);
+void Parrot_setflag(Parrot, Parrot_flag, Parrot_flag_val);
 
-void Parrot_init(struct Parrot_Interp *);
+void Parrot_setwarnings(Parrot, Parrot_warnclass);
 
-void Parrot_setflag(struct Parrot_Interp *, Parrot_flag, Parrot_flag_val);
+Parrot_PackFile Parrot_readbc(Parrot, char *);
 
-void Parrot_setwarnings(struct Parrot_Interp *, Parrot_warnclass);
+void Parrot_setwarnings(Parrot, Parrot_warnclass);
 
-struct PackFile * Parrot_readbc(struct Parrot_Interp *, char *);
+void Parrot_loadbc(Parrot, Parrot_PackFile);
 
-void Parrot_loadbc(struct Parrot_Interp *, struct PackFile *);
+void Parrot_runcode(Parrot, int argc, char *argv[]);
 
-void Parrot_runcode(struct Parrot_Interp *, int argc, char *argv[]);
-
-void Parrot_destroy(struct Parrot_Interp *);
+void Parrot_destroy(Parrot);
 
 #endif

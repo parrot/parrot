@@ -13,18 +13,28 @@
 #if !defined(PARROT_ENCODING_H_GUARD)
 #define PARROT_ENCODING_H_GUARD
 
-typedef struct {
+struct parrot_encoding_t {
     const char *name;
-    UINTVAL max_bytes;
-    UINTVAL (*characters)(const void *ptr, UINTVAL bytes);
-    UINTVAL (*decode)(const void *ptr);
-    void *(*encode)(void *ptr, UINTVAL c);
-    void *(*skip_forward)(const void *ptr, UINTVAL n);
-    void *(*skip_backward)(const void *ptr, UINTVAL n);
-} ENCODING;
+    Parrot_UInt max_bytes;
+    Parrot_UInt (*characters)(const void *ptr, Parrot_UInt bytes);
+    Parrot_UInt (*decode)(const void *ptr);
+    void *(*encode)(void *ptr, Parrot_UInt c);
+    void *(*skip_forward)(const void *ptr, Parrot_UInt n);
+    void *(*skip_backward)(const void *ptr, Parrot_UInt n);
+};
 
-const ENCODING *
-encoding_lookup(const char *name);
+#define Parrot_Encoding struct parrot_encoding_t *
+
+const Parrot_Encoding
+Parrot_encoding_lookup(const char *name);
+
+#ifdef PARROT_IN_CORE
+
+#define ENCODING struct parrot_encoding_t
+
+#define encoding_lookup Parrot_encoding_lookup
+
+#endif
 
 #endif
 

@@ -15,7 +15,7 @@
 #define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2);
 
 char *
-parseflags(struct Parrot_Interp *interpreter, int *argc, char **argv[]);
+parseflags(Parrot interpreter, int *argc, char **argv[]);
 
 static void
 usage(void);
@@ -25,10 +25,10 @@ version(void);
 
 int
 main(int argc, char *argv[]) {
-    struct Parrot_Interp *interpreter;
+    Parrot interpreter;
     char *filename;
-    struct PackFile *pf;
-    
+    Parrot_PackFile pf;
+   
     interpreter=Parrot_new();
 
     if(!interpreter) {
@@ -53,7 +53,7 @@ main(int argc, char *argv[]) {
 }
 
 char *
-parseflags(struct Parrot_Interp *interpreter, int *argc, char **argv[]) {
+parseflags(Parrot interpreter, int *argc, char **argv[]) {
     if(*argc==1) {
         usage();
     }
@@ -64,27 +64,27 @@ parseflags(struct Parrot_Interp *interpreter, int *argc, char **argv[]) {
 
     while ((*argc) && (*argv)[0][0] == '-') {
         switch((*argv)[0][1]) {
-           case 'b':
-               setopt(PARROT_BOUNDS_FLAG); break;
-           case 'j':
-               setopt(PARROT_JIT_FLAG); break;
-           case 'p':
-               setopt(PARROT_PROFILE_FLAG); break;
-           case 'P':
-               setopt(PARROT_PREDEREF_FLAG); break;
-           case 't':
-				setopt(PARROT_TRACE_FLAG); break;
-           case 'd':
-				setopt(PARROT_DEBUG_FLAG); break;
-           case 'h':
-				usage(); break;
-           case 'v':
-				version(); break;
-		   case 'w':
-				Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG); break;
+            case 'b':
+                setopt(PARROT_BOUNDS_FLAG); break;
+            case 'j':
+                setopt(PARROT_JIT_FLAG); break;
+            case 'p':
+                setopt(PARROT_PROFILE_FLAG); break;
+            case 'P':
+                setopt(PARROT_PREDEREF_FLAG); break;
+            case 't':
+                setopt(PARROT_TRACE_FLAG); break;
+            case 'd':
+                setopt(PARROT_DEBUG_FLAG); break;
+            case 'h':
+                usage(); break;
+            case 'v':
+                version(); break;
+            case 'w':
+                 Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG); break;
 
-		   case '.':
-			   fgetc(stdin); break;
+            case '.': /* Give Windows Parrot hackers an opportunity to attach a debuggger. */
+                 fgetc(stdin); break;
 				
            case '-':
                (*argc)--;
@@ -117,7 +117,8 @@ usage(void) {
   -p	Activate profiling\n\
   -P	Activate predereferencing\n\
   -t	Activate tracing\n\
-  -v	Display version information\n\n");
+  -v	Display version information\n\
+  -.	Wait for a keypress (gives Windows users time to attach a debugger)\n\n");
 
     exit(0);
 }
