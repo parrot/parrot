@@ -1,4 +1,10 @@
 #!/usr/bin/perl -w
+#
+# This is a minimal and incomplete python bytecode to PIR translator
+# It's purpose is just to investigate missing pythonic features
+# in Parrot and how to translate Python stack-oriented bytecode to PIR.
+#
+
 use strict;
 use Getopt::Std;
 
@@ -17,7 +23,6 @@ get_dis($DIS, $file);
 get_source($file);
 exit if $opt{D};
 gen_code();
-
 
 # return disassembly of file
 # Pfew
@@ -112,6 +117,8 @@ EOC
 	$n = $arg_count{$arg};
 	$defs = @{$def_args{$arg}};
 	print "# @{$def_args{$arg}}\n";
+	# XXX this is wrong, the default args should be evaluated once
+	#     if this value depends on a global and that changes, this fails
 	for ($i = $n; @{$def_args{$arg}}; $i--) {
 	    my $reg = 4 + $i;
 	    my $d = pop @{$def_args{$arg}};
@@ -155,8 +162,9 @@ EOC
     }
     while ($code_l < @code) {
 	my $l = $code[$code_l++];
-	my ($opcode, $arg, $rest) = ($l->[2], $l->[3], $l->[4]);
+	my ($opcode, $arg, $rest, $src) = ($l->[2], $l->[3], $l->[4], $l->[5]);
 	my $cmt = "";
+	print "## $src" if  $src;
 	$cmt = "\t\t# $opcode\t$arg $rest" unless $opt{n};
 	gen_pir($opcode, $arg, $rest, $cmt);
     }
@@ -524,11 +532,31 @@ EOC
     }
 }
 
+sub except_compare
+{
+    my ($l, $r) = @_;
+    my $cmp = temp('I');
+    if ($l && $l->[1]) {
+	$l = $l->[1];
+    }
+    else {
+	$l = 'P5';
+    }
+    print <<EOC;
+	# except compare '$l' <=> $r->[1]
+	$cmp = iseq $l, $r->[1]
+EOC
+    push @stack, [-1, $cmp, 'P'];
+}
+
 sub COMPARE_OP
 {
     my ($n, $c, $cmt) = @_;
     my $r = pop @stack;
     my $l = pop @stack;
+    if ($c =~ /exception match/) {
+	return except_compare($l, $r);
+    }
     my %rev_map = (
 	'==' => '!=',
 	'!=' => '==',
@@ -574,8 +602,30 @@ sub COMPARE_OP
 	$code_l++;
 	$op = $c;
     }
-    elsif ($label ne '') {
-	$code_l--;
+    else {
+	$code_l-- if ($label ne '');
+	# plain compare, no branch
+	my %is_map = (
+	    '==' => 'iseq',
+	    '!=' => 'isne',
+	    '>' => 'isgt',
+	    '>=' => 'isge',
+	    '<' => 'islt',
+	    '<=' => 'isle',
+	);
+	my $res = temp('I');
+	my $pres = temp('P');
+	$op = $is_map{$c};
+	my $lp = promote($l);
+	my $rp = promote($r);
+	print <<EOC;
+	$res = $op $lp, $rp
+	$pres = new .Boolean
+	$pres = $res # ugly
+EOC
+	push @stack, [-1, $pres, 'I'];
+	return;
+
     }
     # XXX the label may be wrong, if the JUMP_IF_x got rewritten
     if ($r->[2] eq 'I' && $l->[2] eq 'I') {
@@ -739,14 +789,21 @@ EOC
 sub RAISE_VARARGS
 {
     my ($n, $c, $cmt) = @_;
-    for (my $i = $n-1; $i >= 0; $i--) {
-	my $p = pop @stack;
-	print <<EOC;
+    my $throw;
+    if ($n == 0) {
+	$throw = 'rethrow P5';
+    }
+    else {
+	$throw = 'throw P5 # TODO create, args';
+	for (my $i = $n-1; $i >= 0; $i--) {
+	    my $p = pop @stack;
+	    print <<EOC;
 	# arg $p->[1]
 EOC
+	}
     }
     print <<EOC;
-	# TODO $cmt
+	$throw $cmt
 EOC
 }
 sub SETUP_LOOP
@@ -802,7 +859,11 @@ EOC
 
 sub DUP_TOP
 {
+    my ($n, $c, $cmt) = @_;
     my $tos = $stack[-1];
+    print <<EOC;
+	$cmt
+EOC
     push @stack, $tos;
 }
 
@@ -826,5 +887,27 @@ sub STORE_SUBSCR
     my $x = pop @stack;
     print <<EOC
 	$v->[1]\[$x->[1]\] = $w->[1] $cmt
+EOC
+}
+
+# exceptions
+sub SETUP_EXCEPT
+{
+    my ($n, $c, $cmt) = @_;
+    my $targ = "pc_xxx";
+    if ($c =~ /to (\d+)/) {
+	$targ = "pc_$1";
+    }
+    my $eh = temp('P');
+    print <<EOC;
+	newsub $eh, .Exception_Handler, $targ $cmt
+	set_eh $eh
+EOC
+}
+sub END_FINALLY
+{
+    my ($n, $c, $cmt) = @_;
+    print <<EOC;
+	clear_eh $cmt
 EOC
 }

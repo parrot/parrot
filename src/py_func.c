@@ -101,6 +101,14 @@ parrot_py_global(Interp *interpreter, void *func,
     Parrot_store_global(interpreter, NULL, name, method);
 }
 
+/*
+
+=item C<static void parrot_py_create_funcs(Interp *interpreter)>
+
+Initialize Python builtin functions.
+
+*/
+
 static void
 parrot_py_create_funcs(Interp *interpreter)
 {
@@ -125,6 +133,30 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_range_1),
             range_1, range_1_sig);
 }
+
+/*
+
+=item C<static void parrot_py_create_exception(Interp *interpreter)>
+
+Initialize Python exceptions objects and globals.
+
+*/
+
+static void
+parrot_py_create_exceptions(Interp *interpreter)
+{
+    PMC *ex;
+    STRING *s;
+
+    ex = pmc_new(interpreter, enum_class_Exception);
+    s = CONST_STRING(interpreter, "Exception");
+    Parrot_store_global(interpreter, NULL, s, ex);
+
+    ex = pmc_new(interpreter, enum_class_Exception);
+    s = CONST_STRING(interpreter, "RuntimeError");
+    Parrot_store_global(interpreter, NULL, s, ex);
+}
+
 /*
 
 =item C<void Parrot_py_init(Interp *interpreter)>
@@ -135,6 +167,7 @@ Initialize Python functions.
 
 void Parrot_py_init(Interp *interpreter) {
     parrot_py_create_funcs(interpreter);
+    parrot_py_create_exceptions(interpreter);
 
 }
 

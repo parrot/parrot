@@ -584,12 +584,13 @@ real_exception(Interp *interpreter, void *ret_addr,
     }
     else
         msg = string_make(interpreter, format, strlen(format),
-							"iso-8859-1", PObj_external_FLAG);
-			/* string_from_cstring(interpreter, format, strlen(format)); */
+                "iso-8859-1", PObj_external_FLAG);
+    /* string_from_cstring(interpreter, format, strlen(format)); */
     /*
      * FIXME classify errors
      */
     the_exception->severity = EXCEPT_error;
+    the_exception->error = exitcode;
     the_exception->msg = msg;
     the_exception->resume = ret_addr;
     /*

@@ -219,6 +219,24 @@ Sets the PMC value for C<*key>.
         STRING* s = key_string(INTERP, key);
         DYNSELF.setprop(s, value);
     }
+/*
+
+=item C<INTVAL cmp(PMC *value)>
+
+Compare the passed in Exception with SELF. Returns false if C<SELF> isa C<value>
+
+=cut
+
+*/
+    INTVAL cmp(PMC *value) {
+        if (value->vtable->base_type == enum_class_Exception ||
+                VTABLE_isa(INTERP, value,
+                    const_string(INTERP, "Exception"))) {
+            /* TODO check parents */
+            return 0;
+        }
+        return 1;       /* differnt, cmp! */
+    }
 }
 
 /*
