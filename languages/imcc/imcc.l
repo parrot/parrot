@@ -656,6 +656,11 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     struct macro_t *m;
     const char *expansion;
     int start_cond;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
+#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
     UNUSED(valp);
     frame = new_frame();
@@ -670,9 +675,8 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     frame->params = &m->params;
     if (m) {
         /* remember macro name for error reporting
-         * properly
          */
-        sourcefile = name;
+        sourcefile = const_cast(name);
         frame->is_macro = 1;
 	/* whitespace can be savely ignored */
 	do {

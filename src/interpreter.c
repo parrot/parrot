@@ -40,51 +40,6 @@ struct Parrot_Interp interpre;
 
 static void setup_default_compreg(Parrot_Interp interpreter);
 
-/*=for api interpreter load_oplib
- *
- * dynamically load an op_lib extension
- * returns dll handle on success, else 0
- *
- * TODO how do we run these ops
-     */
-#if 0
-void *
-load_oplib(struct Parrot_Interp * interpreter,
-        const char *file, const char *init_func_name)
-{
-    void *handle = Parrot_dlopen(file);
-    oplib_init_f init_func;
-    op_lib_t *oplib;
-
-    if (!handle)
-        internal_exception(1, "Couldn't load oplib file '%s': %s\n",
-                file, Parrot_dlerror());
-    init_func =
-        (oplib_init_f)(ptrcast_t)Parrot_dlsym(handle, init_func_name);
-    if (!init_func)
-        internal_exception(1, "Invalid oplib, '%s' not exported\n",
-                init_func_name);
-    oplib = init_func(1);
-    /* XXX now what
-     * if oplib is a prederefed oplib, and matches the current
-     * oplib, we would run it */
-    return handle;
-}
-#endif
-
-/*=for api interpreter unload_oplib
- *
- * unload op_lib extension
-     */
-#if 0
-void
-unload_oplib(void *handle)
-{
-    Parrot_dlclose(handle);
-}
-#endif
-
-
 /*=for api interpreter prederef
  *
  * Predereference the current opcode. Note that this function has the
@@ -108,33 +63,46 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 {
     size_t offset = pc_prederef - interpreter->prederef_code;
     opcode_t *pc = ((opcode_t *)interpreter->code->byte_code) + offset;
-    op_info_t *opinfo = &interpreter->op_info_table[*pc];
+    op_info_t *opinfo;
     op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
+    struct PackFile_ConstTable * const_table = interpreter->code->const_table;
     int i;
 
+    if (*pc < 0 || *pc >= (opcode_t)interpreter->op_count)
+        internal_exception(INTERP_ERROR, "Illegal opcode");
+    opinfo = &interpreter->op_info_table[*pc];
     for (i = 0; i < opinfo->arg_count; i++) {
+        opcode_t arg = pc[i];
+
         switch (opinfo->types[i]) {
         case PARROT_ARG_OP:
-            pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[pc[i]];
+            pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[arg];
             break;
 
         case PARROT_ARG_KI:
         case PARROT_ARG_I:
-            pc_prederef[i] = (void *)&interpreter->int_reg.registers[pc[i]];
+            if (arg < 0 || arg >= NUM_REGISTERS)
+                internal_exception(INTERP_ERROR, "Illegal register number");
+            pc_prederef[i] = (void *)&interpreter->int_reg.registers[arg];
             break;
 
         case PARROT_ARG_N:
-            pc_prederef[i] = (void *)&interpreter->num_reg.registers[pc[i]];
+            if (arg < 0 || arg >= NUM_REGISTERS)
+                internal_exception(INTERP_ERROR, "Illegal register number");
+            pc_prederef[i] = (void *)&interpreter->num_reg.registers[arg];
             break;
 
         case PARROT_ARG_K:
         case PARROT_ARG_P:
-            pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[pc[i]];
+            if (arg < 0 || arg >= NUM_REGISTERS)
+                internal_exception(INTERP_ERROR, "Illegal register number");
+            pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[arg];
             break;
 
         case PARROT_ARG_S:
-            pc_prederef[i] =
-                (void *)&interpreter->string_reg.registers[pc[i]];
+            if (arg < 0 || arg >= NUM_REGISTERS)
+                internal_exception(INTERP_ERROR, "Illegal register number");
+            pc_prederef[i] = (void *)&interpreter->string_reg.registers[arg];
             break;
 
         case PARROT_ARG_KIC:
@@ -143,25 +111,32 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
             break;
 
         case PARROT_ARG_NC:
-            pc_prederef[i] = (void *)
-                &interpreter->code->const_table->constants[pc[i]]->u.number;
+            if (arg < 0 || arg >= const_table->const_count)
+                internal_exception(INTERP_ERROR, "Illegal constant number");
+            pc_prederef[i] = (void *) &const_table->constants[arg]->u.number;
             break;
 
         case PARROT_ARG_PC:
+            if (arg < 0 || arg >= const_table->const_count)
+                internal_exception(INTERP_ERROR, "Illegal constant number");
 /*        pc_prederef[i] = (void *)
-                 &interpreter->code->const_table->constants[pc[i]]->pmc; */
+                 &const_table->constants[arg]->pmc; */
             internal_exception(ARG_OP_NOT_HANDLED,
                                "PMC constants not yet supported!\n");
             break;
 
         case PARROT_ARG_SC:
+            if (arg < 0 || arg >= const_table->const_count)
+                internal_exception(INTERP_ERROR, "Illegal constant number");
             pc_prederef[i] = (void *)
-                &interpreter->code->const_table->constants[pc[i]]->u.string;
+                &const_table->constants[arg]->u.string;
             break;
 
         case PARROT_ARG_KC:
+            if (arg < 0 || arg >= const_table->const_count)
+                internal_exception(INTERP_ERROR, "Illegal constant number");
             pc_prederef[i] = (void *)
-                &interpreter->code->const_table->constants[pc[i]]->u.key;
+                &const_table->constants[arg]->u.key;
             break;
         default:
             internal_exception(ARG_OP_NOT_HANDLED,
@@ -206,11 +181,11 @@ fill_prederef(struct Parrot_Interp *interpreter, int cgp, size_t N, void **temp)
                 *temp = (void**) *pc;
                 break;
             case PREDEREF_FOR_CGP:
-                *temp = ((void**)(interpreter->op_lib->op_func_table)) [*pc];
+                *temp = ((void**)(prederef_op_func)) [*pc];
                 break;
             case PREDEREF_FOR_EXEC:
                 if (is_ret)
-                    *temp = ((op_func_t*)interpreter->op_lib->op_func_table)[2];
+                    *temp = (void *)(ptrcast_t)prederef_op_func[2];
                 else
                     *temp = (void *)(ptrcast_t)prederef_op_func[*pc];
                 break;
