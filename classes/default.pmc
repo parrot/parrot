@@ -312,4 +312,14 @@ pmclass default abstract noinit {
 	return does_isa(INTERP, method, SELF->vtable->isa_str);
 
     }
+
+    void traverse(traverse_info* info) {
+	(info->func)(INTERP, SELF, info);
+    }
+
+    void dump(traverse_info* info) {
+	STRING *s = Parrot_sprintf_c(INTERP, "%Ss=PMC(%#p)",
+		VTABLE_name(INTERP, SELF), SELF);
+	info->image = string_append(interpreter, info->image, s, 0);
+    }
 }

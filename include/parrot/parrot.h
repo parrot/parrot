@@ -98,14 +98,6 @@ typedef struct PMC PMC;
 typedef void STRING_FUNCS;
 typedef void BIGNUM;
 
-typedef struct _traverse_info {
-    PMC *src;   /* clone, freeze, dump src */
-    PMC *dest;  /* thaw, clone destination */
-    void *seen;  /* seen hash */
-    void *todo;  /* todo list */
-    opcode_t *image;    /* freeze, thaw image */
-} traverse_info;
-
 
 /* weird architectures might need this, s. C-FAQ 5.17
  *
@@ -229,6 +221,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/datatypes.h"
 #include "parrot/chartype.h"
 #include "parrot/string.h"
+#include "parrot/list.h"
 #include "parrot/hash.h"
 #include "parrot/vtable.h"
 #include "parrot/register.h"
@@ -242,7 +235,6 @@ typedef void (*funcptr_t)(void);
 #include "parrot/op.h"
 #include "parrot/pmc.h"
 #include "parrot/events.h"
-#include "parrot/list.h"
 #include "parrot/intlist.h"
 #include "parrot/smallobject.h"
 #include "parrot/headers.h"

@@ -535,5 +535,23 @@ pmclass Array need_ext does array {
 	}
 	return ret;
     }
+
+    void traverse(traverse_info* info) {
+	INTVAL i;
+
+	SUPER(info);
+	for (i = 0; i < VTABLE_elements(INTERP, SELF); ++i) {
+	    PMC *p =
+		Parrot_Array_get_pmc_ptr(INTERP, (List *)PMC_data(SELF), i);
+	    todo_traverse(INTERP, info, p);
+	}
+    }
+
+    void dump(traverse_info* info) {
+	STRING *s;
+	SUPER(info);
+	s = string_from_cstring(INTERP, " -> ", 0);
+	info->image = string_append(interpreter, info->image, s, 0);
+    }
 }
 

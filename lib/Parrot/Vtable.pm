@@ -52,8 +52,21 @@ sub parse_vtable {
 
 sub vtbl_defs {
     my $vtable = shift;
-    my $defs = "";
     my $entry;
+
+    my $defs = <<EOT;
+typedef struct _traverse_info {
+    PMC *src;   /* clone, freeze, dump src */
+    PMC *dest;  /* thaw, clone destination */
+    HASH *seen;  /* seen hash */
+    STRING *key;	/* seen key */
+    List *todo;  /* todo list */
+    STRING *image;    /* freeze, thaw image, dump string */
+    void (*func)(Parrot_Interp, PMC*, struct _traverse_info *);
+    void *extra;
+} traverse_info;
+
+EOT
 
     for $entry (@{$vtable}) {
         my $args = join(", ", 'struct Parrot_Interp* interpreter', 'PMC* pmc', split(/\s*,\s*/, $entry->[2]));

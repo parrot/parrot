@@ -258,9 +258,12 @@ static void
 traverse_init(Parrot_Interp interpreter, void* arg, traverse_enum_t what,
         traverse_info *info)
 {
-    new_hash(interpreter, (HASH**)&info->seen);
+    new_hash(interpreter, &info->seen);
     info->todo = list_new(interpreter, enum_type_PMC);
     info->dest = NULL;
+    info->extra = NULL;
+    info->key = string_make(interpreter, NULL, sizeof(PMC *), NULL,
+                PObj_external_FLAG, NULL);
     switch (what) {
         case TRAV_DO_CLONE:
         case TRAV_DO_DUMP:
@@ -270,11 +273,29 @@ traverse_init(Parrot_Interp interpreter, void* arg, traverse_enum_t what,
             list_push(interpreter, info->todo, arg, enum_type_PMC);
             break;
         case TRAV_DO_THAW:
-            info->image = (opcode_t*) arg;
+            info->image = (STRING*) arg;
             break;
         case TRAV_DO_DESTROY_ORDER:
             break;
     }
+}
+
+static void*
+traverse_ret(Parrot_Interp interpreter, traverse_enum_t what,
+        traverse_info *info)
+{
+    switch (what) {
+        case TRAV_DO_CLONE:
+            return NULL;
+        case TRAV_DO_THAW:
+        case TRAV_DO_DUMP:
+            return info->image;
+        case TRAV_DO_FREEZE:
+            return NULL;
+        case TRAV_DO_DESTROY_ORDER:
+            return NULL;
+    }
+    return NULL;
 }
 
 static STRING*
@@ -282,12 +303,13 @@ pmc_2_key(Parrot_Interp interpreter, PMC *pmc, STRING *key)
 {
     if (!key) {
         /* generate new key for hash_put */
-        key = string_from_cstring(interpreter, pmc, sizeof(PMC *));
+        key = string_make(interpreter, pmc, sizeof(PMC *), NULL,
+                PObj_external_FLAG, NULL);
     }
     else {
         /* reuse passed key for lookup */
         key->strstart = pmc;
-        key->strlen = sizeof(PMC *);
+        key->bufused = key->strlen = sizeof(PMC *);
     }
     return key;
 }
@@ -297,37 +319,46 @@ do_traverse(Parrot_Interp interpreter, void* arg, traverse_enum_t what)
 {
     traverse_info info;
     PMC *cur;
-    STRING *key = string_from_cstring(interpreter, NULL, sizeof(PMC*));
-    HASH_ENTRY *he, entry;
 
     traverse_init(interpreter, arg, what, &info);
-    switch (what) {
-        case TRAV_DO_CLONE:
-            while (list_length(interpreter, info.todo)) {
-                cur = list_shift(interpreter, info.todo, enum_type_PMC);
-                he = hash_get(interpreter, info.seen,
-                        pmc_2_key(interpreter, cur, key));
-                if (he)
-                    info.dest = he->val.pmc_val;
-                else
-                    info.dest = NULL;
-                entry.type = enum_hash_pmc;
-                entry.val.pmc_val = cur;
-                hash_put(interpreter, info.seen,
-                        pmc_2_key(interpreter, cur, NULL), &entry);
-                VTABLE_new_clone(interpreter, cur, &info);
-            }
-            break;
-        case TRAV_DO_DUMP:
-            break;
-        case TRAV_DO_FREEZE:
-            break;
-        case TRAV_DO_THAW:
-            break;
-        case TRAV_DO_DESTROY_ORDER:
-            break;
+    while (list_length(interpreter, info.todo)) {
+        cur = *(PMC**)list_shift(interpreter, info.todo, enum_type_PMC);
+        switch (what) {
+            case TRAV_DO_CLONE:
+                info.func = cur->vtable->new_clone;
+                break;
+            case TRAV_DO_DUMP:
+                info.func = cur->vtable->dump;
+                break;
+            case TRAV_DO_FREEZE:
+                break;
+            case TRAV_DO_THAW:
+                break;
+            case TRAV_DO_DESTROY_ORDER:
+                break;
+        }
+        VTABLE_traverse(interpreter, cur, &info);
     }
-    return NULL;
+    return traverse_ret(interpreter, what, &info);
+}
+
+void
+todo_traverse(Parrot_Interp interpreter, traverse_info* info, PMC* p)
+{
+    HASH_ENTRY *he, entry;
+    he = hash_get(interpreter, info->seen,
+            pmc_2_key(interpreter, p, info->key));
+    if (he)
+        info->dest = he->val.pmc_val;
+    else {
+        info->dest = NULL;
+        entry.type = enum_hash_pmc;
+        entry.val.pmc_val = p;
+        hash_put(interpreter, info->seen,
+                pmc_2_key(interpreter, p, NULL), &entry);
+        /* depth first */
+        list_push(interpreter, info->todo, p, enum_type_PMC);
+    }
 }
 
 /* This segment is made up of the 'fallback' functions -- the

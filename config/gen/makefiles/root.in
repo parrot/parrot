@@ -842,12 +842,12 @@ exec_so : exec_start$(O) blib/lib/libparrot$(SO)
 ###### OS depend targets ##########
 # libnci.so used by t/pmc/nci.t
 
-libnci$(SO): nci_test.c parrot$(EXE)
+libnci$(SO): nci_test.c
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $< -o $@
 
 # ctags
 
-tags:
+tags:	parrot$(EXE)
 	ctags -R --links=no .
 
 # test the EXEC stuff

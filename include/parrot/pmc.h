@@ -47,6 +47,7 @@ opcode_t* do_freeze(Parrot_Interp, PMC*);
 STRING*   do_dump(Parrot_Interp, PMC*);
 PMC*      do_thaw(Parrot_Interp, opcode_t*);
 void*     do_traverse(Parrot_Interp, void*, traverse_enum_t what);
+void      todo_traverse(Parrot_Interp, traverse_info*, PMC*);
 
 /* multi method fallbacks */
 void register_fallback_methods(Parrot_Interp);
