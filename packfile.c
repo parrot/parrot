@@ -763,9 +763,9 @@ PackFile_new(INTVAL is_mapped)
         PackFile_Segment_new_seg(pf, PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, 1);
     pf->need_wordsize = 0;
     pf->need_endianize = 0;
-    pf->fetch_op = (opcode_t (*)(opcode_t)) NULL;
-    pf->fetch_iv = (INTVAL (*)(INTVAL)) NULL;
-    pf->fetch_nv = (void (*)(unsigned char *, unsigned char *)) NULL;
+    pf->fetch_op = (opcode_t (*)(opcode_t)) NULLfunc;
+    pf->fetch_iv = (INTVAL (*)(INTVAL)) NULLfunc;
+    pf->fetch_nv = (void (*)(unsigned char *, unsigned char *)) NULLfunc;
     return pf;
 }
 
@@ -868,10 +868,10 @@ pf_register_standard_funcs(struct PackFile *pf)
     };
     struct PackFile_funcs defaultf = {
         PackFile_Segment_new,
-        (PackFile_Segment_destroy_func_t) NULL,
-        (PackFile_Segment_packed_size_func_t) NULL,
-        (PackFile_Segment_pack_func_t) NULL,
-        (PackFile_Segment_unpack_func_t) NULL,
+        (PackFile_Segment_destroy_func_t) NULLfunc,
+        (PackFile_Segment_packed_size_func_t) NULLfunc,
+        (PackFile_Segment_pack_func_t) NULLfunc,
+        (PackFile_Segment_unpack_func_t) NULLfunc,
         default_dump
     };
     struct PackFile_funcs fixupf = {
@@ -893,9 +893,9 @@ pf_register_standard_funcs(struct PackFile *pf)
     struct PackFile_funcs bytef = {
         byte_code_new,
         byte_code_destroy,
-        (PackFile_Segment_packed_size_func_t) NULL,
-        (PackFile_Segment_pack_func_t) NULL,
-        (PackFile_Segment_unpack_func_t) NULL,
+        (PackFile_Segment_packed_size_func_t) NULLfunc,
+        (PackFile_Segment_pack_func_t) NULLfunc,
+        (PackFile_Segment_unpack_func_t) NULLfunc,
         default_dump
     };
     struct PackFile_funcs debugf = {

@@ -210,7 +210,7 @@ examples/benchmarks/primes.pasm
 examples/benchmarks/primes.pl
 examples/benchmarks/primes2.c
 examples/benchmarks/primes2.pasm
-examples/benchmarks/primes2.pl
+examples/benchmarks/primes2.py
 examples/benchmarks/stress.pasm
 examples/benchmarks/stress.pl
 examples/benchmarks/stress2.pasm
