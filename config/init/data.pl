@@ -25,6 +25,7 @@ sub runstep {
     # (Usually cc or cl, or something like that.)
     cc            => $Config{cc},
     ccflags       => $Config{ccflags},
+    ccwarn        => $Config{ccwarn},
 
     # Linker, used to link object files (plus libraries) into
     # an executable.  It is usually $cc on Unix-ish systems.
@@ -44,7 +45,7 @@ sub runstep {
     cc_inc	  => "-I./include",
     cc_debug      => '-g',
     link_debug    => '',
-    cc_warn       => '',
+
     o             => '.o',                # object files extension
     so            => '.so',               # dynamic link library or shared object extension
     a             => '.a',                # library or archive extension

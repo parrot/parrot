@@ -13,14 +13,15 @@ sub runstep {
   my %args;
   @args{@args}=@_;
 
-  my($cc, $link, $ld, $ccflags, $linkflags, $ldflags, $libs, $lex, $yacc) =
-  Configure::Data->get(qw(cc link ld ccflags linkflags ldflags libs lex yacc));
+  my($cc, $link, $ld, $ccflags, $ccwarn, $linkflags, $ldflags, $libs, $lex,
+     $yacc) =
+       Configure::Data->get(qw(cc link ld ccflags ccwarn linkflags ldflags
+			       libs lex yacc));
   $ccflags =~ s/-D(PERL|HAVE)_\w+\s*//g;
   $ccflags =~ s/-fno-strict-aliasing//g;
   $linkflags =~ s/-libpath:\S+//g;
   $ldflags =~ s/-libpath:\S+//g;
   my $debug='n';
-  my $cc_warn='';
 
   $libs=join ' ',
   grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm|dbm|ndbm|db)$/ }
@@ -93,7 +94,7 @@ END
     linkflags => $linkflags,
     ldflags => $ldflags,
     libs    => $libs,
-    cc_warn => $cc_warn,
+    ccwarn => $ccwarn,
     lex     => $lex,
     yacc    => $yacc,
   );

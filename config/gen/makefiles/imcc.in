@@ -23,7 +23,7 @@ O_FILES = $(IMCC_O_FILES) ../../$(PARROTLIB)
 #Add them in Configure.pl--look for the
 #comment 'ADD C COMPILER FLAGS HERE'
 
-CFLAGS = ${ccflags} ${cc_debug} ${cc_warn} ${cc_hasjit} ${cg_flag}  -I../../include
+CFLAGS = ${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag}  -I../../include
 
 C_LIBS = ${libs}
 

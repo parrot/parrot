@@ -18,8 +18,8 @@ sub runstep {
   %gnuc=eval cc_run() or die "Can't run the test program: $!";
   cc_clean();
 
-  my($gccversion, $warns, $cc_warn);
-  $cc_warn=Configure::Data->get('cc_warn');
+  my($gccversion, $warns, $ccwarn);
+  $ccwarn=Configure::Data->get('ccwarn');
 
   unless (exists $gnuc{__GNUC__}) {
     return;
@@ -88,8 +88,8 @@ sub runstep {
       $warns .= " $opt";
     }
     # if the user overwrites the warnings remove it from $warns
-    if ($cc_warn) {
-      foreach my $w ( split ' ', $cc_warn ) {
+    if ($ccwarn) {
+      foreach my $w ( split ' ', $ccwarn ) {
 	$w =~ s/^-W(?:no-)?(.*)$/$1/;
 	$warns = join ' ' , grep !/^-W(?:no-)?$w/, split ' ', $warns;
       }
@@ -101,7 +101,7 @@ sub runstep {
       # support for GCC-specific features.
 
       Configure::Data->set(
-          cc_warn    => "-ansi -pedantic",
+          ccwarn    => "-ansi -pedantic",
           gccversion => undef
       );
 
@@ -109,7 +109,7 @@ sub runstep {
   }
 
   Configure::Data->set(
-    cc_warn    => "$warns $cc_warn",
+    ccwarn    => "$warns $ccwarn",
     gccversion => $gccversion
   );
 }
