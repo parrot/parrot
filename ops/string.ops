@@ -48,8 +48,7 @@ inline op ord (out INT, in STR, in INT) :base_core {
 
 =item B<chr>(out STR, in INT)
 
-Returns the character represented by the $2 number in the ASCII
-character set.
+Returns a the character specified by the $2 number.
 
 =cut
 
