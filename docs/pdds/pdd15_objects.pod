@@ -186,6 +186,140 @@ classes (not to be confused with object classes) and opcodes.
 
 =head1 IMPLEMENTATION
 
+There are four pieces to the object implementation. There are the PMCs
+for the classes and objects, the opcodes the engine uses to do objecty
+things, the specific vtable methods used to perform those objecty
+things, and the supporting code provided by the interpreter engine to
+do the heavy lifting.
+
+Please note that Parrot, in general, does I<not> restrict operations
+on objects and classes. If a language has restrictions on what can be
+done with them, the language is responsible for making sure that
+disallowed things do not happen. For example, Parrot permits multiple
+inheritance, and will not stop code that adds a new parent to an
+existing class. If a language doesn't allow for multiple inheritance
+it must not emit code which would add multiple parents to a
+class. (Parrot may, at some point, allow imposition of runtime
+restrictions on a class, but currently it doesn't)
+
+=head2 PMCs
+
+There are two PMC classes, C<ParrotClass> and
+C<ParrotObject>. ParrotObject PMCs are the actual objects, and
+hold all the per-object instance data. ParrotClass PMCs hold all the
+class-specific information. Instantiating a new OO class creates a new
+ParrotClass PMC, and enters the new OO class into Parrot's PMC class
+table, at which point it is indistiguishable from any other PMC
+class. (This doesn't mean that non-ParrotClass things can be
+subclassed or treated as an OO class. Neither is that forbidden. Just
+unimplemented)
+
+It's important to note that I<all> 'standard' classes are 
+ParrotClass PMC instancess, and I<all> 'standard' objects are 
+ParrotObject PMCs. We do I<not> create a brand new PMC class for each
+OO class, and they all share the ParrotClass or ParrotObject vtable,
+respectively. This distinction is mostly an artifact of the
+implementation, and may change in the future.
+
+While the internals of the class and object PMCs should be considered
+black boxes, here's some documentation as to what they are for
+implementation purposes.
+
+The ParrotClass PMC holds a 5 element array, which is:
+
+=over 4
+
+=item 0
+
+An array PMC of the immediate parent classes
+
+=item 1
+
+The class name PMC
+
+=item 2
+
+An array of all parent PMCs, in search order
+
+=item 3
+
+The class attribute section hash. Keys are the class name in
+language-defined format (so perl would be foo::bar, while java would
+be some.damn.long.thing.with.dots), values are the integer offset from
+the start of the attribute array where that class' attributes start.
+
+=item 4
+
+The class attribute name hash. Keys are the fully qualified attribute
+names (in whatever format the language governing the class wants) and
+the values are the offset from the beginnign of the attribute array of
+the particular attribute.
+
+=back
+
+Note that the attribute catalog holds I<all> the attributes for an
+object. This includes the attributes in the object's class as well as
+I<all> the attributes defined in all the parent classes. (Multiple
+inheritance makes this necessary -- the offsets of a class' attributes
+will change from child class to child class)
+
+ParrotClass PMCs also have the "I am a class" flag set on them.
+
+The ParrotObject PMC is an array of metainformation and
+attributes. The elements of this array are:
+
+=over 4
+
+=item 0
+
+The class PMC
+
+=item 1
+
+The class name PMC
+
+=item 2+
+
+The attributes for the object
+
+=back
+
+Note that ParrotObject PMCs also have the "I am an object" flag set on
+them.
+
+=head2 Opcodes
+
+The following ops are provided to deal with objects. Please note that
+method calls are governed by parrot's calling conventions, and as such
+objects, method PMCs, return continuations, and parameters must be in
+the right places, though some ops will put parameters where they need
+to go.
+
+=over 4
+
+=item classoffset Ix, Py, Sz
+
+=item getattr Px, Py, Iz
+
+=item getattr Px, Py, Sz
+
+=item setattr Px, Py, Iz
+
+=item setattr Px, Py, Sz
+
+=head2 Vtables
+
+
+
+=head2 Supporting code
+
+Most of the supporting code is in the src/objects.c file.
+
+=head1 What The Bytecode Sees
+
+The bytecode is isolated from most of the internal details of the
+implementation. This allows both for flexibility in the implementation
+and forward compatibility, generally good things.
 
 =head1 TRANSLATION AND GLOSSARY
 
