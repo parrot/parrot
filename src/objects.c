@@ -598,7 +598,7 @@ Parrot_multi_subclass(Parrot_Interp interpreter, PMC *base_class_array,
 =item C<INTVAL
 Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl)>
 
-Return whether the object C<pmc> is an instance of class Ccl>.
+Return whether the object C<pmc> is an instance of class C<cl>.
 
 =cut
 
