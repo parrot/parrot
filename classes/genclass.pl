@@ -15,7 +15,7 @@ my $DOLLAR = '$';
 
 print <<EOF;
 /* ${classname}.pmc
- *  Copyright: (When this is determined...it will go here)
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     ${DOLLAR}Id${DOLLAR}
  *  Overview:

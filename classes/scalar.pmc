@@ -1,5 +1,5 @@
 /* scalar.pmc
- *  Copyright: (When this is determined...it will go here)
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info:
  *  Overview:
  *     These are the vtable functions for the scalar base PMC class

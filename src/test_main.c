@@ -1,5 +1,5 @@
 /* test_main.c
- *  Copyright: (When this is determined...it will go here)
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
  *  Overview:
@@ -204,7 +204,7 @@ version(void)
     fprintf(stderr,
             "This is parrot version " PARROT_VERSION " built for "
             PARROT_ARCHNAME "\n\
-Copyright (C) 2001-2003 Yet Another Society.  All Rights Reserved.\n\
+Copyright (C) 2001-2003 The Perl Foundation.  All Rights Reserved.\n\
 \n\
 Parrot may be copied only under the terms of either the Artistic License or the\n\
 GNU General Public License, which may be found in the Parrot source kit.\n\

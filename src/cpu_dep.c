@@ -1,5 +1,5 @@
 /* cpu_dep.c
- *  Copyright: (When this is determined...it will go here)
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
  *  Overview:

@@ -96,7 +96,7 @@ Now we have downloaded Parrot, we need to build it; so:
  % cd parrot
  % perl Configure.pl
  Parrot Configure
- Copyright (C) 2001 Yet Another Society
+ Copyright (C) 2001-2003 The Perl Foundation.  All Rights Reserved.
 
  Since you're running this script, you obviously have
  Perl 5--I'll be pulling some defaults from its configuration.

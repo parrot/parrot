@@ -1,7 +1,7 @@
 #
 # stack.pasm
 #
-# Copyright (C) 2001 Yet Another Society. All rights reserved.
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 # This program is free software. It is subject to the same
 # license as The Parrot Interpreter.
 #

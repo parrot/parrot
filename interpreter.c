@@ -1,5 +1,5 @@
 /* interpreter.c
- *  Copyright: 2001, 2002, 2001 Yet Another Society
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
  *  Overview:

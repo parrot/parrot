@@ -1,5 +1,5 @@
 # Plot
-# Copyright YAS -- will have more detail later...
+# Copyright (C) 2001-2003 The Perl Foundation.  All Rights Reserved.
 .macro cs_case(S, L)
     newsub P16, .Sub, .L
     store_lex -1, .S, P16

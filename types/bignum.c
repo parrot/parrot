@@ -12,7 +12,7 @@
   continue to pass.
   Alex Gough, 2002
 
-  This code is copyright Yet Another Society 2002.
+  Copyright (c) 2001-2003 Yet Another Society.  All rights reserved.
 
 */
 

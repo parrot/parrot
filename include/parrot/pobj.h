@@ -1,5 +1,5 @@
 /* pobj.h
- *  Copyright: 2002, 2003 Yet Another Society
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
  *  Overview:

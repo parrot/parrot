@@ -199,7 +199,7 @@ inline op classname(out STR, in PMC) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2003 Yet Another Society. All rights reserved.
+Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 
