@@ -65,6 +65,236 @@ my %true_functions = (
 
 
 #
+# emit_code()
+#
+# emit_code LABEL
+# emit_code LABEL OP
+# emit_code LABEL OP ARGS
+#
+# Label can be undef.
+#
+
+sub emit_code
+{
+  my ($label, $op, @args) = @_;
+
+  printf "%-12s ", ((defined $label and $label ne '') ? "$label:" : '');
+  printf "%-8s", $op if defined $op; 
+  print " " if @args;
+  print join(", ", @args) if @args;
+  print "\n";
+}
+
+
+#
+# int_q()
+#
+
+sub int_q
+{
+  my ($value) = @_;
+
+  return $value =~ m/^-?\d+$/;
+}
+
+
+#
+# reg_q()
+#
+
+sub reg_q
+{
+  my ($value) = @_;
+
+  return $value =~ m/^[INPS]\d+$/;
+}
+
+
+#
+# op_comp()
+#
+# The %comp_ops table is used to look up Perl expressions to optimize
+# all-constant ops to branches. Also there are entries to map the source
+# tokens to the op name (used in parsing conditionals below).
+#
+
+my %comp_ops = (
+  'eq' => sub { $_[0] == $_[1] },
+  'ne' => sub { $_[0] != $_[1] },
+  'le' => sub { $_[0] <= $_[1] },
+  'lt' => sub { $_[0] <  $_[1] },
+  'ge' => sub { $_[0] >=  $_[1] },
+  'gt' => sub { $_[0] >   $_[1] },
+
+  '==' => 'eq',
+  '!=' => 'ne',
+  '<=' => 'le',
+  '<'  => 'lt',
+  '>=' => 'ge',
+  '>'  => 'gt',
+);
+
+sub op_comp
+{
+  my ($label, $op, $a, $b, $true, $false) = @_;
+
+  $op = $comp_ops{$op} unless ref $comp_ops{$op}; # Map, e.g., '>=' to 'ge'
+
+  if (int_q($b)) {
+    if (int_q($a)) {
+      if (&{$comp_ops{$op}}($a, $b)) {
+        emit_code($label, 'branch', $true);
+      } else {
+        emit_code($label, 'branch', $false);
+      }
+    } elsif (reg_q($a)) {
+      emit_code($label, 'set', 'I0', $b);
+      emit_code(undef, $op, $a, 'I0', $true, $false);
+    } else {
+      printf STDERR "jako: Syntax error on line %d!\n", $line;
+    }
+  } elsif (reg_q($b)) {
+    if (int_q($a)) {
+      emit_code($label, 'set', 'I0', $a);
+      emit_code(undef, $op, 'I0', $b, $true, $false);
+    } elsif (reg_q($a)) {
+      emit_code($label, $op, $a, $b, $true, $false);
+    } else {
+      printf STDERR "jako: Syntax error on line %d!\n", $line;
+    }
+  } else {
+    printf STDERR "jako: Syntax error on line %d!\n", $line;
+  }
+}
+
+
+#
+# op_eq()
+#
+# Handle a 'eq' op. This includes pseudo-ops for cases that aren't covered in
+# by Parrot, such as comparing a register to constant.
+#
+# eq_i_i    # TRUE op
+# eq_i_ic   # PSEUDO op
+# eq_ic_i   # PSEUDO op
+# eq_ic_ic  # OPTIMIZED to non-conditional branch
+#
+# TODO: Handle numeric and string comparisons
+#
+
+sub op_eq
+{
+  my ($label, $a, $b, $le, $gt) = @_;
+  op_comp($label, 'eq', $a, $b, $le, $gt);
+}
+
+
+#
+# op_ne()
+#
+# Handle a 'ne' op. This includes pseudo-ops for cases that aren't covered in
+# by Parrot, such as comparing a register to constant.
+#
+# ne_i_i    # TRUE op
+# ne_i_ic   # PSEUDO op
+# ne_ic_i   # PSEUDO op
+# ne_ic_ic  # OPTIMIZED to non-conditional branch
+#
+# TODO: Handle numeric and string comparisons
+#
+
+sub op_ne
+{
+  my ($label, $a, $b, $le, $gt) = @_;
+  op_comp($label, 'ne', $a, $b, $le, $gt);
+}
+
+
+#
+# op_le()
+#
+# Handle a 'le' op. This includes pseudo-ops for cases that aren't covered in
+# by Parrot, such as comparing a register to constant.
+#
+# le_i_i    # TRUE op
+# le_i_ic   # PSEUDO op
+# le_ic_i   # PSEUDO op
+# le_ic_ic  # OPTIMIZED to non-conditional branch
+#
+# TODO: Handle numeric and string comparisons
+#
+
+sub op_le
+{
+  my ($label, $a, $b, $le, $gt) = @_;
+  op_comp($label, 'le', $a, $b, $le, $gt);
+}
+
+
+#
+# op_lt()
+#
+# Handle a 'lt' op. This includes pseudo-ops for cases that aren't covered in
+# by Parrot, such as comparing a register to constant.
+#
+# lt_i_i    # TRUE op
+# lt_i_ic   # PSEUDO op
+# lt_ic_i   # PSEUDO op
+# lt_ic_ic  # OPTIMIZED to non-conditional branch
+#
+# TODO: Handle numeric and string comparisons
+#
+
+sub op_lt
+{
+  my ($label, $a, $b, $le, $gt) = @_;
+  op_comp($label, 'lt', $a, $b, $le, $gt);
+}
+
+
+#
+# op_ge()
+#
+# Handle a 'ge' op. This includes pseudo-ops for cases that aren't covered in
+# by Parrot, such as comparing a register to constant.
+#
+# ge_i_i    # TRUE op
+# ge_i_ic   # PSEUDO op
+# ge_ic_i   # PSEUDO op
+# ge_ic_ic  # OPTIMIZED to non-conditional branch
+#
+# TODO: Handle numeric and string comparisons
+#
+
+sub op_ge
+{
+  my ($label, $a, $b, $le, $gt) = @_;
+  op_comp($label, 'ge', $a, $b, $le, $gt);
+}
+
+
+#
+# op_gt()
+#
+# Handle a 'gt' op. This includes pseudo-ops for cases that aren't covered in
+# by Parrot, such as comparing a register to constant.
+#
+# gt_i_i    # TRUE op
+# gt_i_ic   # PSEUDO op
+# gt_ic_i   # PSEUDO op
+# gt_ic_ic  # OPTIMIZED to non-conditional branch
+#
+# TODO: Handle numeric and string comparisons
+#
+
+sub op_gt
+{
+  my ($label, $a, $b, $le, $gt) = @_;
+  op_comp($label, 'gt', $a, $b, $le, $gt);
+}
+
+
+#
 # declare_var()
 #
 
@@ -204,30 +434,9 @@ sub begin_while_block
   my $prefix = "_W$block_count";
   push @block_stack, { TYPE => 'while', NEXT => $line, PREFIX => $prefix };
 
-  if ($cond =~ m/^(.*)\s*==\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "eq", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*!=\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ne", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*<=\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "le", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*<\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "lt", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*>=\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ge", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*>\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "gt", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
+  if ($cond =~ m/^(.*)\s*(==|!=|<=|<|>=|>)\s*(.*)$/) {
+    op_comp("${prefix}_NEXT", $2, map_args($1, $3), "${prefix}_REDO", "${prefix}_LAST");
+    emit_code("${prefix}_REDO");
   } else {
     printf(STDERR "jako: Syntax error. Unrecognized condition in while on line %d.\n", $line);
   }
@@ -246,30 +455,9 @@ sub begin_if_block
   my $prefix = "_I$block_count";
   push @block_stack, { TYPE => 'if', NEXT => $line, PREFIX => $prefix };
 
-  if ($cond =~ m/^(.*)\s*==\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "eq", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*!=\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ne", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*<=\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "le", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*<\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "lt", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*>=\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ge", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
-  } elsif ($cond =~ m/^(.*)\s*>\s*(.*)$/) {
-    my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "gt", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
-    printf "%s_REDO:\n", $prefix;
+  if ($cond =~ m/^(.*)\s*(==|!=|<=|<|>=|>)\s*(.*)$/) {
+    op_comp("${prefix}_NEXT", $2, map_args($1, $3), "${prefix}_REDO", "${prefix}_LAST");
+    emit_code("${prefix}_REDO");
   } else {
     printf(STDERR "jako: Syntax error. Unrecognized condition in while on line %d.\n", $line);
   }
