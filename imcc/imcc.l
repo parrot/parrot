@@ -73,6 +73,7 @@ RANKSPEC        \[[,]*\]
 "dec"           return(DEC);
 "float"         return(FLOAT);
 "new"           return(NEW);
+"defined"       return(DEFINED);
 "string"        return(STRING);
 "call"          return(CALL);
 "print"         return(PRINT);
@@ -83,6 +84,7 @@ RANKSPEC        \[[,]*\]
 "restoreall"    return(RESTOREALL);
 "<<"            return(SHIFT_LEFT);
 ">>"            return(SHIFT_RIGHT);
+"~~"            return(LOG_XOR);
 "<"            return(RELOP_LT);
 "<="            return(RELOP_LTE);
 ">"            return(RELOP_GT);
@@ -91,10 +93,7 @@ RANKSPEC        \[[,]*\]
 "!="            return(RELOP_NE);
 
 {LETTER}{LETTERDIGIT}*":" {
-	int n = strlen(yytext);
-	yytext[n-1] = 0;  /* trim last ':' (argh, I should learn yacc) */
-	n = strlen(yytext);
-
+	yytext[yyleng-1] = 0;  /* trim last ':' */
         yylval.s = str_dup(yytext);
         return(LABEL);
     }

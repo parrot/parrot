@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h> 
+#include <sysexits.h>
 #include "imc.h"
 
 #define YYDEBUG 1
@@ -28,6 +29,23 @@ long        line;
  */
 SymReg * iMOVE(SymReg *r0, SymReg*r1) {
     emitb(mk_instruction("set %s, %s", r0, r1, NULL, NULL, IF_unary));
+    return r0;
+}
+
+SymReg * iNOT(SymReg *r0, SymReg*r1) {
+    emitb(mk_instruction("not %s, %s", r0, r1, NULL, NULL, IF_unary));
+    return r0;
+}
+
+SymReg * iNEG(SymReg *r0, SymReg*r1) {
+    if (r0->set != 'S' || r0->set == r1->set) {
+	emitb(mk_instruction("neg %s, %s", r0, r1, NULL, NULL, IF_unary));
+    }
+    else {
+        fprintf(stderr, "line %ld: Syntax error, neg arguments must be int, float, or PMC\n",
+                line);
+        exit(EX_DATAERR);
+    }
     return r0;
 }
 
@@ -76,14 +94,43 @@ SymReg * iSHR(SymReg *r0, SymReg*r1, SymReg *r2) {
     return r0;
 }
 
+SymReg * iXOR(SymReg *r0, SymReg*r1, SymReg *r2) {
+    if ((r0->set == 'I' && r1->set == 'I' && r2->set == 'I')
+	|| (r0->set == 'P' && r1->set == 'P' && r2->set == 'P')) {
+	emitb(mk_instruction("xor %s, %s, %s", r0, r1, r2, NULL, IF_binary));
+    }
+    else {
+        fprintf(stderr, "line %ld: Syntax error, xor arguments must be int or PMC\n",
+                line);
+        exit(EX_DATAERR);
+    }
+    return r0;
+}
+
+SymReg * iBAND(SymReg *r0, SymReg*r1, SymReg *r2) {
+    emitb(mk_instruction("band %s, %s, %s", r0, r1, r2, NULL, IF_binary));
+    return r0;
+}
+
+SymReg * iBOR(SymReg *r0, SymReg*r1, SymReg *r2) {
+    emitb(mk_instruction("bor %s, %s, %s", r0, r1, r2, NULL, IF_binary));
+    return r0;
+}
+
+SymReg * iBXOR(SymReg *r0, SymReg*r1, SymReg *r2) {
+    emitb(mk_instruction("bxor %s, %s, %s", r0, r1, r2, NULL, IF_binary));
+    return r0;
+}
+
 SymReg * iCONCAT(SymReg *r0, SymReg*r1, SymReg *r2) {
-    if(r0->set == 'S' && r1->set == 'S' && r2->set == 'S') {
+    if((r0->set == 'S' && r1->set == 'S' && r2->set == 'S')
+       || (r0->set == 'P' && r1->set == 'P' && r2->set == 'P')) {
         emitb(mk_instruction("concat %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     }
     else {
-        fprintf(stderr, "line %ld: Syntax error, non-string type used with concat operator\n",
+        fprintf(stderr, "line %ld: Syntax error, concat arguments must be all strings or all PMC's\n",
                 line);
-        exit(0);
+        exit(EX_DATAERR);
     }
     return r0;
 }
@@ -146,26 +193,32 @@ SymReg * iRET() {
 }
 
 SymReg * iINDEXFETCH(SymReg * r0, SymReg * r1, SymReg * r2) {
-    if(r0->set == 'S') {
+    if(r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
         emitb(mk_instruction("substr %s, %s, %s, 1", r0, r1, r2, NULL, IF_binary));
+    }
+    else if (r1->set == 'P') {
+	emitb(mk_instruction("set %s, %s[%s]", r0, r1, r2, NULL, IF_binary));
     }
     else {
         fprintf(stderr, "FIXME: Internal error, unsupported indexed fetch operation\n");
-        exit(0);
+        exit(EX_SOFTWARE);
     }
     return r0;
 }
 
 SymReg * iINDEXSET(SymReg * r0, SymReg * r1, SymReg * r2) {
-    if(r0->set == 'S') {
+    if(r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
         /* Temporaries assigned by IMCC are of form (T.n)
             SymReg * temp = mk_symreg("(S.0)", 'S');
         */
         emitb(mk_instruction("substr %s, %s, 1, %s", r0, r1, r2, NULL, IF_binary));
     }
+    else if (r0->set == 'P') {
+	emitb(mk_instruction("set %s[%s], %s", r0, r1, r2, NULL, IF_binary));
+    }
     else {
         fprintf(stderr, "FIXME: Internal error, unsupported indexed set operation\n");
-        exit(0);
+        exit(EX_SOFTWARE);
     }
     return r0;
 }
@@ -180,11 +233,34 @@ SymReg * iIF(int relop, SymReg * r0, SymReg * r1, SymReg * r2) {
     return 0;
 }
 
+SymReg * iIF1(SymReg * r0, SymReg * dest)
+{
+    Instruction * i;
+    char op[256];
+    strcpy(op, "if %s, %s");
+    i = emitb(mk_instruction(op, r0, dest, 0, NULL, IF_r0_read | IF_r1_branch));
+    i->type = ITBRANCH;
+    return 0;
+}
+
 SymReg * iNEW(SymReg * r0, char * type) {
     char op[256];
     strcpy(op, "new %s, .");
     strcat(op, type);
     emitb(mk_instruction(op, r0, NULL, NULL, NULL, IF_r0_write ));
+    return r0;
+}
+
+SymReg * iDEFINED(SymReg * r0, SymReg * r1) {
+    if (r0->set == 'I' && r1->set == 'P') {
+	emitb(mk_instruction("defined %s, %s", r0, r1, NULL, NULL,
+			     IF_r0_write | IF_r1_read ));
+    }
+    else {
+        fprintf(stderr, "line %ld: Syntax error, defined: arguments must be int, PMC\n",
+                line);
+	exit(EX_DATAERR);
+    }
     return r0;
 }
 
@@ -222,7 +298,7 @@ void relop_to_op(int relop, char * op) {
 
 %token <i> CALL GOTO BRANCH ARG RET PRINT IF NEW END SAVEALL RESTOREALL
 %token <i> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM PUSH POP INC DEC
-%token <i> SHIFT_LEFT SHIFT_RIGHT INT FLOAT STRING
+%token <i> SHIFT_LEFT SHIFT_RIGHT INT FLOAT STRING DEFINED LOG_XOR
 %token <i> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <s> EMIT LABEL
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC
@@ -334,6 +410,8 @@ classname:
 
 assignment:
        labels target '=' var                    { $$ = iMOVE($2, $4); }
+    |  labels target '=' '!' var                { $$ = iNOT($2, $5); }
+    |  labels target '=' '-' var                { $$ = iNEG($2, $5); }
     |  labels target '=' var '+' var            { $$ = iADD($2, $4, $6); } 
     |  labels target '=' var '-' var            { $$ = iSUB($2, $4, $6); } 
     |  labels target '=' var '*' var            { $$ = iMUL($2, $4, $6); } 
@@ -342,14 +420,21 @@ assignment:
     |  labels target '=' var '.' var            { $$ = iCONCAT($2, $4, $6); } 
     |  labels target '=' var SHIFT_LEFT var     { $$ = iSHL($2, $4, $6); } 
     |  labels target '=' var SHIFT_RIGHT var    { $$ = iSHR($2, $4, $6); } 
+    |  labels target '=' var LOG_XOR var        { $$ = iXOR($2, $4, $6); }
+    |  labels target '=' var '&' var            { $$ = iBAND($2, $4, $6); } 
+    |  labels target '=' var '|' var            { $$ = iBOR($2, $4, $6); } 
+    |  labels target '=' var '~' var            { $$ = iBXOR($2, $4, $6); } 
     |  labels target '=' var '[' var ']'        { $$ = iINDEXFETCH($2, $4, $6); }
     |  labels var '[' var ']' '=' var           { $$ = iINDEXSET($2, $4, $7); }
     |  labels target '=' NEW classname          { $$ = iNEW($2, $5); }
+    |  labels target '=' DEFINED var            { $$ = iDEFINED($2, $5); }
     ;
 
 if_statement:
        labels IF var relop var GOTO IDENTIFIER
        { $$ = iIF($4, $3, $5, mk_address($7)); }
+    |  labels IF var GOTO IDENTIFIER
+       { $$ = iIF1($3, mk_address($5)); }
     ;
 
 relop:
@@ -415,12 +500,12 @@ int main(int argc, char * argv[])
     
     if (argc <= 1) {
         fprintf(stderr, "No source file specified.\n" );
-        exit(0);
+        exit(EX_NOINPUT);
     }
 
     if(!(yyin = fopen(argv[1], "r")))    {
         fprintf(stderr, "Error reading source file %s.\n", argv[1] );
-        exit(0);
+        exit(EX_IOERR);
     }
    
     line = 1;
@@ -456,7 +541,7 @@ int yyerror(char * s)
     fprintf(stderr, "last token = [%s]\n", yylval.s); 
     fprintf(stderr, "(error) line %ld: %s\n", line, s );
     fprintf(stderr, "Didn't create output asm.\n" );
-    exit(0);
+    exit(EX_UNAVAILABLE);
 }
 
 
