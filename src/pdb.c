@@ -63,7 +63,7 @@ main(int argc, char *argv[])
 void
 PDB_printwelcome()
 {
-    fprintf(stderr, "Parrot Debugger 0.0.1\n");
+    fprintf(stderr, "Parrot Debugger 0.0.2\n");
 }
 
 /*
