@@ -141,7 +141,7 @@ sub check_comments {
         $line++;
 
         if (/\/\//) {
-            error($file, $line, "C++ comment detected.");
+            error($file, $line, "Possible C++ comment detected.");
         }
 
         if (/XXX/) {
