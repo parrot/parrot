@@ -96,6 +96,13 @@ languages/scheme/t/arith/nested.t
 languages/scheme/t/io/basic.t
 languages/scheme/t/logic/basic.t
 languages/scheme/t/harness
+languages/miniperl/Makefile
+languages/miniperl/Miniperl/Generator.pm
+languages/miniperl/Miniperl/Parser.pm
+languages/miniperl/Miniperl/Test.pm
+languages/miniperl/Miniperl/Tokenizer.pm
+languages/miniperl/Miniperl.pm
+languages/miniperl/miniperlc
 Makefile.in
 MANIFEST
 make_vtable_ops.pl
