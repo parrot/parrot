@@ -31,7 +31,7 @@ TODO
 
 =cut
 
-.sub _main
+.sub main @MAIN
     .local pmc sock
     .local pmc work
     .local pmc fp
@@ -43,33 +43,34 @@ TODO
     .local int ret
     .local int len
     .local int pos
-	.local int occ1
-	.local int occ2
-	.local string meth
-	.local string url
-	.local string doc_root
-	.local string file_con
+    .local int occ1
+    .local int occ2
+    .local string meth
+    .local string url
+    .local string doc_root
+    .local string file_con
 
-	.local string tst
-	.local string tst2
+    .local string tst
+    .local string tst2
 
-	doc_root = "docs"
+    doc_root = "."
 
     socket sock, 2, 1, 0
-    unless sock goto ERR
+    unless sock goto ERR_NO_SOCKET
 
     # Pack a sockaddr_in structure with IP and port
     sockaddr address, 1234, "localhost"
-    print "Binding to port 1234\n"
+    print "Binding to port 1234.\n"
+    print "The Parrot documentation can now be accessed at http://localhost:1234 .\n"
     bind ret, sock, address
 
 
 NEXT:
     listen ret, sock, 5
 
-	accept work, sock
+    accept work, sock
 
-	req = ""
+    req = ""
 MORE:
     recv ret, work, buf
     if ret <= 0 goto SERVE_REQ
@@ -107,9 +108,8 @@ SERVE_GET:
     # decode the url
 	url = urldecode (url)
 	# open the file in url
-	if url !="/" goto GET2
-	url = "/index.html"
-	GET2:
+	if url == "/" goto SERVE_301
+	rep = "HTTP/1.x 301 OK\n"
 	concat url, doc_root, url
 	open fp, url, "<"
 	unless fp goto SERVE_404
@@ -124,7 +124,7 @@ SERVE_GET:
 	concat rep, temp
 	concat rep, "\n\n"
 	concat rep, file_con
-
+        SEND:
 	send ret, work, rep
 
 	print "served file '"
@@ -132,15 +132,27 @@ SERVE_GET:
 	print "'\n"
 	goto NEXT
 
+SERVE_301:
+    rep = "HTTP1/1 301 Moved Permamently\nLocation: /docs/html/index.html\nContent-Length: "
+    file_con = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>." 
+    length len, file_con
+    temp = to_string (len)
+    concat rep, temp
+    concat rep, "\n\n"
+    concat rep, file_con
+    send ret, work, rep
+    print "Redirect to 'docs/html/index.hmtl'\n"
+    goto NEXT
 SERVE_404:
-	rep = "HTTP1/1 404 Not Found\nContent-Length: 3\n\n404\n"
-	print "File not found: '"
-	print url
-	print "'\n"
-	send ret, work, rep
-	goto NEXT
-ERR:
-    print "Socket error\n"
+    rep = "HTTP1/1 404 Not Found\nContent-Length: 3\n\n404\n"
+    print "File not found: '"
+    print url
+    print "'\n"
+    send ret, work, rep
+    goto NEXT
+ERR_NO_SOCKET:
+    print "Could not open socket.\n"
+    print "Did you enable PARROT_NET_DEVEL in include/io_private.h?\n"
     end
 END:
     close sock
@@ -150,6 +162,7 @@ END:
 
 .sub to_string
 	.param int n
+
 	.local string ret
 	.local string char
 	.local int rest
@@ -173,6 +186,7 @@ NEXT_CHAR:
 
 .sub urldecode
 	.param string in
+
 	.local string out
 	.local string char_in
 	.local string char_out
@@ -209,6 +223,7 @@ END:
 
 .sub hex_to_int
 	.param string in
+
 	.local string char
 	.local int ret
 	.local int pos

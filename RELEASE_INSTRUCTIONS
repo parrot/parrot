@@ -1,3 +1,5 @@
+# $Id$
+
 To prepare a release:
 
     0.  Announce to perl6-internals and #parrot at least a
@@ -17,7 +19,7 @@ To prepare a release:
 
         c.  Update README.
 
-        d.  Update ChangeLog and NEWS.
+        d.  Update ChangeLog, NEWS and docs/ROADMAP.
 
         e.  Make sure nothing in TODO has been done.
 
