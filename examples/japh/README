@@ -1,0 +1,8 @@
+These programs show very different ways how to print a simple
+string. Some are obfuscated, some are horribly platform dependend.
+
+To run them all:
+
+$ for f in examples/japh/japh*.pasm; do ./parrot $f ; done
+
+leo
