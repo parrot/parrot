@@ -20,6 +20,7 @@ main(int argc, char **argv) {
     int bounds_checking;
     int profiling;
     int tracing;
+    int debugging;
 
     struct Parrot_Interp *interpreter;
     init_world();
@@ -36,6 +37,7 @@ main(int argc, char **argv) {
     bounds_checking = 0;
     profiling       = 0;
     tracing         = 0;
+    debugging       = 0;
 
     while (argc > 1 && argv[1][0] == '-') {
         if (argv[1][1] == 'b' && argv[1][2] == '\0') {
@@ -54,6 +56,13 @@ main(int argc, char **argv) {
         }
         else if (argv[1][1] == 't' && argv[1][2] == '\0') {
             tracing = 1;
+            for(i = 2; i < argc; i++) {
+                argv[i-1] = argv[i];
+            }
+            argc--;
+        }
+        else if (argv[1][1] == 'd' && argv[1][2] == '\0') {
+            debugging = 1;
             for(i = 2; i < argc; i++) {
                 argv[i-1] = argv[i];
             }
@@ -103,6 +112,10 @@ main(int argc, char **argv) {
         if( !PackFile_unpack(interpreter, pf, (char *)program_code, program_size) ) {
             printf( "Can't unpack.\n" );
             return 1;
+        }
+
+        if (debugging) {
+            interpreter->flags |= PARROT_DEBUG_FLAG;
         }
 
         if (bounds_checking) {
