@@ -3003,10 +3003,12 @@ string_unescape_cstring(Interp * interpreter,
     char_at     = set_char_getter(result);
     set_char_at = set_char_setter(result);
 
-    for (offs = d = 0; ; ++offs) {
+    for (offs = d = 0; offs < clength; ++offs) {
         r = (char_at)(offs, result);
-        if (!r || r == (Parrot_UInt4)delimiter)
-            break;
+        /* There cannot be any NULs within this string.  */
+        assert(r != '\0');
+        /* It's also a logic bug if we encounter the delimiter.  */
+        assert(r != (Parrot_UInt4)delimiter);
         if (r == '\\') {
             ++offs;
             r = string_unescape_one(char_at, &offs, result->strlen, result);
