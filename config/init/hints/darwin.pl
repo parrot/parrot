@@ -1,6 +1,6 @@
 my($ccflags, $ldflags, $libs)=Configure::Data->get(qw(ccflags ldflags libs));
 
-$ccflags .= " -I/sw/include ";
+$ccflags .= " -pipe -fno-common ";
 $ccflags =~ s/-flat_namespace\s*//;
 $ldflags =~ s/-flat_namespace\s*//;
 $ldflags .= " -L/sw/lib -flat_namespace ";
