@@ -6,7 +6,7 @@
 
 DIR=languages/jako
 TOOL_DIR=../..
-ASM=../../assemble.pl
+ASM=perl -I ../../ ../../assemble.pl
 JAKOC=./jakoc
 INTERP=../../parrot
 
@@ -16,7 +16,7 @@ INTERP=../../parrot
 	$(JAKOC) $< > $@
 
 .pasm.pbc:
-	PERL5LIB="$$PERL5LIB:../../" $(ASM) $< > $@
+	$(ASM) $< > $@
 
 
 #
