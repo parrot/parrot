@@ -19,6 +19,7 @@
 #define YY_NO_UNPUT
 extern long line;
 extern int expect_pasm;
+extern int pasm_file;
 int state;
 int yyerror(char *);
 %}
@@ -28,9 +29,11 @@ int yyerror(char *);
 LETTER          [a-zA-Z_]
 DIGIT           [0-9]
 HEX		0x[0-9A-Fa-f]+
+BIN             0b[01]+
 DOT		[.]
-LETTERDIGIT     [a-zA-Z0-9_]
 SIGN            [-+]
+FLOATNUM        {SIGN}?{DIGIT}+{DOT}{DIGIT}*([eE]{SIGN}?{DIGIT}+)?
+LETTERDIGIT     [a-zA-Z0-9_]
 STRINGCONSTANT  \"(\\.|[^"\n]*)*["\n]
 CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
@@ -43,6 +46,10 @@ EOL		\r?\n
 	    expect_pasm = 2;
             BEGIN(emit);
 	}
+	if (pasm_file && YYSTATE != emit) {
+	    BEGIN(emit);
+            return pasm_file == 1 ? EMIT : 0;
+        }
 
 <INITIAL,emit>{EOL} {
         if (expect_pasm == 2)
@@ -152,7 +159,7 @@ EOL		\r?\n
         return(is_op(yylval.s) ? PARROT_OP : IDENTIFIER);
     }
 
-<emit,INITIAL>{SIGN}?{DIGIT}+"."{DIGIT}+ {
+<emit,INITIAL>{FLOATNUM} {
         yylval.s = str_dup(yytext);
         return(FLOATC);
     }
@@ -165,8 +172,16 @@ EOL		\r?\n
         yylval.s = str_dup(yytext);
         return(INTC);
     }
+<emit>{BIN} {
+        yylval.s = str_dup(yytext);
+        return(INTC);
+    }
 <emit,INITIAL>{STRINGCONSTANT} {
         yylval.s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
+        return(STRINGC);
+    }
+<emit>{CHARCONSTANT} {
+        yylval.s = str_dup(yytext);
         return(STRINGC);
     }
 
@@ -195,6 +210,16 @@ EOL		\r?\n
        return yytext[0];
     }
 
+<emit><<EOF>> {
+	   BEGIN (INITIAL);
+	   if (pasm_file) {
+	       pasm_file = 2;
+               return EOM;
+           }
+	   return 0;
+    }
+
+<<EOF>> yyterminate();
 %%
 
 #ifdef yywrap

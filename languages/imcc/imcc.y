@@ -27,6 +27,7 @@ int         yyerror(char *);
 int         yylex();
 extern char yytext[];
 int         expect_pasm;
+int         pasm_file = 0;
 
 /*
  * Choosing instructions for Parrot is pretty easy since
@@ -201,16 +202,16 @@ op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
             *dest++ = 'i';
             *dest++ = 'c';
             continue;
-    }
+        }
         /* if one ever wants num keys, they go with 'S' */
         if (keyvec & KEY_BIT(i)) {
             *dest++ = 'k';
             if (args[i]->set == 'S' || args[i]->set == 'N' ||
-                args[i]->set == 'K') {
+                    args[i]->set == 'K') {
                 *dest++ = 'c';
                 continue;
-    }
-    }
+            }
+        }
         *dest++ = tolower(args[i]->set);
         if (args[i]->type & VTCONST)
             *dest++ = 'c';
@@ -240,6 +241,100 @@ Instruction * INS(char * name, char *fmt, SymReg **regs, int n, int keys) {
 }
 
 
+static Instruction *
+multi_keyed(char *name, SymReg ** regs, int nr, int emit)
+{
+    int i, keys, kv, n;
+    char buf[16];
+    static int p = 0;
+    SymReg *preg[IMCC_MAX_REGS];    /* px,py,pz */
+    SymReg *nreg[IMCC_MAX_REGS];
+    Instruction * ins, *last;
+
+    /* count keys in keyvec */
+    kv = keyvec;
+    for (i = keys = 0; i < nr; i++, kv >>= 1)
+        if (kv & 1)
+            keys++;
+    if (keys <= 1)
+        return 0;
+    /* XXX what to do, if we don't emit instruction? */
+    assert(emit);
+    /* OP  _p_k    _p_k_p_k =>
+     * set      py, p_k
+     * set      pz,     p_k
+     * new px, .PerlUndef
+     * OP  px, py, pz
+     * set _p_k_px
+     */
+
+    kv = keyvec;
+    for (i = n = 0; i < nr; i++, kv >>= 1, n++) {
+        if (kv & 1) {
+            fataly(EX_SOFTWARE, "multi_keyed", line,"illegal key operand\n");
+        }
+        /* make a new P symbol */
+        while (1) {
+            sprintf(buf, "$P%d", ++p);
+            if (get_sym(buf) == 0)
+                break;
+        }
+        preg[n] = mk_symreg(buf, 'P');
+        kv >>= 1;
+        if (kv & 1) {
+            /* we have a keyed operand */
+            if (regs[i]->set != 'P') {
+                fataly(EX_SOFTWARE, "multi_keyed", line,"not an aggregate\n");
+            }
+            nargs = 3;
+            /* don't emit LHS yet */
+            if (i == 0) {
+                keyvec = 1 << 1;
+                nreg[0] = regs[i];
+                nreg[1] = regs[i+1];
+                nreg[2] = preg[n];
+                /* set p_k px */
+                ins = iANY(str_dup("set"), 0, nreg, 0);
+            }
+            else {
+                keyvec = 1 << 2;
+                nreg[0] = preg[n];
+                nreg[1] = regs[i];
+                nreg[2] = regs[i+1];
+                /* set py|z p_k */
+                iANY(str_dup("set"), 0, nreg, 1);
+            }
+            i++;
+        }
+        /* non keyed */
+        else {
+            nargs = 2;
+            keyvec = 0;
+            if (i == 0) {
+                nreg[0] = regs[i];
+                nreg[1] = preg[n];
+                /* set n, px */
+                ins = iANY(str_dup("set"), 0, nreg, 0);
+            }
+            else {
+                nreg[0] = preg[n];
+                nreg[1] = regs[i];
+                /* set px, n */
+                iANY(str_dup("set"), 0, nreg, 1);
+            }
+        }
+    }
+    /* make a new undef */
+    iNEW(preg[0], str_dup("PerlUndef"), 1);
+    /* emit the operand */
+    nargs = 3;
+    keyvec = 0;
+    iANY(name, 0, preg, 1);
+    /* emit the LHS op */
+    emitb(ins);
+    return ins;
+}
+
 Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
     char fullname[64];
     int i;
@@ -247,6 +342,11 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
     int op;
     Instruction * ins;
 
+#if 1
+    ins = multi_keyed(name, regs, nargs, emit);
+    if (ins)
+        return ins;
+#endif
     op_fullname(fullname, name, regs, nargs);
     op = interpreter->op_lib->op_code(fullname, 1);
     if (op >= 0) {
@@ -332,7 +432,6 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
         fataly(EX_SOFTWARE, "iANY", line,"op not found '%s' (%s<%d>)\n",
                 fullname, name, nargs);
     }
-    clear_state();
     return ins;
 }
 
@@ -384,7 +483,8 @@ pasmcode: pasmline
 
 pasmline: labels  pasm_inst '\n'  { $$ = 0; }
     ;
-pasm_inst: PARROT_OP pasm_args	        { $$ = iANY($1,0,regs,1); free($1); }
+pasm_inst: {clear_state();}
+       PARROT_OP pasm_args	        { $$ = iANY($2,0,regs,1); free($2); }
     | /* none */                               { $$ = 0;}
 
     ;
@@ -427,7 +527,8 @@ statements: statement
     |   statements statement
     ;
 
-statement:  instruction
+statement:  {clear_state(); }
+        instruction
     ;
 
 labels:	/* none */         { $$ = NULL; }
@@ -681,7 +782,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             fgetc(stdin);
             break;
         case 'h':
-            usage(stdin);
+            usage(stdout);
             break;
         case 'V':
             version();
@@ -756,10 +857,16 @@ int main(int argc, char * argv[])
     }
     else if (!strcmp(sourcefile, "-"))
        yyin = stdin;
-    else
+    else {
+        char *ext;
         if(!(yyin = fopen(sourcefile, "r")))    {
             fatal(EX_IOERR, "main", "Error reading source file %s.\n",
                     sourcefile);
+    }
+        ext = strrchr(sourcefile, '.');
+        if (ext && strcmp (ext, ".pasm") == 0) {
+            pasm_file = 1;
+        }
     }
 
     if (!output)
@@ -797,8 +904,11 @@ int main(int argc, char * argv[])
         if (!packed)
             fatal(1, "main", "Out of mem\n");
         PackFile_pack(interpreter->code, packed);
-        if ((fp = fopen(output, "wb")) == 0)
+        if (strcmp (output, "-") == 0)
+            fp = stdout;
+        else if ((fp = fopen(output, "wb")) == 0)
             fatal(1, "main", "Couldn't open %s\n", output);
+
         if ((1 != fwrite(packed, size, 1, fp)) )
             fatal(1, "main", "Couldn't write %s\n", output);
         fclose(fp);
@@ -811,8 +921,8 @@ int main(int argc, char * argv[])
         info(1, "Running...\n");
         Parrot_runcode(interpreter, argc, argv);
         /* XXX no return value :-( */
-        Parrot_destroy(interpreter);
     }
+    Parrot_destroy(interpreter);
     free(output);
 
     return 0;
