@@ -28,41 +28,26 @@ static STRING*
 uint_to_str(struct Parrot_Interp *interpreter,
             char *tc, UHUGEINTVAL num, char base, int minus)
 {
-    int i = 0, cur2;
     char cur;
-    STRING *out;
+    char *tail, *p;
+    /* the buffer must be at least as long as this */
+    tail = p = tc + sizeof(UHUGEINTVAL)*8 + 1;
 
     do {
         cur = (char)(num % base);
-
         if (cur < 10) {
-            tc[i] = (char)('0' + cur);
+            *--p = (char)('0' + cur);
         }
         else {
-            tc[i] = (char)('a' + cur - 10);
+            *--p = (char)('a' + cur - 10);
         }
-
-        i++;
     } while (num /= base);
-
-    cur2 = i - 1;
-
-    /* This fixes the problems some people have experienced
-     * with precision--the string was being reused without
-     * being cleared first.
-     */
     if (minus)
-        out = cstr2pstr("-");
-    else
-        out = cstr2pstr("");
-
-    for (i = 0; i <= cur2; i++) {
-        string_append(interpreter, out, char2pstr(tc[cur2 - i]), 0);
-    }
-    return out;
+        *--p = '-';
+    return string_make(interpreter, p, tail - p, NULL, 0, NULL);
 }
 
-static STRING *
+STRING *
 int_to_str(struct Parrot_Interp *interpreter,
            char *tc, HUGEINTVAL num, char base)
 {

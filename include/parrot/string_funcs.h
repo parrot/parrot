@@ -37,6 +37,8 @@ INTVAL string_ord(const STRING *, INTVAL idx);
 FLOATVAL string_to_num(const STRING *);
 INTVAL string_to_int(const STRING *);
 STRING *string_from_int(struct Parrot_Interp *, INTVAL i);
+STRING *int_to_str(struct Parrot_Interp *,
+           char *tc, HUGEINTVAL num, char base);
 STRING *string_from_num(struct Parrot_Interp *, FLOATVAL f);
 STRING *string_grow(struct Parrot_Interp *, STRING *s, INTVAL addlen);
 STRING *string_make(struct Parrot_Interp *, const void *buffer,
