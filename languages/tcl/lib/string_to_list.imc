@@ -6,11 +6,13 @@
   .param string str
   # buffer contains the string we are working on.
 
-  .local int buflen
+  .local int buflen,TclList
   length buflen, str
 
+  TclList = find_type "TclList"
+
   .local pmc list
-  list = new PerlArray
+  list = new TclList
  
   .local pmc parsed_str
 
