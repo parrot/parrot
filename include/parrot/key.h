@@ -16,6 +16,7 @@
 #define NUM_BUCKETS 128
 
 typedef enum {
+  enum_key_undef,
   enum_key_int,
   enum_key_num,
   enum_key_string,
