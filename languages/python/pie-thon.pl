@@ -19,12 +19,12 @@ $lambda_count = 0;
 my %builtin_ops = (
     abs => 'o',
     iter => 'o',
-    bool => 's',   # special
     complex => 's',   # special
 );
 
 my %builtins = (
     AssertionError => 1,
+    bool => 1,
     callable => 1,
     chr => 1,
     dict => 1,
@@ -43,13 +43,17 @@ my %builtins = (
     min => 'v',
     range => 1,
     reduce => 1,
+    str => 1,
     tuple => 1,
 );
 
+# the new way type system
 my %type_map = (
-    float => 'py_float',
-    # int   => 'py_int',
-    int   => 'Py_int',    # the new way type system
+    bool  => 'Py_bool',
+    float => 'Py_float',
+    int   => 'Py_int',
+    long  => 'Py_long',
+    str   => 'Py_str',
 );
 
 
@@ -1100,7 +1104,7 @@ EOC
 	# .param pmc $c $cmt
 	#.local pmc $c
 	#$c = P$p
-	store_lex -1, $n, $c
+	#store_lex -1, $n, $c
 EOC
     }
     push @stack, [$n, $c, 'P'];

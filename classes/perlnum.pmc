@@ -22,6 +22,26 @@ These are the vtable functions for the PerlNum base class
 #include "parrot/perltypes.h"
 
 pmclass PerlNum extends perlscalar {
+/*
+
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a PerlNum Class object. Return a new
+C<float> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        int argcP = REG_INT(3);
+        PMC *res = pmc_new(interpreter, enum_class_PerlNum);
+        if (argcP)
+            VTABLE_set_number_native(interpreter, res,
+                    VTABLE_get_number(interpreter, REG_PMC(5)));
+        REG_PMC(5) = res;
+        return next;
+    }
+
     void class_init () {
         /* this should be autmatically done - probably */
         if (pass) {

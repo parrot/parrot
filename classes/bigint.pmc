@@ -277,6 +277,37 @@ bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
 /* XXX derive from perlscalar because of morph */
 pmclass BigInt extends perlscalar {
 
+/*
+
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a BigInt Class object. Return a new
+C<long> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        int argcP = REG_INT(3);
+        int base;
+        PMC *res;
+        STRING *num;
+
+        if (!argcP) {
+            REG_PMC(5) = pmc_new(INTERP, enum_class_BigInt);
+            return next;
+        }
+        if (argcP == 1)
+            base = 10;
+        if (argcP == 2)
+            base = VTABLE_get_integer(INTERP, REG_PMC(6));
+        res = pmc_new(interpreter, enum_class_BigInt);
+        num = VTABLE_get_string(interpreter, REG_PMC(5));
+        VTABLE_set_string_keyed_int(interpreter, res, base, num);
+        REG_PMC(5) = res;
+        return next;
+    }
+
     void class_init () {
         /* this should be autmatically done - probably */
         if (pass) {

@@ -57,6 +57,25 @@ XXX are these generally useful or should they be moved to src/py_func.c?
 
 /*
 
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a Boolean Class object. Return a new
+C<bool> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        int argcP = REG_INT(3);
+        PMC *res = pmc_new(interpreter, enum_class_Boolean);
+        if (argcP)
+            VTABLE_set_integer_native(interpreter, res,
+                    VTABLE_get_bool(interpreter, REG_PMC(5)));
+        REG_PMC(5) = res;
+        return next;
+    }
+/*
+
 =item C<STRING* get_string ()
 
 Return "True" or "False" if python_mode is true.

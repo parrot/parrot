@@ -42,6 +42,25 @@ pmclass PerlString extends perlscalar {
 
 /*
 
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a PerlString Class object. Return a new
+C<str> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        int argcP = REG_INT(3);
+        PMC *res = pmc_new(interpreter, enum_class_PerlString);
+        if (argcP)
+            VTABLE_set_string_native(interpreter, res,
+                    VTABLE_get_string(interpreter, REG_PMC(5)));
+        REG_PMC(5) = res;
+        return next;
+    }
+/*
+
 =item C<void init()>
 
 Initializes the string.

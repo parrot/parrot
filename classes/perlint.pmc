@@ -81,7 +81,7 @@ C<int> object according to 2.1. Built-in Functions.
 =cut
 
 */
-    void* invoke(void *next) {
+    void* invoke(void* next) {
         int argcP = REG_INT(3);
         int base;
         PMC *res;
