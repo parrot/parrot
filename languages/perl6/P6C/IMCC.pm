@@ -1108,8 +1108,6 @@ sub val {
     my $x = $self->seq;
     my $result = gentmp 'int';
     my %tmps;
-    $tmps{0} = newtmp;		# PMC temporary for odd terms
-    $tmps{2} = newtmp;		# PMC temporary for even terms
     my $res = newtmp;
     my $lasttype;
     my $fail = genlabel 'comparison';

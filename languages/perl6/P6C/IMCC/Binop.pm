@@ -43,7 +43,7 @@ END
 # short-circuit logical '&&' operator
 sub do_logand {
     my $x = shift;
-    my $dest = newtmp;
+    my $dest = newtmp 'PerlUndef';
     my $thenlab = genlabel 'logical_and';
     my $endlab = genlabel 'logical_and';
     my $res = $x->l->val;
@@ -63,7 +63,7 @@ END
 # Short-circuit logical or.
 sub do_logor {
     my $x = shift;
-    my $dest = newtmp;
+    my $dest = gentmp 'PerlUndef';
     my $endlab = genlabel 'logical_or';
     my $res = $x->l->val;
     code(<<END);
@@ -85,7 +85,7 @@ sub do_defined {
     my $x = shift;
     my $val = $x->l->val;
     my $itmp = gentmp 'int';
-    my $res = newtmp;
+    my $res = gentmp 'PerlUndef';
     my $endlab = genlabel 'defined';
     code(<<END);
 	$res = $val
@@ -137,7 +137,7 @@ sub do_range {
 	my $itmp = gentmp 'int';
 	my $lval = $x->l->val;
 	my $rval = $x->r->val;
-	my $val = newtmp;
+	my $val = gentmp 'PerlUndef';
 	my $vtmp = gentmp 'PerlUndef';
 	my $start = genlabel 'range_start';
 	my $end = genlabel 'range_end';
