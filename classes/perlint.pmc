@@ -11,6 +11,7 @@
  */
 
 #include "parrot/parrot.h"
+#include "parrot/perltypes.h"
 
 pmclass PerlInt {
 
@@ -81,12 +82,12 @@ pmclass PerlInt {
     }
 
     void set_number (PMC * value) {
-        SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
+	CHANGE_TYPE(pmc, PerlNum);
 	SELF->cache.num_val = value->cache.num_val;
     }
 
     void set_number_native (FLOATVAL value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
+	CHANGE_TYPE(pmc, PerlNum);
 	SELF->cache.num_val = value;
     }
 
@@ -95,7 +96,7 @@ pmclass PerlInt {
     }
 
     void set_number_same (PMC * value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
+	CHANGE_TYPE(pmc, PerlNum);
 	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
     }
 
@@ -126,33 +127,33 @@ pmclass PerlInt {
     }
     
     void set_string (PMC* value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	CHANGE_TYPE(pmc, PerlString);
 	SELF->data = value->data;
     }
 
     void set_string_native (STRING* value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	CHANGE_TYPE(pmc, PerlString);
 	SELF->data = value;
     }
 
     void set_string_unicode (STRING* value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	CHANGE_TYPE(pmc, PerlString);
 	SELF->data = value;
     }
 
     void set_string_other (STRING* value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	CHANGE_TYPE(pmc, PerlString);
 	SELF->data = value;
     }
 
     void set_string_same (PMC* value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	CHANGE_TYPE(pmc, PerlString);
 	SELF->data = value->data;
     }
 
     void add (PMC* value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	    CHANGE_TYPE(dest, PerlNum);
             dest->vtable->set_number_native(INTERP, dest, 
 		SELF->cache.int_val +
                 value->vtable->get_number(INTERP, value)
@@ -162,14 +163,14 @@ pmclass PerlInt {
 	    FLOATVAL f = value->vtable->get_number(INTERP, value);
 	    INTVAL   i = value->vtable->get_integer(INTERP, value);
 	    if(f != i) {
-		dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+		CHANGE_TYPE(dest, PerlNum);
 		dest->vtable->set_number_native(INTERP, dest, 
 	 	    SELF->cache.int_val +
                     value->vtable->get_number(INTERP, value)
 		);
 	    }
 	    else {
-		dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+		CHANGE_TYPE(dest, PerlInt);
 		dest->vtable->set_integer_native(INTERP, dest, 
 	 	    SELF->cache.int_val +
                     value->vtable->get_integer(INTERP, value)
@@ -177,7 +178,7 @@ pmclass PerlInt {
 	    }
 	}
 	else {
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+	    CHANGE_TYPE(dest, PerlInt);
             dest->vtable->set_integer_native(INTERP, dest, 
 		SELF->cache.int_val +
                 value->vtable->get_integer(INTERP, value)
@@ -198,7 +199,7 @@ pmclass PerlInt {
 
     void subtract (PMC* value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	    CHANGE_TYPE(dest, PerlNum);
             dest->vtable->set_number_native(INTERP, dest, 
 		SELF->cache.int_val -
                 value->vtable->get_number(INTERP, value)
@@ -208,14 +209,14 @@ pmclass PerlInt {
 	    FLOATVAL f = value->vtable->get_number(INTERP, value);
 	    INTVAL   i = value->vtable->get_integer(INTERP, value);
 	    if(f != i) {
-		dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+		CHANGE_TYPE(dest, PerlNum);
 		dest->vtable->set_number_native(INTERP, dest, 
 	 	    SELF->cache.int_val -
                     value->vtable->get_number(INTERP, value)
 		);
 	    }
 	    else {
-		dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+		CHANGE_TYPE(dest, PerlInt);
 		dest->vtable->set_integer_native(INTERP, dest, 
 	 	    SELF->cache.int_val -
                     value->vtable->get_integer(INTERP, value)
@@ -223,7 +224,7 @@ pmclass PerlInt {
 	    }
 	}
 	else {
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+	    CHANGE_TYPE(dest, PerlInt);
             dest->vtable->set_integer_native(INTERP, dest, 
 		SELF->cache.int_val -
                 value->vtable->get_integer(INTERP, value)
@@ -249,7 +250,7 @@ pmclass PerlInt {
 
     void multiply (PMC* value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	    CHANGE_TYPE(dest, PerlNum);
             dest->vtable->set_number_native(INTERP, dest, 
 		SELF->cache.int_val *
                 value->vtable->get_number(INTERP, value)
@@ -259,14 +260,14 @@ pmclass PerlInt {
 	    FLOATVAL f = value->vtable->get_number(INTERP, value);
 	    INTVAL   i = value->vtable->get_integer(INTERP, value);
 	    if(f != i) {
-		dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+		CHANGE_TYPE(dest, PerlNum);
 		dest->vtable->set_number_native(INTERP, dest, 
 	 	    SELF->cache.int_val *
                     value->vtable->get_number(INTERP, value)
 		);
 	    }
 	    else {
-		dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+		CHANGE_TYPE(dest, PerlInt);
 		dest->vtable->set_integer_native(INTERP, dest, 
 	 	    SELF->cache.int_val *
                     value->vtable->get_integer(INTERP, value)
@@ -274,7 +275,7 @@ pmclass PerlInt {
 	    }
 	}
 	else {
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+	    CHANGE_TYPE(dest, PerlInt);
             dest->vtable->set_integer_native(INTERP, dest, 
 		SELF->cache.int_val *
                 value->vtable->get_integer(INTERP, value)
@@ -300,7 +301,7 @@ pmclass PerlInt {
 
     void divide (PMC* value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	    CHANGE_TYPE(dest, PerlNum);
             dest->vtable->set_number_native(INTERP, dest, 
 		SELF->cache.int_val /
                 value->vtable->get_number(INTERP, value)
@@ -310,14 +311,14 @@ pmclass PerlInt {
 	    FLOATVAL f = value->vtable->get_number(INTERP, value);
 	    INTVAL   i = value->vtable->get_integer(INTERP, value);
 	    if(f != i) {
-		dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+		CHANGE_TYPE(dest, PerlNum);
 		dest->vtable->set_number_native(INTERP, dest, 
 	 	    SELF->cache.int_val /
                     value->vtable->get_number(INTERP, value)
 		);
 	    }
 	    else {
-		dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+		CHANGE_TYPE(dest, PerlInt);
 		dest->vtable->set_integer_native(INTERP, dest, 
 	 	    SELF->cache.int_val /
                     value->vtable->get_integer(INTERP, value)
@@ -327,7 +328,7 @@ pmclass PerlInt {
 	else {
             /* Interesting race condition if SELF == dest */
             FLOATVAL result = SELF->cache.int_val / (FLOATVAL)value->vtable->get_integer(INTERP, value);
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	    CHANGE_TYPE(dest, PerlNum);
             dest->vtable->set_number_native(INTERP, dest, result);
 	}
     }
@@ -359,7 +360,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 	    }
 	    else {
-		dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+		CHANGE_TYPE(dest, PerlInt);
 		dest->vtable->set_integer_native(INTERP, dest, 
 	 	    SELF->cache.int_val %
                     value->vtable->get_integer(INTERP, value)
@@ -367,7 +368,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 	    }
 	}
 	else {
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+	    CHANGE_TYPE(dest, PerlInt);
             dest->vtable->set_integer_native(INTERP, dest, 
 		SELF->cache.int_val %
                 value->vtable->get_integer(INTERP, value)
@@ -504,7 +505,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 			  value->vtable->get_string(INTERP, value),
 			  0
         );
-	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	CHANGE_TYPE(dest, PerlString);
 	dest->vtable->set_string_native(INTERP,dest,s);
     }
 
@@ -515,7 +516,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 			  value,
 			  0
         );
-	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	CHANGE_TYPE(dest, PerlString);
 	dest->vtable->set_string_native(INTERP,dest,s);
     }
 
@@ -526,7 +527,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 			  value,
 			  0
         );
-	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	CHANGE_TYPE(dest, PerlString);
 	dest->vtable->set_string_native(INTERP,dest,s);
     }
 
@@ -537,7 +538,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 			  value,
 			  0
         );
-	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	CHANGE_TYPE(dest, PerlString);
 	dest->vtable->set_string_native(INTERP,dest,s);
     }
 
@@ -548,7 +549,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 			  value->vtable->get_string(INTERP, value),
 			  0
         );
-	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	CHANGE_TYPE(dest, PerlString);
 	dest->vtable->set_string_native(INTERP,dest,s);
     }
 
@@ -558,15 +559,55 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
     }
 
     INTVAL cmp(PMC* value) {
-        INTVAL diff;
-        diff = value->vtable->get_integer(INTERP, value) - SELF->cache.int_val;
-        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+	if (value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
+	    FLOATVAL fdiff = SELF->cache.int_val
+		- value->vtable->get_number(INTERP, value);
+	    if (fdiff == 0) {
+		INTVAL idiff = SELF->cache.int_val
+		    - value->vtable->get_integer(INTERP, value);
+		return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+	    } else {
+		return fdiff > 0 ? 1 : -1;
+	    }
+	}
+	else if (value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    FLOATVAL diff;
+	    diff = (FLOATVAL)SELF->cache.int_val
+		- value->vtable->get_number(INTERP, value);
+	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+	}
+	else {
+	    /* int or undef */
+	    INTVAL diff = SELF->cache.int_val
+		- value->vtable->get_integer(INTERP, value);
+	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+	}
     }
 
     INTVAL cmp_num(PMC* value) {
-        INTVAL diff;
-        diff = value->vtable->get_integer(INTERP, value) - SELF->cache.int_val;
-        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+	if (value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
+	    FLOATVAL fdiff = SELF->cache.int_val
+		- value->vtable->get_number(INTERP, value);
+	    if (fdiff == 0) {
+		INTVAL idiff = SELF->cache.int_val
+		    - value->vtable->get_integer(INTERP, value);
+		return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+	    } else {
+		return fdiff > 0 ? 1 : -1;
+	    }
+	}
+	else if (value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    FLOATVAL diff;
+	    diff = (FLOATVAL)SELF->cache.int_val
+		- value->vtable->get_number(INTERP, value);
+	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+	}
+	else {
+	    /* int or undef */
+	    INTVAL diff = SELF->cache.int_val
+		- value->vtable->get_integer(INTERP, value);
+	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+	}
     }
     
     void logical_or (PMC* value, PMC* dest) {

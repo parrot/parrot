@@ -11,6 +11,7 @@
  */
 
 #include "parrot/parrot.h"
+#include "parrot/perltypes.h"
 
 pmclass PerlUndef {
 
@@ -74,12 +75,12 @@ pmclass PerlUndef {
     }
 
     void set_integer (PMC * value) {
-        pmc->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+	CHANGE_TYPE(pmc, PerlInt);
         pmc->vtable->set_integer(interpreter, pmc, value);
     }
 
     void set_integer_native (INTVAL value) {
-        pmc->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+	CHANGE_TYPE(pmc, PerlInt);
         pmc->vtable->set_integer_native(interpreter, pmc, value);
     }
 
@@ -88,12 +89,12 @@ pmclass PerlUndef {
     }
 
     void set_number (PMC* value) {
-        pmc->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	CHANGE_TYPE(pmc, PerlNum);
         pmc->vtable->set_number(interpreter, pmc, value);
     }
 
     void set_number_native (FLOATVAL value) {
-        pmc->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	CHANGE_TYPE(pmc, PerlNum);
         pmc->vtable->set_number_native(interpreter, pmc, value);
     }
 
@@ -117,22 +118,22 @@ pmclass PerlUndef {
     }
 
     void set_string (PMC* value) {
-        pmc->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	CHANGE_TYPE(pmc, PerlString);
         pmc->vtable->set_string(interpreter, pmc, value);
     }
 
     void set_string_native (STRING* value) {
-        pmc->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	CHANGE_TYPE(pmc, PerlString);
         pmc->vtable->set_string_native(interpreter, pmc, value);
     }
 
     void set_string_unicode (STRING* value) {
-        pmc->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	CHANGE_TYPE(pmc, PerlString);
         pmc->vtable->set_string_unicode(interpreter, pmc, value);
     }
 
     void set_string_other (STRING* value) {
-        pmc->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	CHANGE_TYPE(pmc, PerlString);
         pmc->vtable->set_string_other(interpreter, pmc, value);
     }
 
