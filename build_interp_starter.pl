@@ -99,11 +99,10 @@ print INTERP_GUTS_C <<CONST;
 #include "parrot/parrot.h"
 
 op_func_table_t builtin_op_func_table = {
-        /* TODO: (void *) casting here sucks! */
 CONST
 
 for my $name (sort {$opcodes{$a}{CODE} <=> $opcodes{$b}{CODE}} keys %opcodes) {
-    printf INTERP_GUTS_C "    (void *)%-12s, /* %4d */\n", $name, $opcodes{$name}{CODE};
+    printf INTERP_GUTS_C "    %-12s, /* %4d */\n", $name, $opcodes{$name}{CODE};
 }
 print INTERP_GUTS_C "};\n\n";
 
