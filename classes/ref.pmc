@@ -23,13 +23,16 @@ pmclass Ref {
     }
 
     void init_pmc (PMC* initializer) {
-	PMC_ptr2p(SELF) = initializer; /* the refered PMC itself */
-        PObj_custom_mark_SET(SELF);
+	if (initializer) {
+	    PMC_ptr2p(SELF) = initializer; /* the refered PMC itself */
+	    PObj_custom_mark_SET(SELF);
+	}
+	else
+	    internal_exception(1, "Ref init with NULL PMC\n");
     }
 
     void mark () {
-	if (PMC_ptr2p(SELF))
-	     pobject_lives(INTERP, (PObj *) PMC_ptr2p(SELF));
+	 pobject_lives(INTERP, (PObj *) PMC_ptr2p(SELF));
     }
 
     /* must implement these - they are not delegated */
