@@ -17,8 +17,7 @@
 #include "parrot/parrot.h"
 
 #define BUFFER_ALIGNMENT 16
-/* XXX Temporary alignment hack.  See mem_allocate in resources.c */
-#define STRING_ALIGNMENT 16 /* was 4 */
+#define STRING_ALIGNMENT 4
 
 
 static void *
