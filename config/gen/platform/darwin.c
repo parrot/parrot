@@ -65,7 +65,7 @@ Parrot_sleep(unsigned int seconds)
 void
 Parrot_setenv(const char *name, const char *value)
 {
-#ifdef HAS_SETENV
+#ifdef PARROT_HAS_SETENV
     setenv(name, value, 1);
 #else
     int name_len = strlen(name);
@@ -90,7 +90,7 @@ Parrot_setenv(const char *name, const char *value)
 void
 Parrot_unsetenv(const char *name)
 {
-#ifdef HAS_UNSETENV
+#ifdef PARROT_HAS_UNSETENV
     unsetenv(name);
 #else 
     Parrot_setenv(name, "");
@@ -190,7 +190,7 @@ Parrot_dlclose(void *handle)
  * itimer stuff
  */
 
-#ifdef HAS_SETITIMER
+#ifdef PARROT_HAS_SETITIMER
 
 /*
  * Start a system timer with the passed value in milli seconds.

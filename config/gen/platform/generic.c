@@ -55,7 +55,7 @@ Parrot_sleep(unsigned int seconds)
 void
 Parrot_setenv(const char *name, const char *value)
 {
-#ifdef HAS_SETENV
+#ifdef PARROT_HAS_SETENV
     setenv(name, value, 1);
 #else
     int name_len = strlen(name);
@@ -80,7 +80,7 @@ Parrot_setenv(const char *name, const char *value)
 void
 Parrot_unsetenv(const char *name)
 {
-#ifdef HAS_UNSETENV
+#ifdef PARROT_HAS_UNSETENV
     unsetenv(name);
 #else
     Parrot_setenv(name, "");
@@ -156,7 +156,7 @@ Parrot_dlclose(void *handle)
  * memalign related stuff
  */
 
-#if defined(HAS_POSIX_MEMALIGN)
+#if defined(PARROT_HAS_POSIX_MEMALIGN)
 #include <stdlib.h>
 
 void *
@@ -175,7 +175,7 @@ Parrot_memalign_if_possible(size_t align, size_t size)
     return i == 0 ? p : NULL;
 }
 
-#elif defined(HAS_MEMALIGN)
+#elif defined(PARROT_HAS_MEMALIGN)
 
 #if defined(PARROT_HAS_HEADER_MALLOC)
 #include <malloc.h>
@@ -224,7 +224,7 @@ Parrot_set_sighandler(int signum, Parrot_sighandler_t handler)
  * itimer stuff
  */
 
-#ifdef HAS_SETITIMER
+#ifdef PARROT_HAS_SETITIMER
 
 /*
  * Start a system timer with the passed value in milli seconds.

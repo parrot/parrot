@@ -38,7 +38,7 @@
 
 #ifdef PARROT_HAS_HEADER_SIGNAL
 #  undef Parrot_set_sighandler
-#  ifdef HAS___SIGHANDLER_T
+#  ifdef PARROT_HAS___SIGHANDLER_T
     typedef __sighandler_t Parrot_sighandler_t;
 #  else
     typedef void (*Parrot_sighandler_t) (int);

@@ -17,7 +17,7 @@ void *Parrot_memalign(size_t align, size_t size);
 void *Parrot_memalign_if_possible(size_t align, size_t size);
 void Parrot_free_memalign(void *);
 
-#if !defined(HAS_MEMALIGN) && !defined(HAS_POSIX_MEMALIGN)
+#if !defined(PARROT_HAS_MEMALIGN) && !defined(PARROT_HAS_POSIX_MEMALIGN)
 #  define Parrot_memalign_if_possible(a, s) malloc(a)
 #endif
 
@@ -52,7 +52,7 @@ int Parrot_dlclose(void *handle);
  * system timer
  */
 
-#ifdef HAS_SOME_SYS_TIMER
+#ifdef PARROT_HAS_SOME_SYS_TIMER
 
 void * new_sys_timer_ms(void);
 void start_sys_timer_ms(void *handle, int ms);

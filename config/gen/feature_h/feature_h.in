@@ -13,15 +13,15 @@
 EOP
 if (${memalign} eq 'posix_memalign') {
   print OUT <<'END'
-#define HAS_POSIX_MEMALIGN
-#define HAS_SOME_MEMALIGN
+#define PARROT_HAS_POSIX_MEMALIGN
+#define PARROT_HAS_SOME_MEMALIGN
 
 END
 }
 elsif (${memalign} eq 'memalign') {
   print OUT <<'END'
-#define HAS_MEMALIGN
-#define HAS_SOME_MEMALIGN
+#define PARROT_HAS_MEMALIGN
+#define PARROT_HAS_SOME_MEMALIGN
 
 END
 }
@@ -31,7 +31,7 @@ END
 EOP
 unless (${isreg}) {
 	print OUT <<EOP;
-#define BROKEN_ISREG 1
+#define PARROT_HAS_BROKEN_ISREG 1
 EOP
 }
 
@@ -40,7 +40,7 @@ if (${jit_i386} && ${jit_i386} eq 'fcomip') {
 
 /* from config/auto/jit */
 #ifdef I386
-#  define HAS_JIT_FCOMIP
+#  define PARROT_HAS_JIT_FCOMIP
 #endif
 
 END
@@ -48,9 +48,9 @@ END
 
     print OUT <<'END';
 #ifdef __powerpc__
-#  define VA_TO_VAPTR(x) (x)
+#  define PARROT_VA_TO_VAPTR(x) (x)
 #else
-#  define VA_TO_VAPTR(x) (&(x))
+#  define PARROT_VA_TO_VAPTR(x) (&(x))
 #endif
 END
 
@@ -61,20 +61,20 @@ END
 
 if (${has_sigaction}) {
     print OUT <<'END';
-#define HAS_SIGACTION 1
+#define PARROT_HAS_SIGACTION 1
 END
 }
 
 if (${has___sighandler_t}) {
     print OUT <<'END';
-#define HAS___SIGHANDLER_T 1
+#define PARROT_HAS___SIGHANDLER_T 1
 END
 }
 
 if (${has_setitimer}) {
     print OUT <<'END';
-#define HAS_SETITIMER 1
-#define HAS_SOME_SYS_TIMER 1
+#define PARROT_HAS_SETITIMER 1
+#define PARROT_HAS_SOME_SYS_TIMER 1
 END
 }
 
@@ -84,12 +84,12 @@ print OUT <<EOP;
 EOP
 if (${setenv}) {
 	print OUT <<EOP;
-#define HAS_SETENV 1
+#define PARROT_HAS_SETENV 1
 EOP
 }
 if (${unsetenv}) {
 	print OUT <<EOP;
-#define HAS_UNSETENV 1
+#define PARROT_HAS_UNSETENV 1
 EOP
 }
 

@@ -1193,7 +1193,7 @@ static unsigned char *lastpc;
 
 #  define emitm_fcomp(pc, sti) emitm_fl_3(pc, emit_b000, emit_b011, sti)
 
-#ifdef HAS_JIT_FCOMIP
+#ifdef PARROT_HAS_JIT_FCOMIP
 #  define emitm_fcomip(pc, sti) emitm_fl_3(pc, emit_b111, emit_b110, sti)
 #  define emitm_fcomi(pc, sti) emitm_fl_3(pc, emit_b011, emit_b110, sti)
 #else

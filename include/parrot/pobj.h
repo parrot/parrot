@@ -24,7 +24,7 @@
 
 #define ARENA_DOD_FLAGS 1
 
-#if ARENA_DOD_FLAGS && ! defined(HAS_SOME_MEMALIGN)
+#if ARENA_DOD_FLAGS && ! defined(PARROT_HAS_SOME_MEMALIGN)
 #  undef ARENA_DOD_FLAGS
 #  define ARENA_DOD_FLAGS 0
 #endif

@@ -35,7 +35,7 @@ STRING *
 Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat, va_list args)
 {
     SPRINTF_OBJ obj = va_core;
-    obj.data = VA_TO_VAPTR(args);
+    obj.data = PARROT_VA_TO_VAPTR(args);
 
     return Parrot_sprintf_format(interpreter, pat, &obj);
 }
