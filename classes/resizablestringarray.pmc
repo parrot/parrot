@@ -8,8 +8,9 @@ classes/resizablestringarray.pmc - resizable array for strings only
 
 =head1 DESCRIPTION
 
-This class, ResizableStringArray, implements a resizeable array, which stores STRING*
-values only.
+ResizableStringArray implements a resizeable array which stores Parrot 
+strings only. If other PMCs are assigned to elements of it, their 
+values will automatically be stringified and assigned to String PMCs.
 
 =head2 Functions
 
@@ -183,10 +184,6 @@ Marks the array as live.
 /*
 
 =back
-
-=head1 TODO
-
-This PMC uses PerlString's internally to perform conversion, but it should use String PMCs.
 
 =head1 SEE ALSO
 
