@@ -70,7 +70,7 @@ static struct globals {
 static int nsubs;
 
 /* get size of bytecode in ops till now */
-static int get_old_size()
+static int get_old_size(void)
 {
     int i;
     size_t size;
@@ -82,7 +82,7 @@ static int get_old_size()
 }
 
 /* allocate a new globals.sub structure */
-static void make_new_sub()
+static void make_new_sub(void)
 {
     globals.subs = realloc(globals.subs, (nsubs+1) * sizeof(struct subs*));
     if (!globals.subs)
@@ -139,7 +139,7 @@ static void store_key_const(char * str, int idx)
 /* store global labels and bsr for later fixup
  * return size in ops
  */
-static int store_labels()
+static int store_labels(void)
 {
     Instruction * ins;
     int code_size;
@@ -469,7 +469,7 @@ static void add_1_const(SymReg *r)
 
 }
 /* store a constants idx for later reuse */
-static void constant_folding()
+static void constant_folding(void)
 {
     SymReg * r;
     int i;

@@ -83,8 +83,8 @@ int optimize() {
 static char * get_neg_op(char *op, int *nargs)
 {
     static struct br_pairs {
-        char *op;
-        char *nop;
+        const char *op;
+        const char *nop;
         int nargs;
     } br_pairs[] = {
     { "if", "unless", 2 },
@@ -92,7 +92,7 @@ static char * get_neg_op(char *op, int *nargs)
     { "gt", "le", 3 },
     { "ge", "lt", 3 },
     };
-    int i;
+    unsigned int i;
     for (i = 0; i < sizeof(br_pairs)/sizeof(br_pairs[0]); i++) {
         *nargs = br_pairs[i].nargs;
         if (strcmp(op, br_pairs[i].op) == 0)

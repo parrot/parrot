@@ -76,7 +76,7 @@ Instruction * iNEW(SymReg * r0, char * type, int emit);
 Instruction * emitb(Instruction *);
 int instruction_reads(Instruction *, SymReg *);
 int instruction_writes(Instruction *, SymReg *);
-void compute_spilling_costs();
+void compute_spilling_costs(void);
 void free_ins(Instruction *);
 char * ins_string(Instruction * ins);
 
