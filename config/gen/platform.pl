@@ -33,6 +33,7 @@ sub runstep {
   print " platform='$platform' " if $verbose;
 
   my $generated = Configure::Data->get('TEMP_generated');
+  $generated = '' unless defined $generated;
   print " ($generated) " if $verbose;
   print("\n") if defined $verbose && $verbose == 2;
 

@@ -528,10 +528,12 @@ END_C
 
 if ($suffix eq '' && !$dynamic) {
     $getop = 'get_op';
-    my $hash_size = 2111;
+    my $hash_size = 2203;
     $tot = $index + scalar keys(%names);
     if ($hash_size < $tot * 1.2) {
-	    print STDERR "please increase hash_size ($hash_size) in ops2c.pl\n";
+	    print STDERR
+	    "please increase hash_size ($hash_size) in build_tools/ops2c.pl " .
+	    "to a prime number > ", $tot *1.2, "\n";
     }
     print SOURCE <<END_C;
 
