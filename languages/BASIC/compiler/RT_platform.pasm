@@ -3,6 +3,8 @@
 	#	based on platform type.  
 	
 	# Do anything here that needs to be done for your platform to run properly
+	# If Win32, use those routines
+	#    Otherwise assume an ANSI terminal
 .include "RT_platform_win32.pasm"
 .include "RT_platform_ANSIscreen.pasm"
 PLATFORM_SETUP:
