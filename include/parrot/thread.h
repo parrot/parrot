@@ -68,8 +68,26 @@ typedef struct _Thread_data {
     Parrot_thread       thread;         /* pthread_t or such */
     thread_state_enum   state;
     UINTVAL             tid;            /* 0.. n-1 idx in interp array */
+
+    /* for wr access to interpreter e.g. for DOD/GC
+     * if only used for DOD/GC the lock could be in the arena
+     * instead here, or in the interpreter, with negative size impact
+     * for the non-threaded case
+     */
+    Parrot_mutex interp_lock;
 } Thread_data;
 
+#define LOCK_INTERPRETER(interp) \
+    if ( (interp)->thread_data ) \
+        LOCK((interp)->thread_data->interp_lock)
+#define UNLOCK_INTERPRETER(interp) \
+    if ( (interp)->thread_data ) \
+        UNLOCK((interp)->thread_data->interp_lock)
+
+#define INTERPRETER_LOCK_INIT(interp) \
+        MUTEX_INIT((interp)->thread_data->interp_lock)
+#define INTERPRETER_LOCK_DESTROY(interp) \
+        MUTEX_DESTROY((interp)->thread_data->interp_lock)
 /*
  * this global mutex protects the list of interpreters
  */
@@ -77,7 +95,12 @@ VAR_SCOPE Parrot_mutex                  interpreter_array_mutex;
 VAR_SCOPE struct Parrot_Interp          ** interpreter_array;
 VAR_SCOPE size_t                        n_interpreters;
 
-#endif
+
+typedef struct _Sync {
+    Parrot_Interp owner;                /* that interpreter, that owns
+                                           the arena, where the PMC is in */
+    Parrot_mutex pmc_lock;              /* for wr access to PMCs content */
+} Sync;
 
 /*
  * thread.c interface functions
@@ -91,6 +114,8 @@ void * pt_thread_join(UINTVAL);
 void pt_thread_detach(UINTVAL);
 void pt_thread_kill(UINTVAL);
 void pt_join_threads(Parrot_Interp);
+
+#endif
 
 /*
  * Local variables:

@@ -106,13 +106,19 @@ struct PMC {
 #  define PMC_data(pmc) (pmc)->data
 #endif
 
+struct _Sync;   /* forward decl */
+
 struct PMC_EXT {
 #if PMC_DATA_IN_EXT
     DPOINTER *data;
 #endif
     PMC *metadata;      /* properties */
+    /*
+     * PMC access synchronization for shared PMCs
+     * s. parrot/thread.h
+     */
+    struct _Sync *synchronize;
 
-    SYNC *synchronize;
     /* This flag determines the next PMC in the 'used' list during
        dead object detection in the GC. It is a linked list, which is
        only valid in trace_active_PMCs. Also, the linked list is

@@ -293,6 +293,7 @@ pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
     size_t i;
 
     new_interp->thread_data = mem_sys_allocate_zeroed(sizeof(Thread_data));
+    INTERPRETER_LOCK_INIT(new_interp);
     if (n_interpreters == 0) {
         /*
          * first time - add master interpreter and thread
@@ -302,6 +303,7 @@ pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
         interpreter_array[1] = new_interp;
         interpreter->thread_data =
             mem_sys_allocate_zeroed(sizeof(Thread_data));
+        INTERPRETER_LOCK_INIT(interpreter);
         interpreter->thread_data->tid = 0;
         new_interp ->thread_data->tid = 1;
         n_interpreters = 2;
