@@ -34,9 +34,7 @@ sub compile
   if ($self->content) {
     $compiler->emit(".namespace ${namespace}");
     $compiler->indent;
-    foreach my $content ($self->contents) {
-      $content->compile($compiler);
-    }
+    $self->SUPER::compile($compiler);
     $compiler->outdent;
     $compiler->emit(".endnamespace ${namespace}");
   }
@@ -55,9 +53,7 @@ sub sax
   my ($handler) = @_;
 
   $handler->start_element({ Name => 'block', Attributes => { kind => $self->kind } });
-  foreach my $content ($self->content) {
-    $content->sax($handler);
-  }
+  $_->sax($handler) foreach $self->content;
   $handler->end_element({ Name => 'block' });
 }
 
