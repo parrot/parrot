@@ -48,7 +48,9 @@ runops_slow_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     trace_op(interpreter, code_start, code_end, pc);
     
     while (pc && pc >= code_start && pc < code_end ) {
-        interpreter->profile[*pc]++;
+        if (interpreter->flags & PARROT_PROFILE_FLAG) {
+            interpreter->profile[*pc]++;
+        }
         DO_OP(pc, interpreter);
         trace_op(interpreter, code_start, code_end, pc);
     }
