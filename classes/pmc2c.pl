@@ -13,7 +13,7 @@ pmc2c.pl - PMC compiler
 =head1 SYNOPSIS
 
 perl pmc2c.pl [--no-lines] [--tree] foo.pmc [foo2.pmc...]
-perl pmc2c.pl -f method *.pmc
+perl pmc2c.pl B<-f> method *.pmc
 
 The first class.pmc should be the name of the class you wish to
 create. Normally, the pmc2c.pl translator uses #line pragmas to tell
@@ -26,7 +26,7 @@ However, there are times when this is not desirable and therefore the
 If --tree is set, the inheritance tree of given classes is printed, no
 further processing is done. The common base class 'default' is not printed.
 
-If -f is set, the pmcs are printed, where this method is implemented.
+If B<-f> is set, the pmcs are printed, where this method is implemented.
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,42 @@ A preamble, consisting of code to be copied directly to the .c file
 
 =item 2.
 
-pmclass PMCNAME [extends PMCNAME] [abstract] [dynpmc] [noinit] {
+pmclass PMCNAME [extends PMCPARENT] [flags] {
+
+=over 4
+
+=head2 pmclass flags
+
+=item extends PMCPARENT
+
+All methods not defined in PMCNAME are inherited from the PMCPARENT class.
+If no parent class is defined, methods from F<default.pmc> are used.
+
+=item abstract
+
+This class can't be instantiated. Abstract classes are shown with lower
+case class names in the class tree.
+
+=item noinit
+
+Used with B<abstract>: No class_init code is generated.
+
+=item dynpmc
+
+The class is a dynamic classes. These have a special class_init
+routine suitable for dynamic loading at runtime. s. dynclasses/ for an
+example.
+
+=item const_too
+
+Classes with this flag get 2 vtables and 2 enums, one with r/w set
+methods one with r/o set methods.
+
+=item need_ext
+
+The class needs a PMC_EXT structure (its using e.g. PMC_data).
+
+=back
 
 =item 3.
 
@@ -431,11 +466,15 @@ sub rewrite_method ($$$$$) {
     return $_;
 }
 
+use vars qw(@consts %consts);
+
+BEGIN {
+    @consts = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
+    @consts{@consts} = (1) x @consts;
+};
+
 sub is_const($$) {
     my ($meth, $section) = @_;
-    my @consts = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
-    my %consts;
-    @consts{@consts} = (1) x @consts;
     exists $consts{$section} || $meth eq 'morph';
 }
 
@@ -672,7 +711,10 @@ EOC
       $HOUT .= <<EOH;
 void $initname (Interp *, int);
 EOH
-      my $has_const = exists $flags{const_too} ? 'VTABLE_HAS_CONST_TOO' : 0;
+      my $vtbl_flag = exists $flags{const_too} ? 'VTABLE_HAS_CONST_TOO' : 0;
+      if (exists $flags{need_ext}) {
+	  $vtbl_flag .= '|VTABLE_PMC_NEEDS_EXT';
+      }
       $OUT .= <<EOC;
 void $initname (Interp * interp, int entry) {
 
@@ -681,7 +723,7 @@ void $initname (Interp * interp, int entry) {
         enum_class_$classname,
         NULL,	/* whoami */
         NULL,	/* method_table */
-        $has_const, /* flags */
+        $vtbl_flag, /* flags */
         0, /* reserved */
         $methodlist
         };
@@ -703,6 +745,10 @@ EOC
       $HOUT .= <<EOH;
 void $initname (Interp *, int);
 EOH
+      my $vtbl_flag = 'VTABLE_IS_CONST_FLAG';
+      if (exists $flags{need_ext}) {
+	  $vtbl_flag .= '|VTABLE_PMC_NEEDS_EXT';
+      }
       $OUT .= <<EOC;
 void $initname (Interp * interp, int entry) {
 
@@ -711,7 +757,7 @@ void $initname (Interp * interp, int entry) {
         enum_class_Const$classname,
         NULL,	/* whoami */
         NULL,	/* method_table */
-        VTABLE_IS_CONST_FLAG, /* flags */
+        $vtbl_flag, /* flags */
         0, /* reserved */
         $cmethodlist
         };
