@@ -3,7 +3,8 @@ SO = ${so}
 A = ${a}
 RM_F = ${rm_f}
 RM_RF = ${rm_rf}
-AR_CRS = ar crs
+AR_CR = ${ar} cr
+RANLIB = ${ranlib}
 LD = ${ld}
 LD_SHARED = ${ld_shared}
 LD_OUT = ${ld_out}
@@ -189,7 +190,8 @@ shared : blib/lib blib/lib/libparrot$(SO) ${blib_lib_libparrot_a} $(TEST_PROG_SO
 
 # XXX Unix-only for now
 blib/lib/libparrot$(A) : blib/lib $(O_DIRS) $(O_FILES)
-	$(AR_CRS) $@ $(O_FILES)
+	$(AR_CR) $@ $(O_FILES)
+	$(RANLIB) $@ $(O_FILES)
 
 blib/lib/libparrot$(SO) : blib/lib $(O_DIRS) $(O_FILES)
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)

@@ -50,6 +50,8 @@ sub runstep {
     test_prog     => 'parrot',
     rm_f          => 'rm -f',
     rm_rf         => 'rm -rf',
+    ar            => $Config{ar},
+    ranlib        => $Config{ranlib},
     make          => $Config{make},
     make_set_make => $Config{make_set_make},
     
