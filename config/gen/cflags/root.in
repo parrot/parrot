@@ -1,6 +1,9 @@
-# [ filename | {regex} ] -{removed option} +{added option} ...
+# [ filename | {regex} ] -{removed options} +{added options} s/// ...
 #
-# note, empty regexen/options are just ignored
+# Avoid using non-configure controlled +{} directly in this file, as
+# it'll most likely break on other platforms.
+#
+# Note, empty regex/options are just ignored.
 #
 spf_render.c -{-Wformat-nonliteral}   # noisy
 tsq.c -{${optimize}} 		      # never optimize tsq.c!

@@ -1,8 +1,11 @@
-# [ filename | {regex} ] -{removed options} +{added options} ...
+# [ filename | {regex} ] -{removed options} +{added options} s/// ...
 #
-# note, empty regex/options are just ignored
+# Avoid using non-configure controlled +{} directly in this file, as
+# it'll most likely break on other platforms
 #
-{.*} -{-Wwrite-strings -Wcast-qual -Wno-unused}
+# Note, empty regex/options are just ignored
+#
+{.*} -{-Wwrite-strings -Wcast-qual} s/-Wno-unused/-Wunused/
 
 instructions.c -{-Wformat-nonliteral} # noisy
 debug.c        -{-Wformat-nonliteral} # noisy

@@ -25,16 +25,26 @@ while (<F>) {
 	die "syntax error in $cflags: line $., $_\n";
     }
     
-    while (s/^([-+])\{(.*?)\}\s*//) {
-	next unless $2;
-	my ($sign, $options) = ($1, $2);
-	foreach my $option (split ' ', $options) {
-	    push @options, [ $regex, $sign, $option ];
+    for (;;) {
+	if (s/^([-+])\{(.*?)\}\s*//) {
+	    next unless $2;
+	    my ($sign, $options) = ($1, $2);
+	    foreach my $option (split ' ', $options) {
+		push @options, [ $regex, $sign, $option ];
+	    }
 	}
-    }
-    
-    if (/\S/) {
-	die "syntax error in $cflags: line $., $_\n";
+	elsif (s{s(.)(.*?)\1(.*?)\1([imsx]*)\s*}{}) {
+	    my $mod = "";
+	    $mod = "(?$4)" if $4;
+
+	    push @options, [ $regex, 's', "$mod$2", $3 ];
+	}
+	elsif (/\S/) {
+	    die "syntax error in $cflags: line $., $_\n";
+	}
+	else {
+	    last;
+	}
     }
 }
 
@@ -45,8 +55,13 @@ foreach my $option (@options) {
 	if ($option->[1] eq '+') {
 	    splice @ARGV, 1, 0, $option->[2];
 	}
-	else {
+	elsif ($option->[1] eq '-') {
 	    @ARGV = grep { $_ ne $option->[2] } @ARGV;
+	}
+	else {
+	    foreach my $arg (@ARGV) {
+		$arg =~ s/$option->[2]/$option->[3]/;
+	    }
 	}
     }
 }
