@@ -1714,6 +1714,9 @@ string.c
 sub.c
 testyamd
 t/harness
+t/native_pbc/number.t
+t/native_pbc/number_1.pbc
+t/native_pbc/number_2.pbc
 t/op/arithmetics.t
 t/op/basic.t
 t/op/bitwise.t

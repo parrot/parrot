@@ -60,7 +60,10 @@ sub generate_pbc_for {
   my $by_f = per_test('.pbc',$count);
 
   my $can_skip_compile = $ENV{PARROT_QUICKTEST};
-  if ($can_skip_compile)
+  if ($by_f =~ /native_pbc/) {
+      $can_skip_compile = 1;	# i.e. must skip
+  }
+  elsif ($can_skip_compile)
   {
     open INASSEMBLY, "$as_f" or $can_skip_compile = 0;
     if ($can_skip_compile) {
