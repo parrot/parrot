@@ -10,5 +10,5 @@
 #include "parrot.h"
 
 void init_world() {
-  
+    string_init(); /* Set up the string subsystem */ 
 }
