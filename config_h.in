@@ -26,8 +26,11 @@ typedef void SYNC;
 #define FRAMES_PER_INT_REG_CHUNK FRAMES_PER_CHUNK
 #define FRAMES_PER_STR_REG_CHUNK FRAMES_PER_CHUNK
 
-#define MASK_CHUNK_LOW_BITS (~0xfff)
 #define MASK_STACK_CHUNK_LOW_BITS ${stacklow}
+#define MASK_INT_CHUNK_LOW_BITS ${intlow}
+#define MASK_NUM_CHUNK_LOW_BITS ${numlow}
+#define MASK_STR_CHUNK_LOW_BITS ${strlow}
+#define MASK_PMC_CHUNK_LOW_BITS ${pmclow}
 
 
 ${headers}

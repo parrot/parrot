@@ -19,7 +19,7 @@ void
 Parrot_push_i(struct Parrot_Interp *interpreter) {
     struct IRegChunk *chunk_base;
     
-    chunk_base = CHUNK_BASE(interpreter->int_reg);
+    chunk_base = INT_CHUNK_BASE(interpreter->int_reg);
     /* Do we have any slots left in the current chunk? */
     if (chunk_base->free) {
         interpreter->int_reg = &chunk_base->IReg[chunk_base->used++];
@@ -46,7 +46,7 @@ void
 Parrot_clone_i(struct Parrot_Interp *interpreter) {
     struct IRegChunk *chunk_base;
     
-    chunk_base = CHUNK_BASE(interpreter->int_reg);
+    chunk_base = INT_CHUNK_BASE(interpreter->int_reg);
     /* Do we have any slots left in the current chunk? */
     if (chunk_base->free) {
         interpreter->int_reg = &chunk_base->IReg[chunk_base->used++];
@@ -77,7 +77,7 @@ Parrot_clone_i(struct Parrot_Interp *interpreter) {
 void
 Parrot_pop_i(struct Parrot_Interp *interpreter) {
     struct IRegChunk *chunk_base;
-    chunk_base = CHUNK_BASE(interpreter->int_reg);
+    chunk_base = INT_CHUNK_BASE(interpreter->int_reg);
     /* Is there more than one register frame in use? */
     if (chunk_base->used > 1) {
         chunk_base->used--;
@@ -118,7 +118,7 @@ void
 Parrot_push_s(struct Parrot_Interp *interpreter) {
     struct SRegChunk *chunk_base;
     
-    chunk_base = CHUNK_BASE(interpreter->string_reg);
+    chunk_base = STR_CHUNK_BASE(interpreter->string_reg);
     /* Do we have any slots left in the current chunk? */
     if (chunk_base->free) {
         interpreter->string_reg = &chunk_base->SReg[chunk_base->used++];
@@ -148,7 +148,7 @@ void
 Parrot_clone_s(struct Parrot_Interp *interpreter) {
     struct SRegChunk *chunk_base;
     
-    chunk_base = CHUNK_BASE(interpreter->string_reg);
+    chunk_base = STR_CHUNK_BASE(interpreter->string_reg);
     /* Do we have any slots left in the current chunk? */
     if (chunk_base->free) {
         interpreter->string_reg = &chunk_base->SReg[chunk_base->used++];
@@ -182,7 +182,7 @@ Parrot_clone_s(struct Parrot_Interp *interpreter) {
 void
 Parrot_pop_s(struct Parrot_Interp *interpreter) {
     struct SRegChunk *chunk_base;
-    chunk_base = CHUNK_BASE(interpreter->string_reg);
+    chunk_base = STR_CHUNK_BASE(interpreter->string_reg);
     /* Is there more than one register frame in use? */
     if (chunk_base->used > 1) {
         chunk_base->used--;
@@ -223,7 +223,7 @@ void
 Parrot_push_n(struct Parrot_Interp *interpreter) {
     struct NRegChunk *chunk_base;
     
-    chunk_base = CHUNK_BASE(interpreter->num_reg);
+    chunk_base = NUM_CHUNK_BASE(interpreter->num_reg);
     /* Do we have any slots left in the current chunk? */
     if (chunk_base->free) {
         interpreter->num_reg = &chunk_base->NReg[chunk_base->used++];
@@ -250,7 +250,7 @@ void
 Parrot_clone_n(struct Parrot_Interp *interpreter) {
     struct NRegChunk *chunk_base;
     
-    chunk_base = CHUNK_BASE(interpreter->num_reg);
+    chunk_base = NUM_CHUNK_BASE(interpreter->num_reg);
     /* Do we have any slots left in the current chunk? */
     if (chunk_base->free) {
         interpreter->num_reg = &chunk_base->NReg[chunk_base->used++];
@@ -281,7 +281,7 @@ Parrot_clone_n(struct Parrot_Interp *interpreter) {
 void
 Parrot_pop_n(struct Parrot_Interp *interpreter) {
     struct NRegChunk *chunk_base;
-    chunk_base = CHUNK_BASE(interpreter->num_reg);
+    chunk_base = NUM_CHUNK_BASE(interpreter->num_reg);
     /* Is there more than one register frame in use? */
     if (chunk_base->used > 1) {
         chunk_base->used--;
@@ -322,7 +322,7 @@ void
 Parrot_push_p(struct Parrot_Interp *interpreter) {
     struct PRegChunk *chunk_base;
     
-    chunk_base = CHUNK_BASE(interpreter->pmc_reg);
+    chunk_base = PMC_CHUNK_BASE(interpreter->pmc_reg);
     /* Do we have any slots left in the current chunk? */
     if (chunk_base->free) {
         interpreter->pmc_reg = &chunk_base->PReg[chunk_base->used++];
@@ -351,7 +351,7 @@ void
 Parrot_clone_p(struct Parrot_Interp *interpreter) {
     struct PRegChunk *chunk_base;
     
-    chunk_base = CHUNK_BASE(interpreter->pmc_reg);
+    chunk_base = PMC_CHUNK_BASE(interpreter->pmc_reg);
     /* Do we have any slots left in the current chunk? */
     if (chunk_base->free) {
         interpreter->pmc_reg = &chunk_base->PReg[chunk_base->used++];
@@ -384,7 +384,7 @@ Parrot_clone_p(struct Parrot_Interp *interpreter) {
 void
 Parrot_pop_p(struct Parrot_Interp *interpreter) {
     struct PRegChunk *chunk_base;
-    chunk_base = CHUNK_BASE(interpreter->pmc_reg);
+    chunk_base = PMC_CHUNK_BASE(interpreter->pmc_reg);
     /* Is there more than one register frame in use? */
     if (chunk_base->used > 1) {
         chunk_base->used--;

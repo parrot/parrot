@@ -85,7 +85,11 @@ my(%c)=(
   	perl =>			$^X,
 	debugging =>	$opt_debugging,
 	rm_f =>		'rm -f',
-	stacklow => '(~0xfff)',
+	stacklow =>	'(~0xfff)',
+	intlow =>	'(~0xfff)',
+	numlow =>	'(~0xfff)',
+	strlow =>	'(~0xfff)',
+	pmclow =>	'(~0xfff)',
 );
 
 #copy the things from --define foo=bar
