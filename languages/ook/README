@@ -2,9 +2,9 @@ DESCRIPTION
 -----------
 This is an Ook! compiler written in Parrot assembly, version 0.0.1
 
-This is a compiler, and not an interpreter. This means that the code
+This is a compiler and not an interpreter. This means that the code
 is read, then compiled into Parrot assembly (yes, the target language
-is also Parrot). Then, you can fetch the Parrot assembly generated,
+is also Parrot). Then you can fetch the Parrot assembly generated,
 assemble it and interpret it with Parrot just as you would with any
 other Parrot assembly file.
 
@@ -16,7 +16,7 @@ world program):
 Then you can compile your Ook! program with: 
 
      $ ../../parrot ook.pbc > foo.pasm
-     $ perl ../../assemble.pl foo.pasm > foo.pbc
+     $ ../../parrot -o foo.pbc foo.pasm
      $ ../../parrot foo.pbc
 
 

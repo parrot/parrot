@@ -1,16 +1,14 @@
 RM_F = ${rm_f}
-PERL = ${perl}
 
-ASSEMBLE=$(PERL) ../../assemble.pl
-PARROT=../../parrot
+PARROT = ../../parrot
 
 all: build
 
 test: build
-	../imcc/imcc -r ook.pasm test.ook
+	$(PARROT) -r ook.pasm test.ook
 
 build: ook.pasm
-	$(ASSEMBLE) -o ook.pbc ook.pasm
+	$(PARROT) -o ook.pbc ook.pasm
 
 clean:
 	$(RM_F) core *.pbc *~ foo.p*
