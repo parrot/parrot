@@ -28,9 +28,45 @@ Print class tree of given pmcs.
 
 =item perl classes/pmc2c2.pl -c classes/foo.pmc ...
 
-TODO create classes/foo.{c,h} from classes/foo.dump
+Create classes/foo.c and pmc_foo.h from classes/foo.dump
 
 =back
+
+=head1 OPTIONS
+
+=over 4
+
+=item --debug
+
+Increase debug level
+
+=item --verbose
+
+Increase verbose level
+
+=item --no-lines
+
+Omit source line info
+
+=item --no-body
+
+Emit an empty body in the dump. This may be useful for debugging.
+
+=back
+
+=head1 INTERNALS
+
+Please run e.g.
+
+  pmc2c2.pl --c --deb --deb sarray.pmc | less
+
+to see internal data structures.
+
+=head1 AUTHOR
+
+Leopold Toetsch.
+
+Many thanks to the author of pmc2c.pl, many useful code pieces got reused.
 
 =cut
 
@@ -48,8 +84,12 @@ my %opt;
 main();
 
 sub dump_default {
-    my $default = parse_vtable("$FindBin::Bin/../vtable.tbl");
-    open(VTD, ">vtable.dump") or die "Can't write vtable.dump";
+    my $file = "$FindBin::Bin/../vtable.tbl";
+    my $default = parse_vtable($file);
+    my $dump;
+    ($dump = $file) =~ s/\.\w+/\.dump/;
+    print "Writing $dump\n" if $opt{verbose};
+    open(VTD, ">$dump") or die "Can't write $dump";
     my %vt;
     $vt{flags} = {};
     $vt{pre} = '';
@@ -268,6 +308,7 @@ sub dump_pmc {
         gen_super_meths($class, $vt);
         my $Dumper = Data::Dumper->new([$class], [qw(class)]);
         $Dumper->Indent(1);
+        print "Writing $dump\n" if $opt{verbose};
         open PMD, ">$dump" or die "Can't write '$dump";
         print PMD $Dumper->Dump;
         close PMD;
@@ -348,8 +389,8 @@ sub main {
 	"dump"          => \$dump,
 	"c|gen-c"       => \$gen_c,
 	"tree"          => \$tree,
-	"nobody"        => \$nobody,
-	"nolines"       => \$nolines,
+	"no-body"       => \$nobody,
+	"no-lines"      => \$nolines,
 	"debug+"        => \$debug,
 	"verbose+"      => \$verbose,
     );

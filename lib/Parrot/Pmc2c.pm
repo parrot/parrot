@@ -2,7 +2,7 @@ package Parrot::Pmc2c;
 use vars qw(@EXPORT_OK @writes %writes );
 
 use base qw( Exporter );
-@EXPORT_OK = qw(gen_c gen_h);
+@EXPORT_OK = qw(gen_c gen_h gen_ret);
 
 BEGIN {
     @writes = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
@@ -233,12 +233,56 @@ sub methods() {
     my $cout = "";
 
     foreach my $method (@{ $self->{vtable}{methods}} ) {
-        next if $method->{meth} eq 'class_init';
-        my $ret = $self->body($method, $line);
-        $line += count_newlines($ret);
-        $cout .= $ret;
+        my $meth = $method->{meth};
+        next if $meth eq 'class_init';
+        if ($self->implements($meth)) {
+            my $ret = $self->body($method, $line);
+            $line += count_newlines($ret);
+            $cout .= $ret;
+        }
     }
     $cout;
+}
+
+sub lib_load_code() {
+    my $self = shift;
+    my $cout;
+    my $classname = $self->{class};
+    my $lc_classname = lc $classname;
+    # TODO multiple (e.g. Const subclasses
+    my $call_class_init =
+        "Parrot_${classname}_class_init(interpreter,  entry);\n";
+    $cout = <<"EOC";
+/*
+* This load function will be called to do global (once) setup
+* whatever is needed to get this extension running
+*/
+#include "parrot/dynext.h"
+
+PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
+{
+    STRING *whoami;
+    PMC *pmc;
+    INTVAL type;
+
+    /*
+    * TODO which PMC type to return
+    */
+    pmc = new_pmc_header(interpreter);
+    add_pmc_ext(interpreter, pmc);
+
+    /* for all PMCs we want to register:
+    */
+    whoami = string_from_cstring(interpreter, "$classname", 0);
+    type = pmc_register(interpreter, whoami);
+    /* do class_init code */
+    $call_class_init
+    return pmc;
+}
+
+EOC
+
+    return $cout;
 }
 
 sub init_func() {
@@ -246,7 +290,7 @@ sub init_func() {
     my $cout = "";
     return "" if exists $self->{flags}{noinit};
 
-    # gen C line comment
+    # TODO gen C line comment
     my $classname = $self->{class};
     my $vtbl_flag =  $self->{flags}{const_too} ?
         'VTABLE_HAS_CONST_TOO' : $self->{flags}{is_const} ?
@@ -315,6 +359,9 @@ EOC
     $class_init_code
 } /* Parrot_${classname}_class_init */
 EOC
+    if ($self->{flags}{dynpmc}) {
+        $cout .= $self->lib_load_code();
+    }
     $cout;
 }
 
@@ -334,9 +381,9 @@ sub gen_c() {
     $cout;
 }
 
-sub gen_h() {
-    my ($self, $file) = @_;
-    my $hout = $self->dont_edit($file);
+sub hdecls() {
+    my $self = shift;
+    my $hout;
     my $classname = $self->{class};
     # generat decls for all methods in this file
     foreach my $meth (@{ $self->{vtable}{methods} } ) {
@@ -348,17 +395,31 @@ sub gen_h() {
     $hout .= <<"EOC";
 void Parrot_${classname}_class_init(Parrot_Interp, int);
 EOC
+    $hout;
+}
+
+sub gen_h() {
+    my ($self, $file) = @_;
+    my $hout = $self->dont_edit($file);
+    my $name = uc $self->{class};
+    $hout .= <<"EOH";
+
+#ifndef PARROT_PMC_${name}_H_GUARD
+#define PARROT_PMC_${name}_H_GUARD
+
+EOH
+
+    $hout .= $self->hdecls();
     if ($self->{const}) {
         $self = $self->{const};
-        my $classname = $self->{class};
         $hout .= "\n/* Const */\n";
-        foreach my $meth (@{ $self->{methods} } ) {
-            $hout .= $self->decl($classname, $meth, 1);
-        }
-	$hout .= <<"EOC";
-void Parrot_${classname}_class_init(Parrot_Interp, int);
-EOC
+        $hout .= $self->hdecls();
     }
+    $hout .= <<"EOH";
+
+#endif
+
+EOH
     $hout;
 }
 
@@ -369,6 +430,19 @@ sub implements
     return exists $self->{has_method}{$meth};
 }
 
+# generate a return statement, if body is empty make a cast if needed
+sub gen_ret {
+    my ($method, $body) = @_;
+    my $ret;
+    if ($body) {
+        $ret = $method->{type} eq 'void' ? "$body;" : "return $body;" ;
+    }
+    else {
+        $ret = $method->{type} eq 'void' ? "" : "return ($method->{type})0;";
+    }
+    $ret;
+}
+
 # standard behavior
 package Parrot::Pmc2c::Standard;
 use base 'Parrot::Pmc2c';
@@ -376,27 +450,23 @@ sub body
 {
     my ($self, $method) = @_;
     my $meth = $method->{meth};
-    # exisiting methods get emitted
-    if ($self->implements($meth)) {
-        my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n]);
-    }
-    "";
+    my $n = $self->{has_method}{$meth};
+    return $self->SUPER::body($self->{methods}[$n]);
 }
 
-# through excepton if meth writes
+# through exception if meth writes
 package Parrot::Pmc2c::Standard::Const;
 use base 'Parrot::Pmc2c::Standard';
+import Parrot::Pmc2c qw( gen_ret );
 
 sub body {
     my ($self, $method) = @_;
     my $meth = $method->{meth};
-    return "" unless ($self->implements($meth));
 
     my $decl = $self->decl($self->{class}, $method, 0);
     my $classname = $self->{class};
     my $parentname = $self->{parentname};
-    my $ret = $method->{type} eq 'void' ? "" : "return ($method->{type})0;";
+    my $ret = gen_ret($method);
     my $cout = <<"EOC";
 $decl {
 EOC
@@ -427,6 +497,7 @@ EOC
 # Ref directs all unknow methods to the referee
 package Parrot::Pmc2c::Ref;
 use base 'Parrot::Pmc2c';
+import Parrot::Pmc2c qw( gen_ret );
 
 sub implements
 {
@@ -437,7 +508,7 @@ sub body
 {
     my ($self, $method, $line) = @_;
     my $meth = $method->{meth};
-    # exisiting methods get emitted
+    # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
         my $n = $self->{has_method}{$meth};
         return $self->SUPER::body($self->{methods}[$n]);
@@ -449,7 +520,7 @@ sub body
     $arg = ", ". join(' ', @args) if @args;
     $parameters = ", $parameters" if $parameters;
     my $body = "VTABLE_$meth(interpreter, PMC_ptr2p(pmc)$arg)";
-    my $ret = $method->{type} eq 'void' ? "$body;" : "return $body;" ;
+    my $ret = gen_ret($method, $body);
     my $decl = $self->decl($self->{class}, $method, 0);
     my $l = "";
     unless ($self->{opt}{nolines}) {
@@ -469,6 +540,7 @@ EOC
 # default throws an execption for unknown meths
 package Parrot::Pmc2c::default;
 use base 'Parrot::Pmc2c';
+import Parrot::Pmc2c qw( gen_ret );
 
 sub implements
 {
@@ -479,14 +551,14 @@ sub body
 {
     my ($self, $method, $line) = @_;
     my $meth = $method->{meth};
-    # exisiting methods get emitted
+    # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
         my $n = $self->{has_method}{$meth};
         return $self->SUPER::body($self->{methods}[$n]);
     }
     my $decl = $self->decl($self->{class}, $method, 0);
     my $l = "";
-    my $ret = $method->{type} eq 'void' ? "" : "return ($method->{type})0;";
+    my $ret = gen_ret($method);
     unless ($self->{opt}{nolines}) {
         $l = <<"EOC";
 #line $line "default.c"
