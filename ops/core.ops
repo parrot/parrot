@@ -2262,14 +2262,13 @@ Gets the type of entry $2 of the stack and puts in in $1
 =cut
 
 op entrytype(out INT, in INT) {
-  INTVAL depth;
-  Stack_Entry entry;
-  depth = stack_depth(interpreter, interpreter->user_stack);
-  if (depth <= $2) {
-    internal_exception(99, "Stack Depth wrong");
-  }
+  size_t height;
+  Stack_entry *entry;
 
   entry = stack_entry(interpreter, interpreter->user_stack, $2);
+  if (!entry) {
+    internal_exception(99, "Stack Depth wrong");
+  }
   $1 = get_entry_type(interpreter, entry);
   goto NEXT();
 }

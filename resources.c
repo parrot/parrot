@@ -358,7 +358,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
     PMC *last, *current; /* Pointers to the last marked PMC and the
                             currently being processed PMC. */
     unsigned int i, j, chunks_traced;
-    struct Stack_chunk_t *cur_stack, *start_stack;
+    Stack_chunk *cur_stack, *start_stack;
     struct PRegChunk *cur_chunk;
     /* We have to start somewhere, and the global stash is a good
        place */
@@ -442,7 +442,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
 static void
 trace_active_buffers(struct Parrot_Interp *interpreter) {
   UINTVAL i, j, chunks_traced;
-  struct Stack_chunk_t *cur_stack, *start_stack;
+  Stack_chunk *cur_stack, *start_stack;
   struct SRegChunk *cur_chunk;
 
   /* First mark the current set. We assume that all pointers in S

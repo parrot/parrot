@@ -50,7 +50,7 @@ typedef struct ProfData {
 } ProfData;
 
 
-struct Parrot_Interp {
+typedef struct Parrot_Interp {
     struct IReg int_reg;
     struct NReg num_reg;
     struct SReg string_reg;
@@ -65,8 +65,8 @@ struct Parrot_Interp {
     struct NRegChunk *num_reg_base;     /* Base of the float reg stack */
     struct SRegChunk *string_reg_base;  /* Base of the string stack */
     struct PRegChunk *pmc_reg_base;     /* Base of the PMC stack */
-    struct Stack_chunk_t *user_stack;   /* Base of the scratch stack */
-    struct Stack_chunk_t *control_stack;/* Base of the flow control stack */
+    struct stack_chunk *user_stack;            /* Base of the scratch stack */
+    struct stack_chunk *control_stack;         /* Base of the flow control stack */
     struct Stash *perl_stash;           /* Pointer to the global variable
                                          * area */
     struct Scratchpad *cur_pad;         /* The current scratchpad */
@@ -137,7 +137,7 @@ struct Parrot_Interp {
                                    requests are there? */
     UINTVAL GC_block_level;     /* How many outstanding GC block
                                    requests are there? */
-};
+} Interp;
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)

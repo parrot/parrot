@@ -41,6 +41,8 @@ typedef struct {
     UINTVAL flags;
 } Buffer;
 
+typedef struct parrot_string_t String;
+
 /* Buffer flags */
 typedef enum BUFFER_flag {
     /* bits the GC can keep its dirty mitts off of */
