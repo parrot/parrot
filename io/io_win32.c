@@ -157,7 +157,7 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     /* Only files for now */
     flags |= PIO_F_FILE;
 
-    fd = CreateFile(spath, fAcc, 0, NULL, fCreat, FILE_ATTRIBUTE_NORMAL, NULL);
+    fd = CreateFile(spath, fAcc, fShare, NULL, fCreat, FILE_ATTRIBUTE_NORMAL, NULL);
     if (fd != INVALID_HANDLE_VALUE) {
         io = PIO_new(interpreter, type, flags, 0);
         io->fd = fd;
@@ -233,15 +233,17 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                void *buffer, size_t len)
 {
     DWORD countread;
-    if (ReadFile(io->fd, (LPVOID) buffer, (DWORD) len, &countread, NULL))
+    if (ReadFile(io->fd, (LPVOID) buffer, (DWORD) len, &countread, NULL)) {
         if (countread > 0)
             return (size_t)countread;
-        else
+        else if (len > 0)
             /* EOF if read 0 and bytes were requested */
             io->flags |= PIO_F_EOF;
-    else if (GetLastError() != NO_ERROR)
-            /* FIXME : An error occured */
-        ;
+    }
+    else {
+        /* FIXME : An error occured */
+    }
+    
     return 0;
 }
 
