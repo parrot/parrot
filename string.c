@@ -370,7 +370,7 @@ string_str_index_singlebyte(struct Parrot_Interp *interpreter,
     const UINTVAL              find_strlen   = find->strlen;
     const UINTVAL              str_strlen    = str->strlen;
     const unsigned char* const lastmatch     =
-                                   str_strstart + str_strlen - find_strlen;
+                                   str_strstart + str_strlen;
     UINTVAL* p;
     const unsigned char* cp;
     UINTVAL endct, pos;
@@ -393,9 +393,9 @@ string_str_index_singlebyte(struct Parrot_Interp *interpreter,
     /* Perform the match */
 
     pos = start;
-    cp = str_strstart + start;
+    cp = str_strstart + start + find_strlen;
     while (cp <= lastmatch) {
-        register const unsigned char* sp = cp + find_strlen;
+        register const unsigned char* sp = cp;
         register const unsigned char* fp = find_strstart + find_strlen;
 
         while (fp > find_strstart) {
@@ -406,7 +406,7 @@ string_str_index_singlebyte(struct Parrot_Interp *interpreter,
             return pos;
         }
         else {
-            register UINTVAL bsi = badshift[*sp];
+            register UINTVAL bsi = badshift[*(cp-1)];
             cp  += bsi;
             pos += bsi;
         }

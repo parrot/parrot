@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 106;
+use Parrot::Test tests => 107;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1164,6 +1164,20 @@ CODE
 -1
 OUTPUT
 
+output_is(<<'CODE',<<OUTPUT,"index, 4-arg form, bug 22718");
+	set S1, "This is not quite right"
+	set S0, " is "
+	index I0, S1, S0, 0
+	print I0
+	set S0, "is"
+	index I0, S1, S0, 0
+	print I0
+	print "\n"
+	end
+CODE
+42
+OUTPUT
+
 output_is(<<'CODE',<<OUTPUT,"index, null strings");
       set S0, "Parrot"
       set S1, ""
@@ -1193,8 +1207,21 @@ output_is(<<'CODE',<<OUTPUT,"index, null strings");
       print I1
       print "\n"
 
+      set S0, "Parrot"
+      null S1
+      index I1, S0, S1
+      print I1
+      print "\n"
+
+      null S0
+      null S1
+      index I1, S0, S1
+      print I1
+      print "\n"
       end
 CODE
+-1
+-1
 -1
 -1
 -1
