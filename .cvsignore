@@ -1,4 +1,5 @@
 blib
+config_lib.pasm
 libparrot.def
 Makefile
 myconfig
