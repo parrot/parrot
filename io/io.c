@@ -357,7 +357,7 @@ PIO_pop_layer(theINTERP, PMC *pmc)
 
     if (!PMC_IS_NULL(pmc)) {
         if (!io)
-            return -1;
+            return 0;
         layer = io->stack;
         if (layer) {
             io->stack = layer->down;

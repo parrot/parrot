@@ -94,11 +94,11 @@ PIO_unix_init(theINTERP, ParrotIOLayer *layer)
         io = PIO_unix_fdopen(interpreter, layer, STDIN_FILENO, PIO_F_READ);
         if (!io) return -1;
         PIO_STDIN(interpreter) = new_io_pmc(interpreter, io);
-        
+
         io = PIO_unix_fdopen(interpreter, layer, STDOUT_FILENO, PIO_F_WRITE);
         if (!io) return -1;
         PIO_STDOUT(interpreter) = new_io_pmc(interpreter, io);
-        
+
         io = PIO_unix_fdopen(interpreter, layer, STDERR_FILENO, PIO_F_WRITE);
         if (!io) return -1;
         PIO_STDERR(interpreter) = new_io_pmc(interpreter, io);
@@ -198,7 +198,7 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
 /*
  * Toggle ASYNC on the IO descriptor.
  */
-static INTVAL 
+static INTVAL
 PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
 {
     int rflags;
@@ -208,11 +208,11 @@ PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
             rflags |= O_ASYNC;
         else
             rflags &= ~O_ASYNC;
-        return fcntl(io->fd, F_SETFL, rflags); 
+        return fcntl(io->fd, F_SETFL, rflags);
     }
 #else
     internal_exception(PIO_NOT_IMPLEMENTED, "Async support not available");
-#endif 
+#endif
     return -1;
 }
 
@@ -309,7 +309,7 @@ PIO_unix_getblksize(PIOHANDLE fd)
 #  endif
 }
 
-/* 
+/*
  * At lowest layer all we can do for flush is ask kernel to sync().
  * XXX: Is it necessary to sync here?
  */
@@ -434,17 +434,16 @@ PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 
 /*
  * PIO_sockaddr_in is not part of the layer and so must be extern
- * XXX: We can probably just write our own routines (htons, inet_aton, etc.) 
+ * XXX: We can probably just write our own routines (htons, inet_aton, etc.)
  * and take this out of platform specific compilation
  */
 STRING *
 PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 {
-    STRING * packed;
     struct sockaddr_in sa;
     /* XXX: Fixme, inet_addr obsolete, replace with inet_aton */
     char * s = string_to_cstring(interpreter, addr);
-    if(inet_aton(s, &sa.sin_addr.s_addr) != 0) {
+    if(inet_aton(s, &sa.sin_addr) != 0) {
         /* Success converting numeric IP */
     }
     else {
@@ -455,19 +454,19 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
         struct hostent *he = gethostbyname(s);
         /* XXX FIXME - Handle error condition better */
         if(!he) {
+            string_cstring_free(s);
             fprintf(stderr, "gethostbyname failure [%s]\n", s);
-            return packed;
+            return NULL;
         }
         memcpy((char*)&sa.sin_addr, he->h_addr, sizeof(sa.sin_addr));
     }
+    string_cstring_free(s);
+
     sa.sin_port = htons(port);
 
     fprintf(stderr, "sockaddr_in: port %d\n", port);
-    packed = string_make(interpreter, &sa, sizeof(struct sockaddr), NULL, 0,
-                                NULL);
-    if(!packed)
-        PANIC("unix_sockaddr: failed to create string");
-    return packed;
+    return string_make(interpreter, &sa, sizeof(struct sockaddr), NULL, 0,
+            NULL);
 }
 
 #if PARROT_NET_DEVEL
@@ -528,13 +527,13 @@ PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
     io->local.sin_port = sa.sin_port;
 
     if((bind(io->fd, (struct sockaddr *)&io->local, sizeof(struct sockaddr))) == -1)
-    { 
+    {
         fprintf(stderr, "bind: errno= ret=%d fd = %d port = %d\n",
              errno, io->fd, ntohs(io->local.sin_port));
         return -1;
-    } 
+    }
 
-    return 0;    
+    return 0;
 }
 
 /*
@@ -564,12 +563,12 @@ PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 
     if((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
                                   (socklen_t *)&newsize)) == -1)
-    {                       
-        fprintf(stderr, "accept: errno=%d", errno);                             
+    {
+        fprintf(stderr, "accept: errno=%d", errno);
         /* Didn't get far enough, free the io */
-        mem_sys_free(newio); 
+        mem_sys_free(newio);
         return NULL;
-    }                   
+    }
 
     newio->fd = newsock;
 
@@ -704,6 +703,7 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, STRING *cmd, int flags)
     ParrotIO *io;
     int pid, err, fds[2];
     char *ccmd = string_to_cstring(interpreter, cmd);
+    /* FIXME mem leak here */
 
     if((err = pipe(fds)) < 0) {
         perror("pipe:");
