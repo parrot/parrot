@@ -8,5 +8,5 @@ $ldflags .= " -flat_namespace ";
 Configure::Data->set(
   ccflags => $ccflags,
   ldflags => $ldflags,
-  cc_warn => "-Wno-shadow",
+  ccwarn => "-Wno-shadow",
 );
