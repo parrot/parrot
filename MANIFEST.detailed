@@ -1427,6 +1427,7 @@
 []		languages/imcc/parser_util.c
 []		languages/imcc/pbc.c
 []		languages/imcc/pbc.h
+[]		languages/imcc/rebuild.pl
 []		languages/imcc/sets.c
 []		languages/imcc/sets.h
 []		languages/imcc/stacks.c

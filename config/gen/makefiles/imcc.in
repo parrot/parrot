@@ -45,12 +45,13 @@ all : imcc
 ../../$(PARROTLIB): ../../parrot$(EXE)
 	cd ../.. && $(MAKE) $(PARROTLIB)
 
-imcparser.c : imcc.y
-	$(YACC) -d -o imcparser.c imcc.y
+.PHONY : FORCE
 
-imcparser.h : imcc.y
-imclexer.c : imcc.l
-	$(LEX) imcc.l
+imcparser.c imcparser.h : imcc.y FORCE
+	$(PERL) rebuild.pl ${PQ}$(YACC) imcc.y -d -o imcparser.c${PQ} imcc.y imcparser.h imcparser.c
+
+imclexer.c : imcc.l FORCE
+	$(PERL) rebuild.pl ${PQ}$(LEX) imcc.l${PQ} imcc.l
 
 .c$(O):
 	$(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<
