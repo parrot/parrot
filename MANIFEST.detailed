@@ -109,7 +109,6 @@
 []		config/gen/platform/win32.c
 []		config/gen/platform/win32.h
 []		config/init/data.pl
-[]		config/init/debug.pl
 []		config/init/hints.pl
 []		config/init/hints/cygwin.pl
 []		config/init/hints/darwin.pl
@@ -118,6 +117,7 @@
 []		config/init/hints/vms.pl
 []		config/init/manifest.pl
 []		config/init/miniparrot.pl
+[]		config/init/optimize.pl
 []		config/inter/exp.pl
 []		config/inter/ops.pl
 []		config/inter/pmc.pl

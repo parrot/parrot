@@ -61,6 +61,7 @@ END
   if(!$debug || $debug =~ /n/i) {
     Configure::Data->set(
       cc_debug => '',
+      link_debug => '',
       ld_debug => ''
     );
   }
