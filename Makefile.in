@@ -138,6 +138,7 @@ clean:
 	$(RM_F) $(INC)/oplib/core_ops.h
 	$(RM_F) $(INC)/oplib/vtable_ops.h vtable_ops.c vtable.ops
 	$(RM_F) $(TEST_PROG) $(PDISASM) $(PDUMP)
+	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
 	$(RM_F) examples/assembly/mops$(EXE) examples/assembly/mops.c
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
 	$(RM_F) Parrot/OpLib/core.pm
