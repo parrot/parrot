@@ -510,8 +510,6 @@ void relop_to_op(int relop, char * op) {
 
 %start program
 
-%expect 3
-
 %%
 
 program:
@@ -647,7 +645,7 @@ relop:
 opname: IDENTIFIER
     ;
 
-target: IDENTIFIER			{ $$ = get_sym($1); free($1) }
+target: IDENTIFIER			{ $$ = get_sym($1); free($1); }
     |  reg
     ;
 
@@ -664,7 +662,7 @@ var_or_i:
     |  rc
     ;
 
-var:   IDENTIFIER		       { $$ = get_sym($1); free($1) }
+var:   IDENTIFIER		       { $$ = get_sym($1); free($1); }
     |  rc
     ;
 
