@@ -188,14 +188,25 @@ output_is(<<'CODE', <<OUTPUT, "defined");
     defined I0, P0[2]
     print I0
     print "\n"
+    new P2, .Key
+    set P2, 3
+    set P0[3], 4 
+    defined I0, P0[P2]
+    print I0
+    print "\n"
+    set P2, 4
+    defined I0, P0[P2]
+    print I0
+    print "\n"
     end
-
 CODE
 1
 0
 1
 0
 0
+0
+1
 0
 OUTPUT
 
@@ -217,13 +228,24 @@ output_is(<<'CODE', <<OUTPUT, "exists");
     exists I0, P0[2]
     print I0
     print "\n"
+    new P2, .Key
+    set P2, 3
+    set P0[3], 4 
+    exists I0, P0[P2]
+    print I0
+    print "\n"
+    set P2, 4
+    exists I0, P0[P2]
+    print I0
+    print "\n"
     end
-
 CODE
 1
 0
 0
 1
+1
+0
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
