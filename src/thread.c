@@ -161,8 +161,7 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
     /*
      * set regs according to pdd03
      * P0 = sub, P2 = object
-     * XXX P5, P6 are still used to invoke the thread method
-     *     these should be the first params though
+     * P5 is first argument
      */
     REG_PMC(0) = sub;
     REG_PMC(2) = dest_interp;

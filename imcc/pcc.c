@@ -880,6 +880,8 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             regs[1] = sub->pcc_sub->object;
             ins = insINS(interp, unit, ins, "set", regs, 2);
         }
+        if (sub->pcc_sub->nci)
+            goto move_sub;
     }
     else {
         /* plain sub call */
@@ -936,7 +938,7 @@ move_cc:
         if (!need_cc)
             ins = insINS(interp, unit, ins, "updatecc", regs, 0);
     /* restore self */
-    if (meth_call) {
+    if (meth_call && !sub->pcc_sub->nci) {
         regs[0] = s0;
         n = 0;
         if (s0)

@@ -17,6 +17,7 @@
 # PMC reg stuff
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
 # P - pointer to a PMC-register
+# O - pointer to PMC-regise 2 (object)
 # void stuff
 # v - void
 # P - void *
@@ -189,7 +190,7 @@ t	B
 v	P
 
 # Needed for parrot threads
-v	IPP
+v	IOP
 P	Ii
 
 # Oddball ones for postgres

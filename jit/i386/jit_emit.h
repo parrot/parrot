@@ -2955,9 +2955,13 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
 #  endif
                 emitm_pushl_r(pc, emit_EAX);
                 break;
+            case 'O':   /* push PMC * object in P2 */
+                jit_emit_mov_rm_i(pc, emit_EAX, &PMC_REG(2));
+                goto preg;
             case 'P':   /* push PMC * */
                 jit_emit_mov_rm_i(pc, emit_EAX,
                         &PMC_REG(count_regs(sig, signature->strstart)));
+preg:
 #if PARROT_CATCH_NULL
                 jit_emit_cmp_rm_i(pc, emit_EAX, &PMCNULL);
                 emitm_jxs(pc, emitm_jne, 2); /* skip the xor */

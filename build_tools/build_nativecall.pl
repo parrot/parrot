@@ -84,6 +84,7 @@ my (%proto_type) = (p => "void *",
 		    v => "void",
 		    I => "struct Parrot_Interp *",
 		    P => "PMC *",
+		    O => "PMC *",
 		    b => "void *",
 		    B => "void **",
 		    L => "long *",
@@ -329,6 +330,9 @@ sub make_arg {
               };
     /I/ && do {
 	       return "interpreter";
+              };
+    /O/ && do {
+	       return "REG_PMC(2)";
               };
     /P/ && do {my $regnum = $reg_ref->{p}++;
                return "REG_PMC($regnum) == PMCNULL ? NULL : REG_PMC($regnum)";

@@ -11,13 +11,15 @@ classes/parrotthread.pmc - Threaded Interpreter
 ParrotThread extends ParrotInterpreter to provide a threaded interpreter
 which supports:
 
-    new P0, .ParrotThread     # create new threaded interp
-    getinterp P2
-    new P0, .ParrotThread, P2 # create thread P0 from interp P2
-    set I0, P0                # get thread id
+    new P2, .ParrotThread     # create new threaded interp
+    find_method P0, P2, "thread3"       # thread-run function
+    find_global P5, "_th1"    # locate thread function
+    invoke                    # run thread
+
+    set I0, P2                # get thread id
 
 and these methods:
- 
+
     thread1
     thread2
     thread3                   # start thread of type 1..3

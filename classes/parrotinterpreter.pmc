@@ -88,11 +88,8 @@ Called from C<clone_regs_thread()>. Currently commented out.
 static int
 need_reg(Parrot_Interp s, int i, int i3)
 {
-    if (i == 0 || i == 1)       /* Sub, RetCont */
+    if (i >= 0 && i <= 2)       /* Sub, RetCont, object */
         return 1;
-    /*
-     * P2 has the object accoring to pdd03 - not yet
-     */
     if (i == 3 && i3 >= 11 && !PMC_IS_NULL(s->pmc_reg.registers[i]))
         return 1;               /* overflow if present */
     if (i >= 5 && i < 5 + i3)   /* i3 params */
@@ -275,14 +272,13 @@ Class initialization.
 
         /*
          * thread start methods for threads type 1..3
-         * TODO fix signature, when P2/P5 object issues are clarified
          */
         enter_nci_method(INTERP, typ,
-                         F2DPTR(pt_thread_run_1), "thread1", "vIPP");
+                         F2DPTR(pt_thread_run_1), "thread1", "vIOP");
         enter_nci_method(INTERP, typ,
-                         F2DPTR(pt_thread_run_2), "thread2", "vIPP");
+                         F2DPTR(pt_thread_run_2), "thread2", "vIOP");
         enter_nci_method(INTERP, typ,
-                         F2DPTR(pt_thread_run_3), "thread3", "vIPP");
+                         F2DPTR(pt_thread_run_3), "thread3", "vIOP");
 
         /*
          * TODO unify and fix signatures
