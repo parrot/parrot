@@ -49,6 +49,11 @@ pmclass ParrotObject extends ParrotClass need_ext {
 	SELF.init();
     }
 
+    PMC* find_method(STRING* name) {
+	PMC *class = VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), 0);
+	return Parrot_find_method_with_cache(INTERP, class, name);
+    }
+
     /*
      * attrib count
      */

@@ -51,8 +51,11 @@ pmclass ParrotClass need_ext {
      * system method lookup code
      */
     PMC* find_method(STRING* name) {
-	PMC *class = VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), 0);
-	return Parrot_find_method_with_cache(INTERP, class, name);
+	return Parrot_find_method_with_cache(INTERP, SELF, name);
+    }
+
+    INTVAL can(STRING* method) {
+	return VTABLE_find_method(interpreter, SELF, method) != NULL;
     }
 
     /*

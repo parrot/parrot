@@ -408,14 +408,6 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
                 shortcut_name, 0);
         method = find_global(interpreter, FQ_method);
     }
-
-
-    /* Ultimately, if we've failed, pitch an exception */
-    if (NULL == method) {
-        real_exception(interpreter, NULL, METH_NOT_FOUND,
-                "Method '%s' not found\n",
-                string_to_cstring(interpreter, method_name));
-    }
     return method;
 }
 

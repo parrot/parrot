@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 4;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmeth - unknown");
@@ -38,5 +38,48 @@ CODE
 main
 in meth
 back
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "can class");
+    newclass P2, "Foo"
+    set S0, "meth"
+
+    new P3, .Sub
+    # store the sub with the real name
+    store_global "Foo\x0meth", P3
+
+    can I0, P2, "meth"
+    print I0
+    print "\n"
+    can I0, P2, "no_such_meth"
+    print I0
+    print "\n"
+    end
+CODE
+1
+0
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "can object");
+    newclass P2, "Foo"
+    find_type I0, "Foo"
+    new P2, I0
+
+    set S0, "meth"
+
+    new P3, .Sub
+    # store the sub with the real name
+    store_global "Foo\x0meth", P3
+
+    can I0, P2, "meth"
+    print I0
+    print "\n"
+    can I0, P2, "no_such_meth"
+    print I0
+    print "\n"
+    end
+CODE
+1
+0
 OUTPUT
 
