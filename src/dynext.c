@@ -42,7 +42,7 @@ set_cstring_prop(Parrot_Interp interpreter, PMC *lib_pmc, const char *what,
     PMC *prop;
     STRING *key;
 
-    prop = pmc_new(interpreter, enum_class_PerlString);
+    prop = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, prop, name);
     key = const_string(interpreter, what);
     VTABLE_setprop(interpreter, lib_pmc, key, prop);
