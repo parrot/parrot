@@ -4733,17 +4733,24 @@ op new(out PMC, in INT, in PMC) {
 
 Return the type of PMC in $2.
 
+=item B<typeof>(out INT, in PMC, in KEY)
+
+Return the type of the entry in aggregate PMC in $2 at key $3.
+
 =cut
 
 inline op typeof (out STR, in PMC) {
-  PMC *p = $2;
-  $1 = (p->vtable->name(interpreter, p));
+  $1 = $2->vtable->name(interpreter, $2);
   goto NEXT();
 }
 
 inline op typeof (out INT, in PMC) {
-  PMC *p = $2;
-  $1 = (p->vtable->type(interpreter, p));
+  $1 = $2->vtable->type(interpreter, $2);
+  goto NEXT();
+}
+
+inline op typeof (out INT, in PMC, in KEY) {
+  $1 = $2->vtable->type_keyed(interpreter, $2, $3);
   goto NEXT();
 }
 

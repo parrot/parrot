@@ -35,6 +35,7 @@ typedef struct _hash_entry {
 
 /* A BucketIndex is an index into the pool of available buckets. */
 typedef UINTVAL BucketIndex;
+#define INITBucketIndex ((BucketIndex)-2)
 typedef UINTVAL HashIndex;
 struct _hashbucket {
     STRING *key;

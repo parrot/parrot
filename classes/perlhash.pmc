@@ -53,6 +53,24 @@ pmclass PerlHash {
         return enum_class_PerlHash;
     }
 
+    INTVAL type_keyed (PMC* key) {
+        PMC* valpmc;
+        STRING* keystr = make_hash_key(INTERP, key);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_data(SELF), keystr);
+        if (entry == NULL) {
+            return enum_hash_undef;
+        }
+        if (entry->type == enum_hash_pmc) {
+	    PMC* nextkey;
+	    nextkey = key_next(INTERP, key);
+            valpmc = entry->val.pmc_val;
+	    if (!nextkey)
+		return enum_hash_pmc;
+	    return VTABLE_type_keyed(INTERP, valpmc, nextkey);
+        }
+        return entry->type;
+    }
+
     STRING* name() {
         return whoami;
     }
@@ -139,8 +157,17 @@ pmclass PerlHash {
 
     STRING* get_string_keyed (PMC* key) {
         PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_data(SELF), keystr);
+        STRING* keystr;
+        HASH_ENTRY* entry;
+
+	switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+	    case KEY_integer_FLAG:
+		/* called from iterator with an integer idx in key */
+		return hash_get_idx(INTERP, (HASH*) PMC_data(SELF), key);
+	    default:
+		keystr = make_hash_key(INTERP, key);
+	}
+        entry = hash_get(INTERP, (HASH*) PMC_data(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
             return VTABLE_get_string(INTERP, undef);
@@ -349,7 +376,7 @@ pmclass PerlHash {
 		ret->cache.int_val = 0;
 		if (!n)
 		    ret->cache.int_val = -1;
-		PMC_data(ret) = (void *)(UINTVAL)-2; /* XXX */
+		PMC_data(ret) = (void *)INITBucketIndex;
 		break;
 	    case 1:	/* next key */
 		/* do nothing: hash_get_idx does increment the idx */
@@ -361,11 +388,4 @@ pmclass PerlHash {
 	return ret;
     }
 
-    /* used by iterator.pmc:
-     * return hash key string for key
-     */
-    STRING* shift_string_keyed(PMC *key) {
-	HASH * h = (HASH *)PMC_data(SELF);
-	return hash_get_idx(INTERP, h, key);
-    }
 }

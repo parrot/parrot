@@ -358,7 +358,7 @@ pmclass Iterator {
     STRING* shift_string () {
 	PMC *key = SELF->cache.struct_val;
 	PMC *agg = PMC_data(SELF);
-	STRING * ret = VTABLE_shift_string_keyed(INTERP, agg, key);
+	STRING * ret = VTABLE_get_string_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, 1);
         return ret;
@@ -373,7 +373,12 @@ pmclass Iterator {
     }
 
     PMC* shift_pmc () {
-        return (PMC*)0;
+	PMC *key = SELF->cache.struct_val;
+	PMC *agg = PMC_data(SELF);
+	PMC *ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
+	SELF->cache.struct_val =
+	    VTABLE_nextkey_keyed(INTERP, agg, key, 1);
+        return ret;
     }
 
     PMC* shift_pmc_keyed (PMC* key) {

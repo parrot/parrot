@@ -349,7 +349,7 @@ hash_get_idx(Interp *interpreter, HASH *hash, PMC * key)
     BucketIndex bi = (BucketIndex)PMC_data(key);
     HASHBUCKET *b;
     /* locate initial */
-    if (bi == (BucketIndex)-2) { /* XXX */
+    if (bi == INITBucketIndex) {
         bi = lookupBucketIndex(hash, i);
         while (bi == NULLBucketIndex) {
             ++i;
