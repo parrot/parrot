@@ -82,7 +82,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "multiarray access 3d");
 	new P1, .PerlArray
-	# intial size
+	# initial size
 	set P1[0], 0
 	set P1[1], 200
 	# dimensions
