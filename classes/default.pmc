@@ -21,15 +21,6 @@ pmclass default noinit {
      return NULL;
    }
 
-   /* The end of used parameter is passed into the mark_used function of
-    * the garbage collector.
-    */
-   void mark (PMC *end_of_used_list) {
-   }
-
-   void collect () {
-   }
-
    void init (INTVAL size) {
    }
 
@@ -39,15 +30,17 @@ pmclass default noinit {
    void morph (INTVAL type) {
    }
 
-   BOOLVAL move_to (void * destination) {
-     return 0;
-   }
-
    INTVAL real_size () {
      return 0;
    }
 
    void destroy () {
+   }
+
+   /* The end of used parameter is passed into the mark_used function of
+    * the garbage collector.
+    */
+   PMC* mark (PMC *end_of_used_list) {
    }
 
    INTVAL get_integer () {
