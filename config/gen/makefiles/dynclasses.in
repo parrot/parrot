@@ -21,6 +21,7 @@ pyobject \
   pylist \
   pymodule \
   pynone \
+  pytype \
   pystring \
   pytuple
 

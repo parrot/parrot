@@ -841,6 +841,10 @@ Is the PMC a member of B<_class> or one of its subclasses.
 
 See also F<pdd15_objects.pod>.
 
+=item PMC* subclass(STRING* name)
+
+Creates a subclass, optionally with a given B<name>.
+
 =item void freeze(INTERP, PMC* self, visit_info* info)
 
 =item void thaw(INTERP, PMC* self, visit_info* info)

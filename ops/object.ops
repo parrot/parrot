@@ -228,12 +228,12 @@ $1 is replaced--a new PMC for the subclass is generated and put in it.
 =cut
 
 inline op subclass(out PMC, in PMC, in STR) :object_base {
-  $1 = Parrot_single_subclass(interpreter, $2, $3);
+  $1 = VTABLE_subclass(interpreter, $2, $3);
   goto NEXT();
 }
 
 inline op subclass(out PMC, in PMC) :object_classes {
-  $1 = Parrot_single_subclass(interpreter, $2, NULL);
+  $1 = VTABLE_subclass(interpreter, $2, NULL);
   goto NEXT();
 }
 
@@ -243,7 +243,7 @@ op subclass(out PMC, in STR, in STR) :object_classes {
     internal_exception(NO_CLASS, "Class '%s' doesn't exist\n",
 		string_to_cstring( interpreter, $3 ));
   }
-  $1 = Parrot_single_subclass(interpreter, class, $3);
+  $1 = VTABLE_subclass(interpreter, class, $3);
   goto NEXT();
 }
 
@@ -253,7 +253,7 @@ op subclass(out PMC, in STR) :object_classes {
     internal_exception(NO_CLASS, "Class '%s' doesn't exist\n",
 		string_to_cstring( interpreter, $2 ));
   }
-  $1 = Parrot_single_subclass(interpreter, class, NULL);
+  $1 = VTABLE_subclass(interpreter, class, NULL);
   goto NEXT();
 }
 

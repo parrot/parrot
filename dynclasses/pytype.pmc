@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/pyclass.pmc - Python Class
+classes/pytype.pmc - Python Class
 
 =head1 DESCRIPTION
 
@@ -21,10 +21,11 @@ These are the vtable functions for the Python Class base class
 #include "parrot/parrot.h"
 
 /* cache of classes referenced */
+static INTVAL dynclass_PyClass;
 static INTVAL dynclass_PyType;
 static STRING *CLASS;
 
-pmclass PyClass extends ParrotObject dynpmc group python_group {
+pmclass PyType extends ParrotClass dynpmc group python_group {
 
 /*
 
@@ -39,31 +40,10 @@ they will be used frequently here.
 
     void class_init() {
         if (pass) {
+            dynclass_PyClass = Parrot_PMC_typenum(INTERP, "PyClass");
             dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
             CLASS = string_from_cstring(INTERP, "__class__", 0);
         }
-    }
-
-/*
-
-=item C<PMC *find_method(STRING *method_name)>
-
-Looks up the method for C<*method_name> and returns it. If no method is
-found then lookup an attribute by this name, and return it.  If all else
-fails, return null.
-
-=cut
-
-*/
-
-    PMC* find_method(STRING* method_name) {
-        PMC * method = SUPER(method_name);
-        if (method && VTABLE_defined(INTERP, method)) return method;
-
-        method = VTABLE_getprop(INTERP, REG_PMC(0), method_name);
-        if (method && VTABLE_defined(INTERP, method)) return method;
-
-        return 0;
     }
 
 /*
@@ -79,8 +59,8 @@ Return attribute named C<name>.
     PMC* get_attr_str(STRING* idx) {
         STRING *message;
 
-        /* XXX: should test SUPER(idx) first, but for now we receive:
-           "Can't set non-core object attribs yet"
+        /* XXX: should test SUPER(idx) first, but for now we receive a
+           SIGSEGV Segmentation fault in hash_get_bucket
         PMC *attr = SUPER(idx);
         if (attr && VTABLE_defined(INTERP, attr)) return attr;
         */
@@ -97,43 +77,22 @@ Return attribute named C<name>.
 
 /*
 
-=item C<PMC *get_class()>
+=item C<void* invoke(void* next)>
 
-Return the class of this object.
-
-=cut
-
-*/
-
-    PMC* get_class() {
-        PMC *ret = VTABLE_getprop(INTERP, SELF, CLASS);
-        return ret;
-    }
-
-/*
-
-=item C<PMC *getprop(STRING *key)>
-
-Returns the property for C<*key>. If the property is not defined then for
-the instance, try the class.  If still no luck, return None.
+Pythonic object constructor.
 
 =cut
 
 */
 
-    PMC* getprop(STRING* key) {
-        PMC * prop = SUPER(key);
-        PMC * class;
+    void* invoke(void* next) {
+        REG_PMC(5) = pmc_new(interpreter, REG_PMC(0)->vtable->base_type);
 
-        if (prop && VTABLE_defined(INTERP, prop)) return prop;
+        REG_PMC(5)->vtable = Parrot_base_vtables[dynclass_PyClass];
 
-        class = SUPER(CLASS);
-        if (class) {
-            prop = VTABLE_getprop(INTERP, class, key);
-            if (prop && VTABLE_defined(INTERP, prop)) return prop;
-        }
+        VTABLE_setprop(INTERP, REG_PMC(5), CLASS, REG_PMC(0));
 
-        return prop;
+        return next;
     }
 
 /*
