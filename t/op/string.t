@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 96;
+use Parrot::Test tests => 97;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1498,6 +1498,35 @@ Hello, Hello, Pa!
 1e+06 == 1e+06
 0.5 == 0.5
 That's all, folks!
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "other form of sprintf op");
+    branch MAIN
+
+PRINTF:
+    sprintf P3, P2, P1
+    print P3
+    ret
+
+MAIN:
+    new P3, .PerlString
+
+    new P2, .PerlString
+    set P2, "15 is %b\n"
+    new P1, .PerlArray
+    set P1[0], 15
+    bsr PRINTF
+
+    new P2, .PerlString
+    set P2, "128 is %o\n"
+    new P1, .PerlArray
+    set P1[0], 128
+    bsr PRINTF
+
+    end
+CODE
+15 is 1111
+128 is 200
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
