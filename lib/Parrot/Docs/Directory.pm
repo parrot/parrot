@@ -48,7 +48,7 @@ sub file_class
 
 Use this to get a list of the files of a particular type.
 
-C<$recursive> and C<$ignore> function as specified above for C<files()>.
+C<$recursive> and C<$ignore> function as specified in C<files()>.
 
 =cut
 
