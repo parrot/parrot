@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
@@ -588,6 +588,38 @@ ready
 Stack Depth Wrong
 OUTPUT
 }
+
+output_is(<<'CODE', <<'OUTPUT', "intstack");
+	intsave -1
+	intsave 0
+	intsave 1
+	intsave 2
+	intsave 3
+	set I0, 4
+	intsave I0
+	
+	intrestore I1
+	print I1
+	
+	intrestore I1
+	print I1
+	
+	intrestore I1
+	print I1
+	
+	intrestore I1
+	print I1
+	
+	intrestore I1
+	print I1
+	
+	intrestore I1
+	print I1
+
+	print "\n"
+CODE
+43210-1
+OUTPUT
 
 ##############################
 

@@ -63,7 +63,7 @@ typedef struct rxinfo {
 
     opcode_t *substfunc;
 
-    rxStack stack;
+    IntStack stack;
 } rxinfo;
 
 

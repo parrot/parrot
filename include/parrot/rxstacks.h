@@ -17,26 +17,26 @@
 
 #define STACK_CHUNK_DEPTH 256
 
-typedef struct rxStack_entry_t {
+typedef struct IntStack_entry_t {
     INTVAL value;
-} *rxStack_Entry;
+} *IntStack_Entry;
 
-typedef struct rxStack_chunk_t {
+typedef struct IntStack_chunk_t {
     INTVAL used;
-    struct rxStack_chunk_t *next;
-    struct rxStack_chunk_t *prev;
-    struct rxStack_entry_t entry[STACK_CHUNK_DEPTH];
-} *rxStack_Chunk;
+    struct IntStack_chunk_t *next;
+    struct IntStack_chunk_t *prev;
+    struct IntStack_entry_t entry[STACK_CHUNK_DEPTH];
+} *IntStack_Chunk;
 
-typedef rxStack_Chunk rxStack;
+typedef IntStack_Chunk IntStack;
 
-rxStack rxstack_new(struct Parrot_Interp *);
+IntStack intstack_new(struct Parrot_Interp *);
 
-INTVAL rxstack_depth(struct Parrot_Interp *, rxStack);
+INTVAL intstack_depth(struct Parrot_Interp *, IntStack);
 
-void rxstack_push(struct Parrot_Interp *, rxStack, INTVAL);
+void intstack_push(struct Parrot_Interp *, IntStack, INTVAL);
 
-INTVAL rxstack_pop(struct Parrot_Interp *, rxStack);
+INTVAL intstack_pop(struct Parrot_Interp *, IntStack);
 
 #endif
 

@@ -41,7 +41,7 @@ rx_allocate_info(struct Parrot_Interp *interpreter, STRING *string)
     rx->groupstart = pmc_new(interpreter, enum_class_PerlArray);
     rx->groupend = pmc_new(interpreter, enum_class_PerlArray);
 
-    rx->stack = rxstack_new(interpreter);
+    rx->stack = intstack_new(interpreter);
 
     string_transcode(interpreter, rx->string, encoding_lookup("utf32"),
                      rx->string->type, &rx->string);

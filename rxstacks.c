@@ -16,10 +16,10 @@
 
 #define STACK_CHUNK_BASE(x) (void *)(MASK_STACK_CHUNK_LOW_BITS & (ptrcast_t)x)
 
-rxStack
-rxstack_new(struct Parrot_Interp *interpreter)
+IntStack
+intstack_new(struct Parrot_Interp *interpreter)
 {
-    rxStack stack = mem_allocate_aligned(sizeof(struct rxStack_chunk_t));
+    IntStack stack = mem_allocate_aligned(sizeof(struct IntStack_chunk_t));
     stack->used = 0;
     stack->next = stack;
     stack->prev = stack;
@@ -27,9 +27,9 @@ rxstack_new(struct Parrot_Interp *interpreter)
 }
 
 INTVAL
-rxstack_depth(struct Parrot_Interp *interpreter, rxStack stack)
+intstack_depth(struct Parrot_Interp *interpreter, IntStack stack)
 {
-    rxStack_Chunk chunk;
+    IntStack_Chunk chunk;
     INTVAL depth = stack->used;
 
     for (chunk = stack->next; chunk != stack; chunk = chunk->next)
@@ -39,17 +39,17 @@ rxstack_depth(struct Parrot_Interp *interpreter, rxStack stack)
 }
 
 void
-rxstack_push(struct Parrot_Interp *interpreter, rxStack stack, INTVAL data)
+intstack_push(struct Parrot_Interp *interpreter, IntStack stack, INTVAL data)
 {
-    rxStack_Chunk chunk = stack->prev;
-    rxStack_Entry entry = &chunk->entry[chunk->used];
+    IntStack_Chunk chunk = stack->prev;
+    IntStack_Entry entry = &chunk->entry[chunk->used];
 
     entry->value = data;
 
     /* Register the new entry */
     if (++chunk->used == STACK_CHUNK_DEPTH) {
         /* Need to add a new chunk */
-        rxStack_Chunk new_chunk = mem_allocate_aligned(sizeof(*new_chunk));
+        IntStack_Chunk new_chunk = mem_allocate_aligned(sizeof(*new_chunk));
         new_chunk->used = 0;
         new_chunk->next = stack;
         new_chunk->prev = chunk;
@@ -59,10 +59,10 @@ rxstack_push(struct Parrot_Interp *interpreter, rxStack stack, INTVAL data)
 }
 
 INTVAL
-rxstack_pop(struct Parrot_Interp *interpreter, rxStack stack)
+intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)
 {
-    rxStack_Chunk chunk = stack->prev;
-    rxStack_Entry entry;
+    IntStack_Chunk chunk = stack->prev;
+    IntStack_Entry entry;
 
     /* We may have an empty chunk at the end of the list */
     if (chunk->used == 0 && chunk != stack) {

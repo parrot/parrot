@@ -581,6 +581,9 @@ make_interpreter(Interp_flags flags)
     /* And a control stack */
     interpreter->control_stack = new_stack(interpreter);
 
+    /* A regex stack would be nice too. */
+    interpreter->intstack = intstack_new(interpreter);
+
     /* Load the core op func and info tables */
     interpreter->op_lib = PARROT_CORE_OPLIB_INIT();
     interpreter->op_count = interpreter->op_lib->op_count;

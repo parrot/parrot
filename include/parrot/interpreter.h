@@ -40,6 +40,8 @@ typedef enum {
 #include "parrot/op.h"
 #include "parrot/oplib.h"
 
+#include "parrot/rxstacks.h"
+
 typedef union UnionVal {
     INTVAL int_val;
     FLOATVAL num_val;
@@ -79,8 +81,11 @@ typedef struct Parrot_Interp {
     struct NRegChunk *num_reg_base;     /* Base of the float reg stack */
     struct SRegChunk *string_reg_base;  /* Base of the string stack */
     struct PRegChunk *pmc_reg_base;     /* Base of the PMC stack */
+
     struct stack_chunk *user_stack;     /* Base of the scratch stack */
     struct stack_chunk *control_stack;  /* Base of the flow control stack */
+    IntStack intstack;                  /* Base of the regex stack */
+
     struct Stash *perl_stash;           /* Pointer to the global variable
                                          * area */
     struct Scratchpad *cur_pad;         /* The current scratchpad */

@@ -225,8 +225,8 @@ op rx_clearinfo(inout pmc, in str) {
 	rx->minlength=0;
 	rx->whichway=enum_rxdirection_forwards;
 	
-	while(rxstack_depth(interpreter, rx->stack)) {
-		(void)rxstack_pop(interpreter, rx->stack);
+	while(intstack_depth(interpreter, rx->stack)) {
+		(void)intstack_pop(interpreter, rx->stack);
 	}
 	
 	rx->string=$2;
@@ -274,7 +274,7 @@ op rx_cloneinfo(inout pmc) {
 	rx2=mem_sys_allocate(sizeof(rxinfo));
 	*rx2=*rx;
 	
-	rx2->stack=rxstack_new(interpreter);
+	rx2->stack=intstack_new(interpreter);
 
 	$1=pmc_new(interpreter, enum_class_ParrotPointer);
 	$1->data=rx2;
@@ -403,7 +403,7 @@ Pushes the current index onto the stack contained in the info structure.
 op rx_pushindex(in pmc) {
 	RX_dUNPACK($1);
 
-	rxstack_push(interpreter, rx->stack, rx->index);
+	intstack_push(interpreter, rx->stack, rx->index);
 	
 	goto NEXT();
 }
@@ -420,7 +420,7 @@ to indicate where one operation's backtrack information ends and another's begin
 op rx_pushmark(in pmc) {
 	RX_dUNPACK($1);
 
- 	rxstack_push(interpreter, rx->stack, RX_MARK);
+ 	intstack_push(interpreter, rx->stack, RX_MARK);
 	
 	goto NEXT();
 }
@@ -438,7 +438,7 @@ op rx_popindex(in pmc, inconst int) {
 	RX_dUNPACK($1);
 	INTVAL i;
 	
-	i=rxstack_pop(interpreter, rx->stack);
+	i=intstack_pop(interpreter, rx->stack);
 
 	if(i==RX_MARK) {
 		goto OFFSET($2);
@@ -529,8 +529,8 @@ op rx_advance(in pmc, inconst int) {
 
 	rx->index=rx->startindex;
 	
-	while(rxstack_depth(interpreter, rx->stack)) {
-		(void)rxstack_pop(interpreter, rx->stack);
+	while(intstack_depth(interpreter, rx->stack)) {
+		(void)intstack_pop(interpreter, rx->stack);
 	}
 	
 	goto NEXT();

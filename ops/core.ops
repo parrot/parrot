@@ -2632,11 +2632,48 @@ inline op rotate_up(in INT) {
   goto NEXT();
 }
 
+########################################
+
+=item B<intsave>(in INT)
+
+Save register or constant $1 onto the high-speed int stack.
+
+=cut
+
+inline op intsave(in INT) {
+  intstack_push(interpreter, interpreter->intstack, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<intrestore>(out INT)
+
+Restore register $1 from the high-speed int stack.
+
+=cut
+
+inline op intrestore(out INT) {
+  $1=intstack_pop(interpreter, interpreter->intstack);
+  goto NEXT();
+}
+
+########################################
+
+=item B<intdepth>(out INT)
+
+Puts the depth of the high-speed int stack in $1.
+
+=cut
+
+inline op intdepth(out INT) {
+  $1=intstack_depth(interpreter, interpreter->intstack);
+  goto NEXT();
+}
 
 =back
 
 =cut
-
 
 ###############################################################################
 
