@@ -9,8 +9,10 @@ classes/resizablestringarray.pmc - resizable array for strings only
 =head1 DESCRIPTION
 
 ResizableStringArray implements a resizeable array which stores Parrot 
-strings only. If other PMCs are assigned to elements of it, their 
-values will automatically be stringified and assigned to String PMCs.
+strings only. Any ints or floats assigned to elements of the array will
+first be converted to String PMCs and then to native Parrot strings.
+PMCs assigned to to elements of the array will be stringified by having
+their C<get_string> method called.
 
 =head2 Functions
 
