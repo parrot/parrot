@@ -12,7 +12,14 @@
     o = new  typ
 loop:
     $P4 = o."i"()
+    .local pmc x
+    x = new PerlInt
+    assign x, $P4
+
     $P5 = o."j"()
+    .local pmc y
+    y = new PerlInt
+    assign y, $P5
     inc i
     if i <= 500000 goto loop
 

@@ -11,8 +11,12 @@
 loop:
     classoffset I0, P3, "Foo"
     getattribute P2, P3, I0
+    new P10, .PerlInt	# x = Foo.i
+    assign P10, P2
     inc I0
     getattribute P2, P3, I0
+    new P11, .PerlInt	# y = Foo.j
+    assign P11, P2
     inc I10
     lt I10, I11, loop
 
