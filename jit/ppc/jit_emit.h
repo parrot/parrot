@@ -171,7 +171,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 
 #  define _emit_bx(pc, type, disp) \
-    *(pc++) = (char)(18 << 2 | (disp >> 24) & 3); \
+    *(pc++) = (char)((18 << 2) | ((disp >> 24) & 3)); \
     *(pc++) = (char)(disp >> 16); \
     *(pc++) = (char)(disp >> 8); \
     *(pc++) = (char)(disp | type)
@@ -336,6 +336,12 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 #  define jit_emit_addis(pc, D, A, immediate) \
     jit_emit_2reg(pc, 15, D, A, immediate)
+
+#  define jit_emit_ori(pc, D, S, immediate) \
+    jit_emit_2reg(pc, 24, S, D, immediate)
+
+#  define jit_emit_oris(pc, D, S, immediate) \
+    jit_emit_2reg(pc, 25, S, D, immediate)
 
 #  define jit_emit_andil(pc, S, A, uimm) \
     jit_emit_2reg(pc, 28, S, A, uimm)
@@ -541,17 +547,19 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     jit_emit_stfd(pc, reg, (((char *)addr) - \
       ((char *)&interpreter->int_reg.registers[0])), r13)
 
+
 /*
  * Load a 32-bit immediate value.  If the lower 16 bits are bigger than
  * 0x8000 we clear the higher 16 bits.  If the immediate only uses the
  * lower 16 bits, the third instruction is not necessary.
  */
 #  define jit_emit_mov_ri_i(pc, D, imm) \
-    jit_emit_add_rri_i(pc, D, 0, (long)imm & 0xffff); \
-      if (((long)imm & 0xffff) > 0x8000) { \
-        jit_emit_andil(pc, D, D, 0xffff); } \
-      if ((long)imm >> 16 != 0) { \
-        jit_emit_addis(pc, D, D, (long)imm >> 16); }
+    jit_emit_oris(pc, D, r31, (long)imm >> 16); \
+      jit_emit_ori(pc, D, D, (long)imm & 0xffff);
+
+#  define curop_disp(pc, D, disp) \
+    jit_emit_addis(pc, D, r15, (long)disp >> 16); \
+    jit_emit_add_rri_i(pc, D, D, (long)disp & 0xffff)
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
@@ -561,6 +569,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 /*    jit_emit_stmw(jit_info->native_ptr, r30, -8, r1); */
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1);
     jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
+    jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
     jit_emit_mov_rr(jit_info->native_ptr, r13, r3);
     jit_emit_mov_ri_i(jit_info->native_ptr, r14, jit_info->arena.op_map);
     jit_emit_mov_ri_i(jit_info->native_ptr, r15, interpreter->code->byte_code);
@@ -571,7 +580,8 @@ void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
-    jit_emit_mov_ri_i(jit_info->native_ptr, r3, jit_info->cur_op);
+    curop_disp(jit_info->native_ptr, r3,
+        ((long)jit_info->cur_op - (long)interpreter->code->byte_code));
     jit_emit_mov_rr(jit_info->native_ptr, r4, r13);
 
     Parrot_jit_newfixup(jit_info);
@@ -680,20 +690,21 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
 #else
 
 #  define REQUIRES_CONSTANT_POOL 0
-#  define INT_REGISTERS_TO_MAP 25
+#  define INT_REGISTERS_TO_MAP 24
 #  define FLOAT_REGISTERS_TO_MAP 29
 
 /* Reserved:
  * r13 interpreter
  * r14 op_map
  * r15 code_start
+ * r31 zero
  */
 
 #ifndef JIT_IMCC
 char intval_map[INT_REGISTERS_TO_MAP] =
 
     { r16, r17, r18, r19, r20, r21, r22, r23,
-      r24, r25, r26, r27, r28, r29, r30, r31,
+      r24, r25, r26, r27, r28, r29, r30,
       r2, r3, r4, r5, r6, r7, r8, r9, r10 };
 
 char floatval_map[FLOAT_REGISTERS_TO_MAP] =
