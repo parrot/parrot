@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -958,6 +958,48 @@ ok 2
 ok 3
 ok 4
 ok 5
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Testing clone");
+    new P0, .PerlArray
+    set P0[0], 1
+    set P0[1], 2
+    	
+    clone P1, P0
+    set P1[0], 3
+    set P0[2], 4
+    set P1[3], 5
+    
+    set I0, P0[0]
+    eq I0, 1, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    
+    set I0, P1[0]
+    eq I0, 3, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    
+    set P2, P1[2]
+    unless P2, ok3
+    print "not "
+ok3:
+    print "ok 3\n"
+    
+    set P2, P0[3]
+    unless P2, ok4
+    print "not "
+ok4:
+    print "ok 4\n"
+    end
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT
 
 1;
