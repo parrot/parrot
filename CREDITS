@@ -87,6 +87,9 @@ D: PPC JIT patches
 N: Jeff Goff
 D: Release pumpking for 0.0.5-0.0.8
 
+N: Jens Rieks
+D: dumper and sort library
+
 N: Jerome Quelin
 D: befunge interpreter, ook compiler.
 E: jquelin@cpan.org
