@@ -1,4 +1,3 @@
-	       
 ChangeLog
 Configure.pl
 DEVELOPING
@@ -123,6 +122,7 @@ examples/assembly/Makefile
 examples/assembly/bsr.pasm
 examples/assembly/call.pasm
 examples/assembly/cat.pasm
+examples/assembly/coroutine.pasm
 examples/assembly/euclid.pasm
 examples/assembly/fact.pasm
 examples/assembly/hanoi.pasm
@@ -137,6 +137,7 @@ examples/assembly/pmcmops.pasm
 examples/assembly/queens.pasm
 examples/assembly/slurp.pasm
 examples/assembly/stack.pasm
+examples/assembly/sub.pasm
 examples/assembly/substr.pasm
 examples/assembly/trace.pasm
 examples/assembly/xml_parser.pasm
@@ -157,6 +158,8 @@ examples/mops/mops.ps
 examples/mops/mops.py
 examples/mops/mops.rb
 examples/mops/mops.scheme
+examples/pxs/PQt.C
+examples/pxs/QtHelloWorld.pasm
 exceptions.c
 global_setup.c
 hash.c
@@ -180,6 +183,7 @@ include/parrot/oplib.h
 include/parrot/packfile.h
 include/parrot/parrot.h
 include/parrot/pmc.h
+include/parrot/pxs.h
 include/parrot/regfuncs.h
 include/parrot/register.h
 include/parrot/resources.h
@@ -189,6 +193,7 @@ include/parrot/rxstacks.h
 include/parrot/stacks.h
 include/parrot/string.h
 include/parrot/string_funcs.h
+include/parrot/sub.h
 include/parrot/trace.h
 include/parrot/unicode.h
 include/parrot/warnings.h
@@ -229,11 +234,13 @@ languages/cola/System.cola
 languages/cola/cola.h
 languages/cola/cola.l
 languages/cola/cola.y
+languages/cola/colac
 languages/cola/examples/calc.cola
 languages/cola/examples/expressions.cola
 languages/cola/examples/fib.cola
 languages/cola/examples/life.cola
 languages/cola/examples/mandelbrot.cola
+languages/cola/examples/oop.cola
 languages/cola/examples/reverse.cola
 languages/cola/gen.c
 languages/cola/semant.c
@@ -364,6 +371,7 @@ pdb.c
 pdump.c
 pmc.c
 pmc_pm.pl
+pxs.c
 register.c
 resources.c
 runops_cores.c
@@ -372,6 +380,7 @@ rx.ops
 rxstacks.c
 stacks.c
 string.c
+sub.c
 t/harness
 t/op/basic.t
 t/op/bitwise.t
