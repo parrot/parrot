@@ -472,11 +472,11 @@ eval_ins(struct Parrot_Interp *interpreter, Instruction *ins, size_t ops)
                 if (i > 1) {    /* fill source regs */
                     switch (ins->r[i-1]->set) {
                         case 'I':
-                            interpreter->ctx.int_reg.registers[i-1] =
+                            interpreter->int_reg.registers[i-1] =
                                 (INTVAL)atoi(ins->r[i-1]->name);
                             break;
                         case 'N':
-                            interpreter->ctx.num_reg.registers[i-1] =
+                            interpreter->num_reg.registers[i-1] =
                                 (FLOATVAL)atof(ins->r[i-1]->name);
                             break;
                     }
@@ -569,10 +569,10 @@ subst_constants(struct Parrot_Interp *interp)
         /* result is in I0/N0 */
         switch (ins->r[0]->set) {
             case 'I':
-                sprintf(b, INTVAL_FMT, interp->ctx.int_reg.registers[0]);
+                sprintf(b, INTVAL_FMT, interp->int_reg.registers[0]);
                 break;
             case 'N':
-                sprintf(b, fmt, interp->ctx.num_reg.registers[0]);
+                sprintf(b, fmt, interp->num_reg.registers[0]);
                 break;
         }
         r = mk_const(str_dup(b), ins->r[0]->set);

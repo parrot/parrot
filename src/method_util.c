@@ -35,8 +35,8 @@ Parrot_new_csub(struct Parrot_Interp *interp, Parrot_csub_t func)
 void
 Parrot_push_argv(struct Parrot_Interp *interp, INTVAL argc, PMC *argv[])
 {
-    interp->ctx.int_reg.registers[0] = 0;       /* no prototype */
-    interp->ctx.int_reg.registers[1] = argc;
+    interp->int_reg.registers[0] = 0;       /* no prototype */
+    interp->int_reg.registers[1] = argc;
     while (argc--) {
         stack_push(interp, &(interp->ctx.user_stack), argv[argc],
                    STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
@@ -50,7 +50,7 @@ INTVAL
 Parrot_pop_argv(struct Parrot_Interp *interp, PMC ***argv)
 {
     INTVAL i;
-    INTVAL nret = interp->ctx.int_reg.registers[1];
+    INTVAL nret = interp->int_reg.registers[1];
     /* NOTE: not using GC'd memory -- free this yourself. */
     *argv = (PMC **)mem_sys_allocate(nret * sizeof(PMC *));
 
@@ -85,18 +85,18 @@ Parrot_push_proto(struct Parrot_Interp *interp,
                   INTVAL strc, STRING **strv, INTVAL pmcc, PMC **pmcv)
 {
     int npush;                  /* overflow params */
-    interp->ctx.int_reg.registers[0] = 1;       /* with proto */
+    interp->int_reg.registers[0] = 1;       /* with proto */
     npush = 0;
-    push_these(npush, interp, interp->ctx.int_reg.registers, intc, intv[i],
+    push_these(npush, interp, interp->int_reg.registers, intc, intv[i],
                &(intv[i]), STACK_ENTRY_INT);
-    push_these(npush, interp, interp->ctx.num_reg.registers, numc, numv[i],
+    push_these(npush, interp, interp->num_reg.registers, numc, numv[i],
                &(numv[i]), STACK_ENTRY_FLOAT);
-    push_these(npush, interp, interp->ctx.string_reg.registers, strc,
+    push_these(npush, interp, interp->string_reg.registers, strc,
                strv[i], strv[i], STACK_ENTRY_STRING);
-    push_these(npush, interp, interp->ctx.pmc_reg.registers, pmcc,
+    push_these(npush, interp, interp->pmc_reg.registers, pmcc,
                pmcv[i], pmcv[i], STACK_ENTRY_PMC);
 
-    interp->ctx.int_reg.registers[1] = npush;
+    interp->int_reg.registers[1] = npush;
 }
 
 /*

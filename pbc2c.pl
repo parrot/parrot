@@ -245,7 +245,7 @@ main(int argc, char **argv) {
     /* setup P0, stolen from embed.c */
     userargv = pmc_new(interpreter, enum_class_PerlArray);
     /* immediately anchor pmc to root set */
-    interpreter->ctx.pmc_reg.registers[0] = userargv;
+    interpreter->pmc_reg.registers[0] = userargv;
 
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */

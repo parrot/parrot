@@ -70,10 +70,6 @@ typedef struct ProfData {
 } ProfData;
 
 typedef struct Parrot_Context {
-    struct IReg int_reg;
-    struct NReg num_reg;
-    struct SReg string_reg;
-    struct PReg pmc_reg;
     struct IRegChunk *int_reg_top;    /* Current top chunk of int reg stack */
     struct NRegChunk *num_reg_top;    /* Current top chunk of the float reg
                                        * stack */
@@ -97,6 +93,10 @@ typedef struct Parrot_Context {
  * can save/restore context with a single memcpy
  */
 typedef struct Parrot_Interp {
+    struct IReg int_reg;
+    struct NReg num_reg;
+    struct SReg string_reg;
+    struct PReg pmc_reg;
     struct Parrot_Context ctx;          /* All the registers and stacks that
                                            matter when context switching */
 

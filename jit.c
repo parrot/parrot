@@ -770,9 +770,9 @@ reg_addr(struct Parrot_Interp * interpreter, int typ, int i)
 {
     switch (typ) {
         case 0:
-            return (char*)&interpreter->ctx.int_reg.registers[i];
+            return (char*)&interpreter->int_reg.registers[i];
         case 3:
-            return (char*)&interpreter->ctx.num_reg.registers[i];
+            return (char*)&interpreter->num_reg.registers[i];
         default:
             return 0;   /* not currently */
     }

@@ -173,10 +173,10 @@ print JITCPU<<END_C;
 #include"parrot/jit_emit.h"
 
 #undef CONST
-#define IREG(i) interpreter->ctx.int_reg.registers[jit_info->cur_op[i]]
-#define NREG(i) interpreter->ctx.num_reg.registers[jit_info->cur_op[i]]
-#define PREG(i) interpreter->ctx.pmc_reg.registers[jit_info->cur_op[i]]
-#define SREG(i) interpreter->ctx.string_reg.registers[jit_info->cur_op[i]]
+#define IREG(i) interpreter->int_reg.registers[jit_info->cur_op[i]]
+#define NREG(i) interpreter->num_reg.registers[jit_info->cur_op[i]]
+#define PREG(i) interpreter->pmc_reg.registers[jit_info->cur_op[i]]
+#define SREG(i) interpreter->string_reg.registers[jit_info->cur_op[i]]
 #define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
 #ifndef MAP
 # define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]

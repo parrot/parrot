@@ -87,16 +87,16 @@ print NCI <<'HEAD';
 #include "parrot/parrot.h"
 
 #if !defined(INT_REG)
-#  define INT_REG(x) interpreter->ctx.int_reg.registers[x]
+#  define INT_REG(x) interpreter->int_reg.registers[x]
 #endif
 #if !defined(NUM_REG)
-#  define NUM_REG(x) interpreter->ctx.num_reg.registers[x]
+#  define NUM_REG(x) interpreter->num_reg.registers[x]
 #endif
 #if !defined(STR_REG)
-#  define STR_REG(x) interpreter->ctx.string_reg.registers[x]
+#  define STR_REG(x) interpreter->string_reg.registers[x]
 #endif
 #if !defined(PMC_REG)
-#  define PMC_REG(x) interpreter->ctx.pmc_reg.registers[x]
+#  define PMC_REG(x) interpreter->pmc_reg.registers[x]
 #endif
 
 #if defined(HAS_JIT) && defined(I386)

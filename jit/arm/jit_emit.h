@@ -653,7 +653,7 @@ static void Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
 
     switch(op_type){
         case PARROT_ARG_I:
-            offset = ((char *)&interpreter->ctx.int_reg.registers[val])
+            offset = ((char *)&interpreter->int_reg.registers[val])
                 - (char *)interpreter;
             if (offset > 4095) {
                 internal_exception(JIT_ERROR,
@@ -696,7 +696,7 @@ static void Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
 
     switch(op_type){
         case PARROT_ARG_I:
-            offset = ((char *)&interpreter->ctx.int_reg.registers[val])
+            offset = ((char *)&interpreter->int_reg.registers[val])
                 - (char *)interpreter;
             if (offset > 4095) {
                 internal_exception(JIT_ERROR,

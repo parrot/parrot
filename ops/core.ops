@@ -3200,26 +3200,26 @@ from the most recently B<push>ed copies.
 =cut
 
 inline op popi() {
-  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
-  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
   goto NEXT();
 }
 
 inline op popn() {
-  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
-  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
   goto NEXT();
 }
 
 inline op pops() {
-  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
-  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
   goto NEXT();
 }
 
 inline op popp() {
-  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
-  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
   goto NEXT();
 }
 
@@ -3239,22 +3239,22 @@ from the most recently B<push>ed copies.
 =cut
 
 inline op popbottomi() {
-  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
   goto NEXT();
 }
 
 inline op popbottomn() {
-  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
   goto NEXT();
 }
 
 inline op popbottoms() {
-  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
   goto NEXT();
 }
 
 inline op popbottomp() {
-  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
   goto NEXT();
 }
 
@@ -3274,22 +3274,22 @@ from the most recently B<push>ed copies.
 =cut
 
 inline op poptopi() {
-  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
   goto NEXT();
 }
 
 inline op poptopn() {
-  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
   goto NEXT();
 }
 
 inline op poptops() {
-  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
   goto NEXT();
 }
 
 inline op poptopp() {
-  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
   goto NEXT();
 }
 
@@ -3309,26 +3309,26 @@ Save all the registers of the type indicated in the name of the operation.
 =cut
 
 inline op pushi() {
-  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
-  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
   goto NEXT();
 }
 
 inline op pushn() {
-  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
-  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
   goto NEXT();
 }
 
 inline op pushs() {
-  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
-  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
   goto NEXT();
 }
 
 inline op pushp() {
-  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
-  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
   goto NEXT();
 }
 
@@ -3350,22 +3350,22 @@ Save registers 16-31 on the appropriate register stack
 =cut
 
 inline op pushtopi() {
-  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
   goto NEXT();
 }
 
 inline op pushtopn() {
-  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
   goto NEXT();
 }
 
 inline op pushtops() {
-  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
   goto NEXT();
 }
 
 inline op pushtopp() {
-  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
   goto NEXT();
 }
 
@@ -3387,22 +3387,22 @@ Save all the registers of the type indicated in the name of the operation.
 =cut
 
 inline op pushbottomi() {
-  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
   goto NEXT();
 }
 
 inline op pushbottomn() {
-  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
   goto NEXT();
 }
 
 inline op pushbottoms() {
-  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
   goto NEXT();
 }
 
 inline op pushbottomp() {
-  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
   goto NEXT();
 }
 
@@ -3687,26 +3687,26 @@ Restore all the registers.
 =cut
 
 inline op saveall() {
-  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
-  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
-  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
-  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
-  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
-  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
-  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
-  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
   goto NEXT();
 }
 
 inline op restoreall() {
-  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
-  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
-  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
-  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
-  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
-  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
-  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
-  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
   goto NEXT();
 }
 
@@ -4795,7 +4795,7 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
 
 inline op invoke() {
   opcode_t *dest;
-  PMC * p = interpreter->ctx.pmc_reg.registers[0];
+  PMC * p = interpreter->pmc_reg.registers[0];
 
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
 

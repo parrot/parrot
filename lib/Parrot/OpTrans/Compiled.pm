@@ -17,10 +17,10 @@ sub defines
 {
   return <<END;
 #define REL_PC (cur_opcode - start_code)
-#define IREG(i) interpreter->ctx.int_reg.registers[i]
-#define NREG(i) interpreter->ctx.num_reg.registers[i]
-#define PREG(i) interpreter->ctx.pmc_reg.registers[i]
-#define SREG(i) interpreter->ctx.string_reg.registers[i]
+#define IREG(i) interpreter->int_reg.registers[i]
+#define NREG(i) interpreter->num_reg.registers[i]
+#define PREG(i) interpreter->pmc_reg.registers[i]
+#define SREG(i) interpreter->string_reg.registers[i]
 #define CONST(i) interpreter->code->const_table->constants[i]
 END
 }

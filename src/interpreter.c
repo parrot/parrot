@@ -114,21 +114,21 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 
         case PARROT_ARG_KI:
         case PARROT_ARG_I:
-            pc_prederef[i] = (void *)&interpreter->ctx.int_reg.registers[pc[i]];
+            pc_prederef[i] = (void *)&interpreter->int_reg.registers[pc[i]];
             break;
 
         case PARROT_ARG_N:
-            pc_prederef[i] = (void *)&interpreter->ctx.num_reg.registers[pc[i]];
+            pc_prederef[i] = (void *)&interpreter->num_reg.registers[pc[i]];
             break;
 
         case PARROT_ARG_K:
         case PARROT_ARG_P:
-            pc_prederef[i] = (void *)&interpreter->ctx.pmc_reg.registers[pc[i]];
+            pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[pc[i]];
             break;
 
         case PARROT_ARG_S:
             pc_prederef[i] =
-                (void *)&interpreter->ctx.string_reg.registers[pc[i]];
+                (void *)&interpreter->string_reg.registers[pc[i]];
             break;
 
         case PARROT_ARG_KIC:

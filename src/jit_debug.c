@@ -189,13 +189,13 @@ write_vars(FILE *stabs, struct Parrot_Interp *interpreter)
     /* fake static var stabs */
     for (i = 0; i < NUM_REGISTERS; i++) {
         fprintf(stabs, ".stabs \"I%d:S(0,12)\"," N_STSYM ",0,0,%p\n", i,
-                (char*)&interpreter->ctx.int_reg.registers[i]);
+                (char*)&interpreter->int_reg.registers[i]);
         fprintf(stabs, ".stabs \"N%d:S(0,13)\"," N_STSYM ",0,0,%p\n", i,
-                (char*)&interpreter->ctx.num_reg.registers[i]);
+                (char*)&interpreter->num_reg.registers[i]);
         fprintf(stabs, ".stabs \"S%d:S(0,16)\"," N_STSYM ",0,0,%p\n", i,
-                (char*)&interpreter->ctx.string_reg.registers[i]);
+                (char*)&interpreter->string_reg.registers[i]);
         fprintf(stabs, ".stabs \"P%d:S*(0,18)\"," N_STSYM ",0,0,%p\n", i,
-                (char*)&interpreter->ctx.pmc_reg.registers[i]);
+                (char*)&interpreter->pmc_reg.registers[i]);
     }
 }
 

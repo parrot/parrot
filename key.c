@@ -136,12 +136,12 @@ key_integer(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_integer_FLAG:
         return key->cache.int_val;
     case KEY_integer_FLAG | KEY_register_FLAG:
-        return interpreter->ctx.int_reg.registers[key->cache.int_val];
+        return interpreter->int_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
         return VTABLE_get_integer(interpreter,
                                                        key->cache.pmc_val);
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
+        reg = interpreter->pmc_reg.registers[key->cache.int_val];
         return VTABLE_get_integer(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not an integer!\n");
@@ -158,12 +158,12 @@ key_number(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_number_FLAG:
         return key->cache.num_val;
     case KEY_number_FLAG | KEY_register_FLAG:
-        return interpreter->ctx.num_reg.registers[key->cache.int_val];
+        return interpreter->num_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
         return VTABLE_get_number(interpreter,
                                                       key->cache.pmc_val);
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
+        reg = interpreter->pmc_reg.registers[key->cache.int_val];
         return VTABLE_get_number(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not a number!\n");
@@ -180,12 +180,12 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_string_FLAG:
         return key->cache.string_val;
     case KEY_string_FLAG | KEY_register_FLAG:
-        return interpreter->ctx.string_reg.registers[key->cache.int_val];
+        return interpreter->string_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
         return VTABLE_get_string(interpreter,
                                                       key->cache.pmc_val);
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
+        reg = interpreter->pmc_reg.registers[key->cache.int_val];
         return VTABLE_get_string(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not a string!\n");
@@ -200,7 +200,7 @@ key_pmc(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_pmc_FLAG:
         return key->cache.pmc_val;
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        return interpreter->ctx.pmc_reg.registers[key->cache.int_val];
+        return interpreter->pmc_reg.registers[key->cache.int_val];
     default:
         internal_exception(INVALID_OPERATION, "Key not a PMC!\n");
         return 0;

@@ -80,14 +80,14 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
             break;
         case KEY_integer_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "I%vd=%vd", key->cache.int_val,
-                    interpreter->ctx.int_reg.registers[key->cache.int_val]);
+                    interpreter->int_reg.registers[key->cache.int_val]);
             break;
         case KEY_number_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "I%vd=%vd", key->cache.int_val,
-                    interpreter->ctx.num_reg.registers[key->cache.int_val]);
+                    interpreter->num_reg.registers[key->cache.int_val]);
             break;
         case KEY_string_FLAG|KEY_register_FLAG:
-            s = interpreter->ctx.string_reg.registers[key->cache.int_val];
+            s = interpreter->string_reg.registers[key->cache.int_val];
             escaped = PDB_escape(s->bufstart, s->strlen);
             PIO_eprintf(interpreter, "S%vd=\"%s\"", key->cache.int_val,
                     escaped ? escaped : "(null");
@@ -96,7 +96,7 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
             break;
         case KEY_pmc_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "P%vd=", key->cache.int_val);
-            trace_pmc_dump(interpreter, interpreter->ctx.pmc_reg.registers[key->cache.int_val]);
+            trace_pmc_dump(interpreter, interpreter->pmc_reg.registers[key->cache.int_val]);
             break;
         default:
             PIO_eprintf(interpreter, "??");
@@ -161,11 +161,11 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_I:
                 PIO_eprintf(interpreter, "I%vd=%vd", *(pc + i),
-                        interpreter->ctx.int_reg.registers[*(pc + i)]);
+                        interpreter->int_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_N:
                 PIO_eprintf(interpreter, "N%vd=%vg", *(pc + i),
-                        interpreter->ctx.num_reg.registers[*(pc + i)]);
+                        interpreter->num_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_P:
                 /* what does a PMC register look like? */
@@ -173,16 +173,16 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                         PARROT_ARGDIR_IN) {
                     PIO_eprintf(interpreter, "P%vd=", *(pc + i));
                     trace_pmc_dump(interpreter,
-                            interpreter->ctx.pmc_reg.registers[*(pc + i)]);
+                            interpreter->pmc_reg.registers[*(pc + i)]);
                 }
                 else
                     PIO_eprintf(interpreter, "P%vd", *(pc + i));
                 break;
             case PARROT_ARG_S:
-                if (interpreter->ctx.string_reg.registers[*(pc + i)]) {
-                    escaped = PDB_escape(interpreter->ctx.string_reg.
+                if (interpreter->string_reg.registers[*(pc + i)]) {
+                    escaped = PDB_escape(interpreter->string_reg.
                                          registers[*(pc + i)]->strstart,
-                                         interpreter->ctx.string_reg.
+                                         interpreter->string_reg.
                                          registers[*(pc + i)]->bufused);
                     PIO_eprintf(interpreter, "S%vd=\"%s\"", *(pc + i),
                             escaped ? escaped : "(null)");
@@ -195,11 +195,11 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_K:
                 PIO_eprintf(interpreter, "P%vd=", *(pc + i));
-                trace_key_dump(interpreter, interpreter->ctx.pmc_reg.registers[*(pc + i)]);
+                trace_key_dump(interpreter, interpreter->pmc_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_KI:
                 PIO_eprintf(interpreter, "I%vd=[%vd]", *(pc + i),
-                        interpreter->ctx.int_reg.registers[*(pc + i)]);
+                        interpreter->int_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_OP:
                 /* this isn't handled, so at least report the error

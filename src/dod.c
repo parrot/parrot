@@ -143,9 +143,9 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
     for (i = 0; i < NUM_REGISTERS; i++) {
-        if (interpreter->ctx.pmc_reg.registers[i]) {
+        if (interpreter->pmc_reg.registers[i]) {
             pobject_lives(interpreter,
-                    (PObj *)interpreter->ctx.pmc_reg.registers[i]);
+                    (PObj *)interpreter->pmc_reg.registers[i]);
         }
     }
 
@@ -247,7 +247,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
      * are pointing to valid buffers. This is not a good assumption, but it'll
      * do for now */
     for (i = 0; i < NUM_REGISTERS; i++) {
-        Buffer *reg = (Buffer *)interpreter->ctx.string_reg.registers[i];
+        Buffer *reg = (Buffer *)interpreter->string_reg.registers[i];
 
         if (reg)
             pobject_lives(interpreter, reg);

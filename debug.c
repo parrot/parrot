@@ -737,7 +737,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 
     /* set the user arguments */
     userargv = pmc_new(interpreter, enum_class_PerlArray);
-    interpreter->ctx.pmc_reg.registers[0] = userargv;
+    interpreter->pmc_reg.registers[0] = userargv;
 
     while (command && *command) {
         i = 0;
@@ -890,11 +890,11 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
     STRING *m, *n;
 
     if (condition->type & PDB_cond_int) {
-        i = interpreter->ctx.int_reg.registers[condition->reg];
+        i = interpreter->int_reg.registers[condition->reg];
         if (condition->type & PDB_cond_const)
             j = *(INTVAL *)condition->value;
         else
-            j = interpreter->ctx.int_reg.registers[*(int *)condition->value];
+            j = interpreter->int_reg.registers[*(int *)condition->value];
         if (((condition->type & PDB_cond_gt) && (i > j)) ||
             ((condition->type & PDB_cond_ge) && (i >= j)) ||
             ((condition->type & PDB_cond_eq) && (i == j)) ||
@@ -905,11 +905,11 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
         return 0;
     }
     else if (condition->type & PDB_cond_num) {
-        k = interpreter->ctx.num_reg.registers[condition->reg];
+        k = interpreter->num_reg.registers[condition->reg];
         if (condition->type & PDB_cond_const)
             l = *(FLOATVAL *)condition->value;
         else
-            l = interpreter->ctx.num_reg.registers[*(int *)condition->value];
+            l = interpreter->num_reg.registers[*(int *)condition->value];
         if (((condition->type & PDB_cond_gt) && (k > l)) ||
             ((condition->type & PDB_cond_ge) && (k >= l)) ||
             ((condition->type & PDB_cond_eq) && (k == l)) ||
@@ -920,11 +920,11 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
         return 0;
     }
     else if (condition->type & PDB_cond_str) {
-        m = interpreter->ctx.string_reg.registers[condition->reg];
+        m = interpreter->string_reg.registers[condition->reg];
         if (condition->type & PDB_cond_const)
             n = (STRING *)condition->value;
         else
-            n = interpreter->ctx.string_reg.registers[*(int *)condition->value];
+            n = interpreter->string_reg.registers[*(int *)condition->value];
         if (((condition->type & PDB_cond_gt) &&
                 (string_compare(interpreter, m, n) > 0)) ||
             ((condition->type & PDB_cond_ge) &&
@@ -1972,10 +1972,10 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
     command = skip_ws(command);
     command = parse_command(command, &c);
     if (command == NULL) {
-        PDB_print_int(interpreter, &interpreter->ctx.int_reg, -1);
-        PDB_print_num(interpreter, &interpreter->ctx.num_reg, -1);
-        PDB_print_string(interpreter, &interpreter->ctx.string_reg, -1);
-        PDB_print_pmc(interpreter, &interpreter->ctx.pmc_reg, -1, NULL);
+        PDB_print_int(interpreter, &interpreter->int_reg, -1);
+        PDB_print_num(interpreter, &interpreter->num_reg, -1);
+        PDB_print_string(interpreter, &interpreter->string_reg, -1);
+        PDB_print_pmc(interpreter, &interpreter->pmc_reg, -1, NULL);
         return;
     }
 
@@ -1995,19 +1995,19 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
     switch (c) {
         case c_i:
         case c_int:
-            PDB_print_int(interpreter, &interpreter->ctx.int_reg, regnum);
+            PDB_print_int(interpreter, &interpreter->int_reg, regnum);
             break;
         case c_n:
         case c_num:
-            PDB_print_num(interpreter, &interpreter->ctx.num_reg, regnum);
+            PDB_print_num(interpreter, &interpreter->num_reg, regnum);
             break;
         case c_s:
         case c_str:
-            PDB_print_string(interpreter,&interpreter->ctx.string_reg, regnum);
+            PDB_print_string(interpreter,&interpreter->string_reg, regnum);
             break;
         case c_p:
         case c_pmc:
-            PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg, regnum, key);
+            PDB_print_pmc(interpreter,&interpreter->pmc_reg, regnum, key);
             break;
         default:
             PIO_eprintf(interpreter, "Unrecognized print option: must be 'int', 'num', 'str', 'pmc', or a register\n");

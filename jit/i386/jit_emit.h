@@ -1843,16 +1843,16 @@ Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
 }
 
 #  if !defined(INT_REG)
-#    define INT_REG(x) interpreter->ctx.int_reg.registers[x]
+#    define INT_REG(x) interpreter->int_reg.registers[x]
 #  endif
 #  if !defined(NUM_REG)
-#    define NUM_REG(x) interpreter->ctx.num_reg.registers[x]
+#    define NUM_REG(x) interpreter->num_reg.registers[x]
 #  endif
 #  if !defined(STR_REG)
-#    define STR_REG(x) interpreter->ctx.string_reg.registers[x]
+#    define STR_REG(x) interpreter->string_reg.registers[x]
 #  endif
 #  if !defined(PMC_REG)
-#    define PMC_REG(x) interpreter->ctx.pmc_reg.registers[x]
+#    define PMC_REG(x) interpreter->pmc_reg.registers[x]
 #  endif
 
 static void call_func(Parrot_jit_info_t *jit_info, void *addr)
@@ -2267,7 +2267,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     call_func(jit_info, (void (*)(void))pmc_new_noinit);
     /* result = eax = PMC */
     jit_emit_mov_mr_i(jit_info->native_ptr,
-            &interpreter->ctx.pmc_reg.registers[p1], emit_EAX);
+            &interpreter->pmc_reg.registers[p1], emit_EAX);
     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
     /* push interpreter */
     emitm_pushl_i(jit_info->native_ptr, interpreter);

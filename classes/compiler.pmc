@@ -28,26 +28,26 @@ pmclass Compiler extends NCI {
         struct PackFile_ByteCode *eval_cs;
 
 
-  	Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
-  	Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
-  	Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
-  	Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
-  	Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
-  	Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  	Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
+  	Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
+  	Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
+  	Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
+  	Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  	Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
 
-        interpreter->ctx.string_reg.registers[5] = (String*) code_ptr;
+        interpreter->string_reg.registers[5] = (String*) code_ptr;
         func(INTERP, SELF);
 	/* return value PMC is in P5 */
         stack_push(interpreter, &interpreter->ctx.user_stack,
-        interpreter->ctx.pmc_reg.registers[5],
+        interpreter->pmc_reg.registers[5],
 		STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 
-  	Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
-  	Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
-  	Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
-  	Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
-  	Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
-  	Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  	Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  	Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  	Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
+  	Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
+  	Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
+  	Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
 
 	(void)stack_pop(interpreter, &interpreter->ctx.user_stack, &code_seg,
                   STACK_ENTRY_PMC);
