@@ -1,5 +1,5 @@
 #
-# test5.pasm
+# bsr.pasm
 #
 # Copyright (C) 2001 Yet Another Society. All rights reserved.
 # This program is free software. It is subject to the same

@@ -1,5 +1,5 @@
 #
-# test2.pasm
+# substr.pasm
 #
 # Copyright (C) 2001 The Parrot Team. All rights reserved.
 # This program is free software. It is subject to the same
@@ -16,11 +16,13 @@
         length I5, S1
 WAX:    substr S2, S1, I3, I4
         print  S2
+        print  "\n"
         add    I4, I4, I2
         eq     I4, I5, WANE
 	branch WAX
 WANE:   length I1, S1
         print  S1
+        print  "\n"
         chopn  S1, 1
         eq     I1, I3, DONE
 	branch WANE

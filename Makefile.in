@@ -22,7 +22,7 @@ PDUMP = pdump${exe}
 .c$(O):
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-all : $(TEST_PROG) $(PDUMP) t/test1${exe}
+all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe}
 
 #XXX This target is not portable to Win32
 
@@ -39,22 +39,22 @@ $(PDUMP): pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnativ
 
 test_main$(O): $(H_FILES)
 
-t/test.pbc: t/test.pasm assemble.pl
-	cd t; make test.pbc
+examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
+	cd examples/assembly; make mops.pbc
 
 assemble.pl: Parrot/OpLib/core.pm
 
 Parrot/OpLib/core.pm: core.ops
 	$(PERL) ops2pm.pl core.ops
 
-t/test1.c: t/test.pbc
-	$(PERL) pbc2c.pl t/test.pbc > t/test1.c
+examples/assembly/mops.c: examples/assembly/mops.pbc
+	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
-t/test1$(O): t/test1.c
-	$(CC) -o t/test1$(O) -c -I./include t/test1.c
+examples/assembly/mops$(O): examples/assembly/mops.c
+	$(CC) -o examples/assembly/mops$(O) -c -I./include examples/assembly/mops.c
 
-t/test1${exe}: t/test1$(O) $(O_FILES)
-	$(CC) $(CFLAGS) -o t/test1${exe} t/test1$(O) $(O_FILES) $(C_LIBS)
+examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
+	$(CC) $(CFLAGS) -o examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
 global_setup$(O): $(H_FILES)
 

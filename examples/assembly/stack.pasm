@@ -1,11 +1,11 @@
 #
-# test4.pasm
+# stack.pasm
 #
 # Copyright (C) 2001 Yet Another Society. All rights reserved.
 # This program is free software. It is subject to the same
 # license as The Parrot Interpreter.
 #
-# $Id$
+# $Id$ 
 #
 
 	set_i_ic I1, 0
