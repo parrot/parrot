@@ -307,12 +307,19 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
      * It seems that the Class PMC gets DODed - these should
      * get created as constant PMCs
      */
-    for (i = enum_class_core_max; i < (unsigned int)enum_class_max; i++) {
+    for (i = 1; i < (unsigned int)enum_class_max; i++) {
+        VTABLE *vtable;
         /*
          * XXX dynclasses groups have empty slots for abstract objects
          */
-        if (Parrot_base_vtables[i] && Parrot_base_vtables[i]->class)
-            pobject_lives(interpreter, (PObj*)Parrot_base_vtables[i]->class);
+        if ( (vtable = Parrot_base_vtables[i])) {
+#if 0
+            if (vtable->class)
+                pobject_lives(interpreter, (PObj *)vtable->class);
+#endif
+            if (vtable->mro)
+                pobject_lives(interpreter, (PObj *)vtable->mro);
+        }
     }
 
     /* mark exception list */

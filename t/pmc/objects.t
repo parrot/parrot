@@ -1731,7 +1731,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "subclassing ParrotClass");
     cl = subclass parent, "Foo"
     print "ok 1\n"
     .local pmc o
-    o = cl()
+    o = new "Foo"
     print "ok 2\n"
     $S0 = classname o
     print $S0

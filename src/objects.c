@@ -25,8 +25,9 @@ Handles class and object manipulation.
 #include "objects.str"
 
 static void* instantiate_py_object(Interp*, PMC*, void*);
-extern void
-parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class);
+extern void parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class);
+static void parrot_class_register(Interp * , STRING *class_name,
+        PMC *new_class, PMC *parent, PMC *mro);
 
 static PMC *
 clone_array(Parrot_Interp interpreter, PMC *source_array)
@@ -69,10 +70,10 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
     class_slots = PMC_data(class);
     attr_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
     class_offset_hash = pmc_new(interpreter, enum_class_Hash);
-    parent_array = get_attrib_num(class_slots, PCD_ALL_PARENTS);
+    parent_array = class->vtable->mro;
     parent_class_count = VTABLE_elements(interpreter, parent_array);
 
-    for (class_offset = 0; class_offset < parent_class_count; class_offset++) {
+    for (class_offset = 1; class_offset < parent_class_count; class_offset++) {
         INTVAL parent_attr_count;
         SLOTTYPE *parent_slots;
         PMC *parent_attrib_array;
@@ -261,7 +262,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     PMC *child_class;
     SLOTTYPE *child_class_array;
     PMC *classname_pmc;
-    PMC *parents, *temp_pmc;
+    PMC *parents, *temp_pmc, *mro;
     int parent_is_class;
     int is_python = 0;
 
@@ -326,33 +327,19 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
 
     set_attrib_num(child_class, child_class_array, PCD_CLASS_NAME, classname_pmc);
 
-    /* Our penultimate parent list is a clone of our parent's parent
-       list, with our parent unshifted onto the beginning */
-    if (parent_is_class) {
-        PMC *all_parents;
-        all_parents = get_attrib_num((SLOTTYPE *)PMC_data(base_class),
-                PCD_ALL_PARENTS);
-        temp_pmc = clone_array(interpreter, all_parents);
-
-    }
-    else {
-        /*
-         * we have 1 parent, that gets unshifted below
-         */
-        temp_pmc = pmc_new(interpreter, enum_class_Array);
-        VTABLE_set_integer_native(interpreter, temp_pmc, 0);
-    }
-    VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
-    set_attrib_num(child_class, child_class_array, PCD_ALL_PARENTS, temp_pmc);
-
+    /* Our mro list is a clone of our parent's mro
+     * list, with our self unshifted onto the beginning
+     */
+    mro = VTABLE_clone(interpreter, base_class->vtable->mro);
+    VTABLE_unshift_pmc(interpreter, mro, child_class);
 
     /* But we have no attributes of our own. Yet */
     temp_pmc = pmc_new(interpreter, enum_class_Array);
     set_attrib_num(child_class, child_class_array, PCD_CLASS_ATTRIBUTES,
             temp_pmc);
 
-    Parrot_class_register(interpreter, child_class_name, child_class,
-            base_class);
+    parrot_class_register(interpreter, child_class_name, child_class,
+            base_class, mro);
 
     rebuild_attrib_stuff(interpreter, child_class);
 
@@ -386,29 +373,38 @@ void
 Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 {
     SLOTTYPE *class_array;
-    PMC *classname_pmc;
+    PMC *classname_pmc, *mro;
 
     /* Hang an array off the data pointer, empty of course */
     set_attrib_array_size(class, PCD_MAX);
     class_array = PMC_data(class);
     /* set_attrib_flags(class); init does it */
 
-    /* We will have five entries in this array */
     /* Our parent class array has nothing in it */
     set_attrib_num(class, class_array, PCD_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
-    set_attrib_num(class, class_array, PCD_ALL_PARENTS,
-                   pmc_new(interpreter, enum_class_Array));
+    /* TODO create all class structures in constant PMC pool
+     */
+
+    /*
+     * create MRO (method resolution order) array
+     * first entry is this class itself
+     */
+    mro = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    VTABLE_push_pmc(interpreter, mro, class);
+
+    /* no attributes yet
+     * TODO used a core array
+     */
     set_attrib_num(class, class_array, PCD_CLASS_ATTRIBUTES,
             pmc_new(interpreter, enum_class_Array));
 
-
-    /* Set the classname, if we have one */
+    /* Set the classname */
     classname_pmc = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, classname_pmc, class_name);
     set_attrib_num(class, class_array, PCD_CLASS_NAME, classname_pmc);
 
-    Parrot_class_register(interpreter, class_name, class, NULL);
+    parrot_class_register(interpreter, class_name, class, NULL, mro);
 
     rebuild_attrib_stuff(interpreter, class);
 }
@@ -434,10 +430,13 @@ Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
     if (b) {
         INTVAL type = PMC_int_val((PMC*)b->value);
         PMC *pmc = Parrot_base_vtables[type]->class;
+        assert(pmc);
+#if 0
         if (!pmc) {
             pmc = Parrot_base_vtables[type]->class =
                 pmc_new_noinit(interpreter, type);
         }
+#endif
         return pmc;
     }
     return PMCNULL;
@@ -445,9 +444,9 @@ Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
 
 /*
 
-=item C<INTVAL
-Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
-        PMC *new_class)>
+=item C<static void
+parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
+        PMC *new_class, PMC *mro)>
 
 This is the way to register a new Parrot class as an instantiatable
 type. Doing this involves putting it in the class hash, setting its
@@ -459,9 +458,9 @@ you can create a new C<foo> in PASM like this: C<new Px, foo>.
 
 */
 
-INTVAL
-Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
-        PMC *new_class, PMC *parent)
+static void
+parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
+        PMC *new_class, PMC *parent, PMC *mro)
 {
     INTVAL new_type;
     VTABLE *new_vtable, *parent_vtable;
@@ -489,10 +488,10 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     new_vtable = Parrot_clone_vtable(interpreter, parent_vtable);
 
     /* Set the vtable's type to the newly allocated type */
-    Parrot_vtable_set_type(interpreter, new_vtable, new_type);
-
+    new_vtable->base_type = new_type;
     /* And cache our class PMC in the vtable so we can find it later */
-    Parrot_vtable_set_data(interpreter, new_vtable, new_class);
+    new_vtable->class =  new_class;
+    new_vtable->mro = mro;
 
     /* Reset the init method to our instantiation method */
     new_vtable->init = Parrot_instantiate_object;
@@ -517,11 +516,10 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
 
     new_vtable = Parrot_clone_vtable(interpreter, parent_vtable);
     new_vtable->base_type = new_type;
+    new_vtable->mro = mro;
     set_attrib_num(new_class, (SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
             vtable_pmc = constant_pmc_new(interpreter, enum_class_VtableCache));
     PMC_struct_val(vtable_pmc) = new_vtable;
-
-    return new_type;
 }
 
 static PMC*
@@ -557,7 +555,7 @@ static void
 do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
 {
     SLOTTYPE *class_data = PMC_data(class);
-    PMC *classsearch_array = get_attrib_num(class_data, PCD_ALL_PARENTS);
+    PMC *classsearch_array = class->vtable->mro;
     PMC *parent_class;
     INTVAL nparents;
     STRING *meth_str;
@@ -565,9 +563,9 @@ do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
     PMC *arg = REG_PMC(5);
 
     nparents = VTABLE_elements(interpreter, classsearch_array);
-    if (nparents) {
+    if (nparents >= 1) {
         parent_class = VTABLE_get_pmc_keyed_int(interpreter,
-                classsearch_array, nparents - 1);
+                classsearch_array, 1);
         /* if it's a PMC, we put one PMC of that type into
          * the attribute slot #0.
          */
@@ -591,22 +589,20 @@ do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
 static void
 do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
 {
-    SLOTTYPE *class_data = PMC_data(class);
-    PMC *classsearch_array = get_attrib_num(class_data, PCD_ALL_PARENTS);
+    PMC *classsearch_array = class->vtable->mro;
     PMC *parent_class;
     INTVAL i, nparents;
     /*
      * 1) if class has a CONSTRUCT property run it on the object
      *    no redispatch
      *
-     *  TODO if the first meth is found, save registers, do all init
-     *       calls and after the last one restore registers.
-     *
+     * XXX isn't CONSTRUCT for creating new objects?
      */
     STRING *meth_str;
     PMC *meth = get_init_meth(interpreter, class,
             CONST_STRING(interpreter, "CONSTRUCT"), &meth_str);
     int default_meth;
+
     if (meth) {
         if (init)
             Parrot_run_meth_fromc_args(interpreter, meth,
@@ -618,6 +614,8 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
     /*
      * 2. if class has a BUILD property call it for all classes
      *    in reverse search order - this class last.
+     *
+     *    Note: mro contains this class as first element
      */
     nparents = VTABLE_elements(interpreter, classsearch_array);
     for (i = nparents - 1; i >= 0; --i) {
@@ -627,9 +625,22 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
          * the attribute slot #0 and call init() on that PMC
          */
         if (!PObj_is_class_TEST(parent_class)) {
-            PMC *attr = pmc_new_noinit(interpreter,
+            PMC *attr, *next_parent;
+            SLOTTYPE *obj_data;
+
+            /*
+             * but only if init isn't inherited
+             * or rather just on the last non-class parent
+             */
+            assert(i >= 1);
+            next_parent = VTABLE_get_pmc_keyed_int(interpreter,
+                    classsearch_array, i - 1);
+            if (!PObj_is_class_TEST(next_parent)) {
+                continue;
+            }
+            attr = pmc_new_noinit(interpreter,
                     parent_class->vtable->base_type);
-            SLOTTYPE *obj_data = PMC_data(object);
+            obj_data = PMC_data(object);
             set_attrib_num(object, obj_data, POD_FIRST_ATTRIB, attr);
             VTABLE_init(interpreter, attr);
             continue;
@@ -659,30 +670,6 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
             real_exception(interpreter, NULL, METH_NOT_FOUND,
                     "Class BUILD method ('%Ss') not found", meth_str);
         }
-    }
-    meth = get_init_meth(interpreter, class,
-            CONST_STRING(interpreter, "BUILD"), &meth_str);
-    /* no method found and no BUILD property set? */
-    if (!meth && meth_str == NULL) {
-        /* use __init as fallback constructor method, if it exists */
-        meth_str = CONST_STRING(interpreter, "__init");
-        meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
-        default_meth = 1;
-    }
-    else
-        default_meth = 0;
-    if (meth) {
-        if (init)
-            Parrot_run_meth_fromc_args(interpreter, meth,
-                    object, meth_str, "vP", init);
-        else
-            Parrot_run_meth_fromc(interpreter, meth,
-                    object, meth_str);
-    }
-    else if (meth_str != NULL && string_length(interpreter, meth_str) != 0
-            && !default_meth) {
-        real_exception(interpreter, NULL, METH_NOT_FOUND,
-                "Class BUILD method ('%Ss') not found", meth_str);
     }
 }
 
@@ -829,7 +816,6 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
     PMC *add_on_class_array;
     INTVAL current_count, add_on_count, current_offset, add_on_offset;
     INTVAL current_size;
-    INTVAL already_in = 0;
 
     if (!PObj_is_class_TEST(current_class_obj))
         internal_exception(1, "Class isn't a ParrotClass");
@@ -841,18 +827,18 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
 
     /* Start with the current list */
     current_parent_array = get_attrib_num(current_class,
-                                          PCD_PARENTS);
+            PCD_PARENTS);
     current_size = VTABLE_elements(interpreter, current_parent_array);
     /*
      * first check, if the add_on class isn't already in our immediate
      * parents list
      */
     for (current_offset = 0;
-         current_offset < current_size;
-         current_offset++) {
+            current_offset < current_size;
+            current_offset++) {
         if (add_on_class_obj == VTABLE_get_pmc_keyed_int(interpreter,
-                                                         current_parent_array,
-                                                         current_offset)) {
+                    current_parent_array,
+                    current_offset)) {
             /*
              * XXX emit warning? error?
              */
@@ -863,76 +849,47 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
     /* Tack on the new parent class to the end of the immediate parent
        list */
     VTABLE_set_integer_native(interpreter, current_parent_array,
-                              current_size + 1);
+            current_size + 1);
     VTABLE_set_pmc_keyed_int(interpreter, current_parent_array, current_size,
-                            add_on_class_obj);
+            add_on_class_obj);
 
     /*
      * now check all parents
      */
-    current_class_array = get_attrib_num(current_class, PCD_ALL_PARENTS);
+    current_class_array = current_class_obj->vtable->mro;
     /* Loop through them. We can assume that we can just tack on any
        new classes to the end of the current class array. Attributes
        are a bit more interesting, unfortunately */
     current_count = VTABLE_elements(interpreter, current_class_array);
 
-    /* Check to see if the parent class is already in the list. */
-    for (current_offset = 0;
-         current_offset < current_count;
-         current_offset++) {
-        if (add_on_class_obj == VTABLE_get_pmc_keyed_int(interpreter,
-                                                         current_class_array,
-                                                         current_offset)) {
-            already_in = 1;
-            break;
-        }
-    }
+    add_on_class = PMC_data(add_on_class_obj);
+    add_on_class_array = add_on_class_obj->vtable->mro;
+    add_on_count = VTABLE_elements(interpreter, add_on_class_array);
 
-    /* If the parent class isn't already in the list (which can happen
-       in a MI situation) go loop through all the classes in the
-       parent list and add them into the child if they're not already
-       in the child list */
-    if (!already_in) {
-        add_on_class = PMC_data(add_on_class_obj);
-        add_on_class_array = get_attrib_num(add_on_class,
-                                        PCD_ALL_PARENTS);
-        add_on_count = VTABLE_elements(interpreter, add_on_class_array);
-        /* First go put the new parent class on the search list */
-        current_size = VTABLE_elements(interpreter,
-                                       current_class_array);
-        VTABLE_set_integer_native(interpreter,
-                                  current_class_array,
-                                  current_size + 1);
-        VTABLE_set_pmc_keyed_int(interpreter, current_class_array,
-                                 current_size, add_on_class_obj);
-        /* And then go put all the parent class' parents on the list,
-           if they're not there already */
-        for (add_on_offset = 0; add_on_offset < add_on_count;
-             add_on_offset++) {
-            INTVAL found = 0;
-            PMC *potential = VTABLE_get_pmc_keyed_int(interpreter,
-                                                      add_on_class_array,
-                                                      add_on_offset);
-            for (current_offset = 0;
-                 current_offset < current_count;
-                 current_offset++) {
-                if (potential == VTABLE_get_pmc_keyed_int(interpreter,
-                                                          current_class_array,
-                                                          current_offset)) {
-                    found = 1;
-                    break;
-                }
+    /* put all the parents mro on the list
+     * if they're not there already
+     *
+     * XXX fix diamond problem - the oldes parent of a duplicate
+     *     has to remain
+     */
+    for (add_on_offset = 0; add_on_offset < add_on_count;
+            add_on_offset++) {
+        INTVAL found = 0;
+        PMC *potential = VTABLE_get_pmc_keyed_int(interpreter,
+                add_on_class_array,
+                add_on_offset);
+        for (current_offset = 0;
+                current_offset < current_count;
+                current_offset++) {
+            if (potential == VTABLE_get_pmc_keyed_int(interpreter,
+                        current_class_array,
+                        current_offset)) {
+                found = 1;
+                break;
             }
-            /* We found it. Yay us. Add the parent class to the list */
-            if (!found) {
-                current_size = VTABLE_elements(interpreter,
-                                               current_class_array);
-                VTABLE_set_integer_native(interpreter,
-                                          current_class_array,
-                                          current_size + 1);
-                VTABLE_set_pmc_keyed_int(interpreter, current_class_array,
-                                         current_size, potential);
-            }
+        }
+        if (!found) {
+            VTABLE_push_pmc(interpreter, current_class_array, potential);
         }
     }
     rebuild_attrib_stuff(interpreter, current_class_obj);
@@ -987,32 +944,19 @@ Return whether the object C<pmc> is an instance of class C<cl>.
 */
 
 INTVAL
-Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl) {
-    PMC * t;
-    SLOTTYPE *object_array = PMC_data(pmc);
-    PMC *classsearch_array; /* The array of classes we're searching */
+Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl)
+{
+    PMC *mro;
     INTVAL i, classcount;
 
-    /* if this is a class */
-    if (PObj_is_class_TEST(pmc)) {
-        t = pmc;
-        /* check if this is self */
-        if (pmc == cl)
-            return 1;
+    /* if this is not a class */
+    if (!PObj_is_class_TEST(pmc)) {
+        pmc = VTABLE_get_class(interpreter, pmc);
     }
-    else {
-        /* else get the object's class and the data array */
-        t = GET_CLASS(object_array, pmc);
-        object_array = PMC_data(t);
-    }
-    if (t == cl)
-        return 1;
-    /* If not, time to walk through the parent class array. Wheee */
-    classsearch_array =
-        get_attrib_num(object_array, PCD_ALL_PARENTS);
-    classcount = VTABLE_elements(interpreter, classsearch_array);
+    mro = pmc->vtable->mro;
+    classcount = VTABLE_elements(interpreter, mro);
     for (i = 0; i < classcount; ++i) {
-        if (VTABLE_get_pmc_keyed_int(interpreter, classsearch_array, i) == cl)
+        if (VTABLE_get_pmc_keyed_int(interpreter, mro, i) == cl)
             return 1;
     }
     return 0;
@@ -1260,113 +1204,34 @@ static PMC *
 find_method_direct_1(Parrot_Interp interpreter, PMC *class,
                               STRING *method_name)
 {
-    PMC* method = NULL;  /* The method we ultimately return */
-    PMC* curclass;          /* PMC for the current search class */
-    PMC* classsearch_array; /* The array of classes we're searching
-                               for the method in */
-    INTVAL searchoffset = 0; /* Where in that array we are */
-    INTVAL classcount = 0;   /* The number of classes we need to
-                                search */
+    PMC* method, *mro;
+    STRING *class_name;
+    INTVAL i, n;
 
-    /*
-     * if it's a non-ParrotClass PMC, then the namespace
-     * is the PMC's class name
-     * see also enter_nci_method()
-     */
-    if (!PObj_is_class_TEST(class)) {
-        STRING *class_name;
-        STRING *isa;
-        UINTVAL start;
-        INTVAL pos;
-
-        class_name = class->vtable->whoami;
-        method = Parrot_find_global(interpreter,
-                class_name,
-                method_name);
-        TRACE_FM(interpreter, class, method_name, method);
-        if (method) {
-            return method;
-        }
+    mro = class->vtable->mro;
+    n = VTABLE_elements(interpreter, mro);
+    for (i = 0; i < n; ++i) {
+        class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
         /*
-         * now look into that PMCs parents
-         * the parent classes are in vtable->isa_str as blank
-         * terminated class names - suboptimal but good enough for now
-         *
-         * TODO check vtable standard names
+         * TODO add a classname vtable
+         * see also the opcode
          */
-        start = class_name->strlen + 1;
-        isa = class->vtable->isa_str;
-        while (isa->strlen > start) {
-            pos = string_str_index(interpreter, isa,
-                    CONST_STRING(interpreter, " "), start);
-            if (pos == -1) pos=isa->strlen;
-            method = Parrot_find_global(interpreter,
-                    string_substr(interpreter, isa, start,
-                        pos - start, NULL, 0),
-                    method_name);
-            TRACE_FM(interpreter, class, method_name, method);
-            if (method) {
-                return method;
-            }
-            start = pos + 1;
-        }
-        /* finally look in namespace "object" */
-        method =  Parrot_find_global(interpreter,
-                CONST_STRING(interpreter, "object"),
-                method_name);
-        TRACE_FM(interpreter, class, method_name, method);
-        return method;
-    }
-
-    /* The order of operations:
-     *
-     * - Look for the method in the class we were passed
-     * - If that doesn't exist, grab the parent class array
-     * -  For each element in the parent class array, look for the
-     *    method
-     * - If none of that works, try again looking for the fallback method
-     */
-
-    /* See if we get lucky and its in the class of the PMC */
-    method = Parrot_find_global(interpreter,
-            VTABLE_get_string(interpreter,
+        if (PObj_is_class_TEST(class)) {
+            class_name = VTABLE_get_string(interpreter,
                 get_attrib_num((SLOTTYPE *)PMC_data(class),
-                    PCD_CLASS_NAME)),
-            method_name);
-
-    /* Bail immediately if we got something */
-    TRACE_FM(interpreter, class, method_name, method);
-    if (method) {
-        return method;
-    }
-
-    /* If not, time to walk through the parent class array. Wheee */
-    classsearch_array = get_attrib_num((SLOTTYPE *)PMC_data(class),
-            PCD_ALL_PARENTS);
-    classcount = VTABLE_elements(interpreter, classsearch_array);
-
-    for (searchoffset = 0; searchoffset < classcount; searchoffset++) {
-        curclass = VTABLE_get_pmc_keyed_int(interpreter,
-                classsearch_array, searchoffset);
-        if (!PObj_is_class_TEST(curclass)) {
-            class = curclass;
-            if (class->vtable->base_type == enum_class_delegate)
-                break;
-            return VTABLE_find_method(interpreter, curclass, method_name);
+                    PCD_CLASS_NAME));
         }
-        method = Parrot_find_global(interpreter,
-                VTABLE_get_string(interpreter,
-                    get_attrib_num((SLOTTYPE *)PMC_data(curclass),
-                        PCD_CLASS_NAME)),
-                method_name);
-        TRACE_FM(interpreter, curclass, method_name, method);
+        else {
+            class_name = class->vtable->whoami;
+        }
+        method = Parrot_find_global(interpreter, class_name, method_name);
+        TRACE_FM(interpreter, class, method_name, method);
         if (method) {
-            Parrot_note_method_offset(interpreter, searchoffset, method);
             return method;
         }
     }
-    TRACE_FM(interpreter, class, method_name, method);
-    return method;
+    TRACE_FM(interpreter, class, method_name, NULL);
+    return NULL;
 }
 
 static PMC *

@@ -408,6 +408,37 @@ pmc_type(Parrot_Interp interp, STRING *name)
 
 }
 
+static PMC*
+create_class_pmc(Interp *interpreter, INTVAL type)
+{
+    PMC *class;
+    /*
+     * class interface - a PMC is it's own class
+     * put an instance of this PMC into class
+     *
+     * create a constant PMC
+     */
+    class = get_new_pmc_header(interpreter, type, PObj_constant_FLAG);
+    if (PObj_is_PMC_EXT_TEST(class)) {
+        /* if the PMC has a PMC_EXT structure,
+         * return it to the pool/arena
+         * we don't need it - basically only the vtable is important
+         */
+        struct Small_Object_Pool *ext_pool =
+            interpreter->arena_base->pmc_ext_pool;
+        ext_pool->add_free_object(interpreter, ext_pool,
+                class->pmc_ext);
+    }
+    class->pmc_ext = NULL;
+    DOD_flag_CLEAR(is_special_PMC, class);
+    PMC_pmc_val(class)   = (void*)0xdeadbeef;
+    PMC_struct_val(class)= (void*)0xdeadbeef;
+
+    Parrot_base_vtables[type]->class = class;
+
+    return class;
+}
+
 /*
 
 =item C<void Parrot_mmd_register_parents(Interp*, INTVAL type,
@@ -425,13 +456,14 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
 {
     VTABLE *vtable;
     STRING *class_name;
-    INTVAL pos, len, parent_type;
+    INTVAL pos, len, parent_type, total;
     PMC *class, *mro;
 
     vtable = Parrot_base_vtables[type];
     mro = pmc_new(interpreter, enum_class_ResizablePMCArray);
     vtable->mro = mro;
     class_name = vtable->whoami;
+    total = (INTVAL)string_length(interpreter, vtable->isa_str);
     for (pos = 0; ;) {
         len = string_length(interpreter, class_name);
         pos += len + 1;
@@ -440,23 +472,15 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
             break;
         class = Parrot_base_vtables[parent_type]->class;
         if (!class) {
-            /*
-             * class interface - a PMC is it's own class
-             * put an instance of this PMC into class
-             */
-            class = get_new_pmc_header(interpreter, parent_type,
-                    PObj_constant_FLAG);
-            Parrot_base_vtables[parent_type]->class = class;
-            PMC_pmc_val(class)   = (void*)0xdeadbeef;
-            PMC_struct_val(class)= (void*)0xdeadbeef;
+            class = create_class_pmc(interpreter, parent_type);
         }
         VTABLE_push_pmc(interpreter, mro, class);
-        if (pos >= (INTVAL)string_length(interpreter, vtable->isa_str))
+        if (pos >= total)
             break;
         len = string_str_index(interpreter, vtable->isa_str,
                 CONST_STRING(interpreter, " "), pos);
         if (len == -1)
-            break;
+            len = total;
         class_name = string_substr(interpreter, vtable->isa_str, pos,
                 len - pos, NULL, 0);
     }

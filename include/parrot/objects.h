@@ -21,7 +21,6 @@
 typedef enum {
     PCD_PARENTS,        /* An array of immediate parents */
     PCD_CLASS_NAME,     /* A String PMC */
-    PCD_ALL_PARENTS,    /* array in search order */
     PCD_ATTRIB_OFFS,    /* class => offset hash */
     PCD_ATTRIBUTES,      /* class::attrib => offset hash */
     PCD_CLASS_ATTRIBUTES, /* Class attribute array */
@@ -39,7 +38,6 @@ typedef enum {
 PMC *Parrot_single_subclass(Parrot_Interp, PMC *, STRING *);
 void Parrot_new_class(Parrot_Interp, PMC *, STRING *);
 PMC *Parrot_class_lookup(Parrot_Interp, STRING *);
-INTVAL Parrot_class_register(Parrot_Interp, STRING *, PMC *, PMC *);
 PMC *Parrot_add_parent(Parrot_Interp, PMC *, PMC *);
 PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);
 PMC *Parrot_multi_subclass(Parrot_Interp, PMC *, STRING *);
