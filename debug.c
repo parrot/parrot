@@ -1510,7 +1510,7 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
 
     line = pdb->file->line;
 
-    for (i = 0; i < pdb->file->list_line; i++)
+    for (i = 0; i < pdb->file->list_line && line->next; i++)
         line = line->next;
 
     i = 1;
