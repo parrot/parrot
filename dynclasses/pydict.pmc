@@ -25,7 +25,6 @@ STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
 /* cache of classes referenced */
 static INTVAL dynclass_PyInt;
-static INTVAL dynclass_PyNone;
 
 pmclass PyDict extends PyObject need_ext does hash dynpmc group python_group {
 
@@ -43,7 +42,6 @@ Class initialization. Allocates the memory for the hash.
         /* class_init_code */
         if (pass) {
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
 
             make_bufferlike_pool(INTERP, sizeof(struct _hash));
             intret = constant_pmc_new(INTERP, dynclass_PyInt);
@@ -165,9 +163,10 @@ Returns the PMC value for the element at C<*key>.
         b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         keystr);
         if (b == NULL) {
-            /* XXX should store the undef for consistency */
-            PMC *new_undef = pmc_new(INTERP, dynclass_PyNone);
-            return new_undef;
+            STRING *message = Parrot_sprintf_c(INTERP, "KeyError: %s",
+                string_to_cstring(INTERP, keystr));
+            real_exception(INTERP, NULL, E_KeyError,
+                string_to_cstring(INTERP, message));
         }
         nextkey = key_next(INTERP, key);
         if (!nextkey)
@@ -187,9 +186,10 @@ Returns the PMC value for the element at C<*key>.
         HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
-            /* XXX should store the undef for consistency */
-            PMC *new_undef = pmc_new(INTERP, dynclass_PyNone);
-            return new_undef;
+            STRING *message = Parrot_sprintf_c(INTERP, "KeyError: %s",
+                string_to_cstring(INTERP, key));
+            real_exception(INTERP, NULL, E_KeyError,
+                string_to_cstring(INTERP, message));
         }
         return b->value;
     }
@@ -277,9 +277,10 @@ Returns the big number value for the element at C<*key>.
         }
         b = hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
-            /* XXX Warning: use of uninitialized value */
-            PMC *new_undef = pmc_new(INTERP, dynclass_PyNone);
-            return VTABLE_get_string(interpreter, new_undef);
+            STRING *message = Parrot_sprintf_c(INTERP, "KeyError: %s",
+                string_to_cstring(INTERP, keystr));
+            real_exception(INTERP, NULL, E_KeyError,
+                string_to_cstring(INTERP, message));
         }
         nextkey = key_next(INTERP, key);
         valpmc = b->value;
