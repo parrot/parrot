@@ -44,16 +44,13 @@ typedef INTVAL (*intval_mmd_f)(Interp *, PMC *, PMC *);
 typedef FLOATVAL (*floatval_mmd_f)(Interp *, PMC *, PMC *);
 
 static funcptr_t
-get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC *right,
-        INTVAL function, int *is_pmc)
+get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
+        UINTVAL right_type, INTVAL function, int *is_pmc)
 {
     funcptr_t func;
-    UINTVAL left_type, right_type;
     UINTVAL offset;
     MMD_table *table = interpreter->binop_mmd_funcs;
 
-    left_type = VTABLE_type(interpreter, left);
-    right_type = VTABLE_type(interpreter, right);
     if (left_type > table->x[function] || right_type > table->y[function]) {
         func = table->default_func[function];
     } else {
@@ -87,6 +84,18 @@ get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC *right,
         return func;
     }
 #endif
+}
+
+
+static funcptr_t
+get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC * right,
+        INTVAL function, int *is_pmc)
+{
+    UINTVAL left_type, right_type;
+    left_type = VTABLE_type(interpreter, left);
+    right_type = VTABLE_type(interpreter, right);
+    return get_mmd_dispatch_type(interpreter, left_type, right_type,
+            function, is_pmc);
 }
 
 /*
@@ -575,7 +584,12 @@ mmd_destroy(Parrot_Interp interpreter)
 
 PMC *
 mmd_vtfind(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right) {
-    return NULL;
+    int is_pmc;
+    funcptr_t func = get_mmd_dispatch_type(interpreter,
+            left, right, type, &is_pmc);
+    if (func && is_pmc)
+        return (PMC*)F2DPTR(func);
+    return PMCNULL;
 }
 
 /*

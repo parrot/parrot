@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 
 output_is(<<'CODE', <<'OUTPUT', "built in");
     new P0, .Integer
@@ -164,5 +164,78 @@ output_is(<<'CODE', <<'OUTPUT', "INTVAL return numeq");
     .pcc_end_return
 .end
 CODE
+-42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "mmdvtfind");
+##PIR##
+.sub _main
+
+.include "pmctypes.pasm"
+.include "vtable_constants.pasm"
+
+    .local pmc comp
+    comp = global "Float_cmp_Integer"
+    mmdvtregister .VTABLE_NUMCMP, .Float, .Integer, comp
+    $P0 = mmdvtfind .VTABLE_NUMCMP, .Float, .Integer
+    isnull $P0, nok
+    print "ok 1\n"
+    ne_addr $P0, comp, nok
+    print "ok 2\n"
+    end
+nok:
+    print "not ok\n"
+    end
+.end
+
+.sub Float_cmp_Integer
+    .param pmc left
+    .param pmc right
+    .pcc_begin_return
+    .return -42
+    .pcc_end_return
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "mmdvtfind - invoke it");
+##PIR##
+.sub _main
+
+.include "pmctypes.pasm"
+.include "vtable_constants.pasm"
+
+    .local pmc comp
+    comp = global "Float_cmp_Integer"
+    mmdvtregister .VTABLE_NUMCMP, .Float, .Integer, comp
+    $P0 = mmdvtfind .VTABLE_NUMCMP, .Float, .Integer
+    isnull $P0, nok
+    print "ok 1\n"
+    ne_addr $P0, comp, nok
+    print "ok 2\n"
+    $P1 = new Float
+    $P2 = new Integer
+    $P1 = 47.11
+    $P2 = 47
+    $I0 = $P0($P1, $P2)
+    print $I0
+    print "\n"
+    end
+nok:
+    print "not ok\n"
+    end
+.end
+.sub Float_cmp_Integer
+    .param pmc left
+    .param pmc right
+    .pcc_begin_return
+    .return -42
+    .pcc_end_return
+.end
+CODE
+ok 1
+ok 2
 -42
 OUTPUT
