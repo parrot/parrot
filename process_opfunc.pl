@@ -31,6 +31,7 @@
 
 use strict;
 use Parrot::Opcode;
+use Parrot::Config;
 
 my %opcodes = Parrot::Opcode::read_ops();
 
@@ -46,7 +47,7 @@ while (<GUTS>) {
 
 
 my %psize = (i => 1,
-	     n => 2,
+	     n => $PConfig{nvsize}/$PConfig{ivsize},
 	     I => 1,
 	     N => 1,
 	     D => 1,
