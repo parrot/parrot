@@ -636,6 +636,11 @@ Sets $1 to the modulus of $1 and $2.
 
 =cut
 
+op mod(inout INT, in INT) :base_core {
+  $1 = intval_mod($1, $2);
+  goto NEXT();
+}
+
 op mod(out INT, in INT, in INT) :base_core {
   $1 = intval_mod($2, $3);
   goto NEXT();
@@ -646,8 +651,8 @@ inline op mod (in PMC, in PMC, in PMC) :base_core {
   goto NEXT();
 }
 
-inline op mod (in PMC, in INT ) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_MOD_INT);
+inline op mod (in PMC, in PMC) :base_core {
+  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_MOD);
   goto NEXT();
 }
 
@@ -656,11 +661,20 @@ inline op mod(in PMC, in PMC, in INT) :base_core {
   goto NEXT();
 }
 
+inline op mod(in PMC, in INT) :base_core {
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_MOD_INT);
+  goto NEXT();
+}
+
 inline op mod(in PMC, in PMC, in NUM) :base_core {
   mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_MOD_FLOAT);
   goto NEXT();
 }
 
+inline op mod(in PMC, in NUM) :base_core {
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_MOD_FLOAT);
+  goto NEXT();
+}
 
 ########################################
 
@@ -685,6 +699,10 @@ op mod(out NUM, in NUM, in NUM) :base_core {
   goto NEXT();
 }
 
+op mod(inout NUM, in NUM) :base_core {
+  $1 = floatval_mod($1, $2);
+  goto NEXT();
+}
 
 ########################################
 

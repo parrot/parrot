@@ -896,8 +896,8 @@ op_assign:
                    { $$ = MK_I(interp, cur_unit, "mul", 2, $1, $3); }
    | target DIV_ASSIGN var
                    { $$ = MK_I(interp, cur_unit, "div", 2, $1, $3); }
-   | target MOD_ASSIGN var      /* TODO 2 args opcodes */
-                   { $$ = MK_I(interp, cur_unit, "mod", 3, $1, $1, $3); }
+   | target MOD_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "mod", 2, $1, $3); }
    | target FDIV_ASSIGN var
                    { $$ = MK_I(interp, cur_unit, "fdiv", 2, $1, $3); }
    | target CONCAT_ASSIGN var
