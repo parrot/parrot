@@ -121,7 +121,7 @@ handle_flags(struct Parrot_Interp *interpreter,
         }
     }
 
-    if (info->flags & FLAG_WIDTH) {
+    if ((info->flags & FLAG_WIDTH) && info->width > len) {
         STRING *fill;
 
         if (info->flags & FLAG_ZERO) {
@@ -131,8 +131,7 @@ handle_flags(struct Parrot_Interp *interpreter,
             fill = cstr2pstr(" ");
         }
 
-        if (info->width > len)
-            string_repeat(interpreter, fill, info->width - len, &fill);
+        string_repeat(interpreter, fill, info->width - len, &fill);
 
         if (info->flags & FLAG_MINUS) { /* left-align */
             string_append(interpreter, str, fill, 0);

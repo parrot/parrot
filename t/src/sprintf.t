@@ -95,6 +95,9 @@ TODO: {
                 S = Parrot_sprintf_c(interpreter, "== %05d\n", ival);
                 printf("%05d %s", (int) ival,
                        string_to_cstring(interpreter, S));
+                S = Parrot_sprintf_c(interpreter, "== %2d\n", ival);
+                printf("%2d %s", (int) ival,
+                       string_to_cstring(interpreter, S));
 
                 ival = -1;
                 S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
@@ -129,6 +132,7 @@ Hello, Hello, Pa!
    25 ==    25
 25    == 25   |
 00025 == 00025
+25 == 25
 0xffffffff == 0xffffffff
 -0000001 == -0000001
 That's all, folks!
