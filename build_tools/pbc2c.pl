@@ -134,6 +134,10 @@ END_C
 	    my $offset = $1;
 	    $is_branch = 1;
 	}
+       # -lt capturecc
+       if ($src =~ /{{\^\+(.*?)}}/g) {
+           $is_branch = 1;
+       }
 	# relative branch
 	while($src =~ /{{(\-|\+)=(.*?)}}/g){
 	    my $dir = $1;
@@ -225,8 +229,8 @@ main(int argc, char **argv) {
     interpreter = make_interpreter(NO_FLAGS);
     pf          = PackFile_new();
 
-    if( !PackFile_unpack(interpreter, pf, program_code,
-			    (opcode_t)sizeof(program_code)) ) {
+    if( !PackFile_unpack(interpreter, pf, (opcode_t *)program_code,
+			    sizeof(program_code)) ) {
 	printf( "Can't unpack.\n" );
 	return 1;
     }
