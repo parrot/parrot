@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 48;
+use Parrot::Test tests => 54;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -608,6 +608,114 @@ OK2:    print "ok 2\\n"
         set P0, "Virginia Tech"
         new P2, .PerlUndef
         sub P2, P0, P1
+        eq P2, 0, OK3
+        print "not "
+OK3:    print "ok 3\\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "mul str_int, str_int");
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlString
+	set P1, "2"
+	new P2, .PerlUndef
+	mul P2, P0, P1
+	print P2
+	print "\n"
+	end
+CODE
+46
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "mul str_int, str_num");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlString
+	set P0, "5"
+	new P1, .PerlString
+	set P1, "2.5"
+	new P2, .PerlUndef
+	mul P2, P0, P1
+        .fp_eq(P2, 12.5, EQ1)
+        print "not "
+EQ1:    print "ok 1\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "mul str_int, int");
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlInt
+	set P1, 2
+	new P2, .PerlUndef
+	mul P2, P0, P1
+	print P2
+	print "\n"
+	end
+CODE
+46
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "mul str_int, num");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlString
+	set P0, "19"
+	new P1, .PerlNum
+	set P1, 2.5
+	new P2, .PerlUndef
+	mul P2, P0, P1
+        .fp_eq(P2, 47.5, EQ1)
+        print "not "
+EQ1:    print "ok 1\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "mul str_num, int");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlString
+	set P0, "23.4"
+	new P1, .PerlInt
+	set P1, 2
+	new P2, .PerlUndef
+	mul P2, P0, P1
+        .fp_eq(P2, 46.8, EQ1)
+        print P2
+        print "not "
+EQ1:    print "ok 1\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+# XXX - should test for appropriate warnings
+output_is(<<"CODE", <<OUTPUT, "mul non-numeric string");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlString
+        set P0, "24"
+        new P1, .PerlString
+        set P1, "Oklahoma"
+        new P2, .PerlUndef
+        mul P2, P0, P1
+        eq P2, 0, OK1
+        print "not "
+OK1:    print "ok 1\\n"
+        set P0, "5.12"
+        new P2, .PerlUndef
+        mul P2, P0, P1
+        .fp_eq(P2, 0.0, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+        set P0, "Virginia Tech"
+        new P2, .PerlUndef
+        mul P2, P0, P1
         eq P2, 0, OK3
         print "not "
 OK3:    print "ok 3\\n"

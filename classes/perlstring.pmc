@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -8,7 +8,9 @@ classes/perlstring.pmc - Perl String
 
 =head1 DESCRIPTION
 
-C<PerlString> extends C<perlscalar> to provide Perl string behaviour.
+C<PerlString> extends C<String> to provide Perl-specific string behaviour.
+Note that the C<morph> and C<set_pmc> methods come from C<PerlScalar>,
+not from C<String>.
 
 =head2 Methods
 
@@ -85,7 +87,7 @@ Morphs the string to a C<PerlNum> and sets its value to C<value>.
 
 =item C<void set_pmc(PMC *value)>
 
-Sets the value of the number to the value in C<*value>.
+Sets the value of the PMC to the value in C<*value>.
 
 =cut
 
@@ -99,7 +101,7 @@ Sets the value of the number to the value in C<*value>.
 
 =item C<void morph(INTVAL type)>
 
-Morphs the scalar to the specified type.
+Morphs the C<PerlString> to the specified type.
 
 =cut
 
@@ -197,21 +199,32 @@ Multiplies the string by C<*value> and returns the result in C<*dest>.
 */
 
     void multiply (PMC* value, PMC* dest) {
-        if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
-            VTABLE_set_integer_native(INTERP, dest,
-                VTABLE_get_integer(INTERP, SELF) *
-                PMC_int_val(value)
-            );
+MMD_PerlString: {
+            /* work around MMD setup bug */
+	     VTABLE_set_number_native(INTERP, dest,
+		     VTABLE_get_number(INTERP, SELF) *
+		     VTABLE_get_number(INTERP, value));
         }
-        else if(value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
-            VTABLE_set_number_native(INTERP, dest,
-                VTABLE_get_number(INTERP, SELF) *
-                PMC_num_val(value)
-            );
-        }
-        else {
-            SUPER(value, dest);
-        }
+MMD_PerlNum: {
+	     VTABLE_set_number_native(INTERP, dest,
+		     VTABLE_get_number(INTERP, SELF) *
+		     PMC_num_val(value)
+		     );
+	 }
+MMD_DEFAULT: {
+	     FLOATVAL pmcf, valf;
+	     INTVAL  pmci, vali;
+
+	     pmcf = VTABLE_get_number(INTERP, SELF);
+	     pmci = VTABLE_get_integer(INTERP, SELF);
+	     valf = VTABLE_get_number(INTERP, value);
+	     vali = VTABLE_get_integer(INTERP, value);
+
+	     if (pmcf == pmci && valf == vali)
+		 VTABLE_set_integer_native(INTERP, dest, pmci * vali);
+	     else
+		 VTABLE_set_number_native(INTERP, dest, pmcf * valf);
+	 }
     }
 
 /*
