@@ -26,7 +26,7 @@ typedef struct {
     INTVAL      major_version;
     INTVAL      minor_version;
     INTVAL      patch_version;
-    INTVAL      op_count;
+    size_t      op_count;
     op_info_t * op_info_table;
     void *      op_func_table;
     int (*op_code)(const char * name, int full);

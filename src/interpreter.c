@@ -23,42 +23,6 @@
 #endif
 
 
-/*=for api interpreter check_fingerprint
- * TODO: Not really part of the API, but here's the docs.
- * Check the bytecode's opcode table fingerprint.
- */
-static void
-check_fingerprint(struct Parrot_Interp *interpreter)
-{
-    /* if (PNCONST == 0) { */
-    UNUSED(interpreter);
-    return;
-
-#if 0
-    if (interpreter->code->const_table->const_count == 0) {
-        fprintf(stderr,
-                "Warning: Bytecode does not include opcode table fingerprint!\n");
-    }
-    else {
-        const char *fp_data;
-        INTVAL fp_len;
-
-        fp_data = PCONST(0)->string->strstart;
-        fp_len = PCONST(0)->string->buflen;
-
-        if (strncmp(OPCODE_FINGERPRINT, fp_data, fp_len)) {
-            fprintf(stderr,
-                    "Error: Opcode table fingerprint in bytecode does not match interpreter!\n");
-            fprintf(stderr, "       Bytecode:    %*s\n", (int)-fp_len,
-                    fp_data);
-            fprintf(stderr, "       Interpreter: %s\n", OPCODE_FINGERPRINT);
-            exit(1);
-        }
-    }
-#endif
-
-}
-
 
 /*=for api interpreter runops_generic
  * TODO: Not really part of the API, but here's the docs.
@@ -71,8 +35,6 @@ runops_generic(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
     opcode_t *code_start;
     UINTVAL code_size;          /* in opcodes */
     opcode_t *code_end;
-
-    check_fingerprint(interpreter);
 
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
@@ -89,146 +51,76 @@ runops_generic(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
 
 /*=for api interpreter init_prederef
  *
- * Dynamically load the prederef oplib so its opfuncs can be used in
- * place of the standard ones.
+ * interpreter->op_lib = prederefed oplib
  *
- * TODO: These static variables need to be moved into the interpreter
- * structure, or something else smarter than this needs to be done
- * with them.
+ * the "normal" op_lib has a copy in the interpreter structure
  */
 
-static void *prederef_oplib_handle = NULL;
-static oplib_init_f prederef_oplib_init = (oplib_init_f)NULLfunc;
-static op_lib_t *prederef_oplib = NULL;
-static INTVAL prederef_op_count = 0;
-static op_info_t *prederef_op_info = NULL;
-static op_func_t *prederef_op_func = NULL;
 
 static void
 init_prederef(struct Parrot_Interp *interpreter)
 {
-#ifndef DYNAMIC_OPLIBS
     extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
-#endif
-    char file_name[50];
-    char func_name[50];
 
-    UNUSED(interpreter);
-
-#ifdef DYNAMIC_OPLIBS
-    fprintf(stderr, "FIXME: Dynamic oplibs currently broken.\n");
-    exit(0);
-#  if 0
-    /* FIXME: This is platform specific code and needs to go elsewhere */
-
-    sprintf(file_name, "lib%s_prederef.so.%s", PARROT_CORE_OPLIB_NAME,
-            PARROT_VERSION);
-
-    sprintf(func_name, "Parrot_DynOp_%s_prederef_%d_%d_%d",
-            PARROT_CORE_OPLIB_NAME, PARROT_MAJOR_VERSION,
-            PARROT_MINOR_VERSION, PARROT_PATCH_VERSION);
-
-    /*
-     * Get a handle to the library file:
-     */
-
-    prederef_oplib_handle = Parrot_dlopen(file_name);
-
-    if (!prederef_oplib_handle) {
+    interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT();
+    if (interpreter->op_lib->op_count != interpreter->op_count)
         internal_exception(PREDEREF_LOAD_ERROR,
-                           "Unable to dynamically load oplib file '%s' for oplib '%s_prederef' version %s!\n",
-                           file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-    }
-
-    /*
-     * Look up the init function:
-     */
-
-    prederef_oplib_init =
-        (oplib_init_f)(ptrcast_t)Parrot_dlsym(prederef_oplib_handle,
-#  endif
-                                              func_name);
-#else
-    prederef_oplib_init = PARROT_CORE_PREDEREF_OPLIB_INIT;
-#endif
-
-    if (!prederef_oplib_init) {
-        internal_exception(PREDEREF_LOAD_ERROR,
-                           "No exported symbol for oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
-                           func_name, file_name, PARROT_CORE_OPLIB_NAME,
-                           PARROT_VERSION);
-    }
-
-    /*
-     * Run the init function to get the oplib info:
-     */
-
-    prederef_oplib = prederef_oplib_init();
-
-    if (!prederef_oplib) {
-        internal_exception(PREDEREF_LOAD_ERROR,
-                           "No oplib info returned by oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
-                           func_name, file_name, PARROT_CORE_OPLIB_NAME,
-                           PARROT_VERSION);
-    }
-
-    /*
-     * Validate the op count:
-     */
-
-    prederef_op_count = prederef_oplib->op_count;
-
-    if (prederef_op_count <= 0) {
-        internal_exception(PREDEREF_LOAD_ERROR,
-                           "Illegal op count (%d) from oplib file '%s' for oplib '%s_prederef' version %s!\n",
-                           (int)prederef_op_count, file_name,
-                           PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-    }
-
-    /*
-     * Validate the op info table:
-     */
-
-    prederef_op_info = prederef_oplib->op_info_table;
-
-    if (!prederef_op_info) {
-        internal_exception(PREDEREF_LOAD_ERROR,
-                           "No op info table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
-                           file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-    }
-
-    /*
-     * Validate the op func table:
-     */
-
-    prederef_op_func = prederef_oplib->op_func_table;
-
-    if (!prederef_op_func) {
-        internal_exception(PREDEREF_LOAD_ERROR,
-                           "No op func table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
-                           file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-    }
+                           "Illegal op count (%d) in prederef oplib\n",
+                           (int)interpreter->op_lib->op_count);
 }
 
+/*=for api interpreter load_oplib
+ *
+ * dynamically load an op_lib extension
+ * returns dll handle on success, else 0
+ *
+ * TODO how do we run these ops
+     */
+#if 0
+void *
+load_oplib(struct Parrot_Interp * interpreter,
+        const char *file, const char *init_func_name)
+{
+    void *handle = Parrot_dlopen(file);
+    oplib_init_f init_func;
+    op_lib_t *oplib;
+
+    if (!handle)
+        internal_exception(1, "Could't load oplib file '%s': %s\n",
+                file, Parrot_dlerror());
+    init_func =
+        (oplib_init_f)(ptrcast_t)Parrot_dlsym(handle, init_func_name);
+    if (!init_func)
+        internal_exception(1, "Invalid oplib, '%s' not exported\n",
+                init_func_name);
+    oplib = init_func();
+    /* XXX now what
+     * if oplib is a prederefed oplib, and matches the current
+     * oplib, we would run it */
+    return handle;
+}
+#endif
+
+/*=for api interpreter unload_oplib
+ *
+ * unload op_lib extension
+     */
+#if 0
+void
+unload_oplib(void *handle)
+{
+    Parrot_dlclose(handle);
+}
+#endif
 /*=for api interpreter stop_prederef
  *
  * Unload the prederef oplib.
  */
 
 static void
-stop_prederef(void)
+stop_prederef(struct Parrot_Interp *interpreter)
 {
-    prederef_op_func = NULL;
-    prederef_op_info = NULL;
-    prederef_op_count = 0;
-
-#ifdef DYNAMIC_OPLIBS
-    Parrot_dlclose(prederef_oplib_handle);
-#endif
-
-    prederef_oplib = NULL;
-    prederef_oplib_init = (oplib_init_f)NULLfunc;
-    prederef_oplib_handle = NULL;
+    interpreter->op_lib = PARROT_CORE_OPLIB_INIT();
 }
 
 /*=for api interpreter prederef
@@ -254,7 +146,8 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 {
     size_t offset = pc_prederef - interpreter->prederef_code;
     opcode_t *pc = ((opcode_t *)interpreter->code->byte_code) + offset;
-    op_info_t *opinfo = &prederef_op_info[*pc];
+    op_info_t *opinfo = &interpreter->op_lib->op_info_table[*pc];
+    op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
     int i;
 
     for (i = 0; i < opinfo->arg_count; i++) {
@@ -334,14 +227,18 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_end;
     jit_f jit_code;
 
-    check_fingerprint(interpreter);
-
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
     code_end = interpreter->code->byte_code + code_size;
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
     (jit_code) (interpreter);
+    /* if we fall out of runloop with restart, there is
+     * currently no way, to continue in JIT, so stop it
+     *
+     * This is borken too, but better as endless loops
+     */
+    Interp_flags_CLEAR(interpreter, PARROT_JIT_FLAG);
 #endif
 }
 
@@ -373,8 +270,6 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc,
     opcode_t *code_end;
     void **code_start_prederef;
 
-    check_fingerprint(interpreter);
-
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
     code_end = interpreter->code->byte_code + code_size;
@@ -389,7 +284,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc,
                                                            interpreter);
     }
 
-    stop_prederef();
+    stop_prederef(interpreter);
 
     if (pc_prederef == 0) {
         pc = 0;
@@ -451,7 +346,7 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
             }
         }
 
-        if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
+        if (!which && Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
             offset = pc - (opcode_t *)interpreter->code->byte_code;
 
             if (!interpreter->prederef_code) {
