@@ -1,7 +1,11 @@
 PERL = ${perl}
 RM_F = ${rm_f}
 
-all: packfile-c.pod packfile-perl.pod core_ops.pod io_ops.pod
+OPS  = bit.pod cmp.pod core.pod debug.pod dotgnu.pod io.pod math.pod \
+       object.pod obscure.pod pmc.pod rx.pod set.pod stack.pod string.pod \
+       sys.pod var.pod
+
+all: packfile-c.pod packfile-perl.pod $(OPS)
 
 packfile-c.pod: ../packfile.c
 	perldoc -u ../packfile.c > packfile-c.pod
@@ -9,13 +13,8 @@ packfile-c.pod: ../packfile.c
 packfile-perl.pod: ../lib/Parrot/PackFile.pm
 	perldoc -u ../lib/Parrot/PackFile.pm > packfile-perl.pod
 
-core_ops.pod: ../core.ops
-	perldoc -u ../core.ops > core_ops.pod
-
-
-io_ops.pod: ../io.ops
-	perldoc -u ../io.ops > io_ops.pod
- 
+%.pod: ../%.ops
+	perldoc -u $< > ops/$@
 
 clean:
 	$(RM_F) packfile-c.pod packfile-perl.pod
