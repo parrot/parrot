@@ -221,6 +221,15 @@ Calls C<Parrot_lib_%s_load()> which performs the registration of the lib
 once C<Parrot_lib_%s_init()> gets called (if exists) to perform thread
 specific setup. In both functions C<%s> is the name of the library.
 
+If Parrot_lib_%s_load() succeeds, it should either return a
+ParrotLibrary PMC, which is then used as the handle for this library
+or NULL, in which case parrot creates a handle for the library.
+
+If either Parrot_lib_%s_load() or Parrot_lib_%s_init() detects an error
+condition, an exception should be thrown.
+
+TODO: fetch Parrot_lib load/init handler exceptions
+
 =cut
 
 */
@@ -230,9 +239,12 @@ Parrot_init_lib(Interp *interpreter,
                 PMC *(*load_func)(Interp *),
                 void (*init_func)(Interp *, PMC *))
 {
-    PMC *lib_pmc;
+    PMC *lib_pmc = NULL;
 
-    if (!load_func) {
+    if (load_func)
+        lib_pmc = (*load_func)(interpreter);
+
+    if (!load_func || !lib_pmc) {
         /* seems to be a native/NCI lib */
         /*
          * this PMC should better be constant, but then all the contents
@@ -240,9 +252,6 @@ Parrot_init_lib(Interp *interpreter,
          * s. also build_tools/ops2c.pl and lib/Parrot/Pmc2c.pm
          */
         lib_pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
-    }
-    else {
-        lib_pmc = (*load_func)(interpreter);
     }
     /*
      *  call init, if it exists
