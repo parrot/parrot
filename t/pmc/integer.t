@@ -16,7 +16,7 @@ Tests the Integer PMC.
 
 =cut
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 9;
 
 output_is(<< 'CODE', << 'OUTPUT', "basic math");
 ##PIR##
@@ -142,7 +142,7 @@ output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 ##PIR##
 .sub _main
     .local pmc pmc1
-    pmc1 = new Float
+    pmc1 = new Integer
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -155,4 +155,126 @@ output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 CODE
 1
 0
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: ne");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Integer
+    .local int int1
+    pmc1 = 10
+    int1 = 20
+    ne pmc1, int1, OK1
+    print "not "
+OK1:
+    print "ok 1\n"
+    int1 = 10
+    ne pmc1, int1, BAD2
+    branch OK2
+BAD2:
+    print "not "
+OK2:
+    print "ok 2\n"
+    end
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: gt");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Integer
+    .local int int1
+    pmc1 = 10
+    int1 = 5
+    gt pmc1, int1, OK1
+    print "not "
+OK1:
+    print "ok 1\n"
+    int1 = 10
+    gt pmc1, int1, BAD2
+    branch OK2
+BAD2:
+    print "not "
+OK2:
+    print "ok 2\n"
+    int1 = 20
+    gt pmc1, int1, BAD3
+    branch OK3
+BAD3:
+    print "not "
+OK3:
+    print "ok 3\n"
+    end
+.end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: ge");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Integer
+    .local int int1
+    pmc1 = 10
+    int1 = 5
+    ge pmc1, int1, OK1
+    print "not "
+OK1:
+    print "ok 1\n"
+    int1 = 10
+    ge pmc1, int1, OK2
+    print "not "
+OK2:
+    print "ok 2\n"
+    int1 = 20
+    ge pmc1, int1, BAD3
+    branch OK3
+BAD3:
+    print "not "
+OK3:
+    print "ok 3\n"
+    end
+.end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Logical ops: istrue & isfalse");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Integer
+    .local int int1
+    pmc1 = 10
+    istrue int1, pmc1
+    print int1
+    print "\n"
+    isfalse int1, pmc1
+    print int1
+    print "\n"
+    pmc1 = 0
+    istrue int1, pmc1
+    print int1
+    print "\n"
+    isfalse int1, pmc1
+    print int1
+    print "\n"
+
+    end
+.end
+CODE
+1
+0
+0
+1
 OUTPUT
