@@ -373,9 +373,12 @@ pmc_register(Parrot_Interp interp, STRING *name)
         */
         INTVAL new_max = class_table_size + 10;
         INTVAL new_size = new_max * sizeof(VTABLE *);
+        INTVAL i;
         new_vtable_table = mem_sys_realloc(Parrot_base_vtables, new_size);
-        /* XXX Should set all the empty slots to the null PMC's
+        /* Should set all the empty slots to the null PMC's
            vtable pointer */
+        for (i = class_table_size; i < new_max; ++i)
+            new_vtable_table[i] = NULL;
         Parrot_base_vtables = new_vtable_table;
         class_table_size = new_max;
     }
