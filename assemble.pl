@@ -704,6 +704,11 @@ sub to_bytecode {
         # Skip flying comments.
       }
       elsif($temp=~s/^($reg_re)//) {
+        my $reg_idx = substr($1,1);
+        unless($reg_idx >= 0 and $reg_idx <= 31) {
+          print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
+          last;
+        }
         $suffixes .= "_".lc(substr($1,0,1));
         push @{$_->[0]}, [lc(substr($1,0,1)),$1];
       }
@@ -718,10 +723,20 @@ sub to_bytecode {
       # XXX of the string, so we can nip off another argument.
       #
       elsif($temp=~s/^\[k;($reg_re)/\[k/) {
+        my $reg_idx = substr(1,$1);
+        unless($reg_idx >= 0 and $reg_idx <= 31) {
+          print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
+          last;
+        }
         $suffixes .= "_k";
         push @{$_->[0]}, ['k',$1];
       }
       elsif($temp=~s/^\[(S\d+)\]//) { # The only key register should be Sn
+        my $reg_idx = substr(1,$1);
+        unless($reg_idx >= 0 and $reg_idx <= 31) {
+          print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
+          last;
+        }
         $suffixes .= "_s";
         push @{$_->[0]}, ['s',$1];
       }
