@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -811,6 +811,29 @@ CODE
 1
 0
 OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Cloning keys");
+    new P10, .PerlHash
+    new P1, .Key
+
+    set P1, "Bar"
+    set P10[P1], "Food\n"
+    clone P2, P1
+    set S0, P10[P2]
+    print S0
+
+    set S1, "Baa"
+    set P10[S1], "Sheep\n"
+    clone S2, S1
+    set S0, P10[S2]
+    print S0
+
+    end
+CODE
+Food
+Sheep
+OUTPUT
+
 
 1;
 
