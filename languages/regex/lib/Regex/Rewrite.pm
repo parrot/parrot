@@ -32,6 +32,7 @@ sub init {
     $self->{state} ||= Regex->global_state();
     my $FAIL = $self->genlabel("FAIL");
     $self->{_labels}{'fail'} = $FAIL;
+    $self->{num_groups} = 1; # For $0, the full matching region
 }
 
 
@@ -169,7 +170,6 @@ sub rewrite_test {
 sub rewrite_multi_match {
     my ($self, $op, $min, $max, $greedy, $R, @rest) = @_;
 
-#    $DB::single = 1;
     if (($min == 0) && defined($max) && ($max == 1)) {
         return $self->rewrite_optional($op, $R, $greedy, @rest);
     } elsif (($min == 0) && (!defined($max) || ($max == -1))) {
@@ -238,14 +238,25 @@ sub rewrite_try {
 #                  pop -> start[n]
 #                  goto lastback
 #
+#            back: end[n] <- -2
+#                  goto R.back
+#
 #            next:
 #
-# back is R.back
+# The 'back' part is used only so that $n within R does not return a
+# now-abandoned match. I suppose it should restore $n to its previous
+# value, but I'm not going to bother with that for now. (It'll rarely
+# have a valid previous value anyway; I think that'll only come in for
+# situations like (R)*, which are silly anyway. Then again, I'm
+# probably wrong.)
 #
 sub rewrite_group {
     my ($self, $op, $R, $group, $lastback) = @_;
     my $rfail = $self->genlabel("group_iback");
+    my $back = $self->genlabel("group_back");
     my $next = $self->genlabel("group_next");
+
+    $self->{num_groups}++;
 
     $self->need_group_setup($group);
 
@@ -260,8 +271,8 @@ sub rewrite_group {
                         aop('pushint', [ 'I0' ]),
                         aop('setstart', [ $group, 'pos' ]),
                         @R_ops,
-                        $self->dbprint("setting end[$group] := %<rx_pos>\n"),
-                        aop('setend', [ $group, 'pos' ]),
+                        $self->dbprint("setting end[$group] := %<rx_pos>-1\n"),
+                        aop('setend', [ $group, 'pos', -1 ]),
                         aop('goto', [ $next ]),
               $rfail => $self->dbprint("R in group failed\n"),
                         aop('popint', [ 'I0', 'group end' ]),
@@ -269,11 +280,13 @@ sub rewrite_group {
                         aop('popint', [ 'I0', 'group start' ]),
                         aop('setstart', [ $group, 'I0' ] ),
                         aop('goto', [ $lastback ] ),
+               $back => aop('setend', [ $group, -2 ]),
+                        aop('goto', [ $R_back ]),
                $next =>
 
               );
 
-    return ($R_back, @ops);
+    return ($back, @ops);
 }
 
 # Cost: 4 + 2ff (insanely high!) if we need to check the length
@@ -755,7 +768,8 @@ sub rewrite_star {
 #       loop: R or rback
 #             push 0
 #             goto loop
-#      rback: popindex -> junk or lastback
+#      rback: popindex or lastback
+#       next:
 #
 # (back is R.back)
 #
@@ -869,21 +883,7 @@ sub rewrite_nongreedy_optional {
 }
 
 sub rewrite_rule {
-    die "rules should be handled by host language";
-#     my ($self, $op, $R, $lastback) = @_;
-#     my $fail = $self->genlabel("fail");
-#     my $mode = $self->new_local("mode", "int");
-#     my $params = $self->new_local("params");
-#     my ($R_back, @R_ops) = $self->rewrite($R, $fail);
-#     my @ops = (       aop('return' => [ "int", 777 ]),
-#                       aop('param' => [ "mode", "int", $mode ]),
-#                       aop('param' => [ "params", "PerlArray", $params ]),
-#                       aop('eq' => [ $mode, 1, $R_back ]),
-#                       @R_ops,
-#                       aop('return' => [ "int", 1 ]),
-#              $fail => aop('return' => [ "int", 0 ])
-#               );
-#     return (undef, @ops); # Nothing should ever use the backtracking point
+    die "rules must be handled by host language";
 }
 
 ###################### New stuff ###################
@@ -997,7 +997,10 @@ sub run {
 
     # Set up the full preamble, including stuff gathered from
     # rewriting the expression.
-    my $pre_tree = rop('seq', [ aop('preamble'), $self->startup() ] );
+    my $pre_tree = rop('seq', [
+                               aop('preamble', [ $self->{num_groups} ]),
+                               $self->startup()
+                              ] );
     my (undef, @pre_ops) = $self->rewrite($pre_tree, $FAIL);
 
     # Glue them together
@@ -1016,6 +1019,12 @@ sub startup {
     my ($self) = @_;
 
     my @ops;
+    foreach my $group (0 .. $self->{num_groups}-1) {
+        push @ops, aop('initgroup', [ $group ]);
+    }
+
+    push @ops, aop('setstart', [ "0", 0 ]);
+
     foreach my $group (sort keys %{ $self->{_setup_starts} || {} }) {
         push @ops, aop('setstart', [ $group, -2 ]);
     }
