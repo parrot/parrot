@@ -1,0 +1,21 @@
+/* Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/stringarray.pmc - String-only array class
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the StringArray class.
+
+This array holds only string pointers. Right now it just wraps PerlArray,
+so there's something that works.
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass StringArray extends PerlArray need_ext {
+
+}

@@ -1,0 +1,21 @@
+/* Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pmcarray.pmc - PMC-only array class
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the PMCArray class.
+
+This array holds only PMC pointers. Right now it just wraps PerlArray,
+so there's something that works.
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PMCArray extends PerlArray need_ext {
+
+}
