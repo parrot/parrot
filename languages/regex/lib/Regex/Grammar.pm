@@ -502,40 +502,9 @@ sub tokenize {
     return \@tokens, \@types;
 }
 
-# (accept, R) : try R, accept immediately if it matches
-# (atend) : return whether at end of input string
-# (seq, R, S, ...) : return R && S && ...
-# (advance, n, R) : advance input <n> chars, return R
-# (fork, R, S) : if R fails, try S
-# (bytematch, b) : return if start of input is b, advance 1 char
-# (classmatch, charclass) : return if start of input is charclass, advance 1
-# (start, n) : mark start of n-th paren match
-# (end, n) : mark end of n-th paren match
-# (scan, R) : scan for R at every position
-
-#  my @nodes;
-#  sub register {
-#      my $newnode = [ @_ ];
-#      push @nodes, $newnode;
-#      return @nodes - 1;
-#  }
-
-sub register {
-    return bless [ @_ ], 'regex_op';
+sub op {
+    Regex::Ops::Tree->op(@_);
 }
-
-#  sub render {
-#      my $node = $nodes[shift()];
-#      return $node->[0] . "(" . join(", ", @$node[1..$#$node]) . ")";
-#  }
-
-#  sub dump {
-#      use Data::Dumper;
-#      for my $i (reverse(0 .. $#nodes)) {
-#  #	print "$i: ".Dumper($nodes[$i])."\n";
-#  	print "$i: ".render($i)."\n";
-#      }
-#  }
 
 
 
@@ -932,187 +901,187 @@ sub new {
 	[#Rule 1
 		 'regex', 1,
 sub
-#line 57 "lib/Regex/Grammar.y"
-{ return register('accept', $_[1]); }
+#line 26 "lib/Regex/Grammar.y"
+{ return op('accept' => [ $_[1] ]); }
 	],
 	[#Rule 2
 		 'regex0', 1,
 sub
-#line 61 "lib/Regex/Grammar.y"
+#line 30 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	],
 	[#Rule 3
 		 'regex0', 2,
 sub
-#line 63 "lib/Regex/Grammar.y"
-{ return register('seq', $_[1], register('atend')); }
+#line 32 "lib/Regex/Grammar.y"
+{ return op('seq' => [ $_[1], op('atend') ]); }
 	],
 	[#Rule 4
 		 'regex1', 2,
 sub
-#line 67 "lib/Regex/Grammar.y"
+#line 36 "lib/Regex/Grammar.y"
 { return $_[2]; }
 	],
 	[#Rule 5
 		 'regex1', 1,
 sub
-#line 69 "lib/Regex/Grammar.y"
-{ return register('scan', $_[1]); }
+#line 38 "lib/Regex/Grammar.y"
+{ return op('scan' => [ $_[1] ]); }
 	],
 	[#Rule 6
 		 'expr', 3,
 sub
-#line 73 "lib/Regex/Grammar.y"
-{ return register('alternate', $_[1], $_[3]); }
+#line 42 "lib/Regex/Grammar.y"
+{ return op('alternate' => [ $_[1], $_[3] ]); }
 	],
 	[#Rule 7
 		 'expr', 2,
 sub
-#line 75 "lib/Regex/Grammar.y"
-{ return register('seq', $_[1], $_[2]); }
+#line 44 "lib/Regex/Grammar.y"
+{ return op('seq' => [ $_[1], $_[2] ]); }
 	],
 	[#Rule 8
 		 'expr', 1,
 sub
-#line 77 "lib/Regex/Grammar.y"
-{ return register('bytematch', $_[1]); }
+#line 46 "lib/Regex/Grammar.y"
+{ return op('bytematch' => [ $_[1] ]); }
 	],
 	[#Rule 9
 		 'expr', 1,
 sub
-#line 79 "lib/Regex/Grammar.y"
-{ return register('classmatch', $_[1]); }
+#line 48 "lib/Regex/Grammar.y"
+{ return op('classmatch' => [ $_[1] ]); }
 	],
 	[#Rule 10
 		 'expr', 2,
 sub
-#line 81 "lib/Regex/Grammar.y"
-{ return register('multi_match', 0, -1, TRUE, $_[1]); }
+#line 50 "lib/Regex/Grammar.y"
+{ return op('multi_match' => [ 0, -1, TRUE, $_[1] ]); }
 	],
 	[#Rule 11
 		 'expr', 3,
 sub
-#line 83 "lib/Regex/Grammar.y"
-{ return register('multi_match', 0, -1, FALSE, $_[1]); }
+#line 52 "lib/Regex/Grammar.y"
+{ return op('multi_match' => [ 0, -1, FALSE, $_[1] ]); }
 	],
 	[#Rule 12
 		 'expr', 2,
 sub
-#line 85 "lib/Regex/Grammar.y"
-{ return register('multi_match', 1, -1, TRUE, $_[1]); }
+#line 54 "lib/Regex/Grammar.y"
+{ return op('multi_match' => [ 1, -1, TRUE, $_[1] ]); }
 	],
 	[#Rule 13
 		 'expr', 3,
 sub
-#line 87 "lib/Regex/Grammar.y"
-{ return register('multi_match', 1, -1, FALSE, $_[1]); }
+#line 56 "lib/Regex/Grammar.y"
+{ return op('multi_match' => [ 1, -1, FALSE, $_[1] ]); }
 	],
 	[#Rule 14
 		 'expr', 2,
 sub
-#line 89 "lib/Regex/Grammar.y"
-{ return register('multi_match', 0, 1, TRUE, $_[1]); }
+#line 58 "lib/Regex/Grammar.y"
+{ return op('multi_match' => [ 0, 1, TRUE, $_[1] ]); }
 	],
 	[#Rule 15
 		 'expr', 3,
 sub
-#line 91 "lib/Regex/Grammar.y"
-{ return register('multi_match', 0, 1, FALSE, $_[1]); }
+#line 60 "lib/Regex/Grammar.y"
+{ return op('multi_match' => [ 0, 1, FALSE, $_[1] ]); }
 	],
 	[#Rule 16
 		 'expr', 2,
 sub
-#line 93 "lib/Regex/Grammar.y"
-{ return register('multi_match', $_[2]->{min}, $_[2]->{max}, TRUE, $_[1]); }
+#line 62 "lib/Regex/Grammar.y"
+{ return op('multi_match' => [ $_[2]->{min}, $_[2]->{max}, TRUE, $_[1] ]); }
 	],
 	[#Rule 17
 		 'expr', 3,
 sub
-#line 95 "lib/Regex/Grammar.y"
-{ return register('multi_match', $_[2]->{min}, $_[2]->{max}, FALSE, $_[1]); }
+#line 64 "lib/Regex/Grammar.y"
+{ return op('multi_match' => [ $_[2]->{min}, $_[2]->{max}, FALSE, $_[1] ]); }
 	],
 	[#Rule 18
 		 '@1-1', 0,
 sub
-#line 96 "lib/Regex/Grammar.y"
+#line 65 "lib/Regex/Grammar.y"
 { ++$::paren }
 	],
 	[#Rule 19
 		 'expr', 4,
 sub
-#line 97 "lib/Regex/Grammar.y"
-{ return register('group', $_[3], $_[2]) }
+#line 66 "lib/Regex/Grammar.y"
+{ return op('group' => [ $_[3], $_[2] ]) }
 	],
 	[#Rule 20
 		 'expr', 5,
 sub
-#line 99 "lib/Regex/Grammar.y"
+#line 68 "lib/Regex/Grammar.y"
 { return $_[4]; }
 	],
 	[#Rule 21
 		 'range', 5,
 sub
-#line 103 "lib/Regex/Grammar.y"
+#line 72 "lib/Regex/Grammar.y"
 { return { min => $_[2], max => $_[4] }; }
 	],
 	[#Rule 22
 		 'range', 4,
 sub
-#line 105 "lib/Regex/Grammar.y"
+#line 74 "lib/Regex/Grammar.y"
 { return { min => 0, max => $_[3] }; }
 	],
 	[#Rule 23
 		 'range', 4,
 sub
-#line 107 "lib/Regex/Grammar.y"
+#line 76 "lib/Regex/Grammar.y"
 { return { min => $_[2], max => -1 }; }
 	],
 	[#Rule 24
 		 'number', 2,
 sub
-#line 110 "lib/Regex/Grammar.y"
+#line 79 "lib/Regex/Grammar.y"
 { return $_[1] * 10 + $_[2]; }
 	],
 	[#Rule 25
 		 'number', 1,
 sub
-#line 111 "lib/Regex/Grammar.y"
+#line 80 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	],
 	[#Rule 26
 		 'charclass', 4,
 sub
-#line 114 "lib/Regex/Grammar.y"
+#line 83 "lib/Regex/Grammar.y"
 { $_[3] .= '-'; return $_[3]; }
 	],
 	[#Rule 27
 		 'charclass', 3,
 sub
-#line 115 "lib/Regex/Grammar.y"
+#line 84 "lib/Regex/Grammar.y"
 { return $_[2]; }
 	],
 	[#Rule 28
 		 'charclass', 1,
 sub
-#line 116 "lib/Regex/Grammar.y"
+#line 85 "lib/Regex/Grammar.y"
 { return 'ANY'; }
 	],
 	[#Rule 29
 		 'classpieces', 2,
 sub
-#line 119 "lib/Regex/Grammar.y"
+#line 88 "lib/Regex/Grammar.y"
 { $_[1] .= $_[2]; return $_[1]; }
 	],
 	[#Rule 30
 		 'classpieces', 0,
 sub
-#line 120 "lib/Regex/Grammar.y"
+#line 89 "lib/Regex/Grammar.y"
 { return ''; }
 	],
 	[#Rule 31
 		 'classpiece', 3,
 sub
-#line 124 "lib/Regex/Grammar.y"
+#line 93 "lib/Regex/Grammar.y"
 { my $s = $_[1];
       my $p = $s;
       $s .= $p while ($p++ ne $_[3]);
@@ -1122,7 +1091,7 @@ sub
 	[#Rule 32
 		 'classpiece', 1,
 sub
-#line 130 "lib/Regex/Grammar.y"
+#line 99 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	]
 ],
@@ -1130,7 +1099,7 @@ sub
     bless($self,$class);
 }
 
-#line 133 "lib/Regex/Grammar.y"
+#line 102 "lib/Regex/Grammar.y"
 
 
 1;

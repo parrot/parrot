@@ -6,18 +6,15 @@ use Regex::PreOptimize;
 use Regex::Optimize;
 use Regex::Generate;
 
-#my $mode = 'Re';
-my $mode = 'Rx';
-eval "use Regex::Rewrite::$mode";
-die $@ if $@;
-eval "use Regex::CodeGen::$mode";
-die $@ if $@;
+use Regex::Rewrite::Rx;
+use Regex::CodeGen::Pasm;
+use strict;
 
 my $parser = Regex::Parse->new();
 my $opt1 = Regex::PreOptimize->new();
-my $rewrite = "Regex::Rewrite::$mode"->new();
+my $rewrite = Regex::Rewrite::Rx->new();
 my $opt2 = Regex::Optimize->new();
-my $cgen = "Regex::CodeGen::$mode"->new();
+my $cgen = Regex::CodeGen::Pasm->new();
 
 #my $top = compile("^foo");
 #my $top = compile("(.+)+");

@@ -1,5 +1,6 @@
 package Regex::Optimize;
 use Regex::Rewrite;
+use Regex::Ops::List;
 use strict;
 
 sub new {
@@ -18,21 +19,22 @@ sub mklabelnum {
 }
 
 sub mklabel {
-    return [ 'label', mklabelnum() ];
+    Regex::Ops::List->mark(mklabelnum());
 }
 
 sub label_indices {
     my ($self, $op) = @_;
     my @indices;
-    for my $i (1..$#$op) {
-        push(@indices, $i) if ref($op->[$i]) && $op->[$i]->[0] eq 'label';
+    for my $i (0..$#{ $op->{args} }) {
+        push(@indices, $i) if ref($op->{args}->[$i])
+                              && $op->{args}->[$i]->{name} eq 'LABEL';
     }
     return @indices;
 }
 
 sub combineLabels {
     my $self = shift;
-    my @names = map { $_->[1] =~ /(\w+)/; $1 } @_;
+    my @names = map { $_->{label} =~ /(\w+)/; $1 } @_;
     my %names;
     @names{@names} = ();
     my $label = mklabelnum();
@@ -43,17 +45,18 @@ sub combineLabels {
 sub optimize {
     my $self = shift;
 
-    my @equivs;
-    my @output;
+    # @_ : (ops)
+    my @equivs; # (labels)
+    my @output; # (ops)
 
     # Merge adjacent (equivalent) labels, renaming them
     for my $stmt (@_) {
-	if (ref $stmt && $stmt->[0] eq 'label') {
+	if (ref $stmt && $stmt->{name} eq 'LABEL') {
 	    push @equivs, $stmt;
 	} else {
 	    if (@equivs) {
 		my $megalabel = $self->combineLabels(@equivs);
-		$_->[1] = $megalabel foreach (@equivs);
+		$_->{label} = $megalabel foreach (@equivs);
 		push @output, $equivs[0];
 		@equivs = ();
 	    }
@@ -77,16 +80,16 @@ sub optimize {
     #
 
     # First, convert all statements to the form
-    #  { label => optional_label, code => original_statement }
+    #  { label => optional_label, code => original_op }
     my $curlabel;
-    my @output2;
-    my %labels;
+    my @output2; # { label => ?label, code => op } : tagged_op
+    my %labels; # { label string => tagged_op }
     foreach my $stmt (@output) {
-	if (ref $stmt && $stmt->[0] eq 'label') {
+	if ($stmt->{name} eq 'LABEL') {
 	    $curlabel = $stmt;
 	} else {
 	    push @output2, { label => $curlabel, code => $stmt };
-	    $labels{$curlabel->[1]} = $output2[-1] if $curlabel;
+	    $labels{$curlabel->{label}} = $output2[-1] if $curlabel;
 	    undef $curlabel;
 	}
     }
@@ -102,18 +105,16 @@ sub optimize {
         my @labels;
         @labels = $self->label_indices($actual) if ref $actual;
 
-	if (@labels) {
-            foreach my $pos (@labels) {
-                my $dest = $actual->[$pos];
-                while (1) {
-                    my $dest_stmt = $labels{$dest->[1]};
-                    last if ! ref $dest_stmt->{code};
-                    last if $dest_stmt->{code}->[0] ne 'goto';
-                    $dest = $dest_stmt->{code}->[1];
-                }
-                $stmt->{code}->[$pos] = $dest;
+        foreach my $pos (@labels) {
+            my $dest = $actual->{args}->[$pos];
+            while (1) {
+                my $dest_stmt = $labels{$dest->{label}}
+                  or die "untargeted label $dest->{label}";
+                last if $dest_stmt->{code}->{name} ne 'goto';
+                $dest = $dest_stmt->{code}->{args}->[0];
             }
-	}
+            $actual->{args}->[$pos] = $dest;
+        }
     }
 
     # At this point, every basic block but the first begins with a
@@ -122,9 +123,7 @@ sub optimize {
     # 3rd element of the labels.
 
     # But first, make *all* basic blocks begin with a label.
-    if (! $output2[0]->{label}) {
-	$output2[0]->{label} = mklabel();
-    }
+    $output2[0]->{label} ||= mklabel();
 
     # Stick in a next_stmt ref in every statement to make it easier to
     # move around.
@@ -138,10 +137,9 @@ sub optimize {
     my @Q = ($output2[0]);
 
   BBLOCK:
-    while (@Q) {
-	my $stmt = shift(@Q);
-	next if $stmt->{label}->[2]; # Already reached here
-	$stmt->{label}->[2] = 1;
+    while (my $stmt = shift(@Q)) {
+	next if $stmt->{label}->{reachable}; # Already reached here
+	$stmt->{label}->{reachable} = 1;
 
 	# Loop over the basic block starting at $stmt
 	my $prev;
@@ -149,9 +147,9 @@ sub optimize {
 	    if (ref $stmt->{code}) {
                 my @labels = $self->label_indices($stmt->{code});
                 foreach my $pos (@labels) {
-                    push @Q, $labels{$stmt->{code}->[$pos]->[1]};
+                    push @Q, $labels{$stmt->{code}->{args}->[$pos]->{label}};
                 }
-                if ($stmt->{code}->[0] =~ /^(?:goto|fail)$/) {
+                if ($stmt->{code}->{name} =~ /^(?:goto|fail)$/) {
                     next BBLOCK;
                 }
             }
@@ -169,7 +167,7 @@ sub optimize {
     my $keeping = 1;
     foreach my $stmt (@output2) {
 	if ($stmt->{label}) {
-	    $keeping = $stmt->{label}->[2]; # Keep if reachable
+	    $keeping = $stmt->{label}->{reachable}; # Keep if reachable
 	}
 	push @output3, $stmt if $keeping;
     }
@@ -184,9 +182,9 @@ sub optimize {
     # Eliminate gotos to the following address
     my @output4;
     foreach my $stmt (@output3) {
-	if (ref $stmt->{code} && $stmt->{code}->[0] eq 'goto') {
+	if (ref $stmt->{code} && $stmt->{code}->{name} eq 'goto') {
 	    if ($stmt->{next}->{label}
-                && $stmt->{code}->[1] == $stmt->{next}->{label})
+                && $stmt->{code}->{args}->[0] == $stmt->{next}->{label})
             {
 		# If the label of the goto is the label of the following
 		# block of code:
@@ -202,12 +200,12 @@ sub optimize {
     my %AMDEST; # { label name => boolean }
     foreach (@output4) {
         my $code = $_->{code};
-        foreach (map { $code->[$_] } $self->label_indices($code)) {
-            $AMDEST{$_->[1]} = 1;
+        foreach (map { $code->{args}->[$_] } $self->label_indices($code)) {
+            $AMDEST{$_->{label}} = 1;
         }
     }
     foreach (@output4) {
-        delete $_->{label} if ($_->{label} && ! $AMDEST{$_->{label}->[1]});
+        delete $_->{label} if ($_->{label} && ! $AMDEST{$_->{label}->{label}});
     }
 
     return (

@@ -1,9 +1,9 @@
 package Regex::CodeGen::Rx;
-use Regex::RegexOps ();
+use Regex::Ops::Tree ();
 use base 'Regex::CodeGen';
 use strict;
 
-my $fail_label = Regex::RegexOps::mark('FAIL');
+my $fail_label = Regex::Ops::Tree::mark('FAIL');
 
 sub output_preamble {
     my $self = shift;

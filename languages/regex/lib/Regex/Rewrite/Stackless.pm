@@ -1,7 +1,7 @@
 package Regex::Rewrite::Stackless;
 use base 'Regex::Rewrite';
-use Regex::RegexOps;
-use Regex::AsmOps;
+use Regex::Ops::Tree;
+use Regex::Ops::List;
 use strict;
 
 # Stackless engines work rather differently, and so I completely
@@ -15,6 +15,9 @@ use strict;
 # up the partial state and possibly attempt another match, or just
 # abort and return to $lastback.
 #
+
+*aop = *Regex::Rewrite::aop;
+*rop = *Regex::Rewrite::rop;
 
 sub init {
     my ($self, @args) = @_;
@@ -42,12 +45,12 @@ sub rewrite_group {
 
     my ($R_back, @R_ops) = $self->rewrite($R, $back);
 
-    my @ops = (         aop_goto($doit),
-	       $back => aop_delete($group),
-	                aop_goto($lastback),
-	       $doit => aop_start($group),
+    my @ops = (         aop('goto', [ $doit ]),
+	       $back => aop('delete', [ $group ]),
+	                aop('goto', [ $lastback ]),
+	       $doit => aop('start', [ $group ]),
 	                @R_ops,
-	                aop_end($group),
+	                aop('end', [ $group ]),
 	       );
 
     return ($R_back, @ops);
@@ -55,7 +58,7 @@ sub rewrite_group {
 
 sub rewrite_other {
     my ($self, $op, $lastback) = @_;
-    return bless [ @$op, $lastback ], 'asm_op';
+    return aop($op->{name}, [ @{ $op->{args} }, $lastback ]);
 }
 
 ###################### New stuff ###################
@@ -80,19 +83,18 @@ sub rewrite_seq {
 sub rewrite {
     my ($self, $op, $lastback) = @_;
 
-    if (ref($op) eq 'regex_op') {
-        my ($opname, @args) = @$op;
-        my $method = "rewrite_$opname";
+    if (UNIVERSAL::isa($op, 'Regex::Ops::Tree')) {
+        my $method = "rewrite_" . $op->{name};
         if ($self->can($method)) {
-            return $self->$method(@args, $lastback);
+            return $self->$method(@{ $op->{args} }, $lastback);
         } else {
             return ($lastback, $self->rewrite_other($op, $lastback));
         }
-    } elsif (ref($op) eq 'asm_op') {
+    } elsif (UNIVERSAL::isa($op, "Regex::Ops::List")) {
         return ($lastback, $op);
     } else {
         $DB::single = 1;
-        die "malformed op $op: should be blessed regex_op or asm_op";
+        die "malformed op $op";
     }
 }
 
@@ -102,11 +104,11 @@ sub run {
     my (undef, @ops) = $self->rewrite($tree, $self->{_labels}{fail});
 
     foreach my $temp_reg (values %{ $self->{_temps} }) {
-        unshift @ops, aop_push_reg($temp_reg);
-        push @ops, aop_pop_reg($temp_reg);
+        unshift @ops, aop('push_reg', [ $temp_reg ]);
+        push @ops, aop('pop_reg', [ $temp_reg ]);
     }
 
-    push @ops, aop_terminate();
+    push @ops, aop('terminate');
 
     return @ops;
 }

@@ -1,9 +1,9 @@
 package Regex::CodeGen::Pasm;
-use Regex::RegexOps ();
+use Regex::Ops::Tree (); # For mark()
 use base 'Regex::CodeGen';
 use strict;
 
-my $fail_label = Regex::RegexOps::mark('FAIL');
+my $fail_label = Regex::Ops::Tree::mark('FAIL');
 
 sub output_preamble {
     my $self = shift;

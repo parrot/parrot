@@ -1,9 +1,25 @@
-package Regex::AsmOps;
+package Regex::Ops::List;
 use Regex::Grammar;
 use base 'Exporter';
 use strict;
 
 use vars qw(@AsmOps @EXPORT);
+
+sub op {
+    my ($class, $name, $args, %opts) = @_;
+
+    $DB::single = 1 if ref $name;
+    my $self = bless { name => $name,
+                       args => $args || [],
+                       %opts }, (ref($class) || $class);
+
+    $self->init();
+    return $self;
+}
+
+sub init {
+    # Nothing to do
+}
 
 @AsmOps =
   ( [ "scan(R)" => "scan for R at every position" ],
@@ -45,6 +61,11 @@ foreach (@AsmOps) {
     my ($name) = $proto =~ /^(\w+)/;
     eval "sub aop_$name { bless Regex::Grammar::register(\"$name\", \@_), 'asm_op' }";
     push @EXPORT, "\&aop_$name";
+}
+
+sub mark {
+    my ($class, $name) = @_;
+    return bless { name => 'LABEL', label => $name }, (ref($class)||$class);
 }
 
 1;

@@ -1,6 +1,6 @@
 package Regex::Rewrite;
-use Regex::RegexOps;
-use Regex::AsmOps;
+use Regex::Ops::Tree;
+use Regex::Ops::List;
 use strict;
 
 sub new {
@@ -16,12 +16,16 @@ sub init {
     $self->{_temp_int_count} = 0;
 }
 
+sub aop {
+    Regex::Ops::List->op(@_);
+}
+
 sub mark {
     my ($self, $desc) = @_;
     $desc ||= '';
     my $number = ++$self->{_markers}->{$desc};
     $number = '' if ($number == 1) && ($desc ne '');
-    return bless([ 'label', "\@$desc$number" ], 'asm_op');
+    return Regex::Ops::List->mark("\@$desc$number");
 }
 
 sub alloc_temp_int {
@@ -31,6 +35,7 @@ sub alloc_temp_int {
     my $register = "I" . $self->{_temp_int_count};
 
     if (++$self->{_temp_int_count} > $NUM_REGISTERS) {
+        # I betcha live region detection would be better...
         die "Too many temporaries requested! Implement register spilling!";
     }
 
@@ -47,17 +52,17 @@ sub get_temp {
 
 sub rewrite_terminate {
     my ($self, $R) = @_;
-    return $R, rop_goto($self->{_return});
+    return $R, aop('goto', [ $self->{_return} ]);
 }
 
 sub rewrite_goto {
-    my ($self, $R) = @_;
-    return aop_goto($R) if $R->[0] eq 'label';
-    return $R;
+    my ($self, $R, $lastback) = @_;
+    return aop('goto', [ $R ]) if $R->{name} eq 'LABEL';
+    return $self->rewrite($R, $lastback);
 }
 
 sub rewrite_test {
-    my ($self, $op1, $test, $op2, $dest) = @_;
+    my ($self, $op1, $test, $op2, $dest, $lastback) = @_;
     my $continue = $self->mark('after_test');
     my $rev_test = { "==" => "!=",
 		     "!=" => "==",
@@ -67,19 +72,22 @@ sub rewrite_test {
 		     ">=" => "<",
 		 }->{$test};
 
-    if ($dest->[0] eq 'goto') {
-        return aop_if($op1, $test, $op2, $dest->[1]);
-    } elsif ($dest->[0] eq 'label') {
-        return aop_if($op1, $test, $op2, $dest);
+    if ($dest->{name} eq 'goto') {
+        return aop('if', [ $op1, $test, $op2, $dest->[1] ]);
+    } elsif ($dest->{name} eq 'LABEL') {
+        return aop('if', [ $op1, $test, $op2, $dest ]);
     } else {
-        return rop_test($op1, $rev_test, $op2, rop_goto($continue)),
-          $dest, $continue;
+        my $testop = rop('test', [ $op1, $rev_test, $op2,
+                                   rop('goto', [ $continue ]) ]);
+        return ($self->rewrite($testop, $lastback),
+                $self->rewrite($dest, $lastback),
+                $continue);
     }
 }
 
 sub rewrite_accept {
-    my ($self, $R) = @_;
-    return $R;
+    my ($self, $R, $lastback) = @_;
+    return $self->rewrite($R, $lastback);
 }
 
 sub rewrite_seq {
@@ -87,14 +95,9 @@ sub rewrite_seq {
     return @_;
 }
 
-sub rewrite_group {
-    my ($self, $R, $group) = @_;
-    return rop_seq(aop_start($group), $R, aop_end($group));
-}
-
 sub rewrite_other {
-    my ($self, $op) = @_;
-    return (bless $op, 'asm_op');
+    my ($self, $op, @args) = @_;
+    return aop($op, \@args);
 }
 
 # TODO: can_match_empty (so s/a*/x/g doesn't go into infinite loop)
@@ -128,11 +131,11 @@ sub run {
     my @ops = $self->rewrite(@_);
 
     foreach my $temp_reg (values %{ $self->{_temps} }) {
-        unshift @ops, aop_push_reg($temp_reg);
-        push @ops, aop_pop_reg($temp_reg);
+        unshift @ops, aop('push_reg', [ $temp_reg ]);
+        push @ops, aop('pop_reg', [ $temp_reg ]);
     }
 
-    push @ops, aop_terminate();
+    push @ops, aop('terminate');
 
     return @ops;
 }

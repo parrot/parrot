@@ -1,8 +1,11 @@
 package Regex::Rewrite::Rx;
 use base 'Regex::Rewrite::Stackless';
-use Regex::RegexOps;
-use Regex::AsmOps;
+use Regex::Ops::Tree;
+use Regex::Ops::List;
 use strict;
+
+*aop = *Regex::Rewrite::aop;
+*rop = *Regex::Rewrite::rop;
 
 sub rewrite_scan {
     my ($self, $R, $lastback) = @_;
@@ -14,8 +17,8 @@ sub rewrite_scan {
     my ($R_back, @R_body) = $self->rewrite($R, $advance);
 
     my @ops = (
-                           aop_goto($scan),
-               $advance => aop_advance(1, $lastback),
+                           aop('goto', [ $scan ]),
+               $advance => aop('advance', [ 1, $lastback ]),
                   $scan => @R_body,
                   $next =>
               );
@@ -35,15 +38,15 @@ sub rewrite_simple_or_simple {
     my ($S_back, @S_ops) = $self->rewrite($S, $back);
 
     return $S_back, (
-                     aop_pushmark(),
-                     aop_pushindex(),
+                     aop('pushmark'),
+                     aop('pushindex'),
                      @R_ops,
-                     aop_goto($next),
-         $nextalt => aop_popindex($self->{_labels}{'fail'}),
+                     aop('goto', [ $next ]),
+         $nextalt => aop('popindex', [ $self->{_labels}{'fail'} ]),
            $try_S => @S_ops,
-                     aop_goto($next),
-            $back => aop_popindex($lastback),
-                     aop_goto($try_S),
+                     aop('goto', [ $next ]),
+            $back => aop('popindex', [ $lastback ]),
+                     aop('goto', [ $try_S ]),
             $next =>
                     );
 }
@@ -59,17 +62,17 @@ sub rewrite_alternate {
     my ($S_back, @S_ops) = $self->rewrite($S, $fail);
 
     return $back, (
-                     aop_pushmark("|"),
-                     aop_pushindex(),
+                     aop('pushmark', [ "|" ]),
+                     aop('pushindex'),
                      @R_ops,
-                     aop_pushmark("|R"),
-                     aop_pushindex(),
-                     aop_goto($next),
-            $back => aop_popindex($S_back),
-                     aop_popindex($R_back),
-            $fail => aop_popindex($lastback),
+                     aop('pushmark', [ "|R" ]),
+                     aop('pushindex'),
+                     aop('goto', [ $next ]),
+            $back => aop('popindex', [ $S_back ]),
+                     aop('popindex', [ $R_back ]),
+            $fail => aop('popindex', [ $lastback ]),
                      @S_ops,
-                     aop_pushmark("|S"),
+                     aop('pushmark', [ "|S" ]),
             $next =>
                     );
 }
@@ -86,18 +89,18 @@ sub rewrite_star {
         my $loop = $self->mark('loop');
         @ops =
 (
-                aop_pushmark("*"),
-       $loop => aop_pushindex(),
+                aop('pushmark', [ "*" ]),
+       $loop => aop('pushindex'),
                 @R_ops,
-                aop_goto($loop),
-       $back => aop_popindex($lastback),
+                aop('goto', [ $loop ]),
+       $back => aop('popindex', [ $lastback ]),
        $next =>
 );
     } else {
         my ($R_back, @R_ops) = $self->rewrite($R, $next);
        @ops =
 (
-                aop_goto($next),
+                aop('goto', [ $next ]),
        $back => @R_ops,
        $next =>
 );
@@ -115,11 +118,11 @@ sub rewrite_plus {
         my $loop = $self->mark('plus_loop');
         my (undef, @R_ops) = $self->rewrite($R, $back);
         @ops = (
-                         aop_pushmark("+"),
+                         aop('pushmark', [ "+" ]),
                 $loop => @R_ops,
-                         aop_pushindex(),
-                         aop_goto($loop),
-                $back => aop_popindex($lastback)
+                         aop('pushindex'),
+                         aop('goto', [ $loop ]),
+                $back => aop('popindex', [ $lastback ]),
                );
     } else {
         my (undef, @R_ops) = $self->rewrite($R, $lastback);
@@ -147,9 +150,9 @@ sub rewrite_greedy_optional {
     my @ops = (
                         aop_pushmark("?"),
                         @R_ops,
-                        aop_pushindex(),
-                        aop_goto($next),
-               $back => aop_popindex($lastback),
+                        aop('pushindex'),
+                        aop('goto', [ $next ]),
+               $back => aop('popindex', [ $lastback ]),
                $next =>
               );
 
@@ -164,10 +167,10 @@ sub rewrite_nongreedy_optional {
     my ($R_back, @R_ops) = $self->rewrite($R, $next);
 
     my @ops = (
-                        aop_pushmark("??"),
-                        aop_pushindex(),
-                        aop_goto($next),
-               $back => aop_popindex($lastback),
+                        aop('pushmark', [ "??" ]),
+                        aop('pushindex'),
+                        aop('goto', [ $next ]),
+               $back => aop('popindex', [ $lastback ]),
                         @R_ops,
                $next =>
               );
@@ -183,18 +186,18 @@ sub rewrite_nongreedy_optional {
 sub run {
     my $self = shift;
 
-    unshift @_, aop_preamble;
+    unshift @_, aop('preamble');
     my $RETURN = $self->{_labels}{'return'} = $self->mark("RETURN");
     my $FAIL = $self->{_labels}{'fail'};
 
     push @_, (
-              aop_match_succeeded(),
-              aop_goto($RETURN),
-              $FAIL => aop_match_failed(),
+              aop('match_succeeded'),
+              aop('goto', [ $RETURN ]),
+              $FAIL => aop('match_failed'),
               $RETURN =>
              );
 
-    return $self->SUPER::run(rop_seq(@_));
+    return $self->SUPER::run(rop('seq', [ @_ ]));
 }
 
 1;

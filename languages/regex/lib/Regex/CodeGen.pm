@@ -17,10 +17,10 @@ sub render {
     my ($self, $op) = @_;
 
     die if ! ref $op;
-    die if $op->[0] eq 'label';
-    my ($opname, @args) = @$op;
-    my $method = "output_$opname";
-    return $self->$method(@args);
+    die if $op->{name} eq 'LABEL';
+    my $method = "output_$op->{name}";
+    $DB::single = 1 if $method =~ /HASH/;
+    return $self->$method(@{ $op->{args} });
 }
 
 sub output {
@@ -35,7 +35,7 @@ sub output {
     for my $op (@_) {
         die $op if ! ref $op;
 
-        if ($op->[0] eq 'label') {
+        if ($op->{name} eq 'LABEL') {
             $label .= $self->output_label_def($op);
         } else {
             foreach my $line ($self->render($op)) {
@@ -100,15 +100,15 @@ sub output_terminate {
 sub output_label_use {
     my ($self, $label) = @_;
     $DB::single = 1 if ! ref $label;
-    ($label = $label->[1]) =~ s/^@/\$/;
+    ($label = $label->{label}) =~ s/^@/\$/;
     return $label;
 }
 
 sub output_label_def {
     my ($self, $label, $reachable) = @_;
-    my $comment = $self->{_label_comments}{$label->[1]};
+    my $comment = $self->{_label_comments}{$label->{label}};
     $comment = $comment ? "\n\t# $comment" : "";
-    ($label = $label->[1]) =~ s/^@/\$/;
+    ($label = $label->{label}) =~ s/^@/\$/;
     return "$label:\n$comment";
 }
 

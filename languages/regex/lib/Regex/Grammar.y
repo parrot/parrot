@@ -10,40 +10,9 @@ sub tokenize {
     return \@tokens, \@types;
 }
 
-# (accept, R) : try R, accept immediately if it matches
-# (atend) : return whether at end of input string
-# (seq, R, S, ...) : return R && S && ...
-# (advance, n, R) : advance input <n> chars, return R
-# (fork, R, S) : if R fails, try S
-# (bytematch, b) : return if start of input is b, advance 1 char
-# (classmatch, charclass) : return if start of input is charclass, advance 1
-# (start, n) : mark start of n-th paren match
-# (end, n) : mark end of n-th paren match
-# (scan, R) : scan for R at every position
-
-#  my @nodes;
-#  sub register {
-#      my $newnode = [ @_ ];
-#      push @nodes, $newnode;
-#      return @nodes - 1;
-#  }
-
-sub register {
-    return bless [ @_ ], 'regex_op';
+sub op {
+    Regex::Ops::Tree->op(@_);
 }
-
-#  sub render {
-#      my $node = $nodes[shift()];
-#      return $node->[0] . "(" . join(", ", @$node[1..$#$node]) . ")";
-#  }
-
-#  sub dump {
-#      use Data::Dumper;
-#      for my $i (reverse(0 .. $#nodes)) {
-#  #	print "$i: ".Dumper($nodes[$i])."\n";
-#  	print "$i: ".render($i)."\n";
-#      }
-#  }
 
 %}
 
@@ -54,47 +23,47 @@ sub register {
 
 %%
 
-regex : regex0 { return register('accept', $_[1]); }
+regex : regex0 { return op('accept' => [ $_[1] ]); }
 ;
 
 regex0 : regex1
    { return $_[1]; }
       | regex1 '$'
-   { return register('seq', $_[1], register('atend')); }
+   { return op('seq' => [ $_[1], op('atend') ]); }
 ;
 
 regex1 : '^' expr
    { return $_[2]; }
       | expr
-   { return register('scan', $_[1]); }
+   { return op('scan' => [ $_[1] ]); }
 ;
 
 expr : expr '|' expr
-   { return register('alternate', $_[1], $_[3]); }
+   { return op('alternate' => [ $_[1], $_[3] ]); }
      | expr expr %prec SEQUENCE
-   { return register('seq', $_[1], $_[2]); }
+   { return op('seq' => [ $_[1], $_[2] ]); }
      | CHAR
-   { return register('bytematch', $_[1]); }
+   { return op('bytematch' => [ $_[1] ]); }
      | charclass
-   { return register('classmatch', $_[1]); }
+   { return op('classmatch' => [ $_[1] ]); }
      | expr '*'
-   { return register('multi_match', 0, -1, TRUE, $_[1]); }
+   { return op('multi_match' => [ 0, -1, TRUE, $_[1] ]); }
      | expr '*' '?'
-   { return register('multi_match', 0, -1, FALSE, $_[1]); }
+   { return op('multi_match' => [ 0, -1, FALSE, $_[1] ]); }
      | expr '+'
-   { return register('multi_match', 1, -1, TRUE, $_[1]); }
+   { return op('multi_match' => [ 1, -1, TRUE, $_[1] ]); }
      | expr '+' '?'
-   { return register('multi_match', 1, -1, FALSE, $_[1]); }
+   { return op('multi_match' => [ 1, -1, FALSE, $_[1] ]); }
      | expr '?'
-   { return register('multi_match', 0, 1, TRUE, $_[1]); }
+   { return op('multi_match' => [ 0, 1, TRUE, $_[1] ]); }
      | expr '?' '?'
-   { return register('multi_match', 0, 1, FALSE, $_[1]); }
+   { return op('multi_match' => [ 0, 1, FALSE, $_[1] ]); }
      | expr range %prec RANGE
-   { return register('multi_match', $_[2]->{min}, $_[2]->{max}, TRUE, $_[1]); }
+   { return op('multi_match' => [ $_[2]->{min}, $_[2]->{max}, TRUE, $_[1] ]); }
      | expr range '?'
-   { return register('multi_match', $_[2]->{min}, $_[2]->{max}, FALSE, $_[1]); }
+   { return op('multi_match' => [ $_[2]->{min}, $_[2]->{max}, FALSE, $_[1] ]); }
      | '(' { ++$::paren } expr ')'
-   { return register('group', $_[3], $_[2]) }
+   { return op('group' => [ $_[3], $_[2] ]) }
      | '(' '?' ':' expr ')'
    { return $_[4]; }
 ;

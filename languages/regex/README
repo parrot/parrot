@@ -17,6 +17,27 @@ untested. Theoretically, this release should support:
  (R)     - capturing groups
  (?:R)   - noncapturing grouping
  a       - codepoint literals
+ {n,m}   - greedily match n..m times
+ {n,m}?  - nongreedily match n..m times
+
+Missing:
+ [...]   - character classes
+ \w      - character classes
+ \U      - arbitrary codepoints
+ \p      - properties
+ \b      - word boundary
+ /ism    - flags
+ \1      - back references
+ \G      - start position
+ (?=R)   - look-ahead assertion
+ (?!R)   - negative look-ahead assertion
+ (?<=)   - look-behind assertion
+ (?<!)   - negative look-behind assertion
+ (?{ })  - embedded code
+ (??{ }) - match-time evaluated subexpression
+ (?>R)   - independent subexpression
+ (?(cond)R|S) - conditional expression
+ (R?)*   - empty match suppression
 
 Regular expressions are compiled down to regular opcodes, not to the
 rx_* set of opcodes. P0 and P1 are PerlArrays containing the starting
@@ -26,7 +47,7 @@ operators are converted to code sequences. Marks are the value '-1';
 indices are nonnegative integers. (Except in debugging mode, when
 marks are instead strings describing what they're marking.)
 
-Optimizations implemented (notation: parentheses here non-capturing):
+Optimizations implemented (notation: parentheses here are non-capturing):
 
  aR|aS    -> a(R|S)
  R|       -> R?
