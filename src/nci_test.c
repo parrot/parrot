@@ -120,6 +120,17 @@ void * nci_pi(int test) {
                 };
                 return &t;
             }
+        case 2:
+            {
+                static struct {
+                    char c;
+                    int i;
+                } t = {
+                     10,
+                     20
+                };
+                return &t;
+            }
     }
     return NULL;
 }

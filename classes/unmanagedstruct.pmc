@@ -165,6 +165,52 @@ set_float(char *p, int type, FLOATVAL value)
     }
 }
 
+/*
+ * XXX
+ * this does only minimal alignment
+ * gcc-2.95, -3.3 /i386
+ *
+  #include <stddef.h>
+  struct xt {
+	char x;                     // 0
+	struct yt {
+		char y;             // 4
+		char i;             // 5
+		int  j;             // 8
+	} _y;
+	char z;                     // 12
+  } _x;
+
+  ...
+	printf("i : %d\n", offsetof(struct xt, _y.i));
+
+ *
+ * *BUT* if the nested structure contains only char - then
+ *       all is char aligned
+ *       if the nested structure contains a short then align is 2
+ *
+ *       long long is aligned on 4
+ */
+
+static int
+calc_align(int type, int offs)
+{
+    int align = data_types[type - enum_first_type].size;
+
+    if (offs % align) {
+	int diff;
+	if ((type == enum_type_ulonglong ||
+		    type == enum_type_longlong 	||
+		    type == enum_type_int64     ||
+		    type == enum_type_uint64) &&
+		!strcmp(PARROT_CPU_ARCH, "i386"))
+	    align = 4;
+	diff = align - (offs % align);
+	offs += diff;
+    }
+    return offs;
+}
+
 pmclass UnManagedStruct extends default need_ext {
 
     void init() {
@@ -202,7 +248,7 @@ pmclass UnManagedStruct extends default need_ext {
 		VTABLE_set_integer_keyed_int(interpreter, value, i+1, count);
 	    }
 	    if (offs <= 0) {
-		offs = toff;
+		offs = toff = calc_align(type, toff);
 		VTABLE_set_integer_keyed_int(interpreter, value, i+2, offs);
 	    }
 	    else

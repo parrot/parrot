@@ -1,4 +1,4 @@
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -429,6 +429,39 @@ CODE
 42.000000
 100.000000
 47.110000
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "nci_p_i - align");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pi", "pi"
+  # this test function returns a struct { char; int }
+  set I5, 2
+  invoke
+  new P2, .PerlArray
+.include "datatypes.pasm"
+  push P2, .DATATYPE_CHAR
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  assign P5, P2
+  set I0, P5[0]
+  print I0
+  print "\n"
+  set I0, P5[1]
+  print I0
+  print "\n"
+  # check the offset of the int
+  set I0, P2[5]
+  print I0
+  print "\n"
+  end
+CODE
+/10
+20
+(4|8)
+/
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
