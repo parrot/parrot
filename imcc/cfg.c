@@ -16,8 +16,8 @@
 
 /* #define ALIAS */
 
-static void add_instruc_reads(Instruction *ins, SymReg *r0);
-static void add_instruc_writes(Instruction *ins, SymReg *r0);
+static void add_instruct_reads(Instruction *ins, SymReg *r0);
+static void add_instruct_writes(Instruction *ins, SymReg *r0);
 static void propagate_need(Basic_block *bb, SymReg* r, int i);
 static void bb_findadd_edge(Parrot_Interp, IMC_Unit *, Basic_block*, SymReg*);
 static void mark_loop(Parrot_Interp, IMC_Unit *, Edge*);
@@ -94,13 +94,13 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
 
         bb->end = ins;
         ins->bbindex = unit->n_basic_blocks - 1;
-        /* invoke w/o arg implicitly uses P0, so mark it as doing so
-         * XXX but in the parser
+        /* invoke and newsub have implicit args (P0, P1) so mark it as doing so
+         * XXX Needs to be done in the parser or instruction creation api
          */
         if ( !strcmp(ins->op, "invoke") || !strcmp(ins->op, "invokecc")) {
             if (ins->opsize == 1) {
                 SymReg * p0 = mk_pasm_reg(str_dup("P0"));
-                add_instruc_reads(ins, p0);
+                add_instruct_reads(ins, p0);
                 check_invoke_type(unit, ins);
                 p0->use_count++;
             }
@@ -109,8 +109,8 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
         else if ( !strcmp(ins->op, "newsub") && ins->opsize == 5) {
             SymReg * p0 = mk_pasm_reg(str_dup("P0"));
             SymReg * p1 = mk_pasm_reg(str_dup("P1"));
-            add_instruc_writes(ins, p0);
-            add_instruc_writes(ins, p1);
+            add_instruct_writes(ins, p0);
+            add_instruct_writes(ins, p1);
         }
         if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
             if (first) {
@@ -379,14 +379,14 @@ edge_count(IMC_Unit * unit)
 }
 
 static void
-add_instruc_reads(Instruction *ins, SymReg *r0)
+add_instruct_reads(Instruction *ins, SymReg *r0)
 {
     int i;
     for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
         if (r0 == ins->r[i])
             return;
     if (i == IMCC_MAX_REGS) {
-        fatal(1, "add_instruc_reads","out of registers with %s\n", r0->name);
+        fatal(1, "add_instruct_reads","out of registers with %s\n", r0->name);
     }
     /* append reg */
     ins->r[i] = r0;
@@ -395,14 +395,14 @@ add_instruc_reads(Instruction *ins, SymReg *r0)
 }
 
 static void
-add_instruc_writes(Instruction *ins, SymReg *r0)
+add_instruct_writes(Instruction *ins, SymReg *r0)
 {
     int i;
     for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
         if (r0 == ins->r[i])
             return;
     if (i == IMCC_MAX_REGS) {
-        fatal(1, "add_instruc_writes","out of registers with %s\n", r0->name);
+        fatal(1, "add_instruct_writes","out of registers with %s\n", r0->name);
     }
     /* append reg */
     ins->r[i] = r0;
@@ -442,12 +442,12 @@ propagate_alias(Parrot_Interp interpreter)
 			break;
 		    else if (instruction_reads(ins, r0) &&
 			   !instruction_reads(ins, r1)) {
-			add_instruc_reads(ins, r1);
+			add_instruct_reads(ins, r1);
                         any = 1;
 		    }
 		    else if (instruction_reads(ins, r1) &&
 			   !instruction_reads(ins, r0)) {
-			add_instruc_reads(ins, r0);
+			add_instruct_reads(ins, r0);
                         any = 1;
 		    }
 		ins = curr;
