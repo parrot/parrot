@@ -16,7 +16,7 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 
 END { unlink "temp.fpmc"; };
@@ -481,4 +481,24 @@ ok 1
 ok 2
 Foo
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw simple class");
+    newclass P10, "Foo"
+    classname S10, P10
+    print S10
+    print "\n"
+    freeze S11, P10
+
+    thaw P4, S11
+    print "ok\n"
+    classname S12, P4
+    print S12
+    print "\n"
+    end
+CODE
+Foo
+ok
+Foo
+OUTPUT
+
 
