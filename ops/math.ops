@@ -1180,29 +1180,33 @@ Greatest Common divisor of $2 and $3.
 
 inline op gcd(out INT, in INT, in INT) {
 
-UINTVAL q = 0;
-UINTVAL c = 0;
-  while ($3 != 0) {
-    q = (UINTVAL)floor( (FLOATVAL)$2/$3 );
-    c = $2 - $3*q;
-    $2 = $3;
-    $3 = c;
+  UINTVAL q = 0;
+  UINTVAL c = 0;
+  INTVAL temp2 = $2;
+  INTVAL temp3 = $3;
+  while (temp3 != 0) {
+    q = (UINTVAL)floor( (FLOATVAL)temp2/temp3 );
+    c = temp2 - temp3*q;
+    temp2 = temp3;
+    temp3 = c;
   }
-  $1 = $2;
+  $1 = temp2;
   goto NEXT();
 }
 
 inline op gcd(out INT, in NUM, in NUM){ 
 
-FLOATVAL q = 0;
-FLOATVAL c = 0;
-  while ($3 != 0) {
-    q = floor( (FLOATVAL)$2/$3 );
-    c = $2 - $3*q;
-    $2 = $3;
-    $3 = c;
+  FLOATVAL q = 0;
+  FLOATVAL c = 0;
+  FLOATVAL temp2 = $2;
+  FLOATVAL temp3 = $3;
+  while (temp3 != 0) {
+    q = floor( (FLOATVAL)temp2/temp3 );
+    c = temp2 - temp3*q;
+    temp2 = temp3;
+    temp3 = c;
   }
-  $1 = (INTVAL)$2;
+  $1 = (INTVAL)temp2;
   goto NEXT();
 }
 
@@ -1212,39 +1216,53 @@ FLOATVAL c = 0;
 
 =item B<lcm>(out NUM, in INT, in INT)
 
-Least Common Multiple 
+Least Common Multiple of $2 and $3 
 
 =cut
 
 inline op lcm(out INT, in INT, in INT) {
   UINTVAL q = 0;
   UINTVAL c = 0;
-  INTVAL saved_var2 = $2;
-  INTVAL saved_var3 = $3;
-  while ($3 != 0) {
-    q = (UINTVAL)floor( (FLOATVAL)$2/$3 );
-    c = $2 - $3*q;
-    $2 = $3;
-    $3 = c;
+  INTVAL temp2 = $2;
+  INTVAL temp3 = $3;
+  INTVAL saved_var2 = temp2;
+  INTVAL saved_var3 = temp3;
+  while (temp3 != 0) {
+    q = (UINTVAL)floor( (FLOATVAL)temp2/temp3 );
+    c = temp2 - temp3*q;
+    temp2 = temp3;
+    temp3 = c;
   }
-  saved_var2 = saved_var2/$2;
-  $1 = saved_var2*saved_var3;
+  if (saved_var2 == 0) {
+    $1 = 0;
+  }
+  else {
+    saved_var2 = saved_var2 / temp2;
+    $1 = saved_var2*saved_var3;
+  }
   goto NEXT();
 }
 
 inline op lcm(out NUM, in INT, in INT) {
   UINTVAL q = 0;
   UINTVAL c = 0;
-  INTVAL saved_var2 = $2;
-  INTVAL saved_var3 = $3;
-  while ($3 != 0) {
-    q = (UINTVAL)floor( (FLOATVAL)$2/$3 );
-    c = $2 - $3*q;
-    $2 = $3;
-    $3 = c;
+  INTVAL temp2 = $2;
+  INTVAL temp3 = $3;
+  INTVAL saved_var2 = temp2;
+  INTVAL saved_var3 = temp3;
+  while (temp3 != 0) {
+    q = (UINTVAL)floor( (FLOATVAL)temp2/temp3 );
+    c = temp2 - temp3*q;
+    temp2 = temp3;
+    temp3 = c;
   }
-  saved_var2 = saved_var2/$2;
-  $1 = (FLOATVAL)saved_var2*saved_var3;
+  if (saved_var2 == 0) {
+    $1 = 0.0;
+  }
+  else {
+    saved_var2 = saved_var2 / temp2;
+    $1 = (FLOATVAL)saved_var2*saved_var3;
+  }
   goto NEXT();
 }
 
