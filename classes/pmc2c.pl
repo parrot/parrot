@@ -394,7 +394,7 @@ sub rewrite_method ($$$$$) {
     s/INTERP/interpreter/g;
 
     # now use macros for all rewritten stuff
-    s/\s(?:\w+)->vtable->(\w+)\(/ VTABLE_$1(/g;
+    s/\b(?:\w+)->vtable->(\w+)\(/ VTABLE_$1(/g;
 
     return $_;
 }

@@ -66,12 +66,12 @@ int main(int argc, char* argv[]) {
     list = list_new(interpreter, enum_type_PMC);
 
     p1 = pmc_new(interpreter, enum_class_PerlString);
-    p1->vtable->set_string_native(interpreter, p1, s);
+    VTABLE_set_string_native(interpreter, p1, s);
 
     list_push(interpreter, list, p1, enum_type_PMC);
 
     p2 = *(PMC**)list_shift(interpreter, list, enum_type_PMC);
-    s = p2->vtable->get_string(interpreter, p2);
+    s = VTABLE_get_string(interpreter, p2);
     printf("string %s", string_to_cstring(interpreter, s));
 
     i = list_length(interpreter, list);
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 
     s = string_make(interpreter, "list\n", 5, 0, 0,0);
     p1 = pmc_new(interpreter, enum_class_PerlString);
-    p1->vtable->set_string_native(interpreter, p1, s);
+    VTABLE_set_string_native(interpreter, p1, s);
     list_assign(interpreter, list, 0, p1, enum_type_PMC);
 
     /* clone */
@@ -87,15 +87,15 @@ int main(int argc, char* argv[]) {
 
     s = string_make(interpreter, "list 2\n", 7, 0, 0,0);
     p1 = pmc_new(interpreter, enum_class_PerlString);
-    p1->vtable->set_string_native(interpreter, p1, s);
+    VTABLE_set_string_native(interpreter, p1, s);
     list_assign(interpreter, list2, 0, p1, enum_type_PMC);
 
     p1 = *(PMC**) list_shift(interpreter, list, enum_type_PMC);
-    s = p1->vtable->get_string(interpreter, p1);
+    s = VTABLE_get_string(interpreter, p1);
     printf("string %s", string_to_cstring(interpreter, s));
 
     p2 = *(PMC**) list_shift(interpreter, list2, enum_type_PMC);
-    s = p2->vtable->get_string(interpreter, p2);
+    s = VTABLE_get_string(interpreter, p2);
     printf("string %s", string_to_cstring(interpreter, s));
 
     list = list_new(interpreter, enum_type_STRING);
@@ -285,22 +285,22 @@ int main(int argc, char* argv[]) {
 
     p = pmc_new(interpreter, enum_class_Array);
 
-    p->vtable->set_integer_native(interpreter, p, 6);
+    VTABLE_set_integer_native(interpreter, p, 6);
     /* set data type */
     key = 0;
-    p->vtable->set_integer_keyed_int(interpreter, p, &key, 2);
+    VTABLE_set_integer_keyed_int(interpreter, p, &key, 2);
     key++;
-    p->vtable->set_integer_keyed_int(interpreter, p, &key, enum_type_sized);
+    VTABLE_set_integer_keyed_int(interpreter, p, &key, enum_type_sized);
     /* set item_size to 100 */
     key++;
-    p->vtable->set_integer_keyed_int(interpreter, p, &key, 3);
+    VTABLE_set_integer_keyed_int(interpreter, p, &key, 3);
     key++;
-    p->vtable->set_integer_keyed_int(interpreter, p, &key, 100);
+    VTABLE_set_integer_keyed_int(interpreter, p, &key, 100);
     /* set item_per_chunk to 3 */
     key++;
-    p->vtable->set_integer_keyed_int(interpreter, p, &key, 4);
+    VTABLE_set_integer_keyed_int(interpreter, p, &key, 4);
     key++;
-    p->vtable->set_integer_keyed_int(interpreter, p, &key, 3);
+    VTABLE_set_integer_keyed_int(interpreter, p, &key, 3);
 
     list = list_new_init(interpreter, enum_type_sized, p);
     printf("ok 1\n");

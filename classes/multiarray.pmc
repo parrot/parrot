@@ -30,8 +30,7 @@ static INTVAL calc_offset(Interp* interp, List*list, PMC *key)
 {
     INTVAL l = 1;
     INTVAL ninj;
-    PMC * dim = list->user_data->vtable->
-	get_pmc_keyed_int(interp, list->user_data, &l);
+    PMC * dim = VTABLE_get_pmc_keyed_int(interp, list->user_data, &l);
 
     l = key_integer(interp, key);
     ninj = 1;

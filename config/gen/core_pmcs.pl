@@ -77,7 +77,7 @@ static void register_pmc(Interp *interp, PMC* registry, int pmc_id)
 {
     PMC* key;
     key = key_new_string(interp, Parrot_base_vtables[pmc_id].name(interp,NULL));
-    registry->vtable->set_integer_keyed(interp, registry, key, pmc_id);
+    VTABLE_set_integer_keyed(interp, registry, key, pmc_id);
 }
 
 extern void Parrot_register_core_pmcs(Interp *interp, PMC* registry);

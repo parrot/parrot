@@ -48,7 +48,7 @@ int do_test(struct Parrot_Interp* interpreter) {
     free(temp);
 
     pmc=pmc_new(interpreter, enum_class_PerlInt);
-    pmc->vtable->set_integer_native(interpreter, pmc, 1);
+    VTABLE_set_integer_native(interpreter, pmc, 1);
     S = Parrot_sprintf_c(interpreter, "== %Pd\n", pmc);
     printf("%d %s", 1, string_to_cstring(interpreter, S));
 
