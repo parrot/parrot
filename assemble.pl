@@ -13,6 +13,10 @@ Syntax is described later on, in the 'Macro' section. The next pass goes through
 and collects the numeric and string constants along with the definition points
 and PCs of labels.
 
+If you would like to view the text after the macro expansion pass, use the C<-E>
+flag. This flag simply tells the assembler to quit after the C<Macro> class
+does it thing. 
+
 The final pass replaces label occurrences with the appropriate PC offset and
 accumulates the (finally completely numeric) bytecode onto the output string.
 The XS portion takes the constants and bytecode, generates a header, tacks the
@@ -927,6 +931,7 @@ sub Usage {
   print <<"  _EOF_";
 usage: $0 [options] file [file...]
 
+    -E              Preprocess input files and terminate processing
     -h,--help       Print this message
     -o,--output     Write file 
     -c,-checksyntax Check syntax only, do not generate bytecode
