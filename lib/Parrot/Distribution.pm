@@ -91,7 +91,8 @@ sub c_source_file_directories
 		$self->directory_with_name('encodings'),
 		$self->directory_with_name('io'),
 		$self->directory_with_name('pf'),
-		$self->directory_with_name('types'),;
+		$self->directory_with_name('types'),
+		$self->directory_with_name('examples')->directory_with_name('c'),;
 }
 
 =item C<c_source_file_with_name($name)>
@@ -113,6 +114,7 @@ sub c_source_file_with_name
 			if $dir->file_exists_with_name($name);
 	}
 	
+	print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
 	return undef;
 }
 

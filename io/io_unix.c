@@ -661,7 +661,6 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 
     sa.sin_port = htons(port);
 
-    fprintf(stderr, "sockaddr_in: port %d\n", port);
     return string_make(interpreter, &sa, sizeof(struct sockaddr),
             "iso-8859-1", 0);
 }
@@ -692,7 +691,6 @@ PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
         io = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
         io->fd = sock;
         io->remote.sin_family = fam;
-        fprintf(stderr, "socket: fd = %d\n", sock);
         return io;
     }
     perror("socket:");
@@ -1163,13 +1161,19 @@ const ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_unix_socket,
     PIO_unix_connect,
     PIO_unix_send,
-    PIO_unix_recv
+    PIO_unix_recv,
+    PIO_unix_bind,
+    PIO_unix_listen,
+    PIO_unix_accept
 #else
     0, /* no poll */
     0, /* no socket */
     0, /* no connect */
     0, /* no send */
-    0 /* no recv */
+    0, /* no recv */
+    0, /* no bind */
+    0, /* no listen */
+    0  /* no accept */
 #endif
 };
 

@@ -576,7 +576,7 @@ PIO_win32_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
     ParrotIO * io;
     if((sock = socket(fam, type, proto)) >= 0) {
         io = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
-        io->fd = (void *) sock;
+        io->fd = (PIOHANDLE) sock;
         io->remote.sin_family = fam;
         return io;
     }
@@ -606,7 +606,7 @@ PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
     }
 
 /*    PIO_eprintf(interpreter, "connect: fd = %d port = %d\n", io->fd, ntohs(io->remote.sin_port));*/
-    if((connect((int)io->fd, (struct sockaddr*)&io->remote,
+    if((connect((SOCKET)io->fd, (struct sockaddr*)&io->remote,
                    sizeof(struct sockaddr))) != 0) {
         PIO_eprintf(interpreter, "PIO_win32_connect: errno = %d\n", WSAGetLastError());
         return -1;
@@ -637,7 +637,7 @@ AGAIN:
     /*
      * Ignore encoding issues for now.
      */
-    if((error = send((int)io->fd, (char *)PObj_bufstart(s) + byteswrote,
+    if((error = send((SOCKET)io->fd, (char *)PObj_bufstart(s) + byteswrote,
                             PObj_buflen(s), 0)) >= 0) {
         byteswrote += error;
         if(byteswrote >= bytes) {
@@ -656,7 +656,7 @@ AGAIN:
 #else
             case EAGAIN:       goto AGAIN;
 #endif
-            case EPIPE:        close((int)io->fd);
+            case EPIPE:        close((SOCKET)io->fd);
                                return -1;
             default:           return -1;
         }
@@ -683,13 +683,13 @@ PIO_win32_recv(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING **s)
     char buf[2048+1];
 
 AGAIN:
-		error = recv((int)io->fd, buf, 2048, 0);
+	error = recv((SOCKET)io->fd, buf, 2048, 0);
 		err = WSAGetLastError();
     if(error > 0) {
         if(error > 0)
             bytesread += error;
         else {
-            close((int)io->fd);
+            close((SOCKET)io->fd);
         }
         *s = string_make(interpreter, buf, bytesread, "iso-8859-1", 0);
         if(!*s) {
@@ -703,12 +703,12 @@ AGAIN:
         switch(err) {
             case WSAEINTR:        goto AGAIN;
             case WSAEWOULDBLOCK:  goto AGAIN;
-            case WSAECONNRESET:   close((int)io->fd);
+            case WSAECONNRESET:   close((SOCKET)io->fd);
 #if PIO_TRACE
             PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
 #endif
                                return -1;
-            default:           close((int)io->fd);
+            default:           close((SOCKET)io->fd);
 #if PIO_TRACE
 		        PIO_eprintf(interpreter, "recv: errno = %d\n", err);
 #endif
@@ -717,7 +717,104 @@ AGAIN:
     }
 }
 
+/*
 
+=item C<static INTVAL
+PIO_win32_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)>
+
+Binds C<*io>'s socket to the local address and port specified by C<*l>.
+
+=cut
+
+*/
+
+static INTVAL
+PIO_win32_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
+{
+    struct sockaddr_in sa;
+    if(!l) return -1;
+
+    memcpy(&sa, PObj_bufstart(l), sizeof(struct sockaddr));
+    io->local.sin_addr.s_addr = sa.sin_addr.s_addr;
+    io->local.sin_port = sa.sin_port;
+    io->local.sin_family = AF_INET;
+
+    if((bind((SOCKET)io->fd, (struct sockaddr *)&io->local, sizeof(struct sockaddr))) == -1)
+    {
+        PIO_eprintf(interpreter, "PIO_win32_bind: errno = %d\n", WSAGetLastError());
+        return -1;
+    }
+
+    return 0;
+}
+
+/*
+
+=item C<static INTVAL
+PIO_win32_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL sec)>
+
+Listen for new connections. This is only applicable to C<STREAM> or
+C<SEQ> sockets.
+
+=cut
+
+*/
+
+static INTVAL
+PIO_win32_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)
+{
+    if((listen((SOCKET)io->fd, backlog)) == -1) {
+        fprintf(stderr, "listen: errno= ret=%d fd = %d port = %d\n",
+             errno, io->fd, ntohs(io->local.sin_port));
+        return -1;
+    }
+    return 0;
+}
+
+/*
+
+=item C<static ParrotIO *
+PIO_win32_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+Accept a new connection and return a newly created C<ParrotIO> socket.
+
+=cut
+
+*/
+
+static ParrotIO *
+PIO_win32_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
+{
+    int newsock;
+    int newsize;
+    int err_code;
+    ParrotIO *newio;
+    newio = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
+    newsize = sizeof (struct sockaddr);
+
+    newsock = accept((SOCKET)io->fd, (struct sockaddr *)&(newio->remote), &newsize);
+    err_code = WSAGetLastError();
+
+    if(err_code != 0)
+    {
+        fprintf(stderr, "accept: errno=%d", err_code);
+        /* Didn't get far enough, free the io */
+        mem_sys_free(newio);
+        return NULL;
+    }
+
+    newio->fd = (PIOHANDLE) newsock;
+
+    /* XXX FIXME: Need to do a getsockname and getpeername here to
+     * fill in the sockaddr_in structs for local and peer
+     */
+
+    /* Optionally do a gethostyaddr() to resolve remote IP address.
+     * This should be based on an option set in the master socket
+     */
+
+    return newio;
+}
 
 #endif
 
@@ -756,12 +853,18 @@ const ParrotIOLayerAPI pio_win32_layer_api = {
     PIO_win32_connect,
     PIO_win32_send,
     PIO_win32_recv,
+    PIO_win32_bind,
+    PIO_win32_listen,
+    PIO_win32_accept
 #else
     0, /* no poll */
     0, /* no socket */
     0, /* no connect */
     0, /* no send */
     0, /* no recv */
+    0, /* no bind */
+    0, /* no listen */
+    0, /* no accept */
 #endif
 };
 

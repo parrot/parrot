@@ -521,6 +521,12 @@ op tell(out INT, out INT, in PMC) :base_io {
 
 =item B<poll>(out INT, in PMC, in INT, in INT, in INT)
 
+=item B<bind>(out INT, in PMC, in STR)
+
+=item B<listen>(out INT, in PMC, in INT)
+
+=item B<accept>(out PMC, in PMC)
+
 =cut
 
 op socket(out PMC, in INT, in INT, in INT) :base_network {
@@ -553,6 +559,21 @@ op send(out INT, in PMC, in STR) :base_network {
 
 op poll(out INT, in PMC, in INT, in INT, in INT) :base_network {
     $1 = (INTVAL)PIO_poll(interpreter, $2, $3, $4, $5);
+    goto NEXT();
+}
+
+op bind(out INT, in PMC, in STR) :base_network {
+    $1 = (INTVAL)PIO_bind(interpreter, $2, $3);
+    goto NEXT();
+}
+
+op listen(out INT, in PMC, in INT) :base_network {
+    $1 = (INTVAL)PIO_listen(interpreter, $2, $3);
+    goto NEXT();
+}
+
+op accept(out PMC, in PMC) :base_network {
+    $1 = PIO_accept(interpreter, $2);
     goto NEXT();
 }
 

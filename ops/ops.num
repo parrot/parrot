@@ -1367,3 +1367,8 @@ new_p_sc                       1336
 pop_pad_p                      1337
 interpinfo_s_i                 1338
 interpinfo_s_ic                1339
+bind_i_p_s                     1340
+bind_i_p_sc                    1341
+listen_i_p_i                   1342
+listen_i_p_ic                  1343
+accept_p_p                     1344

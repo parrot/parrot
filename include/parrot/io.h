@@ -184,6 +184,9 @@ extern PMC *PIO_socket(theINTERP, INTVAL fam, INTVAL type, INTVAL proto);
 extern INTVAL PIO_recv(theINTERP, PMC *pmc, STRING **buf);
 extern INTVAL PIO_send(theINTERP, PMC *pmc, STRING *buf);
 extern INTVAL PIO_connect(theINTERP, PMC *pmc, STRING *address);
+extern INTVAL PIO_bind(theINTERP, PMC *pmc, STRING *address);
+extern INTVAL PIO_listen(theINTERP, PMC *pmc, INTVAL backlog);
+extern PMC *PIO_accept(theINTERP, PMC *pmc);
 
 
 extern INTVAL PIO_putps(theINTERP, PMC *io, STRING *s);

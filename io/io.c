@@ -1391,6 +1391,73 @@ PIO_connect(theINTERP, PMC *pmc, STRING *address)
 /*
 
 =item C<INTVAL
+PIO_bind(theINTERP, PMC *pmc, STRING *address)>
+
+Binds C<*pmc>'s socket to the local address and port specified by C<*address>.
+
+=cut
+
+*/
+
+INTVAL
+PIO_bind(theINTERP, PMC *pmc, STRING *address)
+{
+    ParrotIOLayer *l = PMC_struct_val(pmc);
+    ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
+
+    return PIO_bind_down(interpreter, l, io, address);
+}
+
+/*
+
+=item C<INTVAL
+PIO_listen(theINTERP, PMC *pmc, INTVAL backlog)>
+
+Listen for new connections on socket C<*pmc>.
+
+=cut
+
+*/
+
+INTVAL
+PIO_listen(theINTERP, PMC *pmc, INTVAL backlog)
+{
+    ParrotIOLayer *l = PMC_struct_val(pmc);
+    ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
+
+    return PIO_listen_down(interpreter, l, io, backlog);
+}
+
+/*
+
+=item C<INTVAL
+PIO_accept(theINTERP, PMC *pmc)>
+
+Accept a new connection and return a newly created C<ParrotIO> socket.
+=cut
+
+*/
+
+PMC *
+PIO_accept(theINTERP, PMC *pmc)
+{
+    ParrotIO *io2;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
+    ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return NULL;
+
+    io2 = PIO_accept_down(interpreter, l, io);
+    return new_io_pmc(interpreter, io2);
+}
+
+/*
+
+=item C<INTVAL
 PIO_isatty(theINTERP, PMC *pmc)>
 
 Returns a boolean value indicating whether C<*pmc> is a console/tty.

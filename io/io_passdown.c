@@ -568,6 +568,88 @@ PIO_connect_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
 
 /*
 
+=item C<INTVAL
+PIO_bind_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)>
+
+Looks for the implementation of C<Bind> and calls it if found,
+returning its return value.
+
+Returns C<-1> if no implementation is found.
+
+
+=cut
+
+*/
+
+INTVAL
+PIO_bind_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
+{
+    while (layer) {
+        if (layer->api->Bind) {
+            return layer->api->Bind(interpreter, layer, io, address);
+        }
+        layer = PIO_DOWNLAYER(layer);
+    }
+    return -1;
+}
+
+/*
+
+=item C<INTVAL
+PIO_listen_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)>
+
+Looks for the implementation of C<listen> and calls it if found,
+returning its return value.
+
+Returns C<-1> if no implementation is found.
+
+
+=cut
+
+*/
+
+INTVAL
+PIO_listen_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)
+{
+    while (layer) {
+        if (layer->api->Listen) {
+            return layer->api->Listen(interpreter, layer, io, backlog);
+        }
+        layer = PIO_DOWNLAYER(layer);
+    }
+    return -1;
+}
+
+/*
+
+=item C<ParrotIO *
+PIO_accept_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)Y
+
+
+Looks for the implementation of C<Accept> and calls it if found,
+returning its return value.
+
+Returns C<-1> if no implementation is found.
+
+
+=cut
+
+*/
+
+ParrotIO *
+PIO_accept_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
+{
+    while (layer) {
+        if (layer->api->Accept) {
+            return layer->api->Accept(interpreter, layer, io);
+        }
+        layer = PIO_DOWNLAYER(layer);
+    }
+    return -1;
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

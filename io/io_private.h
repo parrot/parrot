@@ -170,6 +170,9 @@ ParrotIO *PIO_socket_down(theINTERP, ParrotIOLayer *layer, INTVAL fam,
 INTVAL    PIO_recv_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf);
 INTVAL    PIO_send_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *buf);
 INTVAL    PIO_connect_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address);
+INTVAL    PIO_bind_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address);
+INTVAL    PIO_listen_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog);
+ParrotIO *PIO_accept_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 
 /*
  * By default, any layer not implementing an interface (ie. leaving
@@ -227,6 +230,9 @@ struct _ParrotIOLayerAPI {
                             STRING *);
     INTVAL          (*Send)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING *);
     INTVAL          (*Recv)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING **);
+    INTVAL          (*Bind)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING *);
+    INTVAL          (*Listen)(theINTERP, ParrotIOLayer *, ParrotIO *, INTVAL);
+    ParrotIO *      (*Accept)(theINTERP, ParrotIOLayer *, ParrotIO *);
 };
 
 /* these are defined rather than using NULL because strictly-speaking, ANSI C

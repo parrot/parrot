@@ -545,6 +545,7 @@ examples/compilers/Makefile                       [main]doc
 examples/compilers/japhc.c                        [main]doc
 examples/io/echo_client.imc                       [main]doc
 examples/io/http.imc                              [main]doc
+examples/io/httpd.imc                             [main]doc
 examples/io/net_smtp.pasm                         [main]doc
 examples/io/pioctl.pasm                           [main]doc
 examples/io/pipe2.imc                             [main]doc
