@@ -59,8 +59,9 @@ get_free_buffer(Interp *interpreter,
     PObj_bufstart(buffer) = NULL;
     PObj_buflen(buffer) = 0;
 
-    if (pool->object_size > sizeof(PObj))
-        memset(buffer + 1, 0, pool->object_size - sizeof(PObj));
+    if (pool->object_size  - GC_HEADER_SIZE > sizeof(PObj))
+        memset(buffer + 1, 0,
+                pool->object_size - sizeof(PObj) - GC_HEADER_SIZE);
     return buffer;
 }
 

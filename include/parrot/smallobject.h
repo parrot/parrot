@@ -101,7 +101,11 @@ typedef struct _gc_gms_gen {
 /* Tracked resource pool */
 struct Small_Object_Pool {
     struct Small_Object_Arena *last_Arena;
-    size_t object_size;     /* size in bytes of an individual pool item */
+    /* Size in bytes of an individual pool item. This size may include
+     * a GC-system specific GC header.
+     * See the macros below.
+     */
+    size_t object_size;
     size_t objects_per_alloc;
     size_t total_objects;
     size_t num_free_objects;    /* number of resources in the free pool */
@@ -133,6 +137,21 @@ struct Small_Object_Pool {
 
 #endif
 };
+
+/*
+ * macros used in arena scan code to convert from object pointers
+ * to arena pointers ...
+ */
+
+#if PARROT_GC_GMS
+#  define GC_HEADER_SIZE (sizeof(Gc_gms_hdr))
+#  define PObj_to_ARENA(o) PObj_to_GMSH(o)
+#  define ARENA_to_PObj(p) GMSH_to_PObj(p)
+#else
+#  define GC_HEADER_SIZE 0
+#  define PObj_to_ARENA(o) (o)
+#  define ARENA_to_PObj(p) (p)
+#endif
 
 INTVAL contained_in_pool(Interp *,
                          struct Small_Object_Pool *, void *);

@@ -1076,6 +1076,7 @@ id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
     struct Small_Object_Pool *pool;
     ptrdiff_t ptr_diff;
 
+    pmc = (PMC*)PObj_to_ARENA(pmc);
     pool = interpreter->arena_base->pmc_pool;
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;

@@ -254,9 +254,10 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
         for (cur_buffer_arena = header_pool->last_Arena;
                 NULL != cur_buffer_arena;
                 cur_buffer_arena = cur_buffer_arena->prev) {
-            Buffer *b = cur_buffer_arena->start_objects;
+            Buffer *b;
             UINTVAL i;
 
+            b = ARENA_to_PObj(cur_buffer_arena->start_objects);
             for (i = 0; i < cur_buffer_arena->used; i++) {
                 /* ! (immobile | on_free_list | constant | external | sysmem) */
                 if (PObj_buflen(b) && PObj_is_movable_TESTALL(b)) {
