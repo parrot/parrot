@@ -5,7 +5,7 @@ asm=perl ../../assemble.pl
 all: imcc
 
 test:
-	for t in t/compiler/*.t; do perl -I../../lib $$t; done
+	for t in t/*/*.t; do perl -I../../lib $$t; done
 
 imcc:
 	cd ../imcc; $(MAKE)
