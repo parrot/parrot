@@ -104,7 +104,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
             if (first) {
                 if (ins->type & ITLABEL) {
                     expand_pcc_sub_ret(interpreter, ins);
-                    /* ins->type &= ~ITLABEL; */
+                    ins->type &= ~ITLABEL;
                 }
                 else {
                     /* if this is a pcc_sub_call expand it */
@@ -565,7 +565,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i) {
     Life_range *l;
 
     l = r->life_info[bb->index];
-    l->last_ins = bb->end;
+    /* l->last_ins = bb->end; XXX:leo why? */
 
     /* every predecessor of a LF_lv_in block must be in LF_lv_out
        and, unless itself is LV_def, this should be propagated to

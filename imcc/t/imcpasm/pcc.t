@@ -224,11 +224,11 @@ output_like(<<'CODE', <<'OUT', "non prototyped, P");
 .end
 CODE
 /_main:
-  newsub P16, \d+, _sub
+  newsub P(\d+), \d+, _sub
 #pcc_sub_call_\d:
-  set P5, P18
-  set P6, P17
-  set P0, P16
+  set P5, P\d+
+  set P6, P\d+
+  set P0, P\1
   set I0, 0
   set I1, 0
   set I2, 2
@@ -420,3 +420,4 @@ _sub:
   invoke P1
 /
 OUT
+

@@ -727,7 +727,7 @@ optc_savetop(Parrot_Interp interpreter, Instruction *ins)
 {
     char types[] = "ISPN";
     Instruction *tmp;
-    SymReg * regs[IMCC_MAX_REGS];
+    SymReg * regs[IMCC_MAX_REGS], *r;
     char *new_save[] = {
         "pushtopi",
         "pushtops",
@@ -747,7 +747,7 @@ optc_savetop(Parrot_Interp interpreter, Instruction *ins)
     for (i = 0; i < 4; i++)
         needs_save[i] = 0;
     for (i = 0; i < n_symbols; i++) {
-        SymReg * r = reglist[i];
+        r = reglist[i];
         if ((r->type & VTREGISTER) && r->color >= 16) {
             t = strchr(types, r->set) - types;
             needs_save[t] = 1;
@@ -891,9 +891,9 @@ pcc_sub_reads(Instruction* ins, SymReg* r)
     if ( (arg = pcc->cc) )
         if (arg->reg == r)
             return 1;
-    if (r->set == 'I' && r->color <= 4)
+    if (r->set == 'I' && r->color <= 4 && r->color >= 0)
         return 1;
-    if (r->set == 'P' && r->color <= 3)
+    if (r->set == 'P' && r->color <= 3 && r->color >= 0)
         return 1;
     if (ins->type & ITPCCRET)
         return pcc_ret(ins, r);
