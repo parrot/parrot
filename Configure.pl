@@ -632,10 +632,21 @@ sub prompt {
     chomp($input=<STDIN>);
 
     if($input =~ s/^\+//) {
-		$input="$c{$field} $input";
-	}
+        $input="$c{$field} $input";
+    }
+    else {
+        if($input =~ s/:rem\{(.*?)\}//) {
+            $c{$field} =~ s/$_//g for split / /, $1;
+        }
 
-	$c{$field}=$input||$c{$field};
+        if($input =~ s/:add\{(.*?)\}//) {
+            $input="$c{$field} $1 $input";
+        }
+    }
+
+    $c{$field}=$input||$c{$field};
+
+    print "$field=$c{$field}\n";
 }
 
 
