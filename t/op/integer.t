@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 37;
 
 output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	# XXX: Need a test for writing outside the set of available
@@ -428,46 +428,6 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "eq i, i|ic (pop label from stack)");
-	set	I0, 12
-	set	I1, 12
-
-	print	"the word\\n"
-	bsr	BR1
-	print	"done 1\\n"
-	bsr	BR2
-	print	"done 2\\n"
-	bsr	BR3
-	print	"done 3\\n"
-        bsr     BR4
-        print   "Shouldn't get here \\n"
-
-	end
-
-BR1:	eq	12, I0
-	print	"not equal, or did not jump "
-	ret
-
-BR2:	eq	10, 10
-	print	"not equal, or did not jump 2 "
-	ret
-
-BR3:	eq	I0, I1
-	print	"not equal, equal int regs "
-	ret
-
-BR4:    eq      12, 13
-        print   "done 4\\n"
-        end
-
-CODE
-the word
-done 1
-done 2
-done 3
-done 4
-OUTPUT
-
 output_is(<<CODE, <<OUTPUT, "ne_i_ic");
 	set	I0, 0xa0b0c0d
 	set	I1, 0xa0b0c0d
@@ -518,47 +478,6 @@ ERROR:
 CODE
 ok 1
 ok 2
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "ne ic, i (pop label off stack)");
-
-	set	I0, 12
-	set	I1, 10
-
-	print	"start\\n"
-	bsr	BR1
-	print	"done 1\\n"
-	bsr	BR2
-	print	"done 2\\n"
-	bsr	BR3
-	print	"done 3\\n"
-        bsr     BR4
-        print   "Shouldn't get here\\n"
-
-	end
-
-BR1:	ne	I0, 10
-	print	"bad "
-	ret
-
-BR2:	ne	10, 12
-	print	"10 is 12! "
-	ret
-
-BR3:	ne	I0, I1
-	print	"10 is 12, even when in I reg "
-	ret
-
-BR4:    ne      12, 12
-        print   "done 4\\n"
-        end
-
-CODE
-start
-done 1
-done 2
-done 3
-done 4
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "lt_i_ic");

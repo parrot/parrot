@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 97;
+use Parrot::Test tests => 96;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -662,42 +662,6 @@ ERROR:
     end
 CODE
 ok
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "eq_s|sc_s|sc");
-
-	set	S0, "Spartacus"
-	bsr	TEST1
-	print	"ok 1\\n"
-	bsr	TEST2
-	print	"ok 2\\n"
-	bsr TEST3
-	print "ok 3\\n"
-	bsr TEST4
-	print "ok 4\\n"
-	end
-
-TEST1:	eq	"Spartacus", S0
-	print	"not "
-	ret
-
-TEST2: eq S0, "Spartacus"
- print "not "
- ret
-
-TEST3: eq S0, S0
- print "not "
- ret
-
-TEST4: eq "Spartacus", "Spartacus"
-	print	"not "
-	ret
-
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "lt_s_s_ic");

@@ -822,14 +822,6 @@ met, the branch happens, otherwise control falls to the next operation.
 
 ########################################
 
-=item B<eq>(in INT, in INT)
-
-=item B<eq>(in NUM, in NUM)
-
-=item B<eq>(in STR, in STR)
-
-=item B<eq>(in PMC, in PMC)
-
 =item B<eq>(in INT, in INT, inconst INT)
 
 =item B<eq>(in NUM, in NUM, inconst INT)
@@ -840,37 +832,7 @@ met, the branch happens, otherwise control falls to the next operation.
 
 Branch if $1 is equal to $2.
 
-Return address is popped off the call stack if no address is supplied.
-
 =cut
-
-inline op eq (in INT, in INT) {
-  if ($1 == $2) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-inline op eq (in NUM, in NUM) {
-  if ($1 == $2) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-op eq (in STR, in STR) {
-  if (string_compare (interpreter, $1, $2) == 0) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-op eq (in PMC, in PMC) {
-  if ($1->vtable->is_equal(interpreter, $1, $2)) {
-    goto POP();
-  }
-  goto NEXT();
-}
 
 inline op eq(in INT, in INT, inconst INT) {
   if ($1 == $2) {
@@ -902,14 +864,6 @@ op eq (in PMC, in PMC, inconst INT) {
 
 ########################################
 
-=item B<ne>(in INT, in INT)
-
-=item B<ne>(in NUM, in NUM)
-
-=item B<ne>(in STR, in STR)
-
-=item B<ne>(in PMC, in PMC)
-
 =item B<ne>(in INT, in INT, inconst INT)
 
 =item B<ne>(in NUM, in NUM, inconst INT)
@@ -920,37 +874,7 @@ op eq (in PMC, in PMC, inconst INT) {
 
 Branch if $1 is not equal to $2.
 
-Return address is popped off the call stack if no address is supplied.
-
 =cut
-
-inline op ne (in INT, in INT) {
-  if ($1 != $2) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-inline op ne (in NUM, in NUM) {
-  if ($1 != $2) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-op ne (in STR, in STR) {
-  if (string_compare (interpreter, $1, $2) != 0) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-op ne (in PMC, in PMC) {
-  if (! $1->vtable->is_equal(interpreter, $1, $2)) {
-    goto POP();
-  }
-  goto NEXT();
-}
 
 inline op ne(in INT, in INT, inconst INT) {
   if ($1 != $2) {
