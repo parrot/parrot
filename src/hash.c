@@ -329,19 +329,6 @@ new_bucket(Interp *interpreter, Hash *hash, STRING *key, void *value)
 {
     BucketIndex bucket_index;
 
-#if 0
-    /* key is verified in the vtable, value is an auto variable */
-    if (key == NULL) {
-        internal_exception(INTERNAL_PANIC, "NULL key\n");
-        return NULLBucketIndex;
-    }
-
-    if (value == NULL) {
-        internal_exception(INTERNAL_PANIC, "NULL value\n");
-        return NULLBucketIndex;
-    }
-#endif
-
     bucket_index = hash->free_list;
     if (bucket_index != NULLBucketIndex) {
         HashBucket *bucket = getBucket(hash, bucket_index);
@@ -362,8 +349,7 @@ find_bucket(Interp *interpreter, Hash *hash, BucketIndex head, void *key)
 {
     BucketIndex next;
 
-    if (head != NULLBucketIndex && key == NULL)
-        PANIC("find_bucket given a null key");
+    assert(head == NULLBucketIndex || key);
 
     while (head != NULLBucketIndex) {
         HashBucket *bucket = getBucket(hash, head);
@@ -581,8 +567,6 @@ hash_delete(Interp *interpreter, Hash *hash, void *key)
         }
         prev = bucket;
     }
-
-    PANIC("hash_delete given nonexistent key");
 }
 
 Hash *

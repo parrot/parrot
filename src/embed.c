@@ -349,6 +349,27 @@ op_name(Parrot_Interp interpreter, int k)
     return interpreter->op_info_table[k - PARROT_PROF_EXTRA].full_name;
 }
 
+/*
+ * with this calibration reported times of parrot -p
+ * match almost these measured with time parrot -b
+ */
+
+static FLOATVAL
+calibrate(Parrot_Interp interpreter)
+{
+    int i;
+    FLOATVAL start, empty;
+    opcode_t code[] = {1};      /* noop */
+    opcode_t *pc;
+
+    for (empty = 0.0, i = 0; i < 1000000; ++i) {
+       start = Parrot_floatval_time();
+       pc =  (interpreter->op_func_table[*code])(code,interpreter);
+       empty += Parrot_floatval_time() - start;
+    }
+    return empty;
+}
+
 static void
 print_profile(int status, void *p)
 {
@@ -360,43 +381,49 @@ print_profile(int status, void *p)
         UINTVAL op_count = 0;
         UINTVAL call_count = 0;
         FLOATVAL sum_time = 0.0;
+        RunProfile *profile = interpreter->profile;
+        FLOATVAL empty = calibrate(interpreter);
 
-        PIO_printf(interpreter, "\n\n");
+        PIO_printf(interpreter, "\n");
         PIO_printf(interpreter, "                   OPERATION PROFILE                 \n\n");
-        PIO_printf(interpreter, "  CODE   OP FULL NAME            CALLS  TOTAL TIME    AVG TIME\n");
-        PIO_printf(interpreter, "  -----  -----------------     -------  ----------  ----------\n");
+        PIO_printf(interpreter, " CODE  OP FULL NAME            CALLS  TOTAL TIME   AVG T. ms\n");
+        PIO_printf(interpreter, " ----  -----------------     -------  ----------  ----------\n");
 
-        for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++)
-            interpreter->profile->data[j].op = j;
-        qsort(interpreter->profile->data, interpreter->op_count +
+        for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
+            UINTVAL n = profile->data[j].numcalls;
+            profile->data[j].op = j;
+            if (j >= PARROT_PROF_EXTRA)
+                profile->data[j].time -= (empty * n / 1000000);
+        }
+        qsort(profile->data, interpreter->op_count +
                 PARROT_PROF_EXTRA,
                 sizeof(ProfData), prof_sort_f);
         for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
-            UINTVAL n = interpreter->profile->data[j].numcalls;
-            FLOATVAL t = interpreter->profile->data[j].time;
+            UINTVAL n = profile->data[j].numcalls;
+            FLOATVAL t = profile->data[j].time;
             if (n > 0) {
                 op_count++;
                 call_count += n;
                 sum_time += t;
 
-                k = interpreter->profile->data[j].op;
-                PIO_printf(interpreter, "  %5d  %-20s  %7vu  %10vf  %10vf\n",
+                k = profile->data[j].op;
+                PIO_printf(interpreter, " %4d  %-20s  %7vu  %10vf  %10.4vf\n",
                         k - PARROT_PROF_EXTRA,
                         op_name(interpreter, k),
                         n,
                         t,
-                        (FLOATVAL)(t / n)
+                        (FLOATVAL)(t * 1000.0 / n)
                         );
             }
         }
 
-        PIO_printf(interpreter, "  -----  -----------------     -------  ----------  ----------\n");
-        PIO_printf(interpreter, "  %5vu  %-20s  %7vu  %10vf  %10vf\n",
+        PIO_printf(interpreter, " ----  -----------------     -------  ----------  ----------\n");
+        PIO_printf(interpreter, " %4vu  %-20s  %7vu  %10vf  %10.4vf\n",
                 op_count,
                 "",
                 call_count,
                 sum_time,
-                (FLOATVAL)(sum_time / (FLOATVAL)call_count)
+                (FLOATVAL)(sum_time * 1000.0 / (FLOATVAL)call_count)
                 );
     }
 }
