@@ -211,8 +211,8 @@ test_main$(O): test_main.c $(H_FILES)
 Parrot/Jit.pm: Parrot/Jit/${jitarchname}.pm
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|Parrot/Jit/${jitarchname}.pm|, q|Parrot/Jit.pm|${PQ}
 
-Parrot/OpLib/core.pm: core.ops ops2pm.pl Parrot/OpsFile.pm Parrot/Op.pm
-	$(PERL) ops2pm.pl core.ops vtable.ops
+Parrot/OpLib/core.pm: $(OPS_FILES) ops2pm.pl Parrot/OpsFile.pm Parrot/Op.pm
+	$(PERL) ops2pm.pl $(OPS_FILES)
 
 Parrot/PMC.pm: include/parrot/pmc.h pmc_pm.pl
 	$(PERL) pmc_pm.pl 

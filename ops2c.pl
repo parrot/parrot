@@ -112,7 +112,7 @@ print SOURCE <<END_C;
 
 END_C
 
-print SOURCE $ops->preamble;
+print SOURCE $ops->preamble($trans);
 
 
 #

@@ -54,6 +54,8 @@ sub new
 
   $self->{FILE}=~s/, $//;
 
+  $self->{FILE}=~s/, $//;
+
   return $self;
 }
 
@@ -331,9 +333,25 @@ sub op
 
 sub preamble
 {
-  my $self = shift;
+  my($self, $trans) = @_;
 
-  return $self->{PREAMBLE};
+  local $_=$self->{PREAMBLE};
+
+  if($trans) {
+    s/goto\s+OFFSET\((.*)\)/{{+=$1}}/mg;
+    #s/goto\s+NEXT\(\)/{{+=$op_size}}/mg;	#not supported--dependent on op size
+    s/goto\s+ADDRESS\((.*)\)/{{=$1}}/mg;
+    s/goto\s+POP\(\)/{{=*}}/mg;
+    s/HALT\(\)/{{=0}}/mg;
+
+    #borrowed from Parrot::Op
+    s/{{=\*}}/      $trans->goto_pop();       /mge;
+    s/{{=(.*?)}}/   $trans->goto_address($1); /mge;
+    s/{{\+=(.*?)}}/ $trans->goto_offset($1);  /mge;
+    s/{{-=(.*?)}}/  $trans->goto_offset(-$1); /mge;
+  }
+
+  return $_;
 }
 
 
