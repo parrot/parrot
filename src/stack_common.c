@@ -84,7 +84,18 @@ Get a new chunk either from the freelist or allocate one.
 Stack_Chunk_t *
 cst_new_stack_chunk(Parrot_Interp interpreter, Stack_Chunk_t *chunk)
 {
-    Stack_Chunk_t *new_chunk = new_bufferlike_header(interpreter, chunk->size);
+    Stack_Chunk_t *new_chunk;
+    struct Small_Object_Pool *pool;
+
+    /*
+     * get buffer directly from pool, we don't need zeroed
+     * memory
+     */
+    pool = get_bufferlike_pool(interpreter, chunk->size);
+    new_chunk = pool->get_free_object(interpreter, pool);
+    PObj_bufstart(new_chunk) = NULL;
+    PObj_buflen  (new_chunk) = 0;
+
     new_chunk->size = chunk->size;
     new_chunk->name = chunk->name;
     return new_chunk;
