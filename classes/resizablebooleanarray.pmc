@@ -21,6 +21,12 @@ it uses Boolean PMCs for all of the conversions
 
 #include "parrot/parrot.h"
 
+typedef struct _SizeBooleanData {
+    INTVAL size;
+    INTVAL data[1];
+} SizeBooleanData;
+#define NEEDED_SIZE(n) ((n-1)*sizeof(INTVAL) + sizeof(SizeBooleanData))
+
 pmclass ResizableBooleanArray extends FixedBooleanArray need_ext does array {
     
 /*
@@ -34,37 +40,15 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int (INTVAL key) {
-        INTVAL *data;
+        SizeBooleanData *sd;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS, 
                 "ResizableBooleanArray: index out of bounds!\n");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         
-        data = (INTVAL *)PMC_data(SELF);
-        return data[key];
-    }
-
-
-/*
-
-=item C<void set_integer_native(INTVAL size)>
-
-Resizes the array to C<size> elements.
-
-=cut
-
-*/
-
-    void set_integer_native (INTVAL size) {
-
-        if (size < 0)
-            internal_exception(OUT_OF_BOUNDS, 
-                    "ResizableBooleanArray: Can't resize!\n");
-
-        PMC_int_val(SELF) = size;
-        PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF), size*sizeof(INTVAL));
-        PObj_active_destroy_SET(SELF);
+        sd = (SizeBooleanData *)PMC_data(SELF);
+        return sd->data[key];
     }
 
 /*
@@ -78,15 +62,72 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        INTVAL *data;
+        SizeBooleanData *sd;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS, 
                 "ResizableBooleanArray: index out of bounds!\n");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
-        data = (INTVAL*)PMC_data(SELF);
-        data[key] = (value != 0);
+        sd = (SizeBooleanData *)PMC_data(SELF);
+        sd->data[key] = (value != 0);
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL size)>
+
+Resizes the array to C<size> elements.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL size) {
+        SizeBooleanData *sd;
+        if (size < 0)
+            internal_exception(OUT_OF_BOUNDS, 
+                    "ResizableBooleanArray: Can't resize!\n");
+
+        sd = PMC_data(SELF);
+        PMC_int_val(SELF) = size;
+        if(sd == NULL) {
+            sd = mem_sys_allocate(NEEDED_SIZE(size));
+            sd->size = size;
+        } else if(size >= sd->size) {
+            sd->size = size < 2*sd->size ? sd->size*2 : size;
+            sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
+        } else {
+            return;
+        }
+
+        PMC_data(SELF) = sd;
+        PObj_active_destroy_SET(SELF);
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a copy of the array.
+
+=cut
+
+*/
+
+    PMC* clone () {
+        SizeBooleanData *sd;
+        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+    
+        if (!PMC_data(SELF))
+            return dest;
+        PMC_int_val(dest) = PMC_int_val(SELF);
+        sd = PMC_data(SELF);
+        
+        PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
+        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
+        PObj_active_destroy_SET(dest);
+        return dest;
     }
 
 }
@@ -102,6 +143,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>.
 =head1 HISTORY
 
 Initial version 2004.06.11 by Matt Fowles
+Changed allocator to double size - MF 2004.06.15
 
 =cut
 

@@ -22,8 +22,13 @@ TODO currently this uses PerlString instead of String PMCs.
 
 #include "parrot/parrot.h"
 
+typedef struct _SizePMCData {
+    INTVAL size;
+    PMC* data[1];
+} SizePMCData;
+#define NEEDED_SIZE(n) ((n-1)*sizeof(PMC*) + sizeof(SizePMCData))
+
 pmclass ResizablePMCArray extends FixedPMCArray need_ext does array {
-    
 
 /*
 
@@ -36,18 +41,39 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC* get_pmc_keyed_int (INTVAL key) {
-        PMC **data;
-        PMC *res;
+        SizePMCData *sd;
         if (key < 0) 
             internal_exception(OUT_OF_BOUNDS, 
                 "ResizablePMCArray: index out of bounds!\n");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         
-        data = (PMC **)PMC_data(SELF);
-        if(data[key] == PMCNULL)
-            data[key] = pmc_new(INTERP, enum_class_Undef);
-        return data[key];
+        sd = (SizePMCData *)PMC_data(SELF);
+        if(sd->data[key] == PMCNULL)
+            sd->data[key] = pmc_new(INTERP, enum_class_Undef);
+        return sd->data[key];
+    }
+
+/*
+
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *src)>
+
+Sets the PMC value of the element at index C<key> to C<*src>.
+
+=cut
+
+*/
+
+    void set_pmc_keyed_int (INTVAL key, PMC* src) {
+        SizePMCData *sd;
+        if (key < 0) 
+            internal_exception(OUT_OF_BOUNDS, 
+                "ResizablePMCArray: index out of bounds!\n");
+        if(key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+
+        sd = (SizePMCData *)PMC_data(SELF);
+        sd->data[key] = src;
     }
 
 
@@ -63,41 +89,55 @@ Resizes the array to C<size> elements.
 
     void set_integer_native (INTVAL size) {
         int i;
-        PMC **data;
+        SizePMCData *sd;
         
         if (size < 0)
-            internal_exception(OUT_OF_BOUNDS, "ResizablePMCArray: Can't resize!\n");
+            internal_exception(OUT_OF_BOUNDS, 
+                    "ResizablePMCArray: Can't resize!\n");
         
-        data = (PMC**)mem_sys_realloc(PMC_data(SELF), size*sizeof(PMC*));
-        for(i = PMC_int_val(SELF); i < size; i++)
-            data[i] = PMCNULL;
-
+        sd = (SizePMCData *)PMC_data(SELF);
         PMC_int_val(SELF) = size;
-        PMC_data(SELF) = data;
+        if(sd == NULL) {
+            i = 0;
+            sd = mem_sys_allocate(NEEDED_SIZE(size));
+            sd->size = size;
+        } else if(size >= sd->size) {
+            i = sd->size;
+            sd->size =  size < 2*sd->size ? sd->size*2 : size;
+            sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
+        } else {
+            return;
+        }
+        for(; i < sd->size; i++)
+            sd->data[i] = PMCNULL;
+
+        PMC_data(SELF) = sd;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-
 /*
 
-=item C<void set_pmc_keyed_int(INTVAL key, PMC *src)>
+=item C<PMC *clone()>
 
-Sets the PMC value of the element at index C<key> to C<*src>.
+Creates and returns a copy of the array.
 
 =cut
 
 */
 
-    void set_pmc_keyed_int (INTVAL key, PMC* src) {
-        PMC **data;
-        if (key < 0) 
-            internal_exception(OUT_OF_BOUNDS, 
-                "ResizablePMCArray: index out of bounds!\n");
-        if(key >= PMC_int_val(SELF))
-            DYNSELF.set_integer_native(key+1);
-
-        data = (PMC**)PMC_data(SELF);
-        data[key] = src;
+    PMC* clone () {
+        SizePMCData *sd;
+        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+    
+        if (!PMC_data(SELF))
+            return dest;
+        PMC_int_val(dest) = PMC_int_val(SELF);
+        sd = (SizePMCData *)PMC_data(SELF);
+        
+        PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
+        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
+        PObj_custom_mark_destroy_SETALL(SELF);
+        return dest;
     }
 
 }
@@ -113,6 +153,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>.
 =head1 HISTORY
 
 Initial version 2004.06.11 by Matt Fowles
+Changed allocator to double size - MF 2004.06.15
 
 =cut
 

@@ -21,6 +21,12 @@ TODO: it uses PerlString's internally to perform conversion, but it should use S
 
 #include "parrot/parrot.h"
 
+typedef struct _SizeStringData {
+    INTVAL size;
+    STRING* data[1];
+} SizeStringData;
+#define NEEDED_SIZE(n) ((n-1)*sizeof(STRING*) + sizeof(SizeStringData))
+
 pmclass ResizableStringArray extends FixedStringArray need_ext does array {
     
 /*
@@ -34,15 +40,37 @@ Returns the Parrot string value of the element at index C<key>.
 */
 
     STRING* get_string_keyed_int (INTVAL key) {
-        STRING **data;
+        SizeStringData *sd;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS, 
                 "ResizableStringArray: index out of bounds!\n");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         
-        data = (STRING **)PMC_data(SELF);
-        return data[key];
+        sd = (SizeStringData *)PMC_data(SELF);
+        return sd->data[key];
+    }
+
+/*
+
+=item C<void set_string_keyed_int(INTVAL key, STRING *value)>
+
+Sets the Parrot string value of the element at index C<key> to C<value>.
+
+=cut
+
+*/
+
+    void set_string_keyed_int (INTVAL key, STRING* value) {
+        SizeStringData *sd;
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS, 
+                "ResizableStringArray: index out of bounds!\n");
+        if(key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+
+        sd = (SizeStringData *)PMC_data(SELF);
+        sd->data[key] = value;
     }
 
 /*
@@ -57,41 +85,55 @@ Resizes the array to C<size> elements.
 
     void set_integer_native (INTVAL size) {
         int i;
-        STRING **data;
+        SizeStringData *sd;
+
         if (size < 0)
             internal_exception(OUT_OF_BOUNDS, 
                     "ResizableStringArray: Can't resize!\n");
 
-        data = mem_sys_realloc(PMC_data(SELF), size*sizeof(STRING*));
-        for(i = PMC_int_val(SELF); i < size; i++) 
-            data[i] = NULL;
-
+        sd = (SizeStringData *)PMC_data(SELF);
         PMC_int_val(SELF) = size;
-        PMC_data(SELF) = data;
+        if(sd == NULL) {
+            i = 0;
+            sd = mem_sys_allocate(NEEDED_SIZE(size));
+            sd->size = size;
+        } else if(size >= sd->size) {
+            i = sd->size;
+            sd->size =  size < 2*sd->size ? sd->size*2 : size;
+            sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
+        } else {
+            return;
+        }
+        for(; i < sd->size; i++)
+            sd->data[i] = NULL;
+
+        PMC_data(SELF) = sd;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
-
     
 /*
 
-=item C<void set_string_keyed_int(INTVAL key, STRING *value)>
+=item C<PMC *clone()>
 
-Sets the Parrot string value of the element at index C<key> to C<value>.
+Creates and returns a copy of the array.
 
 =cut
 
 */
 
-    void set_string_keyed_int (INTVAL key, STRING* value) {
-        STRING **data;
-        if (key < 0)
-            internal_exception(OUT_OF_BOUNDS, 
-                "ResizableStringArray: index out of bounds!\n");
-        if(key >= PMC_int_val(SELF))
-            DYNSELF.set_integer_native(key+1);
-
-        data = (STRING**)PMC_data(SELF);
-        data[key] = value;
+    PMC* clone () {
+        SizeStringData *sd;
+        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+    
+        if (!PMC_data(SELF))
+            return dest;
+        PMC_int_val(dest) = PMC_int_val(SELF);
+        sd = (SizeStringData *)PMC_data(SELF);
+        
+        PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
+        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
+        PObj_custom_mark_destroy_SETALL(SELF);
+        return dest;
     }
 
 }
@@ -107,6 +149,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>.
 =head1 HISTORY
 
 Initial version 2004.06.11 by Matt Fowles
+Changed allocator to double size - MF 2004.06.15
 
 =cut
 

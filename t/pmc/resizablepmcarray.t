@@ -225,6 +225,7 @@ OUTPUT
 output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
 @{[ $fp_equality_macro ]}
      new P0, .ResizablePMCArray
+     set P0, 1
 
      set P0[25], 125
      set P0[128], 10.2
