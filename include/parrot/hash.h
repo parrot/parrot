@@ -64,6 +64,7 @@ struct _hash {
     UINTVAL entries;            /* Number of values stored in hashtable */
     Buffer *bucket_pool;        /* Buffer full of buckets, used and unused */
     BucketIndex free_list;
+    PMC *container;             /* e.g. the PerlHash PMC */
     PARROT_DATA_TYPES entry_type;   /* type of value */
     size_t value_size;          /* currently unused, if set this size
                                    at value is copied as a hash_entry */
@@ -76,7 +77,10 @@ struct _hash {
 };
 
 void new_hash(Interp * interpreter, Hash **hptr);
+void new_pmc_hash(Interp * interpreter, PMC *container);
 void new_hash_x(Interp *, Hash**, PARROT_DATA_TYPES, size_t val_size,
+        Hash_key_type, hash_comp_fn, hash_hash_key_fn, hash_mark_key_fn);
+void new_pmc_hash_x(Interp *, PMC*, PARROT_DATA_TYPES, size_t val_size,
         Hash_key_type, hash_comp_fn, hash_hash_key_fn, hash_mark_key_fn);
 void new_cstring_hash(Interp *interpreter, Hash **);
 void hash_clone(Interp * interpreter, Hash * src, Hash **dest);

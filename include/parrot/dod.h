@@ -86,7 +86,7 @@ void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
 #if PARROT_GC_IMS
 #  define DOD_WRITE_BARRIER(interp, agg, old, new) \
     do { \
-        if ( \
+        if (    !PMC_IS_NULL(new)   && \
                 PObj_live_TEST(agg) && \
                 (PObj_get_FLAGS(agg) & PObj_custom_GC_FLAG) && \
                 !PObj_live_TEST(new)) { \

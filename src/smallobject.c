@@ -183,7 +183,10 @@ gc_ms_get_free_object(Interp *interpreter,
         (*pool->more_objects) (interpreter, pool);
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
+    PObj_flags_SETTO( (PObj*) ptr, 0);
+#if ARENA_DOD_FLAGS
     PObj_on_free_list_CLEAR((PObj*) ptr);
+#endif
     --pool->num_free_objects;
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter))
@@ -207,6 +210,7 @@ get_free_object_df(Interp *interpreter,
     --pool->num_free_objects;
     *((Dead_PObj*)ptr)->arena_dod_flag_ptr &=
         ~ (PObj_on_free_list_FLAG << ((Dead_PObj*)ptr)->flag_shift);
+    PObj_flags_SETTO( (PObj*) ptr, 0);
     return ptr;
 }
 

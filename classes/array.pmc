@@ -135,14 +135,14 @@ Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
     PMC *value;
 
     if (ret == 0)
-    internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
+        internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
     /* assign into a sparse or not yet set value */
     if (ret == (void*) -1 || *(PMC**)ret == 0) {
-    value = undef(interp);
-    list_assign(interp, list, key, value, enum_type_PMC);
+        value = undef(interp);
+        list_assign(interp, list, key, value, enum_type_PMC);
     }
     else
-    value = *(PMC**) ret;
+        value = *(PMC**) ret;
     return value;
 }
 

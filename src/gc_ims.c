@@ -436,22 +436,28 @@ static void *
 gc_ims_get_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
-    void *ptr;
+    PObj *ptr;
+    struct Arenas *arena_base;
     Gc_ims_private *g_ims;
 
+    arena_base = interpreter->arena_base;
     /* if we don't have any objects */
     if (!pool->free_list)
         (*pool->alloc_objects) (interpreter, pool);
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
-    PObj_on_free_list_CLEAR((PObj*) ptr);
-    PObj_get_FLAGS((PObj*)ptr) &= ~PObj_custom_GC_FLAG;
+    /*
+     * buffers are born black, PMCs not yet?
+     * XXX this does not solve the problem of storing keys in hashes
+     *     in the next DOD cycle (if the key isn't marked elsewhere ?)
+     */
+    PObj_flags_SETTO(ptr, pool == arena_base->pmc_pool ? 0 : PObj_live_FLAG);
     --pool->num_free_objects;
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter))
-        PObj_version((Buffer*)ptr) = interpreter->arena_base->dod_runs;
+        PObj_version((Buffer*)ptr) = arena_base->dod_runs;
 #endif
-    g_ims = interpreter->arena_base->gc_private;
+    g_ims = arena_base->gc_private;
     if (++g_ims->allocations >= g_ims->alloc_trigger)
         parrot_gc_ims_run_increment(interpreter);
     return ptr;
@@ -683,6 +689,8 @@ parrot_gc_ims_run_increment(Interp* interpreter)
     Gc_ims_private *g_ims;
     struct Arenas *arena_base = interpreter->arena_base;
 
+    if (Parrot_is_blocked_DOD(interpreter))
+        return;
     g_ims = arena_base->gc_private;
     g_ims->allocations = 0;
     ++g_ims->increments;
@@ -695,9 +703,7 @@ parrot_gc_ims_run_increment(Interp* interpreter)
             g_ims->throttle = THROTTLE;
             break;
         case GC_IMS_STARTING:
-            if (Parrot_is_blocked_DOD(interpreter))
-                break;
-            /* else fall through and start */
+            /*  fall through and start */
         case GC_IMS_RE_INIT:
             parrot_gc_ims_reinit(interpreter);
             break;
@@ -839,8 +845,9 @@ void
 Parrot_dod_ims_wb(Interp* interpreter, PMC *agg, PMC *new)
 {
 #if DOD_IMS_GREY_NEW
-    IMS_DEBUG((stderr, "%d ", ((Gc_ims_private *)interpreter->arena_base->
-                gc_private)->state));
+    IMS_DEBUG((stderr, "%d agg %p mark %p\n",
+                ((Gc_ims_private *)interpreter->arena_base->
+                gc_private)->state, agg, new));
     pobject_lives(interpreter, (PObj*)new);
 #else
     PObj_get_FLAGS(agg) &= ~ (PObj_live_FLAG|PObj_custom_GC_FLAG);

@@ -547,6 +547,10 @@ new_hash(Interp *interpreter, Hash **hptr)>
 
 Returns a new Parrot string hash in C<hptr>.
 
+new_pmc_hash(Interp *interpreter, PMC *container)>
+
+Create a new Parrot string hash in PMC_struct_val(container)
+
 =cut
 
 */
@@ -563,6 +567,17 @@ new_hash(Interp *interpreter, Hash **hptr)
             pobject_lives);     /*        mark */
 }
 
+void
+new_pmc_hash(Interp *interpreter, PMC *container)
+{
+    new_pmc_hash_x(interpreter, container,
+            enum_type_PMC,
+            0,
+            Hash_key_type_ascii,
+            STRING_compare,     /* STRING compare */
+            key_hash_STRING,    /*        hash */
+            pobject_lives);     /*        mark */
+}
 /*
 
 =item C<void
@@ -607,19 +622,28 @@ C<**hptr> up to PerlHash's init function, the newly constructed PMC is
 on the stack I<including> this newly constructed Hash, so that it gets
 marked properly.
 
+=item C<void
+new_pmc_hash_x(Interp *interpreter, PMC *container,
+        PARROT_DATA_TYPES val_type, size_t val_size,
+        Hash_key_type hkey_type,
+        hash_comp_fn compare, hash_hash_key_fn keyhash,
+        hash_mark_key_fn mark)>
+
+Like above but w/o the decribed problems. The passed in C<container> PMC gets
+stored in the Hash end the newly created Hash is in PMC_struct_val(container).
+
 =cut
 
 */
 
-void
-new_hash_x(Interp *interpreter, Hash **hptr,
+static void
+init_hash(Interp *interpreter, Hash *hash,
         PARROT_DATA_TYPES val_type, size_t val_size,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash,
         hash_mark_key_fn mark)
 {
-    Hash *hash = (Hash *)new_bufferlike_header(interpreter, sizeof(*hash));
-    *hptr = hash;
+
     hash->compare = compare;
     hash->hash_val = keyhash;
     hash->mark_key = mark;
@@ -648,6 +672,33 @@ new_hash_x(Interp *interpreter, Hash **hptr,
     /*      PObj_report_SET(hash->bucket_pool); */
     hash->free_list = NULLBucketIndex;
     expand_hash(interpreter, hash);
+}
+
+void
+new_hash_x(Interp *interpreter, Hash **hptr,
+        PARROT_DATA_TYPES val_type, size_t val_size,
+        Hash_key_type hkey_type,
+        hash_comp_fn compare, hash_hash_key_fn keyhash,
+        hash_mark_key_fn mark)
+{
+    Hash *hash = (Hash *)new_bufferlike_header(interpreter, sizeof(*hash));
+    *hptr = hash;
+    init_hash(interpreter, hash, val_type, val_size, hkey_type,
+            compare, keyhash, mark);
+}
+
+void
+new_pmc_hash_x(Interp *interpreter, PMC *container,
+        PARROT_DATA_TYPES val_type, size_t val_size,
+        Hash_key_type hkey_type,
+        hash_comp_fn compare, hash_hash_key_fn keyhash,
+        hash_mark_key_fn mark)
+{
+    Hash *hash = (Hash *)new_bufferlike_header(interpreter, sizeof(*hash));
+    PMC_struct_val(container) = hash;
+    hash->container = container;
+    init_hash(interpreter, hash, val_type, val_size, hkey_type,
+            compare, keyhash, mark);
 }
 
 /*
@@ -718,9 +769,9 @@ hash_get_idx(Interp *interpreter, Hash *hash, PMC * key)
 /*
 
 =item C<HashBucket *
-hash_get_bucket(Interp *interpreter, Hash *hash, void *okey)>
+hash_get_bucket(Interp *interpreter, Hash *hash, void *key)>
 
-Returns the bucket for C<okey>.
+Returns the bucket for C<key>.
 
 =cut
 
@@ -774,9 +825,9 @@ hash_exists(Interp *interpreter, Hash *hash, void *key)
 /*
 
 =item C<HashBucket*
-hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)>
+hash_put(Interp *interpreter, Hash *hash, void *key, void *value)>
 
-Puts the key and value into the hash. Note that C<okey> is B<not>
+Puts the key and value into the hash. Note that C<key> is B<not>
 copied.
 
 =cut
@@ -784,15 +835,13 @@ copied.
 */
 
 HashBucket*
-hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)
+hash_put(Interp *interpreter, Hash *hash, void *key, void *value)
 {
     BucketIndex *table;
     UINTVAL hashval;
     BucketIndex bucket_index;
     BucketIndex chain;
     HashBucket *bucket;
-
-    void *key = okey;
 
     /*      dump_hash(interpreter, hash); */
 
@@ -806,10 +855,17 @@ hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)
     /*              hash, PObj_bufstart(&hash->buffer), chain, bucket, string_to_cstring(interpreter, key)); */
 
     if (bucket) {
+        if (hash->entry_type == enum_type_PMC && hash->container) {
+            DOD_WRITE_BARRIER(interpreter, hash->container,
+                    (PMC*)bucket->value, (PMC*)value);
+        }
         /* Replacing old value */
         bucket->value = value;  /* TODO copy value_size */
     }
     else {
+        if (hash->entry_type == enum_type_PMC && hash->container) {
+            DOD_WRITE_BARRIER(interpreter, hash->container, NULL, (PMC*)value);
+        }
         /* Create new bucket */
         hash->entries++;
         bucket_index = new_bucket(interpreter, hash, key, value);
@@ -825,7 +881,7 @@ hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)
 /*
 
 =item C<void
-hash_delete(Interp *interpreter, Hash *hash, void *okey)>
+hash_delete(Interp *interpreter, Hash *hash, void *key)>
 
 Deletes the key from the hash.
 
@@ -834,13 +890,12 @@ Deletes the key from the hash.
 */
 
 void
-hash_delete(Interp *interpreter, Hash *hash, void *okey)
+hash_delete(Interp *interpreter, Hash *hash, void *key)
 {
     UINTVAL hashval;
     HashIndex slot;
     HashBucket *bucket;
     HashBucket *prev = NULL;
-    void *key = okey;
 
     hashval = (hash->hash_val)(interpreter, hash, key);
     slot = hashval & hash->max_chain;

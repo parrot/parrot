@@ -53,10 +53,14 @@ static void *
 get_free_buffer(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
-    Buffer *buffer = pool->get_free_object(interpreter, pool);
+    PObj *buffer = pool->get_free_object(interpreter, pool);
 
-    memset(buffer, 0, pool->object_size);
-    SET_NULL(PObj_bufstart(buffer));
+    /* don't mess around with flags */
+    PObj_bufstart(buffer) = NULL;
+    PObj_buflen(buffer) = 0;
+
+    if (pool->object_size > sizeof(PObj))
+        memset(buffer + 1, 0, pool->object_size - sizeof(PObj));
     return buffer;
 }
 
@@ -266,7 +270,7 @@ new_pmc_header(Interp *interpreter, UINTVAL flags)
     }
     else
         pmc->pmc_ext = NULL;
-    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG|flags);
+    PObj_get_FLAGS(pmc) |= PObj_is_PMC_FLAG|flags;
     pmc->vtable = NULL;
 #if ! PMC_DATA_IN_EXT
     PMC_data(pmc) = NULL;
@@ -340,7 +344,7 @@ new_string_header(Interp *interpreter, UINTVAL flags)
             ? interpreter->
             arena_base->constant_string_header_pool :
             interpreter->arena_base->string_header_pool);
-    PObj_flags_SETTO(string, flags | PObj_is_string_FLAG);
+    PObj_get_FLAGS(string) |= flags | PObj_is_string_FLAG;
     SET_NULL(string->strstart);
     return string;
 }

@@ -83,13 +83,14 @@ fromkeys(Interp *interpreter, PMC *dict, PMC *keys)
     }
     if (keys->vtable->base_type == enum_class_Slice) {
         INTVAL start, end, step;
-        Hash* hash;
+        Hash *hash;
         parrot_range_t *range = PMC_struct_val(keys);
-        new_hash_x(interpreter, &hash, enum_type_ptr,
+
+        new_pmc_hash_x(interpreter, self, enum_type_ptr,
                 0, Hash_key_type_int,
                 int_compare, key_hash_int,
                 (hash_mark_key_fn) NULL);
-        PMC_struct_val(self) = hash;
+        hash = PMC_struct_val(self);
         start = RVal_int(range->start);
         end   = RVal_int(range->end);
         step  = RVal_int(range->step);
@@ -214,7 +215,7 @@ already exist.
 
     void init () {
         PObj_custom_mark_SET(SELF);
-        new_hash(INTERP, (Hash**)&PMC_struct_val(SELF));
+        new_pmc_hash(INTERP, SELF);
     }
 
 /*
@@ -289,6 +290,7 @@ Creates and returns a clone of the hash.
     PMC* clone () {
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
+        ((Hash*)PMC_struct_val(dest))->container = dest;
         hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
                    (Hash**)&PMC_struct_val(dest));
         return dest;
