@@ -13,6 +13,10 @@ CC = ${cc} $(C_FLAGS)
 
 all : $(O_FILES)
 
+shared: libparrot.so
+libparrot.so: $(O_FILES)
+	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
+
 test_prog: test_main$(O) $(O_FILES)
 	$(CC) $(C_LIBS) -o test_prog $(O_FILES) test_main$(O)
 
