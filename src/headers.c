@@ -251,7 +251,7 @@ new_pmc_header(struct Parrot_Interp *interpreter, UINTVAL flags)
         *((Dead_PObj*)pmc)->arena_dod_flag_ptr |=
             (PObj_is_special_PMC_FLAG << ((Dead_PObj*)pmc)->flag_shift);
 #else
-        PObj_is_special_PMC_SET(pmc);
+        flags |= PObj_is_special_PMC_FLAG;
 #endif
         pmc->pmc_ext = new_pmc_ext(interpreter);
         if (flags & PObj_is_PMC_shared_FLAG) {

@@ -69,6 +69,12 @@ trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
                         VTABLE_name(interpreter, pmc), pmc,
                         PMC_struct_val(pmc));
             }
+            else if (PObj_is_object_TEST(pmc)) {
+                /* don't call name, which calls delegate's __get_name
+                 * and changes the trace
+                 */
+                PIO_eprintf(interpreter, "Object=PMC(%#p)", pmc);
+            }
             else {
                 PIO_eprintf(interpreter, "%S=PMC(%#p)",
                         VTABLE_name(interpreter, pmc), pmc);

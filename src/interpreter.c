@@ -1227,8 +1227,6 @@ Parrot_run_meth_fromc_args_save(Parrot_Interp interpreter,
     regsave *data = save_regs(interpreter);
     va_list args;
     void *ret;
-    INTVAL ri;
-    FLOATVAL rf;
 
     REG_PMC(2) = obj;
     REG_STR(0) = meth;
