@@ -34,7 +34,7 @@ sdl_types.imc - PIR interface to SDL types
 	.sym pmc surface
 	surface = _new_SDL_Surface()
 
-	# query a surface (not quite right yet)
+	# query a surface
 	.sym int width
 	.sym int height
 
@@ -138,6 +138,11 @@ This function returns a C<ManagedStruct> pmc.
 		.nci_call SetVideoMode
 		.result screen
 	.pcc_end
+
+	.sym pmc layout
+	layout = _SDL_Surface_layout()
+
+	assign screen, layout
 
 	.pcc_begin_return
 		.return screen
@@ -274,6 +279,11 @@ the returned PMC will be null, in whatever sense that makes sense to SDL.
 		.nci_call SDL_IMG_Load
 		.result image
 	.pcc_end
+
+	.sym pmc layout
+	layout = _SDL_Surface_layout()
+
+	assign image, layout
 
 	.pcc_begin_return
 		.return image
@@ -507,19 +517,36 @@ XXX - exists, but not quite right and not public
 	.pcc_end_return
 .end
 
+=item _SDL_Surface_height( surface )
+
+returns an int representing the height, in pixels, of the surface.
+
+=cut
+
 .sub _SDL_Surface_height prototyped
 	.param pmc surface
 
+	.sym int height
+	set height, surface['h']
 	.pcc_begin_return
-		.return 56
+		.return height
 	.pcc_end_return
 .end
+
+=item _SDL_Surface_width( surface )
+
+returns an int representing the width, in pixels, of the surface.
+
+=cut
 
 .sub _SDL_Surface_width prototyped
 	.param pmc surface
 
+	.sym int width
+	set width, surface['w']
+
 	.pcc_begin_return
-		.return 100
+		.return width
 	.pcc_end_return
 .end
 
@@ -556,8 +583,13 @@ XXX - exists, but not quite right and not public
 
 	.sym pmc c_layout
 	c_layout = _SDL_Color_layout()
+
+	.sym pmc color
+	new color, .ManagedStruct, c_layout
+
 	set $P0, layout[-1]
-	setprop $P0, '_struct', c_layout
+	setprop $P0, '_struct', color
+
 	push layout, 0
 	push layout, 0
 
@@ -572,11 +604,12 @@ XXX - exists, but not quite right and not public
 	set layout['palette'], .DATATYPE_STRUCT_PTR
 
 	set $P0, layout[-1]
+
 	.sym pmc p_layout
 	p_layout = _SDL_Palette_layout()
 
 	.sym pmc palette
-	new palette, .UnManagedStruct, p_layout
+	new palette, .ManagedStruct, p_layout
 
 	setprop $P0, '_struct', palette
 	push layout, 0
@@ -648,7 +681,7 @@ XXX - exists, but not quite right and not public
 	pf_layout = _SDL_PixelFormat_layout()
 
 	.sym pmc pf
-	new pf, .UnManagedStruct, pf_layout
+	new pf, .ManagedStruct, pf_layout
 	setprop $P0, '_struct', pf
 
 	push layout, 0
@@ -671,7 +704,8 @@ XXX - exists, but not quite right and not public
 	push layout, 0
 
 	# private_hwdata struct pointer
-	set layout['hwdata'], .DATATYPE_STRUCT_PTR
+	set layout['hwdata'], .DATATYPE_PTR
+
 	push layout, 0
 	push layout, 0
 
@@ -693,7 +727,7 @@ XXX - exists, but not quite right and not public
 	push layout, 0
 
 	# SDL_BlitMap struct pointer
-	set layout['map'], .DATATYPE_STRUCT_PTR
+	set layout['map'], .DATATYPE_PTR
 	push layout, 0
 	push layout, 0
 

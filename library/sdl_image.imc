@@ -48,8 +48,8 @@ This library provides the following functions:
 =item _init_SDL_Image()
 
 Initializes this library.  You must call this manually before you use any
-features.  At some opint in the future, this will happen automatically.  Ask
-Dan how.
+features.  At some point in the future, this will happen automatically.  Ask
+Leo how, if it's after 23 February 2004.
 
 =cut
 
@@ -67,9 +67,6 @@ Dan how.
 =item _SDL_Image_new( filename )
 
 Given the path to a file to load, creates and returns a new SDL_Image object.
-
-B<Note:> right now, the height and width of this image are almost definitely
-wrong.  I'm working on this with Leo, or vice versa.
 
 =cut
 
