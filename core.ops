@@ -1132,11 +1132,15 @@ met, the branch happens, otherwise control falls to the next operation.
 
 =item B<eq>(in STR, in STR)
 
+=item B<eq>(in PMC, in PMC)
+
 =item B<eq>(in INT, in INT, inconst INT)
 
 =item B<eq>(in NUM, in NUM, inconst INT)
 
 =item B<eq>(in STR, in STR, inconst INT)
+
+=item B<eq>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is equal to $2.
 
@@ -1165,6 +1169,13 @@ op eq (in STR, in STR) {
   goto NEXT();
 }
 
+op eq (in PMC, in PMC) {
+  if ($1->vtable->is_equal(interpreter, $1, $2)) {
+    goto POP();
+  }
+  goto NEXT();
+}
+
 inline op eq(in INT, in INT, inconst INT) {
   if ($1 == $2) {
     goto OFFSET($3);
@@ -1186,6 +1197,12 @@ op eq(in STR, in STR, inconst INT) {
   goto NEXT();
 }
 
+op eq (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->is_equal(interpreter, $1, $2)) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
 
 ########################################
 
@@ -1195,11 +1212,15 @@ op eq(in STR, in STR, inconst INT) {
 
 =item B<ne>(in STR, in STR)
 
+=item B<ne>(in PMC, in PMC)
+
 =item B<ne>(in INT, in INT, inconst INT)
 
 =item B<ne>(in NUM, in NUM, inconst INT)
 
 =item B<ne>(in STR, in STR, inconst INT)
+
+=item B<ne>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is not equal to $2.
 
@@ -1228,6 +1249,13 @@ op ne (in STR, in STR) {
   goto NEXT();
 }
 
+op ne (in PMC, in PMC) {
+  if (! $1->vtable->is_equal(interpreter, $1, $2)) {
+    goto POP();
+  }
+  goto NEXT();
+}
+
 inline op ne(in INT, in INT, inconst INT) {
   if ($1 != $2) {
     goto OFFSET($3);
@@ -1249,6 +1277,12 @@ op ne(in STR, in STR, inconst INT) {
   goto NEXT();
 }
 
+op ne(in PMC, in PMC, inconst INT) {
+  if (! $1->vtable->is_equal(interpreter, $1, $2)) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
 
 ########################################
 
@@ -1256,9 +1290,9 @@ op ne(in STR, in STR, inconst INT) {
 
 =item B<lt>(in NUM, in NUM, inconst INT)
 
-=item B<lt>(in PMC, in PMC, inconst INT)
-
 =item B<lt>(in STR, in STR, inconst INT)
+
+=item B<lt>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is less than $2.
 
@@ -1285,6 +1319,12 @@ op lt(in STR, in STR, inconst INT) {
   goto NEXT();
 }
 
+op lt (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp(interpreter, $1, $2) < 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
 
 ########################################
 
@@ -1293,6 +1333,8 @@ op lt(in STR, in STR, inconst INT) {
 =item B<le>(in NUM, in NUM, inconst INT)
 
 =item B<le>(in STR, in STR, inconst INT)
+
+=item B<le>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is less than or equal to $2.
 
@@ -1319,6 +1361,12 @@ op le(in STR, in STR, inconst INT) {
   goto NEXT();
 }
 
+op le(in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp(interpreter, $1, $2) <= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
 
 ########################################
 
@@ -1327,6 +1375,8 @@ op le(in STR, in STR, inconst INT) {
 =item B<gt>(in NUM, in NUM, inconst INT)
 
 =item B<gt>(in STR, in STR, inconst INT)
+
+=item B<gt>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is greater than $2.
 
@@ -1353,6 +1403,12 @@ op gt(in STR, in STR, inconst INT) {
   goto NEXT();
 }
 
+op gt(in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp(interpreter, $1, $2) > 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
 
 ########################################
 
@@ -1361,6 +1417,8 @@ op gt(in STR, in STR, inconst INT) {
 =item B<ge>(in NUM, in NUM, inconst INT)
 
 =item B<ge>(in STR, in STR, inconst INT)
+
+=item B<ge>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is greater than or equal to $2.
 
@@ -1382,6 +1440,13 @@ inline op ge(in NUM, in NUM, inconst INT) {
 
 op ge(in STR, in STR, inconst INT) {
   if (string_compare(interpreter, $1, $2) >= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ge(in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp(interpreter, $1, $2) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -1926,6 +1991,8 @@ Set $1 to it's negative.
 
 =item B<neg>(out NUM, in NUM)
 
+=item B<neg>(out PMC, in PMC)
+
 Set $1 to the negative of $2.
 
 =cut
@@ -1950,6 +2017,10 @@ inline op neg(out NUM, in NUM) {
   goto NEXT();
 }
 
+inline op neg(out PMC, in PMC) {
+  $2->vtable->neg(interpreter, $2, $1);
+  goto NEXT();
+}
 
 ########################################
 
@@ -3064,6 +3135,19 @@ inline op xor(out INT, in INT, in INT) {
 
 inline op xor(out PMC, in PMC, in PMC) {
   $2->vtable->logical_xor(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+=cut
+
+=item B<defined>(out INT, in PMC)
+
+Test for PMC definedness.
+
+=cut
+
+inline op defined(out INT, in PMC) {
+  $1 = $2->vtable->defined(interpreter, $2);
   goto NEXT();
 }
 
