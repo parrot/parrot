@@ -90,7 +90,7 @@ string_length(const STRING* s) {
  * unicode or JIS-encoded) string, the idea being that once the encoding
  * functions are fleshed out, this function can DTRT.
  */
-static INTVAL
+INTVAL
 string_index(const STRING* s, INTVAL index) {
     return s->encoding->decode(s->encoding->skip_forward(s->bufstart, index));
 }
