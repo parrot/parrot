@@ -516,8 +516,24 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
                         (PMC *)PMC_data(curclass), PCD_CLASS_NAME),
                 shortcut_name, 0);
         method = find_global(interpreter, FQ_method);
+        Parrot_note_method_offset(interpreter, searchoffset, method);
     }
     return method;
+}
+
+/*
+=item C<void
+Parrot_note_method_offset(Parrot_Interp interpreter, UINTVAL offset, PMC *method)>
+
+Notes where in the hierarchy we just found a method. Used so that we
+can do a next and continue the search through the hierarchy for the
+next instance of this method.
+
+*/
+void
+Parrot_note_method_offset(Parrot_Interp interpreter, UINTVAL offset, PMC *method)
+{
+    interpreter->ctx.current_class_offset = offset;
 }
 
 /*

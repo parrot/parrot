@@ -25,13 +25,17 @@ The class name PMC.
 
 =item 2
 
-An array of all parents, in search order.
+A pruned array of all parents, in search order.
 
 =item 3
 
-A hash, keys are the class names, values are the offsets to their attributes.
+A pruned array of all parents in reverse search order.
 
 =item 4
+
+A hash, keys are the class names, values are the offsets to their attributes.
+
+=item 5
 
 A hash, the keys are the classname/attrib name pair (separated by a
 C<NULL>), while the value is the offset to the attribute.

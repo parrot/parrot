@@ -137,7 +137,8 @@ typedef struct Parrot_Context {
     Buffer * warns;             /* Keeps track of what warnings
                                  * have been activated */
     Buffer * errors;            /* fatals that can be turned off */
-
+    UINTVAL current_class_offset; /* Offset into the class array of the
+                                    currently found method */
 
 } parrot_context_t;
 
