@@ -35,7 +35,7 @@ A simple string escaping function.
 
 =over 4
 
-=item C<string>
+=item C<str>
 
 The string to escape.
 
@@ -54,7 +54,7 @@ This function returns the quoted string.
 .sub String
     .param string str
     .param string char
-    .param string ret
+    .local string ret
     .local int i
     .local int j
     .local int c
@@ -69,7 +69,7 @@ LOOP:
     ord c, tmp
 
     if c > 40 goto gt40
-    if c > 30 goto gt30
+    if c > 31 goto gt31
 
     if c > 0 goto n00
     set tmp, "\\0"
@@ -94,7 +94,15 @@ n10:
     branch DONE
 n13:
 
-gt30: # ascii codes greater than 30 below
+    # encode the value as an octal number
+    tmp = "\\"
+    $P0 = new .PerlArray
+    push $P0, c
+    $S0 = sprintf "%o", $P0
+    concat tmp, $S0
+    branch DONE
+    
+gt31: # ascii codes greater than 31 below
 
     # "
     ne char, '"', n34
@@ -121,9 +129,7 @@ DONE:
     inc i
     branch LOOP
 END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 =back
