@@ -37,7 +37,7 @@ Parrot_get_datatype_name(Interp * interpreter, INTVAL type)
 	s = "illegal";
     else
 	s = datatype_names[ type - enum_first_type ];
-    return string_make(interpreter, s, strlen(s), 0, BUFFER_external_FLAG, 0);
+    return string_make(interpreter, s, strlen(s), 0, 0, 0);
 }
 
 /*
