@@ -842,11 +842,9 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      */
     arg = sub->pcc_sub->sub;
     if (meth_call) {
-        char buf[256];
         /* set S0, meth */
         regs[0] = get_pasm_reg("S0");;
-        sprintf(buf, "\"%s\"", arg->name);
-        regs[1] = mk_const(str_dup(buf), 'S');
+        regs[1] = mk_const(str_dup(arg->name), 'S');
         ins = insINS(interp, unit, ins, "set", regs, 2);
         /* set P2, obj */
         regs[0] = get_pasm_reg("P2");

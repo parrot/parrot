@@ -410,6 +410,12 @@ ins_print(FILE *fd, Instruction * ins)
             }
             regstr[i] = regb[i];
         }
+        else if (p->type == VTCONST && p->set == 'S' &&
+                *p->name != '"' && *p->name != '\'' ) {
+            /* unquoted string const */
+            sprintf(regb[i], "\"%s\"", p->name);      /* XXX */
+            regstr[i] = regb[i];
+        }
 	else
 	    regstr[i] = p->name;
     }
