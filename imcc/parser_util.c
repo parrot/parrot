@@ -83,7 +83,8 @@ check_op(struct Parrot_Interp *interpreter, char *fullname,
         char *name, SymReg *r[])
 {
     int op, narg;
-    for (narg = 0; regs[narg]; narg++) ;
+    for (narg = 0; r[narg]; narg++)
+        ;
     op_fullname(fullname, name, r, narg);
     op = interpreter->op_lib->op_code(fullname, 1);
     return op;

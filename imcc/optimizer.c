@@ -57,6 +57,7 @@ static void subst_constants(struct Parrot_Interp *interp);
 static void subst_constants_c(struct Parrot_Interp *interp);
 static void subst_constants_if(struct Parrot_Interp *interp);
 
+/* static void constant_propagation(struct Parrot_Interp *interp); */
 static int used_once(void);
 static int loop_optimization(struct Parrot_Interp *);
 static int clone_remove(void);
@@ -96,7 +97,7 @@ int optimize(struct Parrot_Interp *interp) {
 
     if (optimizer_level & OPT_CFG) {
         info(2, "optimize\n");
-        /* constant_propagation(); N/Y */
+        /* constant_propagation(interp); */
         if (clone_remove())
             return 1;
         if (used_once())
@@ -290,6 +291,92 @@ set_it:
         }
     }
 }
+
+#if 0
+/*
+ * Patch #22387 modified so that its working -- somehow
+ * BUT: a register might get different constant values in different code
+ *      paths, there may be loops and so on
+ *
+ *    ...
+ *    set I2, 10
+ *    set I1, P0["key"]         # some value coming out of the aggregate
+ *    if I1, nxt
+ * add:
+ *    add I0, I2, I2
+ *    print I0
+ *    end
+ * nxt:
+ *    set I2, 20
+ *    branch add
+ *
+ *    now I0 is what?
+ *
+ * The patch could be ok inside one basic block.
+ *
+ * So this patch is left here to show just the necessary code piese
+ * how to substitute the constant.
+ *
+ * This code is only for documentation -lt
+ */
+
+static void
+constant_propagation(struct Parrot_Interp *interp)
+{
+    Instruction *ins, *ins2;
+    int op;
+    int i;
+    char fullname[128];
+    SymReg *c, *old, *o;
+
+    info(2, "\tconstant_propagation\n");
+    for (ins = instructions; ins; ins = ins->next) {
+        if (!strcmp(ins->op, "set") &&
+                ins->opsize == 3 &&             /* no keyed set */
+                ins->r[1]->type == VTCONST &&
+                ins->r[0]->set != 'P') {        /* no PMC consts */
+            c = ins->r[1];
+            o = ins->r[0];
+
+            debug(DEBUG_OPT1, "propagating constant %s => \n", ins_string(ins));
+            for (ins2 = ins->next; ins2; ins2 = ins2->next) {
+                if (ins2->type & ITSAVES)
+                    goto next_constant;
+                /* parrot opsize has opcode too, so argument count is
+                 * opsize - 1
+                 */
+                for (i = ins2->opsize - 2; i >= 0; i--) {
+                    if (!strcmp(o->name, ins2->r[i]->name)) {
+                        if (instruction_writes(ins2,ins2->r[i]))
+                            goto next_constant;
+                        else if (instruction_reads(ins2,ins2->r[i])) {
+                            debug(DEBUG_OPT2,
+                                    "\tpropagating into %s register %i",
+                                    ins_string(ins2), i);
+                            old = ins2->r[i];
+                            ins2->r[i] = c;
+                            op = check_op(interp, fullname, ins2->op, ins2->r);
+                            if (op < 0) {
+                                ins2->r[i] = old;
+                                debug(DEBUG_OPT2," - no %s\n", fullname);
+                            }
+                            else {
+                                --ins2->r[i]->use_count;
+                                ins2->opnum = op;
+                                debug(DEBUG_OPT2," -> %s\n", ins_string(ins2));
+                            }
+                        }
+                    }
+
+                }/* for(i ... )*/
+            }/* for(ins2 ... )*/
+        } /* if */
+next_constant:;
+
+    }/*for(ins ... )*/
+}
+
+#endif
 
 /*
  * rewrite e.g. add_n_nc_ic => add_n_nc_nc
