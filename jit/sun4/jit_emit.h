@@ -312,7 +312,7 @@ Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
     emitm_or_i(jit_info->native_ptr, Parrot_jit_tmp,
         emitm_lo10(interpreter->code->byte_code), Parrot_jit_tmp);
 
-    /* Calculates the offset into op_map shadow array 
+    /* Calculates the offset into op_map shadow array
      * assuming sizeof(opcode_t) == sizeof(opmap array entry) */
     emitm_sub_r(jit_info->native_ptr, reg_num, Parrot_jit_tmp,
                 Parrot_jit_tmp);
@@ -378,7 +378,7 @@ static void Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
             break;
         case PARROT_ARG_NC:
             val = (int)&interpreter->code->const_table->
-                    constants[val]->number;
+                    constants[val]->u.number;
 
             /* Load double into integer registers */
             emitm_sethi(jit_info->native_ptr, emitm_hi22(val), Parrot_jit_tmp);
