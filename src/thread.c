@@ -156,7 +156,7 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
      * TODO thread pools
      */
 
-    PMC_struct_val(dest_interp) = PMC_struct_val(sub);
+    PMC_struct_val(dest_interp) = VTABLE_get_pointer(interp, sub);
     pt_thread_prepare_for_run(interpreter, interp);
     /*
      * set regs according to pdd03

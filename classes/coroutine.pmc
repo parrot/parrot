@@ -102,7 +102,7 @@ Swaps the "context".
 
     void* invoke (void* next) {
         struct Parrot_coro * sub = PMC_coro(SELF);
-        void * dest = PMC_struct_val(SELF);
+        void * dest = sub->address;
         int argcP = REG_INT(3);
         /* python calls the coroutine initially during
          * setup
@@ -120,7 +120,7 @@ Swaps the "context".
             REG_PMC(5) = ret;
             return next;
         }
-        PMC_struct_val(SELF) = next;
+        sub->address = next;
         swap_context(interpreter, SELF);
 
         if (interpreter->code->cur_cs != sub->seg) {
@@ -197,10 +197,10 @@ Return much, we don't know.
             PMC *ret = pmc_new(INTERP, enum_class_Coroutine);
             struct Parrot_coro * coro = PMC_coro(ret);
             coro->end = sub->end;
+            coro->address = sub->address;
 
             PObj_get_FLAGS(ret) |= PObj_private1_FLAG; /* fixup done */
             PObj_get_FLAGS(ret) &= ~PObj_private3_FLAG;
-            PMC_struct_val(ret) = PMC_struct_val(SELF);
             PObj_flag_CLEAR(custom_mark, SELF);
             return ret;
         }

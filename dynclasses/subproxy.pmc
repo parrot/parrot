@@ -48,9 +48,10 @@ pmclass SubProxy dynpmc need_ext extends Sub {
 		internal_exception(1, "SubProxy: sub not found");
 
 	    PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
-	    PMC_struct_val(SELF) = PMC_struct_val(rsub);
 	    ((parrot_sub_t)(PMC_sub(SELF))) ->seg =
 		    ((parrot_sub_t)(PMC_sub(rsub))) ->seg;
+	    ((parrot_sub_t)(PMC_sub(SELF))) ->address =
+		    ((parrot_sub_t)(PMC_sub(rsub))) ->address;
 	    ((parrot_sub_t)(PMC_sub(SELF))) ->end =
 		    ((parrot_sub_t)(PMC_sub(rsub))) ->end;
 	}

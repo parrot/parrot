@@ -90,7 +90,7 @@ Initializes the subroutine.
      * - private7 ... @POSTCOMP
      *
      * Data used:
-     *   PMC_struct_val ... Sub address
+     *   PMC_struct_val ... unused
      *   PMC_pmc_val    ... Parrot_Sub structure
      */
     void init () {
@@ -131,8 +131,9 @@ Sets the pointer to the actual subroutine.
 */
 
     void set_pointer (void* value) {
+        struct Parrot_sub * sub = PMC_sub(SELF);
         PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
-        PMC_struct_val(SELF) = value;
+        sub->address = value;
     }
 
 /*
@@ -146,7 +147,8 @@ Returns the pointer to the actual subroutine.
 */
 
     void* get_pointer () {
-        return PMC_struct_val(SELF);
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        return sub->address;
     }
 
 /*
@@ -177,7 +179,8 @@ Returns whether the subroutine is defined.
 */
 
     INTVAL defined () {
-        return PMC_struct_val(SELF) != NULL;
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        return sub->address != NULL;
     }
 
 /*
@@ -203,7 +206,7 @@ Invokes the subroutine.
         if (interpreter->code->cur_cs != sub->seg) {
             Parrot_switch_to_cs(interpreter, sub->seg, 1);
         }
-        return PMC_struct_val(SELF);
+        return sub->address;
     }
 
 /*
@@ -223,7 +226,7 @@ Creates and returns a clone of the subroutine.
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
         sub->name = string_copy(interpreter, sub->name);
-        PMC_struct_val(ret) = PMC_struct_val(SELF);
+        PMC_struct_val(ret) = NULL;
         return ret;
     }
 
@@ -238,7 +241,7 @@ Sets the subroutine to C<*value>.
 */
 
     void set_same (PMC* value) {
-        PMC_struct_val(SELF) = PMC_struct_val(value);
+        internal_exception(UNIMPLEMENTED, "set_same");
     }
 
 /*
@@ -253,7 +256,7 @@ Returns whether the two subroutines are equal.
 
     INTVAL is_equal (PMC* value) {
         return SELF->vtable == value->vtable &&
-            PMC_struct_val(SELF) == PMC_struct_val(value);
+            (PMC_sub(SELF))->address == (PMC_sub(value))->address;
     }
 
 /*
@@ -288,13 +291,11 @@ Archives the subroutine.
         if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG) {
             ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
 
-            start_offs = ((ptrdiff_t) PMC_struct_val(SELF) - code) /
-            sizeof(opcode_t*);
-            end_offs = ((ptrdiff_t)sub->end - code) /
-            sizeof(opcode_t*);
+            start_offs = ((ptrdiff_t)sub->address - code) / sizeof(opcode_t*);
+            end_offs = ((ptrdiff_t)sub->end - code) / sizeof(opcode_t*);
         }
         else {
-            start_offs = (size_t)PMC_struct_val(SELF);
+            start_offs = (size_t)sub->address;
             end_offs =   (size_t)sub->end;
         }
         io->vtable->push_integer(INTERP, io, (INTVAL) start_offs);
@@ -324,7 +325,7 @@ Unarchives the subroutine.
             PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
             start_offs = (size_t) io->vtable->shift_integer(INTERP, io);
             end_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
-            PMC_struct_val(SELF) = (opcode_t*) start_offs;
+            sub->address = (opcode_t*) start_offs;
             sub->end = (opcode_t*) end_offs;
         }
     }
@@ -351,9 +352,9 @@ Called after the subroutine as been unarchived.
         if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG)
             return;
         code = sub->seg->base.data;
-        start_offs = code + (size_t) PMC_struct_val(SELF);
+        start_offs = code + (size_t) sub->address;
         end_offs =   code + (size_t) sub->end;
-        PMC_struct_val(SELF) = start_offs;
+        sub->address = start_offs;
         sub->end = end_offs;
         PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
     }

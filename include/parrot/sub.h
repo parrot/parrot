@@ -23,6 +23,7 @@
  */
 typedef struct Parrot_sub {
     struct PackFile_ByteCode *seg;      /* bytecode segment */
+    opcode_t *address;          /* start of bytecode, addr to continue */
     opcode_t *end;              /* end of bytecode */
     STRING   *name;             /* name of the sub */
     char *packed;               /* to simplify packing Constant Subs
@@ -39,6 +40,7 @@ typedef struct Parrot_sub {
  */
 typedef struct Parrot_coro {
     struct PackFile_ByteCode *seg;
+    opcode_t *address;          /* start of bytecode, addr to continue */
     opcode_t *end;
     STRING   *name;
     char *packed;
@@ -52,8 +54,9 @@ typedef struct Parrot_coro {
 #define PMC_coro(pmc) LVALUE_CAST(parrot_coro_t, PMC_pmc_val(pmc))
 
 typedef struct Parrot_cont {
-    struct Parrot_Context ctx;  /* copy of interpreter context */
     struct PackFile_ByteCode *seg;      /* bytecode segment */
+    opcode_t *address;          /* start of bytecode, addr to continue */
+    struct Parrot_Context ctx;  /* copy of interpreter context */
 } * parrot_cont_t;
 
 #define PMC_cont(pmc) LVALUE_CAST(parrot_cont_t, PMC_pmc_val(pmc))

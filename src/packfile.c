@@ -2894,8 +2894,8 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     /* both start and end are relative, so are small -
      * cast for 64-bit compilers where sizeof(int)=4, sizeof(long)=8
      */
-    PMC_struct_val(sub_pmc) = (void *)(long) start;
     sub = PMC_sub(sub_pmc);
+    sub->address = (void *)(long) start;
     sub->end = (opcode_t*)(long)end;
     sub->packed = pmcs;
     sub->name = string_from_cstring(interpreter, name, 0);
@@ -3090,7 +3090,7 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
         fprintf(stderr, "packfile.c: VTABLE: compiler->invoke '%s'\n", filename);
 #endif
         code = VTABLE_invoke(interpreter, compiler, file);
-        pf = PMC_struct_val(code);
+        pf = VTABLE_get_pointer(interpreter, code);
         if (pf) {
             if (pf != interpreter->code)
                 PackFile_add_segment(&interpreter->code->directory,
