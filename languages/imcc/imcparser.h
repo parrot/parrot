@@ -76,22 +76,28 @@
      LOG_OR = 299,
      COMMA = 300,
      ESUB = 301,
-     LABEL = 302,
-     EMIT = 303,
-     EOM = 304,
-     IREG = 305,
-     NREG = 306,
-     SREG = 307,
-     PREG = 308,
-     IDENTIFIER = 309,
-     STRINGC = 310,
-     INTC = 311,
-     FLOATC = 312,
-     REG = 313,
-     MACRO = 314,
-     ENDM = 315,
-     PARROT_OP = 316,
-     VAR = 317
+     PCC_BEGIN = 302,
+     PCC_END = 303,
+     PCC_CALL = 304,
+     PCC_SUB = 305,
+     PCC_BEGIN_RETURN = 306,
+     PCC_END_RETURN = 307,
+     LABEL = 308,
+     EMIT = 309,
+     EOM = 310,
+     IREG = 311,
+     NREG = 312,
+     SREG = 313,
+     PREG = 314,
+     IDENTIFIER = 315,
+     STRINGC = 316,
+     INTC = 317,
+     FLOATC = 318,
+     REG = 319,
+     MACRO = 320,
+     ENDM = 321,
+     PARROT_OP = 322,
+     VAR = 323
    };
 #endif
 #define CALL 258
@@ -138,22 +144,28 @@
 #define LOG_OR 299
 #define COMMA 300
 #define ESUB 301
-#define LABEL 302
-#define EMIT 303
-#define EOM 304
-#define IREG 305
-#define NREG 306
-#define SREG 307
-#define PREG 308
-#define IDENTIFIER 309
-#define STRINGC 310
-#define INTC 311
-#define FLOATC 312
-#define REG 313
-#define MACRO 314
-#define ENDM 315
-#define PARROT_OP 316
-#define VAR 317
+#define PCC_BEGIN 302
+#define PCC_END 303
+#define PCC_CALL 304
+#define PCC_SUB 305
+#define PCC_BEGIN_RETURN 306
+#define PCC_END_RETURN 307
+#define LABEL 308
+#define EMIT 309
+#define EOM 310
+#define IREG 311
+#define NREG 312
+#define SREG 313
+#define PREG 314
+#define IDENTIFIER 315
+#define STRINGC 316
+#define INTC 317
+#define FLOATC 318
+#define REG 319
+#define MACRO 320
+#define ENDM 321
+#define PARROT_OP 322
+#define VAR 323
 
 
 
@@ -167,7 +179,7 @@ typedef union {
     Instruction *i;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 171 "imcparser.h"
+#line 183 "imcparser.h"
 # define YYSTYPE yystype
 #endif
 
