@@ -651,15 +651,15 @@ sort_loops(void)
         for (j = i + 1; j < n_loops; j++) {
             if (set_contains(loop_info[i]->loop, first) &&
                     !set_contains(loop_info[i]->loop, last)) {
-                if (optimizer_level)
-                    fatal(1, "sort_loops", "loop %d contains first but not"
-                            "last of outer loop %d\n", j, i);
+                debug(DEBUG_CFG, "sort_loops",
+                        "loop %d contains first but not"
+                        "last of outer loop %d\n", j, i);
             }
             if (set_contains(loop_info[i]->loop, last) &&
                     !set_contains(loop_info[i]->loop, first)) {
-                if (optimizer_level)
-                    fatal(1, "sort_loops", "loop %d contains last but not"
-                            "first of outer loop %d\n", j, i);
+                debug(DEBUG_CFG, "sort_loops",
+                        "loop %d contains last but not"
+                        "first of outer loop %d\n", j, i);
             }
             loop_info[j]->depth = loop_info[i]->depth + 1;
         }
@@ -694,9 +694,14 @@ void find_loops () {
     if (IMCC_DEBUG & DEBUG_CFG) {
         dump_loops();
     }
+#if 0
+    /* when a branch goes to the subroutine entry, this may happen
+     * so its not an error
+     */
     if (bb_list[0]->loop_depth) {
         fatal(1, "find_loops", "basic_block 0 in loop\n");
     }
+#endif
 }
 
 /* Incresases the loop_depth of all the nodes in a loop */
