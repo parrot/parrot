@@ -32,10 +32,11 @@ struct PMC {
     VTABLE *vtable;
     INTVAL flags;
     DPOINTER *data;
-    union {
-        INTVAL int_val;
-        FLOATVAL num_val;
-        DPOINTER *struct_val;
+    union {                   /* cache.* is intended to just be *shortcuts* to*/
+        INTVAL int_val;       /* commonly-accessed data, *not* pointers to */
+        FLOATVAL num_val;     /* completely different data.  That's why it's */
+        DPOINTER *struct_val; /* referred to as a "cache". */
+
     } cache;
     SYNC *synchronize;
     PMC *next_for_GC;         /* Yeah, the GC data should be out of
