@@ -33,13 +33,15 @@ sub runstep {
     $icuheaders =~ s![\\/]$!!;
     my $c_libs = Configure::Data->get('libs');
     $c_libs .= " $icushared";
+    my $localicudatadir = "";
+    $localicudatadir = $icudatadir if defined $icudatadir;
     Configure::Data->set(
         icu_headers => join(' ', map {"$icuheaders/unicode/$_"} @icu_headers),
         blib_lib_libsicuuc_a => '',
         blib_lib_libsicudata_a => '',
 	libs => $c_libs,
         cc_inc => Configure::Data->get(qw(cc_inc))." -I$icuheaders",
-	icudatadir => '',
+	icudatadir => $localicudatadir,
 	TEMP_icu_make => ''
     );
     return;
