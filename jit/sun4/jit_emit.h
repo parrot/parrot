@@ -15,7 +15,7 @@
  * The address of the opcode - native code mapping array is kept in i3.
  *
  * See IMPORTANT SHORTCUTS below.
- * /
+ */
 
 /* Sparc register numbers */
 #define emitm_g(n) (n)

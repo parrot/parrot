@@ -7,6 +7,12 @@
 #include <parrot/parrot.h>
 #include "parrot/jit.h"
 
+#ifdef ARM
+#ifdef __linux
+#include <asm/unistd.h>
+#endif
+#endif
+
 /*
 ** optimize_jit()
 ** XXX Don't pay much attention to this yet.
@@ -128,6 +134,63 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc,
     return optimizer;
 }
 
+#ifdef ARM
+static void
+arm_sync_d_i_cache (void *start, void *end) {
+/* Strictly this is only needed for StrongARM and later (not sure about ARM8)
+   because earlier cores don't have separate D and I caches.
+   However there aren't that many ARM7 or earlier devices around that we'll be
+   running on.  */
+#ifdef __linux
+#ifdef __GNUC__
+    int result;
+    /* swi call based on code snippet from Russell King.  Description
+       verbatim:  */
+    /*
+     * Flush a region from virtual address 'r0' to virtual address 'r1'
+     * _inclusive_.  There is no alignment requirement on either address;   
+     * user space does not need to know the hardware cache layout.
+     *
+     * r2 contains flags.  It should ALWAYS be passed as ZERO until it
+     * is defined to be something else.  For now we ignore it, but may
+     * the fires of hell burn in your belly if you break this rule. ;)
+     *
+     * (at a later date, we may want to allow this call to not flush
+     * various aspects of the cache.  Passing '0' will guarantee that
+     * everything necessary gets flushed to maintain consistency in
+     * the specified region).
+     */
+
+    /* The value of the SWI is actually available by in
+       __ARM_NR_cacheflush defined in <asm/unistd.h>, but quite how to
+       get that to interpolate as a number into the ASM string is beyond
+       me.  */
+    /* I'm actually passing in exclusive end address, so subtract 1 from
+       it inside the assembler.  */
+    __asm__ __volatile__ (
+        "mov     r0, %1\n"
+        "sub     r1, %2, #1\n"
+        "mov     r2, #0\n"
+        "swi     " __sys1(__ARM_NR_cacheflush) "\n"
+        "mov     %0, r0\n"
+        : "=r" (result)
+        : "r" ((long)start), "r" ((long)end)
+        : "r0","r1","r2");
+
+    if (result < 0) {
+        internal_exception(JIT_ERROR,
+                           "Synchronising I and D caches failed with errno=%d\n",
+                           -result);
+    }
+#else
+#error "ARM needs to sync D and I caches, and I don't know how to embed assmbler on this C compiler"
+#endif
+#else
+/* Not strictly true - on RISC OS it's OS_SynchroniseCodeAreas  */
+#error "ARM needs to sync D and I caches, and I don't know how to on this OS"
+#endif
+}
+#endif
 
 /*
 ** build_asm()
@@ -214,6 +277,9 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc,
         }
     }
 
+#ifdef ARM
+    arm_sync_d_i_cache (jit_info.arena_start, jit_info.native_ptr);
+#endif
     return (jit_f)jit_info.arena_start;
 }
 

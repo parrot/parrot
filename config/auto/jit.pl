@@ -42,11 +42,14 @@ sub runstep {
     $cpuarch = 'i386';
   }
 
+  $cpuarch               =~ s/armv[34]l?/arm/i;
+
   Configure::Data->set(
     archname    => $archname,
     cpuarch     => $cpuarch,
     osname      => $osname,
   );
+
 
   $cpuarch                     =~ s/i[456]86/i386/i;
   my $jitarchname              =  "$cpuarch-$osname";

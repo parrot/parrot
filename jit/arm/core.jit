@@ -1,0 +1,71 @@
+;
+; arm/core.jit
+;
+; $Id$
+;
+
+Parrot_noop {
+    jit_info->native_ptr = emit_nop(jit_info->native_ptr);
+}
+
+; ldmea	fp, {r4, r5, r6, r7, fp, sp, pc
+; but K bug Grr if I load pc direct.
+
+Parrot_end {
+ #ifndef ARM_K_BUG
+    jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
+                                        cond_AL, is_load, dir_EA, no_writeback,
+                                        REG11_fp,
+                                        reg2mask(4) | reg2mask(REG11_fp)
+                                        | reg2mask(REG13_sp)
+                                        | reg2mask(REG15_pc));
+ #else
+    jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
+                                        cond_AL, is_load, dir_EA, no_writeback,
+                                        REG11_fp,
+                                        reg2mask(4) | reg2mask(REG11_fp)
+                                        | reg2mask(REG13_sp)
+                                        | reg2mask(REG14_lr));
+    jit_info->native_ptr = emit_mov(jit_info->native_ptr, REG15_pc, REG14_lr);
+ #endif
+}
+
+; This shows why it would be nice in the future to have a way to have ops
+;  broken into 1 to 3 of:
+;
+; -1) get values from parrot registers into CPU registers
+;  0) do stuff
+; +1) write values back to parrot registers
+;
+; that way, a JIT optimiser could punt -1 and +1 outside loops leaving
+; intermediate values in CPU registers. It could collate -1 and +1 [leaving
+; nothing :-)] and choose how to maximise use of as many real CPU registers as
+; possible.
+
+Parrot_set_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, 2, r0);
+    Parrot_jit_int_store(jit_info, interpreter, 1, r0);
+}
+
+Parrot_add_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, 3, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 ADD, 0, r2, r0, r1);
+    Parrot_jit_int_store(jit_info, interpreter, 1, r2);
+}
+
+Parrot_sub_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, 3, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 SUB, 0, r2, r0, r1);
+    Parrot_jit_int_store(jit_info, interpreter, 1, r2);
+}
+
+Parrot_if_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, 1, r0);
+    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+                                                 CMP, 0, 0, r0, 0, 0);
+    emit_jump_to_op (jit_info, cond_NE, 0, *INT_CONST[2]);
+}
