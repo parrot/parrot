@@ -17,13 +17,11 @@
 
 /*=for api pmc pmc_new
 
-   This is the basic function for bootstrapping creation of
-   a PMC. Once you have a PMC, you can call its "new" vtable
-   entry to get another PMC like it. You may pass in either
-   an existing PMC, in which case a new PMC will be created
-   using that PMC as a "base", a pointer to some PMC-sized
-   memory, or a null pointer, in which case memory will be
-   assigned for you.
+   Creates a new PMC of type C<base_type> (which is an index into
+   the list of PMC types declared in C<Parrot_base_vtables> in
+   F<pmc.h>). Once the PMC has been successfully created and
+   its vtable pointer initialized, we call its C<init> method to
+   perform any other necessary initialization.
 
 =cut
 */
@@ -58,6 +56,13 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
     pmc->flags &= ~PMC_immune_FLAG;
     return pmc;
 }
+
+/*=for api pmc pmc_new_sized
+
+   As C<pmc_new>, but passes C<size> to the PMC's C<init> method.
+
+=cut
+*/
 
 PMC *
 pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type, INTVAL size)

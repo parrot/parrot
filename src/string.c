@@ -87,7 +87,7 @@ string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
 }
 
 /*=for api string string_destroy
- * free the strings memory
+ * free the string's memory
  */
 void
 string_destroy(STRING *s)
@@ -260,7 +260,7 @@ string_transcode(struct Parrot_Interp *interpreter,
 /* vtable despatch functions */
 
 /*=for api string string_compute_strlen
- * get the string length of the string
+ * calculate the length (in characters) of the string
  */
 INTVAL
 string_compute_strlen(STRING *s)
@@ -535,7 +535,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 }
 
 /*=for api string string_chopn
- * chop the last n bytes off of s.
+ * chop off the last n characters of s.
  */
 STRING *
 string_chopn(STRING *s, INTVAL n)
@@ -561,7 +561,8 @@ string_chopn(STRING *s, INTVAL n)
 }
 
 /*=for api string string_compare
- * compare two strings.
+ * compare two strings, performing type and encoding conversions if
+ * necessary
  */
 INTVAL
 string_compare(struct Parrot_Interp *interpreter, const STRING *s1,
