@@ -26,7 +26,7 @@ Looks at the command line arguments and acts accordingly.
   program_name = shift argv
 
   # Specification of known command line arguments.
-  # The args are parsed with Getopt_Long.imc which should work 
+  # The args are parsed with library/Getopt/Long.imc which should work 
   # somewhat like the Perl5 module Getopt::Long.
   .local pmc opt_spec      
   opt_spec = new PerlArray
@@ -342,7 +342,7 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 .include "src/builtin.imc"
 
 # A dummy implementation of Getopt::Long
-.include "Getopt_Long.imc"
+.include "library/Getopt/Long.imc"
 
 # This contains reading and writing of frozen files
 .include "src/freeze.imc"

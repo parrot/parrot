@@ -64,7 +64,7 @@ Print program version.
 
 =cut
 
-.include "Getopt_Long.imc"
+.include "library/Getopt/Long.imc"
 .const string VERSION = "0.1.0"
 
 .sub _main @MAIN

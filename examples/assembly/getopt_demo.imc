@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-examples/assembly/getopt_demo.imc - demonstrating Getopt_Long.imc
+examples/assembly/getopt_demo.imc - demonstrating library/Getopt/Long.imc
 
 =head1 SYNOPSIS
 
@@ -14,11 +14,7 @@ examples/assembly/getopt_demo.imc - demonstrating Getopt_Long.imc
 =head1 DESCRIPTION
 
 This demo program shows how to handle command line arguments with the
-PIR library F<runtime/parrot/include/Getopt_Long.imc>.
-
-F<Getopt_Long.imc> is a library file that needs to be present in your
-library search path. Currently the Parrot library search path consists
-of '.' and './runtime/parrot/include'.
+PIR library F<runtime/parrot/library/Getopt/Long.imc>.
 
 =head1 SUBROUTINES
 
@@ -168,7 +164,7 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 .end
 
 # A dummy implementation of Getopt::Long
-.include "Getopt_Long.imc"
+.include "library/Getopt/Long.imc"
 
 =back
 
@@ -178,4 +174,4 @@ Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
-F<runtime/parrot/include/Getopt_Long.imc>
+F<runtime/parrot/library/Getopt/Long.imc>
