@@ -72,7 +72,7 @@ string_chopn(STRING*, INTVAL);
 STRING*
 string_substr(struct Parrot_Interp *interpreter, STRING*, INTVAL, INTVAL, STRING**);
 INTVAL
-string_compare(STRING*, STRING*);
+string_compare(struct Parrot_Interp *, STRING*, STRING*);
 
 /* Declarations of other functions */
 INTVAL
@@ -100,7 +100,7 @@ VAR_SCOPE STRING_VTABLE Parrot_string_vtable[enc_max];
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -24,7 +24,7 @@ Parrot's core library of ops.
 
 These are the fundamental operations.
 
-=over 4 
+=over 4
 
 =cut
 
@@ -35,7 +35,7 @@ These are the fundamental operations.
 
 Halts the interpreter.
 
-=cut 
+=cut
 
 MANUAL_OP end() {
    HALT;
@@ -66,7 +66,7 @@ AUTO_OP noop() {
 These operations allow interaction between the Parrot program and the system
 environment.
 
-=over 4 
+=over 4
 
 =cut
 
@@ -135,7 +135,7 @@ Set $1 to $2.
 
 =cut
 
-  
+
 AUTO_OP set(i, i|ic) {
   $1 = $2;
 }
@@ -241,7 +241,7 @@ AUTO_OP eq(n, n|nc, ic) {
 }
 
 AUTO_OP eq(s, s|sc, ic) {
-  if (string_compare($1, $2) == 0) {
+  if (string_compare(interpreter, $1, $2) == 0) {
     RETREL($3);
   }
 }
@@ -278,7 +278,7 @@ AUTO_OP ne(n, n|nc, ic) {
 }
 
 AUTO_OP ne(s, s|sc, ic) {
-  if (string_compare($1, $2) != 0) {
+  if (string_compare(interpreter, $1, $2) != 0) {
     RETREL($3);
   }
 }
@@ -315,7 +315,7 @@ AUTO_OP lt(n, n|nc, ic) {
 }
 
 AUTO_OP lt(s, s|sc, ic) {
-  if (string_compare($1, $2) < 0) {
+  if (string_compare(interpreter, $1, $2) < 0) {
     RETREL($3);
   }
 }
@@ -352,7 +352,7 @@ AUTO_OP le(n, n|nc, ic) {
 }
 
 AUTO_OP le(s, s|sc, ic) {
-  if (string_compare($1, $2) <= 0) {
+  if (string_compare(interpreter, $1, $2) <= 0) {
     RETREL($3);
   }
 }
@@ -389,7 +389,7 @@ AUTO_OP gt(n, n|nc, ic) {
 }
 
 AUTO_OP gt(s, s|sc, ic) {
-  if (string_compare($1, $2) > 0) {
+  if (string_compare(interpreter, $1, $2) > 0) {
     RETREL($3);
   }
 }
@@ -426,7 +426,7 @@ AUTO_OP ge(n, n|nc, ic) {
 }
 
 AUTO_OP ge(s, s|sc, ic) {
-  if (string_compare($1, $2) >= 0) {
+  if (string_compare(interpreter, $1, $2) >= 0) {
     RETREL($3);
   }
 }
@@ -492,14 +492,14 @@ AUTO_OP print(i|ic) {
   /* TODO: Configure for format */
   printf("%li", (long) $1);
 }
- 
+
 AUTO_OP print(n|nc) {
   /* TODO: Configure for format */
   printf("%f", $1);
 }
 
 AUTO_OP print(s|sc) {
-  STRING *s = $1; 
+  STRING *s = $1;
   if (s) printf("%.*s",(int)string_length(s),(char *) s->bufstart);
 }
 
@@ -534,7 +534,7 @@ constants into their destination register, $1.
 Set $1 to the sum of $2 and $3.
 
 =cut
-  
+
 AUTO_OP add(i, i, i|ic) {
   $1 = $2 + $3;
 }
@@ -1692,7 +1692,7 @@ The control flow opcodes check conditions and manage program flow.
 Branch forward or backward by the amount in $1.
 
 =cut
- 
+
 MANUAL_OP branch(ic) {
   RETREL($1);
 }
@@ -1752,7 +1752,7 @@ MANUAL_OP ret() {
   opcode_t *dest;
   pop_generic_entry(interpreter, &dest, STACK_ENTRY_DESTINATION);
   RETABS(dest);
-} 
+}
 
 
 ########################################
@@ -1768,7 +1768,7 @@ entry in that range.
 
 AUTO_OP rotate(i|ic) {
   rotate_entries(interpreter, $1);
-} 
+}
 
 
 =back

@@ -21,7 +21,7 @@
 /*=for api string_native string_native_compute_strlen
    return the length of s
 */
-static INTVAL 
+static INTVAL
 string_native_compute_strlen (STRING *s) {
     return s->bufused;
 }
@@ -29,7 +29,7 @@ string_native_compute_strlen (STRING *s) {
 /*=for api string_native string_native_max_bytes
    return the max bytes needed for x characters.
 */
-static INTVAL 
+static INTVAL
 string_native_max_bytes (INTVAL x) {
     return x;
 }
@@ -43,7 +43,7 @@ string_native_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, IN
 	/* Transcode */
 	STRING* t = b;
 	b = string_make(interpreter, NULL, 0, enc_native, 0, 0);
-	(Parrot_transcode_table[t->encoding->which][enc_native])(t, b);
+	(Parrot_transcode_table[t->encoding->which][enc_native])(interpreter, t, b);
     }
     /* b is now in native format */
     string_grow(a, a->strlen + b->strlen);
@@ -73,12 +73,12 @@ string_native_substr(STRING* src, INTVAL offset, INTVAL length, STRING* dest)
         /* It is now, matey. */
         dest->encoding = &(Parrot_string_vtable[enc_native]);
     }
-    
+
     /* Offset and length have already been "normalized" */
     string_grow(dest, length);
     mem_sys_memcopy(dest->bufstart, (void*)((ptrcast_t)src->bufstart + offset), length);
     dest->strlen = dest->bufused = length;
-    
+
     return dest;
 }
 
@@ -108,7 +108,7 @@ string_native_compare(STRING* s1, STRING* s2) {
 /*=for api string_native string_native_vtable
    return the vtable for the native string
 */
-STRING_VTABLE 
+STRING_VTABLE
 string_native_vtable (void) {
     STRING_VTABLE sv = {
 	enc_native,
@@ -126,7 +126,7 @@ string_native_vtable (void) {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

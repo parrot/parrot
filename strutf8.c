@@ -64,7 +64,7 @@ string_utf8_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTV
 	/* Transcode */
 	STRING* t = b;
 	b = string_make(interpreter, NULL, 0, enc_utf8, 0, 0);
-	(Parrot_transcode_table[t->encoding->which][enc_utf8])(t, b);
+	(Parrot_transcode_table[t->encoding->which][enc_utf8])(interpreter, t, b);
     }
     /* b is now in UTF-8 format */
     string_grow(a, a->strlen + b->strlen);

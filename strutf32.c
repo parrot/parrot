@@ -40,7 +40,7 @@ string_utf32_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INT
         /* Transcode */
 	STRING* t = b;
 	b = string_make(interpreter, NULL, 0, enc_utf32, 0, 0);
-	(Parrot_transcode_table[t->encoding->which][enc_utf32])(t, b);
+	(Parrot_transcode_table[t->encoding->which][enc_utf32])(interpreter, t, b);
     }
     /* b is now in UTF-32 format */
     string_grow(a, a->strlen + b->strlen);

@@ -103,7 +103,7 @@ string_max_bytes(STRING* s, INTVAL iv) {
 /*=for api string string_concat
  * concatenate two strings
  */
-STRING* 
+STRING*
 string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL flags) {
     return (ENC_VTABLE(a)->concat)(interpreter, a, b, flags);
 }
@@ -134,7 +134,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING* src, INTVAL offset, INT
     else {
         dest = *d;
     }
-    return (ENC_VTABLE(src)->substr)(src, offset, length, dest);   
+    return (ENC_VTABLE(src)->substr)(src, offset, length, dest);
 }
 
 /*=for api string string_chopn
@@ -155,13 +155,13 @@ string_chopn(STRING* s, INTVAL n) {
  * compare two strings.
  */
 INTVAL
-string_compare(STRING* s1, STRING* s2) {
+string_compare(struct Parrot_Interp *interpreter, STRING* s1, STRING* s2) {
     if (s1->encoding != s2->encoding) {
         if (s1->encoding->which != enc_utf32) {
-            s1 = Parrot_transcode_table[s1->encoding->which][enc_utf32](s1, NULL);
+            s1 = Parrot_transcode_table[s1->encoding->which][enc_utf32](interpreter, s1, NULL);
         }
         if (s2->encoding->which != enc_utf32) {
-            s2 = Parrot_transcode_table[s2->encoding->which][enc_utf32](s2, NULL);
+            s2 = Parrot_transcode_table[s2->encoding->which][enc_utf32](interpreter, s2, NULL);
         }
     }
 
@@ -172,7 +172,7 @@ string_compare(STRING* s1, STRING* s2) {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
