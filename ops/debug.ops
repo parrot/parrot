@@ -119,10 +119,10 @@ Print all the parrot registers at once.
 
 op debug_print() {
     if (!(interpreter->pdb->state & PDB_BREAK)) {
-        PDB_print_int(&interpreter->int_reg,NULL);
-        PDB_print_num(&interpreter->num_reg,NULL);
-        PDB_print_string(interpreter,&interpreter->string_reg,NULL);
-        PDB_print_pmc(interpreter,&interpreter->pmc_reg,NULL);
+        PDB_print_int(&interpreter->ctx.int_reg,NULL);
+        PDB_print_num(&interpreter->ctx.num_reg,NULL);
+        PDB_print_string(interpreter,&interpreter->ctx.string_reg,NULL);
+        PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg,NULL);
     }
     goto NEXT();
 }

@@ -91,32 +91,17 @@ typedef struct Parrot_Context {
 
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
     struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
+    IntStack intstack;                  /* Base of the regex stack */
 
-} * parrot_context_t;
+} parrot_context_t;
 
 /*
  * TODO: Parrot_Interp can use a Parrot_Context inline and we
  * can save/restore context with a single memcpy
  */ 
 typedef struct Parrot_Interp {
-    struct IReg int_reg;
-    struct NReg num_reg;
-    struct SReg string_reg;
-    struct PReg pmc_reg;
-    struct IRegChunk *int_reg_top;    /* Current top chunk of int reg stack */
-    struct NRegChunk *num_reg_top;    /* Current top chunk of the float reg
-                                       * stack */
-    struct SRegChunk *string_reg_top; /* Current top chunk of the string 
-                                       * stack */
-    struct PRegChunk *pmc_reg_top;    /* Current top chunk of the PMC stack */
-    struct IRegChunk *int_reg_base;     /* base of the int reg stack */
-    struct NRegChunk *num_reg_base;     /* Base of the float reg stack */
-    struct SRegChunk *string_reg_base;  /* Base of the string stack */
-    struct PRegChunk *pmc_reg_base;     /* Base of the PMC stack */
-
-    struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
-    struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
-    IntStack intstack;                  /* Base of the regex stack */
+    struct Parrot_Context ctx;          /* All the registers and stacks that
+                                           matter when context switching */
 
     struct Stash *perl_stash;           /* Pointer to the global variable
                                          * area */

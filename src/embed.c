@@ -227,7 +227,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 
     userargv = pmc_new(interpreter, enum_class_PerlArray);
     /* immediately anchor pmc to root set */
-    interpreter->pmc_reg.registers[0] = userargv;
+    interpreter->ctx.pmc_reg.registers[0] = userargv;
 
     key.atom.type = enum_key_int;
     key.next = NULL;

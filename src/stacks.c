@@ -381,7 +381,7 @@ pop_dest(Interp *interpreter)
     /* We don't mind the extra call, so we do this: (previous comment
      * said we *do* mind, but I say let the compiler decide) */
     void *dest;
-    (void)stack_pop(interpreter, &interpreter->control_stack,
+    (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
                     &dest, STACK_ENTRY_DESTINATION);
     return dest;
 }

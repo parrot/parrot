@@ -57,20 +57,20 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_I:
                 fprintf(stderr, "I%ld=%ld", (long)*(pc + i),
-                        (long)interpreter->int_reg.registers[*(pc + i)]);
+                        (long)interpreter->ctx.int_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_N:
                 fprintf(stderr, "N%ld=%f", (long)*(pc + i),
-                        interpreter->num_reg.registers[*(pc + i)]);
+                        interpreter->ctx.num_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_P:
                 /* what does a PMC constant look like? */
                 fprintf(stderr, "P%ld=%p", (long)*(pc + i),
-                        interpreter->pmc_reg.registers[*(pc + i)]);
+                        interpreter->ctx.pmc_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_S:
-                if (interpreter->string_reg.registers[*(pc + i)]) {
-                    escaped = PDB_escape(interpreter->string_reg.
+                if (interpreter->ctx.string_reg.registers[*(pc + i)]) {
+                    escaped = PDB_escape(interpreter->ctx.string_reg.
                                          registers[*(pc + i)]->bufstart);
                     fprintf(stderr, "S%ld=\"%s\"", (long)*(pc + i),
                             escaped);
@@ -82,7 +82,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
             case PARROT_ARG_K:
                 /* what does a KEY constant look like? */
                 fprintf(stderr, "K%ld=%p", (long)*(pc + i),
-                        interpreter->pmc_reg.registers[*(pc + i)]);
+                        interpreter->ctx.pmc_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_OP:
                 /* this isn't handled, so at least report the error

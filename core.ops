@@ -3293,7 +3293,7 @@ Gets the type of entry $2 of the user stack and puts it in $1.
 op entrytype(out INT, in INT) {
   Stack_Entry_t *entry;
 
-  entry = stack_entry(interpreter, interpreter->user_stack, $2);
+  entry = stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry) {
     internal_exception(99, "Stack Depth wrong");
   }
@@ -3310,7 +3310,7 @@ Puts the depth of the user stack in $1.
 =cut
 
 inline op depth(out INT) {
-  $1 = stack_height(interpreter, interpreter->user_stack);
+  $1 = stack_height(interpreter, interpreter->ctx.user_stack);
   goto NEXT();
 }
 
@@ -3339,13 +3339,13 @@ op lookback(out INT, in INT) {
   /* If they're counting up from the bottom, figure out where we'd be
      if we counted down from the top */
   if (depth < 0) {
-    total_depth = stack_height(interpreter, interpreter->user_stack);
+    total_depth = stack_height(interpreter, interpreter->ctx.user_stack);
     depth = total_depth + depth;
     if (depth < 0) {
       internal_exception(99, "Stack depth wrong");
     }
   }
-  entry = stack_entry(interpreter, interpreter->user_stack, depth);
+  entry = stack_entry(interpreter, interpreter->ctx.user_stack, depth);
   if (entry->entry_type != STACK_ENTRY_INT) {
     internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
   }
@@ -3361,13 +3361,13 @@ op lookback(out STR, in INT) {
   /* If they're counting up from the bottom, figure out where we'd be
      if we counted down from the top */
   if (depth < 0) {
-    total_depth = stack_height(interpreter, interpreter->user_stack);
+    total_depth = stack_height(interpreter, interpreter->ctx.user_stack);
     depth = total_depth + depth;
     if (depth < 0) {
       internal_exception(99, "Stack depth wrong");
     }
   }
-  entry = stack_entry(interpreter, interpreter->user_stack, depth);
+  entry = stack_entry(interpreter, interpreter->ctx.user_stack, depth);
   if (entry->entry_type != STACK_ENTRY_STRING) {
     internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
   }
@@ -3383,13 +3383,13 @@ op lookback(out NUM, in INT) {
   /* If they're counting up from the bottom, figure out where we'd be
      if we counted down from the top */
   if (depth < 0) {
-    total_depth = stack_height(interpreter, interpreter->user_stack);
+    total_depth = stack_height(interpreter, interpreter->ctx.user_stack);
     depth = total_depth + depth;
     if (depth < 0) {
       internal_exception(99, "Stack depth wrong");
     }
   }
-  entry = stack_entry(interpreter, interpreter->user_stack, depth);
+  entry = stack_entry(interpreter, interpreter->ctx.user_stack, depth);
   if (entry->entry_type != STACK_ENTRY_FLOAT) {
     internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
   }
@@ -3405,13 +3405,13 @@ op lookback(out PMC, in INT) {
   /* If they're counting up from the bottom, figure out where we'd be
      if we counted down from the top */
   if (depth < 0) {
-    total_depth = stack_height(interpreter, interpreter->user_stack);
+    total_depth = stack_height(interpreter, interpreter->ctx.user_stack);
     depth = total_depth + depth;
     if (depth < 0) {
       internal_exception(99, "Stack depth wrong");
     }
   }
-  entry = stack_entry(interpreter, interpreter->user_stack, depth);
+  entry = stack_entry(interpreter, interpreter->ctx.user_stack, depth);
   if (entry->entry_type != STACK_ENTRY_PMC) {
     internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
   }
@@ -3436,22 +3436,22 @@ Save register or constant $1 onto the user stack.
 
 inline op save(in INT) {
   INTVAL i = $1;
-  stack_push(interpreter, &interpreter->user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in NUM) {
-  stack_push(interpreter, &interpreter->user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in PMC) {
-  stack_push(interpreter, &interpreter->user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in STR) {
-  stack_push(interpreter, &interpreter->user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
@@ -3467,7 +3467,7 @@ Save a clone of register or constant $1 onto the user stack.
 =cut
 
 inline op savec(in STR) {
-  stack_push(interpreter, &interpreter->user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
@@ -3487,25 +3487,25 @@ Restore register $1 from the user stack.
 =cut
 
 inline op restore(out INT) {
-  (void)stack_pop(interpreter, &interpreter->user_stack, &($1),
+  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
                   STACK_ENTRY_INT);
   goto NEXT();
 }
 
 inline op restore(out NUM) {
-  (void)stack_pop(interpreter, &interpreter->user_stack, &($1),
+  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
                   STACK_ENTRY_FLOAT);
   goto NEXT();
 }
 
 inline op restore(out PMC) {
-  (void)stack_pop(interpreter, &interpreter->user_stack, &($1), 
+  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1), 
                   STACK_ENTRY_PMC);
   goto NEXT();
 }
 
 inline op restore(out STR) {
-  (void)stack_pop(interpreter, &interpreter->user_stack, &($1),
+  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
                   STACK_ENTRY_STRING);
   goto NEXT();
 }
@@ -3526,7 +3526,7 @@ the second entry, the second becomes the third etc., while the former
 =cut
 
 inline op rotate_up(in INT) {
-  rotate_entries(interpreter, interpreter->user_stack, $1);
+  rotate_entries(interpreter, interpreter->ctx.user_stack, $1);
   goto NEXT();
 }
 
@@ -3539,7 +3539,7 @@ Save register or constant $1 onto the high-speed int stack.
 =cut
 
 inline op intsave(in INT) {
-  intstack_push(interpreter, interpreter->intstack, $1);
+  intstack_push(interpreter, interpreter->ctx.intstack, $1);
   goto NEXT();
 }
 
@@ -3552,7 +3552,7 @@ Restore register $1 from the high-speed int stack.
 =cut
 
 inline op intrestore(out INT) {
-  $1=intstack_pop(interpreter, interpreter->intstack);
+  $1=intstack_pop(interpreter, interpreter->ctx.intstack);
   goto NEXT();
 }
 
@@ -3565,7 +3565,7 @@ Puts the depth of the high-speed int stack in $1.
 =cut
 
 inline op intdepth(out INT) {
-  $1=intstack_depth(interpreter, interpreter->intstack);
+  $1=intstack_depth(interpreter, interpreter->ctx.intstack);
   goto NEXT();
 }
 
@@ -3638,7 +3638,7 @@ stack for later returning.
 =cut
 
 inline op bsr (in INT) {
-  stack_push(interpreter, &interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto OFFSET($1);
 }
 
@@ -3653,7 +3653,7 @@ location onto the call stack for later returning.
 =cut
 
 inline op jsr(in INT) {
-  stack_push(interpreter, &interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto ADDRESS($1);
 }
 
@@ -4254,18 +4254,18 @@ inline op callnative(out PMC, in PMC, in PMC, in STR) {
 
 inline op call() {
   /* This op will be a vtable entry */
-  struct Parrot_Sub * sub = (struct Parrot_Sub*)interpreter->pmc_reg.registers[0]->data;
-  stack_push(interpreter, &interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  struct Parrot_Sub * sub = (struct Parrot_Sub*)interpreter->ctx.pmc_reg.registers[0]->data;
+  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto ADDRESS(sub->init);
 }
 
 inline op callco() {
   /* This op will be a vtable entry */
-  struct Parrot_Coroutine * co = (struct Parrot_Coroutine*)interpreter->pmc_reg.registers[0]->data;
+  struct Parrot_Coroutine * co = (struct Parrot_Coroutine*)interpreter->ctx.pmc_reg.registers[0]->data;
   /* FIXME: Here we need to switch in the co-routines context and save the
    * interpreter's context.
    */
-  stack_push(interpreter, &interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   /* Resuming co-routine or fresh call? */
   if(!co->resume) {
      goto ADDRESS(co->init);
@@ -4277,10 +4277,10 @@ inline op callco() {
 
 inline op yield() {
   opcode_t *dest;
-  struct Parrot_Coroutine * co = (struct Parrot_Coroutine*)interpreter->pmc_reg.registers[0]->data;
+  struct Parrot_Coroutine * co = (struct Parrot_Coroutine*)interpreter->ctx.pmc_reg.registers[0]->data;
   /* suspend the co-routine */
   co->resume = expr NEXT();
-  stack_pop(interpreter, &interpreter->control_stack, &dest, STACK_ENTRY_DESTINATION);
+  stack_pop(interpreter, &interpreter->ctx.control_stack, &dest, STACK_ENTRY_DESTINATION);
   goto ADDRESS(dest);
 }
 

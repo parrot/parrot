@@ -117,11 +117,11 @@ sub goto_pop
 my %arg_maps = (
   'op' => "cur_opcode[%ld]",
 
-  'i'  => "interpreter->int_reg.registers[cur_opcode[%ld]]",
-  'n'  => "interpreter->num_reg.registers[cur_opcode[%ld]]",
-  'p'  => "interpreter->pmc_reg.registers[cur_opcode[%ld]]",
-  's'  => "interpreter->string_reg.registers[cur_opcode[%ld]]",
-  'k'  => "interpreter->int_reg.registers[cur_opcode[%ld]]",
+  'i'  => "interpreter->ctx.int_reg.registers[cur_opcode[%ld]]",
+  'n'  => "interpreter->ctx.num_reg.registers[cur_opcode[%ld]]",
+  'p'  => "interpreter->ctx.pmc_reg.registers[cur_opcode[%ld]]",
+  's'  => "interpreter->ctx.string_reg.registers[cur_opcode[%ld]]",
+  'k'  => "interpreter->ctx.int_reg.registers[cur_opcode[%ld]]",
 
   'ic' => "cur_opcode[%ld]",
   'nc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->number",

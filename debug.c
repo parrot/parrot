@@ -348,7 +348,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 
     /* set the user arguments */
     userargv = pmc_new(interpreter, enum_class_PerlArray);
-    interpreter->pmc_reg.registers[0] = userargv;
+    interpreter->ctx.pmc_reg.registers[0] = userargv;
 
     key.atom.type = enum_key_int;
     key.next = NULL;
@@ -1098,7 +1098,7 @@ void
 PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    struct IRegChunk *chunk = interpreter->int_reg_top;
+    struct IRegChunk *chunk = interpreter->ctx.int_reg_top;
 
     valid_chunk(chunk, command, depth, FRAMES_PER_INT_REG_CHUNK, i);
 
@@ -1121,7 +1121,7 @@ void
 PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    struct NRegChunk *chunk = interpreter->num_reg_top;
+    struct NRegChunk *chunk = interpreter->ctx.num_reg_top;
 
     valid_chunk(chunk, command, depth, FRAMES_PER_NUM_REG_CHUNK, i);
 
@@ -1144,7 +1144,7 @@ void
 PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    struct SRegChunk *chunk = interpreter->string_reg_top;
+    struct SRegChunk *chunk = interpreter->ctx.string_reg_top;
 
     valid_chunk(chunk, command, depth, FRAMES_PER_STR_REG_CHUNK, i);
 
@@ -1167,7 +1167,7 @@ void
 PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    struct PRegChunk *chunk = interpreter->pmc_reg_top;
+    struct PRegChunk *chunk = interpreter->ctx.pmc_reg_top;
 
     valid_chunk(chunk, command, depth, FRAMES_PER_PMC_REG_CHUNK, i);
 
@@ -1190,7 +1190,7 @@ void
 PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0,i;
-    Stack_Chunk_t *chunk = interpreter->user_stack;
+    Stack_Chunk_t *chunk = interpreter->ctx.user_stack;
     Stack_Entry_t *entry;
     STRING *s;
 
@@ -1253,22 +1253,22 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
         case c_i:
         case c_int:
             na(command);
-            PDB_print_int(&interpreter->int_reg,command);
+            PDB_print_int(&interpreter->ctx.int_reg,command);
             break;
         case c_n:
         case c_num:
             na(command);
-            PDB_print_num(&interpreter->num_reg,command);
+            PDB_print_num(&interpreter->ctx.num_reg,command);
             break;
         case c_s:
         case c_str:
             na(command);
-            PDB_print_string(interpreter,&interpreter->string_reg,command);
+            PDB_print_string(interpreter,&interpreter->ctx.string_reg,command);
             break;
         case c_p:
         case c_pmc:
             na(command);
-            PDB_print_pmc(interpreter,&interpreter->pmc_reg,command);
+            PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg,command);
             break;
     }
 }

@@ -263,19 +263,19 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
             break;
 
         case PARROT_ARG_I:
-            pc_prederef[i] = (void *)&interpreter->int_reg.registers[pc[i]];
+            pc_prederef[i] = (void *)&interpreter->ctx.int_reg.registers[pc[i]];
             break;
 
         case PARROT_ARG_N:
-            pc_prederef[i] = (void *)&interpreter->num_reg.registers[pc[i]];
+            pc_prederef[i] = (void *)&interpreter->ctx.num_reg.registers[pc[i]];
             break;
 
         case PARROT_ARG_P:
-            pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[pc[i]];
+            pc_prederef[i] = (void *)&interpreter->ctx.pmc_reg.registers[pc[i]];
             break;
 
         case PARROT_ARG_S:
-            pc_prederef[i] = (void *)&interpreter->string_reg.registers[pc[i]];
+            pc_prederef[i] = (void *)&interpreter->ctx.string_reg.registers[pc[i]];
             break;
 
         case PARROT_ARG_IC:
@@ -520,62 +520,62 @@ make_interpreter(Interp_flags flags)
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     /* Set up the initial register chunks */
-    interpreter->int_reg_base = mem_sys_allocate(sizeof(struct IRegChunk));
-    interpreter->num_reg_base = mem_sys_allocate(sizeof(struct NRegChunk));
-    interpreter->string_reg_base =
+    interpreter->ctx.int_reg_base = mem_sys_allocate(sizeof(struct IRegChunk));
+    interpreter->ctx.num_reg_base = mem_sys_allocate(sizeof(struct NRegChunk));
+    interpreter->ctx.string_reg_base =
         mem_sys_allocate(sizeof(struct SRegChunk));
-    interpreter->pmc_reg_base = mem_sys_allocate(sizeof(struct PRegChunk));
-    interpreter->int_reg_top = interpreter->int_reg_base;
-    interpreter->num_reg_top = interpreter->num_reg_base;
-    interpreter->string_reg_top = interpreter->string_reg_base;
-    interpreter->pmc_reg_top = interpreter->pmc_reg_base;
+    interpreter->ctx.pmc_reg_base = mem_sys_allocate(sizeof(struct PRegChunk));
+    interpreter->ctx.int_reg_top = interpreter->ctx.int_reg_base;
+    interpreter->ctx.num_reg_top = interpreter->ctx.num_reg_base;
+    interpreter->ctx.string_reg_top = interpreter->ctx.string_reg_base;
+    interpreter->ctx.pmc_reg_top = interpreter->ctx.pmc_reg_base;
 
     /* Set up the initial registers */
-    memset(&interpreter->int_reg, 0, sizeof(struct IReg));
-    memset(&interpreter->num_reg, 0, sizeof(struct NReg));
-    memset(&interpreter->string_reg, 0, sizeof(struct SReg));
-    memset(&interpreter->pmc_reg, 0, sizeof(struct PReg));
+    memset(&interpreter->ctx.int_reg, 0, sizeof(struct IReg));
+    memset(&interpreter->ctx.num_reg, 0, sizeof(struct NReg));
+    memset(&interpreter->ctx.string_reg, 0, sizeof(struct SReg));
+    memset(&interpreter->ctx.pmc_reg, 0, sizeof(struct PReg));
 
     /* Initialize the integer register chunk */
-    interpreter->int_reg_base->used = 0;
-    interpreter->int_reg_base->free = FRAMES_PER_INT_REG_CHUNK;
-    interpreter->int_reg_base->next = NULL;
-    interpreter->int_reg_base->prev = NULL;
+    interpreter->ctx.int_reg_base->used = 0;
+    interpreter->ctx.int_reg_base->free = FRAMES_PER_INT_REG_CHUNK;
+    interpreter->ctx.int_reg_base->next = NULL;
+    interpreter->ctx.int_reg_base->prev = NULL;
 
     /* Initialize the initial numeric register chunk */
-    interpreter->num_reg_base->used = 0;
-    interpreter->num_reg_base->free = FRAMES_PER_NUM_REG_CHUNK;
-    interpreter->num_reg_base->next = NULL;
-    interpreter->num_reg_base->prev = NULL;
+    interpreter->ctx.num_reg_base->used = 0;
+    interpreter->ctx.num_reg_base->free = FRAMES_PER_NUM_REG_CHUNK;
+    interpreter->ctx.num_reg_base->next = NULL;
+    interpreter->ctx.num_reg_base->prev = NULL;
 
     /* Initialize the inital string register chunk, be sure to
      * NULL out the strings because string functions rely
      * on NULL strings */
-    interpreter->string_reg_base->used = 0;
-    interpreter->string_reg_base->free = FRAMES_PER_STR_REG_CHUNK;
-    interpreter->string_reg_base->next = NULL;
-    interpreter->string_reg_base->prev = NULL;
+    interpreter->ctx.string_reg_base->used = 0;
+    interpreter->ctx.string_reg_base->free = FRAMES_PER_STR_REG_CHUNK;
+    interpreter->ctx.string_reg_base->next = NULL;
+    interpreter->ctx.string_reg_base->prev = NULL;
     Parrot_clear_s(interpreter);
 
     /* Initialize the initial PMC register chunk. Gotta NULL them out,
      * too, otherwise we might GC Wrong Things later */
-    interpreter->pmc_reg_base->used = 0;
-    interpreter->pmc_reg_base->free = FRAMES_PER_PMC_REG_CHUNK;
-    interpreter->pmc_reg_base->next = NULL;
-    interpreter->pmc_reg_base->prev = NULL;
+    interpreter->ctx.pmc_reg_base->used = 0;
+    interpreter->ctx.pmc_reg_base->free = FRAMES_PER_PMC_REG_CHUNK;
+    interpreter->ctx.pmc_reg_base->next = NULL;
+    interpreter->ctx.pmc_reg_base->prev = NULL;
     Parrot_clear_p(interpreter);
 
     interpreter->DOD_block_level--;
     interpreter->GC_block_level--;
 
     /* Need a user stack */
-    interpreter->user_stack = new_stack(interpreter);
+    interpreter->ctx.user_stack = new_stack(interpreter);
 
     /* And a control stack */
-    interpreter->control_stack = new_stack(interpreter);
+    interpreter->ctx.control_stack = new_stack(interpreter);
 
     /* A regex stack would be nice too. */
-    interpreter->intstack = intstack_new(interpreter);
+    interpreter->ctx.intstack = intstack_new(interpreter);
 
     /* Load the core op func and info tables */
     interpreter->op_lib = PARROT_CORE_OPLIB_INIT();

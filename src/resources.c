@@ -321,8 +321,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
     for (i = 0; i < NUM_REGISTERS; i++) {
-        if (interpreter->pmc_reg.registers[i]) {
-            last = mark_used(interpreter->pmc_reg.registers[i], last);
+        if (interpreter->ctx.pmc_reg.registers[i]) {
+            last = mark_used(interpreter->ctx.pmc_reg.registers[i], last);
         }
     }
 
@@ -335,7 +335,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
 
     /* Now walk the pmc stack. Make sure to walk from top down
      * since stack may have segments above top that we shouldn't walk. */
-    for (cur_chunk = interpreter->pmc_reg_top; cur_chunk;
+    for (cur_chunk = interpreter->ctx.pmc_reg_top; cur_chunk;
          cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
             for (i = 0; i < NUM_REGISTERS; i++) {
@@ -347,7 +347,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     }
 
     /* Finally the general stack */
-    cur_stack = interpreter->user_stack;
+    cur_stack = interpreter->ctx.user_stack;
 
     while (cur_stack) {
         if(cur_stack->buffer){
@@ -422,14 +422,14 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
      * registers are pointing to valid buffers. This is not a good
      * assumption, but it'll do for now */
     for (i = 0; i < NUM_REGISTERS; i++) {
-        if (interpreter->string_reg.registers[i]) {
-            buffer_lives((Buffer *)interpreter->string_reg.registers[i]);
+        if (interpreter->ctx.string_reg.registers[i]) {
+            buffer_lives((Buffer *)interpreter->ctx.string_reg.registers[i]);
         }
     }
 
     /* Now walk the string stack. Make sure to walk from top down
      * since stack may have segments above top that we shouldn't walk. */
-    for (cur_chunk = interpreter->string_reg_top;
+    for (cur_chunk = interpreter->ctx.string_reg_top;
          cur_chunk; cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
             for (i = 0; i < NUM_REGISTERS; i++) {
@@ -441,7 +441,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     }
 
     /* Now the general stack */
-    cur_stack = interpreter->user_stack;
+    cur_stack = interpreter->ctx.user_stack;
     /* The general stack's circular, so we need to be careful */
     while (cur_stack) {
         if(cur_stack->buffer){ 
@@ -459,7 +459,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     }
 
     /* Finally the control stack frames must be marked live */
-    cur_stack = interpreter->control_stack;
+    cur_stack = interpreter->ctx.control_stack;
     while (cur_stack) {
         if(cur_stack->buffer){ 
             buffer_lives(cur_stack->buffer);
