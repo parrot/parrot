@@ -84,4 +84,26 @@ C<$Parrot::Config::PConfig{test_prog}> in lib/Parrot/Config.pm:
 
 and then use any of the above methods for running tests.
 
+=item B<make quicktest>
+
+C<make quicktest> is similar to make test, except that it skips some steps
+that are unnecessary most of the time, allowing for a significant speed gain.
+It's intended to be used as a quick check during development, lowering the
+barrier to checking tests. A C<make test> should be performed before
+submitting patches, just in case it is affected.
+
+Instead of recompiling the .pasm files to .pbc files each time
+the test is run, C<make quicktest> checks to see if the .pasm file is
+identical to the test, and if so, it uses the previously-generated .pbc file.
+
+C<make quicktest> can fail under the following circumstances:
+
+- it is cancelled before the generation of the .pbc file can be completed
+- the .pbc file format changes
+- the numbering of opcodes used in the tests is changed
+- the assembler changes in a manner that would affect its output on tests
+
+If C<make quicktest> fails to work properly, C<make test> is always
+available as a fallback.
+
 =back
