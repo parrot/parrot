@@ -33,22 +33,28 @@ sub runstep {
          # pp_pack is annoying, and this won't work unless sizeof(UV) >= 8
         $format = 'q';
     }
-    die "Configure.pl:  Unable to find a suitable packtype for $_.\n"
+    warn "Configure.pl:  Unable to find a suitable packtype for $_.\n"
         unless $format;
 
     my $test = eval {pack $format, 0};
     unless (defined $test) {
-        die <<"AARGH"
+        warn <<"AARGH"
 Configure.pl:  Unable to find a functional packtype for $_.
                '$format' failed: $@
 AARGH
     }
-    unless (length $test == $size) {
-        die sprintf <<"AARGH", $size, length $test;
+    if ($test) {
+	unless (length $test == $size) {
+	    warn sprintf <<"AARGH", $size, length $test;
 Configure.pl:  Unable to find a functional packtype for $_.
                Need a format for %d bytes, but '$format' gave %d bytes.
 AARGH
+	}
     }
+    else {
+	$format = '?';
+    }
+
     Configure::Data->set($which => $format);
   }
 
@@ -67,7 +73,7 @@ AARGH
   } elsif ($longsize == $ptrsize) {
     Configure::Data->set(ptrconst => "ul");
   } else {
-    die <<"AARGH";
+    warn <<"AARGH";
 Configure.pl:  Unable to find an integer type that fits a pointer.
 AARGH
   }

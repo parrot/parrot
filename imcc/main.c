@@ -502,6 +502,7 @@ int main(int argc, char * argv[])
         if (!pf)
             fatal(1, "main", "Packfile loading failed\n");
         Parrot_loadbc(interpreter, pf);
+        load_pbc = 1;
     }
     if (run_pbc) {
         if (IMCC_INFO(interpreter)->imcc_warn)

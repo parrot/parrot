@@ -1036,10 +1036,11 @@ PackFile_Segment_packed_size(struct PackFile_Segment * self)
     size_t size = default_packed_size(self);
     PackFile_Segment_packed_size_func_t f =
         self->pf->PackFuncs[self->type].packed_size;
+    size_t align = 16/sizeof(opcode_t);
     if (f)
         size += (f)(self);
-    if (size % 4)
-        size += (4 - size % 4);   /* pad/align it */
+    if (align && size % align)
+        size += (align - size % align);   /* pad/align it */
     return size;
 }
 
@@ -1048,13 +1049,15 @@ PackFile_Segment_pack(struct PackFile_Segment * self, opcode_t *cursor)
 {
     PackFile_Segment_pack_func_t f =
         self->pf->PackFuncs[self->type].pack;
+    size_t align = 16/sizeof(opcode_t);
+
     cursor = default_pack(self, cursor);
     if (!cursor)
         return 0;
     if (f)
         cursor = (f)(self, cursor);
-    if ((cursor - self->pf->src) % 4)
-        cursor +=  4 - (cursor - self->pf->src) % 4; /* align/pad it */
+    if (align && (cursor - self->pf->src) % align)
+        cursor += align - (cursor - self->pf->src) % align;
     return cursor;
 }
 
@@ -1065,6 +1068,8 @@ PackFile_Segment_unpack(struct Parrot_Interp *interpreter,
 {
     PackFile_Segment_unpack_func_t f =
         self->pf->PackFuncs[self->type].unpack;
+    size_t align = 16/sizeof(opcode_t);
+
     cursor = default_unpack(interpreter, self, cursor);
     if (!cursor)
         return 0;
@@ -1073,8 +1078,8 @@ PackFile_Segment_unpack(struct Parrot_Interp *interpreter,
         if (!cursor)
             return 0;
     }
-    if ((cursor - self->pf->src) % 4)
-        cursor +=  4 - (cursor - self->pf->src) % 4; /* align/pad it */
+    if (align && (cursor - self->pf->src) % align)
+        cursor += align - (cursor - self->pf->src) % align;
     return cursor;
 }
 
@@ -1131,6 +1136,7 @@ directory_unpack (struct Parrot_Interp *interpreter,
     struct PackFile_Directory *dir = (struct PackFile_Directory *) segp;
     struct PackFile      * pf = dir->base.pf;
     opcode_t *pos;
+    size_t align;
 
     dir->num_segments = PackFile_fetch_op (pf, &cursor);
     dir->segments = mem_sys_realloc (dir->segments,
@@ -1158,8 +1164,9 @@ directory_unpack (struct Parrot_Interp *interpreter,
         tmp = PackFile_fetch_op (pf, &pos);
         if (seg->op_count != tmp) {
             fprintf (stderr,
-                    "%s: Size in directory (%d) doesn't match size "
-                    "at offset (%d)\n", seg->name, (int)seg->op_count,
+                    "%s: Size in directory %d doesn't match size "
+                    "at offset (0x%x) %d\n", seg->name, (int)seg->op_count,
+                    (int)seg->file_offset,
                     (int)tmp);
         }
         if (i) {
@@ -1176,8 +1183,9 @@ directory_unpack (struct Parrot_Interp *interpreter,
         seg->dir = dir;
     }
 
-    if ((cursor - pf->src) % 4)
-        cursor += 4 - (cursor - pf->src) % 4;
+    align = 16/sizeof(opcode_t);
+    if (align && (cursor - pf->src) % align)
+        cursor += align - (cursor - pf->src) % align;
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; i++) {
         opcode_t *csave = cursor;
@@ -1248,6 +1256,7 @@ directory_packed_size (struct PackFile_Segment *self)
 {
     struct PackFile_Directory *dir = (struct PackFile_Directory *)self;
     size_t size, i, seg_size;
+    size_t align = 16/sizeof(opcode_t);
 
     /* need bytecode, fixup, other segs ... */
     sort_segs(dir);
@@ -1259,8 +1268,8 @@ directory_packed_size (struct PackFile_Segment *self)
         str_len = strlen (dir->segments[i]->name);
         size += ROUND_UP(str_len + 1, sizeof(opcode_t)) / sizeof(opcode_t);
     }
-    if (size % 4)
-        size += (4 - size % 4);   /* pad/align it */
+    if (align && size % align)
+        size += (align - size % align);   /* pad/align it */
     for (i=0; i < dir->num_segments; i++) {
         dir->segments[i]->file_offset = size + self->file_offset;
         seg_size = PackFile_Segment_packed_size (dir->segments[i]);
@@ -1280,6 +1289,7 @@ directory_pack (struct PackFile_Segment *self, opcode_t *cursor)
     size_t i;
     size_t num_segs;
     opcode_t *ret;
+    size_t align;
 
 
     num_segs = dir->num_segments;
@@ -1294,15 +1304,16 @@ directory_pack (struct PackFile_Segment *self, opcode_t *cursor)
         *cursor++ = seg->file_offset;
         *cursor++ = seg->op_count;
     }
-    if ((cursor - self->pf->src) % 4)
-        cursor += 4 - (cursor - self->pf->src) % 4;
+    align = 16/sizeof(opcode_t);
+    if (align && (cursor - self->pf->src) % align)
+        cursor += align - (cursor - self->pf->src) % align;
     /* now pack all segments into new format */
     for (i = 0; i < dir->num_segments; i++) {
         struct PackFile_Segment *seg = dir->segments[i];
         size_t size = seg->op_count;
         ret = PackFile_Segment_pack (seg, cursor);
         if ((size_t)(ret - cursor) != size) {
-            internal_exception(1, "PackFile_pack segment '%s' used size %d "
+            internal_exception(1, "directory_pack segment '%s' used size %d "
                 "but reported %d\n", seg->name, (int)(ret-cursor), (int)size);
         }
         cursor = ret;

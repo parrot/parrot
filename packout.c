@@ -94,7 +94,7 @@ PackFile_pack(struct PackFile *self, opcode_t *cursor)
     size = seg->op_count;
     ret = PackFile_Segment_pack (seg, cursor);
     if ((size_t)(ret - cursor) != size) {
-        internal_exception(1, "PackFile_pack segment '%s' used size %d "
+        fprintf(stderr, "PackFile_pack segment '%s' used size %d "
                 "but reported %d\n", seg->name, (int)(ret-cursor), (int)size);
     }
 }
