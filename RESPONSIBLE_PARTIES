@@ -1,0 +1,10 @@
+This is a partial list of the folks with CVS commit access and the
+areas they're directly responsible for. This does not list all the
+people with CVS commit access, just those who have an area they've
+taken responsibility for.
+
+Project lead			Jeff Goff
+JIT				Daniel Grunblatt
+GC/Memory Management		Peter Gibbs
+Configure			Brent Dax
+I/O				Melvin Smith
