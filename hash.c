@@ -437,7 +437,7 @@ hash_clone(struct Parrot_Interp * interp, HASH * hash) {
         HASHBUCKET * b = table[i];
         while (b) {
             /* XXX: does b->key need to be copied? */
-            hash_put(interp, ret, b->key, key_clone(interp, &(b->value)));
+            hash_put(interp, ret, b->key, &(b->value));
             b = b->next;
         }
     }
