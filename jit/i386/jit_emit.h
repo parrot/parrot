@@ -194,8 +194,7 @@ static char *emit_pushl_m(char *pc, int base, int i, int scale,
 /* POPs */
 
 static char *emit_popl_r(char *pc, int reg){
-    *(pc++) = 0x8f;
-    *(pc++) = emit_alu_X_r(emit_b000, reg);
+    *(pc++) = 0x58 | (reg - 1);
     return pc;
 }
 
