@@ -960,7 +960,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     struct Parrot_Interp * interpreter)
 {
     Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->registers_used;
+    int i = cur_se->int_registers_used;
 
     while (i--)
         if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_OUT) {
@@ -973,7 +973,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     struct Parrot_Interp *interpreter)
 {
     Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->registers_used;
+    int i = cur_se->int_registers_used;
 
     while (i--)
         if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_IN) {
