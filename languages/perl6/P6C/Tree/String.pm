@@ -53,7 +53,7 @@ sub concat_string {
     my $expand = [interpolate_expand($x)];
     my $p_one  = interpolate_concat_literal($expand);
     my $s3 = concat_list($p_one);
-    return $s3
+    return $s3;
 }
 
 sub interpolate_expand {
@@ -118,7 +118,8 @@ sub concat_list
         return $list->[0]
     }
     else {
-        return new P6C::sv_literal type => $type, lval => $list->[0]
+        return new P6C::sv_literal type => $type,
+	    lval => ($list->[0] || '""')
     }
 }
 
