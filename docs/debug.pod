@@ -16,7 +16,7 @@ First version by Steve Fink <steve@fink.com>
 
 This document describes ways to debug various parts of Parrot.
 
-=head1 THE PARROT BINARY
+=head1 THE PARROT AND IMCC BINARIES
 
 First, you'll want to use the --debugging flag with Configure.pl to
 generate debugging symbols for the parrot binary:
@@ -25,6 +25,10 @@ generate debugging symbols for the parrot binary:
   shell> make
 
 You can then run the parrot binary under gdb.
+
+You could also run all the tests with valgrind, by running
+
+ make test IMCC="valgrind -q languages/imcc/imcc"
 
 =head2 MEMORY MANAGEMENT
 
