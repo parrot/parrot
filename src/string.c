@@ -434,8 +434,6 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
                                  * end of our piece */
     UINTVAL true_offset;
     UINTVAL true_length;
-    UINTVAL new_length;
-    UINTVAL new_size;
     INTVAL diff;
         
     true_offset = (UINTVAL)offset;
@@ -791,7 +789,7 @@ string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
      * would approach 128 characters in the buffer.
      */
     do {
-        *--ptr = '0' + i % 10;
+        *--ptr = (char)('0' + i % 10);
     }
     while(i /= 10);
 

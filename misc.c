@@ -89,38 +89,40 @@ typedef struct spfinfo_t {
 void int_to_str(char *, char *, HUGEINTVAL, INTVAL );
 */
 
-void gen_sprintf_call(char *, char *, SpfInfo, int);
+void gen_sprintf_call(char *, char *, SpfInfo, char);
 
 static void
-uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num, INTVAL base)
+uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num, char base)
 {
-    int i = 0, cur;
+    int i = 0, cur2;
+	char cur;
 
     do {
-        cur = num % base;
+        cur = (char)(num % base);
 
         if (cur < 10) {
-            buf2[i] = '0' + cur;
+            buf2[i] = (char)('0' + cur);
         }
         else {
-            buf2[i] = 'a' + cur;
+            buf2[i] = (char)('a' + cur);
         }
 
         i++;
     } while (num /= base);
 
-    cur = i;
+    cur2 = i;
 
-    for (i = 0; i <= cur; i++) {
-        buf1[i] = buf2[cur - i];
+    for (i = 0; i <= cur2; i++) {
+        buf1[i] = buf2[cur2 - i];
     }
 }
 
 static void
-int_to_str(char *buf1, char *buf2, HUGEINTVAL num, INTVAL base)
+int_to_str(char *buf1, char *buf2, HUGEINTVAL num, char base)
 {
     BOOLVAL neg;
-    int i = 0, cur;
+    int i = 0, cur2;
+	char cur;
 
     if (num < 0) {
         neg = 1;
@@ -131,13 +133,13 @@ int_to_str(char *buf1, char *buf2, HUGEINTVAL num, INTVAL base)
     }
 
     do {
-        cur = num % base;
+        cur = (char)(num % base);
 
         if (cur < 10) {
-            buf2[i] = '0' + cur;
+            buf2[i] = (char)('0' + cur);
         }
         else {
-            buf2[i] = 'a' + cur;
+            buf2[i] = (char)('a' + cur);
         }
 
         i++;
@@ -147,10 +149,10 @@ int_to_str(char *buf1, char *buf2, HUGEINTVAL num, INTVAL base)
         buf2[i++] = '-';
     }
 
-    cur = i;
+    cur2 = i;
 
-    for (i = 0; i < cur; i++) {
-        buf1[i] = buf2[cur - i - 1];
+    for (i = 0; i < cur2; i++) {
+        buf1[i] = buf2[cur2 - i - 1];
     }
 
     buf1[i] = 0;
@@ -186,7 +188,7 @@ Pad_it(SpfInfo info, char *buf)
 }
 
 void
-gen_sprintf_call(char *buf, char *buf2, SpfInfo info, int thingy)
+gen_sprintf_call(char *buf, char *buf2, SpfInfo info, char thingy)
 {
     int i = 0;
     buf[i++] = '%';
@@ -251,7 +253,7 @@ Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat,
 
                 for (i++; i < (INTVAL)string_length(pat)
                      && info.phase != PHASE_DONE; i++) {
-                    char ch = string_ord(pat, i);
+                    INTVAL ch = string_ord(pat, i);
 
                     switch (info.phase) {
                     /*@fallthrough@ */ case PHASE_FLAGS:
@@ -411,7 +413,7 @@ Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat,
 
                         case 'f':
                             dbl = va_arg(*args, double);
-                            gen_sprintf_call(t1, t2, &info, (char)'f');
+                            gen_sprintf_call(t1, t2, &info, 'f');
                             sprintf(t2, t1, dbl);
                             targ = string_concat(interpreter, targ,
                                                  cstr2pstr(t2), 0);
