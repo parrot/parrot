@@ -1422,6 +1422,7 @@ languages/jako/jakoc
 languages/jako/lib/Jako/Compiler.pm
 languages/jako/lib/Jako/Construct.pm
 languages/jako/lib/Jako/Construct/Block.pm
+languages/jako/lib/Jako/Construct/Block/Bare.pm
 languages/jako/lib/Jako/Construct/Block/Conditional.pm
 languages/jako/lib/Jako/Construct/Block/Conditional/Else.pm
 languages/jako/lib/Jako/Construct/Block/Conditional/If.pm
