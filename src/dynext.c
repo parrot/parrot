@@ -226,6 +226,41 @@ specific setup. In both functions C<%s> is the name of the library.
 */
 
 PMC *
+Parrot_init_lib(Interp *interpreter,
+                PMC *(*load_func)(Interp *),
+                void (*init_func)(Interp *, PMC *))
+{
+    STRING *type;
+    PMC *lib_pmc;
+
+    if (!load_func) {
+        /* seems to be a native/NCI lib */
+        /*
+         * this PMC should better be constant, but then all the contents
+         * and the metadata have to be constant too
+         * s. also build_tools/ops2c.pl and lib/Parrot/Pmc2c.pm
+         */
+        lib_pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
+        type = const_string(interpreter, "NCI");
+    }
+    else {
+        lib_pmc = (*load_func)(interpreter);
+        /* we could set a private flag in the PMC header too
+         * but currently only ops files have struct_val set
+         */
+        type = const_string(interpreter,
+                PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
+    }
+    /*
+     *  call init, if it exists
+     */
+    if (init_func)
+        (init_func)(interpreter, lib_pmc);
+
+    return lib_pmc;
+}
+
+PMC *
 Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 {
     STRING *path, *load_func_name, *init_func_name, *type;
@@ -264,39 +299,21 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
         /* UNLOCK */
         return lib_pmc;
     }
+    /* get load_func */
     load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_load", lib);
     cload_func_name = string_to_cstring(interpreter, load_func_name);
     load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle,
                 cload_func_name));
     string_cstring_free(cload_func_name);
-    if (!load_func) {
-        /* seems to be a native/NCI lib */
-        /*
-         * this PMC should better be constant, but then all the contents
-         * and the metadata have to be constant too
-         * s. also build_tools/ops2c.pl and lib/Parrot/Pmc2c.pm
-         */
-        lib_pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
-        type = const_string(interpreter, "NCI");
-    }
-    else {
-        lib_pmc = (*load_func)(interpreter);
-        /* we could set a private flag in the PMC header too
-         * but currently only ops files have struct_val set
-         */
-        type = const_string(interpreter,
-                PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
-    }
-    /*
-     *  call init, if it exists
-     */
+    /* get init_func */
     init_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_init", lib);
     cinit_func_name = string_to_cstring(interpreter, init_func_name);
     init_func = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(handle,
                 cinit_func_name));
     string_cstring_free(cinit_func_name);
-    if (init_func)
-        (init_func)(interpreter, lib_pmc);
+
+    lib_pmc = Parrot_init_lib(interpreter, load_func, init_func);
+
     PMC_data(lib_pmc) = handle;
     /*
      * remember lib_pmc in iglobals
