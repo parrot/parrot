@@ -281,7 +281,7 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
         case STACK_ENTRY_POINTER:
         case STACK_ENTRY_DESTINATION:
         case STACK_ENTRY_CORO_MARK:
-            entry->entry.generic_pointer = thing;
+            entry->entry.struct_val = thing;
             break;
         default:
             internal_exception(ERROR_BAD_STACK_TYPE,
@@ -368,7 +368,7 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
     case STACK_ENTRY_POINTER:
     case STACK_ENTRY_DESTINATION:
     case STACK_ENTRY_CORO_MARK:
-        *(void **)where = entry->entry.generic_pointer;
+        *(void **)where = entry->entry.struct_val;
         break;
     default:
         internal_exception(ERROR_BAD_STACK_TYPE,
@@ -403,8 +403,14 @@ stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
     if (type != NULL) {
         *type = entry->entry_type;
     }
-
-    return entry->entry.generic_pointer;
+    switch (entry->entry_type) {
+        case STACK_ENTRY_POINTER:
+        case STACK_ENTRY_DESTINATION:
+        case STACK_ENTRY_CORO_MARK:
+            return entry->entry.struct_val;
+        default:
+            return (void *)entry->entry.pmc_val;
+    }
 }
 
 Stack_entry_type

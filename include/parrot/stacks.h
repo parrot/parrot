@@ -19,13 +19,7 @@
 #define STACK_CHUNK_LIMIT 100
 
 typedef struct Stack_Entry {
-    union {
-        Floatval num_val;
-        Intval   int_val;
-        PMC     *pmc_val;
-        String  *string_val;
-        void    *generic_pointer;
-    } entry;
+    UnionVal entry;
     Stack_entry_type  entry_type;
     void (*cleanup)(struct Stack_Entry *);
 } Stack_Entry_t;

@@ -31,16 +31,21 @@
 
 
 typedef union UnionVal {
-    INTVAL int_val;             /* PMC unionval members */
-    FLOATVAL num_val;
-    DPOINTER* struct_val;
-    struct parrot_string_t * string_val;
-    PMC* pmc_val;
     struct {                    /* Buffers structure */
         void * bufstart;
         size_t buflen;
     } b;
+    struct {                    /* PMC unionval members */
+        DPOINTER* struct_val;   /* two ptrs, both are defines */
+        PMC* pmc_val;
+    } ptrs;
+    INTVAL int_val;
+    FLOATVAL num_val;
+    struct parrot_string_t * string_val;
 } UnionVal;
+
+#define struct_val ptrs.struct_val
+#define pmc_val ptrs.pmc_val
 
 /* Parrot Object - base class for all others */
 typedef struct pobj_t {
