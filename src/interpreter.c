@@ -79,6 +79,13 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *),
 }
 
 /*=for api interpreter init_prederef
+ *
+ * Dynamically load the prederef oplib so its opfuncs can be used in
+ * place of the standard ones.
+ *
+ * TODO: These static variables need to be moved into the interpreter
+ * structure, or something else smarter than this needs to be done
+ * with them.
  */
 
 static void *       prederef_oplib_handle = NULL;
@@ -181,6 +188,8 @@ init_prederef(struct Parrot_Interp * interpreter)
 }
 
 /*=for api interpreter stop_prederef
+ *
+ * Unload the prederef oplib.
  */
 
 static void
@@ -198,6 +207,21 @@ stop_prederef(void)
 }
 
 /*=for api interpreter prederef
+ *
+ * Predereference the current opcode. Note that this function has the
+ * same signature as a prederef opfunc. This is important because the
+ * prederef code chunk is pre-initialized with pointers to this
+ * function, so that as ops that have not yet been predereferenced are
+ * encountered, execution is automatically vectored here so the
+ * predereferencing can be performed. Since this function returns the
+ * same pc_prederef it was passed, the runops loop will re-execute
+ * the same location, which will then have the pointer to the real
+ * prederef opfunc and prederef args.
+ *
+ * The initial few lines of pointer arithmetic are used to determine
+ * the index into the bytecode corresponding to the currect pc_prederef.
+ * The bytecode and prederef arrays have the same number of elements
+ * since there is a one-to-one mapping.
  */
 
 static void **
@@ -261,7 +285,6 @@ prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
     }
   }
 
-
   return pc_prederef;
 }
 
@@ -291,6 +314,22 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
 
 
 /*=for api interpreter runops_prederef
+ *
+ * This runops core is used when we are in prederef mode. It works
+ * just like the basic fast core, except it uses pc_prederef instead
+ * of pc, and calls prederef opfuncs instead of regular opfuncs.
+ *
+ * There is code after the main while loop to resynchronize pc with
+ * pc_prederef in case we have exited the loop under restart
+ * conditions (such as with interpreter flag changing ops).
+ *
+ * TODO: The calls to init_prederef() and stop_prederef() would be
+ * best placed elsewhere, since we would re-pay the costs of loading
+ * the prederef oplib every time we dropped out of and back into
+ * this core. For now, however, this implementation should do fine.
+ * Since dropping out of and back into cores is expected to be rare
+ * (at the time of implementation that only occurs for interpreter
+ * flag changing ops).
  */
 static void
 runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc, 
