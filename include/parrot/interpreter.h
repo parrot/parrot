@@ -393,6 +393,8 @@ void clone_interpreter(PMC* dest, PMC* self);
 void enter_nci_method(Parrot_Interp, int type,
 		 void *func, const char *name, const char *proto);
 
+void Parrot_py_init(Interp *interpreter);
+
 #else
 
 typedef void * *(*native_func_t)(struct Parrot_Interp *interpreter,

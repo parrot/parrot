@@ -248,6 +248,7 @@ INTERP_O_FILES = \
     $(SRC)/inter_create$(O)  \
     $(SRC)/inter_misc$(O)  \
     $(SRC)/inter_run$(O)  \
+    $(SRC)/py_func$(O)  \
     $(SRC)/register$(O) \
     $(SRC)/memory$(O) \
     $(SRC)/objects$(O) \
@@ -410,6 +411,7 @@ all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc runtime/parr
 
 STR_FILES = \
     $(SRC)/inter_cb.str \
+    $(SRC)/py_func.str \
     $(SRC)/objects.str
 
 $(INC)/string_private_cstring.h : $(STR_FILES) build_tools/c2str.pl
@@ -772,6 +774,9 @@ $(SRC)/inter_misc$(O) : $(SRC)/inter_misc.c $(GENERAL_H_FILES)
 $(SRC)/inter_create$(O) : $(SRC)/inter_create.c $(GENERAL_H_FILES)
 
 $(SRC)/inter_run$(O) : $(SRC)/inter_run.c $(GENERAL_H_FILES)
+
+$(SRC)/py_func$(O) : $(SRC)/inter_cb.c $(GENERAL_H_FILES) \
+    $(SRC)/py_func.str
 
 io/io$(O) : $(GENERAL_H_FILES) io/io_private.h
 

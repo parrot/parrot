@@ -178,6 +178,9 @@ i	IPii
 i	IPiii
 i	IPt
 
+# Py_func signatures
+P	IP
+
 # the following are use by t/pmc/nci.t
 f	ff
 i	sc

@@ -421,12 +421,16 @@ main(int argc, char * argv[])
     interpreter->DOD_block_level++;
     interpreter->GC_block_level++;
 
+
     imcc_init(interpreter);
 
     sourcefile = parseflags(interpreter, &argc, &argv);
     /* can't run JIT or prederefed yet */
     core = interpreter->run_core;
     interpreter->run_core = 0;
+
+    if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE))
+        Parrot_py_init(interpreter);
 
     /* default optimizations, s. optimizer.c, imc.h */
     if (!*optimizer_opt) {

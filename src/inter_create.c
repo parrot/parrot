@@ -226,6 +226,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 
     /* setup stdio PMCs */
     PIO_init(interpreter);
+
     /* Done. Return and be done with it */
 
 

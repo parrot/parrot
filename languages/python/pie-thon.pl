@@ -195,7 +195,10 @@ sub is_imag {
 sub typ {
     my $c = $_[0];
     my $t = 'P';
-    if ($c =~ /^[+-]?\d+$/) {	# int
+    if ($c =~ /code object/) {
+	$t = 'c';
+    }
+    elsif ($c =~ /^[+-]?\d+$/) {	# int
 	$t = 'I';
     }
     elsif ($c =~ /^\d+[lL]$/) {	# bigint   XXX
@@ -243,6 +246,17 @@ EOC
 	print <<EOC;
 	$pmc = new $typ $cmt
 	$pmc = $c
+EOC
+	push @stack, [$n, $pmc, 'P'];
+	return;
+    }
+    elsif (typ($c) eq 'B') {
+	my $typ = $DEFVAR;
+        my $pmc = temp('P');
+	$c =~ s/[lL]$//;
+	print <<EOC;
+	$pmc = new .BigInt $cmt
+	$pmc = "$c"
 EOC
 	push @stack, [$n, $pmc, 'P'];
 	return;
@@ -320,6 +334,9 @@ sub LOAD_NAME() {
 EOC
 	push @stack, [-1, $c, 'F'];
 	return;
+    }
+    if ($c eq 'range') {
+	$c = 'range_1';
     }
     if ($globals{$c}) {
 	print <<"EOC";
@@ -585,8 +602,8 @@ sub CALL_FUNCTION
     my ($n, $c, $cmt) = @_;
     my @args;
     # arguments = $n & 0xff
-    # ?optional? = $n >> 8
-    $n &= 0xff;
+    # named args: = $n >> 8 # ???
+    $n =  ($n & 0xff) + 2*($n >> 8);	# XXX ???
     for (my $i = 0; $i < $n; $i++) {
 	my $arg = pop @stack;
 	unshift @args, promote($arg);
@@ -594,16 +611,27 @@ sub CALL_FUNCTION
     my $tos = pop @stack;
     my $args = join ', ', @args;
     my $t;
+    my $func = $tos->[1];
+    if ($func eq 'range') {
+	$func = "${func}_$n";	# range_1 .. range_3
+	unless ($globals{$func}) {
+	    $globals{$func} = 1;
+	    print <<"EOC";
+	.local NCI $func
+	$func = global "$func"
+EOC
+	}
+    }
     if ($tos->[2] eq 'F') {	# builtin
 	$t = temp('P');
 	print <<EOC;
 	$t = new $DEFVAR
-	$t = $tos->[1] $args   $cmt
+	$t = $func $args   $cmt
 EOC
     }
     else {
 	print <<EOC;
-	$tos->[1]($args)  $cmt
+	$func($args)  $cmt
 EOC
     }
     my $opcode = $code[$code_l]->[2];

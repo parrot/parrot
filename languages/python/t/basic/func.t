@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 9;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 	foo(a, b, 2)
 CODE
 
-test(<<'CODE', 'abs() builtin');
+test(<<'CODE', 'abs() builtin opcode');
 def check(a,b):
     print a,b
 
@@ -52,4 +52,36 @@ def check_functions(i=0, j=0):
 if __name__ == '__main__':
     check_functions()
     check_functions(-1, 2)
+CODE
+
+test(<<'CODE', 'callable() builtin function');
+if __name__ == '__main__':
+    o = callable
+    i = callable(o)
+    print i
+    a = 5
+    i = callable(a)
+    print i
+CODE
+
+test(<<'CODE', 'chr() builtin function');
+if __name__ == '__main__':
+    print chr(65), chr(97)
+CODE
+
+test(<<'CODE', 'hash() builtin function');
+if __name__ == '__main__':
+    print hash(65), hash(97L)
+CODE
+
+test(<<'CODE', 'hash() builtin function, num, complex');
+if __name__ == '__main__':
+    print hash(42.0), hash(42+0j)
+CODE
+
+test(<<'CODE', 'range 1');
+if __name__ == '__main__':
+    for i in range(10):
+	print i,
+    print
 CODE
