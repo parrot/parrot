@@ -347,12 +347,8 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
 
             if (interpreter->profile == NULL) {
                 interpreter->profile = (ProfData *)
-                    mem_sys_allocate(interpreter->op_count * sizeof(ProfData));
-            }
-
-            for (i = 0; i < interpreter->op_count; i++) {
-                interpreter->profile[i].numcalls = 0;
-                interpreter->profile[i].time = 0.0;
+                    mem_sys_allocate_zeroed(interpreter->op_count *
+                            sizeof(ProfData));
             }
         }
 
@@ -362,7 +358,7 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
             if (!interpreter->prederef_code) {
                 size_t N = interpreter->code->byte_code_size;
                 size_t i;
-                void **temp = (void **)malloc(N * sizeof(void *));
+                void **temp = (void **)mem_sys_allocate(N * sizeof(void *));
 
                 for (i = 0; i < N; i++) {
                     temp[i] = (void *)(ptrcast_t)prederef;
@@ -419,19 +415,8 @@ make_interpreter(Interp_flags flags)
     struct Parrot_Interp *interpreter;
 
     /* Get an empty interpreter from system memory */
-    interpreter = mem_sys_allocate((UINTVAL)sizeof(struct Parrot_Interp));
+    interpreter = mem_sys_allocate_zeroed(sizeof(struct Parrot_Interp));
 
-    /* zero our counters */
-    interpreter->dod_runs = 0;
-    interpreter->collect_runs = 0;
-    interpreter->mem_allocs_since_last_collect = 0;
-    interpreter->header_allocs_since_last_collect = 0;
-    interpreter->active_PMCs = 0;
-    interpreter->active_Buffers = 0;
-    interpreter->total_PMCs = 0;
-    interpreter->total_Buffers = 0;
-    interpreter->memory_allocated = 0;
-    interpreter->memory_collected = 0;
     interpreter->DOD_block_level = 1;
     interpreter->GC_block_level = 1;
 
@@ -461,66 +446,41 @@ make_interpreter(Interp_flags flags)
     interpreter->perl_stash->parent_stash = NULL;
 
     /* Initialize interpreter's flags */
-    interpreter->warns = mem_sys_allocate(sizeof(struct warnings_t));
-    memset(interpreter->warns, 0, sizeof(struct warnings_t));
+    interpreter->warns = mem_sys_allocate_zeroed(sizeof(struct warnings_t));
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     /* Set up the initial register chunks */
-    interpreter->ctx.int_reg_base = mem_sys_allocate(sizeof(struct IRegChunk));
-    interpreter->ctx.num_reg_base = mem_sys_allocate(sizeof(struct NRegChunk));
+    interpreter->ctx.int_reg_base =
+        mem_sys_allocate_zeroed(sizeof(struct IRegChunk));
+    interpreter->ctx.num_reg_base =
+        mem_sys_allocate_zeroed(sizeof(struct NRegChunk));
     interpreter->ctx.string_reg_base =
-        mem_sys_allocate(sizeof(struct SRegChunk));
-    interpreter->ctx.pmc_reg_base = mem_sys_allocate(sizeof(struct PRegChunk));
+        mem_sys_allocate_zeroed(sizeof(struct SRegChunk));
+    interpreter->ctx.pmc_reg_base =
+        mem_sys_allocate_zeroed(sizeof(struct PRegChunk));
     interpreter->ctx.int_reg_top = interpreter->ctx.int_reg_base;
     interpreter->ctx.num_reg_top = interpreter->ctx.num_reg_base;
     interpreter->ctx.string_reg_top = interpreter->ctx.string_reg_base;
     interpreter->ctx.pmc_reg_top = interpreter->ctx.pmc_reg_base;
 
-    /* Set up the initial registers */
-    memset(&interpreter->ctx.int_reg, 0, sizeof(struct IReg));
-    memset(&interpreter->ctx.num_reg, 0, sizeof(struct NReg));
-    memset(&interpreter->ctx.string_reg, 0, sizeof(struct SReg));
-    memset(&interpreter->ctx.pmc_reg, 0, sizeof(struct PReg));
-
-    /* Initialize the integer register chunk */
-    interpreter->ctx.int_reg_base->used = 0;
+    /* Initialize the register chunks */
     interpreter->ctx.int_reg_base->free = FRAMES_PER_INT_REG_CHUNK;
-    interpreter->ctx.int_reg_base->next = NULL;
-    interpreter->ctx.int_reg_base->prev = NULL;
-
-    /* Initialize the initial numeric register chunk */
-    interpreter->ctx.num_reg_base->used = 0;
     interpreter->ctx.num_reg_base->free = FRAMES_PER_NUM_REG_CHUNK;
-    interpreter->ctx.num_reg_base->next = NULL;
-    interpreter->ctx.num_reg_base->prev = NULL;
-
-    /* Initialize the inital string register chunk, be sure to
-     * NULL out the strings because string functions rely
-     * on NULL strings */
-    interpreter->ctx.string_reg_base->used = 0;
     interpreter->ctx.string_reg_base->free = FRAMES_PER_STR_REG_CHUNK;
-    interpreter->ctx.string_reg_base->next = NULL;
-    interpreter->ctx.string_reg_base->prev = NULL;
-    Parrot_clear_s(interpreter);
-
-    /* Initialize the initial PMC register chunk. Gotta NULL them out,
-     * too, otherwise we might GC Wrong Things later */
-    interpreter->ctx.pmc_reg_base->used = 0;
     interpreter->ctx.pmc_reg_base->free = FRAMES_PER_PMC_REG_CHUNK;
-    interpreter->ctx.pmc_reg_base->next = NULL;
-    interpreter->ctx.pmc_reg_base->prev = NULL;
-    Parrot_clear_p(interpreter);
 
     /* Stack for lexical pads */
     interpreter->ctx.pad_stack = new_stack(interpreter);
 
     /* Need a user stack */
     interpreter->ctx.user_stack = new_stack(interpreter);
-    assert(interpreter->ctx.user_stack->buffer != interpreter->ctx.pad_stack->buffer);
+    assert(interpreter->ctx.user_stack->buffer !=
+            interpreter->ctx.pad_stack->buffer);
 
     /* And a control stack */
     interpreter->ctx.control_stack = new_stack(interpreter);
-    assert(interpreter->ctx.control_stack->buffer != interpreter->ctx.user_stack->buffer);
+    assert(interpreter->ctx.control_stack->buffer !=
+            interpreter->ctx.user_stack->buffer);
 
     /* A regex stack would be nice too. */
     interpreter->ctx.intstack = intstack_new(interpreter);
@@ -532,17 +492,11 @@ make_interpreter(Interp_flags flags)
     interpreter->op_info_table = interpreter->op_lib->op_info_table;
 
     /* Set up defaults for line/package/file */
-    interpreter->current_line = 0;
     interpreter->current_file =
         string_make(interpreter, "(unknown file)", 14, NULL, 0, NULL);
     interpreter->current_package =
         string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
 
-
-    /* Set I/O data to NULL first or else PIO_init will
-     * assume this interpreter is already initialized.
-     */
-    interpreter->piodata = NULL;
     PIO_init(interpreter);
 
     /* Done. Return and be done with it */
@@ -553,13 +507,7 @@ make_interpreter(Interp_flags flags)
      */
     Parrot_unblock_DOD(interpreter);
     Parrot_unblock_GC(interpreter);
-    interpreter->code = (struct PackFile *)NULL;
-    interpreter->profile = (ProfData *)NULL;
 
-    interpreter->resume_flag = 0;
-    interpreter->resume_offset = 0;
-
-    interpreter->prederef_code = (void **)NULL;
 #ifdef ATEXIT_DESTROY
     Parrot_on_exit(Parrot_really_destroy, (void*)interpreter);
 #endif

@@ -24,14 +24,9 @@ new_stack(Interp *interpreter)
     Stack_Entry_t *entry;
 #endif
 
-    Stack_Chunk_t *stack = mem_sys_allocate(sizeof(Stack_Chunk_t));
+    Stack_Chunk_t *stack = mem_sys_allocate_zeroed(sizeof(Stack_Chunk_t));
 
-    stack->used = 0;
     stack->flags = NO_STACK_CHUNK_FLAGS;
-    stack->next = NULL;
-    stack->prev = NULL;
-    /* Set buffer to null before allocation which might call GC */
-    stack->buffer = NULL;
     stack->buffer = new_buffer_header(interpreter);
 
     /* Block DOD from murdering our newly allocated stack->buffer. */
@@ -102,6 +97,7 @@ stack_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top)
                                                & ~(int)STACK_CHUNK_COW_FLAG);
 
         /* Copy stack buffer */
+        new_chunk->buffer = NULL;
         new_chunk->buffer = new_buffer_header(interp);
         Parrot_allocate(interp, new_chunk->buffer,
                         sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
@@ -116,7 +112,7 @@ stack_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top)
 /* If depth >= 0, return the entry at that depth from the top of the stack,
    with 0 being the top entry.  If depth < 0, then return the entry |depth|
    entries from the bottom of the stack.
-   Returns NULL if |depth| > number of entries in stack 
+   Returns NULL if |depth| > number of entries in stack
 */
 Stack_Entry_t *
 stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
@@ -231,15 +227,11 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
     if (chunk->used == STACK_CHUNK_DEPTH) {
         if (chunk->next == NULL) {
             /* Need to add a new chunk */
-            Stack_Chunk_t *new_chunk = mem_sys_allocate(sizeof(Stack_Chunk_t));
-            new_chunk->used = 0;
-            new_chunk->next = NULL;
+            Stack_Chunk_t *new_chunk = mem_sys_allocate_zeroed(
+                    sizeof(Stack_Chunk_t));
             new_chunk->prev = chunk;
             chunk->next = new_chunk;
             *stack_p = chunk = new_chunk;
-
-            /* Need to initialize this pointer before the collector sees it */
-            new_chunk->buffer = NULL;
             new_chunk->buffer = new_buffer_header(interpreter);
 
             Parrot_allocate(interpreter, new_chunk->buffer,
@@ -419,7 +411,7 @@ get_entry_type(Interp *interpreter, Stack_Entry_t *entry)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
