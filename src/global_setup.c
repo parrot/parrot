@@ -50,7 +50,6 @@ init_world(Interp *interpreter)
     INTVAL i;
 
     PMC *iglobals;
-    PMC *classname_hash;
     PMC *self;
 
 #ifdef PARROT_HAS_PLATFORM_INIT_CODE
@@ -78,7 +77,7 @@ init_world(Interp *interpreter)
     for (i = 0; i < (INTVAL)IGLOBALS_SIZE; i++)
         VTABLE_set_pmc_keyed_int(interpreter, iglobals, i, NULL);
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,
-            (INTVAL)IGLOBALS_CLASSNAME_HASH, classname_hash);
+            (INTVAL)IGLOBALS_CLASSNAME_HASH, interpreter->class_hash);
     self = pmc_new_noinit(interpreter, enum_class_ParrotInterpreter);
     PMC_data(self) = interpreter;
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,
