@@ -71,16 +71,6 @@ supply one on the command line.
 
 Print version information and exit.
 
-=begin DEVELOPER
-
-=back
-
-=head1 Subroutines
-
-=over 4
-
-=end DEVELOPER
-
 =cut
 
 eval 'exec perl -w -S $0 ${1+"$@"}'
