@@ -933,6 +933,39 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
     return mem;
 }
 
+/* Takes an interpreter, a buffer pointer, and a new size. The buffer
+   pointer is in as a void * because we may take a STRING or
+   something, and C doesn't subclass. The destination may be bigger,
+   since we round up to the allocation quantum */
+void *
+Parrot_reallocate_about(struct Parrot_Interp *interpreter, void *from, size_t tosize)
+{
+    /* Put our void * pointer into something we don't have to cast
+       around with */
+    Buffer *buffer;
+    size_t copysize;
+    size_t alloc_size = tosize;
+    void *mem;
+
+    buffer = from;
+    copysize = (buffer->buflen > tosize ? tosize : buffer->buflen);
+
+    mem = mem_allocate(interpreter, &alloc_size);
+    if (!mem) {
+        return NULL;
+    }
+    /* We shouldn't ever have a 0 from size, but we do. If we can
+       track down those bugs, this can be removed which would make
+       things cheaper */
+    if (copysize) {
+        memcpy(mem, buffer->bufstart, copysize);
+    }
+    buffer->bufstart = mem;
+    buffer->buflen = alloc_size;
+    return mem;
+}
+
+/* Allocate exactly as much memory as they asked for */
 void *
 Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 {
@@ -941,6 +974,19 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
     ((Buffer *)buffer)->bufstart = NULL;
     ((Buffer *)buffer)->bufstart = mem_allocate(interpreter, &req_size);
     ((Buffer *)buffer)->buflen = size;
+    return buffer;
+}
+
+/* Allocate at least as much memory as they asked for. We round the
+   amount up to the allocation quantum */
+void *
+Parrot_allocate_about(struct Parrot_Interp *interpreter, void *buffer, size_t size)
+{
+    size_t req_size = size;
+    ((Buffer *)buffer)->buflen = 0;
+    ((Buffer *)buffer)->bufstart = NULL;
+    ((Buffer *)buffer)->bufstart = mem_allocate(interpreter, &req_size);
+    ((Buffer *)buffer)->buflen = req_size;
     return buffer;
 }
 
