@@ -19,11 +19,11 @@
 #
 #    ... body of function ...
 #
-#    RETVAL = x;
+#    RETURN(x);
 #
 # }
 #
-# There may be more than one RETVAL
+# There may be more than one RETURN
 #
 # The functions have the magic variables Pnnn for parameters 1 through
 # X. (Parameter 0 is the opcode number) Types for each, and the size
