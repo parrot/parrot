@@ -1,0 +1,95 @@
+.include "datatypes.pasm"
+
+.pcc_sub _init_SDL_types prototyped
+	newsub $P0, .Sub, new_SDL_Rect
+	store_global 'new_SDL_Rect', $P0
+	print "Init types\n"
+	.pcc_begin_return
+	.pcc_end_return
+.end
+
+.pcc_sub _new_SDL_Rect prototyped
+	new $P2, .OrderedHash
+	set $P2['x'], .DATATYPE_INT16
+	push $P2, 0
+	push $P2, 0
+	set $P2['y'], .DATATYPE_INT16
+	push $P2, 0
+	push $P2, 0
+	set $P2['w'], .DATATYPE_UINT16
+	push $P2, 0
+	push $P2, 0
+	set $P2['h'], .DATATYPE_UINT16
+	push $P2, 0
+	push $P2, 0
+
+	new $P5, .ManagedStruct, $P2
+	set $I6, 0
+	sizeof $I7, .DATATYPE_INT16
+	add $I6, $I7
+	add $I6, $I7
+	sizeof $I7, .DATATYPE_UINT16
+	add $I6, $I7
+	add $I6, $I7
+
+	set $P5, $I6
+
+	.pcc_begin_return
+	.return $P5
+	.pcc_end_return
+.end
+
+.pcc_sub _new_SDL_Color prototyped
+	.param int red
+	.param int green
+	.param int blue
+
+	new $P2, .OrderedHash
+	set $P2['r'], .DATATYPE_UINT8
+	push $P2, 0
+	push $P2, 0
+	set $P2['g'], .DATATYPE_UINT8
+	push $P2, 0
+	push $P2, 0
+	set $P2['b'], .DATATYPE_UINT8
+	push $P2, 0
+	push $P2, 0
+	set $P2['a'], .DATATYPE_UINT8
+	push $P2, 0
+	push $P2, 0
+
+	new $P5, .ManagedStruct, $P2
+	set $I6, 0
+	sizeof $I7, .DATATYPE_UINT8
+	add $I6, $I7
+	add $I6, $I7
+	add $I6, $I7
+	add $I6, $I7
+
+	set $P5, $I6
+
+	print red
+	print "\n"
+	print green
+	print "\n"
+	print blue
+	print "\n"
+
+	set $P5['r'], red
+	set $P5['g'], green
+	set $P5['b'], blue
+
+	set $I0, $P5['r']
+	print $I0
+	print "\n"
+	set $I0, $P5['g']
+	print $I0
+	print "\n"
+	set $I0, $P5['b']
+	print $I0
+	print "\n"
+
+	.pcc_begin_return
+	.return $P5
+	.pcc_end_return
+.end

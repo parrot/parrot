@@ -205,3 +205,6 @@ p	tiB3P
 i	pPtiiipi
 i	tpiibi
 
+# Used by library/sdl.imc
+p	iiil
+i	ppl

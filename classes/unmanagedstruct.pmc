@@ -80,6 +80,10 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
     return p + count * size;
 }
 
+/*
+ * if e.g. char or short type size doesn't match, this will fail
+ * we need some more configure support for type sizes
+ */
 static INTVAL
 ret_int(char *p, int type)
 {
@@ -91,11 +95,13 @@ ret_int(char *p, int type)
 	case enum_type_uint16:
 	case enum_type_short:
 	    return *(short*) p;
+	case enum_type_uint8:
+	case enum_type_int8:
 	case enum_type_char:
 	case enum_type_uchar:
 	    return *p;
 	default:
-	    internal_exception(1, "unhandled type in struct");
+	    internal_exception(1, "returning unhandled int type in struct");
     }
     return -1;
 }
@@ -111,7 +117,7 @@ ret_float(char *p, int type)
 	case enum_type_double:
 	    return (FLOATVAL) *(double*) p;
 	default:
-	    internal_exception(1, "unhandled type in struct");
+	    internal_exception(1, "returning unhandled float type in struct");
     }
     return -1.0;
 }
@@ -120,6 +126,8 @@ static void
 set_int(char *p, int type, INTVAL value)
 {
     switch (type) {
+	case enum_type_uint8:
+	case enum_type_int8:
 	case enum_type_char:
 	case enum_type_uchar:
 	    *(char*) p = value & 0xff;
@@ -136,7 +144,7 @@ set_int(char *p, int type, INTVAL value)
 	    *(short*)p = (short)value;
 	    break;
 	default:
-	    internal_exception(1, "unhandled type in struct");
+	    internal_exception(1, "setting unhandled int type in struct");
 	    break;
     }
 }
