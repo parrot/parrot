@@ -285,6 +285,33 @@ add_to_free_list(Interp *interpreter,
 }
 
 /*
+ * insert the new arena into the pool's structure, update stats
+ */
+static void
+append_arena_in_pool(Interp *interpreter, struct Small_Object_Pool *pool,
+    struct Small_Object_Arena *new_arena, size_t size)
+{
+
+    /* Maintain the *_arena_memory invariant for stack walking code. Set it
+     * regardless if we're the first pool to be added. */
+    if (!pool->last_Arena
+            || (pool->start_arena_memory > (size_t)new_arena->start_objects))
+        pool->start_arena_memory = (size_t)new_arena->start_objects;
+
+    if (!pool->last_Arena || (pool->end_arena_memory <
+                (size_t)new_arena->start_objects + size))
+        pool->end_arena_memory = (size_t)new_arena->start_objects + size;
+    new_arena->total_objects = pool->objects_per_alloc;
+    new_arena->next = NULL;
+    new_arena->prev = pool->last_Arena;
+    if (new_arena->prev) {
+        new_arena->prev->next = new_arena;
+    }
+    pool->last_Arena = new_arena;
+    interpreter->arena_base->header_allocs_since_last_collect++;
+}
+
+/*
 
 =item C<void
 alloc_objects(Interp *interpreter,
@@ -297,6 +324,7 @@ and put them on.
 
 */
 
+#if ARENA_DOD_FLAGS
 void
 alloc_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)
@@ -306,7 +334,6 @@ alloc_objects(Interp *interpreter,
     UINTVAL start, end;
 
     /* Setup memory for the new objects */
-#if ARENA_DOD_FLAGS
     size_t offset;
 
     /* check old arena first */
@@ -351,27 +378,7 @@ alloc_objects(Interp *interpreter,
 #endif
     new_arena->dod_flags = mem_sys_allocate(ARENA_FLAG_SIZE(pool));
     new_arena->pool = pool;
-#else
-    new_arena = mem_sys_allocate(sizeof(struct Small_Object_Arena));
-    if (!new_arena)
-        PANIC("Out of arena memory");
-    size = pool->object_size * pool->objects_per_alloc;
-    /* could be mem_sys_allocate too, but calloc is fast */
-    new_arena->start_objects = mem_sys_allocate_zeroed(size);
-#endif
 
-    /* Maintain the *_arena_memory invariant for stack walking code. Set it
-     * regardless if we're the first pool to be added. */
-    if (!pool->last_Arena
-            || (pool->start_arena_memory > (size_t)new_arena->start_objects))
-        pool->start_arena_memory = (size_t)new_arena->start_objects;
-
-    if (!pool->last_Arena || (pool->end_arena_memory <
-                    (size_t)new_arena->start_objects + size))
-        pool->end_arena_memory = (size_t)new_arena->start_objects + size;
-
-    /* Hook up the new object block into the object pool */
-#if ARENA_DOD_FLAGS
     /* not the first one - put all on free list */
     if (pool->last_Arena) {
         start = 0;
@@ -383,22 +390,37 @@ alloc_objects(Interp *interpreter,
         end = 1024*2;
         assert(end < pool->objects_per_alloc);
     }
-#else
-    start = 0;
-    end = pool->objects_per_alloc;
-#endif
-    new_arena->total_objects = pool->objects_per_alloc;
-    new_arena->next = NULL;
-    new_arena->prev = pool->last_Arena;
-    if (new_arena->prev) {
-        new_arena->prev->next = new_arena;
-    }
-    pool->last_Arena = new_arena;
-    interpreter->arena_base->header_allocs_since_last_collect++;
+    /* Hook up the new object block into the object pool */
+    append_arena_in_pool(interpreter, pool, new_arena, size);
 
     add_to_free_list(interpreter, pool, new_arena, start, end);
 
-#if ! ARENA_DOD_FLAGS
+}
+
+#else
+
+void
+alloc_objects(Interp *interpreter,
+        struct Small_Object_Pool *pool)
+{
+    struct Small_Object_Arena *new_arena;
+    size_t size;
+    UINTVAL start, end;
+
+    /* Setup memory for the new objects */
+    new_arena = mem_sys_allocate(sizeof(struct Small_Object_Arena));
+    if (!new_arena)
+        PANIC("Out of arena memory");
+    size = pool->object_size * pool->objects_per_alloc;
+    /* could be mem_sys_allocate too, but calloc is fast */
+    new_arena->start_objects = mem_sys_allocate_zeroed(size);
+
+    append_arena_in_pool(interpreter, pool, new_arena, size);
+
+    start = 0;
+    end = pool->objects_per_alloc;
+    add_to_free_list(interpreter, pool, new_arena, start, end);
+
     /* Allocate more next time */
     if (GC_DEBUG(interpreter)) {
         pool->objects_per_alloc *= GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR;
@@ -407,7 +429,8 @@ alloc_objects(Interp *interpreter,
                 GC_DEBUG_REPLENISH_LEVEL_FACTOR);
     }
     else {
-        pool->objects_per_alloc = (UINTVAL) pool->objects_per_alloc * UNITS_PER_ALLOC_GROWTH_FACTOR;
+        pool->objects_per_alloc = (UINTVAL) pool->objects_per_alloc *
+            UNITS_PER_ALLOC_GROWTH_FACTOR;
         pool->replenish_level =
                 (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
     }
@@ -417,8 +440,8 @@ alloc_objects(Interp *interpreter,
     if (size > POOL_MAX_BYTES) {
         pool->objects_per_alloc = POOL_MAX_BYTES / pool->object_size;
     }
-#endif
 }
+#endif
 
 /*
 

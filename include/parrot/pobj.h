@@ -16,15 +16,25 @@
 #include "parrot/config.h"
 
 /*
- * if define below is 1:
+ * if define below is 1 (see include/parrot/settings.h)
  *
  * live, on_free_list, special_PMC are kept in the pools arenas
  * this needs aligned memory
  */
 
-#define ARENA_DOD_FLAGS 1
 
 #if ARENA_DOD_FLAGS && ! defined(PARROT_HAS_SOME_MEMALIGN)
+#  undef ARENA_DOD_FLAGS
+#  define ARENA_DOD_FLAGS 0
+#endif
+
+/*
+ * when GC_IS_MALLOC is set at configure time, we turn off
+ * ARENA_DOD_FLAGS, because the additional flag setting needed
+ * for this mode isn't optimized. See src/dod.c used_cow() and clear_cow()
+ */
+
+#ifdef GC_IS_MALLOC
 #  undef ARENA_DOD_FLAGS
 #  define ARENA_DOD_FLAGS 0
 #endif

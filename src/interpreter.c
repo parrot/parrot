@@ -50,7 +50,6 @@ have the same number of elements since there is a one-to-one mapping.
 #include "parrot/method_util.h"
 #include "parrot/dynext.h"
 
-/* #define USE_CGP */
 
 static void setup_event_func_ptrs(Parrot_Interp interpreter);
 
@@ -468,7 +467,7 @@ init_jit(Interp *interpreter, opcode_t *pc)
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->cur_cs->base.size;
     code_end = interpreter->code->byte_code + code_size;
-#  if defined HAVE_COMPUTED_GOTO && defined USE_CGP
+#  if defined HAVE_COMPUTED_GOTO && PARROT_I386_JIT_CGP
 #    ifdef __GNUC__
 #      ifdef PARROT_I386
     init_prederef(interpreter, PARROT_CGP_CORE);
