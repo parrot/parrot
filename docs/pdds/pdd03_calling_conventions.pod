@@ -79,7 +79,7 @@ It means the caller needs to follow these conventions I<only> when
 calling into subs and methods that it has looked up symbolically via
 parrot's default lookup system. If a language has a lighter-weight
 calling mechanism that's safe to use in some circumstances, it's
-perfectly fine to use them.
+perfectly fine to use that.
 
 This means that if you write a C compiler that targets Parrot, for
 example, you don't need to use parrot's caller-save, full-on calling
@@ -227,7 +227,7 @@ appropriate S, I, N, and P registers. I0 will be true in this case.
 
 An unprototyped call means the caller doesn't know what the sub
 takes, so has stuffed all its parameters into PMCs, and put those
-PMCs first in the PMC registers with any overflow in the overdlow
+PMCs first in the PMC registers with any overflow in the overflow
 array. I0 will be false in this case.
 
 The sub being called is responsible for runtime checking the parameter
@@ -252,7 +252,7 @@ On return from a function, the following registers are set. Return
 values are placed in I, S, and N registers only if the function is
 prototyped to do so. It is unlikely that more than one of these
 registers is set, but you never know. (Perl 6 having fancier return
-types if nothing else) If a prototyped return is indicated then
+types if nothing else). If a prototyped return is indicated then
 register I0 B<must> be set to 1. If I0 is set to 0, then this is a
 non-prototyped return and only the PMC registers and overflow in P3
 may be set.
