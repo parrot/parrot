@@ -121,13 +121,16 @@ In both cases (PMC and buffer), the live flag
 is reset after examination for reclamation.
 
 =head1 History
+
 Initial Version by Mike Lambert on 2002.05.27
 
 =head1 Notes
+
 The C<buffer_lives> function can be found in dod.h
 The C<add_to_free_pool> function can be found in headers.h
 
 =head1 References
+
 There are a number of references available for Garbage Collection.
 For example:
 
