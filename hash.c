@@ -214,11 +214,8 @@ expand_hash(Interp *interpreter, HASH* hash)
     HASHBUCKET* old_pool = (HASHBUCKET*) hash->bucket_pool->bufstart;
 
     Parrot_reallocate(interpreter, hash, new_size * sizeof(HASHBUCKET*));
-    table = (HASHBUCKET**) hash->buffer.bufstart;
-/*      fprintf(stderr, "expand_hash(%p): buckets=%p..%p (mem=%p..%p)\n", hash, table, table + new_size, hash->buffer.bufstart, (char*)hash->buffer.bufstart + hash->buffer.buflen); */
-
     Parrot_reallocate(interpreter, hash->bucket_pool,
-                            new_pool_size * sizeof(HASHBUCKET));
+                      new_pool_size * sizeof(HASHBUCKET));
     restore_invariants(interpreter, hash); /* Bucket pool may have moved */
 
     /* Add the newly allocated buckets onto the free list */
@@ -227,6 +224,8 @@ expand_hash(Interp *interpreter, HASH* hash)
         bucket->next = hash->free_list;
         hash->free_list = bucket;
     }
+
+    table = (HASHBUCKET**) hash->buffer.bufstart;
 
     /* NULL out new space in table */
     memset(table + hash->num_buckets, 0,
