@@ -56,7 +56,7 @@ expand_fast_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int i, n;
 
 #if IMC_TRACE
-    PIO_eprintf("expand_fast_sub\n");
+    PIO_eprintf(NULL, "expand_fast_sub\n");
 #endif
     
     sub = ins->r[1];
@@ -78,7 +78,7 @@ expand_fast_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int i;
 
 #if IMC_TRACE
-    PIO_eprintf("expand_fast_sub_ret\n");
+    PIO_eprintf(NULL, "expand_fast_sub_ret\n");
 #endif
 
     sub = ins->r[1];
@@ -102,7 +102,7 @@ expand_fast_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int i;
 
 #if IMC_TRACE
-    PIO_eprintf("expand_fast_sub_call\n");
+    PIO_eprintf(NULL, "expand_fast_sub_call\n");
 #endif
 
     sub = ins->r[0];
