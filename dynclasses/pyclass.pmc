@@ -30,6 +30,52 @@ static STRING *NAME;
 static STRING *REPR;
 static STRING *STR;
 
+static struct parrot_regs_t *
+Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub)
+{
+    PMC *ret_c, *p1;
+    opcode_t offset, *dest;
+    struct parrot_regs_t *bp_save, *bp_new;
+
+    /* we need one return continuation with a NULL offset */
+    bp_save = interpreter->ctx.bp;
+    p1 = REG_PMC(1);
+    REG_PMC(1) = ret_c = new_ret_continuation_pmc(interpreter, NULL);
+    interpreter->ctx.current_cont = ret_c;
+    interpreter->ctx.current_sub = sub;
+#if GC_VERBOSE
+    PObj_report_SET(ret_c);     /* s. also dod.c */
+#endif
+    /* invoke the sub, which places the context of the sub in the
+     * interpreter, and switches code segments if needed
+     * Passing a dummy true destination copies registers
+     */
+    dest = VTABLE_invoke(interpreter, sub, (void*) 1);
+    bp_new = interpreter->ctx.bp;
+    if (dest) {
+        offset = dest - interpreter->code->byte_code;
+        runops(interpreter, offset);
+        interpreter->ctx.bp = bp_save;
+    }
+    REG_PMC(1) = p1;
+    return bp_new;
+}
+
+static PMC *
+Parrot_PyClass_run_meth_fromc_P(Parrot_Interp interpreter, PMC *sub, PMC *obj,
+        STRING *meth)
+{
+    struct parrot_regs_t *bp;
+
+    REG_STR(0) = meth;
+    REG_INT(0) = 1;
+    REG_INT(1) = REG_INT(2) = REG_INT(3) = 0;
+    interpreter->ctx.current_object = REG_PMC(2) = obj;
+
+    bp = Parrot_PyClass_runops_fromc(interpreter, sub);
+    return BP_REG_PMC(bp,5); 
+}
+
 pmclass PyClass dynpmc group python_group {
 
 /*
@@ -155,7 +201,7 @@ Returns the integer value of the object.
         if (!getint || !VTABLE_defined(INTERP, getint))
            real_exception(INTERP, NULL, E_TypeError,
                    "TypeError: int() argument must be a string or a number");
-        ret = Parrot_run_meth_fromc_args(INTERP, getint, SELF, INT, "P");
+        ret = Parrot_PyClass_run_meth_fromc_P(INTERP, getint, SELF, INT);
         return VTABLE_get_integer(INTERP, ret);
     }
 
@@ -174,8 +220,7 @@ Return an iterator for this object.
         if (!iter || !VTABLE_defined(INTERP, iter))
            real_exception(INTERP, NULL, E_TypeError,
                    "TypeError: iteration over non-sequence");
-        return (PMC*) Parrot_run_meth_fromc_args(INTERP, iter, SELF,
-            REPR, "P");
+        return Parrot_PyClass_run_meth_fromc_P(INTERP, iter, SELF, ITER);
     }
 
 /*
@@ -194,7 +239,7 @@ Return the representation of this object.
         if (repr) {
             PMC *temp;
             STRING *ret;
-            temp = Parrot_run_meth_fromc_args(INTERP, repr, SELF, REPR, "P");
+            temp = Parrot_PyClass_run_meth_fromc_P(INTERP, repr, SELF, REPR);
             ret = VTABLE_get_string(INTERP, temp);
             return ret;
         }
@@ -226,10 +271,10 @@ Return the object in string form.
 */
 
     STRING* get_string() {
-        PMC *repr = VTABLE_find_method(INTERP, SELF, STR);
-        if (repr) {
+        PMC *str = VTABLE_find_method(INTERP, SELF, STR);
+        if (str) {
             PMC *ret;
-            ret = Parrot_run_meth_fromc_args(INTERP, repr, SELF, REPR, "P");
+            ret = Parrot_PyClass_run_meth_fromc_P(INTERP, str, SELF, STR);
             return VTABLE_get_string(INTERP, ret);
         }
         else {
