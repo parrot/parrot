@@ -144,7 +144,7 @@ they appear in the argument list.
 
 sub new {
   my $class = shift;
-  my $self;
+  my $self = { };
   #
   # Read the files, strip leading and trailing whitespace, and put the lines
   # into an array in $self->{cur_contents}.
