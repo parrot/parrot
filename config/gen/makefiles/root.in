@@ -203,7 +203,11 @@ ${make_set_make}
 .c$(O) :
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
-all : $(TEST_PROG) $(IMCC_PROG) docs
+all : flags_dummy $(TEST_PROG) $(IMCC_PROG) docs
+
+flags_dummy:
+	echo Compiling with:
+	echo $(CC) $(CFLAGS) xx$(O) -c xx.c
 
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
@@ -566,9 +570,9 @@ $(IMCC_PROG) : $(LIBPARROT)        \
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS = --gc-debug --running-make-test
 
-test : $(TEST_PROG) test_prep test_dummy
+test : $(TEST_PROG) test_prep test_dummy test_imcc
 
-fulltest : $(TEST_PROG) test_prep fulltest_dummy
+fulltest : $(TEST_PROG) test_prep fulltest_dummy fulltest_imcc
 
 .PHONY: fulltest_dummy
 fulltest_dummy :
@@ -612,6 +616,15 @@ mopstest : $(TEST_PROG) examples/assembly/mops.pbc
 
 lifetest : $(TEST_PROG) examples/assembly/life.pbc
 	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/life.pbc
+
+test_imcc :
+	cd languages/imcc && $(PERL) t/harness && cd ../..
+
+fulltest_imcc :
+	cd languages/imcc && $(PERL) t/harness && cd ../..
+	cd languages/imcc && $(PERL) t/harness -j && cd ../..
+	cd languages/imcc && $(PERL) t/harness -P && cd ../..
+	cd languages/imcc && $(PERL) t/harness -b && cd ../..
 
 # For reporting success or failure with different configurations
 ok:
