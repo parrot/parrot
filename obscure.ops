@@ -36,23 +36,19 @@ Reference:
 
 ########################################
 
-=item B<covers>(n, i)
-
 =item B<covers>(n, n)
 
 Set $1 to the coversine (in radians) of $2.
 
 =cut
 
-inline op covers(n, i|n) {
-  $1 = 1.0 - sin((FLOATVAL)$2);
+inline op covers(out NUM, in NUM) {
+  $1 = 1.0 - sin($2);
   goto NEXT();
 }
 
 
 ########################################
-
-=item B<exsec>(n, i)
 
 =item B<exsec>(n, n)
 
@@ -61,15 +57,13 @@ Set $1 to the exsecant of $2 (given in radians).
 =cut
 
 
-inline op exsec(n, i|n) {
-  $1 = (((FLOATVAL)1.0) / cos((FLOATVAL)$2)) - (FLOATVAL)1.0;
+inline op exsec(out NUM, in NUM) {
+  $1 = (1.0 / cos($2)) - 1.0;
   goto NEXT();
 }
 
 
 ########################################
-
-=item B<hav>(n, i)
 
 =item B<hav>(n, n)
 
@@ -77,15 +71,13 @@ Set $1 to the haversine (in radians) of $2.
 
 =cut
 
-inline op hav(n, i|n) {
-  $1 = 0.5 * (1.0 - cos((FLOATVAL)$2));
+inline op hav(out NUM, in NUM) {
+  $1 = 0.5 * (1.0 - cos($2));
   goto NEXT();
 }
 
 
 ########################################
-
-=item B<vers>(n, i)
 
 =item B<vers>(n, n)
 
@@ -93,8 +85,8 @@ Set $1 to the versine (in radians) of $2.
 
 =cut
 
-inline op vers(n, i|n) {
-  $1 = 1.0 - cos((FLOATVAL)$2);
+inline op vers(out NUM, in NUM) {
+  $1 = 1.0 - cos($2);
   goto NEXT();
 }
 
