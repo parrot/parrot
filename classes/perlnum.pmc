@@ -38,7 +38,7 @@ pmclass PerlNum extends perlscalar {
         sprintf(buff,FLOATVAL_FMT,SELF->cache.num_val);  /* XXX buffer overflow! */
 #endif
         s = string_make(INTERP,buff,strlen(buff),NULL,0,NULL);
-        free(buff);
+        mem_sys_free(buff);
         return s;
     }
 
