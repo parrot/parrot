@@ -9,8 +9,8 @@
     .local pmc p6ge_set_trace
 
     load_bytecode "p6ge.pir"
-    p6ge_compile = global "_p6ge_compile"
-    p6ge_set_trace = global "_p6ge_set_trace"
+    find_global p6ge_compile, "P6GE", "_p6ge_compile"
+    find_global p6ge_set_trace, "P6GE", "_p6ge_set_trace"
     
 
   read_loop:

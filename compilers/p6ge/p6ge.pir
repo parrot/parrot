@@ -25,13 +25,15 @@ use the Perl 6 Grammar Engine.
 =cut
 
 .sub __onload @LOAD
-    newclass $P0, "P6GEMatch"
+    newclass $P0, "P6GE::Match"
     addattribute $P0, ".target"            # string to be matched
     addattribute $P0, ".rulecor"           # match coroutine
     addattribute $P0, ".state"             # result of the match
     addattribute $P0, ".rephash"           # repeats hash (key=groupid)
     addattribute $P0, ".caphash"           # captures hash (key=groupid)
 .end
+
+.namespace [ "P6GE" ]
 
 =item sub = _p6ge_compile( pattern )
 
@@ -69,7 +71,7 @@ the subroutine.
     $P1(istraced)
 .end
 
-.namespace [ "P6GEMatch" ]
+.namespace [ "P6GE::Match" ]
 
 .sub _init method
     .param string target
@@ -77,7 +79,7 @@ the subroutine.
     .local pmc state, rephash, caphash
     $P0 = new .PerlString                  # set .target
     $P0 = target
-    classoffset $I0, self, "P6GEMatch"       
+    classoffset $I0, self, "P6GE::Match"       
     setattribute self, $I0, $P0              
     inc $I0                                # set .rulecor
     setattribute self, $I0, rulecor               
@@ -94,7 +96,7 @@ the subroutine.
 .end
 
 .sub __get_bool method
-    classoffset $I0, self, "P6GEMatch"
+    classoffset $I0, self, "P6GE::Match"
     $I0 += 2
     getattribute $P0, self, $I0            # ".status"
     $I1 = $P0
@@ -108,7 +110,7 @@ the subroutine.
     .local string target_s
     .local int target_len
     .local int pos
-    classoffset $I0, self, "P6GEMatch"
+    classoffset $I0, self, "P6GE::Match"
     getattribute target, self, $I0         # ".target" string to match
     inc $I0
     getattribute rulecor, self, $I0        # ".rulecor" coroutine
@@ -135,7 +137,7 @@ the subroutine.
     .local pmc caparray
     .local pmc groupiter
     .local string gname
-    classoffset $I0, self, "P6GEMatch"
+    classoffset $I0, self, "P6GE::Match"
     getattribute target, self, $I0         # ".target" string
     $I0 += 4
     getattribute caphash, self, $I0        # ".capture" hash
@@ -174,7 +176,8 @@ the subroutine.
 =head1 AUTHOR
 
 Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
-Patches and suggestions should be sent to the Perl 6 compiler list.
+Patches and suggestions should be sent to the Perl 6 compiler list
+(perl6-compiler@perl.org).
 
 =head1 COPYRIGHT
 

@@ -23,10 +23,10 @@ walk the logic tree and replace it with a direct lookup or something.
     newclass base, "P6GE::Class"
 
     subclass $P0, base, "P6GE::Class::Discrete"
-    addattribute $P0, "chars"   # str; attr 0
+    addattribute $P0, ".chars"   # str; attr 0
 
     subclass $P0, base, "P6GE::Class::Invert"
-    addattribute $P0, "child"   # pmc; attr 0
+    addattribute $P0, ".child"   # pmc; attr 0
 
     .return()
 .end

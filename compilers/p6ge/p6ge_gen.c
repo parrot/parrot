@@ -277,7 +277,7 @@ p6ge_gen_group(P6GE_Exp* e, const char* succ)
     /* GROUP: initialization
        This first part sets up the initial structures for a repeating group. 
        We need a repeat count and (possibly) a captures hash. */
-    emit("    classoffset $I0, match, \"P6GEMatch\"\n");
+    emit("    classoffset $I0, match, \"P6GE::Match\"\n");
     emit("    $I0 += 3\n");
     emit("    getattribute gr_rep, match, $I0\n");
     emit("    $I1 = exists gr_rep[%s]\n", key);
@@ -306,7 +306,7 @@ p6ge_gen_group(P6GE_Exp* e, const char* succ)
        subexpression.  It handles closing any outstanding capture, and 
        repeats the group if the quantifier requires it. */
     emit("%s:\n", repsub);
-    emit("    classoffset $I0, match, \"P6GEMatch\"\n");
+    emit("    classoffset $I0, match, \"P6GE::Match\"\n");
     emit("    $I0 += 3\n");
     emit("    getattribute $P0, match, $I0\n");
     emit("    gr_rep = $P0[%s]\n", key);
@@ -459,7 +459,7 @@ p6ge_gen(P6GE_Exp* e)
     emit("    .local pmc match\n");
     emit("    .local pmc rulecor\n");
     emit("  class_loaded:\n");
-    emit("    find_type $I0, \"P6GEMatch\"\n");
+    emit("    find_type $I0, \"P6GE::Match\"\n");
     emit("    new match, $I0\n");
     emit("    newsub rulecor, .Coroutine, _Rule_cor\n");
     emit("    match.\"_init\"(target, rulecor)\n");
