@@ -111,7 +111,8 @@ sub runstep {
                     'icu\source\tools\gentz\gentz.dsp', 'icu\source\tools\genuca\genuca.dsp',
                     'icu\source\tools\makeconv\makeconv.dsp', 'icu\source\tools\pkgdata\pkgdata.dsp',
                     'icu\source\tools\toolutil\toolutil.dsp', 'icu\source\i18n\i18n.dsp',
-                    'icu\source\stubdata\stubdata.dsp', 'icu\source\data\makedata.dsp');
+                    'icu\source\stubdata\stubdata.dsp', 'icu\source\data\makedata.dsp',
+                    'icu\source\allinone\allinone.dsw');
     foreach (@dspfiles) {
         open DSPFILE, "< $_" or die "Cannot open $_: $!\n";
         my $file = join('', <DSPFILE>);
@@ -149,7 +150,7 @@ $(LIBICUCORE) $(LIBICUDATA) :
 	msdev icu\source\allinone\allinone.dsw /MAKE "stubdata - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "common - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "i18n - Win32 Debug"
-	xcopy icu\source\common icu\include
+	xcopy /S /Y "icu\source\common" "icu\include\" 
 	msdev icu\source\allinone\allinone.dsw /MAKE "ctestfw - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "decmn - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "gencmn - Win32 Debug"
@@ -170,17 +171,16 @@ $(LIBICUCORE) $(LIBICUDATA) :
 	msdev icu\source\allinone\allinone.dsw /MAKE "pkgdata - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "toolutil - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "makedata - Win32 Debug"
-	mkdir blib
-	mkdir blib\lib
+	IF NOT EXIST blib\lib mkdir blib\lib
 	copy icu\lib\icuucd$(A) $(LIBICUCORE)
 	copy icu\lib\icudata$(A) $(LIBICUDATA)
-	mkdir blib\include
-	mkdir blib\include\unicode
+	IF NOT EXIST blib\include mkdir blib\include
+	IF NOT EXIST blib\include\unicode mkdir blib\include\unicode
 	copy icu\include\unicode\*.h blib\include\unicode
 	copy icu\bin\icuuc26d.dll .
 	copy icu\bin\*.dll .
-	mkdir blib\lib\icu
-	mkdir blib\lib\icu\2.6.1
+	IF NOT EXIST blib\lib\icu mkdir blib\lib\icu
+	IF NOT EXIST blib\lib\icu\2.6.1 mkdir blib\lib\icu\2.6.1
 	copy icu\source\data\out\*.dat blib\lib\icu\2.6.1
 RULES
     );
