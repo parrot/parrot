@@ -149,6 +149,8 @@ string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
 void
 string_init(void)
 {
+    encoding_init();
+    chartype_init();
     string_native_type = chartype_lookup("usascii");
     string_unicode_type = chartype_lookup("unicode");
 }
@@ -522,6 +524,9 @@ string_transcode(struct Parrot_Interp *interpreter,
          * encoding. So this seems to be the least bad compromise.
          */
     }
+    if (!type) {
+        type = src->type;
+    }
 
     if (src->encoding == encoding && src->type == type) {
         dest = string_copy(interpreter, src);
@@ -538,10 +543,8 @@ string_transcode(struct Parrot_Interp *interpreter,
     if (src->type != dest->type) {
         transcoder1 = chartype_lookup_transcoder(src->type, dest->type);
         if (!transcoder1) {
-            transcoder1 = chartype_lookup_transcoder(src->type,
-                                                     string_unicode_type);
-            transcoder2 = chartype_lookup_transcoder(string_unicode_type,
-                                                     dest->type);
+            transcoder1 = src->type->to_unicode;
+            transcoder2 = dest->type->from_unicode;
         }
     }
 
@@ -554,9 +557,9 @@ string_transcode(struct Parrot_Interp *interpreter,
         UINTVAL c = src->encoding->decode(srcstart);
 
         if (transcoder1)
-            c = transcoder1(c);
+            c = transcoder1(src->type, dest->type, c);
         if (transcoder2)
-            c = transcoder2(c);
+            c = transcoder2(src->type, dest->type, c);
 
         destend = dest->encoding->encode(destend, c);
 
@@ -1234,7 +1237,8 @@ string_bool(const STRING *s)
 
         UINTVAL c = s->encoding->decode(s->strstart);
 
-        if (s->type->is_digit(c) && s->type->get_digit(c) == 0) {
+        if (s->type->is_digit(s->type,c) 
+         && s->type->get_digit(s->type,c) == 0) {
             return 0;
         }
     }
@@ -1306,7 +1310,7 @@ string_to_int(const STRING *s)
         while (start < end) {
             UINTVAL c = s->encoding->decode(start);
 
-            if (s->type->is_digit(c)) {
+            if (s->type->is_digit(s->type,c)) {
                 in_number = 1;
                 i = i * 10 + (c - '0');
             }
@@ -1355,9 +1359,9 @@ string_to_num(const STRING *s)
         while (start < end) {
             UINTVAL c = s->encoding->decode(start);
 
-            if (s->type->is_digit(c)) {
+            if (s->type->is_digit(s->type,c)) {
                 if (in_exp) {
-                    exponent = exponent * 10 + s->type->get_digit(c);
+                    exponent = exponent * 10 + s->type->get_digit(s->type,c);
                     if (!exp_sign) {
                         exp_sign = 1;
                     }
@@ -1365,7 +1369,7 @@ string_to_num(const STRING *s)
                 else {
                     /* We're somewhere in the main string of numbers */
                     in_number = 1;
-                    f = f * 10 + s->type->get_digit(c);
+                    f = f * 10 + s->type->get_digit(s->type,c);
                     if (seen_dot) {
                         fake_exponent--;
                     }

@@ -12,41 +12,25 @@
 
 #include "parrot/parrot.h"
 
-static CHARTYPE_TRANSCODER
-unicode_transcode_from(const char *from)
-{
-    /* NOTE: This cheat silences unused var warnings on gcc */
-    return from ? (CHARTYPE_TRANSCODER)NULLfunc : (CHARTYPE_TRANSCODER)NULLfunc; 
-}
+/* FIXME - need a multi-range digit map */
+struct chartype_digit_map_t unicode_digit_map = { 0x30, 0x39, 0 };
 
-static CHARTYPE_TRANSCODER
-unicode_transcode_to(const char *to)
-{
-    /* NOTE: This cheat silences unused var warnings on gcc */
-    return to ? (CHARTYPE_TRANSCODER)NULLfunc : (CHARTYPE_TRANSCODER)NULLfunc;
-}
+static struct chartype_transcoder_entry_t unicode_transcoders[] = {
+    { NULL, NULL, NULL }
+};
 
-static Parrot_Int
-unicode_is_digit(UINTVAL c)
-{
-    /* FIXME - Other code points are also digits */
-    return (INTVAL)(isdigit((int)c) ? 1 : 0);  
-}
 
-static Parrot_Int
-unicode_get_digit(UINTVAL c)
-{
-    return c - '0';             /* FIXME - many more digits than this... */
-}
-
-const CHARTYPE unicode_chartype = {
+CHARTYPE unicode_chartype = {
     enum_chartype_unicode,
     "unicode",
     "utf32",
-    unicode_transcode_from,
-    unicode_transcode_to,
-    unicode_is_digit,
-    unicode_get_digit
+    chartype_is_digit_map1,          /* is_digit() */
+    chartype_get_digit_map1,         /* get_digit() */
+    &unicode_digit_map,              /* digit_map */
+    NULL,                            /* unicode_map */
+    &chartype_transcode_nop,         /* from_unicode() */
+    &chartype_transcode_nop,         /* to_unicode() */
+    NULL                             /* other transcoders */
 };
 
 /*

@@ -47,11 +47,10 @@ const Parrot_Encoding Parrot_encoding_lookup(const char *name);
 
 #endif
 
+void encoding_init(void);
 const ENCODING *encoding_lookup_index(INTVAL n);
 
 INTVAL encoding_find_encoding(const char *name);
-
-INTVAL encoding_by_encoding(const Parrot_Encoding);
 
 #endif
 

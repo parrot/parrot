@@ -20,8 +20,8 @@ extern const ENCODING utf32_encoding;
 static const ENCODING **encoding_array = NULL;
 static int encoding_count = 0;
 
-static void
-encoding_init(void)
+void
+encoding_init()
 {
     encoding_count = enum_encoding_MAX;
     encoding_array = mem_sys_allocate(sizeof(ENCODING*) * encoding_count);
@@ -36,9 +36,6 @@ encoding_lookup(const char *name)
 {
     int i;
 
-    if (!encoding_array)
-        encoding_init();
-  
     for (i=0; i<encoding_count; i++) {
         if (encoding_array[i] && !strcmp(name, encoding_array[i]->name)) {
             return encoding_array[i];
@@ -51,23 +48,7 @@ encoding_lookup(const char *name)
 const ENCODING *
 encoding_lookup_index(INTVAL n)
 {
-    if (!encoding_array) 
-        encoding_init();
     return encoding_array[n];
-}
-
-INTVAL
-encoding_by_encoding(const ENCODING *encoding) {
-    int i;
-    if (!encoding_array) 
-        encoding_init();
-    for (i = 0; i < encoding_count; i++) {
-        if (encoding_array[i] == encoding) {
-            return i;
-        }
-    }
-    internal_exception(INVALID_ENCODING, "Invalid encoding pointer %p\n", encoding);
-    return -1;
 }
 
 INTVAL

@@ -13,7 +13,11 @@
 #if !defined(PARROT_CHARTYPE_H_GUARD)
 #define PARROT_CHARTYPE_H_GUARD
 
-typedef Parrot_UInt (*Parrot_CharType_Transcoder)(Parrot_UInt c);
+struct parrot_chartype_t;
+typedef Parrot_UInt (*Parrot_CharType_Transcoder)
+           (const struct parrot_chartype_t *from, 
+            const struct parrot_chartype_t *to, 
+            Parrot_UInt c);
 
 /* &gen_from_enum(chartypes.pasm) subst(s/enum_(\w+)/uc($1)/e) */
 enum {
@@ -24,14 +28,45 @@ enum {
 
 /* &end_gen */
 
+/*
+ * Character code to digit value translation map
+ */
+struct chartype_digit_map_t {
+    UINTVAL first_code;
+    UINTVAL last_code;
+    int first_value;
+};
+
+/*
+ * Unicode mapping table
+ * FIXME the design of this struct is not yet complete
+ */
+struct chartype_unicode_map_t;
+
+/*
+ * Transcoder table entry
+ */
+struct chartype_transcoder_entry_t {
+    const char *from;
+    const char *to;
+    Parrot_CharType_Transcoder transcoder;
+};
+
+
 struct parrot_chartype_t {
     INTVAL index;
     const char *name;
     const char *default_encoding;
-    Parrot_CharType_Transcoder (*transcode_from)(const char *from);
-    Parrot_CharType_Transcoder (*transcode_to)(const char *to);
-    Parrot_Int (*is_digit)(Parrot_UInt c);
-    Parrot_Int (*get_digit)(Parrot_UInt c);
+    Parrot_Int (*is_digit)
+        (const struct parrot_chartype_t *type, Parrot_UInt c);
+    Parrot_Int (*get_digit)
+        (const struct parrot_chartype_t *type, Parrot_UInt c);
+    const struct chartype_digit_map_t *digit_map;
+    const struct chartype_unicode_map_t *unicode_map;
+    /* These two are separate because they will be used most often */
+    Parrot_CharType_Transcoder from_unicode;
+    Parrot_CharType_Transcoder to_unicode;
+    const struct chartype_transcoder_entry_t *transcoders;
 };
 
 #define Parrot_CharType struct parrot_chartype_t *
@@ -40,9 +75,15 @@ struct parrot_chartype_t {
 
 #define CHARTYPE struct parrot_chartype_t
 
+void chartype_init(void);
 const CHARTYPE * chartype_lookup_index(INTVAL n);
 INTVAL chartype_find_chartype(const char *name);
-INTVAL chartype_by_chartype(const Parrot_CharType);
+
+Parrot_Int chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c);
+Parrot_Int chartype_get_digit_map1(const CHARTYPE* type, const UINTVAL c);
+Parrot_UInt chartype_transcode_nop(const struct parrot_chartype_t *from, 
+                                   const struct parrot_chartype_t *to, 
+                                   Parrot_UInt c);
 
 typedef Parrot_CharType_Transcoder CHARTYPE_TRANSCODER;
 

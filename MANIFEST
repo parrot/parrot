@@ -1847,6 +1847,7 @@ res_lea.c                                         []
 resources.c                                       []
 runops_cores.c                                    []
 runtime/parrot/include/README                     [main]doc
+runtime/parrot/chartypes/8859-1.TXT               []
 rx.c                                              []
 rx.ops                                            []
 rxstacks.c                                        []

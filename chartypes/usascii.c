@@ -12,6 +12,8 @@
 
 #include "parrot/parrot.h"
 
+struct chartype_digit_map_t usascii_digit_map = { 0x30, 0x39, 0 };
+
 static UINTVAL
 usascii_transcode_from_unicode(UINTVAL c)
 {
@@ -22,54 +24,17 @@ usascii_transcode_from_unicode(UINTVAL c)
     return c;
 }
 
-static CHARTYPE_TRANSCODER
-usascii_transcode_from(const char *from)
-{
-    if (strcmp(from, "unicode") == 0) {
-        return &usascii_transcode_from_unicode;
-    }
-    else {
-        return (CHARTYPE_TRANSCODER)NULLfunc;
-    }
-}
-
-static UINTVAL
-usascii_transcode_to_unicode(UINTVAL c)
-{
-    return c;
-}
-
-static CHARTYPE_TRANSCODER
-usascii_transcode_to(const char *to)
-{
-    if (strcmp(to, "unicode") == 0) {
-        return &usascii_transcode_to_unicode;
-    }
-    else {
-        return (CHARTYPE_TRANSCODER)NULLfunc;
-    }
-}
-
-static Parrot_Int
-usascii_is_digit(UINTVAL c)
-{
-    return c >= 0x30 && c <= 0x39;
-}
-
-static Parrot_Int
-usascii_get_digit(UINTVAL c)
-{
-    return ((INTVAL)c) - 0x30;
-}
-
-const CHARTYPE usascii_chartype = {
+CHARTYPE usascii_chartype = {
     enum_chartype_usascii,
     "usascii",
     "singlebyte",
-    usascii_transcode_from,
-    usascii_transcode_to,
-    usascii_is_digit,
-    usascii_get_digit
+    chartype_is_digit_map1,          /* is_digit() */
+    chartype_get_digit_map1,         /* get_digit() */
+    &usascii_digit_map,              /* digit_map */
+    NULL,                            /* unicode_map */
+    &usascii_transcode_from_unicode, /* from_unicode() */
+    &chartype_transcode_nop,         /* to_unicode() */
+    NULL                             /* transcoders */
 };
 
 /*

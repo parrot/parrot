@@ -449,6 +449,11 @@ becomes a new string. (Transcoding is not inplace)
 
 Put a transcoded version of $2 in $1, turning it to the encoding in $3
 
+=item B<transcode>(out STR, in STR, in INT, in INT)
+
+Put a transcoded version of $2 in $1, turning it to the encoding in $3
+and the chartype in $4.
+
 =cut
 
 op transcode(inout STR, in INT) {
@@ -458,6 +463,12 @@ op transcode(inout STR, in INT) {
 
 op transcode(out STR, in STR, in INT) {
   $1 = string_transcode(interpreter, $2, encoding_lookup_index($3), NULL, NULL);
+  goto NEXT();
+}
+
+op transcode(out STR, in STR, in INT, in INT) {
+  $1 = string_transcode(interpreter, $2, encoding_lookup_index($3), 
+                        chartype_lookup_index($4), NULL);
   goto NEXT();
 }
 
@@ -481,7 +492,7 @@ Find the encoding type for $2 and put it in $1
 =cut
 
 op string_encoding(out INT, in STR) {
-   $1 = encoding_by_encoding($2->encoding);
+   $1 = $2->encoding->index;
    goto NEXT();
 }
 
@@ -505,10 +516,28 @@ Find the chartype type for $2 and put it in $1
 =cut
 
 op string_chartype(out INT, in STR) {
-   $1 = chartype_by_chartype($2->type);
+   $1 = $2->type->index;
    goto NEXT();
 }
 
+########################################
+
+=item B<set_encoding>(in STR, in INT)
+=item B<set_chartype>(in STR, in INT)
+
+Temporary ops to set the encoding and chartype of a string
+
+=cut
+
+inline op set_encoding(in STR, in INT) {
+   $1->encoding = encoding_lookup_index($2);
+   goto NEXT();
+}
+
+inline op set_chartype(in STR, in INT) {
+   $1->type = chartype_lookup_index($2);
+   goto NEXT();
+}
 
 ########################################
 
