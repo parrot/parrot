@@ -206,7 +206,7 @@ while(<>) {
                 $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
                 $pc+=$sizeof{$rtype};           
             }
-            $bytecode .= pack $type, $args[$_];
+            $bytecode .= pack $pack_type{$type}, $args[$_];
         }
 	if($options{'listing'}) {
 	    # add line to listing.
