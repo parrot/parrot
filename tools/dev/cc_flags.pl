@@ -24,7 +24,7 @@ while (<F>) {
     else {
 	die "syntax error in $cflags: line $., $_\n";
     }
-    
+
     for (;;) {
 	if (s/^([-+])\{(.*?)\}\s*//) {
 	    next unless $2;
@@ -66,5 +66,6 @@ foreach my $option (@options) {
     }
 }
 
-print "@ARGV\n";
+#print "@ARGV\n";
+print "$cfile\n";
 exit system(@ARGV)/256;
