@@ -101,8 +101,11 @@ languages/scheme/t/harness
 languages/miniperl/Makefile.in
 languages/miniperl/Miniperl/Generator.pm
 languages/miniperl/Miniperl/Parser.pm
-languages/miniperl/Miniperl/Test.pm
 languages/miniperl/Miniperl/Tokenizer.pm
+languages/miniperl/Miniperl/t/001_tokenizer.t
+languages/miniperl/Miniperl/t/002_parser.t
+languages/miniperl/Miniperl/t/003_generator.t
+languages/miniperl/Miniperl/t/004_combined.t
 languages/miniperl/Miniperl.pm
 languages/miniperl/miniperlc
 Makefile.in
