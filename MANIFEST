@@ -4,8 +4,9 @@ chartype.c
 chartypes/unicode.c
 chartypes/usascii.c
 classes/genclass.pl
-classes/intclass.c
-classes/scalarclass.c
+classes/perlint.c
+classes/perlnum.c
+classes/perlstring.c
 config_h.in
 Config_pm.in
 Configure.pl

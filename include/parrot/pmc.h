@@ -14,8 +14,9 @@
 #define PARROT_PMC_H_GUARD
 
 enum {
-    enum_class_int,
-    enum_class_scalar,
+    enum_class_PerlInt,
+    enum_class_PerlNum,
+    enum_class_PerlString,
     enum_class_max
 };
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
