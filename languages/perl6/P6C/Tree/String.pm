@@ -216,7 +216,7 @@ sub string_special {
             error ("Error in interpolation of control-char: $@"),die if $@;
         }
         else {
-            use charnames qw(:full);
+#            use charnames qw(:full);
             # The charnames doesn't seem to propagate into the eval""
             # for me -- sfink
             $val = eval qq[use charnames qw(:full); "\\N{$_}"];
