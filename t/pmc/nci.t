@@ -12,12 +12,12 @@ t/pmc/nci.t - Native Call Interface
 
 =head1 DESCRIPTION
 
-Tests the NCI PMC. These are all skipped unless the F<libnci.so>
-library is found.
+This tests the Native Call Interface, that is the ParrotLibrary PMC. 
+The tests are all skipped unless the F<libnci.so> library is found.
 
 =cut
 
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 37;
 use Parrot::Config;
 
 SKIP: {
@@ -56,26 +56,52 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_d_d - PIR");
+output_is( << 'CODE', << 'OUTPUT', "nci_dd in PIR" );
 ##PIR##
 .sub _test @MAIN
-  .local pmc lib
-  .local NCI dd
-  lib = loadlib  "libnci"
-  unless lib goto NOT_LOADED
-  print "loaded "
-  print lib
-  print "\n"
-  dd = dlfunc lib, "nci_dd", "dd"
-  .local float r
-  r = dd(4.0)
-  print r
-  NOT_LOADED:
-  print "\n"
+    .local string library_name
+    library_name = 'libnci'
+    .local pmc libnci
+    libnci = loadlib  library_name
+    unless libnci goto NOT_LOADED
+    print library_name
+    print " was successfully loaded\n"
+    .local pmc twice
+    twice = dlfunc libnci, "nci_dd", "dd"
+    .local float r
+    r = twice( -4.128 )
+    print r
+NOT_LOADED:
+    print "\n"
 .end
 CODE
-loaded runtime/parrot/dynext/libnci.so
-8.000000
+libnci was successfully loaded
+-8.256000
+OUTPUT
+
+output_is( << 'CODE', << "OUTPUT", "get_string()" );
+##PIR##
+.sub _test @MAIN
+    .local string library_name
+    library_name = 'libnci'
+    .local pmc libnci
+    libnci = loadlib  library_name
+    unless libnci goto NOT_LOADED
+        .local string filename_with_path
+        filename_with_path = libnci
+        # depending on the platform, 'filename' has path info or not 
+        .local int start_of_filename
+        start_of_filename = index filename_with_path, 'libnci' 
+        if start_of_filename == -1 goto NOT_LOADED
+            .local string filename
+            filename = substr filename_with_path, start_of_filename
+            print filename
+            print " was successfully loaded"
+    NOT_LOADED:
+    print "\n"
+.end
+CODE
+libnci$PConfig{so} was successfully loaded
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_f_ff");
@@ -976,6 +1002,80 @@ external data: succeeded
 done.
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 in PIR");
+##PIR##
+.sub _test @MAIN
+
+    # this flag will be set by the callback function
+    .local pmc cb_done
+    cb_done = new Integer
+    cb_done = 0
+    store_global "cb_done", cb_done
+
+    # this callback function will eventually by called by the library
+    .local pmc cb
+    cb = newsub _call_back 
+
+    # prepare user data
+    .local pmc user_data
+    user_data = new Integer
+    user_data = 42
+
+    # A Sub that can be given to the library
+    .local pmc cb_wrapped
+    cb_wrapped = new_callback cb, user_data, "tU"	# Z in pdd16
+    print "created a callback sub\n"
+
+    # now call the external sub, that takes a callback and user data
+    .local pmc libnci
+    libnci = loadlib "libnci"
+    .local pmc nci_cb_C1
+    nci_cb_C1 = dlfunc libnci, "nci_cb_C1", "vpP"
+    print "loaded a function that takes a callback\n"
+    nci_cb_C1( cb_wrapped, user_data ) 
+
+    # callback will be called at any time
+    # so spin a bit
+    .local int sleep_cnt
+    sleep_cnt = 0
+LOOP:
+    sleep_cnt += 1
+    sleep 0.01
+    .local pmc callback_has_run
+    callback_has_run = find_global "cb_done"
+    if callback_has_run goto FINISHED
+    if sleep_cnt > 10 goto ERROR 
+    goto LOOP
+FINISHED:
+    print "the callback has run\n"
+    end
+ERROR:
+    print "the callback didnt run\n"
+    end
+.end
+
+.sub _call_back
+  print "in callback\n"
+  print "user data: "
+  print P5
+  print "\n"
+  print "external data: "
+  print S5
+  print "\n"
+  find_global P12, "cb_done"
+  inc P12
+  invoke P1
+.end
+
+CODE
+created a callback sub
+loaded a function that takes a callback
+in callback
+user data: 42
+external data: succeeded
+the callback has run
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_D1");
 
   # we need a flag if the call_back is already done
@@ -1343,7 +1443,7 @@ OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
 ##PIR##
-.sub _main
+.sub _test @MAIN
     .local pmc pmc1
     pmc1 = new ParrotLibrary
     .local int bool1
