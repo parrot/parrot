@@ -9,7 +9,7 @@ use strict;
 use Getopt::Std;
 
 my ($DIS, @dis, @source, $file, %opt, $DEFVAR, $cur_func, $lambda_count,
-   %main_names, %namespace);
+   %main_names, %namespace, %may_be_none);
 $DIS = 'python mydis.py';
 $DEFVAR = 'PerlInt';
 
@@ -261,7 +261,8 @@ EOC
     my $self;
     if ($meth ne '') {
 	$self = shift @params;
-	shift @{$def_args{$arg}};
+	#shift @{$def_args{$arg}};
+	$arg_count{$arg}--;
     }
 
     $params = join("\n\t", map {".param pmc $_"} @params);
@@ -304,6 +305,7 @@ EOC
 	    my $reg = 4 + $i;
 	    my $d = pop @{$def_args{$arg}};
 	    my $arg_name = pop @params;
+	    $may_be_none{$arg_name} = 1;
 	    print <<EOC;
 	if argcP >= $i goto arg_ok
 	    find_global $arg_name, "${arg}_$d"
@@ -1353,6 +1355,14 @@ sub STORE_FAST
 EOC
 	}
 	else {
+	    if ($may_be_none{$c}) {
+		delete $may_be_none{$c};
+		print <<"EOC";
+	    ne_addr $c, None, temp_$code_l
+	    $c = new $DEFVAR
+temp_$code_l:
+EOC
+	    }
 	    print <<"EOC";
 	# assign $c, $tos->[1] $cmt
 	set $p, $tos->[1] $cmt

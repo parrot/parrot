@@ -201,7 +201,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
         if (!*meth)
             continue;
         meth_str.strstart = const_cast(meth);
-        meth_str.strlen = strlen(meth);
+        meth_str.strlen = meth_str.bufused = strlen(meth);
         meth_str.hashval = 0;
         if (Parrot_find_global(interpreter, class_name, &meth_str)) {
             /*
@@ -209,7 +209,10 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
              * slot
              */
             LVALUE_CAST(void **,vtable)[i] = ((void**)object_vtable)[i];
-            /* printf("deleg_pmc found '%s'\n", meth); */
+#if 0
+            PIO_eprintf(interpreter, "deleg_pmc class '%Ss' found '%s'\n",
+                    class_name, meth);
+#endif
         }
         else {
             /*
@@ -262,7 +265,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     if (base_class->vtable->base_type == enum_class_FixedPMCArray) {
         PMC *tuple = base_class;
         /* got a tuple holding parents - Python!
-         */
+        */
         INTVAL n = VTABLE_elements(interpreter, tuple);
         is_python = 1;
         if (!n) {
@@ -278,7 +281,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     /*
      * ParrotClass is the baseclass anyway, so build just a new class
      */
-    if (base_class->vtable->base_type == enum_class_ParrotClass) {
+    if (base_class == Parrot_base_vtables[enum_class_ParrotClass]->data) {
         PMC* class = pmc_new(interpreter, enum_class_ParrotClass);
         Parrot_new_class(interpreter, class, child_class_name);
         if (is_python)
@@ -320,19 +323,10 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     /* Our penultimate parent list is a clone of our parent's parent
        list, with our parent unshifted onto the beginning */
     if (parent_is_class) {
-        PMC *all_parents, *last;
+        PMC *all_parents;
         all_parents = get_attrib_num((SLOTTYPE *)PMC_data(base_class),
-                    PCD_ALL_PARENTS);
+                PCD_ALL_PARENTS);
         temp_pmc = clone_array(interpreter, all_parents);
-        /*
-         * if any of the parent is a PMC, we need a deleg_pmc vtable
-         * XXX - we always use the parents vtable XXX
-         */
-        if (0 && VTABLE_elements(interpreter, all_parents)) {
-            last = VTABLE_get_pmc_keyed_int(interpreter, all_parents, -1);
-            if (!PObj_is_class_TEST(last))
-                parent_is_class = 0;
-        }
 
     }
     else {
@@ -574,7 +568,7 @@ do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
         if (!PObj_is_class_TEST(parent_class)) {
             PMC *attr;
             SLOTTYPE *obj_data = PMC_data(object);
-            if (!parent_class->vtable->base_type == enum_class_ParrotClass)
+            if (parent_class->vtable->base_type != enum_class_ParrotClass)
                 VTABLE_invoke(interpreter, parent_class, NULL);
             attr = REG_PMC(5);
             set_attrib_num(obj_data, POD_FIRST_ATTRIB, attr);
@@ -733,10 +727,12 @@ instantiate_py_object(Interp* interpreter, PMC* class, void* next)
             void *data = Parrot_save_register_frames(interpreter, meth);
             REG_STR(0) = meth_str;
             REG_PMC(2) = class;
+#if 0
             /* args are just passed on */
             PIO_eprintf(interpreter, "__new__ class %Ss nargs = %d\n",
                     VTABLE_name(interpreter, class),
                     (int)REG_INT(3));
+#endif
             Parrot_runops_fromc(interpreter, meth);
             object = REG_PMC(5);
             Parrot_restore_register_frames(interpreter, data);
@@ -1159,8 +1155,42 @@ store_e:
     return found;
 }
 
+#ifdef NDEBUG
+#  define TRACE_FM(i, c, m, sub)
+#else
+static void
+debug_trace_find_meth(Interp* interpreter, PMC *class, STRING *name, PMC *sub)
+{
+    STRING *class_name;
+    const char *result;
+    if (!Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))
+        return;
+    if (PObj_is_class_TEST(class)) {
+        SLOTTYPE *class_array = PMC_data(class);
+        PMC *class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
+        class_name = PMC_str_val(class_name_pmc);
+    }
+    else
+        class_name = class->vtable->whoami;
+    if (sub) {
+        if (sub->vtable->base_type == enum_class_NCI)
+            result = "NCI";
+        else
+            result = "Sub";
+    }
+    else
+        result = "no";
+    PIO_eprintf(interpreter,
+            "# find_method class '%Ss' method '%Ss': %s\n",
+            class_name, name, result);
+}
+
+#  define TRACE_FM(i, c, m, sub) \
+    debug_trace_find_meth(i, c, m, sub)
+#endif
+
 static PMC *
-find_method_direct(Parrot_Interp interpreter, PMC *class,
+find_method_direct_1(Parrot_Interp interpreter, PMC *class,
                               STRING *method_name)
 {
     PMC* method = NULL;  /* The method we ultimately return */
@@ -1185,10 +1215,12 @@ find_in_pmc:
 
         class_name = class->vtable->whoami;
         method = Parrot_find_global(interpreter,
-                           class_name,
-                           method_name);
-        if (method)
+                class_name,
+                method_name);
+        TRACE_FM(interpreter, class, method_name, method);
+        if (method) {
             return method;
+        }
         /*
          * now look into that PMCs parents
          * the parent classes are in vtable->isa_str as blank
@@ -1207,16 +1239,20 @@ find_in_pmc:
                         string_substr(interpreter, isa, start,
                             isa->strlen - start, NULL, 0),
                         method_name);
-                if (method)
+                TRACE_FM(interpreter, class, method_name, method);
+                if (method) {
                     return method;
+                }
             }
             /* TODO */
             break;
         }
         /* finally look in namespace "object" */
-        return  Parrot_find_global(interpreter,
-                           CONST_STRING(interpreter, "object"),
-                           method_name);
+        method =  Parrot_find_global(interpreter,
+                CONST_STRING(interpreter, "object"),
+                method_name);
+        TRACE_FM(interpreter, class, method_name, method);
+        return method;
     }
 
     /* The order of operations:
@@ -1230,19 +1266,20 @@ find_in_pmc:
 
     /* See if we get lucky and its in the class of the PMC */
     method = Parrot_find_global(interpreter,
-                         VTABLE_get_string(interpreter,
-                                  get_attrib_num((SLOTTYPE *)PMC_data(class),
-                                                 PCD_CLASS_NAME)),
-                         method_name);
+            VTABLE_get_string(interpreter,
+                get_attrib_num((SLOTTYPE *)PMC_data(class),
+                    PCD_CLASS_NAME)),
+            method_name);
 
     /* Bail immediately if we got something */
+    TRACE_FM(interpreter, class, method_name, method);
     if (method) {
         return method;
     }
 
     /* If not, time to walk through the parent class array. Wheee */
     classsearch_array = get_attrib_num((SLOTTYPE *)PMC_data(class),
-                                       PCD_ALL_PARENTS);
+            PCD_ALL_PARENTS);
     classcount = VTABLE_elements(interpreter, classsearch_array);
 
     for (searchoffset = 0; searchoffset < classcount; searchoffset++) {
@@ -1255,16 +1292,33 @@ find_in_pmc:
             goto find_in_pmc;
         }
         method = Parrot_find_global(interpreter,
-                             VTABLE_get_string(interpreter,
-                                  get_attrib_num((SLOTTYPE *)PMC_data(curclass),
-                                                 PCD_CLASS_NAME)),
-                             method_name);
+                VTABLE_get_string(interpreter,
+                    get_attrib_num((SLOTTYPE *)PMC_data(curclass),
+                        PCD_CLASS_NAME)),
+                method_name);
+        TRACE_FM(interpreter, curclass, method_name, method);
         if (method) {
             Parrot_note_method_offset(interpreter, searchoffset, method);
             return method;
         }
     }
+    TRACE_FM(interpreter, class, method_name, method);
     return method;
+}
+
+static PMC *
+find_method_direct(Parrot_Interp interpreter, PMC *class,
+                              STRING *method_name)
+{
+    PMC *found = find_method_direct_1(interpreter, class, method_name);
+    STRING * s1, *s2;
+    if (found)
+        return found;
+    s1 = CONST_STRING(interpreter, "__get_string");
+    s2 = CONST_STRING(interpreter, "__get_repr");
+    if (string_equal(interpreter, method_name, s1) == 0)
+        return find_method_direct_1(interpreter, class, s2);
+    return NULL;
 }
 
 /*

@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -96,6 +96,29 @@ class TT(T):
 
 def main():
     i = TT(5)
+    print i, `i`
+
+main()
+
+CODE
+
+test(<<'CODE', 'Int __new__');
+T = int
+
+class TT(T):
+    def __repr__(self):
+        return "T(%d)" % self
+
+class Int(TT):
+    def __new__(cls, value=None):
+        if value is None:
+            value = 42
+        return TT.__new__(cls, value)
+
+def main():
+    i = Int(5)
+    print i, `i`
+    i = Int()
     print i, `i`
 
 main()

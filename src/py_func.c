@@ -710,9 +710,20 @@ integer_divide_int(Interp* interp, PMC* self, INTVAL value, PMC* destination)
      VTABLE_set_integer_native(interp, destination, result);
 }
 
+/*
+ * __new__(class, args...)
+ * when its overridden, the call is treated as a method call with
+ * the class in P2
+ *
+ * This is the internal function, if the __new__ isn't present.
+ * We shift down arguments by one and instantiate the object
+ */
+
 static PMC*
-parrot_py_instantiate_new(Parrot_Interp interpreter, PMC *class)
+parrot_py_instantiate_new(Parrot_Interp interpreter, PMC *class, PMC*arg)
 {
+    REG_PMC(5) = arg;   /* XXX shift down more */
+    --REG_INT(3);
     if (PObj_is_class_TEST(class)) {
         /* init calls instantiate */
         return pmc_new_init(interpreter, class->vtable->base_type, (void*) -1);
@@ -727,6 +738,7 @@ static void
 parrot_py_create_default_meths(Interp *interpreter)
 {
     STRING *pio = CONST_STRING(interpreter, "PIO");
+    STRING *piop = CONST_STRING(interpreter, "PIPP");
     STRING *class = CONST_STRING(interpreter, "object");
 
     STRING *repr =  CONST_STRING(interpreter, "__get_repr");
@@ -739,7 +751,7 @@ parrot_py_create_default_meths(Interp *interpreter)
             F2DPTR(parrot_py_str), str, pio);
     */
     parrot_py_global(interpreter,
-            F2DPTR(parrot_py_instantiate_new), new__, pio);
+            F2DPTR(parrot_py_instantiate_new), new__, piop);
 
     mmd_register(interpreter, MMD_DIVIDE,
             enum_class_PerlInt, enum_class_PerlInt,
@@ -938,7 +950,7 @@ parrot_py_get_attr_str(Interp* interpreter, PMC *object, STRING *name)
      */
     Hash *h;
     HashBucket *b;
-    PMC *p, *class;
+    PMC *p, *class = NULL;
     STRING *class_name;
     INTVAL offs;
     SLOTTYPE *class_array;
@@ -984,7 +996,7 @@ parrot_py_get_attr_str(Interp* interpreter, PMC *object, STRING *name)
      */
     real_exception(interpreter, NULL, E_AttributeError,
             "'%Ss' object has no attribute '%Ss'",
-            class, /* TODO demangle */
+            class ? class : object, /* TODO demangle */
             name);
 
     return PMCNULL;
