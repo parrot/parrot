@@ -187,20 +187,7 @@ sub unpack
   $self->{MINOR} = shift_byte($string);
   $self->{FLAGS} = shift_byte($string);
   $self->{FLOATTYPE} = shift_byte($string);
-
-  # Unused fields 
-  shift_byte($string);
-  shift_byte($string);
-  shift_byte($string);
-  shift_byte($string);
-  shift_byte($string);
-  shift_byte($string);
-  shift_byte($string);
-  shift_byte($string);
-  shift_byte($string);
-  shift_byte($string);
-
-  $string = substr($string, 8);
+  $string = substr($string, 10);
 
   my $magic = shift_op($string);
 
