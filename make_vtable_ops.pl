@@ -1,3 +1,4 @@
+use lib 'lib';
 use Parrot::Vtable;
 
 my %vtable = parse_vtable();
