@@ -7,7 +7,5 @@ all :
 
 clean :
 	rm -f core
-	rm -f *.o *.imc
-	rm -f parser.h parser.output
-	rm -f lexer.c parser.c
-	rm -f x
+	rm -f pc.pasm
+	rm -f pc.pbc
