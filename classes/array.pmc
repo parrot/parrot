@@ -27,7 +27,8 @@ static INTVAL kp2int(struct Parrot_Interp *interpreter, KEY_PAIR kp) {
 }
 
 static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL size ) {
-    size++;
+    int i;
+    int old_size = self->cache.int_val;
     if(self->data != NULL) {
 	if(size >= 0) {
 	    ((Buffer *)self->data)->bufstart = (DPOINTER*)mem_realloc(interpreter, ((Buffer *)self->data)->bufstart,self->cache.int_val*sizeof(PMC *), sizeof(PMC*)*size);
@@ -40,6 +41,14 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
     }
     else {
 	((Buffer *)self->data)->bufstart = Parrot_allocate(interpreter, sizeof(PMC*)*size);
+        self->cache.int_val = size;
+    }
+
+    for (i = old_size; i < size; i++) {
+	PMC** array = ((Buffer *)self->data)->bufstart;
+	/* I guess we need an undef PMC? A non-perl array should not
+           be populated with perl PMCs */
+	array[i] = pmc_new(interpreter, enum_class_PerlUndef);
     }
 }
 
@@ -83,7 +92,7 @@ pmclass Array {
             return 0;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp2int(INTERP, *kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
@@ -107,7 +116,7 @@ pmclass Array {
             return 0;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp2int(INTERP, *kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
@@ -131,7 +140,7 @@ pmclass Array {
             return 0;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp2int(INTERP, *kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
@@ -159,20 +168,17 @@ pmclass Array {
     }
 
     void set_integer (PMC* value) {
-	INTVAL size = value->vtable->get_integer(INTERP,value);
-	resize_array(interpreter, SELF,size);
+	INTVAL idx = value->vtable->get_integer(INTERP,value);
+	resize_array(interpreter, SELF, idx);
     }
 
-    void set_integer_native (INTVAL size) {
-	resize_array(interpreter, SELF,size);
-    }
-
-    void set_integer_bigint (BIGINT value) {
+    void set_integer_native (INTVAL idx) {
+	resize_array(interpreter, SELF, idx);
     }
 
     void set_integer_same (PMC * value) {
-	INTVAL size = value->cache.int_val;
-	resize_array(interpreter, SELF,size);
+	INTVAL idx = value->cache.int_val;
+	resize_array(interpreter, SELF, idx);
     }
 
     void set_integer_keyed (KEY * key, INTVAL value) {
@@ -184,10 +190,10 @@ pmclass Array {
             return;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp2int(INTERP, *kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -196,20 +202,17 @@ pmclass Array {
     }
 
     void set_number (PMC * value) {
-	INTVAL size = (INTVAL)value->cache.num_val;
-	resize_array(interpreter, SELF,size);
+	INTVAL idx = (INTVAL)value->cache.num_val;
+	resize_array(interpreter, SELF, idx+1);
     }
 
-    void set_number_native (FLOATVAL size) {
-	resize_array(interpreter, SELF,(INTVAL)size);
-    }
-
-    void set_number_bigfloat (BIGFLOAT value) {
+    void set_number_native (FLOATVAL idx) {
+	resize_array(interpreter, SELF, (INTVAL)idx + 1);
     }
 
     void set_number_same (PMC * value) {
-	INTVAL size = value->cache.int_val;
-	resize_array(interpreter, SELF,size);
+	INTVAL idx = value->cache.int_val;
+	resize_array(interpreter, SELF, idx);
     }
 
     void set_number_keyed (KEY * key, FLOATVAL value) {
@@ -221,30 +224,15 @@ pmclass Array {
             return;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp2int(INTERP, *kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
 	mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
         mypmc->vtable->set_number_native(INTERP, mypmc, value);
-    }
-
-    void set_string (PMC * value) {
-    }
-
-    void set_string_native (STRING * value) {
-    }
-
-    void set_string_unicode (STRING * value) {
-    }
-
-    void set_string_other (STRING * value) {
-    }
-
-    void set_string_same (PMC * value) {
     }
 
     void set_string_keyed (KEY * key, STRING * value) {
@@ -256,10 +244,10 @@ pmclass Array {
             return;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp2int(INTERP, *kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -267,21 +255,18 @@ pmclass Array {
         mypmc->vtable->set_string_native(INTERP, mypmc, value);
     }
 
-    void set_value (void* value) {
-    }
-
     void set_pmc_keyed(KEY * dest_key, PMC* src, KEY* src_key) {
         if (src_key) {
             src = src->vtable->get_pmc_keyed(INTERP, src, src_key);
         }
         if (dest_key) {
-            INTVAL ix = kp2int(INTERP, *((dest_key->keys)[0]));
+            INTVAL ix = kp2int(INTERP, dest_key->keys[0]);
             PMC* dest = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
             dest->vtable->set_pmc(INTERP, dest, src);
         } 
         else {
             /* $#array = $foo[$bar] */
-            resize_array(interpreter, SELF, src->vtable->get_integer(INTERP, src));
+            resize_array(interpreter, SELF, 1+src->vtable->get_integer(INTERP, src));
         }       
     }
 
@@ -312,21 +297,12 @@ pmclass Array {
         );
     }
 
-    void add_bigint (BIGINT value, PMC* dest) {
-    }
-
     void add_float (FLOATVAL value, PMC* dest) {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
 	dest->vtable->set_number_native(INTERP, dest, 
 	    SELF->vtable->get_number(INTERP, SELF) +
             value
         );
-    }
-
-    void add_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void add_same (PMC * value, PMC* dest) {
     }
 
     void subtract (PMC * value, PMC* dest) {
@@ -356,21 +332,12 @@ pmclass Array {
         );
     }
 
-    void subtract_bigint (BIGINT value, PMC* dest) {
-    }
-
     void subtract_float (FLOATVAL value, PMC* dest) {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
 	dest->vtable->set_number_native(INTERP, dest, 
 	    SELF->vtable->get_number(INTERP, SELF) -
             value
         );
-    }
-
-    void subtract_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void subtract_same (PMC * value, PMC* dest) {
     }
 
     void multiply (PMC * value, PMC* dest) {
@@ -400,21 +367,12 @@ pmclass Array {
         );
     }
 
-    void multiply_bigint (BIGINT value, PMC* dest) {
-    }
-
     void multiply_float (FLOATVAL value, PMC* dest) {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
 	dest->vtable->set_number_native(INTERP, dest, 
 	    SELF->vtable->get_number(INTERP, SELF) *
             value
         );
-    }
-
-    void multiply_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void multiply_same (PMC * value, PMC* dest) {
     }
 
     void divide (PMC * value, PMC* dest) {
@@ -444,21 +402,12 @@ pmclass Array {
         );
     }
 
-    void divide_bigint (BIGINT value, PMC* dest) {
-    }
-
     void divide_float (FLOATVAL value, PMC* dest) {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
 	dest->vtable->set_number_native(INTERP, dest, 
 	    SELF->vtable->get_number(INTERP, SELF) /
             value
         );
-    }
-
-    void divide_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void divide_same (PMC * value, PMC* dest) {
     }
 
     void modulus (PMC * value, PMC* dest) {
@@ -479,18 +428,6 @@ pmclass Array {
 	    SELF->vtable->get_integer(INTERP, SELF) %
             value
         );
-    }
-
-    void modulus_bigint (BIGINT value, PMC* dest) {
-    }
-
-    void modulus_float (FLOATVAL value, PMC* dest) {
-    }
-
-    void modulus_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void modulus_same (PMC * value, PMC* dest) {
     }
 
     void concatenate (PMC * value, PMC* dest) {
@@ -541,44 +478,5 @@ pmclass Array {
     /* == operation */
     BOOLVAL is_equal (PMC* value) {
         return 0;
-    }
-
-    void logical_or (PMC* value, PMC* dest) {
-    }
-
-    void logical_and (PMC* value, PMC* dest) {
-    }
-
-    void logical_not (PMC* value) {
-    }
-
-    void match (PMC * value,REGEX* re) {
-    }
-
-    void match_native (STRING * value, REGEX* re) {
-    }
-
-    void match_unicode (STRING * value, REGEX* re) {
-    }
-
-    void match_other (STRING * value, REGEX* re) {
-    }
-
-    void match_same (PMC * value,REGEX* re) {
-    }
-
-    void repeat (PMC * value, PMC* dest) {
-    }
-
-    void repeat_native (STRING * value, PMC* dest) {
-    }
-
-    void repeat_unicode (STRING * value, PMC* dest) {
-    }
-
-    void repeat_other (STRING * value, PMC* dest) {
-    }
-
-    void repeat_same (PMC * value, PMC* dest) {
     }
 }

@@ -3,18 +3,17 @@
 use Parrot::Test tests => 8;
 use Test::More;
 
-SKIP: { skip("No tests for things we know don't work quite yet", 8);
-
+SKIP: { skip("Hashes unimplemented", 8);
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
 	new P0, PerlHash
 	set S0, "one"
 	set S1, "two"
 
-	set P0[S0], 1		# $P0{one} = 1
-	set P0[S1], 2		# $P0{two} = 2
+	set_keyed P0, S0, 1		# $P0{one} = 1
+	set_keyed P0, S1, 2		# $P0{two} = 2
 
-	set I0, P0[S0]
-	set I1, P0[S1]
+	get_keyed I0, P0, S0
+	get_keyed I1, P0, S1
 
 	print I0
 	print "\n"
@@ -29,14 +28,14 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "more than one PerlHash");
 	new P0, PerlHash
 	set S0, "key"
-	set P0, 1, S0
+	set_keyed P0, S0, 1
 		
         new P1, PerlHash
         set S1, "another_key"
-        set P1, 2, S1 
+        set_keyed P1, S1, 2
 
-	set I0, P0, S0
-	set I1, P1, S1
+	get_keyed I0, P0, S0
+	get_keyed I1, P1, S1
 
 	print I0
 	print "\n"
@@ -53,11 +52,11 @@ output_is(<<'CODE', <<OUTPUT, "hash keys with nulls in them");
 	set S0, "parp\0me"
 	set S1, "parp\0you"
 
-	set P0, 1, S0		# $P0{parp\0me} = 1
-	set P0, 2, S1		# $P0{parp\0you} = 2
+	set_keyed P0, S0, 1		# $P0{parp\0me} = 1
+	set_keyed P0, S1, 2		# $P0{parp\0you} = 2
 
-	set I0, P0, S0
-	set I1, P0, S1
+	get_keyed I0, P0, S0
+	get_keyed I1, P0, S1
 
 	print I0
 	print "\n"
@@ -74,11 +73,11 @@ output_is(<<'CODE', <<OUTPUT, "nearly the same hash keys");
 	set S0, "a\0"
 	set S1, "\0a"
 
-	set P0, 1, S0
-	set P0, 2, S1
+	set_keyed P0, S0, 1
+	set_keyed P0, S1, 2
 
-	set I0, P0, S0
-	set I1, P0, S1
+	get_keyed I0, P0, S0
+	get_keyed I1, P0, S1
 
 	print I0
 	print "\n"
@@ -96,13 +95,13 @@ output_is(<<'CODE', <<OUTPUT, "The same hash keys");
 	set S0, "Happy"
 	set S1, "Happy"
 
-	set P0, 1, S0
-	set I0, P0, S0
+	set_keyed P0, S0, 1
+	get_keyed I0, P0, S0
 	print I0
 	print "\n"
 
-	set P0, 2, S1
-	set I1, P0, S1
+	set_keyed P0, S1, 2
+	get_keyed I1, P0, S1
 
 	print I1
 	print "\n"
@@ -116,17 +115,17 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "size of the hash");
 	new P0, PerlHash
 	
-	set P0, 1, 0
+	set_keyed P0, 0, 1
 	set I0, P0
 	print I0
 	print "\n"	
 
-	set P0, 1, 1
+	set_keyed P0, 1, 1
 	set I0, P0
 	print I0
 	print "\n"	
 
-	set P0, 1, 0
+	set_keyed P0, 0, 1
 	set I0, P0
 	print I0
 	print "\n"	
@@ -145,8 +144,8 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "key that hashes to zero");
         new P0, PerlHash
         set S0, "key2"
-        set P0, 1, S0
-        set I0, P0, S0
+        set_keyed P0, S0, 1
+        get_keyed I0, P0, S0
 	print I0
 	print "\n"	
 	end
@@ -157,13 +156,13 @@ OUTPUT
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
 	new	P0, PerlHash
 
-	set	P0, -7,"foo"
-	set	P0, 3.5,"bar"
-	set	P0, "value","baz"
+	set_keyed	P0, "foo", -7
+	set_keyed	P0, "bar", 3.5
+	set_keyed	P0, "baz", "value"
 
-	set	I0, P0, "foo"
-	set	N0, P0, "bar"
-	set	S0, P0, "baz"
+	get_keyed	I0, P0, "foo"
+	get_keyed	N0, P0, "bar"
+	get_keyed	S0, P0, "baz"
 
 	eq	I0,-7,OK_1
 	print	"not "
@@ -182,7 +181,6 @@ ok 2
 ok 3
 OUTPUT
 
+} # SKIP
 
-
-}
 1;

@@ -59,7 +59,7 @@ pmclass PerlHash {
             return 0;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
@@ -89,7 +89,7 @@ pmclass PerlHash {
             return 0;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
@@ -119,7 +119,7 @@ pmclass PerlHash {
             return 0;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
@@ -177,7 +177,7 @@ pmclass PerlHash {
             return;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
@@ -219,7 +219,7 @@ pmclass PerlHash {
             return;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
@@ -259,7 +259,7 @@ pmclass PerlHash {
             return;
         }
 
-        kp = (key->keys)[0];
+        kp = &key->keys[0];
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
@@ -534,44 +534,5 @@ pmclass PerlHash {
     /* == operation */
     BOOLVAL is_equal (PMC* value) {
         return 0;
-    }
-
-    void logical_or (PMC* value, PMC* dest) {
-    }
-
-    void logical_and (PMC* value, PMC* dest) {
-    }
-
-    void logical_not (PMC* value) {
-    }
-
-    void match (PMC * value,REGEX* re) {
-    }
-
-    void match_native (STRING * value, REGEX* re) {
-    }
-
-    void match_unicode (STRING * value, REGEX* re) {
-    }
-
-    void match_other (STRING * value, REGEX* re) {
-    }
-
-    void match_same (PMC * value,REGEX* re) {
-    }
-
-    void repeat (PMC * value, PMC* dest) {
-    }
-
-    void repeat_native (STRING * value, PMC* dest) {
-    }
-
-    void repeat_unicode (STRING * value, PMC* dest) {
-    }
-
-    void repeat_other (STRING * value, PMC* dest) {
-    }
-
-    void repeat_same (PMC * value, PMC* dest) {
     }
 }
