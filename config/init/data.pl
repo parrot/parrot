@@ -75,9 +75,12 @@ sub runstep {
     ld            => $Config{ld},
     ldflags       => $Config{ldflags},
 
-    # Shared libraries
+    # Some operating systems (e.g. Darwin) distinguish between shared libraries and
+    # modules that can be dynamically loaded.
+    # Flags to tell ld to build a shared library, e.g.  -shared for GNU ld.
     ld_share_flags => $Config{lddlflags},
 
+    # Flags to tell ld to build a dynamically loadable module, e.g.  -shared for GNU ld.
     # Dynamically loadable modules
     ld_load_flags => $Config{lddlflags},
 
@@ -87,10 +90,10 @@ sub runstep {
     cc_debug      => '-g',
     link_debug    => '',
 
-    o             => '.o',                # object files extension
-    share_ext     => '.so',               # shared library extension
-    load_ext      => '.so',               # dynamically loadable module extension
-    a             => '.a',                # library or archive extension
+    o             => $Config{_o},         # object files extension
+    share_ext     => ".$Config{so}",      # shared library extension
+    load_ext      => ".$Config{so}",      # dynamically loadable module extension
+    a             => $Config{_a},         # library or archive extension
     exe           => $Config{_exe},       # executable files extension
     cc_o_out      => '-o ',               # cc object output file
     cc_exe_out    => '-o ',               # cc executable output file (different on Win32)
@@ -124,6 +127,7 @@ sub runstep {
     as            => 'as',                # assembler
 
     cp            => 'cp',
+    lns           => $Config{lns},        # soft link
     slash         => '/',
 
     VERSION       => $main::parrot_version,
