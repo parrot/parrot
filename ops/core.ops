@@ -546,6 +546,11 @@ inline op set(out STR, in INT) {
   goto NEXT();
 }
 
+inline op set(out STR, in NUM) {
+  $1 = Parrot_sprintf_c(interpreter, "%f", $2);
+  goto NEXT();
+}
+
 inline op set(out PMC, in INT) { 
   $1->vtable->set_integer_native(interpreter, $1, $2);
   goto NEXT();
