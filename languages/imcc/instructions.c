@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include <string.h>
 #include "imc.h"
 
 /* 
@@ -132,11 +133,19 @@ void emit_flush() {
     int i = 0;
  
     /* first instruction should be ".sub" -- make sure we allocate P31
-     * _after_ subroutine entry. */
+     * _after_ subroutine entry.  And after the "saveall", or any
+     * other assortment of pushes. */
     if (n_spilled > 0 && n_instructions > 0) {
+        emit(instructions[0]);
+        free(instructions[0]);
+        i++;
+        while (i < n_instructions
+               && (strncmp(instructions[i]->fmt, "push", 4) == 0
+                   || strcmp(instructions[i]->fmt, "saveall") == 0)) {
 	emit(instructions[i]);
 	free(instructions[i]);
-	i++;
+            ++i;
+        }
 	printf("new P31, .PerlArray\n");
     }
     for( ; i < n_instructions; i++) {
