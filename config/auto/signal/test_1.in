@@ -10,6 +10,7 @@
 
 
 __sighandler_t set_handler(int sig, __sighandler_t act) {
+  return (__sighandler_t) 0;
 }
 
 int main(int argc, char **argv) {
