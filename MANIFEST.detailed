@@ -62,6 +62,8 @@
 []		config/auto/gcc/test_c.in
 []		config/auto/headers.pl
 []		config/auto/headers/test_c.in
+[]		config/auto/isreg.pl
+[]		config/auto/isreg/test_c.in
 []		config/auto/jit.pl
 []		config/auto/jit/test_c.in
 []		config/auto/memalign.pl
