@@ -369,7 +369,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH };
  * opcode = 31 for integer, 63 for floating point
  * bf is the comparison result field to use (we just always use 0)
  */
-
+ 
 #define _emit_cmp(pc, t, bf, ra, rb) \
   *(pc++) = t << 2 | ((int)bf) >> 1; \
   *(pc++) = (char)(bf << 7 | ra); \
@@ -379,10 +379,28 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH };
 #define emit_cmp(pc, ra, rb) _emit_cmp(pc, 31, 0, ra, rb)
 #define emit_fcmp(pc, ra, rb) _emit_cmp(pc, 63, 0, ra, rb)
 
+/* compare immediate operation.
+ *
+ *  +--------------------------------------------------------------------+
+ *  |  Opcode  | BF   | |L |     A     |             SIMM                |
+ *  +--------------------------------------------------------------------+
+ * 0          5 6    8 9 10 11       15 16                             31
+ *
+ */
+
+#define _emit_cmpi(pc, t, bf, ra, simm) \
+  *(pc++) = t << 2 | ((int)bf) >> 1; \
+  *(pc++) = (char)(bf << 7 | ra); \
+  *(pc++) = simm >> 8; \
+  *(pc++) = (char)simm
+
+#define emit_cmpi(pc, ra, simm) \
+  _emit_cmpi(pc, 11, 0, ra, simm);
+
 /* Branch conditional to immediate
  *
  *  +--------------------------------------------------------------------+
- *  |    19    |     BO     |     BI     |     BO               | AA | LK |
+ *  |    19    |     BO     |     BI     |     BO              | AA | LK |
  *  +--------------------------------------------------------------------+
  * 0          5 6         10 11        15 16                      30   31
  *
@@ -420,13 +438,24 @@ emit_bc(Parrot_jit_info_t * jit_info, branch_t cond, opcode_t disp) {
     if(opcode <= jit_info->op_i) {
         offset = jit_info->arena.op_map[opcode].offset -
             (jit_info->native_ptr - jit_info->arena.start);
+        if (jit_info->optimizer->cur_section->branch_target ==
+            jit_info->optimizer->cur_section)
+                offset + 
+                    jit_info->optimizer->cur_section->branch_target->load_size;
     } else {
         offset = 0;
         Parrot_jit_newfixup(jit_info); 
         jit_info->arena.fixups->type = JIT_PPC_BRANCH;
         jit_info->arena.fixups->param.opcode = opcode;
+
+        if (jit_info->optimizer->cur_section->branch_target ==
+            jit_info->optimizer->cur_section)
+                jit_info->arena.fixups->skip =
+                    jit_info->optimizer->cur_section->branch_target->load_size;
+    
     }
     _emit_bc(jit_info->native_ptr, cond, offset, 0, 0);
+
 }
 
 /* Store a CPU register back to a Parrot register. */
@@ -519,7 +548,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                 fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
                 /* I guess param.fptr is number of insns? */
                 d = jit_info->arena.op_map[fixup->param.opcode].offset
-                    - fixup->native_offset;
+                    - fixup->native_offset + fixup->skip;
                 fixup_ptr += 2;
                 *(fixup_ptr++) = (char)(d >> 8);
                 *(fixup_ptr++) |= (char)d&~3;

@@ -40,9 +40,9 @@ Parrot_set_i_i {
 }
 
 Parrot_set_n_nc {
-        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-	emit_lfd(NATIVECODE, r12, 0, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]); 
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]); 
 }
 
 Parrot_neg_i_i {
@@ -574,6 +574,17 @@ Parrot_sub_n_n {
         emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
 }
 
+Parrot_if_i_ic {
+    if (MAP[1]) {
+        emit_cmpi(NATIVECODE, MAP[1], 0);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
+        emit_cmpi(NATIVECODE, r12, 0);
+    }
+    emit_bc(jit_info, BNE, *INT_CONST[2]);
+}
+        
 Parrot_gt_i_i_ic {
 ; First, emit the compare op:
     if (MAP[1] && MAP[2]) {
