@@ -118,6 +118,7 @@ my %type_for_name = (
 	'MANIFEST' => 'Manifest file',
 	'NEWS' => 'Project info',
 	'PBC_COMPAT' => 'Bytecode compatibility file',
+	'PLATFORMS' => 'Project info',
 	'README' => 'README file',
 	'RELEASE_INSTRUCTIONS' => 'Project info',
 	'RESPONSIBLE_PARTIES' => 'Project info',
@@ -311,9 +312,16 @@ sub is_docs_link
 	# TODO - This needs more thought. I'm trying to work out which files
 	# it's sensible to link directly to. Suffixes other than txt are a
 	# problem (for me at least) because the browser thinks it should
-	# downloat the file.
+	# download the file.
 	
-	return 0 if $self->has_suffix and $self->suffix !~ m/[Tt][Xx][Tt]/o;
+	if ( $self->has_suffix )
+	{
+		return 0 if $self->suffix !~ m/[Tt][Xx][Tt]/o;
+	}
+	else
+	{
+		return 1 if $self->name =~ m/^[[:upper:]]+$/o;
+	}
 	
 	return $self->type =~ /Licence|info|docu|Text|TODO|status|MANIFEST|README/;
 }

@@ -5,7 +5,7 @@ Platform           B8     Runloops         Feature        Compile  Tests
                        CGoto JIT EXEC   Threads Signals
 ---------------------------------------------------------------------
 aix                      -    Y    -       Y      -          Y       Y
-darwin
+darwin             B     Y    Y    Y       Y      -          Y       Y
 freebsd
 hpux
 ?-ia64

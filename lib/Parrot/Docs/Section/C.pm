@@ -41,7 +41,7 @@ sub new
 	return $self->SUPER::new(
 		'C', 'c.html', '',
 		$self->new_group('General', '',
-			$self->new_item('', 'src/parrot.c'),
+			$self->new_item('This just includes parrot.h. It\'s unused.', 'src/parrot.c'),
 			$self->new_item('', 'include/parrot/parrot.h'),
 			$self->new_item('', 'src/warnings.c', 'include/parrot/warnings.h'),
 			$self->new_item('', 'src/longopt.c', 'include/parrot/longopt.h'),
