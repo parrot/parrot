@@ -150,7 +150,7 @@ CC = ${cc}
 PERL = ${perl}
 
 # Make directory; do not die if dir exists.
-MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_ or die foreach @ARGV${PQ}
+MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
 
 
 ###############################################################################
