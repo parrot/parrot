@@ -181,18 +181,13 @@ typedef void (*funcptr_t)(void);
 #endif
 
 /* Helpful internal macro for testing whether we are currently
- * debugging garbage collection and memory management */
+ * debugging garbage collection and memory management. See also the
+ * definition of GC_VERBOSE in dod.c. */
 #if DISABLE_GC_DEBUG
 #  define GC_DEBUG(interp) 0
 #else
 #  define GC_DEBUG(interp) Interp_flags_TEST((interp), PARROT_GC_DEBUG_FLAG)
 #endif
-
-/* If you're really digging into things, then turn on GC_VERBOSE to
- * see warning messages for stuff that might, or might not, be a
- * problem. (See dod.h) This is disabled by default because the
- * warning messages cause many tests to fail. */
-#define GC_VERBOSE 0
 
 #include "parrot/platform.h"
 #include "parrot/global_setup.h"
