@@ -567,48 +567,38 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     mem_sys_free(interpreter->warns);
 
     /* XXX move this to register.c */
-    for (i = 0; i< 4; i++) {
+    {
+        struct IRegChunk *stacks[4];
         struct IRegChunk *top, *next;
-        switch(i) {
-            case 0:
-                top = interpreter->ctx.int_reg_top;
-                break;
-            case 1:
-                top = (struct IRegChunk*) interpreter->ctx.num_reg_top;
-                break;
-            case 2:
-                top = (struct IRegChunk*) interpreter->ctx.string_reg_top;
-                break;
-            case 3:
-                top = (struct IRegChunk*) interpreter->ctx.pmc_reg_top;
-                break;
-        }
-        for (; top ; ) {
-            next = top->next;
-            mem_sys_free(top);
-            top = next;
+        stacks[0] = interpreter->ctx.int_reg_top;
+        stacks[1] = (struct IRegChunk*) interpreter->ctx.num_reg_top;
+        stacks[2] = (struct IRegChunk*) interpreter->ctx.string_reg_top;
+        stacks[3] = (struct IRegChunk*) interpreter->ctx.pmc_reg_top;
+        for (i = 0; i< 4; i++) {
+            top = stacks[i];
+            for (; top ; ) {
+                next = top->next;
+                mem_sys_free(top);
+                top = next;
+            }
         }
     }
+
     /* XXX move this to stacks.c */
-    for (i = 0; i< 3; i++) {
-        Stack_Chunk_t *top, *next;
-        switch(i) {
-            case 0:
-                top = interpreter->ctx.pad_stack;
-                break;
-            case 1:
-                top = interpreter->ctx.user_stack;
-                break;
-            case 2:
-                top = interpreter->ctx.control_stack;
-                break;
-        }
-        while (top->next)
-            top = top->next;
-        while(top) {
-            next = top->prev;
-            mem_sys_free(top);
-            top = next;
+    {
+        Stack_Chunk_t *chunks[3];
+        chunks[0] = interpreter->ctx.pad_stack;
+        chunks[1] = interpreter->ctx.user_stack;
+        chunks[2] = interpreter->ctx.control_stack;
+        for (i = 0; i< 3; i++) {
+            Stack_Chunk_t *top = chunks[0];
+            while (top->next)
+                top = top->next;
+            while(top) {
+                Stack_Chunk_t *next = top->prev;
+                mem_sys_free(top);
+                top = next;
+            }
         }
     }
     /* intstack */
