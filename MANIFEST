@@ -228,12 +228,12 @@ languages/regex/lib/Regex/Ops/List.pm
 languages/regex/lib/Regex/Ops/Tree.pm
 languages/regex/lib/Regex/Optimize.pm
 languages/regex/lib/Regex/Parse.pm
-languages/regex/lib/Regex/Pasm.pm
 languages/regex/lib/Regex/PreOptimize.pm
 languages/regex/lib/Regex/Rewrite.pm
 languages/regex/lib/Regex/Rewrite/Rx.pm
 languages/regex/lib/Regex/Rewrite/Stackless.pm
 languages/regex/regex.pl
+languages/regex/t/a.t
 languages/regex/t/alt.t
 languages/regex/t/example.t
 languages/regex/t/group.t
