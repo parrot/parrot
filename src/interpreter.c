@@ -21,6 +21,7 @@
 #endif
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cg.h"
+#  include "parrot/oplib/core_ops_cgp.h"
 #endif
 #include "parrot/method_util.h"
 
