@@ -223,6 +223,9 @@ static void compact_pool(struct Parrot_Interp *interpreter,
     /* Okay, we're done with the copy. Set the bits in the pool struct */
     /* First, where we allocate next */
     new_block->top = cur_spot;
+
+    assert(new_block->size > new_block->top - new_block->start);
+
     /* How much is free. That's the total size minus the amount we used */
     new_block->free = new_block->size - (new_block->top - new_block->start);
 

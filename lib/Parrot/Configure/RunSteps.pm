@@ -17,6 +17,7 @@ use vars qw(@steps);
     auto/alignptrs.pl
 	auto/headers.pl
 	auto/sizes.pl
+	auto/stackdir.pl
 	auto/byteorder.pl
 	auto/pack.pl
 	auto/format.pl
