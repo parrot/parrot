@@ -8,7 +8,7 @@ description, (S) status, (M) maintained, (V) minimum Parrot version required.
 N: BASIC/compiler
 A: Clint Pierce
 D: BASIC Compiler
-S: Functional, includes samples such as Eliza and Hunt the Wumpus
+S: Broken [perl #30084]
 M: Yes
 V: 0.0.11
 
