@@ -36,9 +36,10 @@ end of the unit is reached.
 
 =head2 Comments
 
-Comment start with B<#> and end at line end.
+Comments start with C<#>, which may appear at any point on a line, and end at 
+the end of the line. 
 
-=head2 POD
+=head2 POD sections
 
 Everything enclosed in POD markers is ignored.
 
@@ -46,33 +47,37 @@ Everything enclosed in POD markers is ignored.
 	...
 	=cut
 
-A POD starts with a B<=> in columns 1 and ends with B<=cut> on its own line.
+A POD section starts with a B<=> in column 1 and ends with a B<=cut> on a line
+on its own.
 
 =head1 Compilation units
 
-=head2 Subroutines .sub ... .end
+=head2 Subroutines: .sub ... .end
+
+This code:
 
 	.sub _name
 		statements
 		...
 	.end
 
-defines a subroutine with the entry point B<_name>. Subroutine entry
-points (as all global labels) have to start with an underscore. The
-statements may contain valid PIR or PASM statements.
+defines a subroutine with the entry point C<_name>. Subroutine entry
+points have to start with an underscore (as do all other global 
+labels). The statements in the subroutine must be valid PIR or PASM.
 
-=head2 Subroutines .pcc_sub ... .end
+=head2 Subroutines: .pcc_sub ... .end
 
 	.pcc_sub _name
 		statements
 		...
 	.end
 
-Like above with parrot calling conventions.
-Subroutines according to Parrot Calling Conventions (PCC) are
-described in F<docs/calling_conventions.pod>.
+As above, but using the Parrot calling conventions. See
+F<docs/calling_conventions.pod> for more details.
 
 =head2 Assembly blocks .emit ... .eom
+
+This code:
 
 	.emit
 	_sub1:
@@ -87,29 +92,30 @@ usage is for language initialization and builtins code.
 
 =head2 Code outside compilation units
 
-Anything outside compilation units will be ignored in the near future.
+Any code appearing outside of a compilation unit will be ignored 
+(if not now, then in the near future).
 
 =head2 Nested subs
 
-Nested subroutines are deprecated and will be removed as well.
+Nested subroutines are deprecated and will be removed in the near
+future.
 
 =head1 Symbols, constants and labels
 
 I<Compilation units> maintain their own symbol table containing local
-labels and variable symbols. This symbol table I<hash> is not visible
+labels and variable symbols. This symbol table, C<hash>, is not visible
 to code in different units.
 
-If you need global variables please use the B<global> opcode.
+If you need global variables, please use the B<global> opcode.
 
 Global labels and constants are kept in the global symbol table
-I<ghash>.
-
-This allows for global constant folding beyond subroutine scope.
+C<ghash>. This allows for global constant folding beyond the scope
+of individual subroutines.
 
 Local labels in different I<compilation units> with the same name are
-allowed, though assembling the generated PASM
-doesn't work. Running this code inside imcc is ok.
-This will probably change so that local labels are mangled to be unique.
+allowed, though assembling the generated PASM doesn't work. However,
+running this code inside imcc is ok. This will probably change in the 
+future so that local labels are mangled to be unique.
 
 =head1 SEE ALSO
 
