@@ -751,7 +751,7 @@ void $initname (Interp * interp, int entry) {
 
     struct _vtable temp_base_vtable = {
         NULL,	/* package */
-        entry,
+        0,	/* base_type */
         NULL,	/* whoami */
         NULL,	/* method_table */
         $vtbl_flag, /* flags */
@@ -759,10 +759,16 @@ void $initname (Interp * interp, int entry) {
         0, /* extra data */
         $methodlist
         };
+    /* must set it here:
+     * Sun's Workshop compiler complains about the use of a non-constant
+     * initializer
+     */
+    temp_base_vtable.base_type = entry;
 
-   /* parrotio calls some class_init functions during its class_init
-    * code, so some of the slots might already be allocated
-    */
+    /*
+     * parrotio calls some class_init functions during its class_init
+     * code, so some of the slots might already be allocated
+     */
     if (!Parrot_base_vtables[entry]) {
 	temp_base_vtable.whoami = string_make(interp,
 	   "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);

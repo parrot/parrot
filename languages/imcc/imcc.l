@@ -509,8 +509,10 @@ yylex_skip (YYSTYPE *valp, void *interp, const char *skip)
         p = skip;
 	while (*p && c != *p) p++;
     } while (*p != '\0');
-
-    DUP_AND_RET(valp, c);
+    if (c)
+        DUP_AND_RET(valp, c);
+    else
+        return c;
 }
 
 static int
