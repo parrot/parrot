@@ -3639,17 +3639,17 @@ current lexical scope stack.
 
 Pop the current lexical scope pad off the stack
 
-=item B<store_lex>(in PMC, in STR)
+=item B<store_lex>(in STR, in PMC)
 
-Store object $1 as lexical symbol $2
+Store object $2 as lexical symbol $1
 
 =item B<find_lex>(in PMC, in STR)
 
 Find the lexical variable named $2 and store it in $1
 
-=item B<store_global>(in PMC, in STR)
+=item B<store_global>(in STR, in PMC)
 
-Store global $1 as global symbol $2
+Store global $2 as global symbol $1
 
 =item B<find_global>(out PMC, in STR)
 
@@ -3669,13 +3669,13 @@ op pop_pad() {
     goto NEXT();
 }
 
-op store_lex(in PMC, in STR) {
+op store_lex(in STR, in PMC) {
     PMC * hash = NULL;
     KEY key;
     Stack_entry_type type = 0;
-    MAKE_KEY(key, $2, enum_key_string, struct_val);
+    MAKE_KEY(key, $1, enum_key_string, struct_val);
     hash = (PMC *)stack_peek(interpreter, interpreter->ctx.pad_stack, &type);
-    hash->vtable->set_pmc_keyed(interpreter, hash, NULL, $1, &key);
+    hash->vtable->set_pmc_keyed(interpreter, hash, NULL, $2, &key);
     goto NEXT();
 }
 
@@ -3692,11 +3692,11 @@ op find_lex(out PMC, in STR) {
     goto NEXT();
 }
 
-op store_global(in PMC, in STR) {
+op store_global(in STR, in PMC) {
     KEY key;
     PMC * globals = interpreter->perl_stash->stash_hash;
-    MAKE_KEY_STRING(key, $2);
-    globals->vtable->set_pmc_keyed(interpreter, globals, NULL, $1, &key);
+    MAKE_KEY_STRING(key, $1);
+    globals->vtable->set_pmc_keyed(interpreter, globals, NULL, $2, &key);
     goto NEXT();
 }
 

@@ -8,7 +8,7 @@ output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new P1, .PerlInt
 	set P0, 12
 	set P1, 7
-	store_lex P0, "Integer"
+	store_lex "Integer", P0
 	find_lex P1, "Integer"
 	print P1
         print "\\n"
@@ -28,16 +28,16 @@ output_is(<<CODE, <<OUTPUT, "nested scopes");
   
   # outer most lexical scope
   new_pad
-  store_lex P0, "a"
+  store_lex "a", P0
   find_lex P3, "a"
   print P3
   print "\\n"
 
     new_pad
-    store_lex P1, "a"
+    store_lex "a", P1
 
       new_pad
-      store_lex P2, "c"
+      store_lex "c", P2
       find_lex P3, "c"
       print P3
       print "\\n"

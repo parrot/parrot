@@ -52,7 +52,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "Continuations");
     new P5, .PerlInt
     set P5, 3
-    store_global P5, "foo"
+    store_global "foo", P5
     new P1, .Continuation
     set_addr I0, endcont
     set P1, I0
@@ -65,7 +65,7 @@ endcont:
     set P2, P2
     unless P4, done
     dec P4
-    store_global P4, "foo"
+    store_global "foo", P4
     print "going to cont\n"
     clone P0, P1
     invoke
