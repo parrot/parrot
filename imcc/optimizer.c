@@ -283,9 +283,7 @@ static void strength_reduce(struct Parrot_Interp *interp)
                      atof(ins->r[2]->name) == 0.0)) &&
                 !strcmp(ins->op, "mul")) {
             debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
-            r = mk_const(ins->r[0]->set == 'I' ? str_dup("0") :
-                    str_dup("0.000000"),
-                    ins->r[0]->set);
+            r = mk_const(str_dup("0"), ins->r[0]->set);
             --ins->r[1]->use_count;
             if (ins->opsize == 4)
                 --ins->r[2]->use_count;
@@ -368,8 +366,7 @@ subst_constants_mix(struct Parrot_Interp *interp)
                     ins->r[2]->type == VTCONST &&
                     ins->r[2]->set == 'I') {
                 debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
-                sprintf(b, FLOATVAL_FMT,
-                        (FLOATVAL)atof(ins->r[2]->name));
+                strcpy(b, ins->r[2]->name);
                 r = mk_const(str_dup(b), 'N');
                 --ins->r[2]->use_count;
                 ins->r[2] = r;
@@ -406,8 +403,7 @@ subst_constants_umix(struct Parrot_Interp *interp)
                     ins->r[1]->set == 'I' &&
                     !strcmp(ins->op, ops[i])) {
                 debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
-                sprintf(b, FLOATVAL_FMT,
-                        (FLOATVAL)atof(ins->r[1]->name));
+                strcpy(b, ins->r[1]->name);
                 r = mk_const(str_dup(b), 'N');
                 --ins->r[1]->use_count;
                 ins->r[1] = r;
@@ -491,7 +487,7 @@ subst_constants(struct Parrot_Interp *interp)
         "sech", "sin", "sinh", "tan", "tanh", "fact"
     };
     size_t i;
-    char b[128];
+    char b[128], fmt[64];
     SymReg *r;
     struct Parrot_Context *ctx;
     int found;
@@ -499,6 +495,19 @@ subst_constants(struct Parrot_Interp *interp)
     /* save interpreter ctx */
     ctx = mem_sys_allocate(sizeof(struct Parrot_Context));
     mem_sys_memcopy(ctx, &interp->ctx, sizeof(struct Parrot_Context));
+    /* construct a FLOATVAL_FMT with needed precision */
+    switch (NUMVAL_SIZE) {
+        case 8:
+            strcpy(fmt, "%0.16g");
+            break;
+        case 12:
+            strcpy(fmt, "%0.18Lg");
+            break;
+        default:
+            warning("subs_constants", "used default FLOATVAL_FMT\n");
+            strcpy(fmt, FLOATVAL_FMT);
+            break;
+    }
 
     for (ins = instructions; ins; ins = ins->next) {
         found = 0;
@@ -523,7 +532,7 @@ subst_constants(struct Parrot_Interp *interp)
             }
         }
         if (!found)
-            break;
+            continue;
         debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
         /* we construct a parrot instruction
          * here and let parrot do the calculation in a
@@ -536,8 +545,8 @@ subst_constants(struct Parrot_Interp *interp)
             case 'I':
                 sprintf(b, INTVAL_FMT, interp->ctx.int_reg.registers[0]);
                 break;
-            case 'N':   /* FIXME precision/exponent */
-                sprintf(b, FLOATVAL_FMT, interp->ctx.num_reg.registers[0]);
+            case 'N':
+                sprintf(b, fmt, interp->ctx.num_reg.registers[0]);
                 break;
         }
         r = mk_const(str_dup(b), ins->r[0]->set);

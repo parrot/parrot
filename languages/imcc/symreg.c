@@ -46,7 +46,7 @@ void pop_namespace(char * name) {
 /* Makes a new SymReg from its varname and type */
 SymReg * _mk_symreg(SymReg* hsh[],char * name, char t) {
     SymReg * r;
-    if((r = _get_sym(hsh, name))) {
+    if((r = _get_sym(hsh, name)) && r->set == t) {
 	free(name);
         return r;
     }

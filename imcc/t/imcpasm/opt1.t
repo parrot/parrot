@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 47;
+use TestCompiler tests => 49;
 use Test::More qw(skip);
 
 # these tests are run with -O1 by TestCompiler and show
@@ -105,7 +105,7 @@ output_is(<<'CODE', <<'OUT', "constant add");
    end
 CODE
    set I0, 25
-   set N0, 25.000000
+   set N0, 25
    end
 OUT
 
@@ -116,7 +116,7 @@ output_is(<<'CODE', <<'OUT', "constant sub");
    end
 CODE
    set I0, -5
-   set N0, -5.000000
+   set N0, -5
    end
 OUT
 
@@ -127,7 +127,7 @@ output_is(<<'CODE', <<'OUT', "constant mul");
    end
 CODE
    set I0, 150
-   set N0, 150.000000
+   set N0, 150
    end
 OUT
 
@@ -138,7 +138,7 @@ output_is(<<'CODE', <<'OUT', "constant div");
    end
 CODE
    set I0, 2
-   set N0, 2.000000
+   set N0, 2
    end
 OUT
 
@@ -149,7 +149,7 @@ output_is(<<'CODE', <<'OUT', "constant cmod");
    end
 CODE
    set I0, 3
-   set N0, 3.000000
+   set N0, 3
    end
 OUT
 
@@ -160,7 +160,7 @@ output_is(<<'CODE', <<'OUT', "constant mod");
    end
 CODE
    set I0, 3
-   set N0, 3.000000
+   set N0, 3
    end
 OUT
 
@@ -381,7 +381,7 @@ output_is(<<'CODE', <<'OUT', "constant mix add");
    add N0, 10.0, 15
    end
 CODE
-   set N0, 25.000000
+   set N0, 25
    end
 OUT
 
@@ -399,7 +399,7 @@ output_is(<<'CODE', <<'OUT', "constant set");
    set N0, 5
    end
 CODE
-   set N0, 5.000000
+   set N0, 5
    end
 OUT
 
@@ -435,7 +435,7 @@ output_is(<<'CODE', <<'OUT', "strength mul N, 0, N");
    mul N0, 0.0, N1
    end
 CODE
-   set N0, 0.000000
+   set N0, 0
    end
 OUT
 
@@ -499,3 +499,31 @@ CODE
    set N0, N1
    end
 OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "multiple const syms");
+   set I0, 0
+   set I1, 1
+   add N0, -1.0, 2
+   add N0, -1.0, 1
+   add N0, 1.0, 0
+   end
+CODE
+   set I0, 0
+   set I1, 1
+   set N0, 1
+   set N0, 0
+   set N0, 1
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant add big nums");
+   add N0, 10.0e20, 15.0e21
+   end
+CODE
+   set N0, 1.6e+22
+   end
+OUT
+
+
