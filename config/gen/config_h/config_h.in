@@ -67,10 +67,13 @@ typedef ${hugefloatval} HUGEFLOATVAL;
 #define LONG_SIZE ${longsize}
 #define HUGEINTVAL_SIZE ${hugeintvalsize}
 
-#if INTVAL_SIZE >= 8
+/* We don't have a portable config for 64-bit
+ * registers yet. */
+#if 0
+# if INTVAL_SIZE >= 8
 typedef Parrot_Int   INTVAL64;
 typedef Parrot_Int   Parrot_Int64;
-#else
+# else
 #  if HUGEINTVAL_SIZE >= 8
 typedef HUGEINTVAL   INTVAL64;
 typedef HUGEINTVAL   Parrot_Int64;
@@ -79,7 +82,9 @@ typedef HUGEINTVAL   Parrot_Int64;
 typedef union { unsigned char b[8]; } INTVAL64;
 typedef INTVAL64   Parrot_Int64;
 #  endif
+# endif
 #endif
+
 
 typedef Parrot_Opcode opcode_t;
 typedef size_t ptrcast_t;
