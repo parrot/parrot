@@ -1226,7 +1226,7 @@ case 2:
 YY_RULE_SETUP
 #line 121 "imcc.l"
 { BEGIN(cmt3);
-                      valp->s = strdup(yytext);
+                      valp->s = str_dup(yytext);
                       return FILECOMMENT;
                }
 	YY_BREAK
