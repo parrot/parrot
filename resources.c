@@ -27,6 +27,8 @@ STRING *new_string_header(struct Parrot_Interp *interpreter) {
 }
 
 void free_string(STRING *string) {
-  free(string->bufstart);
-  free(string);
+  if (string) {
+    free(string->bufstart);
+    free(string);
+  }
 }
