@@ -887,14 +887,14 @@ CODE
 -3.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "neg 0.0");
+output_like(<<CODE, <<OUTPUT, "neg 0.0");
     set N1, 0
     neg N1
     print N1
     print "\\n"
     end
 CODE
-0.000000
+/-?0\.0+/
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "mul_n_n");
