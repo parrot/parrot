@@ -746,13 +746,18 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
 {
     PDB_breakpoint_t *breakpoint;
     PDB_line_t *line;
-    long n;
+    long m,n;
 
     if (isdigit((int) *command)) {
-        n = atol(command);
+        m = n = atol(command);
         breakpoint = interpreter->pdb->breakpoint;
         while (breakpoint && n--)
             breakpoint = breakpoint->next;
+        if (!breakpoint) {
+            PIO_eprintf(interpreter, "No breakpoint number %ld", m);
+            return;
+        }
+
         line = interpreter->pdb->file->line;
         while (line->opcode != breakpoint->pc)
             line = line->next;
