@@ -17,7 +17,6 @@ use File::Copy;
 
 use Parrot::BuildUtil;
 
-
 #
 # Read the array and scalar forms of the version.
 # from the VERSION file.
@@ -243,6 +242,8 @@ my(%c)=(
     PATCH   =>    $parrot_version[2],
 
     ops		=>    "",
+    
+    configdate    => scalar localtime,
 );
 
 # What's the platform shell quote character?

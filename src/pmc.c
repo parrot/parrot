@@ -38,13 +38,14 @@ PMC* pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type) {
     
     pmc->flags = 0;
     pmc->data  = 0;
+
     pmc->vtable = &(Parrot_base_vtables[base_type]);
 
-    if(!pmc->vtable) {
+    if(!pmc->vtable || !pmc->vtable->init) {
         /* This is usually because you either didn't call init_world early 
            enough or you added a new PMC class without adding 
            Parrot_(classname)_class_init to init_world. */
-        PANIC("Null vtable used!\n");
+        PANIC("Null vtable used");
         return NULL;
     }
     

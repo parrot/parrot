@@ -18,7 +18,7 @@
 void internal_exception(int exitcode, const char * format, ... );
 
 #define PANIC(message)\
-	internal_exception(INTERNAL_PANIC, "Parrot VM: PANIC at %s(%d): %s", __FILE__, __LINE__, message)
+	do_panic(interpreter, message, __FILE__, __LINE__)
 
 /* Exception Types */
 #define NO_REG_FRAMES 1
