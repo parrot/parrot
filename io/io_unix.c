@@ -86,11 +86,11 @@ INTVAL PIO_unix_init(theINTERP, ParrotIOLayer * layer) {
         ParrotIOData * d = GET_INTERP_IOD(interpreter);
         if(d != NULL && d->table != NULL ) {
                 if((PIO_STDIN(interpreter) =
-                        PIO_unix_fdopen(interpreter, layer, STDIN_FILENO, "<"))
+                        PIO_unix_fdopen(interpreter, layer, STDIN_FILENO, PIO_F_READ))
                         &&(PIO_STDOUT(interpreter) =
-                                PIO_unix_fdopen(interpreter, layer, STDOUT_FILENO, ">"))
+                                PIO_unix_fdopen(interpreter, layer, STDOUT_FILENO, PIO_F_WRITE))
                         &&(PIO_STDERR(interpreter) =
-                                PIO_unix_fdopen(interpreter, layer, STDERR_FILENO, ">"))
+                                PIO_unix_fdopen(interpreter, layer, STDERR_FILENO, PIO_F_WRITE))
                 )
                 return 0;
         }
