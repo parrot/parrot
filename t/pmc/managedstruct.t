@@ -175,9 +175,6 @@ x: 2
 y: 16
 OUTPUT
 
-SKIP: {
-    skip("intval size != 4", 1) if ($PConfig{intvalsize} != 4);
-
 output_is(<<'CODE', <<'OUTPUT', "nested struct offsets");
   # the nested structure
   .include "datatypes.pasm"
@@ -242,5 +239,3 @@ CODE
 16
 8
 OUTPUT
-
-}
