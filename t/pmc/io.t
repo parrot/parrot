@@ -106,7 +106,8 @@ ok 6
 OUTPUT
 
 SKIP: {
-    skip ("read routines currently crash on bad input", 1);
+    skip ("read routines currently crash on bad input", 1)
+        unless "hoping that someone will fix this before 0.0.11";
 
     unlink "no_such_file" if (-e "no_such_file");
 
