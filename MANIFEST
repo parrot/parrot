@@ -125,6 +125,7 @@ io/io_stdio.c
 io/io_unix.c
 io/io_win32.c
 io/TODO
+io.ops
 jit.c
 jit/i386/core.jit
 jit/i386/lib.jit

@@ -73,20 +73,11 @@ environment.
 
 ########################################
 
-=item B<close>(inout PMC)
-
-Close IO stream $1.
-
 =item B<close>(inout INT)
 
 Close file opened on file descriptor $1.
 
 =cut
-
-inline op close(inout PMC) {
-  PIO_close(interpreter, (ParrotIO*)($1->data));
-  goto NEXT();
-}
 
 inline op close(inout INT) {
   fclose((FILE *)$1);
@@ -120,11 +111,6 @@ op err(out STR) {
 
 
 ########################################
-=item B<open>(out PMC, in STR, in STR)
-
-Open file named $2 with Perl style mode string specified in $3, and
-create the IO stream PMC into $1.
-
 =item B<open>(out INT, in STR)
 
 Open file named $2 for reading and writing and save the file
@@ -136,18 +122,6 @@ Open file named $2 with flags $3 and mode 0644 (rw-r--r--), and save the file
 descriptor into $1.
 
 =cut
-
-inline op open(out PMC, in STR, in STR) {
-  ParrotIO * io;
-  STRING *path = $2;
-  STRING *mode = $3;
-  io = PIO_open(interpreter, path->bufstart, mode->bufstart);
-  if(!io) {
-    /* FIXME: Handle error */
-  }
-  $1 = new_io_pmc(interpreter, io);
-  goto NEXT();
-}
 
 inline op open(out INT, in STR) {
   $1 = (INTVAL)fopen(($2)->bufstart, "r+");
@@ -246,11 +220,6 @@ Print $1 to standard output.
 
 =item B<print>(in INT, in PMC)
 
-=item B<print>(in PMC, in STR)
-
-Print $2 to the file on $1. (0, 1, and 2 correspond to stdin, stdout,
-and stderr)
-
 =cut
 
 inline op print(in INT) {
@@ -267,16 +236,6 @@ op print(in STR) {
   STRING *s = $1;
   if (s && string_length(s)) {
     printf("%.*s", (int)string_length(s), (char *) s->bufstart);
-  }
-  goto NEXT();
-}
-
-op print(in PMC, in STR) {
-  ParrotIO * io;
-  STRING *s = $2;
-  io = (ParrotIO*)($1->data);
-  if (s && string_length(s) && io) {
-    PIO_puts(interpreter, io, (const char *)s->bufstart);
   }
   goto NEXT();
 }
@@ -2036,6 +1995,21 @@ subsequent operation.
 =over 4
 
 =cut
+
+
+########################################
+
+=item B<debug>(in INT)
+
+If $1 is zero, turn off debugging. Otherwise turn it on.
+
+=cut
+
+inline op debug(in INT) {
+  if ($1 != 0) { interpreter->flags |=  PARROT_DEBUG_FLAG; }
+  else         { interpreter->flags &= ~PARROT_DEBUG_FLAG; }
+  restart NEXT();
+}
 
 
 ########################################

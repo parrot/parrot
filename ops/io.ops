@@ -1,0 +1,129 @@
+/*
+** io.ops
+*/
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+io.ops
+
+=cut
+
+=head1 DESCRIPTION
+
+Parrot's IO API 
+
+=cut
+
+
+###############################################################################
+
+=head2 Parrot IO API Operations 
+
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<close>(inout PMC)
+
+Close IO object $1
+
+=cut
+
+inline op close(inout PMC) {
+	PIO_close(interpreter, (ParrotIO*)(($1)->data));
+	goto NEXT();
+}
+
+#########################################
+
+=item B<open>(out PMC, in STR, in STR)
+
+Open URL (file, address, database, in core image) named $2 with
+Perl style mode string in $3 and create an IO object in $1.
+
+=cut
+
+inline op open(out PMC, in STR, in STR) {
+  ParrotIO * io;
+  char * path, * mode;
+  /* We probably need to make this into a String API */
+  path = Parrot_allocate(interpreter, ($2)->bufused + 1);
+  memcpy(path, ($2)->bufstart, ($2)->bufused);
+  *(path + ($2)->bufused) = 0;
+  mode = Parrot_allocate(interpreter, ($3)->bufused + 1);
+  memcpy(mode, ($3)->bufstart, ($3)->bufused);
+  *(mode + ($3)->bufused) = 0;
+
+  io = PIO_open(interpreter, path, mode);
+  if(!io) {
+    /* FIXME: Handle error */
+  }
+  $1 = new_io_pmc(interpreter, io);
+  goto NEXT();
+}
+
+##########################################
+
+=item B<print>(in PMC, in STR)
+
+Print String $2 on the IO stream object $1.
+
+=cut
+
+op print(in PMC, in STR) {
+  ParrotIO * io;
+  io = (ParrotIO*)($1->data);
+  if ($2 && io) {
+    PIO_write(interpreter, io, ($2)->bufstart, string_length($2));
+  }
+  goto NEXT();
+}
+
+##########################################
+
+=item B<printerr>(in STR)
+
+Print $1 to pio_stderr IO stream (unbuffered)
+
+=cut
+
+op printerr(in STR) {
+  if ($1) {
+    PIO_write(interpreter, pio_stderr, ($1)->bufstart, string_length($1));
+  }
+  goto NEXT();
+}
+
+
+########################################
+
+
+
+
+
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2002 Yet Another Society. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut
+
