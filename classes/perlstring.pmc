@@ -24,6 +24,15 @@ C<PerlString> extends C<perlscalar> to provide Perl string behaviour.
 
 pmclass PerlString extends perlscalar {
 
+    void class_init () {
+        /* this should be autmatically done - probably */
+        if (pass) {
+            enter_nci_method(INTERP, enum_class_PerlString,
+                    F2DPTR(Parrot_PerlString_get_repr),
+                    "__repr__", "SIO");
+        }
+    }
+
 /*
 
 =item C<void init()>
@@ -128,6 +137,25 @@ Returns the boolean value of the string.
 
     INTVAL get_bool () {
         return string_bool(INTERP, PMC_str_val(SELF));
+    }
+
+/*
+
+=item C<STRING* get_repr()>
+
+Returns pythons string repr (w/o any escaping, just single quotes around)
+
+=cut
+
+*/
+
+    STRING* get_repr() {
+        STRING *q = const_string(interpreter, "'");
+        STRING *s = DYNSELF.get_string();
+        STRING *repr = string_copy(interpreter, q);
+        s = string_append(interpreter, q, s, 0);
+        s = string_append(interpreter, s, q, 0);
+        return s;
     }
 
 /*

@@ -94,7 +94,7 @@ PMC*
 pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
           UINTVAL flags)
 {
-    INTVAL has_ext = 0, needs_ext = 0;
+    INTVAL has_ext = 0, new_flags = 0;
     PMC_EXT hold_ext;
 
     /* First, is the destination a singleton? No joy for us there */
@@ -126,36 +126,36 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
     }
 
     /* Do we have an extension area? */
-    if (PObj_is_PMC_EXT_TEST(pmc)) {
+    if (PObj_is_PMC_EXT_TEST(pmc) && pmc->pmc_ext) {
         has_ext = 1;
     }
 
     /* Do we need one? */
     if (Parrot_base_vtables[new_type]->flags & VTABLE_PMC_NEEDS_EXT) {
-        needs_ext = 1;
+
+        if (!has_ext) {
+            /* If we need an ext area, go allocate one */
+            add_pmc_ext(interpreter, pmc);
+        }
+        new_flags = PObj_is_PMC_EXT_FLAG;
     }
-
-
-    /* Unconditionally free and potentially reallocate the ext area,
-       for simplicity. Not the most efficient way to do this */
-    if (has_ext && pmc->pmc_ext) {
-        /* if the PMC has a PMC_EXT structure,
-         * return it to the pool/arena
-         */
-        struct Small_Object_Pool *ext_pool =
-            interpreter->arena_base->pmc_ext_pool;
-        ext_pool->add_free_object(interpreter, ext_pool, pmc->pmc_ext);
-    }
-
-    PObj_flags_CLEARALL(pmc);
+    else {
+        if (has_ext) {
+            /* if the PMC has a PMC_EXT structure,
+             * return it to the pool/arena
+             */
+            struct Small_Object_Pool *ext_pool =
+                interpreter->arena_base->pmc_ext_pool;
+            ext_pool->add_free_object(interpreter, ext_pool, pmc->pmc_ext);
+        }
+        pmc->pmc_ext = NULL;
 #if ! PMC_DATA_IN_EXT
-    PMC_data(pmc) = NULL;
+        PMC_data(pmc) = NULL;
 #endif
-
-    /* If we need an ext area, go allocate one */
-    if (needs_ext) {
-        add_pmc_ext(interpreter, pmc);
     }
+
+    /* we are a PMC + maybe is_PMC_EXT */
+    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | new_flags);
 
     /* Set the right vtable */
     pmc->vtable = Parrot_base_vtables[new_type];
