@@ -195,6 +195,17 @@ void register_compilers(Parrot_Interp interp)
           string_make(interp, "pIt", 3, NULL,0,NULL));
 }
 
+/* return the index of a PMC class */
+int get_pmc_num(struct Parrot_Interp *interp, char *pmc_type)
+{
+    STRING * s = string_make(interp, pmc_type,
+            (UINTVAL) strlen(pmc_type), NULL, 0, NULL);
+    PMC * key = key_new_string(interp, s);
+    PMC * cnames = interp->Parrot_base_classname_hash;
+
+    return cnames->vtable->get_integer_keyed(interp, cnames, key);
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

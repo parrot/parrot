@@ -165,18 +165,6 @@ CODE
 OUT
 
 ##############################
-SKIP: {
-skip("constant concat N/Y", 1);
-output_is(<<'CODE', <<'OUT', "constant concat");
-   concat S0, "Parrot ", "rocks"
-   end
-CODE
-   set S0, "Parrot rocks"
-   end
-OUT
-}
-
-##############################
 output_is(<<'CODE', <<'OUT', "constant eq taken");
    eq 10, 10, L1
    set I0, 5
@@ -526,4 +514,16 @@ CODE
    end
 OUT
 
+
+##############################
+SKIP: {
+skip("constant concat N/Y", 1);
+output_is(<<'CODE', <<'OUT', "constant concat");
+   concat S0, "Parrot ", "rocks"
+   end
+CODE
+   set S0, "Parrot rocks"
+   end
+OUT
+}
 

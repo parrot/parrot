@@ -229,13 +229,23 @@ Instruction * delete_ins(Instruction *ins, int needs_freeing)
 
 void insert_ins(Instruction *ins, Instruction * tmp)
 {
-    Instruction *next = ins->next;
-    ins->next = tmp;
-    tmp->prev = ins;
-    tmp->next = next;
-    next->prev = tmp;
-    if (!tmp->line)
-        tmp->line = ins->line;
+    Instruction *next;
+    if (!ins) {
+        next = instructions;
+        instructions = tmp;
+        tmp->next = next;
+        next->prev = tmp;
+        tmp->line = next->line;
+    }
+    else {
+        next = ins->next;
+        ins->next = tmp;
+        tmp->prev = ins;
+        tmp->next = next;
+        next->prev = tmp;
+        if (!tmp->line)
+            tmp->line = ins->line;
+    }
 }
 
 /*
@@ -316,12 +326,19 @@ static char * ins_fmt(Instruction * ins) {
 	    sprintf(regb[i], "%c%d", p->set, p->color);
 	    regstr[i] = regb[i];
 	}
+        else if (p->set != 'K' && p->color < 0 && (p->type & VTREGISTER)) {
+	    sprintf(regb[i], "r%c%d", tolower(p->set), -1 - p->color);
+	    regstr[i] = regb[i];
+	}
         else if (p->type & VTREGKEY) {
             SymReg * k = p->nextkey;
             for (*regb[i] = '\0'; k; k = k->nextkey) {
                 if (k->reg && k->reg->color >= 0)
                     sprintf(regb[i]+strlen(regb[i]), "%c%d",
                             k->reg->set, k->reg->color);        /* XXX */
+                else if (k->reg && k->reg->color < 0)
+                    sprintf(regb[i]+strlen(regb[i]), "r%c%d",
+                            tolower(k->reg->set), -1 - k->reg->color);
                 else
                     strcat(regb[i], k->name);   /* XXX */
                 if (k->nextkey)
@@ -410,6 +427,7 @@ static int emitter;
 int emit_open(int type, void *param)
 {
     emitter = type;
+    has_compile = 0;
     return (emitters[emitter]).open(param);
     return 0;
 }

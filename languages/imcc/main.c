@@ -19,7 +19,7 @@
 #include "pbc.h"
 #include "parser.h"
 
-#define IMCC_VERSION "0.0.9.14"
+#define IMCC_VERSION "0.0.9.15"
 
 static int run_pbc, write_pbc;
 static char optimizer_opt[20];
@@ -210,7 +210,7 @@ int main(int argc, char * argv[])
         if (strchr(optimizer_opt, '2'))
             optimizer_level |= (OPT_CFG | OPT_PRE);
         if (strchr(optimizer_opt, 'j'))
-            optimizer_level |= OPT_J;
+            optimizer_level |= (OPT_J | OPT_PASM);
         if (strchr(optimizer_opt, 'p'))
             optimizer_level |= OPT_PASM;
     }

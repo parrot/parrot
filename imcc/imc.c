@@ -1,4 +1,4 @@
-/* Regsster allocator:
+/* Register allocator:
  *
  * This is a brute force register allocator. It uses a graph-coloring
  * algorithm, but the implementation is very kludgy.
@@ -14,26 +14,17 @@
 #include <string.h>
 #include "imc.h"
 #include "optimizer.h"
+#include "parrot/jit.h"
 
 static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
 static void print_stat(void);
+static void allocate_jit(struct Parrot_Interp *interpreter);
 
 extern int pasm_file;
 /* Globals: */
 
 static IMCStack nodeStack;
-
-/* return the index of a PMC class */
-int get_pmc_num(struct Parrot_Interp *interp, char *pmc_type)
-{
-    STRING * s = string_make(interp, pmc_type,
-            (UINTVAL) strlen(pmc_type), NULL, 0, NULL);
-    PMC * key = key_new_string(interp, s);
-    PMC * cnames = interp->Parrot_base_classname_hash;
-
-    return cnames->vtable->get_integer_keyed(interp, cnames, key);
-}
 
 /* allocate is the main loop of the allocation algorithm */
 void allocate(struct Parrot_Interp *interpreter) {
@@ -64,14 +55,14 @@ void allocate(struct Parrot_Interp *interpreter) {
     while (todo) {
         info(2, "find_basic_blocks\n");
         find_basic_blocks();
+        todo = cfg_optimize(interpreter);
+    }
+    todo = 1;
+    while (todo) {
+        find_basic_blocks();
         info(2, "build_cfg\n");
-        build_cfg();
 
-        if (!dont_optimize && dead_code_remove()) {
-            info(2, "pre_optimize\n");
-            pre_optimize(interpreter);
-            continue;
-        }
+        build_cfg();
 
         info(2, "compute_dominators\n");
         compute_dominators();
@@ -82,9 +73,7 @@ void allocate(struct Parrot_Interp *interpreter) {
         build_reglist();
         info(2, "life_analysis\n");
         life_analysis();
-        /* optimize, as long as there is something to do -
-         * but not, if we found a set_addr, which means
-         * we have probably a CATCH handler */
+        /* optimize, as long as there is something to do */
         if (IMCC_DEBUG & DEBUG_IMC)
             dump_symreg();
         if (dont_optimize)
@@ -116,6 +105,11 @@ void allocate(struct Parrot_Interp *interpreter) {
     }
     if (IMCC_DEBUG & DEBUG_IMC)
         dump_instructions();
+    if (optimizer_level & OPT_J) {
+        allocate_jit(interpreter);
+        if (IMCC_DEBUG & DEBUG_IMC)
+            dump_instructions();
+    }
     if (IMCC_VERBOSE > 1 || (IMCC_DEBUG & DEBUG_IMC))
         print_stat();
     free_reglist();
@@ -239,7 +233,9 @@ void build_reglist(void) {
                     reglist[count++] = r->reg;
                 else
                     reglist[count++] = r;
-                /* rearange I registers */
+                /* rearange I/N registers
+                 * XXX not here, do it, when reading the source
+                 * .nciarg, rx_char, ... !!!1 */
                 if ((optimizer_level & OPT_PASM) && pasm_file &&
                         (reglist[count-1]->set == 'I' ||
                         reglist[count-1]->set == 'N'))
@@ -376,8 +372,11 @@ void compute_spilling_costs () {
 
         depth = bb_list[ins->bbindex]->loop_depth;
 
-        for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
+        for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++) {
             ins->r[i]->score += 1 << (depth * 3);
+            if (ins->flags & ITSPILL)
+                ins->r[i]->score = 50000000;
+        }
 
     }
 
@@ -446,6 +445,9 @@ int interferes(SymReg * r0, SymReg * r1) {
  *
  * Returns if it has been able to delete at least one node
  * and 0 otherwise.
+ *
+ * XXX: this doesn't look at score, so I think this is bogus
+ *      - currently disabled
  *
  */
 
@@ -531,7 +533,7 @@ void order_spilling () {
 void restore_interference_graph() {
     int i;
     for (i=0; i < n_symbols; i++) {
-        if (reglist[i]->type & VTPASM)
+        if ((reglist[i]->type & VTPASM) && !(optimizer_level & OPT_PASM))
             continue;
 	reglist[i]->color = -1;
 	reglist[i]->simplified = 0;
@@ -723,6 +725,149 @@ int neighbours(int node) {
     return cnt;
 }
 
+/* PASM registers are already in most used order, so now:
+ * - consider the top N registers as processor registers
+ * - look at the instruction stream and insert register load/store ins
+ *   for e.g. calling out to unJITted functions
+ *   This is of course processor dependend
+ *
+ * TODO: rx_ ops may have a inout INT parameter for position/mark.
+ *       Do not assign registers, if any such inout branching
+ *       instruction is encountered.
+ */
+
+static void
+allocate_jit(struct Parrot_Interp *interpreter)
+{
+    int i, j, f, k;
+/* int to_map[] = { INT_REGISTERS_TO_MAP, 0, 0,
+ *      FLOAT_REGISTERS_TO_MAP };
+ *      XXX communicate these with jit_emit.h
+ */
+    int to_map[] = { 4, 0, 0, 4 };
+    const char *types = "IPSN";
+    Instruction * ins, *next, *last, *tmp, *prev;
+    SymReg * r, *cpu[4+4], *regs[IMCC_MAX_REGS];       /* XXX */
+    int reads[4+4], writes[4+4], nr, nw;
+    static SymReg *par[4+4];       /* XXX */
+    static int ncpu;
+
+    for (j = 0; j < ncpu; j++)
+        free(par[j]);
+    for(i = ncpu = 0; i < HASH_SIZE; i++) {
+        r = hash[i];
+        /* Add each mapped register to cpu reglist */
+        for(; r; r = r->next) {
+            if ((r->type & VTREGISTER) && r->set != 'K') {
+                if (r->color >= 0 &&
+                        r->color < to_map[strchr(types, r->set) - types]) {
+                    r->color = -1 - r->color;
+                    cpu[ncpu++] = r;
+                }
+            }
+        }
+    }
+    /* generate a list of parrot registers */
+    for (j = 0; j < ncpu; j++) {
+        par[j] = malloc(sizeof(SymReg));
+        memcpy(par[j], cpu[j], sizeof(SymReg));
+        par[j]->color = -1 - cpu[j]->color;
+    }
+    prev = last = NULL;
+    nr = nw = 0;
+    for (ins = instructions; ins; prev = ins, ins = ins->next) {
+        if (ins->opnum >= 0 &&
+                op_jit[ins->opnum].extcall == 1) {  /* XXX i386 */
+            for (k = 0; k < ncpu; k++)
+                reads[k] = writes[k] = 999;
+            /* TODO non preserved regs */
+            for (last = next = ins;
+                    next && op_jit[next->opnum].extcall == 1;
+                    next = next->next) {
+                for (j = 0; j < ncpu; j++) {
+                    if (instruction_reads(next, cpu[j]) &&
+                            instruction_writes(next, cpu[j])) {
+                        /* or set reads[j] - could be faster */
+                        for (k = f = 0; k < nr; k++) {
+                            if (reads[k] == j) {
+                                f = 1;
+                                break;
+                            }
+                        }
+                        if (!f)
+                            reads[nr++] = j;
+                        for (k = f = 0; k < nr; k++) {
+                            if (writes[k] == j) {
+                                f = 1;
+                                break;
+                            }
+                        }
+                        if (!f)
+                            writes[nw++] = j;
+                        for (k = 0; next->r[k] && k < IMCC_MAX_REGS; k++)
+                            if (next->r[k] == cpu[j])
+                                next->r[k] = par[j];
+                    }
+                    else if (instruction_reads(next, cpu[j])) {
+                        for (k = f = 0; k < nr; k++) {
+                            if (reads[k] == j) {
+                                f = 1;
+                                break;
+                            }
+                        }
+                        if (!f)
+                            reads[nr++] = j;
+                        for (k = 0; next->r[k] && k < IMCC_MAX_REGS; k++)
+                            if (next->r[k] == cpu[j])
+                                next->r[k] = par[j];
+                    }
+                    else if (instruction_writes(next, cpu[j])) {
+                        for (k = 0; next->r[k] && k < IMCC_MAX_REGS; k++)
+                            if (next->r[k] == cpu[j])
+                                next->r[k] = par[j];
+                        for (k = f = 0; k < nr; k++) {
+                            if (writes[k] == j) {
+                                f = 1;
+                                break;
+                            }
+                        }
+                        if (!f)
+                            writes[nw++] = j;
+                    }
+                }
+                /* remember last extern opcode, all loads are inserted
+                 * after this instruction
+                 */
+                if (next->type & ITBRANCH) {
+                    break;
+                }
+                last = next;
+            }
+        }
+        /* insert load ins after non JIT block */
+        if (last && nw) {
+            for ( ; nw ; nw--) {
+                j = writes[nw-1];
+                regs[0] = cpu[j];
+                regs[1] = par[j];
+                tmp = INS(interpreter, "set", "%s, %s\t# load",
+                        regs, 2, 0, 0);
+                insert_ins(last, tmp);
+            }
+            last = NULL;
+        }
+        /* insert save ins before extern op */
+        if (nr) {
+            for ( ; nr ; nr--) {
+                j = reads[nr-1];
+                regs[0] = par[j];
+                regs[1] = cpu[j];
+                tmp = INS(interpreter, "set", "%s, %s\t# save", regs, 2, 0, 0);
+                insert_ins(prev, tmp);
+            }
+        }
+    }
+}
 
 /*
  * Utility functions

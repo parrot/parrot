@@ -45,8 +45,11 @@
  *
  */
 static void if_branch(struct Parrot_Interp *);
-static void branch_branch(void);
-static void unused_label(void);
+
+static int branch_branch(void);
+static int unused_label(void);
+static int dead_code_remove(void);
+
 static void strength_reduce(struct Parrot_Interp *interp);
 static void subst_constants_mix(struct Parrot_Interp *interp);
 static void subst_constants_umix(struct Parrot_Interp *interp);
@@ -59,7 +62,7 @@ static int loop_optimization(struct Parrot_Interp *);
 static int clone_remove(void);
 
 void pre_optimize(struct Parrot_Interp *interp) {
-    if (optimizer_level & OPT_PRE) {      /* XXX */
+    if (optimizer_level & OPT_PRE) {
         subst_constants_mix(interp);
         subst_constants_umix(interp);
         subst_constants(interp);
@@ -67,10 +70,21 @@ void pre_optimize(struct Parrot_Interp *interp) {
         subst_constants_if(interp);
         strength_reduce(interp);
         if_branch(interp);
-        branch_branch();
-        /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
-        unused_label();
     }
+}
+
+int cfg_optimize(struct Parrot_Interp *interp) {
+    UNUSED(interp);
+    if (optimizer_level & OPT_PRE) {
+        if (branch_branch())
+            return 1;
+        /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
+        if (unused_label())
+            return 1;
+        if (dead_code_remove())
+            return 1;
+    }
+    return 0;
 }
 
 int optimize(struct Parrot_Interp *interp) {
@@ -127,6 +141,7 @@ static void if_branch(struct Parrot_Interp *interp)
     last = instructions;
     if (!last->next)
         return;
+    info(2, "\tif_branch\n");
     for (ins = last->next; ins; ) {
         if ((last->type & ITBRANCH) &&          /* if ...L1 */
                 (ins->type & IF_goto) &&        /* branch L2*/
@@ -163,81 +178,6 @@ static void if_branch(struct Parrot_Interp *interp)
         ins = ins->next;
     }
 }
-
-/*
- * branch L1  => branch L2
- * ...
- * L1:
- * branch L2
- *
- */
-static void branch_branch()
-{
-    Instruction *ins1, *ins2, *next;
-
-    /* reset statistic globals */
-    ostat.branch_branch = 0;
-    for (ins1 = 0, ins1 = instructions; ins1; ins1 = ins1->next) {
-        if ((ins1->type & IF_goto) && !strcmp(ins1->op, "branch")) {
-            for (ins2 = 0, ins2 = instructions; ins2; ins2 = ins2->next) {
-                if ((ins2->type & ITLABEL) &&
-                        !strcmp(ins1->r[0]->name, ins2->r[0]->name)) {
-                    next = ins2->next;
-                    if (!next)
-                        break;
-                    if ((next->type & IF_goto) &&
-                            !strcmp(next->op, "branch")) {
-                        debug(DEBUG_OPT1, "found branch to branch '%s' %s\n",
-                                ins2->r[0]->name, ins_string(next));
-                        ostat.branch_branch++;
-                        ins1->r[0] = next->r[0];
-                    }
-                }
-            }
-        }
-    }
-
-}
-
-static void unused_label()
-{
-    Instruction *ins, *ins2, *last;
-    SymReg * addr;
-    int used;
-
-    for (last = 0, ins = instructions; ins; ins = ins->next) {
-        if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
-            SymReg * lab = ins->r[0];
-            used = 0;
-            for (ins2 = instructions; ins2; ins2 = ins2->next) {
-                if ((addr = get_branch_reg(ins2)) != 0) {
-                    if (addr == lab && addr->type == VTADDRESS) {
-                        used = 1;
-                        break;
-                    }
-                }
-                /* if we have compile/eval, we don't know, if this
-                 * label might be used
-                 */
-                else if (!strcmp(ins2->op, "compile")) {
-                    used = 1;
-                    break;
-                }
-            }
-            if (!used && last) {
-                ostat.deleted_labels++;
-                debug(DEBUG_OPT1, "label %s deleted\n", lab->name);
-                ostat.deleted_ins++;
-                delete_ins(ins, 1);
-                last = ins;
-                continue;
-            }
-
-        }
-        last = ins;
-    }
-}
-
 /* these are run after constant simplification, so it is
  * guaranteed, that one operand is non constant, if opsize == 4
  */
@@ -248,6 +188,7 @@ static void strength_reduce(struct Parrot_Interp *interp)
     int i, found;
     SymReg *r;
 
+    info(2, "\tstrength_reduce\n");
     for (ins = instructions; ins; ins = ins->next) {
         /*
          * add Ix, Ix, Iy => add Ix, Iy
@@ -356,6 +297,7 @@ subst_constants_mix(struct Parrot_Interp *interp)
     char b[128];
     SymReg *r;
 
+    info(2, "\tsubst_constants_mix\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO compare ins->opnum with a list of instructions
@@ -393,6 +335,7 @@ subst_constants_umix(struct Parrot_Interp *interp)
     char b[128];
     SymReg *r;
 
+    info(2, "\tsubst_constants_umix\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO compare ins->opnum with a list of instructions
@@ -494,6 +437,7 @@ subst_constants(struct Parrot_Interp *interp)
     int found;
 
     /* save interpreter ctx */
+    info(2, "\tsubst_constants\n");
     ctx = mem_sys_allocate(sizeof(struct Parrot_Context));
     mem_sys_memcopy(ctx, &interp->ctx, sizeof(struct Parrot_Context));
     /* construct a FLOATVAL_FMT with needed precision */
@@ -574,6 +518,7 @@ subst_constants_c(struct Parrot_Interp *interp)
     size_t i;
     int res;
 
+    info(2, "\tsubst_constants_c\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO s. above */
@@ -711,6 +656,7 @@ subst_constants_if(struct Parrot_Interp *interp)
     int res;
     char *s;
 
+    info(2, "\tsubst_constants_if\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO s. above */
@@ -761,7 +707,104 @@ do_res:
 
 
 /* optimizations with CFG built */
-int dead_code_remove(void)
+
+/*
+ * branch L1  => branch L2
+ * ...
+ * L1:
+ * branch L2
+ *
+ */
+static int branch_branch()
+{
+    Instruction *ins, *next;
+    SymReg * r;
+
+    info(2, "\tbranch_branch\n");
+    /* reset statistic globals */
+    ostat.branch_branch = 0;
+    for (ins = instructions; ins; ins = ins->next) {
+        if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
+            r = get_sym(ins->r[0]->name);
+
+            if (r && (r->type & VTADDRESS) && r->first_ins) {
+                next = r->first_ins->next;
+                if (!next)
+                    break;
+                if ((next->type & IF_goto) &&
+                        !strcmp(next->op, "branch")) {
+                    debug(DEBUG_OPT1, "found branch to branch '%s' %s\n",
+                            r->first_ins->r[0]->name, ins_string(next));
+                    ostat.branch_branch++;
+                    ins->r[0] = next->r[0];
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+static int unused_label()
+{
+    Instruction *ins;
+    int used;
+    int i;
+
+    info(2, "\tunused_label\n");
+    for (i=1; bb_list[i]; i++) {
+	ins = bb_list[i]->start;
+        if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
+            SymReg * lab = ins->r[0];
+            used = 0;
+            if (has_compile)
+                used = 1;
+#if 1
+            else if (lab->last_ins)
+                used = 1;
+#else
+            else {
+                Instruction *ins2;
+                int j;
+                SymReg * addr;
+                for (j=0; bb_list[j]; j++) {
+                    /* a branch can be the first ins in a block
+                     * (if prev ins was a label)
+                     * or the last ins in a block
+                     */
+                    ins2 = bb_list[j]->start;
+                    if ((ins2->type & ITBRANCH) &&
+                            (addr = get_branch_reg(ins2)) != 0) {
+                        if (addr == lab && addr->type == VTADDRESS) {
+                            used = 1;
+                            break;
+                        }
+                    }
+                    ins2 = bb_list[j]->end;
+                    if ((ins2->type & ITBRANCH) &&
+                            (addr = get_branch_reg(ins2)) != 0) {
+                        if (addr == lab && addr->type == VTADDRESS) {
+                            used = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+#endif
+            if (!used) {
+                ostat.deleted_labels++;
+                debug(DEBUG_OPT1, "label %s deleted\n", lab->name);
+                ostat.deleted_ins++;
+                delete_ins(ins, 1);
+                return 1;
+            }
+
+        }
+    }
+    return 0;
+}
+
+static int dead_code_remove(void)
 {
     Basic_block *bb;
     int i;
@@ -771,6 +814,7 @@ int dead_code_remove(void)
     /* this could be a separate level, now it's done with -O1 */
     if (!(optimizer_level & OPT_PRE))
         return 0;
+    info(2, "\tdead_code_remove\n");
     for (i=1; bb_list[i]; i++) {
 	bb = bb_list[i];
         if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')

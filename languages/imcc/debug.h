@@ -22,6 +22,7 @@ void info(int level, const char *fmt, ...);
 void dump_instructions(void);
 void dump_cfg(void);
 void dump_loops(void);
+void dump_labels(void);
 void dump_symreg(void);
 void dump_interference_graph(void);
 void dump_dominators(void);

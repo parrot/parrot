@@ -22,18 +22,40 @@ void find_basic_blocks () {
     Basic_block *bb;
     Instruction *ins, *lab;
     int nu = 0;
+    int i;
 
     init_basic_blocks();
+    for(i = 0; i < HASH_SIZE; i++) {
+        SymReg * r = hash[i];
+        if (r && (r->type & VTADDRESS)) {
+            r->first_ins = r->last_ins = NULL;
+        }
+    }
 
     ins = instructions;
+    ins->index = i = 0;
 
     bb = make_basic_block(ins);
+    if ( (ins->type & ITLABEL)) {
+        /* set the labels address (ins) */
+        ins->r[0]->first_ins = ins;
+    }
+    else if (ins->type & ITBRANCH) {
+        SymReg * addr = get_branch_reg(bb->end);
+        if (addr)
+            addr->last_ins = ins;
+    }
     for(ins=ins->next; ins; ins = ins->next) {
+        ins->index = ++i;
 
         bb->end = ins;
         ins->bbindex = n_basic_blocks - 1;
         /* a LABEL starts a new basic block, but not, if we have
          * a new one (last was a branch) */
+        if ( (ins->type & ITLABEL)) {
+            /* set the labels address (ins) */
+            ins->r[0]->first_ins = ins;
+        }
         if (nu)
             nu = 0;
         else if ( (ins->type & ITLABEL)) {
@@ -42,7 +64,11 @@ void find_basic_blocks () {
         /* a branch is the end of a basic block
          * so start a new with the next ins */
         if (ins->type & ITBRANCH) {
+            SymReg * addr = get_branch_reg(bb->end);
             int found = 1;
+
+            if (addr)
+                addr->last_ins = ins;
             /* if we have a bsr, then consider it only as a branch,
              * when we have the target here
              * and it doesn't saveall - like P6C recursive bsr's
@@ -51,6 +77,7 @@ void find_basic_blocks () {
                 char *name =
                     *ins->op == 'b' ? ins->r[0]->name : ins->r[1]->name;
                 found = 0;
+                /* TODO get_sym */
                 for (lab = instructions; lab; lab = lab->next) {
                     if ((lab->type & ITLABEL) &&
                             !strcmp(lab->r[0]->name, name)) {
@@ -78,17 +105,12 @@ void find_basic_blocks () {
                 nu = 1;
             }
         }
-        /* XXX instruction type ITADDR is probably address of a
-         * CATCH block - we don't optimize them
-         * XXX they are marked as branch, to avoid dead code removal
-         * when we are sure, how exception will work, we will see.
-         */
-        if (ins->type & ITADDR)
-            dont_optimize = 1;
     }
 
-    if (IMCC_DEBUG & DEBUG_CFG)
-	dump_instructions();
+    if (IMCC_DEBUG & DEBUG_CFG) {
+        dump_instructions();
+        dump_labels();
+    }
 }
 
 /* Once the basic blocks have been computed, build_cfg computes
@@ -148,18 +170,29 @@ void build_cfg() {
 /* find the placement of the label, and link the two nodes */
 
 void bb_findadd_edge(Basic_block *from, SymReg *label) {
+#if 0
+    /* ugly slow quadratic search for a label takes ~35 s for
+     * ../../t/op/stacks_33
+     */
     Instruction *ins;
 
     for (ins = instructions; ins; ins = ins->next) {
-	if ((ins->type & ITLABEL) && label == ins->r[0]){
+        if ((ins->type & ITLABEL) && label == ins->r[0]){
 
-	    bb_add_edge(from, bb_list[ins->bbindex]);
-	    return;
+            bb_add_edge(from, bb_list[ins->bbindex]);
+            return;
 
-	    /* a label appears just once */
+            /* a label appears just once */
 
-	}
+        }
     }
+#else
+    SymReg *r = get_sym(label->name);
+
+    if (r && (r->type & VTADDRESS) && r->first_ins)
+        bb_add_edge(from, bb_list[r->first_ins->bbindex]);
+
+#endif
 }
 
 
@@ -232,11 +265,11 @@ static void add_instruc_reads(Instruction *ins, SymReg *r0)
 {
     int i;
     for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
-	if (r0 == ins->r[i])
-	    return;
+        if (r0 == ins->r[i])
+            return;
     if (i == IMCC_MAX_REGS) {
-	fatal(1, "add_instruc_reads","out of registers with %s\n", r0->name);
-    	}
+        fatal(1, "add_instruc_reads","out of registers with %s\n", r0->name);
+    }
     /* append reg */
     ins->r[i] = r0;
     /* this gets read */
@@ -543,7 +576,6 @@ void find_loops () {
 
     sort_loops();
     if (IMCC_DEBUG & DEBUG_CFG) {
-        dump_instructions();
 	dump_cfg();
         dump_loops();
     }
@@ -555,18 +587,18 @@ void find_loops () {
 /* Incresases the loop_depth of all the nodes in a loop */
 
 void mark_loop (Edge* e){
-   Set* loop;
+    Set* loop;
     Basic_block *header, *footer, *enter;
     int i;
     Edge *edge;
 
-   header =  e->to;
-   footer =  e->from;
+    header =  e->to;
+    footer =  e->from;
     enter = 0;
     /* look from where loop was entered */
 
     for (i = 0, edge=header->pred_list; edge; edge=edge->pred_next)
-	if (footer != edge->from) {
+        if (footer != edge->from) {
             enter = edge->from;
             i++;
         }
@@ -577,22 +609,23 @@ void mark_loop (Edge* e){
         if (i==0)
             debug(DEBUG_CFG,"\tdead code\n");
         else
-            debug(DEBUG_CFG,"\tcan't determine loop entry block (%d found)\n" ,i);
+            debug(DEBUG_CFG,
+                    "\tcan't determine loop entry block (%d found)\n" ,i);
     }
 
-   loop = set_make(n_basic_blocks);
-   set_add(loop, footer->index);
-   set_add(loop, header->index);
+    loop = set_make(n_basic_blocks);
+    set_add(loop, footer->index);
+    set_add(loop, header->index);
 
-   footer->loop_depth++;
+    footer->loop_depth++;
 
     if (header != footer) {
         header->loop_depth++;
-   search_predecessors_not_in (footer, loop);
+        search_predecessors_not_in (footer, loop);
     }
 
     /* now 'loop' contains the set of nodes inside the loop.
-     */
+    */
     loop_info = realloc(loop_info, (n_loops+1)*sizeof(Loop_info *));
     if (!loop_info)
         fatal(1, "mark_loop", "Out of mem\n");
@@ -641,9 +674,9 @@ void init_basic_blocks() {
 
     if (bb_list != NULL)
         clear_basic_blocks();
-   bb_list = calloc(bb_list_size = 256, sizeof(Basic_block*) );
-   n_basic_blocks = 0;
-   edge_list = 0;
+    bb_list = calloc(bb_list_size = 256, sizeof(Basic_block*) );
+    n_basic_blocks = 0;
+    edge_list = 0;
 }
 
 void clear_basic_blocks() {
@@ -658,35 +691,35 @@ void clear_basic_blocks() {
 }
 
 Basic_block* make_basic_block(Instruction* ins) {
-   Basic_block *bb;
+    Basic_block *bb;
 
-   if (ins == NULL) {
+    if (ins == NULL) {
         fatal(1, "make_basic_block", "called with NULL argument\n");
-   }
+    }
 
-   bb = malloc(sizeof(Basic_block));
-   if (bb==NULL) {
+    bb = malloc(sizeof(Basic_block));
+    if (bb==NULL) {
         fatal(1, "make_basic_block","Out of mem\n");
-   }
+    }
 
-   bb->start = ins;
+    bb->start = ins;
     bb->end = ins;
 
-   bb->pred_list = NULL;
-   bb->succ_list = NULL;
+    bb->pred_list = NULL;
+    bb->succ_list = NULL;
     ins->bbindex = bb->index = n_basic_blocks;
-   bb->loop_depth = 0;
-   if (n_basic_blocks == bb_list_size) {
-       bb_list_size *= 2;
-       bb_list = realloc(bb_list, bb_list_size*sizeof(Basic_block*) );
-       if (bb_list == 0) {
+    bb->loop_depth = 0;
+    if (n_basic_blocks == bb_list_size) {
+        bb_list_size *= 2;
+        bb_list = realloc(bb_list, bb_list_size*sizeof(Basic_block*) );
+        if (bb_list == 0) {
             fatal(1, "make_basic_block","Out of mem\n");
-       }
-   }
-   bb_list[n_basic_blocks] = bb;
-   n_basic_blocks++;
+        }
+    }
+    bb_list[n_basic_blocks] = bb;
+    n_basic_blocks++;
 
-   return bb;
+    return bb;
 }
 
 Life_range* make_life_range(SymReg *r, int idx) {

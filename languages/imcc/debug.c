@@ -132,6 +132,24 @@ void dump_loops() {
     }
 }
 
+void
+dump_labels()
+{
+    int i;
+
+    fprintf(stderr, "Labels\n");
+    fprintf(stderr, "name\tpos\tlast ref\n"
+            "-----------------------\n");
+    for(i = 0; i < HASH_SIZE; i++) {
+        SymReg * r = hash[i];
+        if (r && (r->type & VTADDRESS))
+            fprintf(stderr, "%s\t%d\t%d\n",
+                    r->name,
+                    r->first_ins ? r->first_ins->index : -1,
+                    r->last_ins ? r->last_ins->index : -1);
+    }
+    fprintf(stderr, "\n");
+}
 
 extern int n_comp_units;
 void dump_symreg() {

@@ -49,7 +49,7 @@ typedef struct _SymReg {
     enum USAGE usage;	     /* s. USAGE above */
     char set;                /* Which register set/file it belongs to */
     int color;               /* Color: parrot register number
-    				and parrot const table index vof VTCONST*/
+    				and parrot const table index of VTCONST*/
     int score;               /* How costly is to spill this symbol */
     int use_count;	     /* how often is this sym used */
     int lhs_use_count;	     /* how often is this sym written to */
@@ -58,6 +58,7 @@ typedef struct _SymReg {
     struct _SymReg * next;   /* used in the symbols hash */
     struct _Instruction * first_ins;	/* first and last instruction */
     struct _Instruction * last_ins;	/* this symbol is in */
+    /* also used by labels as position of label and last reference */
     struct _SymReg * nextkey;	/* keys */
     struct _SymReg * reg;	/* key->register for VTREGKEYs */
 } SymReg;

@@ -1,4 +1,17 @@
-- 2003-02-20	leo / Juergen Boemmel
+- 2003-02-21	leo
+
+	* version 0.0.9.15
+	* opimized some ugly quadratic timings in cfg building
+	  and branch optimizations by:
+	* build bb_list earlier and use basic blocks
+	  This improves e.g.  -O2 t/op/stacks_33 from >1m to 2s
+
+	* absolute experimental and early stages for using imcc
+	  as JIT optimizer (-Oj) this is broken WRT rx_ops, which
+	  have an inout INT param and can branch, and WRT NCI/invoke
+	  and probably a lot more.
+
+- 2003-02-20	leo / Juergen Boemmels
 
 	* version 0.0.9.14
 	* macro preprocessor - thanks Juergen Boemmels

@@ -365,6 +365,9 @@ iANY(struct Parrot_Interp *interpreter, char * name,
             /* XXX probably a CATCH block */
             ins->type = ITADDR | IF_r1_branch | ITBRANCH;
         }
+        else if (!strcmp(name, "compile"))
+            ++has_compile;
+
         if (emit)
              emitb(ins);
     } else {
@@ -439,7 +442,8 @@ pasm_args:
 emit:
       EMIT                              { open_comp_unit(); }
       pasmcode
-      EOM 				{ emit_flush(interp); $$=0;}
+      EOM 				{ allocate(interp);
+                                          emit_flush(interp); $$=0;}
     ;
 
 

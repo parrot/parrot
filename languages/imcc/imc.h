@@ -79,6 +79,7 @@ EXTERN char * function;	/* current function */
 EXTERN int        line;	/* and line */
 EXTERN int optimizer_level;
 EXTERN int dont_optimize;
+EXTERN int has_compile;
 
 enum {
 	OPT_NONE,

@@ -229,7 +229,6 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
     Instruction * ins;
     int code_size;
     opcode_t pc;
-    int has_compile = 0;
 
     /* run through instructions,
      * 1. pass
@@ -267,8 +266,6 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             else if (!strcmp(ins->op, "set_addr"))
                 store_bsr(ins->r[1], pc, 2);
         }
-        else if (!strcmp(ins->op, "compile"))
-            ++has_compile;
         pc += ins->opsize;
     }
 
