@@ -121,7 +121,7 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
   VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 1, classname_pmc);
 
   /* Add ourselves to the interpreter's class hash */
-  if(Parrot_class_lookup(interpreter, class_name)) {
+  if(Parrot_class_lookup(interpreter, class_name) != PMCNULL) {
      internal_exception(1, "Class %s already registered!\n",
                         string_to_cstring(interpreter, class_name));
   }
@@ -135,8 +135,11 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
 PMC *
 Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
 {
-  return VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash,
-                              key_new_string(interpreter, class_name));
+  if (VTABLE_exists_keyed(interpreter, interpreter->class_hash,
+                          key_new_string(interpreter, class_name)))
+     return VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash,
+                                 key_new_string(interpreter, class_name));
+  return PMCNULL;
 }
 
 void
