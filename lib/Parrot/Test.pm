@@ -13,6 +13,7 @@ require Test::More;
 my $Builder = Test::Builder->new;
 
 @EXPORT = ( qw(output_is   output_like   output_isnt),
+	    qw(pir_output_is   pir_output_like   pir_output_isnt),
             qw(c_output_is c_output_like c_output_isnt),
             qw(skip) );
 @ISA = qw(Exporter);
@@ -79,40 +80,21 @@ sub per_test {
 }
 
 sub generate_pbc_for {
-  my ($assembly,$directory,$count) = @_;
-  local( *ASSEMBLY, *OUTPUT );
-  my $as_f = per_test('.pasm',$count);
-  my $by_f = per_test('.pbc',$count);
-
-  my $can_skip_compile = $ENV{PARROT_QUICKTEST};
-  if ($by_f =~ /native_pbc/) {
-      $can_skip_compile = 1;	# i.e. must skip
-  }
-  elsif ($can_skip_compile)
-  {
-    open INASSEMBLY, "$as_f" or $can_skip_compile = 0;
-    if ($can_skip_compile) {
-      local $/ = undef;
-      my $inassembly = <INASSEMBLY>;
-      close INASSEMBLY;
-      $can_skip_compile = 0 if ($assembly ne $inassembly);
-      $can_skip_compile = 0 if (not -e $by_f);
-    }
-  }
-  $ENV{IMCC} = ${directory} . 'parrot' . $PConfig{exe};
-
-  if (!$can_skip_compile) {
-      open ASSEMBLY, "> $as_f" or die "Unable to open '$as_f'";
-      binmode ASSEMBLY;
-      print ASSEMBLY $assembly;
-      close ASSEMBLY;
-  }
+    my ($assembly,$directory,$count, $as_f) = @_;
+    local( *ASSEMBLY );
+    open ASSEMBLY, "> $as_f" or die "Unable to open '$as_f'";
+    binmode ASSEMBLY;
+    print ASSEMBLY $assembly;
+    close ASSEMBLY;
 }
 
 # Map the Parrot::Test function to a Test::Builder method.
 my %Test_Map = ( output_is   => 'is_eq',
                  output_isnt => 'isnt_eq',
-                 output_like => 'like'
+                 output_like => 'like',
+		 pir_output_is   => 'is_eq',
+                 pir_output_isnt => 'isnt_eq',
+                 pir_output_like => 'like'
                );
 
 my $count = 0;
@@ -131,6 +113,9 @@ sub generate_functions {
     return $file;
   }
 
+  my $PARROT = ${directory} . 'parrot' . $PConfig{exe};
+
+
   foreach my $func ( keys %Test_Map ) {
     no strict 'refs';
 
@@ -148,27 +133,25 @@ sub generate_functions {
 	$output =~ s/\cM\cJ/\n/g;
 
 	#generate pbc for this test (may be overriden)
-	my $imcc;
 	my $out_f = per_test('.out',$count);
-	$TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-	$pbc_generator->( $assembly, $directory, $count );
-        my $cmd;
-	if (($imcc = $ENV{IMCC})) {
-	    my $as_f = per_test('.pasm',$count);
+	my $as_f = per_test('.pasm',$count);
 
-	    if ($as_f =~ /native_pbc/) {
-		$as_f = per_test('.pbc',$count);
-	    }
-	    $cmd = "$imcc ${TEST_PROG_ARGS} $as_f";
+	if ($assembly =~ /^##PIR##/ || $func =~ /^pir_/) {
+	    $as_f = per_test('.imc',$count);
+	}
+
+	$TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
+
+	# native tests are just run
+	if ($as_f =~ /native_pbc/) {
+	    $as_f = per_test('.pbc',$count);
 	}
 	else {
-
-	    my $by_f = per_test('.pbc',$count);
-
-            $cmd = "${directory}$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f";
+	    $pbc_generator->( $assembly, $directory, $count, $as_f );
 	}
-        my $exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
 
+        my $cmd = "$PARROT ${TEST_PROG_ARGS} $as_f";
+        my $exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
 
 	my $meth = $Test_Map{$func};
 	my $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );

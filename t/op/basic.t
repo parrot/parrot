@@ -1,8 +1,9 @@
 #! perl -w
+use strict;
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 21;
 
-# It would be very embarrassing if these didn't work...
+# It would be very embarrassing if these didnt work...
 output_is(<<'CODE', '', "noop, end");
 	noop
 	end
@@ -76,7 +77,7 @@ CODE
 
 output_is(<<'CODE', <<'OUTPUT', "bsr_i");
 	print	"start\n"
-	
+
 	bsr	LAB1
 
 	print	"done\n"
@@ -120,17 +121,73 @@ output_is(<<'CODE', 32, "Predeclared opcodes");
      end
 CODE
 
-output_is(<<'CODE', <<'OUTPUT', "jsr");
-     set_addr I1, FOO
-     jsr I1
-     print "and back again\n"
+output_is(<<'CODE', <<'OUTPUT', "pir syntax with marker - is");
+##PIR##
+.sub _main
+     .const string OK = "ok\n"
+     print OK
      end
-
-FOO: print "There "
-     ret
+.end
 
 CODE
-There and back again
+ok
+OUTPUT
+
+output_isnt(<<'CODE', <<'OUTPUT', "pir syntax with marker - isnt");
+##PIR##
+.sub _main
+     .const string OK = "ok\n"
+     print OK
+     end
+.end
+
+CODE
+parrot
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "pir syntax with marker - like");
+##PIR##
+.sub _main
+     .const string OK = "ok\n"
+     print OK
+     end
+.end
+
+CODE
+/^\w\w\s+$/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pir syntax with function - is");
+.sub _main
+     .const string OK = "ok\n"
+     print OK
+     end
+.end
+
+CODE
+ok
+OUTPUT
+
+pir_output_isnt(<<'CODE', <<'OUTPUT', "pir syntax with function - isnt");
+.sub _main
+     .const string OK = "ok\n"
+     print OK
+     end
+.end
+
+CODE
+nada niete
+OUTPUT
+
+pir_output_like(<<'CODE', <<'OUTPUT', "pir syntax with function - like");
+.sub _main
+     .const string OK = "ok 1\n"
+     print OK
+     end
+.end
+
+CODE
+/^\w{2}\s\d\s+$/
 OUTPUT
 
 1; # HONK

@@ -7,3 +7,7 @@
 #
 spf_render.c -{-Wformat-nonliteral}   # noisy
 tsq.c -{${optimize}} 		      # never optimize tsq.c!
+
+# imcc file settings
+{imcc} -{-Wwrite-strings -Wcast-qual} s/-Wno-unused/-Wunused/ -{-Wformat-nonliteral}
+

@@ -8,13 +8,14 @@ LIBDIR = $(EXEC_PREFIX)/lib
 INCLUDEDIR = $(EXEC_PREFIX)/include
 
 # imcc dir
-IMCC_DIR = languages/imcc
-# file containing main
-PARROT_MAIN = test_main
+IMCC_DIR = languages${slash}imcc
+IMCC_DIR_SL = $(IMCC_DIR)${slash}
 
-O = ${o}
-SO = ${so}
-A = ${a}
+# file containing main
+PARROT_MAIN = $(IMCC_DIR_SL)main
+
+
+# programs and utils used for build
 RM_F = ${rm_f}
 RM_RF = ${rm_rf}
 AR_CR = ${ar} ${ar_flags}
@@ -22,8 +23,17 @@ RANLIB = ${ranlib}
 LINK = ${link}
 LD = ${ld}
 LD_SHARED = ${ld_shared}
+TOUCH  = perl -e ${PQ}open(A,q{>>},$$_) or die foreach @ARGV${PQ}
+YACC = ${yacc}
+LEX = ${lex}
+
+# file extensions and util flags
+O = ${o}
+SO = ${so}
+A = ${a}
 LD_OUT = ${ld_out}
 LD_SHARED_FLAGS=${ld_shared_flags}
+
 
 INC=./${inc}
 
@@ -96,6 +106,36 @@ FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES)
 #
 ###############################################################################
 
+# these are private to the imcc subsystem
+IMCC_H_FILES = \
+	$(IMCC_DIR_SL)imc.h 	\
+	$(IMCC_DIR_SL)stacks.h 	\
+	$(IMCC_DIR_SL)cfg.h 	\
+	$(IMCC_DIR_SL)instructions.h 	\
+	$(IMCC_DIR_SL)debug.h 	\
+	$(IMCC_DIR_SL)sets.h 	\
+	$(IMCC_DIR_SL)symreg.h 	\
+	$(IMCC_DIR_SL)pbc.h 	\
+	$(IMCC_DIR_SL)optimizer.h 	\
+	$(IMCC_DIR_SL)parser.h 	\
+	$(IMCC_DIR_SL)imcparser.h
+
+IMCC_O_FILES = \
+	$(IMCC_DIR_SL)imcparser$(O) 	\
+	$(IMCC_DIR_SL)imclexer$(O) 	\
+	$(IMCC_DIR_SL)imc$(O) 	\
+	$(IMCC_DIR_SL)stacks$(O) 	\
+	$(IMCC_DIR_SL)symreg$(O) 	\
+	$(IMCC_DIR_SL)instructions$(O) 	\
+	$(IMCC_DIR_SL)cfg$(O) 	\
+	$(IMCC_DIR_SL)sets$(O) 	\
+	$(IMCC_DIR_SL)debug$(O) 	\
+	$(IMCC_DIR_SL)optimizer$(O) 	\
+	$(IMCC_DIR_SL)pbc$(O) 	\
+	$(IMCC_DIR_SL)parser_util$(O)	\
+	$(IMCC_DIR_SL)jit$(O) 	\
+	$(IMCC_DIR_SL)pcc$(O)
+
 GENERAL_H_FILES = $(NONGEN_HEADERS) $(GEN_HEADERS) ${cg_h}
 
 
@@ -113,7 +153,7 @@ CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
 IO_O_FILES = io/io$(O) io/io_buf$(O) io/io_unix$(O) io/io_win32$(O) \
 	io/io_stdio$(O) io/io_passdown$(O)
 
-INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
+INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O)  \
 	register$(O) core_ops$(O) core_ops_prederef$(O) core_ops_switch$(O) \
 	memory$(O) objects$(O) ${exec_o} \
 	packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
@@ -128,7 +168,8 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 	dynext$(O) utils$(O) vtables$(O) mmd$(O)
 
 O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) \
-	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
+	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES) \
+	$(IMCC_O_FILES)
 
 OPS_FILES = ${ops} $(GEN_OPSFILES)
 
@@ -170,8 +211,6 @@ PDUMP = pdump${exe}
 PINFO = pbc_info${exe}
 PDB = pdb${exe}
 
-IMCC_PROG = languages/imcc/imcc${exe}
-
 # lclint has changed name to splint at v3.0
 LINT = splint
 
@@ -201,7 +240,7 @@ ${make_set_make}
 .c$(O) :
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
-all : flags_dummy $(TEST_PROG) $(IMCC_PROG) docs
+all : flags_dummy $(TEST_PROG) docs
 
 world: all parrot_utils
 
@@ -216,7 +255,6 @@ mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
 $(TEST_PROG) : $(PARROT_MAIN)$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
 	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(LIBPARROT) $(C_LIBS)
-	$(PERL) -MExtUtils::Command -e mv $(TEST_PROG) test_main$(EXE)
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -238,7 +276,13 @@ check_source : $(GENERAL_H_FILES)
 shared : $(GEN_HEADERS) blib/lib/libparrot$(SO) $(LIBPARROT)
 static : $(GEN_HEADERS) $(LIBPARROT)
 
+# XXX changes don't always propagate into libparrot
+# e.g. when I change debug:fataly to xfataly, nm still shows the old symbol
+# and parrot builds fine (except for the unproto warning
+# so always delete the lib -leo
+
 $(LIBPARROT) : $(O_FILES)
+	$(RM_F) $@
 	$(MKDIR) blib blib/lib
 	$(AR_CR) ${ar_out}$@ $(O_FILES)
 	$(RANLIB) $@
@@ -539,6 +583,28 @@ jit_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h jit/${jitcpuarch}/core.jit
 exec_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h jit/${jitcpuarch}/core.jit ${exec_h} $(INC)/exec_dep.h
 	$(PERL) jit2h.pl ${jitcpuarch} exec_cpu.c
 
+######## imcc files deps
+#
+# The .flag files are needed because we are keeping some derived files in CVS,
+# which does not keep accurate timestamps on the files, relative to each other.
+# Note that YACC or LEX may be null commands, so we must `touch` all the
+# target files, instead of just the .flag files.
+
+$(IMCC_DIR_SL)imcc.y.flag $(IMCC_DIR_SL)imcparser.c $(IMCC_DIR_SL)imcparser.h: $(IMCC_DIR_SL)imcc.y
+	$(YACC) $(IMCC_DIR_SL)imcc.y -d -o $(IMCC_DIR_SL)imcparser.c
+	$(TOUCH) $(IMCC_DIR_SL)imcc.y.flag $(IMCC_DIR_SL)imcparser.c $(IMCC_DIR_SL)imcparser.h
+
+$(IMCC_DIR_SL)imcc.l.flag $(IMCC_DIR_SL)imclexer.c: $(IMCC_DIR_SL)imcc.l
+	$(LEX) -o$(IMCC_DIR_SL)imclexer.c $(IMCC_DIR_SL)imcc.l
+	$(TOUCH) $(IMCC_DIR_SL)imcc.l.flag $(IMCC_DIR_SL)imclexer.c
+
+$(IMCC_O_FILES) : $(IMCC_H_FILES) $(ALL_H_FILES)
+
+$(IMCC_DIR_SL)%${o} : $(IMCC_DIR_SL)%.c
+	$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) -I$(IMCC_DIR) $(CFLAGS) ${cc_o_out}$@ -c $<
+
+################ docs, test and maintainer targets
+
 docs : docs/.dummy
 
 docs/.dummy :
@@ -556,19 +622,6 @@ languages-test :
 # then run `make` in sub-dir to rebuild only the out of date files.
 $(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(NONGEN_HEADERS)
 	cd classes && $(MAKE) && cd ..
-
-
-$(IMCC_PROG) : $(LIBPARROT)        \
-               languages/imcc/*.c \
-               languages/imcc/*.h \
-               languages/imcc/*.y \
-               languages/imcc/*.l
-	cd languages${slash}imcc && $(MAKE) && cd ..${slash}..
-	$(PERL) -MExtUtils::Command -e mv $(IMCC_PROG) $(TEST_PROG)
-	cd languages${slash}imcc && $(MAKE) && cd ..${slash}..
-
-# the chmod doesn't work here, so move imcc and make it again :-(
-# $(PERL) -MExtUtils::Command -e chmod 0755 $(TEST_PROG)
 
 
 ###############################################################################
@@ -602,7 +655,7 @@ quickfulltest_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS) quick
 
 # Common prep for all test targets
-test_prep : $(LIBPARROT) $(IMCC_PROG)
+test_prep : $(LIBPARROT) $(TEST_PROG)
 
 test_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS)
@@ -629,13 +682,13 @@ lifetest : $(TEST_PROG) examples/assembly/life.pbc
 	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/life.pbc
 
 test_imcc :
-	cd languages/imcc && $(PERL) t/harness && cd ../..
+	cd $(IMCC_DIR) && $(PERL) t/harness && cd ../..
 
 fulltest_imcc :
-	cd languages/imcc && $(PERL) t/harness && cd ../..
-	cd languages/imcc && $(PERL) t/harness -j && cd ../..
-	cd languages/imcc && $(PERL) t/harness -P && cd ../..
-	cd languages/imcc && $(PERL) t/harness -b && cd ../..
+	cd $(IMCC_DIR) && $(PERL) t/harness && cd ../..
+	cd $(IMCC_DIR) && $(PERL) t/harness -j && cd ../..
+	cd $(IMCC_DIR) && $(PERL) t/harness -P && cd ../..
+	cd $(IMCC_DIR) && $(PERL) t/harness -b && cd ../..
 
 # For reporting success or failure with different configurations
 ok:
