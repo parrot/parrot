@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 82;
+use Parrot::Test tests => 83;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -1656,6 +1656,46 @@ ok 3
 ok 4
 ok 5
 ok 6
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "eq_p_i");
+      set I0, 12
+
+      new P0, .PerlInt
+      set P0, I0
+      eq P0, I0, OK1 
+      print "not "
+OK1:  print "ok 1\n"
+
+      new P0, .PerlNum
+      set P0, I0
+      eq P0, I0, OK2
+      print "not "
+OK2:  print "ok 2\n"
+
+      new P0, .PerlString
+      set P0, I0
+      eq P0, I0, OK3
+      print "not "
+OK3:  print "ok 3\n"
+
+      new P0, .PerlUndef
+      eq P0, I0, BAD4
+      branch OK4
+BAD4: print "not "
+OK4:  print "ok 4\n"
+
+      set P0, I0
+      eq P0, I0, OK5
+      print "not "
+OK5:  print "ok 5\n"
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "ne_p_p");
