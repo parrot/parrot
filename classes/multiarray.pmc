@@ -179,7 +179,7 @@ static CELL *new_cell( struct Parrot_Interp *interpreter, void *data )
 	cell_b->free_cell -= 1;
 	ret_cell = (CELL *)cell_b->cell_buffer->bufstart;
     }
-    return &ret_cell[cell_b->size - cell_b->free_cell-1]; // notice -1 we start at 0
+    return &ret_cell[cell_b->size - cell_b->free_cell-1]; /* notice -1 we start at 0 */
 }
 
 
@@ -188,7 +188,7 @@ static CELL *new_cell( struct Parrot_Interp *interpreter, void *data )
 static CELL_B *new_marray( Interp *interpreter ) 
 {
     CELL_B *b = (CELL_B *)new_bufferlike_header(interpreter, sizeof(*b));    
-    // CELL_B *b = (CELL_B *)new_tracked_header(interpreter, sizeof(*b));    
+    /* CELL_B *b = (CELL_B *)new_tracked_header(interpreter, sizeof(*b)); */
     b->size = CELL_POOL_SIZE;
     b->free_cell = CELL_POOL_SIZE;
     b->cell_buffer = new_buffer_header(interpreter);
@@ -261,7 +261,7 @@ static INTVAL get_marray_keyed( Interp *interpreter, CELL_B *mg_marray, KEY *key
         if(virtual_addr == buffer_ptr_virt) {
    	ret_val = buffer_ptr->data.int_val;
 	} else {
-           //PANIC
+           /* PANIC */
         }	
     }
 
@@ -299,15 +299,14 @@ pmclass MultiArray {
 	SELF->flags |= (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG);
 	SELF->data = NULL;
 	SELF->cache.int_val = 0;
-	// I use a PMC key class  as wrapper to pass initialvalues to our multi array
-	//  OBS OBS OBS this dont work since we dont have a multidim key standard yet
-	//if((initializer->vtable->type(INTERP, SELF)) == enum_class_Key) {
-	//    init_marray(INTERP, SELF, initializer->data);
-	//} else{
-	    init_marray(INTERP, SELF, NULL);
-	//}
-	
-	
+	/* I use a PMC key class  as wrapper to pass initialvalues to our multi array
+	 *  OBS OBS OBS this dont work since we dont have a multidim key standard yet
+	 *if((initializer->vtable->type(INTERP, SELF)) == enum_class_Key) {
+	 *    init_marray(INTERP, SELF, initializer->data);
+	 *} else{
+	 *   init_marray(INTERP, SELF, NULL);
+	 *}
+        */
     }
 
     void morph (INTVAL type) {
