@@ -208,6 +208,7 @@ foreach (@files) {
 	next;
     }
     else {
+	next unless -e $src;
 	copy($src, $dest) or die "copy $src to $dest: $!\n";
 	print "$dest\n";
     }
