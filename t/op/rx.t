@@ -1,4 +1,4 @@
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 27;
 use Test::More;
 
 sub gentest($$;$$) {
@@ -64,6 +64,12 @@ CODE
 no match
 OUTPUT
 
+output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'Pattern longer than string');
+		rx_literal P0, "aa", $advance
+CODE
+no match
+OUTPUT
+
 output_is(gentest('ba', <<'CODE'), <<'OUTPUT', 'inching through the string');
 		rx_literal P0, "a", $advance
 CODE
@@ -105,6 +111,41 @@ OUTPUT
 
 output_is(gentest('?', <<'CODE'), <<'OUTPUT', '\w (failure)');
 		rx_is_w P0, $advance
+CODE
+no match
+OUTPUT
+
+output_is(gentest('0123456789', <<'CODE'), <<'OUTPUT', '\d (success)');
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+CODE
+<><0123456789><>
+OUTPUT
+
+output_is(gentest('@?#', <<'CODE'), <<'OUTPUT', '\d (failure)');
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+		rx_is_d P0, $advance
+CODE
+no match
+OUTPUT
+
+output_is(gentest(' ', <<'CODE'), <<'OUTPUT', '\s (success)');
+		rx_is_s P0, $advance
+CODE
+<>< ><>
+OUTPUT
+
+output_is(gentest('a', <<'CODE'), <<'OUTPUT', '\s (failure)');
+		rx_is_s P0, $advance
 CODE
 no match
 OUTPUT
