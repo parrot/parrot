@@ -390,6 +390,7 @@ CALL
 
 
 =for comment
+
 This is the template thing
 
 static void pcf_$funcname(struct Parrot_Interp *interpreter, PMC *self) {
@@ -409,4 +410,5 @@ static void pcf_$funcname(struct Parrot_Interp *interpreter, PMC *self) {
 EOR
 
 }
+
 =end comment

@@ -262,8 +262,6 @@ inline op substr(out STR, in PMC, in INT, in INT) {
   goto NEXT();
 }
 
-=cut
-
 ########################################
 
 =item B<index>(out INT, in STR, in STR)
@@ -290,9 +288,6 @@ inline op index(out INT, in STR, in STR, in INT) {
     $1 = string_str_index(interpreter, $2, $3, $4);
     goto NEXT();
 }
-
-=cut
-
 
 ########################################
 
@@ -377,8 +372,6 @@ inline op pack(inout STR, in INT, in INT, in INT) {
     goto NEXT();
 }
 
-=cut
-
 ########################################
 
 =item B<sprintf>(out STR, in STR, in PMC)
@@ -412,8 +405,6 @@ inline op sprintf(out PMC, in PMC, in PMC) {
     );
     goto NEXT();
 }
-
-=cut
 
 =item B<new>(out STR)
 

@@ -387,6 +387,7 @@ _EOF_
 #
 
 =begin commented_out
+
 our $grammar = <<'_EOF_';
 kDEFINED	: 'defined'	{[@item]}
 

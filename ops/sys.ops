@@ -69,8 +69,6 @@ inline op time(out NUM) {
   goto NEXT();
 }
 
-=cut
-
 ########################################
 
 =item B<sysinfo>(out STR, in INT)

@@ -110,4 +110,3 @@ $::RD_TRACE = 1;
 
 #die $Ruby::grammar;
 
-=cut

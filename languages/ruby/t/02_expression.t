@@ -98,4 +98,3 @@ is_deeply($parser->arg('defined(foo)'),
 
 #$::RD_TRACE = 1;
 
-=cut

@@ -268,10 +268,10 @@ op rx_popindex(out int, inconst int) {
 
 =head3 Simple matching ops
 
-=over 4
-
 This ops match a simple pattern against the string, and branch on their
 last argument when they fail.
+
+=over 4
 
 =cut
 

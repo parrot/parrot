@@ -165,6 +165,7 @@ Parrot::Key
 =head1 DESCRIPTION
 
 =head2 components COMPONENTS
+
 =head2 components
 
 =head2 new COMPONENTS
@@ -174,6 +175,7 @@ Parrot::Key
 =head2 pack
 
 =head2 unpack KEY
+
 =head2 unpack
 
 =head2 dump

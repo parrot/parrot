@@ -181,12 +181,15 @@ Parrot::String
 =head1 DESCRIPTION
 
 =head2 data DATA
+
 =head2 data
 
 =head2 encoding ENCODING
+
 =head2 encoding
 
 =head2 flags FLAGS
+
 =head2 flags 
 
 =head2 new FLAGS ENCODING TYPE SIZE DATA
@@ -194,12 +197,15 @@ Parrot::String
 =head2 pack
 
 =head2 size SIZE
+
 =head2 size
 
 =head2 type TYPE
+
 =head2 type
 
 =head2 unpack STRING
+
 =head2 unpack
 
 =head1 AUTHOR

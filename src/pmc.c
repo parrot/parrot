@@ -33,7 +33,9 @@ pmc_init_null(struct Parrot_Interp * interpreter)
 }
 #endif
 
-/*=for api pmc pmc_new
+/*
+
+=for api pmc pmc_new
 
    Creates a new PMC of type C<base_type> (which is an index into
    the list of PMC types declared in C<Parrot_base_vtables> in
@@ -101,7 +103,9 @@ pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
         add_pmc_ext(interpreter, pmc);
 }
 
-/*=for api pmc pmc_new_noinit
+/*
+
+=for api pmc pmc_new_noinit
 
    Creates a new PMC of type C<base_type> (which is an index into the
    list of PMC types declared in C<Parrot_base_vtables> in
@@ -150,7 +154,9 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
     return pmc;
 }
 
-/*=for api pmc constant_pmc_new_noinit
+/*
+
+=for api pmc constant_pmc_new_noinit
 
    Creates a new constant PMC of type C<base_type>
 
@@ -166,10 +172,14 @@ constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
     return pmc;
 }
 
-/*=for api pmc constant_pmc_new
+/*
+
+=for api pmc constant_pmc_new
 
    Creates a new constant PMC of type C<base_type>, the call C<init>.
+
 =cut
+
 */
 
 PMC *
@@ -180,7 +190,10 @@ constant_pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
     VTABLE_init(interpreter, pmc);
     return pmc;
 }
-/*=for api pmc pmc_new_init
+
+/*
+
+=for api pmc pmc_new_init
 
    As C<pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 
@@ -198,7 +211,9 @@ pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)
     return pmc;
 }
 
-/*=for api pmc constant_pmc_new_init
+/*
+
+=for api pmc constant_pmc_new_init
 
    As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 

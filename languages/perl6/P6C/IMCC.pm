@@ -665,9 +665,9 @@ sub newlocal($$) {			# initialized local var
 
 =head2 Code generation functions
 
-=over
-
 The following functions generate useful and common pieces of code.
+
+=over
 
 =item B<gen_counted_loop($counter, $body)>
 

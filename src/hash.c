@@ -105,7 +105,9 @@ lookupBucket(Hash *hash, HashIndex slot)
     return getBucket(hash, lookupBucketIndex(hash, slot));
 }
 
-/*=for api hash key_hash_STRING
+/*
+
+=for api hash key_hash_STRING
 
 Return the hashed value of the string
 
@@ -544,7 +546,9 @@ new_hash_x(Interp *interpreter, Hash **hptr,
     expand_hash(interpreter, hash);
 }
 
-/*=for api hash hash_size
+/*
+
+=for api hash hash_size
 
 return the number of used entries in hashtable
 

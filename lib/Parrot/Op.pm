@@ -282,6 +282,7 @@ Returns a particular argument type.
 Returns the entire argument type list.
 
 =head2 body
+
 =head2 body BODY
 
 Sets or returns the op's code body. If no BODY is given, the body is returned.

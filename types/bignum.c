@@ -48,12 +48,16 @@ thrown.
 
 Parrot string playing, exception raising
 
+=cut
+
 */
 
 /* * This lot wants to go in a (bignum specific seperate header file * */
 
 /* Access digits, macros assume length given */
-/*=for api bignum_private BN_setd(BIGNUM*, pos, value)
+/*
+
+=for api bignum_private BN_setd(BIGNUM*, pos, value)
 
 Set digit at pos (zero is lsd) to value.  [macro]
 
@@ -72,7 +76,9 @@ Get value of digit at pos. [macro]
     ( (x->buffer[(y) / BN_D_PER_NIB] >> \
      ( (y) % BN_D_PER_NIB)*4) & 15 )
 
-/*=for api bignum_private CHECK_OVERFLOW(bn, incr, context)
+/*
+
+=for api bignum_private CHECK_OVERFLOW(bn, incr, context)
 
 If increasing the exponent of I<bn> by I<incr> will cause overflow
 (as decided by I<elimit>), returns true.
@@ -84,7 +90,9 @@ If increasing the exponent of I<bn> by I<incr> will cause overflow
 #define CHECK_OVERFLOW(bn, incr, context) \
     ( (context)->elimit - ((bn)->expn + (bn)->digits -1 ) < (incr) ? 1 : 0) 
 
-/*=for api bignum_private CHECK_UNDERFLOW(bn, decrement, context)
+/*
+
+=for api bignum_private CHECK_UNDERFLOW(bn, decrement, context)
 
 If subtracting I<decrement> (a positive number) from the exponent
 of I<bn> would cause underflow, returns true.
@@ -98,7 +106,9 @@ of I<bn> would cause underflow, returns true.
 
 /********** Special Values ******************/
 
-/*=for api bignum_private am_INF(bn)
+/*
+
+=for api bignum_private am_INF(bn)
 
 True if bn is +Infinity or -Infinity. [macro]
 
@@ -107,7 +117,9 @@ True if bn is +Infinity or -Infinity. [macro]
 */
 
 #define am_INF(bn)  ((bn)->flags & BN_INF_FLAG   )
-/*=for api bignum_private am_NAN(bn)
+/*
+
+=for api bignum_private am_NAN(bn)
 
 True if bn is either a quiet or signalling NaN. [macro]
 
@@ -116,7 +128,9 @@ True if bn is either a quiet or signalling NaN. [macro]
 */
 
 #define am_NAN(bn)  ((bn)->flags & (BN_sNAN_FLAG | BN_qNAN_FLAG)   )
-/*=for api bignum_private am_sNAN(bn)
+/*
+
+=for api bignum_private am_sNAN(bn)
 
 True if bn is a signalling NaN. [macro]
 
@@ -125,7 +139,9 @@ True if bn is a signalling NaN. [macro]
 */
 
 #define am_sNAN(bn) ((bn)->flags & BN_sNAN_FLAG  )
-/*=for api bignum_private am_qNAN(bn)
+/*
+
+=for api bignum_private am_qNAN(bn)
 
 True if bn is a quiet NaN. [macro]
 
@@ -182,7 +198,9 @@ BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context);
 
 /* Creation and memory management */
 
-/*=for api bignum BIGNUM* BN_new(INTVAL length)
+/*
+
+=for api bignum BIGNUM* BN_new(INTVAL length)
 
 Create a new BN.  length is number of I<decimal> digits required.
 The bignumber will be equal to zero.
@@ -211,7 +229,9 @@ BN_new(PINTD_ INTVAL length) {
     return bn;
 }
 
-/*=for api bignum_private BN_grow(BIGNUM *bn, INTVAL length)
+/*
+
+=for api bignum_private BN_grow(BIGNUM *bn, INTVAL length)
 
 Grows bn so that it can contain length I<decimal> digits, does not
 modify the value of the bignumber.
@@ -238,7 +258,9 @@ BN_grow(PINTD_ BIGNUM *in, INTVAL length) {
     return;
 }
 
-/*=for api bignum BN_destroy(BIGNUM *bn)
+/*
+
+=for api bignum BN_destroy(BIGNUM *bn)
 
 Frees all the memory used by the BIGNUM.
 
@@ -255,7 +277,9 @@ BN_destroy(PINTD_ BIGNUM *bn) {
     return;
 }
 
-/*=for api bignum BN_create_context(precision)
+/*
+
+=for api bignum BN_create_context(precision)
 
 Creates a new context object, with specified I<precision>, other fields
 are initialised as follows:
@@ -298,7 +322,9 @@ BN_create_context(PINTD_ INTVAL precision) {
     return result;
 }
 
-/*=for api bignum BN_set_digit(BIGNUM* bn, INTVAL pos, INTVAL value)
+/*
+
+=for api bignum BN_set_digit(BIGNUM* bn, INTVAL pos, INTVAL value)
 
 Sets digit at I<pos> (zero based) to I<value>.  Number is grown if
 digits > allocated space are accessed, but intermediate digits will
@@ -324,7 +350,9 @@ BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, INTVAL value) {
     return value;
 }
 
-/*=for api bignum INTVAL BN_get_digit(BIGNUM* bn, INTVAL pos)
+/*
+
+=for api bignum INTVAL BN_get_digit(BIGNUM* bn, INTVAL pos)
 
 Get the value of the decimal digit at pos, returns -1 if pos is out of
 bounds.
@@ -340,7 +368,9 @@ BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos) {
     return BN_getd(bn, pos);
 }
 
-/*=for api bignum BN_set_(inf|qNAN|sNAN)(bignum)
+/*
+
+=for api bignum BN_set_(inf|qNAN|sNAN)(bignum)
 
 Sets its argument to appropriate value.
 
@@ -378,7 +408,9 @@ int BN_set_sNAN(PINTD_ BIGNUM* bn) {
     return;
 }
 
-/*=for api bignum_private BN_set_verybig(bn, context)
+/*
+
+=for api bignum_private BN_set_verybig(bn, context)
 
 Used when an operation has overflowed, sets bn according to I<rounding>
 and the sign of I<bn>:
@@ -428,7 +460,9 @@ BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
 }
 
 
-/*=for api bignum BIGNUM *BN_copy(one, two)
+/*
+
+=for api bignum BIGNUM *BN_copy(one, two)
 
 Copies two into one, returning one for convenience.
 
@@ -451,7 +485,9 @@ BN_copy(PINTD_ BIGNUM* one, BIGNUM* two) {
     return one;
 }
 
-/*=for api bignum BIGNUM* BN_new_from_int(INTVAL value)
+/*
+
+=for api bignum BIGNUM* BN_new_from_int(INTVAL value)
 
 Create a new bignum from a (signed) integer value (INTVAL)
 We assume that the implementation limits are somewhat larger than
@@ -482,7 +518,9 @@ BN_new_from_int(PINTD_ INTVAL value) {
     return new;
 }
 
-/*=for api bignum BN_PRINT_DEBUG(BIGNUM *bn, char *mesg)
+/*
+
+=for api bignum BN_PRINT_DEBUG(BIGNUM *bn, char *mesg)
 
 Dump the bignum for testing, along with a little message.
 
@@ -508,7 +546,9 @@ BN_PRINT_DEBUG (BIGNUM *bn, char* mesg) {
     printf("\n");
 }
 
-/*=for api bignum_private BN_nonfatal(context, exception, message)
+/*
+
+=for api bignum_private BN_nonfatal(context, exception, message)
 
 When an exceptional condition occurs after which execution could
 continue.  If context specifies that death occurs, then so be it.
@@ -626,7 +666,9 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
     
 }
 
-/*=for api bignum_private void BN_exception(exception, char* message)
+/*
+
+=for api bignum_private void BN_exception(exception, char* message)
 
 Throw `exception'.  Should be accessed via a BN_EXCEPT macro, this
 version is provided until parrot exceptions are sorted out properly.
@@ -641,7 +683,9 @@ BN_exception(PINTD_ BN_EXCEPTIONS exception, char* message) {
     exit(0);
 }
 
-/*=for api bignum BN_to_scientific_string(BIGNUM* bn, char** dest)
+/*
+
+=for api bignum BN_to_scientific_string(BIGNUM* bn, char** dest)
 
 Converts bn into a scientific representation, stored in dest.
 
@@ -671,7 +715,9 @@ BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest) {
     BN_to_scieng_string(PINT_ bn, dest, 1);
 }
 
-/*=for api bignum_private BN_to_scieng_string(bn, char**dest, int eng)
+/*
+
+=for api bignum_private BN_to_scieng_string(bn, char**dest, int eng)
 
 Does the heavy string handling work, I<eng> defines the conversion to
 perform.
@@ -801,7 +847,9 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
     return 0;
 }
 
-/*=for api bignum BIGNUM* BN_from_string(char* string, context) 
+/*
+
+=for api bignum BIGNUM* BN_from_string(char* string, context) 
 
 Convert a scientific string to a BIGNUM.  This function deals entirely
 with common-or-garden C byte strings, so the library can work
@@ -1027,7 +1075,9 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
 }
 
 
-/*=for api bignum_private BN_strip_zeros(BIGNUM* victim, context)
+/*
+
+=for api bignum_private BN_strip_zeros(BIGNUM* victim, context)
 
 Removes any zeros before the msd and after the lsd
 
@@ -1050,7 +1100,9 @@ BN_strip_lead_zeros(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
     bn->digits -= bn->digits-1 - msd;
 }
 
-/*=for api bignum_private BN_strip_tail_zeros(BIGNUM *victim, context)
+/*
+
+=for api bignum_private BN_strip_tail_zeros(BIGNUM *victim, context)
 
 Removes trailing zeros and increases the exponent appropriately.
 Does not remove zeros before the decimal point.
@@ -1086,7 +1138,9 @@ BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
     bn->digits -= lsd;
 }
 
-/*=for api bignum BN_make_integer(BIGNUM* victim, BN_CONTEXT* context)
+/*
+
+=for api bignum BN_make_integer(BIGNUM* victim, BN_CONTEXT* context)
 
 Convert the number to a plain integer *if* precision such that this
 is possible.
@@ -1115,7 +1169,9 @@ BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
     }
 }
 
-/*=for api bignum_private BN_really_zero(BIGNUM* victim, context)
+/*
+
+=for api bignum_private BN_really_zero(BIGNUM* victim, context)
 
 Sets any number which should be zero to a cannonical zero.
 
@@ -1138,7 +1194,9 @@ BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero) {
     return;
 }
 
-/*=for api bignum BN_iround(BIGNUM *victim, BN_CONTEXT* context)
+/*
+
+=for api bignum BN_iround(BIGNUM *victim, BN_CONTEXT* context)
 
 Rounds victim according to context.
 
@@ -1281,7 +1339,9 @@ BN_iround (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     return;
 }
 
-/*=for api bignum_private BN_round_up(bn, context)
+/*
+
+=for api bignum_private BN_round_up(bn, context)
 
 Truncates coefficient of I<bn> to have I<precision> digits, then adds
 1 to the last digits and carries until done.  Do not call this
@@ -1323,7 +1383,9 @@ BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     }
 }
 
-/*=for api bignum_private BN_round_down(bn, context)
+/*
+
+=for api bignum_private BN_round_down(bn, context)
 
 Truncates the coefficient of I<bn> to have I<precision> digits.  Do
 not call this function with non-positive precision.
@@ -1351,7 +1413,9 @@ BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
     return;
 }
 
-/*=for api bignum BN_round_as_integer(bn, context)
+/*
+
+=for api bignum BN_round_as_integer(bn, context)
 
 I<precision> must be less than one.  This rounds so that I<expn> is at
 least I<precision>.  Name is slightly misleading.
@@ -1402,7 +1466,9 @@ BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
 }
 
 
-/*=for api bignum
+/*
+
+=for api bignum
 
 =head2  Arithmetic operations 
 
@@ -1440,7 +1506,9 @@ void BN_operation(result, one, two, context)
 */
 
 
-/*=for api bignum_private BN_arith_setup(result, one, two, context, &restore)
+/*
+
+=for api bignum_private BN_arith_setup(result, one, two, context, &restore)
 
 rounds one and two ready for arithmetic operation.
 
@@ -1473,7 +1541,9 @@ BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
 }
 
-/*=for api bignum_private BN_arith_cleanup(result, one, two, context, &restore)
+/*
+
+=for api bignum_private BN_arith_cleanup(result, one, two, context, &restore)
 
 Rounds result, one, two, checks for zeroness and makes integers.
 Fixes one and two so they don't gain precision by mistake.
@@ -1520,7 +1590,9 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     BN_make_integer(PINT_ result, context);
 }
 
-/*=for api bignum_private BN_align(BIGNUM* one, BIGNUM* two) 
+/*
+
+=for api bignum_private BN_align(BIGNUM* one, BIGNUM* two) 
 
 Adds zero digits so that decimal points of each number are at the same
 place.
@@ -1596,7 +1668,9 @@ BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
     }
 
 }
-/*=for api bignum BN_add(result, one, two, context)
+/*
+
+=for api bignum BN_add(result, one, two, context)
 
 Adds one to two, returning value in result.
 
@@ -1680,7 +1754,9 @@ BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context) {
     }
 }
 
-/*=for api bignum_private BN_iadd(result, one, two, context)
+/*
+
+=for api bignum_private BN_iadd(result, one, two, context)
 
 Adds together two aligned big numbers with coefficients of equal
 length.  Returns a result without reference to the signs of its
@@ -1771,7 +1847,9 @@ BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     return 0;
 }
 
-/*=for api bignum BN_subtract(result, one, two, context)
+/*
+
+=for api bignum BN_subtract(result, one, two, context)
 
 Subtracts two from one, returning value in result.
 
@@ -1857,7 +1935,9 @@ BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
 }
 
-/*=for api bignum_private BN_isubtract(result, one, two, context)
+/*
+
+=for api bignum_private BN_isubtract(result, one, two, context)
 
 Subtracts two from one, assumes both numbers have positive aligned
 coefficients of equal length.  Sets sign of result as appropriate.
@@ -1986,7 +2066,9 @@ BN_isubtract (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 }
 
-/*=for api bignum BN_plus(result, one, context) 
+/*
+
+=for api bignum BN_plus(result, one, context) 
 
 Perform unary + on one.  Does all the rounding and what have you.
 
@@ -2017,7 +2099,9 @@ BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
     BN_arith_cleanup(PINT_ result, one, one, context, NULL);
 }
 
-/*=for api bignum BN_minus(result, one, context) 
+/*
+
+=for api bignum BN_minus(result, one, context) 
 
 Perform unary - on one.  Does all the rounding and what have you.
 
@@ -2049,7 +2133,9 @@ BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
     BN_arith_cleanup(PINT_ result, one, one, context, NULL);
 }
 
-/*=for api bignum BN_compare(result, one, two, context)
+/*
+
+=for api bignum BN_compare(result, one, two, context)
 
 Numerically compares one and two, storing the result (as a BIGNUM) in
 result.
@@ -2114,7 +2200,9 @@ BN_compare (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     BN_arith_cleanup(PINT_ result, one, two, context, NULL);
 }
 
-/*=for api bignum BN_multiply(result, one, two, context) 
+/*
+
+=for api bignum BN_multiply(result, one, two, context) 
 
 Multiplies one and two, storing the result in result.
 
@@ -2221,7 +2309,9 @@ BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     return;
 }
 
-/*=for api bignum BN_divide(result, one, two, context)
+/*
+
+=for api bignum BN_divide(result, one, two, context)
 
 Divide two into one, storing up to I<precision> digits in result.
 Performs own rounding.  We also assume that this function B<will not
@@ -2459,7 +2549,9 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     BN_destroy(PINT_ rem);
 }
 
-/*=for api bignum BN_divide_integer(result, one, two, context)
+/*
+
+=for api bignum BN_divide_integer(result, one, two, context)
 
 Places the integer part of one / two into result.
 
@@ -2561,7 +2653,9 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     BN_make_integer(PINT_ result, context);
 }
 
-/*=for api bignum BN_remainder(result, one, two, context)
+/*
+
+=for api bignum BN_remainder(result, one, two, context)
 
 places the remainder from divide-integer (above) into result.
 
@@ -2805,7 +2899,9 @@ BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context) {
     }
 }
 
-/*=for api bignum BN_power(result, bignum, expn, context)
+/*
+
+=for api bignum BN_power(result, bignum, expn, context)
 
 Calculate result = bignum ** expn;
 
@@ -2825,7 +2921,9 @@ BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
     BN_arith_cleanup(PINT_ result, bignum, expn, context, NULL);
 }
 
-/*=for api bignum BN_rescale(result, bignum, expn, context)
+/*
+
+=for api bignum BN_rescale(result, bignum, expn, context)
 
 Rescales bignum to have an exponent of expn.
 
@@ -2851,7 +2949,9 @@ BN_rescale(PINTD_ BIGNUM* result, BIGNUM* one, BIGNUM* two,
     BN_arith_cleanup(PINT_ result, one, two, context, NULL);
 }
 
-/*=for api bignum INTVAL BN_to_int(BIGNUM* bignum, BN_CONTEXT* context)
+/*
+
+=for api bignum INTVAL BN_to_int(BIGNUM* bignum, BN_CONTEXT* context)
 
 Converts the bignum into an integer, raises overflow if an exact
 representation cannot be created.

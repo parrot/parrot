@@ -402,11 +402,11 @@ This implies that local variables are dangerous. A rewrite may use a
 temporary variable if its value only needs to be preserved within the
 four paths listed above, but no variable will hold its value across
 the external paths of next->back or lastback->start. An example of
-where this applies is the rewrite rule for R<m..n>. The simplistic way
+where this applies is the rewrite rule for C<m..n>. The simplistic way
 of implementing this would be to keep a local variable which counts
 the number of times that R has matched so far. However, this variable
 will not persist across next->back (especially if the overall
-expression re-enters the same rewrite rule, as in (R<m..n>)*!) So it
+expression re-enters the same rewrite rule, as in (C<m..n>)*!) So it
 must be saved somewhere before leaving via 'next', and that somewhere
 pretty much has to be a stack. Upon re-entering via 'back', the value
 will need to be restored (or at the very least popped off the stack,

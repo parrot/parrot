@@ -73,8 +73,6 @@ op callmethcc() {
   dest = (opcode_t *)REG_PMC(0)->vtable->invoke(interpreter, REG_PMC(0), next);
   goto ADDRESS(dest);
 }
-=cut
-
 
 =item B<can>(out INT, in PMC, in STR)
 
@@ -246,8 +244,6 @@ inline op classname(out STR, in PMC) {
   goto NEXT();
 }
 
-
-=cut
 
 ##################################################
 

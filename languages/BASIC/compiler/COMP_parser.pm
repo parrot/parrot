@@ -310,6 +310,7 @@ BARE:	# Check for user-subroutine
 	goto PARSE;
 
 =begin wrongway
+
 UNK:	if (($type[CURR] eq "STMT" or $type[CURR] eq "COMM" or $type[CURR] eq "STMT") and $singleif) {
 		while($_=pop(@ifstack)) {
 			push @{$code{$seg}->{code}}, "IFBRANCH_$_:\n";

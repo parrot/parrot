@@ -679,8 +679,6 @@ inline op gc_debug(in INT) {
   goto NEXT();
 }
 
-=cut
-
 ########################################
 
 =item B<interpinfo>(out INT, in INT)
