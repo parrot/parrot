@@ -70,6 +70,7 @@ BEGIN {
 # __DATA__
 
 package P6C::IMCC::prefix;
+use strict;
 
 =item prefix_if
 
