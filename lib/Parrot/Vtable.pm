@@ -73,7 +73,8 @@ typedef enum {
     VTABLE_IS_CONST_FLAG = 0x01,
     VTABLE_HAS_CONST_TOO = 0x02,
     VTABLE_PMC_NEEDS_EXT = 0x04,
-    VTABLE_DATA_IS_PMC   = 0x08
+    VTABLE_DATA_IS_PMC   = 0x08,
+    VTABLE_PMC_IS_SINGLETON = 0x10
 } vtable_flags_t;
 
 struct _vtable {

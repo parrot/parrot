@@ -1,0 +1,36 @@
+/* random.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the Random base class.
+ *     This is a singleton (monadic) class - only one instance exists.
+ *  Data Structure and Algorithms:
+ *  History:
+ *     2003.12.10	first rev by leo
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include <assert.h>
+
+static PMC * Rand_PMC;
+
+pmclass Random singleton {
+
+    /*
+     * singleton creation interface s. pmc.c
+     */
+    void* get_pointer() {
+	return Rand_PMC;
+    }
+
+    void set_pointer(void* ptr) {
+	assert(!Rand_PMC);
+	Rand_PMC = (PMC*) ptr;
+    }
+
+}
+
+

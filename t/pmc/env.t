@@ -1,8 +1,20 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 use Parrot::Config;
+
+
+output_is(<<'CODE', <<OUT, "all Envs are ident");
+    new P0, .Env
+    new P1, .Env
+    eq_addr P0, P1, ok
+    print "not the same "
+ok: print "ok\n"
+    end
+CODE
+ok
+OUT
 
 $ENV{"PARROT_TMP"} = "riding a ponie";
 output_like(<<'CODE', <<OUT, "getenv");

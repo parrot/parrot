@@ -307,6 +307,9 @@ sub init_func() {
     if (exists $self->{flags}{need_ext}) {
         $vtbl_flag .= '|VTABLE_PMC_NEEDS_EXT';
     }
+    if (exists $self->{flags}{singleton}) {
+        $vtbl_flag .= '|VTABLE_PMC_IS_SINGLETON';
+    }
     my @meths;
     foreach my $method (@{ $self->{vtable}{methods}} ) {
         my $meth = $method->{meth};

@@ -116,13 +116,30 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 {
     PMC *pmc;
     /* we only have one global Env object, livin in the interpreter */
-    if (base_type == enum_class_Env) {
-        pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
-                (INTVAL)IGLOBALS_ENV_HASH);
+    if (Parrot_base_vtables[base_type]->flags & VTABLE_PMC_IS_SINGLETON) {
+        if (base_type == enum_class_Env) {
+            /* XXX need probably a lock around this code
+             */
+            pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
+                    (INTVAL)IGLOBALS_ENV_HASH);
+            if (!pmc) {
+                pmc = get_new_pmc_header(interpreter, base_type, 0);
+                VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
+                        (INTVAL)IGLOBALS_ENV_HASH, pmc);
+            /* UNLOCK */}
+            return pmc;
+        }
+        /*
+         * singletons (monadic objects) exist only once, the interface
+         * with the class is:
+         * - get_pointer: return NULL or a pointer to the single instance
+         * - set_pointer: set the only instance once
+         */
+        pmc = (Parrot_base_vtables[base_type]->get_pointer)(interpreter, NULL);
+        /* LOCK */
         if (!pmc) {
             pmc = get_new_pmc_header(interpreter, base_type, 0);
-            VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
-                    (INTVAL)IGLOBALS_ENV_HASH, pmc);
+            VTABLE_set_pointer(interpreter, pmc, pmc);
         }
         return pmc;
     }

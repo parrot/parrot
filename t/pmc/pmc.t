@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 89;
+use Parrot::Test tests => 90;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2481,6 +2481,17 @@ OK2:  print "ok 2\n"
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Random PMCs are singletons");
+    new P0, .Random
+    new P1, .Random
+    eq_addr P0, P1, ok
+    print "not the same "
+ok: print "ok\n"
+    end
+CODE
+ok
 OUTPUT
 
 1;
