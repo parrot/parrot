@@ -52,7 +52,7 @@ everything is already set up properly.
 
 =cut
 
-op callmethod() {
+op callmethod() :object_base {
   PMC *method_pmc;
   opcode_t *dest;
   opcode_t *next = expr NEXT();
@@ -66,7 +66,7 @@ op callmethod() {
   goto ADDRESS(dest);
 }
 
-op callmethod(in STR) {
+op callmethod(in STR) :object_base {
   PMC *method_pmc;
   opcode_t *dest;
   opcode_t *next = expr NEXT();
@@ -81,7 +81,7 @@ op callmethod(in STR) {
   goto ADDRESS(dest);
 }
 
-op callmethodcc() {
+op callmethodcc() :object_base {
   opcode_t *dest;
   PMC *method_pmc;
   opcode_t *next = expr NEXT();
@@ -98,7 +98,7 @@ op callmethodcc() {
   goto ADDRESS(dest);
 }
 
-op callmethodcc(in STR) {
+op callmethodcc(in STR) :object_base {
   opcode_t *dest;
   PMC *method_pmc;
   opcode_t *next = expr NEXT();
@@ -121,7 +121,7 @@ Sets $1 to true or false, depending on whether $2 ->can the method in $3.
 
 =cut
 
-inline op can(out INT, in PMC, in STR) {
+inline op can(out INT, in PMC, in STR) :object_base {
   $1 = $2->vtable->can(interpreter, $2, $3);
   goto NEXT();
 }
@@ -136,12 +136,12 @@ Sets $1 to true or false, depending on whether $2 isa $3.
 
 =cut
 
-inline op does(out INT, in PMC, in STR) {
+inline op does(out INT, in PMC, in STR) :object_base {
   $1 = $2->vtable->does(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op isa(out INT, in PMC, in STR) {
+inline op isa(out INT, in PMC, in STR) :object_base {
   $1 = $2->vtable->isa(interpreter, $2, $3);
   goto NEXT();
 }
@@ -156,7 +156,7 @@ pointer for the new PMC is put in there).
 
 =cut
 
-inline op newclass(out PMC, in STR) {
+inline op newclass(out PMC, in STR) :object_classes {
   PMC* class = $1 = pmc_new(interpreter, enum_class_ParrotClass);
   Parrot_new_class(interpreter, class, $2);
   goto NEXT();
@@ -177,17 +177,17 @@ $1 is replaced--a new PMC for the subclass is generated and put in it.
 
 =cut
 
-inline op subclass(out PMC, in PMC, in STR) {
+inline op subclass(out PMC, in PMC, in STR) :object_base {
   $1 = Parrot_single_subclass(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op subclass(out PMC, in PMC) {
+inline op subclass(out PMC, in PMC) :object_classes {
   $1 = Parrot_single_subclass(interpreter, $2, NULL);
   goto NEXT();
 }
 
-op subclass(out PMC, in STR, in STR) {
+op subclass(out PMC, in STR, in STR) :object_classes {
   PMC *class = VTABLE_get_pmc_keyed_str(interpreter,
       interpreter->class_hash, $2);
   if (!class || !PObj_is_class_TEST(class)) {
@@ -197,7 +197,7 @@ op subclass(out PMC, in STR, in STR) {
   goto NEXT();
 }
 
-op subclass(out PMC, in STR) {
+op subclass(out PMC, in STR) :object_classes {
   PMC *class = VTABLE_get_pmc_keyed_str(interpreter,
       interpreter->class_hash, $2);
   if (!class || !PObj_is_class_TEST(class)) {
@@ -213,7 +213,7 @@ Returns 1 if the class exists, 0 if it does not.
 
 =cut
 
-inline op findclass(out INT, in STR) {
+inline op findclass(out INT, in STR) :object_base {
   $1 = VTABLE_exists_keyed_str(interpreter, interpreter->class_hash, $2);
   goto NEXT();
 }
@@ -228,7 +228,7 @@ character, so Perl's Foo::Bar would be Foo\0Bar.
 
 =cut
 
-inline op getclass(out PMC, in STR) {
+inline op getclass(out PMC, in STR) :object_classes {
   if (VTABLE_exists_keyed_str(interpreter, interpreter->class_hash, $2)) {
     $1 = VTABLE_get_pmc_keyed_str(interpreter, interpreter->class_hash,  $2);
   } else {
@@ -237,14 +237,14 @@ inline op getclass(out PMC, in STR) {
   goto NEXT();
 }
 
-=item B<singleton>(in PMC)
+=item B<singleton>(in PMC)  B<(unimplemented)>
 
 Take the object in $1 and put it into its own singleton class, which is
 an anonymous subclass of the object's current class.
 
 =cut
 
-inline op singleton(in PMC) {
+inline op singleton(in PMC) :object_classes {
   goto NEXT();
 }
 
@@ -254,7 +254,7 @@ Get the class PMC for the object in $2 and put it in $1.
 
 =cut
 
-inline op class(out PMC, in PMC) {
+inline op class(out PMC, in PMC) :object_classes {
     if (PObj_is_object_TEST($2))
 	$1 = get_attrib_num((Buffer *)PMC_data($2), POD_CLASS);
     else
@@ -268,7 +268,7 @@ Get the class name for the class in $2 and put it in $1.
 
 =cut
 
-inline op classname(out STR, in PMC) {
+inline op classname(out STR, in PMC) :object_base {
   PMC* classname_pmc;
 
   classname_pmc = get_attrib_num((Buffer *)PMC_data($2), PCD_CLASS_NAME);
@@ -292,7 +292,7 @@ Add class $2 to the list of parent classes for $1.
 
 =cut
 
-inline op addparent(in PMC, in PMC) {
+inline op addparent(in PMC, in PMC) :object_classes {
     Parrot_add_parent(interpreter, $1, $2);
     goto NEXT();
 }
@@ -303,7 +303,7 @@ Remove class $2 from class $1's list of parents.
 
 =cut
 
-inline op removeparent(in PMC, in PMC) {
+inline op removeparent(in PMC, in PMC) :object_classes {
     Parrot_remove_parent(interpreter, $2, $1);
     goto NEXT();
 }
@@ -314,14 +314,14 @@ Add the attribute named $2 to the class $1.
 
 =cut
 
-inline op addattribute(in PMC, in STR) {
+inline op addattribute(in PMC, in STR) :object_classes {
     Parrot_add_attribute(interpreter, $1, $2);
     goto NEXT();
 }
 
-=item B<removeattribute>(in PMC, in STR)
+=item B<removeattribute>(in PMC, in STR) B<(unimplemented)>
 
-=item B<removeattribute>(in PMC, in INT)
+=item B<removeattribute>(in PMC, in INT) B<(unimplemented)>
 
 Remove attribute $2 from class $1, specified either by name or offset.
 
@@ -333,7 +333,7 @@ Get attribute number $3 from object $2 and put the result in $1.
 
 =cut
 
-inline op getattribute(out PMC, in PMC, in INT) {
+inline op getattribute(out PMC, in PMC, in INT) :object_classes {
     $1 = Parrot_get_attrib_by_num(interpreter, $2, $3);
     goto NEXT();
 }
@@ -344,7 +344,7 @@ Set attribute $2 of object $1 to $3
 
 =cut
 
-inline op setattribute(in PMC, in INT, in PMC) {
+inline op setattribute(in PMC, in INT, in PMC) :object_classes {
     Parrot_set_attrib_by_num(interpreter, $1, $2, $3);
     goto NEXT();
 }
@@ -356,7 +356,7 @@ Throws an exception if $3 isn't in $2's hierarchy.
 
 =cut
 
-op classoffset(out INT, in PMC, in STR) {
+op classoffset(out INT, in PMC, in STR) :object_classes {
     INTVAL offset;
     offset = Parrot_class_offset(interpreter, $2, $3);
     if (offset < 0) {
@@ -367,20 +367,20 @@ op classoffset(out INT, in PMC, in STR) {
 }
 
 
-=item B<adddoes>(in PMC, in STR)
+=item B<adddoes>(in PMC, in STR) B<(unimplemented)>
 
 Add $2 to the list of interfaces that this class claims to implement.
 
-=item B<removedoes>(in PMC, in STR)
+=item B<removedoes>(in PMC, in STR) B<(unimplemented)>
 
 Remove $2 from the list of interfaces that this class claims to
 implement.
 
-
-=back
-
+=cut
 
 ###############################################################################
+
+=back
 
 =head1 COPYRIGHT
 

@@ -48,17 +48,17 @@ Set $1 to absolute value of $2.
 
 =cut
 
-inline op abs( inout INT) {
+inline op abs( inout INT) :base_core {
   $1 = abs( $1 );
   goto NEXT();
 }
 
-inline op abs(inout NUM) {
+inline op abs(inout NUM) :base_core {
   $1 = fabs( $1 );
   goto NEXT();
 }
 
-inline op abs(out INT, in INT) {
+inline op abs(out INT, in INT) :base_core {
   if ($2 < 0) {
     $1 = - (INTVAL)$2;
   }
@@ -68,7 +68,7 @@ inline op abs(out INT, in INT) {
   goto NEXT();
 }
 
-inline op abs(out INT, in NUM) {
+inline op abs(out INT, in NUM) :base_core {
   if ($2 < 0) {
     $1 = - (INTVAL)$2;
   }
@@ -78,7 +78,7 @@ inline op abs(out INT, in NUM) {
   goto NEXT();
 }
 
-inline op abs(out NUM, in INT) {
+inline op abs(out NUM, in INT) :base_core {
   if ($2 < 0) {
     $1 = - (FLOATVAL)$2;
   }
@@ -88,7 +88,7 @@ inline op abs(out NUM, in INT) {
   goto NEXT();
 }
 
-inline op abs(out NUM, in NUM) {
+inline op abs(out NUM, in NUM) :base_core {
   if ($2 < 0) {
     $1 = - (FLOATVAL)$2;
   }
@@ -130,62 +130,62 @@ Set $1 to the sum of $2 and $3.
 
 =cut
 
-inline op add(inout INT, in INT) {
+inline op add(inout INT, in INT) :base_core {
   $1 += $2;
   goto NEXT();
 }
 
-inline op add(inout NUM, in INT) {
+inline op add(inout NUM, in INT) :base_core {
   $1 += $2;
   goto NEXT();
 }
 
-inline op add(inout NUM, in NUM) {
+inline op add(inout NUM, in NUM) :base_core {
   $1 += $2;
   goto NEXT();
 }
 
-inline op add(in PMC, in INT) {
+inline op add(in PMC, in INT) :base_core {
   $1->vtable->add_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op add(in PMC, in NUM) {
+inline op add(in PMC, in NUM) :base_core {
   $1->vtable->add_float(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op add(in PMC, in PMC) {
+inline op add(in PMC, in PMC) :base_core {
   $1->vtable->add(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op add(out INT, in INT, in INT) {
+inline op add(out INT, in INT, in INT) :base_core {
   $1 = $2 + $3;
   goto NEXT();
 }
 
-inline op add(out NUM, in NUM, in INT) {
+inline op add(out NUM, in NUM, in INT) :base_core {
   $1 = $2 + $3;
   goto NEXT();
 }
 
-inline op add(out NUM, in NUM, in NUM) {
+inline op add(out NUM, in NUM, in NUM) :base_core {
   $1 = $2 + $3;
   goto NEXT();
 }
 
-inline op add(in PMC, in PMC, in INT) {
+inline op add(in PMC, in PMC, in INT) :base_core {
   $2->vtable->add_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op add(in PMC, in PMC, in NUM) {
+inline op add(in PMC, in PMC, in NUM) :base_core {
   $2->vtable->add_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op add (in PMC, in PMC, in PMC) {
+inline op add (in PMC, in PMC, in PMC) :base_core {
   $2->vtable->add(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -227,7 +227,7 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 
 =cut
 
-inline op cmod(out INT, in INT, in INT) {
+inline op cmod(out INT, in INT, in INT) :base_core {
   $1 = $2 % $3;
   goto NEXT();
 }
@@ -240,17 +240,17 @@ inline op cmod(out INT, in INT, in INT) {
 
 =cut
 
-inline op cmod(in PMC, in PMC, in PMC) {
+inline op cmod(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->cmodulus(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op cmod(in PMC, in PMC, in INT) {
+inline op cmod(in PMC, in PMC, in INT) :base_core {
   $2->vtable->cmodulus_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op cmod(in PMC, in PMC, in NUM) {
+inline op cmod(in PMC, in PMC, in NUM) :base_core {
   $2->vtable->cmodulus_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -286,7 +286,7 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 
 =cut
 
-inline op cmod(out NUM, in NUM, in NUM) {
+inline op cmod(out NUM, in NUM, in NUM) :base_core {
   $1 = fmod($2, $3);
   goto NEXT();
 }
@@ -303,17 +303,17 @@ Decrease $1 by one.
 
 =cut
 
-inline op dec(inout INT) {
+inline op dec(inout INT) :base_core {
   $1--;
   goto NEXT();
 }
 
-inline op dec(inout NUM) {
+inline op dec(inout NUM) :base_core {
   $1--;
   goto NEXT();
 }
 
-inline op dec(in PMC) {
+inline op dec(in PMC) :base_core {
   $1->vtable->decrement(interpreter, $1);
   goto NEXT();
 }
@@ -351,62 +351,62 @@ result is truncated (NOT rounded or floored).
 
 =cut
 
-inline op div(inout INT, in INT) {
+inline op div(inout INT, in INT) :base_core {
   $1 /= $2;
   goto NEXT();
 }
 
-inline op div(inout NUM, in INT) {
+inline op div(inout NUM, in INT) :base_core {
   $1 /= $2;
   goto NEXT();
 }
 
-inline op div(inout NUM, in NUM) {
+inline op div(inout NUM, in NUM) :base_core {
   $1 /= $2;
   goto NEXT();
 }
 
-inline op div (in PMC, in PMC) {
+inline op div (in PMC, in PMC) :base_core {
   $1->vtable->divide(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op div (in PMC, in INT) {
+inline op div (in PMC, in INT) :base_core {
   $1->vtable->divide_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op div (in PMC, in NUM) {
+inline op div (in PMC, in NUM) :base_core {
   $1->vtable->divide_float(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op div(out INT, in INT, in INT) {
+inline op div(out INT, in INT, in INT) :base_core {
   $1 = $2 / $3;
   goto NEXT();
 }
 
-inline op div(out NUM, in NUM, in INT) {
+inline op div(out NUM, in NUM, in INT) :base_core {
   $1 = $2 / $3;
   goto NEXT();
 }
 
-inline op div(out NUM, in NUM, in NUM) {
+inline op div(out NUM, in NUM, in NUM) :base_core {
   $1 = $2 / $3;
   goto NEXT();
 }
 
-inline op div (in PMC, in PMC, in INT) {
+inline op div (in PMC, in PMC, in INT) :base_core {
   $2->vtable->divide_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op div (in PMC, in PMC, in NUM) {
+inline op div (in PMC, in PMC, in NUM) :base_core {
   $2->vtable->divide_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op div (in PMC, in PMC, in PMC) {
+inline op div (in PMC, in PMC, in PMC) :base_core {
   $2->vtable->divide(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -425,17 +425,17 @@ Set $1 to the smallest integral value greater than or equal to $2.
 
 =cut
 
-inline op ceil(inout NUM) {
+inline op ceil(inout NUM) :base_core {
   $1 = ceil( $1 );
   goto NEXT();
 }
 
-inline op ceil(out INT, in NUM) {
+inline op ceil(out INT, in NUM) :base_core {
   $1 = (INTVAL)ceil($2);
   goto NEXT();
 }
 
-inline op ceil(out NUM, in NUM) {
+inline op ceil(out NUM, in NUM) :base_core {
   $1 = ceil($2);
   goto NEXT();
 }
@@ -454,17 +454,17 @@ Set $1 to the largest integral value less than or equal to $2.
 
 =cut
 
-inline op floor(inout NUM) {
+inline op floor(inout NUM) :base_core {
   $1 = floor( $1 );
   goto NEXT();
 }
 
-inline op floor(out INT, in NUM) {
+inline op floor(out INT, in NUM) :base_core {
   $1 = (INTVAL)floor($2);
   goto NEXT();
 }
 
-inline op floor(out NUM, in NUM) {
+inline op floor(out NUM, in NUM) :base_core {
   $1 = floor($2);
   goto NEXT();
 }
@@ -481,17 +481,17 @@ Increase $1 by one.
 
 =cut
 
-inline op inc(inout INT) {
+inline op inc(inout INT) :base_core {
   $1++;
   goto NEXT();
 }
 
-inline op inc(inout NUM) {
+inline op inc(inout NUM) :base_core {
   $1++;
   goto NEXT();
 }
 
-inline op inc(in PMC) {
+inline op inc(in PMC) :base_core {
   $1->vtable->increment(interpreter, $1);
   goto NEXT();
 }
@@ -533,27 +533,27 @@ Sets $1 to the modulus of $1 and $2.
 
 =cut
 
-op mod(out INT, in INT, in INT) {
+op mod(out INT, in INT, in INT) :base_core {
   $1 = intval_mod($2, $3);
   goto NEXT();
 }
 
-inline op mod (in PMC, in PMC, in PMC) {
+inline op mod (in PMC, in PMC, in PMC) :base_core {
   $2->vtable->modulus(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op mod (in PMC, in INT ) {
+inline op mod (in PMC, in INT ) :base_core {
   $1->vtable->modulus_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op mod(in PMC, in PMC, in INT) {
+inline op mod(in PMC, in PMC, in INT) :base_core {
   $2->vtable->modulus_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op mod(in PMC, in PMC, in NUM) {
+inline op mod(in PMC, in PMC, in NUM) :base_core {
   $2->vtable->modulus_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -577,7 +577,7 @@ References:
 
 =cut
 
-op mod(out NUM, in NUM, in NUM) {
+op mod(out NUM, in NUM, in NUM) :base_core {
   $1 = floatval_mod($2, $3);
   goto NEXT();
 }
@@ -615,62 +615,62 @@ Set $1 to the product of $2 and $3.
 
 =cut
 
-inline op mul(inout INT, in INT) {
+inline op mul(inout INT, in INT) :base_core {
   $1 *= $2;
   goto NEXT();
 }
 
-inline op mul(inout NUM, in INT) {
+inline op mul(inout NUM, in INT) :base_core {
   $1 *= $2;
   goto NEXT();
 }
 
-inline op mul(inout NUM, in NUM) {
+inline op mul(inout NUM, in NUM) :base_core {
   $1 *= $2;
   goto NEXT();
 }
 
-inline op mul ( in PMC, in INT ) {
+inline op mul ( in PMC, in INT ) :base_core {
   $1->vtable->multiply_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op mul ( in PMC, in NUM ) {
+inline op mul ( in PMC, in NUM ) :base_core {
   $1->vtable->multiply_float(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op mul (in PMC, in PMC) {
+inline op mul (in PMC, in PMC) :base_core {
   $1->vtable->multiply(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op mul(out INT, in INT, in INT) {
+inline op mul(out INT, in INT, in INT) :base_core {
   $1 = $2 * $3;
   goto NEXT();
 }
 
-inline op mul(out NUM, in NUM, in INT) {
+inline op mul(out NUM, in NUM, in INT) :base_core {
   $1 = $2 * $3;
   goto NEXT();
 }
 
-inline op mul(out NUM, in NUM, in NUM) {
+inline op mul(out NUM, in NUM, in NUM) :base_core {
   $1 = $2 * $3;
   goto NEXT();
 }
 
-inline op mul (in PMC, in PMC, in INT) {
+inline op mul (in PMC, in PMC, in INT) :base_core {
   $2->vtable->multiply_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op mul (in PMC, in PMC, in NUM) {
+inline op mul (in PMC, in PMC, in NUM) :base_core {
   $2->vtable->multiply_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op mul (in PMC, in PMC, in PMC) {
+inline op mul (in PMC, in PMC, in PMC) :base_core {
   $2->vtable->multiply(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -695,32 +695,32 @@ Set $1 to the negative of $2.
 
 =cut
 
-inline op neg(inout INT) {
+inline op neg(inout INT) :base_core {
   $1 = 0 - $1;
   goto NEXT();
 }
 
-inline op neg(inout NUM) {
+inline op neg(inout NUM) :base_core {
   $1 = 0.0 - $1;
   goto NEXT();
 }
 
-inline op neg(in PMC) {
+inline op neg(in PMC) :base_core {
   $1->vtable->neg(interpreter, $1, NULL);
   goto NEXT();
 }
 
-inline op neg(out INT, in INT) {
+inline op neg(out INT, in INT) :base_core {
   $1 = 0 - $2;
   goto NEXT();
 }
 
-inline op neg(out NUM, in NUM) {
+inline op neg(out NUM, in NUM) :base_core {
   $1 = 0.0 - $2;
   goto NEXT();
 }
 
-inline op neg(in PMC, in PMC) {
+inline op neg(in PMC, in PMC) :base_core {
   $2->vtable->neg(interpreter, $2, $1);
   goto NEXT();
 }
@@ -739,22 +739,22 @@ Set $1 to $2 raised to the power $3.
 
 =cut
 
-inline op pow(out NUM, in INT, in INT) {
+inline op pow(out NUM, in INT, in INT) :base_core {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
 
-inline op pow(out NUM, in INT, in NUM) {
+inline op pow(out NUM, in INT, in NUM) :base_core {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
 
-inline op pow(out NUM, in NUM, in INT) {
+inline op pow(out NUM, in NUM, in INT) :base_core {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
 
-inline op pow(out NUM, in NUM, in NUM) {
+inline op pow(out NUM, in NUM, in NUM) :base_core {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
@@ -791,62 +791,62 @@ Set $1 to $2 minus $3.
 
 =cut
 
-inline op sub(inout INT, in INT) {
+inline op sub(inout INT, in INT) :base_core {
   $1 -= $2;
   goto NEXT();
 }
 
-inline op sub(inout NUM, in INT) {
+inline op sub(inout NUM, in INT) :base_core {
   $1 -= $2;
   goto NEXT();
 }
 
-inline op sub(inout NUM, in NUM) {
+inline op sub(inout NUM, in NUM) :base_core {
   $1 -= $2;
   goto NEXT();
 }
 
-inline op sub(in PMC, in INT) {
+inline op sub(in PMC, in INT) :base_core {
   $1->vtable->subtract_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op sub(in PMC, in NUM) {
+inline op sub(in PMC, in NUM) :base_core {
   $1->vtable->subtract_float(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op sub(in PMC, in PMC) {
+inline op sub(in PMC, in PMC) :base_core {
   $1->vtable->subtract(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op sub(out INT, in INT, in INT) {
+inline op sub(out INT, in INT, in INT) :base_core {
   $1 = $2 - $3;
   goto NEXT();
 }
 
-inline op sub(out NUM, in NUM, in INT) {
+inline op sub(out NUM, in NUM, in INT) :base_core {
   $1 = $2 - $3;
   goto NEXT();
 }
 
-inline op sub(out NUM, in NUM, in NUM) {
+inline op sub(out NUM, in NUM, in NUM) :base_core {
   $1 = $2 - $3;
   goto NEXT();
 }
 
-inline op sub(in PMC, in PMC, in INT) {
+inline op sub(in PMC, in PMC, in INT) :base_core {
   $2->vtable->subtract_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op sub(in PMC, in PMC, in NUM) {
+inline op sub(in PMC, in PMC, in NUM) :base_core {
   $2->vtable->subtract_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op sub (in PMC, in PMC, in PMC) {
+inline op sub (in PMC, in PMC, in PMC) :base_core {
   $2->vtable->subtract(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -876,12 +876,12 @@ Set $1 to the arc cosine (in radians) of $2.
 
 =cut
 
-inline op acos(out NUM, in INT) {
+inline op acos(out NUM, in INT) :base_math {
   $1 = acos((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op acos(out NUM, in NUM) {
+inline op acos(out NUM, in NUM) :base_math {
   $1 = acos((FLOATVAL)$2);
   goto NEXT();
 }
@@ -896,12 +896,12 @@ Set $1 to the arc secant (in radians) of $2.
 
 =cut
 
-inline op asec(out NUM, in INT) {
+inline op asec(out NUM, in INT) :base_math {
   $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
   goto NEXT();
 }
 
-inline op asec(out NUM, in NUM) {
+inline op asec(out NUM, in NUM) :base_math {
   $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
   goto NEXT();
 }
@@ -916,12 +916,12 @@ Set $1 to the arc sine (in radians) of $2.
 
 =cut
 
-inline op asin(out NUM, in INT) {
+inline op asin(out NUM, in INT) :base_math {
   $1 = asin((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op asin(out NUM, in NUM) {
+inline op asin(out NUM, in NUM) :base_math {
   $1 = asin((FLOATVAL)$2);
   goto NEXT();
 }
@@ -948,32 +948,32 @@ quadrant of the result.
 
 =cut
 
-inline op atan(out NUM, in INT) {
+inline op atan(out NUM, in INT) :base_math {
   $1 = atan((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op atan(out NUM, in NUM) {
+inline op atan(out NUM, in NUM) :base_math {
   $1 = atan((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op atan(out NUM, in INT, in INT) {
+inline op atan(out NUM, in INT, in INT) :base_math {
   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
 
-inline op atan(out NUM, in INT, in NUM) {
+inline op atan(out NUM, in INT, in NUM) :base_math {
   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
 
-inline op atan(out NUM, in NUM, in INT) {
+inline op atan(out NUM, in NUM, in INT) :base_math {
   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
 
-inline op atan(out NUM, in NUM, in NUM) {
+inline op atan(out NUM, in NUM, in NUM) :base_math {
   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
@@ -988,12 +988,12 @@ Set $1 to the cosine of $2 (given in radians).
 
 =cut
 
-inline op cos(out NUM, in INT) {
+inline op cos(out NUM, in INT) :base_math {
   $1 = cos((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op cos(out NUM, in NUM) {
+inline op cos(out NUM, in NUM) :base_math {
   $1 = cos((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1008,12 +1008,12 @@ Set $1 to the hyperbolic cosine of $2 (given in radians).
 
 =cut
 
-inline op cosh(out NUM, in INT) {
+inline op cosh(out NUM, in INT) :base_math {
   $1 = cosh((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op cosh(out NUM, in NUM) {
+inline op cosh(out NUM, in NUM) :base_math {
   $1 = cosh((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1028,12 +1028,12 @@ Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm
 
 =cut
 
-inline op exp(out NUM, in INT) {
+inline op exp(out NUM, in INT) :base_math {
   $1 = exp((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op exp(out NUM, in NUM) {
+inline op exp(out NUM, in NUM) :base_math {
   $1 = exp((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1048,12 +1048,12 @@ Set $1 to the natural (base I<e>) logarithm of $2.
 
 =cut
 
-inline op ln(out NUM, in INT) {
+inline op ln(out NUM, in INT) :base_math {
   $1 = log((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op ln(out NUM, in NUM) {
+inline op ln(out NUM, in NUM) :base_math {
   $1 = log((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1068,12 +1068,12 @@ Set $1 to the base 10 logarithm of $2.
 
 =cut
 
-inline op log10(out NUM, in INT) {
+inline op log10(out NUM, in INT) :base_math {
   $1 = log10((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op log10(out NUM, in NUM) {
+inline op log10(out NUM, in NUM) :base_math {
   $1 = log10((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1088,13 +1088,13 @@ Set $1 to the base 2 logarithm of $2.
 
 =cut
 
-op log2(out NUM, in INT) {
+op log2(out NUM, in INT) :base_math {
    FLOATVAL temp = log((FLOATVAL)2.0);
   $1 = log((FLOATVAL)$2) / temp;
   goto NEXT();
 }
 
-op log2(out NUM, in NUM) {
+op log2(out NUM, in NUM) :base_math {
    FLOATVAL temp = log((FLOATVAL)2.0);
   $1 = log((FLOATVAL)$2) / temp;
   goto NEXT();
@@ -1110,12 +1110,12 @@ Set $1 to the secant of $2 (given in radians).
 
 =cut
 
-inline op sec(out NUM, in INT) {
+inline op sec(out NUM, in INT) :base_math {
   $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op sec(out NUM, in NUM) {
+inline op sec(out NUM, in NUM) :base_math {
   $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1130,12 +1130,12 @@ Set $1 to the hyperbolic secant of $2 (given in radians).
 
 =cut
 
-inline op sech(out NUM, in INT) {
+inline op sech(out NUM, in INT) :base_math {
   $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op sech(out NUM, in NUM) {
+inline op sech(out NUM, in NUM) :base_math {
   $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1150,12 +1150,12 @@ Set $1 to the sine of $2 (given in radians).
 
 =cut
 
-inline op sin(out NUM, in INT) {
+inline op sin(out NUM, in INT) :base_math {
   $1 = sin((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op sin(out NUM, in NUM) {
+inline op sin(out NUM, in NUM) :base_math {
   $1 = sin((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1170,12 +1170,12 @@ Set $1 to the hyperbolic sine of $2 (given in radians).
 
 =cut
 
-inline op sinh(out NUM, in INT) {
+inline op sinh(out NUM, in INT) :base_math {
   $1 = sinh((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op sinh(out NUM, in NUM) {
+inline op sinh(out NUM, in NUM) :base_math {
   $1 = sinh((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1190,12 +1190,12 @@ Set $1 to the tangent of $2 (given in radians).
 
 =cut
 
-inline op tan(out NUM, in INT) {
+inline op tan(out NUM, in INT) :base_math {
   $1 = tan((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op tan(out NUM, in NUM) {
+inline op tan(out NUM, in NUM) :base_math {
   $1 = tan((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1210,12 +1210,12 @@ Set $1 to the hyperbolic tangent of $2 (given in radians).
 
 =cut
 
-inline op tanh(out NUM, in INT) {
+inline op tanh(out NUM, in INT) :base_math {
   $1 = tanh((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op tanh(out NUM, in NUM) {
+inline op tanh(out NUM, in NUM) :base_math {
   $1 = tanh((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1244,7 +1244,7 @@ Greatest Common divisor of $2 and $3.
 
 =cut
 
-inline op gcd(out INT, in INT, in INT) {
+inline op gcd(out INT, in INT, in INT) :advanced_math {
 
   UINTVAL q = 0;
   UINTVAL c = 0;
@@ -1260,7 +1260,7 @@ inline op gcd(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op gcd(out INT, in NUM, in NUM){
+inline op gcd(out INT, in NUM, in NUM) :advanced_math {
 
   FLOATVAL q = 0;
   FLOATVAL c = 0;
@@ -1286,7 +1286,7 @@ Least Common Multiple of $2 and $3
 
 =cut
 
-inline op lcm(out INT, in INT, in INT) {
+inline op lcm(out INT, in INT, in INT) :advanced_math {
   UINTVAL q = 0;
   UINTVAL c = 0;
   INTVAL temp2 = $2;
@@ -1309,7 +1309,7 @@ inline op lcm(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op lcm(out NUM, in INT, in INT) {
+inline op lcm(out NUM, in INT, in INT) :advanced_math {
   UINTVAL q = 0;
   UINTVAL c = 0;
   INTVAL temp2 = $2;
@@ -1342,7 +1342,7 @@ Factorial, n!. Calculates the product of 1 to N.
 
 =cut
 
-inline op fact(out INT, in INT) {
+inline op fact(out INT, in INT) :advanced_math {
   /* Coercing a negative to a UINT can get pretty ugly
    * in this situation. */
   INTVAL i = $2;
@@ -1355,7 +1355,7 @@ inline op fact(out INT, in INT) {
   goto NEXT();
 }
 
-inline op fact(out NUM, in INT) {
+inline op fact(out NUM, in INT) :advanced_math {
   /* Coercing a negative to a UINT can get pretty ugly
    * in this situation. */
   INTVAL i = $2;
@@ -1376,7 +1376,7 @@ inline op fact(out NUM, in INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

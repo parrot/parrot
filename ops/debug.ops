@@ -38,7 +38,7 @@ Init the parrot debugger, must be called before any other debug op.
 
 =cut
 
-op debug_init() {
+op debug_init() :base_debug {
     PDB_t *pdb;
 
     if (!(interpreter->pdb)) {
@@ -60,7 +60,7 @@ Load a Parrot source file for the current program.
 
 =cut
 
-op debug_load(inconst STR) {
+op debug_load(inconst STR) :base_debug {
     const char *f;
 
     if (!(interpreter->pdb->state & PDB_BREAK)) {
@@ -87,7 +87,7 @@ debugger and then continue the normal execution of the program.
 
 =cut
 
-op debug_break() {
+op debug_break() :base_debug {
     const char *command;
 
     if (!(interpreter->pdb->state & PDB_BREAK)) {
@@ -117,7 +117,7 @@ Print all the parrot registers at once.
 
 =cut
 
-op debug_print() {
+op debug_print() :base_debug {
     if (!(interpreter->pdb->state & PDB_BREAK)) {
         PDB_print_int(interpreter, &interpreter->int_reg, -1);
         PDB_print_num(interpreter, &interpreter->num_reg, -1);

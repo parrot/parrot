@@ -31,27 +31,27 @@ their operands.
 
 ########################################
 
-=item B<eq>(in INT, in INT, inconst INT)
+=item B<eq>(in INT, in INT, labelconst INT)
 
-=item B<eq>(in NUM, in NUM, inconst INT)
+=item B<eq>(in NUM, in NUM, labelconst INT)
 
-=item B<eq>(in STR, in STR, inconst INT)
+=item B<eq>(in STR, in STR, labelconst INT)
 
-=item B<eq>(in PMC, in PMC, inconst INT)
+=item B<eq>(in PMC, in PMC, labelconst INT)
 
-=item B<eq>(in PMC, in INT, inconst INT)
+=item B<eq>(in PMC, in INT, labelconst INT)
 
-=item B<eq>(in PMC, in NUM, inconst INT)
+=item B<eq>(in PMC, in NUM, labelconst INT)
 
-=item B<eq>(in PMC, in STR, inconst INT)
+=item B<eq>(in PMC, in STR, labelconst INT)
 
-=item B<eq_str>(in PMC, in PMC, inconst INT)
+=item B<eq_str>(in PMC, in PMC, labelconst INT)
 
-=item B<eq_num>(in PMC, in PMC, inconst INT)
+=item B<eq_num>(in PMC, in PMC, labelconst INT)
 
-=item B<eq_addr>(in STR, in STR, inconst INT)
+=item B<eq_addr>(in STR, in STR, labelconst INT)
 
-=item B<eq_addr>(in PMC, in PMC, inconst INT)
+=item B<eq_addr>(in PMC, in PMC, labelconst INT)
 
 Branch if $1 is equal to $2. For PMCs this does a generic comparison,
 whatever that is for the involved PMCs. Mixed PMC number/string
@@ -63,49 +63,49 @@ B<eq_addr> compares the address of the objects or strings.
 
 =cut
 
-inline op eq(in INT, in INT, inconst INT) {
+inline op eq(in INT, in INT, labelconst INT) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op eq(in NUM, in NUM, inconst INT) {
+inline op eq(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq(in STR, in STR, inconst INT) {
+op eq(in STR, in STR, labelconst INT) :base_core {
   if (string_equal(interpreter, $1, $2) == 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq (in PMC, in PMC, inconst INT) {
+op eq (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->is_equal(interpreter, $1, $2)) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq (in PMC, in INT, inconst INT) {
+op eq (in PMC, in INT, labelconst INT) :base_core {
   if ($1->vtable->get_integer(interpreter, $1) == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq (in PMC, in NUM, inconst INT) {
+op eq (in PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq (in PMC, in STR, inconst INT) {
+op eq (in PMC, in STR, labelconst INT) :base_core {
   if (0 == string_equal(interpreter,
       $1->vtable->get_string(interpreter, $1), $2)) {
     goto OFFSET($3);
@@ -113,28 +113,28 @@ op eq (in PMC, in STR, inconst INT) {
   goto NEXT();
 }
 
-op eq_str (in PMC, in PMC, inconst INT) {
+op eq_str (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_string(interpreter, $1, $2) == 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq_num (in PMC, in PMC, inconst INT) {
+op eq_num (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_num(interpreter, $1, $2) == 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq_addr(in STR, in STR, inconst INT) {
+op eq_addr(in STR, in STR, labelconst INT) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq_addr(in PMC, in PMC, inconst INT) {
+op eq_addr(in PMC, in PMC, labelconst INT) :base_core {
   if ($1 == $2) {
     goto OFFSET($3);
   }
@@ -143,13 +143,13 @@ op eq_addr(in PMC, in PMC, inconst INT) {
 
 ########################################
 
-=item B<isnull>(in PMC, inconst INT)
+=item B<isnull>(in PMC, labelconst INT)
 
 Branch to $2 if $1 is a NULL PMC.
 
 =cut
 
-op isnull(in PMC, inconst INT) {
+op isnull(in PMC, labelconst INT) :base_core {
   if (PMC_IS_NULL($1)) {
     goto OFFSET($2);
   }
@@ -158,75 +158,75 @@ op isnull(in PMC, inconst INT) {
 
 ########################################
 
-=item B<ne>(in INT, in INT, inconst INT)
+=item B<ne>(in INT, in INT, labelconst INT)
 
-=item B<ne>(in NUM, in NUM, inconst INT)
+=item B<ne>(in NUM, in NUM, labelconst INT)
 
-=item B<ne>(in STR, in STR, inconst INT)
+=item B<ne>(in STR, in STR, labelconst INT)
 
-=item B<ne>(in PMC, in PMC, inconst INT)
+=item B<ne>(in PMC, in PMC, labelconst INT)
 
-=item B<ne>(in PMC, in INT, inconst INT)
+=item B<ne>(in PMC, in INT, labelconst INT)
 
-=item B<ne>(in PMC, in NUM, inconst INT)
+=item B<ne>(in PMC, in NUM, labelconst INT)
 
-=item B<ne>(in PMC, in STR, inconst INT)
+=item B<ne>(in PMC, in STR, labelconst INT)
 
-=item B<ne_str>(in PMC, in PMC, inconst INT)
+=item B<ne_str>(in PMC, in PMC, labelconst INT)
 
-=item B<ne_num>(in PMC, in PMC, inconst INT)
+=item B<ne_num>(in PMC, in PMC, labelconst INT)
 
-=item B<ne_addr>(in STR, in STR, inconst INT)
+=item B<ne_addr>(in STR, in STR, labelconst INT)
 
-=item B<ne_addr>(in PMC, in PMC, inconst INT)
+=item B<ne_addr>(in PMC, in PMC, labelconst INT)
 
 Branch if $1 is not equal to $2.
 
 =cut
 
-inline op ne(in INT, in INT, inconst INT) {
+inline op ne(in INT, in INT, labelconst INT) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op ne(in NUM, in NUM, inconst INT) {
+inline op ne(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne(in STR, in STR, inconst INT) {
+op ne(in STR, in STR, labelconst INT) :base_core {
   if (string_equal(interpreter, $1, $2) != 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne(in PMC, in PMC, inconst INT) {
+op ne(in PMC, in PMC, labelconst INT) :base_core {
   if (! $1->vtable->is_equal(interpreter, $1, $2)) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne (in PMC, in INT, inconst INT) {
+op ne (in PMC, in INT, labelconst INT) :base_core {
   if ($1->vtable->get_integer(interpreter, $1) != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne (in PMC, in NUM, inconst INT) {
+op ne (in PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne (in PMC, in STR, inconst INT) {
+op ne (in PMC, in STR, labelconst INT) :base_core {
   if (0 != string_equal(interpreter,
       $1->vtable->get_string(interpreter, $1), $2)) {
     goto OFFSET($3);
@@ -234,28 +234,28 @@ op ne (in PMC, in STR, inconst INT) {
   goto NEXT();
 }
 
-op ne_str (in PMC, in PMC, inconst INT) {
+op ne_str (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_string(interpreter, $1, $2) != 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne_num (in PMC, in PMC, inconst INT) {
+op ne_num (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_num(interpreter, $1, $2) != 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne_addr(in STR, in STR, inconst INT) {
+op ne_addr(in STR, in STR, labelconst INT) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne_addr(in PMC, in PMC, inconst INT) {
+op ne_addr(in PMC, in PMC, labelconst INT) :base_core {
   if ($1 != $2) {
     goto OFFSET($3);
   }
@@ -264,71 +264,71 @@ op ne_addr(in PMC, in PMC, inconst INT) {
 
 ########################################
 
-=item B<lt>(in INT, in INT, inconst INT)
+=item B<lt>(in INT, in INT, labelconst INT)
 
-=item B<lt>(in NUM, in NUM, inconst INT)
+=item B<lt>(in NUM, in NUM, labelconst INT)
 
 =item B<lt>(in STR, in STR, inconst INT)
 
-=item B<lt>(in PMC, in PMC, inconst INT)
+=item B<lt>(in PMC, in PMC, labelconst INT)
 
-=item B<lt>(in PMC, in INT, inconst INT)
+=item B<lt>(in PMC, in INT, labelconst INT)
 
-=item B<lt>(in PMC, in NUM, inconst INT)
+=item B<lt>(in PMC, in NUM, labelconst INT)
 
-=item B<lt>(in PMC, in STR, inconst INT)
+=item B<lt>(in PMC, in STR, labelconst INT)
 
-=item B<lt_str>(in PMC, in PMC, inconst INT)
+=item B<lt_str>(in PMC, in PMC, labelconst INT)
 
-=item B<lt_num>(in PMC, in PMC, inconst INT)
+=item B<lt_num>(in PMC, in PMC, labelconst INT)
 
 Branch if $1 is less than $2.
 
 =cut
 
-inline op lt(in INT, in INT, inconst INT) {
+inline op lt(in INT, in INT, labelconst INT) :base_core {
   if ($1 < $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op lt(in NUM, in NUM, inconst INT) {
+inline op lt(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 < $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt(in STR, in STR, inconst INT) {
+op lt(in STR, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter, $1, $2) < 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt (in PMC, in PMC, inconst INT) {
+op lt (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp(interpreter, $1, $2) < 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt (in PMC, in INT, inconst INT) {
+op lt (in PMC, in INT, labelconst INT) :base_core {
   if ($1->vtable->get_integer(interpreter, $1) < $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt (in PMC, in NUM, inconst INT) {
+op lt (in PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) < $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt (in PMC, in STR, inconst INT) {
+op lt (in PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter,
       $1->vtable->get_string(interpreter, $1), $2) < 0) {
     goto OFFSET($3);
@@ -336,14 +336,14 @@ op lt (in PMC, in STR, inconst INT) {
   goto NEXT();
 }
 
-op lt_str (in PMC, in PMC, inconst INT) {
+op lt_str (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_string(interpreter, $1, $2) < 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt_num (in PMC, in PMC, inconst INT) {
+op lt_num (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_num(interpreter, $1, $2) < 0) {
     goto OFFSET($3);
   }
@@ -352,71 +352,71 @@ op lt_num (in PMC, in PMC, inconst INT) {
 
 ########################################
 
-=item B<le>(in INT, in INT, inconst INT)
+=item B<le>(in INT, in INT, labelconst INT)
 
-=item B<le>(in NUM, in NUM, inconst INT)
+=item B<le>(in NUM, in NUM, labelconst INT)
 
-=item B<le>(in STR, in STR, inconst INT)
+=item B<le>(in STR, in STR, labelconst INT)
 
-=item B<le>(in PMC, in PMC, inconst INT)
+=item B<le>(in PMC, in PMC, labelconst INT)
 
-=item B<le>(in PMC, in INT, inconst INT)
+=item B<le>(in PMC, in INT, labelconst INT)
 
-=item B<le>(in PMC, in NUM, inconst INT)
+=item B<le>(in PMC, in NUM, labelconst INT)
 
-=item B<le>(in PMC, in STR, inconst INT)
+=item B<le>(in PMC, in STR, labelconst INT)
 
-=item B<le_str>(in PMC, in PMC, inconst INT)
+=item B<le_str>(in PMC, in PMC, labelconst INT)
 
-=item B<le_num>(in PMC, in PMC, inconst INT)
+=item B<le_num>(in PMC, in PMC, labelconst INT)
 
 Branch if $1 is less than or equal to $2.
 
 =cut
 
-inline op le(in INT, in INT, inconst INT) {
+inline op le(in INT, in INT, labelconst INT) :base_core {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op le(in NUM, in NUM, inconst INT) {
+inline op le(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le(in STR, in STR, inconst INT) {
+op le(in STR, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter, $1, $2) <= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le(in PMC, in PMC, inconst INT) {
+op le(in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp(interpreter, $1, $2) <= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le(in PMC, in INT, inconst INT) {
+op le(in PMC, in INT, labelconst INT) :base_core {
   if ($1->vtable->get_integer(interpreter, $1) <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le (in PMC, in NUM, inconst INT) {
+op le (in PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le (in PMC, in STR, inconst INT) {
+op le (in PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter,
       $1->vtable->get_string(interpreter, $1), $2) <= 0) {
     goto OFFSET($3);
@@ -424,14 +424,14 @@ op le (in PMC, in STR, inconst INT) {
   goto NEXT();
 }
 
-op le_str (in PMC, in PMC, inconst INT) {
+op le_str (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_string(interpreter, $1, $2) <= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le_num (in PMC, in PMC, inconst INT) {
+op le_num (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_num(interpreter, $1, $2) <= 0) {
     goto OFFSET($3);
   }
@@ -440,71 +440,71 @@ op le_num (in PMC, in PMC, inconst INT) {
 
 ########################################
 
-=item B<gt>(in INT, in INT, inconst INT)
+=item B<gt>(in INT, in INT, labelconst INT)
 
-=item B<gt>(in NUM, in NUM, inconst INT)
+=item B<gt>(in NUM, in NUM, labelconst INT)
 
-=item B<gt>(in STR, in STR, inconst INT)
+=item B<gt>(in STR, in STR, labelconst INT)
 
-=item B<gt>(in PMC, in PMC, inconst INT)
+=item B<gt>(in PMC, in PMC, labelconst INT)
 
-=item B<gt>(in PMC, in INT, inconst INT)
+=item B<gt>(in PMC, in INT, labelconst INT)
 
-=item B<gt>(in PMC, in NUM, inconst INT)
+=item B<gt>(in PMC, in NUM, labelconst INT)
 
-=item B<gt>(in PMC, in STR, inconst INT)
+=item B<gt>(in PMC, in STR, labelconst INT)
 
-=item B<gt_str>(in PMC, in PMC, inconst INT)
+=item B<gt_str>(in PMC, in PMC, labelconst INT)
 
-=item B<gt_num>(in PMC, in PMC, inconst INT)
+=item B<gt_num>(in PMC, in PMC, labelconst INT)
 
 Branch if $1 is greater than $2.
 
 =cut
 
-inline op gt(in INT, in INT, inconst INT) {
+inline op gt(in INT, in INT, labelconst INT) :base_core {
   if ($1 > $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op gt(in NUM, in NUM, inconst INT) {
+inline op gt(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 > $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt(in STR, in STR, inconst INT) {
+op gt(in STR, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter, $1, $2) > 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt(in PMC, in PMC, inconst INT) {
+op gt(in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp(interpreter, $1, $2) > 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt(in PMC, in INT, inconst INT) {
+op gt(in PMC, in INT, labelconst INT) :base_core {
   if ($1->vtable->get_integer(interpreter, $1) > $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt (in PMC, in NUM, inconst INT) {
+op gt (in PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) > $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt (in PMC, in STR, inconst INT) {
+op gt (in PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter,
       $1->vtable->get_string(interpreter, $1), $2) > 0) {
     goto OFFSET($3);
@@ -512,14 +512,14 @@ op gt (in PMC, in STR, inconst INT) {
   goto NEXT();
 }
 
-op gt_str (in PMC, in PMC, inconst INT) {
+op gt_str (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_string(interpreter, $1, $2) > 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt_num (in PMC, in PMC, inconst INT) {
+op gt_num (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_num(interpreter, $1, $2) > 0) {
     goto OFFSET($3);
   }
@@ -528,71 +528,71 @@ op gt_num (in PMC, in PMC, inconst INT) {
 
 ########################################
 
-=item B<ge>(in INT, in INT, inconst INT)
+=item B<ge>(in INT, in INT, labelconst INT)
 
-=item B<ge>(in NUM, in NUM, inconst INT)
+=item B<ge>(in NUM, in NUM, labelconst INT)
 
-=item B<ge>(in STR, in STR, inconst INT)
+=item B<ge>(in STR, in STR, labelconst INT)
 
-=item B<ge>(in PMC, in PMC, inconst INT)
+=item B<ge>(in PMC, in PMC, labelconst INT)
 
-=item B<ge>(in PMC, in INT, inconst INT)
+=item B<ge>(in PMC, in INT, labelconst INT)
 
-=item B<ge>(in PMC, in NUM, inconst INT)
+=item B<ge>(in PMC, in NUM, labelconst INT)
 
-=item B<ge>(in PMC, in STR, inconst INT)
+=item B<ge>(in PMC, in STR, labelconst INT)
 
-=item B<ge_str>(in PMC, in PMC, inconst INT)
+=item B<ge_str>(in PMC, in PMC, labelconst INT)
 
-=item B<ge_num>(in PMC, in PMC, inconst INT)
+=item B<ge_num>(in PMC, in PMC, labelconst INT)
 
 Branch if $1 is greater than or equal to $2.
 
 =cut
 
-inline op ge(in INT, in INT, inconst INT) {
+inline op ge(in INT, in INT, labelconst INT) :base_core {
   if ($1 >= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op ge(in NUM, in NUM, inconst INT) {
+inline op ge(in NUM, in NUM, labelconst INT) :base_core {
   if ($1 >= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge(in STR, in STR, inconst INT) {
+op ge(in STR, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter, $1, $2) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge(in PMC, in PMC, inconst INT) {
+op ge(in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp(interpreter, $1, $2) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge(in PMC, in INT, inconst INT) {
+op ge(in PMC, in INT, labelconst INT) :base_core {
   if ($1->vtable->get_integer(interpreter, $1) >= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge (in PMC, in NUM, inconst INT) {
+op ge (in PMC, in NUM, labelconst INT) :base_core {
   if ($1->vtable->get_number(interpreter, $1) >= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge (in PMC, in STR, inconst INT) {
+op ge (in PMC, in STR, labelconst INT) :base_core {
   if (string_compare(interpreter,
       $1->vtable->get_string(interpreter, $1), $2) >= 0) {
     goto OFFSET($3);
@@ -600,14 +600,14 @@ op ge (in PMC, in STR, inconst INT) {
   goto NEXT();
 }
 
-op ge_str (in PMC, in PMC, inconst INT) {
+op ge_str (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_string(interpreter, $1, $2) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge_num (in PMC, in PMC, inconst INT) {
+op ge_num (in PMC, in PMC, labelconst INT) :base_core {
   if ($1->vtable->cmp_num(interpreter, $1, $2) >= 0) {
     goto OFFSET($3);
   }
@@ -654,31 +654,31 @@ Sets $1 to -1 if $2 < $3, +1 if $2 > $3, and 0 otherwise.
 
 =cut
 
-inline op cmp(out INT, in INT, in INT) {
+inline op cmp(out INT, in INT, in INT) :base_core {
   $1 = $2 < $3 ? -1 :
        $2 > $3 ? +1 :
        0;
   goto NEXT();
 }
 
-inline op cmp(out INT, in NUM, in NUM) {
+inline op cmp(out INT, in NUM, in NUM) :base_core {
   $1 = $2 < $3 ? -1 :
        $2 > $3 ? +1 :
        0;
   goto NEXT();
 }
 
-inline op cmp(out INT, in STR, in STR) {
+inline op cmp(out INT, in STR, in STR) :base_core {
   $1 = string_compare(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op cmp(out INT, in PMC, in PMC) {
+inline op cmp(out INT, in PMC, in PMC) :base_core {
   $1 = VTABLE_cmp(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op cmp(out INT, in PMC, in INT) {
+inline op cmp(out INT, in PMC, in INT) :base_core {
   INTVAL l = VTABLE_get_integer(interpreter, $2);
   $1 = l < $3 ? -1 :
        l > $3 ? +1 :
@@ -686,7 +686,7 @@ inline op cmp(out INT, in PMC, in INT) {
   goto NEXT();
 }
 
-inline op cmp(out INT, in PMC, in NUM) {
+inline op cmp(out INT, in PMC, in NUM) :base_core {
   FLOATVAL l = VTABLE_get_number(interpreter, $2);
   $1 = l < $3 ? -1 :
        l > $3 ? +1 :
@@ -694,18 +694,18 @@ inline op cmp(out INT, in PMC, in NUM) {
   goto NEXT();
 }
 
-inline op cmp(out INT, in PMC, in STR) {
+inline op cmp(out INT, in PMC, in STR) :base_core {
   STRING* l = VTABLE_get_string(interpreter, $2);
   $1 = string_compare(interpreter, l, $3);
   goto NEXT();
 }
 
-inline op cmp_str(out INT, in PMC, in PMC) {
+inline op cmp_str(out INT, in PMC, in PMC) :base_core {
   $1 = VTABLE_cmp_string(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op cmp_num(out INT, in PMC, in PMC) {
+inline op cmp_num(out INT, in PMC, in PMC) :base_core {
   $1 = VTABLE_cmp_num(interpreter, $2, $3);
   goto NEXT();
 }
@@ -734,12 +734,12 @@ Short-circuiting logical and.  Returns $2 if it's false, else returns $3.
 
 =cut
 
-inline op and(out INT, in INT, in INT) {
+inline op and(out INT, in INT, in INT) :base_core {
   $1 = $2 ? $3 : $2;
   goto NEXT();
 }
 
-inline op and(in PMC, in PMC, in PMC) {
+inline op and(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->logical_and(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -754,12 +754,12 @@ Set the boolean state of $1 to the opposite of the boolean state from $2.
 
 =cut
 
-inline op not(out INT, in INT) {
+inline op not(out INT, in INT) :base_core {
   $1 = ! $2;
   goto NEXT();
 }
 
-inline op not(in PMC, in PMC) {
+inline op not(in PMC, in PMC) :base_core {
   $2->vtable->logical_not(interpreter, $2, $1);
   goto NEXT();
 }
@@ -774,12 +774,12 @@ Short-circuiting logical or.  Returns $2 if it's true, else returns $3.
 
 =cut
 
-inline op or(out INT, in INT, in INT) {
+inline op or(out INT, in INT, in INT) :base_core {
   $1 = $2 ? $2 : $3;
   goto NEXT();
 }
 
-inline op or(in PMC, in PMC, in PMC) {
+inline op or(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->logical_or(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -795,12 +795,12 @@ returns $3 if it's true and $2 isn't, else returns false.
 
 =cut
 
-inline op xor(out INT, in INT, in INT) {
+inline op xor(out INT, in INT, in INT) :base_core {
   $1 = ($2 && ! $3) ? $2 : ($3 && ! $2) ? $3 : 0;
   goto NEXT();
 }
 
-inline op xor(in PMC, in PMC, in PMC) {
+inline op xor(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->logical_xor(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -813,7 +813,7 @@ inline op xor(in PMC, in PMC, in PMC) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

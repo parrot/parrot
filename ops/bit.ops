@@ -39,32 +39,32 @@ Set the bits of $1 according to the B<and> of the corresponding bits from $2 and
 
 =cut
 
-inline op band(inout INT, in INT) {
+inline op band(inout INT, in INT) :base_core {
   $1 &= $2;
   goto NEXT();
 }
 
-inline op band(in PMC, in INT) {
+inline op band(in PMC, in INT) :base_core {
   $1->vtable->bitwise_and_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op band(in PMC, in PMC) {
+inline op band(in PMC, in PMC) :base_core {
   $1->vtable->bitwise_and(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op band(out INT, in INT, in INT) {
+inline op band(out INT, in INT, in INT) :base_core {
   $1 = $2 & $3;
   goto NEXT();
 }
 
-inline op band(in PMC, in PMC, in INT) {
+inline op band(in PMC, in PMC, in INT) :base_core {
   $2->vtable->bitwise_and_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op band(in PMC, in PMC, in PMC) {
+inline op band(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->bitwise_and(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -87,32 +87,32 @@ Set the bits of $1 according to the B<and> of the corresponding bits from $2 and
 
 =cut
 
-inline op bands(inout STR, in STR) {
+inline op bands(inout STR, in STR) :base_core {
   string_bitwise_and(interpreter, $1, $2, &$1);
   goto NEXT();
 }
 
-inline op bands(in PMC, in STR) {
+inline op bands(in PMC, in STR) :base_core {
   $1->vtable->bitwise_ands_str(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bands(in PMC, in PMC) {
+inline op bands(in PMC, in PMC) :base_core {
   $1->vtable->bitwise_ands(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bands(out STR, in STR, in STR) {
+inline op bands(out STR, in STR, in STR) :base_core {
   $1 = string_bitwise_and(interpreter, $2, $3, NULL);
   goto NEXT();
 }
 
-inline op bands(in PMC, in PMC, in STR) {
+inline op bands(in PMC, in PMC, in STR) :base_core {
   $2->vtable->bitwise_ands_str(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op bands(in PMC, in PMC, in PMC) {
+inline op bands(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->bitwise_ands(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -127,12 +127,12 @@ Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
 =cut
 
-inline op bnot(out INT, in INT) {
+inline op bnot(out INT, in INT) :base_core {
   $1 = ~ $2;
   goto NEXT();
 }
 
-inline op bnot(in PMC, in PMC) {
+inline op bnot(in PMC, in PMC) :base_core {
   $2->vtable->bitwise_not(interpreter, $2, $1);
   goto NEXT();
 }
@@ -157,32 +157,32 @@ Set the bits of $1 according to the B<or> of the corresponding bits from $2 and 
 
 =cut
 
-inline op bor(inout INT, in INT) {
+inline op bor(inout INT, in INT) :base_core {
   $1 |= $2;
   goto NEXT();
 }
 
-inline op bor(in PMC, in INT) {
+inline op bor(in PMC, in INT) :base_core {
   $1->vtable->bitwise_or_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bor(in PMC, in PMC) {
+inline op bor(in PMC, in PMC) :base_core {
   $1->vtable->bitwise_or(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bor(out INT, in INT, in INT) {
+inline op bor(out INT, in INT, in INT) :base_core {
   $1 = $2 | $3;
   goto NEXT();
 }
 
-inline op bor(in PMC, in PMC, in INT) {
+inline op bor(in PMC, in PMC, in INT) :base_core {
   $2->vtable->bitwise_or_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op bor(in PMC, in PMC, in PMC) {
+inline op bor(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->bitwise_or(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -205,32 +205,32 @@ Set the bits of $1 according to the B<or> of the corresponding bits from $2 and 
 
 =cut
 
-inline op bors(inout STR, in STR) {
+inline op bors(inout STR, in STR) :base_core {
   string_bitwise_or(interpreter, $1, $2, &$1);
   goto NEXT();
 }
 
-inline op bors(in PMC, in STR) {
+inline op bors(in PMC, in STR) :base_core {
   $1->vtable->bitwise_ors_str(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bors(in PMC, in PMC) {
+inline op bors(in PMC, in PMC) :base_core {
   $1->vtable->bitwise_ors(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bors(out STR, in STR, in STR) {
+inline op bors(out STR, in STR, in STR) :base_core {
   $1 = string_bitwise_or(interpreter, $2, $3, NULL);
   goto NEXT();
 }
 
-inline op bors(in PMC, in PMC, in STR) {
+inline op bors(in PMC, in PMC, in STR) :base_core {
   $2->vtable->bitwise_ors_str(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op bors(in PMC, in PMC, in PMC) {
+inline op bors(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->bitwise_ors(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -254,32 +254,32 @@ Set $1 to the value of $2 shifted left by $3 bits.
 
 =cut
 
-inline op shl(inout INT, in INT) {
+inline op shl(inout INT, in INT) :base_core {
   $1 <<= $2;
   goto NEXT();
 }
 
-inline op shl(in PMC, in PMC) {
+inline op shl(in PMC, in PMC) :base_core {
   $1->vtable->bitwise_shl(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op shl(in PMC, in INT) {
+inline op shl(in PMC, in INT) :base_core {
   $1->vtable->bitwise_shl_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op shl(out INT, in INT, in INT) {
+inline op shl(out INT, in INT, in INT) :base_core {
   $1 = $2 << $3;
   goto NEXT();
 }
 
-inline op shl(in PMC, in PMC, in PMC) {
+inline op shl(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->bitwise_shl(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op shl(in PMC, in PMC, in INT) {
+inline op shl(in PMC, in PMC, in INT) :base_core {
   $2->vtable->bitwise_shl_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -304,32 +304,32 @@ Set $1 to the value of $2 shifted right by $3 bits.
 
 =cut
 
-inline op shr(inout INT, in INT) {
+inline op shr(inout INT, in INT) :base_core {
   $1 >>= $2;
   goto NEXT();
 }
 
-inline op shr(in PMC, in PMC) {
+inline op shr(in PMC, in PMC) :base_core {
   $1->vtable->bitwise_shr(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op shr(in PMC, in INT) {
+inline op shr(in PMC, in INT) :base_core {
   $1->vtable->bitwise_shr_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op shr(out INT, in INT, in INT) {
+inline op shr(out INT, in INT, in INT) :base_core {
   $1 = $2 >> $3;
   goto NEXT();
 }
 
-inline op shr(in PMC, in PMC, in PMC) {
+inline op shr(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->bitwise_shr(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op shr(in PMC, in PMC, in INT) {
+inline op shr(in PMC, in PMC, in INT) :base_core {
   $2->vtable->bitwise_shr_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -345,12 +345,12 @@ Set $1 to the value of $2 logically shifted right by $3 bits.
 
 =cut
 
-inline op lsr(out INT, in INT) {
+inline op lsr(out INT, in INT) :base_core {
   LVALUE_CAST(UINTVAL, $1) >>= $2;
   goto NEXT();
 }
 
-inline op lsr(out INT, in INT, in INT) {
+inline op lsr(out INT, in INT, in INT) :base_core {
   $1 = (INTVAL)((UINTVAL)$2 >> $3);
   goto NEXT();
 }
@@ -375,32 +375,32 @@ Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and
 
 =cut
 
-inline op bxor(inout INT, in INT) {
+inline op bxor(inout INT, in INT) :base_core {
   $1 ^= $2;
   goto NEXT();
 }
 
-inline op bxor(in PMC, in INT) {
+inline op bxor(in PMC, in INT) :base_core {
   $1->vtable->bitwise_xor_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bxor(in PMC, in PMC) {
+inline op bxor(in PMC, in PMC) :base_core {
   $1->vtable->bitwise_xor(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bxor(out INT, in INT, in INT) {
+inline op bxor(out INT, in INT, in INT) :base_core {
   $1 = $2 ^ $3;
   goto NEXT();
 }
 
-inline op bxor(in PMC, in PMC, in INT) {
+inline op bxor(in PMC, in PMC, in INT) :base_core {
   $2->vtable->bitwise_xor_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op bxor(in PMC, in PMC, in PMC) {
+inline op bxor(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->bitwise_xor(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -423,32 +423,32 @@ Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and
 
 =cut
 
-inline op bxors(inout STR, in STR) {
+inline op bxors(inout STR, in STR) :base_core {
   string_bitwise_xor(interpreter, $1, $2, &$1);
   goto NEXT();
 }
 
-inline op bxors(in PMC, in STR) {
+inline op bxors(in PMC, in STR) :base_core {
   $1->vtable->bitwise_xors_str(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bxors(in PMC, in PMC) {
+inline op bxors(in PMC, in PMC) :base_core {
   $1->vtable->bitwise_xors(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bxors(out STR, in STR, in STR) {
+inline op bxors(out STR, in STR, in STR) :base_core {
   $1 = string_bitwise_xor(interpreter, $2, $3, NULL);
   goto NEXT();
 }
 
-inline op bxors(in PMC, in PMC, in STR) {
+inline op bxors(in PMC, in PMC, in STR) :base_core {
   $2->vtable->bitwise_xors_str(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op bxors(in PMC, in PMC, in PMC) {
+inline op bxors(in PMC, in PMC, in PMC) :base_core {
   $2->vtable->bitwise_xors(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -461,7 +461,7 @@ inline op bxors(in PMC, in PMC, in PMC) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

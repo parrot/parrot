@@ -35,7 +35,7 @@ Close IO object $1
 
 =cut
 
-inline op close(in PMC) {
+inline op close(in PMC) :base_io {
   PIO_close(interpreter, $1);
   goto NEXT();
 }
@@ -51,7 +51,7 @@ XXX: integral file descriptors may not exist outside of the UNIX
 
 =cut
 
-inline op fdopen(out PMC, in INT, in STR) {
+inline op fdopen(out PMC, in INT, in STR) :filesys_open {
   /* These char * need to go away soon */
   const char * mode;
   mode = string_to_cstring(interpreter, $3);
@@ -77,7 +77,7 @@ XXX: integral file descriptors may not exist outside of the UNIX
 
 =cut
 
-inline op getfd(out INT, in PMC) {
+inline op getfd(out INT, in PMC) :advanced_io {
   $1 = (INTVAL)PIO_getfd(interpreter, $2);
   goto NEXT();
 }
@@ -99,17 +99,17 @@ store it in $1
 
 =cut
 
-inline op getstdin(out PMC) {
+inline op getstdin(out PMC) :base_io {
   $1 = PIO_STDIN(interpreter);
   goto NEXT();
 }
 
-inline op getstdout(out PMC) {
+inline op getstdout(out PMC) :base_io {
   $1 = PIO_STDOUT(interpreter);
   goto NEXT();
 }
 
-inline op getstderr(out PMC) {
+inline op getstderr(out PMC) :base_io {
   $1 = PIO_STDERR(interpreter);
   goto NEXT();
 }
@@ -124,7 +124,7 @@ Examples: setting the record seperator or setting the buffering
 
 =cut
 
-inline op pioctl(out INT, in PMC, in INT, in INT) {
+inline op pioctl(out INT, in PMC, in INT, in INT) :advanced_io {
   $1 = PIO_pioctl(interpreter, $2, $3, $4);
   goto NEXT();
 }
@@ -144,7 +144,7 @@ read/write mode and create an IO object in $1.
 
 =cut
 
-inline op open(out PMC, in STR, in STR) {
+inline op open(out PMC, in STR, in STR) :filesys_open {
   /* These char * need to go away soon */
   const char * path, * mode;
 
@@ -160,7 +160,7 @@ inline op open(out PMC, in STR, in STR) {
   goto NEXT();
 }
 
-inline op open(out PMC, in STR) {
+inline op open(out PMC, in STR) :filesys_open {
   /* These char * need to go away soon */
   const char * path;
 
@@ -188,17 +188,17 @@ Print $1 to standard output.
 
 =cut
 
-inline op print(in INT) {
+inline op print(in INT) :base_io {
   PIO_printf(interpreter, INTVAL_FMT, (INTVAL)$1);
   goto NEXT();
 }
 
-inline op print(in NUM) {
+inline op print(in NUM) :base_io {
   PIO_printf(interpreter, "%f", (double)$1);
   goto NEXT();
 }
 
-op print(in STR) {
+op print(in STR) :base_io {
   STRING *s = $1;
   if (s && string_length(s)) {
     PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
@@ -206,7 +206,7 @@ op print(in STR) {
   goto NEXT();
 }
 
-op print(in PMC) {
+op print(in PMC) :base_io {
   PMC *p = $1;
   STRING *s = (VTABLE_get_string(interpreter, p));
   if (s) {
@@ -215,7 +215,7 @@ op print(in PMC) {
   goto NEXT();
 }
 
-op write(in PMC) {
+op write(in PMC) :base_io {
   PMC *p = $1;
   STRING *s = (VTABLE_get_string(interpreter, p));
   if (s) {
@@ -237,17 +237,17 @@ Print $1 to standard error.
 
 =cut
 
-op printerr(in INT) {
+op printerr(in INT) :base_io {
   PIO_eprintf(interpreter, INTVAL_FMT, $1);
   goto NEXT();
 }
 
-op printerr(in NUM) {
+op printerr(in NUM) :base_io {
   PIO_eprintf(interpreter, "%f", (double)$1);
   goto NEXT();
 }
 
-op printerr(in STR) {
+op printerr(in STR) :base_io {
   STRING *s = $1;
   if (s && string_length(s)) {
     PIO_putps(interpreter, PIO_STDERR(interpreter), s);
@@ -255,7 +255,7 @@ op printerr(in STR) {
   goto NEXT();
 }
 
-op printerr(in PMC) {
+op printerr(in PMC) :base_io {
   PMC *p = $1;
   STRING *s = (VTABLE_get_string(interpreter, p));
   if (s) {
@@ -278,7 +278,7 @@ Print $2 on the IO stream object $1.
 
 =cut
 
-op print(in PMC, in INT) {
+op print(in PMC, in INT) :base_io {
   if ($1) {
     STRING *s = Parrot_sprintf_c(interpreter, INTVAL_FMT, $2);
     PIO_putps(interpreter, $1, s);
@@ -289,7 +289,7 @@ op print(in PMC, in INT) {
   goto NEXT();
 }
 
-op print(in PMC, in NUM) {
+op print(in PMC, in NUM) :base_io {
   if ($1) {
     STRING *s = Parrot_sprintf_c(interpreter, "%f", (double)$2);
     PIO_putps(interpreter, $1, s);
@@ -300,7 +300,7 @@ op print(in PMC, in NUM) {
   goto NEXT();
 }
 
-op print(in PMC, in STR) {
+op print(in PMC, in STR) :base_io {
   if ($2 && $1) {
     PIO_putps(interpreter, $1, $2);
   }
@@ -310,7 +310,7 @@ op print(in PMC, in STR) {
   goto NEXT();
 }
 
-op print(in PMC, in PMC) {
+op print(in PMC, in PMC) :base_io {
   if ($2 && $1) {
     STRING *s = VTABLE_get_string(interpreter, $2);
     PIO_putps(interpreter, $1, s);
@@ -339,7 +339,7 @@ Warning: This is a quick hack.
 
 =cut
 
-op read(out STR, in INT) {
+op read(out STR, in INT) :base_io {
   UINTVAL n;
   INTVAL nr;
   if($2 >= 65535)
@@ -357,7 +357,7 @@ op read(out STR, in INT) {
   goto NEXT();
 }
 
-op read(out STR, in PMC, in INT) {
+op read(out STR, in PMC, in INT) :base_io {
   UINTVAL n;
   INTVAL nr;
   if($3 >= 65535)
@@ -383,7 +383,7 @@ If for some reason the line's longer than 64K you get only 64K
 
 =cut
 
-inline op readline(out STR, in PMC) {
+inline op readline(out STR, in PMC) :base_io {
   size_t len = 0;
   opcode_t * resume = expr NEXT();
   /* experimental error handling, mainly for t/pmc/io_5.pasm */
@@ -416,7 +416,7 @@ remove it from the stream.
 
 =cut
 
-op peek(out STR) {
+op peek(out STR) :base_io {
   INTVAL nr;
 
   $1 = string_make(interpreter, NULL, 1, NULL, 0, NULL);
@@ -430,7 +430,7 @@ op peek(out STR) {
   goto NEXT();
 }
 
-op peek(out STR, in PMC) {
+op peek(out STR, in PMC) :base_io {
   INTVAL nr;
 
   $1 = string_make(interpreter, NULL, 1, NULL, 0, NULL);
@@ -460,7 +460,7 @@ INTVALS.
 
 =cut
 
-op seek(in PMC, in INT, in INT) {
+op seek(in PMC, in INT, in INT) :base_io {
   if ($1) {
     if (PIO_seek(interpreter, $1, PIO_make_offset($2), $3) < 0) {
       /* XXX: seek error */
@@ -469,7 +469,7 @@ op seek(in PMC, in INT, in INT) {
   goto NEXT();
 }
 
-op seek(in PMC, in INT, in INT, in INT) {
+op seek(in PMC, in INT, in INT, in INT) :base_io {
   if ($1) {
     if (PIO_seek(interpreter, $1, PIO_make_offset32($2, $3), $4) < 0) {
       /* XXX: seek error */
@@ -493,14 +493,14 @@ Get the current file positon of stream $3 in two parts of 32-bit each
 
 =cut
 
-op tell(out INT, in PMC) {
+op tell(out INT, in PMC) :base_io {
   if ($2) {
     $1 = (INTVAL)PIO_tell(interpreter, $2);
   }
   goto NEXT();
 }
 
-op tell(out INT, out INT, in PMC) {
+op tell(out INT, out INT, in PMC) :base_io {
   if ($3) {
     PIOOFF_T pos;
     pos = PIO_tell(interpreter, $3);
@@ -526,7 +526,7 @@ op tell(out INT, out INT, in PMC) {
 
 =cut
 
-op socket(out PMC, in INT, in INT, in INT) {
+op socket(out PMC, in INT, in INT, in INT) :base_network {
   $1 = PIO_socket(interpreter, $2, $3, $4);
   if(!$1) {
     $1 = pmc_new(interpreter, enum_class_PerlUndef);
@@ -534,27 +534,27 @@ op socket(out PMC, in INT, in INT, in INT) {
   goto NEXT();
 }
 
-op sockaddr(out STR, in INT, in STR) {
+op sockaddr(out STR, in INT, in STR) :base_network {
     $1 = PIO_sockaddr_in(interpreter, (unsigned short)$2, $3);
     goto NEXT();
 }
 
-op connect(out INT, in PMC, in STR) {
+op connect(out INT, in PMC, in STR) :base_network {
     $1 = (INTVAL)PIO_connect(interpreter, $2, $3);
     goto NEXT();
 }
 
-op recv(out INT, in PMC, in STR) {
+op recv(out INT, in PMC, in STR) :base_network {
     $1 = (INTVAL)PIO_recv(interpreter, $2, &($3));
     goto NEXT();
 }
 
-op send(out INT, in PMC, in STR) {
+op send(out INT, in PMC, in STR) :base_network {
     $1 = (INTVAL)PIO_send(interpreter, $2, $3);
     goto NEXT();
 }
 
-op poll(out INT, in PMC, in INT, in INT, in INT) {
+op poll(out INT, in PMC, in INT, in INT, in INT) :base_network {
     $1 = (INTVAL)PIO_poll(interpreter, $2, $3, $4, $5);
     goto NEXT();
 }
@@ -570,7 +570,7 @@ op poll(out INT, in PMC, in INT, in INT, in INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

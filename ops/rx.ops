@@ -1087,7 +1087,7 @@ There are undoubtably many more in code this complicated.
 
 =head1 AUTHORS
 
-Copyright (C) 2001-2002 The Parrot Team <perl6-internals@perl.org>.
+Copyright (C) 2001-2004 The Parrot Team <perl6-internals@perl.org>.
 
 Initial version by Brent Dax <brentdax@cpan.org>; special thanks to
 Angel Faus <afaus@corp.vlex.com> and Jeff 'japhy' Pinyan

@@ -36,12 +36,12 @@ If $3 is less than the negative of the length, throws an exception.
 
 =cut
 
-inline op ord (out INT, in STR) {
+inline op ord (out INT, in STR) :base_core {
   $1 = string_ord($2,0);
   goto NEXT();
 }
 
-inline op ord (out INT, in STR, in INT) {
+inline op ord (out INT, in STR, in INT) :base_core {
   $1 = string_ord($2,$3);
   goto NEXT();
 }
@@ -53,7 +53,7 @@ character set.
 
 =cut
 
-inline op chr (out STR, in INT) {
+inline op chr (out STR, in INT) :base_core {
   STRING *s;
   s = string_make(interpreter, &$1, (UINTVAL)1, NULL, 0, NULL);
   *(unsigned char *)s->strstart = (unsigned char) $2;
@@ -75,12 +75,12 @@ in $1
 
 =cut
 
-inline op chopn(inout STR, in INT) {
+inline op chopn(inout STR, in INT) :base_core {
   (void)string_chopn($1, $2);
   goto NEXT();
 }
 
-inline op chopn(out STR, in STR, in INT) {
+inline op chopn(out STR, in STR, in INT) :base_core {
   $1 = string_copy(interpreter, $2);
   (void)string_chopn($1,$3);
   goto NEXT();
@@ -102,22 +102,22 @@ Append the string $3 to $2 and places the result into $1.
 
 =cut
 
-inline op concat(inout STR, in STR) {
+inline op concat(inout STR, in STR) :base_mem {
   $1 = string_append(interpreter, $1, $2, 1);
   goto NEXT();
 }
 
-inline op concat(out STR, in STR, in STR) {
+inline op concat(out STR, in STR, in STR) :base_mem {
   $1 = string_concat(interpreter, $2, $3, 1);
   goto NEXT();
 }
 
-inline op concat (in PMC, in PMC, in PMC) {
+inline op concat (in PMC, in PMC, in PMC) :base_mem {
   $2->vtable->concatenate(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op concat (in PMC, in PMC, in STR) {
+inline op concat (in PMC, in PMC, in STR) :base_mem {
   $2->vtable->concatenate_native(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -133,7 +133,7 @@ Repeats string $2 $3 times and stores result in $1.
 
 =cut
 
-inline op repeat(out STR, in STR, in INT) {
+inline op repeat(out STR, in STR, in INT) :base_mem {
   if ($3 < 0) {
       internal_exception(NEG_REPEAT, "Cannot repeat with negative arg\n");
   }
@@ -141,12 +141,12 @@ inline op repeat(out STR, in STR, in INT) {
   goto NEXT();
 }
 
-inline op repeat (in PMC, in PMC, in PMC) {
+inline op repeat (in PMC, in PMC, in PMC) :base_mem {
   $2->vtable->repeat(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op repeat (in PMC, in PMC, in INT) {
+inline op repeat (in PMC, in PMC, in INT) :base_mem {
   $2->vtable->repeat_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -159,7 +159,7 @@ Set $1 to the length (in characters) of the string in $2.
 
 =cut
 
-inline op length(out INT, in STR) {
+inline op length(out INT, in STR) :base_mem {
   $1 = string_length($2);
   goto NEXT();
 }
@@ -175,7 +175,7 @@ length of time after its pinning is no longer necessary.
 
 =cut
 
-op pin(inout STR) {
+op pin(inout STR) :base_mem {
    string_pin(interpreter, $1);
    goto NEXT();
 }
@@ -188,7 +188,7 @@ move.
 
 =cut
 
-op unpin(inout STR) {
+op unpin(inout STR) :base_mem {
    string_unpin(interpreter, $1);
    goto NEXT();
 }
@@ -230,34 +230,34 @@ do not create a new string in the destination register.
 
 =cut
 
-inline op substr(out STR, in STR, in INT) {
+inline op substr(out STR, in STR, in INT) :base_core {
   INTVAL len;
   len = string_length($2);
   $1 = string_substr(interpreter, $2, $3, len, &$1, 0);
   goto NEXT();
 }
 
-inline op substr(out STR, in STR, in INT, in INT) {
+inline op substr(out STR, in STR, in INT, in INT) :base_core {
   $1 = string_substr(interpreter, $2, $3, $4, &$1, 0);
   goto NEXT();
 }
 
-inline op substr_r(out STR, in STR, in INT, in INT) {
+inline op substr_r(out STR, in STR, in INT, in INT) :base_core {
   $1 = string_substr(interpreter, $2, $3, $4, &$1, 1);
   goto NEXT();
 }
 
-inline op substr(out STR, inout STR, in INT, in INT, in STR) {
+inline op substr(out STR, inout STR, in INT, in INT, in STR) :base_core {
   $1 = string_replace(interpreter, $2, $3, $4, $5, &$1);
   goto NEXT();
 }
 
-inline op substr(inout STR, in INT, in INT, in STR) {
+inline op substr(inout STR, in INT, in INT, in STR) :base_core {
   (void)string_replace(interpreter, $1, $2, $3, $4, NULL);
   goto NEXT();
 }
 
-inline op substr(out STR, in PMC, in INT, in INT) {
+inline op substr(out STR, in PMC, in INT, in INT) :base_core {
   $1 = $2->vtable->substr_str(interpreter, $2, $3, $4);
   goto NEXT();
 }
@@ -279,12 +279,12 @@ If the substring is not found, returns "-1".
 
 =cut
 
-inline op index(out INT, in STR, in STR) {
+inline op index(out INT, in STR, in STR) :base_core {
     $1 = string_str_index(interpreter, $2, $3, 0);
     goto NEXT();
 }
 
-inline op index(out INT, in STR, in STR, in INT) {
+inline op index(out INT, in STR, in STR, in INT) :base_core {
     $1 = string_str_index(interpreter, $2, $3, $4);
     goto NEXT();
 }
@@ -309,7 +309,7 @@ BE AFRAID, THIS IS A QUICK HACK, USE IT AT YOUR OWN RISK.
 
 =cut
 
-inline op pack(inout STR, in INT, in INT) {
+inline op pack(inout STR, in INT, in INT) :base_core {
     char *c = (char *)&$3;
     STRING *s;
 
@@ -319,7 +319,7 @@ inline op pack(inout STR, in INT, in INT) {
     goto NEXT();
 }
 
-inline op pack(inout STR, in INT, in NUM) {
+inline op pack(inout STR, in INT, in NUM) :base_core {
     char *c = (char *)&$3;
     STRING *s;
 
@@ -329,7 +329,7 @@ inline op pack(inout STR, in INT, in NUM) {
     goto NEXT();
 }
 
-inline op pack(inout STR, in INT, in STR) {
+inline op pack(inout STR, in INT, in STR) :base_core {
     STRING *t,*s = $3;
     UINTVAL len = (UINTVAL)$2;
     char buf[3];
@@ -346,7 +346,7 @@ inline op pack(inout STR, in INT, in STR) {
 }
 
 
-inline op pack(inout STR, in INT, in INT, in INT) {
+inline op pack(inout STR, in INT, in INT, in INT) :base_core {
     char *c = (char *)&$3, *n;
     STRING *s;
     INTVAL ln;
@@ -394,12 +394,12 @@ see F<misc.c> for details.
 
 =cut
 
-inline op sprintf(out STR, in STR, in PMC) {
+inline op sprintf(out STR, in STR, in PMC) :base_core {
     $1=Parrot_psprintf(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op sprintf(out PMC, in PMC, in PMC) {
+inline op sprintf(out PMC, in PMC, in PMC) :base_core {
     $1->vtable->set_string_native(interpreter, $1,
         Parrot_psprintf(interpreter, $2->vtable->get_string(interpreter, $2), $3)
     );
@@ -419,22 +419,22 @@ Allocate a new empty string, of length $2 (optional), encoding $3
 
 =cut
 
-inline op new(out STR) {
+inline op new(out STR) :base_mem {
   $1 = string_make(interpreter, NULL, 0, NULL, 0, NULL);
   goto NEXT();
 }
 
-inline op new(out STR, in INT) {
+inline op new(out STR, in INT) :base_mem {
   $1 = string_make(interpreter, NULL, $2, NULL, 0, NULL);
   goto NEXT();
 }
 
-inline op new(out STR, in INT, in INT) {
+inline op new(out STR, in INT, in INT) :base_mem {
   $1 = string_make(interpreter, NULL, $2, encoding_lookup_index($3), 0, NULL);
   goto NEXT();
 }
 
-inline op new(out STR, in INT, in INT, in INT) {
+inline op new(out STR, in INT, in INT, in INT) :base_mem {
   internal_exception(INVALID_CHARTYPE,
                      "new_s_i_i_i op not yet implemented\n");
   $1 = string_make(interpreter, NULL, $2, encoding_lookup_index($3), 0, NULL);
@@ -457,17 +457,17 @@ and the chartype in $4.
 
 =cut
 
-op transcode(inout STR, in INT) {
+op transcode(inout STR, in INT) :base_core {
   $1 = string_transcode(interpreter, $1, encoding_lookup_index($2), NULL, NULL);
   goto NEXT();
 }
 
-op transcode(out STR, in STR, in INT) {
+op transcode(out STR, in STR, in INT) :base_core {
   $1 = string_transcode(interpreter, $2, encoding_lookup_index($3), NULL, NULL);
   goto NEXT();
 }
 
-op transcode(out STR, in STR, in INT, in INT) {
+op transcode(out STR, in STR, in INT, in INT) :base_core {
   $1 = string_transcode(interpreter, $2, encoding_lookup_index($3),
                         chartype_lookup_index($4), NULL);
   goto NEXT();
@@ -479,7 +479,7 @@ Find the encoding named in $2 and return its number in $1
 
 =cut
 
-op find_encoding(out INT, in STR) {
+op find_encoding(out INT, in STR) :base_core {
   char *encoding = string_to_cstring(interpreter, $2);
   $1 = encoding_find_encoding(encoding);
   string_cstring_free(encoding);
@@ -492,7 +492,7 @@ Find the encoding type for $2 and put it in $1
 
 =cut
 
-op string_encoding(out INT, in STR) {
+op string_encoding(out INT, in STR) :base_core {
    $1 = $2->encoding->index;
    goto NEXT();
 }
@@ -503,7 +503,7 @@ Find the chartype named in $2 and return its number in $1
 
 =cut
 
-op find_chartype(out INT, in STR) {
+op find_chartype(out INT, in STR) :base_core {
   char *chartype = string_to_cstring(interpreter, $2);
   $1 = chartype_find_chartype(chartype);
   string_cstring_free(chartype);
@@ -516,7 +516,7 @@ Find the chartype type for $2 and put it in $1
 
 =cut
 
-op string_chartype(out INT, in STR) {
+op string_chartype(out INT, in STR) :base_core {
    $1 = $2->type->index;
    goto NEXT();
 }
@@ -530,12 +530,12 @@ Temporary ops to set the encoding and chartype of a string
 
 =cut
 
-inline op set_encoding(in STR, in INT) {
+inline op set_encoding(in STR, in INT) :base_core {
    $1->encoding = encoding_lookup_index($2);
    goto NEXT();
 }
 
-inline op set_chartype(in STR, in INT) {
+inline op set_chartype(in STR, in INT) :base_core {
    $1->type = chartype_lookup_index($2);
    goto NEXT();
 }
@@ -565,7 +565,7 @@ Possible values for $3 are:
 
 =cut
 
-inline op stringinfo(out INT, in STR, in INT) {
+inline op stringinfo(out INT, in STR, in INT) :base_core {
   switch ($3) {
     case STRINGINFO_HEADER:   $1 = PTR2UINTVAL($2);
                               break;
@@ -595,11 +595,11 @@ Uppercase $1 in place
 
 =cut
 
-inline op upcase(out STR, in STR) {
+inline op upcase(out STR, in STR) :base_core {
   goto NEXT();
 }
 
-inline op upcase(inout STR) {
+inline op upcase(inout STR) :base_core {
   goto NEXT();
 }
 
@@ -613,11 +613,11 @@ Downcase $1 in place
 
 =cut
 
-inline op downcase(out STR, in STR) {
+inline op downcase(out STR, in STR) :base_core {
   goto NEXT();
 }
 
-inline op downcase(inout STR) {
+inline op downcase(inout STR) :base_core {
   goto NEXT();
 }
 
@@ -631,12 +631,12 @@ Titlecase $1 in place
 
 =cut
 
-inline op titlecase(out STR, in STR) {
+inline op titlecase(out STR, in STR) :base_core {
   $1 = string_titlecase(interpreter, $2);
   goto NEXT();
 }
 
-inline op titlecase(inout STR) {
+inline op titlecase(inout STR) :base_core {
   string_titlecase_inplace(interpreter, $1);
   goto NEXT();
 }
@@ -655,7 +655,7 @@ regexp $2. Currently implemented only for the empty string $2.
 
 =cut
 
-op join(out STR, in STR, in PMC) {
+op join(out STR, in STR, in PMC) :base_core {
     STRING *res;
     PMC *ar = $3;
     STRING *j = $2;
@@ -677,7 +677,7 @@ op join(out STR, in STR, in PMC) {
     goto NEXT();
 }
 
-op split(out PMC, in STR, in STR) {
+op split(out PMC, in STR, in STR) :base_core {
     PMC *res = $1 = pmc_new(interpreter, enum_class_PerlArray);
     STRING *r = $2;
     STRING *s = $3;
@@ -700,7 +700,7 @@ op split(out PMC, in STR, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

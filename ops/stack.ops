@@ -46,25 +46,25 @@ registers to their original state.
 
 =cut
 
-inline op popi() {
+inline op popi() :base_core {
   Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
   Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
   goto NEXT();
 }
 
-inline op popn() {
+inline op popn() :base_core {
   Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
   Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
   goto NEXT();
 }
 
-inline op pops() {
+inline op pops() :base_core {
   Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
   Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
   goto NEXT();
 }
 
-inline op popp() {
+inline op popp() :base_core {
   Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
   Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
   goto NEXT();
@@ -85,22 +85,22 @@ from a register frame popped off the corresponding frame stack.
 
 =cut
 
-inline op popbottomi() {
+inline op popbottomi() :base_core {
   Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
   goto NEXT();
 }
 
-inline op popbottomn() {
+inline op popbottomn() :base_core {
   Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
   goto NEXT();
 }
 
-inline op popbottoms() {
+inline op popbottoms() :base_core {
   Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
   goto NEXT();
 }
 
-inline op popbottomp() {
+inline op popbottomp() :base_core {
   Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
   goto NEXT();
 }
@@ -120,22 +120,22 @@ from a register frame popped off the corresponding frame stack.
 
 =cut
 
-inline op poptopi() {
+inline op poptopi() :base_core {
   Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
   goto NEXT();
 }
 
-inline op poptopn() {
+inline op poptopn() :base_core {
   Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
   goto NEXT();
 }
 
-inline op poptops() {
+inline op poptops() :base_core {
   Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
   goto NEXT();
 }
 
-inline op poptopp() {
+inline op poptopp() :base_core {
   Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
   goto NEXT();
 }
@@ -160,25 +160,25 @@ frame holds the values from registers 16-31.
 
 =cut
 
-inline op pushi() {
+inline op pushi() :base_core {
   Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
   Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
   goto NEXT();
 }
 
-inline op pushn() {
+inline op pushn() :base_core {
   Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
   Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
   goto NEXT();
 }
 
-inline op pushs() {
+inline op pushs() :base_core {
   Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
   Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
   goto NEXT();
 }
 
-inline op pushp() {
+inline op pushp() :base_core {
   Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
   Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
   goto NEXT();
@@ -200,22 +200,22 @@ on the appropriate register frame stack.
 
 =cut
 
-inline op pushtopi() {
+inline op pushtopi() :base_core {
   Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
   goto NEXT();
 }
 
-inline op pushtopn() {
+inline op pushtopn() :base_core {
   Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
   goto NEXT();
 }
 
-inline op pushtops() {
+inline op pushtops() :base_core {
   Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
   goto NEXT();
 }
 
-inline op pushtopp() {
+inline op pushtopp() :base_core {
   Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
   goto NEXT();
 }
@@ -236,22 +236,22 @@ on the appropriate register frame stack.
 
 =cut
 
-inline op pushbottomi() {
+inline op pushbottomi() :base_core {
   Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
   goto NEXT();
 }
 
-inline op pushbottomn() {
+inline op pushbottomn() :base_core {
   Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
   goto NEXT();
 }
 
-inline op pushbottoms() {
+inline op pushbottoms() :base_core {
   Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
   goto NEXT();
 }
 
-inline op pushbottomp() {
+inline op pushbottomp() :base_core {
   Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
   goto NEXT();
 }
@@ -308,7 +308,7 @@ stacks. This op is equivalent to:
 
 =cut
 
-inline op saveall() {
+inline op saveall() :base_core {
   Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
   Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
   Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
@@ -320,7 +320,7 @@ inline op saveall() {
   goto NEXT();
 }
 
-inline op restoreall() {
+inline op restoreall() :base_core {
   Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
   Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
   Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
@@ -332,7 +332,7 @@ inline op restoreall() {
   goto NEXT();
 }
 
-inline op savetop() {
+inline op savetop() :base_core {
   Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
   Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
   Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
@@ -340,7 +340,7 @@ inline op savetop() {
   goto NEXT();
 }
 
-inline op restoretop() {
+inline op restoretop() :base_core {
   Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
   Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
   Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
@@ -371,7 +371,7 @@ Gets the type of entry $2 of the user stack and puts it in $1.
 
 =cut
 
-op entrytype(out INT, in INT) {
+op entrytype(out INT, in INT) :base_core {
   Stack_Entry_t *entry;
 
   entry = stack_entry(interpreter, interpreter->ctx.user_stack, $2);
@@ -390,7 +390,7 @@ Puts the depth of the user stack in $1.
 
 =cut
 
-inline op depth(out INT) {
+inline op depth(out INT) :base_core {
   $1 = stack_height(interpreter, interpreter->ctx.user_stack);
   goto NEXT();
 }
@@ -412,7 +412,7 @@ is the bottom-most)
 
 =cut
 
-op lookback(out INT, in INT) {
+op lookback(out INT, in INT) :base_core {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
@@ -425,7 +425,7 @@ op lookback(out INT, in INT) {
   goto NEXT();
 }
 
-op lookback(out STR, in INT) {
+op lookback(out STR, in INT) :base_core {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
@@ -438,7 +438,7 @@ op lookback(out STR, in INT) {
   goto NEXT();
 }
 
-op lookback(out NUM, in INT) {
+op lookback(out NUM, in INT) :base_core {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
@@ -451,7 +451,7 @@ op lookback(out NUM, in INT) {
   goto NEXT();
 }
 
-op lookback(out PMC, in INT) {
+op lookback(out PMC, in INT) :base_core {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
@@ -478,23 +478,23 @@ Save register or constant $1 onto the user stack.
 
 =cut
 
-inline op save(in INT) {
+inline op save(in INT) :base_core {
   INTVAL i = $1;
   stack_push(interpreter, &interpreter->ctx.user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
-inline op save(in NUM) {
+inline op save(in NUM) :base_core {
   stack_push(interpreter, &interpreter->ctx.user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
-inline op save(in PMC) {
+inline op save(in PMC) :base_core {
   stack_push(interpreter, &interpreter->ctx.user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
-inline op save(in STR) {
+inline op save(in STR) :base_core {
   stack_push(interpreter, &interpreter->ctx.user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
@@ -509,7 +509,7 @@ Save a clone of register or constant $1 onto the user stack.
 
 =cut
 
-inline op savec(in STR) {
+inline op savec(in STR) :base_core {
   stack_push(interpreter, &interpreter->ctx.user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
@@ -528,25 +528,25 @@ Restore register $1 from the user stack.
 
 =cut
 
-inline op restore(out INT) {
+inline op restore(out INT) :base_core {
   (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
                   STACK_ENTRY_INT);
   goto NEXT();
 }
 
-inline op restore(out NUM) {
+inline op restore(out NUM) :base_core {
   (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
                   STACK_ENTRY_FLOAT);
   goto NEXT();
 }
 
-inline op restore(out PMC) {
+inline op restore(out PMC) :base_core {
   (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
                   STACK_ENTRY_PMC);
   goto NEXT();
 }
 
-inline op restore(out STR) {
+inline op restore(out STR) :base_core {
   (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
                   STACK_ENTRY_STRING);
   goto NEXT();
@@ -566,7 +566,7 @@ the second entry, the second becomes the third etc., while the former
 
 =cut
 
-inline op rotate_up(in INT) {
+inline op rotate_up(in INT) :base_core {
   rotate_entries(interpreter, &interpreter->ctx.user_stack, $1);
   goto NEXT();
 }
@@ -579,7 +579,7 @@ Save register or constant $1 onto the high-speed int stack.
 
 =cut
 
-inline op intsave(in INT) {
+inline op intsave(in INT) :base_core {
   intstack_push(interpreter, interpreter->ctx.intstack, $1);
   goto NEXT();
 }
@@ -592,7 +592,7 @@ Restore register $1 from the high-speed int stack.
 
 =cut
 
-inline op intrestore(out INT) {
+inline op intrestore(out INT) :base_core {
   $1=intstack_pop(interpreter, interpreter->ctx.intstack);
   goto NEXT();
 }
@@ -605,7 +605,7 @@ Puts the depth of the high-speed int stack in $1.
 
 =cut
 
-inline op intdepth(out INT) {
+inline op intdepth(out INT) :base_core {
   $1=intstack_depth(interpreter, interpreter->ctx.intstack);
   goto NEXT();
 }
@@ -618,7 +618,7 @@ inline op intdepth(out INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

@@ -42,7 +42,7 @@ Set $1 to the coversine (in radians) of $2.
 
 =cut
 
-inline op covers(out NUM, in NUM) {
+inline op covers(out NUM, in NUM) :advanced_math {
   $1 = 1.0 - sin($2);
   goto NEXT();
 }
@@ -57,7 +57,7 @@ Set $1 to the exsecant of $2 (given in radians).
 =cut
 
 
-inline op exsec(out NUM, in NUM) {
+inline op exsec(out NUM, in NUM) :advanced_math {
   $1 = (1.0 / cos($2)) - 1.0;
   goto NEXT();
 }
@@ -85,7 +85,7 @@ Set $1 to the versine (in radians) of $2.
 
 =cut
 
-inline op vers(out NUM, in NUM) {
+inline op vers(out NUM, in NUM) :advanced_math {
   $1 = 1.0 - cos($2);
   goto NEXT();
 }
@@ -100,7 +100,7 @@ inline op vers(out NUM, in NUM) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 

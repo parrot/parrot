@@ -17,12 +17,12 @@ Additional opcodes for C# compilation needed by cscc PM codegen
 
 =cut
 
-inline op conv_i1(inout INT) {
+inline op conv_i1(inout INT) :dotgnu_core {
   $1 = (INTVAL)((signed char)($1));
   goto NEXT();
 }
 
-inline op conv_i1_ovf(inout INT) {
+inline op conv_i1_ovf(inout INT) :dotgnu_core {
   if($1 >= -128 && $1 <= 127) {
     $1 = (INTVAL)((signed char)($1));
   }
@@ -32,12 +32,12 @@ inline op conv_i1_ovf(inout INT) {
   goto NEXT();
 }
 
-inline op conv_u1(inout INT) {
+inline op conv_u1(inout INT) :dotgnu_core {
   $1 = (INTVAL)((unsigned char)($1));
   goto NEXT();
 }
 
-inline op conv_u1_ovf(inout INT) {
+inline op conv_u1_ovf(inout INT) :dotgnu_core {
   if($1 >= 0 && $1 <= 255 ) {
     $1 = (INTVAL)((unsigned char)($1));
   }
@@ -47,12 +47,12 @@ inline op conv_u1_ovf(inout INT) {
   goto NEXT();
 }
 
-inline op conv_i2(inout INT) {
+inline op conv_i2(inout INT) :dotgnu_core {
   $1 = (INTVAL)((Parrot_Int2)($1));
   goto NEXT();
 }
 
-inline op conv_i2_ovf(inout INT) {
+inline op conv_i2_ovf(inout INT) :dotgnu_core {
   if($1 >= -32768 && $1 <= 32767 ) {
     $1 = (INTVAL)((Parrot_Int2)($1));
   }
@@ -63,12 +63,12 @@ inline op conv_i2_ovf(inout INT) {
   goto NEXT();
 }
 
-inline op conv_u2(inout INT) {
+inline op conv_u2(inout INT) :dotgnu_core {
   $1 = (INTVAL)((Parrot_UInt2)($1));
   goto NEXT();
 }
 
-inline op conv_u2_ovf(inout INT) {
+inline op conv_u2_ovf(inout INT) :dotgnu_core {
   if($1 >= 0 && $1 <= 65535) {
     $1 = (INTVAL)((Parrot_UInt2)($1));
   }
@@ -79,67 +79,67 @@ inline op conv_u2_ovf(inout INT) {
   goto NEXT();
 }
 
-inline op conv_i4(out INT, in NUM) {
+inline op conv_i4(out INT, in NUM) :dotgnu_core {
   $1 = (INTVAL)((Parrot_Int4)($2));
   goto NEXT();
 }
 
-inline op conv_i4(out INT, in PMC) {
+inline op conv_i4(out INT, in PMC) :dotgnu_core {
   $1 = (INTVAL)(Parrot_Int4)($2->vtable->get_integer(interpreter, $2));
   goto NEXT();
 }
 
-inline op conv_u4(out INT, in NUM) {
+inline op conv_u4(out INT, in NUM) :dotgnu_core {
   $1 = (UINTVAL)((Parrot_UInt4)($2));
   goto NEXT();
 }
 
-inline op conv_u4(out INT, in PMC) {
+inline op conv_u4(out INT, in PMC) :dotgnu_core {
   $1 = (UINTVAL)(Parrot_UInt4) ($2->vtable->get_integer(interpreter, $2));
   goto NEXT();
 }
 
-inline op conv_i8(in PMC, in INT) {
+inline op conv_i8(in PMC, in INT) :dotgnu_core {
   $1->vtable->set_integer_native(interpreter, $1,$2);
   goto NEXT();
 }
 
-inline op conv_i8(in PMC, in PMC) {
+inline op conv_i8(in PMC, in PMC) :dotgnu_core {
   $1->vtable->set_integer_same(interpreter, $1,$2);
   goto NEXT();
 }
 
-inline op conv_i8(in PMC, in NUM) {
+inline op conv_i8(in PMC, in NUM) :dotgnu_core {
   $1->vtable->set_integer_native(interpreter, $1, (INTVAL)$2);
   goto NEXT();
 }
 
-inline op conv_r4(out NUM, in INT) {
+inline op conv_r4(out NUM, in INT) :dotgnu_core {
   $1 =  (FLOATVAL)((Parrot_Float4)($2));
   goto NEXT();
 }
 
-inline op conv_r4(inout NUM) {
+inline op conv_r4(inout NUM) :dotgnu_core {
   $1 =  (FLOATVAL)((Parrot_Float4)($1));
   goto NEXT();
 }
 
-inline op conv_r4(out NUM, in PMC) {
+inline op conv_r4(out NUM, in PMC) :dotgnu_core {
   $1 = (FLOATVAL)(Parrot_Float4)($2->vtable->get_number(interpreter, $2));
   goto NEXT();
 }
 
-inline op conv_r8(out NUM, in INT) {
+inline op conv_r8(out NUM, in INT) :dotgnu_core {
   $1 =  (FLOATVAL)(Parrot_Float8)($2);
   goto NEXT();
 }
 
-inline op conv_r8(inout NUM) {
+inline op conv_r8(inout NUM) :dotgnu_core {
   $1 =  (FLOATVAL)(Parrot_Float8)($1);
   goto NEXT();
 }
 
-inline op conv_r8(out NUM, in PMC) {
+inline op conv_r8(out NUM, in PMC) :dotgnu_core {
   $1 = (FLOATVAL)(Parrot_Float8)($2->vtable->get_number(interpreter, $2));
   goto NEXT();
 }
