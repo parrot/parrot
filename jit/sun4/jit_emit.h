@@ -270,7 +270,7 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 #define Parrot_jit_opmap emitm_i(3)
 #define Parrot_jit_tmp emitm_l(7)
 
-#define Parrot_jit_regbase_ptr(i) &((i)->int_reg.registers[0])
+#define Parrot_jit_regbase_ptr(i) &((i)->ctx.int_reg.registers[0])
 #define Parrot_jit_regoff(a, i) (unsigned)(a) - (unsigned)(Parrot_jit_regbase_ptr(i))
 
 /* Generate conditional branch to offset from current parrot op */
