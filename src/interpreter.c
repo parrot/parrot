@@ -591,7 +591,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         chunks[1] = interpreter->ctx.user_stack;
         chunks[2] = interpreter->ctx.control_stack;
         for (i = 0; i< 3; i++) {
-            Stack_Chunk_t *top = chunks[0];
+            Stack_Chunk_t *top = chunks[i];
             while (top->next)
                 top = top->next;
             while(top) {
