@@ -1,4 +1,5 @@
 #! perl -w
+
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -16,7 +17,7 @@ Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
 
 =cut
 
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 54;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -145,6 +146,114 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "if (P) - Num");
+	new	P0, .PerlNum
+
+	set	P0, 1.1
+	if	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, 0.0
+	if	P0, BAD2
+	branch OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "unless (P) - Num");
+	new	P0, .PerlNum
+
+	set	P0, 0.0
+	unless	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, 1.1
+	unless	P0, BAD2
+	branch OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "inc, PerlNum");
+@{[ $fp_equality_macro ]}
+     new P3, .PerlNum
+
+     set P3, -0.999
+     inc P3
+     .fp_eq(P3, 0.001, OK1)
+     print "not "
+OK1: print "ok 1\\n"
+
+     inc P3
+     .fp_eq(P3, 1.001, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+
+     end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "dec, PerlNum");
+@{[ $fp_equality_macro ]}
+     new P3, .PerlNum
+
+     set P3, 1.001
+     dec P3
+     .fp_eq(P3, 0.001, OK1)
+     print "not "
+OK1: print "ok 1\\n"
+
+     dec P3
+     .fp_eq(P3, -0.999, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+
+     end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mul_p_p, PerlNum");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlNum
+        new P1,.PerlNum
+        set P0,-2.5
+        set P1,2.5
+        mul P0,P1
+        .fp_eq(P0,-6.25,EQ1)
+        print "not "
+EQ1:   print "ok 1"
+       print "\\n"
+
+        new P2, .PerlInt
+        set P2, 2
+        mul P0, P2
+        .fp_eq(P0,-12.5,EQ2)
+        print "not "
+EQ2:   print "ok 2"
+       print "\\n"
+
+       end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string integer");

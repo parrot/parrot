@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -16,7 +17,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 65;
+use Parrot::Test tests => 68;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -365,6 +366,89 @@ output_is(<<CODE, <<OUTPUT, "Assigning string copies");
 CODE
 C2H5OH
 C2H5OH + 10H20
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "if (P) - String");
+	new	P0, .PerlString
+
+	set	P0, "I've told you once, I've told you twice..."
+	if	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, "0.0"
+	if	P0, OK2
+	print	"not "
+OK2:	print	"ok 2\\n"
+
+	set	P0, ""
+	if	P0, BAD3
+	branch OK3
+BAD3:	print	"not "
+OK3:	print	"ok 3\\n"
+
+	set	P0, "0"
+	if	P0, BAD4
+	branch OK4
+BAD4:	print	"not "
+OK4:	print	"ok 4\\n"
+
+	set	P0, "0e0"
+	if	P0, OK5
+	print	"not "
+OK5:	print	"ok 5\\n"
+
+	set	P0, "x"
+	if	P0, OK6
+	print	"not "
+OK6:	print	"ok 6\\n"
+
+	set	P0, "\\x0"
+	if	P0, OK7
+	print	"not "
+OK7:	print	"ok 7\\n"
+
+	set	P0, "\\n"
+	if	P0, OK8
+	print	"not "
+OK8:	print	"ok 8\\n"
+
+	set	P0, " "
+	if	P0, OK9
+	print	"not "
+OK9:	print	"ok 9\\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "unless (P) - String");
+	new	P0, .PerlString
+
+        set     P0, "0"
+        unless  P0, OK1
+        print   "not"
+OK1:	print	"ok 1\\n"
+
+	set	P0, "1"
+	unless	P0, BAD2
+        branch  OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 #
@@ -1203,6 +1287,31 @@ CODE
 1
 -1
 0
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "repeat");
+        new P0, .PerlUndef
+        new P1, .PerlString
+        new P2, .PerlInt
+
+        set P2, 1024
+        repeat P1, P0, P2
+        set S1, P1
+        eq S1, "", OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        new P0, .PerlUndef
+        new P1, .PerlString
+        repeat P1, P0, 1024
+        set S1, P1
+        eq S1, "", OK2
+        print "not "
+OK2:    print "ok 2\n"
+	end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "substr");

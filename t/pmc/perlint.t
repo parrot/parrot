@@ -1,4 +1,5 @@
 #! perl -w
+
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -16,7 +17,7 @@ Tests the PerlInt PMC. Checks Perl-specific integer behaviour.
 
 =cut
 
-use Parrot::Test tests => 60;
+use Parrot::Test tests => 70;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -155,6 +156,166 @@ CODE
 123
 OUTPUT
 
+output_is(<<CODE, <<OUTPUT, "if (P) - Int");
+	new	P0, .PerlInt
+
+	set	P0, 1
+	if	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, 0
+	if	P0, BAD2
+	branch OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "unless (P) - Int");
+	new	P0, .PerlInt
+
+	set	P0, 0
+	unless	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, 1
+	unless	P0, BAD2
+	branch OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "inc, PerlInt");
+    new P3, .PerlInt
+    set P3, 0
+    inc P3
+    print P3
+    print "\n"
+
+LP: inc P3
+    set I3, P3
+    lt I3, 1000, LP
+    print P3
+    print "\n"
+
+    end
+CODE
+1
+1000
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "dec, PerlInt");
+    new P3, .PerlInt
+    set P3, 0
+    dec P3
+    print P3
+    print "\n"
+
+LP: dec P3
+    set I3, P3
+    gt I3, -2000, LP
+    print P3
+    print "\n"
+
+    end
+CODE
+-1
+-2000
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mul_p_p, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        new P1,.PerlInt
+        set P0,8
+        set P1,2
+        mul P0,P1
+        .fp_eq(P0,16,EQ1)
+        print "not "
+EQ1:   print "ok 1"
+        print "\\n"
+
+        new P2, .PerlNum
+        set P2, 0.0625
+        mul P0, P2
+        .fp_eq(P0,1,EQ2)
+        print "not "
+EQ2:   print "ok 2"
+        print "\\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mul_p_i, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        set P0,8
+        mul P0,2
+        .fp_eq(P0,16,EQ1)
+        print "not "
+EQ1:    print "ok 1"
+        print "\\n"
+        end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "div_p_i, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        set P0,8
+        div P0,2
+        .fp_eq(P0,4,EQ1)
+        print "not "
+EQ1:    print "ok 1"
+        print "\\n"
+        end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mod_p_i, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        set P0,3
+        mod P0,6
+        .fp_eq(P0,3,EQ1)
+        print "not "
+EQ1:    print "ok 1"
+        print "\\n"
+        end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mod_p_p_i, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        set P0,7
+        new P1,.PerlInt
+        mod P1, P0, 6
+        .fp_eq(P1,1,EQ1)
+        print "not "
+EQ1:    print "ok 1"
+        print "\\n"
+        end
+CODE
+ok 1
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "bor");
     new P0, .PerlInt
     set P0, 0b11110000
@@ -287,8 +448,28 @@ CODE
 100
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "bnot");
+    new P0, .PerlUndef
 
+# We use band in these tests to null out the high bits, and make the
+# tests independent of the size of our INTVALs
+    bnot P0, P0
+    band P0, 0b01010101
+    print P0
+    print "\n"
 
+    new P0, .PerlUndef
+    new P1, .PerlInt
+    set P1, 0b01100110
+    bnot P0, P1
+    band P0, 0b10011001
+    print P0
+    print "\n"
+    end
+CODE
+85
+153
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "bnot");
     new P0, .PerlInt
