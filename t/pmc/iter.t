@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-t/pmc/iter.t - Iteratation
+t/pmc/iter.t - Iteration
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/iter.t
+	% perl -I lib t/pmc/iter.t
 
 =head1 DECSRIPTION
 
@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More qw(skip);
 output_is(<<'CODE', <<'OUTPUT', "new iter");
 	new P2, .PerlArray
@@ -285,6 +285,44 @@ iter_end:
 CODE
 676665
 ABC
+OUTPUT
+
+
+output_is(<< 'CODE', << 'OUTPUT', "PerlString iterator in PIR");
+##PIR##
+.include "iterator.pasm"
+.sub _main
+    .local pmc string_1
+    string_1 = new PerlString
+    string_1 = "abcd\x65\x66\x67"
+    print string_1
+    print "\n"
+
+    .local pmc iter_1
+    iter_1 = new Iterator, string_1
+    iter_1 = .ITERATE_FROM_START
+
+    .local int code_point_1
+ITER_LOOP:
+    unless iter_1 goto ITER_END
+    shift code_point_1, iter_1
+    print code_point_1
+    print "\n"
+    branch ITER_LOOP
+ITER_END:
+    print "reached end\n"
+    end
+.end
+CODE
+abcdefg
+97
+98
+99
+100
+101
+102
+103
+reached end
 OUTPUT
 
 SKIP: {

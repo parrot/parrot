@@ -11,8 +11,9 @@ aggregates) to visit all entries in that aggregate.
 
 Iterate from the beginning of the aggregate:
 
+  .include "iterator.pasm"
     new P0, .Iterator, P1	# setup iterator for aggregate P1
-    set P0, 0			# reset iterator, begin at start
+    set P0, .ITERATE_FROM_START	# reset iterator, begin at start
   iter_loop:
     unless P0, iter_end		# while (entries) ...
       shift P2, P0		# get entry
@@ -21,8 +22,9 @@ Iterate from the beginning of the aggregate:
 
 Iterate from the end of the aggregate (Array like classes only):
 
+  .include "iterator.pasm"
     new P0, .Iterator, P1	# setup iterator for aggregate P1
-    set P0, 3			# reset iterator, begin at end
+    set P0, .ITERATE_FROM_END   # reset iterator, begin at end
   iter_loop:
     unless P0, iter_end		# while (entries) ...
       pop P2, P0		# get entry
@@ -31,9 +33,10 @@ Iterate from the end of the aggregate (Array like classes only):
 
 =head2 Iterating over hashes
 
-    .include "datatypes.pasm"	# type constants
+  .include "datatypes.pasm"	# type constants
+  .include "iterator.pasm"
     new P0, .Iterator, P1	# setup iterator for hash P1
-    set P0, 0			# reset iterator, begin at start
+    set P0, .ITERATE_FROM_START	# reset iterator, begin at start
   iter_loop:
     unless P0, iter_end		# while (entries) ...
       shift S2, P0		# get key for next entry
