@@ -60,5 +60,6 @@ ${headers}
 #define PARROT_MINOR_VERSION   ${MINOR}
 #define PARROT_PATCH_VERSION   ${PATCH}
 #define PARROT_ARCHNAME        "${jitarchname}"
+#define PARROT_JIT_CAPABLE     ${jitcapable}
 
 #endif
