@@ -1,24 +1,33 @@
-/* pf_items.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Low level packfile functions to fetch and store Parrot data, i.e.
- *     INTVAL, FLOATVAL, STRING ...
- *  Data Structure and Algorithms:
- *  History:
- *     Initial rev by leo 2003.11.21
- *     Most routines moved from src/packfile.c
- *     Renamed PackFile_* to PF_*
- *  Notes:
- *     PF_store_<type> write an opcode_t stream to cursor in natural
- *                     byte-ordering
- *     PF_fetch_<type> read items and possibly convert the foreign
- *                     format
- *     PF_size_<type>  return the needed size in opcode_t units
- *
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+pf/pf_items.c - Fetch/store packfile data
+
+=head1 DESCRIPTION
+
+Low level packfile functions to fetch and store Parrot data, i.e.
+C<INTVAL>, C<FLOATVAL>, C<STRING> ...
+
+C<<PF_fetch_<item>()>> functions retrieve the datatype item from the
+opcode stream and convert byteordering or binary format on the fly,
+depending on the packfile header.
+
+C<<PF_store_<item>()>> functions write the datatype item to the stream
+as is. These functions don't check the available size.
+
+C<<PF_size_<item>()>> functions return the store size of item in
+C<opcode_t> units.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
@@ -35,27 +44,6 @@
  * round val up to whole opcode_t, return result in opcodes
  */
 #define ROUND_UP(val,size) (((val) + ((size) - 1))/(size))
-
-/*
-
-=head1 pf_items
-
-Parrot data items fetch and store functions.
-
-PF_fetch_<item> functions retrieve the datatype item from the opcode
-stream and convert byteordering or binary format on the fly, depending
-on the packfile header.
-
-PF_store_<item> functions write the datatype item to the stream as is.
-These functions don't check the available size.
-
-PF_size_<item> functions return the store size of item in opcode_t units.
-
-=over 4
-
-=cut
-
-*/
 
 /*
  * low level FLOATVAL fetch and convert functions
@@ -163,23 +151,17 @@ fetch_op_mixed(opcode_t b)
 
 #endif
 }
+
 /*
 
-=item PF_fetch_opcode
+=item C<opcode_t
+PF_fetch_opcode(struct PackFile *pf, opcode_t **stream)>
 
-Fetch an opcode_t from the stream, converting byteorder if needed.
-
-=item PF_store_opcode
-
-Store an opcode_t to stream as is.
-
-=item PF_size_opcode
-
-Return size of item in opcode_t units, which is 1 per definitionem.
+Fetch an C<opcode_t> from the stream, converting byteorder if needed.
 
 =cut
 
-***************************************/
+*/
 
 opcode_t
 PF_fetch_opcode(struct PackFile *pf, opcode_t **stream) {
@@ -194,6 +176,17 @@ PF_fetch_opcode(struct PackFile *pf, opcode_t **stream) {
     return o;
 }
 
+/*
+
+=item C<opcode_t*
+PF_store_opcode(opcode_t *cursor, opcode_t val)>
+
+Store an C<opcode_t> to stream as is.
+
+=cut
+
+*/
+
 opcode_t*
 PF_store_opcode(opcode_t *cursor, opcode_t val)
 {
@@ -201,32 +194,37 @@ PF_store_opcode(opcode_t *cursor, opcode_t val)
     return cursor;
 }
 
+/*
+
+=item C<size_t
+PF_size_opcode(void)>
+
+Return size of an item in C<opcode_t> units, which is 1 I<per
+definitionem>.
+
+=cut
+
+*/
+
 size_t
 PF_size_opcode(void)
 {
     return 1;
 }
 
-/***************************************
+/*
 
-=item PF_fetch_integer
+=item C<INTVAL
+PF_fetch_integer(struct PackFile *pf, opcode_t **stream)>
 
-Fetch an INTVAL from the stream, converting byteorder if needed.
+Fetch an C<INTVAL> from the stream, converting byteorder if needed.
 
-XXX assumes sizeof(INTVAL) == sizeof(opcode_t) - we don't have
-    INTVAL size in PF header
-
-=item PF_store_integer
-
-Store an INTVAL to stream as is.
-
-=item PF_size_integer
-
-Return store size of INTVAL in opcode_t units.
+XXX assumes C<sizeof(INTVAL) == sizeof(opcode_t)> - we don't have
+C<INTVAL> size in the PackFile header.
 
 =cut
 
-***************************************/
+*/
 
 INTVAL
 PF_fetch_integer(struct PackFile *pf, opcode_t **stream) {
@@ -242,12 +240,34 @@ PF_fetch_integer(struct PackFile *pf, opcode_t **stream) {
 }
 
 
+/*
+
+=item C<opcode_t*
+PF_store_integer(opcode_t *cursor, INTVAL val)>
+
+Store an C<INTVAL> to stream as is.
+
+=cut
+
+*/
+
 opcode_t*
 PF_store_integer(opcode_t *cursor, INTVAL val)
 {
     *cursor++ = (opcode_t)val; /* XXX */
     return cursor;
 }
+
+/*
+
+=item C<size_t
+PF_size_integer(void)>
+
+Return store size of C<INTVAL> in C<opcode_t> units.
+
+=cut
+
+*/
 
 size_t
 PF_size_integer(void)
@@ -256,25 +276,17 @@ PF_size_integer(void)
     return s ? s : 1;
 }
 
-/***************************************
+/*
 
-=item PF_fetch_number
+=item C<FLOATVAL
+PF_fetch_number(struct PackFile *pf, opcode_t **stream)>
 
-Fetch a FLOATVAL from the stream, converting
-byteorder if needed. Then advance stream pointer by
-amount of packfile float size.
-
-=item PF_store_number
-
-Write a FLOATVAL to the opcode stream as is.
-
-=item PF_size_number
-
-Return store size of FLOATVAL in opcode_t units.
+Fetch a C<FLOATVAL> from the stream, converting byteorder if needed.
+Then advance stream pointer by amount of packfile float size.
 
 =cut
 
-***************************************/
+*/
 
 FLOATVAL
 PF_fetch_number(struct PackFile *pf, opcode_t **stream) {
@@ -310,6 +322,17 @@ PF_fetch_number(struct PackFile *pf, opcode_t **stream) {
     return f;
 }
 
+/*
+
+=item C<opcode_t*
+PF_store_number(opcode_t *cursor, FLOATVAL *val)>
+
+Write a C<FLOATVAL> to the opcode stream as is.
+
+=cut
+
+*/
+
 opcode_t*
 PF_store_number(opcode_t *cursor, FLOATVAL *val)
 {
@@ -320,6 +343,17 @@ PF_store_number(opcode_t *cursor, FLOATVAL *val)
     return cursor;
 }
 
+/*
+
+=item C<size_t
+PF_size_number(void)>
+
+Return store size of FLOATVAL in opcode_t units.
+
+=cut
+
+*/
+
 size_t
 PF_size_number(void)
 {
@@ -328,29 +362,22 @@ PF_size_number(void)
 
 /*
 
-=item PF_fetch_string
+=item C<STRING *
+PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)>
 
-Fetch a STRING from bytecode and return an new STRING.
+Fetch a C<STRING> from bytecode and return a new C<STRING>.
+
 Opcode format is:
 
-  opcode_t flags
-  opcode_t encoding
-  opcode_t type
-  opcode_t size
-  *  data
-
-=item PF_store_string
-
-Write a STRING to the opcode stream.
-
-=item PF_size_string
-
-Report store size of STRING in opcode_t units.
+    opcode_t flags
+    opcode_t encoding
+    opcode_t type
+    opcode_t size
+    * data
 
 =cut
 
 */
-
 
 STRING *
 PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
@@ -389,6 +416,17 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
     return s;
 }
 
+/*
+
+=item C<opcode_t*
+PF_store_string(opcode_t *cursor, STRING *s)>
+
+Write a STRING to the opcode stream.
+
+=cut
+
+*/
+
 opcode_t*
 PF_store_string(opcode_t *cursor, STRING *s)
 {
@@ -425,6 +463,17 @@ PF_store_string(opcode_t *cursor, STRING *s)
     return cursor;
 }
 
+/*
+
+=item C<size_t
+PF_size_string(STRING *s)>
+
+Report store size of C<STRING> in C<opcode_t> units.
+
+=cut
+
+*/
+
 size_t
 PF_size_string(STRING *s)
 {
@@ -440,17 +489,10 @@ PF_size_string(STRING *s)
 
 /*
 
-=item PF_fetch_cstring
+=item C<char *
+PF_fetch_cstring(struct PackFile *pf, opcode_t **cursor)>
 
 Fetch a cstring from bytecode and return an allocated copy
-
-=item PF_store_cstring
-
-Write a 0-terminate string to the stream.
-
-=item PF_size_cstring
-
-Return store size of a C-string in opcode_t units.
 
 =cut
 
@@ -468,12 +510,34 @@ PF_fetch_cstring(struct PackFile *pf, opcode_t **cursor)
     return p;
 }
 
+/*
+
+=item C<opcode_t*
+PF_store_cstring(opcode_t *cursor, const char *s)>
+
+Write a 0-terminate string to the stream.
+
+=cut
+
+*/
+
 opcode_t*
 PF_store_cstring(opcode_t *cursor, const char *s)
 {
     strcpy((char *) cursor, s);
     return cursor + PF_size_cstring(s);
 }
+
+/*
+
+=item C<size_t
+PF_size_cstring(const char *s)>
+
+Return store size of a C-string in C<opcode_t> units.
+
+=cut
+
+*/
 
 size_t
 PF_size_cstring(const char *s)
@@ -487,15 +551,15 @@ PF_size_cstring(const char *s)
 
 /*
 
-=back
+=item C<void
+PackFile_assign_transforms(struct PackFile *pf)>
+
+Assign transform functions to vtable.
 
 =cut
 
 */
 
-/*
- * Assign transform functions to vtable
- */
 void
 PackFile_assign_transforms(struct PackFile *pf) {
 #if PARROT_BIGENDIAN
@@ -546,6 +610,32 @@ PackFile_assign_transforms(struct PackFile *pf) {
         pf->fetch_op = fetch_op_mixed;
     }
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial review by leo 2003.11.21
+
+Most routines moved from F<src/packfile.c>.
+
+Renamed PackFile_* to PF_*
+
+=head1 TODO
+
+C<<PF_store_<type>()>> - write an opcode_t stream to cursor in natural
+byte-ordering.
+
+C<<PF_fetch_<type>()>> - read items and possibly convert the foreign
+format.
+
+C<<PF_size_<type>()>> - return the needed size in C<opcode_t> units.
+
+=cut
+
+*/
 
 /*
 * Local variables:

@@ -1,30 +1,49 @@
 /*
-  $Id$
+Copyright (c) 2001-2003 Yet Another Society.  All rights reserved.
+$Id$
 
-  bignum.c -- A decimal arithmetic library for Perl and Parrot
+=head1 NAME
 
-  This code is intended for inclusion in the parrot project, and also
-  for backporting into Perl5 (as a CPAN module).  Any patches to this
-  code will likely find their way back to the Mother Ship, as it were.
+types/bignum.c - A decimal arithmetic library for Perl and Parrot
 
-  There is a good deal of scope for improving the speed of this code,
-  modifications are encouraged as long as the extended regression tests
-  continue to pass.
-  Alex Gough, 2002
+=head1 DESCRIPTION
 
-  Copyright (c) 2001-2003 Yet Another Society.  All rights reserved.
+This code is intended for inclusion in the parrot project, and also
+for backporting into Perl5 (as a CPAN module).  Any patches to this
+code will likely find their way back to the Mother Ship, as it were.
 
-*/
+There is a good deal of scope for improving the speed of this code,
+modifications are encouraged as long as the extended regression tests
+continue to pass.
+Alex Gough, 2002
 
-/*
-  It was a very inconvenient habit of kittens (Alice had once made the
-  remark) that, whatever you say to them, they always purr.  "If they
-  would only purr for `yes,' and mew for `no,' or any rule of that
-  sort," she had said, "so that one could keep up a conversation!  But
-  how can you talk with a person if they always say the same thing?"
+I<It was a very inconvenient habit of kittens (Alice had once made the
+remark) that, whatever you say to them, they always purr.  "If they
+would only purr for `yes,' and mew for `no,' or any rule of that sort,"
+she had said, "so that one could keep up a conversation!  But how can
+you talk with a person if they always say the same thing?">
 
-  On this occasion the kitten only purred: and it was impossible to
-  guess whether it meant `yes' or `no'.
+I<On this occasion the kitten only purred: and it was impossible to
+guess whether it meant `yes' or `no'.>
+
+=head2 When in parrot
+
+When the library is used within parrot, all calls expect an additional
+first argument of an interpreter, for the purposes of memory allocation,
+some internal macros do not (getd/setd and CHECK(O|U)FLOW.
+
+If you're being useful and inserting proper rapid fillins, start
+with the C<BN_i*> methods, but make sure any errors can still be
+thrown.
+
+=head2 Macros
+
+Access digits, macros assume length given.
+
+=over 4
+
+=cut
+
 */
 
 #include <stdio.h>
@@ -32,38 +51,17 @@
 #include <assert.h>
 #include <string.h> /* XXX:ajg fixme later*/
 
-/*
-
-=head1 When in parrot
-
-When the library is used within parrot, all calls expect an additional
-first argument of an interpreter, for the purposes of memory allocation,
-some internal macros do not (getd/setd and CHECK(O|U)FLOW.
-
-If you're being useful and inserting proper rapid fillins, start
-with the BN_i* methods, but make sure any errors can still be
-thrown.
-
-=head2 TODO
-
-Parrot string playing, exception raising
-
-=cut
-
-*/
-
 /* * This lot wants to go in a (bignum specific seperate header file * */
 
-/* Access digits, macros assume length given */
 /*
 
-=for api bignum_private BN_setd(BIGNUM*, pos, value)
+=item C<BN_setd(BIGNUM*, pos, value)>
 
-Set digit at pos (zero is lsd) to value.  [macro]
+Set digit at C<pos> (zero is lsd) to C<value>.
 
-=for api bignum_private int BN_getd(BIGNUM*, pos)
+=item C<int BN_getd(BIGNUM*, pos)>
 
-Get value of digit at pos. [macro]
+Get value of digit at C<pos>.
 
 =cut
 
@@ -78,10 +76,10 @@ Get value of digit at pos. [macro]
 
 /*
 
-=for api bignum_private CHECK_OVERFLOW(bn, incr, context)
+=item C<CHECK_OVERFLOW(bn, incr, context)>
 
-If increasing the exponent of I<bn> by I<incr> will cause overflow
-(as decided by I<elimit>), returns true.
+If increasing the exponent of C<bn> by C<incr> will cause overflow (as
+decided by C<elimit>), returns true.
 
 =cut
 
@@ -92,10 +90,10 @@ If increasing the exponent of I<bn> by I<incr> will cause overflow
 
 /*
 
-=for api bignum_private CHECK_UNDERFLOW(bn, decrement, context)
+=item C<CHECK_UNDERFLOW(bn, decrement, context)>
 
-If subtracting I<decrement> (a positive number) from the exponent
-of I<bn> would cause underflow, returns true.
+If subtracting C<decrement> (a positive number) from the exponent
+of C<bn> would cause underflow, returns true.
 
 =cut
 
@@ -104,46 +102,53 @@ of I<bn> would cause underflow, returns true.
 #define CHECK_UNDERFLOW(bn, decr, context) \
     ( (context)->elimit + ((bn)->expn + (bn)->digits -1) > (decr) ? 0 : 1 )
 
-/********** Special Values ******************/
-
 /*
 
-=for api bignum_private am_INF(bn)
+=back
 
-True if bn is +Infinity or -Infinity. [macro]
+Special Values
+
+=over 4
+
+=item C<am_INF(bn)>
+
+True if C<bn> is +Infinity or -Infinity.
 
 =cut
 
 */
 
 #define am_INF(bn)  ((bn)->flags & BN_INF_FLAG   )
+
 /*
 
-=for api bignum_private am_NAN(bn)
+=item C<am_NAN(bn)>
 
-True if bn is either a quiet or signalling NaN. [macro]
+True if C<bn> is either a quiet or signalling NaN.
 
 =cut
 
 */
 
 #define am_NAN(bn)  ((bn)->flags & (BN_sNAN_FLAG | BN_qNAN_FLAG)   )
+
 /*
 
-=for api bignum_private am_sNAN(bn)
+=item C<am_sNAN(bn)>
 
-True if bn is a signalling NaN. [macro]
+True if C<bn> is a signalling NaN.
 
 =cut
 
 */
 
 #define am_sNAN(bn) ((bn)->flags & BN_sNAN_FLAG  )
+
 /*
 
-=for api bignum_private am_qNAN(bn)
+=item C<am_qNAN(bn)>
 
-True if bn is a quiet NaN. [macro]
+True if C<bn> is a quiet NaN.
 
 =cut
 
@@ -196,14 +201,19 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg);
 int
 BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context);
 
-/* Creation and memory management */
+/* 
 
-/*
+=back
 
-=for api bignum BIGNUM* BN_new(INTVAL length)
+=head2 Creation and Memory Management Functions
 
-Create a new BN.  length is number of I<decimal> digits required.
-The bignumber will be equal to zero.
+=over 4
+
+=item C<BIGNUM*
+BN_new(PINTD_ INTVAL length)>
+
+Create a new C<BIGNUM>.  C<length> is number of I<decimal> digits
+required. The bignumber will be equal to zero.
 
 =cut
 
@@ -231,9 +241,10 @@ BN_new(PINTD_ INTVAL length) {
 
 /*
 
-=for api bignum_private BN_grow(BIGNUM *bn, INTVAL length)
+=item C<void
+BN_grow(PINTD_ BIGNUM *in, INTVAL length)>
 
-Grows bn so that it can contain length I<decimal> digits, does not
+Grows bn so that it can contain C<length> I<decimal> digits, does not
 modify the value of the bignumber.
 
 =cut
@@ -260,7 +271,8 @@ BN_grow(PINTD_ BIGNUM *in, INTVAL length) {
 
 /*
 
-=for api bignum BN_destroy(BIGNUM *bn)
+=item C<void
+BN_destroy(PINTD_ BIGNUM *bn)>
 
 Frees all the memory used by the BIGNUM.
 
@@ -279,7 +291,8 @@ BN_destroy(PINTD_ BIGNUM *bn) {
 
 /*
 
-=for api bignum BN_create_context(precision)
+=item C<BN_CONTEXT*
+BN_create_context(PINTD_ INTVAL precision)>
 
 Creates a new context object, with specified I<precision>, other fields
 are initialised as follows:
@@ -292,7 +305,7 @@ are initialised as follows:
             and rounded are enabled.
             Lost digits and inexact are disabled.
 
-The context object can be destroyed with free().
+The context object can be destroyed with C<free()>.
 
 =cut
 
@@ -324,12 +337,13 @@ BN_create_context(PINTD_ INTVAL precision) {
 
 /*
 
-=for api bignum BN_set_digit(BIGNUM* bn, INTVAL pos, INTVAL value)
+=item C<INTVAL
+BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, INTVAL value)>
 
-Sets digit at I<pos> (zero based) to I<value>.  Number is grown if
-digits > allocated space are accessed, but intermediate digits will
-have undefined values.  If I<pos> is beyond I<digits> then I<digits>
-is also updated.
+Sets digit at C<pos> (zero based) to C<value>. Number is grown if digits
+> allocated space are accessed, but intermediate digits will have
+undefined values. If C<pos> is beyond C<digits> then C<digits> is also
+updated.
 
 =cut
 
@@ -352,10 +366,11 @@ BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, INTVAL value) {
 
 /*
 
-=for api bignum INTVAL BN_get_digit(BIGNUM* bn, INTVAL pos)
+=item C<INTVAL
+BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos)>
 
-Get the value of the decimal digit at pos, returns -1 if pos is out of
-bounds.
+Get the value of the decimal digit at C<pos>, returns -1 if C<pos> is
+out of bounds.
 
 =cut
 
@@ -370,12 +385,16 @@ BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos) {
 
 /*
 
-=for api bignum BN_set_(inf|qNAN|sNAN)(bignum)
+=item C<int BN_set_inf(PINTD_ BIGNUM* bn)>
+
+=item C<int BN_set_qNAN(PINTD_ BIGNUM* bn)>
+
+=item C<int BN_set_sNAN(PINTD_ BIGNUM* bn)>
 
 Sets its argument to appropriate value.
 
 Infinity is represented as having zero digits, an undefined exponent
-and private I<flags> set to BN_inf_FLAGS.
+and private C<flags> set to C<BN_inf_FLAGS>.
 
 sNAN is represented as having zero digits, an undefined exponent, an
 undefined sign and both qNAN and sNAN bits set.
@@ -410,10 +429,11 @@ int BN_set_sNAN(PINTD_ BIGNUM* bn) {
 
 /*
 
-=for api bignum_private BN_set_verybig(bn, context)
+=item C<int
+BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context)>
 
-Used when an operation has overflowed, sets bn according to I<rounding>
-and the sign of I<bn>:
+Used when an operation has overflowed, sets C<bn> according to
+C<<context->rounding>> and the sign of C<bn>:
 
  ROUND_HALF_UP, ROUND_HALF_EVEN => sign Infinity
  ROUND_DOWN => sign, largest finite number in given precision (or Inf, if
@@ -459,10 +479,10 @@ BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
     }
 }
 
-
 /*
 
-=for api bignum BIGNUM *BN_copy(one, two)
+=item C<BIGNUM*
+BN_copy(PINTD_ BIGNUM* one, BIGNUM* two)>
 
 Copies two into one, returning one for convenience.
 
@@ -487,9 +507,10 @@ BN_copy(PINTD_ BIGNUM* one, BIGNUM* two) {
 
 /*
 
-=for api bignum BIGNUM* BN_new_from_int(INTVAL value)
+=item C<BIGNUM*
+BN_new_from_int(PINTD_ INTVAL value)>
 
-Create a new bignum from a (signed) integer value (INTVAL)
+Create a new bignum from a (signed) integer value (C<INTVAL>)
 We assume that the implementation limits are somewhat larger than
 those required to store a single integer into a bignum.
 
@@ -520,7 +541,8 @@ BN_new_from_int(PINTD_ INTVAL value) {
 
 /*
 
-=for api bignum BN_PRINT_DEBUG(BIGNUM *bn, char *mesg)
+=item C<void
+BN_PRINT_DEBUG (BIGNUM *bn, char* mesg)>
 
 Dump the bignum for testing, along with a little message.
 
@@ -548,7 +570,8 @@ BN_PRINT_DEBUG (BIGNUM *bn, char* mesg) {
 
 /*
 
-=for api bignum_private BN_nonfatal(context, exception, message)
+=item C<INTVAL
+BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg)>
 
 When an exceptional condition occurs after which execution could
 continue.  If context specifies that death occurs, then so be it.
@@ -668,10 +691,11 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
 
 /*
 
-=for api bignum_private void BN_exception(exception, char* message)
+=item C<void
+BN_exception(PINTD_ BN_EXCEPTIONS exception, char* message)>
 
-Throw `exception'.  Should be accessed via a BN_EXCEPT macro, this
-version is provided until parrot exceptions are sorted out properly.
+Throw `exception'. Should be accessed via a C<BN_EXCEPT> macro, this
+version is provided until Parrot exceptions are sorted out properly.
 
 =cut
 
@@ -685,21 +709,23 @@ BN_exception(PINTD_ BN_EXCEPTIONS exception, char* message) {
 
 /*
 
-=for api bignum BN_to_scientific_string(BIGNUM* bn, char** dest)
+=item C<INTVAL
+BN_to_scientific_string(PINTD_ BIGNUM*bn, char **dest)>
 
 Converts bn into a scientific representation, stored in dest.
 
-=for api bignum BN_to_engineering_string(BIGNUM* bn, char* dest)
+=item C<INTVAL
+BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest)>
 
-Converts bn into a engineering representation, stored in dest.
+Converts C<*bn> into a engineering representation, stored in C<**dest>.
 
-These functions return char* strings only, parrot may want to
+These functions return C<char*> strings only, parrot may want to
 reimplement these so that locales and the like are nicely coped with.
 
 Any reimplementation should be in a seperate file, this section of
-the main file can be #ifdef'd out if this is done.
+the main file can be C<#ifdef>ed out if this is done.
 
-Memory pointed to by dest is not freed by this function.
+Memory pointed to by C<dest> is not freed by this function.
 
 =cut
 
@@ -717,9 +743,10 @@ BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest) {
 
 /*
 
-=for api bignum_private BN_to_scieng_string(bn, char**dest, int eng)
+=item C<INTVAL
+BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng)>
 
-Does the heavy string handling work, I<eng> defines the conversion to
+Does the heavy string handling work, C<eng> defines the conversion to
 perform.
 
 =cut
@@ -849,15 +876,16 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
 
 /*
 
-=for api bignum BIGNUM* BN_from_string(char* string, context) 
+=item C<BIGNUM*
+BN_from_string(PINTD_ char* s2, BN_CONTEXT *context)> 
 
 Convert a scientific string to a BIGNUM.  This function deals entirely
 with common-or-garden C byte strings, so the library can work
 anywhere.  Another version will be eventually required to cope with
 the parrot string fun.
 
-This is the Highly Pedantic string conversion.  If I<context> has
-I<extended> as a true value, then the full range of extended number is
+This is the Highly Pedantic string conversion.  If C<context> has
+C<extended> as a true value, then the full range of extended number is
 made available, and any string which does not match the numeric syntax
 is converted to a quiet NaN.
 
@@ -1077,9 +1105,10 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
 
 /*
 
-=for api bignum_private BN_strip_zeros(BIGNUM* victim, context)
+=item C<int
+BN_strip_lead_zeros(PINTD_ BIGNUM* bn, BN_CONTEXT *context)>
 
-Removes any zeros before the msd and after the lsd
+Removes any zeros before the msd and after the lsd.
 
 =cut
 
@@ -1102,7 +1131,8 @@ BN_strip_lead_zeros(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
 
 /*
 
-=for api bignum_private BN_strip_tail_zeros(BIGNUM *victim, context)
+=item C<int
+BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context)>
 
 Removes trailing zeros and increases the exponent appropriately.
 Does not remove zeros before the decimal point.
@@ -1110,7 +1140,6 @@ Does not remove zeros before the decimal point.
 =cut
 
 */
-
 
 int
 BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
@@ -1140,9 +1169,10 @@ BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
 
 /*
 
-=for api bignum BN_make_integer(BIGNUM* victim, BN_CONTEXT* context)
+=item C<int
+BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context)>
 
-Convert the number to a plain integer *if* precision such that this
+Convert the number to a plain integer I<if> precision such that this
 is possible.
 
 =cut
@@ -1171,11 +1201,12 @@ BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
 
 /*
 
-=for api bignum_private BN_really_zero(BIGNUM* victim, context)
+=item C<int
+BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero)>
 
 Sets any number which should be zero to a cannonical zero.
 
-To check if a number is equal to zero, use BN_is_zero.
+To check if a number is equal to zero, use C<BN_is_zero()>.
 
 =cut
 
@@ -1196,28 +1227,10 @@ BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero) {
 
 /*
 
-=for api bignum BN_iround(BIGNUM *victim, BN_CONTEXT* context)
+=item C<void
+BN_round(PINTD_ BIGNUM *bn, BN_CONTEXT* context)>
 
-Rounds victim according to context.
-
-Round assumes that any leading zeros are significant (after an
-addition operation, for instance).
-
-If I<precision> is positive, the digit string is rounded
-to have no more than I<precision> digits.  If I<precision> is
-equal to zero, the number is treated as an integer, and any
-digits after the number's decimal point are removed.  If I<precision>
-is negative, the number is rounded so that there are no more
-than - I<precision> digits after the decimal point.
-
-eg. for  1.234567E+3 with rounding of ROUND_DOWN
-
-precision:  4 =>  1.234E+3      1234
-precision:  6 =>  1.234567E+3   1234.56
-precision:  9 =>  1.234567E+3   1234.567
-precision:  0 =>  1234          1234
-precision: -1 =>  1.2345E+3     1234.5
-precision: -9 =>  1.234567E+3   1234.567
+Rounds C<*bn> according to C<*context>.
 
 =cut
 
@@ -1237,6 +1250,36 @@ BN_round(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
         return;
     }
 }
+
+/*
+
+=item C<int
+BN_iround (PINTD_ BIGNUM *bn, BN_CONTEXT* context)>
+
+Rounds victim according to context.
+
+Round assumes that any leading zeros are significant (after an
+addition operation, for instance).
+
+If C<precision> is positive, the digit string is rounded to have no more
+than C<precision> digits.  If C<precision> is equal to zero, the number
+is treated as an integer, and any digits after the number's decimal
+point are removed.  If C<precision> is negative, the number is rounded
+so that there are no more than - C<precision> digits after the decimal
+point.
+
+eg. for  1.234567E+3 with rounding of C<ROUND_DOWN>
+
+    precision:  4 =>  1.234E+3      1234
+    precision:  6 =>  1.234567E+3   1234.56
+    precision:  9 =>  1.234567E+3   1234.567
+    precision:  0 =>  1234          1234
+    precision: -1 =>  1.2345E+3     1234.5
+    precision: -9 =>  1.234567E+3   1234.567
+
+=cut
+
+*/
 
 int
 BN_iround (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
@@ -1341,11 +1384,12 @@ BN_iround (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
 
 /*
 
-=for api bignum_private BN_round_up(bn, context)
+=item C<int
+BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context)>
 
-Truncates coefficient of I<bn> to have I<precision> digits, then adds
+Truncates coefficient of C<bn> to have C<precision> digits, then adds
 1 to the last digits and carries until done.  Do not call this
-function with non-positive values of I<precision>.
+function with non-positive values of C<precision>.
 
 =cut
 
@@ -1385,9 +1429,10 @@ BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
 
 /*
 
-=for api bignum_private BN_round_down(bn, context)
+=item C<int
+BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context)>
 
-Truncates the coefficient of I<bn> to have I<precision> digits.  Do
+Truncates the coefficient of C<bn> to have C<precision> digits.  Do
 not call this function with non-positive precision.
 
 =cut
@@ -1415,10 +1460,11 @@ BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
 
 /*
 
-=for api bignum BN_round_as_integer(bn, context)
+=item C<void
+BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context)>
 
-I<precision> must be less than one.  This rounds so that I<expn> is at
-least I<precision>.  Name is slightly misleading.
+C<precision> must be less than one.  This rounds so that C<expn> is at
+least C<precision>.  Name is slightly misleading.
 
 =cut
 
@@ -1465,10 +1511,9 @@ BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
     return;
 }
 
-
 /*
 
-=for api bignum
+=back
 
 =head2  Arithmetic operations 
 
@@ -1478,7 +1523,8 @@ Operations are performed like this:
 
 =item Rounding
 
-Both operands are rounded to have no more than context->precision digits.
+Both operands are rounded to have no more than C<<context->precision>>
+digits.
 
 =item Computation
 
@@ -1497,9 +1543,9 @@ less than context->precision, the result is converted into an integer.
 
 =back
 
-The general form for all arithmetic operations is
+The general form for all arithmetic operations is:
 
-void BN_operation(result, one, two, context)
+    void BN_operation(result, one, two, context)
 
 =cut
 
@@ -1508,18 +1554,22 @@ void BN_operation(result, one, two, context)
 
 /*
 
-=for api bignum_private BN_arith_setup(result, one, two, context, &restore)
+=over 4
 
-rounds one and two ready for arithmetic operation.
+=item C<int
+BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+               BN_CONTEXT *context, BN_SAVE_PREC* restore)>
 
-We assume that an operation might extend the digit buffer with zeros
-on either side, but not tamper with the actual digits of the number,
-we can then easily return the number to the correct (but still rounded)
+Rounds one and two ready for arithmetic operation.
+
+We assume that an operation might extend the digit buffer with zeros on
+either side, but not tamper with the actual digits of the number, we can
+then easily return the number to the correct (but still rounded)
 representation in _cleanup later
 
 If you can promise that you will not modify the representation of one
-and two during your operation, then you may pass &restore as a NULL
-pointer to both setup and cleanup.
+and two during your operation, then you may pass C<&restore> as a
+C<NULL> pointer to both setup and cleanup.
 
 If overflow or underflow occurs during rounding, the numbers will be
 modified to the appropriate representation and will not be restorable.
@@ -1543,10 +1593,13 @@ BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=for api bignum_private BN_arith_cleanup(result, one, two, context, &restore)
+=item C<int
+BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+                 BN_CONTEXT *context, BN_SAVE_PREC* restore)>
 
-Rounds result, one, two, checks for zeroness and makes integers.
-Fixes one and two so they don't gain precision by mistake.
+Rounds C<result>, C<one>, C<two>, checks for zeroness and makes
+integers. Fixes C<one> and C<two> so they don't gain precision by
+mistake.
 
 =cut
 
@@ -1592,7 +1645,8 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=for api bignum_private BN_align(BIGNUM* one, BIGNUM* two) 
+=item C<int
+BN_align(PINTD_ BIGNUM* one, BIGNUM* two)> 
 
 Adds zero digits so that decimal points of each number are at the same
 place.
@@ -1670,7 +1724,8 @@ BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
 }
 /*
 
-=for api bignum BN_add(result, one, two, context)
+=item C<void
+BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context)>
 
 Adds one to two, returning value in result.
 
@@ -1756,7 +1811,9 @@ BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context) {
 
 /*
 
-=for api bignum_private BN_iadd(result, one, two, context)
+=item C<int
+BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+              BN_CONTEXT *context)>
 
 Adds together two aligned big numbers with coefficients of equal
 length.  Returns a result without reference to the signs of its
@@ -1849,9 +1906,11 @@ BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=for api bignum BN_subtract(result, one, two, context)
+=item C<void
+BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+            BN_CONTEXT *context)>
 
-Subtracts two from one, returning value in result.
+Subtracts C<*two> from C<*one>, returning value in C<*result>.
 
 =cut
 
@@ -1937,7 +1996,9 @@ BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=for api bignum_private BN_isubtract(result, one, two, context)
+=item C<int
+BN_isubtract (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+              BN_CONTEXT *context)>
 
 Subtracts two from one, assumes both numbers have positive aligned
 coefficients of equal length.  Sets sign of result as appropriate.
@@ -2068,9 +2129,10 @@ BN_isubtract (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=for api bignum BN_plus(result, one, context) 
+=item C<void
+BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)> 
 
-Perform unary + on one.  Does all the rounding and what have you.
+Perform unary C<+> on C<*one>.  Does all the rounding and what have you.
 
 =cut
 
@@ -2101,9 +2163,11 @@ BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
 
 /*
 
-=for api bignum BN_minus(result, one, context) 
+=item C<void
+BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)> 
 
-Perform unary - on one.  Does all the rounding and what have you.
+Perform unary C<-> (minus) on C<*one>.  Does all the rounding and what
+have you.
 
 =cut
 
@@ -2135,14 +2199,16 @@ BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
 
 /*
 
-=for api bignum BN_compare(result, one, two, context)
+=item C<void
+BN_compare (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+            BN_CONTEXT *context)>
 
-Numerically compares one and two, storing the result (as a BIGNUM) in
-result.
+Numerically compares C<*one> and C<*two>, storing the result (as a
+BIGNUM) in C<*result>.
 
-result = 1  => one > two
-result = -1 => two > one
-result = 0  => one == two
+    result = 1  => one > two
+    result = -1 => two > one
+    result = 0  => one == two
 
 =cut
 
@@ -2202,9 +2268,11 @@ BN_compare (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=for api bignum BN_multiply(result, one, two, context) 
+=item C<void 
+BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+             BN_CONTEXT *context)> 
 
-Multiplies one and two, storing the result in result.
+Multiplies C<*one> and C<*two>, storing the result in C<*result>.
 
 =cut
 
@@ -2247,11 +2315,16 @@ BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 }
 
-/*BN_imultiply
+/*
+
+=item C<int
+BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+              BN_CONTEXT *context)>
 
 Multiplication without the rounding and other set up.
 
 */
+
 int
 BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
               BN_CONTEXT *context) {
@@ -2311,14 +2384,16 @@ BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=for api bignum BN_divide(result, one, two, context)
+=item C<void
+BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+          BN_CONTEXT *context)>
 
-Divide two into one, storing up to I<precision> digits in result.
+Divide two into one, storing up to C<precision> digits in result.
 Performs own rounding.  We also assume that this function B<will not
-be used> to produce a BigInt.  That is the job of divide_integer.
+be used> to produce a BigInt.  That is the job of C<divide_integer()>.
 
 If you want to divide two integers to produce a float, you must do so
-with I<precision> greater than the number of significant digits in
+with C<precision> greater than the number of significant digits in
 either operand.  If you want the result to be an integer or a numer
 with a fixed fractional part
 
@@ -2551,9 +2626,11 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=for api bignum BN_divide_integer(result, one, two, context)
+=item C<void
+BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+                   BN_CONTEXT *context)>
 
-Places the integer part of one / two into result.
+Places the integer part of C<*one> divided by C<*two> into C<*result>.
 
 =cut
 
@@ -2655,9 +2732,11 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=for api bignum BN_remainder(result, one, two, context)
+=item C<void
+BN_remainder(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+              BN_CONTEXT *context)>
 
-places the remainder from divide-integer (above) into result.
+Places the remainder from divide-integer (above) into C<*result>.
 
 =cut
 
@@ -2854,7 +2933,17 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     return; /* phew! */
 }
 
-/* Comparison with no rounding etc. */
+/* 
+
+=item C<INTVAL
+BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context)>
+
+Comparison with no rounding etc.
+
+=cut
+
+*/
+
 INTVAL
 BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context) {
     INTVAL i,j;
@@ -2901,11 +2990,11 @@ BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context) {
 
 /*
 
-=for api bignum BN_power(result, bignum, expn, context)
+=item C<void
+BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
+              BIGNUM* expn, BN_CONTEXT* context)>
 
-Calculate result = bignum ** expn;
-
-XXX To Do
+Calculate C<result> = C<bignum> to the power of C<*expn>;
 
 =cut
 
@@ -2923,11 +3012,11 @@ BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
 
 /*
 
-=for api bignum BN_rescale(result, bignum, expn, context)
-
-Rescales bignum to have an exponent of expn.
-
-XXX To Do
+=item C<void
+BN_rescale(PINTD_ BIGNUM* result, BIGNUM* one, BIGNUM* two,
+                BN_CONTEXT* context)>
+                
+Rescales C<*one> to have an exponent of C<*two>.
 
 =cut
 
@@ -2951,7 +3040,8 @@ BN_rescale(PINTD_ BIGNUM* result, BIGNUM* one, BIGNUM* two,
 
 /*
 
-=for api bignum INTVAL BN_to_int(BIGNUM* bignum, BN_CONTEXT* context)
+=item C<INTVAL
+BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context)>
 
 Converts the bignum into an integer, raises overflow if an exact
 representation cannot be created.
@@ -3006,6 +3096,17 @@ BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
     return bn->sign ? -result : result;
 }
 
+/*
+
+=item C<INTVAL
+BN_is_zero(BIGNUM* foo, BN_CONTEXT* context)>
+
+Returns a boolean value indicating whether C<*foo> is zero.
+
+=cut
+
+*/
+
 INTVAL
 BN_is_zero(BIGNUM* foo, BN_CONTEXT* context) {
     BN_really_zero(foo, context->extended);
@@ -3016,6 +3117,18 @@ BN_is_zero(BIGNUM* foo, BN_CONTEXT* context) {
         return 0;
     }
 }
+
+/*
+
+=back
+
+=head1 TODO
+
+Parrot string playing, exception raising
+
+=cut
+
+*/
 
 /*
  * Local variables:

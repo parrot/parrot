@@ -1,20 +1,45 @@
-/* dbcs.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     This defines the DBCS encoding routines.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *     All byte values above 127 are assumed to be lead bytes
- *     skip_backward cannot be implemented for DBCS
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+encodings/dbcs.c - DBCS
+
+=head1 DESCRIPTION
+
+A I<double-byte character set> (DBCS) is a character set that uses two-byte
+(16-bit) characters.
+
+DBCS characters are composed of one or two bytes. A lead byte specifies
+that it and the following I<trail byte> form a single two-byte-wide
+character.
+
+Note that currently all byte values above 127 are assumed to be I<lead
+bytes>, therefore C<skip_backward()> cannot be implemented.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 typedef unsigned char byte_t;
+
+/*
+
+=item C<static UINTVAL
+dbcs_characters(const void *ptr, UINTVAL bytes)>
+
+Returns the number of characters in the C<bytes> bytes from C<*ptr>.
+
+=cut
+
+*/
 
 static UINTVAL
 dbcs_characters(const void *ptr, UINTVAL bytes)
@@ -34,6 +59,17 @@ dbcs_characters(const void *ptr, UINTVAL bytes)
     return characters;
 }
 
+/*
+
+=item C<static UINTVAL
+dbcs_decode(const void *ptr)>
+
+Returns the integer for the one or two byte character found at C<*ptr>.
+
+=cut
+
+*/
+
 static UINTVAL
 dbcs_decode(const void *ptr)
 {
@@ -45,6 +81,17 @@ dbcs_decode(const void *ptr)
         return (byte1 << 8) | byte2;
     }
 }
+
+/*
+
+=item C<static void *
+dbcs_encode(void *ptr, UINTVAL c)>
+
+Returns the one or two byte encoding of integer C<c>.
+
+=cut
+
+*/
 
 static void *
 dbcs_encode(void *ptr, UINTVAL c)
@@ -67,6 +114,17 @@ dbcs_encode(void *ptr, UINTVAL c)
     return bptr;
 }
 
+/*
+
+=item C<static const void *
+dbcs_skip_forward(const void *ptr, UINTVAL n)>
+
+Moves C<ptr> C<n> characters forward.
+
+=cut
+
+*/
+
 static const void *
 dbcs_skip_forward(const void *ptr, UINTVAL n)
 {
@@ -82,6 +140,18 @@ dbcs_skip_forward(const void *ptr, UINTVAL n)
     return bptr;
 }
 
+/*
+
+=item C<static const void *
+dbcs_skip_backward(const void *ptr, UINTVAL n)>
+
+Raises an exception indicating the C<skip_backwards> is an undefined
+operation for DBCS.
+
+=cut
+
+*/
+
 static const void *
 dbcs_skip_backward(const void *ptr, UINTVAL n)
 {
@@ -89,6 +159,26 @@ dbcs_skip_backward(const void *ptr, UINTVAL n)
                        "Undefined operation for DBCS encoding\n");
     return ptr;
 }
+
+/*
+
+=back
+
+=head2 Iterator Functions
+
+String iteration is currently only used in C<hash_string_equal()>.
+
+=over 4
+
+=item C<static UINTVAL
+dbcs_decode_and_advance(struct string_iterator_t *i)>
+
+The DBCS implementation of the string iterator's C<decode_and_advance>
+function.
+
+=cut
+
+*/
 
 static UINTVAL
 dbcs_decode_and_advance(struct string_iterator_t *i)
@@ -105,6 +195,18 @@ dbcs_decode_and_advance(struct string_iterator_t *i)
         return (*ptr << 8) | *(ptr+1);
     }
 }
+
+/*
+
+=item C<static void
+dbcs_set_position(struct string_iterator_t *i, Parrot_Int pos)>
+
+The DBCS implementation of the string iterator's C<set_position>
+function.
+
+=cut
+
+*/
 
 static void
 dbcs_set_position(struct string_iterator_t *i, Parrot_Int pos)
@@ -133,6 +235,24 @@ const ENCODING dbcs_encoding = {
     dbcs_decode_and_advance,
     dbcs_set_position
 };
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<encodings/singlebyte.c>,
+F<encodings/utf8.c>,
+F<encodings/utf16.c>,
+F<encodings/utf32.c>,
+F<src/string.c>,
+F<include/parrot/string.h>,
+F<docs/string.pod>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

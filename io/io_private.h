@@ -1,21 +1,26 @@
-/* io_private.h
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *      Internal Details of the Parrot IO subsystem
- *  Data Structure and Algorithms:
- *  History:
- *      Originally written by Melvin Smith
- *      Refactored by Juergen Boemmels
- *      Internal Definitions moved from include/parrot/io.h
- *  Notes:
- *      TODO: move the Layer structure to here also
- *  References:
- *      Perl6 RFCs (14,30,47,60,186,239,321,345,350)
- *      Some ideas and goals from Perl5.7 and Nick Ing-Simmons' work
- *      Some ideas from AT&T SFIO
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+io/io_private.h - IO internals
+
+=head1 DESCRIPTION
+
+Internal Details of the Parrot IO subsystem.
+
+=head2 References
+
+Perl6 RFCs (14,30,47,60,186,239,321,345,350).
+
+Some ideas and goals from Perl5.7 and Nick Ing-Simmons' work.
+
+Some ideas from AT&T SFIO.
+
+=cut
+
+*/
 
 #if !defined(PARROT_IO_PRIVATE_H_GUARD)
 #define PARROT_IO_PRIVATE_H_GUARD
@@ -139,6 +144,33 @@ INTVAL    PIO_connect_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING
 
 
 #endif /* !defined(PARROT_IO_PRIVATE_H_GUARD) */
+
+/*
+
+=head1 SEE ALSO
+
+F<io/io_buf.c>,
+F<io/io_passdown.c>,
+F<io/io_stdio.c>,
+F<io/io_unix.c>,
+F<io/io_win32.c>,
+F<io/io.c>.
+
+=head1 HISTORY
+
+Originally written by Melvin Smith.
+
+Refactored by Juergen Boemmels.
+
+Internal Definitions moved from F<include/parrot/io.h>.
+
+=head1 TODO
+
+Move the Layer structure to here also.
+
+=cut
+
+*/
 
 /*
  * Local variables:

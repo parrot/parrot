@@ -1,14 +1,22 @@
-/* utf8.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     This defines the UTF-8 encoding routines.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+encodings/utf8.c - UTF-8 encoding
+
+=head1 DESCRIPTION
+
+UTF-8 (L<http://www.utf-8.com/>).
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/unicode.h"
@@ -36,6 +44,17 @@ const char Parrot_utf8skip[256] = {
 typedef unsigned char utf8_t;
 #endif
 
+/*
+
+=item C<static UINTVAL
+utf8_characters(const void *ptr, UINTVAL bytes)>
+
+Returns the number of characters in the C<bytes> bytes from C<*ptr>.
+
+=cut
+
+*/
+
 static UINTVAL
 utf8_characters(const void *ptr, UINTVAL bytes)
 {
@@ -54,6 +73,17 @@ utf8_characters(const void *ptr, UINTVAL bytes)
 
     return characters;
 }
+
+/*
+
+=item C<static UINTVAL
+utf8_decode(const void *ptr)>
+
+Returns the integer for the UTF-8 character found at C<*ptr>.
+
+=cut
+
+*/
 
 static UINTVAL
 utf8_decode(const void *ptr)
@@ -85,6 +115,17 @@ utf8_decode(const void *ptr)
     return c;
 }
 
+/*
+
+=item C<static void *
+utf8_encode(void *ptr, UINTVAL c)>
+
+Returns the UTF-8 encoding of integer C<c>.
+
+=cut
+
+*/
+
 static void *
 utf8_encode(void *ptr, UINTVAL c)
 {
@@ -107,6 +148,17 @@ utf8_encode(void *ptr, UINTVAL c)
     return u8ptr + len;
 }
 
+/*
+
+=item C<static const void *
+utf8_skip_forward(const void *ptr, UINTVAL n)>
+
+Moves C<ptr> C<n> characters forward.
+
+=cut
+
+*/
+
 static const void *
 utf8_skip_forward(const void *ptr, UINTVAL n)
 {
@@ -118,6 +170,17 @@ utf8_skip_forward(const void *ptr, UINTVAL n)
 
     return u8ptr;
 }
+
+/*
+
+=item C<static const void *
+utf8_skip_backward(const void *ptr, UINTVAL n)>
+
+Moves C<ptr> C<n> characters back.
+
+=cut
+
+*/
 
 static const void *
 utf8_skip_backward(const void *ptr, UINTVAL n)
@@ -132,6 +195,26 @@ utf8_skip_backward(const void *ptr, UINTVAL n)
 
     return u8ptr;
 }
+
+/*
+
+=back
+
+=head2 Iterator Functions
+
+String iteration is currently only used in C<hash_string_equal()>.
+
+=over 4
+
+=item C<static UINTVAL
+utf8_decode_and_advance(struct string_iterator_t *i)>
+
+The UTF-8 implementation of the string iterator's C<decode_and_advance>
+function.
+
+=cut
+
+*/
 
 static UINTVAL
 utf8_decode_and_advance(struct string_iterator_t *i)
@@ -167,6 +250,17 @@ utf8_decode_and_advance(struct string_iterator_t *i)
     return c;
 }
 
+/*
+
+=item C<func>
+
+The UTF-8 implementation of the string iterator's C<set_position>
+function.
+
+=cut
+
+*/
+
 /* XXX Should use quickest direction */
 static void
 utf8_set_position(struct string_iterator_t *i, Parrot_Int pos)
@@ -192,6 +286,24 @@ const ENCODING utf8_encoding = {
     utf8_decode_and_advance,
     utf8_set_position
 };
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<encodings/dbcs.c>,
+F<encodings/singlebyte.c>,
+F<encodings/utf16.c>,
+F<encodings/utf32.c>,
+F<src/string.c>,
+F<include/parrot/string.h>,
+F<docs/string.pod>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,19 +1,25 @@
-/* io_stdio.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *      $Id$
- *  Overview:
- *      This is the Parrot IO STDIO layer. This may provide a subset of
- *      full functionality, but must compile on any system with the
- *      ANSI C standard library.  Also note that unlike the other low-level
- *      IO layers (UNIX, Win32), this is _buffered_ IO, out of necessity.
- * 
- *  Data Structure and Algorithms:
- *  History:
- *      Adapted from io_unix.c by Josh WIlmes (josh@hitchhiker.org)
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+io/io_stdio.c - STDIO layer
+
+=head1 DESCRIPTION
+
+This is the Parrot IO STDIO layer. This may provide a subset of full
+functionality, but must compile on any system with the ANSI C standard
+library.  Also note that unlike the other low-level IO layers (UNIX,
+Win32), this is I<buffered> IO, out of necessity.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -56,6 +62,18 @@ static PIOOFF_T  PIO_stdio_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static INTVAL    PIO_stdio_isatty(PIOHANDLE fd);
 
 
+/*
+
+=item C<static const char *
+flags_to_stdio(INTVAL flags)>
+
+Returns a C string representation of C<flags> suitable for passing to
+C<fopen()> in C<PIO_stdio_open()>.
+
+=cut
+
+*/
+
 static const char *
 flags_to_stdio(INTVAL flags)
 {
@@ -83,10 +101,17 @@ flags_to_stdio(INTVAL flags)
     }
 }
 
-
 /*
- * Setup standard streams, etc.
- */
+
+=item C<static INTVAL
+PIO_stdio_init(theINTERP, ParrotIOLayer *layer)>
+
+Setup standard streams, etc.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_stdio_init(theINTERP, ParrotIOLayer *layer)
 {
@@ -110,11 +135,19 @@ PIO_stdio_init(theINTERP, ParrotIOLayer *layer)
     return 0;
 }
 
-
 /*
- * Open modes (read, write, append, etc.) are done in pseudo-Perl
- * style using <, >, etc.
- */
+
+=item C<static ParrotIO *
+PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
+              const char *spath, INTVAL flags)>
+
+Open modes (read, write, append, etc.) are done in pseudo-Perl style
+using C<<<>>, C<<>>>, etc.
+
+=cut
+
+*/
+
 static ParrotIO *
 PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
               const char *spath, INTVAL flags)
@@ -153,6 +186,16 @@ PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
     return NULL;
 }
 
+/*
+
+=item C<static ParrotIO *
+PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fptr, INTVAL flags)>
+
+Desc.
+
+=cut
+
+*/
 
 static ParrotIO *
 PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fptr, INTVAL flags)
@@ -174,6 +217,16 @@ PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fptr, INTVAL flags)
     return io;
 }
 
+/*
+
+=item C<static INTVAL
+PIO_stdio_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+Desc.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_stdio_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -189,6 +242,16 @@ PIO_stdio_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return 0;
 }
 
+/*
+
+=item C<static INTVAL
+PIO_stdio_isatty(PIOHANDLE fptr)>
+
+Desc.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_stdio_isatty(PIOHANDLE fptr)
@@ -199,6 +262,16 @@ PIO_stdio_isatty(PIOHANDLE fptr)
     return 0;
 }
 
+/*
+
+=item C<INTVAL
+PIO_stdio_getblksize(PIOHANDLE fptr)>
+
+Desc.
+
+=cut
+
+*/
 
 INTVAL
 PIO_stdio_getblksize(PIOHANDLE fptr)
@@ -209,6 +282,16 @@ PIO_stdio_getblksize(PIOHANDLE fptr)
     return PIO_BLKSIZE;
 }
 
+/*
+
+=item C<static INTVAL
+PIO_stdio_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+Desc.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_stdio_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -219,6 +302,17 @@ PIO_stdio_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return fflush((FILE*)io->fd);
 }
 
+/*
+
+=item C<static size_t
+PIO_stdio_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+              void *buffer, size_t len)>
+
+Desc.
+
+=cut
+
+*/
 
 static size_t
 PIO_stdio_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -241,6 +335,17 @@ PIO_stdio_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return bytes;
 }
 
+/*
+
+=item C<static size_t
+PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+               const void *buffer, size_t len)>
+
+Desc.
+
+=cut
+
+*/
 
 static size_t
 PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -252,10 +357,18 @@ PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return(fwrite(buffer, 1, len, (FILE*)io->fd));
 }
 
-
 /*
- * Hard seek
- */
+
+=item C<static PIOOFF_T
+PIO_stdio_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+              PIOOFF_T offset, INTVAL whence)>
+
+Hard seek.
+
+=cut
+
+*/
+
 static PIOOFF_T
 PIO_stdio_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
               PIOOFF_T offset, INTVAL whence)
@@ -277,6 +390,16 @@ PIO_stdio_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return pos;
 }
 
+/*
+
+=item C<static PIOOFF_T
+PIO_stdio_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+Desc.
+
+=cut
+
+*/
 
 static PIOOFF_T
 PIO_stdio_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -286,8 +409,6 @@ PIO_stdio_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 
     return(ftell((FILE*)io->fd));
 }
-
-
 
 ParrotIOLayerAPI pio_stdio_layer_api = {
     PIO_stdio_init,
@@ -319,6 +440,27 @@ ParrotIOLayerAPI pio_stdio_layer_api = {
     0, /* no send */
     0 /* no recv */
 };
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<io/io_buf.c>,
+F<io/io_passdown.c>,
+F<io/io_unix.c>,
+F<io/io_win32.c>,
+F<io/io.c>,
+F<io/io_private.h>.
+
+=head1 HISTORY
+
+Adapted from io_unix.c by Josh WIlmes (josh@hitchhiker.org).
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,10 +1,20 @@
-/* bignum.h -- Infinite precision bcd for parrot -- Alex Gough, 2002 */
+/* 
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
 
-/* $Id$ */
+=head1 NAME
 
-/* Some of this file will want to be moved to the parrot include
-   directories, but some should stay here, for the sake of being easily
-   removed for back-porting */
+types/bignum.h - Infinite precision bcd for parrot
+
+=head1 DESCRIPTION
+
+Some of this file will want to be moved to the parrot include
+directories, but some should stay here, for the sake of being easily
+removed for back-porting.
+
+=cut
+
+*/
 
 /* Stuff to be parrot-like in source, even if not being used in parrot */
 #ifdef PARROT_IN_CORE
@@ -177,6 +187,7 @@ int BN_set_qNAN(PINTD_ BIGNUM* bn);
 int BN_set_sNAN(PINTD_ BIGNUM* bn);
 int BN_set_inf(PINTD_ BIGNUM* bn);
 int BN_really_zero(PINTD_ BIGNUM* bn, int);
+
 /*
  * Local variables:
  * c-indentation-style: bsd

@@ -1,19 +1,31 @@
-/* io_unix.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *      $Id$
- *  Overview:
- *      This is the Parrot IO UNIX layer. May be changed to
- *      include other platforms if that platform is similar
- *      enough to keep from smudging, else implement seperate layer.
- *      For UNIX systems this is the low level OS layer (unbuffered).
- *  Data Structure and Algorithms:
- *  History:
- *      Initially written by Melvin Smith (mrjoltcola@mindspring.com)
- *  Notes:
- *  References:
- *      APitUE - W. Richard Stevens, AT&T SFIO, Perl5 (Nick Ing-Simmons)
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+io/io_unix.c - UNIX IO layer
+
+=head1 DESCRIPTION
+
+This is the Parrot UNIX IO layer. It implements unbuffered, low-level,
+UNIX-specifc functionality.
+
+As "UNIX" is already a generalization, it may be necessary to create a
+separate OS-specific layers for UNIX flavours, to avoid
+over-complicating this file.
+
+=head2 References:
+
+APitUE - W. Richard Stevens, AT&T SFIO, Perl5 (Nick Ing-Simmons)
+ 
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "io_private.h"
@@ -54,6 +66,19 @@ static PIOOFF_T  PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 static INTVAL    PIO_unix_isatty(PIOHANDLE fd);
 
 
+/*
+
+=item C<static INTVAL
+flags_to_unix(INTVAL flags)>
+
+Returns a UNIX-specific interpretation of C<flags> suitable for passing
+to C<open()> and C<fopen()> in C<PIO_unix_open()> and
+C<PIO_unix_fdopen()> respectively.
+
+=cut
+
+*/
+
 static INTVAL
 flags_to_unix(INTVAL flags)
 {
@@ -78,11 +103,18 @@ flags_to_unix(INTVAL flags)
     return oflags;
 }
 
-
-
 /*
- * Setup standard streams, etc.
- */
+
+=item C<static INTVAL
+PIO_unix_init(theINTERP, ParrotIOLayer *layer)>
+
+Sets up the interpreter's standard C<std*> IO handles. Returns C<0> on
+success and C<-1> on error.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_unix_init(theINTERP, ParrotIOLayer *layer)
 {
@@ -107,11 +139,19 @@ PIO_unix_init(theINTERP, ParrotIOLayer *layer)
     return -1;
 }
 
-
 /*
- * Open modes (read, write, append, etc.) are done in pseudo-Perl
- * style using <, >, etc.
- */
+
+=item C<static ParrotIO *
+PIO_unix_open(theINTERP, ParrotIOLayer *layer,
+              const char *spath, INTVAL flags)>
+
+Opens C<*spath>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
+values.
+
+=cut
+
+*/
+
 static ParrotIO *
 PIO_unix_open(theINTERP, ParrotIOLayer *layer,
               const char *spath, INTVAL flags)
@@ -195,11 +235,24 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
 
 
 #if PARROT_ASYNC_DEVEL
-/* experimental code, this is gonna get messy */
 
 /*
- * Toggle ASYNC on the IO descriptor.
- */
+
+=item C<static INTVAL
+PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)>
+
+Experimental asynchronous IO. 
+
+This is available if C<PARROT_ASYNC_DEVEL> is defined.
+
+Only works on Linux at the moment.
+
+Toggles the C<O_ASYNC> flag on the IO file descriptor.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
 {
@@ -220,7 +273,16 @@ PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
 
 #endif
 
+/*
 
+=item C<static ParrotIO *
+PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)>
+
+Returns a new C<ParrotIO> with file descriptor C<fd>.
+
+=cut
+
+*/
 
 static ParrotIO *
 PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
@@ -262,6 +324,16 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
     return io;
 }
 
+/*
+
+=item C<static INTVAL
+PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+Closes C<*io>'s file descriptor.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -275,6 +347,16 @@ PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return 0;
 }
 
+/*
+
+=item C<INTVAL
+PIO_unix_isatty(PIOHANDLE fd)>
+
+Returns a boolean value indicating whether C<fd> is a console/tty.
+
+=cut
+
+*/
 
 INTVAL
 PIO_unix_isatty(PIOHANDLE fd)
@@ -283,10 +365,22 @@ PIO_unix_isatty(PIOHANDLE fd)
 }
 
 /*
- * Various ways of determining block size. If passed a descriptor
- * we can use fstat() and the stat buf if available, or the BLKSIZE
- * constant if available at compile time.
- */
+
+=item C<INTVAL
+PIO_unix_getblksize(PIOHANDLE fd)>
+
+Various ways of determining block size.
+
+If passed a file descriptor then C<fstat()> and the C<stat> buffer are
+used if available. 
+
+If called without an argument then the C<BLKSIZE> constant is returned
+if it was available at compile time, otherwise C<PIO_BLKSIZE> is returned.
+
+=cut
+
+*/
+
 INTVAL
 PIO_unix_getblksize(PIOHANDLE fd)
 {
@@ -317,9 +411,19 @@ PIO_unix_getblksize(PIOHANDLE fd)
 }
 
 /*
- * At lowest layer all we can do for flush is ask kernel to sync().
- * XXX: Is it necessary to sync here?
- */
+
+=item C<static INTVAL
+PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+At lowest layer all we can do for C<flush> is to ask the kernel to
+C<sync()>.
+
+XXX: Is it necessary to C<sync()> here?
+
+=cut
+
+*/
+
 static INTVAL
 PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
@@ -329,6 +433,18 @@ PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return fsync(io->fd);
 }
 
+/*
+
+=item C<static size_t
+PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+              void *buffer, size_t len)>
+
+Calls C<read()> to return up to C<len> bytes in the memory starting at
+C<buffer>.
+
+=cut
+
+*/
 
 static size_t
 PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -361,6 +477,18 @@ PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     /* return bytes; */ /* XXX never reached -- why was it here? */
 }
 
+/*
+
+=item C<static size_t
+PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+               const void *buffer, size_t len)>
+
+Calls C<write()> to write C<len> bytes from the memory starting at
+C<buffer> to the file descriptor in C<*io>.
+
+=cut
+
+*/
 
 static size_t
 PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -401,10 +529,21 @@ PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return bytes;
 }
 
-
 /*
- * Hard seek
- */
+
+=item C<static PIOOFF_T
+PIO_unix_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+              PIOOFF_T offset, INTVAL whence)>
+
+Hard seek.
+
+Calls C<lseek()> to advance the read/write position on C<*io>'s file
+descriptor to C<offset> bytes from the location indicated by C<whence>.
+
+=cut
+
+*/
+
 static PIOOFF_T
 PIO_unix_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
               PIOOFF_T offset, INTVAL whence)
@@ -423,6 +562,16 @@ PIO_unix_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return pos;
 }
 
+/*
+
+=item C<static PIOOFF_T
+PIO_unix_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+Returns the current read/write position on C<*io>'s file discriptor.
+
+=cut
+
+*/
 
 static PIOOFF_T
 PIO_unix_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -436,25 +585,33 @@ PIO_unix_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return pos;
 }
 
-
-
 /*
- * These could be native extensions but they probably should be
- * here if we wish to make them integrated with the async IO system.
- */
 
+=back
 
-/*
- *  Networking Section of IO Layer
- *  Very minimal stubs for now, maybe someone will run with these.
- */
+=head2 Networking
 
+Define C<PARROT_NET_DEVEL> to enable networking.
 
-/*
- * PIO_sockaddr_in is not part of the layer and so must be extern
- * XXX: We can probably just write our own routines (htons, inet_aton, etc.)
- * and take this out of platform specific compilation
- */
+These could be native extensions but they probably should be here if we
+wish to make them integrated with the async IO system.
+
+Very minimal stubs for now, maybe someone will run with these.
+
+=over 4
+
+=item C<STRING *
+PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)>
+
+C<PIO_sockaddr_in()> is not part of the layer and so must be C<extern>.
+
+XXX: We can probably just write our own routines (C<htons()>,
+C<inet_aton()>, etc.) and take this out of platform specific compilation
+
+=cut
+
+*/
+
 STRING *
 PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 {
@@ -494,6 +651,18 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 
 #if PARROT_NET_DEVEL
 
+/*
+
+=item C<static ParrotIO *
+PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)>
+
+Uses C<socket()> to create a socket with the specified address family,
+socket type and protocol number.
+
+=cut
+
+*/
+
 static ParrotIO *
 PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
 {
@@ -509,6 +678,17 @@ PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
     perror("socket:");
     return 0;
 }
+
+/*
+
+=item C<static INTVAL
+PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)>
+
+Connects C<*io>'s socket to address C<*r>.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
@@ -544,8 +724,16 @@ AGAIN:
 }
 
 /*
- * Bind the socket to a local address & port
- */
+
+=item C<static INTVAL
+PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)>
+
+Binds C<*io>'s socket to the local address and port specified by C<*l>.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 {
@@ -567,8 +755,17 @@ PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 }
 
 /*
- * Listen for new connections. This is only applicable to STREAM or SEQ sockets
- */
+
+=item C<static INTVAL
+PIO_unix_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL sec)>
+
+Listen for new connections. This is only applicable to C<STREAM> or
+C<SEQ> sockets.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_unix_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL sec)
 {
@@ -581,8 +778,16 @@ PIO_unix_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL sec)
 }
 
 /*
- * Accept new connection and return a newly created ParrotIO Socket
- */
+
+=item C<static ParrotIO *
+PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+Accept a new connection and return a newly created C<ParrotIO> socket.
+
+=cut
+
+*/
+
 static ParrotIO *
 PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
@@ -612,6 +817,16 @@ PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return newio;
 }
 
+/*
+
+=item C<static INTVAL
+PIO_unix_send(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING *s)>
+
+Send the message C<*s> to C<*io>'s connected socket.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_unix_send(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING *s)
@@ -649,6 +864,17 @@ AGAIN:
         }
     }
 }
+
+/*
+
+=item C<static INTVAL
+PIO_unix_recv(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING **s)>
+
+Receives a message in C<**s> from C<*io>'s connected socket.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_unix_recv(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING **s)
@@ -693,15 +919,26 @@ AGAIN:
     }
 }
 
-
 /*
- * Utility function for polling a single IO stream with a timeout.
- * Returns 1 | 2 | 4 (read, write, error) value
- * This is not equivalent to any speficic POSIX or BSD Socket
- * call, however it is a useful, common primitive.
- * Also, a buffering layer above this may choose to reimpliment
- * by checking the read buffer.
- */
+
+=item C<static INTVAL
+PIO_unix_poll(theINTERP, ParrotIOLayer *l, ParrotIO *io, int which,
+               int sec, int usec)>
+
+Utility function for polling a single IO stream with a timeout.
+
+Returns a 1 | 2 | 4 (read, write, error) value.
+
+This is not equivalent to any speficic POSIX or BSD socket call, however
+it is a useful, common primitive.
+
+Also, a buffering layer above this may choose to reimpliment by checking
+the read buffer.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_unix_poll(theINTERP, ParrotIOLayer *l, ParrotIO *io, int which,
                int sec, int usec)
@@ -732,9 +969,18 @@ AGAIN:
 }
 
 /*
- * Very limited exec for now.
- * XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
- */
+
+=item C<static ParrotIO *
+PIO_unix_pipe(theINTERP, ParrotIOLayer *l, STRING *cmd, int flags)>
+
+Very limited C<exec> for now.
+
+XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
+
+=cut
+
+*/
+
 static ParrotIO *
 PIO_unix_pipe(theINTERP, ParrotIOLayer *l, STRING *cmd, int flags)
 {
@@ -826,6 +1072,28 @@ ParrotIOLayerAPI pio_unix_layer_api = {
 
 
 #endif /* PIO_OS_UNIX */
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<io/io_buf.c>,
+F<io/io_passdown.c>,
+F<io/io_stdio.c>,
+F<io/io_unix.c>,
+F<io/io_win32.c>,
+F<io/io.c>,
+F<io/io_private.h>.
+
+=head1 HISTORY
+
+Initially written by Melvin Smith (mrjoltcola@mindspring.com).
+
+=cut
+
+*/
 
 /*
  * Local variables:

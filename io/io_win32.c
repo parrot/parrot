@@ -1,16 +1,26 @@
-/* io_win32.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *      $Id$
- *  Overview:
- *      This is the Parrot IO OS layer for Win32 platforms.
- *  Data Structure and Algorithms:
- *  History:
- *      Initially written by Melvin Smith
- *  Notes:
- *  References:
- *      Win32 System Programming, 2nd Edition
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+io/name.c - Win32 IO layer
+
+=head1 DESCRIPTION
+
+This is the Parrot OS-speciic IO layer for Win32 platforms.
+
+=head2 References
+
+Win32 System Programming, 2nd Edition.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #ifdef WIN32
 #  include <windows.h>
@@ -58,8 +68,18 @@ static PIOOFF_T  PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 static PIOOFF_T  PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 static INTVAL    PIO_win32_isatty(PIOHANDLE fd);
 
+/*
 
-/* Convert to platform specific bit open flags */
+=item C<static INTVAL
+flags_to_win32(INTVAL flags, DWORD * fdwAccess,
+               DWORD * fdwShareMode, DWORD * fdwCreate)>
+
+Convert to platform-specific bit open flags.
+
+=cut
+
+*/
+
 static INTVAL
 flags_to_win32(INTVAL flags, DWORD * fdwAccess,
                DWORD * fdwShareMode, DWORD * fdwCreate)
@@ -90,10 +110,17 @@ flags_to_win32(INTVAL flags, DWORD * fdwAccess,
     return 1;
 }
 
-
 /*
- * Setup standard streams.
- */
+
+=item C<static INTVAL
+PIO_win32_init(theINTERP, ParrotIOLayer *layer)>
+
+Sets up the standard C<std*> IO handles.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_win32_init(theINTERP, ParrotIOLayer *layer)
 {
@@ -123,6 +150,16 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
     return 0;
 }
 
+/*
+
+=item C<INTVAL
+PIO_win32_getblksize(PIOHANDLE fd)>
+
+Returns C<PIO_BLKSIZE>.
+
+=cut
+
+*/
 
 INTVAL
 PIO_win32_getblksize(PIOHANDLE fd)
@@ -131,6 +168,18 @@ PIO_win32_getblksize(PIOHANDLE fd)
     return PIO_BLKSIZE;
 }
 
+/*
+
+=item C<static ParrotIO *
+PIO_win32_open(theINTERP, ParrotIOLayer *layer,
+               const char *spath, INTVAL flags)>
+
+Calls C<CreateFile()> to open C<*spath> with the Win32 translation of
+C<flags>.
+
+=cut
+
+*/
 
 static ParrotIO *
 PIO_win32_open(theINTERP, ParrotIOLayer *layer,
@@ -171,6 +220,16 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     return (ParrotIO *)NULL;
 }
 
+/*
+
+=item C<static ParrotIO *
+PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)>
+
+Returns a new C<ParrotIO> with C<fd> as its file descriptor.
+
+=cut
+
+*/
 
 static ParrotIO *
 PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
@@ -190,6 +249,16 @@ PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
     return io;
 }
 
+/*
+
+=item C<static INTVAL
+PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+Calls C<CloseHandle()> to close C<*io>'s file descriptor.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -201,6 +270,16 @@ PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return 0;
 }
 
+/*
+
+=item C<INTVAL
+PIO_win32_isatty(PIOHANDLE fd)>
+
+Returns whether C<fd> is a console/tty.
+
+=cut
+
+*/
 
 INTVAL
 PIO_win32_isatty(PIOHANDLE fd)
@@ -211,6 +290,16 @@ PIO_win32_isatty(PIOHANDLE fd)
     return 0;
 }
 
+/*
+
+=item C<static INTVAL
+PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -227,6 +316,18 @@ PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return FlushFileBuffers(io->fd);
 }
 
+/*
+
+=item C<static size_t
+PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+               void *buffer, size_t len)>
+
+Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
+descriptor to the memory starting at C<buffer>.
+
+=cut
+
+*/
 
 static size_t
 PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -247,6 +348,18 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return 0;
 }
 
+/*
+
+=item C<static size_t
+PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+                const void *buffer, size_t len)>
+
+Calls C<WriteFile()> to write C<len> bytes from the memory starting at
+C<buffer> to C<*io>'s file descriptor.
+
+=cut
+
+*/
 
 static size_t
 PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -275,14 +388,21 @@ PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return (size_t)-1;
 }
 
-
 /*
- * puts() tries WriteConsole() first, then WriteFile(), whereas
- * write() calls WriteFile() only. I've also read that WriteFile
- * will call WriteConsole if the handle is the right type (console) so
- * I suppose this is saving a function call since puts is probably
- * used for consoles a lot.
- */
+
+=item C<static INTVAL
+PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)>
+
+C<PIO_win32_puts()> tries C<WriteConsole()> first, then C<WriteFile()>,
+whereas C<write()> calls C<WriteFile()> only. I've also read that
+C<WriteFile()> will call C<WriteConsole()> if the handle is the right
+type (console) so I suppose this is saving a function call since "puts"
+is probably used for consoles a lot.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
 {
@@ -308,10 +428,22 @@ PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
     return -1;
 }
 
-
 /*
- * Hard seek
- */
+
+=item C<static PIOOFF_T
+PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+               PIOOFF_T off, INTVAL whence)>
+
+Hard seek.
+
+Calls C<SetFilePointer()> to move the read/write position of C<*io>'s
+file descriptor to C<off> bytes relative to the location specified by
+C<whence>.
+
+=cut
+
+*/
+
 static PIOOFF_T
 PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                PIOOFF_T off, INTVAL whence)
@@ -329,6 +461,16 @@ PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
     return io->fpos;
 }
 
+/*
+
+=item C<static PIOOFF_T
+PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)>
+
+Returns the current read/write position of C<*io>'s file descriptor.
+
+=cut
+
+*/
 
 static PIOOFF_T
 PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
@@ -342,12 +484,20 @@ PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
     return p.QuadPart;
 }
 
-
 /*
- * PIO_sockaddr_in is not part of the layer and so must be extern
- * XXX: We can probably just write our own routines (htons, inet_aton, etc.)
- * and take this out of platform specific compilation
- */
+
+=item C<STRING *
+PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)>
+
+C<PIO_sockaddr_in()> is not part of the layer and so must be C<extern>.
+
+XXX: We can probably just write our own routines (C<htons()>,
+C<inet_aton()>, etc.) and take this out of platform specific compilation
+
+=cut
+
+*/
+
 STRING *
 PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 {       
@@ -401,10 +551,28 @@ ParrotIOLayerAPI pio_win32_layer_api = {
     0 /* no recv */
 };
 
-
-
 #endif /* PIO_OS_WIN32 */
 
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<io/io_buf.c>,
+F<io/io_passdown.c>,
+F<io/io_stdio.c>,
+F<io/io_unix.c>,
+F<io/io.c>,
+F<io/io_private.h>.
+
+=head1 HISTORY
+
+Initially written by Melvin Smith.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,17 +1,22 @@
-/* io_buf.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *      $Id$
- *  Overview:
- *      The "buf" layer of Parrot IO. Buffering and all the fun stuff.
- *
- *  Data Structure and Algorithms:
- *  History:
- *      Initially written by Melvin Smith
- *  Notes:
- *  References:
- *      Some ideas from AT&T SFIO
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+io/io_buf.c - IO buffer layer
+
+=head1 DESCRIPTION
+
+The "buf" layer of Parrot IO. Buffering and all the fun stuff.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "io_private.h"
@@ -63,6 +68,17 @@ static size_t    PIO_buf_readline(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 */
 
 
+/*
+
+=item C<static INTVAL
+PIO_buf_init(theINTERP, ParrotIOLayer *layer)>
+
+The buffer layer's C<Init> function. Initializes buffering.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_buf_init(theINTERP, ParrotIOLayer *layer)
 {
@@ -75,6 +91,17 @@ PIO_buf_init(theINTERP, ParrotIOLayer *layer)
     return 0;
 }
 
+/*
+
+=item C<static ParrotIO *
+PIO_buf_open(theINTERP, ParrotIOLayer *layer,
+               const char *path, INTVAL flags)>
+
+The buffer layer's C<Open> function.
+
+=cut
+
+*/
 
 static ParrotIO *
 PIO_buf_open(theINTERP, ParrotIOLayer *layer,
@@ -98,13 +125,22 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
     return io;
 }
 
-
 /*
- * Don't pass setbuf() calls down the stack, top layer wins.
- * This doesn't mean other layers can't buffer, I just need to
- * think about the mechanism for buffer control or if it even
- * makes sense this way. Most layers will not implement setbuf()...
- */
+
+=item C<static INTVAL
+PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)>
+
+The buffer layer's C<SetBuf> function.
+
+Don't pass C<SetBuf> calls down the stack, top layer wins. This doesn't
+mean other layers can't buffer, I just need to think about the mechanism
+for buffer control or if it even makes sense this way. Most layers will
+not implement C<SetBuf>.
+
+=cut
+
+*/
+
 static INTVAL
 PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
 {
@@ -151,6 +187,16 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
     return 0;
 }
 
+/*
+
+=item C<static INTVAL
+PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+The buffer layer's C<SetLineBuf> function.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -177,6 +223,16 @@ PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return err;
 }
 
+/*
+
+=item C<static ParrotIO *
+PIO_buf_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)>
+
+The buffer layer's C<FDOpen> function.
+
+=cut
+
+*/
 
 static ParrotIO *
 PIO_buf_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
@@ -198,6 +254,16 @@ PIO_buf_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
     return io;
 }
 
+/*
+
+=item C<static INTVAL
+PIO_buf_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+The buffer layer's C<Close> function.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_buf_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -208,6 +274,16 @@ PIO_buf_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return PIO_close_down (interpreter, l, io);
 }
 
+/*
+
+=item C<static INTVAL
+PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+The buffer layer's C<Flush> function.
+
+=cut
+
+*/
 
 static INTVAL
 PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -251,6 +327,17 @@ PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return -1;
 }
 
+/*
+
+=item C<static size_t
+PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+                     ParrotIOBuf *b)>
+
+The buffer layer's C<Fill> function.
+
+=cut
+
+*/
 
 static size_t
 PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -276,6 +363,17 @@ PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return got;
 }
 
+/*
+
+=item C<static size_t
+PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+               void *buffer, size_t len)>
+
+The buffer layer's C<Read> function.
+
+=cut
+
+*/
 
 static size_t
 PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -355,6 +453,18 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return current + len;
 }
 
+/*
+
+=item C<static size_t
+PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+                 void *buffer, size_t len)>
+
+This is called from C<PIO_buf_read()> to do line buffered reading if
+that is what is required.
+
+=cut
+
+*/
 
 static size_t
 PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -398,6 +508,17 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return l;
 }
 
+/*
+
+=item C<static size_t
+PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+                const void *buffer, size_t len)>
+
+The buffer layer's C<Write> function.
+
+=cut
+
+*/
 
 static size_t
 PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -463,6 +584,17 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return (size_t)-1;
 }
 
+/*
+
+=item C<static PIOOFF_T
+PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+               PIOOFF_T offset, INTVAL whence)>
+
+The buffer layer's C<Seek> function.
+
+=cut
+
+*/
 
 static PIOOFF_T
 PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
@@ -504,6 +636,16 @@ PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
     return io->fpos;
 }
 
+/*
+
+=item C<static PIOOFF_T
+PIO_buf_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+
+The buffer layer's C<Tell> function.
+
+=cut
+
+*/
 
 static PIOOFF_T
 PIO_buf_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
@@ -513,8 +655,6 @@ PIO_buf_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 
     return io->fpos;
 }
-
-
 
 ParrotIOLayerAPI pio_buf_layer_api = {
     PIO_buf_init,
@@ -547,7 +687,28 @@ ParrotIOLayerAPI pio_buf_layer_api = {
     0 /* no recv */
 };
 
+/*
 
+=back
+
+=head1 SEE ALSO
+
+F<io/io_passdown.c>,
+F<io/io_stdio.c>,
+F<io/io_unix.c>,
+F<io/io_win32.c>,
+F<io/io.c>,
+F<io/io_private.h>.
+
+=head1 HISTORY
+
+Initially written by Melvin Smith.
+
+Some ideas from AT&T SFIO.
+
+=cut
+
+*/
 
 /*
  * Local variables:
