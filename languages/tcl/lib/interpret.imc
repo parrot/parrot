@@ -16,8 +16,7 @@ Given a pre-parsed chunk of Tcl, interpret it.
   # our running return value, type
   .local int return_type
   return_type = TCL_OK
-  .local string retval
-  retval = ""
+  .local pmc retval
 
   .local pmc escaper
    escaper = find_global "Data::Escape", "String"
@@ -43,9 +42,10 @@ end_scope:
   command = commands[command_num] 
 
   # this should stringify the tclword object, which performs
-  # all necessary substitutions.
+  # all necessary substitutions. 
   $P0 = command[0]
-  (return_type,retval) = $P0.__get_string()
+  (return_type,retval) = $P0.__get_pmc()
+  
   if return_type != TCL_OK goto done
   proc = retval 
 
@@ -73,17 +73,14 @@ end_scope:
   .local pmc folded_args
   folded_args = new PerlArray
   .local pmc current_word
-  .local pmc current_arg
 
 loop:
   if arg_num == num_args goto loop_done
 
   current_word = command[arg_num]
-  (return_type,retval) = current_word.__get_string()
+  (return_type,retval) = current_word.__get_pmc()
   if return_type != TCL_OK goto done
-  current_arg = new PerlString
-  current_arg = retval
-  push folded_args, current_arg
+  push folded_args, retval
   inc arg_num
   if arg_num == num_args goto loop_done
   goto loop
@@ -102,19 +99,12 @@ requiredlabelusedbyIMCC:
 
 no_command:
   return_type = TCL_ERROR
-  retval = "invalid command name \""
-  # Right now, procname begins with a _, remove it.
-  retval = retval . proc
-  retval = retval . "\"\n"
+  $S0 = "invalid command name \""
+  $S0 .= proc
+  $S0 .= "\"\n"
+  retval = $S0
 
 done:
-  # If we've gotten here, and someone returned a TCL_RETURN, we've
-  # already skipped the remaining commands. So, convert it to a TCL_OK
-  # so that it stops propagating outward.
-  if return_type != TCL_RETURN goto done_done
-  return_type = TCL_OK
-
-done_done:
   .pcc_begin_return
     .return return_type
     .return retval

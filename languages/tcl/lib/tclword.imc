@@ -233,6 +233,78 @@ later interpretation.
   push chunks, chunk
 .end
 
+=head2 __get_pmc
+
+Return a PMC that contains the value of our word. If we're just a command,
+evaluate the command and return the resulting PMC. If we're just a variable,
+return the PMC associated with that variable. In any other case, concat
+the results and return a Stringy PMC.
+
+=cut
+
+.sub __get_pmc method
+  .local pmc chunks
+  chunks = getattribute self, "TclWord\x00chunks"
+ 
+  .local int count
+  count = chunks 
+
+  if count == 1 goto justpmc
+  ($I0,$S0) = self.__get_string()
+  $P0 = new PerlString
+  $P0 = $S0
+  .pcc_begin_return
+    .return $I0 
+    .return $P0
+  .pcc_end_return
+
+justpmc:
+  .local pmc chunk
+  chunk = chunks[0]
+  .local int chunk_type
+  chunk_type = chunk[0]
+  .local pmc chunk_value
+  chunk_value = chunk[1]
+
+  if chunk_type == 0 goto constant
+  if chunk_type == 1 goto variable
+
+command:
+  .local pmc interpret
+  interpret = find_global "_Tcl", "__interpret"
+  ($I0,$P0) = interpret(chunk_value)
+  .pcc_begin_return
+    .return $I0
+    .return $P0
+  .pcc_end_return
+
+constant:
+  .pcc_begin_return
+    # 0 == TCL_OK
+    .return 0
+    .return chunk_value
+  .pcc_end_return
+
+variable:
+  .local pmc get_var
+  get_var = find_global "_Tcl", "__get_var"
+  .local int return_type
+  $P1 = new PerlArray
+  $S1 = chunk_value
+  $P1[0] = $S1
+  $S2 = chunk[2]
+  if $S2 == "" goto get_variable
+  $P1[1] = $S2
+get_variable:
+  (return_type,$P9) = get_var($P1)
+  .pcc_begin_return
+    .return return_type
+    .return $P9
+  .pcc_end_return
+ 
+  
+.end
+
 =head2 __get_string
 
 Stringify - In our case, we take the individual chunks of the words and
@@ -301,11 +373,11 @@ command:
   #print "RETURNING COMMAND\n"
   $P1 = $P0[1]
   $S1 = typeof $P1
-  ($I0, $S0) = interpret( $P1 )
+  ($I0, $P9) = interpret( $P1 )
+  retval = $P9
   if $I0 == 0 goto loop_next
   # An exception value was returned. abort.
   return_type = $I0
-  retval = $S0
   goto loop_done
 
 variable:
