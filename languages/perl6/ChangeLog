@@ -65,3 +65,11 @@ Fixes:
 Test failures:
 - with the right version of IMCC, all compiler tests pass!
 - (parser tests disabled waiting for the error-message patch to stabilize)
+
+7/24/02
+=======
+
+Additions:
+- parser error messages (John Kingsley)
+- more parser tests (Kingsley) NOTE: these will generate
+  "uninitialized value" warnings, but they are harmless.

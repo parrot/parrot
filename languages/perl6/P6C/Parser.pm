@@ -54,10 +54,11 @@ recognized.  The hash values are currently unimportant.
 
 =cut
 
-use vars qw(%WANT %CLASSES $FUNCTION_ARGS $grammar);
+use vars qw(%WANT %CLASSES $FUNCTION_ARGS $grammar $err_handler);
 
 %WANT = ();
 %CLASSES = ();
+$err_handler = undef;
 
 sub Precompile {
     shift;
@@ -98,6 +99,27 @@ sub add_class {		# seen class.
     my $c = shift->[1];
     $CLASSES{$c} = $c;
     1;
+}
+
+=item B<set_error_handler($err_handler)>
+
+Sets the error handler for the parser.
+When an error is detected during the parse,
+$err_handler is called with these parameters:
+    &$err_handler($msg, $linenum)
+
+If no error handler if set then a message is printed
+on STDERR.
+
+This function returns the previous error handler.
+
+=cut
+
+sub Parse::RecDescent::set_error_handler {
+    my $self = shift;
+    my $old_handler = $err_handler;
+    $err_handler = shift;
+    $old_handler;
 }
 
 ##############################
@@ -182,15 +204,16 @@ $grammar = <<'ENDSUPPORT';
 # Support functions and variables
 {
     use vars '$no_comma';
+    use vars '$err_handler';
     use vars qw(%KEYWORDS %CLASSES %WANT);
     use vars qw($NAMEPART $COMPARE $CONTEXT $MULDIV $PREFIX $ADDSUB $INCR
 		$LOG_OR $LOGOR $FILETEST $ASSIGN $HYPE $MATCH $BITSHIFT
-		$SOB);
+		$SOB $FLUSH);
 
 # Things from P6C::* used during the parse:
 BEGIN {
     no strict 'refs';
-    for (qw(add_class add_function CLASSES WANT)) {
+    for (qw(add_class add_function CLASSES WANT err_handler)) {
 	*$_ = *{'P6C::Parser::'.$_};
     }
 }
@@ -212,6 +235,8 @@ BEGIN {
     $LOGOR	= qr{\|\||~~|//};
     $FILETEST	= qr{-[rwxoRWXOezsfdlpSbctugkTBMAC]+};
     $ASSIGN	= qr{(?:!|:|//|&&?|\|\|?|~~?|<<|>>|$ADDSUB|$MULDIV|\*\*)?=};
+    # Used for flushing syntax errors
+    $FLUSH	= qr/\w+|[^\s\w;}#'"]+/;
 }
 
 # HACK to distinguish between "my ($a, $b) ..." and "foo ($a, $b)".
@@ -251,6 +276,41 @@ sub check_end {
 sub mark_end {
     my ($type, $text) = @_;
     $since{$type} = consumer($text);
+}
+
+my $seen_err;
+
+sub got_err {
+    my ($msg, $text, $linenum) = @_;
+
+    $seen_err = 1;
+
+    # Take care of the hacked P::RD::linenum, if needed.
+    $linenum = Parse::RecDescent::linenum($linenum) if (ref($linenum));
+
+    # Remove whitespace at start of text.
+    $text =~ s/\A($Parse::RecDescent::skip)//o;
+
+    # Adjust line number to take account of removed whitespace.
+    my $matched = $1;
+    $linenum += $matched =~ s/\n//g;
+
+    # Remove everything after \n
+    $text =~ s/\n.*$//s;
+
+    # Make text more readable
+    if ($text eq "") {
+        $text = "end of input";
+    } else {
+        $text = qq{"$text"};
+    }
+    $msg = "$msg near $text";
+
+    if ($err_handler) {
+        &$err_handler($msg, $linenum);
+    } else {
+        print STDERR "Parse error [line $linenum]: $msg\n";
+    }
 }
 
 }
@@ -464,15 +524,57 @@ initializer:	  assign_op scalar_expr
 ##############################
 # Statements
 
-prog:		  /\A/ stmts /\z/
-		| <error>
+prog:		  {%since=(); $seen_err=undef} <reject>
+		| /\A/ stmts[undef] /\z/ <commit> {$seen_err ? undef : 1} ''
+		| {got_err("Invalid statement", $text, $thisline); undef;}
 
-stmts:	  	  <leftop: stmt stmt_sep stmt> stmt_sep(?)
-		| # nothing
+# $arg[0] is set to true/false. True == "in block"
+stmts:		  _stmt[$arg[0]](s?)
+
+_stmt:		# Handle valid reason for 'stmt' failing (hit end of block)
+		  { $arg[0] } ..."}" <commit> { undef }
+
+		# Handle case where having missing input
+		# or have hit end of file.
+		| /\z/
+		  <commit>
+		  { got_err("Missing }", $text, $thisline) if ($arg[0]) }
+		  <reject>
+
+		# Handle "normal" case.
+		| stmt stmt_sep[$arg[0]] { $item[1] }
+
+		# Handle case where 'stmt' failed - try to remove
+		# bad statement. Allow this to succeed so that
+		# another statement can be tried if the flush
+		# didn't hit the end of input.
+		| { got_err("Invalid statement", $text, $thisline); 1; }
+		  _stmt_flush
+		  {0}
+
+# Heuristic for removing invalid statement:
+# Skip over all tokens up until we see a ';' or '}'
+# or hit the end of the input.
+# The tricky part is to ignore ';' or '}' that are
+# embedded in quoted things or comments.
+# The $FLUSH matches a word (\w+) or
+# one or more non-word chars (\W) except these chars:
+#     ; }   - we are looking for these
+#     ' "   - handled by perl_quotelike
+#     \s    - handled by skip
+#     #     - handled by skip
+# The _stmt_flush rule always succeeds.
+# XXX - a smarter heuristic would match { with }
+_stmt_flush:	  _stmt_token(s?) /[;}]|\z/ {0}
+
+_stmt_token:	  <perl_quotelike>
+		| /$FLUSH/o
 
 stmt_sep:	  ';'
 		| { check_end('block', $text) }
 		| { check_end('label', $text) }
+		| { $arg[0] } <commit> ..."}"
+		| { !$arg[0] } .../\z/
 
 stmt:		  label /:(?!:)/ { mark_end('label', $text);1 } ''
 		| directive <commit> name comma(?)
@@ -501,7 +603,7 @@ label:		  namepart { exists($KEYWORDS{$item[1][1]}) ? undef
 
 block:		  start_block '...' <commit> '}'
 			{ mark_end('block', $text);1; } ''
-		| start_block stmts '}'
+		| start_block stmts[1] '}'
 			{ mark_end('block', $text);1; } ''
 
 start_block:	  <skip:''> /$SOB/o
@@ -669,7 +771,6 @@ sub P6C::'.$rulename.'::tree {
 
     $parser->Replace("$rulename: $rule\n");
     $WANT{$name} = $rulename;
-    print STDERR "Installed want-rule `$rulename' for `$name'\n\t$rule\n";
 }
 
 1;

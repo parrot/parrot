@@ -632,8 +632,10 @@ sub P6C::stmts::tree {
 	return [];
     }
     my @ret = ();
-    for (my $i = 0; $i <= $#{$x->[1]}; $i += 2) {
-	my $child = $x->[1][$i]->tree;
+    foreach my $c (@{$x->[1]}) {
+        my $child = $c->tree;
+#     for (my $i = 0; $i <= $#{$x->[1]}; $i += 2) {
+# 	my $child = $x->[1][$i]->tree;
 	push @ret, $child if ($child);   # Ignore empty statements
     }
     return [@ret];

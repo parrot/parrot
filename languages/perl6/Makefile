@@ -6,7 +6,7 @@ asm=perl ../../assemble.pl
 all: imcc
 
 test:
-	$(myperl) -MTest::Harness -e 'runtests(@ARGV)' t/compiler/*.t
+	$(myperl) -MTest::Harness -e 'runtests(@ARGV)' t/*/*.t
 
 imcc:
 	cd ../imcc; $(MAKE)
