@@ -211,7 +211,7 @@ op rx_clearstack () {
 }
 ########################################
 
-=item C<rx_pushmark>(in pmc)
+=item C<rx_pushmark>()
 
 Pushes a 'mark' onto the stack contained in the info structure.  Marks are used
 to indicate where one operation's backtrack information ends and another's begins.
