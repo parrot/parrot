@@ -91,7 +91,7 @@ O_FILES = $(INTERP_O_FILES) $(CLASS_O_FILES) $(ENCODING_O_FILES) $(CHARTYPE_O_FI
 #
 ###############################################################################
 
-CFLAGS = ${ccflags} ${cc_debug} -I./include
+CFLAGS = ${ccflags} ${cc_warn} ${cc_debug} ${cc_inc}
 
 C_LIBS = ${libs}
 
@@ -109,6 +109,8 @@ PERL = ${perl}
 TEST_PROG = ${test_prog}
 TEST_PROG_SO = ${test_prog}_so
 PDUMP = pdump${exe}
+LINT = lclint
+LINTFLAGS = +showscan +posixlib -weak +longintegral +matchanyintegral -formattype
 
 
 ###############################################################################
@@ -363,7 +365,7 @@ testclean:
 
 realclean: clean
 	$(RM_F) $(STICKY_FILES)
-	
+
 distclean:
 	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
 
@@ -384,3 +386,6 @@ update:
 status:
 	cvs -n -q upd -dP
 
+lint: ${test_prog}
+	$(LINT) ${cc_inc} -Iclasses $(LINTFLAGS) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
+	$(LINT) ${cc_inc} $(LINTFLAGS) test_main.c
