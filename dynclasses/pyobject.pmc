@@ -22,6 +22,7 @@ Abstract base class for Python objects.
 
 /* cache of classes referenced */
 static INTVAL dynclass_PyObject;
+static INTVAL dynclass_PyClass;
 static INTVAL dynclass_PyBoolean;
 static INTVAL dynclass_PyInt;
 static INTVAL dynclass_PyFloat;
@@ -41,10 +42,12 @@ static STRING* __rshift__;
 static STRING* __sub__;
 static STRING* __xor__;
 
+static STRING* __proxy__;
+
 #define RIGHT(INTERP, SELF, OP, VALUE) \
         opcode_t *next = INTERP->code->byte_code; \
         PMC * method_pmc; \
-        if (!OP) OP = string_from_cstring(INTERP, #OP, 0); \
+        if (!OP) OP = const_string(INTERP, #OP); \
         method_pmc = VTABLE_find_method(interpreter, VALUE, OP); \
         REG_PMC(5) = VALUE; \
         REG_PMC(6) = SELF; \
@@ -66,6 +69,7 @@ they will be used frequently here.
 
     void class_init() {
         if (pass) {
+            dynclass_PyClass   = Parrot_PMC_typenum(INTERP, "PyClass");
             dynclass_PyObject  = Parrot_PMC_typenum(INTERP, "PyObject");
             dynclass_PyBoolean = Parrot_PMC_typenum(INTERP, "PyBoolean");
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
@@ -153,6 +157,14 @@ Returns the result of comparing C<self> with C<*value>.
         if (REG_INT(3)>2) {
             self = REG_PMC(6);
             value = REG_PMC(7);
+        }
+
+        if (self->vtable->base_type == dynclass_PyClass) {
+            if (!__proxy__) __proxy__ = const_string(INTERP, "__proxy__");
+            self = VTABLE_getprop(INTERP, self, __proxy__);
+            if (!self || !VTABLE_defined(INTERP, self)) {
+                internal_exception(1, "can't locate __cmp__ method");
+            }
         }
 
         VTABLE_set_integer_native(INTERP, ret,

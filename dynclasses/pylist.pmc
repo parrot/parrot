@@ -49,6 +49,8 @@ static void quicksort(Interp* interpreter, List *list, PMC *cmpsub,
                 cmp = mmd_dispatch_i_pp(interpreter, temp, pivot, MMD_CMP);
             else {
                 struct parrot_regs_t *bp;
+                struct Parrot_Context ctx;
+                save_context(interpreter, &ctx);
                 REG_INT(0) = 1;
                 REG_INT(1) = REG_INT(2) = REG_INT(4) = 0;
                 REG_INT(3) = 2;
@@ -57,6 +59,7 @@ static void quicksort(Interp* interpreter, List *list, PMC *cmpsub,
                 REG_STR(0) = VTABLE_name(interpreter, cmpsub);
                 bp = Parrot_PyClass_runops_fromc(interpreter, cmpsub);
                 cmp = VTABLE_get_integer(interpreter, BP_REG_PMC(bp,5));
+                restore_context(interpreter, &ctx);
             }
 
             if (cmp <= 0) {
