@@ -64,8 +64,8 @@ t/*/*.scheme \
 t/*/*.out
 
 over:
-	@make clean
-	@make all
+	@$(MAKE) clean
+	@$(MAKE) all
 
 test:
 	t/harness

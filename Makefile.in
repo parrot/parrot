@@ -54,7 +54,7 @@ $(PDUMP): pdump$(O) $(O_FILES)
 test_main$(O): $(H_FILES)
 
 examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
-	cd examples/assembly; make mops.pbc PERL=$(PERL)
+	$(MAKE) -C examples/assembly mops.pbc PERL=$(PERL)
 
 Parrot/OpLib/core.pm: core.ops ops2pm.pl
 	$(PERL) ops2pm.pl core.ops vtable.ops
@@ -125,12 +125,10 @@ $(INC)/vtable.h: vtable.tbl vtable_h.pl
 docs: docs/.dummy
 
 docs/.dummy:
-	cd docs
-	make
+	$(MAKE) -C docs
 
 $(CLASS_O_FILES):
-	cd classes
-	make
+	$(MAKE) -C classes
 
 clean:
 	$(RM_F) *$(O) chartypes/*$(O) encodings/*$(O)
@@ -143,8 +141,8 @@ clean:
 	$(RM_F) examples/assembly/mops$(EXE) examples/assembly/mops.c
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
 	$(RM_F) Parrot/OpLib/core.pm
-	cd docs; make clean
-	cd classes; make clean
+	$(MAKE) -C clean
+	$(MAKE) -C clean
 
 distclean:
 	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'

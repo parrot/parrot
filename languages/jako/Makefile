@@ -109,8 +109,8 @@ clean:
 	rm -f *.pasm *.list *.pbc
 
 over:
-	@make clean
-	@make all
+	@$(MAKE) clean
+	@$(MAKE) all
 
 test: all
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/bench.pbc
