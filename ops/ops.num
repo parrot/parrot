@@ -1261,3 +1261,4 @@ store_global_s_p	1233
 store_global_sc_p	1234
 find_global_p_s	1235
 find_global_p_sc	1236
+set_addr_p_ic   1237

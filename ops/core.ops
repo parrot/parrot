@@ -455,10 +455,19 @@ inline op updatecc() {
 
 Sets register $1 to the current address plus the offset $2.
 
+=item B<set_addr>(in PMC, in INT)
+
+Sets PMC in register $1 to the current address plus the offset $2.
+
 =cut
 
 inline op set_addr(out INT, inconst INT) {
   $1 = PTR2OPCODE_T(CUR_OPCODE + $2);
+  goto NEXT();
+}
+
+inline op set_addr(in PMC, inconst INT) {
+  $1->vtable->set_integer_native(interpreter, $1, PTR2OPCODE_T(CUR_OPCODE + $2));
   goto NEXT();
 }
 
