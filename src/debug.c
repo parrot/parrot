@@ -826,12 +826,11 @@ PDB_find_breakpoint(struct Parrot_Interp *interpreter,
         /* Report an appropriate error */
         if (*command) {
             PIO_eprintf(interpreter, "Not a valid breakpoint");
-            return NULL;
         }
         else {
             PIO_eprintf(interpreter, "No breakpoint specified");
-            return NULL;
         }
+        return NULL;
     }
 }
 
