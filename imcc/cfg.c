@@ -15,6 +15,7 @@
  */
 
 static void add_instruc_reads(Instruction *ins, SymReg *r0);
+static void add_instruc_writes(Instruction *ins, SymReg *r0);
 static void propagate_need(Basic_block *bb, SymReg* r, int i);
 
 /* Code: */
@@ -52,7 +53,7 @@ void find_basic_blocks () {
         /* invoke w/o arg implicitly uses P0, so mark it as doing so
          * XXX but in the parser
          */
-        if ( !strcmp(ins->op, "invoke")) {
+        if ( !strcmp(ins->op, "invoke") || !strcmp(ins->op, "invokecc")) {
             if (ins->opsize == 1) {
                 SymReg * p0 = mk_pasm_reg(str_dup("P0"));
                 add_instruc_reads(ins, p0);
@@ -62,6 +63,12 @@ void find_basic_blocks () {
                 p0->use_count++;
             }
             ins->type |= IF_r0_branch | ITBRANCH;
+        }
+        else if ( !strcmp(ins->op, "newsub") && ins->opsize == 5) {
+            SymReg * p0 = mk_pasm_reg(str_dup("P0"));
+            SymReg * p1 = mk_pasm_reg(str_dup("P1"));
+            add_instruc_writes(ins, p0);
+            add_instruc_writes(ins, p1);
         }
         if ( (ins->type & ITLABEL)) {
             /* set the labels address (ins) */
@@ -317,6 +324,19 @@ static void add_instruc_reads(Instruction *ins, SymReg *r0)
     ins->flags |= (1<<i);
 }
 
+static void add_instruc_writes(Instruction *ins, SymReg *r0)
+{
+    int i;
+    for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
+        if (r0 == ins->r[i])
+            return;
+    if (i == IMCC_MAX_REGS) {
+        fatal(1, "add_instruc_writes","out of registers with %s\n", r0->name);
+    }
+    /* append reg */
+    ins->r[i] = r0;
+    ins->flags |= (1<< (16+i));
+}
 #ifdef ALIAS
 /*
  * set P1, P0
