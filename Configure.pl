@@ -878,7 +878,7 @@ sub compiletestc {
     my $cmd = "$c{cc} $c{ccflags} -I./include -c $c{ld_out} $name$c{o} $name.c";
     system($cmd) and die "C compiler died!  Command was '$cmd'\n";
 
-    $cmd = "$c{ld} $c{ldflags} $c{libs} $name$c{o} $c{cc_exe_out}$name$c{exe}";
+    $cmd = "$c{ld} $c{ldflags} $name$c{o} $c{cc_exe_out}$name$c{exe} $c{libs}";
     system($cmd) and die "Linker died!  Command was '$cmd'\n";
 }
 
