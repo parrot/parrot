@@ -164,6 +164,8 @@ END_C
         $trans->args(@args);
         my $source = $op->source($trans);
 
+        $source =~ s/^\s*goto PC_$new_pc;\s*$//mg;
+
         printf("PC_%d: { /* %s */\n%s}\n\n", $pc, $op->full_name, $source);
     }
 
