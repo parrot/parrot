@@ -194,6 +194,8 @@ now.> -DRS
 
 =item C<INTVAL defined()>
 
+=item C<INTVAL get_bool()>
+
 Returns whether the subroutine is defined.
 
 =cut
@@ -201,6 +203,11 @@ Returns whether the subroutine is defined.
 */
 
     INTVAL defined () {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        return sub->address != NULL;
+    }
+
+    INTVAL get_bool () {
         struct Parrot_sub * sub = PMC_sub(SELF);
         return sub->address != NULL;
     }

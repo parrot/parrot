@@ -141,6 +141,8 @@ Returns the pointer to the actual subroutine.
 
 =item C<INTVAL defined()>
 
+=item C<INTVAL get_bool()>
+
 Returns whether the subroutine is defined.
 
 =cut
@@ -148,6 +150,10 @@ Returns whether the subroutine is defined.
 */
 
     INTVAL defined () {
+        return PMC_struct_val(SELF) != NULL;
+    }
+
+    INTVAL get_bool () {
         return PMC_struct_val(SELF) != NULL;
     }
 
@@ -173,6 +179,70 @@ Restores the "context" and calls the superclass's C<invoke()>.
             Parrot_switch_to_cs(interpreter, cc->seg, 1);
         }
         return PMC_struct_val(SELF);
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+Experimental: return caller info as a STRING.
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        PMC *caller;
+        STRING *s;
+
+        caller = cc->ctx.current_sub;
+        s = NULL;
+        if (caller && PMC_sub(caller)->address) {
+            size_t offs = cc->ctx.current_pc -
+                PMC_sub(caller)->seg->base.data;
+            s = Parrot_sprintf_c(INTERP,
+                    "called from Sub '%Ss' pc %d\n",
+                    PMC_sub(caller)->name, (int)offs);
+        }
+        return s;
+    }
+
+/*
+
+=item C<METHOD PMC* "caller"()>
+
+Experimental: return caller PMC or Undef if none.
+
+=cut
+
+*/
+
+    METHOD PMC* caller() {
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        PMC *caller = cc->ctx.current_sub;
+        if (!caller || !PMC_sub(caller)->address) {
+            caller = pmc_new(INTERP, enum_class_Undef);
+        }
+        return caller;
+
+    }
+/*
+
+=item C<METHOD PMC* "continuation"()>
+
+Experimental: return continuation PMC of this Continuation or Undef if none.
+
+=cut
+
+*/
+
+    METHOD PMC* continuation() {
+        struct Parrot_cont * cc = PMC_cont(SELF);
+        PMC *cont = cc->ctx.current_cont;
+        if (cont)
+            return cont;
+        return pmc_new(INTERP, enum_class_Undef);
     }
 }
 
