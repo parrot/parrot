@@ -424,12 +424,6 @@ INTVAL
 string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
         const STRING *s2, UINTVAL start)
 {
-    INTVAL i,j,ls,lp;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
-
     if (!s || !string_length(s))
         return -1;
     if (!s2 || !string_length(s2))
