@@ -330,11 +330,11 @@ _string_downscale(struct Parrot_Interp *interpreter, STRING *s,
 
 		if( s->representation == enum_stringrep_four )
 		{
-			uint32_t *oldCursor = (uint32_t*)s->strstart;
+			Parrot_UInt4 *oldCursor = (Parrot_UInt4*)s->strstart;
 
 			if( representation == enum_stringrep_two )
 			{
-				uint16_t *newCursor = (uint16_t*)s->strstart;
+				Parrot_UInt2 *newCursor = (Parrot_UInt2*)s->strstart;
 
 				while( count-- )
 				{
@@ -343,7 +343,7 @@ _string_downscale(struct Parrot_Interp *interpreter, STRING *s,
 			}
 			else /* representation == enum_stringrep_one */
 			{
-				uint8_t *newCursor = (uint8_t*)s->strstart;
+				Parrot_UInt1 *newCursor = (Parrot_UInt1*)s->strstart;
 
 				while( count-- )
 				{
@@ -353,8 +353,8 @@ _string_downscale(struct Parrot_Interp *interpreter, STRING *s,
 		}
 		else /* s-> representation == enum_stringrep_two, representation == enum_stringrep_one */
 		{
-			uint16_t *oldCursor = (uint16_t*)s->strstart;
-			uint8_t *newCursor = (uint8_t*)s->strstart;
+			Parrot_UInt2 *oldCursor = (Parrot_UInt2*)s->strstart;
+			Parrot_UInt1 *newCursor = (Parrot_UInt1*)s->strstart;
 
 			while( count-- )
 			{
@@ -387,8 +387,8 @@ _string_smallest_representation(struct Parrot_Interp *interpreter, STRING *s)
 	}
 	else if( s->representation == enum_stringrep_two )
 	{
-		uint16_t *cur = (uint16_t *)s->strstart;
-		uint16_t *end = cur + s->strlen;
+		Parrot_UInt2 *cur = (Parrot_UInt2 *)s->strstart;
+		Parrot_UInt2 *end = cur + s->strlen;
 
 		while( cur < end )
 		{
@@ -403,8 +403,8 @@ _string_smallest_representation(struct Parrot_Interp *interpreter, STRING *s)
 	}
 	else if( s->representation == enum_stringrep_four )
 	{
-		uint32_t *cur = (uint32_t *)s->strstart;
-		uint32_t *end = cur + s->strlen;
+		Parrot_UInt4 *cur = (Parrot_UInt4 *)s->strstart;
+		Parrot_UInt4 *end = cur + s->strlen;
 		int saw_two = 0;
 
 		while( cur < end )
@@ -461,121 +461,122 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
     }
 
     /* Is A real? */
-    if (a != NULL)
+    if (a == NULL)
+        return string_copy(interpreter, b);
+
+    a_capacity = string_capacity(interpreter, a);
+    total_length = string_length(interpreter, a) +
+        string_length(interpreter, b);
+
+    /* If the destination's constant, then just fall back to
+       string_concat */
+    if (PObj_constant_TEST(a))
     {
-        /* If the destination's constant, then just fall back to
-           string_concat */
-        if (PObj_constant_TEST(a))
+        return string_concat(interpreter, a, b, Uflags);
+    }
+
+    a_capacity = string_capacity(interpreter, a);
+    total_length = string_length(interpreter, a)
+        + string_length(interpreter, b);
+
+    if( a->representation < b->representation ) /* need to "upscale" */
+    {
+        _string_upscale(interpreter, a, b->representation, total_length);
+    }
+
+    if( a->representation >= b->representation )
+    {
+        /* make sure A's big enough for both */
+        if (a_capacity < total_length)
         {
-            return string_concat(interpreter, a, b, Uflags);
+            a = string_grow(interpreter, a,
+                    (total_length - a_capacity) + EXTRA_SIZE);
+        }
+        else
+        {
+            unmake_COW(interpreter, a);
         }
 
-        a_capacity = string_capacity(interpreter, a);
-        total_length = string_length(interpreter, a)
-            + string_length(interpreter, b);
+        /* A is now ready to receive the contents of B */
 
-        if( a->representation < b->representation ) /* need to "upscale" */
+        /* if same rep, can memcopy */
+        if( a->representation == b->representation )
         {
-            _string_upscale(interpreter, a, b->representation, total_length);
+            /* Tack B on the end of A */
+            mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
+                    b->strstart, b->bufused);
+
+            a->bufused += b->bufused;
+            a->strlen += b->strlen;
+            return a;
         }
-
-        if( a->representation >= b->representation )
+        else /* if not, need to loop */ /* fast_byte_append v. safe_byte_append */
         {
-            /* make sure A's big enough for both */
-            if (a_capacity < total_length)
+            /* remember, this is the case of rep A > rep B */
+            if( a->representation == enum_stringrep_two ) /* B must have rep one */
             {
-                a = string_grow(interpreter, a,
-                        (total_length - a_capacity) + EXTRA_SIZE);
+                Parrot_UInt2 *a_cursor = (Parrot_UInt2 *)((ptrcast_t)a->strstart + a->bufused);
+
+                Parrot_UInt1 *b_cursor = (Parrot_UInt1 *)((ptrcast_t)b->strstart);
+                Parrot_UInt1 *b_end = (Parrot_UInt1 *)((ptrcast_t)b->strstart + b->bufused);
+
+                while(b_cursor < b_end)
+                {
+                    *(a_cursor++) = *(b_cursor++);
+                }
+
+                a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
+                string_compute_strlen(interpreter, a);
+            }
+            else if( a->representation == enum_stringrep_four )
+            {
+                Parrot_UInt4 *a_cursor = (Parrot_UInt4 *)((ptrcast_t)a->strstart + a->bufused);
+
+                switch( b->representation )
+                {
+                    case enum_stringrep_one:
+                        {
+                            Parrot_UInt1 *b_cursor = (Parrot_UInt1 *)((ptrcast_t)b->strstart);
+                            Parrot_UInt1 *b_end = (Parrot_UInt1 *)((ptrcast_t)b->strstart + b->bufused);
+
+                            while(b_cursor < b_end)
+                            {
+                                *(a_cursor++) = *(b_cursor++);
+                            }
+
+                            a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
+                            string_compute_strlen(interpreter, a);
+
+                            break;
+                        }
+                    case enum_stringrep_two:
+                        {
+                            Parrot_UInt2 *b_cursor = (Parrot_UInt2 *)((ptrcast_t)b->strstart);
+                            Parrot_UInt2 *b_end = (Parrot_UInt2 *)((ptrcast_t)b->strstart + b->bufused);
+
+                            while(b_cursor < b_end)
+                            {
+                                *(a_cursor++) = *(b_cursor++);
+                            }
+
+                            a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
+                            string_compute_strlen(interpreter, a);
+
+                            break;
+                        }
+                    default:
+                        /* trouble */
+                        break;
+                }
             }
             else
             {
-                unmake_COW(interpreter, a);
-            }
-
-            /* A is now ready to receive the contents of B */
-
-            /* if same rep, can memcopy */
-            if( a->representation == b->representation )
-            {
-                /* Tack B on the end of A */
-                mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
-                        b->strstart, b->bufused);
-
-                a->bufused += b->bufused;
-                a->strlen += b->strlen;
-                return a;
-            }
-            else /* if not, need to loop */ /* fast_byte_append v. safe_byte_append */
-            {
-                /* remember, this is the case of rep A > rep B */
-                if( a->representation == enum_stringrep_two ) /* B must have rep one */
-                {
-                    uint16_t *a_cursor = (uint16_t *)((ptrcast_t)a->strstart + a->bufused);
-
-                    uint8_t *b_cursor = (uint8_t *)((ptrcast_t)b->strstart);
-                    uint8_t *b_end = (uint8_t *)((ptrcast_t)b->strstart + b->bufused);
-
-                    while(b_cursor < b_end)
-                    {
-                        *(a_cursor++) = *(b_cursor++);
-                    }
-
-                    a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
-                    string_compute_strlen(interpreter, a);
-                }
-                else if( a->representation == enum_stringrep_four )
-                {
-                    uint32_t *a_cursor = (uint32_t *)((ptrcast_t)a->strstart + a->bufused);
-
-                    switch( b->representation )
-                    {
-                        case enum_stringrep_one:
-                            {
-                                uint8_t *b_cursor = (uint8_t *)((ptrcast_t)b->strstart);
-                                uint8_t *b_end = (uint8_t *)((ptrcast_t)b->strstart + b->bufused);
-
-                                while(b_cursor < b_end)
-                                {
-                                    *(a_cursor++) = *(b_cursor++);
-                                }
-
-                                a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
-                                string_compute_strlen(interpreter, a);
-
-                                break;
-                            }
-                        case enum_stringrep_two:
-                            {
-                                uint16_t *b_cursor = (uint16_t *)((ptrcast_t)b->strstart);
-                                uint16_t *b_end = (uint16_t *)((ptrcast_t)b->strstart + b->bufused);
-
-                                while(b_cursor < b_end)
-                                {
-                                    *(a_cursor++) = *(b_cursor++);
-                                }
-
-                                a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
-                                string_compute_strlen(interpreter, a);
-
-                                break;
-                            }
-                        default:
-                            /* trouble */
-                            break;
-                    }
-                }
-                else
-                {
-                    /* problem */
-                }
+                /* problem */
             }
         }
-
-        return a;
     }
 
-    /* If we got here, A was NULL. So clone B. */
-    return string_copy(interpreter, b);
+    return a;
 }
 
 /*
@@ -770,13 +771,13 @@ string_pointer_to_index(struct Parrot_Interp * interpreter, const STRING *s, UIN
 	switch( s->representation )
 	{
 		case enum_stringrep_one:
-			return ((uint8_t*)s->strstart + idx);
+			return ((Parrot_UInt1*)s->strstart + idx);
 			break;
 		case enum_stringrep_two:
-			return ((uint16_t*)s->strstart + idx);
+			return ((Parrot_UInt2*)s->strstart + idx);
 			break;
 		case enum_stringrep_four:
-			return ((uint32_t*)s->strstart + idx);
+			return ((Parrot_UInt4*)s->strstart + idx);
 			break;
 		default:
 		    internal_exception(INVALID_STRING_REPRESENTATION,
@@ -809,13 +810,13 @@ string_index(struct Parrot_Interp * interpreter, const STRING *s, UINTVAL idx)
 	switch( s->representation )
 	{
 		case enum_stringrep_one:
-			return *((uint8_t*)s->strstart + idx);
+			return *((Parrot_UInt1*)s->strstart + idx);
 			break;
 		case enum_stringrep_two:
-			return *((uint16_t*)s->strstart + idx);
+			return *((Parrot_UInt2*)s->strstart + idx);
 			break;
 		case enum_stringrep_four:
-			return *((uint32_t*)s->strstart + idx);
+			return *((Parrot_UInt4*)s->strstart + idx);
 			break;
 		default:
 		    internal_exception(INVALID_STRING_REPRESENTATION,
@@ -829,14 +830,14 @@ static INTVAL
 string_str_index_twobyte(struct Parrot_Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)
 {
-    const uint16_t* const find_strstart = find->strstart;
-    const uint16_t* const str_strstart  = str->strstart;
+    const Parrot_UInt2* const find_strstart = find->strstart;
+    const Parrot_UInt2* const str_strstart  = str->strstart;
     const UINTVAL         find_strlen   = find->strlen;
     const UINTVAL         str_strlen    = str->strlen;
-    const uint16_t* const lastmatch     =
+    const Parrot_UInt2* const lastmatch     =
                                    str_strstart + str_strlen;
     UINTVAL* p;
-    const uint16_t* cp;
+    const Parrot_UInt2* cp;
     UINTVAL endct, pos;
     UINTVAL badshift[256];
 
@@ -861,8 +862,8 @@ string_str_index_twobyte(struct Parrot_Interp *interpreter,
     pos = start;
     cp = str_strstart + start + find_strlen;
     while (cp <= lastmatch) {
-        register const uint16_t* sp = cp;
-        register const uint16_t* fp = find_strstart + find_strlen;
+        register const Parrot_UInt2* sp = cp;
+        register const Parrot_UInt2* fp = find_strstart + find_strlen;
 
         while (fp > find_strstart) {
             if (*--fp != *--sp)
@@ -1069,18 +1070,18 @@ string_chr(struct Parrot_Interp *interpreter, UINTVAL character)
 {
 	if( character <= 0xFF )
 	{
-		uint8_t c = (uint8_t)character;
-		return string_make(interpreter, &c, (UINTVAL)sizeof(uint8_t), "iso-8859-1", 0);
+		Parrot_UInt1 c = (Parrot_UInt1)character;
+		return string_make(interpreter, &c, (UINTVAL)sizeof(Parrot_UInt1), "iso-8859-1", 0);
 	}
 	else if( character <= 0xFFFF )
 	{
-		uint16_t c = (uint16_t)character;
-		return string_make(interpreter, &c, (UINTVAL)sizeof(uint16_t), "ucs-2", 0);
+		Parrot_UInt2 c = (Parrot_UInt2)character;
+		return string_make(interpreter, &c, (UINTVAL)sizeof(Parrot_UInt2), "ucs-2", 0);
 	}
 	else
 	{
-		uint32_t c = (uint32_t)character;
-		return string_make(interpreter, &c, (UINTVAL)sizeof(uint32_t), "utf-32", 0);
+		Parrot_UInt4 c = (Parrot_UInt4)character;
+		return string_make(interpreter, &c, (UINTVAL)sizeof(Parrot_UInt4), "utf-32", 0);
 	}
 }
 
@@ -1581,13 +1582,13 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
 
 			case enum_stringrep_one:
 				/* could use memcmp in this one case; faster?? */
-				COMPARE_STRINGS(uint8_t, uint8_t, s1, s2, &cmp);
+				COMPARE_STRINGS(Parrot_UInt1, Parrot_UInt1, s1, s2, &cmp);
 				break;
 			case enum_stringrep_two:
-				COMPARE_STRINGS(uint16_t, uint16_t, s1, s2, &cmp);
+				COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt2, s1, s2, &cmp);
 				break;
 			case enum_stringrep_four:
-				COMPARE_STRINGS(uint32_t, uint32_t, s1, s2, &cmp);
+				COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt4, s1, s2, &cmp);
 				break;
 			default:
 				/* trouble! */
@@ -1620,16 +1621,16 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
 		{
 			if( smaller->representation == enum_stringrep_two )
 			{
-				COMPARE_STRINGS(uint32_t, uint16_t, larger, smaller, &cmp);
+				COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt2, larger, smaller, &cmp);
         }
 			else /* smaller->representation == enum_stringrep_one */
 			{
-				COMPARE_STRINGS(uint32_t, uint8_t, larger, smaller, &cmp);
+				COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt1, larger, smaller, &cmp);
         }
     }
 		else /* larger->representation == enum_stringrep_two, smaller->representation == enum_stringrep_one */
 		{
-			COMPARE_STRINGS(uint16_t, uint8_t, larger, smaller, &cmp);
+			COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt1, larger, smaller, &cmp);
     }
 
 		return cmp * multiplier;
@@ -1796,13 +1797,13 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
 		{
 
 			case enum_stringrep_one:
-				BITWISE_AND_STRINGS(uint8_t, uint8_t, uint8_t, s1, s2, res, minlen);
+				BITWISE_AND_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1, s1, s2, res, minlen);
 				break;
 			case enum_stringrep_two:
-				BITWISE_AND_STRINGS(uint16_t, uint16_t, uint16_t, s1, s2, res, minlen);
+				BITWISE_AND_STRINGS(Parrot_UInt2, Parrot_UInt2, Parrot_UInt2, s1, s2, res, minlen);
 				break;
 			case enum_stringrep_four:
-				BITWISE_AND_STRINGS(uint32_t, uint32_t, uint32_t, s1, s2, res, minlen);
+				BITWISE_AND_STRINGS(Parrot_UInt4, Parrot_UInt4, Parrot_UInt4, s1, s2, res, minlen);
 				break;
 			default:
 				/* trouble! */
@@ -1830,16 +1831,16 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
 		{
 			if( smaller->representation == enum_stringrep_two )
 			{
-				BITWISE_AND_STRINGS(uint32_t, uint16_t, uint32_t, larger, smaller, res, minlen);
+				BITWISE_AND_STRINGS(Parrot_UInt4, Parrot_UInt2, Parrot_UInt4, larger, smaller, res, minlen);
 			}
 			else /* smaller->representation == enum_stringrep_one */
 			{
-				BITWISE_AND_STRINGS(uint32_t, uint8_t, uint32_t, larger, smaller, res, minlen);
+				BITWISE_AND_STRINGS(Parrot_UInt4, Parrot_UInt1, Parrot_UInt4, larger, smaller, res, minlen);
 			}
 		}
 		else /* larger->representation == enum_stringrep_two, smaller->representation == enum_stringrep_one */
 		{
-			BITWISE_AND_STRINGS(uint16_t, uint8_t, uint16_t, larger, smaller, res, minlen);
+			BITWISE_AND_STRINGS(Parrot_UInt2, Parrot_UInt1, Parrot_UInt2, larger, smaller, res, minlen);
 		}
 	}
 
@@ -1949,13 +1950,13 @@ string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
 		switch( maxrep )
 		{
 			case enum_stringrep_one:
-				BITWISE_OR_STRINGS(uint8_t, uint8_t, uint8_t, s1, s2, res, maxlen, |);
+				BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1, s1, s2, res, maxlen, |);
 				break;
 			case enum_stringrep_two:
-				BITWISE_OR_STRINGS(uint16_t, uint16_t, uint16_t, s1, s2, res, maxlen, |);
+				BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt2, Parrot_UInt2, s1, s2, res, maxlen, |);
 				break;
 			case enum_stringrep_four:
-				BITWISE_OR_STRINGS(uint32_t, uint32_t, uint32_t, s1, s2, res, maxlen, |);
+				BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt4, Parrot_UInt4, s1, s2, res, maxlen, |);
 				break;
 			default:
 				/* trouble! */
@@ -1983,16 +1984,16 @@ string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
 		{
 			if( smaller->representation == enum_stringrep_two )
 			{
-				BITWISE_OR_STRINGS(uint32_t, uint16_t, uint32_t, larger, smaller, res, maxlen, |);
+				BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt2, Parrot_UInt4, larger, smaller, res, maxlen, |);
 			}
 			else /* smaller->representation == enum_stringrep_one */
 			{
-				BITWISE_OR_STRINGS(uint32_t, uint8_t, uint32_t, larger, smaller, res, maxlen, |);
+				BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt1, Parrot_UInt4, larger, smaller, res, maxlen, |);
 			}
 		}
 		else /* larger->representation == enum_stringrep_two, smaller->representation == enum_stringrep_one */
 		{
-			BITWISE_OR_STRINGS(uint16_t, uint8_t, uint16_t, larger, smaller, res, maxlen, |);
+			BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt1, Parrot_UInt2, larger, smaller, res, maxlen, |);
 		}
     }
 
@@ -2062,13 +2063,13 @@ string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
 		switch( maxrep )
 		{
 			case enum_stringrep_one:
-				BITWISE_OR_STRINGS(uint8_t, uint8_t, uint8_t, s1, s2, res, maxlen, ^);
+				BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1, s1, s2, res, maxlen, ^);
 				break;
 			case enum_stringrep_two:
-				BITWISE_OR_STRINGS(uint16_t, uint16_t, uint16_t, s1, s2, res, maxlen, ^);
+				BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt2, Parrot_UInt2, s1, s2, res, maxlen, ^);
 				break;
 			case enum_stringrep_four:
-				BITWISE_OR_STRINGS(uint32_t, uint32_t, uint32_t, s1, s2, res, maxlen, ^);
+				BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt4, Parrot_UInt4, s1, s2, res, maxlen, ^);
 				break;
 			default:
 				/* trouble! */
@@ -2096,16 +2097,16 @@ string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
 		{
 			if( smaller->representation == enum_stringrep_two )
 			{
-				BITWISE_OR_STRINGS(uint32_t, uint16_t, uint32_t, larger, smaller, res, maxlen, ^);
+				BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt2, Parrot_UInt4, larger, smaller, res, maxlen, ^);
 			}
 			else /* smaller->representation == enum_stringrep_one */
 			{
-				BITWISE_OR_STRINGS(uint32_t, uint8_t, uint32_t, larger, smaller, res, maxlen, ^);
+				BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt1, Parrot_UInt4, larger, smaller, res, maxlen, ^);
 			}
 		}
 		else /* larger->representation == enum_stringrep_two, smaller->representation == enum_stringrep_one */
 		{
-			BITWISE_OR_STRINGS(uint16_t, uint8_t, uint16_t, larger, smaller, res, maxlen, ^);
+			BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt1, Parrot_UInt2, larger, smaller, res, maxlen, ^);
 		}
 	}
 
@@ -2125,7 +2126,7 @@ do { \
 	{ \
 		const type *curr = (type *)s->strstart; \
 		size_t length = s->strlen; \
-		uint32_t *dp = (uint32_t *)res->strstart; \
+		Parrot_UInt4 *dp = (Parrot_UInt4 *)res->strstart; \
  \
 		for ( ; length ; --length) \
 		{ \
@@ -2141,13 +2142,13 @@ do { \
 	{ \
 		const type *curr = (type *)s->strstart; \
 		size_t length = s->strlen; \
-		uint32_t *dp = (uint32_t *)res->strstart; \
+		Parrot_UInt4 *dp = (Parrot_UInt4 *)res->strstart; \
  \
 		for ( ; length ; --length, ++dp, ++curr) \
 		{ \
-			uint32_t temp = *curr; \
-			if( temp <= (uint32_t)0xFF ) *dp = 0xFF & ~ *curr; \
-			else if( temp <= (uint32_t)0xFFFF ) *dp = 0xFFFF & ~ *curr; \
+			Parrot_UInt4 temp = *curr; \
+			if( temp <= (Parrot_UInt4)0xFF ) *dp = 0xFF & ~ *curr; \
+			else if( temp <= (Parrot_UInt4)0xFFFF ) *dp = 0xFFFF & ~ *curr; \
 			else *dp = 0xFFFFF & ~ *curr; \
 		} \
 	} \
@@ -2201,13 +2202,13 @@ string_bitwise_not(struct Parrot_Interp *interpreter, STRING *s,
 	switch( s->representation )
 	{
 		case enum_stringrep_one:
-			BITWISE_NOT_STRING(uint8_t, s, res);
+			BITWISE_NOT_STRING(Parrot_UInt1, s, res);
 			break;
 		case enum_stringrep_two:
-			BITWISE_NOT_STRING(uint16_t, s, res);
+			BITWISE_NOT_STRING(Parrot_UInt2, s, res);
 			break;
 		case enum_stringrep_four:
-			BITWISE_NOT_STRING(uint32_t, s, res);
+			BITWISE_NOT_STRING(Parrot_UInt4, s, res);
 			break;
 		default:
 			/* trouble */
@@ -2762,13 +2763,13 @@ string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
 	switch( s->representation )
 	{
 		case enum_stringrep_one:
-			HASH_STRING(uint8_t, s, h);
+			HASH_STRING(Parrot_UInt1, s, h);
 			break;
 		case enum_stringrep_two:
-			HASH_STRING(uint16_t, s, h);
+			HASH_STRING(Parrot_UInt2, s, h);
 			break;
 		case enum_stringrep_four:
-			HASH_STRING(uint32_t, s, h);
+			HASH_STRING(Parrot_UInt4, s, h);
 			break;
 		default:
 			/* trouble */

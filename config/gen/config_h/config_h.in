@@ -28,6 +28,8 @@ typedef ${nv}                   Parrot_Float;
 typedef ${opcode_t}             Parrot_Opcode;
 typedef void *                  Parrot_Pointer;
 
+typedef char                    Parrot_Int1;
+typedef unsigned char           Parrot_UInt1;
 typedef ${int2_t}               Parrot_Int2;
 typedef unsigned ${int2_t}      Parrot_UInt2;
 typedef ${int4_t}               Parrot_Int4;
