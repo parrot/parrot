@@ -292,7 +292,7 @@ itcall_sub(SymReg* sub)
 %type <i> opt_invocant
 %type <sr> target reg const var string
 %type <sr> key keylist _keylist
-%type <sr> vars _vars var_or_i _var_or_i label_op
+%type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args
 %type <symlist> targetlist arglist
@@ -472,9 +472,9 @@ sub:
            cur_unit = (pragmas.fastcall ? imc_open_unit(interp, IMC_FASTSUB)
                                           : imc_open_unit(interp, IMC_PCCSUB));
         }
-     IDENTIFIER pcc_sub_proto '\n'
+     sub_label_op pcc_sub_proto '\n'
         {
-          Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label($3));
+          Instruction *i = iSUBROUTINE(cur_unit, $3);
           i->r[1] = $<sr>$ = mk_pcc_sub(str_dup(i->r[0]->name), 0);
           add_namespace(interp, i->r[1]);
           i->r[1]->pcc_sub->pragma = $4;
@@ -912,7 +912,7 @@ the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
                        if ($1->set != 'P')
                           fataly(1, sourcefile, line, "Sub isn't a PMC");
                      }
-       | target ptr IDENTIFIER { cur_obj = $1; $$ = mk_sub_address($3); }
+       | target ptr sub_label_op  { cur_obj = $1; $$ = $3; }
        | target ptr STRINGC    { cur_obj = $1; $$ = mk_const($3, 'S'); }
        | target ptr target     { cur_obj = $1; $$ = $3; }
    ;
@@ -996,6 +996,11 @@ _var_or_i:
                       keyvec |= KEY_BIT(nargs);
                       regs[nargs++] = $3; $$ = $1;
                    }
+   ;
+
+sub_label_op:
+     IDENTIFIER    { $$ = mk_sub_address($1); }
+   | PARROT_OP     { $$ = mk_sub_address($1); }
    ;
 
 label_op:

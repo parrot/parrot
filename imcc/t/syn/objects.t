@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 10;
+use TestCompiler tests => 11;
 
 ##############################
 # Parrot Calling Conventions
@@ -294,6 +294,28 @@ label:
 
 .namespace [ "Foo" ]
 .sub _meth
+    print "in meth\n"
+.end
+CODE
+in meth
+done
+OUT
+
+output_is(<<'CODE', <<'OUT', "meth call syntax - reserved word");
+
+.sub _main
+    .local pmc class
+    .local pmc obj
+    newclass class, "Foo"
+    find_type $I0, "Foo"
+    new obj, $I0
+    obj.open()
+    print "done\n"
+    end
+.end
+
+.namespace [ "Foo" ]
+.sub open
     print "in meth\n"
 .end
 CODE
