@@ -31,7 +31,7 @@ foreach (keys(%real_type)) {
 open GUTS, "interp_guts.h";
 my %opcodes;
 while (<GUTS>) {
-    next unless /\tx\[(\d+)\] = ([a-z_]+);/;
+    next unless /\tx\[(\d+)\] = ([a-z0-9_]+);/;
     $opcodes{$2}{CODE} = $1;
 }
 close GUTS;
