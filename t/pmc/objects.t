@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1213,6 +1213,49 @@ ok 1
 ok 2
 ok 3
 ok 4
+42
+MyInt(42)
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PMC as classes - mmd methods");
+##PIR##
+
+.sub main @MAIN
+  .local pmc MyInt
+  getclass $P0, "Integer"
+  subclass MyInt, $P0, "MyInt"
+  .local pmc i
+  .local pmc j
+  .local pmc k
+  $I0 = find_type "MyInt"
+  i = new $I0
+  j = new $I0
+  k = new $I0
+  i = 6
+  j = 7
+  k = i * j
+  $I0 = k
+  print $I0
+  print "\n"
+  $S0 = k 	# get_string is overridden below
+  print $S0
+  print "\n"
+.end
+
+.namespace ["MyInt"]
+.sub __get_string method
+   $I0 = classoffset self, "MyInt"
+   $P0 = getattribute self, $I0
+   $I0 = $P0
+   $S1 = $I0
+   $S0 = "MyInt("
+   $S0 .= $S1
+   $S0 .= ")"
+   .pcc_begin_return
+   .return $S0
+   .pcc_end_return
+.end
+CODE
 42
 MyInt(42)
 OUTPUT

@@ -88,7 +88,9 @@ and C<$class> is C<Parrot::Pmc2c>.
 sub class_name {
     my ($self, $class) = @_;
     my %special = ( 'Ref' => 1, 'default' => 1, 'Null' => 1,
-                    'delegate' => 1, 'SharedRef' => 1 );
+                    'delegate' => 1, 'SharedRef' => 1,
+                    'deleg_pmc' => 1,
+                );
     my $classname = $self->{class};
     my $nclass = $class;
     # bless object into different classes inheriting from
@@ -1208,6 +1210,65 @@ ${decl} {
     PMC *sub = find_or_die(interpreter, pmc, meth);
     ${func_ret}Parrot_run_meth_fromc_args_save$ret_type(interpreter, sub,
         pmc, meth, "$sig"$arg);
+    $ret
+}
+
+EOC
+}
+
+package Parrot::Pmc2c::deleg_pmc;
+use base 'Parrot::Pmc2c';
+import Parrot::Pmc2c qw( gen_ret );
+
+=item C<implements($method)>
+
+Always true.
+
+=cut
+
+sub implements
+{
+    1;
+}
+
+=item C<body($method, $line)>
+
+Returns the C code for the method body.
+
+Overrides the default implementation to direct all unknown methods to
+the PMC in the first attribute slot.
+
+=cut
+
+sub body
+{
+    my ($self, $method, $line) = @_;
+    my $meth = $method->{meth};
+    # existing methods get emitted
+    if ($self->SUPER::implements($meth)) {
+        my $n = $self->{has_method}{$meth};
+        return $self->SUPER::body($self->{methods}[$n]);
+    }
+    my $parameters = $method->{parameters};
+    my $n=0;
+    my @args = grep {$n++ & 1 ? $_ : 0} split / /, $parameters;
+    my $arg = '';
+    $arg = ", ". join(' ', @args) if @args;
+    $parameters = ", $parameters" if $parameters;
+    my $body = "VTABLE_$meth(interpreter, attr$arg)";
+    my $ret = gen_ret($method, $body);
+    my $decl = $self->decl($self->{class}, $method, 0);
+    my $l = "";
+    unless ($self->{opt}{nolines}) {
+        $l = <<"EOC";
+#line $line "ref.c"
+EOC
+    }
+    return <<EOC;
+$l
+$decl {
+    SLOTTYPE *attrib_array = PMC_data(pmc);
+    PMC *attr = get_attrib_num(attrib_array, POD_FIRST_ATTRIB);
     $ret
 }
 
