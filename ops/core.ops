@@ -754,6 +754,8 @@ inline op gc_debug(in INT) {
 
 =item B<interpinfo>(out PMC, in INT)
 
+=item B<interpinfo>(out STR, in INT)
+
 Fetch some piece of information about the interpreter and put it in $1.
 Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
 
@@ -766,6 +768,11 @@ op interpinfo(out INT, in INT) {
 
 op interpinfo(out PMC, in INT) {
   $1 = interpinfo_p(interpreter, $2);
+  goto NEXT();
+}
+
+op interpinfo(out STR, in INT) {
+  $1 = interpinfo_s(interpreter, $2);
   goto NEXT();
 }
 

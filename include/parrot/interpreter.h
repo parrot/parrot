@@ -125,8 +125,8 @@ typedef struct _RunProfile {
     ProfData *data;
 } RunProfile;
 
-/* Forward declaration for imc_info_t -- the actual struct is 
- * defined in imcc/imc.h 
+/* Forward declaration for imc_info_t -- the actual struct is
+ * defined in imcc/imc.h
  */
 struct _imc_info_t;
 
@@ -168,8 +168,6 @@ typedef struct Parrot_Context {
     UINTVAL warns;             /* Keeps track of what warnings
                                  * have been activated */
     UINTVAL errors;            /* fatals that can be turned off */
-    UINTVAL current_class_offset; /* Offset into the class array of the
-                                    currently found method */
     UINTVAL recursion_depth;    /* Sub call resursion depth */
     int runloop_level;                  /* for reentering run loop */
     /*
@@ -181,6 +179,9 @@ typedef struct Parrot_Context {
      */
     PMC *current_cont;          /* the return continuation PMC */
     PMC *current_object;        /* current object if a method call */
+    STRING *current_method;     /* name of method */
+    UINTVAL current_class_offset; /* Offset into the class array of the
+                                    currently found method */
     opcode_t *current_pc;       /* program counter of Sub invocation */
 } parrot_context_t;
 
@@ -399,6 +400,7 @@ void Parrot_destroy(Interp *);
 
 INTVAL interpinfo(Interp *interpreter, INTVAL what);
 PMC*   interpinfo_p(Interp *interpreter, INTVAL what);
+STRING*interpinfo_s(Interp *interpreter, INTVAL what);
 
 void runops(Interp *, size_t offset);
 void runops_int(Interp *, size_t offset);

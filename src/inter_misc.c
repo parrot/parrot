@@ -260,6 +260,19 @@ interpinfo_p(Interp *interpreter, INTVAL what)
     return PMCNULL;
 }
 
+STRING*
+interpinfo_s(Interp *interpreter, INTVAL what)
+{
+    switch (what) {
+        case CURRENT_METHOD:
+            return interpreter->ctx.current_method;
+        default:        /* or a warning only? */
+            internal_exception(UNIMPLEMENTED,
+                    "illegal argument in interpinfo");
+    }
+    return NULL;
+}
+
 /*
 
 =item C<INTVAL

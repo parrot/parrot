@@ -1365,3 +1365,5 @@ pushmark_i                     1334
 pushmark_ic                    1335
 new_p_sc                       1336
 pop_pad_p                      1337
+interpinfo_s_i                 1338
+interpinfo_s_ic                1339

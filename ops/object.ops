@@ -65,15 +65,17 @@ op callmethod() :object_base {
   PMC *method_pmc, *object;
   opcode_t *dest;
   opcode_t *next = expr NEXT();
+  STRING *meth = REG_STR(0);
 
   object = REG_PMC(2);
-  method_pmc = VTABLE_find_method(interpreter, object, REG_STR(0));
+  method_pmc = VTABLE_find_method(interpreter, object, meth);
   if (!method_pmc) {
     real_exception(interpreter, next, METH_NOT_FOUND,
-        "Method '%Ss' not found", REG_STR(0));
+        "Method '%Ss' not found", meth);
   }
   REG_PMC(0) = method_pmc;
   interpreter->ctx.current_object = object;
+  interpreter->ctx.current_method = meth;
   dest = (opcode_t *)VTABLE_invoke(interpreter, method_pmc, next);
   goto ADDRESS(dest);
 }
@@ -82,16 +84,17 @@ op callmethod(in STR) :object_base {
   PMC *method_pmc, *object;
   opcode_t *dest;
   opcode_t *next = expr NEXT();
+  STRING *meth = $1;
 
-  REG_STR(0) = $1;
   object = REG_PMC(2);
-  method_pmc = VTABLE_find_method(interpreter, object, REG_STR(0));
+  method_pmc = VTABLE_find_method(interpreter, object, meth);
   if (!method_pmc) {
     real_exception(interpreter, next, METH_NOT_FOUND,
-        "Method '%Ss' not found", REG_STR(0));
+        "Method '%Ss' not found", meth);
   }
   REG_PMC(0) = method_pmc;
   interpreter->ctx.current_object = object;
+  interpreter->ctx.current_method = meth;
   dest = (opcode_t *)VTABLE_invoke(interpreter, method_pmc, next);
   goto ADDRESS(dest);
 }
@@ -100,13 +103,15 @@ op callmethodcc() :object_base {
   opcode_t *dest;
   PMC *method_pmc, *object;
   opcode_t *next = expr NEXT();
+  STRING *meth = REG_STR(0);
 
   REG_PMC(1) = new_ret_continuation_pmc(interpreter, next);
   interpreter->ctx.current_object = object = REG_PMC(2);
-  method_pmc = VTABLE_find_method(interpreter, object, REG_STR(0));
+  interpreter->ctx.current_method = meth;
+  method_pmc = VTABLE_find_method(interpreter, object, meth);
   if (!method_pmc) {
     real_exception(interpreter, next, METH_NOT_FOUND,
-        "Method '%Ss' not found", REG_STR(0));
+        "Method '%Ss' not found", meth);
   }
   REG_PMC(0) = method_pmc;
   dest = (opcode_t *)REG_PMC(0)->vtable->invoke(interpreter, method_pmc, next);
@@ -117,15 +122,17 @@ op callmethodcc(in STR) :object_base {
   opcode_t *dest;
   PMC *method_pmc, *object;
   opcode_t *next = expr NEXT();
+  STRING *meth;
 
-  REG_STR(0) = $1;
+  meth = $1;
   REG_PMC(1) = new_ret_continuation_pmc(interpreter, next);
 
   interpreter->ctx.current_object = object = REG_PMC(2);
-  method_pmc = VTABLE_find_method(interpreter, object, REG_STR(0));
+  interpreter->ctx.current_method = meth;
+  method_pmc = VTABLE_find_method(interpreter, object, meth);
   if (!method_pmc) {
     real_exception(interpreter, next, METH_NOT_FOUND,
-        "Method '%Ss' not found", REG_STR(0));
+        "Method '%Ss' not found", meth);
   }
   REG_PMC(0) = method_pmc;
   dest = (opcode_t *)REG_PMC(0)->vtable->invoke(interpreter, method_pmc, next);
@@ -136,16 +143,18 @@ op tailcallmethod(in STR) :object_base {
   opcode_t *dest;
   PMC *method_pmc, *object;
   opcode_t *next = expr NEXT();
+  STRING *meth;
 
-  REG_STR(0) = $1;
+  meth = $1;
   REG_PMC(1) = interpreter->ctx.current_cont;
   PObj_get_FLAGS(REG_PMC(1)) |= SUB_FLAG_TAILCALL;
 
   interpreter->ctx.current_object = object = REG_PMC(2);
-  method_pmc = VTABLE_find_method(interpreter, object, REG_STR(0));
+  interpreter->ctx.current_method = meth;
+  method_pmc = VTABLE_find_method(interpreter, object, meth);
   if (!method_pmc) {
     real_exception(interpreter, next, METH_NOT_FOUND,
-        "Method '%Ss' not found", REG_STR(0));
+        "Method '%Ss' not found", meth);
   }
   REG_PMC(0) = method_pmc;
   dest = (opcode_t *)REG_PMC(0)->vtable->invoke(interpreter, method_pmc, next);

@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -849,3 +849,28 @@ CODE
 ok 1
 ok 2
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "callmethod - method name");
+    newclass P2, "Foo"
+    set S0, "meth"
+
+    print "main\n"
+    callmethodcc
+    print "back\n"
+    end
+
+.namespace ["Foo"]
+.pcc_sub meth:
+    print "in meth\n"
+    .include "interpinfo.pasm"
+    interpinfo $S0, .INTERPINFO_CURRENT_METHOD
+    print $S0
+    print "\n"
+    returncc
+CODE
+main
+in meth
+meth
+back
+OUTPUT
+
