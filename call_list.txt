@@ -13,6 +13,8 @@
 # t - character string
 # PMC reg stuff
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
+# special stuff
+# I - Parrot_Interp param
 #
 #Return params
 i
@@ -36,3 +38,4 @@ p	v
 v	piiii
 i	pppp
 i	ppi
+p	It

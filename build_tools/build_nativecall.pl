@@ -198,6 +198,9 @@ sub make_arg {
     /t/ && do {my $regnum = $reg_ref->{s}++;
 	       return "string_to_cstring(interpreter, STR_REG($regnum))";
               };
+    /I/ && do {
+	       return "interpreter";
+              };
 
 }
 
