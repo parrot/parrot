@@ -76,7 +76,15 @@ print "opcode_assembly_t op_assembly[$core_numops]= {\n";
 
 for ($i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]};
-    $body = "C(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])" . Parrot::Jit::Assemble("addl \$8,\%esp\n") unless defined $body;
+    if (!defined $body) {
+        # TODO: Add metadata in core.ops to the opcodes that change the program control flow
+        if ($core_opfunc[$i] =~ m/^Parrot_(eq_|ne_|lt_|le_|gt_|ge_|if_|ret|bsr_|jump_|branch)/) {
+            $body = "addl \$8,\%esp\njmp *(\%eax)\n";
+        } else {
+            $body = "addl \$8,\%esp\n";
+        }
+        $body = "C(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])" . Parrot::Jit::Assemble($body);
+    }
 
     my $op = $Parrot::OpLib::core::ops->[$i];
 

@@ -364,8 +364,12 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         /* Keep it pointing to "where the code goes" */
         arena += op_assembly[*pc].size;
 
-        bytecode_position += op_assembly[*pc].nargop;
-        pc += op_assembly[*pc].nargop;
+        ivalue = op_assembly[*pc].nargop;
+        /* Replace the op number in the bytecode with a pointer to
+           the start of jitted code for that opcode */
+        *pc = op_real_address[bytecode_position]; 
+        bytecode_position += ivalue;
+        pc += ivalue;
     }
 
     return (jit_f)arena_start;

@@ -207,28 +207,3 @@ Parrot_print_p {
     CALL(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])
     CALL(fflush, V*CONST_INTVAL[0])
 }
-
-Parrot_eq_s_sc {
-    F(get_interpreter, &INTERPRETER[0])
-    mov %eax,&TEMP_INT[0]
-    CALL(string_compare, A&TEMP_INT[0] A&STRING_REG[1] V&STRING_CONST[2])
-    cmp $0,%eax
-    jne ($0x0) 
-    JUMP(END) 
-    F(get_interpreter, &INTERPRETER[0])
-    mov %eax,&TEMP_INT[0] 
-    F(get_interpreter_control_stack_top, &INTERPRETER[0])
-    mov %eax,&TEMP_INT[1] 
-    CALL(pop_generic_entry, A&TEMP_INT[0] A&TEMP_INT[1] V&TEMP_INT[2] V*CONST_INTVAL[1]) 
-    F(jump, &TEMP_INT[2]) 
-}
-
-Parrot_bsr_i {
-    F(get_interpreter, &INTERPRETER[0])
-    mov %eax,&TEMP_INT[0] 
-    F(get_interpreter_control_stack_top, &INTERPRETER[0])
-    mov %eax,&TEMP_INT[1] 
-    pushl $0
-    CALL(push_generic_entry, A&TEMP_INT[0] A&TEMP_INT[1] V*CUR_OPCODE[3] V*CONST_INTVAL[1]) 
-    F(move, &INT_REG[1]) 
-}
