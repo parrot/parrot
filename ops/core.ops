@@ -453,8 +453,7 @@ $1. Removes the constant flag on the copy, if there was one.
 
 inline op clone(out STR, in STR) {
   $1 = string_copy(interpreter, $2);
-  /* Remove the constant flag, just in case */
-  $1->flags = $1->flags & ~BUFFER_constant_FLAG;
+  goto NEXT();
 }
 
 
@@ -2302,6 +2301,22 @@ inline op save(in PMC) {
 
 inline op save(in STR) {
   stack_push(interpreter, interpreter->user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  goto NEXT();
+}
+
+
+########################################
+
+=item B<savec>(in STR)
+
+=item B<savec>(in PMC)
+
+Save a clone of register or constant $1 onto the stack.
+
+=cut
+
+inline op savec(in STR) {
+  stack_push(interpreter, interpreter->user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
