@@ -382,7 +382,9 @@ Note that this is currently unimplemented for any PMC, and it is not clear
 how it will work in practice.
 
 =item void set_bool_keyed(INTERP, PMC* self, PMC* key, INTVAL value)
+
 =item void set_bool_keyed_int(INTERP, PMC* self, INTVAL key, INTVAL value)
+
 =item void set_bool_keyed_str(INTERP, PMC* self, STRING* key, INTVAL value)
 
 Keyed versions of set_bool. The B<key> parameter is guaranteed not to be
@@ -644,6 +646,7 @@ Note that B<self> and B<dest> may refer to the same PMC; in that case
 optimizations I<may> be made.
 
 =item void bitwise_shl(INTERP, PMC* self, PMC* value, PMC* dest)
+
 =item void bitwise_shl_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
 Apply a leftward shift of B<value> bits to the number stored in B<self>,
@@ -651,6 +654,7 @@ and place the resulting value in B<dest>. Note that B<self> and B<dest> may
 refer to the same PMC; in that case optimizations I<may> be made.
 
 =item void bitwise_shr(INTERP, PMC* self, PMC* value, PMC* dest)
+
 =item void bitwise_shr_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
 Applies a rightward shift of B<value> bits to the number stored in B<self>,
@@ -694,7 +698,6 @@ if B<value> is smaller.
 Compare the two PMCs as strings.
 Return -1 if B<self> is smaller, 0 if the two are equal, and 1
 if B<value> is smaller.
-
 
 =item void logical_or(INTERP, PMC* self, PMC* value, PMC* dest)
 
@@ -823,9 +826,12 @@ Is the PMC a member of B<_class> or one of its subclasses.
 See also F<pdd15_objects.pod>.
 
 =item void freeze(INTERP, PMC* self, visit_info* info)
-=item void thaw  (INTERP, PMC* self, visit_info* info)
-=item void thawfinish (INTERP, PMC* self, visit_info* info)
-=item void visit (INTERP, PMC* self, visit_info* info)
+
+=item void thaw(INTERP, PMC* self, visit_info* info)
+
+=item void thawfinish(INTERP, PMC* self, visit_info* info)
+
+=item void visit(INTERP, PMC* self, visit_info* info)
 
 Serialization functions.
 
@@ -914,5 +920,3 @@ Cleaned up the definition. It was a mess.
 None. First version
 
 =back
-
-
