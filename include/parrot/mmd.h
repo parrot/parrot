@@ -92,8 +92,11 @@ typedef enum {
         MMD_NUMCMP,
         MMD_STRCMP,
         MMD_SOR,
+        MMD_SOR_STR,
         MMD_SAND,
+        MMD_SAND_STR,
         MMD_SXOR,
+        MMD_SXOR_STR,
 
         MMD_USER_FIRST
 } parrot_mmd_func_enum;

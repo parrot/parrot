@@ -184,14 +184,14 @@ void bitwise_and_int(INTVAL value, PMC* dest)   MMD_BAND_INT
 void bitwise_xor(PMC* value, PMC* dest)        MMD_BXOR
 void bitwise_xor_int(INTVAL value, PMC* dest)  MMD_BXOR_INT
 
-void bitwise_ors(PMC* value, PMC* dest)      MMD_SOR
-void bitwise_ors_str(STRING* value, PMC* dest)
+void bitwise_ors(PMC* value, PMC* dest)         MMD_SOR
+void bitwise_ors_str(STRING* value, PMC* dest)  MMD_SOR_STR
 
-void bitwise_ands(PMC* value, PMC* dest)     MMD_SAND
-void bitwise_ands_str(STRING* value, PMC* dest)
+void bitwise_ands(PMC* value, PMC* dest)        MMD_SAND
+void bitwise_ands_str(STRING* value, PMC* dest) MMD_SAND_STR
 
-void bitwise_xors(PMC* value, PMC* dest)     MMD_SXOR
-void bitwise_xors_str(STRING* value, PMC* dest)
+void bitwise_xors(PMC* value, PMC* dest)        MMD_SXOR
+void bitwise_xors_str(STRING* value, PMC* dest) MMD_SXOR_STR
 
 void bitwise_not(PMC* dest)
 
@@ -204,8 +204,8 @@ void bitwise_shr(PMC* value, PMC* dest)        MMD_BSR
 void bitwise_shr_int(INTVAL value, PMC* dest)  MMD_BSR_INT
 
 [STRING]
-void concatenate(PMC* value, PMC* dest)      MMD_CONCAT
-void concatenate_native(STRING* value, PMC* dest)
+void concatenate(PMC* value, PMC* dest)        MMD_CONCAT
+void concatenate_str(STRING* value, PMC* dest) MMD_CONCAT_STR
 
 [CMP]
 INTVAL is_equal(PMC* value)                  MMD_EQ

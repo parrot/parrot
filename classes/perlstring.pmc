@@ -504,7 +504,7 @@ return the result in C<*dest>, morphing it to a PerlString if required.
 
 /*
 
-=item C<void concatenate_native(STRING *value, PMC *dest)>
+=item C<void concatenate_str(STRING *value, PMC *dest)>
 
 Concatenates the string and C<*value> and returns the result in
 C<*dest>.
@@ -513,7 +513,7 @@ C<*dest>.
 
 */
 
-    void concatenate_native (STRING* value, PMC* dest) {
+    void concatenate_str (STRING* value, PMC* dest) {
         STRING* s = PMC_str_val(SELF);
         VTABLE_morph(INTERP, dest, enum_class_PerlString);
         PMC_str_val(dest) = string_concat(INTERP, s, value, 0);
@@ -700,9 +700,9 @@ C<what>.
 
         if (!n)
             PMC_int_val(ret) = -1;
-    
+
         if (PMC_int_val(ret) > 0)
-            PMC_data(key) = string_pointer_to_index(INTERP, s, 
+            PMC_data(key) = string_pointer_to_index(INTERP, s,
                                                     PMC_int_val(ret));
          /* else do what? */
 

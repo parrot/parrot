@@ -790,7 +790,7 @@ Returns in C<*dest> the result of concatenating the scalar and C<*value>.
 
 /*
 
-=item C<void concatenate_native(STRING *value, PMC *dest)>
+=item C<void concatenate_str(STRING *value, PMC *dest)>
 
 Returns in C<*dest> the result of concatenating the scalar and C<*value>.
 
@@ -798,7 +798,7 @@ Returns in C<*dest> the result of concatenating the scalar and C<*value>.
 
 */
 
-    void concatenate_native (STRING* value,  PMC* dest) {
+    void concatenate_str (STRING* value,  PMC* dest) {
         /* dest = SELF (concat) value */
         STRING* s = string_concat(INTERP,
             DYNSELF.get_string(),
@@ -844,7 +844,7 @@ Returns whether the scalar is equal to C<*value>.
 
 =item C<INTVAL cmp_num(PMC *value)>
 
-Returns the result of comparing the floating-point values of the scalar 
+Returns the result of comparing the floating-point values of the scalar
 and C<*value>.
 
 =cut
