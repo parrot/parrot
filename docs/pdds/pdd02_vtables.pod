@@ -196,6 +196,11 @@ PARROT_FALSE(-1) if the PMC is false.
 
 Returns 0 if this method has thrown an exception.
 
+=item INTVAL elements(PMC)
+
+Returns the number of elements in the PMC. If it returns 0, check to
+see if an exception has been thrown.
+
 =item PMC *get_pmc(PMC)
 
 Returns the PMC for this PMC. While this may seem nonsensical, it's
@@ -353,6 +358,12 @@ Returns 0 on exception.
 
 Checks to see if the PMC is defined. Returns PARROT_TRUE or
 PARROT_FALSE, or 0 if an exception is thrown.
+
+=item INTVAL delete(PMC, key)
+
+Delete the specified entry from the aggregate.
+
+Returns 0 if an exception is thrown
 
 =item KEY *nextkey(PMC, key)
 
