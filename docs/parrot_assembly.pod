@@ -637,6 +637,8 @@ name in X.
 
 =head2 I/O operations
 
+Reads and writes read and write records, for some value of record. 
+
 =over 4
 
 =item new_fh px
@@ -652,9 +654,17 @@ Open the file Y on filehandle X
 Issue a read on the filehandle in Y, and put the result in PMC
 X. 
 
+=item write px, sy
+
+Write the string Y to filehandle X
+
+=item wait px
+
+Wait for the I/O operation on filehandle X to finish
+
 =item readw px, py
 
-=item write px, sy
+
 
 =item writew px, sy
 
@@ -663,8 +673,6 @@ X.
 =item seekw px, ty
 
 =item tell tx, py
-
-=item wait px
 
 =back
 

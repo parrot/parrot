@@ -2,9 +2,6 @@
 ** core.ops
 */
 
-#include <math.h>
-#include <sys/time.h>
-
 =head1 NAME
 
 core.ops

@@ -38,6 +38,14 @@
 #	include <sys/mman.h>
 #endif
 
+#ifdef HAS_HEADER_SYSTIME
+#	include <sys/time.h>
+#endif
+
+#ifdef HAS_HEADER_MATH
+#	include <math.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
