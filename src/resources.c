@@ -528,7 +528,7 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
 {
     size_t copysize;
     size_t alloc_size = tosize;
-    void *mem;
+    void *mem, *oldmem;
     struct Memory_Pool *pool;
 
     pool = PObj_constant_TEST(str)
@@ -571,14 +571,16 @@ Parrot_reallocate_string(Interp *interpreter, STRING *str,
     if (!mem) {
         return NULL;
     }
+    oldmem = PObj_bufstart(str);
+    str->strstart = PObj_bufstart(str) = mem;
+    PObj_buflen(str) = alloc_size;
+
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
     if (copysize) {
-        memcpy(mem, PObj_bufstart(str), copysize);
+        /* This should tail call optimise */
+        return memcpy(mem, oldmem, copysize);
     }
-    PObj_bufstart(str) = mem;
-    PObj_buflen(str) = alloc_size;
-    str->strstart = PObj_bufstart(str);
     return mem;
 }
 
