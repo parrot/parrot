@@ -29,7 +29,6 @@ PackFile_pack_size(struct PackFile *self)
 {
     opcode_t size;
     struct PackFile_Directory *dir = self->directory;
-    size_t i;
 
     size = PACKFILE_HEADER_BYTES / sizeof(opcode_t);
     ++size;     /* magic */
@@ -59,7 +58,7 @@ PackFile_pack(struct PackFile *self, opcode_t *cursor)
 {
     opcode_t *ret;
 
-    size_t i, size;
+    size_t size;
     struct PackFile_Directory *dir = self->directory;
     struct PackFile_Segment *seg;
 
