@@ -333,7 +333,7 @@ WS              [\t\f\r ]
         char *label;
 	char *name = macros[num_macros].name;
 
-	if (yylex(valp, interp) != LABEL) 
+	if (yylex(valp, interp) != LABEL)
 	    fataly(EX_SOFTWARE, "", line, "LABEL expected");
 
 	if (valp) {
@@ -460,8 +460,8 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
     c = yylex_skip(&val, interp, " \n");
 
     while(c != ')') {
-	if (c == 0) 
-	    fataly(EX_SOFTWARE, macro_name, line, 
+	if (c == 0)
+	    fataly(EX_SOFTWARE, macro_name, line,
 		   "End of file reached while reading arguments");
 	else if (c == ',') {
 	    params->name[params->num_param++] = current;
@@ -580,6 +580,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     const char *expansion;
     int start_cond;
 
+    UNUSED(valp);
     frame = new_frame();
 
     expansion = find_macro_param(name);
@@ -592,7 +593,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     frame->params = &m->params;
     if (m) {
 	/* whitespace can be savely ignored */
-	do { 
+	do {
 	    c = input();
 	} while (c == ' ' || c == '\t');
 
@@ -618,7 +619,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 	}
 
 	if (frame->expansion.num_param != m->params.num_param) {
-	    fataly(EX_SOFTWARE, m->name, line, 
+	    fataly(EX_SOFTWARE, m->name, line,
 		   "Macro requires %d arguments, but %d given",
 		   frame->expansion.num_param, m->params.num_param);
 	}
@@ -639,7 +640,7 @@ include_file (const char *file_name)
     frame = new_frame();
 
     file = fopen(file_name, "r");
-    if (!file) 
+    if (!file)
 	fataly(EX_SOFTWARE, file_name, line, strerror(errno));
 
     scan_file (frame, file);
