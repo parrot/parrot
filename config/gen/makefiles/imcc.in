@@ -7,7 +7,7 @@ RM_F = ${rm_f}
 
 INC=../../include/parrot
 
-H_FILES = $(INC)/parrot.h imc.h imcparser.h stacks.h cfg.h \
+H_FILES = $(INC)/parrot.h imc.h stacks.h cfg.h \
 	instructions.h cfg.h debug.h sets.h symreg.h \
 	pbc.h optimizer.h
 
@@ -71,6 +71,6 @@ realclean: clean
 imcc: $(O_FILES)
 	$(LINK) $(LD_OUT)imcc $(LINKFLAGS) $(O_FILES) $(C_LIBS)
 
-test:
+test:	imcc
 	$(PERL) t/harness
 

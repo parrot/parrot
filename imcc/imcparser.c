@@ -2101,9 +2101,9 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             (*argc)--;
             (*argv)++;
 
-            goto OUT;
+            goto DONE;
         case '\0':             /* bare '-' means read from stdin */
-            goto OUT;
+            goto DONE;
         default:
             fatal(1, "main", "Invalid flag %s used\n", (*argv)[0]);
             exit(1);
@@ -2113,7 +2113,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
         (*argv)++;
     }
 
-  OUT:
+  DONE:
 
     return (*argv)[0];
 }
