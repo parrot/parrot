@@ -22,7 +22,7 @@ if ($ARGV[0] =~ /recompile/) {
                         }}, $SRCDIR);
 
     #### build parrot with coverage support
-    system("perl Configure.pl --defaults --define cc=\"gcc -fprofile-arcs -ftest-coverage\"");
+    system("perl Configure.pl --cc=\"gcc -fprofile-arcs -ftest-coverage\"");
     system("make");
 
     #### Now run the tests
@@ -37,7 +37,15 @@ File::Find::find({wanted => sub {
 
 my (%file_line_coverage, %file_branch_coverage, %file_call_coverage);
 my (%function_line_coverage, %function_branch_coverage, %function_call_coverage);
-my (%totals, %real_filename);
+my (%real_filename);
+my %totals = (
+    lines            => 0,
+    covered_lines    => 0,
+    branches         => 0,
+    covered_branches => 0,	      
+    calls            => 0,
+    covered_calls    => 0
+);
 
 foreach my $da_file (@dafiles) {
     my $dirname   = dirname($da_file) || ".";
@@ -135,9 +143,9 @@ sub write_index {
     open (OUT, ">$HTMLDIR/index.html") ||
       die "Can't open $HTMLDIR/index.html for writing: $!\n";
 
-    $totals{line_coverage} = sprintf("%.2f", ($totals{covered_lines} / $totals{lines} * 100));
-    $totals{branch_coverage} = sprintf("%.2f", ($totals{covered_branches} / $totals{branches} * 100));
-    $totals{call_coverage} = sprintf("%.2f", ($totals{covered_calls} / $totals{calls} * 100));
+    $totals{line_coverage}   = sprintf("%.2f", ($totals{lines}    ? ($totals{covered_lines} / $totals{lines} * 100)       : 0));
+    $totals{branch_coverage} = sprintf("%.2f", ($totals{branches} ? ($totals{covered_branches} / $totals{branches} * 100) : 0));
+    $totals{call_coverage}   = sprintf("%.2f", ($totals{calls}    ? ($totals{covered_calls} / $totals{calls} * 100)       : 0));
     
     print OUT page_header("Parrot Test Coverage");
     print OUT qq(
