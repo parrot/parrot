@@ -206,7 +206,7 @@ either Ix, Nx, or Px) Branch offset may also be an integer constant.
 Jump to the location specified by register X. Push the current
 location onto the call stack for later returning.
 
-=item return tx
+=item return
 
 Pop the location off the top of the stack and go there.
 
