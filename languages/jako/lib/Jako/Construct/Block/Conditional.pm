@@ -42,9 +42,15 @@ sub compile
   my $namespace = $self->namespace;
   my $kind      = $self->kind;
 
-  my $left  = $self->left->value; # TODO: Compile these.
-  my $op    = $self->op;
-  my $right = $self->right->value;
+  my $left;
+  my $op;
+  my $right;
+
+  if ($kind eq 'if' or $kind eq 'unless') {
+    $left  = $self->left->value; # TODO: Compile these.
+    $op    = $self->op;
+    $right = $self->right->value;
+  }
 
   if ($kind eq 'unless') {
     $op = $inverted_ops{$op}; # Invert the sense for 'unless' conditionals.
