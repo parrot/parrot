@@ -35,26 +35,27 @@ public class Life {
     static void Main() {
         string world = "   **   * * *   " +
                     " **  *  *       " +
-                    " **          *  " +
+                    "             *  " +
                     "        *    ** " +
-                    " **  *  *       " +
-                    "     *          " +
                     "  *     *       " +
+                    "     ****       " +
+                    "     ****       " +
                     "        *       " +
-                    " *   *   *  **  " +
-                    "  *  *  *       " +
-                    " **     *    *  " +
+                    "         *  **  " +
+                    "     *  *       " +
+                    "        *    *  " +
                     "          *     " +
-                    "  *             " +
-                    " *          *   " +
+                    "                " +
+                    "            *   " +
                     "     *          " +
                     "     *         *"
                     ;
         int i, j;
         for(i = 0; i < 500; i++) {
             // Print World
-            //for(j = 0; j < 16; j++)
-            //    puts(substr(world, j * 16, 16) + "\n");
+            for(j = 0; j < 16; j++)
+                puts(substr(world, j * 16, 16) + "\n");
+            puts("----------------\n");
             world = Generate(world);
         }
     }
