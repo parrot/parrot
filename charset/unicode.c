@@ -299,10 +299,19 @@ string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 }
 
 static size_t
-compute_hash(Interp *interpreter, STRING *source_string)
+compute_hash(Interp *interpreter, STRING *src)
 {
-    UNIMPL;
-    return 0;
+    String_iter iter;
+    size_t hashval = 0;
+    UINTVAL offs, c;
+
+    ENCODING_ITER_INIT(interpreter, src, &iter);
+    for (offs = 0; offs < src->strlen; ++offs) {
+        c = iter.get_and_advance(interpreter, &iter);
+        hashval += hashval << 5;
+        hashval += c;
+    }
+    return hashval;
 }
 
 CHARSET *

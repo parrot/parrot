@@ -274,10 +274,11 @@ utf8_encode_and_advance(Interp *interpreter, String_iter *i, UINTVAL c)
     const STRING *s = i->str;
     unsigned char *new_pos, *pos;
 
-    assert(i->bytepos < PObj_buflen(s) - 4);
     pos = (unsigned char *)s->strstart + i->bytepos;
     new_pos = utf8_encode(pos, c);
     i->bytepos += (new_pos - pos);
+    /* XXX possible buffer overrun exception? */
+    assert(i->bytepos < PObj_buflen(s));
     i->charpos++;
 }
 

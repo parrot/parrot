@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 30;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -445,3 +445,28 @@ iso-8859-1
 6
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "bug #34661 literal" );
+.sub main @MAIN
+    $S0 = unicode:"\"]\nif I3 == "
+    print "ok 1\n"
+.end
+CODE
+ok 1
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "todo #34660 hash" );
+.sub main @MAIN
+    $P0 = new Integer
+    $P0 = 42
+    store_global "Foo", unicode:"Bar", $P0
+    print "ok 1\n"
+    $P1 = find_global "Foo", "Bar"
+    print "ok 2\n"
+    print $P1
+    print "\n"
+.end
+CODE
+ok 1
+ok 2
+42
+OUTPUT
