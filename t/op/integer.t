@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 
 output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	# XXX: Need a test for writing outside the set of available
@@ -1033,6 +1033,17 @@ output_is(<<CODE, <<OUTPUT, "neg_i");
     end
 CODE
 -3
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mul_i_i");
+    set I0,3
+    set I1,4
+    mul I0,I1
+    print I0
+    print "\\n"
+    end
+CODE
+12
 OUTPUT
 
 1;

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 56;
+use Parrot::Test tests => 57;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1257,6 +1257,18 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mul_p_p");
+    new P0,.PerlInt
+    new P1,.PerlInt
+    set P0,8
+    set P1,2
+    mul P0,P1
+    print P0
+    print "\\n"
+CODE
+16
 OUTPUT
 
 1;
