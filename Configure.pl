@@ -109,88 +109,96 @@ parrotconfig - Parrot Configure
 
 =head1 NOTE
 
-This document is NOT about how to use Configure--it's about Configure's design.  For
-information on using Configure, type C<perl Configure.pl --help> (or your platform's
-equivalent) at a command line prompt.
+This document is NOT about how to use Configure--it's about Configure's 
+design.  For information on using Configure, type C<perl Configure.pl --help> 
+(or your platform's equivalent) at a command line prompt.
 
 =head1 DESCRIPTION
 
-B<I<U<THIS NEEDS TO BE UPDATED!!!>>>
+B<I<THIS NEEDS TO BE UPDATED!!!>>
 
-Configure is broken up into I<steps>.  Each step contains several related I<prompts>,
-I<probes>, or I<generations>.  Steps should be mostly of a single type, though some overlap
-is allowed (for example, allowing a probe to ask the user what to do in an exceptional
-situation).
+Configure is broken up into I<steps>.  Each step contains several related 
+I<prompts>, I<probes>, or I<generations>.  Steps should be mostly of a single 
+type, though some overlap is allowed (for example, allowing a probe to ask 
+the user what to do in an exceptional situation).
 
-The directory F<config> contains subdirectories for each type of step.  Each step should
-consist of I<exactly one> .pl file and any number of supporting .c, .in, etc. files.  Any
-supporting files should be in a folder whose name is the same as the basename of the step's
-.pl file; for example, if F<foo.pl> uses F<bar_c.in>, F<bar_c.in> should be in a directory
-called F<foo>; the full path might be F<config/auto/foo/bar_c.in>.
+The directory F<config> contains subdirectories for each type of step.  Each 
+step should consist of I<exactly one> .pl file and any number of supporting 
+.c, .in, etc. files.  Any supporting files should be in a folder whose name 
+is the same as the basename of the step's .pl file; for example, if F<foo.pl> 
+uses F<bar_c.in>, F<bar_c.in> should be in a directory called F<foo>; the 
+full path might be F<config/auto/foo/bar_c.in>.
 
-Generally, when adding a new test you should add a new step unless a test I<clearly> belongs
-in a current step.  For example, if we added a new user-configurable type called C<FOOVAL>,
-you should add the test for its size in F<auto/sizes.pl>; however, if you were testing
-what dynaloading capabilities are available, you should create a new step.
+Generally, when adding a new test you should add a new step unless a test 
+I<clearly> belongs in a current step.  For example, if we added a new 
+user-configurable type called C<FOOVAL>, you should add the test for its size 
+in F<auto/sizes.pl>; however, if you were testing what dynaloading 
+capabilities are available, you should create a new step.
 
 =head2 Initialization Steps
 
-I<Initialization steps> are run before any other steps.  They do tasks such as preparing
-Configure's data structures and checking the MANIFEST.  These will rarely be added; when
-they are, it usually means that Configure is getting significant new capabilities.
-They're kept in the directory F<config/init>.
+I<Initialization steps> are run before any other steps.  They do tasks such 
+as preparing Configure's data structures and checking the MANIFEST.  These 
+will rarely be added; when they are, it usually means that Configure is 
+getting significant new capabilities. They're kept in the directory 
+F<config/init>.
 
 Initialization steps usually do not output anything under normal circumstances.
 
 =head2 Prompts
 
-Prompts ask the user for some information.  These should be used sparingly.  A step
-containing prompts is an I<interactive step>.  Interactive steps should be in the
-F<config/inter> folder.
+Prompts ask the user for some information.  These should be used sparingly.  
+A step containing prompts is an I<interactive step>.  Interactive steps 
+should be in the F<config/inter> folder.
 
-Interactive steps often include simple probes to determine good guesses of what the user
-will answer.  See L</Prompt or Probe?> for more information.
+Interactive steps often include simple probes to determine good guesses of 
+what the user will answer.  See L</Prompt or Probe?> for more information.
 
 Interactive steps virtually always output something.
 
 =head2 Probes
 
-Probes are automated tests of some feature of the computer.  These should be used wherever a value
-will not often need to be modified by the user.  A step containing probes is an I<automatic step>.
-Automatic steps should be in the F<config/auto> folder.
+Probes are automated tests of some feature of the computer. These should be 
+used wherever a value will not often need to be modified by the user.  A step 
+containing probes is an I<automatic step>. Automatic steps should be in the 
+F<config/auto> folder.
 
 Automatic steps usually do not output anything under normal circumstances.
 
 =head2 Generations
 
-Generations create files needed after Configure has completed, such as Makefiles and configuration
-headers.  A step containing generations is a I<generation step>.  Generation steps should be in the
-F<config/gen> folder.
+Generations create files needed after Configure has completed, such as 
+Makefiles and configuration headers.  A step containing generations is a 
+I<generation step>.  Generation steps should be in the F<config/gen> folder.
 
 Generation steps usually do not output anything under normal circumstances.
 
 =head2 Prompt or Probe?
 
-It can sometimes be hard to decide whether a given step should be an automatic or an interactive
-step.  The guiding question is I<Would a user ever want to change this?>, or conversely, I<Is this
-something that can be completely determined without user intervention?>  A step figuring out what
-the compiler's command is would probably be an interactive step; conversely, a step figuring out
-if that command is connected to a specific compiler (like gcc) would be an automatic step.
+It can sometimes be hard to decide whether a given step should be an 
+automatic or an interactive step.  The guiding question is I<Would a user 
+ever want to change this?>, or conversely, I<Is this something that can be 
+completely determined without user intervention?>  A step figuring out what
+the compiler's command is would probably be an interactive step; conversely, 
+a step figuring out if that command is connected to a specific compiler 
+(like gcc) would be an automatic step.
 
 =head2 Adding Steps
 
-New steps should be added in one of the three folders mentioned above.  They should include the
-C<Parrot::Configure::Step> module, described below.
+New steps should be added in one of the three folders mentioned above. They 
+should include the C<Parrot::Configure::Step> module, described below.
 
-All steps are really modules; they should start with a declaration setting the current package
-to C<Configure::Step>.  They should define the following:
+All steps are really modules; they should start with a declaration setting 
+the current package to C<Configure::Step>.  They should define the following:
 
 =over 4
 
 =item C<$description>
 
-A short descriptive message that should be printed before the step executes.  Usually, interactive
-steps have long, friendly descriptions and other steps have terse descriptions ending in "...".
+A short descriptive message that should be printed before the step executes. 
+Usually, interactive steps have long, friendly descriptions and other steps 
+have terse descriptions ending in "...".
+
 Some example descriptions:
 
 =over 4
@@ -209,31 +217,33 @@ Some example descriptions:
 
 =item F<gen/config_h.pl>
 
-	Generating a config.h header for Parrot...
+        Generating config.h...
 
 =back
 
-Note that on non-interactive steps, the text C<"done."> will be printed after the description when the step
-finishes executing; for example, the user will see:
+Note that on non-interactive steps, the text C<"done."> will be printed after 
+the description when the step finishes executing; for example, the user will 
+see:
 
 	Determining if your compiler supports computed goto...done.
 
 =item C<@args>
 
-This contains the names of any command-line arguments the step cares about.  Command-line arguments
-are standardized in Configure; this will be described later in more detail.
+This contains the names of any command-line arguments the step cares about. 
+Command-line arguments are standardized in Configure; this will be described 
+later in more detail.
 
 =item C<Configure::Step::runstep>
 
-This is called to actually execute the step.  The command-line arguments that your module said it
-cared about are passed in; they come in the same order as in C<@args>, and any that weren't specified
-are passed as C<undef>.
+This is called to actually execute the step.  The command-line arguments that 
+your module said it cared about are passed in; they come in the same order as 
+in C<@args>, and any that weren't specified are passed as C<undef>.
 
 =back
 
-Configure won't execute your step by default unless it's specifically told to.  To do this, edit the
-C<Parrot::Configure::RunSteps> module's C<@steps> array.  Steps are run in the sequence in which
-they appear in C<@steps>.
+Configure won't execute your step by default unless it's specifically told to.
+To do this, edit the C<Parrot::Configure::RunSteps> module's C<@steps> array. 
+Steps are run in the sequence in which they appear in C<@steps>.
 
 A template for a new step might look like this:
 
@@ -252,17 +262,19 @@ A template for a new step might look like this:
 
 =head2 Command-line Arguments
 
-Command-line arguments look like C</--\w+(=.*)?/>; the equals sign separates the name and the value.
-If the value is omitted, it's assumed to be 1.  The options "--help" and "--version" are built in to
-Configure; any others are defined by steps.  "--help" lists some common options.
+Command-line arguments look like C</--\w+(=.*)?/>; the equals sign separates 
+the name and the value. If the value is omitted, it's assumed to be 1. The 
+options "--help" and "--version" are built in to Configure; any others are 
+defined by steps.  "--help" lists some common options.
 
-Steps use the C<@args> array to list any options they're interested in.  They should be listed without
-the dashes.
+Steps use the C<@args> array to list any options they're interested in. They 
+should be listed without the dashes.
 
 =head2 Building Up Configuration Data
 
-The second step is F<config/init/data.pl>, which sets up a C<Configure::Data> package.  You get and set
-Configure's data by calling methods on this package.  The methods are listed below.
+The second step is F<config/init/data.pl>, which sets up a C<Configure::Data> 
+package.  You get and set Configure's data by calling methods on this 
+package.  The methods are listed below.
 
 =over 4
 
@@ -280,20 +292,22 @@ Returns a list of all keys.
 
 =item C<< Configure::Data->dump() >>
 
-Returns a string that can be C<eval>ed by Perl to create a hash representing Configure's data.
+Returns a string that can be C<eval>ed by Perl to create a hash representing 
+Configure's data.
 
 =back
 
 =head2 C<Parrot::Configure::Step>
 
-The C<Parrot::Configure::Step> module contains utility functions for steps to use.  They include the following:
+The C<Parrot::Configure::Step> module contains utility functions for steps to 
+use.  They include the following:
 
 =over 4
 
 =item C<prompt(message, default)>
 
-Prints out "message [default] " and waits for the user's response.  Returns the response, or the default if the
-user just hit ENTER.
+Prints out "message [default] " and waits for the user's response.  Returns 
+the response, or the default if the user just hit ENTER.
 
 =item C<cc_gen(file)>
 
@@ -313,8 +327,9 @@ Cleans up all files in the root folder that match the glob I<test.*>.
 
 =item C<genfile(infile, outfile)>
 
-Takes the given I<infile>, substitutes any sequences matching C</\$\{\w+\}/> for the given key's value in
-Configure's data, and writes the results to I<outfile>.
+Takes the given I<infile>, substitutes any sequences matching C</\$\{\w+\}/> 
+for the given key's value in Configure's data, and writes the results to 
+I<outfile>.
 
 =back
 
