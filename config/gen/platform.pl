@@ -26,6 +26,7 @@ sub runstep {
 
   open PLATFORM_H, "> include/parrot/platform.h"
       or die "Can't open include/parrot/platform.h: $!";
+  print " platform='$platform' ";
 
   print PLATFORM_H <<HERE;
 #if !defined(PARROT_PLATFORM_H_GUARD)
@@ -111,7 +112,7 @@ HERE
       print PLATFORM_C <IN_C>, "\n\n";
       close IN_C;
   }
-  
+
   # Copy the rest.
 print PLATFORM_C <<HERE;
 #include "parrot/parrot.h"
