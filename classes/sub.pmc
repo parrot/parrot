@@ -41,6 +41,7 @@ sub_name(Parrot_Interp interpreter, PMC* sub)
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
     struct Parrot_sub * s = PMC_sub(sub);
+    struct Parrot_sub * c;
 
     if (s->name) {
         /* sub was located via globals */
@@ -55,10 +56,9 @@ sub_name(Parrot_Interp interpreter, PMC* sub)
             switch (ft->fixups[i]->type) {
                 case enum_fixup_sub:
                     ci = ft->fixups[i]->offset;
-                    if (sub == ct->constants[ci]->u.key) {
-                        return string_from_cstring(interpreter,
-                                ft->fixups[i]->name, 0);
-                    }
+                    c = PMC_sub(ct->constants[ci]->u.key);
+                    if (c->address == s->address)
+                        return c->name;
             }
         }
     }
@@ -244,7 +244,7 @@ Invokes the subroutine.
         interpreter->ctx.bp = stack_prepare_push(interpreter,
                 &interpreter->ctx.reg_stack);
         /*
-         * when next == NULL the call creates ags in the
+         * when next == NULL the call creates args in the
          * new frame, e.g.
          * called from runops_fromc
          */

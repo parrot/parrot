@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 76;
+use Parrot::Test tests => 77;
 use Test::More;
 use Parrot::Config;
 
@@ -1292,4 +1292,28 @@ ok:
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub names w newsub");
+##PIR##
+.sub main @MAIN
+    .include "interpinfo.pasm"
+    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
+    print $P0
+    foo()
+    print "\n"
+.end
+.sub foo
+    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
+    print $P0
+   bar()
+    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
+    print $P0
+.end
+.sub bar
+    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
+    print $P0
+.end
+CODE
+mainfoobarfoo
 OUTPUT

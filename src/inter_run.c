@@ -36,16 +36,15 @@ Run parrot ops. Set exception handler and/or resume after exception.
 #define STACKED_EXCEPTIONS 1
 
 void
-runops(Interp *interpreter, size_t offset)
+runops(Interp *interpreter, size_t offs)
 {
+    volatile size_t offset = offs;
+
+    interpreter->ctx.runloop_level++;
     /*
-     * having stacked exceptions for each runlevel didn't work always
-     * (after a longjmp the interpreter was totally messed up)
-     *
-     * But these are necessary to catch exceptions in reentered
+     * STACKED_EXCEPTIONS are necessary to catch exceptions in reentered
      * run loops, e.g. if a delegate methods throws an exception
      */
-    interpreter->ctx.runloop_level++;
 #if ! STACKED_EXCEPTIONS
     if (!interpreter->exceptions)
 #endif

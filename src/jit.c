@@ -244,7 +244,7 @@ make_branch_list(Interp *interpreter,
             branch[rel_offset + n] |= JIT_BRANCH_TARGET;
         if (op_info->jump & PARROT_JUMP_UNPREDICTABLE) {
             /*
-             * TODO 
+             * TODO
              *   this flag is currently not used or set
              *   and: if we have a branch that isn't going to a constant
              *   target like a calculated branch used by rx_ opcodes
@@ -305,11 +305,11 @@ set_register_usage(Interp *interpreter,
                  * functional because of changed register allocation
                  * strategy inside imcc.
                  * The code is still here and should probably be reactivated
-                 * later, when things are stable: imcc has all the 
+                 * later, when things are stable: imcc has all the
                  * necessary information like basic blocks and loop depth
                  * calculated already. A lot is duplicated here to regain this
                  * information.
-                 */ 
+                 */
                 if (idx < 0)
                     idx = -1 - idx;
                 break;
@@ -665,14 +665,14 @@ TODO
 
 Before actually assigning registers, we should optimize a bit:
 
-1) calculate max use count of register types for all sections 
+1) calculate max use count of register types for all sections
 
 2) calculate costs for register preserving and restoring
    for two different allocation strategies:
 
    a) allocate non-volatiles first
       overhead for jit_begin, jit_end:
-      - 2 * max_used_non_volatile registers  
+      - 2 * max_used_non_volatile registers
       overhead for register preserving around non-jitted sections:
       - only used IN arguments are saved
       - only OUT non-volatile arguments are restored
@@ -1179,7 +1179,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
                                 jit_info->native_ptr);
                         first = 0;
                     }
-                    
+
                     offs = reg_offs(interpreter, typ, us);
                     (mov_f[typ])(interpreter, base_reg, offs, maps[typ][i]);
 #else
@@ -1255,7 +1255,7 @@ program counters values to hardware program counter values.
 
 Finally this code here is used to generate native executables (or better
 object files that are linked to executables), if EXEC_CAPABLE is defined.
-This functionality is triggered by 
+This functionality is triggered by
 
   parrot -o foo.o foo.imc
 
@@ -1365,7 +1365,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
      *   op_map holds the offset from arena.start
      *   of the parrot op at the given opcode index
      *
-     * Set the offset of the first opcode 
+     * Set the offset of the first opcode
      */
     jit_info->arena.op_map[jit_info->op_i].offset =
         jit_info->native_ptr - jit_info->arena.start;
@@ -1395,7 +1395,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
         while (cur_op <= cur_section->end) {
             /* Grow the arena early */
             if (jit_info->arena.size <
-                    (jit_info->arena.op_map[jit_info->op_i].offset + 100)) {
+                    (jit_info->arena.op_map[jit_info->op_i].offset + 200)) {
 #if REQUIRES_CONSTANT_POOL
                 Parrot_jit_extend_arena(jit_info);
 #else
@@ -1425,7 +1425,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
              * differ too much. This could save a lot of register reloads.
              *
              * --
-             *  
+             *
              * save also, if we have a jitted sections and encounter
              * an "end" opcode, e.g. in evaled code
              */
@@ -1439,7 +1439,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
             else if (CALLS_C_CODE(cur_opcode_byte)) {
                 /*
                  * a JITted function with a function call, we have to
-                 * save volatile registers but 
+                 * save volatile registers but
                  * TODO not if the previous opcode was also one
                  *      that called C code
                  */
@@ -1521,7 +1521,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
     PIO_eprintf(interpreter, "\nTotal size %u bytes\n",
             (unsigned int)(jit_info->native_ptr - jit_info->arena.start));
 #endif
-    
+
 /*
  * TODO just call a sync function, which the architecture defines
  *      or not if not
@@ -1529,7 +1529,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
  *      This should be generalized and go along with the executable
  *      allocation functions as e.g. mem_close_executable()
  */
- 
+
 #ifdef PARROT_ARM
     arm_sync_d_i_cache(jit_info->arena.start, jit_info->native_ptr);
 #endif
@@ -1593,7 +1593,7 @@ Parrot_jit_newfixup(Parrot_jit_info_t *jit_info)
 =head1 SEE ALSO
 
 F<include/parrot/jit.h>, F<docs/jit.pod>,d F<src/jit_debug.c>,
-F<jit/$jitcpuarch/jit_emit.h>, F<jit/$jitcpuarch/core.jit>. 
+F<jit/$jitcpuarch/jit_emit.h>, F<jit/$jitcpuarch/core.jit>.
 
 =cut
 

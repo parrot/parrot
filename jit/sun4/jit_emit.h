@@ -355,7 +355,7 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 /* This register can be used only in jit_emit.h calculations */
 #define XSR1 emitm_l(0)
 
-#define Parrot_jit_regbase_ptr(i) &((i)->int_reg.registers[0])
+#define Parrot_jit_regbase_ptr(interpreter) &REG_INT(0)
 
 /* The offset of a Parrot register from the base register */
 #define Parrot_jit_regoff(a, i) (unsigned)(a) - (unsigned)(Parrot_jit_regbase_ptr(i))
@@ -469,25 +469,25 @@ static void jit_emit_load_i(Parrot_jit_info_t *jit_info,
             break;
 
         case PARROT_ARG_I:
-            val = (int)&interpreter->int_reg.registers[val];
+            val = (int)&REG_INT(val);
             emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter), hwreg);
             break;
 
         case PARROT_ARG_P:
-            val = (int)&interpreter->pmc_reg.registers[val];
+            val = (int)&REG_PMC(val);
             emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter), hwreg);
             break;
 
         case PARROT_ARG_S:
-            val = (int)&interpreter->string_reg.registers[val];
+            val = (int)&REG_STR(val);
             emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter), hwreg);
             break;
 
         case PARROT_ARG_N:
-            val = (int)&interpreter->num_reg.registers[val];
+            val = (int)&REG_NUM(val);
             emitm_ldd_i(jit_info->native_ptr, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter), hwreg);
             break;
@@ -512,25 +512,25 @@ static void jit_emit_store_i(Parrot_jit_info_t *jit_info,
 
     switch(op_type){
         case PARROT_ARG_I:
-            val = (int)&interpreter->int_reg.registers[val];
+            val = (int)&REG_INT(val);
             emitm_st_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
 
         case PARROT_ARG_P:
-            val = (int)&interpreter->pmc_reg.registers[val];
+            val = (int)&REG_PMC(val);
             emitm_st_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
 
         case PARROT_ARG_S:
-            val = (int)&interpreter->string_reg.registers[val];
+            val = (int)&REG_STR(val);
             emitm_st_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
 
         case PARROT_ARG_N:
-            val = (int)&interpreter->num_reg.registers[val];
+            val = (int)&REG_NUM(val);
             emitm_std_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
@@ -572,13 +572,13 @@ static void jit_emit_load_n(Parrot_jit_info_t *jit_info,
             break;
 
         case PARROT_ARG_I:
-            val = (int)&interpreter->int_reg.registers[val];
+            val = (int)&REG_INT(val);
             emitm_ldf_i(jit_info->native_ptr, Parrot_jit_regbase,
                         Parrot_jit_regoff(val, interpreter), hwreg);
             break;
 
         case PARROT_ARG_N:
-            val = (int)&interpreter->num_reg.registers[val];
+            val = (int)&REG_NUM(val);
             emitm_lddf_i(jit_info->native_ptr, Parrot_jit_regbase,
                          Parrot_jit_regoff(val, interpreter), hwreg);
             break;
@@ -602,13 +602,13 @@ static void jit_emit_store_n(Parrot_jit_info_t *jit_info,
 
     switch(op_type){
         case PARROT_ARG_I:
-            val = (int)&interpreter->int_reg.registers[val];
+            val = (int)&REG_INT(val);
             emitm_stf_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
 
         case PARROT_ARG_N:
-            val = (int)&interpreter->num_reg.registers[val];
+            val = (int)&REG_NUM(val);
             emitm_stdf_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
@@ -664,23 +664,27 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
      * i1 is reusable once past the jump. interpreter is preserved in i0
      */
     int ireg0_offset;
+    int ireg0_address;
 
     /* Standard Prolog */
     emitm_save_i(jit_info->native_ptr, emitm_SP, -104, emitm_SP);
 
     /* Calculate the offset of I0 in the interpreter struct */
-    ireg0_offset = (int)Parrot_jit_regbase_ptr(interpreter) -
-        (int)interpreter;
+    ireg0_address = (int)Parrot_jit_regbase_ptr(interpreter);
+    ireg0_offset  = ireg0_address - (int)interpreter;
 
-    if(ireg0_offset > 4095){
-        internal_exception(JIT_ERROR,
-                           "Unable to support interpreter structure\n" );
-    }
-
-    /* Calculate the address of I0 */
     /* All parrot registers will be addressed relative to I0 */
-    emitm_add_i(jit_info->native_ptr, Parrot_jit_intrp, ireg0_offset,
-                Parrot_jit_regbase);
+    if((ireg0_offset < emitm_simm13_min) || (ireg0_offset > emitm_simm13_max)){
+        /* Store the address of I0 if its offset doesnt fit in the immediate */
+        emitm_sethi(jit_info->native_ptr, emitm_hi22(ireg0_address), Parrot_jit_regbase);
+        emitm_or_i(jit_info->native_ptr, Parrot_jit_regbase, emitm_lo10(ireg0_address),
+                   Parrot_jit_regbase);
+    }
+    else {
+        /* Calculate the address of I0 */
+        emitm_add_i(jit_info->native_ptr, Parrot_jit_intrp, ireg0_offset,
+                    Parrot_jit_regbase);
+    }
 
     /* Setup the pointer to the opcode map */
     emitm_sethi(jit_info->native_ptr,
