@@ -201,7 +201,7 @@ __join_loopstart:
     concat S0, S2
     inc I0
 __join_test:
-    ne I1, I0 __join_loopstart
+    ne I1, I0, __join_loopstart
 __join_ret:
     new P2, .PerlString
     set P2, S0
