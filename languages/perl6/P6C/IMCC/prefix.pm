@@ -747,14 +747,12 @@ sub wrap_with_catch {
     my $catch;
     my $result;
     my $ret = gentmp 'pmc';
-    my $addr = newtmp 'int';
     if ($catcher) {
        $catch = genlabel 'catch';
        $label = $catch;
     }
     code(<<END);
-       $addr = addr $label
-       $cont = $addr
+       newsub $cont, .Continuation, $label
        find_lex $subtmp, "&install_catch"
        .pcc_begin non_prototyped
        .arg $cont

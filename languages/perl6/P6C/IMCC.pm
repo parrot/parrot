@@ -1868,10 +1868,8 @@ END
 	# Create a closure.
 	set_function($ofunc);
 	$ret = newtmp 'Sub';
-	my $itmp = gentmp 'int';
 	code(<<END);
-	$itmp = addr _$name
-	$ret = $itmp
+	newsub $ret, .Sub, _$name
 END
 	$ret = scalar_in_context($ret, $x->{ctx});
     }
