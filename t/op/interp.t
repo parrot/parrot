@@ -1,22 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
-
-output_is(<<'CODE', <<'OUTPUT', "runinterp");
-	newinterp P0, 0
-	print "calling\n"
-	runinterp P0, foo
-	print "ending\n"
-	end
-	print "bad things!\n"
-foo:
-	print "In 2\n"
-	end
-CODE
-calling
-In 2
-ending
-OUTPUT
+use Parrot::Test tests => 2;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter

@@ -80,8 +80,8 @@ struct parrot_string_t {
     /* completely different data.  That's why it's */
     /* referred to as a "cache". */
 
-/* put data into the PMC_EXT structure - not yet */
-#define PMC_DATA_IN_EXT 0
+/* put data into the PMC_EXT structure */
+#define PMC_DATA_IN_EXT 1
 
 struct PMC {
     pobj_t obj;

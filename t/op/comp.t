@@ -158,6 +158,7 @@ output_is(<<'CODE', <<OUTPUT, "cmp");
         print "\n"
         print I4
         print "\n"
+	end
 CODE
 1
 0

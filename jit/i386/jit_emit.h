@@ -2669,18 +2669,21 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
             emitm_calll(pc, (char*)pmc_new - pc - 4);
             emitm_addb_i_r(pc, 8, emit_ESP);
             /* eax = PMC, get return value into edx */
+            jit_emit_mov_mr_i(pc, &PMC_REG(next_p++), emit_EAX);
             emitm_popl_r(pc, emit_EDX);
             /* stuff return value into pmc->data */
 #if ! PMC_DATA_IN_EXT
+            /* mov %edx, (data) %eax */
             emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
                     offsetof(struct PMC, data));
 #else
-            emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
+            /* mov pmc_ext(%eax), %eax
+               mov %edx, data(%eax) */
+            emitm_movl_m_r(pc, emit_EAX, emit_EAX, 0, 1,
                     offsetof(struct PMC, pmc_ext));
-            emitm_movl_r_m(pc, emit_EAX, emit_EAX, 0, 1,
+            emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
                     offsetof(struct PMC_EXT, data));
 #endif
-            jit_emit_mov_mr_i(pc, &PMC_REG(next_p++), emit_EAX);
             break;
         case 't':   /* string, determine length, make string */
             emitm_pushl_i(pc, 0);

@@ -4651,28 +4651,9 @@ inline op stringinfo(out INT, in STR, in INT) {
 
 ########################################
 
-=item B<newinterp>(out PMC, in INT)
-
-Create a new interpreter and store it in a PMC.
-
-=cut
-
-op newinterp(out PMC, in INT) {
-  struct Parrot_Interp *new_interp;
-  struct PMC *new_pmc;
-  new_pmc = new_pmc_header(interpreter);
-  $1 = new_pmc;
-  new_interp = make_interpreter((Interp_flags)$2);
-  new_interp->parent_interpreter = interpreter;
-  PMC_data(new_pmc) = new_interp;
-  new_pmc->vtable = YOU_LOSE_VTABLE;
-  goto NEXT();
-}
-
-
 =item B<runinterp>(in PMC, in INT)
 
-Take a built interpreter and run the code starting at offset $2.
+Run the code starting at offset $2 within interpreter $1.
 
 =cut
 
@@ -4952,6 +4933,7 @@ inline op loadlib(out PMC, in STR) {
      PANIC("Failed to load native library");
   }
   pmc = new_pmc_header(interpreter);
+  add_pmc_ext(interpreter, pmc);
   PMC_data(pmc) = (void *)p;
   $1 = pmc;
   goto NEXT();

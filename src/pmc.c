@@ -103,6 +103,7 @@ constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
     PMC *pmc = get_new_pmc_header(interpreter, base_type,
             interpreter->arena_base->constant_pmc_pool);
     PObj_constant_SET(pmc);
+    add_pmc_ext(interpreter, pmc);
     return pmc;
 }
 /*=for api pmc pmc_new_init
@@ -133,6 +134,7 @@ pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)
         return NULL;
     }
 
+    add_pmc_ext(interpreter, pmc);
     VTABLE_init_pmc(interpreter, pmc, init);
 
     return pmc;
