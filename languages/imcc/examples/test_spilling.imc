@@ -1,0 +1,170 @@
+# Test the ability of the compiler to spill coded
+#
+.sub _MAIN
+	
+	.local int a
+	.local int b
+	.local int c
+	.local int d
+	.local int e
+	.local int f
+	.local int g
+	.local int h
+	.local int i
+	.local int j
+	.local int k
+	.local int l
+	.local int m
+	.local int n
+	.local int o
+	.local int p
+	.local int q
+	.local int r
+	.local int s
+	.local int t
+	.local int q
+	.local int r
+	.local int s
+	.local int t
+	.local int u
+	.local int v
+	.local int w
+	.local int x
+	.local int y 
+	.local int z
+	.local int aa
+	.local int ab
+	.local int ac
+	.local int ad
+	.local int ae
+	.local int af
+	.local int ag
+	.local int ah
+	.local int ai
+	.local int aj
+	.local int ak
+	.local int al
+	.local int am
+
+        a = 1
+	b = 2
+	c = 3
+	d = 4
+	e = 5
+	f = 6
+	g = 7
+	h = 8
+	i = 9
+	j = 10
+	k = 11
+	l = 12
+	m = 13
+	n = 14
+	o = 15
+	p = 16
+	q = 17
+	r = 18
+	s = 19
+	t = 20
+	u = 21
+	v = 22
+	w = 23
+	x = 24
+	y = 25
+	z = 26
+	aa = 27
+	ab = 28
+	ac = 29
+	ad = 30
+	ae = 31
+	af = 32
+	ag = 33 
+	ah = 34
+	ai = 35
+	aj = 36
+	ak = 37
+	al = 38
+	am = 39
+	
+	print a
+	print "\n"
+	print b
+	print "\n"
+	print c
+	print "\n"
+	print d 
+	print "\n"
+	print e 
+	print "\n"
+	print f 
+	print "\n"
+	print g 
+	print "\n"
+	print h 
+	print "\n"
+	print i
+	print "\n"
+	print j
+	print "\n"
+	print k 
+	print "\n"
+	print l 
+	print "\n"
+	print m 
+	print "\n"
+	print n 
+	print "\n"
+	print o 
+	print "\n"
+	print p 
+	print "\n"
+	print q 
+	print "\n"
+	print r 
+	print "\n"
+	print s 
+	print "\n"
+	print t 
+	print "\n"
+	print u 
+	print "\n"
+	print v
+	print "\n"
+	print w 
+	print "\n"
+	print x 
+	print "\n"
+	print y 
+	print "\n"
+	print z 
+	print "\n"
+	print aa
+	print "\n"
+	print ab 
+	print "\n"
+	print ac 
+	print "\n"
+	print ad 
+	print "\n"
+	print ae 
+	print "\n"
+	print af 
+	print "\n"
+	print ag 
+	print "\n"
+	print ah 
+	print "\n"
+	print ai 
+	print "\n"
+	print aj 
+	print "\n"
+	print ak
+	print "\n"
+	print al
+	print "\n"
+	print am
+	print "\n"
+		
+	end
+	ret
+
