@@ -404,6 +404,9 @@ parrot_py_hash(Interp *interpreter, PMC *pmc)
         case enum_class_String:
             i = string_hash(interpreter, PMC_str_val(pmc));
             break;
+        case enum_class_Complex:
+            i = (INTVAL)VTABLE_get_number_keyed_int(interpreter, pmc, 0);
+            break;
         default:
             i = VTABLE_get_integer(interpreter, pmc);
             break;
