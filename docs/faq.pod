@@ -26,7 +26,7 @@ gotten better.
 =head2 Is Parrot the same as Perl 6?
 
 No. Parrot is an implementation that is expected to be used to execute 
-Perl6 programs. The Perl6 language definition is currently (December 2001) being 
+Perl6 programs. The Perl6 language definition is currently being 
 crafted by Larry Wall. While the true nature of Perl6 is still unknown, it will 
 be substantially similar to Perl as we know it today, and will need a runtime 
 system. For more information on the nascent Perl6 language definition, check out 
