@@ -21,7 +21,7 @@ int nci_isc(short l1, char l2) {
 }
 
 float nci_fff(float l1, float l2) {
-	return l1 * l2;
+	return l1 / l2;
 }
 
 /* test calls this with a string */
@@ -45,6 +45,10 @@ void * nci_pp(void *p) {
 	return p;
 }
 
+int nci_iiii(int i1, int i2, int i3) {
+	fprintf(stderr, "%d %d %d\n", i1, i2, i3);
+	return 2;
+}
 #ifdef TEST
 char l2 = 4;
 float f2 = 4.0;

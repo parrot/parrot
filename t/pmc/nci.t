@@ -1,4 +1,4 @@
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -57,10 +57,10 @@ output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_f_ff");
   print "dlfunced\n"
   set I0, 1	# prototype used - unchecked
   set I1, 0	# items on stack - unchecked
-  set N5, 4.0
+  set N5, 12.0
   set N6, 3.0
   invoke
-  ne N5, 12.0, nok_1
+  ne N5, 4.0, nok_1
   print "ok 1\n"
   ne I0, 0, nok_2	# test return value convention
   ne I1, 0, nok_2
@@ -382,6 +382,23 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_iii");
+  loadlib P1, "libnci.so"
+  dlfunc P0, P1, "nci_iiii", "iiii"
+  set I0, 1	# prototype used - unchecked
+  set I1, 0	# items on stack - unchecked
+  set I5, 10
+  set I6, 20
+  set I7, 30
+  invoke
+  end
+  end
+nok_2: print "nok 2\n"
+  end
+CODE
+10 20 30
 OUTPUT
 
 } # SKIP

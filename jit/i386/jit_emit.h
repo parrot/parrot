@@ -2486,6 +2486,38 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 /*
+ * params are put rigth to left on the stack
+ * parrot registers are counted left to right
+ * so this function returns for a given register type
+ * the needed register number
+ * TODO handel overflow params
+ */
+static int
+count_regs(char *sig, char *sig_start)
+{
+    const char *typs[] = {
+        "lisc", /* I */
+        "t",    /* S */
+        "p",    /* P */
+        "fd"   /* N */
+    };
+    int first_reg = 5;
+    int i, found;
+    /* char at sig is the type to look at */
+    for (found = -1, i = 0; i < 4; i++)
+        if (strchr(typs[i], *sig)) {
+            found = i;
+            break;
+        }
+    if (found == -1)
+        internal_exception(1,
+                "Parrot_jit_build_call_func: sig char not found\n");
+    for (--sig; sig > sig_start; --sig)
+        if (strchr(typs[found], *sig))
+            ++first_reg;
+    return first_reg;
+}
+/*
  * TODO if this is called from an JITed op it has to use MAPs
  */
 void *
@@ -2516,14 +2548,16 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
         switch (*sig) {
             case 'f':
                 /* get a double from next num reg and push it on stack */
-                jit_emit_fload_m_n(pc, &NUM_REG(next_n++));
+                jit_emit_fload_m_n(pc,
+                        &NUM_REG(count_regs(sig, signature->strstart)));
                 /* make room for float */
                 emitm_addb_i_r(pc, -4, emit_ESP);
                 emitm_fstps(pc, emit_ESP, emit_None, 1, 0);
                 break;
             case 'd':
                 /* get a double from next num reg and push it on stack */
-                jit_emit_fload_m_n(pc, &NUM_REG(next_n++));
+                jit_emit_fload_m_n(pc,
+                        &NUM_REG(count_regs(sig, signature->strstart)));
                 /* make room for double */
                 emitm_addb_i_r(pc, -8, emit_ESP);
                 emitm_fstpl(pc, emit_ESP, emit_None, 1, 0);
@@ -2531,15 +2565,18 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                 break;
             case 'l':   /* long */
             case 'i':   /* int */
-                jit_emit_mov_rm_i(pc, emit_EAX, &INT_REG(next_i++));
+                jit_emit_mov_rm_i(pc, emit_EAX,
+                        &INT_REG(count_regs(sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 's':   /* short: movswl intreg, %eax */
-                emitm_movswl_r_m(pc, emit_EAX, 0, 0, 1, &INT_REG(next_i++));
+                emitm_movswl_r_m(pc, emit_EAX, 0, 0, 1,
+                        &INT_REG(count_regs(sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'c':   /* char: movsbl intreg, %eax */
-                emitm_movsbl_r_m(pc, emit_EAX, 0, 0, 1, &INT_REG(next_i++));
+                emitm_movsbl_r_m(pc, emit_EAX, 0, 0, 1,
+                        &INT_REG(count_regs(sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'p':   /* push pmc->data */
@@ -2547,7 +2584,8 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                  * mov 8(%edx), %eax
                  * push %eax
                  */
-                jit_emit_mov_rm_i(pc, emit_EDX, &PMC_REG(next_p++));
+                jit_emit_mov_rm_i(pc, emit_EDX,
+                        &PMC_REG(count_regs(sig, signature->strstart)));
                 emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
                         offsetof(struct PMC, data));
                 emitm_pushl_r(pc, emit_EAX);
@@ -2556,7 +2594,8 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                 st -= 4;        /* undo default stack usage */
                 break;
             case 't':   /* string, pass a cstring */
-                jit_emit_mov_rm_i(pc, emit_EAX, &STR_REG(next_s++));
+                jit_emit_mov_rm_i(pc, emit_EAX,
+                        &STR_REG(count_regs(sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
                 emitm_pushl_i(pc, interpreter);
                 emitm_calll(pc, (char*)string_to_cstring - pc - 4);
@@ -2585,7 +2624,6 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
         emitm_addb_i_r(pc, st, emit_ESP);
 
     /* now place return value in registers */
-    next_i = next_n = next_p = next_s = 5;
     /* first in signature is the return value */
     switch (*sig) {
         case 'f':
