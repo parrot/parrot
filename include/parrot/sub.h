@@ -20,8 +20,6 @@
 
 typedef struct Parrot_Sub { 
     INTVAL              flags;
-    Stack_Chunk_t       *user_stack;
-    Stack_Chunk_t       *control_stack;
     struct Scratchpad   *lex_pad;
     opcode_t            *init;
 } * parrot_sub_t;

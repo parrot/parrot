@@ -34,8 +34,6 @@ new_sub(struct Parrot_Interp * interp, opcode_t * address)
     /* Using system memory until I figure out GC issues */
     struct Parrot_Sub * newsub = mem_sys_allocate(sizeof(struct Parrot_Sub));
     newsub->init = address;
-    newsub->user_stack = new_stack(interp);
-    newsub->control_stack = new_stack(interp);
     newsub->lex_pad = NULL;
     return newsub;
 }
