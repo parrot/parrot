@@ -24,7 +24,7 @@ typedef enum {
     enum_type_INTVAL,
     enum_type_FLOATVAL,
     enum_type_PMC,
-    enum_type_STRING,
+    enum_type_STRING
 } ARRAY_ENTRY_TYPE;
 
 typedef struct List_chunk {
@@ -59,7 +59,7 @@ enum {
     enum_grow_unknown,          /* at beginning, or after emptying list */
     enum_grow_mixed = 1,        /* other */
     enum_grow_fixed = fixed_items,        /* fixed maximum size */
-    enum_grow_growing = grow_items,      /* growing at begin of list */
+    enum_grow_growing = grow_items        /* growing at begin of list */
 } ARRAY_GROW_TYPE;
 
 enum {
