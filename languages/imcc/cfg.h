@@ -20,7 +20,6 @@ typedef struct _basic_block {
     int index;                  /*on bb_list*/
 } Basic_block;
 
-
 /* Globals: */
 Basic_block **bb_list;
 int n_basic_blocks;
@@ -33,6 +32,13 @@ void build_cfg();
 void bb_findadd_edge(Basic_block*, SymReg*);
 void bb_add_edge();
 
+void life_analysis();
+void analyse_life_symbol(SymReg*);
+void analyse_life_block(Basic_block*, SymReg*);
+void add_life_interval(Life_range*, int, int);
+void propagate_need(Basic_block*, SymReg*);
+
 void init_basic_blocks();
 Basic_block* make_basic_block(Instruction*);
 void clear_basic_blocks();
+Life_range* make_life_range(SymReg*, int);

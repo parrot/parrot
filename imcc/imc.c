@@ -38,7 +38,7 @@ void allocate() {
 
         find_basic_blocks();	
 	build_cfg();
-	/*life_analysis();*/
+	life_analysis();
 
         build_interference_graph();  
 
@@ -95,7 +95,12 @@ void build_interference_graph() {
     {
 	int count = 0;
         interference_graph = calloc(n_symbols*n_symbols*n_symbols+1, sizeof(SymReg*)); 
-        for(i = 0; i < HASH_SIZE; i++) {
+        if (interference_graph == NULL) {
+	    fprintf(stderr, "Memory error at build_interference_graph\n");
+	    abort();
+	}
+			    
+	for(i = 0; i < HASH_SIZE; i++) {
             SymReg * r = hash[i];
             /* Add each symbol to its slot on the X axis of the graph */
     	    for(; r; r = r->next) {
@@ -120,7 +125,7 @@ void build_interference_graph() {
    
     if (IMCC_DEBUG) {
 	    dump_symreg();
-	    dump_interference_graph();
+	    /*dump_interference_graph();*/
     }	   
 }
 
@@ -147,7 +152,14 @@ void compute_du_chain(SymReg * r) {
 
 
 /* See if r0's chain interferes with r1. */
+/* We currently decide that two vars interfere if they are both alive 
+ * at any point. This could be improved, requiring that one is alive
+ * at the point of _definition_ of the other.
+ */
+
 int interferes(SymReg * r0, SymReg * r1) {
+    int i;
+    
     /* Register doesn't interfere with itself, and register sets
      * don't interfere with each other.
      */
@@ -168,6 +180,35 @@ int interferes(SymReg * r0, SymReg * r1) {
     /* If symbol was never used in a statment, it can't interfere */
     if(r0->first < 0 || r1->first < 0) return 0;
 
+    /* Now: */
+
+    for (i=0; i <n_basic_blocks; i++) {
+       Life_range *l0, *l1;
+       
+       if (  (l0->flags & LF_lv_all    && l1->flags & LF_lv_inside) 
+          || (l0->flags & LF_lv_inside && l1->flags & LF_lv_all)	    
+          || (l0->flags & LF_lv_in  && l1->flags & LF_lv_in)    
+	  || (l0->flags & LF_lv_out && l1->flags & LF_lv_out)
+	  )
+	   return 1;
+       
+       if (l0->flags & LF_lv_inside && l1->flags & LF_lv_inside) {
+           /* we need to compare the intervals */
+	   int i, j;
+	   for (i=0; i < l0->n_intervals; i++) {
+		for (j=0; j < l1->n_intervals; j++) {
+		     if (l0->intervals[i] >= l1->intervals[j+1] ) 
+			     continue;
+
+		     if (l0->intervals[i+1] <= l1->intervals[j] )
+			     continue;
+
+		     return 1;		     
+		}
+           }		  
+       } 
+    }	  
+
     return 1;
 }
 
@@ -180,15 +221,18 @@ int interferes(SymReg * r0, SymReg * r1) {
  *
  */
 
-int simplify (SymReg **g){
+int simplify (){
     int changes = 0;
     int x;
+    SymReg **g;
     
+    g = interference_graph;
+
     for(x = 0; x < n_symbols; x++) {
 	if (g[x]->simplified) {
             break;
 	}
-		
+
 	if ( neighbours(x) < MAX_COLOR) {
             if (IMCC_DEBUG) 
 	        fprintf(stderr, "#simplifying [%s]\n", g[x]->name);
@@ -342,96 +386,86 @@ int map_colors(int x, SymReg ** graph, int colors[]) {
  */
 void spill (int spilled) {
 	
-    Instruction ** new_instructions;
-
+    Instruction ** old_instructions;
+    int old_n_instructions;
     Instruction * tmp;
-    int i, j, needs_fetch, needs_store, needs_spilling, after_spilled, after_needs_store;
-    SymReg *new_symbol, *old_symbol; 
+    int i, j;
+    int needs_fetch, needs_store, needs_spilling, after_spilled, after_needs_store;    
+    SymReg *new_symbol, *old_symbol;     
     char* buf;
 		    
-    SymReg **g = interference_graph;
     buf = malloc(256 * sizeof(char));
+    if (buf == NULL) {
+	fprintf(stderr, "Memory error at spill\n");
+	abort();
+    }
     
     if (IMCC_DEBUG) 
-	fprintf(stderr, "#Spilling [%s]:\n", g[spilled]->name);
+	fprintf(stderr, "#Spilling [%s]:\n", interference_graph[spilled]->name);
 		    
-    old_symbol = g[spilled]; 
+    old_symbol = interference_graph[spilled];
+    old_instructions = instructions;  
+    old_n_instructions = n_instructions;
+    instructions = NULL;
 
     sprintf(buf, "%s_%d", old_symbol->name, 0);
     new_symbol = mk_symreg(buf, old_symbol->set);
-    new_instructions = calloc(4096, sizeof(Instruction *));
 
     n_spilled++;
     after_spilled = 0;
     after_needs_store = 0;
 
     j = 0;
-    for(i = 0; i < n_instructions; i++) {
-	tmp = instructions[i];
+    for(i = 0; i < old_n_instructions; i++) {
+	tmp = old_instructions[i];
 
 	needs_store = 0;
 	needs_fetch = 0;
 
-	if (tmp->r0 == old_symbol) {
-	    if (tmp->flags & IF_r0_read)  needs_fetch = 1;
-	    if (tmp->flags & IF_r0_write) needs_store = 1;
+	if (instruction_reads (tmp, old_symbol) )
+	    needs_fetch = 1;
 
-	    tmp->r0 = new_symbol;
-	}
-
-	if (tmp->r1 == old_symbol) {
-	    if (tmp->flags & IF_r1_read)  needs_fetch = 1;
-	    if (tmp->flags & IF_r1_write) needs_store = 1;
-
-	    tmp->r1 = new_symbol;
-	}
-
-
-	if (tmp->r2 == old_symbol) {
-	   if (tmp->flags & IF_r2_read)	 needs_fetch = 1;
-           if (tmp->flags & IF_r2_write) needs_store = 1;
-	   
-           tmp->r2 = new_symbol;
-	}
-
-
-	if (tmp->r3 == old_symbol) {
-	    if (tmp->flags & IF_r3_read)  needs_fetch = 1;
-            if (tmp->flags & IF_r3_write) needs_store = 1;
-
-	    tmp->r3 = new_symbol;
-	}
-
+	if (instruction_writes (tmp, old_symbol) )
+	    needs_store = 1;
+		
 	needs_spilling = needs_fetch || needs_store;
 
 	if (needs_fetch && !after_spilled) {
 
-	    sprintf(buf, "set %s, P31, %d #FETCH", "%s", n_spilled); /*ouch*/
-
-	    new_instructions[j++] = mk_instruction(
-	    		buf, new_symbol, NULL, NULL, NULL, IF_r1_write);
-
+	    sprintf(buf, "set %s, P31[%d], #FETCH", "%s", n_spilled); /*ouch*/
+	    emitb( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r1_write));
 	}
 
 	if (!needs_spilling && after_needs_store) {
 
-	    sprintf(buf, "set P31, %d, %s #STORE", n_spilled, "%s"); /*ouch, ouch*/
-	    
-	    new_instructions[j++] = mk_instruction(
-			buf, new_symbol, NULL, NULL, NULL, IF_r1_write);
+	    sprintf(buf, "set P31[%d], %s #STORE", n_spilled, "%s"); /*ouch, ouch*/
+	    emitb ( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r1_read));
 
             sprintf(buf, "%s_%d", old_symbol->name, n_spilled);
-            new_symbol =  mk_symreg(buf, old_symbol->set);
+            new_symbol =  mk_ident(buf, old_symbol->set);
 	}
 		
-	new_instructions[j++] = tmp;
+	/* Emit the old instruction, with the symbol changed */
+	{
+		SymReg *r0, *r1, *r2, *r3;
+		
+		r0 = tmp->r0;
+		r1 = tmp->r1;
+		r2 = tmp->r2;
+		r3 = tmp->r3;
+		
+		if (r0==old_symbol) r0=new_symbol;
+		if (r1==old_symbol) r1=new_symbol;
+		if (r2==old_symbol) r2=new_symbol;
+		if (r3==old_symbol) r3=new_symbol;
+
+		emitb( mk_instruction(tmp->fmt, r0, r1, r2, r3, tmp->flags) );
+	}
 	after_needs_store = needs_store;
 	after_spilled = needs_spilling;
     }
 
-   free(instructions);
-   instructions = new_instructions;
-   n_instructions = j;
+   free(old_instructions);
 
    /* old_symbol does'nt get deleted. It simply loses all references from 
       instructions. So this means that the symbol table gets polluted with 
@@ -439,6 +473,8 @@ void spill (int spilled) {
 
       We should clear, or at least reuse, them.
    */
+
+   dump_instructions();
 }
 
 int neighbours(int node) {
@@ -465,6 +501,10 @@ int neighbours(int node) {
 
 char * str_dup(const char * old) {
     char * copy = (char *)malloc(strlen(old) + 1);
+    if (copy == NULL) {
+        fprintf(stderr, "Memory error at str_dup\n");
+	abort();
+    }	   
     strcpy(copy, old);
     return copy;
 }
@@ -472,6 +512,10 @@ char * str_dup(const char * old) {
 char * str_cat(const char * s1, const char * s2) {
     int len = strlen(s1) + strlen(s2) + 1;
     char * s3 = malloc(len);
+    if (s3 == NULL) {
+       fprintf(stderr, "Memory error at str_cat\n");	    
+       abort();
+    }	  
     strcpy(s3, s1);
     strcat(s3, s2);
     return s3;

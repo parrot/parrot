@@ -17,6 +17,10 @@ SymReg * mk_symreg(const char * name, char t) {
     if((r = get_sym(name)))
         return r;
     r = calloc(1, sizeof(SymReg));
+    if (r==NULL) {
+	fprintf(stderr, "Memory error at mk_symreg\n");
+	abort();
+    }
     r->name = str_dup(name);
     r->reg = str_dup(name);
     if(t == 'I') r->fmt = str_dup("I%d");
@@ -29,6 +33,7 @@ SymReg * mk_symreg(const char * name, char t) {
     r->set = t;
     r->type = VTREG;
     r->simplified = 0;
+    r->life_info = NULL;
 
     if(name[0])
         store_symreg(r);
@@ -48,6 +53,10 @@ SymReg * mk_const(const char * name, char t) {
     if((r = get_sym(name)))
         return r;
     r = calloc(1, sizeof(SymReg));
+    if (r==NULL) {
+	fprintf(stderr, "Memory error at mk_const\n");
+	abort();
+    }
     r->name = str_dup(name);
     r->reg = str_dup(name);
     r->first = -1;
@@ -56,6 +65,7 @@ SymReg * mk_const(const char * name, char t) {
     r->set = t;
     r->type = VTCONST;
     r->simplified = 0;
+    r->life_info = NULL;
     if(name[0])
         store_symreg(r);
     return r;
@@ -67,12 +77,17 @@ SymReg * mk_address(const char * name) {
     if((r = get_sym(name)))
         return r;
     r = calloc(1, sizeof(SymReg));
+    if (r==NULL) {
+	fprintf(stderr, "Memory error at mk_address\n");
+	abort();
+    }
     r->name = str_dup(name);
     r->reg = str_dup(name);
     r->first = -1;
     r->color = -1;
     r->score = 0;
     r->type = VTADDRESS;
+    r->life_info = NULL;
     r->simplified = 0;
     if(name[0])
         store_symreg(r);

@@ -12,7 +12,7 @@ void dump_instructions() {
 	bb = ins->basic_block;
 	
 	if (bb) {
-	     fprintf(stderr, "%d\t", bb->index);
+	     fprintf(stderr, "%i\t%d\t", ins->index, bb->index);
 	}
 	else {
 	     fprintf(stderr, "\t");
@@ -58,10 +58,54 @@ void dump_symreg() {
     	}
     }
     fprintf(stderr, "\n");
+    dump_liveness_status();
+
+}
+
+void dump_liveness_status() {
+    int i;
+
+    fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
+    for(i = 0; i < HASH_SIZE; i++) {
+        SymReg * r = hash[i];
+    	for(; r; r = r->next) {
+	    if (r->type == VTIDENTIFIER) dump_liveness_status_var(r);
+    	}
+    }
+    fprintf(stderr, "\n");
+    
+}
+
+
+void dump_liveness_status_var(SymReg* r) {
+    int i, j;
+    Life_range *l;
+    
+    fprintf(stderr, "\nSymbol %s:", r->name);
+    if (r->life_info==NULL) return;
+    for (i=0; i<n_basic_blocks; i++) {
+        l = r->life_info[i];
+    
+	if (l->flags & LF_lv_all) {
+		fprintf(stderr, "\n\t%i:ALL\t", i);
+	}
+	else if (l->flags & LF_lv_inside) {
+            fprintf(stderr, "\n\t%i:", i);		   
+	    
+	    if (l->flags & LF_lv_in)      fprintf(stderr, "IN\t");
+	    if (l->flags & LF_lv_out)     fprintf(stderr, "OUT\t");
+	
+	    for (j=0; j < l->n_intervals; j++) {
+	       fprintf(stderr, "[%d,%d]\t", 
+	       l->intervals[2*j], l->intervals[2*j+1] );
+	    }		  
+	}
+    }
+    fprintf(stderr, "\n");
 }
 
 void dump_interference_graph() {
-    int x, y, cnt;  
+    int x, y, cnt;      
     SymReg *r;
 
     fprintf(stderr, "\nDumping the Interf. graph:\n-------------------------------\n");

@@ -36,7 +36,7 @@ char *str_dup(const char *);
 char *str_cat(const char *, const char *);
 
 int IMCC_DEBUG;
-int n_spill;
+int n_spilled;
 SymReg** interference_graph;
 
 

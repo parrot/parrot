@@ -14,9 +14,10 @@ typedef struct _Instruction {
     SymReg * r1;           /*   each instruction can use up to 4 registers */
     SymReg * r2;
     SymReg * r3;
-    long flags;             /* how the instruction affects each of the values */    
+    long flags;            /* how the instruction affects each of the values */    
     int type;
-    void * basic_block;             /* basic block */
+    void * basic_block;    /* basic block */
+    int index;             /* index on instructions[] */
 } Instruction;
 
 
@@ -48,6 +49,8 @@ Instruction * mk_instruction(const char *, SymReg *, SymReg *, SymReg *, SymReg 
 Instruction * emitb(Instruction *);
 Instruction * emit(Instruction *);
 void emit_flush();
+int instruction_reads(Instruction *, SymReg *);
+int instruction_writes(Instruction *, SymReg *);
 
 
 /* Globals */

@@ -29,6 +29,10 @@ Instruction * mk_instruction(const char * fmt, SymReg * r0, SymReg * r1,
 {
     static SymReg * nullreg;
     Instruction * i = calloc(1, sizeof(Instruction));
+    if (i == NULL) {
+        fprintf(stderr, "Memory error at mk_instruction\n");
+	abort();
+    }	    
     if(!nullreg)
 	nullreg = mk_symreg("", 'I');
 
@@ -49,10 +53,50 @@ Instruction * mk_instruction(const char * fmt, SymReg * r0, SymReg * r1,
 }
 
 
+int instruction_reads(Instruction* ins, SymReg* r) {
+    int f;
+   
+    if (ins == NULL) {
+	   fprintf(stderr, "Internal error: instruction_reads called with NULL argument\n");
+	   abort();
+   }
+ 
+    f = ins->flags;
+    
+    if ((ins->r0 == r) && f & IF_r0_read) return 1;
+    if ((ins->r1 == r) && f & IF_r1_read) return 1;
+    if ((ins->r2 == r) && f & IF_r2_read) return 1;
+    if ((ins->r3 == r) && f & IF_r3_read) return 1;
+
+    return 0;
+}
+
+int instruction_writes(Instruction* ins, SymReg* r) {
+    int f;
+   
+    if (ins == NULL) {
+	   fprintf(stderr, "Internal error: instruction_reads called with NULL argument\n");
+	   abort();
+   }
+ 
+    f = ins->flags;
+	
+    if ((ins->r0 == r) && f & IF_r0_write) return 1;
+    if ((ins->r1 == r) && f & IF_r1_write) return 1;
+    if ((ins->r2 == r) && f & IF_r2_write) return 1;
+    if ((ins->r3 == r) && f & IF_r3_write) return 1;
+
+    return 0;
+}
+
+
 /* Resizes the array of instructions */
 
 Instruction ** resize_instructions(Instruction ** i, int num) {
     i = realloc(i, num * sizeof(Instruction *));
+    if (i == NULL) {
+	fprintf(stderr, "Memory error at resize_instructions\n");    
+    }	   
     return i;
 }
 
@@ -65,12 +109,16 @@ Instruction * emitb(Instruction * i) {
 #endif
     if(!instructions) {
         instructions = calloc(4096, sizeof(Instruction *));
+	if (instructions == NULL) {
+	    fprintf(stderr, "Memory error at emitb\n");
+	    abort();
+	}
 	n_instructions = 0;
     }
     
+    i->index = n_instructions;
     instructions[n_instructions++] = i;
 
-    i->basic_block = NULL;
     return i;
 }
 
@@ -82,7 +130,7 @@ Instruction * emit(Instruction * i) {
 
 void emit_flush() {
     int i;
-    if (n_spill > 0) {
+    if (n_spilled > 0) {
        printf("new P31, .PerlArray\n");
     }
     
