@@ -207,7 +207,7 @@ print JITCPU<<END_C;
  */
 
 #include<parrot/parrot.h>
-#if HAVE_CGOTO
+#if HAVE_COMPUTED_GOTO
 #  include<parrot/oplib/core_ops_cgp.h>
 #endif
 #include"parrot/exec.h"
