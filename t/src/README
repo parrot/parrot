@@ -1,0 +1,2 @@
+Don't put _ in the name of your test-script - it will be nuked by
+make testclean

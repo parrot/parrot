@@ -37,14 +37,19 @@ INC=include/parrot
 
 GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile docs/Makefile \
 	languages/jako/Makefile languages/miniperl/Makefile \
-	languages/scheme/Makefile
+	languages/scheme/Makefile languages/befunge/Makefile \
+	languages/bf/Makefile languages/imcc/Makefile \
+	languages/ook/Makefile languages/perl6/Makefile
 
 GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
+	include/parrot/platform_interface.h \
 	include/parrot/has_header.h \
 	include/parrot/feature.h \
 	lib/Parrot/Config.pm lib/Parrot/PMC.pm platform.c \
 	include/parrot/core_pmcs.h core_pmcs.c \
-	CFLAGS languages/imcc/CFLAGS
+	CFLAGS languages/imcc/CFLAGS \
+	libparrot.def \
+	runtime/parrot/include/*.pasm
 
 STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig
 
@@ -63,10 +68,10 @@ GEN_OPSFILES =
 
 GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 	$(INC)/oplib/core_ops_prederef.h \
-	$(INC)/oplib/core_ops_switch.h
+	$(INC)/oplib/core_ops_switch.h $(INC)/jit_emit.h
 
 GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c nci.c \
-              core_ops_switch.c
+              core_ops_switch.c jit_cpu.c
 
 GEN_MODULES = lib/Parrot/OpLib/core.pm
 
@@ -639,7 +644,7 @@ testclean :
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out t/op/*.o t/op/*.stabs.s \
 	        t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out t/pmc/*.o t/pmc/*.stabs.s \
 	        t/stress/*.pasm t/stress/*.pbc t/stress/*.out t/stress/*.o t/stress/*.stabs.s \
-	        t/src/*.o t/src/*.c
+	        t/src/*_*
 
 realclean : clean
 	$(RM_F) $(STICKY_FILES)
