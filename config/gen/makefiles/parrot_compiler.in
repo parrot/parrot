@@ -1,18 +1,46 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+EXE      = ${exe}
+
+LN_SF    = ln -s -f
 PERL     = ${perl}
 RM_F     = ${rm_f}
 PARROT   = ../../${test_prog}$(EXE)
 
-all :
-	$(PARROT) -o parrot.pbc parrot.pasm
-	$(PARROT) parrot.pbc < sample.pasm > sample.pbc
-# This can be enabled, when dumping Eval PMCs to string works
-# $(PARROT) parrot.pbc < sample.pasm > sample.pbc
-# $(PARROT) sample.pbc
+all : runtime parrot.pbc parrot_compiler.pbc
+
+# This is a listing of all targets, that are meant to be called by users
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  all:               'parrot_compiler.pbc'"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  test:              run the test suite,"
+	@echo ""
+	@echo "  clean:             clean up temporary files"
+	@echo ""
+	@echo "  realclean:         clean up generated files"
+
+test :
+	cd .. && $(PERL) -I../lib -Iparrot_compiler/lib parrot_compiler/t/harness
 
 clean :
+	$(RM_F) *.pbc
+	$(RM_F) t/*/*.pbc
+
+realclean : clean
 	$(RM_F) core
 	$(RM_F) *.pbc
+
+runtime :
+	$(LN_SF) ../../runtime
+
+parrot.pbc : parrot.pasm
+	$(PARROT) -o parrot.pbc parrot.pasm
+
+parrot_compiler.pbc : parrot_compiler.imc
+	$(PARROT) -o parrot_compiler.pbc parrot_compiler.imc
 
