@@ -34,7 +34,7 @@ sub namespace { return shift->{NAMESPACE}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $prefix    = $self->prefix;
   my $namespace = $self->namespace;
@@ -45,9 +45,9 @@ sub compile
   my $right;
 
   if ($kind eq 'if' or $kind eq 'unless') {
-    $left  = $self->left->compile($fh);
+    $left  = $self->left->compile($compiler);
     $op    = $self->op;
-    $right = $self->right->compile($fh);
+    $right = $self->right->compile($compiler);
   }
 
   if ($kind eq 'if') {
@@ -58,28 +58,32 @@ sub compile
   }
 
   if ($kind eq 'if') {
-    print $fh "${prefix}_TEST:\n";
-    print $fh "  if $left $op $right goto ${prefix}_ELSE\n";
-    print $fh "${prefix}_THEN:\n";
+    $compiler->emit("${prefix}_TEST:");
+    $compiler->emit("  if $left $op $right goto ${prefix}_ELSE");
+    $compiler->emit("${prefix}_THEN:");
 
     if ($self->content) {
-      print $fh ".namespace ${namespace}_THEN\n";
-      $self->SUPER::compile($fh);
-      print $fh ".endnamespace ${namespace}_THEN\n";
+      $compiler->emit(".namespace ${namespace}_THEN");
+      $compiler->indent;
+      $self->SUPER::compile($compiler);
+      $compiler->outdent;
+      $compiler->emit(".endnamespace ${namespace}_THEN");
     }
 
-    print $fh "  goto ${prefix}_LAST\n";
+    $compiler->emit("  goto ${prefix}_LAST");
   }
   elsif ($kind eq 'else') {
-    print $fh "${prefix}_ELSE:\n";
+    $compiler->emit("${prefix}_ELSE:");
 
     if ($self->content) {
-      print $fh ".namespace ${namespace}_ELSE\n";
-      $self->SUPER::compile($fh);
-      print $fh ".endnamespace ${namespace}_ELSE\n";
+      $compiler->emit(".namespace ${namespace}_ELSE");
+      $compiler->indent;
+      $self->SUPER::compile($compiler);
+      $compiler->outdent;
+      $compiler->emit(".endnamespace ${namespace}_ELSE");
     }
 
-    print $fh "${prefix}_LAST:\n";
+    $compiler->emit("${prefix}_LAST:");
   }
 
   return 1;

@@ -45,11 +45,11 @@ sub ident  { return shift->{IDENT};  }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $ident = $self->ident->value;
 
-  print $fh "  inc $ident\n";
+  $compiler->emit("  inc $ident");
 
   return 1;
 }

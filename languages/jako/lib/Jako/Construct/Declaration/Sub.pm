@@ -125,7 +125,7 @@ sub line  { return shift->{LINE};     }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $name  = $self->name;
 
@@ -141,10 +141,9 @@ sub compile
 
     my $thunk = "_${name}_THUNK";
 
-    print $fh "\n";
-    print $fh ".sub $thunk\n";
-    print $fh ".namespace $thunk\n";
-    print $fh "  saveall\n";
+    $compiler->emit(".sub $thunk");
+    $compiler->emit(".namespace $thunk");
+    $compiler->emit("  saveall");
 
     my $sig = defined $self->type ? $self->type->code : 'v';
     my @params;
@@ -157,31 +156,31 @@ sub compile
     $sig =~ tr[INPS][ifpt]; # Defaults.
 
     foreach my $param (reverse @params) {
-      print $fh "  restore $param\n";
+      $compiler->emit("  restore $param");
     }
 
     my $return = defined $self->type ? -2 : 0; # -2 = one, 0 = none
 
-    print $fh "  #undef P1 # NO SUCH OP\n";     # No continuation
-    print $fh "  #undef P2 # NO SUCH OP\n";     # No object
-    print $fh "  I0 = 0\n";       # Not being called with prototyped parameters.
-    print $fh "  I1 = 0\n";       # Number of items on the stack.
-    print $fh "  I2 = 0\n";       # Number of parameters in PMC registers.
-    print $fh "  I3 = $return\n"; # What we expect in return
+    $compiler->emit("  #undef P1 # NO SUCH OP");     # No continuation
+    $compiler->emit("  #undef P2 # NO SUCH OP");     # No object
+    $compiler->emit("  I0 = 0");       # Not being called with prototyped parameters.
+    $compiler->emit("  I1 = 0");       # Number of items on the stack.
+    $compiler->emit("  I2 = 0");       # Number of parameters in PMC registers.
+    $compiler->emit("  I3 = $return"); # What we expect in return
 
-    print $fh "  .local obj lib\n";
-    print $fh "  loadlib lib, $fnlib\n";
-    print $fh "  dlfunc P0, lib, $fn, \"$sig\"\n";
-    print $fh "  invoke\n";
+    $compiler->emit("  .local obj lib");
+    $compiler->emit("  loadlib lib, $fnlib");
+    $compiler->emit("  dlfunc P0, lib, $fn, \"$sig\"");
+    $compiler->emit("  invoke");
 
     if ($self->type) {
-      print $fh "  save " . $self->type->code . '5' . "\n";
+      $compiler->emit("  save " . $self->type->code . '5');
     }
 
-    print $fh "  restoreall\n";
-    print $fh "  ret\n";
-    print $fh ".endnamespace $thunk\n";
-    print $fh ".end\n";
+    $compiler->emit("  restoreall");
+    $compiler->emit("  ret");
+    $compiler->emit(".endnamespace $thunk");
+    $compiler->emit(".end");
   }
 
   return 1;

@@ -49,7 +49,7 @@ sub value { return shift->{VALUE}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   return $self->value;
 }

@@ -58,7 +58,7 @@ sub right { return shift->{RIGHT}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $block = $self->block;
   my $dest  = $self->dest;
@@ -114,34 +114,34 @@ sub compile
   unless ($left_type->name eq $calc_type->name) {
 #    $self->DEBUG(0, "   ...converting left...");
     my $temp = Jako::Compiler::temp_reg($calc_type);
-    $left = $left->compile($fh);
-    print $fh "  $temp = $left\n";
+    $left = $left->compile($compiler);
+    $compiler->emit("  $temp = $left");
     $left = $temp;
   }
   else {
-    $left = $left->compile($fh);
+    $left = $left->compile($compiler);
   }
 
   unless ($right_type->name eq $calc_type->name) {
 #    $self->DEBUG(0, "   ...converting right...");
     my $temp = Jako::Compiler::temp_reg($calc_type);
-    $right = $right->compile($fh);
-    print $fh "  $temp = $right\n";
+    $right = $right->compile($compiler);
+    $compiler->emit("  $temp = $right");
     $right = $temp;
   }
   else {
-    $right = $right->compile($fh);
+    $right = $right->compile($compiler);
   }
 
   $dest = $dest->value;
 
   unless ($dest_type->name eq $calc_type->name) {
     my $temp = Jako::Compiler::temp_reg($calc_type);
-    print $fh "  $temp = $left $op $right\n";
-    print $fh "  $dest = $temp\n";
+    $compiler->emit("  $temp = $left $op $right");
+    $compiler->emit("  $dest = $temp");
   }
   else {
-    print $fh "  $dest = $left $op $right\n";
+    $compiler->emit("  $dest = $left $op $right");
   }
 
   return 1;

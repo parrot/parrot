@@ -54,7 +54,7 @@ sub prefix    { return shift->{PREFIX};    }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $namespace = $self->namespace;
   my $prefix    = $self->prefix;
@@ -75,27 +75,31 @@ sub compile
   }
 
   if ($kind eq 'while' or $kind eq 'until') {
-    print $fh "${prefix}_NEXT:\n";
-    print $fh "  if $left $op $right goto ${prefix}_LAST\n";
-    print $fh "${prefix}_REDO:\n";
+    $compiler->emit("${prefix}_NEXT:");
+    $compiler->emit("  if $left $op $right goto ${prefix}_LAST");
+    $compiler->emit("${prefix}_REDO:");
 
     if ($self->content) {
-      print $fh ".namespace $namespace\n";
-      $self->SUPER::compile($fh);
-      print $fh ".endnamespace $namespace\n";
+      $compiler->emit(".namespace ${namespace}");
+      $compiler->indent;
+      $self->SUPER::compile($compiler);
+      $compiler->outdent;
+      $compiler->emit(".endnamespace ${namespace}");
     }
   }
   elsif ($kind eq 'continue') {
-    print $fh "${prefix}_CONT:\n";
+    $compiler->emit("${prefix}_CONT:");
 
     if ($self->content) {
-      print $fh ".namespace ${namespace}_CONT\n";
-      $self->SUPER::compile($fh);
-      print $fh ".endnamespace ${namespace}_CONT\n";
+      $compiler->emit(".namespace ${namespace}_CONT");
+      $compiler->indent;
+      $self->SUPER::compile($compiler);
+      $compiler->outdent;
+      $compiler->emit(".endnamespace ${namespace}_CONT");
     }
 
-    print $fh "  goto ${prefix}_NEXT\n";
-    print $fh "${prefix}_LAST:\n";
+    $compiler->emit("  goto ${prefix}_NEXT");
+    $compiler->emit("${prefix}_LAST:");
   }
   else {
     $self->INTERNAL_ERROR("Unrecognized kind of block '%s'", $kind);

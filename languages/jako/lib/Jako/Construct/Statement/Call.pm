@@ -54,7 +54,7 @@ sub args { return @{shift->{ARGS}}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $name  = $self->name;
 
@@ -95,20 +95,20 @@ sub compile
 
     if ($formal_arg_type->name ne $actual_arg_type->name) {
       my $temp = Jako::Compiler::temp_reg($formal_arg_type);
-      my $value = $args[$i]->compile($fh);
-      print $fh "  $temp = $value\n";
+      my $value = $args[$i]->compile($compiler);
+      $compiler->emit("  $temp = $value");
       $args[$i] = $temp;
     }
     else {
-      $args[$i] = $args[$i]->compile($fh);
+      $args[$i] = $args[$i]->compile($compiler);
     }
   }
 
   if (exists $props{fnlib}) {
     foreach my $arg (@args) {
-      print $fh "  .arg $arg\n";
+      $compiler->emit("  .arg $arg");
     }
-    print $fh "  call _${name}_THUNK\n";
+    $compiler->emit("  call _${name}_THUNK");
   }
   elsif (exists $props{op}) {
     my $op = $props{op};
@@ -117,15 +117,15 @@ sub compile
 
     $name = $op if defined $op;
 
-    print $fh "  $name ", join(", ", @args), "\n";
+    $compiler->emit("  $name ", join(", ", @args));
   }
   else {
 #    $self->DEBUG(0, "Calling '%s' as regular sub (props = %s)...", $name, join(", ", %props));
 
     foreach my $arg (@args) {
-      print $fh "  .arg $arg\n";
+      $compiler->emit("  .arg $arg");
     }
-    print $fh "  call _${name}\n";
+    $compiler->emit("  call _${name}");
   }
 
   return 1;

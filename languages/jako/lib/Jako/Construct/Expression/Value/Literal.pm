@@ -62,9 +62,9 @@ sub new
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
-  confess "No file handle!" unless defined $fh;
+  confess "No file Compiler!" unless defined $compiler;
 
   my $type = $self->type;
 
@@ -81,13 +81,13 @@ sub compile
 
     my $temp = Jako::Compiler::temp_str();          # Allocate and clear a temporary string register
 
-    print $fh "  $temp = \"\"\n";
+    $compiler->emit("  $temp = \"\"");
 
     while (1) {
       last unless defined $string and
         $string =~ m/(^|^.*?[^\\])\$((([A-Za-z][A-Za-z0-9_]*)\b)|({[A-Za-z][A-Za-z0-9_]*}))(.*)$/;
 
-      print $fh "  concat $temp, \"$1\"\n"
+      $compiler->emit("  concat $temp, \"$1\"")
         if defined $1 and $1 ne '';
 
       my $interp = $2;
@@ -100,16 +100,16 @@ sub compile
 
       if (not UNIVERSAL::isa($sym->type, 'Jako::Construct::Type::String')) {
         my $temp2 = Jako::Compiler::temp_str();
-        print $fh "  $temp2 = $interp\n";
+        $compiler->emit("  $temp2 = $interp");
         $interp = $temp2;
       }
 
-      print $fh "  concat $temp, $interp\n";
+      $compiler->emit("  concat $temp, $interp");
 
       $string = $6;
     }
 
-    print $fh "  concat $temp, \"$string\"\n"
+    $compiler->emit("  concat $temp, \"$string\"")
       if defined $string and $string ne '';
 
     return $temp;

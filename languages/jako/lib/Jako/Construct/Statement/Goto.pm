@@ -76,7 +76,7 @@ sub right { return shift->{RIGHT}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $block = $self->block;
   my $name  = $self->ident ? $self->ident->value : undef;
@@ -86,17 +86,17 @@ sub compile
   my $right = $self->right;
 
   if (!defined $cond) {
-    print $fh "  goto _LABEL_$name\n";
+    $compiler->emit("  goto _LABEL_$name");
   } else {
-    $left  = $left->compile($fh);
-    $right = $right->compile($fh);
+    $left  = $left->compile($compiler);
+    $right = $right->compile($compiler);
 
     if ($cond eq 'unless') {
       $op = Jako::Compiler::invert_relop($op);
       $cond = 'if';
     }
 
-    print $fh "  $cond $left $op $right goto _LABEL_$name\n";
+    $compiler->emit("  $cond $left $op $right goto _LABEL_$name");
   }
 
   return;

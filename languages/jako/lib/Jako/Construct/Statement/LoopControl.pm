@@ -78,7 +78,7 @@ sub right { return shift->{RIGHT}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $block = $self->block;
   my $kind  = $self->kind;
@@ -109,25 +109,20 @@ sub compile
   my $prefix = $loop_block->prefix;
   my $suffix = $block_types{'while'}{uc $kind};
 
-=no
-
-  if (defined $loop_block->cont and $kind eq 'next') {
-    $which = $block_types{pe}{NEXT};      # Hard-coded to NEXT in continue { ... }
-  }
-
-=cut
-
   my $label = "${prefix}_${suffix}";
 
   if (!defined $cond) {
-    print $fh "  goto $label\n";
+    $compiler->emit("  goto $label");
   } else {
-    $left  = $left->compile($fh);
-    $right = $right->compile($fh);
+    if ($cond eq 'unless') {
+      $op = Jako::Compiler->invert_relop($op);
+      $cond = 'if';
+    }
 
-    # TODO: Problems with unless?
+    $left  = $left->compile($compiler);
+    $right = $right->compile($compiler);
 
-    print $fh "  $cond $left $op $right goto $label\n";
+    $compiler->emit("  $cond $left $op $right goto $label");
   }
 
   return;

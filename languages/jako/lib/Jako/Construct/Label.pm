@@ -61,12 +61,12 @@ sub ident { return shift->{IDENT}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $block = $self->block;
   my $ident = $self->ident->value;
 
-  print $fh "_LABEL_$ident:\n";
+  $compiler->emit("_LABEL_$ident:");
 
   return;
 }

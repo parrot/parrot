@@ -48,12 +48,12 @@ sub right { return shift->{RIGHT}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $left  = $self->left->value;
-  my $right = $self->right->compile($fh);
+  my $right = $self->right->compile($compiler);
 
-  print $fh "  $left = $right\n";
+  $compiler->emit("  $left = $right");
 
   return 1;
 }

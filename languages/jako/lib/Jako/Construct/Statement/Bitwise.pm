@@ -58,7 +58,7 @@ sub right { return shift->{RIGHT}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $block = $self->block;
   my $dest  = $self->dest;
@@ -99,10 +99,10 @@ sub compile
   $self->SYNTAX_ERROR("Can only do bitwise ops on integers") unless UNIVERSAL::isa($right_type, 'Jako::Construct::Type::Integer');
 
   $dest  = $dest->value;
-  $left  = $left->compile($fh);
-  $right = $right->compile($fh);
+  $left  = $left->compile($compiler);
+  $right = $right->compile($compiler);
 
-  print $fh "  $dest = $left $op $right\n";
+  $compiler->emit("  $dest = $left $op $right");
 
   return 1;
 }

@@ -76,7 +76,7 @@ sub args      { return @{shift->{ARGS}};   }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $type  = $self->type;
   my $name  = $self->name;
@@ -85,32 +85,26 @@ sub compile
 
   my $namespace = "_SUB_$name";
 
-  print $fh <<END_IMC;
-
-.sub _${name}
-  .namespace $namespace
-  saveall
-
-END_IMC
+  $compiler->emit(".sub _${name}");
+  $compiler->emit(".namespace $namespace");
+  $compiler->emit("saveall");
 
   foreach my $arg (reverse @args) {
     my ($arg_type, $arg_name) = @$arg;
     my $imcc_type = $arg_type->imcc;
-    print $fh "  .param $imcc_type $arg_name\n";
+
+    $compiler->emit("  .param $imcc_type $arg_name");
   }
 
-  print $fh "\n";
-  $self->SUPER::compile($fh);
+  $compiler->indent;
+  $self->SUPER::compile($compiler);
+  $compiler->outdent;
 
-  print $fh <<END_IMC;
-
-_${name}_LEAVE:
-  restoreall
-  ret
-  .endnamespace $namespace
-.end
-
-END_IMC
+  $compiler->emit("_${name}_LEAVE:");
+  $compiler->emit("  restoreall");
+  $compiler->emit("  ret");
+  $compiler->emit("  .endnamespace $namespace");
+  $compiler->emit(".end");
 
   return 1;
 }

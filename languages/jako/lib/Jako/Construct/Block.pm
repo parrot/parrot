@@ -137,22 +137,21 @@ sub push_content
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   if ($self->kind eq 'file') {
-    print $fh ".sub ___MAIN\n";
-    print $fh "  call __MAIN\n";
-    print $fh "  end\n";
-    print $fh ".end\n";
-    print $fh "\n";
-    print $fh "__MAIN:\n";
+    $compiler->emit(".sub ___MAIN");
+    $compiler->emit("  call __MAIN");
+    $compiler->emit("  end");
+    $compiler->emit(".end");
+    $compiler->emit("__MAIN:");
   }
 
   foreach my $construct ($self->content) {
-    $construct->compile($fh);
+    $construct->compile($compiler);
   }
 
-  print $fh "  ret\n" if $self->kind eq 'file';
+  $compiler->emit("  ret") if $self->kind eq 'file';
 }
 
 1;

@@ -124,12 +124,14 @@ sub line { return shift->{LINE}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
+
+  confess "No compiler!" unless $compiler;
 
   my $type  = $self->type->imcc;
   my $name  = $self->name;
 
-  print $fh "  .local $type $name\n";
+  $compiler->emit("  .local $type $name");
 
   return 1;
 }

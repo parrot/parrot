@@ -14,6 +14,7 @@ use warnings;
 package Jako::Compiler;
 
 use Carp;
+use FileHandle;
 
 use base qw(Jako::Processor);
 
@@ -69,8 +70,67 @@ sub new
     LINE     => undef,
     LABELS   => [ ],
     COMMENTS => [ ],
-    LAST_OP  => 'noop'
+    LAST_OP  => 'noop',
+    INDENT   => 0
   }, $class;
+}
+
+
+#
+# indent()
+#
+
+sub indent
+{
+  my $self = shift;
+  $self->{INDENT} += 4;
+}
+
+
+#
+# outdent()
+#
+
+sub outdent
+{
+  my $self = shift;
+  $self->{INDENT} -= 4;
+  
+  confess "Unbalanced indent/outdent!" if $self->{INDENT} < 0;
+}
+
+
+#
+# emit()
+#
+
+sub emit
+{
+  my $self = shift;
+
+  unshift(@_, " " x $self->{INDENT});
+  
+  my $fh = $self->{FH};
+
+  print $fh @_, "\n";
+}
+
+
+#
+# compile()
+#
+
+sub compile
+{
+  my $self = shift;
+
+  my ($root, $fh) = @_;
+
+  $fh = FileHandle->new(">-") unless defined $fh;
+
+  $self->{FH} = $fh;
+
+  $root->compile($self);
 }
 
 1;

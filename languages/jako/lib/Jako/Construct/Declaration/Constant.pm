@@ -132,13 +132,13 @@ sub value { return shift->{VALUE}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $type  = $self->type->imcc;
   my $name  = $self->name;
   my $value = $self->value->value;
 
-  print $fh "  .const $type $name = $value\n";
+  $compiler->emit("  .const $type $name = $value");
 
   return 1;
 }

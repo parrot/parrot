@@ -70,7 +70,7 @@ sub right { return shift->{RIGHT}; }
 sub compile
 {
   my $self = shift;
-  my ($fh) = @_;
+  my ($compiler) = @_;
 
   my $block = $self->block;
   my $value = $self->value;
@@ -95,8 +95,8 @@ sub compile
   my $anon;
 
   if (defined $cond) {
-    $left  = $left->compile($fh);
-    $right = $right->compile($fh);
+    $left  = $left->compile($compiler);
+    $right = $right->compile($compiler);
 
     if ($cond eq 'if') {
       $op = Jako::Compiler::invert_relop($op);
@@ -107,7 +107,7 @@ sub compile
 
     $anon = Jako::Compiler::anon_lbl();
 
-    print $fh "  $cond $left $op $right goto $anon\n";
+    $compiler->emit("  $cond $left $op $right goto $anon");
   }
 
   #
@@ -119,25 +119,25 @@ sub compile
       unless defined $return_type;
 
     my $arg_type = $value->type;
-    my $ret_val = $value->compile($fh);
+    my $ret_val = $value->compile($compiler);
 
     if ($arg_type->name ne $return_type->name) { # TODO: Yuck! should be able to compare directly.
       my $temp = Jako::Compiler::temp_reg($return_type);
-      print $fh "  $temp = $ret_val\n";
+      $compiler->emit("  $temp = $ret_val");
       $ret_val = $temp;
     }
 
-    print $fh "  .return $ret_val\n";
+    $compiler->emit("  .return $ret_val");
   }
 
   #
   # Go to the subroutine exit point:
   #
 
-  print $fh "  goto _${sub_name}_LEAVE\n";
+  $compiler->emit("  goto _${sub_name}_LEAVE");
 
   if (defined $cond) {
-    print $fh "$anon:\n";
+    $compiler->emit("$anon:");
   }
 
   return;
