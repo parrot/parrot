@@ -466,23 +466,31 @@ get_retc_from_free_list(Parrot_Interp interpreter)
 }
 
 PMC *
-new_ret_continuation_pmc(Interp * interp, opcode_t * address)
+new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
 {
     PMC* continuation;
+    PMC *p0;
 
-    continuation = get_retc_from_free_list(interp);
+    continuation = get_retc_from_free_list(interpreter);
     if (continuation) {
         /* freshen context */
         struct Parrot_Sub *sub = PMC_sub(continuation);
-        save_context(interp, &sub->ctx);
-        sub->seg = interp->code->cur_cs;
+        save_context(interpreter, &sub->ctx);
+        sub->seg = interpreter->code->cur_cs;
     }
     else {
-        continuation = pmc_new(interp, enum_class_RetContinuation);
+        continuation = pmc_new(interpreter, enum_class_RetContinuation);
         PObj_get_FLAGS(continuation) |= (
                 PObj_private1_FLAG|PObj_private2_FLAG);
     }
     PMC_struct_val(continuation) = address;
+    p0 = REG_PMC(0);
+    /* don't recylce returncontinuations for coroutines
+     * XXX and continuations?
+     */
+    if (!PMC_IS_NULL(p0) && p0->vtable->base_type == enum_class_Coroutine) {
+        PObj_get_FLAGS(continuation) &= ~PObj_private2_FLAG;
+    }
     return continuation;
 }
 

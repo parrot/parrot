@@ -72,14 +72,15 @@ Swaps the "context".
          */
         if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
             PMC *ret;
-            /* XXX this works only once, the generated isn't reusable
-             *     inside e.g. range()
+            /* this works only once, the generated isn't reusable
+             * inside e.g. range()
              * so, return a clone of ourself
              */
             REG_PMC(5) = ret = pmc_new(INTERP, enum_class_Coroutine);
             PObj_get_FLAGS(ret) |= PObj_private1_FLAG; /* fixup done */
             PObj_get_FLAGS(ret) &= ~PObj_private3_FLAG;
             PMC_struct_val(ret) = PMC_struct_val(SELF);
+            PObj_flag_CLEAR(custom_mark, SELF);
             return next;
         }
         PMC_struct_val(SELF) = next;

@@ -1043,7 +1043,7 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         "pushs",
         "pushtopp",
         "pushp",
-        "pushtopn"
+        "pushtopn",
         "pushn"
     };
     char *new_rest[] = {
@@ -1053,7 +1053,7 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         "pops",
         "poptopp",
         "popp",
-        "poptopn"
+        "poptopn",
         "popn"
     };
     int needs_save[8], nsave;
@@ -1068,8 +1068,11 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         r = reglist[i];
         for (j = 0; j < 4; j++) {
             if (r->set == types[j] && (r->type & VTREGISTER)) {
-                if (r->color >= first_reg[j] && r->color < 16)
+                if (r->color >= first_reg[j] && r->color < 16) {
+                    if (j == 2 && r->color == 5) /* ignore P5 */
+                        continue;
                     needs_save[2*j+1] = 1;
+                }
                 else if (r->color >= 16)
                     needs_save[2*j] = 1;
                 break;
