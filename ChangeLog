@@ -1,3 +1,7 @@
+2003-03-11 22:06  chip
+
+	* Configure.pl: print help on non-option command line args
+
 2002-12-18 20:38  sfink: changes since 0.0.8
 
 	- Allow suppression of cgoto core to save memory during compile

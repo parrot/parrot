@@ -25,7 +25,8 @@ my %args;
 
 for(@ARGV) {
   my($key, $value)=/--(\w+)(?:=(.*))?/;
-  $value = 1 unless defined $value;
+  $key   = 'help' unless defined $key;
+  $value = 1      unless defined $value;
 
   for($key) {
     /version/ && do {
