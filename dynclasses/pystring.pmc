@@ -25,6 +25,57 @@ pmclass PyString extends PyObject dynpmc group python_group {
 
 /*
 
+=item C<PMC* "__getitem__"(PMC *self, PMC *index)>
+
+Returns the PMC value of the element at index C<key>.
+
+=cut
+
+*/
+
+    METHOD PMC* __getitem__(PMC *self, PMC *index) {
+        return VTABLE_get_pmc_keyed(INTERP, self, index);
+    }
+
+/*
+
+=item C<PMC* "__setitem__"(PMC *self, PMC *index, PMC *value)>
+
+Sets the PMC at element C<index> to C<*value>.
+
+=cut
+
+*/
+
+    METHOD void __setitem__(PMC *self, PMC *index, PMC *value) {
+        VTABLE_set_pmc_keyed(INTERP, self, index, value);
+    }
+
+/*
+
+=item C<PMC* "__new__"(PMC *class, PMC *source)>
+
+Create a new string
+
+=cut
+
+*/
+
+    METHOD PMC* __new__(PMC *class, PMC *source) {
+        INTVAL argc = REG_INT(3);
+
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
+
+        if (argc > 1) {
+            STRING *svalue = VTABLE_get_string(INTERP, source);
+            VTABLE_set_string_native(INTERP, ret, svalue);
+        }
+
+        return ret;
+    }
+
+/*
+
 =item C<void add(PMC *value, PMC *dest)>
 
 Concatenates C<*value> to the string and returns the result in C<*dest>.
@@ -110,6 +161,20 @@ Returns the pyboolean value of the string.
 
     INTVAL get_bool () {
         return string_bool(INTERP, PMC_str_val(SELF));
+    }
+
+/*
+
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyString_class;
     }
 
 /*
