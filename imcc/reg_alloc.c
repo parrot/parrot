@@ -288,13 +288,18 @@ sort_reglist(SymReg ** reglist)
  * regs are sorted now according to their start line of usage
  * run through them and allocate all that don't overlap
  * in one bunch
+ *
+ * XXX doesn't work yet - currently allocated registers are also
+ *     in reglist to find allocatable registers and to check for interference
  */
+
+
 #ifdef ALLOCATE_HACK
 static void
 allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
 {
     int i, t;
-    int first_color, last_line;
+    int first_color, last_line, bb_index;
     SymReg *r;
 
     for (t = 0; t < 4; t++) {
@@ -305,7 +310,8 @@ again:
         while (first_color >= 16) {
             for (i = 0; i < n; i++) {
                 r = reglist[i];
-                if (r->set != typ || (r->type & VT_REGP) || r->want_regno >= 0)
+                if (r->set != typ || (r->type & VT_REGP) ||
+                        r->want_regno >= 0 || r->color >= 0)
                     continue;
                 if (r->color == first_color) {
                     first_color--;
@@ -320,20 +326,29 @@ again:
         /*
          * no scan reglist for small ranged non-interfering regs of that typ
          */
-        last_line = -1;
+        bb_index = last_line = -1;
         for (i = 0; i < n; i++) {
             r = reglist[i];
-            if (r->set != typ || (r->type & VT_REGP) || r->want_regno >= 0)
+            if (r->set != typ || (r->type & VT_REGP) ||
+                        r->want_regno >= 0 || r->color >= 0)
                 continue;
             if (r->last_ins->index - r->first_ins->index > 10)
                 continue;
+            if (r->first_ins->bbindex != r->last_ins->bbindex)
             /* found a short ranged reg
              *
              * if this is used before the previous one ended, they overlap
              */
             if (r->first_ins->index <= last_line)
                 continue;
+            /*
+             * if this is not the same basic block, the might interfer
+             * due to a branch
+             */
+            if (r->first_ins->bbindex != bb_index)
+                continue;
             last_line = r->last_ins->index;
+            bb_index = r->last_ins->bbindex;
             r->color = first_color;
             r->type = VTPASM;
             debug(interpreter, DEBUG_IMC, "coloring '%s' %d\n",
