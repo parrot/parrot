@@ -942,6 +942,12 @@ Look up symbol $3 in library $2 with signature $4, and put the
 corresponding sub object in $1. Note that you need the signature so we
 can build or find an appropriate thunking function.
 
+=item B<dlvar>(out PMC, in PMC, in STR)
+
+Look up symbol $3 in library $2. We assume that this is actually a
+variable address rather than a function address, and build an
+unmanagedstruct PMC and stick the address into its data pointer.
+
 =item B<compile>(out PMC, in PMC, in STR)
 
 Compile source code $3 with compiler $2 into PMC $1.
@@ -1004,6 +1010,28 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
   goto NEXT();
 }
 
+op dlvar (out PMC, in PMC, in STR) {
+  char * name = string_to_cstring(interpreter, ($3));
+  
+  PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);
+  
+  void *p = Parrot_dlsym(PMC_data($2), name);
+  string_cstring_free(name);
+  if(p == NULL) {
+    const char * err = Parrot_dlerror();
+    if(err != NULL) {
+      fprintf(stderr, "%s\n", err);
+    }
+    PANIC("Failed to link native method");
+  }
+  
+  /* At this point we have the symbol's address. We just need to build
+     a PMC with it so we can get and set the value */
+
+  PMC_data(final_destination) = p;
+  $1 = final_destination;
+  goto NEXT();
+}
 
 inline op compile(OUT PMC, in PMC, in STR) {
   $1 = $2->vtable->invoke(interpreter, $2, $3);
