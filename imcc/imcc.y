@@ -850,9 +850,9 @@ the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
                        if ($1->set != 'P')
                           fataly(1, sourcefile, line, "Sub isn't a PMC");
                      }
-       | VAR ptr IDENTIFIER { cur_obj = $1; $$ = mk_sub_address($3); }
-       | VAR ptr STRINGC    { cur_obj = $1; $$ = mk_const($3, 'S'); }
-       | VAR ptr target     { cur_obj = $1; $$ = $3; }
+       | lhs ptr IDENTIFIER { cur_obj = $1; $$ = mk_sub_address($3); }
+       | lhs ptr STRINGC    { cur_obj = $1; $$ = mk_const($3, 'S'); }
+       | lhs ptr target     { cur_obj = $1; $$ = $3; }
    ;
 
 ptr:    POINTY { $$=0; }

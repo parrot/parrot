@@ -411,6 +411,11 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         regs[0] = sub->pcc_sub->cc_sym = mk_temp_reg('P');
         regs[1] = get_pasm_reg("P1");
         insINS(interpreter, unit, ins, "set", regs, 2);
+        if (sub->pcc_sub->pragma & P_METHOD) {
+            regs[0] = sub->pcc_sub->p2_sym = mk_temp_reg('P');
+            regs[1] = get_pasm_reg("P2");
+            insINS(interpreter, unit, ins, "set", regs, 2);
+        }
     }
     /*
      * check if there is a return
@@ -459,7 +464,7 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
      */
     sub = unit->instructions->r[1];
     if (sub->pcc_sub->cc_sym) {
-        regs[0] = mk_pasm_reg(str_dup("P1"));
+        regs[0] = get_pasm_reg("P1");
         regs[1] = sub->pcc_sub->cc_sym;
         tmp = insINS(interpreter, unit, ins, "set", regs, 2);
     }
@@ -770,6 +775,13 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int tail_call;
     int proto;
     int meth_call = 0;
+    SymReg * p2 = NULL;
+
+    /*
+     * we must preserve P2 too
+     */
+    reg = unit->instructions->r[1];   /* the  sub we are in */
+    p2 = reg->pcc_sub->p2_sym;
 
 #if IMC_TRACE
     PIO_eprintf(NULL, "expand_pcc_sub_call\n");
@@ -853,9 +865,11 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             regs[1] = mk_const(str_dup(arg->name), 'S');
         ins = insINS(interp, unit, ins, "set", regs, 2);
         /* set P2, obj */
-        regs[0] = get_pasm_reg("P2");
-        regs[1] = sub->pcc_sub->object;
-        ins = insINS(interp, unit, ins, "set", regs, 2);
+        if (sub->pcc_sub->object->color != 2) {
+            regs[0] = get_pasm_reg("P2");
+            regs[1] = sub->pcc_sub->object;
+            ins = insINS(interp, unit, ins, "set", regs, 2);
+        }
     }
     else {
         /* plain sub call */
@@ -898,11 +912,8 @@ move_cc:
 
 
 #if 0
-    /* TODO method calls */
     /* meth hash value: I4 */
     ins = set_I_const(interp, unit, ins, 4, 0);
-    /* meth name: S0 */
-    /* object: P2 */
 #endif
     /*
      * if we reuse the continuation, update it
@@ -913,6 +924,7 @@ move_cc:
     /*
      * emit a savetop for now
      */
+    /* restore self */
     ins = insINS(interp, unit, ins, "savetop", regs, 0);
     if (meth_call)
         ins = insINS(interp, unit, ins,
@@ -936,6 +948,11 @@ move_cc:
         ins = ins->next;
     }
     ins = insINS(interp, unit, ins, "restoretop", regs, 0);
+    if (p2) {
+        regs[0] = get_pasm_reg("P2");
+        regs[1] = p2;
+        ins = insINS(interp, unit, ins, "set", regs, 2);
+    }
     /*
      * handle return results
      */

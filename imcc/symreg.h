@@ -138,7 +138,8 @@ struct pcc_sub_t {
     int nargs;
     SymReg *sub;
     SymReg *cc;
-    SymReg *cc_sym;
+    SymReg *cc_sym;	/* the saved P1 */
+    SymReg *p2_sym;	/* the saved P2 */
     SymReg ** ret;
     int nret;
     pragma_enum_t pragma;
