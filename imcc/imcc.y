@@ -16,7 +16,7 @@
 #include <assert.h>
 
 #define _PARSER
-#define MAIN
+#define PARSER_MAIN
 #include "imc.h"
 #include "pbc.h"
 #include "parser.h"
@@ -221,7 +221,7 @@ static char * inv_op(char *op) {
 %token <t> COMMA ESUB
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL
-%token <t> PROTOTYPED NON_PROTOTYPED
+%token <t> PROTOTYPED NON_PROTOTYPED MAIN LOAD IMMEDIATE POSTCOMP
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
@@ -235,7 +235,7 @@ static char * inv_op(char *op) {
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
 %type <sr> pcc_returns pcc_return pcc_call arg
-%type <t> pcc_proto pcc_sub_proto
+%type <t> pcc_proto pcc_sub_proto proto
 %type <i> instruction assignment if_statement labeled_inst opt_label
 %type <sr> target reg const var string
 %type <sr> key keylist _keylist
@@ -254,7 +254,7 @@ static char * inv_op(char *op) {
 /* In effort to make the grammar readable but not militaristic, please space indent
    code blocks on 10 col boundaries and keep indentation same for all code blocks
    in a rule. Indent rule tokens | and ; to 4th col and sub rules 6th col
- */ 
+ */
 
 %%
 
@@ -312,10 +312,12 @@ pasm_inst:         { clear_state(); }
      PARROT_OP pasm_args
                    { $$ = INS(interp, cur_unit, $2,0,regs,nargs,keyvec,1);
                      free($2); }
-   | PCC_SUB LABEL
-                   { char *name = str_dup($2);
-                     $$ = iSUBROUTINE(cur_unit, mk_sub_label($2));
-                     $$->r[1] = mk_pcc_sub(name, 0); }
+   | PCC_SUB pcc_sub_proto LABEL
+                   { char *name = str_dup($3);
+                     $$ = iSUBROUTINE(cur_unit, mk_sub_label($3));
+                     $$->r[1] = mk_pcc_sub(name, 0);
+                     $$->r[1]->pcc_sub->pragma = $2;
+                   }
    | /* none */    { $$ = 0;}
    ;
 
@@ -337,7 +339,7 @@ emit:
 
 class:
      CLASS IDENTIFIER
-                   { 
+                   {
                       Symbol * sym = new_symbol($2);
                       cur_unit = imc_open_unit(interp, IMC_CLASS);
                       current_class = new_class(sym);
@@ -359,7 +361,7 @@ class_body:
 member_decls:
      member_decl
    | member_decls member_decl
-   ; 
+   ;
 
 member_decl:
      field_decl
@@ -397,7 +399,7 @@ method_decl:
         }
    ;
 
-sub:	
+sub:
      SUB
         {
            cur_unit = (pragmas.fastcall ? imc_open_unit(interp, IMC_FASTSUB)
@@ -408,7 +410,7 @@ sub:
           char *name = str_dup($3);
           Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label($3));
           i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
-          i->r[1]->pcc_sub->prototyped = $4;
+          i->r[1]->pcc_sub->pragma = $4;
         }
      sub_params
      sub_body { $$ = 0; }
@@ -436,7 +438,7 @@ pcc_sub:
             char *name = str_dup($3);
             Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label($3));
             i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
-            i->r[1]->pcc_sub->prototyped = $4;
+            i->r[1]->pcc_sub->pragma = $4;
          }
      pcc_params
      sub_body { $$ = 0; }
@@ -462,7 +464,7 @@ pcc_sub_call:
 
             sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, line - 1);
             $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
-            r->pcc_sub->prototyped = $2;
+            r->pcc_sub->pragma = $2;
             /* this mid rule action has the semantic value of the
              * sub SymReg.
              * This is used below to append args & results
@@ -489,13 +491,21 @@ opt_label:
    ;
 
 pcc_proto:
-     PROTOTYPED    {  $$ = 1; }
-   | NON_PROTOTYPED {  $$ = 0; }
+     PROTOTYPED     {  $$ |= P_PROTOTYPED ; }
+   | NON_PROTOTYPED {  $$ |= P_NON_PROTOTYPED ; }
    ;
 
 pcc_sub_proto:
-     /* empty */   {  $$ = -1; }
-   | pcc_proto
+     /* empty */    {  $$ = P_NONE; }
+   | pcc_sub_proto COMMA proto
+   | proto
+   ;
+
+proto: pcc_proto
+   | LOAD           {  $$ |= P_LOAD; }
+   | MAIN           {  $$ |= P_MAIN; }
+   | IMMEDIATE      {  $$ |= P_IMMEDIATE; }
+   | POSTCOMP       {  $$ |= P_POSTCOMP; }
    ;
 
 pcc_call:
@@ -628,7 +638,7 @@ _labels:
    ;
 
 label:
-     LABEL         { 
+     LABEL         {
                      /* $$ = iLABEL(cur_unit, mk_address($1, U_add_uniq_label)); */
                      $$ = iLABEL(cur_unit, mk_local_label(cur_unit, $1));
                    }
@@ -665,7 +675,7 @@ labeled_inst:
    | NEWSUB                           { expect_pasm = 1; }
      pasm_args
                    { $$ = INS(interp, cur_unit, "newsub",0,regs,nargs,keyvec,1); }
-   | PARROT_OP vars 
+   | PARROT_OP vars
                    { $$ = INS(interp, cur_unit, $1, 0, regs, nargs, keyvec, 1);
                                           free($1); }
    | /* none */                        { $$ = 0;}
@@ -744,7 +754,7 @@ assignment:
                               $$ = iNEWSUB(interp, cur_unit, NULL, $3,
                                            mk_sub_address($4),
                                            mk_sub_address($6), 1); }
-   | target '=' DEFINED var	   
+   | target '=' DEFINED var
                         { $$ = MK_I(interp, cur_unit, "defined", 2, $1, $4); }
    | target '=' DEFINED var '[' keylist ']'
                         { keyvec=KEY_BIT(2);
@@ -760,9 +770,9 @@ assignment:
                         { $$ = MK_I(interp, cur_unit, "store_global",2, $2,$4); }
        /* NEW and is here because it is both PIR and PASM keywords so we
         * have to handle the token here (or badly hack the lexer). */
-   | NEW                
+   | NEW
                         { expect_pasm = 1; }
-     pasm_args	  
+     pasm_args
                         { $$ = INS(interp, cur_unit, "new",0,regs,nargs,keyvec,1); }
    | DEFINED target COMMA var
                         { $$ = MK_I(interp, cur_unit, "defined", 2, $2, $4); }
@@ -792,7 +802,8 @@ assignment:
      '(' targetlist  ')' '=' IDENTIFIER '(' arglist ')'
          {
             current_call->r[0]->pcc_sub->sub = mk_sub_address($6);
-            current_call->r[0]->pcc_sub->prototyped = 1;
+           /* FIXME use the default settings from .pragma */
+            current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
             if(cur_unit->type == IMC_PCCSUB)
                cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
 
@@ -803,8 +814,8 @@ assignment:
 sub_call:
      IDENTIFIER
         {
-           char name[128];           
-           SymReg * r; 
+           char name[128];
+           SymReg * r;
            Instruction *i;
            sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, line - 1);
            r = mk_pcc_sub(str_dup(name), 0);
@@ -812,7 +823,8 @@ sub_call:
            i->type = ITCALL | ITPCCSUB;
            $$ = i;
            current_call->r[0]->pcc_sub->sub = mk_sub_address($1);
-           current_call->r[0]->pcc_sub->prototyped = 1;
+           /* FIXME use the default settings from .pragma */
+           current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
            if(cur_unit->type == IMC_PCCSUB)
               cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
         }
@@ -835,7 +847,7 @@ arg:
 
 targetlist:
      targetlist COMMA target { $$ = 0; add_pcc_result(current_call->r[0], $3); }
-   | target                  { $$ = 0; add_pcc_result(current_call->r[0], $1); }   
+   | target                  { $$ = 0; add_pcc_result(current_call->r[0], $1); }
    ;
 
 if_statement:
@@ -905,7 +917,7 @@ var_or_i:
 var:
      VAR
    | reg
-   | const 
+   | const
    ;
 
 keylist:           {  nkeys=0; }

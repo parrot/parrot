@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 50;
 use Test::More;
 use Parrot::Config;
 
@@ -746,4 +746,11 @@ OUTPUT
 
 unlink($temp, 'temp.pbc');
 
+output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
+.pcc_sub @MAIN _main:
+    print "ok\n"
+    end
+CODE
+ok
+OUT
 

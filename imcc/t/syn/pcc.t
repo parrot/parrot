@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 34;
+use TestCompiler tests => 36;
 
 ##############################
 # Parrot Calling Conventions
@@ -1113,7 +1113,7 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 4");
     .param pmc g
     .param pmc h
     print "Got "
-    print I3 
+    print I3
     print " params\n"
     print a
     print b
@@ -1184,9 +1184,9 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg prototyped 1");
     count = I1 + I2
     count = count + I3
     count = count + I4
-    print count 
+    print count
     print " params\n"
-    print a 
+    print a
     print b
     print c
     print d
@@ -1389,3 +1389,21 @@ CODE
 42.000000
 OUT
 }
+
+output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
+.sub _main prototyped, @MAIN
+    print "ok\n"
+    end
+.end
+CODE
+ok
+OUT
+
+output_is(<<'CODE', <<'OUT', "more pragmas, syntax only");
+.sub _main prototyped, @MAIN, @IMMEDIATE, @LOAD, @POSTCOMP
+    print "ok\n"
+    end
+.end
+CODE
+ok
+OUT

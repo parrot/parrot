@@ -1,7 +1,7 @@
 #ifndef __PARSER_H
 #define __PARSER_H
 
-#ifdef MAIN
+#ifdef PARSER_MAIN
 #define EXTERN
 #else
 #define EXTERN extern

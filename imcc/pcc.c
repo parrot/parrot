@@ -8,6 +8,8 @@
  * .pragma fastcall
  * at the start of an IMC module.
  *
+ * TODO enable default non/prototyped too with this pragma.
+ *
  * This will allow library developers (or non-Perl languages) to turn
  * on very efficient optimizations and a lightweight calling convention.
  * It could also be used for internal libs that do not callout to PCC
@@ -279,8 +281,8 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 
     p3 = i0 = NULL;
     label1 = label2 = NULL;
-    ps = pe = sub->pcc_sub->prototyped;
-    if (ps == -1) {
+    ps = pe = sub->pcc_sub->pragma & P_PROTOTYPED;
+    if (sub->pcc_sub->pragma & P_NONE) {
 	ps = 0; pe = 1;
 	/* subroutine can handle both */
 	i0 = mk_pasm_reg(str_dup("I0"));
@@ -434,7 +436,7 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     }
     /* FIXME
      * fake prototyped
-     * return conventions need more spec in pdd
+     * TODO implement return conventions
      */
     sub = ins->r[0];
     /*
@@ -442,11 +444,11 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
      */
     if (tmp)
         ins = tmp;
-    sub->pcc_sub->prototyped = 1;
+    sub->pcc_sub->pragma = P_PROTOTYPED;
     n = sub->pcc_sub->nret;
     for (i = 0; i < n; i++) {
         arg = sub->pcc_sub->ret[i];
-        if (sub->pcc_sub->prototyped ||
+        if ((sub->pcc_sub->pragma & P_PROTOTYPED) ||
                 (arg->set == 'P' && next[2] < 16)) {
             /*
              * prototyped
@@ -515,7 +517,8 @@ overflow:
      */
 
     /* If prototyped, I0 = 1, else I0 = 0 */
-    ins = set_I_const(interpreter, unit, ins, 0, sub->pcc_sub->prototyped);
+    ins = set_I_const(interpreter, unit, ins, 0,
+            sub->pcc_sub->pragma & P_PROTOTYPED);
 
     /* Setup argument counts */
     for (i = 0; i < REGSET_MAX; i++)
@@ -873,7 +876,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
                           (arg->type & (VTCONST|VT_CONSTP)) ? "c":"", arg->name);
 #endif
         arg_reg = arg->reg;
-        if (sub->pcc_sub->prototyped ||
+        if ((sub->pcc_sub->pragma & P_PROTOTYPED) ||
                 (arg->set == 'P' && next[2] < 16)) {
             switch (arg->type) {
                 /* if arg is constant, set register */
@@ -1000,7 +1003,8 @@ move_cc:
         need_cc = 1;
 
     /* set prototyped: I0  (1=prototyped, 0=non-prototyped) */
-    ins = set_I_const(interp, unit, ins, REG_PROTO_FLAG, sub->pcc_sub->prototyped);
+    ins = set_I_const(interp, unit, ins, REG_PROTO_FLAG,
+            sub->pcc_sub->pragma & P_PROTOTYPED);
 
     /* Ireg param count in: I1 */
     ins = set_I_const(interp, unit, ins, REG_I_PARAM_COUNT,
@@ -1066,7 +1070,7 @@ move_cc:
     n = sub->pcc_sub->nret;
     for (i = 0; i < n; i++) {
         arg = sub->pcc_sub->ret[i];
-        if (sub->pcc_sub->prototyped == 1 ||
+        if ((sub->pcc_sub->pragma & P_PROTOTYPED) ||
                 (arg->set == 'P' && next[2] <= LAST_PARAM_REG)) {
             for (set = 0; set < REGSET_MAX; set++) {
                 if (arg->set == regsets[set]) {

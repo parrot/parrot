@@ -112,13 +112,24 @@ SymReg * mk_local_label(struct _IMC_Unit *, char *);
 SymReg * mk_label_address(struct _IMC_Unit *, char *);
 SymReg * mk_pcc_sub(char *, int proto);
 
-char * symreg_to_str(SymReg *);    
+char * symreg_to_str(SymReg *);
 void add_pcc_arg(SymReg *r, SymReg * arg);
 void add_pcc_sub(SymReg *r, SymReg * arg);
 void add_pcc_cc(SymReg *r, SymReg * arg);
 void add_pcc_result(SymReg *r, SymReg * arg);
 void add_pcc_param(SymReg *r, SymReg * arg);
 void add_pcc_return(SymReg *r, SymReg * arg);
+
+typedef enum {
+	P_NON_PROTOTYPED = 0x00,	/* must be 0 */
+	P_PROTOTYPED     = 0x01,	/* must be 1 */
+	P_NONE           = 0x04,
+
+	P_MAIN           = 0x10,
+	P_LOAD           = 0x20,
+	P_IMMEDIATE      = 0x40,
+	P_POSTCOMP       = 0x80
+} pragma_enum_t;
 
 struct pcc_sub_t {
     SymReg ** args;
@@ -128,7 +139,7 @@ struct pcc_sub_t {
     SymReg *cc_sym;
     SymReg ** ret;
     int nret;
-    int prototyped;
+    pragma_enum_t pragma;
     int calls_a_sub;
     int nci;
     int label;

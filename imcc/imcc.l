@@ -194,6 +194,10 @@ SP              [ ]
 ".pcc_end_yield"      return(PCC_END_YIELD);
 "prototyped"    return(PROTOTYPED);
 "non_prototyped"    return(NON_PROTOTYPED);
+<emit,INITIAL>"@MAIN"    return(MAIN);
+<emit,INITIAL>"@LOAD"    return(LOAD);
+<emit,INITIAL>"@IMMEDIATE"    return(IMMEDIATE);
+<emit,INITIAL>"@POSTCOMP"    return(POSTCOMP);
 
 ".result"       return(RESULT);
 ".return"       return(RETURN);
