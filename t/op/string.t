@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 96;
+use Parrot::Test tests => 97;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1374,6 +1374,28 @@ output_is( <<'CODE', <<OUTPUT, "Check that bug #16874 was fixed" );
 CODE
 [foo     bar     quux    ]
 OUTPUT
+
+output_is( <<'CODE', "all ok\n", "stress concat" );
+ set I0, 1000
+ set S0, "michael"
+LOOP:
+ set S2, I0
+ concat S1, S0, S2
+ concat S3, "mic", "hael"
+ concat S3, S3, S2
+ eq S1, S3, BOTTOM
+ print "Failed: "
+ print S1
+ print " ne "
+ print S3
+ print "\n"
+ end
+BOTTOM:
+ sub I0, I0, 1
+ ne I0, 0, LOOP
+ print "all ok\n"
+ end
+CODE
 
 output_is( <<'CODE', <<OUTPUT, "ord and substring (see #17035)" );
   set S0, "abcdef"
