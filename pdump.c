@@ -14,12 +14,12 @@
 
 int
 main(int argc, char **argv) {
-    struct stat            file_stat;
-    int                    fd;
-    char *                 packed;
-    long                   packed_size;
-    struct PackFile *      pf;
-    struct Parrot_Interp * interpreter;
+    struct stat       file_stat;
+    int               fd;
+    char *            packed;
+    long              packed_size;
+    struct PackFile * pf;
+    struct Parrot_Interp *interpreter = make_interpreter();
 
     if (argc != 2) {
         fprintf(stderr, "pdump: usage: pdump FILE\n");

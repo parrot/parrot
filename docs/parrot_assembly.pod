@@ -666,6 +666,22 @@ X.
 
 =head2 Threading ops
 
+=over 4
+
+=item * lock Px
+
+Take out a high-level lock on the PMC in register X
+
+=item * unlock Px
+
+Unlock the PMC in register X
+
+=item * pushunlock Px
+
+Push an unlock request on the stack
+
+=back
+
 =head2 Interpreter ops
 
 =over 4
