@@ -65,7 +65,7 @@ PackFile_pack_size(struct PackFile *self)
 =item C<void
 PackFile_pack(struct PackFile *self, opcode_t *cursor)>
 
-Pack the PackFile into a contiguous region of memory. 
+Pack the PackFile into a contiguous region of memory.
 
 Note that the memory block had better have at least the amount of memory
 indicated by C<PackFile_pack_size()>.
@@ -223,6 +223,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
 {
     struct PMC *key;
     size_t i;
+    opcode_t type, slice_bits;
 
     *cursor++ = self->type;
 
@@ -264,40 +265,54 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
         *cursor++ = i;
         /* and now type / value per component */
         for (key = self->u.key; key; key = PMC_data(key)) {
-            switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-            case KEY_integer_FLAG:
-                *cursor++ = PARROT_ARG_IC;
-                *cursor++ = PMC_int_val(key);
-                break;
-            case KEY_number_FLAG:
-                *cursor++ = PARROT_ARG_NC;
-                *cursor++ = find_in_const(key, PFC_NUMBER);     /* Argh */
-                break;
-            case KEY_string_FLAG:
-                *cursor++ = PARROT_ARG_SC;
-                *cursor++ = find_in_const(key, PFC_STRING);     /* Argh */
-                break;
+            type = PObj_get_FLAGS(key);
+            slice_bits = 0;
+            if ((type & (KEY_start_slice_FLAG|KEY_inf_slice_FLAG)) ==
+                    (KEY_start_slice_FLAG|KEY_inf_slice_FLAG))
+                slice_bits |= PF_VT_END_INF;
+            if ((type & (KEY_end_slice_FLAG|KEY_inf_slice_FLAG)) ==
+                    (KEY_end_slice_FLAG|KEY_inf_slice_FLAG))
+                slice_bits |= PF_VT_START_ZERO;
+            if (type & KEY_start_slice_FLAG)
+                slice_bits |= PF_VT_START_SLICE;
+            if (type & KEY_end_slice_FLAG)
+                slice_bits |= PF_VT_END_SLICE;
 
-            case KEY_integer_FLAG | KEY_register_FLAG:
-                *cursor++ = PARROT_ARG_I;
-                *cursor++ = PMC_int_val(key);
-                break;
-            case KEY_number_FLAG | KEY_register_FLAG:
-                *cursor++ = PARROT_ARG_N;
-                *cursor++ = PMC_int_val(key);
-                break;
-            case KEY_string_FLAG | KEY_register_FLAG:
-                *cursor++ = PARROT_ARG_S;
-                *cursor++ = PMC_int_val(key);
-                break;
-            case KEY_pmc_FLAG | KEY_register_FLAG:
-                *cursor++ = PARROT_ARG_P;
-                *cursor++ = PMC_int_val(key);
-                break;
-            default:
-                PIO_eprintf(NULL, "PackFile_Constant_pack: "
+            type &= KEY_type_FLAGS;
+            switch (type) {
+                case KEY_integer_FLAG:
+                    *cursor++ = PARROT_ARG_IC | slice_bits;
+                    *cursor++ = PMC_int_val(key);
+                    break;
+                case KEY_number_FLAG:
+                    *cursor++ = PARROT_ARG_NC | slice_bits;
+                    *cursor++ = find_in_const(key, PFC_NUMBER);     /* Argh */
+                    break;
+                case KEY_string_FLAG:
+                    *cursor++ = PARROT_ARG_SC | slice_bits;
+                    *cursor++ = find_in_const(key, PFC_STRING);     /* Argh */
+                    break;
+
+                case KEY_integer_FLAG | KEY_register_FLAG:
+                    *cursor++ = PARROT_ARG_I | slice_bits;
+                    *cursor++ = PMC_int_val(key);
+                    break;
+                case KEY_number_FLAG | KEY_register_FLAG:
+                    *cursor++ = PARROT_ARG_N | slice_bits;
+                    *cursor++ = PMC_int_val(key);
+                    break;
+                case KEY_string_FLAG | KEY_register_FLAG:
+                    *cursor++ = PARROT_ARG_S | slice_bits;
+                    *cursor++ = PMC_int_val(key);
+                    break;
+                case KEY_pmc_FLAG | KEY_register_FLAG:
+                    *cursor++ = PARROT_ARG_P | slice_bits;
+                    *cursor++ = PMC_int_val(key);
+                    break;
+                default:
+                    PIO_eprintf(NULL, "PackFile_Constant_pack: "
                             "unsupported constant type\n");
-                Parrot_exit(1);
+                    Parrot_exit(1);
             }
         }
 
