@@ -2,6 +2,10 @@
 use strict;
 use TestCompiler tests => 5;
 
+
+SKIP: {
+  skip("-O2 disabled", 5);
+
 # these tests are run with -O2 by TestCompiler and show
 # generated PASM code for various optimizations at level 2
 
@@ -118,3 +122,4 @@ _main:
   end
 OUT
 
+}

@@ -654,9 +654,14 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                                 char *tempstr = string_to_cstring(interpreter,
                                                                   ts);
 
+#ifdef HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
                                          tempstr,
                                          (double)thefloat);
+#else
+                                /* the buffer is 4096, so no problem here */
+                                sprintf(tc, tempstr, (double)thefloat);
+#endif
                                 string_cstring_free(tempstr);
                             }
 

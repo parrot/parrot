@@ -11,7 +11,7 @@ Tests
 String subsystem
 ----------------
 
-    Rework string iterators
+    Use string iterators
     Implement character class & properties testing (for regular expressions)
     Automate string vtable generation
     Fill in vtables for non-ASCII encodings: UTF-8, UTF-16, UTF-32, etc.
@@ -32,12 +32,19 @@ Configure system
 ----------------
     Long term, should be replaced with a bootstrapping miniparrot system.
     Short term, fix the dependencies (eg, more needs to depend on classes/*)
-    Platform-independent library creation for pbc2c.pl & extensions
+    Platform-independent library creation for pbc2c2.pl & extensions
     Valgrind test target on supporting platforms
+    Checks for various functions and features (socket related, threads,
+    sigaction ...)
+
+Platforms
+---------
+    Provide own library functions e.g. snprintf for poor platforms.
 
 IO
 --
     Async IO
+    Layer handling
     Full going-over to make sure it works
     Socket IO
     Docs!

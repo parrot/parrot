@@ -80,7 +80,7 @@ Tell Configure that the compiler supports C<inline>.
 
 Enable experimental networking. This is an unused option and should
 probably be removed.
-   
+
 =item C<--cc=(compiler)>
 
 Specify which compiler to use.
@@ -120,7 +120,7 @@ Specify which lexer to use.
 =item C<--yacc=(parser)>
 
 Specify which parser to use.
-   
+
 =item C<--intval=(type)>
 
 Use the given type for C<INTVAL>.
@@ -151,13 +151,20 @@ Use JIT system.
 
 =item C<--execcapable>
 
-Use JIT to emit a native executable.   
+Use JIT to emit a native executable.
 
 =item C<--gc=(type)>
 
 Determine the type of garbage collection. The value for C<type> should
 be one of: C<gc>, C<libc>, C<malloc> or C<malloc-trace>. The default is
 C<gc>.
+
+=item C<--define=val1[,val2]>
+
+Generate "#define PARROT_DEF_VAL1 1" ... entries in has_header.h.
+Currently needed to use inet_aton for systems that lack inet_pton:
+
+  --define=inet_aton
 
 =back
 
@@ -447,7 +454,7 @@ e.g. : --ccflags="rem{-g} :add{-O2}"
    --optimize           Optimized compile
    --inline             Compiler supports inline
    --expnetwork         Enable experimental networking (unused)
-   
+
    --cc=(compiler)      Use the given compiler
    --ccflags=(flags)    Use the given compiler flags
    --ccwarn=(flags)     Use the given compiler warning flags
@@ -458,7 +465,7 @@ e.g. : --ccflags="rem{-g} :add{-O2}"
    --ldflags=(flags)    Use the given loader flags for shared libraries
    --lex=(lexer)        Use the given lexical analyzer generator
    --yacc=(parser)       Use the given parser generator
-   
+
    --intval=(type)      Use the given type for INTVAL
    --floatval=(type)    Use the given type for FLOATVAL
    --opcode=(type)      Use the given type for opcodes
@@ -466,10 +473,12 @@ e.g. : --ccflags="rem{-g} :add{-O2}"
    --pmc=(files)        Use the given PMC files
 
    --cgoto=0            Don't build cgoto core - recommended when short of mem
-   --jitcapable         Use JIT     
-   --execcapable        Use JIT to emit a native executable     
+   --jitcapable         Use JIT
+   --execcapable        Use JIT to emit a native executable
    --gc=(type)          Determine the type of garbage collection
                         type=(gc|libc|malloc|malloc-trace) default is gc
+
+   --define=inet_aton   Quick hack to use inet_aton instead of inet_pton
 
 EOT
       exit;
@@ -496,6 +505,7 @@ END
 
 #Run the actual steps
 Parrot::Configure::RunSteps->runsteps(%args);
+
 
 
 print <<"END";

@@ -18,7 +18,7 @@ over-complicating this file.
 =head2 References:
 
 APitUE - W. Richard Stevens, AT&T SFIO, Perl5 (Nick Ing-Simmons)
- 
+
 =head2 Functions
 
 =over 4
@@ -241,7 +241,7 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
 =item C<static INTVAL
 PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)>
 
-Experimental asynchronous IO. 
+Experimental asynchronous IO.
 
 This is available if C<PARROT_ASYNC_DEVEL> is defined.
 
@@ -372,7 +372,7 @@ PIO_unix_getblksize(PIOHANDLE fd)>
 Various ways of determining block size.
 
 If passed a file descriptor then C<fstat()> and the C<stat> buffer are
-used if available. 
+used if available.
 
 If called without an argument then the C<BLKSIZE> constant is returned
 if it was available at compile time, otherwise C<PIO_BLKSIZE> is returned.
@@ -620,8 +620,11 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     int family = AF_INET;
 
     char * s = string_to_cstring(interpreter, addr);
-    /*if(inet_aton(s, &sa.sin_addr) != 0) {*/
+#ifdef PARROT_DEF_INET_ATON
+    if(inet_aton(s, &sa.sin_addr) != 0) {
+#else
     if(inet_pton(family, s, &sa.sin_addr) != 0) {
+#endif
         /* Success converting numeric IP */
     }
     else {
@@ -711,7 +714,7 @@ AGAIN:
                                PIO_eprintf(interpreter, "PIO_unix_connect: connect refused\n");
 #endif
             case EINVAL:
-            default:          
+            default:
 #if PIO_TRACE
                                PIO_eprintf(interpreter, "PIO_unix_connect: errno = %d\n", errno);
 #endif
@@ -906,12 +909,12 @@ AGAIN:
 #endif
             case ECONNRESET:   close(io->fd);
 #if PIO_TRACE
-            PIO_eprintf(interpreter, "recv: Connection reset by peer\n"); 
+            PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
 #endif
                                return -1;
             default:           close(io->fd);
 #if PIO_TRACE
-            PIO_eprintf(interpreter, "recv: errno = %d\n", errno); 
+            PIO_eprintf(interpreter, "recv: errno = %d\n", errno);
 #endif
                                return -1;
         }

@@ -52,6 +52,10 @@ long" integers on a 32-bit system), you should run:
 
 See "perl Configure.pl --help" for more options.
 
+For systems like HPUX that don't have inet_pton please run:
+
+    perl Configure.pl --define=inet_aton
+
 This will generate a config.h header, a Parrot::Config module, platform
 files and some Makefiles.
 

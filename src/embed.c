@@ -313,7 +313,7 @@ again:
         program_code =
             mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
-        if (program_code == MAP_FAILED) {
+        if (program_code == (void *)MAP_FAILED) {
             Parrot_warn(interpreter, PARROT_WARNINGS_IO_FLAG,
                     "Parrot VM: Can't mmap file %s, code %i.\n",
                     filename, errno);
