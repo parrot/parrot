@@ -147,7 +147,9 @@ LINT = lclint
 # note: +distinctinternalnames with +externalnamelen at 8 characters
 #       (the ANSI standard) is not going to fly for us.
 LINTFLAGS = -weak +showscan +showsummary +posixstrictlib -abstract +aliasunique +ansireserved +ansireservedinternal +assignexpose +bitwisesigned +boolcompare +booltype BOOLVAL +casebreak -castfcnptr -charint +continuecomment +controlnestdepth 15 +cppnames +declundef +distinctinternalnames +evalorder +fielduse +forcehints -globs +imptype +includenest 8 +incondefs +incondefslib +linelen 9999 +longintegral +macroassign +macroempty +macroredef +matchanyintegral +nestedextern +noeffect +readonlystrings +realcompare +shadow -type
-LINTFLAGS2 = $(LINTFLAGS) -ansireserved -retvalother
+
+# slightly weaker, more realistic variant.
+LINTFLAGS2 = $(LINTFLAGS) -ansireserved -retvalother -bitwisesigned
 
 ###############################################################################
 #
