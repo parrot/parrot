@@ -33,6 +33,7 @@ PMC *key_new(struct Parrot_Interp *interpreter);
 PMC *key_new_integer(struct Parrot_Interp *interpreter, INTVAL value);
 PMC *key_new_number(struct Parrot_Interp *interpreter, FLOATVAL value);
 PMC *key_new_string(struct Parrot_Interp *interpreter, STRING *value);
+PMC *key_new_cstring(struct Parrot_Interp *interpreter, const char *value);
 PMC *key_new_pmc(struct Parrot_Interp *interpreter, PMC *value);
 
 void key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value);

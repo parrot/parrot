@@ -83,6 +83,8 @@ struct parrot_exception_t {
     long system;
     exception_severity severity;
     long error;
+    STRING *msg;
+    void *resume;
 };
 
 typedef struct parrot_exception_t Parrot_exception;
@@ -92,7 +94,7 @@ void pop_exception(Parrot_Interp);
 void * throw_exception(Parrot_Interp, PMC *, void *);
 void * rethrow_exception(Parrot_Interp, PMC *);
 
-size_t handle_exception(Parrot_Interp, opcode_t *);
+size_t handle_exception(Parrot_Interp);
 void do_exception(exception_severity severity, long error);
 #endif
 

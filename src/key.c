@@ -57,6 +57,13 @@ key_new_string(struct Parrot_Interp *interpreter, STRING *value)
 }
 
 PMC *
+key_new_cstring(struct Parrot_Interp *interpreter, const char *value)
+{
+    return key_new_string(interpreter,
+            string_from_cstring(interpreter, value, 0));
+}
+
+PMC *
 key_new_pmc(struct Parrot_Interp *interpreter, PMC *value)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);

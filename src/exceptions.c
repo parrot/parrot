@@ -97,14 +97,13 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
 {
     PMC *handler;
     Stack_entry_type type;
-    STRING *message, *s;
+    STRING *message;
     PMC *key;
     char *m;
     /* for now, we don't check the exception class and we don't
      * look for matching handlers
      */
-    s = string_make(interpreter, "_message", 8, NULL,0,NULL);
-    key = key_new_string(interpreter, s);
+    key = key_new_cstring(interpreter, "_message");
     message = VTABLE_get_string_keyed(interpreter, exception, key);
     do {
         handler =
@@ -151,19 +150,21 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
     PMC *handler;
     struct Parrot_Sub * cc;
     PMC* key;
-    STRING *s;
 
     Parrot_block_DOD(interpreter);
     handler = find_exception_handler(interpreter, exception);
     cc = (struct Parrot_Sub*)PMC_data(handler);
     /* preserve P5 register */
-    s = string_make(interpreter, "_P5", 3, NULL,0,NULL);
-    key = key_new_string(interpreter, s);
+    key = key_new_cstring(interpreter, "_P5");
     VTABLE_set_pmc_keyed(interpreter, exception, key, REG_PMC(5));
+#if 0
+    /* remember handler */
+    key = key_new_cstring(interpreter, "_handler");
+    VTABLE_set_pmc_keyed(interpreter, exception, key, handler);
+#endif
     /* generate and place return continuation */
     if (dest) {
-        s = string_make(interpreter, "_invoke_cc", 10, NULL,0,NULL);
-        key = key_new_string(interpreter, s);
+        key = key_new_cstring(interpreter, "_invoke_cc");
         VTABLE_set_pmc_keyed(interpreter, exception, key,
                 new_continuation_pmc(interpreter, dest));
     }
@@ -179,7 +180,18 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 void *
 rethrow_exception(Parrot_Interp interpreter, PMC *exception)
 {
-    return NULL;
+    PMC *handler;
+    struct Parrot_Sub * cc;
+
+    if (exception->vtable->base_type != enum_class_Exception)
+        PANIC("Illegal rethrow");
+    handler = find_exception_handler(interpreter, exception);
+    cc = (struct Parrot_Sub*)PMC_data(handler);
+    restore_context(interpreter, &cc->ctx);
+    /* put exception object in P5 */
+    REG_PMC(5) = exception;
+    /* return the address of the handler */
+    return handler->cache.struct_val;
 }
 
 #ifdef HAS_HEADER_SETJMP
@@ -203,46 +215,41 @@ dest2offset(Parrot_Interp interpreter, opcode_t *dest)
 }
 
 static opcode_t *
-create_exception(Parrot_Interp interpreter, opcode_t *resume, STRING *msg)
+create_exception(Parrot_Interp interpreter)
 {
     PMC *exception;     /* exception object */
     size_t offset;      /* resume offset of handler */
     PMC* key;
-    STRING *s;
     opcode_t *dest;     /* absolute address of handler */
 
     Parrot_block_DOD(interpreter);
     /* create an exception object */
     exception = pmc_new(interpreter, enum_class_Exception);
     /* exception type */
-    s = string_from_cstring(interpreter, "_type", 0);
-    key = key_new_string(interpreter, s);
-    VTABLE_set_integer_keyed(interpreter, exception, key,
-            the_exception.error);
+    key = key_new_cstring(interpreter, "_type");
+    VTABLE_set_integer_keyed(interpreter, exception, key, the_exception.error);
     /* exception severity */
-    s = string_from_cstring(interpreter, "_severity", 0);
-    key = key_new_string(interpreter, s);
+    key = key_new_cstring(interpreter, "_severity");
     VTABLE_set_integer_keyed(interpreter, exception, key,
             (INTVAL)the_exception.severity);
-    if (msg) {
-        s = string_from_cstring(interpreter, "_message", 0);
-        key = key_new_string(interpreter, s);
-        VTABLE_set_string_keyed(interpreter, exception, key, msg);
+    if (the_exception.msg) {
+        key = key_new_cstring(interpreter, "_message");
+        VTABLE_set_string_keyed(interpreter, exception, key, the_exception.msg);
     }
     /* now fill rest of exception, locate handler and get
      * destination of handler
      */
-    dest = throw_exception(interpreter, exception, resume);
+    dest = throw_exception(interpreter, exception, the_exception.resume);
     Parrot_unblock_DOD(interpreter);
     return dest;
 }
 
 size_t
-handle_exception(Parrot_Interp interpreter, opcode_t *resume)
+handle_exception(Parrot_Interp interpreter)
 {
     opcode_t *dest;     /* absolute address of handler */
 
-    dest = create_exception(interpreter, resume, NULL);
+    dest = create_exception(interpreter);
     return dest2offset(interpreter, dest);
 }
 
@@ -273,10 +280,12 @@ real_exception(struct Parrot_Interp *interpreter,
      */
     the_exception.error = exitcode;
     the_exception.severity = EXCEPT_error;
+    the_exception.msg = msg;
+    the_exception.resume = ret_addr;
     /*
-     * construct exception object and get handler address
+     * reenter runloop
      */
-    return create_exception(interpreter, ret_addr, msg);
+    longjmp(the_exception.destination, 1);
 }
 /*
  * do_exception:
@@ -290,6 +299,8 @@ do_exception(exception_severity severity, long error)
 {
     the_exception.error = error;
     the_exception.severity = severity;
+    the_exception.msg = NULL;
+    the_exception.resume = NULL;
     longjmp(the_exception.destination, 1);
 }
 
