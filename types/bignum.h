@@ -67,14 +67,15 @@ typedef enum {
 } BN_ROUNDING;
 
 /* Flags for exception triggers and exception signals */
-#define BN_F_LOST_DIGITS 1
-#define BN_F_DIVISION_BY_ZERO 2
-#define BN_F_INEXACT 4
-#define BN_F_INVALID_OPERATION 8
-#define BN_F_OVERFLOW 16
-#define BN_F_ROUNDED 32
-#define BN_F_UNDERFLOW 64
-
+typedef enum {
+    BN_F_LOST_DIGITS = 1,
+    BN_F_DIVISION_BY_ZERO = 2,
+    BN_F_INEXACT = 4,
+    BN_F_INVALID_OPERATION = 8,
+    BN_F_OVERFLOW = 16,
+    BN_F_ROUNDED = 32,
+    BN_F_UNDERFLOW = 64
+} parrot_bignum_context_flags;
 
 typedef struct {
     INTVAL precision;     /* number of digs to retain */

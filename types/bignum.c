@@ -505,7 +505,7 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
     /* Do we have a special value? */
     if (am_NAN(bn)) {
         if (am_qNAN(bn)) {
-            strcpy(cur, "qNaN");
+            strcpy(cur, "NaN");
         }
         else { /* must be signalling */
             strcpy(cur, "sNaN");
@@ -792,11 +792,12 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
         }
     }
 
+    result = BN_new(pos+1);
+
     /* copy reversed string of digits backwards into result */
     if (!(qNAN || sNAN || infinity)) { /* Normal */
         temp->digits = pos;
-        result = BN_new(pos+1);
-        
+         
         for (i=0; i< temp->digits; i++) {
             BN_setd(result, i, BN_getd(temp, temp->digits-i-1));
         }
@@ -813,6 +814,7 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
     else { /* Special */
         if (infinity) {
             BN_set_inf(PINT_ result);
+            result->sign = negative;
         }
         else if (sNAN) {
             BN_set_sNAN(PINT_ result);
@@ -1480,8 +1482,29 @@ Perform unary + on one.  Does all the rounding and what have you.
 =cut*/
 void
 BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
+    int extended_save;
+    /* Check for special values */
+    if (one->digits ==0) {
+        if (am_sNAN(one)) BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                                      "sNAN in plus");
+        if (am_NAN(one)) {
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        else { /* Infinity */
+            BN_set_inf(PINT_ result);
+            result->sign = one->sign;
+            return;
+        }
+    }
+
     BN_arith_setup(PINT_ result, one, one, context, NULL);
     BN_copy(PINT_ result, one);
+    extended_save = context->extended;
+    context->extended = 0;
+    BN_really_zero(PINT_ result, context);
+    context->extended = extended_save;
+
     BN_arith_cleanup(PINT_ result, one, one, context, NULL);
 }
 

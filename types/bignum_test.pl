@@ -9,7 +9,7 @@ use Inline C => Config => CCFLAGS => '-I/usr/home/alex/perl6/parrot/types';
 use Inline C => <<'END_OF_C_SECTION';
 #include "bignum.c"
 
-int runtest (char* lef, char *rih, int oper, int prec, int round, int lost) {
+int runtest (char* lef, char *rih, int oper, int prec, int round, int extended) {
   BIGNUM *one, *two, *result;
   char *output;
   BN_CONTEXT context;
@@ -17,9 +17,9 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int lost) {
 		    "Invalid_operation","Overflow","Rounded","Underflow"};
 
   context.precision = prec;
-  context.extended = 0;
+  context.extended = extended;
   context.flags = 0;
-  context.traps = lost ? BN_F_LOST_DIGITS : 0;
+  context.traps = 0;
   switch (round) {
   case 1 : context.rounding = ROUND_HALF_UP;
     break;
@@ -99,7 +99,7 @@ my %round = (
 unless (@ARGV == 6) {
     die <<ENDOFUSAGE;
 bignum_test.pl -- run test through bignum.c
-bignum_test.pl one two operation precision rounding lost_digits
+bignum_test.pl one two operation precision rounding extended
 ENDOFUSAGE
 }
 

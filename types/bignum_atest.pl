@@ -6,9 +6,9 @@
 # from: http://www2.hursley.ibm.com/decimal/dectest.html
 
 my ($test, $one, $two, $result, $prec, $round, $maxexp,
-    $extended, $skip ,$op, @conds, $line, $arrow);
+    $skip ,$op, @conds, $line, $arrow);
 
-my ($testsrun, $testspass, $testsfail) = (0,0,0);
+my ($testsrun, $testspass, $testsfail, $extended) = (0,0,0,0);
 $maxexp = 10000;
 while (<>) {
     chomp;
@@ -26,12 +26,21 @@ while (<>) {
     };
     /^version/ && next;
     /^maxexponent:\s*(\d+)/i && do {
-	$expskip = 1 if $1 > $maxexp; next;
+	$expskip = 1 if ($1 > $maxexp);
+	if ($1 <= $maxexp) {
+	    $expskip = 0;
+	}
+	next;
     };
 
     ($test, $op, $one, $two,$arrow, $result, @conds) = split(/\s+/, $_);
 
-
+    # skip null tests
+    if ($one eq '#' || $two eq '#') {
+	print "$test ok \# skip, null test\n";
+	next;
+    } 
+    
     if ($round !~ /^(half_up|half_even|down)$/) {
 	print "$test ok \# skip, $round not available\n";
 	next;
@@ -52,7 +61,7 @@ while (<>) {
 	next;
     }
 
-    if ($extended||$expskip) {
+    if ($expskip) {
 	print "$test ok \# skip\n";
 	next;
     }
@@ -62,7 +71,7 @@ while (<>) {
     }
 
     $testsrun += 2;
-    my ($output) = `perl bignum_test.pl $one $two $op $precision $round 0`;
+    my ($output) = `perl bignum_test.pl $one $two $op $precision $round $extended`;
     chomp($output);
     my @out = split(/\s+/, $output);
     if ($result eq $out[0] || ($result eq '?')) {
