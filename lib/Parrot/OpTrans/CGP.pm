@@ -45,13 +45,12 @@ sub defines
 #define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
 
-static void** opcode_to_prederef(struct Parrot_Interp* interpreter,
+PARROT_INLINE static void**
+opcode_to_prederef(struct Parrot_Interp* interpreter,
                                         opcode_t* opcode_addr)
 {
-    INTVAL offset_in_ops;
-    if (opcode_addr == NULL) return NULL;
-    offset_in_ops = opcode_addr - (opcode_t*) interpreter->code->byte_code;
-    return interpreter->prederef_code + offset_in_ops;
+    return interpreter->prederef_code +
+        (opcode_addr - (opcode_t*) interpreter->code->byte_code);
 }
 
 END
