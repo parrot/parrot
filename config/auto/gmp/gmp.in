@@ -8,7 +8,7 @@
 int main(int argc, char *argv[])
 {
     mpz_t i, j, k;
-    char *s;
+    char *s; int y;
 
     mpz_init(i);
     mpz_set_si(i, 999999);
@@ -19,9 +19,10 @@ int main(int argc, char *argv[])
     mpz_set_si(i, 2);
     mpz_div(k, k, i);
 
+    y = mpz_fits_slong_p(k);
 
     s = mpz_get_str(NULL, 10, k);
-    printf("%s\n", s);
+    printf("%s %d\n", s, y);
     free(s);
     return 0;
 }

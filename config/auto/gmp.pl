@@ -28,7 +28,7 @@ sub runstep {
     my $linkflags = Configure::Data->get('linkflags');
     my $ccflags = Configure::Data->get('ccflags');
     Configure::Data->add(' ', 'libs', '-lgmp');
-    
+
     my $archname = $Config{archname};
     my ($cpuarch, $osname) = split('-', $archname);
     if(!defined $osname) {
@@ -36,7 +36,7 @@ sub runstep {
     }
 
     # On OS X check the presence of the gmp header in the standard
-    # Fink location. TODO: Need a more generalized way for finding 
+    # Fink location. TODO: Need a more generalized way for finding
     # where Fink lives.
     if($osname =~ /darwin/) {
         if( -f "/sw/include/gmp.h") {
@@ -51,7 +51,7 @@ sub runstep {
     my $has_gmp = 0;
     if (! $@) {
 	my $test = cc_run();
-	if ($test eq "499999500000\n") {
+	if ($test eq "499999500000 0\n") {
             $has_gmp = 1;
 	    print " (yes) " if $verbose;
             $Configure::Step::result = 'yes';
@@ -63,7 +63,7 @@ sub runstep {
 	}
     }
     unless ( $has_gmp ) {
-        # The Config::Data settings might have changed for the test 
+        # The Config::Data settings might have changed for the test
         Configure::Data->set('libs', $libs);
         Configure::Data->set('ccflags', $ccflags);
         Configure::Data->set('linkflags', $linkflags);
