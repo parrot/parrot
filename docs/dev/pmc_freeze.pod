@@ -77,7 +77,7 @@ methods and callback functions.
 
 =head2 Working loops
 
-These are labeled B<visit_loop_*>. There are currently to schemes to
+These are labeled B<visit_loop_*>. There are currently two schemes to
 handle the B<todo_list>.
 
 =over 4
@@ -130,7 +130,7 @@ The basic operation is:
 
 =head2 Avoiding duplicates
 
-As stated in the introduction strucutures can be self-referential,
+As stated in the introduction structures can be self-referential,
 they can contain (at an arbitrary depth) PMCs, that where already
 processed. Just following these PMCs would lead to endless loops. So
 already B<seen> PMCs have to be remembered.

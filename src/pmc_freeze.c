@@ -28,7 +28,7 @@
  *  Notes:
  *     The seen-hash version for freezing might go away sometimes.
  *  References:
- *     Lot of discussion on p6i
+ *     Lot of discussion on p6i and docs/dev/pmc_freeze.pod.
  */
 
 #include "parrot/parrot.h"
