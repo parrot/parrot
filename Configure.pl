@@ -412,7 +412,7 @@ if ($c{gccversion}) {
     # An example is Solaris 8.
 
     my @opt_and_vers = 
-        (0 => "-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline -W -Wsign-compare -Wno-unused",
+        (0 => "-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline -W -Wno-unused",
         # others; ones we might like marked with ?
         # ? -Wundef for undefined idenfiers in #if
         # ? -Wbad-function-cast
@@ -428,7 +428,7 @@ if ($c{gccversion}) {
         # Ha. this is the default! with -pedantic.
         # -Wno-long-long for the nicest bit of C99
          2.7 => "",
-         2.8 => "",
+         2.8 => "-Wsign-compare",
          2.95 => "",
          3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked -Wpadded -Wdisabled-optimization",
         # -Wsequence-point is part of -Wall
