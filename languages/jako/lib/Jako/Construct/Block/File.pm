@@ -50,7 +50,8 @@ sub compile
       or $construct->isa("Jako::Construct::Declaration::Sub")
     ) {
       if ($last_seen ne 'sub') {
-        $compiler->emit("goto __INLINE_" . $inline); # $inline is already the next one.
+        $compiler->emit("bsr __INLINE_" . $inline); # $inline is already the next one.
+        $compiler->emit("ret"); # Return to the previous inline chunk.
         $compiler->outdent;
         $compiler->emit(".end");
 
