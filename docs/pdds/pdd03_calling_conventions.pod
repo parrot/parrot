@@ -143,6 +143,10 @@ through P31.
 
 The first 26 integer parameters.
 
+=item S0
+
+The name of the method or sub being called
+
 =item S5 through S31
 
 The first 27 string parameters.
