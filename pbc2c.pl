@@ -235,8 +235,8 @@ main(int argc, char **argv) {
 	return 1;
     }
     interpreter->code = pf;
-    runops(interpreter, pf, 0);
-    exit(1);
+    run_compiled(interpreter, program_code, program_code);
+    exit(0);
 }
 
 static opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code){
