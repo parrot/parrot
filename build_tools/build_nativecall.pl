@@ -114,7 +114,7 @@ my (%ret_type_decl) = (p => "void *",
 		       S => "STRING *",
                      );
 
-my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nREG_PMC(5) = final_destination;",
+my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\n    REG_PMC(5) = final_destination;",
 		    i => "REG_INT(5) = return_data;",
 		    3 => "REG_INT(5) = *return_data;",
 		    l => "REG_INT(5) = return_data;",
@@ -126,9 +126,9 @@ my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nREG_PMC(5)
                     P => "REG_PMC(5) = return_data;",
                     S => "REG_STR(5) = return_data;",
 		    v => "",
-		    t => "final_destination = string_from_cstring(interpreter, return_data, 0);\nREG_STR(5) = final_destination;",
-#		    b => "PObj_bufstart(final_destination) = return_data;\nREG_STR(5) = final_destination",
-#		    B => "PObj_bufstart(final_destination) = *return_data;\nREG_STR(5) = final_destination",
+		    t => "final_destination = string_from_cstring(interpreter, return_data, 0);\n    REG_STR(5) = final_destination;",
+#		    b => "PObj_bufstart(final_destination) = return_data;\n    REG_STR(5) = final_destination",
+#		    B => "PObj_bufstart(final_destination) = *return_data;\n    REG_STR(5) = final_destination",
 		    s => "REG_INT(5) = return_data;",
                    );
 
@@ -223,7 +223,7 @@ while (<>) {
     }
 
     # Header
-    generate_func_header($ret, $args, (join ",", @arg), $ret_type{$ret},
+    generate_func_header($ret, $args, [@arg], $ret_type{$ret},
 			 $ret_type_decl{$ret}, $func_call_assign{$ret},
 			 $other_decl{$ret},  $ret_assign{$ret});
 
@@ -375,7 +375,7 @@ FOOTER
 }
 
 sub generate_func_header {
-    my ($return, $params, $call_params, $ret_type, $ret_type_decl,
+    my ($return, $params, $args, $ret_type, $ret_type_decl,
 	$return_assign, $other_decl, $final_assign) = @_;
     $other_decl ||= "";
 
@@ -383,18 +383,39 @@ sub generate_func_header {
     my $proto = join ', ', map { $proto_type{$_} } split '', $params;
     $extra_preamble = join("", @extra_preamble);
     $extra_postamble = join("", @extra_postamble);
+    # This is an after-the-fact hack: real fix would be in make_arg
+    # or somewhere at that level.  The main point being that one cannot
+    # just cast pointers and expect things to magically align.  Instead
+    # of trying to: (int*)&something_not_int, one HAS to use temporary
+    # variables.  We detect and collect those to "temp".
+    my @temp;
+    for my $i (0..$#$args) {
+        if ($args->[$i] =~ /^\((.+)\*\)&(.+)$/) {
+	    $temp[$i] = [ $1, $2 ];
+	    $args->[$i] = "&arg$i";
+	}
+    }
+    my $call_params = join(",", @$args);
+    my @tempi = grep { defined $temp[$_] } 0..$#$args;
+    my $temp_decl = join("\n    ", map { "$temp[$_]->[0] arg$_;"} @tempi);
+    my $temp_in   = join("\n    ", map { "arg$_ = $temp[$_]->[1];"} @tempi);
+    my $temp_out  = join("\n    ", map { "$temp[$_]->[1] = arg$_;"} @tempi);
+    $return_data = "$return_assign $final_assign" =~ /return_data/ ? "$ret_type_decl return_data;" : "";
     print NCI <<HEADER;
 static void
 pcf_${return}_$params(Interp *interpreter, PMC *self)
 {
     typedef $ret_type (*func_t)($proto);
     func_t pointer;
-    $ret_type_decl return_data;
+    $return_data
+    $temp_decl
     $other_decl
     $extra_preamble
 
     pointer =  (func_t)D2FPTR(PMC_struct_val(self));
+    $temp_in
     $return_assign ($ret_type)(*pointer)($call_params);
+    $temp_out
     $final_assign
     $extra_postamble
 HEADER
@@ -405,7 +426,7 @@ static void
 pcf_${return}(Interp *interpreter, PMC *self)
 {
     $ret_type (*pointer)(void);
-    $ret_type_decl return_data;
+    $return_data
     $other_decl
     $extra_preamble
 
