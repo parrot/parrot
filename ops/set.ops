@@ -265,6 +265,8 @@ affected register - handle with care.
 =cut
 
 inline op setp_ind(in INT, in PMC) {
+    if ($1 < 0 || $1 >= NUM_REGISTERS)
+        PANIC("Out of bound register access");
     REG_PMC($1) = $2;
     goto NEXT();
 }
