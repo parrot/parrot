@@ -33,6 +33,23 @@ typedef struct _hash_entry {
     UnionVal val;
 } HASH_ENTRY;
 
+/* A BucketIndex is an index into the pool of available buckets. */
+typedef UINTVAL BucketIndex;
+typedef UINTVAL HashIndex;
+struct _hashbucket {
+    STRING *key;
+    HASH_ENTRY value;
+    BucketIndex next;
+};
+
+struct _hash {
+    Buffer buffer;              /* This struct is a Buffer subclass! */
+    HashIndex max_chain;
+    UINTVAL entries;            /* Number of values stored in hashtable */
+    Buffer *bucket_pool;        /* Buffer full of buckets, used and unused */
+    BucketIndex free_list;
+};
+
 void new_hash(Interp * interpreter, HASH **hash_ptr);
 void hash_clone(Interp * interpreter, HASH * src, HASH **dest);
 INTVAL hash_size(Interp * interpreter, HASH *hash);

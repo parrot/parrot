@@ -30,6 +30,10 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
 
 pmclass PerlHash {
 
+    void class_init() {
+        /* class_init_code */
+	make_bufferlike_pool(INTERP, sizeof(struct _hash));
+    }
     void init () {
         if (undef == NULL) {
             undef = pmc_new(INTERP, enum_class_PerlUndef);

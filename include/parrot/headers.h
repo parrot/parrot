@@ -45,6 +45,7 @@ struct Small_Object_Pool *new_buffer_pool(struct Parrot_Interp *interpreter);
 struct Small_Object_Pool *new_string_pool(struct Parrot_Interp *interpreter, INTVAL constant);
 struct Small_Object_Pool *get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t unit_size);
 
+struct Small_Object_Pool *make_bufferlike_pool(struct Parrot_Interp *interpreter, size_t unit_size);
 /* header creation functions */
 PMC *new_pmc_header(struct Parrot_Interp *interpreter);
 STRING *new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags);

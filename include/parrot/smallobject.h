@@ -15,14 +15,14 @@ struct Small_Object_Arena {
 struct Small_Object_Pool {
     struct Small_Object_Arena *last_Arena;
     size_t object_size;     /* size in bytes of an individual pool item */
-    size_t objects_per_alloc; 
+    size_t objects_per_alloc;
     size_t total_objects;
     size_t num_free_objects;    /* number of resources in the free pool */
     size_t replenish_level;
     void *free_list;
     UINTVAL align_1;    /* alignment (must be power of 2) minus one */
     /* adds a free object to the pool's free list  */
-    void  (*add_free_object)(struct Parrot_Interp *, 
+    void  (*add_free_object)(struct Parrot_Interp *,
                              struct Small_Object_Pool *, void *);
     /* gets and removes a free object from the pool's free list */
     void *(*get_free_object)(struct Parrot_Interp *,
@@ -47,9 +47,9 @@ size_t get_min_pool_address(struct Parrot_Interp *interpreter,
                             struct Small_Object_Pool *pool);
 
 
-void more_traceable_objects(struct Parrot_Interp *interpreter, 
+void more_traceable_objects(struct Parrot_Interp *interpreter,
                 struct Small_Object_Pool *pool);
-void more_non_traceable_objects(struct Parrot_Interp *interpreter, 
+void more_non_traceable_objects(struct Parrot_Interp *interpreter,
                 struct Small_Object_Pool *pool);
 
 void add_free_object(struct Parrot_Interp *,
@@ -62,18 +62,13 @@ void alloc_objects(struct Parrot_Interp *, struct Small_Object_Pool *);
 struct Small_Object_Pool * new_small_object_pool(struct Parrot_Interp *,
                                                  size_t, size_t);
 
-struct Small_Object_Pool * get_sized_small_object_pool(struct Parrot_Interp *,
-                                                       size_t);
-void set_sized_small_object_pool(struct Parrot_Interp *, size_t,
-                                 struct Small_Object_Pool *);
-
 #endif /* PARROT_SMALLOBJECT_H */
 
 /*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -34,29 +34,12 @@
 #define INITIAL_BUCKETS 16
 #define MAXFULL_PERCENT 80
 
-/* A BucketIndex is an index into the pool of available buckets. */
-typedef UINTVAL BucketIndex;
 /* Assumes 2's complement? */
 const BucketIndex NULLBucketIndex = (BucketIndex)-1;
 
 /* A HashIndex is an index into the hashtable, i.e., the array of
  * buckets indexed by hash(KEY) mod hash_size */
-typedef UINTVAL HashIndex;
 const HashIndex NULLHashIndex = (HashIndex)-1;
-
-struct _hashbucket {
-    STRING *key;
-    HASH_ENTRY value;
-    BucketIndex next;
-};
-
-struct _hash {
-    Buffer buffer;              /* This struct is a Buffer subclass! */
-    HashIndex max_chain;
-    UINTVAL entries;            /* Number of values stored in hashtable */
-    Buffer *bucket_pool;        /* Buffer full of buckets, used and unused */
-    BucketIndex free_list;
-};
 
 /* Is there a way to portably add inlining hints anymore? */
 #define FIXME_INLINE

@@ -158,9 +158,9 @@ struct Small_Object_Pool *
 new_pmc_pool(struct Parrot_Interp *interpreter)
 {
     int num_headers = GC_DEBUG(interpreter) ?
-            GC_DEBUG_PMC_HEADERS_PER_ALLOC : PMC_HEADERS_PER_ALLOC;
+        GC_DEBUG_PMC_HEADERS_PER_ALLOC : PMC_HEADERS_PER_ALLOC;
     struct Small_Object_Pool *pmc_pool =
-            new_small_object_pool(interpreter, sizeof(PMC), num_headers);
+        new_small_object_pool(interpreter, sizeof(PMC), num_headers);
 
     pmc_pool->add_free_object = add_free_pmc;
     pmc_pool->get_free_object = get_free_pmc;
@@ -171,7 +171,7 @@ new_pmc_pool(struct Parrot_Interp *interpreter)
 }
 
 /* Creates a new pool for buffer-like structures.
- * Usually you would need get_bufferlike_pool.
+ * Usually you would need make_bufferlike_pool.
  */
 struct Small_Object_Pool *
 new_bufferlike_pool(struct Parrot_Interp *interpreter,
@@ -216,9 +216,9 @@ new_string_pool(struct Parrot_Interp *interpreter, INTVAL constant)
 }
 
 
-/* returns a Bufferlike Header Pool */
+/* makes and returns a Bufferlike Header Pool */
 struct Small_Object_Pool *
-get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
+make_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
 {
     UINTVAL idx;
     UINTVAL num_old = interpreter->arena_base->num_sized;
@@ -242,7 +242,16 @@ get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
     }
 
     return sized_pools[idx];
-    /* FIXME! Sized buffer headers are currently not collected! */
+}
+
+/* returns a Bufferlike Header Pool, it must exist */
+struct Small_Object_Pool *
+get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
+{
+    struct Small_Object_Pool **sized_pools =
+            interpreter->arena_base->sized_header_pools;
+
+    return sized_pools[ (buffer_size - sizeof(Buffer)) / sizeof(void *) ];
 }
 
 

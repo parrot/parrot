@@ -81,6 +81,12 @@ Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
 
 pmclass Array {
 
+    void class_init() {
+        /* class_init_code */
+	make_bufferlike_pool(INTERP, sizeof(List_chunk));
+	make_bufferlike_pool(INTERP, sizeof(List));
+    }
+
     void init () {
         SELF->data = list_new(INTERP, enum_type_PMC);
         PObj_custom_mark_SET(SELF);

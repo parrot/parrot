@@ -16,7 +16,6 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-static INTVAL world_inited = 0;
 
 struct Parrot_Interp *
 Parrot_new(void)
@@ -25,6 +24,7 @@ Parrot_new(void)
     return make_interpreter(NO_FLAGS);
 }
 
+extern void Parrot_initialize_core_pmcs(Interp *interp);
 void
 Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
 /*                                             ^^^^^^^^^^^^^^
@@ -32,6 +32,7 @@ Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
         we set up our own in embed.c:Parrot_runcode()?
 */
 {
+    static INTVAL world_inited = 0;
     if (!world_inited) {
         /* global_setup.c:init_world sets up some vtable stuff.
          * It must only be called once.
@@ -40,7 +41,8 @@ Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
         world_inited = 1;
         init_world(interpreter);
     }
-
+    else
+        Parrot_initialize_core_pmcs(interpreter);
     if (stacktop)
         interpreter->lo_var_ptr = stacktop;
 }

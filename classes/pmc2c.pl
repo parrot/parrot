@@ -443,6 +443,7 @@ sub filter {
 
 EOC
   my %defaulted;
+  my $class_init_code = '';
 
   # start processing methods
   while ($classblock =~ s/($signature_re)//) {
@@ -464,6 +465,15 @@ EOC
 
      my ($methodblock, $rema, $lines) = extract_balanced($classblock);
      $lineno += $lines;
+
+     # class_init code goes at the end of Parrot_$Class_class_init
+     # these isn't a method but class global init code
+     # only INTERP is expanded
+     if ($methodname =~ /class_init/) {
+	 $methodblock =~ s/INTERP/interp/g;
+	 $class_init_code .= $methodblock;
+	 next;
+     }
 
      $methodblock = rewrite_method($classname, $methodname,
                                    $superpmc, $supermethodloc,
@@ -548,6 +558,7 @@ void $initname (Interp * interp, int entry) {
        "$classname", @{[length($classname)]}, 0, 0, 0);
 
    Parrot_base_vtables[entry] = temp_base_vtable;
+   $class_init_code
 }
 EOC
   }
