@@ -155,7 +155,9 @@ PERL = ${perl}
 TEST_PROG = ${test_prog}${exe}
 TEST_PROG_SO = ${test_prog}_so${exe}
 PDUMP = pdump${exe}
-LINT = lclint
+
+# lclint has changed name to split at v3.0
+LINT = splint
 
 # note: +distinctinternalnames with +externalnamelen at 8 characters
 #       (the ANSI standard) is not going to fly for us.
@@ -163,6 +165,10 @@ LINTFLAGS = -weak +showscan +showsummary +posixstrictlib -abstract +aliasunique 
 
 # slightly weaker, more realistic variant.
 LINTFLAGS2 = $(LINTFLAGS) -ansireserved -retvalother -bitwisesigned
+
+# added to lint target to simplify experimentation,
+# ex: make LINTOPTS='-posixstrictlibs +posixlibs' lint
+LINTOPTS = 
 
 ###############################################################################
 #
@@ -616,16 +622,19 @@ manitest :
 update :
 	cvs -q update -dP
 
+rsync :
+	rsync -av cvs.perl.org::parrot-HEAD .
+
 status :
 	cvs -n -q upd -dP
 
 lint : ${test_prog}
-	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
-	$(LINT) ${cc_inc} $(LINTFLAGS) test_main.c
+	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
+	$(LINT) ${cc_inc} $(LINTFLAGS) $(LINTOPTS) test_main.c
 
 lint2 : ${test_prog}
-	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
-	$(LINT) ${cc_inc} $(LINTFLAGS2) test_main.c
+	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
+	$(LINT) ${cc_inc} $(LINTFLAGS2) $(LINTOPTS) test_main.c
 
 
 ###############################################################################
