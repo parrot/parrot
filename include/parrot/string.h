@@ -70,7 +70,9 @@ typedef enum BUFFER_flag {
     /* Mark the buffer as on the free list */
     BUFFER_on_free_list_FLAG = 1 << 14,
     /* This is a constant--don't kill it! */
-    BUFFER_constant_FLAG = 1 << 15
+    BUFFER_constant_FLAG = 1 << 15,
+    /* For debugging, report when this buffer gets moved around */
+    BUFFER_report_FLAG = 1 << 16
 } BUFFER_flags;
 
 /* stringinfo parameters */

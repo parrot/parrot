@@ -54,6 +54,8 @@ void Parrot_go_collect(struct Parrot_Interp *);
 void *Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize);
 void *Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *, size_t tosize);
 
+/* Functions needed for custom DOD routines */
+PMC * mark_used(PMC *used_pmc, PMC *current_end_of_list);
 void buffer_lives(Buffer *);
 
 void Parrot_initialize_resource_pools(struct Parrot_Interp *);
@@ -62,6 +64,7 @@ void Parrot_initialize_memory_pools(struct Parrot_Interp *);
 #define STRING_HEADERS_PER_ALLOC 128
 #define PMC_HEADERS_PER_ALLOC 128
 #define BUFFER_HEADERS_PER_ALLOC 128
+#define SIZED_HEADERS_PER_ALLOC 128
 
 struct PMC_Arena {
     size_t used;         /* Count of PMCs in this arena */
@@ -96,6 +99,8 @@ struct Arenas {
     struct Resource_Pool *pmc_pool;
     struct Resource_Pool *buffer_header_pool;
     struct Resource_Pool *constant_string_header_pool;
+    struct Resource_Pool **sized_header_pools;
+    size_t num_sized;
 };
 
 struct Stash {
