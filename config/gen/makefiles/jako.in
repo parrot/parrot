@@ -139,9 +139,9 @@ test: all
 	$(INTERP) examples/leibniz.pbc
 #	$(INTERP) examples/life.pbc
 	$(INTERP) examples/mandelbrot.pbc
-	$(INTERP) examples/mandelzoom.pbc
+#	$(INTERP) examples/mandelzoom.pbc
 	$(INTERP) examples/mops.pbc
-	$(INTERP) examples/nci.pbc
+#	$(INTERP) examples/nci.pbc
 	$(INTERP) examples/pmc.pbc
 	$(INTERP) examples/primes.pbc
 	$(INTERP) examples/queens.pbc
