@@ -1879,8 +1879,6 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 
 #    undef Parrot_jit_vtable1_op
 #    undef Parrot_jit_vtable1r_op
-#    undef Parrot_jit_vtable2rk_op
-#    undef Parrot_jit_vtable3k_op
 
 #    undef Parrot_jit_vtable_112_op
 #    undef Parrot_jit_vtable_221_op
@@ -1914,7 +1912,7 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 
 static void
 Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
-                Interp * interpreter, int n, int bp, int *args)
+                Interp * interpreter, int n, int *args)
 {
     int nvtable = op_jit[*jit_info->cur_op].extcall;
     size_t offset;
@@ -1937,10 +1935,6 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     if (ru[0].registers_used == 5) {
         emitm_pushl_r(jit_info->native_ptr, emit_ECX);
         saved = 2;
-    }
-    if (bp) {
-        jit_emit_stack_frame_enter(jit_info->native_ptr);
-        jit_emit_sub_ri_i(jit_info->native_ptr, emit_ESP, sizeof(INTVAL));
     }
 
     /* get the offset of the first vtable func */
@@ -2124,10 +2118,7 @@ store:
             offsetof(struct PMC, vtable));
     /* call *(offset)eax */
     emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
-    if (bp)
-        jit_emit_stack_frame_leave(jit_info->native_ptr);
-    else
-        emitm_addb_i_r(jit_info->native_ptr,
+    emitm_addb_i_r(jit_info->native_ptr,
                 st + sizeof(void *) * (n + 1), emit_ESP);
     if (saved == 2)
         emitm_popl_r(jit_info->native_ptr, emit_ECX);
@@ -2207,7 +2198,7 @@ Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int a[] = { 1 };
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 1, 0, a);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 1, a);
 }
 
 /* emit a call to a vtable func
@@ -2218,21 +2209,10 @@ Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int a[] = { 2 };
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 1, 0, a);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 1, a);
     Parrot_jit_store_retval(jit_info, interpreter);
 }
 
-/* emit a call to a vtable func
- * $1 = $2->vtable(interp, $2, &key)
- */
-static void
-Parrot_jit_vtable2rk_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
-{
-    int a[] = { 2 , 3};
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, 1, a);
-    Parrot_jit_store_retval(jit_info, interpreter);
-}
 
 /* emit a call to a vtable func
  * $1 = $2->vtable(interp, $2, $3)
@@ -2242,7 +2222,7 @@ Parrot_jit_vtable_1r223_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int a[] = { 2 , 3};
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, 0, a);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, a);
     Parrot_jit_store_retval(jit_info, interpreter);
 }
 
@@ -2254,7 +2234,7 @@ Parrot_jit_vtable_1r332_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int a[] = { 3 , 2};
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, 0, a);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, a);
     Parrot_jit_store_retval(jit_info, interpreter);
 }
 /* emit a call to a vtable func
@@ -2265,7 +2245,7 @@ Parrot_jit_vtable_112_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int a[] = { 1, 2 };
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, 0, a);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, a);
 }
 
 /* emit a call to a vtable func
@@ -2276,7 +2256,7 @@ Parrot_jit_vtable_221_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int a[] = { 2, 1 };
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, 0, a);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, a);
 }
 
 /* emit a call to a vtable func
@@ -2287,7 +2267,7 @@ Parrot_jit_vtable_2231_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int a[] = { 2, 3, 1 };
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, 0, a);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, a);
 }
 
 /* emit a call to a vtable func
@@ -2298,7 +2278,7 @@ Parrot_jit_vtable_1123_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int a[] = { 1, 2, 3 };
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, 0, a);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, a);
 }
 
 /* emit a call to a vtable func
@@ -2309,19 +2289,9 @@ Parrot_jit_vtable_1121_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     int a[] = { 1, 2, 1 };
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, 0, a);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, a);
 }
 
-/* emit a call to a vtable func
- * $1->vtable(interp, $1, &key, $3)
- */
-static void
-Parrot_jit_vtable3k_op(Parrot_jit_info_t *jit_info,
-                     Interp * interpreter)
-{
-    int a[] = { 1, 2, 3 };
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, 1, a);
-}
 
 /* if_p_ic, unless_p_ic */
 static void

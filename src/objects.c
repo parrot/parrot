@@ -500,11 +500,13 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
     PMC *parent_class;
     INTVAL i, nparents;
     int free_it;
+    static void *what = (void*)-1;
     /*
      * XXX compat mode
      */
-
-    if (!Parrot_getenv("CALL__BUILD", &free_it)) {
+    if (what == (void*)-1)
+        what = Parrot_getenv("CALL__BUILD", &free_it);
+    if (!what) {
         nparents = VTABLE_elements(interpreter, classsearch_array);
         for (i = nparents - 1; i >= 0; --i) {
             parent_class = VTABLE_get_pmc_keyed_int(interpreter,
