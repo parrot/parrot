@@ -226,6 +226,7 @@ ENCODING_O_FILES = \
 IO_O_FILES = \
     io/io$(O) \
     io/io_buf$(O) \
+    io/io_layers$(O) \
     io/io_unix$(O) \
     io/io_win32$(O) \
     io/io_stdio$(O) \
@@ -758,6 +759,8 @@ $(SRC)/inter_run$(O) : $(SRC)/inter_run.c $(GENERAL_H_FILES)
 io/io$(O) : $(GENERAL_H_FILES) io/io_private.h
 
 io/io_buf$(O) : $(GENERAL_H_FILES) io/io_private.h
+
+io/io_layers$(O) : $(GENERAL_H_FILES) io/io_private.h
 
 io/io_unix$(O) : $(GENERAL_H_FILES) io/io_private.h
 
