@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 3;
+use TestCompiler tests => 4;
 
 ##############################
 
@@ -327,3 +327,100 @@ CODE
 40
 OUT
 
+output_is(<<'CODE', <<'OUT', "spill 4");
+
+.sub _MAIN
+	$I0 = 0
+	$I1 = 1
+	$I2 = 2
+	$I3 = 3
+	$I4 = 4
+	$I5 = 5
+	$I6 = 6
+	$I7 = 7
+	$I8 = 8
+	$I9 = 9
+
+	$I10 = 10
+	$I11 = 11
+	$I12 = 12
+	$I13 = 13
+	$I14 = 14
+	$I15 = 15
+	$I16 = 16
+	$I17 = 17
+	$I18 = 18
+	$I19 = 19
+
+	$I20 = 20
+	$I21 = 21
+	$I22 = 22
+	$I23 = 23
+	$I24 = 24
+	$I25 = 25
+	$I26 = 26
+	$I27 = 27
+	$I28 = 28
+	$I29 = 29
+
+	$I30 = 30
+	$I31 = 31
+	$I32 = 32
+	$I33 = 33
+	$I34 = 34
+	$I35 = 35
+	$I36 = 36
+	$I37 = 37
+	$I38 = 38
+	$I39 = 39
+
+	if $I0 != 0 goto err
+	if $I1 != 1 goto err
+	if $I2 != 2 goto err
+	if $I3 != 3 goto err
+	if $I4 != 4 goto err
+	if $I5 != 5 goto err
+	if $I6 != 6 goto err
+	if $I7 != 7 goto err
+	if $I8 != 8 goto err
+	if $I9 != 9 goto err
+	if $I10 != 10 goto err
+	if $I11 != 11 goto err
+	if $I12 != 12 goto err
+	if $I13 != 13 goto err
+	if $I14 != 14 goto err
+	if $I15 != 15 goto err
+	if $I16 != 16 goto err
+	if $I17 != 17 goto err
+	if $I18 != 18 goto err
+	if $I19 != 19 goto err
+	if $I20 != 20 goto err
+	if $I21 != 21 goto err
+	if $I22 != 22 goto err
+	if $I23 != 23 goto err
+	if $I24 != 24 goto err
+	if $I25 != 25 goto err
+	if $I26 != 26 goto err
+	if $I27 != 27 goto err
+	if $I28 != 28 goto err
+	if $I29 != 29 goto err
+	if $I30 != 30 goto err
+	if $I31 != 31 goto err
+	if $I32 != 32 goto err
+	if $I33 != 33 goto err
+	if $I34 != 34 goto err
+	if $I35 != 35 goto err
+	if $I36 != 36 goto err
+	if $I37 != 37 goto err
+	if $I38 != 38 goto err
+	if $I39 != 39 goto err
+
+	print "ok\n"
+	end
+err:
+	print "nok\n"
+	end
+.end
+CODE
+ok
+OUT

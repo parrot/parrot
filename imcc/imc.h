@@ -36,13 +36,6 @@
 #define EXTERN extern
 #endif
 
-#define SPILL_STRESS 0
-
-#if SPILL_STRESS
-# undef MAX_COLOR
-# define MAX_COLOR 4
-#endif
-
 /* IMCC reserves this character for internally generated labels
  * and identifiers that won't collide with high level compiler generated names.
  */

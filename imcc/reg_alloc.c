@@ -29,7 +29,7 @@
 
 #if SPILL_STRESS
 # undef MAX_COLOR
-# define MAX_COLOR 4
+# define MAX_COLOR 6
 #endif
 
 static void make_stat(IMC_Unit *, int *sets, int *cols);
@@ -294,8 +294,11 @@ sort_reglist(SymReg ** reglist)
  */
 
 
-#define ALLOCATE_HACK
+/* #define ALLOCATE_HACK */
+
 #ifdef ALLOCATE_HACK
+
+#define SHORT_RANGE 5
 static void
 allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
 {
@@ -330,7 +333,7 @@ allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
                 if (r->set != typ || (r->type & VT_REGP) ||
                         r->want_regno >= 0 || r->color >= 0)
                     continue;
-                if (r->last_ins->index - r->first_ins->index > 10)
+                if (r->last_ins->index - r->first_ins->index > SHORT_RANGE)
                     continue;
                 if (r->first_ins->bbindex != r->last_ins->bbindex)
                     continue;
@@ -751,6 +754,9 @@ order_spilling (IMC_Unit * unit)
 	min_node = -1;
 
         for (x = 0; x < n_symbols; x++) {
+            /* if its spilled skip it */
+            if (unit->reglist[x]->usage & U_SPILL)
+                continue;
 
             /* for now, our score function only
 	       takes in account how many times a symbols
@@ -774,10 +780,19 @@ order_spilling (IMC_Unit * unit)
 	    }
         }
 
-	if (min_node == -1) return; /* We are finished */
+	if (min_node == -1)
+            break;       /* We are finished */
 
 	imcstack_push(nodeStack, min_node);
 	unit->reglist[min_node]->simplified = 1;
+    }
+    /*
+     * now put all spilled regs on top of stack so that they
+     * get their register first
+     */
+    for (x = 0; x < n_symbols; x++) {
+        if (unit->reglist[x]->usage & U_SPILL)
+            imcstack_push(nodeStack, x);
     }
 }
 
@@ -848,7 +863,7 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 		free_colors = map_colors(x, graph, colors, typ);
 		if (free_colors > 0) {
 		    for (color = 0; color < MAX_COLOR; color++) {
-                        int c = (color + 16) % 32;
+                        int c = (color + MAX_COLOR/2) % MAX_COLOR;
 			if (!colors[c]) {
 			    reglist[x]->color = c;
 
@@ -863,7 +878,8 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 		}
 
 		if (reglist[x]->color == -1) {
-                    debug(interpreter, DEBUG_IMC, "# no more colors free = %d\n", free_colors);
+                    debug(interpreter, DEBUG_IMC,
+                            "# no more colors free = %d\n", free_colors);
 
 		    /* It has been impossible to assign a color
                      * to this node, return it so it gets spilled
@@ -938,8 +954,10 @@ update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     }
     /* add this sym to reglist, if not there */
     if (add) {
-        unit->reglist = realloc(unit->reglist, (n_symbols + 1) * sizeof(SymReg *));
+        unit->reglist = realloc(unit->reglist, (n_symbols + 1) *
+                sizeof(SymReg *));
         unit->reglist[n_symbols++] = r;
+        unit->n_symbols = n_symbols;
     }
 
     r->first_ins = r->last_ins = ins;
@@ -995,7 +1013,7 @@ update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
             }
         }
         free(interference_graph);
-        interference_graph = new_graph;
+        unit->interference_graph = interference_graph = new_graph;
     }
     for (x = 0; x < n_symbols; x++) {
         for (y = x + 1; y < n_symbols; y++) {
@@ -1013,6 +1031,8 @@ update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
         }
     }
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC) {
+        fprintf(stderr, "old_sym %s\n", old->name);
+        fprintf(stderr, "new_sym %s\n", new->name);
         dump_interference_graph(unit);
     }
 }
