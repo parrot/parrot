@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-tools/dev/parrot_api.pl - Display Parrot API (symbols)
+tools/dev/parrot_api.pl - Verify Parrot API (symbols)
 
 =head1 SYNOPSIS
 
@@ -22,56 +22,85 @@ F<blib/lib/libparrot.a>), and then cross-references the dubious API
 symbols according to the below categories.  Each symbol is listed with
 the object file it was found in.
 
+Good things are listed with C<+++> (at the moment the only good thing
+is Parrot APIs definitions their declarations), bad things are listed
+with C<--->.
+
 =over 4
 
 =item Missing Parrot API
 
-API listed in the public headers or but not defined in the Parrot lib.
+The API is listed in the public headers but not defined in the Parrot lib.
 
 Either the API listing is wrong or the implementation is missing.
 
 =item No Parrot Prefix
 
-API implemented but has no C<Parrot_> prefix.
+The API is implemented but has no C<Parrot_> prefix.
 
-If code: if the API is really to be public, prefix it with <Parrot_>
-(and not something else), if not, considering making it private (local)
-or splitting it off to a Parrot-private library.
+If code: see L</"Public or Private">.
 
-If data, consider making the data either constant or heap B<and>
-accessible only through a real API.
+If data: at least consider limiting its scope by making it file
+static or function static, but see L</"Data is not an API">.
 
 =item No Parrot API
 
-API implemented in the lib but not defined in the public headers.
+The API is defined in the lib but not defined in the public headers.
 
-If code, consider making the API private (local) or splitting
-it off to a Parrot-private library.
+If code: see L</"Public or Private">.
 
-If data, consider making the data constant and/or heap B<and>
-accessible only through a real API.
+If data: see L</"Data is not an API">.
 
 =item Uninitialized Modifiable Data
 
-Data symbol that is not initialized with data.
+Data symbol that is not initialized with any data.
 
-Consider making the data constant and/or heap (and accessed through a
-real API, data as such is not a good API unless it's constant).  Think
-multithreaded access.
+See L</"Data is not an API">.
 
 =item Initialized Modifiable Data
 
 Data symbol that is initialized with data, but modifiable.
 
-Consider making the data constant and/or heap (and accessed through a
-real API, data as such is not a good API unless it's constant).  Think
-multithreaded access.
+See L</"Data is not an API">.
 
 =back
+
+=head1 RULES
+
+=head2 Public or Private
+
+If the API is really meant to be public, prefix it with <Parrot_>,
+or something else specific enough, preferably specific to Parrot,
+not some generic term.  Currently acceptable prefixes are
+C</^(Parrot|PDB|PF|PIO|PackFile)_/>.
+
+If the API is not meant to be public, considering making it private
+(file static, and prefix it with C<S_>, but still do have a prototype
+for it).
+
+=head2 Data is not an API
+
+Consider making the data const(ant) heap (and accessed through a real
+API that takes care of synchronization, data as such is not a good API
+unless it's constant).  Think multithreaded access, or just plan
+reentrancy (think recursion).  Often you can collect data fields into
+a "context" structure that is either explicitly passed between
+functions or implicitly retrieved from a global API.
 
 =head1 DEPENDENCIES
 
 Uses F<tools/dev/nm.pl> to list the symbols.
+
+=head1 TODO
+
+There are a lot of warnings given from "core class" cases like
+
+   Parrot_Array_class_init array.o
+
+which are probably okay.  This tool should be taught about these
+cases: how to find out which APIs are B<supposed> to be found from
+such "core class" objects?  But in any case, even those objects should
+B<NOT> have any data symbols visible.
 
 =head1 HISTORY
 
@@ -145,7 +174,7 @@ for my $api (keys %API) {
     delete $API{$api} unless exists $Code{$api}; # Not ours.
 }
 
-printf "--- Parrot API: %d ---\n", scalar @ParrotAPI;
+printf "+++ Parrot API: %d +++\n", scalar @ParrotAPI;
 if (@ParrotAPI) {
     for my $api (@ParrotAPI) {
 	printf "%s\t%s\n", $api, $API{$api} || "-";
@@ -160,8 +189,10 @@ my @NoParrotAPI = grep { !exists $API{$_} } sort keys %ParrotAPI;
 my @NoParrotPrefix;
 my @UnParrotAPI;
 
+my $ParrotPrefix = qr/^(Parrot|PDB|PF|PIO|PackFile)_/;
+
 for my $api (@API) {
-    unless ($api =~ /^Parrot_/) {
+    unless ($api =~ $ParrotPrefix) {
 	push @NoParrotPrefix, $api;
     }
     unless (exists $ParrotAPI{$api}) {
