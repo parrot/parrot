@@ -618,7 +618,7 @@ in sub1
 back
 OUTPUT
 
-system("parrot$PConfig{exe} -o temp.pbc $temp");
+system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
 
 output_is(<<'CODE', <<'OUTPUT', "load_bytecode PBC call different subs, ret");
 .pcc_sub _main:
