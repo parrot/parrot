@@ -69,6 +69,8 @@ begin_command:
 begin_word:
   #print "begin_word:\n"
   word = new tclword
+  # didn't init used to happen for free?
+  word->__init() 
   end_of_word = 0
   # Skip any leading whitespace, unless we're preserving.
   if preserve_whitespace == 1 goto pre_middle
