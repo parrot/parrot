@@ -19,7 +19,7 @@ sub runstep {
   $ldflags =~ s/-libpath:\S+//g;
   my $debug='n';
   
-  my $libs=join ' ',
+  $libs=join ' ',
            grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm|dbm|ndbm|db)$/ }
            split(' ', $libs);
   
