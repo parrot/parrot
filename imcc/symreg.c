@@ -500,8 +500,8 @@ SymReg *
 link_keys(int nargs, SymReg * keys[])
 {
     SymReg * first, *key, *keychain;
-    int i;
-    char key_str[256];
+    int i, len;
+    char *key_str;
     /* namespace keys are global consts - no cur_unit */
     SymReg **h = cur_unit ? cur_unit->hash : ghash;
 
@@ -510,15 +510,24 @@ link_keys(int nargs, SymReg * keys[])
     first = keys[0];
     if (nargs == 1)
         return first;
+    /* calc len of key_str */
+    for (i = 0, len = 1; i < nargs; i++) {
+        len += strlen(keys[i]->name);
+        if (i < nargs - 1)
+            ++len;
+    }
+    key_str = malloc(len);
     *key_str = 0;
     /* first look, if we already have this exact key chain */
-    for (i = 0; i < nargs && strlen(key_str)<200; i++) {
+    for (i = 0; i < nargs; i++) {
         strcat(key_str, keys[i]->name);
         if (i < nargs - 1)
             strcat(key_str, ";");
     }
-    if ( (keychain = _get_sym(h, key_str)) != 0)
+    if ( (keychain = _get_sym(h, key_str)) != 0) {
+        free(key_str);
         return keychain;
+    }
     /* no, need a new one */
     keychain = calloc(1, sizeof(SymReg));
     if (!keychain)
@@ -540,7 +549,7 @@ link_keys(int nargs, SymReg * keys[])
         if (keys[i]->type & VTREGISTER)
             key->reg = keys[i];
     }
-    keychain->name = str_dup(key_str);
+    keychain->name = key_str;
     keychain->set = 'K';
     keychain->color = -1;
     _store_symreg(h, keychain);

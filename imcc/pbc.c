@@ -686,7 +686,8 @@ build_key(Interp *interpreter, SymReg *reg)
                     case 'I':                       /* P[;42;..] */
                         *pc++ = PARROT_ARG_IC;      /* int constant */
                         *pc++ = r->color = atol(r->name);   /* value */
-                        debug(interpreter, DEBUG_PBC_CONST, " keypart IC %s #%d\n", r->name, r->color);
+                        debug(interpreter, DEBUG_PBC_CONST,
+                                " keypart IC %s #%d\n", r->name, r->color);
                         break;
                     default:
                         fatal(1,"build_key", "unknown set\n");

@@ -56,7 +56,7 @@ Initializes the iterator with an aggregate PMC.
 
 =item C<void mark()>
 
-Marks the current index/key and the aggregate as live.
+Marks the current idx/key and the aggregate as live.
 
 =cut
 
@@ -130,18 +130,18 @@ TODO: keep track of current position and direction
 
 /*
 
-=item C<INTVAL get_integer_keyed_int(INTVAL index)>
+=item C<INTVAL get_integer_keyed_int(INTVAL idx)>
 
-Get integer value of current position plus index.
+Get integer value of current position plus idx.
 
 =cut
 
 */
 
-    INTVAL get_integer_keyed_int (INTVAL index) {
+    INTVAL get_integer_keyed_int (INTVAL idx) {
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_get_integer_keyed_int(INTERP, agg, PMC_int_val(key) + index );
+        return VTABLE_get_integer_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
 /*
@@ -158,18 +158,18 @@ Get integer value of current position plus index.
 
 /*
 
-=item C<FLOATVAL get_number_keyed_int(INTVAL index)>
+=item C<FLOATVAL get_number_keyed_int(INTVAL idx)>
 
-Get number value of current position plus index.
+Get number value of current position plus idx.
 
 =cut
 
 */
 
-    FLOATVAL get_number_keyed_int (INTVAL index) {
+    FLOATVAL get_number_keyed_int (INTVAL idx) {
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_get_number_keyed_int(INTERP, agg, PMC_int_val(key) + index );
+        return VTABLE_get_number_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
 /*
@@ -186,18 +186,18 @@ Get number value of current position plus index.
 
 /*
 
-=item C<BIGNUM *get_bignum_keyed_int(INTVAL index)>
+=item C<BIGNUM *get_bignum_keyed_int(INTVAL idx)>
 
-Get bignum value of current position plus index.
+Get bignum value of current position plus idx.
 
 =cut
 
 */
 
-    BIGNUM* get_bignum_keyed_int (INTVAL index) {
+    BIGNUM* get_bignum_keyed_int (INTVAL idx) {
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_get_bignum_keyed_int(INTERP, agg, PMC_int_val(key) + index );
+        return VTABLE_get_bignum_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
 /*
@@ -214,25 +214,25 @@ Get bignum value of current position plus index.
 
 /*
 
-=item C<STRING *get_string_keyed_int(INTVAL index)>
+=item C<STRING *get_string_keyed_int(INTVAL idx)>
 
-Get string value of current position plus index.
+Get string value of current position plus idx.
 
 =cut
 
 */
 
-    STRING* get_string_keyed_int (INTVAL index) {
+    STRING* get_string_keyed_int (INTVAL idx) {
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_get_string_keyed_int(INTERP, agg, PMC_int_val(key) + index );
+        return VTABLE_get_string_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
 /*
 
 =item C<INTVAL get_bool()>
 
-Returns true if the index/key is not C<-1>.
+Returns true if the idx/key is not C<-1>.
 
 =cut
 
@@ -281,17 +281,17 @@ Returns the element for C<key>.
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL index) {
+    PMC* get_pmc_keyed_int (INTVAL idx) {
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_get_pmc_keyed_int(INTERP, agg, PMC_int_val(key) + index );
+        return VTABLE_get_pmc_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
 /*
 
 =item C<void set_integer_native(INTVAL value)>
 
-Sets the current index to C<value>.
+Sets the current idx to C<value>.
 
 C<value> must be in the range:
 
@@ -386,7 +386,7 @@ C<value> must be in the range:
 
 =item C<PMC *pop_pmc()>
 
-Returns the element for the current index/key and sets the index/key to
+Returns the element for the current idx/key and sets the idx/key to
 the previous one.
 
 =cut
@@ -474,7 +474,7 @@ the previous one.
 
 =item C<PMC* shift_pmc()>
 
-Returns the element for the current index/key and sets the index/key to
+Returns the element for the current idx/key and sets the idx/key to
 the next one.
 
 =cut
@@ -506,18 +506,18 @@ Returns whether an element for C<*key> exists in the aggregate.
 
 /*
 
-=item C<INTVAL exists_keyed_int(INTVAL index)>
+=item C<INTVAL exists_keyed_int(INTVAL idx)>
 
-Returns whether an element for C<index> exists in the aggregate.
+Returns whether an element for C<idx> exists in the aggregate.
 
 =cut
 
 */
 
-    INTVAL exists_keyed_int (INTVAL index) {
+    INTVAL exists_keyed_int (INTVAL idx) {
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_exists_keyed_int(INTERP, agg, PMC_int_val(key) + index );
+        return VTABLE_exists_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
 /*
@@ -556,10 +556,10 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
 
 */
 
-    INTVAL defined_keyed_int (INTVAL index) {
+    INTVAL defined_keyed_int (INTVAL idx) {
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_defined_keyed_int(INTERP, agg, PMC_int_val(key) + index );
+        return VTABLE_defined_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
 /*
@@ -576,8 +576,9 @@ Returns the result of calling C<type_keyed(key)> on the aggregate.
         return VTABLE_type_keyed(INTERP, (PMC *)PMC_pmc_val(SELF), key);
     }
 
+/*
 
-=item C<INTVAL type_keyed_int(PMC *index)>
+=item C<INTVAL type_keyed_int(PMC *idx)>
 
 Returns the result of calling C<type_keyed(key)> on the aggregate.
 
@@ -585,10 +586,10 @@ Returns the result of calling C<type_keyed(key)> on the aggregate.
 
 */
 
-    INTVAL type_keyed_int (INTVAL index) {
+    INTVAL type_keyed_int (INTVAL idx) {
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_type_keyed_int(INTERP, agg, PMC_int_val(key) + index );
+        return VTABLE_type_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 }
 
