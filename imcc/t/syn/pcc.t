@@ -1235,14 +1235,19 @@ CODE
 ok
 OUT
 
-output_is(<<'CODE', <<'OUT', "more pragmas, syntax only");
+{
+  # The result of the code depends on wether we run parrot with the
+  # "-o code.pbc -r -r" command line params
+  my $output = $ENV{TEST_PROG_ARGS} =~ m/-r / ?
+                qq{ok\nok\n} :
+                qq{ok\n};
+  output_is(<<'CODE', $output, "more pragmas, syntax only");
 .sub _main prototyped, @MAIN, @LOAD, @POSTCOMP
     print "ok\n"
     end
 .end
 CODE
-ok
-OUT
+}
 
 output_is(<<'CODE', <<'OUT', "_func() syntax");
 .sub _main

@@ -12,6 +12,8 @@ use Test::Harness qw(runtests);
 # Suck the switches into the TEST_PROG_ARGS evar:
 #
 
+die "This file was thought to be obsolete by Bernhard Schmalhofer";
+
 use Getopt::Std;
 my %opts;
 getopts('wgjPSbvdr?hO:', \%opts);

@@ -1272,10 +1272,12 @@ caller 1 main
 ok
 OUTPUT
 
-# the test is failing when run with --run-pbc (make testr)
-# actually the POSTCOMP is run and "initial" is printed, but
-# its not captured by the test system
-output_is(<<'CODE', <<'OUTPUT', '@IMMEDIATE');
+{
+    # the test is failing when run with --run-pbc (make testr)
+    # actually the POSTCOMP is run and "initial" is printed, but
+    # its not captured by the test system
+
+    my $code = << 'CODE';
 ##PIR##
 .sub optc @IMMEDIATE, @POSTCOMP
     print "initial\n"
@@ -1284,9 +1286,22 @@ output_is(<<'CODE', <<'OUTPUT', '@IMMEDIATE');
     print "main\n"
 .end
 CODE
+    my $output = << 'OUTPUT';
 initial
 main
 OUTPUT
+    my $descr = '@IMMEDIATE, @POSTCOMP';
+    if ( $ENV{TEST_PROG_ARGS} =~ m/-r / )
+    {
+        TODO: 
+        {
+            local $TODO = "output from POSTCOMP is lost";
+            output_is( $code, $output, $descr);
+        };
+    } else {
+        output_is( $code, $output, $descr);
+    }
+}
 
 pir_output_like(<<'CODE', <<'OUTPUT', '@ANON');
 .sub main @MAIN

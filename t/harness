@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -12,7 +12,7 @@ t/harness - Parrot Test Harness
 
 =head1 DESCRIPTION
 
-Command-line options are:
+The short command line options are:
 
 =over 4
 
@@ -54,11 +54,25 @@ Run fast core.
 
 =item C<-r>
 
-assemble to Parrot bytecode and then run the bytecode.
+compile to Parrot bytecode and then run the bytecode.
 
 =item C<-O[012]>
 
 Run optimized to the specified level.
+
+=back
+
+There are also long command line options:
+
+=over 4
+
+=item C<--running-make-test>
+
+Some test scripts run more quickly when this is set.
+
+=item C<--gc-debug>
+
+Invoke parrot with '--gc-debug'.
 
 =back
 
@@ -71,14 +85,12 @@ use Getopt::Std;
 use Test::Harness qw(runtests);
 
 # handle the long options
+
 $ENV{RUNNING_MAKE_TEST} = grep { $_ eq '--running-make-test' } @ARGV;
 @ARGV = grep { $_ ne '--running-make-test' } @ARGV;
-$ENV{PARROT_QUICKTEST} = grep { $_ eq 'quick' } @ARGV;
-@ARGV = grep { $_ ne 'quick' } @ARGV;
+
 my $gc_debug = grep { $_ eq '--gc-debug' } @ARGV;
 @ARGV = grep { $_ ne '--gc-debug' } @ARGV;
-my $run_pbc = grep { $_ eq '--run-pbc' } @ARGV;
-@ARGV = grep { $_ ne '--run-pbc' } @ARGV;
 
 # Suck the short options into the TEST_PROG_ARGS evar:
 my %opts;
@@ -98,6 +110,8 @@ perl t/harness [options] [testfiles]
     -d ... run debug
     -r ... assemble to PBC run PBC
     -O[012] optimize
+    --running-make-test
+    --gc-debug
 EOF
     exit;
 }
@@ -105,7 +119,6 @@ EOF
 my $args = join(' ', map { "-$_" } keys %opts );
 $args =~ s/-O/-O$opts{O}/ if ($opts{O});
 $args .= ' --gc-debug'    if $gc_debug;
-$args .= ' --run-pbc'     if $run_pbc;
 $ENV{TEST_PROG_ARGS} = $args;
 
 # Pass in a list of tests to run on the command line, else run all the tests.

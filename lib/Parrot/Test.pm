@@ -101,13 +101,10 @@ are being skipped.
 package Parrot::Test;
 
 use strict;
-use vars qw(@EXPORT @ISA $TEST_PROG_ARGS);
+use vars qw(@EXPORT @ISA);
 use Parrot::Config;
 use File::Spec;
 use Data::Dumper;
-
-# 5.005_03 Env.pm doesn't make its arguments immune from use strict 'vars';
-use Env qw($TEST_PROG_ARGS);
 
 require Exporter;
 require Test::Builder;
@@ -288,24 +285,20 @@ sub generate_functions {
             $as_f = per_test('.imc',$count);
         }
 
-        $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-        my $args = $TEST_PROG_ARGS;
+        my $args = $ENV{TEST_PROG_ARGS} || '';
 
-        my $run_pbc = 0;
-        if ($args =~ s/--run-pbc//) {
+        if ($args =~ s/--run-pbc// || $args =~ s/-r //) {
             # native tests with --run-pbc don't make sense
             if ($func =~ /^pbc_output_/) {
-                return $Builder->ok(1, $desc);
+                return $Builder->skip( "no native tests with -r" );
             }
             my $pbc_f = per_test('.pbc', $count);
-            $run_pbc = 1;
             $args = "$args -o $pbc_f -r -r";
         }
 
         # native tests are just run
         if ($func =~ /^pbc_output_/) {
             $as_f = per_test('.pbc',$count);
-            $run_pbc = 0;
         }
         else {
             $as_f = File::Spec->rel2abs($as_f);
