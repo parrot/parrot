@@ -102,7 +102,7 @@ runops(Interp *interpreter, size_t offs)
 
 /*
 
-=item C<void
+=item C<struct parrot_regs_t *
 Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)>
 
 Runs the Parrot ops, called from C code. The function arguments are
@@ -113,11 +113,12 @@ is an invocable C<Sub> PMC.
 
 */
 
-void
+struct parrot_regs_t *
 Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 {
     PMC *ret_c, *p1;
     opcode_t offset, *dest;
+    struct parrot_regs_t *bp;
 
     /* we need one return continuation with a NULL offset */
     p1 = REG_PMC(1);
@@ -130,11 +131,13 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
      * Passing a dummy true destination copies registers
      */
     dest = VTABLE_invoke(interpreter, sub, (void*) 1);
+    bp = interpreter->ctx.bp;
     if (dest) {
         offset = dest - interpreter->code->byte_code;
         runops(interpreter, offset);
     }
     REG_PMC(1) = p1;
+    return bp;
 }
 
 /*

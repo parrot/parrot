@@ -510,8 +510,9 @@ set_loc(YYLTYPE *l, char const *tok, size_t len)
     l->last_column = col;
 }
 
+#define YY_NEVER_INTERACTIVE 1
 #define YY_NO_UNPUT 1
-#line 515 "ast/astlexer.c"
+#line 516 "ast/astlexer.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -662,10 +663,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 75 "ast/ast.l"
+#line 76 "ast/ast.l"
 
 
-#line 669 "ast/astlexer.c"
+#line 670 "ast/astlexer.c"
 
 	if ( yy_init )
 		{
@@ -750,22 +751,22 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 77 "ast/ast.l"
+#line 78 "ast/ast.l"
 /* skip comments */ {++line; col=1; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 78 "ast/ast.l"
+#line 79 "ast/ast.l"
 { ++line; col=1; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 80 "ast/ast.l"
+#line 81 "ast/ast.l"
 /* eat white space */ ;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 81 "ast/ast.l"
+#line 82 "ast/ast.l"
 {
 			valp->t = IMCC_find_node_nr(yytext);
 			return MODULE;
@@ -773,7 +774,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 85 "ast/ast.l"
+#line 86 "ast/ast.l"
 {
 			valp->t = IMCC_find_node_nr(yytext);
 			return PCCSUB;
@@ -781,7 +782,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 89 "ast/ast.l"
+#line 90 "ast/ast.l"
 {
 			valp->t = IMCC_find_node_nr(yytext);
 			return FUNCTION;
@@ -789,7 +790,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 93 "ast/ast.l"
+#line 94 "ast/ast.l"
 {
 			valp->t = IMCC_find_node_nr(yytext);
 			if (valp->t)
@@ -799,27 +800,27 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 99 "ast/ast.l"
+#line 100 "ast/ast.l"
 DUP_AND_RET(valp, FLOATC);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 100 "ast/ast.l"
+#line 101 "ast/ast.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 101 "ast/ast.l"
+#line 102 "ast/ast.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 102 "ast/ast.l"
+#line 103 "ast/ast.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 104 "ast/ast.l"
+#line 105 "ast/ast.l"
 {
 	valp->s = str_dup(yytext);
         valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
@@ -828,7 +829,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 110 "ast/ast.l"
+#line 111 "ast/ast.l"
 {
 	valp->s = str_dup(yytext);
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
@@ -836,7 +837,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 115 "ast/ast.l"
+#line 116 "ast/ast.l"
 {
         char *p = strchr(yytext, '"');
 	valp->s = str_dup(p);    /* enc:"..." */
@@ -846,7 +847,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 121 "ast/ast.l"
+#line 122 "ast/ast.l"
 {
         valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
@@ -854,19 +855,19 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 126 "ast/ast.l"
+#line 127 "ast/ast.l"
 return *yytext;
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 128 "ast/ast.l"
+#line 129 "ast/ast.l"
 yyterminate();
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 130 "ast/ast.l"
+#line 131 "ast/ast.l"
 ECHO;
 	YY_BREAK
-#line 870 "ast/astlexer.c"
+#line 871 "ast/astlexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1430,7 +1431,7 @@ YY_BUFFER_STATE b;
 
 #ifndef YY_ALWAYS_INTERACTIVE
 #ifndef YY_NEVER_INTERACTIVE
-#include<unistd.h>
+extern int isatty YY_PROTO(( int ));
 #endif
 #endif
 
@@ -1750,7 +1751,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 130 "ast/ast.l"
+#line 131 "ast/ast.l"
 
 
 int yywrap(void) { return 1; }

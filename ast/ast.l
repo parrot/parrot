@@ -46,6 +46,7 @@ set_loc(YYLTYPE *l, char const *tok, size_t len)
 
 %}
 
+%option never-interactive
 %option nounput
 
 LETTER          [a-zA-Z_@]
