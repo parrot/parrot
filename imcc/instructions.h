@@ -105,11 +105,6 @@ SymReg *get_branch_reg(Instruction * ins);
 
 /* Globals */
 
-#if 0
-/* per-unit instructions now (imc_info->imc_units) */
-EXTERN Instruction* instructions;
-#endif
-
 typedef struct _emittert {
 	int (*open)(void *param);
 	int (*emit)(void *param, struct _IMC_Unit *, Instruction *ins);
