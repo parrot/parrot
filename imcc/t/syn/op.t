@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 19;
+use TestCompiler tests => 20;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "+=");
@@ -50,6 +50,18 @@ output_is(<<'CODE', <<'OUT', "/=");
 .end
 CODE
 10
+OUT
+
+output_is(<<'CODE', <<'OUT', "%=");
+.sub _test
+    $I0 = 20
+    $I0 %= 7
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+6
 OUT
 
 output_is(<<'CODE', <<'OUT', ".=");
