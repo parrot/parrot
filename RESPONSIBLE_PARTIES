@@ -4,7 +4,7 @@ people with CVS commit access, just those who have an area they've
 taken responsibility for.
 See also languages/LANGUAGES.STATUS for language authors/maintainers.
 
-Design				Dan Sugalski
+Design				Chip Salzenberg
 Release pumpking		Leopold "leo" Toetsch
 JIT				Daniel Grunblatt, Leopold Toetsch
 Configure			Brent Royal-Gordon
