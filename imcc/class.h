@@ -21,6 +21,7 @@ typedef struct _Field {
 typedef struct _Method {
 
   Symbol * sym;             /* Circular reference */
+  Symbol * label;
 
 } Method;
 
@@ -34,6 +35,7 @@ typedef struct _Class {
 
 
 Class * new_class(Symbol *);
+Method * new_method(Symbol * sym, Symbol * label);
 void store_field_symbol(Class * cl, Symbol * sym);
 void store_method_symbol(Class * cl, Symbol * sym);
 Symbol * lookup_field_symbol(Class *cl, const char * name);

@@ -29,6 +29,7 @@ enum SYMBOLTYPE {
 typedef struct _Symbol {
 
    char * name;
+   int type;   /* PIR type (int, string, float, pmc) */
 
    /* A symbol can belong to exactly one table and/or one list but no more */
    struct _Symbol * nextintable;

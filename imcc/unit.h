@@ -3,20 +3,21 @@
 #ifndef IMCC_UNIT_H
 #define IMCC_UNIT_H
 
-/* A PIR compilation unit or atomic metadata item.
+/* A IMC compilation unit or atomic metadata item.
  * The unit holds the instruction list as well as
  * all of the compiler state info, (reg allocator, cfg, etc.)
  * for the unit of instructions.
  */
 
 typedef enum {
-    PIR_sub = 1,
-    PIR_class = 2
-} PIR_Unit_Type;
+    IMC_PASM = 0,
+    IMC_SUB = 1,
+    IMC_CLASS = 2
+} IMC_Unit_Type;
 
 
-typedef struct _PIR_Unit {
-    PIR_Unit_Type type;
+typedef struct _IMC_Unit {
+    IMC_Unit_Type type;
     Instruction * instructions;
     Symbol * sym;
     int bb_list_size;
@@ -32,14 +33,16 @@ typedef struct _PIR_Unit {
     SymReg** interference_graph;
     SymReg** reglist;
     int n_symbols;
-    struct _PIR_Unit * prev;
-    struct _PIR_Unit * next;
-} PIR_Unit;
+    struct _IMC_Unit * prev;
+    struct _IMC_Unit * next;
+} IMC_Unit;
 
 
-void pir_unit_close(void);
-PIR_Unit * pir_unit_open(void);
-PIR_Unit * pir_order_for_emit(PIR_Unit * list);
+void imc_unit_close(void);
+IMC_Unit * imc_open_unit(IMC_Unit_Type);
+void imc_close_unit(Parrot_Interp);
+IMC_Unit * imc_new_unit(IMC_Unit_Type);
+IMC_Unit * imc_order_for_emit(IMC_Unit * list);
 
 #endif
 
