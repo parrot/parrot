@@ -143,7 +143,7 @@ void *build_call_func(struct Parrot_Interp *interpreter, String *signature) {
 #else
   /* And in here is the platform-independent way. Which is to say
      "here there be hacks" */
-  if (0 == string_length(signature)) return pcf_v_v;
+  if (0 == string_length(signature)) return F2DPTR(pcf_v_v);
 $icky_global_bit
     PANIC("Unknown signature type");
   return NULL;
@@ -203,7 +203,7 @@ HEADER
   push @icky_global_variable, <<CALL;
   if (!string_compare(interpreter, signature,
     string_from_c_string(interpreter, "$return$params", 0)))
-        return pcf_${return}_$params;
+        return F2DPTR(pcf_${return}_$params);
 CALL
 
 }

@@ -55,7 +55,7 @@ pmclass NCI {
     }
 
     void* invoke (void * next) {
-        Parrot_csub_t func = (Parrot_csub_t)SELF->data;
+        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(SELF->data);
         func(INTERP, SELF);
         return next;
     }
