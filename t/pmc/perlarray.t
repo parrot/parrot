@@ -16,7 +16,7 @@ Tests the C<PerlArray> PMC. Checks basic and Perl-specific array behaviour.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1414,6 +1414,39 @@ CODE
 1
 0
 OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Keyed access");
+@{[ $fp_equality_macro ]}
+     new P0, .PerlArray
+     new P1, .Key
+     set P1, 10
+     set P0[P1], 2
+     new P2, .Key
+     set P2, 20
+     set P0[P2], 4.0
+     new P3, .Key
+     set P3, 30
+     set P0[P3], "six"
+
+     set P10, P0[10]
+     eq P10, 2, OK1
+     print "not "
+OK1: print "ok 1\\n"
+     set P10, P0[20]
+     .fp_eq(P10, 4.0, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+     set P10, P0[30]
+     eq P10, "six", OK3
+     print "not "
+OK3: print "ok 3\\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
 
 1;
 
