@@ -7,7 +7,7 @@ use strict;
 my ($src, $func, $out, $cmd, $func);
 
 $src =  $ARGV[0];
-$cmd  = "cc -c $src.c -Wall -O -DNDEBUG -Wa,-a > $src.s";
+$cmd  = "cc -c $src.c -Wall -O3 -fomit-frame-pointer -DNDEBUG -Wa,-a > $src.s";
 
 &print_header($src);
 &create_s($cmd);

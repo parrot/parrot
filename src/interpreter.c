@@ -992,6 +992,11 @@ Save/restore all registers.
     REG_PMC(2) = p2; \
     REG_STR(0) = s0
 
+#if defined(PARROT_HAS_I386_SSE) || defined(PARROT_HAS_I386_SSE2)
+#  define MIN_SIZE_ALIGN 0x1f
+#else
+#  define MIN_SIZE_ALIGN 0x0f
+#endif
 static size_t
 used_size(Parrot_Interp interpreter, PMC *sub)
 {
@@ -1045,7 +1050,7 @@ used_size(Parrot_Interp interpreter, PMC *sub)
     if (size < 5 * sizeof(INTVAL))
         size = 5 * sizeof(INTVAL);
     /* round up for memcpy_aligned */
-    size = (size + 0xf) & ~0xf;
+    size = (size + MIN_SIZE_ALIGN) & ~MIN_SIZE_ALIGN;
     s->use_reg_offs = size;
     return size;
 }

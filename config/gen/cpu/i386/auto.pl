@@ -18,9 +18,11 @@ Test for MMX/SSE functionality. Creates these Config entries
 use strict;
 sub run_cpu {
     my $verbose = shift;
-    my (@files) = qw( memcpy_mmx.c );
+    my (@files) = qw( memcpy_mmx.c memcpy_sse.c );
     for my $f (@files) {
 	print " $f " if $verbose;
+	$f =~ /memcpy_(\w+)/;
+	my $suffix = $1;
 	$f = "config/gen/cpu/i386/$f";
 	cc_gen($f);
 	eval( cc_build("-DPARROT_CONFIG_TEST"));
@@ -30,10 +32,10 @@ sub run_cpu {
 	else {
 	    if (cc_run() =~ /ok/) {
 		Configure::Data->set(
-		  'i386_has_mmx' => '1',
-		  'HAS_i386_mmx' => '1',
+		  "i386_has_$suffix" => '1',
+		  "HAS_i386_$suffix" => '1',
 		);
-		print " (MMX) " if ($verbose);
+		print " (\U$suffix) " if ($verbose);
 	        Configure::Data->add(',',
 			"TEMP_generated" => $f
 		);

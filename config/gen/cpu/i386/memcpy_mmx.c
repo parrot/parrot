@@ -6,7 +6,7 @@
  */
 
 /*
- * GAS LISTING /tmp/ccAwN5Uc.s 			page 1
+ * GAS LISTING /tmp/ccSoNevX.s 			page 1
  * 
  * 
  *    1              		.file	"memcpy_mmx_in.c"
@@ -19,16 +19,14 @@
  */
 static const char Parrot_memcpy_aligned_mmx_code[] = {
                            /* Parrot_memcpy_aligned_mmx: */
-    0x55,                       /* pushl %ebp */
-    0x89, 0xE5,                 /* movl %esp,%ebp */
-    0x83, 0xEC, 0x1C,           /* subl $28,%esp */
+    0x83, 0xEC, 0x20,           /* subl $32,%esp */
     0x57,                       /* pushl %edi */
     0x56,                       /* pushl %esi */
     0x53,                       /* pushl %ebx */
-    0x8B, 0x5D, 0x08,           /* movl 8(%ebp),%ebx */
-    0x8B, 0x55, 0x0C,           /* movl 12(%ebp),%edx */
-    0x8B, 0x45, 0x10,           /* movl 16(%ebp),%eax */
-    0xDD, 0x5D, 0xF8,           /* fstpl -8(%ebp) */
+    0x8B, 0x5C, 0x24, 0x30,     /* movl 48(%esp),%ebx */
+    0x8B, 0x54, 0x24, 0x34,     /* movl 52(%esp),%edx */
+    0x8B, 0x44, 0x24, 0x38,     /* movl 56(%esp),%eax */
+    0xDD, 0x5C, 0x24, 0x18,     /* fstpl 24(%esp) */
     0x89, 0xDF,                 /* mov %ebx, %edi */
     0x89, 0xD6,                 /* mov %edx, %esi */
     0x89, 0xC1,                 /* mov %eax, %ecx */
@@ -43,13 +41,12 @@ static const char Parrot_memcpy_aligned_mmx_code[] = {
     0x49,                       /* dec %ecx */
     0x75, 0xE7,                 /* jnz 1b */
     0x0F, 0x77,                 /* emms */
-    0xDD, 0x45, 0xF8,           /* fldl -8(%ebp) */
+    0xDD, 0x44, 0x24, 0x18,     /* fldl 24(%esp) */
     0x89, 0xD8,                 /* movl %ebx,%eax */
     0x5B,                       /* popl %ebx */
     0x5E,                       /* popl %esi */
     0x5F,                       /* popl %edi */
-    0x89, 0xEC,                 /* movl %ebp,%esp */
-    0x5D,                       /* popl %ebp */
+    0x83, 0xC4, 0x20,           /* addl $32,%esp */
     0xC3,                       /* ret */
     0x00
 };

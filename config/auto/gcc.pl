@@ -90,9 +90,14 @@ sub runstep {
          2.7 => "",
          2.8 => "-Wsign-compare",
          2.95 => "",
+	# 2.95 does align functions per default -malign-functions=4
+	#      where the argument is used as a power of 2
+	# 3.x  does not align functions per default, its turned on with
+	#      -O2 and -O3
+	#      -falign-functions=16 is the real alignment, no exponent
          3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked " .
 	        "-Wdisabled-optimization -mno-accumulate-outgoing-args " .
-		"-Wno-shadow -falign-functions=3 ",
+		"-Wno-shadow -falign-functions=16 ",
         # -Wsequence-point is part of -Wall
         # -Wfloat-equal may not be what we want
         # We shouldn't be using __packed__, but I doubt -Wpacked will harm us

@@ -42,7 +42,14 @@ void *mem_realloc_executable(void *, size_t);
 
 void* Parrot_memcpy_aligned(void*, void*, size_t);
 
-#ifdef PARROT_HAS_I386_MMX
+#if defined(PARROT_HAS_I386_SSE)
+
+typedef void* (*Parrot_memcpy_func_t)(void *dest, void *src, size_t);
+extern Parrot_memcpy_func_t Parrot_memcpy_aligned_sse;
+
+#  define Parrot_memcpy_aligned(d,s,l) Parrot_memcpy_aligned_sse(d,s,l)
+
+#elif defined(PARROT_HAS_I386_MMX)
 
 typedef void* (*Parrot_memcpy_func_t)(void *dest, void *src, size_t);
 extern Parrot_memcpy_func_t Parrot_memcpy_aligned_mmx;
