@@ -31,9 +31,20 @@ types (detailed below) for the basic types.
 
 The PMC wrapper for Parrot's low-level integer type. Always an
 integer, with other types auto-converted to an integer when stored
-into this PMC.
+into this PMC. The range and behaviour of the Integer PMC is
+identical to the platform low-level integer.
 
 The boolean value for an Integer is false if zero, otherwise true.
+
+Floating point, string, and bignum values assigned to an Integer PMC
+round to the nearest integer. Floats, or strings which resolve to
+numbers, cap at the platform maximum or minimum integer value.
+
+Integer PMCs take on a value of 1 if a boolean true is assigned, and
+a value of 0 if a boolean false is assigned.
+
+If an out-of-range value is assigned to an Integer PMC, the PMC will
+throw an exception if exact math is enaabled.
 
 =item Float
 
@@ -43,6 +54,12 @@ PMC.
 
 The boolean value for a Float is false if exactly zero, otherwise
 true.
+
+When converted to an integer, floats round to the closest integer,
+capping at the platform maximum or minimum integer value.
+
+When converting to a string, floats use the platform default snprintf
+format.
 
 =item String
 
@@ -151,6 +168,17 @@ TERM (the terminal type on most Unix systems):
 Note that an embedding system may override this behaviour.
 
 =back
+
+=head2 Binary Math operations
+
+The following is a list of what should happen with the basic types
+when used in a binary math operation:
+
+=over 4
+
+=item Integer x Integer
+
+The operation is an integer.
 
 =head1 IMPLEMENTATION
 
