@@ -266,36 +266,30 @@ sub parse_locate {	# locate x,y   | locate x   | locate ,y
 			@e2=EXPRESSION();
 		}
 	}
-	if ( (@e and not @e2) or 
-	     (@e2 and not @e)) {	# X but no Y or Y but no X
-	print CODE "\tbsr SCREEN_FINDPOS\t# Update positions\n"
-	}
-	if (@e and @e2) {  	# X but no Y
+	if (@e and @e2) {  	# X and Y
 	print CODE<<XANDY;
 @e	bsr DEREF
 	bsr CAST_TO_INT
 	set P7, P6
+	pushp		
 @e2	bsr DEREF		# Got both
 	bsr CAST_TO_INT
+	save P6
+	popp
+	restore P6
 	bsr SCREEN_LOCATE		
 XANDY
 	} elsif (@e2 and not @e) {
 	print CODE<<YNOTX;
-	bsr SCREEN_GETXCUR	# Y and no X
-	set P7, P6
 @e2	bsr DEREF
 	bsr CAST_TO_INT
-	bsr SCREEN_LOCATE
+	bsr SCREEN_SETYCUR
 YNOTX
 	} elsif (@e and not @e2) {
 	print CODE<<XNOTY;
-	bsr SCREEN_GETYCUR	# X and no Y
-	set P8, P6
 @e	bsr DEREF
 	bsr CAST_TO_INT
-	set P7, P6
-	set P6, P8
-	bsr SCREEN_LOCATE
+	bsr SCREEN_SETXCUR
 XNOTY
 	}
 }

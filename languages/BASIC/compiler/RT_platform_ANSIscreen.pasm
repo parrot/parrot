@@ -11,6 +11,13 @@ ANSI_SCREEN_CLEAR:
 ANSI_SCREEN_FINDPOS:	# Probably not possible.  :(
 	ret
 
+
+ANSI_SCREEN_SETXCUR:
+	ret
+
+ANSI_SCREEN_SETYCUR:
+	ret
+
 	# I0,I1
 	# QB origin is 1,1
 ANSI_SCREEN_LOCATE:

@@ -18,6 +18,7 @@ WIN32_CONSOLE_SETUP:
 	ret
 
 WIN32_CONSOLE_INFO:
+	pushi
 	set P1, P24["kernel32"]		      # 65
 	dlfunc P0, P1, "GetConsoleScreenBufferInfo", "ipp"
 	set P5, P24["handle"]
@@ -43,6 +44,7 @@ WIN32_CONSOLE_INFO:
 	set P0["cury"], I1
 	set I1, P5[8]
 	set P0["attr"], I1	# wAttributes
+	popi
 	ret
 
 	# P5 ManagedStruct
@@ -116,6 +118,23 @@ WIN32_SCREEN_GETYCUR:
 	set P1, P24["console"]
 	set I0, P1["cury"]
 	ret
+
+	# Call with I1 as the Y 
+WIN32_SCREEN_SETXCUR:
+	bsr WIN32_SCREEN_FINDPOS
+	bsr WIN32_SCREEN_GETYCUR
+	bsr WIN32_SCREEN_LOCATE
+	ret
+	# Call with I1 as the X
+WIN32_SCREEN_SETYCUR:
+	set I2, I1
+	bsr WIN32_SCREEN_FINDPOS
+	bsr WIN32_SCREEN_GETXCUR
+	set I1, I0
+	set I0, I2
+	bsr WIN32_SCREEN_LOCATE
+	ret
+	
 WIN32_SCREEN_LOCATE:
 	dec I0		# 1,1 is the origin in QuickBASIC
 	dec I1

@@ -18,34 +18,17 @@ SCREEN_CLEAR:
 	eq S0, "MSWin32", WIN32_SCREEN_CLEAR
 	branch ANSI_SCREEN_CLEAR
 
-# Next three probably only possible under Win32.
-SCREEN_FINDPOS:
+SCREEN_SETXCUR:
+	set I1, P6["value"]
 	sysinfo S0, 4
-	eq S0, "MSWin32", WIN32_SCREEN_FINDPOS
-	branch ANSI_SCREEN_FINDPOS
+	eq S0, "MSWin32", WIN32_SCREEN_SETXCUR
+	branch ANSI_SCREEN_SETXCUR
 
-SCREEN_GETXCUR:
+SCREEN_SETYCUR:
+	set I1, P6["value"]
 	sysinfo S0, 4
-	set I0, 0
-	ne S0, "MSWin32", SCREEN_GETXCUR_NOTWIN
-	bsr WIN32_SCREEN_GETXCUR
-SCREEN_GETXCUR_NOTWIN:
-	new P6, .PerlHash
-	set P6["type"],"INT"
-	set P6["value"],I0
-	ret
-
-SCREEN_GETYCUR:
-	sysinfo S0, 4
-	set I0, 0
-	ne S0, "MSWin32", SCREEN_GETYCUR_NOTWIN
-	bsr WIN32_SCREEN_GETYCUR
-SCREEN_GETYCUR_NOTWIN:
-	new P6, .PerlHash
-	set P6["type"],"INT"
-	set P6["value"],I0
-	ret
-# End of portability nightmare
+	eq S0, "MSWin32", WIN32_SCREEN_SETYCUR
+	branch ANSI_SCREEN_SETYCUR
 
 	# X in P7, Y in P6
 SCREEN_LOCATE:
@@ -63,6 +46,8 @@ SCREEN_COLOR:
 	eq S0, "MSWin32", WIN32_SCREEN_COLOR
 	branch ANSI_SCREEN_COLOR
 
+
+# Problem in ANSI
 SCREEN_GETFORE:
 	sysinfo S0, 4
 	set I0, 0
