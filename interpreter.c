@@ -34,7 +34,7 @@ check_fingerprint(void) {
         
         if (strncmp(OPCODE_FINGERPRINT, fp_data, fp_len)) {
             fprintf(stderr, "Error: Opcode table fingerprint in bytecode does not match interpreter!\n");
-            fprintf(stderr, "       Bytecode:    %*s\n", -fp_len, fp_data);
+            fprintf(stderr, "       Bytecode:    %*s\n", (int)-fp_len, fp_data);
             fprintf(stderr, "       Interpreter: %s\n", OPCODE_FINGERPRINT);
             exit(1);
         }
@@ -71,7 +71,7 @@ trace_op(opcode_t * code_start, long code_size, opcode_t *code) {
     int i;
 
     if (code >= code_start && code < (code_start + code_size)) {
-        fprintf(stderr, "PC=%ld; OP=%ld (%s)", code - code_start, *code, op_names[code->i]);
+        fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(code - code_start), code->i, op_names[code->i]);
         if (op_args[code->i]) {
             fprintf(stderr, "; ARGS=(");
             for(i = 0; i < op_args[code->i]; i++) {
@@ -83,7 +83,7 @@ trace_op(opcode_t * code_start, long code_size, opcode_t *code) {
         fprintf(stderr, "\n");
     }
     else {
-        fprintf(stderr, "PC=%ld; OP=<err>\n", code - code_start);
+        fprintf(stderr, "PC=%ld; OP=<err>\n", (long)(code - code_start));
     }
 }
 
