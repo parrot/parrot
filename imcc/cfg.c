@@ -211,7 +211,8 @@ void bb_findadd_edge(Basic_block *from, SymReg *label) {
         debug(DEBUG_CFG, "register branch %s ",
                 ins_string(from->end));
         for (ins = from->end; ins; ins = ins->prev) {
-            if ((ins->type & ITBRANCH) && !strcmp(ins->op, "set_addr")) {
+            if ((ins->type & ITBRANCH) && !strcmp(ins->op, "set_addr") &&
+                    ins->r[1]->first_ins) {
                 bb_add_edge(from, bb_list[ins->r[1]->first_ins->bbindex]);
                 debug(DEBUG_CFG, "(%s) ", ins->r[1]->name);
                 break;
