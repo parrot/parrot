@@ -914,14 +914,14 @@ PIO_reads(theINTERP, PMC *pmc, size_t len)
 	char *buffer = malloc(len);
 	UINTVAL length_read = 0;
 	STRING *temp = NULL;
-	
+
 	length_read = PIO_read(interpreter, pmc, buffer, len);
 	temp = string_make(interpreter, buffer, length_read, "UTF-8", 0);
 	/* this is temporary, to make freeze/thaw work */
 	Parrot_string_downscale(interpreter, temp, enum_stringrep_one); /* squish it */
 
 	free(buffer);
-	
+
 	return temp;
 }
 
@@ -1068,22 +1068,22 @@ Writes C<*s> tp C<*pmc>. Parrot string version.
 INTVAL
 PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
-	UINTVAL length = string_length(interpreter, s);
-	char *buffer = malloc(4*length);
-	char *cursor = buffer;
-	UINTVAL index = 0;
-	INTVAL temp = 0;
-	
-	/* temporary--write out in UTF-8 */
-	for( index = 0; index < length; ++index )
-	{
-		cursor = Parrot_utf8_encode(cursor, string_index(interpreter, s, index));
-	}
-	
+    UINTVAL length = string_length(interpreter, s);
+    char *buffer = malloc(4*length);
+    char *cursor = buffer;
+    UINTVAL idx = 0;
+    INTVAL temp = 0;
+
+    /* temporary--write out in UTF-8 */
+    for( idx = 0; idx < length; ++idx )
+    {
+        cursor = Parrot_utf8_encode(cursor, string_index(interpreter, s, idx));
+    }
+
     temp = PIO_write(interpreter, pmc, buffer, cursor - buffer);
-    
+
     free(buffer);
-    
+
     return temp;
 }
 

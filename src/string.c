@@ -267,7 +267,7 @@ string_make_empty(struct Parrot_Interp *interpreter,
     STRING *s;
 
 	s = new_string_header(interpreter, 0);
-	
+
 	s->representation = representation;
 
 	Parrot_allocate_string(interpreter, s, string_max_bytes(interpreter, s, capacity));
@@ -285,7 +285,7 @@ _string_upscale(struct Parrot_Interp *interpreter, STRING *s,
 	if( s->representation >= representation )
 	{
 		if( capacity > s->strlen )
-		{ 
+		{
 			string_grow(interpreter, s, capacity - s->strlen);
 		}
 	}
@@ -294,15 +294,15 @@ _string_upscale(struct Parrot_Interp *interpreter, STRING *s,
 		STRING *temp;
 
 		UINTVAL needed_length = s->strlen;
-		
+
 		if( capacity > needed_length ) { needed_length = capacity; }
-		
+
 		temp = string_make_empty(interpreter, representation, needed_length);
 
 		string_append(interpreter, temp, s, s->obj.flags);
-		
+
 		string_set(interpreter, s, temp);
-		
+
 		/*
 		s->representation = temp->representation;
 		s->bufstart = temp->bufstart;
@@ -327,15 +327,15 @@ _string_downscale(struct Parrot_Interp *interpreter, STRING *s,
 	else /* s->representation > representation */
 	{
 		UINTVAL count = s->strlen;
-		
+
 		if( s->representation == enum_stringrep_four )
 		{
 			uint32_t *oldCursor = (uint32_t*)s->strstart;
-			
+
 			if( representation == enum_stringrep_two )
 			{
 				uint16_t *newCursor = (uint16_t*)s->strstart;
-				
+
 				while( count-- )
 				{
 					*(newCursor++) = *(oldCursor++);
@@ -344,7 +344,7 @@ _string_downscale(struct Parrot_Interp *interpreter, STRING *s,
 			else /* representation == enum_stringrep_one */
 			{
 				uint8_t *newCursor = (uint8_t*)s->strstart;
-				
+
 				while( count-- )
 				{
 					*(newCursor++) = *(oldCursor++);
@@ -355,14 +355,14 @@ _string_downscale(struct Parrot_Interp *interpreter, STRING *s,
 		{
 			uint16_t *oldCursor = (uint16_t*)s->strstart;
 			uint8_t *newCursor = (uint8_t*)s->strstart;
-			
+
 			while( count-- )
 			{
 				assert(*oldCursor <= 0xFF);
 				*(newCursor++) = *(oldCursor++);
 			}
 		}
-		
+
 		s->representation = representation;
 		s->bufused = string_max_bytes(interpreter, s, s->strlen);
 	}
@@ -389,7 +389,7 @@ _string_smallest_representation(struct Parrot_Interp *interpreter, STRING *s)
 	{
 		uint16_t *cur = (uint16_t *)s->strstart;
 		uint16_t *end = cur + s->strlen;
-		
+
 		while( cur < end )
 		{
 			if( *cur > 255 )
@@ -398,7 +398,7 @@ _string_smallest_representation(struct Parrot_Interp *interpreter, STRING *s)
 			}
 			cur++;
 		}
-		
+
 		return enum_stringrep_one;
 	}
 	else if( s->representation == enum_stringrep_four )
@@ -406,7 +406,7 @@ _string_smallest_representation(struct Parrot_Interp *interpreter, STRING *s)
 		uint32_t *cur = (uint32_t *)s->strstart;
 		uint32_t *end = cur + s->strlen;
 		int saw_two = 0;
-		
+
 		while( cur < end )
 		{
 			if( *cur > 0xFFFF )
@@ -419,7 +419,7 @@ _string_smallest_representation(struct Parrot_Interp *interpreter, STRING *s)
 			}
 			cur++;
 		}
-		
+
 		if( saw_two )
 		{
 			return enum_stringrep_two;
@@ -451,6 +451,8 @@ STRING *
 string_append(struct Parrot_Interp *interpreter, STRING *a,
               STRING *b, UINTVAL Uflags)
 {
+    UINTVAL a_capacity;
+    UINTVAL total_length;
     UNUSED(Uflags);
 
     /* If B isn't real, we just bail */
@@ -467,111 +469,111 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
         {
             return string_concat(interpreter, a, b, Uflags);
         }
-        
-		UINTVAL a_capacity = string_capacity(interpreter, a);
-		UINTVAL total_length = string_length(interpreter, a) 
-										+ string_length(interpreter, b);
 
-		if( a->representation < b->representation ) /* need to "upscale" */
+        a_capacity = string_capacity(interpreter, a);
+        total_length = string_length(interpreter, a)
+            + string_length(interpreter, b);
+
+        if( a->representation < b->representation ) /* need to "upscale" */
         {
-			_string_upscale(interpreter, a, b->representation, total_length);        
+            _string_upscale(interpreter, a, b->representation, total_length);
         }
 
         if( a->representation >= b->representation )
         {
-        /* make sure A's big enough for both */
-			if (a_capacity < total_length)
-			{
-				a = string_grow(interpreter, a, 
-									(total_length - a_capacity) + EXTRA_SIZE);
-        }
-        else
-			{
-            unmake_COW(interpreter, a);
-			}
-			
-			/* A is now ready to receive the contents of B */
+            /* make sure A's big enough for both */
+            if (a_capacity < total_length)
+            {
+                a = string_grow(interpreter, a,
+                        (total_length - a_capacity) + EXTRA_SIZE);
+            }
+            else
+            {
+                unmake_COW(interpreter, a);
+            }
 
-			/* if same rep, can memcopy */
-			if( a->representation == b->representation )
-			{
-        /* Tack B on the end of A */
-        mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
+            /* A is now ready to receive the contents of B */
+
+            /* if same rep, can memcopy */
+            if( a->representation == b->representation )
+            {
+                /* Tack B on the end of A */
+                mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
                         b->strstart, b->bufused);
-							
-        a->bufused += b->bufused;
-        a->strlen += b->strlen;
+
+                a->bufused += b->bufused;
+                a->strlen += b->strlen;
+                return a;
+            }
+            else /* if not, need to loop */ /* fast_byte_append v. safe_byte_append */
+            {
+                /* remember, this is the case of rep A > rep B */
+                if( a->representation == enum_stringrep_two ) /* B must have rep one */
+                {
+                    uint16_t *a_cursor = (uint16_t *)((ptrcast_t)a->strstart + a->bufused);
+
+                    uint8_t *b_cursor = (uint8_t *)((ptrcast_t)b->strstart);
+                    uint8_t *b_end = (uint8_t *)((ptrcast_t)b->strstart + b->bufused);
+
+                    while(b_cursor < b_end)
+                    {
+                        *(a_cursor++) = *(b_cursor++);
+                    }
+
+                    a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
+                    string_compute_strlen(interpreter, a);
+                }
+                else if( a->representation == enum_stringrep_four )
+                {
+                    uint32_t *a_cursor = (uint32_t *)((ptrcast_t)a->strstart + a->bufused);
+
+                    switch( b->representation )
+                    {
+                        case enum_stringrep_one:
+                            {
+                                uint8_t *b_cursor = (uint8_t *)((ptrcast_t)b->strstart);
+                                uint8_t *b_end = (uint8_t *)((ptrcast_t)b->strstart + b->bufused);
+
+                                while(b_cursor < b_end)
+                                {
+                                    *(a_cursor++) = *(b_cursor++);
+                                }
+
+                                a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
+                                string_compute_strlen(interpreter, a);
+
+                                break;
+                            }
+                        case enum_stringrep_two:
+                            {
+                                uint16_t *b_cursor = (uint16_t *)((ptrcast_t)b->strstart);
+                                uint16_t *b_end = (uint16_t *)((ptrcast_t)b->strstart + b->bufused);
+
+                                while(b_cursor < b_end)
+                                {
+                                    *(a_cursor++) = *(b_cursor++);
+                                }
+
+                                a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
+                                string_compute_strlen(interpreter, a);
+
+                                break;
+                            }
+                        default:
+                            /* trouble */
+                            break;
+                    }
+                }
+                else
+                {
+                    /* problem */
+                }
+            }
+        }
+
         return a;
     }
-			else /* if not, need to loop */ /* fast_byte_append v. safe_byte_append */
-			{
-				/* remember, this is the case of rep A > rep B */
-				if( a->representation == enum_stringrep_two ) /* B must have rep one */
-				{
-					uint16_t *a_cursor = (uint16_t *)((ptrcast_t)a->strstart + a->bufused);
 
-					uint8_t *b_cursor = (uint8_t *)((ptrcast_t)b->strstart);
-					uint8_t *b_end = (uint8_t *)((ptrcast_t)b->strstart + b->bufused);
-					
-					while(b_cursor < b_end)
-					{
-						*(a_cursor++) = *(b_cursor++);
-					}
-					
-					a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
-					string_compute_strlen(interpreter, a);
-				}
-				else if( a->representation == enum_stringrep_four )
-				{
-					uint32_t *a_cursor = (uint32_t *)((ptrcast_t)a->strstart + a->bufused);
-
-					switch( b->representation )
-					{
-						case enum_stringrep_one:
-						{
-							uint8_t *b_cursor = (uint8_t *)((ptrcast_t)b->strstart);
-							uint8_t *b_end = (uint8_t *)((ptrcast_t)b->strstart + b->bufused);
-
-							while(b_cursor < b_end)
-							{
-								*(a_cursor++) = *(b_cursor++);
-							}
-					
-							a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
-							string_compute_strlen(interpreter, a);
-
-							break;
-						}
-						case enum_stringrep_two:
-						{
-							uint16_t *b_cursor = (uint16_t *)((ptrcast_t)b->strstart);
-							uint16_t *b_end = (uint16_t *)((ptrcast_t)b->strstart + b->bufused);
-							
-							while(b_cursor < b_end)
-							{
-								*(a_cursor++) = *(b_cursor++);
-							}
-
-							a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
-							string_compute_strlen(interpreter, a);
-							
-							break;
-						}
-						default:
-							/* trouble */
-							break;
-					}
-				}
-				else
-				{
-					/* problem */
-				}
-			}
-        }
-        
-        return a;     
-    }
-    
     /* If we got here, A was NULL. So clone B. */
     return string_copy(interpreter, b);
 }
@@ -601,7 +603,7 @@ string_from_cstring(struct Parrot_Interp *interpreter, const void *buffer,
 {
     return string_make(interpreter, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
-                       "iso-8859-1", NULL); /* make this utf-8 eventually? */
+                       "iso-8859-1", 0); /* make this utf-8 eventually? */
 }
 
 /* needed for packfile unpacking, unless we just always use utf-8, or BOCU */
@@ -624,7 +626,7 @@ string_primary_encoding_for_representation(struct Parrot_Interp *interpreter,
 			internal_exception(INVALID_STRING_REPRESENTATION,
 				"string_primary_encoding_for_representation: invalid string representation");
 			return NULL;
-			break;			
+			break;
 	}
 }
 
@@ -675,11 +677,11 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
 				"string_make: no encoding name specified");
     }
     else
-    {    
+    {
 		s = new_string_header(interpreter, flags); /* FIXME: ignorning flags below */
 
 		s->representation = enum_stringrep_unknown;
-		
+
     	if (strcmp(encoding_name, "iso-8859-1") == 0 )
     	{
 			s->representation = enum_stringrep_one;
@@ -697,7 +699,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
 		{
 			/* decide in here on the size to use, and transcode.... */
 			Parrot_allocate_string(interpreter, s, len);
-			
+
 			if (buffer)
 			{
             mem_sys_memcopy(s->strstart, buffer, len);
@@ -980,13 +982,13 @@ string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
    for downsizing, need to check if there are any characters which won't
    fit in the downsized range--if so, to search would fail, so bail. should
    do the up- or down-sizing inside of the search helper methods, above, so
-   that we can traverse for prep work just once--building the index and 
-   scaling the rep. at the same time. that gives us a bunch of different 
+   that we can traverse for prep work just once--building the index and
+   scaling the rep. at the same time. that gives us a bunch of different
    variants (both size 1, both size 2 or both size 4, and size mismatched
    with search string smaller rep, and size mismatched with search string
    larger rep. */
 
-    if (s->representation == s2->representation) 
+    if (s->representation == s2->representation)
     {
     	switch (s->representation)
     	{
@@ -1001,7 +1003,7 @@ string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
 						"string_str_index: case not implemented yet");
 				return -1;
 			break;
-    			break;    			
+    			break;
     }
     }
     else
@@ -1064,7 +1066,7 @@ string_ord(struct Parrot_Interp *interpreter, const STRING *s, INTVAL idx)
 /* allow this to take an array of ints? */
 STRING *
 string_chr(struct Parrot_Interp *interpreter, UINTVAL character)
-{	
+{
 	if( character <= 0xFF )
 	{
 		uint8_t c = (uint8_t)character;
@@ -1172,9 +1174,9 @@ string_concat(struct Parrot_Interp *interpreter, STRING *a,
     {
         if (b != NULL && b->strlen != 0)
         {
-			STRING *result = 
+			STRING *result =
 				string_make_empty(interpreter,
-						(a->representation >= b->representation) ? 
+						(a->representation >= b->representation) ?
 								a->representation : b->representation,
 						a->strlen + b->strlen);
 
@@ -1297,7 +1299,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
     else
         dest = make_COW_reference(interpreter, src);
 
-	dest->strstart = (char *)dest->strstart 
+	dest->strstart = (char *)dest->strstart
 						+ string_max_bytes(interpreter, dest, true_offset);
 	dest->bufused = string_max_bytes(interpreter, dest, true_length);
 
@@ -1379,14 +1381,14 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 	if (d != NULL)
 	{
 		UINTVAL length_bytes = string_max_bytes(interpreter, src, true_length);
-		
+
 		dest = string_make_empty(interpreter, src->representation, true_length);
-	
-		mem_sys_memcopy(dest->strstart, 
-						(char *)src->strstart 
+
+		mem_sys_memcopy(dest->strstart,
+						(char *)src->strstart
 							+ string_max_bytes(interpreter, src, true_offset),
 						length_bytes);
-						
+
 		dest->bufused = length_bytes;
 		dest->strlen = true_length;
 
@@ -1405,7 +1407,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 		}
 		else
 		{
-			/* must upsize target string; would be more efficient to do such that the 
+			/* must upsize target string; would be more efficient to do such that the
 			   replacement is done at the same time */
 			_string_upscale(interpreter, src, rep->representation, 0);
     }
@@ -1416,7 +1418,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     substart_off = string_max_bytes(interpreter, src, true_offset);
 
     subend_off = substart_off + string_max_bytes(interpreter, src, true_length);
-    
+
 	/* not possible.... */
     if (subend_off < substart_off) {
         internal_exception(SUBSTR_OUT_OF_STRING,
@@ -1509,11 +1511,11 @@ string_chopn(struct Parrot_Interp *interpreter, STRING *s, INTVAL n)
 #define COMPARE_STRINGS(type1, type2, s1, s2, result) \
 do { \
 	size_t minlen = s1->strlen > s2->strlen ? s2->strlen : s1->strlen; \
-	size_t index = 0; \
+	size_t _index = 0; \
 	type1 *curr1 = (type1 *)s1->strstart; \
 	type2 *curr2 = (type2 *)s2->strstart; \
 	 \
-	while( (index++ < minlen) && (*curr1 == *curr2) ) \
+	while( (_index++ < minlen) && (*curr1 == *curr2) ) \
 	{ \
 		++curr1; \
 		++curr2; \
@@ -1576,7 +1578,7 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
 	{
 		switch( s1->representation )
 		{
-		
+
 			case enum_stringrep_one:
 				/* could use memcmp in this one case; faster?? */
 				COMPARE_STRINGS(uint8_t, uint8_t, s1, s2, &cmp);
@@ -1752,7 +1754,7 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
     if (s1 && s2)
     {
 		minlen = s1->strlen > s2->strlen ? s2->strlen : s1->strlen;
-		maxrep = s1->representation >= s2->representation ? 
+		maxrep = s1->representation >= s2->representation ?
 						s1->representation : s2->representation;
 	}
 
@@ -1792,7 +1794,7 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
 	{
 		switch( s1->representation )
 		{
-		
+
 			case enum_stringrep_one:
 				BITWISE_AND_STRINGS(uint8_t, uint8_t, uint8_t, s1, s2, res, minlen);
 				break;
@@ -1846,7 +1848,7 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
 
     if (dest)
         *dest = res;
-        
+
     return res;
 }
 
@@ -1856,6 +1858,8 @@ do { \
 	const type2 *curr2 = NULL; \
 	size_t length1 = 0; \
 	size_t length2 = 0; \
+        restype *dp; \
+        size_t _index; \
 	 \
 	if( s1 ) \
 	{ \
@@ -1869,19 +1873,19 @@ do { \
 		length2 = s2->strlen; \
 	} \
  \
-    restype *dp = (restype *)res->strstart; \
-    size_t index = 0; \
+    dp = (restype *)res->strstart; \
+    _index = 0; \
  \
-    for ( ; index < maxlen ; ++curr1, ++curr2, ++dp, ++index) \
+    for ( ; _index < maxlen ; ++curr1, ++curr2, ++dp, ++_index) \
     { \
-        if (index < length1) \
+        if (_index < length1) \
         { \
-        	if (index < length2) \
+        	if (_index < length2) \
 				*dp = *curr1 op *curr2; \
 			else \
 				*dp = *curr1; \
 		} \
-        else if (index < length2) \
+        else if (_index < length2) \
         { \
             *dp = *curr2; \
         } \
@@ -1994,7 +1998,7 @@ string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
 
 	res->strlen = maxlen;
 	res->bufused = string_max_bytes(interpreter, res, res->strlen);
-	
+
     if (dest)
         *dest = res;
 
@@ -2107,7 +2111,7 @@ string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
 
 	res->strlen = maxlen;
 	res->bufused = string_max_bytes(interpreter, res, res->strlen);
-	
+
     if (dest)
         *dest = res;
 
@@ -2431,7 +2435,7 @@ string_to_num(struct Parrot_Interp *interpreter, const STRING *s)
     FLOATVAL f = 0.0;
 
     if (s) {
-        UINTVAL index = 0;
+        UINTVAL idx = 0;
         UINTVAL length = s->strlen;
         int sign = 1;
         INTVAL seen_dot = 0;
@@ -2444,8 +2448,8 @@ string_to_num(struct Parrot_Interp *interpreter, const STRING *s)
         INTVAL digit_family = 0;
         FLOATVAL exp_log=10.0, exp_val=1.0;
 
-        while (index < length) {
-			UINTVAL c = string_index(interpreter, s, index);
+        while (idx < length) {
+			UINTVAL c = string_index(interpreter, s, idx);
             INTVAL df = Parrot_char_is_digit(interpreter, c);
 
             if (df && !digit_family)
@@ -2505,7 +2509,7 @@ string_to_num(struct Parrot_Interp *interpreter, const STRING *s)
                 }
             }
 
-            ++index;
+            ++idx;
         }
 
         exponent = fake_exponent + exponent * exp_sign;
@@ -2754,7 +2758,7 @@ string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
     UNUSED(interpreter);
 
 	if( !s ) { return 0; }
-	
+
 	switch( s->representation )
 	{
 		case enum_stringrep_one:
@@ -2775,7 +2779,7 @@ string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
 }
 
 static void
-string_append_chr(struct Parrot_Interp * interpreter, 
+string_append_chr(struct Parrot_Interp * interpreter,
 				  STRING *s, UINTVAL character)
 {
 	/* easy way for now; could make it more efficient */
@@ -2807,31 +2811,31 @@ _parse_hex_digits(char **cstring, int incount)
 		}
 	}
 
-	return cval;	
+	return cval;
 }
 
 static STRING *
 string_constant_copy(struct Parrot_Interp *interpreter, STRING* s)
 {
-	return string_make(interpreter, s->strstart, s->bufused, 
-			string_primary_encoding_for_representation(interpreter, 
+	return string_make(interpreter, s->strstart, s->bufused,
+			string_primary_encoding_for_representation(interpreter,
 												s->representation),
 			(PObj_get_FLAGS(s) | PObj_constant_FLAG) );
 }
-            
+
 static void
-_string_unescape_cstring_large(struct Parrot_Interp * interpreter, 
+_string_unescape_cstring_large(struct Parrot_Interp * interpreter,
 								char *cstring, STRING *outstring, UINTVAL firstchar,
 								char delimiter)
 {
     char hexdigits[] = "0123456789abcdef";
     STRING *result = outstring;
     char *string;
-    
+
 	if( outstring ) string_append_chr(interpreter, result, firstchar);
 
     if( !cstring ) return;
-    
+
     for (string = cstring ; *string; ++string)
     {
         if (*string == '\\' && string[1]) {
@@ -2882,9 +2886,9 @@ string_unescape_cstring(struct Parrot_Interp * interpreter, char *cstring, char 
     char hexdigits[] = "0123456789abcdef";
     STRING *result;
     size_t clength = strlen(cstring);
-    
+
     if( !cstring || !clength ) return NULL;
-    
+
 	result = string_make(interpreter, cstring, clength, "iso-8859-1", 0);
 
     for (p = (char *)result->strstart, string = cstring ; *string; ++string)
@@ -2937,7 +2941,7 @@ string_unescape_cstring(struct Parrot_Interp * interpreter, char *cstring, char 
                     {
                     	UINTVAL cval = 0;
                     	int count = 4;
-                    	
+
                     	while (count-- && string[1])
                     	{
 							int c1 = tolower(*++string);
@@ -2953,7 +2957,7 @@ string_unescape_cstring(struct Parrot_Interp * interpreter, char *cstring, char 
 							}
 
                     	}
-                    	
+
                     	if( cval <= 0xFF )
                     	{
 							*p++ = cval;
@@ -2962,12 +2966,12 @@ string_unescape_cstring(struct Parrot_Interp * interpreter, char *cstring, char 
                     	{
                     		/* fall back to a method which handles non-rep-1 strings */
                     		++string;
-                    		
+
                     		/* finish up the string so far */
 							result->bufused = p - (char *)result->strstart;
 							string_compute_strlen(interpreter, result);
 
-							_string_unescape_cstring_large(interpreter, string, 
+							_string_unescape_cstring_large(interpreter, string,
 														result, cval, delimiter);
 							return string_constant_copy(interpreter, result);
                     	}
@@ -2983,7 +2987,7 @@ string_unescape_cstring(struct Parrot_Interp * interpreter, char *cstring, char 
         else
             *p++ = *string;
     }
-    
+
     result->bufused = p - (char *)result->strstart;
     string_compute_strlen(interpreter, result);
 

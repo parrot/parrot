@@ -37,7 +37,7 @@ sub runstep {
 #  }
 
 #  print "\n";
-  
+
   # MS VC++ requires special treatment.
   my ($cc) = Configure::Data->get(qw(cc));
   my $is_msvc = grep { $cc eq $_ } ( qw(cl cl.exe) );
@@ -60,7 +60,7 @@ RULES
     );
     return;
   }
-  
+
   # Below we use a configure line suggested by icu/README.parrot
   my $cwd = cwd();
 
@@ -70,7 +70,7 @@ RULES
 	blib_lib_libsicuuc_a => 'blib/lib/libicuuc$(A)',
     blib_lib_libsicudata_a => 'blib/lib/libicudata$(A)',
     cc_inc => Configure::Data->get(qw(cc_inc)).' -I./blib/include',
-    icu_make => <<"RULES",
+    TEMP_icu_make => <<"RULES",
 ###############################################################################
 #
 # Build ICU:
@@ -84,8 +84,6 @@ icu.dummy :
 
 icu.clean :
 	\$(MAKE_C) icu/source clean
-
-clean : icu.clean
 
 \$(ICU_H_FILES) : \$(LIBICUCORE)
 

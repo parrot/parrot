@@ -161,23 +161,23 @@ void *Parrot_utf8_encode(void *ptr, UINTVAL c);
 static void
 push_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING *s)
 {
-	UINTVAL length = string_length(interpreter, s);
-	char *buffer = malloc(4*length);
-	char *cursor = buffer;
-	UINTVAL index = 0;
-	INTVAL temp = 0;
-	
-	/* temporary--write out in UTF-8 */
-	for( index = 0; index < length; ++index )
-	{
-/*		cursor = Parrot_utf8_encode(cursor, string_index(interpreter, s, index)); */
-		*cursor++ = (unsigned char)string_index(interpreter, s, index);
-	}
+    UINTVAL length = string_length(interpreter, s);
+    char *buffer = malloc(4*length);
+    char *cursor = buffer;
+    UINTVAL idx = 0;
+    INTVAL temp = 0;
+
+    /* temporary--write out in UTF-8 */
+    for( idx = 0; idx < length; ++idx )
+    {
+        /*		cursor = Parrot_utf8_encode(cursor, string_index(interpreter, s, idx)); */
+        *cursor++ = (unsigned char)string_index(interpreter, s, idx);
+    }
 
     str_append(interpreter, io->image, buffer, cursor - buffer);
     str_append(interpreter, io->image, " ", 1);
 
-    free(buffer);   
+    free(buffer);
 }
 
 /*
