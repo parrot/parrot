@@ -105,7 +105,8 @@ pmclass PerlArray extends Array {
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-	DYNSELF.set_pmc_keyed_int(&ix, src, src_key);
+	Parrot_PerlArray_set_pmc_ptr(INTERP, (List *) SELF->data, ix);
+        SUPER(key, src, src_key);
     };
 
     INTVAL get_integer_keyed_int (INTVAL* key) {
