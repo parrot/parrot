@@ -541,7 +541,7 @@ sub init_func() {
             $func = $method->{mmd};
             # dynamic classes need the runtime type
             # which is passed in entry to class_init
-            $left = "entry"; #"enum_class_$classname";
+            $left = 0;  # set to 'entry' below in initialization loop.
             $right = 0;
             push @mmds, [ $func, $left, $right, $meth_name ];
             foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
@@ -549,7 +549,6 @@ sub init_func() {
                 $meth_name = $variant->[1] . '_' .$variant->[0];
                 push @mmds, [ $func, $left, $right, $meth_name];
             }
-
         }
     }
     my $methlist = join(",\n        ", @meths);
@@ -583,16 +582,23 @@ EOC
 
     $cout .= <<"EOC" if $mmd_list ne '/* N/Y */';
 
-    const struct {
+    struct {
         INTVAL func_nr;
         INTVAL left, right;
         funcptr_t func_ptr;
     } _temp_mmd_init[] = {
         $mmd_list
     };
+    /*  Dynamic classes need the runtime type
+	which is passed in entry to class_init.
+    */
+    #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
+    int i;
+    for (i = 0; i < (int)N_MMD_INIT; ++i) {
+	_temp_mmd_init[i].left = entry;
+    }
 EOC
     $cout .= <<"EOC";
-    int i;
 
     /*
      * parrotio calls some class_init functions during its class_init
@@ -617,7 +623,6 @@ EOC
     /*
      * register mmds
      */
-    #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
     for (i = 0; i < (int)N_MMD_INIT; ++i) {
         mmd_register(interp,
             _temp_mmd_init[i].func_nr,
