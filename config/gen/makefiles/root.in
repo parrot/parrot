@@ -461,6 +461,8 @@ flags_dummy:
 library/config.fpmc: $(TEST_PROG) config_lib.pasm
 	@echo Invoking Parrot to generate library/config.fpmc--cross your fingers
 	./parrot config_lib.pasm
+	@echo If the next line prints $(VERSION), it did help.
+	./parrot parrot-config.imc VERSION DEVEL
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 

@@ -30,17 +30,22 @@ Copyright (c) 2004, the Perl Foundation.
     .local pmc conf_hash
     .local string key
     conf_hash = _config()
-    key = argv[1]
+    .local int i
+    i = 1
+loop:
+    key = argv[i]
     if key == '--dump' goto dump
     $I0 = defined conf_hash[key]
     if $I0 goto ok2
-    print "no such key: '"
+    print " no such key: '"
     print key
     print "'\n"
     end
 ok2:
     $S0 = conf_hash[key]
     print $S0
+    inc i
+    if i < argc goto loop
     print "\n"
     end
 dump:

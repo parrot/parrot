@@ -70,14 +70,25 @@ Initializes the subroutine.
 
 */
 
+    /*
+     * Sub PMC's flags uage:
+     * - private0 ... Coroutine flip/flop
+     * - private1 ... Fixup is done
+     * - private4 ... @MAIN
+     * - private5 ... @LOAD
+     * - private6 ... @IMMEDIATE
+     * - private7 ... @POSTCOMP
+     */
     void init () {
         PMC_sub(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
+#if 0
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
             printf("Address of base segment is %p\n",
                 ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
+#endif
     }
 
 /*
@@ -260,11 +271,13 @@ Archives the subroutine.
 
         SUPER(info);
         /*
-         * we currently need to write 3 items
-         * - name of the sub's label: in properties
+         * we currently need to write these items:
+         * - name of the sub's label: in properties?
          * - start offset in byte-code segment
          * - end   offset in byte-code segment
          * - segment TODO
+         * - flags  (i.e. @LOAD pragma and such)
+         * - namespace constant #
          */
 
         /*
