@@ -1,10 +1,9 @@
 #! perl -w
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 use Parrot::Config;
-SKIP: {
-    skip("no setenv", 3) unless $PConfig{"setenv"};
+
 $ENV{"PARROT_TMP"} = "riding a ponie";
 output_like(<<'CODE', <<OUT, "getenv");
     new P0, .Env
@@ -40,10 +39,30 @@ ok:
 CODE
 ok
 OUT
-}
+
+output_is(<<'CODE', <<OUT, "gone/delete");
+    new P0, .Env
+    set P0["PARROT_TMP"], "hello polly"
+    exists I0, P0["PARROT_TMP"]
+    if I0, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    delete P0["PARROT_TMP"]
+    set S0, P0["PARROT_TMP"]
+    unless S0, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
+OUT
 
 SKIP: {
-    skip("no unsetenv", 1) unless $PConfig{"unsetenv"};
+    # won't work on our unsetenv implementation
+    skip("no native unsetenv", 1) unless $PConfig{"unsetenv"};
 output_is(<<'CODE', <<OUT, "exists/delete");
     new P0, .Env
     set P0["PARROT_TMP"], "hello polly"
