@@ -94,13 +94,13 @@ The optional C<destination> field provides a general way to change
 where a file will be written to. It will be applied before any
 metadata tags.
 
-Example: if this line is in the MANIFEST.detailed file
+Example: if this line is in the MANIFEST.generated file
 
-  *[main]bin	languages/imcc/imcc     imcc
+  languages/snorkfest/snork-compile        [main]bin
 
 and the --bindir=/usr/parroty/bin, then the generated
 parrot-<VERSION>-1.<arch>.rpm file will contain the file
-/usr/parroty/bin/imcc.
+/usr/parroty/bin/snork-compile.
 
 =head1 SEE ALSO
 
@@ -121,18 +121,18 @@ my %options = ( buildprefix => '',
                 includedir => '/usr/include',
               );
 
-my $manifest;
+my @manifests;
 foreach (@ARGV) {
     if (/^--([^=]+)=(.*)/) {
         $options{$1} = $2;
     } else {
-        $manifest = $_;
+        push @manifests, $_;
     }
 }
 
 my @files;
 my %directories;
-@ARGV = ($manifest);
+@ARGV = @manifests;
 while(<>) {
     chomp;
     my ($src, $meta, $dest) = split(/\s+/, $_);
@@ -142,7 +142,7 @@ while(<>) {
     my $generated = $meta =~ s/^\*//;
     my ($package) = $meta =~ /^\[(.*?)\]/;
     $meta =~ s/^\[(.*?)\]//;
-    next if $package eq ""; # Skip if this file belongs to no package
+    next unless $package; # Skip if this file belongs to no package
     my %meta;
     @meta{split(/,/, $meta)} = ();
     $meta{$_} = 1 for (keys %meta); # Laziness

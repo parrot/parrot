@@ -8,8 +8,10 @@
 
 VERSION     = ${VERSION}${DEVEL}
 
+# Override at least PREFIX with the install location if you're going
+# to be using this outside of your build area.
 BUILDPREFIX =
-PREFIX      = /usr/local/parrot/$(VERSION)
+PREFIX      = /usr/local/parrot-$(VERSION)
 EXEC_PREFIX = $(PREFIX)
 BINDIR      = $(EXEC_PREFIX)/bin
 LIBDIR      = $(EXEC_PREFIX)/lib
@@ -869,6 +871,8 @@ $(SRC)/packout$(O) : $(GENERAL_H_FILES)
 $(SRC)/parrot$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/register$(O) : $(GENERAL_H_FILES) $(SRC)/generic_register.c
+
+$(SRC)/runops_cores$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/rx$(O) : $(GENERAL_H_FILES)
 
