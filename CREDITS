@@ -90,7 +90,7 @@ N: H.Merijn Brand
 D: HP-UX fixes and smoke tests
 
 N: Ion Alexandru Morega
-D: string.pmc
+D: string.pmc, complex.pmc
 
 N: Jarkko Hietaniemi
 D: packfile and Tru64 fixes

@@ -33,6 +33,7 @@ classes/array.pmc                                 []
 classes/bigint.pmc                                []
 classes/boolean.pmc                               []
 classes/closure.pmc                               []
+classes/complex.pmc                               []
 classes/compiler.pmc                              []
 classes/continuation.pmc                          []
 classes/coroutine.pmc                             []
@@ -383,6 +384,10 @@ examples/benchmarks/arriter.imc                   [main]doc
 examples/benchmarks/arriter.pl                    [main]doc
 examples/benchmarks/arriter.rb                    [main]doc
 examples/benchmarks/arriter_o1.imc                [main]doc
+examples/benchmarks/b60.imc                       [main]doc
+examples/benchmarks/b60.py                        [main]doc
+examples/benchmarks/b61.imc                       [main]doc
+examples/benchmarks/b61.py                        [main]doc
 examples/benchmarks/bench_newp.pasm               [main]doc
 examples/benchmarks/fib.imc                       [main]doc
 examples/benchmarks/fib.pl                        [main]doc
@@ -2714,6 +2719,7 @@ t/perl/Parrot_IO.t                                [devel]
 t/pmc/array.t                                     []
 t/pmc/bigint.t                                    []
 t/pmc/boolean.t                                   []
+t/pmc/complex.t                                   []
 t/pmc/coroutine.t                                 []
 t/pmc/delegate.t                                  []
 t/pmc/env.t                                       []
