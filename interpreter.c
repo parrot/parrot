@@ -114,6 +114,12 @@ init_prederef(struct Parrot_Interp *interpreter)
 
     UNUSED(interpreter);
 
+#ifdef DYNAMIC_OPLIBS
+    fprintf(stderr, "FIXME: Dynamic oplibs currently broken.\n");
+    exit(0);
+#if 0
+    /* FIXME: This is platform specific code and needs to go elsewhere */
+
     sprintf(file_name, "lib%s_prederef.so.%s", PARROT_CORE_OPLIB_NAME,
             PARROT_VERSION);
 
@@ -125,7 +131,6 @@ init_prederef(struct Parrot_Interp *interpreter)
      * Get a handle to the library file:
      */
 
-#ifdef DYNAMIC_OPLIBS
     prederef_oplib_handle = Parrot_dlopen(file_name);
 
     if (!prederef_oplib_handle) {
@@ -140,6 +145,7 @@ init_prederef(struct Parrot_Interp *interpreter)
 
     prederef_oplib_init =
         (oplib_init_f)(ptrcast_t)Parrot_dlsym(prederef_oplib_handle,
+#endif
                                               func_name);
 #else
     prederef_oplib_init = PARROT_CORE_PREDEREF_OPLIB_INIT;

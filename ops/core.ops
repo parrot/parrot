@@ -1863,7 +1863,7 @@ inline op substr(out STR, in STR, in INT, in INT) {
   goto NEXT();
 }
 
-inline op substr(out STR, in STR, in INT, in INT, in STR) {
+inline op substr(out STR, inout STR, in INT, in INT, in STR) {
   $1 = string_replace(interpreter, $2, $3, $4, $5, &$1);
   goto NEXT();
 }
@@ -3480,6 +3480,38 @@ inline op callnative(out PMC, in PMC, in PMC, in STR) {
   /* Now that it is cached, call it */
   (*p)(interpreter, $3->data);
   goto NEXT();
+}
+
+inline op call() {
+  /* This op will be a vtable entry */
+  struct Parrot_Sub * sub = (struct Parrot_Sub*)interpreter->pmc_reg.registers[0]->data;
+  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  goto ADDRESS(sub->init);
+}
+
+inline op callco() {
+  /* This op will be a vtable entry */
+  struct Parrot_Coroutine * co = (struct Parrot_Coroutine*)interpreter->pmc_reg.registers[0]->data;
+  /* FIXME: Here we need to switch in the co-routines context and save the
+   * interpreter's context.
+   */
+  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  /* Resuming co-routine or fresh call? */
+  if(!co->entry) {
+     goto ADDRESS(co->init);
+  }
+  else {
+     goto ADDRESS(co->entry);
+  }
+}
+
+inline op yield() {
+  opcode_t *dest;
+  struct Parrot_Coroutine * co = (struct Parrot_Coroutine*)interpreter->pmc_reg.registers[0]->data;
+  /* suspend the co-routine */
+  co->entry = expr NEXT();
+  stack_pop(interpreter, interpreter->control_stack, &dest, STACK_ENTRY_DESTINATION);
+  goto ADDRESS(dest);
 }
 
 =item B<warningson>(in INT)

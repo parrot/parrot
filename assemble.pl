@@ -132,6 +132,8 @@ sub new {
   $self->{constants}{PerlHash} = 6;
   $self->{constants}{ParrotPointer} = 7;
   $self->{constants}{IntQueue} = 8;
+  $self->{constants}{ParrotSub} = 9;
+  $self->{constants}{ParrotCoroutine} = 10;
   $self;
 }
 

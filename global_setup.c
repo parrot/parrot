@@ -29,6 +29,8 @@ init_world(void)
     Parrot_PerlHash_class_init(enum_class_PerlHash);
     Parrot_ParrotPointer_class_init(enum_class_ParrotPointer);
     Parrot_IntQueue_class_init(enum_class_IntQueue);
+    Parrot_ParrotSub_class_init(enum_class_ParrotSub);
+    Parrot_ParrotCoroutine_class_init(enum_class_ParrotCoroutine);
 
     /* Now register the names of the PMCs */
     /*
