@@ -2,7 +2,7 @@
 #
 # note, empty regex/options are just ignored
 #
-{.*} -{-Wwrite-strings -Wcast-qual -Wno-unused} +{-Wunused}
+{.*} -{-Wwrite-strings -Wcast-qual -Wno-unused}
 
 instructions.c -{-Wformat-nonliteral} # noisy
 debug.c        -{-Wformat-nonliteral} # noisy
