@@ -1167,6 +1167,7 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
   else {
       $1 = pmc_new(interpreter, enum_class_NCI);
       $1->vtable->set_pointer_keyed_str(interpreter, $1, $4, F2DPTR(p));
+      PObj_get_FLAGS($1) |= PObj_private1_FLAG;
   }
   goto NEXT();
 }

@@ -1475,8 +1475,14 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
      * if we are thawing a lot of PMCs, its cheaper to do
      * a DOD run first and then block DOD - the limit should be
      * chosen so that no more then one DOD run would be triggered
+     *
+     * XXX
+     *
+     * md5_3.imc shows a segfault during thawing the config hash
+     * info->thaw_ptr becomes invalid - seems that the hash got
+     * collected under us.
      */
-    if (string_length(interpreter, image) > THAW_BLOCK_DOD_SIZE) {
+    if (1 || (string_length(interpreter, image) > THAW_BLOCK_DOD_SIZE)) {
         Parrot_do_dod_run(interpreter, 1);
         Parrot_block_DOD(interpreter);
         Parrot_block_GC(interpreter);

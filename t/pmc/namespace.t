@@ -178,9 +178,7 @@ ok
 baz
 OUTPUT
 
-TODO: {
-  local $TODO = "probably wrong function called";
-  pir_output_like(<<'CODE', <<'OUTPUT', "func() namespace resolution");
+pir_output_like(<<'CODE', <<'OUTPUT', "func() namespace resolution");
 
 .sub main @MAIN
     print "calling foo\n"
@@ -227,6 +225,8 @@ CODE
 calling Foo::foo
   Foo::foo
   Foo::bar
-fie.*not found/
+  fie
+calling baz
+.*baz.*not found/
 OUTPUT
-}
+

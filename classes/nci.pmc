@@ -125,10 +125,15 @@ shifted down.
         Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
         PMC *obj;
         /*
-         * if the invocant is a class shift down arguments
+         * If the invocant is a class or there is no invocant
+         * shift down arguments.
+         * But not if it's a plain NCI function created
+         * from dlfunc.
          */
         obj = REG_PMC(2);
-        if (PObj_is_class_TEST(obj) || obj->vtable->class == obj) {
+        if (!(PObj_get_FLAGS(SELF) & PObj_private1_FLAG) &&
+                (PMC_IS_NULL(obj) || PObj_is_class_TEST(obj) ||
+                obj->vtable->class == obj)) {
             INTVAL i, n;
             REG_PMC(2) = REG_PMC(5);    /* obj = 1st arg */
             n = --REG_INT(3);             /* argcP */
