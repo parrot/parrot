@@ -52,7 +52,7 @@ my $restart_op;
 my %argmaps;
 my $jit_cpu;
 
-if ($genfile eq "jit_cpu.c") {
+if ($genfile eq "src/jit_cpu.c") {
     $jit_cpu = 1;
     push @jit_funcs, "Parrot_jit_fn_info_t op_jit[$core_numops] = {\n";
     $func_end = "_jit";
@@ -167,7 +167,7 @@ sub readjit($) {
                 $asm =~ s/(emitm_pushl_m[^\n]*CONST[^\n]*)/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "const_table", 0);/g;
                 $asm =~ s/jit_emit_end/exec_emit_end/;
             }
-            if (($cpuarch eq 'ppc') && ($genfile ne "jit_cpu.c")) {
+            if (($cpuarch eq 'ppc') && ($genfile ne "src/jit_cpu.c")) {
                 $asm =~ s/jit_emit_mov_ri_i\(jit_info->native_ptr, ISR([12]), &CONST\((\d)\)\);/load_nc(jit_info->native_ptr, ISR$1, ECONST($2));/g;
             }
 
@@ -200,7 +200,7 @@ sub vtable_num($) {
     die("vtable not found for $meth\n");
 }
 
-my $jit_emit_n = ($genfile eq "jit_cpu.c") ? 2 : 1;
+my $jit_emit_n = ($genfile eq "src/jit_cpu.c") ? 2 : 1;
 
 open JITCPU, ">$genfile" or die;
 
@@ -276,7 +276,7 @@ else {
 
 END_C
 }
-if (($cpuarch eq 'ppc') && ($genfile ne "jit_cpu.c")) {
+if (($cpuarch eq 'ppc') && ($genfile ne "src/jit_cpu.c")) {
     print JITCPU "#define ECONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 8)\n";
 }
 
@@ -419,7 +419,7 @@ for ($i = 0; $i < $core_numops; $i++) {
 
 print JITCPU @jit_funcs, "};\n";
 
-if ($genfile eq "jit_cpu.c") {
+if ($genfile eq "src/jit_cpu.c") {
     print JITCPU <<EOC;
     extern int jit_op_count(void);
     int jit_op_count() { return $core_numops; }
