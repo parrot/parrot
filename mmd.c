@@ -24,26 +24,18 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
     pmc_mmd_f real_function;
     UINTVAL left_type, right_type;
     UINTVAL offset;
-    puts("In dispatch");
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
-    printf("Left/right: %i/%i\n", left_type, right_type);
     if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
         (right_type > interpreter->binop_mmd_funcs->y[function])) {
         real_function = (pmc_mmd_f)interpreter->binop_mmd_funcs->default_func[
             function];
     } else {
-        puts("Got a real dispatch");
         offset = interpreter->binop_mmd_funcs->x[function] *
             right_type + left_type;
-        printf("Offset is %i\n", offset);
-        real_function = *(interpreter->binop_mmd_funcs->mmd_funcs[function] + offset);
-        printf("Offset address is %p\n",interpreter->binop_mmd_funcs->mmd_funcs[function] + offset); 
-        printf("Function is %p\n", real_function);
+        real_function = (pmc_mmd_f)*(interpreter->binop_mmd_funcs->mmd_funcs[function] + offset);
     }
-    puts("Calling it");
     (*real_function)(interpreter, left, right, dest);
-    puts("Back");
 }
 
 STRING *
@@ -169,20 +161,20 @@ mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
-    new_table = mem_sys_allocate(sizeof(funcptr_t) * y * new_x);
-    for (i = 0; i < new_x * y; i++) {
+    new_table = mem_sys_allocate(sizeof(funcptr_t) * (y+1) * (new_x+1));
+    for (i = 0; i <= new_x * y; i++) {
         new_table[i] = default_func;
     }
 
     /* Then copy the old table over. We have to do this row by row,
        because the rows in the old and new tables are different
        lengths */
-    for (i = 0; i < y; i++) {
+    for (i = 0; i <= y; i++) {
         INTVAL newoffset, oldoffset;
-        newoffset = i * new_x;
-        oldoffset = i * x;
-        memcpy(new_table + newoffset, interpreter->binop_mmd_funcs->mmd_funcs[
-                function] + oldoffset, sizeof(funcptr_t) * x);
+        newoffset = i * (new_x+1);
+        oldoffset = i * (x+1);
+        memcpy(new_table + newoffset,
+               interpreter->binop_mmd_funcs->mmd_funcs[function] + oldoffset, sizeof(funcptr_t) * (x+1));
     }
     /* Set the old table to point to the new table */
     interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
@@ -210,14 +202,16 @@ mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
-    new_table = mem_sys_allocate(sizeof(funcptr_t) * x * new_y);
-    for (i = 0; i < x * new_y; i++) {
+    new_table = mem_sys_allocate(sizeof(funcptr_t) * (x+1) * (new_y+1));
+    for (i = 0; i < ((x+1) * (new_y+1)); i++) {
         new_table[i] = default_func;
     }
 
-    /* Then copy the old table over. */
-    memcpy(new_table, interpreter->binop_mmd_funcs->mmd_funcs[function],
-            sizeof(funcptr_t) * x * y);
+    /* Then copy the old table over, if it existed in the first place. */
+    if (x && y) {
+        memcpy(new_table, interpreter->binop_mmd_funcs->mmd_funcs[function],
+               sizeof(funcptr_t) * (x+1) * (y+1));
+    }
     interpreter->binop_mmd_funcs->y[function] = new_y;
     interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
 
@@ -277,8 +271,6 @@ mmd_register(struct Parrot_Interp *interpreter,
 
     offset = interpreter->binop_mmd_funcs->x[type] * right_type + left_type;
     *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset) = funcptr;
-    /*    printf("Registering %p for %i/%i at %p\n", funcptr, cur_x, cur_y, (interpreter->binop_mmd_funcs->mmd_funcs[type] + offset));
-    printf("And it says: %p\n", *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset)); */
 }
 
 

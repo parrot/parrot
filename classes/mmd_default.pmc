@@ -28,9 +28,7 @@ pmclass mmd_default extends default {
   }
 
   void divide(PMC* value, PMC* dest) {
-    puts("Heading into dispatch");
     mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_DIVIDE);
-    puts("Dispatch done");
   }
 
   void modulus(PMC* value, PMC* dest) {
