@@ -61,8 +61,14 @@ Parrot_pop_i(struct Parrot_Interp *interpreter)
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
-            if (top->prev)
+            if (top->prev) {
+                /* Keep one stack segment spare to avoid thrashing */
+                if (top->next) {
+                    mem_sys_free(top->next);
+                    top->next = NULL;
+                }
                 interpreter->int_reg_top = top->prev;
+            }
         }
     }
     /* Nope. So pitch a fit */
@@ -133,9 +139,14 @@ Parrot_pop_s(struct Parrot_Interp *interpreter)
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
-            if (top->prev)
-                /* Don't free stack segments once stack has grown */
+            if (top->prev) {
+                /* Keep one stack segment spare to avoid thrashing */
+                if (top->next) {
+                    mem_sys_free(top->next);
+                    top->next = NULL;
+                }
                 interpreter->string_reg_top = top->prev;
+            }
         }
     }
     /* Nope. So pitch a fit */
@@ -205,9 +216,14 @@ Parrot_pop_n(struct Parrot_Interp *interpreter)
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
-            if (top->prev)
-                /* Don't free stack segments once stack has grown */
+            if (top->prev) {
+                /* Keep one stack segment spare to avoid thrashing */
+                if (top->next) {
+                    mem_sys_free(top->next);
+                    top->next = NULL;
+                }
                 interpreter->num_reg_top = top->prev;
+            }
         }
     }
     /* Nope. So pitch a fit */
@@ -277,9 +293,14 @@ Parrot_pop_p(struct Parrot_Interp *interpreter)
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
-            if (top->prev)
-                /* Don't free stack segments once stack has grown */
+            if (top->prev) {
+                /* Keep one stack segment spare to avoid thrashing */
+                if (top->next) {
+                    mem_sys_free(top->next);
+                    top->next = NULL;
+                }
                 interpreter->pmc_reg_top = top->prev;
+            }
         }
     }
     /* Nope. So pitch a fit */
