@@ -29,10 +29,7 @@
 
 #define ATEXIT_DESTROY
 
-#define PREDEREF_NORMAL         0
-#define PREDEREF_FOR_CGP        1
-#define PREDEREF_FOR_SWITCH     2
-#define PREDEREF_FOR_EXEC       3
+#define PARROT_CGP_FLAG   (PARROT_PREDEREF_FLAG | PARROT_CGOTO_FLAG)
 
 #if EXEC_CAPABLE
 struct Parrot_Interp interpre;
@@ -159,7 +156,8 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
  * the opcode is replaced depending on the run core
  */
 static void
-fill_prederef(struct Parrot_Interp *interpreter, int cgp, size_t N, void **temp)
+fill_prederef(struct Parrot_Interp *interpreter, int which,
+        size_t N, void **temp)
 {
     size_t i;
     opcode_t *pc = interpreter->code->cur_cs->base.data;
@@ -169,21 +167,21 @@ fill_prederef(struct Parrot_Interp *interpreter, int cgp, size_t N, void **temp)
 
     for (i = 0; i < N; ) {
         is_ret = 0;
-        switch (cgp) {
-            case PREDEREF_FOR_EXEC:
+        switch (which) {
+            case PARROT_EXEC_FLAG:
                 if (*temp)
                     is_ret = 1;
                 break;
         }
         prederef(temp, interpreter);
-        switch (cgp) {
-            case PREDEREF_FOR_SWITCH:
+        switch (which) {
+            case PARROT_SWITCH_FLAG:
                 *temp = (void**) *pc;
                 break;
-            case PREDEREF_FOR_CGP:
+            case PARROT_CGP_FLAG:
                 *temp = ((void**)(prederef_op_func)) [*pc];
                 break;
-            case PREDEREF_FOR_EXEC:
+            case PARROT_EXEC_FLAG:
                 if (is_ret)
                     *temp = (void *)(ptrcast_t)prederef_op_func[2];
                 else
@@ -196,32 +194,67 @@ fill_prederef(struct Parrot_Interp *interpreter, int cgp, size_t N, void **temp)
         temp += n;
     }
 }
+/*=for api interpreter get_op_lib_init
+ *
+ * return an  opcode's library op_lib init func
+ */
 
-/*=for api interpreter init_prederef
+static oplib_init_f
+get_op_lib_init(int core_op, int which, PMC *lib)
+{
+    oplib_init_f init_func = (oplib_init_f)NULL;
+    if (core_op) {
+        switch (which) {
+            case PARROT_SWITCH_FLAG:
+            case PARROT_PREDEREF_FLAG:
+                init_func = PARROT_CORE_PREDEREF_OPLIB_INIT;
+                break;
+#ifdef HAVE_COMPUTED_GOTO
+            case PARROT_CGP_FLAG:
+                init_func = PARROT_CORE_CGP_OPLIB_INIT;
+                break;
+#endif
+            case NO_FLAGS:      /* normal func core */
+                init_func = PARROT_CORE_OPLIB_INIT;
+                break;
+        }
+        if (!init_func)
+            internal_exception(1, "Couldn't find init_func");
+        return init_func;
+    }
+    return lib->cache.struct_val;
+}
+
+/*=for api interpreter load_prederef
  *
  * interpreter->op_lib = prederefed oplib
  *
- * the "normal" op_lib has a copy in the interpreter structure
- * - but get the op_code lookup function from standard core
- *   prederef has no op_info_table
  */
 static void
-init_prederef(struct Parrot_Interp *interpreter, int cgp)
+load_prederef(struct Parrot_Interp *interpreter, int which)
 {
-#ifdef HAVE_COMPUTED_GOTO
-    oplib_init_f init_func = cgp ?
-        PARROT_CORE_CGP_OPLIB_INIT :
-        PARROT_CORE_PREDEREF_OPLIB_INIT;
-#else
-    oplib_init_f init_func = PARROT_CORE_PREDEREF_OPLIB_INIT;
-    UNUSED(cgp);
-#endif
+    oplib_init_f init_func = get_op_lib_init(1, which, NULL);
+    int (*get_op)(const char * name, int full);
+
+    get_op = interpreter->op_lib->op_code;
+    /* preserve the loop fun */
     interpreter->op_lib = init_func(1);
-    interpreter->op_lib->op_code = PARROT_CORE_OPLIB_INIT(1)->op_code;
+    interpreter->op_lib->op_code = get_op;
     if (interpreter->op_lib->op_count != interpreter->op_count)
         internal_exception(PREDEREF_LOAD_ERROR,
                 "Illegal op count (%d) in prederef oplib\n",
                 (int)interpreter->op_lib->op_count);
+}
+
+/*=for api interpreter init_prederef
+ *
+ * initialize: load prederef func_table, file prederef_code
+ *
+ */
+static void
+init_prederef(struct Parrot_Interp *interpreter, int which)
+{
+    load_prederef(interpreter, which);
     if (!interpreter->prederef_code) {
         size_t N = interpreter->code->cur_cs->base.size;
         size_t i;
@@ -233,7 +266,7 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
                 N * sizeof(void *));
 #endif
 
-        if (cgp == PREDEREF_NORMAL) {
+        if (which == PARROT_PREDEREF_FLAG) {
             for (i = 0; i < N; i++) {
                 temp[i] = (void *)(ptrcast_t)prederef;
             }
@@ -242,8 +275,8 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
 
-        if (cgp != PREDEREF_NORMAL)
-            fill_prederef(interpreter, cgp, N, temp);
+        if (which != PARROT_PREDEREF_FLAG)
+            fill_prederef(interpreter, which, N, temp);
     }
 }
 
@@ -270,18 +303,12 @@ stop_prederef(struct Parrot_Interp *interpreter)
 void
 exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 {
+    int which = 0;
 #if HAVE_COMPUTED_GOTO
-    oplib_init_f init_func = PARROT_CORE_CGP_OPLIB_INIT;
-#else  /* HAVE_COMPUTED_GOTO */
-    oplib_init_f init_func = PARROT_CORE_OPLIB_INIT;
-#endif /* HAVE_COMPUTED_GOTO */
+    which = PARROT_CGOTO_FLAG | PARROT_PREDEREF_FLAG;
+#endif
+    load_prederef(interpreter, which);
 
-    interpreter->op_lib = init_func(1);
-    interpreter->op_lib->op_code = PARROT_CORE_OPLIB_INIT(1)->op_code;
-    if (interpreter->op_lib->op_count != interpreter->op_count)
-        internal_exception(PREDEREF_LOAD_ERROR,
-                "Illegal op count (%d) in prederef oplib\n",
-                (int)interpreter->op_lib->op_count);
     if (!interpreter->prederef_code) {
         size_t N = interpreter->code->cur_cs->base.size;
         size_t i;
@@ -291,7 +318,7 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
-        fill_prederef(interpreter, PREDEREF_FOR_EXEC, N, temp);
+        fill_prederef(interpreter, PARROT_EXEC_FLAG, N, temp);
     }
 }
 #endif
@@ -311,7 +338,7 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 #  ifdef HAVE_COMPUTED_GOTO
 #    ifdef __GNUC__
 #      ifdef PARROT_I386
-    init_prederef(interpreter, PREDEREF_FOR_CGP);
+    init_prederef(interpreter, PARROT_CGP_FLAG);
 #      endif
 #    endif
 #  endif
@@ -338,7 +365,7 @@ runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
 #  ifdef HAVE_COMPUTED_GOTO
 #    ifdef __GNUC__
 #      ifdef PARROT_I386
-    init_prederef(interpreter, PREDEREF_FOR_CGP);
+    init_prederef(interpreter, PARROT_CGP_FLAG);
 #      endif
 #    endif
 #  endif
@@ -383,7 +410,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
 
-    init_prederef(interpreter, PREDEREF_NORMAL);
+    init_prederef(interpreter, PARROT_PREDEREF_FLAG);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
 
     while (pc_prederef) {
@@ -402,7 +429,7 @@ runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
 #ifdef HAVE_COMPUTED_GOTO
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
-    init_prederef(interpreter, PREDEREF_FOR_CGP);
+    init_prederef(interpreter, PARROT_CGP_FLAG);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
     pc = cgp_core((opcode_t*)pc_prederef, interpreter);
     return pc;
@@ -419,7 +446,7 @@ runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
-    init_prederef(interpreter, PREDEREF_FOR_SWITCH);
+    init_prederef(interpreter, PARROT_SWITCH_FLAG);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
     pc = switch_core((opcode_t*)pc_prederef, interpreter);
     return pc;
@@ -713,7 +740,7 @@ make_interpreter(Interp_flags flags)
     interpreter->ctx.intstack = intstack_new(interpreter);
 
     /* Load the core op func and info tables */
-    interpreter->op_lib = PARROT_CORE_OPLIB_INIT(1);
+    interpreter->op_lib = get_op_lib_init(1, 0, NULL)(1);
     interpreter->op_count = interpreter->op_lib->op_count;
     interpreter->op_func_table = interpreter->op_lib->op_func_table;
     interpreter->op_info_table = interpreter->op_lib->op_info_table;
