@@ -876,7 +876,7 @@ END
 sub compiletestc {
     my ($name) = @_;
 
-    my $cmd = "$c{cc} $c{ccflags} -I./include -c $c{ld_out} $name$c{o} $name.c";
+    my $cmd = "$c{cc} $c{ccflags} -I./include -c $c{ld_out}$name$c{o} $name.c";
     system($cmd) and die "C compiler died!  Command was '$cmd'\n";
 
     $cmd = "$c{ld} $c{ldflags} $name$c{o} $c{cc_exe_out}$name$c{exe} $c{libs}";

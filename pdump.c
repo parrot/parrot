@@ -30,7 +30,7 @@ main(int argc, char **argv) {
         printf("can't stat %s, code %i\n", argv[1], errno);
         return 1;
     }
-    fd = open(argv[1], O_RDONLY);
+    fd = open(argv[1], O_RDONLY | O_BINARY);
     if (!fd) {
         printf("Can't open, error %i\n", errno);
         return 1;

@@ -96,7 +96,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
             return NULL;
         }
         
-        fd = open(filename, O_RDONLY);
+        fd = open(filename, O_RDONLY | O_BINARY);
         if (!fd) {
              fprintf(stderr, "Parrot VM: Can't open %s, code %i.\n", filename, errno);
              return NULL;
