@@ -16,9 +16,6 @@
 #define BN_FATAL(i, x) bn_fatal_error(x)
 #define BN_EXCEPT(i, excp, mesg) BN_exception(i, excp, mesg)
 #else /* Not in parrot core */
-typedef long INTVAL;
-typedef unsigned long UINTVAL;
-typedef double FLOATVAL;
 #define PINTD_
 #define PINT_
 #define BN_alloc(x) malloc(x)
