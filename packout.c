@@ -168,7 +168,7 @@ PackFile_ConstTable_pack(struct PackFile_ConstTable * self, opcode_t * packed) {
         PackFile_Constant_pack(self->constants[i], cursor);
 
         cursor += 
-	    PackFile_Constant_pack_size(self->constants[i])/sizeof(opcode_t);
+            PackFile_Constant_pack_size(self->constants[i])/sizeof(opcode_t);
     }
 
     return;
@@ -210,18 +210,18 @@ PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed) {
 
         case PFC_NUMBER:
             *cursor++ = sizeof(FLOATVAL);
-	    /* XXX Use memcpy() to avoid alignment issues.
-	       Also, do we need to pad things out to an opcode_t boundary?  
-	       Consider gcc/x86, with opcode_t = (long long) and 
-	       FLOATVAL = (long double):
-		    sizeof(long long) = 8
-		    sizeof(long double) = 12
-	    */
-	    mem_sys_memcopy(cursor,  &self->number, sizeof(FLOATVAL) );
+            /* XXX Use memcpy() to avoid alignment issues.
+               Also, do we need to pad things out to an opcode_t boundary?  
+               Consider gcc/x86, with opcode_t = (long long) and 
+               FLOATVAL = (long double):
+                    sizeof(long long) = 8
+                    sizeof(long double) = 12
+            */
+            mem_sys_memcopy(cursor,  &self->number, sizeof(FLOATVAL) );
             cursor += sizeof(FLOATVAL)/sizeof(opcode_t); /* XXX */
-	    /* XXX cursor is possibly wrong now (because of alignment
-	       issues) but isn't returned from this function anyway!
-	    */
+            /* XXX cursor is possibly wrong now (because of alignment
+               issues) but isn't returned from this function anyway!
+            */
             break;
 
         case PFC_STRING:
@@ -231,7 +231,7 @@ PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed) {
                 padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
             }
 
-	    /* Include space for flags, encoding, type, and size fields.  */
+            /* Include space for flags, encoding, type, and size fields.  */
             packed_size = 4 * sizeof(opcode_t) + padded_size;
 
             *cursor++ = packed_size;
@@ -240,9 +240,9 @@ PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed) {
             *cursor++ = self->string->type->index;
             *cursor++ = self->string->bufused;
 
-	    /* Switch to char * since rest of string is addressed by
-	       characters to ensure padding.  */
-	    charcursor = (char *)cursor;
+            /* Switch to char * since rest of string is addressed by
+               characters to ensure padding.  */
+            charcursor = (char *)cursor;
 
             if (self->string->bufstart) {
                 mem_sys_memcopy(charcursor, self->string->bufstart, self->string->bufused);
@@ -254,12 +254,12 @@ PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed) {
                     }
                 }
             }
-	    /* If cursor is needed below, uncomment the following and
-	       ignore the gcc -Wcast-align warning.  charcursor is
-	       guaranteed to be aligned correctly by the padding logic
-	       above.
-	    cursor = (opcode_t *) charcursor;
-	    */
+            /* If cursor is needed below, uncomment the following and
+               ignore the gcc -Wcast-align warning.  charcursor is
+               guaranteed to be aligned correctly by the padding logic
+               above.
+            cursor = (opcode_t *) charcursor;
+            */
             break;
 
         default:

@@ -396,7 +396,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_Co
         /* NOTE: It would be nice if each of these had its own length first */
 
         cursor += 
-	    PackFile_Constant_pack_size(self->constants[i])/sizeof(opcode_t);
+            PackFile_Constant_pack_size(self->constants[i])/sizeof(opcode_t);
     }
 
     return 1;
@@ -512,7 +512,7 @@ PackFile_Constant_pack_size(struct PackFile_Constant * self) {
                 padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
             }
 
-	    /* Include space for flags, encoding, type, and size fields.  */
+            /* Include space for flags, encoding, type, and size fields.  */
             packed_size = 4 * sizeof(opcode_t) + padded_size;
             break;
 
