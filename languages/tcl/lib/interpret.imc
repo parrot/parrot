@@ -12,8 +12,7 @@ Given a pre-parsed chunk of Tcl, interpret it.
   # our running return value, type
   .local int return_type
   return_type = TCL_OK
-  .local pmc retval,escaper
-   escaper = find_global "Data::Escape", "String"
+  .local pmc retval
 
   # Which command are we processing?
   .local int command_num,num_commands
