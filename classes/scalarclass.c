@@ -163,7 +163,7 @@ static void* Parrot_scalar_get_value (struct Parrot_Interp *interpreter, PMC* pm
 }
 
 static BOOLVAL Parrot_scalar_is_same (struct Parrot_Interp *interpreter, PMC* pmc1, PMC* pmc2) {
-    struct PerlScalarData* d = pmc->data;
+    struct PerlScalarData* d = pmc1->data;
 
     if (pmc1->flags & PS_NUMBER_OK) {
         return d->numdata == pmc2->vtable->get_number(interpreter, pmc2);
