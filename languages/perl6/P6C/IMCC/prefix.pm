@@ -272,7 +272,7 @@ sub gen_sub_call {
         my $am_flattening;
         foreach my $arg (@$positional) {
             my $param = $params->indexed_param($i);
-            my $desc = $param->var->name;
+            my $desc = $param->render;
             if (defined $arg) {
                 if ($ctx->is_sig) {
                     $arg->{ctx} = $ctx->indexed_context($i);

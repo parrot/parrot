@@ -823,6 +823,227 @@ sub P6C::compare::size {
     (@{shift->seq()} - 1) / 2
 }
 
+######################## Rendering (for debugging) ################
+
+sub render_obj_or_literal {
+    my $thing = shift;
+    return UNIVERSAL::can($thing, 'render') ? $thing->render : $thing;
+}
+
+# $sep - separator
+# $term - terminator
+# $pre - prefix if list
+# $post - suffix if list
+sub render_list {
+    my ($thing, $sep, $term, $pre, $post) = @_;
+    if (UNIVERSAL::can($thing, 'render')) {
+        return $thing->render;
+    } else {
+        my $str = '';
+        $str .= $pre if defined($pre);
+        my @lines = map { defined($term) ? $_->render . $term : $_->render }
+          @$thing;
+        $str .= join(defined($sep) ? $sep : "", @lines);
+        $str .= $post if defined($post);
+        return $str;
+    }
+}
+
+sub P6C::closure::render {
+    my $obj = shift;
+    my $str = "";
+    $str .= "sub " if $obj->bare;
+    $str .= "(" . $obj->params->render . ")" if defined($obj->params);
+    $str .= " {" . render_list($obj->block, undef, ";\n") . "}";
+    return $str;
+}
+
+sub P6C::rule::render {
+    my $obj = shift;
+    return "/" . $obj->pat->render . "/";
+}
+
+sub P6C::rx_alt::render {
+    my $obj = shift;
+    return join("|", map { $_->render } @{ $obj->branches });
+}
+
+sub P6C::rx_seq::render {
+    my $obj = shift;
+    return join("", map { $_->render } @{ $obj->things });
+}
+
+sub P6C::rx_repeat::render {
+    my $obj = shift;
+    my $str = $obj->thing->render;
+    if (! $obj->min && ! $obj->max) {
+        $str .= "*";
+    } elsif ($obj->min == 1 && ! $obj->max) {
+        $str .= "+";
+    } elsif ($obj->min && $obj->max && $obj->min == $obj->max) {
+        $str .= "<" . $obj->min . ">";
+    } else {
+        $str .= "<";
+        $str .= $obj->min if defined($obj->min);
+        $str .= ",";
+        $str .= $obj->max if defined($obj->max);
+        $str .= ">";
+    }
+    $str .= "?" unless $obj->greedy;
+    return $str;
+}
+
+sub P6C::rx_atom::render {
+    my $obj = shift;
+    my $atom = $obj->atom->render;
+    return $obj->capture ? "($atom)" : $atom;
+}
+
+sub P6C::rx_any::render {
+    my $obj = shift;
+    return '.';
+}
+
+sub P6C::rx_oneof::render {
+    my $obj = shift;
+    my $str = '<[';
+    $str .= "^" if $obj->negated;
+    $str .= $obj->rep;
+    $str .= "]>";
+    return $str;
+}
+
+sub extregex_unadjust_call {
+    my ($call) = @_;
+    my $args = $call->args;
+    die unless $args->isa('P6C::ValueList');
+    my @arglist = @{ $args->vals };
+    shift @arglist;
+    shift @arglist;
+    shift @arglist;
+    shift @arglist;
+    return P6C::rx_call->new(name => $call->name,
+                             args => P6C::ValueList->new(vals => \@arglist));
+}
+
+sub P6C::rx_call::render {
+    my $obj = shift;
+    my $str = "<" . render_obj_or_literal($obj->name);
+    if (defined $obj->args) {
+        my $obj2 = extregex_unadjust_call($obj);
+        $str .= "(";
+        $str .= render_list($obj2->args, ", ");
+        $str .= ")";
+    }
+    $str .= ">";
+    return $str;
+}
+
+sub P6C::decl::render {
+    my $obj = shift;
+    my $str = $obj->qual->scope; # Works for 'my', probably nothing else
+    $str .= " ";
+    $str .= render_list($obj->vars, ", ", undef, "(", ")");
+    $str .= " " . $_->render foreach (@{ $obj->props });
+    return $str;
+}
+
+sub P6C::prefix::render {
+    my $obj = shift;
+    my $str = render_obj_or_literal($obj->name);
+    if (defined($obj->args)) {
+        $str .= render_list($obj->args, ", ", undef, "(", ")");
+    }
+    return $str;
+}
+
+sub P6C::Binop::render {
+    my $obj = shift;
+    return $obj->l->render . " " . $obj->op . " " . $obj->r->render;
+}
+
+sub P6C::subscript_exp::render {
+    my $obj = shift;
+    return $obj->thing->render . join("", map { $_->render } @{ $obj->subscripts });
+}
+
+sub P6C::indices::render {
+    my $obj = shift;
+    my $inner = $obj->indices->render;
+    return ($obj->type eq 'PerlArray') ? "[$inner]" : "{$inner}";
+}
+
+sub P6C::sv_literal::render {
+    my $obj = shift;
+    return $obj->lval;
+}
+
+sub P6C::variable::render {
+    my $obj = shift;
+    my $str = "";
+    $str .= "*" if $obj->global;
+    $str .= $obj->name;
+    return $str;
+}
+
+sub P6C::yadda::render {
+    return "...";
+}
+
+sub P6C::signature::render {
+    my $obj = shift;
+    my $str = '';
+    $str .= join(" ", map { $_->render } @{ $obj->positional });
+    $str .= join(" ", map { $_->render } @{ $obj->optional });
+    $str .= join(" ", map { $_->render } @{ $obj->required_named });
+    $str .= '*' . $obj->slurpy_array->render if $obj->slurpy_array;
+    $str .= '*' . $obj->slurpy_named->render if $obj->slurpy_named;
+    $str .= join(" ", map { $_->render } @{ $obj->optional_named });
+    return $str;
+}
+
+sub P6C::sigparam::render {
+    my $obj = shift;
+    my $str = $obj->type . " ";
+    if ($obj->zone eq 'positional') {
+    } elsif ($obj->zone eq 'optional') {
+        $str .= "?";
+    } elsif ($obj->zone eq 'required_named') {
+        $str .= "+"; # FIXME!
+    } elsif ($obj->zone eq 'optional_named') {
+        $str .= "+"; # FIXME!
+    }
+    $str .= $obj->var->render;
+    $str .= render_list($obj->traits) if $obj->traits;
+    $str .= " = " . $obj->init->render if $obj->init;
+    return $str;
+}
+
+sub P6C::guard::render {
+    my $obj = shift;
+    return $obj->name . "(" . $obj->test->render . ") {\n"
+      . $obj->expr->render . "\n"
+      . "}";
+}
+
+sub P6C::directive::render {
+    my $obj = shift;
+    my $str = $obj->name . " " . $obj->thing;
+    return $str . " " . $obj->args; # ???
+}
+
+# I think this one might have to be context sensitive to figure out
+# the divider characters, but I'm not sure.
+sub P6C::ValueList::render {
+    my $obj = shift;
+    return join(", ", map { $_->render } @{ $obj->vals });
+}
+
+sub P6C::compare::render {
+    my $obj = shift;
+    return join(" ", map { ref($_) ? $_->render : $_ } @{ $obj->seq });
+}
+
 "Yep.";
 
 =back

@@ -433,3 +433,12 @@
 	* Test Failures:
 	    - t/rx/call.t     1   256     2    1  50.00%  2
 	    - this is due to a memory corruption bug in parrot itself
+
+2004-01-29    <sfink>
+
+	* Additions:
+	    - added render() method to most syntax tree nodes. Currently
+	      only useful for debugging.
+	* Test Failures:
+	    - none (a previous checkin to make builtin subs not have named
+	      args was enough to perturb the memory corruption bug away)
