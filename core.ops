@@ -370,6 +370,8 @@ op print(i|ic, p) {
 
 Print $1 to standard output stream
 
+=cut
+
 op puts(s|sc) {
   STRING *s = $1;
   if (s && string_length(s)) {
