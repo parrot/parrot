@@ -117,10 +117,10 @@ V: 0.0.11
 
 N: tcl
 A: Will Coleda
-S: passes all tests, but all examples do not currently work.
-S: heavily under construction
+S: all tests pass, though still not feature-complete
+S: under active development
 M: Yes
-V: 0.0.11
+V: 0.1.0
 
 N: URM
 A: Marcus Thiesen
