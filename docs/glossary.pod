@@ -162,6 +162,46 @@ provide future unicode support.
 
 http://oss.software.ibm.com/icu/index.html
 
+=head2 IMC
+
+Parrot Intermediate Code. A medium-level assembly language for Parrot
+that hides messy details like register allocation so language
+compiler writers who target IMC don't have to roll their own.
+
+See also IMCC, PIR.
+
+=head2 IMCC
+
+Parrot's Intermediate Code Compiler, which started its life as an
+improved Parrot assembler, and eventually became so integrated with
+Parrot that it became the Parrot executable (being able to load and
+run PBC files, PASM files or IMC files).
+
+=head2 Packfile
+
+Another name for a PBC file, due to the names used for data structures
+in one of the early implementations. You can see the initial commit of
+the PackFile.pm implementation, with the rationale for the name here:
+
+http://cvs.perl.org/cgi/viewcvs.cgi/parrot/lib/Parrot/PackFile.pm?sortby=log
+
+=head2 PBC
+
+Parrot Byte Code. The name for the "executable" files that can be
+passed to the Parrot interpreter for immediate execution (although
+PASM and IMC files can be executed directly, too).
+
+See also Packfile.
+
+=head2 PIR
+
+Parrot Intermediate Representation. The original name for IMC. Since
+it has become the convention to name input files to IMCC with the
+extension ".imc", IMC is a more natural name, although PIR is still
+sighted regularly on the E<lt>perl-internals@perl.orgE<gt> email list.
+
+See also IMC.
+
 =head2 PMC
 
 PMC is an acronym for Parrot Magic Cookie. (Or Cracker, your choice.)  
