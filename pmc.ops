@@ -1,0 +1,44 @@
+/*
+** pmc.ops
+*/
+
+#include "parrot/method_util.h"
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+pmc.ops
+
+=cut
+
+=head1 DESCRIPTION
+
+Library of ops to do PMC introspective things
+
+=cut
+
+
+###############################################################################
+
+=head2 Read ops
+
+Ops to read from PMC fields
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<pmcflags>(out INT, in PMC)
+
+Retrieve the flags from a PMC
+
+=cut
+
+inline op pmcflags(out INT, in PMC) {
+  $1 = $2->flags;
+  goto NEXT();
+}

@@ -1594,6 +1594,7 @@ pbc2c.pl
 pdb.c
 pdump.c
 pmc.c
+pmc.ops
 pxs.c
 register.c
 res_lea.c
