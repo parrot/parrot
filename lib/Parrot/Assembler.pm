@@ -45,6 +45,7 @@ use Parrot::PackFile::FixupTable;
 use Parrot::PackFile::ConstTable;
 #use Parrot::PackFile::Constant;
 #use Parrot::String;
+use Parrot::PMC qw(%pmc_types);
 
 use Symbol;
 use Carp;
@@ -1165,7 +1166,13 @@ sub handle_arguments {
       #
 
       elsif ($args[$_] =~ m/^[A-Za-z_][A-Za-z0-9_]+$/) {
-        if( !exists($label{$args[$_]}) ) {
+        if ($opcode eq "new_p_ic") {
+            my $type = $pmc_types{lc $args[$_]};
+            defined $type
+                or error("Unknown PMC type '$args[$_]'!", $file, $line);
+            $args[$_] = constantize_integer($type);
+        }
+        elsif( !exists($label{$args[$_]}) ) {
           # we have not seen it yet...put it on the fixup list
           push( @{ $fixup{ $args[$_] } }, $op_pc, $pc);
           $args[$_] = 0xffffffff;
@@ -1410,7 +1417,6 @@ else {
     close($handle);
     return @lines;
 }
-
 
 ###############################################################################
 

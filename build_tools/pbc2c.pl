@@ -24,7 +24,8 @@ $Data::Dumper::Useqq  = 1;
 $Data::Dumper::Terse  = 1;
 $Data::Dumper::Indent = 0;
 
-my $ops = new Parrot::OpsFile 'core.ops';
+use Parrot::OpLib::core;
+my $ops = $Parrot::OpLib::core::ops;
 
 
 #

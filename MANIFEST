@@ -117,6 +117,7 @@ platforms/generic.h
 platforms/win32.c
 platforms/win32.h
 pmc.c
+pmc_pm.pl
 README
 register.c
 resources.c

@@ -47,7 +47,7 @@ ENDOFMACRO
 
 output_is(<<'CODE', <<'OUTPUT', "newpmc");
 	print "starting\n"
-	new P0, 0
+	new P0, PerlInt
 	print "ending\n"
 	end
 CODE
@@ -56,7 +56,7 @@ ending
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set/print integer");
-	new P0, 0
+	new P0, PerlInt
 	set P0, 123
 	print P0
 	print "\n"
@@ -69,7 +69,7 @@ OUTPUT
 # Let perl do the computation.
 #
 output_is(<<'CODE', <<OUTPUT, "add integer to self");
-	new P0, 0
+	new P0, PerlInt
 	set P0, 123
 	add P0, P0, P0
 	print P0
@@ -80,7 +80,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "sub integer from self");
-	new P0, 0
+	new P0, PerlInt
 	set P0, 456
 	sub P0, P0, P0
 	print P0
@@ -91,7 +91,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "multiply integer by self");
-	new P0, 0
+	new P0, PerlInt
 	set P0, 124
 	mul P0, P0, P0
 	print P0
@@ -102,7 +102,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "divide integer by self");
-	new P0, 0
+	new P0, PerlInt
 	set P0, 23
 	div P0, P0, P0
 	print P0
@@ -113,8 +113,8 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "add integer to other");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 321
 	add P1, P1, P0
@@ -126,8 +126,8 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "subtract integer from other");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 321
 	sub P1, P1, P0
@@ -139,8 +139,8 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "multiply integer by other");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 321
 	mul P1, P1, P0
@@ -152,8 +152,8 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "divide integer by other");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 246
 	div P1, P1, P0
@@ -169,7 +169,7 @@ OUTPUT
 #
 output_is(<<"CODE", <<OUTPUT, "add number to self");
 @{[ $fp_equality_macro ]}
-	new P0, 0
+	new P0, PerlInt
 	set P0, 123.123
 	add P0, P0, P0
 	fp_eq P0, 246.246, EQ1
@@ -183,7 +183,7 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "sub number from self");
 @{[ $fp_equality_macro ]}
-	new P0, 0
+	new P0, PerlInt
 	set P0, 456.456
 	sub P0, P0, P0
 	fp_eq P0, 0, EQ1
@@ -197,7 +197,7 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply number by self");
 @{[ $fp_equality_macro ]}
-	new P0, 0
+	new P0, PerlInt
 	set P0, 124.124
 	mul P0, P0, P0
 	fp_eq P0, 15406.767376, EQ1
@@ -211,7 +211,7 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide number by self");
 @{[ $fp_equality_macro ]}
-	new P0, 0
+	new P0, PerlInt
 	set P0, 23.23
 	div P0, P0, P0
 	fp_eq P0, 1, EQ1
@@ -228,8 +228,8 @@ OUTPUT
 #
 output_is(<<"CODE", <<OUTPUT, "add number to other");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123.123
 	set P1, 321.321
 	add P1, P1, P0
@@ -244,8 +244,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract number from other");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123.123
 	set P1, 321.321
 	sub P1, P1, P0
@@ -260,8 +260,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply number by other");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123.123
 	set P1, 321.321
 	mul P1, P1, P0
@@ -276,8 +276,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide number by other");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123.123
 	set P1, 246.246
 	div P1, P1, P0
@@ -295,8 +295,8 @@ OUTPUT
 #
 output_is(<<"CODE", <<OUTPUT, "add integer to number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 321.321
 	add P1, P1, P0
@@ -311,8 +311,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract integer from number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 321.321
 	sub P1, P1, P0
@@ -327,8 +327,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply integer by number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 321.321
 	mul P1, P1, P0
@@ -343,8 +343,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide integer by number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 246.246
 	div P1, P1, P0
@@ -362,8 +362,8 @@ OUTPUT
 #
 output_is(<<"CODE", <<OUTPUT, "add integer to number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 321.321
 	add P1, P0, P1
@@ -378,8 +378,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract integer from number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 321.321
 	sub P1, P0, P1
@@ -394,8 +394,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply integer by number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 321.321
 	mul P1, P0, P1
@@ -410,8 +410,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide integer by number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 123
 	set P1, 246.246
 	div P1, P0, P1
@@ -428,8 +428,8 @@ OUTPUT
 # Concat tests
 #
 output_is(<<'CODE', <<OUTPUT, "concatenate integer to string");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, -5
 	set P1, "foo"
 	concat P0,P0,P1
@@ -441,8 +441,8 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concatenate string to integer");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, "foo"
 	set P1, -7
 	concat P0,P0,P1
@@ -454,8 +454,8 @@ foo-7
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concatenate number to string");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 5.43
 	set P1, "bar"
 	concat P0,P0,P1
@@ -467,8 +467,8 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concatenate string to number");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, "bar"
 	set P1, 2.7
 	concat P0,P0,P1
@@ -480,8 +480,8 @@ bar2.700000
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concatenate string to string");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, "foo"
 	set P1, "bar"
 	concat P0,P0,P1
@@ -496,7 +496,7 @@ OUTPUT
 # Basic string number conversion
 #
 output_is(<<CODE, <<OUTPUT, "string to int");
-	new	P0, 0
+	new	P0, PerlInt
 
 	set	P0, "1"
 	set	I0, P0
@@ -525,7 +525,7 @@ OUTPUT
 
 SKIP: { skip("sting->int not finished yet", 1);
 output_is(<<CODE, <<OUTPUT, "nasty string -> int");
-	new	P0, 0
+	new	P0, PerlInt
 	set	P0, "Z1"
 	set	I0, P0
 	print	I0
@@ -544,7 +544,7 @@ OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "string to number conversion");
 @{[ $fp_equality_macro ]}
-	new	P0, 0
+	new	P0, PerlInt
 
 	set	P0, "1"
 	set	N0, P0
@@ -626,8 +626,8 @@ OUTPUT
 # Arithmetic operators
 #
 output_is(<<'CODE', <<OUTPUT, "add integer to string integer");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 6
 	set P1, "7"
 	add P0,P0,P1
@@ -639,8 +639,8 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "add integer to string");
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 6
 	set P1, "ab"
 	add P0,P0,P1
@@ -653,8 +653,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add integer to string number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 6
 	set P1, "7.5"
 	add P0,P0,P1
@@ -669,8 +669,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string integer");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 6.1
 	set P1, "7"
 	add P0,P0,P1
@@ -685,8 +685,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 6.1
 	set P1, "ab"
 	add P0,P0,P1
@@ -701,8 +701,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string number");
 @{[ $fp_equality_macro ]}
-	new P0, 0
-	new P1, 0
+	new P0, PerlInt
+	new P1, PerlInt
 	set P0, 6.1
 	set P1, "7.5"
 	add P0,P0,P1
@@ -716,9 +716,9 @@ ok 1
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "p =  p % p (int % int)");
-	new 	P0, 0
-	new	P1, 0
-	new	P2, 0
+	new 	P0, PerlInt
+	new	P1, PerlInt
+	new	P2, PerlInt
 	set	P0, 11
 	set	P1, 10
 	mod	P2, P0, P1

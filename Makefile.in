@@ -56,6 +56,9 @@ examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
 Parrot/OpLib/core.pm: core.ops ops2pm.pl
 	$(PERL) ops2pm.pl core.ops vtable.ops
 
+Parrot/PMC.pm: include/parrot/pmc.h pmc_pm.pl
+	$(PERL) pmc_pm.pl 
+
 examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
