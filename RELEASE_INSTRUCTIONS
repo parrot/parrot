@@ -24,6 +24,11 @@ To prepare a release:
         f.  Make sure RESPONSIBLE_PARTIES is still
             accurate.
 
+	g.  run tools/dev/mk_native.pbc (on i386/linux)
+	    or disable t/native_pbc/number.t
+
+	h.  make test
+
     3.  cvs commit.
 
     4.  make release VERSION=<version>
