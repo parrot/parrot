@@ -79,6 +79,50 @@ new_stack(Interp *interpreter, const char *name)
             sizeof(Stack_Entry_t), STACK_CHUNK_DEPTH);
 }
 
+
+/*
+
+=item C<void
+mark_stack(struct Parrot_Interp *interpreter,
+           Stack_Chunk_t *cur_stack)>
+
+Mark entries in a stack structure during GC.
+
+=cut
+
+*/
+
+void
+mark_stack(struct Parrot_Interp *interpreter,
+           Stack_Chunk_t *cur_stack)
+{
+    Stack_Entry_t *entry;
+    size_t i;
+
+    for (; cur_stack; cur_stack = cur_stack->prev) {
+
+        pobject_lives(interpreter, (PObj *)cur_stack);
+        entry = (Stack_Entry_t *)(cur_stack->bufstart);
+        for (i = 0; i < cur_stack->used; i++) {
+            switch (entry[i].entry_type) {
+                case STACK_ENTRY_PMC:
+                    if (entry[i].entry.pmc_val) {
+                        pobject_lives(interpreter,
+                                      (PObj *)entry[i].entry.pmc_val);
+                    }
+                    break;
+                case STACK_ENTRY_STRING:
+                    if (entry[i].entry.string_val) {
+                        pobject_lives(interpreter,
+                                      (PObj *)entry[i].entry.string_val);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
 /*
 
 =item C<void
@@ -94,24 +138,6 @@ void
 stack_destroy(Stack_Chunk_t * top)
 {
    /* GC does it all */
-}
-
-/*
-
-=item C<void
-stack_mark_cow(Stack_Chunk_t *top)>
-
-Mark a stack COW.
-
-=cut
-
-*/
-
-void
-stack_mark_cow(Stack_Chunk_t *top)
-{
-    for ( ; top ; top = top->prev)
-        PObj_COW_SET( (Buffer *) top);
 }
 
 /*
@@ -139,55 +165,6 @@ stack_height(Interp *interpreter, Stack_Chunk_t *top)
     return height;
 }
 
-/*
-
-=item C<static Stack_Chunk_t *
-chunk_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top, int depth)>
-
-Copy COWed chunk(s) from top down depth entries return new top of stack.
-
-=cut
-
-*/
-
-static Stack_Chunk_t *
-chunk_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top, int depth)
-{
-    Stack_Chunk_t *old_chunk = old_top;
-    Stack_Chunk_t *new_chunk;
-    Stack_Chunk_t *new_top = NULL;
-    Stack_Chunk_t *last = NULL;
-    do {
-        new_chunk = new_bufferlike_header(interp, sizeof(Stack_Chunk_t));
-        if (new_top == NULL) {
-            new_top = new_chunk;
-            new_top->next = NULL;
-            last = new_top;
-        }
-        else {
-            new_chunk->next = last;
-            last->prev = new_chunk;
-            last = new_chunk;
-        }
-        new_chunk->prev = old_chunk->prev;
-        new_chunk->used = old_chunk->used;
-        new_chunk->n_chunks = old_chunk->n_chunks;
-        new_chunk->chunk_limit = old_chunk->chunk_limit;
-        new_chunk->name = old_chunk->name;
-        depth -= new_chunk->used;
-
-        SET_NULL(new_chunk->items);
-        Parrot_block_DOD(interp);
-        Parrot_allocate(interp, (Buffer *)new_chunk,
-                sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
-        Parrot_unblock_DOD(interp);
-        memcpy(new_chunk->items.bufstart, old_chunk->items.bufstart,
-                old_chunk->items.buflen);
-        old_chunk = old_chunk->prev;
-    }
-    while (old_chunk && depth >= 0);
-    return new_top;
-}
 
 /*
 
@@ -225,7 +202,7 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
     if (chunk == NULL)
         return NULL;
     if (offset < chunk->used) {
-        entry = (Stack_Entry_t *)chunk->items.bufstart +
+        entry = (Stack_Entry_t *)PObj_bufstart(chunk) +
             chunk->used - offset - 1;
     }
     return entry;
@@ -258,6 +235,14 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
         return;
     }
 
+    /* If stack is copy-on-write, copy it before we can execute on it */
+    if (PObj_COW_TEST( (Buffer *) stack)) {
+        stack_unmake_COW(interpreter, stack);
+        if (depth >= STACK_CHUNK_DEPTH)
+            internal_exception(1, "Unhandled deep rotate for COWed stack");
+    }
+
+
     if (num_entries < 0) {
         num_entries = -num_entries;
         depth = num_entries - 1;
@@ -265,9 +250,6 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
         if (stack_height(interpreter, stack) < (size_t)num_entries) {
             internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
         }
-        /* If stack is copy-on-write, copy it before we can execute on it */
-        if (PObj_COW_TEST( (Buffer *) stack))
-            *stack_p = stack = chunk_copy(interpreter, stack, depth);
 
         temp = *stack_entry(interpreter, stack, depth);
         for (i = depth; i > 0; i--) {
@@ -282,9 +264,6 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
         if (stack_height(interpreter, stack) < (size_t)num_entries) {
             internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
         }
-        if (PObj_COW_TEST( (Buffer *) stack))
-            *stack_p = stack = chunk_copy(interpreter, stack, depth);
-
         temp = *stack_entry(interpreter, stack, 0);
         for (i = 0; i < depth; i++) {
             *stack_entry(interpreter, stack, i) =
@@ -318,45 +297,7 @@ void
 stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
            void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)
 {
-    Stack_Chunk_t *chunk = *stack_p;
-    Stack_Entry_t *entry;
-
-
-    /* Do we need a new chunk? */
-    if (chunk->used == STACK_CHUNK_DEPTH) {
-        if (chunk->next == NULL) {
-            /* Need to add a new chunk */
-            Stack_Chunk_t *new_chunk =
-                new_bufferlike_header(interpreter, sizeof(Stack_Chunk_t));
-            SET_NULL(new_chunk->next);
-            new_chunk->prev = chunk;
-            chunk->next = new_chunk;
-            new_chunk->n_chunks = chunk->n_chunks + 1;
-            new_chunk->chunk_limit = chunk->chunk_limit;
-            new_chunk->name = chunk->name;
-            if (new_chunk->n_chunks == new_chunk->chunk_limit)
-                internal_exception(1, "Stack '%s' too deep\n",
-                        chunk->name);
-            *stack_p = chunk = new_chunk;
-            SET_NULL(new_chunk->items);
-
-            Parrot_block_DOD(interpreter);
-            Parrot_allocate(interpreter, (Buffer *)new_chunk,
-                    sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
-            Parrot_unblock_DOD(interpreter);
-        }
-        else {
-            /* Reuse the spare chunk we kept */
-            chunk = chunk->next;
-            assert(!PObj_COW_TEST( (Buffer *) chunk));
-            *stack_p = chunk;
-        }
-    }
-    /* If stack is copy-on-write, copy it before we can execute on it */
-    else if (PObj_COW_TEST( (Buffer *) chunk))
-        *stack_p = chunk = chunk_copy(interpreter, chunk, 0);
-
-    entry = (Stack_Entry_t *)(chunk->items.bufstart) + chunk->used++;
+    Stack_Entry_t *entry = stack_prepare_push(interpreter, stack_p);
 
     /* Remember the type */
     entry->entry_type = type;
@@ -404,45 +345,7 @@ void *
 stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
           void *where, Stack_entry_type type)
 {
-    Stack_Chunk_t *chunk = *stack_p;
-    Stack_Entry_t *entry;
-
-    /* If stack is copy-on-write, copy it before we can execute on it */
-    if (PObj_COW_TEST( (Buffer *) chunk))
-        *stack_p = chunk = chunk_copy(interpreter, chunk, 0);
-
-    /* We may have an empty chunk at the end of the list */
-    if (chunk->used == 0 && chunk->prev != NULL) {
-        /* That chunk != NULL is just to allow the empty stack case
-         * to fall through to the following exception throwing code. */
-
-        /* If the chunk that has just become empty is not the last chunk
-         * on the stack then we make it the last chunk - the GC will clean
-         * up any chunks that are discarded by this operation. */
-        if (chunk->next) {
-            /* GC will collect it */
-            chunk->next = NULL;
-        }
-
-        /* Now back to the previous chunk - we'll keep the one we have
-         * just emptied around for now in case we need it again. */
-        chunk = chunk->prev;
-        *stack_p = chunk;
-        if (PObj_COW_TEST( (Buffer *) chunk))
-            *stack_p = chunk = chunk_copy(interpreter, chunk, 0);
-    }
-
-    /* Quick sanity check */
-    if (chunk->used == 0) {
-        internal_exception(ERROR_STACK_EMPTY, "No entries on %sStack!\n",
-                chunk->name);
-    }
-    assert(!PObj_COW_TEST( (Buffer *) chunk));
-
-    /* Now decrement the SP */
-    chunk->used--;
-
-    entry = (Stack_Entry_t *)(chunk->items.bufstart) + chunk->used;
+    Stack_Entry_t *entry = stack_prepare_pop(interpreter, stack_p);
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {

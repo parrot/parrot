@@ -60,9 +60,9 @@ cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
     mark_register_stack_cow(interp, &ctx->num_reg_stack);
     mark_register_stack_cow(interp, &ctx->string_reg_stack);
     mark_register_stack_cow(interp, &ctx->pmc_reg_stack);
-    stack_mark_cow(ctx->pad_stack);
-    stack_mark_cow(ctx->user_stack);
-    stack_mark_cow(ctx->control_stack);
+    ctx->pad_stack = stack_copy(interp, interp->ctx.pad_stack);
+    ctx->user_stack = stack_copy(interp, interp->ctx.user_stack);
+    ctx->control_stack = stack_copy(interp, interp->ctx.control_stack);
     buffer_mark_COW(ctx->warns);
     buffer_mark_COW(ctx->errors);
 }
@@ -154,9 +154,7 @@ prepend_stack(struct Parrot_Interp *interp,
         return;
     }
     /* save current interp stack */
-    *ctx_stack = *interp_stack;
-    /* copy the interp stack */
-    stack_mark_cow(*interp_stack);
+    *ctx_stack = stack_copy(interp, *interp_stack);
     /* we push a mark on that stack, so if the coroutine pops
      * beyond its own stack into the interpeter stack
      * we can catch this
@@ -446,15 +444,13 @@ new_coroutine(struct Parrot_Interp *interp)
     struct Parrot_Context *ctx = &co->ctx;
     save_context(interp, ctx);
     /* put in a COWed copy of the user stack */
-    ctx->user_stack = interp->ctx.user_stack;
-    stack_mark_cow(ctx->user_stack);
+    ctx->user_stack = stack_copy(interp, interp->ctx.user_stack);
     /* create new pad and control stacks,
      * when invoking the coroutine the real stacks are
      * constructed in swap_context
      * XXX decide what to do with pad
      */
-    ctx->pad_stack = interp->ctx.pad_stack;
-    stack_mark_cow(ctx->pad_stack);
+    ctx->pad_stack = stack_copy(interp, interp->ctx.pad_stack);
 
     co->co_control_stack = new_stack(interp, "Control");
 

@@ -26,7 +26,7 @@ Utility functions to handle Parrot calling conventions, lookup methods, etc.
 =item C<PMC *
 Parrot_new_csub(struct Parrot_Interp *interp, Parrot_csub_t func)>
 
-Create a new native sub. 
+Create a new native sub.
 
 B<OBSOLETE> Use NCI instead. See F<ops/core.ops>CB<dlfunc> and
 F<src/interpreter.c:Parrot_compreg()> for examples.
@@ -177,7 +177,7 @@ Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
 /*
 
 =item C<PMC *
-Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash, 
+Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash,
                    PMC *key)>
 
 Lookup a method in a method stash.
@@ -198,50 +198,6 @@ Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash, PMC *key)
         stash = stash->parent_stash;
     }
     return NULL;
-}
-
-/*
-
-=item C<void
-mark_stack(struct Parrot_Interp *interpreter,
-           Stack_Chunk_t *cur_stack)>
-
-Mark entries in a stack structure during GC.
-
-=cut
-
-*/
-
-void
-mark_stack(struct Parrot_Interp *interpreter,
-           Stack_Chunk_t *cur_stack)
-{
-    Stack_Entry_t *entry;
-    size_t i;
-
-    for (; cur_stack; cur_stack = cur_stack->prev) {
-
-        pobject_lives(interpreter, (PObj *)cur_stack);
-        entry = (Stack_Entry_t *)(cur_stack->items.bufstart);
-        for (i = 0; i < cur_stack->used; i++) {
-            switch (entry[i].entry_type) {
-                case STACK_ENTRY_PMC:
-                    if (entry[i].entry.pmc_val) {
-                        pobject_lives(interpreter,
-                                      (PObj *)entry[i].entry.pmc_val);
-                    }
-                    break;
-                case STACK_ENTRY_STRING:
-                    if (entry[i].entry.string_val) {
-                        pobject_lives(interpreter,
-                                      (PObj *)entry[i].entry.string_val);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
 }
 
 /*

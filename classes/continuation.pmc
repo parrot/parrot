@@ -71,8 +71,10 @@ Creates and returns a clone of the continuation.
         struct Parrot_Sub * sub;
         PMC* ret = SUPER();
         sub = PMC_sub(ret);
-        stack_mark_cow(sub->ctx.user_stack);
-        stack_mark_cow(sub->ctx.control_stack);
+	sub->ctx.user_stack = stack_copy(interpreter,
+				PMC_sub(SELF)->ctx.user_stack);
+	sub->ctx.control_stack = stack_copy(interpreter,
+				PMC_sub(SELF)->ctx.control_stack);
         return ret;
     }
 

@@ -25,7 +25,7 @@ typedef struct Stack_Entry {
 } Stack_Entry_t;
 
 typedef struct Stack_Chunk {
-    Buffer items;
+    pobj_t obj;
     size_t used;
     int n_chunks;
     int chunk_limit;
@@ -58,8 +58,7 @@ void* stack_prepare_pop(Parrot_Interp, Stack_Chunk_t **stack_p);
  */
 
 Stack_Chunk_t * new_stack(Interp *interpreter, const char *name);
-
-void stack_mark_cow(Stack_Chunk_t *stack_base);
+void mark_stack(struct Parrot_Interp *, Stack_Chunk_t * cur_stack);
 
 size_t stack_height(Interp *interpreter, Stack_Chunk_t *stack_base);
 

@@ -38,7 +38,7 @@ cst_new_stack(Interp *interpreter, const char *name, size_t item_size,
     Stack_Chunk_t *chunk = new_bufferlike_header(interpreter,
             sizeof(Stack_Chunk_t));
 
-    SET_NULL(chunk->items);
+    SET_NULL(chunk->bufstart);
     SET_NULL(chunk->next);
     SET_NULL(chunk->prev);
     chunk->n_chunks = 1;
@@ -103,13 +103,13 @@ stack_unmake_COW(Parrot_Interp interpreter, Stack_Chunk_t *stack)
      * also be sure not to allocate from the constant pool
      */
     PObj_constant_CLEAR(&for_alloc);
-    Parrot_allocate(interpreter, &for_alloc, stack->items.buflen);
+    Parrot_allocate(interpreter, &for_alloc, stack->buflen);
     /*
      * copy over used items data
      */
-    mem_sys_memcopy(for_alloc.bufstart, stack->items.bufstart,
+    mem_sys_memcopy(for_alloc.bufstart, stack->bufstart,
 	    stack->item_size * stack->items_per_chunk);
-    stack->items.bufstart = for_alloc.bufstart;
+    stack->bufstart = for_alloc.bufstart;
     PObj_COW_CLEAR((Buffer*)stack);
 }
 
@@ -164,7 +164,7 @@ stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
             assert(!PObj_COW_TEST( (Buffer *) chunk));
 	}
     }
-    return (char*) chunk->items.bufstart + chunk->used++ * chunk->item_size;
+    return (char*) chunk->bufstart + chunk->used++ * chunk->item_size;
 }
 
 /*
@@ -205,7 +205,7 @@ stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
         internal_exception(ERROR_STACK_EMPTY, "No entries on %sStack!\n",
                 chunk->name);
     }
-    return (char*) chunk->items.bufstart + --chunk->used * chunk->item_size;
+    return (char*) chunk->bufstart + --chunk->used * chunk->item_size;
 }
 
 /*
