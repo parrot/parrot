@@ -20,7 +20,7 @@
 int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
-extern flush_register_windows(void);
+extern void flush_register_windows(void);
 static size_t find_common_mask(size_t val1, size_t val2);
 
 PMC *
