@@ -150,8 +150,8 @@ ParrotIO * PIO_win32_fdopen(theINTERP, ParrotIOLayer * layer,
         UINTVAL mode;
         mode = 0;
 
-        /* FIXME - Check file handle specifics, validity */
-
+        if(PIO_win32_isatty(fd))
+                flags |= PIO_F_CONSOLE;
         io = PIO_new(interpreter, NULL, PIO_F_FILE, flags, mode);
         io->fd = fd;
         return io;
@@ -168,16 +168,9 @@ INTVAL PIO_win32_close(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
 
 
 INTVAL PIO_win32_isatty(PIOHANDLE fd) {
-        /* This is the only way I know to do this on Windows */
         HANDLE h;
-        if((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE
-                && (h == fd))
-                return 1;
-        if((h = GetStdHandle(STD_OUTPUT_HANDLE)) != INVALID_HANDLE_VALUE
-                && (h == fd))
-                return 1;
-        if((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE
-                && (h == fd))
+        DWORD ftype = GetFileType(fd);
+        if(ftype == FILE_TYPE_CHAR)
                 return 1;
         return 0;
 }
