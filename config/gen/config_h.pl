@@ -35,6 +35,8 @@ sub runstep {
     }
   }
   
+  print HH "#define BUILD_OS_NAME \"$^O\"\n";
+
   close HH;
 
   move_if_diff("$hh.tmp", $hh);

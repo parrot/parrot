@@ -177,6 +177,15 @@ typedef struct Parrot_Interp {
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
 
+#define PARROT_INTSIZE               1
+#define PARROT_FLOATSIZE             2
+#define PARROT_POINTERSIZE           3
+#define PARROT_OS                    4
+#define PARROT_OS_VERSION            5
+#define PARROT_OS_VERSION_NUMBER     6
+#define CPU_ARCH                     7
+#define CPU_TYPE                     8
+
 struct Parrot_Interp *make_interpreter(Interp_flags);
 void Parrot_init(Parrot_Interp, void*);
 void Parrot_destroy(Parrot_Interp);
@@ -189,6 +198,8 @@ VAR_SCOPE opcode_t *(*run_native)(struct Parrot_Interp * interpreter,
                                   opcode_t * cur_opcode,
                                   opcode_t * start_code);
 void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func);
+INTVAL sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted);
+STRING *sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted);
 
 #endif   /* Parrot core */
 

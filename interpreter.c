@@ -770,6 +770,35 @@ static void setup_default_compreg(Parrot_Interp interpreter)
             string_make(interpreter, "pIt", 3, NULL,0,NULL));
 }
 
+INTVAL
+sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted)
+{
+    switch (info_wanted) {
+    case PARROT_INTSIZE:
+        return sizeof(INTVAL);
+    case PARROT_FLOATSIZE:
+        return sizeof(FLOATVAL);
+    case PARROT_POINTERSIZE:
+        return sizeof(void *);
+    default:
+        return -1;
+    }
+}
+
+STRING *
+sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
+{
+    switch (info_wanted) {
+    case PARROT_OS:
+        return string_from_c_string(interpreter, BUILD_OS_NAME, 0);
+    case PARROT_OS_VERSION:
+    case PARROT_OS_VERSION_NUMBER:
+    case CPU_ARCH:
+    case CPU_TYPE:
+    default:
+        return string_from_c_string(interpreter, "", 0);
+    }
+}
 
 /*
  * Local variables:
