@@ -21,16 +21,17 @@ int   op_args[2048];
  * Check the bytecode's opcode table fingerprint.
  */
 void
-check_fingerprint(void) {
-    if (Parrot_num_string_constants == 0) {
+check_fingerprint(struct Parrot_Interp *interpreter) {
+/*    if (PNCONST == 0) { */
+    if (interpreter->code->const_table->const_count == 0) {
         fprintf(stderr, "Warning: Bytecode does not include opcode table fingerprint!\n");
     }
     else {
         const char * fp_data;
         IV           fp_len;
 
-        fp_data = Parrot_string_constants[0]->bufstart;
-        fp_len  = Parrot_string_constants[0]->buflen;
+        fp_data = PCONST(0)->string->bufstart;
+        fp_len  = PCONST(0)->string->buflen;
         
         if (strncmp(OPCODE_FINGERPRINT, fp_data, fp_len)) {
             fprintf(stderr, "Error: Opcode table fingerprint in bytecode does not match interpreter!\n");
@@ -45,20 +46,27 @@ check_fingerprint(void) {
  * run parrot operations until the program is complete
  */
 opcode_t *
-runops_notrace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
+runops_notrace_core (struct Parrot_Interp *interpreter) {
     /* Move these out of the inner loop. No need to redeclare 'em each
        time through */
     opcode_t *(* func)();
     opcode_t *(**temp)();
-    opcode_t *code_start;
+    opcode_t * code_start;
+    IV         code_size;
+    opcode_t * code_end;
+    opcode_t * pc;
 
-    code_start = code;
+    code_start = (opcode_t *)interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size;
+    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
 
-    while (code >= code_start && code < (code_start + code_size) && *code) {
-        DO_OP(code, temp, func, interpreter);
+    pc = code_start;
+
+    while (pc >= code_start && pc < code_end && *pc) {
+        DO_OP(pc, temp, func, interpreter);
     }
 
-    return code;
+    return pc;
 }
 
 /*
@@ -67,23 +75,23 @@ runops_notrace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_
  * and ARGS. Used by runops_trace.
  */
 void
-trace_op(opcode_t * code_start, long code_size, opcode_t *code) {
+trace_op(opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
     int i;
 
-    if (code >= code_start && code < (code_start + code_size)) {
-        fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(code - code_start), *code, op_names[*code]);
-        if (op_args[*code]) {
+    if (pc >= code_start && pc < code_end) {
+        fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc, op_names[*pc]);
+        if (op_args[*pc]) {
             fprintf(stderr, "; ARGS=(");
-            for(i = 0; i < op_args[*code]; i++) {
+            for(i = 0; i < op_args[*pc]; i++) {
                 if (i) { fprintf(stderr, ", "); }
-                fprintf(stderr, "%ld", *(code + i + 1));
+                fprintf(stderr, "%ld", *(pc + i + 1));
             }
             fprintf(stderr, ")");
         }
         fprintf(stderr, "\n");
     }
     else {
-        fprintf(stderr, "PC=%ld; OP=<err>\n", (long)(code - code_start));
+        fprintf(stderr, "PC=%ld; OP=<err>\n", (long)(pc - code_start));
     }
 }
 
@@ -92,24 +100,31 @@ trace_op(opcode_t * code_start, long code_size, opcode_t *code) {
  * Passed to runops_generic() by runops_trace().
  */
 opcode_t *
-runops_trace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
+runops_trace_core (struct Parrot_Interp *interpreter) {
     /* Move these out of the inner loop. No need to redeclare 'em each
        time through */
     opcode_t *( *func)();
     opcode_t *(**temp)();
-    opcode_t *code_start;
+    opcode_t * code_start;
+    IV         code_size;
+    opcode_t * code_end;
+    opcode_t * pc;
 
-    code_start = code;
+    code_start = (opcode_t *)interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size;
+    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
 
-    trace_op(code_start, code_size, code);
+    pc = code_start;
 
-    while (code >= code_start && code < (code_start + code_size) && *code) {
-        DO_OP(code, temp, func, interpreter);
+    trace_op(code_start, code_end, pc);
+    
+    while (pc >= code_start && pc < code_end && *pc) {
+        DO_OP(pc, temp, func, interpreter);
 
-        trace_op(code_start, code_size, code);
+        trace_op(code_start, code_end, pc);
     }
 
-    return code;
+    return pc;
 }
 
 /*=for api interpreter runops_generic
@@ -117,17 +132,22 @@ runops_trace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_si
  * Generic runops, which takes a function pointer for the core.
  */
 void
-runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *, IV), struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
+runops_generic (opcode_t * (*core)(struct Parrot_Interp *), struct Parrot_Interp *interpreter) {
     opcode_t * code_start;
+    IV         code_size;
+    opcode_t * code_end;
+    IV *       pc;
 
-    check_fingerprint();
+    check_fingerprint(interpreter);
 
-    code_start = code;
+    code_start = (opcode_t *)interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size;
+    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
 
-    code = core(interpreter, code, code_size);
+    pc = core(interpreter);
 
-    if (code < code_start || code >= (code_start + code_size)) {
-        fprintf(stderr, "Error: Control left bounds of byte-code block (now at location %d)!\n", code - code_start);
+    if (pc < code_start || pc >= code_end) {
+        fprintf(stderr, "Error: Control left bounds of byte-code block (now at location %d)!\n", pc - code_start);
         exit(1);
     }
 }
@@ -137,8 +157,8 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *, IV), stru
  * run parrot operations until the program is complete
  */
 void
-runops (struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
-    opcode_t * (*core)(struct Parrot_Interp *, opcode_t *, IV);
+runops (struct Parrot_Interp *interpreter, struct PackFile * code) {
+    opcode_t * (*core)(struct Parrot_Interp *);
 
     if (interpreter->flags & PARROT_TRACE_FLAG) {
         core = runops_trace_core;
@@ -147,7 +167,9 @@ runops (struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
         core = runops_notrace_core;
     }
 
-    runops_generic(core, interpreter, code, code_size);
+    interpreter->code = code;
+
+    runops_generic(core, interpreter);
 }
 
 /*=for api interpreter make_interpreter
@@ -228,6 +250,9 @@ make_interpreter() {
     Init_IO(interpreter);
     
     /* Done. Return and be done with it */
+
+    interpreter->code = (struct PackFile *)NULL;
+
     return interpreter;   
 }
 

@@ -15,7 +15,6 @@ Types_pm.in
 assemble.pl
 basic_opcodes.ops
 build_interp_starter.pl
-bytecode.c
 config_h.in
 disassemble.pl
 docs/opcodes.pod
@@ -26,7 +25,6 @@ docs/strings.pod
 docs/vtables.pod
 global_setup.c
 hints/mswin32.pl
-include/parrot/bytecode.h
 include/parrot/events.h
 include/parrot/exceptions.h
 include/parrot/global_setup.h

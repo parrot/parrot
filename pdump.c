@@ -14,11 +14,11 @@
 
 int
 main(int argc, char **argv) {
-    struct stat file_stat;
-    int         fd;
-    char *      packed;
-    long        packed_size;
-    PackFile * pf;
+    struct stat       file_stat;
+    int               fd;
+    char *            packed;
+    long              packed_size;
+    struct PackFile * pf;
 
     if (argc != 2) {
         fprintf(stderr, "pdump: usage: pdump FILE\n");

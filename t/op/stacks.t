@@ -44,6 +44,7 @@ output_is(<<"CODE", <<'OUTPUT', "push_i_c & pop_i");
 @{[ print_int_regs() ]}
 	pop_i
 @{[ print_int_regs() ]}
+	end
 CODE
 01234
 56789

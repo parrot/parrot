@@ -104,6 +104,7 @@ output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	print	"\\n"
         end
 	set	I0, 0
+	end
 CODE
 0
 1

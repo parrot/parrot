@@ -3,193 +3,199 @@
 * $Id$
 */
 
+#ifndef PACKFILE_H
+#define PACKFILE_H
+
 #include <parrot/parrot.h>
+
+#define PF_NCONST(pf)  (pf)->const_table->const_count
+#define PF_CONST(pf,i) (pf)->const_table->constants[i]
 
 
 /*
 ** Structure Definitions:
 */
 
-typedef struct {
+struct PackFile_FixupTable {
     IV                    dummy;
-} PackFile_FixupTable;
+};
 
 
-typedef struct {
-    IV     flags;
-    IV     encoding;
-    IV     type;
-    IV     size;
-    char * data;
-} PackFile_Constant;
+struct PackFile_Constant {
+    IV       type;
+    STRING * string;
+};
 
 
-typedef struct {
-    IV                    const_count;
-    PackFile_Constant **  constants;
-} PackFile_ConstTable;
+struct PackFile_ConstTable {
+    IV                           const_count;
+    struct PackFile_Constant **  constants;
+};
 
 
-typedef struct {
-    IV                    magic;
-    PackFile_FixupTable * fixup_table;
-    PackFile_ConstTable * const_table;
-    IV                    byte_code_size;
-    char *                byte_code;
-} PackFile;
+struct PackFile {
+    IV                           magic;
+    struct PackFile_FixupTable * fixup_table;
+    struct PackFile_ConstTable * const_table;
+    IV                           byte_code_size;
+    char *                       byte_code;
+};
 
 
 /*
 ** PackFile Functions:
 */
 
-PackFile *
+struct PackFile *
 PackFile_new(void);
 
 void
-PackFile_DELETE(PackFile * self);
+PackFile_DELETE(struct PackFile * self);
 
 void
-PackFile_clear(PackFile * self);
+PackFile_clear(struct PackFile * self);
 
 IV
-PackFile_get_magic(PackFile * self);
+PackFile_get_magic(struct PackFile * self);
 
 void 
-PackFile_set_magic(PackFile * self, IV magic);
+PackFile_set_magic(struct PackFile * self, IV magic);
 
 IV
-PackFile_get_byte_code_size(PackFile * self);
+PackFile_get_byte_code_size(struct PackFile * self);
 
 char *
-PackFile_get_byte_code(PackFile * self);
+PackFile_get_byte_code(struct PackFile * self);
 
 void
-PackFile_set_byte_code(PackFile * self, IV byte_code_size, char * byte_code);
+PackFile_set_byte_code(struct PackFile * self, IV byte_code_size, char * byte_code);
 
 IV
-PackFile_unpack(PackFile * self, char * packed, IV packed_size);
+PackFile_unpack(struct PackFile * self, char * packed, IV packed_size);
 
 IV
-PackFile_pack_size(PackFile * self);
+PackFile_pack_size(struct PackFile * self);
 
 void
-PackFile_pack(PackFile * self, char * packed);
+PackFile_pack(struct PackFile * self, char * packed);
 
 void
-PackFile_dump(PackFile * self);
+PackFile_dump(struct PackFile * self);
 
 
 /*
 ** PackFile_FixupTable Functions:
 */
 
-PackFile_FixupTable *
+struct PackFile_FixupTable *
 PackFile_FixupTable_new(void);
 
 void
-PackFile_FixupTable_DELETE(PackFile_FixupTable * self);
+PackFile_FixupTable_DELETE(struct PackFile_FixupTable * self);
 
 void
-PackFile_FixupTable_clear(PackFile_FixupTable * self);
+PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
 
 IV
-PackFile_FixupTable_unpack(PackFile_FixupTable * self, char * packed, IV packed_size);
+PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, char * packed, IV packed_size);
 
 IV
-PackFile_FixupTable_pack_size(PackFile_FixupTable * self);
+PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 
 void
-PackFile_FixupTable_pack(PackFile_FixupTable * self, char * packed);
+PackFile_FixupTable_pack(struct PackFile_FixupTable * self, char * packed);
 
 void
-PackFile_FixupTable_dump(PackFile_FixupTable * self);
+PackFile_FixupTable_dump(struct PackFile_FixupTable * self);
 
 
 /*
 ** PackFile_ConstTable Functions:
 */
 
-PackFile_ConstTable *
+struct PackFile_ConstTable *
 PackFile_ConstTable_new(void);
 
 void
-PackFile_ConstTable_DELETE(PackFile_ConstTable * self);
+PackFile_ConstTable_DELETE(struct PackFile_ConstTable * self);
 
 void
-PackFile_ConstTable_clear(PackFile_ConstTable * self);
+PackFile_ConstTable_clear(struct PackFile_ConstTable * self);
 
 IV
-PackFile_ConstTable_get_const_count(PackFile_ConstTable * self);
+PackFile_ConstTable_get_const_count(struct PackFile_ConstTable * self);
 
 void
-PackFile_ConstTable_push_constant(PackFile_ConstTable * self, PackFile_Constant * constant);
+PackFile_ConstTable_push_constant(struct PackFile_ConstTable * self, struct PackFile_Constant * constant);
 
-PackFile_Constant *
-PackFile_ConstTable_constant(PackFile_ConstTable * self, IV index);
+struct PackFile_Constant *
+PackFile_ConstTable_constant(struct PackFile_ConstTable * self, IV index);
 
 IV
-PackFile_ConstTable_unpack(PackFile_ConstTable * self, char * packed, IV packed_size);
+PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, IV packed_size);
 
 IV
-PackFile_ConstTable_pack_size(PackFile_ConstTable * self);
+PackFile_ConstTable_pack_size(struct PackFile_ConstTable * self);
 
 void
-PackFile_ConstTable_pack(PackFile_ConstTable * self, char * packed);
+PackFile_ConstTable_pack(struct PackFile_ConstTable * self, char * packed);
 
 void
-PackFile_ConstTable_dump(PackFile_ConstTable * self);
+PackFile_ConstTable_dump(struct PackFile_ConstTable * self);
 
 
 /*
 ** PackFile_Constant Functions:
 */
 
-PackFile_Constant *
+struct PackFile_Constant *
 PackFile_Constant_new(void);
 
 void
-PackFile_Constant_DELETE(PackFile_Constant * self);
+PackFile_Constant_DELETE(struct PackFile_Constant * self);
 
 void
-PackFile_Constant_clear(PackFile_Constant * self);
+PackFile_Constant_clear(struct PackFile_Constant * self);
 
 IV
-PackFile_Constant_get_flags(PackFile_Constant * self);
+PackFile_Constant_get_flags(struct PackFile_Constant * self);
 
 void
-PackFile_Constant_set_flags(PackFile_Constant * self, IV flags);
+PackFile_Constant_set_flags(struct PackFile_Constant * self, IV flags);
 
 IV
-PackFile_Constant_get_encoding(PackFile_Constant * self);
+PackFile_Constant_get_encoding(struct PackFile_Constant * self);
 
 void
-PackFile_Constant_set_encoding(PackFile_Constant * self, IV encoding);
+PackFile_Constant_set_encoding(struct PackFile_Constant * self, IV encoding);
 
 IV
-PackFile_Constant_get_type(PackFile_Constant * self);
+PackFile_Constant_get_type(struct PackFile_Constant * self);
 
 void
-PackFile_Constant_set_type(PackFile_Constant * self, IV type);
+PackFile_Constant_set_type(struct PackFile_Constant * self, IV type);
 
 IV
-PackFile_Constant_get_size(PackFile_Constant * self);
+PackFile_Constant_get_size(struct PackFile_Constant * self);
 
 char *
-PackFile_Constant_get_data(PackFile_Constant * self);
+PackFile_Constant_get_data(struct PackFile_Constant * self);
 
 void
-PackFile_Constant_set_data(PackFile_Constant * self, IV size, char * data);
+PackFile_Constant_set_data(struct PackFile_Constant * self, IV size, char * data);
 
 IV
-PackFile_Constant_unpack(PackFile_Constant * self, char * packed, IV packed_size);
+PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, IV packed_size);
 
 IV
-PackFile_Constant_pack_size(PackFile_Constant * self);
+PackFile_Constant_pack_size(struct PackFile_Constant * self);
 
 void
-PackFile_Constant_pack(PackFile_Constant * self, char * packed);
+PackFile_Constant_pack(struct PackFile_Constant * self, char * packed);
 
 void
-PackFile_Constant_dump(PackFile_Constant * self);
+PackFile_Constant_dump(struct PackFile_Constant * self);
+
+
+#endif /* PACKFILE_H */
 

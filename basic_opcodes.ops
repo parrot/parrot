@@ -425,7 +425,7 @@ AUTO_OP clear_p {
 
 /* SET Sx, CONSTANT */
 AUTO_OP set_s_sc {
-  STR_REG(P1) = Parrot_string_constants[P2];
+  STR_REG(P1) = PCONST(P2)->string;
 }
 
 /* PRINT Sx */
@@ -436,8 +436,9 @@ AUTO_OP print_s {
 
 /* PRINT sc */
 AUTO_OP print_sc {
-  STRING *s = Parrot_string_constants[P1];
-  printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+  STRING *s = PCONST(P1)->string;
+  IV l = string_length(s);
+  printf("%.*s",(int)l, (char *)s->bufstart);
 }
 
 

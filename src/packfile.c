@@ -53,9 +53,9 @@ NOTE: The PackFile's magic is automatically set to PARROT_MAGIC.
 
 ***************************************/
 
-PackFile *
+struct PackFile *
 PackFile_new(void) {
-    PackFile * self = mem_sys_allocate(sizeof(PackFile));
+    struct PackFile * self = mem_sys_allocate(sizeof(struct PackFile));
 
     if (!self) {
         fprintf(stderr, "PackFile_new: Unable to allocate!\n");
@@ -99,7 +99,7 @@ Delete a PackFile.
 ***************************************/
 
 void
-PackFile_DELETE(PackFile * self) {
+PackFile_DELETE(struct PackFile * self) {
     if (!self) {
         fprintf(stderr, "PackFile_DELETE: self == NULL!\n");
         return;
@@ -130,7 +130,7 @@ NOTE: The PackFile's magic is set to PARROT_MAGIC, not to zero (0).
 ***************************************/
 
 void
-PackFile_clear(PackFile * self) {
+PackFile_clear(struct PackFile * self) {
     if (!self) {
         fprintf(stderr, "PackFile_clear: self == NULL!\n");
         return;
@@ -164,7 +164,7 @@ here for completeness of the interface.
 ***************************************/
 
 IV
-PackFile_get_magic(PackFile * self) {
+PackFile_get_magic(struct PackFile * self) {
     return self->magic;
 }
 
@@ -181,7 +181,7 @@ here for completeness of the interface.
 ***************************************/
 
 void 
-PackFile_set_magic(PackFile * self, IV magic) {
+PackFile_set_magic(struct PackFile * self, IV magic) {
     self->magic = magic;
 }
 
@@ -197,7 +197,7 @@ Get the size of the byte code.
 ***************************************/
 
 IV
-PackFile_get_byte_code_size(PackFile * self) {
+PackFile_get_byte_code_size(struct PackFile * self) {
     return self->byte_code_size;
 }
 
@@ -215,7 +215,7 @@ NOTE: The memory is owned by the PackFile.
 ***************************************/
 
 char *
-PackFile_get_byte_code(PackFile * self) {
+PackFile_get_byte_code(struct PackFile * self) {
     return self->byte_code;
 }
 
@@ -234,7 +234,7 @@ own the memory for the input byte code.
 ***************************************/
 
 void
-PackFile_set_byte_code(PackFile * self, IV byte_code_size, char * byte_code) {
+PackFile_set_byte_code(struct PackFile * self, IV byte_code_size, char * byte_code) {
     if (self->byte_code) {
         mem_sys_free(self->byte_code);
         self->byte_code = NULL;
@@ -281,7 +281,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 IV
-PackFile_unpack(PackFile * self, char * packed, IV packed_size) {
+PackFile_unpack(struct PackFile * self, char * packed, IV packed_size) {
     IV *   segment_ptr;
     IV     segment_size;
     char * byte_code_ptr;
@@ -386,7 +386,7 @@ contiguous region of memory.
 ***************************************/
 
 IV
-PackFile_pack_size(PackFile * self) {
+PackFile_pack_size(struct PackFile * self) {
     IV magic_size          = sizeof(IV);
     IV segment_length_size = sizeof(IV);
     IV fixup_table_size    = PackFile_FixupTable_pack_size(self->fixup_table);
@@ -412,7 +412,7 @@ PackFile_pack_size()!
 ***************************************/
 
 void
-PackFile_pack(PackFile * self, char * packed) {
+PackFile_pack(struct PackFile * self, char * packed) {
     char * cursor              = packed;
     IV *   iv_ptr;
     IV     fixup_table_size    = PackFile_FixupTable_pack_size(self->fixup_table);
@@ -455,7 +455,7 @@ Dump the PackFile to standard out in a human-readable form.
 ***************************************/
 
 void
-PackFile_dump(PackFile * self) {
+PackFile_dump(struct PackFile * self) {
     IV i;
 
     printf("MAGIC => 0x%08x,\n", self->magic);
@@ -511,9 +511,9 @@ Allocate a new empty PackFile FixupTable.
 
 ***************************************/
 
-PackFile_FixupTable *
+struct PackFile_FixupTable *
 PackFile_FixupTable_new(void) {
-    PackFile_FixupTable * self = mem_sys_allocate(sizeof(PackFile_FixupTable));
+    struct PackFile_FixupTable * self = mem_sys_allocate(sizeof(struct PackFile_FixupTable));
 
     self->dummy = 0;
 
@@ -532,7 +532,7 @@ Delete a PackFile FixupTable.
 ***************************************/
 
 void
-PackFile_FixupTable_DELETE(PackFile_FixupTable * self) {
+PackFile_FixupTable_DELETE(struct PackFile_FixupTable * self) {
     if (!self) {
         fprintf(stderr, "PackFile_FixupTable_DELETE: self == NULL!\n");
         return;
@@ -555,7 +555,7 @@ Clear a PackFile FixupTable.
 ***************************************/
 
 void
-PackFile_FixupTable_clear(PackFile_FixupTable * self) {
+PackFile_FixupTable_clear(struct PackFile_FixupTable * self) {
     if (!self) {
         fprintf(stderr, "PackFile_FixupTable_clear: self == NULL!\n");
         return;
@@ -580,7 +580,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 IV
-PackFile_FixupTable_unpack(PackFile_FixupTable * self, char * packed, IV packed_size) {
+PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, char * packed, IV packed_size) {
     return 1;
 }
 
@@ -597,7 +597,7 @@ contiguous region of memory.
 ***************************************/
 
 IV
-PackFile_FixupTable_pack_size(PackFile_FixupTable * self) {
+PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self) {
     return 0;
 }
 
@@ -615,7 +615,7 @@ PackFile_FixupTable_pack_size()!
 ***************************************/
 
 void
-PackFile_FixupTable_pack(PackFile_FixupTable * self, char * packed) {
+PackFile_FixupTable_pack(struct PackFile_FixupTable * self, char * packed) {
     return;
 }
 
@@ -631,7 +631,7 @@ Dump the PackFile FixupTable to standard output.
 ***************************************/
 
 void
-PackFile_FixupTable_dump(PackFile_FixupTable * self) {
+PackFile_FixupTable_dump(struct PackFile_FixupTable * self) {
     return;
 }
 
@@ -667,9 +667,9 @@ Allocate a new empty PackFile ConstTable.
 
 ***************************************/
 
-PackFile_ConstTable *
+struct PackFile_ConstTable *
 PackFile_ConstTable_new(void) {
-    PackFile_ConstTable * self = mem_sys_allocate(sizeof(PackFile_ConstTable));
+    struct PackFile_ConstTable * self = mem_sys_allocate(sizeof(struct PackFile_ConstTable));
 
     self->const_count = 0;
     self->constants   = NULL;
@@ -689,7 +689,7 @@ Delete a PackFile ConstTable.
 ***************************************/
 
 void
-PackFile_ConstTable_DELETE(PackFile_ConstTable * self) {
+PackFile_ConstTable_DELETE(struct PackFile_ConstTable * self) {
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_DELETE: self == NULL!\n");
         return;
@@ -714,7 +714,7 @@ Clear a PackFile ConstTable.
 ***************************************/
 
 void
-PackFile_ConstTable_clear(PackFile_ConstTable * self) {
+PackFile_ConstTable_clear(struct PackFile_ConstTable * self) {
     IV i;
 
     if (!self) {
@@ -747,7 +747,7 @@ Get the number of constants in the ConstTable.
 ***************************************/
 
 IV
-PackFile_ConstTable_get_const_count(PackFile_ConstTable * self) {
+PackFile_ConstTable_get_const_count(struct PackFile_ConstTable * self) {
     return self->const_count;
 }
 
@@ -764,15 +764,15 @@ to the ConstTable.
 ***************************************/
 
 void
-PackFile_ConstTable_push_constant(PackFile_ConstTable * self, PackFile_Constant * constant) {
-    PackFile_Constant ** temp;
+PackFile_ConstTable_push_constant(struct PackFile_ConstTable * self, struct PackFile_Constant * constant) {
+    struct PackFile_Constant ** temp;
     IV                   i;
 
     if (!constant) {
         return;
     }
 
-    temp = mem_sys_allocate((self->const_count + 1) * sizeof(PackFile_Constant *));
+    temp = mem_sys_allocate((self->const_count + 1) * sizeof(struct PackFile_Constant *));
 
     if (!temp) {
         fprintf(stderr, "Unable to reallocate Constant array to push a new Constant!\n");
@@ -799,8 +799,8 @@ Retrieve a Constant from the ConstTable.
 
 ***************************************/
 
-PackFile_Constant *
-PackFile_ConstTable_constant(PackFile_ConstTable * self, IV index) {
+struct PackFile_Constant *
+PackFile_ConstTable_constant(struct PackFile_ConstTable * self, IV index) {
     if (index < 0 || index >= self->const_count) {
         return NULL;
     }
@@ -825,7 +825,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 IV
-PackFile_ConstTable_unpack(PackFile_ConstTable * self, char * packed, IV packed_size) {
+PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, IV packed_size) {
     char * cursor;
     IV *   iv_ptr;
     IV     i;
@@ -842,7 +842,7 @@ PackFile_ConstTable_unpack(PackFile_ConstTable * self, char * packed, IV packed_
         return 1;
     }
 
-    self->constants = mem_sys_allocate(self->const_count * sizeof(PackFile_Constant *));
+    self->constants = mem_sys_allocate(self->const_count * sizeof(struct PackFile_Constant *));
 
     if (!self->constants) {
         fprintf(stderr, "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
@@ -874,7 +874,7 @@ contiguous region of memory.
 ***************************************/
 
 IV
-PackFile_ConstTable_pack_size(PackFile_ConstTable * self) {
+PackFile_ConstTable_pack_size(struct PackFile_ConstTable * self) {
     IV i;
     IV size = 0;
 
@@ -899,7 +899,7 @@ PackFile_ConstTable_pack_size()!
 ***************************************/
 
 void
-PackFile_ConstTable_pack(PackFile_ConstTable * self, char * packed) {
+PackFile_ConstTable_pack(struct PackFile_ConstTable * self, char * packed) {
     char * cursor;
     IV *   iv_ptr;
     IV     i;
@@ -931,7 +931,7 @@ Dump the PackFile ConstTable to standard output.
 ***************************************/
 
 void
-PackFile_ConstTable_dump(PackFile_ConstTable * self) {
+PackFile_ConstTable_dump(struct PackFile_ConstTable * self) {
     IV     i;
 
     for(i = 0; i < self->const_count; i++) {
@@ -974,15 +974,12 @@ Allocate a new empty PackFile Constant.
 
 ***************************************/
 
-PackFile_Constant *
+struct PackFile_Constant *
 PackFile_Constant_new(void) {
-    PackFile_Constant * self = mem_sys_allocate(sizeof(PackFile_Constant));
+    struct PackFile_Constant * self = mem_sys_allocate(sizeof(struct PackFile_Constant));
 
-    self->flags    = 0;
-    self->encoding = 0;
-    self->type     = 0;
-    self->size     = 0;
-    self->data     = NULL;
+    self->type       = '\0';
+    self->string     = NULL;
 
     return self;
 }
@@ -999,7 +996,7 @@ Delete a PackFile Constant.
 ***************************************/
 
 void
-PackFile_Constant_DELETE(PackFile_Constant * self) {
+PackFile_Constant_DELETE(struct PackFile_Constant * self) {
     if (!self) {
         fprintf(stderr, "PackFile_Constant_DELETE: self == NULL!\n");
         return;
@@ -1024,20 +1021,17 @@ Clear a PackFile Constant.
 ***************************************/
 
 void
-PackFile_Constant_clear(PackFile_Constant * self) {
+PackFile_Constant_clear(struct PackFile_Constant * self) {
     if (!self) {
         fprintf(stderr, "PackFile_Constant_clear: self == NULL!\n");
         return;
     }
 
-    self->flags    = 0;
-    self->encoding = 0;
-    self->type     = 0;
-    self->size     = 0;
+    self->type     = '\0';
 
-    if (self->data) {
-        mem_sys_free(self->data);
-        self->data = NULL;
+    if (self->string) {
+        string_destroy(self->string);
+        self->string = NULL;
     }
 
     return;
@@ -1055,8 +1049,12 @@ Clear a PackFile Constant.
 ***************************************/
 
 IV
-PackFile_Constant_get_flags(PackFile_Constant * self) {
-    return self->flags;
+PackFile_Constant_get_flags(struct PackFile_Constant * self) {
+    if (!self || !self->string) {
+        return 0;
+    }
+
+    return self->string->flags;
 }
 
 
@@ -1071,8 +1069,12 @@ Set the flags.
 ***************************************/
 
 void
-PackFile_Constant_set_flags(PackFile_Constant * self, IV flags) {
-    self->flags = flags;
+PackFile_Constant_set_flags(struct PackFile_Constant * self, IV flags) {
+    if (!self || !self->string) {
+        return;
+    }
+
+    self->string->flags = flags;
 }
 
 
@@ -1087,8 +1089,12 @@ Get the encoding for the Constant.
 ***************************************/
 
 IV
-PackFile_Constant_get_encoding(PackFile_Constant * self) {
-    return self->encoding;
+PackFile_Constant_get_encoding(struct PackFile_Constant * self) {
+    if (!self || !self->string) {
+        return;
+    }
+
+    return self->string->encoding->which;
 }
 
 /***************************************
@@ -1102,8 +1108,12 @@ Set the encoding for the Constant.
 ***************************************/
 
 void
-PackFile_Constant_set_encoding(PackFile_Constant * self, IV encoding) {
-    self->encoding = encoding;
+PackFile_Constant_set_encoding(struct PackFile_Constant * self, IV encoding) {
+    if (!self || !self->string) {
+        return;
+    }
+
+    self->string->encoding = &Parrot_string_vtable[encoding];
 }
 
 
@@ -1118,7 +1128,11 @@ Get the Constant type.
 ***************************************/
 
 IV
-PackFile_Constant_get_type(PackFile_Constant * self) {
+PackFile_Constant_get_type(struct PackFile_Constant * self) {
+    if (!self || !self->string) {
+        return;
+    }
+
     return self->type;
 }
 
@@ -1134,7 +1148,11 @@ Set the type of the Constant.
 ***************************************/
 
 void
-PackFile_Constant_set_type(PackFile_Constant * self, IV type) {
+PackFile_Constant_set_type(struct PackFile_Constant * self, IV type) {
+    if (!self || !self->string) {
+        return;
+    }
+
     self->type = type;
 }
 
@@ -1151,8 +1169,12 @@ Get the size of the Constant's data.
 ***************************************/
 
 IV
-PackFile_Constant_get_size(PackFile_Constant * self) {
-    return self->size;
+PackFile_Constant_get_size(struct PackFile_Constant * self) {
+    if (!self || !self->string) {
+        return;
+    }
+
+    return self->string->bufused;
 }
 
 
@@ -1160,15 +1182,19 @@ PackFile_Constant_get_size(PackFile_Constant * self) {
 
 =item get_data
 
-Retrieve the Constant's data.
+Retrieve the Constant's data. The data belongs to the PackFile Constant.
 
 =cut
 
 ***************************************/
 
 char *
-PackFile_Constant_get_data(PackFile_Constant * self) {
-    return self->data;
+PackFile_Constant_get_data(struct PackFile_Constant * self) {
+    if (!self || !self->string) {
+        return;
+    }
+
+    return self->string->bufstart;
 }
 
 
@@ -1176,30 +1202,34 @@ PackFile_Constant_get_data(PackFile_Constant * self) {
 
 =item set_data
 
-Set the Constant's data.
+Set the Constant's data. A copy is made.
 
 =cut
 
 ***************************************/
 
 void
-PackFile_Constant_set_data(PackFile_Constant * self, IV size, char * data) {
-    if (self->data) {
-        mem_sys_free(self->data);
-        self->data = NULL;
-        self->size = 0;
-    }
+PackFile_Constant_set_data(struct PackFile_Constant * self, IV size, char * data) {
+    IV       flags;
+    IV       encoding;
+    IV       type;
+    STRING * new_string;
 
-    self->data = mem_sys_allocate(size);
-
-    if (!self->data) {
-        fprintf(stderr, "Unable to allocate memory to copy PackFile Constant data!\n");
+    if (!self) {
         return;
     }
 
-    self->size = size;
+    flags = self->string->flags;
+    flags = self->string->encoding->which;
+    flags = self->string->type;
 
-    mem_sys_memcopy(self->data, data, size);
+    new_string = string_make(data, size, encoding, flags, type);
+
+    if (self->string) {
+        string_destroy(self->string);
+    }
+
+    self->string = new_string;
 
     return;
 }
@@ -1227,37 +1257,33 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 IV
-PackFile_Constant_unpack(PackFile_Constant * self, char * packed, IV packed_size) {
+PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, IV packed_size) {
     char * cursor;
-    IV *   iv_ptr;
-    IV    i;
+    IV     flags;
+    IV     encoding;
+    IV     type;
+    IV     size;
 
-    cursor  = packed;
-
-    iv_ptr          = (IV *)cursor;
-    self->flags     = *iv_ptr;
-    cursor         += sizeof(IV);
-
-    iv_ptr          = (IV *)cursor;
-    self->encoding  = *iv_ptr;
-    cursor         += sizeof(IV);
-
-    iv_ptr          = (IV *)cursor;
-    self->type      = *iv_ptr;
-    cursor         += sizeof(IV);
-
-    iv_ptr          = (IV *)cursor;
-    self->size      = *iv_ptr;
-    cursor         += sizeof(IV);
-
-    self->data = mem_sys_allocate(self->size);
-
-    if (!self->data) {
-        fprintf(stderr, "PackFile_Constant_unpack: Unable to allocate memory!\n");
+    if (!self) {
         return 0;
     }
 
-    mem_sys_memcopy(self->data, cursor, self->size);
+    cursor    = packed;
+
+    flags     = *(IV *)cursor;
+    cursor   += sizeof(IV);
+
+    encoding  = *(IV *)cursor;
+    cursor   += sizeof(IV);
+
+    type      = *(IV *)cursor;
+    cursor   += sizeof(IV);
+
+    size      = *(IV *)cursor;
+    cursor   += sizeof(IV);
+
+    self->type   = 'S';
+    self->string = string_make(cursor, size, encoding, flags, type);
 
     return 1;
 }
@@ -1275,10 +1301,14 @@ contiguous region of memory.
 ***************************************/
 
 IV
-PackFile_Constant_pack_size(PackFile_Constant * self) {
+PackFile_Constant_pack_size(struct PackFile_Constant * self) {
     IV padded_size;
 
-    padded_size = self->size;
+    if (!self) {
+        return 0;
+    }
+
+    padded_size = self->string->bufused;
 
     if (padded_size % sizeof(IV)) {
         padded_size += sizeof(IV) - (padded_size % sizeof(IV));
@@ -1296,42 +1326,46 @@ Pack the PackFile Constant into a contiguous region of memory. NOTE: The memory
 block had better have at least the amount of memory indicated by
 PackFile_Constant_pack_size()!
 
-The data is zero-badded to an IV-boundary, so pad bytes may be added.
+The data is zero-padded to an IV-boundary, so pad bytes may be added.
 
 =cut
 
 ***************************************/
 
 void
-PackFile_Constant_pack(PackFile_Constant * self, char * packed) {
+PackFile_Constant_pack(struct PackFile_Constant * self, char * packed) {
     char * cursor;
     IV *   iv_ptr;
     IV     i;
 
+    if (!self) {
+        return;
+    }
+
     cursor  = packed;
 
     iv_ptr  = (IV *)cursor;
-    *iv_ptr = self->flags;
+    *iv_ptr = self->string->flags;
     cursor += sizeof(IV);
 
     iv_ptr  = (IV *)cursor;
-    *iv_ptr = self->encoding;
+    *iv_ptr = self->string->encoding->which;
     cursor += sizeof(IV);
 
     iv_ptr  = (IV *)cursor;
-    *iv_ptr = self->type;
+    *iv_ptr = self->string->type;
     cursor += sizeof(IV);
 
     iv_ptr  = (IV *)cursor;
-    *iv_ptr = self->size;
+    *iv_ptr = self->string->bufused;
     cursor += sizeof(IV);
 
-    if (self->data) {
-        mem_sys_memcopy(cursor, self->data, self->size);
-        cursor += self->size;
+    if (self->string->bufstart) {
+        mem_sys_memcopy(cursor, self->string->bufstart, self->string->bufused);
+        cursor += self->string->bufused;
 
-        if (self->size % sizeof(IV)) {
-            for(i = 0; i < (sizeof(IV) - (self->size % sizeof(IV))); i++) {
+        if (self->string->bufused % sizeof(IV)) {
+            for(i = 0; i < (sizeof(IV) - (self->string->bufused % sizeof(IV))); i++) {
                 cursor[i] = 0;
             }
         }
@@ -1352,14 +1386,17 @@ Dump the PackFile Constant to standard output.
 ***************************************/
 
 void
-PackFile_Constant_dump(PackFile_Constant * self) {
+PackFile_Constant_dump(struct PackFile_Constant * self) {
+    if (!self) {
+        return;
+    }
 
     printf("    {\n");
-    printf("        FLAGS    => %04x,\n", self->flags);
-    printf("        ENCODING => %ld,\n",  self->encoding);
-    printf("        TYPE     => %ld,\n",  self->type);
-    printf("        SIZE     => %ld,\n",  self->size);
-    printf("        DATA     => '%s'\n",  self->data); /* TODO: Not a good idea in general */
+    printf("        FLAGS    => %04x,\n", self->string->flags);
+    printf("        ENCODING => %ld,\n",  self->string->encoding);
+    printf("        TYPE     => %ld,\n",  self->string->type);
+    printf("        SIZE     => %ld,\n",  self->string->bufused);
+    printf("        DATA     => '%s'\n",  self->string->bufstart); /* TODO: Not a good idea in general */
     printf("    },\n");
 
     return;

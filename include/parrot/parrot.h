@@ -69,7 +69,7 @@ typedef void STRING_FUNCS;
 #include "parrot/register.h"
 #include "parrot/exceptions.h"
 #include "parrot/memory.h"
-#include "parrot/bytecode.h"
+#include "parrot/packfile.h"
 #include "parrot/io.h"
 #include "parrot/op.h"
 #include "parrot/events.h"

@@ -12,19 +12,6 @@
 
 #include "parrot/parrot.h"
 
-IV opcodes[] = {3, 1,                /* put the time in reg 1 */
-                0, 2, 0,             /* Set reg 2 to 0 */
-		0, 3, 1,             /* set reg 3 to 1 */
-		0, 4, 100000000,     /* set reg 4 to 100M  */
-                2, 2, 4, 11, 5,      /* is reg 2 eq to reg 4? */
-		1, 2, 2, 3,          /* Add register 2 to 3, store in 2 */
-		5, -9,               /* branch back to if */
-		3, 5,                /* Put the time in reg 5 */
-		4, 1,                /* Print reg 1 */
-		4, 5,                /* Print reg 5 */
-		6                    /* exit */
-                };
-
 int
 main(int argc, char **argv) {
     int i;
@@ -48,9 +35,10 @@ main(int argc, char **argv) {
         tracing = 0;
     }
 
-    /* If we got only the program name, run the test program */
+    /* If we got only the program name, complain */
     if (argc == 1) {
-        runops(interpreter, (opcode_t*)opcodes, sizeof(opcodes));
+        fprintf(stderr, "%s: usage: %s prog\n", argv[0], argv[0]);
+        exit(1);
     }
     else if (argc == 2 && !strcmp(argv[1], "-s")) { /* String tests */
         STRING *s = string_make("foo", 3, enc_native, 0, 0);
@@ -79,6 +67,7 @@ main(int argc, char **argv) {
         long program_size;
         struct stat file_stat;
         int fd;
+        struct PackFile * pf;
 
         if (stat(argv[1], &file_stat)) {
             printf("can't stat %s, code %i\n", argv[1], errno);
@@ -104,13 +93,14 @@ main(int argc, char **argv) {
             return 1;
         }
         
-        program_code = init_bytecode(program_code, &program_size);
+        pf = PackFile_new();
+        PackFile_unpack(pf, (char *)program_code, program_size);
         
         if (tracing) {
             interpreter->flags |= PARROT_TRACE_FLAG;
         }
 
-        runops(interpreter, program_code, program_size);
+        runops(interpreter, pf);
         
     }
     return 0;

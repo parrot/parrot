@@ -35,17 +35,23 @@ struct Parrot_Interp {
     IV flags;				  /* Various interpreter flags
                                            that signal that runops
                                            should do something */
+
+    struct PackFile * code;                      /* The code we are executing */
+
 };
 
 #define PARROT_DEBUG_FLAG 0x01		/* Bit in the flags that says
                                            we're debugging */
 #define PARROT_TRACE_FLAG 0x02		/* We're tracing execution */
 
+#define PCONST(i) PF_CONST(interpreter->code, (i))
+#define PNCONST   PF_NCONST(interpreter->code)
+
 struct Parrot_Interp *
 make_interpreter();
 
 void
-runops(struct Parrot_Interp *, opcode_t *, IV);
+runops(struct Parrot_Interp *, struct PackFile *);
 
 #endif
 
