@@ -63,7 +63,7 @@ GEN_OPSFILES =
 GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 	$(INC)/oplib/core_ops_prederef.h
 
-GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c
+GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c nci.c
 
 GEN_MODULES = lib/Parrot/OpLib/core.pm
 
