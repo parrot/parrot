@@ -51,7 +51,6 @@ i	lsp
 i	pll
 i	ilsp
 i	pl
-i	4i
 p	B
 
 # These are needed for parrotio.pmc
