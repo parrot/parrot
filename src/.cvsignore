@@ -5,4 +5,5 @@ jit_cpu.c
 nci.c
 platform.c
 platform_asm.s
+parrot_config.h
 *.str

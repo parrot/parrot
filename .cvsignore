@@ -6,6 +6,8 @@ Makefile
 myconfig
 *.patch
 *.tmp
+parrot.ilk
+parrot.pdb
 test
 test.c
 test.o
@@ -15,6 +17,7 @@ test.ldo
 test.out
 test.pdb
 vc60.pdb
+vc70.pdb
 CFLAGS
 disassemble
 pbc_info

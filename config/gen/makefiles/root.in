@@ -1118,11 +1118,20 @@ progclean :
     $(SRC)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC)/pdb$(O) \
     $(DIS) $(SRC)/disassemble$(O) \
-    $(DYNEXT_DIR)/$(LIBNCI_SO)
+    $(LIBNCI_SO)
 	$(RM_F) $(LIBPARROT)
 	$(PERL) build_tools/c2str.pl --init
 	$(RM_F) $(STR_FILES) $(INC)/string_private_cstring.h
 	$(RM_F) classes/*.c classes/*.h classes/*.dump vtable.dump
+# win32 import library (shared object is deleted by LIBNCI_SO above)
+	$(RM_F) $(DYNEXT_DIR)/libnci.lib
+# win32 program data base - contains debugging info
+	$(RM_F) *.pdb $(DYNEXT_DIR)/*.pdb
+# win32 incremental link status files
+	$(RM_F)	*.ilk $(DYNEXT_DIR)/*.ilk
+# win32 exported functions and data items
+	$(RM_F)	$(DYNEXT_DIR)/*.exp
+
 
 testclean :
 	$(RM_F) t/op/*.pasm
