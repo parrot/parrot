@@ -103,9 +103,91 @@ byteorder if needed.
 
 INLINE opcode_t
 PackFile_fetch_op(struct PackFile *pf, opcode_t *stream) {
-    if(pf->transform == NULL)
+    if(pf->fetch_op == NULL)
         return *stream;
-    return endian_fetch_op(*stream, pf->transform);
+#if TRACE_PACKFILE == 2
+    fprintf(stderr, "PackFile_fetch_op: Reordering.\n");
+#endif
+    return (pf->fetch_op)(*stream);
+}
+
+/***************************************
+
+=item fetch_iv
+
+Fetch an INTVAL from the stream, converting
+byteorder if needed.
+
+=cut
+
+***************************************/
+
+INLINE INTVAL
+PackFile_fetch_iv(struct PackFile *pf, opcode_t *stream) {
+    if(pf->fetch_iv == NULL)
+        return *stream;
+    return (pf->fetch_iv)(*stream);
+}
+
+/***************************************
+
+=item fetch_iv
+
+Fetch an INTVAL from the stream, converting
+byteorder if needed.
+
+=cut
+
+***************************************/
+
+INLINE FLOATVAL
+PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream) {
+    /* When we have alignment all squared away we don't need
+     * to use memcpy() for native byteorder.
+     */
+    FLOATVAL f;
+    if(pf->fetch_nv == NULL) {
+#if TRACE_PACKFILE
+        fprintf(stderr, "PackFile_fetch_nv: Native [%d bytes]..\n", sizeof(FLOATVAL));
+#endif
+        memcpy(&f, stream, sizeof(FLOATVAL));
+        return f;
+    }
+#if TRACE_PACKFILE
+    fprintf(stderr, "PackFile_fetch_nv: Byteordering..\n");
+#endif
+    /* Here is where the size transforms get messy */
+    (pf->fetch_nv)((unsigned char *)&f, (unsigned char *)stream);
+    return f;
+}
+
+/*
+ * Assign transform functions to vtable
+ */
+void PackFile_assign_transforms(struct PackFile *pf) {
+#if PARROT_BIGENDIAN
+    if(pf->header->byteorder != PARROT_BIGENDIAN) {
+        pf->need_endianize = 1;
+        pf->fetch_op = fetch_op_le;
+        pf->fetch_iv = fetch_iv_le;
+        /* FIXME: Use the float_type from bytecode header to decide vtable */
+        pf->fetch_nv = fetch_buf_le_8;
+    }
+#else
+    if(pf->header->byteorder != PARROT_BIGENDIAN) {
+        pf->need_endianize = 1;
+        pf->fetch_op = fetch_op_be;
+        pf->fetch_iv = fetch_iv_be;
+        /* FIXME: Use the float_type from bytecode header to decide vtable */
+        pf->fetch_nv = fetch_buf_be_8;
+    }
+#if TRACE_PACKFILE
+    else {
+        fprintf(stderr, "header->byteorder [%d] native byteorder [%d]\n",
+            pf->header->byteorder, PARROT_BIGENDIAN);
+    }
+#endif
+#endif    
 }
 
 /***************************************
@@ -130,10 +212,6 @@ PackFile_destroy(struct PackFile *pf)
         mem_sys_free(pf->header);
     }
 
-    if (pf->transform) {
-        mem_sys_free(pf->transform);
-    }
-    
     if (pf->fixup_table) {
         mem_sys_free(pf->fixup_table);
     }
@@ -175,6 +253,14 @@ PackFile_check_segment_size(opcode_t segment_size, const char *debug)
 
 Unpack a PackFile from a block of memory. The format is:
 
+  byte     wordsize
+  byte     byteorder
+  byte     major
+  byte     minor
+  byte     flags
+  byte     floattype
+  byte     pad[10]
+
   opcode_t magic
 
   opcode_t segment_length
@@ -200,7 +286,6 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 opcode_t *packed, size_t packed_size)
 {
     struct PackFile_Header * header = self->header;
-    unsigned char native_byteorder[64];
     opcode_t *cursor;
     int i;
     
@@ -209,11 +294,6 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         return 0;
     }
 
-    /*
-     * First get our native byteorder matrix
-     */
-    endian_matrix(native_byteorder);
-    
     /*
      * Map the header on top of the buffer later when we are sure
      * we have alignment done right.
@@ -229,8 +309,11 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         }
     }
 
+    PackFile_assign_transforms(self);
+    
 #if TRACE_PACKFILE
     fprintf(stderr, "wordsize: %d\n", header->wordsize);
+    fprintf(stderr, "byteorder: %d\n", header->byteorder);
 #endif
 
     /*
@@ -243,58 +326,6 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         return 0;    
     }    
  
-    /*
-     * Transform the bytecode byteorder matrix (b) with
-     * our matrix (n), which results in the transform
-     * b -> n
-     * Consider a PDP-11 (2301) reading a Sparc generated (3210).
-     * The transform matrix is (1032).
-     */
-    if(memcmp(header->byteorder, native_byteorder, (size_t)header->wordsize)) {
-        self->transform = mem_sys_allocate(32);
-        endian_fetch_buf(self->transform, header->byteorder, native_byteorder,
-                        header->wordsize);
-#if TRACE_PACKFILE
-        if(header->wordsize == 4) {
-            fprintf(stderr, "Bytecode non-native [%u-%u-%u-%u] order, endianizing.\n",
-            header->byteorder[0], header->byteorder[1], header->byteorder[2],
-            header->byteorder[3]);
-            fprintf(stderr, "Native order [%u-%u-%u-%u].\n",
-            native_byteorder[0], native_byteorder[1], native_byteorder[2],
-            native_byteorder[3]);
-            fprintf(stderr, "Transform matrix [%u-%u-%u-%u].\n",
-            self->transform[0], self->transform[1], self->transform[2],
-            self->transform[3]);
-            
-        }
-        else if(header->wordsize == 8)
-            fprintf(stderr, "Bytecode non-native [%d%d%d%d%d%d%d%d] order, endianizing.\n",
-            header->byteorder[0], header->byteorder[1], header->byteorder[2],
-            header->byteorder[3], header->byteorder[4], header->byteorder[5],
-            header->byteorder[6], header->byteorder[7]);
-        
-#endif
-        self->need_endianize = 1;
-        /*
-         * Verify the range of the byteorder matrix elements
-         * Byteorder comes in as 0123, 01234567, 3210, etc.
-         * because it is used as a transformation matrix by the
-         * endianize routine.
-         */
-        for(i = 0; i < header->wordsize; i++) {
-            /* byteorder elements are unsigned so no check for < 0 */
-            if(header->byteorder[i] > header->wordsize - 1) {
-                fprintf(stderr, "PackFile_unpack: invalid byteorder element ");
-                fprintf(stderr, "or wordsize/byteorder mismatch\n");
-                fprintf(stderr, "File wordsize: %d\nByteorder: ", header->wordsize);
-                for(i = 0; i < header->wordsize; i++)
-                    fprintf(stderr, "[%u]", header->byteorder[i]);
-                fprintf(stderr, "\n");
-                return 0;
-            }
-        }
-    }
-
     /*
      * Unpack and verify the magic which is stored byteorder of the file:
      */
@@ -377,7 +408,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
             return 0;
         }
 
-        if(!self->need_endianize) {
+        if(!self->need_endianize && !self->need_wordsize) {
             mem_sys_memcopy(self->byte_code, cursor, self->byte_code_size);
             /* Segment size is in bytes */
             cursor += header->bytecode_ss / sizeof(opcode_t);
@@ -781,14 +812,14 @@ PackFile_Constant_unpack_number(struct PackFile * pf, struct PackFile_Constant *
                                 opcode_t *packed, opcode_t packed_size)
 {
     opcode_t *cursor;
-    /* Yuck, we now need a fetch_number... */
+/*
     union F {
         FLOATVAL value;
         opcode_t b[sizeof(FLOATVAL)/sizeof(opcode_t)];
     } f;
 
     int i;
-    
+*/    
     UNUSED(packed_size);
 
     if (!self) {
@@ -804,17 +835,12 @@ PackFile_Constant_unpack_number(struct PackFile * pf, struct PackFile_Constant *
      * determined by Configure.
      */
 #if TRACE_PACKFILE
-    if(pf->need_endianize)
     fprintf(stderr, "FIXME: PackFile_Constant_unpack_number: assuming size of FLOATVAL!\n");
-#endif    
-    for(i = 0; i < (int)(sizeof(FLOATVAL) / sizeof(opcode_t)); i++) {
-        f.b[i] = PackFile_fetch_op(pf, cursor+i);
-    }
-/*    
-    mem_sys_memcopy(&value, cursor, sizeof(FLOATVAL));
-*/    
+#endif
+    self->number = PackFile_fetch_nv(self, (unsigned char *)cursor);
+     
     self->type = PFC_NUMBER;
-    self->number = f.value;
+/*    self->number = f.value; */
 
     return 1;
 }

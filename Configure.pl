@@ -648,6 +648,18 @@ END
     $c{byteorder}=runtestc("testbyteorder") or die "Can't run the testbyteorder program: $!";
     chop $c{byteorder};
     print "\nNative byte-order appears to be [", $c{byteorder}, "]\n";
+    if($c{byteorder} =~ /^1234/) {
+        print "Configuring for little-endian\n";
+        $c{bigendian} = 0;
+    }
+    elsif($c{byteorder} =~ /^(8765|4321)/) {
+        print "Configuring for big-endian\n";
+        $c{bigendian} = 1;
+    }
+    else {
+        die "Unsupported byte-order!";
+    }
+    
     if(length($c{byteorder}) != length($c{perl5byteorder})) {
         print "Note, the sizeof Perl5 INTs appear to be different from Parrot's\n";
         print "for this configuration, if this is expected, ignore this.\n";
@@ -669,9 +681,14 @@ if ($c{iv} eq "int") {
     die "Configure.pl:  Can't find a printf-style format specifier for type \"$c{iv}\"\n";
 }
 
+$c{nvsize} = $c{floatsize};
 if ($c{nv} eq "double") {
+    $c{nvsize} = $c{doublesize};
     $c{floatvalfmt} = "%f";
 } elsif ($c{nv} eq "long double") {
+    # Stay way from long double for now (it may be 64 or 80 bits)
+    die "long double not supported at this time, use double.";
+    $c{nvsize} = $c{longdoublesize};
     $c{floatvalfmt} = "%lf";
 } else {
     die "Configure.pl:  Can't find a printf-style format specifier for type \"$c{nv}\"\n";

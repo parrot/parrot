@@ -4,11 +4,11 @@
  *     $Id$
  *  Overview:
  *     Byteordering functions
- *     These can be called to convert between our byteorder
- *     and another byteorder. Parrot must be able to load whatever
- *     byteorder/wordsize it sees. The caller should
- *     know if the bytecode byteorder is native and skip
- *     the conversion and just map it in.
+ *     These are assigned to a vtable in PackFile at each load.
+ *     If the vtable method is called for conversion from the
+ *     native byteorder, it is a noop and will work, but the
+ *     caller should know if the PackFile byteorder is native
+ *     and skip the conversion and just map it in.
  *  Data Structure and Algorithms:
  *  History:
  *     Initial version by Melvin on 2002/05/1
@@ -19,141 +19,250 @@
 #include "parrot/parrot.h"
 
 /*
- * The byteorder matrix in parrot is 0 based
- * because it is used as a transformation.
- * We should probably move this to Configure
- */
-void
-endian_matrix(unsigned char * buf) {
-    union U {
-        opcode_t op;
-        unsigned char c[sizeof(opcode_t)/sizeof(unsigned char)];
-    } u;
-    /* Expect the following to generate warning on 32 bit.*/
-    if(sizeof(opcode_t) > 4) {
-        /* Have to do this the long way for tcc */
-        u.op = 0x07060504;
-        u.op <<= 32;
-        u.op |= 0x03020100;
-    }    
-    else {
-        u.op = 0x03020100;
-    }    
-    memcpy(buf, u.c, sizeof(opcode_t));
-}
-
-
-/*
- * Arbitrary byte order handlers.
+ * Byte order handlers.
  */
  
 /*
- * This routine should work for any size
- * and combination of char and word. We can't
- * always assume a char is 8 bits.
- *
- * Takes INTVAL (w) and a byteorder matrix in a
- * character array, and reorders the word.
- * Benchmarking put this at 75% the speed
- * of the conditionally compiled routines
- * and reorders at a bandwidth higher than my
- * disk delivers.
- *
- * NOTE: Don't fear the if statements, they all
- * use compile time constants; and I think its quite
- * pretty with no macros..
+ * Configure should have checked for supported word sizes
  */
 
 INTVAL
-endian_fetch_intval(INTVAL w, unsigned char * o) {
-    unsigned char * b = (unsigned char *)&w;
+fetch_iv_le(INTVAL w) {
+#if !PARROT_BIGENDIAN
+    return w;
+#else
     INTVAL r;
-    unsigned char * rb = (unsigned char *)&r;
-    int nibbles = sizeof(INTVAL) / sizeof(char);
-
-    if(!o)
-        return w;
-        
-    rb[0] = b[o[0]];
-    /*
-     * Optimizer should decide these at compile time;
-     * even a dumb compiler should do constant evaluation
-     */
-    if(nibbles >= 2) {
-        rb[1] = b[o[1]];
-        if(nibbles >= 4) {
-            rb[2] = b[o[2]];
-            rb[3] = b[o[3]];
-            if(nibbles >= 8) {
-                rb[4] = b[o[4]];
-                rb[5] = b[o[5]];
-                rb[6] = b[o[6]];
-                rb[7] = b[o[7]];
-            }
-        }
-    }
-    return r;
+# if INTVAL_SIZE == 4
+    return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w>>24); 
+# else
+    r = w << 56;
+    r |= (w & 0xff00) << 40;
+    r |= (w & 0xff0000) << 24;
+    r |= (w & 0xff000000) << 8;
+    r |= (w & 0xff00000000) >> 8;
+    r |= (w & 0xff0000000000) >> 24;
+    r |= (w & 0xff00000000000000) >> 56;
+    return r;    
+# endif
+#endif
 }
+
+INTVAL
+fetch_iv_be(INTVAL w) {
+#if PARROT_BIGENDIAN
+    return w;
+#else
+    INTVAL r;
+# if INTVAL_SIZE == 4
+    return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w>>24); 
+# else
+    r = w << 56;
+    r |= (w & 0xff00) << 40;
+    r |= (w & 0xff0000) << 24;
+    r |= (w & 0xff000000) << 8;
+    r |= (w & 0xff00000000) >> 8;
+    r |= (w & 0xff0000000000) >> 24;
+    r |= (w & 0xff00000000000000) >> 56;
+    return r;    
+# endif
+#endif
+}
+
 
 /*
  * Same as above for opcode_t
  */
 opcode_t
-endian_fetch_op(opcode_t op, unsigned char * o) {
-    unsigned char * b = (unsigned char *)&op;
-    INTVAL r;
-    unsigned char * rb = (unsigned char *)&r;
-    int nibbles = sizeof(opcode_t) / sizeof(unsigned char);
+fetch_op_be(opcode_t w) {
+#if PARROT_BIGENDIAN
+    return w;
+#else
+    opcode_t r;
+# if OPCODE_T_SIZE == 4
+    return  (w << 24) | ((w & 0x0000ff00) << 8) | ((w & 0x00ff0000) >> 8) |
+            ((w & 0xff000000) >>24); 
+# else
+    r = w << 56;
+    r |= (w & 0xff00) << 40;
+    r |= (w & 0xff0000) << 24;
+    r |= (w & 0xff000000) << 8;
+    r |= (w & 0xff00000000) >> 8;
+    r |= (w & 0xff0000000000) >> 24;
+    r |= (w & 0xff00000000000000) >> 56;
+    return r;    
+# endif
+#endif    
+}
 
-    if(!o)
-        return op;
-        
-    rb[0] = b[o[0]];
-    /*
-     * Optimizer should decide these at compile time;
-     * even a dumb compiler should do constant evaluation
-     */
-    if(nibbles >= 2) {
-        rb[1] = b[o[1]];
-        if(nibbles >= 4) {
-            rb[2] = b[o[2]];
-            rb[3] = b[o[3]];
-            if(nibbles >= 8) {
-                rb[4] = b[o[4]];
-                rb[5] = b[o[5]];
-                rb[6] = b[o[6]];
-                rb[7] = b[o[7]];
-            }
-        }
-    }
-    return r;
+opcode_t
+fetch_op_le(opcode_t w) {
+#if !PARROT_BIGENDIAN
+    return w;
+#else
+    opcode_t r;
+# if OPCODE_T_SIZE == 4
+    return  (w << 24) | ((w & 0x0000ff00) << 8) | ((w & 0x00ff0000) >> 8) |
+            ((w & 0xff000000) >>24); 
+# else
+    r = w << 56;
+    r |= (w & 0xff00) << 40;
+    r |= (w & 0xff0000) << 24;
+    r |= (w & 0xff000000) << 8;
+    r |= (w & 0xff00000000) >> 8;
+    r |= (w & 0xff0000000000) >> 24;
+    r |= (w & 0xff00000000000000) >> 56;
+    return r;    
+# endif
+#endif    
 }
 
 /*
- * Same as above except this version will swap a buffer larger
- * or smaller than the native size and doesn't return a value.
- * Use endianize() if you are converting orders between same word
- * size, use endianize_buf() if word size is larger/smaller
- * such as handling a bytecode stream that was generated on
- * a platform with different word size.
+ * Unrolled routines for swapping various sizes from 32-128 bits
+ * These should only be used if alignment is unknown or we are
+ * pulling something out of a padded buffer.    
  */
 void
-endian_fetch_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
-                        int wsize) {
-    rb[0] = b[o[0]];
-    if(wsize >= 2) {
-        rb[1] = b[o[1]];
-        if(wsize >= 4) {
-            rb[2] = b[o[2]];
-            rb[3] = b[o[3]];
-            if(wsize >= 8) {
-                rb[4] = b[o[4]];
-                rb[5] = b[o[5]];
-                rb[6] = b[o[6]];
-                rb[7] = b[o[7]];
-            }
-        }
-    }
+fetch_buf_be_4(unsigned char * rb, unsigned char * b) {
+#if PARROT_BIGENDIAN
+    memcpy(rb, b, 4);
+#else
+    rb[0] = b[3];
+    rb[1] = b[2];
+    rb[2] = b[1];
+    rb[3] = b[0];
+#endif
+}
+
+void
+fetch_buf_le_4(unsigned char * rb, unsigned char * b) {
+#if !PARROT_BIGENDIAN
+    memcpy(rb, b, 4);
+#else
+    rb[0] = b[3];
+    rb[1] = b[2];
+    rb[2] = b[1];
+    rb[3] = b[0];
+#endif
+}
+
+void
+fetch_buf_be_8(unsigned char * rb, unsigned char * b) {
+#if PARROT_BIGENDIAN
+    memcpy(rb, b, 8);
+#else
+    rb[0] = b[7];
+    rb[1] = b[6];
+    rb[2] = b[5];
+    rb[3] = b[4];
+    rb[4] = b[3];
+    rb[5] = b[2];
+    rb[6] = b[1];
+    rb[7] = b[0];
+#endif
+}
+
+void
+fetch_buf_le_8(unsigned char * rb, unsigned char * b) {
+#if !PARROT_BIGENDIAN
+    memcpy(rb, b, 8);
+#else
+    rb[0] = b[7];
+    rb[1] = b[6];
+    rb[2] = b[5];
+    rb[3] = b[4];
+    rb[4] = b[3];
+    rb[5] = b[2];
+    rb[6] = b[1];
+    rb[7] = b[0];
+#endif
+}
+
+void
+fetch_buf_le_12(unsigned char * rb, unsigned char * b) {
+#if !PARROT_BIGENDIAN
+    memcpy(rb, b, 12);
+#else
+    rb[0] = b[11];
+    rb[1] = b[10];
+    rb[2] = b[9];
+    rb[3] = b[8];
+    rb[4] = b[7];
+    rb[5] = b[6];
+    rb[6] = b[5];
+    rb[7] = b[4];
+    rb[8] = b[3];
+    rb[9] = b[2];
+    rb[10] = b[1];
+    rb[11] = b[0];
+#endif
+}
+
+void
+fetch_buf_be_12(unsigned char * rb, unsigned char * b) {
+#if PARROT_BIGENDIAN
+    memcpy(rb, b, 12);
+#else
+    rb[0] = b[11];
+    rb[1] = b[10];
+    rb[2] = b[9];
+    rb[3] = b[8];
+    rb[4] = b[7];
+    rb[5] = b[6];
+    rb[6] = b[5];
+    rb[7] = b[4];
+    rb[8] = b[3];
+    rb[9] = b[2];
+    rb[10] = b[1];
+    rb[11] = b[0];
+#endif
+}
+
+void
+fetch_buf_le_16(unsigned char * rb, unsigned char * b) {
+#if !PARROT_BIGENDIAN
+    memcpy(rb, b, 16);
+#else
+    rb[0] = b[15];
+    rb[1] = b[14];
+    rb[2] = b[13];
+    rb[3] = b[12];
+    rb[4] = b[11];
+    rb[5] = b[10];
+    rb[6] = b[9];
+    rb[7] = b[8];
+    rb[8] = b[7];
+    rb[9] = b[6];
+    rb[10] = b[5];
+    rb[11] = b[4];
+    rb[12] = b[3];
+    rb[13] = b[2];
+    rb[14] = b[1];
+    rb[15] = b[0];
+#endif
+}
+
+void
+fetch_buf_be_16(unsigned char * rb, unsigned char * b) {
+#if PARROT_BIGENDIAN
+    memcpy(rb, b, 12);
+#else
+    rb[0] = b[15];
+    rb[1] = b[14];
+    rb[2] = b[13];
+    rb[3] = b[12];
+    rb[4] = b[11];
+    rb[5] = b[10];
+    rb[6] = b[9];
+    rb[7] = b[8];
+    rb[8] = b[7];
+    rb[9] = b[6];
+    rb[10] = b[5];
+    rb[11] = b[4];
+    rb[12] = b[3];
+    rb[13] = b[2];
+    rb[14] = b[1];
+    rb[15] = b[0];
+#endif
 }
 
 

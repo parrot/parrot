@@ -45,25 +45,18 @@ sub new
 
   my $self = bless {
     WORDSIZE => sizeof("op"),
+    BYTEORDER => $PConfig{bigendian},
     MAJOR => 0,
     MINOR => 0,
     FLAGS => 0,
-    PAD => 'PAD ',
-    BYTEORDER => $PConfig{byteorder},
+    FLOATTYPE => 0,
+    PAD => 'zzzzzzzzzz',
     MAGIC => $PARROT_MAGIC,
     OPCODETYPE => 0x5045524c,
     FIXUP => Parrot::PackFile::FixupTable->new(),
     CONST => Parrot::PackFile::ConstTable->new(),
     PROG  => '',
   }, $class;
-
-  # Perl config gives us a string like '1234' for byteorder,
-  # take it and turn it into an unsigned byte array of numerical
-  # values (0,1,2,3)
-  $self->{BYTEORDER} =~ tr/12345678/\000\001\002\003\004\005\006\007/;
-
-  # Pad to 8 bytes
-  $self->{BYTEORDER} = sprintf "%-8s", $self->{BYTEORDER};
 
   return $self;
 }
@@ -82,6 +75,13 @@ sub wordsize
   my $self = shift;
 
   return $self->{WORDSIZE};
+}
+
+sub byteorder 
+{
+  my $self = shift;
+
+  return $self->{BYTEORDER};
 }
 
 sub major 
@@ -112,11 +112,11 @@ sub pad
   return $self->{PAD};
 }
 
-sub byteorder 
+sub floattype 
 {
   my $self = shift;
 
-  return $self->{BYTEORDER};
+  return $self->{FLOATTYPE};
 }
 
 sub opcodetype 
@@ -182,17 +182,23 @@ sub unpack
 #  printf "Input string is %d bytes long\n", length($string);
 
   $self->{WORDSIZE} = shift_byte($string);
+  $self->{BYTEORDER} = shift_byte($string);
   $self->{MAJOR} = shift_byte($string);
   $self->{MINOR} = shift_byte($string);
   $self->{FLAGS} = shift_byte($string);
+  $self->{FLOATTYPE} = shift_byte($string);
 
-  # Unused pad
+  # Unused fields 
   shift_byte($string);
   shift_byte($string);
   shift_byte($string);
   shift_byte($string);
-
-  $self->{BYTEORDER} = substr($string, 0, 8);
+  shift_byte($string);
+  shift_byte($string);
+  shift_byte($string);
+  shift_byte($string);
+  shift_byte($string);
+  shift_byte($string);
 
   $string = substr($string, 8);
 
@@ -318,12 +324,12 @@ sub pack
   my $string = '';
 
   $string .= pack_byte($self->wordsize);
+  $string .= pack_byte($self->byteorder);
   $string .= pack_byte($self->major);
   $string .= pack_byte($self->minor);
   $string .= pack_byte($self->flags);
-
+  $string .= pack_byte($self->floattype);
   $string .= $self->pad;
-  $string .= $self->byteorder;
 
 #  print STDERR "sizeof header: ", length($string), "\n";
 

@@ -78,14 +78,13 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
     opcode_t const_table_size =
         PackFile_ConstTable_pack_size(self->const_table);
 
-    /* Move the header construction elsewhere */
     self->header->wordsize = sizeof(opcode_t);
+    self->header->byteorder = PARROT_BIGENDIAN;
     self->header->minor = PARROT_MINOR_VERSION;
     self->header->major = PARROT_MAJOR_VERSION;
-    
-    /* Put the native byteorder into the header */
-    endian_matrix(self->header->byteorder);
-    
+    self->header->flags = 0;
+    self->header->floattype = 0;
+ 
     /* Pack the header */
     mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
     cursor += PACKFILE_HEADER_BYTES / sizeof(opcode_t);

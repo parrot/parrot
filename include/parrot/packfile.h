@@ -28,11 +28,12 @@
 
 struct PackFile_Header {
     unsigned char wordsize;
+    unsigned char byteorder;
     unsigned char major;
     unsigned char minor;
     unsigned char flags;
-    unsigned char pad[4];
-    unsigned char byteorder[8];
+    unsigned char floattype;
+    unsigned char pad[10];
     /* Start words/opcodes on 8-byte boundary */
     opcode_t magic;
     opcode_t opcodetype; 
@@ -71,7 +72,9 @@ struct PackFile {
     opcode_t *                   byte_code;
     INTVAL                       need_wordsize;
     INTVAL                       need_endianize;
-    unsigned char              * transform;
+    opcode_t                     (*fetch_op)(opcode_t);
+    INTVAL                       (*fetch_iv)(INTVAL);
+    void                         (*fetch_nv)(unsigned char *, unsigned char *);
 };
 
 
@@ -162,12 +165,20 @@ opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t *stream);
 /*
 ** Byte Ordering Functions (byteorder.c)
 */
-void endian_matrix(unsigned char * buf);
-INTVAL endian_fetch_intval(INTVAL w, unsigned char * o);
-opcode_t endian_fetch_op(opcode_t op, unsigned char * o);
-void endian_fetch_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
-                        int wsize);
-void endian_put_intval(unsigned char * rb, INTVAL w, unsigned char * o);
+
+INTVAL fetch_iv_le(INTVAL w);
+INTVAL fetch_iv_be(INTVAL w);
+opcode_t fetch_op_be(opcode_t w);
+opcode_t fetch_op_le(opcode_t w);
+void fetch_buf_be_4(unsigned char * rb, unsigned char * b);
+void fetch_buf_le_4(unsigned char * rb, unsigned char * b);
+void fetch_buf_be_8(unsigned char * rb, unsigned char * b);
+void fetch_buf_le_8(unsigned char * rb, unsigned char * b);
+void fetch_buf_le_12(unsigned char * rb, unsigned char * b);
+void fetch_buf_be_12(unsigned char * rb, unsigned char * b);
+void fetch_buf_le_16(unsigned char * rb, unsigned char * b);
+void fetch_buf_be_16(unsigned char * rb, unsigned char * b);
+
 
 
 #endif /* PACKFILE_H */

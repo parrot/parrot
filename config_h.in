@@ -15,6 +15,10 @@ typedef ${iv} INTVAL;
 typedef unsigned ${iv} UINTVAL;
 typedef ${nv} FLOATVAL;
 
+#define INTVAL_SIZE ${intvalsize}
+#define NUMVAL_SIZE ${nvsize}
+#define OPCODE_T_SIZE ${opcode_t_size}
+
 typedef ${opcode_t} opcode_t;
 typedef size_t ptrcast_t;
 
@@ -71,6 +75,7 @@ ${headers}
 #define PARROT_ARCHNAME        "${jitarchname}"
 #define PARROT_JIT_CAPABLE     ${jitcapable}
 #define PARROT_BYTEORDER       ${byteorder}
+#define PARROT_BIGENDIAN       ${bigendian}
 
 typedef ${iv} Parrot_Int;
 typedef unsigned ${iv} Parrot_UInt;
