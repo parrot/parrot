@@ -37,8 +37,8 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
         void *p;
         UINTVAL size;
         if (interpreter) {
-            interpreter->GC_block_level++;
-            interpreter->DOD_block_level++;
+            Parrot_block_GC(interpreter);
+            Parrot_block_DOD(interpreter);
         }
 
         /* Make the copy point to only the portion of the string that
@@ -53,8 +53,8 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
         s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_external_FLAG |
                 BUFFER_bufstart_external_FLAG);
         if (interpreter) {
-            interpreter->GC_block_level--;
-            interpreter->DOD_block_level--;
+            Parrot_unblock_GC(interpreter);
+            Parrot_unblock_DOD(interpreter);
         }
     }
 }

@@ -35,10 +35,10 @@ new_stack(Interp *interpreter)
     stack->buffer = new_buffer_header(interpreter);
 
     /* Block DOD from murdering our newly allocated stack->buffer. */
-    interpreter->DOD_block_level++;
+    Parrot_block_DOD(interpreter);
     Parrot_allocate(interpreter, stack->buffer,
                     sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
-    interpreter->DOD_block_level--;
+    Parrot_unblock_DOD(interpreter);
 
 #ifdef TIDY
     entry = (Stack_Entry_t *)stack->buffer->bufstart;

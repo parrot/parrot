@@ -173,7 +173,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
     if (interpreter->GC_block_level) {
         return;
     }
-    interpreter->GC_block_level++;
+    Parrot_block_GC(interpreter);
 
     /* We're collecting */
     interpreter->mem_allocs_since_last_collect = 0;
@@ -359,7 +359,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
     pool->guaranteed_reclaimable = 0;
     pool->possibly_reclaimable = 0;
-    interpreter->GC_block_level--;
+    Parrot_unblock_GC(interpreter);
 
 }
 

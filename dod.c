@@ -557,7 +557,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     if (interpreter->DOD_block_level) {
         return;
     }
-    interpreter->DOD_block_level++;
+    Parrot_block_DOD(interpreter);
 
     interpreter->active_PMCs = 0;
     interpreter->active_Buffers = 0;
@@ -594,7 +594,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     /* Note it */
     interpreter->dod_runs++;
 
-    interpreter->DOD_block_level--;
+    Parrot_unblock_DOD(interpreter);
     return;
 }
 

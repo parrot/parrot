@@ -3718,7 +3718,7 @@ Disable DOD sweeps. (Nestable)
 =cut
 
 op sweepoff() {
-  interpreter->DOD_block_level++;
+  Parrot_block_DOD(interpreter);
   goto NEXT();
 }
 
@@ -3729,9 +3729,7 @@ Re-enable DOD sweeps.
 =cut
 
 op sweepon() {
-  if (interpreter->DOD_block_level) {
-    interpreter->DOD_block_level--;
-  }
+  Parrot_unblock_DOD(interpreter);
   goto NEXT();
 }
 
@@ -3742,7 +3740,7 @@ Disable GC runs (nestable).
 =cut
 
 op collectoff() {
-  interpreter->GC_block_level++;
+  Parrot_block_GC(interpreter);
   goto NEXT();
 }
 
@@ -3753,9 +3751,7 @@ Re-enable GC.
 =cut
 
 op collecton() {
-  if (interpreter->GC_block_level) {
-    interpreter->GC_block_level--;
-  }
+  Parrot_unblock_GC(interpreter);
   goto NEXT();
 }
 

@@ -1814,7 +1814,7 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
         command = skip_ws(command);
     }
 
-    interpreter->DOD_block_level++;
+    Parrot_block_DOD(interpreter);
 
     if (*command == '[') {
         command = parse_key(interpreter, command, &key);
@@ -1841,7 +1841,7 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
             PIO_eprintf(interpreter, "Unrecognized print option: must be 'int', 'num', 'str', 'pmc', or a register\n");
     }
 
-    interpreter->DOD_block_level--;
+    Parrot_unblock_DOD(interpreter);
 }
 
 /* PDB_print_int

@@ -553,8 +553,8 @@ make_interpreter(Interp_flags flags)
      * Actually, we could enbale DOD/GC earlier, but here all setup is
      * done
      */
-    interpreter->DOD_block_level--;
-    interpreter->GC_block_level--;
+    Parrot_unblock_DOD(interpreter);
+    Parrot_unblock_GC(interpreter);
     interpreter->code = (struct PackFile *)NULL;
     interpreter->profile = (ProfData *)NULL;
 

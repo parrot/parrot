@@ -172,13 +172,13 @@ allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
 {
     List_chunk *chunk;
 
-    interpreter->DOD_block_level++;
-    interpreter->GC_block_level++;
+    Parrot_block_DOD(interpreter);
+    Parrot_block_GC(interpreter);
     chunk = (List_chunk *)new_bufferlike_header(interpreter, sizeof(*chunk));
     chunk->items = items;
     Parrot_allocate(interpreter, (Buffer *)chunk, size);
-    interpreter->DOD_block_level--;
-    interpreter->GC_block_level--;
+    Parrot_unblock_DOD(interpreter);
+    Parrot_unblock_GC(interpreter);
     return chunk;
 }
 
@@ -963,8 +963,8 @@ list_clone(Interp *interpreter, List *other)
     PMC *op, *np;
     STRING *s;
 
-    interpreter->DOD_block_level++;
-    interpreter->GC_block_level++;
+    Parrot_block_DOD(interpreter);
+    Parrot_block_GC(interpreter);
 
     l = list_new(interpreter, other->item_type);
     mem_sys_memcopy(l, other, sizeof(List));
@@ -1012,8 +1012,8 @@ list_clone(Interp *interpreter, List *other)
         l->user_data = other->user_data->vtable->clone(interpreter,
                 other->user_data);
     rebuild_chunk_list(interpreter, l);
-    interpreter->DOD_block_level--;
-    interpreter->GC_block_level--;
+    Parrot_unblock_DOD(interpreter);
+    Parrot_unblock_GC(interpreter);
     return l;
 }
 
