@@ -16,7 +16,7 @@ This way, language designers can get right to work on
 
    Tokenizing, parsing, type checking AST/DAG production
 
-Then they can simply spit out IR to imcc which will compile
+Then they can simply feed IR to imcc which will compile
 directly to Parrot bytecode, potentially skipping the
 assembler altogether.
 
@@ -39,14 +39,13 @@ too fast to have another assembler branch.
 
 Register Allocation
 
-  The allocator uses graph-coloring and du-chains to allocate registers
-  for lexicals and symbolic temporaries.
-  One primary weakness of the allocator as it stands is analysis of
-  jumps. A brute force method is used in the du-chain computation
-  where we assume any symbol is live from the time it was first used
-  until either the last time it was used or the last branch instruction.
-  Branch flow analysis will allow us to greatly reduce the interferences
-  in the graph during coloring.
+  The allocator uses graph-coloring and du-chains to assign registers
+  to lexicals and symbolic temporaries. One weakness of the allocator
+  is the lack of branch analysis. A brute force method is used in the
+  du-chain computation where we assume any symbol is live from the time
+  it was first used until either the last time it was used or the last
+  branch instruction. This is being replaced with directed graphs of
+  basic blocks and flow analysis.
 
 Spilling
 
