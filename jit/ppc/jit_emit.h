@@ -195,6 +195,21 @@ enum { JIT_PPC_CALL };
   *(pc++) = B << 3 | OE | type >> 7; \
   *(pc++) = (char)(type << 1 | Rc);
 
+/* 3 register operation (without OE bit)
+ *
+ *  +--------------------------------------------------------------------+
+ *  |  Opcode  |     D     |     A     |     B     |        type      |Rc|
+ *  +--------------------------------------------------------------------+
+ * 0          5 6        10 11       15 16       20 21 22           30 31
+ *
+ */
+
+#define emit_3reg_x(pc, opcode, D, A, B, type, Rc) \
+  *(pc++) = opcode << 2 | D >> 3; \
+  *(pc++) = (char)(D << 5 | A); \
+  *(pc++) = B << 3 | type >> 7; \
+  *(pc++) = (char)(type << 1 | Rc);
+
 /* Add [type = 266, OE = 0, Rc = 0]
  *
  * adds rA and rB and place the result in rD.
@@ -203,8 +218,28 @@ enum { JIT_PPC_CALL };
 #define emit_add(pc, D, A, B) \
   emit_3reg(pc, 31, D, A, B, 0, 266, 0);
 
-#define emit_sub(pc, D, A, B) \
-  emit_3reg(pc, 31, D, A, B, 0, 40, 0);
+#define emit_subf(pc, D, A, B) \
+  emit_3reg(pc, 31, D, B, A, 0, 40, 0);
+
+#define emit_sub emit_subf
+
+#define emit_neg(pc, D, A) \
+  emit_3reg(pc, 31, D, A, 0, 0, 104, 0);
+
+#define emit_mullw(pc, D, A, B) \
+  emit_3reg(pc, 31, D, A, B, 0, 235, 0);
+
+#define emit_divw(pc, D, A, B) \
+  emit_3reg(pc, 31, D, A, B, 0, 491, 0);
+
+#define emit_and(pc, D, A, B) \
+  emit_3reg_x(pc, 31, D, A, B, 28, 0)
+
+#define emit_or(pc, D, A, B) \
+  emit_3reg_x(pc, 31, D, A, B, 444, 0)
+
+#define emit_xor(pc, D, A, B) \
+  emit_3reg_x(pc, 31, D, A, B, 316, 0)
 
 /* 2 register and immediate operation.
  *
@@ -262,6 +297,11 @@ enum { JIT_PPC_CALL };
 #define emit_andil(pc, S, A, uimm) \
   emit_2reg(pc, 28, S, A, uimm)
 
+#define emit_subfic(pc, D, A, immediate) \
+  emit_2reg(pc, 8, D, A, immediate)
+
+#define emit_subi emit_subfic
+
 #define emit_lwz(pc, D, disp, A) \
   emit_2reg(pc, 32, D, A, disp)
 
@@ -277,6 +317,37 @@ enum { JIT_PPC_CALL };
 #define emit_lmw(pc, D, disp, A) \
   emit_2reg(pc, 46, D, A, disp)
 
+#define emit_lfd(pc, D, disp, A) \
+  emit_2reg(pc, 50, D, A, disp)
+
+#define emit_stfd(pc, S, disp, A) \
+  emit_2reg(pc, 54, S, A, disp)
+
+/* A-format operation.
+ *
+ *  +--------------------------------------------------------------------+
+ *  |  Opcode  |     D     |     A     |     B     |    C    |  XOP   |Rc|
+ *  +--------------------------------------------------------------------+
+ * 0          5 6        10 11       15 16       20 21     25 26    30 31
+ *
+ */
+
+#define emit_3a(pc, opcode, D, A, B, C, type, Rc) \
+  *(pc++) = opcode << 2 | D >> 3; \
+  *(pc++) = (char)(D << 5 | A); \
+  *(pc++) = (char)(B << 3 | C >> 2); \
+  *(pc++) = (char)(C << 6 | type << 1 | Rc)
+
+#define emit_fadd(pc, D, A, B) emit_3a(pc, 63, D, A, B, 0, 21, 0)
+#define emit_fsub(pc, D, A, B) emit_3a(pc, 63, D, A, B, 0, 20, 0)
+#define emit_fmul(pc, D, A, B) emit_3a(pc, 63, D, A, B, 0, 25, 0)
+#define emit_fdiv(pc, D, A, B) emit_3a(pc, 63, D, A, B, 0, 18, 0)
+
+#define emit_fabs(pc, D, A)    emit_3reg_x(pc, 63, D, 0, A, 264, 0)
+#define emit_fneg(pc, D, A)    emit_3reg_x(pc, 63, D, 0, A, 40, 0)
+
+/* not in core.ops, but probably should be: */
+#define emit_fsqrt(pc, D, A) emit_3reg(pc, 63, D, 0, A, 0, 18, 0)
 
 /* Load a CPU register from a Parrot register. */
 
@@ -284,11 +355,20 @@ enum { JIT_PPC_CALL };
   emit_lwz(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
   
+#define emit_lfd_r(pc, reg, addr) \
+  emit_lfd(pc, reg, (((char *)addr) - \
+    ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
+
 /* Store a CPU register back to a Parrot register. */
 
 #define emit_stw_r(pc, reg, addr) \
   emit_stw(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
+
+#define emit_stfd_r(pc, reg, addr) \
+  emit_stfd(pc, reg, (((char *)addr) - \
+    ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
+
 /*
  * Load a 32-bit immediate value.  If the lower 16 bits are bigger than
  * 0x8000 we clear the higher 16 bits.  If the immediate only uses the
@@ -335,7 +415,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
-    emit_sub(jit_info->native_ptr, r0, r15, r0); 
+    emit_sub(jit_info->native_ptr, r0, r0, r15); 
     emit_add(jit_info->native_ptr, r0, r14, r0);
     emit_mr(jit_info->native_ptr, r12, r0); 
     emit_lwz(jit_info->native_ptr, r12, 0, r12);
@@ -427,7 +507,7 @@ static void
 ppc_sync_cache (void *_start, void *_end)
 {   
     char *start = (char*)(((int)_start) &~(CACHELINESIZE - 1));
-    char *end = (char *)((((int)_end) + CACHELINESIZE - 1) &~(CACHELINESIZE - 1));
+    char *end = (char *)((((int)_end)+CACHELINESIZE-1) &~(CACHELINESIZE - 1));
     char *_sync;
     
     for (_sync = start; _sync < end; _sync += CACHELINESIZE) {
@@ -449,3 +529,13 @@ ppc_sync_cache (void *_start, void *_end)
 }
 
 #endif
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
