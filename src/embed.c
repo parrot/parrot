@@ -331,6 +331,8 @@ Parrot_debug(struct Parrot_Interp *interpreter)
     interpreter->pdb = pdb;
     pdb->cur_opcode = interpreter->code->byte_code;
 
+    PDB_init(interpreter,NULL);
+    PDB_disassemble(interpreter,NULL);
     while (!(pdb->state & PDB_EXIT)) {
         PDB_get_command(interpreter);
         command = pdb->cur_command;

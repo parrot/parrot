@@ -81,7 +81,6 @@ void PDB_print_int(struct IReg *, const char *);
 void PDB_print_num(struct NReg *, const char *);
 
 void PDB_print_string(struct Parrot_Interp *interpreter,
-
                       struct SReg *, const char *);
 
 void PDB_print_pmc(struct Parrot_Interp *interpreter,
@@ -116,6 +115,8 @@ void PDB_disassemble(struct Parrot_Interp *, const char *);
 long PDB_add_label(PDB_file_t *, opcode_t *, opcode_t);
 
 void PDB_load_source(struct Parrot_Interp *, const char *);
+
+void PDB_free_file(struct Parrot_Interp *);
 
 void PDB_list(struct Parrot_Interp *, const char *);
 
