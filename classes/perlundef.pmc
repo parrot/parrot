@@ -15,33 +15,34 @@
 pmclass PerlUndef {
 
    INTVAL type () {
+      return 0;
    }
 
    STRING* name () {
-        return whoami;
+      return whoami;
    }
 
    void init () {
-        /* Nothing */
+      /* Nothing */
    }
 
    void clone (PMC* dest) {
-        dest->vtable = pmc->vtable;
+      dest->vtable = pmc->vtable;
    }
 
    void morph (INTVAL type) {
    }
 
    BOOLVAL move_to (void * destination) {
-        /* Nothing */
+      return 0;
    }
 
    INTVAL real_size () {
-        return 0;
+      return 0;
    }
 
    void destroy () {
-        /* Nothing */
+      /* Nothing */
    }
 
    INTVAL get_integer () {
@@ -50,6 +51,7 @@ pmclass PerlUndef {
    }
 
    INTVAL get_integer_index (INTVAL idx) {
+      return 0;
    }
 
    FLOATVAL get_number () {

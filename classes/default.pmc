@@ -14,9 +14,11 @@
 pmclass default noinit {
 
    INTVAL type () {
+     return 0;
    }
 
    STRING* name () {
+     return NULL;
    }
 
    void init () {
@@ -29,9 +31,11 @@ pmclass default noinit {
    }
 
    BOOLVAL move_to (void * destination) {
+     return 0;
    }
 
    INTVAL real_size () {
+     return 0;
    }
 
    void destroy () {
@@ -42,9 +46,11 @@ pmclass default noinit {
    }
 
    INTVAL get_integer_index (INTVAL idx) {
+     return 0;
    }
 
    INTVAL get_integer_index_s (STRING* idx) {
+     return 0;
    }
 
    FLOATVAL get_number () {
@@ -52,9 +58,11 @@ pmclass default noinit {
    }
 
    FLOATVAL get_number_index (INTVAL idx) {
+     return 0.0;
    }
 
    FLOATVAL get_number_index_s (STRING* idx) {
+     return 0.0;
    }
 
    STRING* get_string () {
@@ -63,9 +71,11 @@ pmclass default noinit {
    }
 
    STRING* get_string_index (INTVAL idx) {
+     return NULL;
    }
 
    STRING* get_string_index_s (STRING* idx) {
+     return NULL;
    }
 
    BOOLVAL get_bool () {
@@ -529,14 +539,14 @@ pmclass default noinit {
    void repeat (PMC * value,  PMC* dest) {
      dest->vtable->set_string_native(INTERP, dest,
 	 string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
-		       value->vtable->get_integer(INTERP, value), NULL) );
+		       (UINTVAL)value->vtable->get_integer(INTERP, value), NULL) );
    }
 
    void repeat_native (STRING * value,  PMC* dest) {
      /* dest = value (repeat) SELF */
      dest->vtable->set_string_native(INTERP, dest,
 	 string_repeat(INTERP, value,
-		       SELF->vtable->get_integer(INTERP,SELF),
+		       (UINTVAL)SELF->vtable->get_integer(INTERP,SELF),
 		       NULL) );
    }
 
@@ -544,7 +554,7 @@ pmclass default noinit {
      /* dest = value (repeat) SELF */
      dest->vtable->set_string_native(INTERP, dest,
 	 string_repeat(INTERP, value,
-		       SELF->vtable->get_integer(INTERP,SELF),
+		       (UINTVAL)SELF->vtable->get_integer(INTERP,SELF),
 		       NULL) );
    }
 
@@ -552,14 +562,14 @@ pmclass default noinit {
      /* dest = value (repeat) SELF */
      dest->vtable->set_string_native(INTERP, dest,
 	 string_repeat(INTERP, value,
-		       SELF->vtable->get_integer(INTERP,SELF),
+		       (UINTVAL)SELF->vtable->get_integer(INTERP,SELF),
 		       NULL) );
    }
 
    void repeat_same (PMC * value,  PMC* dest) {
      dest->vtable->set_string_native(INTERP, dest,
 	 string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
-		       value->vtable->get_integer(INTERP, value), NULL) );
+		       (UINTVAL)value->vtable->get_integer(INTERP, value), NULL) );
   }
 
 }

@@ -55,6 +55,7 @@ pmclass ParrotPointer {
    }
 
    FLOATVAL get_number_index (INTVAL idx) {
+      return 0.0;
    }
 
    STRING* get_string () {

@@ -121,6 +121,7 @@ pmclass IntQueue {
     }
 
     INTVAL get_integer_index (INTVAL idx) {
+        return 0;
     }
 
     FLOATVAL get_number () {
@@ -128,6 +129,7 @@ pmclass IntQueue {
     }
 
     FLOATVAL get_number_index (INTVAL idx) {
+        return 0.0;
     }
 
     STRING* get_string () {
@@ -144,6 +146,7 @@ pmclass IntQueue {
     }
 
     STRING* get_string_index (INTVAL idx) {
+        return NULL;
     }
 
     BOOLVAL get_bool () {
@@ -429,7 +432,7 @@ pmclass IntQueue {
 
     void divide_int (INTVAL value, PMC* dest) {
         dest->vtable->set_number_native(INTERP, dest, 
-            SELF->cache.int_val / value
+            (FLOATVAL)SELF->cache.int_val / value
         );
     }
 

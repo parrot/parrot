@@ -88,6 +88,7 @@ pmclass PerlHash {
     }
 
     BOOLVAL get_bool () {
+        return 0;
     }
 
     void* get_value () {
@@ -459,6 +460,7 @@ pmclass PerlHash {
 
     /* == operation */
     BOOLVAL is_equal (PMC* value) {
+        return 0;
     }
 
     void logical_or (PMC* value, PMC* dest) {

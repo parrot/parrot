@@ -50,14 +50,8 @@ fprintf(stderr,"morph not implemented\n");
 	return (INTVAL)SELF->cache.num_val;
     }
 
-    INTVAL get_integer_index (INTVAL idx) {
-    }
-
     FLOATVAL get_number () {
         return SELF->cache.num_val;
-    }
-
-    FLOATVAL get_number_index (INTVAL idx) {
     }
 
     STRING* get_string () {
@@ -71,9 +65,6 @@ fprintf(stderr,"morph not implemented\n");
 	s = string_make(INTERP,buff,strlen(buff),NULL,0,NULL);
 	free(buff);
 	return s;
-    }
-
-    STRING* get_string_index (INTVAL idx) {
     }
 
     BOOLVAL get_bool () {
@@ -108,9 +99,6 @@ fprintf(stderr,"morph not implemented\n");
 	SELF->cache.int_val = value->cache.int_val;
     }
 
-    void set_integer_index (INTVAL value, INTVAL idx) {
-    }
-
     void set_number (PMC * value) {
         SELF->cache.num_val = (FLOATVAL)value->vtable->get_number(INTERP, value);
     }
@@ -125,9 +113,6 @@ fprintf(stderr,"set_number_bigfloat not implemented\n");
 
     void set_number_same (PMC * value) {
 	SELF->cache.num_val = value->cache.num_val;
-    }
-
-    void set_number_index (FLOATVAL value, INTVAL idx) {
     }
 
     void set_string (PMC * value) {
@@ -153,9 +138,6 @@ fprintf(stderr,"set_number_bigfloat not implemented\n");
     void set_string_same (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
 	SELF->cache.struct_val = value->cache.struct_val;
-    }
-
-    void set_string_index (STRING* value, INTVAL idx) {
     }
 
     void set_value (void* value) {

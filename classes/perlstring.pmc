@@ -51,22 +51,13 @@ pmclass PerlString {
  return string_to_int(s);
     }
 
-    INTVAL get_integer_index (INTVAL idx) {
-    }
-
     FLOATVAL get_number () {
 	STRING* s = (STRING*) SELF->cache.struct_val;
  return string_to_num(s);
     }
 
-    FLOATVAL get_number_index (INTVAL idx) {
-    }
-
     STRING* get_string () {
 	return (STRING*)SELF->cache.struct_val;
-    }
-
-    STRING* get_string_index (INTVAL idx) {
     }
 
     BOOLVAL get_bool () {
@@ -102,9 +93,6 @@ pmclass PerlString {
 	SELF->cache.int_val = value->vtable->get_integer(INTERP,value);
     }
 
-    void set_integer_index (INTVAL value, INTVAL idx) {
-    }
-
     void set_number (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
 	SELF->cache.num_val = value->vtable->get_number(INTERP,value);
@@ -121,9 +109,6 @@ pmclass PerlString {
     void set_number_same (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
 	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
-    }
-
-    void set_number_index (FLOATVAL value, INTVAL idx) {
     }
 
     void set_string (PMC * value) {
@@ -146,9 +131,6 @@ pmclass PerlString {
     void set_string_same (PMC * value) {
 	SELF->cache.struct_val =
                string_copy(INTERP, (STRING*)value->cache.struct_val);
-    }
-
-    void set_string_index (STRING* value, INTVAL idx) {
     }
 
     void set_value (void* value) {
@@ -449,39 +431,39 @@ pmclass PerlString {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
 	dest->cache.struct_val =
            string_repeat(INTERP, SELF->cache.struct_val,
-	                 value->vtable->get_integer(INTERP, value), NULL
-	                 );
+	                 (UINTVAL)value->vtable->get_integer(INTERP, value), NULL
+	                );
     }
 
     void repeat_native (STRING * value, PMC* dest) {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
 	dest->cache.struct_val =
            string_repeat(INTERP, SELF->cache.struct_val,
-                  string_to_int(value), NULL
-	                 );
+                         (UINTVAL)string_to_int(value), NULL
+	                );
     }
 
     void repeat_unicode (STRING * value, PMC* dest) {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
 	dest->cache.struct_val =
            string_repeat(INTERP, SELF->cache.struct_val,
-                  string_to_int(value), NULL
-	                 );
+                         (UINTVAL)string_to_int(value), NULL
+	                );
     }
 
     void repeat_other (STRING * value, PMC* dest) {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
 	dest->cache.struct_val =
            string_repeat(INTERP, SELF->cache.struct_val,
-                  string_to_int(value), NULL
-	                 );
+                         (UINTVAL)string_to_int(value), NULL
+	                );
     }
 
     void repeat_same (PMC * value, PMC* dest) {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
 	dest->cache.struct_val =
            string_repeat(INTERP, SELF->cache.struct_val,
-	                 value->vtable->get_integer(INTERP, value), NULL
-	                 );
+	                 (UINTVAL)value->vtable->get_integer(INTERP, value), NULL
+	                );
     }
 }

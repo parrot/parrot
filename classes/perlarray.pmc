@@ -453,6 +453,7 @@ pmclass PerlArray {
 
     /* == operation */
     BOOLVAL is_equal (PMC* value) {
+        return 0;
     }
 
     void logical_or (PMC* value, PMC* dest) {
