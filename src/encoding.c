@@ -18,7 +18,8 @@ extern const ENCODING utf16_encoding;
 extern const ENCODING utf32_encoding;
 
 const ENCODING *
-encoding_lookup(const char *name) {
+encoding_lookup(const char *name)
+{
     if (strcmp(name, "singlebyte") == 0) {
         return &singlebyte_encoding;
     }

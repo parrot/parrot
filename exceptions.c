@@ -16,21 +16,25 @@
 #include <stdarg.h>
 
 /* Exception Handler */
-void internal_exception(int exitcode, const char * format, ... ) {
-	va_list arglist;
-	va_start(arglist, format);
-	vfprintf(stderr,format,arglist);
-	va_end(arglist);
-	exit(exitcode);	
+void
+internal_exception(int exitcode, const char *format, ...)
+{
+    va_list arglist;
+    va_start(arglist, format);
+    vfprintf(stderr, format, arglist);
+    va_end(arglist);
+    exit(exitcode);
 }
 
 /* Panic handler */
 
 #define dumpcore() printf("Sorry, coredump is not yet implemented for this platform.\n\n");  exit(1);
 
-void do_panic(struct Parrot_Interp *interpreter, const char *message, const char *file, int line) {
-    printf(
-"Parrot VM: PANIC: %s!\n\
+void
+do_panic(struct Parrot_Interp *interpreter, const char *message,
+         const char *file, int line)
+{
+    printf("Parrot VM: PANIC: %s!\n\
 C file %s, line %d\n\
 Parrot file %s, line %d\n\
 \n\

@@ -24,26 +24,29 @@
  * Check the bytecode's opcode table fingerprint.
  */
 static void
-check_fingerprint(struct Parrot_Interp *interpreter) {
+check_fingerprint(struct Parrot_Interp *interpreter)
+{
 /*    if (PNCONST == 0) { */
-    UNUSED (interpreter);
+    UNUSED(interpreter);
     return;
 
 #if 0
     if (interpreter->code->const_table->const_count == 0) {
-        fprintf(stderr, "Warning: Bytecode does not include opcode table fingerprint!\n");
+        fprintf(stderr,
+                "Warning: Bytecode does not include opcode table fingerprint!\n");
     }
     else {
-        const char * fp_data;
-        INTVAL           fp_len;
+        const char *fp_data;
+        INTVAL fp_len;
 
         fp_data = PCONST(0)->string->bufstart;
-        fp_len  = PCONST(0)->string->buflen;
-        
+        fp_len = PCONST(0)->string->buflen;
+
         if (strncmp(OPCODE_FINGERPRINT, fp_data, fp_len)) {
-            fprintf(stderr, "Error: Opcode table fingerprint in bytecode does not match interpreter!\n");
-            fprintf(stderr, "       Bytecode:    %*s\n", 
-                    (int) -fp_len, fp_data);
+            fprintf(stderr,
+                    "Error: Opcode table fingerprint in bytecode does not match interpreter!\n");
+            fprintf(stderr, "       Bytecode:    %*s\n", (int)-fp_len,
+                    fp_data);
             fprintf(stderr, "       Interpreter: %s\n", OPCODE_FINGERPRINT);
             exit(1);
         }
@@ -58,22 +61,25 @@ check_fingerprint(struct Parrot_Interp *interpreter) {
  * Generic runops, which takes a function pointer for the core.
  */
 static void
-runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *), 
-                struct Parrot_Interp *interpreter, opcode_t * pc) {
-    opcode_t * code_start;
-    UINTVAL    code_size; /* in opcodes */
-    opcode_t * code_end;
+runops_generic(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
+               struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+    opcode_t *code_start;
+    UINTVAL code_size;          /* in opcodes */
+    opcode_t *code_end;
 
     check_fingerprint(interpreter);
 
     code_start = interpreter->code->byte_code;
-    code_size  = interpreter->code->byte_code_size / sizeof(opcode_t);
-    code_end   = interpreter->code->byte_code + code_size;
+    code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_end = interpreter->code->byte_code + code_size;
 
     pc = core(interpreter, pc);
 
     if (pc && (pc < code_start || pc >= code_end)) {
-		internal_exception(INTERP_ERROR, "Error: Control left bounds of byte-code block (now at location %d)!\n", (int) (pc - code_start));
+        internal_exception(INTERP_ERROR,
+                           "Error: Control left bounds of byte-code block (now at location %d)!\n",
+                           (int)(pc - code_start));
     }
 }
 
@@ -87,97 +93,104 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *),
  * with them.
  */
 
-static void *       prederef_oplib_handle = NULL;
-static oplib_init_f prederef_oplib_init   = (oplib_init_f)NULLfunc;
-static op_lib_t *   prederef_oplib        = NULL;
-static INTVAL       prederef_op_count     = 0;
-static op_info_t *  prederef_op_info      = NULL;
-static op_func_t *  prederef_op_func      = NULL;
+static void *prederef_oplib_handle = NULL;
+static oplib_init_f prederef_oplib_init = (oplib_init_f)NULLfunc;
+static op_lib_t *prederef_oplib = NULL;
+static INTVAL prederef_op_count = 0;
+static op_info_t *prederef_op_info = NULL;
+static op_func_t *prederef_op_func = NULL;
 
 static void
-init_prederef(struct Parrot_Interp * interpreter)
+init_prederef(struct Parrot_Interp *interpreter)
 {
-  char file_name[50];
-  char func_name[50];
+    char file_name[50];
+    char func_name[50];
 
-  UNUSED (interpreter);
+    UNUSED(interpreter);
 
-  sprintf(file_name, "lib%s_prederef.so.%s", PARROT_CORE_OPLIB_NAME,
-    PARROT_VERSION);
+    sprintf(file_name, "lib%s_prederef.so.%s", PARROT_CORE_OPLIB_NAME,
+            PARROT_VERSION);
 
-  sprintf(func_name, "Parrot_DynOp_%s_prederef_%d_%d_%d",
-    PARROT_CORE_OPLIB_NAME, PARROT_MAJOR_VERSION,
-    PARROT_MINOR_VERSION, PARROT_PATCH_VERSION);
+    sprintf(func_name, "Parrot_DynOp_%s_prederef_%d_%d_%d",
+            PARROT_CORE_OPLIB_NAME, PARROT_MAJOR_VERSION,
+            PARROT_MINOR_VERSION, PARROT_PATCH_VERSION);
 
-  /*
-  ** Get a handle to the library file:
-  */
+    /*
+     * Get a handle to the library file:
+     */
 
-  prederef_oplib_handle = Parrot_dlopen(file_name);
+    prederef_oplib_handle = Parrot_dlopen(file_name);
 
-  if (!prederef_oplib_handle) {
-    internal_exception(PREDEREF_LOAD_ERROR, "Unable to dynamically load oplib file '%s' for oplib '%s_prederef' version %s!\n",
-      file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-  }
+    if (!prederef_oplib_handle) {
+        internal_exception(PREDEREF_LOAD_ERROR,
+                           "Unable to dynamically load oplib file '%s' for oplib '%s_prederef' version %s!\n",
+                           file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
+    }
 
-  /*
-  ** Look up the init function:
-  */
+    /*
+     * Look up the init function:
+     */
 
-  prederef_oplib_init   = (oplib_init_f)(ptrcast_t)Parrot_dlsym(prederef_oplib_handle, func_name);
+    prederef_oplib_init =
+        (oplib_init_f)(ptrcast_t)Parrot_dlsym(prederef_oplib_handle,
+                                              func_name);
 
-  if (!prederef_oplib_init) {
-    internal_exception(PREDEREF_LOAD_ERROR, "No exported symbol for oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
-      func_name, file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-  }
+    if (!prederef_oplib_init) {
+        internal_exception(PREDEREF_LOAD_ERROR,
+                           "No exported symbol for oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
+                           func_name, file_name, PARROT_CORE_OPLIB_NAME,
+                           PARROT_VERSION);
+    }
 
-  /*
-  ** Run the init function to get the oplib info:
-  */
+    /*
+     * Run the init function to get the oplib info:
+     */
 
-  prederef_oplib        = prederef_oplib_init();
+    prederef_oplib = prederef_oplib_init();
 
-  if (!prederef_oplib) {
-    internal_exception(PREDEREF_LOAD_ERROR, "No oplib info returned by oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
-      func_name, file_name,
-      PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-  }
+    if (!prederef_oplib) {
+        internal_exception(PREDEREF_LOAD_ERROR,
+                           "No oplib info returned by oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
+                           func_name, file_name, PARROT_CORE_OPLIB_NAME,
+                           PARROT_VERSION);
+    }
 
-  /*
-  ** Validate the op count:
-  */
+    /*
+     * Validate the op count:
+     */
 
-  prederef_op_count     = prederef_oplib->op_count;
+    prederef_op_count = prederef_oplib->op_count;
 
-  if (prederef_op_count <= 0) {
-    internal_exception(PREDEREF_LOAD_ERROR, "Illegal op count (%d) from oplib file '%s' for oplib '%s_prederef' version %s!\n",
-      (int)prederef_op_count, file_name,
-      PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-  }
+    if (prederef_op_count <= 0) {
+        internal_exception(PREDEREF_LOAD_ERROR,
+                           "Illegal op count (%d) from oplib file '%s' for oplib '%s_prederef' version %s!\n",
+                           (int)prederef_op_count, file_name,
+                           PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
+    }
 
-  /*
-  ** Validate the op info table:
-  */
+    /*
+     * Validate the op info table:
+     */
 
-  prederef_op_info      = prederef_oplib->op_info_table;
+    prederef_op_info = prederef_oplib->op_info_table;
 
-  if (!prederef_op_info) {
-    internal_exception(PREDEREF_LOAD_ERROR, "No op info table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
-      file_name,
-      PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-  }
+    if (!prederef_op_info) {
+        internal_exception(PREDEREF_LOAD_ERROR,
+                           "No op info table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
+                           file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
+    }
 
-  /*
-  ** Validate the op func table:
-  */
+    /*
+     * Validate the op func table:
+     */
 
-  prederef_op_func      = prederef_oplib->op_func_table;
+    prederef_op_func = prederef_oplib->op_func_table;
 
-  if (!prederef_op_func) {
-    internal_exception(PREDEREF_LOAD_ERROR, "No op func table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
-      file_name,
-      PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-  }
+    if (!prederef_op_func) {
+        internal_exception(PREDEREF_LOAD_ERROR,
+                           "No op func table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
+                           file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
+    }
 }
 
 /*=for api interpreter stop_prederef
@@ -188,15 +201,15 @@ init_prederef(struct Parrot_Interp * interpreter)
 static void
 stop_prederef(void)
 {
-  prederef_op_func      = NULL;
-  prederef_op_info      = NULL;
-  prederef_op_count     = 0;
+    prederef_op_func = NULL;
+    prederef_op_info = NULL;
+    prederef_op_count = 0;
 
-  Parrot_dlclose(prederef_oplib_handle);
+    Parrot_dlclose(prederef_oplib_handle);
 
-  prederef_oplib        = NULL;
-  prederef_oplib_init   = (oplib_init_f)NULLfunc;
-  prederef_oplib_handle = NULL;
+    prederef_oplib = NULL;
+    prederef_oplib_init = (oplib_init_f)NULLfunc;
+    prederef_oplib_handle = NULL;
 }
 
 /*=for api interpreter prederef
@@ -218,95 +231,100 @@ stop_prederef(void)
  */
 
 static void **
-prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
+prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 {
-  size_t      offset = pc_prederef - interpreter->prederef_code;
-  opcode_t *  pc     = ((opcode_t *)interpreter->code->byte_code) + offset;
-  op_info_t * opinfo = &prederef_op_info[*pc];
-  int         i;
+    size_t offset = pc_prederef - interpreter->prederef_code;
+    opcode_t *pc = ((opcode_t *)interpreter->code->byte_code) + offset;
+    op_info_t *opinfo = &prederef_op_info[*pc];
+    int i;
 
-  for (i = 0; i < opinfo->arg_count; i++) {
-    switch (opinfo->types[i]) {
-      case PARROT_ARG_OP:
-        pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[pc[i]];
-        break;
-  
-      case PARROT_ARG_I:
-        pc_prederef[i] = (void *)&interpreter->int_reg.registers[pc[i]];
-        break;
-    
-      case PARROT_ARG_N:
-        pc_prederef[i] = (void *)&interpreter->num_reg.registers[pc[i]];
-        break;
-    
-      case PARROT_ARG_P:
-        pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[pc[i]];
-        break;
-    
-      case PARROT_ARG_S:
-        pc_prederef[i] = (void *)&interpreter->string_reg.registers[pc[i]];
-        break;
+    for (i = 0; i < opinfo->arg_count; i++) {
+        switch (opinfo->types[i]) {
+        case PARROT_ARG_OP:
+            pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[pc[i]];
+            break;
 
-      case PARROT_ARG_IC:
-        pc_prederef[i] = (void *)&pc[i];
-        break;
+        case PARROT_ARG_I:
+            pc_prederef[i] = (void *)&interpreter->int_reg.registers[pc[i]];
+            break;
 
-      case PARROT_ARG_NC:
-        pc_prederef[i] = (void *)
+        case PARROT_ARG_N:
+            pc_prederef[i] = (void *)&interpreter->num_reg.registers[pc[i]];
+            break;
+
+        case PARROT_ARG_P:
+            pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[pc[i]];
+            break;
+
+        case PARROT_ARG_S:
+            pc_prederef[i] = (void *)&interpreter->string_reg.registers[pc[i]];
+            break;
+
+        case PARROT_ARG_IC:
+            pc_prederef[i] = (void *)&pc[i];
+            break;
+
+        case PARROT_ARG_NC:
+            pc_prederef[i] = (void *)
                 &interpreter->code->const_table->constants[pc[i]]->number;
-        break;
+            break;
 
-      case PARROT_ARG_PC:
+        case PARROT_ARG_PC:
 /*        pc_prederef[i] = (void *)
                  &interpreter->code->const_table->constants[pc[i]]->pmc; */
-          internal_exception(ARG_OP_NOT_HANDLED, "PMC constants not yet supported!\n");
-        break;
+            internal_exception(ARG_OP_NOT_HANDLED,
+                               "PMC constants not yet supported!\n");
+            break;
 
-      case PARROT_ARG_SC:
-        pc_prederef[i] = (void *) 
+        case PARROT_ARG_SC:
+            pc_prederef[i] = (void *)
                 &interpreter->code->const_table->constants[pc[i]]->string;
-        break;
+            break;
 
-      default:
-        break;
+        default:
+            break;
+        }
+
+        if (opinfo->types[i] != PARROT_ARG_IC && pc_prederef[i] == 0) {
+            internal_exception(INTERP_ERROR,
+                               "Prederef generated a NULL pointer for arg of type %d!\n",
+                               opinfo->types[i]);
+        }
     }
 
-    if (opinfo->types[i] != PARROT_ARG_IC && pc_prederef[i] == 0) {
-      internal_exception(INTERP_ERROR, "Prederef generated a NULL pointer for arg of type %d!\n", opinfo->types[i]);
-    }
-  }
-
-  return pc_prederef;
+    return pc_prederef;
 }
 
 
 /*=for api interpreter runops_jit
  */
 static void
-runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
+runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
 #ifdef HAS_JIT
-    opcode_t * code_start;
-    UINTVAL    code_size; /* in opcodes */
-    opcode_t * code_end;
-    jit_f      jit_code;
+    opcode_t *code_start;
+    UINTVAL code_size;          /* in opcodes */
+    opcode_t *code_end;
+    jit_f jit_code;
 
     check_fingerprint(interpreter);
 
     code_start = interpreter->code->byte_code;
-    code_size  = interpreter->code->byte_code_size / sizeof(opcode_t);
-    code_end   = interpreter->code->byte_code + code_size;
+    code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_end = interpreter->code->byte_code + code_size;
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
 #  ifdef ALPHA
-    (jit_code)((void *)(((char *)&interpreter->int_reg.registers[0]) + 0x7fff));
+    (jit_code) ((void *)(((char *)&interpreter->int_reg.registers[0]) +
+                         0x7fff));
 #  endif
 #  ifdef I386
-    (jit_code)();
+    (jit_code) ();
 #  endif
 #  ifdef SUN4
-    (jit_code)((void *)(&interpreter->int_reg.registers[0]),
-                        (void *)&interpreter->num_reg.registers[0],
-                        (void *)&interpreter->string_reg.registers[0]);
+    (jit_code) ((void *)(&interpreter->int_reg.registers[0]),
+                (void *)&interpreter->num_reg.registers[0],
+                (void *)&interpreter->string_reg.registers[0]);
 #  endif
 
 #else
@@ -334,39 +352,43 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
  * flag changing ops).
  */
 static void
-runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc, 
-                 void ** pc_prederef) {
-    opcode_t * code_start;
-    UINTVAL    code_size; /* in opcodes */
-    opcode_t * code_end;
-    void **    code_start_prederef;
+runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc,
+                void **pc_prederef)
+{
+    opcode_t *code_start;
+    UINTVAL code_size;          /* in opcodes */
+    opcode_t *code_end;
+    void **code_start_prederef;
 
     check_fingerprint(interpreter);
 
     code_start = interpreter->code->byte_code;
-    code_size  = interpreter->code->byte_code_size / sizeof(opcode_t);
-    code_end   = interpreter->code->byte_code + code_size;
+    code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_end = interpreter->code->byte_code + code_size;
 
     code_start_prederef = pc_prederef;
 
     init_prederef(interpreter);
 
     while (pc_prederef) {
-      pc_prederef = 
-              ((op_func_prederef_t)(ptrcast_t)*pc_prederef) (pc_prederef, interpreter);
+        pc_prederef =
+            ((op_func_prederef_t)(ptrcast_t)*pc_prederef) (pc_prederef,
+                                                           interpreter);
     }
 
     stop_prederef();
 
     if (pc_prederef == 0) {
-      pc = 0;
+        pc = 0;
     }
     else {
-      pc = code_start + (pc_prederef - code_start_prederef);
+        pc = code_start + (pc_prederef - code_start_prederef);
     }
 
     if (pc && (pc < code_start || pc >= code_end)) {
-        internal_exception(INTERP_ERROR, "Error: Control left bounds of byte-code block (now at location %d)!\n", (int) (pc - code_start));
+        internal_exception(INTERP_ERROR,
+                           "Error: Control left bounds of byte-code block (now at location %d)!\n",
+                           (int)(pc - code_start));
     }
 }
 
@@ -375,25 +397,25 @@ runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc,
  * run parrot operations until the program is complete
  */
 void
-runops (struct Parrot_Interp *interpreter, struct PackFile * code, 
-        size_t offset) {
-    opcode_t * (*core)(struct Parrot_Interp *, opcode_t *);
+runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
+{
+    opcode_t *(*core) (struct Parrot_Interp *, opcode_t *);
 
-    interpreter->code          = code;
+    interpreter->code = code;
     interpreter->resume_offset = offset;
-    interpreter->resume_flag   = 1;
+    interpreter->resume_flag = 1;
 
     while (interpreter->resume_flag) {
-        int        which = 0;
-        opcode_t * pc    = (opcode_t *)
-                interpreter->code->byte_code + interpreter->resume_offset;
+        int which = 0;
+        opcode_t *pc = (opcode_t *)
+            interpreter->code->byte_code + interpreter->resume_offset;
 
         interpreter->resume_offset = 0;
-        interpreter->resume_flag   = 0;
+        interpreter->resume_flag = 0;
 
-        which |= interpreter->flags & PARROT_BOUNDS_FLAG  ? 0x01 : 0x00;
+        which |= interpreter->flags & PARROT_BOUNDS_FLAG ? 0x01 : 0x00;
         which |= interpreter->flags & PARROT_PROFILE_FLAG ? 0x02 : 0x00;
-        which |= interpreter->flags & PARROT_TRACE_FLAG   ? 0x04 : 0x00;
+        which |= interpreter->flags & PARROT_TRACE_FLAG ? 0x04 : 0x00;
 
         core = which ? runops_slow_core : runops_fast_core;
 
@@ -412,38 +434,39 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code,
         }
 
         if ((interpreter->flags & PARROT_PREDEREF_FLAG) != 0) {
-          offset = pc - (opcode_t *)interpreter->code->byte_code;
+            offset = pc - (opcode_t *)interpreter->code->byte_code;
 
-          if (!interpreter->prederef_code) {
-            size_t N = interpreter->code->byte_code_size;
-            size_t i;
-            void ** temp = (void **)malloc(N * sizeof(void *));
+            if (!interpreter->prederef_code) {
+                size_t N = interpreter->code->byte_code_size;
+                size_t i;
+                void **temp = (void **)malloc(N * sizeof(void *));
 
-            for (i = 0; i < N; i++) {
-              temp[i] = (void *)(ptrcast_t)prederef;
+                for (i = 0; i < N; i++) {
+                    temp[i] = (void *)(ptrcast_t)prederef;
+                }
+
+                interpreter->prederef_code = temp;
             }
 
-            interpreter->prederef_code = temp;
-          }
-
-          runops_prederef(interpreter, pc, 
-                          interpreter->prederef_code + offset);
+            runops_prederef(interpreter, pc,
+                            interpreter->prederef_code + offset);
         }
         else if ((interpreter->flags & PARROT_JIT_FLAG) != 0) {
 #if !JIT_CAPABLE
-          internal_exception( JIT_UNAVAILABLE, "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
+            internal_exception(JIT_UNAVAILABLE,
+                               "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
 #endif
 
-          runops_jit(interpreter, pc);
+            runops_jit(interpreter, pc);
         }
         else {
-          runops_generic(core, interpreter, pc);
+            runops_generic(core, interpreter, pc);
         }
     }
 
     if (interpreter->prederef_code) {
-      free(interpreter->prederef_code);
-      interpreter->prederef_code = NULL;
+        free(interpreter->prederef_code);
+        interpreter->prederef_code = NULL;
     }
 }
 
@@ -451,7 +474,8 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code,
  *  Create the Parrot interpreter.  Allocate memory and clear the registers.
  */
 struct Parrot_Interp *
-make_interpreter(INTVAL flags) {
+make_interpreter(INTVAL flags)
+{
     struct Parrot_Interp *interpreter;
     /* Get an empty interpreter from system memory */
     interpreter = mem_sys_allocate((UINTVAL)sizeof(struct Parrot_Interp));
@@ -472,10 +496,10 @@ make_interpreter(INTVAL flags) {
 
     /* Need an empty stash */
     interpreter->perl_stash = mem_sys_allocate(sizeof(struct Stash));
-    interpreter->perl_stash->stash_hash = 
-    	        pmc_new(interpreter, enum_class_PerlHash);
+    interpreter->perl_stash->stash_hash =
+        pmc_new(interpreter, enum_class_PerlHash);
     interpreter->perl_stash->parent_stash = NULL;
-    
+
     /* Initialize interpreter's flags */
     interpreter->flags = flags;
     interpreter->warns = mem_sys_allocate(sizeof(struct warnings_t));
@@ -484,14 +508,16 @@ make_interpreter(INTVAL flags) {
 
     /* Set up defaults for line/package/file */
     interpreter->current_line = 0;
-    interpreter->current_file = string_make(interpreter, "(unknown file)", 14, NULL, 0, NULL);
-    interpreter->current_package = string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
-    
+    interpreter->current_file =
+        string_make(interpreter, "(unknown file)", 14, NULL, 0, NULL);
+    interpreter->current_package =
+        string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
+
     /* Set up the initial register chunks */
     interpreter->int_reg_base = mem_allocate_aligned(sizeof(struct IRegChunk));
     interpreter->num_reg_base = mem_allocate_aligned(sizeof(struct NRegChunk));
     interpreter->string_reg_base =
-            mem_allocate_aligned(sizeof(struct SRegChunk));
+        mem_allocate_aligned(sizeof(struct SRegChunk));
     interpreter->pmc_reg_base = mem_allocate_aligned(sizeof(struct PRegChunk));
     interpreter->int_reg_top = interpreter->int_reg_base;
     interpreter->num_reg_top = interpreter->num_reg_base;
@@ -503,65 +529,65 @@ make_interpreter(INTVAL flags) {
     memset(&interpreter->num_reg, 0, sizeof(struct NReg));
     memset(&interpreter->string_reg, 0, sizeof(struct SReg));
     memset(&interpreter->pmc_reg, 0, sizeof(struct PReg));
-    
+
     /* Initialize the integer register chunk */
     interpreter->int_reg_base->used = 0;
     interpreter->int_reg_base->free = FRAMES_PER_INT_REG_CHUNK;
     interpreter->int_reg_base->next = NULL;
     interpreter->int_reg_base->prev = NULL;
-    
+
     /* Initialize the initial numeric register chunk */
     interpreter->num_reg_base->used = 0;
     interpreter->num_reg_base->free = FRAMES_PER_NUM_REG_CHUNK;
     interpreter->num_reg_base->next = NULL;
     interpreter->num_reg_base->prev = NULL;
-    
+
     /* Initialize the inital string register chunk, be sure to
-       NULL out the strings because string functions rely
-       on NULL strings */
+     * NULL out the strings because string functions rely
+     * on NULL strings */
     interpreter->string_reg_base->used = 0;
     interpreter->string_reg_base->free = FRAMES_PER_STR_REG_CHUNK;
     interpreter->string_reg_base->next = NULL;
     interpreter->string_reg_base->prev = NULL;
     Parrot_clear_s(interpreter);
-    
+
     /* Initialize the initial PMC register chunk. Gotta NULL them out,
-       too, otherwise we might GC Wrong Things later */
+     * too, otherwise we might GC Wrong Things later */
     interpreter->pmc_reg_base->used = 0;
     interpreter->pmc_reg_base->free = FRAMES_PER_PMC_REG_CHUNK;
     interpreter->pmc_reg_base->next = NULL;
     interpreter->pmc_reg_base->prev = NULL;
     Parrot_clear_p(interpreter);
-    
+
     /* Need a user stack */
     interpreter->user_stack = new_stack(interpreter);
-    
+
     /* And a control stack */
     interpreter->control_stack = new_stack(interpreter);
 
     /* Load the core op func and info tables */
-    interpreter->op_lib        = PARROT_CORE_OPLIB_INIT();
-    interpreter->op_count      = interpreter->op_lib->op_count;
+    interpreter->op_lib = PARROT_CORE_OPLIB_INIT();
+    interpreter->op_count = interpreter->op_lib->op_count;
     interpreter->op_func_table = interpreter->op_lib->op_func_table;
     interpreter->op_info_table = interpreter->op_lib->op_info_table;
-    
+
     /* Set I/O data to NULL first or else PIO_init will
      * assume this interpreter is already initialized.
      */
     interpreter->piodata = NULL;
     PIO_init(interpreter);
-    
+
     /* Done. Return and be done with it */
 
     interpreter->code = (struct PackFile *)NULL;
     interpreter->profile = (ProfData *)NULL;
 
-    interpreter->resume_flag   = 0;
+    interpreter->resume_flag = 0;
     interpreter->resume_offset = 0;
 
     interpreter->prederef_code = (void **)NULL;
 
-    return interpreter;   
+    return interpreter;
 }
 
 /*

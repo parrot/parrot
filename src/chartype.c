@@ -16,7 +16,8 @@ extern const CHARTYPE usascii_chartype;
 extern const CHARTYPE unicode_chartype;
 
 const CHARTYPE *
-chartype_lookup(const char *name) {
+chartype_lookup(const char *name)
+{
     if (strcmp(name, "usascii") == 0) {
         return &usascii_chartype;
     }
@@ -29,7 +30,8 @@ chartype_lookup(const char *name) {
 }
 
 CHARTYPE_TRANSCODER
-chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to) {
+chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to)
+{
     CHARTYPE_TRANSCODER transcoder;
 
     if ((transcoder = from->transcode_to(to->name)) == NULL) {

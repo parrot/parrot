@@ -39,28 +39,29 @@
    cheaper, though. 
 */
 void *
-mem_allocate_aligned(UINTVAL size) {
+mem_allocate_aligned(UINTVAL size)
+{
     ptrcast_t max_to_alloc = 0;
     ptrcast_t mask = 0;
     ptrcast_t i;
     void *mem = NULL;
-    
+
     /* Okay, we just brute-force things here. Yeah it's stupid, but it
-       works */
+     * works */
     for (i = 1; i < 0xffffff; i <<= 1) {
         if (size > i) {
-            mask = ~(i*2 - 1);
-            max_to_alloc = i*4;
+            mask = ~(i * 2 - 1);
+            max_to_alloc = i * 4;
         }
         else {
             break;
         }
     }
-    
+
     mem = malloc(max_to_alloc);
     if (((ptrcast_t)mem & mask) < (ptrcast_t)mem) {
         mem = (void *)(((ptrcast_t)mem & mask) + ~mask + 1);
-    } 
+    }
     return mem;
 }
 
@@ -68,7 +69,8 @@ mem_allocate_aligned(UINTVAL size) {
    uses malloc to allocate system memory
 */
 void *
-mem_sys_allocate(UINTVAL size) {
+mem_sys_allocate(UINTVAL size)
+{
     return malloc((size_t)size);
 }
 
@@ -76,7 +78,8 @@ mem_sys_allocate(UINTVAL size) {
    resize a chunk of system memory
 */
 void *
-mem_sys_realloc(void *from, UINTVAL size) {
+mem_sys_realloc(void *from, UINTVAL size)
+{
     return realloc(from, size);
 }
 
@@ -84,7 +87,8 @@ mem_sys_realloc(void *from, UINTVAL size) {
    free a chunk of memory back to the system
 */
 void
-mem_sys_free(void *from) {
+mem_sys_free(void *from)
+{
     free(from);
 }
 
@@ -92,7 +96,8 @@ mem_sys_free(void *from) {
    initializes the allocator
 */
 void
-mem_setup_allocator(struct Parrot_Interp *interpreter) {
+mem_setup_allocator(struct Parrot_Interp *interpreter)
+{
     interpreter->arena_base = mem_sys_allocate(sizeof(struct Arenas));
     interpreter->arena_base->memory_pool = NULL;
     interpreter->arena_base->last_STRING_Arena = NULL;
@@ -101,22 +106,29 @@ mem_setup_allocator(struct Parrot_Interp *interpreter) {
     Parrot_alloc_new_block(interpreter, 0, 1);
 
     /* Init the string header pool */
-    interpreter->arena_base->string_header_pool = mem_sys_allocate(sizeof(struct STRING_free_pool));
-    interpreter->arena_base->string_header_pool->pool_buffer.bufstart = Parrot_allocate(interpreter, 1024);
-    interpreter->arena_base->string_header_pool->pool_buffer.flags = BUFFER_live_FLAG;
+    interpreter->arena_base->string_header_pool =
+        mem_sys_allocate(sizeof(struct STRING_free_pool));
+    interpreter->arena_base->string_header_pool->pool_buffer.bufstart =
+        Parrot_allocate(interpreter, 1024);
+    interpreter->arena_base->string_header_pool->pool_buffer.flags =
+        BUFFER_live_FLAG;
     interpreter->arena_base->string_header_pool->pool_buffer.buflen = 1024;
     interpreter->arena_base->string_header_pool->entries_in_pool = 0;
 
     /* Init the PMC header pool */
-    interpreter->arena_base->pmc_pool = mem_sys_allocate(sizeof(struct PMC_free_pool));
-    interpreter->arena_base->pmc_pool->pool_buffer.bufstart = Parrot_allocate(interpreter, 1024);
+    interpreter->arena_base->pmc_pool =
+        mem_sys_allocate(sizeof(struct PMC_free_pool));
+    interpreter->arena_base->pmc_pool->pool_buffer.bufstart =
+        Parrot_allocate(interpreter, 1024);
     interpreter->arena_base->pmc_pool->pool_buffer.flags = BUFFER_live_FLAG;
     interpreter->arena_base->pmc_pool->pool_buffer.buflen = 1024;
     interpreter->arena_base->pmc_pool->entries_in_pool = 0;
 }
 
 void *
-mem_realloc(struct Parrot_Interp *interpreter, void *from, UINTVAL fromsize, UINTVAL tosize) {
+mem_realloc(struct Parrot_Interp *interpreter, void *from, UINTVAL fromsize,
+            UINTVAL tosize)
+{
     UINTVAL copysize = (fromsize > tosize ? tosize : fromsize);
     void *mem;
     mem = Parrot_allocate(interpreter, copysize);
