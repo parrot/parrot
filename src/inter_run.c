@@ -209,12 +209,14 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     const char *p;
     PMC *p3 = PMCNULL;
     int clear_p3, need_p3, max;
+    PMC *arg;
 
     for (i = 0; i < 4; i++) {
         next[i] = 5;
         count[i] = 0;
     }
 
+    bp = interpreter->ctx.bp;
     ret_c = new_ret_continuation_pmc(interpreter, NULL);
     dest = VTABLE_invoke(interpreter, sub, NULL);
     interpreter->ctx.current_sub = REG_PMC(0) = sub;
@@ -281,11 +283,31 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
                     REG_STR(next[1]++) = va_arg(ap, STRING*);
                 break;
             case 'P':       /* REG_PMC */
+                arg = va_arg(ap, PMC*);
                 if (next[2] == 16)
-                    VTABLE_set_pmc_keyed_int(interpreter,
-                            p3, i++, va_arg(ap, PMC*));
+                    VTABLE_set_pmc_keyed_int(interpreter, p3, i++, arg);
                 else
-                    REG_PMC(next[2]++) = va_arg(ap, PMC*);
+                    REG_PMC(next[2]++) = arg;
+                /*
+                 * if this is a Key PMC with registers, pass on these
+                 * registers.
+                 * XXX make a distinct 'K' signature ?
+                 */
+                if (arg->vtable->base_type == enum_class_Key) {
+                    while (arg) {
+                        UINTVAL flags = PObj_get_FLAGS(arg);
+                        if (flags & KEY_register_FLAG) {
+                            INTVAL n = PMC_int_val(arg);
+                            if (flags & KEY_integer_FLAG)
+                                REG_INT(n) = BP_REG_INT(bp, n);
+                            else if (flags & KEY_pmc_FLAG)
+                                REG_PMC(n) = BP_REG_PMC(bp, n);
+                            else if (flags & KEY_string_FLAG)
+                                REG_STR(n) = BP_REG_STR(bp, n);
+                        }
+                        arg = key_next(interpreter, arg);
+                    }
+                }
                 break;
             case 'N':       /* REG_NUM */
                 if (next[3] == 16)

@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 23;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -744,4 +744,34 @@ ok: print "ok\n"
 .end
 CODE
 ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys");
+##PIR##
+.sub _main
+    newclass $P0, "Foo"
+
+    find_type $I0, "Foo"
+    new $P1, $I0
+
+    $I1 = $P1["foo"]
+
+    $S0 = "foo"
+    $I1 = $P1[$S0]
+
+    end
+.end
+
+.namespace ["Foo"]
+
+.sub __get_integer_keyed
+    .param pmc key
+    print "Key = "
+    print key
+    print "\n"
+    .return(0)
+.end
+CODE
+Key = foo
+Key = foo
 OUTPUT
