@@ -1872,6 +1872,7 @@ imcc/t/syn/op.t                                   []
 imcc/t/syn/pcc.t                                  []
 imcc/t/syn/pod.t                                  []
 imcc/t/syn/scope.t                                []
+imcc/t/syn/tail.t                                 []
 imcc/unit.h                                       []
 include/parrot/autoprefix.h			  [devel]include
 include/parrot/caches.h                           [devel]include
