@@ -6,7 +6,7 @@
 //
 public class Life {
     public string Generate(string input) {
-        int cell, neighbours;
+        int cell, neighbours, i;
         int len = strlen(input);
         int pos, offset;
         string birth = "   *     ";
@@ -14,18 +14,20 @@ public class Life {
         string output = input;
         for(cell=0; cell < len; cell++) {
             neighbours = 0;
-            if(input[(cell + len - 1) % len] == "*") neighbours++;
-            if(input[(cell + len + 1) % len] == "*") neighbours++;
-            if(input[(cell + len - 17) % len] == "*") neighbours++;
-            if(input[(cell + len + 17) % len] == "*") neighbours++;
-            if(input[(cell + len - 16) % len] == "*") neighbours++;
-            if(input[(cell + len + 16) % len] == "*") neighbours++;
-            if(input[(cell + len - 15) % len] == "*") neighbours++;
-            if(input[(cell + len + 15) % len] == "*") neighbours++;
+            i = cell + len;
+            if(input[(i - 1) % len] == "*") neighbours++;
+            if(input[(i + 1) % len] == "*") neighbours++;
+            if(input[(i - 17) % len] == "*") neighbours++;
+            if(input[(i + 17) % len] == "*") neighbours++;
+            if(input[(i - 16) % len] == "*") neighbours++;
+            if(input[(i + 16) % len] == "*") neighbours++;
+            if(input[(i - 15) % len] == "*") neighbours++;
+            if(input[(i + 15) % len] == "*") neighbours++;
             if (input[cell] == "*")
                 output[cell] = death[neighbours];
-            else
-                output[cell] = birth[neighbours];
+            else if(neighbours == 3) {
+                output[cell] = "*";
+            }
         } 
         return output;
     }
@@ -33,13 +35,13 @@ public class Life {
     static void Main() {
         string world = "   **   * * *   " +
                     " **  *  *       " +
-                    " **  *       *  " +
+                    " **          *  " +
                     "        *    ** " +
                     " **  *  *       " +
                     "     *          " +
                     "  *     *       " +
                     "        *       " +
-                    " **  *   *  **  " +
+                    " *   *   *  **  " +
                     "  *  *  *       " +
                     " **     *    *  " +
                     "          *     " +
@@ -51,10 +53,9 @@ public class Life {
         int i, j;
         for(i = 0; i < 500; i++) {
             // Print World
-            for(j = 0; j < 16; j++)
-                puts(substr(world, j * 16, 16) + "\n");
+            //for(j = 0; j < 16; j++)
+            //    puts(substr(world, j * 16, 16) + "\n");
             world = Generate(world);
-            sleep(1);
         }
     }
 }
