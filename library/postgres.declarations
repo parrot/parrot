@@ -1,0 +1,104 @@
+[package]
+PostgreSQL
+
+[lib]
+libpq
+
+[defs]
+# From libpq-fe.h
+p PQconnectStart t
+i PQconnectPoll p
+p PQconnectdb t
+p PQsetdbLogin t t t t t t t
+v PQfinish p
+p PQconndefaults
+v PQconninfoFree p
+i PQresetStart p
+i PQresetPoll p
+c PQreset p
+i PQrequestCancel p
+t PQdb p
+t PQuser p
+t PQpass p
+t PQhost p
+t PQport p
+t PQtty p
+t PQoptions p
+i PQstatus p
+t PQerrorMessage p
+i PQsocket p
+i PQbackendPID p
+i PQclientEncoding p
+i PQsetClientEncoding p t
+v PQtrace p p
+v PQuntrace p
+
+# Needs a function pointer. Can't do that yet
+# i PQsetNoticeProcessor p p
+
+# First arg's a returned char pointer. Can't do that yet
+# i PQescapeString t t i
+
+t PQescapeBytea t l 4
+t PQunescapeBytea t 4
+p PQexec p t
+p PQnotifies p
+v PQfreeNotify p
+
+i PQsendQuery p t
+p PQgetResult p
+
+i PQisBusy p
+i PQconsumeInput p
+
+i PQgetline p t i
+i PQputline p t
+i PQgetlineAsync p t i
+i PQputnbytes p t i
+i PQendcopy p
+
+i PQsetnonblocking p i
+i PQisnonblocking p
+
+i PQflush p
+i PQsendSome p
+
+p PQfn p i 3 3 i p i
+
+i PQresultStatus p
+t PQresStatus i
+t PQresultErrorMessage p
+i PQntuples p
+i PQnfields p
+i PQbinaryTuples p
+t PQfname p i
+i PQfnumber p t
+i PQftype p i
+i PQfsize p i
+i PQfmod p i
+t PQcmdStatus p
+t PQoidStatus p
+i PQoidValue p
+t PQcmdTuples p
+t PQgetvalue p i i
+i PQgetlength p i i
+i PQgetisnull p i i
+
+v PQclear p
+
+p PQmakeEmptyPGresult p i
+
+i lo_open p i i
+i lo_close p i
+i lo_read p i t l
+i lo_write p i t l
+i lo_lseek p i i i
+i lo_creat p i
+i lo_tell p i
+i lo_unlink p i
+i lo_import p t
+i lo_export p i t
+
+i PQmblen t i
+i PQenv2encoding v
+
