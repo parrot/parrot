@@ -1299,6 +1299,7 @@ include/parrot/memory.h                           [devel]include
 include/parrot/method_util.h                      [devel]include
 include/parrot/misc.h                             [devel]include
 include/parrot/nci.h                              [devel]include
+include/parrot/objects.h                          [devel]include
 include/parrot/op.h                               [devel]include
 include/parrot/oplib.h                            [devel]include
 include/parrot/packfile.h                         [devel]include
@@ -1787,6 +1788,7 @@ memory.c                                          []
 method_util.c                                     []
 misc.c                                            []
 nci_test.c                                        []
+objects.c                                         []
 object.ops                                        []
 obscure.ops                                       []
 ops2c.pl                                          [devel]
