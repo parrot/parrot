@@ -4,7 +4,7 @@
 .include "library/pcre.imc"
     .sym int argc
     argc = argv
-    if argc < 3 goto usage
+    if argc != 3 goto usage
 
     .sym string s
     .sym string pat
