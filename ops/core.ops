@@ -367,7 +367,7 @@ op read(out STR, in INT, in INT) {
   string_destroy($1);
   s = string_make(interpreter, NULL, len, NULL, 0, NULL);
   read($2, s->bufstart, len);
-  s->bufused = s->buflen;
+  s->bufused = len;
   $1 = s;
   goto NEXT();
 }
