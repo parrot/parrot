@@ -465,6 +465,9 @@ returns the result in C<*dest>.
 
 =item C<void concatenate(PMC *value, PMC *dest)>
 
+Concatenates the string and the stringified form of C<*value> and
+return the result in C<*dest>, morphing it to a PerlString if required.
+
 =cut
 
 */
