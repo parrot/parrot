@@ -66,19 +66,8 @@ pmclass Array {
     void morph (INTVAL type) {
     }
 
-    BOOLVAL move_to (void * destination) {
-        destination = *(PMC**)(SELF->data);
-        SELF->data = &destination;
-        return 1;
-    }
-
     INTVAL real_size () {
 	return SELF->cache.int_val * sizeof(PMC*);
-    }
-
-    void destroy () {
-	/* XXX Hook into GC */
-	/* key_destroy(INTERP,SELF->data); */
     }
 
     INTVAL get_integer () {

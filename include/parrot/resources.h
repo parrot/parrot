@@ -39,9 +39,9 @@ void Parrot_go_collect(struct Parrot_Interp *);
 
 void buffer_lives(Buffer *);
 
-#define STRING_HEADERS_PER_ALLOC 128
-#define PMC_HEADERS_PER_ALLOC 128
-#define BUFFER_HEADERS_PER_ALLOC 128
+#define STRING_HEADERS_PER_ALLOC 256
+#define PMC_HEADERS_PER_ALLOC 256
+#define BUFFER_HEADERS_PER_ALLOC 256
 
 struct PMC_Arena {
     size_t free;         /* Count of PMCs free in this arena */
@@ -107,7 +107,7 @@ struct Stash {
 #define TOTAL_BUFFERS 7
 #define HEADERS_ALLOC_SINCE_COLLECT 8
 #define MEM_ALLOCS_SINCE_COLLECT 9
-
+#define TOTAL_COPIED 10
 
 #endif /* PARROT_RESOURCES_H */
 

@@ -490,6 +490,7 @@ make_interpreter(Interp_flags flags)
     interpreter->total_PMCs = 0;
     interpreter->total_Buffers = 0;
     interpreter->memory_allocated = 0;
+    interpreter->memory_collected = 0;
 
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);

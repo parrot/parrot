@@ -715,6 +715,7 @@ Parrot_go_collect(struct Parrot_Interp *interpreter) {
 	       string_array[i].buflen);
 	string_array[i].bufstart = cur_spot;
 	cur_size = string_array[i].buflen;
+        interpreter->memory_collected += cur_size;
 	if (cur_size & 0x0f) {
 	  cur_size &= ~0x0f;
 	  cur_size += 16;

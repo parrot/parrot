@@ -24,7 +24,7 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
 	}
     }
     else {
-	self->data = new_tracked_header(interpreter, sizeof(Buffer));
+	self->data = new_buffer_header(interpreter);
 	((Buffer *)self->data)->bufstart = Parrot_allocate(interpreter, sizeof(PMC*)*size);
     }
 }

@@ -77,6 +77,11 @@ getout:	time N6
 	print I1
 	print " collection runs were made\n"
 
+	interpinfo I1, 10
+	print "Copying a total of "
+	print I1
+	print " bytes\n"
+
 	interpinfo I1, 5
 	print "There are "
 	print I1

@@ -131,6 +131,8 @@ struct Parrot_Interp {
                                  * memory for headers or
                                  * internal structures or
                                  * anything */
+    UINTVAL memory_collected;   /* Total amount of memory copied
+                                   during collection */
 };
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))

@@ -2472,6 +2472,8 @@ op interpinfo(out INT, in INT) {
     case MEM_ALLOCS_SINCE_COLLECT:
     $1 = interpreter->header_allocs_since_last_collect;
     break;
+    case TOTAL_COPIED: $1 = interpreter->memory_collected;
+		       break;
   }
   goto NEXT();
 }
