@@ -26,6 +26,7 @@ classes/default.pmc
 classes/genclass.pl
 classes/intlist.pmc
 classes/key.pmc
+classes/managedstruct.pmc
 classes/multiarray.pmc
 classes/nci.pmc
 classes/perlarray.pmc
@@ -39,6 +40,7 @@ classes/pointer.pmc
 classes/scalar.pmc
 classes/scratchpad.pmc
 classes/sub.pmc
+classes/unmanagedstruct.pmc
 config/auto/alignptrs.pl
 config/auto/alignptrs/test_c.in
 config/auto/byteorder.pl

@@ -178,7 +178,7 @@ On return from a function, the following registers are set. Return
 values are placed in registers only if the function is prototyped to
 do so. All values on the stack are in reverse order, such that the top
 value on the stack is the first value returned. 
-
+oÅ≈r
 =over 4
 
 =item I0
