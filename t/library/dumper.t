@@ -20,8 +20,6 @@ use strict;
 
 use Parrot::Test tests => 13;
 
-SKIP: {
-   skip("bogus argument handling in library", 13);
 # no. 1
 output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
 ##PIR##
@@ -616,4 +614,4 @@ CODE
     "0"
 ]
 OUT
-}
+

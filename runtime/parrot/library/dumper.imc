@@ -72,9 +72,22 @@ B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
 =cut
 
 .sub _dumper
+    .param string name
+    .param pmc p
+    .param string ident
+    $I2 = argcS
     _global_dumper()
     find_global $P2, "Data::Dumper", "global"
-    $P2."dumper"()
+    if $I2 == 2 goto w_ident
+    if $I2 == 0 goto wo_name
+    $P2."dumper"(name, p)
+    goto ex
+wo_name:
+    $P2."dumper"(p)
+    goto ex
+w_ident:
+    $P2."dumper"(name, p, ident)
+ex:
 .end
 
 =item _register_dumper( id, sub )
@@ -103,10 +116,12 @@ This function returns nothing.
 =cut
 
 .sub _register_dumper
+    .param int id
+    .param pmc s
     # XXX argument passing
     _global_dumper()
     find_global $P2, "Data::Dumper", "global"
-    $P2."registerDumper"()
+    $P2."registerDumper"(id, s)
 .end
 
 =item dumper =_global_dumper() B<(internal)>
