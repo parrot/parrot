@@ -141,9 +141,9 @@ bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
     /* this is mpz_fdiv_q */
     mpz_div(BN(dest), BN(self), BN(value));
     if (mpz_fits_slong_p(BN(dest))) {
+        long iresult = mpz_get_si(BN(dest));
         VTABLE_morph(interpreter, dest, enum_class_Integer);
-        VTABLE_set_integer_native(interpreter, dest,
-             mpz_get_si(BN(dest)));
+        VTABLE_set_integer_native(interpreter, dest, iresult);
     }
 }
 static void
@@ -153,9 +153,9 @@ bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
     /* this is mpz_fdiv_q */
     mpz_div_ui(BN(dest), BN(self), value);
     if (mpz_fits_slong_p(BN(dest))) {
+        long iresult = mpz_get_si(BN(dest));
         VTABLE_morph(interpreter, dest, enum_class_Integer);
-        VTABLE_set_integer_native(interpreter, dest,
-             mpz_get_si(BN(dest)));
+        VTABLE_set_integer_native(interpreter, dest, iresult);
     }
 }
 static void
@@ -165,9 +165,9 @@ bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
     /* this is mpz_fdiv_q */
     mpz_fdiv_q(BN(dest), BN(self), BN(value));
     if (mpz_fits_slong_p(BN(dest))) {
+        long iresult = mpz_get_si(BN(dest));
         VTABLE_morph(interpreter, dest, enum_class_Integer);
-        VTABLE_set_integer_native(interpreter, dest,
-             mpz_get_si(BN(dest)));
+        VTABLE_set_integer_native(interpreter, dest, iresult);
     }
 }
 static void
@@ -177,9 +177,9 @@ bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
     /* this is mpz_fdiv_q */
     mpz_fdiv_q_ui(BN(dest), BN(self), value);
     if (mpz_fits_slong_p(BN(dest))) {
+        long iresult = mpz_get_si(BN(dest));
         VTABLE_morph(interpreter, dest, enum_class_Integer);
-        VTABLE_set_integer_native(interpreter, dest,
-             mpz_get_si(BN(dest)));
+        VTABLE_set_integer_native(interpreter, dest, iresult);
     }
 }
 static void
@@ -188,9 +188,9 @@ bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_mod(BN(dest), BN(self), BN(value));
     if (mpz_fits_slong_p(BN(dest))) {
+        long iresult = mpz_get_si(BN(dest));
         VTABLE_morph(interpreter, dest, enum_class_Integer);
-        VTABLE_set_integer_native(interpreter, dest,
-             mpz_get_si(BN(dest)));
+        VTABLE_set_integer_native(interpreter, dest, iresult);
     }
 }
 

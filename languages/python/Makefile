@@ -6,7 +6,7 @@ test:
 	perl t/harness t/basic/*.t
 
 testbench:
-	perl t/harness t/pie/b[123].t
+	perl t/harness t/pie/b*.t
 
 testclass:
 	cd ../.. ; perl -Ilib t/harness t/dynclass/py*.t

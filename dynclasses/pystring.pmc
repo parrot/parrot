@@ -109,6 +109,20 @@ Return length of the string.
 
 /*
 
+=item C<INTVAL hash()>
+
+Returns a unique hash for this value
+
+=cut
+
+*/
+
+    INTVAL hash () {
+        return string_hash(interpreter, PMC_str_val(pmc));
+    }
+
+/*
+
 =item C<INTVAL get_bool()>
 
 Returns the pyboolean value of the string.

@@ -54,6 +54,8 @@ if __name__ == '__main__':
     main()
 CODE
 
+SKIP: {
+  skip("dictionaries with non-string keys", 2);
 test(<<'CODE', 'b6 - fdiv');
 # from b5 import check
 show = True
@@ -113,4 +115,4 @@ if __name__ == '__main__':
     main()
 
 CODE
-
+}

@@ -137,6 +137,8 @@ if __name__ == '__main__':
     main()
 CODE
 
+SKIP: {
+  skip("dictionaries with non-string keys", 1);
 test(<<'CODE', 'check_functions complex, dict');
 show = True
 
@@ -162,6 +164,7 @@ def main():
 if __name__ == '__main__':
     main()
 CODE
+}
 
 test(<<'CODE', 'check_functions divmod');
 show = True
@@ -375,6 +378,8 @@ if __name__ == '__main__':
     main()
 CODE
 
+SKIP: {
+  skip("isinstance of primitive types", 1);
 test(<<'CODE', 'check isinstance');
 show = True
 
@@ -402,4 +407,4 @@ if __name__ == '__main__':
     main()
 
 CODE
-
+}

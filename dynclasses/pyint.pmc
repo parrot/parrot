@@ -33,12 +33,7 @@ overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
     PMC *temp;
     INTVAL a = PMC_int_val(self);
 
-    if (PARROT_ERRORS_test(interpreter,PARROT_ERRORS_OVERFLOW_FLAG)) {
-        real_exception(interpreter, NULL, ERR_OVERFLOW,
-                "Integer overflow");
-    }
     if (self == dest) {
-        /* TODO preserve type system */
         VTABLE_morph(interpreter, self, dynclass_PyLong);
         VTABLE_set_integer_native(interpreter, self, a);
         mmd_dispatch_v_pip(interpreter, self, b, dest, mmd);
@@ -648,17 +643,29 @@ Create a new integer
 
 */
 
-    METHOD PMC* __new__(PMC *class, PMC *source) {
+    METHOD PMC* __new__(PMC *class, PMC *source, PMC *base) {
         INTVAL argc = REG_INT(3);
 
         PMC * ret = pmc_new(INTERP, dynclass_PyInt);
 
         /* XXX: quick hack: class method called directly */
-        if (argc == 3 && class == SELF) source = REG_PMC(7);
+        INTVAL dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
+        if (argc == 3 && source->vtable->base_type == dynclass_PyProxyType)
+            source = REG_PMC(7);
 
         if (argc > 1) {
-            INTVAL ivalue = VTABLE_get_integer(INTERP, source);
-            VTABLE_set_integer_native(INTERP, ret, ivalue);
+            if (source->vtable->base_type == dynclass_PyString) {
+                INTVAL key = 0;
+                if (argc > 2) key = VTABLE_get_integer(INTERP, base);
+                VTABLE_morph(INTERP, ret, dynclass_PyLong);
+                VTABLE_set_string_keyed_int(INTERP, ret, key,
+                    VTABLE_get_string(INTERP, source));
+                mmd_dispatch_v_pip(INTERP, ret, 1, ret, MMD_DIVIDE_INT);
+            }
+            else {
+                INTVAL ivalue = VTABLE_get_integer(INTERP, source);
+                VTABLE_set_integer_native(INTERP, ret, ivalue);
+            }
         }
 
         return ret;
@@ -693,6 +700,11 @@ The C<==> operation.
     INTVAL is_equal (PMC* value) {
 MMD_PyNone: {
             return 0;
+        }
+MMD_PyLong: {
+            PMC *temp = pmc_new(INTERP, dynclass_PyLong);
+            VTABLE_set_integer_native(INTERP, temp, PMC_int_val(SELF));
+            return mmd_dispatch_i_pp(INTERP, temp, value, MMD_EQ);
         }
 MMD_DEFAULT: {
             return (INTVAL)(PMC_int_val(SELF) ==
@@ -889,7 +901,7 @@ Raises C<SELF> to the power of C<*value> and returns the result.
             VTABLE_morph(INTERP, dest, dynclass_PyInt);
             PMC_int_val(dest) = 1;
             for (i=1; i<=value; i++) {
-                PMC_int_val(dest) *= PMC_int_val(SELF);
+                mmd_dispatch_v_pip(INTERP, dest, pmci, dest, MMD_MULTIPLY_INT);
             }
         }
     }
