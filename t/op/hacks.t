@@ -5,8 +5,7 @@ use Test::More;
 use Parrot::Config;
 
 SKIP: {
-skip("no setjmp header", Test::Builder->expected_tests())
-    unless ($PConfig{'i_setjmp'});
+skip("no setjmp header", 3) unless ($PConfig{'i_setjmp'});
 
 output_is(<<'CODE', <<OUT, "die_hard");
     newsub P0, .Exception_Handler, _handler
@@ -54,7 +53,11 @@ _handler:
 CODE
 No exception handler and no message
 OUT
+}
 
+SKIP: {
+skip("no setjmp header or OS not linux", 2)
+    unless ($PConfig{'i_setjmp'} && $^O eq 'linux');
 output_is(<<'CODE', <<OUT, "catch a SIGFPE");
     newsub P0, .Exception_Handler, _handler
     set_eh P0
