@@ -10,7 +10,7 @@ t/pmc/env.t - System Environment
 
 	% perl t/pmc/env.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<Env> PMC.
 
@@ -42,6 +42,7 @@ CODE
 /riding a ponie/i
 OUT
 
+delete $ENV{"PARROT_TMP"};
 output_like(<<'CODE', <<OUT, "setenv/getenv");
     new P0, .Env
     set P0["PARROT_TMP"], "hello polly"

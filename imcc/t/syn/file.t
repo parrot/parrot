@@ -8,7 +8,7 @@ syn/file.t - test inclusion of files
 
 =head1 SYNOPSIS
 
-A test script which is suppossed to be called by Test::Harness.
+A test script which is supposed to be called by Test::Harness.
 
 =cut
 
@@ -23,7 +23,7 @@ my $PARROT = ".$PConfig{slash}parrot$PConfig{exe}";
 my $PERL5  = $PConfig{perl};
 
 ##############################
-open FOO, ">temp.pasm" or die "Cant write temp.pasm\n";
+open FOO, ">temp.pasm" or die "Can't write temp.pasm\n";
 print FOO <<'ENDF';
   .constant BAR 42
 ENDF
@@ -45,7 +45,7 @@ OUT
 unlink "temp.pasm";
 
 ##############################
-open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
   .const int BAR = 42
 ENDF
@@ -67,7 +67,7 @@ OUT
 unlink "temp.imc";
 
 ##############################
-open FOO, ">temp.inc" or die "Cant write temp.inc\n";
+open FOO, ">temp.inc" or die "Can't write temp.inc\n";
 print FOO <<'ENDF';
   .const int BAR = 42
 ENDF
@@ -148,7 +148,7 @@ OUT
 # test load_bytecode branches and subs
 
 # write sub2
-open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
 .pcc_sub _sub2 prototyped
     print "sub2\n"
@@ -179,7 +179,7 @@ sub2
 OUT
 
 # write sub2
-open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
 .pcc_sub _sub2 prototyped
     print "sub2\n"
@@ -214,7 +214,7 @@ back
 OUT
 
 # write sub2
-open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
 .pcc_sub _not_sub2 prototyped
     print "not sub2\n"
@@ -250,7 +250,7 @@ sub2
 OUT
 
 # write sub2
-open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
 .pcc_sub _sub2 prototyped
     print "sub2\n"
@@ -308,7 +308,7 @@ back
 OUT
 
 # write subs
-open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+open FOO, ">temp.imc" or die "Can't write temp.imc\n";
 print FOO <<'ENDF';
 .pcc_sub _sub1 prototyped
     print "sub1\n"
@@ -344,7 +344,7 @@ OUT
   # include a non-existent file and catch the error message
   my $err_msg;
   {
-    open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+    open FOO, ">temp.imc" or die "Can't write temp.imc\n";
     print FOO << 'END_PIR';
 # Including a non-existent file should produce an error
 .include "non_existent.imc"
@@ -355,14 +355,22 @@ OUT
 .end
 END_PIR
     close FOO;
-    $err_msg = qx{$PARROT temp.imc 2>&1}
+    open OLDERR, ">&STDERR" or die "Can't save STDERR\n";
+    open STDERR, ">temp.out" or die "Can't write temp.out\n";
+    system "$PARROT temp.imc";
+    open FOO, "<temp.out" or die "Can't read temp.out\n";
+    { local $/; $err_msg = <FOO>; }
+    close FOO;
+    open STDERR, ">&OLDERR" or die "Can't restore STDERR\n";
+    unlink "temp.out";
   }
 
   # read a non-existent file and catch the error message
   my $enoent_err_msg;
   {
-    my $ENOENT = qx{$PERL5 -e 'open FOO, "<non_existent.file"; print( \$! + 0 )'};
-    open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+    open FOO, "<non_existent.file";
+    my $ENOENT = $! + 0;
+    open FOO, ">temp.imc" or die "Can't write temp.imc\n";
     print FOO << "END_PIR";
 .sub _main
   # run a OS command, and get the errmessge for the exit code
