@@ -8,7 +8,6 @@ use Make::CC_Obj qw(CC);
 use Make::Link_Obj qw(Link);
 use Make::Perl_Obj qw(Perl);
 use Make::Target_Obj qw(Target);
-use YAML qw(Store);
 
 =head2 NAME
 
@@ -150,8 +149,6 @@ sub Satisfy {
   my ($target) = @_;
   my $actions = [];
   $depends->{$target}->satisfied($actions);
-
-#  print Store($depends);
 
   for(@$actions) {
 print "running $_->{action}\n";
