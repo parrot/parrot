@@ -176,7 +176,6 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
     case PFC_NUMBER:
         padded_size = (sizeof(FLOATVAL) + sizeof(opcode_t) - 1) /
             sizeof(opcode_t);
-        *cursor++ = padded_size;
         mem_sys_memcopy(cursor, &self->u.number, sizeof(FLOATVAL));
         cursor += padded_size;
         break;
@@ -191,7 +190,6 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
         /* Include space for flags, encoding, type, and size fields.  */
         packed_size = 4 + padded_size / sizeof(opcode_t);
 
-        *cursor++ = packed_size;
         *cursor++ = PObj_get_FLAGS(self->u.string); /* only constant_FLAG */
         *cursor++ = self->u.string->encoding->index;
         *cursor++ = self->u.string->type->index;
@@ -234,7 +232,6 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
                     size_t len;
                     char *s = ((struct Parrot_Sub*)PMC_sub(key))->packed;
                     len = strlen(s) + 1;
-                    *cursor++ = (len + sizeof(opcode_t) - 1) / sizeof(opcode_t);
 
                     strcpy((char *) cursor, s);
 #if TRACE_PACKFILE_PMC
@@ -252,8 +249,6 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
         packed_size = sizeof(opcode_t);
         for (i = 0, key = self->u.key; key; key = PMC_data(key), i++)
             packed_size += 2 * sizeof(opcode_t);
-        /* size */
-        *cursor++ = packed_size;
         /* number of key components */
         *cursor++ = i;
         /* and now type / value per component */

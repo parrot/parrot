@@ -1861,8 +1861,8 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
         return 0;
     }
 
-    /* Tack on space for the initial type and size fields */
-    return packed_size + 2;
+    /* Tack on space for the initial type field */
+    return packed_size + 1;
 }
 
 /***************************************
@@ -1872,7 +1872,6 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
 Unpack a PackFile Constant from a block of memory. The format is:
 
   opcode_t type
-  opcode_t size
   *  data
 
 Returns cursor if everything is OK, else zero (0).
@@ -1887,17 +1886,13 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
                          struct PackFile_Constant *self, opcode_t *cursor)
 {
     opcode_t type;
-    opcode_t size;
     struct PackFile *pf = constt->base.pf;
 
     type = PF_fetch_opcode(pf, &cursor);
-    /* FIXME:leo size is unused */
-    size = PF_fetch_opcode(pf, &cursor);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_Constant_unpack(): Type is %ld ('%c')...\n",
             type, (char)type);
-    PIO_eprintf(NULL, "PackFile_Constant_unpack(): Size is %ld...\n", size);
 #endif
 
     switch (type) {
