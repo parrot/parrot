@@ -21,6 +21,7 @@ output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	set	I3, 4294967295
 	print	I3
 	print	"\\n"
+        end
 CODE
 305419896
 -1698898191
