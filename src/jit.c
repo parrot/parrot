@@ -1153,10 +1153,10 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
             (unsigned int)(jit_info->native_ptr - jit_info->arena.start));
 #endif
 
-#ifdef ARM
+#ifdef PARROT_ARM
     arm_sync_d_i_cache(jit_info->arena.start, jit_info->native_ptr);
 #endif
-#ifdef PPC
+#ifdef PARROT_PPC
     ppc_sync_cache(jit_info->arena.start, jit_info->native_ptr);
 #endif
 

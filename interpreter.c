@@ -17,7 +17,7 @@
 #include "parrot/oplib/core_ops_prederef.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/runops_cores.h"
-#ifdef HAS_JIT
+#ifdef JIT_CAPABLE
 #  include "parrot/exec.h"
 #  include "parrot/jit.h"
 #endif
@@ -392,7 +392,7 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 static opcode_t *
 runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
-#ifdef HAS_JIT
+#ifdef JIT_CAPABLE
     opcode_t *code_start;
     UINTVAL code_size;          /* in opcodes */
     opcode_t *code_end;
