@@ -8,17 +8,26 @@
 
 /* Allocate a chunk of memory aligned on a power-of-2 boundary */
 void *Allocate_Aligned(IV size) {
-  IV boundary;
   IV max_to_alloc;
-  IV temp;
+  IV mask;
+  IV i;
   void *mem = NULL;
 
-  boundary = 1;
-  for (temp = size; temp; temp >>= 1) {
-    boundary *= 2;
+  /* Okay, we just brute-force things here. Yeah it's stupid, but it
+     works */
+  for (i = 1; i < 0xffffff; i <<= 1) {
+    if (size > i) {
+      mask = ~(i*2 - 1);
+      max_to_alloc = i*4;
+    } else {
+      break;
+    }
   }
-  max_to_alloc = boundary * 2;
+    
   mem = malloc(max_to_alloc);
+  if (((IV)mem & mask) < (IV)mem) {
+    mem = ((IV)mem & mask) + ~mask + 1;
+  } 
   return mem;
 }
 
