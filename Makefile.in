@@ -328,6 +328,8 @@ memory$(O): $(GENERAL_H_FILES)
 
 packfile$(O): $(GENERAL_H_FILES)
 
+packout$(O): $(GENERAL_H_FILES)
+
 parrot$(O): $(GENERAL_H_FILES)
 
 register$(O): $(GENERAL_H_FILES)
