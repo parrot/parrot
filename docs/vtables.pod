@@ -1,0 +1,102 @@
+
+=head1 Implementing Variable Types with Vtables
+
+This is a guide to creating your own PMC (Parrot Magic Cookie) classes;
+it tells you what you need to write in order to add new variable types
+to Parrot.
+
+=head2 Overview
+
+The guts of the Parrot interpreter are, by design, ignorant (or, if you
+want to be less disparaging, agnostic) of the intricacies of variable
+type behaviour. The standard example is the difference between Perl
+scalars and Python scalars. In Perl, if you have
+
+    $a = "1a";
+    $a++;
+
+you end up with C<$a> being C<1b>. This is a factor of the way Perl
+scalars increment themselves. In Python, on the other hand, you'd get a
+runtime error. 
+
+=over 3
+
+=item *
+
+To be perfect honest, this is a slightly flawed example, since it's
+unlikely that there will be a distinct "Python scalar" PMC class.
+The Python compiler could well type-inference variables such that
+C<a> would be a C<PythonString> and C<b> would be a C<PythonNumber>.
+But the point remains - incrementing a C<PythonString> is very different
+from incrementing a C<PerlScalar>
+
+=back
+
+Since the behaviour is a function of the "type" of the PMC, it's
+natural to consider the various different types of PMC as classes
+in an object-oriented system whereby the interpreter calls methods on
+the individual PMC objects to manipulate them. So the example above
+would translate to something like:
+
+=over 3
+
+=item 1.
+
+Construct a new PMC in the PerlScalar class.
+
+=item 2.
+
+Call a method setting its string value to C<"a1">.
+
+=item 3.
+
+Call a method to tell it to increment itself.
+
+=back
+
+And if you replace PerlScalar with PythonString, you get different
+behaviour but to the fundamental guts of the interpreter, the
+instructions are the same. PMCs are an abstract virtual class; the
+interpreter calls a method, the PMC object does the right thing, and the
+interpreter shouldn't have to care particularly what that right thing
+happens to be.
+
+Hence, adding a new data type to Parrot is a question of providing
+methods which implement that data type's expected behaviour. Let's
+now look at how one is supposed to do this.
+
+=head2 Starting out
+
+If you're adding data types to the core of Parrot, (and you've
+checked with Dan and/or Simon that you're supposed to be doing so)
+you should be creating a file in the F<classes/> subdirectory; this is
+where all the built-in PMC classes live. (And a good source of examples
+to plunder even if you're not writing a core data type.)
+
+You should almost always start by running F<genclass.pl> found in the
+F<classes/> subdirectory to generate a skeleton for the class. Let's
+generate a number type for the beautifully non-existant Fooby language:
+
+    perl -I.. genclass.pl FoobyNumber > foobynumber.c
+
+This will produce a C file with stubs for all the methods you need to
+fill in; the final function in the file, C<Parrot_FoobyNumber_init>,
+allows you to set up anything you need to set up, and creates the
+vtable structure containing all the methods.
+
+Now you'll have to do something a little different depending on whether
+you're writing a built-in class or an extension class. If you're writing
+a built-in class, then you'll see a reference to
+C<enum_class_FoobyNumber> in the C<init> function. This is something
+that you need to add to the C<enum> of built-in classes located in
+F<pmc.h>. If you're not writing a built-in class, you need to change the
+type of the C<init> function to return C<struct _vtable>, and then
+return C<temp_base_vtable> instead of assigning to the
+C<Parrot_base_vtables> array.
+
+=head2 What You Can and Cannot Do
+
+=head2 Multimethods
+
+=head2 Methods you need to implement
+
