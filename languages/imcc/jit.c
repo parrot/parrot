@@ -19,6 +19,9 @@
 #include <assert.h>
 #include "imc.h"
 #include "pbc.h"
+
+#ifdef HAS_JIT
+
 #define JIT_IMCC
 #include "parrot/jit.h"
 #include "parrot/jit_emit.h"
@@ -314,7 +317,9 @@ allocate_jit(struct Parrot_Interp *interpreter)
     }
 }
 
+#else
 
+#endif
 /*
  * Local variables:
  * c-indentation-style: bsd

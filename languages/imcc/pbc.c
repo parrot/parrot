@@ -126,6 +126,7 @@ int e_pbc_open(void *param) {
     return 0;
 }
 
+#ifdef HAS_JIT
 /* get size/line of bytecode in ops till now */
 static int
 old_blocks(void)
@@ -162,6 +163,7 @@ make_jit_info(struct Parrot_Interp *interpreter)
     globals.cs->jit_info->size = size * 6;
     return globals.cs->jit_info->data + old * 6;
 }
+#endif
 
 /* allocate a new globals.cs->subs structure */
 static void
@@ -177,9 +179,13 @@ make_new_sub(struct Parrot_Interp *interpreter)
     if (!globals.cs->first)
         globals.cs->first = s;
     globals.cs->subs = s;
+#ifdef HAS_JIT
     if ((optimizer_level & OPT_J)) {
         allocate_jit(interpreter);
     }
+#else
+    UNUSED(interpreter);
+#endif
 }
 
 
