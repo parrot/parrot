@@ -74,6 +74,7 @@ END
 if (${has_setitimer}) {
     print OUT <<'END';
 #define HAS_SETITIMER 1
+#define HAS_SOME_SYS_TIMER 1
 END
 }
 

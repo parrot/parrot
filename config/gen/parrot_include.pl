@@ -18,6 +18,7 @@ my @files = qw(
     include/parrot/resources.h
     include/parrot/string.h
     include/parrot/warnings.h
+    classes/timer.pmc
 );
 my $destdir = 'runtime/parrot/include';
 
