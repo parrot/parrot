@@ -34,9 +34,10 @@ The API is listed in the public headers but not defined in the Parrot lib.
 
 Either the API listing is wrong or the implementation is missing.
 
-=item No Parrot Prefix
+=item No Parrotish Prefix
 
-The API is implemented but has no C<Parrot_> prefix.
+The API is implemented but has no C<Parrot_> prefix (or prefix deemed
+Parroty enough, like C<PDB_>, C<PF_>, C<PIO_>, and C<PackFile>).
 
 If code: see L</"Public or Private">.
 
@@ -87,10 +88,27 @@ for it).
 
 Consider making the data const(ant) heap (and accessed through a real
 API that takes care of synchronization, data as such is not a good API
-unless it's constant).  Think multithreaded access, or just plan
-reentrancy (think recursion).  Often you can collect data fields into
-a "context" structure that is either explicitly passed between
-functions or implicitly retrieved from a global API.
+unless it's constant).
+
+Think multithreaded access, or just plain reentrancy (think recursion).
+
+Often you can collect a group of data fields into a "context" (or
+"descriptor", "handle", "session", "state") structure that is either
+explicitly passed between functions or implicitly retrieved from a
+global API.  Encapsulating data like this is good: it allows passing,
+synchronzing, and duplicating state much easier, and makes it clearer
+into which context the data belongs.
+
+For APIs purely internal to Parrot, try using C<const> in function
+prototypes as often as possible to catch inadvertent data modification
+by callers.  For APIs that cross into the operating system and/or
+external libraries, you usually cannot go overly C<const> because of
+portability issues.
+
+Make your strings and arrays of strings (or similar inlined data)
+C<const> -- for the latter, remember that you need two consts:
+
+  const char* const foo[] = { "foo", "bar" };
 
 =head1 DEPENDENCIES
 
@@ -99,17 +117,6 @@ Uses F<tools/dev/nm.pl> to list the symbols.
 =head1 TODO
 
 =over 4
-
-=item *
-
-There are a lot of warnings given from "core class" cases like
-
-   Parrot_Array_class_init array.o
-
-which are probably okay.  This tool should be taught about these
-cases: how to find out which APIs are B<supposed> to be found from
-such "core class" objects?  But in any case, even those objects should
-B<NOT> have any data symbols visible.
 
 =item *
 
@@ -195,7 +202,7 @@ for my $api (keys %API) {
 printf "+++ Parrot API: %d +++\n", scalar @ParrotAPI;
 if (@ParrotAPI) {
     for my $api (@ParrotAPI) {
-	printf "%s\t%s\n", $api, $API{$api} || "-";
+	printf "%s\t%s\tOK\n", $api, $API{$api} || "-";
     }
 }
 
@@ -213,7 +220,7 @@ for my $api (@API) {
     unless ($api =~ $ParrotPrefix) {
 	push @NoParrotPrefix, $api;
     }
-    unless (exists $ParrotAPI{$api}) {
+    unless (exists $ParrotAPI{$api} || $api =~ $ParrotPrefix) {
 	push @UnParrotAPI, $api;
     }
 }
@@ -221,35 +228,35 @@ for my $api (@API) {
 if (@NoParrotAPI) {
     printf "--- Missing Parrot API: %d ---\n", scalar @NoParrotAPI;
     for my $api (@NoParrotAPI) {
-	printf "%s\t%s\n", $api, "-";
+	printf "%s\t%s\tMISSING_API\n", $api, "-";
     }
 }
 
 if (@NoParrotPrefix) {
     printf "--- No Parrot prefix: %d ---\n", scalar @NoParrotPrefix;
     for my $api (@NoParrotPrefix) {
-	printf "%s\t%s\n", $api, $API{$api};
+	printf "%s\t%s\tBAD_PREFIX\n", $api, $API{$api};
     }
 }
 
 if (@UnParrotAPI) {
     printf "--- No Parrot API: %d ---\n", scalar @UnParrotAPI;
     for my $api (@UnParrotAPI) {
-	printf "%s\t%s\n", $api, $API{$api};
+	printf "%s\t%s\tNO_API\n", $api, $API{$api};
     }
 }
 
 if (keys %DataB) {
     printf "--- Uninitialized Modifiable Data: %d ---\n", scalar keys %DataB;
     for my $api (sort keys %DataB) {
-	printf "%s\t%s\n", $api, $DataB{$api};
+	printf "%s\t%s\tUMD\n", $api, $DataB{$api};
     }
 }
 
 if (keys %DataD) {
     printf "--- Initialized Modifiable Data: %d ---\n", scalar keys %DataD;
     for my $api (sort keys %DataD) {
-	printf "%s\t%s\n", $api, $DataD{$api};
+	printf "%s\t%s\tIMD\n", $api, $DataD{$api};
     }
 }
 
