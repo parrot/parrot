@@ -581,6 +581,7 @@ match.  Finally, it outputs its information to the listing.
 =cut
 
 sub process_program_lines {
+  my $gensym = 0;
   while( my $lineinfo = shift( @program ) ) {
     ($file, $line, $pline, $sline) = @$lineinfo;
 
@@ -609,7 +610,7 @@ sub process_program_lines {
       # found a macro, expand it and append its lines to the front of
       # the program lines array.  
 
-      my @expanded_lines = expand_macro( $opcode, @args );
+      my @expanded_lines = expand_macro( $opcode, $gensym++, @args );
       unshift( @program, @expanded_lines );
       $lineinfo->[2] = '';
       unshift( @program, $lineinfo );
@@ -687,7 +688,7 @@ returns true if there is a macro or equ directive
 =cut
 
 sub has_asm_directive {
-  return $_[0] =~ /^[_a-zA-Z]\w*\s+macro\s+.+$/i ||
+  return $_[0] =~ /^[_a-zA-Z]\w*\s+macro(?:\s+.+)?$/i ||
          $_[0] =~ /^[_a-zA-Z]\w*\s+equ\s+.+$/i;
 }
 
@@ -710,11 +711,16 @@ sub handle_asm_directive {
     $equate{$name} = $data;
     return 1;
   }
-  elsif( $line =~ /^([_a-zA-Z]\w*)\s+macro\s+(.+)$/i ) {
+  elsif( $line =~ /^([_a-zA-Z]\w*)\s+macro(?:\s+(.+))?$/i ) {
     # a macro definition
     my ($name, $args) = ($1, $2);
     my $cur_macro = $name;
-    $macros{$name} = [ [split( /,\s*/, $args)], [] ];
+    if(defined $args) {
+      $macros{$name} = [ [split( /,\s*/, $args)], [] ];
+    }
+    else {
+      $macros{$name} = [ [], [] ];
+    }
     while( 1 ) {
       if( !scalar( @program ) ) {
         error( "The end of the macro '$name' was never seen", $file, $line);
@@ -830,8 +836,9 @@ with the ones given to the macro.  NOTE: modifies @program.
 =cut
 
 sub expand_macro {
-  my ($opcode, @args) = @_;
+  my ($opcode, $gensym, @args) = @_;
 
+  my $local_prefix = sprintf("LOCAL_%d_",$gensym);
   my (@margs) = @{ $macros{$opcode}[0] };
   my (@macro);
 
@@ -840,6 +847,11 @@ sub expand_macro {
 
   foreach (@{ $macros{ $opcode }[1] } ) {
     push( @macro, [@$_] );
+  }
+  for(@macro) {
+    $_->[2]=~/\$/ and do {
+      $_->[2]=~s/\$/\$$local_prefix/;
+    };
   }
 
   my $nargs = scalar(@args);
