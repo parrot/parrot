@@ -1,3 +1,6 @@
 # $Id$
 
-Half of the tests will fail, if GNU m4 is not available as 'm4'.
+Parrot m4 is in early stages of development, so most features
+don't work yet.
+
+Half of the tests will fail, if GNU m4 is not in $ENV{PATH} as 'm4'.

@@ -10,7 +10,7 @@
 
 # pragmata
 use strict;
-use 5.008;
+use 5.005;
 
 # standard perl modules
 

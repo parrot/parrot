@@ -30,12 +30,12 @@ This is executed when you call F<getopt_demo.imc>.
 
 =cut
 
-.sub _main prototyped
+.sub _main 
   .param PerlArray argv
 
   # Assemble specification for get_options
   # in an array of format specifiers
-  .sym PerlArray opt_spec    
+  .local PerlArray opt_spec    
   opt_spec = new PerlArray
   # --version, boolean
   push opt_spec, "version"
@@ -49,45 +49,31 @@ This is executed when you call F<getopt_demo.imc>.
   push opt_spec, "integer=i"
 
   # the program name is the first element in argv
-  .sym string program_name
-  shift program_name, argv
+  .local string program_name
+  program_name = shift argv
 
   # Make a copy of argv, because this can easier be handled in get_options()
   # TODO: remove need for cloning
-  .sym PerlArray argv_clone
+  .local PerlArray argv_clone
   argv_clone = clone argv
 
-  .sym PerlUndef opt
-  .sym Sub get_options
-  get_options = newsub _get_options
-  .pcc_begin prototyped
-    .arg argv_clone
-    .arg opt_spec
-    .pcc_call get_options
-    ret_get_options_1:
-    .result opt
-  .pcc_end
+  .local pmc opt
+  ( opt ) = _get_options( argv_clone, opt_spec )
 
   # Now we do what the passed options tell
-  .sym int is_defined
+  .local int is_defined
 
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "getopt_demo.imc version 0.01\n"
+    print "getopt_demo.imc version 0.02\n"
     end
   NO_VERSION_FLAG:
 
   # Was '--help' passed ?
   is_defined = defined opt["help"]
   unless is_defined goto NO_HELP_FLAG
-    .sym Sub usage
-    usage = newsub _usage
-    .pcc_begin prototyped
-      .arg program_name
-      .pcc_call usage
-      ret_usage_1:
-    .pcc_end
+    _usage( program_name )
     end
   NO_HELP_FLAG:
 
@@ -109,7 +95,7 @@ This is executed when you call F<getopt_demo.imc>.
   # handle the string option
   is_defined = defined opt["string"]
   unless is_defined goto NO_STRING_OPTION
-    .sym string string_option
+    .local string string_option
     string_option = opt["string"]
     print "You have passed the option '--string'. The value is '"
     print string_option
@@ -122,7 +108,7 @@ This is executed when you call F<getopt_demo.imc>.
   # handle the integer option
   is_defined = defined opt["integer"]
   unless is_defined goto NO_INTEGER_OPTION
-    .sym string integer_option
+    .local string integer_option
     integer_option = opt["integer"]
     print "You have passed the option '--integer'. The value is '"
     print integer_option
@@ -133,10 +119,10 @@ This is executed when you call F<getopt_demo.imc>.
   END_INTEGER_OPTION:
 
   # For some reason I can't shift from argv_clone
-  .sym string other_arg
-  .sym int cnt_other_args
+  .local string other_arg
+  .local int    cnt_other_args
   cnt_other_args = 0
-  .sym int num_other_args
+  .local int num_other_args
   num_other_args = argv_clone
   goto CHECK_OTHER_ARG_LOOP
   REDO_OTHER_ARG_LOOP:
@@ -179,8 +165,6 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
   print "      --string=STRING          a string option\n"
   print "      --integer=INTEGER        an integer option\n"
   print "      --bool                   a boolean option\n"
-  .pcc_begin_return
-  .pcc_end_return
 .end
 
 # A dummy implementation of Getopt::Long

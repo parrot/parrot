@@ -27,7 +27,10 @@ help:
 test: build
 	$(PERL) -MTest::Harness -e 'Test::Harness::runtests( glob( "t/*/*.t" ) )'
 
-build: runtime library m4.pbc 
+build: blib runtime library m4.pbc runtime/parrot/dynext/m4_eval_compiler.so  
+
+blib: 
+	$(LN_SF) ../../blib
 
 runtime: 
 	$(LN_SF) ../../runtime
@@ -37,6 +40,9 @@ library:
 
 m4.pbc: src/m4.pbc 
 	$(LN_SF) src/m4.pbc 
+
+runtime/parrot/dynext/m4_eval_compiler.so: src/eval.c
+	$(CC) -shared -fpic src/eval.c -o runtime/parrot/dynext/m4_eval_compiler.so -g -Wall -I../../include 
 
 src/m4.imc: src/builtin.imc src/freeze.imc src/input.imc src/macro.imc 
 	touch $@ 
@@ -48,15 +54,16 @@ html:
 clean:
 	$(RM_RF) \
   *.pbc \
+  blib \
+  library \
+  runtime \
   src/*.pbc \
   src/*/*.pbc \
   src/*~ \
   t/*/*.m4 \
   t/*/*.parrot_out \
   t/*/*.gnu_out \
-  t/*/*.imc \
-  runtime \
-  library
+  t/*/*.imc
 
 realclean: clean
 	$(RM_RF) \

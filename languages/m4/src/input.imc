@@ -13,215 +13,146 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head2 void _input_init( PerlHash state )
 
-Initialize the state hash.
-'file_stack' contains input files.
-'word_regex' recognizes words.
-'string_regex' recognizes quoted strings.
-'func_regex' recognizes the a macro with two arguments TODO: get rid of this workaround
-'func2_regex' recognizes the a macro with two arguments TODO: get rid of this workaround
-'line_regex' temporarily for line based workaraunds
-'simple_regex' recognizes TOKEN_SIMPLE
+Initialise the input stack and various regexes.
+
+'input_stack'   contains files, strings and macro definitions
+'word_regex'    recognizes TOKEN_WORD.
+'string_regex'  recognizes TOKEN_STRING
+'simple_regex'  recognizes TOKEN_SIMPLE
 'comment_regex' recognizes comments, returned as TOKEN_SIMPLE
 
 TODO: recognize nested quoted strings
 
 =cut
 
-.sub _input_init prototyped             
+.sub _input_init 
   .param PerlHash state 
 
-  .local int does_exist
+  .local pmc empty_array
 
-  # setup of 'file_stack'
-  exists does_exist, state['file_stack']
-  if does_exist goto FILE_STACK_EXISTS
-    .local pmc empty_array
-    empty_array = new PerlArray
-    state['file_stack'] = empty_array
-  FILE_STACK_EXISTS:
+  # setup of stacks
+  empty_array = new PerlArray
+  state['token_stack'] = empty_array
+  empty_array = new PerlArray
+  state['input_stack'] = empty_array
+  empty_array = new PerlArray
+  state['wrapup_stack'] = empty_array
 
+  # setup of regexes
   # regular expressions are needed for finding words and quoted strings
+  .local pmc regex
   .local string err
-  repeat err, ' ', 500
+  err = repeat ' ', 500
   .local int erroffset
   .local pmc NULL
-  null NULL
+  NULL = null
 
   .local pmc pcre_lib
-  loadlib pcre_lib, "libpcre"
+  pcre_lib = loadlib "libpcre"
 
-  # pcre *pcre_compile(const char *pattern, int options,
-  #            const char **errptr, int *erroffset,
-  #            const unsigned char *tableptr
+  # pcre *pcre_compile( const char *pattern, int options,
+  #                     const char **errptr, int *erroffset,
+  #                     const unsigned char *tableptr
   .local pmc pcre_compile
-  dlfunc pcre_compile, pcre_lib, "pcre_compile", "ptiB3P"
+  pcre_compile = dlfunc pcre_lib, "pcre_compile", "ptiB3P"
 
-  #int pcre_exec(const pcre *code, const pcre_extra *extra,
-  #        const char *subject, int length, int startoffset,
-  #        int options, int *ovector, int ovecsize);
+  #int pcre_exec( const pcre *code, const pcre_extra *extra,
+  #               const char *subject, int length, int startoffset,
+  #               int options, int *ovector, int ovecsize );
   .local pmc pcre_exec
-  dlfunc pcre_exec, pcre_lib, "pcre_exec", "ipPtiiipi"
+  pcre_exec = dlfunc pcre_lib, "pcre_exec", "ipPtiiipi"
   state['pcre_exec'] = pcre_exec
 
-  #int pcre_copy_substring(const char *subject, int *ovector,
-  #        int stringcount, int stringnumber, char *buffer,
-  #        int buffersize);
+  #int pcre_copy_substring( const char *subject, int *ovector,
+  #                         int stringcount, int stringnumber, char *buffer,
+  #                         int buffersize );
   .local pmc pcre_copy_substring
-  dlfunc pcre_copy_substring, pcre_lib, "pcre_copy_substring", "itpiibi"
+  pcre_copy_substring = dlfunc pcre_lib, "pcre_copy_substring", "itpiibi"
   state['pcre_copy_substring'] = pcre_copy_substring
 
-  # setup of 'simple_regex'
-  exists does_exist, state['simple_regex']
-  if does_exist goto SIMPLE_REGEX_EXISTS
-    .local pmc simple_regex
-    .pcc_begin prototyped
-      .arg "^[^`#_a-zA-Z]+"             # pattern
-      .arg 0                           # options
-      .arg err                         # string of length 500
-      .arg erroffset                   # index in pattern, which error occurs
-      .arg NULL
-    .nci_call pcre_compile
-      .result simple_regex
-    .pcc_end
-    state['simple_regex'] = simple_regex
-  SIMPLE_REGEX_EXISTS:
+  regex = pcre_compile( '^[^`#_a-zA-Z]', 0, err, erroffset, NULL )
+  state['simple_regex'] = regex
+  regex = pcre_compile( '^#[^\n]*\n', 0, err, erroffset, NULL )
+  state['comment_regex'] = regex
+  regex = pcre_compile( '^[_a-zA-Z][_a-zA-Z0-9]*', 0, err, erroffset, NULL )
+  state['word_regex'] = regex
+  regex = pcre_compile( "^`[^`]*'", 0, err, erroffset, NULL )
+  state['string_regex'] = regex
 
-  # setup of 'comment_regex'
-  exists does_exist, state['comment_regex']
-  if does_exist goto COMMENT_REGEX_EXISTS
-    .local pmc comment_regex
-    .pcc_begin prototyped
-      .arg "^#[^\n]*\n"             # pattern
-      .arg 0                           # options
-      .arg err                         # string of length 500
-      .arg erroffset                   # index in pattern, which error occurs
-      .arg NULL
-    .nci_call pcre_compile
-      .result comment_regex
-    .pcc_end
-    state['comment_regex'] = comment_regex
-  COMMENT_REGEX_EXISTS:
-
-  # setup of 'word_regex'
-  exists does_exist, state['word_regex']
-  if does_exist goto WORD_REGEX_EXISTS
-    .local pmc word_regex
-    .pcc_begin prototyped
-      .arg '^[_a-zA-Z][_a-zA-Z0-9]*'   # pattern
-      .arg 0                           # options
-      .arg err                         # string of length 500
-      .arg erroffset                   # index in pattern, which error occurs
-      .arg NULL
-    .nci_call pcre_compile
-      .result word_regex
-    .pcc_end
-    state['word_regex'] = word_regex
-  WORD_REGEX_EXISTS:
-
-  # setup of 'string_regex'
-  exists does_exist, state['string_regex']
-  if does_exist goto QUOTED_STRING_REGEX_EXISTS
-    .local pmc string_regex
-    .pcc_begin prototyped
-      .arg "^`[^`]*'"                  # pattern
-      .arg 0                           # options
-      .arg err                         # string of length 500
-      .arg erroffset                   # index in pattern, which error occurs
-      .arg NULL
-    .nci_call pcre_compile
-      .result string_regex
-    .pcc_end
-    state['string_regex'] = string_regex
-  QUOTED_STRING_REGEX_EXISTS:
-
-  # setup of 'func_regex'
-  exists does_exist, state['func_regex']
-  if does_exist goto FUNC_REGEX_EXISTS
-    .local pmc func_regex
-    .pcc_begin prototyped
-      .arg "^define\\(\\s*`[^']*',\\s*`[^']*'\\)" # pattern
-      .arg 0                           # options
-      .arg err                         # string of length 500
-      .arg erroffset                   # index in pattern, which error occurs
-      .arg NULL
-    .nci_call pcre_compile
-      .result func_regex
-    .pcc_end
-    state['func_regex'] = func_regex
-  FUNC_REGEX_EXISTS:
-
-  # setup of 'func2_regex'
-  exists does_exist, state['func2_regex']
-  if does_exist goto FUNC2_REGEX_EXISTS
-    .local pmc func2_regex
-    .pcc_begin prototyped
-      .arg "^define\\(\\s*`[^']*',\\s*`[^']*'\\)" # pattern
-      .arg 0                           # options
-      .arg err                         # string of length 500
-      .arg erroffset                   # index in pattern, which error occurs
-      .arg NULL
-    .nci_call pcre_compile
-      .result func2_regex
-    .pcc_end
-    state['func2_regex'] = func2_regex
-  FUNC2_REGEX_EXISTS:
-
-  exists does_exist, state['line_regex']
-  if does_exist goto LINE_REGEX_EXISTS
-    .local pmc line_regex
-    .pcc_begin prototyped
-      .arg '^[^\n]*\n'                  # pattern
-      .arg 0                           # options
-      .arg err                         # string of length 500
-      .arg erroffset                   # index in pattern, which error occurs
-      .arg NULL
-    .nci_call pcre_compile
-      .result line_regex
-    .pcc_end
-    state['line_regex'] = line_regex
-  LINE_REGEX_EXISTS:
-
-  .pcc_begin_return
-    # Nothing to be returned
-  .pcc_end_return
 .end
 
 
-=head2 void push_file( PerlHash state, string filename )
+=head2 void _push_file( PerlHash state, string filename )
 
 Stores a filename on a stack
 TODO: open these files and complain when they don't or pass filehandles
 
 =cut
 
-.sub _push_file prototyped             
+.sub _push_file 
   .param PerlHash state 
   .param string   filename    
 
-  # state['file_stack'] has been created in input_init 
-  .local pmc file_stack
-  file_stack = state['file_stack']
-  push file_stack, filename
+  .local pmc in
+  in = open filename, '<'
+  if in goto PROCESS_SINGLE_FILE
+    printerr filename
+    printerr " not found\n"
+    end
+  PROCESS_SINGLE_FILE:
+  .local string current_file    # input file handle
+  current_file = read in, 50000
+  close in
 
-  .pcc_begin_return
-    # Nothing to be returned
-  .pcc_end_return
+  # state['input_stack'] has been created in input_init 
+  # TODO: seperate input blocks for every file
+  .local pmc input_stack
+  input_stack = state['input_stack']
+  .local pmc input_block
+  .local int stack_size
+  stack_size = input_stack
+  if stack_size > 0 goto NOT_FIRST_FILE
+    input_block = new PerlHash
+    input_block['type'] = 'INPUT_STRING'
+    input_block['string'] = current_file
+    push input_stack, input_block
+    goto FINISH_PUSH_FILE
+  NOT_FIRST_FILE:
+  input_block = shift input_stack
+  .local string file
+  file = input_block['string']
+  file = file . current_file
+  input_block['string'] = file
+  push input_stack, input_block
+  FINISH_PUSH_FILE:
 .end
 
 
-=head2 string, string next_token( PerlHash state )
+=head2 string next_token( PerlHash state )
+
+Parse and return a single token from the input stream.  A token can
+either be TOKEN_EOF, if the input_stack is empty; it can be TOKEN_STRING
+for a quoted string; TOKEN_WORD for something that is a potential macro
+name; and TOKEN_SIMPLE for any single character that is not a part of
+any of the previous types.					
+									   |
+Next_token () return the token type and the token data.
 
 Uses regular expressions for finding tokens.
 
 =cut
 
-.sub _next_token prototyped            
+.sub _next_token 
   .param PerlHash state 
 
+  .local pmc input_stack    
+  input_stack = state['input_stack']
+  .local pmc input_block    
+  input_block = shift input_stack
   .local string current_file    
-  current_file = state['current_file']
+  current_file = input_block['string']
   .local int current_file_len
-  length current_file_len, current_file    
+  current_file_len = length current_file    
   .local pmc pcre_exec    
   pcre_exec = state['pcre_exec']
   .local pmc NULL
@@ -229,86 +160,46 @@ Uses regular expressions for finding tokens.
   .local pmc ovector
   ovector = new ManagedStruct
   ovector = 120       # 1/(2/3) * 4  * 2 * 10 for 10 result pairs
-  .local int ok
+  .local int is_match
   .local pmc regex    
   .local string token_type
   token_type = 'TOKEN_EOF'
   .local string token_data
   token_data = ''
+  .local int is_string_match
+  is_string_match = 0
     
   # look for 'TOKEN_SIMPLE'
   # read a whole bunch of non-macro and non-word charcters
   regex = state['simple_regex']
   token_type = 'TOKEN_SIMPLE'
-  .pcc_begin prototyped
-    .arg regex
-    .arg NULL           # P extra
-    .arg current_file   # t subject
-    .arg current_file_len    
-    .arg 0
-    .arg 0
-    .arg ovector        # p ovector
-    .arg 10             # i ovecsize
-  .nci_call pcre_exec
-    .result ok
-  .pcc_end
-  if ok ==  1 goto MATCH
-  if ok != -1 goto MATCH_FAILED
+  is_match = pcre_exec( regex, NULL, current_file, current_file_len, 0, 0, ovector, 10 )
+  if is_match ==  1 goto MATCH
+  if is_match != -1 goto MATCH_FAILED
 
   # look for comments and return it as 'TOKEN_SIMPLE'
   regex = state['comment_regex']
   token_type = 'TOKEN_SIMPLE'
-  .pcc_begin prototyped
-    .arg regex
-    .arg NULL           # P extra
-    .arg current_file   # t subject
-    .arg current_file_len    
-    .arg 0
-    .arg 0
-    .arg ovector        # p ovector
-    .arg 10             # i ovecsize
-  .nci_call pcre_exec
-    .result ok
-  .pcc_end
-  if ok ==  1 goto MATCH
-  if ok != -1 goto MATCH_FAILED
+  is_match = pcre_exec( regex, NULL, current_file, current_file_len, 0, 0, ovector, 10 )
+  if is_match ==  1 goto MATCH
+  if is_match != -1 goto MATCH_FAILED
 
   # look for 'TOKEN_STRING'
   regex = state['string_regex']
   token_type = 'TOKEN_STRING'
-  .pcc_begin prototyped
-    .arg regex
-    .arg NULL           # P extra
-    .arg current_file   # t subject
-    .arg current_file_len    
-    .arg 0
-    .arg 0
-    .arg ovector        # p ovector
-    .arg 10             # i ovecsize
-  .nci_call pcre_exec
-    .result ok
-  .pcc_end
-  if ok ==  1 goto MATCH
-  if ok != -1 goto MATCH_FAILED
+  is_string_match = 1
+  is_match = pcre_exec( regex, NULL, current_file, current_file_len, 0, 0, ovector, 10 )
+  if is_match ==  1 goto MATCH
+  if is_match != -1 goto MATCH_FAILED
+  is_string_match = 0
 
   # look for 'TOKEN_WORD'
   # this will be checked for macro substitution
   regex = state['word_regex']
   token_type = 'TOKEN_WORD'
-  .pcc_begin prototyped
-    .arg regex
-    .arg NULL           # P extra
-    .arg current_file   # t subject
-    .arg current_file_len    
-    .arg 0
-    .arg 0
-    .arg ovector        # p ovector
-    .arg 10             # i ovecsize
-  .nci_call pcre_exec
-    .result ok
-  .pcc_end
-  if ok ==  1 goto MATCH
-  if ok != -1 goto MATCH_FAILED
+  is_match = pcre_exec( regex, NULL, current_file, current_file_len, 0, 0, ovector, 10 )
+  if is_match ==  1 goto MATCH
+  if is_match != -1 goto MATCH_FAILED
 
   if current_file_len != 0 goto MATCH_FAILED 
   token_type = 'TOKEN_EOF'
@@ -330,6 +221,10 @@ Uses regular expressions for finding tokens.
     start_line = ovector[0;0]
     end_line   = ovector[0;1]
     substr token_data, current_file, start_line, end_line, ''
+    unless is_string_match goto NO_STRING_MATCH
+      substr token_data, 0, 1, ''
+      substr token_data, -1, 1, ''
+    NO_STRING_MATCH: 
   goto FINISH_NEXT_TOKEN
 
   MATCH_FAILED:
@@ -339,6 +234,8 @@ Uses regular expressions for finding tokens.
   goto FINISH_NEXT_TOKEN
 
   FINISH_NEXT_TOKEN: 
+  input_block['string'] = current_file
+  push input_stack, input_block
   .pcc_begin_return
     .return token_type
     .return token_data

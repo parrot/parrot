@@ -1,0 +1,37 @@
+# $Id$
+
+# See examples/compiler/Makefile for how to generate the needed shared lib
+
+=head1 NAME
+
+m4_eval.c - Integer arithmetic evaluation for Parrot m4
+
+=head1 DESCRIPTION
+
+Just a sample.
+
+=cut
+
+.sub _main
+
+    # load shared lib
+    # There is a init-function in the shared lib,
+    # which registers the new compiler
+    .local pmc m4_eval_compiler_lib
+    m4_eval_compiler_lib = loadlib "m4_eval_compiler"
+
+    # get compiler
+    compreg P1, "m4_eval_compiler"
+
+    # compile code and run it
+    .local string code
+    code = '1'
+    .local pmc compiled_code
+    compiled_code = compile P1, code
+    .local pmc evaled_code
+    P16 = new PerlString
+    invoke compiled_code
+    print P16
+    print "\ninvoked compiled code\n"
+    end
+.end

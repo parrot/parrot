@@ -4,7 +4,7 @@
 
 # pragmata
 use strict;
-use 5.008;
+use 5.005;
 use lib './Perl5/lib';
 
 use Language::m4;

@@ -20,13 +20,9 @@ TODO: Support for sync lines.
 
 =cut
 
-.sub _shipout_text prototyped             
+.sub _shipout_text 
   .param PerlHash state 
   .param string   text 
 
   print text
-
-  .pcc_begin_return
-    # Nothing to be returned
-  .pcc_end_return
 .end

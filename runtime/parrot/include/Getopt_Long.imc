@@ -19,7 +19,7 @@ A single subroutine, get_options(), is provided.
 
 This should work like the Perl5 module Getopt::Long.
 Takes a format specifier and an argument vector.
-Returns a PerlHash
+Returns a PerlHash.
 
 =cut
 
@@ -28,99 +28,83 @@ Returns a PerlHash
   .param PerlArray spec    
 
   # Loop over the array spec and build up two simple hashes
-  .sym PerlHash type                 # the type of the option: binary, string, integer 
+  .local PerlHash type               # the type of the option: binary, string, integer 
   type = new PerlHash
-  .sym int cnt_spec                  # a counter for looping over the array 'spec'
+  .local int cnt_spec                # a counter for looping over the array 'spec'
   cnt_spec = 0
-  .sym int len_spec                  # for end condition of loop over 'spec'
+  .local int len_spec                # for end condition of loop over 'spec'
   len_spec = spec
-  .sym int    spec_index             # searching for patterns in 'spec'
-  .sym string opt_name               # name of specified option
-  .sym string opt_type
+  .local int    spec_index           # searching for patterns in 'spec'
+  .local string opt_name             # name of specified option
+  .local string opt_type             # tyep of specified option
   goto CHECK_PARSE_SPEC     
   NEXT_PARSE_SPEC:                   # Look at next element in 'spec'
     opt_name = spec[cnt_spec]
-    index spec_index, opt_name, '='  # when '=' is not in 'opt_name' then it's binary
+    spec_index = index opt_name, '=' # when '=' is not in 'opt_name' then it's binary
     if spec_index != -1 goto NOT_A_BINARY_OPTION
     opt_type = 'b'
     goto OPTION_TYPE_IS_NOW_KNOWN
   NOT_A_BINARY_OPTION:
     inc spec_index                   # we know where '=', thus the type is one further 
-    substr opt_type, opt_name, spec_index, 1 
+    opt_type = substr opt_name, spec_index, 1 
     dec spec_index                     # Go back to the '='
-    substr opt_name, spec_index, 2, '' # The stuff before '=' is the option name
+    opt_name = substr spec_index, 2, '' # The stuff before '=' is the option name
   OPTION_TYPE_IS_NOW_KNOWN:
-    set    type[opt_name], opt_type
+    type[opt_name] = opt_type
     inc cnt_spec  
   CHECK_PARSE_SPEC:                    # check wether loop over 'spec' is complete
   if cnt_spec < len_spec goto NEXT_PARSE_SPEC
 
   # uncomment this if you want debug output
   goto SKIP_DEBUG_OUTPUT 
-  .sym string debug_var
-  debug_var = type['version']
-  print "version: "
-  print debug_var
-  print "\n"
-  debug_var = type['help']
-  print "help: "
-  print debug_var
-  print "\n"
-  debug_var = type['freeze-state']
-  print "freeze-state: "
-  print debug_var
-  print "\n"
-  debug_var = type['reload-state']
-  print "reload-state: "
-  print debug_var
-  print "\n"
+  _dumper( 'type', type )
   SKIP_DEBUG_OUTPUT:
 
   # Now that we know about the allowed options,
   # we actually parse the argument vector
   # TODO: do this correctly
   # shift from argv until a non-option is encountered 
-  .sym PerlHash opt              # the return PMC
+  .local PerlHash opt              # the return PMC
   opt = new PerlHash
-  .sym string arg                 # element of argument array
-  .sym string value               # element of argument array
-  .sym int    num_remaining_args  # for checking wether loop is complete
-  .sym int    arg_index           # holds result if 'index' op
-  .sym int    is_known_option     # flag wether the option is known
+  .local string arg                 # element of argument array
+  .local string value               # element of argument array
+  .local int    num_remaining_args  # for checking wether loop is complete
+  .local int    arg_index           # holds result if 'index' op
+  .local int    is_known_option     # flag wether the option is known
   goto CHECK_PARSE_ARGV
   NEXT_PARSE_ARGV:
     # first we take a peek at the first remaining element
     arg = argv[0]
     # Is arg a option string like '--help'
-    index arg_index, arg, '--'
+    arg_index = index arg, '--'
     if arg_index > -1 goto HANDLE_OPTION
     # We are done, and don't want to loose the nonoption argument
     goto FINISH_PARSE_ARGV
     HANDLE_OPTION:
     # we take the current option off argv
-    shift arg, argv
+    arg = shift argv
     # get rid of the leading '--'
-    substr arg, arg_index, 2, ''
+    arg = substr arg_index, 2, ''
     # recover the value if any
-    index arg_index, arg, '='
+    arg_index = index arg, '='
     if arg_index > -1 goto VALUE_PASSED
     opt[arg] = 1
     goto VALUE_OF_OPTION_IS_NOW_KNOWN
     VALUE_PASSED:
     inc arg_index    # Go one past the '='
-    .sym int len_value
-    length len_value, arg
+    .local int len_value
+    len_value = length arg
     len_value = len_value - arg_index
-    substr value, arg, arg_index, len_value 
+    value = substr arg, arg_index, len_value 
     # drop the '=file.m4' from '--freeze-state=file.m4'
     dec arg_index
     inc len_value
-    substr arg, arg_index, len_value, ''
+    arg = substr arg_index, len_value, ''
     opt[arg] = value
     VALUE_OF_OPTION_IS_NOW_KNOWN:
     # Is this a known option?
     # TODO: make this work for nonbinary options
-    defined is_known_option, type[arg]
+    is_known_option = defined type[arg]
     unless is_known_option goto UNKNOWN_OPTION
     # Tell the caller that the option 'arg' has been passed
     goto CHECK_PARSE_ARGV 
@@ -141,6 +125,8 @@ Returns a PerlHash
   .pcc_end_return
 .end
 
+.include "library/dumper.imc"
+
 =head1 TODO
 
 Make it work for all cases, short options, long options and bundling
@@ -149,7 +135,7 @@ error reporting, more options
 
 =head1 AUTHOR
 
-Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
+Bernhard Schmalhofer <Bernhard.Schmalhofer at gmx.de>
 
 =head1 SEE ALSO
 

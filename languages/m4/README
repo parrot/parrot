@@ -1,6 +1,7 @@
 # $Id$
 
 This is a Parrot m4, a Parrot port of GNU m4.
+
 Parrot m4 is written in the Parrot Intermediate Language PIR.
 For now it doesn't do much, but it is supposed to become 
 a drop in replacement for GNU m4.
@@ -11,7 +12,7 @@ Actually I found that m4 is already pretty involved
 
 LICENSE:
 
-This stuff is all GPL. See LICENSE.
+Parrot m4 is under the GPL. See LICENSE.
 
 AUTHOR:
 

@@ -1,10 +1,9 @@
-#!perl
-
 # $Id$
 
+# pragmata
 use strict;
 
-use Test::More tests => 27; 
+use Test::More tests => 25*1; 
 
 my $real_out;
 my $parrot_m4 = '../../parrot m4.pbc';
@@ -13,7 +12,7 @@ my $parrot_m4 = '../../parrot m4.pbc';
 #--------------------------------------------
 $real_out     = `$parrot_m4 --help 2>&1`; 
 is( $real_out, << "END_OUT", '--help' );
-Usage: $parrot_m4 [OPTION]... FILE
+Usage: ../../parrot m4.pbc [OPTION]... FILE
 
 Currently only long options are available.
 
@@ -22,7 +21,7 @@ Operation modes:
       --version                output version information and exit
 
 Frozen state files:
-      --freeze-state=FILE      dump a frozen state to FILE at end
+      --freeze-state=FILE      produce a frozen state on FILE at end
       --reload-state=FILE      reload a frozen state from FILE at start
 
 END_OUT
@@ -31,7 +30,7 @@ END_OUT
 #--------------------------------------------
 $real_out     = `$parrot_m4 --version 2>&1`; 
 is( $real_out, << 'END_OUT', '--version' );
-Parrot m4 0.0.2
+Parrot m4 0.0.4
 END_OUT
 
 
@@ -91,13 +90,6 @@ END_OUT
 
 
 #--------------------------------------------
-$real_out     = `$parrot_m4 --prefix-builtins 2>&1`; 
-is( $real_out, << 'END_OUT', '--prefix-builtins' );
-Sorry, the option '--prefix-builtins' is not implemented yet.
-END_OUT
-
-
-#--------------------------------------------
 $real_out     = `$parrot_m4 --word-regexp='[a-z]+' 2>&1`; 
 is( $real_out, << 'END_OUT', '--word-regexp' );
 Sorry, the option '--word-regexp' is not implemented yet.
@@ -108,13 +100,6 @@ END_OUT
 $real_out     = `$parrot_m4 --hash-size=99 2>&1`; 
 is( $real_out, << 'END_OUT', '--hash-size' );
 Sorry, the option '--hash-size' is not implemented yet.
-END_OUT
-
-
-#--------------------------------------------
-$real_out     = `$parrot_m4 --nesting-limit=2 2>&1`; 
-is( $real_out, << 'END_OUT', '--nesting-limit' );
-Sorry, the option '--nesting-limit' is not implemented yet.
 END_OUT
 
 

@@ -2,7 +2,7 @@
 
 package M4::Test;
 
-use 5.008;
+use 5.005;
 use strict;
 use warnings;
 use lib '../../lib';

@@ -18,12 +18,12 @@ Looks at the command line arguments and acts accordingly.
 
 =cut
 
-.sub _main prototyped
+.sub _main 
   .param PerlArray argv
 
   # name of the program
   .local string program_name
-  shift program_name, argv
+  program_name = shift argv
 
   # Specification of known command line arguments.
   # The args are parsed with Getopt_Long.imc which should work 
@@ -78,18 +78,8 @@ Looks at the command line arguments and acts accordingly.
   # TODO: eliminate need for copy
   .local pmc cloned_argv
   cloned_argv = clone argv
-
-  # Now call get_options
-  .local Sub get_options
-  get_options = newsub _get_options
   .local pmc opt
-  .pcc_begin prototyped
-    .arg cloned_argv
-    .arg opt_spec
-  .pcc_call get_options
-    ret_get_options_1:
-    .result opt
-  .pcc_end
+  ( opt ) = _get_options( cloned_argv, opt_spec )
 
   # Now dow what the options want
   .local int is_defined
@@ -97,22 +87,44 @@ Looks at the command line arguments and acts accordingly.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "Parrot m4 0.0.2\n"
+    print "Parrot m4 0.0.4\n"
     end
   NO_VERSION_FLAG: 
 
   # Was '--help' passed ?
   is_defined = defined opt["help"]
   unless is_defined goto NO_HELP_FLAG
-    .local Sub usage
-    usage = newsub _usage
-    .pcc_begin prototyped
-      .arg program_name
-    .pcc_call usage
-      ret_call_usage_1:
-    .pcc_end
+    _usage( program_name )
     end
   NO_HELP_FLAG: 
+
+  # TODO: In near future we propably should use objects here
+  # For now let's just just use a hash with all state information
+  .local pmc state
+  state = new PerlHash
+
+  # Artificial limit for macro expansion in macro.imc
+  # default setting of 'nesting_limit' max be overridden by
+  # command line option '-L' or '--nesting-limit
+  state['nesting_limit']   = 250
+  state['expansion_level'] = 0
+
+  # A flag that tells wether builtin macros should be prefixed with 'm4_'
+  state['prefix_all_builtins'] = 0
+
+  # Was '--nesting-limit' passed ?
+  is_defined = defined opt['nesting-limit']
+  unless is_defined goto NO_NESTING_LIMIT_FLAG
+    .local int nesting_limit
+    nesting_limit = opt['nesting-limit']
+    state['nesting_limit'] = nesting_limit
+  NO_NESTING_LIMIT_FLAG: 
+
+  # Was '--prefix-builtins' passed ?
+  is_defined = defined opt['prefix-builtins']
+  unless is_defined goto NO_PREFIX_BUILTINS_FLAG
+    state['prefix_all_builtins'] = 1
+  NO_PREFIX_BUILTINS_FLAG: 
 
   # Was a yet unimplemented option passed?
   # TODO: put names of unimplemented options in an PerlArray
@@ -150,19 +162,11 @@ Looks at the command line arguments and acts accordingly.
   is_defined = defined opt[unimplemented_option]
   if is_defined goto UNIMPLEMENTED_OPTION
 
-  unimplemented_option = "prefix-builtins"
-  is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
-
   unimplemented_option = "word-regexp"
   is_defined = defined opt[unimplemented_option]
   if is_defined goto UNIMPLEMENTED_OPTION
 
   unimplemented_option = "hash-size"
-  is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
-
-  unimplemented_option = "nesting-limit"
   is_defined = defined opt[unimplemented_option]
   if is_defined goto UNIMPLEMENTED_OPTION
 
@@ -192,29 +196,26 @@ Looks at the command line arguments and acts accordingly.
 
   goto NO_UNIMPLEMENTED_OPTION
   UNIMPLEMENTED_OPTION:
-    print "Sorry, the option '--"
-    print unimplemented_option
-    print "' is not implemented yet.\n"
+    printerr "Sorry, the option '--"
+    printerr unimplemented_option
+    printerr "' is not implemented yet.\n"
     end
   NO_UNIMPLEMENTED_OPTION:
 
-  # TODO: In near future we propably should use objects here
-  # For now let's just just use a hash with all state information
-  .local pmc state
-  state = new PerlHash
-  # init of input structures, creates state['file_stack']
-  .local Sub input_init
-  input_init = newsub _input_init
-  .pcc_begin prototyped
-    .arg state
-  .pcc_call input_init
-    ret_input_init_1:
-  .pcc_end
+  # load shared lib
+  # There is a init-function in the shared lib,
+  # which registers the new compiler
+  .local pmc m4_eval_compiler_lib
+  m4_eval_compiler_lib = loadlib "m4_eval_compiler"
+
+  # init of input structures, creates state['input_stack']
+  _input_init( state )
 
   # TODO: init of output structures
 
   # First we set up a table of all symbols, that is macros 
   .local pmc symtab
+  #symtab = new PerlHash
   symtab = new OrderedHash
   state['symtab'] = symtab    
 
@@ -224,7 +225,6 @@ Looks at the command line arguments and acts accordingly.
   # TODO: enable suppression of warnings
   # TODO: disabling of gnu_extension
   # TODO: handling of sync lines
-  # TODO: prefix all builtins
   # TODO: enable changing definition of what words are
   # TODO: enable changing of quote characters
   # TODO: enable changing of comment delimiters 
@@ -235,13 +235,7 @@ Looks at the command line arguments and acts accordingly.
   .local int argc
   argc = cloned_argv
   if argc >= 1 goto ARGC_IS_OK
-    .local Sub usage
-    usage = newsub _usage
-    .pcc_begin prototyped
-      .arg program_name
-    .pcc_call usage
-      ret_call_usage_2:
-    .pcc_end
+    _usage( program_name )
     end
   ARGC_IS_OK:
 
@@ -249,37 +243,18 @@ Looks at the command line arguments and acts accordingly.
   .local pmc builtin_tab
   builtin_tab = new OrderedHash
   state['builtin_tab'] = builtin_tab    
-  .local Sub builtin_tab_init
-  builtin_tab_init = newsub _builtin_tab_init
-  .pcc_begin prototyped
-    .arg state
-  .pcc_call builtin_tab_init
-    ret_builtin_tab_init_1:
-  .pcc_end
+  _builtin_tab_init( state )
 
   # Check wether the option --reload-state was passed
   .local string frozen_file
   frozen_file = opt['reload-state']
   .local int string_len
-  length string_len, frozen_file
+  string_len = length frozen_file
   unless string_len > 0 goto BUILTIN_MACROS_INIT
-    .local Sub reload_frozen_state
-    reload_frozen_state = newsub _reload_frozen_state
-    .pcc_begin prototyped
-      .arg state
-      .arg frozen_file
-    .pcc_call reload_frozen_state
-      ret_reload_frozen_state_1:
-    .pcc_end
+    _reload_frozen_state( state, frozen_file )
     goto COMMANDLINE_MACROS_INIT
   BUILTIN_MACROS_INIT:
-  .local Sub builtin_init
-  builtin_init = newsub _builtin_init
-  .pcc_begin prototyped
-    .arg state
-  .pcc_call builtin_init
-    ret_builtin_init_1:
-  .pcc_end
+  _builtin_init( state )
 
   COMMANDLINE_MACROS_INIT:
   # TODO: initialize list of macros from command line
@@ -292,29 +267,16 @@ Looks at the command line arguments and acts accordingly.
   # TODO: look for files in M4PATH
   # Name of the input file, usually with extension '.m4'
   .local string filename
-  .local Sub push_file
-  push_file = newsub _push_file
   REDO_FILENAME_LOOP:
   argc = cloned_argv
   unless argc > 0 goto LAST_FILENAME_LOOP
-    shift filename, cloned_argv
-    .pcc_begin prototyped
-      .arg filename
-      .arg state
-    .pcc_call push_file
-      ret_push_file_1:
-    .pcc_end
+    filename = shift cloned_argv
+    _push_file( filename, state )
     goto REDO_FILENAME_LOOP
   LAST_FILENAME_LOOP:
 
   # now we start to do some work
-  .local Sub expand_input
-  expand_input = newsub _expand_input
-  .pcc_begin prototyped
-    .arg state
-  .pcc_call expand_input
-    ret_expand_input_1:
-  .pcc_end
+  _expand_input( state )
 
 HANDLE_WRAPUP_TEXT:
   # TODO: handle wrapup text, whatever that is
@@ -322,16 +284,9 @@ HANDLE_WRAPUP_TEXT:
 CHECK_FROZEN_FLAG:
   .local string freeze_file
   freeze_file = opt["freeze-state"]
-  length string_len, freeze_file
+  string_len = length freeze_file
   unless string_len > 0 goto MAKE_DIVERSION
-    .local Sub produce_frozen_state
-    produce_frozen_state = newsub _produce_frozen_state
-    .pcc_begin prototyped
-      .arg state
-      .arg freeze_file
-    .pcc_call produce_frozen_state
-      ret_produce_frozen_state_1:
-    .pcc_end
+    _produce_frozen_state( state, freeze_file )
     goto FINISH_PROGRAM
   MAKE_DIVERSION:
   # TODO: make_diversion, undiver_all, whatever that does 
@@ -351,7 +306,7 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 =cut
 
-.sub _usage prototyped             
+.sub _usage 
   .param string program_name
 
   print "Usage: ../../parrot "
@@ -365,12 +320,10 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
   print "      --version                output version information and exit\n"
   print "\n"
   print "Frozen state files:\n"
-  print "      --freeze-state=FILE      dump a frozen state to FILE at end\n"
+  print "      --freeze-state=FILE      produce a frozen state on FILE at end\n"
   print "      --reload-state=FILE      reload a frozen state from FILE at start\n"
   print "\n"
-  .pcc_begin_return
-    # void
-  .pcc_end_return
+
 .end
 
 
@@ -396,3 +349,6 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 # Macros are expanded in there.
 .include "src/macro.imc"
+
+# Mainly for debug output
+.include "library/dumper.imc"

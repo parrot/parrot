@@ -18,7 +18,7 @@ package Language::m4::Macro;
 
 # pragmata
 use strict;
-use 5.008;
+use 5.005;
 
 # Modules from http://www.cpan.org
 use IO::File;

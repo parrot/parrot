@@ -25,7 +25,7 @@ Dump a state file.
 
 =cut
 
-.sub _produce_frozen_state prototyped             
+.sub _produce_frozen_state 
   .param PerlHash   state
   .param string     frozen_file    
 
@@ -38,20 +38,20 @@ Dump a state file.
   .local string    text
 
   .local pmc frozen_fh
-  open frozen_fh, frozen_file, ">"
+  frozen_fh = open frozen_file, ">"
   .local pmc iterator
   iterator = new Iterator, symtab
-  set iterator, .ITERATE_FROM_START
+  iterator = .ITERATE_FROM_START
   iter_loop:
-  unless iterator, end_iter
-    shift symbol, iterator
-    name         = symbol['name']
-    text = symbol['text']
+  unless iterator goto end_iter
+    symbol = shift iterator
+    name   = symbol['name']
+    text   = symbol['text']
     print frozen_fh, 'T'
-    length len, name
+    len = length name
     print frozen_fh, len
     print frozen_fh, ','
-    length len, text
+    len = length text
     print frozen_fh, len
     print frozen_fh, "\n"
     print frozen_fh, name
@@ -61,10 +61,6 @@ Dump a state file.
     branch iter_loop
   end_iter:
   close frozen_fh
-
-  .pcc_begin_return
-    # void
-  .pcc_end_return
 .end
 
 
@@ -80,7 +76,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
 
 =cut
 
-.sub _reload_frozen_state prototyped             
+.sub _reload_frozen_state 
   .param PerlHash   state    
   .param string     frozen_file    
 
@@ -88,8 +84,8 @@ For now we just worry about the flags 'F', 'T' and 'V'.
   .local string content
   # TODO: M4PATH
   .local pmc frozen_fh
-  open frozen_fh, frozen_file, "<"
-  if frozen_fh, READ_CONTENT
+  frozen_fh = open frozen_file, "<"
+  if frozen_fh goto READ_CONTENT
     printerr "'"
     printerr frozen_file
     printerr "'"
@@ -97,7 +93,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     # TODO: proper exception handling
     end
   READ_CONTENT:
-  read content, frozen_fh, 60000
+  content = read frozen_fh, 60000
   close frozen_fh
 
   # We have read in a file, now let's parse it.
@@ -115,12 +111,6 @@ For now we just worry about the flags 'F', 'T' and 'V'.
   builtin_tab = state['builtin_tab']
   .local pmc builtin
 
-  # Set up some subroutines, which might get called in the parse loop
-  .local Sub define_builtin
-  define_builtin = newsub _define_builtin
-  .local Sub    define_user_macro
-  define_user_macro = newsub _define_user_macro
-
   # start the parse loop
   goto CHECK_PARSING_FINISHED
 
@@ -132,7 +122,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
 
   if token != '#' goto NOT_A_COMMENT
     # Skip everything up to the end of line
-    index pos, content, "\n"
+    pos = index content, "\n"
     inc pos
     substr content, 0, pos, ''
     goto CHECK_PARSING_FINISHED
@@ -142,7 +132,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     # Skip everything up to the end of line
     # TODO: verify 'V1' and make some test cases
     # TODO: Add version info to symtab
-    index pos, content, "\n"
+    pos = index content, "\n"
     inc pos
     substr content, 0, pos, ''
     goto CHECK_PARSING_FINISHED
@@ -180,13 +170,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     substr text, content, 0, substitution_len, '' 
     builtin = builtin_tab[name]
     unless builtin goto BUILTIN_NOT_FOUND
-    .pcc_begin prototyped
-      .arg state
-      .arg name
-      .arg builtin
-    .pcc_call define_builtin
-      ret_define_builtin_1:
-    .pcc_end
+    _define_builtin( state, name, builtin )
     goto BUILTIN_HAS_BEEN_HANDLED
     BUILTIN_NOT_FOUND:
       printerr "`"
@@ -228,19 +212,9 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     substr content, 0, pos, '' 
     pos = 0
     substr name, content, 0, name_len, '' 
-  # print "--------------------\n"
-  # print name
-  # print " OK5\n"
-  # print "--------------------\n"
     substr text, content, 0, substitution_len, '' 
     # We know the length, so we can extract the strings
-    .pcc_begin prototyped
-      .arg state
-      .arg name
-      .arg text
-    .pcc_call define_user_macro
-      ret_define_user_macro_1:
-    .pcc_end
+    _define_user_macro( state, name, text )
     pos = 0
     rx_literal content, pos, "\n", UNEXPECTED
     substr content, 0, pos, '' 
@@ -263,6 +237,4 @@ For now we just worry about the flags 'F', 'T' and 'V'.
   printerr "'\n"
 
   FINISHED:
-  .pcc_begin_return
-  .pcc_end_return
 .end

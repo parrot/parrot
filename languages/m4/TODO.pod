@@ -12,6 +12,8 @@
 
 =over
 
+=item Modify 'output_is' such that GNU m4 is only test when available.
+
 =item Add tests for new features
 
 =item Add test for dumping frozen file
@@ -22,18 +24,24 @@
 
 =over
 
-=item Create module Lamguage::m4 or Text::m4
+=item Create module Language::m4 or Text::m4
+
+=item Test with Perl 5.005
 
 =back
 
 =head1 Features
 
-The feateres that need to be implemented are orded by chapters in the
-GNU m4 documentation.
+The features that need to be implemented are arranged
+by chapters in the GNU m4 documentation.
 
 =head2 Chapter 1 Introduction and preliminaries
 
 =over
+
+=item read from STDIN, when no file is passed
+
+=item Add some tests with Autoconf macros
 
 =item Parsing of short options
 
@@ -71,6 +79,8 @@ GNU m4 documentation.
 
 =item Option -D or --define
 
+=item Option -U or --undefine
+
 =item Option -t or --trace
 
 =back
@@ -87,11 +97,15 @@ GNU m4 documentation.
 
 =over
 
-=item Recognize builtin macros
+=item Option -P or --prefix-builtins
 
-=item Recognize macros with arguments
+=item trailing whitespace in macro calls
 
-=item Rescanning evaluated macros
+=item warnings for inappropriate number of arguments
+
+=item implement option '--changeword'
+
+=item recognize unquoted parenthesis in macros
 
 =back
 
@@ -99,7 +113,13 @@ GNU m4 documentation.
 
 =over
 
-=item Stack for macro definitions
+=item implement indirect macro calls
+
+=item implement 'pushdef' and 'popdef'
+
+=item implement 'defn'
+
+=item Do 'input_stack' properly
 
 =item Special arguments to macros
 
@@ -109,9 +129,11 @@ GNU m4 documentation.
 
 =over
 
-=item If and loops
+=item implement 'shift' 
 
-=item Recursions
+=item implement 'ifelse' used as switch
+
+=item Write tests with recursion
 
 =back
 
@@ -119,15 +141,21 @@ GNU m4 documentation.
 
 =over
 
+=item implement macro 'dumpdef'
+
 =item Implement debugging options 
 
-=item tracing
+=item implement tracing
+
+=item implement 'debugfile'
 
 =back
 
 =head2 Chapter 7 Input control
 
 =over
+
+=item everything
 
 =back
 
@@ -138,6 +166,10 @@ GNU m4 documentation.
 =item File inclusion
 
 =item include path
+
+=item implement 'include'
+
+=item implement 'sinclude'
 
 =back
 
@@ -153,21 +185,19 @@ GNU m4 documentation.
 
 =over
 
-=item implement all of them
+=item macro translit: add as an op or port from GNU m4
 
-=item Use POSIX regexes
-
-=item Implement the builtin function patsubst
+=item macros regexp and patsubst POSIX regexes 
 
 =back
 
-=head2 Chapter 11 Macros for doin arithmetic
+=head2 Chapter 11 Macros for doing arithmetic
 
 =over
 
-=item implent all of them
+=item incr, decr of large numbers
 
-=item Arithmetic expression parser, bc ???
+=item radix support for `eval'
 
 =back
 
@@ -175,7 +205,9 @@ GNU m4 documentation.
 
 =over
 
-=item Implement it
+=item Why isn't there a 'system' in Parrot?
+
+=item names for temporary files
 
 =back
 

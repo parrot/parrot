@@ -66,10 +66,9 @@ A: Bernhard Schmalhofer
 D: Port of GNU m4 to PIR
 S: Functioning for handcrafted test cases.
 S: Far from complete.
-S: Revision 0.0.2
-W: http://www.schmalhofer.info/schmalhofer/bernhard/projects/m4/
+S: Revision 0.0.4
 M: Yes
-V: 0.0.13
+V: 0.1.0
 
 N: miniperl
 

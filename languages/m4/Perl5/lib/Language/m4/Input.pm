@@ -3,7 +3,7 @@
 package Language::m4::Input;
 
 use strict;
-use 5.008;
+use 5.005;
 
 BEGIN 
 {

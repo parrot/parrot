@@ -1,10 +1,8 @@
-#!perl
-
 # $Id$
 
 use strict;
 
-use M4::Test tests => 2;
+use M4::Test tests => 1*2;
 
 output_is( <<'CODE', <<'OUT', 'hello' );
 
