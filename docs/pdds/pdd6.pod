@@ -6,18 +6,34 @@ Parrot assembly language
 
 =head2 CURRENT
 
-     Maintainer: Dan Sugalski
-     Class: Internals
-     PDD Number: 6
-     Version: 1.2
-     Status: Developing
-     Last Modified: 25 August 2001
-     PDD Format: 1
-     Language:English
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 6
+    Version: 1.6
+    Status: Developing
+    Last Modified: 05 November 2001
+    PDD Format: 1
+    Language:English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.6
+
+November 05, 2001
+
+=item Version 1.5
+
+October 12, 2001
+
+=item Version 1.4
+
+September 24, 2001
+
+=item Version 1.3
+
+September 12, 2001
 
 =item Version 1.2
 
@@ -37,6 +53,52 @@ None. First version
 
 =over 4
 
+=item Version 1.6
+
+=over 4
+
+=item * Added GC opcodes
+
+=back
+
+=item Version 1.5
+
+=over 4
+
+=item * Now have a bsr in addition to a jsr
+
+=item * return is now ret
+
+=item * Added save and restore ops for saving and restoring individual registers
+
+=back
+
+=item Version 1.4
+
+=over 4
+
+=item * Conditional branches have just a true destination now
+
+=item * Added the I/O ops
+
+=item * Added in the threading ops
+
+=item * Added in the interpreter ops
+
+=back
+
+=item Version 1.3
+
+=over 4
+
+=item * Added in the low-level module loading ops
+
+=item * Added in transcendental functions and modulo
+
+=item * Finished the pad/global variable fetching bits
+
+=back
+
 =item Version 1.2
 
 We have an interpreter now! Yay! (Okay, a simple one, but still...)
@@ -46,7 +108,7 @@ Changes made to reflect that.
 
 =over 4
 
-=item * Added in object
+=item * Added in object 
 
 =item * Changed remnants of "perl" to "Parrot"
 
@@ -78,11 +140,15 @@ language.
 
 Parrot opcodes take the format of:
 
-   code destination, dest_key, source1, source1_key, source2, source2_key
+  code destination[dest_key], source1[source1_key], source2[source2_key]
+
+The brackets do not denote optional arguments as such--they are real
+brackets. They may be left out entirely, however. If any argument has
+a key the assembler will substitute the null key for arguments missing keys.
 
 Conditional branches take the format:
 
-   code boolean, bool_key, true_dest, false_dest
+  code boolean[bool_key], true_dest
 
 The key parameters are optional, and may be either an integer or a
 string. If either is passed they are associated with the parameter to
@@ -116,7 +182,7 @@ parameter, the name of the subroutine, which is added to the
 namespace's symbol table. Sub names may be any valid Unicode
 alphanumeric character and the underscore.
 
-String and integer constants don't need to be put in a separate
+String and integer constants don't need to be put in a separate 
 
 
 =head1 OPCODE LIST
@@ -135,7 +201,7 @@ and more than one of the sources or destinations are of variable type,
 then the register is passed in extended format. An extended format
 register number is of the form:
 
-      register_number | register_type
+     register_number | register_type
 
 where register_type is 0x100, 0x200, 0x400, or 0x800 for PMC, string,
 integer, or number respectively. So N19 would be 0x413.
@@ -154,10 +220,9 @@ The control flow opcodes check conditions and manage program flow.
 
 =over 4
 
-=item if tx, X, Y
+=item if tx, X
 
-Check register tx. (Px, Sx, Ix, or Nx) If true, branch by X, otherwise
-branch by Y.
+Check register tx. (Px, Sx, Ix, or Nx) If true, branch by X.
 
 =item jump tx
 
@@ -168,6 +233,20 @@ Jump to the address held in register x (Px, Sx, or Ix).
 Branch forward or backward by the amount in register x. (X may be
 either Ix, Nx, or Px) Branch offset may also be an integer constant.
 
+=item jsr tx
+
+Jump to the location specified by register X. Push the current
+location onto the call stack for later returning.
+
+=item bsr ix
+
+Branch to the location specified by X (either register or label). Push
+the current location onto the call stack for later returning.
+
+=item ret
+
+Pop the location off the top of the stack and go there.
+
 =back
 
 =head2 Data manipulation
@@ -176,14 +255,25 @@ These ops handle manipulating the data in registers
 
 =over 4
 
-=item iton Nx, Iy
+=item new Px, Iy
 
-Copy the integer value from register y to the numeric register x.
+Create a new PMC of class y stored in PMC register x.
 
-=item ntoi Ix, Ny
+=item set tx, ty
 
-Copy the number from register y to register x. Copy is truncated, and
-may be capped if it is too large or small for an integer.
+Copy the value of ty into tx, making appropriate conversions.
+
+The following cases provide exceptions to this rule:
+
+=item set Px, Py
+
+Copies the pmc pointer in Py into Px, both registers now refer to
+the B<same> pmc.  Use L<clone> to copy pmc contents.
+
+=item clone Px, Py
+
+Performs a "deeper" copy of Py into Px, using the vtable appropriate
+to the class of Py.
 
 =item tostring Sx, ty, Iz
 
@@ -221,19 +311,103 @@ omitted, increment is 1.
 Decrement register x by nn. nn is an integer constant. If nn is
 omitted, decrement by 1.
 
-=item iton Nx, Iy
+=item length Ix, Sy
 
-Copy the integer value from register y to the numeric register x.
+Put the length of string y into integer register x.
 
-=item ntoi Ix, Ny
+=item concat Sx, Sy
 
-Copy the number from register y to register x. Copy is truncated, and
-may be capped if it is too large or small for an integer.
+Add string y to the end of string x.
 
-=item tostring Sx, ty, Iz
+=item repeat Sx, Sy, Iz
 
-Take the value in register y and convert it to a string of type z,
-storing the result in string register x.
+Copies string y z times into string x.
+
+=back
+
+=head2 Transcendental operations
+
+These opcodes handle the transcendental math functions. The
+destination register here must always be either a numeric or a PMC
+register.
+
+=over 4
+
+=item sin nx, ty
+
+Return the sine of the number in Y
+
+=item cos nx, ty
+
+Return the cosine of the number in Y
+
+=item tan nx, ty
+
+Return the tangent of the number in Y
+
+=item sec nx, ty
+
+Return the secant of the number in Y
+
+=item atan nx, ty
+
+Return the arctangent of Y
+
+=item atan2 nx, ty
+
+Return the result of atan2 of Y
+
+=item asin nx, ty
+
+Return the arcsine of y
+
+=item acos nx, ty
+
+Return the arccosine of y
+
+=item asec nx, ty
+
+Return the arcsecant of y
+
+=item cosh nx, ty
+
+Return the hyperbolic cosine of y
+
+=item sinh nx, ty
+
+Return the hyperbolic sine of y
+
+=item tanh nx, ty
+
+Return the hyperbolic tangent of y
+
+=item sech nx, ty
+
+Return the hyperbolic secant of y
+
+=item log2 nx, ty
+
+Return the base 2 log of y
+
+=item log10 nx, ty
+
+Return the base 10 log of y
+
+=item ln Nx, ty
+
+Return the base e log of y
+
+=item log nx, ty, tz
+
+Return the base Z log of Y
+
+=item pow nx, ty, tz
+
+Return Y to the Z power
+
+=item exp nx, ty
+
+Return e to the Y power
 
 =back
 
@@ -293,6 +467,42 @@ The same as L<push_p_c>, for the floating-point register set.
 
 The same as L<pop_p>, for the floating-point register set.
 
+=item save_i Ix
+
+Push register X onto the generic stack
+
+=item save_s Sx
+
+Push register X onto the generic stack
+
+=item save_p Px
+
+Push register X onto the generic stack
+
+=item save_n Nx
+
+Push register X onto the generic stack
+
+=item restore_i Ix
+
+Restore register X from the generic stack
+
+=item restore_s Ix
+
+Restore register X from the generic stack
+
+=item restore_p Px
+
+Restore register X from the generic stack
+
+=item restore_n Nx
+
+Restore register X from the generic stack
+
+=item entrytype Ix, iy
+
+Put the type of stack entry Y into integer register X
+
 =item set_warp string
 
 Sets a named marker for the stacks for later use.
@@ -320,6 +530,12 @@ global scopes, as well as storing data into those slots and checking
 constraints on those slots. They also allocate and deallocate
 scratchpads and entries in those pads.
 
+Pad descriptors are templates for a particular pad. They are specified
+in the constant area of a bytecode file, and contain the names, types,
+and attributes for the variables referenced in the scope the pad is for.
+
+The pad 0 is special, and represents the empty pad.
+
 =over 4
 
 =item find_lex Px, sy
@@ -328,8 +544,21 @@ Find the lexical of name sy and store the PMC pointer in register Px.
 
 =item find_global Px, sy, sz
 
-Find the PMC for the global variable sy from the table sz and store
-the PMC point
+Find the PMC for the global variable sy from the table sz and store it
+in register X
+
+=item find_global Px, sy
+
+Find the PMC for the global in the default table and put it in X.
+
+=item find_global_table Px, sy
+
+Find the global symbol table Y and store its PMC in X
+
+=item find_global_slot ix, Py, sz
+
+Find the slot in the global table Y for the global named Z, and store
+its slot in register X.
 
 =item fetch_lex Px, iy, iz
 
@@ -337,7 +566,17 @@ Fetch the lexical in slot y of scratchpad z. If z is negative, search
 out from the current pad, if positive search inwards from the
 outermost pad. Put the resulting PMC pointer in register x
 
+=item fetch_global Px, Py, iz
+
+Fetch the global in slot Z of the symbol table pointed to by Y
+
+=item store_global Px, sy
+
+Store X in the default global symbol table with a name of Y.
+
 =item newpad pad_descriptor
+
+Create a new scratchpad using pad_descriptor as a template.
 
 =back
 
@@ -357,11 +596,11 @@ handler is in scope.
 
 =item clear_eh
 
-Clear out the most recently placed exception
+Clear out the most recently placed exception 
 
 =item throw Px
 
-Throw an exception represented by the object in PMC register x.
+Throw an exception represented by the object in PMC register x. 
 
 =item rethrow Px
 
@@ -381,9 +620,11 @@ items.
 =item make_object Px, ty
 
 Make the variable in PMC x an object of type ty. The type can be a
-string
+string, in which case we treat it as a package name.
 
 =item find_method Px, Py, tz
+
+Find the method Z for object Y, and return a PMC for it in X.
 
 =item call_method Px, ty
 
@@ -394,6 +635,248 @@ string
 =item can Px, ty
 
 =item isa Px, ty
+
+=back
+
+=head2 Module handling
+
+These opcodes deal with loading in bytecode or executable code
+libraries, and fetching info about those libraries. This is all
+dealing with precompiled bytecode or shared libraries.
+
+=over 4
+
+=item load_bytecode sx
+
+Load in the bytecode in file X. Search the library path if need be.
+
+=item load_opcode_lib sx, iy
+
+Load in the opcode library X, starting at opcode number Y. Search the
+path if needed.
+
+=item load_string_lib sx
+
+Load in the string handling library named X
+
+=item get_op_count sx
+
+Return the number of opcodes in opcode library X
+
+=item get_string_name sx
+
+Get the name of the string encoding that the library X handles
+
+=item find_string_lib sx, sy
+
+Find the string library that handles strings of type Y. Return its
+name in X.
+
+=back
+
+=head2 I/O operations
+
+Reads and writes read and write records, for some value of record. 
+
+=over 4
+
+=item new_fh px
+
+Create a new filehandle px
+
+=item open px, sy
+
+Open the file Y on filehandle X
+
+=item read px, py, pz
+
+Issue a read on the filehandle in y, and put the result in PMC
+X. PMC Z is the sync object.
+
+=item write px, sy, pz
+
+Write the string Y to filehandle X. PMC Z is the sync object.
+
+=item wait px
+
+Wait for the I/O operation represented by sync object X to finish
+
+=item readw px, py
+
+Read from filehandle Y and put the results in PMC X. Blocks until the
+read completes.
+
+=item writew px, sy
+
+Write string Y to filehandle X, waiting for the write to complete.
+
+=item seek px, ty
+
+Seek filehndle X to position Y.
+
+=item tell tx, py
+
+Return the current position of filehandle Y and put it in X. Returns
+-1 for filehandles where this can't be determined. (Such as stream
+connections)
+
+=item status px, py, tz
+
+Get informational item Z for filehandle Y and put the result in
+X. This fetches things like the number of entries in the IO pipe,
+number of outstanding I/O ops, number of ops on the filehandle, and so
+forth.
+
+=back
+
+=head2 Threading ops
+
+=over 4
+
+=item * lock Px
+
+Take out a high-level lock on the PMC in register X
+
+=item * unlock Px
+
+Unlock the PMC in register X
+
+=item * pushunlock Px
+
+Push an unlock request on the stack
+
+=back
+
+=head2 Interpreter ops
+
+=over 4
+
+=item * newinterp Px, flags
+
+Create a new interpreter in X, using the passed flags.
+
+=item * runinterp Px, iy
+
+Jump into interpreter X and run the code starting at offset Y from the
+current location. (This is temporary until we get something better)
+
+=item * callout Pw, Px, sy, pz
+
+Call routine Y in interpreter x, passing it the list of parameters
+Z. V is a synchronization object returned. It can be waited on like
+the sync objects returned from async I/O routines.
+
+=back
+
+=head2 Garbage collection
+
+=over 4
+
+=item sweep
+
+Fire off a dead object sweep
+
+=item collect
+
+Fire off a garbage collection sweep
+
+=item pausecollect
+
+Pause the garbage collector. No collections will be done for this interpreter
+until the collector is unpaused.
+
+=item resumecollect
+
+Unpause the collector. This doesn't necessarily do a GC run, merely
+allows the interpreter to fire one off when it deems it necessary.
+
+=back
+
+=head2 Key operations
+
+Keys are used to get access to individual elements of an aggregate
+variable.  This is done to allow for opaque, packed, and
+multidimensional aggregate types.
+
+A key entry may be an integer, string, or PMC. Integers are used for
+array lookups, strings for hash lookups, and PMCs for either. 
+
+=over 4
+
+=item new_key Sx
+
+Create a new key structure and put a pointer to it in register X.
+
+=item clone_key Sx, ky
+
+Make a copy of the key Y and put a pointer to it in register X. Y may
+be either an S register or a constant.
+
+=item size_key Sx, iy
+
+Make the key structure X large enough to hold Y key entries
+
+=item key_size Ix, ky
+
+Put the number of elements in key Y into integer register X.
+
+=item toss_key Sx
+
+Nuke key X. Throws the structure away and invalidates the register.
+
+=item ke_type Ix, ky, iz
+
+Put the type of key Y's entry Z in register X. Current values are 0,
+1, and 2 for Integer, String, and PMC, respectively.
+
+=item ke_value tx, ky, iz
+
+Put the value from key Y, entry Z into register X.
+
+=item chop_key Sx
+
+Toss the topmost entry from key X.
+
+=item inc_key Sx, iy
+
+Increment entry Y of key X by one.
+
+=item set_key Sw, [isp]x, iy[, iz]
+
+Set key W, offset Y, to value X. If X is a PMC, then the fourth
+operand must be specified. It can have a value of 0, 1, or 2,
+corresponding to integer, string, or object. Aggregates use this to
+figure out how to treat the key entry.
+
+=back
+
+=head2 Symbolic support for HLLs
+
+=over 4
+
+=item setline ix
+
+Sets the 'current line' marker.
+
+=item setfile sx
+
+Sets the 'current file' marker.
+
+=item setpackage sx
+
+Sets the 'current package' marker.
+
+=item getline ix
+
+Fetches the 'current line' marker.
+
+=item getfile sx
+
+Fetches the 'current file' marker.
+
+=item getpackage sx
+
+Fetches the 'current package' marker.
 
 =back
 
