@@ -20,7 +20,7 @@ sub runstep {
 
   my($gccversion, $warns, $cc_warn);
   $cc_warn=Configure::Data->get('cc_warn');
-  
+
   unless (exists $gnuc{__GNUC__}) {
     return;
   }
@@ -55,7 +55,7 @@ sub runstep {
     # compilation flags determined in a non-strict environment.
     # An example is Solaris 8.
 
-    my @opt_and_vers = 
+    my @opt_and_vers =
         (0 => "-Larry -Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
         # others; ones we might like marked with ?
         # ? -Wundef for undefined idenfiers in #if
@@ -74,7 +74,7 @@ sub runstep {
          2.7 => "",
          2.8 => "-Wsign-compare",
          2.95 => "",
-         3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked -Wpadded -Wdisabled-optimization",
+         3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked -Wdisabled-optimization",
         # -Wsequence-point is part of -Wall
         # -Wfloat-equal may not be what we want
         # We shouldn't be using __packed__, but I doubt -Wpacked will harm us
