@@ -67,6 +67,8 @@ You can test the assembler and interpreter by running
     make test
 
 Look at docs/parrot.pod and docs/intro.pod for where to go from here.
+If you have any problems, see the section "Reporting Problems" in
+docs/intro.pod.
 
 CHANGES
 -------

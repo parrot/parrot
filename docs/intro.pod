@@ -126,6 +126,13 @@ readout like the following:
 tests may be skipped - for one reason or another - but none of them should
 fail!)
 
+=head2 Reporting Problems
+
+If you have problems with parrot, please send a message to
+bugs-parrot@bugs6.perl.org with a description of your problem.  Please
+include the myconfig file that was generated as part of the build
+process.
+
 =head1 Parrot Concepts
 
 Before we dive into programming Parrot assembly, let's take a brief
