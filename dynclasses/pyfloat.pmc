@@ -79,6 +79,20 @@ Returns the value of the number.
 
 /*
 
+=item C<INTVAL hash()>
+
+Returns a unique hash for this value
+
+=cut
+
+*/
+
+    INTVAL hash () {
+        return VTABLE_get_integer(INTERP, SELF);
+    }
+
+/*
+
 =item C<void set_number_native(FLOATVAL value)>
 
 Sets the value of the number to C<value>.

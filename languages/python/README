@@ -18,8 +18,6 @@ You can get the latest version of Pirate from:
 Outstanding Parrot archicture/design issues:
 
   Keyword/Default arguments
-  Hash VTABLE entry
-  POW MMD
   MMD Inheritance
   Anonymous Classes
 

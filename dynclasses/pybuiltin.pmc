@@ -392,19 +392,9 @@ Returns the hex representation of C<value>.
 */
 
     METHOD PMC* hash(PMC *value) {
-        PMC *h = pmc_new_noinit(INTERP, dynclass_PyInt);
-        INTVAL type = value->vtable->base_type;
-        INTVAL i;
-
-        if (type == dynclass_PyString)
-            i = string_hash(INTERP, PMC_str_val(value));
-        else if (type == dynclass_PyComplex)
-            i = (INTVAL)VTABLE_get_number_keyed_int(INTERP, value, 0);
-        else
-            i = VTABLE_get_integer(INTERP, value);
-
-        PMC_int_val(h) = i;
-        return h;
+        PMC *ret = pmc_new_noinit(INTERP, dynclass_PyInt);
+        VTABLE_set_integer_native(INTERP, ret, VTABLE_hash(INTERP, value));
+        return ret;
     }
 
 /*

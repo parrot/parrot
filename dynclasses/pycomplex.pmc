@@ -840,6 +840,21 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
         FLOATVAL d = sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF));
         VTABLE_set_number_native(INTERP, dest, d);
     }
+
+/*
+
+=item C<INTVAL hash()>
+
+Returns a unique hash for this value
+
+=cut
+
+*/
+
+    INTVAL hash () {
+        return VTABLE_get_integer(INTERP, SELF);
+    }
+
 }
 
 /*

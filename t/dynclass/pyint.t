@@ -454,22 +454,24 @@ output_is(<< 'CODE', << 'OUTPUT', "pow");
     set $P2, -1 
 
     new $P3, $I0
-    # XXX: uncomment if/when a proper op is implemented
-    # $P2 = $P0 ** $P1
-    # print $P2
-    # print " "
-    # $P2 = $P0 ** 3
-    # print $P2
-    # print " "
+    $P3 = $P0 ** $P1
+    print $P3
+    print " "
+    $P3 = $P0 ** 3
+    print $P3
+    print " "
     $P3 = $P0.__pow__($P1)
     print $P3
     print " "
     $P3 = $P1.__pow__($P2)
     print $P3
+    print " "
+    $P3 = $P2.__rpow__($P1)
+    print $P3
     print "\n"
 .end
 CODE
-961 0.5
+961 29791 961 0.5 0.5
 OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "repr");

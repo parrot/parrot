@@ -403,7 +403,6 @@ MMD_DEFAULT: {
             return -1;
         }
     }
-
 /*
 
 =item C<void divide(PMC *value, PMC *dest)>
@@ -539,6 +538,20 @@ Returns the string value of the integer.
 
     STRING* get_string () {
         return string_from_int(INTERP, PMC_int_val(SELF));
+    }
+
+/*
+
+=item C<INTVAL hash()>
+
+Returns a unique hash for this value
+
+=cut
+
+*/
+
+    INTVAL hash () {
+        return VTABLE_get_integer(INTERP, SELF);
     }
 
 /*
@@ -687,7 +700,7 @@ MMD_PyInt: {
         }
 MMD_PyFloat: {
             FLOATVAL valf = VTABLE_get_number(INTERP, value);
-            mmd_dispatch_v_pip(INTERP, SELF, valf, dest, MMD_POW_FLOAT);
+            mmd_dispatch_v_pnp(INTERP, SELF, valf, dest, MMD_POW_FLOAT);
         }
     }
 
@@ -719,7 +732,7 @@ Raises C<SELF> to the power of C<*value> and returns the result.
 
     void pow_int (INTVAL value, PMC *dest) {
         if (value < 0)
-            mmd_dispatch_v_pip(INTERP, SELF, 
+            mmd_dispatch_v_pnp(INTERP, SELF, 
                 (FLOATVAL)value, dest, MMD_POW_FLOAT);
         else {
             int i;

@@ -706,6 +706,21 @@ Sets C<dest> to the absolute value of SELF.
     void absolute(PMC *dest) {
         bigint_abs(INTERP, SELF, dest);
     }
+
+/*
+
+=item C<INTVAL hash()>
+
+Returns a unique hash for this value
+
+=cut
+
+*/
+
+    INTVAL hash () {
+        return VTABLE_get_integer(INTERP, SELF);
+    }
+
 }
 
 /*
