@@ -35,36 +35,6 @@ vtable function.
 
 */
 
-void
-register_fallback_methods(Parrot_Interp interp) {
-    /* Yeah, this first one's out of order logically, but it means
-       the table doesn't have to keep being re-malloc'd */
-    mmd_add_function(interp, MMD_SXOR, (funcptr_t)mmd_fallback_stringxor_pmc);
-    mmd_add_function(interp, MMD_ADD, (funcptr_t)mmd_fallback_add_pmc);
-    mmd_add_function(interp, MMD_SUBTRACT, (funcptr_t)mmd_fallback_subtract_pmc);
-    mmd_add_function(interp, MMD_SUBTRACT, (funcptr_t)mmd_fallback_subtract_pmc);
-    mmd_add_function(interp, MMD_MULTIPLY, (funcptr_t)mmd_fallback_multiply_pmc);
-    mmd_add_function(interp, MMD_DIVIDE, (funcptr_t)mmd_fallback_divide_pmc);
-    mmd_add_function(interp, MMD_MOD, (funcptr_t)mmd_fallback_mod_pmc);
-    mmd_add_function(interp, MMD_CMOD, (funcptr_t)mmd_fallback_cmod_pmc);
-    mmd_add_function(interp, MMD_BAND, (funcptr_t)mmd_fallback_band_pmc);
-    mmd_add_function(interp, MMD_BOR, (funcptr_t)mmd_fallback_bor_pmc);
-    mmd_add_function(interp, MMD_BXOR, (funcptr_t)mmd_fallback_bxor_pmc);
-    mmd_add_function(interp, MMD_BSL, (funcptr_t)mmd_fallback_bsl_pmc);
-    mmd_add_function(interp, MMD_BSR, (funcptr_t)mmd_fallback_bsr_pmc);
-    mmd_add_function(interp, MMD_CONCAT, (funcptr_t)mmd_fallback_concat_pmc);
-    mmd_add_function(interp, MMD_LAND, (funcptr_t)mmd_fallback_land_pmc);
-    mmd_add_function(interp, MMD_LOR, (funcptr_t)mmd_fallback_lor_pmc);
-    mmd_add_function(interp, MMD_LXOR, (funcptr_t)mmd_fallback_lxor_pmc);
-    mmd_add_function(interp, MMD_REPEAT, (funcptr_t)mmd_fallback_repeat_pmc);
-    mmd_add_function(interp, MMD_NUMEQ, (funcptr_t)mmd_fallback_numeq_pmc);
-    mmd_add_function(interp, MMD_STREQ, (funcptr_t)mmd_fallback_streq_pmc);
-    mmd_add_function(interp, MMD_NUMCMP, (funcptr_t)mmd_fallback_numcmp_pmc);
-    mmd_add_function(interp, MMD_STRCMP, (funcptr_t)mmd_fallback_strcmp_pmc);
-    mmd_add_function(interp, MMD_SOR, (funcptr_t)mmd_fallback_stringor_pmc);
-    mmd_add_function(interp, MMD_SAND, (funcptr_t)mmd_fallback_stringand_pmc);
-}
-
 /*
 
 =item C<void
@@ -77,7 +47,7 @@ in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_add_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     FLOATVAL result = (VTABLE_get_number(interp, left) +
@@ -98,7 +68,7 @@ the result as a number in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_subtract_pmc(Parrot_Interp interp,
         PMC *left, PMC *right, PMC *dest)
 {
@@ -121,7 +91,7 @@ result as a number in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_multiply_pmc(Parrot_Interp interp,
         PMC *left, PMC *right, PMC *dest)
 {
@@ -142,7 +112,7 @@ the result as a number in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_divide_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest) {
     FLOATVAL result = (VTABLE_get_number(interp, left) /
                        VTABLE_get_number(interp, right));
@@ -162,7 +132,7 @@ sets the result as an integer in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_cmod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_number_native(interp, dest,
@@ -182,7 +152,7 @@ sets the result as a number in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_mod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     FLOATVAL result = floatval_mod(VTABLE_get_number(interp, left),
@@ -202,7 +172,7 @@ sets the result as an integer in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_band_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_integer_native(interp, dest,
@@ -222,7 +192,7 @@ sets the result as an integer in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_bor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_integer_native(interp, dest,
@@ -242,7 +212,7 @@ sets the result as an integer in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_bxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_integer_native(interp, dest,
@@ -262,7 +232,7 @@ Gets integers from C<left> and C<right>, performs a binary shift left
 
 */
 
-void
+static void
 mmd_fallback_bsl_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_integer_native(interp, dest,
@@ -282,7 +252,7 @@ Gets integers from C<left> and C<right>, performs a binary shift right
 
 */
 
-void
+static void
 mmd_fallback_bsr_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_integer_native(interp, dest,
@@ -302,7 +272,7 @@ sets the result as an string in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_concat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     STRING *left_str, *right_str, *total_string;
@@ -325,7 +295,7 @@ and sets the result as an string in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_land_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     PMC *truth;
@@ -349,7 +319,7 @@ and sets the result as an string in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_lor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     PMC *truth;
@@ -373,7 +343,7 @@ and sets the result as an string in C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_lxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     INTVAL left_truth, right_truth;
@@ -406,7 +376,7 @@ C<dest>.
 
 */
 
-void
+static void
 mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     STRING *base;
@@ -431,7 +401,7 @@ and sets the result as an string in C<dest>.
 
 */
 
-INTVAL
+static INTVAL
 mmd_fallback_numeq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
     if (VTABLE_get_number(interp, left) == VTABLE_get_number(interp, right)) {
@@ -453,10 +423,11 @@ and sets the result as an string in C<dest>.
 
 */
 
-INTVAL
+static INTVAL
 mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
-    if (string_compare(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right))) {
+    if (string_compare(interp, VTABLE_get_string(interp, left),
+                VTABLE_get_string(interp, right))) {
         return 1;
     } else {
         return 0;
@@ -475,7 +446,7 @@ and sets the result as an string in C<dest>.
 
 */
 
-INTVAL
+static INTVAL
 mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
     FLOATVAL left_float, right_float;
@@ -509,10 +480,11 @@ and sets the result as an string in C<dest>.
 
 */
 
-INTVAL
+static INTVAL
 mmd_fallback_strcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
-    return string_compare(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right));
+    return string_compare(interp, VTABLE_get_string(interp, left),
+            VTABLE_get_string(interp, right));
 }
 
 /*
@@ -528,11 +500,14 @@ and sets the result as an string in C<dest>.
 
 */
 
-void
-mmd_fallback_stringor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+static void
+mmd_fallback_stringor_pmc(Parrot_Interp interp, PMC *left, PMC *right,
+        PMC *dest)
 {
     VTABLE_set_string_native(interp, dest,
-                              string_bitwise_or(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right), NULL));
+            string_bitwise_or(interp,
+                VTABLE_get_string(interp, left),
+                VTABLE_get_string(interp, right), NULL));
 }
 
 /*
@@ -547,11 +522,14 @@ and sets the result as an string in C<dest>.
 
 */
 
-void
-mmd_fallback_stringand_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+static void
+mmd_fallback_stringand_pmc(Parrot_Interp interp, PMC *left, PMC *right,
+        PMC *dest)
 {
     VTABLE_set_string_native(interp, dest,
-                              string_bitwise_and(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right), NULL));
+            string_bitwise_and(interp,
+                VTABLE_get_string(interp, left),
+                VTABLE_get_string(interp, right), NULL));
 }
 
 /*
@@ -566,11 +544,45 @@ and sets the result as an string in C<dest>.
 
 */
 
-void
-mmd_fallback_stringxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+static void
+mmd_fallback_stringxor_pmc(Parrot_Interp interp, PMC *left, PMC *right,
+        PMC *dest)
 {
     VTABLE_set_string_native(interp, dest,
-                              string_bitwise_xor(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right), NULL));
+            string_bitwise_xor(interp,
+                VTABLE_get_string(interp, left),
+                VTABLE_get_string(interp, right), NULL));
+}
+
+void
+register_fallback_methods(Parrot_Interp interp) {
+    /* Yeah, this first one's out of order logically, but it means
+       the table doesn't have to keep being re-malloc'd */
+    mmd_add_function(interp, MMD_SXOR, (funcptr_t)mmd_fallback_stringxor_pmc);
+    mmd_add_function(interp, MMD_ADD, (funcptr_t)mmd_fallback_add_pmc);
+    mmd_add_function(interp, MMD_SUBTRACT,
+            (funcptr_t)mmd_fallback_subtract_pmc);
+    mmd_add_function(interp, MMD_MULTIPLY,
+            (funcptr_t)mmd_fallback_multiply_pmc);
+    mmd_add_function(interp, MMD_DIVIDE, (funcptr_t)mmd_fallback_divide_pmc);
+    mmd_add_function(interp, MMD_MOD, (funcptr_t)mmd_fallback_mod_pmc);
+    mmd_add_function(interp, MMD_CMOD, (funcptr_t)mmd_fallback_cmod_pmc);
+    mmd_add_function(interp, MMD_BAND, (funcptr_t)mmd_fallback_band_pmc);
+    mmd_add_function(interp, MMD_BOR, (funcptr_t)mmd_fallback_bor_pmc);
+    mmd_add_function(interp, MMD_BXOR, (funcptr_t)mmd_fallback_bxor_pmc);
+    mmd_add_function(interp, MMD_BSL, (funcptr_t)mmd_fallback_bsl_pmc);
+    mmd_add_function(interp, MMD_BSR, (funcptr_t)mmd_fallback_bsr_pmc);
+    mmd_add_function(interp, MMD_CONCAT, (funcptr_t)mmd_fallback_concat_pmc);
+    mmd_add_function(interp, MMD_LAND, (funcptr_t)mmd_fallback_land_pmc);
+    mmd_add_function(interp, MMD_LOR, (funcptr_t)mmd_fallback_lor_pmc);
+    mmd_add_function(interp, MMD_LXOR, (funcptr_t)mmd_fallback_lxor_pmc);
+    mmd_add_function(interp, MMD_REPEAT, (funcptr_t)mmd_fallback_repeat_pmc);
+    mmd_add_function(interp, MMD_NUMEQ, (funcptr_t)mmd_fallback_numeq_pmc);
+    mmd_add_function(interp, MMD_STREQ, (funcptr_t)mmd_fallback_streq_pmc);
+    mmd_add_function(interp, MMD_NUMCMP, (funcptr_t)mmd_fallback_numcmp_pmc);
+    mmd_add_function(interp, MMD_STRCMP, (funcptr_t)mmd_fallback_strcmp_pmc);
+    mmd_add_function(interp, MMD_SOR, (funcptr_t)mmd_fallback_stringor_pmc);
+    mmd_add_function(interp, MMD_SAND, (funcptr_t)mmd_fallback_stringand_pmc);
 }
 
 /*
