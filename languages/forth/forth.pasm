@@ -1206,10 +1206,21 @@ AddSpecialWord:
     .GetNestLevel
     concat .NewBodyString, "branch begin"
     set .TempString, .NestLevel
+    .DecNestLevel
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n"
     branch EndSpecWord    
   NotAgain:
+    ne .CurrentWord, "until", NotUntil
+    .GetNestLevel
+    concat .NewBodyString, "restore P17\n"
+    concat .NewBodyString, "unless P17, begin"
+    set .TempString, .NestLevel
+    .DecNestLevel
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, "\n"
+    branch EndSpecWord    
+  NotUntil:
     branch EndSpecWord    
 EndSpecWord:
     ret
