@@ -43,7 +43,7 @@ shared: libparrot.so
 libparrot.so: $(O_FILES)
 	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
 
-$(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm
+$(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm Parrot/PMC.pm
 	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
 
 $(PDUMP): pdump$(O) $(O_FILES)
