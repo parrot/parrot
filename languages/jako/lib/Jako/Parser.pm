@@ -38,6 +38,7 @@ use Jako::Construct::Label;
 
 use Jako::Construct::Statement::Arithmetic;
 use Jako::Construct::Statement::Assign;
+use Jako::Construct::Statement::Bitwise;
 use Jako::Construct::Statement::Call;
 use Jako::Construct::Statement::Decrement;
 use Jako::Construct::Statement::Goto;
@@ -238,146 +239,6 @@ sub find_block
 
   return undef;
 }
-
-
-###############################################################################
-###############################################################################
-##
-## Operation Support
-##
-###############################################################################
-###############################################################################
-
-
-#
-# op_comp()
-#
-# There are three kinds of entries in the %comp_ops hash:
-#
-#   * Perl expressions to optimize all-constant ops to branches.
-#
-#   * Entries to map source tokens to the op name. This is used
-#     in parsing conditionals.
-#
-#   * Entries to determine the opposite comparison operator if
-#     we need to reverse the sense of the operator as it appears
-#     in the source.
-#
-# TODO: Handle numeric comparisons, too!
-#
-
-my %comp_ops = (
-  'eq' => sub { $_[0] == $_[1] },
-  'ne' => sub { $_[0] != $_[1] },
-  'le' => sub { $_[0] <= $_[1] },
-  'lt' => sub { $_[0] <  $_[1] },
-  'ge' => sub { $_[0] >= $_[1] },
-  'gt' => sub { $_[0] >  $_[1] },
-
-  '==' => 'eq',
-  '!=' => 'ne',
-  '<=' => 'le',
-  '<'  => 'lt',
-  '>=' => 'ge',
-  '>'  => 'gt',
-
-  '!eq' => 'ne',
-  '!ne' => 'eq',
-  '!le' => 'gt',
-  '!lt' => 'ge',
-  '!ge' => 'lt',
-  '!gt' => 'le',
-);
-
-sub op_comp
-{
-  my $self = shift;
-  my ($type, $op, $a, $b, $true, $false) = @_;
-
-  $op = $comp_ops{$op} unless ref $comp_ops{$op}; # Map, e.g., '>=' to 'ge'
-
-  #
-  # OPTIMIZE const-const comparisons to unconditional branches:
-  #
-
-  if (int_or_num_lit_q($a) and int_or_num_lit_q($b)) {
-    if (&{$comp_ops{$op}}($a, $b)) {
-      $self->emit_code('branch', [$true]);
-    } else {
-      $self->emit_code('branch', [$false]);
-    }
-
-    return;
-  }
-
-  #
-  # CONVERT const-reg comparisons to reg-const comparisons:
-  #
-  # We do this by reversing the operand order and inverting the comparison.
-  #
-
-  if (int_or_num_lit_q($a) and reg_q($b)) {
-    ($a, $op, $b) = ($b, $comp_ops{"!$op"}, $a);
-  }
-
-  #
-  # CONVERT num-int and int-num comparisons to num-num comparisons:
-  #
-
-  my $a_type = type_of($a);
-  my $b_type = type_of($b);
-
-  if (int_or_num_lit_q($b)) {
-    #
-    # reg-const comparisons:
-    #
-    # NOTE: We count on the assembler to promote the integer constant
-    # in the case of num-reg-to-int-const comparisons.
-    #
-
-    if ($a_type eq 'I' and num_q($b)) {
-      my $temp = temp_num();
-      $self->emit_code('set', [$temp, $a]);
-      $a = $temp;
-    }
-  } else {
-    #
-    # reg-reg comparisons:
-    #
-
-    if ($a_type ne $b_type) {
-      if ($a_type eq 'I') {
-        my $temp = temp_num();
-        $self->emit_code('set', [$temp, $a]);
-        $a = $temp;
-      } elsif ($b_type eq 'I') {
-        my $temp = temp_num();
-        $self->emit_code('set', [$temp, $b]);
-        $b = $temp;
-      } else {
-        $self->INTERNAL_ERROR("Expected to have to use iton op.");
-      }
-    }
-  }
-
-  #
-  # EMIT code:
-  #
-
-  if (defined $true) {
-    $self->emit_code($op, [$a, $b, $true]);
-    if (defined $false) {
-      $self->emit_code('branch', [$false]);
-    }
-  } else {
-    if (defined $false) {
-      op_comp($type, $comp_ops{"!$op"}, $a, $b, $false, $true);
-    } else {
-      $self->INTERNAL_ERROR("op_comp called without any destinations!");
-    }
-  }
-}
-
 
 
 ###############################################################################
@@ -1007,6 +868,7 @@ sub do_shift
   my $dir = shift;
   my ($dest, $a, $amount) = @_;
 
+  
   confess "TODO: Implement bitwise shift";
 
 =no
@@ -1293,7 +1155,7 @@ sub parse
       my $block = $self->current_block;
 
       my $ident = Jako::Construct::Expression::Value::Identifier->new($block, $token);
-      my $op    = substr($self->forth->text, 0, 1);
+      my $op    = substr($self->forth->text, 0, -1);
       my $value = Jako::Construct::Expression::Value->new($block, $self->forth);
 
       $self->require_semicolon;
@@ -1309,34 +1171,15 @@ sub parse
     #
 
     if ($token->is_ident and $self->get(1)->is_bit_assign) {
-      my $ident = $token->text;
-      my $op    = $self->forth->text;
-      my $value = $self->forth->text;
+      my $block = $self->current_block;
+
+      my $ident = Jako::Construct::Expression::Value::Identifier->new($block, $token);
+      my $op    = substr($self->forth->text, 0, -1);
+      my $value = Jako::Construct::Expression::Value->new($block, $self->forth);
 
       $self->require_semicolon;
 
-      if ($op eq '<<=' or $op eq '>>=') {
-=no
-        $self->push_source("$ident $op $value");
-        $self->do_bit_shift($op eq '<<=' ? 'l' : 'r', $ident, $ident, $value);
-=cut
-      }
-      elsif ($op eq '|=') {
-=no
-        $self->push_source("$ident |= $value");
-        $self->do_bit_or($ident, $ident, $value);
-=cut
-      }
-      elsif ($op eq '&=') {
-=no
-        $self->push_source("$ident |= $value");
-        $self->do_bit_and($ident, $ident, $value);
-=cut
-      }
-      else {
-        $self->INTERNAL_ERROR("Unrecognized bitwise op '$op'");
-      }
-
+      my $bitwise = Jako::Construct::Statement::Bitwise->new($block, $ident, $ident, $op, $value);
       next;
     }
 
@@ -1468,6 +1311,7 @@ sub parse
     # Bitwise Operators:
     #
     #   a = b << 4;
+    #   a = b >> 4;
     #   a = b & c;
     #   a = b | c;
     #
@@ -1478,34 +1322,18 @@ sub parse
       and $self->get(3)->is_infix_bit
       and $self->get(4)->is_value
     ) {
-      my $ident = $token->text;
+      my $block = $self->current_block();
+      my $ident = Jako::Construct::Expression::Value::Identifier->new($block, $token);
 
       $self->require_assign;
 
-      my $left  = $self->forth->text;
+      my $left  = Jako::Construct::Expression::Value->new($block, $self->forth);
       my $op    = $self->forth->text;
-      my $right = $self->forth->text;
+      my $right = Jako::Construct::Expression::Value->new($block, $self->forth);
 
       $self->require_semicolon;
 
-      if ($op eq '<<' or $op eq '>>') {
-        $self->do_shift($op eq '<<' ? 'l' : 'r', $ident, $left, $right);
-      }
-      elsif ($op eq '&') {
-=no
-        $self->push_source("$ident = $left \& $right");
-        $self->do_bit_and($ident, $left, $right);
-=cut
-      }
-      elsif ($op eq '|') {
-=no
-        $self->push_source("$ident = $left | $right");
-        $self->do_bit_or($ident, $left, $right);
-=cut
-      }
-      else {
-        $self->INTERNAL_ERROR("Unrecognized bitwise op '$op'");
-      }
+      my $arith = Jako::Construct::Statement::Bitwise->new($block, $ident, $left, $op, $right);
 
       next;
     }
