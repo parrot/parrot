@@ -136,8 +136,6 @@ prepend_stack( struct Stack_Chunk **interp_stack,
                 struct Stack_Chunk *saved_stack,
                 struct Stack_Chunk *saved_base)
 {
-    size_t i;
-
     /*
      * the coroutines context gets the interpreter stack
      */

@@ -71,9 +71,15 @@ Swaps the "context".
          * setup
          */
         if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
-            PObj_get_FLAGS(SELF) &= ~PObj_private3_FLAG;
-            /* this should return an iterator */
-            REG_PMC(5) = SELF;
+            PMC *ret;
+            /* XXX this works only once, the generated isn't reusable
+             *     inside e.g. range()
+             * so, return a clone of ourself
+             */
+            REG_PMC(5) = ret = pmc_new(INTERP, enum_class_Coroutine);
+            PObj_get_FLAGS(ret) |= PObj_private1_FLAG; /* fixup done */
+            PObj_get_FLAGS(ret) &= ~PObj_private3_FLAG;
+            PMC_struct_val(ret) = PMC_struct_val(SELF);
             return next;
         }
         PMC_struct_val(SELF) = next;
@@ -120,6 +126,7 @@ Marks the coroutine as live.
     void mark () {
         struct Parrot_Coroutine *c = (struct Parrot_Coroutine *)PMC_sub(SELF);
         mark_stack(INTERP, c->co_control_stack);
+        mark_stack(INTERP, c->co_control_base);
         /* mark_stack(INTERP, c->co_pad_stack); */
         mark_context(INTERP, &c->ctx);
     }
