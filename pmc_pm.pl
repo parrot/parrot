@@ -19,7 +19,7 @@ while (<IN>) {
         my $name = $1;
         $name =~ s/,$//;
         last if $name eq "max";
-        print OUT "\t\L$name => $num,\n";
+        print OUT "\t$name => $num,\n";
         $num++;
     }
 }

@@ -15,7 +15,7 @@ and PCs of labels.
 
 If you would like to view the text after the macro expansion pass, use the C<-E>
 flag. This flag simply tells the assembler to quit after the C<Macro> class
-does it thing. 
+does it thing.
 
 The final pass replaces label occurrences with the appropriate PC offset and
 accumulates the (finally completely numeric) bytecode onto the output string.
@@ -126,6 +126,9 @@ BEGIN {
 package Macro;
 
 use Syntax qw($label_re $num_re);
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use Parrot::PMC qw(%pmc_types);
 
 =head2 Macro class
 
@@ -156,24 +159,9 @@ sub new {
   }
 
   #
-  # XXX Must be generated from the enum in include/parrot/pmc.h
   #
   bless $self,$class;
-  $self->{constants}{Array} = 0;
-  $self->{constants}{Boolean} = 1;
-  $self->{constants}{PerlUndef} = 2;
-  $self->{constants}{PerlInt} = 3;
-  $self->{constants}{PerlNum} = 4;
-  $self->{constants}{PerlString} = 5;
-  $self->{constants}{PerlArray} = 6;
-  $self->{constants}{PerlHash} = 7;
-  $self->{constants}{Pointer} = 8;
-  $self->{constants}{IntQueue} = 9;
-  $self->{constants}{Sub} = 10;
-  $self->{constants}{Coroutine} = 11;
-  $self->{constants}{Continuation} = 12;
-  $self->{constants}{CSub} = 13;
-  $self->{constants}{MultiArray} = 14;
+  @{$self->{constants}}{keys %pmc_types} = values %pmc_types;
   $self;
 }
 
@@ -211,7 +199,7 @@ sub _expand_macro {
 =item preprocess
 
 Preprocesses constants, macros, include statements, and eventually conditional
-compilation. 
+compilation.
 
   .constant name {register}
   .constant name {signed_integer}
@@ -433,7 +421,7 @@ my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
 
 Create a new Assembler instance.
 
-  To compile a list of files: 
+  To compile a list of files:
     $compiler = Assembler->new(-files=>[qw(foo.pasm bar.pasm)]);
 
   To compile an array of instructions:
@@ -742,7 +730,7 @@ sub _key_constant {
 
 =item constant_table
 
-Constant table returns a hash with the length in bytes of the constant table 
+Constant table returns a hash with the length in bytes of the constant table
 and the constant table packed.
 
 =cut
@@ -750,13 +738,13 @@ and the constant table packed.
 sub constant_table {
     my $self = shift;
 
-    # $constl = the length in bytes of the constant table 
+    # $constl = the length in bytes of the constant table
     my ($constl, $wordsize);
     my $const = "";
 
     $constl = $wordsize = $PConfig{'opcode_t_size'};
     my $packtype = $PConfig{'packtype_op'};
-    
+
     for(@{$self->{constants}}) {
         # if it's a string constant.
         if ($_->[0] eq 'S') {
@@ -784,7 +772,7 @@ sub constant_table {
         # if it's a float constant.
         elsif ($_->[0] eq 'N') {
             # The size of the whole constant.
-            $constl += 2 * $wordsize + $PConfig{numvalsize}; 
+            $constl += 2 * $wordsize + $PConfig{numvalsize};
             # Constant type, N
             $const .= pack($packtype,0x6e);
             # Sizeof the Parrot floatval.
@@ -817,9 +805,9 @@ sub constant_table {
 
 =item output_bytecode
 
-Returns a string with the Packfile. 
+Returns a string with the Packfile.
 
-First process the constants and generate the constant table to be able to make 
+First process the constants and generate the constant table to be able to make
 the packfile header, then return all.
 
 =cut
@@ -830,7 +818,7 @@ sub output_bytecode {
 
     $wordsize = $PConfig{'opcode_t_size'};
     my $packtype = $PConfig{'packtype_op'};
-    
+
     my %const_table = constant_table($self);
 
     my $byteorder = (substr($PConfig{'byteorder'},0,1) == 1) ? 0 : 1;
@@ -1049,7 +1037,7 @@ sub to_bytecode {
   });
 }
 
-    
+
 package main;
 
 use strict;
@@ -1129,7 +1117,7 @@ usage: $0 [options] file [file...]
 
     -E              Preprocess input files and terminate processing
     -h,--help       Print this message
-    -o,--output     Write file 
+    -o,--output     Write file
     -c,-checksyntax Check syntax only, do not generate bytecode
 
   _EOF_
