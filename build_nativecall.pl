@@ -119,8 +119,10 @@ while (<>) {
     my @arg;
     my %reg_count;
     @reg_count{qw(p i s n)} = (5, 5, 5, 5);
+    if (defined $args and not $args =~ m/^\s*$/ ) {
     foreach (split //, $args) {
 	push @arg, make_arg($_, \%reg_count);
+    }
     }
 
     # Header
@@ -198,6 +200,8 @@ sub set_return_count {
 sub generate_func_header {
     my ($return, $params, $call_params, $ret_type, $ret_type_decl, $return_assign, $other_decl, $final_assign) = @_;
     $other_decl ||= "";
+
+    if (defined $params) {
     print NCI <<HEADER;
 static void pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self) {
   $ret_type (*pointer)();
@@ -208,12 +212,34 @@ static void pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self) 
   $return_assign ($ret_type)(*pointer)($call_params);
   $final_assign
 HEADER
+  }
+  else {
+    print NCI <<HEADER;
+static void pcf_${return}(struct Parrot_Interp *interpreter, PMC *self) {
+  $ret_type (*pointer)();
+  $ret_type_decl return_data;
+  $other_decl
 
+  pointer =  ($ret_type (*)())D2FPTR(self->cache.struct_val);
+  $return_assign ($ret_type)(*pointer)();
+  $final_assign
+HEADER
+  }
+
+  if (defined $params) {
   push @icky_global_variable, <<CALL;
   if (!string_compare(interpreter, signature,
     string_from_c_string(interpreter, "$return$params", 0)))
         return F2DPTR(pcf_${return}_$params);
 CALL
+  }
+  else {
+  push @icky_global_variable, <<CALL;
+  if (!string_compare(interpreter, signature,
+    string_from_c_string(interpreter, "$return", 0)))
+        return F2DPTR(pcf_${return});
+CALL
+  }
 
 }
 

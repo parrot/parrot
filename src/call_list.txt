@@ -15,8 +15,10 @@
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
 #
 #Return params
+i
 i	i
 i	d
+i	t
 i	ii
 f	is
 d	d
