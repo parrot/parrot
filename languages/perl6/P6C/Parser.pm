@@ -147,7 +147,7 @@ my @builtin_funcs = qw(crypt index pack rindex sprintf substr
 
 ##############################
 # Loop control
-my @loop_control = qw(redo last next continue);
+my @loop_control = qw(redo last next continue break skip);
 @WANT{@loop_control} = ('maybe_label') x @loop_control;
 $WANT{goto} = 'label';
 
@@ -209,7 +209,7 @@ $grammar = <<'ENDSUPPORT';
     use vars qw(%KEYWORDS %CLASSES %WANT);
     use vars qw($NAMEPART $COMPARE $CONTEXT $MULDIV $PREFIX $ADDSUB $INCR
 		$LOG_OR $LOGOR $FILETEST $ASSIGN $HYPE $MATCH $BITSHIFT
-		$SOB $FLUSH);
+		$SOB $FLUSH $NUMPART);
 
 # Things from P6C::* used during the parse:
 BEGIN {
@@ -238,6 +238,7 @@ BEGIN {
     $ASSIGN	= qr{(?:!|:|//|&&?|\|\|?|~~?|<<|>>|$ADDSUB|$MULDIV|\*\*)?=};
     # Used for flushing syntax errors
     $FLUSH	= qr/\w+|[^\s\w;}#'"]+/;
+    $NUMPART	= qr/(?!_)[\d_]+(?<!_)/;
 }
 
 # HACK to distinguish between "my ($a, $b) ..." and "foo ($a, $b)".
@@ -322,7 +323,7 @@ $grammar .= <<'ENDGRAMMAR';
 ##############################
 # Literals:
 
-sv_literal:	  /(?:\d+(?:\.\d+)?|\.\d+)(?:[Ee]-?\d+)?/
+sv_literal:	  /(?:$NUMPART(?:\.$NUMPART)?|\.$NUMPART)(?:[Ee]-?$NUMPART)?/o
 		| '{' <commit> hv_seq '}'
 		| '[' <commit> av_seq(?) ']'
 		| <perl_quotelike>

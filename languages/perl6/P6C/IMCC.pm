@@ -88,12 +88,14 @@ sub import {
     my ($class, $type) = @_;
     my @syms = qw(globalvar localvar paramvar findvar
 		  add_localvar add_globalvar
+		  declare_label goto_label emit_label
 		  push_scope pop_scope
+		  set_topic topic
 		  gentmp genlabel newtmp mangled_name
 		  code
 		  add_function set_function exists_function_def
 		  exists_function_decl set_function_params
-		  gen_counted_loop do_scalar_to_array do_flatten_array);
+		  gen_counted_loop scalar_in_context do_flatten_array);
     my @external = qw(init compile emit);
     my $caller = caller;
     no strict 'refs';
@@ -116,6 +118,7 @@ sub import {
 use vars '$curfunc';		# currently compiling function
 use vars '%funcs';		# all known functions
 use vars '%globals';		# global variables
+use vars '%labels';		# named labels
 
 sub init {			# reset state
     %funcs = ();
@@ -130,9 +133,7 @@ sub compile {			# compile input (don't emit)
     use P6C::Addcontext;
     if (ref $x eq 'ARRAY') {
 	# propagate context:
-	foreach my $stmt (@$x) {
-	    $stmt->ctx_right($ctx);
-	}
+	P6C::Context::block_ctx($x);
 	# generate code:
 	foreach my $stmt (@$x) {
 	    $stmt->val;
@@ -156,7 +157,8 @@ END
     P6C::Builtins::add_code(\%funcs);
     while (my ($name, $sub) = each %funcs) {
 	unless($sub->{code}) {
-	    diag "Function $name has no code.  Builtin?";
+	    diag "Function $name has no code.  Builtin?"
+		unless P6C::Builtins::is_builtin($name);
 	    next;
 	}
 	$name = mangled_name($name);
@@ -244,10 +246,7 @@ sub set_function($) {	       # switch to function, returning old one
 }
 
 sub set_function_params {
-    my $params = $funcs{$curfunc}->args;
-    for my $p (@_) {
-	push @$params, [$p->var->type, $p->var->name];
-    }
+    $funcs{$curfunc}->maybe_set_params(@_);
 }
 
 =head2 Name lookup
@@ -300,11 +299,84 @@ Push a scope within the current function.
 
 Pop a scope from the current function.
 
-=back
-
 =item B<mangled_name($thing)>
 
 Mangle any kind of variable, function, or operator name.
+
+=back
+
+=head2 B<Labels>
+
+Note that the "labels" here aren't necessarily simple addresses in the
+code; while this may sometimes be the case, creating some labels may
+involve taking a continuation, and jumping to labels may involve
+throwing an exception and unwinding the call stack.
+
+XXX: Labels and try/CATCH currently use different mechanisms, contrary
+to Apocalypse 4.  Exceptions are implemented with continuations, and
+are thereforemuch more expensive than labels, which use simple jumps.
+Eventually, either continuations will have to become much
+lighter-weight, or the compiler will have to determine when a jump is
+sufficient, and when a continuation or exception is required.  This
+implementation means that you can't mix gotos and exceptions without
+Bad Things happening.
+
+The C<name> argument is a label name, and may be undefined for typed
+loop labels (e.g. "next").  The C<type> argument should be one of the
+following:
+
+=over
+
+=item B<next>
+
+=item B<redo>
+
+=item B<last>
+
+=item B<break>
+
+=item B<continue>
+
+=item B<skip>
+
+=item B<return>
+
+=back
+
+Label handling functions:
+
+=over
+
+=item B<declare_label(name => $name, type => $type)>
+
+Declare a label in the current scope.  Either C<name> or C<type> may
+be omitted.
+
+=item B<emit_label(name => $name, type => $type)>
+
+Emit code for a label in the current scope.  Either C<name> or C<type>
+may be omitted.
+
+=item B<goto_label(name => $name, type => $type)>
+
+Branch to the appropriate version of a label.  Either C<name> or
+C<type> may be omitted.
+
+=back
+
+=head2 B<Topic>
+
+=over
+
+=item B<set_topic($x)>
+
+Sets the topic to C<$x> until the next call to C<set_topic>, or until
+the end of the current scope, whichever is first.  Note that C<$x> is
+a B<variable>, not a value.
+
+=item B<topic()>
+
+Get the current topic variable.
 
 =back
 
@@ -387,6 +459,39 @@ sub mangled_name($) {
     return '_'.$name;
 }
 
+sub declare_label {
+    return $funcs{$curfunc}->add_label(@_);
+}
+
+sub emit_label {
+    die "Label outside function" unless defined $curfunc;
+    my $name = $funcs{$curfunc}->label(@_);
+    code(<<END);
+$name:
+END
+}
+
+sub goto_label {
+    die "Label outside function" unless defined $curfunc;
+    my $name = $funcs{$curfunc}->label(@_);
+    use P6C::Util 'error';
+    error "Undefined label (@_)" unless $name;
+    code(<<END);
+	goto $name
+END
+    return undef;
+}
+
+sub set_topic {
+    $funcs{$curfunc}->set_topic(@_);
+}
+
+sub topic {
+    my $t = $funcs{$curfunc}->topic;
+    error "No topic in $curfunc" unless $t;
+    return $t;
+}
+
 =head2 Temporary names
 
 =over
@@ -436,6 +541,7 @@ sub gentmp(;*) {			# uninitialized temporary
 }
 
 sub genlabel(;$) {		# new label (optionally annotated)
+    no warnings 'uninitialized';
     'L_'.$_[0]. ++$lastlabel
 }
 
@@ -476,10 +582,10 @@ The loop will iterate over values between 0 and $counter - 1,
 inclusive.  C<$counter> will be used as the iteration variable, so it
 can be used in indexing expressions in the loop body.
 
-=item B<do_scalar_to_array($val)>
+=item B<scalar_in_context($val, $ctx)>
 
-Emit the code to turn a scalar into a one-element array, returning the
-array's name.
+Emit the code to return a scalar C<$val> in the right way for context
+C<$ctx>.
 
 =item B<do_flatten_array($vals)>
 
@@ -505,14 +611,25 @@ END
     return undef;
 }
 
-sub do_scalar_to_array {
-    my $x = shift;
-    my $a = newtmp 'PerlArray';
-    code(<<END);
+sub scalar_in_context {
+    my ($x, $ctx) = @_;
+    if ($ctx->type eq 'void') {
+	return undef;
+    } elsif ($ctx->is_array) {
+	my $a = newtmp 'PerlArray';
+	code(<<END);
+# scalar_in_context ARRAY
 	$a = 1
 	$a\[0] = $x
 END
-    return $a;
+	return $a;
+    } elsif ($ctx->is_tuple) {
+	code("# scalar_in_context TUPLE\n");
+	return [$x];
+    } else {
+	code("# scalar_in_context SCALAR\n");
+	return $x;
+    }
 }
 
 sub do_flatten_array {
@@ -576,15 +693,24 @@ use Class::Struct 'P6C::IMCC::Sub'
 #	{scopelevel}		# current scope number
 #	{oldscopes}		# other closed scopes in this sub.
 
-use P6C::Util 'diag';
-use P6C::IMCC 'mangled_name';
+use P6C::Util qw(diag error);
+use P6C::IMCC qw(mangled_name genlabel);
+
+sub _find {
+    my ($x, $thing) = @_;
+    for (@{$x->scopes}) {
+	if (exists $_->{$thing}) {
+	    return $_->{$thing};
+	}
+    }
+    return undef;
+}
 
 sub localvar {
     my ($x, $var) = @_;
-    for (@{$x->scopes}) {
-	if (exists $_->{$var}) {
-	    return $_->{$var}[0];
-	}
+    my $res = $x->_find($var);
+    if ($res) {
+	return $res->[0];
     }
     return undef;
 }
@@ -599,10 +725,61 @@ sub add_localvar {
     return $scopename;
 }
 
+sub label {
+    my $x = shift;
+    my %o = @_;
+    no warnings 'uninitialized';
+    my $mangled = "label:$o{name}:$o{type}";
+    return $x->_find($mangled);
+}
+
+sub add_label {
+    # XXX: note trickery here -- if the label has both a type and a
+    # name, we just add ":type" and "name:type", not "name".  This is
+    # deliberate -- the label statement itself will cause the "name"
+    # to be emitted.
+    my $x = shift;
+    my %o = @_;
+    my $lab = genlabel;
+    if ($o{type}) {
+	$x->scopes->[0]{"label::$o{type}"} = $lab;
+	if ($o{name}) {
+	    $x->scopes->[0]{"label:$o{name}:$o{type}"} = $lab;
+	}
+    } elsif ($o{name}) {
+	$x->scopes->[0]{"label:$o{name}:"} = $lab;
+    } else {
+	die "internal error -- add_label() with neither type nor name";
+    }
+    return $lab;
+}
+
+sub topic {
+    my $x = shift;
+    return $x->_find('topic:');
+}
+
+sub set_topic {
+    my ($x, $topic) = @_;
+    $x->scopes->[0]{"topic:"} = $topic;
+}
+
 sub push_scope {
     my $x = shift;
     $x->{scopelevel}++;
     unshift @{$x->scopes}, { };
+}
+
+sub maybe_set_params {
+    # XXX: hack to keep inner closures from mucking with our params.
+    my $x = shift;
+    unless ($x->{hasparam}) {
+	my $params = $x->args;
+	for my $p (@_) {
+	    push @$params, [$p->var->type, $p->var->name];
+	}
+	$x->{hasparam} = 1;
+    }
 }
 
 sub pop_scope {
@@ -627,6 +804,7 @@ END
     print "# Named locals:\n";
     for (@{$x->scopes}, @{$x->{oldscopes}}) {
 	for my $v (values %$_) {
+	    next unless ref($v) eq 'ARRAY';
 	    my ($n, $t) = @$v;
 	    print "\t.local $t $n\n";
 	}
@@ -634,6 +812,7 @@ END
     # Maybe constructors for locals:
     for (@{$x->scopes}, @{$x->{oldscopes}}) {
 	for my $v (values %$_) {
+	    next unless ref($v) eq 'ARRAY';
 	    my ($n, $t, $init) = @$v;
 	    print "\t$n = new $t\n"
 		if P6C::IMCC::regtype($t) eq 'P' && $init;
@@ -719,7 +898,7 @@ END
 
 ##############################
 package P6C::Binop;
-use P6C::IMCC::Binop;
+use P6C::IMCC::Binop ':all';
 use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
@@ -781,11 +960,13 @@ BEGIN {
  ','	=> \&do_array,
  'x'	=> \&do_repeat,
  '..'	=> \&do_range,
+ '=~'	=> sub { do_smartmatch($_[0]->l, $_[0]->r) },
 );
 }
 
 use vars '%op_is_array';
 BEGIN {
+    no warnings 'qw';
     my @arrayops = qw(= .. x , // ~~ && ||);
     @op_is_array{@arrayops} = (1) x @arrayops;
 }
@@ -797,21 +978,26 @@ sub val {
 	return do_hyped($x->op->op, $x->l, $x->r);
     }
     my $ret;
-    if ($ops{$x->op}) {
-	$ret = $ops{$x->op}->($x);
-    } elsif($x->op =~ /^([^=]+)=$/ && $ops{$1}) {
+    my $op = $x->op;
+    if ($ops{$op}) {
+	$ret = $ops{$op}->($x);
+    } elsif($op =~ /^([^=]+)=$/ && $ops{$1}) {
+	# XXX:
+	die "Internal error -- assignment op `$op' snuck into IMCC.pm";
+	
 	# Translate assignment operation into a binary operation.
 	# XXX: Context propagation is broken for these, so we won't
 	# ever do this.
+	$op = $1;
 	$ret = $ops{'='}->(new P6C::Binop op => '=', l => $x->l,
-			   r => P6C::Binop->new(op => $1, l => $x->l,
+			   r => P6C::Binop->new(op => $op, l => $x->l,
 						r => $x->r));
     } else {
-	unimp $x->op;
+	unimp $op;
     }
 
-    if (!$op_is_array{$x->op} && $x->{ctx}->is_array) {
-	return do_scalar_to_array($ret);
+    if (!$op_is_array{$op}) {
+	return scalar_in_context($ret, $x->{ctx});
     }
     return $ret;
 }
@@ -841,42 +1027,41 @@ sub val {
     if ($x->post && !($x->{ctx}->type eq 'void')) {
 	my $op = $outaplace_op{$x->op}
 	    or die $x->op().' increment not understood';
-	if ($x->thing->isa('P6C::sv_literal') 
-		&& is_scalar($x->thing->type)) {
+	if ($x->thing->isa('P6C::variable') && is_scalar($x->thing->type)) {
 	    my $val = $x->thing->val;
-	    my $tmp = newtmp 'PerlUndef';
+	    $ret = gentmp 'PerlUndef';
 	    code(<<END);
-	$tmp = $val
+	$ret = $val
+	$val = clone $val
 	$val = $val $op
 END
-    	    return $tmp;
 	} else {
 	    my $val = $x->thing->val;
-	    my $tmp = newtmp 'PerlUndef';
+	    $ret = newtmp 'PerlUndef';
 	    my $tmp2 = newtmp 'PerlUndef';
 	    code(<<END);
-	$tmp = $val
-	$tmp2 = $tmp $op
+	$ret = $val
+	$tmp2 = $ret $op
 END
 	    $x->thing->assign(new P6C::Register reg => $tmp2,
 			      type => 'PerlUndef');
-	    return $tmp;
 	}
     } else {
 	my $op = $inplace_op{$x->op}
 	    or die $x->op().' increment not understood';
-	$ret = $x->thing->val;
-	if ($x->thing->isa('P6C::variable')
-	    && is_scalar($x->thing->type)) {
+	my $tmp = $x->thing->val;
+
+	if ($x->thing->isa('P6C::variable') && is_scalar($x->thing->type)) {
+	    $ret = $tmp;
 	    code(<<END);
 	$ret = clone $ret
 	$op $ret
 END
 	} else {
 	    $op = $outaplace_op{$x->op};
+	    $ret = gentmp 'PerlUndef';
 	    code(<<END);
-	$ret = clone $ret
-	$ret = $ret $op
+	$ret = $tmp $op
 END
 	    # Complex expression => can't just do increment.
 	    my $desttype = $x->thing->can('type') ? 
@@ -884,8 +1069,8 @@ END
 	    $x->thing->assign(new P6C::Register reg => $ret,
 			      type => $desttype);
 	}
-	return $ret;
     }
+    return scalar_in_context($ret, $x->{ctx});
 }
 
 ######################################################################
@@ -974,20 +1159,13 @@ sub P6C::sv_literal::val {
 	|| $ctx->type eq 'void'
 	|| same_type($ctx->type, $type)
 	|| (is_scalar($ctx->type) && is_scalar($type))) {
-	warn "literal in void context" if $ctx->type eq 'void';
 	$ret = newtmp 'PerlUndef';
 	code(<<END);
 	$ret = $val
 END
 
-    } elsif ($ctx->is_array) {
-	$ret = do_scalar_to_array($val);
-
-    } elsif ($ctx->is_tuple) {
-	$ret = newtmp 'PerlUndef';
-	code(<<END);
-	$ret = $val
-END
+    } elsif ($ctx->is_array || $ctx->is_tuple) {
+	return scalar_in_context($val, $ctx);
 
     } else {
  	use Data::Dumper;
@@ -1109,7 +1287,7 @@ sub val {
     my $result = gentmp 'int';
     my %tmps;
     my $res = newtmp;
-    my $lasttype;
+    my $lasttype = '';
     my $fail = genlabel 'comparison';
     code("\t$result = 0\n");
     $tmps{0} = $x->[0]->val;
@@ -1162,7 +1340,7 @@ sub P6C::sub_def::val {
 
 ######################################################################
 package P6C::closure;
-use P6C::Util qw(unimp map_tree);
+use P6C::Util qw(unimp map_preorder);
 use P6C::IMCC::prefix 'wrap_with_catch';
 use P6C::IMCC ':all';
 
@@ -1216,15 +1394,14 @@ sub val {
 
     my $ret;
     my @catchers;
-    map_tree {
+    foreach (@{$x->block}) {
 	if ($_->isa('P6C::prefix') && $_->name eq 'CATCH') {
 	    push @catchers, $_->args;
 	    $_->name(undef);
 	}
-    } $x->block;
+    }
     if (@catchers) {
 	die "Only one catch block per block, please" if @catchers > 1;
-	print STDERR "Found CATCH block\n";
 	wrap_with_catch($x, $catchers[0]);
     } else {
 	foreach my $stmt (@{$x->block}) {
@@ -1256,7 +1433,7 @@ sub val {
     my $x = shift;
     my $ctx = $x->{ctx};
     use Data::Dumper;
-    return undef if $ctx->type eq 'void';
+    die $x->name unless $ctx;
     my ($v, $global) = findvar($x->name);
     if ($global) {
 	my $reg = gentmp 'PerlUndef';
@@ -1266,13 +1443,17 @@ END
 	$v = $reg;
     }
 
-    if (!$ctx->type
-	|| same_type($x->type, $ctx->type)
-	|| (is_scalar($x->type) && is_scalar($ctx->type))) {
+    if (!$ctx->type) {
+	# XXX: undefined context is our way of punting.  Used by
+	# e.g. "when", for which context isn't that well-defined.
 	return $v;
+    } elsif (is_scalar($x->type)) {
+	return scalar_in_context($v, $ctx);
 
-    } elsif (is_scalar($x->type) && $ctx->is_array) {
-	return do_scalar_to_array($v);
+    } elsif (!$ctx->type
+	     || same_type($x->type, $ctx->type)
+	     || $ctx->type eq 'void') {
+	return $v;
 
     } elsif ($ctx->is_tuple) {
 	my @ret;
@@ -1310,12 +1491,32 @@ sub assign {
     my ($name, $global) = findvar($x->name);
     my $tmpv = $thing->val;
     if ($global) {
-	code("# ASSIGN GLOBAL ".$x->name."\n");
-	code("\t$name = $tmpv\n");
-	return $tmpv;		# XXX: is this okay?
+	my $clonev;
+	if (is_scalar($x->type)) {
+	    $clonev = gentmp 'PerlUndef';
+	    code(<<END)
+	$clonev = clone $tmpv
+	$name = $clonev
+END
+	} else {
+	    $clonev = $tmpv;
+	    code(<<END);
+	$name = $tmpv
+END
+	}
+	return $clonev;	# XXX: is this okay?
     } else {
-	code("# ASSIGN TO ".$x->name."\n");
-	code("\t$name = $tmpv\n");
+	if (is_scalar($x->type)) {
+	    code(<<END);
+# ASSIGN TO @{[$x->name(), $global ? " (global)" : ""]}
+	$name = clone $tmpv
+END
+	} else {
+	    # XXX: can't clone arrays!
+	    code(<<END);
+	$name = $tmpv
+END
+	}
 	return $name;
     }
 }
@@ -1566,16 +1767,23 @@ END
 ######################################################################
 sub P6C::loop::val {
     my ($x) = @_;
+    my $label = $x->{ctx}{label};
     my $start = genlabel 'loop';
     my $end = genlabel 'loop';
 
     push_scope;
+    declare_label name => $label, type => $_ for qw(next redo last continue);
     $x->init->val if $x->init;
     code(<<END);
 	goto $end
 $start:
 END
+    emit_label name => $label, type => 'redo';
+
     $_->val for @{$x->block};
+
+    emit_label name => $label, type => 'next';
+    emit_label name => $label, type => 'continue';
     $x->incr->val if $x->incr;
     code(<<END);
 $end:
@@ -1584,7 +1792,16 @@ END
     code(<<END);
 	if $test goto $start
 END
+    emit_label name => $label, type => 'last';
     pop_scope;
+    return undef;
+}
+
+######################################################################
+sub P6C::label::val {
+    my ($x) = @_;
+    declare_label name => $x->name;
+    emit_label name => $x->name;
     return undef;
 }
 

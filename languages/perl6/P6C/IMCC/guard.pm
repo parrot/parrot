@@ -39,6 +39,7 @@ END
 sub guard_while {
     my $x = shift;
     use P6C::IMCC::prefix 'common_while';
-    common_while($x->name, sub { $x->test->val }, sub { $x->expr->val });
+    common_while($x->name, sub { $x->test->val }, sub { $x->expr->val },
+		 $x->{ctx});
 }
 

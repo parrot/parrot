@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use P6C::TestCompiler tests => 2;
+use P6C::TestCompiler tests => 3;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "Exceptions");
@@ -43,10 +43,10 @@ sub main() {
     if 1 {
 	print "about to die\n";
 	foo;
-	CATCH {
+	CATCH { default {
 	    print "caught ", $!, "\n";
 	    $saverr = $!;
-	}
+	} }
     } else {
 	print "oops\n";
     }
@@ -56,7 +56,7 @@ sub main() {
     } else {
 	foo;
     }
-    CATCH { print $!, ", eh?\n" }
+    CATCH { default {print $!, ", eh?\n" } }
     die;			# Not reached.
 }
 CODE
@@ -64,4 +64,45 @@ about to die
 caught eek
 eek: still alive
 eek, eh?
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Exceptions 3");
+sub main() {
+    CATCH { default { print "foo\n" } }
+    for 1..5 {
+	die $_ unless $_ % 3;
+	CATCH {
+	    when 1 { print "a\n" }
+	    print "a.1: ", $!, "\n";
+ 	    when 3 { print "b\n" }
+ 	    print "b.1\n";
+	}
+	print $_, "\n";
+    }
+    print "Survived 1\n";
+    for 1..5 {
+	die $_ unless $_ % 3;
+	CATCH {
+	    when 1 { print "a\n" }
+	    print "a.1: ", $!, "\n";
+ 	    when 2 { print "b\n" }
+ 	    print "b.1\n";
+	}
+	print $_, "\n";
+    }
+}
+CODE
+1
+2
+a.1: 3
+b
+4
+5
+Survived 1
+1
+2
+a.1: 3
+b.1
+foo
 OUT

@@ -102,12 +102,22 @@ sub P6C::Binop::ctx_right {
 
     } elsif ($op eq '=') {
 	# Special-case assignment operator to enforce context l -> r
-	# XXX: not sure what to do with +=, etc.
 
 	# Propagate context:
 	$x->l->ctx_left($x->r, $ctx);
 	# give incoming context to left side
 	$x->l->ctx_right($ctx);
+
+    } elsif ($op =~ /^([^=]+)=$/) {
+	use P6C::Util 'deep_copy';
+	# Turn this into a normal, non-inplace operator and try again.
+	# Yuck.
+	my $ltmp = deep_copy($x->l);
+	my $new_rhs = new P6C::Binop op => $1, l => $ltmp, r => $x->r;
+	$x->op('=');
+	$x->r($new_rhs);
+	$x->ctx_right($ctx);
+	return;
 
     } elsif ($op eq ',') {
 	# List of items.
@@ -124,10 +134,6 @@ sub P6C::Binop::ctx_right {
 	$opctx->type($ltype);
 	$x->l->ctx_right($opctx);
 	$opctx->type($rtype);
-	if ($x->r->isa('P6C::context')) {
-	    use Carp 'confess';
-	    confess 'ohshit: '.$op;
-	}
 	$x->r->ctx_right($opctx);
 
     } else {
@@ -327,7 +333,7 @@ sub P6C::incr::ctx_right {
 	if ($subcontext) {
 	    $x->thing->ctx_right($subcontext);
 	} else {
-	    diag "No context for operator `$name'";
+#	    diag "No context for operator `$name'";
 	}
     }
     $x->{ctx} = $ctx->copy;
@@ -397,16 +403,20 @@ sub foreach_context {
 }
 
 BEGIN {
-    $P6C::Context::CONTEXT{'-'} = new P6C::Context type => ['PerlUndef'];
+    $P6C::Context::CONTEXT{'-'} = new P6C::Context type => 'PerlUndef';
     $P6C::Context::CONTEXT{if}
 	= $P6C::Context::CONTEXT{unless} =  \&ifunless_context;
     $P6C::Context::CONTEXT{'for'} = \&for_context;
     $P6C::Context::CONTEXT{foreach} = \&foreach_context;
+    $P6C::Context::CONTEXT{when}
+	= $P6C::Context::CONTEXT{given}
+	= new P6C::Context type => [undef, 'void'];
     $P6C::Context::CONTEXT{while}
-	= $P6C::Context::CONTEXT{until} # = \&while_context;
-	   = new P6C::Context type => ['bool', 'void'];
-    $P6C::Context::CONTEXT{print1} = new P6C::Context type => ['PerlUndef'];
+	= $P6C::Context::CONTEXT{until}
+	= new P6C::Context type => ['bool', 'void'];
 
+    $P6C::Context::CONTEXT{return} = new P6C::Context type => 'PerlArray';
+    $P6C::Context::CONTEXT{print1} = new P6C::Context type => ['PerlUndef'];
     for (qw(try do CATCH BEGIN END INIT AUTOLOAD PRE POST NEXT LAST FIRST)) {
 	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'void';
     }
@@ -420,7 +430,7 @@ sub arg_context {
     if (exists $P6C::Context::CONTEXT{$name}) {
 	return $P6C::Context::CONTEXT{$name};
     }
-    diag "No context for $name";
+#     diag "No context for $name";
     return $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
 }
 
@@ -431,7 +441,7 @@ sub P6C::prefix::ctx_right {
     if (ref($proto) eq 'CODE') {
 	# blech.
 	$proto->($x, $ctx);
-    } elsif ($x->args) {
+    } elsif (ref $x->args) {
 	$x->args->ctx_right($proto);
     }
 
@@ -519,7 +529,17 @@ sub P6C::ternary::ctx_left {
 }
 
 ##############################
-sub P6C::decl::ctx_right { }
+sub P6C::decl::ctx_right {
+    my ($x, $ctx) = @_;
+    unless ($ctx->type eq 'void') {
+	unimp "declaration in non-void context";
+    }
+    if (ref $x->vars eq 'ARRAY') {
+	$_->ctx_right($ctx) for @{$x->vars};
+    } else {
+	$x->vars->ctx_right($ctx);
+    }
+}
 
 sub P6C::decl::ctx_left {
     my ($x, $other, $ctx) = @_;
@@ -563,6 +583,7 @@ sub P6C::sub_def::ctx_right {
 sub get_closure_params {
     my ($x) = @_;
     my @params;
+    use P6C::Util 'map_preorder';
     if (defined($x->params)) {
 	use P6C::Util 'flatten_leftop';
 	# Explicit parameter list in "-> $foo, $bar { ... }"
@@ -572,7 +593,7 @@ sub get_closure_params {
     } else {
 	my %impl;
 	# Look for implicit param-vars like $^a:
-	map_tree {
+	map_preorder {
 	    if (UNIVERSAL::isa($_, 'P6C::variable')
 		&& $_->implicit) {
 		$impl{$_->name} = $_;
@@ -588,8 +609,8 @@ sub get_closure_params {
 sub setup_catch_blocks {
     my ($x) = @_;
     my @catch;
-    use P6C::Util 'map_tree';
-    map_tree {
+    use P6C::Util 'map_preorder';
+    map_preorder {
 	if (UNIVERSAL::isa($_, 'P6C::prefix')
 	    && $_->name eq 'CATCH') {
 	    push @catch, $_;
@@ -638,10 +659,7 @@ sub P6C::closure::ctx_right {
 	# Look for CATCH blocks in the current block:
 	setup_catch_blocks($x);
 
-	my $voidctx = new P6C::Context type => 'void';
-	foreach my $stmt (@{$x->block}) {
-	    $stmt->ctx_right($voidctx);
-	}
+	P6C::Context::block_ctx($x->block);
     }
     $x->{ctx} = $ctx->copy;
 }
@@ -710,5 +728,8 @@ sub P6C::loop::ctx_right {
 	$_->ctx_right($voidctx);
     }
 }
+
+##############################
+sub P6C::label::ctx_right { }
 
 1;

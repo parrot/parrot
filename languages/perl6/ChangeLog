@@ -52,7 +52,7 @@
 	    - qsort.t -- I suspect funky spilling, but also under
 	      investigation.
 
-2002-07-23-B  Sean O'Rourke
+2002-07-23-B
 
 	* Additions:
 	    - test for increment.
@@ -88,3 +88,26 @@
 
 	* Fixes:
 	    - grammar uninitialized value warnings (John Kingsley)
+
+2002-07-28
+
+	* Additions:
+	    - simple given/when cases.
+	    - labels, loop control (e.g. "next")
+	    - goto (considered harmful).
+
+	    Note that this control flow is _not_ the "control flow
+	    exceptions" mentioned in Apocalypse 4, but more standard
+	    control flow with jumps.  As such, it doesn't play nicely with
+	    exceptions.  If you jump out of a block with a CATCH clause,
+	    you will lose somewhere down the road.
+
+	* Fixes:
+	    - underscores in numbers.
+	    - block in sub resetting sub parameter list
+	    - inplace operators (e.g. +=)
+	    - bug in time0
+
+	* Test-failures:
+	    - 8.3 (Exceptions) -- stack is messed up.  Probably a P6C bug,
+	      since the exception stuff is a bit fragile still.

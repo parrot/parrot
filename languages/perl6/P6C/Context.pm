@@ -157,4 +157,19 @@ sub same {
     return same_type($x->type, $y->type);
 }
 
+# Propagate context for statements in a block.
+sub block_ctx {
+    my $x = shift;
+    my $voidctx = new P6C::Context type => 'void';
+    foreach my $stmt (@$x) {
+	if ($stmt->isa('P6C::label')) {
+	    $voidctx->{label} = $stmt->name;
+	    $stmt->ctx_right($voidctx);
+	    next;
+	}
+	$stmt->ctx_right($voidctx);
+	delete $voidctx->{label};
+    }
+}
+
 1;

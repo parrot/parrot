@@ -216,6 +216,7 @@ sub P6C::sv_literal::tree {
 	    $val = undef;
 	}
     } elsif (!ref($x->[1])) {
+	$x->[1] =~ s/_//g;
 	if ($x->[1] =~ /\./) {
 	    $type = 'PerlNum';
 	} else {

@@ -4,11 +4,11 @@ use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
 require Exporter;
-use vars '@ISA';
+use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK);
 @ISA = qw(Exporter);
-use vars '@EXPORT';
-@EXPORT = qw(slow_pow do_logand do_logor do_defined do_concat do_repeat
-	     do_range);
+@EXPORT_OK = qw(slow_pow do_logand do_logor do_defined do_concat do_repeat
+		do_range do_smartmatch);
+%EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 sub slow_pow ;
 sub do_logand ;
@@ -17,6 +17,13 @@ sub do_defined ;
 sub do_concat ;
 sub do_repeat ;
 sub do_range ;
+
+sub do_smartmatch ;
+sub smartmatch_type ;
+sub sm_array_num ;
+sub sm_hash_scalar ;
+sub sm_expr_num ;
+sub sm_expr_str ;
 
 1;
 
@@ -191,3 +198,123 @@ END
     }
 }
 
+# XXX: the types used here aren't quite the same as those elsewhere.
+# Also, we don't distinguish num/string in $vars.
+sub smartmatch_type {
+    my ($x) = @_;
+    if ($x->can('type')) {
+	return $x->type;
+    } elsif ($x->isa('P6C::Binop') && $x->op eq ',') {
+	return 'list';
+    } else {
+	return undef;		# == "expression"
+    }
+}
+
+sub sm_array_num {
+    my ($a, $n) = @_;
+    $n->{ctx}->type('num');
+    my $av = $a->val;
+    my $nv = $n->val;
+    my $ntmp = gentmp 'int';
+    my $res = newtmp;
+    code(<<END);
+# sm_array_num
+	$ntmp = $nv
+	$res = $av\[$ntmp]
+END
+    return $res;
+}
+
+sub sm_hash_scalar {
+    my ($h, $k) = @_;
+    $k->{ctx}->type('PerlUndef');
+    my $hv = $h->val;
+    my $kv = $k->val;
+    my $stmp = gentmp 'str';
+    my $res = newtmp;
+    code(<<END);
+# sm_hash_scalar
+	$stmp = $kv
+	$res = $hv\[$stmp]
+END
+    return $res;
+}
+
+sub sm_expr_num {
+    my ($e, $n) = @_;
+    $n->{ctx}->type('num');
+    $e->{ctx}->type('num');
+    my $ev = $e->val;
+    my $nv = $n->val;
+    my $res = newtmp;
+    my $na = gentmp 'num';
+    my $nb = gentmp 'num';
+    my $end = genlabel;
+    code(<<END);
+# sm_expr_num
+	$na = $nv
+	$nb = $ev
+	if $na != $nb goto $end
+	$res = 1
+$end:
+END
+    return $res;
+}
+
+sub sm_expr_str {
+    my ($e, $s) = @_;
+    $s->{ctx}->type('str');
+    $e->{ctx}->type('str');
+    my $ev = $e->val;
+    my $sv = $s->val;
+    my $res = newtmp;
+    my $sa = gentmp 'str';
+    my $sb = gentmp 'str';
+    my $end = genlabel;
+    code(<<END);
+# sm_expr_str
+	$sa = $sv
+	$sb = $ev
+	if $sa != $sb goto $end
+	$res = 1
+$end:
+END
+    return $res;
+}
+
+sub do_smartmatch {
+    my ($a, $b) = @_;
+    use Carp 'confess';
+    confess unless $a;
+    die unless $b;
+    my $atype = smartmatch_type $a;
+    my $btype = smartmatch_type $b;
+    my $val;
+    if ($atype eq 'PerlArray' && is_numeric($btype)) {
+	$val = sm_array_num($a, $b);
+    } elsif ($btype eq 'PerlArray' && is_numeric($atype)) {
+	$val = sm_array_num($b, $a);
+
+    } elsif ($atype eq 'PerlHash' && is_scalar($btype)) {
+	$val = sm_hash_scalar($a, $b);
+    } elsif ($btype eq 'PerlHash' && is_scalar($atype)) {
+	$val = sm_hash_scalar($b, $a);
+
+    } elsif (is_numeric($btype)) {
+	$val = sm_expr_num($a, $b);
+    } elsif (is_numeric($atype)) {
+	$val = sm_expr_num($b, $a);
+
+    } elsif (is_string($btype)) {
+	$val = sm_expr_str($a, $b);
+    } elsif (is_string($atype)) {
+	$val = sm_expr_str($b, $a);
+
+    } else {
+	error "Can't smartmatch $atype vs $btype";
+    }
+    return $val;
+}
+
+1;

@@ -34,10 +34,15 @@ in the tree.  So C<(1,(2,(3,4)))> becomes C<(1 2 3 4)>.  Yes, this is
 undoing what we so laboriously did in Tree.pm turning
 C<E<lt>leftop:...E<gt>> sequences into trees.
 
-=item B<map_tree(BLOCK, @trees)>
+=item B<map_preorder(BLOCK, @trees)>
 
 Call C<BLOCK> at each node of each tree in C<@trees>, processing
 parents before children.  The current node will be in C<$_>.
+
+=item B<map_postorder(BLOCK, @trees)>
+
+Call C<BLOCK> at each node of each tree in C<@trees>, processing
+parents after children.  The current node will be in C<$_>.
 
 =cut
 
@@ -45,8 +50,9 @@ require Exporter;
 use vars qw(@EXPORT_OK %EXPORT_TAGS @ISA);
 BEGIN {
 @EXPORT_OK = qw(unimp diag error warning
-		flatten_leftop map_tree
-		is_scalar is_array_expr same_type is_pmc);
+		flatten_leftop map_preorder map_postorder
+		deep_copy
+		is_scalar is_array_expr same_type is_pmc is_numeric is_string);
 %EXPORT_TAGS = (all => [@EXPORT_OK] );
 @ISA = qw(Exporter);
 }
@@ -54,6 +60,7 @@ BEGIN {
 use strict;
 
 sub _info {
+    no warnings 'uninitialized';
     my $type = shift;
     my ($pack, $fn, $line, $subr) = caller 2;
     $subr =~ s/^P6C:://;
@@ -92,25 +99,42 @@ sub flatten_leftop {
     return @ret;
 }
 
-sub map_tree(&@) {
+# Yeah, these could be combined, abstracted, and/or patternized.  Look
+# at all that duplication!
+sub map_preorder(&@) {
     my $code = shift;
     for my $v (@_) {
 	if (ref $v eq 'ARRAY') {
 	    local $_;
 	    for (@$v) {
-		_map_tree($code) if UNIVERSAL::isa($_, 'HASH');
+		_map_tree($code, 1) if UNIVERSAL::isa($_, 'HASH');
 	    }
 	} elsif (UNIVERSAL::isa($v, 'HASH')) {
 	    local $_ = $v;
-	    _map_tree($code);
+	    _map_tree($code, 1);
+	}
+    }
+}
+
+sub map_postorder(&@) {
+    my $code = shift;
+    for my $v (@_) {
+	if (ref $v eq 'ARRAY') {
+	    local $_;
+	    for (@$v) {
+		_map_tree($code, 0) if UNIVERSAL::isa($_, 'HASH');
+	    }
+	} elsif (UNIVERSAL::isa($v, 'HASH')) {
+	    local $_ = $v;
+	    _map_tree($code, 0);
 	}
     }
 }
 
 sub _map_tree {
-    my $code = shift;
+    my ($code, $pre) = @_;
     
-    &$code;
+    &$code if $pre;
 
     my $class = ref $_;
     while (my ($k, $v) = each %$_) {
@@ -126,6 +150,7 @@ sub _map_tree {
 	    }
 	}
     }
+    &$code unless $pre;
 }
 
 =item B<is_scalar($type)>
@@ -155,17 +180,30 @@ errs on the conservative side.
 
 my %isscalar;
 my %isprimitive;
+my %isnum;
 BEGIN {
     my @scalar_types = qw(PerlInt PerlNum PerlString PerlUndef
 			  int num str bool);
     @isscalar{@scalar_types} = (1) x @scalar_types;
     my @primitive = qw(int num str);
     @isprimitive{@primitive} = (1) x @primitive;
+    my @num = qw(PerlInt PerlNum int num);
+    @isnum{@num} = (1) x @num;
 }
 
 sub is_scalar {
     my $t = shift;
     return exists $isscalar{$t};
+}
+
+sub is_numeric {
+    my $t = shift;
+    return exists $isnum{$t};
+}
+
+sub is_string {
+    my $t = shift;
+    return $t eq 'str' || $t eq 'PerlString';
 }
 
 sub is_pmc {
@@ -210,7 +248,21 @@ sub same_type {
 	    return undef;
 	}
     } else {
-	return !ref($y) && ($x eq $y || ($pmc_scalar{$x} && $pmc_scalar{$y}));
+	return !ref($y) && ($x eq $y
+			    || ($pmc_scalar{$x} && $pmc_scalar{$y})
+			    || (is_numeric($x) && is_numeric($y))
+			    || (is_string($x) && is_string($y)));
+    }
+}
+
+sub deep_copy {
+    my $x = shift;
+    {
+	use Data::Dumper;
+	$Data::Dumper::Purity = 1;
+	$Data::Dumper::Terse = 1;
+	$Data::Dumper::Deepcopy = 1;
+	return eval Dumper($x);
     }
 }
 

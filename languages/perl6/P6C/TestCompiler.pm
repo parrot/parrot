@@ -30,7 +30,7 @@ sub dumperr {
     for my $ext (qw(pasm pbc imc err)) {
 	rename "a.$ext", "$name.$ext";
     }
-    print STDERR "See $name.{p6,imc,pasm,pbc,out},",
+    print STDERR "See $name.{p6,imc,pasm,pbc,out}, ",
 	"and $name.err for errors\n";
 }
 
@@ -41,7 +41,7 @@ sub import {
 	*{$pkg.'::'.$_} = \&$_;
     }
     my $class = shift;
-    eval "use Test::Simple qw(@_)";
+    eval "use Test::More qw(@_)";
 }
 
 sub mysystem($$) {
