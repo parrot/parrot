@@ -1,16 +1,20 @@
-/* resources.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Allocate and deallocate tracked resources
- *  Data Structure and Algorithms:
- *
- *  History:
- *     Initial version by Dan on 2001.10.2
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/resources.c - Allocate and deallocate tracked resources
+
+=head1 DESCRIPTION
+
+=head2 Parrot Memory Management Code
+
+=over 4
+
+=cut
+
+*/
 
 #include <assert.h>
 #include "parrot/parrot.h"
@@ -21,10 +25,19 @@
 
 typedef void (*compact_f) (struct Parrot_Interp *, struct Memory_Pool *);
 
-/** Parrot Memory Management Code **/
+/*
 
-/* Allocate a new memory block. We allocate the larger of however much
- * was asked for or the default size, whichever's larger */
+=item C<static void *
+alloc_new_block(struct Parrot_Interp *interpreter,
+        size_t size, struct Memory_Pool *pool)>
+
+Allocate a new memory block. We allocate the larger of however much was
+asked for or the default size, whichever's larger.
+
+=cut
+
+*/
+
 static void *
 alloc_new_block(struct Parrot_Interp *interpreter,
         size_t size, struct Memory_Pool *pool)
@@ -71,16 +84,28 @@ alloc_new_block(struct Parrot_Interp *interpreter,
     return new_block;
 }
 
-/*  Alignment problems:  align_1 sets the size, but not the alignment
-    of the memory block we are about to allocate.  The alignment of *this*
-    block is currently determined by the align_1 sent in by the
-    *previous* allocation.  See
-    http://archive.develooper.com/perl6-internals%40perl.org/msg12310.html
-    for details.
-    Currently, we work around it by forcing all the *ALIGNMENT
-    #defines in include/parrot/<file>.h to be the same :-).
+/*
+
+=item C<static void *
+mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
+        struct Memory_Pool *pool, size_t align_1)>
+
+Allocates memory for headers.
+
+Alignment problems:  C<align_1> sets the size, but not the alignment of
+the memory block we are about to allocate.  The alignment of I<this>
+block is currently determined by the C<align_1> sent in by the
+I<previous> allocation. See
+L<http://archive.develooper.com/perl6-internals%40perl.org/msg12310.html
+> for details. Currently, we work around it by forcing all the
+C<*ALIGNMENT> C<#define>s in F<<include/parrot/<file>.h>> to be the
+same.
+
+
+=cut
+
 */
-/* Allocates memory for headers */
+
 static void *
 mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
         struct Memory_Pool *pool, size_t align_1)
@@ -146,6 +171,17 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
     return (void *)return_val;
 }
 
+/*
+
+=item C<static PARROT_INLINE void
+profile_gc_start(Parrot_Interp interpreter)>
+
+Called within C<compact_pool()> to record the start time of a GC run if
+profiling is enabled.
+
+=cut
+
+*/
 
 static PARROT_INLINE void
 profile_gc_start(Parrot_Interp interpreter)
@@ -154,6 +190,18 @@ profile_gc_start(Parrot_Interp interpreter)
         interpreter->profile->gc_time = Parrot_floatval_time();
     }
 }
+
+/*
+
+=item C<static PARROT_INLINE void
+profile_gc_end(Parrot_Interp interpreter)>
+
+Called within C<compact_pool()> to record the end time of a GC run if
+profiling is enabled.
+
+=cut
+
+*/
 
 static PARROT_INLINE void
 profile_gc_end(Parrot_Interp interpreter)
@@ -168,9 +216,23 @@ profile_gc_end(Parrot_Interp interpreter)
     }
 }
 
-/** Compaction Code **/
+/*
 
-/* Compact the buffer pool */
+=back
+
+=head2 Compaction Code
+
+=over
+
+=item C<static void
+compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)>
+
+Compact the buffer pool.
+
+=cut
+
+*/
+
 static void
 compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 {
@@ -379,20 +441,44 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
 }
 
-/* Go do a GC run. This only scans the string pools and compacts them,
- * it doesn't check for string liveness */
+/*  */
+/*
+
+=item C<void
+Parrot_go_collect(struct Parrot_Interp *interpreter)>
+
+Go do a GC run. This only scans the string pools and compacts them, it
+doesn't check for string liveness.
+
+=cut
+
+*/
+
 void
 Parrot_go_collect(struct Parrot_Interp *interpreter)
 {
     compact_pool(interpreter, interpreter->arena_base->memory_pool);
 }
 
+/*
 
-/** Parrot Re/Allocate Code **/
+=back
 
-/* Takes an interpreter, a buffer pointer, and a new size. The buffer
- * pointer is in as a void * because we may take a STRING or
- * something, and C doesn't subclass */
+=head2 Parrot Re/Allocate Code
+
+=over 4
+
+=item C<void *
+Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)>
+
+Takes an interpreter, a buffer pointer, and a new size. The buffer
+pointer is in as a C<void *> because we may take a C<STRING> or
+something, and C doesn't subclass.
+
+=cut
+
+*/
+
 void *
 Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
 {
@@ -427,8 +513,19 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
     return mem;
 }
 
-/* Takes an interpreter, a STRING pointer, and a new size.
- * The destination may be bigger, since we round up to the allocation quantum*/
+/*
+
+=item C<void *
+Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
+        size_t tosize)>
+
+Takes an interpreter, a C<STRING> pointer, and a new size. The
+destination may be bigger, since we round up to the allocation quantum.
+
+=cut
+
+*/
+
 void *
 Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
         size_t tosize)
@@ -464,7 +561,17 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
     return mem;
 }
 
-/* Allocate exactly as much memory as they asked for */
+/*
+
+=item C<void *
+Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)>
+
+Allocate exactly as much memory as they asked for.
+
+=cut
+
+*/
+
 void *
 Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 {
@@ -477,6 +584,19 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
     ((Buffer *)buffer)->buflen = size;
     return buffer;
 }
+
+/*
+
+=item C<void *
+Parrot_allocate_zeroed(struct Parrot_Interp *interpreter,
+        void *buffer, size_t size)>
+
+Just calls C<Parrot_allocate()>, which also returns zeroed memory.
+
+=cut
+
+*/
+
 void *
 Parrot_allocate_zeroed(struct Parrot_Interp *interpreter,
         void *buffer, size_t size)
@@ -484,8 +604,19 @@ Parrot_allocate_zeroed(struct Parrot_Interp *interpreter,
     return Parrot_allocate(interpreter, buffer, size);
 }
 
-/* Allocate at least as much memory as they asked for. We round the
- * amount up to the allocation quantum */
+/*
+
+=item C<void *
+Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
+        size_t size)>
+
+Allocate at least as much memory as they asked for. We round the amount
+up to the allocation quantum.
+
+=cut
+
+*/
+
 void *
 Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
         size_t size)
@@ -510,8 +641,17 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
     return str;
 }
 
+/*
 
-/* Create a new memory pool */
+=item C<static struct Memory_Pool *
+new_memory_pool(size_t min_block, compact_f compact)>
+
+Create a new memory pool.
+
+=cut
+
+*/
+
 static struct Memory_Pool *
 new_memory_pool(size_t min_block, compact_f compact)
 {
@@ -530,7 +670,17 @@ new_memory_pool(size_t min_block, compact_f compact)
     return pool;
 }
 
-/* Initialize the managed memory pools */
+/*
+
+=item C<void
+Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)>
+
+Initialize the managed memory pools.
+
+=cut
+
+*/
+
 #define POOL_SIZE 65536*2
 void
 Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
@@ -550,6 +700,17 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
     interpreter->arena_base->constant_string_pool =
             new_memory_pool(8192, (compact_f)NULLfunc);
 }
+
+/*
+
+=item C<void
+Parrot_destroy_memory_pools(Interp *interpreter)>
+
+Destroys the memory pools.
+
+=cut
+
+*/
 
 void
 Parrot_destroy_memory_pools(Interp *interpreter)
@@ -573,6 +734,21 @@ Parrot_destroy_memory_pools(Interp *interpreter)
     }
 }
 
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/resources.h>, F<src/memory.c>.
+
+=head1 HISTORY
+
+Initial version by Dan on 2001.10.2.
+
+=cut
+
+*/
 
 /*
  * Local variables:

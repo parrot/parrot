@@ -1,17 +1,20 @@
-/* pmc.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     The base vtable calling functions.
- *  Data Structure and Algorithms:
- *     See include/parrot/vtable.h.
- *  History:
- *     Initial version by Simon on 2001.10.20
- *  Notes:
- *  References:
- *     <5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/pmc.c - The base vtable calling functions
+
+=head1 DESCRIPTION
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 static PMC* get_new_pmc_header(Parrot_Interp, INTVAL base_type, int constant);
@@ -19,6 +22,17 @@ static PMC* get_new_pmc_header(Parrot_Interp, INTVAL base_type, int constant);
 #if PARROT_CATCH_NULL
 PMC * PMCNULL;
 Parrot_mutex init_null_mutex;
+
+/*
+
+=item C<PMC *
+pmc_init_null(struct Parrot_Interp * interpreter)>
+
+Initializes C<PMCNULL>, C<Null> PMC.
+
+=cut
+
+*/
 
 PMC *
 pmc_init_null(struct Parrot_Interp * interpreter)
@@ -35,13 +49,14 @@ pmc_init_null(struct Parrot_Interp * interpreter)
 
 /*
 
-=for api pmc pmc_new
+=item C<PMC *
+pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)>
 
-   Creates a new PMC of type C<base_type> (which is an index into
-   the list of PMC types declared in C<Parrot_base_vtables> in
-   F<pmc.h>). Once the PMC has been successfully created and
-   its vtable pointer initialized, we call its C<init> method to
-   perform any other necessary initialization.
+Creates a new PMC of type C<base_type> (which is an index into the list
+of PMC types declared in C<Parrot_base_vtables> in
+F<include/parrot/pmc.h>). Once the PMC has been successfully created and
+its vtable pointer initialized, we call its C<init> method to perform
+any other necessary initialization.
 
 =cut
 
@@ -54,6 +69,18 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
     VTABLE_init(interpreter, pmc);
     return pmc;
 }
+
+/*
+
+=item C<static PMC*
+get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
+    int constant)>
+
+Gets a new PMC header.
+
+=cut
+
+*/
 
 static PMC*
 get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
@@ -96,30 +123,34 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
     return pmc;
 }
 
+/*
+
+=item C<static void
+pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)>
+
+Add a new C<PMC_EXT> to C<*pmc>.
+
+=cut
+
+*/
+
 static void
 pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
 {
-    if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT) {
+    if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
         add_pmc_ext(interpreter, pmc);
-
-        if (pmc->vtable->flags & VTABLE_IS_SHARED_FLAG) {
-            PMC_sync(pmc) = mem_sys_allocate(sizeof(*pmc->synchronize));
-            PMC_sync(pmc)->owner = interpreter;
-            MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
-            PObj_is_PMC_shared_SET(pmc);
-        }
-    }
 }
 
 /*
 
-=for api pmc pmc_new_noinit
+=item C<PMC *
+pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)>
 
-   Creates a new PMC of type C<base_type> (which is an index into the
-   list of PMC types declared in C<Parrot_base_vtables> in
-   F<pmc.h>). Unlike C<pmc_new>, C<pmc_new_noinit> does not call its
-   C<init> method.  This allows separate allocation and initialization
-   for continuations.
+Creates a new PMC of type C<base_type> (which is an index into the list
+of PMC types declared in C<Parrot_base_vtables> in
+F<include/parrot/pmc.h>). Unlike C<pmc_new()>, C<pmc_new_noinit()> does
+not call its C<init> method.  This allows separate allocation and
+initialization for continuations.
 
 =cut
 
@@ -164,9 +195,10 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 
 /*
 
-=for api pmc constant_pmc_new_noinit
+=item C<PMC *
+constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)>
 
-   Creates a new constant PMC of type C<base_type>
+Creates a new constant PMC of type C<base_type>.
 
 =cut
 
@@ -182,9 +214,10 @@ constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 
 /*
 
-=for api pmc constant_pmc_new
+=item C<PMC *
+constant_pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)>
 
-   Creates a new constant PMC of type C<base_type>, the call C<init>.
+Creates a new constant PMC of type C<base_type>, the call C<init>.
 
 =cut
 
@@ -201,9 +234,10 @@ constant_pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
 
 /*
 
-=for api pmc pmc_new_init
+=item C<PMC *
+pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)>
 
-   As C<pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
+As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
 
 =cut
 
@@ -221,9 +255,11 @@ pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)
 
 /*
 
-=for api pmc constant_pmc_new_init
+=item C<PMC *
+constant_pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type,
+        PMC *init)>
 
-   As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
+As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 
 =cut
 
@@ -239,7 +275,16 @@ constant_pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type,
     return pmc;
 }
 
-/* This segment handles PMC registration and such */
+/*
+
+=item C<INTVAL
+pmc_register(Parrot_Interp interp, STRING *name)>
+
+This segment handles PMC registration and such.
+
+=cut
+
+*/
 
 INTVAL
 pmc_register(Parrot_Interp interp, STRING *name)
@@ -290,6 +335,17 @@ pmc_register(Parrot_Interp interp, STRING *name)
     return type;
 }
 
+/*
+
+=item C<INTVAL
+pmc_type(Parrot_Interp interp, STRING *name)>
+
+Returns the PMC type for C<name>.
+
+=cut
+
+*/
+
 INTVAL
 pmc_type(Parrot_Interp interp, STRING *name)
 {
@@ -305,9 +361,24 @@ pmc_type(Parrot_Interp interp, STRING *name)
 
 }
 
-/* This segment is made up of the 'fallback' functions -- the
-   functions we call if we have no clue as to how to do MMD for a
-   vtable function */
+/*
+
+=back
+
+=head2 MMD Fallback Functions
+
+=over 4
+
+=item C<void
+register_fallback_methods(Parrot_Interp interp)>
+
+Calls C<mmd_add_function()> for each MMD 'fallback' function. These are the
+functions that are called when we don't know how to do MMD for a
+vtable function.
+
+=cut
+
+*/
 
 void
 register_fallback_methods(Parrot_Interp interp) {
@@ -339,6 +410,18 @@ register_fallback_methods(Parrot_Interp interp) {
     mmd_add_function(interp, MMD_SAND, (funcptr_t)mmd_fallback_stringand_pmc);
 }
 
+/*
+
+=item C<void
+mmd_fallback_add_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets numbers from C<left> and C<right>, adds them and saves the result
+in C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_add_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
@@ -346,6 +429,19 @@ mmd_fallback_add_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                        VTABLE_get_number(interp, right));
     VTABLE_set_number_native(interp, dest, result);
 }
+
+/*
+
+=item C<void
+mmd_fallback_subtract_pmc(Parrot_Interp interp,
+        PMC *left, PMC *right, PMC *dest)>
+
+Gets numbers from C<left> and C<right>, does the subtraction and sets
+the result as a number in C<dest>.
+
+=cut
+
+*/
 
 void
 mmd_fallback_subtract_pmc(Parrot_Interp interp,
@@ -357,6 +453,19 @@ mmd_fallback_subtract_pmc(Parrot_Interp interp,
 
 }
 
+/*
+
+=item C<void
+mmd_fallback_multiply_pmc(Parrot_Interp interp,
+        PMC *left, PMC *right, PMC *dest)>
+
+Gets numbers from C<left> and C<right>, multiplies them and sets the
+result as a number in C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_multiply_pmc(Parrot_Interp interp,
         PMC *left, PMC *right, PMC *dest)
@@ -366,6 +475,18 @@ mmd_fallback_multiply_pmc(Parrot_Interp interp,
     VTABLE_set_number_native(interp, dest, result);
 }
 
+/*
+
+=item C<void
+mmd_fallback_divide_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets numbers from C<left> and C<right>, performs the division and sets
+the result as a number in C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_divide_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest) {
     FLOATVAL result = (VTABLE_get_number(interp, left) /
@@ -373,6 +494,18 @@ mmd_fallback_divide_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest) 
     VTABLE_set_number_native(interp, dest, result);
 
 }
+
+/*
+
+=item C<void
+mmd_fallback_cmod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets integers from C<left> and C<right>, performs a C C<mod> (C<%>) and
+sets the result as an integer in C<dest>.
+
+=cut
+
+*/
 
 void
 mmd_fallback_cmod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
@@ -382,6 +515,18 @@ mmd_fallback_cmod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                              VTABLE_get_integer(interp, right));
 }
 
+/*
+
+=item C<void
+mmd_fallback_mod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets numbers from C<left> and C<right>, performs a C<floatval_mod> and
+sets the result as a number in C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_mod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
@@ -389,6 +534,18 @@ mmd_fallback_mod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                                    VTABLE_get_number(interp, right));
     VTABLE_set_number_native(interp, dest, result);
 }
+
+/*
+
+=item C<void
+mmd_fallback_band_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets numbers from C<left> and C<right>, performs a binary C<and> and
+sets the result as an integer in C<dest>.
+
+=cut
+
+*/
 
 void
 mmd_fallback_band_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
@@ -398,6 +555,18 @@ mmd_fallback_band_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                               VTABLE_get_integer(interp, right));
 }
 
+/*
+
+=item C<void
+mmd_fallback_bor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets integers from C<left> and C<right>, performs a binary C<or> and
+sets the result as an integer in C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_bor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
@@ -405,6 +574,18 @@ mmd_fallback_bor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                               VTABLE_get_integer(interp, left) |
                               VTABLE_get_integer(interp, right));
 }
+
+/*
+
+=item C<void
+mmd_fallback_bxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets integers from C<left> and C<right>, performs a binary C<xor> and
+sets the result as an integer in C<dest>.
+
+=cut
+
+*/
 
 void
 mmd_fallback_bxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
@@ -414,6 +595,18 @@ mmd_fallback_bxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                               VTABLE_get_integer(interp, right));
 }
 
+/*
+
+=item C<void
+mmd_fallback_bsl_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets integers from C<left> and C<right>, performs a binary shift left
+(C<<<<<>>>) and sets the result as an integer in C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_bsl_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
@@ -422,6 +615,18 @@ mmd_fallback_bsl_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                               VTABLE_get_integer(interp, right));
 }
 
+/*
+
+=item C<void
+mmd_fallback_bsr_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets integers from C<left> and C<right>, performs a binary shift right
+(C<<<>>>>>) and sets the result as an integer in C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_bsr_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
@@ -429,6 +634,18 @@ mmd_fallback_bsr_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                               VTABLE_get_integer(interp, left) >>
                               VTABLE_get_integer(interp, right));
 }
+
+/*
+
+=item C<void
+mmd_fallback_concat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets strings from C<left> and C<right>, performs the concatenation and
+sets the result as an string in C<dest>.
+
+=cut
+
+*/
 
 void
 mmd_fallback_concat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
@@ -440,6 +657,18 @@ mmd_fallback_concat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
     VTABLE_set_string_native(interp, dest, total_string);
 
 }
+
+/*
+
+=item C<void
+mmd_fallback_land_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets boolean values from C<left> and C<right>, performs a logical C<and>
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
 
 void
 mmd_fallback_land_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
@@ -453,6 +682,18 @@ mmd_fallback_land_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
     VTABLE_set_pmc(interp, dest, truth);
 }
 
+/*
+
+=item C<void
+mmd_fallback_lor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets boolean values from C<left> and C<right>, performs a logical C<or>
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_lor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
@@ -464,6 +705,18 @@ mmd_fallback_lor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
     }
     VTABLE_set_pmc(interp, dest, truth);
 }
+
+/*
+
+=item C<void
+mmd_fallback_lxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets boolean values from C<left> and C<right>, performs a logical C<xor>
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
 
 void
 mmd_fallback_lxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
@@ -485,6 +738,19 @@ mmd_fallback_lxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
     VTABLE_set_pmc(interp, dest, true);
 }
 
+/*
+
+=item C<void
+mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+
+Gets a string from C<left> and an integer C<right>, repeats the string
+the specified number of times, and sets the result as an string in
+C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
@@ -498,6 +764,18 @@ mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                              string_repeat(interp, base, count, NULL));
 }
 
+/*
+
+=item C<INTVAL
+mmd_fallback_numeq_pmc(Parrot_Interp interp, PMC *left, PMC *right)>
+
+Gets numbers from C<left> and C<right>, performs a numeric equals
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
+
 INTVAL
 mmd_fallback_numeq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
@@ -508,6 +786,18 @@ mmd_fallback_numeq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
     }
 }
 
+/*
+
+=item C<INTVAL
+mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right)>
+
+Gets numbers from C<left> and C<right>, performs a string equals
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
+
 INTVAL
 mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
@@ -517,6 +807,18 @@ mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
         return 0;
     }
 }
+
+/*
+
+=item C<INTVAL
+mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)>
+
+Gets numbers from C<left> and C<right>, performs a numeric comparison
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
 
 INTVAL
 mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)
@@ -540,11 +842,36 @@ mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)
     return cmp_val;
 }
 
+/*
+
+=item C<INTVAL
+mmd_fallback_strcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)>
+
+Gets strings from C<left> and C<right>, performs a string comparison
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
+
 INTVAL
 mmd_fallback_strcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
     return string_compare(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right));
 }
+
+/*
+
+=item C<void
+mmd_fallback_stringor_pmc(Parrot_Interp interp, PMC *left, PMC *right, 
+                          PMC *dest)>
+
+Gets strings from C<left> and C<right>, performs a string bitwise C<or>
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
 
 void
 mmd_fallback_stringor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
@@ -553,12 +880,36 @@ mmd_fallback_stringor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest
                               string_bitwise_or(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right), NULL));
 }
 
+/*
+
+=item C<mmd_fallback_stringand_pmc(Parrot_Interp interp, PMC *left, 
+                                   PMC *right, PMC *dest)>
+
+Gets strings from C<left> and C<right>, performs a string bitwise C<and>
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
+
 void
 mmd_fallback_stringand_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_string_native(interp, dest,
                               string_bitwise_and(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right), NULL));
 }
+
+/*
+
+=item C<mmd_fallback_stringxor_pmc(Parrot_Interp interp, PMC *left, 
+                                   PMC *right, PMC *dest)>
+
+Gets strings from C<left> and C<right>, performs a string bitwise C<xor>
+and sets the result as an string in C<dest>.
+
+=cut
+
+*/
 
 void
 mmd_fallback_stringxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
@@ -567,7 +918,18 @@ mmd_fallback_stringxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *des
                               string_bitwise_xor(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right), NULL));
 }
 
+/*
 
+=item C<static size_t
+key_hash_int(Interp *interp, Hash *hash, void *value)>
+
+Simply returns C<value>. C<hash> is ignored.
+
+Used in C<dod_register_pmc()>.
+
+=cut
+
+*/
 
 static size_t
 key_hash_int(Interp *interp, Hash *hash, void *value)
@@ -577,15 +939,43 @@ key_hash_int(Interp *interp, Hash *hash, void *value)
     return (size_t) value;
 }
 
+/*
+
+=item C<static int
+int_compare(Parrot_Interp interp, void *a, void *b)>
+
+Returns whether C<a != b>.
+
+Used in C<dod_register_pmc()>.
+
+=cut
+
+*/
+
 static int
 int_compare(Parrot_Interp interp, void *a, void *b)
 {
     UNUSED(interp);
     return a != b;
 }
+
 /*
- * DOD registry interface
- */
+
+=back
+
+=head2 DOD registry interface
+
+=over 4
+
+=item C<void
+dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)>
+
+Registers the PMC with the interpreter's DOD registery.
+
+=cut
+
+*/
+
 void
 dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
 {
@@ -611,6 +1001,17 @@ dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
         hash_put(interpreter, hash, pmc, (void *) 1);
 }
 
+/*
+
+=item C<void
+dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)>
+
+Unregisters the PMC from the interpreter's DOD registery.
+
+=cut
+
+*/
+
 void
 dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)
 {
@@ -629,6 +1030,25 @@ dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)
             LVALUE_CAST(int, bucket->value) --;
     }
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/vtable.h>.
+
+<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
+(http://www.nntp.perl.org/group/perl.perl6.internals/5516).
+
+=head1 HISTORY
+
+Initial version by Simon on 2001.10.20.
+
+=cut
+
+*/
 
 /*
  * Local variables:

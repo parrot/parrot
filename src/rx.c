@@ -1,32 +1,23 @@
-/* rx.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Supporting file for the regular expression engine
- *  Data Structure and Algorithms:
- *     rxinfo is the main structure involved in regular expressions; it's
- *     stuffed into a Handle PMC and passed to all regular expression opcodes.
- *  History:
- *  Notes:
- *  References:
- */
-
 /*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
 
 =head1 NAME
 
-rx.c / rx.h
+src/rx.c - Supporting file for the regular expression engine
 
-=head1 SUMMARY
+=head1 DESCRIPTION
 
-rx.c and rx.h set up functions to be used by the regular expression engine.
-They also define internal helper functions that add a layer of
-abstraction to
-the rx_is_X family of functions.  Please also see C<rx.ops>, C<rx.dev>,
-C<rxstacks.c>, and C<rxstacks.h>.
+rx.c and rx.h set up functions to be used by the regular expression
+engine. They also define internal helper functions that add a layer of
+abstraction to the C<rx_is_X> family of functions.  Please also see
+C<rx.ops>, C<rx.dev>, C<rxstacks.c>, and C<rxstacks.h>.
 
-=head1 FUNCTIONS
+C<rxinfo> is the main structure involved in regular expressions; it's
+stuffed into a C<Handle> PMC and passed to all regular expression
+opcodes.
+
+=head2 Functions
 
 =over 4
 
@@ -49,18 +40,19 @@ const char *RX_NEWLINES = "\r\n";       /* XXX Unicode defines a few more. */
  *               Initial version by Brent Dax                *
  *************************************************************/
 
-
 /*
 
-=item B<rx_is_word_character>(struct Parrot_Interp *interpreter, INTVAL ch)
+=item C<INTVAL
+rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)>
 
-Checks to see if supplied char is a word character.  It uses the constant
-RX_WORDCHARS to create a bitmap.  Please see rx.dev for a detailed
-explanation of bitmap
+Checks to see if supplied char is a word character.  It uses the
+constant C<RX_WORDCHARS> to create a bitmap.  Please see
+F<docs/dev/rx.dev> for a detailed explanation of bitmap.
 
 =cut
 
 */
+
 INTVAL
 rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)
 {
@@ -75,16 +67,18 @@ rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)
 
 /*
 
-=item B<rx_is_number_character>(struct Parrot_Interp *interpreter, INTVAL ch)
+=item C<INTVAL
+rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch)>
 
-Checks to see if supplied character is a number character.  This function
-breaks abstraction to gain speed.  It's just a speed hack for now, it
-will change when it needs to be changed (for different language
-support/character encoding)
+Checks to see if supplied character is a number character.  This
+function breaks abstraction to gain speed.  It's just a speed hack for
+now, it will change when it needs to be changed (for different language
+support/character encoding).
 
 =cut
 
 */
+
 INTVAL
 rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch)
 {
@@ -100,13 +94,15 @@ rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch)
 
 /*
 
-=item B<rx_is_whitespace_character>(struct Parrot_Interp *interpreter, INTVAL ch)
+=item C<INTVAL
+rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch)>
 
 Checks to see if supplied character is a whitespace character.
 
 =cut
 
 */
+
 INTVAL
 rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch)
 {
@@ -121,13 +117,15 @@ rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch)
 
 /*
 
-=item B<rx_is_newline>(struct Parrot_Interp *interpreter, INTVAL ch)
+=item C<INTVAL
+rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch)>
 
 Checks to see if supplied character is a newline.
 
 =cut
 
 */
+
 INTVAL
 rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch)
 {
@@ -142,14 +140,16 @@ rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch)
 
 /*
 
-=item B<bitmap_make>(struct Parrot_Interp *interpreter, STRING *str)
+=item C<Bitmap
+bitmap_make(struct Parrot_Interp *interpreter, STRING *str)>
 
-Creates a bitmap from supplied string.  Please see rx.dev for more
-information on bitmaps.
+Creates a bitmap from supplied string.  Please see F<docs/dev/rx.dev>
+for more information on bitmaps.
 
 =cut
 
 */
+
 Bitmap
 bitmap_make(struct Parrot_Interp *interpreter, STRING *str)
 {
@@ -181,13 +181,15 @@ bitmap_make(struct Parrot_Interp *interpreter, STRING *str)
 
 /*
 
-=item B<bitmap_make_cstr>(struct Parrot_Interp *interpreter, const char *str)
+=item C<Bitmap
+bitmap_make_cstr(struct Parrot_Interp *interpreter, const char *str)>
 
-Same as bitmap_make, except passed a const char* arg.
+Same as C<bitmap_make()>, except passed a C<const char*> arg.
 
 =cut
 
 */
+
 Bitmap
 bitmap_make_cstr(struct Parrot_Interp *interpreter, const char *str)
 {
@@ -211,13 +213,15 @@ bitmap_make_cstr(struct Parrot_Interp *interpreter, const char *str)
 
 /*
 
-=item B<bitmap_add>(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch)
+=item C<void
+bitmap_add(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch)>
 
 Appends supplied character to supplied bitmap.
 
 =cut
 
 */
+
 void
 bitmap_add(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch)
 {
@@ -234,13 +238,15 @@ bitmap_add(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch)
 
 /*
 
-=item B<bitmap_match>(Bitmap bmp, INTVAL ch)
+=item C<INTVAL
+bitmap_match(Bitmap bmp, INTVAL ch)>
 
 Checks if supplied character is in supplied bitmap.
 
 =cut
 
 */
+
 INTVAL
 bitmap_match(Bitmap bmp, INTVAL ch)
 {
@@ -261,13 +267,15 @@ bitmap_match(Bitmap bmp, INTVAL ch)
 
 /*
 
-=item B<bitmap_destroy>(Bitmap bmp)
+=item C<void
+bitmap_destroy(Bitmap bmp)>
 
 Frees up memory the bitmap allocated.
 
 =cut
 
 */
+
 void
 bitmap_destroy(Bitmap bmp)
 {
@@ -281,6 +289,12 @@ bitmap_destroy(Bitmap bmp)
 /*
 
 =back
+
+=head1 SEE ALSO
+
+
+F<include/parrot/rx.h>, F<src/rxstacks.c>, F<include/parrot/rxstacks.h>,
+F<docs/dev/rx.dev>.
 
 =cut
 

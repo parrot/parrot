@@ -1,16 +1,22 @@
-/* resources.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Handles the accessing of small object pools (header pools)
- *  Data Structure and Algorithms:
- *
- *  History:
- *     Initial version by Mike Lambert on 2002.05.27
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/resources.c - Handling Small Object Pools 
+
+=head1 DESCRIPTION
+
+Handles the accessing of small object pools (header pools).
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
@@ -22,6 +28,18 @@
 #define UNITS_PER_ALLOC_GROWTH_FACTOR 1.75
 
 #define POOL_MAX_BYTES 65536*128
+
+/*
+
+=item C<INTVAL
+contained_in_pool(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool, void *ptr)>
+
+Returns whether C<pool> contains C<*ptr>.
+
+=cut
+
+*/
 
 INTVAL
 contained_in_pool(struct Parrot_Interp *interpreter,
@@ -40,6 +58,17 @@ contained_in_pool(struct Parrot_Interp *interpreter,
     }
     return 0;
 }
+
+/*
+
+=item C<int
+Parrot_is_const_pmc(Parrot_Interp interpreter, PMC *pmc)>
+
+Returns whether C<*pmc> is a constant PMC.
+
+=cut
+
+*/
 
 int
 Parrot_is_const_pmc(Parrot_Interp interpreter, PMC *pmc)
@@ -60,7 +89,18 @@ Parrot_is_const_pmc(Parrot_Interp interpreter, PMC *pmc)
 
 static int find_free_list(struct Small_Object_Pool *pool);
 
-/* We're out of traceable objects. Try a DOD, then get some more if needed */
+/*
+
+=item C<void
+more_traceable_objects(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool)>
+
+We're out of traceable objects. Try a DOD, then get some more if needed.
+
+=cut
+
+*/
+
 void
 more_traceable_objects(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
@@ -86,7 +126,18 @@ more_traceable_objects(struct Parrot_Interp *interpreter,
 #endif
 }
 
-/* We're out of non-traceable objects. Get some more */
+/*
+
+=item C<void
+more_non_traceable_objects(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool)>
+
+We're out of non-traceable objects. Get some more.
+
+=cut
+
+*/
+
 void
 more_non_traceable_objects(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
@@ -95,6 +146,17 @@ more_non_traceable_objects(struct Parrot_Interp *interpreter,
 }
 
 #if  ARENA_DOD_FLAGS
+/*
+
+=item C<static int
+find_free_list(struct Small_Object_Pool *pool)>
+
+Returns whether a free list can be found in C<*pool>.
+
+=cut
+
+*/
+
 static int
 find_free_list(struct Small_Object_Pool *pool)
 {
@@ -109,6 +171,18 @@ find_free_list(struct Small_Object_Pool *pool)
     return 0;
 }
 
+/*
+
+=item C<void
+add_free_object(struct Parrot_Interp *interpreter,
+        struct Small_Object_Arena *arena, void *to_add)>
+
+Add an unused object back to the free pool for later reuse.
+
+=cut
+
+*/
+
 void
 add_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Arena *arena, void *to_add)
@@ -117,7 +191,19 @@ add_free_object(struct Parrot_Interp *interpreter,
     arena->free_list = to_add;
 }
 
-/* Get a new object from the free pool and return it */
+/*  */
+/*
+
+=item C<void *
+get_free_object(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool)>
+
+Get a new object from the free pool and return it.
+
+=cut
+
+*/
+
 void *
 get_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
@@ -147,7 +233,13 @@ get_free_object(struct Parrot_Interp *interpreter,
 }
 
 #else
-/* Add an unused object back to the free pool for later reuse */
+
+/*
+
+Add an unused object back to the free pool for later reuse.
+
+*/
+
 void
 add_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool, void *to_add)
@@ -157,7 +249,12 @@ add_free_object(struct Parrot_Interp *interpreter,
     pool->free_list = to_add;
 }
 
-/* Get a new object from the free pool and return it */
+/*
+
+Get a new object from the free pool and return it.
+
+*/
+
 void *
 get_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
@@ -178,6 +275,20 @@ get_free_object(struct Parrot_Interp *interpreter,
 }
 #endif
 
+/*
+
+=item C<static void
+add_to_free_list(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool,
+        struct Small_Object_Arena *arena,
+        UINTVAL start,
+        UINTVAL end)>
+
+Adds the memory between C<start> and C<end> to the free list.
+
+=cut
+
+*/
 
 static void
 add_to_free_list(struct Parrot_Interp *interpreter,
@@ -221,8 +332,19 @@ add_to_free_list(struct Parrot_Interp *interpreter,
 #endif
 }
 
-/* We have no more headers on the free header pool. Go allocate more
- * and put them on */
+/*
+
+=item C<void
+alloc_objects(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool)>
+
+We have no more headers on the free header pool. Go allocate more
+and put them on.
+
+=cut
+
+*/
+
 void
 alloc_objects(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
@@ -347,6 +469,18 @@ alloc_objects(struct Parrot_Interp *interpreter,
 #endif
 }
 
+/*
+
+=item C<struct Small_Object_Pool *
+new_small_object_pool(struct Parrot_Interp *interpreter,
+        size_t object_size, size_t objects_per_alloc)>
+
+Creates a new C<Small_Object_Pool> and returns a pointer to it.
+
+=cut
+
+*/
+
 struct Small_Object_Pool *
 new_small_object_pool(struct Parrot_Interp *interpreter,
         size_t object_size, size_t objects_per_alloc)
@@ -364,6 +498,18 @@ new_small_object_pool(struct Parrot_Interp *interpreter,
     pool->alloc_objects = alloc_objects;
     return pool;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/smallobject.h>, F<docs/memory_internals.pod>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

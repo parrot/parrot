@@ -1,18 +1,37 @@
-/* rxstacks.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Regex stack handling routines for Parrot
- *  Data Structure and Algorithms:
- *     Same as regular stacks, except they store only INTVALs and don't have
- *     cleanup routines.
- *  History:
- *  Notes:
- * References: */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/rxstacks.c - Regex stack handling routines for Parrot
+
+=head1 DESCRIPTION
+
+Same as regular stacks, except they store only C<INTVAL> values and
+don't have cleanup routines.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/rxstacks.h"
+
+/*
+
+=item C<IntStack
+intstack_new(struct Parrot_Interp *interpreter)>
+
+Creates and returns a new stack.
+
+=cut
+
+*/
 
 IntStack
 intstack_new(struct Parrot_Interp *interpreter)
@@ -23,6 +42,17 @@ intstack_new(struct Parrot_Interp *interpreter)
     stack->prev = stack;
     return stack;
 }
+
+/*
+
+=item C<INTVAL
+intstack_depth(struct Parrot_Interp *interpreter, IntStack stack)>
+
+Returns the depth of the stack.
+
+=cut
+
+*/
 
 INTVAL
 intstack_depth(struct Parrot_Interp *interpreter, IntStack stack)
@@ -35,6 +65,17 @@ intstack_depth(struct Parrot_Interp *interpreter, IntStack stack)
 
     return depth;
 }
+
+/*
+
+=item C<void
+intstack_push(struct Parrot_Interp *interpreter, IntStack stack, INTVAL data)>
+
+Pushes C<data> onto the stack.
+
+=cut
+
+*/
 
 void
 intstack_push(struct Parrot_Interp *interpreter, IntStack stack, INTVAL data)
@@ -62,6 +103,17 @@ intstack_push(struct Parrot_Interp *interpreter, IntStack stack, INTVAL data)
         }
     }
 }
+
+/*
+
+=item C<INTVAL
+intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)>
+
+Pops the top value off the stack and returns it.
+
+=cut
+
+*/
 
 INTVAL
 intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)
@@ -101,6 +153,16 @@ intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)
     return entry->value;
 }
 
+/*
+
+=item C<void
+intstack_free(struct Parrot_Interp *interpreter, IntStack stack)>
+
+Frees all the memory used by the stack.
+
+=cut
+
+*/
 
 void
 intstack_free(struct Parrot_Interp *interpreter, IntStack stack)
@@ -114,6 +176,38 @@ intstack_free(struct Parrot_Interp *interpreter, IntStack stack)
 
     mem_sys_free(stack);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/rx.c>, F<include/parrot/rx.h>, F<src/rxstacks.c>,
+include/parrot/rxstacks.h>.
+
+=head1 HISTORY
+
+You'll note that F<src/intlist.c> and F<src/rxstacks.c> both claim to do
+the stack handling. Steve Fink explains why:
+
+I<The integer stack is fairly useless for a complete regex engine. It
+prevents reentrancy and complicates some of the trickier things that
+need to be done in regexes. We can drop it anytime, and instead use an
+integer-only array PMC instead. (Such a PMC exists and is called
+"intlist.pmc", and uses the same stack engine as the control, user,
+and pad stacks.)>
+
+I<I would remove the rxstack, but I didn't want to break the closest
+thing we have to a regex engine until I or someone else managed to
+release a different working implementation. The particular technique
+of using a single stack tied directly the interpreter is an
+evolutionary dead end, however. Good for a proof of concept, but
+that's it.>
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,35 +1,35 @@
-/* pmc_freeze.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Freeze and thaw functionality
- *  Data Structure and Algorithms:
- *     Freeze uses the next_for_GC pointer to remeber seen PMCs.
- *     PMCs are written as IDs (or tags), which are calculated
- *     from their arena address. This PMC number is multiplied
- *     by four. The 2 lo bits indicate a seen PMC or a PMC of the
- *     same type as the previous one respectively.
- *
- *     Thawing PMCs uses a list with (maximum) size of the
- *     amount of PMCs to keep track of retrieved PMCs.
- *
- *     The individual information of PMCs is frozen/thawed by their
- *     vtables.
- *
- *     To avoid recursion, the whole functionality is driven by
- *     pmc->vtable->visit, which is called for the first PMC initially.
- *     Container PMCs call a "todo-callback" for all contained PMCs.
- *     The individual action vtable (freeze/thaw) is then called for
- *     all todo-PMCs.
- *
- *  History:
- *     Initial version by leo 2003.11.03 - 2003.11.07
- *  Notes:
- *     The seen-hash version for freezing might go away sometimes.
- *  References:
- *     Lot of discussion on p6i and docs/dev/pmc_freeze.pod.
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/pmc_freeze.c - Freeze and thaw functionality
+
+=head1 DESCRIPTION
+
+Freeze uses the C<next_for_GC pointer()> to remember seen PMCs. PMCs are
+written as IDs (or tags), which are calculated from their arena address.
+This PMC number is multiplied by four. The 2 low bits indicate a seen
+PMC or a PMC of the same type as the previous one respectively.
+
+Thawing PMCs uses a list with (maximum) size of the amount of PMCs to
+keep track of retrieved PMCs.
+
+The individual information of PMCs is frozen/thawed by their vtables.
+
+To avoid recursion, the whole functionality is driven by
+C<<pmc->vtable->visit>>, which is called for the first PMC initially.
+Container PMCs call a "todo-callback" for all contained PMCs. The
+individual action vtable (freeze/thaw) is then called for all todo-PMCs.
+
+In the current implementation C<IMAGE_IO> is a stand-in for some kind of
+serializer PMC which will eventually be written. It associates a Parrot
+C<STRING> with a vtable.
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
@@ -60,14 +60,25 @@
 #endif
 
 /*
- * image stream functions
- */
 
-/*
- * plain ascii - for testing only:
- * for speed reasons we mess around with the string buffers directly
- * no encoding of strings, no transcoding
- */
+=head2 Image Stream Functions
+
+=over 4
+
+=item C<static void
+str_append(Parrot_Interp interpreter, STRING *s, const void *b, size_t len)>
+
+Appends C<len> bytes from buffer C<*b> to string C<*s>.
+ 
+Plain ascii - for testing only:
+ 
+For speed reasons we mess around with the string buffers directly.
+ 
+No encoding of strings, no transcoding.
+
+=cut
+
+*/
 
 static void
 str_append(Parrot_Interp interpreter, STRING *s, const void *b, size_t len)
@@ -89,6 +100,18 @@ str_append(Parrot_Interp interpreter, STRING *s, const void *b, size_t len)
     s->strlen += len;
 }
 
+/*
+
+=item C<static void
+push_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io, INTVAL v)>
+
+Pushes an ASCII version of the integer C<v> onto the end of the C<*io>
+"stream".
+
+=cut
+
+*/
+
 static void
 push_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io, INTVAL v)
 {
@@ -96,6 +119,18 @@ push_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io, INTVAL v)
     sprintf(buffer, "%d ", (int) v);
     str_append(interpreter, io->image, buffer, strlen(buffer));
 }
+
+/*
+
+=item C<static void
+push_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)>
+
+Pushes an ASCII version of the number C<v> onto the end of the C<*io>
+"stream".
+
+=cut
+
+*/
 
 static void
 push_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)
@@ -106,15 +141,39 @@ push_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)
 }
 
 /*
- * for testing only - no encodings and such
- * XXX no string delimiters - so no space allowed
- */
+
+=item C<static void
+push_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING *s)>
+
+Pushes an ASCII version of the string C<*s> onto the end of the C<*io>
+"stream".
+
+For testing only - no encodings and such.
+
+XXX no string delimiters - so no space allowed.
+
+=cut
+
+*/
+
 static void
 push_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING *s)
 {
     str_append(interpreter, io->image, s->strstart, s->bufused);
     str_append(interpreter, io->image, " ", 1);
 }
+
+/*
+
+=item C<static void
+push_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io, PMC* v)>
+
+Pushes an ASCII version of the PMC C<*v> onto the end of the C<*io>
+"stream".
+
+=cut
+
+*/
 
 static void
 push_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io, PMC* v)
@@ -123,6 +182,17 @@ push_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io, PMC* v)
     sprintf(buffer, "%p ", v);
     str_append(interpreter, io->image, buffer, strlen(buffer));
 }
+
+/*
+
+=item C<static INTVAL
+shift_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io)>
+
+Removes and returns an integer from the start of the C<*io> "stream".
+
+=cut
+
+*/
 
 static INTVAL
 shift_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io)
@@ -140,6 +210,17 @@ shift_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io)
     return i;
 }
 
+/*
+
+=item C<static FLOATVAL
+shift_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io)>
+
+Removes and returns an number from the start of the C<*io> "stream".
+
+=cut
+
+*/
+
 static FLOATVAL
 shift_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io)
 {
@@ -155,6 +236,17 @@ shift_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io)
     assert((int)io->image->bufused >= 0);
     return f;
 }
+
+/*
+
+=item C<static STRING*
+shift_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io)>
+
+Removes and returns an string from the start of the C<*io> "stream".
+
+=cut
+
+*/
 
 static STRING*
 shift_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io)
@@ -174,6 +266,17 @@ shift_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io)
     return s;
 }
 
+/*
+
+=item C<static PMC*
+shift_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io)>
+
+Removes and returns a PMC from the start of the C<*io> "stream".
+
+=cut
+
+*/
+
 static PMC*
 shift_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
 {
@@ -191,8 +294,22 @@ shift_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
 }
 
 /*
- * opcode_t io functions
- */
+
+=back
+
+=head2 C<opcode_t> IO Functions
+
+=over 4
+
+=item C<static PARROT_INLINE void
+op_check_size(Parrot_Interp interpreter, STRING *s, size_t len)>
+
+Checks the size of the "stream" buffer to see if it can accomodate
+C<len> more bytes. If not then the buffer is expanded.
+
+=cut
+
+*/
 
 static PARROT_INLINE void
 op_check_size(Parrot_Interp interpreter, STRING *s, size_t len)
@@ -211,6 +328,17 @@ op_check_size(Parrot_Interp interpreter, STRING *s, size_t len)
     }
 }
 
+/*
+
+=item C<static void
+op_append(Parrot_Interp interpreter, STRING *s, opcode_t b, size_t len)>
+
+Appends the opcode C<b> to the string C<*s>.
+
+=cut
+
+*/
+
 static void
 op_append(Parrot_Interp interpreter, STRING *s, opcode_t b, size_t len)
 {
@@ -220,16 +348,36 @@ op_append(Parrot_Interp interpreter, STRING *s, opcode_t b, size_t len)
     s->strlen += len;
 }
 
-
 /*
- * XXX assumes sizeof(opcode_t) == sizeof(INTVAL)
- */
+
+=item C<static void
+push_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io, INTVAL v)>
+
+Pushes the integer C<v> onto the end of the C<*io> "stream".
+
+XXX assumes sizeof(opcode_t) == sizeof(INTVAL).
+
+=cut
+
+*/
+
 static void
 push_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io, INTVAL v)
 {
     assert(sizeof(opcode_t) == sizeof(INTVAL));
     op_append(interpreter, io->image, (opcode_t)v, sizeof(opcode_t));
 }
+
+/*
+
+=item C<static void
+push_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)>
+
+Pushes the number C<v> onto the end of the C<*io> "stream".
+
+=cut
+
+*/
 
 static void
 push_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)
@@ -244,6 +392,17 @@ push_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)
     s->strlen += len;
 }
 
+/*
+
+=item C<static void
+push_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING* v)>
+
+Pushes the string C<*v> onto the end of the C<*io> "stream".
+
+=cut
+
+*/
+
 static void
 push_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING* v)
 {
@@ -257,6 +416,17 @@ push_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING* v)
     s->strlen += len;
 }
 
+/*
+
+=item C<static void
+push_opcode_pmc(Parrot_Interp interpreter, IMAGE_IO *io, PMC* v)>
+
+Pushes the PMC C<*v> onto the end of the C<*io> "stream".
+
+=cut
+
+*/
+
 static void
 push_opcode_pmc(Parrot_Interp interpreter, IMAGE_IO *io, PMC* v)
 {
@@ -264,9 +434,19 @@ push_opcode_pmc(Parrot_Interp interpreter, IMAGE_IO *io, PMC* v)
 }
 
 /*
- * the shift functions aren't portable yet
- * we need to have a packfile header for wordsize and endianess
- */
+
+=item C<static INTVAL
+shift_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io)>
+
+Removes and returns an integer from the start of the C<*io> "stream".
+
+TODO - The shift functions aren't portable yet. We need to have a
+packfile header for wordsize and endianess.
+
+=cut
+
+*/
+
 static INTVAL
 shift_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io)
 {
@@ -279,13 +459,34 @@ shift_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io)
 }
 
 /*
- * shift_pmc actually reads a PMC id, not a PMC
- */
+
+=item C<static PMC*
+shift_opcode_pmc(Parrot_Interp interpreter, IMAGE_IO *io)>
+
+Removes and returns an PMC from the start of the C<*io> "stream".
+
+Note that this actually reads a PMC id, not a PMC.
+
+=cut
+
+*/
+
 static PMC*
 shift_opcode_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
 {
     return (PMC*) shift_opcode_integer(interpreter, io);
 }
+
+/*
+
+=item C<tatic FLOATVAL
+shift_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io)>
+
+Removes and returns an number from the start of the C<*io> "stream".
+
+=cut
+
+*/
 
 static FLOATVAL
 shift_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io)
@@ -298,6 +499,17 @@ shift_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io)
     return f;
 }
 
+/*
+
+=item C<static STRING*
+shift_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io)>
+
+Removes and returns a string from the start of the C<*io> "stream".
+
+=cut
+
+*/
+
 static STRING*
 shift_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io)
 {
@@ -309,13 +521,22 @@ shift_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io)
     assert((int)io->image->bufused >= 0);
     return s;
 }
-/*
- * helper functions
- */
 
 /*
- * custom key_hash and compare functions
- */
+
+=back
+
+=head2 Helper Functions
+
+=over 4
+
+=item C<static size_t
+key_hash_int(Interp *interp, Hash *hash, void *value)>
+
+=cut
+
+*/
+
 static size_t
 key_hash_int(Interp *interp, Hash *hash, void *value)
 {
@@ -324,12 +545,34 @@ key_hash_int(Interp *interp, Hash *hash, void *value)
     return (size_t) value;
 }
 
+/*
+
+=item C<static int
+int_compare(Parrot_Interp interp, void *a, void *b)>
+
+Custom C<key_hash> and C<compare> functions.
+
+=cut
+
+*/
+
 static int
 int_compare(Parrot_Interp interp, void *a, void *b)
 {
     UNUSED(interp);
     return a != b;
 }
+
+/*
+
+=item C<static void
+pmc_add_ext(Parrot_Interp interpreter, PMC *pmc)>
+
+Adds a C<PMC_EXT> to C<*pmc>.
+
+=cut
+
+*/
 
 static void
 pmc_add_ext(Parrot_Interp interpreter, PMC *pmc)
@@ -339,8 +582,17 @@ pmc_add_ext(Parrot_Interp interpreter, PMC *pmc)
 }
 
 /*
- * set all next_for_GC pointers to NULL
- */
+
+=item C<static void
+cleanup_next_for_GC_pool(Parrot_Interp interpreter,
+    struct Small_Object_Pool *pool)>
+
+Sets all the C<next_for_GC> pointers to C<NULL>.
+
+=cut
+
+*/
+
 static void
 cleanup_next_for_GC_pool(Parrot_Interp interpreter,
     struct Small_Object_Pool *pool)
@@ -358,6 +610,17 @@ cleanup_next_for_GC_pool(Parrot_Interp interpreter,
         }
     }
 }
+
+/*
+
+=item C<static void
+cleanup_next_for_GC(Parrot_Interp interpreter)>
+
+Cleans up the C<next_for_GC> pointers.
+
+=cut
+
+*/
 
 static void
 cleanup_next_for_GC(Parrot_Interp interpreter)
@@ -396,6 +659,17 @@ static image_funcs opcode_funcs = {
 };
 static IMAGE_IO io_init;
 
+/*
+
+=item C<static void
+ft_init(Parrot_Interp interpreter, visit_info *info)>
+
+Initializes the freeze/thaw subsystem.
+
+=cut
+
+*/
+
 static void
 ft_init(Parrot_Interp interpreter, visit_info *info)
 {
@@ -415,6 +689,17 @@ ft_init(Parrot_Interp interpreter, visit_info *info)
 static void visit_todo_list(Parrot_Interp, PMC*, visit_info* info);
 static void add_pmc_todo_list(Parrot_Interp, PMC*, visit_info* info);
 
+/*
+
+=item C<static void
+todo_list_init(Parrot_Interp interpreter, visit_info *info)>
+
+Initializes the C<*info> lists.
+
+=cut
+
+*/
+
 static void
 todo_list_init(Parrot_Interp interpreter, visit_info *info)
 {
@@ -433,15 +718,15 @@ todo_list_init(Parrot_Interp interpreter, visit_info *info)
 }
 
 /*
- * freeze, thaw a PMC (id)
- *
- * the ASCII representation of the PerlArray
- *   P0 = [P1=666, P2=777, P0]
- * may look like this:
- *   0xdf4 30 3 0xdf8 33 666 0xdf2 777 0xdf5
- * (30 = class_enum_PerlArray, 33 = class_enum_PerlInt, the type of
- * the second PerlInt is suppressed, the repeated P0 has bit 0 set)
- */
+
+=item C<PARROT_INLINE static void
+freeze_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
+        int seen, UINTVAL id)>
+
+=cut
+
+*/
+
 PARROT_INLINE static void
 freeze_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         int seen, UINTVAL id)
@@ -474,6 +759,30 @@ freeze_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
     }
 }
 
+/*
+
+=item C<PARROT_INLINE static int
+thaw_pmc(Parrot_Interp interpreter, visit_info *info,
+        UINTVAL *id, INTVAL *type)>
+
+Freeze and thaw a PMC (id).
+
+For example, the ASCII representation of the C<PerlArray>
+
+P0 = [P1=666, P2=777, P0]
+
+may look like this:
+
+0xdf4 30 3 0xdf8 33 666 0xdf2 777 0xdf5
+
+where 30 is C<class_enum_PerlArray>, 33 is C<class_enum_PerlInt>, the
+type of the second C<PerlInt> is suppressed, the repeated P0 has bit 0
+set.
+
+=cut
+
+*/
+
 PARROT_INLINE static int
 thaw_pmc(Parrot_Interp interpreter, visit_info *info,
         UINTVAL *id, INTVAL *type)
@@ -504,10 +813,20 @@ thaw_pmc(Parrot_Interp interpreter, visit_info *info,
 }
 
 /*
- * visit/thaw common action functions:
- * - freeze PMC
- * -
- */
+
+=item C<PARROT_INLINE static void
+do_action(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
+        int seen, UINTVAL id)>
+
+Called from C<visit_next_for_GC()> and C<visit_todo_list()> to perform
+the action specified in C<<info->what>.
+
+Currently only C<VISIT_FREEZE_NORMAL> is implemented.
+
+=cut
+
+*/
+
 PARROT_INLINE static void
 do_action(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         int seen, UINTVAL id)
@@ -524,6 +843,18 @@ do_action(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
             break;
     }
 }
+
+/*
+
+=item C<PARROT_INLINE static PMC*
+thaw_create_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
+        INTVAL type)>
+
+Called from C<do_thaw()> to attach the vtable etc. to C<*pmc>.
+
+=cut
+
+*/
 
 PARROT_INLINE static PMC*
 thaw_create_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
@@ -550,6 +881,19 @@ thaw_create_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
     }
     return pmc;
 }
+
+/*
+
+=item C<PARROT_INLINE static PMC*
+do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)>
+
+Called by C<visit_todo_list_thaw()> to thaw and return a PMC.
+
+C<seen> is false if this is the first time the PMC has been encountered.
+
+=cut
+
+*/
 
 PARROT_INLINE static PMC*
 do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
@@ -613,12 +957,21 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
     return pmc;
 }
 
-/*
- * create a unique id (tag) for a PMC - this is the object number in
- * the PMCs arena(s) shifted left by 2
- * start at 1<<2, 0 is a NULLPMC
- */
 #if ARENA_DOD_FLAGS
+
+/*
+
+=item C<static UINTVAL
+id_from_pmc(Parrot_Interp interpreter, PMC* pmc)>
+
+Creates and returns a unique id (tag) for a PMC. This is the object
+number in the PMCs arena(s) shifted left by 2. Starts at C<1<<2>. 0 is a
+C<NULLPMC>.
+
+=cut
+
+*/
+
 static UINTVAL
 id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
 {
@@ -647,7 +1000,9 @@ id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
     internal_exception(1, "Couldn't find PMC in arenas");
     return -1;
 }
+
 #else
+
 static UINTVAL
 id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
 {
@@ -682,11 +1037,20 @@ id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
     internal_exception(1, "Couldn't find PMC in arenas");
     return -1;
 }
+
 #endif
 
 /*
- * remember pmc for later processing
- */
+
+=item C<static void
+add_pmc_next_for_GC(Parrot_Interp interpreter, PMC *pmc, visit_info *info)>
+
+Remembers the PMC for later processing.
+
+=cut
+
+*/
+
 static void
 add_pmc_next_for_GC(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
 {
@@ -697,11 +1061,20 @@ add_pmc_next_for_GC(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
 }
 
 /*
- * remember next child to visit via the next_for_GC pointer
- *   generate a unique ID per PMC and freeze the ID (not the PMC addr)
- *   so thaw the hash-lookup can be replaced by an array lookup then
- *   which is a lot faster
- */
+
+=item C<PARROT_INLINE static int
+next_for_GC_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
+        UINTVAL *id)>
+
+Remembers next child to visit via the C<next_for_GC pointer> generate a
+unique ID per PMC and freeze the ID (not the PMC address) so thaw the
+hash-lookup can be replaced by an array lookup then which is a lot
+faster.
+
+=cut
+
+*/
+
 PARROT_INLINE static int
 next_for_GC_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         UINTVAL *id)
@@ -733,18 +1106,36 @@ skip:
 }
 
 /*
- * remember pmc to be processed later
- */
+
+=item C<static void
+add_pmc_todo_list(Parrot_Interp interpreter, PMC *pmc, visit_info *info)>
+
+Remembers the PMC to be processed later.
+
+=cut
+
+*/
+
 static void
 add_pmc_todo_list(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
 {
     list_push(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
 }
+
 /*
- * return true if PMC was seen, else put it on the todo list
- * generate ID (tag) for PMC, offset by 4 as are addresses, lo bits
- * are flags
- */
+
+=item C<PARROT_INLINE static int
+todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
+        UINTVAL *id)>
+
+Returns true if the PMC was seen, otherwise it put it on the todo list,
+generates an ID (tag) for PMC, offset by 4 as are addresses, low bits
+are flags.
+
+=cut
+
+*/
+
 PARROT_INLINE static int
 todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         UINTVAL *id)
@@ -766,10 +1157,18 @@ todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
 }
 
 /*
- * visit_child callbacks:
- * check if PMC was seen, generate ID for it
- * then do the appropriate action
- */
+
+=item C<tatic void
+visit_next_for_GC(Parrot_Interp interpreter, PMC* pmc, visit_info* info)>
+
+C<visit_child> callbacks:
+
+Checks if the PMC was seen, generate an ID for it if not, then do the
+appropriate action.
+
+=cut
+
+*/
 
 static void
 visit_next_for_GC(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
@@ -788,8 +1187,16 @@ visit_next_for_GC(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
 }
 
 /*
- * check seen via the todo list
- */
+
+=item C<static void
+visit_todo_list(Parrot_Interp interpreter, PMC* pmc, visit_info* info)>
+
+Chescks the seen PMC via the todo list.
+
+=cut
+
+*/
+
 static void
 visit_todo_list(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
 {
@@ -801,9 +1208,18 @@ visit_todo_list(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
 }
 
 /*
- * callback for thaw - action first, todo-list and seen handling
- * is all in do_thaw
- */
+
+=item C<static void
+visit_todo_list_thaw(Parrot_Interp interpreter, PMC* old, visit_info* info)>
+
+Callback for thaw - action first.
+
+Todo-list and seen handling is all in C<do_thaw()>.
+
+=cut
+
+*/
+
 static void
 visit_todo_list_thaw(Parrot_Interp interpreter, PMC* old, visit_info* info)
 {
@@ -814,10 +1230,17 @@ visit_todo_list_thaw(Parrot_Interp interpreter, PMC* old, visit_info* info)
 }
 
 /*
- * work loops:
- * put first item on todo list
- * run as long as there are itens to be done
- */
+
+=item C<static void
+visit_loop_next_for_GC(Parrot_Interp interpreter, PMC *current,
+        visit_info *info)>
+
+Put first item on todo list, then run as long as there are items to be
+done.
+
+=cut
+
+*/
 
 static void
 visit_loop_next_for_GC(Parrot_Interp interpreter, PMC *current,
@@ -833,6 +1256,18 @@ visit_loop_next_for_GC(Parrot_Interp interpreter, PMC *current,
         }
     }
 }
+
+/*
+
+=item C<static PMC*
+visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
+        visit_info *info)>
+
+The thaw loop.
+
+=cut
+
+*/
 
 static PMC*
 visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
@@ -884,8 +1319,16 @@ again:
 }
 
 /*
- * allocate image to some estimated size
- */
+
+=item C<static void
+create_image(Parrot_Interp interpreter, PMC *pmc, visit_info *info)>
+
+Allocate image to some estimated size.
+
+=cut
+
+*/
+
 static void
 create_image(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
 {
@@ -905,18 +1348,25 @@ create_image(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
 }
 
 /*
- * run_thaw - helper func
- *
- * thaw could use the next_for_GC pointers as todo-list too,
- * but this would need 2 runs through the arenas to clean the
- * next_for_GC pointers.
- * For now it seems cheaper to use a list for remembering contained
- * aggregates. We could of course decide dynamically, which strategy
- * to use, e.g.: given a big image, the first thawed item is a small
- * aggregate. This implies, it probably contains[1] more nested containers,
- * for which the next_for_GC approach could be a win.
- * [1] or some big strings :)
- */
+
+=item C<static PMC*
+run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)>
+
+Performs thawing. C<what> indicates what to be thawed.
+
+Thaw could use the C<next_for_GC> pointers as todo-list too, but this
+would need 2 runs through the arenas to clean the C<next_for_GC>
+pointers.
+
+For now it seems cheaper to use a list for remembering contained
+aggregates. We could of course decide dynamically, which strategy to
+use, e.g.: given a big image, the first thawed item is a small
+aggregate. This implies, it probably contains (or some big strings) more
+nested containers, for which the C<next_for_GC> approach could be a win.
+
+=cut
+
+*/
 
 static PMC*
 run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
@@ -968,16 +1418,26 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
     }
     return n;
 }
-/*
- * public interface
- */
 
 /*
- * freeze_at_destruct must not consume any resources
- * (except the image itself)
- * It uses the next_for_GC pointer, so its not reentrant and must
- * not be interrupted by a DOD run
- */
+
+=back
+
+=head2 Public Interface
+
+=over 4
+
+=item C<STRING*
+Parrot_freeze_at_destruct(Parrot_Interp interpreter, PMC* pmc)>
+
+This function must not consume any resources (except the image itself).
+It uses the C<next_for_GC> pointer, so its not reentrant and must not be
+interrupted by a DOD run.
+
+=cut
+
+*/
+
 STRING*
 Parrot_freeze_at_destruct(Parrot_Interp interpreter, PMC* pmc)
 {
@@ -1000,8 +1460,16 @@ Parrot_freeze_at_destruct(Parrot_Interp interpreter, PMC* pmc)
 }
 
 /*
- * freeze using either method
- */
+
+=item C<STRING*
+Parrot_freeze(Parrot_Interp interpreter, PMC* pmc)>
+
+Freeze using either method.
+
+=cut
+
+*/
+
 STRING*
 Parrot_freeze(Parrot_Interp interpreter, PMC* pmc)
 {
@@ -1029,8 +1497,16 @@ Parrot_freeze(Parrot_Interp interpreter, PMC* pmc)
 }
 
 /*
- * thaw a PMC, called from the thaw opcode
- */
+
+=item C<PMC*
+Parrot_thaw(Parrot_Interp interpreter, STRING* image)>
+
+Thaw a PMC, called from the C<thaw> opcode.
+
+=cut
+
+*/
+
 PMC*
 Parrot_thaw(Parrot_Interp interpreter, STRING* image)
 {
@@ -1038,26 +1514,61 @@ Parrot_thaw(Parrot_Interp interpreter, STRING* image)
 }
 
 /*
- * thaw constants - used by packfile for unpacking PMC constants
- */
+
+=item C<PMC*
+Parrot_thaw_constants(Parrot_Interp interpreter, STRING* image)>
+
+Thaw the constants. This is used by PackFile for unpacking PMC
+constants.
+
+=cut
+
+*/
+
 PMC*
 Parrot_thaw_constants(Parrot_Interp interpreter, STRING* image)
 {
     return run_thaw(interpreter, image, VISIT_THAW_CONSTANTS);
 }
 
-
 /*
- * there are for sure shortcuts to clone faster, e.g. allways
- * thaw the image immediately or use a special callback
- *
- * for now we just do:
- */
+
+=item C<PMC*
+Parrot_clone(Parrot_Interp interpreter, PMC* pmc)>
+
+There are for sure shortcuts to clone faster, e.g. always thaw the image
+immediately or use a special callback. But for now we just thaw a frozen
+PMC.
+
+=cut
+
+*/
+
 PMC*
 Parrot_clone(Parrot_Interp interpreter, PMC* pmc)
 {
     return Parrot_thaw(interpreter, Parrot_freeze(interpreter, pmc));
 }
+
+/*
+
+=back
+
+=head1 TODO
+
+The seen-hash version for freezing might go away sometimes.
+
+=head1 SEE ALSO
+
+Lot of discussion on p6i and F<docs/dev/pmc_freeze.pod>.
+
+=head1 HISTORY
+
+Initial version by leo 2003.11.03 - 2003.11.07.
+
+=cut
+
+*/
 
 /*
  * Local variables:
