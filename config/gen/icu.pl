@@ -69,11 +69,11 @@ sub runstep {
 	$icu_configure_command = "./configure";
 	my $cc = Configure::Data->get('cc');
 	if ($cc ne '') {
-	  $icu_configure_command = "CC=$cc $icu_configure_command";
+	  $icu_configure_command = "CC='$cc' $icu_configure_command";
 	}
 	my $cxx = Configure::Data->get('cxx');
 	if ($cxx ne '') {
-	  $icu_configure_command = "CXX=$cxx $icu_configure_command";
+	  $icu_configure_command = "CXX='$cxx' $icu_configure_command";
 	}
   }
 
