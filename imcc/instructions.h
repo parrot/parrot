@@ -66,16 +66,16 @@ typedef enum {
  */
 #ifdef _PARSER
 Instruction * _mk_instruction(const char *,const char *, SymReg **, int);
-Instruction * iANY(char * name, const char *fmt, SymReg **r, int emit);
+Instruction * iANY(struct Parrot_Interp *, char * name, const char *fmt, SymReg **r, int emit);
 #else
 #define _mk_instruction(a,b,c,d) dont_use(a,b)
-#define iANY(a,b,c,d) dont_use(a,b)
+#define iANY(i,a,b,c,d) dont_use(a,b)
 #endif
-Instruction * INS(char * name, char *fmt, SymReg **regs, int nargs, int keyv,
-	int emit);
+Instruction * INS(struct Parrot_Interp *, char * name,
+		char *fmt, SymReg **regs, int nargs, int keyv, int emit);
 Instruction * INS_LABEL(SymReg * r0, int emit);
 
-Instruction * iNEW(SymReg * r0, char * type, int emit);
+Instruction * iNEW(struct Parrot_Interp *,SymReg * r0, char * type, int emit);
 Instruction * emitb(Instruction *);
 int instruction_reads(Instruction *, SymReg *);
 int instruction_writes(Instruction *, SymReg *);
@@ -95,16 +95,16 @@ SymReg *get_branch_reg(Instruction * ins);
 EXTERN Instruction* instructions;
 
 typedef struct _emittert {
-	int (*open)(char *file);
-	int (*emit)(Instruction *ins);
-	int (*close)(void);
+	int (*open)(void *param);
+	int (*emit)(void *param, Instruction *ins);
+	int (*close)(void *param);
 } Emitter;
 
 enum Emitter_type { EMIT_FILE, EMIT_PBC };
 
-int emit_open(int type, char *file);
-int emit_flush(void);
-int emit_close(void);
+int emit_open(int type, void *param);
+int emit_flush(void *param);
+int emit_close(void *param);
 
 void open_comp_unit(void);
 void close_comp_unit(void);

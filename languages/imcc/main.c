@@ -46,8 +46,8 @@ static void imcc_version(void)
     exit(0);
 }
 
-#define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2)
-#define unsetopt(flag) Parrot_setflag(interpreter, flag, 0)
+#define setopt(flag) Parrot_setflag(interp, flag, (*argv)[0]+2)
+#define unsetopt(flag) Parrot_setflag(interp, flag, 0)
 
 /* most stolen from test_main.c */
 static char *
@@ -181,7 +181,8 @@ int main(int argc, char * argv[])
     int stacktop;
     struct PackFile *pf;
 
-    interpreter = Parrot_new();
+    struct Parrot_Interp *interpreter = Parrot_new();
+
     Parrot_init(interpreter, (void*)&stacktop);
     pf = PackFile_new(0);
     interpreter->code = pf;
@@ -245,15 +246,16 @@ int main(int argc, char * argv[])
         fclose(yyin);
     }
     else {
+        int per_pbc = write_pbc | run_pbc;
         info(1, "using optimization '%s'\n", optimizer_opt);
 
         line = 1;
-        emit_open(write_pbc | run_pbc, output);
+        emit_open(per_pbc, per_pbc ? (void*)interpreter : (void*)output);
 
         debug(1, "Starting parse...\n");
 
-        yyparse();
-        emit_close();
+        yyparse((void *) interpreter);
+        emit_close(interpreter);
         fclose(yyin);
 
         info(1, "%ld lines compiled.\n", line);

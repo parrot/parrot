@@ -7,6 +7,8 @@
 #define EXTERN extern
 #endif
 
+#include "imcparser.h"
+
 EXTERN SymReg *regs[IMCC_MAX_REGS];
 EXTERN int keyvec;
 EXTERN int nargs;
@@ -22,10 +24,10 @@ EXTERN int yydebug;
 #define KEY_BIT(argnum) (1 << (argnum))
 
 
-SymReg * macro(char *name);
+SymReg * macro(struct Parrot_Interp *, char *name);
 int yyerror(char *);
-int yyparse(void);
-int yylex(void);
+int yyparse(void *param);
+int yylex(YYSTYPE *valp, struct Parrot_Interp *);
 void op_fullname(char * dest, const char * name, SymReg * args[], int);
 void open_comp_unit(void);
 void register_compilers(Parrot_Interp);

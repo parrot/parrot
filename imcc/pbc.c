@@ -99,11 +99,12 @@ void imcc_globals_destroy(int ex, void *param)
     globals.cs = NULL;
 }
 
-int e_pbc_open(char *dummy) {
+int e_pbc_open(void *param) {
     struct cs_t *cs;
+    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+
     /* make a new code segment
      */
-    UNUSED(dummy);
     if (!globals.cs) {
         /* register cleanup code */
         Parrot_on_exit(imcc_globals_destroy, NULL);
@@ -139,7 +140,8 @@ static void make_new_sub(void)
 
 
 /* get size/line of bytecode in ops till now */
-static int get_old_size(int *ins_line)
+static int
+get_old_size(struct Parrot_Interp *interpreter, int *ins_line)
 {
     size_t size;
     struct subs *s;
@@ -223,7 +225,8 @@ static int find_label_cs(char *name, opcode_t *seg, opcode_t *pc)
 /* store global labels and bsr for later fixup
  * return size in ops
  */
-static int store_labels(int *src_lines)
+static int
+store_labels(struct Parrot_Interp *interpreter, int *src_lines)
 {
     Instruction * ins;
     int code_size;
@@ -314,7 +317,7 @@ static int store_labels(int *src_lines)
             /* add inter_cs jump */
             sprintf(buf, "%d", globals.inter_seg_n);
             r[0] = mk_const(str_dup(buf), 'I');
-            INS("branch_cs", "", r, 1, 0, 1);
+            INS(interpreter, "branch_cs", "", r, 1, 0, 1);
             /* finally generate fixup table entry */
             PackFile_FixupTable_new_entry_t0(interpreter, code_seg, offset);
         }
@@ -341,7 +344,7 @@ static SymReg * find_global_label(char *name, int *pc)
 }
 
 /* fix global branches */
-void fixup_bsrs()
+void fixup_bsrs(struct Parrot_Interp *interpreter)
 {
     int i, pc, addr;
     SymReg * bsr, *lab;
@@ -427,7 +430,7 @@ static int unescape(char *string)
 
 /* add constant string to constants */
 static int
-add_const_str(char *str) {
+add_const_str(struct Parrot_Interp *interpreter, char *str) {
     int k, l;
     SymReg * r;
     char *o;
@@ -463,7 +466,7 @@ add_const_str(char *str) {
 }
 
 static int
-add_const_num(char *buf) {
+add_const_num(struct Parrot_Interp *interpreter, char *buf) {
     int k;
     SymReg * r;
 
@@ -481,7 +484,8 @@ add_const_num(char *buf) {
 
 /* add constant key to constants */
 static int
-add_const_key(opcode_t key[], int size, char *s_key) {
+add_const_key(struct Parrot_Interp *interpreter, opcode_t key[],
+        int size, char *s_key) {
     int k;
     SymReg *r;
     struct PackFile_Constant *pfc;
@@ -515,7 +519,7 @@ add_const_key(opcode_t key[], int size, char *s_key) {
  */
 
 static opcode_t
-build_key(SymReg *reg)
+build_key(struct Parrot_Interp *interpreter, SymReg *reg)
 {
 #define KEYLEN 21
     opcode_t key[KEYLEN], *pc, size;
@@ -579,11 +583,11 @@ build_key(SymReg *reg)
     /* now we have a packed key, which packfile can work on */
     /* XXX endianess? probably no, we pack/unpack on the very
      * same computer */
-    k =  add_const_key(key, size, s_key);
+    k =  add_const_key(interpreter, key, size, s_key);
     return k;
 }
 
-static void add_1_const(SymReg *r)
+static void add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
 {
     if (r->color >= 0)
         return;
@@ -597,15 +601,15 @@ static void add_1_const(SymReg *r)
                 r->color = atoi(r->name);
             break;
         case 'S':
-            r->color = add_const_str(r->name);
+            r->color = add_const_str(interpreter, r->name);
             break;
         case 'N':
-            r->color = add_const_num(r->name);
+            r->color = add_const_num(interpreter, r->name);
             break;
         case 'K':
             for (r = r->nextkey; r; r = r->nextkey)
                 if (r->type & VTCONST)
-                    add_1_const(r);
+                    add_1_const(interpreter, r);
         default:
             break;
     }
@@ -614,7 +618,8 @@ static void add_1_const(SymReg *r)
 
 }
 /* store a constants idx for later reuse */
-static void constant_folding(void)
+static void
+constant_folding(struct Parrot_Interp *interpreter)
 {
     SymReg * r;
     int i;
@@ -623,7 +628,7 @@ static void constant_folding(void)
     for(i = 0; i < HASH_SIZE; i++)
         for(r = ghash[i]; r; r = r->next) {
             if (r->type & VTCONST) {
-                add_1_const(r);
+                add_1_const(interpreter, r);
             }
 
         }
@@ -634,7 +639,8 @@ static void constant_folding(void)
  * now let the fun begin, actually emit code for one ins
  */
 
-int e_pbc_emit(Instruction * ins) {
+int e_pbc_emit(void *param, Instruction * ins) {
+    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
     int ok = 0;
     static opcode_t * pc, npc;
     op_info_t *op_info;
@@ -649,10 +655,10 @@ int e_pbc_emit(Instruction * ins) {
         int bytes;
 
         make_new_sub();         /* we start a new compilation unit */
-        code_size = store_labels(&ins_size);
-        oldsize = get_old_size(&ins_line);
+        code_size = store_labels(interpreter, &ins_size);
+        oldsize = get_old_size(interpreter, &ins_line);
         debug(1, "code_size(ops) %d  oldsize %d\n", code_size, oldsize);
-        constant_folding();
+        constant_folding(interpreter);
         store_sub_size(code_size, ins_size);
         bytes = (oldsize + code_size) * sizeof(opcode_t);
         interpreter->code->byte_code =
@@ -716,7 +722,7 @@ int e_pbc_emit(Instruction * ins) {
                     debug(1," %d", r->color);
                     break;
                 case PARROT_ARG_KC:
-                    *pc++ = build_key(ins->r[i]);
+                    *pc++ = build_key(interpreter, ins->r[i]);
                     debug(1," %d", pc[-1]);
                     break;
                 default:
@@ -730,9 +736,10 @@ int e_pbc_emit(Instruction * ins) {
     return ok;
 }
 
-int e_pbc_close(){
+int e_pbc_close(void *param){
+    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
 
-    fixup_bsrs();
+    fixup_bsrs(interpreter);
     return 0;
 }
 

@@ -14,10 +14,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "imc.h"
-#include "imcparser.h"
 #include "parser.h"
 
 #define YY_NO_UNPUT
+#define YY_DECL int yylex(YYSTYPE *valp, struct Parrot_Interp *interp)
 
 int state;
 %}
@@ -80,7 +80,7 @@ EOL		\r?\n
     }
 
 <emit,INITIAL>[ISNP]{DIGIT}{DIGIT}? {
-	yylval.s = str_dup(yytext);
+	valp->s = str_dup(yytext);
 	return REG;
 	}
 
@@ -133,12 +133,12 @@ EOL		\r?\n
 
 <emit,INITIAL>{LETTER}{LETTERDIGIT}*":" {
 	yytext[yyleng-1] = 0;  /* trim last ':' */
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(LABEL);
     }
 
 <emit>{DOT}{LETTER}{LETTERDIGIT}* {
-        yylval.s = str_dup(yytext+1);
+        valp->s = str_dup(yytext+1);
         return(MACRO);
     }
 
@@ -146,57 +146,57 @@ EOL		\r?\n
 	if (!is_def) {
 		SymReg *r = find_sym(yytext);
 		if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
-		    yylval.sr = r;
+		    valp->sr = r;
 		    return VAR;
 		}
 	}
-        yylval.s = str_dup(yytext);
-        return(is_op(yylval.s) ? PARROT_OP : IDENTIFIER);
+        valp->s = str_dup(yytext);
+        return(is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
     }
 
 <emit,INITIAL>{FLOATNUM} {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(FLOATC);
     }
 
 <emit,INITIAL>{SIGN}?{DIGIT}+ {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(INTC);
     }
 <emit,INITIAL>{HEX} {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(INTC);
     }
 <emit,INITIAL>{BIN} {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(INTC);
     }
 <emit,INITIAL>{STRINGCONSTANT} {
-        yylval.s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
+        valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
     }
 <emit,INITIAL>{CHARCONSTANT} {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(STRINGC);
     }
 
 <emit,INITIAL>\$I[0-9]+ {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(IREG);
     }
 
 <emit,INITIAL>\$N[0-9]+ {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(NREG);
     }
 
 <emit,INITIAL>\$S[0-9]+ {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(SREG);
     }
 
 <emit,INITIAL>\$P[0-9]+ {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(PREG);
     }
 

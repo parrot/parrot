@@ -25,9 +25,11 @@
 /*
  * new P, .SomeThing
  */
-Instruction * iNEW(SymReg * r0, char * type, int emit) {
+Instruction *
+iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type, int emit)
+{
     char fmt[256];
-    SymReg *pmc = macro(type);
+    SymReg *pmc = macro(interpreter, type);
     /* XXX check, if type exists, but aove keyed search
      * gives 0 for non existing  PMCs */
     sprintf(fmt, "%%s, %d\t # .%s", atoi(pmc->name), type);
@@ -38,7 +40,7 @@ Instruction * iNEW(SymReg * r0, char * type, int emit) {
     regs[0] = r0;
     regs[1] = pmc;
     nargs = 2;
-    return iANY("new", fmt, regs, emit);
+    return iANY(interpreter, "new", fmt, regs, emit);
 }
 
 /* TODO get rid of nargs */
@@ -71,7 +73,9 @@ op_fullname(char * dest, const char * name, SymReg * args[], int narg) {
     *dest = '\0';
 }
 
-int check_op(char *fullname, char *name, SymReg *r[])
+int
+check_op(struct Parrot_Interp *interpreter, char *fullname,
+        char *name, SymReg *r[])
 {
     int op, narg;
     for (narg = 0; regs[narg]; narg++) ;
@@ -81,7 +85,7 @@ int check_op(char *fullname, char *name, SymReg *r[])
 
 }
 
-int is_op(char *name)
+int is_op(struct Parrot_Interp *interpreter, char *name)
 {
     return interpreter->op_lib->op_code(name, 0) >= 0
         || interpreter->op_lib->op_code(name, 1) >= 0;
@@ -97,12 +101,13 @@ int is_op(char *name)
  *
  * s. e.g. imc.c for usage
  */
-Instruction * INS(char * name, char *fmt, SymReg **r, int n,
-	int keys, int emit)
+Instruction *
+INS(struct Parrot_Interp *interpreter, char *name, char *fmt, SymReg **r,
+        int n, int keys, int emit)
 {
     nargs = n;
     keyvec = keys;
-    return iANY(name, fmt, r, emit);
+    return iANY(interpreter, name, fmt, r, emit);
 }
 
 /* imcc_compile(interp*, const char*)
@@ -137,10 +142,10 @@ static void *imcc_compile(Parrot_Interp interp, const char *s)
     line = 1;
     yy_scan_string(s);
     /* s. also e_pbc_open for reusing code/consts ... */
-    emit_open(1, NULL);
+    emit_open(1, interp);
     /* XXX where to put constants */
-    yyparse();
-    emit_close();
+    yyparse((void *) interp);
+    emit_close(interp);
 
 #ifdef EVAL_TEST
     pc = (opcode_t *) interp->code->byte_code;

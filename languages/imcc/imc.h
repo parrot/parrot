@@ -1,7 +1,7 @@
 #ifndef __IMC_H
 #define __IMC_H
 
-#define IMCC_VERSION "0.0.9.9"
+#define IMCC_VERSION "0.0.9.11"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,18 +48,18 @@ void compute_du_chain(void);
 int interferes(SymReg * r0, SymReg * r1);
 int map_colors(int x, SymReg ** graph, int colors[], int typ);
 void build_interference_graph(void);
-void allocate(void);
+void allocate(struct Parrot_Interp *);
 int simplify (void);
 void order_spilling (void);
-void spill (int);
+void spill (struct Parrot_Interp *, int);
 int try_allocate(void);
 void restore_interference_graph(void);
 void free_reglist(void);
 int neighbours(int node);
 
 
-int check_op(char * fullname, char *op, SymReg *r[]);
-int is_op(char *);
+int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[]);
+int is_op(struct Parrot_Interp *, char *);
 
 /* This should be common with Cola */
 
@@ -68,7 +68,6 @@ char *str_cat(const char *, const char *);
 
 /* globals */
 
-EXTERN struct Parrot_Interp *interpreter;
 EXTERN int IMCC_DEBUG;
 EXTERN int IMCC_VERBOSE;
 

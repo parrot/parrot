@@ -24,7 +24,7 @@ static void print_stat(void);
 static IMCStack nodeStack;
 
 /* allocate is the main loop of the allocation algorithm */
-void allocate() {
+void allocate(struct Parrot_Interp *interpreter) {
     int to_spill;
     int todo;
 
@@ -38,7 +38,7 @@ void allocate() {
         imc_stat_init();
 
     /* consecutive labels, if_branch, unused_labels ... */
-    pre_optimize();
+    pre_optimize(interpreter);
 
     nodeStack = imcstack_new();
     dont_optimize = n_spilled = 0;
@@ -61,7 +61,7 @@ void allocate() {
         if (dont_optimize)
             todo = 0;
         else
-            todo = optimize();
+            todo = optimize(interpreter);
     }
     todo = 1;
     while (todo) {
@@ -74,7 +74,7 @@ void allocate() {
         to_spill = try_allocate();
 
         if ( to_spill >= 0 ) {
-            spill(to_spill);
+            spill(interpreter, to_spill);
             build_reglist();
             life_analysis();
         }
@@ -577,7 +577,7 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
  */
 
 
-void spill(int spilled) {
+void spill(struct Parrot_Interp *interpreter, int spilled) {
 
     Instruction * tmp, *ins;
     int i, n;
@@ -616,7 +616,7 @@ void spill(int spilled) {
             sprintf(buf, "%d", n_spilled);
             regs[2] = mk_const(str_dup(buf), 'I');
 	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", new_symbol->name);
-	    tmp = INS("set", buf, regs, 3, 4, 0);
+	    tmp = INS(interpreter, "set", buf, regs, 3, 4, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
             /* insert tmp before actual ins */
@@ -633,7 +633,7 @@ void spill(int spilled) {
             regs[1] = mk_const(str_dup(buf), 'I');
 	    regs[2] = new_symbol;
 	    sprintf(buf, "%%s[%%s], %%s #STORE %s", old_symbol->name);
-	    tmp = INS("set", buf, regs, 3, 2, 0);
+	    tmp = INS(interpreter, "set", buf, regs, 3, 2, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
             /* insert tmp after ins */

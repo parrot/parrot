@@ -21,8 +21,18 @@
 #include "parser.h"
 
 #define YYDEBUG 1
+#define YYERROR_VERBOSE 1
 
+/*
+ * we use a pure parser wtih the interpreter as a parameter
+ * this still doesn't make the parser reentrant, there are too
+ * many globals around.
+ * These globals should go into one structure, which could be
+ * attached to the interpreter
+ */
 
+#define YYPARSE_PARAM interp
+#define YYLEX_PARAM interp
 /*
  * Choosing instructions for Parrot is pretty easy since
  * many are polymorphic.
@@ -64,7 +74,10 @@ static SymReg ** RR(int n, ...)
  *   op
  *
  */
-static Instruction * MK_I(const char * fmt, SymReg ** r) {
+static
+Instruction *
+MK_I(struct Parrot_Interp *interpreter, const char * fmt, SymReg ** r)
+{
     char opname[64];
     char *p;
     const char *q;
@@ -78,7 +91,7 @@ static Instruction * MK_I(const char * fmt, SymReg ** r) {
 #if OPDEBUG
     fprintf(stderr, "op '%s' format '%s' (%d)\n", opname, fmt?:"",nargs);
 #endif
-    return iANY(opname, fmt, r, 1);
+    return iANY(interpreter, opname, fmt, r, 1);
 }
 
 /*
@@ -122,27 +135,32 @@ static Instruction * iSUBROUTINE(SymReg * r0) {
 /*
  * substr or X = P[key]
  */
-static Instruction * iINDEXFETCH(SymReg * r0, SymReg * r1, SymReg * r2) {
+static Instruction *
+iINDEXFETCH(struct Parrot_Interp *interp, SymReg * r0, SymReg * r1,
+    SymReg * r2)
+{
     if(r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
         SymReg * r3 = mk_const("1", 'I');
-        return MK_I("substr %s, %s, %s, 1", R4(r0, r1, r2, r3));
+        return MK_I(interp, "substr %s, %s, %s, 1", R4(r0, r1, r2, r3));
     }
     keyvec |= KEY_BIT(2);
-    return MK_I("set %s, %s[%s]", R3(r0,r1,r2));
+    return MK_I(interp, "set %s, %s[%s]", R3(r0,r1,r2));
 }
 
 /*
  * substr or P[key] = X
  */
 
-static Instruction * iINDEXSET(SymReg * r0, SymReg * r1, SymReg * r2) {
+static Instruction *
+iINDEXSET(struct Parrot_Interp *interp, SymReg * r0, SymReg * r1, SymReg * r2)
+{
     if(r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
         SymReg * r3 = mk_const("1", 'I');
-        MK_I("substr %s, %s, %s, %s", R4(r0, r1,r3, r2));
+        MK_I(interp, "substr %s, %s, %s, %s", R4(r0, r1,r3, r2));
     }
     else if (r0->set == 'P') {
         keyvec |= KEY_BIT(1);
-	MK_I("set %s[%s], %s", R3(r0,r1,r2));
+	MK_I(interp, "set %s[%s], %s", R3(r0,r1,r2));
     }
     else {
         fataly(EX_SOFTWARE, "iINDEXSET", line,"unsupported indexed set op\n");
@@ -151,7 +169,8 @@ static Instruction * iINDEXSET(SymReg * r0, SymReg * r1, SymReg * r2) {
 }
 
 /* return the index of a PMC class */
-static int get_pmc_num(char *pmc_type)
+static int
+get_pmc_num(struct Parrot_Interp *interpreter, char *pmc_type)
 {
     STRING * s = string_make(interpreter, pmc_type,
             (UINTVAL) strlen(pmc_type), NULL, 0, NULL);
@@ -161,18 +180,20 @@ static int get_pmc_num(char *pmc_type)
 }
 
 /* only .PmcType */
-SymReg * macro(char *name)
+SymReg *
+macro(struct Parrot_Interp *interp, char *name)
 {
     SymReg * r;
     char buf[16];
-    int type = get_pmc_num(name);
+    int type = get_pmc_num(interp, name);
     sprintf(buf, "%d", type);
     r =  mk_const(str_dup(buf), 'I');
     return r;
 }
 
 static Instruction *
-multi_keyed(char *name, SymReg ** r, int nr, int emit)
+multi_keyed(struct Parrot_Interp *interpreter,char *name,
+SymReg ** r, int nr, int emit)
 {
     int i, keyf, kv, n;
     char buf[16];
@@ -224,7 +245,7 @@ multi_keyed(char *name, SymReg ** r, int nr, int emit)
                 nreg[1] = r[i+1];
                 nreg[2] = preg[n];
                 /* set p_k px */
-                ins = iANY(str_dup("set"), 0, nreg, 0);
+                ins = iANY(interpreter, str_dup("set"), 0, nreg, 0);
             }
             else {
                 keyvec = 1 << 2;
@@ -232,7 +253,7 @@ multi_keyed(char *name, SymReg ** r, int nr, int emit)
                 nreg[1] = r[i];
                 nreg[2] = r[i+1];
                 /* set py|z p_k */
-                iANY(str_dup("set"), 0, nreg, 1);
+                iANY(interpreter, str_dup("set"), 0, nreg, 1);
             }
             i++;
         }
@@ -244,28 +265,31 @@ multi_keyed(char *name, SymReg ** r, int nr, int emit)
                 nreg[0] = r[i];
                 nreg[1] = preg[n];
                 /* set n, px */
-                ins = iANY(str_dup("set"), 0, nreg, 0);
+                ins = iANY(interpreter, str_dup("set"), 0, nreg, 0);
             }
             else {
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 /* set px, n */
-                iANY(str_dup("set"), 0, nreg, 1);
+                iANY(interpreter, str_dup("set"), 0, nreg, 1);
             }
         }
     }
     /* make a new undef */
-    iNEW(preg[0], str_dup("PerlUndef"), 1);
+    iNEW(interpreter, preg[0], str_dup("PerlUndef"), 1);
     /* emit the operand */
     nargs = 3;
     keyvec = 0;
-    iANY(name, 0, preg, 1);
+    iANY(interpreter, name, 0, preg, 1);
     /* emit the LHS op */
     emitb(ins);
     return ins;
 }
 
-Instruction * iANY(char * name, const char *fmt, SymReg **r, int emit) {
+Instruction *
+iANY(struct Parrot_Interp *interpreter, char * name,
+    const char *fmt, SymReg **r, int emit)
+{
     char fullname[64];
     int i;
     int dirs = 0;
@@ -273,7 +297,7 @@ Instruction * iANY(char * name, const char *fmt, SymReg **r, int emit) {
     Instruction * ins;
 
 #if 1
-    ins = multi_keyed(name, r, nargs, emit);
+    ins = multi_keyed(interpreter, name, r, nargs, emit);
     if (ins)
         return ins;
 #endif
@@ -399,6 +423,7 @@ Instruction * iANY(char * name, const char *fmt, SymReg **r, int emit) {
 %type <sr> pasm_args lhs
 %token <sr> VAR
 
+%pure_parser
 
 %start program
 
@@ -406,8 +431,8 @@ Instruction * iANY(char * name, const char *fmt, SymReg **r, int emit) {
 
 program:                         { open_comp_unit(); }
     statements  { $$ = 0;
-	  allocate();
-	  emit_flush();
+	  allocate(interp);
+	  emit_flush(interp);
         }
     ;
 
@@ -419,7 +444,7 @@ pasmcode: pasmline
 pasmline: labels  pasm_inst '\n'  { $$ = 0; }
     ;
 pasm_inst: {clear_state();}
-       PARROT_OP pasm_args	        { $$ = iANY($2,0,regs,1); free($2); }
+       PARROT_OP pasm_args	        { $$ = iANY(interp, $2,0,regs,1); free($2); }
     | /* none */                               { $$ = 0;}
 
     ;
@@ -430,7 +455,7 @@ pasm_args:
 emit:
       EMIT                              { open_comp_unit(); }
       pasmcode
-      EOM 				{ emit_flush(); $$=0;}
+      EOM 				{ emit_flush(interp); $$=0;}
     ;
 
 
@@ -439,8 +464,8 @@ sub:	sub_start
         statements ESUB
         {
           $$ = 0;
-	  allocate();
-	  emit_flush();
+	  allocate(interp);
+	  emit_flush(interp);
         }
         | emit { $$=0; }
     ;
@@ -483,23 +508,23 @@ labeled_inst:
     |   LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3);is_def=0; }
     |   CONST { is_def=1; } type IDENTIFIER '=' const
                                     { mk_const_ident($4, $3, $6);is_def=0; }
-    |   PARAM { is_def=1; } type IDENTIFIER { $$ = MK_I("restore",
+    |   PARAM { is_def=1; } type IDENTIFIER { $$ = MK_I(interp, "restore",
 		                            R1(mk_ident($4, $3)));is_def=0; }
-    |   PARAM reg			{ $$ = MK_I("restore", R1($2)); }
-    |   RESULT var			{ $$ = MK_I("restore", R1($2)); }
-    |   ARG var				{ $$ = MK_I("save", R1($2)); }
-    |   RETURN var			{ $$ = MK_I("save", R1($2)); }
-    |   CALL IDENTIFIER			{ $$ = MK_I("bsr",
+    |   PARAM reg			{ $$ = MK_I(interp, "restore", R1($2)); }
+    |   RESULT var			{ $$ = MK_I(interp, "restore", R1($2)); }
+    |   ARG var				{ $$ = MK_I(interp, "save", R1($2)); }
+    |   RETURN var			{ $$ = MK_I(interp, "save", R1($2)); }
+    |   CALL IDENTIFIER			{ $$ = MK_I(interp, "bsr",
                                               R1(mk_address($2, U_add_once)));}
-    |   GOTO IDENTIFIER			{ $$ = MK_I("branch",
+    |   GOTO IDENTIFIER			{ $$ = MK_I(interp, "branch",
                                               R1(mk_address($2, U_add_once)));}
-    |   INC var				{ $$ = MK_I("inc",R1($2)); }
-    |   DEC var				{ $$ = MK_I("dec",R1($2)); }
-    |   PRINT var			{ $$ = MK_I("print",R1($2)); }
-    |   SAVEALL				{ $$ = MK_I("saveall" ,R0()); }
-    |   RESTOREALL			{ $$ = MK_I("restoreall" ,R0()); }
-    |   END				{ $$ = MK_I("end" ,R0()); }
-    |  PARROT_OP vars                   { $$ = iANY($1,0,regs, 1); free($1); }
+    |   INC var				{ $$ = MK_I(interp, "inc",R1($2)); }
+    |   DEC var				{ $$ = MK_I(interp, "dec",R1($2)); }
+    |   PRINT var			{ $$ = MK_I(interp, "print",R1($2)); }
+    |   SAVEALL				{ $$ = MK_I(interp, "saveall" ,R0()); }
+    |   RESTOREALL			{ $$ = MK_I(interp, "restoreall" ,R0()); }
+    |   END				{ $$ = MK_I(interp, "end" ,R0()); }
+    |  PARROT_OP vars                   { $$ = iANY(interp, $1,0,regs, 1); free($1); }
     | /* none */                               { $$ = 0;}
     ;
 
@@ -515,61 +540,61 @@ classname:
     ;
 
 assignment:
-       target '=' var			{ $$ = MK_I("set", R2($1, $3)); }
-    |  target '=' '!' var		{ $$ = MK_I("not", R2($1, $4));}
-    |  target '=' '-' var		{ $$ = MK_I("neg", R2($1, $4));}
-    |  target '=' '~' var		{ $$ = MK_I("bnot", R2($1, $4));}
-    |  target '=' var '+' var		{ $$ = MK_I("add", R3($1, $3, $5)); }
-    |  target '=' var '-' var		{ $$ = MK_I("sub", R3($1, $3, $5)); }
-    |  target '=' var '*' var		{ $$ = MK_I("mul", R3($1, $3, $5)); }
-    |  target '=' var POW var		{ $$ = MK_I("pow", R3($1, $3, $5)); }
-    |  target '=' var '/' var		{ $$ = MK_I("div", R3($1, $3, $5)); }
-    |  target '=' var '%' var		{ $$ = MK_I("mod", R3($1, $3, $5)); }
-    |  target '=' var '.' var		{ $$ = MK_I("concat", R3($1,$3,$5)); }
-    |  target '=' var SHIFT_LEFT var	{ $$ = MK_I("shl", R3($1, $3, $5)); }
-    |  target '=' var SHIFT_RIGHT var	{ $$ = MK_I("shr", R3($1, $3, $5)); }
-    |  target '=' var SHIFT_RIGHT_U var	{ $$ = MK_I("lsr", R3($1, $3, $5)); }
-    |  target '=' var LOG_AND var	{ $$ = MK_I("and", R3($1, $3, $5)); }
-    |  target '=' var LOG_OR var	{ $$ = MK_I("or", R3($1, $3, $5)); }
-    |  target '=' var LOG_XOR var	{ $$ = MK_I("xor", R3($1, $3, $5)); }
-    |  target '=' var '&' var		{ $$ = MK_I("band", R3($1, $3, $5)); }
-    |  target '=' var '|' var		{ $$ = MK_I("bor", R3($1, $3, $5)); }
-    |  target '=' var '~' var		{ $$ = MK_I("bxor", R3($1, $3, $5)); }
-    |  target '=' var '[' keylist ']'   { $$ = iINDEXFETCH($1, $3, $5); }
-    |  var '[' keylist ']' '=' var	{ $$ = iINDEXSET($1, $3, $6); }
-    |  target '=' NEW classname		{ $$ = iNEW($1, $4, 1); }
-    |  target '=' DEFINED var	        { $$ = MK_I("defined",R2($1,$4)); }
+       target '=' var			{ $$ = MK_I(interp, "set", R2($1, $3)); }
+    |  target '=' '!' var		{ $$ = MK_I(interp, "not", R2($1, $4));}
+    |  target '=' '-' var		{ $$ = MK_I(interp, "neg", R2($1, $4));}
+    |  target '=' '~' var		{ $$ = MK_I(interp, "bnot", R2($1, $4));}
+    |  target '=' var '+' var		{ $$ = MK_I(interp, "add", R3($1, $3, $5)); }
+    |  target '=' var '-' var		{ $$ = MK_I(interp, "sub", R3($1, $3, $5)); }
+    |  target '=' var '*' var		{ $$ = MK_I(interp, "mul", R3($1, $3, $5)); }
+    |  target '=' var POW var		{ $$ = MK_I(interp, "pow", R3($1, $3, $5)); }
+    |  target '=' var '/' var		{ $$ = MK_I(interp, "div", R3($1, $3, $5)); }
+    |  target '=' var '%' var		{ $$ = MK_I(interp, "mod", R3($1, $3, $5)); }
+    |  target '=' var '.' var		{ $$ = MK_I(interp, "concat", R3($1,$3,$5)); }
+    |  target '=' var SHIFT_LEFT var	{ $$ = MK_I(interp, "shl", R3($1, $3, $5)); }
+    |  target '=' var SHIFT_RIGHT var	{ $$ = MK_I(interp, "shr", R3($1, $3, $5)); }
+    |  target '=' var SHIFT_RIGHT_U var	{ $$ = MK_I(interp, "lsr", R3($1, $3, $5)); }
+    |  target '=' var LOG_AND var	{ $$ = MK_I(interp, "and", R3($1, $3, $5)); }
+    |  target '=' var LOG_OR var	{ $$ = MK_I(interp, "or", R3($1, $3, $5)); }
+    |  target '=' var LOG_XOR var	{ $$ = MK_I(interp, "xor", R3($1, $3, $5)); }
+    |  target '=' var '&' var		{ $$ = MK_I(interp, "band", R3($1, $3, $5)); }
+    |  target '=' var '|' var		{ $$ = MK_I(interp, "bor", R3($1, $3, $5)); }
+    |  target '=' var '~' var		{ $$ = MK_I(interp, "bxor", R3($1, $3, $5)); }
+    |  target '=' var '[' keylist ']'   { $$ = iINDEXFETCH(interp, $1, $3, $5); }
+    |  var '[' keylist ']' '=' var	{ $$ = iINDEXSET(interp, $1, $3, $6); }
+    |  target '=' NEW classname		{ $$ = iNEW(interp, $1, $4, 1); }
+    |  target '=' DEFINED var	        { $$ = MK_I(interp, "defined",R2($1,$4)); }
     |  target '=' DEFINED var '[' keylist ']' { keyvec=KEY_BIT(2);
-                                     $$ = MK_I("defined", R3($1, $4, $6));}
-    |  target '=' CLONE var		{ $$ = MK_I("clone",R2($1, $4));
+                                     $$ = MK_I(interp, "defined", R3($1, $4, $6));}
+    |  target '=' CLONE var		{ $$ = MK_I(interp, "clone",R2($1, $4));
     }
-    |  target '=' ADDR IDENTIFIER	{ $$ = MK_I("set_addr",
+    |  target '=' ADDR IDENTIFIER	{ $$ = MK_I(interp, "set_addr",
                                           R2($1, mk_address($4,U_add_once))); }
-    |  target '=' GLOBAL string	{ $$ = MK_I("find_global",R2($1,$4)); }
-    |  GLOBAL string '=' var	{ $$ = MK_I("store_global",R2($2,$4)); }
+    |  target '=' GLOBAL string	{ $$ = MK_I(interp, "find_global",R2($1,$4)); }
+    |  GLOBAL string '=' var	{ $$ = MK_I(interp, "store_global",R2($2,$4)); }
     |  NEW                              { expect_pasm = 1; }
-        target COMMA newtype            { $$ = MK_I("new", R2($3, $5)); }
-    |  DEFINED target COMMA var         { $$ = MK_I("defined", R2($2, $4)); }
+        target COMMA newtype            { $$ = MK_I(interp, "new", R2($3, $5)); }
+    |  DEFINED target COMMA var         { $$ = MK_I(interp, "defined", R2($2, $4)); }
     |  DEFINED target COMMA var '[' keylist ']'  { keyvec=KEY_BIT(2);
-                                       $$ = MK_I("defined", R3($2, $4, $6));}
-    |  CLONE target COMMA var           { $$ = MK_I("clone", R2($2, $4)); }
+                                       $$ = MK_I(interp, "defined", R3($2, $4, $6));}
+    |  CLONE target COMMA var           { $$ = MK_I(interp, "clone", R2($2, $4)); }
     ;
 
 newtype:
-     MACRO                             { $$ = macro($1); free($1); }
+     MACRO                             { $$ = macro(interp, $1); free($1); }
     | const
     ;
 
 if_statement:
-       IF var relop var GOTO IDENTIFIER { $$=MK_I($3,R3($2,$4,
+       IF var relop var GOTO IDENTIFIER { $$=MK_I(interp, $3,R3($2,$4,
                                           mk_address($6,U_add_once))); }
-    |  IF var GOTO IDENTIFIER           {$$= MK_I("if", R2($2,
+    |  IF var GOTO IDENTIFIER           {$$= MK_I(interp, "if", R2($2,
                                           mk_address($4, U_add_once))); }
-    |  UNLESS var GOTO IDENTIFIER       {$$= MK_I("unless",R2($2,
+    |  UNLESS var GOTO IDENTIFIER       {$$= MK_I(interp, "unless",R2($2,
                                           mk_address($4, U_add_once))); }
-    |  IF var COMMA IDENTIFIER          { $$= MK_I("if", R2($2,
+    |  IF var COMMA IDENTIFIER          { $$= MK_I(interp, "if", R2($2,
                                           mk_address($4, U_add_once))); }
-    |  UNLESS var COMMA IDENTIFIER      { $$= MK_I("unless", R2($2,
+    |  UNLESS var COMMA IDENTIFIER      { $$= MK_I(interp, "unless", R2($2,
                                           mk_address($4, U_add_once))); }
 
     ;
@@ -608,7 +633,7 @@ var_or_i:
        IDENTIFIER			{ $$ = mk_address($1, U_add_once); }
     |  PARROT_OP                        { $$ = mk_address($1, U_add_once); }
     |  var
-    | MACRO                             { $$ = macro($1); free($1); }
+    | MACRO                             { $$ = macro(interp, $1); free($1); }
     ;
 
 var:   VAR
@@ -650,7 +675,7 @@ string: SREG				{ $$ = mk_symreg($1, 'S'); }
 
 int yyerror(char * s)
 {
-    fprintf(stderr, "last token = [%s]\n", yylval.s);
+    /* fprintf(stderr, "last token = [%s]\n", yylval.s); */
     fprintf(stderr, "(error) line %d: %s\n", line, s );
     fprintf(stderr, "Didn't create output asm.\n" );
     exit(EX_UNAVAILABLE);

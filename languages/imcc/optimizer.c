@@ -49,23 +49,23 @@
  *  because Px where different before
  *
  */
-static void if_branch(void);
+static void if_branch(struct Parrot_Interp *);
 static void branch_branch(void);
 static void unused_label(void);
 static int used_once(void);
-static int loop_optimization(void);
+static int loop_optimization(struct Parrot_Interp *);
 static int clone_remove(void);
 
-void pre_optimize() {
+void pre_optimize(struct Parrot_Interp *interp) {
     if (*optimizer_opt != '0') {      /* XXX */
-        if_branch();
+        if_branch(interp);
         branch_branch();
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
         unused_label();
     }
 }
 
-int optimize() {
+int optimize(struct Parrot_Interp *interp) {
 
     if (*optimizer_opt > '1') {      /* XXX */
         /* constant_propagation(); N/Y */
@@ -73,7 +73,7 @@ int optimize() {
             return 1;
         if (used_once())
             return 1;
-        if (loop_optimization())
+        if (loop_optimization(interp))
             return 1;
     }
     return 0;
@@ -108,7 +108,7 @@ static const char * get_neg_op(char *op, int *nargs)
  * branch L2            ---
  * L1:                  L2:
  */
-static void if_branch()
+static void if_branch(struct Parrot_Interp *interp)
 {
     Instruction *ins, *last;
     int reg;
@@ -136,7 +136,7 @@ static void if_branch()
                 if ((neg_op = get_neg_op(last->op, &args)) != 0) {
                     Instruction * tmp;
                     last->r[reg] = go;
-                    tmp = INS((char*)neg_op, "", last->r, args, 0, 0);
+                    tmp = INS(interp, (char*)neg_op, "", last->r, args, 0, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
                     free(last->op);
@@ -388,7 +388,7 @@ find_outer(Basic_block * blk)
 
 /* move the instruction ins before loop in bb */
 static int
-move_ins_out(Instruction **ins, Basic_block *bb)
+move_ins_out(struct Parrot_Interp *interp, Instruction **ins, Basic_block *bb)
 {
     Basic_block *pred;
     Instruction * next, *out;
@@ -418,7 +418,7 @@ move_ins_out(Instruction **ins, Basic_block *bb)
 
         regs[0] = 0;
         sprintf(buf, "# Invar moved: %s",ins_string(out->next));
-        tmp = INS("", buf, regs, 0, 0, 0);
+        tmp = INS(interp, "", buf, regs, 0, 0, 0);
         insert_ins((*ins)->prev, tmp);
     }
     ostat.invariants_moved++;
@@ -429,7 +429,7 @@ move_ins_out(Instruction **ins, Basic_block *bb)
 }
 
 static int
-loop_one(int bnr)
+loop_one(struct Parrot_Interp *interp, int bnr)
 {
     Basic_block *bb = bb_list[bnr];
     Instruction *ins;
@@ -444,7 +444,7 @@ loop_one(int bnr)
         reason = 0;
         if (is_invariant(ins)) {
             debug(2, "found invariant %s\n", ins_string(ins));
-            if (move_ins_out(&ins, bb)) {
+            if (move_ins_out(interp, &ins, bb)) {
                 changed++;
                 ins = ins->prev;
             }
@@ -457,7 +457,7 @@ loop_one(int bnr)
 }
 
 int
-loop_optimization()
+loop_optimization(struct Parrot_Interp *interp)
 {
     int l, bb, loop_depth;
     int changed = 0;
@@ -470,7 +470,7 @@ loop_optimization()
         debug(2, "loop_depth %d\n", l);
         for (bb = 0; bb < n_basic_blocks; bb++)
             if (bb_list[bb]->loop_depth == l) {
-                changed |= loop_one(bb);
+                changed |= loop_one(interp, bb);
             }
         /* currently e.g. mandel.p6 breaks, if not only the most
          * inner loop is changed, but outer loops to */

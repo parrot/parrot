@@ -341,15 +341,18 @@ char * ins_string(Instruction * ins) {
 }
 
 static char *output;
-static int e_file_open(char *file)
+static int e_file_open(void *param)
 {
+    char *file = (char *) param;
+
     if (strcmp(file, "-"))
         freopen(file, "w", stdout);
     output = file;
     return 1;
 }
 
-static int e_file_close(void) {
+static int e_file_close(void *param) {
+    UNUSED(param);
     printf("\n\n");
     fclose(stdout);
     info(1, "assembly module %s written.\n", output);
@@ -357,7 +360,8 @@ static int e_file_close(void) {
 
 }
 
-static int e_file_emit(Instruction * ins) {
+static int e_file_emit(void *param, Instruction * ins) {
+    UNUSED(param);
     if ((ins->type & ITLABEL) || ! *ins->op)
 	printf(ins_fmt(ins));
     else
@@ -373,16 +377,17 @@ Emitter emitters[2] = {
 
 static int emitter;
 
-int emit_open(int type, char *file)
+int emit_open(int type, void *param)
 {
     emitter = type;
-    return (emitters[emitter]).open(file);
+    return (emitters[emitter]).open(param);
     return 0;
 }
 
-int emit_flush() {
+int emit_flush(void *param) {
 
     Instruction * ins, *next;
+    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
     /* first instruction should be ".sub" -- make sure we allocate P31
      * _after_ subroutine entry.  And after the "saveall", or any
      * other assortment of pushes. */
@@ -397,11 +402,11 @@ int emit_flush() {
                     || strcmp(ins->fmt, "saveall") == 0)) {
             ins = ins->next;
         }
-        spill_ins = iNEW(p31, str_dup("PerlArray"), 0);
+        spill_ins = iNEW(interpreter, p31, str_dup("PerlArray"), 0);
         insert_ins(ins, spill_ins);
     }
     for (ins = instructions; ins; ins = ins->next) {
-        (emitters[emitter]).emit(ins);
+        (emitters[emitter]).emit(param, ins);
     }
     for (ins = instructions; ins; ) {
         next = ins->next;
@@ -411,9 +416,9 @@ int emit_flush() {
     close_comp_unit();
     return 0;
 }
-int emit_close()
+int emit_close(void *param)
 {
-    return (emitters[emitter]).close();
+    return (emitters[emitter]).close(param);
 }
 /*
  * Local variables:
