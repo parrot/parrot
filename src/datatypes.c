@@ -16,7 +16,7 @@
 INTVAL
 Parrot_get_datatype_enum(Interp *interpreter, STRING *typename)
 {
-    const char *type = string_to_cstring(interpreter, typename);
+    char *type = string_to_cstring(interpreter, typename);
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {
