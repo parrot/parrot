@@ -86,10 +86,22 @@ sub process_cfile {
 HEADER
     print ALL "# $infile\n";
     my %this_file_seen;
+    # There is a chance that the same __LINE__ will reoccur if #line directives
+    # are used.
+    my %lines_seen;
     while (<IN>) {
+	if (m/^\s*#\s*line\s+(\d+)/) {
+	    # #line directive
+	    $line = $1 - 1;
+	    next;
+	}
 	$line++;
-	next if m/^\s*#/; # ignore preprocessor
+	next if m/^\s*#/; # otherwise ignore preprocessor
 	next unless s/.*\bCONST_STRING\s*\(\w+\s*,//;
+
+	if ($lines_seen{$line}++) {
+	    die "Seen line $line before in $infile - can't continue";
+	}
 
 	my $str = extract_delimited; # $_, '"';
 	$str = substr $str, 1, -1;
