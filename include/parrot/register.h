@@ -50,7 +50,7 @@ struct PRegFrame {
 
 struct RegStack {
     struct RegisterChunkBuf* top;
-    size_t chunk_size;
+    size_t frame_size;
 };
 
 /* Base class for the RegChunk types */

@@ -23,22 +23,22 @@ setup_register_stacks(Parrot_Interp interpreter)
     buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
     Parrot_allocate_zeroed(interpreter, buf, sizeof(struct IRegChunkBuf));
     interpreter->ctx.int_reg_stack.top = buf;
-    interpreter->ctx.int_reg_stack.chunk_size = sizeof(struct IRegChunkBuf);
+    interpreter->ctx.int_reg_stack.frame_size = sizeof(struct IRegFrame);
 
     buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
     Parrot_allocate_zeroed(interpreter, buf, sizeof(struct SRegChunkBuf));
     interpreter->ctx.string_reg_stack.top = buf;
-    interpreter->ctx.string_reg_stack.chunk_size = sizeof(struct SRegChunkBuf);
+    interpreter->ctx.string_reg_stack.frame_size = sizeof(struct SRegFrame);
 
     buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
     Parrot_allocate_zeroed(interpreter, buf, sizeof(struct NRegChunkBuf));
     interpreter->ctx.num_reg_stack.top = buf;
-    interpreter->ctx.num_reg_stack.chunk_size = sizeof(struct NRegChunkBuf);
+    interpreter->ctx.num_reg_stack.frame_size = sizeof(struct NRegFrame);
 
     buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
     Parrot_allocate_zeroed(interpreter, buf, sizeof(struct PRegChunkBuf));
     interpreter->ctx.pmc_reg_stack.top = buf;
-    interpreter->ctx.pmc_reg_stack.chunk_size = sizeof(struct PRegChunkBuf);
+    interpreter->ctx.pmc_reg_stack.frame_size = sizeof(struct PRegFrame);
 
     Parrot_unblock_DOD(interpreter);
 }
@@ -112,10 +112,11 @@ regstack_copy_chunk(Parrot_Interp interpreter,
     PObj_COW_CLEAR((PObj*) buf);
 
     Parrot_block_DOD(interpreter);
-    Parrot_allocate(interpreter, buf, stack->chunk_size);
+    Parrot_allocate(interpreter, buf, stack->frame_size * FRAMES_PER_CHUNK);
     Parrot_unblock_DOD(interpreter);
 
-    memcpy(buf->data.bufstart, chunk->data.bufstart, stack->chunk_size);
+    memcpy(buf->data.bufstart, chunk->data.bufstart,
+                stack->frame_size * chunk->used);
     return buf;
 }
 
@@ -136,7 +137,8 @@ regstack_push_entry(Parrot_Interp interpreter, struct RegStack* stack)
                 sizeof(struct RegisterChunkBuf));
 
         Parrot_block_DOD(interpreter);
-        Parrot_allocate_zeroed(interpreter, (PObj*)buf, stack->chunk_size);
+        Parrot_allocate(interpreter, (PObj*)buf,
+                    stack->frame_size * FRAMES_PER_CHUNK);
         Parrot_unblock_DOD(interpreter);
 
         buf->used = 1;
