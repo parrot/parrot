@@ -945,7 +945,7 @@ src_tests :
 
 # cgoto runloop
 testg : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) $(TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -g $(TEST_FILES)
 
 # prederef runloop
 testP : test_prep
