@@ -23,7 +23,8 @@ sub runstep {
         jitcapable  => 0,
         cc_hasjit   => '',
         jit_h       => '',
-        jit_o       => ''
+        jit_o       => '',
+	asmfun_o    => ''
       );
       return;
   }
@@ -89,7 +90,7 @@ sub runstep {
       jitcapable  => 1,
       cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
       jit_h       => '$(INC)/jit.h',
-      jit_o       => 'jit$(O) jit_cpu$(O)'
+      jit_o       => 'jit$(O) jit_cpu$(O) jit_debug$(O)'
     );
 
     # test for some instructions

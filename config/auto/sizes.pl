@@ -26,6 +26,10 @@ sub runstep {
           'hugeintvalsize'   => 4,
 	  'hugefloatval'     => 'double',
           'hugefloatvalsize' => 8,
+	  'int2_t'           => 'int',
+	  'int4_t'           => 'int',			     
+	  'float4_t'         => 'double',
+	  'float8_t'         => 'double',
         );
         return;
     }
