@@ -279,8 +279,10 @@ ret:
   restoretop
   end
 _sub:
-  set I31, 1
+  set I16, 1
   bsr _#check_params
+  set I16, -100
+  bsr _#check_param_type
   shift I16, P3
   print I16
   end/
@@ -319,8 +321,10 @@ ret:
   end
 _sub:
   if I0, (\S+)
-  set I31, 1
+  set I16, 1
   bsr _#check_params
+  set I16, -100
+  bsr _#check_param_type
   shift I5, P3
 \1:
   print I5

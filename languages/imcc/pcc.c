@@ -34,28 +34,50 @@ set_I_const(struct Parrot_Interp *interpreter, Instruction *ins,
     return insINS(interpreter, ins, "set", regs, 2);
 }
 
+static void
+pcc_emit_err(Parrot_Interp interpreter, SymReg *err, const char *msg)
+{
+    SymReg *p0;
+    SymReg *regs[IMCC_MAX_REGS];
+
+    /* err_label:
+     *   new $P0, .Exception
+     *   set $P0["_message"], msg
+     *   throw $P0
+     *   ret
+     */
+    INS_LABEL(err, 1);
+    p0 = mk_symreg(str_dup("$P0"), 'P');
+    iNEW(interpreter, p0, str_dup("Exception"), NULL, 1);
+    regs[0] = p0;
+    regs[1] = mk_const(str_dup("\"_message\""), 'S');
+    regs[2] = mk_const(str_dup(msg), 'S');
+    INS(interpreter, "set", NULL, regs, 3, 2, 1);
+    INS(interpreter, "throw", NULL, regs, 1, 0, 1);
+    INS(interpreter, "ret", NULL, regs, 0, 0, 1);
+}
+
 static Instruction *
 pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
-        SymReg *sub, SymReg *i0, SymReg *p3, int first)
+        SymReg *sub, SymReg *i0, SymReg *p3, int first, int type)
 {
-    SymReg *check_sub, *regs[IMCC_MAX_REGS], *p0, *check_type, *i31;
+    SymReg *check_sub, *regs[IMCC_MAX_REGS], *check_type, *what;
     char buf[128];
-    Instruction *last;
 
     /*
      * generate check subroutine if not done yet
      */
-    i31 = mk_pasm_reg(str_dup("I31"));
+    what = mk_symreg(str_dup("#what"), 'I');
     strcpy(buf, "_#check_params");
     check_sub = _get_sym(ghash, buf);
     if (!check_sub) {
-        SymReg * err_nparam;
+        SymReg *err_nparam, *err_type;
 
-	check_sub = mk_address(str_dup(buf), U_add_uniq_label);
+        check_sub = mk_address(str_dup(buf), U_add_uniq_label);
         /* we just append to the current ins stream */
-        last = INS_LABEL(check_sub, 1);
+        INS_LABEL(check_sub, 1);
         /*
-         * first time check: amount of params, elements in P3 >= I1
+         * first time check: amount of params, elements in P3
          * we can globber I0
          */
         if (!i0)
@@ -64,53 +86,65 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
         regs[1] = p3;
         /* set I0, P3 */
         INS(interpreter, "set", NULL, regs, 2, 0, 1);
-        /* lt I0, nparam, check_err_nparams */
-	err_nparam = mk_address(str_dup("#check_err_nparam"), U_add_uniq_label);
-        /* the param count in passed by the sub in I31
-         */
+        /* lt I0, nparam, check_err_nparam */
+        err_nparam = mk_address(str_dup("#check_err_nparam"), U_add_uniq_label);
+        /* the param count in passed by the sub in what
+        */
         regs[0] = i0;
-        regs[1] = i31;
+        regs[1] = what;
         regs[2] = err_nparam;
-	INS(interpreter, "lt", NULL, regs, 3, 0, 1);
+        INS(interpreter, "lt", NULL, regs, 3, 0, 1);
+        INS(interpreter, "ret", NULL, regs, 0, 0, 1);
         /*
-         * type check entry
+         * type check entry to check sub
          */
-	check_type = mk_address(str_dup("_#check_param_type"),
+        check_type = mk_address(str_dup("_#check_param_type"),
                 U_add_uniq_label);
-        /* we just append to the current ins stream */
-        last = INS_LABEL(check_type, 1);
+        INS_LABEL(check_type, 1);
+        /*
+         * param type check, we get the entry type in I31
+         */
+        /* typeof I0, P3[0] */
+        regs[0] = i0;
+        regs[1] = p3;
+        regs[2] = mk_const(str_dup("0"), 'I');
+        INS(interpreter, "typeof", NULL, regs, 3, 4, 1);
+        err_type = mk_address(str_dup("#check_err_type"), U_add_uniq_label);
+        regs[0] = i0;
+        regs[1] = what;
+        regs[2] = err_type;
+        INS(interpreter, "ne", NULL, regs, 3, 0, 1);
+        INS(interpreter, "ret", NULL, regs, 0, 0, 1);
 
-	INS(interpreter, "ret", NULL, regs, 0, 0, 1);
-        INS_LABEL(err_nparam, 1);
-        /* new P0, .Exception */
-        p0 = mk_pasm_reg(str_dup("P0"));
-        iNEW(interpreter, p0, str_dup("Exception"), NULL, 1);
-        regs[0] = p0;
-        regs[1] = mk_const(str_dup("\"_message\""), 'S');
-        sprintf(buf, "\"wrong param count\"");
-        regs[2] = mk_const(str_dup(buf), 'S');
-        INS(interpreter, "set", NULL, regs, 3, 2, 1);
-	INS(interpreter, "throw", NULL, regs, 1, 0, 1);
-	INS(interpreter, "ret", NULL, regs, 0, 0, 1);
+        /* emit err handler routines
+         * param count
+         */
+        pcc_emit_err(interpreter, err_nparam, "\"wrong param count\"");
+        /*
+         * param type
+         */
+        pcc_emit_err(interpreter, err_type, "\"wrong param type\"");
     }
     if (first) {
         /* emit first time check
-         * I31 is param count
+         * what is param count
          */
-        regs[0] = i31;
+        regs[0] = what;
         sprintf(buf, "%d", sub->pcc_sub->nargs);
         regs[1] = mk_const(str_dup(buf), 'I');
         ins = insINS(interpreter, ins, "set", regs, 2);
         regs[0] = check_sub;
         ins = insINS(interpreter, ins, "bsr", regs, 1);
     }
-    else {
-        /* emit type check */
-        strcpy(buf, "_#check_param_type");
-        check_type = _get_sym(ghash, buf);
-        regs[0] = check_type;
-        ins = insINS(interpreter, ins, "bsr", regs, 1);
-    }
+    /* emit type check what is type */
+    regs[0] = what;
+    sprintf(buf, "%d", type);
+    regs[1] = mk_const(str_dup(buf), 'I');
+    ins = insINS(interpreter, ins, "set", regs, 2);
+    strcpy(buf, "_#check_param_type");
+    check_type = _get_sym(ghash, buf);
+    regs[0] = check_type;
+    ins = insINS(interpreter, ins, "bsr", regs, 1);
     return ins;
 }
 
@@ -162,18 +196,26 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 		}
 	    }
 	    else {
+                int type;
                 /*
                  * TODO handle overflow
                  */
 overflow:
 		if (!p3)
 		    p3 = mk_pasm_reg(str_dup("P3"));
+                switch (sub->pcc_sub->args[i]->set) {
+                    case 'I': type = enum_type_INTVAL; break;
+                    case 'S': type = enum_type_STRING; break;
+                    case 'N': type = enum_type_FLOATVAL; break;
+                    case 'P': type = enum_type_PMC; break;
+                    default: type = -1;
+                }
                 /*
                  * emit code to inspect the argument type
                  * if something is wrong, an exception gets thrown
                  */
                 ins = pcc_emit_check_param(interpreter, ins, sub, i0, p3,
-                        i == 0);
+                        i == 0, type);
 		regs[0] = sub->pcc_sub->args[i];
 		regs[1] = p3;
 		ins = insINS(interpreter, ins, "shift", regs, 2);

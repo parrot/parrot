@@ -126,12 +126,27 @@ pmclass SArray {
         return DYNSELF.elements();
     }
 
+    INTVAL type_keyed_int (INTVAL key) {
+        HASH_ENTRY *e = (HASH_ENTRY *) PMC_data(SELF);
+	PMC *ret;
+
+	if (key < 0) {
+	    key += e[1].val.int_val;
+	}
+        key += e[0].val.int_val; /* lower bound if already shifted */
+	if (key < e[0].val.int_val || key >= e[1].val.int_val)
+	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
+	return e->type;
+    }
+
     INTVAL get_integer_keyed_int (INTVAL key) {
         HASH_ENTRY *e = (HASH_ENTRY *) PMC_data(SELF);
 
 	if (key < 0) {
 	    key += e[1].val.int_val;
 	}
+        key += e[0].val.int_val; /* lower bound if already shifted */
 	if (key < e[0].val.int_val || key >= e[1].val.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
@@ -164,6 +179,7 @@ pmclass SArray {
 	if (key < 0) {
 	    key += e[1].val.int_val;
 	}
+        key += e[0].val.int_val;
 	if (key < e[0].val.int_val || key >= e[1].val.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
@@ -195,6 +211,7 @@ pmclass SArray {
 	if (key < 0) {
 	    key += e[1].val.int_val;
 	}
+        key += e[0].val.int_val;
 	if (key < e[0].val.int_val || key >= e[1].val.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
@@ -227,6 +244,7 @@ pmclass SArray {
 	if (key < 0) {
 	    key += e[1].val.int_val;
 	}
+        key += e[0].val.int_val;
 	if (key < e[0].val.int_val || key >= e[1].val.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);

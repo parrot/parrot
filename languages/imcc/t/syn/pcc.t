@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 10;
+use TestCompiler tests => 13;
 
 ##############################
 # Parrot Calling Conventions
@@ -311,3 +311,87 @@ wrong param count
 OUT
 
 
+output_is(<<'CODE', <<'OUT', "wrong param count exception, catch it");
+.sub _main
+    .local Sub ex_handler
+    newsub ex_handler, .Exception_Handler, _handler
+    set_eh ex_handler
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin non_prototyped
+    .arg $S0
+    .pcc_call sub
+    ret:
+    .pcc_end
+    print "back\n"
+    end
+.end
+
+.sub _handler
+    set S0, P5["_message"]	# P5 is the exception object
+    eq S0, "wrong param count", ok
+    print "not "
+ok:
+    print "ok\n"
+    end
+.end
+
+.pcc_sub _sub
+    .param string k
+    .param string l
+    print k
+    print l
+    invoke P1
+.end
+CODE
+ok
+OUT
+
+output_is(<<'CODE', <<'OUT', "wrong param type exception");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin non_prototyped
+    .arg $S0
+    .pcc_call sub
+    ret:
+    .pcc_end
+    print "back\n"
+    end
+.end
+
+.pcc_sub _sub
+    .param int k
+    print k
+    print "n"
+    invoke P1
+.end
+CODE
+wrong param type
+OUT
+
+output_is(<<'CODE', <<'OUT', "wrong param type exception - 2 params");
+.sub _main
+    .local Sub sub
+    $S0 = "ok 1\n"
+    newsub sub, .Sub, _sub
+    .pcc_begin non_prototyped
+    .arg $S0
+    .arg $I0
+    .pcc_call sub
+    ret:
+    .pcc_end
+    print "back\n"
+    end
+.end
+
+.pcc_sub _sub
+    .param string k
+    .param string l
+    print k
+    print l
+    invoke P1
+.end
+CODE
+wrong param type
+OUT

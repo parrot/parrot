@@ -14,7 +14,7 @@ pmc.ops - PMC Operations
 
 =head1 DESCRIPTION
 
-Operations that deal with PMCs, including creation and 
+Operations that deal with PMCs, including creation and
 destruction, manipulation, and introspection.
 
 =cut
@@ -23,7 +23,7 @@ destruction, manipulation, and introspection.
 
 =head2 Creation and Types
 
-These operations are used to create PMCs and examine 
+These operations are used to create PMCs and examine
 type information.
 
 =over 4
@@ -81,6 +81,8 @@ Return the type of PMC in $2.
 
 =item B<typeof>(out INT, in PMC, in KEY)
 
+=item B<typeof>(out INT, in PMC, in INTKEY)
+
 Return the type of the entry in aggregate PMC in $2 at key $3.
 
 =cut
@@ -100,6 +102,10 @@ inline op typeof (out INT, in PMC, in KEY) {
   goto NEXT();
 }
 
+inline op typeof (out INT, in PMC, in INTKEY) {
+  $1 = $2->vtable->type_keyed_int(interpreter, $2, $3);
+  goto NEXT();
+}
 ########################################
 
 =item B<typeof>(out STR, in INT)
