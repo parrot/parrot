@@ -74,7 +74,6 @@ generate:
 	pushi
 	length I0, S15
 	set S1, ""
-	set S1, " "
 	set I1, 0
 genloop:
 	set I2, 0
