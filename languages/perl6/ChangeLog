@@ -165,7 +165,16 @@
 
 	* Additions:
 	    - return values (documentation coming).
+	    - pconfig.pl extracts lib extension from Makefile (Leo)
+	    - perl6 (Leo)
+	        - new options, including support for --shared native -C
+		- some doc
 
+	* Fixes:
+	    - perl6 (Leo)
+	        - catch a pbc2c warning
+	        - use libparrot.a for -C
+	
 	* Test-failures:
 	    - 3.{2,4-7}, a.2 -- register clobbering.
 	    - 8.3 -- not sure
