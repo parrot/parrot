@@ -2392,7 +2392,8 @@ Find the global named $2 and store it in $1
 =cut
 
 op find_global(out PMC, in STR) {
-  $1 = interpreter->perl_stash->stash_hash->vtable->get_string_index_s(interpreter, interpreter->perl_stash->stash_hash, $2);
+/*  $1 = interpreter->perl_stash->stash_hash->vtable->get_string_index_s(interpreter, interpreter->perl_stash->stash_hash, $2);
+*/
   goto NEXT();
 }
 
