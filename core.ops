@@ -3434,6 +3434,38 @@ inline op intdepth(out INT) {
 
 =cut
 
+########################################
+
+=item B<saveall>()
+
+Save all the registers.
+
+=item B<restoreall>()
+
+Restore all the registers.
+
+=cut
+
+inline op saveall() {
+  Parrot_push_i(interpreter);
+  Parrot_push_n(interpreter);
+  Parrot_push_s(interpreter);
+  Parrot_push_p(interpreter);
+  goto NEXT();
+}
+
+inline op restoreall() {
+  Parrot_pop_i(interpreter);
+  Parrot_pop_n(interpreter);
+  Parrot_pop_s(interpreter);
+  Parrot_pop_p(interpreter);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
 ###############################################################################
 
 =head2 Control flow
