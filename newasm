@@ -115,6 +115,8 @@ sub new {
   $self->{constants}{PerlString} = 4;
   $self->{constants}{PerlArray} = 5;
   $self->{constants}{PerlHash} = 6;
+  $self->{constants}{ParrotPointer} = 7;
+  $self->{constants}{IntQueue} = 8;
   $self;
 }
 
@@ -666,7 +668,10 @@ sub to_bytecode {
 
     while($temp ne '') {
       $temp=~s/^\s*(,\s*)?//;
-      if($temp=~s/^($reg_re)//) {
+      if($temp=~s/^#.*//) {
+        # Skip flying comments.
+      }
+      elsif($temp=~s/^($reg_re)//) {
         $_->[0][0] .= "_".lc(substr($1,0,1));
         push @{$_->[0]}, [lc(substr($1,0,1)),$1];
       }
