@@ -46,11 +46,23 @@ my %builtins = (
     tuple => 1,
 );
 
+my %type_map = (
+    float => 'py_float',
+    # int   => 'py_int',
+    int   => 'Py_int',    # the new way type system
+);
+
+
 get_dis($DIS, $file);
 get_source($file);
 exit if $opt{D};
 gen_code();
 
+sub type_map {
+    my $t = $_[0];
+    return $type_map{$t} if $type_map{$t} ;
+    return $t;
+}
 sub parse_dis
 {
     my @d = @_;
@@ -396,6 +408,16 @@ EOC
     }
     push @stack, [$n, $c, $typ];
 }
+sub LOAD_LOCALS {
+    my ($n, $c, $cmt) = @_;
+    # TODO $cmt
+    my $pad = temp('P');
+    print <<EOC;
+	peek_pad $pad      # ???
+EOC
+    push @stack, [-1, $pad, 'P'];
+}
+
 sub STORE_NAME {
     my ($n, $c, $cmt) = @_;
     if ($make_f) {
@@ -496,8 +518,7 @@ EOC
 EOC
     }
     else {
-	$c = 'py_float' if $c eq 'float'; # XXX imcc name clash
-	$c = 'py_int' if $c eq 'int'; # XXX imcc name clash
+	$c = type_map($c);
 	$globals{$c} = 1;
 	my $type = 'pmc';
 	$type = 'NCI' if ($builtins{$c});

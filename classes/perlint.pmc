@@ -73,6 +73,43 @@ pmclass PerlInt extends perlscalar {
 
 /*
 
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a PerlIint Class object. Return a new
+C<int> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void *next) {
+        int argcP = REG_INT(3);
+        int base;
+        PMC *res;
+        STRING *num;
+
+        if (!argcP) {
+            REG_PMC(5) = pmc_new(INTERP, enum_class_PerlInt);
+            return next;
+        }
+        if (argcP == 1)
+            base = 10;
+        if (argcP == 2)
+            base = VTABLE_get_integer(INTERP, REG_PMC(6));
+        res = pmc_new(interpreter, enum_class_BigInt);
+        num = VTABLE_get_string(interpreter, REG_PMC(5));
+        VTABLE_set_string_keyed_int(interpreter, res, base, num);
+        if (num->strlen < 9) {  /* XXX */
+            /* TODO not if it would overflow */
+            INTVAL intnum = VTABLE_get_integer(interpreter, res);
+            res = pmc_new(interpreter, enum_class_PerlInt); /*TODO morph */
+            VTABLE_set_integer_native(interpreter, res, intnum);
+        }
+        REG_PMC(5) = res;
+        return next;
+    }
+
+/*
+
 =item C<void init()>
 
 Initializes the integer with a default value of C<0>.

@@ -209,31 +209,11 @@ parrot_py_long(Interp *interpreter, PMC *val, PMC *radix)
 
 }
 
-static PMC *
-parrot_py_int(Interp *interpreter, PMC *val, PMC *radix)
-{
-    PMC *res;
-    INTVAL base, argcP, intnum;
-    STRING *num;
 
-    if ((argcP = REG_INT(3)) == 0)
-        return pmc_new(interpreter, enum_class_PerlInt);
-    if (argcP == 2) {
-        base = VTABLE_get_integer(interpreter, radix);
-        /* val must be a STRING */
-    }
-    else
-        base = 10;
-    res = pmc_new(interpreter, enum_class_BigInt);
-    num = VTABLE_get_string(interpreter, val);
-    VTABLE_set_string_keyed_int(interpreter, res, base, num);
-    if (num->strlen < 9) {  /* XXX */
-        /* TODO not if it would overflow */
-        intnum = VTABLE_get_integer(interpreter, res);
-        res = pmc_new(interpreter, enum_class_PerlInt); /*TODO morph */
-        VTABLE_set_integer_native(interpreter, res, intnum);
-    }
-    return res;
+static PMC *
+parrot_py_isa(Interp *interpreter, PMC *object, PMC *classinfo)
+{
+    return NULL;
 }
 
 #define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
@@ -660,7 +640,8 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *hash     = CONST_STRING(interpreter, "hash");
     STRING *hex      = CONST_STRING(interpreter, "hex");
     STRING *id       = CONST_STRING(interpreter, "id");
-    STRING *intf     = CONST_STRING(interpreter, "py_int");
+    STRING *isa      = CONST_STRING(interpreter, "isinstance");
+    STRING *Py_int   = CONST_STRING(interpreter, "Py_int");
     STRING *list     = CONST_STRING(interpreter, "list");
     STRING *floatf   = CONST_STRING(interpreter, "py_float");
     STRING *longf    = CONST_STRING(interpreter, "long");
@@ -672,6 +653,15 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *repr   =   CONST_STRING(interpreter, "repr");
     STRING *tuple    = CONST_STRING(interpreter, "tuple");
 
+    PMC* class;
+    /*
+     * new types interface, just place a class object as global
+     * this is invocable and returns a new instance
+     */
+    class = Parrot_base_vtables[enum_class_PerlInt]->data;
+    Parrot_store_global(interpreter, NULL, Py_int, class);
+
+
     parrot_py_global(interpreter, F2DPTR(parrot_py_assert_e), assert_e, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_chr), chr, pip);
@@ -682,7 +672,7 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_hex), hex, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_id), id, ip);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_int), intf, pipp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_isa), isa, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_long), longf, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_float), floatf, pip);
