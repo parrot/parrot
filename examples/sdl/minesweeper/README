@@ -1,0 +1,4 @@
+To run this example, be in the Parrot directory
+and run the following command:
+
+./parrot examples/sdl/minesweeper/mines.imc

@@ -540,6 +540,13 @@ examples/sdl/move_parrot_logo.imc                 [devel]
 examples/sdl/parrot_small.png                     [devel]
 examples/sdl/raw_pixels.imc                       [devel]
 examples/sdl/lcd/clock.imc                        [devel]
+examples/sdl/minesweeper/README                   [main]doc
+examples/sdl/minesweeper/eventhandler.imc         [main]doc
+examples/sdl/minesweeper/field.imc                [main]doc
+examples/sdl/minesweeper/mines.imc                [main]doc
+examples/sdl/minesweeper/mines.png                [main]doc
+examples/sdl/minesweeper/mines_debug.png          [main]doc
+examples/sdl/minesweeper/smiley.png               [main]doc
 examples/sdl/tetris/README			  [main]doc
 examples/sdl/tetris/app.imc			  [main]doc
 examples/sdl/tetris/blockdata.imc		  [main]doc
