@@ -326,7 +326,7 @@ Parrot_destroy_cpa(char **array) {
     UINTVAL offset = 0;
     /* Free each piece */
     while (array[offset] != NULL) {
-        string_cstring_free(array[offset]);
+        string_cstring_free(array[offset++]);
     }
     /* And then the holding array */
     mem_sys_free(array);

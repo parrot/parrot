@@ -143,7 +143,6 @@ print NCI <<'HEAD';
  *  Notes:
  *  References:
  */
-
 #include "parrot/parrot.h"
 
 #if defined(HAS_JIT) && defined(I386)
@@ -207,8 +206,13 @@ print NCI <<TAIL;
    to a function that can call it. */
 void *
 build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
-                String *signature)
+                STRING *signature)
 {
+   
+    STRING *ns;
+    STRING *message;
+    char *c;
+
 #if defined(CAN_BUILD_CALL_FRAMES)
     /* This would be a good place to put the code that builds the
        frames. Undoubtedly painfully platform-dependent */
@@ -221,7 +225,20 @@ build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     UNUSED(pmc_nci);
     if (0 == string_length(signature)) return F2DPTR(pcf_v_v);
     $icky_global_bit
-    PANIC("Unknown signature type");
+ 
+ 
+    /*
+      These three lines have been added to aid debugging. I want to be able to
+      see which signature has an unknown type. I am sure someone can come up
+      with a neater way to do this.
+     */
+    ns = string_make(interpreter, " is an unknown signature type", 30, NULL, 0, NULL);
+    message = string_concat(interpreter, signature, ns, 0);
+   
+    // I think there may be memory issues with this but if we get to here we are
+    // aborting.
+    c = string_to_cstring(interpreter, message);
+    PANIC(c);
     return NULL;
 #endif
 }
