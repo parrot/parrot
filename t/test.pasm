@@ -8,13 +8,13 @@
 # $Id$
 #
 
-        time I1
         set I2, 0
         set I3, 1
         set I4, 100000000
 	set S0, "\nIterations: "
 	print S0
 	print I4
+        time I1
 REDO:   eq I2, I4, DONE
         add I2, I2, I3
         branch REDO

@@ -14,11 +14,15 @@
 #include "parrot/interp_guts.h"
 #include "parrot/oplib/core_ops.h"
 
-runops_core_f   runops_cores[4] = {
-  runops_t0b0_core,
-  runops_t0b1_core,
-  runops_t1b0_core,
-  runops_t1b1_core
+runops_core_f   runops_cores[8] = {
+  runops_t0p0b0_core,
+  runops_t0p0b1_core,
+  runops_t0p1b0_core,
+  runops_t0p1b1_core,
+  runops_t1p0b0_core,
+  runops_t1p0b1_core,
+  runops_t1p1b0_core,
+  runops_t1p1b1_core
 };
 
 /*=for api interpreter check_fingerprint
@@ -53,43 +57,6 @@ check_fingerprint(struct Parrot_Interp *interpreter) {
 
 }
 
-/*=for api interpreter runops_t0b0_core
- * run parrot operations until the program is complete
- *
- * No tracing.
- * No bounds checking.
- */
-
-opcode_t *
-runops_t0b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
-    while (pc) { DO_OP(pc, interpreter); }
-    return pc;
-}
-
-/*=for api interpreter runops_t0b1_core
- * run parrot operations until the program is complete
- *
- * No tracing.
- * With bounds checking.
- */
-
-opcode_t *
-runops_t0b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
-    opcode_t * code_start;
-    INTVAL     code_size;
-    opcode_t * code_end;
-
-    code_start = (opcode_t *)interpreter->code->byte_code;
-    code_size  = interpreter->code->byte_code_size;
-    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
-
-    while (pc && pc >= code_start && pc < code_end) {
-        DO_OP(pc, interpreter);
-    }
-
-    return pc;
-}
-
 /*
  *=for api interpreter trace_op_b0
  * TODO: This isn't really part of the API, but here's its documentation. Prints the PC, OP
@@ -121,29 +88,6 @@ trace_op_b0(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t *
     fprintf(stderr, "\n");
 
     (void)fflush(stderr); /* Flush *stderr* now that we've output the trace info */
-}
-
-/*=for api interpreter runops_t1b0_core
- * TODO: Not really part of the API, but here's the docs.
- * Passed to runops_generic() by runops_trace().
- *
- * With tracing.
- * No bounds checking.
- */
-
-opcode_t *
-runops_t1b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
-    opcode_t *code_start;
-
-    code_start = (opcode_t *)interpreter->code->byte_code;
-
-    trace_op_b0(interpreter, code_start, pc);
-    while (pc) {
-        DO_OP(pc, interpreter);
-        trace_op_b0(interpreter, code_start, pc);
-    }
-
-    return pc;
 }
 
 /*
@@ -184,16 +128,123 @@ trace_op_b1(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t *
     (void)fflush(stderr); /* Flush *stderr* now that we've output the trace info */
 }
 
-/*=for api interpreter runops_t1b1_core
- * TODO: Not really part of the API, but here's the docs.
- * Passed to runops_generic() by runops_trace().
+/*=for api interpreter runops_t0p0b0_core
+ * run parrot operations until the program is complete
  *
- * With tracing.
- * With bounds checking.
+ * No bounds checking.
+ * No profiling.
+ * No tracing.
  */
 
 opcode_t *
-runops_t1b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+runops_t0p0b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    while (pc) { DO_OP(pc, interpreter); }
+    return pc;
+}
+
+/*=for api interpreter runops_t0p0b1_core
+ * run parrot operations until the program is complete
+ *
+ * With bounds checking.
+ * No profiling.
+ * No tracing.
+ */
+
+opcode_t *
+runops_t0p0b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    opcode_t * code_start;
+    INTVAL     code_size;
+    opcode_t * code_end;
+
+    code_start = (opcode_t *)interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size;
+    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
+
+    while (pc && pc >= code_start && pc < code_end) {
+        DO_OP(pc, interpreter);
+    }
+
+    return pc;
+}
+
+/*=for api interpreter runops_t0p1b0_core
+ * run parrot operations until the program is complete
+ *
+ * No bounds checking.
+ * With profiling.
+ * No tracing.
+ */
+
+opcode_t *
+runops_t0p1b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    while (pc) {
+        interpreter->profile[*pc]++;
+        DO_OP(pc, interpreter);
+    }
+    return pc;
+}
+
+/*=for api interpreter runops_t0p1b1_core
+ * run parrot operations until the program is complete
+ *
+ * With bounds checking.
+ * With profiling.
+ * No tracing.
+ */
+
+opcode_t *
+runops_t0p1b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    opcode_t * code_start;
+    INTVAL     code_size;
+    opcode_t * code_end;
+
+    code_start = (opcode_t *)interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size;
+    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
+
+    while (pc && pc >= code_start && pc < code_end) {
+        interpreter->profile[*pc]++;
+        DO_OP(pc, interpreter);
+    }
+
+    return pc;
+}
+
+/*=for api interpreter runops_t1p0b0_core
+ * TODO: Not really part of the API, but here's the docs.
+ * Passed to runops_generic() by runops_trace().
+ *
+ * No bounds checking.
+ * No profiling.
+ * With tracing.
+ */
+
+opcode_t *
+runops_t1p0b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    opcode_t *code_start;
+
+    code_start = (opcode_t *)interpreter->code->byte_code;
+
+    trace_op_b0(interpreter, code_start, pc);
+    while (pc) {
+        DO_OP(pc, interpreter);
+        trace_op_b0(interpreter, code_start, pc);
+    }
+
+    return pc;
+}
+
+/*=for api interpreter runops_t1p0b1_core
+ * TODO: Not really part of the API, but here's the docs.
+ * Passed to runops_generic() by runops_trace().
+ *
+ * With bounds checking.
+ * No profiling.
+ * With tracing.
+ */
+
+opcode_t *
+runops_t1p0b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
     INTVAL     code_size;
     opcode_t * code_end;
@@ -205,6 +256,60 @@ runops_t1b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     trace_op_b1(interpreter, code_start, code_end, pc);
     
     while (pc && pc >= code_start && pc < code_end ) {
+        DO_OP(pc, interpreter);
+        trace_op_b1(interpreter, code_start, code_end, pc);
+    }
+
+    return pc;
+}
+
+/*=for api interpreter runops_t1p1b0_core
+ * TODO: Not really part of the API, but here's the docs.
+ * Passed to runops_generic() by runops_trace().
+ *
+ * No bounds checking.
+ * With profiling.
+ * With tracing.
+ */
+
+opcode_t *
+runops_t1p1b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    opcode_t *code_start;
+
+    code_start = (opcode_t *)interpreter->code->byte_code;
+
+    trace_op_b0(interpreter, code_start, pc);
+    while (pc) {
+        interpreter->profile[*pc]++;
+        DO_OP(pc, interpreter);
+        trace_op_b0(interpreter, code_start, pc);
+    }
+
+    return pc;
+}
+
+/*=for api interpreter runops_t1p1b1_core
+ * TODO: Not really part of the API, but here's the docs.
+ * Passed to runops_generic() by runops_trace().
+ *
+ * With tracing.
+ * With bounds checking.
+ */
+
+opcode_t *
+runops_t1p1b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    opcode_t * code_start;
+    INTVAL     code_size;
+    opcode_t * code_end;
+
+    code_start = (opcode_t *)interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size;
+    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
+
+    trace_op_b1(interpreter, code_start, code_end, pc);
+    
+    while (pc && pc >= code_start && pc < code_end ) {
+        interpreter->profile[*pc]++;
         DO_OP(pc, interpreter);
         trace_op_b1(interpreter, code_start, code_end, pc);
     }
@@ -253,10 +358,23 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code) {
 
         interpreter->resume_addr = (opcode_t *)NULL;
 
-        which |= interpreter->flags & PARROT_BOUNDS_FLAG ? 0x01 : 0x00;
-        which |= interpreter->flags & PARROT_TRACE_FLAG  ? 0x02 : 0x00;
+        which |= interpreter->flags & PARROT_BOUNDS_FLAG  ? 0x01 : 0x00;
+        which |= interpreter->flags & PARROT_PROFILE_FLAG ? 0x02 : 0x00;
+        which |= interpreter->flags & PARROT_TRACE_FLAG   ? 0x04 : 0x00;
 
         core = runops_cores[which];
+
+        if ((interpreter->flags & PARROT_PROFILE_FLAG) != 0) {
+            int i;
+
+            if (interpreter->profile == NULL) {
+                interpreter->profile = (INTVAL *)mem_sys_allocate(core_numops * sizeof(INTVAL));
+            }
+
+            for (i = 0; i < core_numops; i++) {
+                interpreter->profile[i] = 0;
+            }
+        }
 
         runops_generic(core, interpreter, pc);
     }
@@ -340,6 +458,7 @@ make_interpreter() {
     /* Done. Return and be done with it */
 
     interpreter->code = (struct PackFile *)NULL;
+    interpreter->profile = (INTVAL *)NULL;
 
     interpreter->resume_addr = (opcode_t *)NULL;
 

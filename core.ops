@@ -1527,6 +1527,21 @@ MANUAL_OP bounds(ic) {
 
 ########################################
 
+=item B<profile>(ic)
+
+If $1 is zero, turn off profiling. Otherwise turn it on.
+
+=cut
+
+MANUAL_OP profile(ic) {
+  if ($1 != 0) { interpreter->flags |=  PARROT_PROFILE_FLAG; }
+  else         { interpreter->flags &= ~PARROT_PROFILE_FLAG; }
+  RESTART(*);
+}
+
+
+########################################
+
 =item B<trace>(ic)
 
 If $1 is zero, turn off tracing. Otherwise turn it on.

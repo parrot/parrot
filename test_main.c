@@ -12,11 +12,14 @@
 
 #include "parrot/parrot.h"
 
+#include "parrot/oplib/core_ops.h"
+
 int
 main(int argc, char **argv) {
     int i;
-    int tracing;
     int bounds_checking;
+    int profiling;
+    int tracing;
 
     struct Parrot_Interp *interpreter;
     init_world();
@@ -24,23 +27,33 @@ main(int argc, char **argv) {
     interpreter = make_interpreter();
     
     /*
-    ** Look for the '-t' tracing and '-b' bounds checking switches.
+    ** Look for the '-b' bounds checking, '-p' profiling and '-t' tracing
+    ** switches.
+    **
     ** We really should use getopt, but are we allowed?
     */
 
-    tracing         = 0;
     bounds_checking = 0;
+    profiling       = 0;
+    tracing         = 0;
 
     while (argc > 1 && argv[1][0] == '-') {
-        if (argv[1][1] == 't' && argv[1][2] == '\0') {
-            tracing = 1;
+        if (argv[1][1] == 'b' && argv[1][2] == '\0') {
+            bounds_checking = 1;
             for(i = 2; i < argc; i++) {
                 argv[i-1] = argv[i];
             }
             argc--;
         }
-        else if (argv[1][1] == 'b' && argv[1][2] == '\0') {
-            bounds_checking = 1;
+        else if (argv[1][1] == 'p' && argv[1][2] == '\0') {
+            profiling = 1;
+            for(i = 2; i < argc; i++) {
+                argv[i-1] = argv[i];
+            }
+            argc--;
+        }
+        else if (argv[1][1] == 't' && argv[1][2] == '\0') {
+            tracing = 1;
             for(i = 2; i < argc; i++) {
                 argv[i-1] = argv[i];
             }
@@ -49,6 +62,7 @@ main(int argc, char **argv) {
     }
 
     /* If we got only the program name, complain */
+
     if (argc == 1) {
         fprintf(stderr, "%s: usage: %s prog\n", argv[0], argv[0]);
         exit(1);
@@ -121,17 +135,54 @@ main(int argc, char **argv) {
             return 1;
         }
 
-        if (tracing) {
-            interpreter->flags |= PARROT_TRACE_FLAG;
-        }
-
         if (bounds_checking) {
             interpreter->flags |= PARROT_BOUNDS_FLAG;
         }
 
+        if (profiling) {
+            interpreter->flags |= PARROT_PROFILE_FLAG;
+        }
+
+        if (tracing) {
+            interpreter->flags |= PARROT_TRACE_FLAG;
+        }
+
+        /*
+        ** Run the interpreter loop:
+        */
+
         runops(interpreter, pf);
         
+        /*
+        ** If any profile information was gathered, print it out:
+        */
+
+        if (interpreter->profile != NULL) {
+            int i;
+            int op_count   = 0;
+            int call_count = 0;
+
+            printf("Operation profile:\n\n");
+
+            printf("  CODE   OP FULL NAME  CALLS\n");
+            printf("  -----  ------------  ------------\n");
+
+            for (i = 0; i < core_numops; i++) {
+                if(interpreter->profile[i] > 0) {
+                    op_count++;
+                    call_count += interpreter->profile[i];
+
+                    printf("  %5d  %-12s  %12d\n", i, core_opinfo[i].full_name,
+                        interpreter->profile[i]);
+                }
+
+            }
+
+            printf("  -----  ------------  ------------\n");
+            printf("  %5d  %-12s  %12d\n", op_count, "", call_count);
+        }
     }
+
     return 0;
 }
 

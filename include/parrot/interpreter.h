@@ -39,14 +39,15 @@ struct Parrot_Interp {
     INTVAL flags;				  /* Various interpreter flags
                                            that signal that runops
                                            should do something */
+    INTVAL * profile;                     /* The array where we keep the profile counters */
     opcode_t * resume_addr;
     struct PackFile * code;               /* The code we are executing */
 };
 
-#define PARROT_DEBUG_FLAG 0x01		/* Bit in the flags that says
-                                           we're debugging */
-#define PARROT_TRACE_FLAG 0x02		/* We're tracing execution */
-#define PARROT_BOUNDS_FLAG 0x04		/* We're tracking byte code bounds during execution */
+#define PARROT_DEBUG_FLAG   0x01  /* We're debugging */
+#define PARROT_TRACE_FLAG   0x02  /* We're tracing execution */
+#define PARROT_BOUNDS_FLAG  0x04  /* We're tracking byte code bounds */
+#define PARROT_PROFILE_FLAG 0x08  /* We're gathering profile information */
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
@@ -57,16 +58,28 @@ make_interpreter();
 typedef opcode_t * (*runops_core_f)(struct Parrot_Interp *, opcode_t *);
 
 opcode_t *
-runops_t0b0_core(struct Parrot_Interp *, opcode_t *);
+runops_t0p0b0_core(struct Parrot_Interp *, opcode_t *);
 
 opcode_t *
-runops_t0b1_core(struct Parrot_Interp *, opcode_t *);
+runops_t0p0b1_core(struct Parrot_Interp *, opcode_t *);
 
 opcode_t *
-runops_t1b0_core(struct Parrot_Interp *, opcode_t *);
+runops_t0p1b0_core(struct Parrot_Interp *, opcode_t *);
 
 opcode_t *
-runops_t1b1_core(struct Parrot_Interp *, opcode_t *);
+runops_t0p1b1_core(struct Parrot_Interp *, opcode_t *);
+
+opcode_t *
+runops_t1p0b0_core(struct Parrot_Interp *, opcode_t *);
+
+opcode_t *
+runops_t1p0b1_core(struct Parrot_Interp *, opcode_t *);
+
+opcode_t *
+runops_t1p1b0_core(struct Parrot_Interp *, opcode_t *);
+
+opcode_t *
+runops_t1p1b1_core(struct Parrot_Interp *, opcode_t *);
 
 void
 runops_generic();
