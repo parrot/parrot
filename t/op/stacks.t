@@ -617,6 +617,7 @@ output_is(<<'CODE', <<'OUTPUT', "intstack");
 	print I1
 
 	print "\n"
+	end
 CODE
 43210-1
 OUTPUT
