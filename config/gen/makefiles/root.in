@@ -93,6 +93,7 @@ GEN_MAKEFILES = \
     languages/bf/Makefile \
     imcc/Makefile \
     languages/ook/Makefile \
+    languages/m4/Makefile \
     languages/perl6/Makefile \
     languages/urm/Makefile \
     languages/tcl/Makefile
