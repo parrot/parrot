@@ -29,6 +29,20 @@
 # Arrayish things, terminated with NULL/0
 # L - Long array
 # T - Array of string pointers (Converted to cstrings)
+
+#
+# Callback Things
+#
+# C - Function pointer to call back into Parrot. The signature of
+#     this function is: void (function *)(ExternalThing *, CallbackInfo *)
+#     More docs in PDD 16.
+# D - Function pointer. Like C, only the arg order is reversed:
+#     this function is: void (function *)(CallbackInfo *, ExternalThing *)
+#
+# The following parameters must appear in a pair
+# Y - sub PMC to call back into
+# Z - Single PMC parameter to pass into sub Y
+
 #Return params
 #p	b
 c	v

@@ -1,0 +1,47 @@
+=head1 TITLE
+
+NCI conventions and definitions
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 16
+    Version: 1.0
+    Status: Developing
+    Last Modified: December 28, 2003
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.0
+
+None. First version
+
+=back
+
+=head1 ABSTRACT
+
+This PDD describes the native call interface, and the function
+signatures used to describe those functions.
+
+=head1 DESCRIPTION
+
+=head1 REFERENCES
+
+L<docs/pdds/pdd06_pasm.pod>
