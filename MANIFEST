@@ -56,6 +56,7 @@ config/gen/makefiles/docs.in
 config/gen/makefiles/jako.in
 config/gen/makefiles/languages.in
 config/gen/makefiles/miniperl.in
+config/gen/makefiles/perl6.in
 config/gen/makefiles/root.in
 config/gen/makefiles/scheme.in
 config/gen/platform.pl
@@ -311,7 +312,6 @@ languages/parrot_compiler/gentable.pl
 languages/parrot_compiler/parrot.pasm
 languages/parrot_compiler/sample.pasm
 languages/perl6/MANIFEST
-languages/perl6/Makefile
 languages/perl6/P6C/Addcontext.pm
 languages/perl6/P6C/Builtins.pm
 languages/perl6/P6C/Context.pm

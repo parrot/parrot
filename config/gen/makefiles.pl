@@ -16,6 +16,7 @@ sub runstep {
   genfile('config/gen/makefiles/jako.in',      'languages/jako/Makefile');
   genfile('config/gen/makefiles/miniperl.in',  'languages/miniperl/Makefile');
   genfile('config/gen/makefiles/scheme.in',    'languages/scheme/Makefile');
+  genfile('config/gen/makefiles/perl6.in',     'languages/perl6/Makefile');
 }
 
 1;
