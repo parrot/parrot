@@ -152,6 +152,7 @@ my @op_funcs;
 my @op_func_table;
 
 my $index = 0;
+my ($prev_source, $prev_func_name);
 
 foreach my $op ($ops->ops) {
     my $func_name  = $op->func_name;
@@ -162,9 +163,34 @@ foreach my $op ($ops->ops) {
     my $source     = $op->source($trans);
 
 #    print HEADER "$prototype;\n";
+#
+#   for predereferenced code all variants of one op with or without
+#   "c" suffix generate the same function body
+#
+#   e.g.
+#
+#   set i,i,i
+#   set i,ic,i
+#   set i,i,ic
+#   set i,ic,ic
+#
+#   have all the same function body, and thus we generate only the
+#   first one and change the op_func_table accordingly
 
-    push @op_func_table, sprintf("  %-50s /* %6ld */\n", "$func_name,", $index++);
+    if ($prev_source && $prev_source eq $source) {
+	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
+	"$prev_func_name,", $index++);
+	push @op_funcs, <<"EOF";
+	/* $func_name => $prev_func_name */
+EOF
+    }
+    else {
+	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
+	"$func_name,", $index++);
     push @op_funcs,      "$definition {\n$source}\n\n";
+	$prev_source = $source;
+	$prev_func_name = $func_name;
+    }
 }
 
 print SOURCE <<END_C;
