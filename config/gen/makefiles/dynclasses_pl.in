@@ -28,7 +28,7 @@ sub compile_cmd {
 
 sub partial_link_cmd {
     my ($target, @sources) = @_;
-    "$LD $CFLAGS $LDFLAGS $LD_LOAD_FLAGS $LIBPARROT ".
+    "$LD $LDFLAGS $LD_LOAD_FLAGS $LIBPARROT ".
     "-o " . $target . " " .
     join(" ", @sources);
 }
