@@ -284,30 +284,40 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
                 break;
             case 'P':       /* REG_PMC */
                 arg = va_arg(ap, PMC*);
+                /*
+                 * If this is a Key PMC with registers, we have to clone
+                 * the key.
+                 *
+                 * XXX make a distinct 'K' signature ?
+                 */
+                if (arg->vtable->base_type == enum_class_Key) {
+                    PMC *key;
+                    INTVAL any_registers;
+
+                    for (any_registers = 0, key = arg; key; ) {
+                        if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
+                            any_registers = 1;
+                            break;
+                        }
+                        key = key_next(interpreter, key);
+                    }
+
+                    if (any_registers) {
+                        struct parrot_regs_t *new_bp;
+                        new_bp = interpreter->ctx.bp;
+                        /* need old context */
+                        interpreter->ctx.bp = bp;
+                        /* clone sets key values according to refered
+                         * register items
+                         */
+                        arg = VTABLE_clone(interpreter, arg);
+                        interpreter->ctx.bp = new_bp;
+                    }
+                }
                 if (next[2] == 16)
                     VTABLE_set_pmc_keyed_int(interpreter, p3, i++, arg);
                 else
                     REG_PMC(next[2]++) = arg;
-                /*
-                 * if this is a Key PMC with registers, pass on these
-                 * registers.
-                 * XXX make a distinct 'K' signature ?
-                 */
-                if (arg->vtable->base_type == enum_class_Key) {
-                    while (arg) {
-                        UINTVAL flags = PObj_get_FLAGS(arg);
-                        if (flags & KEY_register_FLAG) {
-                            INTVAL n = PMC_int_val(arg);
-                            if (flags & KEY_integer_FLAG)
-                                REG_INT(n) = BP_REG_INT(bp, n);
-                            else if (flags & KEY_pmc_FLAG)
-                                REG_PMC(n) = BP_REG_PMC(bp, n);
-                            else if (flags & KEY_string_FLAG)
-                                REG_STR(n) = BP_REG_STR(bp, n);
-                        }
-                        arg = key_next(interpreter, arg);
-                    }
-                }
                 break;
             case 'N':       /* REG_NUM */
                 if (next[3] == 16)
