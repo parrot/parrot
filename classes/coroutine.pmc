@@ -77,11 +77,11 @@ pmclass Coroutine {
    }
 */
    void set_integer (PMC * value) {
-       ((struct Parrot_Sub*)SELF->data)->init = (opcode_t*)value->vtable->get_integer(INTERP, value);
+       ((struct Parrot_Coroutine*)SELF->data)->init = (opcode_t*)value->vtable->get_integer(INTERP, value);
    }
 
    void set_integer_native (INTVAL value) {
-       ((struct Parrot_Sub*)SELF->data)->init = (opcode_t*)value;
+       ((struct Parrot_Coroutine*)SELF->data)->init = (opcode_t*)value;
    }
 /*
    void set_integer_bigint (BIGINT value) {
