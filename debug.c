@@ -1418,7 +1418,7 @@ PDB_help(const char *command)
     fprintf(stderr,"\tdelete (d) -- delete a breakpoint\n");
     fprintf(stderr,"\tcontinue (c) -- continue the program execution\n");
     fprintf(stderr,"\tnext (n) -- run the next instruction\n");
-    fprintf(stderr,"\teval (w) -- run an instruction\n");
+    fprintf(stderr,"\teval (e) -- run an instruction\n");
     fprintf(stderr,"\ttrace (t) -- trace the next instruction\n");
     fprintf(stderr,"\tprint (p) -- print the interpreter registers\n");
     fprintf(stderr,"\tstack (s) -- examine the stack\n");
