@@ -35,9 +35,11 @@
 typedef void * Parrot_INTERP;
 typedef void * Parrot_STRING;
 typedef void * Parrot_PMC;
-typedef void * Parrot_Encoding;
 typedef Parrot_Int Parrot_Language;
+typedef void * Parrot_Encoding;
 typedef void * Parrot_CharType;
+typedef const void * Parrot_Const_Encoding;
+typedef const void * Parrot_Const_CharType;
 
 #endif
 
@@ -74,9 +76,9 @@ void Parrot_set_pmcreg(Parrot_INTERP, Parrot_Int, Parrot_PMC);
 
 Parrot_STRING Parrot_new_string(Parrot_INTERP, char *, int, Parrot_Encoding, Parrot_CharType, Parrot_Language, Parrot_Int);
 
-const Parrot_CharType Parrot_find_chartype(Parrot_INTERP, char*);
+Parrot_Const_CharType Parrot_find_chartype(Parrot_INTERP, char*);
 Parrot_Language Parrot_find_language(Parrot_INTERP, char*);
-const Parrot_Encoding Parrot_find_encoding(Parrot_INTERP, char*);
+Parrot_Const_Encoding Parrot_find_encoding(Parrot_INTERP, char*);
 
 #endif
 

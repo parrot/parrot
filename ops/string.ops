@@ -10,7 +10,7 @@ string.ops - String Operations
 
 =head1 DESCRIPTION
 
-Operations that work on strings, whether constructing, modifying 
+Operations that work on strings, whether constructing, modifying
 or examining them.  See also F<rx.ops>.
 
 =over 4
@@ -56,7 +56,7 @@ character set.
 inline op chr (out STR, in INT) {
   STRING *s;
   s = string_make(interpreter, &$1, (UINTVAL)1, NULL, 0, NULL);
-  *(char *)s->strstart = $2;
+  *(unsigned char *)s->strstart = (unsigned char) $2;
   s->strlen = 1;
   $1 = s;
   goto NEXT();
@@ -444,7 +444,7 @@ inline op new(out STR, in INT, in INT) {
 }
 
 inline op new(out STR, in INT, in INT, in INT) {
-  internal_exception(INVALID_CHARTYPE, 
+  internal_exception(INVALID_CHARTYPE,
                      "new_s_i_i_i op not yet implemented\n");
   $1 = string_make(interpreter, NULL, $2, encoding_lookup_index($3), 0, NULL);
   goto NEXT();
@@ -477,7 +477,7 @@ op transcode(out STR, in STR, in INT) {
 }
 
 op transcode(out STR, in STR, in INT, in INT) {
-  $1 = string_transcode(interpreter, $2, encoding_lookup_index($3), 
+  $1 = string_transcode(interpreter, $2, encoding_lookup_index($3),
                         chartype_lookup_index($4), NULL);
   goto NEXT();
 }

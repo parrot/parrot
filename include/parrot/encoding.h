@@ -35,9 +35,10 @@ struct parrot_encoding_t {
     const void *(*skip_backward) (const void *ptr, Parrot_UInt n);
 };
 
-#define Parrot_Encoding struct parrot_encoding_t *
+typedef struct parrot_encoding_t* Parrot_Encoding;
+typedef const struct parrot_encoding_t* Parrot_Const_Encoding;
 
-const Parrot_Encoding Parrot_encoding_lookup(const char *name);
+Parrot_Const_Encoding Parrot_encoding_lookup(const char *name);
 
 #ifdef PARROT_IN_CORE
 

@@ -69,7 +69,8 @@ struct parrot_chartype_t {
     const struct chartype_transcoder_entry_t *transcoders;
 };
 
-#define Parrot_CharType struct parrot_chartype_t *
+typedef struct parrot_chartype_t* Parrot_CharType;
+typedef const struct parrot_chartype_t* Parrot_Const_CharType;
 
 #ifdef PARROT_IN_CORE
 
@@ -90,7 +91,7 @@ Parrot_UInt chartype_transcode_nop(const struct parrot_chartype_t *from,
 
 typedef Parrot_CharType_Transcoder CHARTYPE_TRANSCODER;
 
-const Parrot_CharType Parrot_chartype_lookup(const char *name);
+Parrot_Const_CharType Parrot_chartype_lookup(const char *name);
 
 #define chartype_lookup Parrot_chartype_lookup
 

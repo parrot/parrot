@@ -494,7 +494,7 @@ op socket(out PMC, in INT, in INT, in INT) {
 }
 
 op sockaddr(out STR, in INT, in STR) {
-    $1 = PIO_sockaddr_in(interpreter, $2, $3);
+    $1 = PIO_sockaddr_in(interpreter, (unsigned short)$2, $3);
     goto NEXT();
 }
 

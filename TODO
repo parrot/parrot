@@ -46,9 +46,15 @@ Regular expression engine
 
 Interpreter
 -----------
-    Dynamic op libs
+    Combine dynamic op lib cores.
     Make the MMD tables shareable between interpreters for faster
     startup. (Though there are issues with this)
+
+Opcodes
+-------
+
+Mark branch arguments in ops files, e.g. addr/constaddr INT instead of
+in/inconst INT.
 
 Assembler
 ---------

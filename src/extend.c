@@ -283,7 +283,7 @@ Parrot_STRING Parrot_new_string(Parrot_INTERP interpreter,
  *
  * Find the magic token for an encoding, by name
  */
-const Parrot_Encoding Parrot_find_encoding(Parrot_INTERP interpreter, char *encoding_name) {
+Parrot_Const_Encoding Parrot_find_encoding(Parrot_INTERP interpreter, char *encoding_name) {
     return Parrot_encoding_lookup(encoding_name);
 }
 
@@ -301,7 +301,7 @@ Parrot_Language Parrot_find_language(Parrot_INTERP interpreter, char *langauge) 
  * Find the magic token for a chartype, by name
  *
  */
-const Parrot_CharType Parrot_find_chartype(Parrot_INTERP interpreter, char *chartype) {
+Parrot_Const_CharType Parrot_find_chartype(Parrot_INTERP interpreter, char *chartype) {
     return Parrot_chartype_lookup(chartype);
 }
 /*

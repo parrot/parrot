@@ -17,7 +17,7 @@ sub runstep {
     }
     else {
 	cc_gen('config/auto/inline/test_1.in');
-        eval { cc_build(); };
+	eval { cc_build(); };
 	if (! $@) {
 	    $test = cc_run();
 	    chomp $test if $test;
@@ -41,9 +41,7 @@ sub runstep {
 	}
     }
 
-    if ($test) {
-	Configure::Data->set(
-	    inline => $test
-	);
-    }
+    Configure::Data->set(
+	inline => $test
+    );
 }

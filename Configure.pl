@@ -16,6 +16,8 @@ use lib 'lib';
 use Parrot::BuildUtil;
 use Parrot::Configure::RunSteps;
 
+$| = 1;
+
 $parrot_version = parrot_version();
 @parrot_version = parrot_version();
 
