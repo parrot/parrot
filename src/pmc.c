@@ -189,7 +189,7 @@ pmc_register(Parrot_Interp interp, STRING *name)
         return type;
     }
     if (type < enum_type_undef) {
-        internal_exception("native type with name '%s' already exists - "
+        internal_exception(1, "native type with name '%s' already exists - "
                 "can't register PMC", datatype_names[type]);
         return 0;
     }
