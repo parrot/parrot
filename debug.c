@@ -572,6 +572,8 @@ PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)
     PDB_t *pdb = interpreter->pdb;
     PDB_condition_t *condition;
 
+    na(command);
+
     if (!(condition = PDB_cond(interpreter, command)))
         return;
 
