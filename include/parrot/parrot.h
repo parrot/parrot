@@ -60,11 +60,13 @@ struct PMC {
 };
 
 typedef struct PMC PMC;
-
+typedef unsigned char BOOL;
 typedef void STRING_FUNCS;
+typedef void REGEX;
 
 #include "parrot/global_setup.h"
 #include "parrot/string.h"
+#include "parrot/vtable.h"
 #include "parrot/interpreter.h"
 #include "parrot/register.h"
 #include "parrot/exceptions.h"

@@ -13,6 +13,7 @@ Parrot/PackFile/Constant.pm
 Parrot/PackFile/FixupTable.pm
 Parrot/String.pm
 Parrot/Test.pm
+Parrot/Vtable.pm
 Test/More.pm
 Test/Simple.pm
 Test/Utils.pm
@@ -43,7 +44,6 @@ include/parrot/stacks.h
 include/parrot/string.h
 include/parrot/strnative.h
 interpreter.c
-languages/jako/.cvsignore
 languages/jako/Makefile
 languages/jako/bench.jako
 languages/jako/euclid.jako
@@ -85,5 +85,5 @@ t/test2.pasm
 t/test3.pasm
 test_c.in
 test_main.c
-
-
+vtable_h.pl
+vtable.tbl

@@ -1,0 +1,39 @@
+# This is the main vtable data
+# Lines have the following format:
+# return type name \tab type arg1 \tab type arg2
+#
+# So, for instance, a function with two arguments would look like this:
+# void frob	INTVAL foo	STRING bar
+#
+# Note that we don't include the source "PMC* pmc" - that's done implicitly.
+
+INTVAL type	
+STRING name
+PMC* new
+void clone		PMC* dest
+void morph		INTVAL type
+BOOL move_to		void * destination
+INTVAL real_size	
+void destroy	
+INTVAL get_integer	 
+FLOATVAL get_number	 
+STRING get_string	 
+BOOL get_bool	 
+void* get_value	
+BOOL is_same		PMC* pmc2
+void set_integer	INTVAL integer
+void set_number		FLOATVAL number
+void set_string		STRING string
+void set_value		void* value
+void add		PMC* left	 PMC* right 
+void subtract		PMC* left	 PMC* right 
+void multiply		PMC* left	 PMC* right 
+void divide		PMC* left	 PMC* right 
+void modulus		PMC* left	 PMC* right 
+void concatenate	PMC* left	 PMC* right 
+void is_equal		PMC* left 
+void logical_or		PMC* left	 PMC* right 
+void logical_and	PMC* left	 PMC* right 
+void logical_not	PMC* left 
+void match		PMC* left	 REGEX re
+void repeat		PMC* left	 PMC* right 

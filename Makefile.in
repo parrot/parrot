@@ -2,7 +2,7 @@ O = ${o}
 RM_F = ${rm_f}
 
 INC=include/parrot
-H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h $(INC)/global_setup.h
+H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h $(INC)/global_setup.h $(INC)/vtable.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) packfile$(O) string$(O) strnative$(O)
 
@@ -66,6 +66,9 @@ $(INC)/op.h: opcode_table make_op_header.pl
 
 $(INC)/config.h: Configure.pl config_h.in
 	$(PERL) Configure.pl
+
+$(INC)/vtable.h: vtable.tbl vtable_h.pl
+	$(PERL) vtable_h.pl
 
 docs: docs/.dummy
 
