@@ -962,15 +962,20 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     STRING *full_attr_name;
 
     class_array = (SLOTTYPE *)PMC_data(class);
-    class_name = VTABLE_get_string(interpreter, get_attrib_num(class_array,
-                                                               PCD_CLASS_NAME));
+    class_name = VTABLE_get_string(interpreter,
+            get_attrib_num(class_array, PCD_CLASS_NAME));
     attr_array = get_attrib_num(class_array, PCD_CLASS_ATTRIBUTES);
     attr_hash = get_attrib_num(class_array, PCD_ATTRIBUTES);
     idx = VTABLE_elements(interpreter, attr_array);
     VTABLE_set_integer_native(interpreter, attr_array, idx + 1);
     VTABLE_set_string_keyed_int(interpreter, attr_array, idx, attr);
-    full_attr_name = string_concat(interpreter, class_name, string_from_cstring(interpreter, "\0", 1), 0);
+    full_attr_name = string_concat(interpreter, class_name,
+            string_from_cstring(interpreter, "\0", 1), 0);
     full_attr_name = string_concat(interpreter, full_attr_name, attr, 0);
+    /* TODO escape NUL char */
+    if (VTABLE_exists_keyed_str(interpreter, attr_hash, full_attr_name))
+        internal_exception(1, "Attribute '%s' already exists",
+                string_to_cstring(interpreter, full_attr_name));
 
     /*
      * TODO check if someone is trying to add attributes to a parent class
@@ -978,6 +983,19 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
      */
     idx = VTABLE_elements(interpreter, attr_hash);
     assert(PMC_int_val(class) == idx);
+    /*
+     * attr_hash is an OrderedHash so the line below could be:
+     *
+     *   VTABLE_set_string_keyed_str(interpreter, attr_hash,
+     *        full_attr_name, attr);
+     *
+     * so that we have a mapping full_attr_name => attr_name
+     * the index is in the OrderedHash anyway
+     *
+     * if this isn't needed a plain hash is faster
+     *
+     * -leo
+     */
     VTABLE_set_integer_keyed_str(interpreter, attr_hash,
             full_attr_name, idx);
     assert(idx + 1 == VTABLE_elements(interpreter, attr_hash));
@@ -992,6 +1010,11 @@ Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)>
 
 Returns attribute number C<attrib> from C<object>. Presumably the code
 is asking for the correct attribute number.
+
+=item C<PMC *
+Parrot_get_attrib_by_str(Parrot_Interp interpreter, PMC *object, STRING *attr)>
+
+Returns attribute with full qualified name C<attr> from C<object>.
 
 */
 
@@ -1009,7 +1032,8 @@ Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
         return get_attrib_num(attrib_array, attrib);
     }
     else {
-        internal_exception(INTERNAL_NOT_IMPLEMENTED, "Can't get non-core object attribs yet");
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                "Can't get non-core object attribs yet");
     }
     return NULL;
 }
@@ -1046,6 +1070,23 @@ Parrot_get_attrib_by_str(Parrot_Interp interpreter, PMC *object, STRING *attr)
                 POD_FIRST_ATTRIB +
                 attr_str_2_num(interpreter, object, attr));
 }
+
+/*
+
+=item C<PMC *
+Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object,
+  INTVAL attrib, PMC *value)>
+
+Set attribute number C<attrib> from C<object> to C<value>. Presumably the code
+is asking for the correct attribute number.
+
+=item C<PMC *
+Parrot_set_attrib_by_str(Parrot_Interp interpreter, PMC *object,
+  STRING *attr, PMC *value)>
+
+Sets attribute with full qualified name C<attr> from C<object> to C<value>.
+
+*/
 
 void
 Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object,

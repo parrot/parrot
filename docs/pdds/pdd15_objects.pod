@@ -386,15 +386,23 @@ method. (Including with an AUTOLOAD)
 Returns true or false to note whether the object in question
 implements the interface passed in.
 
-=item getattr(int)
+=item get_attr(INTVAL)
 
 Returns the attribute at the passed-in offset for the object.
 
-=item setattr(int, PMC *)
+=item get_attr(STRING*)
+
+Returns the attribute with the fully qualified name for the object.
+
+=item set_attr(INTVAL, PMC *)
 
 Sets the attribute for the passed-in offset to the passed-in PMC value
 
-=item getclass
+=item set_attr(STRING*, PMC *)
+
+Set the attribute with the fully qualified name for the object.
+
+=item get_class
 
 Returns the class PMC for the object.
 
@@ -441,8 +449,8 @@ would be:
 Adding the attributes C<a> and C<b> to the new class C<Foo>:
 
   newclass $P0, "Foo"
-  addattribute $P0, "a", "Foo::a" # This is offset 0
-  addattribute $P0, "b", "Foo::b" # This is offset 1
+  addattribute $P0, "a"   # This is offset 0 + classoffset
+  addattribute $P0, "b"   # This is offset 1 + classoffset
 
 =head2 Instantiating an object
 
@@ -458,14 +466,14 @@ Assuming we want an object of class C<Foo>:
 Calling the method C<Xyzzy> on an object, assuming the PDD03 calling
 conventions are respected:
 
-  callmethod "Xyzzy" (Unimplemented)
+  callmethod "Xyzzy"
 
   set S0, "Xyzzy"
   callmethod
 
 Or, if a return continuation needs constructing:
 
-  callmethodcc "Xyzzy" (Unimplemented)
+  callmethodcc "Xyzzy"
 
   set S0, "Xyzzy"
   callmethodcc
@@ -480,6 +488,10 @@ want to get the second attribute C<b> out of it:
   classoffset BaseOffset, $P0, "Foo"
   BOffset = BaseOffset + 1
   getattribute $P1, $P0, BOffset
+
+Or with named access, if it isn't time critical:
+
+  getattribute $P1, $P0, "Foo\x0b"
 
 =head1 Explanations
 
@@ -1105,6 +1117,10 @@ None.
 
 =over 4
 
+=item Version 1.3
+
+April 3, 2004
+
 =item Version 1.2
 
 February 9, 2004
@@ -1122,6 +1138,11 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.3
+
+Removed some unimplemented notes. Changed vtables to get_*, set_* so that they
+match other vtable function syntax.
 
 =item Version 1.2
 

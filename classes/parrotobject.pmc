@@ -134,6 +134,25 @@ Finds the method for C<*name>.
         return Parrot_find_method_with_cache(INTERP, class, name);
     }
 
+    PMC* get_attr(INTVAL idx) {
+        return Parrot_get_attrib_by_num(interpreter, SELF, idx);
+    }
+
+    PMC* get_attr_str(STRING* idx) {
+        return Parrot_get_attrib_by_str(interpreter, SELF, idx);
+    }
+
+    void set_attr(INTVAL idx, PMC* value) {
+        return Parrot_set_attrib_by_num(interpreter, SELF, idx, value);
+    }
+
+    void set_attr_str(STRING* idx, PMC* value) {
+        return Parrot_set_attrib_by_str(interpreter, SELF, idx, value);
+    }
+
+    PMC* get_class() {
+        return GET_CLASS(PMC_data(SELF), SELF);
+    }
 }
 
 /*

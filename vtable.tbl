@@ -263,6 +263,13 @@ INTVAL does(STRING* method)
 
 INTVAL isa(STRING* _class)
 
+PMC* get_attr(INTVAL idx)
+PMC* get_attr_str(STRING* idx)
+void set_attr(INTVAL idx, PMC* value)
+void set_attr_str(STRING* idx, PMC* value)
+
+PMC* get_class()
+
 void freeze(visit_info* info)
 void thaw  (visit_info* info)
 void thawfinish (visit_info* info)

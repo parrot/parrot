@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 37;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1091,4 +1091,15 @@ output_is(<<'CODE', <<'OUTPUT', "set attrib by name subclass");
 CODE
 foo i
 bar j
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "addattribute duplicate");
+    newclass P1, "Foo"
+    addattribute P1, "i"
+    addattribute P1, "j"
+    addattribute P1, "i"
+    print "never\n"
+    end
+CODE
+/Attribute 'Foo(.*?i)?' already exists/
 OUTPUT

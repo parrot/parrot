@@ -121,6 +121,9 @@ Returns whether the class can perform C<*method>.
         return VTABLE_find_method(interpreter, SELF, method) != NULL;
     }
 
+    PMC* get_class() {
+        return SELF;
+    }
 }
 
 /*

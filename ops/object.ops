@@ -278,10 +278,7 @@ Get the class PMC for the object in $2 and put it in $1.
 =cut
 
 inline op class(out PMC, in PMC) :object_classes {
-    if (PObj_is_object_TEST($2))
-	$1 = GET_CLASS((Buffer *)PMC_data($2), $2);
-    else
-	$1 = $2;
+    $1 = VTABLE_get_class(interpreter, $2);
     goto NEXT();
 }
 
@@ -360,12 +357,12 @@ String attribute names have to be fully qualified.
 =cut
 
 inline op getattribute(out PMC, in PMC, in INT) :object_classes {
-    $1 = Parrot_get_attrib_by_num(interpreter, $2, $3);
+    $1 = VTABLE_get_attr(interpreter, $2, $3);
     goto NEXT();
 }
 
 inline op getattribute(out PMC, in PMC, in STR) :object_classes {
-    $1 = Parrot_get_attrib_by_str(interpreter, $2, $3);
+    $1 = VTABLE_get_attr_str(interpreter, $2, $3);
     goto NEXT();
 }
 
@@ -378,12 +375,12 @@ Set attribute $2 of object $1 to $3
 =cut
 
 inline op setattribute(in PMC, in INT, in PMC) :object_classes {
-    Parrot_set_attrib_by_num(interpreter, $1, $2, $3);
+    VTABLE_set_attr(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
 inline op setattribute(in PMC, in STR, in PMC) :object_classes {
-    Parrot_set_attrib_by_str(interpreter, $1, $2, $3);
+    VTABLE_set_attr_str(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
