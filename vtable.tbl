@@ -255,6 +255,7 @@ void delete_keyed_str(STRING* key)
 PMC* nextkey_keyed(PMC* key, INTVAL what)
 PMC* nextkey_keyed_int(INTVAL key, INTVAL what)
 PMC* nextkey_keyed_str(STRING* key, INTVAL what)
+PMC* get_iter()
 
 [STRING]
 void substr(INTVAL offset, INTVAL length, PMC* dest)

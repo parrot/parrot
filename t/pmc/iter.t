@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 42;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -1008,6 +1008,7 @@ CODE
 11
 ok
 OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "xrange iterator");
 ##PIR##
 .sub main
@@ -1223,3 +1224,150 @@ iter_end:
 CODE
 /10 [0123456789]{10}ok/
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "iter vtable");
+   .include "iterator.pasm"
+   new P0, .PerlArray
+   push P0, 100
+   push P0, 200
+   push P0, 300
+   push P0, 400
+   push P0, 500
+   push P0, 600
+   push P0, 700
+   push P0, 800
+   iter P2, P0
+   print "ok 1\n"
+lp:
+   unless P2, ex
+   shift I0, P2
+   print I0
+   print "\n"
+   branch lp
+ex:
+   print "ok 2\n"
+   end
+CODE
+ok 1
+100
+200
+300
+400
+500
+600
+700
+800
+ok 2
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - xrange get_iter");
+##PIR##
+.sub main @MAIN
+    .include "iterator.pasm"
+    .local pmc hash
+    .local pmc value
+    .local pmc xr
+    xr = new Slice[0 .. 10]
+    .local pmc sl
+    sl = new Iterator, xr
+    hash = new PerlHash
+    null value
+    hash."fromkeys"(sl, value)
+    $I0 = hash
+    print $I0
+    print " "
+    .local pmc Iter
+    Iter = iter hash
+iter_loop:
+    unless Iter, iter_end		# while (entries) ...
+    $I0 = shift Iter
+    print $I0
+    goto iter_loop
+iter_end:
+    print "ok\n"
+.end
+CODE
+/10 [0123456789]{10}ok/
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "string iteration with get_iter");
+    .include "iterator.pasm"
+	new P2, .PerlString
+	set P2, "parrot"
+	iter P1, P2
+iter_loop:
+        unless P1, iter_end		# while (entries) ...
+	shift S1, P1
+	print S1
+	branch iter_loop
+iter_end:
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+parrot
+parrot
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "intlist iter vtable");
+   .include "iterator.pasm"
+   new P0, .IntList
+   push P0, 100
+   push P0, 200
+   push P0, 300
+   push P0, 400
+   push P0, 500
+   push P0, 600
+   push P0, 700
+   push P0, 800
+   iter P2, P0
+   print "ok 1\n"
+lp:
+   unless P2, ex
+   shift I0, P2
+   print I0
+   print "\n"
+   branch lp
+ex:
+   print "ok 2\n"
+   end
+CODE
+ok 1
+100
+200
+300
+400
+500
+600
+700
+800
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "xrange iterator, get_iter");
+##PIR##
+.sub main
+    .include "iterator.pasm"
+        # xrange(10, 14)
+	new P2, .Slice [10 .. 14]
+	P1 = iter  P2
+#	I0 = P1."len"()
+iter_loop:
+        unless P1, iter_end
+	shift I1, P1
+	print I1
+	print "\n"
+	branch iter_loop
+iter_end:
+	print "ok\n"
+	end
+.end
+CODE
+10
+11
+12
+13
+ok
+OUTPUT
+

@@ -508,6 +508,10 @@ inline op set (out PMC, in PMC, in KEY) :base_core {
 
 Return a new Iterator PMC $1 for aggregate $2 and Slice PMC $3.
 
+=item B<iter>(out PMC, in PMC)
+
+Return a new Iterator PMC $1 for aggregate $2.
+
 =cut
 
 inline op slice (out PMC, in PMC, in KEY) :base_core {
@@ -515,6 +519,10 @@ inline op slice (out PMC, in PMC, in KEY) :base_core {
     goto NEXT();
 }
 
+inline op iter (out PMC, in PMC) :base_core {
+    $1 = $2->vtable->get_iter(interpreter, $2);
+    goto NEXT();
+}
 
 =item B<clone>(out PMC, in PMC)
 

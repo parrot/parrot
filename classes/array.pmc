@@ -1120,6 +1120,10 @@ The C<==> operation. Currently just returns C<0>.
 
 Return a new iterator for the slice PMC C<key>
 
+=item C<PMC* get_iter ()>
+
+Return a new iterator for SELF.
+
 =cut
 
 */
@@ -1127,6 +1131,17 @@ Return a new iterator for the slice PMC C<key>
     PMC* slice (PMC* key) {
 	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
         PMC_struct_val(iter) = key;
+        return iter;
+    }
+
+    PMC* get_iter () {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+        PMC_int_val(key) = 0;
+        if (!((List *) PMC_data(SELF))->length)
+            PMC_int_val(key) = -1;
         return iter;
     }
 

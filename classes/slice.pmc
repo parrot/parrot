@@ -252,6 +252,8 @@ Get the next string key from the current slice range.
 
 =item C<PMC* slice(PMC *key)>
 
+=item C<PMC* get_iter()>
+
 A slice can serve as its own iterator, yielding values [start .. end-1].
 This is used for implementing Pythons xrange()
 
@@ -262,6 +264,12 @@ This is used for implementing Pythons xrange()
     PMC* slice(PMC *key) {
 	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
         PMC_struct_val(iter) = key;
+        return iter;
+    }
+
+    PMC* get_iter() {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC_struct_val(iter) = SELF;
         return iter;
     }
 

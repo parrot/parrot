@@ -576,6 +576,18 @@ Returns the PMC value for the element at C<*key>.
 
 */
 
+    PMC* get_iter () {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+        PMC_int_val(key) = 0;
+        PMC_data(key) = (void *)INITBucketIndex;
+        if (!hash_size(INTERP, PMC_struct_val(SELF)))
+            PMC_int_val(key) = -1;
+        return iter;
+    }
+
     PMC* slice (PMC* key) {
 	return NULL;
     }

@@ -20,6 +20,12 @@ Iterate from the beginning of the aggregate:
       ...
       branch iter_loop
 
+The two lines of iterator creation can be short written as:
+
+    iter P0, P1                 # create new iterator P0 for aggregate P1
+
+This creates a new iterator and resets it.
+
 Iterate from the end of the aggregate (Array like classes only):
 
   .include "iterator.pasm"

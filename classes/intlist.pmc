@@ -223,6 +223,16 @@ Removes and returns the first element in the list.
         return iter;
     }
 
+    PMC* get_iter () {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+        PMC_int_val(key) = 0;
+        if (!((List *) PMC_struct_val(SELF))->length)
+            PMC_int_val(key) = -1;
+        return iter;
+    }
 /*
 
 =item C<void multiply_int(INTVAL value,  PMC *dest)>
