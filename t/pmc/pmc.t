@@ -1463,6 +1463,32 @@ OK5:  print "ok 5\n"
       branch OK6
 BAD6: print "not ok 6\n"
 OK6:  print "ok 6\n"
+
+      new P0, .PerlUndef
+      new P1, .PerlUndef
+
+      eq P0, P1, OK7
+      print "not "
+OK7:  print "ok 7\n"
+
+      set P1, 100
+      eq P0, P1, BAD8
+      branch OK8
+BAD8: print "not ok 8\n"
+OK8:  print "ok 8\n"
+
+      set P1, 5.5
+      eq P0, P1, BAD9
+      branch OK9
+BAD9: print "not ok 9\n"
+OK9:  print "ok 9\n"
+
+       set P1, "true"
+       eq P0, P1, BAD10
+       branch OK10
+BAD10: print "not ok 10\n"
+OK10:  print "ok 10\n"
+
       end
 CODE
 ok 1
@@ -1471,6 +1497,10 @@ ok 3
 ok 4
 ok 5
 ok 6
+ok 7
+ok 8
+ok 9
+ok 10
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "eq_p_i");
