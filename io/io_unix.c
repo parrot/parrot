@@ -1044,7 +1044,11 @@ XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
 static ParrotIO *
 PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char *cmd, int flags)
 {
-#if defined (linux) || defined (solaris)
+    /*
+     * pipe(), fork() should be defined, if this header is present
+     *        if that's not true, we need a test
+     */
+#ifdef PARROT_HAS_HEADER_UNISTD
     ParrotIO *io;
     int pid, err, fds[2];
 
@@ -1118,6 +1122,8 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char *cmd, int flags)
     }
 
     perror("fork");
+#else
+    internal_exception(UNIMPLEMENTED, "pipe() unimplemented");
 #endif
     return NULL;
 }
