@@ -120,7 +120,9 @@ sub genfile {
 		}
 		s{
                     \$\{(\w+)\}
-                }{Configure::Data->get($1)}egx;
+                }{my $val=Configure::Data->get($1);
+		  defined $val ? $val
+		    : (warn "value for '$1' in $source is undef", '')}egx;
 		print OUT;
 	}
 

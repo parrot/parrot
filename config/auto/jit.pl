@@ -73,6 +73,8 @@ sub runstep {
     copy_if_diff("config/gen/platform/$cpuarch.s", "asmfun.s");
 
     Configure::Data->set(asmfun_o => 'asmfun$(O)');
+  } else {
+    Configure::Data->set(asmfun_o => '');
   }
 
   $jitcapable = $set_jitcapable if defined $set_jitcapable;
