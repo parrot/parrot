@@ -32,14 +32,16 @@ struct QUEUE {
   volatile INTVAL queue_in_use;
   Parrot_mutex queue_mutex;
 };
-  
+
+void Parrot_ins_queue_interrupt(QUEUE *queue, QUEUE_ENTRY *entry);
+
 #endif /* PARROT_TSQ_H_GUARD */
 
 /*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
