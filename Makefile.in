@@ -76,7 +76,9 @@ clean:
 	$(RM_F) *$(O) *.s basic_opcodes.c $(INC)/interp_guts.h $(INC)/op.h $(TEST_PROG)
 	cd docs; make clean
 
-test:
+test:	.test_dummy
+
+.test_dummy:
 	$(PERL) t/harness
 
 update:
