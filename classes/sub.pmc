@@ -35,7 +35,7 @@ pmclass Sub {
    void mark () {
        PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
        if (pad) {
-           pobject_lives(INTERP, pad);
+           pobject_lives(INTERP, (PObj *)pad);
        }
    }
 
