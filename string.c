@@ -179,7 +179,7 @@ string_transcode(struct Parrot_Interp *interpreter,
     srcstart = (void*)src->bufstart;
     srcend = srcstart + src->bufused;
     deststart = dest->bufstart;
-    destend = deststart + dest->buflen;
+    destend = deststart;
 
     while (srcstart < srcend) {
         INTVAL c = src->encoding->decode(srcstart);
@@ -187,7 +187,7 @@ string_transcode(struct Parrot_Interp *interpreter,
         if (transcoder1) c = transcoder1(c);
         if (transcoder2) c = transcoder2(c);
 
-        deststart = dest->encoding->encode(deststart, c);
+        destend = dest->encoding->encode(destend, c);
 
         srcstart = src->encoding->skip_forward(srcstart, 1);
     }
@@ -322,7 +322,7 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     if (subend < substart) {
         INTERNAL_EXCEPTION(SUBSTR_OUT_OF_STRING,
                            "subend somehow is less than substart");
-    }   
+    }
 
     mem_sys_memcopy(dest->bufstart, substart, (unsigned)(subend - substart));
     dest->bufused = subend - substart;
