@@ -418,27 +418,32 @@ add an opcode is to add its implementation to the F<core.ops> file.
 
 The format of this file is a little funny; it's C which is
 pre-processed by a Perl program. The C functions should be declared
-C<AUTO_OP>, which means that the pre-processor will automatically work
-out the return address of the next op in the bytecode stream. (branch
-operators need special treatment, and as such are C<MANUAL_OP>s)
-Parameters are denoted by C<P1>, C<P2> and so on - they aren't actual
-parameters to the C function, but are pulled out of the bytecode
-stream. Finally, we can access register C<n> by saying C<INT_REG(n)>,
-C<NUM_REG(n)> and so on.
+either C<op foo ()> or <inline op foo ()>.
+
+The C<inline> prefix is a hint for code generation that this is a
+very simple op function, which for JIT or other optimizations might
+be able to be converted inline. Non-inline op functions might
+require more work.
+
+There are special C<return> "macros", the most important of which is
+C<AUTO>. The statement C<return AUTO> means that the return address
+of the next op should be worked out automatically during real C
+code generation.
+
+Arguments are denoted by C<$1>, C<$2> and so on - they aren't actual
+arguments to the C function, but are pulled out of the bytecode
+stream.
 
 So let's do the constant sleep op first. We want to take the first
-parameter, C<P1>, and pass it to sleep:
+parameter, C<$1>, and pass it to C<sleep>:
 
- AUTO_OP sleep_ic {
-      sleep(P1);
+ inline op sleep (i|ic) {
+   sleep($1);
+   return AUTO;
  }
 
-That was easy. The second op is only slightly more complex: we have to
-use C<INT_REG> to retrieve the contents of the register:
-
- AUTO_OP sleep_i {
-      sleep(INT_REG(P1));
- }
+That works for both integer constant and integer register argument
+versions of the op function.
 
 All that's missing is a test suite (see F<t/op/basic.t> for an example)
 and some documentation (add your POD to F<core.ops> and it'll be

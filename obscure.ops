@@ -42,8 +42,9 @@ Set $1 to the coversine (in radians) of $2.
 
 =cut
 
-AUTO_OP covers(n, i|n) {
-   $1 = 1.0 - sin((FLOATVAL)$2);
+inline op covers(n, i|n) {
+  $1 = 1.0 - sin((FLOATVAL)$2);
+  return AUTO;
 }
 
 
@@ -58,8 +59,9 @@ Set $1 to the exsecant of $2 (given in radians).
 =cut
 
 
-AUTO_OP exsec(n, i|n) {
-   $1 = (((FLOATVAL)1.0) / cos((FLOATVAL)$2)) - (FLOATVAL)1.0;
+inline op exsec(n, i|n) {
+  $1 = (((FLOATVAL)1.0) / cos((FLOATVAL)$2)) - (FLOATVAL)1.0;
+  return AUTO;
 }
 
 
@@ -73,8 +75,9 @@ Set $1 to the haversine (in radians) of $2.
 
 =cut
 
-AUTO_OP hav(n, i|n) {
-   $1 = 0.5 * (1.0 - cos((FLOATVAL)$2));
+inline op hav(n, i|n) {
+  $1 = 0.5 * (1.0 - cos((FLOATVAL)$2));
+  return AUTO;
 }
 
 
@@ -88,8 +91,9 @@ Set $1 to the versine (in radians) of $2.
 
 =cut
 
-AUTO_OP vers(n, i|n) {
-   $1 = 1.0 - cos((FLOATVAL)$2);
+inline op vers(n, i|n) {
+  $1 = 1.0 - cos((FLOATVAL)$2);
+  return AUTO;
 }
 
 

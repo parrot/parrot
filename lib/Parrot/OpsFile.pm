@@ -95,7 +95,7 @@ sub read_ops
   while (<OPS>) {
     $seen_pod = 1 if m|^=|;
 
-    unless ($seen_op or m|^AUTO_OP\s+| or m|^MANUAL_OP\s+|) {
+    unless ($seen_op or m|^(inline\s+)?op\s+|) {
       $self->{PREAMBLE} .= $_ unless $seen_pod or $count; # Lines up to first op def.
       next;
     };
@@ -108,8 +108,8 @@ sub read_ops
     #
     # Either of these two forms work:
     #
-    #   AUTO_OP   name (args) {
-    #   MANUAL_OP name (args) {
+    #   inline op  name (args) {
+    #   op         name (args) {
     #
     # The args are a comma-separated list of items from this table of argument
     # types (even if no formal args are specified, there will be a single 'o'
@@ -128,12 +128,12 @@ sub read_ops
     #   sc   String constant index
     #
 
-    if (/^(AUTO|MANUAL)_OP\s+([a-zA-Z]\w*)\s*\((.*)\)\s*{/) {
+    if (/^(inline\s+)?op\s+([a-zA-Z]\w*)\s*\((.*)\)\s*{/) {
       if ($seen_op) {
         die "Parrot::OpsFile: Cannot define an op within an op definition!\n";
       }
 
-      $type       = lc $1;
+      $type       = defined($1) ? 'inline' : 'function';
       $short_name = lc $2;
       $args       = trim(lc $3);
       @args       = split(/\s*,\s*/, $args);
@@ -201,11 +201,11 @@ sub make_op
       #
       #   .ops file   Op body  Meaning       Comment
       #   ----------  -------  ------------  ----------------------------------
+      #   AUTO        {{+=S}}  PC' = PC + S  Where S is op size; for auto ops
       #   HALT        {{=0}}   PC' = 0       Halts run_ops loop, no resume
       #   RESTART(X)  {{=0}}   PC' = 0       Restarts at PC + X
       #   RESTART(*)  {{=0}}   PC' = 0       Restarts at PC + S
       #   RETREL(X)   {{+=X}}  PC' = PC + X  Used for branches
-      #   RETREL(*)   {{+=S}}  PC' = PC + S  Where S is op size; for auto ops
       #   RETABS(X)   {{=X}}   PC' = X       Used for absolute jumps
       #   $X          {{@X}}   Argument X    $0 is opcode, $1 is first arg
       #
@@ -216,15 +216,16 @@ sub make_op
       # TODO: Complain about using, e.g. $3 in an op with only 2 args.
       #
 
-      $body =~ s/HALT/{{=0}}/mg;
+      $body =~ s/return\s+AUTO/{{+=$op_size}}/mg;
+
+      $body =~ s/return\s+HALT/{{=0}}/mg;
       
-      $body =~ s/RESTART\(\*\)/{{=0,+=$op_size}}/mg;
-      $body =~ s/RESTART\((.*)\)/{{=0,+=$1}}/mg;
+      $body =~ s/return\s+RESTART\(\*\)/{{=0,+=$op_size}}/mg;
+      $body =~ s/return\s+RESTART\((.*)\)/{{=0,+=$1}}/mg;
       
-      $body =~ s/RETREL\(\*\)/{{+=$op_size}}/mg;
-      $body =~ s/RETREL\((.*)\)/{{+=$1}}/mg;
+      $body =~ s/return\s+RETREL\((.*)\)/{{+=$1}}/mg;
       
-      $body =~ s/RETABS\((.*)\)/{{=$1}}/mg;
+      $body =~ s/return\s+RETABS\((.*)\)/{{=$1}}/mg;
       
       $body =~ s/\$(\d+)/{{\@$1}}/mg;
       
@@ -237,31 +238,38 @@ sub make_op
   return $counter;
 }
 
+
 #
 # expand_args()
 #
 # Given an arg list, return a list of all possible arg combinations.
-sub expand_args {
-    my(@args)=@_;
-    return "" if(!scalar(@args));
-    my $arg = shift(@args);
-    my @var = split(/\|/,$arg);
-    if(!scalar(@args)) {
-	return @var;
-    } else {
-	my @list = expand_args(@args);
-	my @results;
-	foreach my $l (@list) {
-	    foreach my $v (@var) {
-		push(@results,"$v,$l");
-	    }
-	}
-	return @results;
+#
+
+sub expand_args
+{
+  my(@args)=@_;
+
+  return "" if(!scalar(@args));
+
+  my $arg = shift(@args);
+  my @var = split(/\|/,$arg);
+
+  if(!scalar(@args)) {
+    return @var;
+  }
+  else {
+    my @list = expand_args(@args);
+    my @results;
+
+    foreach my $l (@list) {
+      foreach my $v (@var) {
+        push(@results,"$v,$l");
+      }
     }
 
+    return @results;
+  }
 }
-
-
 
 
 #
@@ -328,28 +336,26 @@ Take a file of opcode functions and create real C code for them
 
 opcode functions are in the format:
 
- AUTO_OP opname {
-
-  ... body of function ...
-
- }
-
-Where the closing brace is on its own line. Alternately, for opcode
-functions that manage their own return values:
-
-MANUAL_OP opname {
-
+  inline op opname (...) {
    ... body of function ...
+  }
 
-   RETURN(x);
+for ops that have trivial bodies (such as just a call to some other
+function and a C<return> statement).
 
-}
+The closing brace must be on its own line.
+
+Alternately, for opcode functions that have more internal complexity:
+
+  op opname (...) {
+    ... body of function ...
+  }
 
 There may be more than one RETURN
 
-The functions have the magic variables Pnnn for parameters 1 through
-X. (Parameter 0 is the opcode number) Types for each, and the size
-of the return offset, are taken from the opcode_table file
+The functions have the magic variables C<$1> to C<$>I<N> for arguments 1
+through I<N>. (Argument 0 is the opcode number) Types for each, and the size
+of the return offset, are determined from the opfunc signature.
 
 
 =head1 AUTHORS

@@ -12,8 +12,8 @@ while (<DATA>) {
     for (multimethod($vtable_entry, $argc)) {
         my $args  = $_->[0];
         my $entry = $_->[1];
-        print "AUTO_OP $params[1] ($args) {\n";
-        print "\t(\$2->vtable->$entry";
+        print "inline op $params[1] ($args) {\n";
+        print "  (\$2->vtable->$entry";
         print ")(interpreter, ";
         if ($params[0] == 3) {
             # Three-address function
@@ -22,7 +22,7 @@ while (<DATA>) {
             # Unary function
             print '$2,$1';
         }
-        print ");\n}\n";
+        print ");\n  return AUTO;\n}\n\n";
     }
 }
 

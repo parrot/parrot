@@ -18,8 +18,8 @@
 #define PARROT_MAX_ARGS 10
 
 typedef enum {
-  PARROT_MANUAL_OP,
-  PARROT_AUTO_OP
+  PARROT_INLINE_OP,
+  PARROT_FUNCTION_OP
 } op_type_t;
 
 typedef enum {
