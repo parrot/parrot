@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -880,7 +880,7 @@ PDB_init(Interp *interpreter, const char *command)
     imcc_init(interpreter);
 
     /* set the user arguments */
-    userargv = pmc_new(interpreter, enum_class_PerlArray);
+    userargv = pmc_new(interpreter, enum_class_ResizableStringArray);
     REG_PMC(5) = userargv;
 
     while (command && *command) {

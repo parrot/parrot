@@ -379,7 +379,7 @@ Parrot_loadbc(Interp *interpreter, struct PackFile *pf)
 =item C<static void
 setup_argv(Interp *interpreter, int argc, char ** argv)>
 
-Sets up the C<ARGV> array in P5.
+Sets up the C<ARGS> array in P5.
 
 =cut
 
@@ -397,6 +397,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
                 argc);
     }
 
+    /* XXX @ARGS should propably be a ResizableStringArray */
     userargv = pmc_new_noinit(interpreter, enum_class_SArray);
     /* immediately anchor pmc to root set */
     REG_PMC(5) = userargv;
@@ -737,9 +738,7 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
         PIO_eprintf(interpreter, " ***\n");
     }
 
-    /* Set up @ARGS (or whatever this language calls it).
-       XXX Should this be Array or PerlArray?             */
-
+    /* Set up @ARGS (or whatever this language calls it) in P5. */
     setup_argv(interpreter, argc, argv);
 
 #if EXEC_CAPABLE

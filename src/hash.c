@@ -12,7 +12,7 @@ A hashtable contains an array of bucket indexes. Buckets are nodes in a
 linked list, each containing a C<STRING> key and a value. The value is
 currently stored as a C<HASH_ENTRY>, which maybe makes sense for some
 hashes but probably doesn't for what they're currently used for, which
-is PerlHash and Hash PMCs  (since those should probably just be hashes of C<STRING>s
+is PerlHash and Hash PMCs (since those should probably just be hashes of C<STRING>s
 mapping to PMCs.)
 
 To minimize memory overhead, buckets are carved out of a pool that is
