@@ -494,8 +494,8 @@ make_interpreter(Interp_flags flags)
     interpreter->total_Buffers = 0;
     interpreter->memory_allocated = 0;
     interpreter->memory_collected = 0;
-    interpreter->DOD_block_level = 0;
-    interpreter->GC_block_level = 0;
+    interpreter->DOD_block_level = 1;
+    interpreter->GC_block_level = 1;
 
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
@@ -557,6 +557,9 @@ make_interpreter(Interp_flags flags)
     interpreter->pmc_reg_base->next = NULL;
     interpreter->pmc_reg_base->prev = NULL;
     Parrot_clear_p(interpreter);
+
+    interpreter->DOD_block_level--;
+    interpreter->GC_block_level--;
 
     /* Need a user stack */
     interpreter->user_stack = new_stack(interpreter);
