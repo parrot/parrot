@@ -598,16 +598,13 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         class = "Coroutine";
     sprintf(buf, "%s %s %d %d %d %d", class, real_name, offs, len,
             r->pcc_sub->pragma, ns_const);
-    pfc = malloc(sizeof(struct PackFile_Constant));
 
+    k = PDB_extend_const_table(interpreter);
+    pfc = interpreter->code->const_table->constants[k];
     rc = PackFile_Constant_unpack_pmc(interpreter,
             interpreter->code->const_table, pfc, (opcode_t*)buf);
     if (!rc)
         fatal(1, "add_const_pmc", "PackFile_Constant error\n");
-
-    k = PDB_extend_const_table(interpreter);
-    interpreter->code->const_table->constants[k]->type = PFC_PMC;
-    interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
     globals.cs->subs->pmc_const = k;
 
     debug(interpreter, DEBUG_PBC_CONST,
