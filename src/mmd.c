@@ -151,8 +151,8 @@ get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC * right,
         INTVAL function, int *is_pmc)
 {
     UINTVAL left_type, right_type;
-    left_type = VTABLE_type(interpreter, left);
-    right_type = VTABLE_type(interpreter, right);
+    left_type = left->vtable->base_type;
+    right_type = right->vtable->base_type;
     return get_mmd_dispatch_type(interpreter, left_type, right_type,
             function, is_pmc);
 }
