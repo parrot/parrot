@@ -251,7 +251,7 @@ CODE
 		push @{$code{$seg}->{code}}, "\t_platform_shutdown()\n\tend\n";
 		goto PARSE;
 	}
-	die "Unkown keyword $syms[CURR]/$type[CURR] source line $sourceline";
+	die "Unknown keyword $syms[CURR]/$type[CURR] source line $sourceline";
 	goto UNK;
 
 BARE:	# Check for user-subroutine
