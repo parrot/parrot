@@ -211,6 +211,29 @@ mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
 
 }
 
+/* Add a function to the MMD table by class name, rather than class
+ * number. Handles the case where the named class isn't loaded yet. 
+ */
+void
+mmd_add_by_class(struct Parrot_Interp *interpreter,
+             INTVAL functype,
+             STRING *left_class, STRING *right_class,
+             funcptr_t funcptr)
+{
+    INTVAL left_type = pmc_type(interpreter, left_class);
+    INTVAL right_type = pmc_type(interpreter, right_class);
+
+    if (left_type == enum_type_undef) {
+        left_type = pmc_register(interpreter, left_class);
+    }
+    if (right_type == enum_type_undef) {
+        right_type = pmc_register(interpreter, right_class);
+    }
+
+    mmd_register(interpreter, functype, left_type, right_type, funcptr);
+
+}
+
 /*
  * Add a new function to the table. This can be interestingly
  * non-trivial, so we get to be tricky.
