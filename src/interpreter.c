@@ -966,7 +966,7 @@ save_regs(Parrot_Interp interpreter)
     }
     save->next = rc->reg_save_mark;
     rc->reg_save_mark = save;
-    mem_sys_memcopy(&save->regs, interpreter, sizeof(reg_store));
+    Parrot_memcpy_aligned(&save->regs, interpreter, sizeof(reg_store));
     return save;
 }
 
@@ -976,7 +976,7 @@ restore_regs(Parrot_Interp interpreter, regsave *data)
 
     Regs_cache * rc = &interpreter->caches->regs_cache;
 
-    mem_sys_memcopy(interpreter, &data->regs, sizeof(reg_store));
+    Parrot_memcpy_aligned(interpreter, &data->regs, sizeof(reg_store));
     data->prev = rc->reg_save_top;
     rc->reg_save_top = data;
     assert(rc->reg_save_mark == data);

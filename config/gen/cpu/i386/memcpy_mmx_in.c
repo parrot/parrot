@@ -12,7 +12,7 @@ Parrot_memcpy_aligned_mmx(void *dest, void *src, size_t n)
 	"mov %1, %%esi\n\t"
 	"mov %2, %%ecx\n\t"
 	"shr $4, %%ecx\n\t"
-	".p2align 3\n\t"
+	"# .p2align 3\n\t"
 	"1:\n\t"
 	"movq 0(%%esi), %%mm0\n\t"
 	"movq 8(%%esi), %%mm1\n\t"
@@ -35,10 +35,26 @@ Parrot_memcpy_aligned_mmx(void *dest, void *src, size_t n)
 
 #include <stdlib.h>
 typedef void* (*@FUNC@_t)(void *dest, void *src, size_t);
+
+#ifndef NDEBUG
+#include <assert.h>
+static void*
+@FUNC@_debug(void* d, void* s, size_t l)
+{
+    assert( (l & 0xf) == 0);
+    assert( ((unsigned long) d & 7) == 0);
+    assert( ((unsigned long) s & 7) == 0);
+    return ((@FUNC@_t)(@FUNC@_code))(d, s, l);
+}
+
+@FUNC@_t @FUNC@ = @FUNC@_debug;
+
+#else
 @FUNC@_t @FUNC@ =
     (@FUNC@_t) @FUNC@_code;
+#endif
 
-#ifdef PARROT_TEST
+#ifdef PARROT_CONFIG_TEST
 #include <string.h>
 #include <stdio.h>
 int main(int argc, char *argv[]) {
@@ -62,5 +78,5 @@ int main(int argc, char *argv[]) {
     puts("ok");
     return 0;
 }
-#endif @* PARROT_TEST *@
+#endif @* PARROT_CONFIG_TEST *@
 INTERFACE*/

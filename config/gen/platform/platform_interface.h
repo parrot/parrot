@@ -9,10 +9,15 @@
 ** I/O:
 */
 
+/*
+** Math:
+*/
+
 int Parrot_signbit(double x);
 #if NUMVAL_SIZE == 12
 int Parrot_signbit_l(long double x);
 #endif
+
 /*
 ** Memory:
 */
@@ -30,9 +35,22 @@ void *mem_alloc_executable(size_t);
 void mem_free_executable(void *);
 void *mem_realloc_executable(void *, size_t);
 #else
-#define mem_alloc_executable mem_sys_allocate
-#define mem_free_executable mem_sys_free
-#define mem_realloc_executable mem_sys_realloc
+#  define mem_alloc_executable mem_sys_allocate
+#  define mem_free_executable mem_sys_free
+#  define mem_realloc_executable mem_sys_realloc
+#endif
+
+void* Parrot_memcpy_aligned(void*, void*, size_t);
+
+#ifdef PARROT_HAS_I386_MMX
+
+typedef void* (*Parrot_memcpy_func_t)(void *dest, void *src, size_t);
+extern Parrot_memcpy_func_t Parrot_memcpy_aligned_mmx;
+
+#  define Parrot_memcpy_aligned(d,s,l) Parrot_memcpy_aligned_mmx(d,s,l)
+
+#else
+#  define Parrot_memcpy_aligned(d,s,l) mem_sys_memcopy(d,s,l)
 #endif
 
 /*

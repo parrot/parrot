@@ -23,13 +23,16 @@ sub run_cpu {
 	print " $f " if $verbose;
 	$f = "config/gen/cpu/i386/$f";
 	cc_gen($f);
-	eval( cc_build("-DPARROT_TEST"));
+	eval( cc_build("-DPARROT_CONFIG_TEST"));
 	if ($@) {
 	    print " $@ " if $verbose;
 	}
 	else {
 	    if (cc_run() =~ /ok/) {
-		Configure::Data->set('i386_has_mmx' => '1');
+		Configure::Data->set(
+		  'i386_has_mmx' => '1',
+		  'HAS_i386_mmx' => '1',
+		);
 		print " (MMX) " if ($verbose);
 	        Configure::Data->add(',',
 			"TEMP_generated" => $f

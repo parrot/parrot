@@ -756,7 +756,7 @@ $(SRC)/packout$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/parrot$(O) : $(GENERAL_H_FILES)
 
-$(SRC)/register$(O) : $(GENERAL_H_FILES)
+$(SRC)/register$(O) : $(GENERAL_H_FILES) $(SRC)/generic_register.c
 
 $(SRC)/rx$(O) : $(GENERAL_H_FILES)
 

@@ -34,6 +34,7 @@ sub runstep {
 
   my $generated = Configure::Data->get('TEMP_generated');
   print " ($generated) " if $verbose;
+  print("\n") if defined $verbose && $verbose == 2;
 
   # headers are merged into platform.h
   my @headers = qw/
@@ -70,6 +71,7 @@ HERE
 
       if ( -e $header_file ) {
           local $/ = undef;
+	  print("\t$header_file\n") if defined $verbose && $verbose == 2;
           open IN_H, "< $header_file" or die "Can't open $header_file: $!";
           print PLATFORM_H <<HERE;
 /*
@@ -86,6 +88,27 @@ HERE
       # be desirable if porters don't see the appropriate file in generic/ and
       # shoehorn their function into the wrong file rather than creating the
       # correct one from the above list in their $platform/ dir (e.g. misc.c).
+  }
+
+  # finally append generated
+  @headers = grep { /\.h$/ } split(',', $generated);
+  for ( @headers ) {
+      if ( -e $_ ) {
+          local $/ = undef;
+	  print("\t$_\n") if defined $verbose && $verbose == 2;
+          open IN_H, "< $_" or die "Can't open $_: $!";
+          print PLATFORM_H <<HERE;
+/*
+** $_
+*/
+
+HERE
+          print PLATFORM_H <IN_H>, "\n\n";
+          close IN_H;
+      }
+      else {
+	  warn("Header file '$_' listed in TEMP_generated but not found\n");
+      }
   }
 
   print PLATFORM_H <<HERE;
@@ -107,6 +130,7 @@ HERE
     exec.c
     misc.c
   /;
+
 
   open PLATFORM_C, "> src/platform.c" or die "Can't open src/platform.c: $!";
 
@@ -148,6 +172,7 @@ HERE
 
       if ( -e $impl_file ) {
           local $/ = undef;
+	  print("\t$impl_file\n") if defined $verbose && $verbose == 2;
           open IN_C, "< $impl_file" or die "Can't open $impl_file: $!";
           print PLATFORM_C <<HERE;
 /*
@@ -159,6 +184,25 @@ HERE
           close IN_C;
       }
   }
+
+  # append generated c files
+  @impls = grep { /\.c$/ } split(',', $generated);
+  for ( @impls ) {
+      if ( -e $_ ) {
+          local $/ = undef;
+	  print("\t$_\n") if defined $verbose && $verbose == 2;
+          open IN_C, "< $_" or die "Can't open $_: $!";
+          print PLATFORM_C <<HERE;
+/*
+** $_:
+*/
+
+HERE
+          print PLATFORM_C <IN_C>, "\n\n";
+          close IN_C;
+      }
+  }
+
   close PLATFORM_C;
 
   if ( Configure::Data->get( 'platform_asm' ) ) {
