@@ -12,7 +12,8 @@
 #
 
 use strict;
-use lib 'lib';
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Parrot::Config;
 
 use Parrot::OpLib::core;
