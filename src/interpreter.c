@@ -1617,7 +1617,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 
     stack_system_init(interpreter);
     /* Set up the initial register chunks */
-    setup_register_stacks(interpreter);
+    setup_register_stacks(interpreter, &interpreter->ctx);
 
     Parrot_clear_s(interpreter);
     Parrot_clear_p(interpreter);

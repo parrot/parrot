@@ -60,6 +60,22 @@ Swaps the "context".
         return dest;
     }
 
+/*
+
+=item C<void mark()>
+
+Marks the coroutine as live.
+
+=cut
+
+*/
+
+    void mark () {
+        struct Parrot_Coroutine *c = (struct Parrot_Coroutine *)PMC_sub(SELF);
+        mark_stack(INTERP, c->co_control_stack);
+        mark_stack(INTERP, c->co_pad_stack);
+        SUPER();    /* mark rest */
+    }
 }
 
 /*

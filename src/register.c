@@ -64,7 +64,7 @@ and register frame stacks.
 /*
 
 =item C<void
-setup_register_stacks(Parrot_Interp interpreter)>
+setup_register_stacks(Parrot_Interp, struct Parrot_Context *)>
 
 Sets up the register stacks.
 
@@ -73,18 +73,18 @@ Sets up the register stacks.
 */
 
 void
-setup_register_stacks(Parrot_Interp interpreter)
+setup_register_stacks(Parrot_Interp interpreter, struct Parrot_Context *ctx)
 {
-    interpreter->ctx.int_reg_stack = cst_new_stack(interpreter,
+    ctx->int_reg_stack = cst_new_stack(interpreter,
             "IntReg_", sizeof(struct IRegFrame), FRAMES_PER_CHUNK);
 
-    interpreter->ctx.string_reg_stack = cst_new_stack(interpreter,
+    ctx->string_reg_stack = cst_new_stack(interpreter,
             "StringReg_", sizeof(struct SRegFrame), FRAMES_PER_CHUNK);
 
-    interpreter->ctx.num_reg_stack = cst_new_stack(interpreter,
+    ctx->num_reg_stack = cst_new_stack(interpreter,
             "NumReg_", sizeof(struct NRegFrame), FRAMES_PER_CHUNK);
 
-    interpreter->ctx.pmc_reg_stack = cst_new_stack(interpreter,
+    ctx->pmc_reg_stack = cst_new_stack(interpreter,
             "PMCReg_", sizeof(struct PRegFrame), FRAMES_PER_CHUNK);
 }
 

@@ -444,6 +444,7 @@ new_coroutine(struct Parrot_Interp *interp)
             sizeof(struct Parrot_Coroutine));
     struct Parrot_Context *ctx = &co->ctx;
     save_context(interp, ctx);
+    setup_register_stacks(interp, &interp->ctx);
     /* put in a COWed copy of the user stack */
     ctx->user_stack = stack_copy(interp, interp->ctx.user_stack);
     /* create new pad and control stacks,
