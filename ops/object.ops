@@ -92,21 +92,72 @@ $1 is replaced--a new PMC for the subclass is generated and put in it.
 =cut
 
 inline op subclass(out PMC, in PMC, in STR) {
+  $1 = Parrot_single_subclass(interpreter, $2, $3);
   goto NEXT();
 }
 
 inline op subclass(out PMC, in PMC) {
+  $1 = Parrot_single_subclass(interpreter, $2, NULL);
   goto NEXT();
 }
 
-inline op subclass(out PMC, in STR, in STR) {
+op subclass(out PMC, in STR, in STR) {
+  PMC *class = VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2));
+  if (!class) {
+    internal_exception(NO_CLASS, "Class doesn't exist");
+  }
+  $1 = Parrot_single_subclass(interpreter, class, $3);
   goto NEXT();
 }
 
-inline op subclass(out PMC, in STR) {
+op subclass(out PMC, in STR) {
+  PMC *class = VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2));
+  if (!class) {
+    internal_exception(NO_CLASS, "Class doesn't exist");
+  }
+  $1 = Parrot_single_subclass(interpreter, class, NULL);
   goto NEXT();
 }
 
+=item B<newclass>(out PMC, in STR)
+
+Create a new base class named $2
+
+=cut
+
+inline op newclass(out PMC, in STR) {
+  $1 = Parrot_new_class(interpreter, $2)
+}
+
+=item B<findclass>(out INT, in STR)
+
+Returns 1 if the class exists, 0 if it does not.
+
+=cut
+
+inline op findclass(out INT, in STR) {
+  if (VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2))) {
+    $1 = 1;
+  } else {
+    $1 = 0;
+  }
+  goto NEXT();
+}
+
+=item B<getclass>(out PMC, in STR)
+
+Find the PMC for a class, by name. Note that this is a one-level hash, so for
+classes that have some structure you need to impose that structure externally.
+
+Parrot's conventions are that level separators are noted with the NULL
+character, so Perl's Foo::Bar would be Foo\0Bar.
+
+=cut
+
+inline op findclass(out PMC, in STR) {
+  $1 = VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2));
+  goto NEXT();
+}
 
 =item B<singleton>(in PMC) 
 

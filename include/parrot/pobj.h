@@ -1,5 +1,5 @@
 /* pobj.h
- *  Copyright: (When this is determined...it will go here)
+ *  Copyright: 2002, 2003 Yet Another Society
  *  CVS Info
  *     $Id$
  *  Overview:
@@ -210,7 +210,12 @@ typedef enum PObj_enum {
      */
     b_PObj_is_special_PMC_FLAG = 1 << 26,
 
-    b_PObj_needs_early_DOD_FLAG = 1 << 27
+    b_PObj_needs_early_DOD_FLAG = 1 << 27,
+
+    /* True if the PMC is a class */
+    PObj_is_class_FLAG = 1 << 28,
+    /* True if the PMC is a parrot object */
+    PObj_is_object_FLAG = 1 << 29
 
 } PObj_flags;
 
@@ -369,6 +374,9 @@ typedef enum PObj_enum {
 #define PObj_is_buffer_ptr_SET(o) PObj_special_SET(is_buffer_ptr, o)
 #define PObj_is_buffer_ptr_CLEAR(o) PObj_special_CLEAR(is_buffer_ptr, o)
 
+#define PObj_is_buffer_of_PMCs_ptr_SET(o) PObj_flag_SET(is_buffer_of_PMCs_ptr, o)
+#define PObj_is_buffer_of_PMCs_ptr_CLEAR(o) PObj_flag_CLEAR(is_buffer_of_PMCs_ptr, o)
+
 #define PObj_custom_mark_SET(o)   PObj_special_SET(custom_mark, o)
 #define PObj_custom_mark_CLEAR(o)   PObj_special_CLEAR(custom_mark, o)
 #define PObj_custom_mark_TEST(o)   PObj_flag_TEST(custom_mark, o)
@@ -376,6 +384,14 @@ typedef enum PObj_enum {
 #define PObj_active_destroy_SET(o) PObj_flag_SET(active_destroy, o)
 #define PObj_active_destroy_TEST(o) PObj_flag_TEST(active_destroy, o)
 #define PObj_active_destroy_CLEAR(o) PObj_flag_CLEAR(active_destroy, o)
+
+#define PObj_is_class_SET(o) PObj_flag_SET(is_class, o)
+#define PObj_is_class_TEST(o) PObj_flag_TEST(is_class, o)
+#define PObj_is_class_CLEAR(o) PObj_flag_CLEAR(is_class, o)
+
+#define PObj_is_object_SET(o) PObj_flag_SET(is_object, o)
+#define PObj_is_object_TEST(o) PObj_flag_TEST(is_object, o)
+#define PObj_is_object_CLEAR(o) PObj_flag_CLEAR(is_object, o)
 
 #define PObj_is_PMC_TEST(o) PObj_flag_TEST(is_PMC, o)
 #define PObj_is_PMC_EXT_TEST(o) PObj_flag_TEST(is_PMC_EXT, o)

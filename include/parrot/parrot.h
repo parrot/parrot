@@ -227,6 +227,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/thread.h"
 #include "parrot/tsq.h"
 #include "parrot/longopt.h"
+#include "parrot/objects.h"
 #endif
 
 /*

@@ -107,6 +107,7 @@ typedef struct Parrot_Interp {
                                          * area */
     struct Arenas *arena_base;          /* Pointer to this interpreter's
                                          * arena */
+    PMC *class_hash;                    /* Hash of classes */
     void *piodata;                      /* interpreter's IO system */
 
     op_lib_t  *op_lib;                  /* Opcode library */

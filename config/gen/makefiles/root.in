@@ -94,7 +94,7 @@ GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 	$(INC)/regfuncs.h $(INC)/string_funcs.h $(INC)/encoding.h \
 	$(INC)/chartype.h $(INC)/oplib.h $(INC)/sub.h $(INC)/unicode.h \
 	$(INC)/perltypes.h $(INC)/exit.h $(INC)/nci.h $(INC)/pobj.h \
-	$(INC)/thread.h $(INC)/tsq.h $(INC)/longopt.h
+	$(INC)/thread.h $(INC)/tsq.h $(INC)/longopt.h $(INC)/objects.h
 
 
 ALL_H_FILES = $(GENERAL_H_FILES)
@@ -113,7 +113,7 @@ IO_O_FILES = io/io$(O) io/io_buf$(O) io/io_unix$(O) io/io_win32$(O) \
 
 INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 	register$(O) core_ops$(O) core_ops_prederef$(O) core_ops_switch$(O) \
-	memory$(O) \
+	memory$(O) objects$(O) \
 	packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
 	chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
 	core_pmcs$(O) platform$(O) ${jit_o} \
@@ -429,6 +429,8 @@ io/io_win32$(O) : $(GENERAL_H_FILES)
 io/io_stdio$(O) : $(GENERAL_H_FILES)
 
 memory$(O) : $(GENERAL_H_FILES)
+
+objects$(O) : $(GENERAL_H_FILES)
 
 packfile$(O) : $(GENERAL_H_FILES)
 

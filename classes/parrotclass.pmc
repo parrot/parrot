@@ -10,17 +10,43 @@
  *  References:
  */
 
+/* The structure of a parrot class is reasonably straightforward. The
+   PMC's cached integer value is the number of attribute slots that
+   an object of this type requires. The data pointer holds a pointer
+   to an array of PMCs. That array has:
+
+   0: An array of immediate parents
+   1: An array of all parents, in search order
+   2: A hash, keys are the class names, values are the offsets to
+      their attributes
+   3: A hash, the keys are the classname/attrib name pair (separated
+      by a NULL), while the value is the offset to the attribute
+   4: The class name PMC
+   
+*/
+
 #include "parrot/parrot.h"
 
 pmclass ParrotClass {
 
-    INTVAL type () {
-        return enum_class_ParrotClass;
-    }
+  void init () {
+    /* Hang an array off the data pointer, empty of course */
+    PMC_data(SELF) = pmc_new(interpreter, enum_class_Array);
+    /* No attributes to start with */
+    SELF->obj.u.int_val = 0;
+    /* But we are a class, really */
+    PObj_is_class_SET(SELF);
+    /* And, coincidentally, a buffer of PMCs. Fancy that... */
+    PObj_get_FLAGS(SELF) |= PObj_is_buffer_of_PMCs_ptr_FLAG;
+  }
 
-    STRING* name() {
-        return whoami;
-    }
-
-
+  INTVAL type () {
+    return enum_class_ParrotClass;
+  }
+  
+  STRING* name() {
+    return whoami;
+  }
+  
+    
 }

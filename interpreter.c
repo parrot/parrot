@@ -1,5 +1,5 @@
 /* interpreter.c
- *  Copyright: (When this is determined...it will go here)
+ *  Copyright: 2001, 2002, 2001 Yet Another Society
  *  CVS Info
  *     $Id$
  *  Overview:
@@ -601,6 +601,10 @@ make_interpreter(Interp_flags flags)
     /* setup stdio PMCs */
     PIO_init(interpreter);
     /* Done. Return and be done with it */
+
+    /* Add in the class hash. Bit of a hack, probably, as there's
+       altogether too much overlap with the PMC classes */
+    interpreter->class_hash = pmc_new(interpreter, enum_class_PerlHash);
 
     /* Okay, we've finished doing anything that might trigger GC.
      * Actually, we could enable DOD/GC earlier, but here all setup is
