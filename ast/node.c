@@ -22,12 +22,7 @@ The AST (Abstract Syntax Tree) represents the code of a HLL source module.
 #include <stdio.h>
 
 #include "ast.h"
-#ifdef AST_TEST
-#define mem_sys_allocate_zeroed(x) calloc(1, x)
-#define fatal(n, s, t, a) fprintf(stderr, t, a); exit(n)
-#else
 #include "../imcc/imc.h"
-#endif
 
 static void
 pr(nodeType *p)
@@ -44,7 +39,7 @@ const_dump(nodeType *p, int l)
 }
 
 static nodeType*
-const_expand(nodeType *p)
+exp_Const(Interp* interpreter, nodeType *p)
 {
     return p;
 }
@@ -52,7 +47,7 @@ const_expand(nodeType *p)
 static void
 set_const(nodeType *p)
 {
-    p->expand = const_expand;
+    p->expand = exp_Const;
     /* p->context = const_context; */
     p->dump = const_dump;
     p->opt = NULL;
@@ -93,11 +88,107 @@ new_con(YYLTYPE *loc)
     return p;
 }
 
+static Instruction *
+insINS(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
+        const char *name, SymReg **regs, int n)
+{
+    Instruction *tmp = INS(interpreter, unit, name, NULL, regs, n, 0, 0);
+    insert_ins(unit, ins, tmp);
+    return tmp;
+}
+/*
+ * node expand aka code creation functions
+ */
+
 static nodeType*
-var_expand(nodeType *p)
+exp_Var(Interp* interpreter, nodeType *p)
 {
     return p;
 }
+
+static nodeType*
+exp_default(Interp* interpreter, nodeType *p)
+{
+    nodeType *child;
+    nodeType *next = p->next;
+    child = NODE0(p);
+    if (child)
+        child->expand(interpreter, child);
+    if (next)
+        next->expand(interpreter, next);
+    return p;
+}
+
+static nodeType*
+exp_next(Interp* interpreter, nodeType *p)
+{
+    nodeType *next = p->next;
+    if (next)
+        next->expand(interpreter, next);
+    return p;
+}
+
+static nodeType*
+exp_Py_Module(Interp* interpreter, nodeType *p)
+{
+    /*
+     * this is the main init code
+     */
+    IMC_Unit *unit = cur_unit = imc_open_unit(interpreter, IMC_PCCSUB);
+    SymReg *sub = mk_sub_address(str_dup("__main__"));
+    Instruction *i = INS_LABEL(cur_unit, sub, 1);
+
+    i->r[1] = mk_pcc_sub(str_dup(i->r[0]->name), 0);
+    add_namespace(interpreter, i->r[1]);
+    i->r[1]->pcc_sub->pragma = P_MAIN|P_PROTOTYPED ;
+    /*
+     * Py_Module has a child node which are statements
+     */
+    return exp_default(interpreter, p);
+}
+
+static nodeType*
+exp_Py_Print(Interp* interpreter, nodeType *p)
+{
+    IMC_Unit *unit = interpreter->imc_info->last_unit;
+    Instruction *ins = unit->last_ins;
+    SymReg *regs[IMCC_MAX_REGS];
+    nodeType * child = NODE0(p);
+    if (!child)
+        fatal(1, "exp_Py_Print", "nothing to print");
+    child = child->expand(interpreter, child);
+    /* TODO file handle node */
+    if (child->expand == exp_Const || child->expand == exp_Var)
+        regs[0] = child->u.r;
+    else
+        fatal(1, "exp_Py_Print", "unknown node to print");
+
+    insINS(interpreter, unit, ins, "print_item", regs, 1);
+    return exp_next(interpreter, p);
+}
+
+static nodeType*
+exp_Py_Print_nl(Interp* interpreter, nodeType *p)
+{
+    IMC_Unit *unit = interpreter->imc_info->last_unit;
+    Instruction *ins = unit->last_ins;
+    SymReg *regs[IMCC_MAX_REGS];
+    insINS(interpreter, unit, ins, "print_newline", regs, 0);
+    return exp_next(interpreter, p);
+}
+
+static nodeType*
+exp_Src_File(Interp* interpreter, nodeType *p)
+{
+    return exp_default(interpreter, p);
+}
+
+static nodeType*
+exp_Src_Lines(Interp* interpreter, nodeType *p)
+{
+    return exp_default(interpreter, p);
+}
+
 
 static nodeType* create_0(int nr, nodeType *self, nodeType *p);
 static nodeType* create_1(int nr, nodeType *self, nodeType *p);
@@ -117,14 +208,14 @@ typedef struct {
 
 static node_names ast_list[] = {
     { "-no-node-", 	NULL, NULL, NULL, NULL },
-    { "Const", 		NULL, NULL, NULL, const_dump },
+    { "Const", 		NULL, exp_Const, NULL, const_dump },
 #define CONST_NODE 1
-    { "Py_Module", 	create_1, NULL, NULL, NULL },
-    { "Py_Print" , 	create_1, NULL, NULL, NULL },
-    { "Py_Print_nl",	create_0, NULL, NULL, NULL },
-    { "Src_File",    	create_1, NULL, NULL, NULL },
-    { "Src_Line",    	create_1, NULL, NULL, NULL },
-    { "Stmts",          create_1, NULL, NULL, NULL }
+    { "Py_Module", 	create_1, exp_Py_Module, NULL, NULL },
+    { "Py_Print" , 	create_1, exp_Py_Print, NULL, NULL },
+    { "Py_Print_nl",	create_0, exp_Py_Print_nl, NULL, NULL },
+    { "Src_File",    	create_1, exp_Src_File, NULL, NULL },
+    { "Src_Line",    	create_1, exp_Src_Lines, NULL, NULL },
+    { "Stmts",          create_1, exp_default, NULL, NULL }
 };
 
 static int
@@ -281,6 +372,17 @@ IMCC_dump_nodes(nodeType *p)
     dump(p, 0);
     printf("\n");
 }
+
+void
+IMCC_expand_nodes(Interp* interpreter, nodeType *p)
+{
+    p->expand(interpreter, p);
+}
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:

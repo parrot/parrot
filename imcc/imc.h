@@ -197,6 +197,13 @@ typedef struct _imc_info_t {
 
 extern IMC_Unit * cur_unit;
 
+/*
+ * ast interface
+ */
+
+void IMCC_ast_init(Interp* interpreter);
+void IMCC_ast_compile(Interp *interpreter, FILE *fp);
+
 #endif /* PARROT_IMCC_IMC_H_GUARD */
 
 

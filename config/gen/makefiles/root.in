@@ -225,6 +225,7 @@ AST_H_FILES = \
 AST_O_FILES = \
     $(AST_DIR)/astparser$(O) \
     $(AST_DIR)/astlexer$(O) \
+    $(AST_DIR)/ast_main$(O) \
     $(AST_DIR)/node$(O)
 
 GENERAL_H_FILES = $(NONGEN_HEADERS) $(GEN_HEADERS) ${TEMP_cg_h}
@@ -926,7 +927,7 @@ $(AST_DIR)/ast.y.flag $(AST_DIR)/astparser.c $(AST_DIR)/astparser.h : $(AST_DIR)
 	$(TOUCH) $(AST_DIR)/ast.y.flag $(AST_DIR)/astparser.c $(AST_DIR)/astparser.h
 
 $(AST_DIR)/ast.l.flag $(AST_DIR)/astlexer.c : $(AST_DIR)/ast.l
-	$(LEX) -o$(AST_DIR)/astlexer.c $(AST_DIR)/ast.l
+	$(LEX) -o$(AST_DIR)/astlexer.c -PAST $(AST_DIR)/ast.l
 	$(TOUCH) $(AST_DIR)/ast.l.flag $(AST_DIR)/astlexer.c
 
 $(AST_O_FILES) : $(IMCC_H_FILES) $(AST_H_FILES) $(ALL_H_FILES)

@@ -411,7 +411,7 @@ int
 main(int argc, char * argv[])
 {
     struct PackFile *pf;
-    int obj_file;
+    int obj_file, ast_file = 0;
     Run_Cores core;
 
     Interp *interpreter = Parrot_new(NULL);
@@ -423,6 +423,7 @@ main(int argc, char * argv[])
 
 
     imcc_init(interpreter);
+    IMCC_ast_init(interpreter);
 
     sourcefile = parseflags(interpreter, &argc, &argv);
     /* can't run JIT or prederefed yet */
@@ -458,6 +459,9 @@ main(int argc, char * argv[])
             }
             if (ext && strcmp (ext, ".pasm") == 0) {
                 pasm_file = 1;
+            }
+            else if (ext && strcmp (ext, ".past") == 0) {
+                ast_file = 1;
             }
         }
     }
@@ -512,7 +516,12 @@ main(int argc, char * argv[])
 
         info(interpreter, 1, "Starting parse...\n");
 
-        yyparse((void *) interpreter);
+        if (ast_file) {
+            IMCC_ast_compile(interpreter, yyin);
+        }
+        else {
+            yyparse((void *) interpreter);
+        }
 
         imc_compile_all_units(interpreter);
         imc_cleanup(interpreter);

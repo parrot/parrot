@@ -1,6 +1,7 @@
 #if !defined(PARROT_AST_H_GUARD)
 #define PARROT_AST_H_GUARD
 
+#include "parrot/parrot.h"
 #include "astparser.h"
 
 typedef enum {
@@ -10,7 +11,7 @@ typedef enum {
 YYLTYPE noloc;
 
 typedef struct nodeType_t* (*node_opt_t)    (struct nodeType_t*);
-typedef struct nodeType_t* (*node_expand_t) (struct nodeType_t*);
+typedef struct nodeType_t* (*node_expand_t) (Interp*, struct nodeType_t*);
 typedef struct nodeType_t* (*node_create_t) (int, struct nodeType_t*,
 					       struct nodeType_t*);
 typedef void               (*node_dump_t)   (struct nodeType_t*, int level);
@@ -61,6 +62,7 @@ nodeType * IMCC_new_node(int nr, nodeType *child, YYLTYPE *loc);
 nodeType * IMCC_append_node(nodeType *head, nodeType *tail, YYLTYPE *loc);
 
 void IMCC_dump_nodes(nodeType *);
+void IMCC_expand_nodes(Interp*, nodeType *);
 
 int IMCC_find_node_type(const char *name);
 

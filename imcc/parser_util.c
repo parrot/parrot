@@ -557,16 +557,21 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     interp->code = pf;  /* put new packfile in place */
     sourcefile = const_cast(s);
     ext = strrchr(fullname, '.');
-    if (ext && strcmp (ext, ".pasm") == 0) {
-        pasm_file = 1;
-    }
-    else
-        pasm_file = 0;
-
     line = 1;
 
-    /* see imcc.l */
-    compile_file(interp, new);
+    if (ext && strcmp (ext, ".pasm") == 0) {
+        pasm_file = 1;
+        /* see imcc.l */
+        compile_file(interp, new);
+    }
+    else if (ext && strcmp (ext, ".past") == 0) {
+        IMCC_ast_compile(interp, new);
+    }
+    else {
+        pasm_file = 0;
+        compile_file(interp, new);
+    }
+
     imc_cleanup(interp);
 
     (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
@@ -581,9 +586,9 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 void
 register_compilers(Parrot_Interp interp)
 {
-    STRING *pasm = string_from_cstring(interp, "PASM", 0);
-    STRING *pir = string_from_cstring(interp, "PIR", 0);
-    STRING *source = string_from_cstring(interp, "FILE", 0);
+    STRING *pasm = const_string(interp, "PASM");
+    STRING *pir = const_string(interp, "PIR");
+    STRING *source = const_string(interp, "FILE");
     Parrot_csub_t pa = (Parrot_csub_t)imcc_compile_pasm;
     Parrot_csub_t pi = (Parrot_csub_t)imcc_compile_pir;
     Parrot_csub_t ps = (Parrot_csub_t)imcc_compile_file;

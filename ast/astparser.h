@@ -1,4 +1,4 @@
-/* A Bison parser, made from ast.y, by GNU bison 1.75.  */
+/* A Bison parser, made from ast/ast.y, by GNU bison 1.75.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
    Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
@@ -23,8 +23,8 @@
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
 
-#ifndef BISON_ASTPARSER_H
-# define BISON_ASTPARSER_H
+#ifndef BISON_AST_ASTPARSER_H
+# define BISON_AST_ASTPARSER_H
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -49,14 +49,14 @@
 
 
 #ifndef YYSTYPE
-#line 43 "ast.y"
+#line 43 "ast/ast.y"
 typedef union {
     int t;
     char *s;
     struct nodeType_t *n;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 60 "astparser.h"
+#line 60 "ast/astparser.h"
 # define YYSTYPE yystype
 #endif
 
@@ -75,5 +75,5 @@ typedef struct yyltype
 
 
 
-#endif /* not BISON_ASTPARSER_H */
+#endif /* not BISON_AST_ASTPARSER_H */
 
