@@ -17,6 +17,7 @@ README                                            [main]doc
 RELEASE_INSTRUCTIONS                              []
 RESPONSIBLE_PARTIES                               [main]doc
 TODO                                              [main]doc
+TODO.win32                                        [main]doc
 VERSION                                           [main]doc
 build_tools/build_nativecall.pl                   []
 build_tools/c2str.pl                              []
