@@ -1,4 +1,4 @@
-/* exceptions.h
+/* exceptions.c
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
  *     $Id$
@@ -11,6 +11,7 @@
  */
 
 #include "parrot/parrot.h"
+#include "parrot/exceptions.h"
 
 #include <stdarg.h>
 
@@ -27,7 +28,7 @@ void internal_exception(int exitcode, const char * format, ... ) {
 
 #define dumpcore() printf("Sorry, coredump is not yet implemented for this platform.\n\n");  exit(1);
 
-void do_panic(struct Parrot_Interp *interpreter, char *message, char *file, int line) {
+void do_panic(struct Parrot_Interp *interpreter, const char *message, const char *file, int line) {
     printf(
 "Parrot VM: PANIC: %s!\n\
 C file %s, line %d\n\
@@ -44,7 +45,7 @@ Configured  : " PARROT_CONFIG_DATE "\n\
 Architecture: " PARROT_ARCHNAME    "\n\
 JIT Capable : %s\n\
 \n\
-Interp Flags: 0x%x\n\
+Interp Flags: 0x%lx\n\
 Exceptions  : (missing from core)\n\
 \n\
 Dumping core...\n\
@@ -53,7 +54,7 @@ Dumping core...\n\
         file, 
         line, 
         "(not available)", 
-        interpreter->current_line, 
+        (int)interpreter->current_line, 
         (JIT_CAPABLE ? "Yes" : "No"),
         interpreter->flags);
     dumpcore();
