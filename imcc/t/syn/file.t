@@ -360,8 +360,9 @@ END_PIR
   # Perl5  has an English locale when started.
   my $ENOENT_msg;
   {
-    eval { local $ENV{LANG} = 'en'; };
-    $ENOENT_msg = qx{$PERL5 -e 'open FOO, "<non_existent.file"; print \$!'};
+    eval { local $ENV{LANG} = 'C';
+      $ENOENT_msg = qx{$PERL5 -e 'open FOO, "<non_existent.file"; print \$!'};
+    };
   }
   use Test::More;
   is( qx{$PARROT temp.imc 2>&1}, <<OUT, "including a non-existent file");
