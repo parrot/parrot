@@ -648,7 +648,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
         for (i = 1; ((i < ln) && (line->next)); i++)
             line = line->next;
 
-        /* Abort if the line number provided doesn't exists */
+        /* Abort if the line number provided doesn't exist */
         if (!line->next) {
             PIO_eprintf(interpreter,
                         "Can't set a breakpoint at line number %li\n",ln);
@@ -658,8 +658,14 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
     else {
         /* Get the line to set it */
         line = pdb->file->line;
-        while (line->opcode != pdb->cur_opcode)
+        while (line->opcode != pdb->cur_opcode) {
             line = line->next;
+            if (!line) {
+                PIO_eprintf(interpreter, 
+                   "No current line found and no line number specified\n");
+                return;
+            }
+        }
     }
 
     /* Skip lines that are not related to an opcode */
