@@ -79,6 +79,30 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
 	.local pmc sdl_function
 
 	loadlib libsdl, 'libSDL'
+	$I0 = typeof libsdl
+	if $I0 != .Undef goto OK
+	
+	# second try
+	loadlib libsdl, 'libSDL-1.2'
+	$I0 = typeof libsdl
+	if $I0 != .Undef goto OK_HINT1
+
+	# third try
+	loadlib libsdl, 'libSDL-1.2.so.0'
+	$I0 = typeof libsdl
+	if $I0 != .Undef goto OK_HINT2
+	
+	# failed to load libSDL
+	$P0 = new Exception
+	$P0["_message"] = "libSDL not found!"
+	throw $P0
+	branch OK
+OK_HINT1:
+	printerr "Hint: create a link from libSDL-1.2.so to libSDL.so to disable the error messages.\n"
+	branch OK
+OK_HINT2:
+	printerr "Hint: create a link from libSDL-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
+OK:
 	dlfunc sdl_function, libsdl, 'SDL_Init', 'ii'
 	store_global 'SDL::NCI', 'Init', sdl_function
 	dlfunc sdl_function, libsdl, 'SDL_SetVideoMode', 'piiil'
@@ -132,6 +156,28 @@ SDL::Image library anyway, which calls this for you.
 	.local pmc nci_sub
 
 	loadlib image_lib, 'libSDL_image'
+	$I0 = typeof image_lib
+	if $I0 != .Undef goto OK
+
+	loadlib image_lib, 'libSDL_image-1.2'
+	$I0 = typeof image_lib
+	if $I0 != .Undef goto OK_HINT1
+
+	loadlib image_lib, 'libSDL_image-1.2.so.0'
+	$I0 = typeof image_lib
+	if $I0 != .Undef goto OK_HINT2
+
+	# failed to load libSDL
+	$P0 = new Exception
+	$P0["_message"] = "libSDL_image not found!"
+	throw $P0
+	branch OK
+OK_HINT1:
+	printerr "Hint: create a link from libSDL_image-1.2.so to libSDL_image.so to disable the error messages.\n"
+	branch OK
+OK_HINT2:
+	printerr "Hint: create a link from libSDL_image-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
+OK:
 	dlfunc nci_sub, image_lib, 'IMG_Load', 'pt'
 	store_global 'SDL::NCI', 'IMG_Load', nci_sub
 .end
