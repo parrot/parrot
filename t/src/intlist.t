@@ -92,7 +92,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "list aerobics");
 
             printf("I need a shower.\n");
 
-            return 0;
+            return NULL;
         }
 
         int main(int argc, char* argv[]) {
@@ -162,6 +162,8 @@ c_output_is(<<'CODE', <<'OUTPUT', "step aerobics");
             /* And the final element is... */
             if (intlist_pop(interpreter, list) != 0)
                 return "last survivor";
+
+            return NULL;
         }
 
         int main(int argc, char* argv[]) {
