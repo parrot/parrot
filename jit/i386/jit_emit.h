@@ -726,34 +726,16 @@ opt_div_rm(Parrot_jit_info_t *jit_info, int dest, void * mem, int is_div)
 #  define jit_emit_div_rm_i(pc, r, m)  pc = opt_div_rm(jit_info, r, m, 1)
 #  define jit_emit_cmod_rm_i(pc, r, m) pc = opt_div_rm(jit_info, r, m, 0)
 
-#  define emitm_smull_op(pc) { *((pc)++) = (char) 0x0f; *((pc)++) = (char) 0xaf; }
-
 #  define emitm_smull_r(pc, reg2) emitm_alu_imp_r((pc), emit_b101, (reg2))
 
 #  define jit_emit_mul_rr_i(pc, reg1, reg2) { \
-    emitm_smull_op(pc); \
-    *((pc)++) = (char) emit_alu_r_r(reg1, reg2); }
+    *pc++ = 0xf; \
+    emitm_alul_r_r(pc, 0xaf, reg1, reg2); }
 
 #  define emitm_smull_r_m(pc, reg1, b, i, s, d) { \
-    emitm_smull_op(pc); \
-    (pc) = emit_r_X((pc), emit_reg(reg1 - 1), b, i, s, (long)d); }
+    *pc++ = 0xf; \
+    emitm_alul_r_m(pc, 0xaf, reg1, b, i, s, d); }
 
-#  ifdef NO_MUL_OPT
-#    if EXEC_CAPABLE
-#      define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
-         *(pc++) = (char) 0x69; \
-         *(pc++) = (char) 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
-         EXEC_RA(pc); \
-         *(long *)(pc) = (long)imm; \
-         pc += 4
-#    else /* EXEC_CAPABLE */
-#      define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
-         *(pc++) = (char) 0x69; \
-         *(pc++) = (char) 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
-         *(long *)(pc) = (long)imm; \
-         pc += 4
-#    endif /* EXEC_CAPABLE */
-#  else
 static char *
 opt_mul(char *pc, int dest, INTVAL imm, int src)
 {
@@ -803,8 +785,7 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
                 emitm_lea_m_r(pc, dest, dest, dest, 4, 0);
                 break;
             default:
-                *(pc++) = (char) 0x69;
-                *(pc++) = (char) 0xc0 | (src - 1) | (dest - 1) << 3;
+                emitm_alul_r_r(pc, 0x69, dest, src);
                 *(long *)(pc) = (long)imm;
                 pc += 4;
         }
@@ -814,17 +795,13 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 #    define jit_emit_mul_rir_i(pc, dest, imm, src) \
        pc = opt_mul(pc, dest, imm, src)
 
-#  endif
 
 #  define jit_emit_mul_ri_i(pc, r, imm) jit_emit_mul_rir_i(pc, r, imm, r)
 
-#  define jit_emit_mul_rim_ii(pc, dst, imm, add) \
-    *(pc++) = (char) 0x69; \
-    *(pc++) = (char) 0x05 | (dst - 1) << 3; \
-    *(long *)(pc) = (long)add; \
-    pc += 4; \
-    *(long *)(pc) = imm; \
-    pc += 4
+#  define jit_emit_mul_RIM_ii(pc, reg, imm, ofs) \
+    emitm_alul_r_m(pc, 0x69, reg, emit_EBX, emit_None, 1, ofs); \
+    *(long *)(pc) = (long)imm; \
+    pc += 4;
 
 
 /* NEG */
@@ -1499,8 +1476,8 @@ static unsigned char *lastpc;
 #  define jit_emit_sub_rm_i(pc, reg, address) \
     emitm_subl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#  define jit_emit_sub_mr_i(pc, address, reg) \
-    emitm_subl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_sub_MR_i(pc, offs, reg) \
+    emitm_subl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_sub_mi_i(pc, address, imm) \
     emitm_subl_i_m(pc, imm, emit_None, emit_None, emit_None, address)
@@ -1508,8 +1485,8 @@ static unsigned char *lastpc;
 #  define jit_emit_add_rm_i(pc, reg, address) \
     emitm_addl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#  define jit_emit_add_mr_i(pc, address, reg) \
-    emitm_addl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_add_MR_i(pc, offs, reg) \
+    emitm_addl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_add_mi_i(pc, address, imm) \
     emitm_addl_i_m(pc, imm, emit_None, emit_None, emit_None, address)
@@ -1760,8 +1737,8 @@ static unsigned char *lastpc;
 #  define jit_emit_neg_M_i(pc, offs) \
     emitm_negl_m(pc, emit_EBX, emit_None, 1, (long)offs)
 
-#  define jit_emit_band_mr_i(pc, d, reg) \
-    emitm_andl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
+#  define jit_emit_band_MR_i(pc, offs, reg) \
+    emitm_andl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_band_rm_i(pc, reg, d) \
     emitm_andl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
@@ -1769,8 +1746,8 @@ static unsigned char *lastpc;
 #  define jit_emit_band_mi_i(pc, d, imm) \
     emitm_andl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
 
-#  define jit_emit_bor_mr_i(pc, d, reg) \
-    emitm_orl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
+#  define jit_emit_bor_MR_i(pc, offs, reg) \
+    emitm_orl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_bor_rm_i(pc, reg, d) \
     emitm_orl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
@@ -1778,8 +1755,8 @@ static unsigned char *lastpc;
 #  define jit_emit_bor_mi_i(pc, d, imm) \
     emitm_orl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
 
-#  define jit_emit_bxor_mr_i(pc, d, reg) \
-    emitm_xorl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
+#  define jit_emit_bxor_MR_i(pc, offs, reg) \
+    emitm_xorl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_bxor_rm_i(pc, reg, d) \
     emitm_xorl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
