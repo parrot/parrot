@@ -26,14 +26,14 @@ static void
 debug_key (struct Parrot_Interp* interpreter, KEY* key) {
   INTVAL i;
   fprintf(stderr," *** key %p\n",key);
-  fprintf(stderr," *** size %d\n",key->size);
+  fprintf(stderr," *** size " INTVAL_FMT "\n",key->size);
   for(i=0;i<key->size;i++) {
     INTVAL type = key->keys[i].type;
     if(type == enum_key_bucket) {
-      fprintf(stderr," *** Bucket %d type %d\n",i,type);
+      fprintf(stderr," *** Bucket " INTVAL_FMT " type " INTVAL_FMT "\n",i,type);
     }
     else if(type != enum_key_undef) {
-      fprintf(stderr," *** Other %d type %d\n",i,type);
+      fprintf(stderr," *** Other " INTVAL_FMT " type " INTVAL_FMT "\n",i,type);
     }
   }
 }
