@@ -16,7 +16,7 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_eh - clear_eh");
@@ -566,5 +566,21 @@ ok 1
 99
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "push_eh - throw");
+    print "main\n"
+    push_eh handler
+    print "ok\n"
+    new P30, .Exception
+    throw P30
+    print "not reached\n"
+    end
+handler:
+    print "catched it\n"
+    end
+CODE
+main
+ok
+catched it
+OUTPUT
 1;
 
