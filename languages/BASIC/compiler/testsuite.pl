@@ -9,7 +9,7 @@ while(1) {
 		local $/="";
 		$_=<DATA>;
 	}
-	if (/end sub/ or /type / or /select/) { # /function/
+	if (/type / or /select/) { # /function/
 		print "Skipped\n";
 		next;
 	}
@@ -32,6 +32,22 @@ while(1) {
 }
 
 __DATA__
+' Simple subs, Made it here
+sub mysub()
+	print "Made it here"
+end sub
+call mysub()
+
+' Arguments.  Expect 2 and 4
+sub twice(a)
+	print a
+	a=a*2
+end sub
+t=2
+call twice t
+print t
+
+STOPPLEASE
 ' Passing arrays, twice, expect 12
 function aftwo(y())
 	print y(4)

@@ -102,7 +102,7 @@ ANSI_FG: set $I3, $P0[fore]
 	
 	# Background
 ANSI_BG:find_global $P0, "ANSI_bgcolors"
-	set $I3, P0[back]
+	set $I3, $P0[back]
 	print "4"
 	print $I3
 	print "m"

@@ -1139,28 +1139,28 @@ sub parse_call {
 		die "Subroutine $syms[CURR] not found at line $sourceline\n"
 	}
 	my $sub=$syms[CURR];
-	my @e=EXPRESSION({ ignorecomma => 1});
-	@e=grep !/bsr/, @e;
-	print CODE<<CALLSUB;
-	
-	bsr EXPRINIT
-	push P9, "$sub"
-	push P9, "FUNC"
-@e	push P9, "ARG"
-	push P9, "ARG"
-	bsr EVALEXPR
-	
+	barf();
+#	print STDERR "Processing call $sub\n";
+	($result, $type, @code)=EXPRESSION({ignorecomma => 1});
+#	print STDERR "Got back @code\n";
+	push @{$code{$seg}->{code}},<<CALLSUB;
+@code
 CALLSUB
 }
 sub parse_sub {
 	# Deja-vu from functions.
-	feedme();
-	open(CODESAVE, ">&CODE") || die "Cannot save CODE: $!";
-	open(CODE, ">&FUNC") || die "Cannot connect CODE to FUNC: $!";
-	$subname=$syms[CURR];
-	#print "Sub $subname  $syms[CURR] CURR\n";
-	$subs{$subname}=1;
-	CALL_BODY($subname, "SUB")
+	feedme;
+	my $f;
+	$funcname=$syms[CURR];
+	my $englishname=english_func($funcname);
+	$subs{$funcname}=$englishname;
+	$functions{$funcname}=$englishname;
+
+	$f="_USERFUNC_$funcname";
+	$f=changename($f);
+	$f=~s/\$/_string/g; $f=~tr/a-z/A-Z/;
+	$seg=$f;
+	CALL_BODY($englishname, "SUB");
 }
 
 sub parse_function {
@@ -1260,18 +1260,7 @@ sub parse_endfunc {
 	return;
 }
 sub parse_endsub {
-	feedme;
-	print CODE<<POSTSCRIPT;
-SUB_EXIT_$subname:
-	# 
-	# Teardown code for $subname
-	#
-	bsr ENDFRAME
-	set I1, 0
-	branch SUB_DISPATCH_END
-POSTSCRIPT
-	open(CODE, ">&CODESAVE") || die "Can't re-open code FH: $!";
-	$subname="";
+	goto &parse_endfunc;
 }
 
 sub parse_function_dispatch {
