@@ -27,6 +27,7 @@ output_like(<<'CODE', <<'OUT', "in P param");
 .end
 CODE
 /_main:
+  set P16, P1
   new P5, \d+ # \.PerlUndef
   set P5, 42
   newsub P0, \d+, _sub
@@ -35,8 +36,10 @@ CODE
   null I1
   set I2, 1
   null I3
+  pushtopp
   invokecc
 ret:
+  poptopp
   end
 _sub:
   print P5
@@ -68,6 +71,7 @@ output_like(<<'CODE', <<'OUT', "in, out P param");
 .end
 CODE
 /_main:
+  set P16, P1
   new P5, \d+ # \.PerlUndef
   set P5, 42
   newsub P0, \d+, _sub
@@ -76,8 +80,10 @@ CODE
   null I1
   set I2, 1
   set I3, -2
+  pushtopp
   invokecc
 ret:
+  poptopp
   print P5
   end
 _sub:
@@ -120,6 +126,7 @@ output_like(<<'CODE', <<'OUT', "in, out P param, P var");
 .end
 CODE
 /_main:
+  set P16, P1
   new P5, \d+ # \.PerlUndef
   set P5, 42
   new P16, \d+ # \.PerlUndef
@@ -174,6 +181,7 @@ output_like(<<'CODE', <<'OUT', "in, out different P param");
 .end
 CODE
 /_main:
+  set P16, P1
   new P5, \d+ # \.PerlUndef
   set P5, 42
   newsub P0, \d+, _sub
@@ -182,8 +190,10 @@ CODE
   null I1
   set I2, 1
   set I3, -2
+  pushtopp
   invokecc
 ret:
+  poptopp
   print P5
   end
 _sub:
@@ -224,6 +234,7 @@ output_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
 .end
 CODE
 /_main:
+  set P16, P1
   new P16, \d+ # \.PerlUndef
   set P16, 42
   newsub P0, \d+, _sub
@@ -280,14 +291,17 @@ output_like(<<'CODE', <<'OUT', "tail call");
 .end
 CODE
 /_main:
+        set P16, P1
         newsub P0, \d+, _sub1
 #pcc_sub_call_\d+:
         set I0, 1
         null I1
         null I2
         null I3
+        pushtopp
         invokecc
 ret:
+        poptopp
         end
 _sub1:
         set P17, P1

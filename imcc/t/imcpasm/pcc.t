@@ -23,6 +23,7 @@ output_like(<<'CODE', <<'OUT', "proto call, proto sub, invokecc");
 .end
 CODE
 /_main:
+  set P16, P1
   newsub P16, \d+, _sub
 #pcc_sub_call_\d:
   set I5, 10
@@ -68,13 +69,14 @@ output_like(<<'CODE', <<'OUT', "basic syntax - constants");
 .end
 CODE
 /_main:
-  newsub P16, \d+, _sub
-  newsub P17, \d+, ret
+  set P16, P1
+  newsub P17, \d+, _sub
+  newsub P16, \d+, ret
 #pcc_sub_call_\d:
   set I5, 10
   set I6, 20
-  set P0, P16
-  set P1, P17
+  set P0, P17
+  set P1, P16
   set I0, 1
   set I1, 0
   set I2, 0
@@ -117,6 +119,7 @@ output_is(<<'CODE', <<'OUT', "basic syntax - sym constants");
 .end
 CODE
 _main:
+  set P16, P1
   print "ok 1\n"
 #pcc_sub_call_5:
   set I5, 10
@@ -155,6 +158,7 @@ output_like(<<'CODE', <<'OUT', "basic syntax - vars");
 .end
 CODE
 /_main:
+  set P16, P1
   set I(\d+), 10
   set I(\d+), 20
 #pcc_sub_call_\d:
@@ -189,6 +193,7 @@ output_like(<<'CODE', <<'OUT', "non prototyped, I,S");
 .end
 CODE
 /_main:
+  set P16, P1
   newsub P16, \d+, _sub
 #pcc_sub_call_\d:
   new P3,.*?
@@ -224,6 +229,7 @@ output_like(<<'CODE', <<'OUT', "non prototyped, P");
 .end
 CODE
 /_main:
+  set P16, P1
   newsub P(\d+), \d+, _sub
 #pcc_sub_call_\d:
   set P5, P\d+
@@ -259,6 +265,7 @@ output_like(<<'CODE', <<'OUT', "non proto call, non proto sub, invokecc");
 .end
 CODE
 /_main:
+  set P16, P1
   newsub P16, \d+, _sub
 #pcc_sub_call_\d:
   new P3,.*?
@@ -302,6 +309,7 @@ output_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc");
 .end
 CODE
 /_main:
+  set P16, P1
   newsub P16, \d+, _sub
 #pcc_sub_call_\d:
   set I5, 10
@@ -347,6 +355,7 @@ output_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
 .end
 CODE
 /_main:
+  set P16, P1
   newsub P16, \d+, _sub
 #pcc_sub_call_\d:
   set P5, P17
@@ -392,6 +401,7 @@ output_like(<<'CODE', <<'OUT', "proto call, sub multiple returns");
 .end
 CODE
 /_main:
+  set P16, P1
   newsub P16, \d+, _sub
 #pcc_sub_call_\d:
   set P0, P16
