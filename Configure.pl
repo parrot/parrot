@@ -236,13 +236,13 @@ my(%c)=(
     cp            => 'cp',
     slash         => '/',
 
-    VERSION =>    $parrot_version,
-    MAJOR   =>    $parrot_version[0],
-    MINOR   =>    $parrot_version[1],
-    PATCH   =>    $parrot_version[2],
-    DEVEL   =>    (-e 'DEVELOPING' ? '-devel' : ''),
+    VERSION       => $parrot_version,
+    MAJOR         => $parrot_version[0],
+    MINOR         => $parrot_version[1],
+    PATCH         => $parrot_version[2],
+    DEVEL         => (-e 'DEVELOPING' ? '-devel' : ''),
 
-    ops		=>    "",
+    ops		  => "",
     
     configdate    => scalar localtime,
 );
@@ -626,15 +626,19 @@ if ($jitcapable) {
     print "Verifying that the compiler supports function pointer casts...\n";
     eval { compiletestc("testparrotfuncptr"); };
 
-    if ($@ || !(runtestc("testparrotfuncptr") =~ /OK/)) {
-        print "Although it is not required by the ANSI C standard,\n";
-        print "Parrot requires the ability to cast from void pointers to function\n";
-        print "pointers for its JIT support.\n\n";
-        print "Your compiler does not appear to support this behavior with the\n";
-        print "flags you have specified.  You must adjust your settings in order\n";
-	print "to use the JIT code.\n\n";
-        print "If you wish to continue without JIT support, please re-run this script\n";
-	print "With the '--define jitcapable=0' argument.\n";
+    if ($@ || runtestc("testparrotfuncptr") !~ /OK/) {
+        print <<"END";
+Although it is not required by the ANSI C standard,
+Parrot requires the ability to cast from void pointers to function
+pointers for its JIT support.
+
+Your compiler does not appear to support this behavior with the
+flags you have specified.  You must adjust your settings in order
+to use the JIT code.
+
+If you wish to continue without JIT support, please re-run this script
+With the '--define jitcapable=0' argument.
+END
 	exit(-1);
     }    
     cleantestc("testparrotfuncptr");
@@ -658,16 +662,21 @@ END
     open NEEDED, ">include/parrot/vtable.h";
     print NEEDED "/* dummy */ struct _vtable { int a; };\n";
     close NEEDED;
+
     buildfile("testparrotsizes_c");
     compiletestc("testparrotsizes");
+
     %newc=eval(runtestc("testparrotsizes"))
       or die "Can't run the test program: $!";
+
     @c{keys %newc}=values %newc;
 
     @c{qw(stacklow intlow numlow strlow pmclow)} = lowbitmask(@c{qw(stackchunk iregchunk nregchunk sregchunk pregchunk)});
 
     cleantestc("testparrotsizes");
+
     unlink('testparrotsizes.c');
+
     unlink("include/parrot/vtable.h");
 }
 
@@ -903,7 +912,7 @@ sub runtestc {
 sub cleantestc {
     my ($name) = @_;
 
-    unlink("$name$c{o}", "$name$c{exe}");
+    unlink(grep {!/\.c$/} glob("$name.*"));
 }
 
 #
