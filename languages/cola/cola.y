@@ -50,7 +50,7 @@ AST         *ast_start = NULL;
 %token LONG METHOD MODIFIER NEW NAMESPACE NULLVAL
 %token OUT OVERRIDE OBJECT PRIVATE PROTECTED PUBLIC
 %token REF READONLY RETURN
-%token SBYTE SEALED SET SHORT STRING STATIC
+%token SBYTE SET SHORT STRING STATIC
 %token THIS TRUE TYPE
 %token UINT USHORT ULONG USING VIRTUAL VOID WHILE
 %token <sym> IDENTIFIER LITERAL RANKSPEC
@@ -1053,9 +1053,9 @@ int main(int argc, char * argv[])
     gen_bootstrap();
     fflush(stdout);
     fprintf(stderr, "%ld lines compiled.\n", line);
-    fprintf(stderr, "Execing IMCC\n");
-    system("../imcc/imcc -o a.pasm a.imc");
-    system("../imcc/imcc -c -o a.pbc a.imc");
+    fprintf(stderr, "Execing Parrot (IMCC)\n");
+    system("../../parrot -o a.pasm a.imc");
+    system("../../parrot -o a.pbc a.imc");
     return 0;
 }
 
