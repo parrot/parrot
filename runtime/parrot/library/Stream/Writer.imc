@@ -54,12 +54,12 @@ END:
 .sub _reader_stub method
     .local pmc source
 
-    getprop source, "CALL", P0
+    getprop source, "CALL", P0		# XXX
     source()
 
     # close the source
     source = find_global "Stream::Base", "close"
-    P2 = self
+    P2 = self		                # XXX
     source()
 
     # mark it as closed
@@ -133,7 +133,8 @@ END:
     .local pmc status
 
     classoffset $I0, self, "Stream::Writer"
-    $P0 = clone P1
+    .include "interpinfo.pasm"
+    $P0 = interpinfo .INTERPINFO_CURRENT_CONT
     setattribute self, $I0, $P0
     inc $I0
     getattribute status, self, $I0
@@ -146,7 +147,8 @@ END:
 WRITE:
 
     classoffset $I0, self, "Stream::Writer"
-    $P0 = clone P1
+    .include "interpinfo.pasm"
+    $P0 = interpinfo .INTERPINFO_CURRENT_CONT
     setattribute self, $I0, $P0
 
     source = self."source"()

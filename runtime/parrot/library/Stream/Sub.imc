@@ -120,7 +120,8 @@ _sub_write_ret:
     typeof $I0, temp
     if $I0 == .PerlUndef goto END
     classoffset $I0, self, "Stream::Sub"
-    $P0 = clone P1
+    .include "interpinfo.pasm"
+    $P0 = interpinfo .INTERPINFO_CURRENT_CONT
     setattribute self, $I0, $P0
 
     str = temp( self )

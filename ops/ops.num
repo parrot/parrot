@@ -30,8 +30,8 @@ check_events	3
 check_events__	4
 wrapper__	5
 prederef__	6
-reserved_i	7
-reserved_ic	8
+reserved_ic	7
+returncc	8
 # other ops
 load_bytecode_s	9
 load_bytecode_sc	10

@@ -118,7 +118,8 @@ pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
      * are working - create it in the new interpreters mem space
      */
     ret_c = pmc_new(d, enum_class_RetContinuation);
-    INTERP_REG_PMC(d, 1) = ret_c;
+    INTERP_REG_PMC(d, 1) =      /* XXX remove when done pdd03 */
+        d->ctx.current_cont = ret_c;
 }
 
 /*

@@ -89,9 +89,9 @@ Internal opcode to prederef opcodes on the fly.
 Don't use.
 (Must be op #6, CORE_OPS_prederef__ ).
 
-=item B<reserved>(in INT)
+=item B<reserved>(inconst INT)
 
-Reserve 2 more fixed entries.
+Reserve 1 more fix entry.
 
 =item B<load_bytecode>(in STR)
 
@@ -136,8 +136,8 @@ inline op prederef__() :internal {
     goto OFFSET(0);
 }
 
-inline op reserved(in INT) {
-  goto NEXT();  /* reserve 2 entries */
+inline op reserved(inconst INT) {
+  goto NEXT();  /* reserve 1 entries */
 }
 
 inline op load_bytecode(in STR) :load_file {
@@ -408,6 +408,10 @@ Update the state of the return continuation in P1. This is necessary,
 when any context stuff was changed between creating the return continuation
 and invoke'ing it.
 
+=item B<returncc>()
+
+Return from the sub or method via the current continuatio.
+
 =cut
 
 inline op invoke() {
@@ -463,6 +467,14 @@ inline op updatecc() {
   cc->ctx.warns = interpreter->ctx.warns;
   cc->ctx.errors = interpreter->ctx.errors;
   goto NEXT();
+}
+
+inline op returncc() {
+  opcode_t *dest;
+  PMC * p = interpreter->ctx.current_cont;
+
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
+  goto ADDRESS(dest);
 }
 
 ########################################
