@@ -179,7 +179,7 @@ useful defaults and don't throw exceptiions.
     }
 
     void mark() {
-        /* don't mark destroy */
+        /* don't delegate mark */
     }
 
     PMC* instantiate() {
