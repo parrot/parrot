@@ -426,11 +426,11 @@ nci_cb_D3(cb_D3_func cb, void* user_data) {
     return;
 }
 
-static int int_cb_D4 = 1;
+int int_cb_D4 = -55555;
 void
 nci_cb_D4(cb_D4_func times_ten, void* user_data) {
     int cnt;
-    for ( cnt = 0; cnt < 10; cnt++ )
+    for ( cnt = 0; cnt < 9; cnt++ )
     {
         (times_ten)(user_data, &int_cb_D4);
         int_cb_D4++;

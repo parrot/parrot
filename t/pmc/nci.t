@@ -1588,6 +1588,21 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
     user_data = new Integer
     user_data = 42
 
+    # load libnci
+    .local pmc libnci
+    libnci = loadlib "libnci"
+
+    # reset int_cb_D4 to 1
+    .local pmc int_cb_D4
+    int_cb_D4 = dlvar libnci, "int_cb_D4"
+    .local pmc int_cb_D4_decl
+    int_cb_D4_decl = new PerlArray
+    push int_cb_D4_decl, .DATATYPE_INT
+    push int_cb_D4_decl, 0
+    push int_cb_D4_decl, 0
+    assign int_cb_D4, int_cb_D4_decl
+    int_cb_D4[0] = 1
+
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
     .local pmc cb
@@ -1595,18 +1610,21 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "Up"	# Z in pdd16
     print "created a callback sub\n"
+
+    # now call the external sub, that takes a callback and user data
+    .local pmc nci_cb_D4
+    nci_cb_D4 = dlfunc libnci, "nci_cb_D4", "vpP"
+    print "loaded a function that takes a callback\n"
+    nci_cb_D4( cb_wrapped, user_data )
+
+    # reset int_cb_D4 to 1
+    int_cb_D4[0] = 1
+
     .local pmc synchronous
     synchronous = new Integer
     synchronous = 1
     setprop user_data, "_synchronous", synchronous
     print "marked callback as synchronous\n"
-
-    # now call the external sub, that takes a callback and user data
-    .local pmc libnci
-    libnci = loadlib "libnci"
-    .local pmc nci_cb_D4
-    nci_cb_D4 = dlfunc libnci, "nci_cb_D4", "vpP"
-    print "loaded a function that takes a callback\n"
     nci_cb_D4( cb_wrapped, user_data )
 
     end
@@ -1632,8 +1650,17 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
 
 CODE
 created a callback sub
-marked callback as synchronous
 loaded a function that takes a callback
+external data: 10
+external data: 100
+external data: 1000
+external data: 10000
+external data: 100000
+external data: 1000000
+external data: 10000000
+external data: 100000000
+external data: 1000000000
+marked callback as synchronous
 external data: 1
 external data: 11
 external data: 111
@@ -1643,7 +1670,6 @@ external data: 111111
 external data: 1111111
 external data: 11111111
 external data: 111111111
-external data: 1111111111
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', 'nci_pip - array of structs');
