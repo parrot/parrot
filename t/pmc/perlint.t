@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -150,3 +150,21 @@ CODE
 12
 100
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "inc/dec a PerlUndef");
+    new P0, .PerlUndef
+    new P1, .PerlUndef
+    inc P0
+    print P0
+    inc P0
+    print P0
+    dec P1
+    print P1
+    dec P1
+    print P1
+    print "\n"
+    end
+CODE
+12-1-2
+OUTPUT
+

@@ -290,6 +290,7 @@ pmclass PerlString extends perlscalar {
 
     void concatenate (PMC* value, PMC* dest) {
         STRING* s = string_copy(INTERP, (STRING*)SELF->cache.string_val);
+	VTABLE_morph(INTERP, dest, enum_class_PerlString);
         dest->cache.string_val =
             string_concat(INTERP,
                           s,
@@ -301,6 +302,7 @@ pmclass PerlString extends perlscalar {
 
     void concatenate_native (STRING* value, PMC* dest) {
         STRING* s = string_copy(INTERP, (STRING*)SELF->cache.string_val);
+	VTABLE_morph(INTERP, dest, enum_class_PerlString);
         dest->cache.string_val =
             string_concat(INTERP,
                           s,
@@ -311,6 +313,7 @@ pmclass PerlString extends perlscalar {
     }
 
     void concatenate_same (PMC* value, PMC* dest) {
+	VTABLE_morph(INTERP, dest, enum_class_PerlString);
         dest->cache.string_val =
             string_concat(INTERP,
                           SELF->cache.string_val,
@@ -334,6 +337,7 @@ pmclass PerlString extends perlscalar {
 
     void repeat (PMC* value, PMC* dest) {
 	DYNSELF.morph(enum_class_PerlString);
+	VTABLE_morph(INTERP, dest, enum_class_PerlString);
         dest->cache.string_val =
            string_repeat(INTERP, SELF->cache.string_val,
                          (UINTVAL)VTABLE_get_integer(INTERP, value), NULL
@@ -342,6 +346,7 @@ pmclass PerlString extends perlscalar {
 
     void repeat_int (INTVAL value, PMC* dest) {
 	DYNSELF.morph(enum_class_PerlString);
+	VTABLE_morph(INTERP, dest, enum_class_PerlString);
         dest->cache.string_val = string_repeat(INTERP, SELF->cache.string_val, (UINTVAL)value, NULL);
     }
 
@@ -355,6 +360,7 @@ pmclass PerlString extends perlscalar {
 
     void substr (INTVAL offset, INTVAL length, PMC* dest) {
 	DYNSELF.morph(enum_class_PerlString);
+	VTABLE_morph(INTERP, dest, enum_class_PerlString);
         dest->cache.string_val = string_substr(INTERP,
 			SELF->cache.string_val, offset, length, NULL, 0);
     }

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -426,4 +426,19 @@ CODE
 25.500000
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "concat must morph dest to a string");
+	new P0, .PerlString
+	new P1, .PerlUndef
+	set P0, "foo"
+	concat	P1, P0, P0
+
+	print	P0
+	print "\n"
+	print	P1
+	print "\n"
+	end
+CODE
+foo
+foofoo
+OUTPUT
 1;

@@ -391,4 +391,16 @@ pmclass PerlUndef extends PerlInt {
     INTVAL defined () {
 	return 0;
     }
+    void increment () {
+	DYNSELF.morph(enum_class_PerlInt);
+        SELF->cache.int_val = 1;
+    }
+
+
+    void decrement () {
+	DYNSELF.morph(enum_class_PerlInt);
+        SELF->cache.int_val = -1;
+    }
+
+
 }
