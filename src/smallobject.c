@@ -38,8 +38,9 @@ more_traceable_objects(struct Parrot_Interp *interpreter,
                 struct Small_Object_Pool *pool)
 {
     Parrot_do_dod_run(interpreter);
-    /* requires that num_free_objects be updated in Parrot_do_dod_run */
-    if (pool->num_free_objects <= pool->replenish_level) {
+    /* requires that num_free_objects be updated in Parrot_do_dod_run.
+       If dod is disabled, then we must check the free list directly. */
+    if (!pool->free_list || pool->num_free_objects <= pool->replenish_level) {
         (*pool->alloc_objects)(interpreter, pool);
     }
 }
