@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 output_is(<<CODE, <<OUTPUT, "direct set and get on scratchpad pmc");
 	new_pad P20, 0
@@ -192,5 +192,21 @@ CODE
 101
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "delete");
+ 	new_pad 0
+	new P1, .PerlString
+	set P1, "ok 1\n"
+	store_lex -1, "foo", P1
+	find_lex P2, "foo"
+	print P2
+	peek_pad P0
+	delete P0["foo"]
+	find_lex P2, "foo"
+	print P2
+	end
+CODE
+ok 1
+Lexical 'foo' not found
+OUTPUT
 1;
 

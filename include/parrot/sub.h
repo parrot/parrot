@@ -62,6 +62,7 @@ PMC * scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad, INTVAL pad_
                            STRING * name, INTVAL position);
 
 void lexicals_mark(struct Parrot_Interp * interp, struct Parrot_Lexicals *lex);
+void scratchpad_delete(Parrot_Interp interp, PMC *pad, STRING *name);
 
 #endif /* PARROT_SUB_H_GUARD */
 

@@ -336,6 +336,14 @@ lexicals_mark(struct Parrot_Interp * interp, struct Parrot_Lexicals *lex)
         list_mark(interp, lex->values);
 }
 
+void
+scratchpad_delete(Parrot_Interp interp, PMC *pad, STRING *name)
+{
+    INTVAL pos;
+    struct Parrot_Lexicals *lex = scratchpad_find(interp, pad, name, &pos);
+    if (lex)
+        list_assign(interp, lex->names, pos, NULL, enum_type_STRING);
+}
 /*
  * Local variables:
  * c-indentation-style: bsd
