@@ -114,7 +114,7 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 	headers$(O) dod$(O) method_util$(O) exit$(O) \
 	misc$(O) spf_render$(O) spf_vtable$(O) datatypes$(O) fingerprint$(O) \
 	nci$(O) cpu_dep$(O) ${asmfun_o} tsq$(O) longopt$(O) events$(O) \
-	dynext$(O) utils$(O) vtables$(O)
+	dynext$(O) utils$(O) vtables$(O) mmd$(O)
 
 O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) \
 	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
@@ -447,6 +447,8 @@ io/io_stdio$(O) : $(GENERAL_H_FILES) io/io_private.h
 io/io_passdown$(O) : $(GENERAL_H_FILES) io/io_private.h
 
 memory$(O) : $(GENERAL_H_FILES)
+
+mmd$(O) : $(GENERAL_H_FILES) $(INC)/mmd.h
 
 objects$(O) : $(GENERAL_H_FILES)
 

@@ -229,6 +229,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/longopt.h"
 #include "parrot/objects.h"
 #include "parrot/vtables.h"
+#include "parrot/mmd.h"
 #endif
 
 /*
