@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -16,7 +17,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 41;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -258,6 +259,51 @@ ok 1
 ok 2
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "Hash iter 2");
+    .include "iterator.pasm"
+	new P0, .Hash	# Hash for iteration
+	new P2, .Hash	# for test
+
+	set I0, 65
+	set I1, 35
+	set I10, I1
+fill:
+	chr S0, I0
+	set P0[S0], I0
+	# XXX
+	# swapping the next two lines breaks JIT/i386
+	# the reason is the if/unless optimization: When the
+	# previous opcode sets flags, these are used - but
+	# there is no check, that the same register is used in the "if".
+	inc I0
+	dec I1
+	if I1, fill
+
+	new P1, .Iterator, P0
+	set I0, P1
+	eq I0, I10, ok1
+	print "not "
+ok1:
+	print "ok 1\n"
+	set P1, .ITERATE_FROM_START
+get:
+	unless P1, done
+        shift S3, P1		# get hash.key
+	set I0, P0[S3]		# and value
+	set P2[S3], I0
+	branch get
+
+done:
+	set I0, P2
+	eq I0, I10, ok2
+	print "not "
+ok2:
+	print "ok 2\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
 output_is(<<'CODE', <<OUTPUT, "string iteration forward");
     .include "iterator.pasm"
 	new P2, .PerlString
@@ -590,7 +636,7 @@ output_is(<<'CODE', <<'OUTPUT', "slice syntax");
    slice P2, P0[10 ..]
    slice P2, P0[.. 11]
    slice P2, P0[I1..3]
-   new P1, .PerlHash
+   new P1, .Hash
    slice P2, P1["0","a".."b","c"]
    print "ok\n"
    end
@@ -904,7 +950,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "slice iter hash values");
     .include "iterator.pasm"
-	new P2, .PerlHash
+	new P2, .Hash
 	set P2["a"], 100
 	set P2["b"], 200
 	set P2["c"], 300
@@ -928,7 +974,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "slice iter hash values 2");
     .include "iterator.pasm"
-	new P2, .PerlHash
+	new P2, .Hash
 	set P2["a"], 100
 	set P2["b"], 200
 	set P2["c"], 300
@@ -956,7 +1002,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "slice iter range");
     .include "iterator.pasm"
-	new P2, .PerlHash
+	new P2, .Hash
 	set P2["a"], 10
 	set P2["b"], 20
 	set P2["c"], 30
@@ -982,7 +1028,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "slice iter range 2");
     .include "iterator.pasm"
-	new P2, .PerlHash
+	new P2, .Hash
 	set P2["a"], 10
 	set P2["b"], 20
 	set P2["c"], 30
@@ -1016,7 +1062,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "slice iter range - vars");
     .include "iterator.pasm"
-	new P2, .PerlHash
+	new P2, .Hash
 	set P2["a"], 10
 	set P2["b"], 20
 	set P2["c"], 30
@@ -1109,101 +1155,6 @@ CODE
 ok
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - string");
-##PIR##
-.sub main @MAIN
-    .include "iterator.pasm"
-    .local pmc hash
-    .local pmc str
-    str = new PerlString
-    str = "abcdef"
-    hash = new PerlHash
-    hash = hash."fromkeys"(str)
-    $I0 = hash
-    print $I0
-    print " "
-    .local pmc iter
-    iter = new .Iterator, hash
-    iter = .ITERATE_FROM_START
-iter_loop:
-    unless iter, iter_end		# while (entries) ...
-    $S0 = shift iter
-    print $S0
-    print ""
-    goto iter_loop
-iter_end:
-    print "ok\n"
-.end
-CODE
-/6 [abcdef]{6}ok/
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - array");
-##PIR##
-.sub main @MAIN
-    .include "iterator.pasm"
-    .local pmc hash
-    .local pmc ar
-    ar = new PerlArray
-    push ar, "a"
-    push ar, "b"
-    push ar, "c"
-    push ar, "d"
-    push ar, "e"
-    hash = new PerlHash
-    hash = hash."fromkeys"(ar)
-    $I0 = hash
-    print $I0
-    print " "
-    .local pmc iter
-    iter = new .Iterator, hash
-    iter = .ITERATE_FROM_START
-iter_loop:
-    unless iter, iter_end		# while (entries) ...
-    $S0 = shift iter
-    print $S0
-    goto iter_loop
-iter_end:
-    print "ok\n"
-.end
-
-CODE
-/5 [abcde]{5}ok/
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "Hash fromkeys - array");
-##PIR##
-.sub main @MAIN
-    .include "iterator.pasm"
-    .local pmc hash
-    .local pmc ar
-    ar = new PerlArray
-    push ar, "a"
-    push ar, "b"
-    push ar, "c"
-    push ar, "d"
-    push ar, "e"
-    hash = new Hash
-    hash = hash."fromkeys"(ar)
-    $I0 = hash
-    print $I0
-    print " "
-    .local pmc iter
-    iter = new .Iterator, hash
-    iter = .ITERATE_FROM_START
-iter_loop:
-    unless iter, iter_end		# while (entries) ...
-    $S0 = shift iter
-    print $S0
-    goto iter_loop
-iter_end:
-    print "ok\n"
-.end
-
-CODE
-/5 [abcde]{5}ok/
-OUTPUT
-
 
 output_is(<<'CODE', <<'OUTPUT', "slice, get strings from array");
 ##PIR##
@@ -1229,69 +1180,6 @@ iter_end:
 .end
 CODE
 bcdeok
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - array slice");
-##PIR##
-.sub main @MAIN
-    .include "iterator.pasm"
-    .local pmc hash
-    .local pmc ar
-    ar = new PerlArray
-    push ar, "a"
-    push ar, "b"
-    push ar, "c"
-    push ar, "d"
-    push ar, "e"
-    .local pmc sl
-    sl = slice ar[1 ..]
-    hash = new PerlHash
-    hash = hash."fromkeys"(sl)
-    $I0 = hash
-    print $I0
-    print " "
-    .local pmc iter
-    iter = new .Iterator, hash
-    iter = .ITERATE_FROM_START
-iter_loop:
-    unless iter, iter_end		# while (entries) ...
-    $S0 = shift iter
-    print $S0
-    goto iter_loop
-iter_end:
-    print "ok\n"
-.end
-CODE
-/4 [bcde]{4}ok/
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - xrange");
-##PIR##
-.sub main @MAIN
-    .include "iterator.pasm"
-    .local pmc hash
-    .local pmc xr
-    xr = new Slice[0 .. 10]
-    .local pmc sl
-    sl = new Iterator, xr
-    hash = new PerlHash
-    hash = hash."fromkeys"(sl)
-    $I0 = hash
-    print $I0
-    print " "
-    .local pmc iter
-    iter = new .Iterator, hash
-    iter = .ITERATE_FROM_START
-iter_loop:
-    unless iter, iter_end		# while (entries) ...
-    $I0 = shift iter
-    print $I0
-    goto iter_loop
-iter_end:
-    print "ok\n"
-.end
-CODE
-/10 [0123456789]{10}ok/
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "iter vtable");
@@ -1327,34 +1215,6 @@ ok 1
 700
 800
 ok 2
-OUTPUT
-
-output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - xrange get_iter");
-##PIR##
-.sub main @MAIN
-    .include "iterator.pasm"
-    .local pmc hash
-    .local pmc xr
-    xr = new Slice[0 .. 10]
-    .local pmc sl
-    sl = new Iterator, xr
-    hash = new PerlHash
-    hash = hash."fromkeys"(sl)
-    $I0 = hash
-    print $I0
-    print " "
-    .local pmc Iter
-    Iter = iter hash
-iter_loop:
-    unless Iter, iter_end		# while (entries) ...
-    $I0 = shift Iter
-    print $I0
-    goto iter_loop
-iter_end:
-    print "ok\n"
-.end
-CODE
-/10 [0123456789]{10}ok/
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration with get_iter");

@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -57,12 +58,12 @@ int do_test(Interp* interpreter) {
     fputs(temp, stdout);
     free(temp);
 
-    S = Parrot_sprintf_c(interpreter, "PerlHash[0x%x]\n", 256);
+    S = Parrot_sprintf_c(interpreter, "Hash[0x%x]\n", 256);
     temp = string_to_cstring(interpreter, S);
     fputs(temp, stdout);
     free(temp);
 
-    S = Parrot_sprintf_c(interpreter, "PerlHash[0x%lx]\n", 256);
+    S = Parrot_sprintf_c(interpreter, "Hash[0x%lx]\n", 256);
     temp = string_to_cstring(interpreter, S);
     fputs(temp, stdout);
     free(temp);
@@ -180,8 +181,8 @@ int main(int argc, char* argv[]) {
 CODE
 C
 Hello, %Parrot!%
-PerlHash[0x100]
-PerlHash[0x100]
+Hash[0x100]
+Hash[0x100]
 Hello, Pa!
 Hello, Hello, Pa!
 1 == 1

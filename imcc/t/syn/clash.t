@@ -2,7 +2,7 @@
 use strict;
 use TestCompiler tests => 15;
 
-##############################
+
 output_is(<<'CODE', <<'OUT', "if/unless");
 .sub _test
 	$I0 = 0
@@ -51,7 +51,8 @@ ok 1
 ok 2
 ok 3
 OUT
-##############################
+
+
 output_is(<<'CODE', <<'OUT', "new");
 .sub _test
 	$P1 = new PerlString
@@ -67,7 +68,7 @@ ok 1
 ok 2
 OUT
 
-##############################
+
 output_is(<<'CODE', <<'OUT', "clone");
 .sub _test
 	$P1 = new PerlString
@@ -85,12 +86,12 @@ ok 1
 ok 2
 OUT
 
-##############################
+
 output_is(<<'CODE', <<'OUT', "defined");
 .sub _test
-	$P1 = new PerlHash
+	$P1 = new Hash
 	$I0 = defined $P1
-	new P1, .PerlHash
+	new P1, .Hash
 	defined I0, P1
 	print $I0
 	print "\n"
@@ -103,13 +104,13 @@ CODE
 1
 OUT
 
-##############################
+
 output_is(<<'CODE', <<'OUT', "defined keyed");
 .sub _test
-	$P1 = new PerlHash
+	$P1 = new Hash
 	$P1["a"] = "ok 1\n"
 	$I0 = defined $P1["a"]
-	new P1, .PerlHash
+	new P1, .Hash
 	set P1["a"], "ok 2\n"
 	defined I0, P1["a"]
 	defined I1, P1["b"]
@@ -127,7 +128,7 @@ CODE
 0
 OUT
 
-##############################
+
 output_is(<<'CODE', <<'OUT', "parrot op as identifier");
 .sub _test
 	.local int set
@@ -144,7 +145,7 @@ CODE
 6
 OUT
 
-##############################
+
 output_is(<<'CODE', <<'OUT', "parrot op as label");
 .sub _test
 	goto set

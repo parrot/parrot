@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -548,9 +549,9 @@ output_is(<<'CODE', <<OUTPUT, "write barrier 2 - hash");
 lp3:
     null I0
     set I1, 100
-    new P1, .PerlHash
+    new P1, .Hash
 lp1:
-    new P2, .PerlHash
+    new P2, .Hash
     new P0, .Integer
     set P0, I0
     set S0, I0
@@ -611,7 +612,7 @@ lp3:
     # ref should now be black
     sweep 0
     # store white hash in ref - needs a barrier
-    new P1, .PerlHash
+    new P1, .Hash
     setref P5, P1
     null P1
     new P0, .Integer

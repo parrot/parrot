@@ -156,10 +156,10 @@ the subroutine.
     pos = -1                               
     inc $I0
     setattribute self, $I0, pos         
-    rephash = new .PerlHash                # set .rep hash
+    rephash = new .Hash                # set .rep hash
     inc $I0
     setattribute self, $I0, rephash
-    caphash = new .PerlHash                # set .capture hash
+    caphash = new .Hash                # set .capture hash
     inc $I0
     setattribute self, $I0, caphash
 .end

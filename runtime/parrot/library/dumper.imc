@@ -67,7 +67,7 @@ B<Note:> This function currently returns nothing. It should return
 the dumped data as a string, like Perl's Data::Dumper. Instead,
 everything is printed out using C<print>.
 
-B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
+B<Note: #2> Hash keys are now sorted using C<_sort()> (library/sort.imc)
 
 =cut
 

@@ -1,10 +1,13 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 NAME
 
 IMCC - Macros
 
 =head1 OVERVIEW
 
-This document describes the macro layer of imcc
+This document describes the macro layer of IMCC.
 
 =head1 DESCRIPTION
 
@@ -48,9 +51,9 @@ do the right thing every time. To use a global label, do just as you usually do.
 
 Constants are new, and the syntax looks like:
 
-  .constant PerlHash 6 # Again, . marks the directive
+  .constant Hash 6 # Again, . marks the directive
 
-  new P0, .PerlHash # . marks the special variable for expansion.
+  new P0, .Hash # . marks the special variable for expansion.
 
 Several constants are predefined, namely the PMC-Classes.
 
@@ -87,7 +90,7 @@ one can expand HelloWorld via:
 Some predefined constants exist for your convenience, namely:
 
   .Array
-  .PerlHash
+  .Hash
   .PerlArray
 
 and the other PMC types.

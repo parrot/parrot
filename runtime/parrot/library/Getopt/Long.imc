@@ -47,7 +47,7 @@ A single subroutine, _get_options(), is provided.
 This should work like the Perl5 module Getopt::Long.
 Takes an array of options and an array of specifications.
 
-A PerlHash is returned.
+A Hash PMC is returned.
 
 =cut
 
@@ -57,7 +57,7 @@ A PerlHash is returned.
 
   # Loop over the array spec and build up two simple hashes
   .local pmc type                    # the type of the option: binary, string, integer
-  type = new PerlHash
+  type = new Hash
   .local int curr_spec               # a counter for looping over the array 'spec'
   curr_spec = 0
   .local int max_spec                # for end condition of loop over 'spec'
@@ -97,7 +97,7 @@ A PerlHash is returned.
   # TODO: do this correctly
   # shift from argv until a non-option is encountered
   .local pmc opt              # the return PMC
-  opt = new PerlHash
+  opt = new Hash
   .local string arg                 # element of argument array
   .local string value               # element of argument array
   .local int    num_remaining_args  # for checking whether loop is complete

@@ -8,20 +8,11 @@ classes/perlhash.pmc - Perl Hash
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the PerlHash base class
-
-PerlHash values should probably only be allowed to be PMCs.
+These are the vtable functions for the PerlHash base class.
 
 =head2 Functions
 
 =over 4
-
-=item C<static void
-fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)>
-
-Fill the hash with keys from the aggregate keys and with the
-optional value. If value isn't given, a None object is filled
-in as value.
 
 =cut
 
@@ -29,160 +20,12 @@ in as value.
 
 #include "parrot/parrot.h"
 
-static size_t
-key_hash_int(Interp *interp, Hash *hash, void *value)
-{
-    UNUSED(interp);
-    UNUSED(hash);
-    return (size_t) value;
-}
-
-static int
-int_compare(Parrot_Interp interp, void *a, void *b)
-{
-    UNUSED(interp);
-    return a != b;
-}
-
-static PMC*
-fromkeys(Interp *interpreter, PMC *dict, PMC *keys)
-{
-    INTVAL elems, dod_disabled, i;
-    PMC *iter = NULL, *value, *self;
-
-    /*
-     * if the number of keys is bigger then the current PMC
-     * count, we do one DOD run and then disable DOD/GC
-     */
-    dod_disabled = 0;
-    elems = 999999; /* TODO VTABLE_elements(interpreter, keys); */
-    if (elems > (INTVAL)interpreter->arena_base->pmc_pool->total_objects) {
-        Parrot_do_dod_run(interpreter, 0);
-        Parrot_block_DOD(interpreter);
-        Parrot_block_GC(interpreter);
-        dod_disabled = 1;
-    }
-    self = pmc_new(interpreter, enum_class_PerlHash);
-    value = pmc_new(interpreter, enum_class_None);
-
-    /*
-     * keys should be able to iterate
-     * There are currently definitely too many ways to create
-     * slices.
-     */
-    if (keys->vtable->base_type == enum_class_Iterator) {
-        iter = keys;
-        if (PMC_pmc_val(iter)) {
-            PMC *xr = PMC_pmc_val(iter);
-            /* check, if we got an xrange iterator */
-            if (PObj_is_PMC_TEST(xr) &&
-                    xr->vtable->base_type == enum_class_Slice) {
-                keys = xr;
-            }
-        }
-    }
-    if (keys->vtable->base_type == enum_class_Slice) {
-        INTVAL start, end, step;
-        Hash *hash;
-        parrot_range_t *range = PMC_struct_val(keys);
-
-        new_pmc_hash_x(interpreter, self, enum_type_ptr,
-                0, Hash_key_type_int,
-                int_compare, key_hash_int,
-                (hash_mark_key_fn) NULL);
-        hash = PMC_struct_val(self);
-        start = RVal_int(range->start);
-        end   = RVal_int(range->end);
-        step  = RVal_int(range->step);
-        /* TODO step
-         * end is already adjusted
-         */
-        if (step < 0) {
-            for (i = start; i >= end; i+= step) {
-                hash_put(interpreter, hash, (void *)i, value);
-            }
-        }
-        else {
-            for (i = start; i <= end; i+= step) {
-                hash_put(interpreter, hash, (void *)i, value);
-            }
-        }
-        goto done;
-    }
-    if (keys->vtable->base_type != enum_class_Iterator)
-        iter = pmc_new_init(interpreter, enum_class_Iterator, keys);
-    VTABLE_set_integer_native(interpreter, iter, ITERATE_FROM_START);
-    for (; VTABLE_get_bool(interpreter, iter); ) {
-        STRING *s = VTABLE_shift_string(interpreter, iter);
-        VTABLE_set_pmc_keyed_str(interpreter, self, s, value);
-    }
-done:
-    if (dod_disabled) {
-        Parrot_unblock_DOD(interpreter);
-        Parrot_unblock_GC(interpreter);
-    }
-    return self;
-}
-
-
-static PMC* undef, *intret;
-
 /* Albeit PerlHash doesn't use PMC_data, it needs the next_for_GC pointer
  * We would get recursive marking of a deeply nested HoHoH...
  */
 
 pmclass PerlHash extends Hash need_ext does hash {
 
-/*
-
-=item C<void class_init()>
-
-Class initialization. Allocates the memory for the hash.
-
-=cut
-
-*/
-
-    void class_init() {
-        /* class_init_code */
-        make_bufferlike_pool(INTERP, sizeof(struct _hash));
-        if (pass) {
-            enter_nci_method(INTERP, Parrot_base_vtables[entry]->base_type,
-                    F2DPTR(fromkeys), "fromkeys", "PIOP");
-            undef = constant_pmc_new(INTERP, enum_class_PerlUndef);
-            intret = constant_pmc_new(INTERP, enum_class_PerlInt);
-        }
-    }
-
-/*
-
-=item C<void* invoke(void* next)>
-
-Pythonic object constructor. SELF is a PerlHash Class object. Return a new
-C<dict> object according to 2.1. Built-in Functions.
-
-=cut
-
-*/
-    void* invoke(void* next) {
-        int argcP = REG_INT(3);
-        PMC *res = pmc_new(interpreter, enum_class_PerlHash);
-        PMC *arg;
-        if (argcP) {
-            if (argcP > 1) {
-                real_exception(interpreter, NULL, E_TypeError,
-                        "TypeError: dict expected at most 1 arguments, got %d",
-                        (int)argcP);
-            }
-            arg = REG_PMC(5);
-            if (arg->vtable->base_type == enum_class_PerlHash)
-                res = arg; /* a dict was passed, return it */
-            else
-                Parrot_py_fill_dict(interpreter, res, arg);
-        }
-        REG_PMC(5) = res;
-        return next;
-    }
 }
 
 /*
@@ -192,6 +35,7 @@ C<dict> object according to 2.1. Built-in Functions.
 =head1 SEE ALSO
 
 F<docs/pdds/pdd08_keys.pod>.
+F<classes/hash.pmc>.
 
 =cut
 

@@ -422,7 +422,7 @@ output_is(<<'CODE', <<'OUTPUT', "set/get multiple object attribs");
 
     new P3, .PerlInt
     set P3, 4201
-    new P4, .PerlHash
+    new P4, .Hash
     set P4["Key"], "Value"
 
     setattribute P2, I1, P3
@@ -1157,7 +1157,7 @@ OUTPUT
 # '
 
 output_like(<<'CODE', <<'OUTPUT', "addparent exceptions #2");
-    new P0, .PerlHash
+    new P0, .Hash
     newclass P1, "Trashcan"
     addparent P0, P1
     end

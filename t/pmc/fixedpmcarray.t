@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -17,7 +18,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -364,7 +365,7 @@ ok 1
 1 2 5 9 10 x
 compares: [1-9]\d*/, "sort");
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
 ##PIR##
 .sub _main
     .local pmc pmc1
@@ -387,4 +388,18 @@ CODE
 0
 OUTPUT
 
-1;
+output_is(<<'CODE', <<'OUTPUT', "Getting unitialized elements");
+##PIR##
+.sub main @MAIN
+    .local pmc arr1
+    arr1 = new FixedPMCArray
+    arr1 = 2005
+    .local pmc elem_1956
+    elem_1956 = arr1[1956]
+    .local string type_1956
+    type_1956 = typeof elem_1956
+    print type_1956
+.end
+CODE
+Null PMC access in name()
+OUTPUT

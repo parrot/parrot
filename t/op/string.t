@@ -1592,12 +1592,12 @@ MAIN:
     bsr NEWARYS
     bsr PRINTF
 
-    set S1, "PerlHash[0x%x]\n"
+    set S1, "Hash[0x%x]\n"
     set I0, 256
     bsr NEWARYI
     bsr PRINTF
 
-    set S1, "PerlHash[0x%lx]\n"
+    set S1, "Hash[0x%lx]\n"
     set I0, 256
     bsr NEWARYI
     bsr PRINTF
@@ -1686,8 +1686,8 @@ MAIN:
     end
 CODE
 Hello, Parrot!
-PerlHash[0x100]
-PerlHash[0x100]
+Hash[0x100]
+Hash[0x100]
 Hello, Pa!
 Hello, Hello, Pa!
 1 == 1

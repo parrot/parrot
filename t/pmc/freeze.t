@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -16,7 +17,7 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Test::More;
 
 END { unlink "temp.fpmc"; };
@@ -227,6 +228,36 @@ output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlHash");
     end
 CODE
 PerlHash 2
+666
+777
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Hash");
+    new P1, .PerlInt
+    set P1, 666
+    new P0, .Hash
+    set P0["k1"], P1
+    new P1, .PerlInt
+    set P1, 777
+    set P0["k2"], P1
+    freeze S0, P0
+
+    thaw P10, S0
+    typeof S10, P10
+    print S10
+    print " "
+    set I11, P10
+    print I11
+    print "\n"
+    set P12, P10["k1"]
+    print P12
+    print "\n"
+    set P12, P10["k2"]
+    print P12
+    print "\n"
+    end
+CODE
+Hash 2
 666
 777
 OUTPUT

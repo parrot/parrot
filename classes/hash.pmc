@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -8,122 +8,110 @@ classes/hash.pmc - Hash PMC
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the Hash base class
+These are the vtable functions for the Hash PMC.
 
 =head2 Functions
 
 =over 4
 
-=item C<static void
-fromkeys(Interp *interpreter, PMC *keys, PMC *value)>
-
-Create a hash with keys from the aggregate keys and with the
-optional value. If value isn't given, a None object is filled
-in as value.
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 
-static size_t
-key_hash_int(Interp *interp, Hash *hash, void *value)
-{
-    UNUSED(interp);
-    UNUSED(hash);
-    return (size_t) value;
+
+/* These are set in class_init */
+static PMC* intret;
+
+/*
+
+=item C<static PMC * get_integer_pmc(Interp* interpreter, INTVAL base_type )>
+
+Lookup the PMC type which is used for storing native integers.
+
+TODO: PMCs extending Hash should propably register themselves.
+
+=cut
+ 
+*/
+
+static PMC* get_integer_pmc(Interp* interpreter, INTVAL base_type ) {
+
+    switch ( base_type ) {
+        case enum_class_PerlHash:
+            return pmc_new(interpreter, enum_class_PerlInt);
+        default:
+            return pmc_new(interpreter, enum_class_Integer);
+    }
 }
 
-static int
-int_compare(Parrot_Interp interp, void *a, void *b)
-{
-    UNUSED(interp);
-    return a != b;
+/*
+
+=item C<static PMC * get_none_pmc(Interp* interpreter, INTVAL base_type )>
+
+As the PerlUndef and the None PMC are singletons, it is propably
+cheap to call pmc_new.
+
+TODO: PMCs extending Hash should propably register themselves.
+
+=cut
+ 
+*/
+
+static PMC * get_none_pmc(Interp* interpreter, INTVAL base_type ) {
+
+    switch ( base_type ) {
+        case enum_class_PerlHash:
+            return pmc_new(interpreter, enum_class_PerlUndef);
+        default:
+            return pmc_new(interpreter, enum_class_None);
+    }
 }
 
-static PMC*
-fromkeys(Interp *interpreter, PMC *dict, PMC *keys)
-{
-    INTVAL elems, dod_disabled, i;
-    PMC *iter = NULL, *value, *self;
+/*
 
-    /*
-     * if the number of keys is bigger then the current PMC
-     * count, we do one DOD run and then disable DOD/GC
-     */
-    dod_disabled = 0;
-    elems = 999999; /* TODO VTABLE_elements(interpreter, keys); */
-    if (elems > (INTVAL)interpreter->arena_base->pmc_pool->total_objects) {
-        Parrot_do_dod_run(interpreter, 0);
-        Parrot_block_DOD(interpreter);
-        Parrot_block_GC(interpreter);
-        dod_disabled = 1;
-    }
-    self = pmc_new(interpreter, enum_class_Hash);
-    value = pmc_new(interpreter, enum_class_None);
+=item C<static PMC * get_number_pmc(Interp* interpreter, INTVAL base_type )>
 
-    /*
-     * keys should be able to iterate
-     * There are currently definitely too many ways to create
-     * slices.
-     */
-    if (keys->vtable->base_type == enum_class_Iterator) {
-        iter = keys;
-        if (PMC_pmc_val(iter)) {
-            PMC *xr = PMC_pmc_val(iter);
-            /* check, if we got an xrange iterator */
-            if (PObj_is_PMC_TEST(xr) &&
-                    xr->vtable->base_type == enum_class_Slice) {
-                keys = xr;
-            }
-        }
-    }
-    if (keys->vtable->base_type == enum_class_Slice) {
-        INTVAL start, end, step;
-        Hash *hash;
-        parrot_range_t *range = PMC_struct_val(keys);
+Lookup the PMC type which is used for floating point numbers.
 
-        new_pmc_hash_x(interpreter, self, enum_type_ptr,
-                0, Hash_key_type_int,
-                int_compare, key_hash_int,
-                (hash_mark_key_fn) NULL);
-        hash = PMC_struct_val(self);
-        start = RVal_int(range->start);
-        end   = RVal_int(range->end);
-        step  = RVal_int(range->step);
-        /* TODO step
-         * end is already adjusted
-         */
-        if (step < 0) {
-            for (i = start; i >= end; i+= step) {
-                hash_put(interpreter, hash, (void *)i, value);
-            }
-        }
-        else {
-            for (i = start; i <= end; i+= step) {
-                hash_put(interpreter, hash, (void *)i, value);
-            }
-        }
-        goto done;
+TODO: PMCs extending Hash should propably register themselves.
+
+=cut
+ 
+*/
+
+static PMC * get_number_pmc(Interp* interpreter, INTVAL base_type ) {
+
+    switch ( base_type ) {
+        case enum_class_PerlHash:
+            return pmc_new(interpreter, enum_class_PerlNum);
+        default:
+            return pmc_new(interpreter, enum_class_Float);
     }
-    if (keys->vtable->base_type != enum_class_Iterator)
-        iter = pmc_new_init(interpreter, enum_class_Iterator, keys);
-    VTABLE_set_integer_native(interpreter, iter, ITERATE_FROM_START);
-    for (; VTABLE_get_bool(interpreter, iter); ) {
-        STRING *s = VTABLE_shift_string(interpreter, iter);
-        VTABLE_set_pmc_keyed_str(interpreter, self, s, value);
+}
+
+/*
+
+=item C<static PMC * get_string_pmc(Interp* interpreter, INTVAL base_type )>
+
+Lookup the PMC type which is used for storing strings.
+
+TODO: PMCs extending Hash should propably register themselves.
+
+=cut
+ 
+*/
+
+static PMC * get_string_pmc(Interp* interpreter, INTVAL base_type ) {
+
+    switch ( base_type ) {
+        case enum_class_PerlHash:
+            return pmc_new(interpreter, enum_class_PerlString);
+        default:
+            return pmc_new(interpreter, enum_class_String);
     }
-done:
-    if (dod_disabled) {
-        Parrot_unblock_DOD(interpreter);
-        Parrot_unblock_GC(interpreter);
-    }
-    return self;
 }
 
 
-static PMC* undef, *intret;
 STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
 /*
@@ -139,14 +127,13 @@ Returns a Parrot string for C<*key>.
 static STRING* make_hash_key(Interp* interpreter, PMC * key)
 {
     if (key == NULL) {
-        internal_exception(OUT_OF_BOUNDS,
-        "Cannot use NULL key for Hash!\n");
+        internal_exception(OUT_OF_BOUNDS, "Hash: Cannot use NULL key");
         return NULL;
     }
     return key_string(interpreter, key);
 }
 
-/* Albeit Hash doesn't use PMC_data, it needs the next_for_GC pointer
+/* Albeit the Hash PMC doesn't use PMC_data, it needs the next_for_GC pointer
  * We would get recursive marking of a deeply nested HoHoH...
  */
 pmclass Hash need_ext does hash {
@@ -156,20 +143,16 @@ pmclass Hash need_ext does hash {
 =item C<void class_init()>
 
 Class initialization. Allocates the memory for the hash.
-Register the NCI method "fromkeys".
+Set up some global variables.
 
 =cut
 
 */
 
     void class_init() {
-        /* class_init_code */
         make_bufferlike_pool(INTERP, sizeof(struct _hash));
         if (pass) {
-            enter_nci_method(INTERP, Parrot_base_vtables[entry]->base_type,
-                    F2DPTR(fromkeys), "fromkeys", "PIOP");
-            undef = constant_pmc_new(INTERP, enum_class_PerlUndef);
-            intret = constant_pmc_new(INTERP, enum_class_PerlInt);
+            intret = get_integer_pmc(INTERP, Parrot_base_vtables[entry]->base_type);
         }
     }
 
@@ -185,7 +168,7 @@ C<dict> object according to 2.1. Built-in Functions.
 */
     void* invoke(void* next) {
         int argcP = REG_INT(3);
-        PMC *res = pmc_new(interpreter, enum_class_Hash);
+        PMC *res = pmc_new(interpreter, pmc->vtable->base_type);
         PMC *arg;
         if (argcP) {
             if (argcP > 1) {
@@ -202,11 +185,12 @@ C<dict> object according to 2.1. Built-in Functions.
         REG_PMC(5) = res;
         return next;
     }
+
 /*
 
 =item C<void init()>
 
-Initializes the instance. Creates a global C<PerlUndef> if it doesn't
+Initializes the instance. Creates a global C<Undef> if it doesn't
 already exist.
 
 =cut
@@ -246,8 +230,11 @@ Returns the type of the element for C<*key>.
     INTVAL type_keyed_str (STRING* key) {
         HashBucket* b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
-        if (!b)
-            return enum_hash_undef;
+        if (b == NULL) {
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+
+            return VTABLE_type(INTERP, none);
+        }
         return VTABLE_type(INTERP, (PMC*) b->value);
     }
 
@@ -268,7 +255,9 @@ Returns the type of the element for C<*key>.
         HashBucket* b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                             keystr);
         if (b == NULL) {
-            return enum_hash_undef;
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+
+            return VTABLE_type(INTERP, none);
         }
         nextkey = key_next(INTERP, key);
         valpmc = b->value;
@@ -325,7 +314,9 @@ Returns the size of the hash.
                                         key);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
-            return VTABLE_get_integer(INTERP, undef);
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+
+            return VTABLE_get_integer(INTERP, none);
         }
         return VTABLE_get_integer(INTERP, (PMC*) b->value);
     }
@@ -369,7 +360,9 @@ Returns the integer value for the element at C<*key>.
         b = hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
-            return VTABLE_get_integer(INTERP, undef);
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+
+            return VTABLE_get_integer(INTERP, none);
         }
         nextkey = key_next(INTERP, key);
         valpmc = b->value;
@@ -393,7 +386,9 @@ Returns the integer value for the element at C<*key>.
                                         key);
         if (b == NULL) {
             /* XXX Warning: Use of uninitialized value */
-            return VTABLE_get_number(INTERP, undef);
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+
+            return VTABLE_get_number(INTERP, none);
         }
         return VTABLE_get_number(INTERP, (PMC*) b->value);
     }
@@ -420,7 +415,9 @@ Returns the floating-point value for the element at C<*key>.
         PMC* nextkey;
         if (b == NULL) {
             /* XXX Warning: Use of uninitialized value */
-            return VTABLE_get_number(INTERP, undef);
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+
+            return VTABLE_get_number(INTERP, none);
         }
         nextkey = key_next(INTERP, key);
         valpmc = b->value;
@@ -504,7 +501,9 @@ For Python returns its repr.
                                         key);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
-            return VTABLE_get_string(INTERP, undef);
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+
+            return VTABLE_get_string(INTERP, none);
         }
         return VTABLE_get_string(INTERP, (PMC*) b->value);
     }
@@ -544,7 +543,9 @@ Returns the big number value for the element at C<*key>.
         b = hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
-            return VTABLE_get_string(INTERP, undef);
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+
+            return VTABLE_get_string(INTERP, none);
         }
         nextkey = key_next(INTERP, key);
         valpmc = b->value;
@@ -596,8 +597,7 @@ Returns the number of elements in the hash.
                                         key);
         if (b == NULL) {
             /* XXX should store the undef for consistency */
-            PMC *new_undef = pmc_new(INTERP, enum_class_PerlUndef);
-            return new_undef;
+            return get_none_pmc(INTERP, SELF->vtable->base_type); 
         }
         return b->value;
     }
@@ -665,8 +665,7 @@ Returns the PMC value for the element at C<*key>.
                                         keystr);
         if (b == NULL) {
             /* XXX should store the undef for consistency */
-            PMC *new_undef = pmc_new(INTERP, enum_class_PerlUndef);
-            return new_undef;
+            return get_none_pmc(INTERP, SELF->vtable->base_type); 
         }
         nextkey = key_next(INTERP, key);
         if (!nextkey)
@@ -701,13 +700,13 @@ Returns whether the hash is the same as C<*other>.
         STRING* keystr;
         PMC* nextkey;
         PMC* box;
-        PMC* val;
 
         if (!key) return;
         keystr = make_hash_key(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            val = pmc_new(interpreter, enum_class_PerlInt);
+            PMC* val = get_integer_pmc(INTERP, SELF->vtable->base_type);
+
             VTABLE_set_integer_native(INTERP, val, value);
             hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
@@ -729,7 +728,8 @@ Returns whether the hash is the same as C<*other>.
 */
 
     void set_integer_keyed_str (STRING* key, INTVAL value) {
-        PMC *val = pmc_new(interpreter, enum_class_PerlInt);
+        PMC* val = get_integer_pmc(INTERP, SELF->vtable->base_type);
+
         PMC_int_val(val) = value;
         hash_put(INTERP, PMC_struct_val(SELF), key, val);
     }
@@ -746,13 +746,12 @@ Returns whether the hash is the same as C<*other>.
         STRING* keystr;
         PMC* nextkey;
         PMC* box;
-        PMC* val;
 
         if (!key) return;
         keystr = make_hash_key(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            val = pmc_new(interpreter, enum_class_PerlNum);
+            PMC* val = get_number_pmc(INTERP, SELF->vtable->base_type);
             PMC_num_val(val) = value;
             hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
@@ -776,7 +775,8 @@ Sets C<value> as the value for C<*key>.
 */
 
     void set_number_keyed_str (STRING* key, FLOATVAL value) {
-        PMC *val = pmc_new(interpreter, enum_class_PerlNum);
+        PMC* val = get_number_pmc(INTERP, SELF->vtable->base_type);
+
         PMC_num_val(val) = value;
         hash_put(INTERP, PMC_struct_val(SELF), key, val);
     }
@@ -793,13 +793,12 @@ Sets C<value> as the value for C<*key>.
         STRING* keystr;
         PMC* nextkey;
         PMC* box;
-        PMC* val;
 
         if (!key) return;
         keystr = make_hash_key(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            val = pmc_new(interpreter, enum_class_PerlString);
+            PMC* val = get_string_pmc(INTERP, SELF->vtable->base_type);
             VTABLE_set_string_native(INTERP, val, value);
             hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
@@ -821,7 +820,8 @@ Sets C<value> as the value for C<*key>.
 */
 
     void set_string_keyed_str (STRING* key, STRING* value) {
-        PMC *val = pmc_new(interpreter, enum_class_PerlString);
+        PMC* val = get_string_pmc(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_string_native(INTERP, val, value);
         hash_put(INTERP, PMC_struct_val(SELF), key, val);
     }

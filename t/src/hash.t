@@ -1,6 +1,8 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
 # Tests the hash.h API without reference to PMCs.
 
 =head1 NAME
@@ -247,7 +249,7 @@ the_test(Interp *interpreter,
     UNUSED(cur_op);
     UNUSED(start);
 
-    h = pmc_new(interpreter, enum_class_PerlHash);
+    h = pmc_new(interpreter, enum_class_Hash);
     hash = PMC_struct_val(h);
     i = pmc_new(interpreter, enum_class_PerlInt);
 

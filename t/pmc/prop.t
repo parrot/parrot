@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -166,7 +167,7 @@ zehn
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "new_init_props");
-    new P1, .PerlHash
+    new P1, .Hash
     new P2, .PerlString
     set P2, "value"
     set P1["prop"], P2

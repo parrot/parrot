@@ -64,6 +64,14 @@ information see F<src/pmc.c>.
 	return 0;
     }
 
+    INTVAL get_integer () {
+	return Parrot_None_get_bool( INTERP, SELF );
+    }
+
+    FLOATVAL get_number() {
+      return 0.0;
+    }
+
     INTVAL type () {
 	return SELF->vtable->base_type;
     }

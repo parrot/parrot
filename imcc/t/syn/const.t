@@ -1,9 +1,12 @@
 #!perl
-use strict;
-use TestCompiler tests => 6;
 
-##############################
-output_is(<<'CODE', <<'OUT', "const 1");
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+use strict;
+use TestCompiler tests => 7;
+
+output_is(<<'CODE', <<'OUT', "globalconst 1");
 
 .sub __main
 	.globalconst int N = 5
@@ -25,9 +28,8 @@ CODE
 5
 OUT
 
-##############################
-output_is(<<'CODE', <<'OUT', "const 2");
-.sub __main
+output_is(<<'CODE', <<'OUT', "globalconst 2");
+.sub test @MAIN
 	.globalconst int N = 5
 	call _main
 	end
@@ -48,17 +50,38 @@ output_is(<<'CODE', <<'OUT', "const 2");
 CODE
 15
 OUT
-##############################
+
+output_is(<<'CODE', <<'OUT', "globalconst 3");
+
+.sub call_sub1
+    sub1()
+.end
+
+.sub test @MAIN
+    .globalconst int N = 5
+    call_sub1()
+.end
+
+.sub sub1
+    print N
+    print "\n"
+.end
+
+CODE
+5
+OUT
+
+
 output_is(<<'CODE', <<'OUT', "array/hash consts");
 .sub _MAIN
    .local PerlArray ar
-   .local PerlHash ha
+   .local pmc ha
    .local string key1
    .const string key2 = "key2"
    .local int idx1
    .const int idx2 = 2
    ar = new PerlArray
-   ha = new PerlHash
+   ha = new Hash
    key1 = "key1"
    idx1 = 1
    ha[key1] = idx1
@@ -79,7 +102,6 @@ CODE
 OUT
 
 
-##############################
 output_is(<<'CODE', <<'OUT', "escaped");
 .sub _MAIN
    $S0 = "\""
@@ -92,6 +114,7 @@ output_is(<<'CODE', <<'OUT', "escaped");
 CODE
 "\"\"
 OUT
+
 
 output_is(<<'CODE', <<'OUT', "PMC const 1 - Sub");
 .sub main @MAIN
@@ -108,6 +131,7 @@ ok 1
 ok 2
 ok 3
 OUT
+
 
 output_is(<<'CODE', <<'OUT', "PMC const 2 - Sub ident");
 .sub main @MAIN

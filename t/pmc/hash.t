@@ -19,7 +19,7 @@ well.
 
 =cut
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 35;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial Hash tests");
@@ -519,12 +519,12 @@ OK1:  print "ok 1\n"
       print "not "
 OK2:  print "ok 2\n"
 
-      eq S0, "", OK3
+      eq S0, "None", OK3
       print "not "
 OK3:  print "ok 3\n"
 
       typeof S1, P0
-      eq S1, "PerlUndef", OK4
+      eq S1, "None", OK4
       print "not "
 OK4:  print "ok 4\n"
       end
@@ -894,15 +894,46 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");
 .include "pmctypes.pasm"
     new P1, .Hash
+
     new P2, .PerlInt
-    set P1["pmc"], P2
-    typeof I0, P1["pmc"]
-    eq I0, .PerlInt, ok4
+    set P1["PerlInt"], P2
+    typeof I0, P1["PerlInt"]
+    eq I0, .PerlInt, ok1
     print "not "
-ok4:print "ok 4\n"
+ok1:print "PerlInt\n"
+
+    new P3, .Integer
+    set P1["Integer"], P3
+    typeof I0, P1["Integer"]
+    eq I0, .Integer, ok2
+    print "not "
+ok2:print "Integer\n"
+
+    set P1["native int"], -123456
+    typeof I0, P1["native int"]
+    eq I0, .Integer, ok3
+    print "not "
+ok3:print "Integer\n"
+
+    set P1["native float"], -123.456
+    typeof I0, P1["native float"]
+    eq I0, .Float, ok4
+    print "not "
+ok4:print "Float\n"
+
+    set P1["native string"], "hello world\n"
+    typeof I0, P1["native string"]
+    eq I0, .String, ok5
+    print "not "
+ok5:print "String\n"
+
     end
 CODE
-ok 4
+PerlInt
+Integer
+Integer
+Float
+String
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "delete and free_list");
@@ -945,16 +976,6 @@ ok 10
 10
 OUTPUT
 
-output_is(<<'CODE', '', "reusing the undef");
-    new P0, .Hash
-    set P1, P0["no"]
-    print P1
-    set P1, "one"
-    set P2, P0["nada"]
-    print P2
-    end
-CODE
-
 output_is(<<'CODE', <<OUTPUT, "exists with constant string key");
     new P16, .Hash
     set P16["key1"], "value for key1\n"
@@ -977,47 +998,6 @@ value for key1
 1
 0
 OUTPUT
-
-SKIP: {
-skip("no more chartype", 1);
-output_is(<<'CODE', <<OUTPUT, "compare keys with different type");
-    set S0, "\xA4"	# currency/euro depending on type
-    clone S1, S0
-    find_chartype I0, "8859-1"
-    set_chartype S0, I0
-    find_chartype I0, "8859-15"
-    set_chartype S1, I0
-
-    ord I0, S0		# both have the same ord
-    print I0
-    print "\n"
-    ord I0, S1
-    print I0
-    print "\n"
-
-    eq S0, S1, equal	# but are not equal
-    print "not "
-equal:
-    print "equal\n"
-
-    new P0, .Hash
-    set P0[S0], "currency"
-    set P0[S1], "euro"
-    set S2, P0[S0]
-    print S2
-    print "\n"
-    set S2, P0[S1]
-    print S2
-    print "\n"
-    end
-CODE
-164
-164
-not equal
-currency
-euro
-OUTPUT
-}
 
 output_is(<< 'CODE', << 'OUTPUT', "Hash in PIR");
 ##PIR##

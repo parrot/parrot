@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -281,7 +282,7 @@ output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
      set P0[P1], "Squeek"
 
      set P1, 3
-     new P2, .PerlHash
+     new P2, .Hash
      set P2["a"], "apple"
      set P0[P1], P2
 

@@ -1,4 +1,5 @@
 #! perl -w
+
 # Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -155,7 +156,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "bug #31467");
 ##PIR##
   .sub main @MAIN
-     $P1 = new PerlHash
+     $P1 = new Hash
      newsub $P0, .Sub, _builtin
      $P1['builtin'] = $P0
 

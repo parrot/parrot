@@ -1,4 +1,4 @@
-	new P0, .PerlHash
+	new P0, .Hash
 	new P1, .PerlUndef
 	
 	<<HERE>>

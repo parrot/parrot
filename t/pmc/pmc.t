@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -1530,8 +1531,8 @@ CHECK
 }
 
 output_is(<<"CODE", <<OUTPUT, "PMC type check");
-    new P10, .PerlHash # Type id hash
-    new P11, .PerlHash # Type name hash
+    new P10, .Hash # Type id hash
+    new P11, .Hash # Type name hash
 $checkTypes
     print "All names and ids ok.\\n"
     end
@@ -2225,7 +2226,7 @@ EQ3:    print "ok 3\\n"
         print "not "
 EQ4:    print "ok 4\\n"
         new P4, .PerlArray
-        new P5, .PerlHash
+        new P5, .Hash
         new P6, .PerlString
         set P4[2], "Array"
         set P5["2"], "Hash"

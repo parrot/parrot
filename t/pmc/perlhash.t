@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -894,15 +894,46 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");
 .include "pmctypes.pasm"
     new P1, .PerlHash
+
     new P2, .PerlInt
-    set P1["pmc"], P2
-    typeof I0, P1["pmc"]
-    eq I0, .PerlInt, ok4
+    set P1["PerlInt"], P2
+    typeof I0, P1["PerlInt"]
+    eq I0, .PerlInt, ok1
     print "not "
-ok4:print "ok 4\n"
+ok1:print "PerlInt\n"
+
+    new P3, .Integer
+    set P1["Integer"], P3
+    typeof I0, P1["Integer"]
+    eq I0, .Integer, ok2
+    print "not "
+ok2:print "Integer\n"
+
+    set P1["native int"], -123456
+    typeof I0, P1["native int"]
+    eq I0, .PerlInt, ok3
+    print "not "
+ok3:print "PerlInt\n"
+
+    set P1["native float"], -123.456
+    typeof I0, P1["native float"]
+    eq I0, .PerlNum, ok4
+    print "not "
+ok4:print "PerlNum\n"
+
+    set P1["native string"], "hello world\n"
+    typeof I0, P1["native string"]
+    eq I0, .PerlString, ok5
+    print "not "
+ok5:print "PerlString\n"
+
     end
 CODE
-ok 4
+PerlInt
+Integer
+PerlInt
+PerlNum
+PerlString
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "delete and free_list");

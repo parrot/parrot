@@ -48,7 +48,7 @@ PGE::RegCounter - A register naming manager
     setattribute me, offset, $P0
 
     inc offset
-    $P0 = new PerlHash    # XXX: There should be a non-perl hash
+    $P0 = new Hash 
     setattribute me, offset, $P0
 
     .return(me)
@@ -70,7 +70,7 @@ PGE::RegCounter - A register naming manager
 
     inc me_offset
 
-    $P0 = new PerlHash
+    $P0 = new Hash
     setattribute me, me_offset, $P0
 
     .return(me)

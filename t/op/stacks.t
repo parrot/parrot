@@ -624,13 +624,13 @@ CODE
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', 'poptopp, aggregate PMCs');
-        new     P15, .PerlHash
-        new     P16, .PerlHash
+        new     P15, .Hash
+        new     P16, .Hash
         set     P15["two"], 2
         set     P16["three"], 3
         pushp
-        new     P15, .PerlHash
-        new     P16, .PerlHash
+        new     P15, .Hash
+        new     P16, .Hash
         set     P15["two"], 3
         set     P16["three"], 2
 	poptopp
@@ -1199,8 +1199,8 @@ OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "savetop/restoretop");
 @{[ $fp_equality_macro ]}
-        new P15, .PerlHash
-        new P16, .PerlHash
+        new P15, .Hash
+        new P16, .Hash
         set I15, 1
         set I16, 2
         set N15, 1.0
@@ -1212,8 +1212,8 @@ output_is(<<"CODE", <<'OUTPUT', "savetop/restoretop");
 
         savetop
 
-        new P15, .PerlHash
-        new P16, .PerlHash
+        new P15, .Hash
+        new P16, .Hash
         set I15, 3
         set I16, 4
         set N15, 3.0
@@ -1289,7 +1289,7 @@ output_is(<<CODE, <<'OUTPUT', "lookback");
         save 1.0
         save "Foo"
 
-        new P12, .PerlHash
+        new P12, .Hash
         set P12["Apple"], "Banana"
         save P12
 
