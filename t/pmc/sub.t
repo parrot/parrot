@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 73;
+use Parrot::Test tests => 76;
 use Test::More;
 use Parrot::Config;
 
@@ -1200,4 +1200,71 @@ output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
 .end
 CODE
 /uninit.*\n.*\nback\nok/
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub names");
+.pcc_sub main:
+    .include "interpinfo.pasm"
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
+    print P20
+    print "\n"
+    find_global P0, "the_sub"
+    invokecc
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
+    print P20
+    print "\n"
+    end
+.pcc_sub the_sub:
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
+    print P20
+    print "\n"
+    interpinfo P1, .INTERPINFO_CURRENT_CONT
+    invoke P1
+CODE
+main
+the_sub
+main
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub names w MAIN");
+.pcc_sub dummy:
+    print "never\n"
+    noop
+.pcc_sub @MAIN main:
+    .include "interpinfo.pasm"
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
+    print P20
+    print "\n"
+    find_global P0, "the_sub"
+    invokecc
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
+    print P20
+    print "\n"
+    end
+.pcc_sub the_sub:
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
+    print P20
+    print "\n"
+    interpinfo P1, .INTERPINFO_CURRENT_CONT
+    invoke P1
+CODE
+main
+the_sub
+main
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub names undefined");
+    .include "interpinfo.pasm"
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
+    print P20
+    print "ok 1\n"
+    defined I0, P20
+    unless I0, ok
+    print "not"
+ok:
+    print "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
 OUTPUT

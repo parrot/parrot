@@ -145,6 +145,14 @@ restore_stack( struct Stack_Chunk **interp_stack,
     saved_base->prev = saved_base;
 }
 
+static void
+swap_pmcs(PMC *a, PMC *b)
+{
+    PMC *t = a;
+    a = b;
+    b = t;
+}
+
 /*
 
 =item C<void
@@ -157,7 +165,7 @@ Swaps the context.
 */
 
 void
-swap_context(Interp *interp, struct PMC *sub)
+swap_context(Interp *interpreter, struct PMC *sub)
 {
     struct Stack_Chunk * tmp_stack = NULL;
     UINTVAL warns;
@@ -169,53 +177,69 @@ swap_context(Interp *interp, struct PMC *sub)
      * Swap user stacks and warnings
      */
 
-    tmp_stack = interp->ctx.user_stack;
-    interp->ctx.user_stack = ctx->user_stack;
+    tmp_stack = interpreter->ctx.user_stack;
+    interpreter->ctx.user_stack = ctx->user_stack;
     ctx->user_stack = tmp_stack;
 
-    warns = interp->ctx.warns;
-    interp->ctx.warns = ctx->warns;
+    warns = interpreter->ctx.warns;
+    interpreter->ctx.warns = ctx->warns;
     ctx->warns = warns;
 
-    warns = interp->ctx.errors;
-    interp->ctx.errors = ctx->errors;
+    warns = interpreter->ctx.errors;
+    interpreter->ctx.errors = ctx->errors;
     ctx->errors = warns;
 
     /* swap register frame tops */
-    reg_top = interp->ctx.int_reg_stack;
-    interp->ctx.int_reg_stack = ctx->int_reg_stack;
+    reg_top = interpreter->ctx.int_reg_stack;
+    interpreter->ctx.int_reg_stack = ctx->int_reg_stack;
     ctx->int_reg_stack = reg_top;
-    reg_top = interp->ctx.num_reg_stack;
-    interp->ctx.num_reg_stack = ctx->num_reg_stack;
+    reg_top = interpreter->ctx.num_reg_stack;
+    interpreter->ctx.num_reg_stack = ctx->num_reg_stack;
     ctx->num_reg_stack = reg_top;
-    reg_top = interp->ctx.string_reg_stack;
-    interp->ctx.string_reg_stack = ctx->string_reg_stack;
+    reg_top = interpreter->ctx.string_reg_stack;
+    interpreter->ctx.string_reg_stack = ctx->string_reg_stack;
     ctx->string_reg_stack = reg_top;
-    reg_top = interp->ctx.pmc_reg_stack;
-    interp->ctx.pmc_reg_stack = ctx->pmc_reg_stack;
+    reg_top = interpreter->ctx.pmc_reg_stack;
+    interpreter->ctx.pmc_reg_stack = ctx->pmc_reg_stack;
     ctx->pmc_reg_stack = reg_top;
 
     /* if calling the coroutine */
     if (!(PObj_get_FLAGS(sub) & PObj_private0_FLAG)) {
         /*
-         * construct stacks that have the interpreter stack
+         * first time set current sub, cont, object
+         */
+        if (!interpreter->ctx.current_sub) {
+            interpreter->ctx.current_sub = REG_PMC(0);
+            interpreter->ctx.current_cont = REG_PMC(1);
+            interpreter->ctx.current_object = REG_PMC(2);
+        }
+        else {
+            swap_pmcs(interpreter->ctx.current_sub, ctx->current_sub);
+            swap_pmcs(interpreter->ctx.current_cont, ctx->current_cont);
+            swap_pmcs(interpreter->ctx.current_object, ctx->current_object);
+        }
+        /*
+         * construct stacks that have the interpreterreter stack
          * at bottom and the coroutine stack at top
          */
-        prepend_stack(&interp->ctx.control_stack, &ctx->control_stack,
+        prepend_stack(&interpreter->ctx.control_stack, &ctx->control_stack,
                 co->co_control_stack, co->co_control_base);
         PObj_get_FLAGS(sub) |= PObj_private0_FLAG;
     }
     else {
         PObj_get_FLAGS(sub) &= ~PObj_private0_FLAG;
-        restore_stack(&interp->ctx.control_stack, &ctx->control_stack,
+        restore_stack(&interpreter->ctx.control_stack, &ctx->control_stack,
                 &co->co_control_stack, co->co_control_base);
+        swap_pmcs(interpreter->ctx.current_sub, ctx->current_sub);
+        swap_pmcs(interpreter->ctx.current_cont, ctx->current_cont);
+        swap_pmcs(interpreter->ctx.current_object, ctx->current_object);
     }
     /*
      * TODO FIXME swap the pad_stack or act like the control_stack
      */
 #if 1
-    tmp_stack = interp->ctx.pad_stack;
-    interp->ctx.pad_stack = ctx->pad_stack;
+    tmp_stack = interpreter->ctx.pad_stack;
+    interpreter->ctx.pad_stack = ctx->pad_stack;
     ctx->pad_stack = tmp_stack;
 #endif
 }

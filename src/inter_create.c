@@ -74,6 +74,7 @@ static void setup_default_compreg(Parrot_Interp interpreter)
     /* register the nci ccompiler object */
     Parrot_compreg(interpreter, pasm1, (PMC*)F2DPTR(p));
 }
+
 /*
 
 =item C<Parrot_Interp

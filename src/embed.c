@@ -611,6 +611,50 @@ print_debug(int status, void *p)
     }
 }
 
+static void
+set_current_sub(Interp *interpreter)
+{
+    opcode_t i, ci;
+    struct PackFile *pf;
+    struct PackFile_FixupTable *ft;
+    struct PackFile_ConstTable *ct;
+    struct Parrot_sub *sub;
+    PMC *sub_pmc;
+    opcode_t *code_start;
+    size_t offs;
+
+    /*
+     * walk the fixup table, the first Sub-like entry should be our
+     * entry point with the address at our resoume_offset
+     */
+
+    pf = interpreter->code;
+    ft = pf->cur_cs->fixups;
+    ct = pf->cur_cs->consts;
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_sub:
+                ci = ft->fixups[i]->offset;
+                sub_pmc = ct->constants[ci]->u.key;
+                sub = PMC_sub(sub_pmc);
+                if (sub->seg != pf->cur_cs)
+                    continue;
+                code_start = (opcode_t*) sub->seg->base.data;
+                offs = sub->address - code_start;
+                if (offs == interpreter->resume_offset) {
+                    interpreter->ctx.current_sub = sub_pmc;
+                    return;
+                }
+                break;
+        }
+    }
+    /*
+     * if we didn't find anything put an Undef PMC into current_sub
+     */
+    sub_pmc = pmc_new(interpreter, enum_class_Undef);
+    interpreter->ctx.current_sub = sub_pmc;
+}
+
 /*
 
 =item C<void
@@ -696,6 +740,11 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
      */
     Parrot_on_exit(print_debug,   interpreter);
     Parrot_on_exit(print_profile, interpreter);
+
+    /*
+     * set current subroutine
+     */
+    set_current_sub(interpreter);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     runops(interpreter,  interpreter->resume_offset);

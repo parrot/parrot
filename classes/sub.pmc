@@ -33,8 +33,8 @@ the globals.
 
 */
 
-static void
-print_sub_name(Parrot_Interp interpreter, PMC* sub)
+static STRING*
+sub_name(Parrot_Interp interpreter, PMC* sub)
 {
     opcode_t i, ci;
     struct PackFile *pf;
@@ -44,7 +44,7 @@ print_sub_name(Parrot_Interp interpreter, PMC* sub)
 
     if (s->name) {
         /* sub was located via globals */
-        PIO_eprintf(interpreter, "# Calling sub '%Ss'\n#", s->name);
+        return s->name;
     }
     else {
         /* sub was created via new_sub and offset, probably */
@@ -56,13 +56,22 @@ print_sub_name(Parrot_Interp interpreter, PMC* sub)
                 case enum_fixup_sub:
                     ci = ft->fixups[i]->offset;
                     if (sub == ct->constants[ci]->u.key) {
-                        PIO_eprintf(interpreter, "# Calling sub '%s'\n#",
-                                ft->fixups[i]->name);
-                        break;
+                        return string_from_cstring(interpreter,
+                                ft->fixups[i]->name, 0);
                     }
             }
         }
     }
+    return NULL;
+}
+
+static void
+print_sub_name(Parrot_Interp interpreter, PMC* sub)
+{
+
+        /* sub was located via globals */
+    PIO_eprintf(interpreter, "# Calling sub '%Ss'\n#",
+        sub_name(interpreter, sub));
     print_pbc_location(interpreter);
 }
 
@@ -119,6 +128,19 @@ Destroys the subroutine.
         mem_sys_free(sub);
     }
 
+/*
+
+=item C<STRING *get_string()>
+
+Returns the name of the subroutine.
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        return sub_name(INTERP, SELF);
+    }
 
 /*
 
@@ -206,6 +228,17 @@ Invokes the subroutine.
         if (interpreter->code->cur_cs != sub->seg) {
             Parrot_switch_to_cs(interpreter, sub->seg, 1);
         }
+        /*
+         * if that's really according to pdd03, we now should have
+         * P0 ... sub
+         * P1 ... continuation
+         * P2 ... object, if it's a method call
+         *
+         * update the context
+         */
+        interpreter->ctx.current_sub = REG_PMC(0);
+        interpreter->ctx.current_cont = REG_PMC(1);
+        interpreter->ctx.current_object = REG_PMC(2);
         return sub->address;
     }
 
