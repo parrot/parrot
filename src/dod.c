@@ -752,7 +752,7 @@ clear_live_bits(Parrot_Interp interpreter)
         }
 #else
         Buffer *b = arena->start_objects;
-        for (i = 0; i < cur_arena->used; i++) {
+        for (i = 0; i < arena->used; i++) {
             PObj_live_CLEAR(b);
             b = (Buffer *)((char *)b + object_size);
         }
