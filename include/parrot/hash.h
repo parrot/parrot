@@ -38,10 +38,14 @@ typedef UINTVAL BucketIndex;
 #define INITBucketIndex ((BucketIndex)-2)
 typedef UINTVAL HashIndex;
 struct _hashbucket {
-    STRING *key;
+    void *key;
     HASH_ENTRY value;
     BucketIndex next;
 };
+
+typedef int    (*hash_comp_fn)(Parrot_Interp, void*, void*);
+typedef void   (*hash_mark_key_fn)(Parrot_Interp, PObj *);
+typedef size_t (*hash_hash_key_fn)(Parrot_Interp, void*);
 
 struct _hash {
     Buffer buffer;              /* This struct is a Buffer subclass! */
@@ -49,16 +53,22 @@ struct _hash {
     UINTVAL entries;            /* Number of values stored in hashtable */
     Buffer *bucket_pool;        /* Buffer full of buckets, used and unused */
     BucketIndex free_list;
+    hash_comp_fn   compare;
+    hash_hash_key_fn hash_val;
+    hash_mark_key_fn mark_key;
 };
 
 void new_hash(Interp * interpreter, HASH **hash_ptr);
+void new_hash_x(Interp * interpreter, HASH **hash_ptr,
+        hash_comp_fn, hash_hash_key_fn, hash_mark_key_fn);
+void new_cstring_hash(Interp *interpreter, HASH **hash_ptr);
 void hash_clone(Interp * interpreter, HASH * src, HASH **dest);
 INTVAL hash_size(Interp * interpreter, HASH *hash);
 void hash_set_size(Interp * interpreter, HASH *hash, UINTVAL size);
 void hash_destroy(Interp * interpreter, HASH *hash);
-HASH_ENTRY *hash_get(Interp * interpreter, HASH *hash, STRING *key);
-void hash_put(Interp * interpreter, HASH *hash, STRING *key, HASH_ENTRY * value);
-void hash_delete(Interp * interpreter, HASH *hash, STRING *key);
+HASH_ENTRY *hash_get(Interp * interpreter, HASH *hash, void *key);
+void hash_put(Interp * interpreter, HASH *hash, void *key, HASH_ENTRY * value);
+void hash_delete(Interp * interpreter, HASH *hash, void *key);
 void mark_hash(Interp * interpreter, HASH *hash);
 void dump_hash(Interp * interpreter, HASH *hash);
 

@@ -18,9 +18,10 @@
  *  History:
  *     Initial version by Jeff G. on 2001.12.05
  *     Substantially rewritten by Steve F.
- *  Todo:
- *     FIXME: hash_delete is currently incorrect if string_compare can
- *     trigger a collection.
+ *     2003.10.25 leo add function pointer for compare, hash, mark
+ *                    hash keys are now (void *)
+ *                    add new_cstring_hash() function
+ *
  *  Notes:
  *     Future optimizations:
  *       - Stop reallocating the bucket pool, and instead add chunks on.
@@ -43,10 +44,7 @@ const HashIndex NULLHashIndex = (HashIndex)-1;
 
 STRING * hash_get_idx(Interp *interpreter, HASH *hash, PMC *key);
 
-/* Is there a way to portably add inlining hints anymore? */
-#define FIXME_INLINE
-
-static FIXME_INLINE HASHBUCKET *
+static PARROT_INLINE HASHBUCKET *
 getBucket(HASH *hash, BucketIndex idx)
 {
     if (idx == NULLBucketIndex)
@@ -54,30 +52,31 @@ getBucket(HASH *hash, BucketIndex idx)
     return &((HASHBUCKET *)hash->bucket_pool->bufstart)[idx];
 }
 
-static FIXME_INLINE BucketIndex
+static PARROT_INLINE BucketIndex
 lookupBucketIndex(HASH *hash, HashIndex slot)
 {
     return ((BucketIndex *)hash->buffer.bufstart)[slot];
 }
 
-static FIXME_INLINE HASHBUCKET *
+static PARROT_INLINE HASHBUCKET *
 lookupBucket(HASH *hash, HashIndex slot)
 {
     return getBucket(hash, lookupBucketIndex(hash, slot));
 }
 
-/*=for api key key_hash
+/*=for api hash key_hash_STRING
 
 Return the hashed value of the string
 
 =cut */
 
-static INTVAL
-key_hash(Interp *interpreter, STRING *value)
+static size_t
+key_hash_STRING(Interp *interpreter, void *value)
 {
-    char *buffptr = value->strstart;
-    INTVAL len = value->strlen;
-    register INTVAL hash = 5381;
+    char *buffptr = ((STRING* )value)->strstart;
+    INTVAL len = ((STRING* )value)->strlen;
+    /* TODO randomize this for each new_hash */
+    register size_t hash = 5381;
 
     UNUSED(interpreter);
 
@@ -87,6 +86,32 @@ key_hash(Interp *interpreter, STRING *value)
     }
 
     return hash;
+}
+
+static int
+STRING_compare(Parrot_Interp interp, void *a, void *b)
+{
+    return string_compare(interp, (STRING *)a, (STRING *) b);
+}
+
+static size_t
+key_hash_cstring(Interp *interpreter, void *value)
+{
+    /* TODO randomize this for each new_hash */
+    register size_t hash = 5381;
+    unsigned char * p = (unsigned char *) value;
+    while (*p) {
+        hash += hash << 5;
+        hash += *p++;
+    }
+    return hash;
+}
+
+static int
+cstring_compare(Parrot_Interp interp, void *a, void *b)
+{
+    UNUSED(interp);
+    return strcmp(a, b);
 }
 
 void
@@ -138,7 +163,8 @@ mark_hash(Interp *interpreter, HASH *hash)
     for (i = 0; i <= hash->max_chain; i++) {
         HASHBUCKET *bucket = lookupBucket(hash, i);
         while (bucket) {
-            pobject_lives(interpreter, (PObj *)bucket->key);
+            if (hash->mark_key)
+            (hash->mark_key)(interpreter, (PObj *)bucket->key);
             if (bucket->value.type == enum_hash_string)
                 pobject_lives(interpreter,
                              (PObj *)bucket->value.val.string_val);
@@ -216,7 +242,8 @@ expand_hash(Interp *interpreter, HASH *hash)
         while (*bucketIdxP != NULLBucketIndex) {
             BucketIndex bucketIdx = *bucketIdxP;
             bucket = getBucket(hash, bucketIdx);
-            new_loc = key_hash(interpreter, bucket->key) & new_max_chain;
+            new_loc =
+                (hash->hash_val)(interpreter, bucket->key) & new_max_chain;
             if (new_loc != hi) {
                 /* Remove from table */
                 *bucketIdxP = bucket->next;
@@ -278,7 +305,7 @@ find_bucket(Interp *interpreter, HASH *hash, BucketIndex head, STRING *key)
     while (head != NULLBucketIndex) {
         HASHBUCKET *bucket = getBucket(hash, head);
         next = bucket->next;
-        if (string_compare(interpreter, key, bucket->key) == 0) {
+        if ((hash->compare)(interpreter, key, bucket->key) == 0) {
             return getBucket(hash, head);
         }
         head = next;
@@ -292,8 +319,31 @@ find_bucket(Interp *interpreter, HASH *hash, BucketIndex head, STRING *key)
 void
 new_hash(Interp *interpreter, HASH **hash_ptr)
 {
+    new_hash_x(interpreter, hash_ptr,
+            STRING_compare,     /* STRING compare */
+            key_hash_STRING,    /*        hash */
+            pobject_lives);     /*        mark */
+}
+
+void
+new_cstring_hash(Interp *interpreter, HASH **hash_ptr)
+{
+    new_hash_x(interpreter, hash_ptr,
+            cstring_compare,     /* cstring compare */
+            key_hash_cstring,    /*        hash */
+            (hash_mark_key_fn)0);/* no     mark */
+}
+
+void
+new_hash_x(Interp *interpreter, HASH **hash_ptr,
+        hash_comp_fn compare, hash_hash_key_fn keyhash,
+        hash_mark_key_fn mark)
+{
     HASH *hash = (HASH *)new_bufferlike_header(interpreter, sizeof(*hash));
     *hash_ptr = hash;
+    hash->compare = compare;
+    hash->hash_val = keyhash;
+    hash->mark_key = mark;
 
     /*      PObj_report_SET(&hash->buffer); */
 
@@ -314,7 +364,7 @@ new_hash(Interp *interpreter, HASH **hash_ptr)
     expand_hash(interpreter, hash);
 }
 
-/*=for api key hash_size
+/*=for api hash hash_size
 
 return the number of used entries in hashtable
 
@@ -336,9 +386,9 @@ hash_size(Interp *interpreter, HASH *hash)
 }
 
 static HASHBUCKET *
-hash_lookup(Interp *interpreter, HASH *hash, STRING *key)
+hash_lookup(Interp *interpreter, HASH *hash, void *key)
 {
-    UINTVAL hashval = key_hash(interpreter, key);
+    UINTVAL hashval = (hash->hash_val)(interpreter, key);
     HashIndex *table = (HashIndex *)hash->buffer.bufstart;
     BucketIndex chain = table[hashval & hash->max_chain];
     return find_bucket(interpreter, hash, chain, key);
@@ -380,7 +430,7 @@ hash_get_idx(Interp *interpreter, HASH *hash, PMC * key)
 }
 
 HASH_ENTRY *
-hash_get(Interp *interpreter, HASH *hash, STRING *key)
+hash_get(Interp *interpreter, HASH *hash, void *key)
 {
     HASHBUCKET *bucket = hash_lookup(interpreter, hash, key);
     if (bucket == NULL)
@@ -390,7 +440,7 @@ hash_get(Interp *interpreter, HASH *hash, STRING *key)
 
 /* The key is *not* copied. */
 void
-hash_put(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
+hash_put(Interp *interpreter, HASH *hash, void *key, HASH_ENTRY *value)
 {
     BucketIndex *table;
     UINTVAL hashval;
@@ -400,7 +450,7 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 
     /*      dump_hash(interpreter, hash); */
 
-    hashval = key_hash(interpreter, key);
+    hashval = (hash->hash_val)(interpreter, key);
     table = (BucketIndex *)hash->buffer.bufstart;
     chain = table ? table[hashval & hash->max_chain] : NULLBucketIndex;
     bucket = find_bucket(interpreter, hash, chain, key);
@@ -425,14 +475,14 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 }
 
 void
-hash_delete(Interp *interpreter, HASH *hash, STRING *key)
+hash_delete(Interp *interpreter, HASH *hash, void *key)
 {
     UINTVAL hashval;
     HashIndex slot;
     HASHBUCKET *bucket;
     HASHBUCKET *prev = NULL;
 
-    hashval = key_hash(interpreter, key);
+    hashval = (hash->hash_val)(interpreter, key);
     slot = hashval & hash->max_chain;
 
     /*
@@ -441,7 +491,7 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
     Parrot_block_GC(interpreter);
     for (bucket = lookupBucket(hash, slot);
          bucket != NULL; bucket = getBucket(hash, bucket->next)) {
-        if (string_compare(interpreter, key, bucket->key) == 0) {
+        if ((hash->compare)(interpreter, key, bucket->key) == 0) {
             BucketIndex bi;
             if (prev)
                 prev->next = bucket->next;
@@ -473,7 +523,7 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
         BucketIndex bi = lookupBucketIndex(hash, i);
         while (bi != NULLBucketIndex) {
             HASHBUCKET *b = getBucket(hash, bi);
-            STRING *key = b->key;
+            void *key = b->key;
             HASH_ENTRY valtmp;
             switch (b->value.type) {
             case enum_hash_undef:
