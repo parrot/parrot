@@ -36,6 +36,7 @@ typedef struct _IMC_Unit {
     int n_symbols;
     struct _IMC_Unit * prev;
     struct _IMC_Unit * next;
+    int local_count;
 } IMC_Unit;
 
 

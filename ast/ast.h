@@ -45,7 +45,10 @@ typedef struct nodeType_t {
     YYLTYPE loc;		/* yacc/bison code location */
     node_flags_enum flags;	/* NODE_HAS_CHILD ... */
     union {
-	struct _SymReg *r;	/* var, temp, const node */
+	struct {
+	    struct _SymReg *r;	/* var, temp, const node */
+	    int local_nr;		/* local slot nr */
+	} var;
 	struct nodeType_t *child;	/* contained node */
     } u;
 } nodeType;

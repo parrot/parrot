@@ -312,6 +312,8 @@ class PirateVisitor(object):
     def visitCompare(self, node):
 	# .expr .ops
 	# x < y <= z   :=   x < y and y <= z
+	# but evaluate y only once, so we can't create
+	# a more regular node
 	self.set_lineno(node)
 	self.begin("Compare(")
 	self.visit(node.expr)	# lhs
@@ -323,11 +325,11 @@ class PirateVisitor(object):
 	    '<=' : 'isle',
 	    '<'  : 'islt',
 	    'is' : 'issame',
-	    'is not' : 'TODO',
-	    'in' : 'TODO',
-	    'not in' : 'TODO'
+	    'is not' : 'isntsame',
+	    'in' : '_in',
+	    'not in' : '_not in'
         }
-	   
+
 	for op, n in node.ops:
 	    self.append("Op(%s)" % op_map[op])
 	    self.visit(n)
