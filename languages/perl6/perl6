@@ -77,7 +77,7 @@ Global options:
     -h|--help        Print this message and exit
     --help-(imcc|parrot|test|parser|global|output)
                      Print detailed help for one subpart
-    -v|--verbose     Print mesages about compile stages (repeat for
+    -v|--verbose     Print messages about compile stages (repeat for
                          more verbosity)
     -V|--version     Print versions and exit
     -w|--warnings    Print warnings (repeat for more warnings)

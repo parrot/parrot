@@ -13,13 +13,13 @@ sub main() {
     my @x = (3,4);
     my @b = (5,6);
     my $i = 2;
-    parray @a ^* @x ^+ @b;
-    parray $i ^* @x ^+ @b;
-    parray @a  * @x ^+ @b;
-    parray 2 * 3 ^+ @b;
-#    print1(@a ^* @x  + @b); # Array math not in 0.0.7
+    parray @a >>*<< @x >>+<< @b;
+    parray $i >>*<< @x >>+<< @b;
+    parray @a  * @x >>+<< @b;
+    parray 2 * 3 >>+<< @b;
+#    print1(@a >>*<< @x  + @b); # Array math not in 0.0.7
 # IMCC clobbers too many registers with this:
-#     @y = @a ^<< @a;
+#     @y = @a >><<<< @a;
 #     print1('(' _ @y[0] _ ', ' _ @y[1] _ ')');
 }
 CODE
@@ -35,7 +35,7 @@ sub main() {
     my $a = 2.1;
     my @x = 1..1000;
     my @b = 1001..2000;
-    my @c = $a ^* @x ^+ @b;
+    my @c = $a >>*<< @x >>+<< @b;
     print1(@c[0]);
     print1(@c[9]);
     print1(@c[99]);
@@ -61,11 +61,11 @@ sub main() {
     parray(@c);
     @c = @a || @b;
     parray(@c);
-    @c = @a ^&& @b;
+    @c = @a >>&&<< @b;
     parray(@c);
-    @c = @a ^|| @b;
+    @c = @a >>||<< @b;
     parray(@c);
-    @c = @a ^~~ @b;
+    @c = @a >>^^<< @b;
     parray(@c);
 }
 CODE
@@ -81,18 +81,18 @@ output_is(<<'CODE', <<'OUT', 'Hyper 4');
 sub main () {
     my @a = (1..3);
     my @b = (4..9);
-    my @c = @a ^+ @b;
-    print @c ^_ ' ',"x\n";
-    @c = @b ^+ @a;
-    print @c ^_ ' ',"x\n";
-    @b = @b ^+ @a;
-    print @b ^_ ' ',"x\n";
+    my @c = @a >>+<< @b;
+    print @c >>_<< ' ',"x\n";
+    @c = @b >>+<< @a;
+    print @c >>_<< ' ',"x\n";
+    @b = @b >>+<< @a;
+    print @b >>_<< ' ',"x\n";
     @b = (4..9);
-    @b ^+= @a;
-    print @b ^_ ' ',"x\n";
+    @b >>+=<< @a;
+    print @b >>_<< ' ',"x\n";
     @b = (4..9);
-    @a ^+= @b;
-    print @a ^_ ' ',"x\n";
+    @a >>+=<< @b;
+    print @a >>_<< ' ',"x\n";
 }
 CODE
 5 7 9 7 8 9 x
@@ -108,31 +108,31 @@ my @a = 2..4;
 my @b = 5..6;
 my @c;
 @c = @a;
-@c ^+= @b;
-print @c ^_ ' ',"x\n";
+@c >>+=<< @b;
+print @c >>_<< ' ',"x\n";
 @c = @b;
-@c ^+= @a;
-print @c ^_ ' ',"x\n";
+@c >>+=<< @a;
+print @c >>_<< ' ',"x\n";
 
 @c = @a;
-@c ^*= @b;
-print @c ^_ ' ',"x\n";
+@c >>*=<< @b;
+print @c >>_<< ' ',"x\n";
 
 @c = @a;
-@c ^**= @b;
-print @c ^_ ' ',"x\n";
+@c >>**=<< @b;
+print @c >>_<< ' ',"x\n";
 
 @c = @a;
-@c ^/= @b;
-print @c ^_ ' ',"x\n";
+@c >>/=<< @b;
+print @c >>_<< ' ',"x\n";
 
 @c = @b;
-@c ^%= @a;
-print @c ^_ ' ',"x\n";
+@c >>%=<< @a;
+print @c >>_<< ' ',"x\n";
 
 @c = @b;
-@c ^-= @a;
-print @c ^_ ' ',"x\n";
+@c >>-=<< @a;
+print @c >>_<< ' ',"x\n";
 CODE
 /7 9 4 x
 7 9 4 x

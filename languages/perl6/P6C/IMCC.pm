@@ -1347,7 +1347,7 @@ sub simple_binary {
     my $ltmp = $x->l->val;
     my $rtmp = $x->r->val;
     my $dest = newtmp 'PerlUndef';
-    my $op = $x->op;
+    my $op = imcc_op($x->op);
     code("\t$dest = $ltmp $op $rtmp\n");
     return $dest;
 }
@@ -1401,7 +1401,7 @@ BEGIN {
  '='	=> \&do_assign,
  '||'	=> \&do_logor,
  '&&'	=> \&do_logand,
- '~~'	=> \&simple_binary,
+ '^^'	=> \&simple_binary,
  '//'	=> \&do_defined,
  ','	=> \&do_array,
  'x'	=> \&do_repeat,
@@ -1413,39 +1413,41 @@ BEGIN {
 
 use vars '%op_is_array';
 BEGIN {
-    my @arrayops = qw(= .. x // ~~ && || _);
+    my @arrayops = qw(= .. x // ^^ && || _);
     push(@arrayops, ',');
     @op_is_array{@arrayops} = (1) x @arrayops;
 }
 
 sub val {
     my $x = shift;
+
     if (ref($x->op) eq 'P6C::hype') {
+	check_assign_op($x->op->op);
 	return do_hyped($x->op->op, $x->l, $x->r);
     }
+
     my $ret;
     my $op = $x->op;
     if ($ops{$op}) {
 	$ret = $ops{$op}->($x);
-    } elsif($op =~ /^([^=]+)=$/ && $ops{$1}) {
-	# XXX:
-	die "Internal error -- assignment op `$op' snuck into IMCC.pm";
-
-	# Translate assignment operation into a binary operation.
-	# XXX: Context propagation is broken for these, so we won't
-	# ever do this.
-	$op = $1;
-	$ret = $ops{'='}->(new P6C::Binop op => '=', l => $x->l,
-			   r => P6C::Binop->new(op => $op, l => $x->l,
-						r => $x->r));
     } else {
-	unimp $op;
+	check_assign_op($op);
+	unimp "Unimplemented operator $op";
     }
 
     if (!$op_is_array{$op}) {
 	return scalar_in_context($ret, $x->{ctx});
     }
     return $ret;
+}
+
+sub check_assign_op {
+    my $op = shift;
+    if($op =~ /^([^=]+)=$/ && $ops{$1}) {
+        # XXX: This should probably be checked at an earler stage.
+        die "Internal error -- assignment op `$op' snuck into IMCC.pm";
+    }
+    return 1;
 }
 
 ######################################################################

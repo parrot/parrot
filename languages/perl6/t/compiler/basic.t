@@ -133,10 +133,10 @@ sub main() {
     print1(2 && 0);
     print1(0 && 2);
     print1(0 && 0);
-    print1(2 ~~ 3);
-    print1(2 ~~ 0);
-    print1(0 ~~ 2);
-    print1(0 ~~ 0);
+    print1(2 ^^ 3);
+    print1(2 ^^ 0);
+    print1(0 ^^ 2);
+    print1(0 ^^ 0);
     my $x;
     print1($x // 0);
     print1(0  // $x);
@@ -154,8 +154,8 @@ CODE
 
 
 0
-1
-1
+2
+2
 0
 0
 0

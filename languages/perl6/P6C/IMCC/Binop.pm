@@ -10,7 +10,7 @@ require Exporter;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(do_pow do_logand do_logor do_defined do_concat do_repeat
-		do_range do_smartmatch);
+		do_range do_smartmatch imcc_op);
 %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 sub do_pow ;
@@ -27,6 +27,16 @@ sub sm_array_num ;
 sub sm_hash_scalar ;
 sub sm_expr_num ;
 sub sm_expr_str ;
+
+# Remap operator names from P6 to IMCC.
+sub imcc_op {
+	my $op = shift;
+
+	return "~~" if ($op eq '^^');
+	return "." if ($op eq '_');
+
+	return $op;
+}
 
 1;
 

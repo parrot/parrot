@@ -229,7 +229,8 @@ $grammar = <<'ENDSUPPORT';
     use vars '$err_handler';
     use vars qw(%KEYWORDS %CLASSES %WANT);
     use vars qw($NAMEPART $COMPARE $CONTEXT $MULDIV $PREFIX $ADDSUB $INCR
-		$LOG_OR $LOGOR $FILETEST $ASSIGN $HYPE $MATCH $BITSHIFT
+		$LOG_OR $LOGOR $FILETEST $ASSIGN $VOPEN $VCLOSE $MATCH 
+		$BITSHIFT $BITOR $BITAND
 		$SOB $FLUSH $NUMPART $NUMBER $RXATOM $RXMETA $RXCHARCLASS
  		$SPECIAL_DELIM
 		$RXESCAPED $HEXCHAR $RXASSERTION);
@@ -246,7 +247,8 @@ BEGIN {
 # Regexen used in the parser:
 BEGIN {
     $SOB	= qr|$Parse::RecDescent::skip(?<![^\n\s]){|o;
-    $HYPE	= qr/\^?/;
+    $VOPEN	= qr/>>/;
+    $VCLOSE	= qr/<</;
     $NAMEPART	= qr/[a-zA-Z_][\w_]*/;
     $COMPARE	= qr{(?:cmp|eq|[gnl]e|[gl]t)\b|<=>|[<>=!]=|<|>};
     $CONTEXT	= qr{[\%\@\$\&*_?]|\+(?!\+)};
@@ -260,9 +262,11 @@ BEGIN {
     $ADDSUB	= qr{[-+_]};
     $BITSHIFT	= qr{<<|>>};
     $LOG_OR	= qr{(?:x?or|err)\b};
-    $LOGOR	= qr{\|\||~~|//};
+    $LOGOR	= qr{\|\||\^\^|//};
+    $BITOR	= qr{(?:\|(?!\|)|~(?!~))};
+    $BITAND	= qr{&(?!&)};
     $FILETEST	= qr{-[rwxoRWXOezsfdlpSbctugkTBMAC]+\b};
-    $ASSIGN	= qr{(?:!|:|//|&&?|\|\|?|~~?|<<|>>|$ADDSUB|$MULDIV|\*\*)?=};
+    $ASSIGN	= qr{(?:!|:|//|&&?|\|\|?|~|\^\^|<<|>>|$ADDSUB|$MULDIV|\*\*)?=};
     # Used for flushing syntax errors
     $FLUSH	= qr/\w+|[^\s\w;}#'"]+/;
     $NUMPART	= qr/(?!_)[\d_]+(?<!_)/;
@@ -488,14 +492,14 @@ apply_rhs:	  namepart <commit> subscript(s?)
 		| subscript(s)
 
 apply:		  <leftop: term apply_op apply_rhs>
-apply_op:	  /$HYPE\./o
+apply_op:	  /\.|$VOPEN\.$VCLOSE/o
 
 incr:		  incr_op <commit> apply
 		| apply incr_op(?)
-incr_op:	  /$HYPE$INCR/o
+incr_op:	  /$INCR|$VOPEN$INCR$VCLOSE/o
 
 pow:		  <leftop: incr pow_op prefix>
-pow_op:		  /$HYPE\*\*/o
+pow_op:		  /\*\*|$VOPEN\*\*$VCLOSE/o
 
 prefix:		  filetest_op <commit> prefix
 		| prefix_op <commit> prefix
@@ -503,7 +507,7 @@ prefix:		  filetest_op <commit> prefix
 		| pow
 
 # prefix_op:	  '!' | '~' | '\\' | /-(?![->])/
-prefix_op:	  /$HYPE$PREFIX/o
+prefix_op:	  /$PREFIX|$VOPEN$PREFIX$VCLOSE/o
 filetest_op:	  /$FILETEST/o
 
 pair:		  namepart '=>' <commit> prefix
@@ -512,36 +516,36 @@ maybe_pair:	  namepart '=>' <commit> prefix
 		| prefix ('=>' prefix)(?)
 
 match:		  <leftop: maybe_pair match_op maybe_pair>
-match_op:	  /$HYPE$MATCH/o
+match_op:	  /$MATCH|$VOPEN$MATCH$VCLOSE/o
 
 muldiv:		  <leftop: match muldiv_op match>
 # muldiv_op:	  '*' | '/' | '%' | 'x'
-muldiv_op:	  /$HYPE$MULDIV/o
+muldiv_op:	  /$MULDIV|$VOPEN$MULDIV$VCLOSE/o
 
 addsub:		  <leftop: muldiv addsub_op muldiv>
 # addsub_op:	  '+' | '-' | '_'
-addsub_op:	  /$HYPE$ADDSUB/o
+addsub_op:	  /$ADDSUB|$VOPEN$ADDSUB$VCLOSE/o
 
 bitshift:	  <leftop: addsub bitshift_op addsub>
-bitshift_op:	  /$HYPE$BITSHIFT/o
+bitshift_op:	  /$BITSHIFT|$VOPEN$BITSHIFT$VCLOSE/o
 
 compare:	  <leftop: bitshift compare_op bitshift>
-compare_op:	  /$HYPE$COMPARE/o
+compare_op:	  /$COMPARE|$VOPEN$COMPARE$VCLOSE/o
 # compare_op:	  '<=>' | '<=' | '==' | '>=' | '<' | '>' | '!='
 # 		| 'eq' | 'ge' | 'ne' | 'le' | 'lt' | 'gt' | 'cmp'
 
 bitand:		  <leftop: compare bitand_op compare>
-bitand_op:	  /$HYPE&(?!&)/o
+bitand_op:	  /$BITAND|$VOPEN$BITAND$VCLOSE/o
 
 bitor:		  <leftop: bitand bitor_op bitand>
-bitor_op:	  /$HYPE(?:\|(?!\|)|~(?!~))/o
+bitor_op:	  /$BITOR|$VOPEN$BITOR$VCLOSE/o
 
 logand:		  <leftop: bitor logand_op bitor>
-logand_op:	  /$HYPE&&/o
+logand_op:	  /&&|$VOPEN&&$VCLOSE/o
 
 logor:		  <leftop: logand logor_op logand>
-# logor_op:	  '||' | '~~' | '//'
-logor_op:	  /$HYPE$LOGOR/o
+# logor_op:	  '||' | '^^' | '//'
+logor_op:	  /$LOGOR|$VOPEN$LOGOR$VCLOSE/o
 
 range:		  logor (range_op logor)(?)
 range_op:	  '..'
@@ -571,7 +575,7 @@ assign_lhs:	  scope_class decl
 		| ternary
 assign_rhs:	  assign_op scalar_expr
 
-assign_op:	  /$HYPE$ASSIGN/o
+assign_op:	  /$ASSIGN|$VOPEN$ASSIGN$VCLOSE/o
 # assign_op:	  /[!:]?=/ <commit>
 # 		| assignable_op <skip:''> '='
 # assignable_op:	  '//'
@@ -595,11 +599,11 @@ adverb:		  comma adv_clause(?)
 adv_clause:	  /:(?!:)/ comma['scalar_expr']
 
 log_AND:	  <leftop: adverb log_AND_op adverb>
-log_AND_op:	  /${HYPE}and\b/o
+log_AND_op:	  /and\b|${VOPEN}and\b$VCLOSE/o
 
 log_OR:		  <leftop: log_AND log_OR_op log_AND>
 # log_OR_op:	  'or' | 'xor' | 'err'
-log_OR_op:	  /$HYPE$LOG_OR/o
+log_OR_op:	  /$LOG_OR|$VOPEN$LOG_OR$VCLOSE/o
 
 expr:		  log_OR
 

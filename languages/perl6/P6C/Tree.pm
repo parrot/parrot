@@ -124,7 +124,7 @@ sub scalar_tree {
 # Having a separate rule for hyping is too expensive.
 sub operator_tree {
     local $_ = shift->[1];
-    if (/^\^(.+)/) {
+    if (/^>>(.+)<</) {
 	return new P6C::hype op => $1;
     }
     return $_;

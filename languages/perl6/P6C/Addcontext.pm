@@ -52,7 +52,7 @@ BEGIN { # Add types for builtin binary operators.
 	 # propagate values in their surrounding context (even though
 	 # they may evaluate in boolean context?).  So we can't quite
 	 # do this:
-#	 bool => [ qw(&& ~~ ||) ],
+#	 bool => [ qw(&& ^^ ||) ],
 	);
 
     while (my ($t, $ops) = each %opmap) {
@@ -91,6 +91,7 @@ sub P6C::Binop::ctx_right {
     my ($x, $ctx) = @_;
     my $op = $x->op;
 
+    # Checking for stray assignment operators: "+=" or ">>+=<<".
     if ((ref($op) && $op->isa('P6C::hype') && $op->op =~ /^([^=]+)=$/)
 	|| $op =~ /^([^=]+)=$/) {
 	# Turn this into a normal, non-inplace operator and try again.

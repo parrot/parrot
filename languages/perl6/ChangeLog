@@ -1,3 +1,10 @@
+2003-11-27
+	* Patch #24559 (Allison Randal)
+		- update vector operators
+	* Test Failures (failed before patch):
+		- t/rx/basic.t    1   256     7    1  14.29%  4
+		- t/rx/call.t     1   256     2    1  50.00%  2
+		
 2002-07-??    (Parrot 0.0.7)
 
 	* Initial CVS revision, modified from "V.00I_0I" on

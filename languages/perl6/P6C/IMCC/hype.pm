@@ -9,6 +9,7 @@ load it on demand (with SelfLoader).
 package P6C::IMCC::hype;
 use SelfLoader;
 use P6C::IMCC ':all';
+use P6C::IMCC::Binop 'imcc_op';
 use P6C::Util qw(diag is_array_expr unimp);
 require Exporter;
 use vars qw(@ISA @EXPORT_OK);
@@ -20,7 +21,7 @@ use vars qw(@ISA @EXPORT_OK);
 
 use vars '%optype';
 BEGIN {
-    my %opmap = (int => [ qw(>> << | & ~ ~~)],
+    my %opmap = (int => [ qw(>> << | & ~ ^^)],
 		 num => [ qw(+ - * / % **)],
 		 str => [ qw(_) ]);
     while (my ($t, $ops) = each %opmap) {
@@ -50,11 +51,12 @@ __DATA__
 sub simple_hyped {
     my ($op, $targ, $lindex, $rindex) = @_;
     my $optype = $optype{$op} or unimp "Can't hype $op yet";
-    $op = '.' if $op eq '_';	# XXX: should handle this elsewhere.
+    $op = imcc_op($op);	# XXX: should handle this elsewhere.
     my $ltmp = gentmp $optype;
     my $rtmp = gentmp $optype;
     my $dest = gentmp $optype;
     return <<END;
+	# simple_hyped $op
 	$ltmp = $lindex
 	$rtmp = $rindex
 	$dest = $ltmp $op $rtmp
@@ -118,11 +120,11 @@ sub do_hyped {
 	return hype_scalar_array(@_);
     } else {
 	diag "Tried to hyper-operate two scalars";
-	return simple_binary(@_);
+	return P6C::Binop::simple_binary(@_);
     }
 }
 
-# @xs ^op $y
+# @xs >>op<< $y
 sub hype_array_scalar {
     my ($op, $l, $r) = @_;
     my $lval = $l->val;
@@ -141,7 +143,7 @@ END
     return $op->{ctx} ? array_in_context($dest, $op->{ctx}) : $dest;
 }
 
-# $x ^op @ys
+# $x >>op<< @ys
 sub hype_scalar_array {
     my ($op, $l, $r) = @_;
     my $lval = $l->val;
@@ -160,7 +162,7 @@ END
     return $op->{ctx} ? array_in_context($dest, $op->{ctx}) : $dest;
 }
 
-# @xs ^op @ys
+# @xs >>op<< @ys
 #
 # Currently iterates over the number of elements in the _shorter_ of
 # the two arrays, rather than the longer.  This is useful for working
