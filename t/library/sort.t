@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/pmc/sort.t - Sorting
+t/library/sort.t - Sorting
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ output_is(<<'CODE', <<'OUT', "sorting already sorted numbers");
     push array, 8
     push array, 9
 
-    _sort( array )
+    simple( array )
     i = 0
     j = array
 LOOP:
@@ -51,7 +51,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/sort.imc"
+.include "library/Data/Sort.imc"
 CODE
 0
 1
@@ -85,7 +85,7 @@ output_is(<<'CODE', <<'OUT', "sorting unsorted numbers");
     push array, 1
     push array, 0
 
-    _sort( array )
+    simple( array )
     i = 0
     j = array
 LOOP:
@@ -96,7 +96,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/sort.imc"
+.include "library/Data/Sort.imc"
 CODE
 0
 1
@@ -130,7 +130,7 @@ output_is(<<'CODE', <<'OUT', "sorting unsorted numbers (2)");
     push array, 9
     push array, 0
 
-    _sort( array )
+    simple( array )
     i = 0
     j = array
 LOOP:
@@ -141,7 +141,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/sort.imc"
+.include "library/Data/Sort.imc"
 CODE
 0
 1
@@ -173,7 +173,7 @@ output_is(<<'CODE', <<'OUT', "sorting sorted strings");
     push array, "golf"
     push array, "hotel"
 
-    _sort( array )
+    simple( array )
     i = 0
     j = array
 LOOP:
@@ -184,7 +184,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/sort.imc"
+.include "library/Data/Sort.imc"
 CODE
 alpha
 bravo
@@ -214,7 +214,7 @@ output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
     push array, "bravo"
     push array, "echo"
 
-    _sort( array )
+    simple( array )
     i = 0
     j = array
 LOOP:
@@ -225,7 +225,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/sort.imc"
+.include "library/Data/Sort.imc"
 CODE
 alpha
 bravo
@@ -267,7 +267,7 @@ output_is(<<'CODE', <<'OUT', "sorting different types");
     push array, 0
     push array, "echo"
 
-    _sort( array )
+    simple( array )
     i = 0
     j = array
 LOOP:
@@ -278,7 +278,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/sort.imc"
+.include "library/Data/Sort.imc"
 CODE
 0
 0
@@ -316,7 +316,7 @@ output_is(<<'CODE', <<'OUT', "sorting letters");
     push array, "h"
     push array, "y"
 
-    _sort( array )
+    simple( array )
     i = 0
     j = array
 LOOP:
@@ -327,7 +327,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/sort.imc"
+.include "library/Data/Sort.imc"
 CODE
 h
 w
@@ -360,7 +360,7 @@ output_is(<<'CODE', <<'OUT', "sorting PerlString letters");
     set tmp, "y"
     push array, tmp
 
-    _sort( array )
+    simple( array )
     i = 0
     j = array
 LOOP:
@@ -371,7 +371,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/sort.imc"
+.include "library/Data/Sort.imc"
 CODE
 h
 w
@@ -397,7 +397,7 @@ output_is(<<'CODE', <<'OUT', "sorting strings");
     push array, "bbbbbb"
     push array, "aaaa1"
 
-    _sort( array )
+    simple( array )
     i = 0
     j = array
 LOOP:
@@ -408,7 +408,7 @@ LOOP:
     if i < j goto LOOP
     end
 .end
-.include "library/sort.imc"
+.include "library/Data/Sort.imc"
 CODE
 aaaa1
 aaaa2
