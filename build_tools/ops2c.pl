@@ -338,6 +338,11 @@ END_C
 #
 #   have all the same function body, and thus we generate only the
 #   first one and change the op_func_table accordingly
+#
+#   Err, above was true when absolute addresses were used, now
+#   with frame-pointer relative addressing, this doesn't work
+#   any more. Anyway, the compare of prev_source and source makes
+#   sure that correct code is produced.
 
     if ($prev_source && $prev_source eq $source) {
 	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
@@ -393,6 +398,7 @@ if ($suffix =~ /cgp/) {
     else
       _check();
 #endif
+    _reg_base = (char*)interpreter->ctx.bp;
     goto *((void *)*cur_opcode);
 
 END_C

@@ -34,7 +34,7 @@ Returns C<PARROT_CGP_CORE>.
 
 =cut
 
-sub core_type 
+sub core_type
 {
     return 'PARROT_CGP_CORE';
 }
@@ -56,7 +56,7 @@ The core prefix is C<'cgp_'>.
 
 =cut
 
-sub core_prefix 
+sub core_prefix
 {
     return "cgp_";
 }
@@ -82,7 +82,7 @@ opcode_to_prederef(Interp* interpreter,
         (opcode_addr - (opcode_t*) interpreter->code->byte_code);
 }
 
-#define OP_AS_OFFS(o) ((char *)interpreter->ctx.bp + ((opcode_t*)cur_opcode)[o])
+#define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
 
 END
 }
@@ -103,11 +103,12 @@ sub goto_address
     if ($addr eq '0')
     {
         return "return (0);"
-    } 
-    else 
+    }
+    else
     {
         return "if ((opcode_t *) $addr == 0)
 	  return 0;
+   _reg_base = (char*)interpreter->ctx.bp;
    goto *((void*)*(cur_opcode = (opcode_t *)
 	opcode_to_prederef(interpreter, $addr)))";
   }
@@ -139,6 +140,21 @@ sub goto_pop
     my ($self) = @_;
 
     return "goto *((void*)* (cur_opcode = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter))))";
+}
+
+sub run_core_func_start
+{
+    return <<END_C;
+#if defined(__GNUC__) && defined(I386) /* && defined(NO_DYNOPS) */
+    register opcode_t *cur_opcode asm ("esi") = cur_op;
+    register char *   _reg_base   asm ("edi");
+#else
+    opcode_t *cur_opcode = cur_op;
+    char * _reg_base;
+#endif
+
+    static void *const l_ops_addr[] = {
+END_C
 }
 
 =back

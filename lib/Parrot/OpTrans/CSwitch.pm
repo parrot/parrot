@@ -33,7 +33,7 @@ The core type is C<PARROT_SWITCH_CORE>.
 
 =cut
 
-sub core_type 
+sub core_type
 {
     return 'PARROT_SWITCH_CORE';
 }
@@ -44,9 +44,9 @@ The prefix is C<'switch_'>.
 
 =cut
 
-sub core_prefix 
-{ 
-    return "switch_"; 
+sub core_prefix
+{
+    return "switch_";
 }
 
 =item C<suffix()>
@@ -82,7 +82,7 @@ static void** opcode_to_prederef(Interp* interpreter,
     return interpreter->prederef.code + offset_in_ops;
 }
 
-#define OP_AS_OFFS(o) ((char *)interpreter->ctx.bp + cur_opcode[o])
+#define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
 
 END
 }
@@ -97,16 +97,21 @@ relevant C code.
 sub goto_address
 {
     my ($self, $addr) = @_;
-    
+
     #print STDERR "pbcc: map_ret_abs($addr)\n";
 
     if ($addr eq '0')
     {
   	    return "return (0);"
-    } 
-    else 
+    }
+    else
     {
-  	    return " {cur_opcode = (opcode_t *) opcode_to_prederef(interpreter, $addr); goto SWITCH_AGAIN; }";
+  	    return <<EOC;
+	    {
+	       cur_opcode = (opcode_t *) opcode_to_prederef(interpreter, $addr);
+	       goto SWITCH_RELOAD;
+            }
+EOC
     }
 }
 
@@ -142,10 +147,10 @@ Returns the C code for the run core function declaration.
 
 =cut
 
-sub run_core_func_decl 
+sub run_core_func_decl
 {
     my ($self, $core) = @_;
-    
+
     return "opcode_t * " .
         $self->core_prefix .
         "$core(opcode_t *cur_op, Parrot_Interp interpreter)";
@@ -160,8 +165,16 @@ Returns the C code prior to the run core function.
 sub run_core_func_start
 {
     return <<END_C;
+#if defined(__GNUC__) && defined(I386) /* && defined(NO_DYNOPS) */
+    register opcode_t *cur_opcode asm ("esi") = cur_op;
+    register char *   _reg_base   asm ("edi");
+#else
     opcode_t *cur_opcode = cur_op;
+    char * _reg_base;
+#endif
 
+SWITCH_RELOAD:
+    _reg_base = (char*)interpreter->ctx.bp;
     do {
 SWITCH_AGAIN:
     cur_opcode = CHECK_EVENTS(interpreter, cur_opcode);
@@ -177,7 +190,7 @@ Returns the C code following the run core function.
 
 =cut
 
-sub run_core_finish 
+sub run_core_finish
 {
     my ($self, $base) = @_;
     my $bs = $base . $self->suffix . '_';
@@ -194,9 +207,9 @@ sub run_core_finish
     return NULL;
 }
 END_C
-    
+
     $c .= " /* " . $self->core_prefix . "$base */\n\n";
-    
+
     return $c;
 }
 
