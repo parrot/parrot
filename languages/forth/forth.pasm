@@ -1396,6 +1396,18 @@ AddSpecialWord:
     branch EndSpecWord    
   NotLoop:
     ne .CurrentWord, "+loop", NotPlusLoop
+    concat .NewBodyString, "pop P6, P30\n"
+    concat .NewBodyString, "restore P7\n"
+    concat .NewBodyString, "add P6, P6, P7\n"
+    concat .NewBodyString, "pop P31, P30\n"
+    concat .NewBodyString, "push P30, P31\n"
+    concat .NewBodyString, "push P30, P6\n"
+    concat .NewBodyString, "ne P6, P31, dolabel"
+    .GetNestLevel
+    set .TempString, .NestLevel
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, "\n"
+    concat .NewBodyString, "pop P31, P30\npop P31, P30\n"
     branch EndSpecWord    
   NotPlusLoop:
 
