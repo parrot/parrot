@@ -944,7 +944,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
             /* FIXME length and multiple subs */
             debug_seg = Parrot_new_debug_seg(interpreter,
                     interpreter->code->cur_cs, sourcefile,
-                    (size_t) ins_line+ins_size);
+                    (size_t) ins_line + ins_size + 1);
         }
         else
             debug_seg = NULL;

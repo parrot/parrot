@@ -206,6 +206,8 @@ the array.
 
 =item C<void push_integer(INTVAL value)>
 
+=item C<void push_string(INTVAL value)>
+
 Extends the array by adding an element of value C<*value> to the end of
 the array.
 
@@ -216,7 +218,7 @@ the array.
     void push_integer(INTVAL value) {
         PMC *val;
         INTVAL size;
- 
+
         size = PMC_int_val(SELF);
         val = pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, val, value);
@@ -226,6 +228,18 @@ the array.
         return;
     }
 
+    void push_string(STRING* value) {
+        PMC *val;
+        INTVAL size;
+
+        size = PMC_int_val(SELF);
+        val = pmc_new(INTERP, enum_class_String);
+        VTABLE_assign_string_native(INTERP, val, value);
+        /* let set_pmc_keyed_int() worry about memory allocation */
+        DYNSELF.set_pmc_keyed_int(size, val);
+
+        return;
+    }
 /*
 
 =item C<PMC *clone()>
