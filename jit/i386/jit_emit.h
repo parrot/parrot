@@ -2003,18 +2003,6 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
 
 static void call_func(Parrot_jit_info_t *jit_info, void *addr);
 
-#  if !defined(INT_REG)
-#    define INT_REG(x) interpreter->int_reg.registers[x]
-#  endif
-#  if !defined(NUM_REG)
-#    define NUM_REG(x) interpreter->num_reg.registers[x]
-#  endif
-#  if !defined(STR_REG)
-#    define STR_REG(x) interpreter->string_reg.registers[x]
-#  endif
-#  if !defined(PMC_REG)
-#    define PMC_REG(x) interpreter->pmc_reg.registers[x]
-#  endif
 
 static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 {
@@ -2855,8 +2843,13 @@ count_regs(char *sig, char *sig_start)
     return first_reg;
 }
 /*
- * TODO the interpreter at runtime is at 8(%ebp) - use it
- * for register addressing and an "I" signature
+ * The function generated here is called as func(interpreter, nci_pmc)
+ * interpreter ...  8(%ebp)
+ * pmc         ... 12(%ebp)
+ *
+ * The generate function for a specific signature looks quite similar to
+ * an optimized compile of src/nci.c:pcf_x_yy(). In case of any troubles
+ * just compare the disassembly.
  */
 void *
 Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
@@ -2880,8 +2873,12 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
     jit_info.native_ptr = jit_info.arena.start = mem_alloc_executable(size);
     pc = jit_info.native_ptr;
 
-    /* make stack frame */
+    /* make stack frame, preserve %ebx */
     jit_emit_stack_frame_enter(pc);
+    emitm_pushl_r(pc, emit_EBX);
+    /* get interp into %ebx */
+    emitm_movl_m_r(pc, emit_EBX, emit_EBP, 0, 1, 8);
+
     /* get rightmost param, assume ascii chars */
     sig = (char *)signature->strstart + signature->bufused - 1;
     /* as long as there are params */
@@ -2897,24 +2894,24 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
             case '4':
                 /* This might be right. Or not... */
                 /* we need the offset of PMC_int_val */
-                jit_emit_mov_rm_i(pc, emit_EDX,
-                        &PMC_REG(count_regs(sig, signature->strstart)));
+                jit_emit_mov_RM_i(pc, emit_EDX,
+                        REG_OFFS_PMC(count_regs(sig, signature->strstart)));
                 emitm_lea_m_r (pc, emit_EAX, emit_EDX, 0, 1,
                         (size_t) &PMC_int_val((PMC *) 0));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'f':
                 /* get a double from next num reg and push it on stack */
-                jit_emit_fload_m_n(pc,
-                        &NUM_REG(count_regs(sig, signature->strstart)));
+                jit_emit_fload_mb_n(pc, emit_EBX,
+                        REG_OFFS_NUM(count_regs(sig, signature->strstart)));
                 /* make room for float */
                 emitm_addb_i_r(pc, -4, emit_ESP);
                 emitm_fstps(pc, emit_ESP, emit_None, 1, 0);
                 break;
             case 'd':
                 /* get a double from next num reg and push it on stack */
-                jit_emit_fload_m_n(pc,
-                        &NUM_REG(count_regs(sig, signature->strstart)));
+                jit_emit_fload_mb_n(pc, emit_EBX,
+                        REG_OFFS_NUM(count_regs(sig, signature->strstart)));
                 /* make room for double */
                 emitm_addb_i_r(pc, -8, emit_ESP);
                 emitm_fstpl(pc, emit_ESP, emit_None, 1, 0);
@@ -2922,18 +2919,18 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
                 break;
             case 'l':   /* long */
             case 'i':   /* int */
-                jit_emit_mov_rm_i(pc, emit_EAX,
-                        &INT_REG(count_regs(sig, signature->strstart)));
+                jit_emit_mov_RM_i(pc, emit_EAX,
+                        REG_OFFS_INT(count_regs(sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
-            case 's':   /* short: movswl intreg, %eax */
-                emitm_movswl_r_m(pc, emit_EAX, 0, 0, 1,
-                        &INT_REG(count_regs(sig, signature->strstart)));
+            case 's':   /* short: movswl intreg_o(base), %eax */
+                emitm_movswl_r_m(pc, emit_EAX, emit_EBX, 0, 1,
+                        REG_OFFS_INT(count_regs(sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
-            case 'c':   /* char: movsbl intreg, %eax */
-                emitm_movsbl_r_m(pc, emit_EAX, 0, 0, 1,
-                        &INT_REG(count_regs(sig, signature->strstart)));
+            case 'c':   /* char: movsbl intreg_o(base), %eax */
+                emitm_movsbl_r_m(pc, emit_EAX, emit_EBX, 0, 1,
+                        REG_OFFS_INT(count_regs(sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'p':   /* push pmc->data */
@@ -2942,8 +2939,8 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
                  * mov 8(%edx), %eax
                  * push %eax
                  */
-                jit_emit_mov_rm_i(pc, emit_EDX,
-                        &PMC_REG(count_regs(sig, signature->strstart)));
+                jit_emit_mov_RM_i(pc, emit_EDX,
+                        REG_OFFS_PMC(count_regs(sig, signature->strstart)));
                 emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
                         offsetof(struct PMC, data));
 #  else
@@ -2953,8 +2950,8 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
                  * mov data(%eax), %eax
                  * push %eax
                  */
-                jit_emit_mov_rm_i(pc, emit_EDX,
-                        &PMC_REG(count_regs(sig, signature->strstart)));
+                jit_emit_mov_RM_i(pc, emit_EDX,
+                        REG_OFFS_PMC(count_regs(sig, signature->strstart)));
                 emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
                         offsetof(struct PMC, pmc_ext));
                 emitm_movl_m_r(pc, emit_EAX, emit_EAX, 0, 1,
@@ -2963,13 +2960,14 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'O':   /* push PMC * object in P2 */
-                jit_emit_mov_rm_i(pc, emit_EAX, &PMC_REG(2));
+                jit_emit_mov_RM_i(pc, emit_EAX, REG_OFFS_PMC(2));
                 goto preg;
             case 'P':   /* push PMC * */
-                jit_emit_mov_rm_i(pc, emit_EAX,
-                        &PMC_REG(count_regs(sig, signature->strstart)));
+                jit_emit_mov_RM_i(pc, emit_EAX,
+                        REG_OFFS_PMC(count_regs(sig, signature->strstart)));
 preg:
 #if PARROT_CATCH_NULL
+                /* PMCNULL is a global */
                 jit_emit_cmp_rm_i(pc, emit_EAX, &PMCNULL);
                 emitm_jxs(pc, emitm_jne, 2); /* skip the xor */
                 jit_emit_bxor_rr_i(pc, emit_EAX, emit_EAX);
@@ -2980,30 +2978,30 @@ preg:
                 st -= 4;        /* undo default stack usage */
                 break;
             case 'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
-                jit_emit_mov_rm_i(pc, emit_EDX,
-                        &STR_REG(count_regs(sig, signature->strstart)));
+                jit_emit_mov_RM_i(pc, emit_EDX,
+                        REG_OFFS_STR(count_regs(sig, signature->strstart)));
                 emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
                         (size_t) &PObj_bufstart((STRING *) 0));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'B':   /* buffer (void**) pass &PObj_bufstart(SReg) */
-                jit_emit_mov_rm_i(pc, emit_EDX,
-                        &STR_REG(count_regs(sig, signature->strstart)));
+                jit_emit_mov_RM_i(pc, emit_EDX,
+                        REG_OFFS_STR(count_regs(sig, signature->strstart)));
                 emitm_lea_m_r (pc, emit_EAX, emit_EDX, 0, 1,
                         (size_t) &PObj_bufstart((STRING *) 0));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 't':   /* string, pass a cstring */
-                jit_emit_mov_rm_i(pc, emit_EAX,
-                        &STR_REG(count_regs(sig, signature->strstart)));
+                jit_emit_mov_RM_i(pc, emit_EAX,
+                        REG_OFFS_STR(count_regs(sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
-                emitm_pushl_i(pc, interpreter);
+                emitm_pushl_r(pc, emit_EBX);
                 emitm_calll(pc, (char*)string_to_cstring - pc - 4);
                 emitm_addb_i_r(pc, 8, emit_ESP);
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'I':
-                emitm_pushl_i(pc, interpreter);
+                emitm_pushl_r(pc, emit_EBX);
                 break;
             default:
                 /*
@@ -3041,42 +3039,46 @@ preg:
         case '2':
         case '3':
         case '4':
-            jit_emit_mov_ri_i(pc, emit_EAX, &INT_REG(next_i++));
+            /* get integer from pointer - untested */
+            emitm_movl_m_r(pc, emit_EDX, emit_EAX, 0, 1, 0);
+            if (*sig == 2)      /* short */
+                emitm_movswl_r_r(pc, emit_EDX, emit_EDX);
+            jit_emit_mov_MR_i(pc, REG_OFFS_INT(next_i++), emit_EDX);
             break;
         case 'f':
         case 'd':
             /* pop num from st(0) and mov to reg */
-            jit_emit_fstore_m_n(pc, &NUM_REG(next_n++));
+            jit_emit_fstore_mb_n(pc, emit_EBX, REG_OFFS_NUM(next_n++));
             break;
         case 's':
             /* movswl %ax, %edx */
             emitm_movswl_r_r(pc, emit_EDX, emit_EAX);
-            jit_emit_mov_mr_i(pc, &INT_REG(next_i++), emit_EDX);
+            jit_emit_mov_MR_i(pc, REG_OFFS_INT(next_i++), emit_EDX);
             break;
         case 'c':
             /* movsbl %al, %edx */
             emitm_movsbl_r_r(pc, emit_EDX, emit_EAX);
-            jit_emit_mov_mr_i(pc, &INT_REG(next_i++), emit_EDX);
+            jit_emit_mov_MR_i(pc, REG_OFFS_INT(next_i++), emit_EDX);
             break;
         case 'l':
         case 'i':
-            jit_emit_mov_mr_i(pc, &INT_REG(next_i++), emit_EAX);
+            jit_emit_mov_MR_i(pc, REG_OFFS_INT(next_i++), emit_EAX);
             /* fall through */
         case 'v': /* void - do nothing */
             break;
         case 'P':
-            jit_emit_mov_mr_i(pc, &PMC_REG(next_p++), emit_EAX);
+            jit_emit_mov_MR_i(pc, REG_OFFS_PMC(next_p++), emit_EAX);
             break;
         case 'p':   /* make a new unmanaged struct */
             /* save return value on stack */
             emitm_pushl_r(pc, emit_EAX);
             /* make new pmc */
             emitm_pushl_i(pc, enum_class_UnManagedStruct);
-            emitm_pushl_i(pc, interpreter);
+            emitm_pushl_r(pc, emit_EBX);
             emitm_calll(pc, (char*)pmc_new - pc - 4);
             emitm_addb_i_r(pc, 8, emit_ESP);
             /* eax = PMC, get return value into edx */
-            jit_emit_mov_mr_i(pc, &PMC_REG(next_p++), emit_EAX);
+            jit_emit_mov_MR_i(pc, REG_OFFS_PMC(next_p++), emit_EAX);
             emitm_popl_r(pc, emit_EDX);
             /* stuff return value into pmc->data */
 #  if ! PMC_DATA_IN_EXT
@@ -3094,45 +3096,47 @@ preg:
             break;
         case 'b':   /* (void *) = PObj_bufstart(new_buffer_header) */
             /* preserve return value */
-            jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
-            emitm_pushl_i(pc, interpreter);
+            emitm_pushl_r(pc, emit_EAX);
+            emitm_pushl_r(pc, emit_EBX);
             emitm_calll(pc, (char*)new_buffer_header - pc - 4);
             emitm_addb_i_r(pc, 4, emit_ESP);
             /* *eax = buffer_header */
             /* set external flag */
             emitm_orl_i_m(pc, PObj_external_FLAG, emit_EAX, 0, 1,
                     offsetof(pobj_t, flags));
+            emitm_popl_r(pc, emit_EDX);
             /* mov %edx, (bufstart) %eax */
             emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
                         (size_t) &PObj_bufstart((STRING *) 0));
             /* place result in SReg */
-            jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
+            jit_emit_mov_MR_i(pc, REG_OFFS_STR(next_s++), emit_EAX);
 
             break;
         case 'S':
-            jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
+            jit_emit_mov_MR_i(pc, REG_OFFS_STR(next_s++), emit_EAX);
             break;
         case 't':   /* string */
             /* EAX is char* */
-            emitm_pushl_i(pc, 0);   /* len */
-            emitm_pushl_r(pc, emit_EAX);  /* string */
-            emitm_pushl_i(pc, interpreter);
+            emitm_pushl_i(pc, 0);               /* len */
+            emitm_pushl_r(pc, emit_EAX);        /* string */
+            emitm_pushl_r(pc, emit_EBX);        /* interpreter */
             emitm_calll(pc, (char*)string_from_cstring - pc - 4);
             emitm_addb_i_r(pc, 12, emit_ESP);
-            jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
+            jit_emit_mov_MR_i(pc, REG_OFFS_STR(next_s++), emit_EAX);
             break;
         default:
             mem_free_executable(jit_info.native_ptr);
             return NULL;
     }
     /* set prototyped return */
-    jit_emit_mov_mi_i(pc, &INT_REG(0), 1);
+    jit_emit_mov_MI_i(pc, REG_OFFS_INT(0), 1);
     /* set return values in I,S,P,N regs */
-    jit_emit_mov_mi_i(pc, &INT_REG(1), next_i-5);
-    jit_emit_mov_mi_i(pc, &INT_REG(2), next_s-5);
-    jit_emit_mov_mi_i(pc, &INT_REG(3), next_p-5);
-    jit_emit_mov_mi_i(pc, &INT_REG(4), next_n-5);
+    jit_emit_mov_MI_i(pc, REG_OFFS_INT(1), next_i-5);
+    jit_emit_mov_MI_i(pc, REG_OFFS_INT(2), next_s-5);
+    jit_emit_mov_MI_i(pc, REG_OFFS_INT(3), next_p-5);
+    jit_emit_mov_MI_i(pc, REG_OFFS_INT(4), next_n-5);
 
+    emitm_popl_r(pc, emit_EBX);
     jit_emit_stack_frame_leave(pc);
     emitm_ret(pc);
     assert(pc - jit_info.arena.start <= size);
