@@ -1,7 +1,7 @@
 #! perl -w
 # Tests the extension API
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Parrot::Config;
 
 c_output_is(<<'CODE', <<'OUTPUT', "set/get_intreg");
@@ -378,6 +378,61 @@ hello in sub2
 back
 OUTPUT
 
+open S, ">$temp.pasm" or die "Can't write $temp.pasm";
+print S <<'EOF';
+  .pcc_sub _sub1:
+  printerr "in sub1\n"
+  new_pad 0
+  find_lex P2, "no_such_var"
+  printerr "never\n"
+  invoke P1
+EOF
+close S;
+# compile to pbc
+system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
+
+c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub");
+
+#include <stdio.h>
+/* have to cheat because of missing extend interfaces */
+/* #include "parrot/extend.h" */
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+
+/* also both the test PASM and main print to stderr
+ * so that buffering in PIO isn't and issue
+ */
+
+int main(int argc, char* argv[]) {
+    Parrot_Interp interpreter;
+    struct PackFile *pf;
+    PMC *key, *sub, *arg;
+    Parrot_exception jb;
+
+    interpreter = Parrot_new();
+    pf = Parrot_readbc(interpreter, "temp.pbc");
+    Parrot_loadbc(interpreter, pf);
+    key = key_new_cstring(interpreter, "_sub1");
+    sub = VTABLE_get_pmc_keyed(interpreter,
+				interpreter->perl_stash->stash_hash, key);
+    if (setjmp(jb.destination)) {
+	fprintf(stderr, "caught\n");
+    }
+    else {
+	PMC *handler = new_c_exception_handler(interpreter, &jb);
+	push_exception(interpreter, handler);
+	Parrot_call(interpreter, sub, 0);
+    }
+    fprintf(stderr, "back\n");
+    return 0;
+}
+CODE
+in sub1
+caught
+back
+OUTPUT
+
 unlink "$temp.pasm", "$temp.pbc";
+
 
 1;

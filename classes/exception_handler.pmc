@@ -19,8 +19,9 @@
 
 pmclass Exception_Handler extends Continuation {
 
-    INTVAL type() {		/* pmc2c.pl doesn't like empty classes */
-	return SELF->vtable->base_type;
+    void init() {
+	PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
+	SUPER();
     }
 
 }

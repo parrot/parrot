@@ -159,6 +159,21 @@ pop_exception(Parrot_Interp interpreter)
                     STACK_ENTRY_PMC);
 }
 
+/*
+ * generate an exception handler, that catches PASM level exceptions
+ * inside a C function
+ * This could be a separate class too, for now just a private flag
+ * bit is set
+ */
+PMC*
+new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
+{
+    PMC *handler = pmc_new(interpreter, enum_class_Exception_Handler);
+    PObj_get_FLAGS(handler) |= PObj_private0_FLAG;
+    handler->cache.struct_val = jb;
+    return handler;
+}
+
 void *
 throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 {
@@ -183,6 +198,15 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
     restore_context(interpreter, &cc->ctx);
     /* put exception object in P5 */
     REG_PMC(5) = exception;
+    if (PObj_get_FLAGS(handler) & PObj_private0_FLAG) {
+        /* its a C exception handler */
+        Parrot_exception *jb = (Parrot_exception *) handler->cache.struct_val;
+#ifdef PARROT_HAS_HEADER_SETJMP
+        longjmp(jb->destination, 1);
+#else
+        return NULL; /* we are lost */
+#endif
+    }
     /* return the address of the handler */
     return handler->cache.struct_val;
 }
