@@ -452,6 +452,7 @@ languages/python/python.prd
 languages/regex/MAINTAINER
 languages/regex/Makefile
 languages/regex/README
+languages/regex/README.hacking
 languages/regex/lib/Regex.pm
 languages/regex/lib/Regex/CodeGen.pm
 languages/regex/lib/Regex/CodeGen/IMCC.pm

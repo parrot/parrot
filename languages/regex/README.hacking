@@ -1,0 +1,75 @@
+Somebody once suggested an optimization where you would find pieces of
+a regular expression that would produce the same result if they were
+implemented as a DFA, and implement just those parts as a DFA-style
+jump table called by the regular NFA-ish code. This file is a
+step-by-step description of how to implement that optimization, but
+can be used as a general walkthrough for any modifications to this
+code.
+
+=====================================================================
+
+I talk about precisely this optimization in the section "Longer-term
+optimization vague ideas". (Heh.) I thought a bunch more about this a
+while back, but didn't put any of it in the README. Didn't really come
+up with any brilliant ideas anyway.
+
+languages/regex is set up to make it straightforward to implement
+precisely this type of transparent optimization. Of course, nobody but
+me has ever attempted doing anything, but if you'd like to give it a
+shot, here's how:
+
+In languages/regex/lib/Regex/Ops/Tree.pm, there is a start of an
+implementation of this, done back before I got distracted by the urge
+to make the regex compiler actually work for simple cases first. ;-)
+The way it works is that you have a tree of regex operator nodes, each
+represented by a Tree object. There are various methods on these nodes
+that compute information that might be useful to an optimizer. For
+example, minlen() and maxlen() return the fewest and most characters
+that a subexpression could possibly match; it's used to convert things
+like /a[bB]c+def/ to a code sequence resembling
+
+  check length >= 6
+  match a
+  match [bB]
+  match c+
+  check length >= 3
+  match d
+  match e
+  match f
+
+rather than checking the input stream's length just before matching
+any single character.
+
+Anyway, I also have a method dfa_safe() that is supposed to return
+whether or not a subtree would return the same result on a DFA or
+traditional backtracking NFA. The implementation is mostly trivial (if
+you see capturing parens, FALSE. A sequence of nodes is only dfa_safe
+if all subnodes are. Etc.) For alternation, it is conservative and
+only returns true if the first character in every branch of the
+alternation is different, and if every branch is itself dfa_safe. (And
+I've never run the code, even once, so it doesn't actually work
+anyway!)
+
+The code for making use of this information is in Regex/PreOptimize.pm
+(possibly to be renamed to TreeOptimize.pm). Look at
+disable_implicit_checks() for an example of performing the length
+checking optimization described above. This whole module is for
+adding, deleting, and changing nodes in the expression tree according
+to a set of optimizations. You can also subclass it to override the
+optimize_tree() method to add in your optimization, like so:
+
+ sub optimize_tree {
+     my ($self, tree) = @_;
+     $tree = $self->SUPER::optimize_tree($tree);
+     ...perform your optimization...
+     return $tree;
+ }
+
+The next step is to convert the optimized tree into what I call List
+ops, which are just slightly higher level than pasm ops. You might
+want to create a state table lookup op, for example. Look at
+Regex/Rewrite.pm and Regex/Rewrite/Stackless.pm for many examples of
+this (Stackless subclasses Rewrite and does most of the work.)
+
+Finally, you'll need to implement the pasm rendering of your new List
+ops. That goes in Regex/CodeGen/Pasm.pm.
