@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_eh - clear_eh");
@@ -471,5 +471,34 @@ Hi from handler
 Hi from handler
 mark2
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "check that coroutines handler isnt run");
+    print "main\n"
+    newsub P0, .Coroutine, _sub
+    invokecc
+    print "back in main\n"
+    find_lex P3, -1, "nix"
+    end
+
+_sub:
+    print "in coro\n"
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+    invoke P1
+
+_handler:
+    print "catched it\n"
+    set S0, P5["_message"]
+    print S0
+    print "\n"
+    set P2, P5["_invoke_cc"]	# the return continuation
+    invoke P2
+CODE
+main
+in coro
+back in main
+Lexical 'nix' not found
+OUTPUT
+
 1;
 

@@ -448,6 +448,8 @@ scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name,
 {
     struct Parrot_Lexicals * lex = NULL;
 
+    if (!pad)
+        return NULL;
     if (name) lex = scratchpad_find(interp, pad, name, &position);
     else lex = scratchpad_index(interp, pad, -1);
 
@@ -461,7 +463,11 @@ PMC *
 scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad,
                      INTVAL scope_index, STRING * name, INTVAL position)
 {
-    struct Parrot_Lexicals * lex = scratchpad_index(interp, pad, scope_index);
+    struct Parrot_Lexicals * lex;
+
+    if (!pad)
+        return NULL;
+    lex = scratchpad_index(interp, pad, scope_index);
 
     if (name) {
         position = lexicals_get_position(interp, lex, name);
