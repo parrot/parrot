@@ -328,6 +328,7 @@ languages/imcc/debug.c
 languages/imcc/debug.h
 languages/imcc/examples/README
 languages/imcc/examples/sample.imc
+languages/imcc/examples/test_allocate.imc
 languages/imcc/examples/test_spilling.imc
 languages/imcc/imc.c
 languages/imcc/imc.h
