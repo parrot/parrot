@@ -372,7 +372,7 @@ PDB_next(struct Parrot_Interp *interpreter, const char *command)
 
     /* If program ended */
     if (!pdb->cur_opcode)
-        PDB_program_end(interpreter);
+        (void)PDB_program_end(interpreter);
 }
 
 /* PDB_trace
@@ -408,7 +408,7 @@ PDB_trace(struct Parrot_Interp *interpreter,
 
     /* If program ended */
     if (!pdb->cur_opcode)
-        PDB_program_end(interpreter);
+        (void)PDB_program_end(interpreter);
 }
 
 /*  PDB_cond
@@ -1508,8 +1508,12 @@ void
 PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 {
     opcode_t *run;
-    struct PackFile_ByteCode *eval_cs = PDB_compile(interpreter,
-            strdup(command));
+    char *c;
+    struct PackFile_ByteCode *eval_cs;
+
+    c = mem_sys_allocate(strlen(command) + 1);
+    strcpy(c, command);
+    eval_cs = PDB_compile(interpreter, c);
 
     if (eval_cs) {
         Parrot_switch_to_cs(interpreter, eval_cs);

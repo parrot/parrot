@@ -130,9 +130,9 @@ PackFile_new(void)
     pf->directory = NULL;
     pf->need_wordsize = 0;
     pf->need_endianize = 0;
-    pf->fetch_op = NULL;
-    pf->fetch_iv = NULL;
-    pf->fetch_nv = NULL;
+    pf->fetch_op = (opcode_t (*)(opcode_t)) NULL;
+    pf->fetch_iv = (INTVAL (*)(INTVAL)) NULL;
+    pf->fetch_nv = (void (*)(unsigned char *, unsigned char *)) NULL;
     return pf;
 }
 
@@ -746,7 +746,7 @@ directory_unpack (struct PackFile      * self,
 }
 
 
-void
+static void
 directory_destroy (struct PackFile_Segment *self)
 {
     struct PackFile_Directory *dir = (struct PackFile_Directory *)self;
@@ -766,7 +766,7 @@ directory_destroy (struct PackFile_Segment *self)
     default_destroy (self);
 }
 
-size_t
+static size_t
 directory_packed_size (struct PackFile_Segment *self)
 {
     struct PackFile_Directory *dir = (struct PackFile_Directory *)self;
@@ -792,7 +792,7 @@ directory_packed_size (struct PackFile_Segment *self)
     return size;
 }
 
-size_t
+static size_t
 directory_pack (struct PackFile_Segment *self,
                 opcode_t *dest, size_t offset, size_t size)
 {
@@ -1028,7 +1028,8 @@ Parrot_new_debug_seg(struct Parrot_Interp *interpreter,
     PackFile_add_segment(interpreter->code,
             (struct PackFile_Segment*)debug);
     debug->lines = mem_sys_allocate(cs->base.byte_count);
-    debug->filename = strdup(filename);
+    debug->filename = mem_sys_allocate(strlen(filename) + 1);
+    strcpy(debug->filename, filename);
     debug->code = cs;
     cs->debug = debug;
     return debug;
@@ -1123,7 +1124,7 @@ fixup_pack (struct PackFile_Segment *self,
 ** PackFile_FixupTable_new
 */
 
-struct PackFile_FixupTable *
+static struct PackFile_FixupTable *
 fixup_new (struct PackFile *pf)
 {
     struct PackFile_FixupTable *fixup;

@@ -106,7 +106,7 @@ handle_flags(struct Parrot_Interp *interpreter,
     else {
         /* string precision */
         if (info->flags & FLAG_PREC && info->prec < len) {
-            string_chopn(str, -(info->prec));
+            string_chopn(str, -(INTVAL)(info->prec));
             len = info->prec;
         }
     }

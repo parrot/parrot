@@ -246,8 +246,8 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     jit_code = build_asm(interpreter, pc, code_start, code_end);
     interpreter->code->cur_cs->jit_info = interpreter->jit_info;
     (jit_code) (interpreter, pc);
-    return NULL;
 #endif
+    return NULL;
 }
 
 
