@@ -162,6 +162,7 @@ while(my $l=shift(@program)) {
 
     1 while $code=~s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
     $code=~s/,/ /g;
+    $code =~ s/#.*$//; # Strip end-of-line comments
     my($opcode,@args)=split(/\s+/,$code);    
     if(exists($macros{$opcode})) {
 	# found a macro
@@ -303,6 +304,7 @@ while(my $l=shift(@program)) {
 	if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq "S") {
 	    # its a register argument
 	    $args[$_]=~s/^[INPS](\d+)$/$1/i;
+	    error("Register $1 out of range (should be 0-31) in '$opcode'",$file,$line) if $1 < 0 or $1 > 31;
 	} elsif($rtype eq "D") {
 	    # a destination
 	    if($args[$_]=~/^\$/) {
