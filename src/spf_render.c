@@ -138,7 +138,7 @@ handle_flags(struct Parrot_Interp *interpreter,
         }
         else {                  /* right-align */
             /* signed and zero padded */
-            if (info->flags & FLAG_ZERO 
+            if (info->flags & FLAG_ZERO
                 && (string_ord(str,0) == '-' || string_ord(str,0) == '+')) {
                 STRING *temp;
                 string_substr(interpreter, str, 1, len-1, &temp);
@@ -147,7 +147,7 @@ handle_flags(struct Parrot_Interp *interpreter,
                 string_append(interpreter, str, temp, 0);
             }
             else {
-                string_set(interpreter, str, 
+                string_set(interpreter, str,
                            string_concat(interpreter, fill, str, 0));
             }
         }
@@ -238,8 +238,11 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
             len = 0;
             old = i;
             if (string_ord(pat, i + 1) == '%') {
+                /* skip this one, make next the first char
+                 * of literal sequence, starting at old */
                 i++;
-                len += 2;
+                old++;
+                len++;
                 continue;
             }
             else {
@@ -515,7 +518,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                             break;
 
                         case 'X':
-                            theuint = 
+                            theuint =
                                 obj->getuint(interpreter, info.type, obj);
                             uint_to_str(interpreter, ts, tc, theuint, 16);
 
@@ -525,7 +528,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                             break;
 
                         case 'b':
-                            theuint = 
+                            theuint =
                                 obj->getuint(interpreter, info.type, obj);
                             uint_to_str(interpreter, ts, tc, theuint, 2);
 
