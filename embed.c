@@ -64,12 +64,14 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     struct stat file_stat;
 #endif
 #ifdef HAS_HEADER_SYSMMAN
-    int fd;
+    int fd = -1;
 #endif    
 
     if (filename == NULL || strcmp(filename, "-") == 0) {
         /* read from STDIN */
         io = PIO_STDIN(interpreter);
+        /* read 1k at a time */
+        program_size = 0;
     } else {
 #ifdef HAS_HEADER_SYSSTAT
         /* if we have stat(), get the actual file size so we can read it
@@ -106,10 +108,12 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
     /* if we've opened a file (or stdin) with PIO, read it in */
     if (io != NULL) {
+        size_t chunk_size;
         char *cursor;
         INTVAL read_result;
-        
-        program_code = (char *)malloc(program_size + 1024);
+
+        chunk_size = program_size > 0 ? program_size : 1024;
+        program_code = (char *)malloc(chunk_size);
         program_size = 0;
         if (NULL == program_code) {
             fprintf(stderr,
@@ -118,10 +122,11 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         }
         cursor = (char *)program_code;
 
-        while ((read_result = PIO_read(interpreter, io, cursor, 1024)) > 0) {
+        while ((read_result = PIO_read(interpreter, io, cursor, chunk_size)) > 0) {
             program_size += read_result;
+            chunk_size = 1024;
             program_code =
-                realloc(program_code, program_size + 1024);
+                realloc(program_code, program_size + chunk_size);
 
             if (NULL == program_code) {
                 fprintf(stderr,
@@ -151,8 +156,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         }
 
         program_code =
-            mmap(0, program_size, PROT_READ, MAP_SHARED, fd,
-                 (off_t)0);
+            mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
         if (!program_code) {
             fprintf(stderr, "Parrot VM: Can't read file %s, code %i.\n",
@@ -174,8 +178,10 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     }
 
 #ifdef HAS_HEADER_SYSMMAN
-    munmap(program_code, (size_t)program_size);
-    close(fd);
+    if (fd >= 0) {
+        munmap(program_code, program_size);
+        close(fd);
+    }
 #endif
 
     return pf;

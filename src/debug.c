@@ -255,22 +255,23 @@ PDB_set_break(struct Parrot_Interp *interpreter,
     /* If no line number was specified set it at the current line */
     if (command && *command) {
         ln = atol(command);
+        
         /* Move to the line where we will set the break point */
         line = pdb->file->line;
         for (i = 1; ((i < ln) && (line->next)); i++)
             line = line->next;
+   
+        /* Abort if the line number provided doesn't exists */
+        if (!line->next) {
+            fprintf(stderr,"Can't set a breakpoint at line number %li\n",ln);
+            return;
+        }
     }
     else {
         /* Get the line to set it */
         line = pdb->file->line;
         while (line->opcode != pdb->cur_opcode)
             line = line->next;
-    }
-   
-    /* Abort if the line number provided doesn't exists */
-    if (!line->next) {
-        fprintf(stderr,"Can't set a breakpoint at line number %li\n",ln);
-        return;
     }
         
     /* Skip lines that are not related to an opcode */
