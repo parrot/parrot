@@ -180,8 +180,32 @@ constant_pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type,
 INTVAL
 pmc_register(Parrot_Interp interp, STRING *name)
 {
-    /* Stub for now */
-    return 0;
+    INTVAL type;
+    PMC *classname_hash;
+    PMC *key;
+    /* If they're looking to register an existing class, return that
+       class' type number */
+    if ((type = pmc_type(interp, name)) != enum_type_undef) {
+        return type;
+    }
+    /* We don't have one, so lets add one. We need to get a lock for
+       this, though */
+    LOCK(class_count_mutex);
+    /* Try again, just in case */
+    if ((type = pmc_type(interp, name)) != enum_type_undef) {
+        UNLOCK(class_count_mutex);
+        return type;
+    }
+
+    classname_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                                              IGLOBALS_CLASSNAME_HASH);
+    key = key_new_string(interp, name);
+    
+    type = ++enum_class_max;
+    VTABLE_set_integer_keyed(interp, classname_hash, key, type);
+    
+    UNLOCK(class_count_mutex);
+    return type;
 }
 
 INTVAL
