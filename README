@@ -63,8 +63,12 @@ For systems like HPUX that don't have inet_pton please run
 
     perl Configure.pl --define=inet_aton
 
-This will generate a config.h header, a Parrot::Config module, platform
-files and some Makefiles.
+If you want to install Parrot into a non-standard location use
+
+    perl Configure.pl --prefix=/Users/foo/parrot-0.1.1
+
+Running Configure.pl will generate a config.h header, a Parrot::Config
+module, platform files and some Makefiles.
 
 The file "myconfig" has an overview of configure settings.
 
@@ -91,6 +95,17 @@ You can test parrot by running
 You can run the full test suite with
 
     make fulltest
+
+On some systems you can install parrot:
+
+    make install
+
+This installs a bunch of files in /usr/local/parrot-$VERSION. The parrot
+executable is in /usr/local/parrot-$VERSION/bin. Please note that this
+feature is currently experimental. You have to link or copy the executable
+somewhere into your path. Finally no dynamic extensions from
+runtime/parrot/dynext are installed, albeit dynamic extensions are searched
+for in the installed directory structure.
 
 Look at docs/parrot.pod and docs/intro.pod for where to go from here.
 If you have any problems, see the section "Reporting Problems" in

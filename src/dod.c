@@ -1122,7 +1122,8 @@ Parrot_dod_ms_run_init(Interp *interpreter)
 #if ARENA_DOD_FLAGS
     clear_live_counter(interpreter, arena_base->pmc_pool);
     for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-        header_pool = arena_base->sized_header_pools[j];
+        struct Small_Object_Pool *header_pool =
+            arena_base->sized_header_pools[j];
         if (header_pool)
             clear_live_counter(interpreter, header_pool);
     }

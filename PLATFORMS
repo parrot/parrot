@@ -49,7 +49,7 @@ CGoto ... CGoto runloop is supported
 JIT   ... JIT core is supported
 EXEC  ... compiling to native executables is supported
 Thr   ... Parrot is multi-threaded
-Sig   ... Parrot catches kind of a SIGINT (program termination) signal
+Sig   ... Parrot catches a SIGHUP signal
 Comp  ... Compiles ok
 Test  ... Runs "make test"
 Inst  ... "make install" is ok
@@ -63,4 +63,11 @@ Remarks:
 *4 need deactivating of  PARROT_HAS_HEADER_DLFCN
 *5 by enabling cygwin in t/pmc/threads.t, some tests fail due to a bug in
    that release. 1.5.10-3 and latest snapshots are ok.
+
+The following configurations are also working on x86/linux (and likely
+other platforms):
+optimized build: perl Configure.pl --optimize
+system malloc:   perl Configure.pl --gc=libc
+incremental GC:  include/parrot/settings.h PARROT_GC_MS:=0 PARROT_GC_IMS:=1
+arena_dod_flags: include/parrot/settings.h ARENA_DOD_FLAGS:=1
 

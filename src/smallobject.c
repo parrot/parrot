@@ -480,7 +480,6 @@ new_small_object_pool(Interp *interpreter,
     pool->add_free_object = add_free_object_fn;
     pool->get_free_object = get_free_object_fn;
 #if ARENA_DOD_FLAGS
-    assert(0);
     if (object_size >= sizeof(Dead_PObj))
         pool->get_free_object = get_free_object_df;
 #endif
