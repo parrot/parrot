@@ -138,7 +138,7 @@ NONGEN_HEADERS  = ${TEMP_nongen_headers}
 GEN_MAKEFILES = \
     Makefile \
     languages/Makefile \
-#CONDITIONED_LINE(perldoc):    docs/Makefile \
+#CONDITIONED_LINE(has_perldoc):    docs/Makefile \
     dynclasses/Makefile \
     dynoplibs/Makefile \
     languages/cola/Makefile \
@@ -989,17 +989,17 @@ $(AST_O_FILES) : $(IMCC_H_FILES) $(AST_H_FILES) $(ALL_H_FILES)
 #
 ###############################################################################
 
-#CONDITIONED_LINE(perldoc):docs : docs.dummy
-#CONDITIONED_LINE(notperldoc):docs : docs.stub
+#CONDITIONED_LINE(has_perldoc):docs : docs.dummy
+#INVERSE_CONDITIONED_LINE(has_perldoc):docs : docs.stub
 
-#CONDITIONED_LINE(perldoc):html : html.dummy
-#CONDITIONED_LINE(notperldoc):html : html.stub
+#CONDITIONED_LINE(has_perldoc):html : html.dummy
+#INVERSE_CONDITIONED_LINE(has_perldoc):html : html.stub
 
 html.stub:
-	echo "Perldoc is required, but not detected."
+	@echo "Perldoc is required, but not detected."
 
 docs.stub:
-	echo "Perldoc is required, but not detected."
+	@echo "Perldoc is required, but not detected."
 
 docs.dummy :
 	$(MAKE_C) docs
@@ -1174,28 +1174,28 @@ nokfile :
 ###############################################################################
 
 clean : \
-  test-clean \
-  prog-clean \
-  dynext-clean \
-  languages-clean \
-  docs-clean \
-  dynclasses-clean \
-  examples-clean \
-  imcc-clean \
-  compilers-clean
+    test-clean \
+    prog-clean \
+    dynext-clean \
+    languages-clean \
+#CONDITIONED_LINE(has_perldoc):    docs-clean \
+    dynclasses-clean \
+    examples-clean \
+    imcc-clean \
+    compilers-clean
 	${TEMP_cg_r}
 	$(RM_F) *.s *~ $(FLUID_FILES)
 
 prog-clean :
 	$(RM_F) \
-  $(O_FILES) \
-  $(PARROT) $(IMCC_DIR)/main$(O) \
-  $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
-  $(SRC_DIR)/pbc_info$(O) $(PINFO) \
-  $(PDB) $(SRC_DIR)/pdb$(O) \
-  $(DIS) $(SRC_DIR)/disassemble$(O) \
-  $(LIBNCI_TEST_SO) \
-  $(LIBPARROT)
+    $(O_FILES) \
+    $(PARROT) $(IMCC_DIR)/main$(O) \
+    $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
+    $(SRC_DIR)/pbc_info$(O) $(PINFO) \
+    $(PDB) $(SRC_DIR)/pdb$(O) \
+    $(DIS) $(SRC_DIR)/disassemble$(O) \
+    $(LIBNCI_TEST_SO) \
+    $(LIBPARROT)
 	$(PERL) build_tools/c2str.pl --init
 	$(RM_F) $(STR_FILES) $(INC_DIR)/string_private_cstring.h
 	$(RM_F) classes/*.c classes/*.h classes/*.dump vtable.dump

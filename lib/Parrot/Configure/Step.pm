@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -29,18 +29,18 @@ use Carp;
 use File::Copy ();
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-@ISA=qw(Exporter);
+@ISA = qw(Exporter);
 
-@EXPORT=();
+@EXPORT = ();
 
-@EXPORT_OK=qw(prompt genfile copy_if_diff move_if_diff integrate
-              cc_gen cc_build cc_run cc_clean cc_run_capture);
+@EXPORT_OK = qw(prompt genfile copy_if_diff move_if_diff integrate
+                cc_gen cc_build cc_run cc_clean cc_run_capture );
 
-%EXPORT_TAGS=(
-	inter => [qw(prompt integrate)],
-	auto  => [qw(cc_gen cc_build cc_run cc_clean cc_run_capture)],
-	gen   => [qw(genfile copy_if_diff move_if_diff)]
-);
+%EXPORT_TAGS = (
+        inter => [qw(prompt integrate)],
+        auto  => [qw(cc_gen cc_build cc_run cc_clean cc_run_capture)],
+        gen   => [qw(genfile copy_if_diff move_if_diff)]
+               );
 
 #Configure::Data->get('key')
 #Configure::Data->set('key', 'value')
@@ -54,24 +54,24 @@ Integrates C<$new> into C<$orig>.
 =cut
 
 sub integrate {
-    my($orig, $new)=@_;
+    my($orig, $new) = @_;
 
     unless(defined $new) {
         warn "String to be integrated in to '$orig' undefined";
         return $orig;
     }
 
-	while($new =~ s/:add\{([^}]+)\}//) {
-		$orig .= $1;
-	}
+    while($new =~ s/:add\{([^}]+)\}//) {
+        $orig .= $1;
+    }
 
-	while($new =~ s/:rem\{([^}]+)\}//) {
-		$orig =~ s/\Q$1\E//;
-	}
+    while($new =~ s/:rem\{([^}]+)\}//) {
+        $orig =~ s/\Q$1\E//;
+    }
 
-	if($new =~ /\S/) {
-		$orig =  $new;
-	}
+    if($new =~ /\S/) {
+        $orig =  $new;
+    }
 
     return $orig;
 }
@@ -84,25 +84,25 @@ Returns the response, or the default if the user just hit C<ENTER>.
 =cut
 
 sub prompt {
-	my($message, $value)=@_;
+    my ($message, $value) = @_;
 
-	print("$message [$value] ");
+    print("$message [$value] ");
 
-	chomp(my $input=<STDIN>);
+    chomp(my $input=<STDIN>);
 
-	while($input =~ s/:add\{([^}]+)\}//) {
-		$value .= $1;
-	}
+    while($input =~ s/:add\{([^}]+)\}//) {
+        $value .= $1;
+    }
 
-	while($input =~ s/:rem\{([^}]+)\}//) {
-		$value =~ s/\Q$1\E//;
-	}
+    while($input =~ s/:rem\{([^}]+)\}//) {
+        $value =~ s/\Q$1\E//;
+    }
 
-	if($input) {
-		$value =  $input;
-	}
+    if($input) {
+        $value =  $input;
+    }
 
-	return integrate($value, $input);
+    return integrate($value, $input);
 }
 
 =item C<file_checksum($filename, $ignorePattern)>
@@ -209,13 +209,21 @@ sub genfile {
       last;
 
     }
-    if ($options{conditioned_lines} && /^#CONDITIONED_LINE\(([^)]+)\):(.*)/s) {
-      # lines of the form "CONDITIONED_LINE(var):..." are skipped if
-      # the "var" condition is false.
-      next unless Configure::Data->get($1);
-      $_ = $2;
+    if ( $options{conditioned_lines} ) {
+        # Lines with "#CONDITIONED_LINE(var):..." are skipped if
+        # the "var" condition is false.
+        # Lines with "#INVERSE_CONDITIONED_LINE(var):..." are skipped if
+        # the "var" condition is true.
+        if ( m/^#CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
+            next unless Configure::Data->get($1);
+            $_ = $2;
+        }
+        elsif ( m/^#INVERSE_CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
+            next if Configure::Data->get($1);
+            $_ = $2;
+        }
     }
-    if ($options{replace_slashes}) {
+    if ( $options{replace_slashes} ) {
       s{(/+)}{
 	my $len = length $1;
 	my $slash = Configure::Data->get('slash');
@@ -252,6 +260,7 @@ C<$err>.
 
 sub _run_command {
     my ($command, $out, $err) = @_;
+
     my $verbose = Configure::Data->get('verbose');
 
     if ($verbose) {
@@ -308,9 +317,9 @@ Generates F<test.c> from the specified source file.
 =cut
 
 sub cc_gen {
-	my($source)=@_;
+    my ( $source ) = @_;
 
-	genfile($source, "test.c");
+    genfile($source, "test.c");
 }
 
 =item C<cc_build($cc_args, $link_args)>
@@ -324,21 +333,22 @@ Calls the compiler and linker on F<test.c>.
 =cut
 
 sub cc_build {
-  my ($cc_args, $link_args) = @_;
-  $cc_args = '' unless defined $cc_args;
-  $link_args = '' unless defined $link_args;
+    my ($cc_args, $link_args) = @_;
 
-  my ($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)=
-  Configure::Data->get( qw(cc ccflags ld_out o link linkflags
-                        cc_exe_out exe libs) );
+    $cc_args = '' unless defined $cc_args;
+    $link_args = '' unless defined $link_args;
 
-  _run_command("$cc $ccflags $cc_args -I./include -c test.c",
+    my ($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)=
+    Configure::Data->get( qw(cc ccflags ld_out o link linkflags
+                          cc_exe_out exe libs) );
+
+    _run_command("$cc $ccflags $cc_args -I./include -c test.c",
       'test.cco', 'test.cco')
-    and confess "C compiler failed (see test.cco)";
+        and confess "C compiler failed (see test.cco)";
 
-  _run_command("$link $linkflags $link_args test$o ${cc_exe_out}test$exe $libs",
+    _run_command("$link $linkflags $link_args test$o ${cc_exe_out}test$exe $libs",
       'test.ldo', 'test.ldo')
-    and confess "Linker failed (see test.ldo)";
+        and confess "Linker failed (see test.ldo)";
 }
 
 =item C<cc_run()>
@@ -349,7 +359,7 @@ F<test.out>.
 =cut
 
 sub cc_run {
-	my $exe=Configure::Data->get('exe');
+    my $exe=Configure::Data->get('exe');
     my $slash=Configure::Data->get('slash');
 
     if (defined($_[0]) && length($_[0])) {
@@ -377,7 +387,7 @@ F<test.out>.
 =cut
 
 sub cc_run_capture {
-	my $exe=Configure::Data->get('exe');
+    my $exe=Configure::Data->get('exe');
     my $slash=Configure::Data->get('slash');
 
     if (defined($_[0]) && length($_[0])) {
@@ -404,9 +414,9 @@ Cleans up all files in the root folder that match the glob F<test.*>.
 =cut
 
 sub cc_clean {
-	unlink map "test$_",
-		qw( .c .cco .ldo .out),
-		Configure::Data->get( qw( o exe ) );
+    unlink map "test$_",
+               qw( .c .cco .ldo .out),
+               Configure::Data->get( qw( o exe ) );
 }
 
 =back

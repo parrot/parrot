@@ -87,8 +87,7 @@ sub makefiles {
   genfile('config/gen/makefiles/parrot_compiler.in', 'languages/parrot_compiler/Makefile',
           commentType => '#', replace_slashes => 1);
 
-  my $perldoc = Configure::Data->get('perldoc');
-  if ($perldoc) {
+  if ( Configure::Data->get('has_perldoc') ) {
     # set up docs/Makefile, partly based on the .ops in the root dir
   
     opendir OPS, "ops" or die "opendir ops: $!";
@@ -117,9 +116,9 @@ EOM
     }
   
     close MAKEFILE
-    } else {
-        print "\nNo Perldoc, not generating a docs makefile.\n";
-    }
+  } else {
+    print "\nNo Perldoc, not generating a docs makefile.\n";
+  }
 }
 
 1;

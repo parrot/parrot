@@ -73,6 +73,10 @@ folder.
 Generation steps usually do not output anything under normal
 circumstances.
 
+Templates for to be generated files usually have the extension '.in'.
+There is variable substitutes and funny macros like 'CONDITIONED_LINE'
+and INVERSE_CONDITIONED_LINE'.
+
 =head2 Prompt or Probe?
 
 It can sometimes be hard to decide whether a given step should be an
