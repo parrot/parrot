@@ -1,4 +1,4 @@
-o = ${o}
+O = ${o}
 SO = ${so}
 A = ${a}
 RM_F = ${rm_f}
