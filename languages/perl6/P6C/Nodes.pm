@@ -30,6 +30,18 @@ types, a reference to the contents' parse tree.
 
 use Class::Struct P6C::sv_literal => { qw(type $ lval $) };
 
+sub P6C::sv_literal::min_listlen {
+    my $obj = shift;
+    return 1 if P6C::Util::is_scalar($obj->type);
+    return 0;
+}
+
+sub P6C::sv_literal::max_listlen {
+    my $obj = shift;
+    return 1 if P6C::Util::is_scalar($obj->type);
+    return undef;
+}
+
 =item B<variable>
 
 A variable.
@@ -67,6 +79,18 @@ use Class::Struct P6C::variable => { qw(type     $
 					implicit $
 					topical  $
 					name     $) };
+
+sub P6C::variable::min_listlen {
+    my $obj = shift;
+    return 1 unless $obj->{ctx}->flatten;
+    return scalar(P6C::Util::is_scalar($obj->type));
+}
+
+sub P6C::variable::max_listlen {
+    my $obj = shift;
+    return 1 unless $obj->{ctx}->flatten;
+    return scalar(P6C::Util::is_scalar($obj->type));
+}
 
 =item B<Binop>
 

@@ -955,37 +955,45 @@ whose name is returned.
 sub do_flatten_array {
     my ($vals, $off) = @_;
     $off ||= 0;
+    $vals = [ @$vals[$off..$#$vals] ];
+
+    # Optimization (for readability more than speed): if each of the
+    # values is known to be a single scalar value, then the code to
+    # generate the list can be much simpler.
+    my $dynamic = 0;
+    if (grep { ! $_->can("min_listlen") || $_->min_listlen != 1 } @$vals) {
+        $dynamic = 1; # darn
+    }
+    if (! $dynamic && grep { ! $_->can("max_listlen") } @$vals) {
+        $dynamic = 1; # darn
+    }
+    if (! $dynamic && grep { my $max = $_->max_listlen; ! defined $max || $max != 1 } @$vals) {
+        $dynamic = 1; # darn
+    }
+
     my $tmp = newtmp 'PerlArray';
     my $len = gentmp 'int';
-    my $offset = gentmp 'int';
-    my $tmpindex = gentmp 'int';
+    my $offset = $dynamic ? gentmp('int') : 0;
     my $ptmp = gentmp 'PerlUndef';
-    code(<<END);
-# START array flattening.
-	$offset = 0
-END
-    for my $i ($off .. $#{$vals}) {
-	if ($vals->[$i]->isa('P6C::sv_literal')) {
-	    my $itemval = $vals->[$i]->lval;
-	    code(<<END);
-	$tmp\[$offset] = $itemval
-	inc $offset
-END
+    code("# START array flattening.");
+    code("\t$offset = 0") if $dynamic;
+    foreach my $val (@$vals) {
+	if ($val->isa('P6C::sv_literal')) {
+	    my $itemval = $val->lval;
+            code("\t$tmp\[$offset] = $itemval");
+            code("\tinc $offset") if $dynamic;
 	} else {
-	    my $item = $vals->[$i]->val;
-	    code(<<END);
-	$len = $item
-END
-	    code(gen_counted_loop($len, <<END));
-	$ptmp = $item\[$len]
-	$tmpindex = $offset + $len
-	$tmp\[$tmpindex] = $ptmp
-END
-	    code(<<END);
-	$len = $item
-	$offset = $offset + $len
-END
-	}
+            $val->{ctx}->type('PerlUndef') if ! $dynamic;
+	    my $item = $val->val;
+            if ($dynamic) {
+                do_append_array($tmp, $item);
+                code("\t$len = $item");
+                code("\t$offset = $offset + $len");
+            } else {
+                code("\t$tmp\[$offset] = $item");
+            }
+        }
+        ++$offset if ! $dynamic;
     }
     code("# END array flattening\n");
     return $tmp;
