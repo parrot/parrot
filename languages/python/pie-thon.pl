@@ -30,6 +30,7 @@ my %builtins = (
     dict => 'v',
     divmod => 1,
     enumerate => 1,
+    float => 1,
     hash => 1,
     id => 1,
     filter => 1,
@@ -493,6 +494,7 @@ EOC
 EOC
     }
     else {
+	$c = 'py_float' if $c eq 'float'; # XXX imcc name clash
 	$globals{$c} = 1;
 	my $type = 'pmc';
 	$type = 'NCI' if ($builtins{$c});
@@ -638,6 +640,30 @@ sub BINARY_DIVIDE
 {
     my ($n, $c, $cmt) = @_;
     binary('/', $cmt);
+}
+sub BINARY_POWER
+{
+    my ($op, $cmt) = @_;
+    my $r = pop @stack;
+    my $l = pop @stack;
+    my ($t, $n);
+    if ($r->[2] eq 'I' && $l->[2] eq 'I') {
+	$n = temp($t = 'N');
+	print <<"EOC";
+	$n = pow $l->[1], $r->[1] $cmt
+EOC
+    }
+    else {
+	my $nl = temp('N');
+	my $nr = temp('N');
+	$n = temp($t = 'N');
+	print <<"EOC";
+	$nl = $l->[1]
+	$nr = $r->[1]
+	$n = pow $nl, $nr $cmt
+EOC
+    }
+    push @stack, [-1, $n, $t];
 }
 sub inplace
 {
@@ -1090,8 +1116,8 @@ sub BUILD_TUPLE
 {
     my ($n, $c, $cmt, $type) = @_;
     # TODO iter for FixedPMCArray
-    # $type = "FixedPMCArray" unless defined $type;
-    $type = "PerlArray";
+    $type = "FixedPMCArray" unless defined $type;
+    # $type = "PerlArray";
     my ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
     if ($opcode eq 'UNPACK_SEQUENCE') {
 	$code_l++;

@@ -281,7 +281,7 @@ For Python returns its repr.
             INTVAL j, n;
             PMC *val;
 
-            res = string_from_cstring(INTERP, "(", 0);
+            res = string_from_cstring(INTERP, "[", 0);
             n = VTABLE_elements(INTERP, SELF);
             for (j = 0; j < n; ++j) {
                 val = SELF.get_pmc_keyed_int(j);
@@ -292,7 +292,7 @@ For Python returns its repr.
                             const_string(INTERP, ", "), 0);
             }
             res = string_append(INTERP, res,
-                        const_string(INTERP, ")"), 0);
+                        const_string(INTERP, "]"), 0);
             return res;
         }
 

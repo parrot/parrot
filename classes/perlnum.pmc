@@ -94,7 +94,9 @@ Returns the number as a Parrot string.
             /* XXX make a Python format string */
             STRING *s = Parrot_sprintf_c(interpreter, "%s%.12g", sign, d);
             if (string_str_index(interpreter, s,
-                        const_string(interpreter, "."), 0) == -1)
+                        const_string(interpreter, "."), 0) == -1 &&
+                    string_str_index(interpreter, s,
+                        const_string(interpreter, "e"), 0) == -1)
                 string_append(INTERP, s, const_string(INTERP, ".0"), 0);
             return s;
         }
@@ -111,7 +113,9 @@ Returns the number as a Parrot string.
             /* XXX make a Python format string */
             STRING *s = Parrot_sprintf_c(interpreter, "%s%.17g", sign, d);
             if (string_str_index(interpreter, s,
-                        const_string(interpreter, "."), 0) == -1)
+                        const_string(interpreter, "."), 0) == -1 &&
+                    string_str_index(interpreter, s,
+                        const_string(interpreter, "e"), 0) == -1)
                 string_append(INTERP, s, const_string(INTERP, ".0"), 0);
             return s;
         }

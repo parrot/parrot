@@ -63,7 +63,9 @@ inline op print_item(in NUM) :base_io {
   s = Parrot_sprintf_c(interpreter, "%.12g", (double)$1);
   PIO_putps(interpreter, io, s);
   if (string_str_index(interpreter, s,
-	const_string(interpreter, "."), 0) == -1)
+	const_string(interpreter, "."), 0) == -1 &&
+      string_str_index(interpreter, s,
+	const_string(interpreter, "e"), 0) == -1)
     PIO_puts(interpreter, io, ".0");
   PIO_softspace(interpreter, io, 1);
   goto NEXT();

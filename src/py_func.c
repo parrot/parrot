@@ -120,7 +120,7 @@ parrot_py_dict(Interp *interpreter, PMC *argv)
 static PMC *
 parrot_py_divmod(Interp *interpreter, PMC *nom, PMC *denom)
 {
-    PMC *tupl = pmc_new(interpreter, enum_class_PerlArray); /* XXX */
+    PMC *tupl = pmc_new(interpreter, enum_class_FixedPMCArray);
     PMC *pmod =  pmc_new(interpreter, enum_class_PerlInt);
     PMC *pdiv =  pmc_new(interpreter, enum_class_PerlInt);
     VTABLE_modulus(interpreter, nom, denom, pmod);
@@ -168,6 +168,21 @@ parrot_py_list(Interp *interpreter, PMC *argv)
         VTABLE_set_pmc_keyed_int(interpreter, list, i++, item);
     }
     return list;
+}
+
+static PMC *
+parrot_py_float(Interp *interpreter, PMC *arg)
+{
+    PMC *ret;
+    switch (arg->vtable->base_type) {
+        case enum_class_PerlNum:
+            return arg; /* XXX copy? */
+        default:
+            ret = pmc_new(interpreter, enum_class_PerlNum);
+            VTABLE_set_number_native(interpreter, ret,
+                    VTABLE_get_number(interpreter, arg));
+    }
+    return ret;
 }
 
 static PMC *
@@ -415,6 +430,23 @@ parrot_py_reduce(Interp *interpreter, PMC *func, PMC *list /*, PMC *init */)
 }
 
 static PMC *
+parrot_py_repr(Interp *interpreter, PMC *pmc)
+{
+    PMC *res = pmc_new(interpreter, enum_class_PerlString);
+    STRING *repr =  CONST_STRING(interpreter, "__repr__");
+    PMC *meth = VTABLE_find_method(interpreter, pmc, repr);
+    if (!meth) {
+        real_exception(interpreter, NULL, METH_NOT_FOUND,
+                "Method '%Ss' not found", repr);
+    }
+    REG_PMC(2) = pmc;
+    REG_PMC(0) = meth;
+    (void*)VTABLE_invoke(interpreter, meth, NULL);
+    VTABLE_set_string_native(interpreter, res, REG_STR(5));
+    return res;
+}
+
+static PMC *
 parrot_py_hash(Interp *interpreter, PMC *pmc)
 {
     PMC *h = pmc_new_noinit(interpreter, enum_class_PerlInt);
@@ -493,11 +525,20 @@ parrot_py_tuple(Interp *interpreter, PMC *pmc)
     STRING *s;
 
     switch (pmc->vtable->base_type) {
+        case enum_class_FixedPMCArray:
+            return pmc;  /* XXX copy ? */
         case enum_class_PerlArray:
-            return pmc;
+            ar = pmc_new(interpreter, enum_class_FixedPMCArray);
+            n = VTABLE_elements(interpreter, pmc);
+            VTABLE_set_integer_native(interpreter, ar, n);
+            for (i = 0; i < n; ++i) {
+                VTABLE_set_pmc_keyed_int(interpreter, ar, i,
+                        VTABLE_get_pmc_keyed_int(interpreter, pmc, i));
+            }
+            return ar;
         case enum_class_String:
         case enum_class_PerlString:
-            ar = pmc_new(interpreter, enum_class_PerlArray);
+            ar = pmc_new(interpreter, enum_class_FixedPMCArray);
             s = PMC_str_val(pmc);
             n = string_length(interpreter, s);
             VTABLE_set_integer_native(interpreter, ar, n);
@@ -577,12 +618,14 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *hash     = CONST_STRING(interpreter, "hash");
     STRING *id       = CONST_STRING(interpreter, "id");
     STRING *list     = CONST_STRING(interpreter, "list");
+    STRING *floatf   = CONST_STRING(interpreter, "py_float");
     STRING *longf    = CONST_STRING(interpreter, "long");
     STRING *map      = CONST_STRING(interpreter, "map");
     STRING *max      = CONST_STRING(interpreter, "max");
     STRING *min      = CONST_STRING(interpreter, "min");
     STRING *range    = CONST_STRING(interpreter, "range");
     STRING *reduce   = CONST_STRING(interpreter, "reduce");
+    STRING *repr   =   CONST_STRING(interpreter, "repr");
     STRING *tuple    = CONST_STRING(interpreter, "tuple");
 
     parrot_py_global(interpreter, F2DPTR(parrot_py_assert_e), assert_e, pip);
@@ -596,11 +639,13 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_id), id, ip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_long), longf, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_float), floatf, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_max), max, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_min), min, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_range), range, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_reduce), reduce, pipp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_repr), repr, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_tuple), tuple, pipp);
 }
 

@@ -85,7 +85,7 @@ BIN             0b[01]+
 DOT		[.]
 SIGN            [-+]
 BIGINT          {SIGN}?{DIGITS}"L"
-FLOATNUM        {SIGN}?({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?
+FLOATNUM        {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?|{DIGITS}[eE]{SIGN}?{DIGITS})
 LETTERDIGIT     [a-zA-Z0-9_]
 LABELLETTERDIGIT     ([a-zA-Z0-9_@]|"::")
 ID              {LETTER}{LABELLETTERDIGIT}*

@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 11;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -70,5 +70,18 @@ if __name__ == '__main__':
     print a[0], a[1]
 CODE
 
+test(<<'CODE', 'tuple vs list');
+if __name__ == '__main__':
+    print (1,2,3)
+    print range(3)
+    print list(range(3))
+    print tuple(range(3))
+CODE
+
+test(<<'CODE', 'float');
+if __name__ == '__main__':
+    print float(1e100)
+    print 1.5, float("1.5")
+CODE
 
 

@@ -167,6 +167,41 @@ Returns the number of elements in the array.
         return DYNDYNSELF.elements();
     }
 
+/*
+
+=item C<STRING *get_string()>
+
+Returns the number of elements in the array as a Parrot string.
+
+For Python returns its repr.
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE)) {
+            STRING *res, *s;
+            INTVAL j, n;
+            PMC *val;
+
+            res = string_from_cstring(INTERP, "(", 0);
+            n = VTABLE_elements(INTERP, SELF);
+            for (j = 0; j < n; ++j) {
+                val = SELF.get_pmc_keyed_int(j);
+                res = string_append(INTERP, res,
+                        VTABLE_get_repr(INTERP, val), 0);
+                if (j < n - 1)
+                    res = string_append(INTERP, res,
+                            const_string(INTERP, ", "), 0);
+            }
+            res = string_append(INTERP, res,
+                        const_string(INTERP, ")"), 0);
+            return res;
+        }
+
+        return string_from_int(INTERP, DYNSELF.elements());
+    }
 
 /*
 
@@ -464,6 +499,78 @@ C<value>.
         DYNSELF.set_pmc_keyed_int(k, value);
     }
 
+/*
+
+=item C<INTVAL is_equal (PMC* value)>
+
+The C<==> operation. Compares two array to hold equal elements.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+        INTVAL j, n;
+
+        if (value->vtable->base_type != enum_class_FixedPMCArray)
+            return 0;
+        n = SELF.elements();
+        if (VTABLE_elements(INTERP, value) != n)
+            return 0;
+        for (j = 0; j < n; ++j) {
+            PMC *item1, *item2;
+            item1 = SELF.get_pmc_keyed_int(j);
+            item2 = VTABLE_get_pmc_keyed_int(INTERP, value, j);
+            if (item1 == item2)
+                continue;
+            if (!mmd_dispatch_i_pp(INTERP, item1, item2, MMD_EQ))
+                return 0;
+        }
+        return 1;
+    }
+
+/*
+
+=item C<PMC* slice (PMC *key, INTVAL f)>
+
+Return a new iterator for the slice PMC C<key> if f == 0.
+
+Return a new pythonic array slice if f == 1.
+
+=item C<PMC* get_iter ()>
+
+Return a new iterator for SELF.
+
+=cut
+
+*/
+
+    PMC* slice (PMC* key, INTVAL f) {
+        switch (f) {
+            case 0:
+                {
+                    PMC *iter = pmc_new_init(interpreter,
+                            enum_class_Iterator, SELF);
+                    PMC_struct_val(iter) = key;
+                    return iter;
+                }
+            case 1:
+                return Parrot_py_get_slice(INTERP, SELF, key);
+        }
+        internal_exception(1, "Array: Unknown slice type");
+        return NULL;
+    }
+
+    PMC* get_iter () {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+        PMC_int_val(key) = 0;
+        if (!((List *) PMC_data(SELF))->length)
+            PMC_int_val(key) = -1;
+        return iter;
+    }
 }
 
 /*
