@@ -119,9 +119,9 @@ InitializeCoreOps:
     .AddCoreOp(Int_And, "and")
     .AddCoreOp(Int_Or, "or")
     .AddCoreOp(Int_XOr, "xor")
-# invert
-# lshift
-# rshift
+    .AddCoreOp(Int_Invert, "invert")
+    .AddCoreOp(Int_LShift, "lshift")
+    .AddCoreOp(Int_RShift, "rshift")
     set .UserOps["2*"], "2 *" # 2*
 # d2*
     set .UserOps["2/"], "2 /" # 2/
@@ -246,8 +246,8 @@ InitializeCoreOps:
     .AddCoreOp(Int_Drop,"drop")
     set .UserOps["nip"], "swap drop" # nip
     .AddCoreOp(Int_Dup,"dup")
-# over
-# tuck
+    .AddCoreOp(Int_Over, "over")
+    set .UserOps["tuck"], "swap over"
     .AddCoreOp(Int_Swap,"swap")
 # pick
 # rot
@@ -486,6 +486,12 @@ InitializeCoreOps:
     #
 
 # nextname
+
+   #
+   # Miscellaneous other stuff
+   #
+   set .UserOps["false"], "0"
+   set .UserOps["true"], "0 invert"
 
     ret
 
@@ -847,6 +853,33 @@ Int_XOr:
     set .TempInt, .IntStack
     restore .IntStack
     bxor .IntStack, .TempInt
+    save .IntStack
+    branch DoneInterpretWord
+Int_Invert:
+    restore .IntStack
+    bnot .IntStack, .IntStack
+    save .IntStack
+    branch DoneInterpretWord
+Int_LShift:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    shl .IntStack, .IntStack, .TempInt
+    save .IntStack
+    branch DoneInterpretWord
+Int_RShift:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    shr .IntStack, .IntStack, .TempInt
+    save .IntStack
+    branch DoneInterpretWord
+Int_Over:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    save .IntStack
+    save .TempInt
     save .IntStack
     branch DoneInterpretWord
 
