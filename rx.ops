@@ -4,7 +4,7 @@
 
 #include "parrot/rx.h"
 
-#define RxAssertMore(rx, branchto) if(rx->index >= string_length(rx->string)) { goto OFFSET(branchto); }
+#define RxAssertMore(rx, branchto) if((UINTVAL)rx->index >= string_length(rx->string)) { goto OFFSET(branchto); }
 
 VERSION = PARROT_VERSION;
 
@@ -580,7 +580,7 @@ op rx_setprops(in pmc, in str, in int) {
 	rx->minlength=$3;
 
 	for(i=0; i < string_length($2); i++) {
-		switch((char)string_ord($2, i)) {
+		switch((char)string_ord($2, (INTVAL)i)) {
 			case 'i':
 				RxCaseInsensitive_on(rx);
 				break;
@@ -595,7 +595,7 @@ op rx_setprops(in pmc, in str, in int) {
 				rx->index=rx->startindex=string_length(rx->string);
 				break;
 			default:
-				fprintf(stderr, "Unknown regular expression option '%c'.", (char)string_ord($2, i));
+				fprintf(stderr, "Unknown regular expression option '%c'.", (char)string_ord($2, (INTVAL)i));
 				HALT();
 		}
 	}
@@ -649,7 +649,7 @@ B<XXX> Currently does not honor the C<i> modifier.
 =cut
 
 op rx_literal(in pmc, in str, in int) {
-	INTVAL i;
+	UINTVAL i;
 	RX_dUNPACK($1);
 
 	if(string_length(rx->string) < rx->index+string_length($2)) {
@@ -658,7 +658,7 @@ op rx_literal(in pmc, in str, in int) {
 	
 	/* This is faster than using substr--it avoids memory allocations. */
 	for(i=0; i < string_length($2); i++) {
-		if(string_ord(rx->string, rx->index+i) != string_ord($2, i)) {
+		if(string_ord(rx->string, rx->index+(INTVAL)i) != string_ord($2, (INTVAL)i)) {
 			goto OFFSET($3);
 		}
 	}
@@ -865,7 +865,7 @@ op rx_zwa_boundary(in pmc, in int) {
 	two=rx_is_word_character(interpreter, RxCurChar(rx));
 	RxAdvance(rx);
 
-	if(one && two || !one && !two) {
+	if((one && two) || (!one && !two)) {
 		goto OFFSET($2);
 	}
 	
@@ -907,7 +907,7 @@ B<XXX> Currently does not honor the C<m> modifier.
 op rx_zwa_atend(in pmc, in int) {
 	RX_dUNPACK($1);
 
-	if(rx->index != string_length(rx->string)) {
+	if((UINTVAL)rx->index != string_length(rx->string)) {
 		goto OFFSET($2);
 	}
 	

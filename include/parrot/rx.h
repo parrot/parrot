@@ -44,8 +44,8 @@ extern const char * RX_SPACECHARS;
 
 typedef struct rxinfo {
 	STRING *string;
-	UINTVAL index;
-	UINTVAL startindex;
+	INTVAL index;
+	INTVAL startindex;
 	BOOLVAL success;
 
 	rxflags flags;

@@ -86,7 +86,7 @@ STRING *rxP_get_substr(struct Parrot_Interp *interpreter, STRING * source, INTVA
 }
 
 Bitmap bitmap_make(struct Parrot_Interp *interpreter, STRING* str) {
-	INTVAL i, ch;
+	UINTVAL i, ch;
 	Bitmap bmp=mem_sys_allocate(sizeof(struct bitmap_t));
 	bmp->bmp=mem_sys_allocate(32);
 	bmp->bigchars=NULL;
@@ -120,7 +120,7 @@ void bitmap_add(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch) {
 
 BOOLVAL bitmap_match(Bitmap bmp, INTVAL ch) {
 	if(ch > 255) {
-		INTVAL i;
+		UINTVAL i;
 		
 		for(i=0; i < string_length(bmp->bigchars); i++) {
 			if(string_ord(bmp->bigchars, i) == ch) {
