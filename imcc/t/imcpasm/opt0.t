@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 3;
+use TestCompiler tests => 6;
 
 # these tests are run with -O0 by TestCompiler and show
 # generated PASM code for various optimizations at level 0
@@ -39,4 +39,40 @@ _test:
   sub N0, N16, N1
   set N16, I0
   div N0, N16, N1
+  invoke P1
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "added return - end");
+.sub _test
+   noop
+   end
+.end
+CODE
+_test:
+  noop
+  end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "added return - exit");
+.sub _test
+   noop
+   exit 0
+.end
+CODE
+_test:
+  noop
+  exit 0
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "added return - nil");
+.sub _test
+   noop
+.end
+CODE
+_test:
+  noop
+  invoke P1
 OUT

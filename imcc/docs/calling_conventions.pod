@@ -102,7 +102,14 @@ Only the top half of registers are preserved currently.
 =item * B<.param>
 
 The B<.param> declarations must be the first statements in the
-sub if any. No other statements are allowed between B<.param>.
+sub if any. No other statements are allowed between B<.param> -
+not even comments currently.
+
+=item * B<pcc_begin_return>, B<pcc_end_return>
+
+If there is no return value and the return should be the last
+instruction of the subroutine, this declaration pair can be omitted.
+Parrot provides an B<invoke P1> as last instruction automatically.
 
 =back
 
