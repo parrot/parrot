@@ -6,6 +6,8 @@
 
 TODO tests would also suffice, where possible.
 
+=item update docs/* 
+
 =back 4
 
 =head1 Programming Issues
@@ -30,16 +32,89 @@ moving the parser into a pmc.)
 An object is probably too heavyweight for this. A PMC with a few overloaded
 methods is probably sufficient.
 
+=item Use PMCs to handle numifying
+
+not the pir routines we now have. Verify that [expr 2a + 2b] behaves
+appropriately when doing this. Include proper numififcation of octal and
+hex
+
+=back 4
+
+=head2 PIR-level tasks
+
+=over 4
+
+=item interactive tclsh
+
+interactive tclsh mode currently only waits for EOF and then runs all
+commands entered. should have sane defaults for tcl_prompt1, tcl_prompt2
+and respect them, and process intermediate input.
+
+=item implement default globals, etc.
+
+global variables provided by tcl libary. L<tclvars>.
+
+global variables provided by tcl interpreter. L<tclsh>
+
+source per-user settings. L<tclsh>
+
+=item misc
+
+octal and hex escapes are not supported. (Not sure parrot is
+ready for this yet) in C<lib/parser.imc>
+
+=item unimplemented commands/subcommands
+
+[after] [array get] [array names] [array unset] 
+[array statistics] [array anymore] [array donesearch]
+[array nextelement] [array startsearch] [bgerror] [binary] 
+[case] [clock] [close] [cd] [dde] [encoding] [eof] [exec]
+[fblocked] [fconfigure] [fcopy] [file] [filename] [fileevent]
+[flush] [foreach] [gets] [glob] [http] [info] [interp] [library]
+[lindex] [load] [lreplace] [lsearch] [lset] [lsort] 
+[memory] [msgcat] [namespace] [open] [package] [pid] [pwd]
+[read] [registry] [regexp] [regsub] [resource] 
+[safe] [scan] [seek] [socket] [subst]
+[string repeat] [string replace] [string tolower]
+[string totitle] [string toupper] [string trim] [string trimleft]
+[string trimright] [string compare] [string equal] [string last]
+[string bytelength] [string compare] [string is] [string map]
+[string wordstart] [string wordend] [string map] [switch] [tcltest]
+[tell] [update] [variable] [vwait]
+
+=item interpreter exit value
+
+If the return type of the outermost script is not OK, return the
+I<appropriate> code to the system.
+
+
+=back 4
+
+=head2 Tests
+
+=over 4
+
+=item standards
+
+Any future tests, write more like t/tcl_var_subst.t. Eventually cleanup
+tests so they're consistent.
+
+=item Add tests for...
+
+tclword.imc tcl*.pmc
+[concat] [join] [lrepeat] [uplevel] [upvar]
+[lrange] [array set] [global] [string match] [inline]
+the macros?
+expr's precedence and parens
+[puts]'s ability to write to other channels.
+
+=item pass tcl test suite
+
 =back 4
 
 =head1 Uncategorized Issues
 
 =over 4
-
-=item given PGE
-
-[array get] [array names] [array unset] 
-[regexp] [regsub] [switch] [glob]
 
 =item From leo - cleanup of tcl objects.
 
@@ -79,13 +154,6 @@ PIR support before welding in.
 
 =item add benchmarks?
 
-=item cross language compatibility 
-
-We need to make sure that we I<take> any PMC and try to do the right
-thing. Don't I<require> that someone pass in a TclString when a PerlString
-will work fine, thanks. This is now a bigger issue when using the [list] ops.
-if someone passes in a fixed list and we need to resize it... what do we do?
-
 =item given freeze/thaw for objects...
 
 Once freeze/thaw is working for tclwords (currently waiting on parrot
@@ -108,12 +176,6 @@ Move TclWord namespace into _Tcl::Word, less clutter?
 
 This will be much easier to do when we can call into the parser from
 the TclList PMC. (is this already doable?)
-
-=item [[list]] proc
-
-doesn't handle varargs.
-
-support default values (e.g.: proc joe {{drink coffee}} { slurp $drink } )
 
 =item compiler vs. interpreter
 
@@ -140,58 +202,6 @@ Comparing examples/fact.tcl with parrot vs. tclsh (OSX)
  ??/??/??: 8-12 x slower, single call
  05/14/04: 500 calls in a loop slows us down to 60x!
  11/22/04: 500 calls in a loop: only 10x slower!
-
-=item Tests
-
-Any future tests, write more like t/tcl_var_subst.t. Eventually cleanup
-tests so they're consistent.
-
-=item Add tests for...
-
-tclword.imc tcl*.pmc
-[concat] [join] [lrepeat] [uplevel] [upvar]
-[lrange] [array set] [global] [string match] [inline]
-the macros?
-expr's precedence and parens
-[puts]'s ability to write to other channels.
-
-=item update docs/* 
-
-with the parser/interpreter split, things are different.
-(And, hopefully, easier.)
-
-=item Use PMCs to handle numifying
-
-not the pir routines we now have. Verify that [expr 2a + 2b] behaves
-appropriately when doing this. Include proper numififcation of octal and
-hex
-
-=item test suite patches
-
-need to patch testall so that it's not so cranky about people
-who don't play nice with the new tests...
-
-=item unfinished commands
-
-[array statistics] - useless?
-
-[array anymore], [array donesearch] [array nextelement], [array startsearch]
- { use iterators }
-
-[string repeat], [string replace], [string tolower],
-[string totitle], [string toupper], [string trim], [string trimleft],
-[string trimright], [string compare], [string equal], [string last]
-
-[string bytelength], [string compare], [string is], [string map],
-[string wordstart], [string wordend]
-
-=item given [list]
-
-[foreach]
-
-=item given arrays
-
-[string map]
 
 =item expr
 
@@ -228,78 +238,7 @@ PMCs and putting the logic in there hidden under MMD}
 
 =item misc
 
-tclsh normally does some extra processing that we aren't doing, namely
-.tclshrc/tclshrc.tcl, setting of variables argc, argv, argv0, and
-tcl_interactive... see also "man n tclvars"
-
-=item misc
-
-interactive tclsh mode currently only waits for EOF and then runs all
-commands entered. should have sane defaults for tcl_prompt1, tcl_prompt2
-and respect them, and process intermediate input.
-
-=item misc
-
-octal and hex escapes are not supported. (Not sure parrot is
-ready for this yet)
-
-=item tests 
-
-run a tcl test suite (7.6p2 ?) and pass one test.
-(then, pass most of them.) (then, retarget against tcl-latest)
-
-=item misc
-
 complete [error] (need global var support)
-
-If the return type of the outermost script is not OK, return the
-I<appropriate> code to the system.
-
-=item missing procs
-
-Here's a list of commands from the 7.3 Ousterhout book that have yet to be
-implemented. Just because something is implemented doesn't mean it's a full
-implementation, either. That's what the test suite is for. =-) I've tried
-to group them so that any procs that depend on another proc to really work
-are so listed, and that related procs are grouped together. Some are SMOPs
-at this point, others require me to add features, or refactor. Many already
-implemented procs will require updating after procs/features are added.
-
-  lreplace, lsearch, lsort, foreach, scan
-
-  cd, file, pwd, pid, glob
-
-  seek, tell, open, close, eof, flush (use pioctl?), read, gets, close
-
-  info, exec {use exec/spawn opcodes.}
-
-  auto_mkindex*, trace*
-
-  unknown, history [ only in interactive mode ]
-
-  * isn't a recent distro of tcl
-  
-  And, here are more from a more recent tcl in no order.
-
-  after bgerror binary case clock dde
-  encoding fblocked fconfigure (use pioctl?) fcopy fileevent filename
-  http interp {setup our current single parser/interp as an pmc?}
-  library lindex load lset memory
-  msgcat namespace package packagens
-  pkgMkIndex registry resource
-  safe socket subst (use our parser?) tcltest
-  update variable vwait
- 
-  also see "man n tclvars"
-
-=item tests
-
-Long term goal: Run the tcl test suite. Will an  older one, be easier to pass?
-Yes, much easier. We still have a ways to go, however. To run all the tests,
-run tclsh, sourcing "<tcl distro>tests/all".
-
-The sooner we can do this, the better, as I only want to have tests for
-internals, not for any Tcl.
 
 =back 4
 
