@@ -500,6 +500,7 @@ INTVAL PIO_seek(theINTERP, ParrotIO * io, INTVAL hi, INTVAL lo,
                         l = PIO_DOWNLAYER(l);
                 }
         }
+        return -1;
 }
 
 
