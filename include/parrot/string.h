@@ -23,7 +23,7 @@ typedef struct {
     INTVAL strlen;
     const ENCODING *encoding;
     const CHARTYPE *type;
-    INTVAL lanugage;
+    INTVAL language;
 } STRING;
 
 
