@@ -55,7 +55,7 @@ sub output_is() {
 	$pir_file = Parrot::Test::slurp_file($pir_f);
     }
     else {
-	$cmd = $self->{relpath}. $self->{parrot} . " ${args} $pir_f";
+	$cmd = $self->{relpath}. $self->{parrot} . " --python ${args} $pir_f";
 	# print STDERR "$cmd\n";
 	$exit_code = Parrot::Test::_run_command($cmd, STDOUT => $pir_out_f);
 	$pir_file = Parrot::Test::slurp_file($pir_out_f);

@@ -28,6 +28,52 @@ pmclass Boolean extends PerlInt {
 
 /*
 
+=item C<class_init ()>
+
+Define 3 pythonic globals C<True>, C<False>, and C<__debug__>.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            PMC *t;
+            t = pmc_new(interp, enum_class_Boolean);
+            PMC_int_val(t)  = 1;
+            Parrot_store_global(interp, NULL,
+                    const_string(interp, "True"), t);
+            t = pmc_new(interp, enum_class_Boolean);
+            Parrot_store_global(interp, NULL,
+                    const_string(interp, "False"), t);
+            t = pmc_new(interp, enum_class_Boolean);
+            PMC_int_val(t)  = 1;
+            Parrot_store_global(interp, NULL,
+                    const_string(interp, "__debug__"), t);
+        }
+    }
+
+/*
+
+=item C<STRING* get_string ()
+
+Return "True" or "False" if python_mode is true.
+
+=cut
+
+*/
+    STRING* get_string () {
+        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE))
+            return PMC_int_val(SELF) ?
+                const_string(INTERP, "True") :
+                const_string(INTERP, "False");
+        else
+            return SUPER();
+    }
+
+
+/*
+
 =item C<void set_integer_native (INTVAL value)>
 
 =cut

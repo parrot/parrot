@@ -1881,6 +1881,7 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 #    undef Parrot_jit_vtable1_op
 #    undef Parrot_jit_vtable1r_op
 
+#    undef Parrot_jit_vtable_111_op
 #    undef Parrot_jit_vtable_112_op
 #    undef Parrot_jit_vtable_221_op
 #    undef Parrot_jit_vtable_1121_op
@@ -2249,6 +2250,16 @@ Parrot_jit_vtable_112_op(Parrot_jit_info_t *jit_info,
     Parrot_jit_vtable_n_op(jit_info, interpreter, 2, a);
 }
 
+/* emit a call to a vtable func
+ * $1->vtable(interp, $1, $1)
+ */
+static void
+Parrot_jit_vtable_111_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    int a[] = { 1, 1 };
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, a);
+}
 /* emit a call to a vtable func
  * $2->vtable(interp, $2, $1)
  */

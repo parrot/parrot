@@ -613,6 +613,20 @@ Compares the complex number with C<value> and returs true if they are equal.
         return (RE(SELF) == VTABLE_get_number(INTERP, value));
     }
 
+/*
+
+=item C<void absolute()>
+
+Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
+
+=cut
+
+*/
+
+    void absolute(PMC *dest) {
+        FLOATVAL d = sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF));
+        VTABLE_set_number_native(INTERP, dest, d);
+    }
 }
 
 /*

@@ -507,6 +507,20 @@ Decrements the number.
     }
 /*
 
+=item C<void absolute()>
+
+Sets C<dest> to the absolute value of SELF.
+
+=cut
+
+*/
+
+    void absolute(PMC *dest) {
+        VTABLE_set_number_native(INTERP, dest, fabs(PMC_num_val(SELF)));
+    }
+
+/*
+
 =item C<void freeze(visit_info *info)>
 
 Used to archive the number.

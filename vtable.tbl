@@ -233,6 +233,7 @@ void repeat_int(INTVAL value, PMC* dest)     MMD_REPEAT_INT
 [MATH]
 void increment()
 void decrement()
+void absolute(PMC* dest)
 
 [EXISTS]
 INTVAL exists_keyed(PMC* key)

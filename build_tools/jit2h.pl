@@ -251,6 +251,7 @@ print JITCPU<<END_C;
 /*
  * the numbers corresspond to the registers
  */
+#define Parrot_jit_vtable_111_op Parrot_jit_normal_op
 #define Parrot_jit_vtable_112_op Parrot_jit_normal_op
 #define Parrot_jit_vtable_221_op Parrot_jit_normal_op
 #define Parrot_jit_vtable_1121_op Parrot_jit_normal_op

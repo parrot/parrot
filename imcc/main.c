@@ -87,6 +87,8 @@ help(void)
     "    -c --pbc\n"
     "    -r --run-pbc\n"
     "    -y --yydebug\n"
+    "   <Language options>\n"
+    "       --python\n"
     "see docs/running.pod for more\n");
 }
 
@@ -117,6 +119,7 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 #define OPT_DESTROY_FLAG 129
 #define OPT_HELP_DEBUG   130
 #define OPT_PBC_OUTPUT   131
+#define OPT_PYTHON       132
 static struct longopt_opt_decl options[] = {
     { '.', '.', 0, { "--wait" } },
     { 'C', 'C', 0, { "--CGP-core" } },
@@ -145,6 +148,7 @@ static struct longopt_opt_decl options[] = {
     { 'v', 'v', 0, { "--verbose" } },
     { 'w', 'w', 0, { "--warnings" } },
     { 'y', 'y', 0, { "--yydebug" } },
+    { '\0', OPT_PYTHON, 0, { "--python" } },
     { 0, 0, 0, { NULL } }
 };
 
@@ -302,6 +306,9 @@ opt_t:
                 break;
             case OPT_DESTROY_FLAG:
                 setopt(PARROT_DESTROY_FLAG);
+                break;
+            case OPT_PYTHON:
+                setopt(PARROT_PYTHON_MODE);
                 break;
 
             default:

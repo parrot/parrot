@@ -16,7 +16,7 @@ Tests the Complex PMC.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -517,3 +517,13 @@ ok1
 ok2
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "abs");
+    new P0, .Complex
+    set P0, "4 + 3j"
+    new P1, .Undef
+    abs P1, P0
+    print P1
+    print "\n"
+CODE
+5
+OUTPUT

@@ -9,6 +9,10 @@ $DEFVAR = 'PerlInt';
 getopts('dnD', \%opt);
 $file = $ARGV[0];
 
+my %builtins = (
+    [ 'iabs', 1, 'I' ],   # no abs P,P
+);
+
 get_dis($DIS, $file);
 get_source($file);
 exit if $opt{D};
@@ -42,49 +46,20 @@ sub get_source {
     close(IN);
 }
 
-my ($code_l, %params, %lexicals, %names, %def_args, %arg_count);
+my ($code_l, %params, %lexicals, %names, %def_args, %arg_count, @code);
 
 sub decode_line {
     my $l = shift;
     my ($pc, $line ,$opcode, $arg, $rest);
     if ($l =~ /Disassembly of (\w+)/) {
-	$arg = $1;
-	print <<EOC;
-.end		# $cur_func
-
-.sub $arg prototyped
-	new_pad 0
-EOC
-	if ($def_args{$arg}) {
-	    my ($i, $n, $defs);
-	    $n = $arg_count{$arg};
-	    $defs = @{$def_args{$arg}};
-	# @{$def_args{$arg}}
-	    for ($i = $n; $i >= $defs; $i--) {
-		my $reg = 4 + $i;
-		my $d = pop @{$def_args{$arg}};
-		print <<EOC;
-	if argcP >= $i goto arg_ok
-	    find_global P$reg, "${arg}_$d"
-EOC
-	    }
-	    print <<EOC;
-arg_ok:
-EOC
-	}
-	$cur_func = $arg;
-	%params = ();
-	%lexicals = ();
-	%names = ();
-	return (undef, undef);
+	push @code, [ 0, 0, "New_func", 0, $1, undef ];
+	return;
     }
     if ($l =~ />>\s+(\d+)/) {
-	my $label = $1;
+	push @code, [ 0, $1, "Label", $1, "", undef ];
 	$l =~ s/>>//;
-	print <<EOC;
-pc_$label:
-EOC
     }
+    my $source = undef;
     if ($l =~ /^\s+	     # intial space
 	(?:(\d+)\s+)?   # optional line
 	(\d+)\s+        # PC
@@ -93,23 +68,75 @@ EOC
 	/x) {
 	($line, $pc, $opcode, $arg, $rest) = ($1, $2, $3, $4, $5);
 	if ($line) {
-	    print "\n##\t\t", $source[$line-1];
-	    if ($source[$line-1] =~ /def (\w+)\s*\((.*)\)/) {
+	    $source = $source[$line-1];
+	    if ($source =~ /def (\w+)\s*\((.*)\)/) {
 		my ($f, $args) = ($1, $2);
 		my @args = split(/,/, $args);
 		my $n = @args;
-		print "# '$f' $n args\n";
 		$arg_count{$f} = $n;
+		push @code, [$line, $pc, "ARG_count", $n, $f, $source];
 	    }
 	}
 	$arg = '' unless defined $arg;
 	$rest = '' unless defined $rest;
     }
     else {
-	print "# XXX $l";
+	push @code, [0,0, "XXX", 0, $l, ''];
+	return;
     }
-    ($line, $pc, $opcode, $arg, $rest);
+    push @code, [$line, $pc, $opcode, $arg, $rest, $source];
 }
+
+sub XXX {
+   my ($n, $c, $cmt) = @_;
+   print "#Unknown '$cmt'\n";
+}
+
+sub Label {
+   my ($n, $c) = @_;
+   print <<EOC;
+pc_$n:
+EOC
+}
+
+sub New_func {
+    my ($n, $arg) = @_;
+    print <<EOC;
+.end		# $cur_func
+
+.sub $arg prototyped
+	new_pad 0
+EOC
+    if ($def_args{$arg}) {
+	my ($i, $n, $defs);
+	$n = $arg_count{$arg};
+	$defs = @{$def_args{$arg}};
+	print "# @{$def_args{$arg}}\n";
+	for ($i = $n; @{$def_args{$arg}}; $i--) {
+	    my $reg = 4 + $i;
+	    my $d = pop @{$def_args{$arg}};
+	    print <<EOC;
+	if argcP >= $i goto arg_ok
+	    find_global P$reg, "${arg}_$d"
+EOC
+	}
+	print <<EOC;
+arg_ok:
+EOC
+    }
+    $cur_func = $arg;
+    %params = ();
+    %lexicals = ();
+    %names = ();
+}
+
+sub ARG_count {
+    my ($n, $c) = @_;
+    print <<EOC;
+	# $c($n)
+EOC
+}
+my (@stack, $temp, %globals, $make_f, %pir_functions);
 
 sub gen_code {
     $cur_func = 'test::main';
@@ -120,26 +147,27 @@ sub gen_code {
     __name__ = new $DEFVAR
     __name__ = '__main__'
 EOC
+    $globals{'__name__'} = 1;
     $code_l = 0;
-    while ($code_l < @dis) {
-	my $l = $dis[$code_l++];
-	my ($line , $pc, $opcode, $arg, $rest);
-	next if $l =~ /^\s*$/;
-	($line, $pc, $opcode, $arg, $rest) = decode_line($l);
-	next unless defined $pc;
-	print "\t\t\t\t# $opcode\t$arg $rest\n" unless $opt{n};
-	gen_pir($opcode, $arg, $rest);
+    for (@dis) {
+	next if /^\s*$/;
+	decode_line($_);
+    }
+    while ($code_l < @code) {
+	my $l = $code[$code_l++];
+	my ($opcode, $arg, $rest) = ($l->[2], $l->[3], $l->[4]);
+	my $cmt = "";
+	$cmt = "\t\t# $opcode\t$arg $rest" unless $opt{n};
+	gen_pir($opcode, $arg, $rest, $cmt);
     }
     print ".end\t\t# $cur_func\n";
 }
 
 sub gen_pir {
-    my ($opcode, $arg, $rest) = @_;
+    my ($opcode, $arg, $rest, $cmt) = @_;
     no strict "refs";
-    &$opcode($arg, $rest);
+    &$opcode($arg, $rest, $cmt);
 }
-
-my (@stack, $temp, %globals, $make_f, %pir_functions);
 
 sub temp {
     my $t = $_[0];
@@ -174,19 +202,24 @@ EOC
     $n;
 }
 
-sub LOAD_CONST{
-    my ($n, $c) = @_;
+sub LOAD_CONST {
+    my ($n, $c, $cmt) = @_;
     if ($c =~ /^[_a-zA-Z]/ && !$names{$c}) {
 	print <<EOC;
-	.local pmc $c
+	.local pmc $c $cmt
 	$c = new .$c
 EOC
 	$names{$c} = 1;
     }
+    else {
+	print <<EOC;
+	$cmt
+EOC
+    }
     push @stack, [$n, $c, typ($c)];
 }
-sub STORE_NAME() {
-    my ($n, $c) = @_;
+sub STORE_NAME {
+    my ($n, $c, $cmt) = @_;
     if ($make_f) {
 	$make_f = 0;
 	return;
@@ -194,14 +227,14 @@ sub STORE_NAME() {
     my $tos = pop @stack;
     if ($globals{$c}) {
 	print <<"EOC";
-	assign $c, $tos->[1]
+	assign $c, $tos->[1] $cmt
 EOC
     }
     else {
 	$globals{$c} = 1;
 	$names{$c} = 1;
 	print <<"EOC";
-        .local pmc $c
+        .local pmc $c $cmt
 	$c = new $DEFVAR
 	$c = $tos->[1]
 	global "$c" = $c
@@ -209,34 +242,79 @@ EOC
     }
 }
 
-sub LOAD_NAME() {
-    my ($n, $c) = @_;
-    print <<"EOC";
-	# $c = global "$c"
+sub STORE_GLOBAL {
+    my ($n, $c, $cmt) = @_;
+    my $tos = pop @stack;
+    print <<EOC;
+	global "$c" = $tos->[1] $cmt
 EOC
+}
+
+
+sub is_builtin {
+    my $f = shift;
+    return 0;
+}
+
+sub LOAD_GLOBAL {
+    my ($n, $c, $cmt) = @_;
+    my $p = temp('P');
+    if (is_builtin($c)) {
+    print <<EOC;
+	# builtin $c $cmt
+EOC
+	push @stack, [-1, $c, 'F'];
+    }
+    else {
+	print <<EOC;
+	$p = global "$c" $cmt
+EOC
+	push @stack, [-1, $p, 'P'];
+    }
+    # print_stack();
+}
+
+sub LOAD_NAME() {
+    my ($n, $c, $cmt) = @_;
+    if ($globals{$c}) {
+	print <<"EOC";
+	# $c = global "$c" $cmt
+EOC
+    }
+    else {
+	$globals{$c} = 1;
+	print <<"EOC";
+	.local pmc $c $cmt
+	$c = global "$c"
+EOC
+    }
     push @stack, [$n, $c, 'P'];
 }
-sub PRINT_ITEM()
+
+sub PRINT_ITEM
 {
+    my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
     print <<"EOC";
-	print_item $tos->[1]
+	print_item $tos->[1] $cmt
 EOC
 }
 
 sub PRINT_NEWLINE
 {
+    my ($n, $c, $cmt) = @_;
     print <<"EOC";
-	print_newline
+	print_newline $cmt
 EOC
 }
 
 sub RETURN_VALUE
 {
+    my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
     unless ($cur_func eq 'test::main') {
 	print <<EOC;
-    	.pcc_begin_return
+    	.pcc_begin_return $cmt
 	.return $tos->[1]
 	.pcc_end_return
 EOC
@@ -245,11 +323,12 @@ EOC
 
 sub MAKE_FUNCTION
 {
-    my ($n, $c) = @_;
+    my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
     my $f;
     $tos->[1] =~ /code object (\w+)/;
     $f = $1;
+    print "$cmt\n";
     if ($n) {
 	for (my $i=0; $i < $n; ++$i) {
 	    my $arg = pop @stack;
@@ -270,7 +349,7 @@ EOC
 
 sub binary
 {
-    my ($op) = @_;
+    my ($op, $cmt) = @_;
     my $r = pop @stack;
     my $l = pop @stack;
     my ($t, $n);
@@ -278,45 +357,114 @@ sub binary
 	$n = temp($t = 'I');
 	# TODO only if args are small constants
 	print <<"EOC";
-	$n = $l->[1] $op $r->[1]
+	$n = $l->[1] $op $r->[1] $cmt
 EOC
     }
     else {
 	my $nl = promote($l);
 	$n = temp($t = 'P');
 	print <<"EOC";
-	$n = new $DEFVAR
+	$n = new $DEFVAR $cmt
 	$n = $nl $op $r->[1]
 EOC
     }
     push @stack, [-1, $n, $t];
 }
-sub BINARY_ADD()
+sub BINARY_ADD
 {
-    binary('+');
+    my ($n, $c, $cmt) = @_;
+    binary('+', $cmt);
 }
 
 
-sub BINARY_SUBTRACT()
+sub BINARY_SUBTRACT
 {
-    binary('-');
+    my ($n, $c, $cmt) = @_;
+    binary('-', $cmt);
 }
 
+sub BINARY_MODULO
+{
+    my ($n, $c, $cmt) = @_;
+    binary('%', $cmt);
+}
+sub BINARY_MULTIPLY
+{
+    my ($n, $c, $cmt) = @_;
+    binary('*', $cmt);
+}
 sub JUMP_FORWARD()
 {
-    my ($n, $c) = @_;
+    my ($n, $c, $cmt) = @_;
     my $targ = "pc_xxx";
     if ($c =~ /to (\d+)/) {
 	$targ = "pc_$1";
     }
     print <<EOC;
-	goto $targ
+	goto $targ $cmt
 EOC
 }
 
-sub COMPARE_OP()
+sub JUMP_ABSOLUTE()
 {
-    my ($n, $c) = @_;
+    my ($n, $c, $cmt) = @_;
+    my $targ = "pc_$n";
+    print <<EOC;
+	goto $targ $cmt
+EOC
+}
+
+sub JUMP_IF_FALSE
+{
+    my ($n, $c, $cmt) = @_;
+    my $tos = pop @stack;
+    my $targ = "pc_xxx";
+    if ($c =~ /to (\d+)/) {
+	$targ = "pc_$1";
+    }
+    print <<EOC;
+	unless $tos->[1] goto $targ $cmt
+EOC
+}
+
+sub JUMP_IF_TRUE
+{
+    my ($n, $c, $cmt) = @_;
+    my $tos = pop @stack;
+    my $targ = "pc_xxx";
+    if ($c =~ /to (\d+)/) {
+	$targ = "pc_$1";
+    }
+    print <<EOC;
+	if $tos->[1] goto $targ $cmt
+EOC
+}
+
+sub UNARY_NOT
+{
+    my ($n, $c, $cmt) = @_;
+    my ($opcode, $arg, $rest) = ($code[$code_l]->[2],
+	$code[$code_l]->[3],$code[$code_l]->[4]);
+
+    if ($opcode eq 'JUMP_IF_FALSE') {
+	print "$cmt\n";
+	$code_l++;
+	JUMP_IF_TRUE($arg, $rest);
+    }
+    else {
+	my $tos = pop @stack;
+	my $n = temp($tos->[2]);
+	print <<EOC;
+	$n = not $tos->[1] $cmt
+EOC
+	push @stack, [-1, $n, $tos->[2]];
+
+    }
+}
+
+sub COMPARE_OP
+{
+    my ($n, $c, $cmt) = @_;
     my $r = pop @stack;
     my $l = pop @stack;
     my %rev_map = (
@@ -324,34 +472,49 @@ sub COMPARE_OP()
 	'!=' => '==',
     );
     my $op = $rev_map{$c};
-    my ($line, $pc, $opcode, $arg, $rest) = decode_line($dis[$code_l]);
+    my ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
     my $targ = "pc_xxx";
     if ($opcode eq 'JUMP_IF_FALSE') {
+	print "$cmt\n";
 	$code_l++;
 	if ($rest =~ /to (\d+)/) {
 	    $targ = "pc_$1";
 	}
     }
-    else {
-	print "# XXX \n";
+    elsif ($opcode eq 'UNARY_NOT' && $code[$code_l+1]->[2] eq 'JUMP_IF_FALSE') {
+	$code_l++;
+	print "\t\t\t# UNARY_NOT\n\t\t\t# JUMP_IF_FALSE\n";
+        ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
+	if ($rest =~ /to (\d+)/) {
+	    $targ = "pc_$1";
+	}
+	$code_l++;
+	$op = $c;
     }
     if ($r->[2] eq 'I' && $l->[2] eq 'I') {
 	print <<"EOC";
-	if $l->[1] $op $r->[1] goto $targ
+	if $l->[1] $op $r->[1] goto $targ $cmt
 EOC
     }
     else {
 	my $nl = promote($l);
 	print <<"EOC";
-	if $nl $op $r->[1] goto $targ
+	if $nl $op $r->[1] goto $targ $cmt
 EOC
     }
 }
-
-sub CALL_FUNCTION()
+sub print_stack {
+    for $_ (@stack) {
+	print "# st $_->[2] : $_->[1]\n";
+    }
+}
+sub CALL_FUNCTION
 {
-    my ($n, $c) = @_;
+    my ($n, $c, $cmt) = @_;
     my @args;
+    # arguments = $n & 0xff
+    # ?optional? = $n >> 8
+    $n &= 0xff;
     for (my $i = 0; $i < $n; $i++) {
 	my $arg = pop @stack;
 	unshift @args, promote($arg);
@@ -359,27 +522,34 @@ sub CALL_FUNCTION()
     my $tos = pop @stack;
     my $args = join ', ', @args;
     print <<EOC;
-	$tos->[1]($args) 	# nargs = $n
+	$tos->[1]($args)  $cmt
 EOC
-    my ($line, $pc, $opcode, $arg, $rest) = decode_line($dis[$code_l]);
+    my $opcode = $code[$code_l]->[2];
     if ($opcode eq 'POP_TOP') {
+	print "# POP_TOP\n";
 	$code_l++;
     }
     else {
-	push @stack, [-1, 'P5', 'P'];
+	my $t = temp('P');
+	print <<EOC;
+	$t = P5
+EOC
+	push @stack, [-1, $t, 'P'];
     }
 }
 
 sub POP_TOP
 {
-    pop @stack;
+    my ($n, $c, $cmt) = @_;
+    print "$cmt\n";
+    #pop @stack;
 }
-sub LOAD_FAST()
+sub LOAD_FAST
 {
-    my ($n, $c) = @_;
+    my ($n, $c, $cmt) = @_;
     if ($lexicals{$c}) {
 	print <<EOC;
-	# lexical $n '$c'
+	# lexical $n '$c' $cmt
 EOC
     }
     else {
@@ -388,7 +558,7 @@ EOC
 	$lexicals{$c} = 1;
 	$names{$c} = 1;
 	print <<EOC;
-	# .param pmc $c
+	# .param pmc $c $cmt
 	.local pmc $c
 	$c = P$p
 	store_lex -1, $n, $c
@@ -397,13 +567,13 @@ EOC
     push @stack, [$n, $c, 'P'];
 }
 
-sub STORE_FAST()
+sub STORE_FAST
 {
-    my ($n, $c) = @_;
+    my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
     if ($lexicals{$c}) {
 	print <<"EOC";
-	assign $c, $tos->[1]
+	assign $c, $tos->[1] $cmt
 EOC
     }
     else {
@@ -415,4 +585,74 @@ EOC
 	store_lex -1, $n, $c
 EOC
     }
+}
+
+sub UNARY_CONVERT
+{
+    my ($n, $c, $cmt) = @_;
+    my $tos = pop @stack;
+    my $p = promote($tos);
+    my $s = temp('S');
+    print <<EOC;
+	$s = $p $cmt
+EOC
+    push @stack, [-1, $s, 'S'];
+}
+
+sub BUILD_TUPLE
+{
+    my ($n, $c, $cmt) = @_;
+    my $ar = temp('P');
+    print <<EOC;
+	$ar = new PerlArray
+EOC
+    for (my $i = $n-1; $i >= 0; $i--) {
+	my $p = pop @stack;
+	print <<EOC;
+	$ar\[$i\] = $p->[1]
+EOC
+    }
+    push @stack, [-1, $ar, 'P'];
+}
+
+sub RAISE_VARARGS
+{
+    my ($n, $c, $cmt) = @_;
+    for (my $i = $n-1; $i >= 0; $i--) {
+	my $p = pop @stack;
+	print <<EOC;
+	# arg $p->[1]
+EOC
+    }
+    print <<EOC;
+	# TODO $cmt
+EOC
+}
+sub SETUP_LOOP
+{
+    my ($n, $c, $cmt) = @_;
+    print <<EOC;
+	# TODO $cmt
+EOC
+}
+sub GET_ITER
+{
+    my ($n, $c, $cmt) = @_;
+    print <<EOC;
+	# TODO $cmt
+EOC
+}
+sub FOR_ITER
+{
+    my ($n, $c, $cmt) = @_;
+    print <<EOC;
+	# TODO $cmt
+EOC
+}
+sub POP_BLOCK
+{
+    my ($n, $c, $cmt) = @_;
+    print <<EOC;
+	# TODO $cmt
+EOC
 }

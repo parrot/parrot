@@ -34,6 +34,8 @@ constants into their destination register, $1.
 
 =item B<abs>(inout NUM)
 
+=item B<abs>(in PMC)
+
 Set $1 to its absolute value.
 
 =item B<abs>(out INT, in INT)
@@ -43,6 +45,8 @@ Set $1 to its absolute value.
 =item B<abs>(out NUM, in INT)
 
 =item B<abs>(out NUM, in NUM)
+
+=item B<abs>(in PMC, in PMC)
 
 Set $1 to absolute value of $2.
 
@@ -95,6 +99,16 @@ inline op abs(out NUM, in NUM) :base_core {
   else {
     $1 = (FLOATVAL)$2;
   }
+  goto NEXT();
+}
+
+inline op abs(in PMC) :base_core {
+  $1->vtable->absolute(interpreter, $1, $1);
+  goto NEXT();
+}
+
+inline op abs(in PMC, in PMC) :base_core {
+  $2->vtable->absolute(interpreter, $2, $1);
   goto NEXT();
 }
 
