@@ -2748,9 +2748,12 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     interpreter->code = pf;
     VTABLE_init(interpreter, sub_pmc);
 
-    sub_pmc->cache.struct_val = (void *) start;
+    /* both start and end are relative, so are small -
+     * cast for 64-bit compilers where sizeof(int)=4, sizeof(long)=8
+     */
+    sub_pmc->cache.struct_val = (void *)(long) start;
     sub = PMC_sub(sub_pmc);
-    sub->end = (opcode_t*)end;
+    sub->end = (opcode_t*)(long)end;
     sub->packed = pmcs;
     /*
      * if the Sub has some special pragmas in flag (LOAD, MAIN...)

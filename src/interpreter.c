@@ -1391,13 +1391,13 @@ Parrot_run_callback(Parrot_Interp interpreter, PMC* cbi, void* ext)
             i_param = (INTVAL)(long) ext;
             goto case_I;
         case 'i':
-            i_param = (INTVAL)(int) ext;
+            i_param = (INTVAL)(int)(long) ext;
             goto case_I;
         case 's':
-            i_param = (INTVAL)(short)(int) ext;
+            i_param = (INTVAL)(short)(long) ext;
             goto case_I;
         case 'c':
-            i_param = (INTVAL)(char)(int)ext;
+            i_param = (INTVAL)(char)(long)ext;
 case_I:
             pasm_sig[2] = 'I';
             param = (void*) i_param;
@@ -2216,7 +2216,7 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
             ops_addr[i] = ((void **)new_lib->op_func_table)[i - n_old];
         new_lib->op_func_table = (void *) ops_addr;
         new_lib->op_count = n_tot;
-        new_init_func((int) ops_addr);
+        new_init_func((long) ops_addr);
     }
     else {
         /* if not install wrappers */
@@ -2238,7 +2238,7 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
      */
     cg_lib->op_func_table = (void *) ops_addr;
     cg_lib->op_count = n_tot;
-    init_func((int) ops_addr);
+    init_func((long) ops_addr);
 }
 
 /*
@@ -2277,7 +2277,7 @@ notify_func_table(Parrot_Interp interpreter, void* table, int on)
 {
     oplib_init_f init_func = get_op_lib_init(1, interpreter->run_core, NULL);
     op_lib_t *lib = init_func(1);
-    init_func((int) table);
+    init_func((long) table);
     switch (interpreter->run_core) {
         case PARROT_SLOW_CORE:      /* normal func core */
         case PARROT_FAST_CORE:      /* normal func core */

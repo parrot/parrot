@@ -281,7 +281,7 @@ static PMC*
 shift_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
 {
     char *start, *p;
-    int i;
+    unsigned long i;
 
     p = start = (char*)io->image->strstart;
     i = strtoul(p, &p, 16);

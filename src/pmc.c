@@ -1004,7 +1004,7 @@ dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
 
     bucket = hash_get_bucket(interpreter, hash, pmc);
     if (bucket)
-        LVALUE_CAST(int, bucket->value) ++;
+        LVALUE_CAST(long, bucket->value) ++;
     else
         hash_put(interpreter, hash, pmc, (void *) 1);
 }
@@ -1032,10 +1032,10 @@ dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)
 
     bucket = hash_get_bucket(interpreter, hash, pmc);
     if (bucket) {
-        if ((int) bucket->value == 1)
+        if ((long) bucket->value == 1L)
             hash_delete(interpreter, hash, pmc);
         else
-            LVALUE_CAST(int, bucket->value) --;
+            LVALUE_CAST(long, bucket->value) --;
     }
 }
 

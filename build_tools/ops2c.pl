@@ -228,7 +228,7 @@ print HEADER <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
 
-extern op_lib_t *$init_func(int init);
+extern op_lib_t *$init_func(long init);
 
 END_C
 my $cg_func = $trans->core_prefix . $base;
@@ -652,7 +652,7 @@ if ($trans->can("init_set_dispatch")) {
 
 print SOURCE <<END_C;
 op_lib_t *
-$init_func(int init) {
+$init_func(long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 $init1_code
