@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/env perl -w
 # Copyright: 2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -73,6 +73,7 @@ Print version information and exit.
 
 =cut
 
+#'
 eval 'exec perl -w -S $0 ${1+"$@"}'
   if $running_under_some_shell;
 
@@ -111,16 +112,8 @@ query_info();
 send_msg();
 exit;
 
-=begin DEVELOPER
 
-=item C<explain_parrotbug()>
-
-Explain what C<parrotbug> is.
-
-=end DEVELOPER
-
-=cut
-
+#Explain what C<parrotbug> is.
 sub explain_parrotbug {
     print <<EOF;
 
@@ -146,16 +139,8 @@ EOF
 #'
 }
 
-=begin DEVELOPER
 
-=item C<help()>
-
-Print synopsis + help message and exit.
-
-=end DEVELOPER
-
-=cut
-
+#Print synopsis + help message and exit.
 sub help {
     print <<EOF;
 
@@ -196,8 +181,8 @@ EOF
     exit;
 }
 
-# Print version information (of the parrotbug program) and exit.
 
+# Print version information (of the parrotbug program) and exit.
 sub version {
     print <<"EOF";
 
@@ -214,7 +199,6 @@ EOF
 #                        Utils subs.                         #
 
 # Generate random filename to edit report.
-
 sub generate_filename {
     my $dir = File::Spec->tmpdir();
     my $filename = "bugrep0$$";
@@ -223,11 +207,10 @@ sub generate_filename {
     return $filename;
 }
 
+
 # Check whether a subject is trivial. A subject is not considered trivial
 # if it's an ok or a nok report.
-# 
 # Return 1 if trivial, 0 otherwise (subject acceptable).
-
 sub trivial_subject {
     my $subject = shift;
 
@@ -253,7 +236,6 @@ sub trivial_subject {
 # Get parrot information, process the options, create the message
 # information (subject, to, body, etc.) depending on the type of report
 # (ok, nok or bug report).
-
 sub init {
     $is_linux   = lc($^O) eq 'linux';
     $is_macos   = $^O eq 'MacOS';
@@ -386,7 +368,6 @@ sub init {
 #                       Querying subs.                       #
 
 # Query missing information in order to have a complete report.
-
 sub query_info {
     $subject = "" if trivial_subject( $subject );
     ask_for_subject()        unless $subject;
@@ -408,7 +389,6 @@ sub query_info {
 # Return the lowercased alternative chosen.
 # 
 # Die if more than 5 wrong answers.
-
 sub ask_for_alternative {
     my ( $what, $choices, $default ) = @_;
 
@@ -432,8 +412,8 @@ EOF
     return lc $alt;
 }
 
-# Prompt for body, through an external editor.
 
+# Prompt for body, through an external editor.
 sub ask_for_body {
     print <<EOF;
 Now you need to supply the bug report. Try to make the report concise
@@ -468,8 +448,8 @@ EOF
     edit_bug_report( $opts{f} );
 }
 
-# Prompt for editor to use.
 
+# Prompt for editor to use.
 sub ask_for_editor {
     print shift() . "Editor [$editor]: ";
     my $entry = <>;
@@ -477,8 +457,8 @@ sub ask_for_editor {
     $editor = $entry if $entry ne "";
 }
 
-# Prompt for return address.
 
+# Prompt for return address.
 sub ask_for_return_address {
     print <<EOF;
 Your e-mail address will be useful if you need to be contacted. If the
@@ -513,8 +493,8 @@ EOF
     print "\n\n\n";
 }
 
-# Prompt for subject of message.
 
+# Prompt for subject of message.
 sub ask_for_subject {
     print <<EOF;
 First of all, please provide a subject for the message. It should be a
@@ -535,8 +515,8 @@ EOF
     print "\n\n\n";
 }
 
-# Launch an editor in which to edit the bug report.
 
+# Launch an editor in which to edit the bug report.
 sub edit_bug_report {
     my $filename = shift;
 
@@ -566,7 +546,6 @@ EOF
 #                        Action subs.                        #
 
 # Dump everything collected on the specified glob.
-
 sub dump_info {
     local (*OUT) = @_;
 
@@ -606,8 +585,8 @@ EOF
     }
 }
 
-# Send message to final recipient.
 
+# Send message to final recipient.
 sub send_msg {
     # Get the body.
     if ( $opts{f} ) {
