@@ -54,8 +54,11 @@ typedef enum {
     PMC_private7_FLAG   = 2 << 7,
 
     /* The rest of the flags are for use by Parrot */
-
-    PMC_tba_FLAG        = 2 << 8 /* XXX none yet, just an example... */
+    PMC_active_destroy_FLAG	= 2 << 8,
+    PMC_is_container_FLAG	= 2 << 9,
+    PMC_is_buffer_ptr_FLAG	= 2 << 10,
+    PMC_is_PMC_ptr_FLAG		= 2 << 11,
+    PMC_private_GC_FLAG		= 2 << 12
 } PMC_flags;
 
 /* XXX add various bit test macros once we have need of them */
