@@ -13,8 +13,11 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
+/* s. packdump.c */
 void PackFile_ConstTable_dump(struct Parrot_Interp *,
                                      struct PackFile_ConstTable *);
+void PackFile_Fixup_dump(Parrot_Interp , struct PackFile_FixupTable *ft);
+
 static void
 const_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
 {
@@ -24,6 +27,14 @@ const_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
     PIO_printf(interpreter, "],\n");
 }
 
+static void
+fixup_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
+{
+    PIO_printf(interpreter, "%s => [\n", segp->name);
+    PackFile_Fixup_dump(interpreter,
+            (struct PackFile_FixupTable *)segp);
+    PIO_printf(interpreter, "],\n");
+}
 static void
 disas_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *self)
 {
@@ -176,8 +187,10 @@ main(int argc, char **argv)
         Parrot_exit(0);
     }
     /* install a dumper function */
-    if (!terse)
+    if (!terse) {
         pf->PackFuncs[PF_CONST_SEG].dump = const_dump;
+        pf->PackFuncs[PF_FIXUP_SEG].dump = fixup_dump;
+    }
     if (disas)
         pf->PackFuncs[PF_BYTEC_SEG].dump = disas_dump;
     /* do a directory dump, which dumps segs then */

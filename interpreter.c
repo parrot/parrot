@@ -624,8 +624,8 @@ runops_ex(struct Parrot_Interp *interpreter, size_t offset)
 
             if ((opcode_t)interpreter->resume_offset >= ft->fixup_count)
                 internal_exception(1, "Illegal fixup after branch_cs\n");
-            seg = ft->fixups[interpreter->resume_offset]->u.t0.seg;
-            offset = ft->fixups[interpreter->resume_offset]->u.t0.offset;
+            seg = ft->code;     /* FIXME */
+            offset = ft->fixups[interpreter->resume_offset]->offset;
             Parrot_switch_to_cs(interpreter, seg);
             if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
                 PIO_eprintf(interpreter, "*** Resume at seg %s ofs %d\n",

@@ -277,8 +277,8 @@ find_label_cs(struct Parrot_Interp *interpreter, char *name)
         return -1;
     for (i = 0; i < ft->fixup_count; i++) {
         switch (ft->fixups[i]->type) {
-            case 0:
-                if (!strcmp(name, ft->fixups[i]->u.t0.label))
+            case enum_fixup_label:
+                if (!strcmp(name, ft->fixups[i]->name))
                     return i;
                 break;
         }
@@ -585,7 +585,7 @@ add_const_key(struct Parrot_Interp *interpreter, opcode_t key[],
         return r->color;
     pfc = malloc(sizeof(struct PackFile_Constant));
     rc = PackFile_Constant_unpack_key(interpreter,
-            interpreter->code, pfc, key);
+            interpreter->code->const_table, pfc, key);
     if (!rc)
         fatal(1, "add_onst_key", "PackFile_Constant error\n");
     k = PDB_extend_const_table(interpreter);

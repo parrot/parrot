@@ -24,6 +24,7 @@ void PackFile_ConstTable_dump(struct Parrot_Interp *,
                                      struct PackFile_ConstTable *);
 static void PackFile_Constant_dump(struct Parrot_Interp *,
                                    struct PackFile_Constant *);
+void PackFile_Fixup_dump(Parrot_Interp , struct PackFile_FixupTable *ft);
 
 void
 PackFile_ConstTable_dump(struct Parrot_Interp *interpreter,
@@ -75,6 +76,26 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
     }
 }
 
+void
+PackFile_Fixup_dump(Parrot_Interp interpreter, struct PackFile_FixupTable *ft)
+{
+    opcode_t i;
+
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_label:
+                PIO_printf(interpreter,"\t%2d %8d %s,\n",
+                        (int)enum_fixup_label,
+                        (int)ft->fixups[i]->offset,
+                        ft->fixups[i]->name);
+                    break;
+            default:
+                PIO_printf(interpreter,"\t%2d ???,\n",
+                        (int) ft->fixups[i]->type);
+                break;
+        }
+    }
+}
 /*
 * Local variables:
 * c-indentation-style: bsd

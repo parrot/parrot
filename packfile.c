@@ -403,6 +403,51 @@ PackFile_check_segment_size(opcode_t segment_size, const char *debug)
     return 1;
 }
 
+/* make compat/shorthand pointers:
+ * the first segments read are the default segments
+ */
+static void
+make_code_pointers(struct PackFile_Directory *dir)
+{
+    size_t i;
+    struct PackFile *pf = dir->base.pf;
+
+    /* first find byte code seg */
+    for (i = 0; !pf->cur_cs && i < dir->num_segments; i++) {
+        struct PackFile_Segment *seg = dir->segments[i];
+        switch (seg->type) {
+            case PF_BYTEC_SEG:
+                if (!pf->cur_cs) {
+                    pf->cur_cs = (struct PackFile_ByteCode*)seg;
+                    pf->byte_code = pf->cur_cs->base.data;
+                }
+                break;
+        }
+    }
+    if (!pf->cur_cs)
+        return;
+    for (i = 0; i < dir->num_segments; i++) {
+        struct PackFile_Segment *seg = dir->segments[i];
+        switch (seg->type) {
+            case PF_FIXUP_SEG:
+                if (!pf->fixup_table) {
+                    pf->cur_cs->fixups = pf->fixup_table =
+                        (struct PackFile_FixupTable *)seg;
+                    pf->fixup_table->code = pf->cur_cs;
+                }
+                break;
+            case PF_CONST_SEG:
+                if (!pf->const_table) {
+                    pf->cur_cs->consts = pf->const_table =
+                        (struct PackFile_ConstTable*)seg;
+                    pf->const_table->code = pf->cur_cs;
+                }
+            default:
+                break;
+        }
+    }
+}
+
 /***************************************
 
 =item unpack
@@ -553,8 +598,8 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         self->directory.base.file_offset = (size_t)(cursor - self->src);
         cursor = PackFile_Segment_unpack(interpreter,
                 &self->directory.base, cursor);
+        make_code_pointers(&self->directory);
     }
-    self->byte_code = self->cur_cs->base.data;
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (self->is_mmap_ped && (
             self->need_endianize || self->need_wordsize)) {
@@ -1059,25 +1104,6 @@ directory_unpack (struct Parrot_Interp *interpreter,
         seg = PackFile_Segment_new_seg(dir, type, name, 0);
         mem_sys_free(name);
 
-        /* make compat/shorthand pointers:
-         * the first segments read are the default segments
-         */
-        switch (type) {
-            case PF_FIXUP_SEG:
-                if (!pf->fixup_table)
-                    pf->fixup_table = (struct PackFile_FixupTable *)seg;
-                break;
-            case PF_BYTEC_SEG:
-                if (!pf->cur_cs)
-                    pf->cur_cs = (struct PackFile_ByteCode*)seg;
-                break;
-            case PF_CONST_SEG:
-                if (!pf->const_table)
-                    pf->const_table = (struct PackFile_ConstTable*)seg;
-            default:
-                break;
-        }
-
         seg->file_offset = PackFile_fetch_op(pf, &cursor);
         seg->op_count = PackFile_fetch_op(pf, &cursor);
 
@@ -1304,7 +1330,10 @@ byte_code_new (struct PackFile *pf, const char * name, int add)
     byte_code->prederef_code = NULL;
     byte_code->jit_info = NULL;
     byte_code->prev = NULL;
-    byte_code->debug = NULL;
+    byte_code->debugs = NULL;
+    byte_code->debugs = NULL;
+    byte_code->consts = NULL;
+    byte_code->fixups = NULL;
     return (struct PackFile_Segment *) byte_code;
 }
 
@@ -1369,7 +1398,7 @@ pf_debug_unpack (struct Parrot_Interp *interpreter,
     if (!code || code->base.type != PF_BYTEC_SEG)
         internal_exception(1, "Code '%s' not found for debug segment '%s'\n",
                 code_name, self->name);
-    code->debug = debug;
+    code->debugs = debug;
     debug->code = code;
     return cursor;
 }
@@ -1382,8 +1411,8 @@ Parrot_new_debug_seg(struct Parrot_Interp *interpreter,
     char *name;
     size_t len;
 
-    if (cs->debug) {    /* it exists already, resize it */
-        debug = cs->debug;
+    if (cs->debugs) {    /* it exists already, resize it */
+        debug = cs->debugs;
         debug->base.data = mem_sys_realloc(debug->base.data, size *
                 sizeof(opcode_t));
     }
@@ -1399,7 +1428,7 @@ Parrot_new_debug_seg(struct Parrot_Interp *interpreter,
         debug->filename = mem_sys_allocate(strlen(filename) + 1);
         strcpy(debug->filename, filename);
         debug->code = cs;
-        cs->debug = debug;
+        cs->debugs = debug;
     }
     debug->base.size = size;
     return debug;
@@ -1497,8 +1526,8 @@ PackFile_FixupTable_clear(struct PackFile_FixupTable *self)
 
     for (i = 0; i < self->fixup_count; i++) {
         switch (self->fixups[i]->type) {
-            case 0:
-                mem_sys_free(self->fixups[i]->u.t0.label);
+            case enum_fixup_label:
+                mem_sys_free(self->fixups[i]->name);
                 break;
         }
         mem_sys_free(self->fixups[i]);
@@ -1532,9 +1561,9 @@ fixup_packed_size (struct PackFile_Segment *self)
     for (i = 0; i < ft->fixup_count; i++) {
         size++;  /* fixup_entry type */
         switch (ft->fixups[i]->type) {
-            case 0:
-                size += cstring_packed_size(ft->fixups[i]->u.t0.label);
-                size ++ ; /* labelname, offs */
+            case enum_fixup_label:
+                size += cstring_packed_size(ft->fixups[i]->name);
+                size ++; /* offset */
                 break;
             default:
                 internal_exception(1, "Unknown fixup type\n");
@@ -1552,12 +1581,12 @@ fixup_pack (struct PackFile_Segment *self, opcode_t *cursor)
 
     *cursor++ = ft->fixup_count;
     for (i = 0; i < ft->fixup_count; i++) {
+        *cursor++ = (opcode_t) ft->fixups[i]->type;
         switch (ft->fixups[i]->type) {
-            case 0:
-                *cursor++ = 0;   /* type */
-                strcpy ((char *)cursor, ft->fixups[i]->u.t0.label);
-                cursor += cstring_packed_size(ft->fixups[i]->u.t0.label);
-                *cursor++ = ft->fixups[i]->u.t0.offset;
+            case enum_fixup_label:
+                strcpy ((char *)cursor, ft->fixups[i]->name);
+                cursor += cstring_packed_size(ft->fixups[i]->name);
+                *cursor++ = ft->fixups[i]->offset;
                 break;
             default:
                 internal_exception(1, "Unknown fixup type\n");
@@ -1630,12 +1659,9 @@ fixup_unpack(struct Parrot_Interp *interpreter,
         self->fixups[i] = mem_sys_allocate(sizeof(struct PackFile_FixupEntry));
         self->fixups[i]->type = PackFile_fetch_op(pf, &cursor);
         switch (self->fixups[i]->type) {
-            case 0:
-                self->fixups[i]->u.t0.label =
-                    PackFile_fetch_cstring(pf, &cursor);
-                self->fixups[i]->u.t0.offset = PackFile_fetch_op(pf, &cursor);
-                /* XXX remember code segment currently read */
-                self->fixups[i]->u.t0.seg = pf->cur_cs;
+            case enum_fixup_label:
+                self->fixups[i]->name = PackFile_fetch_cstring(pf, &cursor);
+                self->fixups[i]->offset = PackFile_fetch_op(pf, &cursor);
                 break;
             default:
                 PIO_eprintf(interpreter,
@@ -1658,6 +1684,7 @@ void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
             (struct PackFile_FixupTable  *) PackFile_Segment_new_seg(
                     &interpreter->code->directory, PF_FIXUP_SEG,
                     FIXUP_TABLE_SEGMENT_NAME, 1);
+        self->code = interpreter->code->cur_cs;
     }
     i = self->fixup_count;
     self->fixup_count++;
@@ -1666,10 +1693,9 @@ void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
                          sizeof(struct PackFile_FixupEntry *));
     self->fixups[i] = mem_sys_allocate(sizeof(struct PackFile_FixupEntry));
     self->fixups[i]->type = 0;
-    self->fixups[i]->u.t0.label = mem_sys_allocate(strlen(label) + 1);
-    strcpy(self->fixups[i]->u.t0.label, label);
-    self->fixups[i]->u.t0.offset = offs;
-    self->fixups[i]->u.t0.seg = interpreter->code->cur_cs;
+    self->fixups[i]->name = mem_sys_allocate(strlen(label) + 1);
+    strcpy(self->fixups[i]->name, label);
+    self->fixups[i]->offset = offs;
 }
 /*
 
@@ -1716,7 +1742,7 @@ Unpack a PackFile ConstTable from a block of memory. The format is:
   opcode_t const_count
   *  constants
 
-Returns one (1) if everything is OK, else zero (0).
+Returns cursor if everything is OK, else zero (0).
 
 =cut
 
@@ -1776,7 +1802,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
 #endif
             self->constants[i] = PackFile_Constant_new();
 
-        cursor = PackFile_Constant_unpack(interpreter, pf, self->constants[i],
+        cursor = PackFile_Constant_unpack(interpreter, self, self->constants[i],
                     cursor);
     }
     return cursor;
@@ -1914,7 +1940,7 @@ Unpack a PackFile Constant from a block of memory. The format is:
   opcode_t size
   *  data
 
-Returns one (1) if everything is OK, else zero (0).
+Returns cursor if everything is OK, else zero (0).
 
 =cut
 
@@ -1922,11 +1948,12 @@ Returns one (1) if everything is OK, else zero (0).
 
 opcode_t *
 PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
-                         struct PackFile *pf,
+                         struct PackFile_ConstTable *constt,
                          struct PackFile_Constant *self, opcode_t *cursor)
 {
     opcode_t type;
     opcode_t size;
+    struct PackFile *pf = constt->base.pf;
 
     type = PackFile_fetch_op(pf, &cursor);
     size = PackFile_fetch_op(pf, &cursor);
@@ -1939,15 +1966,18 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
 
     switch (type) {
     case PFC_NUMBER:
-        cursor = PackFile_Constant_unpack_number(interpreter, pf, self, cursor);
+        cursor = PackFile_Constant_unpack_number(interpreter, constt,
+                self, cursor);
         break;
 
     case PFC_STRING:
-        cursor = PackFile_Constant_unpack_string(interpreter, pf, self, cursor);
+        cursor = PackFile_Constant_unpack_string(interpreter, constt,
+                self, cursor);
         break;
 
     case PFC_KEY:
-        cursor = PackFile_Constant_unpack_key(interpreter, pf, self, cursor);
+        cursor = PackFile_Constant_unpack_key(interpreter, constt,
+                self, cursor);
         break;
 
     default:
@@ -1967,7 +1997,7 @@ Unpack a PackFile Constant number from a block of memory. The format is:
 
   FLOATVAL value
 
-Returns one (1) if everything is OK, else zero (0).
+Returns cursor if everything is OK, else zero (0).
 
 =cut
 
@@ -1975,17 +2005,18 @@ Returns one (1) if everything is OK, else zero (0).
 
 opcode_t *
 PackFile_Constant_unpack_number(struct Parrot_Interp *interpreter,
-        struct PackFile * pf,
-        struct PackFile_Constant *self, opcode_t *cursor)
+            struct PackFile_ConstTable *constt,
+            struct PackFile_Constant *self, opcode_t *cursor)
 {
+    struct PackFile *pf = constt->base.pf;
     /*
-    union F {
-        FLOATVAL value;
-        opcode_t b[sizeof(FLOATVAL)/sizeof(opcode_t)];
-    } f;
+       union F {
+       FLOATVAL value;
+       opcode_t b[sizeof(FLOATVAL)/sizeof(opcode_t)];
+       } f;
 
-    int i;
-    */
+       int i;
+       */
 
     /* We need to do a memcpy from the packed area to the value
      * because we can't guarantee that the packed area (which is
@@ -2019,7 +2050,7 @@ Unpack a PackFile Constant from a block of memory. The format is:
 The data is expected to be zero-padded to an opcode_t-boundary, so any
 pad bytes are removed.
 
-Returns one (1) if everything is OK, else zero (0).
+Returns cursor if everything is OK, else zero (0).
 
 =cut
 
@@ -2027,14 +2058,15 @@ Returns one (1) if everything is OK, else zero (0).
 
 opcode_t *
 PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
-                                struct PackFile * pf,
-                                struct PackFile_Constant *self,
-                                opcode_t *cursor)
+                         struct PackFile_ConstTable *constt,
+                         struct PackFile_Constant *self,
+                         opcode_t *cursor)
 {
     UINTVAL flags;
     opcode_t encoding;
     opcode_t type;
     size_t size;
+    struct PackFile *pf = constt->base.pf;
     int wordsize = pf->header->wordsize;
 
     /* don't let PBC mess our internals */
@@ -2074,7 +2106,7 @@ of a sequence of key atoms, each with the following format:
   opcode_t type
   opcode_t value
 
-Returns one (1) if everything is OK, else zero (0).
+Returns cursor if everything is OK, else zero (0).
 
 =cut
 
@@ -2082,7 +2114,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 opcode_t *
 PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
-                             struct PackFile * pf,
+                             struct PackFile_ConstTable *constt,
                              struct PackFile_Constant *self,
                              opcode_t *cursor)
 {
@@ -2090,6 +2122,7 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
     PMC *head;
     PMC *tail;
     opcode_t type, op;
+    struct PackFile *pf = constt->base.pf;
 
     components = (INTVAL)PackFile_fetch_op(pf, &cursor);
     head = tail = NULL;
@@ -2113,12 +2146,10 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
             key_set_integer(interpreter, tail, op);
             break;
         case PARROT_ARG_NC:
-            key_set_number(interpreter, tail,
-                    pf->const_table->constants[op]->u.number);
+            key_set_number(interpreter, tail, constt->constants[op]->u.number);
             break;
         case PARROT_ARG_SC:
-            key_set_string(interpreter, tail,
-                pf->const_table->constants[op]->u.string);
+            key_set_string(interpreter, tail, constt->constants[op]->u.string);
             break;
         case PARROT_ARG_I:
             key_set_register(interpreter, tail, op, KEY_integer_FLAG);

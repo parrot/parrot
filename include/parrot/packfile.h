@@ -115,20 +115,22 @@ struct PackFile_Segment {
 ** PackFile_FixupTable:
 */
 struct PackFile_FixupEntry {
-    opcode_t type;              /* who knows, what fixups we need */
-    union {
-        struct t0 {             /* type 0 entries */
-            char *label;        /* name of the label */
-            opcode_t offset;    /* offset in in the byte code stream */
-            struct PackFile_ByteCode *seg;   /* where this belongs to */
-        } t0;
-    } u;
+    opcode_t type;     /* who knows, what fixups we need */
+    char *name;        /* name of the label */
+    opcode_t offset;    /* location of the item */
 };
+
+typedef enum {
+    enum_fixup_label,
+    enum_fixup_sub,
+    enum_fixup_var
+} enum_fixup_t;
 
 struct PackFile_FixupTable {
     struct PackFile_Segment base;
     opcode_t fixup_count;
     struct PackFile_FixupEntry ** fixups;
+    struct PackFile_ByteCode  * code;   /* where this segment belongs to */
 };
 
 #define PFC_NONE    '\0'
@@ -150,6 +152,7 @@ struct PackFile_ConstTable {
     struct PackFile_Segment     base;
     opcode_t const_count;
     struct PackFile_Constant ** constants;
+    struct PackFile_ByteCode  * code;   /* where this segment belongs to */
 };
 
 struct PackFile_ByteCode {
@@ -157,7 +160,9 @@ struct PackFile_ByteCode {
     void **prederef_code;       /* The predereferenced code */
     void *jit_info;             /* JITs data */
     struct PackFile_ByteCode  * prev;   /* was executed previous */
-    struct PackFile_Debug     * debug;
+    struct PackFile_Debug     * debugs;
+    struct PackFile_ConstTable *consts;
+    struct PackFile_FixupTable *fixups;
 };
 
 struct PackFile_Debug {
@@ -315,16 +320,16 @@ void PackFile_Constant_pack(struct PackFile_Constant * self,
 void PackFile_Constant_destroy(struct PackFile_Constant * self);
 
 opcode_t * PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
-        struct PackFile * pf, struct PackFile_Constant *, opcode_t * packed);
+        struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
 opcode_t * PackFile_Constant_unpack_number(struct Parrot_Interp *interpreter,
-        struct PackFile * pf, struct PackFile_Constant *, opcode_t * packed);
+        struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
 opcode_t * PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
-        struct PackFile * pf, struct PackFile_Constant *, opcode_t * packed);
+        struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
 opcode_t * PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
-        struct PackFile * pf, struct PackFile_Constant *, opcode_t * packed);
+        struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
 opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t **stream);
 

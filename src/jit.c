@@ -76,9 +76,9 @@ insert_fixup_targets(struct Parrot_Interp* interpreter, char *branch,
         return;
     for (i = 0; i < ft->fixup_count; i++) {
         switch (ft->fixups[i]->type) {
-            case 0:
-                if ((size_t)ft->fixups[i]->u.t0.offset < limit)
-                    branch[ft->fixups[i]->u.t0.offset] |= JIT_BRANCH_TARGET;
+            case enum_fixup_label:
+                if ((size_t)ft->fixups[i]->offset < limit)
+                    branch[ft->fixups[i]->offset] |= JIT_BRANCH_TARGET;
                 break;
         }
     }
