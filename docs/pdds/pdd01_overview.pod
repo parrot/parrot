@@ -1,6 +1,6 @@
 =head1 TITLE
 
-A high-level overview of the perl system
+A high-level overview of the Parrot system
 
 =head1 VERSION
 
@@ -11,27 +11,40 @@ A high-level overview of the perl system
     PDD Number: 1
     Version: 1
     Status: Developing
-    Last Modified: 02 January 2001
+    Last Modified: 12 August 2003
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
-None--this is the first version
+=item 1.1
+
+12 Aug 2003
+
+=item 1.0
+
+02 Jan 2001
 
 =head1 CHANGES
 
-None. (Yet...)
+=item 1.1
+
+Changed perl to Parrot where appropriate. Rewrote some sections to 
+reflect the language agnostic nature of the project.
+
+=item 1.0
+
+None. First version
 
 =head1 ABSTRACT
 
-This PDD provides a high-level overview of the perl system. 
+This PDD provides a high-level overview of the Parrot system. 
 
 =head1 DESCRIPTION
 
 =head2 Major components
 
-The perl system generally looks like this:
+The Parrot system generally looks like this:
 
  +----------------------------------------------------+
  |                   Embedding App                    |
@@ -40,23 +53,21 @@ The perl system generally looks like this:
  |  parser <-> compiler <-> optimizer <-> interpreter |
  |          |            |             |              |
  +----------+------------+-------------+--------------+
- |                Extensions to perl                  |
+ |                Extensions to Parrot                |
  +----------------------------------------------------+ 
 
 =over 4
 
 =item Parser
 
-The parser takes source code of some sort (presumably perl source, but
-we're not picky--if you want to write a parser module that takes C,
-Python, or klingon that's OK with us) and creates a syntax tree of
+The parser takes source code of some sort and creates a syntax tree of
 that source.
 
-The parser module is designed to be extended both with perl and
-compiled languages, and much of the parser is written in perl. (This
-is the plan, at least) Generally there will be one parser, though
-there's no reason that there can't be multiple independent
-parsers.
+Different high level languages will generally have their own parser
+modules, implemented in whatever language is most convient. For instance,
+we currently intend to write the parser for Perl 6 in Perl 6, to allow
+for easy extension. Generally there will be one parser per language, though
+there's no reason that there can't be multiple independent parsers.
 
 =item Bytecode compiler
 
@@ -76,41 +87,44 @@ optimizes the bytecode.
 The interpreter module takes the bytecode stream from either the
 optimizer or the bytecode compiler and executes it. There must always
 be at least one interpreter module available for any program that can
-handle all of perl, since it's required for use statements and BEGIN
+handle all of Perl, since it's required for use statements and BEGIN
 blocks.
 
 While there must be at least one interpreter, there may be multiple
 interpreter modules linked into an executable. This would be the case,
 for example, for programs that produced Java bytecode, where one of
 the interpreter modules would take the bytecode stream and spit out
-java bytecode instead of interpreting it.
+Java bytecode instead of interpreting it.
 
 =back
 
 =head2 Independent subsystems
 
-Perl also has a number of subsystems that are independent of any
+Parrot also has a number of subsystems that are independent of any
 single module.
 
 =over 4
 
-=item PerlIO subsystem
+=item ParrotIO subsystem
 
-The PerlIO subsystem provides source- and platform-independent
-asynchronous I/O to perl. With this, perl 6 is independent of C's
-stdio system. (And good riddance--it sucks) How this maps to an OS'
-underlying I/O code is not generally perl's concern, and a platform
-isn't obligated to provide asynchronous I/O.
+The ParrotIO subsystem provides source- and platform-independent
+asynchronous I/O to Parrot. The intent is to make Parrot (and any
+languages that run on it) independent of C's stdio system. (And good 
+riddance--it sucks) How this maps to the OS's underlying I/O code is not 
+generally Parrot's concern, and a platform isn't obligated to provide 
+asynchronous I/O.
 
-Additionally, the PerlIO subsystem allows a program to push filters
+Additionally, the ParrotIO subsystem allows a program to push filters
 onto an input stream if necessary, to manipulate the data before it is
-presented to a perl program. 
+presented to a program. 
 
 =item Regex engine
 
-The regular expression engine's somewhat decoupled from the guts of
-perl. Its job is to turn regexes into objects, and apply those regex
-objects to strings. 
+By providing a regular expression engine as a separate subsystem of
+Parrot, we intend to make it easily available to any language running
+on Parrot (cf. the Perl 5 regex engine, which is itimately linked to
+the perl core). The job of the regex engine is to turn regexes into objects, 
+and apply those regex objects to strings. 
 
 =back
 
@@ -125,22 +139,22 @@ application. This is a small, simple set of calls, requiring minimum
 effort to use. 
 
 The goal is to provide an interface that a competent programmer who is
-uninterested in perl can use to provide access to a perl interpreter
-within another application with very little programming or
+uninterested in Parrot internals can use to provide access to a Parrot
+interpreter within another application with very little programming or
 intellectual effort. Generally it should take less than thirty minutes
 for a simple interface, though more complete integration will take
 longer.
 
 Backwards binary compatibility at this level is guaranteed across the
-life of perl 6.
+life of Parrot.
 
 =item Extensions
 
-The extension API is the set of calls exported to perl
+The extension API is the set of calls exported to Parrot
 extensions. They provide access to most of the things an exension
 needs to do, while hiding the implementation details. (So that, for
 example, we can change the way scalars are stored without having to
-rewrite, or even recompile, an extension)
+rewrite, or even recompile, an extension).
 
 Binary compatibility is a serious goal, though it may be broken if
 absolutely necessary.
@@ -150,7 +164,7 @@ absolutely necessary.
 The guts-level APIs are the routines used within a component. These
 aren't guaranteed to be stable, and shouldn't be used outside a
 component. (For example, an extension to the interpreter shouldn't
-call any of the parser's internal routines)
+call any of the parser's internal routines).
 
 No binary compatibility is guaranteed, and routines here may be
 changed without notice.
@@ -159,63 +173,49 @@ changed without notice.
 
 =head1 VARIATIONS ON A THEME
 
-One of the explicit goals of perl 6 is to generate Java bytecode and
-.NET code, as well as to run on small devices such as the Palm. The
-modular nature of perl 6 makes this reasonably straightforward.
+One of the explicit goals of the Parrot project is to generate Java 
+bytecode and .NET code, as well as to run on small devices such as the Palm. 
+The modular nature of the Parrot system makes this reasonably straightforward.
 
 =over 4
 
-=item Perl for small platforms
+=item Parrot for small platforms
 
-For small platforms, the parser, compiler, and optimizer modules are
-replaced with a small bytecode loader module which reads in perl
-bytecode and passes it to the interpreter for execution. No string
-eval, do, use, or require is available, though loading of precompiled
-modules via do, use, or require may be supported.
+For small platforms, any parser, compiler, and optimizer modules are
+replaced with a small bytecode loader module which reads in Parrot
+bytecode and passes it to the interpreter for execution. Note that 
+the lack of a parser will limit the available functionality in some 
+languages: for instance, in Perl, string eval, do, use, and require 
+will not be available (although loading of precompiled modules via do, 
+use, or require may be supported).
 
 =item Bytecode compilation
 
-One straightforward use of modular perl is to precompile perl source
-into bytecode and save it for later use. This is easily done by having
-a second interpreter module. The standard perl interpreter is used
-during compilation to evaluate BEGIN blocks and such-like things, but a
-simple freeze-to-disk module is used when mainline execution
-begins. Then, rather than executing the bytecode, it gets frozen to
-disk for later loading.
+One straightforward use of the Parrot system is to precompile a 
+program into bytecode and save it for later use. Essentially, we
+would compile a program as normal, but then simply freeze the 
+bytecode to disk for later loading.
 
 =item Perl in, Java (or whatever) out
 
-This is a variant of the bytecode compilation. Instead of freezing the
-bytecode to disk, it's instead translated to something else. That
-something could be Java bytecode or .NET code, or an executable of
-some sort. Perl could also be a front end to other modular compilers
-such as gcc or Compaq's GEM compiler system.
+The previous section implicitly assumes that we will be emitting 
+Parrot bytecode. However, there are other possibilities: we could
+translate the bytecode to Java bytecode or .NET code, or even to a
+native executable. In principle, Parrot could also act as a front end to 
+other modular compilers such as gcc or HP's GEM compiler system.
 
 =item Standalone pieces
 
-Each piece of perl can, with enough support hidden away (in the form
+Each piece of Parrot can, with enough support hidden away (in the form
 of an interpreter for the parsing module, for example), stand on its
-own. This means it's feasible to have separate executables that parse
-perl to a syntax tree, turn a syntax tree into bytecode, optimize the
-bytecode, and execute the bytecode.
+own. This means it's feasible to make the parser, bytecode compiler,
+optimizer and interpreter separate executables.
 
 This allows us to develop pieces independently--the first version of
-the parser, for example, can be written mainly in perl 5 using an
+the Perl 6 parser, for example, can be written mainly in perl 5 using an
 embedded interpreter. It also means we can have a standalone optimizer
 which can spend a lot of time groveling over bytecode, far more than
 you might want to devote to optimizing one-liners or code that'll run
 only once or twice.
-
-=item The perl assembler
-
-The parser and bytecode compiler can be replaced with a unit that will
-eat a textual representation of the bytecode--essentially a perl
-assembler. This can be useful in a number of ways, allowing programs
-to emit perl bytecode without having to know the gory details of the
-binary interface, or in fact having perl immediately available at
-all. (It also means we can cobble up real perl programs without having
-a full parser built yet, though that's more an issue of initial
-implementation than anything else)
-
 
 =back
