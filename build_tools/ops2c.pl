@@ -9,6 +9,7 @@
 #
 
 use strict;
+use lib 'lib';
 use Parrot::OpsFile;
 
 sub Usage {

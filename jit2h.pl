@@ -6,6 +6,7 @@
 #
 
 use strict;
+use lib 'lib';
 use Parrot::Jit;
 use Parrot::OpLib::core;
 use Parrot::Op;

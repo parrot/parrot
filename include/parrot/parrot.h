@@ -86,7 +86,7 @@ typedef void* BIGFLOAT;
 #include "parrot/string.h"
 #include "parrot/vtable.h"
 #include "parrot/register.h"
-#include "parrot/register_funcs.h"
+#include "parrot/regfuncs.h"
 #include "parrot/exceptions.h"
 #include "parrot/memory.h"
 #include "parrot/packfile.h"

@@ -6,6 +6,7 @@
 #
 
 use strict;
+use lib 'lib';
 use Parrot::OpsFile;
 
 use Data::Dumper;
@@ -33,8 +34,8 @@ my $base = $file;
 $base =~ s/\.ops$//;
 
 my $package = "${base}";
-my $moddir  = "Parrot/OpLib";
-my $module  = "Parrot/OpLib/${package}.pm";
+my $moddir  = "lib/Parrot/OpLib";
+my $module  = "lib/Parrot/OpLib/${package}.pm";
 
 
 #

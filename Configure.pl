@@ -155,7 +155,7 @@ $jitarchname		      =~ s/i[456]86/i386/i;
 $jitarchname              =~ s/-(net|free|open)bsd$/-bsd/i;
 $jitcapable               = 0;
 
-if (-e "Parrot/Jit/$jitarchname.pm") {
+if (-e "lib/Parrot/Jit/$jitarchname.pm") {
     my $objdump_test = `objdump -V`;
     if(defined($objdump_test)){
        $jitcapable = 1 if($objdump_test =~ /GNU\s+objdump/)
@@ -608,7 +608,7 @@ buildfile("languages/jako/Makefile");
 buildfile("languages/miniperl/Makefile");
 buildfile("languages/scheme/Makefile");
 
-buildfile("Types_pm", "Parrot");
+buildfile("Types_pm", "lib/Parrot");
 
 buildconfigpm();
 
@@ -786,7 +786,7 @@ END
         return;
     }
 
-    printf "  Building %-30s from %s...\n", "Parrot/Config.pm",
+    printf "  Building %-30s from %s...\n", "lib/Parrot/Config.pm",
         "Config_pm.in";
 
     my %C=%c;
@@ -801,9 +801,9 @@ END
 
     $text =~ s/#DUMPER OUTPUT HERE/$dd->Dump()/eg;
 
-    open(OUT, ">Parrot/Config.pm") or die "Can't open file Parrot/Config.pm: $!";
+    open(OUT, ">lib/Parrot/Config.pm") or die "Can't open file lib/Parrot/Config.pm: $!";
     print OUT $text;
-    close(OUT) or die "Can't close file Parrot/Config.pm: $!";
+    close(OUT) or die "Can't close file lib/Parrot/Config.pm: $!";
 }
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 open (IN, "include/parrot/pmc.h") or die $!;
-open (OUT, ">Parrot/PMC.pm") or die $!;
+open (OUT, ">lib/Parrot/PMC.pm") or die $!;
 
 print OUT <<'EOF';
 package Parrot::PMC;
