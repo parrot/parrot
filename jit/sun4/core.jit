@@ -583,6 +583,124 @@ Parrot_branch_ic {
     emitm_nop(NATIVECODE);
 }
 
+TEMPLATE Parrot_cmp_ix_ix_ic {
+    if(MAP[1] && MAP[2]){
+        emitm_subcc_r(NATIVECODE, MAP[1], MAP[2], emitm_g(0));
+    }
+    else if (MAP[1]) {
+        jit_emit_load_i(jit_info, interpreter, 2, ISR2);
+        emitm_subcc_r(NATIVECODE, MAP[1], ISR2, emitm_g(0));
+    }
+    else if (MAP[2]) {
+        jit_emit_load_i(jit_info, interpreter, 1, ISR1);
+        emitm_subcc_r(NATIVECODE, ISR1, MAP[2], emitm_g(0));
+    }
+    else {
+        jit_emit_load_i(jit_info, interpreter, 1, ISR1);
+        jit_emit_load_i(jit_info, interpreter, 2, ISR2);
+        emitm_subcc_r(NATIVECODE, ISR1, ISR2, emitm_g(0));
+    }
+
+    Parrot_jit_bicc(jit_info, emitm_<a>, 0, *INT_CONST[3]);
+    emitm_nop(NATIVECODE);
+}
+
+Parrot_eq_ic_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/be/
+}
+
+Parrot_eq_i_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/be/
+}
+
+Parrot_eq_ic_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/be/
+}
+
+Parrot_eq_i_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/be/
+}
+
+Parrot_ne_ic_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bne/
+}
+
+Parrot_ne_i_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bne/
+}
+
+Parrot_ne_ic_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bne/
+}
+
+Parrot_ne_i_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bne/
+}
+
+Parrot_lt_ic_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bl/
+}
+
+Parrot_lt_i_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bl/
+}
+
+Parrot_lt_ic_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bl/
+}
+
+Parrot_lt_i_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bl/
+}
+
+Parrot_le_ic_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/ble/
+}
+
+Parrot_le_i_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/ble/
+}
+
+Parrot_le_ic_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/ble/
+}
+
+Parrot_le_i_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/ble/
+}
+
+Parrot_gt_ic_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bg/
+}
+
+Parrot_gt_i_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bg/
+}
+
+Parrot_gt_ic_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bg/
+}
+
+Parrot_gt_i_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bg/
+}
+
+Parrot_ge_ic_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bge/
+}
+
+Parrot_ge_i_ic_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bge/
+}
+
+Parrot_ge_ic_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bge/
+}
+
+Parrot_ge_i_i_ic {
+    Parrot_cmp_ix_ix_ic  s/<a>/bge/
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

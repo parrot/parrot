@@ -734,9 +734,9 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg, char *mem)
 }
 
 #  ifndef NO_JIT_VTABLE_OPS
-
+/*
 #    undef Parrot_jit_vtable1_op
-/*#    undef Parrot_jit_vtable1r_op
+#    undef Parrot_jit_vtable1r_op
 #    undef Parrot_jit_vtable2rk_op
 #    undef Parrot_jit_vtable3k_op
 
@@ -752,14 +752,14 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg, char *mem)
 #    undef Parrot_jit_vtable_ifp_op
 #    undef Parrot_jit_vtable_unlessp_op
 #    undef Parrot_jit_vtable_newp_ic_op
-*/
+
 
 static void
 Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info,
                       Interp *interpreter)
 {
 }
-
+*/
 #endif /* NO_JIT_VTABLE_OPS */
 
 #else
