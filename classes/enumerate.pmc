@@ -1,0 +1,95 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/enumerate.pmc - enumerate PMC
+
+=head1 DESCRIPTION
+
+These is an Iterator return [idx, item] tuples.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass Enumerate extends Iterator {
+
+    void init_pmc(PMC* iterable) {
+	SUPER(iterable);
+	PMC_struct_val(SELF) = key_new_integer(INTERP, 0);
+        PMC_pmc_val(SELF) =
+            pmc_new_init(INTERP, enum_class_Iterator, iterable);
+        VTABLE_set_integer_native(INTERP, PMC_pmc_val(SELF), 0);
+    }
+
+/*
+
+=item C<PMC* shift_pmc()>
+
+Returns [idx, element] for the current idx/key and sets the idx/key to
+the next one.
+
+=cut
+
+*/
+
+    INTVAL get_bool() {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *iter = PMC_pmc_val(SELF);
+        INTVAL ok = PMC_int_val(key) >= 0 && VTABLE_get_bool(INTERP, iter);
+        if (!ok)
+            PMC_int_val(key) = -1;
+        return ok;
+    }
+
+    PMC* shift_pmc () {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *iter = PMC_pmc_val(SELF);
+        PMC *item, *tupl, *val;
+	INTVAL i = PMC_int_val(key);
+
+        if (i == -1)
+            real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
+        item = VTABLE_shift_pmc(INTERP, iter);
+        tupl = pmc_new(interpreter, enum_class_FixedPMCArray);
+        ++PMC_int_val(key);
+        VTABLE_set_integer_native(interpreter, tupl, 2);
+        val = pmc_new(interpreter, enum_class_Integer);
+        PMC_int_val(val) = i;
+        VTABLE_set_pmc_keyed_int(interpreter, tupl, 0, val);
+        VTABLE_set_pmc_keyed_int(interpreter, tupl, 1, item);
+        return tupl;
+    }
+
+    PMC* get_iter() {
+        return SELF;
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
+
