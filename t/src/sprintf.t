@@ -7,112 +7,116 @@ TODO: {
     $TODO=$TODO;  #warnings
 
     c_output_is(<<'CODE', <<'OUTPUT', "hello world");
-        #include <stdio.h>
-        #include "parrot/parrot.h"
-        #include "parrot/embed.h"
+#include <stdio.h>
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
-        int main(int argc, char* argv[]) {
-	        int dummy_var;
-	        STRING *S;
-	        PMC *pmc;
-            INTVAL ival;
-            UINTVAL uval;
-            float fval;
-            double dval;
-            FLOATVAL fltval;
-            char *fmt;
-	    char dest[20];
-	        struct Parrot_Interp * interpreter;
+int do_test(struct Parrot_Interp* interpreter) {
+    STRING *S;
+    PMC *pmc;
+    INTVAL ival;
+    UINTVAL uval;
+    float fval;
+    double dval;
+    FLOATVAL fltval;
+    char *fmt;
+    char dest[20];
+    
+    Parrot_snprintf(interpreter, dest, 2, "%s", "CERT");
+    printf("%s\n",dest);
 
-	        interpreter = Parrot_new();
-	        Parrot_init(interpreter, (void*) &dummy_var);
+    S = Parrot_sprintf_c(interpreter, "Hello, %%%s%%\n", "Parrot!");
+    fputs(string_to_cstring(interpreter, S), stdout);
 
-		Parrot_snprintf(interpreter, dest, 2, "%s", "CERT");
-		printf("%s\n",dest);
+    S = Parrot_sprintf_c(interpreter, "PerlHash[0x%x]\n", 256);
+    fputs(string_to_cstring(interpreter, S), stdout);
 
-	        S = Parrot_sprintf_c(interpreter, "Hello, %%%s%%\n", "Parrot!");
-	        printf(string_to_cstring(interpreter, S));
+    S = Parrot_sprintf_c(interpreter, "PerlHash[0x%lx]\n", 256);
+    fputs(string_to_cstring(interpreter, S), stdout);
 
-	        S = Parrot_sprintf_c(interpreter, "PerlHash[0x%x]\n", 256);
-	        printf(string_to_cstring(interpreter, S));
+    S = Parrot_sprintf_c(interpreter, "Hello, %.2s!\n", "Parrot");
+    fputs(string_to_cstring(interpreter, S), stdout);
 
-	        S = Parrot_sprintf_c(interpreter, "PerlHash[0x%lx]\n", 256);
-	        printf(string_to_cstring(interpreter, S));
+    S = Parrot_sprintf_c(interpreter, "Hello, %Ss", S);
+    fputs(string_to_cstring(interpreter, S), stdout);
 
-	        S = Parrot_sprintf_c(interpreter, "Hello, %.2s!\n", "Parrot");
-	        printf(string_to_cstring(interpreter, S));
+    pmc=pmc_new(interpreter, enum_class_PerlInt);
+    pmc->vtable->set_integer_native(interpreter, pmc, 1);
+    S = Parrot_sprintf_c(interpreter, "== %Pd\n", pmc);
+    printf("%d %s", 1, string_to_cstring(interpreter, S));
 
-	        S = Parrot_sprintf_c(interpreter, "Hello, %Ss", S);
-	        printf(string_to_cstring(interpreter, S));
+    ival = -255;
+    S = Parrot_sprintf_c(interpreter, "== %vd\n", ival);
+    printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
 
-            pmc=pmc_new(interpreter, enum_class_PerlInt);
-            pmc->vtable->set_integer_native(interpreter, pmc, 1);
-	        S = Parrot_sprintf_c(interpreter, "== %Pd\n", pmc);
-	        printf("%d %s", 1, string_to_cstring(interpreter, S));
+    uval = 256;
+    S = Parrot_sprintf_c(interpreter, "== %vu\n", uval);
+    printf("%u %s", (unsigned) uval, string_to_cstring(interpreter, S));
+    
+    fval = 0.5;
+    S = Parrot_sprintf_c(interpreter, "== %f\n", fval);
+    printf("%f %s", fval, string_to_cstring(interpreter, S));
 
-		    ival = -255;
-	        S = Parrot_sprintf_c(interpreter, "== %vd\n", ival);
-	        printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
+    dval = 0.5;
+    S = Parrot_sprintf_c(interpreter, "== %5.3f\n", dval);
+    printf("%5.3f %s", dval, string_to_cstring(interpreter, S));
 
-		    uval = 256;
-	        S = Parrot_sprintf_c(interpreter, "== %vu\n", uval);
-	        printf("%u %s", (unsigned) uval,  string_to_cstring(interpreter, S));
+    dval = 0.001;
+    S = Parrot_sprintf_c(interpreter, "== %g\n", dval);
+    printf("%g %s", dval, string_to_cstring(interpreter, S));
 
-		    fval = 0.5;
-	        S = Parrot_sprintf_c(interpreter, "== %f\n", fval);
-	        printf("%f %s", fval, string_to_cstring(interpreter, S));
+    dval = 1.0e6;
+    S = Parrot_sprintf_c(interpreter, "== %g\n", dval);
+    printf("%g %s", dval, string_to_cstring(interpreter, S));
 
-		    dval = 0.5;
-	        S = Parrot_sprintf_c(interpreter, "== %5.3f\n", dval);
-	        printf("%5.3f %s", dval, string_to_cstring(interpreter, S));
+    fltval = 0.5;
+    S = Parrot_sprintf_c(interpreter, "== %3.3g\n", fltval);
+    printf("%3.3g %s", (double) fltval, string_to_cstring(interpreter, S));
 
-		    dval = 0.001;
-	        S = Parrot_sprintf_c(interpreter, "== %g\n", dval);
-	        printf("%g %s", dval, string_to_cstring(interpreter, S));
+    ival = 32;
+    S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
+    printf("0x%x %s", (int) ival, string_to_cstring(interpreter, S));
 
-		    dval = 1.0e6;
-	        S = Parrot_sprintf_c(interpreter, "== %g\n", dval);
-	        printf("%g %s", dval, string_to_cstring(interpreter, S));
+    /* test several flags */
+        ival = 25;
+    S = Parrot_sprintf_c(interpreter, "== % 5d\n", ival);
+    printf("% 5d %s", (int) ival,
+           string_to_cstring(interpreter, S));
+    S = Parrot_sprintf_c(interpreter, "== %-5d|\n", ival);
+    printf("%-5d %s", (int) ival,
+           string_to_cstring(interpreter, S));
+    S = Parrot_sprintf_c(interpreter, "== %05d\n", ival);
+    printf("%05d %s", (int) ival,
+           string_to_cstring(interpreter, S));
+    S = Parrot_sprintf_c(interpreter, "== %2d\n", ival);
+    printf("%2d %s", (int) ival,
+           string_to_cstring(interpreter, S));
+    
+    ival = -1;
+    S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
+    printf("0x%x %s", (int) ival,
+           string_to_cstring(interpreter, S));
+    S = Parrot_sprintf_c(interpreter, "== %08d\n", ival);
+    printf("%08d %s", (int) ival,
+           string_to_cstring(interpreter, S));
+ 
+    /* Test we've not left junk behind on the stack */
+    S = Parrot_sprintf_c(interpreter, "That's all, %s\n", "folks!");
+    fputs(string_to_cstring(interpreter, S), stdout);
 
-		    fltval = 0.5;
-	        S = Parrot_sprintf_c(interpreter, "== %3.3g\n", fltval);
-	        printf("%3.3g %s", (double) fltval,
-            string_to_cstring(interpreter, S));
+    return 0;
+}
 
-                ival = 32;
-	        S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
-	        printf("0x%x %s", (int) ival,
-            string_to_cstring(interpreter, S));
+int main(int argc, char* argv[]) {
+    int dummy_var;
+    struct Parrot_Interp * interpreter;
+    
+    interpreter = Parrot_new();
+    Parrot_init(interpreter, (void*) &dummy_var);
+    do_test(interpreter);
 
-                /* test several flags */
-                ival = 25;
-                S = Parrot_sprintf_c(interpreter, "== % 5d\n", ival);
-                printf("% 5d %s", (int) ival,
-                       string_to_cstring(interpreter, S));
-                S = Parrot_sprintf_c(interpreter, "== %-5d|\n", ival);
-                printf("%-5d %s", (int) ival,
-                       string_to_cstring(interpreter, S));
-                S = Parrot_sprintf_c(interpreter, "== %05d\n", ival);
-                printf("%05d %s", (int) ival,
-                       string_to_cstring(interpreter, S));
-                S = Parrot_sprintf_c(interpreter, "== %2d\n", ival);
-                printf("%2d %s", (int) ival,
-                       string_to_cstring(interpreter, S));
-
-                ival = -1;
-                S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
-                printf("0x%x %s", (int) ival,
-                       string_to_cstring(interpreter, S));
-                S = Parrot_sprintf_c(interpreter, "== %08d\n", ival);
-                printf("%08d %s", (int) ival,
-                       string_to_cstring(interpreter, S));
-
-		    /* Test we've not left junk behind on the stack */
-	        S = Parrot_sprintf_c(interpreter, "That's all, %s\n", "folks!");
-	        printf(string_to_cstring(interpreter, S));
-
-	        return 0;
-       }
+    return 0;
+}
 CODE
 C
 Hello, %Parrot!%
