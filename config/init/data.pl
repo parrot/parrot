@@ -79,6 +79,9 @@ sub runstep {
     make_and      => '&&',
     make_c        => '$(PERL) -e \'chdir shift @ARGV; system q{$(MAKE)}, @ARGV; exit $$? >> 8;\'',
 
+    platform_asm  => 0,                   # if platform has a .s file that needs to be assembled
+    as            => 'as',                # assembler
+
     cp            => 'cp',
     slash         => '/',
 

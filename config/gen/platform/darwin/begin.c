@@ -1,0 +1,2 @@
+#undef environ
+#undef bool

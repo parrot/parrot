@@ -10,7 +10,7 @@ $description="Generating Makefiles...";
 
 sub runstep {
   genfile('config/gen/makefiles/root.in',      'Makefile',
-          commentType => '#', replace_slashes => 1);
+          commentType => '#', replace_slashes => 1, conditioned_lines => 1);
   genfile('config/gen/makefiles/classes.in',   'classes/Makefile',
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/imcc.in',      'imcc/Makefile',
