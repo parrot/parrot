@@ -68,8 +68,6 @@ pmclass PerlUndef extends PerlInt {
         /* Do nothing; Can't happen? */
     }
 
-
-
     void set_string (PMC* value) {
 	DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string(value);
@@ -371,9 +369,21 @@ pmclass PerlUndef extends PerlInt {
     }
 
     void repeat (PMC* value,  PMC* dest) {
+        STRING * empty_string;
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in repeat");
-        VTABLE_set_string(INTERP, dest, NULL);
+    
+        empty_string = string_make(interpreter,  NULL, 0, NULL, 0, NULL);
+        VTABLE_set_string_native(INTERP, dest, empty_string);
+    }
+
+    void repeat_int (INTVAL value, PMC* dest) {
+        STRING * empty_string;
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in repeat");
+
+        empty_string = string_make(interpreter,  NULL, 0, NULL, 0, NULL);
+        VTABLE_set_string_native(INTERP, dest, empty_string);
     }
 
     INTVAL defined () {

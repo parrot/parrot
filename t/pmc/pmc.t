@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 79;
+use Parrot::Test tests => 80;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2258,6 +2258,31 @@ output_like(<<'CODE', <<'OUTPUT', "new with a native type");
 	end
 CODE
 /error:\w+:unknown macro '\.INTVAL'/
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "repeat");
+        new P0, .PerlUndef
+        new P1, .PerlString
+        new P2, .PerlInt
+
+        set P2, 1024       
+        repeat P1, P0, P2 
+        set S1, P1
+        eq S1, "", OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        new P0, .PerlUndef
+        new P1, .PerlString
+        repeat P1, P0, 1024
+        set S1, P1
+        eq S1, "", OK2
+        print "not "
+OK2:    print "ok 2\n"
+	end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 1;
