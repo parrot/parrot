@@ -119,35 +119,10 @@ On return from NCI, the PMC_int_val will hold the new value.
 string pointer. Taken from, or stuck into, a string
 register. (Converted to a null-terminated C string before passing in)
 
-=item C
+=item U
 
-This parameter is used for passing in a callback function pointer. It
-refers to the function Parrot_callback_C, which has a signature of:
-
-  void Parrot_callback_C(void *external_data, PMC *callback_info);
-
+This parameter is used for passing user data to a callback creation.
 More explanation in the L<callbacks> section.
-
-=item D
-
-This parameter is used for passing in a callback function pointer. It
-refers to the function Parrot_callback_C, which has a signature of:
-
-  void Parrot_callback_D(PMC *callback_info, void *external_data);
-
-More explanation in the L<callbacks> section.
-
-=item Y
-
-This parameter is a PMC for the sub which should be called into by
-the callback. Only valid in a signature with a C or D parameter, and
-it I<must> be immediately followed by a parameter of type Z.
-
-=item Z
-
-This parameter is a PMC representing the data to be passed into the
-function being called into. It is only valid when it immediately
-follows a parameter of type Y.
 
 =back
 
@@ -173,36 +148,40 @@ signature, and parrot provides some ready-made functions for this
 purpose that should serve for most of the callback uses.
 
 There are two callback functions, Parrot_callback_C and
-Parrot_callback_D, corresponding to callback function signature
-letters C and D, respectively. If the callback function is supposed
-to look like:
+Parrot_callback_D, which differ if the passed in C<user_data> is
+second or first respectively:
 
-   void (function *)(void *library_data, void *your_data);
+   void (function *)(void *library_data, void *user_data);
 
-then use type C, where if the function signature is:
+   void (function *)(void *user_data, void *library_data);
 
-   void (function *)(void *your_data, void *library_data);
+The information C<library_data> is normally coming from C code and
+can be any C type that Parrot supports as NCI value.
 
-then use a type of D. The actual pointer types for the parameters
-don't have to be void *, but they must be pointers of some sort.
+The position of the C<user_data> is specified with the C<U> function
+signature, when creating the callback PMC:
+
+  cb_PMC = new_callback cb_Sub, user_data, "tU"
+
+Given a Parrot function C<cb_Sub>, and a C<user_data> PMC, this creates
+a callback PMC C<cb_PMC>, which expects the user data as the second argument.
+The information returned by the callback (C<library_data) is a C string.
 
 Since parrot needs more than just a pointer to a generic function to
 figure out what to do, it stuffs all the extra information into the
-C<your_data> pointer, which contains a custom PMC holding all the
-information that Parrot needs.
+C<user_data> pointer, which contains a custom PMC holding all the
+information that Parrot needs. This also implies that the C function
+that installs the callback, must not make any assumptions on the C<user_data>
+argument. This argument must be handled transparently by the C code.
 
-The NCI function signature for a callback matching Parrot_callback_C
-is C<vCYZ>, while the function signature for a callback matching
-Parrot_callback_D is C<vDYZ>.
-
-The callback functions take care of wrapping the external data
+The callback function takes care of wrapping the external data
 pointer into an UnManagedStruct PMC, the same as if it were a p
 return type of a normal NCI function.
 
 The signature of the I<parrot> subroutine which is called by the
 callback should be:
 
-   void parrotsub(PMC user_data, PMC external_data)
+   void parrotsub(PMC user_data, <type> external_data)
 
 The sequence for this is:
 
@@ -210,29 +189,16 @@ The sequence for this is:
 
 =item Step 1
 
-Register the function which takes all the callback information
+Create a callback function.
 
-  dlfunc CALLBACK_REGISTER_FUNC, LIBRARY_PMC, FUNCTION_NAME, 'vCYZ'
+  new_callback CB_PMC, CB_SUB, USER_DATA, "signature"
 
 =item Step 2
 
-Register the actual callback
+Register the callback
 
-  newsub $P5, .Sub, _some_parrot_sub
-  # Alternately, if it's in a global
-  # $P5 = global "some::sub::name"
-  new $P6, .PerlInt # The data we get handed
-  .pcc_begin prototyped
-  .arg $P5
-  .arg $P6
-  .pcc_call CALLBACK_REGISTER_FUNC
-  .pcc_end
-
-=item Step 3
-
-Hand over control to the external library. I<IT IS IMPORTANT THAT THE
-INTERPRETER YOU ARE CALLING BACK INTO IS NOT ACTIVE WHEN THE CALLBACK
-IS MADE!>
+  dlfunc C_FUNCION, "function_name", "signature"
+  C_FUNCTION(CP_PMC, USER_DATA)
 
 =back
 
@@ -241,7 +207,7 @@ function itself should look like:
 
   .sub _my_callback prototyped
     .param pmc my_data
-    .param pmc library_data
+    .param pmc library_data   # type depends on signature
     # Do something with the passed in data
   .end
 
@@ -253,6 +219,10 @@ various places, and generally dealing with the bookkeeping.
 
 L<pdd06_pasm.pod>
 
+=head1 SEE ALSO
+
+L<t/pmc/nci.t>, L<src/nci_test.c>
+
 =head1 VERSION
 
 =head2 CURRENT
@@ -260,15 +230,19 @@ L<pdd06_pasm.pod>
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 16
-    Version: 1.0
+    Version: 1.1
     Status: Developing
-    Last Modified: December 28, 2003
+    Last Modified: Oct 12, 2004
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item version 1.1
+
+Changed callback section to reflect current status.
 
 =item version 1
 
@@ -279,6 +253,10 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item version 1.1
+
+Changed callback section to reflect current status.
 
 =item Version 1.0
 
