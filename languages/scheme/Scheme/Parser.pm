@@ -33,6 +33,27 @@ sub _build_tree {
     ($count, $expr) = _build_tree ($tokens, $count);
     push @{$temp->{children}}, $expr;
   }
+  elsif ($tokens->[$count] eq "`") {
+    $temp = { children => [{ value => 'quasiquote' }] };
+    my $expr;
+    $count++;
+    ($count, $expr) = _build_tree ($tokens, $count);
+    push @{$temp->{children}}, $expr;
+  }
+  elsif ($tokens->[$count] eq ",") {
+    $temp = { children => [{ value => 'unquote' }] };
+    my $expr;
+    $count++;
+    ($count, $expr) = _build_tree ($tokens, $count);
+    push @{$temp->{children}}, $expr;
+  }
+  elsif ($tokens->[$count] eq ",@") {
+    $temp = { children => [{ value => 'unquote-splicing' }] };
+    my $expr;
+    $count++;
+    ($count, $expr) = _build_tree ($tokens, $count);
+    push @{$temp->{children}}, $expr;
+  }
   else {
     $temp->{value} = $tokens->[$count++];
   }

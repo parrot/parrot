@@ -23,10 +23,16 @@ sub link_functions {
 
   my $code = $main->{code};
 
+  my $header = "# Header information\n        new_pad 0\n";
+
   while (@missing) {
     my $miss = shift @missing;
 
     my $link = Scheme::Builtins->generate($miss);
+    $header .= << "END";
+        newsub P16, .Sub, ${miss}_ENTRY
+        store_lex 0, "$miss", P16
+END
 
     push @function, $miss;
 
@@ -39,7 +45,7 @@ sub link_functions {
     $code .= $link->{code};
   }
 
-  $code;
+  $header . $code;
 }
 
 sub compile {

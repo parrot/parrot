@@ -124,6 +124,7 @@ sub _find_lex {
   my ($self, $symbol) = @_;
   my $return = $self->_save_1 ('P');
   $self->_add_inst ('','find_lex',[$return,"\"$symbol\""]);
+
   return $return;
 }
 
@@ -135,6 +136,17 @@ sub _store_lex {
 sub _new_lex {
   my ($self, $symbol, $value) = @_;
   $self->_add_inst ('','store_lex',[-1,"\"$symbol\"",$value]);
+  $self->{scope}->{$symbol} = $value;
+}
+
+sub _new_pair {
+  my ($self) = @_;
+  my $return = $self->_save_1('P');
+
+  $self->_add_inst('', 'new', [$return,'.Array']);
+  $self->_add_inst('', 'set', [$return, 2]);
+
+  return $return;
 }
 
 #------------------------------------
@@ -188,8 +200,7 @@ sub _morph {
 #---- Section 4 ----
 
 sub __quoted {
-  my ($self, $node) = @_;
-  my $return = $self->_save_1 ('P');
+  my ($self, $node, $return, $special) = @_;
 
   if (exists $node->{value}) {
     my $value = $node->{value};
@@ -207,13 +218,27 @@ sub __quoted {
     }
   }
   elsif (exists $node->{children}) {
+    my $children = $node->{children};
+ 
     $self->_add_inst ('', 'new', [$return,'.PerlUndef']);
-    for (reverse @{$node->{children}}) {
+    for (reverse @$children) {
+      if (exists $_->{children}) {
+        my $arg0 = _get_arg($_, 0);
+        if (exists $arg0->{value}) {
+          my $value = $arg0->{value};
+          if (exists $special->{$value}) {
+            _num_arg($_, 1);
+            $special->{$value}->($self, _get_arg($_, 1), $return);
+            next;
+          }
+        }
+      }
+      my $item = $self->_save_1 ('P');
 
-      my $item = __quoted ($self, $_);
-      my $pair = $self->_save_1 ('P');
-      $self->_add_inst ('', 'new', [$pair,'.Array']);
-      $self->_add_inst ('', 'set', [$pair,2]);
+      __quoted ($self, $_, $item, $special);
+
+      my $pair = $self->_new_pair();
+
       $self->_add_inst ('', 'set', [$pair.'[0]',$item]);
       $self->_add_inst ('', 'set', [$pair.'[1]',$return]);
       $self->_add_inst ('', 'set', [$return,$pair]);
@@ -226,13 +251,94 @@ sub __quoted {
 
 sub _op_quote {
   my ($self, $node) = @_;
-  my $return;
+  my $return = $self->_save_1 ('P');
 
   _num_arg ($node, 1, 'quote');
 
   my $item = _get_arg($node,1);
 
-  return __quoted ($self, $item);
+  return __quoted ($self, $item, $return, {});
+}
+
+sub _op_quasiquote {
+  my ($self, $node) = @_;
+  my $return = $self->_save_1 ('P');
+  my $special = { 
+		  unquote => \&_qq_unquote,
+		  'unquote-splicing' => \&_qq_unquote_splicing
+		};
+
+  _num_arg ($node, 1, 'quote');
+
+  my $item = _get_arg($node,1);
+
+  __quoted ($self, $item, $return, $special);
+}
+
+# helper functions for quasiquote
+
+sub _qq_unquote {
+  my ($self, $node, $return) = @_;
+
+  my $item = $self->_generate($node);
+
+  if ($item =~ /^[INS]/) {
+    my $temp = $self->_save_1('P');
+    $self->_morph($temp, $item);
+    $self->_restore($item);
+    $item = $temp;
+  }
+  my $pair = $self->_new_pair;
+  $self->_add_inst('', 'set', [$pair.'[0]',$item]);
+  $self->_add_inst('', 'set', [$pair.'[1]',$return]);
+  $self->_add_inst('', 'set', [$return,$pair]);
+  $self->_restore($item, $pair);
+
+  return $return;
+}
+
+sub _qq_unquote_splicing {
+  my ($self, $node, $return) = @_;
+
+  my $list = $self->_generate($node);
+
+  die "unquote-splicing called on no list" if ($list =~ /^[INS]/);
+
+  my $type = $self->_save_1('I');
+  my $head = $self->_save_1('P');
+  my $label = $self->_gensym;
+
+  # check for empty list
+  $self->_add_inst('', 'typeof', [$type, $list]);
+  $self->_add_inst('', 'eq', [$type,'.PerlUndef',"DONE_$label"]);
+
+  my $copy = $self->_new_pair;
+
+  $self->_add_inst('', 'set', [$head, $copy]);
+
+  # maybe ensure that $type is a pair here
+  my $temp = $self->_save_1('P');
+  $self->_add_inst("ITER_$label", 'set', [$temp,$list.'[0]']);
+  $self->_add_inst('', 'set', [$copy.'[0]',$temp]);
+  $self->_restore($temp);
+
+  $self->_add_inst('', 'set', [$list,$list.'[1]']);
+  $self->_add_inst('', 'typeof', [$type,$list]);
+  $self->_add_inst('', 'eq', [$type,'.PerlUndef',"FINISH_$label"]);
+
+  $temp = $self->_new_pair;
+  $self->_add_inst('', 'set', [$copy.'[1]',$temp]);
+  $self->_add_inst('', 'set', [$copy,$temp]);
+  $self->_add_inst('', 'branch', ["ITER_$label"]);
+  $self->_restore($temp);
+
+  # append the rest to the end of list
+  $self->_add_inst("FINISH_$label", 'set', [$copy.'[1]',$return]);
+  $self->_add_inst('', 'set', [$return,$head]);
+  $self->_add_inst("DONE_$label");
+
+  $self->_restore($list, $copy, $head, $type);
+  return $return;
 }
 
 sub _op_lambda {
@@ -243,12 +349,7 @@ sub _op_lambda {
 
   $return = $self->_save_1 ('P');
 
-  $self->_add_inst ('', 'new',[$return,'.Closure']);
-
-  my $addr = $self->_save_1 ('I');
-  $self->_add_inst ('', 'set_addr',[$addr,"LAMBDA_$label"]);
-  $self->_add_inst ('', 'set',[$return,$addr]);
-  $self->_restore ($addr);
+  $self->_add_inst ('', 'newsub',[$return,'.Closure',"LAMBDA_$label"]);
 
   $self->_add_inst ('', 'branch',["DONE_$label"]);
   $self->_add_inst ("LAMBDA_$label");
@@ -258,9 +359,12 @@ sub _op_lambda {
   $self->{regs} = _new_regs;
   # P1 is the return contination
   $self->{regs}{P}{1} = 1;
-
+  
   # expand the lexical scope
   $self->_add_inst('', 'new_pad', [-1]);
+  my $oldscope = $self->{scope};
+  $self->{scope} = { '*UP*' => $oldscope };
+
   my $num = 5;
   my @args = @{_get_arg($node,1)->{children}};
   for (@args) {
@@ -282,6 +386,7 @@ sub _op_lambda {
   $self->_add_inst("DONE_$label");
 
   $self->{regs} = pop @{$self->{frames}};
+  $self->{scope} = $self->{scope}->{'*UP*'};
 
   return $return;
 }
@@ -315,25 +420,29 @@ sub _op_define {
 
   _num_arg ($node, 2, 'define');
 
-  my ($symbol, $value);
+  my ($symbol, $lambda, $value);
 
   if (exists _get_arg($node,1)->{children}) {
     my @formals;
     ($symbol, @formals) = @{_get_arg($node,1)->{children}};
     $symbol = $symbol->{value};
-    my $lambda = { children => [ { value => 'lambda' },
-				 { children => [ @formals ] },
-				 _get_args ($node, 2) ] };
-    $value = $self->_generate($lambda);
+    $lambda = { children => [ { value => 'lambda' },
+                              { children => [ @formals ] },
+                              _get_args ($node, 2) ] };
   }
   else {
     $symbol = _get_arg($node,1)->{value};
-    $value = $self->_generate (_get_arg($node,2));
+    $lambda = _get_arg($node,2);
   }
 
   if (exists $self->{scope}->{$symbol}) {
     die "define: $symbol is already defined\n";
   }
+  else {
+    $self->{scope}->{$symbol} = '*unknown*';
+  }
+
+  $value = $self->_generate($lambda);
 
   if ($value !~ /^P/) {
     my $pmc = $self->_save_1 ('P');
@@ -342,7 +451,6 @@ sub _op_define {
     $value = $pmc;
   }
 
-  $self->{scope}->{$symbol} = 1;
   $self->_new_lex ($symbol,$value);
 
   return $value;
@@ -476,9 +584,6 @@ sub _op_do {
 }
 
 sub _op_delay {
-}
-
-sub _op_quasiquote {
 }
 
 #---- Section 6 ----
@@ -1360,17 +1465,7 @@ sub _op_apply {
   my @args = _get_args ($node, 2);
   die "apply: wrong number of args\n" unless @args;
 
-  my $argl = $self->_generate(pop @args);
-  while (@args) {
-    my $elem = $self->_generate(pop @args);
-    my $pair = _save_1('P');
-    $self->_add_inst ('','new',[$pair,'.Array']);
-    $self->_add_inst ('','set',[$pair,2]);
-    $self->_add_inst ('','set',[$pair.'[0]',$elem]);
-    $self->_add_inst ('','set',[$pair.'[1]',$argl]);
-  }
-
-#  $return = $self->_call_function ('apply');
+  $return = $self->_call_function_sym('apply');
 
   return $return;
 }
@@ -1448,13 +1543,8 @@ sub _op_write {
     if ($temp =~ /[INS]/) {
       $self->_add_inst('','print',[$temp]);
     }
-    else {
-      push @{$self->{functions}}, 'write'
-	unless grep { $_ eq 'write' } @{$self->{functions}};
-      $self->_save_set;
-      $self->_add_inst('', 'set', ['P5', $temp]);
-      $self->_add_inst('', 'bsr', ['write_ENTRY']);
-      $self->_restore_set;
+    else {  
+      $self->_call_function_sym('write',$temp);
     }
   }
   return $temp; # We need to return something
@@ -1815,7 +1905,28 @@ sub __max_lengths {
   @max_len;
 }
 
-sub _call_function {
+sub _call_function_sym {
+  my $self = shift;
+  my $symbol = shift;
+  my $func_obj = $self->_find_lex($symbol);
+
+  my $scope = $self->{scope};
+
+  while ($scope && !exists $scope->{$symbol}) {
+    $scope = $scope->{'*UP*'};
+  }
+  if (!$scope) {
+    push @{$self->{functions}}, $symbol
+      unless grep { $_ eq $symbol} @{$self->{functions}};
+  }
+
+  my $return = $self->_call_function_obj($func_obj, @_);
+  $self->_restore($func_obj);
+
+  return $return;
+}
+
+sub _call_function_obj {
   my $self = shift;
   my $func_obj = shift;
 
@@ -1890,6 +2001,7 @@ sub new {
     frames => [],
     gensym   => 0,
     functions=> [],
+    scope    => {},
   };
   bless $self,$class;
 }
@@ -1918,14 +2030,13 @@ sub _generate {
       if (exists $global_ops{$symbol}) {
 	$return = $global_ops{$symbol}->($self, $node);
       } else {
-	my $func_obj = $self->_find_lex ($symbol);
 	my @args = map { $self->_generate($_); } _get_args($node);
-	$return = $self->_call_function($func_obj, @args);
-	$self->_restore($func_obj, @args);
+	$return = $self->_call_function_sym($symbol, @args);
+	$self->_restore(@args);
       }
     } else {
       my @args = map { $self->_generate($_); } _get_args($node, 0);
-      $return = $self->_call_function(@args);
+      $return = $self->_call_function_obj(@args);
       $self->_restore(@args);
     }
   } else {
@@ -1946,11 +2057,9 @@ sub generate {
   my $temp;
 
   $self->{scope} = {};
-  $self->_add_inst ('', 'new_pad',[0]);
 
   $temp = $self->_generate($tree);
 
-  $self->_add_inst ('', 'pop_pad');
   $self->_restore($temp);
   $self->_add_inst('',"end");
 

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Scheme::Test tests => 21;
+use Scheme::Test tests => 26;
 
 output_is(<<'CODE', '(2 . 5)', 'cons');
 (write (cons 2 5))
@@ -105,4 +105,29 @@ CODE
 output_is (<<'CODE', '(1 2 (3 4))', 'complex list II');
 (write
   (list 1 2 (list 3 4)))
+CODE
+
+output_is (<<'CODE', '(list 3 4)', 'quasiquote');
+(write
+  `(list ,(+ 1 2) 4))
+CODE
+
+output_is (<<'CODE', '(quasiquote (list (unquote (+ 1 2)) 4))', 'quoted quasiquote');
+(write
+  '`(list ,(+ 1 2) 4))
+CODE
+
+output_is(<<'CODE', '(list 1 2 3)', 'unquote-splicing');
+(write
+  `(list ,@(list 1 2 3)))
+CODE
+
+output_is(<<'CODE', '(list)', 'splicing empty list');
+(write
+  `(list ,@(list)))
+CODE
+
+output_is(<<'CODE', '(list 1 2 3 (4 5))', 'complex quasiquote');
+(write
+  `(list ,@(list 1 2) ,(+ 1 2) ,(list 4 5)))
 CODE
