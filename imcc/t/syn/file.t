@@ -341,9 +341,11 @@ END_PIR
 close FOO;
 # compile it
 
+open FOO, "<non_existent.file";
+my $ENOENT = $!;
 use Test::More;
 is(`$PARROT temp.imc 2>&1`, <<OUT, "calling a non-existent file");
-error:imcc:No such file or directory
+error:imcc:$ENOENT
 in file 'temp.imc' line 2
 OUT
 unlink "temp.pasm";
