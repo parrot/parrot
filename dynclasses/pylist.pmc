@@ -541,9 +541,10 @@ Sort this array, optionally using the provided cmp_func
 */
 
 METHOD void sort(PMC *self, PMC *cmp_func) {
+    INTVAL n;
     if (REG_INT(3) < 2 || !VTABLE_get_bool(INTERP, cmp_func)) 
         cmp_func = NULL;
-    INTVAL n = VTABLE_elements(INTERP, self);
+    n = VTABLE_elements(INTERP, self);
     quicksort(INTERP, (List *) PMC_data(self), cmp_func, 0, n-1);
 }
 
