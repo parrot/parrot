@@ -619,10 +619,9 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     /* Hard coded to IPv4 for now */
     int family = AF_INET;
 
-    /* XXX: Fixme, inet_addr obsolete, replace with inet_aton */
     char * s = string_to_cstring(interpreter, addr);
-    if(inet_aton(s, &sa.sin_addr) != 0) {
-    /*if(inet_pton(family, s, &sa.sin_addr) != 0) {*/
+    /*if(inet_aton(s, &sa.sin_addr) != 0) {*/
+    if(inet_pton(family, s, &sa.sin_addr) != 0) {
         /* Success converting numeric IP */
     }
     else {
