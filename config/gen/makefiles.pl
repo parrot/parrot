@@ -29,6 +29,8 @@ sub runstep {
           commentType => '#');
   genfile('config/gen/makefiles/bf.in',        'languages/bf/Makefile',
           commentType => '#');
+  genfile('config/gen/makefiles/befunge.in',   'languages/befunge/Makefile',
+          commentType => '#');
 }
 
 1;

@@ -1292,7 +1292,6 @@ languages/BASIC/stackops.pasm
 languages/BASIC/tokenize.pasm
 languages/BASIC/wumpus.bas
 languages/befunge/Changes
-languages/befunge/Makefile
 languages/befunge/README
 languages/befunge/befunge.pasm
 languages/befunge/debug.pasm
