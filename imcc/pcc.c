@@ -573,6 +573,77 @@ move_cc:
         }
     }
 }
+
+/*
+ * optimize register save op (savetop/restoretop)
+ * for PCC
+ */
+static void
+optc_savetop(Parrot_Interp interpreter, Instruction *ins)
+{
+    char types[] = "ISPN";
+    Instruction *tmp;
+    SymReg * regs[IMCC_MAX_REGS];
+    char *new_save[] = {
+        "pushtopi",
+        "pushtops",
+        "pushtopp",
+        "pushtopn"
+    };
+    char *new_restore[] = {
+        "poptopi",
+        "poptops",
+        "poptopp",
+        "poptopn"
+    };
+    int needs_save[4], nsave;
+    int i, t;
+
+    UNUSED(interpreter);
+    for (i = 0; i < 4; i++)
+        needs_save[i] = 0;
+    for (i = 0; i < n_symbols; i++) {
+        SymReg * r = reglist[i];
+        if ((r->type & VTREGISTER) && r->color >= 16) {
+            t = strchr(types, r->set) - types;
+            needs_save[t] = 1;
+        }
+    }
+
+    for (nsave = i = 0; i < 4; i++)
+        nsave += needs_save[i];
+    switch (nsave) {
+        case 0:
+            debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            ins = delete_ins(ins, 1);
+            debug(DEBUG_OPT1, "deleted\n");
+            ostat.deleted_ins++;
+            for (; ins ; ins = ins->next)
+                if (!strcmp(ins->op, "restoretop"))
+                    break;
+            debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            ins = delete_ins(ins, 1);
+            debug(DEBUG_OPT1, "deleted\n");
+            ostat.deleted_ins++;
+            break;
+        case 1:
+            debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            for (i = 0; i < 4; i++)
+                if (needs_save[i])
+                    break;
+            tmp = INS(interpreter, new_save[i], NULL, regs, 0, 0, 0);
+            subst_ins(ins, tmp, 1);
+            debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+            for (; ins ; ins = ins->next)
+                if (!strcmp(ins->op, "restoretop"))
+                    break;
+            debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            tmp = INS(interpreter, new_restore[i], NULL, regs, 0, 0, 0);
+            subst_ins(ins, tmp, 1);
+            debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+            break;
+    }
+}
 /*
  * special peephole optimizer for code generated mainly by
  * above functions
@@ -609,6 +680,17 @@ pcc_optimize(Parrot_Interp interpreter)
                 ins = ins->prev ? ins->prev : instructions;
                 debug(DEBUG_OPT1, "deleted\n");
                 ostat.deleted_ins++;
+            }
+        }
+        else if (ins->type & ITPCCSUB) {
+            tmp = ins;
+            tmp = tmp->prev;
+            if (!strcmp(tmp->op, "savetop"))
+                optc_savetop(interpreter, tmp);
+            else {
+                tmp = tmp->prev;
+                if (!strcmp(tmp->op, "savetop"))
+                    optc_savetop(interpreter, tmp);
             }
         }
     }
