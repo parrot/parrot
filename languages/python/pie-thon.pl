@@ -37,6 +37,7 @@ my %builtins = (
     filter => 1,
     list => 1,
     long => 1,
+    int => 1,
     map => 1,
     max => 'v',
     min => 'v',
@@ -496,6 +497,7 @@ EOC
     }
     else {
 	$c = 'py_float' if $c eq 'float'; # XXX imcc name clash
+	$c = 'py_int' if $c eq 'int'; # XXX imcc name clash
 	$globals{$c} = 1;
 	my $type = 'pmc';
 	$type = 'NCI' if ($builtins{$c});
@@ -1006,6 +1008,7 @@ EOC
 	}
 	$args = $ar;
     }
+    my $rett = 'P';
     if ($tos->[2] eq 'o') {	# builtin opcode
 	$t = temp('P');
 	print <<EOC;
@@ -1018,7 +1021,7 @@ EOC
 	my $ret_type = ret_val($attr);
 	my $ret_string = "";
 	if ($ret_type ne 'None') {
-	    $t = temp($ret_type);
+	    $t = temp($rett = $ret_type);
 	    $ret_string = "$t = ";
 	}
 	print <<EOC;
@@ -1030,7 +1033,7 @@ EOC
 	my $ret_type = ret_val($func);
 	my $ret_string = "";
 	if ($ret_type ne 'None') {
-	    $t = temp($ret_type);
+	    $t = temp($rett = $ret_type);
 	    $ret_string = "$t = ";
 	}
 	print <<EOC;
@@ -1049,7 +1052,7 @@ EOC
 	$t = P5
 EOC
 	}
-	push @stack, [-1, $t, 'P'];
+	push @stack, [-1, $t, $rett];
     }
 }
 

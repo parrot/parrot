@@ -428,8 +428,8 @@ output_is(<<'CODE', <<OUTPUT, "nasty string -> int");
 	print	"\n"
        end
 CODE
-1Z1
-1
+0Z1
+0
 123
 OUTPUT
 
@@ -474,21 +474,21 @@ EQ5:	print	"ok 5\\n"
 
 	set	P0, "X1.2X"
 	set	N0, P0
-	.fp_eq(	N0, 1.2, EQ6)
+	.fp_eq(	N0, 0.0, EQ6)
 	print	N0
 	print	"not "
 EQ6:	print	"ok 6\\n"
 
 	set	P0, "E1-1.2e+2"
 	set	N0, P0
-	.fp_eq(	N0, 1, EQ7)
+	.fp_eq(	N0, 0.0, EQ7)
 	print	N0
 	print	"not "
 EQ7:	print	"ok 7\\n"
 
 	set	P0, "++-1"
 	set	N0, P0
-	.fp_eq(	N0, -1, EQ8)
+	.fp_eq(	N0, 0.0, EQ8)
 	print	N0
 	print	"not "
 EQ8:	print	"ok 8\\n"

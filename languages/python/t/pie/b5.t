@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 12;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -259,6 +259,61 @@ def main():
 	check(hash(42), hash(42.0))
 	check(hash(42+0j), hash(42.0))
 	print hash("abc") == hash(u"abc")
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'check_functions hex');
+show = True
+
+def check(a, b):
+    if __debug__:
+        if show:
+            print `a`, "==", `b`
+    if not a == b:
+        raise AssertionError("%.30r != %.30r" % (a, b))
+
+def check_functions(i=0, j=0):
+    check(divmod(7, 4), (1, 3))
+
+def main():
+    check_functions()
+    check_functions(j=10, i=10)
+    for i in range(0,500,249):
+	print "i:", i
+	check(hex(42).lower(), "0x2a")
+	check(hex(42L).lower(), "0x2al")
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'check_functions int');
+show = True
+
+def check(a, b):
+    if __debug__:
+        if show:
+            print `a`, "==", `b`
+    if not a == b:
+        raise AssertionError("%.30r != %.30r" % (a, b))
+
+def check_functions(i=0, j=0):
+    check(divmod(7, 4), (1, 3))
+
+def main():
+    check_functions()
+    check_functions(j=10, i=10)
+    for i in range(0,500,249):
+	print "i:", i
+	check(int("42"), 42)
+	check(int("12345678910"), 12345678910)
+	check(int("42", 0), 42)
+	check(int("042", 0), 34)
+	check(int("0x42", 0), 66)
+	check(int("42", 8), 34)
+	check(int("42", 16), 66)
 
 if __name__ == '__main__':
     main()

@@ -82,8 +82,8 @@ bigint_get_bool(Interp *interpreter, PMC *self) {
     return 0;
 }
 static char *
-bigint_get_string(Interp *interpreter, PMC *self) {
-    return mpz_get_str(NULL, 10, BN(self));
+bigint_get_string(Interp *interpreter, PMC *self, int base) {
+    return mpz_get_str(NULL, base, BN(self));
 }
 
 static double
@@ -198,7 +198,7 @@ bigint_get_self(Interp *interpreter, PMC *self) {
 }
 
 static char *
-bigint_get_string(Interp *interpreter, PMC *self) {
+bigint_get_string(Interp *interpreter, PMC *self, int base) {
     internal_exception(1, "no bigint lib loaded");
     return NULL;
 }
@@ -428,6 +428,10 @@ Returns the boolean value of the integer.
 
 Returns the string representation of the integer.
 
+=item C<STRING* get_string_keyed_int(INTVAL base)>
+
+Returns the string representation of the integer in base C<base>.
+
 =item C<STRING* get_repr()>
 
 Returns the string representation of the integer with the letter 'L'
@@ -438,12 +442,18 @@ appended.
 */
 
     STRING* get_string() {
-        char *s = bigint_get_string(INTERP, SELF);
+        char *s = bigint_get_string(INTERP, SELF, 10);
         STRING *ps = string_from_cstring(INTERP, s, 0);
         free(s);
         return ps;
     }
 
+    STRING* get_string_keyed_int(INTVAL base) {
+        char *s = bigint_get_string(INTERP, SELF, base);
+        STRING *ps = string_from_cstring(INTERP, s, 0);
+        free(s);
+        return ps;
+    }
     STRING* get_repr() {
         STRING *s = SELF.get_string();
         return string_append(INTERP, s, const_string(INTERP, "L"), 0);

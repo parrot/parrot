@@ -203,6 +203,33 @@ parrot_py_long(Interp *interpreter, PMC *val, PMC *radix)
 
 }
 
+static PMC *
+parrot_py_int(Interp *interpreter, PMC *val, PMC *radix)
+{
+    PMC *res;
+    INTVAL base, argcP, intnum;
+    STRING *num;
+
+    if ((argcP = REG_INT(3)) == 0)
+        return pmc_new(interpreter, enum_class_PerlInt);
+    if (argcP == 2) {
+        base = VTABLE_get_integer(interpreter, radix);
+        /* val must be a STRING */
+    }
+    else
+        base = 10;
+    res = pmc_new(interpreter, enum_class_BigInt);
+    num = VTABLE_get_string(interpreter, val);
+    VTABLE_set_string_keyed_int(interpreter, res, base, num);
+    if (num->strlen < 9) {  /* XXX */
+        /* TODO not if it would overflow */
+        intnum = VTABLE_get_integer(interpreter, res);
+        res = pmc_new(interpreter, enum_class_PerlInt); /*TODO morph */
+        VTABLE_set_integer_native(interpreter, res, intnum);
+    }
+    return res;
+}
+
 #define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
 static PMC *
 parrot_py_max(Interp *interpreter, PMC *argv)
@@ -467,6 +494,11 @@ parrot_py_hex(Interp *interpreter, PMC *pmc)
     STRING *s = Parrot_sprintf_c(interpreter, "%#x",
             VTABLE_get_integer(interpreter, pmc));
     PMC *p = pmc_new(interpreter, enum_class_PerlString);
+    /*
+     * XXX should sprintf handle that
+     */
+    if (pmc->vtable->base_type == enum_class_BigInt)
+        s = string_append(interpreter, s, CONST_STRING(interpreter, "L"), 0);
     string_set(interpreter, PMC_str_val(p), s);
     return p;
 }
@@ -622,6 +654,7 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *hash     = CONST_STRING(interpreter, "hash");
     STRING *hex      = CONST_STRING(interpreter, "hex");
     STRING *id       = CONST_STRING(interpreter, "id");
+    STRING *intf     = CONST_STRING(interpreter, "py_int");
     STRING *list     = CONST_STRING(interpreter, "list");
     STRING *floatf   = CONST_STRING(interpreter, "py_float");
     STRING *longf    = CONST_STRING(interpreter, "long");
@@ -643,6 +676,7 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_hex), hex, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_id), id, ip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_int), intf, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_long), longf, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_float), floatf, pip);
