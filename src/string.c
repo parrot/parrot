@@ -159,7 +159,12 @@ string_transcode(struct Parrot_Interp *interpreter,
     char *destend;
 
     if (src->encoding == encoding && src->type == type) {
-        return string_copy(interpreter, src);
+        dest = string_copy(interpreter, src);
+
+        if (dest_ptr) {
+            *dest_ptr = dest;
+        }
+        return dest;
     }
 
     dest = string_make(interpreter, NULL, src->strlen*encoding->max_bytes,
