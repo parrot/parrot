@@ -20,6 +20,7 @@ pmclass Sub {
        PMC_sub(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
        SELF->cache.struct_val = NULL;
        PObj_custom_mark_destroy_SETALL(SELF);
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
        printf("Address of base segment is %p\n", ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
    }
 

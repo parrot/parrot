@@ -21,6 +21,7 @@ pmclass Closure extends Sub {
        PMC_sub(SELF) = new_closure(INTERP);
        SELF->cache.struct_val = NULL;
        PObj_custom_mark_destroy_SETALL(SELF);
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
        printf("Address of base segment is %p\n", ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
    }
 
