@@ -19,6 +19,7 @@ sub common_while ;
 sub prefix_while ;
 sub gen_sub_call ;
 sub prefix_for ;
+sub prefix_pos ;
 sub prefix_neg ;
 sub prefix_foreach ;
 sub prefix_try ;
@@ -35,6 +36,7 @@ BEGIN {
  'for' => \&prefix_for,
  'foreach' => \&prefix_foreach,
  'try' => \&prefix_try,
+ '+' => \&prefix_pos,
  '-' => \&prefix_neg,
  'return' => \&prefix_return,
  'given' => \&prefix_given,
@@ -457,6 +459,17 @@ sub prefix_neg {
     my $res = newtmp;
     code(<<END);
 	$res = - $tmp
+END
+    return scalar_in_context($res, $x->{ctx});
+}
+
+# unary plus.
+sub prefix_pos {
+    my $x = shift;
+    my $tmp = $x->args->val;
+    my $res = newtmp;
+    code(<<END);
+	$res = $tmp
 END
     return scalar_in_context($res, $x->{ctx});
 }

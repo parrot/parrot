@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 14;
+use P6C::TestCompiler tests => 15;
 use Test::More qw(skip);
 
 ##############################
@@ -10,6 +10,23 @@ sub main() {
 }
 CODE
 Hello, world
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Unary '+', posification");
+print( 0, "\n" );
+print( -0, "\n" );
+print( +0, "\n" );
+print( 1, "\n" );
+print( +2, "\n" );
+print( -3, "\n" );
+CODE
+0
+0
+0
+1
+2
+-3
 OUT
 
 ##############################

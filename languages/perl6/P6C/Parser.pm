@@ -252,7 +252,10 @@ BEGIN {
     $MULDIV	= qr{[\%*x]|/(?!/)};
     $MATCH	= qr{[=!]~};
     $INCR	= qr{\+\+|--};
-    $PREFIX	= qr{[!~\\]|-(?![->])};
+    $PREFIX	= qr{ [!~\\]   |    # logical negation '!', bitwise negation '~', create a reference '\'
+                      \+(?!\+) |    # posification '+', but not increment '++' 
+                      -(?![->])     # negation '-', but not decrement '--', but not dereference '->'
+                    }x;
     $ADDSUB	= qr{[-+_]};
     $BITSHIFT	= qr{<<|>>};
     $LOG_OR	= qr{(?:x?or|err)\b};

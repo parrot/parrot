@@ -413,6 +413,7 @@ sub foreach_context {
 }
 
 BEGIN {
+    $P6C::Context::CONTEXT{'+'} = new P6C::Context type => 'PerlUndef';
     $P6C::Context::CONTEXT{'-'} = new P6C::Context type => 'PerlUndef';
     $P6C::Context::CONTEXT{defined} = new P6C::Context type => 'PerlUndef';
     $P6C::Context::CONTEXT{if}
