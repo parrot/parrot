@@ -733,3 +733,12 @@ miniparrot-prebuild : $(GEN_CONFIGS) $(FLUID_FILES)
 
 miniparrot-update :
 	tools/dev/rebuild_miniparrot.pl
+
+###############################################################################
+#
+# exec:
+#
+###############################################################################
+
+exec : exec_start($O) $(LIBPARROT)
+	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) exec_start$(O) $(LIBPARROT) $(C_LIBS)
