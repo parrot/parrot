@@ -1,4 +1,5 @@
 # Parrot md5sum; Nick Glencross <nickg@glencros.demon.co.uk>
+#                Improvements from Leo
 #
 # Based on md5.c, from md5sum
 #           written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
@@ -36,7 +37,7 @@ Only tested so far on i386.
 
 =item * Might work on 64 bit platforms
 
-=item * Might not work on big endian systems
+=item * Might not work on big endian systems (confirmed)
 
 =back
 
@@ -95,6 +96,7 @@ is_little_endian:
     _md5_process_buffer (context, buffer)
 
     .return(context)
+
 .end
 
 
@@ -275,7 +277,7 @@ md5_create_buffer_break:
      shift = 8*subcounter
      word = word << shift
      if endian goto endian_ok2
-	 .swap (word)
+     .swap (word)
 endian_ok2:
 
      buffer[slow_counter] = word
@@ -300,15 +302,8 @@ complete:
     .param pmc    context
     .param pmc  buffer
 
-    .local int A
-    .local int B
-    .local int C
-    .local int D
-
-    .local int A_save
-    .local int B_save
-    .local int C_save
-    .local int D_save
+    .local int A, B, C, D
+    .local int A_save, B_save, C_save, D_save
 
     .local int tmp, idx, len
 
@@ -413,7 +408,7 @@ md5_loop:
     context[2] = C
     context[3] = D
 
-    # _print_vals (A,B,C,D)
+    # print_vals (A,B,C,D)
     # print "\n"
 
 .end
@@ -470,6 +465,7 @@ md5_loop:
 dont_swap:
 
     _print_vals (A,B,C,D)
+
 .end
 
 ###########################################################################
@@ -501,6 +497,7 @@ print_buffer_loop:
 print_buffer_done:
 
     print "\n"
+
 .end
 
 ###########################################################################
@@ -523,4 +520,5 @@ print_buffer_done:
     sprintf $S0, $S1, $P0
 
     .return($S0)
+
 .end

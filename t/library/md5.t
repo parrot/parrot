@@ -6,19 +6,22 @@
 # $ echo -n Hello World! | md5sum
 # a0f32c7d31302c1427285b1a0fcbb015  -
 
+# As well as testing the MD5 library itself, it is useful for spotting
+# regressisions in the parrot VM, JIT and GC
+
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 use Parrot::Config;
 
-my $bigendian = $PConfig{bigendian};
 my $intsize   = $PConfig{intsize};
+my $bigendian = $PConfig{bigendian};
 
 SKIP: {
 
 if ($bigendian || $intsize != 4)
 {
-    skip('MD5 only known to work on small endian 32 bit processors', 3)
+    skip('MD5 only known to work on small endian 32 bit processors', 4)
 }
 
 
@@ -53,6 +56,8 @@ e7cb1e977e896954fec46d2ea7832072
 ed076287532e86365e841e92bfc50d8c
 OUT
 
+
+
 pir_output_is(<<'CODE', <<'OUT', "Funny chars");
 .sub _main
     load_bytecode "library/Digest/MD5.imc"
@@ -78,6 +83,7 @@ CODE
 ;
      }
      (
+      "",
       "0",
       "01",
       "012",
@@ -200,6 +206,7 @@ pir_output_is(<<CODE, <<'OUT', "String lengths");
     end
 .end
 CODE
+d41d8cd98f00b204e9800998ecf8427e
 cfcd208495d565ef66e7dff9f98764da
 96a3be3cf272e017046d1b2674a52bd3
 d2490f048dc3b77a457e3e450ab4eb38
@@ -312,4 +319,20 @@ d2cfbebc441bea6a9c9c4a2faba865e2
 09e32555adc12a6f2c8fed9a459935af
 6c27622d1d5365e4abfd02f2eccfd8f9
 OUT
+
+
+my $text = "Hello Parrot World! " x 50_000;
+
+pir_output_is(<<CODE, <<'OUT', "REALLY long string");
+.sub _main
+    load_bytecode "library/Digest/MD5.imc"
+    \$P0 = _md5sum ("$text")
+    _md5_print (\$P0)
+    print "\\n"
+    end
+.end
+CODE
+840e4dec51660b1f52473e0b0b9545f5
+OUT
+
 }

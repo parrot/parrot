@@ -1,7 +1,7 @@
 # Parrot md5sum; Nick Glencross <nickg@glencros.demon.co.uk>
+#                Improvements from Leo
 #
-# Based on md5.c, from md5sum
-#           written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
+# Harness for the library/Digest/MD5.imc library
 
 =head1 NAME
 
@@ -15,17 +15,19 @@ examples/assembly/md5sum.imc - calculate MD5 checksums
 
 Behave very much like md5sum(1).
 
+Running parrot with -j will give a significant performance boost (often
+about ten-fold).
+
 =cut
 
 ###########################################################################
 
-
-# Main Harness to show that it works
+# Main Harness to demonstrate MD5.imc
 
 .sub _main @MAIN
     .param pmc args
 
-    .local int   size
+    .local int size
     load_bytecode "library/Digest/MD5.imc"
     # Argument count
     $I0 = args
@@ -46,7 +48,7 @@ next_iter:
     if $I1 > $I0 goto iter_done
     $S0 = args[$I1]
     .include "stat.pasm"
-    # get size of file
+    # Get size of file
     stat size, $S0, .STAT_FILESIZE
     open $P0, $S0, "<"
     defined $I2, $P0
