@@ -1,11 +1,12 @@
 #! ruby
 
 class Foo
-	attr_reader :i, :j
-
 	def initialize()
 		@i = 10
 		@j = 20
+	end
+	def i
+		@i
 	end
 	def i=(i)
 		@i = i
