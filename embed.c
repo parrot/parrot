@@ -171,7 +171,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
     
     for(i=0; i < argc; i++) {
         if(interpreter->flags & PARROT_DEBUG_FLAG) {
-            fprintf(stderr, "\t%d: %s\n", i, argv[i]);
+            fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
         userargv->vtable->set_string_index(interpreter, userargv, 
