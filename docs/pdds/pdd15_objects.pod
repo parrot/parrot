@@ -487,7 +487,23 @@ Adding the attributes C<a> and C<b> to the new class C<Foo>:
 
 =head2 Instantiating an object
 
+Assuming we want an object of class C<Foo>:
+
+  .local int FooType
+  .local pmc MyObject
+  findtype FooType, "Foo"
+  new MyObject, FooType
+
 =head2 Calling a method on an object
+
+Calling the method C<Xyzzy> on an object, assuming the PDD03 calling
+conventions are respected:
+
+  callmeth "Xyzzy"
+
+Or, if a return continuation needs constructing:
+
+  callmethcc "Xyzzy"
 
 =head2 Accessing attributes from within a class
 
