@@ -269,13 +269,13 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
   emit_3reg(pc, 31, D, A, B, 0, 491, 0);
 
 #define emit_and(pc, D, A, B) \
-  emit_3reg_x(pc, 31, D, A, B, 28, 0)
+  emit_3reg_x(pc, 31, A, D, B, 28, 0)
 
 #define emit_or(pc, D, A, B) \
-  emit_3reg_x(pc, 31, D, A, B, 444, 0)
+  emit_3reg_x(pc, 31, A, D, B, 444, 0)
 
 #define emit_xor(pc, D, A, B) \
-  emit_3reg_x(pc, 31, D, A, B, 316, 0)
+  emit_3reg_x(pc, 31, A, D, B, 316, 0)
 
 /* 2 register and immediate operation.
  *
@@ -578,11 +578,10 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
-    emit_sub(jit_info->native_ptr, r0, r0, r15); 
-    emit_add(jit_info->native_ptr, r0, r14, r0);
-    emit_mr(jit_info->native_ptr, r12, r0); 
-    emit_lwz(jit_info->native_ptr, r12, 0, r12);
-    emit_mtlr(jit_info->native_ptr, r12);    
+    emit_sub(jit_info->native_ptr, r3, r3, r15); 
+    emit_add(jit_info->native_ptr, r3, r14, r3);
+    emit_lwz(jit_info->native_ptr, r3, 0, r3);
+    emit_mtlr(jit_info->native_ptr, r3);    
     emit_blr(jit_info->native_ptr);
 }
 
@@ -612,7 +611,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                 fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
                 d = jit_info->arena.op_map[fixup->param.opcode].offset
                     - fixup->native_offset + fixup->skip;
-                *(fixup_ptr++) = (char)(d >> 24) & 3;
+                *(fixup_ptr++) |= (char)(d >> 24) & 3;
                 *(fixup_ptr++) = (char)(d >> 16);
                 *(fixup_ptr++) = (char)(d >> 8);
                 *(fixup_ptr++) |= (char)d & ~3;

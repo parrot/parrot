@@ -853,7 +853,7 @@ Parrot_gt_ic_i_ic {
 
 Parrot_gt_ic_ic_ic {
     if (*INT_CONST[1] > *INT_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_eq_i_i_ic {
@@ -908,7 +908,7 @@ Parrot_eq_ic_i_ic {
 
 Parrot_eq_ic_ic_ic {
     if (*INT_CONST[1] == *INT_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_ge_i_i_ic {
@@ -963,7 +963,7 @@ Parrot_ge_ic_i_ic {
 
 Parrot_ge_ic_ic_ic {
     if (*INT_CONST[1] >= *INT_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_lt_i_i_ic {
@@ -1018,7 +1018,7 @@ Parrot_lt_ic_i_ic {
 
 Parrot_lt_ic_ic_ic {
     if (*INT_CONST[1] < *INT_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_le_i_i_ic {
@@ -1073,7 +1073,7 @@ Parrot_le_ic_i_ic {
 
 Parrot_le_ic_ic_ic {
     if (*INT_CONST[1] <= *INT_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_ne_i_i_ic {
@@ -1128,7 +1128,7 @@ Parrot_ne_ic_i_ic {
 
 Parrot_ne_ic_ic_ic {
     if (*INT_CONST[1] != *INT_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_gt_n_n_ic {
@@ -1188,7 +1188,7 @@ Parrot_gt_nc_n_ic {
 
 Parrot_gt_nc_nc_ic {
     if (*NUM_CONST[1] > *NUM_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_eq_n_n_ic {
@@ -1248,7 +1248,7 @@ Parrot_eq_nc_n_ic {
 
 Parrot_eq_nc_nc_ic {
     if (*NUM_CONST[1] == *NUM_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_ge_n_n_ic {
@@ -1308,7 +1308,7 @@ Parrot_ge_nc_n_ic {
 
 Parrot_ge_nc_nc_ic {
     if (*NUM_CONST[1] >= *NUM_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_lt_n_n_ic {
@@ -1368,7 +1368,7 @@ Parrot_lt_nc_n_ic {
 
 Parrot_lt_nc_nc_ic {
     if (*NUM_CONST[1] < *NUM_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_le_n_n_ic {
@@ -1428,7 +1428,7 @@ Parrot_le_nc_n_ic {
 
 Parrot_le_nc_nc_ic {
     if (*NUM_CONST[1] <= *NUM_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
 
 Parrot_ne_n_n_ic {
@@ -1488,5 +1488,5 @@ Parrot_ne_nc_n_ic {
 
 Parrot_ne_nc_nc_ic {
     if (*NUM_CONST[1] != *NUM_CONST[2])
-        emit_b(jit_info, *INT_CONST[3]);
+        emit_bx(jit_info, 0, *INT_CONST[3]);
 }
