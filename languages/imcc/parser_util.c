@@ -413,7 +413,7 @@ void register_compilers(Parrot_Interp interp)
  * e.g. add_n_i_n => add_n_n_i
  *      div_n_ic_n => div_n_nc_n
  *      div_n_i_n => set_n_i ; div_n_n_n
- *      ge_n_ic_ic => ge_nc_ic
+ *      ge_n_ic_ic => ge_n_nc_ic
  */
 int
 try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r,

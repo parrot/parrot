@@ -75,7 +75,7 @@ examples/sub.imc:        examples/sub.jako        jakoc
 ../imcc/imcc:
 
 imcc: ../imcc/imcc${exe}
-	@cd ../imcc make
+	@cd ../imcc && $(MAKE) && cd ../jako
 
 examples/bench.pasm:      examples/bench.imc      imcc
 examples/board.pasm:      examples/board.imc      imcc
