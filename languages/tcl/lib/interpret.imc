@@ -4,16 +4,23 @@ Given a pre-parsed chunk of Tcl, interpret it.
 
 =cut
 
+.namespace [ "_Tcl" ]
+
 .sub __interpret
   .param pmc commands
-
-  #_dumper("INTERPRETING",commands)
+  
+  #load_bytecode "library/Data/Dumper.imc"
+  #$P1= find_global "Data::Dumper", "dumper"
+  #$P1(commands)
 
   # our running return value, type
   .local int return_type
   return_type = TCL_OK
   .local string retval
   retval = ""
+
+  .local pmc escaper
+   escaper = find_global "Data::Escape", "String"
 
   # Which command are we processing?
   .local int command_num
@@ -27,16 +34,8 @@ Given a pre-parsed chunk of Tcl, interpret it.
   .local pmc parsed_body
   .local pmc argument_list
 
-  # global variables....
-  .local pmc proc_body
-  proc_body = global "proc_body" 
-  .local pmc proc_args
-  proc_args = global "proc_args" 
-  .local pmc global_cmds
-  global_cmds = global "commands"
-
- 
 end_scope:
+  #print "end_scope:\n"
   inc command_num
   if command_num == num_commands goto done
   if return_type != TCL_OK goto done
@@ -46,11 +45,7 @@ end_scope:
   # this should stringify the tclword object, which performs
   # all necessary substitutions.
   $P0 = command[0]
-  #_dumper("Command word",$P0)
   (return_type,retval) = $P0.__get_string()
-  #print "COMMAND='"
-  #print retval
-  #print "'\n"
   if return_type != TCL_OK goto done
   proc = retval 
 
@@ -60,117 +55,81 @@ end_scope:
   num_args = command
   .local int arg_num
   arg_num = 1
+   
+  # XXX Originally, we constructed a PerlArray to pass it to the command.
+  # instead, we now dynamically generate a call to the sub (the only way
+  # to use a dynamic # of arguments to a function, SFAIK.
+
+  # XXX It appears that for the PIR compiler, we can only define .sub's
+  #  This means that we'll need to write the text for a sub that will return
+  #  the appropriate values, compile it, then run it, then use the return
+  #  value of that execution to proceed. 
+
+  # So, to dynamically generate a sub call that uses a dynamic # of arguments,
+  # We have to go through an extra sub call. This seems suboptimal - perhaps
+  # there's a better way to abuse parrot. (Though this is only temporary
+  # as we move towards the tcl compiler, so perhaps we can not worry about it)
+
+  #The sub we'll use to drive the calls to the foldup'd subs.
+  .local string caller_sub_text
+  .local Exception_Handler ignore
+  newsub ignore, .Exception_Handler, __default_handler
+  $S0 = "_"
+  $S0 .= proc
+  # evil. this should actually occur inside _driver
+  set_eh ignore
+    $P1 = find_global "Tcl", $S0
+  clear_eh 
+  isnull $P1, no_command
+
+  caller_sub_text=".namespace [ \"_Tcl\"]\n.sub _driver\n.local pmc sub\nsub = find_global \"Tcl\", \"_"
+  proc = escaper(proc,"\"")
+  caller_sub_text .= proc
+  caller_sub_text .= "\"\n"
+  .local string caller_sub_args
+  caller_sub_args = ""
+
 
 loop:
   if arg_num == num_args goto loop_done
   $I0 = arg_num - 1
   $P0 = command[arg_num]
-  #_dumper("arg",$P0)
   (return_type,retval) = $P0.__get_string()
-  #print "ARG_NUM='"
-  #print arg_num
-  #print "'\n"
-  #print "RETVAL IS '"
-  #print retval
-  #print "'\n"
-  #print "RETURN_TYPE='"
-  #print return_type
-  #print "'\n"
   if return_type != TCL_OK goto done
-  args[$I0] = retval
+  caller_sub_text .= "$P"
+  $S1 = arg_num
+  caller_sub_text .= $S1
+  caller_sub_text .= " = new PerlString\n"
+  caller_sub_text .= "$P"
+  caller_sub_text .= $S1
+  caller_sub_text .= "= \"" 
+  retval = escaper(retval,"\"")
+  caller_sub_text .= retval
+  caller_sub_text .= "\"\n"
+  caller_sub_args .= "$P"
+  caller_sub_args .= $S1
   inc arg_num
+  if arg_num == num_args goto loop_done
+  caller_sub_args .= ", "
   goto loop
 
 loop_done: 
+  caller_sub_text .= "($I0,$S0) = sub("
+  caller_sub_text .= caller_sub_args
+  caller_sub_text .= ")\n.pcc_begin_return\n.return $I0\n.return $S0\n.pcc_end_return\n.end\n"
+  #print "CALLER_SUB_TEXT:\n"
+  #print caller_sub_text
  
   # get the sub we need..
-  my_cmd = global_cmds[proc]
+  # XXX need to specify procs with a leading _. There a way around this?
+  proc = "_" . proc
 
-  # XXX Switch back to isnull when we switch to Tcl*
-  typeof $I0, my_cmd
-  if .PerlUndef == $I0 goto user_command
-  #isnull my_cmd, user_command
-  (return_type,retval) = my_cmd(args)
-  
-cooked2:
+  .local pmc pir_compiler
+  pir_compiler = compreg "PIR"
+  $P1 = compile pir_compiler, caller_sub_text
+  $P2 = find_global "_Tcl", "_driver"
+  (return_type,retval) = $P2(args)
   goto end_scope
-
-user_command:
-  #print "USER_COMMAND:\n"
-  parsed_body   = proc_body[proc]
-  #_dumper("PARSED BODY",parsed_body)
-  argument_list = proc_args[proc]
-  #_dumper("ARGULIST",argument_list)
-
-  # XXX Switch back to isnull when we switch to Tcl*
-  typeof $I0, parsed_body
-  if .PerlUndef == $I0 goto no_command
-  #isnull parsed_body, no_command
-  dec num_args # We inc'd the command, above.
-  #print "NUM_ARGS='"
-  #print num_args
-  #print "'\n"
-  $I3 = argument_list
-  #print "CALLED_WITH_ARGS='"
-  #print $I3
-  #print "'\n"
-
-  if num_args != $I3 goto bad_user_args
-
-  new_pad 1
- 
-  .local int arg_loop_var
-  .local string arg_var_name
-  .local pmc arg_var_value
-  arg_loop_var = 0
-arg_loop:
-  if arg_loop_var >= num_args goto args_done
- 
-  arg_var_name  =  argument_list[arg_loop_var]
-  #print "SETTING ARG_VAR_NAME='"
-  #print arg_var_name
-  #print "'\n"
-  arg_var_value =  args[arg_loop_var]
-  #print "SETTING ARG_VAR_VALUE'"
-  #print arg_var_value
-  #print "'\n"
-    
-  .local pmc copied_var
-  clone copied_var, arg_var_value
-
-  store_lex -1, arg_var_name, copied_var
-  inc arg_loop_var
-  goto arg_loop
-
-args_done:
-  #_dumper("ABOUT TO CALL PARSED BODY",parsed_body)
-  (return_type,retval) = __interpret(parsed_body)
-  # Getting a TCL_RETURN or a TCL_OK here is fine - both indicate
-  # that we returned from the user's proc properly.
-  # we'll cheat for now and morph a return from a proc into an OK.
-  if return_type != TCL_RETURN goto donemorph
-  return_type = TCL_OK
-donemorph:
-  if return_type != TCL_OK goto bad_sub_command
-  pop_pad
-
-  goto end_scope
-
-bad_user_args:
-  # XXX This needs to be smart enough to say:
-  # called "foo" with too many arguments
-  # vs.
-  # no value given for parameter "i" to "foo"
-  return_type = TCL_ERROR
-  retval ="called \""
-  retval = retval . $S0
-  retval = retval . "\" with wrong # of arguments\n"
-  goto end_scope
-
-bad_sub_command:
-  retval = $S0
-  return_type = $I0
-  goto done
 
 no_command:
   return_type = TCL_ERROR
@@ -179,7 +138,6 @@ no_command:
   retval = retval . "\"\n"
 
 done:
- # print "DONE with interpreter...\n"
   .pcc_begin_return
     .return return_type
     .return retval
