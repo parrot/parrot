@@ -146,11 +146,11 @@ languages.dummy:
 
 clean:
 	$(RM_F) *$(O) chartypes/*$(O) encodings/*$(O)
-	$(RM_F) *.s core_ops.c core_ops_prederef.c $(TEST_PROG) $(PDISASM) $(PDUMP)
+	$(RM_F) *.s core_ops.c core_ops_prederef.c $(TEST_PROG) $(PDUMP)
 	$(RM_F) $(INC)/vtable.h
 	$(RM_F) $(INC)/oplib/core_ops.h $(INC)/oplib/core_ops_prederef.h
 	$(RM_F) vtable.ops
-	$(RM_F) $(TEST_PROG) $(PDISASM) $(PDUMP)
+	$(RM_F) $(TEST_PROG) $(PDUMP)
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
 	$(RM_F) examples/assembly/mops$(EXE) examples/assembly/mops.c
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
