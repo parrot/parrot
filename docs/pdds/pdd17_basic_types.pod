@@ -89,6 +89,18 @@ functions to the referred-to PMC.
 
 =item Env
 
+Env is a singleton PMC class, that is there is only one Env PMC in any
+interpreter. This PMC gives access to the process' environment
+variables--reading from it returns the value of the named process
+environment variable, while writing to it sets the value of a process
+environment variable. For example, to retrieve the current value of
+TERM (the terminal type on most Unix systems):
+
+   new P1, .Env
+   set S1, P1['TERM']
+
+Note that an embedding system may override this behaviour.
+
 =back
 
 =head1 IMPLEMENTATION
