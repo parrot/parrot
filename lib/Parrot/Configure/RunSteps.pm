@@ -56,9 +56,7 @@ use vars qw(@steps);
     gen/core_pmcs.pl
     gen/parrot_include.pl
     gen/makefiles.pl
-    gen/cflags.pl
     gen/platform.pl
-    gen/libparrot_def.pl
     gen/config_pm.pl
 );
 

@@ -4,11 +4,12 @@
 
 =head1 NAME
 
-config/gen/makefiles.pl - Makefiles
+config/gen/makefiles.pl - Build files
 
 =head1 DESCRIPTION
 
-Generates the various F<Makefiles>.
+Generates the various F<Makefile>s and other files needed to 
+build Parrot.
 
 =cut
 
@@ -18,11 +19,33 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':gen';
 
-$description="Generating Makefiles...";
+$description="Generating build files...";
 
 @args=();
 
 sub runstep {
+  makefiles();
+  cflags();
+  genfile('config/gen/makefiles/libparrot_def.in', 'libparrot.def');
+}
+
+sub cflags {
+  genfile('config/gen/makefiles/CFLAGS.in',      'CFLAGS',
+          commentType => '#');
+
+  open(CFLAGS, ">> CFLAGS") or die "open >> CFLAGS: $!";
+
+  if (Configure::Data->get('cpuarch') =~ /sun4|sparc64/) {
+      print CFLAGS <<"EOF";
+      jit_cpu.c -{-Wcast-align}        # lots of noise!
+      nci.c     -{-Wstrict-prototypes} # lots of noise!
+EOF
+  }
+
+  close CFLAGS
+}
+
+sub makefiles {
   genfile('config/gen/makefiles/root.in',      'Makefile',
           commentType => '#', replace_slashes => 1, conditioned_lines => 1);
   genfile('config/gen/makefiles/classes.in',   'classes/Makefile',
