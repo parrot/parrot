@@ -104,6 +104,19 @@ typedef void *BIGFLOAT;
 typedef void (*funcptr_t)(void);
 #define NULLfunc (funcptr_t)0
 
+/* define macros for converting between data and function pointers.  As it
+ * turns out, ANSI C does appear to permit you to do this conversion if you
+ * convert the value to an integer (well, a value type large enough to hold
+ * a pointer) in between.  Believe it or not, this even works on TenDRA (tcc).
+ * 
+ * NOTE!  UINTVAL is incorrect below.  It should be UINTPTR or something like
+ * that. The equivalent of C99's uintptr_t- a non-pointer data type that can 
+ * hold a pointer.
+ */
+#define D2FPTR(x) (funcptr_t)(UINTVAL) x
+#define F2DPTR(x) (void*)(UINTVAL)(funcptr_t) x
+
+
 /* Provide support for inline keyword where available.  Just make sure to use
  * "INLINE" instead and it will DTRT. */
 #ifdef __cplusplus

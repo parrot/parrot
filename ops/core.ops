@@ -130,7 +130,7 @@ descriptor into $1.
 =cut
 
 inline op open(out INT, in STR) {
-  $1 = (INTVAL)fopen(string_to_cstring(interpreter, ($2)), "r+");
+  $1 = (INTVAL)fopen(string_to_cstring(interpreter, ($2)), "r+"));
   if (!$1) {
     perror("Can't open");
     exit(1);
@@ -3416,7 +3416,7 @@ this would be the this/self pointer.
 inline op loadlib(out PMC, in STR) {
   PMC * pmc;
   void * p;
-  char * s = string_to_cstring(interpreter, ($2));
+  const char * s = string_to_cstring(interpreter, ($2));
   p = Parrot_dlopen(s);
   if(p == NULL) {
      const char * err = Parrot_dlerror();
@@ -3438,9 +3438,10 @@ inline op callnative(out PMC, in PMC, in STR) {
    */
   PMC * fun;
   int ret;
-  char * name = string_to_cstring(interpreter, ($3));
-  void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))Parrot_dlsym(($2)->data,
-						name);
+  const char * name = string_to_cstring(interpreter, ($3));
+  void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(
+                                                ($2)->data,        
+						(char *)name));
   if(p == NULL) {
      const char * err = Parrot_dlerror();
      if(err != NULL) {
@@ -3448,9 +3449,11 @@ inline op callnative(out PMC, in PMC, in STR) {
          PANIC("Failed to link native method");
      }
   }
+
   fun = new_pmc_header(interpreter);
-  fun->data = p;
+  fun->data = F2DPTR(p);
   $1 = fun;
+
   /* Now that it is cached, call it */
   (*p)(interpreter, NULL);
   goto NEXT();
@@ -3464,9 +3467,10 @@ inline op callnative(out PMC, in PMC, in PMC, in STR) {
    */
   PMC * fun;
   int ret;
-  char * name = string_to_cstring(interpreter, ($4));
-  void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))Parrot_dlsym(($2)->data,
-						name);
+  const char * name = string_to_cstring(interpreter, ($4));
+  void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(
+                                                ($2)->data,
+						(char *)name));
   if(p == NULL) {
      const char * err = Parrot_dlerror();
      if(err != NULL) {
@@ -3475,7 +3479,7 @@ inline op callnative(out PMC, in PMC, in PMC, in STR) {
      }
   }
   fun = new_pmc_header(interpreter);
-  fun->data = p;
+  fun->data = F2DPTR(p);
   $1 = fun;
   /* Now that it is cached, call it */
   (*p)(interpreter, $3->data);
