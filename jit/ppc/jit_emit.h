@@ -171,7 +171,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 
 #  define _emit_bx(pc, type, disp) \
-    *(pc++) = (char)(18 << 2 | disp >> 24); \
+    *(pc++) = (char)(18 << 2 | (disp >> 24) & 3); \
     *(pc++) = (char)(disp >> 16); \
     *(pc++) = (char)(disp >> 8); \
     *(pc++) = (char)(disp | type)

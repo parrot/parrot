@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 
 # It would be very embarrassing if these didn't work...
 output_is(<<'CODE', '', "noop, end");
@@ -55,6 +55,20 @@ output_is( <<'CODE', '42', "branch_ic" );
 	branch	HERE
 	set	I4, 1234
 HERE:
+	print	I4
+	end
+CODE
+
+
+output_is( <<'CODE', '42', "branch_ic (backward)" );
+	set	I4, 42
+	branch	one
+two:	branch	three
+	set	I4, 1234
+	add	I4, I4, I4
+one:
+	branch	two
+three:
 	print	I4
 	end
 CODE
