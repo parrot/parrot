@@ -8,6 +8,7 @@
  * Class management. Really quick and dirty.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -24,6 +25,15 @@ Class * new_class(Symbol * sym)
    return cl;
 }
 
+Method * new_method(Symbol * sym, Symbol * label)
+{
+   Method * meth = calloc(1, sizeof(Method));
+   sym->symtype = SYMTYPE_METHOD;
+   meth->sym = sym;
+   meth->label = label;
+   sym->p = (void*)meth;
+   return meth;
+}
 
 /* 
  * XXX: I suppose this is inadequate since there are
@@ -32,6 +42,9 @@ Class * new_class(Symbol * sym)
  */
 void store_field_symbol(Class * cl, Symbol * sym)
 {
+#if 0
+   fprintf(stderr, "%s.store_field_symbol %s\n", cl->sym->name, sym->name);
+#endif
    sym->symtype = SYMTYPE_FIELD;
    store_symbol(cl->members, sym);
 }

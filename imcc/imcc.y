@@ -257,17 +257,17 @@ static char * inv_op(char *op) {
 
 %%
 
-program:                         { open_comp_unit(); $$ = 0;}
-    compilation_units            { close_comp_unit(interp); $$ = 0; }
+program:                         { /*imc_open_unit();*/ $$ = 0;}
+    compilation_units            { /*imc_close_unit(interp);*/ $$ = 0; }
     ;
 
 compilation_unit:
-          class
-        | sub
-        | pcc_sub
-        | emit
-        | MACRO '\n'                  { $$ = 0; }
-        | '\n'  { $$ = 0; }
+          class                  { $$ = $1; imc_close_unit(interp); }
+        | sub                    { $$ = $1; imc_close_unit(interp); }
+        | pcc_sub                { $$ = $1; imc_close_unit(interp); }
+        | emit                   { $$ = $1; imc_close_unit(interp); }
+        | MACRO '\n'             { $$ = 0;  imc_close_unit(interp); }
+        | '\n'                   { $$ = 0; }
     ;
 
 compilation_units: compilation_unit
@@ -288,12 +288,11 @@ pasm_inst: {clear_state();}
        PARROT_OP pasm_args	 { $$ = INS(interp, $2,0,regs,nargs,keyvec,1);
                                           free($2); }
     | PCC_SUB LABEL              {
-                                          char *name = str_dup($2);
-                                          $$ = iSUBROUTINE(
-                                          mk_address($2, U_add_uniq_sub));
-                                          $$->r[1] =  mk_pcc_sub(name, 0);
-                                        }
-    | /* none */                        { $$ = 0;}
+                                   char *name = str_dup($2);
+                                   $$ = iSUBROUTINE(mk_address($2, U_add_uniq_sub));
+                                   $$->r[1] = mk_pcc_sub(name, 0);
+                                 }
+    | /* none */                 { $$ = 0;}
     ;
 
 pasm_args:
@@ -301,26 +300,85 @@ pasm_args:
     ;
 
 emit:
-      EMIT                              { open_comp_unit();
-                                          function = "(emit)"; }
+      EMIT                       { imc_open_unit(IMC_PASM);
+                                   function = "(emit)";
+                                 }
       pasmcode
-      EOM 				{ if (optimizer_level & OPT_PASM)
-                                                imc_compile_unit(interp, instructions);
-                                          emit_flush(interp); $$=0;}
+      EOM                        { if (optimizer_level & OPT_PASM)
+                                      imc_compile_unit(interp, instructions);
+                                   emit_flush(interp);
+                                   $$=0;
+                                 }
     ;
 
 class:
         CLASS IDENTIFIER
         { 
            Symbol * sym = new_symbol($2);
+
+           imc_open_unit(IMC_CLASS);
+
            current_class = new_class(sym);
            sym->p = (void*)current_class;
            store_symbol(&global_sym_tab, sym);
         }
         '\n' class_body ENDCLASS
         {
-           $$ = 0;
+           /* XXX EVIL XXX
+            * Don't look behind the curtain, the wizard is fat and ugly.
+            * After 0.0.12 IMCC gets a long overdue rewrite. I
+            * just want a quick hack for 0.0.12 for "fake" classes
+            * We are using SymReg where we should be using Symbols
+            * and the APIs are done all wrong and we are doing all sorts
+            * of backflips. (And its my fault -Melvin)
+            */
+           SymbolList * list;
+           char buf[256];
+           SymReg * t1;
+           SymReg * p0 = mk_pasm_reg(str_dup("P0"));
+           sprintf(buf, "\"%s\"", $2);
+           t1 = mk_const(str_dup(buf), 'S');
+
+           /* make class and store PMC globally */
+           iNEW(interp, p0, str_dup("PerlHash"), NULL, 1);
+           MK_I(interp, "store_global", 2, t1, p0); 
+
+           /* foreach class.members generate */
+           list = symtab_to_symlist(current_class->members);
+           { 
+             Symbol * s;
+             SymReg * t2;
+             for(s = list->head; s; s = s->nextinlist) {
+                if(s->symtype == SYMTYPE_FIELD) {
+                   sprintf(buf, "\"%s\"", s->name);
+                   t1 = mk_const(str_dup(buf), 'S');
+                   if(s->type == 'I' || s->type == 'N') {
+                      t2 = mk_const(str_dup("0"), s->type);
+                      iINDEXSET(interp, p0, t1, t2);
+                   }
+                   else if(s->type == 'S') {
+                      t2 = mk_const(str_dup("\"\""), s->type);
+                      iINDEXSET(interp, p0, t1, t2);
+                   }
+                   else {
+
+                   }
+                }
+                else if(s->symtype == SYMTYPE_METHOD) {
+                   SymReg * p1;
+                   sprintf(buf, "\"%s\"", s->name);
+                   t1 = mk_const(str_dup(buf), 'S');
+                   p1 = mk_pasm_reg(str_dup("P1"));
+                   iNEWSUB(interp, p1, NEWSUB,
+                        mk_address(((Method*)s->p)->label->name, U_add_once), 1);
+                   iINDEXSET(interp, p0, t1, p1);
+                }
+             }
+           }
+           MK_I(interp, "end" ,0); 
+           emit_flush(interp);
            current_class = NULL;
+           $$ = 0;
         }
     ;
 
@@ -349,20 +407,23 @@ field_decl:
                  "field '%s' previously declared in class '%s'\n",
                     $3, current_class->sym->name);
            }
+           sym->type = $2;
            store_field_symbol(current_class, sym);
            $$ = 0;
         }
     ;
 
 method_decl:
-        METHOD IDENTIFIER '\n'
+        METHOD IDENTIFIER IDENTIFIER '\n'
         {
+           Method * meth;
            Symbol * sym = new_symbol($2);
            if(lookup_method_symbol(current_class, $2)) {
               fataly(EX_SOFTWARE, sourcefile, line,
                  "method '%s' previously declared in class '%s'\n",
                     $2, current_class->sym->name);
            }
+           meth = new_method(sym, new_symbol($3));
            store_method_symbol(current_class, sym);
            $$ = 0;
         }
@@ -381,22 +442,25 @@ sub_body:
         }
      ;
 
-sub_start: SUB                           { open_comp_unit(); }
-           IDENTIFIER '\n'
+sub_start:
+        SUB                           { imc_open_unit(IMC_SUB); }
+        IDENTIFIER '\n'
         { $$ = 0;
           iSUBROUTINE(mk_address($3, U_add_uniq_sub));
         }
     ;
-pcc_sub: PCC_SUB   { open_comp_unit(); }
-       IDENTIFIER pcc_sub_proto '\n'
+
+pcc_sub:
+        PCC_SUB   { imc_open_unit(IMC_SUB); }
+        IDENTIFIER pcc_sub_proto '\n'
         {
           char *name = str_dup($3);
           Instruction *i = iSUBROUTINE(mk_address($3, U_add_uniq_sub));
           i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
           i->r[1]->pcc_sub->prototyped = $4;
         }
-       pcc_params
-       sub_body { $$ = 0; }
+        pcc_params
+        sub_body { $$ = 0; }
     ;
 
 pcc_params: /* empty */                   { $$ = 0; } %prec LOW_PREC

@@ -46,6 +46,7 @@
 #define MAX_COLOR NUM_REGISTERS
 
 void imc_compile_unit(struct Parrot_Interp *, Instruction * unit);
+
 void free_reglist(struct Parrot_Interp *);
 
 const char * get_neg_op(char *op, int *nargs);

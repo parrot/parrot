@@ -22,25 +22,68 @@
 
 /* Global variables , forward def */
 
+static IMC_Unit * imc_units;
+static IMC_Unit * cur_unit;
+
+static Instruction * last_ins;
+
+int n_comp_units;
+
+static int e_file_open(void *);
+static int e_file_close(void *);
+static int e_file_emit(void *param, Instruction *);
+
+Emitter emitters[2] = {
+    {e_file_open, e_file_emit, (int (*)(void *))NULLfunc, e_file_close},
+    {e_pbc_open, e_pbc_emit, e_pbc_new_sub, e_pbc_close},
+};
+
+static int emitter;
+
 /* all code is collected in compilation units, which may be:
  * - .sub/.end
  * - .emit/.eom
  * - stuff outside of these
  */
 
-static Instruction * last_ins;
 
-int n_comp_units;
-
-void
-open_comp_unit(void)
+/*
+ * Create a new IMC_Unit.
+ */
+IMC_Unit *
+imc_new_unit(IMC_Unit_Type t)
 {
+   IMC_Unit * unit = calloc(1, sizeof(IMC_Unit));
+   unit->type = t;
+   return unit;
+}
+
+/*
+ * Create a new IMC_Unit and "open" it for construction.
+ * This sets the current state of the parser. The unit
+ * can be closed later retaining all the current state.
+ */
+IMC_Unit *
+imc_open_unit(IMC_Unit_Type t)
+{
+    IMC_Unit * unit;
+    unit = imc_new_unit(t);
+    if(!cur_unit)
+       imc_units = unit;
+    unit->prev = cur_unit;
+    if(cur_unit)
+       cur_unit->next = unit;
+    cur_unit = unit;
     n_comp_units++;
+#if 0
+    fprintf(stderr, "imc_open_unit()\n");
+#endif
+    return cur_unit;
 }
 
 
 void
-close_comp_unit(Parrot_Interp interpreter)
+imc_close_unit(Parrot_Interp interpreter)
 {
     free_reglist(interpreter);
     clear_basic_blocks(interpreter);       /* and cfg ... */
@@ -48,13 +91,17 @@ close_comp_unit(Parrot_Interp interpreter)
         fatal(1, "close_comp_unit", "non existent comp_unit\n");
     n_comp_units--;
     clear_tables(interpreter, hash);
+#if 0
+    fprintf(stderr, "imc_close_unit()\n");
+#endif
     instructions = last_ins = NULL;
 }
 
 
 /* Creates a new instruction */
 
-Instruction * _mk_instruction(const char *op, const char * fmt,
+Instruction *
+_mk_instruction(const char *op, const char * fmt,
 	SymReg ** r, int flags)
 {
     int i;
@@ -151,7 +198,8 @@ ins_writes2(Instruction *ins, int t)
 #ifdef HAS_INLINE
 inline
 #endif
-int instruction_reads(Instruction* ins, SymReg* r) {
+int
+instruction_reads(Instruction* ins, SymReg* r) {
     int f, i;
     SymReg *key;
     SymReg *ri;
@@ -181,7 +229,8 @@ int instruction_reads(Instruction* ins, SymReg* r) {
 #ifdef HAS_INLINE
 inline
 #endif
-int instruction_writes(Instruction* ins, SymReg* r) {
+int
+instruction_writes(Instruction* ins, SymReg* r) {
     int f, i;
 
     f = ins->flags;
@@ -200,7 +249,8 @@ int instruction_writes(Instruction* ins, SymReg* r) {
 }
 
 /* get the reg no of address, where a branch targets to */
-int get_branch_regno(Instruction * ins)
+int
+get_branch_regno(Instruction * ins)
 {
     int j;
     for (j = ins->opsize - 2;  j >= 0 && ins->r[j] ; --j)
@@ -210,7 +260,8 @@ int get_branch_regno(Instruction * ins)
 }
 
 /* get the reg no of address, where a branch targets to */
-SymReg *get_branch_reg(Instruction * ins)
+SymReg *
+get_branch_reg(Instruction * ins)
 {
     int r = get_branch_regno(ins);
     if (r >= 0)
@@ -224,7 +275,8 @@ SymReg *get_branch_reg(Instruction * ins)
  * delete and free *ins
  * actual new ins is returned
  */
-Instruction * delete_ins(Instruction *ins, int needs_freeing)
+Instruction *
+delete_ins(Instruction *ins, int needs_freeing)
 {
     Instruction *next, *prev;
 
@@ -245,7 +297,8 @@ Instruction * delete_ins(Instruction *ins, int needs_freeing)
  * insert tmp after ins
  */
 
-void insert_ins(Instruction *ins, Instruction * tmp)
+void
+insert_ins(Instruction *ins, Instruction * tmp)
 {
     Instruction *next;
     if (!ins) {
@@ -271,7 +324,8 @@ void insert_ins(Instruction *ins, Instruction * tmp)
  * subst tmp for ins
  */
 
-void subst_ins(Instruction *ins, Instruction * tmp, int needs_freeing)
+void
+subst_ins(Instruction *ins, Instruction * tmp, int needs_freeing)
 {
     Instruction *prev = ins->prev;
     if (prev)
@@ -287,8 +341,10 @@ void subst_ins(Instruction *ins, Instruction * tmp, int needs_freeing)
     if (needs_freeing)
         free_ins(ins);
 }
+
 /* move instruction ins to to */
-Instruction *move_ins(Instruction *ins, Instruction *to)
+Instruction *
+move_ins(Instruction *ins, Instruction *to)
 {
     Instruction *next = delete_ins(ins, 0);
     insert_ins(to, ins);
@@ -297,7 +353,9 @@ Instruction *move_ins(Instruction *ins, Instruction *to)
 
 
 /* Emits the instructions buffered in 'instructions' */
-Instruction * emitb(Instruction * i) {
+Instruction *
+emitb(Instruction * i)
+{
 
     if (!i)
 	return 0;
@@ -312,7 +370,8 @@ Instruction * emitb(Instruction * i) {
     return i;
 }
 
-void free_ins(Instruction *ins)
+void
+free_ins(Instruction *ins)
 {
     free(ins->fmt);
     free(ins->op);
@@ -320,8 +379,9 @@ void free_ins(Instruction *ins)
 }
 
 
-int ins_print(FILE *fd, Instruction * ins) {
-
+int
+ins_print(FILE *fd, Instruction * ins)
+{
     char regb[IMCC_MAX_REGS][256];      /* XXX */
     /* only long key constants can overflow */
     char *regstr[IMCC_MAX_REGS];
@@ -406,7 +466,8 @@ int ins_print(FILE *fd, Instruction * ins) {
 
 /* for debug */
 static char *output;
-static int e_file_open(void *param)
+static int
+e_file_open(void *param)
 {
     char *file = (char *) param;
 
@@ -416,16 +477,19 @@ static int e_file_open(void *param)
     return 1;
 }
 
-static int e_file_close(void *param) {
+static int
+e_file_close(void *param)
+{
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
     printf("\n\n");
     fclose(stdout);
     info(interpreter, 1, "assembly module %s written.\n", output);
     return 0;
-
 }
 
-static int e_file_emit(void *param, Instruction * ins) {
+static int
+e_file_emit(void *param, Instruction * ins)
+{
     UNUSED(param);
     if ((ins->type & ITLABEL) || ! *ins->op)
 	ins_print(stdout, ins);
@@ -436,14 +500,8 @@ static int e_file_emit(void *param, Instruction * ins) {
     return 0;
 }
 
-Emitter emitters[2] = {
-    {e_file_open, e_file_emit, (int (*)(void *))NULLfunc, e_file_close},
-    {e_pbc_open, e_pbc_emit, e_pbc_new_sub, e_pbc_close},
-};
-
-static int emitter;
-
-int emit_open(int type, void *param)
+int
+emit_open(int type, void *param)
 {
     emitter = type;
     has_compile = 0;
@@ -451,8 +509,9 @@ int emit_open(int type, void *param)
     return (emitters[emitter]).open(param);
 }
 
-int emit_flush(void *param) {
-
+int
+emit_flush(void *param)
+{
     Instruction * ins, *next;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
     if (emitters[emitter].new_sub)
@@ -466,13 +525,16 @@ int emit_flush(void *param) {
         free_ins(ins);
         ins = next;
     }
-    close_comp_unit(interpreter);
+    /*imc_close_unit(interpreter);*/
     return 0;
 }
-int emit_close(void *param)
+
+int
+emit_close(void *param)
 {
     return (emitters[emitter]).close(param);
 }
+
 /*
  * Local variables:
  * c-indentation-style: bsd
