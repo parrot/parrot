@@ -1,0 +1,58 @@
+;
+; mips/core.jit
+;
+;
+; $Id$
+;
+
+Parrot_end {
+    emit_lw(NATIVECODE, ra, 32, sp);
+    emit_lw(NATIVECODE, fp, 28, sp);
+    emit_addiu(jit_info->native_ptr, sp, sp, 40);
+    emit_jr(NATIVECODE, ra);
+}
+
+Parrot_set_i_ic {
+    if (MAP[1]) {
+        emit_imm32(NATIVECODE, MAP[1], *INT_CONST[2]);
+    }
+    else {
+        emit_imm32(NATIVECODE, at, *INT_CONST[2]);
+        emit_sw_r(NATIVECODE, at, &INT_REG[1]); 
+    }
+}
+
+Parrot_set_i_i {
+    if (MAP[1] && MAP[2]) {
+        emit_mov(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lw_r(NATIVECODE, MAP[1], &INT_REG[2]); 
+    } 
+    else if (MAP[2]) {
+        emit_sw_r(NATIVECODE, MAP[2], &INT_REG[1]); 
+    }
+    else {
+        emit_lw_r(NATIVECODE, at, &INT_REG[2]); 
+        emit_sw_r(NATIVECODE, at, &INT_REG[1]); 
+    }
+}
+
+Parrot_neg_i_i {
+    if (MAP[1] && MAP[2]) {
+        emit_neg(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lw_r(NATIVECODE, at, &INT_REG[2]); 
+        emit_neg(NATIVECODE, MAP[1], at);
+    }
+    else if (MAP[2]) {
+        emit_neg(NATIVECODE, at, MAP[1]);
+        emit_sw_r(NATIVECODE, at, &INT_REG[1]);
+    }
+    else {
+        emit_lw_r(NATIVECODE, at, &INT_REG[2]);
+        emit_neg(NATIVECODE, at, at);
+        emit_sw_r(NATIVECODE, at, &INT_REG[1]);
+    }
+}
