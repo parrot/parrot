@@ -5,7 +5,7 @@
 
 " For installation please read:
 " :he filetypes
-" :he sytax
+" :he syntax
 "
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
@@ -17,6 +17,9 @@ elseif exists("b:current_syntax")
 endif
 
 syntax clear
+
+syn include @Pod syntax/pod.vim
+syn region myPod start="^=pod" start="^=item" start="^=head" end="^=cut" keepend contains=@Pod
 
 syn keyword imcType 		int float string pmc object
 syn keyword imcPMC		Array Boolean Compiler Continuation Coroutine CSub
@@ -60,6 +63,7 @@ if version >= 508 || !exists("did_pasm_syntax_inits")
     command -nargs=+ HiLink hi def link <args>
   endif
 
+  HiLink myPod              Comment
   HiLink imcWord            Normal
   HiLink imcComment         Comment
   HiLink imcLabel           Label
