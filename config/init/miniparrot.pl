@@ -14,6 +14,7 @@ sub runstep {
     print "Yes..";
     
     Configure::Data->set('miniparrot' => 1);
+    Configure::Data->set('DEVEL' => Configure::Data->get('DEVEL') . '-miniparrot');
 }
 
 1;
