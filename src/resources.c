@@ -213,7 +213,7 @@ alloc_more_buffer_headers(struct Parrot_Interp *interpreter,
     for (i = 0; i < pool->units_per_alloc; i++) {
         cur_buffer->flags = BUFFER_on_free_list_FLAG;
         add_to_free_pool(interpreter, pool, cur_buffer);
-        (char *)cur_buffer += pool->unit_size;
+        cur_buffer = (Buffer *)((char *)cur_buffer + pool->unit_size);
     }
 }
 
