@@ -19,7 +19,7 @@ Native compilers include:
 
        Borland C++ (bcc)		version xxx or later
        Microsoft Visual C++ (cl)	version 13.10.3077 or later
-       MinGW32 with GCC (gcc)		version xxx or later
+       MinGW32 with GCC (gcc)		version 3.2.3 or later
        Intel C++ (icl)                  version 8.0.48 works
 
 =head2 Setting Up Parrot
@@ -28,15 +28,18 @@ Native compilers include:
 
 =item Make
 
-You need "nmake" to build Parrot under Windows.  It should be
-available via Microsoft Visual Studio .NET 2003 or the Microsoft .NET
-Framework SDK 1.1.  The later can be downloaded from the Microsoft
-.NET Framework Homepage L<http://msdn.microsoft.com/netframework/>.
+You need "nmake" to build Parrot under Windows with Microsoft compilers.  
+It should be available via Microsoft Visual Studio .NET 2003 or the 
+Microsoft .NET Framework SDK 1.1.  The later can be downloaded from the 
+Microsoft .NET Framework Homepage L<http://msdn.microsoft.com/netframework/>.
 
 nmake should also be available at:
 http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe
 or
 ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+
+MinGW works with its GNU "make" port. It can be downloaded here:
+L<http://prdownloads.sf.net/mingw/mingw32-make-3.80.0-3.exe>
 
 =item Command Shell
 
@@ -57,6 +60,8 @@ Configure.pl to use it.
     cd <parrot directory>
     perl Configure.pl --icushared="C:\usr\lib\icu\lib\icudata.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include"
 
+With MinGW32, use icu-2.8-Win32_msvc6.zip . 
+
 =item Borland C++
 
 XXX
@@ -75,7 +80,19 @@ Microsoft Visual C++ Toolkit instructions here XXX
 
 =item MinGW32 with GCC
 
-XXX
+The latest release of MSYS package at the time of writing is 1.0.10, 
+which contains gcc-3.2.3. It can be downloaded here: 
+L<http://prdownloads.sf.net/mingw/MSYS-1.0.10.exe>
+
+The HomePage is on L<http://www.mingw.org/>.
+
+As Configure.pl extracts configuration from the perl program,
+first build/install perl with MinGW (no binary distribution available).
+
+See details on L<http://search.cpan.org/dist/perl/README.win32>, 
+and source on L<http://www.cpan.org/src/stable.tar.gz>.
+
+Nota: Use only the ICU binary distribution. 
 
 =item Intel C++
 
@@ -85,15 +102,15 @@ XXX
 
 =head2 Building
 
-    nmake
+    $MAKE
 
 =head2 Testing
 
-    nmake test
+    $MAKE test
 
 =head2 Installation
 
-    nmake install
+    $MAKE install
 
 =head2 Usage Hints
 
@@ -127,6 +144,6 @@ This document is maintained by XXX Your Name Here XXX.
 
 This document borrows heavily from perl's README.win32.
 
-Last updated: 08 May 2004
+Last updated: 23 Jan 2005
 
 =cut
