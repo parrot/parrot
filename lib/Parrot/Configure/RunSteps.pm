@@ -61,6 +61,7 @@ use vars qw(@steps);
     auto/snprintf.pl
     auto/perldoc.pl
     auto/antlr.pl
+    auto/bc.pl
     gen/icu.pl
     gen/config_h.pl
     gen/core_pmcs.pl

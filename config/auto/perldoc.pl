@@ -7,7 +7,7 @@ config/auto/perldoc - Check whether perldoc works
 
 =head1 DESCRIPTION
 
-Determines if perldoc exists on the system.
+Determines whether perldoc exists on the system.
 
 =cut
 
