@@ -309,7 +309,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     set_attrib_num(child_class, child_class_array, PCD_PARENTS, parents);
 
     /* Set the classname, if we have one */
-    classname_pmc = pmc_new(interpreter, enum_class_PerlString);
+    classname_pmc = pmc_new(interpreter, enum_class_String);
     if (child_class_name) {
         VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
     }
@@ -400,7 +400,7 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 
 
     /* Set the classname, if we have one */
-    classname_pmc = pmc_new(interpreter, enum_class_PerlString);
+    classname_pmc = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, classname_pmc, class_name);
     set_attrib_num(class, class_array, PCD_CLASS_NAME, classname_pmc);
 
