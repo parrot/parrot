@@ -191,12 +191,16 @@ main:
     new P5, .PerlInt
     set P5, 5
 
+    set I0, 0	# non-proto
+    set I3, 1	# 1 arg
     invokecc
     set P0, P5	# the closure
 
     new P5, .PerlInt
     set P5, 3
 
+    set I0, 0	# non-proto
+    set I3, 1	# 1 arg
     pushbottomp	# preserve P regs
     invokecc
     save P5	# result in P5
@@ -206,6 +210,8 @@ main:
     print P2
     print "\n"
 
+    set I0, 0	# non-proto
+    set I3, 1	# 1 arg
     pushbottomp	# preserve P regs
     invokecc
     save P5	# result in P5
@@ -215,6 +221,8 @@ main:
     print P2
     print "\n"
 
+    set I0, 0	# non-proto
+    set I3, 1	# 1 arg
     pushbottomp	# preserve P regs
     invokecc
     save P5	# result in P5
@@ -233,6 +241,8 @@ foo:
     store_lex 0, "n", P5
     new P5, .Closure	# P5 has now the lexical "n" in the pad
     set_addr P5, f
+    set I0, 0	# non-proto
+    set I3, 1	# 1 retval
     invoke P1		# ret
 
 # expects arg in P5, returns incremented result in P5
@@ -242,6 +252,8 @@ f:
     add P2, P5		# n += shift, the lexical is incremented
     new P5, .PerlInt
     set P5, P2
+    set I0, 0	# non-proto
+    set I3, 1	# 1 retval
     invoke P1		# ret
 
 CODE
