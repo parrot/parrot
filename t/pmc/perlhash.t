@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 30;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -948,6 +948,29 @@ output_is(<<'CODE', '', "reusing the undef");
     print P2
     end
 CODE
+
+output_is(<<'CODE', <<OUTPUT, "exists with constant string key");
+    new P16, .PerlHash
+    set P16["key1"], "value for key1\n"
+    set S16, P16["key1"]
+    print S16
+    set I16, 777777777
+    print I16
+    print "\n"
+    exists I17, P16["key1"]
+    print I17
+    print "\n"
+    exists I17, P16["no such"]
+    print I17
+    print "\n"
+    end
+
+CODE
+value for key1
+777777777
+1
+0
+OUTPUT
 
 1;
 
