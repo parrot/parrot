@@ -616,10 +616,10 @@ sub handle_arguments {
       $args[$_] =~ s/[\[\]]//g;
     }
     else {
-      if ($args[$_] =~ /^0b[01]+$/) {
+      if ($args[$_] =~ /^0b[01]+$/i) {
         $args[$_] = from_binary( $args[$_] );
       }
-      elsif ($args[$_] =~ /^0x?[0-9a-f]*$/) {
+      elsif ($args[$_] =~ /^0x?[0-9a-f]*$/i) {
         $args[$_] = oct($args[$_]);
       }
     }
