@@ -96,27 +96,35 @@ pmclass PerlInt extends perlscalar {
         DYNSELF.set_string_same(value);
     }
 
+    /* XXX -lt: only add done yet, others will follow, when
+     * vtable changes are carved in electrons
+     */
     void add (PMC* value, PMC* dest) {
-        INTVAL i;
-	int type = enum_class_PerlInt;
+        INTVAL pmci;
+	int dtype = enum_class_PerlInt;
+	int vtype = VTABLE_type(INTERP, value);
 
-	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    type = enum_class_PerlNum;
+	pmci = VTABLE_get_integer(INTERP, SELF);
+	if (vtype == enum_class_PerlNum) {
+	    dtype = enum_class_PerlNum;
 	}
-	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL f = VTABLE_get_number(INTERP, value);
-	    i = VTABLE_get_integer(INTERP, value);
-	    if(f != i)
-		type = enum_class_PerlNum;
+	else if (vtype == enum_class_PerlString) {
+	    FLOATVAL valf = VTABLE_get_number(INTERP, value);
+	    INTVAL vali = VTABLE_get_integer(INTERP, value);
+	    if (valf == vali)
+		VTABLE_set_integer_native(INTERP, dest, pmci + vali);
+	    else
+		VTABLE_set_number_native(INTERP, dest, pmci + valf);
+	    return;
+
 	}
-	i = SELF->cache.int_val;
 	/* no add_int here: SELF may be dest */
-	if(type == enum_class_PerlNum)
+	if (dtype == enum_class_PerlNum)
             VTABLE_set_number_native(INTERP, dest,
-		i + VTABLE_get_number(INTERP, value));
+		pmci + VTABLE_get_number(INTERP, value));
 	else
             VTABLE_set_integer_native(INTERP, dest,
-		i + VTABLE_get_integer(INTERP, value));
+		pmci + VTABLE_get_integer(INTERP, value));
     }
 
     void add_same (PMC* value, PMC* dest) {

@@ -107,21 +107,30 @@ pmclass PerlString extends perlscalar {
         SELF->data = string_copy(INTERP, (STRING*)value->data);
     }
 
+    /* XXX -lt: only add done yet, others will follow, when
+     * vtable changes are carved in electrons
+     */
     void add (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            VTABLE_set_integer_native(INTERP, dest,
-                VTABLE_get_integer(INTERP, SELF) +
-                value->cache.int_val
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	int vtype = VTABLE_type(INTERP, value);
+
+	INTVAL val_type;
+
+        if (vtype == enum_class_PerlNum) {
             VTABLE_set_number_native(INTERP, dest,
                 VTABLE_get_number(INTERP, SELF) +
                 value->cache.num_val
             );
         }
         else {
-	   SUPER(value, dest);
+	    FLOATVAL pmcf = VTABLE_get_number(INTERP, SELF);
+	    INTVAL pmci = VTABLE_get_integer(INTERP, SELF);
+	    FLOATVAL valf = VTABLE_get_number(INTERP, value);
+	    INTVAL vali = VTABLE_get_integer(INTERP, value);
+
+	    if (pmcf == pmci && valf == vali)
+		VTABLE_set_integer_native(INTERP, dest, pmci + vali);
+	    else
+		VTABLE_set_number_native(INTERP, dest, pmcf + valf);
         }
     }
 

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 13;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -311,7 +311,7 @@ output_is(<<CODE, <<OUTPUT, "if(PerlString)");
         branch NEXT
 TRUE:   print "true"
 NEXT:   print "\\n"
-  
+
         new P1, .PerlString
         set S1, ""
         set P1, S1
@@ -352,6 +352,78 @@ false
 false
 true
 false
+OUTPUT
+
+# XXX these tests better should get generated
+#     with all combinations of params and ops
+output_is(<<'CODE', <<OUTPUT, "add str_int, str_int");
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlString
+	set P1, "2"
+	new P2, .PerlUndef
+	add P2, P0, P1
+	print P2
+	print "\n"
+	end
+CODE
+25
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "add str_int, str_num");
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlString
+	set P1, "2.5"
+	new P2, .PerlUndef
+	add P2, P0, P1
+	print P2
+	print "\n"
+	end
+CODE
+25.500000
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "add str_int, int");
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlInt
+	set P1, 2
+	new P2, .PerlUndef
+	add P2, P0, P1
+	print P2
+	print "\n"
+	end
+CODE
+25
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "add str_int, num");
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlNum
+	set P1, 2.5
+	new P2, .PerlUndef
+	add P2, P0, P1
+	print P2
+	print "\n"
+	end
+CODE
+25.500000
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "add str_num, int");
+	new P0, .PerlString
+	set P0, "23.5"
+	new P1, .PerlInt
+	set P1, 2
+	new P2, .PerlUndef
+	add P2, P0, P1
+	print P2
+	print "\n"
+	end
+CODE
+25.500000
 OUTPUT
 
 1;
