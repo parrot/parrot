@@ -33,7 +33,29 @@ struct PMC {
   SYNC *synchronize;
 };
 
-#define PMC_USER_FLAG 9 /* Unreserved flags start here */
+/* PMC flag bits */
+
+typedef enum {
+    /* the first 8 bits are for private use by individual vtable
+     * classes. It is suggested that you alias these within an individual
+     * class's header file
+     */
+    PMC_private0_FLAG   = 2 << 0,
+    PMC_private1_FLAG   = 2 << 1,
+    PMC_private2_FLAG   = 2 << 2,
+    PMC_private3_FLAG   = 2 << 3,
+    PMC_private4_FLAG   = 2 << 4,
+    PMC_private5_FLAG   = 2 << 5,
+    PMC_private6_FLAG   = 2 << 6,
+    PMC_private7_FLAG   = 2 << 7,
+
+    /* The rest of the flags are for use by Parrot */
+
+    PMC_tba_FLAG        = 2 << 8, /* XXX none yet, just an example... */
+} PMC_flags;
+
+/* XXX add various bit test macros once we have need of them */
+
 
 #endif
 

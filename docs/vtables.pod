@@ -100,17 +100,23 @@ The usual way to continue from the F<genclass.pl>-generated skeleton
 is to define a structure that will hook onto the C<data>, if your data
 type needs to use that, and then also define some user-defined flags.
 
-Flags are accessed by C<< pmc->flags >>, but a number of these flags
-are reserved by Parrot internally. Hence, you should start your
-user-defined flags from offset C<PMC_USER_FLAG>, like this:
+Flags are accessed by C<< pmc->flags >>. Most of the bits in the flag word
+are reserved for use by parrot itself, but a number of them have been
+assigned for general use by individual classes. These are referred to as
+C<PMC_private0_FLAG> .. C<PMC_private7_FLAG>. (The '7' may change during the
+early development of parrot, but will become pretty fixed at some point.)
 
-    #define FOOBYNUMBER_IS_BIGNUM (1<<(PMC_USER_FLAG))
-    #define FOOBYNUMBER_IS_BIGINT (1<<(PMC_USER_FLAG+1))
-    ...
+Normally, you will want to alias these generic bit names to something
+more meaningful within your class:
 
-You're quite at liberty to make these two definitions in a separate
-header file, but I find it more convenient to keep everything together
-in F<foobynumber.c>.
+    enum {
+	Foobynumber_is_bignum = PMC_private0_FLAG,
+	Foobynumber_is_bigint = PMC_private1_FLAG,
+	....
+    };
+
+You're quite at liberty to declare these in a separate header file, but I
+find it more convenient to keep everything together in F<foobynumber.c>.
 
 You may also use the C<cache> union in the PMC structure to remove
 some extraneous dereferences in your code if that would help. 
