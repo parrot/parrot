@@ -29,6 +29,12 @@
 
 .constant IntStack      I31
 
+.constant TempNum	N5
+.constant TempNum2	N6
+.constant TempNum3	N7
+
+.constant NumStack	N31
+
 #
 
 .constant Commands      S0
@@ -110,9 +116,9 @@ InitializeCoreOps:
     # Arithmetic, Bitwise operations
     #
 
-# and
-# or
-# xor
+    .AddCoreOp(Int_And, "and")
+    .AddCoreOp(Int_Or, "or")
+    .AddCoreOp(Int_XOr, "xor")
 # invert
 # lshift
 # rshift
@@ -125,29 +131,17 @@ InitializeCoreOps:
     # Arithmetic, Numeric comparison
     #
 
-# <
     .AddCoreOp(Int_LT,"<")
-# <=
     .AddCoreOp(Int_LE,"<=")
-# <>
     .AddCoreOp(Int_NE,"<>")
-# =
     .AddCoreOp(Int_EQ,"=")
-# >
     .AddCoreOp(Int_GT,">")
-# >=
     .AddCoreOp(Int_GE,">=")
-# 0<
     .AddCoreOp(Int_LT0,"0<")
-# 0<=
     .AddCoreOp(Int_LE0,"0<=")
-# 0<>
     .AddCoreOp(Int_NE0,"0<>")
-# 0=
     .AddCoreOp(Int_EQ0,"0=")
-# 0>
     .AddCoreOp(Int_GT0,"0>")
-# 0>=
     .AddCoreOp(Int_GE0,"0>=")
 # u<
 # u<=
@@ -831,6 +825,28 @@ Int_GE0:
  Int_is_GE0:
     set .IntStack, 1
  Int_GE0_end:
+    save .IntStack
+    branch DoneInterpretWord
+
+Int_And:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    band .IntStack, .TempInt
+    save .IntStack
+    branch DoneInterpretWord
+Int_Or:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    bor .IntStack, .TempInt
+    save .IntStack
+    branch DoneInterpretWord
+Int_XOr:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    bxor .IntStack, .TempInt
     save .IntStack
     branch DoneInterpretWord
 
