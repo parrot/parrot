@@ -319,8 +319,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     /* No JIT here--make sure they didn't ask for it. */
 
     if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
-                "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
+        PIO_eprintf(interpreter, "Parrot VM: Platform " JIT_ARCHNAME 
+                    " is not JIT-capable.\n");
         Parrot_exit(1);
     }
 
