@@ -7,7 +7,10 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
+/* we have an hand-rolled unsetenv */
+#ifndef WIN32
     unsetenv("PARROT_TEST");
+#endif
     puts("ok");
     return 0;
 }

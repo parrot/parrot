@@ -666,10 +666,17 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
 static int
 is_env_var_set(const char* var)
 {
-    char* value = Parrot_getenv(var);
-    if (value == NULL) return 0;
-    if (*value == '\0') return 0;
-    return ! (strcmp(value, "0") == 0);
+    int free_it, retval;
+    char* value = Parrot_getenv(var, &free_it);
+    if (value == NULL)
+        retval = 0;
+    else if (*value == '\0')
+        retval = 0;
+    else
+        retval = ! (strcmp(value, "0") == 0);
+    if (free_it)
+        mem_sys_free(value);
+    return retval;
 }
 
 void Parrot_really_destroy(int exit_code, void *interpreter);

@@ -30,7 +30,9 @@ INTVAL Parrot_intval_time(void);
 FLOATVAL Parrot_floatval_time(void);
 void Parrot_setenv(const char *name, const char *value);
 void Parrot_unsetenv(const char *name);
-char * Parrot_getenv(const char *name);
+/* free_it is set by the function to either 0 or 1; if set to 1,
+   the return value of the function needs to be mem_sys_free()d after use */
+char * Parrot_getenv(const char *name, int *free_it);
 
 /*
 ** Dynamic Loading:

@@ -98,8 +98,9 @@ Parrot_unsetenv(const char *name)
 }
 
 char *
-Parrot_getenv(const char *name)
+Parrot_getenv(const char *name, int *free_it)
 {
+    *free_it = 0
     return getenv(name);
 }
 
