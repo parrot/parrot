@@ -6,3 +6,4 @@ Makefile
 *.patch
 vtable.ops
 vtable_ops.c
+platform.c
