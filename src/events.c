@@ -213,14 +213,21 @@ Parrot_kill_event_loop(void)
     Parrot_schedule_event(NULL, ev);
 }
 
+/*
+ * put a queue entry into the interpreters task queue
+ */
 void
 Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
 {
     parrot_event* event;
-    push_entry(interpreter->task_queue, entry);
     event = entry->data;
     if (event->type != EVENT_TYPE_SLEEP)
         enable_event_checking(interpreter);
+    /*
+     * do push_entry last - this signales the queue condition so the
+     * interpreter might starting process that event immediately
+     */
+    push_entry(interpreter->task_queue, entry);
 }
 
 /*
@@ -240,6 +247,83 @@ dup_entry_interval(QUEUE_ENTRY* entry, FLOATVAL now)
     event->u.timer_event.abs_time = now + event->u.timer_event.interval;
     return new_entry;
 }
+
+/*
+ * do something, when an event arrived caller has locked the mutex
+ * returns 0 if event thread terminates
+ */
+static int
+process_events(QUEUE* event_q)
+{
+    FLOATVAL now;
+    QUEUE_ENTRY *entry;
+    parrot_event* event;
+
+    while (( entry = peek_entry(event_q))) {
+        /*
+         * one or more entries arrived - we hold the mutex again
+         * so we have to use the nonsyc_pop_entry to pop off event entries
+         */
+        event = NULL;
+        switch (entry->type) {
+            case QUEUE_ENTRY_TYPE_EVENT:
+                entry = nosync_pop_entry(event_q);
+                event = entry->data;
+                break;
+            case QUEUE_ENTRY_TYPE_TIMED_EVENT:
+                event = entry->data;
+                now = Parrot_floatval_time();
+                /*
+                 * if the timer_event isn't due yet, ignore the event
+                 * (we were signalled on insert of the event)
+                 * wait until we get at it again when time has elapsed
+                 */
+                if (now < event->u.timer_event.abs_time)
+                    return 1;
+                entry = nosync_pop_entry(event_q);
+                /*
+                 * if event is repeated dup and reinsert it
+                 */
+                if (event->u.timer_event.interval) {
+                    if (event->u.timer_event.repeat) {
+                        if (event->u.timer_event.repeat != -1)
+                            event->u.timer_event.repeat--;
+                        nosync_insert_entry(event_q,
+                                dup_entry_interval(entry, now));
+                    }
+                }
+                break;
+            default:
+                internal_exception(1, "Unknown queue entry");
+        }
+        assert(event);
+        if (event->type == EVENT_TYPE_NONE) {
+            mem_sys_free(entry);
+            mem_sys_free(event);
+            continue;
+        }
+        else if (event->type == EVENT_TYPE_EVENT_TERMINATE) {
+            mem_sys_free(entry);
+            mem_sys_free(event);
+            return 0;
+        }
+        /*
+         * now insert entry in interpreter task queue
+         */
+        if (event->interp) {
+            Parrot_schedule_interp_qentry(event->interp, entry);
+        }
+        else {
+            /*
+             * TODO broadcast or deliver to first interp
+             */
+            mem_sys_free(entry);
+            mem_sys_free(event);
+        }
+    } /* while events */
+    return 1;
+}
+
 /*
  * The event_thread is started by the first interpreter.
  * It handles all events for all interpreters.
@@ -250,9 +334,15 @@ event_thread(void *data)
     QUEUE* event_q = (QUEUE*) data;
     parrot_event* event;
     QUEUE_ENTRY *entry;
+    int running = 1;
 
     LOCK(event_q->queue_mutex);
-    while (1) {
+    /*
+     * we might already have an event in the queue
+     */
+    if (peek_entry(event_q))
+        running = process_events(event_q);
+    while (running) {
         entry = peek_entry(event_q);
         if (!entry) {
             /* wait infinite until entry arrives */
@@ -271,82 +361,19 @@ event_thread(void *data)
         }
         else {
             /* we shouldn't get here probably
-             * - the event queue terminating event is seen here
              */
+            internal_exception(1, "Spurious event");
 
         }
         /*
          * one or more entries arrived - we hold the mutex again
          * so we have to use the nonsyc_pop_entry to pop off event entries
          */
-        while (( entry = peek_entry(event_q))) {
-            FLOATVAL now;
-
-            event = NULL;
-            switch (entry->type) {
-                case QUEUE_ENTRY_TYPE_EVENT:
-                    entry = nosync_pop_entry(event_q);
-                    event = entry->data;
-                    break;
-                case QUEUE_ENTRY_TYPE_TIMED_EVENT:
-                    event = entry->data;
-                    now = Parrot_floatval_time();
-                    /*
-                     * if the timer_event isn't due yet, ignore the event
-                     * (we were signalled on insert of the event)
-                     * wait until we get at it again when time has elapsed
-                     */
-                    if (now < event->u.timer_event.abs_time)
-                        goto again;
-                    entry = nosync_pop_entry(event_q);
-                    /*
-                     * if event is repeated dup and reinsert it
-                     */
-                    if (event->u.timer_event.interval) {
-                        if (event->u.timer_event.repeat) {
-                            if (event->u.timer_event.repeat != -1)
-                                event->u.timer_event.repeat--;
-                            nosync_insert_entry(event_q,
-                                    dup_entry_interval(entry, now));
-                        }
-                    }
-                    break;
-                default:
-                    internal_exception(1, "Unknown queue entry");
-            }
-            /*
-             * TODO check for a stop event to do cleanup
-             */
-            assert(event);
-            if (event->type == EVENT_TYPE_NONE) {
-                mem_sys_free(entry);
-                continue;
-            }
-            else if (event->type == EVENT_TYPE_EVENT_TERMINATE) {
-                mem_sys_free(entry);
-                goto out;
-            }
-            /*
-             * now insert entry in interpreter task queue
-             */
-            if (event->interp) {
-                Parrot_schedule_interp_qentry(event->interp, entry);
-            }
-            else {
-                /*
-                 * TODO broadcast or deliver to first interp
-                 */
-                mem_sys_free(entry);
-            }
-        } /* while events */
-again:
-        ;
+        running = process_events(event_q);
     } /* event loop */
-out:
     /*
      * the main interpreter is dying
      */
-    mem_sys_free(event);
     UNLOCK(event_q->queue_mutex);
     queue_destroy(event_q);
     return NULL;
