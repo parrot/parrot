@@ -63,6 +63,11 @@ struct Arenas {
     UINTVAL collections;
 };
 
+struct Stash {
+    struct PMC *stash_hash;
+    struct Stash *parent_stash;
+};
+
 
 #endif /* PARROT_RESOURCES_H */
 

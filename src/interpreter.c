@@ -511,9 +511,6 @@ make_interpreter(INTVAL flags) {
     /* And a control stack */
     interpreter->control_stack = new_stack(interpreter);
 
-    /* Need an empty stash */
-    interpreter->perl_stash = mem_allocate_new_stash();
-    
     /* Load the core op func and info tables */
     interpreter->op_lib        = PARROT_CORE_OPLIB_INIT();
     interpreter->op_count      = interpreter->op_lib->op_count;
@@ -533,6 +530,9 @@ make_interpreter(INTVAL flags) {
 
     interpreter->prederef_code = (void **)NULL;
 
+    /* Need an empty stash */
+    interpreter->perl_stash = pmc_new(interpreter, enum_class_PerlHash);
+    
     return interpreter;   
 }
 

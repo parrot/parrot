@@ -60,7 +60,7 @@ struct Parrot_Interp {
     str_func_t * string_funcs;
 #endif
 
-    INTVAL flags;				          /* Various interpreter flags
+    INTVAL flags;				          /* Various interpreter flagBut whBut what 
                                              that signal that runops
                                              should do something */
     ProfData* profile;                     /* The array where we keep the profile counters */
