@@ -181,6 +181,10 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name, PMC *new_cl
       /* Set the vtable's type to the newly allocated type */
       Parrot_vtable_set_type(interpreter, new_vtable, new_type);
 
+      /* And cache our class PMC in the vtable so we can find it later
+       */
+      Parrot_vtable_set_data(interpreter, new_vtable, new_class);
+      
       /* Reset the init method to our instantiation method */
       new_vtable->init = Parrot_instantiate_object;
       new_class->vtable = new_vtable;
@@ -201,11 +205,14 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name, PMC *new_cl
  *
  */
 PMC *
-Parrot_instantiate_object(Parrot_Interp interpreter, PMC *class) {
+Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     PMC *new_object;
     PMC *new_object_array;
     INTVAL attrib_count;
     PMC *class_array;
+    PMC *class;
+
+    class = object->vtable->data;
 
     /* Grab the attribute count from the parent */
     attrib_count = class->cache.int_val;
