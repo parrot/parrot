@@ -2,6 +2,9 @@
 ** math.ops
 */
 
+#define DEPRECATED internal_exception(UNIMPLEMENTED, "you should't see this")
+
+
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -980,10 +983,14 @@ inline op sub (in PMC, in PMC, in PMC) :base_core {
 
 Set $1 to the square root of $2.
 
+Please note that for all these opcodes the variant with an INTVAL
+argument is deprecated. Actually code is generated that uses a
+FLOATVAL argument instead.
+
 =cut
 
 inline op sqrt(out NUM, in INT) :base_core {
-  $1 = sqrt((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1020,7 +1027,7 @@ Set $1 to the arc cosine (in radians) of $2.
 =cut
 
 inline op acos(out NUM, in INT) :base_math {
-  $1 = acos((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1040,7 +1047,7 @@ Set $1 to the arc secant (in radians) of $2.
 =cut
 
 inline op asec(out NUM, in INT) :base_math {
-  $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1060,7 +1067,7 @@ Set $1 to the arc sine (in radians) of $2.
 =cut
 
 inline op asin(out NUM, in INT) :base_math {
-  $1 = asin((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1092,7 +1099,7 @@ quadrant of the result.
 =cut
 
 inline op atan(out NUM, in INT) :base_math {
-  $1 = atan((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1102,17 +1109,17 @@ inline op atan(out NUM, in NUM) :base_math {
 }
 
 inline op atan(out NUM, in INT, in INT) :base_math {
-  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  DEPRECATED;
   goto NEXT();
 }
 
 inline op atan(out NUM, in INT, in NUM) :base_math {
-  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  DEPRECATED;
   goto NEXT();
 }
 
 inline op atan(out NUM, in NUM, in INT) :base_math {
-  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1132,7 +1139,7 @@ Set $1 to the cosine of $2 (given in radians).
 =cut
 
 inline op cos(out NUM, in INT) :base_math {
-  $1 = cos((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1152,7 +1159,7 @@ Set $1 to the hyperbolic cosine of $2 (given in radians).
 =cut
 
 inline op cosh(out NUM, in INT) :base_math {
-  $1 = cosh((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1172,7 +1179,7 @@ Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm
 =cut
 
 inline op exp(out NUM, in INT) :base_math {
-  $1 = exp((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1192,7 +1199,7 @@ Set $1 to the natural (base I<e>) logarithm of $2.
 =cut
 
 inline op ln(out NUM, in INT) :base_math {
-  $1 = log((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1212,7 +1219,7 @@ Set $1 to the base 10 logarithm of $2.
 =cut
 
 inline op log10(out NUM, in INT) :base_math {
-  $1 = log10((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1232,8 +1239,7 @@ Set $1 to the base 2 logarithm of $2.
 =cut
 
 op log2(out NUM, in INT) :base_math {
-   FLOATVAL temp = log((FLOATVAL)2.0);
-  $1 = log((FLOATVAL)$2) / temp;
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1254,7 +1260,7 @@ Set $1 to the secant of $2 (given in radians).
 =cut
 
 inline op sec(out NUM, in INT) :base_math {
-  $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1274,7 +1280,7 @@ Set $1 to the hyperbolic secant of $2 (given in radians).
 =cut
 
 inline op sech(out NUM, in INT) :base_math {
-  $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1294,7 +1300,7 @@ Set $1 to the sine of $2 (given in radians).
 =cut
 
 inline op sin(out NUM, in INT) :base_math {
-  $1 = sin((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1314,7 +1320,7 @@ Set $1 to the hyperbolic sine of $2 (given in radians).
 =cut
 
 inline op sinh(out NUM, in INT) :base_math {
-  $1 = sinh((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1334,7 +1340,7 @@ Set $1 to the tangent of $2 (given in radians).
 =cut
 
 inline op tan(out NUM, in INT) :base_math {
-  $1 = tan((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 
@@ -1354,7 +1360,7 @@ Set $1 to the hyperbolic tangent of $2 (given in radians).
 =cut
 
 inline op tanh(out NUM, in INT) :base_math {
-  $1 = tanh((FLOATVAL)$2);
+  DEPRECATED;
   goto NEXT();
 }
 

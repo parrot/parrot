@@ -473,17 +473,16 @@ output_is(<<'CODE', <<OUTPUT, "Recursion and exceptions");
 .sub b11 method
     .param pmc n
     .local pmc n1
-    new_pad -1
-    store_lex -1, "n", n
+    # new_pad -1
+    # store_lex -1, "n", n
     n1 = new Integer
     n1 = n + 1
-    newsub $P0, .Exception_Handler, catch
-    set_eh $P0
+    push_eh catch
     n = self."b11"(n1)
-    store_lex -1, "n", n
+    # store_lex -1, "n", n
     clear_eh
 catch:
-    n = find_lex "n"
+    # n = find_lex "n"
     .return(n)
 .end
 CODE

@@ -25,7 +25,7 @@ on an automatically generated next-op to be appended to the op body.
 
 Note that F<build_tools/ops2c.pl> supplies either 'inline' or 'function'
 as the op's type, depending on whether the C<inline> keyword is present
-in the op definition. This has the effect of causing all ops to be 
+in the op definition. This has the effect of causing all ops to be
 considered manual.
 
 =head2 Op Arguments
@@ -77,7 +77,7 @@ C<$type> is the type of op (see the note on op types above).
 
 C<$name> is the name of the op.
 
-C<$args> is a reference to an array of argument type descriptors. 
+C<$args> is a reference to an array of argument type descriptors.
 
 C<$argdirs> is a reference to an array of argument direction
 descriptors. Element I<x> is the direction of argument C<< $args->[I<x>]
@@ -95,7 +95,7 @@ sub new
     my $class = shift;
     my ($code, $type, $name, $args, $argdirs, $labels, $flags) = @_;
 
-    my $self = { 
+    my $self = {
         CODE => $code,
         TYPE => $type,
         NAME => $name,
@@ -172,6 +172,8 @@ sub full_name
     shift @arg_types; # Remove the 'op' type.
 
     $name .=  "_" . join("_", @arg_types) if @arg_types;
+
+    $name = "deprecated_$name" if ($self->body =~ /DEPRECATED/);
 
     return $name;
 }
@@ -253,7 +255,7 @@ sub flags
 {
     my $self = shift;
 
-    if (@_) 
+    if (@_)
     {
         $self->{FLAGS} = shift;
     }
@@ -286,7 +288,7 @@ sub body
 {
     my $self = shift;
 
-    if (@_) 
+    if (@_)
     {
         $self->{BODY} = shift;
     }
@@ -308,7 +310,7 @@ sub jump
 {
     my $self = shift;
 
-    if (@_) 
+    if (@_)
     {
         $self->{JUMP} = shift;
     }
@@ -335,7 +337,7 @@ sub full_body
 }
 
 # Called from rewrite_body() to perform the actual substitutions.
-sub _substitute 
+sub _substitute
 {
     my $self = shift;
     local $_ = shift;
@@ -373,7 +375,7 @@ method >> >>> to C<VTABLE_I<method>>.
 
 =cut
 
-sub rewrite_body 
+sub rewrite_body
 {
     my ($self, $body, $trans) = @_;
 
@@ -386,12 +388,12 @@ sub rewrite_body
         )->vtable->\s*(\w+)\(
         !VTABLE_$1(!sgx;
 
-    while (1) 
+    while (1)
     {
         my $new_body = $self->_substitute($body, $trans);
-        
+
         last if $body eq $new_body;
-        
+
         $body = $new_body;
     }
 

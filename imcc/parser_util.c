@@ -598,6 +598,37 @@ register_compilers(Parrot_Interp interp)
     /* Parrot_compreg(interp, const_string(interp, "FILE"), imcc_compile_file ); */
 }
 
+static int
+change_op(Interp *interpreter, IMC_Unit *unit, SymReg **r, int num, int emit)
+{
+    int changed = 0;
+    SymReg *s;
+
+    if (r[num]->type & VTCONST) {
+        /* make a number const */
+        s = mk_const(str_dup(r[num]->name), 'N');
+        r[num] = s;
+        changed = 1;
+    }
+    else if (emit) {
+        /* emit
+         *   set $N0, Iy
+         *   op  Nx, $N0
+         * or
+         *   op  Nx, ..., $N0
+         */
+        SymReg *rr[IMCC_MAX_REGS];
+
+        rr[0] = mk_temp_reg('N');
+        rr[1] = r[num];
+        INS(interpreter, unit, "set", NULL, rr, 2, 0, 1);
+        r[num] = rr[0];
+        changed = 1;
+        /* need to allocate the temp - run reg_alloc */
+        optimizer_level |= OPT_PASM;
+    }
+    return changed;
+}
 
 /*
  * Try to find valid op doing the same operation
@@ -606,6 +637,7 @@ register_compilers(Parrot_Interp interp)
  *      div_n_ic_n => div_n_nc_n
  *      div_n_i_n => set_n_i ; div_n_n_n
  *      ge_n_ic_ic => ge_n_nc_ic
+ *      acos_n_i   => acos_n_n
  */
 int
 try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
@@ -652,14 +684,20 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
     }
     else if (n == 3 &&
             (!strcmp(name, "cmp_str") ||
-            !strcmp(name, "cmp_num"))) {
+             !strcmp(name, "cmp_num"))) {
         name = "cmp";
         changed = 1;
     }
     /*
      * TODO handle eq_i_n_ic too
      */
-    if (n == 3 && r[0]->set == 'N') {
+    if (n == 3 && !strcmp(name, "atan")) {
+        if (r[1]->set == 'I')
+            changed |= change_op(interpreter, unit, r, 1, emit);
+        if (r[2]->set == 'I')
+            changed |= change_op(interpreter, unit, r, 2, emit);
+    }
+    else if (n == 3 && r[0]->set == 'N') {
         if (r[1]->set == 'I' && (r[2]->set == 'N' ||
                     (r[2]->type == VTADDRESS))) {
             if (!strcmp(name, "add") ||
@@ -672,23 +710,15 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
                 r[2] = s;
                 changed = 1;
             }
-            else if (r[1]->type & VTCONST) {
-                /* make a number const */
-                s = mk_const(str_dup(r[1]->name), 'N');
-                r[1] = s;
-                changed = 1;
-            }
-            else if (emit) {
-                /* emit set_n_ix */
-                SymReg *rr[IMCC_MAX_REGS];
-
-                rr[0] = mk_temp_reg('N');
-                rr[1] = r[1];
-                INS(interpreter, unit, "set", NULL, rr, 2, 0, 1);
-                r[1] = rr[0];
-                changed = 1;
-            }
+            else
+                changed = change_op(interpreter, unit, r, 1, emit);
         }
+    }
+    else if (n == 2 && r[0]->set == 'N' && r[1]->set == 'I') {
+        /*
+         * transcendentals  e.g. acos N, I
+         */
+        changed = change_op(interpreter, unit, r, 1, emit);
     }
     if (changed) {
         op_fullname(fullname, name, r, n, keyvec);
