@@ -6,9 +6,11 @@
 
 =head1 NAME
 
-classes/pmc2c.pl - PMC compiler
+classes/pmc2c.pl - PMC compiler (Old Version)
 
 =head1 SYNOPSIS
+
+B<This script has now been superceeded by F<classes/pmc2c2.pl>.>
 
     % perl pmc2c.pl [--no-lines] [--tree] foo.pmc [foo2.pmc...]
     % perl pmc2c.pl B<-f> method *.pmc
