@@ -93,7 +93,7 @@ void list_assign(Interp *interpreter, List *list, INTVAL idx,
 void * list_get(Interp *interpreter, List *list, INTVAL idx, int type);
 void list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
 void list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
-void list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
+void list_splice(Interp *interpreter, List *list, List* value, INTVAL offset,
                  INTVAL count);
 
 #endif /* PARROT_LIST_H_GUARD */

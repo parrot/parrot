@@ -1991,10 +1991,9 @@ If C<count> is 0 then the items in C<value> will be inserted after C<offset>.
 */
 
 void
-list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
+list_splice(Interp *interpreter, List *list, List *value_list, INTVAL offset,
         INTVAL count)
 {
-    List *value_list = value ? (List *)PMC_data(value): NULL;
     INTVAL value_length = value_list ? value_list->length : 0;
     INTVAL length = list->length;
     INTVAL i, j;

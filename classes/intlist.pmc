@@ -213,8 +213,8 @@ Removes and returns the first element in the list.
     void splice(PMC* value, INTVAL offset, INTVAL count) {
         if (SELF->vtable->base_type != value->vtable->base_type)
             internal_exception(1, "Type mismatch in splice");
-        list_splice(INTERP, (List*) PMC_struct_val(SELF), value,
-                offset, count);
+        list_splice(INTERP, (List*) PMC_struct_val(SELF),
+            (List *)PMC_struct_val(value), offset, count);
     }
 
     PMC* slice (PMC* key, INTVAL f) {
