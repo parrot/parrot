@@ -252,6 +252,25 @@ inline op assign(out STR, in STR) {
 
 =back
 
+=head2 Indirect PMC register set
+
+=over 4
+
+=item B<setp_ind>(in INT, in PMC)
+
+Set the PMC in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op setp_ind(in INT, in PMC) {
+    REG_PMC($1) = $2;
+    goto NEXT();
+}
+
+=back
+
 =cut
 
 ########################################

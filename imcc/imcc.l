@@ -181,6 +181,7 @@ SP              [ ]
 
 ".sym"          return(LOCAL);
 ".arg"          return(ARG);
+".flatten_arg"  return(FLATTEN_ARG);
 ".sub"          return(SUB);
 ".end"          return(ESUB);
 ".pcc_begin"    return(PCC_BEGIN);

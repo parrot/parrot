@@ -195,7 +195,7 @@ static char * inv_op(char *op) {
     Instruction *i;
 }
 
-%token <t> CALL GOTO ARG IF UNLESS NEW END SAVEALL RESTOREALL
+%token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS NEW END SAVEALL RESTOREALL
 %token <t> SUB NAMESPACE ENDNAMESPACE CLASS ENDCLASS SYM LOCAL CONST PARAM
 %token <t> INC DEC GLOBAL_CONST
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
@@ -374,13 +374,14 @@ pcc_args: /* empty */                   { $$ = 0; }
     ;
 
 pcc_arg: ARG var                        { $$ = $2; }
+    | FLATTEN_ARG target                { $2->type |= VT_FLATTEN; $$ = $2; }
     ;
 
 pcc_results: /* empty */                { $$ = 0; }
     | pcc_results pcc_result '\n'       { if($2) add_pcc_result($<sr>-4, $2); }
     ;
 
-pcc_result: RESULT var                  { $$ = $2; }
+pcc_result: RESULT target               { $$ = $2; }
     |   LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3);is_def=0; $$=0; }
     ;
 

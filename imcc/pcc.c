@@ -2,6 +2,7 @@
 #include <string.h>
 #include <assert.h>
 #include "imc.h"
+#include "parser.h"
 
 /*
  * pcc.c - parrot calling conventions stuff
@@ -501,10 +502,117 @@ insert_tail_call(Parrot_Interp interpreter, Instruction *ins, SymReg *sub)
     ins = insINS(interpreter, ins, "jump", regs, 1);
 }
 
+static Instruction *
+pcc_emit_flatten(Parrot_Interp interpreter, Instruction *ins,
+        SymReg *arg, int i, int *flatten)
+{
+
+    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *i0, *i1, *i2, *py, *p3;
+    SymReg *loop, *next, *over;
+    Instruction *tmp;
+    char buf[128];
+    /*
+     * emited code is
+     *   $I2 = i+5    # once
+     *   ============
+     *   $I0 = 0
+     *   $I1 = arg
+     * arg_loop_N:
+     *   if $I0 >= $I1 goto next_arg_N
+     *   PY = arg[$I0]
+     *   inc $I0
+     *   if $I2 >= 15  goto over_flow_N
+     *   setp_ind $I2, Py
+     *   inc $I2
+     *   goto _arg_loop_N
+     * over_flow_N:
+     *   push P3, $P0
+     *   goto _arg_loop_N
+     * next_arg_N:
+     *
+     * if there was a flattening before, next regs are handled with:
+     *   setp_ind $I2, arg
+     *   inc $I2
+     */
+
+    i0 = mk_symreg(str_dup("#i0"), 'I');        /* TODO cache syms */
+    i1 = mk_symreg(str_dup("#i1"), 'I');
+    i2 = mk_symreg(str_dup("#i2"), 'I');
+    py = mk_symreg(str_dup("#py"), 'P');
+    p3 = mk_pasm_reg(str_dup("P3"));
+    /* first time */
+    if (!*flatten) {
+        *flatten = 1;
+        regs[0] = i2;
+        sprintf(buf, "%d", i+5);
+        regs[1] = mk_const(str_dup(buf), 'I');
+        ins = insINS(interpreter, ins, "set", regs, 2);
+    }
+    if (!(arg->type & VT_FLATTEN)) {
+        /* normal arg, but needs indirect addressing */
+        regs[0] = i2;
+        regs[1] = arg;
+        ins = insINS(interpreter, ins, "setp_ind", regs, 2);
+        regs[0] = i2;
+        ins = insINS(interpreter, ins, "inc", regs, 1);
+        return ins;
+    }
+    regs[0] = i0;
+    ins = insINS(interpreter, ins, "null", regs, 1);
+    regs[0] = i1;
+    regs[1] = arg;
+    ins = insINS(interpreter, ins, "set", regs, 2);
+    sprintf(buf, "#arg_loop_%d", i);
+    loop = mk_address(str_dup(buf), U_add_uniq_label);
+    tmp = INS_LABEL(loop, 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
+    sprintf(buf, "#next_arg_%d", i);
+    next = mk_address(str_dup(buf), U_add_uniq_label);
+    regs[0] = i0;
+    regs[1] = i1;
+    regs[2] = next;
+    ins = insINS(interpreter, ins, "ge", regs, 3);
+    regs[0] = py;
+    regs[1] = arg;
+    regs[2] = i0;
+    tmp = INS(interpreter, "set", NULL, regs, 3, KEY_BIT(2), 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
+    regs[0] = i0;
+    ins = insINS(interpreter, ins, "inc", regs, 1);
+    sprintf(buf, "#over_flow_%d", i);
+    over = mk_address(str_dup(buf), U_add_uniq_label);
+    regs[0] = i2;
+    regs[1] = mk_const(str_dup("15"), 'I');
+    regs[2] = over;
+    ins = insINS(interpreter, ins, "gt", regs, 3);
+    regs[0] = i2;
+    regs[1] = py;
+    ins = insINS(interpreter, ins, "setp_ind", regs, 2);
+    regs[0] = i2;
+    ins = insINS(interpreter, ins, "inc", regs, 1);
+    regs[0] = loop;
+    ins = insINS(interpreter, ins, "branch", regs, 1);
+    tmp = INS_LABEL(over, 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
+    regs[0] = p3;
+    regs[1] = py;
+    ins = insINS(interpreter, ins, "push", regs, 2);
+    regs[0] = loop;
+    ins = insINS(interpreter, ins, "branch", regs, 1);
+    tmp = INS_LABEL(next, 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
+    return ins;
+}
+
 void
 expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
 {
-    SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS];
+    SymReg *arg, *sub, *reg, *arg_reg, *regs[IMCC_MAX_REGS];
     int next[4], i, j, n;
     char types[] = "ISPN";
     Instruction *tmp, *call_ins;
@@ -513,6 +621,7 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
     SymReg *p3;
     int n_p3;
     int tail_call;
+    int flatten;
 
     tail_call = check_tail_call(interpreter, ins);
     if (tail_call)
@@ -523,6 +632,7 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
     sub = ins->r[0];
     p3 = NULL;
     n_p3 = 0;
+    flatten = 0;
     /*
      * insert arguments
      */
@@ -532,6 +642,7 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
          * if prototyped, first 11 I,S,N go into regs
          */
         arg = sub->pcc_sub->args[i];
+        arg_reg = arg->reg;
         if (sub->pcc_sub->prototyped ||
                 (arg->set == 'P' && next[2] < 15)) {
             switch (arg->type) {
@@ -539,19 +650,18 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
                 case VT_CONSTP:
                 case VTCONST:
 lazy:
-                    arg = arg->reg;
                     for (j = 0; j < 4; j++) {
-                        if (arg->set == types[j]) {
-                            if (arg->color == next[j]) {
+                        if (arg_reg->set == types[j]) {
+                            if (arg_reg->color == next[j]) {
                                 next[j]++;
                                 break;
                             }
                             if (next[j] == 15)
                                 goto overflow;
-                            sprintf(buf, "%c%d", arg->set, next[j]++);
+                            sprintf(buf, "%c%d", arg_reg->set, next[j]++);
                             reg = mk_pasm_reg(str_dup(buf));
                             regs[0] = reg;
-                            regs[1] = arg;
+                            regs[1] = arg_reg;
                             ins = insINS(interpreter, ins, "set", regs, 2);
                             /* remember reg for life analysis */
                             sub->pcc_sub->args[i]->used = reg;
@@ -565,8 +675,12 @@ lazy:
                         /* TODO for now just emit a register move */
                         for (j = 0; j < 4; j++)
                             if (arg->set == types[j]) {
-                                arg->reg->want_regno = next[j];
-                                sub->pcc_sub->args[i]->used = arg->reg;
+                                if (j == 2 &&
+                                        (flatten ||
+                                         (arg_reg->type & VT_FLATTEN)))
+                                    goto flatten;
+                                arg_reg->want_regno = next[j];
+                                sub->pcc_sub->args[i]->used = arg_reg;
                                 break;
                             }
                         goto lazy;
@@ -586,12 +700,21 @@ overflow:
                 regs[1] = mk_const(str_dup(buf), 'I');
                 ins = insINS(interpreter, ins, "set", regs, 2);
             }
+            if (flatten || (arg_reg->type & VT_FLATTEN))
+                goto flatten;
             regs[0] = p3;
             regs[1] = arg;
             ins = insINS(interpreter, ins, "push", regs, 2);
             n_p3++;
         }
-    }
+        continue;
+flatten:
+        /* if we had a flattening arg, we must continue emitting
+         * code to do all at runtime
+         */
+        ins = pcc_emit_flatten(interpreter, ins, arg_reg, i, &flatten);
+    } /* for i */
+
     /*
      * if we have a tail call then
      * insert a jump

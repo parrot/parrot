@@ -15,7 +15,8 @@ enum VARTYPE {		/* variable type can be */
     VTPASM	= 1 << 5,	/* parrot register, colored from .emit */
     VT_REGP	= 1 << 6,	/* pointer to register */
     VT_CONSTP	= 1 << 7,	/* pointer to constant value */
-    VT_PCC_SUB  = 1 << 8	/* PCC subroutine call */
+    VT_PCC_SUB  = 1 << 8,	/* PCC subroutine call */
+    VT_FLATTEN  = 1 << 9	/* .flatten_arg IDENT | VTIDENT ... */
 };
 
 /* this VARTYPE needs register allocation and such */
