@@ -413,6 +413,7 @@ void register_compilers(Parrot_Interp interp)
  * e.g. add_n_i_n => add_n_n_i
  *      div_n_ic_n => div_n_nc_n
  *      div_n_i_n => set_n_i ; div_n_n_n
+ *      ge_n_ic_ic => ge_nc_ic
  */
 int
 try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r,
@@ -422,7 +423,8 @@ try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r,
     SymReg *s;
     int changed = 0;
     if (n == 3 && r[0]->set == 'N') {
-        if (r[1]->set == 'I' && r[2]->set == 'N') {
+        if (r[1]->set == 'I' && (r[2]->set == 'N' ||
+            (r[2]->type == VTADDRESS))) {
             if (!strcmp(name, "add") ||
                     !strcmp(name, "mul")
                ) {

@@ -869,7 +869,7 @@ OUT
 }
 
 $code = repeat($template, 18,
-               LOCALS => '.local PerlInt a<index>',
+               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
                INITS => 'a<index> = <index>',
                ARGS => '.arg a<index>',
                PARAMS => '.param PerlInt a<index>',
