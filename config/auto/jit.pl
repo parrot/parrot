@@ -85,7 +85,6 @@ sub runstep {
   }
 
   $jitcapable = $set_jitcapable if defined $set_jitcapable;
-  $execcapable = $set_execcapable if defined $set_execcapable;
 
   if($jitcapable) {
     my($jitcpuarch, $jitosname) =  split('-', $jitarchname);
@@ -117,6 +116,7 @@ sub runstep {
         $execcapable = 0;
       }
     }
+    $execcapable = $set_execcapable if defined $set_execcapable;
     if ($execcapable) {
       Configure::Data->set(
         exec_h       => '$(INC)/jit.h',

@@ -406,8 +406,8 @@ runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
 #  endif
 
     Parrot_exec(interpreter, pc, code_start, code_end);
-    return NULL;
 #endif
+    return NULL;
 }
 
 
