@@ -9,27 +9,34 @@ $VERSION   = '0.01';
 
 use Data::Dumper;
 
+my $ind = 0;
 sub _build_tree {
   my ($tokens,$count) = @_;
   my $temp   = {};
 
-  $count++;
+  die "EOF reached" if $count >= $#$tokens;
 
-  while($tokens->[$count] ne ')') {
-    if($tokens->[$count] eq '(') {
-      my ($lcount,$ltemp) = _build_tree($tokens,$count);
-      $count = $lcount;
-      push @{$temp->{children}},$ltemp;
-    } else {
-      if(exists $temp->{value} or exists $temp->{children}) {
-        push @{$temp->{children}},{value=>$tokens->[$count]};
-      } else {
-        $temp->{value} = $tokens->[$count];
-      }
+  if ($tokens->[$count] eq '(') {
+    $temp->{children} = [];
+    $count++;
+    while($tokens->[$count] ne ')') {
+      my $expr;
+      ($count, $expr) = _build_tree ($tokens, $count);
+      push @{$temp->{children}}, $expr;
     }
     $count++;
   }
-
+  elsif ($tokens->[$count] eq "'") {
+    $temp = { children => [{ value => 'quote' }] };
+    my $expr;
+    $count++;
+    ($count, $expr) = _build_tree ($tokens, $count);
+    push @{$temp->{children}}, $expr;
+  }
+  else {
+    $temp->{value} = $tokens->[$count++];
+  }
+  
   return ($count,$temp);
 }
 
@@ -57,9 +64,23 @@ sub _dataflow {
 
 sub parse {
   my $tokens = shift;
-  my (undef,$tree) = _build_tree($tokens,0);
-  _dataflow($tree);
+  my @tree;
+  my $tree;
 
+  my $count = 0;
+
+  while ($count < scalar @$tokens) {
+    #print Dumper $tokens;
+    ($count,$tree) = _build_tree($tokens,$count);
+    #_dataflow($tree);
+    #print Data::Dumper->Dump ([$count, $tree]);
+    push @tree, $tree;
+  }
+
+  # Implicit begin at toplevel
+  if (@tree > 1) {
+    $tree = { children => [ { value => 'begin' }, @tree ] };
+  }
   return $tree;
 }
 

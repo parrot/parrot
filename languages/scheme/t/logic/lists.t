@@ -1,10 +1,6 @@
 #! perl -w
 
-use Scheme::Test tests => 15;
-
-###
-### Add
-###
+use Scheme::Test tests => 21;
 
 output_is(<<'CODE', '(2 . 5)', 'cons');
 (write (cons 2 5))
@@ -81,4 +77,32 @@ CODE
 output_is(<<'CODE', '(1 4 2)', 'set-cdr!');
 (write
   (set-cdr! (list 1 2 3) (list 4 2)))
+CODE
+
+output_is(<<'CODE', '(1 2 3 4)', 'quoted list');
+(write '(1 2 3 4)) ; for emacs ')
+CODE
+
+output_is(<<'CODE', '1', 'null?');
+(write
+  (null? (list)))
+CODE
+
+output_is (<<'CODE', '()', "'()");
+(write '()) ; for emacs ')
+CODE
+
+output_is (<<'CODE', '0', 'failed null?');
+(write
+  (null? (list 1)))
+CODE
+
+output_is (<<'CODE', '(1 2 (3 4))', 'complex list');
+(write
+  '(1 2 (3 4))) ; for emacs ')
+CODE
+
+output_is (<<'CODE', '(1 2 (3 4))', 'complex list II');
+(write
+  (list 1 2 (list 3 4)))
 CODE

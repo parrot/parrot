@@ -18,6 +18,7 @@ sub tokenize {
   open SOURCE,"<$file";
   while(<SOURCE>) {
     next if /^\s*;/;
+    s/;.*$//;
     $text .= $_;
   }
   close SOURCE;

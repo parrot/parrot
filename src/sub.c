@@ -148,7 +148,13 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
     PMC * pad_pmc = pmc_new(interp, enum_class_Scratchpad);
     pad_pmc->cache.int_val = 0;
 
-    if ((base && depth > base->cache.int_val) || (!base && depth != 0)) {
+    if (base && depth < 0) {
+        depth = base->cache.int_val + depth + 1;
+    }
+
+    if ((depth < 0)
+        || (base && depth > base->cache.int_val) 
+        || (!base && depth != 0)) {
         internal_exception(-1, "-scratch_pad: too deep\n");
         return NULL;
     }
