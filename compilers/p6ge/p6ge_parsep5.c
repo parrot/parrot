@@ -20,8 +20,8 @@ expression code.
 
 #include "p6ge.h"
 #include <ctype.h>
-#include <malloc.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static P6GE_Exp* p5re_parse_expr(P6GE_Text* t);
 

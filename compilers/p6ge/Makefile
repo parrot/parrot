@@ -1,5 +1,6 @@
 PARROT = ../..
 CFLAGS = -I $(PARROT)/include
+
 p6ge.so: p6ge_parse.o p6ge_gen.o p6ge_parsep5.o
 	$(CC) -shared -fpic p6ge_parse.o p6ge_gen.o p6ge_parsep5.o -o p6ge.so
 

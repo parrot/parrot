@@ -20,8 +20,8 @@ that can execute the rule on a string.
 
 #include "p6ge.h"
 #include "parrot/parrot.h"
-#include <malloc.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 static char* p6ge_cbuf = 0;
 static int p6ge_cbuf_size = 0;
@@ -389,6 +389,7 @@ p6ge_gen_exp(P6GE_Exp* e, const char* succ)
 {
     emitlcount();
     switch (e->type) {
+    case P6GE_NULL_PATTERN: emit("R%d:\n", e->id); break;
     case P6GE_PATTERN_END: p6ge_gen_pattern_end(e, succ); break;
     case P6GE_DOT: p6ge_gen_dot(e, succ); break;
     case P6GE_LITERAL: p6ge_gen_literal(e, succ); break;
@@ -445,6 +446,20 @@ p6ge_gen(P6GE_Exp* e)
     return p6ge_cbuf;
 }
 
+/* is_bos_anchored() returns true if an expression is anchored to the bos */
+static int 
+is_bos_anchored(P6GE_Exp* e)
+{
+    switch (e->type) {
+    case P6GE_ANCHOR_BOS: return 1;
+    case P6GE_CONCAT: 
+        return is_bos_anchored(e->exp1) || is_bos_anchored(e->exp2);
+    case P6GE_GROUP: return is_bos_anchored(e->exp1);
+    case P6GE_ALT: return is_bos_anchored(e->exp1) && is_bos_anchored(e->exp2);
+    }
+    return 0;
+}
+
 /*
 
 =item C<char* p6ge_p6rule_pir(const char* s)>
@@ -463,19 +478,17 @@ p6ge_p6rule_pir(const char* s)
 {
     P6GE_Exp* e = 0;
     P6GE_Exp* dot0 = 0;
-    P6GE_Exp* group0 = 0;
-    P6GE_Exp* end = 0;
     char* pir = 0;
 
-    dot0 = p6ge_parse_new(P6GE_DOT, 0, 0);
-    dot0->min = 0; dot0->max = P6GE_INF; dot0->isgreedy = 0;
+    e = p6ge_parse_new(P6GE_CONCAT,
+                           p6ge_parse_new(P6GE_GROUP, p6ge_parse(s), 0),
+                           p6ge_parse_new(P6GE_PATTERN_END, 0, 0));
 
-    group0 = p6ge_parse_new(P6GE_GROUP, p6ge_parse(s), 0);
-
-    end = p6ge_parse_new(P6GE_PATTERN_END, 0, 0);
-
-    e = p6ge_parse_new(P6GE_CONCAT, dot0,
-                       p6ge_parse_new(P6GE_CONCAT, group0, end));
+    if (!is_bos_anchored(e)) {
+        dot0 = p6ge_parse_new(P6GE_DOT, 0, 0);
+        dot0->min = 0; dot0->max = P6GE_INF; dot0->isgreedy = 0;
+        e = p6ge_parse_new(P6GE_CONCAT, dot0, e);
+    }
 
     pir = p6ge_gen(e);
     p6ge_parse_free(e);
@@ -501,19 +514,17 @@ p6ge_p5rule_pir(const char* s)
 {
     P6GE_Exp* e = 0;
     P6GE_Exp* dot0 = 0;
-    P6GE_Exp* group0 = 0;
-    P6GE_Exp* end = 0;
     char* pir = 0;
 
-    dot0 = p6ge_parse_new(P6GE_DOT, 0, 0);
-    dot0->min = 0; dot0->max = P6GE_INF; dot0->isgreedy = 0;
+    e = p6ge_parse_new(P6GE_CONCAT,
+                           p6ge_parse_new(P6GE_GROUP, p6ge_parse(s), 0),
+                           p6ge_parse_new(P6GE_PATTERN_END, 0, 0));
 
-    group0 = p6ge_parse_new(P6GE_GROUP, p6ge_parsep5(s), 0);
-
-    end = p6ge_parse_new(P6GE_PATTERN_END, 0, 0);
-
-    e = p6ge_parse_new(P6GE_CONCAT, dot0,
-                       p6ge_parse_new(P6GE_CONCAT, group0, end));
+    if (!is_bos_anchored(e)) {
+        dot0 = p6ge_parse_new(P6GE_DOT, 0, 0);
+        dot0->min = 0; dot0->max = P6GE_INF; dot0->isgreedy = 0;
+        e = p6ge_parse_new(P6GE_CONCAT, dot0, e);
+    }
 
     pir = p6ge_gen(e);
     p6ge_parse_free(e);

@@ -8,6 +8,7 @@
 #define P6GE_MAX_LITERAL_LEN 128
 
 typedef enum {
+    P6GE_NULL_PATTERN,
     P6GE_PATTERN_END, P6GE_DOT, P6GE_LITERAL, 
     P6GE_CONCAT, P6GE_GROUP, P6GE_ALT,
     P6GE_ANCHOR_BOS, P6GE_ANCHOR_EOS,
@@ -17,7 +18,6 @@ typedef enum {
 enum { ctliteral=0x00, ctmeta=0x01, ctspace=0x02, ctket=0x04, ctquant=0x08 };
 extern int p6ge_ctype[256];
 extern int p6ge_cmeta[256];
-extern const char* p6ge_exp_s[];
 
 typedef struct _P6GE_Text {
   const unsigned char* text;

@@ -20,15 +20,8 @@ expression code.
 
 #include "p6ge.h"
 #include <ctype.h>
-#include <malloc.h>
 #include <stdio.h>
-
-const char* p6ge_exp_s[] = {
-   "pattern end", "dot", "literal", 
-   "concat", "group", "alt",
-   "^anchor", "anchor$",
-   "^^anchor", "anchor$$"
-};
+#include <stdlib.h>
 
 int p6ge_ctype[256];
 int p6ge_cmeta[256];
