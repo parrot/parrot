@@ -38,7 +38,8 @@ getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 {
     va_list *arg = (va_list *) (obj->data);
 
-    char ch = (char) (int) va_arg(*arg, int);
+    /* char promoted to int */
+    char ch = (char)va_arg(*arg, int);
     return string_make(interpreter, &ch, 1, NULL, 0, NULL);
 }
 
@@ -114,7 +115,8 @@ getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 
     switch (size) {
     case SIZE_SHORT:
-        return (HUGEFLOATVAL) (double)va_arg(*arg, double);
+        /* float is promoted to double */
+        return (HUGEFLOATVAL) (float)va_arg(*arg, double);
     case SIZE_REG:
         return (HUGEFLOATVAL) (double)va_arg(*arg, double);
     case SIZE_HUGE:
@@ -302,4 +304,4 @@ SPRINTF_OBJ pmc_core = {
  * End:
  *
  * vim: expandtab shiftwidth=4:
-*/
+ */
