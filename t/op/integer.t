@@ -34,6 +34,7 @@ output_is(<<CODE, <<OUTPUT, "set_i");
 	set	I1, I0
 	print	I1
 	print	"\\n"
+        end
 CODE
 2003195204
 OUTPUT
@@ -61,6 +62,7 @@ output_is(<<CODE, <<OUTPUT, "add_i");
 	add	I7, I5, I6
 	print	I7
 	print	"\\n"
+        end
 CODE
 574908040
 862362060
@@ -75,6 +77,7 @@ output_is(<<CODE, <<OUTPUT, "sub_i");
 	sub	I2, I0, I1
 	print	I2
 	print	"\\n"
+        end
 CODE
 286331153
 OUTPUT
@@ -85,6 +88,7 @@ output_is(<<CODE, <<OUTPUT, "mul_i");
 	mul	I2, I0, I1
 	print	I2
 	print	"\\n"
+        end
 CODE
 203
 OUTPUT
@@ -107,6 +111,7 @@ output_is(<<CODE, <<OUTPUT, "div_i");
 	div	I2, I0, I1
 	print	I2
 	print	"\\n"
+        end
 CODE
 3
 5
@@ -125,6 +130,7 @@ output_is(<<CODE, <<OUTPUT, "mod_i");
 	mod	I2, I0, I1
 	print	I2
 	print	"\\n"
+        end
 CODE
 2
 -7
@@ -149,6 +155,7 @@ TWO:
 
 ERROR:
 	print	"bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -171,6 +178,7 @@ TWO:
 
 ERROR:
 	print	"bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -195,6 +203,7 @@ TWO:
 
 ERROR:
 	print	"bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -217,6 +226,7 @@ TWO:
 
 ERROR:
 	print	"bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -247,6 +257,7 @@ THREE:
 
 ERROR:
 	print "bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -277,6 +288,7 @@ THREE:
 
 ERROR:
 	print	"bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -308,6 +320,7 @@ THREE:
 
 ERROR:
 	print "bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -338,6 +351,7 @@ THREE:
 
 ERROR:
 	print	"bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -369,6 +383,7 @@ THREE:
 
 ERROR:
 	print "bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -399,6 +414,7 @@ THREE:
 
 ERROR:
 	print	"bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -430,6 +446,7 @@ THREE:
 
 ERROR:
 	print "bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -460,6 +477,7 @@ THREE:
 
 ERROR:
 	print	"bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -490,6 +508,7 @@ THREE:
 
 ERROR:
 	print	"bad\\n"
+        end
 CODE
 ok 1
 ok 2
@@ -515,6 +534,7 @@ output_is(<<CODE, <<OUTPUT, "inc_i");
 	inc	I1
 	print	I1
 	print	"\\n"
+        end
 CODE
 1
 5
@@ -531,6 +551,7 @@ output_is(<<CODE, <<OUTPUT, "inc_i_ic");
 	inc	I0, -10
 	print	I0
 	print	"\\n"
+        end
 CODE
 5
 -5
@@ -555,6 +576,7 @@ output_is(<<CODE, <<OUTPUT, "dec_i");
 	dec	I1
 	print	I1
 	print	"\\n"
+        end
 CODE
 -1
 -5
@@ -571,6 +593,7 @@ output_is(<<CODE, <<OUTPUT, "dec_i_ic");
 	dec	I0, -10
 	print	I0
 	print	"\\n"
+        end
 CODE
 -5
 5
@@ -591,6 +614,7 @@ output_is(<<CODE, <<OUTPUT, "iton_n_i");
 	iton	N2, I2
 	print	N2
 	print	"\\n"
+        end
 CODE
 0.000000
 2147483647.000000
@@ -664,6 +688,7 @@ output_is(<<CODE, <<OUTPUT, "clear_i");
 	print	I30
 	print	I31
 	print	"\\n"
+        end
 CODE
 00000000000000000000000000000000
 OUTPUT
