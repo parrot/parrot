@@ -1095,7 +1095,8 @@ directory_unpack (struct Parrot_Interp *interpreter,
         if (seg->op_count != tmp) {
             fprintf (stderr,
                     "%s: Size in directory (%d) doesn't match size "
-                    "at offset (%d)\n", seg->name, seg->op_count, tmp);
+                    "at offset (%d)\n", seg->name, (int)seg->op_count, 
+                    (int)tmp);
         }
         if (i) {
             struct PackFile_Segment *last = dir->segments[i-1];
