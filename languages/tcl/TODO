@@ -149,9 +149,8 @@ tests so they're consistent.
 =item Add tests for...
 
 tclword.imc tcl*.pmc
-[concat] [join] [list] [llength] [lappend] [linsert] [lrepeat]
+[concat] [join] [lrepeat] [uplevel] [upvar]
 [lrange] [array set] [global] [string match] [inline]
-[uplevel] [upvar]
 the macros?
 expr's precedence and parens
 [puts]'s ability to write to other channels.

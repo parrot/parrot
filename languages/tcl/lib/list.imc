@@ -43,7 +43,7 @@ bad_arg:
   retval = new TclString
   $S9  = "bad index \""
   $S9 .= position
-  $S9 .= "\": must be integer or end?-integer?"
+  $S9 .= "\": must be integer or end?-integer?\n"
   retval = $S9
   return_type=TCL_ERROR
   goto done
