@@ -21,24 +21,35 @@ int do_test(struct Parrot_Interp* interpreter) {
     FLOATVAL fltval;
     char *fmt;
     char dest[20];
+    char *temp;
     
     Parrot_snprintf(interpreter, dest, 2, "%s", "CERT");
     printf("%s\n",dest);
 
     S = Parrot_sprintf_c(interpreter, "Hello, %%%s%%\n", "Parrot!");
-    fputs(string_to_cstring(interpreter, S), stdout);
+    temp = string_to_cstring(interpreter, S);
+    fputs(temp, stdout);
+    free(temp);
 
     S = Parrot_sprintf_c(interpreter, "PerlHash[0x%x]\n", 256);
-    fputs(string_to_cstring(interpreter, S), stdout);
+    temp = string_to_cstring(interpreter, S);
+    fputs(temp, stdout);
+    free(temp);
 
     S = Parrot_sprintf_c(interpreter, "PerlHash[0x%lx]\n", 256);
-    fputs(string_to_cstring(interpreter, S), stdout);
+    temp = string_to_cstring(interpreter, S);
+    fputs(temp, stdout);
+    free(temp);
 
     S = Parrot_sprintf_c(interpreter, "Hello, %.2s!\n", "Parrot");
-    fputs(string_to_cstring(interpreter, S), stdout);
+    temp = string_to_cstring(interpreter, S);
+    fputs(temp, stdout);
+    free(temp);
 
     S = Parrot_sprintf_c(interpreter, "Hello, %Ss", S);
-    fputs(string_to_cstring(interpreter, S), stdout);
+    temp = string_to_cstring(interpreter, S);
+    fputs(temp, stdout);
+    free(temp);
 
     pmc=pmc_new(interpreter, enum_class_PerlInt);
     pmc->vtable->set_integer_native(interpreter, pmc, 1);
