@@ -37,8 +37,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
     new P0, .Sub
-    set_addr I3, func
-    set P0, I3
+    set_addr P0, func
 
     set I5, 3
     save I5
@@ -73,8 +72,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc_p");
     new P0, .Sub
-    set_addr I3, func
-    set P0, I3
+    set_addr P0, func
 
     set I5, 3
     save I5
@@ -112,8 +110,7 @@ output_is(<<'CODE', <<'OUTPUT', "Continuation");
     set P5, 3
     store_global "foo", P5
     new P1, .Continuation
-    set_addr I0, endcont
-    set P1, I0
+    set_addr P1, endcont
 endcont:
     find_global P4, "foo"
     print "here "
@@ -145,8 +142,7 @@ output_is(<<'CODE', <<'OUTPUT', "definedness of Continuation");
     defined I1, P1
     print I1
     print "\n"
-    set_addr I0, cont
-    set P1, I0
+    set_addr P1, cont
     defined I1, P1
     print I1
     print "\n"
@@ -173,8 +169,7 @@ output_is(<<'CODE', <<'OUTPUT', "PASM sub as closure");
 main:
 
     new P0, .Sub
-    set_addr I3, foo
-    set P0, I3
+    set_addr P0, foo
 
     new P5, .PerlInt
     set P5, 5
@@ -220,8 +215,7 @@ foo:
     new_pad 0
     store_lex 0, "n", P5
     new P5, .Closure	# P5 has now the lexical "n" in the pad
-    set_addr I3, f
-    set P5, I3
+    set_addr P5, f
     invoke P1		# ret
 
 # expects arg in P5, returns incremented result in P5
@@ -241,8 +235,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - tail invoke");
     new P0, .Sub
-    set_addr I3, func1
-    set P0, I3
+    set_addr P0, func1
 
     invokecc
     print "done\n"
@@ -252,8 +245,7 @@ func1:
     print "in func1\n"
 
     new P0, .Sub
-    set_addr I3, func2
-    set P0, I3
+    set_addr P0, func2
 
     invoke    # tail invoke (reuses context already in P1)
     print "this should not be called\n"
@@ -661,16 +653,14 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "equality of closures");
       new P0, .Closure
-      set_addr I3, f1
-      set P0, I3
+      set_addr P0, f1
       clone P1, P0
       eq P0, P1, OK1
       print "not "
 OK1:  print "ok 1\n"
 
       new P2, .Closure
-      set_addr I3, f2
-      set P2, I3
+      set_addr P2, f2
       eq P0, P2, BAD2
       branch OK2
 BAD2: print "not "
@@ -691,16 +681,14 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "equality of subs");
       new P0, .Sub
-      set_addr I3, f1
-      set P0, I3
+      set_addr P0, f1
       clone P1, P0
       eq P0, P1, OK1
       print "not "
 OK1:  print "ok 1\n"
 
       new P2, .Sub
-      set_addr I3, f2
-      set P2, I3
+      set_addr P2, f2
       eq P0, P2, BAD2
       branch OK2
 BAD2: print "not "
