@@ -383,7 +383,7 @@ sub preprocess {
     elsif(/\.($label_re)/o) {                         # .{name}
       if(defined $self->{constants}{$1}) {
         push @{$self->{contents}},$_;
-        $self->{contents}[-1] =~ s/\.(\w+)/$self->{constants}{$1}/g;
+        $self->{contents}[-1] =~ s/\.($label_re)/$self->{constants}{$1}/g;
       }
       else {
         push @{$self->{contents}},$_;
