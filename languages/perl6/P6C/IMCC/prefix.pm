@@ -966,7 +966,9 @@ sub prefix_return {
     my ($x) = @_;
     my $val = $x->args->val;
     code(<<END);
+	.pcc_begin_return
 	.return $val
+	.pcc_end_return
 END
     goto_label type => 'return';
     return $val;
