@@ -66,6 +66,8 @@
 
 .constant NewBodyString	S6
 
+.constant TempStr    	S7
+
 #
 
 .constant CoreOps       P0
@@ -190,6 +192,7 @@ InitializeCoreOps:
     set .SpecialWords["exit"], 6
 
     .AddCoreOp(Int_Dot,".")
+    .AddCoreOp(Int_Dot, "u.")
     .AddCoreOp(Int_Dot_Stack,".s")
     .AddCoreOp(Quit,"quit")
     .AddCoreOp(Int_Add,"+")
@@ -200,6 +203,7 @@ InitializeCoreOps:
     .AddCoreOp(Int_Div,"/")
     .AddCoreOp(Int_Mod,"mod")
     .AddCoreOp(Int_Slash_Mod,"/mod")
+    .AddCoreOp(Int_Slash_Mod,"um/mod")
     .AddCoreOp(Int_Negate,"negate")
     .AddCoreOp(Int_Abs,"abs")
     .AddCoreOp(Int_Min,"min")
@@ -249,10 +253,10 @@ InitializeCoreOps:
     .AddCoreOp(Int_EQ0,"0=")
     .AddCoreOp(Int_GT0,"0>")
     .AddCoreOp(Int_GE0,"0>=")
-# u<
-# u<=
-# u>
-# u>=
+    .AddCoreOp(Int_LT,"u<")
+    .AddCoreOp(Int_LE,"u<=")
+    .AddCoreOp(Int_GT,"u>")
+    .AddCoreOp(Int_GE,"u>=")
 # within
 # d<
 # d<=
@@ -270,20 +274,6 @@ InitializeCoreOps:
 # du<=
 # du>
 # du>=
-
-    #
-    # Arithmetic, Mixed precision
-    #
-
-# m+
-# */
-# */mod
-# m*
-# um*
-# m*/
-# um/mod
-# fm/mod
-# sm/rem
 
     #
     # Arithmetic, Floating Point
@@ -356,17 +346,17 @@ InitializeCoreOps:
     .AddUserOp("tuck", "swap over")
     .AddCoreOp(Int_Swap,"swap")
     .AddCoreOp(Stack_Depth, "depth")
-# pick
+    .AddCoreOp(Pick_Stack, "pick")
     .AddCoreOp(Rot_Stack, "rot")
 # -rot
-# ?dup
+    .AddCoreOp(Maybe_Dup, "?dup")
     .AddCoreOp(Roll_Stack, "roll")
     .AddUserOp("2drop", "drop drop")
 # 2nip
     .AddUserOp("2dup", "over over")
-# 2over
+    .AddCoreOp(Two_Over, "2over")
 # 2tuck
-# 2swap
+    .AddCoreOp(Two_Swap, "2swap")
 # 2rot
 
     #
@@ -382,6 +372,21 @@ InitializeCoreOps:
 # fswap
 # fpick
 # frot
+
+
+    #
+    # Arithmetic, Mixed precision
+    #
+
+# m+
+
+  .AddUserOp('*/', 'rot rot * swap /')
+  .AddUserOp('*/mod', 'rot rot * swap /mod')
+  .AddCoreOp(Int_Mul, "m*")
+  .AddCoreOp(Int_Mul, "um*")
+# m*/
+# fm/mod
+# sm/rem
 
     #
     # Stack Manipulation, Return stack
@@ -601,6 +606,9 @@ InitializeCoreOps:
    .AddUserOp("true", "0 invert")
    .AddCoreOp(Print_Space, "space")
    .AddCoreOp(Print_Spaces, "spaces")
+   .AddCoreOp(Print_CR, "cr")
+   .AddCoreOp(Emit, "emit")
+   .AddCoreOp(Execute, "execute")
 
     ret
 
@@ -1010,6 +1018,51 @@ Roll_Stack:
     .PopInt
     sub .IntStack, 0, .IntStack
     rotate_up .IntStack
+    branch DoneInterpretWord
+
+Two_Over:
+    lookback .PMCStack, 3
+    save .PMCStack
+    lookback .PMCStack, 3
+    save .PMCStack
+    branch DoneInterpretWord
+
+Two_Swap:
+    rotate_up -4
+    rotate_up -4
+    branch DoneInterpretWord
+
+Maybe_Dup:
+    .PopPMC
+    if .PMCStack, dupit
+    new .PMCStack, .Integer
+    set .PMCStack, 0
+    .PushPMC
+    branch DoneInterpretWord
+    .PushPMC
+    .PushPMC
+    branch DoneInterpretWord
+
+Print_CR:
+    print "\n"
+    branch DoneInterpretWord
+
+Emit:
+    .PopInt
+    chr .TempStr, .IntStack
+    print .TempStr
+    branch DoneInterpretWord
+
+Execute:
+    .PopInt
+    jsr .IntStack
+    branch DoneInterpretWord
+
+Pick_Stack:
+    .PopInt
+    dec .IntStack
+    lookback .PMCStack, .IntStack
+    .PushPMC
     branch DoneInterpretWord
 
 DoneInterpretWord:
