@@ -286,6 +286,10 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
             if(header->byteorder[i] > header->wordsize - 1) {
                 fprintf(stderr, "PackFile_unpack: invalid byteorder element ");
                 fprintf(stderr, "or wordsize/byteorder mismatch\n");
+                fprintf(stderr, "File wordsize: %d\nByteorder: ", header->wordsize);
+                for(i = 0; i < header->wordsize; i++)
+                    fprintf(stderr, "[%u]", header->byteorder[i]);
+                fprintf(stderr, "\n");
                 return 0;
             }
         }
