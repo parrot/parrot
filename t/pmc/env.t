@@ -16,7 +16,7 @@ Tests the C<Env> PMC.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 use Parrot::Config;
 
@@ -132,3 +132,28 @@ CODE
 0
 OUTPUT
 
+output_is(<<'CODE', <<OUT, "getenv - null key");
+    new P0, .Env
+    set S0, P0[""]
+    eq S0, "", OK
+    print "not "
+OK: print "ok\n"
+    end
+CODE
+ok
+OUT
+
+output_like(<<'CODE', <<OUT, "setenv/getenv - PMC key");
+    new P0, .Env
+    new P1, .Key
+    set P1, "PARROT_TMP"
+    new P2, .String
+    set P2, "Foobar"
+    new P3, .String
+    set P0[P1], P2
+    set P3, P0[P1]
+    print P3
+    end
+CODE
+/Foobar/i
+OUT
