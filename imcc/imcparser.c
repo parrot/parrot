@@ -2057,12 +2057,12 @@ yyreduce:
 
   case 62:
 #line 494 "imcc/imcc.y"
-    {  yyval.t |= P_PROTOTYPED ; }
+    {  yyval.t = P_PROTOTYPED ; }
     break;
 
   case 63:
 #line 495 "imcc/imcc.y"
-    {  yyval.t |= P_NON_PROTOTYPED ; }
+    {  yyval.t = P_NON_PROTOTYPED ; }
     break;
 
   case 64:
@@ -2070,24 +2070,34 @@ yyreduce:
     {  yyval.t = P_NONE; }
     break;
 
+  case 65:
+#line 500 "imcc/imcc.y"
+    { yyval.t |= yyvsp[0].t; }
+    break;
+
+  case 66:
+#line 501 "imcc/imcc.y"
+    { yyval.t |= yyvsp[0].t; }
+    break;
+
   case 68:
 #line 505 "imcc/imcc.y"
-    {  yyval.t |= P_LOAD; }
+    {  yyval.t = P_LOAD; }
     break;
 
   case 69:
 #line 506 "imcc/imcc.y"
-    {  yyval.t |= P_MAIN; }
+    {  yyval.t = P_MAIN; }
     break;
 
   case 70:
 #line 507 "imcc/imcc.y"
-    {  yyval.t |= P_IMMEDIATE; }
+    {  yyval.t = P_IMMEDIATE; }
     break;
 
   case 71:
 #line 508 "imcc/imcc.y"
-    {  yyval.t |= P_POSTCOMP; }
+    {  yyval.t = P_POSTCOMP; }
     break;
 
   case 72:
@@ -2922,7 +2932,7 @@ yyreduce:
     }
 
 /* Line 1016 of /usr/share/bison/yacc.c.  */
-#line 2926 "imcc/imcparser.c"
+#line 2936 "imcc/imcparser.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
