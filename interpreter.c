@@ -171,11 +171,14 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
  * interpreter->op_lib = prederefed oplib
  *
  * the "normal" op_lib has a copy in the interpreter structure
+ * - but get the op_code lookup function from standard core
+ *   prederef has no op_info_table
  */
 static void
 init_prederef(struct Parrot_Interp *interpreter)
 {
     interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT(1);
+    interpreter->op_lib->op_code = PARROT_CORE_OPLIB_INIT(1)->op_code;
     if (interpreter->op_lib->op_count != interpreter->op_count)
         internal_exception(PREDEREF_LOAD_ERROR,
                 "Illegal op count (%d) in prederef oplib\n",

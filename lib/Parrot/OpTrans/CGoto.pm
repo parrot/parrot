@@ -13,6 +13,8 @@ use Parrot::OpTrans;
 use vars qw(@ISA);
 @ISA = qw(Parrot::OpTrans);
 
+sub suffix { return "_cg"; }
+
 sub defines
 {
   return <<END;

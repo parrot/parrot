@@ -4230,7 +4230,7 @@ Take a built interpreter and run the code starting at offset $2.
 
 op runinterp(inout PMC, in INT) {
   struct Parrot_Interp * new_interp = (struct Parrot_Interp *)$1->data;
-  Interp_flags_SET(interpreter, PARROT_EXTERN_CODE_FLAG);
+  Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
   new_interp->code = interpreter->code;
   runops(new_interp, REL_PC + $2);
   goto NEXT();

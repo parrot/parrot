@@ -132,6 +132,13 @@ extern op_lib_t *Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}
 
 END_C
 
+if ($suffix =~ /cg/) {
+	print HEADER <<END_C;
+
+opcode_t *cg_${base}(opcode_t *, struct Parrot_Interp *);
+END_C
+}
+
 print SOURCE $preamble;
 print SOURCE <<END_C;
 #include "$include"
@@ -143,22 +150,43 @@ END_C
 print SOURCE $ops->preamble($trans);
 
 
+if ($suffix =~ /cg/) {
+	print SOURCE <<END_C;
+
+opcode_t *
+cg_$base(opcode_t *cur_opcode, struct Parrot_Interp *interpreter)
+{
+    static void *ops_addr[] = {
+END_C
+
+}
+
 #
 # Iterate over the ops, appending HEADER and SOURCE fragments:
 #
 
 my @op_funcs;
 my @op_func_table;
-
+my @cg_jump_table;
 my $index = 0;
-my ($prev_source, $prev_func_name);
+my ($prev_source, $prev_func_name, $prev_def);
 
 foreach my $op ($ops->ops) {
     my $func_name  = $op->func_name;
     my $arg_types  = "$opsarraytype *, struct Parrot_Interp *";
     my $prototype  = "$opsarraytype * $func_name ($arg_types)";
     my $args       = "$opsarraytype *cur_opcode, struct Parrot_Interp * interpreter";
-    my $definition = "static $opsarraytype *\n$func_name ($args)";
+    my $definition;
+    my $comment = '';
+    $prev_def = '';
+    if ($suffix =~ /cg/) {
+	$prev_def = $definition = "PC_$index:";
+	$comment =  "/* ". $op->func_name ." */";
+	push @cg_jump_table, "        &&PC_$index,\n";
+    }
+    else {
+	$definition = "static $opsarraytype *\n$func_name ($args)";
+    }
     my $source     = $op->source($trans);
 
 #    print HEADER "$prototype;\n";
@@ -178,18 +206,47 @@ foreach my $op ($ops->ops) {
 
     if ($prev_source && $prev_source eq $source) {
 	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
-	"$prev_func_name,", $index++);
+	    "$prev_func_name,", $index);
 	push @op_funcs, <<"EOF";
-	/* $func_name => $prev_func_name */
+/*$prev_def	 $func_name => $prev_func_name */
 EOF
+	# pop off  label and duplicate previous
+	if ($suffix =~ /cg/) {
+	    pop @cg_jump_table;
+	    push @cg_jump_table, $cg_jump_table[-1];
+	}
     }
     else {
 	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
-	"$func_name,", $index++);
-    push @op_funcs,      "$definition {\n$source}\n\n";
+	    "$func_name,", $index);
+	push @op_funcs,      "$definition $comment {\n$source}\n\n";
 	$prev_source = $source;
 	$prev_func_name = $func_name;
     }
+    $index++;
+}
+
+if ($suffix =~ /cg/) {
+    print SOURCE @cg_jump_table;
+    print SOURCE <<END_C;
+  NULL
+};
+
+/* #ifdef HAVE_NESTED_FUNC */
+#ifdef __GNUC__
+    static void _check(void);
+    static void _check(void) {
+	int lo_var_ptr;
+	if (!interpreter->lo_var_ptr)
+	    interpreter->lo_var_ptr = (void*)&lo_var_ptr;
+    }
+    _check();
+#endif
+/* #endif */
+
+goto *ops_addr[*cur_opcode];
+
+END_C
 }
 
 print SOURCE <<END_C;
@@ -200,7 +257,16 @@ print SOURCE <<END_C;
 
 END_C
 
+#
+# Finish the SOURCE file's array initializer:
+#
 print SOURCE @op_funcs;
+
+if ($suffix =~ /cg/) {
+    print SOURCE <<END_C;
+} /* cg_$base */
+END_C
+}
 
 #
 # reset #line in the SOURCE file.
@@ -215,10 +281,16 @@ print SOURCE "#line $line \"$source\"\n" unless $ENV{PARROT_NO_LINE};
 
 
 #
-# Finish the SOURCE file's array initializer:
+# write op_func_func
 #
 
-print SOURCE <<END_C;
+my ($op_info, $op_func, $getop);
+$op_info = $op_func = 'NULL';
+$getop = '( int (*)(const char *, int) )NULL';
+
+if ($suffix !~ /cg/) {
+    $op_func = 'op_func_table';
+    print SOURCE <<END_C;
 
 INTVAL ${base}_numops${suffix} = $num_ops;
 
@@ -229,21 +301,24 @@ INTVAL ${base}_numops${suffix} = $num_ops;
 static op_func${suffix}_t op_func_table\[$num_entries] = {
 END_C
 
-print SOURCE @op_func_table;
+    print SOURCE @op_func_table;
 
-print SOURCE <<END_C;
+    print SOURCE <<END_C;
   (op_func${suffix}_t)0  /* NULL function pointer */
 };
 
 
 END_C
 
+}
 
+if ($suffix eq '') {
+    $op_info = 'op_info_table';
+    $getop = 'get_op';
 #
 # Op Info Table:
 #
-
-print SOURCE <<END_C;
+    print SOURCE <<END_C;
 
 /*
 ** Op Info Table:
@@ -252,20 +327,20 @@ print SOURCE <<END_C;
 static op_info_t op_info_table\[$num_entries] = {
 END_C
 
-$index = 0;
+    $index = 0;
 
-foreach my $op ($ops->ops) {
-    my $type       = sprintf("PARROT_%s_OP", uc $op->type);
-    my $name       = $op->name;
-    my $full_name  = $op->full_name;
-    my $func_name  = $op->func_name;
-    my $body       = $op->body;
-    my $jump       = $op->jump || 0;
-    my $arg_count  = $op->size;
-    my $arg_types  = "{ " . join(", ", map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types) . " }";
-    my $arg_dirs   = "{ " . join(", ", map { $arg_dir_mapping{$_} } $op->arg_dirs) . " }";
+    foreach my $op ($ops->ops) {
+	my $type       = sprintf("PARROT_%s_OP", uc $op->type);
+	my $name       = $op->name;
+	my $full_name  = $op->full_name;
+	my $func_name  = $op->func_name;
+	my $body       = $op->body;
+	my $jump       = $op->jump || 0;
+	my $arg_count  = $op->size;
+	my $arg_types  = "{ " . join(", ", map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types) . " }";
+	my $arg_dirs   = "{ " . join(", ", map { $arg_dir_mapping{$_} } $op->arg_dirs) . " }";
 
-    print SOURCE <<END_C;
+	print SOURCE <<END_C;
   { /* $index */
     $type,
     "$name",
@@ -279,10 +354,10 @@ foreach my $op ($ops->ops) {
   },
 END_C
 
-  $index++;
-}
+	$index++;
+    }
 
-print SOURCE <<END_C;
+    print SOURCE <<END_C;
 };
 
 /*
@@ -334,7 +409,7 @@ static size_t hash_str(const char * str) {
     size_t key = 0;
     const char * s;
     for(s=str; *s; s++)
-        key = key * 65599 + *s;
+	key = key * 65599 + *s;
     return key;
 }
 
@@ -350,8 +425,8 @@ static int get_op(const char * name, int full) {
     HOP * p;
     size_t hidx = hash_str(name) % OP_HASH_SIZE;
     if (!hop) {
-        hop = mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
-        hop_init();
+	hop = mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
+	hop_init();
     }
     for(p = hop[hidx]; p; p = p->next) {
 	if(!strcmp(name, full ? p->info->full_name : p->info->name))
@@ -364,11 +439,11 @@ static void hop_init() {
     op_info_t * info = op_info_table;
     /* store full names */
     for (i = 0; i < NUM_OPS; i++)
-        store_op(info + i, 1);
+	store_op(info + i, 1);
     /* plus one short name */
     for (i = 0; i < NUM_OPS; i++)
-        if (get_op(info[i].name, 0) == -1)
-            store_op(info + i, 0);
+	if (get_op(info[i].name, 0) == -1)
+	    store_op(info + i, 0);
 }
 static void hop_deinit(void)
 {
@@ -380,7 +455,7 @@ static void hop_deinit(void)
 		next = p->next;
 		free(p);
 		p = next;
-        }
+	}
 	free(hop);
     }
     hop = 0;
@@ -388,6 +463,12 @@ static void hop_deinit(void)
 
 END_C
 
+}
+else {
+    print SOURCE <<END_C;
+static void hop_deinit(void) {}
+END_C
+}
 
 print SOURCE <<END_C;
 
@@ -401,9 +482,9 @@ static op_lib_t op_lib = {
   $minor_version,
   $patch_version,
   $num_ops,
-  op_info_table,
-  op_func_table,
-  get_op
+  $op_info,
+  $op_func,
+  $getop
 };
 
 op_lib_t *
