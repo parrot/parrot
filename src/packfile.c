@@ -178,19 +178,92 @@ make_code_pointers(struct PackFile_Segment *seg)
     }
 }
 
+static enum {
+    PBC_MAIN   = 1,
+    PBC_LOADED = 2,
+    PBC_PBC    = 4
+} pbc_action_enum_t;
+
+
 /*
 
-=item C<static void
-fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)>
+=item C<static int
+sub_pragma(Parrot_Interp interpreter, struct PackFile *pf,
+        int action, PMC *sub_pmc)>
 
-Fixes up the constant subroutine objects.
+Handle @LOAD, @MAIN ... pragmas for B<sub_pmc>
+
+=cut
+
+*/
+
+static int
+sub_pragma(Parrot_Interp interpreter, struct PackFile *pf,
+        int action, PMC *sub_pmc)
+{
+    int pragmas = PObj_get_FLAGS(sub_pmc) & 0xf0;
+    int todo = 0;
+
+    /*
+     * - FIXME need that for PBC too but must check, if this
+     *   is the first PBC loaded or not
+     */
+    switch (action) {
+        case PBC_MAIN:
+            /* denote MAIN entry in first loaded PASM
+            */
+            /* TODO set resume_offset/flags on interp */
+            break;
+        case PBC_LOADED:
+            if (pragmas & PObj_private5_FLAG) /* symreg.h:P_LOAD */
+                todo = 1;
+            break;
+    }
+    return todo;
+}
+
+/*
+
+=item C<static void run_sub(Parrot_Interp interpreter, PMC* sub_pmc)>
+
+Run the B<sub_pmc> due its B<@LOAD> pragma
 
 =cut
 
 */
 
 static void
-fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
+run_sub(Parrot_Interp interpreter, PMC* sub_pmc)
+{
+    Parrot_Run_core_t old = interpreter->run_core;
+
+    /*
+     * turn off JIT and prederef - both would act on the whole
+     * PackFile which isn't worth the effort - probably
+     */
+    if (interpreter->run_core != PARROT_SWITCH_CORE &&
+        interpreter->run_core != PARROT_CGOTO_CORE  &&
+        interpreter->run_core != PARROT_FAST_CORE)
+        interpreter->run_core = PARROT_FAST_CORE;
+    Parrot_runops_fromc_save(interpreter, sub_pmc);
+    interpreter->run_core = old;
+}
+
+/*
+
+=item C<static void
+fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self,
+   int action)>
+
+Fixes up the constant subroutine objects. B<action> is one of
+B<PBC_PBC>, B<PBC_LOADED>, or B<PBC_MAIN>.
+
+=cut
+
+*/
+
+static void
+fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self, int action)
 {
     opcode_t i, ci;
     struct PackFile_FixupTable *ft;
@@ -198,6 +271,7 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
     PMC *sub_pmc;
     struct Parrot_Sub *sub;
     INTVAL rel;
+    int again = 0;
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "fixup_subs\n");
@@ -233,6 +307,13 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
                         rel += (INTVAL) self->cur_cs->base.data;
                         sub->end = (opcode_t *) rel;
                         PObj_get_FLAGS(sub_pmc) |= PObj_private1_FLAG;
+                        if (PObj_get_FLAGS(sub_pmc) & 0xf0) {
+                            /*
+                             * private4-7 are sub pragmas LOAD ...
+                             */
+                            again |= sub_pragma(interpreter, self,
+                                    action, sub_pmc);
+                        }
                         break;
                 }
                 /* goon */
@@ -240,6 +321,34 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
                 /* fill in current bytecode seg */
                 ft->fixups[i]->seg = self->cur_cs;
                 break;
+        }
+    }
+    if (again) {
+        /*
+         * there were subs that wanted to be run on load
+         * we have to do it there, above not all subs got their
+         * absolute address, so we couldn't run these.
+         */
+        for (i = 0; i < ft->fixup_count; i++) {
+            switch (ft->fixups[i]->type) {
+                case enum_fixup_sub:
+                    /*
+                     * offset is an index into the const_table holding
+                     * the Sub PMC
+                     */
+                    ci = ft->fixups[i]->offset;
+                    sub_pmc = ct->constants[ci]->u.key;
+                    switch (sub_pmc->vtable->base_type) {
+                        case enum_class_Sub:
+                        case enum_class_Closure:
+                        case enum_class_Continuation:
+                        case enum_class_Coroutine:
+                        if (PObj_get_FLAGS(sub_pmc) & PObj_private5_FLAG) {
+                            run_sub(interpreter, sub_pmc);
+                            PObj_get_FLAGS(sub_pmc) &= ~PObj_private5_FLAG;
+                        }
+                    }
+            }
         }
     }
 }
@@ -384,7 +493,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     /*
      * fixup constant subroutine objects
      */
-    fixup_subs(interpreter, self);
+    fixup_subs(interpreter, self, PBC_PBC);
     /*
      * JITting and/or prederefing the sub/the bytecode is done
      * in switch_to_cs before actual usage of the segment
@@ -2490,7 +2599,7 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     struct PackFile *pf = constt->base.pf;
     char * pmcs;
     char class[32], name[128];
-    int start, end;
+    int start, end, flag;
     int rc, pmc_num;
     PMC *sub_pmc, *key;
     struct Parrot_Sub *sub;
@@ -2505,14 +2614,15 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
      *
      * TODO first get classname, then get rest according to PMC type
      */
-    rc = sscanf(pmcs, "%31s %127s %d %d)", class, name, &start, &end);
-    if (rc != 4) {
+    rc = sscanf(pmcs, "%31s %127s %d %d %d)", class, name, &start, &end, &flag);
+    if (rc != 5) {
         fprintf(stderr, "PMC_CONST ERR RC '%d'\n", rc);
     }
 
 #if TRACE_PACKFILE_PMC
-    fprintf(stderr, "PMC_CONST: class '%s', name '%s', start %d end %d\n",
-            class, name, start, end);
+    fprintf(stderr,
+            "PMC_CONST: class '%s', name '%s', start %d end %d flag %d\n",
+            class, name, start, end, flag);
 #endif
     /*
      * make a constant subroutine object of the desired class
@@ -2531,6 +2641,14 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     sub = PMC_sub(sub_pmc);
     sub->end = (opcode_t*)end;
     sub->packed = pmcs;
+    /*
+     * if the Sub has some special pragmas in flag (LOAD, MAIN...)
+     * then set private flags of that PMC
+     */
+    if (flag) {
+	PObj_get_FLAGS(sub_pmc) |= (flag & 0xf0);
+    }
+
     /*
      * place item in const_table
      */
@@ -2709,7 +2827,7 @@ Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
         if (pf) {
             PackFile_add_segment(&interpreter->code->directory,
                     &pf->directory.base);
-            fixup_subs(interpreter, pf);
+            fixup_subs(interpreter, pf, PBC_LOADED);
         }
         else
             internal_exception(1, "compiler return NULL PackFile");
@@ -2730,7 +2848,7 @@ I<What does this do?>
 void
 PackFile_fixup_subs(struct Parrot_Interp *interpreter)
 {
-    fixup_subs(interpreter, interpreter->code);
+    fixup_subs(interpreter, interpreter->code, PBC_MAIN);
 }
 
 /*

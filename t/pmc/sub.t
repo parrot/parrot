@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 50;
+use Parrot::Test tests => 54;
 use Test::More;
 use Parrot::Config;
 
@@ -744,8 +744,6 @@ CODE
 ok
 OUTPUT
 
-unlink($temp, 'temp.pbc');
-
 output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
 .pcc_sub @MAIN _main:
     print "ok\n"
@@ -753,4 +751,112 @@ output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
 CODE
 ok
 OUT
+
+$temp = "temp.pasm";
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+  .pcc_sub @LOAD _sub1:
+  print "in sub1\n"
+  invoke P1
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD');
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pasm"
+    print "back\n"
+    end
+CODE
+main
+in sub1
+back
+OUTPUT
+
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+  .pcc_sub @LOAD _sub1:
+  print "in sub1\n"
+  invoke P1
+  .pcc_sub _sub2:
+  print "in sub2\n"
+  invoke P1
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pasm"
+    print "loaded\n"
+    find_global P0, "_sub2"
+    invokecc
+    print "back\n"
+    end
+CODE
+main
+in sub1
+loaded
+in sub2
+back
+OUTPUT
+
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+  .pcc_sub _sub1:
+  print "in sub1\n"
+  invoke P1
+  .pcc_sub @LOAD _sub2:
+  print "in sub2\n"
+  invoke P1
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun second");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pasm"
+    print "loaded\n"
+    find_global P0, "_sub1"
+    invokecc
+    print "back\n"
+    end
+CODE
+main
+in sub2
+loaded
+in sub1
+back
+OUTPUT
+
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+  .pcc_sub @LOAD _sub1:
+  print "in sub1\n"
+  invoke P1
+  .pcc_sub @LOAD _sub2:
+  print "in sub2\n"
+  invoke P1
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pasm"
+    print "loaded\n"
+    find_global P0, "_sub1"
+    invokecc
+    print "back\n"
+    end
+CODE
+main
+in sub1
+in sub2
+loaded
+in sub1
+back
+OUTPUT
+
+unlink($temp, 'temp.pbc');
 

@@ -491,21 +491,21 @@ opt_label:
    ;
 
 pcc_proto:
-     PROTOTYPED     {  $$ |= P_PROTOTYPED ; }
-   | NON_PROTOTYPED {  $$ |= P_NON_PROTOTYPED ; }
+     PROTOTYPED     {  $$ = P_PROTOTYPED ; }
+   | NON_PROTOTYPED {  $$ = P_NON_PROTOTYPED ; }
    ;
 
 pcc_sub_proto:
      /* empty */    {  $$ = P_NONE; }
-   | pcc_sub_proto COMMA proto
-   | proto
+   | pcc_sub_proto COMMA proto  { $$ |= $3; }
+   | proto          { $$ |= $1; }
    ;
 
 proto: pcc_proto
-   | LOAD           {  $$ |= P_LOAD; }
-   | MAIN           {  $$ |= P_MAIN; }
-   | IMMEDIATE      {  $$ |= P_IMMEDIATE; }
-   | POSTCOMP       {  $$ |= P_POSTCOMP; }
+   | LOAD           {  $$ = P_LOAD; }
+   | MAIN           {  $$ = P_MAIN; }
+   | IMMEDIATE      {  $$ = P_IMMEDIATE; }
+   | POSTCOMP       {  $$ = P_POSTCOMP; }
    ;
 
 pcc_call:

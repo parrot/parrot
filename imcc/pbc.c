@@ -612,17 +612,14 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
     opcode_t *rc;
     struct PackFile_Constant *pfc;
 
-#if IMC_TRACE
-    PIO_eprintf(interpreter, "pbc.c: add_const_pmc_sub '%s'\n", r->name);
-#endif
-
-    debug(interpreter, DEBUG_PBC_CONST, "add_const_pmc_sub '%s'\n", r->name);
+    debug(interpreter, DEBUG_PBC_CONST, "add_const_pmc_sub '%s' flags %d\n",
+            r->name, r->pcc_sub->pragma);
     /*
      * TODO use serialize api if that is done
      *      for now:
-     * "Class name offs end"
+     * "Class name offs end flags"
      */
-    sprintf(buf, "%s %s %d %d", "Sub", r->name, offs, len);
+    sprintf(buf, "Sub %s %d %d %d",  r->name, offs, len, r->pcc_sub->pragma);
     pfc = malloc(sizeof(struct PackFile_Constant));
 
     rc = PackFile_Constant_unpack_pmc(interpreter,
@@ -881,7 +878,10 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
                     oldsize+code_size);
         }
     }
-    if (pasm_file && ins->r[1] && ins->r[1]->pcc_sub) {
+    /*
+     * if this is not the first sub then store the sub
+     */
+    if (npc && pasm_file && ins->r[1] && ins->r[1]->pcc_sub) {
         /* we can only set the offset for PASM code */
         add_const_pmc_sub(interpreter, ins->r[1], npc, npc);
     }

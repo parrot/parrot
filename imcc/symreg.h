@@ -125,10 +125,10 @@ typedef enum {
 	P_PROTOTYPED     = 0x01,	/* must be 1 */
 	P_NONE           = 0x04,
 
-	P_MAIN           = 0x10,
-	P_LOAD           = 0x20,
-	P_IMMEDIATE      = 0x40,
-	P_POSTCOMP       = 0x80
+	P_MAIN           = PObj_private4_FLAG,	/* s. packfile.c ... */
+	P_LOAD           = PObj_private5_FLAG,
+	P_IMMEDIATE      = PObj_private6_FLAG,
+	P_POSTCOMP       = PObj_private7_FLAG
 } pragma_enum_t;
 
 struct pcc_sub_t {
