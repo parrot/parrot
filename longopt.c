@@ -12,11 +12,11 @@
 #include "parrot/parrot.h"
 #include "parrot/longopt.h"
 
-static int longopt_get_longopt(Parrot_Interp, int argc, const char* argv[],
+static int longopt_get_longopt(Parrot_Interp, int argc, char* argv[],
                                const struct longopt_opt_decl options[],
                                struct longopt_opt_info* info_buf);
 
-static int longopt_get_shortopt(Parrot_Interp, int argc, const char* argv[],
+static int longopt_get_shortopt(Parrot_Interp, int argc, char* argv[],
                                 const struct longopt_opt_decl options[],
                                 struct longopt_opt_info* info_buf);
 
@@ -30,7 +30,7 @@ static char longopt_error_buffer[512];
  * Any other value is a valid option id.
  */
 int
-longopt_get(Parrot_Interp interp, int argc, const char* argv[],
+longopt_get(Parrot_Interp interp, int argc, char* argv[],
             const struct longopt_opt_decl options[],
             struct longopt_opt_info* info_buf)
 {
@@ -70,7 +70,7 @@ longopt_get(Parrot_Interp interp, int argc, const char* argv[],
  * three characters and start with --.
  */
 static int
-longopt_get_longopt(Parrot_Interp interp, int argc, const char* argv[],
+longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
                     const struct longopt_opt_decl options[],
                     struct longopt_opt_info* info_buf)
 {
@@ -125,7 +125,7 @@ longopt_get_longopt(Parrot_Interp interp, int argc, const char* argv[],
  * long and start with a dash.
  */
 static int 
-longopt_get_shortopt(Parrot_Interp interp, int argc, const char* argv[],
+longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
                      const struct longopt_opt_decl options[],
                      struct longopt_opt_info* info_buf)
 {
