@@ -21,7 +21,7 @@
 void
 trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
 {
-    if(pmc) {
+    if (pmc && pmc != PMCNULL) {
         if(pmc->vtable) {
             if (pmc->vtable->base_type == enum_class_PerlString) {
                 PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%Ps\")",
