@@ -355,7 +355,10 @@ sub make_arg {
 	       return "(double)REG_NUM($regnum)";
               };
     /t/ && do {my $regnum = $reg_ref->{s}++;
-	       return "string_to_cstring(interpreter, REG_STR($regnum))";
+	       my $tempnum = $tempcounter++;
+	       push @extra_preamble, "char *tempvar$tempnum = string_to_cstring(interpreter, REG_STR($regnum));\n";
+	       push @extra_postamble, "Parrot_free_cstring(tempvar$tempnum);\n";
+	       return "tempvar$tempnum";
               };
     /b/ && do {my $regnum = $reg_ref->{s}++;
 	       return "PObj_bufstart(REG_STR($regnum))";
