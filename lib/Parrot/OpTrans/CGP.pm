@@ -60,8 +60,8 @@ sub goto_address
   } else {
   	return "if ((opcode_t *) $addr == 0)
 	  return 0;
-   goto *ops_addr[*(cur_opcode = (opcode_t *)
-	opcode_to_prederef(interpreter, $addr))]";
+   goto **(cur_opcode = (opcode_t *)
+	opcode_to_prederef(interpreter, $addr))";
   }
 }
 
@@ -72,7 +72,7 @@ sub goto_address
 sub goto_offset
 {
   my ($self, $offset) = @_;
-  return "goto *ops_addr[*(cur_opcode += $offset)]";
+  return "goto **(cur_opcode += $offset)";
 }
 #
 # goto_pop()
@@ -81,5 +81,5 @@ sub goto_offset
 sub goto_pop
 {
   my ($self) = @_;
-  return "opcode_t* pop_addr = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter));\ncur_opcode = pop_addr;goto *ops_addr[*(pop_addr)]";
+  return "goto ** (cur_opcode = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter)))";
 }

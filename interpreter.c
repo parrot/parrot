@@ -178,7 +178,11 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 static void
 init_prederef(struct Parrot_Interp *interpreter, int cgp)
 {
-    interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT(1);
+
+    oplib_init_f init_func = cgp ?
+        Parrot_DynOp_core_cgp_0_0_9 :
+        PARROT_CORE_PREDEREF_OPLIB_INIT;
+    interpreter->op_lib = init_func(1);
     interpreter->op_lib->op_code = PARROT_CORE_OPLIB_INIT(1)->op_code;
     if (interpreter->op_lib->op_count != interpreter->op_count)
         internal_exception(PREDEREF_LOAD_ERROR,
@@ -200,7 +204,7 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
             size_t n;
             for (i = 0; i < N; ) {
                 prederef(temp, interpreter);
-                *temp = (void*)*pc;
+                *temp = ((void**)(interpreter->op_lib->op_func_table)) [*pc];
                 n = interpreter->op_info_table[*pc].arg_count;
                 pc += n;
                 i += n;

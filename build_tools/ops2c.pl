@@ -241,17 +241,35 @@ if ($suffix =~ /cg/) {
 	if (!interpreter->lo_var_ptr)
 	    interpreter->lo_var_ptr = (void*)&lo_var_ptr;
     }
-    _check();
 #endif
 /* #endif */
+END_C
+}
 
+if ($suffix =~ /cgp/) {
+    print SOURCE <<END_C;
+    if (cur_opcode == 0)
+      return (opcode_t *)ops_addr;
+#ifdef __GNUC__
+    else
+      _check();
+#endif
+    goto **cur_opcode;
+
+END_C
+} elsif ($suffix =~ /cg/) {
+    print SOURCE <<END_C;
+#ifdef __GNUC__
+    _check();
+#endif
 goto *ops_addr[*cur_opcode];
 
 END_C
 }
 
-print SOURCE <<END_C;
 
+
+print SOURCE <<END_C;
 /*
 ** Op Function Definitions:
 */
@@ -265,7 +283,8 @@ print SOURCE @op_funcs;
 
 if ($suffix =~ /cg/) {
     print SOURCE <<END_C;
-} /* cg_$base */
+} /* $cg_func$base */
+
 END_C
 }
 
@@ -490,8 +509,19 @@ static op_lib_t op_lib = {
 
 op_lib_t *
 Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(int init) {
-    if (init)
+    if (init) {
+
+END_C
+
+if ($suffix =~ /cgp/) {
+print SOURCE <<END_C;
+	op_lib.op_func_table = (op_func_t *) cgp_$base(0, 0);
+END_C
+}
+
+print SOURCE <<END_C;
 	return &op_lib;
+    }
     else {
 	hop_deinit();
 	return NULL;
