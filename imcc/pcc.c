@@ -488,7 +488,7 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
                 regs[0] = sub->pcc_sub->cc_sym;
             else
                 regs[0] = get_pasm_reg("P1");
-            tmp = INS(interpreter, unit, "invoke", NULL, regs, 1, 0, 0);
+            tmp = INS(interpreter, unit, "returncc", NULL, regs, 0, 0, 0);
         }
         debug(interpreter, DEBUG_IMC, "add sub ret - %I\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
