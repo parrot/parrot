@@ -1,0 +1,62 @@
+#! perl -w
+
+# Author: Will "Coke" Coleda
+#
+# Thanks to jq for portability issues.
+
+use strict;
+
+use File::Spec;
+use Test::Harness;
+
+=head1 language harness
+
+There are 3 ways to run a language test: 
+
+=over 4
+
+=item * Overall Harness
+
+C<cd languages && make test>
+
+=item * Per Language Harness
+
+e.g., C<cd languages/tcl && make test>
+
+=item * Run a single test for more detailed output.
+
+e.g., C<cd languages/tcl && t/joe_test.t>
+
+=for comment
+
+We are assuming that we are running out of parrot/languages; we are being
+called by languages/Makefile with an explicit perl. All languages have 
+a Makefile with a "test" target, and any prereqs required by that test
+have already been built.
+
+=cut
+
+# Step 1: find the harness files 
+
+opendir(CUR,File::Spec->curdir()) or die "can't search for harnesses.\n";
+
+my @harnesses =
+  grep {-f $_}
+    map { File::Spec->join($_,"t","harness") }
+     grep {$_ ne File::Spec->curdir() && $_ ne File::Spec->updir()}
+       (readdir(CUR));
+
+closedir(CUR);
+
+# Step 2: Get a listing of files from these harnesses.
+
+my @testfiles;
+foreach my $harness (@harnesses) {
+  my $perl = "$^X -I" . File::Spec->join(File::Spec->updir,"lib");
+  open (FILES, "$perl $harness -files|");  
+  chomp && push @testfiles, $_ while (<FILES>);
+}
+
+# Step 3: test.
+
+runtests(@testfiles);

@@ -7,8 +7,8 @@ all : befunge bf cola m4 ook perl6 regex tcl urm
 
 complete-all : all jako scheme
 
-test : befunge.test bf.test jako.test m4.test ook.test perl6.test regex.test scheme.test tcl.test urm.test
-	@echo "SKIPPED: cola (no make test)"
+test: 
+	$(PERL) -I ../lib testall
 
 complete-test: test cola.test
 

@@ -88,6 +88,7 @@ package Parrot::Test;
 use strict;
 use vars qw(@EXPORT @ISA $TEST_PROG_ARGS);
 use Parrot::Config;
+use File::Spec;
 
 # 5.005_03 Env.pm doesn't make its arguments immune from use strict 'vars';
 use Env qw($TEST_PROG_ARGS);
@@ -95,11 +96,13 @@ use Env qw($TEST_PROG_ARGS);
 require Exporter;
 require Test::Builder;
 require Test::More;
+
 my $Builder = Test::Builder->new;
 
 @EXPORT = ( qw(output_is   output_like   output_isnt),
 	    qw(pir_output_is   pir_output_like   pir_output_isnt),
             qw(c_output_is c_output_like c_output_isnt),
+            qw(language_output_is),
             qw(skip) );
 @ISA = qw(Exporter);
 
@@ -145,6 +148,7 @@ sub _run_command {
   }
 
   system $command;
+
   my $exit_code = $? >> 8;
 
   close STDOUT             or die "Can't close    stdout" if $out;
@@ -165,7 +169,7 @@ sub per_test {
 }
 
 sub generate_pbc_for {
-    my ($assembly,$directory,$count, $as_f) = @_;
+    my ($assembly, $directory, $count, $as_f) = @_;
     local( *ASSEMBLY );
     open ASSEMBLY, "> $as_f" or die "Unable to open '$as_f'";
     binmode ASSEMBLY;
@@ -179,7 +183,8 @@ my %Test_Map = ( output_is   => 'is_eq',
                  output_like => 'like',
 		 pir_output_is   => 'is_eq',
                  pir_output_isnt => 'isnt_eq',
-                 pir_output_like => 'like'
+                 pir_output_like => 'like',
+                 language_output_is => 'is_eq',
                );
 
 my $count = 0;
@@ -187,7 +192,7 @@ my $count = 0;
 *skip = \&Test::More::skip;
 
 sub generate_functions {
-  my ($package, $pbc_generator, $directory) = @_;
+  my ($package, $pbc_generator) = @_;
 
   sub slurp_file {
     open SLURP, "< $_[0]" or die "open '$_[0]': $!";
@@ -198,14 +203,34 @@ sub generate_functions {
     return $file;
   }
 
-  my $PARROT = ${directory} . 'parrot' . $PConfig{exe};
+  my $path_to_parrot = $INC{"Parrot/Config.pm"};
+  $path_to_parrot =~ s:lib/Parrot/Config.pm$::;	
+  $path_to_parrot = File::Spec->curdir if $path_to_parrot eq "";
 
+  my $PARROT = File::Spec->join(File::Spec->curdir,'parrot' . $PConfig{exe});
 
   foreach my $func ( keys %Test_Map ) {
     no strict 'refs';
 
+    if ($func =~ m/^language_/) {
+        my $delegate_func = $func;
+        $delegate_func =~ s/^language_//;
+        *{$package.'::'.$func} = sub ($$$;$) {
+          my $language = ucfirst($_[0]);
+          # get modified PARROT command.
+          require "Parrot/Test/$language.pm";
+	  # set the builder object, and parrot config.
+          my $obj = eval "new Parrot::Test::${language}";
+          $obj->{builder} = $Builder;
+          $obj->{relpath} = $path_to_parrot;
+	  $obj->{parrot}  = $PARROT;
+          $obj->$delegate_func(@_[1..$#_]);
+        }
+    } else {
+
     *{$package.'::'.$func} = sub ($$;$) {
-	my( $assembly, $output, $desc ) = @_;
+
+	my( $assembly, $output, $desc) = @_;
 
 	$count = $Builder->current_test + 1;
 
@@ -245,14 +270,19 @@ sub generate_functions {
 	    $run_pbc = 0;
 	}
 	else {
-	    $pbc_generator->( $assembly, $directory, $count, $as_f );
+	    # flatten filenames (don't use directories)
+	    $as_f = (File::Spec->splitpath($as_f))[2];
+	    # but, always put the test in a tempdir, so we're not cluttering
+	    $as_f = File::Spec->catfile(File::Spec->tmpdir(),$as_f);
+	    $pbc_generator->( $assembly, $path_to_parrot, $count, $as_f );
 	}
 
         my $cmd;
         my $exit_code = 0;
 	my $pass = 0;
 
-	$cmd = "$PARROT ${args} $as_f";
+	$cmd = "(cd $path_to_parrot && $PARROT ${args} $as_f)";
+
 	$exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
 
 	my $meth = $Test_Map{$func};
@@ -267,7 +297,8 @@ sub generate_functions {
 	}
 
 	return $pass;
-    }
+    }  # sub
+    }  # language-if
   }
 
   my %C_Test_Map = ( c_output_is   => 'is_eq',
@@ -346,8 +377,7 @@ sub generate_functions {
   }
 }
 
-Parrot::Test::generate_functions(__PACKAGE__,\&generate_pbc_for,
-                                 $^O eq 'MSWin32' ? '.\\' : "./");
+Parrot::Test::generate_functions(__PACKAGE__,\&generate_pbc_for);
 
 =head1 SEE ALSO
 
