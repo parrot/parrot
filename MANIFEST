@@ -7,6 +7,7 @@ classes/Makefile.in
 classes/genclass.pl
 classes/pmc2c.pl
 classes/default.pmc
+classes/perlarray.pmc
 classes/perlint.pmc
 classes/perlnum.pmc
 classes/perlstring.pmc
