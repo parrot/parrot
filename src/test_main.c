@@ -100,7 +100,8 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG);
             break;
 
-        case '.':              /* Give Windows Parrot hackers an opportunity to attach a debuggger. */
+        case '.':  /* Give Windows Parrot hackers an opportunity to 
+                    * attach a debuggger. */
             fgetc(stdin);
             break;
         case '-':

@@ -574,7 +574,8 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
         diff = -(diff);
         string_grow(interpreter, src, diff);
  
-        /* Move the end of old string that isn't replaced to new offset first */
+        /* Move the end of old string that isn't replaced to new offset
+         * first */
         mem_sys_memmove((char*)src->bufstart + subend_off + diff,
                                 (char*)src->bufstart + subend_off,
                                 src->buflen - subend_off);
@@ -678,7 +679,7 @@ string_bool(const STRING *s)
     }
 
     len = string_length(s);
-	
+
     if (len == 0) {
         return 0;
     }
@@ -802,7 +803,7 @@ string_to_num(const STRING *s)
                 if (!seen_dot && c == '.' && !in_exp) { /* XXX: ascii */
                     seen_dot = 1;
                 }
-                else if (!seen_e && (c == 'e' || c == 'E')) {   /* XXX: ascii */
+                else if (!seen_e && (c == 'e' || c == 'E')) { /* XXX: ascii */
                     seen_e = 1;
                     in_exp = 1;
                 }

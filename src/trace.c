@@ -124,7 +124,7 @@ trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
         return;
     }
 
-    (void)fflush(NULL);         /* Flush *ALL* output before printing trace info */
+    (void)fflush(NULL);    /* Flush *ALL* output before printing trace info */
     if (pc >= code_start && pc < code_end) {
         trace_op_dump(interpreter, code_start, pc);
     }

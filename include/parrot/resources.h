@@ -38,8 +38,10 @@ struct Memory_Pool {
 
 void *Parrot_allocate(struct Parrot_Interp *, void *, size_t size);
 void *Parrot_allocate_string(struct Parrot_Interp *, STRING *, size_t size);
-void *Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize);
-void *Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *, size_t tosize);
+void *Parrot_reallocate(struct Parrot_Interp *interpreter, 
+                        void *from, size_t tosize);
+void *Parrot_reallocate_string(struct Parrot_Interp *interpreter, 
+                               STRING *, size_t tosize);
 
 void Parrot_initialize_memory_pools(struct Parrot_Interp *);
 

@@ -61,18 +61,16 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     /* mark it as used and get an updated end of list */
     last = mark_used(current, last);
 
-	/* Find important stuff on the system stack */
-	last = trace_system_stack(interpreter,last);
+    /* Find important stuff on the system stack */
+    last = trace_system_stack(interpreter,last);
 
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
     for (i = 0; i < NUM_REGISTERS; i++) {
         if (interpreter->ctx.pmc_reg.registers[i]) {
             last = mark_used(interpreter->ctx.pmc_reg.registers[i], last);
-        }
-
-    
-	}
+        }               
+    }
 
     /* Walk through the stashes */
     stash = interpreter->perl_stash;
@@ -323,7 +321,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     
     /* Now go trace the PMCs */
     trace_active_PMCs(interpreter);
-	
+
     /* And the buffers */
     trace_active_buffers(interpreter);
 
@@ -342,3 +340,14 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     interpreter->DOD_block_level--;
     return;
 }
+
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -41,7 +41,8 @@ alloc_new_block(struct Parrot_Interp *interpreter,
 
     /* Allocate a new block. Header info's on the front, plus a fudge
      * factor for good measure */
-    new_block = mem_sys_allocate(sizeof(struct Memory_Block) + alloc_size + 32);
+    new_block = mem_sys_allocate(sizeof(struct Memory_Block) + 
+                                 alloc_size + 32);
     if (!new_block) {
         return NULL;
     }
@@ -99,7 +100,8 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
                  ) 
             {
               (*pool->compact)(interpreter, pool);
-            } else {
+            } 
+            else {
                 Parrot_do_dod_run(interpreter);
             }
 
@@ -125,7 +127,8 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
 /** Compaction Code **/
 
 /* Compact the buffer pool */
-static void compact_pool(struct Parrot_Interp *interpreter,struct Memory_Pool *pool)
+static void compact_pool(struct Parrot_Interp *interpreter,
+                         struct Memory_Pool *pool)
 {
     UINTVAL total_size;
     struct Memory_Block *new_block;        /* A pointer to our working block */
@@ -145,11 +148,13 @@ static void compact_pool(struct Parrot_Interp *interpreter,struct Memory_Pool *p
     interpreter->mem_allocs_since_last_collect = 0;
     interpreter->collect_runs++;
 
-    /* total-reclaimable == currently used. Add a minimum block to the current amount, 
-	 * so we can avoid having to allocate it in the future. */
+    /* total-reclaimable == currently used. Add a minimum block to the
+     * current amount, so we can avoid having to allocate it in the
+     * future. */
     total_size = pool->total_allocated - pool->reclaimable + pool->minimum_block_size;
     /* total_size = pool->total_allocated; */
-	/* TODO: can reduce this by pool->total_reclaimable if we want to be precise */
+    /* TODO: can reduce this by pool->total_reclaimable if we want to 
+     * be precise */
     /* Snag a block big enough for everything */
     new_block = alloc_new_block(interpreter, total_size, pool);
   
@@ -398,3 +403,14 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
     interpreter->arena_base->constant_string_pool = 
         new_memory_pool(8192, NULL);
 }
+
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

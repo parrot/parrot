@@ -100,11 +100,13 @@ opcode_t PackFile_unpack(struct Parrot_Interp *interpreter,
 
 void PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
 
-INTVAL PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, opcode_t * packed, opcode_t packed_size);
+INTVAL PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, 
+                                  opcode_t * packed, opcode_t packed_size);
 
 opcode_t PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 
-void PackFile_FixupTable_pack(struct PackFile_FixupTable * self, opcode_t * packed);
+void PackFile_FixupTable_pack(struct PackFile_FixupTable * self, 
+                              opcode_t * packed);
 
 /*
 ** PackFile_ConstTable Functions:
@@ -131,24 +133,25 @@ struct PackFile_Constant *PackFile_Constant_new(void);
 
 opcode_t PackFile_Constant_pack_size(struct PackFile_Constant * self);
 
-void PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed);
+void PackFile_Constant_pack(struct PackFile_Constant * self, 
+                            opcode_t * packed);
 
 void PackFile_Constant_destroy(struct PackFile_Constant * self);
 
 INTVAL PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
-                                 struct PackFile *packfile,
-                                 struct PackFile_Constant *self,
-                                 opcode_t *packed, opcode_t packed_size);
+                                struct PackFile *packfile,
+                                struct PackFile_Constant *self,
+                                opcode_t *packed, opcode_t packed_size);
 
 INTVAL PackFile_Constant_unpack_number(struct PackFile * pf,
-                                        struct PackFile_Constant * self,
-                                        opcode_t * packed, opcode_t packed_size);
+                                       struct PackFile_Constant * self,
+                                       opcode_t * packed, opcode_t packed_size);
 
 INTVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
-                                        struct PackFile * pf,
-                                        struct PackFile_Constant *self,
-                                        opcode_t *packed,
-                                        opcode_t packed_size);
+                                       struct PackFile * pf,
+                                       struct PackFile_Constant *self,
+                                       opcode_t *packed,
+                                       opcode_t packed_size);
 
 opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t *stream);
 

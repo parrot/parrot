@@ -13,7 +13,8 @@
 */
 
 Parrot_jit_optimizer_t *
-optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, opcode_t *code_start, opcode_t *code_end)
+optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, 
+             opcode_t *code_start, opcode_t *code_end)
 {
     Parrot_jit_optimizer_t *optimizer;
     Parrot_jit_register_count_t int_reg_usage_count[NUM_REGISTERS];
@@ -87,7 +88,8 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, opcode_t *code_sta
                 cur_section->int_reg_count[*(pc + argn)]++;
 
         if ((branches[pc - code_start] == JIT_BRANCH_SOURCE) ||
-            (nextpc < code_end && branches[nextpc - code_start] == JIT_BRANCH_TARGET))
+            (nextpc < code_end &&
+             branches[nextpc - code_start] == JIT_BRANCH_TARGET))
         {
             /* cur_section->int_reg_map = registers_tomap(&cur_section->int_reg_count) */
             cur_section->end = (pc - code_start);
@@ -105,7 +107,8 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, opcode_t *code_sta
             }
         } 
 
-        if ((op_jit[*pc].fn != Parrot_jit_normal_op) && (op_jit[*pc].fn != Parrot_jit_cpcf_op))
+        if ((op_jit[*pc].fn != Parrot_jit_normal_op) && 
+            (op_jit[*pc].fn != Parrot_jit_cpcf_op))
             cur_section->has_jit_op = 0;
         
         pc = nextpc;
@@ -131,7 +134,8 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, opcode_t *code_sta
 */
 
 jit_f
-build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, opcode_t *code_end)
+build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, 
+          opcode_t *code_start, opcode_t *code_end)
 {
     UINTVAL i;
     char *new_arena;

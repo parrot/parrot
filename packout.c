@@ -100,14 +100,16 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
     *cursor++ = fixup_table_size;
 
     PackFile_FixupTable_pack(self->fixup_table, cursor);
-    cursor += fixup_table_size / sizeof(opcode_t);      /* Sizes are in bytes */
+    /* Sizes are in bytes */
+    cursor += fixup_table_size / sizeof(opcode_t);
 
     /* Pack the constant table size, followed by the packed constant table */
 
     *cursor++ = const_table_size;
 
     PackFile_ConstTable_pack(self, self->const_table, cursor);
-    cursor += const_table_size / sizeof(opcode_t);      /* Sizes are in bytes */
+    /* Sizes are in bytes */
+    cursor += const_table_size / sizeof(opcode_t);
 
     /* Pack the byte code size, followed by the byte code */
 
@@ -134,9 +136,9 @@ PackFile_FixupTable_pack_size(struct PackFile_FixupTable *self)
 
 
 /***************************************
-Pack the PackFile FixupTable into a contiguous region of memory. NOTE: The memory
-block had better have at least the amount of memory indicated by
-PackFile_FixupTable_pack_size()!
+Pack the PackFile FixupTable into a contiguous region of memory. 
+NOTE: The memory block had better have at least the amount of memory 
+      indicated by PackFile_FixupTable_pack_size()!
 ***************************************/
 
 void
@@ -172,9 +174,9 @@ PackFile_ConstTable_pack_size(struct PackFile_ConstTable *self)
 
 
 /***************************************
-Pack the PackFile ConstTable into a contiguous region of memory. NOTE: The memory
-block had better have at least the amount of memory indicated by
-PackFile_ConstTable_pack_size()!
+Pack the PackFile ConstTable into a contiguous region of memory.
+NOTE: The memory block had better have at least the amount of memory 
+      indicated by PackFile_ConstTable_pack_size()!
 ***************************************/
 
 void

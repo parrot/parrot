@@ -3,7 +3,8 @@
  *  CVS Info
  *     $Id$
  *  Overview:
- *     Header management functions. Handles getting of various headers, and pool creation
+ *     Header management functions. Handles getting of various headers, 
+ *     and pool creation
  *  Data Structure and Algorithms:
  *     
  *  History:
@@ -19,7 +20,8 @@
 #define STRING_HEADERS_PER_ALLOC 256
 
 static void
-do_pool_dod_run(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
+do_pool_dod_run(struct Parrot_Interp *interpreter, 
+                struct Small_Object_Pool *pool)
 {
     Parrot_do_dod_run(interpreter);
 }
@@ -27,7 +29,8 @@ do_pool_dod_run(struct Parrot_Interp *interpreter, struct Small_Object_Pool *poo
 /** PMC Header Functions for small-object lookup table **/
 
 void
-add_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool, void *pmc)
+add_free_pmc(struct Parrot_Interp *interpreter, 
+             struct Small_Object_Pool *pool, void *pmc)
 {
     interpreter->active_PMCs--;
     ((PMC *)pmc)->flags = PMC_on_free_list_FLAG;
@@ -48,7 +51,8 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     return pmc;
 }
 void 
-alloc_more_pmcs(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
+alloc_more_pmcs(struct Parrot_Interp *interpreter, 
+                struct Small_Object_Pool *pool)
 {
     interpreter->active_PMCs += pool->objects_per_alloc;
     interpreter->total_PMCs += pool->objects_per_alloc;
@@ -59,14 +63,16 @@ alloc_more_pmcs(struct Parrot_Interp *interpreter, struct Small_Object_Pool *poo
 /** Buffer Header Functions for small-object lookup table **/
 
 void
-add_free_buffer(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool, void *buffer)
+add_free_buffer(struct Parrot_Interp *interpreter, 
+                struct Small_Object_Pool *pool, void *buffer)
 {
     interpreter->active_Buffers--;
     ((Buffer *)buffer)->flags = BUFFER_on_free_list_FLAG;
     add_free_object(interpreter,pool,buffer);
 }
 void *
-get_free_buffer(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
+get_free_buffer(struct Parrot_Interp *interpreter, 
+                struct Small_Object_Pool *pool)
 {
     Buffer *buffer = get_free_object(interpreter,pool);
     /* Count that we've allocated it */
@@ -80,7 +86,8 @@ get_free_buffer(struct Parrot_Interp *interpreter, struct Small_Object_Pool *poo
     return buffer;
 }
 void 
-alloc_more_buffers(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
+alloc_more_buffers(struct Parrot_Interp *interpreter, 
+                   struct Small_Object_Pool *pool)
 {
     interpreter->active_Buffers += pool->objects_per_alloc;
     interpreter->total_Buffers += pool->objects_per_alloc;
@@ -205,11 +212,11 @@ new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
         return return_me;
     }
     string = get_from_free_pool(interpreter, (flags & BUFFER_constant_FLAG)
-                                         ?  interpreter->arena_base->constant_string_header_pool
-                                         :  interpreter->arena_base->string_header_pool
-                                         );
+                                ? interpreter->arena_base->constant_string_header_pool
+                                : interpreter->arena_base->string_header_pool
+                                );
     string->flags |= flags;
-	return string;
+    return string;
 }
 
 Buffer *
@@ -222,7 +229,8 @@ new_buffer_header(struct Parrot_Interp *interpreter)
         return return_me;
     }
 
-    return get_from_free_pool(interpreter, interpreter->arena_base->buffer_header_pool);
+    return get_from_free_pool(interpreter, 
+                              interpreter->arena_base->buffer_header_pool);
 }
 
 void *
@@ -250,7 +258,7 @@ new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size)
 size_t
 get_max_buffer_address(struct Parrot_Interp *interpreter)
 {
-	UINTVAL i;
+    UINTVAL i;
     size_t max = interpreter->arena_base->string_header_pool->end_arena_memory;
 
     if (max < interpreter->arena_base->buffer_header_pool->end_arena_memory)
@@ -271,7 +279,7 @@ get_max_buffer_address(struct Parrot_Interp *interpreter)
 size_t
 get_min_buffer_address(struct Parrot_Interp *interpreter)
 {
-	UINTVAL i;
+    UINTVAL i;
     size_t min = interpreter->arena_base->string_header_pool->end_arena_memory;
 
     if (min > interpreter->arena_base->buffer_header_pool->end_arena_memory)

@@ -224,7 +224,7 @@ expand_hash(Interp *interpreter, HASH *hash)
     Parrot_reallocate(interpreter, hash, new_size * sizeof(HASHBUCKET *));
     Parrot_reallocate(interpreter, hash->bucket_pool,
                       new_pool_size * sizeof(HASHBUCKET));
-    restore_invariants(interpreter, hash);      /* Bucket pool may have moved */
+    restore_invariants(interpreter, hash);    /* Bucket pool may have moved */
 
     /* Add the newly allocated buckets onto the free list */
     for (i = old_pool_size; i < new_pool_size; i++) {
@@ -379,8 +379,9 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
     chain = table ? table[hashval % hash->num_buckets] : NULL;
     bucket = find_bucket(interpreter, chain, key);
 
-/*      fprintf(stderr, "HASH=%p buckets=%p chain=%p bucket=%p KEY=%s\n", */
-/*              hash, hash->buffer.bufstart, chain, bucket, string_to_cstring(interpreter, key)); */
+/*      fprintf(stderr, "HASH=%p buckets=%p chain=%p bucket=%p KEY=%s\n", 
+ *              hash, hash->buffer.bufstart, chain, bucket, 
+ *              string_to_cstring(interpreter, key)); */
 
     if (bucket) {
         /* Replacing old value */

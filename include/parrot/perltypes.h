@@ -21,7 +21,7 @@
     } \
     (thing)->vtable = &Parrot_base_vtables[enum_class_ ## type]; \
     if (enum_class_ ## type == enum_class_PerlString) { \
-	(thing)->flags = PMC_is_buffer_ptr_FLAG; \
+         (thing)->flags = PMC_is_buffer_ptr_FLAG; \
     } \
 } while (0)
 

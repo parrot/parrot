@@ -132,14 +132,16 @@ new_small_object_pool(struct Parrot_Interp *interpreter,
     pool->more_objects = alloc_more_objects;
     pool->replenish_level = 0;
     pool->free_list = NULL;
-	return pool;
+    return pool;
 }
 
 
 /* Use get_sized_small_object_pool and set_sized_small_object_pool for
- * when you want a pool of a given size, and don't particularly care what's in it */
+ * when you want a pool of a given size, and don't particularly care what's
+ * in it */
 struct Small_Object_Pool *
-get_sized_small_object_pool(struct Parrot_Interp *interpreter, size_t object_size)
+get_sized_small_object_pool(struct Parrot_Interp *interpreter, 
+                            size_t object_size)
 {
     size_t new_object_size;
     UINTVAL idx;

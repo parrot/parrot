@@ -13,7 +13,8 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
     va_list args;
     va_start(args, message);
 
-    if (!(interpreter == NULL || PARROT_WARNINGS_test(interpreter, warnclass))) {
+    if (!(interpreter == NULL || 
+          PARROT_WARNINGS_test(interpreter, warnclass))) {
         return 2;
     }
 
@@ -27,7 +28,8 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
     targ = Parrot_sprintf_c(
              interpreter,
              "%S at %S line %d.\n", targ,
-             Default(interpreter, current_file, string_make(interpreter, "?", 1, NULL, 0, NULL)),
+             Default(interpreter, current_file, 
+                     string_make(interpreter, "?", 1, NULL, 0, NULL)),
              Default(interpreter, current_line, 0)
     );
     
@@ -53,7 +55,8 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
     va_list args;
     va_start(args, message);
 
-    if (!(interpreter == NULL || PARROT_WARNINGS_test(interpreter, warnclass))) {
+    if (!(interpreter == NULL || 
+          PARROT_WARNINGS_test(interpreter, warnclass))) {
         return 2;
     }
 
@@ -66,7 +69,8 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
 
     targ = Parrot_sprintf_c(
         interpreter, "%S at %S line %d.\n", targ,
-        Default(interpreter, current_file, string_make(interpreter, "?", 1, NULL, 0, NULL)),
+        Default(interpreter, current_file, 
+                string_make(interpreter, "?", 1, NULL, 0, NULL)),
         Default(interpreter, current_line, 0)
     );
     if (!targ) {

@@ -3,7 +3,8 @@
  *  CVS Info
  *     $Id$
  *  Overview:
- *     Header management functions. Handles getting of various headers, and pool creation
+ *     Header management functions. Handles getting of various headers, 
+ *     and pool creation
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
@@ -26,7 +27,8 @@ get_from_free_pool(struct Parrot_Interp *interpreter,
     return (*pool->get_free_object)(interpreter, pool);
 }
 static void
-add_to_free_pool(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool, void* to_free)
+add_to_free_pool(struct Parrot_Interp *interpreter, 
+                 struct Small_Object_Pool *pool, void* to_free)
 {
     (*pool->add_free_object)(interpreter, pool, to_free);
 }
@@ -34,14 +36,20 @@ add_to_free_pool(struct Parrot_Interp *interpreter, struct Small_Object_Pool *po
 /** Header Management Functions **/
 
 /* pmc header small-object methods */
-void add_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool, void *pmc);
-void *get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool);
-void alloc_more_pmcs(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool);
+void add_free_pmc(struct Parrot_Interp *interpreter, 
+                  struct Small_Object_Pool *pool, void *pmc);
+void *get_free_pmc(struct Parrot_Interp *interpreter, 
+                   struct Small_Object_Pool *pool);
+void alloc_more_pmcs(struct Parrot_Interp *interpreter, 
+                     struct Small_Object_Pool *pool);
 
 /* buffer header small-object methods */
-void add_free_buffer(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool, void *buffer);
-void *get_free_buffer(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool);
-void alloc_more_buffers(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool);
+void add_free_buffer(struct Parrot_Interp *interpreter, 
+                     struct Small_Object_Pool *pool, void *buffer);
+void *get_free_buffer(struct Parrot_Interp *interpreter, 
+                      struct Small_Object_Pool *pool);
+void alloc_more_buffers(struct Parrot_Interp *interpreter, 
+                        struct Small_Object_Pool *pool);
 
 /* pool creation and access functions */
 struct Small_Object_Pool *new_pmc_pool(struct Parrot_Interp *interpreter);

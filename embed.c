@@ -152,7 +152,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
         cursor = (char *)program_code;
 
-        while ((read_result = PIO_read(interpreter, io, cursor, chunk_size)) > 0) {
+        while ((read_result = 
+                PIO_read(interpreter, io, cursor, chunk_size)) > 0) {
             program_size += read_result;
             chunk_size = 1024;
             program_code =
@@ -197,7 +198,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
 #else   /* HAS_HEADER_SYSMMAN */
 
-        fprintf(stderr, "Parrot VM: uncaught error occurred reading file or mmap not available.\n");
+        fprintf(stderr,
+                "Parrot VM: uncaught error occurred reading file or mmap not available.\n");
         return NULL;
 
 #endif  /* HAS_HEADER_SYSMMAN */
@@ -326,7 +328,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
                        interpreter->op_info_table[j].full_name,
                        interpreter->profile[j].numcalls,
                        interpreter->profile[j].time,
-                       interpreter->profile[j].time / (FLOATVAL)interpreter->profile[j].numcalls
+                       interpreter->profile[j].time / 
+                           (FLOATVAL)interpreter->profile[j].numcalls
                 );
             }
         }
@@ -342,7 +345,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     }
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        /* Give the souls brave enough to activate debugging an earful about GC. */
+        /* Give the souls brave enough to activate debugging an earful 
+         * about GC. */
         fprintf(stderr, "\
 *** Parrot VM: Dumping GC info ***\n\
 \tTotal memory allocated: %u\n\

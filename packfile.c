@@ -148,7 +148,8 @@ PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream) {
     FLOATVAL f;
     if(pf->fetch_nv == NULL) {
 #if TRACE_PACKFILE
-        fprintf(stderr, "PackFile_fetch_nv: Native [%d bytes]..\n", sizeof(FLOATVAL));
+        fprintf(stderr, "PackFile_fetch_nv: Native [%d bytes]..\n", 
+                sizeof(FLOATVAL));
 #endif
         memcpy(&f, stream, sizeof(FLOATVAL));
         return f;
@@ -320,9 +321,10 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      * FIXME
      */
     if(self->need_wordsize) {
-        fprintf(stderr, "PackFile_unpack: Unimplemented wordsize transform.\n");
-        fprintf(stderr, "File has wordsize: %d (native is %dn", header->wordsize,
-                        sizeof(opcode_t));
+        fprintf(stderr, 
+                "PackFile_unpack: Unimplemented wordsize transform.\n");
+        fprintf(stderr, "File has wordsize: %d (native is %d)\n", 
+                header->wordsize,  sizeof(opcode_t));
         return 0;    
     }    
  
@@ -359,13 +361,15 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         return 0;
     }
 
-    if (!PackFile_FixupTable_unpack(self->fixup_table, cursor, header->fixup_ss)) {
+    if (!PackFile_FixupTable_unpack(self->fixup_table, cursor, 
+                                    header->fixup_ss)) {
         fprintf(stderr,
                 "PackFile_unpack: Error reading fixup table segment!\n");
         return 0;
     }
 
-    cursor += header->fixup_ss / sizeof(opcode_t);  /* Segment size is in bytes */
+    /* Segment size is in bytes */
+    cursor += header->fixup_ss / sizeof(opcode_t); 
 
     /*
      * Unpack the Constant Table Segment:
@@ -384,7 +388,8 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         return 0;
     }
 
-    cursor += header->const_ss / sizeof(opcode_t);  /* Segment size is in bytes */
+    /* Segment size is in bytes */
+    cursor += header->const_ss / sizeof(opcode_t); 
 
     /*
      * Unpack the Byte Code Segment:
@@ -417,7 +422,8 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
             for(i = 0; i < (int)(self->byte_code_size / sizeof(opcode_t)); i++) {
                 self->byte_code[i] = PackFile_fetch_op(self, cursor++);
 #if TRACE_PACKFILE
-                fprintf(stderr, "op[%u]->[%u]\n", *(cursor-1), self->byte_code[i]);
+                fprintf(stderr, "op[%u]->[%u]\n", *(cursor-1),
+                        self->byte_code[i]);
 #endif
             }    
         }
@@ -674,8 +680,8 @@ PackFile_Constant_destroy(struct PackFile_Constant *self)
 
 =item pack_size
 
-Determine the size of the buffer needed in order to pack the PackFile Constant into a
-contiguous region of memory.
+Determine the size of the buffer needed in order to pack the PackFile 
+Constant into a contiguous region of memory.
 
 =cut
 
@@ -779,7 +785,8 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
         break;
 
     case PFC_STRING:
-        rc = PackFile_Constant_unpack_string(interpreter, pf, self, cursor, size);
+        rc = PackFile_Constant_unpack_string(interpreter, pf, self, 
+                                             cursor, size);
         break;
 
     default:
@@ -808,7 +815,8 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 INTVAL
-PackFile_Constant_unpack_number(struct PackFile * pf, struct PackFile_Constant *self,
+PackFile_Constant_unpack_number(struct PackFile * pf, 
+                                struct PackFile_Constant *self,
                                 opcode_t *packed, opcode_t packed_size)
 {
     opcode_t *cursor;
@@ -835,7 +843,8 @@ PackFile_Constant_unpack_number(struct PackFile * pf, struct PackFile_Constant *
      * determined by Configure.
      */
 #if TRACE_PACKFILE
-    fprintf(stderr, "FIXME: PackFile_Constant_unpack_number: assuming size of FLOATVAL!\n");
+    fprintf(stderr,
+            "FIXME: PackFile_Constant_unpack_number: assuming size of FLOATVAL!\n");
 #endif
     self->number = PackFile_fetch_nv(pf, (opcode_t *)cursor);
      
@@ -890,7 +899,9 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
     flags = (UINTVAL)PackFile_fetch_op(pf, cursor++);
     encoding = PackFile_fetch_op(pf, cursor++);
     type = PackFile_fetch_op(pf, cursor++);
-    size = (size_t)PackFile_fetch_op(pf, cursor++); /* These may need to be separate */
+
+    /* These may need to be separate */
+    size = (size_t)PackFile_fetch_op(pf, cursor++);
 
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack_string(): flags are 0x%04x...\n", flags);
