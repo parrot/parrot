@@ -16,7 +16,7 @@ Tests the Float PMC.
 
 =cut
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 26;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -478,3 +478,302 @@ output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0.000");
 CODE
 0 is false
 OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Basic integer arithmetic: addition");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 0.001
+	add P0, 1
+	.fp_eq(P0, 1.001, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+	add P0, -2
+	.fp_eq(P0, -0.999, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Basic integer arithmetic: subtraction");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 103.45
+	sub P0, 77
+	.fp_eq(P0, 26.45, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+	sub P0, -24 
+	.fp_eq(P0, 50.45, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Basic integer arithmetic: multiplication");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 0.001
+	mul P0, 10000
+	.fp_eq(P0, 10.0, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+	mul P0, -1 
+	.fp_eq(P0, -10.0, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2\\n"
+
+	mul P0, 0
+	.fp_eq(P0, 0.0, EQ3)
+	print P0
+	print "not "
+EQ3:	print "ok 3\\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Basic integer arithmetic: division");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 1e8
+	div P0, 10000 
+	.fp_eq(P0, 10000.0, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+	div P0, 1000000
+	.fp_eq(P0, 0.01, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Basic numeric arithmetic: addition");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 0.001
+	add P0, 1.2
+	.fp_eq(P0, 1.201, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+	add P0, -2.4
+	.fp_eq(P0, -1.199, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Basic numeric arithmetic: subtraction");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 103.45
+	sub P0, 3.46
+	.fp_eq(P0, 99.99, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+	sub P0, -0.01
+	.fp_eq(P0, 100.00, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Basic numeric arithmetic: multiplication");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 0.001
+	mul P0, 123.5
+	.fp_eq(P0, 0.1235, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+	mul P0, -2.6
+	.fp_eq(P0, -0.3211, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2\\n"
+
+	mul P0, 0
+	.fp_eq(P0, 0.0, EQ3)
+	print P0
+	print "not "
+EQ3:	print "ok 3\\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Basic numeric arithmetic: division");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 1e8
+	div P0, 0.5
+	.fp_eq(P0, 2e8, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+	div P0, 4000.0
+	.fp_eq(P0, 50000.0, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Increment & decrement");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 0.5
+	inc P0
+	.fp_eq(P0, 1.5, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+	dec P0
+	.fp_eq(P0, 0.5, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2\\n"
+
+	dec P0
+	.fp_eq(P0, -0.5, EQ3)
+	print P0
+	print "not "
+EQ3:	print "ok 3\\n"
+
+	inc P0
+	.fp_eq(P0, 0.5, EQ4)
+	print P0
+	print "not "
+EQ4:	print "ok 4\\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Neg");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 0.5
+	neg P0
+	.fp_eq(P0, -0.5, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+
+        new P1, .Float
+	neg P1, P0
+	.fp_eq(P1, 0.5, EQ2)
+	print P1
+	print "not "
+EQ2:	print "ok 2\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Equality");
+	new P0, .Float
+	set P0, 1e8
+        new P1, .Float
+        set P1, 1e8
+        new P2, .Float
+        set P2, 2.4
+
+        eq P0, P1, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        eq P0, P2, BAD2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        ne P0, P2, OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+        ne P0, P1, BAD4
+        branch OK4
+BAD4:   print "not "
+OK4:    print "ok 4\n"
+
+        eq_num P0, P1, OK5
+        print "not "
+OK5:    print "ok 5\n"
+
+        eq_num P0, P2, BAD6
+        branch OK6
+BAD6:   print "not "
+OK6:    print "ok 6\n"
+
+        ne_num P0, P2, OK7
+        print "not "
+OK7:    print "ok 7\n"
+
+        ne_num P0, P1, BAD8
+        branch OK8
+BAD8:   print "not "
+OK8:    print "ok 8\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+OUTPUT
+
+
+
+
+
