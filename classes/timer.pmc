@@ -16,9 +16,9 @@ classes/timer.pmc - Timer
     set P0[.PARROT_TIMER_HANDLER], P_sub        # set handler sub PMC
     invoke P0                                   # start timer
     set P0[.PARROT_TIMER_RUNNING], 1            # same
-    
+
     new P0, .Timer, P1                          # set everything
-    
+
     set I0, P0[.PARROT_TIMER_SEC]               # query current timer status
     set N0, P0[.PARROT_TIMER_NSEC]
     ...
@@ -149,7 +149,7 @@ See F<docs/pdds/pdd02_vtables.pod> for intializers.
         INTVAL val;
         FLOATVAL nval;
         PMC *pval;
-    
+
         SELF.init();
         for (i = 0; i < n; i += 2) {
             INTVAL key = VTABLE_get_integer_keyed_int(interpreter, init, i);
@@ -204,7 +204,7 @@ Returns the timer info for C<key>.
 
     INTVAL get_integer_keyed_int(INTVAL key) {
         parrot_timer_event *t = PMC_struct_val(SELF);
-    
+
         switch(key) {
             case PARROT_TIMER_SEC:
                 return (INTVAL)t->abs_time;
@@ -233,9 +233,6 @@ Returns the PMC associated with C<key>.
         switch(key) {
             case PARROT_TIMER_HANDLER:
                 return t->sub;
-                break;
-            default:
-                return PMCNULL;
         }
         return PMCNULL;
     }
@@ -252,11 +249,10 @@ Returns the number associated with C<key>.
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
         parrot_timer_event *t = PMC_struct_val(SELF);
-    
+
         switch(key) {
             case PARROT_TIMER_NSEC:
                 return t->abs_time;
-                break;
         }
         return -1.0;
     }
@@ -273,7 +269,7 @@ Sets the value associated with C<key> to C<value>.
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
         parrot_timer_event *t = PMC_struct_val(SELF);
-    
+
         switch(key) {
             case PARROT_TIMER_SEC:
                 t->abs_time = value;
@@ -310,9 +306,7 @@ Sets the PMC associated with C<key> to C<*value>.
         switch(key) {
             case PARROT_TIMER_HANDLER:
                 t->sub = value;
-            break;
-                default:
-            break;
+                break;
         }
     }
 
@@ -343,7 +337,7 @@ Sets the floating-point value associated with C<key> to C<value>.
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         parrot_timer_event *t = PMC_struct_val(SELF);
-    
+
         switch(key) {
             case PARROT_TIMER_NSEC:
                 t->abs_time = value;
