@@ -182,6 +182,7 @@ docs/debug.pod                                    [devel]doc
 docs/debugger.pod                                 [main]doc
 docs/dev/byteorder.dev                            [main]doc
 docs/dev/dod.dev                                  [devel]doc
+docs/dev/pmc_freeze.pod                           [devel]doc
 docs/dev/infant.dev                               [devel]doc
 docs/dev/jit_i386.dev                             [main]doc
 docs/dev/longopt.dev                              [main]doc
@@ -285,6 +286,8 @@ examples/benchmarks/arriter_o1.imc                [main]doc
 examples/benchmarks/bench_newp.pasm               [main]doc
 examples/benchmarks/fib.imc                       [main]doc
 examples/benchmarks/fib.pl                        [main]doc
+examples/benchmarks/freeze.pl                     [main]doc
+examples/benchmarks/freeze.pasm                   [main]doc
 examples/benchmarks/gc_alloc_new.pasm             [main]doc
 examples/benchmarks/gc_alloc_reuse.pasm           [main]doc
 examples/benchmarks/gc_generations.pasm           [main]doc
