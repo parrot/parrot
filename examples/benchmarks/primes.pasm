@@ -53,7 +53,7 @@ NEXT:   # Move on to the next number
 	inc     P1
 	le      P1, P2, REDO
 	time	N11
-	print	I6
+	print	P6
 	print	"\nlast is: "
 	print   P7
 	print   "\n"
