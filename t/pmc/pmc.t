@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 85;
+use Parrot::Test tests => 86;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2393,6 +2393,32 @@ output_is(<<'CODE', <<'OUTPUT', "bnot");
 CODE
 85
 153
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "if/unless with Integer PMC");
+      new P0, .Integer
+      set P0, 10
+      if P0, OK1
+      print "not "
+OK1:  print "ok 1\n"
+      unless P0, BAD2
+      branch OK2
+BAD2: print "not "
+OK2:  print "ok 2\n"
+      set P0, 0
+      if P0, BAD3
+      branch OK3
+BAD3: print "not "
+OK3:  print "ok 3\n"
+      unless P0, OK4
+      print "not "
+OK4:  print "ok 4\n"
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT
 
 1;
