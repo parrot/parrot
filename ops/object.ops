@@ -267,6 +267,14 @@ offset of the new attribute
 
 Remove attribute $2 from class $1, specified either by name or offset
 
+=back
+
+op addattrib(out INT, in PMC, in STR) {
+    if (!PObj_is_class_TEST($2))
+        internal_exception(1, "PMC is not a class");
+    $1 = Parrot_add_attribute(interpreter, $2, $3);
+    goto NEXT();
+}
 
 =item B<adddoes>(in PMC, in STR)
 

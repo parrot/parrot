@@ -48,4 +48,16 @@ pmclass ParrotObject extends ParrotClass need_ext {
     void init_pmc_props(PMC* init, PMC* props) {
 	SELF.init();
     }
+
+    /*
+     * attrib count
+     */
+    INTVAL elements() {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	return VTABLE_elements(interpreter, data_array) - SELF->cache.int_val;
+    }
+
+    INTVAL get_integer() {
+	return SELF.elements();
+    }
 }

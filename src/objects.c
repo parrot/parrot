@@ -11,6 +11,7 @@
  */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 /* This should be public, but for right now it's internal */
 static PMC *
@@ -179,11 +180,11 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     }
     new_type = pmc_register(interpreter, class_name);
     /* Build a new vtable for this class
-     * The child class PMC gets a ParrotObject vtable, which is a
+     * The child class PMC gets a ParrotClass vtable, which is a
      * good base to work from
+     * XXX we are leaking ths vtable
      */
-    new_vtable = Parrot_clone_vtable(interpreter,
-            Parrot_base_vtables[enum_class_ParrotObject]);
+    new_vtable = Parrot_clone_vtable(interpreter, new_class->vtable);
 
     /* register the class */
     VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
@@ -218,13 +219,26 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     INTVAL attrib_count;
     PMC *class_array;
     PMC *class;
+    INTVAL class_enum;
+    PMC *class_name;
 
     class = object->vtable->data;
+    /* * remember PMC type */
+    class_enum = object->vtable->base_type;
+    /* put in the real vtable
+     * XXX we are leaking ths vtable
+     */
+    object->vtable = Parrot_clone_vtable(interpreter,
+                Parrot_base_vtables[enum_class_ParrotObject]);
+    /* and set type of class */
+    object->vtable->base_type = class_enum;
 
     /* Grab the attribute count from the parent */
     attrib_count = class->cache.int_val;
 
     class_array = PMC_data(class);
+    class_name = VTABLE_get_pmc_keyed_int(interpreter, class_array,
+            PCD_CLASS_NAME);
 
     /* Build the array that hangs off the new object */
     new_object_array = pmc_new(interpreter, enum_class_Array);
@@ -234,15 +248,17 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /* 0 - class PMC, 1 - class name */
     VTABLE_set_pmc_keyed_int(interpreter, new_object_array, POD_CLASS, class);
     VTABLE_set_pmc_keyed_int(interpreter, new_object_array, POD_CLASS_NAME,
-            VTABLE_get_pmc_keyed_int(interpreter, class_array, PCD_CLASS_NAME));
+            class_name);
 
     /* Note the number of used slots */
     object->cache.int_val = POD_FIRST_ATTRIB;
 
     PMC_data(object) = new_object_array;
     PObj_flag_SET(is_PMC_ptr, object);
+    /* We are an object now */
+    PObj_is_object_SET(object);
 
-    /* We really ought to call the class init routines here... */
+    /* TODO We really ought to call the class init routines here... */
 }
 
 PMC *
@@ -401,6 +417,53 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
                 string_to_cstring(interpreter, method_name));
     }
     return method;
+}
+
+INTVAL
+Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
+{
+    PMC *class_array;
+    STRING *class_name, *full_attr_name;
+    INTVAL idx;
+    PMC *offs_hash;
+    PMC *attr_hash;
+
+    class_array = (PMC*) PMC_data(class);
+    class_name = VTABLE_get_string(interpreter,
+            VTABLE_get_pmc_keyed_int(interpreter,
+            class_array, PCD_CLASS_NAME));
+    /*
+     * our attributes start at offset found in hash at PCD_ATTRIB_OFFS
+     */
+    offs_hash = VTABLE_get_pmc_keyed_int(interpreter,
+            class_array, PCD_ATTRIB_OFFS);
+    if (VTABLE_exists_keyed_str(interpreter, offs_hash, class_name))
+        idx = VTABLE_get_integer_keyed_str(interpreter, offs_hash, class_name);
+    else {
+        PMC* parent_array = VTABLE_get_pmc_keyed_int(interpreter,
+                class_array, PCD_ALL_PARENTS);
+        if (VTABLE_elements(interpreter, parent_array)) {
+            PMC *parent = VTABLE_get_pmc_keyed_int(interpreter,
+                    parent_array, 0);
+            PMC *parent_attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
+                    (PMC*) PMC_data(parent), PCD_ATTRIBUTES);
+            idx = VTABLE_elements(interpreter, parent_attr_hash);
+        }
+        else
+            idx = 0;
+        VTABLE_set_integer_keyed_str(interpreter, offs_hash, class_name, idx);
+    }
+    attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
+            class_array, PCD_ATTRIBUTES);
+    full_attr_name = Parrot_sprintf_c(interpreter, "%S%s%S",
+            class_name, PARROT_NAMESPACE_SEPARATOR, attr),
+    idx = VTABLE_elements(interpreter, attr_hash);
+    assert(class->cache.int_val == idx);
+    VTABLE_set_integer_keyed_str(interpreter, attr_hash,
+            full_attr_name, idx);
+    assert(idx + 1 == VTABLE_elements(interpreter, attr_hash));
+    class->cache.int_val = idx + 1;
+    return idx;
 }
 
 /*

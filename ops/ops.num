@@ -1278,3 +1278,5 @@ get_addr_i_p    1250
 freeze_s_p	1251
 thaw_p_s	1252
 thaw_p_sc	1253
+addattrib_i_p_s	1254
+addattrib_i_p_sc	1255

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 16;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -279,3 +279,108 @@ ok 3
 ok 4
 ok 5
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "addattrib");
+    newclass P1, "Foo"
+    addattrib I1, P1, "foo_i"
+    print "ok 1\n"
+    print I1
+    print "\n"
+    addattrib I1, P1, "foo_j"
+    print I1
+    print "\n"
+    end
+CODE
+ok 1
+0
+1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "addattrib subclass");
+    newclass P1, "Foo"
+    addattrib I1, P1, "foo_i"
+    print "ok 1\n"
+    print I1
+    print "\n"
+    addattrib I1, P1, "foo_j"
+    print I1
+    print "\n"
+
+    subclass P2, P1, "Bar"
+    addattrib I1, P2, "bar_i"
+    print "ok 2\n"
+    print I1
+    print "\n"
+    addattrib I1, P2, "bar_j"
+    print I1
+    print "\n"
+    # attr count
+    set I0, P2
+    print I0
+    print "\n"
+    end
+CODE
+ok 1
+0
+1
+ok 2
+2
+3
+4
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "addattrib subclass - get idx");
+    newclass P1, "Foo"
+    addattrib I1, P1, "foo_i"
+    set I2, P1["Foo\x0foo_i"]
+    eq I1, I2, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    addattrib I1, P1, "foo_j"
+    set I2, P1["Foo\x0foo_j"]
+    eq I1, I2, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+
+    subclass P2, P1, "Bar"
+    addattrib I1, P2, "bar_i"
+    set I2, P2["Bar\x0bar_i"]
+    eq I1, I2, ok3
+    print "not "
+ok3:
+    print "ok 3\n"
+    addattrib I1, P2, "bar_j"
+    set I2, P2["Bar\x0bar_j"]
+    eq I1, I2, ok4
+    print "not "
+ok4:
+    print "ok 4\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "object attr count");
+    newclass P1, "Foo"
+    addattrib I1, P1, "foo_i"
+    addattrib I1, P1, "foo_j"
+    set I1, P1
+    print I1
+    print "\n"
+
+    find_type I0, "Foo"
+    new P2, I0
+    set I1, P2
+    print I1
+    print "\n"
+    end
+CODE
+2
+2
+OUTPUT
+

@@ -41,15 +41,6 @@ pmclass ParrotClass need_ext {
 
     INTVAL isa(STRING * classname) {
 	PMC *class;
-	/*
-	 * a bit tricky:
-	 * a ParrotClass has a Parrot_Object vtable but isn't an objecz
-	 */
-	if (PObj_is_class_TEST(SELF) &&
-		0 == string_equal(interpreter, classname,
-		    string_from_cstring(interpreter, "ParrotObject", 0))) {
-	    return 0;
-	}
 	if (SUPER(classname))
             return 1;
 	class = Parrot_class_lookup(interpreter, classname);
@@ -62,5 +53,39 @@ pmclass ParrotClass need_ext {
     PMC* find_method(STRING* name) {
 	PMC *class = VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), 0);
 	return Parrot_find_method_with_cache(INTERP, class, name);
+    }
+
+    /*
+     * attribute access meths
+     */
+
+    INTVAL elements() {
+	PMC* class_array = (PMC*) PMC_data(SELF);
+	PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
+		class_array, PCD_ATTRIBUTES);
+	return VTABLE_elements(interpreter, attr_hash);
+    }
+
+    INTVAL get_integer() {
+	return SELF.elements();
+    }
+
+    INTVAL get_integer_keyed_str (STRING* attr) {
+	PMC* class_array = (PMC*) PMC_data(SELF);
+	PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
+		class_array, PCD_ATTRIBUTES);
+	STRING *class_name = VTABLE_get_string(interpreter,
+		VTABLE_get_pmc_keyed_int(interpreter,
+		    class_array, PCD_CLASS_NAME));
+	STRING *full_attr_name = Parrot_sprintf_c(interpreter, "%S%s%S",
+            class_name, PARROT_NAMESPACE_SEPARATOR, attr);
+	if (VTABLE_exists_keyed_str(interpreter, attr_hash, full_attr_name))
+	    return VTABLE_get_integer_keyed_str(interpreter,
+		    attr_hash, full_attr_name);
+	return -1;
+    }
+
+    INTVAL get_integer_keyed (PMC* attr) {
+	return SELF.get_integer_keyed_str(key_string(interpreter, attr));
     }
 }
