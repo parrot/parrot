@@ -46,8 +46,7 @@ pmclass NCI {
 
     PMC* clone () {
         PMC *ret = pmc_new(INTERP, enum_class_NCI);
-        ret->cache.struct_val = (DPOINTER *)
-		(Parrot_csub_t)D2FPTR(SELF->cache.struct_val);
+        ret->cache.struct_val = SELF->cache.struct_val;
 	/* FIXME if data is malloced (JIT/i386!) then we need
 	 * the length of data here, to memcpy it
 	 * ManagedStruct or Buffer?
