@@ -315,7 +315,7 @@ Creates an identical copy of the complex number.
 
     void destroy () {
         mem_sys_free(PMC_struct_val(SELF));
-	PMC_struct_val(SELF) = NULL;
+        PMC_struct_val(SELF) = NULL;
     }
 
     void morph (INTVAL type) {
@@ -361,8 +361,7 @@ Returns true if the complex number is non-zero.
     }
 
     FLOATVAL get_number () {
-        internal_exception(1, "Complex: unimp get_number");
-        return (FLOATVAL)0;
+        return sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF));
     }
 
     STRING* get_string () {
@@ -598,9 +597,16 @@ Adds C<value> to the complex number, placing the result in C<dest>.
 */
 
     void add (PMC* value, PMC* dest) {
+MMD_Complex: {
         VTABLE_morph(INTERP, dest, enum_class_Complex);
         RE(dest) = RE(SELF) + RE(value);
         IM(dest) = IM(SELF) + IM(value);
+        }
+MMD_DEFAULT: {
+        VTABLE_morph(INTERP, dest, enum_class_Complex);
+        RE(dest) = RE(SELF) + VTABLE_get_number(INTERP, value);
+        IM(dest) = IM(SELF);
+        }
     }
 
     void add_int (INTVAL value, PMC* dest) {
@@ -630,9 +636,16 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 */
 
     void subtract (PMC* value, PMC* dest) {
+MMD_Complex: {
         VTABLE_morph(INTERP, dest, enum_class_Complex);
         RE(dest) = RE(SELF) - RE(value);
         IM(dest) = IM(SELF) - IM(value);
+        }
+MMD_DEFAULT: {
+        VTABLE_morph(INTERP, dest, enum_class_Complex);
+        RE(dest) = RE(SELF) - VTABLE_get_number(INTERP, value);
+        IM(dest) = IM(SELF);
+        }
     }
 
     void subtract_int (INTVAL value, PMC* dest) {
@@ -719,6 +732,7 @@ Divide the complex number by C<value>, placing the result in C<dest>.
 */
 
     void divide (PMC* value, PMC* dest) {
+MMD_Complex: {
         FLOATVAL mod, re, im;
 
         VTABLE_morph(INTERP, dest, enum_class_Complex);
@@ -732,6 +746,12 @@ Divide the complex number by C<value>, placing the result in C<dest>.
 
         RE(dest) = re;
         IM(dest) = im;
+        }
+MMD_DEFAULT: {
+        VTABLE_morph(INTERP, dest, enum_class_Complex);
+        RE(dest) = RE(SELF) / VTABLE_get_number(INTERP, value);
+        IM(dest) = IM(SELF) / VTABLE_get_number(INTERP, value);
+        }
     }
 
     void divide_int (INTVAL value, PMC* dest) {

@@ -180,11 +180,11 @@ output_is(<<'CODE', <<'OUTPUT', "add");
     print P1
     print "\n"
 
-#    set P0, "2 + i"
-#    set P2, 3.3
-#    add P1, P0, P2
-#    print P1
-#    print "\n"
+    set P0, "2 + i"
+    set P2, 3.3
+    add P1, P0, P2
+    print P1
+    print "\n"
 
     set P0, "3 + 5i"
     add P1, P0, 2
@@ -203,6 +203,7 @@ CODE
 1+1i
 0-1i
 1-1i
+5.3+1i
 5+5i
 0+2i
 OUTPUT
@@ -233,11 +234,11 @@ output_is(<<'CODE', <<'OUTPUT', "substract");
     print P1
     print "\n"
 
-#    set P0, "1 - 4i"
-#    set P2, -1.0
-#    sub P1, P0, P2
-#    print P1
-#    print "\n"
+    set P0, "1 - 4i"
+    set P2, -1.0
+    sub P1, P0, P2
+    print P1
+    print "\n"
 
     set P0, "- 2 - 2i"
     sub P1, P0, -4
@@ -256,6 +257,7 @@ CODE
 1+1i
 0-1i
 -1-1i
+2-4i
 2-2i
 1.8+1i
 OUTPUT
@@ -286,11 +288,11 @@ output_is(<<'CODE', <<'OUTPUT', "multiply");
     print P1
     print "\n"
 
-#    set P0, "2 - 2i"
-#    set P2, 0.5
-#    mul P1, P0, P2
-#    print P1
-#    print "\n"
+    set P0, "2 - 2i"
+    set P2, 0.5
+    mul P1, P0, P2
+    print P1
+    print "\n"
 
     set P0, "1 - i"
     mul P1, P0, 2
@@ -309,6 +311,7 @@ CODE
 5+2i
 0+3i
 3+6i
+1-1i
 2-2i
 1-1i
 OUTPUT
@@ -339,11 +342,11 @@ output_is(<<'CODE', <<'OUTPUT', "divide");
     print P1
     print "\n"
 
-#    set P0, "-3 + 6i"
-#    set P2, 3.0
-#    div P1, P0, P2
-#    print P1
-#    print "\n"
+    set P0, "-3 + 6i"
+    set P2, 3.0
+    div P1, P0, P2
+    print P1
+    print "\n"
 
     set P0, "-2 + 3i"
     div P1, P0, 2
@@ -362,44 +365,44 @@ CODE
 5-3i
 25+0i
 3-4i
+-1+2i
 -1+1.5i
 4-6i
 OUTPUT
 
-SKIP: {
-  skip("modulus not implemented", 1);
-output_is(<<'CODE', <<'OUTPUT', "get int/num/bool");
+output_is(<<"CODE", <<'OUTPUT', "get int/num/bool");
+@{[ $fp_equality_macro ]}
         new P0, .Complex
-        set P0, "1.6 - .9i"
+        set P0, "2 - 1.5i"
         print P0
-        print "\n"
+        print "\\n"
 
         set I0, P0
         print I0
-        print "\n"
+        print "\\n"
 
         set N0, P0
-        print N0
-        print "\n"
+        .fp_eq( N0, 2.5, OK )
+        print "not "
+OK:     print "ok\\n"
 
         if P0, TRUE
         print "not "
-TRUE:   print "true\n"
+TRUE:   print "true\\n"
 
         set P0, "0"
         unless P0, FALSE
         print "not "
-FALSE:  print "false\n"
+FALSE:  print "false\\n"
 
         end
 CODE
-1.6-0.9i
+2-1.5i
 2
-2.5
+ok
 true
 false
 OUTPUT
-}
 
 output_is(<<"CODE", <<'OUTPUT', "get keyed");
 @{[ $fp_equality_macro ]}
