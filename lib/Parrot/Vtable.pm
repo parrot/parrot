@@ -105,6 +105,7 @@ sub vtbl_defs {
     my $entry;
 
     for $entry (@{$vtable}) {
+	next if ($entry->[4] =~ /MMD_BXOR/);	# XXX test one only first
         my $args = join(", ", 'Interp* interpreter', 'PMC* pmc', split(/\s*,\s*/, $entry->[2]));
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
     }
@@ -147,6 +148,7 @@ struct _vtable {
 
 EOF
     for $entry (@{$vtable}) {
+	next if ($entry->[4] =~ /MMD_BXOR/);	# XXX test one only first
         $struct .= "    $entry->[1]_method_t $entry->[1];\n";
     }
 
@@ -174,6 +176,7 @@ sub vtbl_macros {
 
 EOM
     for my $entry (@{$vtable}) {
+	next if ($entry->[4] =~ /MMD_BXOR/);	# XXX test one only first
 	my @args = split /,\s*/, $entry->[2];
 	unshift @args, "i interp", "p pmc";
 	my $args = join ', ', map { (split / /, $args[$_])[1] } (0..$#args);
@@ -185,7 +188,7 @@ EOM
     $macros .= <<"EOM";
 
 /*
- * vtable method name defines
+ * vtable method name defines for delegate
  */
 
 /* &gen_from_def(vtable_methods.pasm) */

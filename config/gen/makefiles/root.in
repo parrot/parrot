@@ -844,7 +844,7 @@ ${TEMP_pmc_build}
 # $(STICKY_FILES) : Configure.pl
 #	$(PERL) Configure.pl
 
-$(INC)/vtable.h : vtable.tbl $(BUILD_TOOL)/vtable_h.pl
+$(INC)/vtable.h : vtable.tbl $(BUILD_TOOL)/vtable_h.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOL)/vtable_h.pl
 
 $(INC)/jit_emit.h : jit/${jitcpuarch}/jit_emit.h

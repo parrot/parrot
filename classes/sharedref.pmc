@@ -36,6 +36,13 @@ we can relax that a bit.
 #define LOCK_PMC(interp, pmc) LOCK(PMC_sync(pmc)->pmc_lock);
 #define UNLOCK_PMC(interp, pmc) UNLOCK(PMC_sync(pmc)->pmc_lock);
 
+/*
+ * bxor and bxor_int are already MMDs - dispatch
+ * TODO generate appropriate macros
+ */
+
+#define VTABLE_bitwise_xor(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_BXOR)
+#define VTABLE_bitwise_xor_int(i,l,r,d) mmd_dispatch_v_pip(i,l,r,d,MMD_BXOR_INT)
 pmclass SharedRef does ref need_ext is_shared extends Ref {
 
 
