@@ -484,7 +484,14 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
         opcode_t *pc = (opcode_t *)
             interpreter->code->byte_code + interpreter->resume_offset;
 
-        interpreter->lo_var_ptr = (void *)&lo_var_ptr;
+        /*
+         * if we are reentering the run-loop, offset will be non-zero
+         * e.g. from delegate.pmc
+         * This might be of course wrong, when a new segment is run
+         * TODO have some flag for this case
+         */
+        if (!offset)
+            interpreter->lo_var_ptr = (void *)&lo_var_ptr;
         interpreter->resume_offset = 0;
         interpreter->resume_flag = 0;
         switch (interpreter->run_core) {
@@ -513,7 +520,8 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
                  */
                 /* #ifdef HAVE_NESTED_FUNC */
 #  ifdef __GNUC__
-                interpreter->lo_var_ptr = 0;
+                if (!offset)
+                    interpreter->lo_var_ptr = 0;
 #  endif
                 core = runops_cgoto_core;
 #else
@@ -558,7 +566,8 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
          * the stacktop again to a sane value, so that restarting the runloop
          * is ok.
          */
-        interpreter->lo_var_ptr = (void *)&lo_var_ptr;
+        if (!offset)
+            interpreter->lo_var_ptr = (void *)&lo_var_ptr;
         if ((interpreter->resume_flag & 1) &&
                 (int)interpreter->resume_offset < 0)
                 internal_exception(1, "branch_cs: illegal resume offset");
@@ -650,13 +659,11 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
 void
 Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 {
-    static PMC *ret_c = NULL;
+    PMC *ret_c = NULL;
     opcode_t offset, *dest;
 
-    /* we ever need one return continuation with a NULL offset */
-    if (!ret_c) {
-        ret_c = pmc_new(interpreter, enum_class_RetContinuation);
-    }
+    /* we need one return continuation with a NULL offset */
+    ret_c = pmc_new(interpreter, enum_class_RetContinuation);
     REG_PMC(1) = ret_c;
     /* invoke the sub, which places the context of the sub in the
      * interpreter, and switches code segments if needed

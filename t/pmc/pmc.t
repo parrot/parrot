@@ -1514,6 +1514,17 @@ L_BadId:
     print I0
     print "\\n"
     end
+# delegate calls these 2 functions
+.pcc_sub __name:
+   set S5, "delegate"
+   set I0, 1
+   set I3, 1
+   invoke P1
+.pcc_sub __type:
+   find_type I5, "delegate"
+   set I0, 1
+   set I1, 1
+   invoke P1
 CODE
 All names and ids ok.
 OUTPUT

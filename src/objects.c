@@ -307,10 +307,9 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     STRING *shortcut_name; /* The method name with the separator
                               prepended */
 
-    /* For right now, no methods for non-classes. This should change,
-       but it'll do for the moment. */
+    /* if its a non-classes, just return the sub */
     if (!PObj_is_class_TEST(class)) {
-        return NULL;
+        return find_global(interpreter, method_name);
     }
 
     /* We're going to make this over and over, so get it once and

@@ -649,8 +649,8 @@ sub signature
 sub gen_ret
 {
     my ($self, $type) = @_;
-    return "return *($1*) ret_val;" if ($type =~ /((?:INT|FLOAT)VAL)/);
-    return "return ($type) ret_val;";
+    return "ret_val = *($1*) " if ($type =~ /((?:INT|FLOAT)VAL)/);
+    return "ret_val = ($type) ";
 }
 
 sub body
@@ -675,9 +675,10 @@ sub body
     my $ret_def = '';
     my $func_ret = '(void) ';
     if ($method->{type} ne 'void') {
-        $ret_def = "void *ret_val;";
-        $func_ret = 'ret_val = ';
-        $ret = $self->gen_ret($method->{type});
+        my $type = $method->{type};
+        $ret_def = "$type ret_val;";
+        $func_ret = $self->gen_ret($method->{type});
+        $ret = "return ret_val;";
     }
     my $umeth = uc $meth;
     my $delegate_meth = "PARROT_VTABLE_${umeth}_METHNAME";
@@ -690,8 +691,8 @@ EOC
 $l
 ${decl} {
     $ret_def
-    PMC *sub = find_or_die(interpreter, pmc, $delegate_meth);
     struct regsave *data = save_regs(interpreter);
+    PMC *sub = find_or_die(interpreter, pmc, $delegate_meth);
     ${func_ret}Parrot_runops_fromc_args(interpreter, sub, "$sig"$arg);
     restore_regs(interpreter, data);
     $ret
