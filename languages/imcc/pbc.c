@@ -420,6 +420,8 @@ void fixup_bsrs(struct Parrot_Interp *interpreter)
     for (s = globals.cs->first; s; s = s->next) {
         for(i = 0; i < HASH_SIZE; i++) {
             for(bsr = s->bsrs[i]; bsr; bsr = bsr->next ) {
+                if (*bsr->name != '_')
+                    continue;
                 lab = find_global_label(bsr->name, &pc);
                 if (!lab)
                     fatal(1, "fixup_bsrs", "couldn't find addr of sub '%s'\n",
