@@ -68,7 +68,6 @@ SKIP: {
 
 output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start");
 .include "timer.pasm"
-    bounds 1	# cant run with JIT core yet
     new P1, .SArray
     set P1, 6
     set P1[0], .PARROT_TIMER_NSEC
@@ -95,7 +94,6 @@ OUT
 
 output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start/stop");
 .include "timer.pasm"
-    bounds 1	# cant run with JIT core yet
     new P1, .SArray
     set P1, 6
     set P1[0], .PARROT_TIMER_NSEC
@@ -123,7 +121,6 @@ OUT
 
 output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start/repeat");
 .include "timer.pasm"
-    bounds 1	# cant run with JIT core yet
     new P1, .SArray
     set P1, 8
     set P1[0], .PARROT_TIMER_NSEC
@@ -154,7 +151,6 @@ OUT
 
 output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start/destroy");
 .include "timer.pasm"
-    bounds 1	# cant run with JIT core yet
     new P1, .SArray
     set P1, 6
     set P1[0], .PARROT_TIMER_NSEC
@@ -186,7 +182,6 @@ OUT
 
 output_is(<<'CODE', <<'OUT', "Timer setup - timer in array destroy");
 .include "timer.pasm"
-    bounds 1	# cant run with JIT core yet
     new P1, .SArray
     set P1, 6
     set P1[0], .PARROT_TIMER_NSEC
