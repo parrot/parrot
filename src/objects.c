@@ -42,32 +42,6 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
   VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 0, temp_pmc);
   VTABLE_set_pmc_keyed_int(interpreter, temp_pmc, 0, base_class);
 
-  /* Our penultimate parent list is a clone of our parent's parent
-     list, with our parent unshifted onto the beginning */
-  temp_pmc = pmc_new_noinit(interpreter, enum_class_Array);
-  VTABLE_clone(interpreter, 
-               VTABLE_get_pmc_keyed_int(interpreter,
-                                        (PMC *)PMC_data(base_class), 1),
-               temp_pmc);
-  VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
-  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 1, temp_pmc);
-
-  /* Our attribute list is our parent's attribute list */
-  temp_pmc = pmc_new_noinit(interpreter, enum_class_PerlHash);
-  VTABLE_clone(interpreter,
-               VTABLE_get_pmc_keyed_int(interpreter,
-                                        (PMC *)PMC_data(base_class), 2),
-               temp_pmc);
-  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 2, temp_pmc);
-
-  /* And our full keyed attribute list is our parent's */
-  temp_pmc = pmc_new_noinit(interpreter, enum_class_PerlHash);
-  VTABLE_clone(interpreter,
-               VTABLE_get_pmc_keyed_int(interpreter,
-                                        (PMC *)PMC_data(base_class), 3),
-               temp_pmc);
-  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 3, temp_pmc);
-
   /* Set the classname, if we have one */
   classname_pmc = pmc_new(interpreter, enum_class_PerlString);
   if (child_class_name) {
@@ -85,7 +59,33 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
                                            11, NULL, 0, NULL));
   }
 
-  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 4, classname_pmc);
+  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 1, classname_pmc);
+
+  /* Our penultimate parent list is a clone of our parent's parent
+     list, with our parent unshifted onto the beginning */
+  temp_pmc = pmc_new_noinit(interpreter, enum_class_Array);
+  VTABLE_clone(interpreter, 
+               VTABLE_get_pmc_keyed_int(interpreter,
+                                        (PMC *)PMC_data(base_class), 2),
+               temp_pmc);
+  VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
+  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 2, temp_pmc);
+
+  /* Our attribute list is our parent's attribute list */
+  temp_pmc = pmc_new_noinit(interpreter, enum_class_OrderedHash);
+  VTABLE_clone(interpreter,
+               VTABLE_get_pmc_keyed_int(interpreter,
+                                        (PMC *)PMC_data(base_class), 3),
+               temp_pmc);
+  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 3, temp_pmc);
+
+  /* And our full keyed attribute list is our parent's */
+  temp_pmc = pmc_new_noinit(interpreter, enum_class_OrderedHash);
+  VTABLE_clone(interpreter,
+               VTABLE_get_pmc_keyed_int(interpreter,
+                                        (PMC *)PMC_data(base_class), 4),
+               temp_pmc);
+  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 4, temp_pmc);
 
   return child_class;
 }
@@ -108,17 +108,17 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
   /* Our parent class array has nothing in it */
   VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 0,
                            pmc_new(interpreter, enum_class_Array));
-  VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 1,
-                           pmc_new(interpreter, enum_class_Array));
   VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 2,
-                           pmc_new(interpreter, enum_class_PerlHash));
+                           pmc_new(interpreter, enum_class_Array));
   VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 3,
-                           pmc_new(interpreter, enum_class_PerlHash));
+                           pmc_new(interpreter, enum_class_OrderedHash));
+  VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 4,
+                           pmc_new(interpreter, enum_class_OrderedHash));
 
   /* Set the classname, if we have one */
   classname_pmc = pmc_new(interpreter, enum_class_PerlString);
   VTABLE_set_string_native(interpreter, classname_pmc, class_name);
-  VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 4, classname_pmc);
+  VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 1, classname_pmc);
 
   /* Add ourselves to the interpreter's class hash */
   VTABLE_set_pmc_keyed(interpreter, interpreter->class_hash,
@@ -154,7 +154,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *class) {
     /* 0 - class PMC, 1 - class name */
     VTABLE_set_pmc_keyed_int(interpreter, new_object_array, 0, class);
     VTABLE_set_pmc_keyed_int(interpreter, new_object_array, 1,
-                             VTABLE_get_pmc_keyed_int(interpreter, class_array, 4));
+                             VTABLE_get_pmc_keyed_int(interpreter, class_array, 1));
 
     /* Allocate the object itself */
     new_object = pmc_new(interpreter, enum_class_ParrotObject);

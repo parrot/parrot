@@ -16,12 +16,12 @@
    to an array of PMCs. That array has:
 
    0: An array of immediate parents
-   1: An array of all parents, in search order
-   2: A hash, keys are the class names, values are the offsets to
+   1: The class name PMC
+   2: An array of all parents, in search order
+   3: A hash, keys are the class names, values are the offsets to
       their attributes
-   3: A hash, the keys are the classname/attrib name pair (separated
+   4: A hash, the keys are the classname/attrib name pair (separated
       by a NULL), while the value is the offset to the attribute
-   4: The class name PMC
 
 */
 
