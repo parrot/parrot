@@ -1,4 +1,17 @@
-VERSION 0.0.7
+VERSION 0.0.8
+
+New in 0.0.8
+
+- Several new grammars and a BNF -> perl5 and perl6 converter (Jeff)
+- Working Perl6 REs (Sean)
+- Keyed Access (Tom Hughes et al)
+- New PMCs (Alberto et al)
+- Better Documentation
+- New COW semantics
+- GC acceleration (Mike Lambert)
+- Lexical scope (Jonathan Sillto)
+- IMCC patches
+- JIT for the ARM
 
 New in 0.0.7
 

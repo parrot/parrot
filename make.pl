@@ -7,7 +7,7 @@ use lib "$FindBin::Bin/lib";
 
 use Make; # XXX NO EXPORTS DAMNIT
 
-$Make::AppVersion = "0.0.7";
+$Make::AppVersion = "0.0.8";
 
 my $INC = 'include/parrot';
 
