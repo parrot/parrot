@@ -14,23 +14,24 @@ into a new test suite.
 
 =head1 How to write a test
 
-=head2 Assembler tests
+New tests should be added to F<*.t> files. These test files 
+can be found in the directories F<t>, F<imcc/t> and F<languages/*/t>.
+If a new feature is tested,
+it might also make sense to create a new F<*.t> file.
 
-First, find an appropriate file in F<t/op/*.t> (for basic ops),
-F<t/pmc/*.t> (for anything to do with PMCs), and F<t/src/*.t> for C
-source code tests. If there isn't an appropriate file, create one.
-
-Near the top of each file, you'll see a line like:
+The testing framework needs to know how many tests it should expect.
+So the number of planned tests needs to be
+incremented when adding a new test.
+This is done near the top of a test file, in a line that looks like:
 
   use Parrot::Test tests => 8;
 
-This sets up the test harness used to assemble and run the tests, and
-lets it know how many tests you plan to run. New tests should be added
-by:
+=head2 Parrot Assembler
 
-1. Incrementing the number of planned tests.
-
-2. Putting some code in like this:
+PASM test are mostly used for testing ops.
+Appropriate test files for basic ops are F<t/op/*.t>.
+Perl Magic Cookies are tested in F<t/pmc/*.t>.
+Add the new test like this:
 
     pasm_output_is(<<'CODE', <<'OUTPUT', "name for test");
         *** a big chunk of assembler, eg:
@@ -42,12 +43,26 @@ by:
     1
     OUTPUT
 
-Tests in F<t/op/> or F<t/pmc/> are considered to be B<PASM> tests.
-Tests in F<imcc/t/> are assumed to be B<PIR> tests. You can put B<PIR>
-tests into F<t/op/> or F<t/pmc/> by using functions like 'pir_output_is'.
+=head2 Parrot Intermediate Representation
+
+Tests can also be written in B<PIR>. This is done with 
+C<pir_output_is> and friends.
+
+    pir_output_is(<<'CODE',<<'OUT','nothing useful');
+        .include 'library/config.imc'
+
+        .sub main @MAIN
+            print "hi\n"
+        .end
+    CODE
+    hi
+    OUT
 
 =head2 C source tests
 
+C source tests are usually located in F<t/src/*.t>.
+A simple test looks like:
+ 
     c_output_is(<<'CODE', <<'OUTPUT', "name for test");
     #include <stdio.h>
     #include "parrot/parrot.h"
@@ -82,9 +97,14 @@ tests into F<t/op/> or F<t/pmc/> by using functions like 'pir_output_is'.
     done
     OUTPUT
 
-Note, it's always a good idea to output "done" to confirm that the compiled
+Note that it's always a good idea to output "done" to confirm that the compiled
 code executed completely. When mixing C<printf> and C<PIO_printf> always
 append a C<fflush(stdout);> after the former.
+
+=head2 Testing language implementations
+
+Language implementations are usually tested with the test function 
+C<language_output_is>.
 
 =head1 Ideal tests:
 
@@ -113,3 +133,16 @@ then feel free to add some and/or complain to the mailing list].
 Are a chunk of assembler and a chunk of expected output.
 
 =back
+
+=head1 TODO tests
+
+In test driven development, tests are implemented first.
+So the tests are initially expected to fail.
+This can be expressed by marking the tests as TODO. 
+See L<Test::More> on how to do that.
+
+=head1 SEE ALSO
+
+L<http://qa.perl.org>
+
+=cut
