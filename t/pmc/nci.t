@@ -1,4 +1,4 @@
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -464,10 +464,38 @@ CODE
 /
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "nci_p_i - char*");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pi", "pi"
+  # this test function returns a struct { char*; int }
+  set I5, 3
+  invoke
+  new P2, .PerlArray
+.include "datatypes.pasm"
+  push P2, .DATATYPE_CSTR
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  assign P5, P2
+  set S0, P5[0]
+  print S0
+  print "\n"
+  set I0, P5[1]
+  print I0
+  print "\n"
+  end
+CODE
+hello
+20
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_ip", "ip"
-  # this test function wants a struct { double d; float f; int i }
+  # this test function wants a struct
+  # { double d; float f; int i; char*}
   # and returns the sum of these values
   new P2, .PerlArray
 .include "datatypes.pasm"
@@ -480,6 +508,9 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
   push P2, .DATATYPE_INT
   push P2, 0	# 1 elem array
   push P2, 0
+  push P2, .DATATYPE_CSTR
+  push P2, 0	# 1 elem array
+  push P2, 0
   new P5, .ManagedStruct, P2
   set I6, 0
   sizeof I7, .DATATYPE_DOUBLE
@@ -488,16 +519,20 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
   add I6, I7
   sizeof I7, .DATATYPE_INT
   add I6, I7
+  sizeof I7, .DATATYPE_CSTR
+  add I6, I7
   set P5, I6
   set P5[0], 10.0
   set P5[1], 4.0
   set P5[2], 17
+  set P5[3], "hello from Parrot\x0"
   set I5, 1
   invoke
   print I5
   print "\n"
   end
 CODE
+hello from Parrot
 31
 OUTPUT
 

@@ -45,8 +45,11 @@ int nci_ip(void *p) {
         double d;
         float f;
         int i;
+        char *s;
     } dfi;
     dfi *sp = (dfi*) p;
+    puts(sp->s);
+    fflush(stdout);
     return (int) (sp->d + sp->f + sp->i);
 }
 
@@ -127,6 +130,17 @@ void * nci_pi(int test) {
                     int i;
                 } t = {
                      10,
+                     20
+                };
+                return &t;
+            }
+        case 3:
+            {
+                static struct {
+                    const char *c;
+                    int i;
+                } t = {
+                     "hello",
                      20
                 };
                 return &t;

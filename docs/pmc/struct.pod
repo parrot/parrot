@@ -56,6 +56,7 @@ The C structure
     double d;
     float  f;
     int    i[4];
+    char  *s;
   };
 
 can be declared with this initializer:
@@ -70,6 +71,9 @@ can be declared with this initializer:
   push P2, 0
   push P2, .DATATYPE_INT
   push P2, 4	# 4 elem array
+  push P2, 0
+  push P2, .DATATYPE_CSTR
+  push P2, 0
   push P2, 0
 
 =head2 Named Structure Elements
@@ -104,6 +108,8 @@ in the following example:
   sizeof I7, .DATATYPE_INT
   mul I7, 4
   add I6, I7
+  sizeof I7, .DATATYPE_CSTR
+  add I6, I7
 
   set P5, I6	# allocate size
 
@@ -116,9 +122,8 @@ assigned to the struct, zero offsets are recalculated).
 
 So for above example:
 
-  set I6, P2[8]	# offset of 3rd struct element i[4]
-  sizeof I7, .DATATYPE_INT
-  mul I7, 4
+  set I6, P2[11]	# offset of 4rd struct element *s
+  sizeof I7, .DATATYPE_CSTR
   add I6, I7	# I6 is now the total size
 
 =head1 Accessing Structure Items
@@ -142,6 +147,28 @@ n-th array element.
   set I3, P5[2;3]	# get i[3]
 
   set P5["i"; 2]        # set i[2] if initializer is an OrderedHash
+
+  set S0, P5[3]         # get string at *s
+  set S0, P5["s"]	# same
+
+=head2 Strings
+
+When passing a STRING to a structure that needs a 0-terminated
+C-string (char *s), then you have to provide the terminating NUL char
+in the string.
+
+  struct {
+    ...
+    char *s;
+  };
+
+  set P5["s"], "a string\x0"
+
+Please also note, that the C function currently gets a pointer to string
+memory, so any code that might trigger GC should be avoided (or GC turned off).
+Passing constant strings like above is safe though.
+
+  set P5["s"], S0  # S0 shouldn't move until function call
 
 =head1 Passing A Structure to a C function
 

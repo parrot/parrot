@@ -123,6 +123,24 @@ ret_float(char *p, int type)
     return -1.0;
 }
 
+static STRING*
+ret_string(Parrot_Interp interpreter, char *p, int type)
+{
+    char *cstr;
+    size_t len;
+
+    switch (type) {
+	case enum_type_cstr:
+	    cstr = *(char **) p;
+	    len = strlen(cstr);
+	    return string_make(interpreter, cstr, len, NULL,
+		    PObj_external_FLAG, NULL);
+	default:
+	    internal_exception(1, "returning unhandled string type in struct");
+    }
+    return NULL;
+}
+
 static void
 set_int(char *p, int type, INTVAL value)
 {
@@ -162,6 +180,27 @@ set_float(char *p, int type, FLOATVAL value)
 	    break;
 	case enum_type_double:
 	    *(double*) p = (double) value;
+	    break;
+	default:
+	    internal_exception(1, "setting unhandled float type in struct");
+	    break;
+    }
+}
+
+static void
+set_string(char *p, int type, STRING* value)
+{
+    char *cstr;
+    switch (type) {
+	case enum_type_cstr:
+	    /* XXX assumes 0-terminate C-string here
+	     *     we can't use string_to_cstring easily
+	     */
+	    cstr = value->strstart;
+	    *(char **) p = cstr;
+	    break;
+	default:
+	    internal_exception(1, "setting unhandled string type in struct");
 	    break;
     }
 }
@@ -323,6 +362,18 @@ pmclass UnManagedStruct extends default need_ext {
 	return ret_float(p, type);
     }
 
+    STRING* get_string_keyed_int (INTVAL key) {
+	int type;
+	char *p = char_offset_int(interpreter, pmc, key, &type);
+	return ret_string(interpreter, p, type);
+    }
+
+    STRING* get_string_keyed (PMC* key) {
+	int type;
+	char *p = char_offset_key(interpreter, pmc, key, &type);
+	return ret_string(interpreter, p, type);
+    }
+
     INTVAL get_integer() {
        return (INTVAL)*(INTVAL *)PMC_data(SELF);
     }
@@ -377,6 +428,18 @@ pmclass UnManagedStruct extends default need_ext {
 	int type;
 	char *p = char_offset_key(interpreter, pmc, key, &type);
 	set_float(p, type, value);
+    }
+
+    void set_string_keyed_int (INTVAL key, STRING* value) {
+	int type;
+	char *p = char_offset_int(interpreter, pmc, key, &type);
+	set_string(p, type, value);
+    }
+
+    void set_string_keyed (PMC *key, STRING* value) {
+	int type;
+	char *p = char_offset_key(interpreter, pmc, key, &type);
+	set_string(p, type, value);
     }
 
 }
