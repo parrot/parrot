@@ -1,0 +1,7 @@
+parser.[ch]
+parser.output
+lexer.c
+a.imc
+a.pasm
+colacc
+imcc
