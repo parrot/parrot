@@ -2,26 +2,28 @@
 
 /* GNU m4 -- A simple macro processor
    Copyright (C) 1989, 90, 91, 92, 93, 94 Free Software Foundation, Inc.
-  
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2, or (at your option)
    any later version.
-  
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-  
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdlib.h> 
-#include <stdio.h> 
-#include <error.h> 
-#include <ctype.h> 
+#include <stdlib.h>
+#include <stdio.h>
+#ifdef PARROT_HAS_HEADER_ERROR    /* Not tested by Configure.pl yet */
+#  include <error.h>
+#endif
+#include <ctype.h>
 typedef int boolean;
 int warning_status;
 typedef int eval_t;
@@ -32,7 +34,7 @@ typedef int eval_t;
 /* This file contains the functions to evaluate integer expressions for
    the "eval" macro.  It is a little, fairly self-contained module, with
    its own scanner, and a recursive descent parser.  The only entry point
-   is evaluate ().  
+   is evaluate ().
 */
 
 
@@ -277,7 +279,7 @@ evaluate (const char *expr, eval_t *val)
 
   if (err == NO_ERROR && *eval_text != '\0')
     err = EXCESS_INPUT;
-    
+
   switch (err)
     {
     case NO_ERROR:
@@ -932,31 +934,31 @@ m4_eval_compiler( Parrot_Interp interpreter, const char *program )
      */
     pc = cur_cs->base.data;
     /* first integer return value */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
-    *pc++ = 5; 
-    *pc++ = value; 
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = 5;
+    *pc++ = value;
     /* promise to fill in the counters */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
-    *pc++ = 0; 
-    *pc++ = 1; 
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = 0;
+    *pc++ = 1;
     /* one integer return value */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
-    *pc++ = 1; 
-    *pc++ = 1; 
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = 1;
+    *pc++ = 1;
     /* no string return values */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
-    *pc++ = 2; 
-    *pc++ = 0; 
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = 2;
+    *pc++ = 0;
     /* no PMC return values */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
-    *pc++ = 3; 
-    *pc++ = 0; 
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = 3;
+    *pc++ = 0;
     /* no numeric return values */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
-    *pc++ = 3; 
-    *pc++ = 0; 
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = 3;
+    *pc++ = 0;
     /* do something else now */
-    *pc++ = interpreter->op_lib->op_code("end", 1); 
+    *pc++ = interpreter->op_lib->op_code("end", 1);
 
     return pf;
 }
