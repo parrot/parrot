@@ -197,7 +197,11 @@ static void compact_pool(struct Parrot_Interp *interpreter,
             cur_block = cur_block->prev;
         }
     }
+    /* this makes for ever increasing allocations but
+     * fewer collect runs */
+#ifdef WE_WANT_EVER_GROWING_ALLOCATIONS
     total_size += pool->minimum_block_size;
+#endif
 
     /* Snag a block big enough for everything */
     new_block = alloc_new_block(interpreter, total_size, pool);
