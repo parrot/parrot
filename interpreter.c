@@ -463,7 +463,7 @@ runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
     return pc;
 }
 
-/*=for api interpreter runops
+/*=for api interpreter runops_int
  * run parrot operations of loaded code segment until an end opcode is reached
  * run core is selected depending on the Interp_flags
  * when a restart opcode is encountered a different core my be selected
@@ -563,6 +563,9 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
     }
 }
 
+/*=for api interpreter runops_ex
+ * handles intersegment jumps from eval'ed code
+ */
 static void
 runops_ex(struct Parrot_Interp *interpreter, size_t offset)
 {
@@ -601,6 +604,10 @@ runops_ex(struct Parrot_Interp *interpreter, size_t offset)
     }
 }
 
+/*=for api interpreter runops
+ * run parrot ops
+ * set exception handler and/or resume after exception
+ */
 #ifdef PARROT_HAS_HEADER_SETJMP
 /* XXX s. exception.c */
 extern Parrot_exception the_exception;
@@ -628,6 +635,36 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
 #if 0
     do_exception(EXCEPT_exit, 0);
 #endif
+}
+
+/*=for api interpreter Parrot_runops_fromc
+ * run parrot ops, called from c code
+ * function arguments are already setup according to PCC
+ * the sub argument is an invocable Sub PMC
+ */
+
+void
+Parrot_runops_fromc(struct Parrot_Interp *interpreter, PMC *sub)
+{
+    static PMC *ret_c = NULL;
+    opcode_t offset, *dest;
+
+    /* we ever need one return continuation with a NULL offset */
+    if (!ret_c) {
+        ret_c = pmc_new(interpreter, enum_class_RetContinuation);
+    }
+    REG_PMC(1) = ret_c;
+    /* invoke the sub, which places the context of the sub in the
+     * interpreter, and switches code segments if needed
+     */
+    dest = VTABLE_invoke(interpreter, sub, NULL);
+    if (!dest) {
+        /* code was run inside invoke - probably - e.g. for NCI */
+        return;
+    }
+
+    offset = dest - interpreter->code->byte_code;
+    runops(interpreter, offset);
 }
 
 static int
