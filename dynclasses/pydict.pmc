@@ -346,6 +346,20 @@ Returns the big number value for the element at C<*key>.
 
 /*
 
+=item C<void set_integer_keyed(PMC *key, STRING *value)>
+
+=cut
+
+*/
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+         PMC *ivalue = pmc_new(INTERP, dynclass_PyInt);
+         VTABLE_set_integer_native(INTERP, ivalue, value);
+         VTABLE_set_pmc_keyed(INTERP, SELF, key, ivalue);
+    }
+
+/*
+
 =item C<void set_pmc_keyed(PMC *key, PMC *value)>
 
 =cut
