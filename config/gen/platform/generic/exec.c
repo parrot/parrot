@@ -39,3 +39,16 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command)
     }
     return 1;	/* make gcc happy */
 }
+
+void
+Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command) {
+  /* Be horribly profligate with memory, since we're
+     about to be something else */
+  int status;
+  status = execlp("sh", "sh", "-c",
+		  string_to_cstring(interpreter, command), NULL);
+  /* if we get here, something's horribly wrong... */
+  if (status) {
+    internal_exception(NOSPAWN, "Exec failed, code %i", status);
+  }
+}

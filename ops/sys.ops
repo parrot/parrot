@@ -30,6 +30,20 @@ inline op spawnw(out INT, in STR) {
   goto NEXT();
 }
 
+=item B<exec>(in STR)
+
+Execute the passed-in command. Completely tosses the current process
+image and replaces it with the command. Doesn't exit (the program
+ends, after all), though it does throw an exception if something goes
+wrong.
+
+=cut
+
+inline op exec(in STR) {
+  Parrot_Exec_OS_Command(interpreter, $1);
+  goto NEXT();
+}
+
 ###############################################################################
 
 =item B<err>(out INT)

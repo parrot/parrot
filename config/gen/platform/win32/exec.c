@@ -43,3 +43,7 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
     return status;
 }
 
+void 
+Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command) {
+  internal_exception(NOSPAWN, "Exec not implemented");
+}

@@ -121,6 +121,7 @@ int get_sys_timer_ms(void *handle);
 struct parrot_string_t;
 struct Parrot_Interp;
 INTVAL Parrot_Run_OS_Command(struct Parrot_Interp*, struct parrot_string_t *);
+void Parrot_Exec_OS_Command(struct Parrot_Interp*, struct parrot_string_t *);
 
 /*
  * Local variables:
