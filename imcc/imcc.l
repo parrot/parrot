@@ -202,6 +202,8 @@ SP              [ ]
 ".endclass"     return(ENDCLASS);
 ".namespace"    return(NAMESPACE);
 ".endnamespace" return(ENDNAMESPACE);
+".field"        return(FIELD);
+".method"       return(METHOD);
 ".local"        return(LOCAL);
 ".const"        return(CONST);
 ".globalconst"  return(GLOBAL_CONST);

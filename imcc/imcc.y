@@ -201,7 +201,8 @@ static char * inv_op(char *op) {
 %nonassoc <t> PARAM
 
 %token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS NEW END SAVEALL RESTOREALL
-%token <t> SUB NAMESPACE ENDNAMESPACE CLASS ENDCLASS SYM LOCAL CONST
+%token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD METHOD
+%token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
@@ -215,7 +216,8 @@ static char * inv_op(char *op) {
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
 %token <s> PARROT_OP
 %type <t> type
-%type <i> program sub sub_start emit pcc_sub sub_body pcc_ret pcc_yield
+%type <i> program class class_body member_decls member_decl field_decl method_decl
+%type <i> sub sub_start emit pcc_sub sub_body pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit
 %type <s> classname relop
 %type <i> labels _labels label statements statement
@@ -243,7 +245,9 @@ program:                         { open_comp_unit(); $$ = 0;}
     compilation_units            { close_comp_unit(interp); $$ = 0; }
     ;
 
-compilation_unit:    sub
+compilation_unit:
+          class
+        | sub
         | pcc_sub
         | emit
         | MACRO '\n'                  { $$ = 0; }
@@ -253,7 +257,6 @@ compilation_unit:    sub
 compilation_units: compilation_unit
     | compilation_units compilation_unit
     ;
-
 
 pasmcode: pasmline
     | pasmcode pasmline
@@ -276,6 +279,7 @@ pasm_inst: {clear_state();}
                                         }
     | /* none */                        { $$ = 0;}
     ;
+
 pasm_args:
     vars
     ;
@@ -287,6 +291,39 @@ emit:
       EOM 				{ if (optimizer_level & OPT_PASM)
                                                 allocate(interp);
                                           emit_flush(interp); $$=0;}
+    ;
+
+class:
+        CLASS class_body ENDCLASS
+        { $$ = 0; }
+    ;
+
+class_body:
+        member_decls
+    ;
+
+member_decls:
+        member_decl
+    |   member_decls member_decl
+    ; 
+
+member_decl:
+        field_decl
+    |   method_decl
+    ;
+
+field_decl:
+        FIELD type IDENTIFIER
+        {
+           $$ = 0;
+        }
+    ;
+
+method_decl:
+        METHOD IDENTIFIER
+        {
+           $$ = 0;
+        }
     ;
 
 sub:	sub_start
