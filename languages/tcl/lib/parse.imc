@@ -17,21 +17,12 @@ word, and whitespace encountered here is added into the string.
   .param int preserve_whitespace
   .param int block_interpolation
 
-  #print "BUFFER="
-  #print buffer
-  #print "\n"
-  #print "preserve_whitespace="
-  #print preserve_whitespace
-  #print "\n"
-
   # TclWord
   .local pmc word 
 
-  .local int tclword
+  .local int tclword,TclList
   tclword = find_type "TclWord"
-  #print "TYPE OF TCLWORD IS:"
-  #print tclword
-  #print "\n"
+  TclList = find_type "TclList"
 
   # Keep track of the position of the current word
   .local int start_word
@@ -48,14 +39,60 @@ word, and whitespace encountered here is added into the string.
 
   # An array of commands, the current command
   .local pmc commands
-  commands = new PerlArray
+  commands = new TclList
 
-  .local PerlArray command
+  .local pmc command
 
-  # macros..
-  .include "languages/tcl/lib/macros/is_space.imc"
+  ## backslash_newline_substitution {
 
-  buffer = __backslash_newline_subst(buffer)
+  .local string bs_nl
+  .local int bs_marker
+  .local int bs_pos
+  .local int bs_retval
+  .local int bs_buffer_length
+  .local int bs_diff
+  .local string bs_a_char
+  .local int bs_a_byte
+
+  bs_nl = ""
+  # \
+  chr bs_a_char, 92
+  concat bs_nl, bs_a_char
+  # <NL>
+  chr bs_a_char, 10
+  concat bs_nl, bs_a_char
+  bs_marker=0
+
+bs_loop_outer:
+  length bs_buffer_length, buffer
+  if bs_marker > bs_buffer_length goto bs_my_end
+  index bs_pos, buffer, bs_nl, bs_marker
+  if bs_pos == -1 goto bs_my_end
+
+  bs_marker = bs_pos
+
+  # skip one byte of the two byte marker,
+  # the second is skipped in the loop, and
+  # we then use that inc as the loop increment as well.
+  inc bs_pos
+
+bs_loop_inner:
+  inc bs_pos
+
+  ord bs_a_byte, buffer, bs_pos
+
+  .is_space(bs_a_byte,bs_retval)
+
+  if bs_retval == 1 goto bs_loop_inner
+
+  # delete the items from marker to pos
+
+  bs_diff = bs_pos - bs_marker
+  substr buffer,bs_marker,bs_diff," "
+  goto bs_loop_outer
+
+bs_my_end:
+  ## backslash_newline_substitution }
 
   # (Do this after the newline_subst since this could change the
   #  size of the buffer.)  ... don't fall off the end
@@ -65,7 +102,7 @@ word, and whitespace encountered here is added into the string.
 
 begin_command:
   #print "begin_command:\n"
-  command = new PerlArray
+  command = new TclList
 
 begin_word:
   #print "begin_word:\n"
@@ -239,8 +276,7 @@ end_command_2:
   goto begin_command
 
 handle_brace:
-  word_length = __match_close(buffer,start_word)
-
+  .match_close(buffer,start_word,word_length)
   if word_length < 0 goto bad_block
   end_of_word = 1 
 
@@ -259,7 +295,7 @@ handle_brace:
 
 # This looks very much like handle_brace, eh?
 handle_quote:
-  word_length = __match_close(buffer,start_word)
+  .match_close(buffer,start_word,word_length)
 
   if word_length < 0 goto bad_block
   end_of_word = 1 
@@ -289,7 +325,9 @@ handle_variable:
   old_length = word_length
   .local int chunk_start
   chunk_start = start_word + word_length
+  # XXX Why oh why doesn't this work as a macro? (IMCC BUG?)
   word_length = __match_close(buffer,chunk_start)
+  #.match_close(buffer,chunk_start,word_length)
 
   # if there's any word so far, save it
   if old_length == 0 goto handle_variable_1
@@ -461,7 +499,9 @@ handle_command_block:
   old_length = word_length
   .local int chunk_start
   chunk_start = start_word + word_length
+  # This macro causes an error.
   word_length = __match_close(buffer,chunk_start)
+  #.match_close(buffer,chunk_start,word_length)
 
   if word_length < 0 goto bad_block
 
