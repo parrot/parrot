@@ -70,6 +70,14 @@ Look at docs/parrot.pod and docs/intro.pod for where to go from here.
 If you have any problems, see the section "Reporting Problems" in
 docs/intro.pod.
 
+NOTES
+-----
+
+On some older computers with little RAM, the computed-goto dispatch core
+(core_ops_cg.c) may take a while to compile or may fail to compile at all.
+You can pass a flag to Configure (--cgoto=0) to disable the computed-goto
+core, at a slight cost in runtime speed.
+
 CHANGES
 -------
 
