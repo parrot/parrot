@@ -130,7 +130,7 @@ Parrot_pop_s(struct Parrot_Interp *interpreter, void *where)
     if (top->used > 0) {
         top->used--;
         memcpy(where,
-               &top->SRegFrame[top->used], sizeof(struct SReg));
+               &top->SRegFrame[top->used], sizeof(struct SRegFrame));
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
@@ -337,7 +337,7 @@ Parrot_pop_off_stack(void *thing, INTVAL type)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
