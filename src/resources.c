@@ -76,7 +76,7 @@ alloc_new_block(struct Parrot_Interp *interpreter,
     http://archive.develooper.com/perl6-internals%40perl.org/msg12310.html
     for details.
     Currently, we work around it by forcing all the *ALIGNMENT
-    #defines in include/parrot/*.h to be the same :-).
+    #defines in include/parrot/<file>.h to be the same :-).
 */
 /* Allocates memory for headers */
 static void *
