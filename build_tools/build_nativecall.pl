@@ -332,10 +332,14 @@ close NCI;
 sub make_arg {
     my ($argtype, $reg_ref) = @_;
     /p/ && do {my $regnum = $reg_ref->{p}++;
-	       return "PMC_data(REG_PMC($regnum))";
+	       my $tempnum = $tempcounter++;
+	       push @extra_preamble, "void *tempvar$tempnum = PMC_data(REG_PMC($regnum));\n";
+	       return "tempvar$tempnum";
               };
     /i/ && do {my $regnum = $reg_ref->{i}++;
-	       return "(int)REG_INT($regnum)";
+	       my $tempnum = $tempcounter++;
+	       push @extra_preamble, "int *tempvar$tempnum = (int)REG_INT($regnum);\n";
+	       return "tempvar$tempnum";
               };
     /3/ && do {my $regnum = $reg_ref->{p}++;
 	       return "(int*)&PMC_int_val(REG_PMC($regnum))";
