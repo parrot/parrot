@@ -17,7 +17,7 @@
 /* Create a new free pool */
 static struct free_pool *
 new_free_pool(struct Parrot_Interp *interpreter, size_t entries,
-              void (*replenish)(struct Parrot_Interp *, struct free_pool*))
+              void (*replenish)(struct Parrot_Interp *, struct free_pool *))
 {
     struct free_pool *pool;
     size_t temp_len;
@@ -43,7 +43,7 @@ add_to_free_pool(struct Parrot_Interp *interpreter,
     void **temp_ptr;
 
     /* First, check and see if there's enough space in the free pool. If
-     we're within the size of a pointer, we make it bigger */
+     * we're within the size of a pointer, we make it bigger */
     if (pool->entries_in_pool * sizeof(void *) >=
         pool->pool_buffer.buflen - sizeof(void *)) {
         /* If not, make the free pool bigger. We enlarge it by 20% */
@@ -68,10 +68,9 @@ add_to_free_pool(struct Parrot_Interp *interpreter,
  * If the pool is still empty, call the replenishment function
  */
 static void *
-get_from_free_pool(struct Parrot_Interp *interpreter,
-                   struct free_pool *pool)
+get_from_free_pool(struct Parrot_Interp *interpreter, struct free_pool *pool)
 {
-    void ** ptr;
+    void **ptr;
 
     if (!pool->entries_in_pool) {
         Parrot_do_dod_run(interpreter);
@@ -132,13 +131,15 @@ Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter)
 
 /* We have no more headers on the free header pool. Go allocate more
    and put them on */
-static void alloc_more_pmc_headers(struct Parrot_Interp *interpreter,
+static void
+alloc_more_pmc_headers(struct Parrot_Interp *interpreter,
                                    struct free_pool *pool)
 {
     Parrot_new_pmc_header_arena(interpreter);
 }
 
-PMC *new_pmc_header(struct Parrot_Interp *interpreter)
+PMC *
+new_pmc_header(struct Parrot_Interp *interpreter)
 {
     PMC *return_me;
 
@@ -164,16 +165,18 @@ PMC *new_pmc_header(struct Parrot_Interp *interpreter)
     return return_me;
 }
 
-void free_pmc(PMC *pmc)
+void
+free_pmc(PMC *pmc)
 {
     if (pmc) {
         memset(pmc, 0, sizeof(PMC));
     }
 }
 
-Buffer *new_tracked_header(struct Parrot_Interp *interpreter, size_t size)
+Buffer *
+new_tracked_header(struct Parrot_Interp *interpreter, size_t size)
 {
-    UNUSED (interpreter);
+    UNUSED(interpreter);
     return (Buffer *)mem_sys_allocate(size);
 }
 
@@ -226,7 +229,7 @@ new_buffer_header(struct Parrot_Interp *interpreter)
     Buffer *return_me;
 
     /* Icky special case. Grab system memory if there's no interpreter
-       yet */
+     * yet */
     if (interpreter == NULL) {
         return_me = mem_sys_allocate(sizeof(Buffer));
         return_me->flags = BUFFER_live_FLAG;
@@ -246,7 +249,8 @@ new_buffer_header(struct Parrot_Interp *interpreter)
     return return_me;
 }
 
-void free_buffer(Buffer *thing)
+void
+free_buffer(Buffer *thing)
 {
     if (thing) {
         if (thing->bufstart && (thing->flags & BUFFER_sysmem_FLAG)) {
@@ -319,8 +323,8 @@ PMC *
 mark_used(PMC *used_pmc, PMC *current_end_of_list)
 {
     /* If the PMC we've been handed has already been marked as live
-       (ie we put it on the list already) we just return. Otherwise we
-       could get in some nasty loops */
+     * (ie we put it on the list already) we just return. Otherwise we
+     * could get in some nasty loops */
     if (used_pmc->next_for_GC) {
         return current_end_of_list;
     }
@@ -343,14 +347,14 @@ static void
 trace_active_PMCs(struct Parrot_Interp *interpreter)
 {
     PMC *last, *current, *prev; /* Pointers to the last marked PMC, the
-                                   currently being processed PMC, and in
-                                   the previously processed PMC in a loop. */
+                                 * currently being processed PMC, and in
+                                 * the previously processed PMC in a loop. */
     unsigned int i, j, chunks_traced;
     Stack_chunk *cur_stack, *start_stack;
     struct PRegChunk *cur_chunk;
 
     /* We have to start somewhere, and the global stash is a good
-       place */
+     * place */
     last = current = interpreter->perl_stash->stash_hash;
 
     /* mark it as used and get an updated end of list */
@@ -358,7 +362,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
 
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
-    for (i=0; i < NUM_REGISTERS; i++) {
+    for (i = 0; i < NUM_REGISTERS; i++) {
         if (interpreter->pmc_reg.registers[i]) {
             last = mark_used(interpreter->pmc_reg.registers[i], last);
         }
@@ -369,40 +373,40 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     for (cur_chunk = interpreter->pmc_reg_top; cur_chunk;
          cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
-            for (i=0; i < NUM_REGISTERS; i++) {
-                if(cur_chunk->PReg[j].registers[i]) {
-                    last =mark_used(cur_chunk->PReg[j].registers[i], last);
+            for (i = 0; i < NUM_REGISTERS; i++) {
+                if (cur_chunk->PReg[j].registers[i]) {
+                    last = mark_used(cur_chunk->PReg[j].registers[i], last);
                 }
             }
         }
     }
-    
+
     /* Finally the general stack */
     start_stack = cur_stack = interpreter->user_stack;
     chunks_traced = 0;
     /* The general stack's circular, so we need to be careful */
-    while(cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
+    while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
         for (i = 0; i < cur_stack->used; i++) {
             if (STACK_ENTRY_PMC == cur_stack->entry[i].entry_type) {
                 last = mark_used(cur_stack->entry[i].entry.pmc_val, last);
             }
         }
-        
+
         chunks_traced++;
         cur_stack = cur_stack->prev;
     }
 
 
     /* Okay, we've marked the whole root set, and should have a
-       good-sized list 'o things to look at. Run through it */
+     * good-sized list 'o things to look at. Run through it */
     prev = NULL;
     for (; current != prev; current = current->next_for_GC) {
         UINTVAL mask = PMC_is_PMC_ptr_FLAG | PMC_is_buffer_ptr_FLAG | PMC_custom_mark_FLAG;
         UINTVAL bits = current->flags & mask;
 
         /* Start by checking if there's anything at all. This assumes
-           that the largest percentage of PMCs won't have anything in
-           their data pointer that we need to trace */
+         * that the largest percentage of PMCs won't have anything in
+         * their data pointer that we need to trace */
         if (bits) {
             if (bits == PMC_is_PMC_ptr_FLAG) {
                 last = mark_used(current->data, last);
@@ -437,15 +441,16 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
 /* Scan any buffers in S registers and other non-PMC places and mark
    them as active */
 static void
-    trace_active_buffers(struct Parrot_Interp *interpreter) {
+trace_active_buffers(struct Parrot_Interp *interpreter)
+{
     UINTVAL i, j, chunks_traced;
     Stack_chunk *cur_stack, *start_stack;
     struct SRegChunk *cur_chunk;
 
     /* First mark the current set. We assume that all pointers in S
-       registers are pointing to valid buffers. This is not a good
-       assumption, but it'll do for now */
-    for (i=0; i < NUM_REGISTERS; i++) {
+     * registers are pointing to valid buffers. This is not a good
+     * assumption, but it'll do for now */
+    for (i = 0; i < NUM_REGISTERS; i++) {
         if (interpreter->string_reg.registers[i]) {
             buffer_lives((Buffer *)interpreter->string_reg.registers[i]);
         }
@@ -454,12 +459,10 @@ static void
     /* Now walk the string stack. Make sure to walk from top down
      * since stack may have segments above top that we shouldn't walk. */
     for (cur_chunk = interpreter->string_reg_top;
-         cur_chunk;
-         cur_chunk = cur_chunk->prev)
-    {
+         cur_chunk; cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
-            for (i=0; i < NUM_REGISTERS; i++) {
-                if(cur_chunk->SReg[j].registers[i]) {
+            for (i = 0; i < NUM_REGISTERS; i++) {
+                if (cur_chunk->SReg[j].registers[i]) {
                     buffer_lives((Buffer *)cur_chunk->SReg[j].registers[i]);
                 }
             }
@@ -470,7 +473,7 @@ static void
     start_stack = cur_stack = interpreter->user_stack;
     chunks_traced = 0;
     /* The general stack's circular, so we need to be careful */
-    while(cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
+    while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
         for (i = 0; i < cur_stack->used; i++) {
             if (STACK_ENTRY_STRING == cur_stack->entry[i].entry_type) {
                 buffer_lives((Buffer *)cur_stack->entry[i].entry.string_val);
@@ -543,7 +546,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     }
 
     /* First go mark all PMCs as unused */
-    mark_PMCs_unused(interpreter);  
+    mark_PMCs_unused(interpreter);
 
     /* Then mark the buffers as unused */
     mark_buffers_unused(interpreter);
@@ -568,23 +571,26 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
 
 /* We have no more headers on the free header pool. Go allocate more
    and put them on */
-static void alloc_more_string_headers(struct Parrot_Interp *interpreter,
-                                      struct free_pool *pool)
+static void
+alloc_more_string_headers(struct Parrot_Interp *interpreter,
+                          struct free_pool *pool)
 {
     struct STRING_Arena *new_arena;
     STRING *cur_string;
     int i;
 
     new_arena = mem_sys_allocate(sizeof(struct STRING_Arena));
-    new_arena->start_STRING = mem_sys_allocate(sizeof(STRING) * STRING_HEADERS_PER_ALLOC);
-    memset(new_arena->start_STRING, 0, sizeof(STRING) * STRING_HEADERS_PER_ALLOC);
+    new_arena->start_STRING =
+        mem_sys_allocate(sizeof(STRING) * STRING_HEADERS_PER_ALLOC);
+    memset(new_arena->start_STRING, 0,
+           sizeof(STRING) * STRING_HEADERS_PER_ALLOC);
     new_arena->free = 0;
     new_arena->used = STRING_HEADERS_PER_ALLOC; /* Need to rethink the
-                                                   whole arena
-                                                   free/used thing, as
-                                                   the headers go into
-                                                   a single allocation
-                                                   pool */
+                                                 * whole arena
+                                                 * free/used thing, as
+                                                 * the headers go into
+                                                 * a single allocation
+                                                 * pool */
     new_arena->next = NULL;
     new_arena->prev = interpreter->arena_base->last_STRING_Arena;
     /* Is there a previous arena */
@@ -594,7 +600,7 @@ static void alloc_more_string_headers(struct Parrot_Interp *interpreter,
 
     interpreter->arena_base->last_STRING_Arena = new_arena;
 
-  /* Note it in our stats */
+    /* Note it in our stats */
     interpreter->total_Buffers += STRING_HEADERS_PER_ALLOC;
 
     cur_string = new_arena->start_STRING;
@@ -607,12 +613,13 @@ static void alloc_more_string_headers(struct Parrot_Interp *interpreter,
 }
 
 /* Fetch a string header from the free header pool */
-STRING *new_string_header(struct Parrot_Interp *interpreter)
+STRING *
+new_string_header(struct Parrot_Interp *interpreter)
 {
     STRING *return_me;
 
     /* Icky special case. Grab system memory if there's no interpreter
-       yet */
+     * yet */
     if (interpreter == NULL) {
         return_me = mem_sys_allocate(sizeof(STRING));
         return_me->flags = BUFFER_live_FLAG;
@@ -687,7 +694,7 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
     interpreter->collect_runs++;
 
     /* Find out how much memory we've used so far. We're guaranteed to
-       use no more than this in our collection run */
+     * use no more than this in our collection run */
     total_size = calc_total_size(interpreter);
     /* Snag a block big enough for everything */
     new_block = Parrot_alloc_new_block(interpreter, total_size, 0);
@@ -709,7 +716,7 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
 
     /* Collect the PMC header pool */
     memcpy(cur_spot,
-           interpreter->arena_base->pmc_pool->pool_buffer.bufstart, 
+           interpreter->arena_base->pmc_pool->pool_buffer.bufstart,
            interpreter->arena_base->pmc_pool->pool_buffer.buflen);
     interpreter->arena_base->pmc_pool->pool_buffer.bufstart = cur_spot;
     cur_size = interpreter->arena_base->pmc_pool->pool_buffer.buflen;
@@ -789,17 +796,17 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
     interpreter->memory_collected += (new_block->top - new_block->start);
 
     /* Now we're done. Put us as the only block on the free list and
-       free the rest */
+     * free the rest */
     {
         struct Memory_Pool *cur_pool, *next_pool;
-    
+
         cur_pool = interpreter->arena_base->memory_pool;
         while (cur_pool) {
             next_pool = cur_pool->prev;
             /* Note that we don't have it any more */
             interpreter->memory_allocated -= cur_pool->size;
             /* We know the pool body and pool header are a single chunk, so
-               this is enough to get rid of 'em both */
+             * this is enough to get rid of 'em both */
             mem_sys_free(cur_pool);
             cur_pool = next_pool;
         }
@@ -827,7 +834,7 @@ Parrot_alloc_new_block(struct Parrot_Interp *interpreter,
     size_t alloc_size = (size > DEFAULT_SIZE) ? size : DEFAULT_SIZE;
     struct Memory_Pool *new_pool;
     /* Allocate a new block. Header info's on the front, plus a fudge
-     factor for good measure */
+     * factor for good measure */
     new_pool = mem_sys_allocate(sizeof(struct Memory_Pool) + alloc_size + 32);
     if (!new_pool) {
         return NULL;
@@ -844,7 +851,7 @@ Parrot_alloc_new_block(struct Parrot_Interp *interpreter,
     interpreter->memory_allocated += alloc_size;
 
     /* If this is a public pool, add it to the list of pools for this
-     interpreter */
+     * interpreter */
     if (public) {
         new_pool->prev = interpreter->arena_base->memory_pool;
         /* If we're not first, then tack us on the list */
@@ -863,7 +870,7 @@ void *
 Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
 {
     /* Put our void * pointer into something we don't have to cast
-       around with */
+     * around with */
     Buffer *buffer;
     size_t copysize;
     size_t alloc_size = tosize;
@@ -877,8 +884,8 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
         return NULL;
     }
     /* We shouldn't ever have a 0 from size, but we do. If we can
-       track down those bugs, this can be removed which would make
-       things cheaper */
+     * track down those bugs, this can be removed which would make
+     * things cheaper */
     if (copysize) {
         memcpy(mem, buffer->bufstart, copysize);
     }
@@ -895,7 +902,7 @@ void *
 Parrot_reallocate_about(Interp *interpreter, void *from, size_t tosize)
 {
     /* Put our void * pointer into something we don't have to cast
-       around with */
+     * around with */
     Buffer *buffer;
     size_t copysize;
     size_t alloc_size = tosize;
@@ -909,8 +916,8 @@ Parrot_reallocate_about(Interp *interpreter, void *from, size_t tosize)
         return NULL;
     }
     /* We shouldn't ever have a 0 from size, but we do. If we can
-       track down those bugs, this can be removed which would make
-       things cheaper */
+     * track down those bugs, this can be removed which would make
+     * things cheaper */
     if (copysize) {
         memcpy(mem, buffer->bufstart, copysize);
     }
@@ -934,7 +941,8 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 /* Allocate at least as much memory as they asked for. We round the
    amount up to the allocation quantum */
 void *
-Parrot_allocate_about(struct Parrot_Interp *interpreter, void *buffer, size_t size)
+Parrot_allocate_about(struct Parrot_Interp *interpreter, void *buffer,
+                      size_t size)
 {
     size_t req_size = size;
     ((Buffer *)buffer)->buflen = 0;
