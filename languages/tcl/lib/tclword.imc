@@ -38,12 +38,6 @@ constant. I<Used as a hint at compile time.>
 
 =cut
 
-# XXX - figure out how to get namespace-mangled constants, to replace:
-#      - const   - 0
-#      - var     - 1
-#      - command - 2
-# XXX how do I get at global constants like TCL_OK from this namespace?
-
 .namespace [ "TclWord" ]
 
 =head1 Methods
@@ -71,9 +65,8 @@ Initialize the attributes for an instance of the class
 .sub __init
   .local pmc emptyArray
   .local pmc constant
-  .local int TclList,TclInt
+  .local int TclList
 
-  TclInt = find_type "TclInt" 
   TclList = find_type "TclList" 
   emptyArray = new TclList
 
@@ -81,7 +74,7 @@ Initialize the attributes for an instance of the class
   me = interpinfo 16 #INTERPINFO_CURRENT_OBJECT
 
   setattribute me, "TclWord\x00chunks", emptyArray
-  constant = new TclInt
+  constant = new Integer
   constant = 1
   setattribute me, "TclWord\x00constant", constant
 .end
@@ -89,8 +82,6 @@ Initialize the attributes for an instance of the class
 =head2 concat_words
 
 Given an array of words, append the chunks of a given word to the existing word 
-
-XXX - need to make this respect the constant attribute.
 
 =cut
 
@@ -100,10 +91,11 @@ XXX - need to make this respect the constant attribute.
   .local pmc word
   .local pmc chunk
 
-  .local pmc these_chunks
+  .local pmc these_chunks,this_constant
   these_chunks = getattribute self, "TclWord\x00chunks" 
+  this_constant = getattribute self, "TclWord\x00constant"
 
-  .local pmc those_chunks
+  .local pmc those_chunks,that_constant
 
   .local int num_words
   .local int word_num
@@ -118,9 +110,14 @@ outer_loop:
 
   word = words[word_num]
   those_chunks = getattribute word, "TclWord\x00chunks"
+  that_constant = getattribute word, "TclWord\x00constant"
 
   num_chunks = those_chunks
   chunk_num = 0
+
+  if that_constant goto inner_loop
+  this_constant = 0
+
 inner_loop:   
   if chunk_num == num_chunks goto inner_loop_done
 
@@ -134,6 +131,9 @@ inner_loop_done:
   inc word_num
 
 outer_loop_done:
+
+  
+
 .end
 
 =head2 concat_char
@@ -225,9 +225,7 @@ later interpretation.
 .sub concat_command method
   .param string cmd
 
-  .local pmc chunk
-  .local pmc chunks
-  .local pmc parsed_cmd
+  .local pmc chunk,chunks,parsed_cmd,constant
 
   .local pmc parser 
   parser = find_global "_Tcl", "parser"
@@ -244,7 +242,9 @@ later interpretation.
   chunk[0] = 2
   chunk[1] = parsed_cmd
 
-  chunks = getattribute self, "TclWord\x00chunks"
+  chunks   = getattribute self, "TclWord\x00chunks"
+  constant = getattribute self, "TclWord\x00constant"
+  constant = 0
   push chunks, chunk
 .end
 
@@ -514,10 +514,12 @@ Return the number of chunks in this tclword.
 =head2 XXX __freeze
 
 Not implemented yet, pending delegation of C<freeze> to objects.
+(Necessary anymore?)
 
 =head2 XXX __thaw
 
 Not implemented yet, pending delegation of C<thaw> to objects.
+(Necessary anymore?)
 
 =cut
 
