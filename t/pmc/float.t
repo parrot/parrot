@@ -16,7 +16,7 @@ Tests the Float PMC.
 
 =cut
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 37;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -821,4 +821,268 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: lt");
+        new P1, .Float
+        set P1, 111.1
+        set N1, P1
+
+        lt P1, 111.2, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        lt P1, N1, BAD2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        lt P1, 111.0, BAD3
+        branch OK3
+BAD3:   print "not "
+OK3:    print "ok 3\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: lt_num");
+        new P1, .Float
+        set P1, 1.1
+        new P2, .Float
+        set P2, 1.2
+        new P3, .Float
+        set P3, 1.0
+        new P4, .Float
+        set P4, P1
+
+        lt_num P1, P2, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        lt_num P1, P4, BAD2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        lt_num P1, P3, BAD3
+        branch OK3
+BAD3:   print "not "
+OK3:    print "ok 3\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: le");
+        new P1, .Float
+        set P1, 111.1
+        set N1, P1
+
+        le P1, 111.2, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        le P1, N1, OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+        le P1, 111.0, BAD3
+        branch OK3
+BAD3:   print "not "
+OK3:    print "ok 3\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: le_num");
+        new P1, .Float
+        set P1, 1.1
+        new P2, .Float
+        set P2, 1.2
+        new P3, .Float
+        set P3, 1.0
+        new P4, .Float
+        set P4, P1
+
+        le_num P1, P2, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        le_num P1, P4, OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+        le_num P1, P3, BAD3
+        branch OK3
+BAD3:   print "not "
+OK3:    print "ok 3\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: gt");
+        new P1, .Float
+        set P1, 111.1
+        set N1, P1
+
+        gt P1, 111.2, BAD1
+        branch OK1
+BAD1:   print "not "
+OK1:    print "ok 1\n"
+
+        gt P1, N1, OK2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        gt P1, 111.0, OK3
+        print "not "
+OK3:    print "ok 3\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: gt_num");
+        new P1, .Float
+        set P1, 1.1
+        new P2, .Float
+        set P2, 1.2
+        new P3, .Float
+        set P3, 1.0
+        new P4, .Float
+        set P4, P1
+
+        gt_num P1, P2, BAD1
+        branch OK1
+BAD1:   print "not "
+OK1:    print "ok 1\n"
+
+        gt_num P1, P4, OK2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        gt_num P1, P3, OK3
+        print "not "
+OK3:    print "ok 3\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: ge");
+        new P1, .Float
+        set P1, 111.1
+        set N1, P1
+
+        ge P1, 111.2, BAD1
+        branch OK1
+BAD1:   print "not "
+OK1:    print "ok 1\n"
+
+        ge P1, N1, OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+        ge P1, 111.0, OK3
+        print "not "
+OK3:    print "ok 3\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: ge_num");
+        new P1, .Float
+        set P1, 1.1
+        new P2, .Float
+        set P2, 1.2
+        new P3, .Float
+        set P3, 1.0
+        new P4, .Float
+        set P4, P1
+
+        ge_num P1, P2, BAD1
+        branch OK1
+BAD1:   print "not "
+OK1:    print "ok 1\n"
+
+        ge_num P1, P4, OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+        ge_num P1, P3, OK3
+        print "not "
+OK3:    print "ok 3\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: cmp_num");
+        new P1, .Float
+        set P1, 1.1
+        new P2, .Float
+        set P2, 1.2
+        new P3, .Float
+        set P3, 1.0
+        new P4, .PerlNum
+        set P4, 1.1
+        new P5, .PerlNum
+        set P5, 1.2
+        new P6, .PerlNum
+        set P6, 1.0
+        new P7, .Float
+        set P7, P1
+
+        cmp_num I0, P1, P1
+        print I0
+        print "\n"
+        cmp_num I0, P1, P2
+        print I0
+        print "\n"
+        cmp_num I0, P1, P3
+        print I0
+        print "\n"
+        cmp_num I0, P1, P4
+        print I0
+        print "\n"
+        cmp_num I0, P1, P5
+        print I0
+        print "\n"
+        cmp_num I0, P1, P6
+        print I0
+        print "\n"
+        cmp_num I0, P1, P7
+        print I0
+        print "\n"
+        end
+CODE
+0
+-1
+1
+0
+-1
+1
+0
 OUTPUT
