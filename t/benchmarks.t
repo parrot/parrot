@@ -1,10 +1,24 @@
 #! perl
+# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/benchmarks.t - test scrips in examples/benchmarks
+
+=head1 DESCRIPTION
+
+Called by 'make testbench'.
+
+=cut
 
 use strict;
 use warnings;
+
 use Parrot::Test;
 use Test::More;
 
+# Set up expected output from files in 'examples/benchmarks'
 my %outputs = (
     q(addit.imc)        => qq(21001097.970000\n),
     q(addit.pasm)       => qq(21001097.970000\n),
@@ -204,9 +218,10 @@ my %outputs = (
     q(stress3.pasm) => qr/^A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
         \d+\sactive\sPMCs\n
         \d+\stotal\s\sPMCs\n$/x,
-    q(vpm.imc) => qq(100000\nl hackerjust another per\n)
+    q(vpm.imc) => qq(100000;\nl hackerjust another per\n)
 );
 
+# array_access.imc has weird output
 my %filters = ( q(array_access.imc) => \&array_access_imc_filter );
 
 sub array_access_imc_filter {
@@ -255,4 +270,3 @@ foreach ( sort keys %outputs ) {
         }
     }
 }
-
