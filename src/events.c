@@ -919,6 +919,10 @@ wait_for_wakeup(Parrot_Interp interpreter, void *next)
      * are done in do_event and we should probably suspend nested
      * event handlers sometimes
      *
+     * FIXME: the same is true for the *next param:
+     *        get rid of that, instead mangle the resume flags
+     *        and offset to stop the runloop
+     *
      */
 
     while (interpreter->sleeping) {
