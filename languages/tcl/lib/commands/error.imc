@@ -7,11 +7,8 @@
 # (So, the usage statement lies)
 
 .sub __cmd_error
-  .param PerlArray argv
+  .param pmc argv
  
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
-
   .local int argc 
   argc = argv
 
@@ -23,7 +20,7 @@
   goto done
 
 badargs:
-  retval = "wrong # args: should be \"error message ?errorInfo? ?errorCode?\"
+  retval = "wrong # args: should be \"error message ?errorInfo? ?errorCode?\""
  
  # The sole purpose of this command (and break, and continue) is to 
  # generate a specific return code. Normally, when a proc finishes TCL_OK

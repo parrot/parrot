@@ -5,7 +5,7 @@
 # expr arg [... arg arg]
 
 .sub __cmd_expr
-  .param PerlArray argv
+  .param pmc argv
   
   .local string expr
   .local int argc

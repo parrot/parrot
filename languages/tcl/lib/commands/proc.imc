@@ -2,7 +2,7 @@
 # [proc]
 
 .sub __cmd_proc
-  .param PerlArray argv
+  .param pmc argv
 
   #_dumper("proc called with",argv)
 
@@ -24,14 +24,14 @@
   args = argv[1]
   body = argv[2]
 
-  .local PerlArray arg_list
+  .local pmc arg_list
 
   arg_list = __stringToList(args)
 
   # Save the parsed body.
 
-  .local PerlArray parsed_body
-  parsed_body = __parse(body) 
+  .local pmc parsed_body
+  parsed_body = __parse(body,0)
   #_dumper("proc generated parsed body of",parsed_body)
 
   # Now, shove the parsed routine into the global hash...
@@ -41,11 +41,6 @@
   $P0[name] = parsed_body
   $P2[name] = arg_list
  
-  # XXX in retrospect, we shouldn't have to push this back into the globals.
-  
-  global "proc_body" = $P0
-  global "proc_args" = $P2
-
   goto done
  
 error:

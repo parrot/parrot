@@ -2,10 +2,8 @@
 # [rename]
 
 .sub __cmd_rename
-  .param PerlArray argv
+  .param pmc argv
   
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
 
   .local int argc 
   argc = argv
@@ -17,7 +15,7 @@
 
   .local string oldName
   .local string newName
-  .local PerlHash commands
+  .local pmc commands
  
   if argc != 2 goto error
   oldName = argv[0]
@@ -31,15 +29,9 @@
   if $I1 == 0 goto delete
 
 add:
-  .debug("Adding proc:")
-  .debug(S1)
-  .debug("\n")
   commands[newName] = $P1
 
 delete:
-  .debug("Removing proc:")
-  .debug(S1)
-  .debug("\n")
   delete commands[oldName]
 
   goto done 

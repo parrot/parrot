@@ -2,10 +2,8 @@
 # [source]
 
 .sub __cmd_source
-  .param PerlArray argv
+  .param pmc argv
  
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
 
   .local int argc 
   argc = argv
@@ -17,23 +15,21 @@
   .local string chunk
   .local int code
   .local string filename
-  .local string type
-  .local ParrotIO handle
+  .local int type
+  .local pmc handle
 
   $P1 = argv[0] 
   typeof type, $P1
-  if type != "ParrotIO" goto file
+  if type != .ParrotIO goto file
   handle = $P1
   goto loop
 
 file:
   filename = $P1
-  .debug("Trying to read filename: '")
-  .debug(filename)
-  .debug("'\n")
   $S1="<"
   open handle, filename, $S1
-  isnull $P1, badfile
+  $I0 = typeof handle
+  if $I0 == .PerlUndef goto badfile
   contents = ""
  
 loop:
@@ -43,7 +39,7 @@ loop:
   goto loop
 
 gotfile:
-  $P1 = __parse(contents)
+  $P1 = __parse(contents,0)
   (code,retval) = __interpret($P1)
   goto done
  

@@ -2,12 +2,12 @@
 # [if]
 
 .sub __cmd_if
-  .param PerlArray argv
+  .param pmc argv
  
   .local int argc 
   argc = argv
 
-  .local PerlArray elseifs
+  .local pmc elseifs
   elseifs = new PerlArray
   .local string retval
   .local string code
@@ -18,8 +18,6 @@
 
   .local int counter
 
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
   
   # XXX each one of this argv[counter] sets should be protected
   # against getting past the end of the input array... 
@@ -64,12 +62,10 @@ get_final:
   goto done
  
 do_elseifs:
-  .debug("do_elseifs:\n")
   $I1 = elseifs
   if $I1 == 0 goto do_else
   $I2 = 0
 elseif_loop:
-  .debug("elseif_loop:\n")
   if $I2 == $I1 goto do_else
   $P1 = elseifs[$I2]
   condition = $P1[0]
@@ -82,20 +78,14 @@ elseif_loop:
   goto elseif_loop  
 
 done_elseifs:
-  .debug("done_elseifs:\n")
   code = $P1[1]
   goto done
 
 do_else:
-  .debug("do_else:\n")
   code = else
 
 done:
-  .debug("do_else:\n")
-  .debug("GOING TO RUN CODE='")
-  .debug(code)
-  .debug("'\n")
-  $P1 = __parse(code)
+  $P1 = __parse(code,0)
   (return_type,retval) = __interpret($P1)
 
   .pcc_begin_return

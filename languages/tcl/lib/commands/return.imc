@@ -2,10 +2,7 @@
 # [return]
 
 .sub __cmd_return
-  .param PerlArray argv
- 
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
+  .param pmc argv
  
   .local int argc 
   argc = argv

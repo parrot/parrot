@@ -7,11 +7,8 @@
 # (So, the usage statement lies)
 
 .sub __cmd_catch
-  .param PerlArray argv
+  .param pmc argv
  
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
-
   .local int argc 
   argc = argv
 
@@ -23,7 +20,7 @@
   if argc ==0 goto badargs
   if argc > 2 goto badargs
   code = argv[0]
-  $P1 = __parse(code)
+  $P1 = __parse(code,0)
   ($I0,$S0) = __interpret($P1)
   print "script returned value='"
   print $S0

@@ -2,11 +2,15 @@
 # [puts]
 
 .sub __cmd_puts
-  .param PerlArray argv
+  .param pmc argv
+
+  #_dumper("puts called with",argv)
+
 
   .local int argc 
   argc = argv
   if argc == 0 goto error
+  if argc > 3 goto error
 
   .local int return_type  
   .local string retval
@@ -14,25 +18,67 @@
   return_type = TCL_OK
   retval = ""
  
-  $S1 = argv[0] 
-  if argc == 2 goto twoarg
-  print $S1
-  if argc == 1 goto newline
-  if argc > 2 goto error
+  if argc == 1 goto one_arg
+  if argc == 2 goto two_arg
 
-twoarg:
-  if $S1 != "-nonewline" goto error
+three_arg: 
+  $S1 = argv[0]
+  if $S1 != "-nonewline" goto bad_option
+  .local pmc channels 
+  channels = global "channels"
   $S2 = argv[1]
-  print $S2
-  goto done 
-
-error:
-  return_type = TCL_ERROR
-  retval = "Bad call to puts: \n"
+  $P1 = channels[$S2]
+  $I0 = typeof $P1
+  if $I0 == .PerlUndef goto bad_channel   
+  $S3 = argv[2]
+  print $P1, $S3
   goto done
 
-newline:
+two_arg:
+  # The first arg could be the option, or it could be a channel
+  # figure out which.
+  $S2 = argv[0]
+  if $S2 != "-nonewline" goto two_arg_channel
+two_arg_nonewline:
+  $S3 = argv[1] 
+  print $S3
+  goto done
+
+two_arg_channel:  
+  $S3 = argv[1]
+  .local pmc channels 
+  channels = global "channels"
+  $P1 = channels[$S2]
+  $I0 = typeof $P1
+  if $I0 == .PerlUndef goto bad_channel   
+  print $P1, $S3
+  print $P1, "\n"
+  goto done
+
+one_arg:
+  $S1 = argv[0]
+  print $S1
   print "\n"
+  goto done  
+
+bad_channel:
+  return_type = TCL_ERROR
+  retval = "can not find channel named \""
+  retval .= $S2
+  retval .= "\""
+  goto done
+
+bad_option:
+  return_type = TCL_ERROR
+  retval = "bad argument \""
+  retval .= $S1
+  retval .= "\": should be \"nonewline\""
+  goto done
+ 
+error:
+  return_type = TCL_ERROR
+  retval = "wrong # args: should be \"puts ?-nonewline? ?channelId? string\""
+  goto done
 
 done:
   .pcc_begin_return

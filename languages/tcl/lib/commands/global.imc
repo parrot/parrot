@@ -2,10 +2,8 @@
 # [global]
 
 .sub __cmd_global
-  .param PerlArray argv
+  .param pmc argv
  
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
 
   .local int argc 
   argc = argv

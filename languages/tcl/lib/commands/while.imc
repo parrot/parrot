@@ -2,15 +2,13 @@
 # [while]
 
 .sub __cmd_while
-  .param PerlArray argv
+  .param pmc argv
  
   .local int argc 
   argc = argv
 
   #_dumper("while called with",argv)
 
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
   # XXX no bad arg handling...
 
   .local string code
@@ -24,8 +22,7 @@
   code = argv[1]
 
 while_loop:
-  .debug("while - while loop:\n")
-  parsed_code = __parse(code)
+  parsed_code = __parse(code,0)
   $P0 = __expression(condition)
   # XXX Happy case - expression could have failed.
   $S0 = $P0[1]
@@ -49,7 +46,7 @@ done_cleaned:
   # XXX - (unless there's an error)
 
   .pcc_begin_return
-  .return return_type
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end

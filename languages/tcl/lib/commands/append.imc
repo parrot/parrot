@@ -5,11 +5,8 @@
 # append var [...]
 
 .sub __cmd_append
-  .param PerlArray argv
+  .param pmc argv
   
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
-
   .local int argc 
   argc = argv
 

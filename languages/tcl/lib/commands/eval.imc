@@ -5,7 +5,7 @@
 # eval arg [... arg arg]
 
 .sub __cmd_eval
-  .param PerlArray argv
+  .param pmc argv
   
   .local string expr
   .local int argc
@@ -28,7 +28,7 @@ loop:
 loop_done:
  
   # should handle errors here, neh? 
-  $P1 = __parse(expr)   
+  $P1 = __parse(expr,0)
   ($I0,$S0) = __interpret($P1) 
 
 done:

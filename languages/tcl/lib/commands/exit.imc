@@ -2,7 +2,7 @@
 # [exit]
 
 .sub __cmd_exit
-  .param PerlArray argv
+  .param pmc argv
 
   .local int argc
   argc = argv

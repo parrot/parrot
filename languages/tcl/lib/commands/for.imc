@@ -2,10 +2,11 @@
 # [for]
 
 .sub __cmd_for
-  .param PerlArray argv
+  .param pmc argv
  
   .local int argc 
   argc = argv
+
 
   # XXX no bad arg handling...
 
@@ -24,9 +25,9 @@
   body  = argv[3]
 
   # Parse the bits that are code.
-  start_parsed = __parse(start)
-  next_parsed  = __parse(next)
-  body_parsed  = __parse(body)
+  start_parsed = __parse(start,0)
+  next_parsed  = __parse(next,0)
+  body_parsed  = __parse(body,0)
 
   # first, execute start.
   (return_type,$S0) = __interpret(start_parsed)
@@ -59,7 +60,7 @@ done_cleansed:
   # for always returns "", regardless of the code it may have executed
 
   .pcc_begin_return
-  .return 0
+  .return return_type
   .return ""
   .pcc_end_return
 .end
