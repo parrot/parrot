@@ -46,8 +46,8 @@ sub add_code {
 
 sub emit {
 
-print <<'END';
 # -*- pasm -*- 
+print <<'END';
 
 .emit
 
@@ -67,7 +67,7 @@ pushp
 time N0
 new P0, .PerlUndef
 set P0, N0
-store_global P0, "_SV_t"
+store_global "_SV_t", P0
 popp
 popn
 ret
@@ -135,7 +135,7 @@ _die_loopstart:
 _die_unknown:
     set P0, "Unknown error."
 _die_loopend:
-    store_global P0, "_SV__BANG_"
+    store_global "_SV__BANG_", P0
 
     # Look for a CATCH handler: ###
     find_global P1, "_AV_catchers"
@@ -146,7 +146,7 @@ _die_loopend:
     dec I0
     set P0, P1[I0]
     set P1, I0
-    store_global P1, "_AV_catchers"   
+    store_global "_AV_catchers", P1
 # Implicitly refers to continuation in P0
     invoke
 _die_nohandler:
@@ -171,9 +171,9 @@ ret
 __setup:
     pushp
     new P0, .PerlArray
-    store_global P0, "_AV_catchers"
+    store_global "_AV_catchers", P0
     new P0, .PerlUndef
-    store_global P0, "_SV__BANG_"
+    store_global "_SV__BANG_", P0
     popp
     ret
 
@@ -190,7 +190,7 @@ __install_catch_endcont:
     find_global P2, "_AV_catchers"
     set I1, P2
     set P2[I1], P0
-    store_global P2, "_AV_catchers"
+    store_global "_AV_catchers", P2
 __install_catch_end:
     popi
     popp
@@ -203,7 +203,7 @@ __pop_catch:
     set I1, P2
     dec I1
     set P2, I1
-    store_global P2, "_AV_catchers"
+    store_global "_AV_catchers", P2
     popi
     popp
     ret
