@@ -30,7 +30,8 @@ teardown();
 
 my $d = Parrot::Docs::Directory->new(catfile(qw(lib Parrot Docs)));
 my @a = $d->files_of_type('Perl module');
-ok(@a == 5, 'files_of_type succeed');
+# This will fail if you add a new module.
+ok(@a == 6, 'files_of_type succeed');
 @a = $d->files_of_type('foo');
 ok(@a == 0, 'files_of_type fail');
 

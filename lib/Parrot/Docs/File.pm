@@ -29,7 +29,8 @@ use Parrot::IO::File;
 @Parrot::Docs::File::ISA = qw(Parrot::IO::File);
 
 use Pod::Simple::Checker;
-use Pod::Simple::HTML;
+#use Pod::Simple::HTML;
+use Parrot::Docs::POD2HTML;
 
 my $UNDEFINED = 'Undefined';
 
@@ -289,20 +290,20 @@ sub pod_as_html
 		
 		if ( $self->num_pod_errors == 0 )
 		{
-			my $checker = Pod::Simple::HTML->new;
+			my $formatter = Parrot::Docs::POD2HTML->new;
 		
-			$checker->output_string(\$self->{POD_HTML});
-			$checker->parse_file($self->path);
+			$formatter->output_string(\$self->{POD_HTML});
+			$formatter->parse_file($self->path);
 		}
 
-		$self->{POD_HTML} =~ s|</head>|<link rel="stylesheet" href="http://dev.perl.org/perl-styles.css" type="text/css" />\n</head>|s;
-		$self->{POD_HTML} =~ s|<body>|<body>\n\n<table width=100%>\n<tr>\n<td valign="TOP"><a href="">Contents</a></td>\n<td align="RIGHT"><img src="http://www.parrotcode.org/images/parrot.small.png"></td>\n</tr>\n</table>\n<div class="pod">\n<a name="_top"></a>\n|s;
+		#$self->{POD_HTML} =~ s|</head>|<link rel="stylesheet" href="http://dev.perl.org/perl-styles.css" type="text/css" />\n</head>|s;
+		#$self->{POD_HTML} =~ s|<body>|<body>\n\n<table width=100%>\n<tr>\n<td valign="TOP"><a href="">Contents</a></td>\n<td align="RIGHT"><img src="http://www.parrotcode.org/images/parrot.small.png"></td>\n</tr>\n</table>\n<div class="pod">\n<a name="_top"></a>\n|s;
 		$self->{POD_HTML} =~ s|</pre>|\n\n</pre>|gs;
 		$self->{POD_HTML} =~ s|\s\*\s+\b| \*|gs;
 		$self->{POD_HTML} =~ s|</h(\d)| <a href="#_top"><img alt="^" border=0 src="http://www.parrotcode.org/images/up.gif"></a></h$1|gs;
 		$self->{POD_HTML} =~ s|<dt>|<dt><b>|gs;
 		$self->{POD_HTML} =~ s|</dt>|</b></dt>|gs;
-		$self->{POD_HTML} =~ s|</body>|</div>\n\n</body>|s;
+		#$self->{POD_HTML} =~ s|</body>|</div>\n\n</body>|s;
 	}
 	
 	return $self->{POD_HTML};
@@ -340,7 +341,8 @@ sub short_description
 	
 	my $text = $self->read;
 	
-	return '' unless $text =~ /\n=head1\s+NAME\n+([^\n]+)/s;
+	# TODO - Maybe just look for file path/name - description.
+	return '' unless $text =~ /\n=head1\s+NAME[\n\r]+([^\n\r]+)/s;
 	
 	my ($path, $desc) = split /\s*-\s*/, $1, 2;
 	

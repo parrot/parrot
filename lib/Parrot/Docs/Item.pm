@@ -19,6 +19,10 @@ Directory paths will be expanded to all the file paths within the
 directory and any subdirectories recursively (see the C<files()> method
 in C<Parrot::IO::Directory>).
 
+If an item has more than one file associated with it, and has no text,
+then an attempt will be made to extract short descriptions from each
+file to place under the file path in the index HTML.
+
 =head2 Methods
 
 =over

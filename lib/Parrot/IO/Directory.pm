@@ -120,7 +120,7 @@ sub parent
 	my $self = shift;
 	my $path = shift;
 	
-	return Parrot::IO::Directory->new($self->parent_path);
+	return $self->new($self->parent_path);
 }
 
 =item C<file_and_directory_names()>
@@ -212,7 +212,8 @@ sub files
 
 =item C<directories()>
 
-This gives you an array of C<Parrot::Docs::Directory> instances.
+This gives you an array of instances of the same class as the directory
+itself.
 
 =cut
 
@@ -220,7 +221,7 @@ sub directories
 {
 	my $self = shift;
 
-	return map {Parrot::IO::Directory->new($_)} $self->directory_paths;
+	return map {$self->new($_)} $self->directory_paths;
 }
 
 =item C<file_suffixes($recursive, $ignore)>
@@ -299,7 +300,7 @@ sub directory_with_name
 	my $self = shift;
 	my $name = shift;
 	
-	return Parrot::IO::Directory->new(File::Spec->catdir($self->path, $name));
+	return $self->new(File::Spec->catdir($self->path, $name));
 }
 
 =item C<file_with_name($name)>
@@ -363,7 +364,7 @@ sub directory_with_relative_path
 	
 	$path = File::Spec->catdir($self->path, $directories, $name);
 	
-	return Parrot::IO::Directory->new($path);
+	return $self->new($path);
 }
 
 =item C<file_with_relative_path($path)>

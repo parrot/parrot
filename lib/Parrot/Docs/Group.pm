@@ -32,12 +32,13 @@ use strict;
 use Parrot::Docs::Item;
 @Parrot::Docs::Group::ISA = qw(Parrot::Docs::Item);
 
-=item C<new($name, $text, @items)>
+=item C<new($name, $text, @contents)>
 
 Returns a new group. 
 
 C<$name> and C<$text> are required, though the text can be an empty
-string. C<@items> is one or more C<Parrot::Docs::Item> instances.
+string. C<@contents> is one or more C<Parrot::Docs::Item> instances, or 
+relative paths.
 
 =cut
 
@@ -48,7 +49,7 @@ sub new
 	my $text = shift;
 	my @contents = @_;
 	
-	# Should check the items are not sections or groups.
+	# TODO - Groups should only contain items or paths.
 	
 	$self = $self->SUPER::new($text, @contents);
 	$self->{NAME} = $name;
@@ -87,9 +88,27 @@ sub write_html
 	
 	print "\n\n", $self->name unless $silent;
 	
-	foreach my $item (@{$self->{CONTENTS}})
+	foreach my $content (@{$self->{CONTENTS}})
 	{
-		$index_html .= $item->write_html($source, $target, $silent);
+		if ( ref($content) )
+		{
+			$index_html .= $content->write_html($source, $target, $silent);
+		}
+		else
+		{
+			# It would be good to check the short description for each
+			# file and create an item for sequences of files with the
+			# same description.
+			
+			my @items = map {
+				Parrot::Docs::Item->new('', $_)
+			} $self->relative_file_paths_for_relative_path($source, $content);
+			
+			foreach my $item (@items)
+			{
+				$index_html .= $item->write_html($source, $target, $silent);
+			}
+		}
 	}
 	
 	if ( $index_html )
