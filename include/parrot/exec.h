@@ -16,7 +16,11 @@
 #   define EXEC_H_GUARD
 
 #   if PARROT_EXEC_OS_OPENBSD
-#     define EXEC_A_OUT
+#     ifdef PARROT_OPENBSD_ELF
+#       define EXEC_ELF
+#     else
+#       define EXEC_A_OUT
+#     endif
 #   endif
 #   if PARROT_EXEC_OS_DARWIN
 #     define EXEC_MACH_O
