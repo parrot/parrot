@@ -28,6 +28,12 @@
 #define EXTERN extern
 #endif
 
+#define SPILL_STRESS 0
+    
+#if SPILL_STRESS 
+# undef MAX_COLOR
+# define MAX_COLOR 4
+#endif      
 
 #include "symreg.h"
 #include "instructions.h"
@@ -45,22 +51,43 @@
  */
 #define MAX_COLOR NUM_REGISTERS
 
+/*
+ * imc.c
+ */
 void imc_compile_unit(struct Parrot_Interp *, Instruction * unit);
 
-void free_reglist(struct Parrot_Interp *);
 
-const char * get_neg_op(char *op, int *nargs);
-
-int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[],
-    int narg, int keyvec);
-int get_keyvec(Parrot_Interp, int opnum);
-int is_op(struct Parrot_Interp *, char *);
+/*
+ * instructions.c
+ */
 void init_tables(struct Parrot_Interp * interp);
 
+/*
+ * optimizer.c
+ */
+const char * get_neg_op(char *op, int *nargs);
+
+/*
+ * reg_alloc.c
+ */
+void imc_reg_alloc(struct Parrot_Interp *, Instruction * unit);
+void free_reglist(struct Parrot_Interp *);
+
+/*
+ * parser_util.c
+ */
+int get_keyvec(Parrot_Interp, int opnum);
+int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[],
+    int narg, int keyvec);
+int is_op(struct Parrot_Interp *, char *);
+char *str_dup(const char *);
+char *str_cat(const char *, const char *);
 int imcc_vfprintf(FILE *fd, const char *format, va_list ap);
 int imcc_fprintf(FILE *fd, const char *fmt, ...);
 
-/* pcc protos */
+/* 
+ * pcc.c
+ */
 void expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins);
 void expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins);
 void expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins);
@@ -69,10 +96,6 @@ void pcc_optimize(Parrot_Interp interpreter);
 int pcc_sub_reads(Instruction* ins, SymReg* r);
 int pcc_sub_writes(Instruction* ins, SymReg* r);
 
-/* This should be common with Cola */
-
-char *str_dup(const char *);
-char *str_cat(const char *, const char *);
 
 /* globals */
 

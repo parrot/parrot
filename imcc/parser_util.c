@@ -705,6 +705,39 @@ imcc_vfprintf(FILE *fd, const char *format, va_list ap) {
 }
 
 /*
+ * Utility functions
+ */
+
+char *
+str_dup(const char * old)
+{
+    char * copy = (char *)malloc(strlen(old) + 1);
+    if (copy == NULL) {
+        fatal(1, "str_dup", "Out of mem\n");
+    }
+    strcpy(copy, old);
+#ifdef MEMDEBUG
+    debug(interpreter, 1,"line %d str_dup %s [%x]\n", line, old, copy);
+#endif
+    return copy;
+}       
+    
+char *
+str_cat(const char * s1, const char * s2)
+{
+    int len = strlen(s1) + strlen(s2) + 1;
+    char * s3 = malloc(len);
+    if (s3 == NULL) {
+        fatal(1, "str_cat", "Out of mem\n");
+    }
+    strcpy(s3, s1);
+    strcat(s3, s2);
+    return s3;
+}   
+
+
+
+/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
