@@ -156,7 +156,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *class) {
     VTABLE_set_pmc_keyed_int(interpreter, new_object_array, 1,
                              VTABLE_get_pmc_keyed_int(interpreter, class_array, 4));
 
-    /* Allocate teh object itself */
+    /* Allocate the object itself */
     new_object = pmc_new(interpreter, enum_class_ParrotObject);
     /* Note the number of used slots */
     new_object->cache.int_val = 2;
