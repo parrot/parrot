@@ -1009,7 +1009,7 @@ interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
 
 void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
 {
-    PMC* key, *hash;
+    PMC* key, *hash, *nci;
     PMC* iglobals = interpreter->iglobals;
     hash = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
             IGLOBALS_COMPREG_HASH);
@@ -1019,22 +1019,22 @@ void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
         VTABLE_set_pmc_keyed_int(interpreter, iglobals,
                 (INTVAL)IGLOBALS_COMPREG_HASH, hash);
     }
+    nci = pmc_new(interpreter, enum_class_Compiler);
     key = key_new_string(interpreter, type);
-    VTABLE_set_pmc_keyed(interpreter, hash, key, func);
+    VTABLE_set_pmc_keyed(interpreter, hash, key, nci);
+    /* build native call interface fir the C sub in "func" */
+    VTABLE_set_string_keyed(interpreter, nci, func,
+            string_from_cstring(interpreter, "pIt", 0));
 }
 
 
 static void setup_default_compreg(Parrot_Interp interpreter)
 {
-    STRING *pasm1 = string_make(interpreter, "PASM1", 5, NULL,0,NULL);
-    PMC * nci;
+    STRING *pasm1 = string_from_cstring(interpreter, "PASM1", 0);
+
     Parrot_csub_t p = (Parrot_csub_t) PDB_compile;
-    nci = pmc_new(interpreter, enum_class_Compiler);
     /* register the nci ccompiler object */
-    Parrot_compreg(interpreter, pasm1, nci);
-    /* build native call interface */
-    VTABLE_set_string_keyed(interpreter, nci, (PMC*)F2DPTR(p),
-            string_make(interpreter, "pIt", 3, NULL,0,NULL));
+    Parrot_compreg(interpreter, pasm1, (PMC*)F2DPTR(p));
 }
 
 INTVAL

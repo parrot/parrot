@@ -126,7 +126,8 @@ INS(struct Parrot_Interp *interpreter, char *name, char *fmt, SymReg **r,
  *
  * compile a pasm or imcc string
  *
- * FIXME compile to a new PackFile - we need separate constants
+ * FIXME as we have separate constants, the old constants in ghash must
+ *       be deleted.
  *
  */
 extern void* yy_scan_string(const char *);
@@ -245,23 +246,13 @@ void register_compilers(Parrot_Interp interp)
     STRING *pasm = string_from_cstring(interp, "PASM", 0);
     STRING *pir = string_from_cstring(interp, "PIR", 0);
     STRING *source = string_from_cstring(interp, "FILE", 0);
-    STRING *sig =    string_from_cstring(interp, "pIt", 0);
-    PMC * func;
     Parrot_csub_t pa = (Parrot_csub_t)imcc_compile_pasm;
     Parrot_csub_t pi = (Parrot_csub_t)imcc_compile_pir;
     Parrot_csub_t ps = (Parrot_csub_t)imcc_compile_file;
 
-    func = pmc_new(interp, enum_class_Compiler);
-    Parrot_compreg(interp, pasm, func);
-    VTABLE_set_string_keyed(interp, func, (PMC*)F2DPTR(pa), sig);
-
-    func = pmc_new(interp, enum_class_Compiler);
-    Parrot_compreg(interp, pir, func);
-    VTABLE_set_string_keyed(interp, func, (PMC*)F2DPTR(pi), sig);
-
-    func = pmc_new(interp, enum_class_Compiler);
-    Parrot_compreg(interp, source, func);
-    VTABLE_set_string_keyed(interp, func, (PMC*)F2DPTR(ps), sig);
+    Parrot_compreg(interp, pasm, (PMC*)F2DPTR(pa));
+    Parrot_compreg(interp, pir, (PMC*)F2DPTR(pi));
+    Parrot_compreg(interp, source, (PMC*)F2DPTR(ps) );
 }
 
 
