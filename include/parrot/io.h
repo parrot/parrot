@@ -190,6 +190,8 @@ struct _ParrotIOLayerAPI {
                                   DummyCodeRef *);
     INTVAL          (*Flush)(theINTERP, ParrotIOLayer * layer,
                              ParrotIO * io);
+    size_t          (*Peek)(theINTERP, ParrotIOLayer * layer,
+                            ParrotIO * io, void * buf);
     PIOOFF_T        (*Seek)(theINTERP, ParrotIOLayer * layer,
                             ParrotIO * io, PIOOFF_T offset, INTVAL whence);
     PIOOFF_T        (*Tell)(theINTERP, ParrotIOLayer * layer,
@@ -269,6 +271,7 @@ extern INTVAL PIO_write(theINTERP, PMC *, const void *, size_t);
 extern INTVAL PIO_setbuf(theINTERP, PMC *, size_t);
 extern INTVAL PIO_setlinebuf(theINTERP, PMC *);
 extern INTVAL PIO_puts(theINTERP, PMC *, const char *);
+extern INTVAL PIO_peek(theINTERP, PMC *, void *);
 extern PIOOFF_T PIO_seek(theINTERP, PMC *, PIOOFF_T offset, INTVAL whence);
 extern INTVAL PIO_eof(theINTERP, PMC *);
 extern INTVAL PIO_pioctl(theINTERP, PMC *, INTVAL cmd, INTVAL arg);

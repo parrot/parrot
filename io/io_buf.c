@@ -51,6 +51,8 @@ static size_t    PIO_buf_read(theINTERP, ParrotIOLayer *l,
                               ParrotIO *io, void *buffer, size_t len);
 static size_t    PIO_buf_write(theINTERP, ParrotIOLayer *l,
                                ParrotIO *io, const void *buffer, size_t len);
+static size_t    PIO_buf_peek(theINTERP, ParrotIOLayer *l,
+                              ParrotIO *io, void *buffer);
 static PIOOFF_T  PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                               PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
@@ -467,6 +469,50 @@ that is what is required.
 */
 
 static size_t
+PIO_buf_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, void *buffer)
+{
+    unsigned char *out_buf = buffer;
+    ParrotIOLayer *l = layer;
+    ParrotIOBuf *b;
+    size_t len = 1;
+
+    /* write buffer flush */
+    if (io->b.flags & PIO_BF_WRITEBUF) {
+        PIO_buf_flush(interpreter, layer, io);
+    }
+
+    b = &io->b;
+
+    /* read Data from buffer */
+    if (b->flags & PIO_BF_READBUF) {
+        size_t avail = b->endb - b->next;
+
+        /* if we have data available, copy out the next byte */
+        if (avail) {
+            memcpy(out_buf, b->next, len);
+            return len;
+        }
+    }
+
+    /* (re)fill the buffer */
+    if (! (b->flags & PIO_BF_READBUF)) {
+        size_t got;
+        /* exception if we're unbuffered */
+        if (io->b.size == 0)
+            internal_exception(PIO_ERROR, "Can't peek at unbuffered PIO");
+
+        got = PIO_buf_fill_readbuf(interpreter, l, io, b);
+        len = (len < got) ? len : got;
+    }
+
+    /* if we got any data, then copy out the next byte */
+    memcpy(out_buf, io->b.next, len);
+
+    return len;
+}
+
+
+static size_t
 PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                  void *buffer, size_t len)
 {
@@ -673,6 +719,7 @@ ParrotIOLayerAPI pio_buf_layer_api = {
     PIO_buf_read,
     PIO_null_read_async,
     PIO_buf_flush,
+    PIO_buf_peek,
     PIO_buf_seek,
     PIO_buf_tell,
     PIO_buf_setbuf,

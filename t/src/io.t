@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 use Test::More;
 
 $/=undef; # slurp mode
@@ -626,3 +626,51 @@ the_test(struct Parrot_Interp *interpreter,
 CODE
 Hello, World
 OUTPUT
+
+###############################################################################
+
+setup("temp.file", "Hello World!");
+
+c_output_is($main . <<'CODE', <<'OUTPUT', 'peek');
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
+    ParrotIO *io;
+    char peekbuf[1024], readbuf[1024];
+    UINTVAL len;
+
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
+
+    do {
+      len = PIO_peek(interpreter, io, peekbuf);
+      peekbuf[len] = '\0';
+
+      len = PIO_read(interpreter, io, readbuf, 1);
+      readbuf[len] = '\0';
+
+      PIO_printf(interpreter, "peek = '%s', read = '%s'\n", peekbuf, readbuf);
+    } while (len > 0);
+
+
+    PIO_close(interpreter, io);
+
+    return NULL;
+}
+CODE
+peek = 'H', read = 'H'
+peek = 'e', read = 'e'
+peek = 'l', read = 'l'
+peek = 'l', read = 'l'
+peek = 'o', read = 'o'
+peek = ' ', read = ' '
+peek = 'W', read = 'W'
+peek = 'o', read = 'o'
+peek = 'r', read = 'r'
+peek = 'l', read = 'l'
+peek = 'd', read = 'd'
+peek = '!', read = '!'
+peek = '', read = ''
+OUTPUT
+
+teardown("temp.file");

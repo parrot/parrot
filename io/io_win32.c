@@ -551,6 +551,7 @@ ParrotIOLayerAPI pio_win32_layer_api = {
     PIO_win32_read,
     PIO_null_read_async,
     PIO_null_flush,
+    0, /* no peek */
     PIO_win32_seek,
     PIO_win32_tell,
     PIO_null_setbuf,

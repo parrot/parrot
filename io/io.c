@@ -647,6 +647,28 @@ PIO_parse_open_flags(const char *flagstr)
 }
 
 /*
+=item C<INTVAL
+PIO_peek(theINTERP, PMC *pmc, void *buffer)>
+
+ Iterate down the stack to the first layer implementing "Peek" API
+
+=cut
+
+*/
+
+INTVAL
+PIO_peek(theINTERP, PMC *pmc, void *buffer)
+{
+    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
+    return PIO_peek_down(interpreter, l, io, buffer);
+}
+ 
+ 
+
+/*
 
 =item C<INTVAL
 PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)>

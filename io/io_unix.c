@@ -1047,6 +1047,7 @@ ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_unix_read,
     PIO_null_read_async,
     PIO_unix_flush,
+    0, /* no peek */
     PIO_unix_seek,
     PIO_unix_tell,
     PIO_null_setbuf,

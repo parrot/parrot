@@ -56,6 +56,8 @@ static size_t    PIO_stdio_read(theINTERP, ParrotIOLayer *layer,
                                 ParrotIO *io, void *buffer, size_t len);
 static size_t    PIO_stdio_write(theINTERP, ParrotIOLayer *layer,
                                  ParrotIO *io, const void *buffer, size_t len);
+static size_t    PIO_stdio_peek(theINTERP, ParrotIOLayer *layer,
+                                ParrotIO *io, void *buffer);
 static PIOOFF_T  PIO_stdio_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                                 PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_stdio_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
@@ -262,6 +264,26 @@ PIO_stdio_isatty(PIOHANDLE fptr)
     return 0;
 }
 
+static size_t
+PIO_stdio_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, void *buffer)
+{
+    FILE *fptr = (FILE *)io->fd;
+    size_t bytes;
+
+    UNUSED(interpreter);
+    UNUSED(layer);
+
+    /* read the next byte into the buffer */
+    bytes = fread((char *)buffer, 1, 1, fptr);
+
+    /* if we got anything from the stream, push it back on */
+    if (bytes)
+        ungetc(((char *)buffer)[0], fptr);
+    
+    return bytes;
+}
+
+
 /*
 
 =item C<INTVAL
@@ -427,6 +449,7 @@ ParrotIOLayerAPI pio_stdio_layer_api = {
     PIO_stdio_read,
     PIO_null_read_async,
     PIO_stdio_flush,
+    PIO_stdio_peek,
     PIO_stdio_seek,
     PIO_stdio_tell,
     PIO_null_setbuf,

@@ -404,6 +404,47 @@ inline op readline(out STR, in PMC) {
 
 ##########################################
 
+=item B<peek>(out STR)
+
+Returns the next byte from standard input, but does not
+remove it from the stream.
+
+=item B<peek>(out STR, in PMC)
+
+Reads the next byte from an IO PMC, but does not
+remove it from the stream.
+
+=cut
+
+op peek(out STR) {
+  INTVAL nr;
+
+  $1 = string_make(interpreter, NULL, 1, NULL, 0, NULL);
+  memset(($1)->strstart, 0, 1);
+  nr = PIO_peek(interpreter, PIO_STDIN(interpreter),
+                ($1)->strstart);
+  if(nr > 0)
+    ($1)->strlen = ($1)->bufused = nr;
+  else
+    ($1)->strlen = ($1)->bufused = 0;
+  goto NEXT();
+}
+
+op peek(out STR, in PMC) {
+  INTVAL nr;
+
+  $1 = string_make(interpreter, NULL, 1, NULL, 0, NULL);
+  memset(($1)->strstart, 0, 1);
+  nr = PIO_peek(interpreter, $2, ($1)->strstart);
+  if(nr > 0)
+    ($1)->strlen = ($1)->bufused = nr;
+  else
+    ($1)->strlen = ($1)->bufused = 0;
+  goto NEXT();
+}
+
+##########################################
+
 =item B<seek>(in PMC, in INT, in INT)
 
 seek:

@@ -123,6 +123,21 @@ Returns C<-1> if no implementation is found.
 
 */
 
+size_t
+PIO_peek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, void * buf)
+{
+    while (layer) {
+        if (layer->api->Peek) {
+            return layer->api->Peek(interpreter, layer, io, buf);
+        }
+        layer = PIO_DOWNLAYER(layer);
+    }
+
+    /* No layer found */
+    return 0;
+}
+
+
 INTVAL
 PIO_close_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
 {
