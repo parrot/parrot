@@ -16,45 +16,85 @@
 #ifdef __GNUC__
 void Parrot_jit_debug(struct Parrot_Interp* interpreter);
 
+typedef struct {
+	const char *name;
+	const char *spec;
+} BaseTypes;
 static void
 write_types(FILE *stabs)
 {
-    fprintf(stabs,
-".stabs \"int:t1=r1;0020000000000;0017777777777;\",128,0,0,0\n"
-".stabs \"char:t2=r2;0;127;\",128,0,0,0\n"
-".stabs \"long int:t3=r1;0020000000000;0017777777777;\",128,0,0,0\n"
-".stabs \"unsigned int:t4=r1;0000000000000;0037777777777;\",128,0,0,0\n"
-".stabs \"long unsigned int:t5=r1;0000000000000;0037777777777;\",128,0,0,0\n"
-".stabs \"long long int:t6=r1;01000000000000000000000;07777777777777777777;\",128,0,0,0\n"
-".stabs \"long long unsigned int:t7=r1;0000000000000;017777777777777777777;\",128,0,0,0\n"
-".stabs \"short int:t8=r8;-32768;32767;\",128,0,0,0\n"
-".stabs \"short unsigned int:t9=r9;0;65535;\",128,0,0,0\n"
-".stabs \"signed char:t10=r10;-128;127;\",128,0,0,0\n"
-".stabs \"unsigned char:t11=r11;0;255;\",128,0,0,0\n"
-".stabs \"float:t12=r1;4;0;\",128,0,0,0\n"
-".stabs \"double:t13=r1;8;0;\",128,0,0,0\n"
-           );
+    int i;
+    /* borrowed from mono */
+    static BaseTypes base_types[] = {
+            {"Void", "(0,1)"},
+            {"Char", ";-128;127;"},
+            {"Byte", ";0;255;"},
+            {"Int16", ";-32768;32767;"},
+            {"UInt16", ";0;65535;"},
+            {"Int32", ";0020000000000;0017777777777;"}, /* 5 */
+            {"UInt32", ";0000000000000;0037777777777;"},
+            {"Int64", ";01000000000000000000000;0777777777777777777777;"},
+            {"UInt64", ";0000000000000;01777777777777777777777;"},
+            {"Single", "r(0,8);4;0;"},
+            {"Double", "r(0,8);8;0;"},  /* 10 */
+            {"LongDouble", "r(0,8);12;0;"},
 #if INTVAL_SIZE == 4
-    fprintf(stabs, ".stabs \"Parrot_Int:t14=1\",128,0,0,0\n");
+            {"INTVAL", "(0,5);"},       /* 12 */
 #else
-    fprintf(stabs, ".stabs \"Parrot_Int:t14=6\",128,0,0,0\n");
+            {"INTVAL", "(0,7);"},
 #endif
-#if NUMVAL_SIZE == 4
-    fprintf(stabs, ".stabs \"Parrot_Float:t15=12\",128,0,0,0\n");
+#if NUMVAL_SIZE == 8
+            {"FLOATVAL", "(0,10);"},    /* 13 */
 #else
-    fprintf(stabs, ".stabs \"Parrot_Float:t15=13\",128,0,0,0\n");
+            {"FLOATVAL", "(0,11);"},
 #endif
+            {"Ptr", "*(0,0);"},
+            {"CharPtr", "*(0,1);"},     /* 15 */
+            {0, 0}
+        };
+    for (i = 0; base_types[i].name; ++i) {
+        if (! base_types[i].spec)
+            continue;
+        fprintf (stabs, ".stabs \"%s:t(0,%d)=", base_types[i].name, i);
+        if (base_types[i].spec [0] == ';') {
+            fprintf (stabs, "r(0,%d)%s\"", i, base_types[i].spec);
+        } else {
+            fprintf (stabs, "%s\"", base_types[i].spec);
+        }
+        fprintf (stabs, ",128,0,0,0\n");
+    }
+    fprintf(stabs, ".stabs \"STRING:t(0,%d)=*(0,%d)\""
+                ",128,0,0,0\n", i, i+1);
+    i++;
+    fprintf(stabs, ".stabs \"Parrot_String:T(0,%d)=s%d"
+                "bufstart:(0,14),%d,%d;"
+                "buflen:(0,6),%d,%d;"   /* XXX type */
+                "flags:(0,12),%d,%d;"
+                "bufused:(0,12),%d,%d;"
+                "strstart:(0,15),%d,%d;"        /* fake a char* */
+                ";\""
+                ",128,0,0,0\n", i++, sizeof(STRING),
+                offsetof(STRING, bufstart) * 8, sizeof(void *) * 8,
+                offsetof(STRING, buflen) * 8, sizeof(size_t) * 8,
+                offsetof(STRING, obj.flags) * 8, sizeof(UINTVAL) * 8,
+                offsetof(STRING, bufused) * 8, sizeof(UINTVAL) * 8,
+                offsetof(STRING, strstart) * 8, sizeof(void *) * 8
+                );
+
 }
 
 static void
 write_vars(FILE *stabs, struct Parrot_Interp *interpreter)
 {
     int i;
+    /* fake static var stabs */
     for (i = 0; i < NUM_REGISTERS; i++) {
-        fprintf(stabs, ".stabs \"I%d:b14\",38,0,0,%p\n", i,
+        fprintf(stabs, ".stabs \"I%d:S(0,12)\",38,0,0,%p\n", i,
                 (char*)&interpreter->ctx.int_reg.registers[i]);
-        fprintf(stabs, ".stabs \"N%d:b15\",38,0,0,%p\n", i,
+        fprintf(stabs, ".stabs \"N%d:S(0,13)\",38,0,0,%p\n", i,
                 (char*)&interpreter->ctx.num_reg.registers[i]);
+        fprintf(stabs, ".stabs \"S%d:S(0,16)\",38,0,0,%p\n", i,
+                (char*)&interpreter->ctx.string_reg.registers[i]);
     }
 }
 
