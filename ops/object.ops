@@ -20,24 +20,35 @@ Parrot's library of object ops
 
 =item B<callmethod>()
 
-Call a method on an object as per Parrot's calling conventions. We assume
-that all the registers are properly set up.
+=item B<callmethod>(in STR)
 
-All calls assume P2 = object, S0 = method.
-
-=cut
-
-=item B<callmethodcc>
-
-Take the continuation for the next instruction, put it in P1, then call the
-method as per the calling conventions.
+Call a method on an object. If a method name is provided, we find
+the PMC for the named method and put it into the sub/method slot.
+If no name is provided, then we assume that the method PMC and
+method name are already in their proper places. We assume that
+all other registers are correctly set up, as per the Parrot
+calling conventions.
 
 =cut
 
-=item B<tailcallmeth>
+=item B<callmethodcc>()
 
-Restore the continuation in P1 then call the method as per the calling
-conventions.
+=item B<callmethodcc>(in STR)
+
+Make a method call, automatically generating a return continuation. If
+a method name is passed in we look up the method PMC for the object
+and put it in the method slot. If a method name isn't provided then we
+assume that things are already properly set up. Note that the return
+continuation is placed in P1.
+
+=cut
+
+=item B<tailcallmethod>
+
+=item B<tailcallmethod>(in STR)
+
+Make a tailcall to method $1. If no method name is given, we assume
+everything is already set up properly.
 
 =cut
 
