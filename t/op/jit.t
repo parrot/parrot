@@ -1,6 +1,6 @@
 #! perl -w
 # test WRT JIT register allocation
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 57;
 
 output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped");
 set I0,0
@@ -540,6 +540,237 @@ CODE
 00
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 1,2,3 mapped");
+set I0,0
+set I1,6
+set I2,2
+div I0,I1,I2
+print I0
+print I1
+print I2
+print "\n"
+end
+CODE
+362
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 1,2 mapped");
+set I0,0
+set I1,8
+set I2,2
+set I3,3
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I0,I1,I4
+print I0
+print I1
+print I4
+print "\n"
+end
+CODE
+284
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 1,3 mapped");
+set I0,0
+set I1,1
+set I2,2
+set I3,3
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I0,I4,I1
+print I0
+print I4
+print I1
+print "\n"
+end
+CODE
+441
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 2,3 mapped");
+set I0,0
+set I1,9
+set I2,2
+set I3,3
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I4,I1,I3
+print I4
+print I1
+print I3
+print "\n"
+end
+CODE
+393
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 1 mapped");
+set I0,0
+set I1,1
+set I2,2
+set I3,3
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I1,I5,I4
+print I1
+print I5
+print I4
+print "\n"
+end
+CODE
+004
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 2 mapped");
+set I0,0
+set I1,8
+set I2,2
+set I3,3
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I5,I1,I4
+print I5
+print I1
+print I4
+print "\n"
+end
+CODE
+284
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 3 mapped");
+set I0,0
+set I1,1
+set I2,2
+set I3,3
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I5,I4,I1
+print I5
+print I1
+print I4
+print "\n"
+end
+CODE
+414
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 0 mapped");
+set I0,0
+set I1,1
+set I2,2
+set I3,3
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I5,I6,I4
+print I5
+print I6
+print I4
+print "\n"
+end
+CODE
+004
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i 1,2 mapped");
+set I0,0
+set I1,1
+set I2,9
+set I3,9
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I2, I3
+print I2
+print I3
+print "\n"
+end
+CODE
+19
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i 1 mapped");
+set I0,0
+set I1,1
+set I2,8
+set I3,8
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I2, I4
+print I2
+print I4
+print "\n"
+end
+CODE
+24
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i 2 mapped");
+set I0,0
+set I1,1
+set I2,2
+set I3,2
+set I4,4
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I4, I2
+print I4
+print I2
+print "\n"
+end
+CODE
+22
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "div_i_i 0 mapped");
+set I0,0
+set I1,1
+set I2,2
+set I3,3
+set I4,4
+set I5,1
+set I0,I1
+set I2,I3
+set I0,I1
+set I2,I3
+div I4, I5
+print I4
+print I5
+print "\n"
+end
+CODE
+41
+OUTPUT
+
 # tests for JIT CGP
 output_is(<<'CODE', <<'OUTPUT', "1 non jit");
 	set I0, 16
@@ -754,7 +985,7 @@ OUTPUT
 
 # multiply optimization tests
 
-output_is(<<'CODE', <<'OUTPUT', "power of 2");
+output_is(<<'CODE', <<'OUTPUT', "mul power of 2");
    set I0, 5
    mul I1, I0, 0
    eq I1, 0, ok_1
@@ -856,3 +1087,35 @@ ok 6
 ok 7
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "div power of 2");
+   set I0, 1024
+   div I1, I0, 2
+   eq I1, 512, ok_1
+   print "nok div 2 "
+ok_1:
+   print "ok 1\n"
+
+   div I1, I0, 4
+   eq I1, 256, ok_2
+   print "nok div 4 "
+ok_2:
+   print "ok 2\n"
+
+   div I1, I0, 8
+   eq I1, 128, ok_3
+   print "nok div 8 "
+ok_3:
+   print "ok 3\n"
+
+   div I1, I0, 16
+   eq I1, 64, ok_4
+   print "nok div 16 "
+ok_4:
+   print "ok 4\n"
+   end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT

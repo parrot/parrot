@@ -12,6 +12,8 @@
 #  define JIT_CGP
 #endif
 
+extern UINTVAL ld(UINTVAL);
+
 /* #define NEG_MINUS_ZERO */
 #define NEG_ZERO_SUB
 
@@ -485,6 +487,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 #  define jit_emit_cdq(pc) *(pc)++ = 0x99
 
+#if 0
 #  define jit_emit_div_rr_i(pc, r1, r2) { \
     if (r1 == r2) { \
       jit_emit_mov_ri_i(pc, r1, 1); \
@@ -531,6 +534,60 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
     } \
 }
 
+#else
+static char *
+opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
+{
+    char *pc = jit_info->native_ptr;
+    int saved = 0;
+    if (dest != emit_EAX) {
+        jit_emit_mov_rr_i(pc, emit_EAX, dest);
+    }
+    /* if EDX is mapped, save it to ECX */
+    if (jit_info->optimizer->cur_section->ru[0].registers_used == 4) {
+        saved = 1;
+        jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+    }
+#if 0
+    jit_emit_cdq(pc);
+#else
+    /* this sequence allows 2 other instructions to run parallel */
+    jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
+    pc = emit_shift_i_r(pc, emit_b111, 31, emit_EDX); /* SAR 31 */
+#endif
+    if (src == emit_EDX) {
+        assert(saved);
+        emitm_sdivl_r(pc, emit_ECX);
+    }
+    else {
+        emitm_sdivl_r(pc, src);
+    }
+    if (is_div) {
+        /* result = quotient in EAX */
+        if (saved) {
+            jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
+        }
+        if (dest != emit_EAX) {
+            jit_emit_mov_rr_i(pc, dest, emit_EAX);
+        }
+    }
+    else {
+        /* result = remainder in EDX */
+        if (dest != emit_EDX) {
+            jit_emit_mov_rr_i(pc, dest, emit_EDX);
+            if (saved) {
+                jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
+            }
+        }
+    }
+    return pc;
+}
+
+#  define jit_emit_div_rr_i(pc, r1, r2) pc = opt_div_rr(jit_info, r1, r2, 1)
+#  define jit_emit_cmod_rr_i(pc, r1, r2) pc = opt_div_rr(jit_info, r1, r2, 0)
+#endif
+
+#if 0
 #  define jit_emit_div_ri_i(pc, r1, imm) { \
     if (r1 != emit_EAX) { \
       jit_emit_mov_rr_i(pc, emit_EAX, r1); \
@@ -554,6 +611,56 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
       jit_emit_mov_rr_i(pc, r1, emit_EAX); \
     } \
 }
+
+#else
+static char *
+opt_div_ri(Parrot_jit_info_t *jit_info, int dest, INTVAL imm)
+{
+    char *pc = jit_info->native_ptr;
+
+    UINTVAL ld2 = ld((UINTVAL) imm);
+    if (imm > 1 && !(imm & (imm - 1))) {
+        /* positive power of 2 - do a shift */
+        pc = emit_shift_i_r(pc, emit_b101, ld2, dest);
+    }
+    else {
+        int saved = 0;
+        if (dest != emit_EAX) {
+            jit_emit_mov_rr_i(pc, emit_EAX, dest);
+        }
+        if (jit_info->optimizer->cur_section->ru[0].registers_used == 4) {
+            saved = 1;
+            jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+        }
+        jit_emit_cdq(pc);
+        if (!saved) {            /* use ECX for imm */
+            jit_emit_mov_ri_i(pc, emit_ECX, imm);
+            emitm_sdivl_r(pc, emit_ECX);
+        }
+        else {
+            if (dest != emit_EBX) {
+                emitm_pushl_r(pc, emit_EBX);
+                jit_emit_mov_ri_i(pc, emit_EBX, imm);
+                emitm_sdivl_r(pc, emit_EBX);
+                pc = emit_popl_r(pc, emit_EBX);
+            }
+            else {
+                emitm_pushl_r(pc, emit_EDI);
+                jit_emit_mov_ri_i(pc, emit_EDI, imm);
+                emitm_sdivl_r(pc, emit_EDI);
+                pc = emit_popl_r(pc, emit_EDI);
+            }
+            jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
+        }
+        if (dest != emit_EAX) {
+            jit_emit_mov_rr_i(pc, dest, emit_EAX);
+        }
+    }
+    return pc;
+}
+
+#  define jit_emit_div_ri_i(pc, r1, imm) pc = opt_div_ri(jit_info, r1, imm)
+#endif
 
 #  define jit_emit_cmod_ri_i(pc, r1, imm) { \
     if (r1 != emit_EAX) { \
@@ -624,7 +731,6 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
     *(long *)(pc) = (long)imm; \
     pc += 4
 #else
-extern UINTVAL ld(UINTVAL);
 static char *
 opt_mul(char *pc, int dest, INTVAL imm, int src)
 {
@@ -2582,12 +2688,24 @@ char floatval_map[] = { 1,2,3,4 };
 
 /*
  * if jit_emit_noop is defined, it does align a jump target
- * to 1 << JUMP_ALIGN (it should emit exactly 1 byte)
+ * to 1 << JUMP_ALIGN
+ * It may emit exactly one byte, or some desired padding.
+ * The instructions must perfomr like a noop.
+ *
  *
  * s. also info gcc /align-jump
+ *
+ * noop; mov %esi, %esi; lea 0(%esi), %esi
  */
 
-#define jit_emit_noop(pc) *pc++ = 0x90;
+#define jit_emit_noop(pc) do { \
+    switch ( ((unsigned long) pc) & 3) { \
+        case 1: *pc++ = 0x8d; *pc++ = 0x76; *pc++ = 0x00; break; \
+        case 2: *pc++ = 0x89; *pc++ = 0xf6; break; \
+        case 3: *pc++ = 0x90; break; \
+    } \
+} while (0)
+
 #define JUMP_ALIGN 2
 
 /* registers are either allocate per section or per basic block
