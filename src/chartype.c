@@ -139,12 +139,21 @@ chartype_get_digit_Unicode(const CHARTYPE* type, const UINTVAL c)
     return chartype_get_digit_mapn(&unicode_chartype, uc);
 }
 
+static INTVAL
+chartype_is_charclass_Unicode(const struct parrot_chartype_t *type, 
+                              const Parrot_UInt c, const unsigned int class)
+{
+    UINTVAL uc = chartype_to_unicode_cparray(type, NULL, c);
+    return unicode_chartype.is_charclass[enum_charclass_SLOW]
+               (&unicode_chartype, uc, class);
+}
+
+
 /*
  * Create chartype from mapping file
  * Still TODO:
  *   Handle more encodings (singlebyte & dbcs implemented so far)
- *   Create proper digit mapping table (currently always ascii)
- *   -> this is REQUIRED for DBCS!
+ *   Create custom digit mapping table
  *   Path is hardcoded to "runtime/parrot/chartypes/<name>.TXT"
  *   Does direct file system IO - should probably use Parrot IO
  *   Better parsing code - e.g. handle erroneous input!
@@ -162,6 +171,7 @@ chartype_create_from_mapping(const char *name)
     INTVAL *cparray2 = NULL;
     struct chartype_unicode_map_t *map;
     int one2one = 0;
+    int i;
 
     path = mem_sys_allocate(strlen(name) + 32);
     sprintf(path, "runtime/parrot/chartypes/%s.TXT", name);
@@ -214,6 +224,8 @@ chartype_create_from_mapping(const char *name)
     }
     type->from_unicode = chartype_from_unicode_cparray;
     type->to_unicode = chartype_to_unicode_cparray;
+    for (i=0; i<=enum_charclass_SLOW; i++)
+        type->is_charclass[i] = chartype_is_charclass_Unicode;
     /* XXX Should generate a custom digit mapping table */
     if (enum_charclass_digit < enum_charclass_SLOW)
         type->is_charclass[enum_charclass_digit] = chartype_is_digit_Unicode;
