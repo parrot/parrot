@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 68;
+use Parrot::Test tests => 71;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1480,6 +1480,102 @@ LP: dec P3
 CODE
 -1
 -2000
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "assign integer");
+    new P0, .PerlInt
+    assign P0, 42
+    print P0
+    print "\n"
+
+    new P1, .PerlNum
+    assign P1, 21
+    print P1
+    print "\n"
+
+    new P2, .PerlString
+    assign P2, 7
+    print P2
+    print "\n"
+
+    new P3, .PerlUndef
+    assign P3, 1
+    print P3
+    print "\n"
+
+    end
+CODE
+42
+21
+7
+1
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "assign number");
+@{[ $fp_equality_macro ]}
+    new P0, .PerlInt
+    assign P0, 42.21
+    .fp_eq(P0, 42.21, OK1)
+    print  "not "
+OK1:
+    print  "ok 1\\n"
+
+    new P1, .PerlNum
+    assign P1, 21.01
+    .fp_eq(P1, 21.01, OK2)
+    print  "not "
+OK2:
+    print  "ok 2\\n"
+
+    new P2, .PerlString
+    assign P2, 7.65
+    .fp_eq(P2, 7.65, OK3)
+    print  "not "
+OK3:
+    print  "ok 3\\n"
+
+    new P3, .PerlUndef
+    assign P3, 1.23
+    .fp_eq(P3, 1.23, OK4)
+    print  "not "
+OK4:
+    print  "ok 4\\n"
+
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "assign string");
+    new P0, .PerlInt
+    assign P0, "Albert"
+    print P0
+    print "\n"
+
+    new P1, .PerlNum
+    assign P1, "Beth"
+    print P1
+    print "\n"
+
+    new P2, .PerlString
+    assign P2, "Charlie"
+    print P2
+    print "\n"
+
+    new P3, .PerlUndef
+    assign P3, "Doris"
+    print P3
+    print "\n"
+
+    end
+CODE
+Albert
+Beth
+Charlie
+Doris
 OUTPUT
 
 1;
