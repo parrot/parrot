@@ -15,19 +15,13 @@
 #  ifndef EXEC_H_GUARD
 #   define EXEC_H_GUARD
 
-#   define OPENBSD      1
-#   define FREEBSD      2
-#   define NETBSD       3
-#   define LINUX        4
-#   define DARWIN       5
-
-#   if EXEC_OS == OPENBSD
+#   if PARROT_EXEC_OS_OPENBSD
 #     define EXEC_A_OUT
 #   endif
-#   if EXEC_OS == DARWIN
+#   if PARROT_EXEC_OS_DARWIN
 #     define EXEC_MACH_O
 #   endif
-#   if (EXEC_OS == FREEBSD) || (EXEC_OS == LINUX)
+#   if (PARROT_EXEC_OS_FREEBSD) || (PARROT_EXEC_OS_LINUX)
 #     define EXEC_ELF
 #   endif
 

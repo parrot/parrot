@@ -146,7 +146,7 @@ exec_init(Parrot_exec_objfile_t *obj)
     obj->symbol_table = (Parrot_exec_symbol_t *)
         mem_sys_allocate_zeroed(sizeof(Parrot_exec_symbol_t));
     /* size of table */
-#ifdef I386
+#ifdef PARROT_I386
     obj->symbol_list_size = 4;
 #else
     obj->symbol_list_size = 0;

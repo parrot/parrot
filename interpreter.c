@@ -403,7 +403,7 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     code_end = interpreter->code->byte_code + code_size;
 #  ifdef HAVE_COMPUTED_GOTO
 #    ifdef __GNUC__
-#      ifdef I386
+#      ifdef PARROT_I386
     init_prederef(interpreter, PREDEREF_FOR_CGP);
 #      endif
 #    endif
@@ -430,7 +430,7 @@ runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
     code_end = interpreter->code->byte_code + code_size;
 #  ifdef HAVE_COMPUTED_GOTO
 #    ifdef __GNUC__
-#      ifdef I386
+#      ifdef PARROT_I386
     init_prederef(interpreter, PREDEREF_FOR_CGP);
 #      endif
 #    endif

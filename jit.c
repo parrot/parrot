@@ -787,7 +787,7 @@ optimize_imcc_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
 static char *
 reg_addr(struct Parrot_Interp * interpreter, int typ, int i)
 {
-#ifdef I386
+#ifdef PARROT_I386
     if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG))
         switch (typ) {
             case 0:

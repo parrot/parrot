@@ -98,7 +98,8 @@ typedef SYNC     Sync;
 #define JIT_ARCHNAME "${jitarchname}"
 #define JIT_CAPABLE  ${jitcapable}
 #define EXEC_CAPABLE ${execcapable}
-#define EXEC_OS      ${execos}
+#define PARROT_EXEC_OS_${jitosname} 1
+#define PARROT_${jitcpu} 1
 
 /*
  * Switches to turn on/off new code so people can compile

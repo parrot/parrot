@@ -19,10 +19,10 @@ sub runstep {
         osname      => 'ANSI',
         jitarchname => 'nojit',
         jitcpuarch  => 'i386',
+        jitcpu      => 'I386',
         jitosname   => 'nojit',
         jitcapable  => 0,
         execcapable => 0,
-        execos      => 0,
         cc_hasjit   => '',
         jit_h       => '',
         jit_o       => '',
@@ -66,7 +66,6 @@ sub runstep {
   #$jitarchname                 =~ s/-(net|free|open)bsd$/-bsd/i;
   my $jitcapable               =  0;
   my $execcapable              =  0;
-  my $execos                   =  0;
 
   if (-e "jit/$cpuarch/core.jit") {
     $jitcapable = 1;
@@ -92,7 +91,8 @@ sub runstep {
     Configure::Data->set(
       jitarchname => $jitarchname,
       jitcpuarch  => $jitcpuarch,
-      jitosname   => $jitosname,
+      jitcpu      => uc($jitcpuarch),
+      jitosname   => uc($jitosname),
       jitcapable  => 1,
       cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
       jit_h       => '$(INC)/jit.h',
@@ -102,17 +102,12 @@ sub runstep {
     if (($jitcpuarch eq 'i386' && ($osname =~ /bsd$/i || $osname =~ /linux/i))
      || ($jitcpuarch eq 'ppc') || ($jitcpuarch eq 'arm')) {
       $execcapable = 1;
-      if ($osname eq 'openbsd') {
-        $execos = 1;
-      } elsif ($osname eq 'freebsd') {
-        $execos = 2;
-      } elsif ($osname eq 'netbsd') {
-        $execos = 3;
-      } elsif ($osname eq 'linux') {
-        $execos = 4;
-      } elsif ($osname eq 'darwin') {
-        $execos = 5;
-      } else {
+      unless (($osname eq 'openbsd') ||
+              ($osname eq 'freebsd') ||
+              ($osname eq 'netbsd')  ||
+              ($osname eq 'linux')   ||
+              ($osname eq 'darwin'))
+      {
         $execcapable = 0;
       }
     }
@@ -121,7 +116,6 @@ sub runstep {
       Configure::Data->set(
         exec_h       => '$(INC)/jit.h $(INC)/exec.h $(INC)/exec_save.h',
         exec_o       => 'exec$(O) exec_cpu$(O) exec_save$(O)',
-        execos       => $execos,
         execcapable  => 1
       );
     }
@@ -129,7 +123,6 @@ sub runstep {
        Configure::Data->set(
         exec_h       => '',
         exec_o       => '',
-        execos       => 0,
         execcapable  => 0
       );
     }
@@ -150,10 +143,10 @@ sub runstep {
     Configure::Data->set(
       jitarchname => 'nojit',
       jitcpuarch  => 'i386',
+      jitcpu      => 'I386',
       jitosname   => 'nojit',
       jitcapable  => 0,
       execcapable => 0,
-      execos      => 0,
       cc_hasjit   => '',
       jit_h       => '',
       jit_o       => '',
