@@ -18,7 +18,6 @@ core.ops
 disassemble.pl
 docs/Makefile
 docs/intro.pod
-docs/opcodes.pod
 docs/overview.pod
 docs/parrot.pod
 docs/parrot_assembly.pod
