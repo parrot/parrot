@@ -28,6 +28,7 @@ use vars qw(@steps);
     init/manifest.pl
     init/data.pl
     init/miniparrot.pl
+    auto/gcc.pl
     init/hints.pl
     init/optimize.pl
     init/headers.pl
@@ -42,7 +43,6 @@ use vars qw(@steps);
     auto/byteorder.pl
     auto/pack.pl
     auto/format.pl
-    auto/gcc.pl
     auto/isreg.pl
     auto/jit.pl
     gen/cpu.pl

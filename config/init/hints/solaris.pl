@@ -11,7 +11,9 @@ Configure::Data->set(
 
 # my $cc = Configure::Data->get('cc');
 my $link = Configure::Data->get('link');
-if (!Configure::Data->get('gccversion')) {
+if (Configure::Data->get('gccversion')) {
+    Configure::Data->set('link', 'c++');
+} else {
     # Going to assume Sun's compiler
     # In which case we need to link with the C++ compiler (CC) rather than the
     # C compiler (cc)
