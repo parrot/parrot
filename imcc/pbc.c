@@ -671,8 +671,6 @@ int e_pbc_emit(void *param, Instruction * ins) {
         bytes = (oldsize + code_size) * sizeof(opcode_t);
         interpreter->code->byte_code =
             mem_sys_realloc(interpreter->code->byte_code, bytes);
-        interpreter->code->byte_code_size = bytes;
-        /* XXX */
         interpreter->code->cur_cs->base.size = oldsize + code_size;
         interpreter->code->cur_cs->base.data = interpreter->code->byte_code;
         pc = (opcode_t*) interpreter->code->byte_code + oldsize;

@@ -576,7 +576,6 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 (struct PackFile_Segment *) self->directory, cursor);
     }
     self->byte_code = self->cur_cs->base.data;
-    self->byte_code_size = self->cur_cs->base.size * sizeof(opcode_t);
 #ifdef HAS_HEADER_SYSMMAN
     if (self->is_mmap_ped && (
             self->need_endianize || self->need_wordsize)) {
@@ -753,7 +752,6 @@ PackFile_new(INTVAL is_mapped)
 
     /* Other fields empty for now */
     pf->byte_code = NULL;
-    pf->byte_code_size = 0;
     pf->eval_nr = 0;
     pf_register_standard_funcs(pf);
     pf->directory = (struct PackFile_Directory *)
@@ -1458,9 +1456,6 @@ Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
     interpreter->code->cur_cs = new_cs;
     new_cs->prev = cur_cs;
     interpreter->code->byte_code = new_cs->base.data;
-    /* TODO byte_count in ops */
-    interpreter->code->byte_code_size = new_cs->base.size *
-        sizeof(opcode_t);
     interpreter->prederef_code = new_cs->prederef_code;
     interpreter->jit_info = new_cs->jit_info;
     return cur_cs;

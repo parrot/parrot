@@ -181,7 +181,7 @@ init_prederef(struct Parrot_Interp *interpreter)
                 "Illegal op count (%d) in prederef oplib\n",
                 (int)interpreter->op_lib->op_count);
     if (!interpreter->prederef_code) {
-        size_t N = interpreter->code->byte_code_size;
+        size_t N = interpreter->code->cur_cs->base.size;
         size_t i;
         void **temp = (void **)mem_sys_allocate(N * sizeof(void *));
 
@@ -215,7 +215,7 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     jit_f jit_code;
 
     code_start = interpreter->code->byte_code;
-    code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_size = interpreter->code->cur_cs->base.size;
     code_end = interpreter->code->byte_code + code_size;
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);

@@ -174,7 +174,7 @@ struct PackFile_Directory {
 struct PackFile {
     opcode_t *src;              /* the possible mmap()ed start of the PF */
     size_t   size;              /* size in bytes */
-    INTVAL is_mmap_ped;         /* don't free it, mmunmap it at destroy */
+    INTVAL is_mmap_ped;         /* don't free it, munmap it at destroy */
 
     struct PackFile_Header     * header;
 
@@ -187,9 +187,8 @@ struct PackFile {
     struct PackFile_ConstTable * const_table;
     INTVAL                       eval_nr;   /* nr. of eval cs */
 
-    /* XXX the next too items are shortcuts to the real thing in
-     * the current byte code segment - these will go away */
-    size_t                       byte_code_size;  /* size in bytes */
+    /* the next pointer is a shortcut to the real thing in
+     * the current byte code segment, i.e. cur_cs->base.data */
     opcode_t *                   byte_code;
 
     INTVAL                       need_wordsize;

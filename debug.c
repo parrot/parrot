@@ -399,7 +399,7 @@ PDB_trace(struct Parrot_Interp *interpreter,
         trace_op(interpreter,
                 interpreter->code->byte_code,
                 interpreter->code->byte_code +
-                interpreter->code->byte_code_size / sizeof(opcode_t),
+                interpreter->code->cur_cs->base.size,
                 interpreter->pdb->cur_opcode);
         DO_OP(pdb->cur_opcode,interpreter);
     }
@@ -1239,7 +1239,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
     pfile->line = pline;
     pline->number = 1;
 
-    code_end = pc + interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_end = pc + interpreter->code->cur_cs->base.size / sizeof(opcode_t);
     while (pc != code_end) {
         /* Grow it early*/
         if (pfile->size % 32768 < 32668 ) {

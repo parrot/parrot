@@ -29,17 +29,17 @@ static void PackFile_Constant_dump(struct Parrot_Interp *,
 void
 PackFile_dump(struct Parrot_Interp *interpreter, struct PackFile *self)
 {
-    size_t i;
+    size_t i, size;
 
-
+    size = self->cur_cs->base.size;
     PIO_printf(interpreter, "CONST => [\n");
     PackFile_ConstTable_dump(interpreter, self->const_table);
     PIO_printf(interpreter, "],\n");
 
-    PIO_printf(interpreter, "BCODE => [ # %ld bytes",
-               (long)self->byte_code_size);
+    PIO_printf(interpreter, "BCODE => [ # %ld ops",
+               (long)size);
 
-    for (i = 0; i < self->byte_code_size / sizeof(opcode_t); i++) {
+    for (i = 0; i < size; i++) {
         if (i % 8 == 0) {
             PIO_printf(interpreter, "\n %04lx:  ",
                        (unsigned long)i * sizeof(opcode_t));

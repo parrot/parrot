@@ -74,7 +74,6 @@ opcode_t *
 runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
     opcode_t *code_start;
-    INTVAL code_size;           /* in opcodes */
     opcode_t *code_end;
     opcode_t *lastpc = NULL;
     FLOATVAL starttime = 0;
@@ -84,8 +83,8 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
 
     code_start = interpreter->code->byte_code;
-    code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
-    code_end = interpreter->code->byte_code + code_size;
+    code_end = interpreter->code->byte_code +
+        interpreter->code->cur_cs->base.size;
 
 #ifdef USE_TRACE_INTERP
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
