@@ -30,10 +30,7 @@ typedef enum {
                      KEY_number_FLAG |
                      KEY_string_FLAG |
                      KEY_pmc_FLAG |
-                     KEY_register_FLAG |
-                     KEY_start_slice_FLAG |
-                     KEY_end_slice_FLAG |
-                     KEY_inf_slice_FLAG
+                     KEY_register_FLAG
 
 } KEY_flags;
 

@@ -264,27 +264,35 @@ Returns the key itself.
 
 Returns the next key relative to the location specified in C<what>.
 
-Raises an exception of an attempt is made to iterate backwards.
-
 =cut
 
 */
 
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
+    PMC* nextkey_keyed (PMC* agg, INTVAL what) {
+        INTVAL n = VTABLE_elements(interpreter, agg);
         PMC *ret = SELF;
 
+        PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
+        PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
         switch (what) {
             case ITERATE_FROM_START:    /* reset key */
-            break;
+                PMC_int_val(ret) = 0;
+                if (!n)
+                    PMC_int_val(ret) = -1;
+                break;
             case ITERATE_GET_NEXT:
-            if (PMC_data(key))
-                ret = key_next(interpreter, key);
-            else
-                PMC_int_val(ret) = -1;
-            break;
-            default:
-            internal_exception(1, "Key can't iterate backwards");
-            break;
+                if (PMC_int_val(ret) < n - 1)
+                    ++PMC_int_val(ret);
+                else
+                    PMC_int_val(ret) = -1;
+                break;
+            case ITERATE_GET_PREV:
+                if (PMC_int_val(ret) >= 0)
+                    --PMC_int_val(ret);
+                break;
+            case ITERATE_FROM_END:
+                PMC_int_val(ret) = n - 1;
+                break;
         }
         return ret;
     }

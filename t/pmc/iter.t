@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 17;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -553,3 +553,100 @@ output_is(<<'CODE', <<'OUTPUT', "slice syntax");
 CODE
 ok
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "slice creates an iterator");
+   new P0, .PerlArray
+   slice P2, P0[2 .. 3, 4, 5 ..6]
+   typeof S0, P2
+   print S0
+   print "\n"
+   end
+CODE
+Iterator
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "slice iter simple array elements");
+   .include "iterator.pasm"
+   new P0, .PerlArray
+   push P0, 100
+   push P0, 200
+   push P0, 300
+   push P0, 400
+   push P0, 500
+   push P0, 600
+   slice P2, P0[0, 1, 4]
+   set P2, .ITERATE_FROM_START
+lp:
+   unless P2, ex
+   shift I0, P2
+   print I0
+   print "\n"
+   branch lp
+ex:
+   print "ok\n"
+   end
+CODE
+100
+200
+500
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "slice iter simple array elements - repeat");
+   .include "iterator.pasm"
+   new P0, .PerlArray
+   push P0, 100
+   push P0, 200
+   push P0, 300
+   push P0, 400
+   push P0, 500
+   slice P2, P0[2, 4]
+   set P2, .ITERATE_FROM_START
+lp:
+   unless P2, ex
+   shift I0, P2
+   print I0
+   print "\n"
+   branch lp
+ex:
+
+   slice P2, P0[2, 4]		# this is the same PF constant
+   set P2, .ITERATE_FROM_START
+lp2:
+   unless P2, ex2
+   shift I0, P2
+   print I0
+   print "\n"
+   branch lp2
+ex2:
+   print "ok\n"
+   end
+CODE
+300
+500
+300
+500
+ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "slice iter string");
+    .include "iterator.pasm"
+	new P2, .PerlString
+	set P2, "parrot"
+	slice P1, P2[0,1,4,5]
+	set P1, .ITERATE_FROM_START
+iter_loop:
+        unless P1, iter_end		# while (entries) ...
+	shift S1, P1
+	print S1
+	branch iter_loop
+iter_end:
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+paot
+parrot
+OUTPUT
+

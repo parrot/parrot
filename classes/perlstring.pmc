@@ -656,6 +656,14 @@ C<offset>.
 
 =over 4
 
+=item C<PMC* slice (PMC *key)>
+
+Return a new iterator for the slice PMC C<key>
+
+=item C<INTVAL elements ()>
+
+Return length of the string.
+
 =item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
 
 Returns the next key relative to the location and direction specified in
@@ -665,40 +673,21 @@ C<what>.
 
 */
 
+    INTVAL elements () {
+	return string_length(INTERP, PMC_str_val(SELF));
+    }
+
+    PMC* slice (PMC* key) {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC_struct_val(iter) = key;
+        return iter;
+    }
+
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
         PMC *ret = key;
         STRING *s = PMC_str_val(SELF);
-        INTVAL n = string_length(INTERP, s);
-        union {
-            const void * __c_ptr;
-            void * __ptr;
-        } __ptr_u;
 
-        PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
-        PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
-        switch (what) {
-            case ITERATE_FROM_START:    /* reset key */
-                PMC_int_val(ret) = 0;
-                break;
-            case ITERATE_GET_NEXT:
-                if (PMC_int_val(ret) < n - 1) {
-                    ++PMC_int_val(ret);
-                }
-                else
-                    PMC_int_val(ret) = -1;
-                break;
-            case ITERATE_GET_PREV:
-                if (PMC_int_val(ret) >= 0) {
-                    --PMC_int_val(ret);
-                }
-                break;
-            case ITERATE_FROM_END:
-                PMC_int_val(ret) = n-1;
-                break;
-        }
-
-        if (!n)
-            PMC_int_val(ret) = -1;
+        ret = VTABLE_nextkey_keyed(interpreter, key, SELF, what);
 
         if (PMC_int_val(ret) > 0)
             PMC_data(key) = string_pointer_to_index(INTERP, s,
@@ -721,7 +710,7 @@ Returns the string value for C<*key>.
     STRING* get_string_keyed(PMC* key) {
         STRING *s = PMC_str_val(SELF);
 
-        return string_substr(INTERP, s, PMC_int_val(key), 1, NULL, 0);
+        return string_substr(INTERP, s, key_integer(INTERP,key), 1, NULL, 0);
     }
 
 /*

@@ -2982,6 +2982,7 @@ PackFile_Constant_unpack_key(Interp *interpreter,
     PMC *tail;
     opcode_t type, op, slice_bits;
     struct PackFile *pf = constt->base.pf;
+    int pmc_enum = enum_class_Key;
 
     components = (INTVAL)PF_fetch_opcode(pf, &cursor);
     head = tail = NULL;
@@ -2991,15 +2992,15 @@ PackFile_Constant_unpack_key(Interp *interpreter,
         slice_bits = type & VT_SLICE_BITS;
         type &= ~VT_SLICE_BITS;
         if (!head && slice_bits) {
-            head = tail = constant_pmc_new(interpreter, enum_class_Slice);
+            pmc_enum = enum_class_Slice;
         }
         if (tail) {
             PMC_data(tail)
-                = constant_pmc_new_noinit(interpreter, enum_class_Key);
+                = constant_pmc_new_noinit(interpreter, pmc_enum);
             tail = PMC_data(tail);
         }
         else {
-            head = tail = constant_pmc_new_noinit(interpreter, enum_class_Key);
+            head = tail = constant_pmc_new_noinit(interpreter, pmc_enum);
         }
 
         VTABLE_init(interpreter, tail);
