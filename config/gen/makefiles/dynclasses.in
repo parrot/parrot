@@ -19,8 +19,8 @@ pyobject \
   pyexception \
   pyfloat \
   pyfunc \
-    pyboundcall \
     pyboundmeth \
+      pyboundcall \
     pynci \
     pystaticmeth \
   pygen \
