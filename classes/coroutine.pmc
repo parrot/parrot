@@ -325,14 +325,14 @@ pmclass Coroutine {
    }
 */
 
-   INTVAL invoke () {
-     struct Parrot_Coroutine* co = (struct Parrot_Sub*)SELF->data;
+   INTVAL invoke () { /* XXX shouldn't this be UINTVAL? XXX */
+     struct Parrot_Coroutine* co = (struct Parrot_Coroutine*)SELF->data;
 
      /* Resuming co-routine or fresh call? */
      if(!co->resume) {
-       return co->init;
+       return PTR2INTVAL(co->init);
      }
 
-     return co->resume;
+     return PTR2INTVAL(co->resume);
    } 
 }

@@ -97,6 +97,12 @@ typedef void (*funcptr_t)(void);
 #define D2FPTR(x) (funcptr_t)(UINTVAL) x
 #define F2DPTR(x) (void*)(UINTVAL)(funcptr_t) x
 
+/*
+ * Macroized in case more complex casts required in some platforms.
+ */
+#define PTR2INTVAL(p)   (INTVAL)(p)
+#define INTVAL2PTR(i,p) (p*)(i)
+
 /* On Win32 we need the constant O_BINARY for open() (at least for Borland C), 
    but on UNIX it doesn't exist, so set it to 0 if it's not defined
  */
