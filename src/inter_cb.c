@@ -8,8 +8,9 @@ src/inter_cb.c - Parrot Interpreter - Callback Function Handling
 
 =head1 DESCRIPTION
 
-NCI callback functions may run, whenever the C code executes the callback.
-To be prepared for async callbacks these are converted to callback events.
+NCI callback functions may run whenever the C code executes the callback.
+To be prepared for asynchronous callbacks these are converted to callback 
+events.
 
 Often callbacks should run synchronously. This can only happen when
 the C-library calls the callback, because Parrot called a function in
@@ -58,7 +59,7 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
     VTABLE_setprop(interpreter, user_data, sc, interp_pmc);
     sc = CONST_STRING(interpreter, "_sub");
     VTABLE_setprop(interpreter, user_data, sc, sub);
-    /* only ASCII sigs supported */
+    /* only ASCII signatures are supported */
     sig_str = cb_signature->strstart;
     if (*sig_str == 'U') {
         type = 'D';
@@ -74,29 +75,30 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
         }
     }
 
-    cb_sig = pmc_new(interpreter, enum_class_PerlString);
+    cb_sig = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, cb_sig, cb_signature);
     sc = CONST_STRING(interpreter, "_signature");
     VTABLE_setprop(interpreter, user_data, sc, cb_sig);
     /*
-     * we are gonna passing this PMC to external code, the PMCs
-     * might get out of scope until the callback is called -
-     * we don't know, when the callback will be called
+     * We are going to be passing the user_data PMC to external code, but 
+     * it may go out of scope until the callback is called -- we don't know 
+     * for certain as we don't know when the callback will be called. 
+     * Therefore, to prevent the PMC from being destroyed by a DOD sweep, 
+     * we need to anchor it.
      *
-     * so anchor the PMC
      */
     dod_register_pmc(interpreter, user_data);
 
     /*
-     * finally the external lib awaits a function pointer
-     * create a PMC that points to Parrot_callback_C (or _D)
-     * it can be passed on with signature 'p'
+     * Finally, the external lib awaits a function pointer.
+     * Create a PMC that points to Parrot_callback_C (or _D);
+     * it can be passed on with signature 'p'.
      */
     cb = pmc_new(interpreter, enum_class_UnManagedStruct);
     /*
-     * we handle currently 2 types only:
-     * _C ... user_data is 2nd param
-     * _D ... user_data is 1st param
+     * Currently, we handle only 2 types:
+     * _C ... user_data is 2nd parameter
+     * _D ... user_data is 1st parameter
      */
     if (type == 'C')
         PMC_data(cb) = F2DPTR(Parrot_callback_C);
@@ -136,8 +138,9 @@ verify_CD(void *external_data, PMC *user_data)
         PANIC("user_data doesn't look like a pointer");
 
     /*
-     * we don't have an interpreter yet, where this PMC might be
-     * located so run through interpreters and check their PMC pools
+     * We don't yet know which interpreter this PMC is from, so run
+     * through all of the existing interpreters and check their PMC 
+     * pools
      */
     LOCK(interpreter_array_mutex);
     for (i = 0; i < n_interpreters; ++i) {
@@ -176,7 +179,7 @@ verify_CD(void *external_data, PMC *user_data)
 =item C<static void
 callback_CD(Parrot_Interp, void *external_data, PMC *user_data)>
 
-Common callback function handler s. pdd16
+Common callback function handler. See pdd16.
 
 =cut
 
@@ -327,7 +330,7 @@ case_I:
 
 =item C<void Parrot_callback_D(PMC *user_data, void *external_data)>
 
-NCI callback functions s. ppd16
+NCI callback functions. See pdd16.
 
 =cut
 
