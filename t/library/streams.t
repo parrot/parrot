@@ -113,12 +113,12 @@ output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
     newsub $P1, .Sub, _hello
     assign $P0, $P1
 
-    find_type $I0,"Stream::Replay"
+    find_type $I0, "Stream::Replay"
     stream = new $I0
     assign stream, $P0
 
     $S0 = stream."read_bytes"( 3 )
-    print "["
+    print "1: ["
     print $S0
     print "]\n"
 
@@ -126,21 +126,23 @@ output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
     $P0 = clone stream
 
     $S0 = stream."read_bytes"( 4 )
-    print "["
+    print "2: ["
     print $S0
     print "] = "
 
     $S0 = $P0."read_bytes"( 4 )
-    print "["
+    print "3: ["
     print $S0
     print "]\n"
 
     $S0 = stream."read"()
-    print "["
+    print "4: ["
     print $S0
     print "]\n"
+
+    print "# _hello ends now:\n"    
     $S0 = stream."read_bytes"( 100 )
-    print "["
+    print "5: ["
     print $S0
     print "]\n"
 
@@ -152,19 +154,21 @@ output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
 .end
 
 .sub _hello method
+    print "_hello start!\n"
     self."write"( "hello" )
     self."write"( "world!" )
     self."write"( "parrot" )
     self."write"( "is cool" )
+    print "_hello end!\n"
 .end
 CODE
-[hel]
-[lowo] = [lowo]
-[rld!]
-[lo]
-[lowo] = [lowo]
-[rld!]
-[parrotis cool]
+_hello start!
+1: [hel]
+2: [lowo] = 3: [lowo]
+4: [rld!]
+# _hello ends now:
+_hello end!
+5: [parrotis cool]
 done
 finished
 OUT

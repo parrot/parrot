@@ -16,6 +16,7 @@ version 0.1
     assign $P0, other_stream
     
     # .. read from $P0 ..
+
     $P1 = clone $P0
     
     # .. read further ..

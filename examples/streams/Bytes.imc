@@ -27,9 +27,9 @@ This example shows the usage of C<Stream::read_bytes>.
     find_type $I0,"Stream::Replay"
     stream = new $I0
     assign stream, $P0
-    
+
     $S0 = stream."read_bytes"( 3 )
-    print "["
+    print "'hel': ["
     print $S0
     print "]\n"
 
@@ -37,7 +37,7 @@ This example shows the usage of C<Stream::read_bytes>.
     $P0 = clone stream
     
     $S0 = stream."read_bytes"( 4 )
-    print "["
+    print "'lowo': ["
     print $S0
     print "] = "
 
@@ -47,11 +47,12 @@ This example shows the usage of C<Stream::read_bytes>.
     print "]\n"
     
     $S0 = stream."read"()
-    print "["
+    print "'rld!': ["
     print $S0
     print "]\n"
+
     $S0 = stream."read_bytes"( 100 )
-    print "["
+    print "'parrotis cool': ["
     print $S0
     print "]\n"
 

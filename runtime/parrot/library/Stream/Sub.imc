@@ -124,7 +124,21 @@ _sub_write_ret:
     setattribute self, $I0, $P0
 
     str = temp( self )
+    
+    # sub exited, delete source
+    null temp
+    self."setSource"( temp )
 
+    # write null-string to terminate the read request
+    null str
+    self."write"( str )
+
+    # should never be executed
+    new temp, .Exception
+    set temp["_message"], "fatal error in library/Streams/Sub.imc: rawRead()"
+    throw temp
+    end
+    
 END:
     # return a null string to indicate end of stream
     null str
