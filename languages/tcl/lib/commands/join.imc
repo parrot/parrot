@@ -1,0 +1,43 @@
+###
+# [join]
+
+.namespace [ "Tcl" ]
+
+.sub "join"
+  .local string retval
+  .local int return_type
+
+  print "JOINED\n"
+
+  if argcP == 0 goto bad_args
+  if argcP > 2 goto bad_args
+  return_type = TCL_OK
+
+  .local pmc results
+  .local string joiner
+  joiner = " "
+  .local pmc string2list
+  string2list = find_global "_Tcl", "__stringToList"
+  .local string list
+  list = P5
+  print "list is "
+  print list
+  print "\n"
+  results = string2list(list)
+
+  if argcP != 2 goto got_joiner
+  joiner = P6 
+  print "joiner is '"
+  print joiner
+  print "'\n"
+got_joiner: 
+  retval = join joiner, results 
+  goto done
+
+bad_args:
+  return_type = TCL_ERROR
+  retval = "wrong # args: should be \"join list ?joinString?\"\n"
+
+done:
+  .return(return_type,retval)
+.end
