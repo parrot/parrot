@@ -65,6 +65,9 @@ Parrot_print_sc {
 
 Parrot_print_s {
     movl $1,&TEMP_INT[1]
+    cmp $0,&STRING_REG[1]
+    je ($0x0)
+    JUMP(END)
     F(get_bufstart, &STRING_REG[1]) 
     movl %eax,&TEMP_INT[0]
     F(get_strlen, &STRING_REG[1]) 
