@@ -1,6 +1,17 @@
 package P6C::TestCompiler;
 
+=head1 DESCRIPTION
+
+A Module for test Perl6.
+
+=head1 SYNOPSIS
+
+See t/harness
+
+=cut
+
 use Parrot::Config;
+use Exporter;
 require Parrot::Test;
 require Test::Builder;
 @EXPORT = ( qw(output_is output_like output_isnt) );
@@ -10,6 +21,7 @@ $| = 1;
 
 sub dumperr {
     my $file = shift;
+
     my $name = "test-$file-$testno";
     open IN, $ERR;
     print STDERR <IN>;
@@ -41,13 +53,14 @@ sub generate_pbc_for {
     open P6, ">$p6_f";
     print P6 $code;
     close P6;
-    my $imc_f = Parrot::Test::per_test('.imc',$count);
-    my $err_f = Parrot::Test::per_test('.err',$count);
+    my $imc_f  = Parrot::Test::per_test('.imc',$count);
+    my $err_f  = Parrot::Test::per_test('.err',$count);
     my $pasm_f = Parrot::Test::per_test('.pasm',$count);
-    my $PARROT = "..$PConfig{slash}..$PConfig{slash}parrot$PConfig{exe}";
+    my $pbc_f  = Parrot::Test::per_test('.pbc',$count);
+    my $parrot = "..$PConfig{slash}..$PConfig{slash}parrot$PConfig{exe}";
 
     Parrot::Test::_run_command("$PConfig{perl} prd-perl6.pl --batch=$p6_f --imc", 'STDOUT' => $imc_f, 'STDERR' => $err_f);
-    Parrot::Test::_run_command("$PARROT -o $pasm_f $imc_f", 'STDERR' => $err_f);
+    Parrot::Test::_run_command("$parrot -o $pasm_f $imc_f", 'STDERR' => $err_f);
     my $pasm;
     {
       open PASM, $pasm_f;
@@ -55,7 +68,7 @@ sub generate_pbc_for {
       $pasm = <PASM>;
       close PASM;
     }
-    Parrot::Test::generate_pbc_for($pasm,$package,$count);
+    Parrot::Test::generate_pbc_for($pasm,$package,$count,$pbc_f);
 }
 
 Parrot::Test::generate_functions(__PACKAGE__,\&generate_pbc_for,"../../");
