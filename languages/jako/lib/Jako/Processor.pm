@@ -279,7 +279,7 @@ sub dump
     last if $tok->is_eof;
   }
 
-=no
+=begin commented_out
 
   foreach (my $i = 0; $i < scalar(@{$self->{TOKENS}}); $i++) {
     my $tok = $self->at($i);

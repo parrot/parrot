@@ -941,7 +941,7 @@ sub parse
       next;
     }
 
-=no
+=begin commented_out
 
     #
     # Bare Blocks:

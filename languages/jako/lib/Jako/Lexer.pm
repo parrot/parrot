@@ -96,7 +96,7 @@ sub scan_line
     # String literals:
     #
 
-=no
+=begin commented_out
 
     if ($text =~ m{^((?:\'(?:\\\'|(?!\').)*\'))(.*)$}) {
       push @tokens, Jako::Token->new(
