@@ -140,19 +140,32 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *class) {
     PMC *new_object;
     PMC *new_object_array;
     INTVAL attrib_count;
+    PMC *class_array;
 
     /* Grab the attribute count from the parent */
     attrib_count = class->cache.int_val;
 
-    /* */
+    class_array = PMC_data(class);
+
+    /* Build the array that hangs off the new object */
     new_object_array = pmc_new(interpreter, enum_class_Array);
-    VTABLE_set_integer_native(interpreter, new_object_array, attrib_count);
+    /* Presize it */
+    VTABLE_set_integer_native(interpreter, new_object_array, attrib_count + 2);
+    /* 0 - class PMC, 1 - class name */
+    VTABLE_set_pmc_keyed_int(interpreter, new_object_array, 0, class);
+    VTABLE_set_pmc_keyed_int(interpreter, new_object_array, 1,
+                             VTABLE_get_pmc_keyed_int(interpreter, class_array, 4));
+
+    /* Allocate teh object itself */
     new_object = pmc_new(interpreter, enum_class_ParrotObject);
+    /* Note the number of used slots */
+    new_object->cache.int_val = 2;
+    
     PMC_data(new_object) = new_object_array;
     PObj_flag_SET(is_PMC_ptr, new_object);
-
+    
+    /* We really ought to call the class init routines here... */
     return new_object;
-
 }
 
 PMC *

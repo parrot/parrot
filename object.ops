@@ -251,6 +251,7 @@ PMC into register $1.
 
 inline op instantiate(out PMC, in PMC) {
 
+  $1 = Parrot_instantiate_object(interpreter, $2);
   goto NEXT();
 }
 
