@@ -29,7 +29,12 @@ pmclass Undef extends default {
 
   void set_pmc(PMC* other) {
     VTABLE_morph(INTERP, SELF, enum_class_Ref);
-    VTABLE_set_pmc(INTERP, SELF, other);    
+    VTABLE_set_pmc(INTERP, SELF, other);
+  }
+
+  void assign_pmc(PMC* other) {
+    VTABLE_morph(INTERP, SELF, other->vtable->base_type);
+    VTABLE_set_pmc(INTERP, SELF, other);
   }
 
   void morph(INTVAL new_type) {
