@@ -263,8 +263,8 @@ p6ge_gen_group(P6GE_Exp* e, const char* succ)
     /* otherwise, we have work to do */
 
     /* GROUP: initialization
-    /* This first part sets up the initial structures for a repeating group. 
-    /* We need a repeat count and (possibly) a captures hash. */
+       This first part sets up the initial structures for a repeating group. 
+       We need a repeat count and (possibly) a captures hash. */
     emit("    classoffset $I0, match, \"P6GEMatch\"\n");
     emit("    $I0 += 3\n");
     emit("    getattribute gr_rep, match, $I0\n");
@@ -290,9 +290,9 @@ p6ge_gen_group(P6GE_Exp* e, const char* succ)
     emit("    goto fail\n\n");
 
     /* GROUP: repeat code
-    /* This code is called whenever we reach the end of the group's
-    /* subexpression.  It handles closing any outstanding capture, and 
-    /* repeats the group if the quantifier requires it. */
+       This code is called whenever we reach the end of the group's
+       subexpression.  It handles closing any outstanding capture, and 
+       repeats the group if the quantifier requires it. */
     emit("%s:\n", repsub);
     emit("    classoffset $I0, match, \"P6GEMatch\"\n");
     emit("    $I0 += 3\n");
