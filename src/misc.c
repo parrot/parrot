@@ -414,7 +414,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			                    case 'f':
 			                        dbl = va_arg(*args, double);
 			                        gen_sprintf_call(t1, t2, &info,
-					                        (const char) 'f');
+					                        (char) 'f');
 			                        sprintf(t2, t1, dbl);
 			                        targ =
 				                    string_concat(interpreter, targ,
