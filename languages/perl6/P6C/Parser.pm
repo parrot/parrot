@@ -229,7 +229,7 @@ $grammar = <<'ENDSUPPORT';
     use vars qw(%KEYWORDS %CLASSES %WANT);
     use vars qw($NAMEPART $COMPARE $CONTEXT $MULDIV $PREFIX $ADDSUB $INCR
 		$LOG_OR $LOGOR $FILETEST $ASSIGN $HYPE $MATCH $BITSHIFT
-		$SOB $FLUSH $NUMPART $RXATOM $RXMETA $RXCHARCLASS
+		$SOB $FLUSH $NUMPART $NUMBER $RXATOM $RXMETA $RXCHARCLASS
  		$SPECIAL_DELIM
 		$RXESCAPED $HEXCHAR $RXASSERTION);
     use vars '%CDELIM';
@@ -262,6 +262,7 @@ BEGIN {
     # Used for flushing syntax errors
     $FLUSH	= qr/\w+|[^\s\w;}#'"]+/;
     $NUMPART	= qr/(?!_)[\d_]+(?<!_)/;
+    $NUMBER = qr/(?:$NUMPART(?:\.$NUMPART)?|\.$NUMPART)(?:[Ee]-?$NUMPART)?/o;
     $HEXCHAR	= qr/[a-fA-F0-9]{2,4}/;
     $RXESCAPED	= qr/\\(?:[Xx]$HEXCHAR|0[0-7]{1,3}|[Xx]\{$HEXCHAR\}|[Pp]\{\w+\}|.)/o;
     $RXASSERTION= qr/:{1,3}|\^{1,2}|\${1,2}/;
@@ -385,10 +386,44 @@ $grammar .= <<'ENDGRAMMAR';
 ##############################
 # Literals:
 
-sv_literal:	  /(?:$NUMPART(?:\.$NUMPART)?|\.$NUMPART)(?:[Ee]-?$NUMPART)?/o
+sv_literal:
+          number
+        | /$NUMBER/
 		| '{' <commit> hv_seq '}'
 		| '[' <commit> av_seq(?) ']'
 		| quoted_string
+
+number: radii | base
+
+base: binary | octal | decimal | hex
+
+binary: /0b0[01]+/
+octal:  /0c0[0-7]+/
+decimal: /0d0[0-9]+/
+hex: /0x0[0-9a-fA-F]+/
+
+radii: dotted_radii | reg_radii
+
+dotted_radii:
+        /(?=\d+\#(?:\d+:)+\d+)/
+        <skip:''>
+        /[0-9]+/ '#'
+        (/(\d+)/ ':')(s) /(\d+)/
+        <skip:$item[1]>
+
+reg_radii:
+        /(?=\d+\#\d+)/
+        <skip:''>
+        /[0-9]+/ '#'
+        {
+            local $_ = '0-9';
+            $_ = "0-" . ($item[3]-1) unless $item[3] > 9;
+            $_ .= ('a-' . chr ($item[3] + ord('a') - 11) )
+                unless $item[3] < 10 || $item[3] > 35;
+            $_ = qr/[$_]+/i;
+        }
+        /$item[5]/
+        <skip:$item[1]>
 
 av_seq:		  semi /[;,]?/
 
@@ -764,9 +799,9 @@ backslashed_expr:
           /(?=[qQ])/ single_quoted_string { $item[2] }
         | 'c' '[' string_set ']'
         | ':' '[' string_set ']'
-        | /[ULE]/ '[' /[^\]]*/ ']'
-        | /[ule]/ /./
-        | /[terfn]/
+        | /[UL]/ '[' /[^\]]*/ ']'
+        | /[ul]/ /./
+        | /[trfn]/
 
 string_set:
         (

@@ -231,6 +231,58 @@ sub P6C::sv_literal::tree {
     return new P6C::sv_literal type => $type, lval => $val;
 }
 
+sub P6C::number::tree {
+	$_[0]->[1]->tree
+}
+
+sub P6C::base::tree {
+	$_[0]->[1]->tree
+}
+
+sub P6C::binary::tree {
+	new P6C::sv_literal type => 'PerlInt', lval => oct($_[0]->[1])
+}
+
+sub P6C::octal::tree {
+	new P6C::sv_literal type => 'PerlInt', lval => oct(substr($_[0]->[1],2))
+}
+
+sub P6C::decimal::tree {
+	new P6C::sv_literal type => 'PerlInt', lval => substr($_[0]->[1],2)
+}
+
+sub P6C::hex::tree {
+	new P6C::sv_literal type => 'PerlInt', lval => hex $_[0]->[1]
+}
+
+sub P6C::radii::tree {
+	$_[0]->[1]->tree
+}
+
+sub P6C::reg_radii::tree {
+	my $x = shift;
+	my $base = $x->[3];
+	my ($val,$digit)=(0,0);
+	foreach (reverse split //, $x->[6]) {
+		$_ = ord(lc $_) - 87 if (!/^\d+$/);
+		$val += ($base**$digit) * $_;
+		++$digit
+	}
+	return new P6C::sv_literal type => 'PerlInt', lval => $val
+}
+
+sub P6C::dotted_radii::tree {
+	my $x = shift;
+	my $base = $x->[3];
+	my ($val,$digit) = ($x->[6],1);
+	foreach (reverse @{$x->[5]}) {
+		error ("digit higher than radii base"), die if $_->[1] >= $base;
+		$val += ($base**$digit) * $_->[1];
+		++$digit
+	}
+	return new P6C::sv_literal type => 'PerlInt', lval => $val
+}
+
 sub P6C::av_seq::tree {
     shift->[1]->tree;
 }
