@@ -8,6 +8,7 @@
 
 PYVAR_SCOPE INTVAL PyBuiltin_PyBoolean;
 PYVAR_SCOPE INTVAL PyBuiltin_PyBoundMeth;
+PYVAR_SCOPE INTVAL PyBuiltin_PyBoundCall;
 PYVAR_SCOPE INTVAL PyBuiltin_PyClass;
 PYVAR_SCOPE INTVAL PyBuiltin_PyComplex;
 PYVAR_SCOPE INTVAL PyBuiltin_PyDict;
@@ -68,6 +69,10 @@ PYVAR_SCOPE STRING *PyString_oct;
 PYVAR_SCOPE STRING *PyString_proxy;
 PYVAR_SCOPE STRING *PyString_repr;
 PYVAR_SCOPE STRING *PyString_str;
+
+PYVAR_SCOPE STRING *PyFunc_args;
+PYVAR_SCOPE STRING *PyFunc_varargs;
+PYVAR_SCOPE STRING *PyFunc_defaults;
 
 /* utility functions */
 

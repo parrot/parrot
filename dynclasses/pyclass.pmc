@@ -373,6 +373,8 @@ Call the object.
 
     void* invoke(void* next) {
         PMC *call = VTABLE_find_method(INTERP, SELF, PyString_call);
+        if (!REG_INT(3)) REG_INT(3)=1;
+        REG_PMC(5) = SELF;
         return VTABLE_invoke(INTERP, call, next);
     }
 

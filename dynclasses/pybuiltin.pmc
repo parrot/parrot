@@ -84,6 +84,7 @@ they will be used frequently here.
         if (pass) {
             PyBuiltin_PyBoolean    = Parrot_PMC_typenum(INTERP, "PyBoolean");
             PyBuiltin_PyBoundMeth  = Parrot_PMC_typenum(INTERP, "PyBoundMeth");
+            PyBuiltin_PyBoundCall  = Parrot_PMC_typenum(INTERP, "PyBoundCall");
             PyBuiltin_PyClass      = Parrot_PMC_typenum(INTERP, "PyClass");
             PyBuiltin_PyComplex    = Parrot_PMC_typenum(INTERP, "PyComplex");
             PyBuiltin_PyDict       = Parrot_PMC_typenum(INTERP, "PyDict");
@@ -125,6 +126,10 @@ they will be used frequently here.
             PyString_str   = const_string(INTERP, "__str__");
 
             PyString_next  = const_string(INTERP, "next");
+
+            PyFunc_args     = const_string(INTERP, "func_args");
+            PyFunc_varargs  = const_string(INTERP, "func_varargs");
+            PyFunc_defaults = const_string(INTERP, "func_defaults");
         }
     }
 
@@ -958,6 +963,22 @@ calculation, and serves as a default whe n the sequence is empty.
             res = init;
 
         return res;
+    }
+
+/*
+
+=item C<PMC* "repr"(PMC *value)>
+
+Returns the representation of C<value>.
+
+=cut
+
+*/
+
+    METHOD PMC* repr(PMC *value) {
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyString);
+        VTABLE_set_string_native(INTERP, ret, VTABLE_get_repr(INTERP, value));
+        return ret;
     }
 
 /*

@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-classes/nci.pmc - Python Native Call Interface Functions
+classes/pyboundmeth.pmc - Python Bound Method
 
 =head1 DESCRIPTION
 
-Extends Parrot's NCI to include attributes, implemented as properties.
+A Python Method, bound to an object, and callable as a function
 
 =head2 Methods
 
@@ -54,39 +54,6 @@ Marks the hash as live.
             pobject_lives(INTERP, (PObj *) PMC_struct_val(SELF));
         if (PMC_pmc_val(SELF))      /* real sub */
              pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
-    }
-
-/*
-
-=item C<PMC *find_method(STRING *method_name)>
-
-Find a method call on the indicated object.
-
-=cut
-
-*/
-
-    PMC* find_method(STRING* method_name) {
-        if (0 == string_compare(INTERP, method_name, PyString_call)) {
-            int i = REG_INT(3)++;
-            while (i--)
-                REG_PMC(6+i)=REG_PMC(5+i);
-            REG_PMC(5) = PMC_struct_val(SELF); 
-        }
-        return VTABLE_find_method(INTERP, PMC_pmc_val(SELF), method_name);
-    }
-/*
-
-=item C<PMC* get_attr_str(STRING *name)>
-
-Return attribute named C<name>.
-
-=cut
-
-*/
-
-    PMC* get_attr_str(STRING* idx) {
-        return VTABLE_get_attr_str(INTERP, PMC_pmc_val(SELF), idx);
     }
 
 /*

@@ -21,31 +21,7 @@ This class implements a Python Function, i.e. a Parrot Closure.
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 
-static STRING *FUNC_ARGS;
-static STRING *FUNC_DEFAULTS;
-static STRING *FUNC_VARARGS;
-
 pmclass PyFunc extends Closure dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            FUNC_ARGS = const_string(INTERP, "func_args");
-            FUNC_VARARGS = const_string(INTERP, "func_varargs");
-            FUNC_DEFAULTS = const_string(INTERP, "func_defaults");
-        }
-    }
-
 
 /*
 
@@ -61,7 +37,7 @@ Create an (empty) list of function arguments
         PMC *func_args;
         SUPER();
         func_args = pmc_new(INTERP, PyBuiltin_PyList);
-        VTABLE_setprop(INTERP, SELF, FUNC_ARGS, func_args);
+        VTABLE_setprop(INTERP, SELF, PyFunc_args, func_args);
     }
 
 /*
@@ -76,58 +52,14 @@ at this time, functions with a maximum of 11 arguments are supported.
 
 TODO: error checking (e.g., missing, duplicate or extra arguments)
 
-XXX: the __call__ support is bad, bad, bad.  Consider the following
-conversation: Do you have a __call__ method?  Sure!  Meanwhile I hope
-you don't mind me rearranging your registers.  I hope you are intending
-to call the method real soon...  Have a nice day!
-
-The right way to accomplish this would be to create a method-wrapper
-object and return it.  And this overhead could be avoided in the normal
-case if there were a VTABLE_call_method entry which unambiguously
-involved a find_method in anticipation of an invoke.
-
 */
 
     PMC* find_method(STRING* method_name) {
         if (0 == string_compare(INTERP, method_name, PyString_call)) {
-            PMC *args = REG_PMC(5);
-            PMC *keywords = REG_PMC(6);
-            PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
-            PMC *func_defaults = VTABLE_getprop(INTERP, SELF, FUNC_DEFAULTS);
-            INTVAL j;
-
-            INTVAL n = VTABLE_elements(INTERP, func_args);
-            REG_INT(3) = n;
-
-            /* fill in defaults */
-            if (func_defaults && VTABLE_defined(INTERP, func_defaults)) {
-                INTVAL nd = VTABLE_elements(INTERP, func_defaults);
-                for (j=n-nd; j<n && j<11; j++) {
-                    REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP,
-                        func_defaults, j+nd-n);
-                }
-            }
-
-            /* fill in positional arguments */
-            if (VTABLE_get_bool(INTERP, args)) {
-                INTVAL np = VTABLE_elements(INTERP, args);
-                for (j=0; j<np && j<11; j++) {
-                    REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP, args, j);
-                }
-            }
-
-            /* fill in keyword arguments */
-            if (VTABLE_get_bool(INTERP, keywords)) {
-                for (j=0; j<n && j<11; j++) {
-                    PMC *name = VTABLE_get_pmc_keyed_int(INTERP, func_args, j);
-                    if (VTABLE_exists_keyed(INTERP, keywords, name)) {
-                        REG_PMC(5+j) =
-                            VTABLE_get_pmc_keyed(INTERP, keywords, name);
-                    }
-                }
-            }
-
-            return SELF;
+            PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoundCall);
+            VTABLE_set_pointer(INTERP, ret, SELF);
+            VTABLE_set_pmc(INTERP, ret, SELF);
+            return ret;
         }
 
         return SUPER(method_name);
@@ -202,13 +134,17 @@ Invoke a function.  Defaults are filled in first.
 */
 
     void* invoke(void* next) {
-        PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
-        PMC *func_varargs = VTABLE_getprop(INTERP, SELF, FUNC_VARARGS);
-        INTVAL n = VTABLE_elements(INTERP, func_args);
-        INTVAL j;
+        PMC *func_args = VTABLE_getprop(INTERP, SELF, PyFunc_args);
+        PMC *func_varargs = VTABLE_getprop(INTERP, SELF, PyFunc_varargs);
+        INTVAL n,j;
+
+        if (func_args && VTABLE_defined(INTERP, func_args))
+            n = VTABLE_elements(INTERP, func_args);
+        else
+            n = REG_INT(3);
 
         if (n > REG_INT(3)) {
-            PMC *func_defaults = VTABLE_getprop(INTERP,SELF,FUNC_DEFAULTS);
+            PMC *func_defaults = VTABLE_getprop(INTERP, SELF, PyFunc_defaults);
 
             if (func_defaults && VTABLE_defined(INTERP, func_defaults)) {
                 INTVAL nd = VTABLE_elements(INTERP, func_defaults);
@@ -250,7 +186,7 @@ Add an argument to the func_args list
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
+        PMC *func_args = VTABLE_getprop(INTERP, SELF, PyFunc_args);
         VTABLE_set_integer_keyed_int(INTERP, func_args, key, value);
     }
 
@@ -265,7 +201,7 @@ Add an argument to the func_args list
 */
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
-        PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
+        PMC *func_args = VTABLE_getprop(INTERP, SELF, PyFunc_args);
         VTABLE_set_string_keyed_int(INTERP, func_args, key, value);
     }
 

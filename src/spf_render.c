@@ -689,8 +689,26 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             break;
 
                             /* STRINGS */
+                        case 'r':        /* Python repr */
+                            /* XXX the right fix is to add a getrepr entry *
+                             * to SPRINTF_OBJ, but for now, getstring_pmc  *
+                             * is inlined and modified to call get_repr    */
+                            if (obj->getstring == pmc_core.getstring) {
+                                PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
+                                    ((PMC *)obj->data), (obj->index));
+                               
+                                obj->index++;
+                                string = (VTABLE_get_repr(interpreter, tmp));
+
+                                ts = handle_flags(interpreter, &info, string,
+                                    0, NULL);
+
+                                string_append(interpreter, targ, ts, 0);
+
+                                break;
+                            }
+
                         case 's':
-                        case 'r':        /* Python repr??? */
                           CASE_s:
                             string = obj->getstring
                                 (interpreter, info.type, obj);

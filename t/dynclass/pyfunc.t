@@ -106,15 +106,15 @@ output_is($base . << 'CODE', << 'OUTPUT', "positional expression");
     find_type $I2, "PyDict"
     new $P2, $I2
 
-    $P0.__call__($P1, $P2)
+    $P0.__call__($P0, $P1, $P2)
 
     push $P1, "one"
 
-    $P0.__call__($P1, $P2)
+    $P0.__call__($P0, $P1, $P2)
 
     push $P1, "two"
 
-    $P0.__call__($P1, $P2)
+    $P0.__call__($P0, $P1, $P2)
 .end
 CODE
 uno dos tres
@@ -134,15 +134,15 @@ output_is($base . << 'CODE', << 'OUTPUT', "keyword expression");
 
     $P2['y'] = "two"
 
-    $P0.__call__($P1, $P2)
+    $P0.__call__($P0, $P1, $P2)
 
     $P2['z'] = "three"
 
-    $P0.__call__($P1, $P2)
+    $P0.__call__($P0, $P1, $P2)
 
     $P2['x'] = "one"
 
-    $P0.__call__($P1, $P2)
+    $P0.__call__($P0, $P1, $P2)
 .end
 CODE
 uno two tres

@@ -193,8 +193,8 @@ Returns the PMC value of the element at index C<key>.
     PMC* get_pmc_keyed_int (INTVAL key) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS,
-                "PyTuple: index out of bounds!");
+            real_exception(INTERP, NULL, E_IndexError,
+                "IndexError: tuple index out of range");
 
         data = (PMC **)PMC_data(SELF);
         return data[key];

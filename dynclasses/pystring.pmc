@@ -483,6 +483,37 @@ character in S, False otherwise.
 
 /*
 
+=item C<PMC* "join"(PMC *self, PMC *sequence)>
+
+Return True if all characters in S are whitespace and there is at least one
+character in S, False otherwise.
+
+=cut
+
+*/
+
+    METHOD PMC* join (PMC *self, PMC *sequence) {
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyString);
+        PMC *iter = VTABLE_get_iter(INTERP, sequence);
+        STRING *s;
+
+        if (!VTABLE_get_bool(INTERP, iter))
+           s = string_from_cstring(INTERP, "", 0); 
+        else {
+           s = VTABLE_shift_string(INTERP, iter);
+           while (VTABLE_get_bool(INTERP, iter)) {
+               s = string_append(INTERP, s, PMC_str_val(self), 0);
+               s = string_append(INTERP, s, 
+                   VTABLE_get_string(INTERP, iter), 0);
+           }
+        }
+
+        VTABLE_set_string_native(INTERP, ret, s);
+        return ret;
+    }
+
+/*
+
 =item C<PMC* "lower"(PMC *self)>
 
 downcase this string
@@ -535,7 +566,7 @@ Interpolates a formatstring with a set of values.
          * SELF is formatstring, value = argument array or item
          */
         /* TODO: figure out why C<DOES> doesn't work for dynclasses */
-        if (value->vtable->base_type != enum_class_FixedPMCArray) {
+        if (value->vtable->base_type != PyBuiltin_PyTuple) {
             /* not a tuple - make one */
             ar = pmc_new(INTERP, PyBuiltin_PyTuple);
             VTABLE_set_integer_native(INTERP, ar, 1);

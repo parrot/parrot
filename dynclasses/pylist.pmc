@@ -378,8 +378,9 @@ Returns the PMC value of the element at index C<key>.
         List *list = (List *)PMC_data(SELF);
         PMC *ret = list_get(INTERP, list, key, enum_type_PMC);
 
-        if (ret == (void*) -1)
-            /* XXX throw IndexError: list index out of range */ ;
+        if (!ret)
+            real_exception(INTERP, NULL, E_IndexError,
+                "IndexError: list index out of range");
         else {
             ret = *(PMC**) ret;
             if (ret == NULL)
@@ -418,6 +419,21 @@ Returns the list as a string
         res = string_append(INTERP, res,
                     const_string(INTERP, "]"), 0);
         return res;
+    }
+
+/*
+
+=item C<STRING* get_string_keyed(PMC* key)>
+
+Returns the PMC value of the element at index C<key> as a string.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed (PMC* key) {
+        PMC *item = VTABLE_get_pmc_keyed(INTERP, SELF, key);
+        return VTABLE_get_string(INTERP, item);
     }
 
 /*

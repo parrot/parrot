@@ -1,0 +1,108 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/nci.pmc - Python Native Call Interface Functions
+
+=head1 DESCRIPTION
+
+Extends Parrot's NCI to include attributes, implemented as properties.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "pyconsts.h"
+
+pmclass PyBoundCall extends PyBoundMeth dynpmc group python_group {
+
+/*
+
+=item C<void* invoke(void* next)>
+
+Invoke a method call on the indicated object.
+
+=cut
+
+*/
+
+    void* invoke(void* next) {
+        PMC *self = REG_PMC(5);
+        PMC *args = REG_PMC(6);
+        PMC *keywords = REG_PMC(7);
+        PMC *func_args = VTABLE_getprop(INTERP, self, PyFunc_args);
+        PMC *func_defaults = VTABLE_getprop(INTERP, self, PyFunc_defaults);
+        INTVAL j,n;
+
+        if (func_args && VTABLE_defined(INTERP, func_args))
+            n = VTABLE_elements(INTERP, func_args);
+        else
+            n = VTABLE_elements(INTERP, args);
+
+        REG_INT(3) = n;
+
+        /* fill in defaults */
+        if (func_defaults && VTABLE_defined(INTERP, func_defaults)) {
+            INTVAL nd = VTABLE_elements(INTERP, func_defaults);
+            for (j=n-nd; j<n && j<11; j++) {
+                REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP,
+                    func_defaults, j+nd-n);
+            }
+        }
+
+        /* fill in positional arguments */
+        if (VTABLE_get_bool(INTERP, args)) {
+            INTVAL np = VTABLE_elements(INTERP, args);
+            for (j=0; j<np && j<11; j++) {
+                REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP, args, j);
+            }
+        }
+
+        /* fill in keyword arguments */
+        if (VTABLE_get_bool(INTERP, keywords)) {
+            for (j=0; j<n && j<11; j++) {
+                PMC *name = VTABLE_get_pmc_keyed_int(INTERP, func_args, j);
+                if (VTABLE_exists_keyed(INTERP, keywords, name)) {
+                    REG_PMC(5+j) =
+                        VTABLE_get_pmc_keyed(INTERP, keywords, name);
+                }
+            }
+        }
+
+        return VTABLE_invoke(INTERP, PMC_pmc_val(SELF), next);
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
