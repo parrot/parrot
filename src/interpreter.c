@@ -1520,7 +1520,7 @@ setup_event_func_ptrs(Parrot_Interp interpreter)
         interpreter->evc_func_table = mem_sys_allocate(sizeof(void *) * n);
         for (i = 0; i < n; ++i)
             interpreter->evc_func_table[i] = (op_func_t)
-                ((void**)lib->op_func_table)[CORE_OPS_check_events__];
+                DTOFPTR(((void**)lib->op_func_table)[CORE_OPS_check_events__]);
     }
 }
 
@@ -2243,7 +2243,7 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
     if ((int)interpreter->run_core == cg_lib->core_type) {
         for (i = n_old; i < n_tot; ++i)
             interpreter->evc_func_table[i] =
-                (op_func_t)ops_addr[CORE_OPS_check_events__];
+                (op_func_t)DTOFPTR(ops_addr[CORE_OPS_check_events__]);
         interpreter->save_func_table = (void *) ops_addr;
     }
     /*
