@@ -198,6 +198,13 @@ static void unused_label()
                         break;
                     }
                 }
+                /* if we have compile/eval, we don't know, if this
+                 * label might be used
+                 */
+                else if (!strcmp(ins2->op, "compile")) {
+                    used = 1;
+                    break;
+                }
             }
             if (!used && last) {
                 ostat.deleted_labels++;
@@ -226,6 +233,7 @@ static int used_once()
         if (!r)
             continue;
         if (r->use_count == 1 && r->lhs_use_count == 1) {
+            debug(DEBUG_OPT2, "used once »%s« deleted\n", ins_string(ins));
             delete_ins(ins, 1);
             ostat.deleted_ins++;
             ostat.used_once++;

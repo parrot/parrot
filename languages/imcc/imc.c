@@ -314,6 +314,13 @@ static void compute_one_du_chain(SymReg * r) {
             if (rw)
                 r->lhs_use_count++;
             r->use_count++;
+            /* if this symbol is used in a different scope
+             * assume usage
+             */
+            if (r->reg) {
+                r->lhs_use_count++;
+                r->use_count++;
+            }
 	}
     }
     /* TODO score high if r is a array/hash key */

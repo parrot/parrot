@@ -1,3 +1,11 @@
+- 2003-02-08 	leo
+	* version 0.0.9.13
+	* pass -Ox on to tests
+	* remove dead code
+	* remove branch to next ins
+	* fix use_count for invoke and .local vars
+	* don't remove unused global labels
+
 - 2003-02-07 	leo
 	* first step for bsr handling in the CFG
 	  local bsrs (target in the same compilation unit) can

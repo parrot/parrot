@@ -19,6 +19,7 @@
 #include "pbc.h"
 #include "parser.h"
 
+#define IMCC_VERSION "0.0.9.13"
 
 static int run_pbc, write_pbc;
 extern FILE *yyin;

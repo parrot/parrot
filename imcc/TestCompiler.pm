@@ -78,6 +78,7 @@ sub generate_functions {
 	my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
 
 	if ($gen_pasm) {
+	    $TEST_PROG_ARGS =~ s/-O.//;
 	    system("./imcc ${TEST_PROG_ARGS} $opt -o $out_f $by_f");
 	}
 	elsif ($TEST_PROG_ARGS =~ /-c/) {

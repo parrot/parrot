@@ -71,12 +71,12 @@ void dump_instructions() {
     int pc;
 
     fprintf(stderr, "\nDumping the instructions status:\n-------------------------------\n");
-    fprintf(stderr, "n\tblock\tdepth\tflags\ttype\topnum\tsize\tpc\top\n");
+    fprintf(stderr, "n\tblock\tdepth\tflags\ttype     opnum\tsize\tpc\tins\n");
     for (pc = 0, ins = instructions; ins; ins = ins->next) {
 	bb = bb_list[ins->bbindex];
 
 	if (bb) {
-	     fprintf(stderr, "%i\t%d\t%d\t%x\t%x\t%d\t%d\t%d\t",
+	     fprintf(stderr, "%i\t%d\t%d\t%x\t%8x %d\t%d\t%d\t",
 		     ins->index, bb->index, bb->loop_depth,
                      ins->flags, ins->type, ins->opnum, ins->opsize, pc);
 	}
@@ -133,15 +133,18 @@ void dump_loops() {
 }
 
 
+extern int n_comp_units;
 void dump_symreg() {
     int i;
 
     if (!reglist)
         return;
     fprintf(stderr,
-            "\nSymbols:\n----------------------------------------------\n");
+            "\nSymbols: n_comp_units %d"
+            "\n----------------------------------------------\n",
+            n_comp_units);
     fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col tscore\t"
-            "used\tlhs_use\tus flgs\n"
+            "used\tlhs_use\tregp\tus flgs\n"
             "----------------------------------------------\n");
     for(i = 0; i <n_symbols; i++) {
         SymReg * r = reglist[i];
@@ -149,13 +152,14 @@ void dump_symreg() {
             continue;
         if(!r->first_ins)
             continue;
-        fprintf(stderr, "%s\t%d\t%d\t%d\t%d\t%c   %2d  %d\t%d\t%d\t%x\n",
+        fprintf(stderr, "%s\t%d\t%d\t%d\t%d\t%c   %2d  %d\t%d\t%d\t%s\t%x\n",
                 r->name,
 		    r->first_ins->index, r->last_ins->index,
 		    r->first_ins->bbindex, r->last_ins->bbindex,
 		    r->set,
                 r->color, r->score,
                 r->use_count, r->lhs_use_count,
+                r->reg ? r->reg->name : "",
                 r->usage
                );
     }

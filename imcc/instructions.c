@@ -36,7 +36,7 @@ typedef struct comp_unit_t {
 } comp_unit_t;
 
 static comp_unit_t *comp_unit;
-static int n_comp_units;
+int n_comp_units;
 
 void
 open_comp_unit(void)
@@ -96,6 +96,10 @@ _find_sym(Namespace * nspace, SymReg * hsh[], const char * name) {
                     SymReg *new = mk_ident(str_dup(p->name), p->set);
                     new->type |= VT_REGP;
                     new->reg = p;
+                    /* link in both dirs, so that usage can be determined */
+                    p->reg = new;
+                    debug(DEBUG_LEXER, "found outer scope sym '%s'\n",
+                            p->name);
                     return new;
                 }
                 return p;

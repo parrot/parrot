@@ -277,6 +277,12 @@ static void propagate_alias(void)
 		ins = curr;
 	    }
 	}
+        /* invoke implicitely uses P0, so mark it doin so */
+        else if (!strcmp(ins->op, "invoke")) {
+            SymReg * p0 = mk_pasm_reg("P0");
+            add_instruc_reads(ins, p0);
+            p0->use_count++;
+        }
     }
     if (IMCC_DEBUG & DEBUG_CFG) {
 	debug(DEBUG_CFG, "\nAfter propagate_alias\n");
