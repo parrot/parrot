@@ -661,7 +661,11 @@ constants into their destination register, $1.
 
 =item B<add>(i, i, i)
 
+=item B<add>(i, i, ic)
+
 =item B<add>(n, n, n)
+
+=item B<add>(n, n, nc)
 
 Set $1 to the sum of $2 and $3.
 
@@ -670,8 +674,16 @@ Set $1 to the sum of $2 and $3.
 AUTO_OP add(i, i, i) {
   $1 = $2 + $3;
 }
+
+AUTO_OP add(i, i, ic) {
+  $1 = $2 + $3;
+}
   
 AUTO_OP add(n, n, n) {
+  $1 = $2 + $3;
+}
+
+AUTO_OP add(n, n, nc) {
   $1 = $2 + $3;
 }
 
@@ -679,6 +691,10 @@ AUTO_OP add(n, n, n) {
 ########################################
 
 =item B<cmod>(i, i, i)
+
+=item B<cmod>(i, i, ic)
+
+=item B<cmod>(i, ic, i)
 
 NOTE: This "uncorrected mod" algorithm uses the C language's built-in
 mod operator (x % y), which is
@@ -716,10 +732,22 @@ AUTO_OP cmod(i, i, i) {
   $1 = $2 % $3;
 }
 
+AUTO_OP cmod(i, i, ic) {
+  $1 = $2 % $3;
+}
+
+AUTO_OP cmod(i, ic, i) {
+  $1 = $2 % $3;
+}
+
 
 ########################################
 
 =item B<cmod>(n, n, n)
+
+=item B<cmod>(n, n, nc)
+
+=item B<cmod>(n, nc, n)
 
 NOTE: This "uncorrected mod" algorithm uses the built-in C math library's
 fmod() function, which computes
@@ -749,6 +777,14 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 =cut
 
 AUTO_OP cmod(n, n, n) {
+  $1 = fmod($2, $3);
+}
+
+AUTO_OP cmod(n, n, nc) {
+  $1 = fmod($2, $3);
+}
+
+AUTO_OP cmod(n, nc, n) {
   $1 = fmod($2, $3);
 }
 
@@ -795,7 +831,15 @@ AUTO_OP dec(n, nc) {
 
 =item B<div>(i, i, i)
 
+=item B<div>(i, i, ic)
+
+=item B<div>(i, ic, i)
+
 =item B<div>(n, n, n)
+
+=item B<div>(n, n, nc)
+
+=item B<div>(n, nc, n)
 
 Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
 result is truncated (NOT rounded or floored).
@@ -806,7 +850,23 @@ AUTO_OP div(i, i, i) {
   $1 = $2 / $3;
 }
 
+AUTO_OP div(i, i, ic) {
+  $1 = $2 / $3;
+}
+
+AUTO_OP div(i, ic, i) {
+  $1 = $2 / $3;
+}
+
 AUTO_OP div(n, n, n) {
+  $1 = $2 / $3;
+}
+
+AUTO_OP div(n, n, nc) {
+  $1 = $2 / $3;
+}
+
+AUTO_OP div(n, nc, n) {
   $1 = $2 / $3;
 }
 
@@ -852,6 +912,10 @@ AUTO_OP inc(n, nc) {
 ########################################
 
 =item B<mod>(i, i, i)
+
+=item B<mod>(i, i, ic)
+
+=item B<mod>(i, ic, i)
 
 NOTE: This "corrected mod" algorithm is based on the C code on page 70
 of [1]. Assuming correct behavior of C's built-in mod operator (%) with
@@ -899,10 +963,66 @@ AUTO_OP mod(i, i, i) {
   $1 = r;
 }
 
+AUTO_OP mod(i, i, ic) {
+  INTVAL y = $2;
+  INTVAL z = $3;
+  INTVAL s = 0;
+  INTVAL r;
+
+  if (z == 0) {
+    r = y;
+  }
+  else {
+    if (y < 0) { s += 2; y = -y; }
+    if (z < 0) { s += 1; z = -z; }
+
+    r = y % z;
+
+    switch (s) {
+      case 0 + 0:            break;
+      case 0 + 1: r = r - z; break;
+      case 2 + 0: r = z - r; break;
+      case 2 + 1: r = -r;    break;
+    }
+  }
+
+  $1 = r;
+}
+
+AUTO_OP mod(i, ic, i) {
+  INTVAL y = $2;
+  INTVAL z = $3;
+  INTVAL s = 0;
+  INTVAL r;
+
+  if (z == 0) {
+    r = y;
+  }
+  else {
+    if (y < 0) { s += 2; y = -y; }
+    if (z < 0) { s += 1; z = -z; }
+
+    r = y % z;
+
+    switch (s) {
+      case 0 + 0:            break;
+      case 0 + 1: r = r - z; break;
+      case 2 + 0: r = z - r; break;
+      case 2 + 1: r = -r;    break;
+    }
+  }
+
+  $1 = r;
+}
+
 
 ########################################
 
 =item B<mod>(n, n, n)
+
+=item B<mod>(n, n, nc)
+
+=item B<mod>(n, nc, n)
 
 NOTE: This "corrected mod" algorithm is based on the formula of [1]:
 
@@ -924,12 +1044,28 @@ AUTO_OP mod(n, n, n) {
      : $2;
 }
 
+AUTO_OP mod(n, n, nc) {
+  $1 = $3
+     ? ($2 - $3 * floor($2 / $3))
+     : $2;
+}
+
+AUTO_OP mod(n, nc, n) {
+  $1 = $3
+     ? ($2 - $3 * floor($2 / $3))
+     : $2;
+}
+
 
 ########################################
 
 =item B<mul>(i, i, i)
 
+=item B<mul>(i, i, ic)
+
 =item B<mul>(n, n, n)
+
+=item B<mul>(n, n, nc)
 
 Set $1 to the product of $2 and $3.
 
@@ -939,7 +1075,15 @@ AUTO_OP mul(i, i, i) {
   $1 = $2 * $3;
 }
 
+AUTO_OP mul(i, i, ic) {
+  $1 = $2 * $3;
+}
+
 AUTO_OP mul(n, n, n) {
+  $1 = $2 * $3;
+}
+
+AUTO_OP mul(n, n, nc) {
   $1 = $2 * $3;
 }
 
@@ -948,11 +1092,27 @@ AUTO_OP mul(n, n, n) {
 
 =item B<pow>(n, i, i)
 
+=item B<pow>(n, i, ic)
+
+=item B<pow>(n, ic, i)
+
 =item B<pow>(n, i, n)
+
+=item B<pow>(n, i, nc)
+
+=item B<pow>(n, ic, n)
 
 =item B<pow>(n, n, i)
 
+=item B<pow>(n, n, ic)
+
+=item B<pow>(n, nc, i)
+
 =item B<pow>(n, n, n)
+
+=item B<pow>(n, n, nc)
+
+=item B<pow>(n, nc, n)
 
 Set $1 to $2 raised to the power $3.
 
@@ -962,7 +1122,23 @@ AUTO_OP pow(n, i, i) {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
 }
 
+AUTO_OP pow(n, i, ic) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+}
+
+AUTO_OP pow(n, ic, i) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+}
+
 AUTO_OP pow(n, i, n) {
+   $1 = pow((FLOATVAL)$2, $3);
+}
+
+AUTO_OP pow(n, i, nc) {
+   $1 = pow((FLOATVAL)$2, $3);
+}
+
+AUTO_OP pow(n, ic, n) {
    $1 = pow((FLOATVAL)$2, $3);
 }
 
@@ -970,7 +1146,23 @@ AUTO_OP pow(n, n, i) {
    $1 = pow($2, (FLOATVAL)$3);
 }
 
+AUTO_OP pow(n, n, ic) {
+   $1 = pow($2, (FLOATVAL)$3);
+}
+
+AUTO_OP pow(n, nc, i) {
+   $1 = pow($2, (FLOATVAL)$3);
+}
+
 AUTO_OP pow(n, n, n) {
+   $1 = pow($2, $3);
+}
+
+AUTO_OP pow(n, n, nc) {
+   $1 = pow($2, $3);
+}
+
+AUTO_OP pow(n, nc, n) {
    $1 = pow($2, $3);
 }
 
@@ -979,7 +1171,15 @@ AUTO_OP pow(n, n, n) {
 
 =item B<sub>(i, i, i)
 
+=item B<sub>(i, i, ic)
+
+=item B<sub>(i, ic, i)
+
 =item B<sub>(n, n, n)
+
+=item B<sub>(n, n, nc)
+
+=item B<sub>(n, nc, n)
 
 Set $1 to $2 minus $3.
 
@@ -989,7 +1189,23 @@ AUTO_OP sub(i, i, i) {
   $1 = $2 - $3;
 }
 
+AUTO_OP sub(i, i, ic) {
+  $1 = $2 - $3;
+}
+
+AUTO_OP sub(i, ic, i) {
+  $1 = $2 - $3;
+}
+
 AUTO_OP sub(n, n, n) {
+  $1 = $2 - $3;
+}
+
+AUTO_OP sub(n, n, nc) {
+  $1 = $2 - $3;
+}
+
+AUTO_OP sub(n, nc, n) {
   $1 = $2 - $3;
 }
 
@@ -1012,6 +1228,8 @@ These operations operate on STRINGs.
 
 =item B<chopn>(s, ic)
 
+=item B<chopn>(s, i)
+
 Remove $2 characters from the end of the string in $1.
 
 TODO: Create a three-argument version of this? Don't force in-place modification.
@@ -1022,14 +1240,27 @@ AUTO_OP chopn(s, ic) {
    (void)string_chopn($1, $2);
 }
 
+AUTO_OP chopn(s, i) {
+   (void)string_chopn($1, $2);
+}
+
 
 ########################################
 
 =item B<concat>(s, s)
 
+=item B<concat>(s,sc)
+
+=item B<concat>(s, s, s)
+
+=item B<concat>(s, s, sc)
+
+=item B<concat>(s, sc, s)
+
 Append the string in $2 to the string in $1.
 
-TODO: Create a three-argument version of this. Don't force in-place modification.
+The three argument version appends the string $3 to $2 and places the result
+into $1.
 
 =cut
 
@@ -1037,6 +1268,29 @@ AUTO_OP concat(s, s) {
     STRING *s = string_concat($1, $2, 1);
     $1 = s;
 }
+
+AUTO_OP concat(s, sc) {
+    STRING *s = string_concat($1, $2, 1);
+    $1 = s;
+}
+
+AUTO_OP concat(s, s, s) {
+    STRING *s = string_concat($2, $3, 1);
+    $1 = s;
+}
+
+AUTO_OP concat(s, s, sc) {
+    STRING *s = string_concat($2, $3, 1);
+    $1 = s;
+}
+
+
+AUTO_OP concat(s, sc, s) {
+    STRING *s = string_concat($2, $3, 1);
+    $1 = s;
+}
+
+
 
 ########################################
 
@@ -1055,12 +1309,54 @@ AUTO_OP length(i, s) {
 
 =item B<substr>(s, s, i, i)
 
+=item B<substr>(s, s, i, ic)
+
+=item B<substr>(s, s, ic, i)
+
+=item B<substr>(s, s, ic, ic)
+
+=item B<substr>(s, sc, i, i)
+
+=item B<substr>(s, sc, i, ic)
+
+=item B<substr>(s, sc, ic, i)
+
 Set $1 to the portion of $2 starting at (zero-based) character position $3 and having
 length $4.
 
 =cut
 
 AUTO_OP substr(s, s, i, i) {
+    STRING *s = string_substr($2, $3, $4, &$1);
+    $1 = s;
+}
+
+AUTO_OP substr(s, s, i, ic) {
+    STRING *s = string_substr($2, $3, $4, &$1);
+    $1 = s;
+}
+
+AUTO_OP substr(s, s, ic, i) {
+    STRING *s = string_substr($2, $3, $4, &$1);
+    $1 = s;
+}
+
+AUTO_OP substr(s, s, ic, ic) {
+    STRING *s = string_substr($2, $3, $4, &$1);
+    $1 = s;
+}
+
+AUTO_OP substr(s, sc, i, i) {
+    STRING *s = string_substr($2, $3, $4, &$1);
+    $1 = s;
+}
+
+AUTO_OP substr(s, sc, i, ic) {
+    STRING *s = string_substr($2, $3, $4, &$1);
+    $1 = s;
+}
+
+AUTO_OP substr(s, sc, ic, i) {
     STRING *s = string_substr($2, $3, $4, &$1);
     $1 = s;
 }
@@ -1146,13 +1442,29 @@ AUTO_OP asin(n, n) {
 
 =item B<atan>(n, i, i)
 
+=item B<atan>(n, i, ic)
+
+=item B<atan>(n, ic, i)
+
 =item B<atan>(n, i, n)
+
+=item B<atan>(n, i, nc)
+
+=item B<atan>(n, ic, n)
 
 =item B<atan>(n, n)
 
 =item B<atan>(n, n, i)
 
+=item B<atan>(n, n, ic)
+
+=item B<atan>(n, nc, i)
+
 =item B<atan>(n, n, n)
+
+=item B<atan>(n, n, nc)
+
+=item B<atan>(n, nc, n)
 
 The two-argument versions set $1 to the arc tangent (in radians) of $2.
 
@@ -1170,7 +1482,23 @@ AUTO_OP atan(n, i, i) {
    $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
 }
 
+AUTO_OP atan(n, i, ic) {
+   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+}
+
+AUTO_OP atan(n, ic, i) {
+   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+}
+
 AUTO_OP atan(n, i, n) {
+   $1 = atan2((FLOATVAL)$2, $3);
+}
+
+AUTO_OP atan(n, i, nc) {
+   $1 = atan2((FLOATVAL)$2, $3);
+}
+
+AUTO_OP atan(n, ic, n) {
    $1 = atan2((FLOATVAL)$2, $3);
 }
 
@@ -1182,7 +1510,23 @@ AUTO_OP atan(n, n, i) {
    $1 = atan2($2, (FLOATVAL)$3);
 }
 
+AUTO_OP atan(n, n, ic) {
+   $1 = atan2($2, (FLOATVAL)$3);
+}
+
+AUTO_OP atan(n, nc, i) {
+   $1 = atan2($2, (FLOATVAL)$3);
+}
+
 AUTO_OP atan(n, n, n) {
+   $1 = atan2($2, $3);
+}
+
+AUTO_OP atan(n, n, nc) {
+   $1 = atan2($2, $3);
+}
+
+AUTO_OP atan(n, nc, n) {
    $1 = atan2($2, $3);
 }
 
@@ -1437,11 +1781,17 @@ These operations apply  bitwise logical functions to their arguments.
 
 =item B<and>(i, i, i)
 
+=item B<and>(i, i, ic)
+
 Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
 
 =cut
 
 AUTO_OP and(i, i, i) {
+  $1 = $2 & $3;
+}
+
+AUTO_OP and(i, i, ic) {
   $1 = $2 & $3;
 }
 
@@ -1463,6 +1813,8 @@ AUTO_OP not(i, i) {
 
 =item B<or>(i, i, i)
 
+=item B<or>(i, i, ic)
+
 Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
 
 =cut
@@ -1471,8 +1823,13 @@ AUTO_OP or(i, i, i) {
   $1 = $2 | $3;
 }
 
+AUTO_OP or(i, i, ic) {
+  $1 = $2 | $3;
+}
 
 ########################################
+
+=item B<shl>(i, i, i)
 
 =item B<shl>(i, i, ic)
 
@@ -1484,8 +1841,14 @@ AUTO_OP shl(i, i, ic) {
   $1 = $2 << $3;
 }
 
+AUTO_OP shl(i, i, i) {
+  $1 = $2 << $3;
+}
+
 
 ########################################
+
+=item B<shr>(i, i, i)
 
 =item B<shr>(i, i, ic)
 
@@ -1497,10 +1860,16 @@ AUTO_OP shr(i, i, ic) {
   $1 = $2 >> $3;
 }
 
+AUTO_OP shr(i, i, i) {
+  $1 = $2 >> $3;
+}
+
 
 ########################################
 
 =item B<xor>(i, i, i)
+
+=item B<xor>(i, i, ic)
 
 Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
 
@@ -1509,6 +1878,11 @@ Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and
 AUTO_OP xor(i, i, i) {
   $1 = $2 ^ $3;
 }
+
+AUTO_OP xor(i, i, ic) {
+  $1 = $2 ^ $3;
+}
+
 
 =back
 
