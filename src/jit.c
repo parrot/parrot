@@ -48,10 +48,6 @@
 # endif
 #endif
 
-#ifndef ALLOCATE_REGISTERS_ALWAYS
-# define ALLOCATE_REGISTERS_ALWAYS 1
-#endif
-
 #ifdef __GNUC__
 void Parrot_jit_debug(struct Parrot_Interp* interpreter);
 #endif
@@ -407,29 +403,6 @@ sort_registers(struct Parrot_Interp *interpreter,
             next = next->next;
         }
 
-#if ALLOCATE_REGISTERS_ALWAYS
-        for (typ = 0; typ < 4; typ++) {
-            /* for a reg_count of 1 and the register is used RHS only,
-             * we don't allocate a register - it's not worth the effort
-             *
-             * the loop in mops is then "sub mem,%reg" instead of
-             * "sub %reg, %reg"  but this seems to be equally fast.
-             *
-             * if different architectures slow down due to this code
-             * they should define ALLOCATE_REGS_ALWAYS as true in jit_emit.h
-             */
-            /* turning this code on may break numerous tests due to wrong
-             * argument directions, or errors in core.jit
-             */
-            for (i = 0; i < NUM_REGISTERS; i++) {
-                if (ru[typ].reg_count[i] == 1 &&
-                        ru[typ].reg_dir[i] == PARROT_ARGDIR_IN) {
-                    ru[typ].reg_count[i] = 0;
-                    ru[typ].reg_dir[i] = 0;
-                }
-            }
-        }
-#endif
         /* now sort registers by there usage count */
         for (typ = 0; typ < 4; typ++) {
             /* find most used register */

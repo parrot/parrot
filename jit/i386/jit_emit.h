@@ -2129,14 +2129,6 @@ char floatval_map[] = { 1,2,3,4 };
 
 /* #define jit_emit_noop(pc) *pc++ = 0x90; */
 
-/* for a reg_count of 1 and the register is used RHS only,
- * we don't allocate a register - it's not worth the effort
- *
- * if the following is true, registers are always used
- */
-
-#define ALLOCATE_REGISTERS_ALWAYS 0
-
 /* registers are either allocate per section or per basic block
  * set this to 1 or 0 to change allocation scheme
  */
