@@ -3,8 +3,8 @@
  */
 
 
-#if !defined(PARROT_FEATRUE_H_GUARD)
-#define PARROT_FEATRUE_H_GUARD
+#if !defined(PARROT_FEATURE_H_GUARD)
+#define PARROT_FEATURE_H_GUARD
 
 #perl - all below here gets evaled by perl, OUT is the filehandle
 
@@ -70,6 +70,22 @@ if (${has___sighandler_t}) {
 #define HAS___SIGHANDLER_T 1
 END
 }
+
+print OUT <<EOP;
+
+/* from config/auto/env */
+EOP
+if (${setenv}) {
+	print OUT <<EOP;
+#define HAS_SETENV 1
+EOP
+}
+if (${unsetenv}) {
+	print OUT <<EOP;
+#define HAS_UNSETENV 1
+EOP
+}
+
 
 #endif guard
 print OUT "\n\n#endif\n"

@@ -62,28 +62,46 @@ Parrot_sleep(unsigned int seconds)
 ** Parrot_setenv()
 */
 
-#define HAS_SETENV /* XXX need a test, this is never set */
-#ifdef HAS_SETENV
 void
 Parrot_setenv(const char *name, const char *value)
 {
+#ifdef HAS_SETENV
     setenv(name, value, 1);
+#else
+    int name_len = strlen(name);
+    int val_len = strlen(value);
+
+    char *envs = malloc(name_len + 1 + val_len + 1);
+    if (envs == NULL)
+        return;
+
+    /* Save a bit of time, by using the fact we already have the
+       lengths, avoiding strcat */
+    strcpy(envs, name);
+    strcpy(envs + name_len, "=");
+    strcpy(envs + name_len + 1, value);
+
+    putenv(envs);
+
+    /* The buffer is intentionally not freed! */
+#endif
 }
+
 void
 Parrot_unsetenv(const char *name)
 {
+#ifdef HAS_UNSETENV
     unsetenv(name);
+#else 
+    Parrot_setenv(name, "");
+#endif 
 }
+
 char *
 Parrot_getenv(const char *name)
 {
     return getenv(name);
 }
-#else
-/* putenv-based version might go here, but see perl5's util.c for
-   warnings and workarounds.
-*/
-#endif
 
 /*
 ** Parrot_dlopen()

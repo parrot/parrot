@@ -1,0 +1,17 @@
+/*
+ * test for setenv
+ *
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char **argv) {
+    if (setenv("PARROT_TEST", "flaf", 1)) {
+        puts("borken");
+    } else {
+        puts("ok");
+    }
+
+    return 0;
+}
