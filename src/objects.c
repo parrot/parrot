@@ -121,7 +121,6 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
 
         }
     }
-
     /* Now append our own. To make things easier, we make sure we
        always appear in the offset list, even if we don't have any
        attributes. That way the append code for adding attributes to a
@@ -133,7 +132,6 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
     {
         PMC *attribs;
         INTVAL attr_count;
-        
         attribs = VTABLE_get_pmc_keyed_int(interpreter, obj_array,
                                            PCD_CLASS_ATTRIBUTES);
         attr_count = VTABLE_elements(interpreter, attribs);
@@ -155,7 +153,6 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
         }
     }
             
-
     /* And replace what was in there with the new ones */
     VTABLE_set_pmc_keyed_int(interpreter, obj_array, PCD_ATTRIBUTES,
                              attr_offset_hash);
@@ -254,6 +251,10 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
                 (PMC *)PMC_data(base_class), PCD_ATTRIBUTES));
     VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_ATTRIBUTES,
             temp_pmc);
+
+    /* But we have no attributes of our own. Yet */
+    temp_pmc = pmc_new(interpreter, enum_class_Array);
+    VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_CLASS_ATTRIBUTES, temp_pmc);
 
     Parrot_class_register(interpreter, child_class_name, child_class);
 
@@ -504,7 +505,6 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
                                                          current_class_array,
                                                          current_offset)) {
             already_in = 1;
-            puts("Already there");
         }
     }
 
@@ -521,7 +521,6 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
                                   current_size + 1);
         VTABLE_set_pmc_keyed_int(interpreter, current_class_array,
                                  current_size, add_on_class_obj);
-        
         /* And then go put all the parent class' parents on the list,
            if they're not there already */
         for (add_on_offset = 0; add_on_offset < add_on_count;
