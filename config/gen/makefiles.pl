@@ -8,7 +8,7 @@ config/gen/makefiles.pl - Build files
 
 =head1 DESCRIPTION
 
-Generates the various F<Makefile>s and other files needed to 
+Generates the various F<Makefile>s and other files needed to
 build Parrot.
 
 =cut
@@ -51,8 +51,6 @@ EOF
 sub makefiles {
   genfile('config/gen/makefiles/root.in',      'Makefile',
           commentType => '#', replace_slashes => 1, conditioned_lines => 1);
-  genfile('config/gen/makefiles/classes.in',   'classes/Makefile',
-          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/imcc.in',      'imcc/Makefile',
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/languages.in', 'languages/Makefile',

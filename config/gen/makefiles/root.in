@@ -85,7 +85,6 @@ NONGEN_HEADERS = ${TEMP_nongen_headers}
 
 GEN_MAKEFILES = \
     Makefile \
-    classes/Makefile \
     languages/Makefile \
     docs/Makefile \
     languages/jako/Makefile \
@@ -376,6 +375,8 @@ MAKE_C = ${make_c}
 
 all : flags_dummy $(TEST_PROG) library/config.fpmc docs
 
+.SUFFIXES: .c .h .pmc .dump $(O)
+
 # constant string support
 %.str : %.c  build_tools/c2str.pl
 	$(PERL) build_tools/c2str.pl $< > $@
@@ -385,6 +386,25 @@ STR_FILES = \
 
 $(INC)/string_private_cstring.h: $(STR_FILES)
 	$(PERL) build_tools/c2str.pl --all
+
+# classes PMC build utils and rules
+PMC2CD=$(PERL) classes/pmc2c2.pl --dump
+PMC2CC=$(PERL) classes/pmc2c2.pl --c --no-lines
+PMC2CV=$(PERL) classes/pmc2c2.pl --vt
+
+.pmc.dump:
+	$(PMC2CD) $<
+
+.pmc.c:
+	$(PMC2CC) $<
+
+# not all makes might understant this, so the rules are generated
+#classes/pmc_%.h : classes/%.c
+#	$(PMC2CC) $<
+
+vtable.dump: vtable.tbl
+	$(PMC2CV)
+
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -791,6 +811,8 @@ ${TEMP_cg_c}
 
 ${TEMP_gc_c}
 
+${TEMP_pmc_build}
+
 # $(STICKY_FILES) : Configure.pl
 #	$(PERL) Configure.pl
 
@@ -862,13 +884,6 @@ languages-test :
 
 languages-clean :
 	$(MAKE_C) languages clean
-
-#
-# If anything in the classes directory is out of date,
-# then run `make` in sub-dir to rebuild only the out of date files.
-#
-$(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(NONGEN_HEADERS)
-	$(MAKE_C) classes
 
 
 ${TEMP_icu_make}
@@ -987,7 +1002,6 @@ clean : testclean progclean languages-clean docs-clean
 	        examples/assembly/mops${exe} examples/assembly/mops.c \
 	        examples/assembly/mops$(O) examples/assembly/mops.pbc \
 	        examples/mops/mops$(O) examples/mops/mops${exe}
-	$(MAKE_C) classes clean
 
 progclean:
 	$(RM_F) $(O_FILES) \
@@ -996,9 +1010,9 @@ progclean:
 	        $(PDB) $(SRC)/pdb$(O) \
 	        $(DIS) $(SRC)/disassemble$(O)
 	$(RM_F) $(LIBPARROT)
-	$(MAKE_C) classes progclean
 	$(PERL) build_tools/c2str.pl --init
 	$(RM_F) $(STR_FILES) $(INC)/string_private_cstring.h
+	$(RM_F) classes/*.c classes/*.h classes/*.dump vtable.dump
 
 testclean :
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out t/op/*.o t/op/*.stabs.s \

@@ -440,6 +440,16 @@ sub add_defaulted {
     }
 }
 
+sub dump_is_newer {
+    my $file = shift;
+    my $pmc;
+    ($pmc = $file) =~ s/\.\w+$/\.pmc/;
+    my ($pmc_dt, $dump_dt);
+    $pmc_dt = (stat($pmc))[9];
+    $dump_dt = (stat($file))[9];
+    return $dump_dt > $pmc_dt;
+}
+
 sub dump_pmc {
     my @files = @_;
     my %all;
@@ -464,10 +474,14 @@ sub dump_pmc {
         gen_parent_list($name, \%all);
         my $class = $all{$name};
         gen_super_meths($class, $vt);
+        # XXX write default.dump only once
+        next if (  ## $dump eq 'classes/default.dump' &&
+            ((-e $dump && dump_is_newer($dump)) ||
+            (-e "../$dump"  && dump_is_newer("../$dump"))));
         my $Dumper = Data::Dumper->new([$class], [qw(class)]);
         $Dumper->Indent(1);
         print "Writing $dump\n" if $opt{verbose};
-        open PMD, ">$dump" or die "Can't write '$dump";
+        open PMD, ">$dump" or die "Can't write '$dump'";
         print PMD $Dumper->Dump;
         close PMD;
     }

@@ -93,15 +93,29 @@ E_NOTE
 
       # make each pmc depend upon its parent.
       my $parent = pmc_parent($pmc).".pmc";
-      $parent = "perlhash.pmc $parent" if ($pmc eq 'orderedhash');
+      $parent = "perlhash.pmc classes/$parent" if ($pmc eq 'orderedhash');
+      my $parent_dumps = '';
+      $parent_dumps .= "classes/$_.dump " foreach reverse((pmc_parents($pmc)));
+      $parent_dumps = "classes/perlhash.dump $parent_dumps"
+		if ($pmc eq 'orderedhash');
       my $parent_headers = '';
-      $parent_headers .= "pmc_$_.h " foreach (pmc_parents($pmc));
-      $TEMP_pmc_build .= "$pmc.c pmc_$pmc.h: $parent $pmc.pmc\n";
-      $TEMP_pmc_build .= "\t\$(PMC2C) perlhash.pmc\n" if ($pmc eq 'orderedhash');
-      $TEMP_pmc_build .= "\t\$(PMC2C) $pmc.pmc\n";
-      $TEMP_pmc_build .= "\n";
-      $TEMP_pmc_build .= "$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers pmc_$pmc.h\n";
+      $parent_headers .= "classes/pmc_$_.h " foreach (pmc_parents($pmc));
+      $parent_headers = "classes/pmc_perlhash.h $parent_headers"
+		if ($pmc eq 'orderedhash');
+      $TEMP_pmc_build .= <<END
+classes/$pmc.c classes/pmc_$pmc.h: \\
+         vtable.dump classes/$pmc.pmc \\
+	$parent_dumps classes/$pmc.dump
+
+classes/pmc_$pmc.h: classes/$pmc.pmc
+	\$(PMC2CC) \$<
+
+classes/$pmc\$(O): \$(NONGEN_HEADERS) \\
+        $parent_headers
+
+END
   }
+# classes/$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers classes/pmc_$pmc.h
 
   # build list of libraries for link line in Makefile
   my $slash = Configure::Data->get('slash');
