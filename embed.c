@@ -148,16 +148,16 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
     PMC* userargv;
     
     if(interpreter->flags & PARROT_DEBUG_FLAG) {
-        fprintf(stderr, "Parrot VM: Debugging enabled.\n");
+        fprintf(stderr, "*** Parrot VM: Debugging enabled. ***\n");
 
         if(interpreter->flags & PARROT_BOUNDS_FLAG) {
-            fprintf(stderr, "Parrot VM: Bounds checking enabled.\n");
+            fprintf(stderr, "*** Parrot VM: Bounds checking enabled. ***\n");
         }
         if(interpreter->flags & PARROT_PREDEREF_FLAG) {
-            fprintf(stderr, "Parrot VM: Predereferencing enabled.\n");
+            fprintf(stderr, "*** Parrot VM: Predereferencing enabled. ***\n");
         }
         if(interpreter->flags & PARROT_JIT_FLAG) {
-            fprintf(stderr, "Parrot VM: JIT enabled.\n");
+            fprintf(stderr, "*** Parrot VM: JIT enabled. ***\n");
         }
     }
 
@@ -169,7 +169,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
 #endif
 
     if(interpreter->flags & PARROT_DEBUG_FLAG) {
-        fprintf(stderr, "Parrot VM: Setting up ARGV array in P0.  Current argc: %d\n", argc);
+        fprintf(stderr, "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n", argc);
     }
 
     userargv=pmc_new(interpreter, enum_class_PerlArray);
@@ -179,7 +179,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
             fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
-        /* Delayed XXX
+        /* XXX: Delayed
         userargv->vtable->set_string_index(interpreter, userargv, 
             string_make(interpreter, argv[i], strlen(argv[i]), 0, 0, 0), i
         );
@@ -227,6 +227,32 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
             call_count,
             sum_time,
             sum_time / (FLOATVAL)call_count
+        );
+    }
+
+    if(interpreter->flags & PARROT_DEBUG_FLAG) {
+        fprintf(stderr, "\
+*** Parrot VM: Dumping GC info ***\n\
+\tTotal memory allocated: %u\n\
+\tTotal DOD runs:         %u\n\
+\tTotal collector runs:   %u\n\
+\tActive PMCs:            %u\n\
+\tActive buffers:         %u\n\
+\tTotal PMCs:             %u\n\
+\tTotal buffers:          %u\n\
+\tSince last collection:\n\
+\t\tHeader allocations: %u\n\
+\t\tMemory allocations: %u\n\
+\n",
+            interpreter->memory_allocated,
+            interpreter->dod_runs,
+            interpreter->collect_runs,
+            interpreter->active_PMCs,
+            interpreter->active_Buffers,
+            interpreter->total_PMCs,
+            interpreter->total_Buffers,
+            interpreter->header_allocs_since_last_collect,
+            interpreter->mem_allocs_since_last_collect
         );
     }
 }
