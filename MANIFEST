@@ -1784,7 +1784,6 @@ icu/source/tools/toolutil/uparse.h                [icu]
 icu/source/tools/toolutil/uperf.cpp               [icu]
 icu/source/tools/toolutil/uperf.h                 [icu]
 icu/source/tools/toolutil/utimer.h                [icu]
-imcc/BUGS                                         [main]doc
 imcc/ChangeLog                                    [main]doc
 imcc/README                                       [main]doc
 imcc/TestCompiler.pm                              [devel]
