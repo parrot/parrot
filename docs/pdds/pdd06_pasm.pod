@@ -936,6 +936,26 @@ attached to.
 Properties may be used for runtime notes on variables, or other
 metadata that may change. They are not for object attributes.
 
+=over 4
+
+=item setprop Px, Sy, Pz
+
+Set the property named Y of PMC X to the PMC in Z
+
+=item getprop Px, Sy, Pz
+
+Get the property named Y from PMC Z and put the result in register X
+
+=item delprop Px, Sy
+
+Delete the property Y from PMC X
+
+=item prophash Px, Py
+
+Fetch the properties from Y, put them in a Hash, and put the Hash in X.
+
+=back
+
 =head2 Symbolic support for HLLs
 
 =over 4
