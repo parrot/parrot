@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 3;
+use TestCompiler tests => 4;
 use Test::More qw(skip);
 
 ##############################
@@ -107,3 +107,62 @@ b = 20
 r = 30
 s = -10
 OUT
+
+##############################
+my $file = '_test.inc';
+open F, ">$file";
+print F <<'EOF';
+.sub _foo		# sub foo(int a, int b)
+   saveall
+   .param int a
+   .param int b
+   print "a = "
+   print a
+   print "\n"
+   print "b = "
+   print b
+   print "\n"
+   .local int pl
+   .local int mi
+   pl = a + b
+   mi = a - b
+   .return pl		# return (pl, mi)
+   .return mi
+   restoreall
+   ret
+.end
+EOF
+
+output_is(<<'CODE', <<'OUT', "subroutine in external file");
+.sub _main
+   .local int x
+   x = 10
+   .const int y = 20
+
+   .arg y	# save args in reversed order
+   .arg x
+   call _foo	#(r, s) = _foo(x,y)
+   .local int r
+   .local int s
+   .result s	# restore results in reversed order
+   .result r
+
+   print "r = "
+   print r
+   print "\n"
+   print "s = "
+   print s
+   print "\n"
+   end
+.end
+.include "_test.inc"
+CODE
+a = 10
+b = 20
+r = 30
+s = -10
+OUT
+
+END {
+  unlink $file;
+}

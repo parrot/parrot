@@ -214,7 +214,7 @@ WS              [\t\f\r ]
 	return MACRO;
     }
 
-<emit>".include" {
+<*>".include" {
         int c;
 
 	c = yylex(valp, interp);
