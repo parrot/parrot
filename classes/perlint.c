@@ -11,13 +11,18 @@
 
 #include "parrot/parrot.h"
 
+static STRING* whoami;
+
 static INTVAL Parrot_PerlInt_type (struct Parrot_Interp *interpreter, PMC* pmc) {
+    return 0;
 }
 
 static STRING* Parrot_PerlInt_name (struct Parrot_Interp *interpreter, PMC* pmc) {
+    return whoami;
 }
 
-static PMC* Parrot_PerlInt_new (struct Parrot_Interp *interpreter, PMC* pmc) {
+static void Parrot_PerlInt_init (struct Parrot_Interp *interpreter, PMC* pmc) {
+    
 }
 
 static void Parrot_PerlInt_clone (struct Parrot_Interp *interpreter, PMC* pmc, PMC* dest) {
@@ -30,30 +35,42 @@ static BOOLVAL Parrot_PerlInt_move_to (struct Parrot_Interp *interpreter, PMC* p
 }
 
 static INTVAL Parrot_PerlInt_real_size (struct Parrot_Interp *interpreter, PMC* pmc) {
+    return 0; /* ->data is unused */
 }
 
 static void Parrot_PerlInt_destroy (struct Parrot_Interp *interpreter, PMC* pmc) {
+    /* Integers need no destruction! */
 }
 
 static INTVAL Parrot_PerlInt_get_integer (struct Parrot_Interp *interpreter, PMC* pmc) {
+    return pmc->cache.int_val;
 }
 
 static FLOATVAL Parrot_PerlInt_get_number (struct Parrot_Interp *interpreter, PMC* pmc) {
+    /* We're a float now */
+    pmc->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
+    return pmc->cache.num_val = (FLOATVAL)pmc->cache.int_val;
 }
 
 static STRING* Parrot_PerlInt_get_string (struct Parrot_Interp *interpreter, PMC* pmc) {
 }
 
 static BOOLVAL Parrot_PerlInt_get_bool (struct Parrot_Interp *interpreter, PMC* pmc) {
+    return (BOOLVAL)pmc->cache.int_val;
 }
 
 static void* Parrot_PerlInt_get_value (struct Parrot_Interp *interpreter, PMC* pmc) {
+    return &pmc->cache; /* YAFIYGI */
 }
 
+/* Do you refer to exactly the same data that I do? */
 static BOOLVAL Parrot_PerlInt_is_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC* pmc2) {
+    return pmc2->vtable == pmc->vtable /* You never know if you've been inherited...*/
+          && pmc->cache.int_val == pmc2->cache.int_val;
 }
 
 static void Parrot_PerlInt_set_integer (struct Parrot_Interp *interpreter, PMC* pmc, PMC * value) {
+    pmc->cache.int_val = (INTVAL)value->vtable->get_integer(interpreter, value);
 }
 
 static void Parrot_PerlInt_set_integer_native (struct Parrot_Interp *interpreter, PMC* pmc, INTVAL value) {
@@ -200,16 +217,29 @@ static void Parrot_PerlInt_concatenate_other (struct Parrot_Interp *interpreter,
 static void Parrot_PerlInt_concatenate_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC * value,  PMC* dest) {
 }
 
+/* == operation */
+
 static BOOLVAL Parrot_PerlInt_is_equal (struct Parrot_Interp *interpreter, PMC* pmc, PMC* value) {
+    return pmc->cache.int_val == value->vtable->get_integer(interpreter, value);
 }
 
 static void Parrot_PerlInt_logical_or (struct Parrot_Interp *interpreter, PMC* pmc, PMC* value,  PMC* dest) {
+    /* No set_bool :( */
+    dest->vtable->set_integer_native(interpreter, dest,
+            pmc->cache.int_val || 
+            value->vtable->get_integer(interpreter, value)
+    );
 }
 
 static void Parrot_PerlInt_logical_and (struct Parrot_Interp *interpreter, PMC* pmc, PMC* value,  PMC* dest) {
+    dest->vtable->set_integer_native(interpreter, dest,
+            pmc->cache.int_val && 
+            value->vtable->get_integer(interpreter, value)
+    );
 }
 
 static void Parrot_PerlInt_logical_not (struct Parrot_Interp *interpreter, PMC* pmc, PMC* value) {
+    pmc->cache.int_val = (INTVAL)(!value->vtable->get_bool(interpreter, value));
 }
 
 static void Parrot_PerlInt_match (struct Parrot_Interp *interpreter, PMC* pmc, PMC * value,  REGEX* re) {
@@ -242,7 +272,7 @@ static void Parrot_PerlInt_repeat_other (struct Parrot_Interp *interpreter, PMC*
 static void Parrot_PerlInt_repeat_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC * value,  PMC* dest) {
 }
 
-void Parrot_PerlInt_init (void) {
+void Parrot_PerlInt_class_init (void) {
     struct _vtable temp_base_vtable = {
         NULL,
         enum_class_PerlInt,
@@ -253,7 +283,7 @@ void Parrot_PerlInt_init (void) {
 
 		Parrot_PerlInt_type,
 		Parrot_PerlInt_name,
-		Parrot_PerlInt_new,
+		Parrot_PerlInt_init,
 		Parrot_PerlInt_clone,
 		Parrot_PerlInt_morph,
 		Parrot_PerlInt_move_to,
@@ -329,5 +359,7 @@ void Parrot_PerlInt_init (void) {
 		Parrot_PerlInt_repeat_other,
 		Parrot_PerlInt_repeat_same,
 	};
+    whoami = string_make(NULL, /* DIRTY HACK */
+             "PerlInt", 7, 0, 0, 0);
 	Parrot_base_vtables[enum_class_PerlInt] = temp_base_vtable;
 }

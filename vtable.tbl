@@ -17,7 +17,7 @@
 
 unique	INTVAL type	
 unique	STRING* name
-unique	PMC* new
+unique	void init
 unique	void clone		PMC* dest
 unique	void morph		INTVAL type
 unique	BOOLVAL move_to		void * destination

@@ -31,7 +31,7 @@ for (vtbl_enumerate(%vtbl)) {
     print "}\n\n";
 }
 
-print "void Parrot_${classname}_init (void) {\n";
+print "void Parrot_${classname}_class_init (void) {\n";
 #print $decls;
 
 print <<EOF;
