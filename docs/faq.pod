@@ -227,7 +227,7 @@ Perl 5 is highly portable, and builds on around 50 different systems, many
 far removed from Unix or MS Windows. We'd like Perl 6 to be able run
 everywhere that Perl 5 runs, so we need to keep Parrot as portable as possible.
 The Glasgow Haskell Compiler is a pain to build on minor systems, and downright
-impossible on small systems. So by going with Pugs and Haskell we'd be
+impossible on small systems. So by going with Pugs and GHC we'd be
 sacrificing portability.
 
 Finally there is a reason the Parrot design keeps talking about running
