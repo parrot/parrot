@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 57;
+use Parrot::Test tests => 58;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1270,6 +1270,24 @@ output_is(<<CODE, <<OUTPUT, "mul_p_p");
     end
 CODE
 16
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "typeof");	
+    new P0,.PerlInt
+    typeof S0,P0
+    eq     S0,"PerlInt",OK_1
+    print  "not "
+OK_1:
+    print  "ok 1\\n"
+    typeof I0,P0
+    eq     I0,.PerlInt,OK_2
+    print  "not "
+OK_2:
+    print  "ok 2\\n"
+    end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 1;

@@ -2076,7 +2076,9 @@ These operations operate on STRINGs.
 
 =item B<chopn>(out STR, in STR, in INT)
 
-Remove $2 characters from the end of the string in $1.
+Remove $2 characters from the end of the string in $1.  The 3-arg version
+removes $3 characters from the end of the string in $2 and returns the result
+in $1
 
 =cut
 
