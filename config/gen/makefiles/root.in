@@ -453,7 +453,7 @@ MAKE_C = ${make_c}
 .c$(O) :
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
 
-.pbc.imc:
+.imc.pbc:
 	.${slash}$(TEST_PROG) -o $@ $<
 
 ###############################################################################
@@ -466,7 +466,7 @@ MAKE_C = ${make_c}
 
 all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc runtime/parrot/include/config.fpmc docs $(LIBNCI_SO) $(GEN_LIBRARY)
 
-.SUFFIXES : .c .h .pmc .dump $(O) .str
+.SUFFIXES : .c .h .pmc .dump $(O) .str .imc .pbc
 
 # constant string support
 .c.str :
