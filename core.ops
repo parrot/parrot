@@ -3345,6 +3345,37 @@ These operations effect entire sets of registers.
 
 ########################################
 
+=item B<null>(out STR)
+=item B<null>(out INT)
+=item B<null>(out PMC)
+=item B<null>(out NUM)
+
+Set register $1 to a null value, or zero for the numeric registers
+
+=cut
+
+inline op null(out STR) {
+  $1 = NULL;
+  goto NEXT();
+}
+
+inline op null(out INT) {
+  $1 = 0;
+  goto NEXT();
+}
+
+inline op null(out PMC) {
+  $1 = NULL;
+  goto NEXT();
+}
+
+inline op null(out NUM) {
+  $1 = 0;
+  goto NEXT();
+}
+
+########################################
+
 =item B<cleari>()
 
 =item B<clearn>()
@@ -3882,6 +3913,14 @@ Save all the registers.
 
 Restore all the registers.
 
+=item B<savetop>()
+
+Save registers 16-31 of all the register sets
+
+=item  B<restoretop>()
+
+Restore registers 16-31 of all the register sets
+
 =cut
 
 inline op saveall() {
@@ -3905,6 +3944,22 @@ inline op restoreall() {
   Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
   Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
   Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op savetop() {
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op restoretop() {
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
   goto NEXT();
 }
 

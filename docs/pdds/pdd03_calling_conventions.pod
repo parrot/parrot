@@ -112,9 +112,11 @@ The caller is responsible for preserving any environment it is
 interested in keeping. This includes any and all registers, lexical
 scoping and scratchpads, opcode libraries, and so forth.
 
-Use of the C<saveall> opcode is recommended if the caller wishes to
-save everything, and the C<restoreall> opcode to restore everything
-C<saveall> saved.
+Use of the C<savetop> opcode is recommended if the caller wishes to
+save everything, and the C<restoretop> opcode to restore everything
+C<savetop> saved. This saves off the top 16 of each register type,
+leaving the bottom 16 registers, which generally contain the return
+values, intact.
 
 =head2 Calling conventions
 
@@ -214,6 +216,36 @@ numeric, and PMC parameters are in the parameter list up until
 overflow occurs. Once overflow occurs the parameters must be taken in
 the exact order that they appear in the signature.
 
+=head2 Prototyped parameters
+
+A sub or method can be called in two ways--either prototyped or
+non-prototyped.
+
+A prototyped call means that the caller has an idea of what
+parameters the sub takes, and has placed its parameters in the
+appropriate S, I, N, and P registers. I0 will be true in this case.
+
+An unprototyped call means the caller doesn't know what the sub
+takes, so has stuffed all its parameters into PMCs, and put those
+PMCs first in the PMC registers with any overflow in the overdlow
+array. I0 will be false in this case.
+
+The sub being called is responsible for runtime checking the parameter
+types to see if there is a parameter mismatch problem, if it
+cares. (Often it doesn't) This isn't a replacement for that sort of
+parameter type checking. What it is, instead, is a means of allowing
+shortcutting parameter placement checking for the called sub.
+
+For example, assume we have a subroutine with a signature that looks
+like:
+
+    sub foo(int a, int b, string c, PMC d, float e);
+
+If we were calling without prototyping, all five parameters would be
+passed in as PMCs, in registers P5 through P9. If, on the other hand,
+we were calling with prototyping, a would be in I5, b in I6, c in S5,
+d in P5, and e in N5. 
+
 =head2 Return conventions
 
 On return from a function, the following registers are set. Return
@@ -225,7 +257,7 @@ register I0 B<must> be set to 1. If I0 is set to 0, then this is a
 non-prototyped return and only the PMC registers and overflow in P3
 may be set.
 
-Overflow return values are put in the array PMC in register P3
+Overflow return values are put in the array PMC in register P3.
 
 =over 4
 
