@@ -220,9 +220,8 @@ again:
 
 #else   /* HAS_HEADER_SYSMMAN */
 
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
-                "Parrot VM: uncaught error occurred reading file "
-                "or mmap not available.\n");
+        PIO_eprintf(interpreter, "Parrot VM: uncaught error occurred reading "
+                    "file or mmap not available.\n");
         return NULL;
 
 #endif  /* HAS_HEADER_SYSMMAN */

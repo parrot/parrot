@@ -246,7 +246,7 @@ trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
     }
 
     /* Flush *stderr* now that we've output the trace info */
-    PIO_flush(interpreter, PIO_STDERR(interpreter));
+    PIO_flush(interpreter, new_io_pmc(interpreter, PIO_STDERR(interpreter)));
 }
 
 
