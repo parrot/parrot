@@ -30,7 +30,7 @@ Parrot_push_i(struct Parrot_Interp *interpreter)
     else {
         struct IRegChunk *new_chunk;
         new_chunk = mem_sys_allocate(sizeof(struct IRegChunk));
-        memcpy(&interpreter->int_reg_top->IReg[0],
+        memcpy(&new_chunk->IReg[0],
                &interpreter->int_reg, sizeof(struct IReg));
         new_chunk->used = 1;
         new_chunk->free = FRAMES_PER_INT_REG_CHUNK - 1;
@@ -101,7 +101,7 @@ Parrot_push_s(struct Parrot_Interp *interpreter)
     else {
         struct SRegChunk *new_chunk;
         new_chunk = mem_sys_allocate(sizeof(struct SRegChunk));
-        memcpy(&interpreter->string_reg_top->SReg[0],
+        memcpy(&new_chunk->SReg[0],
                &interpreter->string_reg, sizeof(struct SReg));
         new_chunk->used = 1;
         new_chunk->free = FRAMES_PER_STR_REG_CHUNK - 1;
@@ -171,7 +171,7 @@ Parrot_push_n(struct Parrot_Interp *interpreter)
     else {
         struct NRegChunk *new_chunk;
         new_chunk = mem_sys_allocate(sizeof(struct NRegChunk));
-        memcpy(&interpreter->num_reg_top->NReg[0],
+        memcpy(&new_chunk->NReg[0],
                &interpreter->num_reg, sizeof(struct NReg));
         new_chunk->used = 1;
         new_chunk->free = FRAMES_PER_NUM_REG_CHUNK - 1;
@@ -241,7 +241,7 @@ Parrot_push_p(struct Parrot_Interp *interpreter)
     else {
         struct PRegChunk *new_chunk;
         new_chunk = mem_sys_allocate(sizeof(struct PRegChunk));
-        memcpy(&interpreter->pmc_reg_top->PReg[0],
+        memcpy(&new_chunk->PReg[0],
                &interpreter->pmc_reg, sizeof(struct PReg));
         new_chunk->used = 1;
         new_chunk->free = FRAMES_PER_PMC_REG_CHUNK - 1;
