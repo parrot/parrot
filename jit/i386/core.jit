@@ -125,7 +125,7 @@ Parrot_null_i {
 }
 
 Parrot_null_p {
-    Parrot_null_x s/<_N>/_i/ s/INT_R/PMC_R/ s/<val>/NULL/
+    Parrot_null_x s/<_N>/_i/ s/INT_R/PMC_R/ s/<val>/PMCNULL/
 }
 
 Parrot_null_s {
