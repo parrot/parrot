@@ -557,7 +557,7 @@ $2 and $3.
 =cut
 
 inline op mmdvtregister(in INT, in INT, in INT, in PMC) {
-  mmd_vtregister(interpreter, $1, $2, $3, $4);
+  mmd_register_sub(interpreter, $1, $2, $3, $4);
   goto NEXT();
 }
 

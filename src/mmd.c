@@ -520,23 +520,6 @@ mmd_destroy(Parrot_Interp interpreter)
 }
 
 
-/*
-
-=item C<void
-mmd_vtregister(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right, PMC *subroutine)>
-
-Register a new mmd function. Type indicates which MMD function is
-being registered, left and right are the left and right PMC types, and
-subroutine is a subroutine pointer.
-
-=cut
-
-*/
-
-void
-mmd_vtregister(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right, PMC *subroutine) {
-}
-
 PMC *
 mmd_vtfind(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right) {
     return NULL;
