@@ -64,7 +64,7 @@ enter_nci_method(Parrot_Interp interpreter, int type,
     else
         table = interpreter->nci_method_table;
     if (!table[type])
-        table[type] = pmc_new(interpreter, enum_class_PerlHash);
+        table[type] = pmc_new(interpreter, enum_class_Hash);
     method_table = table[type];
 
     method = pmc_new(interpreter, enum_class_NCI);
@@ -115,7 +115,7 @@ Parrot_compreg(Parrot_Interp interpreter, STRING *type, Parrot_compiler_func_t f
     hash = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
             IGLOBALS_COMPREG_HASH);
     if (!hash) {
-        hash = pmc_new_noinit(interpreter, enum_class_PerlHash);
+        hash = pmc_new_noinit(interpreter, enum_class_Hash);
         VTABLE_init(interpreter, hash);
         VTABLE_set_pmc_keyed_int(interpreter, iglobals,
                 (INTVAL)IGLOBALS_COMPREG_HASH, hash);

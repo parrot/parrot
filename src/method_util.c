@@ -167,7 +167,7 @@ Parrot_init_stash(Interp *interp, struct method_rec_t *recp,
         return;
 
     k = key_new(interp);
-    stash->stash_hash = hash = pmc_new(interp, enum_class_PerlHash);
+    stash->stash_hash = hash = pmc_new(interp, enum_class_Hash);
     while (recp->name != NULL) {
         PMC *csub = Parrot_new_csub(interp, recp->sub);
         STRING *name = string_make(interp, recp->name, strlen(recp->name),

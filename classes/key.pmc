@@ -24,7 +24,7 @@ static int
 is_hash_iter(PMC *agg, PMC *key)
 {
     if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == 
-        (KEY_integer_FLAG | KEY_number_FLAG))
+        KEY_hash_iterator_FLAGS )
         return 1;
     return 0;
 }
@@ -297,13 +297,16 @@ PMC_int_val(-1) means end of iteration.
                 PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
                 PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
                 /*
-                 * KEY_integer_FLAG | KEY_number_FLAG indicates
-                 * a hash iterator operation
+                 * KEY_hash_iterator_FLAGS, which is the same as
+                 * KEY_integer_FLAG | KEY_number_FLAG 
+                 * indicates a hash iterator operation
                  * KEY_integer_FLAG alone is an indexed hash lookup
                  * with an Integer KEY
                  */
                 if (agg->vtable->base_type == enum_class_PerlHash)
-                    PObj_get_FLAGS(ret) |= KEY_number_FLAG;
+                    PObj_get_FLAGS(ret) |= KEY_hash_iterator_FLAGS;
+                if (agg->vtable->base_type == enum_class_Hash)
+                    PObj_get_FLAGS(ret) |= KEY_hash_iterator_FLAGS;
         init:
                 PMC_int_val(ret) = 0;
                 if (!n)

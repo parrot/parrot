@@ -77,13 +77,14 @@ multiarray.pmc		51
 
 
 # hashes
-perlhash.pmc		52
-orderedhash.pmc		53
+hash.pmc		52
+perlhash.pmc		53
+orderedhash.pmc		54
 
 # other
 
-tqueue.pmc		54
+tqueue.pmc		55
 
-parrotclass.pmc		55
-parrotobject.pmc	56
+parrotclass.pmc		56
+parrotobject.pmc	57
 

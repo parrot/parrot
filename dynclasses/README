@@ -42,7 +42,7 @@ C<group GROUPNAME> syntax to trigger a group library to built. You
 will use the group name as the name of the library to load using the
 PASM op C<loadlib>.
 
-        pmclass Match extends PerlHash dynpmc group match_group { ... }
+        pmclass Match extends Hash dynpmc group match_group { ... }
 
 and then in your .imc or .pasm file:
 

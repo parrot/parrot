@@ -9,7 +9,7 @@ classes/orderedhash.pmc - Ordered Hash
 =head1 DESCRIPTION
 
 C<OrderedHash> extends C<PerlArray> to provide the functionality of
-C<PerlArray> (list in C<data>) and a C<PerlHash> (hash in
+C<PerlArray> (list in C<data>) and a C<Hash> (hash in
 C<struct_val>). The list holds the PMC values, the hash keys point to
 the index of the value in the list.
 
@@ -37,7 +37,7 @@ over the hash doesn't show these values.
 */
 
 #include "parrot/parrot.h"
-#include "pmc_perlhash.h"
+#include "pmc_hash.h"
 
 /*
 
@@ -70,7 +70,7 @@ Initializes the ordered hash.
         /* clear the Hash ptr - its not yet existing */
         PMC_struct_val(SELF) = NULL;
         SUPER();
-        PerlHash.SUPER();
+        Hash.SUPER();
     }
 
 /*
@@ -85,7 +85,7 @@ Marks the ordered hash as live.
 
     void mark () {
         SUPER();
-        PerlHash.SUPER();
+        Hash.SUPER();
     }
 
 /*
@@ -118,7 +118,7 @@ Creates and returns a clone of the ordered hash.
             return SUPER(key);
         }
         else {
-            INTVAL n = PerlHash.SELF.get_integer_keyed(key);
+            INTVAL n = Hash.SELF.get_integer_keyed(key);
             return DYNSELF.get_pmc_keyed_int(n);
         }
     }
@@ -134,7 +134,7 @@ Returns the PMC value associated with C<*key>.
 */
 
     PMC* get_pmc_keyed_str (STRING* key) {
-        INTVAL n = PerlHash.SELF.get_integer_keyed_str(key);
+        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
         return DYNSELF.get_pmc_keyed_int(n);
     }
 
@@ -147,7 +147,7 @@ Returns the PMC value associated with C<*key>.
 */
 
     INTVAL get_integer_keyed_str (STRING* key) {
-        INTVAL n = PerlHash.SELF.get_integer_keyed_str(key);
+        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
         return DYNSELF.get_integer_keyed_int(n);
     }
 
@@ -162,7 +162,7 @@ Returns the integer value associated with C<*key>.
 */
 
     INTVAL get_integer_keyed (PMC* key) {
-        INTVAL n = PerlHash.SELF.get_integer_keyed(key);
+        INTVAL n = Hash.SELF.get_integer_keyed(key);
         return DYNSELF.get_integer_keyed_int(n);
     }
 
@@ -177,7 +177,7 @@ Returns the floating-point value for the element at C<*key>.
 */
 
     FLOATVAL get_number_keyed (PMC* key) {
-        INTVAL n = PerlHash.SELF.get_integer_keyed(key);
+        INTVAL n = Hash.SELF.get_integer_keyed(key);
         return DYNSELF.get_number_keyed_int(n);
     }
 
@@ -194,7 +194,7 @@ Associates C<*value> with C<*key>.
     void set_pmc_keyed (PMC* key, PMC* value) {
         INTVAL n = DYNSELF.elements();
         DYNSELF.set_pmc_keyed_int(n, value);
-        PerlHash.SELF.set_integer_keyed(key, n);
+        Hash.SELF.set_integer_keyed(key, n);
     }
 
 /*
@@ -210,7 +210,7 @@ Associates C<value> with C<*key>.
     void set_integer_keyed (PMC* key, INTVAL value) {
         INTVAL n = DYNSELF.elements();
         DYNSELF.set_integer_keyed_int(n, value);
-        PerlHash.SELF.set_integer_keyed(key, n);
+        Hash.SELF.set_integer_keyed(key, n);
     }
 
 /*
@@ -226,7 +226,7 @@ Associates C<value> with C<*key>.
     void set_string_keyed (PMC* key, STRING* value) {
         INTVAL n = DYNSELF.elements();
         DYNSELF.set_string_keyed_int(n, value);
-        PerlHash.SELF.set_integer_keyed(key, n);
+        Hash.SELF.set_integer_keyed(key, n);
     }
 
 /*
@@ -242,7 +242,7 @@ Associates C<*value> with C<*key>.
     void set_pmc_keyed_str (STRING* key, PMC* value) {
         INTVAL n = DYNSELF.elements();
         DYNSELF.set_pmc_keyed_int(n, value);
-        PerlHash.SELF.set_integer_keyed_str(key, n);
+        Hash.SELF.set_integer_keyed_str(key, n);
     }
 
 /*
@@ -258,7 +258,7 @@ Associates C<value> with C<*key>.
     void set_integer_keyed_str (STRING* key, INTVAL value) {
         INTVAL n = DYNSELF.elements();
         DYNSELF.set_integer_keyed_int(n, value);
-        PerlHash.SELF.set_integer_keyed_str(key, n);
+        Hash.SELF.set_integer_keyed_str(key, n);
     }
 
 /*
@@ -272,7 +272,7 @@ Associates C<value> with C<*key>.
     void set_number_keyed (PMC* key, FLOATVAL value) {
         INTVAL n = DYNSELF.elements();
         DYNSELF.set_number_keyed_int(n, value);
-        PerlHash.SELF.set_integer_keyed(key, n);
+        Hash.SELF.set_integer_keyed(key, n);
     }
 
 /*
@@ -286,7 +286,7 @@ Associates C<value> with C<*key>.
     void set_string_keyed_str (STRING* key, STRING* value) {
         INTVAL n = DYNSELF.elements();
         DYNSELF.set_string_keyed_int(n, value);
-        PerlHash.SELF.set_integer_keyed_str(key, n);
+        Hash.SELF.set_integer_keyed_str(key, n);
     }
 
 /*
@@ -302,7 +302,7 @@ Associates C<value> with C<*key>.
             return SUPER(key);
         }
         else {
-            return PerlHash.SUPER(key);
+            return Hash.SUPER(key);
         }
     }
 
@@ -317,7 +317,7 @@ Returns whether the key C<*key> exists in the hash.
 */
 
     INTVAL exists_keyed_str(STRING* key) {
-        return PerlHash.SUPER(key);
+        return Hash.SUPER(key);
     }
 
 /*
@@ -333,7 +333,7 @@ Returns whether the key C<*key> exists in the hash.
             return SUPER(key);
         }
         else {
-            INTVAL n = PerlHash.SELF.get_integer_keyed(key);
+            INTVAL n = Hash.SELF.get_integer_keyed(key);
             return DYNSELF.defined_keyed_int(n);
         }
     }
@@ -349,7 +349,7 @@ Returns whether the value for key C<*key> is defined in the hash.
 */
 
     INTVAL defined_keyed_str(STRING* key) {
-        INTVAL n = PerlHash.SELF.get_integer_keyed_str(key);
+        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
         return DYNSELF.defined_keyed_int(n);
     }
 
@@ -372,12 +372,12 @@ Deletes the key C<*key> from the hash.
         else {
             PMC *new_undef = undef(INTERP);
             /* fetch index into the PerlArray
-               and delete the key in the PerlHash afterward */
-            INTVAL n = PerlHash.SELF.get_integer_keyed(key);
-            PerlHash.SUPER(key);
+               and delete the key in the Hash afterward */
+            INTVAL n = Hash.SELF.get_integer_keyed(key);
+            Hash.SUPER(key);
             /* remove the value from the PerlArray,
                but don't splice the PerlArray. We don't want to mess up
-               the mapping from the PerlHash to the PerlArray */
+               the mapping from the Hash to the PerlArray */
             DYNSELF.set_pmc_keyed_int(n,new_undef);
         }
     }
@@ -385,12 +385,12 @@ Deletes the key C<*key> from the hash.
     void delete_keyed_str(STRING* key) {
         PMC *new_undef = undef(INTERP);
         /* fetch index into the PerlArray
-           and delete the key in the PerlHash afterward */
-        INTVAL n = PerlHash.SELF.get_integer_keyed_str(key);
-        PerlHash.SUPER(key);
+           and delete the key in the Hash afterward */
+        INTVAL n = Hash.SELF.get_integer_keyed_str(key);
+        Hash.SUPER(key);
         /* remove the value from the PerlArray,
            but don't splice the PerlArray. We don't want to mess up
-           the mapping from the PerlHash to the PerlArray */
+           the mapping from the Hash to the PerlArray */
         DYNSELF.set_pmc_keyed_int(n,new_undef);
     }
 
@@ -405,7 +405,7 @@ Returns the Parrot string associated with C<*key>.
 */
 
     STRING* get_string_keyed (PMC* key) {
-        return PerlHash.SUPER(key);
+        return Hash.SUPER(key);
     }
 }
 

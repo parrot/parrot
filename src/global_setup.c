@@ -85,7 +85,7 @@ init_world(Interp *interpreter)
 
     /* We need a class hash */
     interpreter->class_hash = classname_hash =
-        pmc_new(interpreter, enum_class_PerlHash);
+        pmc_new(interpreter, enum_class_Hash);
 
     /* Now fill the hash */
     Parrot_register_core_pmcs(interpreter, classname_hash);

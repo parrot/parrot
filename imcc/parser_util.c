@@ -62,7 +62,7 @@ iNEW(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
                 "Unknown PMC type '%s'\n", type);
     sprintf(fmt, "%%s, %d\t # .%s", pmc_num, type);
     r0->usage = U_NEW;
-    if (!strcmp(type, "PerlArray") || !strcmp(type, "PerlHash"))
+    if (!strcmp(type, "PerlArray") || !strcmp(type, "PerlHash") || !strcmp(type, "Hash"))
         r0->usage |= U_KEYED;
     free(type);
     regs[0] = r0;

@@ -50,7 +50,7 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
     STRING *ns_name;
 #if 1
     /*
-     * we are cheating a bit and use PerlHash internals to avoid
+     * we are cheating a bit and use Hash internals to avoid
      * hash lookup duplication
      */
     HashBucket *b;

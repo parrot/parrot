@@ -378,6 +378,25 @@ Dumps a PerlHash PMC.
 .end
 
 
+=item style."pmcHash"( name, hash )
+
+Dumps a Hash PMC.
+
+=cut
+
+.sub pmcHash method
+    .param string name
+    .param pmc hash
+    .local string indent
+
+    print "Hash "
+
+    self."dumpHash"( name, hash )
+
+    .return ( 1 )
+.end
+
+
 =item style."pmcString"( name, str )
 
 Dumps a String PMC.

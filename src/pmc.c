@@ -597,7 +597,7 @@ dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
     if (!interpreter->DOD_registry) {
         PMC *registry;
         registry = interpreter->DOD_registry = pmc_new_noinit(interpreter,
-                enum_class_PerlHash);
+                enum_class_Hash);
         new_hash_x(interpreter, &hash, enum_type_int, 0, Hash_key_type_int,
                 int_compare, key_hash_int, pobject_lives);
         PObj_custom_mark_SET(registry);

@@ -39,7 +39,7 @@ static STRING *OCT;
 static STRING *PYOBJECT;
 static STRING *BASES;
 
-extern PMC* Parrot_PerlHash_get_iter(Interp* interpreter, PMC* pmc);
+extern PMC* Parrot_Hash_get_iter(Interp* interpreter, PMC* pmc);
 
 #define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
 
@@ -114,7 +114,7 @@ enter_nci_method should create these as locals to begin with.
             internal_exception(1, "Can't find PyBuiltins");
 
         /* For each, extract the key and item, and store in the scratchpad */
-        iter = Parrot_PerlHash_get_iter(INTERP, stash);
+        iter = Parrot_Hash_get_iter(INTERP, stash);
         n = VTABLE_elements(INTERP, stash);
         for (j = 0; j < n; ++j) {
             key = VTABLE_shift_string(INTERP, iter);

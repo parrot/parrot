@@ -68,7 +68,7 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
 
     class_slots = PMC_data(class);
     attr_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
-    class_offset_hash = pmc_new(interpreter, enum_class_PerlHash);
+    class_offset_hash = pmc_new(interpreter, enum_class_Hash);
     parent_array = get_attrib_num(class_slots, PCD_ALL_PARENTS);
     parent_class_count = VTABLE_elements(interpreter, parent_array);
 
@@ -1595,7 +1595,7 @@ Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
     }
 #else
     /*
-     * cheat a bit--the offset_hash is a PerlHash PMC
+     * cheat a bit--the offset_hash is a Hash PMC
      */
     b = hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(offset_hash), class);

@@ -18,7 +18,7 @@ Tests data dumping.
 
 use strict;
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 
 # no. 1
 output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
@@ -646,3 +646,107 @@ CODE
     "This is a String"
 ]
 OUT
+
+# no. 15
+output_is(<<'CODE', <<'OUT', "dumping complex data in Hash");
+##PIR##
+.sub _main
+    .local pmc hash1
+    .local pmc hash2
+    .local pmc hash3
+    .local pmc array1
+
+    new hash1, .Hash
+    new hash2, .Hash
+    new hash3, .Hash
+    new array1, .PerlArray
+
+    _dumper( "hash1", hash1 )
+
+    S0 = "hello"
+    S1 = "world"
+    set hash1[S0], S1
+
+    _dumper( "hash1", hash1 )
+
+    S0 = "hello2"
+    S1 = "world2"
+    set hash1[S0], S1
+
+    _dumper( "hash1", hash1 )
+
+    S0 = "hash2"
+    set hash1[S0], hash2
+
+    _dumper( "hash1", hash1 )
+
+    S0 = "hello3"
+    S1 = "world3"
+    set hash2[S0], S1
+
+    _dumper( "hash1", hash1 )
+
+    S0 = "name"
+    S1 = "parrot"
+    set hash3[S0], S1
+    S0 = "is"
+    S1 = "cool"
+    set hash3[S0], S1
+
+    array1 = 5
+    array1[0] = "this"
+    array1[1] = "is"
+    array1[2] = "a"
+    array1[3] = "test"
+    array1[4] = hash3
+
+    S0 = "array1"
+    set hash2[S0], array1
+
+    _dumper( "hash1", hash1 )
+
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"hash1" => Hash {
+}
+"hash1" => Hash {
+    "hello" => "world"
+}
+"hash1" => Hash {
+    "hello" => "world",
+    "hello2" => "world2"
+}
+"hash1" => Hash {
+    "hash2" => Hash {
+    },
+    "hello" => "world",
+    "hello2" => "world2"
+}
+"hash1" => Hash {
+    "hash2" => Hash {
+        "hello3" => "world3"
+    },
+    "hello" => "world",
+    "hello2" => "world2"
+}
+"hash1" => Hash {
+    "hash2" => Hash {
+        "array1" => PerlArray (size:5) [
+            "this",
+            "is",
+            "a",
+            "test",
+            Hash {
+                "is" => "cool",
+                "name" => "parrot"
+            }
+        ],
+        "hello3" => "world3"
+    },
+    "hello" => "world",
+    "hello2" => "world2"
+}
+OUT
+

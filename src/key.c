@@ -291,7 +291,7 @@ key_integer(Interp *interpreter, PMC *key)
     PMC *reg;
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-    case KEY_integer_FLAG|KEY_number_FLAG:
+    case KEY_hash_iterator_FLAGS:
     case KEY_integer_FLAG:
         return PMC_int_val(key);
     case KEY_integer_FLAG | KEY_register_FLAG:
@@ -460,10 +460,10 @@ key_mark(Interp *interpreter, PMC *key)
     if (flags == KEY_string_FLAG)
         pobject_lives(interpreter, (PObj *)PMC_str_val(key));
     /*
-     * this combination denotes a hash key iteration, PMC_data() is
+     * KEY_hash_iterator_FLAGS denote a hash key iteration, PMC_data() is
      * the bucket_index and not the next key component
      */
-    if (flags == (KEY_integer_FLAG|KEY_number_FLAG))
+    if (flags == KEY_hash_iterator_FLAGS)
         return;
 
     if (PMC_data(key))

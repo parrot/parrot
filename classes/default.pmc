@@ -46,7 +46,7 @@ caller(Parrot_Interp interp, PMC * pmc)
 
 =item C<static void cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)>
 
-Throws an exception "$methnme() not implemented in class '$class'", used by
+Throws an exception "$methname() not implemented in class '$class'", used by
 all unimplemented messages.
 
 */

@@ -1,5 +1,5 @@
 /* key.h
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
  *  Overview:
@@ -16,21 +16,23 @@
 #include "parrot/parrot.h"
 
 typedef enum {
-    KEY_integer_FLAG = PObj_private0_FLAG,
-    KEY_number_FLAG = PObj_private1_FLAG,
-    KEY_string_FLAG = PObj_private2_FLAG,
-    KEY_pmc_FLAG = PObj_private3_FLAG,
-    KEY_register_FLAG = PObj_private4_FLAG,
+    KEY_integer_FLAG        = PObj_private0_FLAG,
+    KEY_number_FLAG         = PObj_private1_FLAG,
+    KEY_hash_iterator_FLAGS = PObj_private0_FLAG | PObj_private1_FLAG,
+    KEY_string_FLAG         = PObj_private2_FLAG,
+    KEY_pmc_FLAG            = PObj_private3_FLAG,
+    KEY_register_FLAG       = PObj_private4_FLAG,
 
-    KEY_start_slice_FLAG = PObj_private5_FLAG,
-    KEY_end_slice_FLAG = PObj_private6_FLAG,
-    KEY_inf_slice_FLAG = PObj_private7_FLAG,
+    KEY_start_slice_FLAG    = PObj_private5_FLAG,
+    KEY_end_slice_FLAG      = PObj_private6_FLAG,
+    KEY_inf_slice_FLAG      = PObj_private7_FLAG,
 
-    KEY_type_FLAGS = KEY_integer_FLAG |
-                     KEY_number_FLAG |
-                     KEY_string_FLAG |
-                     KEY_pmc_FLAG |
-                     KEY_register_FLAG
+    KEY_type_FLAGS          = KEY_integer_FLAG         |
+                              KEY_number_FLAG          |
+                              KEY_string_FLAG          |
+                              KEY_pmc_FLAG             |
+                              KEY_register_FLAG        |
+                              KEY_hash_iterator_FLAGS
 
 } KEY_flags;
 

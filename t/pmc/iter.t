@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 46;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -104,7 +104,7 @@ ok 11
 ok 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "hash iter 1");
+output_is(<<'CODE', <<'OUTPUT', "PerlHash iter 1");
     .include "iterator.pasm"
 	new P0, .PerlHash	# empty Hash
 	new P2, .PerlHash	# Hash with 2 elements
@@ -158,7 +158,61 @@ ok 7
 ok 8
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "hash iter 2");
+output_is(<<'CODE', <<'OUTPUT', "Hash iter 1");
+    .include "iterator.pasm"
+	new P0, .Hash	# empty Hash
+	new P2, .Hash	# Hash with 2 elements
+	set P2["ab"], 100
+	set P2["xy"], "value"
+	set I0, P2
+	new P1, .Iterator, P2
+	print "ok 1\n"
+	set I1, P1
+	eq I0, I1, ok2		# iter.length() == hash.length()
+	print "not "
+ok2:	print "ok 2\n"
+	new P1, .Iterator, P0
+	set P1, .ITERATE_FROM_START
+	print "ok 3\n"
+	unless P1, ok4		# if(iter) == false on empty
+	print "not "
+ok4:	print "ok 4\n"
+	new P1, .Iterator, P2
+	set P1, .ITERATE_FROM_START
+	if P1, ok5		# if(iter) == true on non empty
+	print "not "
+ok5:	print "ok 5\n"
+	# now iterate over P2
+	# while (P1) { key = shift(P1) }
+	unless P1, nok6
+        shift S3, P1		# get hash.key
+	eq S3, "ab", ok6
+	eq S3, "xy", ok6
+nok6:	print " not "
+ok6:	print "ok 6\n"
+	unless P1, nok7
+        shift S3, P1
+	eq S3, "ab", ok7
+	eq S3, "xy", ok7
+nok7:	print "not "
+ok7:	print "ok 7\n"
+	unless P1, ok8		# if(iter) == false after last
+	print "not "
+ok8:	print "ok 8\n"
+	end
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PerlHash iter 2");
     .include "iterator.pasm"
 	new P0, .PerlHash	# Hash for iteration
 	new P2, .PerlHash	# for test
@@ -1055,7 +1109,7 @@ CODE
 ok
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - string");
+output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - string");
 ##PIR##
 .sub main @MAIN
     .include "iterator.pasm"
@@ -1084,7 +1138,7 @@ CODE
 /6 [abcdef]{6}ok/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - array");
+output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - array");
 ##PIR##
 .sub main @MAIN
     .include "iterator.pasm"
@@ -1097,6 +1151,39 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - array");
     push ar, "d"
     push ar, "e"
     hash = new PerlHash
+    hash = hash."fromkeys"(ar)
+    $I0 = hash
+    print $I0
+    print " "
+    .local pmc iter
+    iter = new .Iterator, hash
+    iter = .ITERATE_FROM_START
+iter_loop:
+    unless iter, iter_end		# while (entries) ...
+    $S0 = shift iter
+    print $S0
+    goto iter_loop
+iter_end:
+    print "ok\n"
+.end
+
+CODE
+/5 [abcde]{5}ok/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "Hash fromkeys - array");
+##PIR##
+.sub main @MAIN
+    .include "iterator.pasm"
+    .local pmc hash
+    .local pmc ar
+    ar = new PerlArray
+    push ar, "a"
+    push ar, "b"
+    push ar, "c"
+    push ar, "d"
+    push ar, "e"
+    hash = new Hash
     hash = hash."fromkeys"(ar)
     $I0 = hash
     print $I0
@@ -1144,7 +1231,7 @@ CODE
 bcdeok
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - array slice");
+output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - array slice");
 ##PIR##
 .sub main @MAIN
     .include "iterator.pasm"
@@ -1178,7 +1265,7 @@ CODE
 /4 [bcde]{4}ok/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - xrange");
+output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - xrange");
 ##PIR##
 .sub main @MAIN
     .include "iterator.pasm"
@@ -1242,7 +1329,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - xrange get_iter");
+output_like(<<'CODE', <<'OUTPUT', "PerlHash fromkeys - xrange get_iter");
 ##PIR##
 .sub main @MAIN
     .include "iterator.pasm"

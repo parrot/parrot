@@ -180,6 +180,42 @@ END:
     .pcc_end_return
 .end
 
+.sub Hash method
+    .param pmc where
+    .param pmc oldVal
+    .param pmc newVal
+    .param pmc cache
+    .local pmc iter
+    .local string key
+    .local pmc val
+    
+    new iter, .Iterator, where
+    set iter, 0
+    
+LOOP:
+    unless iter, END
+
+    shift key, iter
+    
+    val = where[key]
+    
+    ne_addr val, oldVal, SKIP
+    where[key] = newVal
+SKIP:
+    I0 = __in_cache( val, cache )
+    if I0 goto LOOP
+    
+    push cache, val
+    __do_replace( val, oldVal, newVal, cache )
+    branch LOOP
+    
+END:
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+=back
+
 =back
 
 =head1 AUTHOR

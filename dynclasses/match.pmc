@@ -85,7 +85,7 @@ static INTVAL fetch_integer(Interp* interp, PMC* matchobj, PMC* val)
     }
 }
 
-pmclass Match extends PerlHash dynpmc group match_group {
+pmclass Match extends Hash dynpmc group match_group {
 
 /*
 
@@ -93,7 +93,7 @@ pmclass Match extends PerlHash dynpmc group match_group {
 
 Class initialization. Caches the type id of the MatchRange PMC,
 because it will be used frequently here. Does not bother to call
-PerlHash's class_init(), because everything it does looks like it only
+Hash's class_init(), because everything it does looks like it only
 needs to be done once.
 
 =cut

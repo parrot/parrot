@@ -622,7 +622,7 @@ parrot_py_create_funcs(Interp *interpreter)
 
     class = Parrot_base_vtables[enum_class_ResizablePMCArray]->data;
     Parrot_store_global(interpreter, NULL, Py_list, class);
-    class = Parrot_base_vtables[enum_class_PerlHash]->data;
+    class = Parrot_base_vtables[enum_class_Hash]->data;
     Parrot_store_global(interpreter, NULL, Py_dict, class);
     class->vtable->get_repr = class->vtable->get_string;
 
