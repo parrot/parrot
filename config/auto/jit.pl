@@ -10,8 +10,9 @@ $description = "Determining architecture, OS and JIT capability...";
 @args=qw(jitcapable miniparrot);
 
 sub runstep {
+    my ($set_jitcapable, $miniparrot) = @_;
 
-    if (defined $_[1]) {
+    if (defined $miniparrot) {
       Configure::Data->set(
         archname    => 'miniparrot',
         cpuarch     => 'unknown',
@@ -68,7 +69,7 @@ sub runstep {
 	}
   }
 
-  $jitcapable = $_[0] if defined $_[0];
+  $jitcapable = $set_jitcapable if defined $set_jitcapable;
 
   if($jitcapable) {
     my($jitcpuarch, $jitosname) =  split('-', $jitarchname);
