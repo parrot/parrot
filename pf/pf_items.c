@@ -348,6 +348,7 @@ Write a STRING to the opcode stream.
 Report store size of STRING in opcode_t units.
 
 =cut
+
 */
 
 
@@ -452,6 +453,7 @@ Write a 0-terminate string to the stream.
 Return store size of a C-string in opcode_t units.
 
 =cut
+
 */
 
 char *
