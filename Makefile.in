@@ -78,6 +78,8 @@ examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
 	$(CC) $(CFLAGS) -o examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
+examples/mops/mops$(O): examples/mops/mops.c
+
 examples/mops/mops${exe}: examples/mops/mops$(O) platform$(O)
 	$(CC) $(CFLAGS) -o examples/mops/mops${exe} examples/mops/mops$(O) platform$(O) $(C_LIBS)
 

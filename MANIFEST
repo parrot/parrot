@@ -43,6 +43,13 @@ examples/assembly/queens.pasm
 examples/assembly/stack.pasm
 examples/assembly/substr.pasm
 examples/assembly/trace.pasm
+examples/mops/README   
+examples/mops/mops.c
+examples/mops/mops.pl
+examples/mops/mops.ps  
+examples/mops/mops.py
+examples/mops/mops.rb
+examples/mops/mops.scheme
 global_setup.c
 hints/darwin.pl
 hints/mswin32.pl
