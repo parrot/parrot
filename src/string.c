@@ -332,6 +332,24 @@ string_compare(struct Parrot_Interp *interpreter, STRING* s1, STRING* s2) {
     return cmp;
 }
 
+INTVAL string_to_int (struct Parrot_Interp *interpreter, STRING *s) {
+    if (s == NULL) {
+        return 0;
+    }
+    else {
+        return s->encoding->extract_int(s->bufstart);
+    }
+}
+
+FLOATVAL string_to_num (struct Parrot_Interp *interpreter, STRING *s) {
+    if (s == NULL) {
+        return 0.0;
+    }
+    else {
+        return s->encoding->extract_num(s->bufstart);
+    }
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

@@ -45,12 +45,12 @@ pmclass PerlString {
 
     INTVAL get_integer () {
 	STRING* s = (STRING*) SELF->cache.struct_val;
-        return strtol(s->bufstart,NULL,10);
+	return string_to_int(interpreter, s);
     }
 
     FLOATVAL get_number () {
 	STRING* s = (STRING*) SELF->cache.struct_val;
-	return strtod(s->bufstart,NULL);
+	return string_to_num(interpreter, s);
     }
 
     STRING* get_string () {

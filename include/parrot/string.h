@@ -47,6 +47,10 @@ INTVAL
 string_length(STRING*);
 INTVAL
 string_ord(STRING* s, INTVAL index);
+FLOATVAL
+string_to_num (struct Parrot_Interp *interpreter, STRING *s);
+INTVAL
+string_to_int (struct Parrot_Interp *interpreter, STRING *s);
 void
 string_grow(STRING* s, INTVAL newsize);
 void

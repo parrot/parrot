@@ -26,6 +26,18 @@ singlebyte_decode (const void *ptr) {
     return *bptr;
 }
 
+static INTVAL
+singlebyte_extract_int (const void *ptr) {
+    char *s = (char*)ptr;
+    return (INTVAL)strtol(s, NULL, 10); /* XXX: Fixme! */
+}
+
+static FLOATVAL
+singlebyte_extract_num (const void*ptr) {
+    char *s = (char*)ptr;
+    return strtod(s, NULL); /* XXX: Fixme! */
+}
+
 static void *
 singlebyte_encode (void *ptr, INTVAL c) {
     byte_t *bptr = ptr;
@@ -59,6 +71,8 @@ const ENCODING singlebyte_encoding = {
     1,
     singlebyte_characters,
     singlebyte_decode,
+    singlebyte_extract_int,
+    singlebyte_extract_num,
     singlebyte_encode,
     singlebyte_skip_forward,
     singlebyte_skip_backward
