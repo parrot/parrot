@@ -359,14 +359,14 @@ int main(int argc, char* argv[]) {
     Parrot_loadbc(interpreter, pf);
     key = key_new_cstring(interpreter, "_sub1");
     sub = VTABLE_get_pmc_keyed(interpreter,
-				interpreter->perl_stash->stash_hash, key);
+				interpreter->globals->stash_hash, key);
     Parrot_call(interpreter, sub, 0);
     fprintf(stderr, "back\n");
     fflush(stderr);	/* win32 seems to buffer stderr */
 
     key = key_new_cstring(interpreter, "_sub2");
     sub = VTABLE_get_pmc_keyed(interpreter,
-				interpreter->perl_stash->stash_hash, key);
+				interpreter->globals->stash_hash, key);
     arg = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, arg,
 	    string_from_cstring(interpreter, "hello ", 0));
@@ -419,7 +419,7 @@ int main(int argc, char* argv[]) {
     Parrot_loadbc(interpreter, pf);
     key = key_new_cstring(interpreter, "_sub1");
     sub = VTABLE_get_pmc_keyed(interpreter,
-				interpreter->perl_stash->stash_hash, key);
+				interpreter->globals->stash_hash, key);
     if (setjmp(jb.destination)) {
 	fprintf(stderr, "caught\n");
     }
