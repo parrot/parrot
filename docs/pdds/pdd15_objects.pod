@@ -447,7 +447,30 @@ some point soon.
 
 =head2 Supporting code
 
-Most of the supporting code is in the src/objects.c file.
+Most of the supporting code is in the src/objects.c file. The
+following routines are provided for PMC authors to use:
+
+=over 4
+
+=item Parrot_single_subclass
+
+=item Parrot_new_class
+
+=item Parrot_class_lookup
+
+=item Parrot_class_register
+
+=item Parrot_instantiate_object
+
+=item Parrot_add_parent
+
+=item Parrot_remove_parent
+
+=item Parrot_object_isa
+
+
+
+=back
 
 =head1 What The Bytecode Sees
 
