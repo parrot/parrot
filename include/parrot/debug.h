@@ -45,10 +45,13 @@ enum {
  *  value:          A pointer to the second argument.
  */
 
+typedef struct PDB_condition *PDB_condition_ptr;
+
 typedef struct PDB_condition {
     unsigned short          type;
     unsigned char           reg;
     void                    *value;
+    PDB_condition_ptr       next;
 } PDB_condition_t;
 
 /*  PDB_label_t 
@@ -157,10 +160,10 @@ void PDB_print_int(struct IReg *, const char *);
 void PDB_print_num(struct NReg *, const char *);
 
 void PDB_print_string(struct Parrot_Interp *interpreter,
-                      struct SReg *, const char *);
+    struct SReg *, const char *);
 
 void PDB_print_pmc(struct Parrot_Interp *interpreter,
-                   struct PReg *, const char *);
+    struct PReg *, const char *);
 
 void PDB_debug(struct Parrot_Interp *);
 
@@ -201,7 +204,10 @@ void PDB_set_break(struct Parrot_Interp *, const char *);
 PDB_condition_t *PDB_cond(struct Parrot_Interp *, const char *);
 
 char PDB_check_condition(struct Parrot_Interp *interpreter, 
-                         PDB_condition_t *condition);
+    PDB_condition_t *condition);
+
+void PDB_watchpoint(struct Parrot_Interp *interpreter,
+    const char *);
 
 char PDB_program_end(struct Parrot_Interp *);
 

@@ -111,73 +111,65 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
     for (i = 0; ((command[i] != 32) && command[i]) ; i++)
         c += (command[i] + (i + 1)) * ((i + 1) * 255);
 
+    na(command);
+
     switch (c) {
         case c_disassemble:
-            na(command);
-            PDB_disassemble(interpreter,command);
+            PDB_disassemble(interpreter, command);
             break;
         case c_load:
-            na(command);
-            PDB_load_source(interpreter,command);
+            PDB_load_source(interpreter, command);
             break;
         case c_l:
         case c_list:
-            na(command);
-            PDB_list(interpreter,command);
+            PDB_list(interpreter, command);
             break;
         case c_b:
         case c_break:
-            na(command);
-            PDB_set_break(interpreter,command);
+            PDB_set_break(interpreter, command);
+            break;
+        case c_w:
+        case c_watch:
+            PDB_watchpoint(interpreter, command);
             break;
         case c_d:
         case c_delete:
-            na(command);
-            PDB_delete_breakpoint(interpreter,command);
+            PDB_delete_breakpoint(interpreter, command);
             break;
         case c_r:
         case c_run:
-            na(command);
-            PDB_init(interpreter,command);
+            PDB_init(interpreter, command);
             PDB_continue(interpreter, NULL);
             break;
         case c_c:
         case c_continue:
-            na(command);
-            PDB_continue(interpreter,command);
+            PDB_continue(interpreter, command);
             break;
         case c_p:
         case c_print:
-            na(command);
-            PDB_print(interpreter,command);
+            PDB_print(interpreter, command);
             break;
         case c_s:
         case c_stack:
-            na(command);
-            PDB_print_stack(interpreter,command);
+            PDB_print_stack(interpreter, command);
             break;
         case c_n:
         case c_next:
-            na(command);
-            PDB_next(interpreter,command);
+            PDB_next(interpreter, command);
             break;
         case c_t:
         case c_trace:
-            na(command);
-            PDB_trace(interpreter,command);
+            PDB_trace(interpreter, command);
             break;
         case c_e:
         case c_eval:
-            na(command);
-            PDB_eval(interpreter,command);
+            PDB_eval(interpreter, command);
             break;
         case c_info:
-            na(command);
             PDB_info(interpreter);
             break;
         case c_h:
         case c_help:
-            na(command);
             PDB_help(command);
             break;
         case c_q:
@@ -210,7 +202,7 @@ PDB_next(struct Parrot_Interp *interpreter, const char *command)
 
     /* Init the program if it's not running */
     if (!(pdb->state & PDB_RUNNING))
-        PDB_init(interpreter,command);
+        PDB_init(interpreter, command);
     
     /* Get the number of operations to execute if any */
     if (command && isdigit((int) *command))
@@ -243,7 +235,7 @@ PDB_trace(struct Parrot_Interp *interpreter,
  
     if (!(pdb->state & PDB_RUNNING))
     {
-        PDB_init(interpreter,command);
+        PDB_init(interpreter, command);
     }
    
     if (command && isdigit((int) *command))
@@ -282,8 +274,6 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
 
     /* Allocate new condition */
     condition = (PDB_condition_t *)mem_sys_allocate(sizeof(PDB_condition_t));
-    /* The first argument after the 'if' MUST be a register of any type. */
-    na(command);
 
     /* return if no more arguments */
     if (!(command && *command))
@@ -398,6 +388,24 @@ INV_COND:   fprintf(stderr, "Invalid condition\n");
 
     return condition;
 }
+  
+/* PDB_watchpoint
+ * set a watchpoint.
+ */
+void
+PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)
+{
+    PDB_t *pdb = interpreter->pdb;
+    PDB_condition_t *condition;
+
+    if (!(condition = PDB_cond(interpreter, command)))
+        return;
+
+    /* Add it to the head of the list */
+    if (pdb->watchpoint)
+        condition->next = pdb->watchpoint;
+    pdb->watchpoint = condition;
+}
  
 /* PDB_set_break
  * set a break point, the source code file must be loaded.
@@ -463,9 +471,11 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 
     /* if there is another argument to break, besides the line number,
      * it should be an 'if', so we call another handler. */
-    if (command && *command &&
-        !(newbreak->condition = PDB_cond(interpreter, command)))
+    if (command && *command) {
+        na(command);
+        if (!(newbreak->condition = PDB_cond(interpreter, command)))
             return;
+    }
  
     /* Set the address where to stop */
     newbreak->pc = line->opcode;
@@ -685,6 +695,16 @@ PDB_break(struct Parrot_Interp *interpreter)
 {
     PDB_t *pdb = interpreter->pdb;
     PDB_breakpoint_t *breakpoint = pdb->breakpoint;
+    PDB_condition_t *watchpoint = pdb->watchpoint;
+
+    /* Check the watchpoints first. */
+    while (watchpoint) {
+        if (PDB_check_condition(interpreter, watchpoint)) {
+            pdb->state |= PDB_STOPPED;
+            return 1;
+        }
+        watchpoint = watchpoint->next;
+    }
 
     /* If program ended */
     if (!pdb->cur_opcode)
@@ -1169,7 +1189,7 @@ void
 PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
 {
     FILE *file; 
-    char f[255],c;
+    char f[255], c;
     int i;
     unsigned long size = 0;
     PDB_t *pdb = interpreter->pdb;
@@ -1412,7 +1432,7 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
 
     /* Print from the user stack? */
     if (!*command || isdigit((int) *command))
-        PDB_print_user_stack(interpreter,command);
+        PDB_print_user_stack(interpreter, command);
     else {
         for (i = 0; ((command[i] != 32) && command[i]) ; i++)
             c += (command[i] + (i + 1)) * ((i + 1) * 255);
@@ -1421,25 +1441,25 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
             case c_i:
             case c_int:
                 na(command);
-                PDB_print_stack_int(interpreter,command);
+                PDB_print_stack_int(interpreter, command);
                 break;
             case c_n:
             case c_next:
                 na(command);
-                PDB_print_stack_num(interpreter,command);
+                PDB_print_stack_num(interpreter, command);
                 break;
             case c_s:
             case c_str:
                 na(command);
-                PDB_print_stack_string(interpreter,command);
+                PDB_print_stack_string(interpreter, command);
                 break;
             case c_p:
             case c_pmc:
                 na(command);
-                PDB_print_stack_pmc(interpreter,command);
+                PDB_print_stack_pmc(interpreter, command);
                 break;
             default:
-                fprintf(stderr,"Unknown argument \"%s\" to 'stack'\n",command);
+                fprintf(stderr,"Unknown argument \"%s\" to 'stack'\n", command);
                 break;
         }
     }
@@ -1465,7 +1485,7 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
     fprintf(stderr,"Integer stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_int(&chunk->IReg[depth],command);
+    PDB_print_int(&chunk->IReg[depth], command);
 }
 
 /* PDB_print_stack_num
@@ -1488,7 +1508,7 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
     fprintf(stderr,"Float stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_num(&chunk->NReg[depth],command);
+    PDB_print_num(&chunk->NReg[depth], command);
 }
 
 /* PDB_print_stack_string
@@ -1511,7 +1531,7 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
     fprintf(stderr,"String stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_string(interpreter,&chunk->SReg[depth],command);
+    PDB_print_string(interpreter,&chunk->SReg[depth], command);
 }
 
 /* PDB_print_stack_pmc
@@ -1534,7 +1554,7 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
     fprintf(stderr,"PMC stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_pmc(interpreter,&chunk->PReg[depth],command);
+    PDB_print_pmc(interpreter,&chunk->PReg[depth], command);
 } 
 
 /* PDB_print_user_stack
@@ -1606,22 +1626,22 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
         case c_i:
         case c_int:
             na(command);
-            PDB_print_int(&interpreter->ctx.int_reg,command);
+            PDB_print_int(&interpreter->ctx.int_reg, command);
             break;
         case c_n:
         case c_num:
             na(command);
-            PDB_print_num(&interpreter->ctx.num_reg,command);
+            PDB_print_num(&interpreter->ctx.num_reg, command);
             break;
         case c_s:
         case c_str:
             na(command);
-            PDB_print_string(interpreter,&interpreter->ctx.string_reg,command);
+            PDB_print_string(interpreter,&interpreter->ctx.string_reg, command);
             break;
         case c_p:
         case c_pmc:
             na(command);
-            PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg,command);
+            PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg, command);
             break;
     }
 }
