@@ -908,14 +908,6 @@ find_loops (Parrot_Interp interpreter, IMC_Unit * unit)
     sort_loops(interpreter, unit);
     if (interpreter->imc_info->debug & DEBUG_CFG)
         dump_loops(unit);
-#if 0
-    /* when a branch goes to the subroutine entry, this may happen
-     * so its not an error
-     */
-    if (unit->bb_list[0]->loop_depth) {
-        fatal(1, "find_loops", "basic_block 0 in loop\n");
-    }
-#endif
 }
 
 /* Incresases the loop_depth of all the nodes in a loop */

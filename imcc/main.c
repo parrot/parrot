@@ -484,7 +484,7 @@ main(int argc, char * argv[])
             Parrot_setup_opt(interp, 0, output);
             Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
-            fatal(1, "main", "can't produce object file");
+            IMCC_fatal(interp, 1, "main: can't produce object file");
 #endif
         }
         if (!strcmp(sourcefile, output) && strcmp(sourcefile, "-"))
