@@ -1397,26 +1397,33 @@ mark_chunk(Interp *interpreter, List_chunk *chunk, int obj_size)
             ++pp;
             next = pp[1];
             if (up) {
-                if ((char*)next - (char*)p != obj_size)
+                if ((char*)next - (char*)p != obj_size) {
+                    ++i;
                     goto slow;
+                }
+                nm += 4;
+                ++n;
                 if (! (n & ARENA_FLAG_MASK)) {
                     ++dod_flags;
-                    if ((*dod_flags & 0x44444444) == 0x44444444) {
+                    if ((*dod_flags & ALL_SPECIAL_MASK) ==
+                            ALL_SPECIAL_MASK) {
                         /* found a bunch of special_PMCs */
+                        ++i;
                         goto slow;
                     }
                     nm = 0;
                 }
-                else
-                    nm += 4;
-                ++n;
             }
             else {
-                if ((char*)p - (char*)next != obj_size)
+                if ((char*)p - (char*)next != obj_size) {
+                    ++i;
                     goto slow;
+                }
                 if (! (n & ARENA_FLAG_MASK)) {
                     --dod_flags;
-                    if ((*dod_flags & 0x44444444) == 0x44444444) {
+                    if ((*dod_flags & ALL_SPECIAL_MASK) ==
+                            ALL_SPECIAL_MASK) {
+                        ++i;
                         goto slow;
                     }
                     nm = ((n-1) & ARENA_FLAG_MASK) << 2;
@@ -1430,9 +1437,9 @@ mark_chunk(Interp *interpreter, List_chunk *chunk, int obj_size)
         }
     }
     else {
+slow:
         /* do it the plain way */
         for ( ; i < chunk->items; ++i, ++pp) {
-slow:
             if (*pp)
                 pobject_lives(interpreter, *pp);
         }
