@@ -100,7 +100,7 @@ sub runstep {
       jit_o       => 'jit$(O) jit_cpu$(O) jit_debug$(O)'
     );
 
-    if (($jitcpuarch eq 'i386' && ($osname =~ 'bsd$' || $osname =~ 'linux')) 
+    if (($jitcpuarch eq 'i386' && ($osname =~ /bsd$/i || $osname =~ /linux/i)) 
      || ($jitcpuarch eq 'ppc')) {
       $execcapable = 1;
       if ($osname eq 'openbsd') {
