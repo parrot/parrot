@@ -494,6 +494,19 @@ set_retval(Parrot_Interp interpreter, int sig_ret)
      *     by the subroutine or both if possible, i.e. extract
      *     e.g. an INTVAL from a returned PMC?
      */
+    if (REG_INT(3) == 1) {
+        /*
+         * pythons functions from pie-thon always return a PMC
+         */
+        switch (sig_ret) {
+            case 'S':
+                REG_STR(5) = VTABLE_get_string(interpreter, REG_PMC(5));
+                break;
+            case 'I':
+                REG_INT(5) = VTABLE_get_integer(interpreter, REG_PMC(5));
+                break;
+        }
+    }
     REG_INT(0) = 1;     /* prototyped */
     REG_INT(1) = 0;     /* I */
     REG_INT(2) = 0;     /* S */

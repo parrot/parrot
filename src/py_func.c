@@ -599,12 +599,18 @@ parrot_py_create_funcs(Interp *interpreter)
      */
     class = Parrot_base_vtables[enum_class_Boolean]->data;
     Parrot_store_global(interpreter, NULL, Py_bool, class);
+    class->vtable->get_repr = class->vtable->get_string;
+
     class = Parrot_base_vtables[enum_class_Complex]->data;
     Parrot_store_global(interpreter, NULL, Py_complex, class);
+    class->vtable->get_repr = class->vtable->get_string;
+
     class = Parrot_base_vtables[enum_class_PerlNum]->data;
     Parrot_store_global(interpreter, NULL, Py_float, class);
     class = Parrot_base_vtables[enum_class_PerlInt]->data;
     Parrot_store_global(interpreter, NULL, Py_int, class);
+    class->vtable->get_repr = class->vtable->get_string;
+
     class = Parrot_base_vtables[enum_class_BigInt]->data;
     Parrot_store_global(interpreter, NULL, Py_long, class);
     class = Parrot_base_vtables[enum_class_PerlString]->data;
@@ -612,10 +618,13 @@ parrot_py_create_funcs(Interp *interpreter)
 
     class = Parrot_base_vtables[enum_class_FixedPMCArray]->data;
     Parrot_store_global(interpreter, NULL, Py_tuple, class);
+    class->vtable->get_repr = class->vtable->get_string;
+
     class = Parrot_base_vtables[enum_class_ResizablePMCArray]->data;
     Parrot_store_global(interpreter, NULL, Py_list, class);
     class = Parrot_base_vtables[enum_class_PerlHash]->data;
     Parrot_store_global(interpreter, NULL, Py_dict, class);
+    class->vtable->get_repr = class->vtable->get_string;
 
     class = Parrot_base_vtables[enum_class_Iterator]->data;
     Parrot_store_global(interpreter, NULL, Py_iter, class);

@@ -1540,12 +1540,14 @@ L_BadId:
 .pcc_sub __name:
    set S5, "delegate"
    set I0, 1
-   set I3, 1
+   set I1, 1	# 1 string retval
+   set I3, 0	# no pmc
    invoke P1
 .pcc_sub __type:
    find_type I5, "delegate"
    set I0, 1
    set I1, 1
+   set I3, 0
    invoke P1
 CODE
 All names and ids ok.

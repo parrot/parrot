@@ -343,18 +343,6 @@ Returns the name of the PMC.
     STRING* name () {
         return SELF->vtable->whoami;
     }
-/*
-
-=item C<STRING* get_repr()>
-
-Fallback to get_string() - return pythonic textual representation of
-SELF.
-
-*/
-
-    STRING* get_repr() {
-        return DYNSELF.get_string();
-    }
 
 /*
 

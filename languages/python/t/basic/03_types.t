@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -144,4 +144,21 @@ def main():
 
 if __name__ == "__main__":
     main()
+CODE
+
+test(<<'CODE', 'repr of all');
+def main():
+    print "int", `1`
+    print "bool", `1==1`
+    print 'long', `1L`
+    print 'float', `1.2`
+    print 'str', `"ab"`
+    print 'unicode', `u"ab"`
+    print 'complex', `1+2j`
+    print 'list', `[1,2]`
+    print 'tuple', `(1,2)`
+    print 'dict', `{"a":1}`
+
+main()
+
 CODE
