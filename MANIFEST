@@ -262,6 +262,10 @@ test_main.c
 testparrotfuncptr.c
 testparrotsizes_c.in
 trace.c
+types/bignum.c
+types/bignum.h
+types/bignum_atest.pl
+types/bignum_test.pl
 vtable.tbl
 vtable_h.pl
 warnings.c
