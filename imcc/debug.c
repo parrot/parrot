@@ -1,7 +1,7 @@
 /*
  * print debug info of various structures
  *
- * handle info/error/warnins of imcc
+ * handle info/error/warning messages from imcc
  */
 
 
