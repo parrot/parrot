@@ -153,7 +153,7 @@ again:
         if (NULL == program_code) {
             /* Whoops, out of memory. */
 
-            PIO_fprintf(interpreter, PIO_STDERR(interpreter),
+            PIO_eprintf(interpreter,
                     "Parrot VM: Could not allocate buffer to read packfile from PIO.\n");
 
             return NULL;
@@ -171,8 +171,8 @@ again:
                 realloc(program_code, program_size + chunk_size);
 
             if (NULL == program_code) {
-                PIO_fprintf(interpreter, PIO_STDERR(interpreter),
-                        "Parrot VM: Could not reallocate buffer while reading packfile from PIO.\n");
+                PIO_eprintf(interpreter, 
+                            "Parrot VM: Could not reallocate buffer while reading packfile from PIO.\n");
                 return NULL;
             }
 
@@ -180,7 +180,7 @@ again:
         }
 
         if (read_result < 0) {
-            PIO_fprintf(interpreter, PIO_STDERR(interpreter),
+            PIO_eprintf(interpreter,
                     "Parrot VM: Problem reading packfile from PIO.\n");
             return NULL;
         }
@@ -265,7 +265,7 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
     PMC *userargv;
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
+        PIO_eprintf(interpreter,
                 "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
                 argc);
     }

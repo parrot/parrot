@@ -91,8 +91,8 @@ void
 dump_hash(Interp *interpreter, HASH *hash)
 {
     HashIndex i;
-    PIO_fprintf(interpreter, PIO_STDERR(interpreter),
-                "Hashtable[%vd/%vd]\n", hash->entries, hash->max_chain + 1);
+    PIO_eprintf(interpreter, "Hashtable[%vd/%vd]\n", hash->entries,
+                hash->max_chain + 1);
 
     /* Iterate one past the end of the hashtable, so we can use the
      * last value as a special case for dumping out the free bucket
