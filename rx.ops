@@ -40,7 +40,7 @@ rx.ops - Parrot Regular Expression Engine, version 4.0
 		rx_popindex I1, $advance
 
 	$start2:
-		rx_literal S0, I1, "cd", $back1
+		rx_oneof S0, I1, "cd", $back1
 	$top2:
 		rx_oneof S0, I1, "cd", $succeed
 		branch $top2
@@ -289,9 +289,9 @@ op rx_advance(in str, inout int, inconst int) {
 Matches the exact string passed in the third 
 parameter.
 
-B<XXX> Currently there is no way to to case-insenstive matches. The right
-way would involve either an specialized rx_literal_insensitive op, or 
-some more sophisticated method.
+B<XXX> Currently there is no way to do case-insensitive matches. The
+right way would involve either a specialized rx_literal_insensitive op,
+or some more sophisticated method.
 
 =cut
 
@@ -519,7 +519,7 @@ op rx_zwa_atend(in str, in int, inconst int) {
 
 =back
 
-=head3 Optimitzation ops: searching at the beginning of the string.
+=head3 Optimization ops: searching at the beginning of the string.
 
 This ops combine rx_advance with other ops, with the goal of increasing the
 code density, and saving a few repeated computations.
@@ -637,7 +637,7 @@ op rx_search_char (in str, inout int, inout int, in int, inconst int) {
 
 =back
 
-=head3 Optimitzation ops: combining a simple match with a greedy star.
+=head3 Optimization ops: combining a simple match with a greedy star.
 
 =over 4
 
