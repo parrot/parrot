@@ -336,11 +336,7 @@ new_coroutine(Interp *interp)
  * Return continuation PMCs are re-used.
  * In the cache they are chained together by this pointer:
  */
-#if PMC_DATA_IN_EXT
-#  define PREV_RETC(p) (PMC*)((p)->pmc_ext)
-#else
-#  define PREV_RETC(p) PMC_data(p)
-#endif
+#  define PREV_RETC(p) PMC_struct_val(p)
 
 /*
 
@@ -375,6 +371,7 @@ add_to_retc_cache(Interp *interpreter, PMC *pmc)
 
     if (mc->retc_cache)
         PREV_RETC(mc->retc_cache) = mc->retc_cache;
+    PREV_RETC(pmc) = NULL;
     mc->retc_cache = pmc;
     /* XXX expensive w. ARENA_DOD_FLAGS */
     PObj_custom_mark_CLEAR(pmc);

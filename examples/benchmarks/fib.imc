@@ -16,7 +16,7 @@ unspecified).
 
 =cut
 
-.pcc_sub _main prototyped
+.sub _main prototyped
     .param pmc argv
     .sym int argc
     argc = argv
@@ -28,14 +28,9 @@ unspecified).
 noarg:
     .sym float start
     .sym pmc fib
-    fib = newsub _fib
-    time start
-    .pcc_begin prototyped
-    .arg N
-    .pcc_call fib
     .sym int r
-    .result r
-    .pcc_end
+    time start
+    r = _fib(N)
     .sym float fin
     time fin
     print "fib("
@@ -43,38 +38,22 @@ noarg:
     print ") = "
     print r
     print " "
-    sub fin, start
+    fin -= start
     print fin
     print "s\n"
     end
 .end
 
-.pcc_sub _fib prototyped
+.sub _fib prototyped
     .param int n
-    if n >= 2 goto rec
-    .pcc_begin_return
-    .return n
-    .pcc_end_return
-rec:
-    .sym int n1
-    .sym int n2
-    .sym int r1
-    .sym int r2
-    .sym pmc fib
-    fib = P0
+    if n < 2 goto ret
+    .sym int n1, n2, r1, r2
     n1 = n - 1
     n2 = n - 2
-    .pcc_begin prototyped
-    .arg n1
-    .pcc_call fib
-    .result r1
-    .pcc_end
-    .pcc_begin prototyped
-    .arg n2
-    .pcc_call fib
-    .result r2
-    .pcc_end
+    r1 = _fib(n1)
+    r2 = _fib(n2)
     n = r1 + r2
+ret:
     .pcc_begin_return
     .return n
     .pcc_end_return

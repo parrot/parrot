@@ -253,9 +253,8 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
 
     for (i = 0; *++sig; ) {
         /*
-         * TODO handle overflow: if any next[] reaches 16 create
-         *      overflow array in P3 and pass additional args in the
-         *      array
+         * handle overflow: if any next[] reaches 16 create
+         * overflow array in P3 and pass additional args in the array
          */
         switch (*sig) {
             case 'v':       /* void func, no params */

@@ -157,6 +157,7 @@ add_to_fp_cache(Interp* interpreter, Stack_Chunk_t *stack_p)
     if (ic->frame_cache)
         PObj_bufstart(ic->frame_cache) = ic->frame_cache;
     ic->frame_cache = stack_p;
+    PObj_bufstart(stack_p) = NULL;
 }
 
 /*

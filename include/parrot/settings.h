@@ -46,7 +46,7 @@
 /*
  * PARROT_GC_IMS incremental mark and sweep collector
  */
-#define PARROT_GC_IMS     0
+#define PARROT_GC_IMS     !PARROT_GC_MS
 
 
 /*

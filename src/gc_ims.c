@@ -348,12 +348,12 @@ a sleep opcode.
  * each ALLOCATIONS_INIT allocations of any object an incremental
  * step is triggered
  */
-#define ALLOCATIONS_INIT      1024
+#define ALLOCATIONS_INIT      1024*4
 
 /*
  * a mark step does allocations * throttle work
  */
-#define THROTTLE              1.2
+#define THROTTLE              1.3
 
 /*
  * if we have at the end total * refill free objects
@@ -386,7 +386,9 @@ typedef enum {          /* these states have to be in execution order */
     GC_IMS_SWEEP,       /* sweep buffers */
     GC_IMS_COLLECT,     /* collect buffer memory */
     GC_IMS_FINISHED,    /* update statistics */
-    GC_IMS_CONSUMING    /* when we have plenty of free objects */
+    GC_IMS_CONSUMING,   /* when we have plenty of free objects */
+    GC_IMS_DEAD         /* gc is alreadz shutdown */         
+
 } gc_ims_state_enum;
 
 typedef struct {
@@ -469,8 +471,10 @@ gc_ims_get_free_object(Interp *interpreter,
         PObj_version((Buffer*)ptr) = arena_base->dod_runs;
 #endif
     g_ims = arena_base->gc_private;
-    if (++g_ims->allocations >= g_ims->alloc_trigger)
+    if (++g_ims->allocations >= g_ims->alloc_trigger) {
+        g_ims->allocations = 0;
         parrot_gc_ims_run_increment(interpreter);
+    }
     return ptr;
 }
 
@@ -650,7 +654,7 @@ parrot_gc_ims_sweep(Interp* interpreter)
      * except for a lazy run, which is invoked from the run loop
      */
     /* TODO mark volatile roots */
-    Parrot_dod_trace_root(interpreter, g_ims->lazy ? 0 : 1);
+    Parrot_dod_trace_root(interpreter, g_ims->lazy ? 0 : DOD_trace_stack_FLAG);
     /*
      * mark (again) rest of children
      */
@@ -766,13 +770,12 @@ allocation.
 static void
 parrot_gc_ims_run_increment(Interp* interpreter)
 {
-    Gc_ims_private *g_ims;
     struct Arenas *arena_base = interpreter->arena_base;
+    Gc_ims_private *g_ims = arena_base->gc_private;
 
-    if (Parrot_is_blocked_DOD(interpreter))
+    if (arena_base->DOD_block_level || g_ims->state == GC_IMS_DEAD) {
         return;
-    g_ims = arena_base->gc_private;
-    g_ims->allocations = 0;
+    }
     ++g_ims->increments;
     IMS_DEBUG((stderr, "state = %d => ", g_ims->state));
 
@@ -802,7 +805,7 @@ parrot_gc_ims_run_increment(Interp* interpreter)
             (void)parrot_gc_ims_collect(interpreter, 0);
             break;
         case GC_IMS_FINISHED:
-            ++interpreter->arena_base->dod_runs;
+            ++arena_base->dod_runs;
             g_ims->state = GC_IMS_CONSUMING;
             /* fall through */
         case GC_IMS_CONSUMING:
@@ -846,9 +849,9 @@ parrot_gc_ims_run(Interp *interpreter, int flags)
 {
     int lazy;
     struct Arenas *arena_base = interpreter->arena_base;
-    Gc_ims_private *g_ims;
+    Gc_ims_private *g_ims = arena_base->gc_private;
 
-    if (arena_base->DOD_block_level) {
+    if (arena_base->DOD_block_level || g_ims->state == GC_IMS_DEAD) {
         return;
     }
     g_ims = arena_base->gc_private;
@@ -861,11 +864,9 @@ parrot_gc_ims_run(Interp *interpreter, int flags)
          *
          * Be sure live bits are clear.
          */
-        if (g_ims->state < GC_IMS_RE_INIT)
-            return;
-        if (g_ims->state >= GC_IMS_FINISHED)
-            return;
-        Parrot_dod_clear_live_bits(interpreter);
+        if (g_ims->state >= GC_IMS_RE_INIT || g_ims->state < GC_IMS_FINISHED)
+            Parrot_dod_clear_live_bits(interpreter);
+        g_ims->state = GC_IMS_DEAD;
         return;
     }
     /* make the test happy that checks the count ;) */
