@@ -29,6 +29,7 @@ A Data::Dumper::Default object has the following methods:
     if I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Base.imc"
     load_bytecode "library/Data/Sort.imc"
+    load_bytecode "library/Data/Escape.imc"
     getclass P0, "Data::Dumper::Base"
     subclass P0, P0, "Data::Dumper::Default"
 END:
@@ -187,37 +188,14 @@ Escape any characters in a string so we can re-use it as a literal.
 .sub dumpStringEscaped method
     .param pmc var
     .param string char
-
-    .local string copy
-    copy = var
-
-    .local int last_index
-    last_index = 0
-    .local int string_len
-    length string_len, copy
-    .local int position
-    position = 0
-    .local int val
-
-escape_loop:
-    if position >= string_len goto escape_done
-    substr char, copy, position, 1
-    ord val, char
-
-    if val == 34 goto escape_escape
-    if val == 92 goto escape_escape
-    goto escape_next
-
-escape_escape:
-    print "\\"
-
-escape_next:
-    print char
-
-    inc position
-    goto escape_loop
-
-escape_done:
+    .local string str
+    .local pmc escape
+    
+    escape = find_global "Data::Escape", "String"
+    str = var
+    str = escape( str, char )
+    print str
+    
     .pcc_begin_return
     .return 1
     .pcc_end_return
