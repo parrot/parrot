@@ -245,8 +245,6 @@ if __name__ == '__main__':
     main()
 CODE
 
-$ENV{TEST_PROG_ARGS} = '-j -Oc -G';
-
 test(<<'CODE', 'b3.py, somehow');
 class Random:
 

@@ -122,6 +122,8 @@ use_sub:
         REG_PMC(1) = new_ret_continuation_pmc(interpreter, NULL);
         /* don't recycle it */
         PObj_get_FLAGS(REG_PMC(1)) &= ~PObj_private2_FLAG;
+        /* and don't mark it, its just a ret continuation */
+        PObj_flag_CLEAR(custom_mark, REG_PMC(1));
         /* TODO create one exception frame */
 #endif
         /*

@@ -43,7 +43,6 @@ Initializes the continuation.
         PMC_cont(SELF) = new_ret_continuation(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
-        PObj_get_FLAGS(SELF) &= ~PObj_private2_FLAG;
     }
 
     void mark () {

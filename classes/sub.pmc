@@ -25,7 +25,7 @@ These are the vtable functions for the Sub (subroutine) base class
 
 =item C<>
 
-Print name and location of suroutine this should finally use the label
+Print name and location of subroutine, This should finally use the label
 name of the frozen C<Sub> PMC image for now locate the C<Sub> name in
 the globals.
 
@@ -97,7 +97,6 @@ Initializes the subroutine.
         PMC_sub(SELF) = new_sub(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_active_destroy_SET(SELF);
-        PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
 #if 0
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
             printf("Address of base segment is %p\n",
