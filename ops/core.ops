@@ -3761,7 +3761,7 @@ stack for later returning.
 =cut
 
 inline op bsr (in INT) {
-  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.control_stack, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto OFFSET($1);
 }
 
@@ -3777,7 +3777,7 @@ location onto the call stack for later returning.
 
 inline op jsr(in INT) {
   opcode_t * loc;
-  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.control_stack, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   loc = INTVAL2PTR(opcode_t *, $1);
   goto ADDRESS(loc);
 }

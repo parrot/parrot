@@ -113,7 +113,7 @@ sub goto_offset
 sub goto_pop
 {
   my ($self) = @_;
-  return "goto *pop_dest(interpreter)";
+  return "cur_opcode = pop_dest(interpreter);\ngoto switch_label";
 }
 
 #
