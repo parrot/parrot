@@ -345,10 +345,12 @@ XXX - not ready to expose this one yet
 	.sym pmc WaitEvent
 	WaitEvent = global "SDL::WaitEvent"
 
+	.sym int ret
+
 	.pcc_begin prototyped
 		.arg event
 		.nci_call WaitEvent
-		.result event
+		.result ret
 	.pcc_end
 
 	# dunno what this is
@@ -357,6 +359,34 @@ XXX - not ready to expose this one yet
 
 	.pcc_begin_return
 		.return event
+		.return ret
+	.pcc_end_return
+.end
+
+=item _SDL_Poll_Event()
+
+XXX - not ready to expose this one yet
+
+=cut
+
+.pcc_sub _SDL_PollEvent
+	.sym pmc event
+	event     = _new_SDL_Event()
+
+	.sym pmc PollEvent
+	PollEvent = global "SDL::PollEvent"
+
+	.sym int ret
+	
+	.pcc_begin prototyped
+		.arg event
+		.nci_call PollEvent
+		.result ret
+	.pcc_end
+
+	.pcc_begin_return
+		.return event
+		.return ret
 	.pcc_end_return
 .end
 
@@ -365,9 +395,14 @@ XXX - not ready to expose this one yet
 given an .OrderedHash associating SDL event constants to .Sub objects, loops
 around input, calling the callbacks when their associated events come in.
 
+This will call any C<idle> callback provided every 0.05 seconds (or as close as
+possible) unless an event has occurred.  This should probably be configurable.
+
 For events that have secondary distinguishing information -- for example, key
 events, the value of the .OrderedHash should itself be an .OrderedHash,
 associating the distinguishing constants to their callbacks.
+
+Callbacks should return true if the loop should continue.
 
 =cut
 
@@ -375,19 +410,48 @@ associating the distinguishing constants to their callbacks.
 	.param pmc events
 
 	.sym pmc event
+	.sym int type
+	.sym Sub callback
+	.sym num nexttime
+	.sym num curtime
 
-loop:
+	time nexttime
+	add nexttime, 0.05
+
+_loop:
+	exists type, events["idle"]
+	if type == 0 goto _wait
+
+_poll:
+	(type, event) = _SDL_PollEvent()
+
+	if type == 1 goto _process
+
+	time curtime
+	if curtime >= nexttime goto _idle
+	sleep 0.025
+	branch _poll
+
+_idle:
+	set callback, events["idle"]
+
+	.pcc_begin prototyped
+		.pcc_call callback
+	.pcc_end
+
+	time nexttime
+	add nexttime, 0.05
+
+_wait:
 	event = _SDL_WaitEvent()
 
-	.sym int type
+_process:
 	set type, event['type']
 
-	if type == 0 goto loop
+	if type == 0 goto _loop
 
 	exists $I0, events[type]
-	if $I0 == 0 goto loop
-
-	.sym Sub callback
+	if $I0 == 0 goto _loop
 
 	if type == 2 goto _key_event
 	if type == 3 goto _key_event
@@ -402,7 +466,7 @@ _key_event:
 	.sym int key
 	set key, event['sym']
 
-	if $I0 == 0 goto loop
+	if $I0 == 0 goto _loop
 
 	set callback, key_events[key]
 
@@ -411,14 +475,14 @@ _have_callback:
 
 	# no error if the event is not defined
 	typeof result, callback
-	if result == .PerlUndef goto loop
+	if result == .PerlUndef goto _loop
 	
 	.pcc_begin prototyped
 		.pcc_call callback
 		.result result
 	.pcc_end
 
-	if result != 0 goto loop
+	if result != 0 goto _loop
 
 	.pcc_begin_return
 	.pcc_end_return

@@ -23,6 +23,8 @@ dlfunc P2, P1, 'SDL_UpperBlit', 'ipppp'
 store_global 'SDL::BlitSurface', P2
 dlfunc P2, P1, 'SDL_WaitEvent', 'ip'
 store_global 'SDL::WaitEvent', P2
+dlfunc P2, P1, 'SDL_PollEvent', 'ip'
+store_global 'SDL::PollEvent', P2
 dlfunc P2, P1, 'SDL_GetKeyName', 'ti'
 store_global 'SDL::GetKeyName', P2
 
