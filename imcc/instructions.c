@@ -76,10 +76,10 @@ _mk_instruction(const char *op, const char * fmt,
 
 
 /*
- * some instructions don't have a hint in op_info, that they work
- * on all registers:
- * - push?, pop?, clear?
- * - saveall/restoreall
+ * Some instructions don't have a hint in op_info that they work
+ * on all registers (e.g. saveall, restoreall) or on all registers
+ * of a given type  (e.g. pushi, popi, cleari). These instructions
+ * need special handling at various points in the code. 
  */
 
 static int r_special[5];
@@ -113,7 +113,9 @@ imcc_init_tables(Interp * interpreter)
     }
 }
 
-/* return TRUE, if instruction ins reads from a register of type t */
+/* 
+ * Returns TRUE if instruction ins reads from a register of type t 
+ */
 int
 ins_reads2(Instruction *ins, int t)
 {
@@ -134,7 +136,9 @@ ins_reads2(Instruction *ins, int t)
     return 0;
 }
 
-/* return TRUE, if instruction ins writes to a register of type t */
+/* 
+ * Returns TRUE if instruction ins writes to a register of type t 
+ */
 int
 ins_writes2(Instruction *ins, int t)
 {
@@ -210,7 +214,9 @@ instruction_writes(Instruction* ins, SymReg* r) {
     return 0;
 }
 
-/* get the reg no of address, where a branch targets to */
+/* 
+ * Get the register number of an address which is a branch target
+ */
 int
 get_branch_regno(Instruction * ins)
 {
@@ -221,7 +227,9 @@ get_branch_regno(Instruction * ins)
     return -1;
 }
 
-/* get the reg no of address, where a branch targets to */
+/* 
+ * Get the register corresponding to an address which is a branch target 
+ */
 SymReg *
 get_branch_reg(Instruction * ins)
 {
@@ -234,8 +242,8 @@ get_branch_reg(Instruction * ins)
 /* some useful instruction routines */
 
 /*
- * delete and free *ins
- * actual new ins is returned
+ * Delete instruction ins. Also free it if needs_freeing is true.
+ * The instruction following ins is returned.
  */
 Instruction *
 delete_ins(IMC_Unit *unit, Instruction *ins, int needs_freeing)
@@ -336,7 +344,11 @@ subst_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp, int needs_freeing
         free_ins(ins);
 }
 
-/* move instruction ins to to */
+/* 
+ * Move instruction ins from its current position to the position 
+ * following instruction to. Returns the instruction following the
+ * initial position of ins.
+ *
 Instruction *
 move_ins(IMC_Unit * unit, Instruction *ins, Instruction *to)
 {
@@ -375,7 +387,9 @@ free_ins(Instruction *ins)
     free(ins);
 }
 
-
+/* 
+ * Print details of instruction ins in file fd.
+ */
 int
 ins_print(Interp *interp, FILE *fd, Instruction * ins)
 {
