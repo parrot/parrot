@@ -309,4 +309,42 @@ Configure's data, and writes the results to I<outfile>.
 
 =back
 
+=head1 MISCELLANEOUS
+
+=head2 Moved Files
+
+Several files have been moved from their original locations to new ones.
+
+=over 4
+
+=item F<*/Makefile.in>
+
+Moved to F<config/gen/makefiles> and renamed appropriately.
+
+=item F<config_h.in>
+
+Moved to F<config/gen/config_h>.
+
+=item F<Config_pm.in>
+
+moved to F<config/gen/config_pm>.
+
+=item F<Types_pm.in>
+
+Deleted; F<lib/Parrot/Types.pm> now doesn't need to be generated.
+
+=item F<hints/*>
+
+Moved to F<config/init/hints> and rewritten.
+
+=item F<platforms/*>
+
+Moved to F<config/gen/platform>.
+
+=item F<test*.c>, F<test*_c.in>
+
+Moved to various subdirectories of F<hints/auto>.
+
+=back
+
 =cut
