@@ -92,15 +92,15 @@ Parrot_unsetenv(const char *name)
 {
 #ifdef PARROT_HAS_UNSETENV
     unsetenv(name);
-#else 
+#else
     Parrot_setenv(name, "");
-#endif 
+#endif
 }
 
 char *
 Parrot_getenv(const char *name, int *free_it)
 {
-    *free_it = 0
+    *free_it = 0;
     return getenv(name);
 }
 
