@@ -428,7 +428,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
         }
     }
 
-    /* Finally the general stack */
+    /* Now the general stack */
     start_stack = cur_stack = interpreter->user_stack;
     chunks_traced = 0;
     /* The general stack's circular, so we need to be careful */
@@ -442,6 +442,19 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
                     buffer_lives((Buffer *)entry[i].entry.string_val);
                 }
             }
+        }
+
+        chunks_traced++;
+        cur_stack = cur_stack->prev;
+    }
+
+   /* Finally the control stack frames must be marked live */
+    start_stack = cur_stack = interpreter->control_stack;
+    chunks_traced = 0;
+    /* This stack, like the general stack is circular */
+    while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
+        if(cur_stack->buffer){ 
+            buffer_lives(cur_stack->buffer);
         }
 
         chunks_traced++;
