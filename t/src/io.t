@@ -25,24 +25,38 @@ sub teardown
 	die "Failed to delete $name"if -e $name;
 }
 
-###############################################################################
-
-c_output_is(<<'CODE', <<'OUTPUT', "hello world");
+my $main = <<'CODE';
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
-#include <parrot/io.h>
 
-int
-main ()
+static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+
+int main(int argc, char* argv[])
 {
-    struct Parrot_Interp *interpreter;
-
-    interpreter = Parrot_new(NULL);
+    Parrot_Interp interpreter = Parrot_new(NULL);
+    if (!interpreter) {
+        return 1;
+    }
     Parrot_init(interpreter);
 
+    Parrot_run_native(interpreter, the_test);
+
+    Parrot_exit(0);
+    return 0;
+}
+
+CODE
+
+###############################################################################
+
+c_output_is($main . <<'CODE', <<'OUTPUT', "hello world");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     PIO_printf(interpreter, "Hello, World!\n");
 
-    return 0;
+    return NULL;
 }
 CODE
 Hello, World!
@@ -50,20 +64,13 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is(<<'CODE', <<'OUTPUT', "write");
-#include <parrot/parrot.h>
-#include <parrot/embed.h>
-#include <parrot/io.h>
-
-int
-main ()
+c_output_is($main . <<'CODE', <<'OUTPUT', "write");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
 {
-    struct Parrot_Interp *interpreter;
     ParrotIO *io;
     char *p;
-
-    interpreter = Parrot_new(NULL);
-    Parrot_init(interpreter);
 
     io = PIO_STDOUT(interpreter);
     PIO_write(interpreter, io, "Hello, World!\n", 14);
@@ -74,7 +81,7 @@ main ()
     }
     PIO_close(interpreter, io);
 
-    return 0;
+    return NULL;
 }
 CODE
 Hello, World!
@@ -88,21 +95,14 @@ close FILE;
 
 ###############################################################################
 
-c_output_is(<<'CODE', <<'OUTPUT', 'read');
-#include <parrot/parrot.h>
-#include <parrot/embed.h>
-#include <parrot/io.h>
-
-int
-main ()
+c_output_is($main . <<'CODE', <<'OUTPUT', 'read');
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
 {
-    struct Parrot_Interp *interpreter;
     ParrotIO *io;
     char buf[1024];
     UINTVAL len;
-
-    interpreter = Parrot_new(NULL);
-    Parrot_init(interpreter);
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
     len = PIO_read(interpreter, io, buf, sizeof(buf)-1);
@@ -122,7 +122,7 @@ main ()
         PIO_printf(interpreter, "%d: %s\n", len, len ? buf : "EOF");
     } while (len > 0);
 
-    return 0;
+    return NULL;
 }
 CODE
 Hello, World!
@@ -137,25 +137,18 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is(<<'CODE', '', 'append');
-#include <parrot/parrot.h>
-#include <parrot/embed.h>
-#include <parrot/io.h>
-
-int
-main ()
+c_output_is($main . <<'CODE', '', 'append');
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
 {
-    struct Parrot_Interp *interpreter;
     ParrotIO *io;
-
-    interpreter = Parrot_new(NULL);
-    Parrot_init(interpreter);
 
     io = PIO_open(interpreter, NULL, "temp.file", ">>");
     PIO_write(interpreter, io, "Parrot flies.\n", 14);
     PIO_close(interpreter, io);
 
-    return 0;
+    return NULL;
 }
 CODE
 
@@ -168,21 +161,14 @@ close FILE;
 
 ###############################################################################
 
-c_output_is(<<'CODE', <<'OUTPUT', 'readline');
-#include <parrot/parrot.h>
-#include <parrot/embed.h>
-#include <parrot/io.h>
-
-int
-main ()
+c_output_is($main . <<'CODE', <<'OUTPUT', 'readline');
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
 {
-    struct Parrot_Interp *interpreter;
     ParrotIO *io;
     size_t len;
     char buf[1024];
-
-    interpreter = Parrot_new(NULL);
-    Parrot_init(interpreter);
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
     PIO_setlinebuf(interpreter, io);
@@ -193,9 +179,9 @@ main ()
         PIO_printf(interpreter, "%d: %s", len, len ? buf : "EOF");
     } while (len > 0);
 
-   PIO_printf(interpreter, "\n");
+    PIO_printf(interpreter, "\n");
 
-    return 0;
+    return NULL;
 }
 CODE
 14: Hello, World!
@@ -205,32 +191,37 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is(<<'CODE', <<'OUTPUT', "PIO_parse_open_flags");
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_parse_open_flags");
 #include "../io/io_private.h"
 
-int main(int argc, char* argv[]) {
-    char *flags[] = {"<", ">", ">>", "+<", "+>", "", ";-)", "<<<<<<<<<", "+", "<-:"};
-    INTVAL expected[] = {PIO_F_READ, (PIO_F_WRITE | PIO_F_TRUNC), (PIO_F_WRITE | PIO_F_APPEND), (PIO_F_WRITE | PIO_F_READ), (PIO_F_WRITE | PIO_F_READ | PIO_F_TRUNC), 0, 0, 0, 0, 0};
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
+    char *flags[] = {"<", ">", ">>", "+<", "+>", 
+		     "", ";-)", "<<<<<<<<<", "+", "<-:"};
+    INTVAL expected[] = {PIO_F_READ,
+			 (PIO_F_WRITE | PIO_F_TRUNC),
+			 (PIO_F_WRITE | PIO_F_APPEND),
+			 (PIO_F_WRITE | PIO_F_READ),
+			 (PIO_F_WRITE | PIO_F_READ | PIO_F_TRUNC),
+			 0, 0, 0, 0, 0};
     INTVAL got;
     int i;
 
-	for (i = 0; i < 10; i++)
-	{
-		got = PIO_parse_open_flags(flags[i]);
-
-		if ( got != expected[i] )
-		{
-			printf("\"%s\" should have parsed to %i not %i\n",
-				flags[i], expected[i], got);
-		}
+    for (i = 0; i < 10; i++) {
+	got = PIO_parse_open_flags(flags[i]);
+	
+	if ( got != expected[i] ) {
+	    PIO_printf(interpreter,
+		       "\"%s\" should have parsed to %i not %i\n",
+		       flags[i], expected[i], got);
 	}
+    }
 
-    printf("done\n");
+    PIO_printf(interpreter, "done\n");
 
-    return 0;
+    return NULL;
 }
 CODE
 done
@@ -240,12 +231,11 @@ OUTPUT
 
 setup();
 
-c_output_is(<<'CODE', <<'OUTPUT', "PIO_open");
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_open");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
     char *file[] = {"", "temp.file", "does_not_exist"};
     char *flags[] = {"<", ">", ">>", "+<", "+>", "", ";-)"};
     int expected[][7] = {
@@ -253,33 +243,24 @@ int main(int argc, char* argv[]) {
     	{1, 1, 1, 1, 1, 0, 0},
     	{0, 1, 1, 1, 1, 0, 0},
     };
-    Interp* interpreter;
     PMC *io;
     int i, j;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
-
-	for (i = 0; i < 3; i++)
-	{
-		for (j = 0; j < 7; j++)
-		{
-			io = PIO_open(interpreter, NULL, file[i], flags[j]);
-
-			if ( (PIO_eof(interpreter, io) ? 0:1) != expected[i][j] )
-			{
-				printf("\"%s\" \"%s\" should%s have opened\n",
-					file[i], flags[j], expected[i][j] ? "" : " not");
-			}
-		}
+    for (i = 0; i < 3; i++) {
+	for (j = 0; j < 7; j++) {
+	    io = PIO_open(interpreter, NULL, file[i], flags[j]);
+	    
+	    if ( (PIO_eof(interpreter, io) ? 0:1) != expected[i][j] ) {
+		PIO_printf(interpreter, 
+			   "\"%s\" \"%s\" should%s have opened\n",
+			   file[i], flags[j], expected[i][j] ? "" : " not");
+	    }
 	}
+    }
+    
+    PIO_printf(interpreter, "done\n");
 
-    printf("done\n");
-
-    return 0;
+    return NULL;
 }
 CODE
 done
@@ -291,34 +272,25 @@ teardown();
 
 setup("temp.file", "This is a test.");
 
-c_output_is(<<'CODE', <<'OUTPUT', "PIO_read");
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
     int len[] = {0, 9, 5, 100};
     char *str[] = {"", "This is a", " test", "."};
     int i, n;
-    Interp* interpreter;
     PMC *io;
     char *buffer;
 
-    interpreter = Parrot_new(NULL);
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
 
-    if ( interpreter == NULL ) return 1;
+    if ( PIO_eof(interpreter, io) ) {
+	PIO_printf(interpreter, "PIO_open failed\n");
+	return NULL;
+    }
 
-    Parrot_init(interpreter);
-
-	io = PIO_open(interpreter, NULL, "temp.file", "<");
-
-	if ( PIO_eof(interpreter, io) )
-	{
-		printf("PIO_open failed\n");
-		return 1;
-	}
-
-    for (i = 0; i < 4; i++)	{
+    for (i = 0; i < 4; i++) {
         /* alloc enough space including '\0' */
         buffer = malloc((len[i] + 1) * sizeof(char));
 
@@ -326,20 +298,22 @@ int main(int argc, char* argv[]) {
         buffer[n] = '\0';
 
         if ( n != strlen(str[i]) ) {
-            printf("read: %i expected: %i\n", n, strlen(str[i]));
+            PIO_printf(interpreter, 
+		       "read: %i expected: %i\n", n, strlen(str[i]));
         }
 
         if ( strcmp(buffer, str[i]) ) {
-            printf("should have read \"%s\" not \"%s\"", str[i], buffer);
+            PIO_printf(interpreter,
+		       "should have read \"%s\" not \"%s\"", str[i], buffer);
         }
 
         /* buffer no longer needed */
         free(buffer);
     }
 
-    printf("done\n");
+    PIO_printf(interpreter, "done\n");
 
-	return 0;
+    return NULL;
 }
 CODE
 done
@@ -351,36 +325,27 @@ teardown();
 
 setup("temp.file", ("x" x 65533) . "yz");
 
-c_output_is(<<'CODE', <<'OUTPUT', "PIO_read larger file");
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read larger file");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
     PMC *io;
     char *buffer;
 
-    interpreter = Parrot_new(NULL);
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
 
-    if ( interpreter == NULL ) return 1;
+    if ( !io ) {
+	PIO_printf(interpreter, "PIO_open failed\n");
+	return NULL;
+    }
 
-    Parrot_init(interpreter);
+    buffer = malloc(65536 * sizeof(char));
+    buffer[65535] = '\0';
+    printf("%i\n", PIO_read(interpreter, io, buffer, 65535));
+    printf("%s\n", &buffer[65532]);
 
-	io = PIO_open(interpreter, NULL, "temp.file", "<");
-
-	if ( !io )
-	{
-		printf("PIO_open failed\n");
-		return 1;
-	}
-
-	buffer = malloc(65536 * sizeof(char));
-	buffer[65535] = '\0';
-	printf("%i\n", PIO_read(interpreter, io, buffer, 65535));
-	printf("%s\n", &buffer[65532]);
-
-    return 0;
+    return NULL;
 }
 CODE
 65535
@@ -391,68 +356,51 @@ teardown();
 
 ###############################################################################
 
-c_output_is(<<'CODE', <<'OUTPUT', "PIO_write");
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_write");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
     PMC *io;
 
-    interpreter = Parrot_new(NULL);
+    io = PIO_open(interpreter, NULL, "temp.file", ">");
 
-    if ( interpreter == NULL ) return 1;
+    if ( !io ) {
+	PIO_printf(interpreter, "PIO_open failed\n");
+	return NULL;
+    }
 
-    Parrot_init(interpreter);
+    PIO_printf(interpreter, 
+	       "%i\n", PIO_write(interpreter, io, "This is a test\n", 15));
 
-	io = PIO_open(interpreter, NULL, "temp.file", ">");
-
-	if ( !io )
-	{
-		printf("PIO_open failed\n");
-		return 1;
-	}
-
-    printf("%i\n", PIO_write(interpreter, io, "This is a test\n", 15));
-
-    return 0;
+    return NULL;
 }
 CODE
 15
 OUTPUT
 
 ###############################################################################
-# PIO_unix_close and PIO_win32_close return 0.
+# PIO_unix_close and PIO_win32_close return NULL.
 
 setup();
 
-c_output_is(<<'CODE', <<'OUTPUT', "PIO_close");
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_close");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
     PMC *io;
 
-    interpreter = Parrot_new(NULL);
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
 
-    if ( interpreter == NULL ) return 1;
+    if ( !io ) {
+	PIO_printf(interpreter, "PIO_open failed\n");
+	return NULL;
+    }
 
-    Parrot_init(interpreter);
+    PIO_printf(interpreter, "%i\n", PIO_close(interpreter, io));
 
-	io = PIO_open(interpreter, NULL, "temp.file", "<");
-
-	if ( !io )
-	{
-		printf("PIO_open failed\n");
-		return 1;
-	}
-
-	printf("%i\n", PIO_close(interpreter, io));
-
-    return 0;
+    return NULL;
 }
 CODE
 0
@@ -462,31 +410,29 @@ teardown;
 
 ###############################################################################
 
-c_output_is(<<'CODE', <<'OUTPUT', "PIO_make_offset");
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_make_offset");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
     INTVAL intval[] = {0, 1, -1, 100, -100};
     PIOOFF_T expected[] = {0, 1, -1, 100, -100};
     PIOOFF_T offset;
     int i;
 
-	for (i = 0; i < 5; i++)
-	{
+    for (i = 0; i < 5; i++) {
         offset = PIO_make_offset(intval[i]);
 
-	    if ( offset != expected[i] )
-        {
-            printf("offset for %i should have been %i not %i\n",
-                intval[i], (int)expected[i], (int)offset);
+	if ( offset != expected[i] ) {
+            PIO_printf(interpreter,
+		       "offset for %i should have been %i not %i\n",
+		       intval[i], (int)expected[i], (int)offset);
         }
     }
 
-    printf("done\n");
+    PIO_printf(interpreter, "done\n");
 
-    return 0;
+    return NULL;
 }
 CODE
 done
@@ -496,37 +442,29 @@ OUTPUT
 
 setup("temp.file", "abcdefg");
 
-c_output_is(<<'CODE', <<'OUTPUT', "PIO_seek");
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_seek");
 #include "../io/io_private.h"
 
-int main(int argc, char* argv[]) {
-	INTVAL fixture[][3] = {
-		{1, SEEK_SET},
-		{2, SEEK_CUR},
-		{-2, SEEK_CUR},
-		{-3, SEEK_END}
-	};
-    Interp* interpreter;
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
+    INTVAL fixture[][3] = {
+	{1, SEEK_SET},
+	{2, SEEK_CUR},
+	{-2, SEEK_CUR},
+	{-3, SEEK_END}
+    };
     PMC *io;
     char *buffer;
     int i;
     int got;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
-
     io = PIO_open(interpreter, NULL, "temp.file", "<");
 
-    if ( !io )
-    {
-        printf("PIO_open failed\n");
-        return 1;
+    if ( !io ) {
+        PIO_printf(interpreter, "PIO_open failed\n");
+        return NULL;
     }
 
     for (i = 0; i < 4; i++) {
@@ -537,17 +475,18 @@ int main(int argc, char* argv[]) {
             buffer = malloc(2 * sizeof(char));
             buffer[1] = '\0';
             PIO_read(interpreter, io, buffer, 1);
-            printf("%s", buffer);
+            PIO_printf(interpreter, "%s", buffer);
             free(buffer);
         }
         else {
-            printf("seek %i %i failed\n", fixture[i][0], fixture[i][1]);
+            PIO_printf(interpreter, 
+		       "seek %i %i failed\n", fixture[i][0], fixture[i][1]);
         }
     }
 
-    printf("\ndone\n");
+    PIO_printf(interpreter, "\ndone\n");
 
-    return 0;
+    return NULL;
 }
 CODE
 bede
@@ -560,25 +499,17 @@ teardown();
 
 SKIP: {
     skip ("fdopen does not handle illegal modes correct", 1);
-c_output_is(<<'CODE', <<'OUTPUT', "PIO_fdopen");
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_fdopen");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
     char *flags[] = {"<", ">", ">>", "+<", "+>", "", ";-)"};
     int expected[] = {1, 1, 1, 1, 1, 0, 0};
     int i;
-    Interp* interpreter;
     PMC *iostdout;
     PIOHANDLE fd;
     PMC *io;
-
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
 
     for (i = 0; i < 7; i++)
     {
@@ -588,14 +519,15 @@ int main(int argc, char* argv[]) {
 
         if ( ( io != NULL ) != expected[i] )
         {
-            printf("stdout should%s have opened with \"%s\" flags\n",
-                expected[i] ? "" : " not", flags[i]);
+            PIO_printf(interpreter, 
+		       "stdout should%s have opened with \"%s\" flags\n",
+		       expected[i] ? "" : " not", flags[i]);
         }
-	}
+    }
 
-    printf("done\n");
+    PIO_printf(interpreter, "done\n");
 
-    return 0;
+    return NULL;
 }
 CODE
 done
@@ -604,27 +536,20 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is(<<'CODE', <<'OUTPUT', 'stdio-layer');
-#include "parrot/parrot.h"
-
-extern ParrotIOLayer pio_stdio_layer;
-
-int main()
+c_output_is($main . <<'CODE', <<'OUTPUT', 'stdio-layer');
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
 {
-    Interp *interpreter;
+    extern ParrotIOLayer pio_stdio_layer;
+
     PMC *io;
-
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
 
     io = PIO_fdopen(interpreter, &pio_stdio_layer, (PIOHANDLE)stdout, ">");
     PIO_puts(interpreter, io, "Hello, World\n");
     PIO_flush(interpreter, io);
 
-    return 0;
+    return NULL;
 }
 CODE
 Hello, World

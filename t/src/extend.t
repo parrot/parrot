@@ -337,42 +337,56 @@ system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
 c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub");
 
-#include <stdio.h>
-/* have to cheat because of missing extend interfaces */
-/* #include "parrot/extend.h" */
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
 
-void Parrot_call(Parrot_Interp interpreter, PMC* sub,
-                 Parrot_Int argcount, ...);
-/* also both the test PASM and main print to stderr
- * so that buffering in PIO isn't and issue
+static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+
+int main(int argc, char* argv[])
+{
+    Parrot_Interp interpreter = Parrot_new(NULL);
+    if (!interpreter) {
+        return 1;
+    }
+    Parrot_init(interpreter);
+
+    Parrot_run_native(interpreter, the_test);
+
+    Parrot_exit(0);
+    return 0;
+}
+
+/* also both the test PASM and the_test() print to stderr
+ * so that buffering in PIO is not an issue
  */
 
-int main(int argc, char* argv[]) {
-    Parrot_Interp interpreter;
+static opcode_t*
+the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
+{
     struct PackFile *pf;
     PMC *key, *sub, *arg;
 
-    interpreter = Parrot_new(NULL);
     pf = Parrot_readbc(interpreter, "temp.pbc");
     Parrot_loadbc(interpreter, pf);
     key = key_new_cstring(interpreter, "_sub1");
     sub = VTABLE_get_pmc_keyed(interpreter,
-				interpreter->globals->stash_hash, key);
+			       interpreter->globals->stash_hash, key);
     Parrot_call(interpreter, sub, 0);
-    fprintf(stderr, "back\n");
-    fflush(stderr);	/* win32 seems to buffer stderr */
+    PIO_eprintf(interpreter, "back\n");
+
+    /* win32 seems to buffer stderr ? */ 
+    PIO_flush(interpreter, PIO_STDERR(interpreter)); 
 
     key = key_new_cstring(interpreter, "_sub2");
     sub = VTABLE_get_pmc_keyed(interpreter,
-				interpreter->globals->stash_hash, key);
+			       interpreter->globals->stash_hash, key);
     arg = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, arg,
-	    string_from_cstring(interpreter, "hello ", 0));
+			     string_from_cstring(interpreter, "hello ", 0));
     Parrot_call(interpreter, sub, 1, arg);
-    fprintf(stderr, "back\n");
-    return 0;
+    PIO_eprintf(interpreter, "back\n");
+
+    return NULL;
 }
 CODE
 in sub1
@@ -396,39 +410,53 @@ system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
 c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub, catch exception");
 
-#include <stdio.h>
-/* have to cheat because of missing extend interfaces */
-/* #include "parrot/extend.h" */
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
 
-void Parrot_call(Parrot_Interp interpreter, PMC* sub,
-                 Parrot_Int argcount, ...);
-/* also both the test PASM and main print to stderr
- * so that buffering in PIO isn't and issue
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+
+static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+
+int main(int argc, char* argv[])
+{
+    Parrot_Interp interpreter = Parrot_new(NULL);
+    if (!interpreter) {
+        return 1;
+    }
+    Parrot_init(interpreter);
+
+    Parrot_run_native(interpreter, the_test);
+
+    Parrot_exit(0);
+    return 0;
+}
+
+/* also both the test PASM and the_test() print to stderr
+ * so that buffering in PIO is not an issue
  */
 
-int main(int argc, char* argv[]) {
-    Parrot_Interp interpreter;
+static opcode_t*
+the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
+{
     struct PackFile *pf;
     PMC *key, *sub;
     Parrot_exception jb;
 
-    interpreter = Parrot_new(NULL);
     pf = Parrot_readbc(interpreter, "temp.pbc");
     Parrot_loadbc(interpreter, pf);
     key = key_new_cstring(interpreter, "_sub1");
     sub = VTABLE_get_pmc_keyed(interpreter,
-				interpreter->globals->stash_hash, key);
+			       interpreter->globals->stash_hash, key);
+
     if (setjmp(jb.destination)) {
-	fprintf(stderr, "caught\n");
+	PIO_eprintf(interpreter, "caught\n");
     }
     else {
 	push_new_c_exception_handler(interpreter, &jb);
 	Parrot_call(interpreter, sub, 0);
     }
-    fprintf(stderr, "back\n");
-    return 0;
+    PIO_eprintf(interpreter, "back\n");
+
+    return NULL;
 }
 CODE
 in sub1
