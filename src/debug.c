@@ -1264,7 +1264,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                     break;
                 case KEY_number_FLAG:
                     Parrot_snprintf(interpreter, buf, sizeof(buf),
-                                    "%f", (double)k->cache.num_val);
+                                    FLOATVAL_FMT, k->cache.num_val);
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
