@@ -2,6 +2,11 @@
 
 =over 4
 
+=item tclword
+
+An object is probably too heavyweight for this. A PMC with a few overloaded
+methods is probably sufficient.
+
 =item From Use-perl Journal
 
 Remove any dependence in Tcl's PIR on the Perl* PMCs.
@@ -12,7 +17,6 @@ puts '[string range [list 1 2 3] 0 2]'
 Actually generates
 '1 2'
 which will have been shimmered from a TclList (returned by [list]) to a TclString
-
 
 =item From leo - cleanup of tcl objects.
 
@@ -35,38 +39,6 @@ Mostly done. All that seems to be left is PerlUndef. Much was already
 converted to the internal types. PerlUndef removal will probably result
 (finally) in the use of null checks where it's being used for that, and
 TclObject where it's being used for shimmering.
-
-=item WRITE [list] !!!
-
-SYNOPSIS
-       list ?arg arg ...?
-_________________________________________________________________
-
-DESCRIPTION
-       This  command  returns  a  list  comprised of all the args, or an empty
-       string if no args are specified.  Braces and backslashes get  added  as
-       necessary,  so that the lindex command may be used on the result to re-
-       extract the original arguments, and also so that eval may  be  used  to
-       execute the resulting list, with arg1 comprising the command's name and
-       the other args comprising its arguments.  List produces  slightly  dif-
-       ferent  results  than  concat:   concat  removes  one level of grouping
-       before forming the list, while list works directly  from  the  original
-       arguments.  For example, the command
-              list a b {c d e} {f {g h}}
-       will return
-              a b {c d e} {f {g h}}
-       while concat with the same arguments will return
-              a b c d e f {g h}
-
-
-=item GC bug
-
-yet another GC bug has crept in. do a checkin/update to give leo something
-to track down.
-
-=item new .local syntax
-
-Clean up our .local declarations with the new syntax.
 
 =item function calls...
 
@@ -114,24 +86,19 @@ the substring.
 We are currently using Perl* pmcs in a few more places. In some cases,
 we need Resizable PMCs, and the core versions are not fully implemented.
 
-When  converting to Tcl*, be sure to take advantage of morphing. Right now,
+When converting to Tcl*, be sure to take advantage of morphing. Right now,
 we're kind of avoiding morphing. (like, having separate new PerlInt and 
 PerlString conditionally depending on the code path.) (fixed in string)
 
-Ok. First, we need to build the dyn pmcs using the new build "group" tag.
-
-Then, we need to go through and eliminate all references to Perl:
+We need to go through and eliminate all references to Perl:
 (This is done for PerlInt, PerlString. Get rid of PerlHash, PerlArray)
+
+=item cross language compatibility 
 
 We need to also make sure that we /take/ any PMC and try to do the right
 thing. Don't /require/ that someone pass in a TclString when a PerlString
 will work fine, thanks. This is now a bigger issue when using the [list] ops.
 if someone passes in a fixed list and we need to resize it... what do we do?
-
-=item implement [list]
-
-This should be blindingly simple, given an actual TclList PMC. (which we don't
-quite have yet.
 
 =item given freeze/thaw for objects...
 
@@ -435,20 +402,15 @@ implemented procs will require updating after procs/features are added.
     support in parrot. Well, upvar, anyway. implementing uplevel
     may require a rethunk. 
 
-  foreach  {list}
-
   switch  {regexp regsub "string match"}
 
-  list {llength, linsert, lreplace, lrange, lappend,
-          lsearch, lsort, split}
+  linsert, lreplace, lrange, lsearch, lsort, split, foreach, scan
 
   cd, file, pwd, pid, glob
 
   seek, tell, open, close, eof, flush, read, gets
 
-  open close
-
-  scan {list}
+  open, close
 
   info, exec {use exec/spawn opcodes.}
 
