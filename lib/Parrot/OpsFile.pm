@@ -336,6 +336,8 @@ sub make_op
         $op->body(qq{#line $line "$file"\n}.$body);
       }
 
+      # Must be in sync with the PARROT_JUMP* defines in include/parrot/op.h
+
       $jumps |= 1 if ($branch);
       $jumps |= 2 if ($absolute);
       $jumps |= 4 if ($pop);
