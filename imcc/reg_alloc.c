@@ -347,7 +347,7 @@ allocate_non_interfering(Parrot_Interp interpreter, IMC_Unit *unit, int n)
 {
     int i, t;
     int first_color, last_line, b, first_reg;
-    SymReg *r;
+    SymReg *r = NULL;   /* uninit gcc warning */
     SymReg ** reglist = unit->reglist;
 
     for (t = 0; t < 4; t++) {

@@ -63,7 +63,7 @@ dump_Const(nodeType *p, int l)
 
 static void dump_context(nodeType *p)
 {
-    int c;
+    int c = '?';
     fprintf(stderr, "\t[");
 
     switch (p->up_ctx) {
@@ -126,7 +126,7 @@ check_nodes(Interp *interpreter, nodeType *p)
 static context_type
 ctx_default(nodeType *p, context_type outer)
 {
-    context_type inner;
+    context_type inner = CTX_UNK;
     nodeType *child, *next;
 
     for (; p; p = p->next) {
@@ -135,7 +135,7 @@ ctx_default(nodeType *p, context_type outer)
             inner = p->context(p, outer);
         else if (p->flags & NODE_HAS_CHILD) {
             child = CHILD(p);
-            ctx_default(child, outer);
+            inner = ctx_default(child, outer);
         }
         else
             inner = outer;
@@ -511,8 +511,8 @@ exp_default(Interp* interpreter, nodeType *p)
 static SymReg*
 exp_Assign(Interp* interpreter, nodeType *p)
 {
-    Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS], *lr, *rr;
+    Instruction *ins = NULL;    /* gcc uninit warning */
+    SymReg *regs[IMCC_MAX_REGS], *lr = NULL, *rr = NULL;
     nodeType *var = CHILD(p);
     nodeType *rhs = var->next;
     int need_assign = 0, need_store = 0;

@@ -526,7 +526,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     struct PackFile *pf_save = interp->code;
     struct PackFile *pf;
     const char *source = sourcefile;
-    char *ext, *fullname;
+    char *ext, *fullname = NULL;   /* gc uninit warning */
     int pasm = pasm_file;
     FILE *new;
     union {

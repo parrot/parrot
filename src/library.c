@@ -64,14 +64,14 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     char *csig;
     INTVAL resume = interpreter->resume_flag;
 
-    if (!init_done) {	
+    if (!init_done) {
 	library_init(interpreter);
 
         init_done = 1;
     }
-    
+
     name = string_from_cstring(interpreter, func_name, strlen(func_name));
-    
+
     /* get the sub pmc */
     str = CONST_STRING(interpreter, "_parrotlib");
     sub = Parrot_find_global(interpreter, str, name);
@@ -91,12 +91,12 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     }
     str = VTABLE_get_string(interpreter, prop);
     csig = string_to_cstring(interpreter, str);
-    
+
     /* call the bytecode method */
     va_start(args, func_name);
     ret = Parrot_runops_fromc_arglist_save(interpreter, sub, csig, args);
     va_end(args);
-    
+
     string_cstring_free(csig);
 
     /* done */
@@ -111,8 +111,8 @@ Parrot_library_fallback_locate(Parrot_Interp interp, const char *file_name, cons
     const char** ptr;
     int length = 0;
     int i, ok = 0;
-    STRING *str;
-    
+    STRING *str = NULL; /* gcc uninit warn */
+
     /* calculate the length of the largest include directory */
     for( ptr = incl; *ptr != 0; ++ptr ) {
         i = strlen(*ptr);
