@@ -505,7 +505,6 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
 
 #  define REQUIRES_CONSTANT_POOL 1
 #  define INT_REGISTERS_TO_MAP 21
-#  define FLOAT_REGISTERS_TO_MAP 0
 
 char intval_map[INT_REGISTERS_TO_MAP] =
     { REG1_t0, REG2_t1, REG3_t2, REG4_t3, REG5_t4, REG6_t5, REG7_t6, REG12_s3,
