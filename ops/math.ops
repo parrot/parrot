@@ -151,7 +151,7 @@ inline op add(in PMC, in INT) :base_core {
 }
 
 inline op add(in PMC, in NUM) :base_core {
-  $1->vtable->add_float(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_ADD_FLOAT);
   goto NEXT();
 }
 
@@ -181,8 +181,7 @@ inline op add(in PMC, in PMC, in INT) :base_core {
 }
 
 inline op add(in PMC, in PMC, in NUM) :base_core {
-/*  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_ADD_NUM);*/
-  $2->vtable->add_float(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_ADD_FLOAT);
   goto NEXT();
 }
 
@@ -252,7 +251,7 @@ inline op cmod(in PMC, in PMC, in INT) :base_core {
 }
 
 inline op cmod(in PMC, in PMC, in NUM) :base_core {
-  $2->vtable->cmodulus_float(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_CMOD_FLOAT);
   goto NEXT();
 }
 
@@ -378,7 +377,7 @@ inline op div (in PMC, in INT) :base_core {
 }
 
 inline op div (in PMC, in NUM) :base_core {
-  $1->vtable->divide_float(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_DIVIDE_FLOAT);
   goto NEXT();
 }
 
@@ -403,7 +402,7 @@ inline op div (in PMC, in PMC, in INT) :base_core {
 }
 
 inline op div (in PMC, in PMC, in NUM) :base_core {
-  $2->vtable->divide_float(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_DIVIDE_FLOAT);
   goto NEXT();
 }
 
@@ -555,7 +554,7 @@ inline op mod(in PMC, in PMC, in INT) :base_core {
 }
 
 inline op mod(in PMC, in PMC, in NUM) :base_core {
-  $2->vtable->modulus_float(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_MOD_FLOAT);
   goto NEXT();
 }
 
@@ -637,7 +636,7 @@ inline op mul ( in PMC, in INT ) :base_core {
 }
 
 inline op mul ( in PMC, in NUM ) :base_core {
-  $1->vtable->multiply_float(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_MULTIPLY_FLOAT);
   goto NEXT();
 }
 
@@ -667,7 +666,7 @@ inline op mul (in PMC, in PMC, in INT) :base_core {
 }
 
 inline op mul (in PMC, in PMC, in NUM) :base_core {
-  $2->vtable->multiply_float(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_MULTIPLY_FLOAT);
   goto NEXT();
 }
 
@@ -813,7 +812,7 @@ inline op sub(in PMC, in INT) :base_core {
 }
 
 inline op sub(in PMC, in NUM) :base_core {
-  $1->vtable->subtract_float(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_SUBTRACT_FLOAT);
   goto NEXT();
 }
 
@@ -843,7 +842,7 @@ inline op sub(in PMC, in PMC, in INT) :base_core {
 }
 
 inline op sub(in PMC, in PMC, in NUM) :base_core {
-  $2->vtable->subtract_float(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_SUBTRACT_FLOAT);
   goto NEXT();
 }
 

@@ -45,6 +45,8 @@ not highest type in table.
 
 typedef void    (*mmd_f_v_ppp)(Interp *, PMC *, PMC *, PMC *);
 typedef void    (*mmd_f_v_pip)(Interp *, PMC *, INTVAL, PMC *);
+typedef void    (*mmd_f_v_pnp)(Interp *, PMC *, FLOATVAL, PMC *);
+typedef void    (*mmd_f_v_psp)(Interp *, PMC *, STRING *, PMC *);
 typedef INTVAL  (*mmd_f_i_pp) (Interp *, PMC *, PMC *);
 
 #ifndef NDEBUG
@@ -179,6 +181,18 @@ mmd_dispatch_v_pip(Interp *interpreter,
 
 Like above, right argument is a native INTVAL.
 
+=item C<void
+mmd_dispatch_v_pnp(Interp *interpreter,
+		 PMC *left, FLOATVAL right, PMC *dest, INTVAL function)>
+
+Like above, right argument is a native FLOATVAL.
+
+=item C<void
+mmd_dispatch_v_psp(Interp *interpreter,
+		 PMC *left, STRING *right, PMC *dest, INTVAL function)>
+
+Like above, right argument is a native STRING *.
+
 =cut
 
 */
@@ -219,6 +233,50 @@ mmd_dispatch_v_pip(Interp *interpreter,
     if (is_pmc) {
         sub = (PMC*)real_function;
         Parrot_runops_fromc_args_save(interpreter, sub, "vPIP",
+                left, right, dest);
+    }
+    else {
+        (*real_function)(interpreter, left, right, dest);
+    }
+}
+
+void
+mmd_dispatch_v_pnp(Interp *interpreter,
+		 PMC *left, FLOATVAL right, PMC *dest, INTVAL function)
+{
+    mmd_f_v_pnp real_function;
+    PMC *sub;
+    int is_pmc;
+    UINTVAL left_type;
+
+    left_type = left->vtable->base_type;
+    real_function = (mmd_f_v_pnp)get_mmd_dispatch_type(interpreter,
+            left_type, 0, function, &is_pmc);
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        Parrot_runops_fromc_args_save(interpreter, sub, "vPNP",
+                left, right, dest);
+    }
+    else {
+        (*real_function)(interpreter, left, right, dest);
+    }
+}
+
+void
+mmd_dispatch_v_psp(Interp *interpreter,
+		 PMC *left, STRING *right, PMC *dest, INTVAL function)
+{
+    mmd_f_v_psp real_function;
+    PMC *sub;
+    int is_pmc;
+    UINTVAL left_type;
+
+    left_type = left->vtable->base_type;
+    real_function = (mmd_f_v_psp)get_mmd_dispatch_type(interpreter,
+            left_type, 0, function, &is_pmc);
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        Parrot_runops_fromc_args_save(interpreter, sub, "vPSP",
                 left, right, dest);
     }
     else {
