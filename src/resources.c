@@ -526,7 +526,7 @@ free_unused_PMCs(struct Parrot_Interp *interpreter) {
     PMC *pmc_array = cur_arena->start_PMC;
     for (i = 0; i < cur_arena->used; i++) {
       /* If it's not live or on the free list, put it on the free list */
-      if (!(pmc_array[i].flags & (PMC_live_FLAG | PMC_immortal_FLAG |
+      if (!(pmc_array[i].flags & (PMC_live_FLAG | PMC_immune_FLAG |
                                   PMC_on_free_list_FLAG))) {
         add_pmc_to_free(interpreter,
                         interpreter->arena_base->pmc_pool,

@@ -40,7 +40,7 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
     }
 
     /* Ensure the PMC survives DOD during this function */
-    pmc->flags |= PMC_immortal_FLAG;
+    pmc->flags |= PMC_immune_FLAG;
 
     pmc->vtable = &(Parrot_base_vtables[base_type]);
 
@@ -55,7 +55,7 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
     pmc->vtable->init(interpreter, pmc, 0);
 
     /* Let the caller track this PMC */
-    pmc->flags &= ~PMC_immortal_FLAG;
+    pmc->flags &= ~PMC_immune_FLAG;
     return pmc;
 }
 
@@ -71,7 +71,7 @@ pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type, INTVAL size)
     }
 
     /* Ensure the PMC survives DOD during this function */
-    pmc->flags |= PMC_immortal_FLAG;
+    pmc->flags |= PMC_immune_FLAG;
 
     pmc->vtable = &(Parrot_base_vtables[base_type]);
 
@@ -86,7 +86,7 @@ pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type, INTVAL size)
     pmc->vtable->init(interpreter, pmc, size);
 
     /* Let the caller track this PMC */
-    pmc->flags &= ~PMC_immortal_FLAG;
+    pmc->flags &= ~PMC_immune_FLAG;
     return pmc;
 }
 
