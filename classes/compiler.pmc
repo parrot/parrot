@@ -1,7 +1,7 @@
 /* Compiler.pmc
  *  Copyright: 2002 Yet Another Society
  *  CVS Info
- *     $$
+ *     $Id$
  *  Overview:
  *     The vtable functions for implementing assembler/compilers
  *  Data Structure and Algorithms:
@@ -41,6 +41,17 @@ pmclass Compiler extends NCI {
 	(void)stack_pop(interpreter, &interpreter->ctx.user_stack, &code_seg,
                   STACK_ENTRY_PMC);
 	pc = (opcode_t*) code_seg->data;
+/* add a code seg
+ * in PDB_compile, imcc_compile
+ PackFile_add_segement(interpreter->code, byte_code_new(interpreter->code))
+ ... seg is at directory->segments[num_segments-1]
+eval:
+ ... remember old code segment
+ ... set global byte_code{,size} to new seg
+ ... DO_OP
+ ... restore old code seg
+ */
+
 	/* test
 	while (pc)
 	    DO_OP(pc, interpreter);
