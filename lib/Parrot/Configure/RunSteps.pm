@@ -53,6 +53,7 @@ use vars qw(@steps);
     auto/memalign.pl
     auto/signal.pl
     auto/env.pl
+    auto/aio.pl
     gen/icu.pl
     gen/config_h.pl
     gen/core_pmcs.pl

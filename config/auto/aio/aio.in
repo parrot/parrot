@@ -1,0 +1,69 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <aio.h>
+#include <signal.h>
+
+static void
+die(const char *s)
+{
+    fprintf(stderr, "%s\n", s);
+    exit(1);
+}
+
+static int my_sig, retval;
+
+static volatile sig_atomic_t flag;
+
+static void
+sighandler(const int s, siginfo_t *i, void *x)
+{
+    if (s == my_sig) {
+	flag = s;
+	retval =  *(int*)i->si_ptr;
+    }
+}
+
+int
+main(int argc, char *argv[])
+{
+    struct aiocb a;
+    struct sigaction sa;
+    int fd;
+    int i = 42;
+
+    my_sig = atoi(argv[1]);
+    printf("SIGRTMIN=%d SIGRTMAX=%d\n", SIGRTMIN, SIGRTMAX);
+
+    fd = open("MANIFEST", O_RDONLY);
+    if (fd < 0)
+	die("can't open MANIFEST");
+
+    a.aio_fildes = fd;
+    a.aio_offset = 0;
+    a.aio_reqprio = 0;
+    a.aio_buf = malloc(100);
+    a.aio_nbytes = 100;
+    a.aio_sigevent.sigev_notify = SIGEV_SIGNAL;
+    a.aio_sigevent.sigev_signo = my_sig;
+    a.aio_sigevent.sigev_value.sival_ptr = &i;
+    sa.sa_sigaction = sighandler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART|SA_SIGINFO;
+    if (sigaction(my_sig, &sa, NULL) < 0)
+	die("sigaction err");
+    if (aio_read(&a) < 0)
+	die("aio_read err");
+    while (!flag) {
+	sleep(1);
+    }
+    if (flag != my_sig)
+	die("wrong signal");
+    close(fd);
+    printf("INFO=%d\n", retval);
+    puts("ok");
+    return 0;
+}

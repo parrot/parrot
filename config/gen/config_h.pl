@@ -82,7 +82,7 @@ EOF
 
   }
 
-    print HH <<EOF;
+  print HH <<EOF;
 
 /*
  * HAS_(\\w+) config entries
@@ -93,6 +93,20 @@ EOF
     next unless /HAS_(\w+)/;
     if(Configure::Data->get($_)) {
       print HH "#define PARROT_HAS_\U$1 1\n"
+    }
+  }
+  print HH <<EOF;
+
+/*
+ * D_(\\w+) config entries
+ */
+
+EOF
+  for (sort(Configure::Data->keys())) {
+    next unless /D_(\w+)/;
+    my $val;
+    if ($val=Configure::Data->get($_)) {
+      print HH "#define PARROT_\U$1 $val\n"
     }
   }
 
