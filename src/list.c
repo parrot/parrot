@@ -239,8 +239,9 @@ allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
     chunk->prev     = NULL;
     Parrot_allocate_zeroed(interpreter, (Buffer *)chunk, size);
     /* see also src/hash.c */
-    if (list->container)
+    if (list->container) {
         DOD_WRITE_BARRIER(interpreter, list->container, 0, chunk);
+    }
     Parrot_unblock_DOD(interpreter);
     /*Parrot_unblock_GC(interpreter); */
     return chunk;
@@ -404,8 +405,9 @@ rebuild_other(Interp *interpreter, List *list)
             if(prev->items + chunk->items > MAX_ITEMS) {
                 Parrot_reallocate(interpreter, (Buffer *)prev,
                         MAX_ITEMS * list->item_size);
-                if (list->container)
+                if (list->container) {
                     DOD_WRITE_BARRIER(interpreter, list->container, 0, prev);
+                }
                 mem_sys_memmove(
                         (char *) PObj_bufstart(&prev->data) +
                         prev->items * list->item_size,
@@ -422,8 +424,9 @@ rebuild_other(Interp *interpreter, List *list)
             else {
                 Parrot_reallocate(interpreter, (Buffer *)prev,
                         (prev->items + chunk->items) * list->item_size);
-                if (list->container)
+                if (list->container) {
                     DOD_WRITE_BARRIER(interpreter, list->container, 0, prev);
+                }
                 mem_sys_memmove(
                         (char *) PObj_bufstart(&prev->data) +
                         prev->items * list->item_size,
@@ -509,8 +512,9 @@ rebuild_chunk_list(Interp *interpreter, List *list)
             len = 4;
         Parrot_reallocate(interpreter, (Buffer *)list,
                 len * sizeof(List_chunk *));
-        if (list->container)
+        if (list->container) {
             DOD_WRITE_BARRIER(interpreter, list->container, 0, list);
+        }
         list->collect_runs = interpreter->arena_base->collect_runs;
     }
 
@@ -941,8 +945,9 @@ split_chunk(Interp *interpreter, List *list, List_chunk *chunk, UINTVAL ix)
         /* it fits, just allocate */
         Parrot_reallocate(interpreter, (Buffer *)chunk,
                 chunk->items * list->item_size);
-        if (list->container)
+        if (list->container) {
             DOD_WRITE_BARRIER(interpreter, list->container, 0, chunk);
+        }
         chunk->flags |= no_power_2;
         chunk->flags &= ~sparse;
     }
@@ -955,8 +960,9 @@ split_chunk(Interp *interpreter, List *list, List_chunk *chunk, UINTVAL ix)
         chunk->items = n2;
         Parrot_reallocate(interpreter, (Buffer *)chunk,
                 chunk->items * list->item_size);
-        if (list->container)
+        if (list->container) {
             DOD_WRITE_BARRIER(interpreter, list->container, 0, chunk);
+        }
         chunk->flags &= ~sparse;
         if (n3) {
             new_chunk = allocate_chunk(interpreter, list, n3, list->item_size);

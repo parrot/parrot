@@ -114,6 +114,51 @@ A chained list of headers used e.g. for the IGP list.
 #if PARROT_GC_GMS
 
 /*
+ * XXX
+ *
+ * Main problem TODO 1):
+ *
+ * [ PCont ]       ... continuation object in old generation
+ *    |
+ *    v
+ * [ Stack chunk ] --> [ e.g. P register frame ]  ... new generation
+ *
+ * By pushing a new stack chunk onto the (old) existing stack frame,
+ * we'd need a WRITE_BARRIER that promotes the stack chunk to the old
+ * generation of the continuation.
+ * This would also need an IGP entry for the stack chunk buffer. But -
+ * as buffers aren't really containers in Parrot - this isn't possible.
+ *
+ * To get that right, the code needs better support by the running
+ * interpreter.
+ * - never promote continuations (and stacks) in the current stack frame
+ *   to an old generation
+ * - create scope_enter / scope_exit opcodes
+ *
+ * A scope_enter happens on a subroutine call *and' with new_pad /
+ * push_pad opcodes. Each lexical scope must have its distinct register
+ * frame, else timely detruction can't work.
+ * If the frame needs active destruction, the old frame should be
+ * converted to the (new-1) generation, the inner frame is the nursery.
+ * On scope exit the newest (nursery) generation is collected and the
+ * current generation number is reset back to (new-1).
+ *
+ * If the scope_enter doesn't indicate timely destruction, generation
+ * promoting should be done only, if object statistics indicate the
+ * presence of a fair amount of live objects.
+ *
+ * TODO 2) in lazy sweep
+ * If timely destruction didn't find (all) eager objects, go back to
+ * older generations, until all these objects have been seen.
+ *
+ * TODO 3) interpreter startup
+ * After all internal structures are created, promote interpreter state
+ * into initial first old generation by running one GC cycle before
+ * program execution begins (or just treat all objects as being alive).
+ *
+ */
+
+/*
  * call code to verify chain of pointers after each change
  * this is very expensive, but should be used during development
  */
