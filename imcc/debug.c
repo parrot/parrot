@@ -7,7 +7,8 @@
 
 #include "imc.h"
 
-void fatal(int code, const char *func, const char *fmt, ...)
+void
+fatal(int code, const char *func, const char *fmt, ...)
 {
     va_list ap;
 
@@ -19,7 +20,8 @@ void fatal(int code, const char *func, const char *fmt, ...)
 }
 
 
-void fataly(int code, const char *file, int lin, const char *fmt, ...)
+void
+fataly(int code, const char *file, int lin, const char *fmt, ...)
 {
     va_list ap;
 
@@ -33,7 +35,8 @@ void fataly(int code, const char *file, int lin, const char *fmt, ...)
 }
 
 
-void warning(Parrot_Interp interpreter, const char *func, const char *fmt, ...)
+void
+warning(Parrot_Interp interpreter, const char *func, const char *fmt, ...)
 {
     va_list ap;
     if (IMCC_INFO(interpreter)->imcc_warn)
@@ -45,7 +48,8 @@ void warning(Parrot_Interp interpreter, const char *func, const char *fmt, ...)
     va_end(ap);
 }
 
-void info(Parrot_Interp interpreter, int level, const char *fmt, ...)
+void
+info(Parrot_Interp interpreter, int level, const char *fmt, ...)
 {
     va_list ap;
 
@@ -69,7 +73,9 @@ debug(Parrot_Interp interpreter, int level, const char *fmt, ...)
     va_end(ap);
 }
 
-void dump_instructions(Parrot_Interp interpreter) {
+void
+dump_instructions(Parrot_Interp interpreter)
+{
     Instruction *ins;
     Basic_block *bb;
     int pc;
@@ -96,7 +102,9 @@ void dump_instructions(Parrot_Interp interpreter) {
     fprintf(stderr, "\n");
 }
 
-void dump_cfg(Parrot_Interp interpreter) {
+void
+dump_cfg(Parrot_Interp interpreter)
+{
     int i;
     Basic_block *bb;
     Edge *e;
@@ -119,7 +127,9 @@ void dump_cfg(Parrot_Interp interpreter) {
 
 }
 
-void dump_loops(Parrot_Interp interpreter) {
+void
+dump_loops(Parrot_Interp interpreter)
+{
     int i, j;
     Set *loop;
     Loop_info ** loop_info = IMCC_INFO(interpreter)->loop_info;
@@ -159,7 +169,9 @@ dump_labels(Parrot_Interp interpreter)
     fprintf(stderr, "\n");
 }
 
-void dump_symreg(Parrot_Interp interpreter) {
+void
+dump_symreg(Parrot_Interp interpreter)
+{
     int i;
     SymReg** reglist = IMCC_INFO(interpreter)->reglist;
 
@@ -193,7 +205,9 @@ void dump_symreg(Parrot_Interp interpreter) {
 
 }
 
-void dump_liveness_status(Parrot_Interp interpreter) {
+void
+dump_liveness_status(Parrot_Interp interpreter)
+{
     int i;
     SymReg** reglist = IMCC_INFO(interpreter)->reglist;
 
@@ -208,7 +222,9 @@ void dump_liveness_status(Parrot_Interp interpreter) {
 }
 
 
-void dump_liveness_status_var(Parrot_Interp interpreter, SymReg* r) {
+void
+dump_liveness_status_var(Parrot_Interp interpreter, SymReg* r)
+{
     int i;
     Life_range *l;
 
@@ -245,7 +261,9 @@ void dump_liveness_status_var(Parrot_Interp interpreter, SymReg* r) {
     fprintf(stderr, "\n");
 }
 
-void dump_interference_graph(Parrot_Interp interpreter) {
+void
+dump_interference_graph(Parrot_Interp interpreter)
+{
     int x, y, cnt;
     SymReg *r;
     SymReg** reglist = IMCC_INFO(interpreter)->reglist;
@@ -274,7 +292,9 @@ void dump_interference_graph(Parrot_Interp interpreter) {
     fprintf(stderr, "\n");
 }
 
-void dump_dominators(Parrot_Interp interpreter) {
+void
+dump_dominators(Parrot_Interp interpreter)
+{
     int i, j;
 
     fprintf(stderr, "\nDumping the Dominators Tree:"

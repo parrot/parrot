@@ -72,7 +72,8 @@ static int add_const_str(struct Parrot_Interp *, char *str);
 
 static void imcc_globals_destroy(int ex, void *param);
 
-static void imcc_globals_destroy(int ex, void *param)
+static void
+imcc_globals_destroy(int ex, void *param)
 {
     struct cs_t *cs, *prev_cs;
     struct subs *s, *prev_s;
@@ -136,7 +137,9 @@ create_default_segs(Parrot_Interp interpreter)
     return cur_cs;
 }
 
-int e_pbc_open(void *param) {
+int
+e_pbc_open(void *param)
+{
     struct cs_t *cs;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
 
@@ -253,13 +256,15 @@ get_old_size(struct Parrot_Interp *interpreter, int *ins_line)
 }
 
 
-static void store_sub_size(size_t size, size_t ins_line)
+static void
+store_sub_size(size_t size, size_t ins_line)
 {
     globals.cs->subs->size = size;
     globals.cs->subs->ins_line = ins_line;
 }
 
-static void store_label(SymReg * r, int pc)
+static void
+store_label(SymReg * r, int pc)
 {
     SymReg * label;
     label = _mk_address(globals.cs->subs->labels, str_dup(r->name),
@@ -267,7 +272,8 @@ static void store_label(SymReg * r, int pc)
     label->color = pc;
 }
 
-static void store_bsr(SymReg * r, int pc, int offset)
+static void
+store_bsr(SymReg * r, int pc, int offset)
 {
     SymReg * bsr;
     bsr = _mk_address(globals.cs->subs->bsrs, str_dup(r->name), U_add_all);
@@ -275,7 +281,8 @@ static void store_bsr(SymReg * r, int pc, int offset)
     bsr->score = offset;        /* bsr = 1, set_addr I,x = 2, newsub = 3 */
 }
 
-static void store_key_const(char * str, int idx)
+static void
+store_key_const(char * str, int idx)
 {
     SymReg * c;
     c  = _mk_const(globals.cs->key_consts, str_dup(str), 0);
@@ -417,7 +424,8 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
 
 
 /* get a globale label, return the pc (absolute) */
-static SymReg * find_global_label(char *name, int *pc)
+static SymReg *
+find_global_label(char *name, int *pc)
 {
     SymReg * r;
     struct subs *s;
@@ -433,7 +441,8 @@ static SymReg * find_global_label(char *name, int *pc)
 }
 
 /* fix global branches */
-void fixup_bsrs(struct Parrot_Interp *interpreter)
+void
+fixup_bsrs(struct Parrot_Interp *interpreter)
 {
     int i, pc, addr;
     SymReg * bsr, *lab;
@@ -466,7 +475,8 @@ void fixup_bsrs(struct Parrot_Interp *interpreter)
 /*
  * the string can't grow, so its done in place
  */
-static int unescape(char *string)
+static int
+unescape(char *string)
 {
     char *start, *p;
     char hexdigits[] = "0123456789abcdef";
@@ -530,7 +540,8 @@ static int unescape(char *string)
 
 /* add constant string to constant_table */
 static int
-add_const_str(struct Parrot_Interp *interpreter, char *str) {
+add_const_str(struct Parrot_Interp *interpreter, char *str)
+{
     int k, l;
     char *o;
     char *buf = o = str_dup(str);
@@ -565,7 +576,8 @@ add_const_str(struct Parrot_Interp *interpreter, char *str) {
 }
 
 static int
-add_const_num(struct Parrot_Interp *interpreter, char *buf) {
+add_const_num(struct Parrot_Interp *interpreter, char *buf)
+{
     int k;
 
     k = PDB_extend_const_table(interpreter);
@@ -579,7 +591,8 @@ add_const_num(struct Parrot_Interp *interpreter, char *buf) {
 
 static int
 add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
-        int offs, int len) {
+        int offs, int len)
+{
     int k;
     char buf[256];
     opcode_t *rc;
@@ -615,7 +628,8 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
 /* add constant key to constant_table */
 static int
 add_const_key(struct Parrot_Interp *interpreter, opcode_t key[],
-        int size, char *s_key) {
+        int size, char *s_key)
+{
     int k;
     SymReg *r;
     struct PackFile_Constant *pfc;
@@ -724,7 +738,8 @@ build_key(struct Parrot_Interp *interpreter, SymReg *reg)
     return k;
 }
 
-static void add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
+static void
+add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
 {
     if (r->color >= 0)
         return;
@@ -919,7 +934,9 @@ e_pbc_emit(void *param, Instruction * ins)
     return ok;
 }
 
-int e_pbc_close(void *param){
+int
+e_pbc_close(void *param)
+{
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
 
     fixup_bsrs(interpreter);
