@@ -122,4 +122,5 @@ OUTPUT
 output_is(<<'CODE', '32', "constant defined and used");
 .constant FOO 32
   print .FOO
+  end
 CODE
