@@ -4,7 +4,7 @@
 
 use strict;
 
-my (%opcodes, %labels);
+my(%opcodes, %labels);
 
 my %pack_type;
 %pack_type = (i => 'l',
@@ -12,6 +12,12 @@ my %pack_type;
 	  );
 my $sizeof_packi = length(pack($pack_type{i},1024));
 
+open GUTS, "interp_guts.h";
+my $opcode;
+while (<GUTS>) {
+    next unless /\tx\[(\d+)\] = ([a-z_]+);/;
+    $opcodes{$2}{CODE} = $1;
+}
 
 open OPCODES, "<opcode_table" or die "Can't get opcode table, $!/$^E";
 while (<OPCODES>) {
@@ -19,11 +25,9 @@ while (<OPCODES>) {
     chomp;
     s/^\s+//;
     next unless $_;
-    my ($code, $name, $args, @types) = split /\s+/, $_;
-    $opcodes{$name} = {CODE => $code,
-		       ARGS => $args,
-		       TYPES => [@types]
-		      };
+    my ($name, $args, @types) = split /\s+/, $_;
+    $opcodes{$name}{ARGS} = $args;
+    $opcodes{$name}{TYPES} = [@types];
 }
 
 my $pc = 0;
@@ -33,6 +37,7 @@ my @constants;
 
 # First scan for labels and strings
 while (<>) {
+    next if /^\s?#/;
     s/^\s*//;
     if (s/^\s*([a-zA-Z_]\w+):\s*//) { $labels{$1} = $pc; }
     1 while s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
@@ -62,8 +67,9 @@ while ($_ = shift @code) {
 
     $args[0] = fixup($args[0])
         if $opcode eq "branch_ic" and $args[0] =~ /[a-zA-Z]/;
-    
-    if ($opcode eq "eq_i_ic") {
+
+#    if ($opcode eq "eq_i_ic" or $opcode eq "lt_i_ic") {
+    if ($opcode =~ /^(eq|ne|lt|le|gt|ge)_i_ic$/) {
         $args[2] = fixup($args[2]) if $args[2] =~ /[a-zA-Z]/;
         $args[3] = fixup($args[3]) if $args[3] =~ /[a-zA-Z]/;
     }
@@ -115,7 +121,7 @@ sub emit_constants_section {
 
     # Then spit out how many constants there are, so we can allocate
     print pack($pack_type{i}, scalar @constants);
-    
+
     # Now emit each constant
     for (@constants) {
         print pack($pack_type{i},0) x 3; # Flags, encoding, type

@@ -5,7 +5,7 @@
 while (<>) {
     next if /^\s*#/ or /^\s*$/;
     chomp;
-    (undef, $name, undef) = split /\t/, $_;
+    ($name, undef) = split /\t/, $_;
     print "IV *$name(IV *, struct Perl_Interp *);\n";
 }
 

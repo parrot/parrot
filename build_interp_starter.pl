@@ -1,5 +1,5 @@
-#! perl -w
-#
+# !/usr/bin/perl -w
+use strict;
 
 open INTERP, "> interp_guts.h" or die "Can't open interp_guts.h, $!/$^E";
 
@@ -18,13 +18,16 @@ print INTERP <<CONST;
 #define BUILD_TABLE(x) do { \\
 CONST
 
+my $count = 1;
 while (<OPCODES>) {
     chomp;
     s/#.*$//;
     s/^\s+//;
     next unless $_;
-    ($num, $name) = split /\s+/;
+    my($name) = split /\s+/;
+    my $num = $count;
+    $num = 0 if $name eq 'end';
     print INTERP "\tx[$num] = $name; \\\n";
-    $num++;
+    $count++ unless $name eq 'end';
 }
 print INTERP "} while (0);\n";

@@ -1,7 +1,9 @@
 # opcode function table
 # 
 # format is:
-# number name args arg_types
+# name args arg_types
+# 
+# Opcode number is determined at build time
 #
 # All fields should be whitespace separated
 #
@@ -9,74 +11,83 @@
 # not the type of the register or anything. So N3 is still an i, since that
 # 3 specifying the register should be packed as an integer.
 
+# This must be opcode zero
+
+end	0
+
 # Integer ops
 
-6	set_i_ic	2	i i
-1	add_i	3	i i i
-7	sub_i	3	i i i
-8	mul_i	3	i i i
-9	div_i	3	i i i
-11	inc_i	1	i
-12	inc_i_ic	2	i i
-13	dec_i	1	i
-14	dec_i_ic	2	i i
+set_i_ic	2	i i
+set_i	2	i i
+add_i	3	i i i
+sub_i	3	i i i
+mul_i	3	i i i
+div_i	3	i i i
+inc_i	1	i
+inc_i_ic	2	i i
+dec_i	1	i
+dec_i_ic	2	i i
 
 # NUM ops
 
-16	set_n_nc	2	i n
-17	add_n	3	i i i
-18	sub_n	3	i i i
-19	mul_n	3	i i i
-20	div_n	3	i i i
-25	inc_n	1	i
-26	inc_n_nc	2	i n
-27	dec_n	1	i
-28	dec_n_nc	2	i n
+set_n_nc	2	i n
+add_n	3	i i i
+sub_n	3	i i i
+mul_n	3	i i i
+div_n	3	i i i
+inc_n	1	i
+inc_n_nc	2	i n
+dec_n	1	i
+dec_n_nc	2	i n
 
 # String ops
 
-31	set_s_sc	2	i i
-32	print_s	1	i
-33	length_s_i	2	i i
-34	chopn_s_ic	2	i i
+set_s_sc	2	i i
+print_s	1	i
+length_s_i	2	i i
+chopn_s_ic	2	i i
 
 # Comparators
 
-2	eq_i_ic	4	i i i i
-21	eq_n_ic	4	i i i i
+eq_i_ic	4	i i i i
+eq_n_ic	4	i i i i
+ne_i_ic	4	i i i i
+lt_i_ic	4	i i i i
+le_i_ic	4	i i i i
+gt_i_ic	4	i i i i
+ge_i_ic	4	i i i i
 
 # Flow control
 
-0	end	0
-15	jump_i	1	i
-5	branch_ic	1	i
-10	if_i_ic	3	i i i
-24	if_n_ic	3	i i i
+jump_i	1	i
+branch_ic	1	i
+if_i_ic	3	i i i
+if_n_ic	3	i i i
 
 # Convertors
 
-29	iton_n_i	2	i i
-30	ntoi_i_n	2	i i
+iton_n_i	2	i i
+ntoi_i_n	2	i i
 
 # Miscellaneous and debugging ops
 
-3	time_i	1	i
-4	print_i	1	i
-22	time_n	1	i
-23	print_n	1	i
-47	noop	0
+time_i	1	i
+print_i	1	i
+time_n	1	i
+print_n	1	i
+noop	0
 
 # Register ops
-35	push_i	0
-36	push_s	0
-37	push_n	0
-38	push_p	0
-39	pop_i	0
-40	pop_s	0
-41	pop_n	0
-42	pop_p	0
-43	clear_i	0
-44	clear_s	0
-45	clear_n	0
-46	clear_p	0
+push_i	0
+push_s	0
+push_n	0
+push_p	0
+pop_i	0
+pop_s	0
+pop_n	0
+pop_p	0
+clear_i	0
+clear_s	0
+clear_n	0
+clear_p	0
 

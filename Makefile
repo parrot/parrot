@@ -22,7 +22,7 @@ string$(O): $(H_FILES)
 
 strnative$(O): $(H_FILES)
 
-interp_guts.h: opcode_table
+interp_guts.h: opcode_table build_interp_starter.pl
 	perl build_interp_starter.pl
 
 interpreter$(O): interpreter.c $(H_FILES) interp_guts.h
@@ -37,10 +37,10 @@ register$(O): $(H_FILES)
 
 basic_opcodes$(O): $(H_FILES) basic_opcodes.c
 
-basic_opcodes.c: basic_opcodes.ops
+basic_opcodes.c: basic_opcodes.ops process_opfunc.pl interp_guts.h
 	perl process_opfunc.pl basic_opcodes.ops
 
-op.h: opcode_table
+op.h: opcode_table make_op_header.pl
 	perl make_op_header.pl opcode_table > op.h
 
 clean:

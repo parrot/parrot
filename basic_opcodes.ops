@@ -11,6 +11,11 @@ AUTO_OP set_i_ic {
   INT_REG(P1) = P2;
 }
   
+// SET Ix, Ix
+AUTO_OP set_i {
+  INT_REG(P1) = INT_REG(P2);
+}
+  
 // ADD Ix, Iy, Iz  
 AUTO_OP add_i {
   INT_REG(P1) = INT_REG(P2) +
@@ -38,6 +43,51 @@ AUTO_OP div_i {
 // EQ Ix, Iy, EQ_BRANCH, NE_BRANCH
 MANUAL_OP eq_i_ic {
   if (INT_REG(P1) == INT_REG(P2)) {
+    RETURN(P3);
+  } else {
+    RETURN(P4);
+  }
+}
+
+// NE Ix, Iy, NE_BRANCH, EQ_BRANCH
+MANUAL_OP ne_i_ic {
+  if (INT_REG(P1) != INT_REG(P2)) {
+    RETURN(P3);
+  } else {
+    RETURN(P4);
+  }
+}
+
+// LT Ix, Iy, LT_BRANCH, GE_BRANCH
+MANUAL_OP lt_i_ic {
+  if (INT_REG(P1) < INT_REG(P2)) {
+    RETURN(P3);
+  } else {
+    RETURN(P4);
+  }
+}
+
+// LE Ix, Iy, LE_BRANCH, GT_BRANCH
+MANUAL_OP le_i_ic {
+  if (INT_REG(P1) <= INT_REG(P2)) {
+    RETURN(P3);
+  } else {
+    RETURN(P4);
+  }
+}
+
+// GT Ix, Iy, GT_BRANCH, LE_BRANCH
+MANUAL_OP gt_i_ic {
+  if (INT_REG(P1) > INT_REG(P2)) {
+    RETURN(P3);
+  } else {
+    RETURN(P4);
+  }
+}
+
+// GE Ix, Iy, GE_BRANCH, LT_BRANCH
+MANUAL_OP ge_i_ic {
+  if (INT_REG(P1) >= INT_REG(P2)) {
     RETURN(P3);
   } else {
     RETURN(P4);

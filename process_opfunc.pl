@@ -29,16 +29,26 @@
 # X. (Parameter 0 is the opcode number) Types for each, and the size
 # of the return offset, are taken from the opcode_table file
 
+use strict;
+
+my %opcode;
+
+open GUTS, "interp_guts.h";
+my $opcode;
+while (<GUTS>) {
+    next unless /\tx\[(\d+)\] = ([a-z_]+);/;
+    $opcode{$2}{OPNUM} = $1;
+}
+
 open OPCODE, "opcode_table" or die "Can't open opcode_table, $!/$^E";
 while (<OPCODE>) {
     s/#.*//;
     s/^\s+//;
     chomp;
     next unless $_;
-    my ($num, $name, $params, @params) = split /\s+/;
+    my ($name, $params, @params) = split /\s+/;
     $opcode{$name}{PARAM_COUNT} = $params;
     $opcode{$name}{PARAM_ARRAY} = \@params;
-    $opcode{$name}{OPNUM} = $num;
 
     my $num_i = () = grep {/i/} @params;
     my $num_n = () = grep {/n/} @params;
@@ -62,7 +72,9 @@ if (! ($file =~ s/\.ops$/.c/)) {
 }
 open OUTPUT, ">$file" or die "Can't open $file, $!/$^E";
 
+my($name, $footer);
 while (<INPUT>) {
+
     if (/^AUTO_OP/) {
 	($name, $footer) = emit_auto_header($_);
 	next;
