@@ -273,7 +273,7 @@ int main(int argc, char* argv[]) {
 }
 
 int do_test(Interp *interpreter)
-[
+{
     HASH _hash;
     HASH *hash = &_hash;
     STRING *key;
