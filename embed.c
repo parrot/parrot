@@ -139,6 +139,9 @@ Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf) {
 
 void
 Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
+    INTVAL i;
+    PMC* userargv;
+    
     if(interpreter->flags & PARROT_DEBUG_FLAG) {
         fprintf(stderr, "Parrot VM: Debugging enabled.\n");
 
@@ -159,6 +162,24 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
         exit(1);
     }
 #endif
+
+    if(interpreter->flags & PARROT_DEBUG_FLAG) {
+        fprintf(stderr, "Parrot VM: Setting up ARGV array in P0.  Current argc: %d\n", argc);
+    }
+
+    userargv=pmc_new(interpreter, enum_class_PerlArray);
+    
+    for(i=0; i < argc; i++) {
+        if(interpreter->flags & PARROT_DEBUG_FLAG) {
+            fprintf(stderr, "\t%d: %s\n", i, argv[i]);
+        }
+
+        userargv->vtable->set_string_index(interpreter, userargv, 
+            string_make(interpreter, argv[i], strlen(argv[i]), 0, 0, 0), i
+        );
+    }
+
+    interpreter->pmc_reg.registers[0]=userargv;
 
     runops(interpreter, interpreter->code, 0);
 

@@ -96,8 +96,8 @@ parseflags(struct Parrot_Interp *interpreter, int *argc, char **argv[]) {
     }
     
 OUT:
-    (*argc)--;
-    return (*(argv++))[0];
+
+    return (*argv)[0];
 }
 
 static void
