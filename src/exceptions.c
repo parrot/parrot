@@ -106,7 +106,8 @@ do_panic(Interp *interpreter, const char *message,
 
     fprintf(stderr, "\n\
 We highly suggest you notify the Parrot team if you have not been working on\n\
-Parrot.  Use bugs6.perl.org or send an e-mail to perl6-internals@perl.org.\n\
+Parrot.  Use parrotbug (located in parrot's root directory) or send an\n\
+e-mail to perl6-internals@perl.org.\n\
 Include the entire text of this error message and the text of the script that\n\
 generated the error.  If you've made any modifications to Parrot, please\n\
 describe them as well.\n\n");
