@@ -36,8 +36,8 @@ set_make_full (int length)
 void
 set_free (Set *s)
 {
-    free (s->bmp);
-    free (s);
+    mem_sys_free(s->bmp);
+    mem_sys_free(s);
 }
 
 void
