@@ -1298,7 +1298,6 @@ languages/befunge/load.pasm
 languages/befunge/maths.pasm
 languages/befunge/stack.pasm
 languages/befunge/test.bef
-languages/brainfuck/Makefile
 languages/brainfuck/README
 languages/brainfuck/brainfuck.pasm
 languages/brainfuck/countdown.bf
