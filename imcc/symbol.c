@@ -67,12 +67,12 @@ void store_symbol(SymbolTable * st, Symbol * sym)
    unsigned int i;
    if(!sym)
       return;
-#if 0
-   fprintf(stderr, "store_symbol: %s\n", sym->name);
-#endif
    i = hash_str(sym->name) % SYMTAB_HASHSIZE;
    sym->nextintable = st->table[i];
    st->table[i] = sym;
+#if 0
+   fprintf(stderr, "store_symbol table=%x: %s hashbucket=%d\n", st, sym->name, i);
+#endif
 }
 
 
@@ -114,7 +114,7 @@ SymbolList * symtab_to_symlist(SymbolTable * st)
    SymbolList * list = new_symbol_list();
    sym = NULL;
    for(i = 0; i < SYMTAB_HASHSIZE; i++) {
-      for(next = st->table[0]; next; next = next->nextintable) {
+      for(next = st->table[i]; next; next = next->nextintable) {
          if(!list->head)
             list->head = next;
          if(sym)
