@@ -930,7 +930,8 @@ string_chopn(STRING *s, INTVAL n)
 
 /*=for api string string_compare
  * compare two strings, performing type and encoding conversions if
- * necessary
+ * necessary.
+ * return -1, 0, 1 if s1 < , == , > s2
  */
 INTVAL
 string_compare(struct Parrot_Interp *interpreter, STRING *s1,
@@ -1003,6 +1004,84 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
         cmp = -1;
 
     return cmp;
+}
+
+/*=for api hash_string_equal
+ * compare 2 strings, which are non-null and properly transcoded
+ * return 0 if equal
+ */
+INTVAL
+hash_string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
+{
+    const char *s1start, *s1end;
+    const char *s2start;
+    size_t len;
+    /*
+     * both strings aren't null
+     */
+    if (s1->strlen != s2->strlen)
+        return 1;       /* we don't care which is bigger */
+    if (!s1->strlen)
+        return 0;
+    /*
+     * both strings have equal amount of chars
+     */
+    s1start = s1->strstart;
+    s2start = s2->strstart;
+    len = (size_t) s1->bufused;
+
+    /* speed up ascii, slow down general case
+     */
+    if (s1->encoding->index == enum_encoding_singlebyte &&
+        s2->encoding->index == enum_encoding_singlebyte) {
+        return memcmp(s1start, s2start, s1->bufused);
+    }
+
+    s1end = s1start + len;
+    while (s1start < s1end) {
+        if (s1->encoding->decode(s1start) != s2->encoding->decode(s2start))
+            return 1;
+        s1start = s1->encoding->skip_forward(s1start, 1);
+        s2start = s2->encoding->skip_forward(s2start, 1);
+    }
+    return 0;
+}
+
+/*=for api string string_equal
+ * compare two strings, performing type and encoding conversions if
+ * necessary, like string_compare, but just return 0 = equal else unequal
+ */
+INTVAL
+string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
+{
+    const char *s1start;
+    const char *s1end;
+    const char *s2start;
+    const char *s2end;
+
+    if (!s1 && !s2) {
+        return 0;
+    }
+    if (!s2) {
+        return s1->strlen != 0;
+    }
+    if (!s1) {
+        return s2->strlen != 0;
+    }
+
+#  if ! DISABLE_GC_DEBUG
+    /* It's easy to forget that string comparison can trigger GC */
+    if (GC_DEBUG(interpreter))
+        Parrot_do_dod_run(interpreter, 1);
+#  endif
+
+    if (s1->type != s2->type || s1->encoding != s2->encoding) {
+        s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
+                NULL);
+        s2 = string_transcode(interpreter, s2, NULL, string_unicode_type,
+                NULL);
+    }
+    return hash_string_equal(interpreter, s1, s2);
 }
 
 /*=for api string string_bitwise_and

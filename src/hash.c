@@ -139,41 +139,7 @@ STRING_compare(Parrot_Interp interp, void *a, void *b)
 #if USE_STRING_COMPARE
     return string_compare(interp, (STRING *)a, (STRING *) b);
 #else
-    STRING *s1 = (STRING*) a;
-    STRING *s2 = (STRING*) b;
-    const char *s1start, *s1end;
-    const char *s2start;
-    size_t len;
-    /*
-     * both strings aren't null
-     */
-    if (s1->strlen != s2->strlen)
-        return 1;       /* we don't care which is bigger */
-    if (!s1->strlen)
-        return 0;
-    /*
-     * both strings have equal amount of chars
-     */
-    s1start = s1->strstart;
-    s2start = s2->strstart;
-    len = (size_t) s1->bufused;
-
-    /* speed up ascii, slow down general case
-     * TODO we could save some cylces, if we use 2 compare functions
-     */
-    if (s1->encoding->index == enum_encoding_singlebyte &&
-        s2->encoding->index == enum_encoding_singlebyte) {
-        return memcmp(s1start, s2start, s1->bufused);
-    }
-
-    s1end = s1start + len;
-    while (s1start < s1end) {
-        if (s1->encoding->decode(s1start) != s2->encoding->decode(s2start))
-            return 1;
-        s1start = s1->encoding->skip_forward(s1start, 1);
-        s2start = s2->encoding->skip_forward(s2start, 1);
-    }
-    return 0;
+    return hash_string_equal(interp, (STRING *)a, (STRING *) b);
 #endif
 }
 

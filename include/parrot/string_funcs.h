@@ -31,6 +31,8 @@ STRING *string_replace(struct Parrot_Interp *, STRING *, INTVAL, INTVAL,
 STRING *string_nprintf(struct Parrot_Interp *,
                        STRING *, INTVAL, const char *, ...);
 INTVAL string_compare(struct Parrot_Interp *, STRING *, STRING *);
+INTVAL string_equal(struct Parrot_Interp *, STRING *, STRING *);
+INTVAL hash_string_equal(struct Parrot_Interp *, STRING *, STRING *);
 INTVAL string_bool(const STRING *);
 const char *Parrot_string_cstring(const STRING *);
 
