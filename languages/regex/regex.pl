@@ -49,6 +49,7 @@ my %options;
 $options{'no-tree-optimize'} = 1 if ! $tree_opt;
 $options{'no-list-optimize'} = 1 if ! $list_opt;
 $options{'DEBUG'} = 1 if $debug;
+$options{subname} = $subname if $subname;
 
 if ($language eq 'pir') {
   $options{module} = "Regex::CodeGen::IMCC";

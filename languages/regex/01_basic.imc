@@ -20,7 +20,9 @@
 
 match2:
         regex2 = compile_regex("aa")
-        match = regex2("aaaargh")
+        .local pmc stack
+        stack = new IntList
+        match = regex2(1, "aaaargh", 0, stack)
 
         print "regex match \"aaaargh\" =~ /aa/: "
         if match goto goodness2
@@ -51,11 +53,11 @@ goodness2:
 match3:
         match=regex2("blah")
         print "regex match \"blah\" =~ /aa/: "
-        if match goto goodness3
+        if match goto badness3
         print "Failed (as it should)\n"
         end
 
-goodness3:
+badness3:
         print "succeeded?! (should not have)\n"
         end
 .end

@@ -505,7 +505,7 @@ sub tokenize {
             push @types, 'CHAR';
         } elsif (/\d/) {
             push @types, 'NUM';
-        } elsif (/\w/) {
+        } elsif (/[\w\s]/) {
             push @types, 'CHAR';
         } else {
             push @types, $_;

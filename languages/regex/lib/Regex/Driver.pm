@@ -114,4 +114,23 @@ sub output_rule_body {
     print $fh join("\n", @$instructions), "\n";
 }
 
+sub output_footer {
+    my ($self, $fh) = @_;
+
+    my $subname = $self->{subname} || '_regex';
+    print $fh <<"END";
+.sub $subname
+    .param string rx_input
+
+    .local pmc rx_match
+    .local pmc rx_stack
+    rx_stack = new IntList
+    rx_match = _default(1, rx_input, 0, rx_stack)
+    .return (rx_match)
+    end
+.end
+END
+
+}
+
 1;
