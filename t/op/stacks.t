@@ -332,9 +332,9 @@ CODE
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "combining pops with pushtops, pushbottoms");
-@{[ set_str_regs( sub {$_[0]} ) ]}
+@{[ set_str_regs( sub {$_[0]+1} ) ]}
 	pushtops
-@{[ set_str_regs( sub {-$_[0]} ) ]}
+@{[ set_str_regs( sub {-$_[0]-1} ) ]}
         pushbottoms
 @{[ set_str_regs( sub {0} ) ]}
 @{[ print_str_regs() ]}
@@ -345,9 +345,9 @@ output_is(<<"CODE", <<OUTPUT, "combining pops with pushtops, pushbottoms");
 
         clears
 
-@{[ set_str_regs( sub {$_[0]} ) ]}
+@{[ set_str_regs( sub {$_[0]+1} ) ]}
 	pushbottoms
-@{[ set_str_regs( sub {-$_[0]} ) ]}
+@{[ set_str_regs( sub {-$_[0]-1} ) ]}
         pushtops
 @{[ set_str_regs( sub {0} ) ]}
 @{[ print_str_regs() ]}
@@ -358,9 +358,9 @@ output_is(<<"CODE", <<OUTPUT, "combining pops with pushtops, pushbottoms");
 	end
 CODE
 00000000000000000000000000000000
-161718192021222324252627282930310-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15
+17181920212223242526272829303132-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16
 00000000000000000000000000000000
-0123456789101112131415-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31
+12345678910111213141516-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32
 OUTPUT
 
 ($code, $output) = ();
@@ -574,9 +574,9 @@ CODE
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "combining popp with pushtopp, pushbottomp");
-@{[ set_pmc_regs( sub {$_[0]} ) ]}
+@{[ set_pmc_regs( sub {$_[0]+1} ) ]}
 	pushtopp
-@{[ set_pmc_regs( sub {-$_[0]} ) ]}
+@{[ set_pmc_regs( sub {-$_[0]-1} ) ]}
         pushbottomp
 @{[ set_pmc_regs( sub {0} ) ]}
 @{[ print_pmc_regs() ]}
@@ -587,9 +587,9 @@ output_is(<<"CODE", <<OUTPUT, "combining popp with pushtopp, pushbottomp");
 
         clearp
 
-@{[ set_pmc_regs( sub {$_[0]} ) ]}
+@{[ set_pmc_regs( sub {$_[0]+1} ) ]}
 	pushbottomp
-@{[ set_pmc_regs( sub {-$_[0]} ) ]}
+@{[ set_pmc_regs( sub {-$_[0]-1} ) ]}
         pushtopp
 @{[ set_pmc_regs( sub {0} ) ]}
 @{[ print_pmc_regs() ]}
@@ -600,9 +600,9 @@ output_is(<<"CODE", <<OUTPUT, "combining popp with pushtopp, pushbottomp");
 	end
 CODE
 00000000000000000000000000000000
-161718192021222324252627282930310-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15
+17181920212223242526272829303132-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16
 00000000000000000000000000000000
-0123456789101112131415-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31
+12345678910111213141516-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', 'poptopp, aggregate PMCs');
