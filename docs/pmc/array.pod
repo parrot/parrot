@@ -1,27 +1,36 @@
 # -*- cperl -*-
+#
 
-=head1 Array base class
+=head1 TITLE
+
+Array base class
+
+=head1 ABSTRACT
 
 This pod file documents the Array base class usage. For implementation
 details you should look inside the class file, found at
 C<classes/array.pmc> in the parrot source code.
 
-=head2 Synopsis
+=head1 SYNOPSIS
 
   new P0, .Array    # initialize P0 as an array
 
-  set I0, P0        # get to I0 size of the array P0
-  set P0, 2         # set array P0 size to 2
+  set I0, P0        # set I0 to the size of the array in P0
+  set P0, 2         # set the size of the array in P0 to 2
 
-  set P0[0], "foo"  # put "foo" on array position 0
-  set I1, P0[1]     # get value from array position 1
+  set P0[0], "foo"  # put "foo" into the array at position 0
+  set I1, P0[1]     # get an integer value from the entry 
+                    # at array position 1
 
-  defined I2, P0[1] # value on position 1 is defined?
-  exists  I3, P0[0] # there is an element on position 0?
+  defined I2, P0[1] # is the value at position 1 defined?
+  exists  I3, P0[0] # is there an element at position 0?
+
+=head1 DESCRIPTION
 
 =head2 Creation
 
-As any other PMC, the following line creates an array PMC on register C<P0>.
+As with any other PMC, the following line creates an array PMC in register 
+C<P0>:
 
   new P0, .Array
 
@@ -31,22 +40,27 @@ You can retrieve the size of the array using
 
   set I0, P0
 
-This will put in C<I0> the size of the array on register C<P0>. In the
-same way, you can assign directly the size of the array using
+This will put the size of the array in register C<P0> into C<I0>. In the
+same way, assigning an integer driectly to the array sets the size of the 
+array. For instance: 
 
+  new P0, .Array
   set P0, 2
 
-which will expand the array size to two.
+creates a new Array (with default size 0) and then expands the size of the 
+array to two.
+
+Arrays do not automatically resize themselves when you access out-of-bounds
+elements. This means that you must remember to size an Array appropriately
+before storing anything in it.
 
 =head2 Accessing elements
 
-Elements are accessed using indexes, as in any programming
-language. Notice that these arrays do not expand as Perl arrays do,
-when you access nonexistent indexes.
+Elements are accessed using indexes, as in any programming language. 
 
 The following code initializes an array in C<P0> with size two, and
-sets the first position to an integer C<-8> and second position to
-the real number C<3.1415>.
+sets the first position to the integer C<-8> and second position to
+the floating point number C<3.1415>.
 
   new P0, .Array
   set P0, 2
@@ -54,8 +68,7 @@ the real number C<3.1415>.
   set P0[0], -8
   set P0[1], 3.1415
 
-It must be clear that you can assign directly from a register. Check
-this second example, with the same meaning:
+You can also assign directly from registers; for instance:
 
   new P0, .Array
   set P0, 2
@@ -66,27 +79,30 @@ this second example, with the same meaning:
   set P0[0], I0
   set P0[1], N0
 
-To retrieve the elements we use the same syntax, switching registers:
+leaves P0 in the same state as in the previous code snippet. 
+
+To retrieve elements, we use the same syntax: 
 
   set N1, P0[1]
   set I1, P0[0]
 
 Those two lines retrieve the values from the array back into registers.
-Whenever you want, it is possible to change the value type at some
-position:
+
+The value stored at a given position is not fixed; it can be
+changed simply by assigning a new value:
 
   set P0[1], "A string"
 
-If you access an out-of-bounds array element, an exception will be
-raised (as soon as we have exceptions).
+Accessing an out-of-bounds array element raises an exception; if you want
+an Array that will automatically resize, then use a C<PerlArray>.
 
-You can test if there is a defined element on some array position using
+You can test if there is a defined element at an array position by using
 
   defined I0, P0[1]
 
-for the position you want to test. On the other hand, if you want only
-to test if there is an element (rather than testing if it is defines)
-you should use the C<exists> keyword:
+for the position you want to test. On the other hand, if you only want to
+test whether a given element exists (rather than whether it is defined), 
+then use the C<exists> op instead:
 
   exists I0, P0[0]
 
