@@ -11,6 +11,7 @@
 use strict;
 use lib 'lib';
 use Parrot::OpsFile;
+use Parrot::OpLib::core;
 
 my %arg_dir_mapping = (
 	''   => 'PARROT_ARGDIR_IGNORED',
@@ -21,7 +22,7 @@ my %arg_dir_mapping = (
 
 sub Usage {
     print STDERR <<_EOF_;
-usage: $0 trans [--dynamic] input.ops [input2.ops ...]
+usage: $0 trans [--dynamic] [--core | input.ops [input2.ops ...]]
        trans := C | CGoto | CGP | CSwitch | CPrederef
 _EOF_
     exit 1;
@@ -51,6 +52,11 @@ if ($file eq '-d' || $file eq '--dynamic') {
     $file = shift @ARGV;
     $dynamic = 1;
 }
+my $core = 0;
+if ($file eq '--core') {
+	$file = 'core.ops';
+	$core = 1;
+}
 
 my $base = $file;
 $base =~ s/\.ops$//;
@@ -73,34 +79,42 @@ my %hashed_ops;
 # Read the input files:
 #
 
-my %opsfiles;
-my @opsfiles;
+my $ops;
+if ($core) {
+    $ops = Parrot::OpsFile->new('core.ops');
+    $ops->{OPS} = $Parrot::OpLib::core::ops;
+    $ops->{PREAMBLE} = $Parrot::OpLib::core::preamble;
+}
+else {
+    my %opsfiles;
+    my @opsfiles;
 
-foreach my $opsfile ($file, @ARGV) {
-  if ($opsfiles{$opsfile}) {
-    print STDERR "$0: Ops file '$opsfile' mentioned more than once!\n";
-    next;
-  }
+    foreach my $opsfile ($file, @ARGV) {
+	if ($opsfiles{$opsfile}) {
+	    print STDERR "$0: Ops file '$opsfile' mentioned more than once!\n";
+	    next;
+	}
 
-  $opsfiles{$opsfile} = 1;
-  push @opsfiles, $opsfile;
+	$opsfiles{$opsfile} = 1;
+	push @opsfiles, $opsfile;
 
-  die "$0: Could not read ops file '$opsfile'!\n" unless -r $opsfile;
+	die "$0: Could not read ops file '$opsfile'!\n" unless -r $opsfile;
+    }
+
+    $ops = new Parrot::OpsFile @opsfiles;
+
+    my $cur_code = 0;
+    for(@{$ops->{OPS}}) {
+	$_->{CODE}=$cur_code++;
+
+    }
 }
 
-my $ops = new Parrot::OpsFile @opsfiles;
 
 my $version       = $ops->version;
 my $major_version = $ops->major_version;
 my $minor_version = $ops->minor_version;
 my $patch_version = $ops->patch_version;
-
-my $cur_code = 0;
-for(@{$ops->{OPS}}) {
-   $_->{CODE}=$cur_code++;
-
-}
-
 my $num_ops     = scalar $ops->ops;
 my $num_entries = $num_ops + 1; # For trailing NULL
 

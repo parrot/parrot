@@ -86,6 +86,7 @@ for $file (@ARGV) {
 
     die "OPS invalid for $file" unless ref $temp_ops->{OPS};
     push @{$ops->{OPS}}, @{$temp_ops->{OPS}};
+    $ops->{PREAMBLE} .= "\n" . $temp_ops->{PREAMBLE};
 }
 
 
@@ -132,14 +133,15 @@ use strict;
 
 package Parrot::OpLib::$package;
 
-use vars qw(\$VERSION \$ops);
+use vars qw(\$VERSION \$ops \$preamble);
 
 \$VERSION = "$version";
 
 END_C
 
 print MODULE $preamble;
-print MODULE Data::Dumper->Dump([[ $ops->ops ]], [ qw($ops) ]);
+print MODULE Data::Dumper->Dump([ $ops->preamble, [$ops->ops ]],
+          [ qw($preamble $ops) ]);
 
 print MODULE <<END_C;
 

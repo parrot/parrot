@@ -548,18 +548,18 @@ nci.c : call_list.txt build_nativecall.pl
 	$(PERL) build_nativecall.pl call_list.txt
 
 #core_ops depends upon config.h so that it gets updated along with updates to config.h's version numbers
-core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h
-	$(PERL) ops2c.pl C $(OPS_FILES)
+core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
+	$(PERL) ops2c.pl C --core
 
 core_ops_prederef$(O) : $(GENERAL_H_FILES) core_ops_prederef.c
 
-core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h
-	$(PERL) ops2c.pl CPrederef $(OPS_FILES)
+core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
+	$(PERL) ops2c.pl CPrederef --core
 
 core_ops_switch$(O) : $(GENERAL_H_FILES) core_ops_switch.c
 
-core_ops_switch.c $(INC)/oplib/core_ops_switch.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h
-	$(PERL) ops2c.pl CSwitch $(OPS_FILES)
+core_ops_switch.c $(INC)/oplib/core_ops_switch.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
+	$(PERL) ops2c.pl CSwitch --core
 
 ${cg_c}
 
