@@ -1,11 +1,8 @@
-Files
-=====
+Roadmap
+=======
 
-prd-perl6.pl		interactive and batch interface to compiler
-test.pl			test suite
-Makefile
-README
-mkdistro.sh		bundle things up.
+prd-perl6.pl		old interactive and batch interface
+perl6			new compiler interface
 P6C/Addcontext.pm	Context propagation.
 P6C/Builtins.pm		"built-in" function code and prototypes
 P6C/Context.pm		evaluation context structure
@@ -67,4 +64,4 @@ John Kingsley		Numerous bug fixes to the parser, parser
 			tests, parse error messages.
 
 Leopold Toetsch		5.005_03 compatibility fixes, test driver
-			cleanup.
+			cleanup, new driver program.

@@ -20,6 +20,14 @@ imcc:
 %.pbc: %.pasm
 	$(asm) $< > $@
 
-.PRECIOUS: %.imc %.pasm
+clean:
+	rm -f test-*.imc test-*.pasm test-*.p6 test-*.out test-*.pbc test-*.err
+	rm -f a.err a.imc a.output a.pasm a.pbc
+	rm -f core
 
-.PHONY: all test
+distclean: clean
+	rm -f Perl6grammar.pm
+
+.PRECIOUS: %.imc %.pasm %.p6
+
+.PHONY: all test clean distclean imcc

@@ -149,6 +149,7 @@ my @builtin_funcs = qw(crypt index pack rindex sprintf substr
 # Loop control
 my @loop_control = qw(redo last next continue);
 @WANT{@loop_control} = ('maybe_label') x @loop_control;
+$WANT{goto} = 'label';
 
 ##############################
 # Unary operators
@@ -525,14 +526,14 @@ initializer:	  assign_op scalar_expr
 # Statements
 
 prog:		  {%since=(); $seen_err=undef} <reject>
-		| /\A/ stmts[undef] /\z/ <commit> {$seen_err ? undef : 1} ''
+		| /\A/ stmts[0] /\z/ <commit> {$seen_err ? undef : 1} ''
 		| {got_err("Invalid statement", $text, $thisline); undef;}
 
 # $arg[0] is set to true/false. True == "in block"
 stmts:		  _stmt[$arg[0]](s?)
 
 _stmt:		# Handle valid reason for 'stmt' failing (hit end of block)
-		  { $arg[0] } ..."}" <commit> { undef }
+		  { $arg[0] ? 1 : undef } ..."}" <commit> { undef }
 
 		# Handle case where having missing input
 		# or have hit end of file.
@@ -573,8 +574,8 @@ _stmt_token:	  <perl_quotelike>
 stmt_sep:	  ';'
 		| { check_end('block', $text) }
 		| { check_end('label', $text) }
-		| { $arg[0] } <commit> ..."}"
-		| { !$arg[0] } .../\z/
+		| { $arg[0] ? 1 : undef } <commit> ..."}"
+		| { $arg[0] ? undef : 1 } .../\z/
 
 stmt:		  label /:(?!:)/ { mark_end('label', $text);1 } ''
 		| directive <commit> name comma(?)

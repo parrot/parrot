@@ -1,0 +1,384 @@
+#!/usr/bin/perl -w
+#
+# perl6 driver:  parse assemble compile and run .p6 files
+#
+# perl6 -h   for help
+#
+# e.g. perl6 -vv mops.p6
+#
+# (c) 2002 Leopold Toetsch <lt@toetsch.at>
+# s. LICENCES in parrot root dir for licence
+#
+# TODO's:
+# - as always docu ;-)
+# - clean up source file
+# - more use of Parrot::Config
+# - use assemble.pl's classes directly
+# - filter warnings/diagnostics ...
+# - --version option for all parts
+
+use 5.005;
+use strict;
+use FindBin;
+use lib "$FindBin::Bin/../../lib";
+use Getopt::Long;
+use P6C::Tree;
+use P6C::Parser;
+
+use vars qw($IMCC $ASM $PARROT $PBC2C $HERE $CD $VERSION);
+$VERSION = '0.01';
+
+$HERE   = 'languages/perl6';
+$IMCC   = '../imcc/imcc';
+$ASM    = 'perl ../../assemble.pl';
+if ($^O eq 'cygwin') {
+    $PARROT = '../../parrot.exe';
+} else {
+    $PARROT = '../../parrot';
+    $PBC2C = 'cd ../../; perl pbc2c.pl';
+    $CD = "cd ../..;";
+}
+
+sub usage() {
+        print(<<'EOF'
+usage:  perl6 [ p6c-options ] [ imcc-options ]
+              [ asm-options ] [ run-options ]
+              [ global-options ] file ...
+
+    p6c-options:
+
+      Output options:
+        -C,--compile-pbc compile to executable
+        -B,--pbc         stop after creating .pbc file
+        -S,--pasm        stop after creating .pasm file
+        -I,--imc         stop after creating .imc file
+        --tree           stop after creating parse tree
+        --test-parser    interactive parser-testing mode
+
+      Parse::RecDescent control:
+        --trace          set $::RD_TRACE
+        --no-hitem       don't keep track of %item hash
+                         (only useful when constructing parser)
+        --force-grammar  Rebuild grammar even if it exists.
+        --grammar NAME   use precompiled grammar NAME (default = Perl6grammar)
+
+      Misc:
+        --add-main       suround code by the main() function
+        --rule NAME      start with rule NAME (default = 'prog')
+                         (only useful in interactive mode)
+
+    imcc-options:
+
+        --debug          write various debug messages to STDERR
+
+    asm-options:
+
+        -E               Preprocess input files and terminate processing
+        -h,--help        Print this message
+        -o,--output F    Write output to file F
+        -c,--checksyntax Check syntax only, do not generate bytecode
+
+    run-options:
+
+        -R.. --parrot-options=bdhjpPgtv.
+                         pass option(s) to parrot, s. parrot -h
+          -Rb.           e.g. call parrot -b -.
+
+    global-options:
+
+        -h --help        Print this message and exit
+        -v --verbose     Print mesages about compile stages
+          -vv            be more verbose
+        -V --version     Print versions and exit
+        -w --warnings    Print warnings
+          -ww            Print diagnostics
+
+EOF
+        );
+        exit(1);
+}
+
+use vars '%o';
+
+Getopt::Long::Configure(qw(bundling));
+(GetOptions(\%o,qw(test-parser
+                   trace no-hitem tree
+                   add-main rule=s grammar=s force-grammar
+                   debug
+                   verbose|v+
+                   warnings|w+
+                   parrot-options|R=s
+                   compile-pbc|C
+                   pbc|B pasm|S imc|I 
+                   help|h version|V))
+ && !$o{help})
+    || usage();
+
+$::RD_TRACE = $o{trace};
+$::RD_NO_HITEM = $o{"no-hitem"};
+$::rule = $o{rule} || 'prog';
+$o{grammar} ||= 'Perl6grammar';
+$o{'parrot-options'} ||= '';
+$o{verbose} = 0 unless (defined $o{verbose});
+$o{tree} = 1 if $o{'test-parser'};
+
+my $filebase = 'a';		# basename for output files.
+
+##########################
+# Pass 1 P6C parser
+#        output file.imc [ file.tree ]
+#
+
+if (defined $o{tree}) {
+    eval <<'END';
+    use Data::Dumper;
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Indent = 1;
+END
+    die $@ if $@;
+} else {
+    eval 'use P6C::IMCC qw(:external)';
+    die $@ if $@;
+}
+
+sub verbose($@) {
+    my ($level, @t) = @_;
+    if ($level <= $o{verbose}) {
+        print STDERR "@t\n";
+    }
+}
+
+#
+# catch warnings of sub $sub and redirect them to file
+#
+my $wn = 0;
+sub warnings($$) {
+    my ($sub, $file) = @_;
+
+    unless ($o{warnings}) {
+        $wn++;
+        verbose(1, "Writing warnings to '$file'") if ($wn == 1);
+        # redirect STDERR to file
+        open(OERR, ">&STDERR");
+        open(STDERR, ">>$file");
+        select(STDERR); $|=1;
+        select(STDOUT); $|=1;
+        # and all warn messages too
+        $SIG{'__WARN__'} = sub { print STDERR @_; };
+    }
+
+    my $ret = &$sub;
+    if ($wn) {
+        # restore above redirects
+        close(STDERR);
+        open(STDERR, ">&OERR");
+        close(OERR);
+        $SIG{'__WARN__'} = sub { warn @_; };
+    }
+    $ret;
+}
+
+my $parser;
+
+if (!$o{'force-grammar'} && eval("require $o{grammar}")) {
+    $parser = eval "new $o{grammar}" or die "$o{grammar}: $@";
+} else {
+    warn $@ if $@;
+    verbose(1,"Constructing parser for $o{grammar}...");
+    if ($o{grammar}) {
+        P6C::Parser->Precompile($o{grammar});
+        eval "require $o{grammar}" or die $@;
+        $parser = $o{grammar}->new;
+    } else {
+        $parser = P6C::Parser->new();
+    }
+    verbose(1, "Done");
+}
+
+sub output_tree {
+    my $x = shift->tree;
+    my $file = shift;
+    $file = '-' unless defined $file;
+    my $fw = shift || 0;
+    if ($o{tree}) {
+        my $tf;
+        if ($file eq '-') {
+            $tf = '&STDOUT';
+        } else {
+            $tf = "$filebase.tree";
+        }
+        verbose(2, "Dump tree to '$tf'");
+        open(OUT, ">$tf") or die("Can't write '$tf': $!");
+        print OUT Dumper($x);
+        close OUT;
+    } else {
+        P6C::IMCC::init();
+        if ($o{'add-main'}) {
+            P6C::IMCC::add_function('main');
+            P6C::IMCC::set_function('main');
+        }
+        verbose(2, "compiling tree");
+        warnings(sub { P6C::IMCC::compile($x) }, $fw);
+        my $f = "$filebase.imc";
+        verbose(2, "Writing '$f'");
+        open(OOUT, ">&STDOUT");
+        open(STDOUT, ">$f");
+        warnings(sub { P6C::IMCC::emit() }, $fw);
+        close(STDOUT);
+        open(STDOUT, ">&OOUT");
+        close(OOUT);
+        pass2($f, $fw);
+    }
+}
+
+sub pass2($) {
+    return if $o{imc};          # stop after generating IMC.
+    my $file = shift;
+    my $fw = shift;
+    my $debug = defined $o{debug} ? '--'.$o{debug} : '';
+    my $outfile = "$filebase.pasm";
+    my $cmd = "$IMCC $debug $file $outfile";
+    verbose(1, $cmd);
+    warnings(sub {
+        if (system($cmd)) {
+            die("$IMCC returned $?");
+        }
+    }, $fw);
+    pass3($outfile, $fw);
+}
+
+sub pass3($$) {
+    return if $o{pasm};         # stop after generating assembly
+    my $file = shift;
+    my $fw = shift;
+
+    my $outfile = "$filebase.pbc";
+    my $opt = '';
+    $opt .= ' -E' if ($o{E});
+    $opt .= ' -c' if ($o{checksyntax});
+    my $cmd = "$ASM $opt $file -o $outfile";
+    verbose(1, "assembling $cmd");
+    warnings(sub {
+        if (system($cmd)) {
+            die("$ASM returned $?");
+        }
+    }, $fw);
+    pass4($outfile, $fw);
+}
+
+sub pass4($$) {
+    return if $o{pbc};          # stop after generating bytecode
+    my $file = shift;
+    my $fw = shift;
+
+    if ($o{'compile-pbc'}) {
+        use Parrot::Config;
+        die $@ if $@;
+        my $cmd;
+        $cmd = "$PBC2C $HERE/$file";    # FIXME
+        verbose(1, "compiling $cmd");
+        my $c = `$cmd`;
+        open(C, ">$filebase.c") or die("Can't write '$filebase.c'");
+        print C $c;
+        close(C);
+        $cmd = "$CD $PConfig{cc} $PConfig{ccflags} ".
+                "$PConfig{cg_flag} $PConfig{cc_inc} ".
+                "$PConfig{cc_warn} -c $HERE/$filebase.c $PConfig{'cc_o_out'} ".
+                "$HERE/$filebase$PConfig{o}";
+        verbose(1, "compiling $cmd");
+        if (system($cmd)) {
+            die("failed: return $?");
+        }
+        my $objs = join" ",map{ s/\$\(O\)/$PConfig{o}/g; $_ } split(/ /,
+                "$PConfig{pmc_classes_o} ");
+                # FIXME how to get these objects
+                # parsing Makefile or by Configure.pl?
+        $objs .=  ' exceptions.o global_setup.o interpreter.o parrot.o '.
+                'register.o core_ops.o core_ops_prederef.o memory.o '.
+                'packfile.o stacks.o string.o sub.o encoding.o chartype.o '.
+                'runops_cores.o trace.o pmc.o key.o hash.o platform.o '.
+                'resources.o rx.o rxstacks.o embed.o '.
+                'warnings.o misc.o core_ops_cg.o packout.o byteorder.o '.
+                'debug.o smallobject.o headers.o dod.o '.
+                'io/io.o io/io_buf.o io/io_unix.o io/io_win32.o  '.
+                'io/io_stdio.o encodings/singlebyte.o encodings/utf8.o '.
+                'encodings/utf16.o encodings/utf32.o chartypes/unicode.o '.
+                'chartypes/usascii.o ';
+        $cmd = "$CD $PConfig{ld} $PConfig{ldflags} ".
+                "$PConfig{ld_out} $HERE/$filebase $HERE/$filebase$PConfig{'o'} ".
+                "$objs ".
+                "$PConfig{libs}";
+        verbose(1, "linking $cmd");
+        if (system($cmd)) {
+            die("failed: return $?");
+        }
+        verbose(1, "running $filebase");
+        if (system($filebase)) {
+            die("failed: return $?");
+        }
+
+    }
+    else {
+        my @opt = map { "-$_" } split(//, $o{'parrot-options'});
+        verbose(1, "running: $PARROT @opt $file");
+        if (system($PARROT, @opt, $file)) {
+            die("$PARROT $file returned $?");
+        }
+    }
+}
+
+my $in = '';
+unless ($o{'test-parser'}) {
+    local $/ = undef;
+    push(@ARGV, "-") unless(@ARGV);
+    for my $f (@ARGV) {
+        verbose(1, "P6C '$f'");
+        open(IN, $f) or die("Can't read '$f': $!");
+        $in = <IN>;
+        close(IN);
+	if ($f eq '-') {
+	    $filebase = 'a';
+	} else {
+	    ($filebase = $f) =~ s/\.[^.]*$//;
+        }
+        my $fw = "$filebase.warn";
+        unlink($fw);
+        verbose(2, "Parsing");
+        my $result = warnings(sub {$parser->$::rule($in)}, $fw);
+        output_tree($result, $f, $fw);
+    }
+    exit;
+}
+
+# Delay loading Term::ReadLine if we don't need it.
+eval <<'END';
+use Term::ReadLine;
+
+my $term = new Term::ReadLine $0 or die $!;
+my $prompt = '> ';
+
+while (defined(my $l = $term->readline($prompt))) {
+    if ($in =~ /^:(.*)/) {
+        print eval $1, "\n";
+        $in = '';
+        next;
+    }
+    unless ($l =~ /^$/) {
+        $in .= "$l\n";
+        $prompt = '? ';
+        next;
+    }
+    print "as $::rule:\n";
+    my $result = $parser->$::rule($in);
+    print STDERR "done\n";
+    if ($result) {
+        output_tree($result);
+    } else {
+        print "parse error\n";
+    }
+    print "\n";
+    $in = '';
+    $prompt = '> ';
+}
+END
+die $@ if $@;

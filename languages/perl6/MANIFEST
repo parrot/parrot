@@ -17,6 +17,7 @@ t/compiler/5.t
 t/compiler/6.t
 t/compiler/7.t
 t/compiler/qsort.t
+perl6
 prd-perl6.pl
 P6C/Builtins.pm
 P6C/IMCC.pm
