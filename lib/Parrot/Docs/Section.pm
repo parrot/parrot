@@ -140,11 +140,28 @@ sub write_html
 	# This is only done here. It's not passed down.
 	$target->delete_contents if $delete;
 
+	# TODO - This method is very similar to the superclass version.
+	# It should be possible to remove code duplication.
+	
 	print "\n\n", $self->name unless $silent;
 	
 	foreach my $content (@{$self->{CONTENTS}})
 	{
-		$index_html .= $content->write_html($source, $target, $silent);
+		if ( ref($content) )
+		{
+			$index_html .= $content->write_html($source, $target, $silent);
+		}
+		else
+		{
+			my @items = map {
+				$self->item('', $_)
+			} $self->relative_file_paths_for_relative_path($source, $content);
+			
+			foreach my $item (@items)
+			{
+				$index_html .= $item->write_html($source, $target, $silent);
+			}
+		}
 	}
 	
 	print "\n", $self->{INDEX_PATH} unless $silent;
@@ -158,12 +175,11 @@ sub write_html
 
 	$index->write(<<'HEADER');
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-	"http://www.w3.org/TR/REC-html40/loose.dtd">
-
+    "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>  
-
 <head><title>parrot - </title>
-<link rel="stylesheet" href="../resources/perl-styles.css" type="text/css" />
+<link rel="stylesheet" href="../resources/perl-styles.css" 
+    type="text/css" />
 </head>
 <body> 
 <table width=100%>

@@ -39,8 +39,7 @@ sub new
 	my $self = shift;
 	
 	return $self->SUPER::new(
-		'IMCC', 'imcc.html', '',
-		Parrot::Docs::Item->new('', 'imcc')
+		'IMCC', 'imcc.html', '', 'imcc'
 	);
 }
 
