@@ -22,7 +22,7 @@ my %opcodes            = Parrot::Opcode::read_ops();
 my $opcode_fingerprint = Parrot::Opcode::fingerprint();
 
 for my $name (sort {$opcodes{$a}{CODE} <=> $opcodes{$b}{CODE}} keys %opcodes) {
-    print INTERP "\tx[$opcodes{$name}{CODE}] = $name; \\\n";
+    print INTERP "\tx[$opcodes{$name}{CODE}] = (void*)$name; \\\n";
 }
 print INTERP "} while (0);\n";
 
