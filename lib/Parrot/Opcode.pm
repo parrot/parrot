@@ -110,8 +110,9 @@ The name of the C function implementing this op.
 read_ops() takes an optional argument: the file to read the opcode table
 from.
 
-The fingerprint() function returns the MD5 signature (in hex) of the
-opcode table.
+The fingerprint() function returns a checksum for the opcode table.  It is
+used to ensure that bytecode is only executed if it was generated for
+a version of parrot supporting the appropriate opcodes.
 
 =cut
 package Parrot::Opcode;
