@@ -29,6 +29,7 @@ typedef struct {
     INTVAL      op_count;
     op_info_t * op_info_table;
     void *      op_func_table;
+    int (*op_code)(const char * name);
 } op_lib_t;
 
 typedef op_lib_t * (*oplib_init_f)(void);

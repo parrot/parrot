@@ -46,6 +46,8 @@ my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
 my $source  = "${base}_ops${suffix}.c";
 
+my $remembered_ops = { };
+
 
 #
 # Read the input files:
@@ -76,6 +78,8 @@ my $patch_version = $ops->patch_version;
 my $cur_code = 0;
 for(@{$ops->{OPS}}) {
    $_->{CODE}=$cur_code++;
+
+   remember_op($_->full_name(), $_->{CODE});
 }
 
 my $num_ops     = scalar $ops->ops;
@@ -233,6 +237,20 @@ print SOURCE <<END_C;
 };
 
 /*
+** Op lookup function:
+*/
+
+static int find_op(const char * name) {
+END_C
+
+#print STDERR "Top level op chars: ", keys %$remembered_ops, "\n";
+
+generate_switch($remembered_ops);
+
+print SOURCE <<END_C;
+}
+
+/*
 ** op lib descriptor:
 */
 
@@ -243,7 +261,8 @@ static op_lib_t op_lib = {
   $patch_version,
   $num_ops,
   op_info_table,
-  op_func_table
+  op_func_table,
+  find_op
 };
 
 op_lib_t * Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(void) {
@@ -254,3 +273,70 @@ END_C
 
 exit 0;
 
+
+#
+# remember_op()
+#
+
+sub remember_op
+{
+  my ($name, $code) = @_;
+  my $hash = $remembered_ops;
+
+#  print STDERR "Remembering [$code] $name...";
+
+  my @chars = (split(//, $name), "\0");
+
+  while (@chars) {
+    my $char = shift @chars;
+
+#    print "$char...";
+
+    if (@chars) {
+      if (!exists $hash->{$char}) {
+        $hash->{$char} = { };
+      }
+
+      $hash = $hash->{$char}
+    }
+    else {
+      $hash->{$char} = $code;
+#      print "$code.\n";
+    }
+  }
+}
+
+
+#
+# generate_switch()
+#
+
+sub generate_switch {
+  my ($hash, @so_far) = @_;
+  my $index = scalar(@so_far);
+  my $indent = "  " x $index;
+
+  print SOURCE <<END_C;
+${indent}  switch (name[$index]) {
+END_C
+
+  foreach my $key (sort keys %$hash) {
+    print SOURCE "${indent}    case '" . ($key eq "\0" ? "\\0" : $key) . "':\n";
+
+    if (ref $hash->{$key} eq 'HASH') {
+        generate_switch($hash->{$key}, @so_far, $key);
+    }
+    else {
+        print SOURCE "${indent}      return " . $hash->{$key} . ";\n";
+    }
+
+    print SOURCE "${indent}      break;\n"; 
+  }
+
+  print SOURCE <<END_C;
+${indent}    default:
+${indent}      return -1;
+${indent}      break;
+${indent}  }
+END_C
+}
