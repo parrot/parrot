@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -244,6 +244,80 @@ CODE
 240
 204
 255
+OUTPUT
+
+# shl/shr tests adapted from t/op/bitwise.t
+
+output_is(<<'CODE', <<'OUTPUT', "shr (>>)");
+    new P0, .PerlInt
+    new P1, .PerlInt
+    new P2, .PerlInt
+    new P3, .PerlInt
+    set P0, 0b001100
+    set P1, 0b010100
+    set P2, 1
+    set P3, 2
+
+    new P4, .PerlInt
+    new P5, .PerlNum
+    new P6, .PerlString
+    new P7, .PerlUndef
+
+    shr P4, P0, P2
+    shr P5, P0, P3
+    shr P6, P1, P2
+    shr P7, P1, P3
+
+    print P4
+    print "\n"
+    print P5
+    print "\n"
+    print P6
+    print "\n"
+    print P7
+    print "\n"
+    end
+CODE
+6
+3
+10
+5
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "shl (<<)");
+    new P0, .PerlInt
+    new P1, .PerlInt
+    new P2, .PerlInt
+    new P3, .PerlInt
+    set P0, 0b001100
+    set P1, 0b010100
+    set P2, 1
+    set P3, 2
+
+    new P4, .PerlInt
+    new P5, .PerlNum
+    new P6, .PerlString
+    new P7, .PerlUndef
+
+    shl P4, P0, P2
+    shl P5, P0, P3
+    shl P6, P1, P2
+    shl P7, P1, P3
+
+    print P4
+    print "\n"
+    print P5
+    print "\n"
+    print P6
+    print "\n"
+    print P7
+    print "\n"
+    end
+CODE
+24
+48
+40
+80
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "inc/dec a PerlUndef");
