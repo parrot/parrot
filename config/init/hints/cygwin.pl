@@ -5,6 +5,6 @@
 # If this later causes problems, it might be worth revisiting.
 # A. Dougherty 9/9/2002
 Configure::Data->set(
-  ld => 'gcc'
-  ld_shared => '-shared'
+  ld => 'gcc',
+  ld_shared => '-shared',
 );
