@@ -1049,9 +1049,8 @@ sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
 /*
  * dynamic loading stuff
  */
-#if defined HAVE_COMPUTED_GOTO
-static void dynop_register_cg(Parrot_Interp, PMC*, op_lib_t *, op_lib_t *);
-#endif
+static void dynop_register_xx(Parrot_Interp, PMC*, op_lib_t *, op_lib_t *,
+        oplib_init_f init_func);
 
 /*=for api interpreter dynop_register
  *
@@ -1065,7 +1064,7 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     oplib_init_f init_func;
     op_func_t *new_func_table;
     op_info_t *new_info_table;
-    size_t i, n_old, n_new;
+    size_t i, n_old, n_new, n_tot;
 
     interpreter->all_op_libs = mem_sys_realloc(interpreter->all_op_libs,
             sizeof(op_lib_t *) * (interpreter->n_libs + 1));
@@ -1076,23 +1075,33 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     interpreter->all_op_libs[interpreter->n_libs++] = lib;
     n_old = interpreter->op_count;
     n_new = lib->op_count;
+    n_tot = n_old + n_new;
+    core = PARROT_CORE_OPLIB_INIT(1);
 
-    /*
-     * allocate new op_func and info tables
-     */
-    new_func_table = mem_sys_allocate(sizeof (void *) * (n_old + n_new));
-    new_info_table = mem_sys_allocate(sizeof (op_info_t) * (n_old + n_new));
-    /* copy old */
-    for (i = 0; i < n_old; ++i) {
-        new_func_table[i] = interpreter->op_func_table[i];
-        new_info_table[i] = interpreter->op_info_table[i];
+    assert(interpreter->op_count == core->op_count);
+    if (core->flags & OP_FUNC_IS_ALLOCATED) {
+        new_func_table = mem_sys_realloc(core->op_func_table,
+                sizeof (void *) * n_tot);
+        new_info_table = mem_sys_realloc(core->op_info_table,
+                sizeof (op_info_t) * n_tot);
+    }
+    else {
+        /*
+         * allocate new op_func and info tables
+         */
+        new_func_table = mem_sys_allocate(sizeof (void *) * n_tot);
+        new_info_table = mem_sys_allocate(sizeof (op_info_t) * n_tot);
+        /* copy old */
+        for (i = 0; i < n_old; ++i) {
+            new_func_table[i] = interpreter->op_func_table[i];
+            new_info_table[i] = interpreter->op_info_table[i];
+        }
     }
     /* add new */
-    for (i = n_old; i < n_old + n_new; ++i) {
+    for (i = n_old; i < n_tot; ++i) {
         new_func_table[i] = ((op_func_t*)lib->op_func_table)[i - n_old];
         new_info_table[i] = lib->op_info_table[i - n_old];
     }
-    core = PARROT_CORE_OPLIB_INIT(1);
     /*
      * deinit core, so that it gets rehashed
      */
@@ -1100,45 +1109,58 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     /* set table */
     core->op_func_table = interpreter->op_func_table = new_func_table;
     core->op_info_table = interpreter->op_info_table = new_info_table;
-    core->op_count = interpreter->op_count = n_old + n_new;
+    core->op_count = interpreter->op_count = n_tot;
+    core->flags = OP_FUNC_IS_ALLOCATED | OP_INFO_IS_ALLOCATED;
     /* done for plain core */
 #if defined HAVE_COMPUTED_GOTO
-    dynop_register_cg(interpreter, lib_pmc, lib, core);
+    dynop_register_xx(interpreter, lib_pmc, lib, core,
+                      PARROT_CORE_CGP_OPLIB_INIT);
+    dynop_register_xx(interpreter, lib_pmc, lib, core,
+                      PARROT_CORE_CG_OPLIB_INIT);
 #endif
+    dynop_register_xx(interpreter, lib_pmc, lib, core,
+                      PARROT_CORE_PREDEREF_OPLIB_INIT);
 }
 
-#if defined HAVE_COMPUTED_GOTO
 /*
- * register op_lib with CGOTO core
+ * register op_lib with other cores
  */
 static void
-dynop_register_cg(Parrot_Interp interpreter, PMC* lib_pmc,
-        op_lib_t *lib, op_lib_t *core)
+dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
+        op_lib_t *lib, op_lib_t *core, oplib_init_f init_func)
 {
     op_lib_t *cg_lib;
     void **ops_addr;
-    size_t i, n_old, n_new;
+    size_t i, n_old, n_new, n_tot;
 
     n_new = lib->op_count;
-    n_old = core->op_count;
+    n_tot = n_old = core->op_count;
+    n_old -= n_new;
 
-    cg_lib = PARROT_CORE_CG_OPLIB_INIT(1);
-    /* TODO check if the lib_pmc exists with a _cg flavor */
+    cg_lib = init_func(1);
+
+    if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
+        cg_lib = mem_sys_realloc(cg_lib, n_tot * sizeof(void *));
+    }
+    else {
+        ops_addr = mem_sys_allocate(n_tot * sizeof(void *));
+        cg_lib->flags = OP_FUNC_IS_ALLOCATED;
+        for (i = 0; i < n_old; ++i)
+            ops_addr[i] = ((void **)cg_lib->op_func_table)[i];
+    }
+    /* TODO check if the lib_pmc exists with a _xx flavor */
 
     /* if not install wrappers */
-    ops_addr = mem_sys_allocate(n_old * sizeof(void *));
-    n_old -= n_new;
-    for (i = 0; i < n_old; ++i)
-        ops_addr[i] = ((void **)cg_lib->op_func_table)[i];
     /* fill new entries with the wrapper op */
-    for (i = n_old; i < n_old + n_new; ++i)
+    for (i = n_old; i < n_tot; ++i)
         ops_addr[i] = ((void **)cg_lib->op_func_table)[CORE_OPS_wrapper__];
     /*
      * tell the cg_core about the new jump table
      */
-    PARROT_CORE_CG_OPLIB_INIT((int) ops_addr);
+    cg_lib->op_func_table = (void *) ops_addr;
+    cg_lib->op_count = n_tot;
+    init_func((int) ops_addr);
 }
-#endif
 
 /*
  * Local variables:

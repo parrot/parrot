@@ -34,6 +34,11 @@ typedef struct {
     int (*op_code)(const char * name, int full);
 } op_lib_t;
 
+typedef enum {
+    OP_FUNC_IS_ALLOCATED = 0x01,
+    OP_INFO_IS_ALLOCATED = 0x02
+} op_lib_flags_enum;
+
 /* when init = true initialize, else de_initialize */
 typedef op_lib_t *(*oplib_init_f)(int init);
 
