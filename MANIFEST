@@ -1,4 +1,4 @@
-Configure.in
+Configure.pl
 MANIFEST
 Makefile
 README
@@ -39,4 +39,5 @@ strnative.h
 t/test.pasm
 t/test2.pasm
 t/test3.pasm
+t/euclid.pasm
 test_main.c
