@@ -22,7 +22,7 @@
 pmclass OrderedHash extends PerlArray {
     void init () {
 	SUPER();
-	Parrot_PerlHash_init(INTERP, SELF);
+	PerlHash.SUPER();
     }
 
     STRING* name() {
@@ -31,12 +31,12 @@ pmclass OrderedHash extends PerlArray {
 
     void mark () {
         SUPER();
-        Parrot_PerlHash_mark(INTERP, SELF);
+        PerlHash.SUPER();
     }
 
     void clone (PMC *dest) {
         SUPER(dest);
-        Parrot_PerlHash_clone(INTERP, SELF, dest);
+        PerlHash.SUPER(dest);
     }
 
     PMC* get_pmc_keyed (PMC* key) {
@@ -44,7 +44,7 @@ pmclass OrderedHash extends PerlArray {
 	    return SUPER(key);
 	}
 	else {
-            INTVAL n = Parrot_PerlHash_get_integer_keyed(INTERP, SELF, key);
+            INTVAL n = PerlHash.SELF.get_integer_keyed(key);
             return DYNSELF.get_pmc_keyed_int(n);
         }
     }
@@ -52,7 +52,7 @@ pmclass OrderedHash extends PerlArray {
     void set_pmc_keyed (PMC* key, PMC* value) {
 	INTVAL n = DYNSELF.elements();
 	DYNSELF.set_pmc_keyed_int(n, value);
-	Parrot_PerlHash_set_integer_keyed(INTERP, SELF, key, n);
+	PerlHash.SELF.set_integer_keyed(key, n);
     }
 
     INTVAL exists_keyed(PMC* key) {
@@ -60,7 +60,7 @@ pmclass OrderedHash extends PerlArray {
 	    return SUPER(key);
 	}
 	else {
-            return Parrot_PerlHash_exists_keyed(INTERP, SELF, key);
+            return PerlHash.SUPER(key);
         }
     }
 
@@ -69,7 +69,7 @@ pmclass OrderedHash extends PerlArray {
 	    return SUPER(key);
 	}
 	else {
-            INTVAL n = Parrot_PerlHash_get_integer_keyed(INTERP, SELF, key);
+            INTVAL n = PerlHash.SELF.get_integer_keyed(key);
             return DYNSELF.defined_keyed_int(n);
         }
     }
@@ -79,8 +79,8 @@ pmclass OrderedHash extends PerlArray {
             SUPER(key);
         }
         else {
-            INTVAL n = Parrot_PerlHash_get_integer_keyed(INTERP, SELF, key);
-            Parrot_PerlHash_delete_keyed(INTERP, SELF, key);
+            INTVAL n = PerlHash.SELF.get_integer_keyed(key);
+            PerlHash.SUPER(key);
             DYNSELF.delete_keyed_int(n);
         }
     }

@@ -87,6 +87,11 @@ I<INTERP> - Converted to the interpreter object.
 
 =item *
 
+I<Otherclass.SELF.method(a,b,c)> - calls the static vtable method 'method'
+in OtherClass.
+
+=item *
+
 I<SELF.method(a,b,c)> - calls the vtable method 'method' using the
 static type of SELF (in other words, calls another method defined in
 the same file).
@@ -99,6 +104,11 @@ dynamic type of SELF
 =item *
 
 I<DYNSELF(a,b,c)> - same as above, but calls the current method
+
+=item *
+
+I<OtherClass.SUPER(a,b,c)> - calls the overridden implementation of the current
+method in OtherClass.
 
 =item *
 
@@ -382,6 +392,9 @@ sub rewrite_method ($$$$$) {
     # Rewrite DYNSUPER(args...)
     s/DYNSUPER\(\s*(.*?)\)/"Parrot_base_vtables[$supertype].$method(".full_arguments($1).")"/eg;
 
+    # Rewrite OtherClass.SUPER(args...)
+    s/(\w+)\.SUPER\(\s*(.*?)\)/"Parrot_${1}_$method(".full_arguments($2).")"/eg;
+
     # Rewrite SUPER(args...)
     s/SUPER\(\s*(.*?)\)/"$supermethod(".full_arguments($1).")"/eg;
 
@@ -390,6 +403,9 @@ sub rewrite_method ($$$$$) {
 
     # Rewrite DYNSELF(args...). See comments above.
     s/DYNSELF\(\s*(.*?)\)/"pmc->vtable->$method(".full_arguments($1).")"/eg;
+
+    # Rewrite OtherClass.SELF.other_method(args...)
+    s/(\w+)\.SELF\.(\w+)\(\s*(.*?)\)/"Parrot_${1}_$2(".full_arguments($3).")"/eg;
 
     # Rewrite SELF.other_method(args...)
     s/SELF\.(\w+)\(\s*(.*?)\)/"Parrot_${class}_$1(".full_arguments($2).")"/eg;
