@@ -65,7 +65,7 @@ struct PRegChunk {
 
 /* This macro masks off the low bits of a register chunk address,
    since we're guaranteed to be aligned */
-#define CHUNK_BASE(x) (void *)(MASK_CHUNK_LOW_BITS & (INTVAL)x)
+#define CHUNK_BASE(x) (void *)(MASK_CHUNK_LOW_BITS & (ptrcast_t)x)
 
 void Parrot_clear_i(struct Parrot_Interp *);
 void Parrot_clear_s(struct Parrot_Interp *);

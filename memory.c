@@ -40,9 +40,9 @@
 */
 void *
 mem_allocate_aligned(INTVAL size) {
-    INTVAL max_to_alloc;
-    INTVAL mask;
-    INTVAL i;
+    ptrcast_t max_to_alloc;
+    ptrcast_t mask;
+    ptrcast_t i;
     void *mem = NULL;
     
     /* Okay, we just brute-force things here. Yeah it's stupid, but it
@@ -58,8 +58,8 @@ mem_allocate_aligned(INTVAL size) {
     }
     
     mem = malloc(max_to_alloc);
-    if (((INTVAL)mem & mask) < (INTVAL)mem) {
-        mem = (void *)(((INTVAL)mem & mask) + ~mask + 1);
+    if (((ptrcast_t)mem & mask) < (ptrcast_t)mem) {
+        mem = (void *)(((ptrcast_t)mem & mask) + ~mask + 1);
     } 
     return mem;
 }

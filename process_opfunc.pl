@@ -32,51 +32,9 @@
 use strict;
 use Parrot::Opcode;
 use Parrot::Config;
+use Parrot::Types;
 
 my %opcodes = Parrot::Opcode::read_ops();
-
-my %opcode;
-
-open GUTS, "include/parrot/interp_guts.h"
-  or die "Could not open include/parrot/interp_guts.h";
-my $opcode;
-while (<GUTS>) {
-    next unless /\tx\[(\d+)\] = ([a-z_]+);/;
-    $opcode{$2}{OPNUM} = $1;
-}
-
-
-my %psize = (i => 1,
-	     n => 1,
-	     I => 1,
-	     N => 1,
-	     D => 1,
-	     S => 1,
-	     s => 1,
-	     );
-
-
-open OPCODE, "opcode_table" or die "Can't open opcode_table, $!/$^E";
-while (<OPCODE>) {
-    s/#.*//;
-    s/^\s+//;
-    chomp;
-    next unless $_;
-    my ($name, $params, @params) = split /\s+/;
-    $opcode{$name}{PARAM_COUNT} = $params;
-    $opcode{$name}{PARAM_ARRAY} = \@params;
-
-    my $psize=0;
-    foreach (@params) {
-       $psize+=$psize{$_};
-    }
-
-
-    $opcode{$name}{RETURN_OFFSET} = 1 + $psize;
-    my $count = 1;
-    $opcode{$name}{PARAMETER_SUB} = ["", 
-	map { "cur_opcode[" . $count++ . "]" } @params];
-}
 
 my $orig = my $file = $ARGV[0];
 open INPUT, $file or die "Can't open $file, $!/$^E";
@@ -126,7 +84,7 @@ while (<INPUT>) {
 
     s/NUM_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->number/g;
     s/STR_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->string/g;
-    s/INT_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->integer/g;
+    s/INT_CONST\(([^)]+)\)/$1/g;
 
     if (/^}/) {
         print OUTPUT $footer, "\n";
@@ -140,14 +98,8 @@ sub emit_auto_header {
     my $line = shift;
     my ($name) = $line =~ /AUTO_OP\s+(\w+)/;
 
-    my $psize=0;
-    foreach (@{$opcodes{$name}{TYPES}}) {
-       $psize+=$psize{$_};
-    }
-    my $return_offset = $psize + 1;
+    my $return_offset = $opcodes{$name}{RETURN_OFFSET};
 
-    $opcode{$name}{RETURN_OFFSET} = 1 + $psize;
-    
     print OUTPUT ("opcode_t *$opcodes{$name}{FUNC}".
 		  "(opcode_t cur_opcode[], struct Parrot_Interp *interpreter) {\n");
     return($name, "  return cur_opcode + " . $return_offset . ";\n}\n");
@@ -157,13 +109,7 @@ sub emit_manual_header {
     my $line = shift;
     my ($name) = $line =~ /MANUAL_OP\s+(\w+)/;
     
-    my $psize=0;
-    foreach (@{$opcodes{$name}{TYPES}}) {
-       $psize+=$psize{$_};
-    }
-    my $return_offset = $psize + 1;
-
-    $opcode{$name}{RETURN_OFFSET} = 1 + $psize;
+    my $return_offset = $opcodes{$name}{RETURN_OFFSET};
     
     print OUTPUT ("opcode_t *$opcodes{$name}{FUNC}".
 		  "(opcode_t cur_opcode[], struct Parrot_Interp *interpreter) {\n");

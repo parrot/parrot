@@ -17,7 +17,7 @@
 */
 
 struct PackFile_FixupTable {
-    INTVAL                    dummy;
+    opcode_t                    dummy;
 };
 
 #define PFC_NONE    '\0'
@@ -26,24 +26,24 @@ struct PackFile_FixupTable {
 #define PFC_STRING  's'
 
 struct PackFile_Constant {
-    INTVAL       type;
-    INTVAL       integer;
+    opcode_t       type;
+    opcode_t       integer;
     FLOATVAL       number;
     STRING * string;
 };
 
 
 struct PackFile_ConstTable {
-    INTVAL                           const_count;
+    opcode_t                           const_count;
     struct PackFile_Constant **  constants;
 };
 
 
 struct PackFile {
-    INTVAL                           magic;
+    opcode_t                           magic;
     struct PackFile_FixupTable * fixup_table;
     struct PackFile_ConstTable * const_table;
-    INTVAL                           byte_code_size;
+    opcode_t                           byte_code_size;
     char *                       byte_code;
 };
 
@@ -61,25 +61,25 @@ PackFile_DELETE(struct PackFile * self);
 void
 PackFile_clear(struct PackFile * self);
 
-INTVAL
+opcode_t
 PackFile_get_magic(struct PackFile * self);
 
 void 
-PackFile_set_magic(struct PackFile * self, INTVAL magic);
+PackFile_set_magic(struct PackFile * self, opcode_t magic);
 
-INTVAL
+opcode_t
 PackFile_get_byte_code_size(struct PackFile * self);
 
 char *
 PackFile_get_byte_code(struct PackFile * self);
 
 void
-PackFile_set_byte_code(struct PackFile * self, INTVAL byte_code_size, char * byte_code);
+PackFile_set_byte_code(struct PackFile * self, opcode_t byte_code_size, char * byte_code);
 
-INTVAL
-PackFile_unpack(struct PackFile * self, char * packed, INTVAL packed_size);
+opcode_t
+PackFile_unpack(struct PackFile * self, char * packed, opcode_t packed_size);
 
-INTVAL
+opcode_t
 PackFile_pack_size(struct PackFile * self);
 
 void
@@ -102,10 +102,10 @@ PackFile_FixupTable_DELETE(struct PackFile_FixupTable * self);
 void
 PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
 
-INTVAL
-PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, char * packed, INTVAL packed_size);
+opcode_t
+PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, char * packed, opcode_t packed_size);
 
-INTVAL
+opcode_t
 PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 
 void
@@ -128,19 +128,19 @@ PackFile_ConstTable_DELETE(struct PackFile_ConstTable * self);
 void
 PackFile_ConstTable_clear(struct PackFile_ConstTable * self);
 
-INTVAL
+opcode_t
 PackFile_ConstTable_get_const_count(struct PackFile_ConstTable * self);
 
 void
 PackFile_ConstTable_push_constant(struct PackFile_ConstTable * self, struct PackFile_Constant * constant);
 
 struct PackFile_Constant *
-PackFile_ConstTable_constant(struct PackFile_ConstTable * self, INTVAL index);
+PackFile_ConstTable_constant(struct PackFile_ConstTable * self, opcode_t index);
 
-INTVAL
-PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, INTVAL packed_size);
+opcode_t
+PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, opcode_t packed_size);
 
-INTVAL
+opcode_t
 PackFile_ConstTable_pack_size(struct PackFile_ConstTable * self);
 
 void
@@ -158,7 +158,7 @@ struct PackFile_Constant *
 PackFile_Constant_new(void);
 
 struct PackFile_Constant *
-PackFile_Constant_new_integer(INTVAL i);
+PackFile_Constant_new_integer(opcode_t i);
 
 struct PackFile_Constant *
 PackFile_Constant_new_number(FLOATVAL n);
@@ -172,11 +172,11 @@ PackFile_Constant_DELETE(struct PackFile_Constant * self);
 void
 PackFile_Constant_clear(struct PackFile_Constant * self);
 
-INTVAL
+opcode_t
 PackFile_Constant_get_type(struct PackFile_Constant * self);
 
 void
-PackFile_Constant_set_integer(struct PackFile_Constant * self, INTVAL i);
+PackFile_Constant_set_integer(struct PackFile_Constant * self, opcode_t i);
 
 void
 PackFile_Constant_set_number(struct PackFile_Constant * self, FLOATVAL n);
@@ -184,19 +184,19 @@ PackFile_Constant_set_number(struct PackFile_Constant * self, FLOATVAL n);
 void
 PackFile_Constant_set_string(struct PackFile_Constant * self, STRING * s);
 
-INTVAL
-PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, INTVAL packed_size);
+opcode_t
+PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
 
-INTVAL
-PackFile_Constant_unpack_integer(struct PackFile_Constant * self, char * packed, INTVAL packed_size);
+opcode_t
+PackFile_Constant_unpack_integer(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
 
-INTVAL
-PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, INTVAL packed_size);
+opcode_t
+PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
 
-INTVAL
-PackFile_Constant_unpack_string(struct PackFile_Constant * self, char * packed, INTVAL packed_size);
+opcode_t
+PackFile_Constant_unpack_string(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
 
-INTVAL
+opcode_t
 PackFile_Constant_pack_size(struct PackFile_Constant * self);
 
 void

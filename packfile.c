@@ -166,7 +166,7 @@ here for completeness of the interface.
 
 ***************************************/
 
-INTVAL
+opcode_t
 PackFile_get_magic(struct PackFile * self) {
     return self->magic;
 }
@@ -184,7 +184,7 @@ here for completeness of the interface.
 ***************************************/
 
 void 
-PackFile_set_magic(struct PackFile * self, INTVAL magic) {
+PackFile_set_magic(struct PackFile * self, opcode_t magic) {
     self->magic = magic;
 }
 
@@ -199,7 +199,7 @@ Get the size of the byte code.
 
 ***************************************/
 
-INTVAL
+opcode_t
 PackFile_get_byte_code_size(struct PackFile * self) {
     return self->byte_code_size;
 }
@@ -237,7 +237,7 @@ own the memory for the input byte code.
 ***************************************/
 
 void
-PackFile_set_byte_code(struct PackFile * self, INTVAL byte_code_size, char * byte_code) {
+PackFile_set_byte_code(struct PackFile * self, opcode_t byte_code_size, char * byte_code) {
     if (self->byte_code) {
         mem_sys_free(self->byte_code);
         self->byte_code = NULL;
@@ -267,15 +267,15 @@ PackFile_set_byte_code(struct PackFile * self, INTVAL byte_code_size, char * byt
 
 Unpack a PackFile from a block of memory. The format is:
 
-  INTVAL magic
+  opcode_t magic
 
-  INTVAL segment_length
+  opcode_t segment_length
   *  fixup_segment
 
-  INTVAL segment_length
+  opcode_t segment_length
   *  const_segment
 
-  INTVAL segment_length
+  opcode_t segment_length
   *  byte_code
 
 Checks to see if the magic matches the Parrot magic number for
@@ -287,11 +287,11 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
-PackFile_unpack(struct PackFile * self, char * packed, INTVAL packed_size) {
-    INTVAL     segment_size;
+opcode_t
+PackFile_unpack(struct PackFile * self, char * packed, opcode_t packed_size) {
+    opcode_t     segment_size;
     char * cursor;
-    INTVAL *   iv_ptr;
+    opcode_t *   op_ptr;
 
     if (!self) {
         fprintf(stderr, "PackFile_unpack: self == NULL!\n");
@@ -306,9 +306,9 @@ PackFile_unpack(struct PackFile * self, char * packed, INTVAL packed_size) {
     ** Unpack and verify the magic:
     */
 
-    iv_ptr = (INTVAL *)cursor;
-    self->magic = *iv_ptr;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    self->magic = *op_ptr;
+    cursor += sizeof(opcode_t);
 
     if (self->magic != PARROT_MAGIC) {
         fprintf(stderr, "PackFile_unpack: Not a Parrot PackFile!\n");
@@ -323,17 +323,17 @@ PackFile_unpack(struct PackFile * self, char * packed, INTVAL packed_size) {
     ** Unpack the Fixup Table Segment:
     */
 
-    iv_ptr = (INTVAL *)cursor;
-    segment_size = *iv_ptr;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    segment_size = *op_ptr;
+    cursor += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_unpack(): Unpacking %ld bytes for fixup table...\n", segment_size);
 #endif
     
-    if (segment_size % sizeof(INTVAL)) {
+    if (segment_size % sizeof(opcode_t)) {
         fprintf(stderr, "PackFile_unpack: Illegal fixup table segment size %d (must be multiple of %d)!\n",
-            segment_size, sizeof(INTVAL));
+            segment_size, sizeof(opcode_t));
         return 0;
     }
 
@@ -348,17 +348,17 @@ PackFile_unpack(struct PackFile * self, char * packed, INTVAL packed_size) {
     ** Unpack the Constant Table Segment:
     */
 
-    iv_ptr = (INTVAL *)cursor;
-    segment_size = *iv_ptr;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    segment_size = *op_ptr;
+    cursor += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_unpack(): Unpacking %ld bytes for constant table...\n", segment_size);
 #endif
     
-    if (segment_size % sizeof(INTVAL)) {
+    if (segment_size % sizeof(opcode_t)) {
         fprintf(stderr, "PackFile_unpack: Illegal constant table segment size %d (must be multiple of %d)!\n",
-            segment_size, sizeof(INTVAL));
+            segment_size, sizeof(opcode_t));
         return 0;
     }
     
@@ -373,9 +373,9 @@ PackFile_unpack(struct PackFile * self, char * packed, INTVAL packed_size) {
     ** Unpack the Byte Code Segment:
     */
 
-    iv_ptr = (INTVAL *)cursor;
-    segment_size = *iv_ptr;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    segment_size = *op_ptr;
+    cursor += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_unpack(): Unpacking %ld bytes for byte code...\n", segment_size);
@@ -410,15 +410,15 @@ contiguous region of memory.
 
 ***************************************/
 
-INTVAL
+opcode_t
 PackFile_pack_size(struct PackFile * self) {
-    INTVAL magic_size;
-    INTVAL segment_length_size;
-    INTVAL fixup_table_size;
-    INTVAL const_table_size;
+    opcode_t magic_size;
+    opcode_t segment_length_size;
+    opcode_t fixup_table_size;
+    opcode_t const_table_size;
 
-    magic_size          = sizeof(INTVAL);
-    segment_length_size = sizeof(INTVAL);
+    magic_size          = sizeof(opcode_t);
+    segment_length_size = sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("getting fixup table size...\n");
@@ -462,39 +462,39 @@ PackFile_pack_size()!
 void
 PackFile_pack(struct PackFile * self, char * packed) {
     char * cursor              = packed;
-    INTVAL *   iv_ptr;
-    INTVAL     fixup_table_size    = PackFile_FixupTable_pack_size(self->fixup_table);
-    INTVAL     const_table_size    = PackFile_ConstTable_pack_size(self->const_table);
+    opcode_t *   op_ptr;
+    opcode_t     fixup_table_size    = PackFile_FixupTable_pack_size(self->fixup_table);
+    opcode_t     const_table_size    = PackFile_ConstTable_pack_size(self->const_table);
 
     /* Pack the magic */
 
-    iv_ptr = (INTVAL *)cursor;
-    *iv_ptr = self->magic;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    *op_ptr = self->magic;
+    cursor += sizeof(opcode_t);
 
     /* Pack the fixup table size, followed by the packed fixup table */
 
-    iv_ptr = (INTVAL *)cursor;
-    *iv_ptr = fixup_table_size;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    *op_ptr = fixup_table_size;
+    cursor += sizeof(opcode_t);
 
     PackFile_FixupTable_pack(self->fixup_table, cursor);
     cursor += fixup_table_size;
 
     /* Pack the constant table size, followed by the packed constant table */
 
-    iv_ptr = (INTVAL *)cursor;
-    *iv_ptr = const_table_size;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    *op_ptr = const_table_size;
+    cursor += sizeof(opcode_t);
     
     PackFile_ConstTable_pack(self->const_table, cursor);
     cursor += const_table_size;
 
     /* Pack the byte code size, followed by the byte code */
 
-    iv_ptr = (INTVAL *)cursor;
-    *iv_ptr = self->byte_code_size;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    *op_ptr = self->byte_code_size;
+    cursor += sizeof(opcode_t);
 
     if (self->byte_code_size) {
         mem_sys_memcopy(cursor, self->byte_code, self->byte_code_size);
@@ -516,7 +516,7 @@ Dump the PackFile to standard out in a human-readable form.
 
 void
 PackFile_dump(struct PackFile * self) {
-    INTVAL i;
+    opcode_t i;
 
     printf("MAGIC => 0x%08x,\n", self->magic);
 
@@ -538,7 +538,7 @@ PackFile_dump(struct PackFile * self) {
         if (i % 8 == 0) {
             printf("\n    %08x:  ", i * 4);
         }
-        printf("%08x ", ((INTVAL *)(self->byte_code))[i]);
+        printf("%08x ", ((opcode_t *)(self->byte_code))[i]);
     }
 
     printf("\n]\n");
@@ -645,8 +645,8 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
-PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, char * packed, INTVAL packed_size) {
+opcode_t
+PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, char * packed, opcode_t packed_size) {
     return 1;
 }
 
@@ -662,7 +662,7 @@ contiguous region of memory.
 
 ***************************************/
 
-INTVAL
+opcode_t
 PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self) {
     return 0;
 }
@@ -781,7 +781,7 @@ Clear a PackFile ConstTable.
 
 void
 PackFile_ConstTable_clear(struct PackFile_ConstTable * self) {
-    INTVAL i;
+    opcode_t i;
 
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_DELETE: self == NULL!\n");
@@ -812,7 +812,7 @@ Get the number of constants in the ConstTable.
 
 ***************************************/
 
-INTVAL
+opcode_t
 PackFile_ConstTable_get_const_count(struct PackFile_ConstTable * self) {
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_get_const_count: self == NULL!\n");
@@ -837,7 +837,7 @@ to the ConstTable.
 void
 PackFile_ConstTable_push_constant(struct PackFile_ConstTable * self, struct PackFile_Constant * constant) {
     struct PackFile_Constant ** temp;
-    INTVAL                   i;
+    opcode_t                   i;
 
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_push_constant: self == NULL!\n");
@@ -881,7 +881,7 @@ Retrieve a Constant from the ConstTable.
 ***************************************/
 
 struct PackFile_Constant *
-PackFile_ConstTable_constant(struct PackFile_ConstTable * self, INTVAL index) {
+PackFile_ConstTable_constant(struct PackFile_ConstTable * self, opcode_t index) {
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_constant: self == NULL!\n");
         return NULL;
@@ -901,7 +901,7 @@ PackFile_ConstTable_constant(struct PackFile_ConstTable * self, INTVAL index) {
 
 Unpack a PackFile ConstTable from a block of memory. The format is:
 
-  INTVAL const_count
+  opcode_t const_count
   *  constants
 
 Returns one (1) if everything is OK, else zero (0).
@@ -910,11 +910,11 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
-PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, INTVAL packed_size) {
+opcode_t
+PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, opcode_t packed_size) {
     char * cursor;
-    INTVAL *   iv_ptr;
-    INTVAL     i;
+    opcode_t *   op_ptr;
+    opcode_t     i;
 
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_unpack: self == NULL!\n");
@@ -925,9 +925,9 @@ PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, INT
 
     cursor = packed;
 
-    iv_ptr = (INTVAL *)cursor;
-    self->const_count = *iv_ptr;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    self->const_count = *op_ptr;
+    cursor += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_ConstTable_unpack(): Unpacking %ld constants...\n", self->const_count);
@@ -972,10 +972,10 @@ contiguous region of memory.
 
 ***************************************/
 
-INTVAL
+opcode_t
 PackFile_ConstTable_pack_size(struct PackFile_ConstTable * self) {
-    INTVAL i;
-    INTVAL size = 0;
+    opcode_t i;
+    opcode_t size = 0;
 
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_size: self == NULL!\n");
@@ -989,7 +989,7 @@ PackFile_ConstTable_pack_size(struct PackFile_ConstTable * self) {
         size += PackFile_Constant_pack_size(self->constants[i]);
     }
 
-    return sizeof(INTVAL) + size;
+    return sizeof(opcode_t) + size;
 }
 
 
@@ -1008,8 +1008,8 @@ PackFile_ConstTable_pack_size()!
 void
 PackFile_ConstTable_pack(struct PackFile_ConstTable * self, char * packed) {
     char * cursor;
-    INTVAL *   iv_ptr;
-    INTVAL     i;
+    opcode_t *   op_ptr;
+    opcode_t     i;
 
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_pack: self == NULL!\n");
@@ -1018,9 +1018,9 @@ PackFile_ConstTable_pack(struct PackFile_ConstTable * self, char * packed) {
 
     cursor = packed;
 
-    iv_ptr = (INTVAL *)cursor;
-    *iv_ptr = self->const_count;
-    cursor += sizeof(INTVAL);
+    op_ptr = (opcode_t *)cursor;
+    *op_ptr = self->const_count;
+    cursor += sizeof(opcode_t);
 
     for(i = 0; i < self->const_count; i++) {
         PackFile_Constant_pack(self->constants[i], cursor);
@@ -1044,7 +1044,7 @@ Dump the PackFile ConstTable to standard output.
 
 void
 PackFile_ConstTable_dump(struct PackFile_ConstTable * self) {
-    INTVAL     i;
+    opcode_t     i;
 
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_dump: self == NULL!\n");
@@ -1106,14 +1106,14 @@ PackFile_Constant_new(void) {
 
 =item new_integer
 
-Allocate a new PackFile Constant containing an INTVAL.
+Allocate a new PackFile Constant containing an opcode_t.
 
 =cut
 
 ***************************************/
 
 struct PackFile_Constant *
-PackFile_Constant_new_integer(INTVAL i) {
+PackFile_Constant_new_integer(opcode_t i) {
     struct PackFile_Constant * self = mem_sys_allocate(sizeof(struct PackFile_Constant));
 
     self->type    = PFC_INTEGER;
@@ -1248,7 +1248,7 @@ Get the Constant type.
 
 ***************************************/
 
-INTVAL
+opcode_t
 PackFile_Constant_get_type(struct PackFile_Constant * self) {
     if (!self) {
         /* TODO: Is it OK to be silent about this? */
@@ -1265,8 +1265,8 @@ PackFile_Constant_get_type(struct PackFile_Constant * self) {
 
 Unpack a PackFile Constant from a block of memory. The format is:
 
-  INTVAL type
-  INTVAL size
+  opcode_t type
+  opcode_t size
   *  data
 
 Returns one (1) if everything is OK, else zero (0).
@@ -1275,11 +1275,11 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
-PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, INTVAL packed_size) {
+opcode_t
+PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
     char * cursor;
-    INTVAL     type;
-    INTVAL     size;
+    opcode_t     type;
+    opcode_t     size;
 
     if (!self) {
         return 0;
@@ -1287,15 +1287,15 @@ PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, INTVAL 
 
     cursor    = packed;
 
-    type      = *(INTVAL *)cursor;
-    cursor   += sizeof(INTVAL);
+    type      = *(opcode_t *)cursor;
+    cursor   += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack(): Type is %ld ('%c')...\n", type, (char)type);
 #endif
 
-    size      = *(INTVAL *)cursor;
-    cursor   += sizeof(INTVAL);
+    size      = *(opcode_t *)cursor;
+    cursor   += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack(): Size is %ld...\n", size);
@@ -1345,7 +1345,7 @@ PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, INTVAL 
 
 Unpack a PackFile Constant integer from a block of memory. The format is:
 
-  INTVAL value
+  opcode_t value
 
 Returns one (1) if everything is OK, else zero (0).
 
@@ -1353,10 +1353,10 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
-PackFile_Constant_unpack_integer(struct PackFile_Constant * self, char * packed, INTVAL packed_size) {
+opcode_t
+PackFile_Constant_unpack_integer(struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
     char * cursor;
-    INTVAL     value;
+    opcode_t     value;
 
     if (!self) {
         return 0;
@@ -1366,8 +1366,8 @@ PackFile_Constant_unpack_integer(struct PackFile_Constant * self, char * packed,
 
     cursor    = packed;
 
-    value     = *(INTVAL *)cursor;
-    cursor   += sizeof(INTVAL);
+    value     = *(opcode_t *)cursor;
+    cursor   += sizeof(opcode_t);
 
     self->type    = PFC_INTEGER;
     self->integer = value;
@@ -1394,8 +1394,8 @@ picky platforms?
 
 ***************************************/
 
-INTVAL
-PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, INTVAL packed_size) {
+opcode_t
+PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
     char * cursor;
     FLOATVAL     value;
 
@@ -1408,7 +1408,7 @@ PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, 
     cursor    = packed;
 
     mem_sys_memcopy( &value, cursor, sizeof(FLOATVAL) );
-    cursor   += sizeof(INTVAL);
+    cursor   += sizeof(opcode_t);
 
     self->type   = PFC_NUMBER;
     self->number = value;
@@ -1423,13 +1423,13 @@ PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, 
 
 Unpack a PackFile Constant from a block of memory. The format is:
 
-  INTVAL flags
-  INTVAL encoding
-  INTVAL type
-  INTVAL size
+  opcode_t flags
+  opcode_t encoding
+  opcode_t type
+  opcode_t size
   *  data
 
-The data is expected to be zero-padded to an INTVAL-boundary, so any
+The data is expected to be zero-padded to an opcode_t-boundary, so any
 pad bytes are removed.
 
 Returns one (1) if everything is OK, else zero (0).
@@ -1438,13 +1438,13 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
-PackFile_Constant_unpack_string(struct PackFile_Constant * self, char * packed, INTVAL packed_size) {
+opcode_t
+PackFile_Constant_unpack_string(struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
     char * cursor;
-    INTVAL     flags;
-    INTVAL     encoding;
-    INTVAL     type;
-    INTVAL     size;
+    opcode_t     flags;
+    opcode_t     encoding;
+    opcode_t     type;
+    opcode_t     size;
 
     if (!self) {
         return 0;
@@ -1454,29 +1454,29 @@ PackFile_Constant_unpack_string(struct PackFile_Constant * self, char * packed, 
 
     cursor    = packed;
 
-    flags     = *(INTVAL *)cursor;
-    cursor   += sizeof(INTVAL);
+    flags     = *(opcode_t *)cursor;
+    cursor   += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack_string(): flags are 0x%04x...\n", flags);
 #endif
 
-    encoding  = *(INTVAL *)cursor;
-    cursor   += sizeof(INTVAL);
+    encoding  = *(opcode_t *)cursor;
+    cursor   += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack_string(): encoding is %ld...\n", encoding);
 #endif
 
-    type      = *(INTVAL *)cursor;
-    cursor   += sizeof(INTVAL);
+    type      = *(opcode_t *)cursor;
+    cursor   += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack_string(): type is %ld...\n", type);
 #endif
 
-    size      = *(INTVAL *)cursor;
-    cursor   += sizeof(INTVAL);
+    size      = *(opcode_t *)cursor;
+    cursor   += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack_string(): size is %ld...\n", size);
@@ -1500,10 +1500,10 @@ contiguous region of memory.
 
 ***************************************/
 
-INTVAL
+opcode_t
 PackFile_Constant_pack_size(struct PackFile_Constant * self) {
-    INTVAL packed_size;
-    INTVAL padded_size;
+    opcode_t packed_size;
+    opcode_t padded_size;
 
     if (!self) {
         /* TODO: OK to gloss over this? */
@@ -1515,7 +1515,7 @@ PackFile_Constant_pack_size(struct PackFile_Constant * self) {
             break;
  
         case PFC_INTEGER:
-            packed_size = sizeof(INTVAL);
+            packed_size = sizeof(opcode_t);
             break;
  
         case PFC_NUMBER:
@@ -1525,11 +1525,11 @@ PackFile_Constant_pack_size(struct PackFile_Constant * self) {
         case PFC_STRING:
             padded_size = self->string->bufused;
 
-            if (padded_size % sizeof(INTVAL)) {
-                padded_size += sizeof(INTVAL) - (padded_size % sizeof(INTVAL));
+            if (padded_size % sizeof(opcode_t)) {
+                padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
             }
 
-            packed_size = 4 * sizeof(INTVAL) + padded_size;
+            packed_size = 4 * sizeof(opcode_t) + padded_size;
             break;
 
         default:
@@ -1538,7 +1538,7 @@ PackFile_Constant_pack_size(struct PackFile_Constant * self) {
 
     /* Tack on space for the initial type and size fields */
 
-    return packed_size + 2 * sizeof(INTVAL);
+    return packed_size + 2 * sizeof(opcode_t);
 }
 
 
@@ -1550,7 +1550,7 @@ Pack the PackFile Constant into a contiguous region of memory. NOTE: The memory
 block had better have at least the amount of memory indicated by
 PackFile_Constant_pack_size()!
 
-The data is zero-padded to an INTVAL-boundary, so pad bytes may be added.
+The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 
 =cut
 
@@ -1559,11 +1559,11 @@ The data is zero-padded to an INTVAL-boundary, so pad bytes may be added.
 void
 PackFile_Constant_pack(struct PackFile_Constant * self, char * packed) {
     char * cursor;
-    INTVAL *   iv_ptr;
+    opcode_t *   op_ptr;
     FLOATVAL *   nv_ptr;
-    INTVAL     i;
-    INTVAL     padded_size;
-    INTVAL     packed_size;
+    opcode_t     i;
+    opcode_t     padded_size;
+    opcode_t     packed_size;
 
     if (!self) {
         /* TODO: OK to be silent here? */
@@ -1572,33 +1572,33 @@ PackFile_Constant_pack(struct PackFile_Constant * self, char * packed) {
 
     cursor  = packed;
 
-    iv_ptr  = (INTVAL *)cursor;
-    *iv_ptr = self->type;
-    cursor += sizeof(INTVAL);
+    op_ptr  = (opcode_t *)cursor;
+    *op_ptr = self->type;
+    cursor += sizeof(opcode_t);
 
     switch (self->type) {
         case PFC_NONE:
-            iv_ptr  = (INTVAL *)cursor;
-            *iv_ptr = 0;
-            cursor += sizeof(INTVAL);
+            op_ptr  = (opcode_t *)cursor;
+            *op_ptr = 0;
+            cursor += sizeof(opcode_t);
 
             /* TODO: OK to be silent here? */
             break;
 
         case PFC_INTEGER:
-            iv_ptr  = (INTVAL *)cursor;
-            *iv_ptr = sizeof(INTVAL);
-            cursor += sizeof(INTVAL);
+            op_ptr  = (opcode_t *)cursor;
+            *op_ptr = sizeof(opcode_t);
+            cursor += sizeof(opcode_t);
 
-            iv_ptr  = (INTVAL *)cursor;
-            *iv_ptr = self->integer;
-            cursor += sizeof(INTVAL);
+            op_ptr  = (opcode_t *)cursor;
+            *op_ptr = self->integer;
+            cursor += sizeof(opcode_t);
             break;
 
         case PFC_NUMBER:
-            iv_ptr  = (INTVAL *)cursor;
-            *iv_ptr = sizeof(FLOATVAL);
-            cursor += sizeof(INTVAL);
+            op_ptr  = (opcode_t *)cursor;
+            *op_ptr = sizeof(FLOATVAL);
+            cursor += sizeof(opcode_t);
 
             nv_ptr  = (FLOATVAL *)cursor;
             *nv_ptr = self->number;
@@ -1608,38 +1608,38 @@ PackFile_Constant_pack(struct PackFile_Constant * self, char * packed) {
         case PFC_STRING:
             padded_size = self->string->bufused;
 
-            if (padded_size % sizeof(INTVAL)) {
-                padded_size += sizeof(INTVAL) - (padded_size % sizeof(INTVAL));
+            if (padded_size % sizeof(opcode_t)) {
+                padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
             }
 
-            packed_size = 4 * sizeof(INTVAL) + padded_size;
+            packed_size = 4 * sizeof(opcode_t) + padded_size;
 
-            iv_ptr  = (INTVAL *)cursor;
-            *iv_ptr = packed_size;
-            cursor += sizeof(INTVAL);
+            op_ptr  = (opcode_t *)cursor;
+            *op_ptr = packed_size;
+            cursor += sizeof(opcode_t);
 
-            iv_ptr  = (INTVAL *)cursor;
-            *iv_ptr = self->string->flags;
-            cursor += sizeof(INTVAL);
+            op_ptr  = (opcode_t *)cursor;
+            *op_ptr = self->string->flags;
+            cursor += sizeof(opcode_t);
 
-            iv_ptr  = (INTVAL *)cursor;
-            *iv_ptr = self->string->encoding->which;
-            cursor += sizeof(INTVAL);
+            op_ptr  = (opcode_t *)cursor;
+            *op_ptr = self->string->encoding->which;
+            cursor += sizeof(opcode_t);
 
-            iv_ptr  = (INTVAL *)cursor;
-            *iv_ptr = self->string->type;
-            cursor += sizeof(INTVAL);
+            op_ptr  = (opcode_t *)cursor;
+            *op_ptr = self->string->type;
+            cursor += sizeof(opcode_t);
 
-            iv_ptr  = (INTVAL *)cursor;
-            *iv_ptr = self->string->bufused;
-            cursor += sizeof(INTVAL);
+            op_ptr  = (opcode_t *)cursor;
+            *op_ptr = self->string->bufused;
+            cursor += sizeof(opcode_t);
 
             if (self->string->bufstart) {
                 mem_sys_memcopy(cursor, self->string->bufstart, self->string->bufused);
                 cursor += self->string->bufused;
 
-                if (self->string->bufused % sizeof(INTVAL)) {
-                    for(i = 0; i < (sizeof(INTVAL) - (self->string->bufused % sizeof(INTVAL))); i++) {
+                if (self->string->bufused % sizeof(opcode_t)) {
+                    for(i = 0; i < (sizeof(opcode_t) - (self->string->bufused % sizeof(opcode_t))); i++) {
                         cursor[i] = 0;
                     }
                 }

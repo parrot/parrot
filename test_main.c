@@ -94,8 +94,11 @@ main(int argc, char **argv) {
         }
         
         pf = PackFile_new();
-        PackFile_unpack(pf, (char *)program_code, program_size);
-        
+        if( !PackFile_unpack(pf, (char *)program_code, program_size) ) {
+            printf( "Can't unpack.\n" );
+            return 1;
+        }
+
         if (tracing) {
             interpreter->flags |= PARROT_TRACE_FLAG;
         }

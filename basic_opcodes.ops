@@ -9,7 +9,7 @@
 
 /* SET Ix, CONSTANT */
 AUTO_OP set_i_ic {
-  INT_REG(P1) = P2;
+  INT_REG(P1) = INT_CONST(P2);
 }
   
 /* SET Ix, Ix */
@@ -50,91 +50,91 @@ AUTO_OP mod_i {
 /* EQ Ix, Iy, EQ_BRANCH */
 MANUAL_OP eq_i_ic {
   if (INT_REG(P1) == INT_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* EQ Ix, CONSTANT, EQ_BRANCH */
 MANUAL_OP eq_ic_ic {
-  if (INT_REG(P1) == P2) {
-    RETURN(P3);
+  if (INT_REG(P1) == INT_CONST(P2)) {
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* NE Ix, Iy, NE_BRANCH */
 MANUAL_OP ne_i_ic {
   if (INT_REG(P1) != INT_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* NE Ix, CONSTANT, NE_BRANCH */
 MANUAL_OP ne_ic_ic {
-  if (INT_REG(P1) != P2) {
-    RETURN(P3);
+  if (INT_REG(P1) != INT_CONST(P2)) {
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* LT Ix, Iy, LT_BRANCH */
 MANUAL_OP lt_i_ic {
   if (INT_REG(P1) < INT_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* LT Ix, CONSTANT, LT_BRANCH */
 MANUAL_OP lt_ic_ic {
-  if (INT_REG(P1) < P2) {
-    RETURN(P3);
+  if (INT_REG(P1) < INT_CONST(P2)) {
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* LE Ix, Iy, LE_BRANCH */
 MANUAL_OP le_i_ic {
   if (INT_REG(P1) <= INT_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* LE Ix, CONSTANT, LE_BRANCH */
 MANUAL_OP le_ic_ic {
-  if (INT_REG(P1) <= P2) {
-    RETURN(P3);
+  if (INT_REG(P1) <= INT_CONST(P2)) {
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* GT Ix, Iy, GT_BRANCH */
 MANUAL_OP gt_i_ic {
   if (INT_REG(P1) > INT_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* GT Ix, CONSTANT, GT_BRANCH */
 MANUAL_OP gt_ic_ic {
-  if (INT_REG(P1) > P2) {
-    RETURN(P3);
+  if (INT_REG(P1) > INT_CONST(P2)) {
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* GE Ix, Iy, GE_BRANCH */
 MANUAL_OP ge_i_ic {
   if (INT_REG(P1) >= INT_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* GE Ix, CONSTANT, GE_BRANCH */
 MANUAL_OP ge_ic_ic {
-  if (INT_REG(P1) >= P2) {
-    RETURN(P3);
+  if (INT_REG(P1) >= INT_CONST(P2)) {
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* IF IXx, TRUE_BRANCH */
 MANUAL_OP if_i_ic {
   if (INT_REG(P1)) {
-    RETURN(P2);
+    RETURN(INT_CONST(P2));
   }
 }
 
@@ -150,13 +150,13 @@ AUTO_OP print_i {
 
 /* PRINT ic */
 AUTO_OP print_ic {
-  printf("%li", (long) P1);
+  printf("%li", (long) INT_CONST(P1));
 }
 
  
 /* BRANCH CONSTANT */
 MANUAL_OP branch_ic {
-  RETURN(P1);
+  RETURN(INT_CONST(P1));
 }
 
 /* END */
@@ -171,7 +171,7 @@ AUTO_OP inc_i {
 
 /* INC Ix, nnn */
 AUTO_OP inc_i_ic {
-  INT_REG(P1) += P2;
+  INT_REG(P1) += INT_CONST(P2);
 }
 
 /* DEC Ix */
@@ -181,7 +181,7 @@ AUTO_OP dec_i {
 
 /* DEC Ix, nnn */
 AUTO_OP dec_i_ic {
-  INT_REG(P1) -= P2;
+  INT_REG(P1) -= INT_CONST(P2);
 }
 
 /* JUMP Ix */
@@ -226,91 +226,91 @@ AUTO_OP div_n {
 /* EQ Nx, Ny, EQ_BRANCH */
 MANUAL_OP eq_n_ic {
   if (NUM_REG(P1) == NUM_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* EQ Nx, CONSTANT, EQ_BRANCH */
 MANUAL_OP eq_nc_ic {
   if (NUM_REG(P1) == NUM_CONST(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* NE Nx, Ny, NE_BRANCH */
 MANUAL_OP ne_n_ic {
   if (NUM_REG(P1) != NUM_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* NE Nx, CONSTANT, NE_BRANCH */
 MANUAL_OP ne_nc_ic {
   if (NUM_REG(P1) != NUM_CONST(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* LT Nx, Ny, LT_BRANCH */
 MANUAL_OP lt_n_ic {
   if (NUM_REG(P1) < NUM_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* LT Nx, CONSTANT, LT_BRANCH */
 MANUAL_OP lt_nc_ic {
   if (NUM_REG(P1) < NUM_CONST(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* LE Nx, Ny, LE_BRANCH */
 MANUAL_OP le_n_ic {
   if (NUM_REG(P1) <= NUM_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* LE Nx, CONSTANT, LE_BRANCH */
 MANUAL_OP le_nc_ic {
   if (NUM_REG(P1) <= NUM_CONST(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* GT Nx, Ny, GT_BRANCH */
 MANUAL_OP gt_n_ic {
   if (NUM_REG(P1) > NUM_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* GT Nx, CONSTANT, GT_BRANCH */
 MANUAL_OP gt_nc_ic {
   if (NUM_REG(P1) > NUM_CONST(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* GE Nx, Ny, GE_BRANCH */
 MANUAL_OP ge_n_ic {
   if (NUM_REG(P1) >= NUM_REG(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* GE Nx, CONSTANT, GE_BRANCH */
 MANUAL_OP ge_nc_ic {
   if (NUM_REG(P1) >= NUM_CONST(P2)) {
-    RETURN(P3);
+    RETURN(INT_CONST(P3));
   }
 }
 
 /* IF Nx, TRUE_BRANCH */
 MANUAL_OP if_n_ic {
   if (NUM_REG(P1)) {
-    RETURN(P2);
+    RETURN(INT_CONST(P2));
   }
 }
 
@@ -449,7 +449,7 @@ AUTO_OP length_i_s {
 
 /* CHOPN Sx, CONSTANT */
 AUTO_OP chopn_s_ic {
-   string_chopn(STR_REG(P1), P2);
+   string_chopn(STR_REG(P1), INT_CONST(P2));
 }
 
 /* SUBSTR Sx, Sx, Ix, Ix */
@@ -687,12 +687,12 @@ AUTO_OP or_i {
 
 /* SHL_i_ic */
 AUTO_OP shl_i_ic {
-  INT_REG(P1) = INT_REG(P2) << P3;
+  INT_REG(P1) = INT_REG(P2) << INT_CONST(P3);
 }
 
 /* SHR_i_ic */
 AUTO_OP shr_i_ic {
-  INT_REG(P1) = INT_REG(P2) >> P3;
+  INT_REG(P1) = INT_REG(P2) >> INT_CONST(P3);
 }
 
 /* XOR_i */

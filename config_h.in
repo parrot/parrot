@@ -5,11 +5,13 @@
  */
 
 #if !defined(PARROT_CONFIG_H_GUARD)
-#define PARROT_CONFIG_H_GUARD 
+#define PARROT_CONFIG_H_GUARD
+#include <stddef.h>
 typedef ${iv} INTVAL;
 typedef ${nv} FLOATVAL;
 
 typedef ${opcode_t} opcode_t;
+typedef size_t ptrcast_t;
 
 typedef struct _vtable VTABLE;
 typedef void DPOINTER;
