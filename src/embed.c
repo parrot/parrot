@@ -208,7 +208,7 @@ Parrot_readbc(Interp *interpreter, const char *filename)
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     int fd = -1;
 #endif
-    char *fullname;
+    const char *fullname;
 
     if (filename == NULL || strcmp(filename, "-") == 0) {
         /* read from STDIN */
