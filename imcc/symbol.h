@@ -14,12 +14,12 @@ typedef struct _Symbol {
    struct _Symbol * last;
    struct _Symbol * next;
 
-   union p {
+   union {
       SymReg * reg;
       Class * cl;
       Method * method;
       Field * field;
-   };
+   } u;
 
 } Symbol;
 
