@@ -1,0 +1,17 @@
+.sub main
+    .include "iterator.pasm"
+	$P2 = new .Slice [ .. 1000000]
+	new P1, .Iterator, $P2
+	set P1, .ITERATE_FROM_START
+        .local pmc n
+	n = new PerlInt
+iter_loop:
+        unless P1, iter_end
+	shift I1, P1
+	# n += I1
+	branch iter_loop
+iter_end:
+	print n
+	print "\n"
+	end
+.end

@@ -275,7 +275,8 @@ This is used for implementing Pythons xrange()
     }
 
     INTVAL get_integer_keyed(PMC* key) {
-        return VTABLE_get_integer(INTERP, key);
+        range_t *r = PMC_struct_val(key);
+        return RVal_int(r->cur);
     }
 
     STRING* get_string_keyed(PMC* key) {

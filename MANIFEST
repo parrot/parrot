@@ -388,6 +388,10 @@ examples/benchmarks/b60.imc                       [main]doc
 examples/benchmarks/b60.py                        [main]doc
 examples/benchmarks/b61.imc                       [main]doc
 examples/benchmarks/b61.py                        [main]doc
+examples/benchmarks/b62.imc                       [main]doc
+examples/benchmarks/b62.py                        [main]doc
+examples/benchmarks/b63.imc                       [main]doc
+examples/benchmarks/b63.py                        [main]doc
 examples/benchmarks/bench_newp.pasm               [main]doc
 examples/benchmarks/fib.imc                       [main]doc
 examples/benchmarks/fib.pl                        [main]doc

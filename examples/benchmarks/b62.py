@@ -1,9 +1,7 @@
 def main():
-    L = [1]*1000000
-    L[-1] = 42
     n = 0
-    for i in L:
-        n += i
+    for i in xrange(1000000):
+        pass
     print n
 
 if __name__ == '__main__':
