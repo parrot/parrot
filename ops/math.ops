@@ -809,7 +809,7 @@ inline op neg(inout NUM) :base_core {
 }
 
 inline op neg(in PMC) :base_core {
-  $1->vtable->neg(interpreter, $1, NULL);
+  $1->vtable->neg(interpreter, $1, $1);
   goto NEXT();
 }
 

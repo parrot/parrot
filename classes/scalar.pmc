@@ -470,15 +470,14 @@ Calls the superclass implementation.
 
 =item C<void neg(PMC *dest)>
 
-Returns the negation of the scalar in C<*dest> if it is supplied.
-Otherwise the scalar itself is negated.
+Set C<dest> to the negated value of C<SELF>.
 
 =cut
 
 */
 
     void neg (PMC* dest) {
-        if (!dest)
+        if (dest == SELF)
             PMC_int_val(SELF) = -DYNSELF.get_integer();
         else
             VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());

@@ -434,15 +434,14 @@ result in C<*dest>.
 
 =item C<void neg(PMC *dest)>
 
-If C<dest> is true, then the negation of the number is returned in
-C<*dest>. Otherwise the number itself is negated.
+Set C<dest> to the negated value of C<SELF>.
 
 =cut
 
 */
 
     void neg (PMC * dest) {
-        if (!dest)
+        if (dest == SELF)
             PMC_num_val(SELF) = -PMC_num_val(SELF);
         else
             VTABLE_set_number_native(INTERP, dest, -PMC_num_val(SELF));

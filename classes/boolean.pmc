@@ -137,15 +137,14 @@ Sets the value to C<*value> evaluated in a boolean context.
 
 =item C<void neg(PMC* dest)>
 
-If C<*dest> is supplied then the negation of the boolean is set in
-C<*dest>, otherwise the value of the boolean itself is negated.
+Set C<dest> to the negated value of C<SELF>.
 
 =cut
 
 */
 
     void neg (PMC* dest) {
-        if (!dest)
+        if (dest == SELF)
             PMC_int_val(SELF) = -PMC_int_val(SELF);
         else
             VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
