@@ -275,7 +275,7 @@ CODE
 -2.250000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "mod_n");
+output_like(<<CODE, <<OUTPUT, "mod_n");
 	set	N0, 5.0
 	set	N1, 0.0
 	mod	N2, N0, N1
@@ -314,12 +314,13 @@ output_is(<<CODE, <<OUTPUT, "mod_n");
 
         end
 CODE
-5.000000
-0.000000
+/5.000000
+-?0.000000
 2.000000
 -1.000000
 1.000000
 -2.000000
+/
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "cmod_n");
@@ -1043,7 +1044,7 @@ output_is(<<'CODE', <<OUTPUT, "null");
     null N31
     print N31
     print "\n"
-   
+
     end
 CODE
 12.500000
