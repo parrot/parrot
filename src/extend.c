@@ -745,7 +745,7 @@ Parrot_Const_Encoding Parrot_find_encoding(Parrot_INTERP interpreter, char *enco
 /*
 
 =item C<Parrot_Language 
-Parrot_find_language(Parrot_INTERP interpreter, char *langauge)>
+Parrot_find_language(Parrot_INTERP interpreter, char *language)>
 
 Find the magic language token for a language, by language name.
 
@@ -753,7 +753,7 @@ Find the magic language token for a language, by language name.
 
 */
 
-Parrot_Language Parrot_find_language(Parrot_INTERP interpreter, char *langauge) {
+Parrot_Language Parrot_find_language(Parrot_INTERP interpreter, char *language) {
     return 0;
 }
 
