@@ -326,8 +326,8 @@ handle_variable:
   .local int chunk_start
   chunk_start = start_word + word_length
   # XXX Why oh why doesn't this work as a macro? (IMCC BUG?)
-  word_length = __match_close(buffer,chunk_start)
-  #.match_close(buffer,chunk_start,word_length)
+  # word_length = __match_close(buffer,chunk_start)
+  .match_close(buffer,chunk_start,word_length)
 
   # if there's any word so far, save it
   if old_length == 0 goto handle_variable_1
@@ -500,8 +500,8 @@ handle_command_block:
   .local int chunk_start
   chunk_start = start_word + word_length
   # This macro causes an error.
-  word_length = __match_close(buffer,chunk_start)
-  #.match_close(buffer,chunk_start,word_length)
+  #word_length = __match_close(buffer,chunk_start)
+  .match_close(buffer,chunk_start,word_length)
 
   if word_length < 0 goto bad_block
 
