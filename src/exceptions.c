@@ -174,6 +174,12 @@ new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
     return handler;
 }
 
+void
+push_new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
+{
+    push_exception(interpreter, new_c_exception_handler(interpreter, jb));
+}
+
 void *
 throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 {
@@ -228,10 +234,44 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
     return handler->cache.struct_val;
 }
 
+#ifndef PARROT_HAS_HEADER_SETJMP
+void
+rethrow_c_exception(Parrot_Interp interpreter)
+{
+}
+#endif
+
 #ifdef PARROT_HAS_HEADER_SETJMP
 /* XXX s. interpreter.c */
 Parrot_exception the_exception;
 
+/*
+ * return back to runloop, assumes exception is still in REG_PMC(5)
+ * and that this is called from within a handler setup with
+ * new_c_exception
+ */
+void
+rethrow_c_exception(Parrot_Interp interpreter)
+{
+    PMC *exception, *handler, *p5;
+
+    p5 = VTABLE_get_pmc_keyed_int(interpreter, REG_PMC(5), 3);
+    exception = REG_PMC(5);
+    REG_PMC(5) = p5;
+    handler = find_exception_handler(interpreter, exception);
+    /* XXX we should only peek for the next handler */
+    push_exception(interpreter, handler);
+    /*
+     * if there was no user handler, interpreter is already shutdown
+     */
+    the_exception.resume = handler->cache.struct_val;
+    the_exception.error = VTABLE_get_integer_keyed_int(interpreter,
+            exception, 1);
+    the_exception.severity = VTABLE_get_integer_keyed_int(interpreter,
+            exception, 2);
+    the_exception.msg = VTABLE_get_string_keyed_int(interpreter, exception, 0);
+    longjmp(the_exception.destination, 1);
+}
 static size_t
 dest2offset(Parrot_Interp interpreter, opcode_t *dest)
 {

@@ -391,7 +391,7 @@ close S;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
-c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub");
+c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub, catch exception");
 
 #include <stdio.h>
 /* have to cheat because of missing extend interfaces */
@@ -419,8 +419,7 @@ int main(int argc, char* argv[]) {
 	fprintf(stderr, "caught\n");
     }
     else {
-	PMC *handler = new_c_exception_handler(interpreter, &jb);
-	push_exception(interpreter, handler);
+	push_new_c_exception_handler(interpreter, &jb);
 	Parrot_call(interpreter, sub, 0);
     }
     fprintf(stderr, "back\n");

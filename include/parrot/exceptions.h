@@ -103,6 +103,8 @@ size_t handle_exception(Parrot_Interp);
 void do_exception(exception_severity severity, long error);
 
 PMC* new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
+void push_new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
+void rethrow_c_exception(Parrot_Interp interpreter);
 
 #endif
 
