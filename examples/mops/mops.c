@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-FLOATVAL time(void)
+FLOATVAL time_n(void)
 {
   struct timeval t;
   gettimeofday(&t, NULL);
@@ -48,14 +48,14 @@ int main(int argc, char * argv[])
                                       /* print  I5                */
                                       /* print  "\n"              */
                                       /*                          */
-  N1 = time();                        /* time   N1                */
+  N1 = time_n();                      /* time   N1                */
                                       /*                          */
 REDO:                                 /* REDO:                    */
   I4 = I4 - I3;                       /* sub    I4, I4, I3        */
   if (I4) goto REDO;                  /* if     I4, REDO          */
                                       /*                          */
 DONE:                                 /* DONE:                    */
-  N5 = time();                        /* time   N5                */
+  N5 = time_n();                      /* time   N5                */
                                       /*                          */
   N2 = N5 - N1;                       /* sub    N2, N5, N1        */
                                       /*                          */
