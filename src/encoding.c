@@ -52,7 +52,7 @@ encoding_lookup_index(INTVAL n)
     return encoding_array[n];
 }
 
-const INTVAL
+INTVAL
 encoding_by_encoding(const ENCODING *encoding) {
     int i;
     for (i = 0; i < enum_encoding_MAX && encoding_array[i]; i++) {
@@ -64,7 +64,7 @@ encoding_by_encoding(const ENCODING *encoding) {
     return -1;
 }
 
-const INTVAL
+INTVAL
 encoding_find_encoding(const char *name) 
 {
     if (strcmp(name, "singlebyte") == 0) {
