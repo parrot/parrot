@@ -1394,6 +1394,7 @@ languages/imcc/t/harness
 languages/imcc/t/imcpasm/opt1.t
 languages/imcc/t/imcpasm/opt2.t
 languages/imcc/t/imcpasm/sub.t
+languages/imcc/t/syn/bsr.t
 languages/imcc/t/syn/clash.t
 languages/imcc/t/syn/const.t
 languages/imcc/t/syn/eval.t
