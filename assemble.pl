@@ -314,10 +314,15 @@ sub preprocess {
     elsif(/\.($label_re) \s*
            \(([^)]*)\)/x) {                    # .{name} (...
       if(defined $self->{macros}{$1}) {
-        my @arguments = split /,/,$2;
+        my $macro_name = $1;
+        my $arguments = $2;
+        $arguments =~ s{\.(\w+)}
+                       {defined $self->{constants}{$1} ?
+                          $self->{constants}{$1} : ".$1"}egx;
+        my @arguments = split /,/,$arguments;
         s/(^\s+|\s+$)//g for @arguments;
         push @{$self->{contents}},
-             $self->_expand_macro($1,\@arguments);
+             $self->_expand_macro($macro_name,\@arguments);
       }
       else {
         push @{$self->{contents}},$_;

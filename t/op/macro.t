@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
@@ -135,5 +135,15 @@ output_is(<<'CODE', 'foo', "constant defined and used");
 .constant FOO S0
   set .FOO,"foo"
   print .FOO
+  end
+CODE
+
+output_is(<<'CODE', 'foo', "constant defined, used in a macro call");
+.constant FOO S0
+.macro answer (bar)
+  print .bar
+.endm
+  set .FOO,"foo"
+  .answer(.FOO)
   end
 CODE
