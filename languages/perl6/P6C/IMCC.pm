@@ -729,10 +729,16 @@ can be used in indexing expressions in the loop body.
 =cut
 
 sub gen_counted_loop {
-    my ($count, $body) = @_;
+    my ($count, $body, $what) = @_;
     my $start = genlabel;
     my $end = genlabel;
-    return <<END;
+    my $top_comment = "";
+    my $bottom_comment = "";
+    if ($what) {
+        $top_comment = "# loop top ($what)\n";
+        $bottom_comment = "# loop bottom ($what)\n";
+    }
+    return $top_comment . <<END . $bottom_comment;
 	goto $end
 $start:
 	dec $count
@@ -740,7 +746,6 @@ $body
 $end:
 	if $count != 0 goto $start
 END
-    return undef;
 }
 
 =item B<scalar_in_context($val, $ctx)>
