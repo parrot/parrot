@@ -60,16 +60,16 @@ Only tested so far on i386.
     .local pmc endian
     endian = new Integer
     endian = 0
-    
+
     $P0 = _config()
 
-    $I0 = $P0["intsize"]
-    if $I0 == 4 goto is_4byte_word
-
-    printerr "This doesn't seem to be a 32 bit processor: "
-    printerr "Please verify the MD5 checksum\n"
-
-is_4byte_word:
+#    $I0 = $P0["intvalsize"]
+#    if $I0 == 4 goto is_4byte_word
+#
+#    printerr "This doesn't seem to be a 32 bit processor: "
+#    printerr "Please verify the MD5 checksum\n"
+#
+#is_4byte_word:
 
     $I0 = $P0["bigendian"]
     unless $I0 goto is_little_endian
@@ -123,11 +123,10 @@ is_little_endian:
 
 # A parrot rol instruction might be good (as it can often be JIT'd)
 .macro rol (x,n,  out)
-    .out = .x << .n
+    .out   = .x << .n
     $I1000 = 32 - .n
     $I1000 = .x >>> $I1000
-    $I1000 = $I1000 & 0xffffffff
-    .out |= $I1000
+    .out  |= $I1000
 .endm
 
 .macro FF (b,c,d)
@@ -156,8 +155,10 @@ is_little_endian:
     $I99 = .k + idx
     tmp = buffer[$I99]
     .a += tmp
+    .a &= 0xffffffff
     .rol (.a, .s, tmp)
-    .a = .b + tmp
+    .a  = .b + tmp
+    .a &= 0xffffffff
 .endm
 
 .macro OP1 (aa,bb,cc,dd, kk, ss, TT)
@@ -424,10 +425,6 @@ md5_loop:
     context[1] = B
     context[2] = C
     context[3] = D
-
-    # $S0 = _md5_format_vals (A,B,C,D)
-    # print $S0
-    # print "\n"
 
 .end
 

@@ -19,9 +19,9 @@ my $bigendian = $PConfig{bigendian};
 
 SKIP: {
 
-if ($bigendian || $intsize != 4)
+if ($bigendian)
 {
-    skip('MD5 only known to work on small endian 32 bit processors', 4)
+    skip('MD5 only known to work on little endian bit processors', 6)
 }
 
 
@@ -335,7 +335,6 @@ CODE
 840e4dec51660b1f52473e0b0b9545f5
 OUT
 
-}
 
 =bash
 
@@ -357,7 +356,7 @@ pir_output_is(<<'CODE', <<'OUT', "recursive md5sum (1)");
 
     $S0 = "Hello World!"
     $I0 = 0
-    
+
 loop:
     print $S0
     print "\n"
@@ -593,7 +592,7 @@ pir_output_is(<<'CODE', <<'OUT', "recursive md5sum (2)");
 
     $S0 = "Hello World!"
     $I0 = 0
-    
+
 loop:
     print $S0
     print "\n"
@@ -810,3 +809,5 @@ f67fa138069da8fce68c131106492372
 8408bf5f0144309374e66278bec290b2
 982e0fde28cd2f62ef8db2d8dfd0f0d7
 OUT
+
+}
