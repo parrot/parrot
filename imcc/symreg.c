@@ -143,6 +143,9 @@ void
 add_pcc_arg(SymReg *r, SymReg * arg)
 {
     int n = r->pcc_sub->nargs;
+#if IMC_TRACE_HIGH
+    PIO_eprintf(NULL, "add_pcc_arg(%s)\n", arg->name); 
+#endif
     r->pcc_sub->args = realloc(r->pcc_sub->args, (n + 1) * sizeof(SymReg *));
     if(arg->type & (VTCONST)) {
         r->pcc_sub->args[n] = dup_sym(arg);
@@ -520,7 +523,7 @@ void
 _store_symreg(SymReg *hsh[], SymReg * r)
 {
     int i = hash_str(r->name) % HASH_SIZE;
-#if IMC_TRACE
+#if IMC_TRACE_HIGH
     printf("    store [%s]\n", r->name);
 #endif
     r->next = hsh[i];
