@@ -154,7 +154,7 @@ inline op open(out PMC, in STR, in STR) {
   $1 = PIO_open(interpreter, NULL, path, mode);
   /* string_cstring_free(mode); */
   /* string_cstring_free(path); */
-  if(!$1) {
+  if(!$1 || !PMC_struct_val($1)) {
     $1 = pmc_new(interpreter, enum_class_PerlUndef);
   }
   goto NEXT();

@@ -209,9 +209,11 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                     break;
                 case PARROT_ARG_I:
                     PIO_eprintf(interpreter, "I%vd", o);
+                    more = 1;
                     break;
                 case PARROT_ARG_N:
                     PIO_eprintf(interpreter, "N%vd", o);
+                    more = 1;
                     break;
                 case PARROT_ARG_P:
                     PIO_eprintf(interpreter, "P%vd", o);
@@ -240,6 +242,12 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 PIO_eprintf(interpreter, ", ");
             }
             switch (info->types[i]) {
+                case PARROT_ARG_I:
+                    PIO_eprintf(interpreter, "I%vd=%vd", o, REG_INT(o));
+                    break;
+                case PARROT_ARG_N:
+                    PIO_eprintf(interpreter, "N%vd=%vf", o, REG_NUM(o));
+                    break;
                 case PARROT_ARG_P:
                     PIO_eprintf(interpreter, "P%vd=", o);
                     trace_pmc_dump(interpreter, REG_PMC(o));
