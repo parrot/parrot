@@ -535,14 +535,19 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing 2");
     newclass P1, "Foo"
-    # must add attributes before object instantion
-    addattribute P1, "i"
-    addattribute P1, "j"
+    # must add attributes before object instantiation
+    addattribute P1, ".i"
+    addattribute P1, ".j"
 
-    newclass P2, "Bar"		# or subclass P2, P1, "Bar" ???
-    addattribute P2, "k"
-    addattribute P2, "l"
-    addparent P2, P1
+    subclass P2, P1, "Bar"
+    addattribute P2, ".k"
+    addattribute P2, ".l"
+
+    # subclass is prefered for the SI case over
+    #   newclass P2, "Bar"
+    #   addattrib ...
+    #   addparent P2, P1
+    # which is suitable for adding multiple parents to one class
 
     # instantiate a Bar object
     find_type I1, "Bar"
@@ -550,40 +555,43 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing 2");
 
     classoffset I3, P3, "Foo"   # The parent class
     # print I3                  # don't assume anything about this offset
-    # print "\n"
+    # print "\n"		# ' for vim
 
-
-    set I0, I3			# is this always the first attribute?
+    set I0, I3			# access Foo attribs, remember offset
 
     new P10, .PerlString	# set attribute values
-    set P10, "i\n"
-    setattribute P3, I0, P10
-    inc I0
+    set P10, "i\n"		# attribute slots have reference semantics
+    setattribute P3, I0, P10	# so always put new PMCs in
+                                # if you have unique values
+    inc I0			# next attribute
     new P10, .PerlString
     set P10, "j\n"
     setattribute P3, I0, P10
-    inc I0			# is that safe to assume
+
+    classoffset I4, P3, "Bar"   # set Bar attribs
+    set I1, I4			# dup offset for retrieval again
+
     new P10, .PerlString
     set P10, "k\n"
-    setattribute P3, I0, P10
-    inc I0
+    setattribute P3, I1, P10
+    inc I1
     new P10, .PerlString
     set P10, "l\n"
-    setattribute P3, I0, P10
+    setattribute P3, I1, P10
 
-    getattribute P11, P3, I3
-    print P11
-    inc I3
-    getattribute P11, P3, I3
-    print P11
-    inc I3
-    getattribute P11, P3, I3
+    getattribute P11, P3, I3	# retrieve attribs
     print P11
     inc I3
     getattribute P11, P3, I3
     print P11
 
-    classname S0, P3
+    getattribute P11, P3, I4
+    print P11
+    inc I4
+    getattribute P11, P3, I4
+    print P11
+
+    classname S0, P3		# verify classname is still ok
     print S0
     print "\n"
     end
