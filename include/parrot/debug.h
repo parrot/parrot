@@ -196,12 +196,6 @@ PDB_print_stack_pmc(struct Parrot_Interp *,
 void
 PDB_help(const char *);
 
-#define na(c) { \
-    while(*c && !isspace(*c)) \
-        c++; \
-    while(*c && isspace(*c)) \
-        c++; }
-
 #define valid_chunk(chunk,c,d,s,i) { \
     if (*c) { \
         d = atol(c); \

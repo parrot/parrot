@@ -19,6 +19,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define na(c) { \
+    while(*c && !isspace(*c)) \
+        c++; \
+    while(*c && isspace(*c)) \
+        c++; }
+
 /* PDB_get_command
  * get a command from stdin to execute
  */
