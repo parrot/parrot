@@ -97,6 +97,7 @@ SymReg * mk_const(char *, int t);
 SymReg * mk_const_ident(char *, int t, SymReg *, int);
 SymReg * mk_address(char *, int uniq);
 SymReg * mk_pcc_sub(char *, int proto);
+char * symreg_to_str(SymReg *);    
 void add_pcc_arg(SymReg *r, SymReg * arg);
 void add_pcc_sub(SymReg *r, SymReg * arg);
 void add_pcc_cc(SymReg *r, SymReg * arg);

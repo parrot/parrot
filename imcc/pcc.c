@@ -91,7 +91,7 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
     /*
      * generate check subroutine if not done yet
      */
-    what = mk_symreg(str_dup("#what"), 'I');
+    what = mk_symreg(str_dup("_#what"), 'I');
     strcpy(buf, "_#check_params");
     check_sub = _get_sym(ghash, buf);
     if (!check_sub) {
@@ -103,7 +103,7 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
          * first time check: amount of params, elements in P3
          * we can globber I0
          */
-        err_nparam = mk_address(str_dup("#check_err_nparam"), U_add_uniq_label);
+        err_nparam = mk_address(str_dup("_#check_err_nparam"), U_add_uniq_label);
         if (p3) {
             if (!i0)
                 i0 = mk_pasm_reg(str_dup("I0"));
@@ -147,7 +147,7 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
         regs[1] = p3;
         regs[2] = mk_const(str_dup("0"), 'I');
         INS(interpreter, unit, "typeof", NULL, regs, 3, 4, 1);
-        err_type = mk_address(str_dup("#check_err_type"), U_add_uniq_label);
+        err_type = mk_address(str_dup("_#check_err_type"), U_add_uniq_label);
         regs[0] = i0;
         regs[1] = what;
         regs[2] = err_type;
@@ -241,7 +241,7 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 	/* subroutine can handle both */
 	i0 = mk_pasm_reg(str_dup("I0"));
 	regs[0] = i0;
-	sprintf(buf, "#sub_%s_p1", sub->name);
+	sprintf(buf, "_#sub_%s_p1", sub->name);
         regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
 	ins = insINS(interpreter, unit, ins, "if", regs, 2);
 
@@ -257,8 +257,18 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 		    (arg->set == 'P' && next[2] < 16)) {
 		for (j = 0; j < 4; j++) {
 		    if (arg->set == types[j]) {
-			if (next[j] == 16)
+			if (next[j] == 16) {
+#if IMC_TRACE
+                            PIO_eprintf(NULL, "expand_sub nextreg[%d]: switching to arg overflow\n", next[j]);
+#endif
 			    goto overflow;
+                        } 
+                        else if(next[j] >= 17) {
+                            PIO_eprintf(NULL,
+                                "imcc internal error: next reg(%d) > 16 for PCC convention\n",
+                                    next[j]);
+                            abort();
+                        }
 			if (arg->color == next[j]) {
 			    next[j]++;
 			    break;
@@ -324,7 +334,7 @@ overflow:
         if (ps != pe) {
             if (!proto) {
                 /* branch to the end */
-                sprintf(buf, "#sub_%s_p0", sub->name);
+                sprintf(buf, "_#sub_%s_p0", sub->name);
                 regs[0] = label2 = mk_address(str_dup(buf), U_add_uniq_label);
                 ins = insINS(interpreter, unit, ins, "branch", regs, 1);
                 tmp = INS_LABEL(unit, label1, 0);
@@ -647,13 +657,13 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         ins = insINS(interpreter, unit, ins, "set", regs, 2);
     }
     lin = ins->line;
-    sprintf(buf, "#arg_loop_%d_%d", lin, i);
+    sprintf(buf, "_#arg_loop_%d_%d", lin, i);
     loop = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "#next_arg_%d_%d", lin, i);
+    sprintf(buf, "_#next_arg_%d_%d", lin, i);
     next = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "#over_flow_%d_1_%d", lin, i);
+    sprintf(buf, "_#over_flow_%d_1_%d", lin, i);
     over1 = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "#over_flow_%d_%d", lin, i);
+    sprintf(buf, "_#over_flow_%d_%d", lin, i);
     over = mk_address(str_dup(buf), U_add_uniq_label);
 
     if (arg->type & VT_FLATTEN) {
@@ -723,6 +733,16 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
 /*
  * Expand a PCC subroutine call (IMC) into its PASM instructions
  * This is the nuts and bolts of Perl6/Parrot routine call style
+ * 
+ * XXX FIXME: VTCONST and VT_CONSTP, VTREG and VT_REGP are
+ * mixed and matched here. There should only be pointer types
+ * in sub->args. Trim out non-pointer type checks and verify
+ * correctness. (see symreg.c: add_pcc_arg())
+ * This potentially applies to much of the flow analysis code
+ * that is currently lazy and checks for too many things, which
+ * is fine but it was the source of a really nasty bug when add_pcc_arg()
+ * was not setting arg->type correctly. 
+ * And THAT is the reason for all this nasty TRACE code. -Mel
  */
 void
 expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
@@ -774,8 +794,15 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     /*
      * insert arguments
      */
-#if IMC_TRACE
+#if IMC_TRACE_HIGH
     PIO_eprintf(NULL, "expand_pcc_sub_call: nargs = %d\n", sub->pcc_sub->nargs);
+    PIO_eprintf(NULL, "args (");
+    for(i = 0; i < sub->pcc_sub->nargs; i++) {
+       arg = sub->pcc_sub->args[i];
+       PIO_eprintf(NULL, " (%c%s)%s", arg->set,
+                          (arg->type & (VTCONST|VT_CONSTP)) ? "c":"", arg->name);
+    }
+    PIO_eprintf(NULL, ")\n");
 #endif
     n = sub->pcc_sub->nargs;
     for (i = 0; i < n; i++) {
@@ -783,6 +810,10 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
          * if prototyped, first 11 I,S,N go into regs
          */
         arg = sub->pcc_sub->args[i];
+#if IMC_TRACE_HIGH
+        PIO_eprintf(NULL, "    arg(%c%s)%s\n", arg->set,
+                          (arg->type & (VTCONST|VT_CONSTP)) ? "c":"", arg->name);
+#endif
         arg_reg = arg->reg;
         if (sub->pcc_sub->prototyped ||
                 (arg->set == 'P' && next[2] < 16)) {
@@ -843,8 +874,12 @@ overflow:
             }
             if (flatten || (arg_reg->type & VT_FLATTEN))
                 goto flatten;
+#if IMC_TRACE_HIGH
+            PIO_eprintf(NULL, "expand_pcc_sub_call: overflow (%c%s)%s\n", arg->set,
+                        (arg->type & (VTCONST|VT_CONSTP)) ? "c":"",  arg->name);
+#endif
             regs[0] = p3;
-            regs[1] = arg;
+            regs[1] = arg_reg;
             ins = insINS(interp, unit, ins, "push", regs, 2);
             n_p3++;
         }

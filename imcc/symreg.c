@@ -85,6 +85,31 @@ mk_symreg(char * name, int t)
     return _mk_symreg(cur_unit->hash, name, t);
 }
 
+/*
+ * Dump a SymReg to a printable format.
+ */
+char *
+symreg_to_str(SymReg * s)
+{
+    char buf[8192];
+    int t = s->type;
+    sprintf(buf, "symbol [%s]  set [%c]  color [%d]  type [",
+                 s->name, s->set, s->color);
+    if(t & VTCONST)      { strcat(buf, "VTCONST ");      }
+    if(t & VTREG)        { strcat(buf, "VTREG ");        }
+    if(t & VTIDENTIFIER) { strcat(buf, "VTIDENTIFIER "); }
+    if(t & VTADDRESS)    { strcat(buf, "VTADDRESS ");    }
+    if(t & VTREGKEY)     { strcat(buf, "VTREGKEY ");     }
+    if(t & VTPASM)       { strcat(buf, "VTPASM ");       }
+    if(t & VT_REGP)      { strcat(buf, "VT_REGP ");      }
+    if(t & VT_CONSTP)    { strcat(buf, "VT_CONSTP ");    }
+    if(t & VT_PCC_SUB)   { strcat(buf, "VT_PCC_SUB ");   }
+    if(t & VT_FLATTEN)   { strcat(buf, "VT_FLATTEN ");   }
+    strcat(buf, "]");
+    return str_dup(buf);
+}
+
+
 SymReg *
 mk_temp_reg(int t)
 {
@@ -102,14 +127,38 @@ mk_pcc_sub(char * name, int proto) {
     return r;
 }
 
+/*
+ * Add make a pointer to a register or constant
+ * and add to the subroutine structure arg list.
+ * If arg is a pointer, deref the symbol first.
+ */
 void
 add_pcc_arg(SymReg *r, SymReg * arg)
 {
     int n = r->pcc_sub->nargs;
     r->pcc_sub->args = realloc(r->pcc_sub->args, (n + 1) * sizeof(SymReg *));
-    r->pcc_sub->args[n] = dup_sym(arg);
-    r->pcc_sub->args[n]->reg = arg;
-    r->pcc_sub->args[n]->type = VT_REGP;
+    if(arg->type & (VTCONST)) {
+        r->pcc_sub->args[n] = dup_sym(arg);
+        r->pcc_sub->args[n]->reg = arg;
+        r->pcc_sub->args[n]->type = VT_CONSTP;
+    }
+    else if(arg->type & (VTREGISTER)) {
+        r->pcc_sub->args[n] = dup_sym(arg);
+        r->pcc_sub->args[n]->reg = arg;
+        r->pcc_sub->args[n]->type = VT_REGP;
+    }
+    /* If this is already a pointer, dup the symbol
+     * that it point to, not the pointer itself.
+     */
+    else if(arg->type & (VT_CONSTP)) {
+        r->pcc_sub->args[n] = dup_sym(arg->reg);
+        r->pcc_sub->args[n]->reg = arg->reg;
+        r->pcc_sub->args[n]->type = VT_CONSTP;
+    }
+    else
+        fataly(EX_SOFTWARE, sourcefile, line,
+                "sub argument is not a valid arg (const, constp or reg) '%s'\n%s",
+                     arg->name, symreg_to_str(arg));
     r->pcc_sub->nargs++;
 }
 
