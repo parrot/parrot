@@ -743,7 +743,14 @@ make_interpreter(Interp_flags flags)
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
-    /* initialize classes */
+    /* Set up the MMD struct */
+    interpreter->binop_mmd_funcs =
+        mem_sys_allocate_zeroed(sizeof(struct MMD_table));
+
+    /* Go and init the MMD tables */
+    register_fallback_methods(interpreter);
+
+    /* initialize classes - this needs mmd func table */
     Parrot_init(interpreter);
 
     /* Need an empty stash */
@@ -768,12 +775,6 @@ make_interpreter(Interp_flags flags)
         mem_sys_allocate_zeroed(sizeof(struct SRegChunk));
     interpreter->ctx.pmc_reg_top =
         mem_sys_allocate_zeroed(sizeof(struct PRegChunk));
-
-    /* Set up the MMD struct */
-    interpreter->binop_mmd_funcs =
-        mem_sys_allocate_zeroed(sizeof(struct MMD_table));
-    /* Go and init the MMD tables */
-    register_fallback_methods(interpreter);
 
     /* the SET_NULL macros are only for systems where a NULL pointer
      * isn't represented by zeroes, so don't use these for resetting
