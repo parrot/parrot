@@ -1093,7 +1093,7 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
         }
         /*
          * now consider MRO of types the signature type has to be somewhere
-         * int the MRO of the type_call
+         * in the MRO of the type_call
          */
         mro = Parrot_base_vtables[type_call]->mro;
         m = VTABLE_elements(interpreter, mro);
@@ -1431,7 +1431,7 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter,
 {
     const char *name, *short_name;
     char signature[6], val_sig;
-    STRING *meth_name, *ns;
+    STRING *meth_name, *ns, *_sub;
     int len;
     char *p;
     PMC *method, *multi, *class, *multi_sig;
@@ -1490,8 +1490,10 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter,
         VTABLE_add_method(interpreter, class, meth_name, method);
     }
     else {
+        _sub = CONST_STRING(interpreter, "Sub");
         /* multiple methods with that same name */
-        if (method->vtable->base_type == enum_class_NCI) {
+        if (method->vtable->base_type == enum_class_NCI ||
+            VTABLE_isa(interpreter, method, _sub)) {
             /* convert first to a multi */
             multi = constant_pmc_new(interpreter, enum_class_MultiSub);
             VTABLE_add_method(interpreter, class, meth_name, multi);

@@ -25,6 +25,21 @@ pmclass PyString extends PyObject dynpmc group python_group {
 
 /*
 
+=item C<void mark()>
+
+Marks the string as live.
+
+=cut
+
+*/
+
+    void mark () {
+        if(PMC_str_val(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
+    }
+
+/*
+
 =item C<PMC* "__getitem__"(PMC *self, PMC *index)>
 
 Returns the PMC value of the element at index C<key>.
@@ -245,7 +260,7 @@ Extracts a given character from the string.
             INTVAL start = RVal_int(range->start);
             INTVAL end   = RVal_int(range->end);
             PMC * ret = pmc_new(INTERP, PyBuiltin_PyString);
-            PMC_str_val(ret) = string_substr(INTERP, PMC_str_val(SELF), 
+            PMC_str_val(ret) = string_substr(INTERP, PMC_str_val(SELF),
                 start, end-start, NULL, 0);
             return ret;
         }
@@ -498,12 +513,12 @@ character in S, False otherwise.
         STRING *s;
 
         if (!VTABLE_get_bool(INTERP, iter))
-           s = string_from_cstring(INTERP, "", 0); 
+           s = string_from_cstring(INTERP, "", 0);
         else {
            s = VTABLE_shift_string(INTERP, iter);
            while (VTABLE_get_bool(INTERP, iter)) {
                s = string_append(INTERP, s, PMC_str_val(self), 0);
-               s = string_append(INTERP, s, 
+               s = string_append(INTERP, s,
                    VTABLE_get_string(INTERP, iter), 0);
            }
         }
@@ -609,6 +624,7 @@ Sets the string's value to the value of the specified Parrot string.
 
     void set_string_native (STRING * value) {
         PMC_str_val(SELF) = value;
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
