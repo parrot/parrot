@@ -69,7 +69,7 @@ static void
 insert_fixup_targets(struct Parrot_Interp* interpreter, char *branch,
         size_t limit)
 {
-    struct PackFile_FixupTable *ft = interpreter->code->fixup_table;
+    struct PackFile_FixupTable *ft = interpreter->code->cur_cs->fixups;
     int i;
 
     if (!ft)

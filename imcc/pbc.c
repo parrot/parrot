@@ -68,6 +68,8 @@ static struct globals {
 } globals;
 
 
+static int add_const_str(struct Parrot_Interp *, char *str);
+
 void imcc_globals_destroy(int ex, void *param);
 void imcc_globals_destroy(int ex, void *param)
 {
@@ -266,22 +268,22 @@ static void store_key_const(char * str, int idx)
     c->color = idx;
 }
 
-/* find a label in interpreters fixup table */
+/* find a label in interpreters fixup table
+ * return the index in the const_table of the name
+ */
 static int
 find_label_cs(struct Parrot_Interp *interpreter, char *name)
 {
-    struct PackFile_FixupTable *ft = interpreter->code->fixup_table;
-    opcode_t i;
-
-    if (!ft)
+    struct PackFile_FixupEntry *fe =
+        PackFile_find_fixup_entry(interpreter, enum_fixup_label, name);
+    int i;
+    struct PackFile *pf = interpreter->code;
+    if (!fe)
         return -1;
-    for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_label:
-                if (!strcmp(name, ft->fixups[i]->name))
-                    return i;
-                break;
-        }
+    for (i = 0; i < PF_NCONST(pf); i++) {
+        struct PackFile_Constant * c = PF_CONST(pf, i);
+        if (c->type == PFC_STRING && !strcmp(name, c->u.string->strstart))
+            return i;
     }
     return -1;
 }
@@ -378,18 +380,20 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             continue;
         if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
                 strcmp(ins->op, "branch_cs") && strcmp(ins->op, "newsub")) {
-            char buf[64];
             Instruction *il;
+            char buf[64];
             SymReg *r[IMCC_MAX_REGS];
-            INTVAL fixup_nr;
+            int fixup_const_nr;
 
             debug(DEBUG_PBC_FIXUP, "inter_cs found for '%s'\n", addr->name);
             /* find symbol */
-            if ((fixup_nr = find_label_cs(interpreter, addr->name)) < 0)
-                fatal(1, "store_labels", "inter_cs label '%s' not found\n",
+            if ((fixup_const_nr = find_label_cs(interpreter, addr->name)) < 0)
+                debug(DEBUG_PBC_FIXUP,
+                        "store_labels", "inter_cs label '%s' not found\n",
                         addr->name);
-            debug(DEBUG_PBC_FIXUP, "inter_cs label '%s' found fixup_nr %d\n",
-                        addr->name, (int)fixup_nr);
+            fixup_const_nr = add_const_str(interpreter, addr->name);
+            debug(DEBUG_PBC_FIXUP, "inter_cs label '%s' const#%d\n",
+                    addr->name, fixup_const_nr);
             /* append inter_cs jump */
             free(addr->name);
             sprintf(buf, "#isc_%d", globals.inter_seg_n);
@@ -399,8 +403,8 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             store_label(addr, code_size);
             /* increase code_size by 2 ops */
             code_size += 2;
-            /* add inter_cs jump */
-            sprintf(buf, "%d", (int)fixup_nr);
+            /* add inter_segment jump */
+            sprintf(buf, "%d", fixup_const_nr);
             r[0] = mk_const(str_dup(buf), 'I');
             INS(interpreter, "branch_cs", "", r, 1, 0, 1);
         }

@@ -38,7 +38,8 @@ static opcode_t * default_unpack (struct Parrot_Interp *,
 static void default_dump (struct Parrot_Interp *,
         struct PackFile_Segment *self);
 
-struct PackFile_Segment *directory_new (struct PackFile *, const char *, int);
+static struct PackFile_Segment *directory_new (struct PackFile *,
+        const char *, int);
 static void directory_destroy (struct PackFile_Segment *self);
 static size_t directory_packed_size (struct PackFile_Segment *self);
 static opcode_t * directory_pack (struct PackFile_Segment *, opcode_t *dest);
@@ -430,10 +431,9 @@ make_code_pointers(struct PackFile_Directory *dir)
         struct PackFile_Segment *seg = dir->segments[i];
         switch (seg->type) {
             case PF_FIXUP_SEG:
-                if (!pf->fixup_table) {
-                    pf->cur_cs->fixups = pf->fixup_table =
-                        (struct PackFile_FixupTable *)seg;
-                    pf->fixup_table->code = pf->cur_cs;
+                if (!pf->cur_cs->fixups) {
+                    pf->cur_cs->fixups = (struct PackFile_FixupTable *)seg;
+                    pf->cur_cs->fixups->code = pf->cur_cs;
                 }
                 break;
             case PF_CONST_SEG:
@@ -1038,7 +1038,7 @@ PackFile_Segment_dump(struct Parrot_Interp *interpreter,
     self->pf->PackFuncs[self->type].dump(interpreter, self);
 }
 
-struct PackFile_Segment *
+static struct PackFile_Segment *
 directory_new (struct PackFile *pf, const char *name, int add)
 {
     struct PackFile_Directory *dir;
@@ -1676,14 +1676,14 @@ fixup_unpack(struct Parrot_Interp *interpreter,
 void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
         char *label, opcode_t offs)
 {
-    struct PackFile_FixupTable *self = interpreter->code->fixup_table;
+    struct PackFile_FixupTable *self = interpreter->code->cur_cs->fixups;
     opcode_t i;
 
     if (!self) {
-        self = interpreter->code->fixup_table =
-            (struct PackFile_FixupTable  *) PackFile_Segment_new_seg(
-                    &interpreter->code->directory, PF_FIXUP_SEG,
-                    FIXUP_TABLE_SEGMENT_NAME, 1);
+        self = (struct PackFile_FixupTable  *) PackFile_Segment_new_seg(
+                &interpreter->code->directory, PF_FIXUP_SEG,
+                FIXUP_TABLE_SEGMENT_NAME, 1);
+        interpreter->code->cur_cs->fixups = self;
         self->code = interpreter->code->cur_cs;
     }
     i = self->fixup_count;
@@ -1696,6 +1696,55 @@ void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
     self->fixups[i]->name = mem_sys_allocate(strlen(label) + 1);
     strcpy(self->fixups[i]->name, label);
     self->fixups[i]->offset = offs;
+}
+
+static struct PackFile_FixupEntry *
+find_fixup(struct PackFile_FixupTable *ft, enum_fixup_t type,
+        const char * name)
+{
+    opcode_t i;
+    for (i = 0; i < ft->fixup_count; i++) {
+        if ((enum_fixup_t)ft->fixups[i]->type == type &&
+                !strcmp(ft->fixups[i]->name, name)) {
+            ft->fixups[i]->seg = ft->code;
+            return ft->fixups[i];
+        }
+    }
+    return NULL;
+}
+
+static INTVAL
+find_fixup_iter(struct PackFile_Segment *seg, void *user_data)
+{
+    if (seg->type == PF_DIR_SEG)
+	PackFile_map_segments((struct PackFile_Directory*)seg,
+                find_fixup_iter, user_data);
+    else if (seg->type == PF_FIXUP_SEG) {
+        struct PackFile_FixupEntry **e = user_data;
+        struct PackFile_FixupEntry *fe = find_fixup(
+                (struct PackFile_FixupTable *) seg, (*e)->type, (*e)->name);
+        if (fe) {
+            *e = fe;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+struct PackFile_FixupEntry *
+PackFile_find_fixup_entry(Parrot_Interp interpreter, enum_fixup_t type,
+        char * name)
+{
+    /* TODO make a hash of all fixups */
+    struct PackFile_Directory *dir = &interpreter->code->directory;
+    struct PackFile_FixupEntry *ep, e;
+    int found;
+
+    e.type = type;
+    e.name = name;
+    ep = &e;
+    found = PackFile_map_segments(dir, find_fixup_iter, (void *) &ep);
+    return found ? ep : NULL;
 }
 /*
 

@@ -617,19 +617,28 @@ runops_ex(struct Parrot_Interp *interpreter, size_t offset)
 
         if (interpreter->resume_flag & 2) {
             /* inter segment jump
-             * resume_offset = entry in fixup table
+             * resume_offset = entry of name in current const_table
              */
-            struct PackFile_FixupTable *ft = interpreter->code->fixup_table;
-            struct PackFile_ByteCode *seg;
+            struct PackFile_Constant * c;
+            struct PackFile_FixupEntry *fe;
+            struct PackFile *pf = interpreter->code;
+            char *s;
 
-            if ((opcode_t)interpreter->resume_offset >= ft->fixup_count)
-                internal_exception(1, "Illegal fixup after branch_cs\n");
-            seg = ft->code;     /* FIXME */
-            offset = ft->fixups[interpreter->resume_offset]->offset;
-            Parrot_switch_to_cs(interpreter, seg);
+            if ((int)interpreter->resume_offset >= PF_NCONST(pf) ||
+                (int)interpreter->resume_offset < 0)
+                internal_exception(1, "branch_cs: illegal resume offset");
+            c = PF_CONST(pf, interpreter->resume_offset);
+            if (c->type != PFC_STRING)
+                internal_exception(1, "branch_cs: not a string\n");
+            s = c->u.string->strstart;
+            fe = PackFile_find_fixup_entry(interpreter, enum_fixup_label, s);
+            if (!fe)
+                internal_exception(1, "branch_cs: fixup not found\n");
+            offset = fe->offset;
+            Parrot_switch_to_cs(interpreter, fe->seg);
             if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
                 PIO_eprintf(interpreter, "*** Resume at seg %s ofs %d\n",
-                        seg->base.name, (int)offset);
+                        fe->seg->base.name, (int)offset);
             }
         }
     }

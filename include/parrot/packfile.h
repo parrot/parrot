@@ -118,7 +118,9 @@ struct PackFile_FixupEntry {
     opcode_t type;     /* who knows, what fixups we need */
     char *name;        /* name of the label */
     opcode_t offset;    /* location of the item */
+    struct PackFile_ByteCode *seg;
 };
+
 
 typedef enum {
     enum_fixup_label,
@@ -190,15 +192,14 @@ struct PackFile {
     /* directory hold all Segments */
     /* TODO make this reallocatable */
     struct PackFile_funcs      PackFuncs[PF_MAX_SEG];
-    struct PackFile_ByteCode   * cur_cs;   /* current byte code seg */
-    struct PackFile_FixupTable * fixup_table;
-    struct PackFile_ConstTable * const_table;
-    INTVAL                       eval_nr;   /* nr. of eval cs */
 
-    /* the next pointer is a shortcut to the real thing in
+    /* the next pointers are shortcuts to the real thing in
      * the current byte code segment, i.e. cur_cs->base.data */
+    struct PackFile_ByteCode   * cur_cs;   /* current byte code seg */
+    struct PackFile_ConstTable * const_table;
     opcode_t *                   byte_code;
 
+    INTVAL                       eval_nr;   /* nr. of eval cs */
     INTVAL                       need_wordsize;
     INTVAL                       need_endianize;
     opcode_t                     (*fetch_op)(opcode_t);
@@ -278,6 +279,9 @@ void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
 /* create new fixup entry */
 void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *, char *label,
                 opcode_t offs);
+/* find entry */
+struct PackFile_FixupEntry * PackFile_find_fixup_entry(struct Parrot_Interp *,
+        enum_fixup_t type, char *);
 
 /*
 ** PackFile_ByteCode Functions:

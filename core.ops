@@ -144,7 +144,7 @@ Intersegment branch to location in fixup table $1.
 
 =cut
 
-inline op branch_cs (in INT) {
+inline op branch_cs (inconst INT) {
   interpreter->resume_offset = $1;
   interpreter->resume_flag = 2;
   goto ADDRESS(0);
