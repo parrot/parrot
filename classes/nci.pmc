@@ -52,4 +52,8 @@ pmclass NCI need_ext {
         func(INTERP, SELF);
         return next;
     }
+    INTVAL get_integer () {
+	return((INTVAL)PMC_data(SELF));
+    }
+
 }

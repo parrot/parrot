@@ -26,6 +26,10 @@
 .constant TempInt       I5
 .constant TempInt2	I6
 .constant TempInt3      I7
+
+.constant StartOp	I12
+.constant EndOp		I13
+
 .constant InternalInt	I27
 
 .constant Status	I12
@@ -61,9 +65,17 @@
 
 .constant TempPMC	P27
 
+VeryBeginning:
+    set_addr .StartOp, VeryBeginning
+    set_addr .EndOp, VeryEnd
+    print "We go from "
+    print .StartOp
+    print " to "
+    print .EndOp
+    print "\n"
+
     # We need a PMC for the compiler
     compreg .PASMCompiler, "PASM"
-
     bsr InitializeCoreOps
 
     set .Mode, .InterpretMode
@@ -97,12 +109,17 @@ DonePromptString:
     # Invoke the compiler
     bsr CompileString
     # Snag the address of the new body
-    set .TempInt, .CompiledWordPMC
+    set .TempInt, .CompiledWordPMC[1]
     # Add the PMC to the user ops slot so it doesn't disappear
-    set .UserOps[.OpName], .CompiledWordPMC
+#    set .UserOps[.OpName], .CompiledWordPMC
     # Put the actual function address into the core ops hash, since
     # it is now a core op
     set .CoreOps[.OpName], .TempInt
+    print "Address for "
+    print .OpName
+    print " is "
+    print .TempInt
+    print "\n"
 .endm
 
 InitializeCoreOps:
@@ -601,6 +618,11 @@ MaybeInterpretWord:
 NotInt:
     set .TempInt, .CoreOps[.CurrentWord]
     eq .TempInt, 0, UserWord
+    print "Calling into "
+    print .CurrentWord
+    print " at "
+    print .TempInt
+    print "\n"
     jsr .TempInt
     branch DoneInterpretWord
 
@@ -995,9 +1017,10 @@ CompileWord:
     if .TempInt, CompileWord
 
     # Add in the return
-    concat .NewBodyString, "end\n"
+    concat .NewBodyString, "ret\n"
 
     # Compile the string
+    print .NewBodyString
     compile .CompiledWordPMC, .PASMCompiler, .NewBodyString
 
     # And we're done
@@ -1105,11 +1128,15 @@ AddStringConstant:
 
 AddPlainWord:
     set .TempInt, .CoreOps[.CurrentWord]
-    concat .NewBodyString, "jsr "
+    concat .NewBodyString, "set I27, "
     set .TempString, .TempInt
     concat .NewBodyString, .TempString
+    concat .NewBodyString, "\njsr I27"
     concat .NewBodyString, "\n"
     ret
 
 AddControlStruct:
     ret
+
+VeryEnd:
+    end

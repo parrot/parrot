@@ -91,6 +91,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #define  code_end   (interpreter->code->byte_code + \
         interpreter->code->cur_cs->base.size)
 
+
 #ifdef USE_TRACE_INTERP
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         trace_i = make_interpreter(NO_FLAGS);
@@ -111,7 +112,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
         trace_op(interpreter, code_start, code_end, pc);
 #endif
 
-    while (pc && pc >= code_start && pc < code_end) {
+    while (pc) {/* && pc >= code_start && pc < code_end) {*/
         interpreter->cur_pc = pc;
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
             interpreter->profile->data[*pc].numcalls++;
@@ -143,11 +144,11 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     }
 #endif
 
-    if (pc && (pc < code_start || pc >= code_end)) {
+    /*    if (pc && (pc < code_start || pc >= code_end)) {
         internal_exception(INTERP_ERROR,
        "Error: Control left bounds of byte-code block (now at location %d)!\n",
        (int)(pc - code_start));
-    }
+       }*/
 #undef code_stat
 #undef code_end
     return pc;

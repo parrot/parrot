@@ -20,6 +20,7 @@ pmclass Sub {
        PMC_sub(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
        SELF->cache.struct_val = NULL;
        PObj_custom_mark_destroy_SETALL(SELF);
+       printf("Address of base segment is %p\n", ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
    }
 
    void destroy () {
@@ -42,6 +43,13 @@ pmclass Sub {
 
    INTVAL get_integer () {
        return (INTVAL) SELF->cache.struct_val;
+   }
+
+   /* This just unconditionally returns the start of bytecode. It's
+      wrong, wrong, wrong, *WRONG*. And there's no other good way, so
+      it's here for now. -DRS */
+   INTVAL get_integer_keyed (PMC* key) {
+     return (INTVAL)(((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
    }
 
    INTVAL defined () {

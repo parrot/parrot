@@ -1048,6 +1048,10 @@ inline op compreg(OUT PMC, in STR) {
   goto NEXT();
 }
 
+inline op bogus() {
+  goto NEXT();
+}
+
 =back
 
 =cut
