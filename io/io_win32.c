@@ -84,6 +84,20 @@ static INTVAL
 flags_to_win32(INTVAL flags, DWORD * fdwAccess,
                DWORD * fdwShareMode, DWORD * fdwCreate)
 {
+    static DWORD dwDefaultShareMode;
+    if (!dwDefaultShareMode) {
+        OSVERSIONINFO osvi;
+        osvi.dwOSVersionInfoSize = sizeof(osvi);
+        GetVersionEx(&osvi);
+        if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
+            dwDefaultShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+        }
+        else {
+            dwDefaultShareMode =
+                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+        }
+    }
+
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == (PIO_F_WRITE | PIO_F_READ)) {
         *fdwAccess = GENERIC_WRITE | GENERIC_READ;
         if (flags & PIO_F_TRUNC)
@@ -103,7 +117,7 @@ flags_to_win32(INTVAL flags, DWORD * fdwAccess,
         *fdwCreate = OPEN_EXISTING;
     }
 
-    *fdwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+    *fdwShareMode = dwDefaultShareMode;
     if (flags & PIO_F_APPEND) {
         /* dealt with specially in _write and _puts */
     }

@@ -11,6 +11,7 @@ sub setup
 	my $content = @_ ? shift : "This is a test\n";
 
 	open(FILE, ">$name") or die "Failed to create $name";
+        binmode FILE;
 	print FILE $content;
 	close(FILE);
 
@@ -69,7 +70,7 @@ static opcode_t*
 the_test(struct Parrot_Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
-    ParrotIO *io;
+    PMC *io;
     char *p;
 
     io = PIO_STDOUT(interpreter);
@@ -100,15 +101,15 @@ static opcode_t*
 the_test(struct Parrot_Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
-    ParrotIO *io;
+    PMC *io;
     char buf[1024];
-    UINTVAL len;
+    INTVAL len;
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
     len = PIO_read(interpreter, io, buf, sizeof(buf)-1);
     PIO_close(interpreter, io);
 
-    buf[len] = '\0';
+    buf[len < 0 ? 0 : len] = '\0';
     PIO_printf(interpreter, "%s", buf);
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
@@ -142,7 +143,7 @@ static opcode_t*
 the_test(struct Parrot_Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
-    ParrotIO *io;
+    PMC *io;
 
     io = PIO_open(interpreter, NULL, "temp.file", ">>");
     PIO_write(interpreter, io, "Parrot flies.\n", 14);
@@ -166,8 +167,8 @@ static opcode_t*
 the_test(struct Parrot_Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
-    ParrotIO *io;
-    size_t len;
+    PMC *io;
+    INTVAL len;
     char buf[1024];
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
@@ -175,7 +176,7 @@ the_test(struct Parrot_Interp *interpreter,
 
     do {
         len = PIO_read(interpreter, io, buf, sizeof(buf)-1);
-        buf[len] = '\0';
+        buf[len < 0 ? 0 : len] = '\0';
         PIO_printf(interpreter, "%d: %s", len, len ? buf : "EOF");
     } while (len > 0);
 
