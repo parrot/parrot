@@ -745,7 +745,7 @@ instantiate_object(Parrot_Interp interpreter, PMC *object,
         PMC *init, int is_python)
 {
     SLOTTYPE *new_object_array;
-    INTVAL attrib_count;
+    INTVAL attrib_count, i;
     SLOTTYPE *class_array;
     PMC *class;
     PMC *class_name;
@@ -769,6 +769,10 @@ instantiate_object(Parrot_Interp interpreter, PMC *object,
     set_attrib_array_size(object,
                           attrib_count + POD_FIRST_ATTRIB);
     new_object_array = PMC_data(object);
+
+    /* fill with PMCNULL, so that access doesn't segfault */
+    for (i = POD_FIRST_ATTRIB; i < attrib_count + POD_FIRST_ATTRIB; ++i)
+        set_attrib_num(object, new_object_array, i, PMCNULL);
 
     /* turn marking on */
     set_attrib_flags(object);
@@ -1491,7 +1495,8 @@ Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
     attrib_array = PMC_data(object);
     attrib_count = ATTRIB_COUNT(object);
     if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
-        internal_exception(OUT_OF_BOUNDS, "No such attribute");
+        internal_exception(OUT_OF_BOUNDS,
+                "No such attribute #%d", (int)attrib);
     }
     return get_attrib_num(attrib_array, attrib);
 }
@@ -1503,6 +1508,7 @@ attr_str_2_num(Parrot_Interp interpreter, PMC *object, STRING *attr)
     PMC *attr_hash;
     SLOTTYPE *class_array;
     HashBucket *b;
+    char *cattr, *cobj;
 
     if (!PObj_is_object_TEST(object))
         internal_exception(INTERNAL_NOT_IMPLEMENTED,
@@ -1515,9 +1521,12 @@ attr_str_2_num(Parrot_Interp interpreter, PMC *object, STRING *attr)
                 (Hash*) PMC_struct_val(attr_hash), attr);
     if (b)
         return VTABLE_get_integer(interpreter, (PMC*)b->value);
-    /* TODO escape the NUL char(s) */
-    internal_exception(1, "No such attribute '%s'",
-            string_to_cstring(interpreter, attr));
+    /* escape the NUL char */
+    cobj = string_to_cstring(interpreter, attr);
+    cattr = cobj + strlen(cobj) + 1;
+    internal_exception(1, "No such attribute '%s\\0%s'",
+            cobj, cattr);
+    string_cstring_free(cattr);
     return 0;
 }
 
@@ -1558,7 +1567,8 @@ Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object,
     attrib_array = PMC_data(object);
     attrib_count = ATTRIB_COUNT(object);
     if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
-        internal_exception(OUT_OF_BOUNDS, "No such attribute");
+        internal_exception(OUT_OF_BOUNDS,
+                "No such attribute #%d", (int)attrib);
     }
     set_attrib_num(object, attrib_array, attrib, value);
 }

@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 57;
+use Parrot::Test tests => 59;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -453,6 +453,31 @@ output_like(<<'CODE', <<'OUTPUT', "setting non-existent attribute");
     end
 CODE
 /No such attribute/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "setting non-existent by name");
+    newclass P1, "Foo"
+    find_type I0, "Foo"
+    new P2, I0
+
+    new P3, .PerlInt
+    setattribute P2, "Foo\0no_such", P3
+    end
+CODE
+/No such attribute 'Foo\\0no_such'/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "getting NULL attribute");
+    newclass P1, "Foo"
+    addattribute P1, "i"
+    find_type I0, "Foo"
+    new P2, I0
+
+    getattribute P3, P2, "Foo\0i"
+    print P3
+    end
+CODE
+/Null PMC access/
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "setting non-existent attribute - 1");

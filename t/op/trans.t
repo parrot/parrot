@@ -334,7 +334,7 @@ EQ3:	print "ok 3\\n"
 	.fp_eq	(N4, 0.785398, EQ4)
 	print "not "
 EQ4:	print "ok 4\\n"
-	
+
         atan N4, N3, 1.0
         .fp_eq   (N4, -0.785398, EQ5)
 	print "not "
@@ -359,7 +359,7 @@ EQ8:	print "ok 8\\n"
         .fp_eq   (N4, 2.356194, EQ9)
 	print "not "
 EQ9:	print "ok 9\\n"
-        
+
         atan N4, 1.0, I0
         .fp_eq   (N4, 1.570796, EQ10)
 	print "not "
@@ -394,6 +394,12 @@ EQ15:	print "ok 15\\n"
         .fp_eq   (N4, 0.000000, EQ16)
 	print "not "
 EQ16:	print "ok 16\\n"
+
+        atan N4, -0.0, -0.0
+        .fp_eq   (N4, -3.1415926, EQ17)
+	print "not "
+	print N4
+EQ17:	print "ok 17\\n"
         end
 CODE
 ok 1
@@ -412,6 +418,7 @@ ok 13
 ok 14
 ok 15
 ok 16
+ok 17
 OUTPUT
 
 output_is( <<"CODE", <<OUTPUT, "log2" );
@@ -524,7 +531,7 @@ EQ4:	print "ok 4\\n"
         set I1, 1
         set N2, 4.0
         set I2, 4
-	pow N3, N2, 2.5 
+	pow N3, N2, 2.5
 	.fp_eq	(N3, 32.0, EQ5)
 	print "not "
 EQ5:	print "ok 5\\n"
@@ -623,5 +630,5 @@ ok 1
 ok 2
 OUTPUT
 
-    
+
 1;
