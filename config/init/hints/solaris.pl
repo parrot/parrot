@@ -9,3 +9,12 @@ Configure::Data->set(
     libs => $libs,
 );
 
+# my $cc = Configure::Data->get('cc');
+my $link = Configure::Data->get('link');
+if (!Configure::Data->get('gccversion')) {
+    # Going to assume Sun's compiler
+    # In which case we need to link with the C++ compiler (CC) rather than the
+    # C compiler (cc)
+    $link =~ s/\bcc\b/CC/;
+    Configure::Data->set('link', $link);
+}
