@@ -411,7 +411,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
      * Link is the strtab section header index.
      * Info is self section header index.
      */
-    sh_add(".symtab", SHT_SYMTAB, 0, (obj->symbol_count + 7) *
+    sh_add(".symtab", SHT_SYMTAB, 0, (obj->symbol_count + 6) *
         sizeof(Elf32_Sym), 7, 6, 4, sizeof(Elf32_Sym));
     /* String Table */
     obj->symbol_list_size += 1; /* Trailing \0 */
@@ -433,17 +433,14 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
             case RTYPE_FUNC:
                 rellocation.r_info =
                     ELF32_R_INFO(
-                        obj->text_rellocation_table[i].symbol_number + 7, 2);
+                        obj->text_rellocation_table[i].symbol_number + 6, 2);
                 break;
             case RTYPE_DATA:
             case RTYPE_COM:
                 rellocation.r_info =
                     ELF32_R_INFO(
-                        obj->text_rellocation_table[i].symbol_number + 7, 1);
+                        obj->text_rellocation_table[i].symbol_number + 6, 1);
                 break;
-                /* 3 == data section */
-                /*   rellocation.r_info = ELF32_R_INFO(3, 1); */
-                /*   break; */
             default:
                 break;
         }
@@ -452,12 +449,6 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     /* Symbol table */
     /* zero */
     bzero(&symlst, sizeof(Elf32_Sym));
-    save_struct(fp, &symlst, sizeof(Elf32_Sym));
-    /* File */
-    bzero(&symlst, sizeof(Elf32_Sym));
-    symlst.st_name = 1;
-    symlst.st_info = ELF32_ST_INFO(STB_LOCAL, STT_FILE);
-    symlst.st_shndx = SHN_ABS;
     save_struct(fp, &symlst, sizeof(Elf32_Sym));
     /* Text */
     bzero(&symlst, sizeof(Elf32_Sym));
@@ -514,14 +505,12 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
    }
     /* String table */
     save_zero(fp);
-    fprintf(fp, "t.pbc");
-    save_zero(fp);
     for (i = 0; i < obj->symbol_count; i++) {
         fprintf(fp, "%s", obj->symbol_table[i].symbol);
         save_zero(fp);
     }
     /* PAD */
-    for (i = 0; i < (4 - (obj->symbol_list_size + 1) % 4); i++)
+    for (i = 0; i < (4 - obj->symbol_list_size % 4); i++)
         save_zero(fp);
     save_zero(fp);
     fprintf(fp,"GCC: (GNU) c 2.95.4 20020320 [FreeBSD]");

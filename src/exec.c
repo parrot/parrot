@@ -14,7 +14,7 @@
 #include <parrot/parrot.h>
 #if HAVE_COMPUTED_GOTO
 #  include <parrot/oplib/core_ops_cgp.h>
-#endif /* HAVE_CGOTO */
+#endif /* HAVE_COMPUTED_GOTO */
 #include "parrot/exec.h"
 #include "parrot/jit.h"
 #define JIT_EMIT 1
@@ -23,8 +23,6 @@
 
 static void exec_init(Parrot_exec_objfile_t *obj);
 static void add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len);
-static void call_opcode(Parrot_exec_objfile_t *obj,
-                            struct Parrot_Interp *interpreter, opcode_t *pc);
 static int symbol_list_find(Parrot_exec_objfile_t *obj, const char *func_name);
 static void do_fixup(Parrot_exec_objfile_t *obj);
 static Parrot_exec_fixup_t *new_fixup(int type, void *addr);
@@ -174,7 +172,7 @@ exec_init(Parrot_exec_objfile_t *obj)
     obj->symbol_list_size = 0;
 #endif
 #ifdef EXEC_ELF
-    obj->symbol_list_size += 2;
+    obj->symbol_list_size = 0;
 #endif
     Parrot_exec_add_symbol(obj, "program_code", STYPE_GDATA);
     Parrot_exec_add_symbol(obj, "opcode_map", STYPE_GDATA);
