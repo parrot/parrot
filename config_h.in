@@ -18,7 +18,7 @@ typedef struct _vtable VTABLE;
 typedef void DPOINTER;
 typedef void SYNC;
 
-//typedef IV *(*opcode_funcs)(void *, void *) OPFUNC;
+/* typedef IV *(*opcode_funcs)(void *, void *) OPFUNC; */
 
 #define FRAMES_PER_CHUNK 16
 
