@@ -2962,7 +2962,8 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
         case '2':
         case '3':
         case '4':
-            abort();
+            jit_emit_mov_ri_i(pc, emit_EAX, &INT_REG(next_i++));
+            break;
         case 'f':
         case 'd':
             /* pop num from st(0) and mov to reg */
