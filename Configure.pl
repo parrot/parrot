@@ -559,7 +559,7 @@ sub buildfile {
     close(IN) or die "Can't close $source_filename.in: $!";
 
     $text =~ s/\$\{(\w+)\}/$c{$1}/g;
-
+    $text =~ s/\cM//g;                 # Potental drek on Win32
     open(OUT, ">$path/$target_filename") or die "Can't open $path/$target_filename: $!";
     print OUT $text;
     close(OUT) or die "Can't close $target_filename: $!";
