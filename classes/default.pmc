@@ -11,9 +11,6 @@
 
 #include "parrot/parrot.h"
 
-/* Shamelessly stolen from core.ops */
-#define INT_TO_KEY(key,int) ((key)->atom.type = enum_key_int, (key)->atom.val.int_val = int, (key)->next = NULL, (key)->flags = BUFFER_sysmem_FLAG, key)
-
 pmclass default noinit {
 
     void init () {
@@ -48,7 +45,7 @@ pmclass default noinit {
 
     INTVAL type_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->type_keyed(INTERP, SELF, &r_key);
     }
 
@@ -63,7 +60,7 @@ pmclass default noinit {
 
     UINTVAL subtype_keyed_int (INTVAL* key, INTVAL type) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->subtype_keyed(INTERP, SELF, &r_key, type);
     }
 
@@ -78,7 +75,7 @@ pmclass default noinit {
 
     STRING* name_keyed_int (INTVAL *key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->name_keyed(INTERP, SELF, &r_key);
     }
 
@@ -97,7 +94,7 @@ pmclass default noinit {
 
     PMC* clone_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->clone_keyed(INTERP, SELF, &r_key);
     }
 
@@ -112,7 +109,7 @@ pmclass default noinit {
 
     PMC* find_method_keyed_int(INTVAL *key, STRING* method_name) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->find_method_keyed(INTERP, SELF, &r_key, method_name);
     }
 
@@ -127,7 +124,7 @@ pmclass default noinit {
 
     INTVAL get_integer_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->get_number_keyed(INTERP, SELF, &r_key);
     }
 
@@ -142,7 +139,7 @@ pmclass default noinit {
 
     FLOATVAL get_number_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->get_number_keyed(INTERP, SELF, &r_key);
     }
 
@@ -157,7 +154,7 @@ pmclass default noinit {
 
     BIGNUM* get_bignum_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->get_bignum_keyed(INTERP, SELF, &r_key);
     }
 
@@ -173,7 +170,7 @@ pmclass default noinit {
 
     STRING* get_string_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->get_string_keyed(INTERP, SELF, &r_key);
     }
 
@@ -196,7 +193,7 @@ pmclass default noinit {
 
     INTVAL get_bool_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->get_bool_keyed(INTERP, SELF, &r_key);
     }
 
@@ -212,7 +209,7 @@ pmclass default noinit {
 
     INTVAL elements_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->elements_keyed(INTERP, SELF, &r_key);
     }
 
@@ -227,7 +224,7 @@ pmclass default noinit {
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->get_pmc_keyed(INTERP, SELF, &r_key);
     }
 
@@ -250,14 +247,14 @@ pmclass default noinit {
     INTVAL is_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         KEY r_key, r_value_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_value_key, *value_key);
+            MAKE_KEY_INT(r_value_key, *value_key);
             return SELF->vtable->is_same_keyed(INTERP, SELF, NULL, value, &r_value_key);
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
             return SELF->vtable->is_same_keyed(INTERP, SELF, &r_key, value, NULL);
         }
-        INT_TO_KEY(&r_value_key, *value_key);
+        MAKE_KEY_INT(r_value_key, *value_key);
         return SELF->vtable->is_same_keyed(INTERP, SELF, &r_key, value, &r_value_key);
     }
 
@@ -287,7 +284,7 @@ pmclass default noinit {
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->set_integer_keyed(INTERP, SELF, &r_key, value);
     }
 
@@ -313,7 +310,7 @@ pmclass default noinit {
 
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->set_number_keyed(INTERP, SELF, &r_key, value);
     }
 
@@ -343,7 +340,7 @@ pmclass default noinit {
 
     void set_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->set_bignum_keyed(INTERP, SELF, &r_key, value);
     }
 
@@ -373,7 +370,7 @@ pmclass default noinit {
 
     void set_string_keyed_int (INTVAL* key, STRING* string) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->set_string_keyed(INTERP, SELF, &r_key, string);
     }
 
@@ -392,16 +389,16 @@ pmclass default noinit {
     void set_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         KEY r_key, r_value_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_value_key, *value_key);
+            MAKE_KEY_INT(r_value_key, *value_key);
             SELF->vtable->set_pmc_keyed(INTERP, SELF, NULL, value, &r_value_key);
             return;
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
             SELF->vtable->set_pmc_keyed(INTERP, SELF, &r_key, value, NULL);
             return;
         }
-        INT_TO_KEY(&r_value_key, *value_key);
+        MAKE_KEY_INT(r_value_key, *value_key);
         SELF->vtable->set_pmc_keyed(INTERP, SELF, &r_key, value, &r_value_key);
     }
 
@@ -416,16 +413,16 @@ pmclass default noinit {
     void set_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         KEY r_key, r_value_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_value_key, *value_key);
+            MAKE_KEY_INT(r_value_key, *value_key);
             SELF->vtable->set_same_keyed(INTERP, SELF, NULL, value, &r_value_key);
             return;
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
             SELF->vtable->set_same_keyed(INTERP, SELF, &r_key, value, NULL);
             return;
         }
-        INT_TO_KEY(&r_value_key, *value_key);
+        MAKE_KEY_INT(r_value_key, *value_key);
         SELF->vtable->set_same_keyed(INTERP, SELF, &r_key, value, &r_value_key);
     }
 
@@ -441,7 +438,7 @@ pmclass default noinit {
     
     INTVAL pop_integer_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->pop_integer_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -457,7 +454,7 @@ pmclass default noinit {
     
     FLOATVAL pop_float_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->pop_float_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -473,7 +470,7 @@ pmclass default noinit {
     
     BIGNUM* pop_bignum_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->pop_bignum_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -489,7 +486,7 @@ pmclass default noinit {
     
     STRING* pop_string_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->pop_string_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -505,7 +502,7 @@ pmclass default noinit {
     
     PMC* pop_pmc_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->pop_pmc_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -519,7 +516,7 @@ pmclass default noinit {
     
     void push_integer_keyed_int (INTVAL* key, INTVAL value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->push_integer_keyed(INTERP, SELF, &r_key, value);
     }    
 
@@ -533,7 +530,7 @@ pmclass default noinit {
     
     void push_float_keyed_int (INTVAL* key, FLOATVAL value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->push_float_keyed(INTERP, SELF, &r_key, value);
     }    
 
@@ -547,7 +544,7 @@ pmclass default noinit {
     
     void push_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->push_bignum_keyed(INTERP, SELF, &r_key, value);
     }    
 
@@ -561,7 +558,7 @@ pmclass default noinit {
     
     void push_string_keyed_int (INTVAL* key, STRING* value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->push_string_keyed(INTERP, SELF, &r_key, value);
     }    
 
@@ -576,16 +573,16 @@ pmclass default noinit {
     void push_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         KEY r_key, r_value_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_value_key, *value_key);
+            MAKE_KEY_INT(r_value_key, *value_key);
             SELF->vtable->push_pmc_keyed(INTERP, SELF, NULL, value, &r_value_key);
             return;
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
             SELF->vtable->push_pmc_keyed(INTERP, SELF, &r_key, value, NULL);
             return;
         }
-        INT_TO_KEY(&r_value_key, *value_key);
+        MAKE_KEY_INT(r_value_key, *value_key);
         SELF->vtable->push_pmc_keyed(INTERP, SELF, &r_key, value, &r_value_key);
     }    
 
@@ -601,7 +598,7 @@ pmclass default noinit {
     
     INTVAL shift_integer_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->shift_integer_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -617,7 +614,7 @@ pmclass default noinit {
     
     FLOATVAL shift_float_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->shift_float_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -633,7 +630,7 @@ pmclass default noinit {
     
     BIGNUM* shift_bignum_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->shift_bignum_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -649,7 +646,7 @@ pmclass default noinit {
     
     STRING* shift_string_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->shift_string_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -665,7 +662,7 @@ pmclass default noinit {
     
     PMC* shift_pmc_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->shift_pmc_keyed(INTERP, SELF, &r_key);
     }    
 
@@ -679,7 +676,7 @@ pmclass default noinit {
     
     void unshift_integer_keyed_int (INTVAL* key, INTVAL value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->unshift_integer_keyed(INTERP, SELF, &r_key, value);
     }    
 
@@ -693,7 +690,7 @@ pmclass default noinit {
     
     void unshift_float_keyed_int (INTVAL* key, FLOATVAL value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->unshift_float_keyed(INTERP, SELF, &r_key, value);
     }    
 
@@ -707,7 +704,7 @@ pmclass default noinit {
     
     void unshift_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->unshift_bignum_keyed(INTERP, SELF, &r_key, value);
     }    
 
@@ -721,7 +718,7 @@ pmclass default noinit {
     
     void unshift_string_keyed_int (INTVAL* key, STRING* value) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->unshift_string_keyed(INTERP, SELF, &r_key, value);
     }    
 
@@ -736,16 +733,16 @@ pmclass default noinit {
     void unshift_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         KEY r_key, r_value_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_value_key, *value_key);
+            MAKE_KEY_INT(r_value_key, *value_key);
             SELF->vtable->unshift_pmc_keyed(INTERP, SELF, NULL, value, &r_value_key);
             return;
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
             SELF->vtable->unshift_pmc_keyed(INTERP, SELF, &r_key, value, NULL);
             return;
         }
-        INT_TO_KEY(&r_value_key, *value_key);
+        MAKE_KEY_INT(r_value_key, *value_key);
         SELF->vtable->unshift_pmc_keyed(INTERP, SELF, &r_key, value, &r_value_key);
     }    
 
@@ -830,30 +827,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->add_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->add_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->add_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->add_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->add_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->add_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -941,30 +938,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->subtract_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->subtract_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->subtract_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->subtract_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->subtract_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->subtract_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1050,30 +1047,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->multiply_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->multiply_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->multiply_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->multiply_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->multiply_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->multiply_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1163,30 +1160,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->divide_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->divide_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->divide_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->divide_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->divide_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->divide_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1268,30 +1265,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->modulus_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->modulus_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->modulus_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->modulus_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->modulus_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->modulus_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1313,16 +1310,16 @@ pmclass default noinit {
     void neg_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
         KEY r_key, r_dest_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_dest_key, *dest_key);
+            MAKE_KEY_INT(r_dest_key, *dest_key);
             SELF->vtable->neg_keyed(INTERP, SELF, NULL, dest, &r_dest_key);
             return;
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
             SELF->vtable->neg_keyed(INTERP, SELF, &r_key, dest, NULL);
             return;
         }
-        INT_TO_KEY(&r_dest_key, *dest_key);
+        MAKE_KEY_INT(r_dest_key, *dest_key);
         SELF->vtable->neg_keyed(INTERP, SELF, &r_key, dest, &r_dest_key);
     }
 
@@ -1384,30 +1381,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->bitwise_or_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->bitwise_or_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_or_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_or_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_or_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_or_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1472,30 +1469,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->bitwise_and_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->bitwise_and_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_and_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_and_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_and_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_and_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1560,30 +1557,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->bitwise_xor_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->bitwise_xor_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_xor_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_xor_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_xor_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_xor_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1605,16 +1602,16 @@ pmclass default noinit {
     void bitwise_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
         KEY r_key, r_dest_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_dest_key, *dest_key);
+            MAKE_KEY_INT(r_dest_key, *dest_key);
             SELF->vtable->bitwise_not_keyed(INTERP, SELF, NULL, dest, &r_dest_key);
             return;
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
             SELF->vtable->bitwise_not_keyed(INTERP, SELF, &r_key, dest, NULL);
             return;
         }
-        INT_TO_KEY(&r_dest_key, *dest_key);
+        MAKE_KEY_INT(r_dest_key, *dest_key);
         SELF->vtable->bitwise_not_keyed(INTERP, SELF, &r_key, dest, &r_dest_key);
     }
 
@@ -1676,30 +1673,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->bitwise_shr_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->bitwise_shr_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_shr_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_shr_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_shr_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_shr_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1764,30 +1761,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->bitwise_shl_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->bitwise_shl_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_shl_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_shl_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->bitwise_shl_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->bitwise_shl_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1872,30 +1869,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->concatenate_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->concatenate_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->concatenate_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->concatenate_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->concatenate_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->concatenate_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -1940,14 +1937,14 @@ pmclass default noinit {
     INTVAL is_equal_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         KEY r_key, r_value_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_value_key, *value_key);
+            MAKE_KEY_INT(r_value_key, *value_key);
             return SELF->vtable->is_equal_keyed(INTERP, SELF, NULL, value, &r_value_key);
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
             return SELF->vtable->is_equal_keyed(INTERP, SELF, &r_key, value, NULL);
         }
-        INT_TO_KEY(&r_value_key, *value_key);
+        MAKE_KEY_INT(r_value_key, *value_key);
         return SELF->vtable->is_equal_keyed(INTERP, SELF, &r_key, value, &r_value_key);
     }
 
@@ -1967,14 +1964,14 @@ pmclass default noinit {
     INTVAL cmp_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         KEY r_key, r_value_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_value_key, *value_key);
+            MAKE_KEY_INT(r_value_key, *value_key);
             return SELF->vtable->cmp_keyed(INTERP, SELF, NULL, value, &r_value_key);
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
             return SELF->vtable->cmp_keyed(INTERP, SELF, &r_key, value, NULL);
         }
-        INT_TO_KEY(&r_value_key, *value_key);
+        MAKE_KEY_INT(r_value_key, *value_key);
         return SELF->vtable->cmp_keyed(INTERP, SELF, &r_key, value, &r_value_key);
     }
 
@@ -2001,14 +1998,14 @@ pmclass default noinit {
     INTVAL cmp_num_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         KEY r_key, r_value_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_value_key, *value_key);
+            MAKE_KEY_INT(r_value_key, *value_key);
             return SELF->vtable->cmp_num_keyed(INTERP, SELF, NULL, value, &r_value_key);
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
             return SELF->vtable->cmp_num_keyed(INTERP, SELF, &r_key, value, NULL);
         }
-        INT_TO_KEY(&r_value_key, *value_key);
+        MAKE_KEY_INT(r_value_key, *value_key);
         return SELF->vtable->cmp_num_keyed(INTERP, SELF, &r_key, value, &r_value_key);
     }
 
@@ -2028,14 +2025,14 @@ pmclass default noinit {
     INTVAL cmp_string_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         KEY r_key, r_value_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_value_key, *value_key);
+            MAKE_KEY_INT(r_value_key, *value_key);
             return SELF->vtable->cmp_string_keyed(INTERP, SELF, NULL, value, &r_value_key);
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
             return SELF->vtable->cmp_string_keyed(INTERP, SELF, &r_key, value, NULL);
         }
-        INT_TO_KEY(&r_value_key, *value_key);
+        MAKE_KEY_INT(r_value_key, *value_key);
         return SELF->vtable->cmp_string_keyed(INTERP, SELF, &r_key, value, &r_value_key);
     }
 
@@ -2073,30 +2070,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->logical_or_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->logical_or_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->logical_or_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->logical_or_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->logical_or_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->logical_or_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -2136,30 +2133,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->logical_and_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->logical_and_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->logical_and_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->logical_and_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->logical_and_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->logical_and_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -2229,30 +2226,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->logical_xor_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->logical_xor_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->logical_xor_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->logical_xor_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->logical_xor_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->logical_xor_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -2277,16 +2274,16 @@ pmclass default noinit {
     void logical_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
         KEY r_key, r_dest_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_dest_key, *dest_key);
+            MAKE_KEY_INT(r_dest_key, *dest_key);
             SELF->vtable->logical_not_keyed(INTERP, SELF, NULL, dest, &r_dest_key);
             return;
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
             SELF->vtable->logical_not_keyed(INTERP, SELF, &r_key, dest, NULL);
             return;
         }
-        INT_TO_KEY(&r_dest_key, *dest_key);
+        MAKE_KEY_INT(r_dest_key, *dest_key);
         SELF->vtable->logical_not_keyed(INTERP, SELF, &r_key, dest, &r_dest_key);
     }
 
@@ -2308,30 +2305,30 @@ pmclass default noinit {
         
         if (key == NULL) {
             if (value_key == NULL) {
-                INT_TO_KEY(&r_dest_key, *dest_key);
+                MAKE_KEY_INT(r_dest_key, *dest_key);
                 SELF->vtable->repeat_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 SELF->vtable->repeat_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
-            INT_TO_KEY(&r_key, *key);
+            MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
                     SELF->vtable->repeat_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->repeat_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
-                INT_TO_KEY(&r_value_key, *value_key);
+                MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
                     SELF->vtable->repeat_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
                 else {
-                    INT_TO_KEY(&r_dest_key, *dest_key);
+                    MAKE_KEY_INT(r_dest_key, *dest_key);
                     SELF->vtable->repeat_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
@@ -2351,16 +2348,16 @@ pmclass default noinit {
     void repeat_int_keyed_int (INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key) {
         KEY r_key, r_dest_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_dest_key, *dest_key);
+            MAKE_KEY_INT(r_dest_key, *dest_key);
             SELF->vtable->repeat_int_keyed(INTERP, SELF, NULL, value, dest, &r_dest_key);
             return;
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
             SELF->vtable->repeat_int_keyed(INTERP, SELF, &r_key, value, dest, NULL);
             return;
         }
-        INT_TO_KEY(&r_dest_key, *dest_key);
+        MAKE_KEY_INT(r_dest_key, *dest_key);
         SELF->vtable->repeat_int_keyed(INTERP, SELF, &r_key, value, dest, &r_dest_key);
     }
 
@@ -2374,7 +2371,7 @@ pmclass default noinit {
 
     void increment_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->increment_keyed(INTERP, SELF, &r_key);
     }
 
@@ -2388,7 +2385,7 @@ pmclass default noinit {
 
     void decrement_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->decrement_keyed(INTERP, SELF, &r_key);
     }
 
@@ -2399,7 +2396,7 @@ pmclass default noinit {
 
     INTVAL exists_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->exists_keyed(INTERP, SELF, &r_key);
     }
 
@@ -2414,7 +2411,7 @@ pmclass default noinit {
 
     INTVAL defined_keyed_int (INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->defined_keyed(INTERP, SELF, &r_key);
     }
 
@@ -2424,7 +2421,7 @@ pmclass default noinit {
 
     void delete_keyed_int(INTVAL* key) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         SELF->vtable->delete_keyed(INTERP, SELF, &r_key);
     }
 
@@ -2436,7 +2433,7 @@ pmclass default noinit {
     KEY* nextkey_keyed_int (INTVAL* key) {
         /* XXX - Something's not right with this method */
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->nextkey_keyed(INTERP, SELF, &r_key);
     }
 
@@ -2450,16 +2447,16 @@ pmclass default noinit {
     void substr_keyed_int(INTVAL* key, INTVAL offset, INTVAL length, PMC* dest, INTVAL* dest_key) {
         KEY r_key, r_dest_key;
         if (key == NULL) {
-            INT_TO_KEY(&r_dest_key, *dest_key);
+            MAKE_KEY_INT(r_dest_key, *dest_key);
             SELF->vtable->substr_keyed(INTERP, SELF, NULL, offset, length, dest, &r_dest_key);
             return;
         }
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
             SELF->vtable->substr_keyed(INTERP, SELF, &r_key, offset, length, dest, NULL);
             return;
         }
-        INT_TO_KEY(&r_dest_key, *dest_key);
+        MAKE_KEY_INT(r_dest_key, *dest_key);
         SELF->vtable->substr_keyed(INTERP, SELF, &r_key, offset, length, dest, &r_dest_key);
     }
 
@@ -2475,7 +2472,7 @@ pmclass default noinit {
 
     STRING* substr_str_keyed_int (INTVAL* key, INTVAL offset, INTVAL length) {
         KEY r_key;
-        INT_TO_KEY(&r_key, *key);
+        MAKE_KEY_INT(r_key, *key);
         return SELF->vtable->substr_str_keyed(INTERP, SELF, &r_key, offset, length);
     }
 }

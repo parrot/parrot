@@ -29,8 +29,8 @@ key_new(Interp *interpreter)
     UNUSED(interpreter);
 
     key->atom.type = enum_key_undef;
+    key->atom.val.struct_val = NULL;
     key->next = NULL;
-    key->flags = BUFFER_immobile_FLAG;
 
     return key;
 }

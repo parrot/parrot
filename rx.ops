@@ -375,7 +375,7 @@ op rx_info_getgroup(in pmc, out int, out int, in int) {
         KEY key;
 	RX_dUNPACK($1);
 
-        MAKE_KEY(key, $4, enum_key_int, int_val);
+        MAKE_KEY_INT(key, $4);
 	$2=rx->groupstart->vtable->get_integer_keyed(interpreter, rx->groupstart, &key);
 	$3=rx->groupend->vtable->get_integer_keyed(interpreter, rx->groupend, &key);
 	
@@ -638,7 +638,7 @@ op rx_startgroup(in pmc, in int) {
         KEY key;
 	RX_dUNPACK($1);
 	
-        MAKE_KEY(key, $2, enum_key_int, int_val);
+        MAKE_KEY_INT(key, $2);
 	rx->groupstart->vtable->set_integer_keyed(interpreter, rx->groupstart, &key, rx->index);
 	
 	goto NEXT();
@@ -657,7 +657,7 @@ op rx_endgroup(in pmc, in int) {
     KEY key;
     RX_dUNPACK($1);
 	
-    MAKE_KEY(key, $2, enum_key_int, int_val);        
+    MAKE_KEY_INT(key, $2);
     rx->groupend->vtable->set_integer_keyed(interpreter, rx->groupend, &key, rx->index);
 	
     goto NEXT();

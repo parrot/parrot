@@ -32,14 +32,31 @@ struct _key_atom {
 typedef struct _key KEY;
 
 struct _key {
-    KEY *next;
-    INTVAL pad;
-    UINTVAL flags;
     KEY_ATOM atom;
+    KEY *next;
 };
 
-KEY *key_new(Interp * interpreter);
-KEY *key_clone(Interp * interpreter, KEY *key);
+KEY *key_new(Interp *);
+KEY *key_clone(Interp *, KEY *);
+
+/* This (now even more) convoluted mess avoids costly runtime creation
+ * of KEY structures
+ *
+ * Usage: MAKE_KEY(KEY k, (INTVAL|FLOATVAL|DPOINTER*|STRING*|PMC*) v,
+ *                 KEY_TYPE c, (int_val|num_val|struct_val|string_val|pmc_val)); 
+ * or:
+ * MAKE_KEY_INT(KEY k, INTVAL v);
+ * MAKE_KEY_STRING(KEY k, STRING *v);
+ * MAKE_KEY_UNDEF(KEY k);
+ * etc
+ */
+
+#define MAKE_KEY(k,v,c,t) {k.atom.type = c; k.atom.val.t = v; k.next = NULL;}
+#define MAKE_KEY_UNDEF(k) {k.atom.type = enum_key_undef; k.atom.val.struct_val = NULL; k.next = NULL;}
+#define MAKE_KEY_INT(k,v) {k.atom.type = enum_key_int; k.atom.val.int_val = v; k.next = NULL;}
+#define MAKE_KEY_NUM(k,v) {k.atom.type = enum_key_num; k.atom.val.num_val = v; k.next = NULL;}
+#define MAKE_KEY_STRING(k,v) {k.atom.type = enum_key_string; k.atom.val.struct_val = v; k.next = NULL;}
+#define MAKE_KEY_PMC(k,v) {k.atom.type = enum_key_pmc; k.atom.val.pmc_val = v; k.next = NULL;}
 
 #endif
 

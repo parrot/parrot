@@ -17,7 +17,7 @@
 void
 init_world(void)
 {
-    KEY *key;
+    KEY key;
     string_init();              /* Set up the string subsystem */
 
     /* Call base vtable class constructor methods! */
@@ -35,83 +35,56 @@ init_world(void)
 
     /* Now register the names of the PMCs */
 
-    /* We need a key to work with */
-    key = key_new(NULL);
-    key->atom.type = enum_key_string;
-
-    /* And we need a hash */
+    /* We need a hash */
     Parrot_base_classname_hash = pmc_new(NULL, enum_class_PerlHash);
     Parrot_base_classname_hash->vtable->init(NULL, Parrot_base_classname_hash);
 
     /* Now start filling the hash */
 
     /* Array */
-    key->atom.val.string_val =
-        (STRING*)Parrot_base_vtables[enum_class_Array].name(NULL,
-                                                            NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_Array].name(NULL,NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Array);
+                                                          Parrot_base_classname_hash, &key, enum_class_Array);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_PerlUndef].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_PerlUndef].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlUndef);
+                                                          Parrot_base_classname_hash, &key, enum_class_PerlUndef);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_PerlInt].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_PerlInt].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlInt);
+                                                          Parrot_base_classname_hash, &key, enum_class_PerlInt);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_PerlNum].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_PerlNum].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlNum);
+                                                          Parrot_base_classname_hash, &key, enum_class_PerlNum);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_PerlString].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_PerlString].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlString);
+                                                          Parrot_base_classname_hash, &key, enum_class_PerlString);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_PerlArray].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_PerlArray].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlArray);
+                                                          Parrot_base_classname_hash, &key, enum_class_PerlArray);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_PerlHash].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_PerlHash].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlHash);
+                                                          Parrot_base_classname_hash, &key, enum_class_PerlHash);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_Pointer].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_Pointer].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Pointer);
+                                                          Parrot_base_classname_hash, &key, enum_class_Pointer);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_IntQueue].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_IntQueue].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_IntQueue);
+                                                          Parrot_base_classname_hash, &key, enum_class_IntQueue);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_Sub].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_Sub].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Sub);
+                                                          Parrot_base_classname_hash, &key, enum_class_Sub);
 
-    key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_Coroutine].name(NULL, NULL);
-    key->atom.type = enum_key_string;
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_Coroutine].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Coroutine);
+                                                          Parrot_base_classname_hash, &key, enum_class_Coroutine);
 
 }
 
