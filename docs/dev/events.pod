@@ -21,17 +21,16 @@ B<PARROT_HAS_HEADER_PTHREAD> link against B<libpthread>.
 
 =head1 DESCRIPTION
 
-On construction of the first interpreter (that one with no
+On construction of the first interpreter (the one with no
 B<parent_interpreter>) two threads are started: The B<event_thread>,
 which manages the static global B<event_queue> and the B<io_thread>
 which is responsible for signal and IO related events.
 
 =head2 Events
 
-Events can be basically kind of timed events (they are due after some
-elapsed time) or they are not timed. For the former thers is one API
-call: B<Parrot_new_timer_event>, used by the
-F<dynoplibs/myops.ops>:B<alarm> opcode for testing.
+Events can be either timed (they are due after some elapsed time) or 
+untimed. For the former there is one API call: B<Parrot_new_timer_event>, 
+used by the F<dynoplibs/myops.ops>:B<alarm> opcode for testing.
 
 =head2 The B<event_thread>
 
@@ -43,8 +42,8 @@ condition releases the mutex, so that other threads can insert events
 into the B<event_queue>.)
 
 When an event arrives (or the timeout was reached) the B<event_thread>
-pops off all events and places the queue entries into the interpreters
-B<task_queue>. This also enables event checking in the interpreters
+pops off all events and places the queue entries into the interpreter's
+B<task_queue>. This also enables event checking in the interpreter's
 run-core.
 
 When the popped off entry is a timed event and has a repeat interval,
@@ -61,20 +60,20 @@ B<io_thread>.
 
 =head2 The B<io_thread>
 
-The B<io_thread> sleeps in a select(2) loop, which is interrupted,
+The B<io_thread> sleeps in a select(2) loop, which is interrupted
 when either a signal arrives or when one of the file descriptors has a
 ready condition. Additionally the file descriptor set contains the
-reader end of an internal pipe, which is used by other threads, to
+reader end of an internal pipe, which is used by other threads to
 communicate with the B<io_thread>.
 
 Signal events like SIGINT are broadcasted to all running
-interpreters, which then throw an approprate exception.
+interpreters, which then throw an appropriate exception.
 
 =head2 The interpreter event checking code
 
 We cannot interrupt the interpreter at arbitrary points and run some
 different code (e.g. a PASM subroutine handling timer events). So when
-an event is put into the interpreters B<task_queue> the opcode
+an event is put into the interpreter's B<task_queue> the opcode
 dispatch table for the interpreter is changed.
 
 Plain function cores get a function table with all entries filled with
@@ -86,9 +85,9 @@ are to be handled.
 Prederefed and especially the CGP core don't have an opcode dispatch
 table that is checked during running the opcodes. When an event is
 scheduled, the event handler replaces backward branches in the opcode
-image, with the B<check_events__> opcode.
+image with the B<check_events__> opcode.
 
-The JIT core doesn't handles events yet.
+The JIT core doesn't handle events yet.
 
 After all events are popped off and handled, the opcode dispatch table
 is restored to its original, and the B<check_events__> reexecutes the
@@ -96,7 +95,7 @@ same instruction again, which is now the real one and thus normal
 execution flow continues.
 
 This scheme has zero overhead in the absence of scheduled events for
-all cores execept switched and JIT.
+all cores except switched and JIT.
 
 =head1 Missing
 
@@ -104,7 +103,7 @@ all cores execept switched and JIT.
 
 =item Synchronous event API
 
-Sync events could be placed directly into the interpreters task queue.
+Sync events could be placed directly into the interpreter's task queue.
 
 =item Async IO
 
