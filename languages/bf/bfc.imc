@@ -1,7 +1,7 @@
 # $Id$
 # A Brainfuck compiler
 # By Leon Brocard <acme@astray.com>
-# 
+#
 # See http://www.catseye.mb.ca/esoteric/bf/
 # for more information on this silly language
 
@@ -16,23 +16,32 @@
   .local string program
   .local string char
 
+  program = P0[0]
+  # check argc
+  I0 = P0
+  if I0 < 2 goto usage
   # Get the filename
   filename = P0[1]
   if filename goto SOURCE
-  program = P0[0]
-  print "usage: ../imcc/imcc -r "
+usage:
+  print "usage: ../../parrot "
   print program
   print " file.bf\n"
   end
 
   # Read the file into S1
 SOURCE:
-  open I0, filename
+  open P1, filename, "<"
+  defined I0, P1
+  if I0, SOURCE_LOOP
+  print filename
+  print " not found\n"
+  branch usage
 SOURCE_LOOP:
-  readline line, I0
+  read line, P1, 1024
   file = file . line
   if line goto SOURCE_LOOP
-  close I0
+  close P1
 
   length maxpc, file
 
