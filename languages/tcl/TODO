@@ -2,6 +2,33 @@
 
 =over 4
 
+=item From Use-perl Journal
+
+Remove any dependence in Tcl's PIR on the Perl* PMCs.
+
+Provide the ability to generate Tcl Lists from within Tcl
+(that is, write [list]), and insure that the right thing happens when shimmering between a list and a string. For example, insure that:
+puts '[string range [list 1 2 3] 0 2]'
+Actually generates
+'1 2'
+which will have been shimmered from a TclList (returned by [list]) to a TclString
+
+
+=item From leo - cleanup of tcl objects.
+
+C<tclobject> is an abstract object, it doesn't have a vtable. But the
+bundling code *does* C<pmc_register> this PMC. This leads to an empty
+vtable slot, dereferencing that NULL is an operation, which many systems
+don't like.
+
+I'd first reduce C<TclArray> to a bare minimum. Specifically the creation
+functions (init, clone) should be inherited (or follow the C<PerlHash>
+conventions). The same applies to any PMC that can hold pointers to
+other PMCs.
+
+These changes are necessary to make a PMC compliant with incremental GC.
+Please grep through the docs and the sources for DOD_WRITE_BARRIER.
+
 =item REMOVE Perl*
 
 Mostly done. All that seems to be left is PerlUndef. Much was already
