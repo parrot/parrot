@@ -171,7 +171,7 @@ again:
                 realloc(program_code, program_size + chunk_size);
 
             if (NULL == program_code) {
-                PIO_eprintf(interpreter, 
+                PIO_eprintf(interpreter,
                             "Parrot VM: Could not reallocate buffer while reading packfile from PIO.\n");
                 return NULL;
             }
@@ -269,10 +269,11 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
                 argc);
     }
 
-    userargv = pmc_new_noinit(interpreter, enum_class_PerlArray);
+    userargv = pmc_new_noinit(interpreter, enum_class_SArray);
     /* immediately anchor pmc to root set */
     interpreter->pmc_reg.registers[0] = userargv;
     VTABLE_init(interpreter, userargv);
+    VTABLE_set_integer_native(interpreter, userargv, argc);
 
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
@@ -319,7 +320,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     /* No JIT here--make sure they didn't ask for it. */
 
     if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
-        PIO_eprintf(interpreter, "Parrot VM: Platform " JIT_ARCHNAME 
+        PIO_eprintf(interpreter, "Parrot VM: Platform " JIT_ARCHNAME
                     " is not JIT-capable.\n");
         Parrot_exit(1);
     }
