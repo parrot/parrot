@@ -129,14 +129,11 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, opcode_t *code_sta
 jit_f
 build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, opcode_t *code_end)
 {
-    INTVAL *address,ivalue,i,k;
-    INTVAL bytecode_position;
+    UINTVAL i;
     char *new_arena;
     void *prev_address;
     Parrot_jit_info jit_info;
     opcode_t cur_opcode_byte;
-
-    STRING *s;
 
     jit_info.optimizer = optimize_jit(interpreter,pc,code_start,code_end); 
     /* Byte code size in opcode_t's */
@@ -151,7 +148,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 
     jit_info.arena_size = 1024;
     jit_info.native_ptr = jit_info.arena_start =
-        mem_sys_allocate(jit_info.arena_size);
+        mem_sys_allocate((size_t)jit_info.arena_size);
 
     jit_info.op_i = 0;
     jit_info.cur_op = pc;
@@ -173,7 +170,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         /* Grow the arena early */ 
         if(jit_info.arena_size < (jit_info.op_map[jit_info.op_i].offset + 100)){
             new_arena = mem_sys_realloc(jit_info.arena_start,
-                                        jit_info.arena_size * 2);
+                                        (size_t)jit_info.arena_size * 2);
             jit_info.arena_size *= 2;
             jit_info.native_ptr = new_arena +
                                 (jit_info.native_ptr - jit_info.arena_start);

@@ -91,6 +91,9 @@ void Parrot_jit_dofixup(Parrot_jit_info *jit_info, struct Parrot_Interp * interp
 void Parrot_jit_cpcf_op(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter);
 void Parrot_jit_normal_op(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter);
 
+Parrot_jit_optimizer_t *
+optimize_jit(struct Parrot_Interp *, opcode_t *, opcode_t *, opcode_t *);
+
 #endif /* JIT_H_GUARD */
 
 /*
