@@ -46,10 +46,6 @@ pmclass PerlString extends perlscalar {
         return NULL;
     }
 
-    STRING* get_string () {
-        return (STRING*)SELF->cache.string_val;
-    }
-
     INTVAL get_bool () {
         return string_bool(SELF->cache.string_val);
     }
@@ -72,11 +68,6 @@ pmclass PerlString extends perlscalar {
         DYNSELF.set_integer_native(value);
     }
 
-    void set_integer_same (PMC* value) {
-	DYNSELF.morph(enum_class_PerlInt);
-        DYNSELF.set_integer_same(value);
-    }
-
     void set_number (PMC * value) {
 	DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number(value);
@@ -85,11 +76,6 @@ pmclass PerlString extends perlscalar {
     void set_number_native (FLOATVAL value) {
 	DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number_native(value);
-    }
-
-    void set_number_same (PMC * value) {
-	DYNSELF.morph(enum_class_PerlNum);
-        DYNSELF.set_number_same(value);
     }
 
     void set_string (PMC * value) {
@@ -221,13 +207,6 @@ pmclass PerlString extends perlscalar {
         );
     }
 
-    void bitwise_or_same (PMC* value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            VTABLE_get_integer(INTERP, SELF) |
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
 
     void bitwise_and (PMC* value, PMC* dest) {
 	DYNSELF.morph(enum_class_PerlInt);
@@ -245,14 +224,6 @@ pmclass PerlString extends perlscalar {
         );
     }
 
-    void bitwise_and_same (PMC* value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            VTABLE_get_integer(INTERP, SELF) &
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
-
     void bitwise_xor (PMC* value, PMC* dest) {
 	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
@@ -266,14 +237,6 @@ pmclass PerlString extends perlscalar {
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) ^
             value
-        );
-    }
-
-    void bitwise_xor_same (PMC* value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            VTABLE_get_integer(INTERP, SELF) ^
-            VTABLE_get_integer(INTERP, value)
         );
     }
 

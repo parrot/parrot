@@ -43,7 +43,7 @@ pmclass PerlNum extends perlscalar {
     }
 
     INTVAL get_bool () {
-        return (INTVAL)(pmc->cache.num_val != 0.0);
+        return (INTVAL)(SELF->cache.num_val != 0.0);
     }
 
     void set_integer (PMC* value) {
@@ -54,11 +54,6 @@ pmclass PerlNum extends perlscalar {
     void set_integer_native (INTVAL value) {
 	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer_native(value);
-    }
-
-    void set_integer_same (PMC* value) {
-	DYNSELF.morph(enum_class_PerlInt);
-        DYNSELF.set_integer_same(value);
     }
 
     void set_number (PMC* value) {
@@ -90,11 +85,6 @@ pmclass PerlNum extends perlscalar {
     void set_string_native (STRING * value) {
 	DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string_native(value);
-    }
-
-    void set_string_same (PMC * value) {
-	DYNSELF.morph(enum_class_PerlString);
-        DYNSELF.set_string_same(value);
     }
 
     void add (PMC* value, PMC* dest) {
@@ -224,13 +214,6 @@ pmclass PerlNum extends perlscalar {
         );
     }
 
-    void bitwise_or_same (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            (INTVAL)SELF->cache.num_val |
-            (INTVAL)value->cache.num_val
-        );
-    }
-
     void bitwise_and (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val &
@@ -245,13 +228,6 @@ pmclass PerlNum extends perlscalar {
         );
     }
 
-    void bitwise_and_same (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            (INTVAL)SELF->cache.num_val &
-            (INTVAL)value->cache.num_val
-        );
-    }
-
     void bitwise_xor (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val ^
@@ -263,13 +239,6 @@ pmclass PerlNum extends perlscalar {
         VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val ^
             value
-        );
-    }
-
-    void bitwise_xor_same (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            (INTVAL)SELF->cache.num_val ^
-            (INTVAL)value->cache.num_val
         );
     }
 

@@ -201,38 +201,28 @@ pmclass default abstract noinit {
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
-        VTABLE_set_integer_keyed(INTERP, SELF, r_key, value);
+        DYNSELF.set_integer_keyed(r_key, value);
     }
 
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
-        VTABLE_set_number_keyed(INTERP, SELF, r_key, value);
+        DYNSELF.set_number_keyed(r_key, value);
     }
 
     void set_bignum_keyed_int (INTVAL key, BIGNUM* value) {
         PMC* r_key = INT2KEY(INTERP, key);
-        VTABLE_set_bignum_keyed(INTERP, SELF, r_key, value);
+        DYNSELF.set_bignum_keyed(r_key, value);
     }
 
     void set_string_keyed_int (INTVAL key, STRING* string) {
         PMC* r_key = INT2KEY(INTERP, key);
-        VTABLE_set_string_keyed(INTERP, SELF, r_key, string);
-    }
-
-    void set_pmc (PMC* value) {
-        SELF->cache.struct_val =
-	    VTABLE_get_pmc(INTERP, value)->cache.struct_val;
+        DYNSELF.set_string_keyed(r_key, string);
     }
 
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_pmc_keyed(r_key, value);
-    }
-
-    void set_same (PMC* value) {
-        SELF->cache.struct_val = value->cache.struct_val;
-	PMC_data(SELF) = PMC_data(value);
     }
 
     void set_same_keyed_int (INTVAL key, PMC* value) {
@@ -270,7 +260,6 @@ pmclass default abstract noinit {
 
 
     PMC* nextkey_keyed_int (INTVAL key, INTVAL w) {
-        /* XXX - Something's not right with this method */
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.nextkey_keyed(r_key, w);
     }

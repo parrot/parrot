@@ -32,9 +32,6 @@ pmclass PerlInt extends perlscalar {
         return string_from_int(INTERP, SELF->cache.int_val);
     }
 
-    INTVAL get_bool () {
-        return (INTVAL)(pmc->cache.int_val != 0);
-    }
 
     void set_integer_same (PMC * value) {
         SELF->cache.int_val = value->cache.int_val;
@@ -50,11 +47,6 @@ pmclass PerlInt extends perlscalar {
         DYNSELF.set_number_native(value);
     }
 
-    void set_number_same (PMC * value) {
-	DYNSELF.morph(enum_class_PerlNum);
-        DYNSELF.set_number_same(value);
-    }
-
     void set_bignum (PMC* value) {
         /* XXX not sure if this can be optimized further safely */
         SELF->cache.struct_val = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
@@ -67,12 +59,6 @@ pmclass PerlInt extends perlscalar {
         /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBignum]); */
     }
 
-    void set_bignum_same (PMC* value) {
-        /* XXX not sure if this can be optimized further safely */
-        SELF->cache.struct_val = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
-	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
-    }
-
     void set_string (PMC* value) {
 	DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string(value);
@@ -81,11 +67,6 @@ pmclass PerlInt extends perlscalar {
     void set_string_native (STRING* value) {
 	DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string_native(value);
-    }
-
-    void set_string_same (PMC* value) {
-	DYNSELF.morph(enum_class_PerlString);
-        DYNSELF.set_string_same(value);
     }
 
     /* XXX -lt: only add done yet, others will follow, when

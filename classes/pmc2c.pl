@@ -13,6 +13,7 @@ pmc2c.pl - PMC compiler
 =head1 SYNOPSIS
 
 perl pmc2c.pl [--no-lines] [--tree] foo.pmc [foo2.pmc...]
+perl pmc2c.pl -f method *.pmc
 
 The first class.pmc should be the name of the class you wish to
 create. Normally, the pmc2c.pl translator uses #line pragmas to tell
@@ -24,6 +25,8 @@ However, there are times when this is not desirable and therefore the
 
 If --tree is set, the inheritance tree of given classes is printed, no
 further processing is done. The common base class 'default' is not printed.
+
+If -f is set, the pmcs are printed, where this method is implemented.
 
 =head1 DESCRIPTION
 
@@ -133,7 +136,7 @@ use Parrot::Vtable;
 use strict;
 
 my $default = parse_vtable("$FindBin::Bin/../vtable.tbl");
-my $print_tree;
+my ($print_tree, $print_meth);
 
 # The signature regex is used to parse a function signature for
 # example void func( int x ) { ... } after having applied the
@@ -256,11 +259,11 @@ data and calls parse_superpmc().
 sub superpmc_info {
     my $pmc = shift;
     my $filename = "$FindBin::Bin/\L$pmc\E.pmc";
-    print "Scanning $filename...\n" unless $print_tree;
+    print "Scanning $filename...\n" unless ($print_tree||$print_meth);
     local $/;
     if (!open(SUPERPMC, $filename)) {
 	$filename =~ s/classes/dynclasses/;
-        print "\tScanning $filename...\n" unless $print_tree;
+        print "\tScanning $filename...\n" unless ($print_tree||$print_meth) ;
 	open(SUPERPMC, $filename) or die "open superpmc file $filename: $!";
     };
     my $data = <SUPERPMC>;
@@ -290,8 +293,11 @@ sub scan_inheritance_tree {
     while ($class ne 'default') {
         my ($methods, $super) = superpmc_info($class);
         foreach my $method (@$methods) {
-            $methods{$method} ||= $class;
-            $super{$method} ||= $class unless $class eq $leafclass;
+	    $methods{$method} ||= $class;
+	    $super{$method} ||= $class unless $class eq $leafclass;
+	    if ($print_meth && $print_meth eq $method) {
+		print "    " x $depth++, $class, "\n";
+	    }
         }
 	if ($print_tree) {
 		print "    " x $depth++, $class, "\n";
@@ -323,6 +329,7 @@ _EOF_
 
 my $suppress_lines;
 Usage() unless @ARGV;
+# TODO use getopt
 if ($ARGV[0] eq '--no-lines') {
     $suppress_lines = 1;
     shift(@ARGV);
@@ -331,6 +338,10 @@ if ($ARGV[0] eq '--no-lines') {
 if ($ARGV[0] eq '--tree') {
     $print_tree = 1;
     shift(@ARGV);
+}
+if ($ARGV[0] eq '-f') {
+    shift(@ARGV);
+    $print_meth = shift(@ARGV);
 }
 while (my $file = shift @ARGV) {
 
@@ -347,7 +358,7 @@ while (my $file = shift @ARGV) {
   close PMC;
 
   my ($coutput, $houtput) = filter($contents, $file, $cfile); # run the filter
-  next if $print_tree;
+  next if $print_tree || $print_meth;
 
   open (SOURCE, ">$cfile") || die "$0: Could not write file '$cfile'\n";
   print SOURCE $coutput;
@@ -472,7 +483,7 @@ sub filter {
 
   # $methodloc is a hash reference methodname => defining class
   my ($methodloc, $supermethodloc) = scan_inheritance_tree($classname);
-  return if $print_tree;
+  return if $print_tree || $print_meth;
 
   # look through the pmc declaration header for flags such as noinit
   my $saw_extends;

@@ -33,25 +33,11 @@ pmclass scalar abstract noinit {
     }
 
     STRING* get_string () {
-        STRING*s = string_copy(INTERP, SELF->cache.struct_val);
-        return s;
+        return (STRING*)SELF->cache.string_val;
     }
 
     INTVAL get_bool () {
-        /*  Everything has to be 0 */
-        if (   DYNSELF.get_integer() == 0
-            && DYNSELF.get_number() == 0.0
-            && string_bool(DYNSELF.get_string()) == 0
-            )
-        {
-            return 0;
-        }
-        return 1;
-    }
-
-    INTVAL elements () {
-        /* XXX maybe this should be one */
-        return 0;
+        return SELF->cache.int_val != 0;
     }
 
 
@@ -67,20 +53,12 @@ pmclass scalar abstract noinit {
         SELF->cache.int_val = value;
     }
 
-    void set_integer_same (PMC* value) {
-        SELF->cache.int_val = VTABLE_get_integer(INTERP, value);
-    }
-
     void set_number (PMC* value) {
         SELF->cache.num_val = VTABLE_get_number(INTERP, value);
     }
 
     void set_number_native (FLOATVAL value) {
         SELF->cache.num_val = value;
-    }
-
-    void set_number_same (PMC* value) {
-        SELF->cache.num_val = VTABLE_get_number(INTERP, value);
     }
 
     void set_bignum (PMC* value) {
@@ -91,26 +69,13 @@ pmclass scalar abstract noinit {
         SELF->cache.struct_val = (DPOINTER*)value;
     }
 
-    void set_bignum_same (PMC* value) {
-        SELF->cache.struct_val = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
-    }
-
     void set_string (PMC* value) {
-        SELF->cache.struct_val = VTABLE_get_string(INTERP, value);
+        SELF->cache.string_val = VTABLE_get_string(INTERP, value);
     }
 
     void set_string_native (STRING* value) {
-        SELF->cache.struct_val = string_copy(INTERP, value);
+        SELF->cache.string_val = string_copy(INTERP, value);
     }
-
-    void set_string_same (PMC* value) {
-        SELF->cache.struct_val = VTABLE_get_string(INTERP, value);
-    }
-
-    void set_same (PMC* value) {
-        SELF->cache = value->cache;
-    }
-
 
     void add_int (INTVAL value, PMC* dest) {
         /* dest = SELF + value */

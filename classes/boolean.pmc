@@ -7,6 +7,8 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
+ *     Albeit Boolean is derived from PerlInt, it doesn't morph
+ *     to other types, its value is changed only.
  *  References:
  */
 
@@ -25,20 +27,12 @@ pmclass Boolean extends PerlInt {
         SELF->cache.int_val = (value != 0);
     }
 
-    void set_integer_same (PMC * value) {
-        SELF->cache.int_val = value->cache.int_val;
-    }
-
     void set_number (PMC * value) {
 	SELF->cache.int_val = (value!=0);
     }
 
     void set_number_native (FLOATVAL value) {
 	SELF->cache.int_val = (value!=0);
-    }
-
-    void set_number_same (PMC * value) {
-	SELF->cache.int_val = value->cache.int_val;
     }
 
     void set_string (PMC* value) {
@@ -48,11 +42,6 @@ pmclass Boolean extends PerlInt {
     void set_string_native (STRING* value) {
 	SELF->cache.int_val = string_bool(value);
     }
-
-    void set_string_same (PMC* value) {
-	SELF->cache.int_val = string_bool(value->cache.string_val);
-    }
-
 
     void neg (PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest, !SELF->cache.int_val);
