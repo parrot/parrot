@@ -46,13 +46,18 @@ Parrot_is_const_pmc(Parrot_Interp interpreter, PMC *pmc)
 {
     struct Small_Object_Pool *pool
         = interpreter->arena_base->constant_pmc_pool;
+    int c;
 #if  ARENA_DOD_FLAGS
-    return GET_ARENA(pmc)->pool == pool;
+    c = GET_ARENA(pmc)->pool == pool;
 #else
-    return contained_in_pool(interpreter, pool, pmc);
+    c = contained_in_pool(interpreter, pool, pmc);
 #endif
 
+    /* some paranoia first */
+    assert(!!PObj_constant_TEST(pmc) == !!c);
+    return c;
 }
+
 static int find_free_list(struct Small_Object_Pool *pool);
 
 /* We're out of traceable objects. Try a DOD, then get some more if needed */

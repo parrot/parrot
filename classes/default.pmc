@@ -23,6 +23,20 @@ static const char * caller(Parrot_Interp interp, PMC * pmc)
 	VTABLE_name(interp, pmc)->strstart : "(null)";
 }
 
+static void
+check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)
+{
+    if (!string_compare(interp, key, string_from_cstring(interp, "_ro", 0))) {
+	/* pmc should set/clear readonly */
+	INTVAL on = VTABLE_get_bool(interp, value);
+	/* morph to Const/normal class */
+	if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
+	    pmc->vtable = &Parrot_base_vtables[pmc->vtable->base_type + 1];
+	else if (!on && (pmc->vtable->flags & VTABLE_IS_CONST_FLAG))
+	    VTABLE_morph(interp, pmc, pmc->vtable->base_type - 1);
+    }
+}
+
 pmclass default abstract noinit {
 
     void init () {
@@ -49,13 +63,14 @@ pmclass default abstract noinit {
 	}
         else {
 	  PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
-          PObj_constant_SET(undef);
 	  return undef;
 	}
     }
 
     void setprop(STRING* key, PMC* value) {
         PMC* p_key;
+
+	check_set_std_props(INTERP, SELF, key, value);
 	if (SELF->pmc_ext && SELF->metadata) {
           p_key = key_new_string(interpreter, key);
 	  VTABLE_set_pmc_keyed(interpreter,

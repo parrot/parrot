@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Setting sarray size");
@@ -410,18 +410,50 @@ ok 11
 ok 12
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "const SArray");
+output_like(<<'CODE', <<'OUTPUT', "const SArray 1");
     new P0, .ConstSArray
     set P0, 10
+    new P1, .PerlInt
+    inc P1
+    setprop P0, "_ro", P1
+    set P0, 20
     end
 CODE
-/set_integer_native\(\) in ConstSArray/
+/^set_integer_native\(\) in ConstSArray/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "const SArray");
+output_like(<<'CODE', <<'OUTPUT', "const SArray 2");
     new P0, .ConstSArray
+    set P0, 2
     push P0, 10
+    new P1, .PerlInt
+    inc P1
+    setprop P0, "_ro", P1
+    set P2, P0[0]
+    printerr P2
+    printerr "\n"
+    getprop P3, "_ro", P0
+    printerr P3
+    printerr "\n"
+    shift I4, P0
     end
 CODE
-/push_integer\(\) in ConstSArray/
+/^10
+1
+shift_integer\(\) in ConstSArray/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "const SArray try to unset _ro");
+    new P0, .ConstSArray
+    set P0, 10
+    new P1, .PerlInt
+    inc P1
+    setprop P0, "_ro", P1
+    printerr "ok\n"
+    dec P1
+    setprop P0, "_ro", P1
+    end
+CODE
+/^ok
+morph\(\) in ConstSArray/
 OUTPUT

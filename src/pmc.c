@@ -36,16 +36,32 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
 
 static PMC*
 get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
-    struct Small_Object_Pool *pool)
+    int constant)
 {
-    PMC *pmc = get_free_pmc(interpreter, pool);
+    struct Small_Object_Pool *pool;
+    PMC *pmc;
 
+    if (Parrot_base_vtables[base_type].flags & VTABLE_IS_CONST_FLAG) {
+        /* put the normal vtable in, so that the pmc can be initialized first
+         * parrot or user code has to set the _ro property then,
+         * to morph the PMC to the const variant
+         */
+        constant = 1;
+        --base_type;
+    }
+    pool = constant ?
+        interpreter->arena_base->constant_pmc_pool :
+        interpreter->arena_base->pmc_pool;
+
+    pmc = get_free_pmc(interpreter, pool);
     if (!pmc) {
         internal_exception(ALLOCATION_ERROR,
-                           "Parrot VM: PMC allocation failed!\n");
+                "Parrot VM: PMC allocation failed!\n");
         return NULL;
     }
 
+    if (constant)
+        PObj_constant_SET(pmc);
     pmc->vtable = &(Parrot_base_vtables[base_type]);
 
     if (!pmc->vtable || !pmc->vtable->init) {
@@ -57,6 +73,24 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
     }
 
     return pmc;
+}
+
+static void
+pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
+{
+    /* TODO have a bit in the vtable defining if a pmc_ext is needed */
+    switch (base_type) {
+        case enum_class_PerlInt:
+        case enum_class_PerlNum:
+        case enum_class_PerlString:
+        case enum_class_PerlUndef:
+        case enum_class_Boolean:
+        case enum_class_PerlHash:
+            break;
+        default:
+            add_pmc_ext(interpreter, pmc);
+            break;
+    }
 }
 
 /*=for api pmc pmc_new_noinit
@@ -79,28 +113,14 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
         pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
                 (INTVAL)IGLOBALS_ENV_HASH);
         if (!pmc) {
-            pmc = get_new_pmc_header(interpreter, base_type,
-                    interpreter->arena_base->pmc_pool);
+            pmc = get_new_pmc_header(interpreter, base_type, 0);
             VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
                     (INTVAL)IGLOBALS_ENV_HASH, pmc);
         }
         return pmc;
     }
-    pmc = get_new_pmc_header(interpreter, base_type,
-            interpreter->arena_base->pmc_pool);
-    /* TODO have a bit in the vtable defining if a pmc_ext is needed */
-    switch (base_type) {
-        case enum_class_PerlInt:
-        case enum_class_PerlNum:
-        case enum_class_PerlString:
-        case enum_class_PerlUndef:
-        case enum_class_Boolean:
-        case enum_class_PerlHash:
-            break;
-        default:
-            add_pmc_ext(interpreter, pmc);
-            break;
-    }
+    pmc = get_new_pmc_header(interpreter, base_type, 0);
+    pmc_new_ext(interpreter, pmc, base_type);
     return pmc;
 }
 
@@ -113,10 +133,8 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 PMC *
 constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 {
-    PMC *pmc = get_new_pmc_header(interpreter, base_type,
-            interpreter->arena_base->constant_pmc_pool);
-    PObj_constant_SET(pmc);
-    add_pmc_ext(interpreter, pmc);
+    PMC *pmc = get_new_pmc_header(interpreter, base_type, 1);
+    pmc_new_ext(interpreter, pmc, base_type);
     return pmc;
 }
 /*=for api pmc pmc_new_init
@@ -129,25 +147,8 @@ constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 PMC *
 pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)
 {
-    PMC *pmc = new_pmc_header(interpreter);
+    PMC *pmc = pmc_new_noinit(interpreter, base_type);
 
-    if (!pmc) {
-        internal_exception(ALLOCATION_ERROR,
-                           "Parrot VM: PMC allocation failed!\n");
-        return NULL;
-    }
-
-    pmc->vtable = &(Parrot_base_vtables[base_type]);
-
-    if (!pmc->vtable || !pmc->vtable->init) {
-        /* This is usually because you either didn't call init_world early
-         * enough or you added a new PMC class without adding
-         * Parrot_(classname)_class_init to init_world. */
-        PANIC("Null vtable used");
-        return NULL;
-    }
-
-    add_pmc_ext(interpreter, pmc);
     VTABLE_init_pmc(interpreter, pmc, init);
 
     return pmc;

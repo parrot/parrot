@@ -2,6 +2,7 @@
 # [MAIN] #default section name
 
 void init()
+# init must be first for JITed vtable meths
 void init_pmc(PMC* initializer)
 void init_pmc_props(PMC* initializer, PMC* properties)
 void morph(INTVAL type)

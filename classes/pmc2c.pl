@@ -661,6 +661,7 @@ EOC
       $HOUT .= <<EOH;
 void $initname (Interp *, int);
 EOH
+      my $has_const = exists $flags{const_too} ? 'VTABLE_HAS_CONST_TOO' : 0;
       $OUT .= <<EOC;
 void $initname (Interp * interp, int entry) {
 
@@ -669,7 +670,7 @@ void $initname (Interp * interp, int entry) {
         enum_class_$classname,
         NULL,	/* whoami */
         NULL,	/* method_table */
-        0, /* reserved */
+        $has_const, /* flags */
         0, /* reserved */
         $methodlist
         };
@@ -699,7 +700,7 @@ void $initname (Interp * interp, int entry) {
         enum_class_Const$classname,
         NULL,	/* whoami */
         NULL,	/* method_table */
-        0, /* reserved */
+        VTABLE_IS_CONST_FLAG, /* flags */
         0, /* reserved */
         $cmethodlist
         };

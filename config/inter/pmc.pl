@@ -60,6 +60,9 @@ END
       $pmc_list = prompt('Which PMC files would you like?', $pmc_list);
     }
   }
+  # XXX:leo do we really need an interactive step for this
+  # user could deactivate vital PMCs like PerlHash or SArray
+  # so there would be tests needed, that check for vital classes
 
   # names of class files for classes/Makefile
   (my $pmc_o = $pmc_list) =~ s/\.pmc/\$(O)/g;
@@ -106,6 +109,8 @@ END
       close PMC;
       die "No pmclass declaration found in $pmc_file"
         if ! defined $name;
+      # please note that normal and Const PMCs must be in this
+      # order
       push @names, $name;
       push @names, "Const$name" if $const;
   }

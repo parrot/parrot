@@ -1628,8 +1628,14 @@ OUTPUT
 my $checkTypes;
 while (my ($type, $id) = each %pmc_types) {
     next if $type eq "Iterator";
+    my $set_ro = ($type =~ /^Const\w+/) ? <<EOPASM : '';
+    new P10, .PerlInt
+    inc P10
+    setprop P0, "_ro", P10
+EOPASM
     $checkTypes .= <<"CHECK";
     new P0, .$type
+    $set_ro
     set S1, "$type"
     typeof S0, P0
     ne S0, S1, L_BadName

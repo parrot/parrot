@@ -69,14 +69,19 @@ sub vtbl_struct {
     my $entry;
 
     $struct = <<"EOF";
+typedef enum {
+    VTABLE_IS_CONST_FLAG = 0x01,
+    VTABLE_HAS_CONST_TOO = 0x02
+} vtable_flags_t;
+
 struct _vtable {
     /* XXX - What on earth are these for??? */
     struct PACKAGE *package;
     INTVAL base_type;
     STRING* whoami;
     PMC* method_table;
-    INTVAL reserved1;
-    INTVAL reserved2;
+    UINTVAL flags;
+    INTVAL reserved;
 
     /* Vtable Functions */
 
