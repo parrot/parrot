@@ -8,8 +8,8 @@ classes/fixedstringarray.pmc - fixed size array for strings only
 
 =head1 DESCRIPTION
 
-This class, FixedStringArray, implements an array of fixed size, which stored STRING*
-TODO: it uses PerlString's internally to perform conversion, but it should use String PMCs
+This class, FixedStringArray, implements an array of fixed size, which 
+stores Parrot strings.
 
 =head2 Functions
 
@@ -129,8 +129,10 @@ Marks the array as live.
 
 =item C<INTVAL get_bool()>
 
-Returns whether the array has any elements (meaning been initialized, for a
-fixed sized array).
+Returns 1 if the array has any elements; otherwise, returns 0. 
+Since this is a fixed size array, C<get_bool> will always 
+return true once the array has been initialized and had its 
+size set by C<set_integer_native>.
 
 =cut
 
@@ -143,6 +145,8 @@ fixed sized array).
 /*
 
 =item C<INTVAL elements()>
+
+Returns the number of elements in the array.
 
 =cut
 
@@ -279,7 +283,7 @@ Returns the PMC value of the element at index C<key>.
         PMC *ret;
         STRING *val;
 
-        ret = pmc_new(INTERP, enum_class_PerlString);
+        ret = pmc_new(INTERP, enum_class_String);
         val = DYNSELF.get_string_keyed_int(key);
         VTABLE_set_string_native(INTERP, ret, val);
         return ret;
@@ -304,7 +308,9 @@ Returns the PMC value of the element at index C<*key>.
 
 =item C<void set_integer_native(INTVAL size)>
 
-Resizes the array to C<size> elements.
+Sets the size of the array to C<size> elements. Once the array 
+has been given an initial size, attempts to resize it will 
+cause an exception to be thrown.
 
 =cut
 
@@ -332,7 +338,7 @@ Sets the integer value of the element at index C<key> to C<value>.
         PMC *ret;
         STRING *val;
 
-        ret = pmc_new(INTERP, enum_class_PerlString);
+        ret = pmc_new(INTERP, enum_class_String);
         VTABLE_set_integer_native(INTERP, ret, value);
         val = VTABLE_get_string(INTERP, ret);
         DYNSELF.set_string_keyed_int(key, val);
@@ -369,7 +375,7 @@ C<value>.
         PMC *ret;
         STRING *val;
 
-        ret = pmc_new(INTERP, enum_class_PerlString);
+        ret = pmc_new(INTERP, enum_class_String);
         VTABLE_set_number_native(INTERP, ret, value);
         val = VTABLE_get_string(INTERP, ret);
         DYNSELF.set_string_keyed_int(key, val);
