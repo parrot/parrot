@@ -44,11 +44,12 @@ extern PMC* Parrot_Hash_get_iter(Interp* interpreter, PMC* pmc);
 #define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
 
 PMC* Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc);
+void Parrot_PyBuiltin___load__(Interp* interpreter, PMC* pmc);
 
 PMC*
 Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc)
 {
-    Parrot_PyBuiltin___load__(interpreter);
+    Parrot_PyBuiltin___load__(interpreter, NULL);
     return lib_pmc;
 }
 pmclass PyBuiltin dynpmc group python_group {
