@@ -168,7 +168,6 @@ CODE
 no match
 OUTPUT
 
-#SKIP: { skip("Arrays are still wacky", 1);
 output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'groups');
 		rx_startgroup P0, 0
 		rx_literal P0, "a", ADVANCE
@@ -184,7 +183,6 @@ CODE
 (a)
 <><a><>
 OUTPUT
-#}
 
 output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'ZWA: ^ (success)');
 		rx_zwa_atbeginning P0, ADVANCE
@@ -242,8 +240,6 @@ CODE
 ><>
 OUTPUT
 
-SKIP: {
-skip("Failing under new assembler for unknown reason.",1);
 output_is(gentest('\n\n', <<'CODE', 'm'), <<'OUTPUT', 'multiline regexen (/m)');
 		rx_literal P0, "\n", ADVANCE
 		rx_zwa_atbeginning P0, ADVANCE
@@ -253,7 +249,6 @@ CODE
 ><
 >
 OUTPUT
-};
 
 SKIP: {
 	skip("Pending some sort of lowercasing op",1);
