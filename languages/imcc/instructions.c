@@ -129,15 +129,20 @@ Instruction * emit(Instruction * i) {
 }	
 
 void emit_flush() {
-    int i;
-    if (n_spilled > 0) {
-       printf("new P31, .PerlArray\n");
-    }
-    
-    for(i = 0; i < n_instructions; i++) {
+    int i = 0;
+ 
+    /* first instruction should be ".sub" -- make sure we allocate P31
+     * _after_ subroutine entry. */
+    if (n_spilled > 0 && n_instructions > 0) {
 	emit(instructions[i]);
-        free(instructions[i]);
-        instructions[i] = 0;
+	free(instructions[i]);
+	i++;
+	printf("new P31, .PerlArray\n");
+    }
+    for( ; i < n_instructions; i++) {
+	emit(instructions[i]);
+	free(instructions[i]);
+	instructions[i] = 0;
     }
     free(instructions);
     instructions = NULL;
