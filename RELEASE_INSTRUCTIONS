@@ -8,7 +8,8 @@ To prepare a release:
 
     2.  Update files with version-specific information:
 
-        a.  Increment the version number in VERSION.
+        a.  Increment the version number in VERSION and
+	    adjust IMCC_VERSION in languages/imcc/main.c.
 
         b.  Change the information in DEVELOPING to reflect
             this release's version number and date.
@@ -28,8 +29,8 @@ To prepare a release:
 
     6.  untar parrot-<version>.tar.gz into another area
 
-    7.  Make sure everything works--Configure, make and 
-        make fulltest.  Check the Tinderbox and make sure that 
+    7.  Make sure everything works--Configure, make and
+        make fulltest.  Check the Tinderbox and make sure that
         everything's green (or that any yellows and reds are
         due to problems with the particular box, like a
         botched compiler upgrade).
@@ -46,7 +47,7 @@ To prepare a release:
 ABOUT THIS DOCUMENT:
 
 This document was written after a couple of subtly incorrectly
-assembled releases--usually when someone forgot to delete 
+assembled releases--usually when someone forgot to delete
 DEVELOPING, but at least once where the MANIFEST check failed.
-The intent of this file is to document what must be done to 
+The intent of this file is to document what must be done to
 release so that such mistakes don't happen again.
