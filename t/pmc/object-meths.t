@@ -33,20 +33,12 @@ output_is(<<'CODE', <<'OUTPUT', "callmethod 1");
     newclass P2, "Foo"
     set S0, "meth"
 
-    # cant mangle method names yet
-    find_global P3, "meth"
-    # so store ref to the sub with the real name
-    store_global "Foo", "meth", P3
-
     print "main\n"
     callmethodcc
     print "back\n"
     end
 
-# .mangle "::" "\x00"
-# .pcc_sub Foo::meth:
-#  or some such
-
+.namespace ["Foo"]
 .pcc_sub meth:
     print "in meth\n"
     invoke P1
@@ -101,13 +93,12 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "constructor");
     newclass P1, "Foo"
-    find_global P2, "init"
-    store_global "Foo", "__init", P2
     find_type I1, "Foo"
     new P3, I1
     print "ok 2\n"
     end
-.pcc_sub init:
+.namespace ["Foo"]
+.pcc_sub __init:
     print "ok 1\n"
     invoke P1
 CODE
@@ -118,24 +109,21 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "constructor - init attr");
     newclass P1, "Foo"
     addattribute P1, ".i"
-    find_global P2, "Foo::init"
-    store_global "Foo", "__init", P2
-    find_global P2, "Foo::get_s"
-    store_global "Foo", "__get_string", P2
     find_type I1, "Foo"
     new P3, I1
     print "ok 2\n"
     print P3
     print "\n"
     end
-.pcc_sub Foo::init:
+.namespace ["Foo"]
+.pcc_sub __init:
     print "ok 1\n"
     new P10, .PerlInt
     set P10, 42
     classoffset I0, P2, "Foo"
     setattribute P2, I0, P10
     invoke P1
-.pcc_sub Foo::get_s:
+.pcc_sub __get_string:
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0
     set S5, P10
@@ -148,32 +136,40 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "constructor - parents");
     newclass P1, "Foo"
-    find_global P12, "_foo::init"
-    store_global "Foo", "__init", P12
     subclass P2, P1, "Bar"
-    find_global P12, "_bar::init"
-    store_global "Bar", "__init", P12
     subclass P3, P2, "Baz"
-    find_global P12, "_baz::init"
-    store_global "Baz", "__init", P12
     find_type I1, "Baz"
     new P3, I1
     find_type I1, "Bar"
     new P3, I1
+    find_global P0, "_sub"
+    invokecc
     print "done\n"
     end
-.pcc_sub _foo::init:
+
+    .namespace ["Foo"]
+.pcc_sub __init:
     print "foo_init\n"
     classname S0, P2
     print S0
     print "\n"
     invoke P1
-.pcc_sub _bar::init:
+
+    .namespace ["Bar"]
+.pcc_sub __init:
     print "bar_init\n"
     invoke P1
-.pcc_sub _baz::init:
+
+    .namespace ["Baz"]
+.pcc_sub __init:
     print "baz_init\n"
     invoke P1
+
+    .namespace [""]	# main again
+.pcc_sub _sub:
+    print "in sub\n"
+    invoke P1
+
 CODE
 foo_init
 Baz
@@ -182,5 +178,6 @@ baz_init
 foo_init
 Bar
 bar_init
+in sub
 done
 OUTPUT

@@ -37,11 +37,11 @@
 #endif
 
 #define SPILL_STRESS 0
-    
-#if SPILL_STRESS 
+
+#if SPILL_STRESS
 # undef MAX_COLOR
 # define MAX_COLOR 4
-#endif      
+#endif
 
 /* IMCC reserves this character for internally generated labels
  * and identifiers that won't collide with high level compiler generated names.
@@ -115,7 +115,7 @@ void sub_optimize(Parrot_Interp interpreter, IMC_Unit *);
 
 /* Call convention specific implementations (currently 2, FASTSUB and PCCSUB)*/
 
-/* 
+/*
  * pcc.c
  */
 void expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
@@ -128,19 +128,19 @@ int pcc_sub_writes(Instruction* ins, SymReg* r);
 
 /*
  * fastcall.c
- */    
+ */
 void expand_fast_sub(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
 void expand_fast_sub_ret(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
 void expand_fast_sub_call(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
 void fast_sub_optimize(Parrot_Interp interpreter, IMC_Unit *);
-    
+
 
 
 /* globals */
 
 /* Compiler pragma options that may affect the whole module being compiled */
 struct _imc_pragmas {
-  int fastcall;          /* Use low level branch op, pass/return on stack 
+  int fastcall;          /* Use low level branch op, pass/return on stack
                           * as opposed to pcc convention and invoke */
                          /* more to come */
   int prototyped;        /* Currently undefined which will be the default */
@@ -185,10 +185,11 @@ typedef struct _imc_info_t {
     int verbose;
     int debug;
     int n_comp_units;
+    SymReg  *  cur_namespace;
 
 } imc_info_t;
 
-#define IMCC_INFO(i) ((i)->imc_info)
+#define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)
 
 #define IMC_TRACE 0
 #define IMC_TRACE_HIGH 0

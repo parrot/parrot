@@ -203,7 +203,7 @@ SP              [ ]
 ".return"       return(RETURN);
 ".class"        return(CLASS);
 ".endclass"     return(ENDCLASS);
-".namespace"    return(NAMESPACE);
+<emit,INITIAL>".namespace"    return(NAMESPACE);
 ".endnamespace" return(ENDNAMESPACE);
 ".field"        return(FIELD);
 ".method"       return(METHOD);

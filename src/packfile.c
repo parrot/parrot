@@ -27,6 +27,7 @@ structure of the frozen bytecode.
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/packfile.h"
+#include <assert.h>
 
 #define TRACE_PACKFILE 0
 #define TRACE_PACKFILE_PMC 0
@@ -2736,6 +2737,57 @@ Unpack a constant PMC (currently Subs only).
 
 */
 
+static void
+store_sub_in_namespace(Parrot_Interp interpreter, struct PackFile *pf,
+        PMC* sub_pmc,
+        char *name, int ns)
+{
+    STRING *key = string_from_cstring(interpreter, name, 0);
+    PMC * globals = interpreter->globals->stash_hash;
+
+#if TRACE_PACKFILE_PMC
+    fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %d\n", name, ns);
+#endif
+    /*
+     * namespace is a const table entry indey
+     * -1 ... no namespace or
+     * type PFC_STRING .. a simple string
+     *      PFC_KEY   ... a Key chain
+     */
+    if (ns == -1) {
+global_ns:
+        VTABLE_set_pmc_keyed_str(interpreter, globals, key, sub_pmc);
+    }
+    else {
+        STRING *names;
+        PMC * stash;
+        struct PackFile_Constant *pfc_const;
+
+        assert(ns < pf->const_table->const_count);
+        pfc_const = pf->const_table->constants[ns];
+        switch (pfc_const->type) {
+            case PFC_STRING:
+                names = pfc_const->u.string;
+                if (!string_length(names))
+                    goto global_ns;
+                if (!VTABLE_exists_keyed_str(interpreter, globals, names)) {
+                    stash = pmc_new(interpreter, enum_class_OrderedHash);
+                    VTABLE_set_pmc_keyed_str(interpreter, globals, names,
+                            stash);
+                }
+                else {
+                    stash = VTABLE_get_pmc_keyed_str(interpreter, globals,
+                            names);
+                }
+                VTABLE_set_pmc_keyed_str(interpreter, stash, key, sub_pmc);
+                break;
+            default:
+                internal_exception(1, "Unhandled namespace constant");
+        }
+
+    }
+}
+
 opcode_t *
 PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
                          struct PackFile_ConstTable *constt,
@@ -2747,9 +2799,10 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     char class[32], name[128];
     int start, end, flag;
     int rc, pmc_num;
-    PMC *sub_pmc, *key;
+    PMC *sub_pmc;
     struct Parrot_Sub *sub;
     struct PackFile *pf_save;
+    int ns_const;
 
 #if TRACE_PACKFILE_PMC
     fprintf(stderr, "PMC_CONST '%s'\n", (char*)cursor);
@@ -2760,15 +2813,16 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
      *
      * TODO first get classname, then get rest according to PMC type
      */
-    rc = sscanf(pmcs, "%31s %127s %d %d %d)", class, name, &start, &end, &flag);
-    if (rc != 5) {
+    rc = sscanf(pmcs, "%31s %127s %d %d %d %d",
+            class, name, &start, &end, &flag, &ns_const);
+    if (rc != 6) {
         fprintf(stderr, "PMC_CONST ERR RC '%d'\n", rc);
     }
 
 #if TRACE_PACKFILE_PMC
     fprintf(stderr,
-            "PMC_CONST: class '%s', name '%s', start %d end %d flag %d\n",
-            class, name, start, end, flag);
+            "PMC_CONST: class '%s', name '%s', start %d end %d flag %d ns %d\n",
+            class, name, start, end, flag, ns_const);
 #endif
     /*
      * make a constant subroutine object of the desired class
@@ -2813,12 +2867,7 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     /*
      * finally place the sub in the global stash
      */
-    key = key_new_cstring(interpreter, name);
-#if TRACE_PACKFILE_PMC
-    fprintf(stderr, "PMC_CONST: store_global: name '%s'\n", name);
-#endif
-    VTABLE_set_pmc_keyed(interpreter, interpreter->globals->stash_hash,
-            key, sub_pmc);
+    store_sub_in_namespace(interpreter, pf, sub_pmc, name, ns_const);
 
     /*
      * restore interpreters packfile

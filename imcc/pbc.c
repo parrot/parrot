@@ -71,6 +71,7 @@ static struct globals {
 static int add_const_str(struct Parrot_Interp *, char *str);
 
 static void imcc_globals_destroy(int ex, void *param);
+static opcode_t build_key(struct Parrot_Interp *interpreter, SymReg *reg);
 
 static void
 imcc_globals_destroy(int ex, void *param)
@@ -608,15 +609,38 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
     char buf[256];
     opcode_t *rc;
     struct PackFile_Constant *pfc;
+    SymReg *ns;
+    int ns_const = -1;
+    char *real_name;
 
-    debug(interpreter, DEBUG_PBC_CONST, "add_const_pmc_sub '%s' flags %d\n",
-            r->name, r->pcc_sub->pragma);
+
+    if (r->pcc_sub->namespace) {
+        ns = r->pcc_sub->namespace->reg;
+        if (ns->set == 'K')
+            ns->color = build_key(interpreter, ns);
+        debug(interpreter, DEBUG_PBC_CONST, "name space const = %d\n",
+                ns->color);
+        ns_const = ns->color;
+        /* strip namespace off from front */
+        real_name = strrchr(r->name, ':');
+        if (!real_name)
+            real_name = r->name;
+        else
+            ++real_name;
+    }
+    else
+        real_name = r->name;
+    debug(interpreter, DEBUG_PBC_CONST,
+            "add_const_pmc_sub '%s' -> '%s' flags %d\n",
+            r->name, real_name, r->pcc_sub->pragma);
+
     /*
      * TODO use serialize api if that is done
      *      for now:
-     * "Class name offs end flags"
+     * "Class name offs end flags namespace#"
      */
-    sprintf(buf, "Sub %s %d %d %d",  r->name, offs, len, r->pcc_sub->pragma);
+    sprintf(buf, "Sub %s %d %d %d %d",  real_name, offs, len,
+            r->pcc_sub->pragma, ns_const);
     pfc = malloc(sizeof(struct PackFile_Constant));
 
     rc = PackFile_Constant_unpack_pmc(interpreter,
@@ -631,7 +655,7 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
      * create entry in our fixup (=symbol) table
      * the offset is the index in the constant table of this Sub
      */
-    PackFile_FixupTable_new_entry(interpreter, r->name, enum_fixup_sub, k);
+    PackFile_FixupTable_new_entry(interpreter, real_name, enum_fixup_sub, k);
     return k;
 }
 
@@ -796,6 +820,9 @@ constant_folding(struct Parrot_Interp *interpreter, IMC_Unit * unit)
         for (r = ghash[i]; r; r = r->next) {
             if (r->type & VTCONST) {
                 add_1_const(interpreter, r);
+            }
+            else if (r->type & VT_CONSTP) {
+                add_1_const(interpreter, r->reg);
             }
         }
         /* ... but keychains 'K' are in local hash, they may contain

@@ -14,8 +14,6 @@
 /* Globals: */
 /* Code: */
 
-static SymReg * dup_sym(SymReg *r);
-
 
 void
 push_namespace(char * name)
@@ -132,6 +130,25 @@ mk_pcc_sub(char * name, int proto) {
     r->type = VT_PCC_SUB;
     r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
     return r;
+}
+
+/*
+ * add current namespace to sub decl
+ */
+void
+add_namespace(Parrot_Interp interpreter, SymReg *sub)
+{
+    SymReg *ns = IMCC_INFO(interpreter)->cur_namespace;
+    SymReg *r, *g;
+
+    if (!ns)
+        return;
+    g = dup_sym(ns);
+    sub->pcc_sub->namespace = g;
+    g->reg = ns;
+    g->type = VT_CONSTP;
+    if (! (r = _get_sym(ghash, g->name)) || r->type != VT_CONSTP )
+        _store_symreg(ghash, g);
 }
 
 /*
@@ -305,6 +322,31 @@ mk_const(char * name, int t)
     return _mk_const(ghash, name, t);
 }
 
+extern SymReg *cur_namespace; /* ugly hack for mk_address */
+
+/*
+ * add namespace to sub if any
+ * */
+static char *
+add_ns(SymReg *r, char *name)
+{
+    int len, l;
+    char *ns_name;
+
+    if (!cur_namespace || (l = strlen(cur_namespace->name)) <= 2)
+        return name;
+    /* TODO keyed syntax */
+    len = strlen(name) + l  + 3;
+    ns_name = mem_sys_allocate(len);
+    strcpy(ns_name, cur_namespace->name);
+    *ns_name = '_';
+    ns_name[l - 1] = '\0';
+    strcat(ns_name, "::");
+    strcat(ns_name, name);
+    mem_sys_free(name);
+    return ns_name;
+}
+
 /* Makes a new address */
 SymReg *
 _mk_address(SymReg *hsh[], char * name, int uniq)
@@ -318,6 +360,8 @@ _mk_address(SymReg *hsh[], char * name, int uniq)
         _store_symreg(hsh,r);
         return r;
     }
+    if (uniq == U_add_uniq_sub)
+        name = add_ns(r, name);
 
     if (uniq && (r = _get_sym(hsh, name)) &&
             r->type == VTADDRESS &&
@@ -429,7 +473,7 @@ mk_label_address(IMC_Unit * unit, char * name)
  *
  */
 
-static SymReg *
+SymReg *
 dup_sym(SymReg *r)
 {
     SymReg * new = malloc(sizeof(SymReg));
@@ -446,6 +490,8 @@ link_keys(int nargs, SymReg * keys[])
     SymReg * first, *key, *keychain;
     int i;
     char key_str[256];
+    /* namespace keys are global consts - no cur_unit */
+    SymReg **h = cur_unit ? cur_unit->hash : ghash;
 
     if (nargs == 0)
         fatal(1, "link_keys", "hu? no keys\n");
@@ -459,7 +505,7 @@ link_keys(int nargs, SymReg * keys[])
         if (i < nargs - 1)
             strcat(key_str, ";");
     }
-    if ( (keychain = get_sym(key_str)) != 0)
+    if ( (keychain = _get_sym(h, key_str)) != 0)
         return keychain;
     /* no, need a new one */
     keychain = calloc(1, sizeof(SymReg));
@@ -485,7 +531,7 @@ link_keys(int nargs, SymReg * keys[])
     keychain->name = str_dup(key_str);
     keychain->set = 'K';
     keychain->color = -1;
-    store_symreg(keychain);
+    _store_symreg(h, keychain);
     return keychain;
 }
 

@@ -1,17 +1,17 @@
 #!perl
 use strict;
-use TestCompiler tests => 3;
+use TestCompiler tests => 5;
 
 ##############################
 # Parrot Calling Conventions
 
 
 output_is(<<'CODE', <<'OUT', "meth call syntax");
+.namespace [ "Foo" ]
+
 .sub _main
     .local pmc class
     .local pmc obj
-    find_global $P0, "_meth"
-    store_global "Foo", "_meth", $P0
     newclass class, "Foo"
     find_type $I0, "Foo"
     new obj, $I0
@@ -30,11 +30,10 @@ done
 OUT
 
 output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
+.namespace [ "Foo" ]
 .sub _main
     .local pmc class
     .local pmc obj
-    find_global $P0, "_meth"
-    store_global "Foo", "_meth", $P0
     newclass class, "Foo"
     find_type $I0, "Foo"
     new obj, $I0
@@ -56,11 +55,10 @@ done
 OUT
 
 output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
+.namespace [ "Foo" ]
 .sub _main
     .local pmc class
     .local pmc obj
-    find_global $P0, "_meth"
-    store_global "Foo", "_meth", $P0
     newclass class, "Foo"
     find_type $I0, "Foo"
     new obj, $I0
@@ -83,3 +81,74 @@ in meth
 ok
 done
 OUT
+
+output_is(<<'CODE', <<'OUT', "meth call syntax");
+.namespace [ "Foo" ]
+.sub _main
+    .local pmc class
+    .local pmc obj
+    .local string meth
+    meth = "_meth"
+    newclass class, "Foo"
+    find_type $I0, "Foo"
+    new obj, $I0
+    obj."_meth"()
+    obj->meth()
+    set S10, "_meth"
+    obj->S10()
+    set $S10, "_meth"
+    obj->$S10()
+    print "done\n"
+    end
+.end
+.sub _meth
+    print "in meth\n"
+.end
+CODE
+in meth
+in meth
+in meth
+in meth
+done
+OUT
+
+output_is(<<'CODE', <<'OUT', "initializer");
+.sub _main
+    newclass P1, "Foo"
+    subclass P2, P1, "Bar"
+    subclass P3, P2, "Baz"
+    find_type I1, "Baz"
+    new P3, I1
+    find_global P0, "_sub"
+    invokecc
+    print "done\n"
+    end
+.end
+
+.namespace ["Foo"]
+.sub __init
+    print "foo_init\n"
+.end
+
+.namespace ["Bar"]
+.sub __init
+    print "bar_init\n"
+.end
+
+.namespace ["Baz"]
+.sub __init
+    print "baz_init\n"
+.end
+
+.namespace [""]	# main again
+.sub _sub
+    print "in sub\n"
+.end
+CODE
+foo_init
+bar_init
+baz_init
+in sub
+done
+OUT
+

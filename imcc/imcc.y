@@ -53,6 +53,7 @@ static Class * current_class;
 static Instruction * current_call;
 static SymReg *cur_obj;
 IMC_Unit * cur_unit;
+SymReg *cur_namespace; /* ugly hack for mk_address */
 
 /*
  * these are used for constructing one INS
@@ -257,7 +258,7 @@ itcall_sub(SymReg* sub)
 %token <s> PARROT_OP
 %type <t> type newsub ptr
 %type <i> program class class_body member_decls member_decl field_decl
-%type <i> method_decl
+%type <i> method_decl class_namespace
 %type <i> global constdef sub emit pcc_sub sub_body pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit
 %type <s> classname relop
@@ -303,6 +304,7 @@ compilation_units:
 
 compilation_unit:
      class         { $$ = $1; cur_unit = 0; }
+   | class_namespace  { $$ = $1; }
    | constdef      { $$ = $1; }
    | global        { $$ = $1; }
    | sub           { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
@@ -340,6 +342,7 @@ pasmline:
    | MACRO '\n'                        { $$ = 0; }
    | FILECOMMENT                       { $$ = 0; }
    | LINECOMMENT                       { $$ = 0; }
+   | class_namespace  { $$ = $1; }
    ;
 
 pasm_inst:         { clear_state(); }
@@ -347,9 +350,10 @@ pasm_inst:         { clear_state(); }
                    { $$ = INS(interp, cur_unit, $2,0,regs,nargs,keyvec,1);
                      free($2); }
    | PCC_SUB pcc_sub_proto LABEL
-                   { char *name = str_dup($3);
+                   {
                      $$ = iSUBROUTINE(cur_unit, mk_sub_label($3));
-                     $$->r[1] = mk_pcc_sub(name, 0);
+                     $$->r[1] = mk_pcc_sub(str_dup($$->r[0]->name), 0);
+                     add_namespace(interp, $$->r[1]);
                      $$->r[1]->pcc_sub->pragma = $2;
                    }
    | /* none */    { $$ = 0;}
@@ -369,6 +373,13 @@ emit:
                          emit_flush(interp);
                      */
                      $$=0; }
+   ;
+
+class_namespace:
+    NAMESPACE '[' keylist ']'  { $$=0;
+                                 IMCC_INFO(interp)->cur_namespace = $3;
+                                 cur_namespace = $3;
+                                 }
    ;
 
 class:
@@ -441,9 +452,9 @@ sub:
         }
      IDENTIFIER pcc_sub_proto '\n'
         {
-          char *name = str_dup($3);
           Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label($3));
-          i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
+          i->r[1] = $<sr>$ = mk_pcc_sub(str_dup(i->r[0]->name), 0);
+          add_namespace(interp, i->r[1]);
           i->r[1]->pcc_sub->pragma = $4;
         }
      sub_params
@@ -469,9 +480,9 @@ pcc_sub:
      PCC_SUB       { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
      IDENTIFIER pcc_sub_proto '\n'
          {
-            char *name = str_dup($3);
             Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label($3));
-            i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
+            i->r[1] = $<sr>$ = mk_pcc_sub(str_dup(i->r[0]->name), 0);
+            add_namespace(interp, i->r[1]);
             i->r[1]->pcc_sub->pragma = $4;
          }
      pcc_params
@@ -839,6 +850,8 @@ the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
                           fataly(1, sourcefile, line, "Sub isn't a PMC");
                      }
        | VAR ptr IDENTIFIER { cur_obj = $1; $$ = mk_sub_address($3); }
+       | VAR ptr STRINGC    { cur_obj = $1; $$ = mk_const($3, 'S'); }
+       | VAR ptr target     { cur_obj = $1; $$ = $3; }
    ;
 
 ptr:    POINTY { $$=0; }

@@ -119,6 +119,7 @@ void add_pcc_cc(SymReg *r, SymReg * arg);
 void add_pcc_result(SymReg *r, SymReg * arg);
 void add_pcc_param(SymReg *r, SymReg * arg);
 void add_pcc_return(SymReg *r, SymReg * arg);
+void add_namespace(Parrot_Interp interpreter, SymReg *sub);
 
 typedef enum {
 	P_NON_PROTOTYPED = 0x00,	/* must be 0 */
@@ -144,6 +145,7 @@ struct pcc_sub_t {
     int nci;
     int label;
     SymReg * object;
+    SymReg * namespace;
 };
 
 
@@ -170,6 +172,7 @@ void clear_sym_hash(SymReg **);
 void clear_globals(void);
 unsigned int  hash_str(const char * str);
 void _delete_sym(struct _IMC_Unit *, const char * name);
+SymReg * dup_sym(SymReg *r);
 
 SymReg * _find_sym(Namespace * ns, SymReg * hash[], const char * name);
 char * _mk_fullname(Namespace * ns, const char * name);
