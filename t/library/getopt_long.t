@@ -3,36 +3,32 @@
 
 =head1 NAME
 
-examples/assembly/getopt_demo.imc - demonstrating library/Getopt/Long.imc
+t/library/getopt_long.t - testing library/Getopt/Long.imc
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/assembly/getopt_demo.imc --help
-    % ./parrot examples/assembly/getopt_demo.imc --version
-    % ./parrot examples/assembly/getopt_demo.imc --string=asdf --bool --integer=42 some thing
+	% perl -Ilib t/library/getopt_long.t
 
 =head1 DESCRIPTION
 
-This demo program shows how to handle command line arguments with the
-PIR library F<runtime/parrot/library/Getopt/Long.imc>.
-
-=head1 SUBROUTINES
-
-=over 4
-
-=item C<_main>
-
-This is executed when you call F<getopt_demo.imc>.
+This test program tries to handle command line arguments with the
+library F<runtime/parrot/library/Getopt/Long.imc>.
 
 =cut
 
+use strict;
+
+use Parrot::Test tests => 1;
+
+# no. 1
+output_is(<<'CODE', <<'OUT', "basic long options");
+##PIR##
 .sub _main 
-  .param pmc argv
 
   # Assemble specification for get_options
   # in an array of format specifiers
-  .local ResizableStringArray opt_spec    
-  opt_spec = new PerlArray
+  .local pmc opt_spec    
+  opt_spec = new ResizableStringArray
   # --version, boolean
   push opt_spec, "version"
   # --help, boolean
@@ -44,17 +40,19 @@ This is executed when you call F<getopt_demo.imc>.
   # --integer, integer
   push opt_spec, "integer=i"
 
-  # the program name is the first element in argv
-  .local string program_name
-  program_name = shift argv
-
-  # Make a copy of argv, because this can easier be handled in get_options()
-  # TODO: remove need for cloning
-  .local pmc argv_clone
-  argv_clone = clone argv
+  # This comes usually from the command line
+  .local pmc argv
+  argv = new PerlArray
+  push argv, "--help"
+  push argv, "--version"
+  push argv, "--string=asdf"
+  push argv, "--bool"
+  push argv, "--integer=42"
+  push argv, "some"
+  push argv, "thing"
 
   .local pmc opt
-  ( opt ) = _get_options( argv_clone, opt_spec )
+  ( opt ) = _get_options( argv, opt_spec )
 
   # Now we do what the passed options tell
   .local int is_defined
@@ -62,22 +60,14 @@ This is executed when you call F<getopt_demo.imc>.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "getopt_demo.imc version 0.02\n"
-    end
+    print "getopt_long.t 0.01\n"
   NO_VERSION_FLAG:
 
   # Was '--help' passed ?
   is_defined = defined opt["help"]
   unless is_defined goto NO_HELP_FLAG
-    _usage( program_name )
-    end
+    print "This is just a test.\n"
   NO_HELP_FLAG:
-
-  # Say Hi
-  print "Hi, I am '"
-  print program_name
-  print "'.\n"
-  print "\n"
 
   # handle the bool option
   is_defined = defined opt["bool"]
@@ -114,15 +104,15 @@ This is executed when you call F<getopt_demo.imc>.
     print "You haven't passed the option '--integer'. This is fine with me.\n"
   END_INTEGER_OPTION:
 
-  # For some reason I can't shift from argv_clone
+  # For some reason I can't shift from argv
   .local string other_arg
   .local int    cnt_other_args
   cnt_other_args = 0
   .local int num_other_args
-  num_other_args = argv_clone
+  num_other_args = argv
   goto CHECK_OTHER_ARG_LOOP
   REDO_OTHER_ARG_LOOP:
-    other_arg = argv_clone[cnt_other_args]
+    other_arg = argv[cnt_other_args]
     print "You have passed the additional argument: '"
     print other_arg
     print "'.\n"
@@ -131,40 +121,22 @@ This is executed when you call F<getopt_demo.imc>.
   if cnt_other_args < num_other_args goto REDO_OTHER_ARG_LOOP
   print "All args have been parsed.\n"
 
-  # Do a lot of useful stuff here
-
   end
-.end
-
-=item C<_usage>
-
-Print the usage message.
-
-TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
-
-=cut
-
-.sub _usage prototyped
-  .param string program_name
-
-  print "Usage: ./parrot "
-  print program_name
-  print " [OPTION]... [STRING]...\n"
-  print "\n"
-  print "Currently only long options are available.\n"
-  print "\n"
-  print "Operation modes:\n"
-  print "      --help                   display this help and exit\n"
-  print "      --version                output version information and exit\n"
-  print "\n"
-  print "For demo of option parsing:\n"
-  print "      --string=STRING          a string option\n"
-  print "      --integer=INTEGER        an integer option\n"
-  print "      --bool                   a boolean option\n"
 .end
 
 # A dummy implementation of Getopt::Long
 .include "library/Getopt/Long.imc"
+
+CODE
+getopt_long.t 0.01
+This is just a test.
+You have passed the option '--bool'.
+You have passed the option '--string'. The value is 'asdf'.
+You have passed the option '--integer'. The value is '42'.
+You have passed the additional argument: 'some'.
+You have passed the additional argument: 'thing'.
+All args have been parsed.
+OUT
 
 =back
 

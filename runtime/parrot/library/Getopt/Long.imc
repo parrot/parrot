@@ -2,11 +2,38 @@
 
 =head1 NAME
 
-library/Getopt/Long.imc - parse command line options
+library/Getopt/Long.imc - parse long and short command line options
 
 =head1 SYNOPSIS
 
-See examples/assembly/getopt_demo.imc
+  # Assemble option specification
+  .local pmc opt_spec    
+  opt_spec = new ResizableStringArray
+  push opt_spec, "bool"
+  push opt_spec, "string=s"
+  push opt_spec, "integer=i"
+
+  # the program name is the first element in argv
+  .local string program_name
+  program_name = shift argv
+
+  # Make a copy of argv, because this can easier be handled in get_options()
+  .local pmc argv_clone
+  argv_clone = clone argv
+
+  # Parse the command line params
+  .local pmc opt
+  ( opt ) = _get_options( argv_clone, opt_spec )
+
+  .local int is_defined
+  is_defined = defined opt["bool"]
+
+  .local int integer
+  integer = opt["integer"]
+
+  .local string s
+  s = opt["string"]
+
 
 =head1 DESCRIPTION
 
@@ -25,19 +52,18 @@ A PerlHash is returned.
 =cut
 
 .sub _get_options prototyped             
-  .param PerlArray argv    
-  .param PerlArray spec    
+  .param pmc argv    
+  .param pmc spec    
 
   # Loop over the array spec and build up two simple hashes
-  .local pmc type               # the type of the option: binary, string, integer 
+  .local pmc type                    # the type of the option: binary, string, integer 
   type = new PerlHash
-  .local int curr_spec                # a counter for looping over the array 'spec'
+  .local int curr_spec               # a counter for looping over the array 'spec'
   curr_spec = 0
   .local int max_spec                # for end condition of loop over 'spec'
   max_spec = spec
   .local int    spec_index           # searching for patterns in 'spec'
-  .local string opt_name             # name of specified option
-  .local string opt_type             # tyep of specified option
+  .local string opt_name, opt_type   # name and type of specified option
   goto CHECK_PARSE_SPEC     
   NEXT_PARSE_SPEC:                   # Look at next element in 'spec'
     opt_name = spec[curr_spec]
@@ -146,11 +172,12 @@ error reporting, more options
 
 =head1 AUTHOR
 
-Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
+Bernhard Schmalhofer - L<Bernhard.Schmalhofer@biomax.de>
 
 =head1 SEE ALSO
 
 The Perl5 module L<Getopt::Long>.
+F<examples/assembly/getopt_demo.imc
 
 =head1 COPYRIGHT
 
