@@ -96,10 +96,11 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 				 packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
 				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
 				 core_pmcs$(O) platform$(O) ${jit_o} \
-	     ${gc_o} rx$(O) rxstacks$(O) intlist$(O) \
-				 embed$(O) warnings$(O) misc$(O) ${cg_o} \
+			     ${gc_o} rx$(O) rxstacks$(O) intlist$(O) \
+				 embed$(O) warnings$(O)  ${cg_o} \
 				 packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
-				 headers$(O) dod$(O) method_util$(O)
+				 headers$(O) dod$(O) method_util$(O) \
+				 misc$(O) spf_render$(O) spf_vtable$(O)
 
 O_FILES = $(INTERP_O_FILES) \
 	      $(IO_O_FILES) \
@@ -122,7 +123,7 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 CFLAGS = ${ccflags} ${cc_warn} ${cc_inc} ${cc_hasjit} ${cg_flag} ${gc_flag}
 
 LINKFLAGS = ${linkflags}
-LDFLAGS = ${ldflags}
+LDFLAGS = ${ldflags} ${ld_debug}
 
 C_LIBS = ${libs}
 
@@ -418,9 +419,13 @@ ${cg_c}
 
 ${gc_c}
 
-warnings$(O) : $(H_FILES)
+warnings$(O) : $(GENERAL_H_FILES)
 
-misc$(O) : $(H_FILES)
+misc$(O) : $(GENERAL_H_FILES)
+
+spf_render$(O) : $(GENERAL_H_FILES)
+
+spf_vtable$(O) : $(GENERAL_H_FILES)
 
 # $(STICKY_FILES) : Configure.pl
 #	$(PERL) Configure.pl

@@ -104,7 +104,8 @@ void
 dump_hash(Interp *interpreter, HASH *hash)
 {
     HashIndex i;
-    fprintf(stderr, "Hashtable[" INTVAL_FMT "/" INTVAL_FMT "]\n",
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),
+            "Hashtable[%vd/%vd]\n",
             hash->entries, hash->max_chain + 1);
 
     /* Iterate one past the end of the hashtable, so we can use the
@@ -115,13 +116,13 @@ dump_hash(Interp *interpreter, HASH *hash)
         if (i > hash->max_chain) bucket = getBucket(hash, hash->free_list);
         else bucket = lookupBucket(hash, i);
         if (bucket == NULL) continue;
-        fprintf(stderr, "  Bucket " INTVAL_FMT ": ", i);
+        PIO_eprintf(interpreter, "  Bucket %vd: ", i);
         while (bucket) {
-            fprintf(stderr, "type(%d)", bucket->value.type);
+            PIO_eprintf(interpreter, "type(%d)", bucket->value.type);
             bucket = getBucket(hash, bucket->next);
-            if (bucket) fprintf(stderr, " -> ");
+            if (bucket) PIO_eprintf(interpreter, " -> ");
         }
-        fprintf(stderr, "\n");
+        PIO_eprintf(interpreter, "\n");
     }
 }
 
@@ -335,7 +336,7 @@ hash_size(Interp *interpreter, HASH *hash)
         return hash->entries;
     }
     else {
-        fprintf(stderr, "*** hash_size asked to check a NULL hash\n");
+        PIO_eprintf(interpreter, "*** hash_size asked to check a NULL hash\n");
         return 0;
     }
 }

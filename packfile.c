@@ -48,14 +48,14 @@ PackFile_new(void)
     struct PackFile *pf = mem_sys_allocate(sizeof(struct PackFile));
 
     if (!pf) {
-        fprintf(stderr, "PackFile_new: Unable to allocate!\n");
+        PIO_eprintf(NULL, "PackFile_new: Unable to allocate!\n");
         return NULL;
     }
 
     pf->header =
         mem_sys_allocate(sizeof(struct PackFile_Header));
     if(!pf->header) {
-        fprintf(stderr, "PackFile_new: Unable to allocate header!\n");
+        PIO_eprintf(NULL, "PackFile_new: Unable to allocate header!\n");
         PackFile_destroy(pf);
         return NULL;
     }
@@ -65,7 +65,7 @@ PackFile_new(void)
         mem_sys_allocate(sizeof(struct PackFile_FixupTable));
 
     if (!pf->fixup_table) {
-        fprintf(stderr, "PackFile_new: Unable to allocate fixup table!\n");
+        PIO_eprintf(NULL, "PackFile_new: Unable to allocate fixup table!\n");
         PackFile_destroy(pf);
         return NULL;
     }
@@ -76,7 +76,7 @@ PackFile_new(void)
         mem_sys_allocate(sizeof(struct PackFile_ConstTable));
 
     if (!pf->const_table) {
-        fprintf(stderr, "PackFile_new: Unable to allocate constant table!\n");
+        PIO_eprintf(NULL, "PackFile_new: Unable to allocate constant table!\n");
         PackFile_destroy(pf);
         return NULL;
     }
@@ -106,7 +106,7 @@ PackFile_fetch_op(struct PackFile *pf, opcode_t *stream) {
     if(pf->fetch_op == NULL)
         return *stream;
 #if TRACE_PACKFILE == 2
-    fprintf(stderr, "PackFile_fetch_op: Reordering.\n");
+    PIO_eprintf(NULL, "PackFile_fetch_op: Reordering.\n");
 #endif
     return (pf->fetch_op)(*stream);
 }
@@ -148,14 +148,14 @@ PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream) {
     FLOATVAL f;
     if(pf->fetch_nv == NULL) {
 #if TRACE_PACKFILE
-        fprintf(stderr, "PackFile_fetch_nv: Native [%d bytes]..\n",
+        PIO_eprintf(NULL, "PackFile_fetch_nv: Native [%d bytes]..\n", 
                 sizeof(FLOATVAL));
 #endif
         memcpy(&f, stream, sizeof(FLOATVAL));
         return f;
     }
 #if TRACE_PACKFILE
-    fprintf(stderr, "PackFile_fetch_nv: Byteordering..\n");
+    PIO_eprintf(NULL, "PackFile_fetch_nv: Byteordering..\n");
 #endif
     /* Here is where the size transforms get messy */
     (pf->fetch_nv)((unsigned char *)&f, (unsigned char *)stream);
@@ -184,7 +184,7 @@ void PackFile_assign_transforms(struct PackFile *pf) {
     }
 #  if TRACE_PACKFILE
     else {
-        fprintf(stderr, "header->byteorder [%d] native byteorder [%d]\n",
+        PIO_eprintf(NULL, "header->byteorder [%d] native byteorder [%d]\n",
             pf->header->byteorder, PARROT_BIGENDIAN);
     }
 #  endif
@@ -205,7 +205,7 @@ void
 PackFile_destroy(struct PackFile *pf)
 {
     if (!pf) {
-        fprintf(stderr, "PackFile_destroy: pf == NULL!\n");
+        PIO_eprintf(NULL, "PackFile_destroy: pf == NULL!\n");
         return;
     }
 
@@ -235,12 +235,12 @@ static INTVAL
 PackFile_check_segment_size(opcode_t segment_size, const char *debug)
 {
 #if TRACE_PACKFILE
-    printf("PackFile_unpack(): Unpacking %ld bytes for %s table...\n",
+    PIO_eprintf(NULL, "PackFile_unpack(): Unpacking %ld bytes for %s table...\n",
            segment_size, debug);
 #endif
 
     if (segment_size % sizeof(opcode_t)) {
-        fprintf(stderr,
+        PIO_eprintf(NULL,
                 "PackFile_unpack: Illegal %s table segment size %ld (must be multiple of %ld)!\n",
                 debug, segment_size, (long)sizeof(opcode_t));
         return 0;
@@ -291,7 +291,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     int i;
 
     if (!self) {
-        fprintf(stderr, "PackFile_unpack: self == NULL!\n");
+        PIO_eprintf(NULL, "PackFile_unpack: self == NULL!\n");
         return 0;
     }
 
@@ -304,7 +304,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     if(header->wordsize != sizeof(opcode_t)) {
         self->need_wordsize = 1;
         if(header->wordsize == 0) {
-            fprintf(stderr, "PackFile_unpack: Invalid wordsize %d\n",
+            PIO_eprintf(NULL, "PackFile_unpack: Invalid wordsize %d\n",
                         header->wordsize);
             return 0;
         }
@@ -313,17 +313,17 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     PackFile_assign_transforms(self);
 
 #if TRACE_PACKFILE
-    fprintf(stderr, "wordsize: %d\n", header->wordsize);
-    fprintf(stderr, "byteorder: %d\n", header->byteorder);
+    PIO_eprintf(NULL, "wordsize: %d\n", header->wordsize);
+    PIO_eprintf(NULL, "byteorder: %d\n", header->byteorder);
 #endif
 
     /*
      * FIXME
      */
     if(self->need_wordsize) {
-        fprintf(stderr,
+        PIO_eprintf(NULL, 
                 "PackFile_unpack: Unimplemented wordsize transform.\n");
-        fprintf(stderr, "File has wordsize: %d (native is %d)\n",
+        PIO_eprintf(NULL, "File has wordsize: %d (native is %d)\n", 
                 header->wordsize,  sizeof(opcode_t));
         return 0;
     }
@@ -337,9 +337,9 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      * The magic and opcodetype fields are in native byteorder.
      */
     if (header->magic != PARROT_MAGIC) {
-        fprintf(stderr, "PackFile_unpack: Not a Parrot PackFile!\n");
+        PIO_eprintf(NULL, "PackFile_unpack: Not a Parrot PackFile!\n");
 #if TRACE_PACKFILE
-        fprintf(stderr, "Magic number was [%x] not [%x]\n",
+        PIO_eprintf(NULL, "Magic number was [%x] not [%x]\n",
                             header->magic, PARROT_MAGIC);
 #endif
         return 0;
@@ -348,7 +348,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     header->opcodetype = PackFile_fetch_op(self, cursor++);
 
 #if TRACE_PACKFILE
-    fprintf(stderr, "PackFile_unpack(): Magic verified.\n");
+    PIO_eprintf(NULL, "PackFile_unpack(): Magic verified.\n");
 #endif
 
     /*
@@ -363,7 +363,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
 
     if (!PackFile_FixupTable_unpack(self->fixup_table, cursor,
                                     header->fixup_ss)) {
-        fprintf(stderr,
+        PIO_eprintf(NULL,
                 "PackFile_unpack: Error reading fixup table segment!\n");
         return 0;
     }
@@ -383,7 +383,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
 
     if (!PackFile_ConstTable_unpack(interpreter, self, self->const_table,
                         cursor, header->const_ss)) {
-        fprintf(stderr,
+        PIO_eprintf(NULL,
                 "PackFile_unpack: Error reading constant table segment!\n");
         return 0;
     }
@@ -407,7 +407,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         self->byte_code = mem_sys_allocate(self->byte_code_size);
 
         if (!self->byte_code) {
-            fprintf(stderr,
+            PIO_eprintf(NULL,
                     "PackFile_unpack: Unable to allocate memory to copy byte code!\n");
             self->byte_code_size = 0;
             return 0;
@@ -422,7 +422,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
             for(i = 0; i < (int)(self->byte_code_size / sizeof(opcode_t)); i++) {
                 self->byte_code[i] = PackFile_fetch_op(self, cursor++);
 #if TRACE_PACKFILE
-                fprintf(stderr, "op[%u]->[%u]\n", *(cursor-1),
+                PIO_eprintf(NULL, "op[%u]->[%u]\n", *(cursor-1),
                         self->byte_code[i]);
 #endif
             }
@@ -453,7 +453,7 @@ void
 PackFile_FixupTable_clear(struct PackFile_FixupTable *self)
 {
     if (!self) {
-        fprintf(stderr, "PackFile_FixupTable_clear: self == NULL!\n");
+        PIO_eprintf(NULL, "PackFile_FixupTable_clear: self == NULL!\n");
         return;
     }
 
@@ -507,7 +507,7 @@ PackFile_ConstTable_clear(struct PackFile_ConstTable *self)
     opcode_t i;
 
     if (!self) {
-        fprintf(stderr, "PackFile_ConstTable_clear: self == NULL!\n");
+        PIO_eprintf(NULL, "PackFile_ConstTable_clear: self == NULL!\n");
         return;
     }
 
@@ -551,7 +551,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
     opcode_t i;
 
     if (!self) {
-        fprintf(stderr, "PackFile_ConstTable_unpack: self == NULL!\n");
+        PIO_eprintf(interpreter, "PackFile_ConstTable_unpack: self == NULL!\n");
         return 0;
     }
 
@@ -562,7 +562,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
     self->const_count = PackFile_fetch_op(pf, cursor++);
 
 #if TRACE_PACKFILE
-    printf("PackFile_ConstTable_unpack(): Unpacking %ld constants...\n",
+    PIO_eprintf(interpreter, "PackFile_ConstTable_unpack(): Unpacking %ld constants...\n",
            self->const_count);
 #endif
 
@@ -575,7 +575,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
                          sizeof(struct PackFile_Constant *));
 
     if (!self->constants) {
-        fprintf(stderr,
+        PIO_eprintf(interpreter,
                 "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
         self->const_count = 0;
         return 0;
@@ -584,7 +584,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
     for (i = 0; i < self->const_count; i++) {
         INTVAL rc;
 #if TRACE_PACKFILE
-        printf("PackFile_ConstTable_unpack(): Unpacking constant %ld...\n", i);
+        PIO_eprintf(interpreter, "PackFile_ConstTable_unpack(): Unpacking constant %ld...\n", i);
 #endif
 
         self->constants[i] = PackFile_Constant_new();
@@ -644,7 +644,7 @@ void
 PackFile_Constant_destroy(struct PackFile_Constant *self)
 {
     if (!self) {
-        fprintf(stderr, "PackFile_Constant_destroy: self == NULL!\n");
+        PIO_eprintf(NULL, "PackFile_Constant_destroy: self == NULL!\n");
         return;
     }
 
@@ -668,7 +668,7 @@ PackFile_Constant_destroy(struct PackFile_Constant *self)
         break;
 
     default:
-        fprintf(stderr,
+        PIO_eprintf(NULL,
                 "PackFile_Constant_clear: Unrecognized type '%c' (%ld)!\n",
                 (char)self->type, self->type);
         return;
@@ -784,9 +784,9 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
     size = PackFile_fetch_op(pf, cursor++);
 
 #if TRACE_PACKFILE
-    printf("PackFile_Constant_unpack(): Type is %ld ('%c')...\n", type,
+    PIO_eprintf(NULL, "PackFile_Constant_unpack(): Type is %ld ('%c')...\n", type,
            (char)type);
-    printf("PackFile_Constant_unpack(): Size is %ld...\n", size);
+    PIO_eprintf(NULL, "PackFile_Constant_unpack(): Size is %ld...\n", size);
 #endif
 
     switch (type) {
@@ -807,7 +807,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
         break;
 
     default:
-        fprintf(stderr,
+        PIO_eprintf(NULL,
                 "PackFile_Constant_clear: Unrecognized type '%c' during unpack!\n",
                 (char)type);
         return 0;
@@ -860,7 +860,7 @@ PackFile_Constant_unpack_number(struct PackFile * pf,
      * determined by Configure.
      */
 #if TRACE_PACKFILE
-    fprintf(stderr,
+    PIO_eprintf(NULL,
             "FIXME: PackFile_Constant_unpack_number: assuming size of FLOATVAL!\n");
 #endif
     self->number = PackFile_fetch_nv(pf, (opcode_t *)cursor);
@@ -921,11 +921,11 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
     size = (size_t)PackFile_fetch_op(pf, cursor++);
 
 #if TRACE_PACKFILE
-    printf("PackFile_Constant_unpack_string(): flags are 0x%04x...\n", flags);
-    printf("PackFile_Constant_unpack_string(): encoding is %ld...\n",
+    PIO_eprintf(NULL, "PackFile_Constant_unpack_string(): flags are 0x%04x...\n", flags);
+    PIO_eprintf(NULL, "PackFile_Constant_unpack_string(): encoding is %ld...\n",
            encoding);
-    printf("PackFile_Constant_unpack_string(): type is %ld...\n", type);
-    printf("PackFile_Constant_unpack_string(): size is %ld...\n", size);
+    PIO_eprintf(NULL, "PackFile_Constant_unpack_string(): type is %ld...\n", type);
+    PIO_eprintf(NULL, "PackFile_Constant_unpack_string(): size is %ld...\n", size);
 #endif
 
     self->type = PFC_STRING;

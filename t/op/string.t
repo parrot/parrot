@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 95;
+use Parrot::Test tests => 96;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1269,8 +1269,8 @@ output_is(<<'CODE',<<OUTPUT,"num to string");
     print "\n"
     end
 CODE
-80.430000
--1.111111
+80.43
+-1.11111
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string to int");
@@ -1398,6 +1398,120 @@ fail:
   end
 CODE
 It's all good
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "sprintf");
+    branch MAIN
+    
+NEWARYP:
+    new P1, .PerlArray
+    set P1[0], P0
+    ret
+NEWARYS:
+    new P1, .PerlArray
+    set P1[0], S0
+    ret
+NEWARYI:
+    new P1, .PerlArray
+    set P1[0], I0
+    ret
+NEWARYN:
+    new P1, .PerlArray
+    set P1[0], N0
+    ret
+PRINTF:
+    sprintf S2, S1, P1
+    print S2
+    ret
+    
+MAIN:
+    set S1, "Hello, %s\n"
+    set S0, "Parrot!"
+    bsr NEWARYS
+    bsr PRINTF
+    
+    set S1, "PerlHash[0x%x]\n"
+    set I0, 256
+    bsr NEWARYI
+    bsr PRINTF
+    
+    set S1, "PerlHash[0x%lx]\n"
+    set I0, 256
+    bsr NEWARYI
+    bsr PRINTF
+	        
+    set S1, "Hello, %.2s!\n"
+    set S0, "Parrot"
+    bsr NEWARYS
+    bsr PRINTF
+	        
+    set S1, "Hello, %Ss"
+    set S0, S2
+    bsr NEWARYS
+    bsr PRINTF
+    
+    set S1, "1 == %Pd\n"
+    new P0, .PerlInt
+    set P0, 1
+    bsr NEWARYP
+    bsr PRINTF
+	        
+    set S1, "-255 == %vd\n"
+    set I0, -255
+    bsr NEWARYI
+    bsr PRINTF
+    
+    set S1, "256 == %vu\n"
+    set I0, 256
+    bsr NEWARYI
+    bsr PRINTF
+    	
+    set S1, "0.500000 == %f\n"
+    set N0, 0.5
+    bsr NEWARYN
+    bsr PRINTF
+
+    set S1, "0.500 == %5.3f\n"
+    set N0, 0.5
+    bsr NEWARYN
+    bsr PRINTF
+		
+    set S1, "0.001 == %g\n"
+    set N0, 0.001
+    bsr NEWARYN
+    bsr PRINTF
+		
+    set S1, "1e+06 == %g\n"
+    set N0, 1.0e6
+    bsr NEWARYN
+    bsr PRINTF
+    
+    set S1, "0.5 == %3.3g\n"
+    set N0, 0.5
+    bsr NEWARYN
+    bsr PRINTF	
+
+    set S1, "That's all, %s\n"
+    set S0, "folks!"
+    bsr NEWARYS
+    bsr PRINTF
+    
+    end
+CODE
+Hello, Parrot!
+PerlHash[0x100]
+PerlHash[0x100]
+Hello, Pa!
+Hello, Hello, Pa!
+1 == 1
+-255 == -255
+256 == 256
+0.500000 == 0.500000
+0.500 == 0.500
+0.001 == 0.001
+1e+06 == 1e+06
+0.5 == 0.5
+That's all, folks!
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)

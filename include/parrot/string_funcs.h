@@ -30,6 +30,7 @@ STRING *string_replace(struct Parrot_Interp *, STRING *, INTVAL, INTVAL,
 INTVAL string_compare(struct Parrot_Interp *, STRING *, STRING *);
 INTVAL string_bool(const STRING *);
 const char *Parrot_string_cstring(const STRING *);
+STRING *string_set(struct Parrot_Interp *, STRING *, STRING *);
 
 /* Declarations of other functions */
 UINTVAL string_length(const STRING *);

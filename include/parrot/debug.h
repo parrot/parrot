@@ -155,9 +155,9 @@ void PDB_get_command(struct Parrot_Interp *interpreter);
 
 void PDB_print(struct Parrot_Interp *interpreter, const char *command);
 
-void PDB_print_int(struct IReg *int_reg, int regnum);
+void PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, int regnum);
 
-void PDB_print_num(struct NReg *num_reg, int regnum);
+void PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, int regnum);
 
 void PDB_print_string(struct Parrot_Interp *interpreter,
                       struct SReg *string_reg, int regnum);

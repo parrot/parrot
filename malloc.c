@@ -4703,30 +4703,30 @@ void mSTATs()
   {
     CHUNK_SIZE_T  free, reserved, committed;
     vminfo (&free, &reserved, &committed);
-    fprintf(stderr, "free bytes       = %10lu\n", 
+    PIO_eprintf(NULL, "free bytes       = %10lu\n", 
             free);
-    fprintf(stderr, "reserved bytes   = %10lu\n", 
+    PIO_eprintf(NULL, "reserved bytes   = %10lu\n", 
             reserved);
-    fprintf(stderr, "committed bytes  = %10lu\n", 
+    PIO_eprintf(NULL, "committed bytes  = %10lu\n", 
             committed);
   }
 #endif
 
 
-  fprintf(stderr, "max system bytes = %10lu\n",
+  PIO_eprintf(NULL, "max system bytes = %10lu\n",
           (CHUNK_SIZE_T)(mi.usmblks));
-  fprintf(stderr, "system bytes     = %10lu\n",
+  PIO_eprintf(NULL, "system bytes     = %10lu\n",
           (CHUNK_SIZE_T)(mi.arena + mi.hblkhd));
-  fprintf(stderr, "in use bytes     = %10lu\n",
+  PIO_eprintf(NULL, "in use bytes     = %10lu\n",
           (CHUNK_SIZE_T)(mi.uordblks + mi.hblkhd));
 
 #ifdef WIN32 
   {
     CHUNK_SIZE_T  kernel, user;
     if (cpuinfo (TRUE, &kernel, &user)) {
-      fprintf(stderr, "kernel ms        = %10lu\n", 
+      PIO_eprintf(NULL, "kernel ms        = %10lu\n", 
               kernel);
-      fprintf(stderr, "user ms          = %10lu\n", 
+      PIO_eprintf(NULL, "user ms          = %10lu\n", 
               user);
     }
   }
@@ -5033,7 +5033,7 @@ static void *sbrk (long size) {
     static region_list_entry *g_last;
     void *result = (void *) MORECORE_FAILURE;
 #ifdef TRACE
-    printf ("sbrk %d\n", size);
+    PIO_printf (NULL, "sbrk %d\n", size);
 #endif
 #if defined (USE_MALLOC_LOCK) && defined (NEEDED)
     /* Wait for spin lock */
@@ -5090,7 +5090,7 @@ static void *sbrk (long size) {
                         /* Assert postconditions */
                         assert ((unsigned) base_committed % g_pagesize == 0);
 #ifdef TRACE
-                        printf ("Commit %p %d\n", base_committed, remaining_commit_size);
+                        PIO_printf (NULL, "Commit %p %d\n", base_committed, remaining_commit_size);
 #endif
                         /* Adjust the regions commit top */
                         g_last->top_committed = (char *) base_committed + remaining_commit_size;
@@ -5116,7 +5116,7 @@ static void *sbrk (long size) {
                             /* Assert postconditions */
                             assert ((unsigned) memory_info.BaseAddress % g_pagesize == 0);
 #ifdef TRACE
-                            printf ("Query %p %d %s\n", memory_info.BaseAddress, memory_info.RegionSize, 
+                            PIO_printf (NULL, "Query %p %d %s\n", memory_info.BaseAddress, memory_info.RegionSize, 
                                     memory_info.State == MEM_FREE ? "FREE": 
                                     (memory_info.State == MEM_RESERVE ? "RESERVED":
                                      (memory_info.State == MEM_COMMIT ? "COMMITTED": "?")));
@@ -5160,7 +5160,7 @@ static void *sbrk (long size) {
                     /* Assert postconditions */
                     assert ((unsigned) base_reserved % g_regionsize == 0);
 #ifdef TRACE
-                    printf ("Reserve %p %d\n", base_reserved, reserve_size);
+                    PIO_printf (NULL, "Reserve %p %d\n", base_reserved, reserve_size);
 #endif
                     /* Did we get contiguous memory? */
                     if (contiguous) {
@@ -5198,7 +5198,7 @@ static void *sbrk (long size) {
                 /* Assert postconditions */
                 assert ((unsigned) base_committed % g_pagesize == 0);
 #ifdef TRACE
-                printf ("Commit %p %d\n", base_committed, commit_size);
+                PIO_printf (NULL, "Commit %p %d\n", base_committed, commit_size);
 #endif
                 /* Adjust the regions commit top */
                 g_last->top_committed = (char *) base_committed + commit_size;
@@ -5226,7 +5226,7 @@ static void *sbrk (long size) {
                 if (! rc)
                     goto sbrk_exit;
 #ifdef TRACE
-                printf ("Release %p %d\n", base_reserved, release_size);
+                PIO_printf (NULL, "Release %p %d\n", base_reserved, release_size);
 #endif
             }
             /* Adjust deallocation size */
@@ -5252,7 +5252,7 @@ static void *sbrk (long size) {
                     if (! rc)
                         goto sbrk_exit;
 #ifdef TRACE
-                    printf ("Decommit %p %d\n", base_committed, decommit_size);
+                    PIO_printf (NULL, "Decommit %p %d\n", base_committed, decommit_size);
 #endif
                 }
                 /* Adjust deallocation size and regions commit and allocate top */
@@ -5295,7 +5295,7 @@ static void *mmap (void *ptr, long size, long prot, long type, long handle, long
     static long g_pagesize;
     static long g_regionsize;
 #ifdef TRACE
-    printf ("mmap %d\n", size);
+    PIO_printf (NULL, "mmap %d\n", size);
 #endif
 #if defined (USE_MALLOC_LOCK) && defined (NEEDED)
     /* Wait for spin lock */
@@ -5319,7 +5319,7 @@ static void *mmap (void *ptr, long size, long prot, long type, long handle, long
     /* Assert postconditions */
     assert ((unsigned) ptr % g_regionsize == 0);
 #ifdef TRACE
-    printf ("Commit %p %d\n", ptr, size);
+    PIO_printf (NULL, "Commit %p %d\n", ptr, size);
 #endif
 mmap_exit:
 #if defined (USE_MALLOC_LOCK) && defined (NEEDED)
@@ -5335,7 +5335,7 @@ static long munmap (void *ptr, long size) {
     static long g_regionsize;
     int rc = MUNMAP_FAILURE;
 #ifdef TRACE
-    printf ("munmap %p %d\n", ptr, size);
+    PIO_printf (NULL, "munmap %p %d\n", ptr, size);
 #endif
 #if defined (USE_MALLOC_LOCK) && defined (NEEDED)
     /* Wait for spin lock */
@@ -5355,7 +5355,7 @@ static long munmap (void *ptr, long size) {
         goto munmap_exit;
     rc = 0;
 #ifdef TRACE
-    printf ("Release %p %d\n", ptr, size);
+    PIO_printf (NULL, "Release %p %d\n", ptr, size);
 #endif
 munmap_exit:
 #if defined (USE_MALLOC_LOCK) && defined (NEEDED)

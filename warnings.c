@@ -18,27 +18,21 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
         return 2;
     }
 
-    targ = Parrot_vsprintf_c(interpreter, message, &args);
-    if (!targ) {
-        return -1;
-    }
+    targ = Parrot_vsprintf_c(interpreter, message, args);
 
     va_end(args);
 
-    targ = Parrot_sprintf_c(
-             interpreter,
-             "%S at %S line %d.\n", targ,
-             Default(interpreter, current_file, 
-                     string_make(interpreter, "?", 1, NULL, 0, NULL)),
-             Default(interpreter, current_line, 0)
-    );
-    
     if (!targ) {
         return -1;
     }
 
-    if (PIO_write(interpreter, PIO_STDERR(interpreter), targ->strstart,
-         targ->bufused) < 0) {
+    if (PIO_eprintf(interpreter, "%S%S.\n",
+            targ,
+            interpreter ? Parrot_sprintf_c(
+                interpreter, " at %S line %d", interpreter->current_file, interpreter->current_line
+            ) : NULL
+        ) < 0)
+    {
         return -2;
     }
     else {
@@ -60,25 +54,20 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
         return 2;
     }
 
-    targ = Parrot_vsprintf_s(interpreter, message, &args);
-    if (!targ) {
-        return -1;
-    }
-
+    targ = Parrot_vsprintf_s(interpreter, message, args);
     va_end(args);
 
-    targ = Parrot_sprintf_c(
-        interpreter, "%S at %S line %d.\n", targ,
-        Default(interpreter, current_file, 
-                string_make(interpreter, "?", 1, NULL, 0, NULL)),
-        Default(interpreter, current_line, 0)
-    );
     if (!targ) {
         return -1;
     }
 
-    if (PIO_write(interpreter, PIO_STDERR(interpreter), targ->strstart,
-         targ->bufused) < 0) {
+    if (PIO_eprintf(interpreter, "%S%S.\n",
+            targ,
+            interpreter ? Parrot_sprintf_c(
+                interpreter, " at %S line %d", interpreter->current_file, interpreter->current_line
+            ) : NULL
+        ) < 0)
+    {
         return -2;
     }
     else {

@@ -376,36 +376,36 @@ END_SECTION:cur_section->end = cur_op;
 #if JIT_DEBUG
     cur_section = optimizer->sections;
     while (cur_section) {
-        fprintf(stderr, "\nSection:\n");
-        fprintf(stderr, "%s\n", (cur_section->type) ? "JITTED" : "NOT JITTED");
-        fprintf(stderr, "\tbegin:\t0x%x\t(%li)\n", 
-            (unsigned int)cur_section->begin, *cur_section->begin);
-        fprintf(stderr, "\tend:\t0x%x\t(%li)\n",
-            (unsigned int)cur_section->end, *cur_section->end);
-        fprintf(stderr, "\tInt register count:\t");
+        PIO_eprintf(interpreter, "\nSection:\n");
+        PIO_eprintf(interpreter, "%s\n", (cur_section->type) ? "JITTED" : "NOT JITTED");
+        PIO_eprintf(interpreter, "\tbegin:\t%#p\t(%Ou)\n", 
+            cur_section->begin, *cur_section->begin);
+        PIO_eprintf(interpreter, "\tend:\t%#p\t(%Ou)\n",
+            cur_section->end, *cur_section->end);
+        PIO_eprintf(interpreter, "\tInt register count:\t");
         for (i = 0; i < NUM_REGISTERS; i++)
-            fprintf(stderr, "%i ", cur_section->int_reg_count[i]);
-        fprintf(stderr, "\n\tInt register usage:\t");
+            PIO_eprintf(interpreter, "%i ", cur_section->int_reg_count[i]);
+        PIO_eprintf(interpreter, "\n\tInt register usage:\t");
         for (i = 0; i < NUM_REGISTERS; i++)
-            fprintf(stderr, "%i ", cur_section->int_reg_usage[i]);
-        fprintf(stderr, "\n\tInt register direction:\t");
+            PIO_eprintf(interpreter, "%i ", cur_section->int_reg_usage[i]);
+        PIO_eprintf(interpreter, "\n\tInt register direction:\t");
         for (i = 0; i < NUM_REGISTERS; i++)
-            fprintf(stderr, "%i ", (int)cur_section->int_reg_dir[i]);
-        fprintf(stderr, "\n\tInt registers used:\t%i\n", 
+            PIO_eprintf(interpreter, "%i ", (int)cur_section->int_reg_dir[i]);
+        PIO_eprintf(interpreter, "\n\tInt registers used:\t%i\n", 
             cur_section->int_registers_used);
-        fprintf(stderr, "\tFloat register count:\t");
+        PIO_eprintf(interpreter, "\tFloat register count:\t");
         for (i = 0; i < NUM_REGISTERS; i++)
-            fprintf(stderr, "%i ", cur_section->float_reg_count[i]);
-        fprintf(stderr, "\n\tFloat register usage:\t");
+            PIO_eprintf(interpreter, "%i ", cur_section->float_reg_count[i]);
+        PIO_eprintf(interpreter, "\n\tFloat register usage:\t");
         for (i = 0; i < NUM_REGISTERS; i++)
-            fprintf(stderr, "%i ", cur_section->float_reg_usage[i]);
-        fprintf(stderr, "\n\tFloat register direction:\t");
+            PIO_eprintf(interpreter, "%i ", cur_section->float_reg_usage[i]);
+        PIO_eprintf(interpreter, "\n\tFloat register direction:\t");
         for (i = 0; i < NUM_REGISTERS; i++)
-            fprintf(stderr, "%i ", (int)cur_section->float_reg_dir[i]);
-        fprintf(stderr, "\n\tFloat Registers used:\t%i\n", 
+            PIO_eprintf(interpreter, "%i ", (int)cur_section->float_reg_dir[i]);
+        PIO_eprintf(interpreter, "\n\tFloat Registers used:\t%i\n", 
             cur_section->float_registers_used);
-        fprintf(stderr, "\tJit opcodes:\t%i\n", cur_section->jit_op_count);
-        fprintf(stderr, "\tTotal opcodes:\t%i\n", cur_section->op_count);
+        PIO_eprintf(interpreter, "\tJit opcodes:\t%u\n", cur_section->jit_op_count);
+        PIO_eprintf(interpreter, "\tTotal opcodes:\t%u\n", cur_section->op_count);
         cur_section = cur_section->next;
     }
 #endif

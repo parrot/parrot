@@ -27,7 +27,7 @@ Parrot_floatval_time(void)
 {
     /* unable to provide this level of precision under ANSI-C, so just fall
        back to intval time for this. */
-    fprintf(stderr, "[ANSI] Parrot_floatval_time not accurate!\n");
+    Parrot_warn_c(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_floatval_time not accurate");
     return (FLOATVAL)Parrot_intval_time();
 }
 
@@ -39,7 +39,7 @@ Parrot_floatval_time(void)
 void
 Parrot_sleep(unsigned int seconds)
 {
-    fprintf(stderr, "[ANSI] Parrot_sleep not implemented!\n");
+    Parrot_warn_c(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_sleep not implemented");
     return;
 }
 
@@ -50,7 +50,7 @@ Parrot_sleep(unsigned int seconds)
 void
 Parrot_setenv(const char *name, const char *value)
 {
-    fprintf(stderr, "[ANSI] Parrot_setenv not implemented!\n");
+    Parrot_warn_c(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_setenv not implemented");
     return;
 }
 
@@ -62,7 +62,7 @@ Parrot_setenv(const char *name, const char *value)
 void *
 Parrot_dlopen(const char *filename)
 {
-    fprintf(stderr, "[ANSI] Parrot_dlopen not implemented!\n");
+    Parrot_warn_c(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_dlopen not implemented");
     return NULL;
 }
 
@@ -74,7 +74,7 @@ Parrot_dlopen(const char *filename)
 const char *
 Parrot_dlerror(void)
 {
-    return "[ANSI] Parrot_dlerror not implemented!\n";
+    return "Parrot_dlerror not implemented";
 }
 
 
@@ -85,7 +85,7 @@ Parrot_dlerror(void)
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
-    fprintf(stderr, "[ANSI] Parrot_dlsym not implemented!\n");
+    Parrot_warn_c(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_dlsym not implemented");
     return NULL;
 }
 
@@ -97,7 +97,7 @@ Parrot_dlsym(void *handle, const char *symbol)
 int
 Parrot_dlclose(void *handle)
 {
-    fprintf(stderr, "[ANSI] Parrot_dlclose not implemented!\n");
+    Parrot_warn_c(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_dlclose not implemented");
     return 0;
 }
 

@@ -48,6 +48,10 @@ typedef Parrot_Int INTVAL;
 typedef Parrot_UInt UINTVAL;
 typedef Parrot_Float FLOATVAL;
 
+typedef ${hugeintval} HUGEINTVAL;
+typedef unsigned ${hugeintval} UHUGEINTVAL;
+typedef ${hugefloatval} HUGEFLOATVAL;
+
 #define INTVAL_SIZE ${intvalsize}
 #define NUMVAL_SIZE ${nvsize}
 #define OPCODE_T_SIZE ${opcode_t_size}

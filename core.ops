@@ -2155,7 +2155,37 @@ inline op pack(inout STR, in INT, in INT, in INT) {
     goto NEXT();
 }
 
+=item C<sprintf>(out STR, in STR, in PMC)
+
+=item C<sprintf>(out PMC, in PMC, in PMC)
+
+=item C<sprintf>(out STR, in STR) [unimplemented]
+
+=item C<sprintf>(out PMC, in PMC) [unimplemented]
+
+Sets $1 to the result of calling C<Parrot_psprintf> with the 
+given format ($2) and arguments ($3, which should be an ordered
+aggregate PMC).  In the (unimplemented) versions that don't include
+$3, arguments are popped off the user stack.
+
+The result is quite similar to using the system C<sprintf>, but is 
+protected against buffer overflows and the like.  There are some 
+differences, especially concerning sizes (which are largely ignored); 
+see F<misc.c> for details.
+
 =back
+
+inline op sprintf(out STR, in STR, in PMC) {
+    $1=Parrot_psprintf(interpreter, $2, $3);
+    goto NEXT();
+}
+
+inline op sprintf(out PMC, in PMC, in PMC) {
+    $1->vtable->set_string_native(interpreter, $1,
+        Parrot_psprintf(interpreter, $2->vtable->get_string(interpreter, $2), $3)
+    );
+    goto NEXT();
+}
 
 =cut
 

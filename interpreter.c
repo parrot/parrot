@@ -22,8 +22,6 @@
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
 
-
-
 /*=for api interpreter runops_generic
  * TODO: Not really part of the API, but here's the docs.
  * Generic runops, which takes a function pointer for the core.

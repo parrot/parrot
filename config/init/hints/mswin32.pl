@@ -18,6 +18,7 @@
 		# The logo gets printed to STDERR; hence the redirection.
 		my $cc_output = `$cc 2>&1`;
 		$ccflags =~ s/-O1 // if $cc_output =~ m/Standard/;
+		
 
 		Configure::Data->set(
 			so         => '.dll',
@@ -26,7 +27,8 @@
 			cc_o_out   => '-Fo',
 			cc_exe_out => '-Fe',
 			cc_ldflags => '/link',
-			cc_debug   => '-Zi',
+			              #Use Edit and Continue debugging if available
+			cc_debug   => ($cc_output =~ /-ZI/? '-ZI' : '-Zi'),
 			ld_debug   => '-debug',
 			ld_shared  => '-dll',
 			ld_shared_flags=> '-def:libparrot.def',

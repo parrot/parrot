@@ -18,28 +18,28 @@ PackFile_dump(struct PackFile *self)
 {
     size_t i;
 
-    printf("FIXUP => {\n");
+    PIO_printf(NULL, "FIXUP => {\n");
 
     PackFile_FixupTable_dump(self->fixup_table);
 
-    printf("},\n");
+    PIO_printf(NULL, "},\n");
 
-    printf("CONST => [\n");
+    PIO_printf(NULL, "CONST => [\n");
 
     PackFile_ConstTable_dump(self->const_table);
 
-    printf("],\n");
+    PIO_printf(NULL, "],\n");
 
-    printf("BCODE => [ # %ld bytes", (long)self->byte_code_size);
+    PIO_printf(NULL, "BCODE => [ # %ld bytes", (long)self->byte_code_size);
 
     for (i = 0; i < self->byte_code_size / sizeof(opcode_t); i++) {
         if (i % 8 == 0) {
-            printf("\n    %08lx:  ", (unsigned long)i * sizeof(opcode_t));
+            PIO_printf(NULL, "\n    %08lx:  ", (unsigned long)i * sizeof(opcode_t));
         }
-        printf("%08lx ", (unsigned long)self->byte_code[i]);
+        PIO_printf(NULL, "%08lx ", (unsigned long)self->byte_code[i]);
     }
 
-    printf("\n]\n");
+    PIO_printf(NULL, "\n]\n");
 
     return;
 }
@@ -57,12 +57,12 @@ PackFile_ConstTable_dump(struct PackFile_ConstTable *self)
     opcode_t i;
 
     if (!self) {
-        fprintf(stderr, "PackFile_ConstTable_dump: self == NULL!\n");
+        PIO_eprintf(NULL, "PackFile_ConstTable_dump: self == NULL!\n");
         return;
     }
 
     for (i = 0; i < self->const_count; i++) {
-        printf("    # %ld:\n", (long)i);
+        PIO_printf(NULL, "    # %ld:\n", (long)i);
         PackFile_Constant_dump(self->constants[i]);
     }
 
@@ -80,23 +80,23 @@ PackFile_Constant_dump(struct PackFile_Constant *self)
     switch (self->type) {
     case PFC_NONE:
         /* TODO: OK to be silent here? */
-        printf("    [ 'PFC_NONE', undef ],\n");
+        PIO_printf(NULL,"    [ 'PFC_NONE', undef ],\n");
         break;
 
     case PFC_NUMBER:
-        printf("    [ 'PFC_NUMBER', %g ],\n", self->number);
+        PIO_printf(NULL, "    [ 'PFC_NUMBER', %g ],\n", self->number);
         break;
 
     case PFC_STRING:
-        printf("    [ 'PFC_STRING', {\n");
-        printf("        FLAGS    => 0x%04lx,\n", (long)self->string->flags);
-        printf("        ENCODING => %s,\n", self->string->encoding->name);
-        printf("        TYPE     => %s,\n", self->string->type->name);
-        printf("        SIZE     => %ld,\n", (long)self->string->bufused);
+        PIO_printf(NULL, "    [ 'PFC_STRING', {\n");
+        PIO_printf(NULL, "        FLAGS    => 0x%04lx,\n", (long)self->string->flags);
+        PIO_printf(NULL, "        ENCODING => %s,\n", self->string->encoding->name);
+        PIO_printf(NULL, "        TYPE     => %s,\n", self->string->type->name);
+        PIO_printf(NULL, "        SIZE     => %ld,\n", (long)self->string->bufused);
         /* TODO: Won't do anything reasonable for most encodings */
-        printf("        DATA     => '%.*s'\n",
+        PIO_printf(NULL, "        DATA     => '%.*s'\n",
                (int)self->string->bufused, (char *)self->string->strstart);
-        printf("    } ],\n");
+        PIO_printf(NULL, "    } ],\n");
         break;
 
     default:

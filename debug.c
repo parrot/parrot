@@ -215,18 +215,18 @@ PDB_get_command(struct Parrot_Interp *interpreter)
         while (pdb->cur_opcode != line->opcode)
             line = line->next;
         
-        fprintf(stderr,"\n%li  ",line->number); 
+        PIO_eprintf(interpreter, "\n%li  ", line->number); 
         c = pdb->file->source + line->source_offset;
         while (*c != '\n'  && c)
-            fprintf(stderr,"%c",*(c++));
-        fprintf(stderr,"\n");
+            PIO_eprintf(interpreter, "%c", *(c++));
+        PIO_eprintf(interpreter, "\n");
     }
 
     i = 0;
 
     c = (char *)mem_sys_allocate(255);
 
-    fprintf(stderr,"\n(pdb) ");
+    PIO_eprintf(interpreter, "\n(pdb) ");
 
     /* skip leading whitespace */
     do {
@@ -331,7 +331,7 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
                 PDB_run_command(interpreter,pdb->last_command);
             break;
         default:
-            fprintf(stderr,"Undefined command: \"%s\".  Try \"help\".",
+            PIO_eprintf(interpreter, "Undefined command: \"%s\".  Try \"help\".",
                     command);
             break;
     }
@@ -448,7 +448,7 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
             condition->type = PDB_cond_pmc;
             break;
         default:
-            fprintf(stderr, "First argument must be a register\n");
+            PIO_eprintf(interpreter, "First argument must be a register\n");
             return NULL;
     }
 
@@ -496,7 +496,7 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
                 goto INV_COND;     
             break;
         default:
-INV_COND:   fprintf(stderr, "Invalid condition\n");
+INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
             return NULL;
     }
 
@@ -580,7 +580,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
    
         /* Abort if the line number provided doesn't exists */
         if (!line->next) {
-            fprintf(stderr,"Can't set a breakpoint at line number %li\n",ln);
+            PIO_eprintf(interpreter, "Can't set a breakpoint at line number %li\n",ln);
             return;
         }
     }
@@ -605,13 +605,13 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 
     /* Revive the breakpoint if was deleted */
     if (sbreak && sbreak->skip == -1) {
-        fprintf(stderr,"Breakpoint %li at line %li\n",i,line->number);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Breakpoint %li at line %li\n",i,line->number);
         sbreak->skip = 0;
         return;
     }
     /* Don't do anything if there is already a breakpoint at this line */
     if (sbreak) {
-        fprintf(stderr,"Breakpoint %li already at line %li\n",i,line->number);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Breakpoint %li already at line %li\n",i,line->number);
         return;
     }
         
@@ -648,7 +648,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
         pdb->breakpoint = newbreak;
     }
 
-    fprintf(stderr,"Breakpoint %li at line %li\n",i,line->number);
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Breakpoint %li at line %li\n",i,line->number);
 }
 
 /* PDB_init
@@ -694,7 +694,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 
     /* Restart if we are already running */
     if (pdb->state & PDB_RUNNING)
-        fprintf(stderr,"Restating\n");
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Restating\n");
 
     /* Get the bytecode start */
     pdb->cur_opcode = interpreter->code->byte_code;
@@ -715,7 +715,7 @@ PDB_continue(struct Parrot_Interp *interpreter,
     /* Skip any breakpoint? */
     if (command && *command) {
         if (!pdb->breakpoint) {
-            fprintf(stderr,"No breakpoints to skip\n");
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"No breakpoints to skip\n");
             return;
         }
         ln = atol(command);
@@ -769,7 +769,7 @@ PDB_program_end(struct Parrot_Interp *interpreter)
 
     /* Remove the RUNNING state */
     pdb->state &= ~PDB_RUNNING;
-    fprintf(stderr,"Program exited.\n");
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Program exited.\n");
     return 1;
 }
 
@@ -1258,7 +1258,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
             pline = pline->next;
 
         if (!(pline)) {
-            fprintf(stderr,"Label number %li out of bounds.\n",label->number);
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Label number %li out of bounds.\n",label->number);
             return;
         }
 
@@ -1363,7 +1363,7 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
 
     /* abort if fopen failed */
     if (!file) {
-        fprintf(stderr,"Unable to load %s\n", f);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Unable to load %s\n", f);
         return;
     }
 
@@ -1461,14 +1461,14 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
 
     i = 1;
     while (line->next) {
-        fprintf(stderr,"%li  ",pdb->file->list_line + i); 
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"%li  ",pdb->file->list_line + i); 
         /* If it has a label print it */
         if (line->label)
-            fprintf(stderr,"L%li:\t",line->label->number);
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"L%li:\t",line->label->number);
         c = pdb->file->source + line->source_offset;
         while (*c != '\n')
-            fprintf(stderr,"%c",*(c++));
-        fprintf(stderr,"\n");
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"%c",*(c++));
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\n");
         line = line->next;
         if (i++ == n)
             break;
@@ -1501,7 +1501,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
     /* Find the opcode number */
     op_number = interpreter->op_lib->op_code(buf, 1);
     if (op_number < 0) {
-        fprintf(stderr, "Invalid opcode '%s'\n", buf);
+        PIO_eprintf(interpreter, "Invalid opcode '%s'\n", buf);
         return;
     }
     /* Start generating the bytecode */
@@ -1619,7 +1619,7 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
                 PDB_print_stack_pmc(interpreter, command);
                 break;
             default:
-                fprintf(stderr,"Unknown argument \"%s\" to 'stack'\n", command);
+                PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Unknown argument \"%s\" to 'stack'\n", command);
                 break;
         }
     }
@@ -1638,14 +1638,14 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
 
     if (!chunk) {
         i = depth / FRAMES_PER_INT_REG_CHUNK;
-        fprintf(stderr,"There are only %li frames\n",i);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"There are only %li frames\n",i);
         return;
     }
     
-    fprintf(stderr,"Integer stack, frame %li, depth %li\n", i, depth);
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Integer stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_int(&chunk->IReg[depth], atoi(command));
+    PDB_print_int(interpreter, &chunk->IReg[depth], atoi(command));
 }
 
 /* PDB_print_stack_num
@@ -1661,14 +1661,14 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
 
     if (!chunk) {
         i = depth / FRAMES_PER_NUM_REG_CHUNK;
-        fprintf(stderr,"There are only %li frames\n",i);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"There are only %li frames\n",i);
         return;
     }
     
-    fprintf(stderr,"Float stack, frame %li, depth %li\n", i, depth);
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Float stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_num(&chunk->NReg[depth], atoi(command));
+    PDB_print_num(interpreter, &chunk->NReg[depth], atoi(command));
 }
 
 /* PDB_print_stack_string
@@ -1684,11 +1684,11 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
 
     if (!chunk) {
         i = depth / FRAMES_PER_STR_REG_CHUNK;
-        fprintf(stderr,"There are only %li frames\n",i);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"There are only %li frames\n",i);
         return;
     }
     
-    fprintf(stderr,"String stack, frame %li, depth %li\n", i, depth);
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"String stack, frame %li, depth %li\n", i, depth);
 
     na(command);
     PDB_print_string(interpreter,&chunk->SReg[depth], atoi(command));
@@ -1707,11 +1707,11 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
 
     if (!chunk) {
         i = depth / FRAMES_PER_PMC_REG_CHUNK;
-        fprintf(stderr,"There are only %li frames\n",i);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"There are only %li frames\n",i);
         return;
     }
     
-    fprintf(stderr,"PMC stack, frame %li, depth %li\n", i, depth);
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"PMC stack, frame %li, depth %li\n", i, depth);
 
     na(command);
     PDB_print_pmc(interpreter,&chunk->PReg[depth], atoi(command), NULL);
@@ -1721,14 +1721,13 @@ static void
 dump_string(struct Parrot_Interp *interpreter, STRING* s)
 {
     if (s) {
-        fprintf(stderr,"\tBuflen  =\t%12ld\n",s->buflen);
-        fprintf(stderr,"\tFlags   =\t%12ld\n",s->flags);
-        fprintf(stderr,"\tBufused =\t%12ld\n",s->bufused);
-        fprintf(stderr,"\tStrlen  =\t%12ld\n",s->strlen);
-        fprintf(stderr,"\tOffset  =\t%12d\n",
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tBuflen  =\t%12ld\n",s->buflen);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tFlags   =\t%12ld\n",s->flags);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tBufused =\t%12ld\n",s->bufused);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tStrlen  =\t%12ld\n",s->strlen);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tOffset  =\t%12d\n",
                 (char*) s->strstart - (char*) s->bufstart);
-        fprintf(stderr,"\tString  =\t%s\n",
-                string_to_cstring(interpreter, s));
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tString  =\t%S\n", s);
     }
 }
 
@@ -1749,31 +1748,26 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
 
     switch (entry->entry_type) {
         case STACK_ENTRY_INT:
-            fprintf(stderr,"Integer\t=\t%8li\n",entry->entry.int_val);
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Integer\t=\t%8vi\n",entry->entry.int_val);
             break;
         case STACK_ENTRY_FLOAT:
-            fprintf(stderr,"Float\t=\t%8.4f\n",entry->entry.num_val);
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Float\t=\t%8.4vf\n",entry->entry.num_val);
             break;
         case STACK_ENTRY_STRING:
-            fprintf(stderr,"String =\n");
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"String =\n");
             dump_string(interpreter, entry->entry.string_val);
             break;
         case STACK_ENTRY_PMC:
-            fprintf(stderr,"PMC =\n");
-            s = (entry->entry.pmc_val->vtable->get_string(
-                 interpreter, entry->entry.pmc_val));
-
-            if (s)
-                fprintf(stderr,"%s\n", string_to_cstring(interpreter, (s)));
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"PMC =\n%PS\n", entry->entry.pmc_val);
             break;
         case STACK_ENTRY_POINTER:
-            fprintf(stderr,"POINTER\n");
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"POINTER\n");
             break;
         case STACK_ENTRY_DESTINATION:
-            fprintf(stderr,"DESTINATION\n");
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"DESTINATION\n");
             break;
         default:
-            fprintf(stderr,"Invalid stack_entry_type!\n");
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Invalid stack_entry_type!\n");
             break;
     }
 }
@@ -1812,11 +1806,11 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
     switch (c) {
         case c_i:
         case c_int:
-            PDB_print_int(&interpreter->ctx.int_reg, regnum);
+            PDB_print_int(interpreter, &interpreter->ctx.int_reg, regnum);
             break;
         case c_n:
         case c_num:
-            PDB_print_num(&interpreter->ctx.num_reg, regnum);
+            PDB_print_num(interpreter, &interpreter->ctx.num_reg, regnum);
             break;
         case c_s:
         case c_str:
@@ -1827,7 +1821,7 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
             PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg, regnum, key);
             break;
         default:
-            fprintf(stderr, "Unrecognized print option: must be 'int', 'num', 'str', 'pmc', or a register\n");
+            PIO_eprintf(interpreter, "Unrecognized print option: must be 'int', 'num', 'str', 'pmc', or a register\n");
     }
 
     interpreter->DOD_block_level--;
@@ -1837,7 +1831,7 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
  * print the whole or a specific value of a integer register structure.
  */
 void
-PDB_print_int(struct IReg *int_reg, int regnum)
+PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
 
@@ -1846,10 +1840,10 @@ PDB_print_int(struct IReg *int_reg, int regnum)
         k = regnum + 1;
     }
 
-    fprintf(stderr,"Integer Registers:\n");
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Integer Registers:\n");
     for (i = j; i < k; i++) {
-        fprintf(stderr,"I%i =\t",i);
-        fprintf(stderr,"%11li\n",int_reg->registers[i]);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"I%i =\t",i);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"%11vi\n",int_reg->registers[i]);
     }
 }
 
@@ -1857,7 +1851,7 @@ PDB_print_int(struct IReg *int_reg, int regnum)
  * print the whole or a specific value of a float register structure.
  */
 void
-PDB_print_num(struct NReg *num_reg, int regnum)
+PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
 
@@ -1866,10 +1860,10 @@ PDB_print_num(struct NReg *num_reg, int regnum)
         k = regnum + 1;
     }
 
-    fprintf(stderr,"Float Registers:\n");
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Float Registers:\n");
     for (i = j; i < k; i++) {
-        fprintf(stderr,"N%i =\t",i);
-        fprintf(stderr,"%20.4f\n",num_reg->registers[i]);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"N%i =\t",i);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"%20.4f\n",num_reg->registers[i]);
     }
 }
 
@@ -1888,9 +1882,9 @@ PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
         k = regnum + 1;
     }
 
-    fprintf(stderr,"String Registers:\n");
+    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"String Registers:\n");
     for (i = j; i < k; i++) {
-        fprintf(stderr,"S%i =\n",i);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"S%i =\n",i);
         dump_string(interpreter, string_reg->registers[i]);
     }
 }
@@ -1901,16 +1895,12 @@ print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
     if (pmc && pmc->vtable) {
         STRING* s = pmc->vtable->name(interpreter, pmc);
         if (s) {
-            fprintf(stderr, " [%s]\n", string_to_cstring(interpreter, s));
+            PIO_eprintf(interpreter, " [%S]\n", s);
         }
-        s = (pmc->vtable->get_string(interpreter, pmc));
-        if (s) {
-            fprintf(stderr,"Stringified: %s\n",
-                    string_to_cstring(interpreter, s));
-        }
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Stringified: %PS\n", pmc);
     } 
     else {
-        fprintf(stderr, "<null pmc>\n");
+        PIO_eprintf(interpreter, "<null pmc>\n");
     }
 }
 
@@ -1927,14 +1917,14 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
     }
 
     if (regnum == -1)
-        fprintf(stderr,"PMC Registers:\n");
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"PMC Registers:\n");
 
     for (i = j; i < k; i++) {
         PMC* pmc = pmc_reg->registers[i];
 
-        fprintf(stderr,"P%i", i);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"P%i", i);
         if (key) trace_key_dump(interpreter, key);
-        fprintf(stderr," =");
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter)," =");
 
         if (key) pmc = pmc->vtable->get_pmc_keyed(interpreter, pmc, key);
         print_pmc(interpreter, pmc);
@@ -1947,17 +1937,17 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
 void
 PDB_info(struct Parrot_Interp *interpreter)
 {
-    fprintf(stderr, "Total memory allocated = %d\n",
+    PIO_eprintf(interpreter, "Total memory allocated = %d\n",
             interpreter->memory_allocated);
-    fprintf(stderr, "DOD runs = %d\n", interpreter->dod_runs);
-    fprintf(stderr, "Collect runs = %d\n", interpreter->collect_runs);
-    fprintf(stderr, "Active PMCs = %d\n", interpreter->active_PMCs);
-    fprintf(stderr, "Active buffers = %d\n", interpreter->active_Buffers);
-    fprintf(stderr, "Total PMCs = %d\n", interpreter->total_PMCs);
-    fprintf(stderr, "Total buffers = %d\n", interpreter->total_Buffers);
-    fprintf(stderr, "Header allocations since last collect = %d\n",
+    PIO_eprintf(interpreter, "DOD runs = %d\n", interpreter->dod_runs);
+    PIO_eprintf(interpreter, "Collect runs = %d\n", interpreter->collect_runs);
+    PIO_eprintf(interpreter, "Active PMCs = %d\n", interpreter->active_PMCs);
+    PIO_eprintf(interpreter, "Active buffers = %d\n", interpreter->active_Buffers);
+    PIO_eprintf(interpreter, "Total PMCs = %d\n", interpreter->total_PMCs);
+    PIO_eprintf(interpreter, "Total buffers = %d\n", interpreter->total_Buffers);
+    PIO_eprintf(interpreter, "Header allocations since last collect = %d\n",
             interpreter->header_allocs_since_last_collect);
-    fprintf(stderr, "Memory allocations since last collect = %d\n",
+    PIO_eprintf(interpreter, "Memory allocations since last collect = %d\n",
             interpreter->mem_allocs_since_last_collect);
 }
 
@@ -1968,23 +1958,24 @@ PDB_info(struct Parrot_Interp *interpreter)
 void
 PDB_help(const char *command)
 {
-    fprintf(stderr,"List of commands:\n");
-    fprintf(stderr,"\tdisassemble -- disassemble the bytecode\n");
-    fprintf(stderr,"\tload -- load a source code file\n");
-    fprintf(stderr,"\tlist (l) -- list the source code file\n");
-    fprintf(stderr,"\trun (r) -- run the programm\n");
-    fprintf(stderr,"\tbreak (b) -- add a breakpoint\n");
-    fprintf(stderr,"\twatch (w) -- add a watchpoint\n");
-    fprintf(stderr,"\tdelete (d) -- delete a breakpoint\n");
-    fprintf(stderr,"\tcontinue (c) -- continue the program execution\n");
-    fprintf(stderr,"\tnext (n) -- run the next instruction\n");
-    fprintf(stderr,"\teval (e) -- run an instruction\n");
-    fprintf(stderr,"\ttrace (t) -- trace the next instruction\n");
-    fprintf(stderr,"\tprint (p) -- print the interpreter registers\n");
-    fprintf(stderr,"\tstack (s) -- examine the stack\n");
-    fprintf(stderr,"\tinfo -- print interpreter information\n");
-    fprintf(stderr,"\tquit (q) -- exit the debugger\n");
-    fprintf(stderr,"\thelp (h) -- print this help\n\n");
+    PIO_eprintf(NULL, "\
+List of commands:\n\
+    disassemble -- disassemble the bytecode\n\
+    load -- load a source code file\n\
+    list (l) -- list the source code file\n\
+    run (r) -- run the program\n\
+    break (b) -- add a breakpoint\n\
+    watch (w) -- add a watchpoint\n\
+    delete (d) -- delete a breakpoint\n\
+    continue (c) -- continue the program execution\n\
+    next (n) -- run the next instruction\n\
+    eval (e) -- run an instruction\n\
+    trace (t) -- trace the next instruction\n\
+    print (p) -- print the interpreter registers\n\
+    stack (s) -- examine the stack\n\
+    info -- print interpreter information\n\
+    quit (q) -- exit the debugger\n\
+    help (h) -- print this help\n\n");
 }
 
 /*

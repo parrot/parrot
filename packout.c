@@ -37,23 +37,23 @@ PackFile_pack_size(struct PackFile *self)
     segment_length_size = sizeof(opcode_t);
 
 #if TRACE_PACKFILE
-    printf("getting fixup table size...\n");
+    PIO_eprintf(NULL, "getting fixup table size...\n");
 #endif
 
     fixup_table_size = PackFile_FixupTable_pack_size(self->fixup_table);
 
 #if TRACE_PACKFILE
-    printf("  ... it is %ld\n", fixup_table_size);
+    PIO_eprintf(NULL, "  ... it is %ld\n", fixup_table_size);
 #endif
 
 #if TRACE_PACKFILE
-    printf("getting const table size...\n");
+    PIO_eprintf(NULL, "getting const table size...\n");
 #endif
 
     const_table_size = PackFile_ConstTable_pack_size(self->const_table);
 
 #if TRACE_PACKFILE
-    printf("  ... it is %ld\n", const_table_size);
+    PIO_eprintf(NULL, "  ... it is %ld\n", const_table_size);
 #endif
 
     return header_size + magic_size + oct_size
@@ -161,7 +161,7 @@ PackFile_ConstTable_pack_size(struct PackFile_ConstTable *self)
     opcode_t size = 0;
 
     if (!self) {
-        fprintf(stderr, "PackFile_ConstTable_size: self == NULL!\n");
+        PIO_eprintf(NULL, "PackFile_ConstTable_size: self == NULL!\n");
         return -1;
     }
 
@@ -188,7 +188,7 @@ PackFile_ConstTable_pack(struct PackFile *packfile,
     opcode_t i;
 
     if (!self) {
-        fprintf(stderr, "PackFile_ConstTable_pack: self == NULL!\n");
+        PIO_eprintf(NULL, "PackFile_ConstTable_pack: self == NULL!\n");
         return;
     }
 
@@ -222,7 +222,7 @@ static int find_in_const(PMC *key, int type)
         else if (type == PFC_NUMBER && ct->constants[i]->number ==
                 key->cache.num_val)
             return i;
-    fprintf(stderr, "find_in_const: couldn't find const for key\n");
+    PIO_eprintf(NULL, "find_in_const: couldn't find const for key\n");
     exit(1);
 }
 /***************************************
@@ -360,7 +360,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
                         *cursor++ = key->cache.int_val;
                         break;
                     default:
-                        fprintf(stderr, "PackFile_Constant_pack: "
+                        PIO_eprintf(NULL, "PackFile_Constant_pack: "
                                 "unsupported constant type\n");
                         exit(1);
                 }
@@ -371,7 +371,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
     default:
         /* TODO: OK to be silent here? */
             /* ARGH, don't be silent -lt */
-            fprintf(stderr, "PackFile_Constant_pack: unsupported constant\n");
+            PIO_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
             exit(1);
         break;
     }

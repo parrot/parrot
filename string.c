@@ -81,6 +81,21 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
     return d;
 }
 
+static void
+make_COW_reference_from_header(struct Parrot_Interp *interpreter, STRING *s, STRING *d) {
+    if (s->flags & BUFFER_constant_FLAG) {
+        s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
+        copy_string_header(d, s);
+        d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG);
+    }
+    else {;
+        s->flags |= BUFFER_COW_FLAG;
+        copy_string_header(d, s);
+    }
+}
+
+
+
 /* Basic string stuff - creation, enlargement, destruction, etc. */
 
 /*=for api string string_init
@@ -788,6 +803,21 @@ string_bool(const STRING *s)
     return 1;                   /* it must be true */
 }
 
+/*=for api string string_set
+ * Set the contents of one string to the contents of another.
+ */
+STRING *
+string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src) {
+    if(dest) {
+        make_COW_reference_from_header(interpreter, src, dest);
+    }
+    else {
+        dest=make_COW_reference(interpreter, src);
+    }
+    
+    return dest;
+}
+
 /* A number is such that:
   sign           =  '+' | '-'
   digit          =  "Any code point considered a digit by the chartype"
@@ -956,15 +986,10 @@ string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
 STRING *
 string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
 {
-    char buff[200];
-    STRING* s;
-#ifdef HAS_SNPRINTF
-    snprintf(buff, sizeof(buff), FLOATVAL_FMT, f);
-#else
-    sprintf(buff, FLOATVAL_FMT, f);  /* XXX buffer overflow! */
-#endif
-    s = string_make(interpreter, buff, strlen(buff), NULL, 0, NULL);
-    return s;
+    /* Too damn hard--hand it off to Parrot_sprintf, which'll probably
+       use the system sprintf anyway, but has gigantic buffers that are
+       awfully hard to overflow. */
+    return Parrot_sprintf_c(interpreter, "%vg", f);
 }
 
 const char *

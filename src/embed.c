@@ -36,9 +36,11 @@ Parrot_new(void)
 
 void
 Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
+/*                                             ^^^^^^^^^^^^^^
+    XXX BD Do we really need this to be user-provided, or can
+        we set up our own in embed.c:Parrot_runcode()?
+*/
 {
-    /* This function currently unused, but is here in case we need it later. */
-
     if (!world_inited) {
         /* See comments in Parrot_new. */
         world_inited = 1;
@@ -97,13 +99,13 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         /* if we have stat(), get the actual file size so we can read it
          * in one chunk. */
         if (stat(filename, &file_stat)) {
-            fprintf(stderr, "Parrot VM: Can't stat %s, code %i.\n", filename,
+            PIO_eprintf(interpreter, "Parrot VM: Can't stat %s, code %i.\n", filename,
                     errno);
             return NULL;
         }
 
         if (!S_ISREG(file_stat.st_mode)) {
-            fprintf(stderr, "Parrot VM: %s is not a normal file.\n", filename);
+            PIO_eprintf(interpreter, "Parrot VM: %s is not a normal file.\n", filename);
             return NULL;
         }
 
@@ -119,7 +121,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 #ifndef HAS_HEADER_SYSMMAN
         io = PIO_open(interpreter, filename, "<");
         if (!io) {
-            fprintf(stderr, "Parrot VM: Can't open %s, code %i.\n", filename,
+            PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n", filename,
                     errno);
             return NULL;
         }
@@ -146,7 +148,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         if (NULL == program_code) {
             /* Whoops, out of memory. */
 
-            fprintf(stderr,
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),
                     "Parrot VM: Could not allocate buffer to read packfile from PIO.\n");
 
             return NULL;
@@ -162,7 +164,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
                 realloc(program_code, program_size + chunk_size);
 
             if (NULL == program_code) {
-                fprintf(stderr,
+                PIO_fprintf(interpreter, PIO_STDERR(interpreter),
                         "Parrot VM: Could not reallocate buffer while reading packfile from PIO.\n");
                 return NULL;
             }
@@ -171,7 +173,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         }
 
         if (read_result < 0) {
-            fprintf(stderr,
+            PIO_fprintf(interpreter, PIO_STDERR(interpreter),
                     "Parrot VM: Problem reading packfile from PIO.\n");
             return NULL;
         }
@@ -184,7 +186,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
         fd = open(filename, O_RDONLY | O_BINARY);
         if (!fd) {
-            fprintf(stderr, "Parrot VM: Can't open %s, code %i.\n", filename,
+            PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n", filename,
                     errno);
             return NULL;
         }
@@ -193,14 +195,14 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
             mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
         if (!program_code) {
-            fprintf(stderr, "Parrot VM: Can't read file %s, code %i.\n",
+            PIO_eprintf(interpreter, "Parrot VM: Can't read file %s, code %i.\n",
                     filename, errno);
             return NULL;
         }
 
 #else   /* HAS_HEADER_SYSMMAN */
 
-        fprintf(stderr,
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
                 "Parrot VM: uncaught error occurred reading file or mmap not available.\n");
         return NULL;
 
@@ -214,7 +216,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
     if (!PackFile_unpack
         (interpreter, pf, (opcode_t *)program_code, program_size)) {
-        fprintf(stderr, "Parrot VM: Can't unpack packfile %s.\n", filename);
+        PIO_eprintf(interpreter, "Parrot VM: Can't unpack packfile %s.\n", filename);
         return NULL;
     }
 
@@ -236,14 +238,14 @@ Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)
     interpreter->code = pf;
 }
 
-void
-Parrot_setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
+static void
+setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
 {
-    int i;
+    INTVAL i;
     PMC *userargv;
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        fprintf(stderr,
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
                 "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
                 argc);
     }
@@ -258,7 +260,7 @@ Parrot_setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
                                   0, BUFFER_external_FLAG, 0);
 
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-            fprintf(stderr, "\t%d: %s\n", i, argv[i]);
+            PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);
         }
 
         userargv->vtable->push_string(interpreter, userargv, arg);
@@ -272,19 +274,19 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        fprintf(stderr, "*** Parrot VM: Debugging enabled. ***\n");
+        PIO_eprintf(interpreter, "*** Parrot VM: Debugging enabled. ***\n");
 
         if (Interp_flags_TEST(interpreter, PARROT_BOUNDS_FLAG)) {
-            fprintf(stderr, "*** Parrot VM: Bounds checking enabled. ***\n");
+            PIO_eprintf(interpreter, "*** Parrot VM: Bounds checking enabled. ***\n");
         }
         if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
-            fprintf(stderr, "*** Parrot VM: Predereferencing enabled. ***\n");
+            PIO_eprintf(interpreter, "*** Parrot VM: Predereferencing enabled. ***\n");
         }
         if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
-            fprintf(stderr, "*** Parrot VM: JIT enabled. ***\n");
+            PIO_eprintf(interpreter, "*** Parrot VM: JIT enabled. ***\n");
         }
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-            fprintf(stderr, "*** Parrot VM: Tracing enabled. ***\n");
+            PIO_eprintf(interpreter, "*** Parrot VM: Tracing enabled. ***\n");
         }
     }
 
@@ -293,7 +295,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     /* No JIT here--make sure they didn't ask for it. */
 
     if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
-        fprintf(stderr,
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
                 "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
         exit(1);
     }
@@ -303,7 +305,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     /* Set up @ARGS (or whatever this language calls it).
        XXX Should this be Array or PerlArray?             */
 
-    Parrot_setup_argv(interpreter, argc, argv);
+    setup_argv(interpreter, argc, argv);
     
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     runops(interpreter, interpreter->code, 0);
@@ -313,15 +315,15 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
      */
 
     if (interpreter->profile != NULL) {
-        unsigned int j;
-        int op_count = 0;
-        int call_count = 0;
+        UINTVAL j;
+        UINTVAL op_count = 0;
+        UINTVAL call_count = 0;
         FLOATVAL sum_time = 0.0;
 
-        printf("\n\n");
-        printf("                   OPERATION PROFILE                 \n\n");
-        printf("  CODE   OP FULL NAME   CALLS  TOTAL TIME    AVG TIME\n");
-        printf("  -----  ------------  ------  ----------  ----------\n");
+        PIO_printf(interpreter, "\n\n");
+        PIO_printf(interpreter, "                   OPERATION PROFILE                 \n\n");
+        PIO_printf(interpreter, "  CODE   OP FULL NAME   CALLS  TOTAL TIME    AVG TIME\n");
+        PIO_printf(interpreter, "  -----  ------------  ------  ----------  ----------\n");
 
         for (j = 0; j < interpreter->op_count; j++) {
             if (interpreter->profile[j].numcalls > 0) {
@@ -329,41 +331,41 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
                 call_count += interpreter->profile[j].numcalls;
                 sum_time += interpreter->profile[j].time;
 
-                printf("  %5u  %-12s  %6ld  %10f  %10f\n", j, 
+                PIO_printf(interpreter, "  %5vu  %-12s  %6vu  %10vf  %10vf\n", j, 
                        interpreter->op_info_table[j].full_name,
                        interpreter->profile[j].numcalls,
                        interpreter->profile[j].time,
-                       interpreter->profile[j].time / 
-                           (FLOATVAL)interpreter->profile[j].numcalls
+                       (FLOATVAL)(interpreter->profile[j].time / 
+                           (FLOATVAL)interpreter->profile[j].numcalls)
                 );
             }
         }
 
-        printf("  -----  ------------  ------  ----------  ----------\n");
-        printf("  %5d  %-12s  %6d  %10f  %10f\n", 
+        PIO_printf(interpreter, "  -----  ------------  ------  ----------  ----------\n");
+        PIO_printf(interpreter, "  %5vu  %-12s  %6vu  %10vf  %10vf\n", 
             op_count,
             "",
             call_count,
             sum_time,
-            sum_time / (FLOATVAL)call_count
+            (FLOATVAL)(sum_time / (FLOATVAL)call_count)
         );
     }
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         /* Give the souls brave enough to activate debugging an earful 
          * about GC. */
-        fprintf(stderr, "\
+        PIO_eprintf(interpreter, "\
 *** Parrot VM: Dumping GC info ***\n\
-\tTotal memory allocated: %u\n\
-\tTotal DOD runs:         %u\n\
-\tTotal collector runs:   %u\n\
-\tActive PMCs:            %u\n\
-\tActive buffers:         %u\n\
-\tTotal PMCs:             %u\n\
-\tTotal buffers:          %u\n\
+\tTotal memory allocated: %p\n\
+\tTotal DOD runs:         %p\n\
+\tTotal collector runs:   %p\n\
+\tActive PMCs:            %p\n\
+\tActive buffers:         %p\n\
+\tTotal PMCs:             %p\n\
+\tTotal buffers:          %p\n\
 \tSince last collection:\n\
-\t\tHeader allocations: %u\n\
-\t\tMemory allocations: %u\n\
+\t\tHeader allocations:   %p\n\
+\t\tMemory allocations:   %p\n\
 \n",
             interpreter->memory_allocated,
             interpreter->dod_runs,
@@ -382,7 +384,7 @@ void
 Parrot_destroy(struct Parrot_Interp *interp)
 {
     /* XXX Leaks tons of memory. */
-    free(interp);
+    mem_sys_free(interp);
 }
 
 /* XXX Doesn't handle arguments with spaces */
@@ -448,11 +450,11 @@ Parrot_disassemble(struct Parrot_Interp *interpreter)
     while (line->next) {
         /* If it has a label print it */
         if (line->label)
-            printf("L%li:\t", line->label->number);
+            PIO_printf(interpreter, "L%li:\t", line->label->number);
         c = pdb->file->source + line->source_offset;
         while (*c != '\n' && c)
-            printf("%c", *(c++));
-        printf("\n");
+            PIO_printf(interpreter, "%c", *(c++));
+        PIO_printf(interpreter, "\n");
         line = line->next;
     }
     return;

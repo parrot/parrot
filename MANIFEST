@@ -585,6 +585,8 @@ rx.c
 rx.ops
 rxstacks.c
 smallobject.c
+spf_render.c
+spf_vtable.c
 stacks.c
 string.c
 sub.c

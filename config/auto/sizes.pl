@@ -41,6 +41,68 @@ Hmm, I see your chosen INTVAL isn't the same size as your pointers.  Parrot shou
 still compile and run, but you may see a ton of warnings.
 END
   }
+  
+  #Get HUGEINTVAL
+  if(my $size=eval {
+    open(TEST, ">test.c") or die "Can't open test.c: $!";
+    print TEST <<'END';
+#include <stdio.h>
+
+int main() {
+    long long foo;
+    printf("%u", sizeof(foo));
+    return 0;
+}
+END
+    close TEST;
+    
+    cc_build();
+    cc_run();
+  }) {
+    Configure::Data->set(
+        'hugeintval'     => 'long long',
+        'hugeintvalsize' => $size
+    );
+  }
+  else {
+    Configure::Data->set(
+        'hugeintval'     => 'long',
+        'hugeintvalsize' => Configure::Data->get('longsize')
+    );
+  }
+  
+  cc_clean();
+  
+  #get HUGEFLOATVAL
+  if(my $size=eval {
+    open(TEST, ">test.c") or die "Can't open test.c: $!";
+    print TEST <<'END';
+#include <stdio.h>
+
+int main() {
+    long double foo;
+    printf("%u", sizeof(foo));
+    return 0;
+}
+END
+    close TEST;
+    
+    cc_build();
+    cc_run();
+  }) {
+    Configure::Data->set(
+        'hugefloatval'      => 'long double',
+        'hugefloatvalsize'  => $size
+    );
+  }
+  else {
+    Configure::Data->set(
+        'hugefloatval'      => 'double',
+        'hugefloatvalsize'  => Configure::Data->get('doublesize')
+    );
+  }
+  
+  cc_clean();
 }
 
 1;

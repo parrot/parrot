@@ -322,6 +322,11 @@ extern INTVAL PIO_seek(theINTERP, ParrotIO *, INTVAL hi,
                        INTVAL lo, INTVAL whence);
 extern INTVAL PIO_eof(theINTERP, ParrotIO *);
 
+extern INTVAL PIO_putps(theINTERP, ParrotIO *io, STRING *s);
+extern INTVAL PIO_fprintf(theINTERP, ParrotIO *io, const char *s, ...);
+extern INTVAL PIO_printf(theINTERP, const char *s, ...);
+extern INTVAL PIO_eprintf(theINTERP, const char *s, ...);
+
 
 /* Put platform specific macros here if you must */
 #ifdef PIO_OS_WIN32

@@ -21,6 +21,7 @@
 
 #include "parrot/parrot.h"
 
+#include <stdarg.h>
 
 /* This is list of valid layers */
 ParrotIOLayer *pio_registered_layers;
@@ -362,6 +363,7 @@ PIO_copy_stack(ParrotIOLayer *stack)
  * Parse string for file open mode and return generic
  * bits. The low level OS layers may then interpret the
  * generic bits differently depending on platform.
+ *   XXX BD Should this be static?
  */
 INTVAL
 PIO_parse_open_flags(const char *flagstr)
@@ -588,8 +590,8 @@ PIO_eof(theINTERP, ParrotIO *io)
 }
 
 
-/* Don't use this on a standard Parrot string, unless you
- * have null terminated it.
+/* Don't use this on a standard Parrot string--that's what
+ * PIO_putps is for.
  */
 INTVAL
 PIO_puts(theINTERP, ParrotIO *io, const char *s)
@@ -607,6 +609,74 @@ PIO_puts(theINTERP, ParrotIO *io, const char *s)
     return -1;
 }
 
+INTVAL
+PIO_putps(theINTERP, ParrotIO *io, STRING *s) {
+    return PIO_puts(interpreter, io, string_to_cstring(interpreter, s));
+}
+
+INTVAL
+PIO_fprintf(theINTERP, ParrotIO *io, const char *s, ...) {
+    va_list args;
+    INTVAL ret=-1;
+    
+    va_start(args, s);
+    
+    ret=PIO_putps(interpreter, io, Parrot_vsprintf_c(interpreter, s, args));
+    
+    va_end(args);
+    
+    return ret;
+}
+
+INTVAL
+PIO_printf(theINTERP, const char *s, ...) {
+    va_list args;
+    STRING *str;
+    INTVAL ret=-1;
+    
+    va_start(args, s);
+    
+    str=Parrot_vsprintf_c(interpreter, s, args);
+    
+    if(interpreter) {
+        ret=PIO_putps(interpreter, PIO_STDOUT(interpreter), str);
+    }
+    else {
+        /* Be nice about this... 
+        **   XXX BD Should this use the default PIO_STDOUT or something?
+        */
+        ret=printf("%s", string_to_cstring(interpreter, str));
+    }
+    
+    va_end(args);
+    
+    return ret;
+}
+
+INTVAL
+PIO_eprintf(theINTERP, const char *s, ...) {
+    va_list args;
+    STRING *str;
+    INTVAL ret=-1;
+    
+    va_start(args, s);
+    
+    str=Parrot_vsprintf_c(interpreter, s, args);
+    
+    if(interpreter) {
+        ret=PIO_putps(interpreter, PIO_STDERR(interpreter), str);
+    }
+    else {
+        /* Be nice about this... 
+        **   XXX BD Should this use the default PIO_STDERR or something?
+        */
+        ret=fprintf(stderr, "%s", string_to_cstring(interpreter, str));
+    }
+    
+    va_end(args);
+    
+    return ret;
+}
 
 /*
  * Local variables:
