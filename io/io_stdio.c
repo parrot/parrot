@@ -34,12 +34,12 @@ ParrotIOLayer pio_stdio_layer = {
 
 INTVAL PIO_stdio_init(theINTERP, ParrotIOLayer *l);
 ParrotIO *PIO_stdio_open(theINTERP, ParrotIOLayer *l,
-                         const char *path, UINTVAL flags);
+                         const char *path, INTVAL flags);
 INTVAL PIO_stdio_setbuf(theINTERP, ParrotIOLayer *l,
                         ParrotIO *io, size_t bufsize);
 INTVAL PIO_stdio_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 ParrotIO *PIO_stdio_fdopen(theINTERP, ParrotIOLayer *l,
-                           PIOHANDLE fd, UINTVAL flags);
+                           PIOHANDLE fd, INTVAL flags);
 INTVAL PIO_stdio_close(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 void PIO_stdio_flush(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 size_t PIO_stdio_read(theINTERP, ParrotIOLayer *l,
@@ -73,7 +73,7 @@ PIO_stdio_init(theINTERP, ParrotIOLayer *layer)
 
 ParrotIO *
 PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
-               const char *path, UINTVAL flags)
+               const char *path, INTVAL flags)
 {
     ParrotIO *io;
     ParrotIOLayer *l = layer;
@@ -153,7 +153,7 @@ PIO_stdio_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 
 
 ParrotIO *
-PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, UINTVAL flags)
+PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIO *io;
     ParrotIOLayer *l = PIO_DOWNLAYER(layer);

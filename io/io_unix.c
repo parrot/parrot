@@ -36,13 +36,13 @@ ParrotIOLayer pio_unix_layer = {
  * Currently keeping layer prototypes local to each layer
  * file.
  */
-UINTVAL flags_to_unix(UINTVAL flags);
+INTVAL flags_to_unix(INTVAL flags);
 
 INTVAL PIO_unix_init(theINTERP, ParrotIOLayer *layer);
 ParrotIO *PIO_unix_open(theINTERP, ParrotIOLayer *layer,
-                        const char *spath, UINTVAL flags);
+                        const char *spath, INTVAL flags);
 ParrotIO *PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer,
-                          PIOHANDLE fd, UINTVAL flags);
+                          PIOHANDLE fd, INTVAL flags);
 INTVAL PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 void PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 size_t PIO_unix_read(theINTERP, ParrotIOLayer *layer,
@@ -55,10 +55,10 @@ INTVAL PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 PIOOFF_T PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
 
-UINTVAL
-flags_to_unix(UINTVAL flags)
+INTVAL
+flags_to_unix(INTVAL flags)
 {
-    UINTVAL oflags;
+    INTVAL oflags;
     oflags = 0;
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == (PIO_F_WRITE | PIO_F_READ)) {
         oflags |= O_RDWR | O_CREAT;
@@ -110,10 +110,10 @@ PIO_unix_init(theINTERP, ParrotIOLayer *layer)
  */
 ParrotIO *
 PIO_unix_open(theINTERP, ParrotIOLayer *layer,
-              const char *spath, UINTVAL flags)
+              const char *spath, INTVAL flags)
 {
     ParrotIO *io;
-    UINTVAL mode;
+    INTVAL mode;
     INTVAL oflags, type;
     PIOHANDLE fd;
     type = PIO_TYPE_FILE;
@@ -188,10 +188,10 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
 
 
 ParrotIO *
-PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, UINTVAL flags)
+PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIO *io;
-    UINTVAL oflags, mode;
+    INTVAL oflags, mode;
 #ifdef HAS_HEADER_FCNTL
     INTVAL rflags;
 #endif

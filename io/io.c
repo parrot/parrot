@@ -79,7 +79,7 @@ realloc_pio_array(ParrotIOTable *table, int numhandles)
  * Create a new IO stream, optionally reusing old structure.
  */
 ParrotIO *
-PIO_new(theINTERP, ParrotIO *old, INTVAL iotype, UINTVAL flags, UINTVAL mode)
+PIO_new(theINTERP, ParrotIO *old, INTVAL iotype, INTVAL flags, INTVAL mode)
 {
     ParrotIO *new_io;
 
@@ -359,10 +359,10 @@ PIO_copy_stack(ParrotIOLayer *stack)
  * bits. The low level OS layers may then interpret the
  * generic bits differently depending on platform.
  */
-UINTVAL
+INTVAL
 PIO_parse_open_flags(const char *flagstr)
 {
-    UINTVAL flags;
+    INTVAL flags;
     const char *s;
 
     if (!flagstr || !(*flagstr))
@@ -435,7 +435,7 @@ PIO_open(theINTERP, const char *spath, const char *sflags)
 {
     ParrotIO *io;
     ParrotIOLayer *l = GET_INTERP_IO(interpreter);
-    UINTVAL flags = PIO_parse_open_flags(sflags);
+    INTVAL flags = PIO_parse_open_flags(sflags);
     while (l) {
         if (l->api->Open) {
             io = (*l->api->Open) (interpreter, l, spath, flags);
@@ -462,7 +462,7 @@ ParrotIO *
 PIO_fdopen(theINTERP, PIOHANDLE fd, const char *sflags)
 {
     ParrotIO *io;
-    UINTVAL flags;
+    INTVAL flags;
     ParrotIOLayer *l = GET_INTERP_IO(interpreter);
     flags = PIO_parse_open_flags(sflags);
     while (l) {

@@ -37,9 +37,9 @@ ParrotIOLayer pio_win32_layer = {
 
 INTVAL PIO_win32_init(theINTERP, ParrotIOLayer *layer);
 ParrotIO *PIO_win32_open(theINTERP, ParrotIOLayer *layer,
-                         const char *spath, UINTVAL flags);
+                         const char *spath, INTVAL flags);
 ParrotIO *PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer,
-                           PIOHANDLE fd, UINTVAL flags);
+                           PIOHANDLE fd, INTVAL flags);
 INTVAL PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 void PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 size_t PIO_win32_read(theINTERP, ParrotIOLayer *layer,
@@ -54,8 +54,8 @@ PIOOFF_T PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
 
 /* Convert to platform specific bit open flags */
-UINTVAL
-flags_to_win32(UINTVAL flags, DWORD * fdwAccess,
+INTVAL
+flags_to_win32(INTVAL flags, DWORD * fdwAccess,
                DWORD * fdwShareMode, DWORD * fdwCreate)
 {
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == (PIO_F_WRITE | PIO_F_READ)) {
@@ -124,7 +124,7 @@ PIO_win32_getblksize(PIOHANDLE fd)
 
 ParrotIO *
 PIO_win32_open(theINTERP, ParrotIOLayer *layer,
-               const char *spath, UINTVAL flags)
+               const char *spath, INTVAL flags)
 {
     ParrotIO *io;
     int type;
@@ -155,6 +155,7 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     }
     else {
         int err = GetLastError();
+        if(err) {}
     }
 
     return (ParrotIO *)NULL;
@@ -162,10 +163,10 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
 
 
 ParrotIO *
-PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, UINTVAL flags)
+PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIO *io;
-    UINTVAL mode;
+    INTVAL mode;
     mode = 0;
 
     if (PIO_win32_isatty(fd))
@@ -210,7 +211,7 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 {
     DWORD countread;
     if (ReadFile(io->fd, (LPVOID) buffer, (DWORD) len, &countread, NULL))
-        return countread;
+        return (size_t)countread;
     else {
         if (GetLastError() != NO_ERROR) {
             /* FIXME : An error occured */
@@ -219,9 +220,8 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             /* EOF if read 0 and bytes were requested */
             io->flags |= PIO_F_EOF;
         }
-        return 0;
     }
-    return -1;
+    return 0;
 }
 
 
@@ -234,7 +234,7 @@ PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         && WriteFile(io->fd, (LPCSTR) buffer, (DWORD) len, &countwrote, NULL))
         return countwrote;
     /* FIXME: Set error flag */
-    return -1;
+    return (size_t)-1;
 }
 
 
