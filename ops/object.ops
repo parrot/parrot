@@ -45,9 +45,9 @@ Throws a Method_Not_Found_Exception for a non-existent method.
 
 =cut
 
-=item B<tailcallmethod>
+=item B<tailcallmethod>  B<(unimplemented)>
 
-=item B<tailcallmethod>(in STR)
+=item B<tailcallmethod>(in STR)  B<(unimplemented)>
 
 Make a tailcall to method $1. If no method name is given, we assume
 everything is already set up properly.
@@ -419,17 +419,16 @@ implement.
 
 ###############################################################################
 
-=item B<makemmd>(in PMC, in INT)
+=item B<makemmd>(in PMC, in INT)   B<(unimplemented)>
 
-Makes vtable entry $2 use parrot's multimethod dispatch system
+Makes vtable entry $2 use Parrot's multimethod dispatch system
 
-
-=item B<mmdfunc>(in INT, in PMC, in PMC, in PMC)
+=item B<mmdfunc>(in INT, in PMC, in PMC, in PMC)  B<(unimplemented)>
 
 Make $4 the function called when MMD function $1 is called for
 types $2 and $3.
 
-=item B<mmddispatch>(out PMC, in INT, in PMC, in PMC)
+=item B<mmddispatch>(out PMC, in INT, in PMC, in PMC)   B<(unimplemented)>
 
 Do a multimethod dispatch for binary MMD function $2 on PMCs $3 and $4, and
 put the result in $1.
