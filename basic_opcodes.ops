@@ -7,6 +7,13 @@
 #include "parrot/parrot.h"
 #include <math.h>
 
+/* DEFINES to make true mod work right */
+
+#define OPP_SIGNS(x,y)     ((((x)<0)&&((y)>0))||(((x)>0)&&((y)<0)))
+#define REM_INC(x,y)       (((x)%(y))?1:0)
+#define INT_FLOOR_DIV(x,y) (OPP_SIGNS(x,y)?(-((-x)/(y)+REM_INC((-x),(y)))):((x)/(y)))
+#define INT_MOD(x,y)       (((y)==0)?(x):((x)-(y)*INT_FLOOR_DIV((x),(y))))
+
 /* SET Ix, CONSTANT */
 AUTO_OP set_i_ic {
   INT_REG(P1) = INT_CONST(P2);
@@ -41,10 +48,93 @@ AUTO_OP div_i {
                            INT_REG(P3);
 }
 
+/*
+** mod_i
+**
+** NOTE: This "corrected mod" algorithm is based on the C code on page 70
+** of [1]. Assuming correct behavior of C's built-in mod operator (%) with
+** positive arguments, this algorithm implements a mathematically convenient
+** version of mod, defined thus:
+**
+**   x mod y = x - y * floor(x / y)
+**
+** For more information on this definition of mod, see section 3.4 of [2],
+** pages 81-85.
+**
+** References:
+**
+**   [1] Donald E. Knuth, *MMIXware: A RISC Computer for the Third
+**       Millennium* Springer, 1999.
+**
+**   [2] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
+**       Mathematics*, Second Edition. Addison-Wesley, 1994.
+*/
+
 /* MOD Ix, Iy, Iz   */
 AUTO_OP mod_i {
-  INT_REG(P1) = INT_REG(P2) %
-                           INT_REG(P3);
+  INTVAL y = INT_REG(P2);
+  INTVAL z = INT_REG(P3);
+  INTVAL s = 0;
+  INTVAL r;
+
+  if (z == 0) {
+    r = y;
+  }
+  else {
+    if (y < 0) { s += 2; y = -y; }
+    if (z < 0) { s += 1; z = -z; }
+
+    r = y % z;
+
+    switch (s) {
+      case 0 + 0:            break;
+      case 0 + 1: r = r - z; break;
+      case 2 + 0: r = z - r; break;
+      case 2 + 1: r = -r;    break;
+    }
+  }
+
+  INT_REG(P1) = r;
+}
+
+/*
+** cmod_i
+**
+** NOTE: This "uncorrected mod" algorithm uses the C language's built-in
+** mod operator (x % y), which is
+**
+**     ... the remainder when x is divided by y, and thus is zero when y
+**     divides x exactly.
+**     ...
+**     The direction of truncation for / and teh sign of the result for %
+**     are machine-dependent for negative operands, as is the action taken
+**     on overflow or underlfow.
+**                                                          -- [1], page 41
+**
+** Also:
+**
+**     ... if the second operand is 0, the result is undefined. Otherwise, it
+**     is always true that (a/b)*b + a%b is equal to z. I both operands are
+**     non-negative, then teh remainder is non-negative and smaller than the
+**     divisor; if not, it is guaranteed only that the absolute value of the
+**     remainder is smaller than the absolute value of the divisor.
+**                                                          -- [1], page 205
+**
+** This op is provided for those who need it (such as speed-sensitive
+** applications with heavy use of mod, but using it only with positive
+** arguments), but a more mathematically useful numeric mod based on
+** floor(x/y) and defined with y == 0 is provided by the mod_i op.
+**
+**   [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
+**       Language*, Second Edition. Prentice Hall, 1988.
+**
+** TODO: Doesn't the Parrot interpreter need to catch the exception?
+*/
+
+/* CMOD Ix, Iy, Iz   */
+AUTO_OP cmod_i {
+
+  INT_REG(P1) = INT_REG(P2) % INT_REG(P3);
 }
 
 /* EQ Ix, Iy, EQ_BRANCH */
@@ -221,6 +311,64 @@ AUTO_OP mul_n {
 AUTO_OP div_n {
   NUM_REG(P1) = NUM_REG(P2) /
                            NUM_REG(P3);
+}
+
+/*
+** mod_n
+**
+** NOTE: This "corrected mod" algorithm is based on the formula of [1]:
+**
+**   x mod y = x - y * floor(x / y)
+**
+** For more information on this definition of mod, see section 3.4 of [1],
+** pages 81-85.
+**
+** References:
+**
+**   [1] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
+**       Mathematics*, Second Edition. Addison-Wesley, 1994.
+*/
+
+/* MOD Nx, Ny, Nz   */
+AUTO_OP mod_n {
+
+  NUM_REG(P1) = NUM_REG(P3)
+    ? (NUM_REG(P2) - NUM_REG(P3) * floor(NUM_REG(P2) / NUM_REG(P3)))
+    : NUM_REG(P2);
+}
+
+/*
+** cmod_n
+**
+** NOTE: This "uncorrected mod" algorithm uses the built-in C math library's
+** fmod() function, which computes
+**
+**     ... the remainder of dividing x by y. The return value is x - n * y,
+**     where n is the quotient of x / y, rounded towards zero to an
+**     integer.
+**                                     -- fmod() manpage on RedHat Linux 7.0
+**
+** In addition, fmod() returns
+**
+**     the remainder, unless y is zero, when the function fails and errno
+**     is set.
+**
+** According to page 251 of [1], the result when y is zero is implementation-
+** defined.
+**
+** This op is provided for those who need it, but a more mathematically
+** useful numeric mod based on floor(x/y) instead of truncate(x/y) and
+** defined with y == 0 is provided by the mod_n op.
+**
+**   [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
+**       Language*, Second Edition. Prentice Hall, 1988.
+**
+** TODO: Doesn't the Parrot interpreter need to catch the exception?
+*/
+
+/* CMOD Nx, Ny, Nz   */
+AUTO_OP cmod_n {
+  NUM_REG(P1) = fmod(NUM_REG(P2), NUM_REG(P3));
 }
 
 /* EQ Nx, Ny, EQ_BRANCH */

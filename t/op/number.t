@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 27;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
 	set	N0, 1.0
@@ -192,6 +192,65 @@ CODE
 5.000000
 3.500000
 -2.250000
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mod_n");
+	set	N0, 5.0
+	set	N1, 0.0
+	mod	N2, N0, N1
+	print	N2
+	print	"\\n"
+
+	set	N0, 0.0
+	set	N1, 3.0
+	mod	N2, N0, N1
+	print	N2
+	print	"\\n"
+
+	set	N0, 5.0
+	set	N1, 3.0
+	mod	N2, N0, N1
+	print	N2
+	print	"\\n"
+
+	set	N0, 5.0
+	set	N1, -3.0
+	mod	N2, N0, N1
+	print	N2
+	print	"\\n"
+
+	set	N0, -5.0
+	set	N1, 3.0
+	mod	N2, N0, N1
+	print	N2
+	print	"\\n"
+
+	set	N0, -5.0
+	set	N1, -3.0
+	mod	N2, N0, N1
+	print	N2
+	print	"\\n"
+
+        end
+CODE
+5.000000
+0.000000
+2.000000
+-1.000000
+1.000000
+-2.000000
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "cmod_n");
+	set	N0, 5.000
+	set	N1, 3.000
+	cmod	N2, N0, N1
+	print	N2
+	print	"\\n"
+
+        end
+CODE
+2.000000
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "eq_n_ic");
@@ -679,7 +738,6 @@ CODE
 -0.500000
 0.500000
 OUTPUT
-
 
 output_is(<<CODE, <<OUTPUT, "ntoi_i_n");
 	set	N0, 0.0

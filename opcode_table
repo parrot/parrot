@@ -36,6 +36,7 @@ sub_i	3	I I I
 mul_i	3	I I I
 div_i	3	I I I
 mod_i	3	I I I
+cmod_i	3	I I I
 inc_i	1	I
 inc_i_ic	2	I i
 dec_i	1	I
@@ -49,6 +50,8 @@ add_n	3	N N N
 sub_n	3	N N N
 mul_n	3	N N N
 div_n	3	N N N
+mod_n	3	N N N
+cmod_n	3	N N N
 inc_n	1	N
 inc_n_nc	2	N n
 dec_n	1	N

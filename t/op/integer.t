@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 
 output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	# XXX: Need a test for writing outside the set of available
@@ -219,21 +219,62 @@ CODE
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "mod_i");
-	set	I0, 17
-	set	I1, 5
+	set	I0, 5
+	set	I1, 0
 	mod	I2, I0, I1
 	print	I2
 	print	"\\n"
 
-	set	I0, -57
-	set	I1, 10
+	set	I0, 0
+	set	I1, 3
 	mod	I2, I0, I1
 	print	I2
 	print	"\\n"
+
+	set	I0, 5
+	set	I1, 3
+	mod	I2, I0, I1
+	print	I2
+	print	"\\n"
+
+	set	I0, 5
+	set	I1, -3
+	mod	I2, I0, I1
+	print	I2
+	print	"\\n"
+
+	set	I0, -5
+	set	I1, 3
+	mod	I2, I0, I1
+	print	I2
+	print	"\\n"
+
+	set	I0, -5
+	set	I1, -3
+	mod	I2, I0, I1
+	print	I2
+	print	"\\n"
+
+        end
+CODE
+5
+0
+2
+-1
+1
+-2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "cmod_i");
+	set	I0, 5
+	set	I1, 3
+	mod	I2, I0, I1
+	print	I2
+	print	"\\n"
+
         end
 CODE
 2
--7
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "eq_i_ic");
