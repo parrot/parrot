@@ -136,7 +136,7 @@ fetch_op_le(opcode_t w)
 /*
  * Unrolled routines for swapping various sizes from 32-128 bits
  * These should only be used if alignment is unknown or we are
- * pulling something out of a padded buffer.    
+ * pulling something out of a padded buffer.
  */
 void
 fetch_buf_be_4(unsigned char *rb, unsigned char *b)
@@ -292,24 +292,10 @@ fetch_buf_be_16(unsigned char *rb, unsigned char *b)
 
 
 /*
- * Fetch/Put directly on bytestream, need to implement...
-
-INTVAL
-endianize_fetch_int(char * s, char * o) {
-    
-}
-
-void endianize_put_int(const char * s, char * o) {
-    
-}
-*/
-
-
-/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

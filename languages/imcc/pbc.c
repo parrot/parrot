@@ -485,7 +485,7 @@ add_const_key(opcode_t key[], int size, char *s_key) {
     int k;
     SymReg *r;
     struct PackFile_Constant *pfc;
-    int rc;
+    opcode_t *rc;
 
     if ( (r = _get_sym(globals.key_consts, s_key)) != 0)
         return r->color;

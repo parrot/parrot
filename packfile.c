@@ -127,31 +127,47 @@ PackFile_fetch_iv(struct PackFile *pf, opcode_t *stream) {
 =item fetch_nv
 
 Fetch a FLOATVAL from the stream, converting
-byteorder if needed.
+byteorder if needed. Then advance stream pointer by
+amount of packfile float size.
 
 =cut
 
 ***************************************/
 
 FLOATVAL
-PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream) {
+PackFile_fetch_nv(struct PackFile *pf, opcode_t **stream) {
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.
      */
     FLOATVAL f;
+    HUGEFLOATVAL g;
+    double d;
     if(pf->fetch_nv == NULL) {
 #if TRACE_PACKFILE
         PIO_eprintf(NULL, "PackFile_fetch_nv: Native [%d bytes]..\n",
                 sizeof(FLOATVAL));
 #endif
-        memcpy(&f, stream, sizeof(FLOATVAL));
+        memcpy(&f, *stream, sizeof(FLOATVAL));
+        (*stream) += (sizeof(FLOATVAL) + sizeof(opcode_t) - 1)/
+            sizeof(opcode_t);
         return f;
     }
+    f = (FLOATVAL) 0;
+    g = (HUGEFLOATVAL) 0;
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_fetch_nv: Byteordering..\n");
 #endif
     /* Here is where the size transforms get messy */
-    (pf->fetch_nv)((unsigned char *)&f, (unsigned char *)stream);
+    if (NUMVAL_SIZE == 8 && pf->header->floattype == 1) {
+        (pf->fetch_nv)((unsigned char *)&g, (unsigned char *) *stream);
+        ((unsigned char *) (*stream)) += 12;
+        f = g;
+    }
+    else {
+        (pf->fetch_nv)((unsigned char *)&d, (unsigned char *) *stream);
+        ((unsigned char *) (*stream)) += 8;
+        f = d;
+    }
     return f;
 }
 
@@ -164,23 +180,32 @@ void PackFile_assign_transforms(struct PackFile *pf) {
         pf->need_endianize = 1;
         pf->fetch_op = fetch_op_le;
         pf->fetch_iv = fetch_iv_le;
-        /* FIXME: Use the float_type from bytecode header to decide vtable */
-        pf->fetch_nv = fetch_buf_le_8;
+        if (pf->header->floattype == 0)
+            pf->fetch_nv = fetch_buf_le_8;
+        else if (pf->header->floattype == 1)
+            pf->fetch_nv = fetch_buf_le_12;
     }
 #else
     if(pf->header->byteorder != PARROT_BIGENDIAN) {
         pf->need_endianize = 1;
         pf->fetch_op = fetch_op_be;
         pf->fetch_iv = fetch_iv_be;
-        /* FIXME: Use the float_type from bytecode header to decide vtable */
-        pf->fetch_nv = fetch_buf_be_8;
+        if (pf->header->floattype == 0)
+            pf->fetch_nv = fetch_buf_be_8;
+        else if (pf->header->floattype == 1)
+            pf->fetch_nv = fetch_buf_be_12;
     }
-#  if TRACE_PACKFILE
     else {
+        if (NUMVAL_SIZE == 8 && pf->header->floattype == 1)
+            pf->fetch_nv = fetch_buf_le_12;
+        else if (NUMVAL_SIZE != 8 && pf->header->floattype == 0)
+            pf->fetch_nv = fetch_buf_le_8;
+        /* XXX else */
+#  if TRACE_PACKFILE
         PIO_eprintf(NULL, "header->byteorder [%d] native byteorder [%d]\n",
             pf->header->byteorder, PARROT_BIGENDIAN);
-    }
 #  endif
+    }
 #endif
 }
 
@@ -1623,11 +1648,8 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
 #endif
 
         self->constants[i] = PackFile_Constant_new();
-        if (!PackFile_Constant_unpack(interpreter, pf, self->constants[i],
-                    cursor))
-            return 0;
-        /* NOTE: It would be nice if each of these had its own length first */
-        cursor += PackFile_Constant_pack_size(self->constants[i]);
+        cursor = PackFile_Constant_unpack(interpreter, pf, self->constants[i],
+                    cursor);
     }
     return cursor;
 }
@@ -1769,14 +1791,13 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
+opcode_t *
 PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
                          struct PackFile *pf,
                          struct PackFile_Constant *self, opcode_t *cursor)
 {
     opcode_t type;
     opcode_t size;
-    INTVAL rc = 1;
 
     type = PackFile_fetch_op(pf, cursor++);
     size = PackFile_fetch_op(pf, cursor++);
@@ -1789,15 +1810,15 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
 
     switch (type) {
     case PFC_NUMBER:
-        rc = PackFile_Constant_unpack_number(interpreter, pf, self, cursor);
+        cursor = PackFile_Constant_unpack_number(interpreter, pf, self, cursor);
         break;
 
     case PFC_STRING:
-        rc = PackFile_Constant_unpack_string(interpreter, pf, self, cursor);
+        cursor = PackFile_Constant_unpack_string(interpreter, pf, self, cursor);
         break;
 
     case PFC_KEY:
-        rc = PackFile_Constant_unpack_key(interpreter, pf, self, cursor);
+        cursor = PackFile_Constant_unpack_key(interpreter, pf, self, cursor);
         break;
 
     default:
@@ -1806,7 +1827,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
                 (char)type);
         return 0;
     }
-    return rc;
+    return cursor;
 }
 
 /***************************************
@@ -1823,7 +1844,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
+opcode_t *
 PackFile_Constant_unpack_number(struct Parrot_Interp *interpreter,
         struct PackFile * pf,
         struct PackFile_Constant *self, opcode_t *cursor)
@@ -1847,10 +1868,10 @@ PackFile_Constant_unpack_number(struct Parrot_Interp *interpreter,
     PIO_eprintf(NULL,
             "FIXME: PackFile_Constant_unpack_number: assuming size of FLOATVAL!\n");
 #endif
-    self->u.number = PackFile_fetch_nv(pf, (opcode_t *)cursor);
+    self->u.number = PackFile_fetch_nv(pf, &cursor);
     self->type = PFC_NUMBER;
 
-    return 1;
+    return cursor;
 }
 
 
@@ -1875,7 +1896,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
+opcode_t *
 PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                 struct PackFile * pf,
                                 struct PackFile_Constant *self,
@@ -1909,7 +1930,8 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                flags | PObj_constant_FLAG,
                                chartype_lookup_index(type));
 
-    return 1;
+    size = ROUND_UP(size, sizeof(opcode_t)) / sizeof(opcode_t);
+    return cursor + size;
 }
 
 /***************************************
@@ -1928,7 +1950,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-INTVAL
+opcode_t *
 PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
                              struct PackFile * pf,
                              struct PackFile_Constant *self,
@@ -1984,7 +2006,7 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
     self->type = PFC_KEY;
     self->u.key = head;
 
-    return 1;
+    return cursor;
 }
 
 /*

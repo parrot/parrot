@@ -71,7 +71,10 @@ PackFile_pack(struct PackFile *self, opcode_t *cursor)
     /* XXX during development, we check PATCH_LEVEL too */
     self->header->minor = PARROT_MINOR_VERSION | PARROT_PATCH_VERSION;
     self->header->flags = 0;
-    self->header->floattype = 0;
+    if (NUMVAL_SIZE == 8)
+        self->header->floattype = 0;
+    else /* if XXX */
+        self->header->floattype = 1;
 
     /* write the fingerprint */
     PackFile_write_fingerprint(self->header->pad);

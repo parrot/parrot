@@ -48,6 +48,17 @@ disas_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *self)
     PIO_printf(interpreter, "]\n");
 }
 
+static void
+PackFile_header_dump(struct Parrot_Interp *interpreter, struct PackFile *pf)
+{
+    PIO_printf(interpreter, "HEADER => [\n");
+    PIO_printf(interpreter, "\twordsize  = %d\n", pf->header->wordsize);
+    PIO_printf(interpreter, "\tbyteorder = %d\n", pf->header->byteorder);
+    PIO_printf(interpreter, "\tfloattype = %d", pf->header->floattype);
+    PIO_printf(interpreter, "\t(interpreter's NUMVAL_SIZE = %d)\n",NUMVAL_SIZE);
+    PIO_printf(interpreter, "]\n");
+}
+
 int
 main(int argc, char **argv)
 {
@@ -131,6 +142,7 @@ main(int argc, char **argv)
     }
     interpreter->code = pf;
 
+    PackFile_header_dump(interpreter, pf);
     if (pf->header->dir_format == 0)
         PackFile_dump(interpreter, pf);
     else {

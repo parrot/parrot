@@ -307,23 +307,23 @@ void PackFile_Constant_pack(struct PackFile_Constant * self,
 
 void PackFile_Constant_destroy(struct PackFile_Constant * self);
 
-INTVAL PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
+opcode_t * PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
         struct PackFile * pf, struct PackFile_Constant *, opcode_t * packed);
 
-INTVAL PackFile_Constant_unpack_number(struct Parrot_Interp *interpreter,
+opcode_t * PackFile_Constant_unpack_number(struct Parrot_Interp *interpreter,
         struct PackFile * pf, struct PackFile_Constant *, opcode_t * packed);
 
-INTVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
+opcode_t * PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
         struct PackFile * pf, struct PackFile_Constant *, opcode_t * packed);
 
-INTVAL PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
+opcode_t * PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
         struct PackFile * pf, struct PackFile_Constant *, opcode_t * packed);
 
 opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t *stream);
 
 INTVAL PackFile_fetch_iv(struct PackFile *pf, opcode_t *stream);
 
-FLOATVAL PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream);
+FLOATVAL PackFile_fetch_nv(struct PackFile *pf, opcode_t **stream);
 
 void PackFile_assign_transforms(struct PackFile *pf);
 
