@@ -766,6 +766,23 @@ MMD_DEFAULT: {
         IM(dest) = IM(SELF) / value;
     }
 
+
+/*
+
+=item C<void neg(PMC *dest)>
+
+Set C<dest> to the negated value of C<SELF>.
+
+=cut
+
+*/
+
+    void neg (PMC* dest) {
+        VTABLE_morph(INTERP, dest, enum_class_Complex);
+        RE(dest) = - RE(SELF);
+        IM(dest) = - IM(SELF);
+    }
+
 /*
 
 =item C<INTVAL is_equal (PMC* value)>
