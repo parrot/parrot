@@ -1085,17 +1085,32 @@ Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
     PMC *offset_hash;
     PMC *class_pmc;
     INTVAL offset;
+    HashBucket *b;
 
     class_pmc = get_attrib_num((SLOTTYPE *)PMC_data(object),
                                POD_CLASS);
     offset_hash = get_attrib_num((SLOTTYPE *)PMC_data(class_pmc),
                                  PCD_ATTRIB_OFFS);
+#if 0
     if (VTABLE_exists_keyed_str(interpreter, offset_hash, class)) {
         offset = VTABLE_get_integer_keyed_str(interpreter, offset_hash, class);
     }
     else {
         offset = -1;
     }
+#else
+    /*
+     * cheat a bit--the offset_hash is an OrderedHash PMC
+     */
+    b = hash_get_bucket(interpreter,
+                (Hash*) PMC_struct_val(offset_hash), class);
+    if (!b)
+        offset = -1;
+    else {
+        offset = VTABLE_get_integer_keyed_int(interpreter, offset_hash,
+                PMC_int_val((PMC*)b->value));
+    }
+#endif
     return offset;
 }
 
