@@ -114,6 +114,7 @@ docs/faq.pod
 docs/glossary.pod
 docs/intro.pod
 docs/jit.pod
+docs/memory_internals.pod
 docs/overview.pod
 docs/parrot.pod
 docs/parrot_assembly.pod
