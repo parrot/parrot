@@ -81,17 +81,3 @@ sub goto_pop
   my ($self) = @_;
   return "opcode_t* pop_addr = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter));\ncur_opcode = pop_addr;goto *ops_addr[*(pop_addr)]";
 }
-sub expr_address
-{
-  my ($self, $addr) = @_;
-  return "opcode_to_prederef(interpreter, $addr)";
-}
-sub expr_offset {
-    my ($self, $offset) = @_;
-    return "CUR_OPCODE + $offset";
-}
-sub expr_pop
-{
-  my ($self) = @_;
-  return "opcode_to_prederef(interpreter, pop_dest(interpreter))";
-}

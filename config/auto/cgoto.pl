@@ -30,9 +30,9 @@ sub runstep {
 core_ops_cg$(O): $(GENERAL_H_FILES) core_ops_cg.c
 core_ops_cgp$(O): $(GENERAL_H_FILES) core_ops_cgp.c
 
-core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
+core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGoto.pm
 	$(PERL) ops2c.pl CGoto $(OPS_FILES)
-core_ops_cgp.c $(INC)/oplib/core_ops_cgp.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
+core_ops_cgp.c $(INC)/oplib/core_ops_cgp.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGP.pm
 	$(PERL) ops2c.pl CGP $(OPS_FILES)
 EOF
       cg_o          => 'core_ops_cg$(O) core_ops_cgp$(O)',
