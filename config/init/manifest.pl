@@ -5,7 +5,7 @@ use vars qw($description @args);
 use Parrot::Configure::Step;
 use ExtUtils::Manifest qw(manicheck);
 
-$description="Generating and checking MANIFEST...";
+$description="Checking MANIFEST...";
 
 @args=qw(nomanicheck);
 
