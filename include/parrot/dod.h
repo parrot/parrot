@@ -76,6 +76,9 @@ void Parrot_dod_sweep(Interp *, struct Small_Object_Pool *pool);
 void Parrot_dod_ms_run_init(Interp *interpreter);
 void Parrot_dod_clear_live_bits(Interp*);
 
+void Parrot_dod_profile_start(Parrot_Interp interpreter);
+void Parrot_dod_profile_end(Parrot_Interp interpreter, int what);
+
 /* GC subsystem init functions */
 void Parrot_gc_ms_init(Interp* interpreter);
 void Parrot_gc_ims_init(Interp* interpreter);

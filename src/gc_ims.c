@@ -387,7 +387,7 @@ typedef enum {          /* these states have to be in execution order */
     GC_IMS_COLLECT,     /* collect buffer memory */
     GC_IMS_FINISHED,    /* update statistics */
     GC_IMS_CONSUMING,   /* when we have plenty of free objects */
-    GC_IMS_DEAD         /* gc is alreadz shutdown */         
+    GC_IMS_DEAD         /* gc is alreadz shutdown */
 
 } gc_ims_state_enum;
 
@@ -665,6 +665,8 @@ parrot_gc_ims_sweep(Interp* interpreter)
      * TODO profile timings for sweep
      */
     Parrot_dod_sweep(interpreter, header_pool);
+    if (interpreter->profile)
+        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cp);
     n_objects = header_pool->total_objects - header_pool->num_free_objects;
 
     /* and non-empty sized buffer pools */
@@ -682,6 +684,8 @@ parrot_gc_ims_sweep(Interp* interpreter)
                 header_pool->num_free_objects;
         }
     }
+    if (interpreter->profile)
+        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cb);
     g_ims->state = GC_IMS_COLLECT;
     g_ims->n_objects = n_objects;
     g_ims->n_extended_PMCs = arena_base->num_extended_PMCs;
@@ -716,6 +720,8 @@ parrot_gc_ims_collect(Interp* interpreter, int check_only)
     Gc_ims_private *g_ims;
     int j;
 
+    if (!check_only && interpreter->profile)
+        Parrot_dod_profile_start(interpreter);
     g_ims = arena_base->gc_private;
     for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
         header_pool = arena_base->sized_header_pools[j];
@@ -751,6 +757,8 @@ parrot_gc_ims_collect(Interp* interpreter, int check_only)
     }
     if (check_only)
         return 0;
+    if (interpreter->profile)
+        Parrot_dod_profile_end(interpreter, PARROT_PROF_GC);
     g_ims->state = GC_IMS_FINISHED;
     return 0;
 }

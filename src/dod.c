@@ -40,10 +40,7 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
 static size_t find_common_mask(size_t val1, size_t val2);
-static void profile_dod_end(Parrot_Interp, int what);
 static void trace_active_buffers(Interp *interpreter);
-static void profile_dod_start(Parrot_Interp interpreter);
-static void profile_dod_end(Parrot_Interp interpreter, int what);
 
 /*
 
@@ -273,7 +270,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
         return 0;
     }
     if (interpreter->profile)
-        profile_dod_start(interpreter);
+        Parrot_dod_profile_start(interpreter);
     /* We have to start somewhere, the interpreter globals is a good place */
     if (!arena_base->dod_mark_start) {
         arena_base->dod_mark_start = arena_base->dod_mark_ptr =
@@ -358,7 +355,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     /* And the buffers */
     trace_active_buffers(interpreter);
     if (interpreter->profile)
-        profile_dod_end(interpreter, PARROT_PROF_DOD_p1);
+        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_p1);
     return 1;
 }
 
@@ -404,7 +401,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
      * all these, we could skip that
      */
     if (interpreter->profile)
-        profile_dod_start(interpreter);
+        Parrot_dod_profile_start(interpreter);
     pt_DOD_mark_root_finished(interpreter);
 
     for (; ; current = next) {
@@ -466,7 +463,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
     arena_base->dod_mark_start = current;
     arena_base->dod_trace_ptr = NULL;
     if (interpreter->profile)
-        profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
+        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_p2);
     return 1;
 }
 
@@ -1050,8 +1047,8 @@ Parrot_dod_clear_live_bits(Parrot_Interp interpreter)
 
 /*
 
-=item C<static void
-profile_dod_start(Parrot_Interp interpreter)>
+=item C<void
+Parrot_dod_profile_start(Parrot_Interp interpreter)>
 
 Records the start time of a DOD run when profiling is enabled.
 
@@ -1059,8 +1056,8 @@ Records the start time of a DOD run when profiling is enabled.
 
 */
 
-static void
-profile_dod_start(Parrot_Interp interpreter)
+void
+Parrot_dod_profile_start(Parrot_Interp interpreter)
 {
     if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
         interpreter->profile->dod_time = Parrot_floatval_time();
@@ -1069,17 +1066,18 @@ profile_dod_start(Parrot_Interp interpreter)
 
 /*
 
-=item C<static void
-profile_dod_end(Parrot_Interp interpreter)>
+=item C<void
+Parrot_dod_profile_end(Parrot_Interp interpreter, int what)>
 
-Records the end time of a DOD run when porfiling is enabled.
+Records the end time of the DOD part C<what> run when profiling is enabled.
+Also record start time of next part.
 
 =cut
 
 */
 
-static void
-profile_dod_end(Parrot_Interp interpreter, int what)
+void
+Parrot_dod_profile_end(Parrot_Interp interpreter, int what)
 {
     if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
         RunProfile *profile = interpreter->profile;
@@ -1087,7 +1085,14 @@ profile_dod_end(Parrot_Interp interpreter, int what)
 
         profile->data[what].numcalls++;
         profile->data[what].time += now - profile->dod_time;
+        /*
+         * we've recorded the time of a DOD/GC piece from
+         * dod_time til now, so add this to the start of the
+         * currently executing opcode, which hasn't run this
+         * internval.
+         */
         profile->starttime += now - profile->dod_time;
+        /* prepare start for next step */
         profile->dod_time = now;
     }
 }
@@ -1175,7 +1180,7 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
         Parrot_dod_sweep(interpreter, header_pool);
         total_free += header_pool->num_free_objects;
         if (interpreter->profile)
-            profile_dod_end(interpreter, PARROT_PROF_DOD_cp);
+            Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cp);
 
         /* And unused buffers on the free list */
         for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
@@ -1192,7 +1197,7 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
             }
         }
         if (interpreter->profile)
-            profile_dod_end(interpreter, PARROT_PROF_DOD_cb);
+            Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cb);
     }
     else {
         /*
@@ -1206,7 +1211,7 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
         Parrot_dod_clear_live_bits(interpreter);
 #endif
         if (interpreter->profile)
-            profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
+            Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_p2);
     }
     pt_DOD_stop_mark(interpreter);
     /* Note it */

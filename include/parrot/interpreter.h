@@ -122,7 +122,6 @@ typedef struct ProfData {
 typedef struct _RunProfile {
     FLOATVAL starttime;
     FLOATVAL dod_time;
-    FLOATVAL gc_time;
     opcode_t cur_op;
     ProfData *data;
 } RunProfile;

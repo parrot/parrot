@@ -175,50 +175,6 @@ mem_allocate(Interp *interpreter, size_t *req_size,
     return (void *)return_val;
 }
 
-/*
-
-=item C<static PARROT_INLINE void
-profile_gc_start(Parrot_Interp interpreter)>
-
-Called within C<compact_pool()> to record the start time of a GC run if
-profiling is enabled.
-
-=cut
-
-*/
-
-static PARROT_INLINE void
-profile_gc_start(Parrot_Interp interpreter)
-{
-    if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        interpreter->profile->gc_time = Parrot_floatval_time();
-    }
-}
-
-/*
-
-=item C<static PARROT_INLINE void
-profile_gc_end(Parrot_Interp interpreter)>
-
-Called within C<compact_pool()> to record the end time of a GC run if
-profiling is enabled.
-
-=cut
-
-*/
-
-static PARROT_INLINE void
-profile_gc_end(Parrot_Interp interpreter)
-{
-    if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        RunProfile *profile = interpreter->profile;
-        FLOATVAL now = Parrot_floatval_time();
-
-        profile->data[PARROT_PROF_GC].numcalls++;
-        profile->data[PARROT_PROF_GC].time += now - profile->gc_time;
-        profile->starttime += now - profile->gc_time;
-    }
-}
 
 /*
 
@@ -256,7 +212,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
     }
     ++arena_base->GC_block_level;
     if (interpreter->profile)
-        profile_gc_start(interpreter);
+        Parrot_dod_profile_start(interpreter);
 
     /* We're collecting */
     arena_base->mem_allocs_since_last_collect = 0;
@@ -405,7 +361,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
     pool->guaranteed_reclaimable = 0;
     pool->possibly_reclaimable = 0;
     if (interpreter->profile)
-        profile_gc_end(interpreter);
+        Parrot_dod_profile_end(interpreter, PARROT_PROF_GC);
     --arena_base->GC_block_level;
 }
 
