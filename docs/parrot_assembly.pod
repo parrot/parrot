@@ -140,11 +140,15 @@ language.
 
 Parrot opcodes take the format of:
 
-  code destination, dest_key, source1, source1_key, source2, source2_key
+  code destination[dest_key], source1[source1_key], source2[source2_key]
+
+The brackets do not denote optional arguments as such--they are real
+brackets. They may be left out entirely, however. If any argument has
+a key the assembler will substitute the null key for arguments missing keys.
 
 Conditional branches take the format:
 
-  code boolean, bool_key, true_dest
+  code boolean[bool_key], true_dest
 
 The key parameters are optional, and may be either an integer or a
 string. If either is passed they are associated with the parameter to
@@ -836,6 +840,13 @@ Toss the topmost entry from key X.
 =item inc_key Sx, iy
 
 Increment entry Y of key X by one.
+
+=item set_key Sw, [isp]x, iy[, iz]
+
+Set key W, offset Y, to value X. If X is a PMC, then the fourth
+operand must be specified. It can have a value of 0, 1, or 2,
+corresponding to integer, string, or object. Aggregates use this to
+figure out how to treat the key entry.
 
 =back
 
