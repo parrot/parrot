@@ -1,4 +1,4 @@
-# First, read the file.  
+# First, read the file.
         set S0, P0[1]      # Name of the Ook source.
 	open P0, S0, "<"   # P0 = file descriptor
 	set S1, ""         # S1 = accumulator
@@ -94,14 +94,19 @@ LOOP_NOT_READ:
         print " "
         print S3
         print "\n"
-        end        
+        end
 LOOP_LINEFEED:
         inc I2
         # Fallthru.
 LOOP_END:
         le I1, I0, LOOP
         concat S4, "\tend\n"
-        print S4
+        #print S4
+	# needs imcc:
+	# ../imcc/imcc -r ook.pasm hello.ook
+	compreg P1, "PASM"
+	compile P0, P1, S4
+	invoke
         end
 
 # Given the content of P1, create a label of integers concateneted in S6.
@@ -119,5 +124,5 @@ LABEL_LOOP:
 LABEL_END:
         lt I11, I10, LABEL_LOOP
         ret
-                
+
 
