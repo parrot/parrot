@@ -1391,6 +1391,11 @@ inline op sub(out NUM, in NUM, in NUM) {
   goto NEXT();
 }
 
+inline op sub(out PMC, in PMC, in INT) {
+  $2->vtable->subtract_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
 
 =back
 
