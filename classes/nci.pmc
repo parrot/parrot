@@ -21,16 +21,9 @@ pmclass NCI {
     }
 
     void set_string_keyed (PMC* func, STRING* value) {
-    	PObj_custom_mark_SET(SELF);
 	/* key = func_ptr, value = signature */
 	SELF->cache.struct_val = (DPOINTER *)func;
 	SELF->data = build_call_func(INTERP, SELF, value);
-    }
-
-    void mark () {
-	PMC *f = SELF->cache.struct_val;
-	if (f)
-	    pobject_lives(INTERP, (PObj *)f);
     }
 
     STRING* name () {
@@ -43,7 +36,6 @@ pmclass NCI {
     }
 
     void clone (PMC *ret) {
-    	PObj_custom_mark_SET(ret);
         ret->cache.struct_val = SELF->cache.struct_val;
 	/* FIXME if data is malloced (JIT/i386!) then we need
 	 * the length of data here, to memcpy it
