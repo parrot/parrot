@@ -11,7 +11,7 @@ src/inter_cb.c - Parrot Interpreter - Callback Function Handling
 NCI callback functions may run, whenever the C code executes the callback.
 To be prepared for async callbacks these are converted to callback events.
 
-Often callbacks should run synchronously. This can only happen when 
+Often callbacks should run synchronously. This can only happen when
 the C-library calls the callback, because Parrot called a function in
 the C-library.
 
@@ -187,7 +187,7 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *user_data)
 {
 
     PMC *passed_interp;       /* the interp that originated the CB */
-    PMC *passed_synchronous;  /* flagging synchronous execution */ 
+    PMC *passed_synchronous;  /* flagging synchronous execution */
     int synchronous = 0;      /* cb is hitting this sub somewhen inmidst, or not */
     STRING *sc;
     /*
@@ -319,7 +319,7 @@ case_I:
             internal_exception(1, "unhandled signature char '%c' in run_cb", *p);
     }
     pasm_sig[3] = '\0';
-    Parrot_runops_fromc_args_save(interpreter, sub, pasm_sig,
+    Parrot_runops_fromc_args(interpreter, sub, pasm_sig,
             user_data, param);
 }
 /*

@@ -605,10 +605,10 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
     int default_meth;
     if (meth) {
         if (init)
-            Parrot_run_meth_fromc_args_save(interpreter, meth,
+            Parrot_run_meth_fromc_args(interpreter, meth,
                     object, meth_str, "vP", init);
         else
-            Parrot_run_meth_fromc_save(interpreter, meth,
+            Parrot_run_meth_fromc(interpreter, meth,
                     object, meth_str);
     }
     /*
@@ -644,10 +644,10 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
             default_meth = 0;
         if (meth) {
             if (init)
-                Parrot_run_meth_fromc_args_save(interpreter, meth,
+                Parrot_run_meth_fromc_args(interpreter, meth,
                         object, meth_str, "vP", init);
             else
-                Parrot_run_meth_fromc_save(interpreter, meth,
+                Parrot_run_meth_fromc(interpreter, meth,
                         object, meth_str);
         }
         else if (meth_str != NULL &&
@@ -669,10 +669,10 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
         default_meth = 0;
     if (meth) {
         if (init)
-            Parrot_run_meth_fromc_args_save(interpreter, meth,
+            Parrot_run_meth_fromc_args(interpreter, meth,
                     object, meth_str, "vP", init);
         else
-            Parrot_run_meth_fromc_save(interpreter, meth,
+            Parrot_run_meth_fromc(interpreter, meth,
                     object, meth_str);
     }
     else if (meth_str != NULL && string_length(interpreter, meth_str) != 0

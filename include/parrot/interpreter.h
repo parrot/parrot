@@ -373,43 +373,33 @@ extern PMC * PMCNULL;                     /* Holds single Null PMC         */
 
 /* &end_gen */
 
-Interp *make_interpreter(Parrot_Interp parent, Interp_flags);
-void Parrot_init(Parrot_Interp);
-void Parrot_destroy(Parrot_Interp);
+Interp *make_interpreter(Interp * parent, Interp_flags);
+void Parrot_init(Interp *);
+void Parrot_destroy(Interp *);
 
 INTVAL interpinfo(Interp *interpreter, INTVAL what);
 PMC*   interpinfo_p(Interp *interpreter, INTVAL what);
 
 void runops(Interp *, size_t offset);
 void runops_int(Interp *, size_t offset);
-void Parrot_runops_fromc(Parrot_Interp, PMC *sub);
-void Parrot_runops_fromc_save(Parrot_Interp, PMC *sub);
-void* Parrot_runops_fromc_args(Parrot_Interp, PMC *sub, const char *sig, ...);
-void* Parrot_runops_fromc_args_save(Parrot_Interp, PMC *, const char *, ...);
-INTVAL Parrot_runops_fromc_args_save_reti(Parrot_Interp, PMC *,
-        const char *, ...);
-FLOATVAL Parrot_runops_fromc_args_save_retf(Parrot_Interp, PMC *,
-        const char *, ...);
+void Parrot_runops_fromc(Interp *, PMC *sub);
+void* Parrot_runops_fromc_args(Interp *, PMC *sub, const char *sig, ...);
+INTVAL Parrot_runops_fromc_args_reti(Interp *, PMC *, const char *, ...);
+FLOATVAL Parrot_runops_fromc_args_retf(Interp *, PMC *, const char *, ...);
 
-void* Parrot_runops_fromc_arglist_save(Parrot_Interp, PMC *,
-        const char *sig, va_list);
+void* Parrot_runops_fromc_arglist(Interp *, PMC *, const char *sig, va_list);
 
-void* Parrot_run_meth_fromc(Parrot_Interp, PMC *sub, PMC* obj, STRING *meth);
-void Parrot_run_meth_fromc_save(Parrot_Interp, PMC *sub,
-        PMC* obj, STRING *meth);
-void* Parrot_run_meth_fromc_args_save(Parrot_Interp, PMC *sub,
+void* Parrot_run_meth_fromc(Interp *, PMC *sub, PMC* obj, STRING *meth);
+void* Parrot_run_meth_fromc_args(Interp *, PMC *sub,
         PMC* obj, STRING *meth, const char *signature, ...);
-INTVAL Parrot_run_meth_fromc_args_save_reti(Parrot_Interp, PMC *sub,
+INTVAL Parrot_run_meth_fromc_args_reti(Interp *, PMC *sub,
         PMC* obj, STRING *meth, const char *signature, ...);
-FLOATVAL Parrot_run_meth_fromc_args_save_retf(Parrot_Interp, PMC *sub,
+FLOATVAL Parrot_run_meth_fromc_args_retf(Interp *, PMC *sub,
         PMC* obj, STRING *meth, const char *signature, ...);
-
-void *Parrot_save_register_frames(Parrot_Interp, PMC *sub);
-void Parrot_restore_register_frames(Parrot_Interp, void *data);
 
 void Parrot_callback_C(void *external_data, PMC *callback_info);
 void Parrot_callback_D(PMC *callback_info, void *external_data);
-PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
+PMC* Parrot_make_cb(Interp * interpreter, PMC* sub, PMC* user_data,
         STRING* cb_signature);
 
 typedef opcode_t *(*native_func_t)(Interp * interpreter,
@@ -418,20 +408,20 @@ typedef opcode_t *(*native_func_t)(Interp * interpreter,
 
 VAR_SCOPE native_func_t run_native;
 
-void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func);
-INTVAL sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted);
-STRING *sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted);
+void Parrot_compreg(Interp * interpreter, STRING *type, PMC *func);
+INTVAL sysinfo_i(Interp * interpreter, INTVAL info_wanted);
+STRING *sysinfo_s(Interp * interpreter, INTVAL info_wanted);
 void exec_init_prederef(Interp *interpreter,
     void *prederef_arena);
 
-void prepare_for_run(Parrot_Interp interpreter);
-void *init_jit(Parrot_Interp interpreter, opcode_t *pc);
-void dynop_register(Parrot_Interp interpreter, PMC* op_lib);
-void do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type);
+void prepare_for_run(Interp * interpreter);
+void *init_jit(Interp * interpreter, opcode_t *pc);
+void dynop_register(Interp * interpreter, PMC* op_lib);
+void do_prederef(void **pc_prederef, Interp * interpreter, int type);
 
 void clone_interpreter(PMC* dest, PMC* self);
 
-void enter_nci_method(Parrot_Interp, int type,
+void enter_nci_method(Interp *, int type,
 		 void *func, const char *name, const char *proto);
 
 #else

@@ -1444,7 +1444,7 @@ ${decl} {
     $ret_def
     STRING *meth = CONST_STRING(interpreter, "__$meth");
     PMC *sub = find_or_die(interpreter, pmc, meth);
-    ${func_ret}Parrot_run_meth_fromc_args_save$ret_type(interpreter, sub,
+    ${func_ret}Parrot_run_meth_fromc_args$ret_type(interpreter, sub,
         pmc, meth, "$sig"$arg);
     $ret
 }

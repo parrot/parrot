@@ -222,7 +222,7 @@ mmd_dispatch_v_ppp(Interp *interpreter,
 
     if (is_pmc) {
         sub = (PMC*)real_function;
-        Parrot_runops_fromc_args_save(interpreter, sub, "vPPP",
+        Parrot_runops_fromc_args(interpreter, sub, "vPPP",
                 left, right, dest);
     }
     else {
@@ -244,7 +244,7 @@ mmd_dispatch_v_pip(Interp *interpreter,
             left_type, 0, function, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
-        Parrot_runops_fromc_args_save(interpreter, sub, "vPIP",
+        Parrot_runops_fromc_args(interpreter, sub, "vPIP",
                 left, right, dest);
     }
     else {
@@ -266,7 +266,7 @@ mmd_dispatch_v_pnp(Interp *interpreter,
             left_type, 0, function, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
-        Parrot_runops_fromc_args_save(interpreter, sub, "vPNP",
+        Parrot_runops_fromc_args(interpreter, sub, "vPNP",
                 left, right, dest);
     }
     else {
@@ -288,7 +288,7 @@ mmd_dispatch_v_psp(Interp *interpreter,
             left_type, 0, function, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
-        Parrot_runops_fromc_args_save(interpreter, sub, "vPSP",
+        Parrot_runops_fromc_args(interpreter, sub, "vPSP",
                 left, right, dest);
     }
     else {
@@ -322,7 +322,7 @@ mmd_dispatch_i_pp(Interp *interpreter,
 
     if (is_pmc) {
         sub = (PMC*)real_function;
-        ret = Parrot_runops_fromc_args_save_reti(interpreter, sub, "IPP",
+        ret = Parrot_runops_fromc_args_reti(interpreter, sub, "IPP",
                 left, right);
     }
     else {

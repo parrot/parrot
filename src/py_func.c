@@ -250,8 +250,7 @@ parrot_py_filter(Interp *interpreter, PMC *func, PMC *list)
             /* run filter func -
              * TODO save registers once around loop
              */
-            PMC *t = Parrot_runops_fromc_args_save(interpreter, func,
-                    "PP", item);
+            PMC *t = Parrot_runops_fromc_args(interpreter, func, "PP", item);
             if (!VTABLE_get_bool(interpreter, t))
                 continue;
         }
@@ -303,8 +302,7 @@ parrot_py_map(Interp *interpreter, PMC *func, PMC *list)
                 /* an object constructor */
             }
             else {
-            item = Parrot_runops_fromc_args_save(interpreter, func,
-                    "PP", item);
+            item = Parrot_runops_fromc_args(interpreter, func, "PP", item);
             }
         }
         VTABLE_set_pmc_keyed_int(interpreter, res, i++, item);
@@ -356,8 +354,7 @@ parrot_py_reduce(Interp *interpreter, PMC *func, PMC *list /*, PMC *init */)
             /* run filter func -
              * TODO save registers once around loop
              */
-        res = Parrot_runops_fromc_args_save(interpreter, func,
-                    "PPP", res, item);
+        res = Parrot_runops_fromc_args(interpreter, func, "PPP", res, item);
     }
     return res;
 }

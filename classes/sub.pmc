@@ -238,27 +238,29 @@ Invokes the subroutine.
          * P1 ... continuation
          * P2 ... object, if it's a method call
          *
-         * update the context
+         * create new register frame, remember old
          */
-        interpreter->ctx.current_sub = SELF;
-        interpreter->ctx.current_cont = REG_PMC(1);
-        interpreter->ctx.current_object = REG_PMC(2);
-#if INDIRECT_REGS
         caller_regs = interpreter->ctx.bp;
         interpreter->ctx.bp = stack_prepare_push(interpreter,
                 &interpreter->ctx.reg_stack);
-        /* called from runops_fromc - regs are setup there */
+        /*
+         * when next == NULL the call creates ags in the
+         * new frame, e.g.
+         * called from runops_fromc
+         */
         if (next) {
+            /* copy function arguments */
             copy_regs(interpreter, caller_regs);
             /*
-             * for now copy P0..P2, S0
+             * and copy P0..P2, S0
              */
-            REG_PMC(2) = caller_regs->pmc_reg.registers[2];
+            interpreter->ctx.current_sub = REG_PMC(0) = SELF;
+            interpreter->ctx.current_cont = REG_PMC(1) =
+                caller_regs->pmc_reg.registers[1];
+            interpreter->ctx.current_object = REG_PMC(2) =
+                caller_regs->pmc_reg.registers[2];
             REG_STR(0) = caller_regs->string_reg.registers[0];
         }
-        REG_PMC(0) = SELF;
-        REG_PMC(1) = caller_regs->pmc_reg.registers[1];
-#endif
         return sub->address;
     }
 

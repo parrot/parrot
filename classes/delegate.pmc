@@ -137,7 +137,7 @@ noarg_noreturn(Parrot_Interp interpreter, PMC *obj, PMC* class,
         }
         return;
     }
-    Parrot_run_meth_fromc_save(interpreter, method, obj, meth);
+    Parrot_run_meth_fromc(interpreter, method, obj, meth);
 }
 
 pmclass delegate {

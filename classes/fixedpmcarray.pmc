@@ -35,31 +35,13 @@ sort_compare(void *a, void *b)
     return mmd_dispatch_i_pp(the_interp, pa, pb, MMD_CMP);
 }
 
-static void
-runops_fast_cmp(Interp *interpreter, PMC *sub, PMC *left, PMC *right)
-{
-    opcode_t offset, *dest;
-
-    dest = VTABLE_invoke(interpreter, sub, NULL);
-    REG_PMC(5) = left;
-    REG_PMC(6) = right;
-    offset = dest - interpreter->code->byte_code;
-    runops_int(interpreter, offset);
-}
-
-/* #define RUN_FAST_CMP */
 static int
 sort_ext_compare(void *a, void *b)
 {
     PMC *pa = *(PMC**)a;
     PMC *pb = *(PMC**)b;
-#ifdef RUN_FAST_CMP
-    runops_fast_cmp(the_interp, sort_cmp_pmc, pa, pb);
-    return INTERP_REG_INT(the_interp, 5);
-#else
-    return Parrot_runops_fromc_args_save_reti(the_interp,
+    return Parrot_runops_fromc_args_reti(the_interp,
         sort_cmp_pmc, "IPP", pa, pb);
-#endif
 }
 
 pmclass FixedPMCArray need_ext does array {
@@ -130,10 +112,6 @@ use_sub:
          */
         func = sort_ext_compare;
         sort_cmp_pmc = cmp_func;
-#ifdef RUN_FAST_CMP
-        REG_PMC(1) = new_ret_continuation_pmc(interpreter, NULL);
-        /* TODO create one exception frame */
-#endif
         /*
          * TODO fix errors with JIT or prederefed core
          */

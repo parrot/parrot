@@ -255,7 +255,7 @@ run_sub(Parrot_Interp interpreter, PMC* sub_pmc)
         interpreter->run_core != PARROT_SLOW_CORE  &&
         interpreter->run_core != PARROT_FAST_CORE)
         interpreter->run_core = PARROT_FAST_CORE;
-    Parrot_runops_fromc_save(interpreter, sub_pmc);
+    Parrot_runops_fromc(interpreter, sub_pmc);
     interpreter->run_core = old;
 }
 

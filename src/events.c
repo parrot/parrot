@@ -1110,8 +1110,7 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             break;
         case EVENT_TYPE_TIMER:
             /* run ops, save registers */
-            Parrot_runops_fromc_save(interpreter,
-                    event->u.timer_event.sub);
+            Parrot_runops_fromc(interpreter, event->u.timer_event.sub);
             break;
         case EVENT_TYPE_CALL_BACK:
             edebug((stderr, "starting user cb\n"));
