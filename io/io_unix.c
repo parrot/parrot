@@ -621,8 +621,8 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 
     /* XXX: Fixme, inet_addr obsolete, replace with inet_aton */
     char * s = string_to_cstring(interpreter, addr);
-    /*if(inet_aton(s, &sa.sin_addr) != 0) {*/
-    if(inet_pton(family, s, &sa.sin_addr) != 0) {
+    if(inet_aton(s, &sa.sin_addr) != 0) {
+    /*if(inet_pton(family, s, &sa.sin_addr) != 0) {*/
         /* Success converting numeric IP */
     }
     else {
@@ -695,7 +695,7 @@ PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
 {
     if(r) {
         struct sockaddr_in sa;
-        memcpy(&sa, r->bufstart, sizeof(struct sockaddr));
+        memcpy(&sa, PObj_bufstart(r), sizeof(struct sockaddr));
         io->remote.sin_addr.s_addr = sa.sin_addr.s_addr;
         io->remote.sin_port = sa.sin_port;
     }
@@ -740,7 +740,7 @@ PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
     struct sockaddr_in sa;
     if(!l) return -1;
 
-    memcpy(&sa, l->bufstart, sizeof(struct sockaddr));
+    memcpy(&sa, PObj_bufstart(l), sizeof(struct sockaddr));
     io->local.sin_addr.s_addr = sa.sin_addr.s_addr;
     io->local.sin_port = sa.sin_port;
 
@@ -839,8 +839,8 @@ AGAIN:
     /*
      * Ignore encoding issues for now.
      */
-    if((error = send(io->fd, (char *)s->bufstart + byteswrote,
-                            s->buflen, 0)) >= 0) {
+    if((error = send(io->fd, (char *)PObj_bufstart(s) + byteswrote,
+                            PObj_buflen(s), 0)) >= 0) {
         byteswrote += error;
         if(byteswrote >= bytes) {
             return byteswrote;

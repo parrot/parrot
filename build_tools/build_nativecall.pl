@@ -125,8 +125,8 @@ my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nREG_PMC(5)
                     P => "REG_PMC(5) = return_data;",
 		    v => "",
 		    t => "final_destination = string_from_cstring(interpreter, return_data, 0);\nREG_STR(5) = final_destination;",
-#		    b => "final_destination->bufstart = return_data;\nREG_STR(5) = final_destination",
-#		    B => "final_destination->bufstart = *return_data;\nREG_STR(5) = final_destination",
+#		    b => "PObj_bufstart(final_destination) = return_data;\nREG_STR(5) = final_destination",
+#		    B => "PObj_bufstart(final_destination) = *return_data;\nREG_STR(5) = final_destination",
 		    s => "REG_INT(5) = return_data;",
                    );
 
@@ -309,10 +309,10 @@ sub make_arg {
 	       return "string_to_cstring(interpreter, REG_STR($regnum))";
               };
     /b/ && do {my $regnum = $reg_ref->{s}++;
-	       return "REG_STR($regnum)->bufstart";
+	       return "PObj_bufstart(REG_STR($regnum))";
               };
     /B/ && do {my $regnum = $reg_ref->{s}++;
-	       return "&(REG_STR($regnum)->bufstart)";
+	       return "(&PObj_bufstart(REG_STR($regnum)))";
               };
     /I/ && do {
 	       return "interpreter";
@@ -371,7 +371,7 @@ pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self)
     $other_decl
     $extra_preamble
 
-    pointer =  (func_t)D2FPTR(self->cache.struct_val);
+    pointer =  (func_t)D2FPTR(PMC_struct_val(self));
     $return_assign ($ret_type)(*pointer)($call_params);
     $final_assign
     $extra_postamble
@@ -387,7 +387,7 @@ pcf_${return}(struct Parrot_Interp *interpreter, PMC *self)
     $other_decl
     $extra_preamble
 
-    pointer =  ($ret_type (*)(void))D2FPTR(self->cache.struct_val);
+    pointer =  ($ret_type (*)(void))D2FPTR(PMC_struct_val(self));
     $return_assign ($ret_type)(*pointer)();
     $final_assign
     $extra_postamble
@@ -420,7 +420,7 @@ static void pcf_$funcname(struct Parrot_Interp *interpreter, PMC *self) {
     $ret_type (*pointer)();
     $ret_type return_data;
 
-    pointer = self->cache.struct_val;
+    pointer = PMC_struct_val(self);
     return_data = ($ret_type)(*pointer)($params);
     $ret_reg  = return_data;
     REG_INT(0) = $stack_returns;

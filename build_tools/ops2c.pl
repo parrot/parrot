@@ -682,7 +682,7 @@ PMC*
 $load_func(Parrot_Interp interpreter)
 {
     PMC *lib = pmc_new(interpreter, enum_class_ParrotLibrary);
-    lib->cache.struct_val = (void *) $init_func;
+    PMC_struct_val(lib) = (void *) $init_func;
     dynop_register(interpreter, lib);
     return lib;
 }

@@ -70,9 +70,9 @@ new_io_pmc(theINTERP, ParrotIO *io)
     PMC_data(new_pmc) = io;
     /* io could be NULL */
     if(io)
-       new_pmc->cache.struct_val = io->stack;
+       PMC_struct_val(new_pmc) = io->stack;
     else
-       new_pmc->cache.struct_val = NULL;
+       PMC_struct_val(new_pmc) = NULL;
     return new_pmc;
 }
 
@@ -178,7 +178,7 @@ PIO_destroy(theINTERP, PMC *pmc)
     }
     mem_sys_free(io);
     PMC_data(pmc) = NULL;
-    pmc->cache.struct_val = NULL;
+    PMC_struct_val(pmc) = NULL;
 }
 
 /*
@@ -719,7 +719,7 @@ buffering was enabled.
 INTVAL
 PIO_setbuf(theINTERP, PMC *pmc, size_t bufsize)
 {
-    ParrotIOLayer *layer = pmc->cache.struct_val;
+    ParrotIOLayer *layer = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;
@@ -742,7 +742,7 @@ successfully set, or already enabled.
 INTVAL
 PIO_setlinebuf(theINTERP, PMC *pmc)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;
@@ -838,7 +838,7 @@ INTVAL
 PIO_close(theINTERP, PMC *pmc)
 {
     INTVAL res;
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;
@@ -863,7 +863,7 @@ Flushes the C<ParrotIO> PMC C<*pmc>.
 void
 PIO_flush(theINTERP, PMC *pmc)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return;
@@ -885,7 +885,7 @@ Reads up to C<len> bytes from C<*pmc> and copys them into C<*buffer>.
 INTVAL
 PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;
@@ -907,7 +907,7 @@ Writes C<len> bytes from C<*buffer> to C<*pmc>.
 INTVAL
 PIO_write(theINTERP, PMC *pmc, const void *buffer, size_t len)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;
@@ -934,7 +934,7 @@ the file, C<1> for the current position, and C<2> for the end.
 PIOOFF_T
 PIO_seek(theINTERP, PMC *pmc, PIOOFF_T offset, INTVAL w)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;
@@ -956,7 +956,7 @@ Returns the current read/write position of C<*pmc>.
 PIOOFF_T
 PIO_tell(theINTERP, PMC *pmc)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;
@@ -1340,7 +1340,7 @@ microseconds.
 INTVAL
 PIO_poll(theINTERP, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     return PIO_poll_down(interpreter, l, io, which, sec, usec);
 }
@@ -1386,7 +1386,7 @@ Receives a message from the connected socket C<*pmc> in C<*buf>.
 INTVAL
 PIO_recv(theINTERP, PMC *pmc, STRING **buf)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;
@@ -1408,7 +1408,7 @@ Send the message C<*buf> to the connected socket C<*pmc>.
 INTVAL
 PIO_send(theINTERP, PMC *pmc, STRING *buf)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;
@@ -1430,7 +1430,7 @@ Connect C<*pmc> to C<*address>.
 INTVAL
 PIO_connect(theINTERP, PMC *pmc, STRING *address)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     if(!io)
         return -1;

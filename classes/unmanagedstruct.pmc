@@ -198,7 +198,7 @@ ret_pmc(Parrot_Interp interpreter, PMC* pmc, char *p, int type, INTVAL idx)
 	    /* now check if initializer has a signature attached */
 	    init = PMC_pmc_val(pmc);
 	    ptr = VTABLE_get_pmc_keyed_int(interpreter, init, idx*3);
-	    if (ptr->pmc_ext && ptr->metadata) {
+	    if (ptr->pmc_ext && PMC_metadata(ptr)) {
 		PMC *sig = VTABLE_getprop(interpreter, ptr,
 			string_from_cstring(interpreter, "_signature", 0));
 		if (VTABLE_defined(interpreter, sig)) {
