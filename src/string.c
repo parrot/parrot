@@ -83,6 +83,49 @@ string_length(STRING* s) {
     return s->strlen;
 }
 
+/*=for api string _string_index
+ * return the character (or glyph, depending upon the string's encoding)
+ * This is to abstract the process of finding the Nth character in a (possibly
+ * unicode or JIS-encoded) string, the idea being that once the encoding
+ * functions are fleshed out, this function can DTRT.
+ */
+static INTVAL
+_string_index(STRING* s, INTVAL index) {
+    char *buf = s->bufstart;
+    return (INTVAL)buf[index];
+}
+
+/*=for api string string_ord
+ * return the length of the string
+ */
+INTVAL
+string_ord(STRING* s, INTVAL index) {
+    if((s == NULL) || (string_length(s) == 0)) {
+        INTERNAL_EXCEPTION(ORD_OUT_OF_STRING,
+                           "Cannot get character of empty string");
+    }
+    else {
+        int len = string_length(s);
+	if((index > (len - 1)) ||
+	   (index < 0 && -index > len)
+          )
+        {
+            INTERNAL_EXCEPTION(ORD_OUT_OF_STRING,
+                               "Cannot get character past end of string");
+        }
+        else {
+            char *buf = s->bufstart;
+	    if(index < 0) {
+		return _string_index(s,len+index);
+            }
+            else {
+		return _string_index(s,index);
+            }
+        }
+    }
+    return -1;
+}
+
 /*=for api string string_copy
  * create a copy of the argument passed in
  */
