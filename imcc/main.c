@@ -413,7 +413,7 @@ int main(int argc, char * argv[])
             Parrot_setflag(interpreter, PARROT_EXEC_FLAG, ext);
         }
 #endif
-        if (!strcmp(sourcefile, output))
+        if (!strcmp(sourcefile, output) && strcmp(sourcefile, "-"))
             fatal(1, "main", "outputfile is sourcefile\n");
     }
 
