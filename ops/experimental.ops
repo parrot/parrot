@@ -12,7 +12,11 @@ experimental.ops - Experimental Operations
 
 =head1 DESCRIPTION
 
-Operations that are in an experimental state.
+This file contains operations that are in an experimental state. Do not
+rely upon the existence of the ops in this file when writing production code.
+There is no decision yet whether they are accepted as regular parrot ops or not.
+They are included here for testing purposes only!
+
 
 =cut
 
