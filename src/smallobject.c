@@ -177,7 +177,13 @@ get_free_object(struct Parrot_Interp *interpreter,
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
 #if ARENA_DOD_FLAGS
-    PObj_on_free_list_CLEAR((PObj*) ptr);
+    if (pool->object_size >= sizeof(Dead_PObj)) {
+        *((Dead_PObj*)ptr)->arena_dod_flag_ptr &=
+            ~ (PObj_on_free_list_FLAG << ((Dead_PObj*)ptr)->flag_shift);
+    }
+    else {
+        PObj_on_free_list_CLEAR((PObj*) ptr);
+    }
 #endif
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter) && pool !=
@@ -211,6 +217,7 @@ add_to_free_list(struct Parrot_Interp *interpreter,
 {
 #if ARENA_DOD_FLAGS
     UINTVAL *dod_flags;
+    UINTVAL nm;
 #endif
     UINTVAL i;
     void *object;
@@ -225,13 +232,25 @@ add_to_free_list(struct Parrot_Interp *interpreter,
     pool->replenish_level =
                 (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
     dod_flags = arena->dod_flags + (start >> ARENA_FLAG_SHIFT);
+    assert((start & ARENA_FLAG_MASK) == 0);
+    nm = 0;
 #endif
     for (i = start; i < end; i++) {
 #if ARENA_DOD_FLAGS
         if (! (i & ARENA_FLAG_MASK)) {
             *dod_flags = ALL_FREE_MASK;
+            if (pool->object_size >= sizeof(Dead_PObj))
+                ((Dead_PObj*)object)->arena_dod_flag_ptr = dod_flags;
             ++dod_flags;
+            nm = 0;
         }
+        else {
+            if (pool->object_size >= sizeof(Dead_PObj))
+                ((Dead_PObj*)object)->arena_dod_flag_ptr = dod_flags - 1;
+            nm += 4;
+        }
+        if (pool->object_size >= sizeof(Dead_PObj))
+            ((Dead_PObj*)object)->flag_shift = nm;
 #else
         PObj_flags_SETTO((PObj *)object, PObj_on_free_list_FLAG);
 #endif

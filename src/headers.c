@@ -38,7 +38,7 @@ Handles getting of various headers, and pool creation.
 =over 4
 
 =item C<void *
-get_free_pmc(struct Parrot_Interp *interpreter, 
+get_free_pmc(struct Parrot_Interp *interpreter,
              struct Small_Object_Pool *pool)>
 
 Gets a free PMC from C<pool> and returns it.
@@ -54,6 +54,7 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 
     /* clear flags, set is_PMC_FLAG */
     PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
+    ((PMC *)pmc)->vtable = NULL;
 #if ! PMC_DATA_IN_EXT
     PMC_data((PMC *)pmc) = NULL;
 #endif
@@ -398,7 +399,7 @@ buffer_unmake_COW(struct Parrot_Interp *interpreter, Buffer *src)
 /*
 
 =item C<Buffer *
-buffer_copy_if_diff(struct Parrot_Interp *interpreter, Buffer *src, 
+buffer_copy_if_diff(struct Parrot_Interp *interpreter, Buffer *src,
                     Buffer *dst)>
 
 Returns a copy of C<src> if it differs from C<dst>.

@@ -17,6 +17,22 @@ struct Small_Object_Arena {
     void *start_objects;
 };
 
+#if ARENA_DOD_FLAGS
+/*
+ * objects on the free list are overlaid with
+ * this data structure just for resetting
+ * the on_free_list FLAG cheaper
+ *
+ */
+typedef struct {
+    void *free_list_ptr;        /* generic free list ptr */
+    UINTVAL object_buflen_dont_use;
+    UINTVAL object_flags_dont_use;
+    UINTVAL *arena_dod_flag_ptr;/* ptr to the dod flag nibble */
+    UINTVAL flag_shift;         /* shift inside dod_flags */
+} Dead_PObj;
+
+#endif
 /* Tracked resource pool */
 struct Small_Object_Pool {
     struct Small_Object_Arena *last_Arena;

@@ -760,6 +760,10 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                 }
 #if ARENA_DOD_FLAGS
                 *dod_flags |= PObj_on_free_list_FLAG << nm;
+                if (pool->object_size >= sizeof(Dead_PObj)) {
+                    ((Dead_PObj*)b)->arena_dod_flag_ptr = dod_flags;
+                    ((Dead_PObj*)b)->flag_shift = nm;
+                }
 #else
                 PObj_flags_SETTO((PObj *)b, PObj_on_free_list_FLAG);
 #endif

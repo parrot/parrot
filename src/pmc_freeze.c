@@ -625,6 +625,8 @@ cleanup_next_for_GC_pool(Parrot_Interp interpreter,
         UINTVAL i;
 
         for (i = 0; i < arena->used; i++) {
+            if (PObj_on_free_list_TEST(p)) /* TODO used dod flags */
+                continue;
             if (p->pmc_ext)
                 PMC_next_for_GC(p) = NULL;
             p = (PMC *)((char *)p + sizeof(PMC));
