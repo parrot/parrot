@@ -10,6 +10,7 @@
 
 		The Parrot Team
 		PS: Yes, this looks remarkably like the Linux CREDITS format
+		PPS: This file is encoded in UTF-8
 
 ----------
 N: Aaron Sherman
@@ -290,10 +291,10 @@ D: Fix for string_to_num
 N: Stefan Lidman
 D: sqrt ops
 
-N: St�hane Payrard
+N: Stéphane Payrard
 D: Various code fixes and improvements
 
-N: St�hane Peiry
+N: Stéphane Peiry
 D: Lot of JIT/sun patches
 
 N: Sterling Hughes
