@@ -404,6 +404,28 @@ SymReg * get_sym(const char * name) {
     return _get_sym(hash, name);
 }
 
+/* find a symbol hash or ghash */
+SymReg *
+_find_sym(Namespace * nspace, SymReg * hsh[], const char * name) {
+    Namespace * ns;
+    SymReg *p;
+
+    for (ns = nspace; ns; ns = ns->parent) {
+        char * fullname = _mk_fullname(ns, name);
+        p = _get_sym(hsh, fullname);
+        free(fullname);
+        if (p)
+            return p;
+    }
+    p = _get_sym(hsh, name);
+    if (p)
+        return p;
+    p = _get_sym(ghash, name);
+    if (p)
+        return p;
+    return 0;
+}
+
 
 SymReg * find_sym(const char * name) {
     return _find_sym(namespace, hash, name);

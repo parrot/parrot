@@ -51,32 +51,6 @@ close_comp_unit(Parrot_Interp interpreter)
     instructions = last_ins = NULL;
 }
 
-/* find a symbol on all hashes */
-SymReg *
-_find_sym(Namespace * nspace, SymReg * hsh[], const char * name) {
-    Namespace * ns;
-    int n;
-    SymReg *p;
-
-    UNUSED(hsh);
-    for (n = n_comp_units - 1; n >= 0; n--) {
-        for (ns = nspace; ns; ns = ns->parent) {
-            char * fullname = _mk_fullname(ns, name);
-            p = _get_sym(hash, fullname);
-            free(fullname);
-            if (p)
-                return p;
-        }
-        p = _get_sym(hash, name);
-        if (p)
-            return p;
-        p = _get_sym(ghash, name);
-        if (p)
-            return p;
-    }
-    return 0;
-}
-
 
 /* Creates a new instruction */
 

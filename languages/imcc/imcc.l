@@ -42,6 +42,7 @@ struct macro_frame_t {
     struct params_t *params;
     struct params_t expansion;
     int label;
+    char *file;
     int line;
     int pasm_file;      /* pasm_file mode of previous frame */
 };
@@ -57,7 +58,7 @@ static int yylex_skip (YYSTYPE *valp, void *interp, const char *skip);
 
 static int read_macro (YYSTYPE *valp, void *interp);
 static int expand_macro (YYSTYPE *valp, void *interp, const char *name);
-static void include_file (const char *file_name);
+static void include_file (char *file_name);
 static int in_pod;
 static int prev_state;
 
@@ -455,6 +456,7 @@ new_frame (void)
     tmp = mem_sys_allocate_zeroed(sizeof(struct macro_frame_t));
     tmp->label = ++label;
     tmp->line = line;
+    tmp->file = sourcefile;
     tmp->pasm_file = pasm_file;
 
     return tmp;
@@ -483,6 +485,7 @@ destroy_frame (struct macro_frame_t *frame)
     }
 
     line = frame->line;
+    sourcefile = frame->file; /* FIXME, if file was allocated free it */
 
     mem_sys_free(frame);
 
@@ -691,13 +694,14 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 }
 
 static void
-include_file (const char *file_name)
+include_file (char *file_name)
 {
     struct macro_frame_t *frame;
     FILE *file;
     char *ext;
 
     frame = new_frame();
+    sourcefile = file_name;
 
     file = fopen(file_name, "r");
     if (!file) {
@@ -715,7 +719,8 @@ include_file (const char *file_name)
         }
 #endif
         file = fopen(s, "r");
-        free(s);
+        sourcefile = s;
+        /* free(s); FIXME leak */
     }
     if (!file)
         fataly(EX_SOFTWARE, file_name, line, strerror(errno));
@@ -761,6 +766,18 @@ compile_file(Interp *interp, FILE *file)
 
     yy_switch_to_buffer(buffer);
 }
+
+void
+print_inc(void)
+{
+    struct macro_frame_t *f;
+
+    for (f = frames; f; f = f->next) {
+        if (f->file && strcmp(f->file, sourcefile))
+            fprintf(stderr, "\tcalled from '%s' line %d\n", f->file, f->line);
+    }
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

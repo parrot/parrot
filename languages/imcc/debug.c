@@ -24,9 +24,12 @@ void fataly(int code, const char *func, int lin, const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    fprintf(stderr, "error:imcc:%s file %s line %d: ", func, sourcefile, lin);
+    fprintf(stderr, "error:imcc:");
     vfprintf(stderr, fmt, ap);
     va_end(ap);
+    fprintf(stderr, "in file '%s' line %d\n", func, lin);
+    print_inc();
+    /* TODO through compiler exception */
     exit(code);
 }
 
