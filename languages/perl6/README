@@ -14,24 +14,21 @@ P6C/Parser.pm		the grammar
 P6C/Tree.pm		functions translating parser output to tree
 P6C/Util.pm		miscellaneous utility functions
 t/compiler		compiler tests
-t/parser		parser tests
+t/parser		parser tests (unmaintained)
+t/rx			regex tests
 
 Notes
 =====
 
 Before you begin, make sure that imcc (../imcc) is compiled.  Typing
-"make" should do this.
+"make" should do this.  Also, if you have updated from CVS (rather
+than doing a fresh checkout), you should remove Perl6grammar.pm to
+force the compiler to re-compile the grammar file.
 
-Then, type "make test".  All the compiler test cases pass on my
-machine (except where noted in ChangeLog), and compile in less than
-five seconds each.  However, your mileage may vary for a number of
-reasons:
+All the compiler test cases pass on my machine (except where noted in
+ChangeLog), and compile in less than five seconds each.
 
-- The parser may be unusably slow on Windows.
-- your version of IMCC may be less hacked than mine (see the ChangeLog
-  for what this should affect).
-
-Take a look at t/compiler/*.t for an idea of the kinds of operations
+Take a look at t/*/*.t for an idea of the kinds of operations
 currently supported.  For more internal details, see the POD
 documentation in P6C/*.pm, especially P6C/Nodes.pm.
 
@@ -49,10 +46,11 @@ The resulting code is then run through imcc (parrot/languages/imcc), which
 handles register allocation and spilling, and then finally assembled
 by the parrot assembler (parrot/assembler.pl).
 
-Nodes.pm is probably the best place to start.  If you're not sure
-where to go from there, you might look for "XXX:", which I use to mark
-things that need fixing.  If you're interested in getting involved,
-drop me an email.
+If you want to get started in parser development, you should probably
+start by reading overview.pod.  If you're not sure where to go from
+there, you can look for "XXX:" in the code, which I use to mark things
+that need fixing.  If you're interested in getting involved, drop me
+an email.
 
 Sean O'Rourke
 seano@cpan.org
@@ -64,4 +62,6 @@ John Kingsley		Numerous bug fixes to the parser, parser
 			tests, parse error messages.
 
 Leopold Toetsch		5.005_03 compatibility fixes, test driver
-			cleanup, new driver program.
+			cleanup, new driver program, many bug fixes
+
+Joseph Ryan		Compiler overview doc

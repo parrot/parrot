@@ -252,6 +252,7 @@
 
 	* Additions:
 	    - "perl6 --test" to run tests faster by about 2x (Leo)
+	    - overview.pod -- compiler structure overview (Joseph Ryan)
 
 	* Fixes:
 	    - doc updates in perl6 (Leo)
