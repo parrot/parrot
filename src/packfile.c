@@ -183,7 +183,7 @@ Unpack a PackFile from a block of memory. The format is:
   byte     byteorder
   byte     major
   byte     minor
-  byte     flags
+  byte     intvalsize
   byte     floattype
   byte     pad[10] = fingerprint
 
@@ -562,7 +562,7 @@ PackFile_set_header(struct PackFile *self)
     self->header->major = PARROT_MAJOR_VERSION;
     /* XXX during development, we check PATCH_LEVEL too */
     self->header->minor = PARROT_MINOR_VERSION | PARROT_PATCH_VERSION;
-    self->header->flags = 0;
+    self->header->intvalsize = sizeof(INTVAL);
     if (NUMVAL_SIZE == 8)
         self->header->floattype = 0;
     else /* if XXX */

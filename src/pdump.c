@@ -60,6 +60,9 @@ PackFile_header_dump(struct Parrot_Interp *interpreter, struct PackFile *pf)
     PIO_printf(interpreter, "\twordsize  = %d", pf->header->wordsize);
     PIO_printf(interpreter, "\t(interpreter's wordsize    = %d)\n",
             sizeof(opcode_t));
+    PIO_printf(interpreter, "\tint_size  = %d", pf->header->intvalsize);
+    PIO_printf(interpreter, "\t(interpreter's INTVAL size = %d)\n",
+            sizeof(INTVAL));
     PIO_printf(interpreter, "\tbyteorder = %d", pf->header->byteorder);
     PIO_printf(interpreter, "\t(interpreter's byteorder   = %d)\n",
             PARROT_BIGENDIAN);

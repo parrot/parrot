@@ -36,15 +36,14 @@ struct PackFile_Header {
     unsigned char byteorder;
     unsigned char major;
     unsigned char minor;
-    unsigned char flags;
+    unsigned char intvalsize;   /* was flags */
     unsigned char floattype;
     unsigned char pad[10];      /* fingerprint */
     /* Start words/opcodes on 16-byte boundary */
     opcode_t magic;
     opcode_t opcodetype;
     opcode_t dir_format;        /* was fixup_ss */
-    opcode_t _unused_const_ss;          /* old format data */
-    opcode_t _unused_bytecode_ss;
+    opcode_t _unused_padding;
 };
 
 /*

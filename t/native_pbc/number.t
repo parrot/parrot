@@ -29,10 +29,11 @@ output_is(<<CODE, <<OUTPUT, "i386 double float 32 bit opcode_t");
 # number_1.pbc
 # HEADER => [
 #        wordsize  = 4   (interpreter's wordsize    = 4)
+#        int_size  = 4   (interpreter's INTVAL size = 4)
 #        byteorder = 0   (interpreter's byteorder   = 0)
 #        floattype = 0   (interpreter's NUMVAL_SIZE = 8)
 #        no endianize, no opcode, no numval transform
-#        dirformat = 0
+#        dirformat = 1
 #]                #'
 
 CODE
@@ -68,6 +69,7 @@ output_is(<<CODE, <<OUTPUT, "i386 long double float 32 bit opcode_t");
  # number_2.pbc
 #HEADER => [
 #        wordsize  = 4   (interpreter's wordsize    = 4)
+#        int_size  = 4   (interpreter's INTVAL size = 4)
 #        byteorder = 0   (interpreter's byteorder   = 0)
 #        floattype = 1   (interpreter's NUMVAL_SIZE = 8)
 #        no endianize, no opcode, **need** numval transform
