@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+interactive.pl
+README
+Ruby.pm
+t/01_terminal.t
+t/02_expression.t
+Yacc/01_terminal.t
+Yacc/02_expression.t
+Yacc/parse.y
+Yacc/Ruby.pm

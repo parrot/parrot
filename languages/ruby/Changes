@@ -1,0 +1,6 @@
+Revision history for Perl extension Ruby.
+
+0.01  Fri Aug  9 21:30:44 2002
+	- original version; created by h2xs 1.21 with options
+		-AXn Ruby
+
