@@ -26,9 +26,14 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
-    offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-    real_function = (pmc_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
-            function] + offset);
+
+    if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
+        (right_type > interpreter->binop_mmd_funcs->y[function])) {
+        real_function = interpreter->binop_mmd_funcs->default_func[function];
+    } else {
+        offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
+        real_function = (pmc_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[function] + offset);
+    }
     (*real_function)(interpreter, left, right, dest);
 }
 

@@ -50,6 +50,9 @@ void mmd_fallback_streq_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 void mmd_fallback_numeq_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 void mmd_fallback_strcmp_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 void mmd_fallback_numcmp_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_stringor_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_stringand_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_stringxor_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 
 #endif
 

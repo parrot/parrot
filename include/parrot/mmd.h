@@ -55,6 +55,9 @@ typedef struct MMD_table mmd_table;
 #define MMD_REPEAT 15 
 #define MMD_EQ 16 
 #define MMD_CMP 17 
+#define MMD_SOR 18
+#define MMD_SAND 19
+#define MMD_SXOR 20
 
 #endif
 

@@ -388,6 +388,27 @@ mmd_fallback_strcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                               string_compare(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right)));
 }
 
+void
+mmd_fallback_stringor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_string_native(interp, dest,
+                              string_bitwise_or(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right), NULL));
+}
+
+void
+mmd_fallback_stringand_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_string_native(interp, dest,
+                              string_bitwise_and(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right), NULL));
+}
+
+void
+mmd_fallback_stringxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_string_native(interp, dest,
+                              string_bitwise_xor(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right), NULL));
+}
+
 
 
 /*

@@ -87,6 +87,18 @@ pmclass mmd_default extends default {
     mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_CMP);
   }
 
+  void bitwise_ors(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_SOR);
+  }
+
+  void bitwise_ands(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_SAND);
+  }
+
+  void bitwise_xors(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_SXOR);
+  }
+
 
 
 }
