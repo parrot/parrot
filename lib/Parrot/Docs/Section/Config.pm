@@ -89,7 +89,7 @@ which they are performed.',
 		),
 		$self->new_group('Library', '',
 		    $self->new_item('PASM/IMC access to Parrot configuration data.', 
-		        'library/config.imc')
+		        'runtime/parrot/library/config.imc')
 		),
 	);
 }
