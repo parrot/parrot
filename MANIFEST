@@ -64,6 +64,7 @@ docs/running.pod
 docs/strings.pod
 docs/tests.pod
 docs/vtables.pod
+editor/pasm.el
 editor/pasm.vim
 embed.c
 encoding.c
@@ -165,8 +166,10 @@ languages/BASIC/basic.pasm
 languages/BASIC/basic.pl
 languages/BASIC/basicvar.pasm
 languages/BASIC/dumpstack.pasm
+languages/BASIC/eliza.bas
 languages/BASIC/expr.pasm
 languages/BASIC/instructions.pasm
+languages/BASIC/sampleb.bas
 languages/BASIC/sample2.bas
 languages/BASIC/sample3.bas
 languages/BASIC/sample4.bas
