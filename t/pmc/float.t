@@ -16,7 +16,7 @@ Tests the Float PMC.
 
 =cut
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 44;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -1039,6 +1039,29 @@ ok 2
 ok 3
 OUTPUT
 
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: cmp_p_n");
+        new P1, .Float
+        set P1, 123.45
+        set N1, 123.45
+        set N2, -1.0
+        set N3, 123.54
+
+        cmp I0, P1, N1
+        print I0
+        print "\n"
+        cmp I0, P1, N2
+        print I0
+        print "\n"
+        cmp I0, P1, N3
+        print I0
+        print "\n"
+        end
+CODE
+0
+1
+-1
+OUTPUT
+
 output_is(<< 'CODE', << 'OUTPUT', "comparison ops: cmp_num");
         new P1, .Float
         set P1, 1.1
@@ -1086,3 +1109,239 @@ CODE
 1
 0
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: isgt");
+        new P1, .Float
+        new P2, .Float
+        new P3, .Float
+        new P4, .Integer
+        new P5, .Integer
+        new P6, .Float
+
+        set P1, 10.0
+        set P2, 20.0
+        set P3, 5.0
+        set P4, 3
+        set P5, 12
+        set P6, 10.0
+
+        isgt I0, P1, P2
+        print I0
+        print "\n"
+        isgt I0, P1, P1
+        print I0
+        print "\n"
+        isgt I0, P1, P3
+        print I0
+        print "\n"
+        isgt I0, P1, P4
+        print I0
+        print "\n"
+        isgt I0, P1, P5
+        print I0
+        print "\n"
+        isgt I0, P1, P6
+        print I0
+        print "\n"
+        end
+CODE
+0
+0
+1
+1
+0
+0
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: isge");
+        new P1, .Float
+        new P2, .Float
+        new P3, .Float
+        new P4, .Integer
+        new P5, .Integer
+        new P6, .Float
+
+        set P1, 10.0
+        set P2, 20.0
+        set P3, 5.0
+        set P4, 3
+        set P5, 12
+        set P6, 10.0
+
+        isge I0, P1, P2
+        print I0
+        print "\n"
+        isge I0, P1, P1
+        print I0
+        print "\n"
+        isge I0, P1, P3
+        print I0
+        print "\n"
+        isge I0, P1, P4
+        print I0
+        print "\n"
+        isge I0, P1, P5
+        print I0
+        print "\n"
+        isge I0, P1, P6
+        print I0
+        print "\n"
+        end
+CODE
+0
+1
+1
+1
+0
+1
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: islt");
+        new P1, .Float
+        new P2, .Float
+        new P3, .Float
+        new P4, .Integer
+        new P5, .Integer
+        new P6, .Float
+
+        set P1, 10.0
+        set P2, 20.0
+        set P3, 5.0
+        set P4, 3
+        set P5, 12
+        set P6, 10.0
+
+        islt I0, P1, P2
+        print I0
+        print "\n"
+        islt I0, P1, P1
+        print I0
+        print "\n"
+        islt I0, P1, P3
+        print I0
+        print "\n"
+        islt I0, P1, P4
+        print I0
+        print "\n"
+        islt I0, P1, P5
+        print I0
+        print "\n"
+        islt I0, P1, P6
+        print I0
+        print "\n"
+        end
+CODE
+1
+0
+0
+0
+1
+0
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: isle");
+        new P1, .Float
+        new P2, .Float
+        new P3, .Float
+        new P4, .Integer
+        new P5, .Integer
+        new P6, .Float
+
+        set P1, 10.0
+        set P2, 20.0
+        set P3, 5.0
+        set P4, 3
+        set P5, 12
+        set P6, 10.0
+
+        isle I0, P1, P2
+        print I0
+        print "\n"
+        isle I0, P1, P1
+        print I0
+        print "\n"
+        isle I0, P1, P3
+        print I0
+        print "\n"
+        isle I0, P1, P4
+        print I0
+        print "\n"
+        isle I0, P1, P5
+        print I0
+        print "\n"
+        isle I0, P1, P6
+        print I0
+        print "\n"
+        end
+CODE
+1
+1
+0
+0
+1
+1
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: iseq");
+        new P1, .Float
+        new P2, .Float
+        new P3, .Float
+        new P4, .Integer
+
+        set P1, 2.5
+        set P2, 2.6
+        set P3, 2.5
+        set P4, 2
+
+        iseq I0, P1, P1
+        print I0
+        print "\n"
+        iseq I0, P1, P2
+        print I0
+        print "\n"
+        iseq I0, P1, P3
+        print I0
+        print "\n"
+        iseq I0, P1, P4
+        print I0
+        print "\n"
+        end
+CODE
+1
+0
+1
+0
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "comparison ops: isne");
+        new P1, .Float
+        new P2, .Float
+        new P3, .Float
+        new P4, .Integer
+
+        set P1, 2.5
+        set P2, 2.6
+        set P3, 2.5
+        set P4, 2
+
+        isne I0, P1, P1
+        print I0
+        print "\n"
+        isne I0, P1, P2
+        print I0
+        print "\n"
+        isne I0, P1, P3
+        print I0
+        print "\n"
+        isne I0, P1, P4
+        print I0
+        print "\n"
+        end
+CODE
+0
+1
+0
+1
+OUTPUT
+
+
