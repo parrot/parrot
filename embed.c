@@ -416,7 +416,7 @@ Parrot_debug(struct Parrot_Interp *interpreter, int argc, char ** argv)
     PDB_t *pdb;
     const char *command;
 
-    pdb = (PDB_t *)mem_sys_allocate(sizeof(PDB_t));
+    pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
 
     interpreter->pdb = pdb;
     pdb->cur_opcode = interpreter->code->byte_code;
@@ -438,7 +438,7 @@ Parrot_disassemble(struct Parrot_Interp *interpreter)
     PDB_line_t *line;
     char *c;
 
-    pdb = (PDB_t *)mem_sys_allocate(sizeof(PDB_t));
+    pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
 
     interpreter->pdb = pdb;
     pdb->cur_opcode = interpreter->code->byte_code;
