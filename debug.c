@@ -1261,6 +1261,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
         newline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
         newline->number = pline->number + 1;
         newline->label  = NULL;
+        newline->next   = NULL;
         pline->next = newline;
         pline = newline;
         pline->source_offset = pfile->size;
@@ -1308,6 +1309,7 @@ PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
     label = file->label;
     new = (PDB_label_t *)mem_sys_allocate(sizeof(PDB_label_t));
     new->opcode = cur_opcode + offset;
+    new->next   = NULL;
     if (label) {
         while (label->next)
             label = label->next;
