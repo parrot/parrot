@@ -10,6 +10,7 @@
 #define YY_FLEX_MINOR_VERSION 5
 
 #include <stdio.h>
+#include <unistd.h>
 
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
@@ -23,7 +24,6 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
-#include <unistd.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -1234,7 +1234,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
+	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
 #line 107 "imcc/imcc.l"
@@ -2643,11 +2643,6 @@ YY_BUFFER_STATE b;
 	}
 
 
-#ifndef YY_ALWAYS_INTERACTIVE
-#ifndef YY_NEVER_INTERACTIVE
-extern int isatty YY_PROTO(( int ));
-#endif
-#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -3328,8 +3323,14 @@ compile_file(Interp *interp, FILE *file)
     buffer = YY_CURRENT_BUFFER;
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
 
+#if IMC_TRACE
+    fprintf(stderr, "imcc.l: compile_file\n");
+#endif
+
     emit_open(1, interp);
     yyparse((void *) interp);
+    imc_compile_all_units(interp);
+    imc_cleanup(interp);
     emit_close(interp);
 
     yy_switch_to_buffer(buffer);
