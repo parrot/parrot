@@ -107,12 +107,20 @@ may be collected later. This method does I<not> have to call the
 C<mark> method on any PMCs it marks--the DOD system takes care of
 that. (So no need to recurse into aggregate PMCs or anything of the sort)
 
+This method may allocate no memory from Parrot, nor may it alter
+Parrot's internal structures. It should have no side-effects from the
+C level either.
+
 This routine may B<not> throw an exception.
 
 =item INTVAL destroy(PMC)
 
 This method is called by the DOD when it determines that a PMC is
 dead, and that PMC has marked itself as having a destroy method.
+
+When this method finishes, the PMC will be marked as dead. As such you
+should make sure that you do I<not> leave any references to it in any
+parrot structure by the end of the method. 
 
 This method may I<not> throw an exception. It will be ignored if it does.
 
