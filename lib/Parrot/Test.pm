@@ -253,6 +253,8 @@ sub generate_functions {
       unless($ENV{POSTMORTEM}) {
         unlink $out_f;
 	unlink $build_f;
+	unlink $exe_f;
+	unlink $obj_f;
       }
       return $pass;
     }
