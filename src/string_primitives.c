@@ -460,7 +460,7 @@ Parrot_char_is_blank(Interp *interpreter, UINTVAL character)
 #if PARROT_HAS_ICU
     return u_isblank(character);
 #else
-    return character == 0x20;
+    return (character == 0x20) || (character == 0x09);
 #endif
 }
 
