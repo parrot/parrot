@@ -199,13 +199,13 @@ determines which set of Parrot registers it belongs to.
 	$I2 = $I1 * 3
 
 
-This uses symbolic STRING and INTVAL registers as temporaries. This is they typical sort of code
+This uses symbolic STRING and INTVAL registers as temporaries. This is the typical sort of code
 that compilers generate from the syntax tree.
 
 =head3 Named Variables
 
 Named variables are either local, global or namespace qualified. Currently IMCC only
-supports locals transparently, however globals are support in an explicit syntax.
+supports locals transparently, however globals are supported with explicit syntax.
 The way to declare locals in a subroutine is with the B<.local> directive. The B<.local> directive
 also requires a type (B<int>, B<num>, B<string> or a classname such as B<PerlArray>).
 
@@ -222,7 +222,7 @@ also requires a type (B<int>, B<num>, B<string> or a classname such as B<PerlArr
 
 =head2 How do I declare global or package variables in IMC?
 
-You can't yet. IMCC still lacks a few features and these are one of those features.
+You can't yet. IMCC still lacks a few features and this is one of those features.
 You can explicitly create global variables at runtime, however, but currently it
 only works for PMC types, like so:
 
@@ -286,8 +286,8 @@ Parrot will fixup the symbol references at runtime.
 
 This one is very simple. Use the B<.include> directive to include other .imc source
 files. Do keep in mind that currently Parrot starts execution with the first
-sub it sees in the bytecode; so if your main includes external .imc files it needs
-to include them after the your "main" start sub. If you .include them first (in
+sub it sees in the bytecode; so if your main includes external .imc files you need
+to include them after your "main" start sub. If you .include them first (in
 typical C or Perl style, Parrot will execute the first sub in the first included
 source file. This is because B<.include> is a preprocessed directive and simply creates
 one huge .imc source module.
@@ -392,6 +392,151 @@ Parrot will support a cleaner way of doing this.
 	   .pcc_begin_return
 	   .pcc_end_return
 	.end
+
+=head2 How can I compile classes and objects?
+
+Parrot and IMCC do not YET support pre-compiled classes and objects. Until
+the support is added, you can easily achieve it, you just need to do it all
+dynamically.
+
+Write support routines for new and construct and generate your constructors
+as simple subroutines. I suggest some sort of simple name mangling (C++/Java)
+when naming the subs (_TestClass__print_i). Your compiler will need
+to track field (or member) offsets in the array, or if you want to
+be even lazier and give up a tiny amount of speed, use a hash and you don't
+have to track them.
+
+
+=head2 That sounds easy, but how would it look?
+
+I'd be surpised if you are writing a compiler and can't figure this one out by
+yourself, but I'll be nice since this IS supposed to be documentation.
+It does help to actually see how IMCC does it.
+
+Remember, you only have to use Parrot's builtin mechanisms if your language
+wishes to interact with other languages, otherwise you can implement high level
+constructs any way you wish. You'll have to for a while longer, anyway.
+
+The exercise for a destructor is left up to you. You'll quickly notice that
+supporting destruction with Parrot's garbage collection requires a bit of
+support from the internals that currently just isn't there. But we plan to get
+there soon. By the time we DO get there, you won't need the syntax below.
+
+=head3 An OOP Example
+
+Hypothetical language Mython, (apologies to Python, but it sure is nice and brief):
+
+	class TestClass:
+	   int i
+	   method init:
+	   	i = 0
+	   method print_self:
+		printf "%d\n", i
+
+	sub main:
+	   TestClass obj1, obj2
+	   obj1 = new TestClass
+	   obj2 = new TestClass
+	   obj1.i = 1
+	   obj2.i = 2
+	   obj1.print_self()
+	   obj2.print_self()
+
+
+Here is the IMCC workaround until we have explicit .class syntax and bytecode freeze/thaw.
+
+	.sub _main
+	   .local pmc obj1
+	   .local pmc obj2
+	   .local pmc meth
+	   _init_world()                 # _init() sets up all classes and globals
+	   obj1 = __new("TestClass")     # obj1 = new TestClass;
+	   __ctor(obj1)
+	   obj2 = __new("TestClass")     # obj2 = new TestClass;
+	   __ctor(obj2)
+	   obj1[4] = 1                   # obj1.i = 1;
+	   obj2[4] = 2                   # obj1.i = 2;
+	   P2 = obj1                     # obj1.print_self()
+	   meth = obj1[3]
+	   invokecc meth
+	   P2 = obj2                     # obj2.print_self()
+	   meth = obj2[3]
+	   invokecc meth
+	   end
+	.end
+
+	# Called only once upon program start
+	.sub _init_world
+	   .local SArray c
+	   .local Sub meth
+	   .local PerlString classname
+	   classname = new PerlString               # class TestClass:
+	   c = new SArray
+	   c = 10    # Array size 10
+	   global "classes::TestClass" = c
+	   classname = "TestClass"
+	   c[0] = classname
+	   meth = global "_TestClass_ctor"          # method init:
+	   c[2] = meth
+	   meth = global "_TestClass_print_self"    # method print_self:
+	   c[3] = meth
+	   $P100 = new PerlInt                      # int i
+	   c[4] = $P100
+	   # TestClass is now defined, instantiate away
+	   # Setup any other globals for program
+	   .pcc_begin_return
+	   .pcc_end_return
+	.end
+
+	# This is generic infrastructure code
+	.sub __new
+	   .param string classname
+	   $S1 = "classes::" . classname
+	   # Instantiate a TestClass
+	   $P11 = global $S1
+	   P2 = clone $P11                          # Clone does a copy, including members
+	   .pcc_begin_return                        # Return the new "object"
+	   .return P2
+	   .pcc_end_return
+	.end
+
+	# This is generic infrastructure code
+	.sub __ctor
+	   .param pmc self
+	   # Call TestClass constructor
+	   $P100 = self[2]
+	   P2 = self       # For method calling convention P2 is the object
+	   invoke $P100    # Leave P1 with ret continuatio (tail chain)
+	   .pcc_begin_return
+	   .pcc_end_return
+	.end
+
+	.sub _TestClass_init            # method TestClass.init
+	   .local pmc self
+	   .local pmc classname
+	   .local Integer i
+	   self = P2
+	   classname = self[0]
+	   print classname
+	   print "::constructor\n"
+	   self[4] = 0                  # self.i = 0;
+	   .pcc_begin_return
+	   .pcc_end_return
+	.end
+
+	.sub _TestClass_print_self      # method TestClass.print_self
+	   .local pmc self
+	   .local pmc i
+	   self = P2
+	   i = self[4]                  # printf ("self.i = %d\n", i)
+	   print "self.i = "
+	   print i
+	   print "\n"
+	   .pcc_begin_return
+	   .pcc_end_return
+	.end
+
+
 
 =head1 Thats not all.
 
