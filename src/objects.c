@@ -15,14 +15,13 @@
 /* This should be public, but for right now it's internal */
 static PMC *
 find_global(Parrot_Interp interpreter, STRING *globalname) {
-    PMC* key = key_new_string(interpreter, globalname);
-    if (!VTABLE_exists_keyed(interpreter,
-                             interpreter->globals->stash_hash, key)) {
+    if (!VTABLE_exists_keyed_str(interpreter,
+                             interpreter->globals->stash_hash, globalname)) {
         return NULL;
     }
 
-    return VTABLE_get_pmc_keyed(interpreter,
-				interpreter->globals->stash_hash, key);
+    return VTABLE_get_pmc_keyed_str(interpreter,
+				interpreter->globals->stash_hash, globalname);
 }
 
 /* Subclass a class. Single parent class, nice and
@@ -47,7 +46,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
   child_class_array = PMC_data(child_class);
 
   /* We have the same number of attributes as our parent */
-  child_class->obj.u.int_val = base_class->obj.u.int_val;
+  child_class->cache.int_val = base_class->cache.int_val;
 
   /* Our parent class array has a single member in it */
   temp_pmc = pmc_new(interpreter, enum_class_Array);
@@ -61,9 +60,8 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
       VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
 
     /* Add ourselves to the interpreter's class hash */
-      VTABLE_set_pmc_keyed(interpreter, interpreter->class_hash,
-                           key_new_string(interpreter, child_class_name),
-                                          child_class);
+      VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
+                           child_class_name, child_class);
   }
   else {
       VTABLE_set_string_native(interpreter, classname_pmc,
@@ -120,7 +118,7 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
   new_class = pmc_new(interpreter, enum_class_ParrotClass);
   new_class_array = PMC_data(new_class);
   /* We have the same number of attributes as our parent */
-  new_class->obj.u.int_val = 0;
+  new_class->cache.int_val = 0;
   /* Our parent class array has nothing in it */
   VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 0,
                            pmc_new(interpreter, enum_class_Array));
@@ -151,10 +149,10 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
 PMC *
 Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
 {
-  if (VTABLE_exists_keyed(interpreter, interpreter->class_hash,
-                          key_new_string(interpreter, class_name)))
-     return VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash,
-                                 key_new_string(interpreter, class_name));
+  if (VTABLE_exists_keyed_str(interpreter, interpreter->class_hash,
+                          class_name))
+     return VTABLE_get_pmc_keyed_str(interpreter, interpreter->class_hash,
+                                 class_name);
   return PMCNULL;
 }
 
@@ -167,8 +165,8 @@ Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
 void
 Parrot_class_register(Parrot_Interp interpreter, STRING *class_name, PMC *new_class)
 {
-  VTABLE_set_pmc_keyed(interpreter, interpreter->class_hash,
-                       key_new_string(interpreter,class_name), new_class);
+  VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
+                       class_name, new_class);
 
   /* Now build a new vtable for this class and register it in the
      global registry */
@@ -292,7 +290,6 @@ Parrot_new_method_cache(Parrot_Interp interpreter) {
 PMC *
 Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
                               STRING *method_name) {
-    PMC* key = key_new_string(interpreter, method_name);
     PMC* method = NULL;  /* The method we ultimately return */
     PMC* classname;      /* The classname PMC for the currently
                             searched class */

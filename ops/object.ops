@@ -144,7 +144,8 @@ inline op subclass(out PMC, in PMC) {
 }
 
 op subclass(out PMC, in STR, in STR) {
-  PMC *class = VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2));
+  PMC *class = VTABLE_get_pmc_keyed_str(interpreter,
+      interpreter->class_hash, $2);
   if (!class) {
     internal_exception(NO_CLASS, "Class doesn't exist");
   }
@@ -153,7 +154,8 @@ op subclass(out PMC, in STR, in STR) {
 }
 
 op subclass(out PMC, in STR) {
-  PMC *class = VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2));
+  PMC *class = VTABLE_get_pmc_keyed_str(interpreter,
+      interpreter->class_hash, $2);
   if (!class) {
     internal_exception(NO_CLASS, "Class doesn't exist");
   }
@@ -168,11 +170,7 @@ Returns 1 if the class exists, 0 if it does not.
 =cut
 
 inline op findclass(out INT, in STR) {
-  if (VTABLE_exists_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2))) {
-    $1 = 1;
-  } else {
-    $1 = 0;
-  }
+  $1 = VTABLE_exists_keyed_str(interpreter, interpreter->class_hash, $2);
   goto NEXT();
 }
 
@@ -187,8 +185,8 @@ character, so Perl's Foo::Bar would be Foo\0Bar.
 =cut
 
 inline op getclass(out PMC, in STR) {
-  if (VTABLE_exists_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2))) {
-    $1 = VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2));
+  if (VTABLE_exists_keyed_str(interpreter, interpreter->class_hash, $2)) {
+    $1 = VTABLE_get_pmc_keyed_str(interpreter, interpreter->class_hash,  $2);
   } else {
     internal_exception(NO_CLASS, "Class doesn't exist");
   }
@@ -213,6 +211,8 @@ Get the class PMC for the object in $2 and put it in $1.
 =cut
 
 inline op class(out PMC, in PMC) {
+  $1 = VTABLE_get_pmc_keyed_int(interpreter,
+                  (PMC *)PMC_data($2), 0);
   goto NEXT();
 }
 
