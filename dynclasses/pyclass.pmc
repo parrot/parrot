@@ -22,6 +22,7 @@ These are the vtable functions for the Python Class base class
 
 /* cache of classes referenced */
 static INTVAL dynclass_PyNone;
+static STRING *CLASS;
 
 pmclass PyClass dynpmc group python_group {
 
@@ -38,7 +39,8 @@ they will be used frequently here.
 
     void class_init() {
         if (pass) {
-            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
+            dynclass_PyNone = Parrot_PMC_typenum(INTERP, "PyNone");
+            CLASS = string_from_cstring(INTERP, "__class__", 0);
         }
     }
 
@@ -46,8 +48,8 @@ they will be used frequently here.
 
 =item C<PMC *getprop(STRING *key)>
 
-Returns the property for C<*key>. If no property is defined then an
-None is returned.
+Returns the property for C<*key>. If the property is not defined then for
+the instance, try the class.  If still no luck, return None.
 
 =cut
 
@@ -55,13 +57,21 @@ None is returned.
 
     PMC* getprop(STRING* key) {
         PMC * prop = SUPER(key);
-        if (!prop) {
-            prop = VTABLE_getprop(INTERP, SELF, key);
-            if (!VTABLE_defined(INTERP, prop)) {
-              prop = pmc_new(INTERP, dynclass_PyNone);
-            }
+
+        if (prop && VTABLE_defined(INTERP, prop)) return prop;
+
+        PMC *class = SELF;
+        if (PObj_is_object_TEST(SELF)) {
+            class = GET_CLASS((Buffer *)PMC_data(SELF), SELF);
         }
-        return prop;
+
+        if (class) {
+            prop = VTABLE_getprop(INTERP, class, key);
+        }
+
+        if (prop && VTABLE_defined(INTERP, prop)) return prop;
+
+        return pmc_new(INTERP, dynclass_PyNone);
     }
 
 /*
@@ -89,8 +99,7 @@ fails, return null.
 
 =item C<void* invoke(void* next)>
 
-Pythonic object constructor. SELF is a PerlHash Class object. Return a new
-C<dict> object according to 2.1. Built-in Functions.
+Pythonic object constructor.
 
 =cut
 
@@ -98,6 +107,19 @@ C<dict> object according to 2.1. Built-in Functions.
 
     void* invoke(void* next) {
         REG_PMC(5) = pmc_new(interpreter, REG_PMC(0)->vtable->base_type);
+
+        /*
+           XXX
+
+           If Parrot allowed you to override getprop on subclasses, and
+           put the parent class PMC someplace where it could be found,
+           none of this would be necessary, but as Parrot doesn't
+           (currently!), we take matters into our own hands...
+        */
+
+        REG_PMC(5)->vtable->getprop = Parrot_PyClass_getprop;
+        VTABLE_setprop(INTERP, REG_PMC(0), CLASS, REG_PMC(0));
+
         return next;
     }
 

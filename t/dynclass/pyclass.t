@@ -18,9 +18,6 @@ Tests the Python Class PMC.
 
 use Parrot::Test tests => 2;
 
-SKIP : {
-    skip("can't inherit getprop yet", 1);
-
 output_is(<< 'CODE', << 'OUTPUT', "attribute");
 ##PIR##
 .sub main @MAIN
@@ -43,7 +40,6 @@ output_is(<< 'CODE', << 'OUTPUT', "attribute");
 CODE
 1
 OUTPUT
-}
 
 output_is(<< 'CODE', << 'OUTPUT', "method");
 ##PIR##
