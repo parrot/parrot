@@ -7,47 +7,47 @@
 #include "parrot.h"
 #include "math.h"
 
-// SET Ix, CONSTANT
+/* SET Ix, CONSTANT */
 AUTO_OP set_i_ic {
   INT_REG(P1) = P2;
 }
   
-// SET Ix, Ix
+/* SET Ix, Ix */
 AUTO_OP set_i {
   INT_REG(P1) = INT_REG(P2);
 }
   
-// ADD Ix, Iy, Iz  
+/* ADD Ix, Iy, Iz   */
 AUTO_OP add_i {
   INT_REG(P1) = INT_REG(P2) +
                            INT_REG(P3);
 }
 
-// SUB Ix, Iy, Iz  
+/* SUB Ix, Iy, Iz   */
 AUTO_OP sub_i {
   INT_REG(P1) = INT_REG(P2) -
                            INT_REG(P3);
 }
 
-// MUL Ix, Iy, Iz  
+/* MUL Ix, Iy, Iz   */
 AUTO_OP mul_i {
   INT_REG(P1) = INT_REG(P2) *
                            INT_REG(P3);
 }
 
-// DIV Ix, Iy, Iz  
+/* DIV Ix, Iy, Iz   */
 AUTO_OP div_i {
   INT_REG(P1) = INT_REG(P2) /
                            INT_REG(P3);
 }
 
-// MOD Ix, Iy, Iz  
+/* MOD Ix, Iy, Iz   */
 AUTO_OP mod_i {
   INT_REG(P1) = INT_REG(P2) %
                            INT_REG(P3);
 }
 
-// EQ Ix, Iy, EQ_BRANCH, NE_BRANCH
+/* EQ Ix, Iy, EQ_BRANCH, NE_BRANCH */
 MANUAL_OP eq_i_ic {
   if (INT_REG(P1) == INT_REG(P2)) {
     RETURN(P3);
@@ -56,7 +56,7 @@ MANUAL_OP eq_i_ic {
   }
 }
 
-// NE Ix, Iy, NE_BRANCH, EQ_BRANCH
+/* NE Ix, Iy, NE_BRANCH, EQ_BRANCH */
 MANUAL_OP ne_i_ic {
   if (INT_REG(P1) != INT_REG(P2)) {
     RETURN(P3);
@@ -65,7 +65,7 @@ MANUAL_OP ne_i_ic {
   }
 }
 
-// LT Ix, Iy, LT_BRANCH, GE_BRANCH
+/* LT Ix, Iy, LT_BRANCH, GE_BRANCH */
 MANUAL_OP lt_i_ic {
   if (INT_REG(P1) < INT_REG(P2)) {
     RETURN(P3);
@@ -74,7 +74,7 @@ MANUAL_OP lt_i_ic {
   }
 }
 
-// LE Ix, Iy, LE_BRANCH, GT_BRANCH
+/* LE Ix, Iy, LE_BRANCH, GT_BRANCH */
 MANUAL_OP le_i_ic {
   if (INT_REG(P1) <= INT_REG(P2)) {
     RETURN(P3);
@@ -83,7 +83,7 @@ MANUAL_OP le_i_ic {
   }
 }
 
-// GT Ix, Iy, GT_BRANCH, LE_BRANCH
+/* GT Ix, Iy, GT_BRANCH, LE_BRANCH */
 MANUAL_OP gt_i_ic {
   if (INT_REG(P1) > INT_REG(P2)) {
     RETURN(P3);
@@ -92,7 +92,7 @@ MANUAL_OP gt_i_ic {
   }
 }
 
-// GE Ix, Iy, GE_BRANCH, LT_BRANCH
+/* GE Ix, Iy, GE_BRANCH, LT_BRANCH */
 MANUAL_OP ge_i_ic {
   if (INT_REG(P1) >= INT_REG(P2)) {
     RETURN(P3);
@@ -101,7 +101,7 @@ MANUAL_OP ge_i_ic {
   }
 }
 
-// IF IXx, TRUE_BRANCH, FALSE_BRANCH
+/* IF IXx, TRUE_BRANCH, FALSE_BRANCH */
 MANUAL_OP if_i_ic {
   if (INT_REG(P1)) {
     RETURN(P2);
@@ -110,81 +110,81 @@ MANUAL_OP if_i_ic {
   }
 }
 
-// TIME Ix
+/* TIME Ix */
 AUTO_OP time_i {
   INT_REG(P1) = time(NULL);
 }
 
-// PRINT Ix
+/* PRINT Ix */
 AUTO_OP print_i {
   printf("I reg %li is %li\n", P1, INT_REG(P1));
 }
  
-// BRANCH CONSTANT
+/* BRANCH CONSTANT */
 MANUAL_OP branch_ic {
   RETURN(P1);
 }
 
-// END
+/* END */
 MANUAL_OP end {
    RETURN(0);
 }
 
-// INC Ix
+/* INC Ix */
 AUTO_OP inc_i {
   INT_REG(P1)++;
 }
 
-// INC Ix, nnn
+/* INC Ix, nnn */
 AUTO_OP inc_i_ic {
   INT_REG(P1) += P2;
 }
 
-// DEC Ix
+/* DEC Ix */
 AUTO_OP dec_i {
   INT_REG(P1)--;
 }
 
-// DEC Ix, nnn
+/* DEC Ix, nnn */
 AUTO_OP dec_i_ic {
   INT_REG(P1) -= P2;
 }
 
-// JUMP Ix
+/* JUMP Ix */
 MANUAL_OP jump_i {
   RETURN(INT_REG(P1));
 }
 
-// SET Nx, CONSTANT
+/* SET Nx, CONSTANT */
 AUTO_OP set_n_nc {
   NUM_REG(P1) = P2;
 }
   
-// ADD Nx, Ny, Nz  
+/* ADD Nx, Ny, Nz   */
 AUTO_OP add_n {
   NUM_REG(P1) = NUM_REG(P2) +
                            NUM_REG(P3);
 }
 
-// SUB Nx, Ny, Iz  
+/* SUB Nx, Ny, Iz   */
 AUTO_OP sub_n {
   NUM_REG(P1) = NUM_REG(P2) -
                            NUM_REG(P3);
 }
 
-// MUL Nx, Ny, Iz  
+/* MUL Nx, Ny, Iz   */
 AUTO_OP mul_n {
   NUM_REG(P1) = NUM_REG(P2) *
                            NUM_REG(P3);
 }
 
-// DIV Nx, Ny, Iz  
+/* DIV Nx, Ny, Iz   */
 AUTO_OP div_n {
   NUM_REG(P1) = NUM_REG(P2) /
                            NUM_REG(P3);
 }
 
-// EQ Nx, Ny, EQ_BRANCH, NE_BRANCH
+/* EQ Nx, Ny, EQ_BRANCH, NE_BRANCH */
 MANUAL_OP eq_n_ic {
   if (NUM_REG(P1) == NUM_REG(P2)) {
     RETURN(P3);
@@ -193,7 +193,7 @@ MANUAL_OP eq_n_ic {
   }
 }
 
-// IF Nx, TRUE_BRANCH, FALSE_BRANCH
+/* IF Nx, TRUE_BRANCH, FALSE_BRANCH */
 MANUAL_OP if_n_ic {
   if (NUM_REG(P1)) {
     RETURN(P2);
@@ -202,369 +202,369 @@ MANUAL_OP if_n_ic {
   }
 }
 
-// TIME Nx
+/* TIME Nx */
 AUTO_OP time_n {
   NUM_REG(P1) = time(NULL);
 }
 
-// PRINT Nx
+/* PRINT Nx */
 AUTO_OP print_n {
   printf("N reg %li is %f\n", P1, NUM_REG(P1));
 }
  
-// INC Nx
+/* INC Nx */
 AUTO_OP inc_n {
   NUM_REG(P1) += 1;
 }
 
-// INC Nx, nnn
+/* INC Nx, nnn */
 AUTO_OP inc_n_nc {
   NUM_REG(P1) += P2;
 }
 
-// DEC Nx
+/* DEC Nx */
 AUTO_OP dec_n {
   NUM_REG(P1) -= 1;
 }
 
-// DEC Nx, nnn
+/* DEC Nx, nnn */
 AUTO_OP dec_n_nc {
   NUM_REG(P1) += P2;
 }
 
-// ITON Nx, Iy
+/* ITON Nx, Iy */
 AUTO_OP iton_n_i {
-//  IV number;
-//  number = INT_REG(P2);
+/*  IV number; */
+/*  number = INT_REG(P2); */
   NUM_REG(P1) = INT_REG(P2);
 }
 
-// NTOI Ix, Ny
+/* NTOI Ix, Ny */
 AUTO_OP ntoi_i_n {
   NV number;
   number = NUM_REG(P2);
   INT_REG(P1) = number;
 }
 
-// PUSH_I
+/* PUSH_I */
 AUTO_OP push_i {
   Parrot_push_i(interpreter);
 }
 
-// PUSH_N
+/* PUSH_N */
 AUTO_OP push_n {
   Parrot_push_n(interpreter);
 }
 
-// PUSH_S
+/* PUSH_S */
 AUTO_OP push_s {
   Parrot_push_s(interpreter);
 }
 
-// PUSH_P
+/* PUSH_P */
 AUTO_OP push_p {
   Parrot_push_p(interpreter);
 }
 
-// POP_I
+/* POP_I */
 AUTO_OP pop_i {
   Parrot_pop_i(interpreter);
 }
 
-// POP_N
+/* POP_N */
 AUTO_OP pop_n {
   Parrot_pop_n(interpreter);
 }
 
-// POP_S
+/* POP_S */
 AUTO_OP pop_s {
   Parrot_pop_s(interpreter);
 }
 
-// POP_P
+/* POP_P */
 AUTO_OP pop_p {
   Parrot_pop_p(interpreter);
 }
 
-// CLEAR_I
+/* CLEAR_I */
 AUTO_OP clear_i
   Parrot_clear_i(interpreter);
 }
 
-// CLEAR_N
+/* CLEAR_N */
 AUTO_OP clear_n {
   Parrot_clear_n(interpreter);
 }
 
-// CLEAR_S
+/* CLEAR_S */
 AUTO_OP clear_s {
   Parrot_clear_s(interpreter);
 }
 
-// CLEAR_P
+/* CLEAR_P */
 AUTO_OP clear_p {
   Parrot_clear_p(interpreter);
 }
 
-// SET Sx, CONSTANT
+/* SET Sx, CONSTANT */
 AUTO_OP set_s_sc {
   STR_REG(P1) = Parrot_string_constants[P2];
 }
 
-// PRINT Sx
+/* PRINT Sx */
 AUTO_OP print_s {
   STRING *s = STR_REG(P1); 
    printf("S reg %li is %.*s\n", P1, (int) string_length(s), (char *) s->bufstart);
 }
 
-// LEN Ix, Sx
+/* LEN Ix, Sx */
 AUTO_OP length_i_s {
   INT_REG(P1) = string_length(STR_REG(P2));
 }
 
-// CHOPN Sx, CONSTANT
+/* CHOPN Sx, CONSTANT */
 AUTO_OP chopn_s_ic {
    string_chopn(STR_REG(P1), P2);
 }
 
-// SUBSTR Sx, Sx, Ix, Ix
+/* SUBSTR Sx, Sx, Ix, Ix */
 AUTO_OP substr_s_s_i {
     STRING *s = string_substr(STR_REG(P2), INT_REG(P3), INT_REG(P4), &STR_REG(P1));
     STR_REG(P1) = s;
 }
 
-// NOOP
+/* NOOP */
 AUTO_OP noop {
 }
 
-// TRANSCENDENTAL MATH FUNCTIONS
+/* TRANSCENDENTAL MATH FUNCTIONS */
 
-// sin_n_n
+/* sin_n_n */
 AUTO_OP sin_n_n {
    NUM_REG(P1) = sin(NUM_REG(P2));
 }
 
-// cos_n_n
+/* cos_n_n */
 AUTO_OP cos_n_n {
    NUM_REG(P1) = cos(NUM_REG(P2));
 }
 
-// tan_n_n
+/* tan_n_n */
 AUTO_OP tan_n_n {
    NUM_REG(P1) = tan(NUM_REG(P2));
 }
 
-// sec_n_n
+/* sec_n_n */
 AUTO_OP sec_n_n {
    NUM_REG(P1) = ((NV)1) / cos(NUM_REG(P2));
 }
 
-// atan_n_n
+/* atan_n_n */
 AUTO_OP atan_n_n {
    NUM_REG(P1) = atan(NUM_REG(P2));
 }
 
-// atan2_n_n_n
+/* atan2_n_n_n */
 AUTO_OP atan2_n_n_n {
    NUM_REG(P1) = atan2(NUM_REG(P2), NUM_REG(P3));
 }
 
-// asin_n_n
+/* asin_n_n */
 AUTO_OP asin_n_n {
    NUM_REG(P1) = asin(NUM_REG(P2));
 }
 
-// acos_n_n
+/* acos_n_n */
 AUTO_OP acos_n_n {
    NUM_REG(P1) = acos(NUM_REG(P2));
 }
 
-// asec_n_n
+/* asec_n_n */
 AUTO_OP asec_n_n {
    NUM_REG(P1) = acos(((NV)1) / NUM_REG(P2));
 }
 
-// cosh_n_n
+/* cosh_n_n */
 AUTO_OP cosh_n_n {
    NUM_REG(P1) = cosh(NUM_REG(P2));
 }
 
-// sinh_n_n
+/* sinh_n_n */
 AUTO_OP sinh_n_n {
    NUM_REG(P1) = sinh(NUM_REG(P2));
 }
 
-// tanh_n_n
+/* tanh_n_n */
 AUTO_OP tanh_n_n {
    NUM_REG(P1) = tanh(NUM_REG(P2));
 }
 
-// sech_n_n
+/* sech_n_n */
 AUTO_OP sech_n_n {
    NUM_REG(P1) = ((NV)1) / cosh(NUM_REG(P2));
 }
 
-// log2_n_n
+/* log2_n_n */
 AUTO_OP log2_n_n {
    NUM_REG(P1) = log(NUM_REG(P2)) / log((NV)2);
 }
 
-// log10_n_n
+/* log10_n_n */
 AUTO_OP log10_n_n {
    NUM_REG(P1) = log10(NUM_REG(P2));
 }
 
-// ln_n_n
+/* ln_n_n */
 AUTO_OP ln_n_n {
    NUM_REG(P1) = log(NUM_REG(P2));
 }
 
-// exp_n_n
+/* exp_n_n */
 AUTO_OP exp_n_n {
    NUM_REG(P1) = exp(NUM_REG(P2));
 }
 
-// pow_n_n_n
+/* pow_n_n_n */
 AUTO_OP pow_n_n_n {
    NUM_REG(P1) = pow(NUM_REG(P2), NUM_REG(P3));
 }
 
-// sin_n_i
+/* sin_n_i */
 AUTO_OP sin_n_i {
    NUM_REG(P1) = sin(INT_REG(P2));
 }
 
-// cos_n_i
+/* cos_n_i */
 AUTO_OP cos_n_i {
    NUM_REG(P1) = cos(INT_REG(P2));
 }
 
-// tan_n_i
+/* tan_n_i */
 AUTO_OP tan_n_i {
    NUM_REG(P1) = tan(INT_REG(P2));
 }
 
-// sec_n_i
+/* sec_n_i */
 AUTO_OP sec_n_i {
    NUM_REG(P1) = ((NV)1) / cos(INT_REG(P2));
 }
 
-// atan_n_i
+/* atan_n_i */
 AUTO_OP atan_n_i {
    NUM_REG(P1) = atan(INT_REG(P2));
 }
 
-// atan2_n_n_i
+/* atan2_n_n_i */
 AUTO_OP atan2_n_n_i {
    NUM_REG(P1) = atan2(NUM_REG(P2), INT_REG(P3));
 }
 
-// atan2_n_i_n
+/* atan2_n_i_n */
 AUTO_OP atan2_n_i_n {
    NUM_REG(P1) = atan2(INT_REG(P2), NUM_REG(P3));
 }
 
-// atan2_n_i_i
+/* atan2_n_i_i */
 AUTO_OP atan2_n_i_i {
    NUM_REG(P1) = atan2(INT_REG(P2), INT_REG(P3));
 }
 
-// asin_n_i
+/* asin_n_i */
 AUTO_OP asin_n_i {
    NUM_REG(P1) = asin(INT_REG(P2));
 }
 
-// acos_n_i
+/* acos_n_i */
 AUTO_OP acos_n_i {
    NUM_REG(P1) = acos(INT_REG(P2));
 }
 
-// asec_n_i
+/* asec_n_i */
 AUTO_OP asec_n_i {
    NUM_REG(P1) = acos(((NV)1) / ((NV)INT_REG(P2)));
 }
 
-// cosh_n_i
+/* cosh_n_i */
 AUTO_OP cosh_n_i {
    NUM_REG(P1) = cosh(INT_REG(P2));
 }
 
-// sinh_n_i
+/* sinh_n_i */
 AUTO_OP sinh_n_i {
    NUM_REG(P1) = sinh(INT_REG(P2));
 }
 
-// tanh_n_i
+/* tanh_n_i */
 AUTO_OP tanh_n_i {
    NUM_REG(P1) = tanh(INT_REG(P2));
 }
 
-// sech_n_i
+/* sech_n_i */
 AUTO_OP sech_n_i {
    NUM_REG(P1) = ((NV)1) / cosh(INT_REG(P2));
 }
 
-// log2_n_i
+/* log2_n_i */
 AUTO_OP log2_n_i {
    NUM_REG(P1) = log(INT_REG(P2)) / log((NV)2);
 }
 
-// log10_n_i
+/* log10_n_i */
 AUTO_OP log10_n_i {
    NUM_REG(P1) = log10(INT_REG(P2));
 }
 
-// ln_n_i
+/* ln_n_i */
 AUTO_OP ln_n_i {
    NUM_REG(P1) = log(INT_REG(P2));
 }
 
-// exp_n_i
+/* exp_n_i */
 AUTO_OP exp_n_i {
    NUM_REG(P1) = exp(INT_REG(P2));
 }
 
-// pow_n_n_i
+/* pow_n_n_i */
 AUTO_OP pow_n_n_i {
    NUM_REG(P1) = pow(NUM_REG(P2), INT_REG(P3));
 }
 
-// pow_n_i_i
+/* pow_n_i_i */
 AUTO_OP pow_n_i_i {
    NUM_REG(P1) = pow(INT_REG(P2), INT_REG(P3));
 }
 
-// pow_n_n_i
+/* pow_n_n_i */
 AUTO_OP pow_n_i_n {
    NUM_REG(P1) = pow(INT_REG(P2), NUM_REG(P3));
 }
 
-// AND_i
+/* AND_i */
 AUTO_OP and_i {
   INT_REG(P1) = INT_REG(P2) & INT_REG(P3);
 }
 
-// NOT_i
+/* NOT_i */
 AUTO_OP not_i {
   INT_REG(P1) = ! INT_REG(P2);
 }
 
-// OR_i
+/* OR_i */
 AUTO_OP or_i {
   INT_REG(P1) = INT_REG(P2) | INT_REG(P3);
 }
 
-// SHL_i_ic
+/* SHL_i_ic */
 AUTO_OP shl_i_ic {
   INT_REG(P1) = INT_REG(P2) << P3;
 }
 
-// SHR_i_ic
+/* SHR_i_ic */
 AUTO_OP shr_i_ic {
   INT_REG(P1) = INT_REG(P2) >> P3;
 }
 
-// XOR_i
+/* XOR_i */
 AUTO_OP xor_i {
   INT_REG(P1) = INT_REG(P2) ^ INT_REG(P3);
 }

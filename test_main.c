@@ -6,17 +6,17 @@
 
 #include "parrot.h"
 
-IV opcodes[] = {3, 1,                // put the time in reg 1
-                0, 2, 0,             // Set reg 2 to 0
-		0, 3, 1,             // set reg 3 to 1
-		0, 4, 100000000,     // set reg 4 to 100M 
-                2, 2, 4, 11, 5,      // is reg 2 eq to reg 4?
-		1, 2, 2, 3,          // Add register 2 to 3, store in 2
-		5, -9,               // branch back to if
-		3, 5,                // Put the time in reg 5
-		4, 1,                // Print reg 1
-		4, 5,                // Print reg 5
-		6                    // exit
+IV opcodes[] = {3, 1,                /* put the time in reg 1 */
+                0, 2, 0,             /* Set reg 2 to 0 */
+		0, 3, 1,             /* set reg 3 to 1 */
+		0, 4, 100000000,     /* set reg 4 to 100M  */
+                2, 2, 4, 11, 5,      /* is reg 2 eq to reg 4? */
+		1, 2, 2, 3,          /* Add register 2 to 3, store in 2 */
+		5, -9,               /* branch back to if */
+		3, 5,                /* Put the time in reg 5 */
+		4, 1,                /* Print reg 1 */
+		4, 5,                /* Print reg 5 */
+		6                    /* exit */
                 };
 
 int main(int argc, char **argv) {

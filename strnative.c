@@ -55,12 +55,13 @@ string_native_substr(STRING* src, IV offset, IV length, STRING* dest)
 
 STRING_VTABLE 
 string_native_vtable (void) {
-    return (STRING_VTABLE) {
+    STRING_VTABLE sv = {
 	enc_native,
-	    string_native_compute_strlen,
-	    string_native_max_bytes,
-	    string_native_concat,
-	    string_native_chopn,
-	    string_native_substr,
-	    };
+	string_native_compute_strlen,
+	string_native_max_bytes,
+	string_native_concat,
+	string_native_chopn,
+	string_native_substr,
+    };
+    return sv;
 }

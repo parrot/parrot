@@ -17,7 +17,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-//#include <types.h>
+/*#include <types.h> */
 #include <time.h>
 #include <unistd.h>
 #include <sys/mman.h>
