@@ -416,6 +416,17 @@ use Parrot::Types; # For pack_op()
 use Parrot::OpLib::core;
 use Parrot::Config;
 
+my $reg_re = qr([INPS]\d+);
+my $bin_re = qr([-+]?0[bB][01]+);
+my $dec_re = qr([-+]?\d+);
+my $hex_re = qr([-+]?0[xX][0-9a-fA-F]+);
+my $flt_re = qr{[-+]?\d+ (?:(?:\.\d+(?:[eE][-+]?\d+)?)
+                          | (?:[Ee][+-]?\d+))}x;
+my $str_re = qr(\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
+                \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
+                )x;
+my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
+
 =head2 Assembler class
 
 =item new
@@ -574,7 +585,7 @@ sub _generate_bytecode {
           $_->[1] =~ /(\d+)/;
           $self->{bytecode} .= pack_op($1);
         }
-        elsif ($_->[0] =~ /^([spn])c$/) { # String/num/PMC constant
+        elsif ($_->[0] =~ /^([snpk])c$/) { # String/Num/PMC/Key constant
           $self->{bytecode} .= pack_op($_->[1]);
         }
         elsif ($_->[0] eq "ic") {          # Integer constant
@@ -633,8 +644,8 @@ sub _adjust_labels {
 Unescape special characters in the constant and add them to not one but two
 data structures. C<$self->{constants}{s}> is for fast lookup when time comes
 to substitute constants for their indices, and C<$self->{ordered_constants}>
-keeps track of numeric and string constants in order of occurrence, so they
-can be packed directly into the binary format.
+keeps track of constants in order of occurrence, so they can be packed
+directly into the binary format.
 
 =cut
 
@@ -658,8 +669,8 @@ sub _string_constant {
 Take the numeric constant and place it into both C<$self->{constants}{n}> and
 C<$self->{ordered_constants}>. The first hash lets us do fast lookup when time
 comes to replace a constant with its value. The second array maintains the
-various string and numeric constants in order of first occurrence, and is ready
-to pack into the bytecode.
+various constants in order of first occurrence, and is ready to pack into
+the bytecode.
 
 =cut
 
@@ -673,29 +684,60 @@ sub _numeric_constant {
   return ['nc',$self->{constants}{n}{$constant}];
 }
 
-=item _to_keyed
+=item _key_constant
 
-Convert the operator to a keyed operator. Admittedly it's not much of a
-transformation, but it's a way to mark the code.
-
-=cut
-
-sub _to_keyed {
-  my $operator = shift;
-  return if $operator->[0][0] =~ /^[a-zA-Z]+_keyed/;
-  $operator->[0][0] =~ s/^([a-zA-Z]+)/${1}_keyed/;
-}
-
-=item _to_keyed_integer
-
-Convert the operator to a keyed operator
+Build a key constant and place it into both C<$self->{constants}{n}> and
+C<$self->{ordered_constants}>. The first hash lets us do fast lookup when time
+comes to replace a constant with its value. The second array maintains the
+various constants in order of first occurrence, and is ready to pack into
+the bytecode.
 
 =cut
 
-sub _to_keyed_integer {
-  my $operator = shift;
-  return if $operator->[0][0] =~ /^[a-zA-Z]+_keyed_integer/;
-  $operator->[0][0] =~ s/^([a-zA-Z]+)/${1}_keyed_integer/;
+sub _key_constant {
+  my ($self,$constant) = @_;
+
+  $constant .= ";";
+
+  my @keys;
+
+  while ($constant)
+  {
+    if ($constant =~ s/^($bin_re);//) {
+      my $val = $1; $val =~ s/0b//;
+      push(@keys, 1, (strtol($val,2))[0]);
+    }
+    elsif ($constant =~ s/^($hex_re);//) {
+      my $val = $1; $val =~ s/0x//;
+      push(@keys, 1, (strtol($val,16))[0]);
+    }
+    elsif ($constant =~ s/^($dec_re);//) {
+      push(@keys, 1, 0+$1);
+    }
+    elsif ($constant =~ s/^($flt_re);//) {
+      push(@keys, 2, $self->_numeric_constant($1)->[1]);
+    }
+    elsif ($constant =~ s/^($str_re);//) {
+      push(@keys, 4, $self->_string_constant($1)->[1]);
+    }
+    elsif ($constant =~ s/^($reg_re);//) {
+      my $type = lc(substr($1,0,1));
+      $type =~ tr/inps/0123/;
+      push(@keys, 7 + $type, substr($1,1));
+    }
+    else {
+      print STDERR "Couldn't parse key '$constant'.\n";
+      last;
+    }
+  }
+
+  $constant = join(";", @keys);
+
+  unless(defined $self->{constants}{k}{$constant}) {
+    $self->{constants}{k}{$constant} = $self->{num_constants}++;
+    push @{$self->{ordered_constants}},['K',$constant];
+  }
+  return ['kc',$self->{constants}{k}{$constant}];
 }
 
 =item constant_table
@@ -749,6 +791,23 @@ sub constant_table {
             $const .= pack($packtype,$PConfig{numvalsize});
             # The number if self.
             $const .= pack($PConfig{'packtype_n'},$_->[1]);
+        }
+        # if it's a key constant.
+        elsif ($_->[0] eq 'K') {
+            my @values = split(/;/, $_->[1]);
+            my $values = @values;
+            # The size of the whole constant;
+            $constl += 3 * $wordsize + $values * $wordsize;
+            # Constant type, K
+            $const .= pack($packtype,0x6b);
+            # Size of the packed key.
+            $const .= pack($packtype,$wordsize + $values * $wordsize);
+            # Number of key components
+            $const .= pack($packtype,$values / 2);
+            # The key atoms themselves as type and value pairs.
+            for(@values) {
+                $const .= pack($packtype,$_);
+            }
         }
     }
 
@@ -905,74 +964,43 @@ sub to_bytecode {
         $suffixes .= "_".lc(substr($1,0,1));
         push @{$_->[0]}, [lc(substr($1,0,1)),$1];
       }
-      #
-      # XXX '[k]' should be the result of one or more chained '[k;I3]' type
-      # XXX arguments. '[k;I3;N0]' gets transformed to '[k;N0]', then just '[k]'
-      #
-      elsif($temp=~s/^\[k\]//) {
-      }
-      #
-      # XXX Nip off the first keyed register and replace the '[k' at the start
-      # XXX of the string, so we can nip off another argument.
-      #
-      elsif($temp=~s/^\[k;($reg_re)/\[k/o) {
+      elsif($temp=~s/^\[(P\d+)\]//) { # P1[P0]
         my $reg_idx = substr($1,1);
         unless($reg_idx >= 0 and $reg_idx <= 31) {
           print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
           last;
         }
         $suffixes .= "_k";
-        _to_keyed($_);
-        push @{$_->[0]}, ['k',$1];
+        push @{$_->[0]}, ['p',$1];
       }
-      elsif($temp=~s/^\[(S\d+)\]//) { # The only key register should be Sn
+      elsif($temp=~s/^\[(I\d+)\]//) { # P2[I1]
         my $reg_idx = substr($1,1);
         unless($reg_idx >= 0 and $reg_idx <= 31) {
           print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
           last;
         }
-        $suffixes .= "_s";
-        _to_keyed($_);
-        push @{$_->[0]}, ['s',$1];
-      }
-      elsif($temp=~s/^\[(I\d+)\]//) { # The only key register should be Sn
-        my $reg_idx = substr($1,1);
-        unless($reg_idx >= 0 and $reg_idx <= 31) {
-          print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
-          last;
-        }
-        $suffixes .= "_k";
-        _to_keyed_integer($_);
-        push @{$_->[0]}, ['s',$1];
-      }
-      elsif($temp=~s/^($flt_re)//o) {
-        $suffixes .= "_nc";
-        push @{$_->[0]}, $self->_numeric_constant($1);
-      }
-      elsif($temp=~s/^\[($str_re)\]//o) {
-        $suffixes .= "_sc";
-        _to_keyed($_);
-        push @{$_->[0]}, $self->_string_constant($1);
+        $suffixes .= "_ki";
+        push @{$_->[0]}, ['i',$1];
       }
       elsif($temp=~s/^\[($bin_re)\]//o) { # P3[0b11101]
         my $val = $1;$val=~s/0b//;
-        $suffixes .= "_ic";
-        _to_keyed_integer($_);
+        $suffixes .= "_kic";
         push @{$_->[0]}, ['ic',(strtol($val,2))[0]];
       }
-      elsif($temp=~s/^\[($hex_re)\]//o) { # P7[0x1234]
-        $suffixes .= "_ic";
-        _to_keyed_integer($_);
+      elsif($temp=~s/^\[($hex_re)\]//) { # P7[0x1234]
+        $suffixes .= "_kic";
         push @{$_->[0]}, ['ic',(strtol($1,16))[0]];
       }
-      elsif($temp=~s/^\[($dec_re)\]//o) { # P14[3]
-        $suffixes .= "_ic";
-        _to_keyed_integer($_);
+      elsif($temp=~s/^\[($dec_re)\]//) { # P14[3]
+        $suffixes .= "_kic";
         push @{$_->[0]}, ['ic',0+$1];
       }
-      elsif($temp=~s/^\[($flt_re)\]//o) {
+      elsif($temp=~s/^\[([^]]+)\]//) { # P18[3;2]
+        $suffixes .= "_kc";
+        push @{$_->[0]}, $self->_key_constant($1);
+      }
+      elsif($temp=~s/^($flt_re)//) {
         $suffixes .= "_nc";
-	_to_keyed($_);
         push @{$_->[0]}, $self->_numeric_constant($1);
       }
       elsif($temp=~s/^($bin_re)//o) {     # 0b1101

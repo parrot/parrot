@@ -94,37 +94,6 @@ hey
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "keys of different types");
-        new P0, .PerlArray
-        set P0[5.0], 3
-        set I0, P0
-        bsr PRINT
-        set P0["10"], 6
-        set I0, P0
-        bsr PRINT
-        set P0[15], 9
-        set I0, P0
-        bsr PRINT
-        set I0, P0[5]
-        bsr PRINT
-        set I0, P0[10]
-        bsr PRINT
-        set I0, P0[15]
-        bsr PRINT
-        end
-PRINT:
-        print I0
-        print "\n"
-        ret
-CODE
-6
-11
-16
-3
-6
-9
-OUTPUT
-
 output_is(<<'CODE', <<'OUTPUT', "If P");
         new P0, .PerlArray
         if P0, TR
@@ -480,183 +449,6 @@ OK_16: print "ok 16\n"
        print "not "
 OK_17: print "ok 17\n"
 
-#---------------------------------------------
-#
-# String constant
-#
-       #
-       # Set index zero to 7
-       #
-       set   P0["bar"], 7
-
-       #
-       # Make sure the length is 1
-       #
-       set   I0, P0
-       eq    I0, 1, OK_18
-       print "not "
-OK_18: print "ok 18\n"
-
-       #
-       # Make sure index zero is indeed 7
-       #
-       set   I0, P0["bar"]
-       eq    I0, 7, OK_19
-       print "not "
-OK_19: print "ok 19\n"
-
-       #
-       # Set index zero to -15
-       #
-       set   P0["bar"], -15
-
-       #
-       # Make sure the length is 1
-       #
-       set   I0, P0
-       eq    I0, 1, OK_20
-       print "not "
-OK_20: print "ok 20\n"
-
-       #
-       # Make sure index zero is indeed 7
-       #
-       set   I0, P0["bar"]
-       eq    I0, -15, OK_21
-       print "not "
-OK_21: print "ok 21\n"
-
-       #
-       # Set index zero to 3.7
-       #
-       set   P0["bar"], 3.7
- 
-       #
-       # Make sure the length is 1
-       #
-       set   I0, P0
-       eq    I0, 1, OK_22
-       print "not "
-OK_22: print "ok 22\n"
-
-       #
-       # Make sure index zero is indeed 3.7
-       #
-       set   N0, P0["bar"]
-       eq    N0, 3.700000, OK_23
-       print "not "
-OK_23: print "ok 23\n"
-
-       #
-       # Set index zero to "foo"
-       #
-       set   P0["bar"], "foo"
- 
-       #
-       # Make sure the length is 1
-       #
-       set   I0, P0
-       eq    I0, 1, OK_24
-       print "not "
-OK_24: print "ok 24\n"
-
-       #
-       # Make sure index zero is indeed "bar"
-       #
-       set   S0, P0["bar"]
-       eq    S0, "foo", OK_25
-       print "not "
-OK_25: print "ok 25\n"
-
-#---------------------------------------------
-#
-# String register
-#
-       set S31,"qux"
-       #
-       # Set index zero to 7
-       #
-       set   P0[S31], 7
-
-       #
-       # Make sure the length is 1
-       #
-       set   I0, P0
-       eq    I0, 1, OK_26
-       print "not "
-OK_26: print "ok 26\n"
-
-       #
-       # Make sure index zero is indeed 7
-       #
-       set   I0, P0[S31]
-       eq    I0, 7, OK_27
-       print "not "
-OK_27: print "ok 27\n"
-
-       #
-       # Set index zero to -15
-       #
-       set   P0[S31], -15
-
-       #
-       # Make sure the length is 1
-       #
-       set   I0, P0
-       eq    I0, 1, OK_28
-       print "not "
-OK_28: print "ok 28\n"
-
-       #
-       # Make sure index zero is indeed 7
-       #
-       set   I0, P0[S31]
-       eq    I0, -15, OK_29
-       print "not "
-OK_29: print "ok 29\n"
-
-       #
-       # Set index zero to 3.7
-       #
-       set   P0[S31], 3.7
- 
-       #
-       # Make sure the length is 1
-       #
-       set   I0, P0
-       eq    I0, 1, OK_30
-       print "not "
-OK_30: print "ok 30\n"
-
-       #
-       # Make sure index zero is indeed 3.7
-       #
-       set   N0, P0[S31]
-       eq    N0, 3.700000, OK_31
-       print "not "
-OK_31: print "ok 31\n"
-
-       #
-       # Set index zero to "foo"
-       #
-       set   P0[S31], "foo"
- 
-       #
-       # Make sure the length is 1
-       #
-       set   I0, P0
-       eq    I0, 1, OK_32
-       print "not "
-OK_32: print "ok 32\n"
-
-       #
-       # Make sure index zero is indeed "bar"
-       #
-       set   S0, P0[S31]
-       eq    S0, "foo", OK_33
-       print "not "
-OK_33: print "ok 33\n"
-
        end
 CODE
 ok 1
@@ -676,22 +468,6 @@ ok 14
 ok 15
 ok 16
 ok 17
-ok 18
-ok 19
-ok 20
-ok 21
-ok 22
-ok 23
-ok 24
-ok 25
-ok 26
-ok 27
-ok 28
-ok 29
-ok 30
-ok 31
-ok 32
-ok 33
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PerlArray integer access, two locations");
@@ -1001,6 +777,65 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Testing multi-level fetch");
+    new P0, .PerlArray
+    new P1, .PerlArray
+    set P1[0], "0;0"
+    set P1[1], "0;1"
+    set P0[0], P1
+    new P1, .PerlArray
+    set P1[0], "1;0"
+    set P1[1], "1;1"
+    set P0[1], P1
+    set S0, P0[0;0]
+    print S0
+    print "\n"
+    set S0, P0[0;1]
+    print S0
+    print "\n"
+    set S0, P0[1;0]
+    print S0
+    print "\n"
+    set S0, P0[1;1]
+    print S0
+    print "\n"
+    set I0, 0
+loop1:
+    set S0, P0[I0;0]
+    print S0
+    print "\n"
+    set S0, P0[I0;1]
+    print S0
+    print "\n"
+    inc I0
+    lt I0, 2, loop1
+    set I0, 0
+    set I1, 0
+loop2:
+    set S0, P0[I0;I1]
+    print S0
+    print "\n"
+    inc I1
+    lt I1, 2, loop2
+    set I1, 0
+    inc I0
+    lt I0, 2, loop2
+    end
+CODE
+0;0
+0;1
+1;0
+1;1
+0;0
+0;1
+1;0
+1;1
+0;0
+0;1
+1;0
+1;1
 OUTPUT
 
 1;

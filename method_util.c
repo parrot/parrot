@@ -99,19 +99,20 @@ Parrot_push_proto(struct Parrot_Interp * interp,
 void
 Parrot_init_stash(struct Parrot_Interp * interp, struct method_rec_t * recp,
                   struct Stash * stash) {
-    KEY k;
+    PMC * k;
     PMC * hash = stash->stash_hash;
 
     if (hash != NULL)
         return;
 
+    k = key_new(interp);
     stash->stash_hash = hash = pmc_new(interp, enum_class_PerlHash);
     while (recp->name != NULL) {
         PMC * csub = Parrot_new_csub(interp, recp->sub);
         STRING * name = string_make(interp, recp->name, strlen(recp->name),
                                     NULL, 0, NULL);
-        MAKE_KEY_STRING(k, name);
-        hash->vtable->set_pmc_keyed(interp, hash, NULL, csub, &k);
+        key_set_string(interp, k, name);
+        hash->vtable->set_pmc_keyed(interp, hash, NULL, csub, k);
         ++recp;
     }
 }
@@ -121,7 +122,7 @@ Parrot_init_stash(struct Parrot_Interp * interp, struct method_rec_t * recp,
  */
 PMC *
 Parrot_find_method(struct Parrot_Interp * interp, struct Stash * stash,
-                   KEY * key) {
+                   PMC * key) {
     while (stash) {
         PMC * meth = stash->stash_hash->vtable
             ->get_pmc_keyed(interp, stash->stash_hash, key);

@@ -170,7 +170,9 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
          * their data pointer that we need to trace */
         if (bits) {
             if (bits == PMC_is_PMC_ptr_FLAG) {
-                last = mark_used(current->data, last);
+                if (current->data) {
+                    last = mark_used(current->data, last);
+                }
             }
             else if (bits == PMC_is_buffer_ptr_FLAG) {
                 if (current->data) {

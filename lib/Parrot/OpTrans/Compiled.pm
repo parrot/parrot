@@ -119,13 +119,15 @@ my %arg_maps = (
   'n'  => "interpreter->ctx.num_reg.registers[%ld]",
   'p'  => "interpreter->ctx.pmc_reg.registers[%ld]",
   's'  => "interpreter->ctx.string_reg.registers[%ld]",
-  'k'  => "interpreter->ctx.int_reg.registers[%ld]",
+  'k'  => "interpreter->ctx.pmc_reg.registers[%ld]",
+  'ki'  => "interpreter->ctx.int_reg.registers[%ld]",
 
   'ic' => "%ld",
   'nc' => "interpreter->code->const_table->constants[%ld]->number",
   'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
   'sc' => "interpreter->code->const_table->constants[%ld]->string",
-  'kc' => "interpreter->code->const_table->constants[%ld]->string",
+  'kc' => "interpreter->code->const_table->constants[%ld]->key",
+  'kic' => "%ld",
 );
 
 sub access_arg

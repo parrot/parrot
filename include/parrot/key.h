@@ -13,50 +13,43 @@
 #if !defined(PARROT_KEY_H_GUARD)
 #define PARROT_KEY_H_GUARD
 
+#include "parrot/parrot.h"
+
 typedef enum {
-    enum_key_undef,
-    enum_key_int,
-    enum_key_num,
-    enum_key_string,
-    enum_key_pmc,
-    enum_key_max
-} KEY_TYPE;
+    KEY_integer_FLAG = PMC_private0_FLAG,
+    KEY_number_FLAG = PMC_private1_FLAG,
+    KEY_string_FLAG = PMC_private2_FLAG,
+    KEY_pmc_FLAG = PMC_private3_FLAG,
+    KEY_register_FLAG = PMC_private4_FLAG,
 
-typedef struct _key_atom KEY_ATOM;
+    KEY_type_FLAGS = KEY_integer_FLAG |
+                     KEY_number_FLAG |
+                     KEY_string_FLAG |
+                     KEY_pmc_FLAG |
+                     KEY_register_FLAG
+} KEY_flags;
 
-struct _key_atom {
-    KEY_TYPE type;
-    UnionVal val;
-};
+PMC *key_new(struct Parrot_Interp *interpreter);
+PMC *key_new_integer(struct Parrot_Interp *interpreter, INTVAL value);
+PMC *key_new_number(struct Parrot_Interp *interpreter, FLOATVAL value);
+PMC *key_new_string(struct Parrot_Interp *interpreter, STRING *value);
+PMC *key_new_pmc(struct Parrot_Interp *interpreter, PMC *value);
 
-typedef struct _key KEY;
+void key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value);
+void key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value);
+void key_set_string(struct Parrot_Interp *interpreter, PMC *key, STRING *value);
+void key_set_pmc(struct Parrot_Interp *interpreter, PMC *key, PMC *value);
 
-struct _key {
-    KEY_ATOM atom;
-    KEY *next;
-};
+INTVAL key_type(struct Parrot_Interp *interpreter, PMC *key);
+INTVAL key_integer(struct Parrot_Interp *interpreter, PMC *key);
+FLOATVAL key_number(struct Parrot_Interp *interpreter, PMC *key);
+STRING *key_string(struct Parrot_Interp *interpreter, PMC *key);
+PMC *key_pmc(struct Parrot_Interp *interpreter, PMC *key);
+PMC *key_next(struct Parrot_Interp *interpreter, PMC *key);
 
-KEY *key_new(Interp *);
-KEY *key_clone(Interp *, KEY *);
+PMC *key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2);
 
-/* This (now even more) convoluted mess avoids costly runtime creation
- * of KEY structures
- *
- * Usage: MAKE_KEY(KEY k, (INTVAL|FLOATVAL|DPOINTER*|STRING*|PMC*) v,
- *                 KEY_TYPE c, (int_val|num_val|struct_val|string_val|pmc_val)); 
- * or:
- * MAKE_KEY_INT(KEY k, INTVAL v);
- * MAKE_KEY_STRING(KEY k, STRING *v);
- * MAKE_KEY_UNDEF(KEY k);
- * etc
- */
-
-#define MAKE_KEY(k,v,c,t) {k.atom.type = c; k.atom.val.t = v; k.next = NULL;}
-#define MAKE_KEY_UNDEF(k) {k.atom.type = enum_key_undef; k.atom.val.struct_val = NULL; k.next = NULL;}
-#define MAKE_KEY_INT(k,v) {k.atom.type = enum_key_int; k.atom.val.int_val = v; k.next = NULL;}
-#define MAKE_KEY_NUM(k,v) {k.atom.type = enum_key_num; k.atom.val.num_val = v; k.next = NULL;}
-#define MAKE_KEY_STRING(k,v) {k.atom.type = enum_key_string; k.atom.val.struct_val = v; k.next = NULL;}
-#define MAKE_KEY_PMC(k,v) {k.atom.type = enum_key_pmc; k.atom.val.pmc_val = v; k.next = NULL;}
+PMC *key_mark(struct Parrot_Interp *interpreter, PMC *key, PMC *end_of_used_list);
 
 #endif
 

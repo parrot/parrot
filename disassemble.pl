@@ -23,6 +23,7 @@ use Parrot::Types;
 use Parrot::PackFile;
 use Parrot::PackFile::ConstTable;
 use Parrot::String;
+use Parrot::Key;
 
 use Data::Dumper;
 $Data::Dumper::Useqq  = 1;
@@ -101,6 +102,8 @@ sub dump_const_table {
 
       if ($type eq 'PFC_STRING') {
         $value = Dumper($_->value->data);
+      } elsif ($type eq 'PFC_KEY') {
+        $value = $_->value->dump($pf->const_table);
       } else {
         $value = Dumper($_->value);
       }
@@ -123,11 +126,15 @@ my %rtype_map = (
   "n" => "N",
   "p" => "P",
   "s" => "S",
+  "k" => "K",
+  "ki" => "KI",
 
   "ic" => "i",
   "nc" => "n",
   "pc" => "p",
   "sc" => "s",
+  "kc" => "k",
+  "kic" => "ki",
 );
 
 sub disassemble_byte_code {
@@ -197,10 +204,18 @@ sub disassemble_byte_code {
                     $pasm{$dest}[0] = "L" . $label_counter++;
                 }
 		push @{$pasm{$op_start}[3]}, $pasm{$dest}[0];
+	    } elsif($type eq "K") { # key
+		push @{$pasm{$op_start}[3]}, sprintf("[P$arg]");
+	    } elsif($type eq "KI") { # integer key
+		push @{$pasm{$op_start}[3]}, sprintf("[I$arg]");
 	    } elsif($type eq "n") { # number constant
 		push @{$pasm{$op_start}[3]}, sprintf("[nc:$arg]");
 	    } elsif($type eq "s") { # string constant
 		push @{$pasm{$op_start}[3]}, sprintf("[sc:$arg]");
+	    } elsif($type eq "k") { # key constant
+		push @{$pasm{$op_start}[3]}, sprintf("[kc:$arg]");
+	    } elsif($type eq "ki") { # integer key constant
+		push @{$pasm{$op_start}[3]}, sprintf("[$arg]");
 	    } else { # constant
 		push @{$pasm{$op_start}[3]}, $arg;
 	    }

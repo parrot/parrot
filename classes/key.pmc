@@ -1,0 +1,72 @@
+/* key.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info $Id$
+ *  Overview:
+ *     These are the vtable functions for the default PMC class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass Key {
+
+    void init () {
+        SELF->flags |= PMC_custom_mark_FLAG;
+    }
+
+    PMC* mark (PMC* end_of_used_list) {
+        return key_mark(INTERP, SELF, end_of_used_list);
+    }
+
+    STRING* name () {
+        return whoami;
+    }
+
+    INTVAL get_integer () {
+        return key_integer(INTERP, SELF);
+    }
+
+    FLOATVAL get_number () {
+        return key_number(INTERP, SELF);
+    }
+
+    STRING* get_string () {
+        return key_string(INTERP, SELF);
+    }
+
+    PMC* get_pmc () {
+        return key_pmc(INTERP, SELF);
+    }
+
+    void set_integer (PMC* value) {
+        key_set_integer(INTERP, SELF, value->vtable->get_integer(INTERP, value));
+    }
+
+    void set_integer_native (INTVAL value) {
+        key_set_integer(INTERP, SELF, value);
+    }
+
+    void set_number (PMC* value) {
+        key_set_number(INTERP, SELF, value->vtable->get_number(INTERP, value));
+    }
+
+    void set_number_native (FLOATVAL value) {
+        key_set_number(INTERP, SELF, value);
+    }
+
+    void set_string (PMC* value) {
+        key_set_string(INTERP, SELF, value->vtable->get_string(INTERP, value));
+    }
+
+    void set_string_native (STRING* value) {
+        key_set_string(INTERP, SELF, value);
+    }
+
+    void set_pmc (PMC* value) {
+        key_set_pmc(INTERP, SELF, value);
+    }
+    
+}

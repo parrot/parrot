@@ -6,7 +6,7 @@
  *  Data Structure and Algorithms:
  *     A hashtable contains an array of bucket indexes. Buckets
  *     are nodes in a linked list, each containing a STRING key and
- *     a value. The value is currently stored as a KEY_ATOM, which
+ *     a value. The value is currently stored as a HASH_ENTRY, which
  *     maybe makes sense for some hashes but probably doesn't for what
  *     they're currently used for, which is PerlHashes (since those
  *     should probably just be hashes of STRINGs mapping to PMCs.)
@@ -46,7 +46,7 @@ const HashIndex NULLHashIndex = (HashIndex) -1;
 
 struct _hashbucket {
     STRING *key;
-    KEY_ATOM value;
+    HASH_ENTRY value;
     BucketIndex next;
 };
 
@@ -144,9 +144,9 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
         HASHBUCKET *bucket = lookupBucket(hash, i);
         while (bucket) {
             buffer_lives((Buffer *)bucket->key);
-            if (bucket->value.type == enum_key_string)
+            if (bucket->value.type == enum_hash_string)
                 buffer_lives((Buffer *)bucket->value.val.string_val);
-            else if (bucket->value.type == enum_key_pmc)
+            else if (bucket->value.type == enum_hash_pmc)
                 end_of_used_list = mark_used(bucket->value.val.pmc_val,
                                              end_of_used_list);
             bucket = getBucket(hash, bucket->next);
@@ -243,7 +243,7 @@ expand_hash(Interp *interpreter, HASH *hash)
 }
 
 static BucketIndex
-new_bucket(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
+new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 {
     BucketIndex bucket_index;
     
@@ -350,7 +350,7 @@ hash_lookup(Interp *interpreter, HASH *hash, STRING *key)
     return find_bucket(interpreter, hash, chain, key);
 }
 
-KEY_ATOM *
+HASH_ENTRY *
 hash_get(Interp *interpreter, HASH *hash, STRING *key)
 {
     HASHBUCKET* bucket = hash_lookup(interpreter, hash, key);
@@ -360,7 +360,7 @@ hash_get(Interp *interpreter, HASH *hash, STRING *key)
 
 /* The key is *not* copied. */
 void
-hash_put(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
+hash_put(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 {
     BucketIndex* table;
     UINTVAL hashval;
@@ -380,7 +380,7 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
 
     if (bucket) {
         /* Replacing old value */
-        memcpy(&bucket->value, value, sizeof(KEY_ATOM));
+        memcpy(&bucket->value, value, sizeof(HASH_ENTRY));
     }
     else {
         /* Create new bucket */
@@ -437,24 +437,24 @@ hash_clone(struct Parrot_Interp * interp, HASH * hash, HASH ** clone)
         BucketIndex bi = lookupBucketIndex(hash, i);
         while (bi != NULLBucketIndex) {
             HASHBUCKET * b = getBucket(hash, bi);
-            KEY_ATOM valtmp;
+            HASH_ENTRY valtmp;
             switch (b->value.type) {
-            case enum_key_undef:
-            case enum_key_int:
-            case enum_key_num:
+            case enum_hash_undef:
+            case enum_hash_int:
+            case enum_hash_num:
                 valtmp = b->value;
                 break;
 
-            case enum_key_string:
-                valtmp.type = enum_key_string;
+            case enum_hash_string:
+                valtmp.type = enum_hash_string;
                 valtmp.val.string_val
                     = string_copy(interp, b->value.val.string_val);
                 /* b is no longer valid (due to GC) */
                 b = getBucket(hash, bi);
                 break;
 
-            case enum_key_pmc:
-                valtmp.type = enum_key_pmc;
+            case enum_hash_pmc:
+                valtmp.type = enum_hash_pmc;
                 valtmp.val.pmc_val = b->value.val.pmc_val->vtable->clone(
                     interp, b->value.val.pmc_val);
                 /* b is no longer valid (due to GC) */

@@ -37,7 +37,7 @@ void Parrot_init_stash(struct Parrot_Interp * interp, struct method_rec_t * recp
                        struct Stash * stash);
 
 PMC * Parrot_find_method(struct Parrot_Interp * interp, struct Stash * stash,
-                         KEY * key);
+                         PMC * key);
 
 PMC * mark_stack(Stack_Chunk_t * cur_stack, PMC * end_of_used_list);
 

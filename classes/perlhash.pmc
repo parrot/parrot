@@ -16,41 +16,19 @@
 
 static PMC* undef = NULL;
 
-static STRING* make_hash_key_helper(Interp* interpreter, KEY * key)
+static STRING* make_hash_key(Interp* interpreter, PMC * key)
 {
     if (key == NULL) {
         internal_exception(OUT_OF_BOUNDS, "Cannot use NULL key for PerlHash!\n");
         return NULL;
     }
 
-    if (key->next != NULL) {
+    if (key_next(interpreter, key) != NULL) {
         internal_exception(OUT_OF_BOUNDS, "PerlHash does not support compound keys!\n");
         return NULL;
     }
 
-    switch (key->atom.type) {
-    case enum_key_int:
-        return string_from_int(interpreter, key->atom.val.int_val);
-    case enum_key_num:
-        return string_from_num(interpreter, key->atom.val.num_val);
-    case enum_key_pmc: {
-        PMC* pmc = key->atom.val.pmc_val;
-        return string_copy(interpreter,
-                           pmc->vtable->get_string(interpreter, pmc));
-    }
-    case enum_key_string:
-        return string_copy(interpreter, key->atom.val.string_val);
-    default:
-        internal_exception(OUT_OF_BOUNDS, "Cannot make hash key from type %d\n", key->atom.type);
-    }
-
-    return NULL;
-}
-
-static STRING* make_hash_key(Interp* interpreter, KEY * key)
-{
-        STRING* s = make_hash_key_helper(interpreter, key);
-        return s;
+    return key_string(interpreter, key);
 }
 
 pmclass PerlHash {
@@ -100,17 +78,17 @@ pmclass PerlHash {
         return hash_size(INTERP, SELF->data);
     }
 
-    INTVAL get_integer_keyed (KEY* key) {
+    INTVAL get_integer_keyed (PMC* key) {
         PMC* valpmc;
-        STRING* key_string = make_hash_key(INTERP, key);
-        KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
-        if (atom == NULL) {
+        STRING* keystr = make_hash_key(INTERP, key);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
             return undef->vtable->get_integer(INTERP, undef);
         }
-        if (atom->type == enum_key_int) return atom->val.int_val;
-        if (atom->type == enum_key_pmc) {
-            valpmc = atom->val.pmc_val;
+        if (entry->type == enum_hash_int) return entry->val.int_val;
+        if (entry->type == enum_hash_pmc) {
+            valpmc = entry->val.pmc_val;
             return valpmc->vtable->get_integer(INTERP, valpmc);
         }
         /* XXX This should convert to an integer if possible */
@@ -122,18 +100,18 @@ pmclass PerlHash {
         return (FLOATVAL)SELF->cache.int_val;
     }
 
-    FLOATVAL get_number_keyed (KEY* key) {
+    FLOATVAL get_number_keyed (PMC* key) {
         PMC* valpmc;
-        STRING* key_string = make_hash_key(INTERP, key);
-        KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
-        if (atom == NULL) {
+        STRING* keystr = make_hash_key(INTERP, key);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        if (entry == NULL) {
             /* XXX Warning: Use of uninitialized value */
             return undef->vtable->get_number(INTERP, undef);
         }
-        if (atom->type == enum_key_num) return atom->val.num_val;
+        if (entry->type == enum_hash_num) return entry->val.num_val;
         /* XXX This should convert to a number if possible */
-        if (atom->type == enum_key_pmc) {
-            valpmc = atom->val.pmc_val;
+        if (entry->type == enum_hash_pmc) {
+            valpmc = entry->val.pmc_val;
             return valpmc->vtable->get_number(INTERP, valpmc);
         }
         internal_exception(OUT_OF_BOUNDS, "Cannot fetch number out of non-numeric key!\n");
@@ -145,18 +123,18 @@ pmclass PerlHash {
         return NULL;
     }
 
-    BIGNUM* get_bignum_keyed (KEY* key) {
+    BIGNUM* get_bignum_keyed (PMC* key) {
         PMC* valpmc;
-        STRING* key_string = make_hash_key(INTERP, key);
-        KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
-        if (atom == NULL) {
+        STRING* keystr = make_hash_key(INTERP, key);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        if (entry == NULL) {
             /* XXX Warning: Use of uninitialized value */
             return undef->vtable->get_bignum(INTERP, undef);
         }
-        if (atom->type == enum_key_num) return (BIGNUM*)atom->val.struct_val;
+        if (entry->type == enum_hash_num) return (BIGNUM*)entry->val.struct_val;
         /* XXX This should convert to a number if possible */
-        if (atom->type == enum_key_pmc) {
-            valpmc = atom->val.pmc_val;
+        if (entry->type == enum_hash_pmc) {
+            valpmc = entry->val.pmc_val;
             return valpmc->vtable->get_bignum(INTERP, valpmc);
         }
         internal_exception(OUT_OF_BOUNDS, "Cannot fetch number out of non-numeric key!\n");
@@ -167,18 +145,18 @@ pmclass PerlHash {
         return (STRING*)SELF->cache.struct_val;
     }
 
-    STRING* get_string_keyed (KEY* key) {
+    STRING* get_string_keyed (PMC* key) {
         PMC* valpmc;
-        STRING* key_string = make_hash_key(INTERP, key);
-        KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
-        if (atom == NULL) {
+        STRING* keystr = make_hash_key(INTERP, key);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
             return undef->vtable->get_string(INTERP, undef);
         }
-        if (atom->type == enum_key_string) return atom->val.string_val;
+        if (entry->type == enum_hash_string) return entry->val.string_val;
         /* XXX This should convert to a string */
-        if (atom->type == enum_key_pmc) {
-            valpmc = atom->val.pmc_val;
+        if (entry->type == enum_hash_pmc) {
+            valpmc = entry->val.pmc_val;
             return valpmc->vtable->get_string(INTERP, valpmc);
         }
         internal_exception(OUT_OF_BOUNDS, "Cannot fetch string out of non-string key!\n");
@@ -193,15 +171,15 @@ pmclass PerlHash {
         return hash_size(INTERP, SELF->data);
     }
 
-    PMC* get_pmc_keyed (KEY* key) {
-        STRING* key_string = make_hash_key(INTERP, key);
-        KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
-        if (atom == NULL) {
+    PMC* get_pmc_keyed (PMC* key) {
+        STRING* keystr = make_hash_key(INTERP, key);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
             return (PMC*)undef->vtable->get_pmc(INTERP, undef);
         }
-        if (atom->type == enum_key_pmc) {
-            return atom->val.pmc_val;
+        if (entry->type == enum_hash_pmc) {
+            return entry->val.pmc_val;
         }
         internal_exception(OUT_OF_BOUNDS, "Cannot fetch PMC out of non-PMC key!\n");
         return NULL;
@@ -227,12 +205,12 @@ pmclass PerlHash {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
     }
 
-    void set_integer_keyed (KEY* key, INTVAL value) {
-        STRING* key_string = make_hash_key(INTERP, key);
-        KEY_ATOM atom;
-        atom.type = enum_key_int;
-        atom.val.int_val = value;
-        hash_put(INTERP, SELF->data, key_string, &atom);
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        STRING* keystr = make_hash_key(INTERP, key);
+        HASH_ENTRY entry;
+        entry.type = enum_hash_int;
+        entry.val.int_val = value;
+        hash_put(INTERP, SELF->data, keystr, &entry);
     }
 
     void set_number (PMC* value) {
@@ -247,12 +225,12 @@ pmclass PerlHash {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
     }
 
-    void set_number_keyed (KEY* key, FLOATVAL value) {
-        STRING* key_string = make_hash_key(INTERP, key);
-        KEY_ATOM atom;
-        atom.type = enum_key_num;
-        atom.val.num_val = value;
-        hash_put(INTERP, SELF->data, key_string, &atom);
+    void set_number_keyed (PMC* key, FLOATVAL value) {
+        STRING* keystr = make_hash_key(INTERP, key);
+        HASH_ENTRY entry;
+        entry.type = enum_hash_num;
+        entry.val.num_val = value;
+        hash_put(INTERP, SELF->data, keystr, &entry);
     }
 
     void set_bignum (PMC* value) {
@@ -267,7 +245,7 @@ pmclass PerlHash {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to bignum\n");
     }
 
-    void set_bignum_keyed (KEY* key, BIGNUM* value) {
+    void set_bignum_keyed (PMC* key, BIGNUM* value) {
         /* XXX */
     }
 
@@ -283,20 +261,20 @@ pmclass PerlHash {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
     }
 
-    void set_string_keyed (KEY* key, STRING* value) {
-        STRING* key_string = make_hash_key(INTERP, key);
-        KEY_ATOM atom;
-        atom.type = enum_key_string;
-        atom.val.string_val = value;
-        hash_put(INTERP, SELF->data, key_string, &atom);
+    void set_string_keyed (PMC* key, STRING* value) {
+        STRING* keystr = make_hash_key(INTERP, key);
+        HASH_ENTRY entry;
+        entry.type = enum_hash_string;
+        entry.val.string_val = value;
+        hash_put(INTERP, SELF->data, keystr, &entry);
     }
 
-    void set_pmc_keyed (KEY* dest_key, PMC* value, KEY* val_key) {
-        STRING* key_string = make_hash_key(INTERP, val_key);
-        KEY_ATOM atom;
-        atom.type = enum_key_pmc;
-        atom.val.pmc_val = value;
-        hash_put(INTERP, SELF->data, key_string, &atom);
+    void set_pmc_keyed (PMC* dest_key, PMC* value, PMC* val_key) {
+        STRING* keystr = make_hash_key(INTERP, dest_key);
+        HASH_ENTRY entry;
+        entry.type = enum_hash_pmc;
+        entry.val.pmc_val = value;
+        hash_put(INTERP, SELF->data, keystr, &entry);
     }
 
     void add (PMC* value, PMC* dest) {

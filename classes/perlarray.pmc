@@ -24,22 +24,6 @@ static PMC* undef(struct Parrot_Interp* interpreter)
     return pmc_new(interpreter, enum_class_PerlUndef);
 }
 
-static INTVAL atom2int(Interp *interpreter, KEY_ATOM* atom) {
-    switch ((int)atom->type) {
-        case enum_key_undef:
-        default:
-            return 0;
-        case enum_key_int:
-            return atom->val.int_val;
-        case enum_key_num:
-            return (INTVAL)atom->val.num_val;
-        case enum_key_pmc:
-            return atom->val.pmc_val->vtable->get_integer(interpreter, atom->val.pmc_val);
-        case enum_key_string:
-            return string_to_int(atom->val.struct_val);
-    }
-}
-
 pmclass PerlArray extends Array {
 
     INTVAL type () {
@@ -75,12 +59,12 @@ pmclass PerlArray extends Array {
         return dest;
     }
 
-    void set_integer_keyed (KEY* key, INTVAL value) {
+    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
         INTVAL ix;
 
         if (!key) return;
 
-        ix = atom2int(interpreter, &key->atom);
+        ix = *key;
 
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
@@ -89,12 +73,13 @@ pmclass PerlArray extends Array {
         SUPER(key, value);
     };
 
-    void set_number_keyed (KEY* key, FLOATVAL value) {
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
         INTVAL ix;
 
         if (!key) return;
 
-        ix = atom2int(interpreter, &key->atom);
+        ix = key_integer(INTERP, key);
 
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
@@ -103,12 +88,13 @@ pmclass PerlArray extends Array {
         SUPER(key, value);
     };
 
-    void set_string_keyed (KEY* key, STRING* value) {
+
+    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
         INTVAL ix;
 
         if (!key) return;
 
-        ix = atom2int(interpreter, &key->atom);
+        ix = *key;
 
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
@@ -117,12 +103,69 @@ pmclass PerlArray extends Array {
         SUPER(key, value);
     };
 
-    void set_pmc_keyed (KEY* key, PMC* src, KEY* src_key) {
+    void set_number_keyed (PMC* key, FLOATVAL value) {
         INTVAL ix;
 
         if (!key) return;
 
-        ix = atom2int(interpreter, &key->atom);
+        ix = key_integer(INTERP, key);
+
+        if (ix >= SELF->cache.int_val) {
+            resize_array(interpreter, SELF, ix+1);
+        }
+
+        SUPER(key, value);
+    };
+
+
+    void set_string_keyed_int (INTVAL* key, STRING* value) {
+        INTVAL ix;
+
+        if (!key) return;
+
+        ix = *key;
+
+        if (ix >= SELF->cache.int_val) {
+            resize_array(interpreter, SELF, ix+1);
+        }
+
+        SUPER(key, value);
+    };
+
+    void set_string_keyed (PMC* key, STRING* value) {
+        INTVAL ix;
+
+        if (!key) return;
+
+        ix = key_integer(INTERP, key);
+
+        if (ix >= SELF->cache.int_val) {
+            resize_array(interpreter, SELF, ix+1);
+        }
+
+        SUPER(key, value);
+    };
+
+    void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
+        INTVAL ix;
+
+        if (!key) return;
+
+        ix = *key;
+
+        if (ix >= SELF->cache.int_val) {
+            resize_array(interpreter, SELF, ix+1);
+        }
+
+        SUPER(key, src, src_key);
+    };
+
+    void set_pmc_keyed (PMC* key, PMC* src, PMC* src_key) {
+        INTVAL ix;
+
+        if (!key) return;
+
+        ix = key_integer(INTERP, key);
 
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
@@ -140,17 +183,19 @@ pmclass PerlArray extends Array {
             return SUPER(key);
     }
 
-    INTVAL get_integer_keyed (KEY* key) {
+    INTVAL get_integer_keyed (PMC* key) {
         INTVAL ix;
+        PMC* nextkey;
         PMC* box;
 
         if (!key) return 0;
-        ix = atom2int(interpreter, &key->atom);
-        if (key->next == NULL) return SELF.get_integer_keyed_int(&ix);
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) return SELF.get_integer_keyed_int(&ix);
 
         box = SELF.get_pmc_keyed_int(&ix);
         if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_integer_keyed(INTERP, box, key->next);
+        return box->vtable->get_integer_keyed(INTERP, box, nextkey);
     }
 
     FLOATVAL get_number_keyed_int (INTVAL* key) {
@@ -162,17 +207,19 @@ pmclass PerlArray extends Array {
             return SUPER(key);
     }
 
-    FLOATVAL get_number_keyed (KEY* key) {
+    FLOATVAL get_number_keyed (PMC* key) {
         INTVAL ix;
+        PMC* nextkey;
         PMC* box;
 
         if (!key) return 0;
-        ix = atom2int(interpreter, &key->atom);
-        if (key->next == NULL) return SELF.get_number_keyed_int(&ix);
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) return SELF.get_number_keyed_int(&ix);
 
         box = SELF.get_pmc_keyed_int(&ix);
         if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_number_keyed(INTERP, box, key->next);
+        return box->vtable->get_number_keyed(INTERP, box, nextkey);
     }
 
     STRING* get_string_keyed_int (INTVAL* key) {
@@ -184,17 +231,19 @@ pmclass PerlArray extends Array {
             return SUPER(key);
     }
 
-    STRING* get_string_keyed (KEY* key) {
+    STRING* get_string_keyed (PMC* key) {
         INTVAL ix;
+        PMC* nextkey;
         PMC* box;
 
         if (!key) return 0;
-        ix = atom2int(interpreter, &key->atom);
-        if (key->next == NULL) return SELF.get_string_keyed_int(&ix);
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) return SELF.get_string_keyed_int(&ix);
 
         box = SELF.get_pmc_keyed_int(&ix);
         if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_string_keyed(INTERP, box, key->next);
+        return box->vtable->get_string_keyed(INTERP, box, nextkey);
     }
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
@@ -204,17 +253,19 @@ pmclass PerlArray extends Array {
             return SUPER(key);
     }
 
-    PMC* get_pmc_keyed (KEY* key) {
+    PMC* get_pmc_keyed (PMC* key) {
         INTVAL ix;
+        PMC* nextkey;
         PMC* box;
 
         if (!key) return 0;
-        ix = atom2int(interpreter, &key->atom);
-        if (key->next == NULL) return SELF.get_pmc_keyed_int(&ix);
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) return SELF.get_pmc_keyed_int(&ix);
 
         box = SELF.get_pmc_keyed_int(&ix);
         if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_pmc_keyed(INTERP, box, key->next);
+        return box->vtable->get_pmc_keyed(INTERP, box, nextkey);
     }
 
     void add (PMC * value, PMC* dest) {

@@ -368,12 +368,10 @@ Gets the start and end indices of the group indicated by the fourth parameter.
 =cut
 
 op rx_info_getgroup(in pmc, out int, out int, in int) {
-        KEY key;
 	RX_dUNPACK($1);
 
-        MAKE_KEY_INT(key, $4);
-	$2=rx->groupstart->vtable->get_integer_keyed(interpreter, rx->groupstart, &key);
-	$3=rx->groupend->vtable->get_integer_keyed(interpreter, rx->groupend, &key);
+	$2=rx->groupstart->vtable->get_integer_keyed_int(interpreter, rx->groupstart, &$4);
+	$3=rx->groupend->vtable->get_integer_keyed_int(interpreter, rx->groupend, &$4);
 	
 	goto NEXT();
 }
@@ -631,11 +629,9 @@ the second parameter.
 =cut
 
 op rx_startgroup(in pmc, in int) {
-        KEY key;
 	RX_dUNPACK($1);
 	
-        MAKE_KEY_INT(key, $2);
-	rx->groupstart->vtable->set_integer_keyed(interpreter, rx->groupstart, &key, rx->index);
+	rx->groupstart->vtable->set_integer_keyed_int(interpreter, rx->groupstart, &$2, rx->index);
 	
 	goto NEXT();
 }
@@ -650,11 +646,9 @@ the second parameter.
 =cut
 
 op rx_endgroup(in pmc, in int) {
-    KEY key;
     RX_dUNPACK($1);
 	
-    MAKE_KEY_INT(key, $2);
-    rx->groupend->vtable->set_integer_keyed(interpreter, rx->groupend, &key, rx->index);
+    rx->groupend->vtable->set_integer_keyed_int(interpreter, rx->groupend, &$2, rx->index);
 	
     goto NEXT();
 }

@@ -50,12 +50,14 @@ struct PackFile_FixupTable {
 #define PFC_NONE    '\0'
 #define PFC_NUMBER  'n'
 #define PFC_STRING  's'
+#define PFC_KEY     'k'
 
 struct PackFile_Constant {
     opcode_t type;
     opcode_t integer;
     FLOATVAL number;
     STRING *string;
+    PMC *key;
 };
 
 
@@ -153,6 +155,12 @@ INTVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                        struct PackFile_Constant *self,
                                        opcode_t *packed,
                                        opcode_t packed_size);
+
+INTVAL PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
+                                    struct PackFile * pf,
+                                    struct PackFile_Constant *self,
+                                    opcode_t *packed,
+                                    opcode_t packed_size);
 
 opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t *stream);
 

@@ -663,6 +663,10 @@ PackFile_Constant_destroy(struct PackFile_Constant *self)
         }
         break;
 
+    case PFC_KEY:
+        self->key = NULL;
+        break;
+
     default:
         fprintf(stderr,
                 "PackFile_Constant_clear: Unrecognized type '%c' (%ld)!\n",
@@ -692,6 +696,7 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
 {
     opcode_t packed_size;
     opcode_t padded_size;
+    PMC *component;
 
     if (!self) {
         /* TODO: OK to gloss over this? */
@@ -716,6 +721,14 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
 
         /* Include space for flags, encoding, type, and size fields.  */
         packed_size = 4 * sizeof(opcode_t) + padded_size;
+        break;
+
+    case PFC_KEY:
+        packed_size = sizeof(opcode_t);
+
+        for (component = self->key; component; component = component->data) {
+            packed_size += 2 * sizeof(opcode_t);
+        }
         break;
 
     default:
@@ -787,6 +800,10 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
     case PFC_STRING:
         rc = PackFile_Constant_unpack_string(interpreter, pf, self, 
                                              cursor, size);
+        break;
+
+    case PFC_KEY:
+        rc = PackFile_Constant_unpack_key(interpreter, pf, self, cursor, size);
         break;
 
     default:
@@ -917,6 +934,97 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                encoding_lookup_index(encoding), 
                                flags | BUFFER_constant_FLAG,
                                chartype_lookup_index(type));
+
+    return 1;
+}
+
+/***************************************
+
+=item unpack_key
+
+Unpack a PackFile Constant from a block of memory. The format consists
+of a sequence of key atomes, each with the following format:
+
+  opcode_t type
+  opcode_t value
+
+Returns one (1) if everything is OK, else zero (0).
+
+=cut
+
+***************************************/
+
+INTVAL
+PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
+                             struct PackFile * pf,
+                             struct PackFile_Constant *self,
+                             opcode_t *packed, opcode_t packed_size)
+{
+    opcode_t *cursor;
+    INTVAL components;
+    PMC *head;
+    PMC *tail;
+
+    UNUSED(packed_size);
+
+    if (!self) 
+    {
+        return 0;
+    }
+    
+    cursor = packed;
+
+    components = *cursor++;
+
+    head = tail = NULL;
+
+    while (components-- > 0) {
+        if (tail) {
+            tail->data = pmc_new(interpreter, enum_class_Key);
+            tail = tail->data;
+        }
+        else {
+            head = tail = pmc_new(interpreter, enum_class_Key);
+        }
+
+        tail->flags |= PMC_constant_FLAG;
+        
+        switch (*cursor++) {
+        case PARROT_ARG_IC:
+            tail->flags |= KEY_integer_FLAG;
+            tail->cache.int_val = *cursor++;
+            break;
+        case PARROT_ARG_NC:
+            tail->flags |= KEY_number_FLAG;
+            tail->cache.num_val = pf->const_table->constants[*cursor++]->number;
+            break;
+        case PARROT_ARG_SC:
+            tail->flags |= KEY_string_FLAG;
+            tail->cache.string_val = pf->const_table->constants[*cursor++]->string;
+            break;
+        case PARROT_ARG_I:
+            tail->flags |= KEY_integer_FLAG|KEY_register_FLAG;
+            tail->cache.int_val = *cursor++;
+            break;
+        case PARROT_ARG_N:
+            tail->flags |= KEY_number_FLAG|KEY_register_FLAG;
+            tail->cache.int_val = *cursor++;
+            break;
+        case PARROT_ARG_S:
+            tail->flags |= KEY_string_FLAG|KEY_register_FLAG;
+            tail->cache.int_val = *cursor++;
+            break;
+        case PARROT_ARG_P:
+            tail->flags |= KEY_pmc_FLAG|KEY_register_FLAG;
+            tail->cache.int_val = *cursor++;
+            break;
+        default:
+            return 0;
+        }
+    }
+
+    self->type = PFC_KEY;
+    self->key = head;
 
     return 1;
 }

@@ -20,13 +20,26 @@ typedef struct _hashbucket HASHBUCKET;
 /* HASH is really a hashtable, but 'hash' is standard perl nomenclature. */
 typedef struct _hash HASH;
 
+typedef enum {
+    enum_hash_undef,
+    enum_hash_int,
+    enum_hash_num,
+    enum_hash_string,
+    enum_hash_pmc
+} HASH_ENTRY_TYPE;
+
+typedef struct _hash_entry {
+    HASH_ENTRY_TYPE type;
+    UnionVal val;
+} HASH_ENTRY;
+
 void new_hash(Interp * interpreter, HASH **hash_ptr);
 void hash_clone(Interp * interpreter, HASH * src, HASH **clone);
 INTVAL hash_size(Interp * interpreter, HASH *hash);
 void hash_set_size(Interp * interpreter, HASH *hash, UINTVAL size);
 void hash_destroy(Interp * interpreter, HASH *hash);
-KEY_ATOM *hash_get(Interp * interpreter, HASH *hash, STRING *key);
-void hash_put(Interp * interpreter, HASH *hash, STRING *key, KEY_ATOM * value);
+HASH_ENTRY *hash_get(Interp * interpreter, HASH *hash, STRING *key);
+void hash_put(Interp * interpreter, HASH *hash, STRING *key, HASH_ENTRY * value);
 void hash_delete(Interp * interpreter, HASH *hash, STRING *key);
 PMC *mark_hash(Interp * interpreter, HASH *hash, PMC * end_of_used_list);
 void dump_hash(Interp * interpreter, HASH *hash);

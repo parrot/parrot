@@ -32,6 +32,7 @@ void Parrot_Coroutine_class_init(INTVAL);
 void Parrot_Continuation_class_init(INTVAL);
 void Parrot_CSub_class_init(INTVAL);
 void Parrot_MultiArray_class_init(INTVAL);
+void Parrot_Key_class_init(INTVAL);
 
 void init_world(void);
 

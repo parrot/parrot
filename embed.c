@@ -241,7 +241,6 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 {
     INTVAL i;
     PMC *userargv;
-    KEY key;
 
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
@@ -286,9 +285,6 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     /* immediately anchor pmc to root set */
     interpreter->ctx.pmc_reg.registers[0] = userargv;
 
-    key.atom.type = enum_key_int;
-    key.next = NULL;
-
     userargv->vtable->set_integer_native(interpreter, userargv, (INTVAL) argc);
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
@@ -299,8 +295,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
             fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
-        key.atom.val.int_val = i;
-        userargv->vtable->set_string_keyed(interpreter, userargv, &key, arg);
+        userargv->vtable->push_string(interpreter, userargv, arg);
     }
     
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */

@@ -161,7 +161,6 @@ typedef void (*funcptr_t)(void);
 #include "parrot/encoding.h"
 #include "parrot/chartype.h"
 #include "parrot/string.h"
-#include "parrot/key.h"
 #include "parrot/hash.h"
 #include "parrot/vtable.h"
 #include "parrot/register.h"
@@ -183,6 +182,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/misc.h"
 #include "parrot/debug.h"
 #include "parrot/sub.h"
+#include "parrot/key.h"
 #endif
 
 /*

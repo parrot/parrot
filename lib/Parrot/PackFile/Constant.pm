@@ -22,6 +22,7 @@ my %type_names = (
   ord('i')  => 'PFC_INTEGER',
   ord('n')  => 'PFC_NUMBER',
   ord('s')  => 'PFC_STRING',
+  ord('k')  => 'PFC_KEY',
 );
 
 my %type_codes = (
@@ -29,6 +30,7 @@ my %type_codes = (
   'PFC_INTEGER' => ord('i'),
   'PFC_NUMBER'  => ord('n'),
   'PFC_STRING'  => ord('s'),
+  'PFC_KEY'     => ord('k'),
 );
 
 
@@ -190,6 +192,8 @@ sub unpack
     $value = shift_floatval($string);
   } elsif ($type == $type_codes{'PFC_STRING'}) {
     $value = shift_sv($string);
+  } elsif ($type == $type_codes{'PFC_KEY'}) {
+    $value = shift_key($string);
   } else {
     die;
   }
@@ -218,6 +222,9 @@ sub packed_size
   } elsif ($self->type == $type_codes{'PFC_NUMBER'}) {
     $size += sizeof('floatval');
   } elsif ($self->type == $type_codes{'PFC_STRING'}) {
+    if (!ref $self->value) { print $self->value, "\n"; die; }
+    $size += $self->value->packed_size;
+  } elsif ($self->type == $type_codes{'PFC_KEY'}) {
     if (!ref $self->value) { print $self->value, "\n"; die; }
     $size += $self->value->packed_size;
   } else {
@@ -250,6 +257,9 @@ sub pack
   } elsif ($self->type == $type_codes{'PFC_STRING'}) {
     $packed .= pack_op($self->value->packed_size);
     $packed .= pack_sv($self->value);
+  } elsif ($self->type == $type_codes{'PFC_KEY'}) {
+    $packed .= pack_op($self->value->packed_size);
+    $packed .= pack_key($self->value);
   } else {
     die;
   }

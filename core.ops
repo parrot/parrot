@@ -590,342 +590,155 @@ inline op set(out INT, in PMC) {
   goto NEXT();
 }
 
-=item B<set>(out PMC, out PMC, in PMC, in PMC)
+=head2 Keyed set operations: Px[ INTKEY ] = Bx
 
-Set the entry of $1 accessed by $2 to the entry of $3 accessed by
-$4, ie:
+=item B<set>(out PMC, in INTKEY, in INT)
 
-    $1[$2] = $3[$4];
+=item B<set>(out PMC, in INTKEY, in NUM)
 
-=cut
+=item B<set>(out PMC, in INTKEY, in STR)
 
-inline op set (out PMC, in PMC, in PMC, in PMC)  {
-    KEY src_key, dest_key;
-    MAKE_KEY_PMC(src_key, $2);
-    MAKE_KEY_PMC(dest_key, $4);
-    $1->vtable->set_pmc_keyed(interpreter, 
-                    $1, $2 ? &src_key : NULL, $3, $4 ? &dest_key : NULL);
-    goto NEXT();
-}
-
-=head2 Keyed set operations: Px[ Ix|KEY ] = Bx
-
-=item B<set_keyed_integer>(out PMC, in INT, in INT)
-
-=item B<set_keyed_integer>(out PMC, in INT, in NUM)
-
-=item B<set_keyed_integer>(out PMC, in INT, in STR)
-
-=item B<set_keyed_integer>(out PMC, in INT, in PMC)
+=item B<set>(out PMC, in INTKEY, in PMC)
 
 =cut
 
-inline op set_keyed_integer (out PMC, in INT, in INT)  {
-    KEY key;
-    MAKE_KEY_INT(key, $2);
-    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
+inline op set (out PMC, in INTKEY, in INT)  {
+    INTVAL key = $2;
+    $1->vtable->set_integer_keyed_int(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
-inline op set_keyed_integer (out PMC, in INT, in NUM)  {
-    KEY key;
-    MAKE_KEY_INT(key, $2);
-    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
+inline op set (out PMC, in INTKEY, in NUM)  {
+    INTVAL key = $2;
+    $1->vtable->set_number_keyed_int(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
-inline op set_keyed_integer (out PMC, in INT, in STR)  {
-    KEY key;
-    MAKE_KEY_INT(key, $2);
-    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
+inline op set (out PMC, in INTKEY, in STR)  {
+    INTVAL key = $2;
+    $1->vtable->set_string_keyed_int(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
-inline op set_keyed_integer (out PMC, in INT, in PMC)  {
-    KEY key;
-    MAKE_KEY_INT(key, $2);
-    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
+inline op set (out PMC, in INTKEY, in PMC)  {
+    INTVAL key = $2;
+    $1->vtable->set_pmc_keyed_int(interpreter, $1, &key, $3, NULL);
     goto NEXT();
 }
 
-=item B<set_keyed_integer>(out PMC, in KEY, in INT)
-
-=item B<set_keyed_integer>(out PMC, in KEY, in NUM)
-
-=item B<set_keyed_integer>(out PMC, in KEY, in STR)
-
-=item B<set_keyed_integer>(out PMC, in KEY, in PMC)
+=head2 Keyed set operations: Ax = Px[ INTKEY ]
 
 =cut
 
-inline op set_keyed_integer (out PMC, in KEY, in INT)  {
-    KEY key;
-    MAKE_KEY_INT(key, $2);
-    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
+=item B<set>(out INT, in PMC, in INTKEY)
 
-inline op set_keyed_integer (out PMC, in KEY, in NUM)  {
-    KEY key;
-    MAKE_KEY_INT(key, $2);
-    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
+=item B<set>(out NUM, in PMC, in INTKEY)
 
-inline op set_keyed_integer (out PMC, in KEY, in STR)  {
-    KEY key;
-    MAKE_KEY_INT(key, $2);
-    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
+=item B<set>(out STR, in PMC, in INTKEY)
 
-inline op set_keyed_integer (out PMC, in KEY, in PMC)  {
-    KEY key;
-    MAKE_KEY_INT(key, $2);
-    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
-    goto NEXT();
-}
-
-=head2 Keyed set operations: Ax = Px[ Ix|KEY ]
+=item B<set>(out PMC, in PMC, in INTKEY)
 
 =cut
 
-=item B<set_keyed_integer>(out INT, in PMC, in INT)
+inline op set (out INT, in PMC, in INTKEY)  {
+    INTVAL key = $3;
+    $1 = $2->vtable->get_integer_keyed_int(interpreter, $2, &key);
+    goto NEXT();
+}
 
-=item B<set_keyed_integer>(out NUM, in PMC, in INT)
+inline op set (out NUM, in PMC, in INTKEY)  {
+    INTVAL key = $3;
+    $1 = $2->vtable->get_number_keyed_int(interpreter, $2, &key);
+    goto NEXT();
+}
 
-=item B<set_keyed_integer>(out STR, in PMC, in INT)
+inline op set (out STR, in PMC, in INTKEY)  {
+    INTVAL key = $3;
+    $1 = $2->vtable->get_string_keyed_int(interpreter, $2, &key);
+    goto NEXT();
+}
 
-=item B<set_keyed_integer>(out PMC, in PMC, in INT)
+inline op set (out PMC, in PMC, in INTKEY) {
+    INTVAL key = $3;
+    $1 = $2->vtable->get_pmc_keyed_int(interpreter, $2, &key);
+    goto NEXT();
+}
+
+
+=head2 Keyed set operations: Px[ KEY ] = Bx
+
+=item B<set>(out PMC, in KEY, in INT)
+
+=item B<set>(out PMC, in KEY, in NUM)
+
+=item B<set>(out PMC, in KEY, in STR)
+
+=item B<set>(out PMC, in KEY, in PMC)
 
 =cut
 
-inline op set_keyed_integer (out INT, in PMC, in INT)  {
-    KEY key;
-    MAKE_KEY_INT(key, $3);
-    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+inline op set (out PMC, in KEY, in INT)  {
+    $1->vtable->set_integer_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set_keyed_integer (out NUM, in PMC, in INT)  {
-    KEY key;
-    MAKE_KEY_INT(key, $3);
-    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
+inline op set (out PMC, in KEY, in NUM)  {
+    $1->vtable->set_number_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set_keyed_integer (out STR, in PMC, in INT)  {
-    KEY key;
-    MAKE_KEY_INT(key, $3);
-    $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
+inline op set (out PMC, in KEY, in STR)  {
+    $1->vtable->set_string_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set_keyed_integer (out PMC, in PMC, in INT) {
-    KEY key;
-    MAKE_KEY_INT(key, $3);
-    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
+inline op set (out PMC, in KEY, in PMC)  {
+    $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3, NULL);
     goto NEXT();
 }
 
-=item B<set_keyed_integer>(out INT, in PMC, in KEY)
+=head2 Keyed set operations: Ax = Px[ KEY ]
 
-=item B<set_keyed_integer>(out NUM, in PMC, in KEY)
+=item B<set>(out INT, in PMC, in KEY)
 
-=item B<set_keyed_integer>(out STR, in PMC, in KEY)
+=item B<set>(out NUM, in PMC, in KEY)
 
-=item B<set_keyed_integer>(out PMC, in PMC, in KEY)
+=item B<set>(out STR, in PMC, in KEY)
+
+=item B<set>(out PMC, in PMC, in KEY)
 
 =cut
 
-inline op set_keyed_integer (out INT, in PMC, in KEY)  {
-    KEY key;
-    MAKE_KEY_INT(key, $3);
-    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+inline op set (out INT, in PMC, in KEY)  {
+    $1 = $2->vtable->get_integer_keyed(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op set_keyed_integer (out NUM, in PMC, in KEY)  {
-    KEY key;
-    MAKE_KEY_INT(key, $3);
-    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
+inline op set (out NUM, in PMC, in KEY)  {
+    $1 = $2->vtable->get_number_keyed(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op set_keyed_integer (out STR, in PMC, in KEY)  {
-    KEY key;
-    MAKE_KEY_INT(key, $3);
-    $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
+inline op set (out STR, in PMC, in KEY)  {
+    $1 = $2->vtable->get_string_keyed(interpreter, $2, $3);
     goto NEXT();
 }
 
-inline op set_keyed_integer (out PMC, in PMC, in KEY) {
-    KEY key;
-    MAKE_KEY_INT(key, $3);
-    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
+inline op set (out PMC, in PMC, in KEY)  {
+    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, $3);
     goto NEXT();
 }
 
-=head2 Keyed set operations: Px[Sx] = Bx
+=head2 Keyed set operations: Px[ KEY ] = Px[ KEY ]
 
-=item B<set_keyed>(out PMC, in STR, in INT)
-
-=item B<set_keyed>(out PMC, in STR, in NUM)
-
-=item B<set_keyed>(out PMC, in STR, in STR)
-
-=item B<set_keyed>(out PMC, in STR, in PMC)
+=item B<set>(out PMC, in KEY, in PMC, in KEY)
 
 =cut
 
-inline op set_keyed (out PMC, in STR, in INT)  {
-    KEY key;
-    MAKE_KEY_STRING(key, $2);
-    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
+inline op set (out PMC, in KEY, in PMC, in KEY)  {
+    $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3, $4);
     goto NEXT();
 }
-
-inline op set_keyed (out PMC, in STR, in NUM)  {
-    KEY key;
-    MAKE_KEY_STRING(key, $2);
-    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set_keyed (out PMC, in STR, in STR)  {
-    KEY key;
-    MAKE_KEY_STRING(key, $2);
-    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set_keyed (out PMC, in STR, in PMC)  {
-    KEY key;
-    MAKE_KEY_STRING(key, $2);
-    $1->vtable->set_pmc_keyed(interpreter, $1, NULL, $3, &key);
-    goto NEXT();
-}
-
-=head2 Keyed set operations: Ax = Px[Sx]
-
-=item B<set_keyed>(out INT, in PMC, in STR)
-
-=item B<set_keyed>(out NUM, in PMC, in STR)
-
-=item B<set_keyed>(out STR, in PMC, in STR)
-
-=item B<set_keyed>(out PMC, in PMC, in STR)
-
-=cut
-
-inline op set_keyed (out INT, in PMC, in STR)  {
-    KEY key;
-    MAKE_KEY_STRING(key, $3);
-    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
-inline op set_keyed (out NUM, in PMC, in STR)  {
-    KEY key;
-    MAKE_KEY_STRING(key, $3);
-    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
-inline op set_keyed (out STR, in PMC, in STR)  {
-    KEY key;
-    MAKE_KEY_STRING(key, $3);
-    $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
-inline op set_keyed (out PMC, in PMC, in STR)  {
-    KEY key;
-    MAKE_KEY_STRING(key, $3);
-    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
-=head2 Keyed set operations: Px[Nx] = Bx
-
-=item B<set_keyed>(out PMC, in NUM, in INT)
-
-=item B<set_keyed>(out PMC, in NUM, in NUM)
-
-=item B<set_keyed>(out PMC, in NUM, in STR)
-
-=item B<set_keyed>(out PMC, in NUM, in PMC)
-
-=cut
-
-inline op set_keyed (out PMC, in NUM, in INT)  {
-    KEY key;
-    MAKE_KEY_NUM(key, $2);
-    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set_keyed (out PMC, in NUM, in NUM)  {
-    KEY key;
-    MAKE_KEY_NUM(key, $2);
-    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set_keyed (out PMC, in NUM, in STR)  {
-    KEY key;
-    MAKE_KEY_NUM(key, $2);
-    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set_keyed (out PMC, in NUM, in PMC)  {
-    KEY key;
-    MAKE_KEY_NUM(key, $2);
-    $1->vtable->set_pmc_keyed(interpreter, $1, NULL, $3, &key);
-    goto NEXT();
-}
-
-=head2 Keyed set operations: Ax = Px[Nx]
-
-=item B<set_keyed>(out INT, in PMC, in NUM)
-
-=item B<set_keyed>(out NUM, in PMC, in NUM)
-
-=item B<set_keyed>(out STR, in PMC, in NUM)
-
-=item B<set_keyed>(out PMC, in PMC, in NUM)
-
-=cut
-
-inline op set_keyed (out INT, in PMC, in NUM)  {
-    KEY key;
-    MAKE_KEY_NUM(key, $3);
-    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
-inline op set_keyed (out NUM, in PMC, in NUM)  {
-    KEY key;
-    MAKE_KEY_NUM(key, $3);
-    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
-inline op set_keyed (out STR, in PMC, in NUM)  {
-    KEY key;
-    MAKE_KEY_NUM(key, $3);
-    $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
-inline op set_keyed (out PMC, in PMC, in NUM)  {
-    KEY key;
-    MAKE_KEY_NUM(key, $3);
-    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
 
 =item B<clone>(out PMC, in PMC)
 
@@ -3674,21 +3487,19 @@ op pop_pad() {
 
 op store_lex(in STR, in PMC) {
     PMC * hash = NULL;
-    KEY key;
+    PMC * key = key_new_string(interpreter, $1);
     Stack_entry_type type = NO_STACK_ENTRY_TYPE;
-    MAKE_KEY(key, $1, enum_key_string, struct_val);
     hash = (PMC *)stack_peek(interpreter, interpreter->ctx.pad_stack, &type);
-    hash->vtable->set_pmc_keyed(interpreter, hash, NULL, $2, &key);
+    hash->vtable->set_pmc_keyed(interpreter, hash, key, $2, NULL);
     goto NEXT();
 }
 
 op find_lex(out PMC, in STR) {
     PMC * hash = NULL;
-    KEY key;
+    PMC * key = key_new_string(interpreter, $2);
     Stack_entry_type type = NO_STACK_ENTRY_TYPE;
-    MAKE_KEY(key, $2, enum_key_string, struct_val);
     hash = (PMC *)stack_peek(interpreter, interpreter->ctx.pad_stack, &type);
-    $1 = hash->vtable->get_pmc_keyed(interpreter, hash, &key);
+    $1 = hash->vtable->get_pmc_keyed(interpreter, hash, key);
 
     /* FIXME: should the not found case be an internal_exception ? */
 
@@ -3696,18 +3507,16 @@ op find_lex(out PMC, in STR) {
 }
 
 op store_global(in STR, in PMC) {
-    KEY key;
+    PMC * key = key_new_string(interpreter, $1);
     PMC * globals = interpreter->perl_stash->stash_hash;
-    MAKE_KEY_STRING(key, $1);
-    globals->vtable->set_pmc_keyed(interpreter, globals, NULL, $2, &key);
+    globals->vtable->set_pmc_keyed(interpreter, globals, key, $2, NULL);
     goto NEXT();
 }
 
 op find_global(out PMC, in STR) {
-    KEY key;
+    PMC * key = key_new_string(interpreter, $2);
     PMC * globals = interpreter->perl_stash->stash_hash;
-    MAKE_KEY_STRING(key, $2);
-    $1 = globals->vtable->get_pmc_keyed(interpreter, globals, &key);
+    $1 = globals->vtable->get_pmc_keyed(interpreter, globals, key);
     goto NEXT();
 }
 
@@ -4032,9 +3841,9 @@ Find the PMC type by name.
 =cut
 
 op find_type(out INT, in STR) {
-    KEY key;
-    MAKE_KEY_STRING(key, $2);
-    $1 = Parrot_base_classname_hash->vtable->get_integer_keyed(interpreter, Parrot_base_classname_hash, &key);
+    PMC * key = key_new_string(interpreter, $2);
+
+    $1 = Parrot_base_classname_hash->vtable->get_integer_keyed(interpreter, Parrot_base_classname_hash, key);
 
     goto NEXT();
 }

@@ -24,6 +24,7 @@ use Parrot::Config;
     &unpack_intval
     &unpack_floatval
     &unpack_sv
+    &unpack_key
     &unpack_op
     &unpack_ops
     &unpack_arg
@@ -32,6 +33,7 @@ use Parrot::Config;
     &shift_intval
     &shift_floatval
     &shift_sv
+    &shift_key
     &shift_op
     &shift_arg
 );
@@ -52,7 +54,10 @@ my %how_to_pack = (
     n  => $pack_type{op},
     S  => $pack_type{op},
     s  => $pack_type{op},
-#    K  => $pack_type{op},
+    K  => $pack_type{op},
+    k  => $pack_type{op},
+    KI => $pack_type{op},
+    ki => $pack_type{op},
     r  => $pack_type{op},
     D  => $pack_type{op},
     op => $pack_type{op},
@@ -76,6 +81,7 @@ sub pack_byte { return pack  ($how_to_pack{byte}, shift) }
 sub pack_intval   { return pack  ($how_to_pack{intval}, shift) }
 sub pack_floatval   { return pack  ($how_to_pack{floatval}, shift) }
 sub pack_sv   { return shift->pack }
+sub pack_key  { return shift->pack }
 sub pack_op   { return pack  ($how_to_pack{op}, shift) }
 
 sub unpack_byte { return unpack($how_to_pack{byte}, shift) } 
@@ -101,6 +107,19 @@ sub shift_sv  {
   $data = substr($data, 0, $size);
 
   return new Parrot::String $flags, $encoding, $type, $size, $data;
+}
+sub shift_key {
+  my $atoms = shift_intval($_[0]);
+  my @atoms;
+
+  for (1..$atoms) {
+    my $type = shift_intval($_[0]);
+    my $value = shift_intval($_[0]);
+
+    push @atoms, { TYPE => $type, VALUE => $value };
+  }
+
+  return new Parrot::Key [ @atoms ];
 }
 sub shift_op  { my $op = substr($_[0], 0, sizeof("op"), ''); return unpack_op($op) }
 

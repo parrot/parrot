@@ -220,7 +220,6 @@ main(int argc, char **argv) {
     struct PackFile *          pf;
     INTVAL i;
     PMC *userargv;
-    KEY key;
 
     init_world();
   
@@ -240,9 +239,6 @@ main(int argc, char **argv) {
     /* immediately anchor pmc to root set */
     interpreter->ctx.pmc_reg.registers[0] = userargv;
 
-    key.atom.type = enum_key_int;
-    key.next = NULL;
-
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
@@ -252,8 +248,7 @@ main(int argc, char **argv) {
             fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
-        key.atom.val.int_val = i;
-        userargv->vtable->set_string_keyed(interpreter, userargv, &key, arg);
+        userargv->vtable->push_string(interpreter, userargv, arg);
     }
 
 //    runops(interpreter, pf, 0);

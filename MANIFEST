@@ -23,6 +23,7 @@ classes/csub.pmc
 classes/default.pmc
 classes/genclass.pl
 classes/intqueue.pmc
+classes/key.pmc
 classes/multiarray.pmc
 classes/perlarray.pmc
 classes/perlhash.pmc
@@ -397,6 +398,7 @@ lib/Make.pm
 lib/Parrot/BuildUtil.pm
 lib/Parrot/Configure/RunSteps.pm
 lib/Parrot/Configure/Step.pm
+lib/Parrot/Key.pm
 lib/Parrot/Makefile.PL
 lib/Parrot/Op.pm
 lib/Parrot/OpTrans.pm

@@ -11,6 +11,8 @@
 
 #include "parrot/parrot.h"
 
+#define INT2KEY(i,k) ((k) ? key_new_integer((i), *(k)) : NULL)
+
 pmclass default noinit {
 
     void init () {
@@ -38,45 +40,42 @@ pmclass default noinit {
         return SELF->vtable->base_type;
     }
 
-    INTVAL type_keyed (KEY* key) {
+    INTVAL type_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
     }
 
     INTVAL type_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.type_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.type_keyed(r_key);
     }
 
     UINTVAL subtype (INTVAL type) {
         return 0;
     }
 
-    UINTVAL subtype_keyed (KEY* key, INTVAL type) {
+    UINTVAL subtype_keyed (PMC* key, INTVAL type) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
     }
 
     UINTVAL subtype_keyed_int (INTVAL* key, INTVAL type) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.subtype_keyed(&r_key, type);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.subtype_keyed(r_key, type);
     }
 
     STRING* name () {
         return NULL;
     }
 
-    STRING* name_keyed (KEY* key) {
+    STRING* name_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
 
     STRING* name_keyed_int (INTVAL *key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.name_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.name_keyed(r_key);
     }
 
     PMC* clone () {
@@ -87,75 +86,70 @@ pmclass default noinit {
         return dest;
     }
 
-    PMC* clone_keyed (KEY* key) {
+    PMC* clone_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
 
     PMC* clone_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.clone_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.clone_keyed(r_key);
     }
 
     PMC* find_method(STRING* method_name) {
         return NULL;
     }
 
-    PMC* find_method_keyed(KEY* key, STRING* method_name) {
+    PMC* find_method_keyed(PMC* key, STRING* method_name) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
 
     PMC* find_method_keyed_int(INTVAL *key, STRING* method_name) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.find_method_keyed(&r_key, method_name);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.find_method_keyed(r_key, method_name);
     }
 
     INTVAL get_integer () {
         return SELF->cache.int_val;
     }
 
-    INTVAL get_integer_keyed (KEY* key) {
+    INTVAL get_integer_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
     }
 
     INTVAL get_integer_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.get_integer_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.get_integer_keyed(r_key);
     }
 
     FLOATVAL get_number () {
         return SELF->cache.num_val;
     }
 
-    FLOATVAL get_number_keyed (KEY* key) {
+    FLOATVAL get_number_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0.0;
     }
 
     FLOATVAL get_number_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.get_number_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.get_number_keyed(r_key);
     }
 
     BIGNUM* get_bignum () {
         return (BIGNUM*)SELF->cache.struct_val;
     }
 
-    BIGNUM* get_bignum_keyed (KEY* key) {
+    BIGNUM* get_bignum_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
 
     BIGNUM* get_bignum_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.get_bignum_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.get_bignum_keyed(r_key);
     }
 
     STRING* get_string () {
@@ -163,15 +157,14 @@ pmclass default noinit {
         return s;
     }
 
-    STRING* get_string_keyed (KEY* key) {
+    STRING* get_string_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
 
     STRING* get_string_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.get_string_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.get_string_keyed(r_key);
     }
 
     INTVAL get_bool () {
@@ -186,15 +179,14 @@ pmclass default noinit {
         return 1;
     }
 
-    INTVAL get_bool_keyed (KEY* key) {
+    INTVAL get_bool_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
     }
 
     INTVAL get_bool_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.get_bool_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.get_bool_keyed(r_key);
     }
 
     INTVAL elements () {
@@ -202,30 +194,28 @@ pmclass default noinit {
         return 0;
     }
 
-    INTVAL elements_keyed (KEY* key) {
+    INTVAL elements_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
     }
 
     INTVAL elements_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.elements_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.elements_keyed(r_key);
     }
 
     PMC* get_pmc () {
         return SELF;
     }
 
-    PMC* get_pmc_keyed (KEY* key) {
+    PMC* get_pmc_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.get_pmc_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.get_pmc_keyed(r_key);
     }
 
     INTVAL is_same (PMC* pmc2) {
@@ -235,7 +225,7 @@ pmclass default noinit {
         return (INTVAL)(SELF->vtable == pmc2->vtable && &SELF->cache == &pmc2->cache);
     }
 
-    INTVAL is_same_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL is_same_keyed (PMC* key, PMC* value, PMC* value_key) {
         if (key == NULL) {
             /* pmc2_key must not be null, else why did you call me? */
             return SELF->vtable->is_same(INTERP, SELF, value->vtable->get_pmc_keyed(INTERP, value, value_key));
@@ -245,17 +235,9 @@ pmclass default noinit {
     }
 
     INTVAL is_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        KEY r_key, r_value_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_value_key, *value_key);
-            return DYNSELF.is_same_keyed(NULL, value, &r_value_key);
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (value_key == NULL) {
-            return DYNSELF.is_same_keyed(&r_key, value, NULL);
-        }
-        MAKE_KEY_INT(r_value_key, *value_key);
-        return DYNSELF.is_same_keyed(&r_key, value, &r_value_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        return DYNSELF.is_same_keyed(r_key, value, r_value_key);
     }
 
     /* The set methods merely make the appropriate part of the cache
@@ -274,14 +256,13 @@ pmclass default noinit {
         SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
     }
 
-    void set_integer_keyed (KEY* key, INTVAL value) {
+    void set_integer_keyed (PMC* key, INTVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->set_integer_keyed(INTERP, SELF, &r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        SELF->vtable->set_integer_keyed(INTERP, SELF, r_key, value);
     }
 
     void set_number (PMC* value) {
@@ -296,14 +277,13 @@ pmclass default noinit {
         SELF->cache.num_val = value->vtable->get_number(INTERP, value);
     }
 
-    void set_number_keyed (KEY* key, FLOATVAL value) {
+    void set_number_keyed (PMC* key, FLOATVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->set_number_keyed(INTERP, SELF, &r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        SELF->vtable->set_number_keyed(INTERP, SELF, r_key, value);
     }
 
     void set_bignum (PMC* value) {
@@ -318,14 +298,13 @@ pmclass default noinit {
         SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
     }
 
-    void set_bignum_keyed (KEY* key, BIGNUM* value) {
+    void set_bignum_keyed (PMC* key, BIGNUM* value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void set_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->set_bignum_keyed(INTERP, SELF, &r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        SELF->vtable->set_bignum_keyed(INTERP, SELF, r_key, value);
     }
 
     void set_string (PMC* value) {
@@ -340,21 +319,20 @@ pmclass default noinit {
         SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
     }
 
-    void set_string_keyed (KEY* key, STRING* string) {
+    void set_string_keyed (PMC* key, STRING* string) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void set_string_keyed_int (INTVAL* key, STRING* string) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->set_string_keyed(INTERP, SELF, &r_key, string);
+        PMC* r_key = INT2KEY(INTERP, key);
+        SELF->vtable->set_string_keyed(INTERP, SELF, r_key, string);
     }
 
     void set_pmc (PMC* value) {
         SELF->cache.struct_val = value->vtable->get_pmc(INTERP, value);
     }
 
-    void set_pmc_keyed (KEY* key, PMC* value, KEY* value_key) {
+    void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
         /* Either key or value must NOT be NULL */
         if (key == NULL)
             SELF->vtable->set_pmc(INTERP, SELF, value->vtable->get_pmc_keyed(INTERP, value, value_key));
@@ -363,43 +341,23 @@ pmclass default noinit {
     }
 
     void set_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        KEY r_key, r_value_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_value_key, *value_key);
-            SELF->vtable->set_pmc_keyed(INTERP, SELF, NULL, value, &r_value_key);
-            return;
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (value_key == NULL) {
-            DYNSELF.set_pmc_keyed(&r_key, value, NULL);
-            return;
-        }
-        MAKE_KEY_INT(r_value_key, *value_key);
-        DYNSELF.set_pmc_keyed(&r_key, value, &r_value_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        DYNSELF.set_pmc_keyed(r_key, value, r_value_key);
     }
 
     void set_same (PMC* value) {
         SELF->cache = value->cache;
     }
 
-    void set_same_keyed (KEY* dest_key, PMC* src, KEY* src_key) {
+    void set_same_keyed (PMC* dest_key, PMC* src, PMC* src_key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void set_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        KEY r_key, r_value_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_value_key, *value_key);
-            DYNSELF.set_same_keyed(NULL, value, &r_value_key);
-            return;
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (value_key == NULL) {
-            DYNSELF.set_same_keyed(&r_key, value, NULL);
-            return;
-        }
-        MAKE_KEY_INT(r_value_key, *value_key);
-        DYNSELF.set_same_keyed(&r_key, value, &r_value_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        DYNSELF.set_same_keyed(r_key, value, r_value_key);
     }
 
     INTVAL pop_integer() {
@@ -407,15 +365,14 @@ pmclass default noinit {
         return 0;
     }
 
-    INTVAL pop_integer_keyed(KEY* key) {
+    INTVAL pop_integer_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
     }
     
     INTVAL pop_integer_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.pop_integer_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.pop_integer_keyed(r_key);
     }    
 
     FLOATVAL pop_float() {
@@ -423,15 +380,14 @@ pmclass default noinit {
         return 0.0;
     }
 
-    FLOATVAL pop_float_keyed(KEY* key) {
+    FLOATVAL pop_float_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0.0;
     }
     
     FLOATVAL pop_float_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.pop_float_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.pop_float_keyed(r_key);
     }    
 
     BIGNUM* pop_bignum() {
@@ -439,15 +395,14 @@ pmclass default noinit {
         return NULL;
     }
 
-    BIGNUM* pop_bignum_keyed(KEY* key) {
+    BIGNUM* pop_bignum_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
     
     BIGNUM* pop_bignum_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.pop_bignum_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.pop_bignum_keyed(r_key);
     }    
 
     STRING* pop_string() {
@@ -455,15 +410,14 @@ pmclass default noinit {
         return NULL;
     }
 
-    STRING* pop_string_keyed(KEY* key) {
+    STRING* pop_string_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
     
     STRING* pop_string_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.pop_string_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.pop_string_keyed(r_key);
     }    
 
     PMC* pop_pmc() {
@@ -471,95 +425,80 @@ pmclass default noinit {
         return NULL;
     }
 
-    PMC* pop_pmc_keyed(KEY* key) {
+    PMC* pop_pmc_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
     
     PMC* pop_pmc_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.pop_pmc_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.pop_pmc_keyed(r_key);
     }    
 
     void push_integer (INTVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
     }
 
-    void push_integer_keyed (KEY* key, INTVAL value) {
+    void push_integer_keyed (PMC* key, INTVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void push_integer_keyed_int (INTVAL* key, INTVAL value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.push_integer_keyed(&r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.push_integer_keyed(r_key, value);
     }    
 
     void push_float (FLOATVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
     }
 
-    void push_float_keyed (KEY* key, FLOATVAL value) {
+    void push_float_keyed (PMC* key, FLOATVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void push_float_keyed_int (INTVAL* key, FLOATVAL value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.push_float_keyed(&r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.push_float_keyed(r_key, value);
     }    
 
     void push_bignum (BIGNUM* value) {
         internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
     }
 
-    void push_bignum_keyed (KEY* key, BIGNUM* value) {
+    void push_bignum_keyed (PMC* key, BIGNUM* value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void push_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.push_bignum_keyed(&r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.push_bignum_keyed(r_key, value);
     }    
 
     void push_string (STRING* value) {
         internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
     }
 
-    void push_string_keyed (KEY* key, STRING* value) {
+    void push_string_keyed (PMC* key, STRING* value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void push_string_keyed_int (INTVAL* key, STRING* value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.push_string_keyed(&r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.push_string_keyed(r_key, value);
     }    
 
     void push_pmc (PMC* value) {
         internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
     }
 
-    void push_pmc_keyed (KEY* key, PMC* value, KEY* value_key) {
+    void push_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void push_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        KEY r_key, r_value_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_value_key, *value_key);
-            DYNSELF.push_pmc_keyed(NULL, value, &r_value_key);
-            return;
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (value_key == NULL) {
-            DYNSELF.push_pmc_keyed(&r_key, value, NULL);
-            return;
-        }
-        MAKE_KEY_INT(r_value_key, *value_key);
-        DYNSELF.push_pmc_keyed(&r_key, value, &r_value_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        DYNSELF.push_pmc_keyed(r_key, value, r_value_key);
     }    
 
     INTVAL shift_integer() {
@@ -567,15 +506,14 @@ pmclass default noinit {
         return 0;
     }
 
-    INTVAL shift_integer_keyed(KEY* key) {
+    INTVAL shift_integer_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
     }
     
     INTVAL shift_integer_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.shift_integer_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.shift_integer_keyed(r_key);
     }    
 
     FLOATVAL shift_float() {
@@ -583,15 +521,14 @@ pmclass default noinit {
         return 0.0;
     }
 
-    FLOATVAL shift_float_keyed(KEY* key) {
+    FLOATVAL shift_float_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0.0;
     }
     
     FLOATVAL shift_float_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.shift_float_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.shift_float_keyed(r_key);
     }    
 
     BIGNUM* shift_bignum() {
@@ -599,15 +536,14 @@ pmclass default noinit {
         return NULL;
     }
 
-    BIGNUM* shift_bignum_keyed(KEY* key) {
+    BIGNUM* shift_bignum_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
     
     BIGNUM* shift_bignum_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.shift_bignum_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.shift_bignum_keyed(r_key);
     }    
 
     STRING* shift_string() {
@@ -615,15 +551,14 @@ pmclass default noinit {
         return NULL;
     }
 
-    STRING* shift_string_keyed(KEY* key) {
+    STRING* shift_string_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
     
     STRING* shift_string_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.shift_string_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.shift_string_keyed(r_key);
     }    
 
     PMC* shift_pmc() {
@@ -631,95 +566,80 @@ pmclass default noinit {
         return NULL;
     }
 
-    PMC* shift_pmc_keyed(KEY* key) {
+    PMC* shift_pmc_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
     
     PMC* shift_pmc_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.shift_pmc_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.shift_pmc_keyed(r_key);
     }    
 
     void unshift_integer (INTVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
     }
 
-    void unshift_integer_keyed (KEY* key, INTVAL value) {
+    void unshift_integer_keyed (PMC* key, INTVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void unshift_integer_keyed_int (INTVAL* key, INTVAL value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.unshift_integer_keyed(&r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.unshift_integer_keyed(r_key, value);
     }    
 
     void unshift_float (FLOATVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
     }
 
-    void unshift_float_keyed (KEY* key, FLOATVAL value) {
+    void unshift_float_keyed (PMC* key, FLOATVAL value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void unshift_float_keyed_int (INTVAL* key, FLOATVAL value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.unshift_float_keyed(&r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.unshift_float_keyed(r_key, value);
     }    
 
     void unshift_bignum (BIGNUM* value) {
         internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
     }
 
-    void unshift_bignum_keyed (KEY* key, BIGNUM* value) {
+    void unshift_bignum_keyed (PMC* key, BIGNUM* value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void unshift_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.unshift_bignum_keyed(&r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.unshift_bignum_keyed(r_key, value);
     }    
 
     void unshift_string (STRING* value) {
         internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
     }
 
-    void unshift_string_keyed (KEY* key, STRING* value) {
+    void unshift_string_keyed (PMC* key, STRING* value) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void unshift_string_keyed_int (INTVAL* key, STRING* value) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.unshift_string_keyed(&r_key, value);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.unshift_string_keyed(r_key, value);
     }    
 
     void unshift_pmc (PMC* value) {
         internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
     }
 
-    void unshift_pmc_keyed (KEY* key, PMC* value, KEY* value_key) {
+    void unshift_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
     
     void unshift_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        KEY r_key, r_value_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_value_key, *value_key);
-            DYNSELF.unshift_pmc_keyed(NULL, value, &r_value_key);
-            return;
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (value_key == NULL) {
-            DYNSELF.unshift_pmc_keyed(&r_key, value, NULL);
-            return;
-        }
-        MAKE_KEY_INT(r_value_key, *value_key);
-        DYNSELF.unshift_pmc_keyed(&r_key, value, &r_value_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        DYNSELF.unshift_pmc_keyed(r_key, value, r_value_key);
     }    
 
     void add (PMC* value, PMC* dest) {
@@ -772,8 +692,8 @@ pmclass default noinit {
         dest->vtable->set_number_native(INTERP, dest, result);
     }
 
-    void add_keyed (KEY* key, PMC* value, KEY* value_key,
-        PMC* dest, KEY* dest_key) {
+    void add_keyed (PMC* key, PMC* value, PMC* value_key,
+        PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -796,41 +716,11 @@ pmclass default noinit {
     }
 
     void add_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.add_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.add_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.add_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.add_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.add_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.add_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.add_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void subtract (PMC* value,  PMC* dest) {
@@ -883,8 +773,8 @@ pmclass default noinit {
         dest->vtable->set_number_native(INTERP, dest, result);
     }
 
-    void subtract_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void subtract_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -907,41 +797,11 @@ pmclass default noinit {
     }
 
     void subtract_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.subtract_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.subtract_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.subtract_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.subtract_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.subtract_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.subtract_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.subtract_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void multiply (PMC* value,  PMC* dest) {
@@ -992,8 +852,8 @@ pmclass default noinit {
         dest->vtable->set_number_native(INTERP, dest, result);
     }
 
-    void multiply_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void multiply_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -1016,41 +876,11 @@ pmclass default noinit {
     }
 
     void multiply_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
 
-        KEY r_key, r_value_key, r_dest_key;
-        
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.multiply_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.multiply_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.multiply_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.multiply_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.multiply_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.multiply_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.multiply_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void divide (PMC* value,  PMC* dest) {
@@ -1105,8 +935,8 @@ pmclass default noinit {
         dest->vtable->set_number_native(INTERP, dest, result);
     }
 
-    void divide_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void divide_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -1129,41 +959,11 @@ pmclass default noinit {
     }
 
     void divide_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.divide_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.divide_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.divide_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.divide_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.divide_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.divide_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.divide_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void modulus (PMC* value,  PMC* dest) {
@@ -1210,8 +1010,8 @@ pmclass default noinit {
         dest->vtable->set_integer_native(INTERP, dest, result);
     }
 
-    void modulus_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void modulus_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -1234,48 +1034,18 @@ pmclass default noinit {
     }
 
     void modulus_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.modulus_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.modulus_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.modulus_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.modulus_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.modulus_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.modulus_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.modulus_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void neg (PMC* dest) {
         dest->vtable->set_integer_native(INTERP, dest, -DYNSELF.get_integer());
     }
 
-    void neg_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+    void neg_keyed (PMC* key, PMC* dest, PMC* dest_key) {
         if (key == NULL)
             dest->vtable->set_integer_keyed(INTERP, dest,
                 dest_key, -DYNSELF.get_integer());
@@ -1284,19 +1054,9 @@ pmclass default noinit {
     }
 
     void neg_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
-        KEY r_key, r_dest_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_dest_key, *dest_key);
-            DYNSELF.neg_keyed(NULL, dest, &r_dest_key);
-            return;
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (dest_key == NULL) {
-            DYNSELF.neg_keyed(&r_key, dest, NULL);
-            return;
-        }
-        MAKE_KEY_INT(r_dest_key, *dest_key);
-        DYNSELF.neg_keyed(&r_key, dest, &r_dest_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
+        DYNSELF.neg_keyed(r_key, dest, r_dest_key);
     }
 
     void bitwise_or (PMC* value, PMC* dest) {
@@ -1326,8 +1086,8 @@ pmclass default noinit {
         dest->vtable->set_integer_native(INTERP, dest, result);
     }
 
-    void bitwise_or_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void bitwise_or_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -1350,41 +1110,11 @@ pmclass default noinit {
     }
 
     void bitwise_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.bitwise_or_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.bitwise_or_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_or_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_or_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_or_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_or_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.bitwise_or_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void bitwise_and (PMC* value, PMC* dest) {
@@ -1414,8 +1144,8 @@ pmclass default noinit {
         dest->vtable->set_integer_native(INTERP, dest, result);
     }
 
-    void bitwise_and_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void bitwise_and_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -1438,41 +1168,11 @@ pmclass default noinit {
     }
 
     void bitwise_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.bitwise_and_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.bitwise_and_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_and_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_and_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_and_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_and_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.bitwise_and_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void bitwise_xor (PMC* value, PMC* dest) {
@@ -1502,8 +1202,8 @@ pmclass default noinit {
         dest->vtable->set_integer_native(INTERP, dest, result);
     }
 
-    void bitwise_xor_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void bitwise_xor_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -1526,48 +1226,18 @@ pmclass default noinit {
     }
 
     void bitwise_xor_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.bitwise_xor_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.bitwise_xor_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_xor_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_xor_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_xor_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_xor_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.bitwise_xor_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void bitwise_not (PMC* dest) {
         dest->vtable->set_integer_native(INTERP, dest, ~DYNSELF.get_integer());
     }
 
-    void bitwise_not_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+    void bitwise_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
         if (key == NULL)
             dest->vtable->set_integer_keyed(INTERP, dest,
                 dest_key, ~DYNSELF.get_integer());
@@ -1576,19 +1246,9 @@ pmclass default noinit {
     }
 
     void bitwise_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
-        KEY r_key, r_dest_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_dest_key, *dest_key);
-            DYNSELF.bitwise_not_keyed(NULL, dest, &r_dest_key);
-            return;
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (dest_key == NULL) {
-            DYNSELF.bitwise_not_keyed(&r_key, dest, NULL);
-            return;
-        }
-        MAKE_KEY_INT(r_dest_key, *dest_key);
-        DYNSELF.bitwise_not_keyed(&r_key, dest, &r_dest_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
+        DYNSELF.bitwise_not_keyed(r_key, dest, r_dest_key);
     }
 
     void bitwise_shr (PMC* value, PMC* dest) {
@@ -1618,8 +1278,8 @@ pmclass default noinit {
         dest->vtable->set_integer_native(INTERP, dest, result);
     }
 
-    void bitwise_shr_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void bitwise_shr_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -1642,41 +1302,11 @@ pmclass default noinit {
     }
 
     void bitwise_shr_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.bitwise_shr_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.bitwise_shr_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_shr_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_shr_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_shr_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_shr_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.bitwise_shr_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void bitwise_shl (PMC* value, PMC* dest) {
@@ -1706,8 +1336,8 @@ pmclass default noinit {
         dest->vtable->set_integer_native(INTERP, dest, result);
     }
 
-    void bitwise_shl_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void bitwise_shl_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -1730,41 +1360,11 @@ pmclass default noinit {
     }
 
     void bitwise_shl_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.bitwise_shl_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.bitwise_shl_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_shl_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_shl_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.bitwise_shl_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.bitwise_shl_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.bitwise_shl_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void concatenate (PMC* value,  PMC* dest) {
@@ -1792,8 +1392,8 @@ pmclass default noinit {
         dest->vtable->set_string_native(INTERP, dest, s);
     }
 
-    void concatenate_keyed (KEY* key, PMC* value, KEY* value_key,
-            PMC* dest, KEY* dest_key) {
+    void concatenate_keyed (PMC* key, PMC* value, PMC* value_key,
+            PMC* dest, PMC* dest_key) {
 
         /* At least one key MUST NOT be NULL */
 
@@ -1820,41 +1420,11 @@ pmclass default noinit {
     }
 
     void concatenate_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.concatenate_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.concatenate_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.concatenate_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.concatenate_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.concatenate_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.concatenate_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.concatenate_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     INTVAL is_equal (PMC* value) {
@@ -1873,7 +1443,7 @@ pmclass default noinit {
         return 0;
     }
 
-    INTVAL is_equal_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {
         if (key == NULL) {
             if (DYNSELF.get_integer()
                     == value->vtable->get_integer_keyed(INTERP, value, value_key)
@@ -1893,17 +1463,9 @@ pmclass default noinit {
     }
 
     INTVAL is_equal_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        KEY r_key, r_value_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_value_key, *value_key);
-            return DYNSELF.is_equal_keyed(NULL, value, &r_value_key);
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (value_key == NULL) {
-            return DYNSELF.is_equal_keyed(&r_key, value, NULL);
-        }
-        MAKE_KEY_INT(r_value_key, *value_key);
-        return DYNSELF.is_equal_keyed(&r_key, value, &r_value_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        return DYNSELF.is_equal_keyed(r_key, value, r_value_key);
     }
 
     INTVAL cmp (PMC* value) {
@@ -1911,7 +1473,7 @@ pmclass default noinit {
         return 0;
     }
 
-    INTVAL cmp_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL cmp_keyed (PMC* key, PMC* value, PMC* value_key) {
         if (key == NULL)
             /* XXX: What does this mean for this class? */
             return 0;
@@ -1920,17 +1482,9 @@ pmclass default noinit {
     }
 
     INTVAL cmp_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        KEY r_key, r_value_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_value_key, *value_key);
-            return DYNSELF.cmp_keyed(NULL, value, &r_value_key);
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (value_key == NULL) {
-            return DYNSELF.cmp_keyed(&r_key, value, NULL);
-        }
-        MAKE_KEY_INT(r_value_key, *value_key);
-        return DYNSELF.cmp_keyed(&r_key, value, &r_value_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        return DYNSELF.cmp_keyed(r_key, value, r_value_key);
     }
 
     INTVAL cmp_num (PMC* value) {
@@ -1941,7 +1495,7 @@ pmclass default noinit {
         return diff == 0.0 ? 0 : diff < 0.0 ? -1 : 1;
     }
 
-    INTVAL cmp_num_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL cmp_num_keyed (PMC* key, PMC* value, PMC* value_key) {
         if (key == NULL) {
             /* XXX - Floating-point precision errors possible? */
             FLOATVAL diff = value->vtable->get_number_keyed(INTERP, value, value_key) -
@@ -1954,17 +1508,9 @@ pmclass default noinit {
     }
 
     INTVAL cmp_num_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        KEY r_key, r_value_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_value_key, *value_key);
-            return DYNSELF.cmp_num_keyed(NULL, value, &r_value_key);
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (value_key == NULL) {
-            return DYNSELF.cmp_num_keyed(&r_key, value, NULL);
-        }
-        MAKE_KEY_INT(r_value_key, *value_key);
-        return DYNSELF.cmp_num_keyed(&r_key, value, &r_value_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        return DYNSELF.cmp_num_keyed(r_key, value, r_value_key);
     }
 
     INTVAL cmp_string (PMC* value) {
@@ -1972,7 +1518,7 @@ pmclass default noinit {
             value->vtable->get_string(INTERP, value));
     }
 
-    INTVAL cmp_string_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL cmp_string_keyed (PMC* key, PMC* value, PMC* value_key) {
         if (key == NULL)
             return string_compare(INTERP, DYNSELF.get_string(),
                 value->vtable->get_string_keyed(INTERP, value, value_key));
@@ -1981,17 +1527,9 @@ pmclass default noinit {
     }
 
     INTVAL cmp_string_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        KEY r_key, r_value_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_value_key, *value_key);
-            return DYNSELF.cmp_string_keyed(NULL, value, &r_value_key);
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (value_key == NULL) {
-            return DYNSELF.cmp_string_keyed(&r_key, value, NULL);
-        }
-        MAKE_KEY_INT(r_value_key, *value_key);
-        return DYNSELF.cmp_string_keyed(&r_key, value, &r_value_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        return DYNSELF.cmp_string_keyed(r_key, value, r_value_key);
     }
 
     void logical_or (PMC* value,  PMC* dest) {
@@ -2003,7 +1541,7 @@ pmclass default noinit {
         }
     }
 
-    void logical_or_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void logical_or_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
         if (key == NULL) {
             if (DYNSELF.get_bool()) {
                 if (dest_key != NULL)
@@ -2020,41 +1558,11 @@ pmclass default noinit {
     }
 
     void logical_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.logical_or_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.logical_or_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.logical_or_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.logical_or_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.logical_or_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.logical_or_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.logical_or_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void logical_and (PMC* value,  PMC* dest) {
@@ -2066,7 +1574,7 @@ pmclass default noinit {
         }
     }
 
-    void logical_and_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void logical_and_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
         if (key == NULL) {
             if (DYNSELF.get_bool())
                 /* Either value_key or dest_key is not NULL */
@@ -2083,41 +1591,11 @@ pmclass default noinit {
     }
 
     void logical_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.logical_and_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.logical_and_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.logical_and_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.logical_and_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.logical_and_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.logical_and_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.logical_and_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void logical_xor (PMC* value,  PMC* dest) {
@@ -2139,7 +1617,7 @@ pmclass default noinit {
         }
     }
 
-    void logical_xor_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void logical_xor_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
 
         if (key == NULL) {
 
@@ -2176,41 +1654,11 @@ pmclass default noinit {
 
 
     void logical_xor_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.logical_xor_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.logical_xor_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.logical_xor_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.logical_xor_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.logical_xor_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.logical_xor_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.logical_xor_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void logical_not (PMC* dest) {
@@ -2219,7 +1667,7 @@ pmclass default noinit {
             ! DYNSELF.get_bool());
     }
 
-    void logical_not_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+    void logical_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
         /* XXX - Need a better way to set boolean state */
         if (key == NULL)
             dest->vtable->set_integer_keyed(INTERP, dest,
@@ -2229,19 +1677,9 @@ pmclass default noinit {
     }
 
     void logical_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
-        KEY r_key, r_dest_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_dest_key, *dest_key);
-            DYNSELF.logical_not_keyed(NULL, dest, &r_dest_key);
-            return;
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (dest_key == NULL) {
-            DYNSELF.logical_not_keyed(&r_key, dest, NULL);
-            return;
-        }
-        MAKE_KEY_INT(r_dest_key, *dest_key);
-        DYNSELF.logical_not_keyed(&r_key, dest, &r_dest_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
+        DYNSELF.logical_not_keyed(r_key, dest, r_dest_key);
     }
 
     void repeat (PMC* value,  PMC* dest) {
@@ -2250,46 +1688,16 @@ pmclass default noinit {
                 (UINTVAL)value->vtable->get_integer(INTERP, value), NULL) );
     }
 
-    void repeat_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void repeat_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void repeat_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-
-        KEY r_key, r_value_key, r_dest_key;
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_value_key = INT2KEY(INTERP, value_key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
         
-        /* Lots of comparisons here, but any given path has a max of 3 */
-        
-        if (key == NULL) {
-            if (value_key == NULL) {
-                MAKE_KEY_INT(r_dest_key, *dest_key);
-                DYNSELF.repeat_keyed(NULL, value, NULL, dest, &r_dest_key);
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                DYNSELF.repeat_keyed(NULL, value, &r_value_key, dest, NULL);
-            }
-        }
-        else {
-            MAKE_KEY_INT(r_key, *key);
-            if (value_key == NULL) {
-                if (dest_key == NULL)
-                    DYNSELF.repeat_keyed(&r_key, value, NULL, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.repeat_keyed(&r_key, value, NULL, dest, &r_dest_key);
-                }
-            }
-            else {
-                MAKE_KEY_INT(r_value_key, *value_key);
-                if (dest_key == NULL)
-                    DYNSELF.repeat_keyed(&r_key, value, &r_value_key, dest, NULL);
-                else {
-                    MAKE_KEY_INT(r_dest_key, *dest_key);
-                    DYNSELF.repeat_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
-                }
-            }
-        }
+        DYNSELF.repeat_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
@@ -2298,123 +1706,97 @@ pmclass default noinit {
                 (UINTVAL)value, NULL) );
     }
 
-    void repeat_int_keyed (KEY* key, INTVAL value, PMC* dest, KEY* dest_key) {
+    void repeat_int_keyed (PMC* key, INTVAL value, PMC* dest, PMC* dest_key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void repeat_int_keyed_int (INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key) {
-        KEY r_key, r_dest_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_dest_key, *dest_key);
-            DYNSELF.repeat_int_keyed(NULL, value, dest, &r_dest_key);
-            return;
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (dest_key == NULL) {
-            DYNSELF.repeat_int_keyed(&r_key, value, dest, NULL);
-            return;
-        }
-        MAKE_KEY_INT(r_dest_key, *dest_key);
-        DYNSELF.repeat_int_keyed(&r_key, value, dest, &r_dest_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
+        DYNSELF.repeat_int_keyed(r_key, value, dest, r_dest_key);
     }
 
     void increment () {
         SELF->cache.int_val = DYNSELF.get_integer() + 1;
     }
 
-    void increment_keyed (KEY* key) {
+    void increment_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void increment_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.increment_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.increment_keyed(r_key);
     }
 
     void decrement () {
         SELF->cache.int_val = DYNSELF.get_integer() - 1;
     }
 
-    void decrement_keyed (KEY* key) {
+    void decrement_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void decrement_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.decrement_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.decrement_keyed(r_key);
     }
 
-    INTVAL exists_keyed (KEY* key) {
+    INTVAL exists_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
     }
 
     INTVAL exists_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.exists_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.exists_keyed(r_key);
     }
 
     INTVAL defined () {
         return 1;
     }
 
-    INTVAL defined_keyed (KEY* key) {
+    INTVAL defined_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
     }
 
     INTVAL defined_keyed_int (INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.defined_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.defined_keyed(r_key);
     }
 
-    void delete_keyed(KEY* key) {
+    void delete_keyed(PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void delete_keyed_int(INTVAL* key) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        DYNSELF.delete_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.delete_keyed(r_key);
     }
 
-    KEY* nextkey_keyed (KEY* key) {
+    PMC* nextkey_keyed (PMC* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
 
-    KEY* nextkey_keyed_int (INTVAL* key) {
+    PMC* nextkey_keyed_int (INTVAL* key) {
         /* XXX - Something's not right with this method */
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.nextkey_keyed(&r_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.nextkey_keyed(r_key);
     }
 
     void substr(INTVAL offset, INTVAL length, PMC* dest) {
     }
 
-    void substr_keyed(KEY* key, INTVAL offset, INTVAL length, PMC* dest, KEY* dest_key) {
+    void substr_keyed(PMC* key, INTVAL offset, INTVAL length, PMC* dest, PMC* dest_key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void substr_keyed_int(INTVAL* key, INTVAL offset, INTVAL length, PMC* dest, INTVAL* dest_key) {
-        KEY r_key, r_dest_key;
-        if (key == NULL) {
-            MAKE_KEY_INT(r_dest_key, *dest_key);
-            DYNSELF.substr_keyed(NULL, offset, length, dest, &r_dest_key);
-            return;
-        }
-        MAKE_KEY_INT(r_key, *key);
-        if (dest_key == NULL) {
-            DYNSELF.substr_keyed(&r_key, offset, length, dest, NULL);
-            return;
-        }
-        MAKE_KEY_INT(r_dest_key, *dest_key);
-        DYNSELF.substr_keyed(&r_key, offset, length, dest, &r_dest_key);
+        PMC* r_key = INT2KEY(INTERP, key);
+        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
+        DYNSELF.substr_keyed(r_key, offset, length, dest, r_dest_key);
     }
 
     STRING* substr_str(INTVAL offset, INTVAL length) {
@@ -2422,15 +1804,14 @@ pmclass default noinit {
             offset, length, NULL);
     }
 
-    STRING* substr_str_keyed(KEY* key, INTVAL offset, INTVAL length) {
+    STRING* substr_str_keyed(PMC* key, INTVAL offset, INTVAL length) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return NULL;
     }
 
     STRING* substr_str_keyed_int (INTVAL* key, INTVAL offset, INTVAL length) {
-        KEY r_key;
-        MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.substr_str_keyed(&r_key, offset, length);
+        PMC* r_key = INT2KEY(INTERP, key);
+        return DYNSELF.substr_str_keyed(r_key, offset, length);
     }
 
     void* invoke (void* next) {

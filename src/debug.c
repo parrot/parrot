@@ -335,10 +335,9 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     PMC *userargv;
-    KEY key;
     STRING *arg;
     struct PackFile *code;
-    unsigned long i,j = 1;
+    unsigned long i;
     char c[256];
     
     /* The bytecode is readonly, right? */
@@ -354,9 +353,6 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
     userargv = pmc_new(interpreter, enum_class_PerlArray);
     interpreter->ctx.pmc_reg.registers[0] = userargv;
 
-    key.atom.type = enum_key_int;
-    key.next = NULL;
-
     while (command && *command) {
         i = 0;
         while (command[i] && !isspace((int) command[i])) {
@@ -368,8 +364,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 
         arg = string_make(interpreter, c, i, NULL, 
                           BUFFER_external_FLAG, NULL);
-        key.atom.val.int_val = j++;
-        userargv->vtable->set_string_keyed(interpreter, userargv, &key, arg);
+        userargv->vtable->push_string(interpreter, userargv, arg);
     }
 
     /* Restart if we are already running */
@@ -604,6 +599,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
     char *ptr,*escaped;
     int neg = 0, j;
     long i;
+    PMC *k;
 
     pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
     pline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
@@ -703,6 +699,115 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
                         }
                     }
                     pfile->source[pfile->size++] = '"';
+                    break;
+                case PARROT_ARG_K:
+                    pfile->source[pfile->size - 1] = '[';
+#ifdef HAS_SNPRINTF
+                    snprintf(buf, sizeof(buf), "P" INTVAL_FMT, pc[j]);
+#else
+                    sprintf(buf, "P" INTVAL_FMT, pc[j]);  /* XXX buffer overflow! */
+#endif
+                    strcpy(&pfile->source[pfile->size], buf);
+                    pfile->size += strlen(buf);
+                    pfile->source[pfile->size++] = ']';
+                    break;
+                case PARROT_ARG_KC:
+                    pfile->source[pfile->size - 1] = '[';
+                    k = interpreter->code->const_table->constants[pc[j]]->key;
+                    while (k) {
+                        switch (k->flags & KEY_type_FLAGS) {
+                            case 0:
+                                break;
+                            case KEY_integer_FLAG:
+#ifdef HAS_SNPRINTF
+                                snprintf(buf, sizeof(buf), INTVAL_FMT, k->cache.int_val);
+#else
+                                sprintf(buf, INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+#endif
+                                strcpy(&pfile->source[pfile->size], buf);
+                                pfile->size += strlen(buf);
+                                break;
+                            case KEY_number_FLAG:
+#ifdef HAS_SNPRINTF
+                                snprintf(buf, sizeof(buf), FLOATVAL_FMT, k->cache.num_val);
+#else
+                                sprintf(buf, FLOATVAL_FMT, k->cache.num_val);  /* XXX buffer overflow! */
+#endif
+                                strcpy(&pfile->source[pfile->size], buf);
+                                pfile->size += strlen(buf);
+                                break;
+                            case KEY_string_FLAG:
+                                pfile->source[pfile->size++] = '"';
+                                strcpy(&pfile->source[pfile->size], string_to_cstring(interpreter, k->cache.string_val));
+                                pfile->size += string_length(k->cache.string_val);
+                                pfile->source[pfile->size++] = '"';
+                                break;
+                            case KEY_integer_FLAG|KEY_register_FLAG:
+#ifdef HAS_SNPRINTF
+                                snprintf(buf, sizeof(buf), "I" INTVAL_FMT, k->cache.int_val);
+#else
+                                sprintf(buf, "I" INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+#endif
+                                strcpy(&pfile->source[pfile->size], buf);
+                                pfile->size += strlen(buf);
+                                break;
+                            case KEY_number_FLAG|KEY_register_FLAG:
+#ifdef HAS_SNPRINTF
+                                snprintf(buf, sizeof(buf), "N" INTVAL_FMT, k->cache.int_val);
+#else
+                                sprintf(buf, "N" INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+#endif
+                                strcpy(&pfile->source[pfile->size], buf);
+                                pfile->size += strlen(buf);
+                                break;
+                            case KEY_string_FLAG|KEY_register_FLAG:
+#ifdef HAS_SNPRINTF
+                                snprintf(buf, sizeof(buf), "S" INTVAL_FMT, k->cache.int_val);
+#else
+                                sprintf(buf, "S" INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+#endif
+                                strcpy(&pfile->source[pfile->size], buf);
+                                pfile->size += strlen(buf);
+                                break;
+                            case KEY_pmc_FLAG|KEY_register_FLAG:
+#ifdef HAS_SNPRINTF
+                                snprintf(buf, sizeof(buf), "P" INTVAL_FMT, k->cache.int_val);
+#else
+                                sprintf(buf, "P" INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+#endif
+                                strcpy(&pfile->source[pfile->size], buf);
+                                pfile->size += strlen(buf);
+                                break;
+                            default:
+                                pfile->source[pfile->size++] = '?';
+                                break;
+                        }
+                        k = k->data;
+                        if (k) pfile->source[pfile->size++] = ';';
+                    }
+                    pfile->source[pfile->size++] = ']';
+                    break;
+                case PARROT_ARG_KI:
+                    pfile->source[pfile->size - 1] = '[';
+#ifdef HAS_SNPRINTF
+                    snprintf(buf, sizeof(buf), "I" INTVAL_FMT, pc[j]);
+#else
+                    sprintf(buf, "I" INTVAL_FMT, pc[j]);  /* XXX buffer overflow! */
+#endif
+                    strcpy(&pfile->source[pfile->size], buf);
+                    pfile->size += strlen(buf);
+                    pfile->source[pfile->size++] = ']';
+                    break;
+                case PARROT_ARG_KIC:
+                    pfile->source[pfile->size - 1] = '[';
+#ifdef HAS_SNPRINTF
+                    snprintf(buf, sizeof(buf), INTVAL_FMT, pc[j]);
+#else
+                    sprintf(buf, INTVAL_FMT, pc[j]);  /* XXX buffer overflow! */
+#endif
+                    strcpy(&pfile->source[pfile->size], buf);
+                    pfile->size += strlen(buf);
+                    pfile->source[pfile->size++] = ']';
                     break;
                 default:
                     break;

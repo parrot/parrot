@@ -14,6 +14,63 @@
 
 
 /*
+ *=for api interpreter trace_key_dump
+ * TODO: This isn't really part of the API, but here's its documentation. 
+ * Prints a key. Used by trace_op_dump
+ */
+static
+void
+trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
+{
+    char *escaped;
+    STRING *s;
+
+    fprintf(stderr, "[");
+                
+    while (key) {
+        switch (key->flags & KEY_type_FLAGS) {
+        case 0:
+            break;
+        case KEY_integer_FLAG:
+            fprintf(stderr, INTVAL_FMT, key->cache.int_val);
+            break;
+        case KEY_number_FLAG:
+            fprintf(stderr, FLOATVAL_FMT, key->cache.num_val);
+            break;
+        case KEY_string_FLAG:
+            s = key->cache.string_val;
+            escaped = PDB_escape(s->bufstart, s->strlen);
+            fprintf(stderr, "\"%s\"", escaped);
+            break;
+        case KEY_integer_FLAG|KEY_register_FLAG:
+            fprintf(stderr, "I" INTVAL_FMT "=" INTVAL_FMT, key->cache.int_val,
+                    interpreter->ctx.int_reg.registers[key->cache.int_val]);
+            break;
+        case KEY_number_FLAG|KEY_register_FLAG:
+            fprintf(stderr, "I" INTVAL_FMT "=" FLOATVAL_FMT, key->cache.int_val,
+                    interpreter->ctx.num_reg.registers[key->cache.int_val]);
+            break;
+        case KEY_string_FLAG|KEY_register_FLAG:
+            s = interpreter->ctx.string_reg.registers[key->cache.int_val];
+            escaped = PDB_escape(s->bufstart, s->strlen);
+            fprintf(stderr, "S" INTVAL_FMT "=\"%s\"", key->cache.int_val, escaped);
+            break;
+        case KEY_pmc_FLAG|KEY_register_FLAG:
+            fprintf(stderr, "P" INTVAL_FMT, key->cache.int_val);
+            break;
+        default:
+            fprintf(stderr, "??");
+        }
+        
+        key = key->data;
+        
+        if (key) fprintf(stderr, ";");
+    }
+    
+    fprintf(stderr, "]");
+}
+
+/*
  *=for api interpreter trace_op_dump
  * TODO: This isn't really part of the API, but here's its documentation. 
  * Prints the PC, OP and ARGS. Used by trace_op
@@ -36,15 +93,15 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
             }
             switch (interpreter->op_info_table[*pc].types[i]) {
             case PARROT_ARG_IC:
-                fprintf(stderr, "%ld", (long)*(pc + i));
+                fprintf(stderr, INTVAL_FMT, *(pc + i));
                 break;
             case PARROT_ARG_NC:
-                fprintf(stderr, "%f", interpreter->code->const_table->
+                fprintf(stderr, FLOATVAL_FMT, interpreter->code->const_table->
                         constants[*(pc + i)]->number);
                 break;
             case PARROT_ARG_PC:
                 /* what is a PMC constant look like? */
-                fprintf(stderr, "%ld", (long)*(pc + i));
+                fprintf(stderr, INTVAL_FMT, *(pc + i));
                 break;
             case PARROT_ARG_SC:
                 escaped = PDB_escape(interpreter->code->const_table->
@@ -54,20 +111,22 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 fprintf(stderr, "\"%s\"", escaped);
                 break;
             case PARROT_ARG_KC:
-                /* what will a KEY constant look like? */
-                fprintf(stderr, "%ld", (long)*(pc + i));
+                trace_key_dump(interpreter, interpreter->code->const_table->constants[*(pc + i)]->key);
+                break;
+            case PARROT_ARG_KIC:
+                fprintf(stderr, "[" INTVAL_FMT "]", *(pc + i));
                 break;
             case PARROT_ARG_I:
-                fprintf(stderr, "I%ld=%ld", (long)*(pc + i),
-                        (long)interpreter->ctx.int_reg.registers[*(pc + i)]);
+                fprintf(stderr, "I" INTVAL_FMT "=" INTVAL_FMT, *(pc + i),
+                        interpreter->ctx.int_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_N:
-                fprintf(stderr, "N%ld=%f", (long)*(pc + i),
+                fprintf(stderr, "N" INTVAL_FMT "=" FLOATVAL_FMT, *(pc + i),
                         interpreter->ctx.num_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_P:
-                /* what does a PMC constant look like? */
-                fprintf(stderr, "P%ld=%p", (long)*(pc + i),
+                /* what does a PMC register look like? */
+                fprintf(stderr, "P" INTVAL_FMT "=%p", *(pc + i),
                         interpreter->ctx.pmc_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_S:
@@ -76,17 +135,20 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                                          registers[*(pc + i)]->bufstart,
                                          interpreter->ctx.string_reg.
                                          registers[*(pc + i)]->strlen);
-                    fprintf(stderr, "S%ld=\"%s\"", (long)*(pc + i),
+                    fprintf(stderr, "S" INTVAL_FMT "=\"%s\"", *(pc + i),
                             escaped);
                 }
                 else {
-                    fprintf(stderr, "S%ld=(null)", (long)*(pc + i));
+                    fprintf(stderr, "S" INTVAL_FMT "=(null)", *(pc + i));
                 }
                 break;
             case PARROT_ARG_K:
-                /* what does a KEY constant look like? */
-                fprintf(stderr, "K%ld=%p", (long)*(pc + i),
-                        interpreter->ctx.pmc_reg.registers[*(pc + i)]);
+                fprintf(stderr, "P" INTVAL_FMT "=", *(pc + i));
+                trace_key_dump(interpreter, interpreter->ctx.pmc_reg.registers[*(pc + i)]);
+                break;
+            case PARROT_ARG_KI:
+                fprintf(stderr, "[I" INTVAL_FMT "=" INTVAL_FMT "]", *(pc + i),
+                        interpreter->ctx.int_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_OP:
                 /* this isn't handled, so at least report the error
@@ -96,9 +158,9 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             default:
                 /* -Wall expects us to cover PARROT_ARG_OP somewhere. */
-                fprintf(stderr, "?(%i)%ld=???",
+                fprintf(stderr, "?(%i)" INTVAL_FMT "=???",
                         interpreter->op_info_table[*pc].types[i],
-                        (long)*(pc + i));
+                        *(pc + i));
                 break;
             }
         }

@@ -59,7 +59,7 @@ struct _cell_buffer {
     Buffer *cell_buffer;
     INTVAL size;
     INTVAL free_cell;
-    KEY *dimension;
+    PMC *dimension;
 };
 
 struct _cell {
@@ -89,26 +89,26 @@ struct _cell {
  * $1 is addr of our CELL_BUFFER structure.
  * $2 is a key pointer containing positions in multidimensional space 
  */
-static INTVAL calc_offset_multi(void *base, KEY k) 
+static INTVAL calc_offset_multi(struct Parrot_Interp *interpreter, void *base, PMC *k) 
 {
     
     CELL_B *cell_data = (CELL_B *)base;
-    KEY *dim_key;
-    KEY *my_key;
+    PMC *dim_key;
+    PMC *my_key;
     INTVAL offset = 0;
     INTVAL prod_of_dims = 1;
     INTVAL loop_i;
     INTVAL inner_loop_i;
     dim_key = cell_data->dimension;
     
-    my_key = &k;
+    my_key = key_next(interpreter, k);
 
-    if(cell_data->cell_buffer != NULL && dim_key != NULL && k.next != NULL ) {
+    if(cell_data->cell_buffer != NULL && dim_key != NULL && my_key != NULL ) {
 
 /* first part of alg.
  * (i + (j-1)*Ni
  */ 
-	offset =  (INTVAL) ( k.atom.val.int_val + (k.next->atom.val.int_val)*(dim_key->atom.val.int_val) );
+	offset = key_integer(interpreter, k) + key_integer(interpreter, my_key) * key_integer(interpreter, dim_key);
 
 /* add the rest of algoritm 
  * ...  + (k-1)*Ni*Nj + (l-1)*Ni*Nj*Nk ...
@@ -120,25 +120,26 @@ static INTVAL calc_offset_multi(void *base, KEY k)
  *
  */
 	loop_i = 2;
-	while ( my_key->next->next != NULL ) {
+        my_key = key_next(interpreter, my_key);
+	while ( my_key != NULL ) {
 	    inner_loop_i = loop_i;
 	    
 	    
-	    while ( inner_loop_i > 0 && dim_key->next != NULL ) {
+	    while ( inner_loop_i > 0 && key_next(interpreter, dim_key) != NULL ) {
 		
-		prod_of_dims *= (dim_key->atom.val.int_val);
-		dim_key = dim_key->next;
+		prod_of_dims *= key_integer(interpreter, dim_key);
+		dim_key = key_next(interpreter, dim_key);
 		inner_loop_i--;
 	    }
 	    
-	    offset +=  (INTVAL)(my_key->next->next->atom.val.int_val)*prod_of_dims;	    
+	    offset += key_integer(interpreter, my_key) * prod_of_dims;
 
-	    my_key = my_key->next;
+	    my_key = key_next(interpreter, my_key);
 	    loop_i++;
 	}		 
     } else {
 	/* only 1 dim */
-	offset =  (INTVAL) ( k.atom.val.int_val );
+	offset = key_integer(interpreter, k);
     }
     return offset;
 }
@@ -200,12 +201,12 @@ static CELL_B *new_marray( Interp *interpreter )
 }
 
 
-static void init_marray( Interp *interpreter, PMC *self, KEY *key ) 
+static void init_marray( Interp *interpreter, PMC *self, PMC *key ) 
 {
     
     CELL_B *marray;
     INTVAL size;
-    KEY *oldkey;
+    PMC *oldkey;
 
     marray = new_marray(interpreter);
     marray->cell_buffer->flags |= PMC_is_buffer_ptr_FLAG;
@@ -217,11 +218,10 @@ static void init_marray( Interp *interpreter, PMC *self, KEY *key )
     size = 1;
 
     
-    while(key->next != NULL) {
+    while (key_next(interpreter, key) != NULL) {
       
-      size *= key->atom.val.int_val;
-      key = key->next;
-      
+      size *= key_integer(interpreter, key);
+      key = key_next(interpreter, key);
       
     }
 
@@ -235,7 +235,7 @@ static void init_marray( Interp *interpreter, PMC *self, KEY *key )
 
 
 /* Todo: heavy optimisation. should also return a KEY_ATOM */
-static INTVAL get_marray_keyed( Interp *interpreter, CELL_B *mg_marray, KEY *key ) 
+static INTVAL get_marray_keyed( Interp *interpreter, CELL_B *mg_marray, PMC *key ) 
 {
     
     CELL *buffer_ptr;
@@ -246,7 +246,7 @@ static INTVAL get_marray_keyed( Interp *interpreter, CELL_B *mg_marray, KEY *key
     INTVAL offs = 0;
     INTVAL ret_val = 0;
     
-    offs = calc_offset_multi(mg_marray, *key);
+    offs = calc_offset_multi(interpreter, mg_marray, key);
     base = (CELL *)mg_marray->cell_buffer->bufstart;
     buffer_ptr = &base[offs];
     buffer_ptr_virt = buffer_ptr;
@@ -269,14 +269,14 @@ static INTVAL get_marray_keyed( Interp *interpreter, CELL_B *mg_marray, KEY *key
 }
 
 
-static void set_marray_keyed( Interp *interpreter, CELL_B *sik_marray, KEY *key, INTVAL src_value ) 
+static void set_marray_keyed( Interp *interpreter, CELL_B *sik_marray, PMC *key, INTVAL src_value ) 
 {
     
   CELL *my_cell;
   CELL *base;
   INTVAL offs = 0;
   
-  offs = calc_offset_multi(sik_marray, *key);
+  offs = calc_offset_multi(interpreter, sik_marray, key);
   base = (CELL *)sik_marray->cell_buffer->bufstart;
   my_cell = &base[offs];
   my_cell->virtual_addr = offs;
@@ -323,7 +323,7 @@ pmclass MultiArray {
       return enum_class_MultiArray;
     }
 
-    INTVAL type_keyed (KEY* key) {
+    INTVAL type_keyed (PMC* key) {
 	return 0;
     }
 
@@ -335,7 +335,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    UINTVAL subtype_keyed (KEY* key, INTVAL type) {
+    UINTVAL subtype_keyed (PMC* key, INTVAL type) {
 	return 0;
     }
 
@@ -347,7 +347,7 @@ pmclass MultiArray {
         return whoami;
     }
 
-    STRING* name_keyed (KEY* key) {
+    STRING* name_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -359,7 +359,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    PMC* clone_keyed (KEY* key) {
+    PMC* clone_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -371,7 +371,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    PMC* find_method_keyed (KEY* key, STRING* method_name) {
+    PMC* find_method_keyed (PMC* key, STRING* method_name) {
 	return NULL;
     }
 
@@ -383,7 +383,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL get_integer_keyed (KEY* key) {
+    INTVAL get_integer_keyed (PMC* key) {
 	INTVAL ret = get_marray_keyed( INTERP, SELF->data, key );
 	return ret;
     }
@@ -396,7 +396,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    FLOATVAL get_number_keyed (KEY* key) {
+    FLOATVAL get_number_keyed (PMC* key) {
 	return (FLOATVAL)get_marray_keyed( INTERP, SELF->data, key );
     }
 
@@ -408,7 +408,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    BIGNUM* get_bignum_keyed (KEY* key) {
+    BIGNUM* get_bignum_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -420,7 +420,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    STRING* get_string_keyed (KEY* key) {
+    STRING* get_string_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -432,7 +432,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL get_bool_keyed (KEY* key) {
+    INTVAL get_bool_keyed (PMC* key) {
 	return 0;
     }
 
@@ -444,7 +444,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL elements_keyed (KEY* key) {
+    INTVAL elements_keyed (PMC* key) {
 	return 0;
     }
 
@@ -456,7 +456,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    PMC* get_pmc_keyed (KEY* key) {
+    PMC* get_pmc_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -468,7 +468,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL is_same_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL is_same_keyed (PMC* key, PMC* value, PMC* value_key) {
 	return 0;
     }
 
@@ -485,7 +485,7 @@ pmclass MultiArray {
     void set_integer_same (PMC* value) {
     }
 
-    void set_integer_keyed (KEY* key, INTVAL value) {
+    void set_integer_keyed (PMC* key, INTVAL value) {
 	set_marray_keyed( INTERP, SELF->data, key, value );  
     }
 
@@ -501,7 +501,7 @@ pmclass MultiArray {
     void set_number_same (PMC* value) {
     }
 
-    void set_number_keyed (KEY* key, FLOATVAL value) {
+    void set_number_keyed (PMC* key, FLOATVAL value) {
     }
 
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
@@ -516,7 +516,7 @@ pmclass MultiArray {
     void set_bignum_same (PMC* value) {
     }
 
-    void set_bignum_keyed (KEY* key, BIGNUM* value) {
+    void set_bignum_keyed (PMC* key, BIGNUM* value) {
     }
 
     void set_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
@@ -531,7 +531,7 @@ pmclass MultiArray {
     void set_string_same (PMC* value) {
     }
 
-    void set_string_keyed (KEY* key, STRING* value) {
+    void set_string_keyed (PMC* key, STRING* value) {
     }
 
     void set_string_keyed_int (INTVAL* key, STRING* value) {
@@ -540,7 +540,7 @@ pmclass MultiArray {
     void set_pmc (PMC* value) {
     }
 
-    void set_pmc_keyed (KEY* key, PMC* value, KEY* value_key) {
+    void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
     }
 
     void set_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
@@ -549,7 +549,7 @@ pmclass MultiArray {
     void set_same (PMC* value) {
     }
 
-    void set_same_keyed (KEY* key, PMC* value, KEY* value_key) {
+    void set_same_keyed (PMC* key, PMC* value, PMC* value_key) {
     }
 
     void set_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
@@ -559,7 +559,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL pop_integer_keyed (KEY* key) {
+    INTVAL pop_integer_keyed (PMC* key) {
 	return 0;
     }
 
@@ -571,7 +571,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    FLOATVAL pop_float_keyed (KEY* key) {
+    FLOATVAL pop_float_keyed (PMC* key) {
 	return 0;
     }
 
@@ -583,7 +583,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    BIGNUM* pop_bignum_keyed (KEY* key) {
+    BIGNUM* pop_bignum_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -595,7 +595,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    STRING* pop_string_keyed (KEY* key) {
+    STRING* pop_string_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -607,7 +607,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    PMC* pop_pmc_keyed (KEY* key) {
+    PMC* pop_pmc_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -618,7 +618,7 @@ pmclass MultiArray {
     void push_integer (INTVAL value) {
     }
 
-    void push_integer_keyed (KEY* key, INTVAL value) {
+    void push_integer_keyed (PMC* key, INTVAL value) {
     }
 
     void push_integer_keyed_int (INTVAL* key, INTVAL value) {
@@ -627,7 +627,7 @@ pmclass MultiArray {
     void push_float (FLOATVAL value) {
     }
 
-    void push_float_keyed (KEY* key, FLOATVAL value) {
+    void push_float_keyed (PMC* key, FLOATVAL value) {
     }
 
     void push_float_keyed_int (INTVAL* key, FLOATVAL value) {
@@ -636,7 +636,7 @@ pmclass MultiArray {
     void push_bignum (BIGNUM* value) {
     }
 
-    void push_bignum_keyed (KEY* key, BIGNUM* value) {
+    void push_bignum_keyed (PMC* key, BIGNUM* value) {
     }
 
     void push_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
@@ -645,7 +645,7 @@ pmclass MultiArray {
     void push_string (STRING* value) {
     }
 
-    void push_string_keyed (KEY* key, STRING* value) {
+    void push_string_keyed (PMC* key, STRING* value) {
     }
 
     void push_string_keyed_int (INTVAL* key, STRING* value) {
@@ -654,7 +654,7 @@ pmclass MultiArray {
     void push_pmc (PMC* value) {
     }
 
-    void push_pmc_keyed (KEY* key, PMC* value, KEY* value_key) {
+    void push_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
     }
 
     void push_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
@@ -664,7 +664,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL shift_integer_keyed (KEY* key) {
+    INTVAL shift_integer_keyed (PMC* key) {
 	return 0;
     }
 
@@ -676,7 +676,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    FLOATVAL shift_float_keyed (KEY* key) {
+    FLOATVAL shift_float_keyed (PMC* key) {
 	return 0;
     }
 
@@ -688,7 +688,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    BIGNUM* shift_bignum_keyed (KEY* key) {
+    BIGNUM* shift_bignum_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -700,7 +700,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    STRING* shift_string_keyed (KEY* key) {
+    STRING* shift_string_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -712,7 +712,7 @@ pmclass MultiArray {
 	return NULL;
     }
 
-    PMC* shift_pmc_keyed (KEY* key) {
+    PMC* shift_pmc_keyed (PMC* key) {
 	return NULL;
     }
 
@@ -723,7 +723,7 @@ pmclass MultiArray {
     void unshift_integer (INTVAL value) {
     }
 
-    void unshift_integer_keyed (KEY* key, INTVAL value) {
+    void unshift_integer_keyed (PMC* key, INTVAL value) {
     }
 
     void unshift_integer_keyed_int (INTVAL* key, INTVAL value) {
@@ -732,7 +732,7 @@ pmclass MultiArray {
     void unshift_float (FLOATVAL value) {
     }
 
-    void unshift_float_keyed (KEY* key, FLOATVAL value) {
+    void unshift_float_keyed (PMC* key, FLOATVAL value) {
     }
 
     void unshift_float_keyed_int (INTVAL* key, FLOATVAL value) {
@@ -741,7 +741,7 @@ pmclass MultiArray {
     void unshift_bignum (BIGNUM* value) {
     }
 
-    void unshift_bignum_keyed (KEY* key, BIGNUM* value) {
+    void unshift_bignum_keyed (PMC* key, BIGNUM* value) {
     }
 
     void unshift_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
@@ -750,7 +750,7 @@ pmclass MultiArray {
     void unshift_string (STRING* value) {
     }
 
-    void unshift_string_keyed (KEY* key, STRING* value) {
+    void unshift_string_keyed (PMC* key, STRING* value) {
     }
 
     void unshift_string_keyed_int (INTVAL* key, STRING* value) {
@@ -759,7 +759,7 @@ pmclass MultiArray {
     void unshift_pmc (PMC* value) {
     }
 
-    void unshift_pmc_keyed (KEY* key, PMC* value, KEY* value_key) {
+    void unshift_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
     }
 
     void unshift_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
@@ -797,7 +797,7 @@ pmclass MultiArray {
     void add_same (PMC* value, PMC* dest) {
     }
 
-    void add_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void add_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void add_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -834,7 +834,7 @@ pmclass MultiArray {
     void subtract_same (PMC* value, PMC* dest) {
     }
 
-    void subtract_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void subtract_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void subtract_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -871,7 +871,7 @@ pmclass MultiArray {
     void multiply_same (PMC* value, PMC* dest) {
     }
 
-    void multiply_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void multiply_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void multiply_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -908,7 +908,7 @@ pmclass MultiArray {
     void divide_same (PMC* value, PMC* dest) {
     }
 
-    void divide_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void divide_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void divide_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -945,7 +945,7 @@ pmclass MultiArray {
     void modulus_same (PMC* value, PMC* dest) {
     }
 
-    void modulus_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void modulus_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void modulus_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -954,7 +954,7 @@ pmclass MultiArray {
     void neg (PMC* dest) {
     }
 
-    void neg_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+    void neg_keyed (PMC* key, PMC* dest, PMC* dest_key) {
     }
 
     void neg_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
@@ -969,7 +969,7 @@ pmclass MultiArray {
     void bitwise_or_same (PMC* value, PMC* dest) {
     }
 
-    void bitwise_or_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void bitwise_or_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void bitwise_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -984,7 +984,7 @@ pmclass MultiArray {
     void bitwise_and_same (PMC* value, PMC* dest) {
     }
 
-    void bitwise_and_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void bitwise_and_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void bitwise_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -999,7 +999,7 @@ pmclass MultiArray {
     void bitwise_xor_same (PMC* value, PMC* dest) {
     }
 
-    void bitwise_xor_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void bitwise_xor_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void bitwise_xor_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -1008,7 +1008,7 @@ pmclass MultiArray {
     void bitwise_not (PMC* dest) {
     }
 
-    void bitwise_not_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+    void bitwise_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
     }
 
     void bitwise_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
@@ -1023,7 +1023,7 @@ pmclass MultiArray {
     void bitwise_shl_same (PMC* value, PMC* dest) {
     }
 
-    void bitwise_shl_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void bitwise_shl_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void bitwise_shl_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -1038,7 +1038,7 @@ pmclass MultiArray {
     void bitwise_shr_same (PMC* value, PMC* dest) {
     }
 
-    void bitwise_shr_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void bitwise_shr_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void bitwise_shr_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -1053,7 +1053,7 @@ pmclass MultiArray {
     void concatenate_same (PMC* value, PMC* dest) {
     }
 
-    void concatenate_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void concatenate_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void concatenate_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -1063,7 +1063,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL is_equal_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {
 	return 0;
     }
 
@@ -1075,7 +1075,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL cmp_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL cmp_keyed (PMC* key, PMC* value, PMC* value_key) {
 	return 0;
     }
 
@@ -1087,7 +1087,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL cmp_num_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL cmp_num_keyed (PMC* key, PMC* value, PMC* value_key) {
 	return 0;
     }
 
@@ -1099,7 +1099,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL cmp_string_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL cmp_string_keyed (PMC* key, PMC* value, PMC* value_key) {
 	return 0;
     }
 
@@ -1110,7 +1110,7 @@ pmclass MultiArray {
     void logical_or (PMC* value, PMC* dest) {
     }
 
-    void logical_or_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void logical_or_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void logical_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -1119,7 +1119,7 @@ pmclass MultiArray {
     void logical_and (PMC* value, PMC* dest) {
     }
 
-    void logical_and_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void logical_and_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void logical_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -1128,7 +1128,7 @@ pmclass MultiArray {
     void logical_xor (PMC* value, PMC* dest) {
     }
 
-    void logical_xor_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void logical_xor_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void logical_xor_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
@@ -1137,7 +1137,7 @@ pmclass MultiArray {
     void logical_not (PMC* dest) {
     }
 
-    void logical_not_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+    void logical_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
     }
 
     void logical_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
@@ -1149,13 +1149,13 @@ pmclass MultiArray {
     void repeat_int (INTVAL value, PMC* dest) {
     }
 
-    void repeat_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    void repeat_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
     }
 
     void repeat_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
     }
 
-    void repeat_int_keyed (KEY* key, INTVAL value, PMC* dest, KEY* dest_key) {
+    void repeat_int_keyed (PMC* key, INTVAL value, PMC* dest, PMC* dest_key) {
     }
 
     void repeat_int_keyed_int (INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key) {
@@ -1164,7 +1164,7 @@ pmclass MultiArray {
     void increment () {
     }
 
-    void increment_keyed (KEY* key) {
+    void increment_keyed (PMC* key) {
     }
 
     void increment_keyed_int (INTVAL* key) {
@@ -1173,13 +1173,13 @@ pmclass MultiArray {
     void decrement () {
     }
 
-    void decrement_keyed (KEY* key) {
+    void decrement_keyed (PMC* key) {
     }
 
     void decrement_keyed_int (INTVAL* key) {
     }
 
-    INTVAL exists_keyed (KEY* key) {
+    INTVAL exists_keyed (PMC* key) {
 	return 0;
     }
 
@@ -1191,7 +1191,7 @@ pmclass MultiArray {
 	return 0;
     }
 
-    INTVAL defined_keyed (KEY* key) {
+    INTVAL defined_keyed (PMC* key) {
 	return 0;
     }
 
@@ -1199,24 +1199,24 @@ pmclass MultiArray {
 	return 0;
     }
 
-    void delete_keyed (KEY* key) {
+    void delete_keyed (PMC* key) {
     }
 
     void delete_keyed_int (INTVAL* key) {
     }
 
-    KEY* nextkey_keyed (KEY* key) {
+    PMC* nextkey_keyed (PMC* key) {
 	return  NULL;
     }
 
-    KEY* nextkey_keyed_int (INTVAL* key) {
+    PMC* nextkey_keyed_int (INTVAL* key) {
 	return  NULL;
     }
 
     void substr (INTVAL offset, INTVAL length, PMC* dest) {
     }
 
-    void substr_keyed (KEY* key, INTVAL offset, INTVAL length, PMC* dest, KEY* dest_key) {
+    void substr_keyed (PMC* key, INTVAL offset, INTVAL length, PMC* dest, PMC* dest_key) {
     }
 
     void substr_keyed_int (INTVAL* key, INTVAL offset, INTVAL length, PMC* dest, INTVAL* dest_key) {
@@ -1226,7 +1226,7 @@ pmclass MultiArray {
 	return  NULL;
     }
 
-    STRING* substr_str_keyed (KEY* key, INTVAL offset, INTVAL length) {
+    STRING* substr_str_keyed (PMC* key, INTVAL offset, INTVAL length) {
 	return  NULL;
     }
 

@@ -54,22 +54,6 @@ void Parrot_Array_resize_array (struct Parrot_Interp *interpreter, PMC* self, IN
     self->cache.int_val = size;
 }
 
-static INTVAL atom2int(Interp *interpreter, KEY_ATOM* atom) {
-    switch ((int)atom->type) {
-        case enum_key_undef:
-        default:
-            return 0;
-        case enum_key_int:
-            return atom->val.int_val;
-        case enum_key_num:
-            return (INTVAL)atom->val.num_val;
-        case enum_key_pmc:
-            return atom->val.pmc_val->vtable->get_integer(interpreter, atom->val.pmc_val);
-        case enum_key_string:
-            return string_to_int(atom->val.struct_val);
-    }
-}
-
 pmclass Array {
 
     void init () {
@@ -147,17 +131,19 @@ pmclass Array {
         return value->vtable->get_integer(INTERP, value);
     }
 
-    INTVAL get_integer_keyed (KEY* key) {
+    INTVAL get_integer_keyed (PMC* key) {
         INTVAL ix;
+        PMC* nextkey;
         PMC* box;
 
         if (!key) return 0;
-        ix = atom2int(interpreter, &key->atom);
-        if (key->next == NULL) return SELF.get_integer_keyed_int(&ix);
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) return SELF.get_integer_keyed_int(&ix);
 
         box = SELF.get_pmc_keyed_int(&ix);
         if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_integer_keyed(INTERP, box, key->next);
+        return box->vtable->get_integer_keyed(INTERP, box, nextkey);
     }
 
     FLOATVAL get_number () {
@@ -190,17 +176,19 @@ pmclass Array {
         return value->vtable->get_number(INTERP, value);
     }
 
-    FLOATVAL get_number_keyed (KEY* key) {
+    FLOATVAL get_number_keyed (PMC* key) {
         INTVAL ix;
+        PMC* nextkey;
         PMC* box;
 
         if (!key) return 0;
-        ix = atom2int(interpreter, &key->atom);
-        if (key->next == NULL) return SELF.get_number_keyed_int(&ix);
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) return SELF.get_number_keyed_int(&ix);
 
         box = SELF.get_pmc_keyed_int(&ix);
         if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_number_keyed(INTERP, box, key->next);
+        return box->vtable->get_number_keyed(INTERP, box, nextkey);
     }
 
     STRING* get_string () {
@@ -233,17 +221,19 @@ pmclass Array {
         return value->vtable->get_string(INTERP, value);
     }
 
-    STRING* get_string_keyed (KEY* key) {
+    STRING* get_string_keyed (PMC* key) {
         INTVAL ix;
+        PMC* nextkey;
         PMC* box;
 
         if (!key) return 0;
-        ix = atom2int(interpreter, &key->atom);
-        if (key->next == NULL) return SELF.get_string_keyed_int(&ix);
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) return SELF.get_string_keyed_int(&ix);
 
         box = SELF.get_pmc_keyed_int(&ix);
         if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_string_keyed(INTERP, box, key->next);
+        return box->vtable->get_string_keyed(INTERP, box, nextkey);
     }
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
@@ -272,17 +262,19 @@ pmclass Array {
         return value;
     }
 
-    PMC* get_pmc_keyed (KEY* key) {
+    PMC* get_pmc_keyed (PMC* key) {
         INTVAL ix;
+        PMC* nextkey;
         PMC* box;
 
         if (!key) return 0;
-        ix = atom2int(interpreter, &key->atom);
-        if (key->next == NULL) return SELF.get_pmc_keyed_int(&ix);
+        ix = key_integer(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) return SELF.get_pmc_keyed_int(&ix);
 
         box = SELF.get_pmc_keyed_int(&ix);
         if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_pmc_keyed(INTERP, box, key->next);
+        return box->vtable->get_pmc_keyed(INTERP, box, nextkey);
     }
 
     INTVAL get_bool () {
@@ -347,12 +339,12 @@ pmclass Array {
         element->vtable->set_integer_native(INTERP, element, value);
     }
 
-    void set_integer_keyed (KEY* key, INTVAL value) {
+    void set_integer_keyed (PMC* key, INTVAL value) {
         INTVAL ix;
 
         if (!key) return;
 
-        ix = atom2int(interpreter, &key->atom);
+        ix = key_integer(INTERP, key);
         SELF.set_integer_keyed_int(&ix, value);
     }
 
@@ -400,11 +392,11 @@ pmclass Array {
         element->vtable->set_number_native(INTERP, element, value);
     }
 
-    void set_number_keyed (KEY* key, FLOATVAL value) {
+    void set_number_keyed (PMC* key, FLOATVAL value) {
         INTVAL ix;
 
         if (!key) return;
-        ix = atom2int(interpreter, &key->atom);
+        ix = key_integer(INTERP, key);
         SELF.set_number_keyed_int(&ix, value);
     }
 
@@ -450,11 +442,11 @@ pmclass Array {
         element->vtable->set_string_native(INTERP, element, value);
     }
 
-    void set_string_keyed (KEY* key, STRING* value) {
+    void set_string_keyed (PMC* key, STRING* value) {
         INTVAL ix;
 
         if (!key) return;
-        ix = atom2int(interpreter, &key->atom);
+        ix = key_integer(INTERP, key);
         SELF->vtable->set_string_keyed_int(INTERP, SELF, &ix, value);
     }
 
@@ -486,16 +478,40 @@ pmclass Array {
         array[ix] = src;
     }
 
-    void set_pmc_keyed (KEY* dest_key, PMC* src, KEY* src_key) {
-        INTVAL ix;
+    void set_pmc_keyed (PMC* dest_key, PMC* src, PMC* src_key) {
+        INTVAL src_ix;
+        INTVAL dest_ix;
 
         if (!dest_key) return;
 
-        ix = atom2int(interpreter, &dest_key->atom);
-        if (src_key)
-            SELF.set_pmc_keyed_int(&ix, src, &src_key->atom.val.int_val);
-        else
-            SELF.set_pmc_keyed_int(&ix, src, NULL);
+        dest_ix = key_integer(INTERP, dest_key);
+        if (src_key) {
+            src_ix = key_integer(INTERP, src_key);
+            SELF.set_pmc_keyed_int(&dest_ix, src, &src_ix);
+        }
+        else {
+            SELF.set_pmc_keyed_int(&dest_ix, src, NULL);
+        }
+    }
+
+    void push_integer (INTVAL value) {
+        INTVAL nextix = SELF->cache.int_val;
+        DYNSELF.set_integer_keyed_int(&nextix, value);
+    }
+
+    void push_float (FLOATVAL value) {
+        INTVAL nextix = SELF->cache.int_val;
+        DYNSELF.set_number_keyed_int(&nextix, value);
+    }
+
+    void push_string (STRING* value) {
+        INTVAL nextix = SELF->cache.int_val;
+        DYNSELF.set_string_keyed_int(&nextix, value);
+    }
+
+    void push_pmc (PMC* value) {
+        INTVAL nextix = SELF->cache.int_val;
+        DYNSELF.set_pmc_keyed_int(&nextix, value, NULL);
     }
 
     /* == operation */
@@ -503,7 +519,7 @@ pmclass Array {
         return 0;
     }
     
-    INTVAL is_equal_keyed (KEY* key, PMC* value, KEY* value_key) {
+    INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {
         return 0;
     }
 
@@ -543,8 +559,8 @@ pmclass Array {
         THROW_UNSUPPORTED;
     }
 
-    void add_keyed (KEY* key, PMC* value, KEY* value_key,
-                               PMC* dest, KEY* dest_key) {
+    void add_keyed (PMC* key, PMC* value, PMC* value_key,
+                               PMC* dest, PMC* dest_key) {
         THROW_UNSUPPORTED;
     }
 
@@ -573,8 +589,8 @@ pmclass Array {
         THROW_UNSUPPORTED;
     }
 
-    void subtract_keyed (KEY* key, PMC* value, KEY* value_key,
-                                    PMC* dest, KEY* dest_key) {
+    void subtract_keyed (PMC* key, PMC* value, PMC* value_key,
+                                    PMC* dest, PMC* dest_key) {
         THROW_UNSUPPORTED;
     }
 
@@ -603,8 +619,8 @@ pmclass Array {
         THROW_UNSUPPORTED;
     }
 
-    void multiply_keyed (KEY* key, PMC* value, KEY* value_key,
-                                    PMC* dest, KEY* dest_key) {
+    void multiply_keyed (PMC* key, PMC* value, PMC* value_key,
+                                    PMC* dest, PMC* dest_key) {
         THROW_UNSUPPORTED;
     }
 
@@ -633,8 +649,8 @@ pmclass Array {
         THROW_UNSUPPORTED;
     }
 
-    void divide_keyed (KEY* key, PMC* value, KEY* value_key,
-                                  PMC* dest, KEY* dest_key) {
+    void divide_keyed (PMC* key, PMC* value, PMC* value_key,
+                                  PMC* dest, PMC* dest_key) {
         THROW_UNSUPPORTED;
     }
 
@@ -663,8 +679,8 @@ pmclass Array {
         THROW_UNSUPPORTED;
     }
 
-    void modulus_keyed (KEY* key, PMC* value, KEY* value_key,
-                                   PMC* dest, KEY* dest_key) {
+    void modulus_keyed (PMC* key, PMC* value, PMC* value_key,
+                                   PMC* dest, PMC* dest_key) {
         THROW_UNSUPPORTED;
     }
 
@@ -685,8 +701,8 @@ pmclass Array {
         THROW_UNSUPPORTED;
     }
 
-    void concatenate_keyed (KEY* key, PMC* value, KEY* value_key,
-                                       PMC* dest, KEY* dest_key) {
+    void concatenate_keyed (PMC* key, PMC* value, PMC* value_key,
+                                       PMC* dest, PMC* dest_key) {
         THROW_UNSUPPORTED;
     }
 

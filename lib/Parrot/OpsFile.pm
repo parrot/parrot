@@ -174,11 +174,16 @@ sub read_ops
       my @temp = ();
 
       foreach my $arg (@args) {
-	my ($use, $type) = $arg =~ m/^(in|out|inout|inconst|invar)\s+(INT|NUM|STR|PMC|KEY)$/i;
+	my ($use, $type) = $arg =~ m/^(in|out|inout|inconst|invar)\s+(INT|NUM|STR|PMC|KEY|INTKEY)$/i;
 
         die "Unrecognized arg format '$arg' in '$_'!" unless defined($use) and defined($type);
 
-        $type = lc substr($type, 0, 1);
+        if ($type =~ /^INTKEY$/i) {
+          $type = "ki";
+        }
+        else {
+          $type = lc substr($type, 0, 1);
+        }
 
         if ($use eq 'in') {
           push @temp, ($type eq 'p') ? 'p' : "$type|${type}c";
