@@ -14,6 +14,7 @@
 #define PARROT_PMC_H_GUARD
 
 #include "parrot/core_pmcs.h"
+#include "parrot/pobj.h"
 
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
 VAR_SCOPE PMC *Parrot_base_classname_hash;
@@ -54,49 +55,6 @@ struct PMC {
                                  block */
 };
 
-/* PMC flag bits */
-
-
-/* Flag bit notes: When both the is_PMC_ptr and is_buffer_ptr flags
-   are set, we assume that data is pointing to a buffer of PMCs, and
-   will run through that buffer and mark all the PMCs in it as live */
-typedef enum {
-    /* the first 8 bits are for private use by individual vtable
-     * classes. It is suggested that you alias these within an individual
-     * class's header file
-     */
-    PMC_private0_FLAG = 1 << 0,
-    PMC_private1_FLAG = 1 << 1,
-    PMC_private2_FLAG = 1 << 2,
-    PMC_private3_FLAG = 1 << 3,
-    PMC_private4_FLAG = 1 << 4,
-    PMC_private5_FLAG = 1 << 5,
-    PMC_private6_FLAG = 1 << 6,
-    PMC_private7_FLAG = 1 << 7,
-
-    /* The rest of the flags are for use by Parrot */
-
-    /* Set if the PMC has a destroy method that must be called */
-    PMC_active_destroy_FLAG = 1 << 8,
-    /* Set to true if the PMC data pointer points to something that
-     * looks like a string or buffer pointer */
-    PMC_is_buffer_ptr_FLAG = 1 << 10,
-    /* Set to true if the data pointer points to a PMC */
-    PMC_is_PMC_ptr_FLAG = 1 << 11,
-    /* Set to true if the PMC has a private GC function. For PMCs the
-     * GC system can't snoop into */
-    PMC_private_GC_FLAG = 1 << 12,
-    /* Set to true if the PMC has a custom mark routine */
-    PMC_custom_mark_FLAG = 1 << 13,
-    /* Are we live? */
-    PMC_live_FLAG = 1 << 14,
-    /* Are we on the free list */
-    PMC_on_free_list_FLAG = 1 << 15,
-    /* Our refcount */
-    PMC_refcount_field = 1 << 16 | 1 << 17,
-    /* Constant flag */
-    PMC_constant_FLAG = 1 << 18
-} PMC_flags;
 
 /* XXX add various bit test macros once we have need of them */
 

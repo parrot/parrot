@@ -532,7 +532,7 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
             str[i - 1] = command[i];
         str[i - 1] = '\0';
         condition->value = string_make(interpreter,
-            str, i - 1, NULL, BUFFER_external_FLAG, NULL);
+            str, i - 1, NULL, PObj_external_FLAG, NULL);
         condition->type |= PDB_cond_const;
     }
 
@@ -579,7 +579,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 
         /* Abort if the line number provided doesn't exists */
         if (!line->next) {
-            PIO_eprintf(interpreter, 
+            PIO_eprintf(interpreter,
                         "Can't set a breakpoint at line number %li\n",ln);
             return;
         }
@@ -1557,7 +1557,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
                 interpreter->code->const_table->constants[k]->type =PFC_STRING;
                 interpreter->code->const_table->constants[k]->string =
                     string_make(interpreter, buf, (UINTVAL)l,
-                            NULL, BUFFER_constant_FLAG, NULL);
+                            NULL, PObj_constant_FLAG, NULL);
 
                 /* Add it to the bytecode */
                 eval[j++] = (opcode_t)k;

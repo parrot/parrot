@@ -15,43 +15,78 @@
 
 #include "parrot/config.h"
 
-/* Buffer flags */
-typedef enum BUFFER_flag {
-    /* bits the GC can keep its dirty mitts off of */
-    BUFFER_private0_FLAG = 1 << 0,
-    BUFFER_private1_FLAG = 1 << 1,
-    BUFFER_private2_FLAG = 1 << 2,
-    BUFFER_private3_FLAG = 1 << 3,
-    BUFFER_private4_FLAG = 1 << 4,
-    BUFFER_private5_FLAG = 1 << 5,
-    BUFFER_private6_FLAG = 1 << 6,
-    BUFFER_private7_FLAG = 1 << 7,
+/* PObj flags */
+typedef enum PObj {
+    /* This first 8 flags may be used privately by a Parrot Object.
+     * It is suggested that you alias these within an individual
+     * class's header file
+     */
+    PObj_private0_FLAG = 1 << 0,
+    PObj_private1_FLAG = 1 << 1,
+    PObj_private2_FLAG = 1 << 2,
+    PObj_private3_FLAG = 1 << 3,
+    PObj_private4_FLAG = 1 << 4,
+    PObj_private5_FLAG = 1 << 5,
+    PObj_private6_FLAG = 1 << 6,
+    PObj_private7_FLAG = 1 << 7,
+
+    /* Object specification FLAGs */
+
+    /* PObj is a string */
+    PObj_is_string_FLAG = 1 << 8,
+    /* PObj is a PMC */
+    PObj_is_PMC_FLAG = 1 << 9,
+    PObj_is_reserved1_FLAG = 1 << 10,
+    PObj_is_reserved2_FLAG = 1 << 11,
+
+    /* Memory management FLAGs */
+
     /* The contents of the buffer can't be moved by the GC */
-    BUFFER_immobile_FLAG = 1 << 8,
+    PObj_immobile_FLAG = 1 << 12,
     /* Marks the contents as coming from a non-Parrot source,
      * also used for COWed strings */
-    BUFFER_external_FLAG = 1 << 9,
-    /* Mark the buffer as pointing to system memory */
-    BUFFER_sysmem_FLAG = 1 << 10,
-    /* Mark the contents as Copy on write */
-    BUFFER_COW_FLAG = 1 << 11,
-    /* Private flag for the GC system. Set if the buffer's in use as
-     * far as the GC's concerned */
-    BUFFER_live_FLAG = 1 << 12,
-    /* Mark the bufffer as needing GC */
-    BUFFER_needs_GC_FLAG = 1 << 13,
-    /* Mark the buffer as on the free list */
-    BUFFER_on_free_list_FLAG = 1 << 14,
-    /* This is a constant--don't kill it! */
-    BUFFER_constant_FLAG = 1 << 15,
-    /* For debugging, report when this buffer gets moved around */
-    BUFFER_report_FLAG = 1 << 16,
+    PObj_external_FLAG = 1 << 13,
     /* real external bufstart string */
-    BUFFER_bufstart_external_FLAG = 1 << 17,
-    BUFFER_unused_FLAG = 1 << 18,
-    /* Buffer header has a strstart which needs to be updated with bufstart */
-    BUFFER_strstart_FLAG = 1 << 19
-} BUFFER_flags;
+    PObj_bufstart_external_FLAG = 1 << 14,
+    /* Mark the buffer as pointing to system memory */
+    PObj_sysmem_FLAG = 1 << 15,
+
+    /* PObj usage FLAGs, COW & GC */
+
+    /* Mark the contents as Copy on write */
+    PObj_COW_FLAG = 1 << 16,
+    /* This is a constant--don't kill it! */
+    PObj_constant_FLAG = 1 << 17,
+    /* Private flag for the GC system. Set if the PObj's in use as
+     * far as the GC's concerned */
+    PObj_live_FLAG = 1 << 18,
+    /* Mark the object as on the free list */
+    PObj_on_free_list_FLAG = 1 << 19,
+
+    /* DOD/GC FLAGS */
+
+    /* Set to true if the PObj has a custom mark routine */
+    PObj_custom_mark_FLAG = 1 << 20,
+    /* Mark the buffer as needing GC */
+    PObj_custom_GC_FLAG = 1 << 21,
+    /* Set if the PObj has a destroy method that must be called */
+    PObj_active_destroy_FLAG = 1 << 22,
+    /* For debugging, report when this buffer gets moved around */
+    PObj_report_FLAG = 1 << 23,
+
+    /* PMC specific FLAGs */
+
+    /* Set to true if the PMC data pointer points to something that
+     * looks like a string or buffer pointer */
+    PObj_is_buffer_ptr_FLAG = 1 << 24,
+    /* Set to true if the data pointer points to a PMC */
+    PObj_is_PMC_ptr_FLAG = 1 << 25,
+    /* When both the is_PMC_ptr and is_buffer_ptr flags
+       are set, we assume that data is pointing to a buffer of PMCs, and
+       will run through that buffer and mark all the PMCs in it as live */
+    PObj_is_buffer_of_PMCs_ptr_FLAG = (1 << 24 | 1 << 25)
+
+} PObj_flags;
 
 /*
  * flag access macros:
@@ -60,10 +95,10 @@ typedef enum BUFFER_flag {
  */
 #define PObj_get_FLAGS(o) (o)->flags
 
-#define PObj_flag_TEST(flag, o) ((o)->flags & BUFFER_ ## flag ## _FLAG)
-#define PObj_flag_SET(flag, o) ((o)->flags |= BUFFER_ ## flag ## _FLAG)
+#define PObj_flag_TEST(flag, o) ((o)->flags & PObj_ ## flag ## _FLAG)
+#define PObj_flag_SET(flag, o) ((o)->flags |= PObj_ ## flag ## _FLAG)
 #define PObj_flag_CLEAR(flag, o) \
-        ((o)->flags &= ~(UINTVAL)(BUFFER_ ## flag ## _FLAG))
+        ((o)->flags &= ~(UINTVAL)(PObj_ ## flag ## _FLAG))
 
 #define PObj_COW_TEST(o) PObj_flag_TEST(COW, o)
 #define PObj_COW_SET(o) PObj_flag_SET(COW, o)
@@ -81,19 +116,61 @@ typedef enum BUFFER_flag {
 
 /* some combinations */
 #define PObj_is_cowed_TESTALL(o) ((o)->flags & \
-            (BUFFER_COW_FLAG|BUFFER_constant_FLAG|BUFFER_external_FLAG))
+            (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
 #define PObj_is_cowed_SETALL(o) ((o)->flags |= \
-            (BUFFER_COW_FLAG|BUFFER_constant_FLAG|BUFFER_external_FLAG))
+            (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
 
 #define PObj_is_external_TESTALL(o) ((o)->flags & \
-            (UINTVAL)(BUFFER_COW_FLAG|BUFFER_bufstart_external_FLAG| \
-		    BUFFER_external_FLAG|BUFFER_immobile_FLAG))
+            (UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
+		    PObj_external_FLAG|PObj_immobile_FLAG))
 #define PObj_is_external_CLEARALL(o) ((o)->flags &= \
-            ~(UINTVAL)(BUFFER_COW_FLAG|BUFFER_bufstart_external_FLAG| \
-		    BUFFER_external_FLAG|BUFFER_immobile_FLAG))
+            ~(UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
+		    PObj_external_FLAG|PObj_immobile_FLAG))
 
 /* compat macros */
-#define PObj_external_FLAG BUFFER_external_FLAG
+
+/* Buffer flags */
+typedef enum BUFFER_flag {
+    BUFFER_private0_FLAG = PObj_private0_FLAG,
+    BUFFER_private1_FLAG = PObj_private1_FLAG,
+    BUFFER_private2_FLAG = PObj_private2_FLAG,
+    BUFFER_private3_FLAG = PObj_private3_FLAG,
+    BUFFER_private4_FLAG = PObj_private4_FLAG,
+    BUFFER_private5_FLAG = PObj_private5_FLAG,
+    BUFFER_private6_FLAG = PObj_private6_FLAG,
+    BUFFER_private7_FLAG = PObj_private7_FLAG,
+    BUFFER_immobile_FLAG = PObj_immobile_FLAG,
+    BUFFER_external_FLAG = PObj_external_FLAG,
+    BUFFER_sysmem_FLAG = PObj_sysmem_FLAG,
+    BUFFER_COW_FLAG = PObj_COW_FLAG,
+    BUFFER_live_FLAG = PObj_live_FLAG,
+    BUFFER_needs_GC_FLAG = PObj_custom_GC_FLAG,
+    BUFFER_on_free_list_FLAG = PObj_on_free_list_FLAG,
+    BUFFER_constant_FLAG = PObj_constant_FLAG,
+    BUFFER_report_FLAG =PObj_report_FLAG,
+    BUFFER_bufstart_external_FLAG = PObj_bufstart_external_FLAG,
+    BUFFER_strstart_FLAG = PObj_is_string_FLAG
+} BUFFER_flags;
+
+
+typedef enum {
+    PMC_private0_FLAG = PObj_private0_FLAG,
+    PMC_private1_FLAG = PObj_private1_FLAG,
+    PMC_private2_FLAG = PObj_private2_FLAG,
+    PMC_private3_FLAG = PObj_private3_FLAG,
+    PMC_private4_FLAG = PObj_private4_FLAG,
+    PMC_private5_FLAG = PObj_private5_FLAG,
+    PMC_private6_FLAG = PObj_private6_FLAG,
+    PMC_private7_FLAG = PObj_private7_FLAG,
+    PMC_active_destroy_FLAG = PObj_active_destroy_FLAG,
+    PMC_is_buffer_ptr_FLAG = PObj_is_buffer_ptr_FLAG,
+    PMC_is_PMC_ptr_FLAG = PObj_is_PMC_ptr_FLAG,
+    PMC_private_GC_FLAG = PObj_custom_GC_FLAG,
+    PMC_custom_mark_FLAG = PObj_custom_mark_FLAG,
+    PMC_live_FLAG = PObj_live_FLAG,
+    PMC_on_free_list_FLAG = PObj_on_free_list_FLAG,
+    PMC_constant_FLAG = PObj_constant_FLAG
+} PMC_flags;
 
 #endif
 
