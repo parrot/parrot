@@ -776,7 +776,6 @@ string_to_num(const STRING *s)
 
 STRING *
 string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
-    const char * digits = "0123456789";
     char buf[128];
     char *ptr = &buf[127];
     int neg = 0;
@@ -790,10 +789,9 @@ string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
      * would approach 128 characters in the buffer.
      */
     do {
-        *--ptr = digits[i % 10];
-        i /= 10;
+        *--ptr = '0' + i % 10;
     }
-    while(i);
+    while(i /= 10);
 
     if(neg)
         *--ptr = '-';
