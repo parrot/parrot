@@ -118,9 +118,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     interpreter->resume_flag = RESUME_INITIAL;
     interpreter->recursion_limit = 1000;
 
-    interpreter->DOD_block_level = 1;
-    interpreter->GC_block_level = 1;
-
     /* Must initialize flags here so the GC_DEBUG stuff is available before
      * mem_setup_allocator() is called. */
     interpreter->flags = flags;
@@ -140,6 +137,9 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
+    Parrot_block_DOD(interpreter);
+    Parrot_block_GC(interpreter);
+
     /*
      * Set up the string subsystem
      * This also generates the constant string tables

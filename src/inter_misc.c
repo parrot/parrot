@@ -162,6 +162,7 @@ interpinfo(Interp *interpreter, INTVAL what)
     INTVAL ret = 0;
     struct Small_Object_Pool *header_pool;
     int j;
+    struct Arenas *arena_base = interpreter->arena_base;
 
     switch (what) {
         case TOTAL_MEM_ALLOC:
@@ -170,46 +171,46 @@ interpinfo(Interp *interpreter, INTVAL what)
             interpreter->memory_allocated = mallinfo().uordblks;
 #endif
 #endif
-            ret = interpreter->memory_allocated;
+            ret = arena_base->memory_allocated;
             break;
         case DOD_RUNS:
-            ret = interpreter->dod_runs;
+            ret = arena_base->dod_runs;
             break;
         case COLLECT_RUNS:
-            ret = interpreter->collect_runs;
+            ret = arena_base->collect_runs;
             break;
         case ACTIVE_PMCS:
-            ret = interpreter->arena_base->pmc_pool->total_objects -
-                interpreter->arena_base->pmc_pool->num_free_objects;
+            ret = arena_base->pmc_pool->total_objects -
+                arena_base->pmc_pool->num_free_objects;
             break;
         case ACTIVE_BUFFERS:
             ret = 0;
-            for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-                header_pool = interpreter->arena_base->sized_header_pools[j];
+            for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+                header_pool = arena_base->sized_header_pools[j];
                 if (header_pool)
                     ret += header_pool->total_objects -
                         header_pool->num_free_objects;
             }
             break;
         case TOTAL_PMCS:
-            ret = interpreter->arena_base->pmc_pool->total_objects;
+            ret = arena_base->pmc_pool->total_objects;
             break;
         case TOTAL_BUFFERS:
             ret = 0;
-            for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-                header_pool = interpreter->arena_base->sized_header_pools[j];
+            for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+                header_pool = arena_base->sized_header_pools[j];
                 if (header_pool)
                     ret += header_pool->total_objects;
             }
             break;
         case HEADER_ALLOCS_SINCE_COLLECT:
-            ret = interpreter->header_allocs_since_last_collect;
+            ret = arena_base->header_allocs_since_last_collect;
             break;
         case MEM_ALLOCS_SINCE_COLLECT:
-            ret = interpreter->mem_allocs_since_last_collect;
+            ret = arena_base->mem_allocs_since_last_collect;
             break;
         case TOTAL_COPIED:
-            ret = interpreter->memory_collected;
+            ret = arena_base->memory_collected;
             break;
         case IMPATIENT_PMCS:
             ret = interpreter->num_early_DOD_PMCs;

@@ -633,6 +633,7 @@ void
 free_unused_pobjects(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
+    struct Arenas *arena_base = interpreter->arena_base;
     struct Small_Object_Arena *cur_arena;
     UINTVAL i, total_used = 0;
     UINTVAL object_size = pool->object_size;
@@ -647,7 +648,7 @@ free_unused_pobjects(Interp *interpreter,
      * pool to free only some objects, except it's the pmc_pool
      * which might need timely destruction.
      */
-    if (pool != interpreter->arena_base->pmc_pool &&
+    if (pool != arena_base->pmc_pool &&
             pool->num_free_objects >
             pool->total_objects - pool->replenish_level)
         return;
@@ -722,7 +723,7 @@ free_unused_pobjects(Interp *interpreter,
                          * return it to the pool/arena
                          */
                         struct Small_Object_Pool *ext_pool =
-                            interpreter->arena_base->pmc_ext_pool;
+                            arena_base->pmc_ext_pool;
                         ext_pool->add_free_object(interpreter, ext_pool,
                                 ((PMC *)b)->pmc_ext);
                     }
@@ -1016,16 +1017,17 @@ See if we can find some unused headers.
 void
 Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
 {
+    struct Arenas *arena_base = interpreter->arena_base;
     struct Small_Object_Pool *header_pool;
     int j;
     /* XXX these should go into the interpreter */
     int total_free = 0;
 
-    if (interpreter->DOD_block_level) {
+    if (arena_base->DOD_block_level) {
         return;
     }
     pt_DOD_start_mark(interpreter);
-    Parrot_block_DOD(interpreter);
+    ++arena_base->DOD_block_level;
     /*
      * tell the threading system that we gonna DOD mark
      */
@@ -1038,9 +1040,9 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
         profile_dod_start(interpreter);
 
 #if ARENA_DOD_FLAGS
-    clear_live_counter(interpreter, interpreter->arena_base->pmc_pool);
-    for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-        header_pool = interpreter->arena_base->sized_header_pools[j];
+    clear_live_counter(interpreter, arena_base->pmc_pool);
+    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+        header_pool = arena_base->sized_header_pools[j];
         if (header_pool)
             clear_live_counter(interpreter, header_pool);
     }
@@ -1057,15 +1059,15 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
             profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
         /* pt_DOD_stop_mark(interpreter); */
         /* Now put unused PMCs on the free list */
-        header_pool = interpreter->arena_base->pmc_pool;
+        header_pool = arena_base->pmc_pool;
         free_unused_pobjects(interpreter, header_pool);
         total_free += header_pool->num_free_objects;
         if (interpreter->profile)
             profile_dod_end(interpreter, PARROT_PROF_DOD_cp);
 
         /* And unused buffers on the free list */
-        for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-            header_pool = interpreter->arena_base->sized_header_pools[j];
+        for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+            header_pool = arena_base->sized_header_pools[j];
             if (header_pool) {
 #ifdef GC_IS_MALLOC
                 used_cow(interpreter, header_pool, 0);
@@ -1092,9 +1094,9 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
     }
     pt_DOD_stop_mark(interpreter);
     /* Note it */
-    interpreter->dod_runs++;
+    arena_base->dod_runs++;
     interpreter->dod_trace_ptr = NULL;
-    Parrot_unblock_DOD(interpreter);
+    --arena_base->DOD_block_level;
     return;
 }
 

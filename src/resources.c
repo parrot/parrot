@@ -70,7 +70,7 @@ alloc_new_block(Interp *interpreter,
     new_block->top = new_block->start;
 
     /* Note that we've allocated it */
-    interpreter->memory_allocated += alloc_size;
+    interpreter->arena_base->memory_allocated += alloc_size;
 
     /* If this is for a public pool, add it to the list */
     new_block->prev = pool->top_block;
@@ -133,7 +133,7 @@ mem_allocate(Interp *interpreter, size_t *req_size,
     /* If not enough room, try to find some */
     if (pool->top_block == NULL) {
         alloc_new_block(interpreter, size, pool);
-        interpreter->mem_allocs_since_last_collect++;
+        interpreter->arena_base->mem_allocs_since_last_collect++;
     }
     if (0 && GC_DEBUG(interpreter)) {
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
@@ -159,7 +159,7 @@ mem_allocate(Interp *interpreter, size_t *req_size,
             if (pool->minimum_block_size < 65536*16)
                 pool->minimum_block_size *= 2;
             alloc_new_block(interpreter, size, pool);
-            interpreter->mem_allocs_since_last_collect++;
+            interpreter->arena_base->mem_allocs_since_last_collect++;
             if (pool->top_block->free < size) {
                 fprintf(stderr, "out of mem\n");
                 exit(1);
@@ -245,23 +245,25 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
     struct Memory_Block *new_block;     /* A pointer to our working block */
     char *cur_spot;             /* Where we're currently copying to */
     UINTVAL cur_size;           /* How big our chunk is going to be */
+    struct Arenas *arena_base = interpreter->arena_base;
     struct Small_Object_Arena *cur_buffer_arena;
     struct Small_Object_Pool *header_pool;
     INTVAL j;
     UINTVAL object_size;
 
     /* Bail if we're blocked */
-    if (interpreter->GC_block_level) {
+    if (arena_base->GC_block_level) {
         return;
     }
+    ++arena_base->GC_block_level;
     Parrot_block_GC(interpreter);
     if (interpreter->profile)
         profile_gc_start(interpreter);
 
     /* We're collecting */
-    interpreter->mem_allocs_since_last_collect = 0;
-    interpreter->header_allocs_since_last_collect = 0;
-    interpreter->collect_runs++;
+    arena_base->mem_allocs_since_last_collect = 0;
+    arena_base->header_allocs_since_last_collect = 0;
+    arena_base->collect_runs++;
 
     /* total-reclaimable == currently used. Add a minimum block to the current
      * amount, so we can avoid having to allocate it in the future. */
@@ -288,8 +290,8 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
     cur_spot = new_block->start;
 
     /* Run through all the Buffer header pools and copy */
-    for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-        header_pool = interpreter->arena_base->sized_header_pools[j];
+    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+        header_pool = arena_base->sized_header_pools[j];
         if (header_pool == NULL)
             continue;
 
@@ -378,7 +380,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
     /* How much is free. That's the total size minus the amount we used */
     new_block->free = new_block->size - (new_block->top - new_block->start);
 
-    interpreter->memory_collected += (new_block->top - new_block->start);
+    arena_base->memory_collected += (new_block->top - new_block->start);
 
     /* Now we're done. We're already on the pool's free list, so let us be the
      * only one on the free list and free the rest */
@@ -390,7 +392,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
         while (cur_block) {
             next_block = cur_block->prev;
             /* Note that we don't have it any more */
-            interpreter->memory_allocated -= cur_block->size;
+            arena_base->memory_allocated -= cur_block->size;
             /* We know the pool body and pool header are a single chunk, so
              * this is enough to get rid of 'em both */
             mem_sys_free(cur_block);
@@ -406,8 +408,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
     pool->possibly_reclaimable = 0;
     if (interpreter->profile)
         profile_gc_end(interpreter);
-    Parrot_unblock_GC(interpreter);
-
+    --arena_base->GC_block_level;
 }
 
 /*  */

@@ -223,32 +223,6 @@ typedef struct Parrot_Interp {
     String *current_file;       /* The file we're currently in */
     String *current_package;    /* The package we're currently in */
 
-    /* Some counters for the garbage collector.xs */
-    size_t  dod_runs;           /* Number of times we've
-                                 * done a DOD sweep */
-    size_t  collect_runs;       /* Number of times we've
-                                 * done a memory compaction
-                                 */
-    size_t  mem_allocs_since_last_collect;      /* The number of memory
-                                                 * allocations from the
-                                                 * system since the last
-                                                 * compaction run */
-    size_t  header_allocs_since_last_collect;   /* The number of header
-                                                 * blocks allocated from
-                                                 * the system since the last
-                                                 * DOD run */
-    size_t  memory_allocated;   /* The total amount of
-                                 * allocatable memory
-                                 * allocated. Doesn't count
-                                 * memory for headers or
-                                 * internal structures or
-                                 * anything */
-    UINTVAL memory_collected;   /* Total amount of memory copied
-                                   during collection */
-    UINTVAL DOD_block_level;    /* How many outstanding DOD block
-                                   requests are there? */
-    UINTVAL GC_block_level;     /* How many outstanding GC block
-                                   requests are there? */
 
     PDB_t *pdb;                 /* Debug system */
     void *lo_var_ptr;           /* Pointer to memory on runops system stack */

@@ -19,19 +19,19 @@
 
 /* Macros for recursively blocking and unblocking DOD */
 #define Parrot_block_DOD(interpreter) \
-        (interpreter)->DOD_block_level++
+        (interpreter)->arena_base->DOD_block_level++
 
 #define Parrot_unblock_DOD(interpreter) \
-        if ((interpreter)->DOD_block_level) \
-            (interpreter)->DOD_block_level--
+        if ((interpreter)->arena_base->DOD_block_level) \
+            (interpreter)->arena_base->DOD_block_level--
 
 /* Macros for recursively blocking and unblocking GC */
 #define Parrot_block_GC(interpreter) \
-        (interpreter)->GC_block_level++
+        (interpreter)->arena_base->GC_block_level++
 
 #define Parrot_unblock_GC(interpreter) \
-        if ((interpreter)->GC_block_level) \
-            (interpreter)->GC_block_level--
+        if ((interpreter)->arena_base->GC_block_level) \
+            (interpreter)->arena_base->GC_block_level--
 
 /* Macros for testing if the DOD and GC are blocked */
 #define Parrot_is_blocked_DOD(interpreter) \

@@ -182,7 +182,7 @@ get_free_object(Interp *interpreter,
     --pool->num_free_objects;
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter))
-        PObj_version((Buffer*)ptr) = interpreter->dod_runs;
+        PObj_version((Buffer*)ptr) = interpreter->arena_base->dod_runs;
 #endif
     return ptr;
 }
@@ -394,7 +394,7 @@ alloc_objects(Interp *interpreter,
         new_arena->prev->next = new_arena;
     }
     pool->last_Arena = new_arena;
-    interpreter->header_allocs_since_last_collect++;
+    interpreter->arena_base->header_allocs_since_last_collect++;
 
     add_to_free_list(interpreter, pool, new_arena, start, end);
 

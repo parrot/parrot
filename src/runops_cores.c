@@ -106,6 +106,7 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
     struct Parrot_Context *trace_ctx;
 #endif
     static size_t dod, gc;
+    struct Arenas *arena_base = interpreter->arena_base;
 
 #ifdef code_start
 #  undef code_start
@@ -135,8 +136,8 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
     }
 #endif
 
-    dod = interpreter->dod_runs;
-    gc = interpreter->collect_runs;
+    dod = arena_base->dod_runs;
+    gc = arena_base->collect_runs;
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         trace_op(interpreter, code_start, code_end, pc);
     }
@@ -153,12 +154,12 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
 #else
             trace_op(interpreter, code_start, code_end, pc);
 #endif
-            if (dod != interpreter->dod_runs) {
-                dod = interpreter->dod_runs;
+            if (dod != arena_base->dod_runs) {
+                dod = arena_base->dod_runs;
                 PIO_eprintf(interpreter, "       DOD\n");
             }
-            if (gc != interpreter->collect_runs) {
-                gc = interpreter->collect_runs;
+            if (gc != arena_base->collect_runs) {
+                gc = arena_base->collect_runs;
                 PIO_eprintf(interpreter, "       GC\n");
             }
         }

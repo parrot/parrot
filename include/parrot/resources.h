@@ -62,6 +62,32 @@ struct Arenas {
     struct Small_Object_Pool *constant_string_header_pool;
     struct Small_Object_Pool **sized_header_pools;
     size_t num_sized;
+    /* Some counters for the garbage collector */
+    size_t  dod_runs;           /* Number of times we've
+                                 * done a DOD sweep */
+    size_t  collect_runs;       /* Number of times we've
+                                 * done a memory compaction
+                                 */
+    size_t  mem_allocs_since_last_collect;      /* The number of memory
+                                                 * allocations from the
+                                                 * system since the last
+                                                 * compaction run */
+    size_t  header_allocs_since_last_collect;   /* The number of header
+                                                 * blocks allocated from
+                                                 * the system since the last
+                                                 * DOD run */
+    size_t  memory_allocated;   /* The total amount of
+                                 * allocatable memory
+                                 * allocated. Doesn't count
+                                 * memory for headers or
+                                 * internal structures or
+                                 * anything */
+    UINTVAL memory_collected;   /* Total amount of memory copied
+                                   during collection */
+    UINTVAL DOD_block_level;    /* How many outstanding DOD block
+                                   requests are there? */
+    UINTVAL GC_block_level;     /* How many outstanding GC block
+                                   requests are there? */
 };
 
 struct Stash {

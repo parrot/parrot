@@ -418,8 +418,8 @@ main(int argc, char * argv[])
 
     Parrot_init(interpreter);
 
-    interpreter->DOD_block_level++;
-    interpreter->GC_block_level++;
+    Parrot_block_DOD(interpreter);
+    Parrot_block_GC(interpreter);
 
 
     imcc_init(interpreter);
@@ -562,8 +562,8 @@ main(int argc, char * argv[])
         else
             PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
         if (!gc_off) {
-            interpreter->DOD_block_level--;
-            interpreter->GC_block_level--;
+            Parrot_unblock_DOD(interpreter);
+            Parrot_unblock_GC(interpreter);
         }
         if (obj_file)
             info(interpreter, 1, "Writing %s\n", output);
