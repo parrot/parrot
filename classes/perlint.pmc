@@ -40,6 +40,10 @@ pmclass PerlInt extends scalar {
         return (INTVAL)(pmc->cache.int_val != 0);
     }
 
+    void set_pmc (PMC* value) {
+        SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
+    }
+
     void set_integer_same (PMC * value) {
         SELF->cache.int_val = value->cache.int_val;
     }

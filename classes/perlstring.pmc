@@ -38,6 +38,10 @@ pmclass PerlString extends scalar {
         string_destroy(SELF->data);
     }
 
+    void set_pmc (PMC* value) {
+        SELF->cache.string_val = value->vtable->get_string(INTERP, value);
+    }
+
     INTVAL get_integer () {
         STRING* s = (STRING*) SELF->data;
         return string_to_int(s);

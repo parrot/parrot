@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 81;
+use Parrot::Test tests => 82;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -191,7 +191,7 @@ OUTPUT
 #
 output_is(<<"CODE", <<OUTPUT, "add number to self");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
+	new P0, .PerlNum
 	set P0, 123.123
 	add P0, P0, P0
 	.fp_eq( P0, 246.246, EQ1)
@@ -205,7 +205,7 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "sub number from self");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
+	new P0, .PerlNum
 	set P0, 456.456
 	sub P0, P0, P0
 	.fp_eq( P0, 0, EQ1)
@@ -219,7 +219,7 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply number by self");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
+	new P0, .PerlNum
 	set P0, 124.124
 	mul P0, P0, P0
 	.fp_eq( P0, 15406.767376, EQ1)
@@ -233,7 +233,7 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide number by self");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
+	new P0, .PerlNum
 	set P0, 23.23
 	div P0, P0, P0
 	.fp_eq( P0, 1, EQ1)
@@ -250,8 +250,8 @@ OUTPUT
 #
 output_is(<<"CODE", <<OUTPUT, "add number to other");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlNum
+	new P1, .PerlNum
 	set P0, 123.123
 	set P1, 321.321
 	add P1, P1, P0
@@ -266,8 +266,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract number from other");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlNum
+	new P1, .PerlNum
 	set P0, 123.123
 	set P1, 321.321
 	sub P1, P1, P0
@@ -282,8 +282,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply number by other");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlNum
+	new P1, .PerlNum
 	set P0, 123.123
 	set P1, 321.321
 	mul P1, P1, P0
@@ -298,8 +298,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide number by other");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlNum
+	new P1, .PerlNum
 	set P0, 123.123
 	set P1, 246.246
 	div P1, P1, P0
@@ -318,7 +318,7 @@ OUTPUT
 output_is(<<"CODE", <<OUTPUT, "add integer to number");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlNum
 	set P0, 123
 	set P1, 321.321
 	add P1, P1, P0
@@ -334,7 +334,7 @@ OUTPUT
 output_is(<<"CODE", <<OUTPUT, "subtract integer from number");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlNum
 	set P0, 123
 	set P1, 321.321
 	sub P1, P1, P0
@@ -350,7 +350,7 @@ OUTPUT
 output_is(<<"CODE", <<OUTPUT, "multiply integer by number");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlNum
 	set P0, 123
 	set P1, 321.321
 	mul P1, P1, P0
@@ -366,7 +366,7 @@ OUTPUT
 output_is(<<"CODE", <<OUTPUT, "divide integer by number");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlNum
 	set P0, 123
 	set P1, 246.246
 	div P1, P1, P0
@@ -385,7 +385,7 @@ OUTPUT
 output_is(<<"CODE", <<OUTPUT, "add integer to number");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlNum
 	set P0, 123
 	set P1, 321.321
 	add P1, P0, P1
@@ -401,7 +401,7 @@ OUTPUT
 output_is(<<"CODE", <<OUTPUT, "subtract integer from number");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlNum
 	set P0, 123
 	set P1, 321.321
 	sub P1, P0, P1
@@ -417,7 +417,7 @@ OUTPUT
 output_is(<<"CODE", <<OUTPUT, "multiply integer by number");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlNum
 	set P0, 123
 	set P1, 321.321
 	mul P1, P0, P1
@@ -433,7 +433,7 @@ OUTPUT
 output_is(<<"CODE", <<OUTPUT, "divide integer by number");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlNum
 	set P0, 123
 	set P1, 246.246
 	div P1, P0, P1
@@ -451,7 +451,7 @@ OUTPUT
 #
 output_is(<<'CODE', <<OUTPUT, "concatenate integer to string");
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlString
 	set P0, -5
 	set P1, "foo"
 	concat P0,P0,P1
@@ -464,7 +464,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concatenate string to integer");
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlString
 	set P0, "foo"
 	set P1, -7
 	concat P0,P0,P1
@@ -476,8 +476,8 @@ foo-7
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concatenate number to string");
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlNum
+	new P1, .PerlString
 	set P0, 5.43
 	set P1, "bar"
 	concat P0,P0,P1
@@ -489,8 +489,8 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concatenate string to number");
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlString
+	new P1, .PerlNum
 	set P0, "bar"
 	set P1, 2.7
 	concat P0,P0,P1
@@ -502,8 +502,8 @@ bar2.700000
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concatenate string to string");
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlString
+	new P1, .PerlString
 	set P0, "foo"
 	set P1, "bar"
 	concat P0,P0,P1
@@ -518,7 +518,7 @@ OUTPUT
 # Basic string number conversion
 #
 output_is(<<CODE, <<OUTPUT, "string to int");
-	new	P0, .PerlInt
+	new	P0, .PerlString
 
 	set	P0, "1"
 	set	I0, P0
@@ -584,7 +584,7 @@ OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "string to number conversion");
 @{[ $fp_equality_macro ]}
-	new	P0, .PerlInt
+	new	P0, .PerlNum
 
 	set	P0, "1"
 	set	N0, P0
@@ -691,7 +691,7 @@ OUTPUT
 #
 output_is(<<'CODE', <<OUTPUT, "add integer to string integer");
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlString
 	set P0, 6
 	set P1, "7"
 	add P0,P0,P1
@@ -704,7 +704,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "add integer to string");
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlString
 	set P0, 6
 	set P1, "ab"
 	add P0,P0,P1
@@ -718,7 +718,7 @@ OUTPUT
 output_is(<<"CODE", <<OUTPUT, "add integer to string number");
 @{[ $fp_equality_macro ]}
 	new P0, .PerlInt
-	new P1, .PerlInt
+	new P1, .PerlString
 	set P0, 6
 	set P1, "7.5"
 	add P0,P0,P1
@@ -733,8 +733,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string integer");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlNum
+	new P1, .PerlString
 	set P0, 6.1
 	set P1, "7"
 	add P0,P0,P1
@@ -749,8 +749,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlNum
+	new P1, .PerlString
 	set P0, 6.1
 	set P1, "ab"
 	add P0,P0,P1
@@ -765,8 +765,8 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string number");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .PerlNum
+	new P1, .PerlString
 	set P0, 6.1
 	set P1, "7.5"
 	add P0,P0,P1
@@ -797,7 +797,7 @@ output_is(<<CODE, <<OUTPUT, "(int / int) -> float");
 @{[ $fp_equality_macro ]}
 	new 	P0, .PerlInt
 	new	P1, .PerlInt
-	new	P2, .PerlInt
+	new	P2, .PerlNum
 	set	P0, 1
 	set	P1, 2
 	div		P2, P0, P1
@@ -833,7 +833,7 @@ foo
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set/get string value");
-	new P0, .PerlInt
+	new P0, .PerlString
         set P0, "foo"
         set S0, P0
         eq S0, "foo", OK1
@@ -883,7 +883,7 @@ OUTPUT
 # The same for PerlNums...
 
 output_is(<<'CODE', <<'OUTPUT', "set/get string value");
-	new P0, .PerlNum
+	new P0, .PerlString
         set P0, "bar"
         set S0, P0
         eq S0, "bar", OK1
@@ -971,7 +971,7 @@ ok 2
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "if (P) - Num");
-	new	P0, .PerlInt
+	new	P0, .PerlNum
 
 	set	P0, 1.1
 	if	P0, OK1
@@ -991,7 +991,7 @@ ok 2
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "unless (P) - Num");
-	new	P0, .PerlInt
+	new	P0, .PerlNum
 
 	set	P0, 0.0
 	unless	P0, OK1
@@ -1094,7 +1094,7 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-logical");
-	new P0, .PerlUndef
+	new P0, .PerlInt
 	new P1, .PerlUndef
 	new P2, .PerlInt
 
@@ -1168,7 +1168,7 @@ OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
 @{[ $fp_equality_macro ]}
-	new P0, .PerlUndef
+	new P0, .PerlInt
 	new P1, .PerlUndef
 
 # undef - undef
@@ -1204,7 +1204,7 @@ OUTPUT
 output_is(<<"CODE", <<'OUTPUT', "undef-multiply");
 @{[ $fp_equality_macro ]}
 
-	new P0, .PerlUndef
+	new P0, .PerlInt
 	new P1, .PerlUndef
 	new P2, .PerlInt
 
@@ -1234,7 +1234,7 @@ CODE
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-divide");
-	new P0, .PerlUndef
+	new P0, .PerlInt
 	new P1, .PerlUndef
 	new P2, .PerlInt
 
@@ -1269,7 +1269,7 @@ ok
 OUTPUT
 
 
-output_is(<<CODE, <<OUTPUT, "IntQueue test");
+output_is(<<CODE, <<OUTPUT, "IntQueue test 1");
 	new P0,.IntQueue
 	set P0,32
 	set P0,-7
@@ -1302,7 +1302,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "IntQueue test");
+output_is(<<CODE, <<OUTPUT, "IntQueue test 2");
 	new P0,.IntQueue
 	set P0,32
 	set P0,-7
@@ -1335,7 +1335,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "IntQueue test");
+output_is(<<CODE, <<OUTPUT, "IntQueue test 3");
 	new P0,.IntQueue
         set I0, P0
         end
@@ -2015,5 +2015,82 @@ CODE
 -25
 12.098765
 OUTPUT
+
+SKIP: { skip("variable/value semantics being hashed out", 1);
+output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
+    new P0, .PerlInt
+    new P1, .PerlNum
+    new P2, .PerlString
+    new P3, .PerlUndef
+    set P0, 123
+    set P1, 3.14
+    set P2, "7.4x"
+    set P3, 666
+
+    new P10, .PerlInt
+    new P11, .PerlNum
+    new P12, .PerlString
+    new P13, .PerlUndef
+
+    assign P10, P0
+    assign P11, P0
+    assign P12, P0
+    assign P13, P0
+    print P10
+    print ":"
+    print P11
+    print ":"
+    print P12
+    print ":"
+    print P13
+    print "\n"
+    
+    assign P10, P1
+    assign P11, P1
+    assign P12, P1
+    assign P13, P1
+    print P10
+    print ":"
+    print P11
+    print ":"
+    print P12
+    print ":"
+    print P13
+    print "\n"
+    
+    assign P10, P2
+    assign P11, P2
+    assign P12, P2
+    assign P13, P2
+    print P10
+    print ":"
+    print P11
+    print ":"
+    print P12
+    print ":"
+    print P13
+    print "\n"
+    
+    assign P10, P3
+    assign P11, P3
+    assign P12, P3
+    assign P13, P3
+    print P10
+    print ":"
+    print P11
+    print ":"
+    print P12
+    print ":"
+    print P13
+    print "\n"
+
+    end
+CODE
+123:123.000000:123:
+3:3.140000:3.140000:
+7:7.400000:7.4x:
+0:0.000000::
+OUTPUT
+}
 
 1;
