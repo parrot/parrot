@@ -60,22 +60,26 @@ flags_to_win32(INTVAL flags, DWORD * fdwAccess,
 {
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == (PIO_F_WRITE | PIO_F_READ)) {
         *fdwAccess = GENERIC_WRITE | GENERIC_READ;
-        *fdwCreate = CREATE_ALWAYS;
+        if (flags & PIO_F_TRUNC)
+            *fdwCreate = CREATE_ALWAYS;
+        else
+            *fdwCreate = OPEN_ALWAYS;
     }
     else if (flags & PIO_F_WRITE) {
         *fdwAccess = GENERIC_WRITE;
-        *fdwCreate = CREATE_ALWAYS;
+        if (flags & PIO_F_TRUNC)
+            *fdwCreate = CREATE_ALWAYS;
+        else
+            *fdwCreate = OPEN_ALWAYS;
     }
     else if (flags & PIO_F_READ) {
         *fdwAccess = GENERIC_READ;
         *fdwCreate = OPEN_EXISTING;
     }
 
-    *fdwShareMode = FILE_SHARE_READ;
-    if ((flags & PIO_F_TRUNC) && (flags & PIO_F_WRITE) &&
-        (*fdwCreate & CREATE_ALWAYS) == 0)
-        *fdwCreate |= TRUNCATE_EXISTING;
-    else if (flags & PIO_F_APPEND) {
+    *fdwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+    if (flags & PIO_F_APPEND) {
+        /* dealt with specially in _write and _puts */
     }
     return 1;
 }
@@ -239,6 +243,21 @@ PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                 const void *buffer, size_t len)
 {
     DWORD countwrote = 0;
+    /* do it by hand, Win32 hasn't any specific flag */
+    if (io->flags & PIO_F_APPEND)
+    {
+        PIOOFF_T p;
+        p.LowPart = 0;
+        p.HighPart = 0;
+
+        p.LowPart = SetFilePointer(io->fd, p.LowPart,
+                                   &p.HighPart, FILE_END);
+        if (p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
+            /* Error - exception */
+            return -1;
+        }
+    }
+
     if (io
         && WriteFile(io->fd, (LPCSTR) buffer, (DWORD) len, &countwrote, NULL))
         return countwrote;
@@ -259,8 +278,22 @@ PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
 {
     DWORD len, countwrote;
     len = _tcslen((LPCSTR) s);
-    if (WriteConsole(io->fd, (LPCSTR) s, len, &countwrote, NULL)
-        || WriteFile(io->fd, (LPCSTR) s, len, &countwrote, NULL))
+    /* do it by hand, Win32 hasn't any specific flag */
+    if (io->flags & PIO_F_APPEND)
+    {
+        PIOOFF_T p;
+        p.LowPart = 0;
+        p.HighPart = 0;
+
+        p.LowPart = SetFilePointer(io->fd, p.LowPart,
+                                   &p.HighPart, FILE_END);
+        if (p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
+            /* Error - exception */
+            return -1;
+        }
+    }
+
+    if (WriteFile(io->fd, (LPCSTR) s, len, &countwrote, NULL))
         return countwrote;
     return -1;
 }
