@@ -1,5 +1,5 @@
 #
-# test.pasm
+# mops.pasm
 #
 # Copyright (C) 2001 The Parrot Team. All rights reserved.
 # This program is free software. It is subject to the same
