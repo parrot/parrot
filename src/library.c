@@ -22,6 +22,8 @@ This file contains a C function to access parrot's bytecode library functions.
 #include <assert.h>
 #include "library.str"
 
+#include "parrot_config.h"
+
 #if 0
 /*
 
@@ -244,6 +246,36 @@ char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
     return NULL;
 }
 
+const char*
+Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
+{
+    static STRING *s;
+    static int init_done;
+    static const char *prefix;
+    int free_env;
+    char *env;
+
+    if (!*runtime_prefix)
+	return NULL;
+    if (!init_done) {
+	init_done = 1;
+	prefix = runtime_prefix;
+	s = const_string(interpreter, runtime_prefix);
+	if (!Parrot_stat_info_intval(interpreter, s, STAT_EXISTS))
+	    prefix = NULL;
+        env = Parrot_getenv("PARROT_TEST", &free_env);
+        if (env) {
+            prefix = NULL;
+            if (free_env)
+                mem_sys_free(env);
+        }
+        if (!prefix)
+            s = NULL;
+    }
+    if (prefix_str)
+	*prefix_str = s;
+    return prefix;
+}
 /*
 
 =back
