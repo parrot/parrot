@@ -1,6 +1,6 @@
 package P6C::IMCC::ExtRegex::Rewrite;
 use base 'Regex::Rewrite';
-use P6C::IMCC;
+require P6C::IMCC;
 use strict;
 
 =head1 NAME

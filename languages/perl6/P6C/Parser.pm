@@ -175,7 +175,7 @@ sub parse_sig {
 
     $sig = $sig->tree;
     $sig->{no_named} = 1 if $options{no_named};
-    return ($sig, new P6C::Context type => $sig->arg_context);
+    return ($sig, new P6C::Context(type => $sig->arg_context) );
 }
 
 ##############################

@@ -354,7 +354,7 @@ sub convert_rx_call {
 
     # Set the context of the call, to get the return values stored
     # safely back into our vars
-    $tree->{ctx} = new P6C::Context type => ['fwoing_one', 'fwoing_two' ];
+    $tree->{ctx} = new P6C::Context(type => ['fwoing_one', 'fwoing_two']);
 
     return op('call' => [ $tree ]);
 }

@@ -6,7 +6,7 @@ use Carp 'confess';
 use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
-use P6C::IMCC::ExtRegex qw(node_to_tree tree_to_list list_to_pasm emit_extregex_code);
+require P6C::IMCC::ExtRegex;
 require Exporter;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK);
 @ISA = qw(Exporter);
@@ -418,7 +418,7 @@ sub sm_expr_pattern {
     $ctx->{rx_scan} = 1; # Generate a regex that scans the input
     my $regex = generate_regex($R, $continue_label, $continue_label, $ctx);
 
-    emit_extregex_code($regex->{code});
+    P6C::IMCC::ExtRegex::emit_extregex_code($regex->{code});
 
     # Set up return value
     code("$continue_label:");
@@ -453,7 +453,7 @@ sub generate_regex {
 
     # Translate a native perl6 regex optree into a native
     # languages/regex optree.
-    my $tree = node_to_tree($R, $ctx, DEBUG => $ENV{RX_DEBUG});
+    my $tree = P6C::IMCC::ExtRegex::node_to_tree($R, $ctx, DEBUG => $ENV{RX_DEBUG});
 
 #    Regex::Ops::Tree::dump_tree($tree);
 
@@ -463,7 +463,7 @@ sub generate_regex {
     # am not informing the optimizer that I will be calling into its
     # backtracking label, so it optimizes it away. (If I did tell it,
     # would it leave it in but rename it and thus break anyway?)
-    my $list_regex = tree_to_list($tree, $ctx,
+    my $list_regex = P6C::IMCC::ExtRegex::tree_to_list($tree, $ctx,
                                   $pass_label, $fail_label,
                                   DEBUG => $ENV{RX_DEBUG},
                                   'no-list-optimize' => 1, # FIXME!!!
@@ -472,7 +472,7 @@ sub generate_regex {
     # And finally, convert those list ops to PASM. Er... actually,
     # that's PIR, the stuff IMCC eats.
     $ctx->{rx_tmp} = $tmp;
-    my $imcc_regex = list_to_pasm($list_regex, $ctx,
+    my $imcc_regex = P6C::IMCC::ExtRegex::list_to_pasm($list_regex, $ctx,
                                   DEBUG => $ENV{RX_DEBUG},
                                  );
 
