@@ -46,7 +46,7 @@ struct Parrot_Interp *
 make_interpreter();
 
 void
-runops(struct Parrot_Interp *, IV *);
+runops(struct Parrot_Interp *, IV *, IV);
 
 #endif
 

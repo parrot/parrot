@@ -37,19 +37,21 @@ structure of the frozen bycode.
 
 =item C<check_magic>
 
-    Args: void** program_code
+    Args: void** program_code, long* program_size
 
-Check to see if the first C<long> in C<*program_code>
+Check to see if the first C<IV> in C<*program_code>
 matches the Parrot magic number for bytecode; return 1
 if so, and 0 if not. This function is expected to advance
-the C<*program_code> pointer beyond the magic number.
+the C<*program_code> pointer beyond the magic number. It
+also decrements C<*program_size> by the same amount.
 
 =cut
 
 */
 
 static int
-check_magic(void** program_code) {
+check_magic(void** program_code, long* program_size) {
+    program_size -= sizeof(IV);
     return (GRAB_IV(program_code) == PARROT_MAGIC);
 }
 
@@ -57,23 +59,26 @@ check_magic(void** program_code) {
 
 =item C<read_constants_table>
 
-    Args: void** program_code
+    Args: void** program_code, long* program_size
 
 Reads the constants segment from C<*program_code>, and
 creates the referenced constants. See L<parrotbyte/Constants Segment>
 for the structure of the constants segment. Advances
-C<*program_code> beyond the constants segment.
+C<*program_code> beyond the constants segment and decrements
+C<*program_size> byt the amount consumed.
 
 =cut
 
 */
 
 static void
-read_constants_table(void** program_code)
+read_constants_table(void** program_code, long* program_size)
 {
     IV len = GRAB_IV(program_code);
     IV num;
     IV i = 0;
+
+    *program_size -= sizeof(IV);
 
     Parrot_num_string_constants = len;
     if (len == 0) {
@@ -82,6 +87,7 @@ read_constants_table(void** program_code)
 
     num = GRAB_IV(program_code);
     len -= sizeof(IV);
+    *program_size -= sizeof(IV);
     
     Parrot_string_constants = mem_allocate_aligned(num * sizeof(STRING*));
 
@@ -93,10 +99,12 @@ read_constants_table(void** program_code)
 	int pad;
 
         len -= 4 * sizeof(IV);
+        *program_size -= 4 * sizeof(IV);
 
         Parrot_string_constants[i++] = string_make(*program_code /* ouch */, buflen, encoding, flags, type);
         (char*)*program_code += buflen;
         len -= buflen;
+        *program_size -= buflen;
 
         /* Padding */
 	pad=buflen % sizeof(IV);
@@ -104,6 +112,7 @@ read_constants_table(void** program_code)
 	  pad=sizeof(IV)-pad;
 	  len -= pad;
 	  (char*)*program_code += pad;       
+          *program_size -= pad;
 	}
         num--;
         if (len < 0 || (len > 0 && num == 0)) {
@@ -129,18 +138,20 @@ fixup segment.
 */
 
 static void
-read_fixup_table(void** program_code)
+read_fixup_table(void** program_code, long* program_size)
 {
     IV len = GRAB_IV(program_code);
+    *program_size -= sizeof(IV);
     /* For now, just skip over it */
     ((IV*)*program_code) += len;
+    *program_size -= len;
 }
 
 /*
 
 =item C<init_bytecode>
 
-    Args: void* program_code
+    Args: void* program_code, long* program_size
 
 This function is responsible for calling the above three
 functions, exiting if the Parrot magic is not found, and
@@ -152,15 +163,15 @@ bytecode stream begins.
 */
 
 void *
-init_bytecode(void* program_code) 
+init_bytecode(void* program_code, long* program_size) 
 {
-    if (!check_magic(&program_code)) {
+    if (!check_magic(&program_code, program_size)) {
         printf("This isn't Parrot bytecode!\n");
         exit(1);
     }
 
-    read_fixup_table(&program_code);
-    read_constants_table(&program_code);
+    read_fixup_table(&program_code, program_size);
+    read_constants_table(&program_code, program_size);
     return program_code;
 }
 

@@ -27,14 +27,29 @@ IV opcodes[] = {3, 1,                /* put the time in reg 1 */
 
 int
 main(int argc, char **argv) {
+    int i;
+    int tracing;
+
     struct Parrot_Interp *interpreter;
     init_world();
   
     interpreter = make_interpreter();
     
+    /* Look for the '-t' tracing switch. We really should use getopt, but are we allowed? */
+
+    if (argc > 1 && strcmp(argv[1], "-t") == 0) {
+        tracing = 1;
+        for(i = 2; i < argc; i++) {
+            argv[i-1] = argv[i];
+        }
+        argc--;
+    } else {
+        tracing = 0;
+    }
+
     /* If we got only the program name, run the test program */
     if (argc == 1) {
-        runops(interpreter, opcodes);
+        runops(interpreter, opcodes, sizeof(opcodes));
     }
     else if (argc == 2 && !strcmp(argv[1], "-s")) { /* String tests */
         STRING *s = string_make("foo", 3, enc_native, 0, 0);
@@ -60,8 +75,10 @@ main(int argc, char **argv) {
     /* Otherwise load in the program they gave and try that */
     else {
         void *program_code;
+        long program_size;
         struct stat file_stat;
         int fd;
+
         if (stat(argv[1], &file_stat)) {
             printf("can't stat %s, code %i\n", argv[1], errno);
             return 1;
@@ -72,20 +89,27 @@ main(int argc, char **argv) {
             return 1;
         }
         
+        program_size = file_stat.st_size;
+
 #ifndef HAS_HEADER_SYSMMAN
-		program_code = mem_sys_allocate(file_stat.st_size);
-		_read(fd, program_code, file_stat.st_size);
+        program_code = mem_sys_allocate(program_size);
+        _read(fd, program_code, program_size);
 #else
-		program_code = mmap(0, file_stat.st_size, PROT_READ, MAP_SHARED, fd, 0);
+        program_code = mmap(0, program_size, PROT_READ, MAP_SHARED, fd, 0);
 #endif
+
         if (!program_code) {
             printf("Can't mmap, code %i\n", errno);
             return 1;
         }
         
-        program_code = init_bytecode(program_code);
+        program_code = init_bytecode(program_code, &program_size);
         
-        runops(interpreter, program_code);
+        if (tracing) {
+            interpreter->flags |= PARROT_TRACE_FLAG;
+        }
+
+        runops(interpreter, program_code, program_size);
         
     }
     return 0;

@@ -13,18 +13,17 @@
 #include "parrot/parrot.h"
 #include "parrot/interp_guts.h"
 
-/*=for api interpreter runops
- * run parrot operations until the program is complete
+char *op_names[2048];
+int   op_args[2048];
+
+/*=for api interpreter check_fingerprint
+ * TODO: Not really part of the API, but here's the docs.
+ * Check the bytecode's opcode table fingerprint.
  */
 void
-runops (struct Parrot_Interp *interpreter, IV *code) {
-    /* Move these out of the inner loop. No need to redeclare 'em each
-       time through */
-    IV *(*func)();
-    void **temp; 
-    
+check_fingerprint(void) {
     if (Parrot_num_string_constants == 0) {
-        printf("Warning: Bytecode does not include opcode table fingerprint!\n");
+        fprintf(stderr, "Warning: Bytecode does not include opcode table fingerprint!\n");
     } else {
         const char * fp_data;
         IV           fp_len;
@@ -33,16 +32,118 @@ runops (struct Parrot_Interp *interpreter, IV *code) {
         fp_len  = Parrot_string_constants[0]->buflen;
         
         if (strncmp(OPCODE_FINGERPRINT, fp_data, fp_len)) {
-            printf("Error: Opcode table fingerprint in bytecode does not match interpreter!\n");
-            printf("       Bytecode:    %*s\n", -fp_len, fp_data);
-            printf("       Interpreter: %s\n", OPCODE_FINGERPRINT);
+            fprintf(stderr, "Error: Opcode table fingerprint in bytecode does not match interpreter!\n");
+            fprintf(stderr, "       Bytecode:    %*s\n", -fp_len, fp_data);
+            fprintf(stderr, "       Interpreter: %s\n", OPCODE_FINGERPRINT);
             exit(1);
         }
     }
+}
 
-    while (*code) {
+/*=for api interpreter runops
+ * run parrot operations until the program is complete
+ */
+IV *
+runops_notrace_core (struct Parrot_Interp *interpreter, IV *code, IV code_size) {
+    /* Move these out of the inner loop. No need to redeclare 'em each
+       time through */
+    IV *(*func)();
+    void **temp; 
+    IV *code_start;
+
+    code_start = code;
+
+    while (code >= code_start && code < (code_start + code_size) && *code) {
         DO_OP(code, temp, func, interpreter);
     }
+
+    return code;
+}
+
+/*
+ *=for api interpreter trace_op
+ * TODO: This isn't really part of the API, but here's its documentation. Prints the PC, OP
+ * and ARGS. Used by runops_trace.
+ */
+void
+trace_op(IV * code_start, long code_size, IV *code) {
+    int i;
+
+    if (code >= code_start && code < (code_start + code_size)) {
+        fprintf(stderr, "PC=%ld; OP=%ld (%s)", code - code_start, *code, op_names[*code]);
+        if (op_args[*code]) {
+            fprintf(stderr, "; ARGS=(");
+            for(i = 0; i < op_args[*code]; i++) {
+                if (i) { fprintf(stderr, ", "); }
+                fprintf(stderr, "%ld", *(code + i + 1));
+            }
+            fprintf(stderr, ")");
+        }
+        fprintf(stderr, "\n");
+    } else {
+        fprintf(stderr, "PC=%ld; OP=<err>\n", code - code_start);
+    }
+}
+
+/*=for api interpreter runops_trace_core
+ * TODO: Not really part of the API, but here's the docs.
+ * Passed to runops_generic() by runops_trace().
+ */
+IV *
+runops_trace_core (struct Parrot_Interp *interpreter, IV *code, IV code_size) {
+    /* Move these out of the inner loop. No need to redeclare 'em each
+       time through */
+    IV *(*func)();
+    void **temp; 
+    IV *code_start;
+
+    code_start = code;
+
+    trace_op(code_start, code_size, code);
+
+    while (code >= code_start && code < (code_start + code_size) && *code) {
+        DO_OP(code, temp, func, interpreter);
+
+        trace_op(code_start, code_size, code);
+    }
+
+    return code;
+}
+
+/*=for api interpreter runops_generic
+ * TODO: Not really part of the API, but here's the docs.
+ * Generic runops, which takes a function pointer for the core.
+ */
+void
+runops_generic (IV * (*core)(struct Parrot_Interp *, IV *, IV), struct Parrot_Interp *interpreter, IV *code, IV code_size) {
+    IV * code_start;
+
+    check_fingerprint();
+
+    code_start = code;
+    code = core(interpreter, code, code_size);
+
+    if (code < code_start || code >= (code_start + code_size)) {
+        fprintf(stderr, "Error: Control left bounds of byte-code block (now at location %d)!\n", code - code_start);
+        exit(1);
+    }
+}
+
+
+/*=for api interpreter runops
+ * run parrot operations until the program is complete
+ */
+void
+runops (struct Parrot_Interp *interpreter, IV *code, IV code_size) {
+    IV * (*core)(struct Parrot_Interp *, IV *, IV);
+
+    if (interpreter->flags & PARROT_TRACE_FLAG) {
+        core = runops_trace_core;
+    } else {
+        core = runops_notrace_core;
+    }
+
+    runops_generic(core, interpreter, code, code_size);
 }
 
 /*=for api interpreter make_interpreter
@@ -111,6 +212,9 @@ make_interpreter() {
         BUILD_TABLE(foo);
         
         interpreter->opcode_funcs = (void*)foo;
+
+        BUILD_NAME_TABLE(op_names);
+        BUILD_ARG_TABLE(op_args);
     }
     
     /* In case the I/O system needs something */

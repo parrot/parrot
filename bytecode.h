@@ -14,7 +14,7 @@
 #define PARROT_BYTECODE_H_GUARD
 
 void*
-init_bytecode(void* program_code);
+init_bytecode(void* program_code, long* program_size);
 
 VAR_SCOPE IV Parrot_num_string_constants;
 VAR_SCOPE STRING** Parrot_string_constants;

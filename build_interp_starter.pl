@@ -26,7 +26,39 @@ for my $name (sort {$opcodes{$a}{CODE} <=> $opcodes{$b}{CODE}} keys %opcodes) {
 }
 print INTERP "} while (0);\n";
 
+
+#
+# BUILD_NAME_TABLE macro:
+#
+
+print INTERP <<CONST;
+#define BUILD_NAME_TABLE(x) do { \\
+CONST
+
+for my $name (sort {$opcodes{$a}{CODE} <=> $opcodes{$b}{CODE}} keys %opcodes) {
+    print INTERP "\tx[$opcodes{$name}{CODE}] = \"$name\"; \\\n";
+}
+print INTERP "} while (0);\n";
+
+
+#
+# BUILD_ARG_TABLE macro:
+#
+
+print INTERP <<CONST;
+#define BUILD_ARG_TABLE(x) do { \\
+CONST
+
+for my $name (sort {$opcodes{$a}{CODE} <=> $opcodes{$b}{CODE}} keys %opcodes) {
+    print INTERP "\tx[$opcodes{$name}{CODE}] = $opcodes{$name}{ARGS}; \\\n";
+}
+print INTERP "} while (0);\n";
+
+
+#
 # Spit out the DO_OP function
+#
+
 print INTERP <<EOI;
 
 #define DO_OP(w,x,y,z) do { \\
