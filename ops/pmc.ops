@@ -219,27 +219,27 @@ Test for key existence.
 =cut
 
 inline op defined(out INT, in PMC) {
-  $1 = $2 ? $2->vtable->defined(interpreter, $2) : 0;
+  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined(interpreter, $2);
   goto NEXT();
 }
 
 inline op defined(out INT, in PMC, in INTKEY) {
-  $1 = $2 ? $2->vtable->defined_keyed_int(interpreter, $2, $3) : 0;
+  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed_int(interpreter, $2, $3);
   goto NEXT();
 }
 
 inline op defined(out INT, in PMC, in KEY) {
-  $1 = ($2 && $3) ? $2->vtable->defined_keyed(interpreter, $2, $3) : 0;
+  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->defined_keyed(interpreter, $2, $3);
   goto NEXT();
 }
 
 inline op exists(out INT, in PMC, in INTKEY) {
-  $1 = $2 ? $2->vtable->exists_keyed_int(interpreter, $2, $3) : 0;
+  $1 = PMC_IS_NULL($2) ? 0 : $2->vtable->exists_keyed_int(interpreter, $2, $3);
   goto NEXT();
 }
 
 inline op exists(out INT, in PMC, in KEY) {
-  $1 = ($2 && $3) ? $2->vtable->exists_keyed(interpreter, $2, $3) : 0;
+  $1 = PMC_IS_NULL($2) ? 0: $2->vtable->exists_keyed(interpreter, $2, $3);
   goto NEXT();
 }
 

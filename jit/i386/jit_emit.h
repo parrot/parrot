@@ -831,6 +831,13 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 /* TEST for zero */
 #  define jit_emit_test_r_i(pc, reg1) emitm_alul_r_r(pc, 0x85, reg1, reg1)
 
+/* TEST op */
+#  define jit_emit_test_rr_i(pc, r1, r2) emitm_alul_r_r(pc, 0x85, r1, r2)
+#  define jit_emit_test_ri_i(pc, r, im)  \
+           emitm_alul_i_r(pc, 0xF7, emit_b000, im, r)
+#  define jit_emit_test_rm_i(pc, r, m)  \
+           emitm_alul_r_m(pc, 0x85, r, 0, 0, 0, (long)m)
+
 /* OR */
 
 #  define jit_emit_bor_rr_i(pc, reg1, reg2) emitm_alul_r_r(pc, 0x9, reg2, reg1)
@@ -2870,6 +2877,10 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     /* as long as there are params */
     while (sig > (char *)signature->strstart) {
         switch (*sig) {
+            case '0':    /* null ptr or such - doesn't consume a reg */
+                jit_emit_bxor_rr_i(pc, emit_EAX, emit_EAX);
+                emitm_pushl_r(pc, emit_EAX);
+                break;
             /* I have no idea how to handle these */
             case '2':
             case '3':
@@ -2941,6 +2952,12 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
             case 'P':   /* push PMC * */
                 jit_emit_mov_rm_i(pc, emit_EAX,
                         &PMC_REG(count_regs(sig, signature->strstart)));
+#if PARROT_CATCH_NULL
+                /* FIXME this is wrong */
+                jit_emit_test_rm_i(pc, emit_EAX, &PMCNULL);
+                emitm_jxs(pc, emitm_jnz, 2); /* skip the xor */
+                jit_emit_bxor_rr_i(pc, emit_EAX, emit_EAX);
+#endif
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'v':

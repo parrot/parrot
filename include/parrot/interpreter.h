@@ -240,12 +240,14 @@ typedef enum {
 #define PNCONST   PF_NCONST(interpreter->code)
 
 /* Make this a config option */
-#define PARROT_CATCH_NULL 0
+#define PARROT_CATCH_NULL 1
 
 #if PARROT_CATCH_NULL
 extern PMC * PMCNULL;                     /* Holds single Null PMC         */
+#  define PMC_IS_NULL(p) (!(p) || (p) == PMCNULL)
 #else
-# define PMCNULL NULL
+#  define PMCNULL NULL
+#  define PMC_IS_NULL(p) (!(p))
 #endif
 
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
