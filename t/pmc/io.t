@@ -16,6 +16,7 @@ a line
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "timely destruction");
+	interpinfo I0, 2	# DOD runs
 	open P0, "temp.file", ">"
 	print P0, "a line\n"
 	null P0			# kill it
@@ -23,8 +24,9 @@ output_is(<<'CODE', <<'OUTPUT', "timely destruction");
 	open P0, "temp.file", "<"
 	read S0, P0, 20
 	print S0
-	interpinfo I0, 2	# DOD runs
-	print I0
+	interpinfo I1, 2	# DOD runs
+	sub I1, I0
+	print I1
 	print "\n"
 	end
 CODE
