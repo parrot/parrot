@@ -497,6 +497,15 @@ mmd_destroy(Parrot_Interp interpreter)
     mem_sys_free(interpreter->binop_mmd_funcs);
 }
 
+void
+mmd_vtregister(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right, PMC *subroutine) {
+}
+
+PMC *
+mmd_vtfind(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right) {
+    return NULL;
+}
+
 /*
 
 =back

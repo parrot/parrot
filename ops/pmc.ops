@@ -536,6 +536,48 @@ op thaw(out PMC, in STR) {
 
 ###############################################################################
 
+=head2 Vtable MMD manipulation functions
+
+These functions manipulate the vtable MMD function table. 
+
+These functions allow bytecode to register subs or methods, and query which
+sub or method would get called for a particular vtable operation. This way
+you're not required to drop to C to register a new method variant for
+addition or subtraction, or one of the other binary MMD operations.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<mmdvtregister>(in INT, in INT, in INT, in PMC)
+
+Register method $4 as the MMD method for vtable entry $1 for classes
+$2 and $3.
+
+=cut
+
+inline op mmdvtregister(in INT, in INT, in INT, in PMC) {
+  mmd_vtregister(interpreter, $1, $2, $3, $4);
+  goto NEXT();
+}
+
+=item B<mmdvtfind>(out PMC, in INT, in INT, in INT)
+
+Find the sub that would be called for vtable entry $2 for types $3 and $4.
+
+=cut
+
+inline op mmdvtfind(out PMC, in INT, in INT, in INT) {
+  $1 = mmd_vtfind(interpreter, $2, $3, $4);
+  goto NEXT();
+}
+
+=back
+
+###############################################################################
+
 =head2 Misc PMC related ops
 
 =over 4
@@ -570,6 +612,8 @@ op unregister(in PMC) {
 }
 
 =back
+
+
 
 
 =head1 COPYRIGHT

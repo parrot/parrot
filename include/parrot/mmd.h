@@ -22,6 +22,8 @@ void mmd_add_by_class(struct Parrot_Interp *, INTVAL, STRING *, STRING *, funcpt
 void mmd_register(struct Parrot_Interp *, INTVAL, INTVAL, INTVAL, funcptr_t);
 void mmd_add_function(struct Parrot_Interp *, INTVAL, funcptr_t);
 void mmd_destroy(Parrot_Interp);
+void mmd_vtregister(Parrot_Interp, INTVAL, INTVAL, INTVAL, PMC *);
+PMC *mmd_vtfind(Parrot_Interp, INTVAL, INTVAL, INTVAL);
 
 typedef struct MMD_table {
     funcptr_t **mmd_funcs;     /* The functions for the MMD table */
