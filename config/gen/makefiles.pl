@@ -35,10 +35,13 @@ sub cflags {
 
   open(CFLAGS, ">> CFLAGS") or die "open >> CFLAGS: $!";
 
+  # Why is this here?  I'd think this information belongs
+  # in the CFLAGS.in file. -- A.D.  March 12, 2004
   if (Configure::Data->get('cpuarch') =~ /sun4|sparc64/) {
+      # CFLAGS entries must be left-aligned.
       print CFLAGS <<"EOF";
-      jit_cpu.c -{-Wcast-align}        # lots of noise!
-      nci.c     -{-Wstrict-prototypes} # lots of noise!
+jit_cpu.c -{-Wcast-align}        # lots of noise!
+nci.c     -{-Wstrict-prototypes} # lots of noise!
 EOF
   }
 
