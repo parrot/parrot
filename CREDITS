@@ -319,6 +319,12 @@ S: San Carlos, CA, USA
 N: Steve Peters
 D: Patch for unreferenced variable warnings on Win32
 
+N: Steven Schubiger
+D: refactored out t/pmc/pmc.t perl tests
+E: steven@accognoscere.org
+W: http://www.accognoscere.org
+S: Winterthur, Switzerland
+
 N: TOGoS
 D: Some FAQ questions and answers
 
