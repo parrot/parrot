@@ -24,6 +24,11 @@ C<PerlInt> extends C<perlscalar> to provide a Perl integer.
 
 pmclass PerlInt extends perlscalar {
 
+    void class_init() {
+        mmd_register(interp, MMD_BXOR, enum_class_PerlInt, enum_class_PerlInt,
+                (funcptr_t)Parrot_PerlInt_bitwise_xor);
+    }
+
 /*
 
 =item C<void init()>
@@ -206,7 +211,7 @@ Adds C<*value> to the integer and returns the result in C<*dest>.
         int vtype = VTABLE_type(INTERP, value);
         FLOATVAL valf;
         FLOATVAL sumf;
-    
+
         pmci = PMC_int_val(SELF);
         if (vtype == enum_class_PerlUndef) {
             VTABLE_set_integer_native(INTERP, dest, pmci);
@@ -229,7 +234,7 @@ Adds C<*value> to the integer and returns the result in C<*dest>.
                 VTABLE_set_number_native(INTERP, dest, sumf);
             }
             return;
-    
+
         }
     }
 
@@ -270,7 +275,7 @@ Subtracts C<*value> from the integer and returns the result in C<*dest>.
                 VTABLE_set_number_native(INTERP, dest, diff);
             }
             return;
-    
+
         }
     }
 
@@ -303,13 +308,13 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
         int vtype = VTABLE_type(INTERP, value);
         FLOATVAL valf;
         FLOATVAL mulf;
-    
+
         pmci = PMC_int_val(SELF);
         if (vtype == enum_class_PerlUndef) {
             VTABLE_set_integer_native(INTERP, dest, 0);
             return;
         }
-    
+
         valf = VTABLE_get_number(INTERP, value);
         mulf = pmci * valf;
         if (vtype == enum_class_PerlNum) {
@@ -326,7 +331,7 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
                 VTABLE_set_number_native(INTERP, dest, mulf);
             }
             return;
-    
+
         }
     }
 
@@ -359,21 +364,21 @@ Divides the integer by C<*value> and returns the result in C<*dest>.
         int vtype = VTABLE_type(INTERP, value);
         FLOATVAL valf;
         FLOATVAL divf;
-    
+
         /* TODO: Is this the appropriate way to throw the exception? */
-    
+
         pmci = PMC_int_val(SELF);
         if (vtype == enum_class_PerlUndef) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
             return;
         }
-    
+
         valf = VTABLE_get_number(INTERP, value);
             if (valf == 0.0) {
                 internal_exception(DIV_BY_ZERO, "division by zero!\n");
             return;
         }
-    
+
         divf = pmci / valf;
         if (vtype == enum_class_PerlNum) {
             VTABLE_set_number_native(INTERP, dest, divf);
@@ -390,7 +395,7 @@ Divides the integer by C<*value> and returns the result in C<*dest>.
                 VTABLE_set_number_native(INTERP, dest, divf);
             }
             return;
-    
+
         }
     }
 
@@ -406,7 +411,7 @@ Divides the integer by C<value> and returns the result in C<*dest>.
     void divide_int (INTVAL value, PMC* dest) {
         INTVAL pmci, divi;
         FLOATVAL valf, divf;
-    
+
         pmci = PMC_int_val(SELF);
         /* TODO exception */
         divf = (FLOATVAL)pmci / value;

@@ -327,7 +327,7 @@ sub parse_pmc {
     (\w+)         #method name
     \s*
     \(([^\(]*)\)  #parameters
-}sx;
+    }sx;
 
   my ($pre, $classname, $flags) = parse_flags(\$_);
   my $lineno = 1;
@@ -335,7 +335,7 @@ sub parse_pmc {
   my ($classblock, $post, $lines) = extract_balanced($_);
   $classblock = substr($classblock, 1,-1); # trim out the { }
 
-  my (@methods, %meth_hash);
+  my (@methods, %meth_hash, $class_init);
 
   while ($classblock =~ s/($signature_re)//) {
      $lineno += count_newlines($1);
@@ -343,18 +343,34 @@ sub parse_pmc {
      my ($methodblock, $rema, $lines) = extract_balanced($classblock);
      $lineno += $lines;
      $methodblock = "" if $opt{nobody};
-     # name => method idx mapping
-     $meth_hash{$methodname} = scalar @methods;
-     push @methods,
-	{ 'meth' => $methodname,
-	  'body' => $methodblock,
-	  'line' => $lineno,
-	  'type' => $type,
-	  'parameters' => $parameters
-      };
+     if ($methodname eq 'class_init') {
+         $class_init =
+	  {   'meth' => $methodname,
+              'body' => $methodblock,
+              'line' => $lineno,
+              'type' => $type,
+              'parameters' => $parameters
+          };
+      }
+      else {
+         # name => method idx mapping
+         $meth_hash{$methodname} = scalar @methods;
+         push @methods,
+            { 'meth' => $methodname,
+              'body' => $methodblock,
+              'line' => $lineno,
+              'type' => $type,
+              'parameters' => $parameters
+          };
+     }
      $classblock = $rema;
      $lineno += count_newlines($methodblock);
-  }
+    }
+    if ($class_init) {
+        $meth_hash{'class_init'} = scalar @methods;
+        push @methods, $class_init;
+    }
+
 
   return ( $classname, {
 	       'pre'   => $pre,
