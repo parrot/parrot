@@ -587,14 +587,14 @@ pcc_result: RESULT var                  { $$ = $2; }
 
 pcc_ret: PCC_BEGIN_RETURN '\n' {
                 Instruction *i, *ins = instructions;
+                SymReg *r;
                 char name[128];
                 if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
                     fataly(EX_SOFTWARE, "pcc_ret", line,
                         "pcc_return not inside pcc subroutine\n");
-                $<sr>$ = ins->r[1];
-                sprintf(name, "#pcc_sub_ret_%d:", line - 1);
-                i = _mk_instruction("", name, NULL, 0);
-                i = emitb(i);
+                sprintf(name, "#pcc_sub_ret_%d", line - 1);
+                $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
+                i = iLABEL(r);
                 i->type = ITPCCSUB | ITLABEL;
         }
         pcc_returns
@@ -603,15 +603,15 @@ pcc_ret: PCC_BEGIN_RETURN '\n' {
 
 pcc_yield: PCC_BEGIN_YIELD '\n' {
                 Instruction *i, *ins = instructions;
+                SymReg *r;
                 char name[128];
                 if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
                     fataly(EX_SOFTWARE, "pcc_yield", line,
                         "pcc_yield not inside pcc subroutine\n");
                 ins->r[1]->pcc_sub->calls_a_sub = 1;
-                $<sr>$ = ins->r[1];
-                sprintf(name, "#pcc_sub_yield_%d:", line - 1);
-                i = _mk_instruction("", name, NULL, 0);
-                i = emitb(i);
+                sprintf(name, "#pcc_sub_yield_%d", line - 1);
+                $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
+                i = iLABEL(r);
                 i->type = ITPCCSUB | ITLABEL | ITPCCYIELD;
         }
         pcc_returns

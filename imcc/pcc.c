@@ -277,8 +277,12 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
         next[i] = 5;
     p3 = NULL;
     n_p3 = 0;
-    /* the first ins holds the sub SymReg */
-    sub = instructions->r[1];
+    sub = ins->r[0];
+    /* FIXME
+     * fake prototyped
+     * return conventions need more spec in pdd
+     */
+    sub->pcc_sub->prototyped = 1;
     n = sub->pcc_sub->nret;
     for (i = 0; i < n; i++) {
         arg = sub->pcc_sub->ret[i];

@@ -104,7 +104,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
             if (first) {
                 if (ins->type & ITLABEL) {
                     expand_pcc_sub_ret(interpreter, ins);
-                    ins->type &= ~ITLABEL;
+                    /* ins->type &= ~ITLABEL; */
                 }
                 else {
                     /* if this is a pcc_sub_call expand it */

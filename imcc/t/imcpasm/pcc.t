@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 9;
+use TestCompiler tests => 10;
 
 ##############################
 # parrot calling conventions
@@ -367,4 +367,56 @@ _sub:
 \2:
   print P5
   end/
+OUT
+
+output_like(<<'CODE', <<'OUT', "proto call, sub multiple returns");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin prototyped
+    .pcc_call sub
+    ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub prototyped
+    .pcc_begin_return
+    .return P16
+    .pcc_end_return
+    .pcc_begin_return
+    .return P17
+    .pcc_end_return
+.end
+CODE
+/_main:
+  newsub P16, \d+, _sub
+#pcc_sub_call_\d:
+  set P0, P16
+  set I0, 1
+  set I1, 0
+  set I2, 0
+  set I3, 0
+  savetop
+  invokecc
+ret:
+  restoretop
+  end
+_sub:
+#pcc_sub_ret_\d+:
+  set P5, P16
+  set I0, 1
+  set I1, 0
+  set I2, 0
+  set I3, 1
+  set I4, 0
+  invoke P1
+#pcc_sub_ret_\d+:
+  set P5, P17
+  set I0, 1
+  set I1, 0
+  set I2, 0
+  set I3, 1
+  set I4, 0
+  invoke P1
+/
 OUT
