@@ -16,7 +16,7 @@ Tests method delegation.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 # basic functionality - setting and getting types
@@ -178,4 +178,50 @@ one
 1
 777
 3
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p - clobber regs");
+    set S5, "ok\n"
+    new P0, .delegate
+    set P0, 1
+    new P1, .PerlInt
+    set P1, 1
+    new P2, .PerlInt
+    set P2, 777
+    add P2, P0, P1
+    print P2	# yeah 1+1 = 3
+    print "\n"
+    print S5
+    end
+.pcc_sub __set_integer_native:
+    # cant keep state yet
+    # just print arg and return
+    print I5
+    print "\n"
+    invoke P1
+.pcc_sub __add:
+    print "in __add\n"
+    print P2	# self - this triggers __get_string
+    print "\n"
+    print P5	# value
+    print "\n"
+    print P6	# dest
+    print "\n"
+    set P6, 3
+    set S5, "nok"
+    invoke P1
+.pcc_sub __get_string:
+    set S5, "one"
+    null P2	# clobber registers these must be restored
+    null P5
+    null P6
+    invoke P1
+CODE
+1
+in __add
+one
+1
+777
+3
+ok
 OUTPUT

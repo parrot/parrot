@@ -16,10 +16,12 @@
 # list MIN_ITEMS 4->16          2.25
 # find_global hack              2.16          1.6
 # reuse exception               2.00          1.37
+# reuse regsave mem                           1.25
 
 # parrot -j oo1.pasm
 # find_global hack                            1.51
 # reuse exception                             1.30
+# reuse regsave mem                           1.23
 
 
 # parrot -C oo1-prop.pasm

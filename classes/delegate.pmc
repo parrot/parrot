@@ -36,12 +36,12 @@ string or PMC not otherwise rooted it could be collected too early.
 
 #include "parrot/parrot.h"
 
-static struct regsave {
+typedef struct _reg_store {
     struct IReg int_reg;
     struct NReg num_reg;
     struct SReg string_reg;
     struct PReg pmc_reg;
-} regsave;
+} reg_store;
 
 /*
 
@@ -54,14 +54,29 @@ Saves the registers to the C<regsave struct>.
 
 */
 
+typedef struct regsave {
+    struct regsave *prev;
+    reg_store      regs;
+} regsave;
+
+/*
+ * TODO move this into interpreter
+ */
+
+static regsave *reg_save_top;
+
 PARROT_INLINE static struct regsave *
 save_regs(Parrot_Interp interp) {
     struct regsave *save;
-    save = mem_sys_allocate(sizeof(struct regsave));
-    if (!save) {
-        internal_exception(ALLOCATION_ERROR, "No memory for save struct");
+    if (reg_save_top) {
+        save = reg_save_top;
+        reg_save_top = save->prev;
     }
-    mem_sys_memcopy(save, interp, sizeof(struct regsave));
+    else {
+        save = mem_sys_allocate(sizeof(struct regsave));
+        save->prev = NULL;
+    }
+    mem_sys_memcopy(&save->regs, interp, sizeof(reg_store));
     return save;
 }
 
@@ -78,8 +93,11 @@ Restores the registers from C<*data>.
 
 PARROT_INLINE static void
 restore_regs(Parrot_Interp interpreter, struct regsave *data) {
-    mem_sys_memcopy(interpreter, data, sizeof(struct regsave));
-    mem_sys_free(data);
+
+    mem_sys_memcopy(interpreter, &data->regs, sizeof(reg_store));
+    data->prev = reg_save_top;
+    reg_save_top = data;
+
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         PIO_eprintf(interpreter, "# return\n");
     }
