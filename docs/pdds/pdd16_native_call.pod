@@ -96,7 +96,7 @@ A PMC register.
 
 PMC thingie. A generic pointer, taken from or stuck into a PMC's
 data pointer. If this is a return type, parrot will create a new
-UnManagedStruct PMC type, which is just a generic "pointer so some
+UnManagedStruct PMC type, which is just a generic "pointer to some
 damn thing or other" PMC type which Parrot does I<no> management of.
 
 =item 2
@@ -197,7 +197,7 @@ Create a callback function.
 
 Register the callback
 
-  dlfunc C_FUNCION, "function_name", "signature"
+  dlfunc C_FUNCTION, "function_name", "signature"
   C_FUNCTION(CP_PMC, USER_DATA)
 
 =back
