@@ -20,7 +20,8 @@
 typedef const char* longopt_string_t;
 
 typedef enum {
-    OPTION_required_FLAG = 0x1
+    OPTION_required_FLAG = 0x1,
+    OPTION_optional_FLAG = 0x2
 } OPTION_flags;
 
 struct longopt_opt_decl {

@@ -29,13 +29,13 @@ extern FILE *yyin;
 static void usage(FILE* fp)
 {
     fprintf(fp,
-    "imcc -[abcgGhjpPrStvVwy.] [-d FLAGS] [-o FILE] [-O level] <file>\n");
+    "parrot -[abcgGhjpPrStvVwy.] [-d [FLAGS]] [-O [level]] [-o FILE] <file>\n");
 }
 
 static void help(void)
 {
     printf(
-    "imcc [Options] <file>\n"
+    "parrot [Options] <file>\n"
     "  Options:\n"
     "    -h --help\n"
     "    -V --version\n"
@@ -47,7 +47,7 @@ static void help(void)
     "    -S --switched-core\n"
     "    -g --no-computed-goto\n"
     "    -t --trace\n"
-    "    -d --debug=HEXFLAGS\n"
+    "    -d --debug[=HEXFLAGS]\n"
     "    -w --warnings\n"
     "    -G --no-gc\n"
     "       --gc-debug\n"
@@ -55,7 +55,7 @@ static void help(void)
     "   <Compiler options>\n"
     "    -v --verbose\n"
     "    -o --output=FILE\n"
-    "    -O --optimize=LEVEL\n"
+    "    -O --optimize[=LEVEL]\n"
     "    -a --pasm\n"
     "    -c --pbc\n"
     "    -r --run-pbc\n"
@@ -95,7 +95,7 @@ static struct longopt_opt_decl options[] = {
     { 'S', 'S', 0, { "--switched-core" } },
     { 'g', 'g', 0, { "--no-computed-goto" } },
     { 't', 't', 0, { "--trace" } },
-    { 'd', 'd', OPTION_required_FLAG, { "--debug" } },
+    { 'd', 'd', OPTION_optional_FLAG, { "--debug" } },
     { 'w', 'w', 0, { "--warnings" } },
     { 'G', 'G', 0, { "--no-gc" } },
     { '.', '.', 0, { "--wait" } },
@@ -107,7 +107,7 @@ static struct longopt_opt_decl options[] = {
     { 'v', 'v', 0, { "--verbose" } },
     { 'y', 'y', 0, { "--yydebug" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
-    { 'O', 'O', OPTION_required_FLAG, { "--optimize" } },
+    { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
     { '\0', OPT_GC_DEBUG, 0, { "--gc-debug" } },
     {'\0', OPT_DESTROY_FLAG, 0,   { "--leak_test", "--destroy-at-end" } },
     { 0, 0, 0, { NULL } }
@@ -153,8 +153,12 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 setopt(PARROT_TRACE_FLAG);
                 break;
             case 'd':
-                IMCC_DEBUG++;
-                IMCC_DEBUG = strtoul(opt.opt_arg, 0, 16);
+                if (opt.opt_arg) {
+                    IMCC_DEBUG = strtoul(opt.opt_arg, 0, 16);
+                }
+                else {
+                    IMCC_DEBUG++;
+                }
                 if (IMCC_DEBUG & 1)
                     setopt(PARROT_DEBUG_FLAG);
                 break;
@@ -197,8 +201,13 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
 
             case 'O':
-                strncpy(optimizer_opt, opt.opt_arg, sizeof(optimizer_opt));
-                optimizer_opt[sizeof(optimizer_opt)-1] = '\0';
+                if (opt.opt_arg) {
+                    strncpy(optimizer_opt, opt.opt_arg, sizeof(optimizer_opt));
+                    optimizer_opt[sizeof(optimizer_opt)-1] = '\0';
+                }
+                else {
+                    strcpy(optimizer_opt, "1");
+                }
                 if (strchr(optimizer_opt, '1'))
                     optimizer_level |= OPT_PRE;
                 if (strchr(optimizer_opt, '2'))
@@ -231,6 +240,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 	}
     }
     if (status == -1) {
+        fprintf(stderr, "%s\n", opt.opt_error);
         usage(stderr);
         exit(EX_USAGE);
     }
