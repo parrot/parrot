@@ -2,7 +2,9 @@
 #
 # assemble.pl - take a parrot assembly file and spit out a bytecode file
 
-my %opcodes;
+use strict;
+
+my (%opcodes, %labels);
 
 my %pack_type;
 %pack_type = (i => 'l',
@@ -73,7 +75,7 @@ while ($_ = shift @code) {
     print pack "l", $opcodes{$opcode}{CODE};
     foreach (0..$#args) {
 	$args[$_] =~ s/^[INPS]?(\d+)$/$1/i;
-	$type = $pack_type{$opcodes{$opcode}{TYPES}[$_]};
+	my $type = $pack_type{$opcodes{$opcode}{TYPES}[$_]};
 	print pack $type, $args[$_];
     }
     $pc += 1+@args;
