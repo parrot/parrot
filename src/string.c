@@ -663,59 +663,74 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
         void * __ptr;
     } __ptr_u;
 
-/*    PIO_eprintf(NULL, "string_make(): length = %ld, encoding name = %s, buffer = %s\n",
-            len, encoding_name, (const char *)buffer); */
+    /*    PIO_eprintf(NULL, "string_make(): length = %ld, encoding name = %s, buffer = %s\n",
+          len, encoding_name, (const char *)buffer); */
 
-	if( len && !buffer )
-	{
-		internal_exception(BAD_BUFFER_SIZE,
-				"string_make: buffer pointer NULL, but length nonzero");
+    if( len && !buffer )
+    {
+        internal_exception(BAD_BUFFER_SIZE,
+                "string_make: buffer pointer NULL, but length nonzero");
     }
 
-    if (!encoding_name)
-    {
-		internal_exception(MISSING_ENCODING_NAME,
-				"string_make: no encoding name specified");
+    if (!encoding_name) {
+
+        internal_exception(MISSING_ENCODING_NAME,
+                "string_make: no encoding name specified");
     }
     else
     {
-		s = new_string_header(interpreter, flags); /* FIXME: ignorning flags below */
+        s = new_string_header(interpreter, flags);
 
-		s->representation = enum_stringrep_unknown;
+        s->representation = enum_stringrep_unknown;
 
-    	if (strcmp(encoding_name, "iso-8859-1") == 0 )
-    	{
-			s->representation = enum_stringrep_one;
-    }
-    	else if (strcmp(encoding_name, "ucs-2") == 0 ) /* worry about endian-ness */
-    	{
-			s->representation = enum_stringrep_two;
-    }
-    	else if (strcmp(encoding_name, "utf-32") == 0 )
-    	{
-			s->representation = enum_stringrep_four;
+        if (strcmp(encoding_name, "iso-8859-1") == 0 )
+        {
+            s->representation = enum_stringrep_one;
+            /*
+             * fast path for external (constant) strings - don't allocate
+             * and copy data
+             */
+            if (flags & PObj_external_FLAG) {
+                /* The following cast discards the 'const'.  That raises
+                   a warning with gcc, but is ok since the caller indicated
+                   it was safe by setting PObj_external_FLAG.
+                   (The cast is necessary to pacify TenDRA's tcc.)
+                   */
+                PObj_bufstart(s) = s->strstart = const_cast(buffer);
+                PObj_buflen(s)   = s->strlen = s->bufused = len;
+                PObj_bufstart_external_SET(s);
+                return s;
+            }
+        }
+        else if (strcmp(encoding_name, "ucs-2") == 0 ) /* worry about endian-ness */
+        {
+            s->representation = enum_stringrep_two;
+        }
+        else if (strcmp(encoding_name, "utf-32") == 0 )
+        {
+            s->representation = enum_stringrep_four;
         }
 
-		if( s->representation != enum_stringrep_unknown ) /* fast encodings */
-		{
-			/* decide in here on the size to use, and transcode.... */
-			Parrot_allocate_string(interpreter, s, len);
+        if( s->representation != enum_stringrep_unknown ) /* fast encodings */
+        {
+            /* decide in here on the size to use, and transcode.... */
+            Parrot_allocate_string(interpreter, s, len);
 
-			if (buffer)
-			{
-            mem_sys_memcopy(s->strstart, buffer, len);
-        s->bufused = len;
-				string_compute_strlen(interpreter, s);
-    }
-			else
-			{
-        s->strlen = s->bufused = 0;
-    }
-    	}
-    	else /* even if buffer is "external", we won't use it directly */
-    	{
-			string_fill_from_buffer(interpreter, buffer, len, encoding_name, s);
-    	}
+            if (buffer)
+            {
+                mem_sys_memcopy(s->strstart, buffer, len);
+                s->bufused = len;
+                string_compute_strlen(interpreter, s);
+            }
+            else
+            {
+                s->strlen = s->bufused = 0;
+            }
+        }
+        else
+        {
+            string_fill_from_buffer(interpreter, buffer, len, encoding_name, s);
+        }
     }
 
     return s;
