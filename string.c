@@ -203,7 +203,8 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
 STRING *
 string_from_cstring(struct Parrot_Interp *interpreter, const void *buffer,
                      UINTVAL len) {
-    return string_make(interpreter, buffer, len ? len : strlen(buffer),
+    return string_make(interpreter, buffer, len ? len :
+            buffer ? strlen(buffer) : 0,
                        NULL, 0, NULL);
 }
 

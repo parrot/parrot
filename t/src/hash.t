@@ -145,13 +145,13 @@ int main(int argc, char* argv[]) {
 	return 1;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", NULL);
+    key = string_from_cstring(interpreter, "fortytwo", 0);
     value->type = enum_hash_int;
     value->val.int_val = 42;
     hash_put(interpreter, hash, key, value);
     value = hash_get(interpreter, hash, key);
 
-    printf("%i\n", value->val.int_val);
+    printf("%i\n", (int)value->val.int_val);
 
     return 0;
 }
@@ -190,20 +190,24 @@ int main(int argc, char* argv[]) {
     /*
      * It might be worth finding out where this fails to work,
      * no key? fail to put? fail to get?
+     *
+     * string_from_cstring did segfault
+     * it works now exactly as the next (empty key) case
      */
 
-    key = string_from_cstring(interpreter, NULL, NULL);
+    key = string_from_cstring(interpreter, NULL, 0);
     value->type = enum_hash_int;
     value->val.int_val = 42;
     hash_put(interpreter, hash, key, value);
     value = hash_get(interpreter, hash, key);
 
-    printf("%i\n", value->val.int_val);
+    printf("%i\n", (int)value->val.int_val);
 
     return 0;
 }
 
 CODE
+42
 OUTPUT
 
 c_output_is(<<'CODE', <<'OUTPUT', "hash_get with empty string key");
