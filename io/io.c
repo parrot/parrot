@@ -1407,6 +1407,22 @@ PIO_isatty(theINTERP, PMC *pmc)
 
     return (io->flags & PIO_F_CONSOLE) ? 1 : 0;
 }
+
+int PIO_softspace(theINTERP, PMC *pmc, int new);
+
+int
+PIO_softspace(theINTERP, PMC *pmc, int new)
+{
+    ParrotIO *io = PMC_data(pmc);
+    int ret;
+
+    if (!io)
+        return 0;
+    ret = io->flags & PIO_F_SOFT_SP ? 1 : 0;
+    io->flags |= new ? PIO_F_SOFT_SP : 0;
+    return ret;
+}
+
 /*
 
 =back

@@ -1,0 +1,69 @@
+# $Id$
+
+# pragmata
+use strict;
+
+use Test::Harness;
+use File::Spec;
+
+my $language = 'python';
+
+=head1 NAME
+
+languages/python/t/harness - A harness for Parrot python
+
+=head1 SYNOPSIS
+
+  cd languages && perl python/t/harness -files
+
+=head1 DESCRIPTION
+
+Conformant to a recent post on p6i, if I'm called with a single
+argument of "-files", I just return a list of files to process.
+This list is one per line, and is relative to the languages dir.
+
+If I'm called with no args, I run all tests.
+
+Otherwise I try to run list of passed tests.
+
+=cut
+
+if ( grep { /^-files$/ } @ARGV )
+{
+  # I must be running out of languages/
+  my $dir = File::Spec->catfile( $language, 't' );
+  my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
+  print join( "\n", @files );
+  print "\n" if scalar(@files);
+}
+else
+{
+  my @files;
+  if ( scalar(@ARGV) )
+  {
+    # Someone specified tests for me to run.
+    @files = grep { -f $_ } @ARGV
+  }
+  else
+  {
+    # I must be running out of languages/$language
+    # You may want a deeper search than this.
+    @files = glob( "t/*/*.t" );
+  }
+  runtests( @files ) if scalar(@files);
+}
+
+=head1 HISTORY
+
+Mostly taken from m4/t/harness.
+
+=head1 SEE ALSO
+
+  L<languages/m4/t/harness>
+
+=head1 AUTHOR
+
+  Bernhard.Schmalhofer@gmx.de
+  stolen by leo
+
+=cut

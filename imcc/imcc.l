@@ -84,6 +84,7 @@ HEX		0x[0-9A-Fa-f]+
 BIN             0b[01]+
 DOT		[.]
 SIGN            [-+]
+BIGINT          {SIGN}?{DIGITS}"L"
 FLOATNUM        {SIGN}?({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?
 LETTERDIGIT     [a-zA-Z0-9_]
 LABELLETTERDIGIT     ([a-zA-Z0-9_@]|"::")
@@ -413,6 +414,12 @@ SP              [ ]
 <*>{SIGN}?{DIGIT}+    DUP_AND_RET(valp, INTC);
 <*>{HEX}              DUP_AND_RET(valp, INTC);
 <*>{BIN}              DUP_AND_RET(valp, INTC);
+
+<*>{BIGINT}         {
+	valp->s = str_dup(yytext);
+        valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
+        return(STRINGC); /* no BIGINT native format yet */
+    }
 
 <*>{STRINGCONSTANT} {
 	valp->s = str_dup(yytext);

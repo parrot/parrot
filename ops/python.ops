@@ -1,0 +1,118 @@
+/*
+** python.ops
+*/
+
+/* XXX in io/io.c */
+int PIO_softspace(theINTERP, PMC *pmc, int new);
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+python.ops - Python Operations
+
+=cut
+
+=head1 DESCRIPTION
+
+Currently included in main - will be splitted.
+
+=cut
+
+###############################################################################
+
+=head2 IO operations
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<print_item>(in INT)
+
+=item B<print_item>(in NUM)
+
+=item B<print_item>(in PMC)
+
+=item B<print_item>(in STR)
+
+Print $1 to standard output. If another C<print_item> follows, a
+space is inserted.
+
+=item B<print_newline>()
+
+Print a newline char to standar output.
+
+=cut
+
+inline op print_item(in INT) :base_io {
+  PMC *io = PIO_STDOUT(interpreter);
+  if (PIO_softspace(interpreter, io, 0))
+    PIO_puts(interpreter, io, " ");
+  PIO_printf(interpreter, INTVAL_FMT, (INTVAL)$1);
+  PIO_softspace(interpreter, io, 1);
+  goto NEXT();
+}
+
+inline op print_item(in NUM) :base_io {
+  PMC *io = PIO_STDOUT(interpreter);
+  if (PIO_softspace(interpreter, io, 0))
+    PIO_puts(interpreter, io, " ");
+  PIO_printf(interpreter, "%.g", (double)$1);
+  PIO_softspace(interpreter, io, 1);
+  goto NEXT();
+}
+
+op print_item(in STR) :base_io {
+  STRING *s = $1;
+  PMC *io = PIO_STDOUT(interpreter);
+  if (s && string_length(interpreter, s)) {
+    if (PIO_softspace(interpreter, io, 0))
+      PIO_puts(interpreter, io, " ");
+    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
+    PIO_softspace(interpreter, io, 1);
+  }
+  goto NEXT();
+}
+
+op print_item(in PMC) :base_io {
+  PMC *p = $1;
+  PMC *io = PIO_STDOUT(interpreter);
+  STRING *s = (VTABLE_get_string(interpreter, p));
+  if (s) {
+    if (PIO_softspace(interpreter, io, 0))
+      PIO_puts(interpreter, io, " ");
+    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
+    PIO_softspace(interpreter, io, 1);
+  }
+  goto NEXT();
+}
+
+op print_newline() :base_io {
+  PMC *io = PIO_STDOUT(interpreter);
+  PIO_puts(interpreter, io, "\n");
+  PIO_softspace(interpreter, io, 0);
+  goto NEXT();
+}
+
+########################################
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut
+
