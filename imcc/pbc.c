@@ -706,6 +706,7 @@ build_key(Interp *interpreter, SymReg *reg)
                         r->name, r->set, (int)r->color,
                         slice_deb(slice_bits));
                 break;
+            case VT_CONSTP:
             case VTCONST:
                 switch (r->set) {
                     case 'S':                       /* P["key"] */
@@ -731,7 +732,7 @@ build_key(Interp *interpreter, SymReg *reg)
                 break;
             default:
                 fatal(1,"build_key", "unknown type 0x%x on %s\n",
-                        r->type, r->name);
+                        var_type, r->name);
         }
     }
     key[0] = key_length;
