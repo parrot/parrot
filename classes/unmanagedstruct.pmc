@@ -169,6 +169,7 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
              */
             if (*type == enum_type_struct_ptr) {
                 /* that is either a pointer */
+                assert((PTR2INTVAL(p) & (PARROT_PTR_ALIGNMENT - 1)) == 0);
                 PMC_data(init) = *(void**)p;
             }
             else {
@@ -182,8 +183,8 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
              * p is the location of the struct pointer in the
              * outer struct, the inner is at PMC_data(init)
              */
+            assert((PTR2INTVAL(p) & (PARROT_PTR_ALIGNMENT - 1)) == 0);
             *(void**)p = PMC_data(init);
-
         }
         return char_offset_key(interpreter, init, next, type);
     }
@@ -527,8 +528,6 @@ calc_align(Parrot_Interp interpreter, PMC* pmc, PMC* type_pmc,
 
     if (align && offs % align) {
         int diff;
-        if (align > 4 && !strcmp(PARROT_CPU_ARCH, "i386"))
-            align = 4;
         diff = align - (offs % align);
         offs += diff;
     }

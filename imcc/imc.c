@@ -201,6 +201,7 @@ imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
     imc->n_comp_units--;
 
     clear_locals(unit);
+    free(unit->hash);
 
     free(unit);
 }

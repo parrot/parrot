@@ -16,6 +16,7 @@ package Configure::Step;
 use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':auto';
+use Config;
 
 $description="Determining your minimum pointer alignment...";
 
@@ -26,11 +27,10 @@ sub runstep {
 
   return if $miniparrot;
   # HP-UX 10.20/32 hangs in this test.
-  # We currently don't need this configure setting,
-  # so we just do not test and set some value here
-  print(" not tested (4) ") if $_[1];
-  Configure::Data->set(ptr_alignment => 4);
-  return;
+  if ($^O eq 'hpux' && $Config{ccflags} !~ /DD64/) {
+      Configure::Data->set(ptr_alignment => 4);
+      return;
+  }
 
   return if (defined(Configure::Data->get('ptr_alignment')));
   cc_gen('config/auto/alignptrs/test_c.in');

@@ -499,17 +499,19 @@ measured with time C<parrot -b>.
 static FLOATVAL
 calibrate(Parrot_Interp interpreter)
 {
-    int i;
+    size_t n = interpreter->op_count;
+    size_t i;
     FLOATVAL start, empty;
-    opcode_t code[] = {1};      /* noop */
+    opcode_t code[] = { 1 };      /* noop */
     opcode_t *pc = code;
 
-    for (empty = 0.0, i = 0; i < 1000000; ++i) {
-       start = Parrot_floatval_time();
+    if (n < 1000000)	/* minimum opcode count for calibration */
+        n = 1000000;
+    start = Parrot_floatval_time();
+    for (empty = 0.0, i = 0; i < n; i++)
        pc =  (interpreter->op_func_table[*code])(pc, interpreter);
-       empty += Parrot_floatval_time() - start;
-    }
-    return empty;
+    empty += Parrot_floatval_time() - start;
+    return empty / (FLOATVAL)n;
 }
 
 /*
@@ -537,16 +539,15 @@ print_profile(int status, void *p)
         RunProfile *profile = interpreter->profile;
         FLOATVAL empty = calibrate(interpreter);
 
-        PIO_printf(interpreter, "\n");
-        PIO_printf(interpreter, "                   OPERATION PROFILE                 \n\n");
-        PIO_printf(interpreter, " CODE J OP FULL NAME            CALLS  TOTAL TIME   AVG T. ms\n");
-        PIO_printf(interpreter, " ---- - -----------------    --------  ----------  ----------\n");
-
+        PIO_printf(interpreter, " Code J Name                    Calls  Total/s       Avg/ms\n");
         for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
             UINTVAL n = profile->data[j].numcalls;
             profile->data[j].op = j;
-            if (j >= PARROT_PROF_EXTRA)
-                profile->data[j].time -= (empty * n / 1000000);
+            if (j >= PARROT_PROF_EXTRA) {
+                profile->data[j].time -= empty * n;
+                if (profile->data[j].time < 0.0) /* faster than noop */
+                    profile->data[j].time = 0.0;
+            }
         }
         qsort(profile->data, interpreter->op_count +
                 PARROT_PROF_EXTRA,
@@ -560,27 +561,26 @@ print_profile(int status, void *p)
                 sum_time += t;
 
                 k = profile->data[j].op;
-                jit = ' ';
+                jit = '-';
 #if JIT_CAPABLE
-                if (k >= PARROT_PROF_EXTRA)
-                    jit = op_jit[k - PARROT_PROF_EXTRA].extcall != 1 ?
-                        'j' : ' ';
+                if (k >= PARROT_PROF_EXTRA &&
+                    op_jit[k - PARROT_PROF_EXTRA].extcall != 1)
+                    jit = 'j';
 #endif
-                PIO_printf(interpreter, " %4d %c %-20s %8vu  %10vf  %10.4vf\n",
+                PIO_printf(interpreter, " %4d %c %-20s %8vu  %10vf  %10.6vf\n",
                         k - PARROT_PROF_EXTRA,
                         jit,
                         op_name(interpreter, k),
                         n,
                         t,
-                        (FLOATVAL)(t * 1000.0 / n)
+                        (FLOATVAL)(t * 1000.0 / (FLOATVAL)n)
                         );
             }
         }
 
-        PIO_printf(interpreter, " ---- - -----------------    --------  ----------  ----------\n");
-        PIO_printf(interpreter, " %4vu   %-20s %8vu  %10vf  %10.4vf\n",
+        PIO_printf(interpreter, " %4vu - %-20s %8vu  %10vf  %10.6vf\n",
                 op_count,
-                "",
+                "-",
                 call_count,
                 sum_time,
                 (FLOATVAL)(sum_time * 1000.0 / (FLOATVAL)call_count)
