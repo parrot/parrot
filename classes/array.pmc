@@ -34,11 +34,13 @@ pmclass Array {
     }
 
     BOOLVAL move_to (void * destination) {
-        return 0; /* You can't move me, I don't have anything to move! */
+        destination = *(PMC**)(SELF->data);
+        SELF->data = &destination;
+        return 1;
     }
 
     INTVAL real_size () {
-	return 0; /* ->data is unused */
+	return SELF->cache.int_val * sizeof(PMC*);
     }
 
     void destroy () {
@@ -62,7 +64,7 @@ pmclass Array {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-            extend_array(SELF->data, ix);
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
         value = ((PMC**)(SELF->data))[ix];
@@ -70,29 +72,59 @@ pmclass Array {
     }
 
     FLOATVAL get_number () {
-	return (FLOATVAL)key_size(INTERP,SELF->data);
+	return (FLOATVAL)(SELF->cache.int_val);
     }
 
-    FLOATVAL get_number_index ( INTVAL idx ) {
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
-	return key_pair->cache.num_val;
+    FLOATVAL get_number_keyed (KEY* key) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        value = ((PMC**)(SELF->data))[ix];
+        return value->vtable->get_number(INTERP, value);
     }
 
     STRING* get_string () {
 	return NULL;
     }
 
-    STRING* get_string_index ( INTVAL idx ) {
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
-	return key_pair->cache.struct_val;
+    STRING* get_string_keyed ( KEY* key) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        value = ((PMC**)(SELF->data))[ix];
+        return value->vtable->get_string(INTERP, value);
     }
 
     BOOLVAL get_bool () {
-	return (BOOLVAL)(key_size(INTERP,SELF->data) != 0);
+	return (BOOLVAL)(SELF->cache.int_val != 0);
     }
 
     void* get_value () {
-        return &SELF->cache;
+        return &SELF->data;
     }
 
     BOOLVAL is_same (PMC* other) {
@@ -166,7 +198,7 @@ pmclass Array {
     void set_string_same (PMC * value) {
     }
 
-    void set_string_index (STRING * value, INTVAL idx) {
+    void set_string_keyed (STRING * value, INTVAL idx) {
 	KEY_PAIR key_pair;
 	key_pair.type = enum_key_string;
 	key_pair.cache.struct_val = value;
