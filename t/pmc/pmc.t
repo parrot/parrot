@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 87;
+use Parrot::Test tests => 89;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -777,18 +777,72 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "p =  p % p (int % int)");
+output_is(<<'CODE', <<OUTPUT, "p =  p % p (int % int)");
 	new 	P0, .PerlInt
 	new	P1, .PerlInt
 	new	P2, .PerlInt
+        new     P3, .PerlNum
 	set	P0, 11
 	set	P1, 10
 	mod	P2, P0, P1
 	print	P2
-	print	"\\n"
+	print	"\n"
+        set     P0, 12
+	mod	P3, P0, P1
+	print	P3
+	print	"\n"
+	mod	P0, P0, P1
+	print	P0
+	print	"\n"
 	end
 CODE
 1
+2
+2
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "p =  p % p (int % numeric string)");
+	new 	P0, .PerlInt
+	new	P1, .PerlString
+	new	P2, .PerlInt
+        new     P3, .PerlNum
+	set	P0, 11
+	set	P1, "10"
+	mod	P2, P0, P1
+	print	P2
+	print	"\n"
+        set     P0, 12
+	end
+CODE
+1
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "p =  fmod(p,p)");
+@{[ $fp_equality_macro ]}
+	new 	P0, .PerlNum
+	new	P1, .PerlNum
+	new	P2, .PerlNum
+        new     P3, .PerlInt
+	set	P0, 13.4
+	set	P1, 6.0
+	mod	P2, P0, P1
+        .fp_eq(P2, 1.4, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+        set     P0, -25.1
+	mod	P3, P0, P1
+        .fp_eq(P3, -1.1, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+	mod	P0, P0, P1
+        .fp_eq(P0, -1.1, OK3)
+        print "not "
+OK3:    print "ok 3\\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "(int / int) -> float");
