@@ -194,44 +194,154 @@ above, the following arguments to GNU Indent should be used:
    -kr -nce -sc -cp0 -l79 -lc79 -psl -nut -cdw -ncs -lps
 
 This expands out to:
-   -nbad  Do not force blank lines after declarations.
-   -bap   Force blank lines after procedure bodies.
-   -bbo   Prefer to break long lines before boolean operators.
-   -nbc   Do not force newlines after commas in declarations
-   -br    Put braces on line with if, etc.
-   -brs   Put braces on struct declaration line.
-   -c33   Put comments to the right of code in column 33 (not recommended)
-   -cd33  Put declaration comments to the right of code in column 33
-   -ncdb  Do not put comment delimiters on blank lines.
-   -nce   Do not cuddle } and else.
-   -cdw   Do cuddle do { } while.
-   -ci4   Continuation indent of 4 spaces
-   -cli0  Case label indent of 0 spaces
-   -ncs   Do not put a space after a cast operator.
-   -d0    Set indentation of comments not to the right of code to 0 spaces.
-   -di1   Put declaration variables 1 space after their types
-   -nfc1  Do not format comments in the first column as  normal.
-   -nfca  Do not format any comments
-   -hnl   Prefer to break long lines at the position of newlines in the input.
-   -i4    4-space indents
-   -ip0   Indent parameter types in old-style function definitions by 0 spaces.
-   -l79   maximum line length for non-comment lines is 79 spaces.
-   -lc79  maximum line length for comment lines is 79 spaces.
-   -lp    maximum line length for non-comment lines is 79 spaces.
-   -npcs  Do not put a space after the function in function calls.
-   -nprs  Do not put a space after every ´(´ and before every ´)´.
-   -saf   Put a space after each for.
-   -sai   Put a space after each if.
-   -saw   Put a space after each while.
-   -sc    Put the `*´ character at the left of comments.
-   -nsob  Do not swallow optional blank lines.
-   -nss   Do not force a space before the semicolon  after  certain statements
-   -nut   Use spaces instead of tabs.
-   -lps   Leave space between `#´ and preprocessor directive.
 
-   -psl   Put the type of a procedure on the line before its name. (.c files)
-    or
-   -npsl  Leave a procedure declaration's return type alone (.h files)
+=over
+
+=item -nbad
+
+Do not force blank lines after declarations.
+
+=item -bap
+
+Force blank lines after procedure bodies.
+
+=item -bbo
+
+Prefer to break long lines before boolean operators.
+
+=item -nbc
+
+Do not force newlines after commas in declarations
+
+=item -br
+
+Put braces on line with if, etc.
+
+=item -brs
+
+Put braces on struct declaration line.
+
+=item -c33
+
+Put comments to the right of code in column 33 (not recommended)
+
+=item -cd33
+
+Put declaration comments to the right of code in column 33
+
+=item -ncdb
+
+Do not put comment delimiters on blank lines.
+
+=item -nce
+
+Do not cuddle } and else.
+
+=item -cdw
+
+Do cuddle do { } while.
+
+=item -ci4
+
+Continuation indent of 4 spaces
+
+=item -cli0
+
+Case label indent of 0 spaces
+
+=item -ncs
+
+Do not put a space after a cast operator.
+
+=item -d0
+
+Set indentation of comments not to the right of code to 0 spaces.
+
+=item -di1
+
+Put declaration variables 1 space after their types
+
+=item -nfc1
+
+Do not format comments in the first column as  normal.
+
+=item -nfca
+
+Do not format any comments
+
+=item -hnl
+
+Prefer to break long lines at the position of newlines in the input.
+
+=item -i4
+
+4-space indents
+
+=item -ip0
+
+Indent parameter types in old-style function definitions by 0 spaces.
+
+=item -l79
+
+maximum line length for non-comment lines is 79 spaces.
+
+=item -lc79
+
+maximum line length for comment lines is 79 spaces.
+
+=item -lp
+
+maximum line length for non-comment lines is 79 spaces.
+
+=item -npcs
+
+Do not put a space after the function in function calls.
+
+=item -nprs
+
+Do not put a space after every ´(´ and before every ´)´.
+
+=item -saf
+
+Put a space after each for.
+
+=item -sai
+
+Put a space after each if.
+
+=item -saw
+
+Put a space after each while.
+
+=item -sc
+
+Put the `*´ character at the left of comments.
+
+=item -nsob
+
+Do not swallow optional blank lines.
+
+=item -nss
+
+Do not force a space before the semicolon  after  certain statements
+
+=item -nut
+
+Use spaces instead of tabs.
+
+=item -lps
+
+Leave space between `#´ and preprocessor directive.
+
+=item -psl
+
+Put the type of a procedure on the line before its name. (.c files), or
+
+=item -npsl
+
+Leave a procedure declaration's return type alone (.h files)
+
+=back
 
 Please note that it is also necessary to include all typedef types
 with the "-T" option to ensure that everything is formatted properly.
