@@ -73,12 +73,20 @@ PMCs in general, but objects are presumed to actually do something
 useful with these things rather than just (potentially) throwing an
 exception.
 
+Any PMC that meets these criteria can be considered an object. Objects
+do I<not> have to have corresponding classes, though it's a fairly
+common occurrence.
+
 =over 4
 
 =item Get and set properties
 
 Strictly speaking, getting and setting properties is a PMC thing
 rather than an object thing, as PMCs are 
+
+=item Get a property hash
+
+=item Get and set attributes
 
 =item
 
@@ -146,11 +154,27 @@ required.
 An object that is transparently (to the user) embedded in another
 object. Delegate objects are used in those cases where we can't
 inherit from a class because the class is from a different object
-universe. 
+universe.
+
+As an example, assume you have a class A, which inherits from class
+B. The classes are incompatible, so Parrot can't automatically meld B
+into A, as it might if they were. When instantiating an object of
+class A, Parrot will automatically instantiate an object of class B
+and embed it in the object of class A. The object of class B is class
+A's delegate--when a method call comes in that A can't handle, that
+method call is delegated to B.
 
 =item Parent class
 
+Also called the super-class. The parent class is, in an inheritance
+situation, the class being derived from. If A derives from B, B is the
+parent class of A.
+
 =item Child class
+
+Also called the sub-class. The child class is, in an inheritance
+situation, the class doing the deriving. If A derives from B, A is the
+child class.
 
 =back
 
