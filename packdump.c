@@ -70,8 +70,14 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
         PIO_printf(interpreter, "    ??? TODO \n");
         PIO_printf(interpreter, "    } ],\n");
         break;
+    case PFC_PMC:
+        PIO_printf(interpreter, "    [ 'PFC_PMC', {\n");
+        PIO_printf(interpreter, "    ??? TODO \n");
+        PIO_printf(interpreter, "    } ],\n");
+        break;
     default:
-        PIO_printf(interpreter, "    [ 'PFC_????', undef ],\n");
+        PIO_printf(interpreter, "    [ 'PFC_????', type '0x%x' ],\n",
+                self->type);
         break;
     }
 }
@@ -82,15 +88,18 @@ PackFile_Fixup_dump(Parrot_Interp interpreter, struct PackFile_FixupTable *ft)
     opcode_t i;
 
     for (i = 0; i < ft->fixup_count; i++) {
+        PIO_printf(interpreter,"\t#%d\n", (int) i);
         switch (ft->fixups[i]->type) {
             case enum_fixup_label:
-                PIO_printf(interpreter,"\t%2d %8d %s,\n",
-                        (int)enum_fixup_label,
+            case enum_fixup_sub:
+                PIO_printf(interpreter,
+                        "\ttype => %d offs => %8d name => '%s',\n",
+                        (int)ft->fixups[i]->type,
                         (int)ft->fixups[i]->offset,
                         ft->fixups[i]->name);
                     break;
             default:
-                PIO_printf(interpreter,"\t%2d ???,\n",
+                PIO_printf(interpreter,"\ttype => %d ???,\n",
                         (int) ft->fixups[i]->type);
                 break;
         }

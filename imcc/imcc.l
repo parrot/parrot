@@ -279,7 +279,7 @@ WS              [\t\f\r ]
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        int type = get_pmc_num(interp, yytext+1);
+        int type = Parrot_get_pmc_num(interp, yytext+1);
 
         if (type) {
             char *buf = malloc(16);

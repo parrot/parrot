@@ -236,6 +236,7 @@ INTVAL sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted);
 STRING *sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted);
 void exec_init_prederef(struct Parrot_Interp *interpreter,
     void *prederef_arena);
+int Parrot_get_pmc_num(struct Parrot_Interp *interp, char *pmc_type);
 
 #endif   /* Parrot core */
 

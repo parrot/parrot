@@ -63,7 +63,7 @@ new_sub(struct Parrot_Interp *interp)
 {
     /* Using system memory until I figure out GC issues */
     struct Parrot_Sub *newsub =
-        mem_sys_allocate(sizeof(struct Parrot_Sub));
+        mem_sys_allocate_zeroed(sizeof(struct Parrot_Sub));
     newsub->ctx.warns = interp->ctx.warns;
     buffer_mark_COW(interp->ctx.warns);
     newsub->seg = interp->code->cur_cs;

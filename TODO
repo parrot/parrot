@@ -56,14 +56,16 @@ Interpreter
 
 Assembler
 ---------
-    Key support
     Debugging and source line number info
-    .sub directive (+ others)
-    Local labels
 
 Bytecode
 --------
     Metadata (source line number info, symbol table)
+
+pdump
+-----
+    Dumping constants shouldn't unpack the constants, but
+    just print out the segment.
 
 Stability
 ---------

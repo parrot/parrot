@@ -22,6 +22,7 @@
 #include "parrot/packfile.h"
 
 #define TRACE_PACKFILE 0
+#define TRACE_PACKFILE_PMC 0
 
 /*
 ** Static functions
@@ -409,43 +410,31 @@ PackFile_check_segment_size(opcode_t segment_size, const char *debug)
  * the first segments read are the default segments
  */
 static void
-make_code_pointers(struct PackFile_Directory *dir)
+make_code_pointers(struct PackFile_Segment *seg)
 {
     size_t i;
-    struct PackFile *pf = dir->base.pf;
+    struct PackFile *pf = seg->pf;
 
-    /* first find byte code seg */
-    for (i = 0; !pf->cur_cs && i < dir->num_segments; i++) {
-        struct PackFile_Segment *seg = dir->segments[i];
-        switch (seg->type) {
-            case PF_BYTEC_SEG:
-                if (!pf->cur_cs) {
-                    pf->cur_cs = (struct PackFile_ByteCode*)seg;
-                    pf->byte_code = pf->cur_cs->base.data;
-                }
-                break;
-        }
-    }
-    if (!pf->cur_cs)
-        return;
-    for (i = 0; i < dir->num_segments; i++) {
-        struct PackFile_Segment *seg = dir->segments[i];
-        switch (seg->type) {
-            case PF_FIXUP_SEG:
-                if (!pf->cur_cs->fixups) {
-                    pf->cur_cs->fixups = (struct PackFile_FixupTable *)seg;
-                    pf->cur_cs->fixups->code = pf->cur_cs;
-                }
-                break;
-            case PF_CONST_SEG:
-                if (!pf->const_table) {
-                    pf->cur_cs->consts = pf->const_table =
-                        (struct PackFile_ConstTable*)seg;
-                    pf->const_table->code = pf->cur_cs;
-                }
-            default:
-                break;
-        }
+    switch (seg->type) {
+        case PF_BYTEC_SEG:
+            if (!pf->cur_cs) {
+                pf->cur_cs = (struct PackFile_ByteCode*)seg;
+            }
+            break;
+        case PF_FIXUP_SEG:
+            if (!pf->cur_cs->fixups) {
+                pf->cur_cs->fixups = (struct PackFile_FixupTable *)seg;
+                pf->cur_cs->fixups->code = pf->cur_cs;
+            }
+            break;
+        case PF_CONST_SEG:
+            if (!pf->const_table) {
+                pf->cur_cs->consts = pf->const_table =
+                    (struct PackFile_ConstTable*)seg;
+                pf->const_table->code = pf->cur_cs;
+            }
+        default:
+            break;
     }
 }
 
@@ -503,6 +492,53 @@ Returns one (1) if everything is OK, else zero (0).
 =cut
 
 ***************************************/
+static void
+fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
+{
+    opcode_t i, ci;
+    struct PackFile_FixupTable *ft;
+    struct PackFile_ConstTable *ct;
+    PMC *sub_pmc;
+    struct Parrot_Sub *sub;
+    INTVAL rel;
+
+    ft = self->cur_cs->fixups;
+    ct = self->cur_cs->consts;
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_sub:
+                /*
+                 * offset is an index into the const_table holding
+                 * the Sub PMC
+                 */
+                ci = ft->fixups[i]->offset;
+                if (ci < 0 || ci >= ct->const_count)
+                    internal_exception(1,
+                            "Illegal fixup offset (%d) in enum_fixup_sub");
+                sub_pmc = ct->constants[ci]->u.key;
+                switch (sub_pmc->vtable->base_type) {
+                    case enum_class_Sub:
+                    case enum_class_Closure:
+                    case enum_class_Continuation:
+                    case enum_class_Coroutine:
+                        rel = (INTVAL) sub_pmc->cache.struct_val;
+                        rel += (INTVAL) self->cur_cs->base.data;
+                        sub_pmc->cache.struct_val = (void*) rel;
+                        sub = (struct Parrot_Sub*) PMC_data(sub_pmc);
+                        rel = (INTVAL) sub->end;
+                        rel += (INTVAL) self->cur_cs->base.data;
+                        sub->end = (opcode_t *) rel;
+                        break;
+                }
+                /* goon */
+            case enum_fixup_label:
+                /* fill in current bytecode seg */
+                ft->fixups[i]->seg = self->cur_cs;
+                break;
+        }
+    }
+}
+
 opcode_t
 PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 opcode_t *packed, size_t packed_size)
@@ -599,7 +635,16 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         self->directory.base.file_offset = (size_t)(cursor - self->src);
         cursor = PackFile_Segment_unpack(interpreter,
                 &self->directory.base, cursor);
-        make_code_pointers(&self->directory);
+        /* shortcut */
+        self->byte_code = self->cur_cs->base.data;
+        /*
+         * fixup constant subroutine objects
+         */
+        fixup_subs(interpreter, self);
+        /*
+         * TODO JIT and/or prederef the sub/the bytecode
+         */
+
     }
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (self->is_mmap_ped && (
@@ -1123,6 +1168,7 @@ directory_unpack (struct Parrot_Interp *interpreter,
                         "section");
             }
         }
+        make_code_pointers(seg);
 
         /* store the segment */
         dir->segments[i] = seg;
@@ -1477,6 +1523,10 @@ Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
     struct PackFile_ByteCode *new_cs)
 {
     struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
+
+    if (!new_cs) {
+        internal_exception(NO_PREV_CS, "No code segment to switch to\n");
+    }
     if (new_cs->base.pf != interpreter->code)
         interpreter->code = new_cs->base.pf;
     interpreter->code->cur_cs = new_cs;
@@ -1494,10 +1544,6 @@ Parrot_pop_cs(struct Parrot_Interp *interpreter)
     struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
     struct PackFile_ByteCode *new_cs = cur_cs->prev;
 
-    if (!new_cs) {
-        internal_exception(NO_PREV_CS, "No previous code segment\n");
-        return;
-    }
     Parrot_switch_to_cs(interpreter, new_cs);
     PackFile_remove_segment_by_name (cur_cs->base.dir, cur_cs->base.name);
 }
@@ -1565,6 +1611,7 @@ fixup_packed_size (struct PackFile_Segment *self)
         size++;  /* fixup_entry type */
         switch (ft->fixups[i]->type) {
             case enum_fixup_label:
+            case enum_fixup_sub:
                 size += cstring_packed_size(ft->fixups[i]->name);
                 size ++; /* offset */
                 break;
@@ -1587,6 +1634,7 @@ fixup_pack (struct PackFile_Segment *self, opcode_t *cursor)
         *cursor++ = (opcode_t) ft->fixups[i]->type;
         switch (ft->fixups[i]->type) {
             case enum_fixup_label:
+            case enum_fixup_sub:
                 strcpy ((char *)cursor, ft->fixups[i]->name);
                 cursor += cstring_packed_size(ft->fixups[i]->name);
                 *cursor++ = ft->fixups[i]->offset;
@@ -1663,12 +1711,14 @@ fixup_unpack(struct Parrot_Interp *interpreter,
         self->fixups[i]->type = PackFile_fetch_op(pf, &cursor);
         switch (self->fixups[i]->type) {
             case enum_fixup_label:
+            case enum_fixup_sub:
                 self->fixups[i]->name = PackFile_fetch_cstring(pf, &cursor);
                 self->fixups[i]->offset = PackFile_fetch_op(pf, &cursor);
                 break;
             default:
                 PIO_eprintf(interpreter,
-                        "PackFile_FixupTable_unpack: Unknown fixup type!\n");
+                        "PackFile_FixupTable_unpack: Unknown fixup type %d!\n",
+                        self->fixups[i]->type);
                 return 0;
         }
     }
@@ -1676,8 +1726,8 @@ fixup_unpack(struct Parrot_Interp *interpreter,
     return cursor;
 }
 
-void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
-        char *label, opcode_t offs)
+void PackFile_FixupTable_new_entry(struct Parrot_Interp *interpreter,
+        char *label, enum_fixup_t type, opcode_t offs)
 {
     struct PackFile_FixupTable *self = interpreter->code->cur_cs->fixups;
     opcode_t i;
@@ -1695,10 +1745,11 @@ void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
         mem_sys_realloc(self->fixups, self->fixup_count *
                          sizeof(struct PackFile_FixupEntry *));
     self->fixups[i] = mem_sys_allocate(sizeof(struct PackFile_FixupEntry));
-    self->fixups[i]->type = 0;
+    self->fixups[i]->type = type;
     self->fixups[i]->name = mem_sys_allocate(strlen(label) + 1);
     strcpy(self->fixups[i]->name, label);
     self->fixups[i]->offset = offs;
+    self->fixups[i]->seg = self->code;
 }
 
 static struct PackFile_FixupEntry *
@@ -1973,6 +2024,25 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
             packed_size += 2;
         break;
 
+    case PFC_PMC:
+        component = self->u.key; /* the pmc (Sub, ...) */
+        /*
+         * TODO use serialize api if that is done
+         */
+        switch (component->vtable->base_type) {
+            case enum_class_Sub:
+            case enum_class_Closure:
+            case enum_class_Continuation:
+            case enum_class_Coroutine:
+                packed_size = cstring_packed_size(
+                        ((struct Parrot_Sub*)PMC_data(component))->packed);
+                break;
+            default:
+                PIO_eprintf(NULL, "pack_size: Unknown PMC constant");
+                return 0;
+        }
+        break;
+
     default:
         PIO_eprintf(NULL,
                 "Constant_packed_size: Unrecognized type '%c'!\n",
@@ -2010,6 +2080,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
     struct PackFile *pf = constt->base.pf;
 
     type = PackFile_fetch_op(pf, &cursor);
+    /* FIXME:leo size is unused */
     size = PackFile_fetch_op(pf, &cursor);
 
 #if TRACE_PACKFILE
@@ -2034,6 +2105,10 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
                 self, cursor);
         break;
 
+    case PFC_PMC:
+        cursor = PackFile_Constant_unpack_pmc(interpreter, constt,
+                self, cursor);
+        break;
     default:
         PIO_eprintf(NULL,
                 "Constant_unpack: Unrecognized type '%c' during unpack!\n",
@@ -2148,6 +2223,84 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
 
     size = ROUND_UP(size, wordsize) / sizeof(opcode_t);
     return cursor + size;
+}
+
+/**
+
+=item unpack_pmc
+
+Unpack a constant PMC (currently Subs only)
+
+=cut
+
+*/
+
+opcode_t *
+PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
+                         struct PackFile_ConstTable *constt,
+                         struct PackFile_Constant *self,
+                         opcode_t *cursor)
+{
+    struct PackFile *pf = constt->base.pf;
+    char * pmcs;
+    char class[32], name[128];
+    int start, end;
+    int rc, pmc_num;
+    PMC *sub_pmc, *key;
+    struct Parrot_Sub *sub;
+    struct PackFile *pf_save;
+
+#if TRACE_PACKFILE_PMC
+    fprintf(stderr, "PMC_CONST '%s'\n", (char*)cursor);
+#endif
+    pmcs = PackFile_fetch_cstring(pf, &cursor);
+    /*
+     * TODO use serialize api if that is done
+     */
+    rc = sscanf(pmcs, "%31s %127s %d %d)", class, name, &start, &end);
+    if (rc != 4) {
+        fprintf(stderr, "PMC_CONST ERR RC '%d'\n", rc);
+        /* my sscanf returns 1 :-( */
+    }
+
+#if TRACE_PACKFILE_PMC
+    fprintf(stderr, "PMC_CONST: class '%s', name '%s', start %d end %d\n",
+            class, name, start, end);
+#endif
+    /*
+     * make a constant subroutine object of the desired class
+     */
+    pmc_num = Parrot_get_pmc_num(interpreter, class);
+    sub_pmc = constant_pmc_new_noinit(interpreter, pmc_num);
+    /*
+     * this places the current bytecode segment in the Parrot_Sub
+     * structure, which needs interpreter->code
+     */
+    pf_save = interpreter->code;
+    interpreter->code = pf;
+    VTABLE_init(interpreter, sub_pmc);
+
+    sub_pmc->cache.struct_val = (void *) start;
+    sub = PMC_data(sub_pmc);
+    sub->end = (opcode_t*)end;
+    sub->packed = pmcs;
+    /*
+     * place item in const_table
+     */
+    self->type = PFC_PMC;
+    self->u.key = sub_pmc;
+    /*
+     * finally place the sub in the global stash
+     */
+    key = key_new_cstring(interpreter, name);
+    VTABLE_set_pmc_keyed(interpreter, interpreter->perl_stash->stash_hash,
+            key, sub_pmc);
+
+    /*
+     * restore interpreters packfile
+     */
+    interpreter->code = pf_save;
+    return cursor;
 }
 
 /***************************************

@@ -136,9 +136,11 @@ struct PackFile_FixupTable {
 };
 
 #define PFC_NONE    '\0'
-#define PFC_NUMBER  'n'
-#define PFC_STRING  's'
-#define PFC_KEY     'k'
+/* no ascii chars use numbers: for n,s,k,p */
+#define PFC_NUMBER  '\156'
+#define PFC_STRING  '\163'
+#define PFC_KEY     '\153'
+#define PFC_PMC     '\160'
 
 struct PackFile_Constant {
     opcode_t type;
@@ -279,8 +281,8 @@ void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
                               opcode_t * packed);
 
 /* create new fixup entry */
-void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *, char *label,
-                opcode_t offs);
+void PackFile_FixupTable_new_entry(struct Parrot_Interp *, char *label,
+                enum_fixup_t, opcode_t offs);
 /* find entry */
 struct PackFile_FixupEntry * PackFile_find_fixup_entry(struct Parrot_Interp *,
         enum_fixup_t type, char *);
@@ -335,6 +337,9 @@ opcode_t * PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
 opcode_t * PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
+        struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
+
+opcode_t * PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
 opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t **stream);

@@ -31,7 +31,7 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
 {
     char fmt[256];
     SymReg *pmc;
-    int pmc_num = get_pmc_num(interpreter, type);
+    int pmc_num = Parrot_get_pmc_num(interpreter, type);
     sprintf(fmt, "%d", pmc_num);
     pmc = mk_const(str_dup(fmt), 'I');
     /* XXX check, if type exists, but aove keyed search
@@ -204,17 +204,6 @@ void register_compilers(Parrot_Interp interp)
           string_make(interp, "pIt", 3, NULL,0,NULL));
 }
 
-/* return the index of a PMC class */
-int get_pmc_num(struct Parrot_Interp *interp, char *pmc_type)
-{
-    STRING * s = string_make(interp, pmc_type,
-            (UINTVAL) strlen(pmc_type), NULL, 0, NULL);
-    PMC * key = key_new_string(interp, s);
-    PMC * cnames = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-            IGLOBALS_CLASSNAME_HASH);
-
-    return VTABLE_get_integer_keyed(interp, cnames, key);
-}
 
 /*
  * Try to find valid op doing the same operation

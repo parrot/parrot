@@ -22,6 +22,8 @@ Determine the size of the buffer needed in order to pack the PackFile into a
 contiguous region of memory.
 ***************************************/
 
+#define TRACE_PACKFILE_PMC 0
+
 extern struct PackFile_Directory *directory_new (struct PackFile *pf);
 
 opcode_t
@@ -233,6 +235,31 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
          * above.
          * cursor = (opcode_t *) charcursor;
          */
+        break;
+
+    case PFC_PMC:
+        key = self->u.key;      /* the (Sub) PMC */
+        switch (key->vtable->base_type) {
+            case enum_class_Sub:
+            case enum_class_Closure:
+            case enum_class_Continuation:
+            case enum_class_Coroutine:
+                {
+                    size_t len;
+                    char *s = ((struct Parrot_Sub*)PMC_data(key))->packed;
+                    len = strlen(s) + 1;
+                    *cursor++ = (len + sizeof(opcode_t) - 1) / sizeof(opcode_t);
+
+                    strcpy((char *) cursor, s);
+#if TRACE_PACKFILE_PMC
+                    fprintf(stderr, "PMC_packed '%s'\n", (char*) cursor);
+#endif
+                }
+                break;
+            default:
+                internal_exception(1, "pack_size: Unknown PMC constant");
+                break;
+        }
         break;
 
     case PFC_KEY:

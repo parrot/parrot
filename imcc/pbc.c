@@ -129,13 +129,21 @@ int e_pbc_open(void *param) {
      * we need some segments
      */
     if (!interpreter->code->cur_cs) {
+        /* TODO mangle segment names */
         seg = PackFile_Segment_new_seg(&interpreter->code->directory,
                 PF_BYTEC_SEG,
                 BYTE_CODE_SEGMENT_NAME, 1);
         cs->seg = interpreter->code->cur_cs = (struct PackFile_ByteCode*)seg;
         seg = PackFile_Segment_new_seg(&interpreter->code->directory,
+                PF_FIXUP_SEG,
+                FIXUP_TABLE_SEGMENT_NAME , 1);
+        interpreter->code->cur_cs->fixups = (struct PackFile_FixupTable *)seg;
+        ((struct PackFile_FixupTable *)seg)->code = cs->seg;
+
+        seg = PackFile_Segment_new_seg(&interpreter->code->directory,
                 PF_CONST_SEG,
                 CONSTANT_SEGMENT_NAME , 1);
+        interpreter->code->cur_cs->consts =
         interpreter->code->const_table = (struct PackFile_ConstTable*) seg;
     }
     globals.cs = cs;
@@ -362,8 +370,9 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
              */
             debug(DEBUG_PBC_FIXUP, "write fixup '%s' offs %d\n",
                     ins->r[0]->name, ins->r[0]->color + oldsize);
-            PackFile_FixupTable_new_entry_t0(interpreter,
-                    ins->r[0]->name, ins->r[0]->color + oldsize);
+            PackFile_FixupTable_new_entry(interpreter,
+                    ins->r[0]->name, enum_fixup_label,
+                    ins->r[0]->color + oldsize);
         }
         if (!ins->op || !*ins->op)
             continue;
@@ -444,9 +453,12 @@ void fixup_bsrs(struct Parrot_Interp *interpreter)
                 if (*bsr->name != '_')
                     continue;
                 lab = find_global_label(bsr->name, &pc);
-                if (!lab)
+                if (!lab) {
+                    /* TODO continue; */
+                    /* do fixup at runtime */
                     fatal(1, "fixup_bsrs", "couldn't find addr of sub '%s'\n",
                             bsr->name);
+                }
                 addr = jumppc + bsr->color;
                 /* patch the bsr __ instruction */
                 debug(DEBUG_PBC_FIXUP, "fixup %s pc %d fix %d\n",
@@ -576,7 +588,45 @@ add_const_num(struct Parrot_Interp *interpreter, char *buf) {
     return k;
 }
 
+static int
+add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
+        int offs, int len) {
+    int k;
+#if 1
+    /* N/Y */
+    char buf[256];
+    opcode_t *rc;
+    struct PackFile_Constant *pfc;
+
+    debug(DEBUG_PBC_CONST, "add_const_pmc_sub '%s'\n", r->name);
+    /*
+     * TODO use serialize api if that is done
+     *      for now:
+     * "Class name offs end"
+     */
+    sprintf(buf, "%s %s %d %d", "Sub", r->name, offs, len);
+    pfc = malloc(sizeof(struct PackFile_Constant));
+
+    interpreter->code->const_table->base.pf->header->wordsize =
+        sizeof(opcode_t);
+    rc = PackFile_Constant_unpack_pmc(interpreter,
+            interpreter->code->const_table, pfc, (opcode_t*)buf);
+    if (!rc)
+        fatal(1, "add_const_pmc", "PackFile_Constant error\n");
+
+    k = PDB_extend_const_table(interpreter);
+    interpreter->code->const_table->constants[k]->type = PFC_PMC;
+    interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
+    /*
+     * create entry in our fixup (=symbol) table
+     * the offset is the index in the constant table of this Sub
+     */
+    PackFile_FixupTable_new_entry(interpreter, r->name, enum_fixup_sub, k);
+#endif
+    return k;
+}
 /* add constant key to constants */
+
 static int
 add_const_key(struct Parrot_Interp *interpreter, opcode_t key[],
         int size, char *s_key) {
@@ -797,6 +847,10 @@ e_pbc_emit(void *param, Instruction * ins)
             debug_seg = Parrot_new_debug_seg(interpreter,
                     interpreter->code->cur_cs, sourcefile,
                     (size_t) ins_line+ins_size);
+        }
+        /* if item is a PCC_SUB entry then store it constants */
+        if (ins->r[1] && ins->r[1]->pcc_sub) {
+            add_const_pmc_sub(interpreter, ins->r[1], oldsize, code_size);
         }
     }
     if (ins->op && *ins->op) {
