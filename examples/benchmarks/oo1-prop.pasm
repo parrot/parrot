@@ -3,15 +3,18 @@
     find_global P0, "__init"
     set I10, 0
     set I11, 100000
-    newsub P1, .RetContinuation, retl
 loop:
+    set I0, 0
+    set I3, 1
     new P5, .PerlUndef
-    invoke			# invokecc
+    invokecc			# invokecc
 retl:
     inc I10
     lt I10, I11, loop
 
     new P5, .PerlUndef
+    set I0, 0
+    set I3, 1
     invokecc
     getprop P2, "i", P5
     print P2
@@ -25,4 +28,4 @@ retl:
     new P10, .PerlInt
     set P10, 20
     setprop P5, "j", P10
-    invoke P1
+    returncc
