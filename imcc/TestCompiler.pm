@@ -91,7 +91,7 @@ sub generate_functions {
 	my $s = $PConfig{slash};
 	my $exe = $PConfig{exe};
 	#my $PARROT = $ENV{PARROT} || "..${s}parrot$exe";	# XXX
-	my $PARROT = $ENV{PARROT} || "parrot$exe";	# XXX
+	my $PARROT = $ENV{PARROT} || ".${s}parrot$exe";	# XXX
 
 	if ($gen_pasm) {
 	    system("$PARROT $opt -o $out_f $by_f");

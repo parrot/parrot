@@ -3,7 +3,8 @@ use strict;
 use TestCompiler tests => 12;
 use Parrot::Config;
 
-my $PARROT = "parrot$PConfig{exe}";
+# Do not assume that . is in $PATH
+my $PARROT = ".$PConfig{slash}parrot$PConfig{exe}";
 
 # include file tests
 
