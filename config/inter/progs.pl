@@ -4,8 +4,6 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':inter';
 
-use Config;
-
 $description = 'Determining what C compiler and linker to use...';
 
 @args = qw(ask cc ld ccflags ldflags libs debugging);
