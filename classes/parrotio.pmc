@@ -88,13 +88,14 @@ pmclass ParrotIO need_ext {
         }
     }
 
-    void clone (PMC *dest) {
-	VTABLE_init(INTERP, dest);
+    PMC* clone () {
+	PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
 	/* For now both PMCs refer to the same ParrotIO object.
 	 * If we have different IO layers, we might copy these structures
 	 */
 	PMC_data(dest) = PMC_data(SELF);
 	dest->cache.struct_val = SELF->cache.struct_val;
+	return dest;
     }
 
     INTVAL get_bool() {

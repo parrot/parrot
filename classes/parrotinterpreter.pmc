@@ -20,6 +20,7 @@
 #include "parrot/embed.h"
 #include <assert.h>
 
+void clone_interpreter(PMC* dest, PMC* self);
 /*
  * copy / clone interpreter registers
  * all resources are created in the destination interpreter
@@ -46,12 +47,39 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
                  sp->vtable->base_type == enum_class_ParrotThread))
 		d->pmc_reg.registers[i] = dest;
 	    else {
-		PMC *dp = pmc_new_noinit(d, sp->vtable->base_type);
-		VTABLE_clone(d, sp, dp);
+		PMC* dp = VTABLE_clone(d, sp);
 		d->pmc_reg.registers[i] = dp;
 	    }
 	}
     }
+}
+
+void
+clone_interpreter(PMC* dest, PMC* self)
+{
+
+    Parrot_Interp s = PMC_data(self);
+    Parrot_Interp d;
+
+    d = PMC_data(dest);
+
+    /*
+     * copy register files
+     */
+    clone_regs(d, s, dest);
+    /*
+     * copy over packfile - done currently in the runinterp opcode
+     * for multi-threading we have to generate separate
+     * profile, prederef, and JIT data
+     */
+#if 0
+    pt_clone_code(d, s);
+#endif
+    /*
+     * set flags and run core
+     */
+    d->run_core = s->run_core;
+    d->flags = s->flags;
 }
 
 /*
@@ -201,36 +229,10 @@ pmclass ParrotInterpreter need_ext {
      *
      * XXX this should of course call Parrot_clone() and use freeze/thaw
      */
-    void clone(PMC* dest) {
-	Parrot_Interp s = PMC_data(SELF);
-	Parrot_Interp d;
-
-        /*
-         * clone may be called internally (from thread creation in
-         * ParrotThread::init_pmc() or stand-alone
-         * so we check, if the interpreter is already setup
-         */
-        if (!PMC_data(dest))
-            VTABLE_init_pmc(s, dest, SELF);
-	d = PMC_data(dest);
-
-	/*
-	 * copy register files
-	 */
-	clone_regs(d, s, dest);
-	/*
-	 * copy over packfile - done currently in the runinterp opcode
-	 * for multi-threading we have to generate separate
-	 * profile, prederef, and JIT data
-	 */
-#if 0
-	pt_clone_code(d, s);
-#endif
-	/*
-	 * set flags and run core
-	 */
-	d->run_core = s->run_core;
-	d->flags = s->flags;
+    PMC* clone() {
+	PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
+        clone_interpreter(dest, SELF);
+        return dest;
     }
 }
 

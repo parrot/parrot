@@ -31,7 +31,8 @@ pmclass Iterator {
 	     pobject_lives(INTERP, (PObj *) PMC_ptr2p(SELF));
     }
 
-    void clone (PMC* dest) {
+    PMC* clone () {
+	return SUPER();
 	/* XXX TODO */
     }
 

@@ -170,14 +170,14 @@ pmclass SArray const_too need_ext does array {
 	PMC_data(SELF) = NULL;
     }
 
-    void clone (PMC *dest) {
+    PMC* clone () {
 	HashEntry *e, *d;
 	int i, start, end;
 	INTVAL size;
-	PMC * np;
+	PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
 
 	if (!PMC_data(SELF))
-	    return;
+	    return dest;
 	size = SELF->cache.int_val;
 	dest->cache.int_val = size;
 	PMC_data(dest) = mem_sys_allocate_zeroed((2 + size) *
@@ -203,16 +203,14 @@ pmclass SArray const_too need_ext does array {
 		    d->val.string_val = string_copy(INTERP, e->val.string_val);
 		    break;
 		case enum_hash_pmc:
-		    np = pmc_new_noinit(interpreter,
-			    e->val.pmc_val->vtable->base_type);
-		    d->val.pmc_val = np;
-		    VTABLE_clone(INTERP, e->val.pmc_val, np);
+		    d->val.pmc_val = VTABLE_clone(INTERP, e->val.pmc_val);
 		    break;
 		default:
 		    break;
 	    }
 	}
 	PObj_custom_mark_destroy_SETALL(dest);
+	return dest;
     }
 
     INTVAL get_bool () {

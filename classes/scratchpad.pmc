@@ -35,13 +35,14 @@ pmclass Scratchpad need_ext {
 	    mem_sys_free(PMC_data(SELF));
     }
 
-    void clone (PMC *ret) {
-        PObj_custom_mark_destroy_SETALL(ret);
+    PMC* clone () {
+	PMC* ret = pmc_new(INTERP, SELF->vtable->base_type);
 	PMC_data(ret) = mem_sys_allocate(SELF->cache.int_val *
                                      sizeof(struct Parrot_Lexicals));
 	ret->cache.int_val = SELF->cache.int_val;
 	mem_sys_memcopy(PMC_data(ret), PMC_data(SELF),
 			SELF->cache.int_val * sizeof(struct Parrot_Lexicals));
+	return ret;
     }
 
     INTVAL elements () {

@@ -66,13 +66,15 @@ pmclass Sub {
 	return SELF->cache.struct_val;
     }
 
-    void clone (PMC *ret) {
+    PMC* clone () {
 	struct Parrot_Sub * sub;
+	PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
 	PObj_custom_mark_destroy_SETALL(ret);
 	sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
 	memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
 	buffer_mark_COW(sub->ctx.warns);
 	ret->cache.struct_val = SELF->cache.struct_val;
+	return ret;
     }
 
     void set_same (PMC* value) {

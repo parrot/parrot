@@ -105,9 +105,11 @@ pmclass Array need_ext does array {
         list_mark(INTERP, (List *) PMC_data(SELF));
     }
 
-    void clone (PMC *dest) {
+    PMC* clone () {
+	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = list_clone(INTERP, (List *) PMC_data(SELF));
+	return dest;
     }
 
     INTVAL get_integer () {

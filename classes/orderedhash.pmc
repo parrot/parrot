@@ -39,9 +39,10 @@ pmclass OrderedHash extends PerlArray need_ext does array does hash {
         PerlHash.SUPER();
     }
 
-    void clone (PMC *dest) {
-        SUPER(dest);
-        PerlHash.SUPER(dest);
+    PMC* clone () {
+        PMC* dest = SUPER();
+	hash_clone(INTERP, (Hash *)PMC_ptr1v(SELF), (Hash**)&PMC_ptr1v(dest));
+        return dest;
     }
 
     PMC* get_pmc_keyed (PMC* key) {

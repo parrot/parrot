@@ -74,9 +74,11 @@ pmclass PerlHash need_ext does hash {
 	return VTABLE_type_keyed(INTERP, valpmc, nextkey);
     }
 
-    void clone (PMC *ret) {
-	PObj_custom_mark_SET(ret);
-	hash_clone(INTERP, (Hash *)PMC_ptr1v(SELF), (Hash**)&PMC_ptr1v(ret));
+    PMC* clone () {
+	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+	PObj_custom_mark_SET(dest);
+	hash_clone(INTERP, (Hash *)PMC_ptr1v(SELF), (Hash**)&PMC_ptr1v(dest));
+	return dest;
     }
 
     INTVAL get_integer () {

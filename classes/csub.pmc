@@ -16,8 +16,10 @@
 
 pmclass CSub {
 
-    void clone (PMC *dest) {
+    PMC* clone () {
+	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
 	dest->cache.struct_val = SELF->cache.struct_val;
+	return dest;
     }
 
     PMC* get_pmc () {

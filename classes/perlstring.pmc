@@ -26,9 +26,11 @@ pmclass PerlString extends perlscalar {
 	    pobject_lives(INTERP, (PObj *)SELF->cache.string_val);
     }
 
-    void clone (PMC *dest) {
+    PMC* clone () {
+	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         dest->cache.string_val = string_copy(INTERP,SELF->cache.string_val);
+	return dest;
     }
 
     INTVAL get_integer () {

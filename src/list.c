@@ -1073,7 +1073,7 @@ list_clone(Interp *interpreter, List *other)
     List *l;
     List_chunk *chunk, *prev, *new_chunk;
     UINTVAL i;
-    PMC *op, *np;
+    PMC *op;
     STRING *s;
 
     Parrot_block_DOD(interpreter);
@@ -1100,10 +1100,8 @@ list_clone(Interp *interpreter, List *other)
                 for (i = 0; i < chunk->items; i++) {
                     op = ((PMC **)chunk->data.bufstart)[i];
                     if (op) {
-                        np = pmc_new_noinit(interpreter,
-                                op->vtable->base_type);
-                        ((PMC **)new_chunk->data.bufstart)[i] = np;
-                        VTABLE_clone(interpreter, op, np);
+                        ((PMC **)new_chunk->data.bufstart)[i] =
+                            VTABLE_clone(interpreter, op);
                     }
                 }
                 break;
@@ -1124,9 +1122,7 @@ list_clone(Interp *interpreter, List *other)
         }
     }
     if (other->user_data) {
-        l->user_data = pmc_new_noinit(interpreter, enum_class_SArray);
-        VTABLE_clone(interpreter, other->user_data,
-                l->user_data);
+        l->user_data = VTABLE_clone(interpreter, other->user_data);
     }
     rebuild_chunk_list(interpreter, l);
     Parrot_unblock_DOD(interpreter);

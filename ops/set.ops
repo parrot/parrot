@@ -484,11 +484,7 @@ Makes a copy of the PMC in $2 and puts it in $1.
 =cut
 
 inline op clone(out PMC, in PMC) {
-  /* P6C emits clone P0, P0 */
-  if (&$1 != &$2) {
-      $1 = pmc_new_noinit(interpreter, $2->vtable->base_type);
-      $2->vtable->clone(interpreter, $2, $1);
-  }
+  $1 = VTABLE_clone(interpreter, $2);
   goto NEXT();
 }
 

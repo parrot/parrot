@@ -81,30 +81,25 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
 
     /* Our penultimate parent list is a clone of our parent's parent
        list, with our parent unshifted onto the beginning */
-    temp_pmc = pmc_new_noinit(interpreter, enum_class_Array);
-    VTABLE_clone(interpreter,
-            VTABLE_get_pmc_keyed_int(interpreter,
-                (PMC *)PMC_data(base_class), PCD_ALL_PARENTS),
-            temp_pmc);
+    temp_pmc =
+        VTABLE_clone(interpreter,
+                VTABLE_get_pmc_keyed_int(interpreter,
+                    (PMC *)PMC_data(base_class), PCD_ALL_PARENTS));
     VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
     VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_ALL_PARENTS,
             temp_pmc);
 
     /* Our attribute list is our parent's attribute list */
-    temp_pmc = pmc_new_noinit(interpreter, enum_class_OrderedHash);
-    VTABLE_clone(interpreter,
+    temp_pmc = VTABLE_clone(interpreter,
             VTABLE_get_pmc_keyed_int(interpreter,
-                (PMC *)PMC_data(base_class), PCD_ATTRIB_OFFS),
-            temp_pmc);
+                (PMC *)PMC_data(base_class), PCD_ATTRIB_OFFS));
     VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_ATTRIB_OFFS,
             temp_pmc);
 
     /* And our full keyed attribute list is our parent's */
-    temp_pmc = pmc_new_noinit(interpreter, enum_class_OrderedHash);
-    VTABLE_clone(interpreter,
+    temp_pmc = VTABLE_clone(interpreter,
             VTABLE_get_pmc_keyed_int(interpreter,
-                (PMC *)PMC_data(base_class), PCD_ATTRIBUTES),
-            temp_pmc);
+                (PMC *)PMC_data(base_class), PCD_ATTRIBUTES));
     VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_ATTRIBUTES,
             temp_pmc);
 

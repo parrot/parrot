@@ -725,9 +725,7 @@ hash_clone(struct Parrot_Interp *interp, Hash *hash, Hash **dest)
                 break;
 
             case enum_type_PMC:
-                valtmp = pmc_new_noinit(interp,
-                    ((PMC*)b->value)->vtable->base_type);
-                VTABLE_clone(interp, (PMC*)b->value, valtmp);
+                valtmp = VTABLE_clone(interp, (PMC*)b->value);
                 break;
 
             default:

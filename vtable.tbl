@@ -23,7 +23,7 @@ UINTVAL subtype(INTVAL type)
 
 STRING* name()
 
-void clone(PMC* dest)
+PMC* clone()
 
 PMC* find_method(STRING* method_name)
 

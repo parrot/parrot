@@ -39,11 +39,12 @@ pmclass Closure extends Sub {
        return SUPER(next);
    }
 
-   void clone (PMC *ret) {
+   PMC* clone () {
        struct Parrot_Sub * sub;
-       SUPER(ret);
+       PMC* ret = SUPER();
        sub = PMC_sub(ret);
        stack_mark_cow(sub->ctx.pad_stack);
+       return ret;
    }
 
     void set_same (PMC* value) {
