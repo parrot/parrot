@@ -482,8 +482,6 @@ ok 2
 Foo
 OUTPUT
 
-SKIP: {
-#	skip("todo class exists", 1);
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw simple class");
     newclass P10, "Foo"
     classname S10, P10
@@ -502,7 +500,7 @@ Foo
 ok
 Foo
 OUTPUT
-}
+
 
 output_is(<<'CODE', <<'OUTPUT', "freeze class w attr");
     newclass P10, "Foo"
@@ -523,9 +521,7 @@ ok 1
 ok 2
 OUTPUT
 
-SKIP: {
-	skip("todo class attrs", 1);
-output_is(<<'CODE', <<'OUTPUT', "thaw class  w attr into new interpreter");
+output_is(<<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter");
     set S3, "temp.fpmc"
     .include "stat.pasm"
     stat I0, S3, .STAT_FILESIZE
@@ -564,10 +560,8 @@ ok 3
 ok 4
 ok 5
 OUTPUT
-}
-SKIP: {
-	skip("todo class attrs", 1);
-output_is(<<'CODE', <<'OUTPUT', "thaw class  w attrr");
+
+output_is(<<'CODE', <<'OUTPUT', "thaw class w attr same interp");
     newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
@@ -617,4 +611,4 @@ ok 4
 ok 5
 ok 6
 OUTPUT
-}
+

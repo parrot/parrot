@@ -173,7 +173,7 @@ Create the class from the thawed parents and attributes array.
         /* 3) attributes array */
         if (info->what == VISIT_THAW_NORMAL ||
                 info->what == VISIT_FREEZE_AT_DESTRUCT)
-            pos = class_data + PCD_MAX;
+            pos = class_data + PCD_MAX + 1;
         else
             pos = class_data + PCD_CLASS_ATTRIBUTES;
         info->thaw_ptr = pos;
@@ -268,7 +268,7 @@ Create the class from the thawed parents and attributes array.
             n = 0;
         else
             n = VTABLE_elements(INTERP, parents);
-        if (n != nold)
+        if (nold && n != nold)
             internal_exception(1, "thawed class differs");
         /* TODO compare elements */
         if (!nold) {
@@ -287,7 +287,7 @@ Create the class from the thawed parents and attributes array.
             n = 0;
         else
             n = VTABLE_elements(INTERP, attribs);
-        if (n != nold)
+        if (nold && n != nold)
             internal_exception(1, "thawed class differs");
         /* TODO compare attribs */
 
