@@ -15,7 +15,7 @@ use File::Spec;
 use Getopt::Long;
 
 
-my $VERSION = "0.5.0";
+my $VERSION = "0.6.0";
 
 # These are the standard addresses for reporting bugs.
 my %std_to = 
@@ -281,7 +281,7 @@ sub query_missing_info {
 sub ask_for_alternative {
     my ( $what, $choices, $default ) = @_;
 
-    print <<EOT;
+    print <<EOT unless $opts{quiet};
 Please pick a $what from the following:
   @{$choices}
 
@@ -305,7 +305,8 @@ EOT
 
 # Prompt for a body, through an external editor.
 sub ask_for_body {
-    print <<EOT;
+    unless ( $opts{quiet} ) {
+        print <<EOT;
 Now you need to supply the bug report. Try to make the report concise
 but descriptive. Include any relevant detail. If you are reporting
 something that does not work as you think it should, please try to
@@ -318,15 +319,16 @@ versions are relevant.
 
 EOT
 
-    print "Press 'Enter' to continue...\n";
-    scalar <STDIN>;
+        print "Press 'Enter' to continue...\n";
+        scalar <STDIN>;
+    }
 
     # Prompt for editor to use if none supplied.
     if ( $opts{editor} ) {
         $editor = $opts{editor};
 
     } else {
-        ask_for_editor(<<EOT);
+        ask_for_editor($opts{quiet} ? "" : <<EOT);
 You will probably want to use an editor to enter the report. If the
 default editor proposed below is the editor you want to use, then just
 press the 'Enter' key, otherwise type in the name of the editor you
@@ -371,7 +373,7 @@ sub ask_for_editor {
 
 # Prompt for return address, return it.
 sub ask_for_return_address {
-    print <<EOT;
+    print <<EOT unless $opts{quiet};
 Your e-mail address will be useful if you need to be contacted. If the
 default shown below is not your full internet e-mail address, please
 correct it.
@@ -412,7 +414,7 @@ EOT
 # 
 # Die if more than 5 wrong subjects.
 sub ask_for_subject {
-    print <<EOT;
+    print <<EOT unless $opts{quiet};
 First of all, please provide a subject for the message. It should be a
 concise description of the bug or problem. "parrot bug" or "parrot
 problem" is not a concise description.
