@@ -40,7 +40,7 @@ sub _run_command {
   }
 
   system "$^X -e \"$redir_string;system q{$command};\"";
-  my $exit_code = $? / 256;
+  my $exit_code = $? >> 8;
   $Builder->diag("'$command' failed with exit code $exit_code") if $exit_code;
 }
 
