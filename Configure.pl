@@ -426,11 +426,14 @@ if ($c{gccversion}) {
         # -Wpadded may prove interesting, or even noisy.
         # -Wunreachable-code might be useful in a non debugging version
     );
+    my $warns = "";
     while (my ($vers, $opt) = splice @opt_and_vers, 0, 2) {
         last if $vers > $c{gccversion};
         next unless $opt; # Ignore blank lines
-        $c{cc_warn} .= " $opt";
+        $warns .= " $opt";
     }
+    $c{cc_warn} = $warns . " " . $c{cc_warn};
+    
     prompt("What gcc warning flags do you want to use?", 'cc_warn');
 }
 
