@@ -622,9 +622,9 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 
     char * s = string_to_cstring(interpreter, addr);
 #ifdef PARROT_DEF_INET_ATON
-    if(inet_aton(s, &sa.sin_addr) != 0) {
+    if (inet_aton(s, &sa.sin_addr) != 0) {
 #else
-    if(inet_pton(family, s, &sa.sin_addr) != 0) {
+    if (inet_pton(family, s, &sa.sin_addr) != 0) {
 #endif
         /* Success converting numeric IP */
     }
@@ -647,7 +647,8 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     sa.sin_port = htons(port);
 
     fprintf(stderr, "sockaddr_in: port %d\n", port);
-    return string_make(interpreter, &sa, sizeof(struct sockaddr), "iso-8859-1", 0);
+    return string_make(interpreter, &sa, sizeof(struct sockaddr),
+            "iso-8859-1", 0);
 }
 
 
@@ -670,7 +671,9 @@ PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
 {
     int sock;
     ParrotIO * io;
-    if((sock = socket(fam, type, proto)) >= 0) {
+
+    UNUSED(layer);
+    if ((sock = socket(fam, type, proto)) >= 0) {
         io = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
         io->fd = sock;
         io->remote.sin_family = fam;
@@ -695,30 +698,39 @@ Connects C<*io>'s socket to address C<*r>.
 static INTVAL
 PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
 {
-    if(r) {
+    UNUSED(layer);
+
+    if (r) {
         struct sockaddr_in sa;
         memcpy(&sa, PObj_bufstart(r), sizeof(struct sockaddr));
         io->remote.sin_addr.s_addr = sa.sin_addr.s_addr;
         io->remote.sin_port = sa.sin_port;
     }
 AGAIN:
-    PIO_eprintf(interpreter, "connect: fd = %d port = %d\n", io->fd, ntohs(io->remote.sin_port));
-    if((connect(io->fd, (struct sockaddr*)&io->remote,
-                   sizeof(struct sockaddr))) != 0) {
+    PIO_eprintf(interpreter,
+            "connect: fd = %d port = %d\n",
+            io->fd, ntohs(io->remote.sin_port));
+    if ((connect(io->fd, (struct sockaddr*)&io->remote,
+                    sizeof(struct sockaddr))) != 0) {
         switch(errno) {
-            case EINTR:        goto AGAIN;
-            case EINPROGRESS:  goto AGAIN;
-            case EISCONN:      return 0;
+            case EINTR:
+                goto AGAIN;
+            case EINPROGRESS:
+                goto AGAIN;
+            case EISCONN:
+                return 0;
             case ECONNREFUSED:
 #if PIO_TRACE
-                               PIO_eprintf(interpreter, "PIO_unix_connect: connect refused\n");
+                PIO_eprintf(interpreter,
+                        "PIO_unix_connect: connect refused\n");
 #endif
             case EINVAL:
             default:
 #if PIO_TRACE
-                               PIO_eprintf(interpreter, "PIO_unix_connect: errno = %d\n", errno);
+                PIO_eprintf(interpreter,
+                        "PIO_unix_connect: errno = %d\n", errno);
 #endif
-                               return -1;
+                return -1;
         }
     }
 
@@ -740,16 +752,20 @@ static INTVAL
 PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 {
     struct sockaddr_in sa;
-    if(!l) return -1;
+
+    UNUSED(layer);
+    UNUSED(interpreter);
+    if (!l)
+        return -1;
 
     memcpy(&sa, PObj_bufstart(l), sizeof(struct sockaddr));
     io->local.sin_addr.s_addr = sa.sin_addr.s_addr;
     io->local.sin_port = sa.sin_port;
 
-    if((bind(io->fd, (struct sockaddr *)&io->local, sizeof(struct sockaddr))) == -1)
-    {
+    if ((bind(io->fd, (struct sockaddr *)&io->local,
+                    sizeof(struct sockaddr))) == -1) {
         fprintf(stderr, "bind: errno= ret=%d fd = %d port = %d\n",
-             errno, io->fd, ntohs(io->local.sin_port));
+             errno, (int)io->fd, (int)ntohs(io->local.sin_port));
         return -1;
     }
 
@@ -771,9 +787,11 @@ C<SEQ> sockets.
 static INTVAL
 PIO_unix_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL sec)
 {
-    if((listen(io->fd, sec)) == -1) {
+    UNUSED(layer);
+    UNUSED(interpreter);
+    if ((listen(io->fd, sec)) == -1) {
         fprintf(stderr, "listen: errno= ret=%d fd = %d port = %d\n",
-             errno, io->fd, ntohs(io->local.sin_port));
+             errno, (int)io->fd, (int)ntohs(io->local.sin_port));
         return -1;
     }
     return 0;
@@ -796,9 +814,11 @@ PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     int newsock;
     int newsize;
     ParrotIO *newio;
+
+    UNUSED(layer);
     newio = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
 
-    if((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
+    if ((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
                                   (socklen_t *)&newsize)) == -1)
     {
         fprintf(stderr, "accept: errno=%d", errno);
@@ -834,35 +854,43 @@ static INTVAL
 PIO_unix_send(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING *s)
 {
     int error, bytes, byteswrote, maxwrite;
-    bytes = string_length(s);
+
+    UNUSED(layer);
+    UNUSED(interpreter);
+    bytes = s->bufused;
     byteswrote = 0;
     maxwrite = 2048;
 AGAIN:
     /*
      * Ignore encoding issues for now.
      */
-    if((error = send(io->fd, (char *)PObj_bufstart(s) + byteswrote,
-                            PObj_buflen(s), 0)) >= 0) {
+    if ((error = send(io->fd, (char *)s->strstart + byteswrote,
+                    s->bufused, 0)) >= 0) {
         byteswrote += error;
-        if(byteswrote >= bytes) {
+        if (byteswrote >= bytes) {
             return byteswrote;
         }
-        else if(bytes - byteswrote < maxwrite) {
+        else if (bytes - byteswrote < maxwrite) {
             maxwrite = bytes - byteswrote;
         }
         goto AGAIN;
     }
     else {
         switch(errno) {
-            case EINTR:        goto AGAIN;
+            case EINTR:
+                goto AGAIN;
 #ifdef EWOULDBLOCK
-            case EWOULDBLOCK:  goto AGAIN;
+            case EWOULDBLOCK:
+                goto AGAIN;
 #else
-            case EAGAIN:       goto AGAIN;
+            case EAGAIN:
+                goto AGAIN;
 #endif
-            case EPIPE:        close(io->fd);
-                               return -1;
-            default:           return -1;
+            case EPIPE:
+                close(io->fd);
+                return -1;
+            default:
+                return -1;
         }
     }
 }
@@ -883,16 +911,18 @@ PIO_unix_recv(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING **s)
 {
     int error;
     unsigned int bytesread = 0;
-    char buf[2048+1];
+    char buf[2048];
+
+    UNUSED(layer);
 AGAIN:
-    if((error = recv(io->fd, buf, 2048, 0)) >= 0) {
-        if(error > 0)
+    if ((error = recv(io->fd, buf, 2048, 0)) >= 0) {
+        if (error > 0)
             bytesread += error;
         else {
             close(io->fd);
         }
-        *s = string_make(interpreter, buf, bytesread + 1, NULL, 0, NULL);
-        if(!*s) {
+        *s = string_make(interpreter, buf, bytesread, "iso-8859-1", 0);
+        if (!*s) {
             PANIC("PIO_recv: Failed to allocate string");
         }
 #if PIO_TRACE
@@ -900,23 +930,28 @@ AGAIN:
 #endif
         return bytesread;
     } else {
-        switch(errno) {
-            case EINTR:        goto AGAIN;
+        switch (errno) {
+            case EINTR:
+                goto AGAIN;
 #ifdef EWOULDBLOCK
-            case EWOULDBLOCK:  goto AGAIN;
+            case EWOULDBLOCK:
+                goto AGAIN;
 #else
-            case EGAIN:        goto AGAIN;
+            case EGAIN:
+                goto AGAIN;
 #endif
-            case ECONNRESET:   close(io->fd);
+            case ECONNRESET:
+                close(io->fd);
 #if PIO_TRACE
-            PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
+                PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
 #endif
-                               return -1;
-            default:           close(io->fd);
+                return -1;
+            default:
+                close(io->fd);
 #if PIO_TRACE
-            PIO_eprintf(interpreter, "recv: errno = %d\n", errno);
+                PIO_eprintf(interpreter, "recv: errno = %d\n", errno);
 #endif
-                               return -1;
+                return -1;
         }
     }
 }
@@ -948,6 +983,9 @@ PIO_unix_poll(theINTERP, ParrotIOLayer *l, ParrotIO *io, int which,
     int n;
     fd_set r, w, e;
     struct timeval t;
+
+    UNUSED(l);
+    UNUSED(interpreter);
     t.tv_sec = sec;
     t.tv_usec = usec;
     FD_ZERO(&r); FD_ZERO(&w); FD_ZERO(&e);
@@ -989,16 +1027,19 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, STRING *cmd, int flags)
 #if defined (linux) || defined (solaris)
     ParrotIO *io;
     int pid, err, fds[2];
-    char *ccmd = string_to_cstring(interpreter, cmd);
-    /* FIXME mem leak here */
+    char *ccmd;
 
-    if((err = pipe(fds)) < 0) {
+    UNUSED(interpreter);
+    UNUSED(l);
+    UNUSED(flags);
+
+    if ((err = pipe(fds)) < 0) {
         perror("pipe:");
         return NULL;
     }
 
     /* Parent - return IO stream */
-    if((pid = fork()) > 0) {
+    if ((pid = fork()) > 0) {
         io = PIO_new(interpreter, PIO_F_PIPE, 0, PIO_F_READ|PIO_F_WRITE);
         io->fd = fds[0];
         io->fd2 = fds[1];
@@ -1006,15 +1047,16 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, STRING *cmd, int flags)
     }
 
     /* Child - exec process */
-    if(pid == 0) {
+    if (pid == 0) {
         close(STDIN_FILENO);
         close(STDOUT_FILENO);
         close(STDERR_FILENO);
-        if( dup(fds[0]) != STDIN_FILENO || dup(fds[1]) != STDOUT_FILENO
+        if ( dup(fds[0]) != STDIN_FILENO || dup(fds[1]) != STDOUT_FILENO
                || dup(fds[1]) != STDERR_FILENO )
         {
             exit(0);
         }
+        ccmd = string_to_cstring(interpreter, cmd);
 
         execl(ccmd, ccmd, (char*)0);
         /* Will never reach this unless exec fails. */

@@ -143,7 +143,7 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
 #endif
 
     if ((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-        PIO_STDIN(interpreter) = new_io_pmc(interpreter, 
+        PIO_STDIN(interpreter) = new_io_pmc(interpreter,
             PIO_win32_fdopen(interpreter, layer, h, PIO_F_READ));
     }
     else {
@@ -348,7 +348,7 @@ PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
      *
      * Windows NT: The function fails if hFile is a handle to console output. That is because console output is not buffered.
      * The function returns FALSE, and GetLastError returns ERROR_INVALID_HANDLE.
-     * 
+     *
      * Windows 9x: The function does nothing if hFile is a handle to console output. That is because console output is not buffered.
      * The function returns TRUE, but it does nothing.
      */
@@ -387,7 +387,7 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     else {
         /* FIXME : An error occured */
     }
-    
+
     return 0;
 }
 
@@ -516,7 +516,7 @@ C<inet_aton()>, etc.) and take this out of platform specific compilation
 
 STRING *
 PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
-{       
+{
     struct sockaddr_in sa;
     struct hostent *he;
     /* Hard coded to IPv4 for now */
@@ -683,7 +683,7 @@ AGAIN:
         else {
             close((int)io->fd);
         }
-        *s = string_make(interpreter, buf, bytesread, "iso-8859-1", 0, NULL);
+        *s = string_make(interpreter, buf, bytesread, "iso-8859-1", 0);
         if(!*s) {
             PANIC("PIO_recv: Failed to allocate string");
         }
