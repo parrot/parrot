@@ -156,7 +156,7 @@ $WANT{until} = 'want_for_while';
 ##############################
 # Named blocks
 
-# XXX: Will not compile.
+# XXX: Most will not compile.
 my @special_blocks = qw(CATCH BEGIN END INIT AUTOLOAD
 			PRE POST NEXT LAST FIRST
 			try do);
@@ -200,27 +200,18 @@ BEGIN {
     $SOB	= qr|$Parse::RecDescent::skip(?<![^\n\s]){|o;
     $HYPE	= qr/\^?/;
     $NAMEPART	= qr/[a-zA-Z_][\w_]*/;
-    $COMPARE	= qr{cmp | eq | [gnl]e | [gl]t
-		     | <=> | [<>=!]= | < | > }x;
-    $CONTEXT	= qr{[\%\@\$\&*_?] | \+(?!\+)}x;
-    $MULDIV	= qr{[\%*x] | /(?!/)}x;
+    $COMPARE	= qr{cmp|eq|[gnl]e|[gl]t|<=>|[<>=!]=|<|>};
+    $CONTEXT	= qr{[\%\@\$\&*_?]|\+(?!\+)};
+    $MULDIV	= qr{[\%*x]|/(?!/)};
     $MATCH	= qr{[=!]~};
-    $INCR	= qr{\+\+ | --}x;
-    $PREFIX	= qr{[!~\\] | -(?![->])}x;
+    $INCR	= qr{\+\+|--};
+    $PREFIX	= qr{[!~\\]|-(?![->])};
     $ADDSUB	= qr{[-+_]};
-    $BITSHIFT	= qr{<< | >>}x;
-    $LOG_OR	= qr{x?or | err}x;
-    $LOGOR	= qr{\|\| | ~~ | //}x;
+    $BITSHIFT	= qr{<<|>>};
+    $LOG_OR	= qr{x?or|err};
+    $LOGOR	= qr{\|\||~~|//};
     $FILETEST	= qr{-[rwxoRWXOezsfdlpSbctugkTBMAC]+};
-    $ASSIGN	= qr{(?:
-		     ! | :	# != and :=
-		     | //
-		     | &&? | \|\|? | ~~?
-		     | << | >>
-		     | $ADDSUB
-		     | $MULDIV
-		     | \*\*
-		    )? =}x;
+    $ASSIGN	= qr{(?:!|:|//|&&?|\|\|?|~~?|<<|>>|$ADDSUB|$MULDIV|\*\*)?=};
 }
 
 # HACK to distinguish between "my ($a, $b) ..." and "foo ($a, $b)".
@@ -333,14 +324,14 @@ apply_rhs:	  namepart <commit> subscript(s?)
 		| subscript(s)
 
 apply:		  <leftop: term apply_op apply_rhs>
-apply_op:	  /$HYPE \./xo
+apply_op:	  /$HYPE\./o
 
 incr:		  incr_op <commit> apply
 		| apply incr_op(?)
-incr_op:	  /$HYPE $INCR/xo
+incr_op:	  /$HYPE$INCR/o
 
 pow:		  <leftop: incr pow_op prefix>
-pow_op:		  /$HYPE \*\*/ox
+pow_op:		  /$HYPE\*\*/o
 
 prefix:		  filetest_op <commit> prefix
 		| prefix_op <commit> prefix
@@ -348,7 +339,7 @@ prefix:		  filetest_op <commit> prefix
 		| pow
 
 # prefix_op:	  '!' | '~' | '\\' | /-(?![->])/
-prefix_op:	  /$HYPE $PREFIX/ox
+prefix_op:	  /$HYPE$PREFIX/o
 filetest_op:	  /$FILETEST/o
 
 pair:		  namepart '=>' <commit> prefix
@@ -357,36 +348,36 @@ maybe_pair:	  namepart '=>' <commit> prefix
 		| prefix ('=>' prefix)(?)
 
 match:		  <leftop: maybe_pair match_op maybe_pair>
-match_op:	  /$HYPE $MATCH/xo
+match_op:	  /$HYPE$MATCH/o
 
 muldiv:		  <leftop: match muldiv_op match>
 # muldiv_op:	  '*' | '/' | '%' | 'x'
-muldiv_op:	  /$HYPE $MULDIV/ox
+muldiv_op:	  /$HYPE$MULDIV/o
 
 addsub:		  <leftop: muldiv addsub_op muldiv>
 # addsub_op:	  '+' | '-' | '_'
-addsub_op:	  /$HYPE $ADDSUB/ox
+addsub_op:	  /$HYPE$ADDSUB/o
 
 bitshift:	  <leftop: addsub bitshift_op addsub>
-bitshift_op:	  /$HYPE $BITSHIFT/xo
+bitshift_op:	  /$HYPE$BITSHIFT/o
 
 compare:	  <leftop: bitshift compare_op bitshift>
-compare_op:	  /$HYPE $COMPARE/ox
+compare_op:	  /$HYPE$COMPARE/o
 # compare_op:	  '<=>' | '<=' | '==' | '>=' | '<' | '>' | '!='
 # 		| 'eq' | 'ge' | 'ne' | 'le' | 'lt' | 'gt' | 'cmp'
 
 bitand:		  <leftop: compare bitand_op compare>
-bitand_op:	  /$HYPE &(?!&)/ox
+bitand_op:	  /$HYPE&(?!&)/o
 
 bitor:		  <leftop: bitand bitor_op bitand>
-bitor_op:	  /$HYPE ([|~])(?!\1)/ox
+bitor_op:	  /$HYPE([|~])(?!\1)/o
 
 logand:		  <leftop: bitor logand_op bitor>
-logand_op:	  /$HYPE &&/ox
+logand_op:	  /$HYPE&&/o
 
 logor:		  <leftop: logand logor_op logand>
 # logor_op:	  '||' | '~~' | '//'
-logor_op:	  /$HYPE $LOGOR/ox
+logor_op:	  /$HYPE$LOGOR/o
 
 range:		  logor (range_op logor)(?)
 range_op:	  '..'
@@ -416,7 +407,7 @@ assign_lhs:	  scope_class decl
 		| ternary
 assign_rhs:	  assign_op scalar_expr
 
-assign_op:	  /$HYPE $ASSIGN/ox
+assign_op:	  /$HYPE$ASSIGN/o
 # assign_op:	  /[!:]?=/ <commit>
 # 		| assignable_op <skip:''> '='
 # assignable_op:	  '//'
@@ -440,11 +431,11 @@ adverb:		  comma adv_clause(?)
 adv_clause:	  /:(?!:)/ comma['scalar_expr']
 
 log_AND:	  <leftop: adverb log_AND_op adverb>
-log_AND_op:	  /$HYPE and/xo
+log_AND_op:	  /${HYPE}and/o
 
 log_OR:		  <leftop: log_AND log_OR_op log_AND>
 # log_OR_op:	  'or' | 'xor' | 'err'
-log_OR_op:	  /$HYPE $LOG_OR/ox
+log_OR_op:	  /$HYPE$LOG_OR/o
 
 expr:		  log_OR
 

@@ -11,13 +11,14 @@ use SelfLoader;
 use P6C::IMCC ':all';
 use P6C::Util qw(diag is_array_expr unimp);
 require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(do_hyped);
+use vars qw(@ISA @EXPORT_OK);
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(do_hyped);
 
 # XXX: We go through typed registers instead of PMC registers for some
 # hyped operators.  Not sure if this is a good idea.
 
-our %optype;
+use vars '%optype';
 BEGIN {
     my %opmap = (int => [ qw(>> << | & ~ ~~)],
 		 num => [ qw(+ - * / % **)],

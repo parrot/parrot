@@ -42,11 +42,15 @@ parents before children.  The current node will be in C<$_>.
 =cut
 
 require Exporter;
-our @EXPORT_OK = qw(unimp diag error warning
-		    flatten_leftop map_tree
-		    is_scalar is_array_expr same_type is_pmc);
-our %EXPORT_TAGS = (all => [@EXPORT_OK] );
-our @ISA = qw(Exporter);
+use vars qw(@EXPORT_OK %EXPORT_TAGS @ISA);
+BEGIN {
+@EXPORT_OK = qw(unimp diag error warning
+		flatten_leftop map_tree
+		is_scalar is_array_expr same_type is_pmc);
+%EXPORT_TAGS = (all => [@EXPORT_OK] );
+@ISA = qw(Exporter);
+}
+
 use strict;
 
 sub _info {
@@ -67,6 +71,10 @@ sub diag {
 
 sub error {
     _info 'error', @_;
+}
+
+sub warning {
+    _info 'warning', @_;
 }
 
 sub flatten_leftop {
@@ -162,7 +170,6 @@ sub is_scalar {
 
 sub is_pmc {
     my $t = shift;
-    print STDERR "primitive $t?\n";
     return !exists $isprimitive{$t};
 }
 

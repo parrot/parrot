@@ -14,11 +14,10 @@ use P6C::Parser;
 
 sub declare {
     my $hash = shift;
-    $hash->{print1} = new P6C::IMCC::Sub args => [['PerlUndef', 'a']];
-    $P6C::Context::CONTEXT{print1} = new P6C::Context type => 'PerlUndef';
-
-    $hash->{exit} = new P6C::IMCC::Sub args => [['PerlUndef', 'a']];
-    $P6C::Context::CONTEXT{exit} = new P6C::Context type => 'PerlUndef';
+    for (qw(print1 exit)) {
+	$hash->{$_} = new P6C::IMCC::Sub args => [['PerlUndef', 'a']];
+	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'PerlUndef';
+    }
 
     for (qw(print warn die)) {
 	$P6C::Context::CONTEXT{$_} = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
@@ -70,10 +69,41 @@ end
 ret
 
 _die:
-bsr _print
-print "\nDied.\n"
-end
-ret
+    pushp
+    pushi
+    # setup $!:
+    new P0, .PerlString
+    restore P3
+    set I0, P3
+    eq I0, 0, _die_unknown
+    new P1, .PerlString
+    set I1, 0
+_die_loopstart:
+    eq I0, I1, _die_loopend
+    set P1, P3[I1]
+    concat P0, P0, P1
+    inc I1
+    branch _die_loopstart
+_die_unknown:
+    set P0, "Unknown error."
+_die_loopend:
+    store_global P0, "_SV__BANG_"
+    # Look for a CATCH handler:
+    find_global P1, "_AV_catchers"
+    set I0, P1
+    eq I0, 0, _die_nohandler
+
+    dec I0
+    set P0, P1[I0]
+    set P1, I0
+    store_global P1, "_AV_catchers"
+    callcc P0
+    print "shouldn't be here\n"
+_die_nohandler:
+    print P0
+    print "\nDied (no handler).\n"
+    end
+    ret
 
 _warn:
 bsr _print
@@ -89,9 +119,37 @@ popp
 ret
 
 __setup:
-new P0, .PerlArray
-store_global P0, "_AV_catchers"
-ret
+    pushp
+    new P0, .PerlArray
+    store_global P0, "_AV_catchers"
+    new P0, .PerlUndef
+    store_global P0, "_SV__BANG_"
+    popp
+    ret
+
+__install_catch:
+    pushp
+    pushi
+    capturecc P0
+    find_global P2, "_AV_catchers"
+    set I1, P2
+    set P2[I1], P0
+    store_global P2, "_AV_catchers"
+    popi
+    popp
+    ret
+
+__pop_catch:
+    pushp
+    pushi
+    find_global P2, "_AV_catchers"
+    set I1, P2
+    dec I1
+    set P2, I1
+    store_global P2, "_AV_catchers"
+    popi
+    popp
+    ret
 
 .eom
 

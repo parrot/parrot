@@ -4,9 +4,11 @@ use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
 require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT = qw(slow_pow do_logand do_logor do_defined do_concat do_repeat
-		 do_range);
+use vars '@ISA';
+@ISA = qw(Exporter);
+use vars '@EXPORT';
+@EXPORT = qw(slow_pow do_logand do_logor do_defined do_concat do_repeat
+	     do_range);
 
 sub slow_pow ;
 sub do_logand ;
@@ -133,10 +135,10 @@ sub do_range {
 	# temporaries to create new values.
 	my $ret = newtmp 'PerlArray';
 	my $itmp = gentmp 'int';
-	my $vtmp = gentmp 'int';
 	my $lval = $x->l->val;
 	my $rval = $x->r->val;
 	my $val = newtmp;
+	my $vtmp = gentmp 'PerlUndef';
 	my $start = genlabel 'range_start';
 	my $end = genlabel 'range_end';
 	code(<<END);
@@ -144,7 +146,7 @@ sub do_range {
 	$itmp = 0
 $start:
 	if $val > $rval goto $end
-	$vtmp = $val
+	$vtmp = clone $val
 	$ret\[$itmp] = $vtmp
 	inc $val
 	inc $itmp
@@ -168,12 +170,12 @@ END
 	my $lval = $x->l->val;
 	my $rval = $x->r->val;
 	my $end = genlabel 'range_end';
-	my $vtmp = gentmp 'int';
+	my $vtmp = gentmp 'PerlUndef';
 	for my $i (0 .. $#{$ctx->type}) {
 	    # XXX: promoting everything to PMC registers.
 	    code(<<END);
 	if $lval > $rval goto $end
-	$vtmp = $lval
+	$vtmp = clone $lval
 	$ret[$i] = $vtmp
 	inc $lval
 END

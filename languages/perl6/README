@@ -26,13 +26,13 @@ Before you begin, make sure that imcc (../imcc) is compiled.  Typing
 "make" should do this.
 
 Then, type "make test".  All the compiler test cases pass on my
-machine (Linux PPC, Perl 5.6.1 and 5.8.0 RC 1), and compile in less
-than five seconds each.  However, your mileage may vary for a number
-of reasons:
+machine (except where noted in ChangeLog), and compile in less than
+five seconds each.  However, your mileage may vary for a number of
+reasons:
 
 - The parser may be unusably slow on Windows.
-- The parser will either not work or generate unusable code on
-  Perl < 5.6.
+- your version of IMCC may be less hacked than mine (see the ChangeLog
+  for what this should affect).
 
 Take a look at t/compiler/*.t for an idea of the kinds of operations
 currently supported.  For more internal details, see the POD
@@ -65,3 +65,4 @@ Contributors
 
 John Kingsley		Numerous bug fixes to the parser, parser
 			tests.
+Leopold Toetsch		5.005_03 compatibility fixes.

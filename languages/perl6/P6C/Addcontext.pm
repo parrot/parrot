@@ -406,6 +406,10 @@ BEGIN {
 	= $P6C::Context::CONTEXT{until} # = \&while_context;
 	   = new P6C::Context type => ['bool', 'void'];
     $P6C::Context::CONTEXT{print1} = new P6C::Context type => ['PerlUndef'];
+
+    for (qw(try do CATCH BEGIN END INIT AUTOLOAD PRE POST NEXT LAST FIRST)) {
+	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'void';
+    }
 }
 
 # Lookup context for a prefix operator.  If the sub hasn't been

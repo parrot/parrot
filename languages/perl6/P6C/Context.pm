@@ -107,9 +107,7 @@ use strict;
 use P6C::Util qw(diag unimp same_type);
 use Class::Struct 'P6C::Context' => { qw(type $ flatten $ hype $) };
 
-our %CONTEXT;
-
-our $DEFAULT_ARGUMENT_CONTEXT;
+use vars qw(%CONTEXT $DEFAULT_ARGUMENT_CONTEXT);
 
 BEGIN {
     $DEFAULT_ARGUMENT_CONTEXT

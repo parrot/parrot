@@ -6,8 +6,12 @@ use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
 require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(%prefix_ops val_noarg gen_sub_call common_while);
+use vars qw(@ISA @EXPORT_OK);
+BEGIN {
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(%prefix_ops val_noarg gen_sub_call common_while
+		wrap_with_catch);
+}
 
 sub prefix_if ;
 sub common_while ;
@@ -16,8 +20,11 @@ sub gen_sub_call ;
 sub prefix_for ;
 sub prefix_neg ;
 sub prefix_foreach ;
+sub prefix_try ;
 
-our %prefix_ops =
+use vars '%prefix_ops';
+BEGIN {
+%prefix_ops =
 (
  'if' => \&prefix_if,
  'unless' => \&prefix_if,
@@ -25,8 +32,10 @@ our %prefix_ops =
  'until' => \&prefix_while,
  'for' => \&prefix_for,
  'foreach' => \&prefix_foreach,
+ 'try' => \&prefix_try,
  '-' => \&prefix_neg,
 );
+}
 
 1;
 
@@ -203,7 +212,7 @@ END
 	@vars = @{$vars[0]};
 	my $nstreams = @$streams;
 	my $valsrc = newtmp 'PerlArray'; # value streams.
-	my $tmpsrc = newtmp 'PerlUndef'; # temp for stream.
+	my $tmpsrc = gentmp 'PerlUndef'; # temp for stream.
 	my $stream = gentmp 'int';	# index into streams.
 	my $streamoff = gentmp 'int'; # offset within streams.
 	my $streamlen = gentmp 'int'; # length of shortest stream.
@@ -376,3 +385,35 @@ END
     return undef;
 }
 
+sub wrap_with_catch {
+    my ($block, $catcher) = @_;
+    my $ptmp = gentmp 'PerlUndef';
+    my $died = genlabel 'death';
+    my $endblock = genlabel 'block_end';
+    code(<<END);
+	call __install_catch
+	$ptmp = global "_SV__BANG_"
+	if $ptmp goto $died
+END
+    val_noarg($block);
+    code(<<END);
+	goto $endblock
+$died:
+END
+    if ($catcher) {
+	print STDERR "wrapping catcher with block\n";
+	val_noarg($catcher);
+    }
+    code(<<END);
+	$ptmp = new PerlUndef
+	global "_SV__BANG_" = $ptmp
+$endblock:
+	call __pop_catch
+END
+    return undef;
+}
+
+sub prefix_try {
+    my ($x) = @_;
+    wrap_with_catch($x->args, undef);
+}

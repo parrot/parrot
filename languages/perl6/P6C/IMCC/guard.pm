@@ -2,8 +2,9 @@ package P6C::IMCC::guard;
 use SelfLoader;
 use P6C::IMCC ':all';
 require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(guard_if guard_while);
+use vars qw(@ISA @EXPORT_OK);
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(guard_if guard_while);
 
 sub guard_if ;
 sub guard_while ;

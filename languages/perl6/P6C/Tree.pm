@@ -768,7 +768,7 @@ sub P6C::maybe_comma::tree {
     if (@$x == 3) {
 	return $x->[2]->tree;
     }
-    return undef;
+    return new P6C::ValueList vals => [];
 }
 
 ##############################
