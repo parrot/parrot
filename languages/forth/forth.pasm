@@ -211,6 +211,9 @@ InitializeCoreOps:
     set .LastCellUsed, 0
     new .LabelStack, .PerlArray
     set .LastConstant, 0
+    new .TempPMC, .Integer # Cell 0 holds the current base
+    set .TempPMC, 10
+    set .CellPMC[0], .TempPMC
 
     store_global "__forth::CoreOps", .CoreOps
     store_global "__forth::UserOps", .UserOps
@@ -226,7 +229,9 @@ InitializeCoreOps:
     set .SpecialWords["+loop"], 9
     set .SpecialWords["compile,"], 10
     set .SpecialWords['p"'], 11
+    .AddCoreOp(Parrot_String, 'p"') # Has a dual life
     set .SpecialWords["recurse"], 12
+    set .SpecialWords['."'], 13
 
     .AddCoreOp(Thing_Dot,".")
     .AddCoreOp(Thing_Dot, "u.")
@@ -246,6 +251,7 @@ InitializeCoreOps:
     .AddCoreOp(Int_Abs,"abs")
     .AddCoreOp(Int_Min,"min")
     .AddCoreOp(Int_Max,"max")
+    .AddUserOp("base", "0")
 
     #
     # Arithmetic, Double precision
@@ -502,6 +508,9 @@ InitializeCoreOps:
 # df@
 # df!
 
+    .AddUserOp("decimal", "10 0 !")
+    .AddUserOp("hex", "16 0 !")
+
     #
     # Memory, Address arithmetic
     #
@@ -685,6 +694,68 @@ InitializeCoreOps:
 
 #------------------------------------------------------------------------------
 #
+# Check to see if .CurrentWord is a number.
+#
+IsWordNumber:
+    pushi
+
+.constant CVOffset	I0
+.constant CVLength	I1
+.constant CVBase	I2
+.constant CVDigit	I3
+.constant CVTotal	I4
+.constant CVNegative	I5
+
+    set .NumStack, 0
+    # First, get the base
+    set .TempPMC, .CellPMC[0]
+    set .CVBase, .TempPMC
+ 
+    # Next look for signs of a float
+    index .TempInt, .CurrentWord, "."
+    ne .TempInt, -1, ConvertFloat
+
+ConvertInt:
+    eq .TempInt2, 10, ConvertDecimal
+
+ConvertDecimal:
+    # Okay, base 10. We can handle that.
+    set .CVTotal, 0
+    set .CVOffset, 0
+#    length .CVLength, 
+ decimalloop:
+    set .NumStack, .CurrentWord
+    branch WordIsNumber    
+
+ConvertFloat:
+    # Format of a float is:
+ checkfloatsign:
+ checkfloatdigit:
+ checkfloatdecimal:
+ checkE:
+ checkESign:
+ checkEDigit:
+
+WordIsNumber:
+  set .TempInt, 1
+  save .NumStack
+  save .TempInt
+  branch DoneWordIsNumber
+
+WordIsNotNumber:
+  set .TempInt, 0
+  save .NumStack
+  save .TempInt
+  branch DoneWordIsNumber
+
+DoneWordIsNumber:
+  popi
+  restore .IntStack
+  restore .NumStack
+  ret
+
+#------------------------------------------------------------------------------
+#
 # Test Interpret routine
 #
 Interpret:
@@ -749,6 +820,10 @@ FillCompileBuffer:
 EndCompileWord:
     branch DoneInterpretWord
 MaybeInterpretWord:
+#    bsr IsWordNumber
+#    unless .IntStack, NotNum
+#    .PushNum
+#    branch DoneInterpretWord
     set .IntStack, .CurrentWord
     length .TempInt, .CurrentWord
     dec .TempInt
@@ -758,6 +833,7 @@ MaybeInterpretWord:
     gt .TempInt, 58, NotInt
     ne .IntStack, 0, PushInt
     eq .CurrentWord, "0", PushInt
+ 
 
 NotInt:
     ne .CurrentWord, "'", NotTick
@@ -1468,6 +1544,14 @@ Get_Time:
     .PushNum
     branch DoneInterpretWord
 
+Parrot_String:
+    # Okay, we need to yank the string out of the input stream
+    bsr CollectToQuote
+    new .PMCStack, .PerlString
+    set .PMCStack, .CurrentWord
+    save .PMCStack
+    branch DoneInterpretWord
+
 DoneInterpretWord:
     ret
 
@@ -1758,7 +1842,6 @@ AddSpecialWord:
     bsr EatLeadingWhitespace
     bsr CollectToQuote
 
-   GotConstant:
     inc .LastConstant
     set .ConstantTable[.LastConstant], .CurrentWord
     concat .NewBodyString, "set S31, P15["
@@ -1776,6 +1859,21 @@ AddSpecialWord:
     branch EndSpecWord    
 
   NotRecurse:
+    ne .CurrentWord, '."', NotPrintString
+
+    # Okay, we need to yank the string out of the input stream
+    bsr EatLeadingWhitespace
+    bsr CollectToQuote
+
+    inc .LastConstant
+    set .ConstantTable[.LastConstant], .CurrentWord
+    concat .NewBodyString, "set P31, P15["
+    set .TempString, .LastConstant
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, "]\n"
+    concat .NewBodyString, "print P31\n"
+    branch EndSpecWord
+
     branch EndSpecWord
 
 
