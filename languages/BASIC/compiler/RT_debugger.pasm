@@ -28,6 +28,8 @@ DEBUGGER_STEP:
 	#  p,var	-- display var's value (no arrays yet)
 	#  aw,var	-- add var to watchlist
 	#  dw,var	-- delete var from watchlist
+	#  pw		-- print watches
+	#  daw		-- delete all watches
 DEBUGGER_COMMAND:
 	print .LINE
 	print "->"
