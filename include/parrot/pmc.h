@@ -70,7 +70,11 @@ typedef enum {
     PMC_is_PMC_ptr_FLAG     = 1 << 11,
     /* Set to true if the PMC has a private GC function. For PMCs the
        GC system can't snoop into */
-    PMC_private_GC_FLAG     = 1 << 12
+    PMC_private_GC_FLAG     = 1 << 12,
+    /* Are we live? */
+    PMC_live_FLAG           = 1 << 13,
+    /* Are we on the free list */
+    PMC_on_free_list_FLAG   = 1 << 14
 } PMC_flags;
 
 /* XXX add various bit test macros once we have need of them */

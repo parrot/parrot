@@ -39,13 +39,14 @@ void Parrot_go_collect(struct Parrot_Interp *);
 void buffer_lives(Buffer *);
 
 #define STRING_HEADERS_PER_ALLOC 128
+#define PMC_HEADERS_PER_ALLOC 128
 
 struct PMC_Arena {
     UINTVAL free;         /* Count of PMCs free in this arena */
     UINTVAL used;         /* Count of PMCs used in this arena */
     struct PMC_Arena *prev;
     struct PMC_Arena *next;
-    PMC *next_PMC;        /* Next PMC in the arena ready to allocate */
+    PMC *start_PMC;        /* Next PMC in the arena ready to allocate */
     UINTVAL *GC_data;     /* Actually an array with one element per PMC */
 };
 
@@ -59,6 +60,12 @@ struct STRING_Arena {
 
 /* The free string header pool */
 struct STRING_free_pool {
+    Buffer pool_buffer;
+    UINTVAL entries_in_pool;
+};
+    
+/* The free PMC header pool */
+struct PMC_free_pool {
     Buffer pool_buffer;
     UINTVAL entries_in_pool;
 };
@@ -77,6 +84,7 @@ struct Arenas {
     struct STRING_Arena *last_STRING_Arena;
     struct Memory_Pool *memory_pool;
     struct STRING_free_pool *string_header_pool;
+    struct PMC_free_pool *pmc_pool;
     UINTVAL collections;
 };
 
