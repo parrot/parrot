@@ -989,8 +989,22 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
 #  define INT_REGISTERS_TO_MAP 10
 #  define FLOAT_REGISTERS_TO_MAP 0
 
+/* XXX NOTE before actually mapping things
+
+   1: currently the code has r4  (INTERP_STRUCT_ADDR_REG) is in use
+   2: r12 is trashed over any function call
+   3: currently the entry code doesn't save r5,r6,r7,r8 (or r9) - if the
+      mapping code uses them then it must arrange to save (and restore them)
+
+   and as we're not generating re-entrant code (I assume) surely we can also
+   map r9?
+
+   NWC
+*/
 char intval_map[INT_REGISTERS_TO_MAP] =
     { r0, r1, r2, r3, r4, r5, r6, r7, r8, r12 };
+
+char *floatval_map = 0;
 
 static void
 arm_sync_d_i_cache (void *start, void *end) {
