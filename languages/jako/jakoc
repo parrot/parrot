@@ -1103,7 +1103,7 @@ sub map_args
   my @result;
 
   foreach my $arg (@args) {
-    die "map_args(): Undefined argument in array!\n" unless defined $arg;
+    confess "map_args(): Undefined argument in array!\n" unless defined $arg;
 
     $arg =~ s/^\s+//;
     $arg =~ s/\s+$//;
@@ -1166,8 +1166,10 @@ sub void_func
 
   if ($name eq 'print') {
     foreach my $arg (@args) {
-      emit_code($name, [$arg]);
+      emit_code('print', [$arg]);
     }
+  } elsif ($name eq 'sleep') {
+    emit_code('sleep', [ shift @args ]); # TODO: Really need to complain if > 1 arg.
   } elsif (exists $subs{$name}) {
     #
     # First, we make sure everything is in order for the call:
@@ -1316,7 +1318,7 @@ sub begin_cond_block
     } elsif ($type eq 'if') {
       push_label "${name}_TEST";
     } else {
-      die;
+      confess;
     }
 
     if ($type eq 'while') {
