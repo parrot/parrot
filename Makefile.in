@@ -51,7 +51,7 @@ memory$(O): $(H_FILES)
 
 bytecode$(O): $(H_FILES)
 
-packfile$(0): $(H_FILES)
+packfile$(O): $(H_FILES)
 
 parrot$(O): $(H_FILES)
 
