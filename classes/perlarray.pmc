@@ -72,7 +72,6 @@ pmclass PerlArray {
 	PMC ** array;
 	PMC * element;
 
-	fprintf(stderr, "Marking perlarray %p\n", SELF);
 	array = ((Buffer *) SELF->data)->bufstart;
 	for (i = 0; i < SELF->cache.int_val; i++) {
 	    if (array[i] != NULL)
