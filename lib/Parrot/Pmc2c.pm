@@ -72,7 +72,7 @@ sub init() {
 
 sub class_name {
     my ($self, $class) = @_;
-    my %special = ( 'Ref' => 1, 'default' => 1 );
+    my %special = ( 'Ref' => 1, 'default' => 1, 'Null' => 1 );
     my $classname = $self->{class};
     my $nclass = $class;
     # bless object into different classes inheriting from
@@ -577,6 +577,39 @@ ${decl} {
 	internal_exception(ILL_INHERIT,
 		"$meth() not implemented in class '%s'",
 		caller(interpreter, pmc));
+        $ret
+}
+
+EOC
+}
+
+# null.pmc throws an execption for all meths
+package Parrot::Pmc2c::Null;
+use base 'Parrot::Pmc2c';
+import Parrot::Pmc2c qw( gen_ret );
+
+sub implements
+{
+    1;
+}
+
+sub body
+{
+    my ($self, $method, $line) = @_;
+    my $meth = $method->{meth};
+    my $decl = $self->decl($self->{class}, $method, 0);
+    my $l = "";
+    my $ret = gen_ret($method);
+    unless ($self->{opt}{nolines}) {
+        $l = <<"EOC";
+#line $line "null.c"
+EOC
+    }
+    return <<EOC;
+$l
+${decl} {
+	internal_exception(NULL_REG_ACCESS,
+		"Null PMC access in $meth()");
         $ret
 }
 

@@ -1,5 +1,6 @@
 O = ${o}
 RM_F = ${rm_f}
+TOUCH  = $(PERL) -e ${PQ}$$n=time; utime $$n,$$n,@ARGV${PQ}
 
 INC=../include/parrot
 
@@ -18,17 +19,40 @@ C_LIBS = ${libs}
 CC = ${cc}
 PERL = ${perl}
 MAKE_F=${make}
-PMC2C=$(PERL) pmc2c.pl
+PMC2C_old=$(PERL) pmc2c.pl
+
+PMC2CD=$(PERL) pmc2c2.pl --dump
+PMC2CC=$(PERL) pmc2c2.pl --c --no-lines
+
+PMC2C=$(PMC2CC)
+
+.SUFFIXES: .c .h .pmc .dump $(O)
 
 .c$(O):
 	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
-all : $(O_FILES)
+.pmc.dump:
+	$(PMC2CD) *.pmc
+
+all : dumps $(O_FILES) fin
+
+dumps: ../vtable.dump $(DUMP_FILES)
+	$(PMC2CD) *.pmc
+
+# main depends on $(O_FILES)
+# when 1 is recompiled each other is out of data, but not
+# to the rules inside here, so we touch all O_FILES at the
+# end and avoid getting called ever and ever
+fin:
+	$(TOUCH) $(O_FILES)
+
+../vtable.dump: ../vtable.tbl
+	$(PERL) pmc2c2.pl --vt
 
 ${pmc_build}
 
 clean:	progclean
-	$(RM_F) *.c *.h
+	$(RM_F) *.c *.h *.dump
 
 progclean:
 	$(RM_F) *$(O)
