@@ -13,13 +13,14 @@ t/op/jitn.t - JIT register allocation
 
 =head1 DESCRIPTION
 
-Tests JIT register allocation.
+Tests JIT register allocation. These tests are written for four mappable
+registers.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 13;
 
-output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1,2,3 mapped");
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1,2,3 mapped");
 set N0,0
 set N1,1
 set N2,2
@@ -37,7 +38,22 @@ CODE
 2.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1,2 mapped");
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_i 1,2,3 mapped");
+set N0,0
+set N1,1
+set I2,2
+sub N0,N1,I2
+print N0
+print "\n"
+print N1
+print "\n"
+end
+CODE
+-1.000000
+1.000000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1,2 mapped");
 set N0,0
 set N1,1
 set N2,2
@@ -61,7 +77,7 @@ CODE
 4.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1,3 mapped");
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1,3 mapped");
 set N0,0
 set N1,1
 set N2,2
@@ -85,7 +101,29 @@ CODE
 1.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 2,3 mapped");
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_i 1,3 mapped");
+set N0,0
+set I1,1
+set N1,1
+set N2,2
+set N3,3
+set N4,4
+set N0,N1
+set N2,N3
+set N0,N1
+set N2,N3
+sub N0,N4,I1
+print N0
+print "\n"
+print N4
+print "\n"
+end
+CODE
+3.000000
+4.000000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 2,3 mapped");
 set N0,0
 set N1,1
 set N2,2
@@ -109,7 +147,32 @@ CODE
 1.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1 mapped");
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_i 2,3 mapped");
+set N0,0
+set N1,1
+set I1,1
+set N2,2
+set N3,3
+set N4,4
+set N0,N1
+set N2,N3
+set N0,N1
+set N2,N3
+sub N4,N0,I1
+print N4
+print "\n"
+print N0
+print "\n"
+print N1
+print "\n"
+end
+CODE
+0.000000
+1.000000
+1.000000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1 mapped");
 set N0,0
 set N1,1
 set N2,2
@@ -133,7 +196,7 @@ CODE
 4.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 2 mapped");
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 2 mapped");
 set N0,0
 set N1,1
 set N2,2
@@ -157,7 +220,7 @@ CODE
 4.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 3 mapped");
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 3 mapped");
 set N0,0
 set N1,1
 set N2,2
@@ -181,7 +244,7 @@ CODE
 4.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped");
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 0 mapped");
 set N0,0
 set N1,1
 set N2,2
@@ -205,7 +268,7 @@ CODE
 4.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i mapped same");
+output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n mapped same");
 set N2, 1
 add N2, N2, N2	# reserve first reg
 add N2, N2, N2

@@ -736,8 +736,13 @@ TEMPLATE Parrot_op_n_n_i {
         else {
             jit_emit_mov_RM_n(NATIVECODE, FSR1, ROFFS_NUM(2));
         }
-        jit_emit_<op>_RM_ni(NATIVECODE, ISR1, ROFFS_INT(3));
-        jit_emit_mov_MR_n(NATIVECODE, ROFFS_NUM(1), FSR1);
+        jit_emit_<op>_RM_ni(NATIVECODE, FSR1, ROFFS_INT(3));
+        if (MAP[1]) {
+            jit_emit_mov_rr_n(NATIVECODE, MAP[1], FSR1);
+        }
+        else {
+            jit_emit_mov_MR_n(NATIVECODE, ROFFS_NUM(1), FSR1);
+        }
     }
 }
 
