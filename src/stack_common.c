@@ -38,7 +38,6 @@ cst_new_stack(Interp *interpreter, const char *name, size_t item_size,
     Stack_Chunk_t *chunk = new_bufferlike_header(interpreter,
             sizeof(Stack_Chunk_t));
 
-    SET_NULL(chunk->bufstart);
     SET_NULL(chunk->next);
     SET_NULL(chunk->prev);
     chunk->n_chunks = 1;
@@ -158,6 +157,7 @@ stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 	    if (PObj_get_FLAGS((Buffer*)chunk->next) & PObj_private0_FLAG) {
 		new_chunk = cst_new_stack(interpreter, chunk->name,
 		    chunk->item_size, chunk->items_per_chunk);
+                new_chunk->prev = chunk;
 		chunk->next = new_chunk;
 	    }
             *stack_p = chunk = chunk->next;
@@ -202,7 +202,7 @@ stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 	assert(!PObj_COW_TEST( (Buffer *) chunk));
     }
     if (chunk->used == 0) {
-        internal_exception(ERROR_STACK_EMPTY, "No entries on %sStack!\n",
+        internal_exception(ERROR_STACK_EMPTY, "No entries on %sStack!",
                 chunk->name);
     }
     return (char*) chunk->bufstart + --chunk->used * chunk->item_size;

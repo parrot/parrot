@@ -84,7 +84,7 @@ new_stack(Interp *interpreter, const char *name)
 
 =item C<void
 mark_stack(struct Parrot_Interp *interpreter,
-           Stack_Chunk_t *cur_stack)>
+           Stack_Chunk_t *chunk)>
 
 Mark entries in a stack structure during GC.
 
@@ -94,16 +94,18 @@ Mark entries in a stack structure during GC.
 
 void
 mark_stack(struct Parrot_Interp *interpreter,
-           Stack_Chunk_t *cur_stack)
+           Stack_Chunk_t *chunk)
 {
     Stack_Entry_t *entry;
     size_t i;
 
-    for (; cur_stack; cur_stack = cur_stack->prev) {
+    for (; chunk && chunk->prev; chunk = chunk->prev)
+        ;
+    for (; chunk; chunk = chunk->next) {
 
-        pobject_lives(interpreter, (PObj *)cur_stack);
-        entry = (Stack_Entry_t *)(cur_stack->bufstart);
-        for (i = 0; i < cur_stack->used; i++) {
+        pobject_lives(interpreter, (PObj *)chunk);
+        entry = (Stack_Entry_t *)(chunk->bufstart);
+        for (i = 0; i < chunk->used; i++) {
             switch (entry[i].entry_type) {
                 case STACK_ENTRY_PMC:
                     if (entry[i].entry.pmc_val) {

@@ -48,18 +48,6 @@ struct PRegFrame {
     PMC *registers[NUM_REGISTERS/2];
 };
 
-struct RegStack {
-    struct RegisterChunkBuf* top;
-    size_t frame_size;
-};
-
-/* Base class for the RegChunk types */
-struct RegisterChunkBuf {
-    Buffer data;
-    size_t used;
-    struct RegisterChunkBuf* next;
-};
-
 struct IRegChunkBuf {
     struct IRegFrame IRegFrame[FRAMES_PER_CHUNK];
 };
@@ -76,15 +64,14 @@ struct PRegChunkBuf {
     struct PRegFrame PRegFrame[FRAMES_PER_CHUNK];
 };
 
+struct Stack_Chunk;
 void setup_register_stacks(struct Parrot_Interp* interpreter);
-void mark_register_stack_cow(struct Parrot_Interp* interpreter,
-                             struct RegStack* stack);
-void mark_pmc_register_stack(struct Parrot_Interp* interpreter, 
-                             struct RegStack* stack);
+void mark_pmc_register_stack(struct Parrot_Interp* interpreter,
+                             struct Stack_Chunk* stack);
 void mark_string_register_stack(struct Parrot_Interp* interpreter,
-                                struct RegStack* stack);
+                                struct Stack_Chunk* stack);
 void mark_register_stack(struct Parrot_Interp* interpreter,
-                         struct RegStack* stack);
+                         struct Stack_Chunk* stack);
 
 #endif /* PARROT_REGISTER_H */
 
@@ -92,7 +79,7 @@ void mark_register_stack(struct Parrot_Interp* interpreter,
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

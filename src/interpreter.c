@@ -1615,26 +1615,13 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* undefined globals are errors by default */
     PARROT_ERRORS_on(interpreter, PARROT_ERRORS_GLOBALS_FLAG);
 
+    stack_system_init(interpreter);
     /* Set up the initial register chunks */
     setup_register_stacks(interpreter);
-
-    /* the SET_NULL macros are only for systems where a NULL pointer
-     * isn't represented by zeroes, so don't use these for resetting
-     * non-null pointers
-     */
-    SET_NULL(interpreter->ctx.int_reg_top->next);
-    SET_NULL(interpreter->ctx.int_reg_top->prev);
-    SET_NULL(interpreter->ctx.num_reg_top->next);
-    SET_NULL(interpreter->ctx.num_reg_top->prev);
-    SET_NULL(interpreter->ctx.string_reg_top->next);
-    SET_NULL(interpreter->ctx.string_reg_top->prev);
-    SET_NULL(interpreter->ctx.pmc_reg_top->next);
-    SET_NULL(interpreter->ctx.pmc_reg_top->prev);
 
     Parrot_clear_s(interpreter);
     Parrot_clear_p(interpreter);
 
-    stack_system_init(interpreter);
     /* Stack for lexical pads */
     interpreter->ctx.pad_stack = new_stack(interpreter, "Pad");
 

@@ -55,14 +55,15 @@ continuation is activated.
 void
 cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
-    memcpy(ctx, &interp->ctx, sizeof(*ctx));
-    mark_register_stack_cow(interp, &ctx->int_reg_stack);
-    mark_register_stack_cow(interp, &ctx->num_reg_stack);
-    mark_register_stack_cow(interp, &ctx->string_reg_stack);
-    mark_register_stack_cow(interp, &ctx->pmc_reg_stack);
+    ctx->int_reg_stack = stack_copy(interp, interp->ctx.int_reg_stack);
+    ctx->num_reg_stack = stack_copy(interp, interp->ctx.num_reg_stack);
+    ctx->string_reg_stack = stack_copy(interp, interp->ctx.string_reg_stack);
+    ctx->pmc_reg_stack = stack_copy(interp, interp->ctx.pmc_reg_stack);
     ctx->pad_stack = stack_copy(interp, interp->ctx.pad_stack);
     ctx->user_stack = stack_copy(interp, interp->ctx.user_stack);
     ctx->control_stack = stack_copy(interp, interp->ctx.control_stack);
+    ctx->warns = interp->ctx.warns;
+    ctx->errors = interp->ctx.errors;
     buffer_mark_COW(ctx->warns);
     buffer_mark_COW(ctx->errors);
 }
@@ -101,10 +102,10 @@ mark_context(struct Parrot_Interp* interpreter, struct Parrot_Context* ctx)
     mark_stack(interpreter, ctx->pad_stack);
     mark_stack(interpreter, ctx->user_stack);
     mark_stack(interpreter, ctx->control_stack);
-    mark_register_stack(interpreter, &ctx->int_reg_stack);
-    mark_register_stack(interpreter, &ctx->num_reg_stack);
-    mark_string_register_stack(interpreter, &ctx->string_reg_stack);
-    mark_pmc_register_stack(interpreter, &ctx->pmc_reg_stack);
+    mark_register_stack(interpreter, ctx->int_reg_stack);
+    mark_register_stack(interpreter, ctx->num_reg_stack);
+    mark_string_register_stack(interpreter, ctx->string_reg_stack);
+    mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
 }
 
 /*
@@ -274,7 +275,7 @@ swap_context(struct Parrot_Interp *interp, struct PMC *sub)
     Buffer * warns;
     struct Parrot_Coroutine* co = (struct Parrot_Coroutine *)PMC_sub(sub);
     struct Parrot_Context *ctx = &co->ctx;
-    struct RegisterChunkBuf *reg_top;
+    Stack_Chunk_t *reg_top;
 
     /*
      * Swap user stacks and warnings
@@ -293,18 +294,18 @@ swap_context(struct Parrot_Interp *interp, struct PMC *sub)
     ctx->errors = warns;
 
     /* swap register frame tops */
-    reg_top = interp->ctx.int_reg_stack.top;
-    interp->ctx.int_reg_stack.top = ctx->int_reg_stack.top;
-    ctx->int_reg_stack.top = reg_top;
-    reg_top = interp->ctx.num_reg_stack.top;
-    interp->ctx.num_reg_stack.top = ctx->num_reg_stack.top;
-    ctx->num_reg_stack.top = reg_top;
-    reg_top = interp->ctx.string_reg_stack.top;
-    interp->ctx.string_reg_stack.top = ctx->string_reg_stack.top;
-    ctx->string_reg_stack.top = reg_top;
-    reg_top = interp->ctx.pmc_reg_stack.top;
-    interp->ctx.pmc_reg_stack.top = ctx->pmc_reg_stack.top;
-    ctx->pmc_reg_stack.top = reg_top;
+    reg_top = interp->ctx.int_reg_stack;
+    interp->ctx.int_reg_stack = ctx->int_reg_stack;
+    ctx->int_reg_stack = reg_top;
+    reg_top = interp->ctx.num_reg_stack;
+    interp->ctx.num_reg_stack = ctx->num_reg_stack;
+    ctx->num_reg_stack = reg_top;
+    reg_top = interp->ctx.string_reg_stack;
+    interp->ctx.string_reg_stack = ctx->string_reg_stack;
+    ctx->string_reg_stack = reg_top;
+    reg_top = interp->ctx.pmc_reg_stack;
+    interp->ctx.pmc_reg_stack = ctx->pmc_reg_stack;
+    ctx->pmc_reg_stack = reg_top;
 
     /* if calling the coroutine */
     if (!(PObj_get_FLAGS(sub) & PObj_private0_FLAG)) {

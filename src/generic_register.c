@@ -13,9 +13,7 @@ src/generic_register.c - Generalized register handling routines
     #define REG_CLEAR Parrot_clear_p
     #define REG_STACK pmc_reg_stack
     #define REG_TYPE pmc_reg
-    #define REG_CHUNK_BUF PRegChunkBuf
     #define REG_FRAME PRegFrame
-    #define REG_EXCEPTION_STRING "No more P register frames to pop!"
     #define REG_NULL PMCNULL
     #include "generic_register.c"
 
@@ -49,12 +47,9 @@ Pushes a new register frame onto the corresponding frame stack.
 void
 REG_PUSH(struct Parrot_Interp *interpreter, void *where)
 {
-    struct RegisterChunkBuf* top;
-    top = regstack_push_entry(interpreter, &interpreter->ctx.REG_STACK);
-    memcpy(&((struct REG_CHUNK_BUF*)top->data.bufstart)->
-            REG_FRAME[top->used-1].registers,
-            where,
-	    sizeof(struct REG_FRAME));
+    void* top;
+    top = stack_prepare_push(interpreter, &interpreter->ctx.REG_STACK);
+    memcpy(top, where, sizeof(struct REG_FRAME));
 }
 
 /*
@@ -71,19 +66,9 @@ Pops a register frame from the corresponding frame stack.
 void
 REG_POP(struct Parrot_Interp *interpreter, void *where)
 {
-    struct RegisterChunkBuf* top = interpreter->ctx.REG_STACK.top;
-    /* Do we even have anything? */
-    if (top->used > 0) {
-        memcpy(where,
-                &((struct REG_CHUNK_BUF*)top->data.bufstart)->
-		REG_FRAME[top->used-1].registers,
-                sizeof(struct REG_FRAME));
-        regstack_pop_entry(interpreter, &interpreter->ctx.REG_STACK);
-    }
-    /* Nope. So pitch a fit */
-    else {
-        internal_exception(NO_REG_FRAMES, REG_EXCEPTION_STRING);
-    }
+    void* top;
+    top = stack_prepare_pop(interpreter, &interpreter->ctx.REG_STACK);
+    memcpy(where, top, sizeof(struct REG_FRAME));
 }
 
 /*
@@ -111,9 +96,7 @@ REG_CLEAR(struct Parrot_Interp *interpreter)
 #undef REG_CLEAR
 #undef REG_STACK
 #undef REG_TYPE
-#undef REG_CHUNK_BUF
 #undef REG_FRAME
-#undef REG_EXCEPTION_STRING
 #undef REG_NULL
 
 /*

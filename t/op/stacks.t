@@ -471,7 +471,7 @@ output_is(<<"CODE", <<OUTPUT, "combining popn with pushtopn, pushbottomn");
 @{[ check_num_regs(0) ]}
         .fp_ne(N15, 1.031, ERROR)
         .fp_ne(N16, -1.000, ERROR)
- 
+
         print "ok 1\\n"
 
 @{[ set_num_regs( sub { "1.0".$_ } ) ]}
@@ -679,15 +679,15 @@ OUTPUT
 
 
 # Now, to make it do BAD THINGS!
-output_is(<<"CODE",'No more I register frames to pop!','ENO I frames');
+output_is(<<"CODE",'No entries on IntReg_Stack!','ENO I frames');
 	popi
 	end
 CODE
-output_is(<<"CODE",'No more N register frames to pop!','ENO N frames');
+output_is(<<"CODE",'No entries on NumReg_Stack!','ENO N frames');
 	popn
 	end
 CODE
-output_is(<<"CODE",'No more S register frames to pop!','ENO S frames');
+output_is(<<"CODE",'No entries on StringReg_Stack!','ENO S frames');
 	pops
 	end
 CODE
@@ -1207,7 +1207,7 @@ output_is(<<"CODE", <<'OUTPUT', "savetop/restoretop");
         ne S15, "three", ERROR
         ne S16, "two", ERROR
         set I1, P15["three"]
-        ne I1, 3, ERROR 
+        ne I1, 3, ERROR
         set I2, P16["two"]
         ne I2, 2, ERROR
 

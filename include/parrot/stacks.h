@@ -16,7 +16,7 @@
 #include "parrot/parrot.h"
 
 #define STACK_CHUNK_DEPTH 256
-#define STACK_CHUNK_LIMIT 100
+#define STACK_CHUNK_LIMIT 1000
 
 typedef struct Stack_Entry {
     UnionVal entry;

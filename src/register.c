@@ -37,9 +37,9 @@ C<INTVAL>s.
 
 The top frame is always C<used - 1>. When C<used> indicates that a new
 C<IRegChunk> should be created, it is allocated with
-C<mem_sys_allocate()> and the C<int_reg_top>, C<previous>, C<next>
+C<Parrot_allocate> and the C<int_reg_top>, C<prev>, C<next>
 pointers set accordingly. Popping register frames from the stack
-decrements C<used>. Chunks are reclaimed with C<mem_sys_free()>.
+decrements C<used>. Chunks are freed by te GC subsystem.
 
 Note that C<int_reg_top>'s C<next> is always empty - it I<is> the top of
 the stack.
@@ -75,38 +75,23 @@ Sets up the register stacks.
 void
 setup_register_stacks(Parrot_Interp interpreter)
 {
-    struct RegisterChunkBuf* buf;
-    make_bufferlike_pool(interpreter, sizeof(struct RegisterChunkBuf));
+    interpreter->ctx.int_reg_stack = cst_new_stack(interpreter,
+            "IntReg_", sizeof(struct IRegFrame), FRAMES_PER_CHUNK);
 
-    Parrot_block_DOD(interpreter);
+    interpreter->ctx.string_reg_stack = cst_new_stack(interpreter,
+            "StringReg_", sizeof(struct SRegFrame), FRAMES_PER_CHUNK);
 
-    buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
-    Parrot_allocate_zeroed(interpreter, buf, sizeof(struct IRegChunkBuf));
-    interpreter->ctx.int_reg_stack.top = buf;
-    interpreter->ctx.int_reg_stack.frame_size = sizeof(struct IRegFrame);
+    interpreter->ctx.num_reg_stack = cst_new_stack(interpreter,
+            "NumReg_", sizeof(struct NRegFrame), FRAMES_PER_CHUNK);
 
-    buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
-    Parrot_allocate_zeroed(interpreter, buf, sizeof(struct SRegChunkBuf));
-    interpreter->ctx.string_reg_stack.top = buf;
-    interpreter->ctx.string_reg_stack.frame_size = sizeof(struct SRegFrame);
-
-    buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
-    Parrot_allocate_zeroed(interpreter, buf, sizeof(struct NRegChunkBuf));
-    interpreter->ctx.num_reg_stack.top = buf;
-    interpreter->ctx.num_reg_stack.frame_size = sizeof(struct NRegFrame);
-
-    buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
-    Parrot_allocate_zeroed(interpreter, buf, sizeof(struct PRegChunkBuf));
-    interpreter->ctx.pmc_reg_stack.top = buf;
-    interpreter->ctx.pmc_reg_stack.frame_size = sizeof(struct PRegFrame);
-
-    Parrot_unblock_DOD(interpreter);
+    interpreter->ctx.pmc_reg_stack = cst_new_stack(interpreter,
+            "PMCReg_", sizeof(struct PRegFrame), FRAMES_PER_CHUNK);
 }
 
 /*
 
 =item C<void
-mark_register_stack(Parrot_Interp interpreter, struct RegStack* stack)>
+mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* stack)>
 
 Marks the contents of the register stacks as live.
 
@@ -115,10 +100,12 @@ Marks the contents of the register stacks as live.
 */
 
 void
-mark_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
+mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
-    struct RegisterChunkBuf* chunk;
-    for (chunk = stack->top; chunk; chunk = chunk->next) {
+    /* go up to top */
+    for (; chunk && chunk->prev; chunk = chunk->prev)
+        ;
+    for (; chunk; chunk = chunk->next) {
         pobject_lives(interpreter, (PObj*)chunk);
     }
 }
@@ -126,7 +113,7 @@ mark_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
 /*
 
 =item C<void
-mark_pmc_register_stack(Parrot_Interp interpreter, struct RegStack* stack)>
+mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* stack)>
 
 Marks the PMC register stack as live.
 
@@ -135,12 +122,13 @@ Marks the PMC register stack as live.
 */
 
 void
-mark_pmc_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
+mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
-    struct RegisterChunkBuf* chunk;
     UINTVAL i, j;
-    for (chunk = stack->top; chunk; chunk = chunk->next) {
-        struct PRegChunkBuf* pc = chunk->data.bufstart;
+    for (; chunk && chunk->prev; chunk = chunk->prev)
+        ;
+    for ( ; chunk; chunk = chunk->next) {
+        struct PRegChunkBuf* pc = chunk->bufstart;
         pobject_lives(interpreter, (PObj*)chunk);
         for (i = 0; i < chunk->used; i++) {
             struct PRegFrame *pf = &pc->PRegFrame[i];
@@ -156,7 +144,7 @@ mark_pmc_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
 /*
 
 =item C<void
-mark_string_register_stack(Parrot_Interp interpreter, struct RegStack* stack)>
+mark_string_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* stack)>
 
 Mark the contents of the string register stack as live.
 
@@ -165,12 +153,13 @@ Mark the contents of the string register stack as live.
 */
 
 void
-mark_string_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
+mark_string_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
-    struct RegisterChunkBuf* chunk;
     UINTVAL i, j;
-    for (chunk = stack->top; chunk; chunk = chunk->next) {
-        struct SRegChunkBuf* sc = chunk->data.bufstart;
+    for (; chunk && chunk->prev; chunk = chunk->prev)
+        ;
+    for ( ; chunk; chunk = chunk->next) {
+        struct SRegChunkBuf* sc = chunk->bufstart;
         pobject_lives(interpreter, (PObj*)chunk);
         for (i = 0; i < chunk->used; i++) {
             struct SRegFrame *sf = &sc->SRegFrame[i];
@@ -183,135 +172,7 @@ mark_string_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
     }
 }
 
-/*
 
-=item C<void
-mark_register_stack_cow(Parrot_Interp interpreter, struct RegStack* stack)>
-
-Marks the contents of the register stacks as Copy on Write.
-
-=cut
-
-*/
-
-void
-mark_register_stack_cow(Parrot_Interp interpreter, struct RegStack* stack)
-{
-    struct RegisterChunkBuf* chunk;
-    for (chunk = stack->top; chunk; chunk = chunk->next) {
-        PObj_COW_SET((PObj*)chunk);
-    }
-}
-
-/*
-
-=item C<static struct RegisterChunkBuf*
-regstack_copy_chunk(Parrot_Interp interpreter,
-                    struct RegisterChunkBuf* chunk,
-                    struct RegStack* stack)>
-
-Copies the specified register stack chunk.
-
-=cut
-
-*/
-
-static struct RegisterChunkBuf*
-regstack_copy_chunk(Parrot_Interp interpreter,
-                    struct RegisterChunkBuf* chunk,
-                    struct RegStack* stack)
-{
-    struct RegisterChunkBuf* buf =
-        new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
-    *buf = *chunk;
-
-    PObj_COW_CLEAR((PObj*) buf);
-
-    Parrot_block_DOD(interpreter);
-    Parrot_allocate(interpreter, buf, stack->frame_size * FRAMES_PER_CHUNK);
-    Parrot_unblock_DOD(interpreter);
-
-    memcpy(buf->data.bufstart, chunk->data.bufstart,
-                stack->frame_size * chunk->used);
-    return buf;
-}
-
-/*
-
-=item C<static struct RegisterChunkBuf*
-regstack_push_entry(Parrot_Interp interpreter, struct RegStack* stack)>
-
-Pushes the entry on the specified register stack.
-
-=cut
-
-*/
-
-static struct RegisterChunkBuf*
-regstack_push_entry(Parrot_Interp interpreter, struct RegStack* stack)
-{
-    struct RegisterChunkBuf* top = stack->top;
-    /* Before we change anything, is this a read-only stack? */
-    if (PObj_COW_TEST((PObj*)top))
-        top = stack->top = regstack_copy_chunk(interpreter, top, stack);
-    /* If we can stay in the current frame, we will.  Else make a new chunk */
-    if (top->used < FRAMES_PER_CHUNK) {
-        top->used++;
-        return top;
-    }
-    else {
-        struct RegisterChunkBuf* buf = new_bufferlike_header(interpreter,
-                sizeof(struct RegisterChunkBuf));
-
-        Parrot_block_DOD(interpreter);
-        Parrot_allocate(interpreter, (PObj*)buf,
-                    stack->frame_size * FRAMES_PER_CHUNK);
-        Parrot_unblock_DOD(interpreter);
-
-        buf->used = 1;
-        buf->next = top;
-
-        stack->top = buf;
-        return buf;
-    }
-}
-
-/*
-
-=item C<static void
-regstack_pop_entry(Parrot_Interp interpreter, struct RegStack* stack)>
-
-Pushes the entry on the specified register stack.
-
-=cut
-
-*/
-
-static void
-regstack_pop_entry(Parrot_Interp interpreter, struct RegStack* stack)
-{
-    struct RegisterChunkBuf* top = stack->top;
-    if (top->used > 1) {
-        /* Before we change anything, is this a read-only stack? */
-        if (PObj_COW_TEST((PObj*)top))
-            top = stack->top =
-                regstack_copy_chunk(interpreter, stack->top, stack);
-        top->used--;
-    }
-    else {
-        /* XXX: If this isn't marked COW, we should keep it around to
-         * prevent thrashing */
-        if (top->next) {
-            stack->top = top->next;
-        }
-        else {
-            if (PObj_COW_TEST((PObj*)top))
-                top = stack->top =
-                    regstack_copy_chunk(interpreter, stack->top, stack);
-            top->used--;
-        }
-    }
-}
 
 /*
 
@@ -355,9 +216,7 @@ Parrot_pop_off_stack(void *thing, INTVAL type)
 #define REG_CLEAR Parrot_clear_i
 #define REG_STACK int_reg_stack
 #define REG_TYPE int_reg
-#define REG_CHUNK_BUF IRegChunkBuf
 #define REG_FRAME IRegFrame
-#define REG_EXCEPTION_STRING "No more I register frames to pop!"
 #define REG_NULL 0
 #include "generic_register.c"
 
@@ -366,9 +225,7 @@ Parrot_pop_off_stack(void *thing, INTVAL type)
 #define REG_CLEAR Parrot_clear_s
 #define REG_STACK string_reg_stack
 #define REG_TYPE string_reg
-#define REG_CHUNK_BUF SRegChunkBuf
 #define REG_FRAME SRegFrame
-#define REG_EXCEPTION_STRING "No more S register frames to pop!"
 #define REG_NULL NULL
 #include "generic_register.c"
 
@@ -377,9 +234,7 @@ Parrot_pop_off_stack(void *thing, INTVAL type)
 #define REG_CLEAR Parrot_clear_n
 #define REG_STACK num_reg_stack
 #define REG_TYPE num_reg
-#define REG_CHUNK_BUF NRegChunkBuf
 #define REG_FRAME NRegFrame
-#define REG_EXCEPTION_STRING "No more N register frames to pop!"
 #define REG_NULL 0.0
 #include "generic_register.c"
 
@@ -388,9 +243,7 @@ Parrot_pop_off_stack(void *thing, INTVAL type)
 #define REG_CLEAR Parrot_clear_p
 #define REG_STACK pmc_reg_stack
 #define REG_TYPE pmc_reg
-#define REG_CHUNK_BUF PRegChunkBuf
 #define REG_FRAME PRegFrame
-#define REG_EXCEPTION_STRING "No more P register frames to pop!"
 #define REG_NULL PMCNULL
 #include "generic_register.c"
 
