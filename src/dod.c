@@ -374,7 +374,7 @@ trace_children(Interp *interpreter, PMC *current)
 
                 if (data) {
                     for (i = 0; i < PMC_int_val(current); i++) {
-                        if (data[i]) {
+                        if (!PMC_IS_NULL(data[i])) {
                             pobject_lives(interpreter, (PObj *)data[i]);
                         }
                     }

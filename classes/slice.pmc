@@ -231,7 +231,7 @@ C<xrange> object.
             RVal_int(range->end)++;
         PMC_pmc_val(xro) = pmc_new_noinit(INTERP, enum_class_PerlInt);
         REG_PMC(5) = xro;
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
         return next;
     }
 

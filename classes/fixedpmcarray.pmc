@@ -233,31 +233,6 @@ Creates and returns a copy of the array.
 
 /*
 
-=item C<void mark()>
-
-Marks the array as live.
-
-=cut
-
-*/
-
-    void mark () {
-        int i, end;
-        PMC **data;
-        if (!PMC_data(SELF))
-            return;
-        data = (PMC **) PMC_data(SELF);
-        end = PMC_int_val(SELF);
-        for(i = 0; i < end; i++) {
-            PMC *p = data[i];
-            if (p == PMCNULL || p == SELF)
-                continue;
-            pobject_lives(INTERP, (PObj *) p);
-        }
-    }
-
-/*
-
 =item C<INTVAL get_bool()>
 
 Returns whether the array has any elements (meaning been initialized, for a

@@ -106,6 +106,10 @@ pmclass deleg_pmc {
         pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
     }
 
+    void destroy() {
+        /* don't pass that on */
+    }
+
 }
 
 /*
