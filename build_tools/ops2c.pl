@@ -473,20 +473,26 @@ END_C
 	my $body       = $op->body;
 	my $jump       = $op->jump || 0;
 	my $arg_count  = $op->size;
-	my $arg_types  = "{ " . join(", ", map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types) . " }";
-	my $arg_dirs   = "{ " . join(", ", map { $arg_dir_mapping{$_} } $op->arg_dirs) . " }";
+	my $arg_types  = "{ " . join(", ",
+	   map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types) . " }";
+	my $arg_dirs   = "{ " . join(", ",
+	   map { $arg_dir_mapping{$_} } $op->arg_dirs) . " }";
+	my $labels   = "{ " . join(", ",  $op->labels) . " }";
+	my $flags      = 0;
 
 	print SOURCE <<END_C;
   { /* $index */
-    $type,
+    /* type $type, */
     "$name",
     "$full_name",
     "$func_name",
-    "", /* TODO: Put the body here */
+    /* "",  body */
     $jump,
     $arg_count,
     $arg_types,
-    $arg_dirs
+    $arg_dirs,
+    $labels,
+    $flags
   },
 END_C
 

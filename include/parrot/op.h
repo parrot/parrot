@@ -75,15 +75,17 @@ typedef void **(*op_func_prederef_t)(void **, struct Parrot_Interp *);
 */
 
 typedef struct {
-    op_type_t type;
+    /* op_type_t type; unused */
     const char *name;
     const char *full_name;
     const char *func_name;
-    const char *body;
-    unsigned short jump;
-    short arg_count;           /* Includes opcode as one arg */
-    arg_type_t types[PARROT_MAX_ARGS];
-    arg_dir_t dirs[PARROT_MAX_ARGS];
+    /* const char *body; unused */
+    unsigned short jump;           /* s. above */
+    short arg_count;               /* Includes opcode as one arg */
+    char types[PARROT_MAX_ARGS];   /* arg_type_t, 0 = op */
+    char dirs[PARROT_MAX_ARGS];    /* arg_dir_t   0 = op */
+    char labels[PARROT_MAX_ARGS];  /* 0/1         0 = op */
+    unsigned int flags;
 } op_info_t;
 
 
@@ -93,7 +95,7 @@ typedef struct {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
