@@ -254,14 +254,6 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
 }
 
 /*
-
-=back
-
-=cut
-
-*/
-
-/*
 * Local variables:
 * c-indentation-style: bsd
 * c-basic-offset: 4

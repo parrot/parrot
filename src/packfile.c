@@ -87,6 +87,8 @@ to dissect and reconstruct data from the various segments.
 See L<parrotbyte> for information about the structure of the
 frozen bytecode.
 
+=over 4
+
 =cut
 
 */
@@ -531,6 +533,7 @@ A Segment Header has these entries:
  * data         possibly empty data, or e.g. byte code
 
 =cut
+
 */
 
 /*
@@ -2057,6 +2060,8 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
 
 =back
 
+=over
+
 =item PackFile_append_pbc
 
 Read a PBC and append it to the current directory
@@ -2134,6 +2139,11 @@ PackFile_fixup_subs(struct Parrot_Interp *interpreter)
 {
     fixup_subs(interpreter, interpreter->code);
 }
+
+=back
+
+=cut
+
 /*
 * Local variables:
 * c-indentation-style: bsd

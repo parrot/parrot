@@ -32,7 +32,9 @@
 #include <assert.h>
 #include <string.h> /* XXX:ajg fixme later*/
 
-/*=head1 When in parrot
+/*
+
+=head1 When in parrot
 
 When the library is used within parrot, all calls expect an additional
 first argument of an interpreter, for the purposes of memory allocation,
@@ -59,7 +61,9 @@ Set digit at pos (zero is lsd) to value.  [macro]
 
 Get value of digit at pos. [macro]
 
-=cut*/
+=cut
+
+*/
 #define BN_setd(x, y, z) \
     ( x->buffer[(y) / BN_D_PER_NIB] = \
      ((z) << ( (y) % BN_D_PER_NIB)*4) | \
@@ -73,7 +77,10 @@ Get value of digit at pos. [macro]
 If increasing the exponent of I<bn> by I<incr> will cause overflow
 (as decided by I<elimit>), returns true.
 
-=cut*/
+=cut
+
+*/
+
 #define CHECK_OVERFLOW(bn, incr, context) \
     ( (context)->elimit - ((bn)->expn + (bn)->digits -1 ) < (incr) ? 1 : 0) 
 
@@ -82,7 +89,10 @@ If increasing the exponent of I<bn> by I<incr> will cause overflow
 If subtracting I<decrement> (a positive number) from the exponent
 of I<bn> would cause underflow, returns true.
 
-=cut*/
+=cut
+
+*/
+
 #define CHECK_UNDERFLOW(bn, decr, context) \
     ( (context)->elimit + ((bn)->expn + (bn)->digits -1) > (decr) ? 0 : 1 )
 
@@ -92,25 +102,37 @@ of I<bn> would cause underflow, returns true.
 
 True if bn is +Infinity or -Infinity. [macro]
 
-=cut*/
+=cut
+
+*/
+
 #define am_INF(bn)  ((bn)->flags & BN_INF_FLAG   )
 /*=for api bignum_private am_NAN(bn)
 
 True if bn is either a quiet or signalling NaN. [macro]
 
-=cut*/
+=cut
+
+*/
+
 #define am_NAN(bn)  ((bn)->flags & (BN_sNAN_FLAG | BN_qNAN_FLAG)   )
 /*=for api bignum_private am_sNAN(bn)
 
 True if bn is a signalling NaN. [macro]
 
-=cut*/
+=cut
+
+*/
+
 #define am_sNAN(bn) ((bn)->flags & BN_sNAN_FLAG  )
 /*=for api bignum_private am_qNAN(bn)
 
 True if bn is a quiet NaN. [macro]
 
-=cut*/
+=cut
+
+*/
+
 #define am_qNAN(bn) ( (bn)->flags & BN_qNAN_FLAG  )
 
 /* For the sake of debugging */
@@ -165,7 +187,10 @@ BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context);
 Create a new BN.  length is number of I<decimal> digits required.
 The bignumber will be equal to zero.
 
-=cut*/
+=cut
+
+*/
+
 BIGNUM*
 BN_new(PINTD_ INTVAL length) {
     BIGNUM* bn;
@@ -191,7 +216,10 @@ BN_new(PINTD_ INTVAL length) {
 Grows bn so that it can contain length I<decimal> digits, does not
 modify the value of the bignumber.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_grow(PINTD_ BIGNUM *in, INTVAL length) {
     assert(in != NULL);
@@ -214,7 +242,10 @@ BN_grow(PINTD_ BIGNUM *in, INTVAL length) {
 
 Frees all the memory used by the BIGNUM.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_destroy(PINTD_ BIGNUM *bn) {
     assert(bn!=NULL);
@@ -239,7 +270,10 @@ are initialised as follows:
 
 The context object can be destroyed with free().
 
-=cut*/
+=cut
+
+*/
+
 BN_CONTEXT*
 BN_create_context(PINTD_ INTVAL precision) {
     BN_CONTEXT *result;
@@ -271,7 +305,10 @@ digits > allocated space are accessed, but intermediate digits will
 have undefined values.  If I<pos> is beyond I<digits> then I<digits>
 is also updated.
 
-=cut*/
+=cut
+
+*/
+
 INTVAL
 BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, INTVAL value) {
     assert(bn != NULL);
@@ -292,7 +329,10 @@ BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, INTVAL value) {
 Get the value of the decimal digit at pos, returns -1 if pos is out of
 bounds.
 
-=cut*/
+=cut
+
+*/
+
 INTVAL
 BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos) {
     assert(bn != NULL);
@@ -313,7 +353,10 @@ undefined sign and both qNAN and sNAN bits set.
 qNAN is represented as having zero digits, an undefined exponent
 and only the qNAN bit set.
 
-=cut*/
+=cut
+
+*/
+
 int BN_set_inf(PINTD_ BIGNUM* bn) {
     assert(bn != NULL);
     bn->digits = 0;
@@ -346,7 +389,10 @@ and the sign of I<bn>:
  ROUND_CEILING => same as round down, if sign is 1, +Inf otherwise
  ROUND_FLOOR => same as round down, if sign is 0, -Inf otherwise
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
     int massive = 0; /* 0 => inf, 1=> 99999999999 etc...*/
@@ -386,7 +432,10 @@ BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
 
 Copies two into one, returning one for convenience.
 
-=cut*/
+=cut
+
+*/
+
 BIGNUM*
 BN_copy(PINTD_ BIGNUM* one, BIGNUM* two) {
     assert(one != NULL); assert(two != NULL);
@@ -408,7 +457,10 @@ Create a new bignum from a (signed) integer value (INTVAL)
 We assume that the implementation limits are somewhat larger than
 those required to store a single integer into a bignum.
 
-=cut*/
+=cut
+
+*/
+
 BIGNUM*
 BN_new_from_int(PINTD_ INTVAL value) {
     BIGNUM *new;
@@ -434,7 +486,10 @@ BN_new_from_int(PINTD_ INTVAL value) {
 
 Dump the bignum for testing, along with a little message.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_PRINT_DEBUG (BIGNUM *bn, char* mesg) {
     INTVAL i;
@@ -458,7 +513,10 @@ BN_PRINT_DEBUG (BIGNUM *bn, char* mesg) {
 When an exceptional condition occurs after which execution could
 continue.  If context specifies that death occurs, then so be it.
 
-=cut*/
+=cut
+
+*/
+
 INTVAL
 BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
     /* See extended standard for details */
@@ -573,7 +631,10 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
 Throw `exception'.  Should be accessed via a BN_EXCEPT macro, this
 version is provided until parrot exceptions are sorted out properly.
 
-=cut */
+=cut
+
+*/
+
 void
 BN_exception(PINTD_ BN_EXCEPTIONS exception, char* message) {
     printf("Exception %d %s\n", exception, message);
@@ -596,7 +657,10 @@ the main file can be #ifdef'd out if this is done.
 
 Memory pointed to by dest is not freed by this function.
 
-=cut*/
+=cut
+
+*/
+
 
 INTVAL
 BN_to_scientific_string(PINTD_ BIGNUM*bn, char **dest) {
@@ -612,7 +676,10 @@ BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest) {
 Does the heavy string handling work, I<eng> defines the conversion to
 perform.
 
-=cut*/
+=cut
+
+*/
+
 INTVAL
 BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
     char* cur;
@@ -748,7 +815,10 @@ is converted to a quiet NaN.
 
 Does not yet check for exponent overflow.
 
-=cut*/
+=cut
+
+*/
+
 BIGNUM*
 BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
     BIGNUM *result;
@@ -961,7 +1031,10 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
 
 Removes any zeros before the msd and after the lsd
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_strip_lead_zeros(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
     INTVAL msd, i;
@@ -982,7 +1055,10 @@ BN_strip_lead_zeros(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
 Removes trailing zeros and increases the exponent appropriately.
 Does not remove zeros before the decimal point.
 
-=cut*/
+=cut
+
+*/
+
 
 int
 BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
@@ -1015,7 +1091,10 @@ BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
 Convert the number to a plain integer *if* precision such that this
 is possible.
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
     /* Normal bignum */
@@ -1042,7 +1121,10 @@ Sets any number which should be zero to a cannonical zero.
 
 To check if a number is equal to zero, use BN_is_zero.
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero) {
     INTVAL i;
@@ -1079,7 +1161,10 @@ precision:  0 =>  1234          1234
 precision: -1 =>  1.2345E+3     1234.5
 precision: -9 =>  1.234567E+3   1234.567
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_round(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     /* In exported version, must check for sNAN */
@@ -1202,7 +1287,10 @@ Truncates coefficient of I<bn> to have I<precision> digits, then adds
 1 to the last digits and carries until done.  Do not call this
 function with non-positive values of I<precision>.
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     INTVAL i, carry;
@@ -1240,7 +1328,10 @@ BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
 Truncates the coefficient of I<bn> to have I<precision> digits.  Do
 not call this function with non-positive precision.
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
     INTVAL i =0;
@@ -1265,7 +1356,10 @@ BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
 I<precision> must be less than one.  This rounds so that I<expn> is at
 least I<precision>.  Name is slightly misleading.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
     INTVAL i;
@@ -1341,7 +1435,10 @@ The general form for all arithmetic operations is
 
 void BN_operation(result, one, two, context)
 
-=cut*/
+=cut
+
+*/
+
 
 /*=for api bignum_private BN_arith_setup(result, one, two, context, &restore)
 
@@ -1359,7 +1456,10 @@ pointer to both setup and cleanup.
 If overflow or underflow occurs during rounding, the numbers will be
 modified to the appropriate representation and will not be restorable.
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                BN_CONTEXT *context, BN_SAVE_PREC* restore) {
@@ -1378,7 +1478,10 @@ BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 Rounds result, one, two, checks for zeroness and makes integers.
 Fixes one and two so they don't gain precision by mistake.
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                  BN_CONTEXT *context, BN_SAVE_PREC* restore) {
@@ -1422,7 +1525,10 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 Adds zero digits so that decimal points of each number are at the same
 place.
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
     INTVAL i;
@@ -1494,7 +1600,10 @@ BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
 
 Adds one to two, returning value in result.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context) {
     BN_SAVE_PREC restore;
@@ -1577,7 +1686,10 @@ Adds together two aligned big numbers with coefficients of equal
 length.  Returns a result without reference to the signs of its
 arguments.  Cannot cope with special values.
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
               BN_CONTEXT *context) {
@@ -1663,7 +1775,10 @@ BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 Subtracts two from one, returning value in result.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context) {
@@ -1748,7 +1863,10 @@ Subtracts two from one, assumes both numbers have positive aligned
 coefficients of equal length.  Sets sign of result as appropriate.
 Cannot cope with special values.
 
-=cut*/
+=cut
+
+*/
+
 int
 BN_isubtract (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
               BN_CONTEXT *context) {
@@ -1872,7 +1990,10 @@ BN_isubtract (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 Perform unary + on one.  Does all the rounding and what have you.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
     /* Check for special values */
@@ -1900,7 +2021,10 @@ BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
 
 Perform unary - on one.  Does all the rounding and what have you.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
     /* Check for special values */
@@ -1934,7 +2058,10 @@ result = 1  => one > two
 result = -1 => two > one
 result = 0  => one == two
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_compare (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context) {
@@ -1991,7 +2118,10 @@ BN_compare (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 Multiplies one and two, storing the result in result.
 
-=cut*/
+=cut
+
+*/
+
 void 
 BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
              BN_CONTEXT *context) {
@@ -2102,7 +2232,10 @@ with I<precision> greater than the number of significant digits in
 either operand.  If you want the result to be an integer or a numer
 with a fixed fractional part
 
-=cut*/
+=cut
+
+*/
+
 
 void
 BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
@@ -2330,7 +2463,10 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 Places the integer part of one / two into result.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                    BN_CONTEXT *context) {
@@ -2429,7 +2565,10 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 places the remainder from divide-integer (above) into result.
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
               BN_CONTEXT *context) {
@@ -2672,7 +2811,10 @@ Calculate result = bignum ** expn;
 
 XXX To Do
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
               BIGNUM* expn, BN_CONTEXT* context) {
@@ -2689,7 +2831,10 @@ Rescales bignum to have an exponent of expn.
 
 XXX To Do
 
-=cut*/
+=cut
+
+*/
+
 void
 BN_rescale(PINTD_ BIGNUM* result, BIGNUM* one, BIGNUM* two,
                 BN_CONTEXT* context) {
@@ -2711,7 +2856,10 @@ BN_rescale(PINTD_ BIGNUM* result, BIGNUM* one, BIGNUM* two,
 Converts the bignum into an integer, raises overflow if an exact
 representation cannot be created.
 
-=cut*/
+=cut
+
+*/
+
 INTVAL
 BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
     INTVAL insig, i;

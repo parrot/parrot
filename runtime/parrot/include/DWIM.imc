@@ -316,9 +316,13 @@ now it looks like this:
 
 =head1 DIAGNOSTICS
 
+=over
+
 =item Can't open 'file' for reading
 
 =item Can't open 'file' for writing
+
+=back
 
 =head1 BUGS
 

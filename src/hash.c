@@ -109,7 +109,9 @@ lookupBucket(Hash *hash, HashIndex slot)
 
 Return the hashed value of the string
 
-=cut */
+=cut 
+
+*/
 
 static size_t
 key_hash_STRING(Interp *interpreter, Hash *hash, void *value)
@@ -547,6 +549,7 @@ new_hash_x(Interp *interpreter, Hash **hptr,
 return the number of used entries in hashtable
 
 =cut
+
 */
 
 INTVAL

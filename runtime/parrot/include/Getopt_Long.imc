@@ -22,6 +22,7 @@ Takes a format specifier and an argument vector.
 Returns a PerlHash
 
 =cut
+
 .sub _get_options prototyped             
   .param PerlArray argv    
   .param PerlArray spec    

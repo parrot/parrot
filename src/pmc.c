@@ -42,6 +42,7 @@ pmc_init_null(struct Parrot_Interp * interpreter)
    perform any other necessary initialization.
 
 =cut
+
 */
 
 PMC *
@@ -109,6 +110,7 @@ pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
    for continuations.
 
 =cut
+
 */
 
 PMC *
@@ -151,7 +153,9 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 /*=for api pmc constant_pmc_new_noinit
 
    Creates a new constant PMC of type C<base_type>
+
 =cut
+
 */
 
 PMC *
@@ -181,6 +185,7 @@ constant_pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
    As C<pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 
 =cut
+
 */
 
 PMC *
@@ -198,6 +203,7 @@ pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)
    As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 
 =cut
+
 */
 
 PMC *

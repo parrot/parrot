@@ -278,6 +278,10 @@ bitmap_destroy(Bitmap bmp)
     mem_sys_free(bmp);
 }
 
+=back
+
+=cut
+
 /*
  * Local variables:
  * c-indentation-style: bsd
