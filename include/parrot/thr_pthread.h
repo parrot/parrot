@@ -52,9 +52,14 @@
 #  define JOIN(t, ret) pthread_join(t, &ret)
 #  define DETACH(t)    pthread_detach(t)
 
+#  define CLEANUP_PUSH(f, a) pthread_cleanup_push(f, a)
+#  define CLEANUP_POP(a)     pthread_cleanup_pop(a)
+
 typedef pthread_mutex_t Parrot_mutex;
 typedef pthread_cond_t Parrot_cond;
 typedef pthread_t Parrot_thread;
+
+typedef void (*Cleanup_Handler)(void *);
 
 #endif
 

@@ -36,9 +36,14 @@
 #  define JOIN(t, ret)
 #  define DETACH(t)
 
+#  define CLEANUP_PUSH(f, a)
+#  define CLEANUP_POP(a)
+
 #  define Parrot_mutex int
 #  define Parrot_cond int
 #  define Parrot_thread int
+
+typedef void (*Cleanup_Handler)(void *);
 
 #  ifndef _STRUCT_TIMESPEC
 #  define _STRUCT_TIMESPEC

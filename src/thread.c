@@ -200,6 +200,13 @@ pt_check_tid(UINTVAL tid, const char *from)
     return interpreter_array[tid];
 }
 
+
+static void
+mutex_unlock(void *arg)
+{
+    UNLOCK(*(Parrot_mutex*) arg);
+}
+
 /*
  * join (wait for) a joinable thread
  */
@@ -217,7 +224,17 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
         interpreter->thread_data->state |= THREAD_STATE_JOINED;
         UNLOCK(interpreter_array_mutex);
         JOIN(interpreter->thread_data->thread, retval);
-        LOCK(interpreter_array_mutex);
+        /*
+         * we need to push a cleanup handler here: if cloning
+         * of the retval fails (e.g. it's a NULLPMC) this lock
+         * isn't released until eternity or someone hits ^C
+         *
+         * TODO This is needed for all places holding a lock for
+         *      non-trivial tasks
+         *      -leo
+         */
+        CLEANUP_PUSH(mutex_unlock, &interpreter_array_mutex);
+
         if (retval) {
             /* clone the PMC into caller */
             PMC *parent_ret = VTABLE_clone(parent, (PMC*)retval);
@@ -225,7 +242,7 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
         }
         interpreter_array[tid] = NULL;
         Parrot_really_destroy(0, interpreter);
-        UNLOCK(interpreter_array_mutex);
+        CLEANUP_POP(1);
         return retval;
     }
     /*
