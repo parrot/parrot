@@ -1744,6 +1744,7 @@ t/src/manifest.t
 t/src/sprintf.t
 test_main.c
 tools/dev/check_source_standards.pl
+tools/dev/extract_file_descriptions.pl
 tools/dev/genrpt.pl
 tools/dev/lib_deps.pl
 tools/dev/manicheck.pl
