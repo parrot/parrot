@@ -21,24 +21,26 @@ C<PerlString> extends C<perlscalar> to provide Perl string behaviour.
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
-static PMC*
-string_lower(Interp *interpreter, PMC *self)
-{
-    STRING *s = string_downcase(interpreter, PMC_str_val(self));
-    PMC *ret = pmc_new(interpreter, enum_class_PerlString);
-    string_set(interpreter, PMC_str_val(ret), s);
-    return ret;
-}
-
 pmclass PerlString extends perlscalar {
 
     void class_init () {
-        /* this should be autmatically done - probably */
-        if (pass) {
-            enter_nci_method(INTERP, enum_class_PerlString,
-                    F2DPTR(string_lower),
-                    "lower", "PIO");
-        }
+    }
+
+/*
+
+=item C<PMC* lower()>
+
+NCI method: downcase this string
+
+=cut
+
+*/
+
+    METHOD PMC* lower() {
+        STRING *s = string_downcase(interpreter, PMC_str_val(pmc));
+        PMC *ret = pmc_new(interpreter, enum_class_PerlString);
+        string_set(interpreter, PMC_str_val(ret), s);
+        return ret;
     }
 
 /*

@@ -363,6 +363,7 @@ sub parse_pmc {
       (?:/\*.*?\*/)?  # C-like comments
     )*
 
+    (METHOD\s+)?  #method flag
     (\w+\**)      #type
     \s+
     (\w+)         #method name
@@ -380,7 +381,7 @@ sub parse_pmc {
 
   while ($classblock =~ s/($signature_re)//) {
      $lineno += count_newlines($1);
-     my ($type, $methodname, $parameters) = ($2,$3,$4);
+     my ($flag, $type, $methodname, $parameters) = ($2,$3,$4,$5);
      my ($methodblock, $rema, $lines) = extract_balanced($classblock);
      $lineno += $lines;
      $methodblock = "" if $opt{nobody};
@@ -390,7 +391,8 @@ sub parse_pmc {
               'body' => $methodblock,
               'line' => $lineno,
               'type' => $type,
-              'parameters' => $parameters
+              'parameters' => $parameters,
+              'loc' => "vtable"
           };
       }
       else {
@@ -401,7 +403,8 @@ sub parse_pmc {
               'body' => $methodblock,
               'line' => $lineno,
               'type' => $type,
-              'parameters' => $parameters
+              'parameters' => $parameters,
+              'loc' => $flag ? "nci" : "vtable"
           };
      }
      $classblock = $rema;

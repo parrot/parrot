@@ -395,14 +395,71 @@ sub full_arguments {
     }
 }
 
-=item C<rewrite_method($class, $method, $super, $super_table)>
+=item C<proto($type,$parameters)>
 
-Rewrites the method body performing the various macro subsitiutions for
+Determines the prototype (argument signature) for a method body
+(see F<src/call_list>).
+
+=cut
+
+my %calltype = (
+  "char"     => "c",
+  "short"    => "s",
+  "char"     => "c",
+  "short"    => "s",
+  "int"      => "i",
+  "INTVAL"   => "i",
+  "float"    => "f",
+  "FLOATVAL" => "f",
+  "double"   => "d",
+  "STRING*"  => "t",
+  "char*"    => "t",
+  "PMC*"     => "P",
+  "short*"   => "2",
+  "int*"     => "3",
+  "long*"    => "4",
+  "void"     => "v",
+  "void*"    => "b",
+  "void**"   => "B",
+  #"BIGNUM*" => "???" # XXX
+);
+
+sub proto ($$) {
+    my ($type, $parameters) = @_;
+
+    # reduce to a comma separated set of types
+    $parameters =~ s/ +\w+(,|$)/,/g;
+    $parameters =~ s/ //g;
+
+    # type method(interpreter, self, parameters...)
+    my $ret = $calltype{$type or "void"};
+    $ret .= "IO";
+    $ret .= join('', map {$calltype{$_} or "?"} split(/,/, $parameters));
+
+    return $ret;
+}
+
+=item C<rewrite_nci_method($class, $method, $super, $super_table)>
+
+Rewrites the method body performing the various macro substitutions for
+nci method bodies (see F<classes/pmc2c.pl>).
+
+=cut
+
+sub rewrite_nci_method ($$$) {
+    my ($class, $method) = @_;
+    local $_ = $_[2];
+    return $_;
+}
+
+=item C<rewrite_vtable_method($class, $method, $super, $super_table)>
+
+Rewrites the method body performing the various macro substitutions for
 vtable method bodies (see F<classes/pmc2c.pl>).
 
 =cut
 
-sub rewrite_method ($$$$$) {
+sub rewrite_vtable_method ($$$$$) {
     my ($class, $method, $super, $super_table) = @_;
     local $_ = $_[4];
 
@@ -465,8 +522,16 @@ EOC
     $body =~ s/^\t/        /mg;
     $body =~ s/^[ ]{4}//mg;
     my $super = $self->{super}{$meth};
-    my $total_body = rewrite_method($classname, $meth, $super,
-                      $self->{super}, $body);
+
+    my $total_body;
+    if ($method->{loc} eq 'vtable') {
+        $total_body = rewrite_vtable_method($classname, $meth, $super,
+                       $self->{super}, $body);
+    }
+    else {
+        $total_body = rewrite_nci_method($classname, $meth, $body);
+    }
+
     # now split into MMD if necessary:
     my $additional_bodies= '';
     $total_body = substr $total_body, 1, -1;
@@ -513,6 +578,7 @@ sub methods() {
     my ($self, $line) = @_;
     my $cout = "";
 
+    # vtable methods
     foreach my $method (@{ $self->{vtable}{methods}} ) {
         my $meth = $method->{meth};
         next if $meth eq 'class_init';
@@ -522,6 +588,15 @@ sub methods() {
             $cout .= $ret;
         }
     }
+
+    # nci methods
+    foreach my $method (@{ $self->{methods}} ) {
+        next unless $method->{loc} eq 'nci';
+        my $ret = $self->body($method, $line);
+        $line += count_newlines($ret);
+        $cout .= $ret;
+    }
+
     $cout;
 }
 
@@ -716,10 +791,32 @@ EOC
     $cout .= <<"EOC";
     } /* pass */
 EOC
+
+    # declare each nci method for this class
+    my $firstnci = 1;
+    foreach my $method (@{ $self->{methods} }) {
+      next unless $method->{loc} eq 'nci';
+      my $proto = proto($method->{type}, $method->{parameters});
+      $cout .= <<"EOC" if $firstnci;
+    if (pass) {
+EOC
+      $cout .= <<"EOC";
+        enter_nci_method(interp, enum_class_${classname},
+                F2DPTR(Parrot_${classname}_$method->{meth}),
+                "$method->{meth}", "$proto");
+EOC
+      $firstnci = 0;
+    }
+      $cout .= <<"EOC" unless $firstnci;
+    }
+EOC
+
+    # include any class specific init code from the .pmc file
     $cout .= <<"EOC";
     $class_init_code
     if (pass == 1) {
 EOC
+
     # declare auxiliary variables for dyncpmc IDs
     foreach my $dynclass (keys %init_mmds) {
         next if $dynclass eq $classname;
