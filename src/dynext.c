@@ -131,82 +131,63 @@ Return path and handle of a dynamic lib.
 
 */
 
-#if !defined(_PARROTLIB)
 static STRING *
 get_path(Interp *interpreter, STRING *lib, void **handle)
 {
-    char *cpath;
     STRING *path;
-    /* TODO runtime path for dynamic extensions */
-    /* TODO $SO extension */
-#ifndef RUNTIME_DYNEXT
-#  define RUNTIME_DYNEXT "runtime/parrot/dynext/"
-#endif
+    char *full_name, *file_name, *file_w_ext = NULL;
+    const char *err;
 
     /*
-     * Current dir with no extension
+     * first try file with extension if it got none
      */
-    path = string_copy(interpreter, lib);
-    cpath = string_to_cstring(interpreter, lib);
-    *handle = Parrot_dlopen(cpath);
+    file_name = string_to_cstring(interpreter, lib);
+    if (!strchr(file_name, '.')) {
+        file_w_ext = malloc(strlen(file_name) +
+                strlen(PARROT_DLL_EXTENSION) + 1);
+        strcpy(file_w_ext, file_name);
+        strcat(file_w_ext, PARROT_DLL_EXTENSION);
+        full_name = Parrot_locate_runtime_file(interpreter, file_w_ext,
+                PARROT_RUNTIME_FT_DYNEXT);
+        if (full_name) {
+            *handle = Parrot_dlopen(full_name);
+            if (*handle) {
+                path = string_from_cstring(interpreter, full_name, 0);
+                string_cstring_free(file_name);
+                string_cstring_free(file_w_ext);
+                return path;
+            }
+            err = Parrot_dlerror();
+            fprintf(stderr, "Couldn't load '%s': %s\n",
+                    full_name, err ? err : "unknown reason");
+            return NULL;
+        }
+        /*
+         * then file.extension w/o prefix
+         */
+        *handle = Parrot_dlopen(file_w_ext);
+        if (handle) {
+            path = string_from_cstring(interpreter, file_w_ext, 0);
+            string_cstring_free(file_name);
+            string_cstring_free(file_w_ext);
+            return path;
+        }
+        string_cstring_free(file_w_ext);
+    }
     /*
-     * first look in current dir
+     * then the given file name as is
      */
-    if (!*handle) {
-        string_cstring_free(cpath);
-        path = Parrot_sprintf_c(interpreter, "%Ss%s",
-                                lib,
-                                PARROT_DLL_EXTENSION);
-        cpath = string_to_cstring(interpreter, path);
-        *handle = Parrot_dlopen(cpath);
+    *handle = Parrot_dlopen(file_name);
+    if (*handle) {
+        path = string_from_cstring(interpreter, file_name, 0);
+        string_cstring_free(file_name);
+        return path;
     }
-    if (!*handle) {
-        /*
-         * then in runtime/ ...
-         */
-        /* TODO only if not an absolute path */
-        string_cstring_free(cpath);
-        path = Parrot_sprintf_c(interpreter, "%s%Ss%s",
-                RUNTIME_DYNEXT,
-                lib,
-                PARROT_DLL_EXTENSION);
-        cpath = string_to_cstring(interpreter, path);
-        *handle = Parrot_dlopen(cpath);
-    }
-    if (!*handle) {
-        /*
-         * then in runtime/ with no extension
-         */
-        /* TODO only if not an absolute path */
-        string_cstring_free(cpath);
-        path = Parrot_sprintf_c(interpreter, "%s%Ss",
-                                RUNTIME_DYNEXT,
-                                lib);
-        cpath = string_to_cstring(interpreter, path);
-        *handle = Parrot_dlopen(cpath);
-    }
-    if (!*handle) {
-        /*
-         * then in runtime/ with no extension
-         */
-        /* TODO only if not an absolute path */
-        string_cstring_free(cpath);
-        path = Parrot_sprintf_c(interpreter, "runtime/parrot/%Ss",
-                                lib);
-        cpath = string_to_cstring(interpreter, path);
-        *handle = Parrot_dlopen(cpath);
-    }
-    if (!*handle) {
-        const char * err = Parrot_dlerror();
-        fprintf(stderr, "Couldn't load '%s': %s\n",
-                cpath, err ? err : "unknown reason");
-        string_cstring_free(cpath);
-        return NULL;
-    }
-    string_cstring_free(cpath);
-    return path;
+    err = Parrot_dlerror();
+    fprintf(stderr, "Couldn't load '%s': %s\n",
+            full_name, err ? err : "unknown reason");
+    return NULL;
 }
-#endif
 
 /*
 
@@ -272,18 +253,8 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     char *cinit_func_name, *cload_func_name;
     PMC *lib_pmc;
 
-#if defined(_PARROTLIB)
-    type = const_string(interpreter, PARROT_DLL_EXTENSION);
-    path = Parrot_library_query(interpreter, "dynext_location", lib, type, initializer);
-    if (path) {
-	char* cpath = string_to_cstring(interpreter, path);
-	handle = Parrot_dlopen(cpath);
-        string_cstring_free(cpath);
-    }
-#else
     UNUSED(initializer);
     path = get_path(interpreter, lib, &handle);
-#endif
     if (!path || !handle) {
         /*
          * XXX internal_exception? return a PerlUndef? return PMCNULL?

@@ -171,7 +171,17 @@ char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         "./",
         NULL
     };
+    const char *dynext_paths[] = {
+        "runtime/parrot/dynext/",
+        NULL
+    };
+    const char **paths;
     int length;
+
+    if (type & PARROT_RUNTIME_FT_DYNEXT)
+        paths = dynext_paths;
+    else
+        paths = include_paths;
 
     prefix = Parrot_get_runtime_prefix(interpreter, NULL);
     if (!prefix)
@@ -183,17 +193,17 @@ char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
      * TODO if not try extensions according to type
      */
     if (!ext) {
-        internal_exception(UNIMPLEMENTED, "no extension");
+        internal_exception(UNIMPLEMENTED, "no extension: file '%s'", file_name);
     }
     length = 0;
-    for (ptr = include_paths; *ptr; ++ptr) {
+    for (ptr = paths; *ptr; ++ptr) {
         int len = strlen(*ptr);
         length = (len > length) ? len : length;
     }
     length += strlen(prefix) + strlen(file_name) + 2;
     full_name = mem_sys_allocate(length);
 
-    for( ptr = include_paths; *ptr; ++ptr ) {
+    for (ptr = paths; *ptr; ++ptr) {
         strcpy(full_name, prefix);
         if (*prefix) {
 #ifdef WIN32
