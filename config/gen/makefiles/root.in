@@ -74,7 +74,7 @@ $(INC)/core_pmcs.h $(INC)/platform.h ${cg_h} \
 $(INC)/interp_guts.h $(INC)/rx.h $(INC)/rxstacks.h $(INC)/intlist.h \
 $(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h $(INC)/pmc.h \
 $(INC)/key.h $(INC)/hash.h $(INC)/smallobject.h $(INC)/headers.h $(INC)/dod.h \
-$(INC)/method_util.h
+$(INC)/method_util.h $(INC)/list.h
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
@@ -92,15 +92,15 @@ IO_O_FILES = io/io$(O) io/io_buf$(O) io/io_unix$(O) io/io_win32$(O) \
              io/io_stdio$(O)
 
 INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
-				 register$(O) core_ops$(O) core_ops_prederef$(O) memory$(O) \
-				 packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
-				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
-				 core_pmcs$(O) platform$(O) ${jit_o} \
-			     ${gc_o} rx$(O) rxstacks$(O) intlist$(O) \
-				 embed$(O) warnings$(O)  ${cg_o} \
-				 packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
-				 headers$(O) dod$(O) method_util$(O) \
-				 misc$(O) spf_render$(O) spf_vtable$(O)
+	 register$(O) core_ops$(O) core_ops_prederef$(O) memory$(O) \
+	 packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
+	 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
+	 core_pmcs$(O) platform$(O) ${jit_o} \
+     ${gc_o} rx$(O) rxstacks$(O) intlist$(O) list$(O) \
+	 embed$(O) warnings$(O)  ${cg_o} \
+	 packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
+	 headers$(O) dod$(O) method_util$(O) \
+	 misc$(O) spf_render$(O) spf_vtable$(O)
 
 O_FILES = $(INTERP_O_FILES) \
 	      $(IO_O_FILES) \
@@ -329,6 +329,8 @@ pmc$(O) : $(GENERAL_H_FILES)
 hash$(O) : $(GENERAL_H_FILES)
 
 intlist$(O) : $(GENERAL_H_FILES)
+
+list$(O) : $(GENERAL_H_FILES)
 
 jit$(O) : $(GENERAL_H_FILES) ${jit_h} $(INC)/jit_emit.h
 

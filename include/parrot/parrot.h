@@ -10,7 +10,7 @@
  *  References:
  */
 
-/* Only parrot core files should include this file.  
+/* Only parrot core files should include this file.
    Extensions should include <parrot/extend.h>.
    Programs embedding parrot should include <parrot/embed.h>.
 */
@@ -129,15 +129,15 @@ typedef void (*funcptr_t)(void);
  * turns out, ANSI C does appear to permit you to do this conversion if you
  * convert the value to an integer (well, a value type large enough to hold
  * a pointer) in between.  Believe it or not, this even works on TenDRA (tcc).
- * 
+ *
  * NOTE!  UINTVAL is incorrect below.  It should be UINTPTR or something like
- * that. The equivalent of C99's uintptr_t- a non-pointer data type that can 
+ * that. The equivalent of C99's uintptr_t- a non-pointer data type that can
  * hold a pointer.
  */
 #define D2FPTR(x) UINTVAL2PTR(funcptr_t, PTR2UINTVAL(x))
 #define F2DPTR(x) UINTVAL2PTR(void *, PTR2UINTVAL((funcptr_t) x))
 
-/* On Win32 we need the constant O_BINARY for open() (at least for Borland C), 
+/* On Win32 we need the constant O_BINARY for open() (at least for Borland C),
    but on UNIX it doesn't exist, so set it to 0 if it's not defined
  */
 #ifndef O_BINARY
@@ -150,8 +150,8 @@ typedef void (*funcptr_t)(void);
 #define UNUSED(a) if (a) {}
 
 /* If you are trying to debug GC problems which only occur on large test cases,
- * turning on GC_DEBUG should help make the problem appear with smaller data 
- * samples by reducing various numbers, and causing DOD and allocation runs 
+ * turning on GC_DEBUG should help make the problem appear with smaller data
+ * samples by reducing various numbers, and causing DOD and allocation runs
  * to occur more frequently. It does significantly reduce performance. */
 #define GC_DEBUG 0
 
@@ -174,6 +174,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/pmc.h"
 #include "parrot/events.h"
 #include "parrot/stacks.h"
+#include "parrot/list.h"
 #include "parrot/intlist.h"
 #include "parrot/smallobject.h"
 #include "parrot/headers.h"

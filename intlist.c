@@ -1,9 +1,9 @@
-/* intlists.c
- *  Copyright: (When this is determined...it will go here)
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Regex stack handling routines for Parrot
+#include <parrot/parrot.h>
+
+/* intlist emulation code, calls routines in list.c
+ *
+ * here is the original docu for intlist
+ *
  *  Data Structure and Algorithms:
  *
  *     The basic data structure is a variant of a doubly-linked list
@@ -86,364 +86,63 @@
  *     If on any indexed access interpreter's collect_runs is
  *     different, the chunks might have been moved, so the chunk_list
  *     has to be rebuilt.
- *
- *
- *  History:
- *  Notes:
- * References: */
+ */
 
-#include "parrot/parrot.h"
-#include "parrot/intlist.h"
 
-static size_t rebuild_chunk_list(Interp *interpreter, IntList *list);
-static IntList* allocate_chunk(Interp *interpreter, int initial);
-static size_t rebuild_chunk_list(Interp *interpreter, IntList *list);
+/* getting data outside the array dimensions will
+ * return the value NULL, which will SIGSEGV, the intlist did
+ * an explicit exception, so there is not much difference.
+ * Of course, a check for valid pointers could be added here.
+ */
 
-IntList*
-intlist_new(Interp *interpreter) {
-    return allocate_chunk(interpreter, 1);
+PMC* intlist_mark(Interp*i, IntList*l, PMC* last) {
+    return list_mark(i, (List*) l, last);
 }
 
-/* growth increment of chunk_list, must be a power of 2 */
-#define CL_SIZE 16
+IntList *intlist_new(Interp*i){
+    return (IntList *) list_new(i, enum_type_int);
+}
 
-/* Buffers store the used len in bytes in buflen
- * so, the len in entries is: */
-
-#define chunk_list_size(list) \
-                (list->chunk_list.buflen / sizeof(IntList_Chunk *))
-
-/* hide the ugly cast somehow: */
-#define chunk_list_ptr(list, idx) \
-        ((IntList_Chunk**)list->chunk_list.bufstart)[idx]
-
-static IntList*
-allocate_chunk(Interp *interpreter, int initial)
+INTVAL intlist_length(Interp* interpreter, IntList* list)
 {
-    IntList* list;
-
-    interpreter->DOD_block_level++;
-    list = (IntList *) new_bufferlike_header(interpreter, sizeof(*list));
-    list->start = 0;
-    list->end = 0;
-    list->length = 0;
-    list->next = list;
-    list->prev = list;
-    list->buffer.bufstart = NULL;
-    interpreter->GC_block_level++;
-    Parrot_allocate(interpreter, (Buffer*) list,
-                    INTLIST_CHUNK_SIZE * sizeof(INTVAL));
-    if (initial) {
-        /* we have a cleared list, so no need to zero chunk_list */
-        rebuild_chunk_list(interpreter, list);
-    }
-    interpreter->DOD_block_level--;
-    interpreter->GC_block_level--;
-    return list;
+    UNUSED(interpreter);
+    return ((List*)list)->length;
 }
 
-PMC*
-intlist_mark(Interp* interpreter, IntList* list, PMC* last)
-{
-    IntList_Chunk* chunk = (IntList_Chunk*) list;
-    do {
-        buffer_lives((Buffer *) chunk);
-        chunk = chunk->next;
-    } while (chunk != (IntList_Chunk*) list);
-    buffer_lives(&list->chunk_list);
-    return last;
+void intlist_assign(Interp*i, IntList*l, INTVAL idx, INTVAL val) {
+    list_assign(i, (List*)l, idx, INTVAL2PTR(void*,val), enum_type_int);
 }
 
-#ifdef INTLIST_DEBUG
-void
-intlist_dump(FILE* fp, IntList* list, int verbose)
-{
-    IntList_Chunk* chunk = (IntList_Chunk*) list;
-    IntList_Chunk* lastChunk = list->prev;
-    if (fp == NULL) fp = stderr; /* Useful for calling from gdb */
-
-    if (verbose) fprintf(fp, "LIST[%d]: ", (int) chunk->length);
-
-    while (1) {
-        int i;
-
-        if (verbose)
-            fprintf(fp, "[%d..%d] ", (int) chunk->start, (int) chunk->end-1);
-
-        for (i = chunk->start; i < chunk->end; i++) {
-            INTVAL* entries = (INTVAL*) chunk->buffer.bufstart;
-            fprintf(fp, INTVAL_FMT " ", entries[i]);
-        }
-        if (chunk == lastChunk) break;
-        chunk = chunk->next;
-    }
-
-    fprintf(fp, "\n");
+void intlist_push(Interp*i, IntList*l, INTVAL val) {
+    list_push(i,(List*)l,INTVAL2PTR(void*, val), enum_type_int);
 }
+
+void intlist_unshift(Interp*i, IntList**l, INTVAL val) {
+    list_unshift(i, (List*)*l, INTVAL2PTR(void*, val), enum_type_int);
+}
+
+/* popping /shifting into a sparse hole returns 0 */
+
+INTVAL intlist_pop(Interp *i, IntList* l) {
+    void *ret =  list_pop(i,(List*)l,enum_type_int);
+    INTVAL retval = ret == (void*) -1 ? 0 : *(INTVAL*) ret;
+    return retval;
+}
+
+INTVAL intlist_shift(Interp *i, IntList**l) {
+    void *ret = list_shift(i,(List*)*l,enum_type_int);
+    INTVAL retval = ret == (void*) -1 ? 0 : *(INTVAL*) ret;
+    return retval;
+}
+
+INTVAL intlist_get(Interp*i, IntList*l, INTVAL idx) {
+    void * ret = list_get(i,(List*)l,idx, enum_type_int);
+    INTVAL retval = ret == (void*) -1 ? 0 : *(INTVAL*) ret;
+    return retval;
+}
+void intlist_dump(FILE* fp, IntList* list, int verbose) {
+#ifdef LIST_DEBUG
+    list_dump(fp, (List*)list, verbose);
 #endif
-
-static size_t
-rebuild_chunk_list(Interp *interpreter, IntList *list)
-{
-    IntList_Chunk* chunk = (IntList_Chunk*) list;
-    IntList_Chunk* lastChunk = list->prev;
-    size_t len = 0;
-    /* allocate a new chunk_list buffer, old one my have moved
-     * first, count chunks */
-    while (1) {
-        len++;
-        if (chunk == lastChunk) break;
-        chunk = chunk->next;
-    }
-    Parrot_allocate(interpreter, &list->chunk_list,
-                    (len+1) * sizeof(IntList_Chunk *));
-    len = 0;
-    chunk = list;
-    /* then fill list */
-    while (1) {
-        chunk_list_ptr(list, len) = (IntList_Chunk*) chunk;
-        len++;
-        if (chunk == lastChunk) break;
-        chunk = chunk->next;
-    }
-    list->collect_runs = interpreter->collect_runs;
-    list->n_chunks = len;
-    return len;
 }
 
-static void
-add_chunk(Interp* interpreter, IntList* list)
-{
-    IntList_Chunk* chunk = list->prev;
-
-    if (chunk->next == list) {
-        /* Need to add a new chunk */
-        IntList_Chunk* new_chunk = allocate_chunk(interpreter, 0);
-        new_chunk->next = list;
-        new_chunk->prev = chunk;
-        chunk->next = new_chunk;
-        list->prev = new_chunk;
-    }
-    else {
-        /* Reuse the spare chunk we kept */
-        list->prev = chunk->next;
-    }
-}
-
-static void
-push_chunk(Interp* interpreter, IntList* list)
-{
-    add_chunk(interpreter, list);
-    list->prev->start = 0;
-    list->prev->end = 0;
-    /* optimization, add new chunk directly, if still space
-     * but only, if no collections was done in between
-     */
-    if (list->n_chunks >= chunk_list_size(list) ||
-            list->collect_runs != interpreter->collect_runs)
-        rebuild_chunk_list(interpreter, list);
-    else {
-        /* add the appended = last chunk = list->prev to chunk_list */
-        chunk_list_ptr(list, list->n_chunks) = list->prev;
-        list->n_chunks++;
-    }
-}
-
-static void
-unshift_chunk(Interp* interpreter, IntList* list)
-{
-    add_chunk(interpreter, list);
-    list->prev->start = INTLIST_CHUNK_SIZE;
-    list->prev->end = INTLIST_CHUNK_SIZE;
-}
-
-INTVAL
-intlist_length(Interp* interpreter, IntList* list)
-{
-    UNUSED(interpreter);
-    return list->length;
-}
-
-void
-intlist_push(Interp *interpreter, IntList* list, INTVAL data)
-{
-    IntList_Chunk* chunk = (IntList *) list->prev;
-    INTVAL length = list->length + 1;
-
-    ((INTVAL*)chunk->buffer.bufstart)[chunk->end++] = data;
-
-    /* Add on a new chunk if necessary */
-    if (chunk->end == INTLIST_CHUNK_SIZE)
-        push_chunk(interpreter, list);
-
-    list->length = length;
-}
-
-void
-intlist_unshift(Interp *interpreter, IntList** list, INTVAL data)
-{
-    IntList_Chunk* chunk = (IntList_Chunk *) *list;
-    INTVAL length = chunk->length + 1;
-    INTVAL offset;
-    IntList_Chunk * o = chunk;
-
-    /* Add on a new chunk if necessary */
-    if (chunk->start == 0) {
-        unshift_chunk(interpreter, *list);
-        chunk = chunk->prev;
-        *list = chunk;
-        /* move chunk_list to new list head */
-        (*list)->chunk_list = o->chunk_list;
-        /* and rebuild it from scratch */
-        rebuild_chunk_list(interpreter, *list);
-    }
-
-    ((INTVAL*)chunk->buffer.bufstart)[--chunk->start] = data;
-
-    (*list)->length = length;
-}
-
-INTVAL
-intlist_shift(Interp *interpreter, IntList** list)
-{
-    IntList_Chunk* chunk = (IntList_Chunk *) *list;
-    INTVAL length = chunk->length - 1;
-    INTVAL value;
-    IntList_Chunk * o = chunk;
-
-    if (chunk->start >= chunk->end) {
-        internal_exception(OUT_OF_BOUNDS, "No entries on list!\n");
-        return 0;
-    }
-
-    value = ((INTVAL*)chunk->buffer.bufstart)[chunk->start++];
-
-    if (chunk->start >= chunk->end) {
-        /* Just walked off the end of the initial chunk. Make initial
-         * chunk into the spare. */
-        chunk->next->prev = chunk->prev;
-        chunk->prev->next = chunk;
-        *list = chunk->next;
-        /* like above */
-        (*list)->chunk_list = o->chunk_list;
-        rebuild_chunk_list(interpreter, *list);
-    }
-
-    (*list)->length = length;
-
-    return value;
-}
-
-INTVAL
-intlist_pop(Interp *interpreter, IntList* list)
-{
-    IntList_Chunk* chunk = (IntList *) list->prev;
-    INTVAL length = list->length - 1;
-
-    /* We may have an empty chunk at the end of the list */
-    if (chunk->start >= chunk->end) {
-        /* Discard this chunk by making it the spare. */
-        chunk->prev->next = chunk;
-        chunk->next = list;
-        list->prev = chunk->prev;
-        chunk = chunk->prev;
-        /* chunk_list hold one less valid entry now */
-        list->n_chunks--;
-    }
-
-    /* Quick sanity check */
-    if (chunk->end == chunk->start) {
-        internal_exception(OUT_OF_BOUNDS, "No entries on list!\n");
-        return 0;
-    }
-
-    list->length = length;
-
-    /* Decrement end and return the value */
-    return ((INTVAL*)chunk->buffer.bufstart)[--chunk->end];
-}
-
-static IntList_Chunk*
-find_chunk(Interp* interpreter, IntList* list, INTVAL idx)
-{
-    IntList_Chunk* chunk = list;
-    UNUSED(interpreter);
-
-    if (list->collect_runs != interpreter->collect_runs)
-        rebuild_chunk_list(interpreter, list);
-    return chunk_list_ptr(list, idx / INTLIST_CHUNK_SIZE);
-}
-
-INTVAL
-intlist_get(Interp* interpreter, IntList* list, INTVAL idx)
-{
-    IntList_Chunk* chunk;
-    INTVAL length = list->length;
-
-    if (idx >= length || -idx > length) {
-        internal_exception(OUT_OF_BOUNDS,
-                          "Invalid index, must be " INTVAL_FMT ".." INTVAL_FMT,
-                           -length, length-1);
-        return 0;
-    }
-
-    if (idx < 0) idx += length;
-    idx +=  list->start;
-
-    chunk = find_chunk(interpreter, list, idx);
-
-    idx = idx % INTLIST_CHUNK_SIZE;
-
-    return ((INTVAL*)chunk->buffer.bufstart)[idx];
-}
-
-static void
-intlist_extend(Interp* interpreter, IntList* list, INTVAL length)
-{
-    IntList_Chunk* chunk = list->prev;
-    INTVAL idx = length - list->length + chunk->end;
-    INTVAL chunks_to_add = idx / INTLIST_CHUNK_SIZE;
-    for (; chunks_to_add ; chunks_to_add--) {
-        chunk->end = INTLIST_CHUNK_SIZE;
-        push_chunk(interpreter, list);
-        chunk = chunk->next;
-    }
-    chunk->end = idx % INTLIST_CHUNK_SIZE;
-    list->length = length;
-}
-
-void
-intlist_assign(Interp* interpreter, IntList* list, INTVAL idx, INTVAL val)
-{
-    IntList_Chunk* chunk;
-    INTVAL length = list->length;
-
-    if (idx < -length) {
-        internal_exception(OUT_OF_BOUNDS,
-                          "Invalid index, must be " INTVAL_FMT ".." INTVAL_FMT,
-                           -length, length-1);
-        return;
-    }
-
-    if (idx < 0)
-        idx += length;
-    else if (idx >= length) {
-        intlist_extend(interpreter, list, idx + 1);
-    }
-
-    idx +=  list->start;
-    chunk = find_chunk(interpreter, list, idx);
-
-    idx = idx % INTLIST_CHUNK_SIZE;
-    ((INTVAL*)chunk->buffer.bufstart)[idx] = val;
-}
-
-/*
- * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
- * End:
- *
- * vim: expandtab shiftwidth=4:
-*/

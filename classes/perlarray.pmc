@@ -14,14 +14,26 @@
 
 #include "parrot/parrot.h"
 
-#define THROW_UNSUPPORTED internal_exception(INTERP_ERROR, "Operation not supported\n")
-
-#define resize_array Parrot_Array_resize_array
-extern void Parrot_Array_resize_array ( struct Parrot_Interp *, PMC*, INTVAL);
 
 static PMC* undef(struct Parrot_Interp* interpreter)
 {
     return pmc_new(interpreter, enum_class_PerlUndef);
+}
+
+static PMC *
+Parrot_PerlArray_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
+{
+    void * ret = list_get(interp, list, key, enum_type_PMC);
+    PMC *value;
+
+    /* assign into a sparse or past end */
+    if (ret == 0 || ret == (void*) -1 || *(PMC**)ret == 0) {
+	value = undef(interp);
+	list_assign(interp, list, key, value, enum_type_PMC);
+    }
+    else
+	value = *(PMC**) ret;
+    return value;
 }
 
 pmclass PerlArray extends Array {
@@ -35,19 +47,9 @@ pmclass PerlArray extends Array {
     }
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
-        INTVAL ix;
-
-        if (!key) return;
-
-        ix = *key;
-
-        if (ix >= SELF->cache.int_val) {
-            resize_array(interpreter, SELF, ix+1);
-        }
-	else if (ix < -SELF->cache.int_val)
-            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
-
-        SUPER(key, value);
+	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
+		(List *) SELF->data, *key);
+        ptr->vtable->set_integer_native(INTERP, ptr, value);
     };
 
 
@@ -57,31 +59,14 @@ pmclass PerlArray extends Array {
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-
-        if (ix >= SELF->cache.int_val) {
-            resize_array(interpreter, SELF, ix+1);
-        }
-	else if (ix < -SELF->cache.int_val)
-            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
-
-        SUPER(key, value);
+	DYNSELF.set_integer_keyed_int(&ix, value);
     };
 
 
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
-        INTVAL ix;
-
-        if (!key) return;
-
-        ix = *key;
-
-        if (ix >= SELF->cache.int_val) {
-            resize_array(interpreter, SELF, ix+1);
-        }
-	else if (ix < -SELF->cache.int_val)
-            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
-
-        SUPER(key, value);
+	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
+		(List *) SELF->data, *key);
+        ptr->vtable->set_number_native(INTERP, ptr, value);
     };
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
@@ -90,31 +75,14 @@ pmclass PerlArray extends Array {
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-
-        if (ix >= SELF->cache.int_val) {
-            resize_array(interpreter, SELF, ix+1);
-        }
-	else if (ix < -SELF->cache.int_val)
-            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
-
-        SUPER(key, value);
+	DYNSELF.set_number_keyed_int(&ix, value);
     };
 
 
     void set_string_keyed_int (INTVAL* key, STRING* value) {
-        INTVAL ix;
-
-        if (!key) return;
-
-        ix = *key;
-
-        if (ix >= SELF->cache.int_val) {
-            resize_array(interpreter, SELF, ix+1);
-        }
-	else if (ix < -SELF->cache.int_val)
-            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
-
-        SUPER(key, value);
+	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
+		(List *) SELF->data, *key);
+        ptr->vtable->set_string_native(INTERP, ptr, value);
     };
 
     void set_string_keyed (PMC* key, STRING* value) {
@@ -123,29 +91,11 @@ pmclass PerlArray extends Array {
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-
-        if (ix >= SELF->cache.int_val) {
-            resize_array(interpreter, SELF, ix+1);
-        }
-	else if (ix < -SELF->cache.int_val)
-            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
-
-        SUPER(key, value);
+	DYNSELF.set_string_keyed_int(&ix, value);
     };
 
     void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
-        INTVAL ix;
-
-        if (!key) return;
-
-        ix = *key;
-
-        if (ix >= SELF->cache.int_val) {
-            resize_array(interpreter, SELF, ix+1);
-        }
-	else if (ix < -SELF->cache.int_val)
-            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
-
+	Parrot_PerlArray_set_pmc_ptr(INTERP, (List *) SELF->data, *key);
         SUPER(key, src, src_key);
     };
 
@@ -155,18 +105,11 @@ pmclass PerlArray extends Array {
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-
-        if (ix >= SELF->cache.int_val) {
-            resize_array(interpreter, SELF, ix+1);
-        }
-	else if (ix < -SELF->cache.int_val)
-            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
-
-        SUPER(key, src, src_key);
+	DYNSELF.set_pmc_keyed_int(&ix, src, src_key);
     };
 
     INTVAL get_integer_keyed_int (INTVAL* key) {
-        if (*key >= SELF->cache.int_val || *key < -SELF->cache.int_val) {
+        if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
             PMC* temp = undef(INTERP);
             return temp->vtable->get_integer(INTERP, temp);
         }
@@ -179,7 +122,7 @@ pmclass PerlArray extends Array {
     }
 
     FLOATVAL get_number_keyed_int (INTVAL* key) {
-        if (*key >= SELF->cache.int_val || *key < -SELF->cache.int_val) {
+        if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
             PMC* temp = undef(INTERP);
             return temp->vtable->get_number(INTERP, temp);
         }
@@ -192,11 +135,11 @@ pmclass PerlArray extends Array {
     }
 
     STRING* get_string () {
-	return string_from_int(INTERP, SELF->cache.int_val);
+	return string_from_int(INTERP, DYNSELF.elements());
     }
 
     STRING* get_string_keyed_int (INTVAL* key) {
-        if (*key >= SELF->cache.int_val || *key < -SELF->cache.int_val) {
+        if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
             PMC* value = undef(INTERP);
             return value->vtable->get_string(INTERP, value);
         }
@@ -209,7 +152,7 @@ pmclass PerlArray extends Array {
     }
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
-        if (*key >= SELF->cache.int_val || *key < -SELF->cache.int_val)
+        if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements())
             return undef(INTERP);
         else
             return SUPER(key);

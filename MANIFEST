@@ -8,6 +8,7 @@ MANIFEST
 MANIFEST.SKIP
 NEWS
 README
+RELEASE_INSTRUCTIONS
 RESPONSIBLE_PARTIES
 TODO
 VERSION
@@ -35,6 +36,7 @@ classes/perlstring.pmc
 classes/perlundef.pmc
 classes/pmc2c.pl
 classes/pointer.pmc
+classes/scalar.pmc
 classes/sub.pmc
 config/auto/alignptrs.pl
 config/auto/alignptrs/test_c.in
@@ -213,6 +215,7 @@ include/parrot/intlist.h
 include/parrot/io.h
 include/parrot/jit.h
 include/parrot/key.h
+include/parrot/list.h
 include/parrot/memory.h
 include/parrot/method_util.h
 include/parrot/misc.h
@@ -482,6 +485,7 @@ languages/regex/lib/Regex/Parse/P6C.pm
 languages/regex/lib/Regex/PreOptimize.pm
 languages/regex/lib/Regex/Rewrite.pm
 languages/regex/lib/Regex/Rewrite/Stackless.pm
+languages/regex/lib/Regex/State.pm
 languages/regex/regex.pl
 languages/regex/t/a.t
 languages/regex/t/alt.t
@@ -556,6 +560,7 @@ lib/Test/Builder.pm
 lib/Test/More.pm
 lib/Test/Simple.pm
 lib/Text/Balanced.pm
+list.c
 make.pl
 malloc.c
 malloc-trace.c
@@ -614,6 +619,7 @@ t/pmc/boolean.t
 t/pmc/intlist.t
 t/pmc/perlarray.t
 t/pmc/perlhash.t
+t/pmc/perlint.t
 t/pmc/perlstring.t
 t/pmc/pmc.t
 t/pmc/sub.t
