@@ -1123,12 +1123,13 @@ Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
 {
     struct regsave *data = save_regs(interpreter);
     va_list args;
+    void *ret;
 
     va_start(args, sig);
-    (void) runops_args(interpreter, sub, sig, args);
+    ret = runops_args(interpreter, sub, sig, args);
     va_end(args);
     restore_regs(interpreter, data);
-    return NULL;
+    return ret;
 }
 
 /*

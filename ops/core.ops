@@ -1082,12 +1082,7 @@ Get a compiler for source type $2.
 =item B<compreg>(in STR, in PMC)
 
 Register the sub $2 as a compiler for source type $1.
-XXX: leo: N/Y how would we get the C-subroutine?
-
-=item B<compreg>(in STR, in INT)
-
-Register the PASM sub at address $2 as a compiler for source type $1.
-XXX: leo N/Y
+$2 is either a NCI PMC with signature "pIt" or a PASM Sub.
 
 =item B<new_callback>(out PMC, in PMC, in PMC, in STR)
 
@@ -1146,7 +1141,21 @@ op dlvar (out PMC, in PMC, in STR) {
 }
 
 inline op compile(out PMC, in PMC, in STR) {
-  $1 = $2->vtable->invoke(interpreter, $2, $3);
+  PMC *compiler = $2;
+  if (compiler->vtable->base_type == enum_class_Compiler ||
+	  compiler->vtable->base_type == enum_class_NCI) {
+      $1 = VTABLE_invoke(interpreter, compiler, $3);
+  }
+  else {
+      $1 = Parrot_runops_fromc_args_save(interpreter, compiler, "PS", $3);
+  }
+  goto NEXT();
+}
+
+inline op compreg(in STR, in PMC) {
+  PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
+      interpreter->iglobals, IGLOBALS_COMPREG_HASH);
+  VTABLE_set_pmc_keyed_str(interpreter, compreg_hash, $1, $2);
   goto NEXT();
 }
 
