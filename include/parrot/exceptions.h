@@ -66,6 +66,7 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define GLOBAL_NOT_FOUND 5
 #define METH_NOT_FOUND 6
 #define WRITE_TO_CONSTCLASS 7
+#define NOSPAWN 8
 
 /* &end_gen */
 
