@@ -690,7 +690,7 @@ sub pass4($$) {
 	my @opt = map { "-$_" } split(//, $o{'parrot-options'});
 	my $cmd = "$PARROT @opt $file @ARGV";
 	verbose(1, "running: $cmd");
-	if (system($cmd) && !$o{'ignore-exitcode'}) {
+	if (system($PARROT, @opt, $file, @ARGV) && !$o{'ignore-exitcode'}) {
 	    mydie($?, $cmd);
 	}
     }

@@ -30,11 +30,13 @@ Branch destination on failure, or C<undef> for fallthrough.
 =cut
 
 package P6C::IMCC::rule;
-use P6C::IMCC ':all';
 use strict;
-use P6C::Util qw(unimp is_string);
+use P6C::IMCC ':all';
+use P6C::Util qw(unimp is_string map_preorder);
 use P6C::IMCC::prefix 'gen_sub_call';
 
+# C<undef> means fallthrough, so use this to generate a jump to what
+# may be a fallthrough label.
 sub maybe_fallthrough {
     my $l = shift;
     if (defined($l)) {
@@ -44,6 +46,7 @@ END
     }
 }
 
+# top-level regex
 sub P6C::IMCC::rule::rx_val {
     my $x = shift;
     my $pos  = $x->{ctx}{rx_pos};
@@ -51,7 +54,16 @@ sub P6C::IMCC::rule::rx_val {
     my $fail = $x->{ctx}{rx_fail} || genlabel 'endrule_no';
     my $ret = newtmp 'PerlUndef';
     my $isback = gentmp 'int';
-    my $init = genlabel;
+
+    # Find and emit initialization code.
+    # XXX: shouldn't re-do this every time we invoke a rule...
+    map_preorder {
+	if (UNIVERSAL::can($_, 'rx_rule_init')) {
+	    $_->rx_rule_init;
+	}
+    } $x;
+
+    # Emit regex body:
     my $back = $x->pat->rx_val({ succ => undef,
 				 fail => $fail,
 				 pos => $pos,
@@ -65,6 +77,7 @@ END
 # Alternation
 #   Creates a backtracking label.
 #   Code for an alternation looks like this:
+#           push mark
 #	    push offset
 #	    <code for alt 1, fail => goto fail1>
 #	    push 1	(== last successful branch)
@@ -93,9 +106,14 @@ sub P6C::rx_alt::rx_val {
     }
 
     my $which = gentmp 'int';
+    my $savepos = gentmp 'int';
     my $bt = genlabel 'alt_back';
     my $need_endlabel;
     my $startdepth;
+    my @nextlabel = map { genlabel 'alt_'.$_ } 0..$#{$x->branches};
+    my @bt_labels;
+    my %subctx = %$ctx;
+    $subctx{succ} = undef;
 
     # We need a success label, so define one if we're expected to fall
     # through.
@@ -112,28 +130,24 @@ sub P6C::rx_alt::rx_val {
 END
     }
 
-    # setup -- push our index onto the intstack.
     code(<<END);
+	rx_pushmark
 	rx_pushindex $ctx->{pos}
 END
-
-    my @nextlabel = map { genlabel 'alt_'.$_ } 0..$#{$x->branches};
-    my @bt_labels;
-    my %subctx = %$ctx;
-    $subctx{succ} = undef;
+    # setup -- push our index onto the intstack.
     for my $i (0..$#{$x->branches}) {
 	$subctx{fail} = $nextlabel[$i];
 	$bt_labels[$i] = $x->branches($i)->rx_val({ %subctx });
 	code(<<END);
 	rx_pushindex $i
-	goto $ctx->{succ}	# alt
+	goto $ctx->{succ}
 $nextlabel[$i]:
 END
     }
 
     # Failure branch:
     code(<<END);
-	rx_popindex $ctx->{pos}, $ctx->{fail}	# won't fail
+	rx_popindex $ctx->{pos}, $ctx->{fail}
 	goto $ctx->{fail}
 END
 
@@ -157,6 +171,10 @@ END
 	if $which == $i goto $bt_labels[$i]
 END
     }
+    code(<<END);
+	rx_popindex $ctx->{pos}, $ctx->{fail}
+	goto $ctx->{fail}
+END
     if ($need_endlabel) {
 	code(<<END);
 $ctx->{succ}:
@@ -189,17 +207,6 @@ sub P6C::rx_seq::rx_val {
 #	Note: this should probably be a special opcode that builds an
 #	Aho-Corasic matcher to do all branches at once.
 #
-#   Code:
-#	
-#	push pos
-#	current = -1
-#   back:
-#	current++
-#	pop pos
-#	if which == last goto fail
-#	push pos
-#	rx_literal @array[current], fail => back
-#
 sub rx_alt_array {
     my ($x, $ctx) = @_;
     my $which = gentmp 'int';
@@ -209,20 +216,24 @@ sub rx_alt_array {
     my $bt = genlabel 'alt_back';
     my $again = genlabel 'alt_next';
     my $start = gentmp 'int';
+    my $fail = genlabel 'altfail';
     my $need_endlabel;
 
     code(<<END);
 	$which = 0
 	$num = $things
+	$start = $ctx->{pos}
 	goto $again
 $bt:
-	rx_popindex $which, $ctx->{fail} # XXX: shouldn't fail
+	rx_popindex $which, $ctx->{fail}
 	rx_popindex $ctx->{pos}, $ctx->{fail}
+	$start = $ctx->{pos}
+# XXX: need to reinitialize because of sub calls
+	$num = $things
 $again:
 	if $which == $num goto $ctx->{fail}
 	$lit = $things\[$which]
 	inc $which
-	$start = $ctx->{pos}
 	rx_literal $ctx->{str}, $ctx->{pos}, $lit, $again
 	rx_pushindex $start
 	rx_pushindex $which
@@ -281,220 +292,167 @@ END
 	}
 	code(<<END);
 	rx_literal $ctx->{str}, $ctx->{pos}, $lit, $ctx->{fail}
-#	print $ctx->{pos}
-#	print " ATOM MATCH\\n"
 END
     }
     maybe_fallthrough($ctx->{succ});
     return $startdepth ? $x->{ctx}{rx_fail_label} : $ctx{fail};
 }
 
-# Greedy repeat with runtime limits.
+# Greedy repeat <$n,$m>
 #
-#   Note: I doubt this is actually right.  For example, the first
-#   repetition should probably backtrack into the rep when it fails
-#   instead of failing the whole <$n,$m>.
-#
-#	push mark
-#	count = n
-#   min:
-#	if --count < 0 goto saw_min
-#	<code for item, succ => min>
-#   saw_min:
-#	push mark
-#	count = count - m
-#   max:
-#	if --count < 0 goto succ
-#	push pos
-#	<code for item, succ => max, fail => internal_fail>
-#   external_fail:
-#	pop pos, fail => backtrack min
-#	push pos
-#	goto backtrack for item
-#   internal_fail:
-#	pop pos, fail => backtrack min
+#   push mark
+#   count = 0
+# loop:
+#   push pos
+#   push count
+#   if count++ == max goto done
+#   <code for item succ => loop, fail => lastrep>
+# back:
+#   pop count
+#   pop pos
+#   if count > 0 goto back_for_item
+#   if min == 0 goto done
+#   goto fail
+# lastrep:
+#   if --count < min goto back
+# done:
 #
 sub do_var_repeat {
     my ($x, $ctx) = @_;
-    my $n = ref($x->min) ? $x->min->val : $x->min;
-    my ($bt, $btfirst);
+    my $nv = ref($x->min) ? $x->min->val : $x->min;
+    my $mv = ref($x->max) ? $x->max->val : $x->max;
+
+    my $bt;
     my $loop = genlabel 'fixrep';
     my $succ = $ctx->{succ};
     my $mindone = genlabel('max');
     my $count = gentmp 'int';
-    code(<<END);
-	rx_pushmark
-	$count = $n
-$loop:
-	dec $count
-	if $count < 0 goto $mindone
-END
-    my %loopctx = %$ctx;
-    $loopctx{succ} = $loop;
-    $btfirst = $x->thing->rx_val({ %loopctx });
-    # Okay, matched at least $min times
+    my $n = gentmp 'int';
+    my $m = gentmp 'int';
 
-    my $loop2 = genlabel 'rep';
     my $loopfail = genlabel 'rep';
-    my $loopfailex = genlabel 'rep';
-    my $itmp = gentmp 'int';
-    code(<<END);
-$mindone:
-	rx_pushmark
-	$itmp = $n
-END
-    my $m = ref($x->max) ? $x->max->val : $x->max;
-    code(<<END);
-	$count = $m
-	$count = $count - $itmp
-$loop2:
-	dec $count
-	if $count < 0 goto $ctx->{succ}
-	rx_pushindex $ctx->{pos}
-END
-    %loopctx = %$ctx;
-    $loopctx{succ} = $loop2;
+    my $loopfailex = genlabel 'max';
+    my $maxdone = genlabel 'max';
+    my $zerocnt = genlabel 'zero';
+    my %loopctx = %$ctx;	# context for min loop
+    $loopctx{succ} = $loop;
     $loopctx{fail} = $loopfail;
+
+    code(<<END);
+	rx_pushmark
+	$m = $mv
+	$n = $nv
+	$count = 0
+$loop:
+	rx_pushindex $ctx->{pos}
+	rx_pushindex $count
+	if $count == $m goto $maxdone
+	inc $count
+END
     $bt = $x->thing->rx_val({ %loopctx });
     code(<<END);
 $loopfailex:
-	rx_popindex $ctx->{pos}, $btfirst
-	rx_pushindex $ctx->{pos}
-	goto $bt
+	rx_popindex $count, $ctx->{fail}
+	rx_popindex $ctx->{pos}, $ctx->{fail}
+# XXX: reinitialize:
+	$m = $mv
+	$n = $nv
+	if $count > 0 goto $bt
+$zerocnt:
+	if $n == 0 goto $maxdone
+	goto $ctx->{fail}
 $loopfail:
-	rx_popindex $ctx->{pos}, $btfirst
+	dec $count
+	if $count == 0 goto $zerocnt
+	if $count < $n goto $loopfailex
+$maxdone:
 END
     return $loopfailex;
 }
 
-# Frugal quantifier
+# Frugal repeat
 #
-#   Note: +? and *? currently don't backtrack into the item they
-#   modify.  <n,m> is not right.  I need to think about this more and
-#   rewrite it if we don't move over to using languages/regex for
-#   this...
+# The intended order to try alternatives of e.g. "(a|b)+?" is
+# "a", "b", "aa", "ab", "ba", "bb", "aaa", ...
 #
-#   For +?:
+# Code:
 #
-#	<code for item, fail => fail>
-#	goto succ
-#   back:
-#	<code for item, fail => fail>
-#
-#   For ??:
-#
-#	goto succ
-#   back:
-#	<code for item, fail => fail>
-#
-#   For <n,m>:
-#
-#	push mark
-#	count = -1
-#   min:
-#	if ++count == n goto min_done
-#	<code for item, succ => min, fail => fail>
-#   min_done:
-#	--count
-#	goto succ
-#   max:		(== backtrack destination)
-#	if ++count == m goto backtrack_min_item
-#	<code for item, succ => next, fail => backtrack min>
-#   succ:
+#   push mark
+#   count = 0
+#   limit = min
+# loop:
+#   push pos, count, limit
+#   if count++ == limit goto enough
+#   <code for item succ => loop, fail => failitem>
+# back:
+#   pop limit, count, pos
+#   if limit == 0 goto incr
+#   goto item_back
+# failitem:
+#   if --count > 0 goto back
+#   pop limit, count, pos
+# incr:
+#   if ++limit > max goto fail
+#   goto item_back
 #
 sub do_frugal_rep {
     my ($x, $ctx) = @_;
-    my $bt = genlabel 'frugal_bt';
-    my $needend;
-    if (ref($x->min) || ref($x->max)) {
-	# variables.
-	unimp 'variable frugal rep';
-    } elsif (!defined($x->max)) {
-	# *? or +?
-	unless (defined $ctx->{succ}) {
-	    $needend = 1;
-	    $ctx->{succ} = genlabel('frugal');
-	}
-	if ($x->min == 1) {
-	    my %ctx = %$ctx;
-	    delete $ctx{succ};	# fallthrough
-	    $x->thing->rx_val(\%ctx);
-	}
-	code(<<END);
-	goto $ctx->{succ}
-$bt:
-END
-	$x->thing->rx_val($ctx);
-    } elsif ($x->min == 0 && $x->max == 1) {
-	# ??
-	unless (defined $ctx->{succ}) {
-	    $needend = 1;
-	    $ctx->{succ} = genlabel('frugal');
-	}
-	my $bt = genlabel('frugal_bt');
-	code(<<END);
-	goto $ctx->{succ}
-$bt:
-END
-        $x->thing->rx_val($ctx);
-    } else {
-	# <n,m>? or <n>?
-	# NOTE: the latter makes no sense at all, but is legal syntax.
-	# XXX: backtracking is completely hosed here (and below...)
-	my $n = $x->min;
-	my $loop = genlabel 'fixrep';
-	my $mindone;
-	if ($n == $x->max) {
-	    unless (defined $ctx->{succ}) {
-		$needend = 1;
-		$ctx->{succ} = genlabel('frugal');
-	    }
-	    $mindone = $ctx->{succ};
-	} else {
-	    $mindone = genlabel('max');
-	}
-	my $count = gentmp 'int';
-	code(<<END);
-	rx_pushmark
-	$count = -1
-$loop:
-	inc $count
-	if $count == $n goto $mindone
-END
-	my %loopctx = %$ctx;
-	$loopctx{succ} = $loop;
-	$bt = $x->thing->rx_val({ %loopctx });
-	# Okay, matched at least $min times, now see if we need to
-	# construct more.
-	if ($n < $x->max) {
-	    unless (defined $ctx->{succ}) {
-		$needend = 1;
-		$ctx->{succ} = genlabel('frugal');
-	    }
-	    my $m = $x->max;
-	    my $loop2 = genlabel 'rep';
-	    my $loopfail = genlabel 'rep';
-	    my $loopfailex = genlabel 'rep';
-	    code(<<END);
-$mindone:
-	dec $count
-	goto $ctx->{succ}
-$loop2:
-	inc $count
-	if $count > $m goto $bt
-END
-	    %loopctx = %$ctx;
-	    $loopctx{fail} = $bt;
-	    $x->thing->rx_val({ %loopctx });
-	    $bt = $loop2;
-	}
+    if (!defined($x->max)) {
+	$x->max(100000);
     }
+    my $nv = ref($x->min) ? $x->min->val : $x->min;
+    my $mv = ref($x->max) ? $x->max->val : $x->max;
 
-    maybe_fallthrough($ctx->{succ}) unless $needend;
-    code(<<END) if $needend;
-$ctx->{succ}:
+    my $bt;
+    my $loop = genlabel 'fixrep';
+    my $succ = $ctx->{succ};
+    my $mindone = genlabel('max');
+    my $count = gentmp 'int';
+    my $n = gentmp 'int';
+    my $m = gentmp 'int';
+
+    my $loopfail = genlabel 'rep';
+    my $loopfailex = genlabel 'max';
+    my $enough = genlabel 'enough';
+    my %loopctx = %$ctx;	# context for min loop
+    $loopctx{succ} = $loop;
+    $loopctx{fail} = $loopfail;
+
+    code(<<END);
+	rx_pushmark
+	$m = $mv
+	$n = $nv
+	$count = 0
+$loop:
+	rx_pushindex $ctx->{pos}
+	rx_pushindex $count
+	rx_pushindex $n
+	if $count == $n goto $enough
+	inc $count
 END
-    return $bt;
+    $bt = $x->thing->rx_val({ %loopctx });
+    my $incr = genlabel 'incr';
+    code(<<END);
+$loopfailex:
+	rx_popindex $n, $ctx->{fail}
+	rx_popindex $count, $ctx->{fail}
+	rx_popindex $ctx->{pos}, $ctx->{fail}
+	$m = $mv
+	if $n == 0 goto $incr
+	goto $bt
+$loopfail:
+	dec $count
+	if $count > 0 goto $loopfailex
+	rx_popindex $n, $ctx->{fail}
+	rx_popindex $count, $ctx->{fail}
+	rx_popindex $ctx->{pos}, $ctx->{fail}
+$incr:
+	inc $n
+	if $n > $m goto $ctx->{fail}
+	goto $loop
+$enough:
+END
+    return $loopfailex;
 }
 
 # Greedy repetition
@@ -504,14 +462,12 @@ END
 #	push mark
 #   loop:
 #	push pos
-#	<code for item, fail => loop_fail, succ => loop>
+#	push first_time ? 0 : 1
+#	<code for item, fail => next, succ => loop>
 #   external_fail:		(== backtracking target)
+#	pop can_back
 #	pop pos, fail => fail
-#	push pos
-#	goto backtrack_item
-#
-#   loop_fail:
-#	pop pos, fail => fail
+#	if can_back backtrack item
 #
 #   ?:
 #
@@ -521,46 +477,24 @@ END
 #   next:			(== backtracking target)
 #	pop pos, fail => fail
 #
-#
-#   <n,m>:
-#
-#	push mark
-#	count = -1
-#   min:
-#	if ++count == n goto min_done
-#	<code for item, succ => min, fail => fail>
-#   min_done:
-#	push mark
-#	--count
-#   max:
-#	if ++count == m goto max_done
-#	push pos
-#	<code for item, fail => fail_max, succ => max>
-#   external_fail:		(== backtracking target)
-#	pop pos, fail => backtrack_min_item
-#	push pos
-#	goto backtrack_max_item
-#   fail_max:
-#	pop pos, fail => backtrack_min_item
-#
 sub P6C::rx_repeat::rx_val {
     my ($x, $ctx) = @_;
     my $bt;
+    my $needend;
+
     if (!$x->greedy) {
 	return do_frugal_rep($x, $ctx);
     } elsif ($x->negated) {
 	unimp 'Negated repetition specifier';
     }
     
-    # Most of these need an end-label:
-    my $needend;
     my %ctx = %$ctx;
-    if (ref($x->min) || ref($x->max)) {
+    if (ref($x->min) || ref($x->max) || (defined($x->max) && $x->max != 1)) {
+	# <$n, $m>
 	unless ($ctx->{succ}) {
 	    $needend = 1;
 	    $ctx->{succ} = genlabel 'repeat';
 	}
-	# Variables.  I hate variables.
 	$bt = do_var_repeat($x, $ctx);
     } elsif (!defined($x->max)) {
 	# Star or plus
@@ -570,32 +504,32 @@ sub P6C::rx_repeat::rx_val {
 	my $loop = genlabel 'star';
 	my $loopfail = genlabel 'star_infail';
 	my $loopfailex = genlabel 'star_back';
-	code(<<END);
-	rx_pushmark
-$loop:
-	rx_pushindex $ctx->{pos}
-#	print $ctx->{pos}
-#	print " STAR TRY\\n"
-END
+	my $end = genlabel 'star_end';
+	my $itmp = gentmp 'int';
+	my $initdepth = gentmp 'int';
 	my %loopctx = %$ctx;
 	$loopctx{succ} = $loop;
 	$loopctx{fail} = $loopfail;
+
+	code(<<END);
+	rx_pushmark
+	$itmp = 0
+$loop:
+	rx_pushindex $ctx->{pos}
+	rx_pushindex $itmp
+	$itmp = 1
+END
 	$bt = $x->thing->rx_val({ %loopctx });
 	code(<<END);
 $loopfailex:
+	rx_popindex $itmp, $ctx{fail}
 	rx_popindex $ctx->{pos}, $ctx{fail}
-	rx_pushindex $ctx->{pos}
-#	print $ctx->{pos}
-#	print " STAR BACK\\n"
-	goto $bt
+	if $itmp != 0 goto $bt
 $loopfail:
-	rx_popindex $ctx->{pos}, $ctx{fail}
-#	print $ctx->{pos}
-#	print " STAR END\\n"
 END
 	$bt = $loopfailex;
 
-    } elsif ($x->min == 0 && $x->max == 1) {
+    } else {
 	# ?
 	unless ($ctx->{succ}) {
 	    $needend = 1;
@@ -613,57 +547,6 @@ END
 $ctx{fail}:
 	rx_popindex $ctx->{pos}, $ctx->{fail}
 END
-    } else {
-	# <$n, $m>
-	unless ($ctx->{succ}) {
-	    $needend = 1;
-	    $ctx->{succ} = genlabel 'repeat';
-	}
-	my $n = $x->min;
-	my $btfirst;
-	my $loop = genlabel 'fixrep';
-	my $mindone = ($n == $x->max ? $ctx->{succ} : genlabel('max'));
-	my $count = gentmp 'int';
-	code(<<END);
-	rx_pushmark
-	$count = -1
-$loop:
-	inc $count
-	if $count == $n goto $mindone
-END
-	my %loopctx = %$ctx;
-	$loopctx{succ} = $loop;
-	$bt = $btfirst = $x->thing->rx_val({ %loopctx });
-	# Okay, matched at least $min times, now see if we need to
-	# construct more.
-	if ($n < $x->max) {
-	    my $m = $x->max;
-	    my $loop2 = genlabel 'rep';
-	    my $loopfail = genlabel 'rep';
-	    my $loopfailex = genlabel 'rep';
-	    code(<<END);
-$mindone:
-	rx_pushmark
-	dec $count
-$loop2:
-	inc $count
-	if $count == $m goto $ctx->{succ}
-	rx_pushindex $ctx->{pos}
-END
-	    %loopctx = %$ctx;
-	    $loopctx{succ} = $loop2;
-	    $loopctx{fail} = $loopfail;
-	    $bt = $x->thing->rx_val({ %loopctx });
-	    code(<<END);
-$loopfailex:
-	rx_popindex $ctx->{pos}, $btfirst
-	rx_pushindex $ctx->{pos}
-	goto $bt
-$loopfail:
-	rx_popindex $ctx->{pos}, $btfirst
-END
-	    $bt = $loopfailex;
-	}
     }
     maybe_fallthrough($ctx->{succ}) unless $needend;
 
@@ -816,17 +699,22 @@ sub P6C::rx_charclass::rx_val {
 }
 
 # enumerated character class.
-sub P6C::rx_oneof::rx_val {
-    my ($x, $ctx) = @_;
+sub P6C::rx_oneof::rx_rule_init {
+    my $x = shift;
     my $rep = $x->rep;
-    my $inv = $x->negated;
     $rep =~ s/(.)-(.)/join '', map { chr } ord($1) .. ord($2)/eg;
-    my $bmp = gentmp 'pmc';
+    my $bmp = $x->{ctx}{rx_bmp_name} = gentmp 'PerlUndef';
     $rep =~ s/(?<!\\)"/\\"/g;
     code(<<END);
 	rx_makebmp $bmp, "$rep"
 END
-    if ($inv) {
+}
+
+sub P6C::rx_oneof::rx_val {
+    my ($x, $ctx) = @_;
+    my $bmp = $x->{ctx}{rx_bmp_name}
+	|| die "Internal error: can't find regex bitmap.";
+    if ($x->negated) {
 	rx_not_one($ctx, sub { 
 		       code(<<END);
 	rx_oneof_bmp $ctx->{str}, $ctx->{pos}, $bmp, $ctx->{fail}
@@ -886,8 +774,6 @@ sub P6C::rx_call::rx_val {
 	rx_pushindex $ctx->{pos}
 	goto $start
 $bt:
-#	print $ctx->{pos}
-#	print " CALL BACK\\n"
 	rx_pushmark
 $start:
 	push $ctx->{str}
@@ -911,7 +797,7 @@ sub P6C::rx_cut::rx_val {
     my ($x, $ctx) = @_;
     die $x->level if $x->level != 1 && $x->level != 2;
 
-    my $bt = genlabel 'cut_'.$x->level;
+    my $bt = genlabel 'cut_'.$x->level.'_';
     my $needsucc;
     my $unwind = $x->{ctx}{rx_unwind}->{ctx}{rx_fail_label};
 

@@ -94,10 +94,9 @@ sub main() {
     print "ok 4\n" if $s =~ /aca<2>?/;
     print "ok 5\n" if $s =~ /aca<0,2>?/;
     print "ok 6\n" if $s =~ /aca<2,1000>?/;
-# XXX: frugal variable quantifiers not done yet.
-#     my ($n, $m) = (2, 34);
-#     print "ok 7\n" if $s =~ /aca<2,$m>?/;
-#     print "ok 8\n" if $s !~ /aca<3,$m>?/;
+    my ($n, $m) = (2, 34);
+    print "ok 7\n" if $s =~ /aca<2,$m>?/;
+    print "ok 8\n" if $s !~ /aca<3,$m>?/;
     print "ok 9\n" if $s =~ /abb??/;
     print "ok 10\n" if $s !~ /abb+?/;
     print "ok 11\n" if $s =~ /abb*?/;
@@ -109,6 +108,8 @@ ok 3
 ok 4
 ok 5
 ok 6
+ok 7
+ok 8
 ok 9
 ok 10
 ok 11
@@ -125,6 +126,9 @@ sub main() {
     print "ok 4\n" if $s =~ /@a @a @a @a @a @a/;
     print "ok 5\n" if $s !~ /@a @a @a @a @a @a @a/;
     print "ok 6\n" if $s =~ /@a a @a ac/;
+    print "ok 7\n" if $s =~ /^@a+ b/;
+    print "ok 8\n" if $s =~ /^@a*? b/;
+    print "ok 9\n" if $s !~ /@a+ .$/;
 }
 CODE
 ok 1
@@ -133,6 +137,9 @@ ok 3
 ok 4
 ok 5
 ok 6
+ok 7
+ok 8
+ok 9
 OUT
 
 ##############################

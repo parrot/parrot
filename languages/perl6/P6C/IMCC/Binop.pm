@@ -301,6 +301,7 @@ sub sm_expr_pattern {
 	rx_clearstack		# XXX: good old non-reentrant engine.
 	rx_initstack
 	$str = $val
+
 	$pos = 0
 	$basepos = 0
 	goto $begin
@@ -323,7 +324,31 @@ END
 
 sub sm_array_pattern {
     my ($a, $r, $ctx) = @_;
-    unimp '@a =~ /regex/';
+    my $aval = $a->val;
+    my $i = gentmp 'int';
+    my $n = gentmp 'int';
+    my $vtmp = gentmp 'PerlUndef';
+    my $loop = genlabel 'arraymatch';
+    my $test = genlabel 'arraymatch';
+    my $done = genlabel 'arraymatch';
+    code(<<END);
+	$n = $aval
+	$i = 0
+	goto $test
+$loop:
+	$vtmp = $aval\[$i]
+END
+    my $ret = sm_expr_pattern(P6C::Register->new(reg => $vtmp,
+						 $type => 'PerlUndef'),
+			      $r, $ctx);
+    code(<<END);
+	if $ret goto $done
+	inc $i
+$test:
+	if $i < $n goto $loop
+$done:
+END
+    return $ret;
 }
 
 sub sm_hash_pattern {

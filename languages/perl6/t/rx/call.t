@@ -59,7 +59,7 @@ rule balanced($open, $close) {
 sub main() {
     my $s = " 12 112213455898898992020 ";
     print "ok 1\n" if $s =~ /<two_of(1..10)>/;
-    print "ok 2\n" if $s =~ /<two_of(10..30)>\s$/;
+    print "ok 2\n" if $s =~ /<two_of(1..30)>\s$/;
     print "ok 3\n" if $s =~ /5<balanced(8, 9)>+20/;
     print "ok 4\n" if $s =~ /<two_of(1..10)><2> .<6> <balanced(9,8)>/;
     print "ok 5\n" if $s =~ /<two_of:20>/;

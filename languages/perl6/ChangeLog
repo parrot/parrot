@@ -289,6 +289,8 @@
 	    - allow 'sub' in place of '->' for anon subs
 	    - subscripting on variables in regexes
 	    - ++@x[$i] (Leo Toetsch)
+	    - move initialization code to start of rule
+	    - fit driver help message on a single screen
 
 	* Additions:
 	    - String interpolation (Joseph Ryan)
@@ -296,3 +298,16 @@
 	* Test-failures:
 	    - t/rx/call_2 -- backtracking bug.  Hopefully I'll track this
 	      down soon.
+
+2002-09-06
+
+	* Fixes:
+	    - rule state restored when backtracking called rules
+	    - have driver use system(@args) to avoid shell meta-character
+	      problems.
+	    - quantifiers, stingy and otherwise, made more sane.
+
+	* Test-failures:
+	    - compiler/1_11: segfault, compiler/3_7: weird stack problem.
+	      These seem to be either memory corruption or use of freed
+	      memory -- small changes to the .p6 files make them go away.

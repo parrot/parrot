@@ -32,6 +32,7 @@ use Carp 'confess';
 use strict;
 use P6C::Context;
 use P6C::Nodes;
+use P6C::IMCC 'gentmp';
 use P6C::Util qw(:all);
 
 BEGIN { # Add types for builtin binary operators.
@@ -823,7 +824,10 @@ sub P6C::rx_cut::ctx_right {
 }
 sub P6C::rx_meta::ctx_right { }
 sub P6C::rx_any::ctx_right { }
-sub P6C::rx_oneof::ctx_right { }
+sub P6C::rx_oneof::ctx_right {
+    my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
+}
 
 sub P6C::rx_atom::ctx_right {
     my ($x, $ctx) = @_;
