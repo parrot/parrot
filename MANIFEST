@@ -350,6 +350,7 @@ examples/mops/mops.rb                             [main]doc
 examples/mops/mops.scheme                         [main]doc
 examples/pni/PQt.C                                [main]doc
 examples/pni/QtHelloWorld.pasm                    [main]doc
+examples/pni/sdl_blue_rectangle.imc               [main]doc
 examples/pni/win32api.imc                         [main]doc
 examples/subs/sub1.imc                            [main]doc
 examples/subs/sub2.imc                            [main]doc
