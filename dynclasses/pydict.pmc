@@ -1,0 +1,338 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pydict.pmc - Python Dictionary
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Python Dictionary class
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+static PMC* intret;
+STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
+
+/* cache of classes referenced */
+static INTVAL dynclass_PyInt;
+static INTVAL dynclass_PyNone;
+
+pmclass PyDict extends PyObject need_ext does hash dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Allocates the memory for the hash.
+
+=cut
+
+*/
+
+    void class_init() {
+        /* class_init_code */
+        if (pass) {
+            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
+
+            make_bufferlike_pool(INTERP, sizeof(struct _hash));
+            intret = constant_pmc_new(INTERP, dynclass_PyInt);
+        }
+    }
+
+/*
+
+=item C<void init()>
+
+Initializes the instance.
+
+=cut
+
+*/
+
+    void init () {
+        PObj_custom_mark_SET(SELF);
+        new_pmc_hash(INTERP, SELF);
+    }
+
+/*
+
+=item C<void delete_keyed(PMC *key)>
+
+Deletes the element associated with C<*key>.
+
+=cut
+
+*/
+
+    void delete_keyed(PMC* key) {
+        STRING * sx;
+        Hash * h = (Hash *)PMC_struct_val(SELF);
+        HashBucket *b;
+        sx = key_string(INTERP, key);
+        key = key_next(INTERP, key);
+        b = hash_get_bucket(INTERP, h, sx);
+        if (b == NULL)
+                return;  /* no such key */
+        else if (key == NULL)
+            hash_delete(INTERP, h, sx);
+        else
+            VTABLE_delete_keyed(INTERP, (PMC*)b->value, key);
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+Returns the number of elements in the hash.
+
+=cut
+
+*/
+
+    INTVAL elements () {
+        return hash_size(INTERP, PMC_struct_val(SELF));
+    }
+
+/*
+
+=item C<PMC* get_iter ()>
+
+Return a new iterator for dictionary
+
+=cut
+
+*/
+
+    PMC* get_iter () {
+        PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG|KEY_number_FLAG;
+        PMC_int_val(key) = 0;
+        PMC_data(key) = (void *)INITBucketIndex;
+        if (!hash_size(INTERP, PMC_struct_val(SELF)))
+            PMC_int_val(key) = -1;
+        return iter;
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+Returns the PMC value for the element at C<*key>.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed (PMC* key) {
+        PMC* valpmc;
+        STRING* keystr;
+        Hash *hash = PMC_struct_val(SELF);
+        HashBucket *b;
+        PMC* nextkey;
+
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_integer_FLAG|KEY_number_FLAG: {
+                /* called from iterator with an integer idx in key
+                 * check if we really have Hash_key_type_int
+                 */
+                if (hash->key_type == Hash_key_type_int) {
+                    INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
+                    PMC_int_val(intret) = i;
+                    return intret;
+                }
+                else {
+                    STRING *s = hash_get_idx(INTERP, hash, key);
+                    VTABLE_set_string_native(INTERP, intret, s);
+                    return intret;
+                }
+           }
+            default:
+                keystr = key_string(INTERP, key);
+        }
+        b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+                                        keystr);
+        if (b == NULL) {
+            /* XXX should store the undef for consistency */
+            PMC *new_undef = pmc_new(INTERP, dynclass_PyNone);
+            return new_undef;
+        }
+        nextkey = key_next(INTERP, key);
+        if (!nextkey)
+            return b->value;
+        return VTABLE_get_pmc_keyed(INTERP, (PMC*)b->value, nextkey);
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed_str(STRING *key)>
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed_str (STRING* key) {
+        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+                                        key);
+        if (b == NULL) {
+            /* XXX should store the undef for consistency */
+            PMC *new_undef = pmc_new(INTERP, dynclass_PyNone);
+            return new_undef;
+        }
+        return b->value;
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns a string representation of the dictionary.
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        /* TODO use freeze */
+        PMC *iter = VTABLE_get_iter(INTERP, SELF);
+        STRING *res, *s;
+        INTVAL j, n;
+
+        res = string_from_cstring(INTERP, "{", 0);
+        n = VTABLE_elements(INTERP, SELF);
+        for (j = 0; j < n; ++j) {
+            STRING *key = VTABLE_shift_string(INTERP, iter);
+            int i,all_digit = 1;
+            PMC *val;
+
+            for (i = 0; i < (int)key->strlen; ++i) {
+                if (!isdigit(((char *)key->strstart)[i])) {
+                    all_digit = 0;
+                    break;
+                }
+            }
+            if (all_digit) {
+                res = string_append(INTERP, res, key, 0);
+            }
+            else {
+                res = string_append(INTERP, res,
+                        const_string(INTERP, "'"), 0);
+                res = string_append(INTERP, res, key, 0);
+                res = string_append(INTERP, res,
+                        const_string(INTERP, "'"), 0);
+            }
+            res = string_append(INTERP, res,
+                    const_string(INTERP, ": "), 0);
+            val = SELF.get_pmc_keyed_str(key);
+            res = string_append(INTERP, res,
+                    VTABLE_get_repr(INTERP, val), 0);
+            if (j < n - 1)
+            res = string_append(INTERP, res,
+                    const_string(INTERP, ", "), 0);
+        }
+        res = string_append(INTERP, res,
+                    const_string(INTERP, "}"), 0);
+        return res;
+    }
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the big number value for the element at C<*key>.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed (PMC* key) {
+        PMC* valpmc;
+        STRING* keystr;
+        HashBucket *b;
+        Hash *hash = PMC_struct_val(SELF);
+        PMC* nextkey;
+
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_integer_FLAG|KEY_number_FLAG:
+                /* called from iterator with an integer idx in key */
+                if (hash->key_type == Hash_key_type_int) {
+                    INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
+                    return string_from_int(interpreter, i);
+                }
+                return hash_get_idx(INTERP, hash, key);
+            default:
+                keystr = key_string(INTERP, key);
+        }
+        b = hash_get_bucket(INTERP, hash, keystr);
+        if (b == NULL) {
+            /* XXX Warning: use of uninitialized value */
+            PMC *new_undef = pmc_new(INTERP, dynclass_PyNone);
+            return VTABLE_get_string(interpreter, new_undef);
+        }
+        nextkey = key_next(INTERP, key);
+        valpmc = b->value;
+        if (!nextkey)
+            return VTABLE_get_string(INTERP, valpmc);
+        return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
+    }
+
+/*
+
+=item C<void set_pmc_keyed(PMC *dest_key, PMC *value)>
+
+=cut
+
+*/
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        STRING* keystr;
+        PMC* nextkey;
+        PMC* box;
+        PMC* val;
+
+        if (!key) return;
+        keystr = key_string(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+            hash_put(INTERP, PMC_struct_val(SELF), keystr, value);
+            return;
+        }
+        box = SELF.get_pmc_keyed_str(keystr);
+        if (box == NULL) {
+            /* autovivify an PyDict */
+            box = pmc_new(INTERP, DYNSELF.type());
+        }
+        VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

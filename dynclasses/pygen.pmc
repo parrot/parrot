@@ -1,0 +1,61 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pymodule.pmc - Python Module
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Python Module base class
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PyGen dynpmc group python_group {
+
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+Looks up the method for C<*method_name> and returns it. If no method is
+found then lookup an attribute by this name, and return it.  If all else
+fails, return null.
+
+=cut
+
+*/
+
+    PMC* find_method(STRING* method_name) {
+        PMC * method = SUPER(method_name);
+        if (!method) method = VTABLE_getprop(INTERP, SELF, method_name);
+        return method;
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

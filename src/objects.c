@@ -1212,7 +1212,6 @@ find_method_direct_1(Parrot_Interp interpreter, PMC *class,
         STRING *isa;
         UINTVAL start;
         INTVAL pos;
-find_in_pmc:
 
         class_name = class->vtable->whoami;
         method = Parrot_find_global(interpreter,
@@ -1287,7 +1286,7 @@ find_in_pmc:
             class = curclass;
             if (class->vtable->base_type == enum_class_delegate)
                 break;
-            goto find_in_pmc;
+            return VTABLE_find_method(interpreter, curclass, method_name);
         }
         method = Parrot_find_global(interpreter,
                 VTABLE_get_string(interpreter,

@@ -126,17 +126,8 @@ sub dynext_load_code {
  * This load function will be called to do global (once) setup
  * whatever is needed to get this extension running
  */
-#include "parrot/parrot.h"
-#include "parrot/extend.h"
-#include "parrot/dynext.h"
 
 EOC
-    for my $class (keys %classes) {
-        my $lc_class = lc $class;
-        $cout .= <<"EOC";
-#include "pmc_${lc_class}.h"
-EOC
-    }
     $cout .= <<"EOC";
 
 extern Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter); /* don't warn */
@@ -372,6 +363,11 @@ superclasses.
 sub includes() {
     my $self = shift;
     my $cout = "";
+    $cout .= <<"EOC";
+#include "parrot/parrot.h"
+#include "parrot/extend.h"
+#include "parrot/dynext.h"
+EOC
     foreach my $parents ($self->{class}, @{ $self->{parents} } ) {
 	my $name = lc $parents;
 	$cout .= <<"EOC";
@@ -732,9 +728,10 @@ Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
     };
 EOC
 
+    my $const = ($self->{flags}{dynpmc}) ? " " : " const ";
     $cout .= <<"EOC";
 
-    const MMD_init _temp_mmd_init[] = {
+   $const MMD_init _temp_mmd_init[] = {
         $mmd_list
     };
     /*  Dynamic classes need the runtime type
@@ -812,14 +809,26 @@ EOC
 
     # declare each nci method for this class
     my $firstnci = 1;
+    my $my_enum_class;
+    if ($self->{flags}{dynpmc}) {
+       $my_enum_class = "my_enum_class_${classname}";
+    }
+    else {
+       $my_enum_class = "enum_class_${classname}";
+    }
     foreach my $method (@{ $self->{methods} }) {
       next unless $method->{loc} eq 'nci';
       my $proto = proto($method->{type}, $method->{parameters});
-      $cout .= <<"EOC" if $firstnci;
+      if ($firstnci) {
+          $cout .= <<"EOC";
     if (pass) {
 EOC
+          $cout .= <<"EOC" if $self->{flags}{dynpmc};
+        int my_enum_class_$classname = Parrot_PMC_typenum(interp, "$classname");
+EOC
+      }
       $cout .= <<"EOC";
-        enter_nci_method(interp, enum_class_${classname},
+        enter_nci_method(interp, $my_enum_class,
                 F2DPTR(Parrot_${classname}_$method->{meth}),
                 "$method->{meth}", "$proto");
 EOC
@@ -1647,11 +1656,35 @@ sub gen_c {
     my ($self, $file) = @_;
     my $cout = Parrot::Pmc2c->dont_edit('various files');
 
+    $cout .= $self->includes;
     $cout .= Parrot::Pmc2c::dynext_load_code($self->{opt}{library},
                                              map { $_->{class} => $_ }
                                                  values %{$self->{pmcs}} );
 
     return $cout;
+}
+
+=item C<includes()>
+
+Returns the set of C C<#include>s for the library.
+
+=cut
+
+sub includes() {
+    my $self = shift;
+    my $cout = "";
+    $cout .= <<"EOC";
+#include "parrot/parrot.h"
+#include "parrot/extend.h"
+#include "parrot/dynext.h"
+EOC
+    foreach my $pmc (values %{$self->{pmcs}}) {
+	my $name = lc $pmc->{class};
+	$cout .= <<"EOC";
+#include "pmc_$name.h"
+EOC
+    }
+    "$cout\n";
 }
 
 =back

@@ -1,0 +1,44 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pynone.pmc - Python None
+
+=head1 DESCRIPTION
+
+C<PyNone> extends C<PyInt> to provide a class with the behaviour of
+the Python C<None> value.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PyNone extends PyObject dynpmc group python_group {
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

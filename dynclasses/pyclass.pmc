@@ -1,0 +1,122 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pyclass.pmc - Python Class
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Python Class base class
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/* cache of classes referenced */
+static INTVAL dynclass_PyNone;
+
+pmclass PyClass dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of various PMCs because
+they will be used frequently here.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
+        }
+    }
+
+/*
+
+=item C<PMC *getprop(STRING *key)>
+
+Returns the property for C<*key>. If no property is defined then an
+None is returned.
+
+=cut
+
+*/
+
+    PMC* getprop(STRING* key) {
+        PMC * prop = SUPER(key);
+        if (!prop) {
+            prop = VTABLE_getprop(INTERP, SELF, key);
+            if (!VTABLE_defined(INTERP, prop)) {
+              prop = pmc_new(INTERP, dynclass_PyNone);
+            }
+        }
+        return prop;
+    }
+
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+Looks up the method for C<*method_name> and returns it. If no method is
+found then lookup an attribute by this name, and return it.  If all else
+fails, return null.
+
+=cut
+
+*/
+
+    PMC* find_method(STRING* method_name) {
+        PMC * method = SUPER(method_name);
+        if (!method) {
+            method = VTABLE_getprop(INTERP, REG_PMC(0), method_name);
+            if (!VTABLE_defined(INTERP, method)) method=0;
+        }
+        return method;
+    }
+
+/*
+
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a PerlHash Class object. Return a new
+C<dict> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+
+    void* invoke(void* next) {
+        REG_PMC(5) = pmc_new(interpreter, REG_PMC(0)->vtable->base_type);
+        return next;
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

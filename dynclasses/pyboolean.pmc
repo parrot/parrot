@@ -1,0 +1,88 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pyboolean.pmc - PyBoolean PMC
+
+=head1 DESCRIPTION
+
+This class implements a Python Boolean value variable.
+
+Albeit C<PyBoolean> is derived from C<PyInt>, it doesn't morph to other
+types, its value is changed only.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PyBoolean extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the scalar.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return PMC_int_val(SELF) != 0;
+    }
+
+/*
+
+=item C<STRING* get_string ()>
+
+Return "True" or "False" if python_mode is true.
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        return PMC_int_val(SELF) ?
+            const_string(INTERP, "True") :
+            const_string(INTERP, "False");
+    }
+
+/*
+
+=item C<void set_integer_native (INTVAL value)>
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL value) {
+        PMC_int_val(SELF) = (value != 0);
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

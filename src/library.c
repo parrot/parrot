@@ -175,6 +175,7 @@ char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
     };
     const char *dynext_paths[] = {
         "runtime/parrot/dynext/",
+        "",
         NULL
     };
     const char **paths;

@@ -9,6 +9,9 @@ our $LD_LOAD_FLAGS = "${ld_load_flags}";
 our $PERL = "${perl}";
 our $LOAD_EXT = "${load_ext}";
 our $O = "${o}";
+our $LIBPARROT = "../src/extend${o}";
+    # XXX: ultimately, this should be replaced with:
+    #  $LIBPARROT = "-L../blib/lib -lparrot";
 our $CFLAGS = "${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}";
 our $PMC2C = "$PERL ${build_dir}${slash}classes${slash}pmc2c2.pl";
 
@@ -23,8 +26,8 @@ sub compile_cmd {
 
 sub partial_link_cmd {
     my ($target, @sources) = @_;
-    "$LD $CFLAGS $LDFLAGS $LD_LOAD_FLAGS ".
-    "${cc_o_out}" . $target . " " .
+    "$LD $CFLAGS $LDFLAGS $LD_LOAD_FLAGS $LIBPARROT ".
+    "-o " . $target . " " .
     join(" ", @sources);
 }
 

@@ -1,0 +1,801 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pyint.pmc - Python Integer
+
+=head1 DESCRIPTION
+
+C<PyInt> extends C<PyObject> to provide a Python integer.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/* cache of classes referenced */
+static INTVAL dynclass_PyInt;
+static INTVAL dynclass_PyFloat;
+static INTVAL dynclass_PyString;
+
+pmclass PyInt extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of various PMCs because
+they will be used frequently here.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
+            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
+        }
+    }
+
+/*
+
+=item C<PMC* "__hex__"()>
+
+Returns the hex representation of C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __hex__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        STRING *s = Parrot_sprintf_c(INTERP, "%#x",
+            VTABLE_get_integer(INTERP, SELF));
+        VTABLE_set_string_native(INTERP, ret, s);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__oct__"()>
+
+Returns the hex representation of C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __oct__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        STRING *s = Parrot_sprintf_c(INTERP, "%#o",
+            VTABLE_get_integer(INTERP, SELF));
+        VTABLE_set_string_native(INTERP, ret, s);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__pos__"()>
+
+Returns the value of the prefix operator C<+>.
+
+=cut
+
+*/
+
+    METHOD PMC* __pos__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        PMC_int_val(ret) = PMC_int_val(SELF);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__pow__"(PMC *value)>
+
+Raises C<SELF> to the power of C<*value> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __pow__(PMC *value) {
+        /* XXX: redo as a proper MMD if/when a proper op is implemented */
+        FLOATVAL valf = VTABLE_get_number(INTERP, value);
+        INTVAL vali = VTABLE_get_integer(INTERP, value);
+        PMC * ret;
+        if ( (vali < 0) || ((FLOATVAL)vali != valf) ) {
+            ret = pmc_new(INTERP, dynclass_PyFloat);
+            VTABLE_set_number_native(INTERP, ret,
+                (FLOATVAL) pow( (FLOATVAL) PMC_int_val(SELF), valf) );
+        }
+        else {
+            int i;
+            ret = pmc_new(INTERP, dynclass_PyInt);
+            PMC_int_val(ret) = 1;
+            for (i=1; i<=vali; i++) {
+                PMC_int_val(ret) *= PMC_int_val(SELF);
+            }
+        }
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__truediv__"(PMC *value)>
+
+Divides C<SELF> by C<*value> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __truediv__(PMC *value) {
+        FLOATVAL valf = VTABLE_get_number(INTERP, value);
+        FLOATVAL d = PMC_int_val(SELF)/valf;
+        INTVAL i = (INTVAL) d;
+        PMC * ret;
+        if ( (FLOATVAL)i != d ) {
+            ret = pmc_new(INTERP, dynclass_PyFloat);
+            VTABLE_set_number_native(INTERP, ret, d);
+        }
+        else {
+            ret = pmc_new(INTERP, dynclass_PyInt);
+            PMC_int_val(ret) = i;
+        }
+        return ret;
+    }
+
+/*
+
+=item C<void absolute(dest)>
+
+Sets C<dest> to the absolute value of SELF.
+
+=cut
+
+*/
+
+    void absolute(PMC *dest) {
+        VTABLE_set_integer_native(INTERP, dest, abs(PMC_int_val(SELF)));
+    }
+
+/*
+
+=item C<void add(PMC *value, PMC *dest)>
+
+Adds C<*value> to the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void add (PMC* value, PMC* dest) {
+MMD_PyInt: {
+            INTVAL pmci = PMC_int_val(SELF);
+            INTVAL vali = VTABLE_get_integer(INTERP, value);
+            VTABLE_set_integer_native(INTERP, dest, pmci + vali);
+        }
+MMD_PyFloat: {
+            INTVAL pmci = PMC_int_val(SELF);
+            FLOATVAL valf = VTABLE_get_number(INTERP, value);
+            /* XXX: Morph? */
+            VTABLE_set_number_native(INTERP, dest, pmci + valf);
+        }
+    }
+
+/*
+
+=item C<void add_int(INTVAL b, PMC* dest)>
+
+Adds C<b> to the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void add_int (INTVAL b, PMC* dest) {
+        INTVAL a = PMC_int_val(SELF);
+        VTABLE_set_integer_native(INTERP, dest, a+b);
+    }
+
+/*
+
+=item C<void bitwise_and_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise C<AN> of the integer and C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_and (PMC *value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) & VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+/*
+
+=item C<void bitwise_and_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise C<AN> of the integer and C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_and_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) & value
+        );
+    }
+
+/*
+
+=item C<void bitwise_not(PMC *dest)>
+
+Calculates the bitwise C<NOT> of the integer and returns the result in
+C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_not (PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest, ~PMC_int_val(SELF));
+    }
+
+/*
+
+=item C<void bitwise_or(PMC *value, PMC *dest)>
+
+Calculates the bitwise C<OR> of the integer and C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_or (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) |
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+/*
+
+=item C<void bitwise_or_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise C<OR> of the integer and C<value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_or_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) | value
+        );
+    }
+
+/*
+
+=item C<void bitwise_shl(PMC *value, PMC *dest)>
+
+Calculates the bitwise shift left (C<<<<<>>>) of the integer by
+C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_shl (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) <<
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+/*
+
+=item C<void bitwise_shl_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise shift left (C<<<<<>>>) of the integer by
+C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_shl_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) << value
+        );
+    }
+
+/*
+
+=item C<void bitwise_shr(PMC *value, PMC *dest)>
+
+Calculates the bitwise shift right (C<<<>>>>>) of the integer by
+C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_shr (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) >>
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+/*
+
+=item C<void bitwise_shr_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise shift right (C<<<>>>>>) of the integer by
+C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_shr_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) >> value
+        );
+    }
+
+/*
+
+=item C<void bitwise_xor(PMC *value, PMC *dest)>
+
+Calculates the bitwise C<XOR> of the integer and C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_xor (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) ^
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+/*
+
+=item C<void bitwise_xor_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise C<XOR> of the integer and C<value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_xor_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) ^ value
+        );
+    }
+
+/*
+
+=item C<INTVAL cmp(PMC *value)>
+
+Returns the result of comparing the integer with C<*value>.
+
+=cut
+
+*/
+
+    INTVAL cmp(PMC* value) {
+MMD_PyFloat: {
+            FLOATVAL diff;
+            diff = (FLOATVAL)PMC_int_val(SELF)
+                - VTABLE_get_number(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+MMD_PyInt: {
+            /* int or undef */
+            INTVAL diff = PMC_int_val(SELF)
+                - VTABLE_get_integer(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+MMD_DEFAULT: {
+            return -1;
+        }
+    }
+
+/*
+
+=item C<void divide(PMC *value, PMC *dest)>
+
+Divides the integer by the C<*value> returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void divide (PMC* value, PMC* dest) {
+MMD_PyInt: {
+            INTVAL pmci = PMC_int_val(SELF);
+            INTVAL vali = VTABLE_get_integer(INTERP, value);
+            INTVAL xdivy = pmci / vali;
+            INTVAL xmody = pmci - xdivy * vali;
+            if (xmody && ((vali ^ xmody) < 0) /* i.e. and signs differ */) {
+                    --xdivy;
+            }
+            VTABLE_set_integer_native(INTERP, dest, xdivy);
+        }
+MMD_PyFloat: {
+            INTVAL pmci = PMC_int_val(SELF);
+            FLOATVAL valf = VTABLE_get_number(INTERP, value);
+            /* XXX: Morph? */
+            VTABLE_set_number_native(INTERP, dest, pmci / valf);
+        }
+    }
+
+/*
+
+=item C<void divide_int(INTVAL value, PMC *dest)>
+
+Divides the integer by C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void divide_int (INTVAL value, PMC* dest) {
+        INTVAL pmci = PMC_int_val(SELF);
+        INTVAL xdivy = pmci / value;
+        INTVAL xmody = pmci - xdivy * value;
+        if (xmody && ((value ^ xmody) < 0) /* i.e. and signs differ */) {
+                --xdivy;
+        }
+        VTABLE_set_integer_native(INTERP, dest, xdivy);
+    }
+
+/*
+
+=item C<void floor_divide(PMC *value, PMC *dest)>
+
+Divides the integer by the C<*value> returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void floor_divide (PMC* value, PMC* dest) {
+MMD_DEFAULT: {
+            mmd_dispatch_v_ppp(INTERP, SELF, value, dest, MMD_DIVIDE);
+        }
+    }
+
+/*
+
+=item C<void floor_divide_int(PMC *value, PMC *dest)>
+
+Divides the integer by the C<*value> returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void floor_divide_int (INTVAL value, PMC* dest) {
+MMD_DEFAULT: {
+            mmd_dispatch_v_pip(INTERP, SELF, value, dest, MMD_DIVIDE_INT);
+        }
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the integer.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return PMC_int_val(SELF) != 0;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the integer value of the integer.
+
+=cut
+
+*/
+
+    INTVAL get_integer () {
+        return PMC_int_val(SELF);
+    }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the float value of the integer.
+
+=cut
+
+*/
+
+    FLOATVAL get_number () {
+        return (FLOATVAL) PMC_int_val(SELF);
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns the string value of the integer.
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        return string_from_int(INTERP, PMC_int_val(SELF));
+    }
+
+/*
+
+=item C<INTVAL is_equal (PMC* value)>
+
+The C<==> operation.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+        return (INTVAL)(PMC_int_val(SELF) ==
+            VTABLE_get_integer(INTERP, value));
+    }
+
+/*
+
+=item C<void logical_not(PMC *value)>
+
+Calculates the logical negation of the integer and returns the result in
+C<*value>.
+
+=cut
+
+*/
+
+    void logical_not (PMC* value) {
+        VTABLE_set_integer_native(INTERP, value, !PMC_int_val(SELF));
+    }
+
+/*
+
+=item C<void modulus(PMC *value, PMC *dest)>
+
+Calculates the value of the integer C-style C<mod> C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void modulus (PMC* value, PMC* dest) {
+        INTVAL pmci = PMC_int_val(SELF);
+        INTVAL vali = VTABLE_get_integer(INTERP, value);
+        INTVAL xdivy = pmci / vali;
+        INTVAL xmody = pmci - xdivy * vali;
+        if (xmody && ((vali ^ xmody) < 0) /* i.e. and signs differ */) {
+            xmody += vali;
+        }
+        VTABLE_set_integer_native(INTERP, dest, xmody);
+    }
+
+/*
+
+=item C<void modulus_int(INTVAL value, PMC *dest) >
+
+Calculates the value of the integer C-style C<mod> C<value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void modulus_int (INTVAL value, PMC* dest) {
+        INTVAL pmci = PMC_int_val(SELF);
+        INTVAL xdivy = pmci / value;
+        INTVAL xmody = pmci - xdivy * value;
+        if (xmody && ((value ^ xmody) < 0) /* i.e. and signs differ */) {
+            xmody += value;
+        }
+        VTABLE_set_integer_native(INTERP, dest, xmody);
+    }
+
+/*
+
+=item C<void multiply(PMC *value, PMC *dest)>
+
+Multiplies C<*value> with the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void multiply (PMC* value, PMC* dest) {
+MMD_PyInt: {
+            INTVAL pmci = PMC_int_val(SELF);
+            INTVAL vali = VTABLE_get_integer(INTERP, value);
+            VTABLE_set_integer_native(INTERP, dest, pmci * vali);
+        }
+MMD_PyFloat: {
+            INTVAL pmci = PMC_int_val(SELF);
+            FLOATVAL valf = VTABLE_get_number(INTERP, value);
+            /* XXX: Morph? */
+            VTABLE_set_number_native(INTERP, dest, pmci * valf);
+        }
+    }
+
+/*
+
+=item C<void multiply_int(INTVAL value, PMC *dest)>
+
+Multiplies C<*value> with the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void multiply_int (INTVAL value, PMC* dest) {
+        INTVAL pmci = PMC_int_val(SELF);
+        VTABLE_set_integer_native(INTERP, dest, pmci * value);
+    }
+
+/*
+
+=item C<void neg(PMC *dest)>
+
+Set C<dest> to the negated value of C<SELF>.
+
+=cut
+
+*/
+
+    void neg (PMC* dest) {
+        if (dest == SELF)
+            PMC_int_val(SELF) = -PMC_int_val(SELF);
+        else
+            VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Sets the value of the integer to the value of the C<PyInt> C<*value>.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL value) {
+        PMC_int_val(SELF) = value;
+    }
+
+/*
+
+=item C<void set_integer_same(PMC *value)>
+
+Sets the value of the integer to the value of the C<PyInt> C<*value>.
+
+=cut
+
+*/
+
+    void set_integer_same (PMC * value) {
+        PMC_int_val(SELF) = PMC_int_val(value);
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the PMC C<*value>, calling the appropriate C<set_*> method
+according to the type of C<*value>.
+
+=cut
+
+*/
+
+    void set_pmc (PMC* value) {
+        if (SELF->vtable->base_type == value->vtable->base_type) {
+            DYNSELF.set_integer_same(value);
+        }
+        else {
+            DYNSELF.morph(value->vtable->base_type);
+            DYNSELF.set_pmc(value);
+        }
+    }
+
+/*
+
+=item C<void subtract(PMC *value, PMC *dest)>
+
+Subtracts C<*value> from the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void subtract (PMC* value, PMC* dest) {
+MMD_PyInt: {
+            INTVAL pmci = PMC_int_val(SELF);
+            INTVAL vali = VTABLE_get_integer(INTERP, value);
+            VTABLE_set_integer_native(INTERP, dest, pmci - vali);
+        }
+MMD_PyFloat: {
+            INTVAL pmci = PMC_int_val(SELF);
+            FLOATVAL valf = VTABLE_get_number(INTERP, value);
+            /* XXX: Morph? */
+            VTABLE_set_number_native(INTERP, dest, pmci - valf);
+        }
+    }
+
+/*
+
+=item C<void subtract_int(INTVAL value, PMC *dest)>
+
+Subtracts C<value> from the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void subtract_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) - value
+        );
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

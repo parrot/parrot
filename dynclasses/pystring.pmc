@@ -1,0 +1,250 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pystring.pmc - Python String
+
+=head1 DESCRIPTION
+
+C<PyString> extends C<PyObject> to provide Perl string behaviour.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/* cache of classes referenced */
+static INTVAL dynclass_PyString;
+
+pmclass PyString extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of various PMCs because
+they will be used frequently here.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
+        }
+    }
+
+/*
+
+=item C<void add(PMC *value, PMC *dest)>
+
+Adds C<*value> to the string and returns the result in C<*dest>.
+
+When Python mode is enabled does concat :(
+
+=cut
+
+*/
+
+    void add (PMC * value, PMC* dest) {
+        SELF.concatenate(value, dest);
+    }
+
+/*
+
+=item C<void concatenate(PMC *value, PMC *dest)>
+
+Concatenates the string and the stringified form of C<*value> and
+return the result in C<*dest>, morphing it to a PyString if required.
+
+=cut
+
+*/
+
+    void concatenate (PMC* value, PMC* dest) {
+        STRING* s = PMC_str_val(SELF);
+        VTABLE_morph(INTERP, dest, dynclass_PyString);
+        PMC_str_val(dest) =
+            string_concat(INTERP, s, VTABLE_get_string(INTERP, value), 0);
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the pyboolean value of the string.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return string_bool(INTERP, PMC_str_val(SELF));
+    }
+
+/*
+
+=item C<STRING* get_repr()>
+
+Returns pythons string repr (w/o any escaping, just single quotes around)
+
+=cut
+
+*/
+
+    STRING* get_repr() {
+        STRING *s = DYNSELF.get_string();
+        STRING *repr;
+        INTVAL start = 0;
+        STRING *q = const_string(INTERP, "'");
+        STRING *dq = const_string(INTERP, "\"");
+        STRING *bs = const_string(INTERP, "\\");
+        INTVAL i_q;
+        INTVAL i_bs;
+
+        i_q = string_str_index(INTERP, s, q, 0);
+        i_bs = string_str_index(INTERP, s, bs, 0);
+
+        if ((i_q > 0) && (string_str_index(INTERP, s, dq, 0) < 0)) {
+            q = dq;
+            i_q = -1;
+        }
+
+        if (PObj_get_FLAGS(s) & PObj_private7_FLAG)
+            repr = string_copy(INTERP, const_string(INTERP, "u'"));
+        else
+            repr = string_copy(INTERP, q);
+
+        if ((i_q < 0) && (i_bs < 0))
+            string_append(INTERP, repr, s, 0);
+        else {
+           STRING *sub;
+           while ((i_q >= 0) || (i_bs >= 0)) {
+               if ((i_bs >= 0) && ((i_q < 0) || (i_bs < i_q))) {
+                   sub = string_substr(INTERP, s, start, i_bs-start, NULL, 0);
+                   start = i_bs;
+                   i_bs = string_str_index(INTERP, s, bs, start+1);
+               }
+               else {
+                   sub = string_substr(INTERP, s, start, i_q-start, NULL, 0);
+                   start = i_q;
+                   i_q = string_str_index(INTERP, s, q, start+1);
+               }
+
+               string_append(INTERP, repr, sub, 0);
+               string_append(INTERP, repr, bs, 0);
+           }
+
+           i_q = string_length(INTERP, s);
+           sub = string_substr(INTERP, s, start, i_q-start, NULL, 0);
+           string_append(INTERP, repr, sub, 0);
+        }
+
+        repr = string_append(INTERP, repr, q, 0);
+        return repr;
+    }
+
+/*
+=item C<STRING *get_string()>
+
+=cut
+*/
+
+    STRING* get_string () {
+        return (STRING*) PMC_str_val(SELF);
+    }
+
+/*
+
+=item C<INTVAL is_equal(PMC *value)>
+
+The C<==> operation.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+    return (INTVAL)( 0 == string_compare(INTERP,
+            PMC_str_val(SELF),
+            VTABLE_get_string(INTERP, value)
+            ));
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the PMC C<*value>, calling the appropriate C<set_*> method
+according to the type of C<*value>.
+
+=cut
+
+*/
+
+    void set_pmc (PMC* value) {
+        if (SELF->vtable->base_type == value->vtable->base_type) {
+            DYNSELF.set_string_same(value);
+        }
+        else {
+            DYNSELF.morph(value->vtable->base_type);
+            DYNSELF.set_pmc(value);
+        }
+    }
+
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Sets the string's value to the value of the specified Parrot string.
+
+=cut
+
+*/
+
+    void set_string_native (STRING * value) {
+        PMC_str_val(SELF) = value;
+    }
+
+/*
+
+=item C<void set_string_same(PMC *value)>
+
+Sets the string's value to the value of the specified C<PerlString>.
+
+=cut
+
+*/
+
+    void set_string_same (PMC * value) {
+        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF),
+        PMC_str_val(value));
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -9,7 +9,20 @@ O = ${o}
 PMCS = foo subproxy \
 tclobject tclstring tclint tclfloat \
 tcllist tclarray \
-match matchrange
+match matchrange \
+pyobject \
+  pyboolean \
+  pyclass \
+  pydict \
+  pyfloat \
+  pyfunc \
+  pygen \
+  pyint \
+  pylist \
+  pymodule \
+  pynone \
+  pystring \
+  pytuple
 
 BUILD = ${perl} build.pl
 
@@ -19,7 +32,13 @@ all :
 	@$(BUILD) linklibs $(PMCS)
 	@$(BUILD) copy --destination=$(DESTDIR) $(PMCS)
 
-clean :
+test : all
+	cd .. ; perl -Ilib t/harness t/dynclass/*.t
+
+testclean :
+	$(RM_F) ../t/dynclass/*.imc
+
+clean : testclean
 	$(RM_F) *.c *.h *$(LOAD_EXT) *.dump lib-* *$(O)
 
 realclean: clean

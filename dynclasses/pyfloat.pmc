@@ -1,0 +1,85 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pyfloat.pmc - Python Floating-Point Number
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the PyFloat base class
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PyFloat extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns the number as a Parrot string.
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        double d = (double) PMC_num_val(SELF);
+        const char *sign = "-";
+        if (!signbit(PMC_num_val(SELF)))
+            sign = "";
+        d = fabs(d);
+        /* XXX make a Python format string */
+        STRING *s = Parrot_sprintf_c(interpreter, "%s%.12g", sign, d);
+        if (string_str_index(interpreter, s,
+                    const_string(interpreter, "."), 0) == -1 &&
+                string_str_index(interpreter, s,
+                    const_string(interpreter, "e"), 0) == -1)
+            string_append(INTERP, s, const_string(INTERP, ".0"), 0);
+        return s;
+    }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the value of the number to C<value>.
+
+Note that if C<value> is an integer the number morphs to a C<PerlInt>.
+
+=cut
+
+*/
+
+    void set_number_native (FLOATVAL value) {
+        PMC_num_val(SELF) = value;
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

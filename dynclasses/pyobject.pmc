@@ -1,0 +1,719 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pyobject.pmc - Python Object
+
+=head1 DESCRIPTION
+
+Abstract base class for Python objects.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/* cache of classes referenced */
+static INTVAL dynclass_PyObject;
+static INTVAL dynclass_PyBoolean;
+static INTVAL dynclass_PyInt;
+static INTVAL dynclass_PyFloat;
+static INTVAL dynclass_PyString;
+
+static STRING* __add__;
+static STRING* __and__;
+static STRING* __div__;
+static STRING* __floordiv__;
+static STRING* __lshift__;
+static STRING* __mod__;
+static STRING* __mul__;
+static STRING* __or__;
+static STRING* __rshift__;
+static STRING* __sub__;
+static STRING* __xor__;
+
+#define RIGHT(INTERP, SELF, OP, VALUE) \
+        opcode_t *next = INTERP->code->byte_code; \
+        PMC * method_pmc; \
+        if (!OP) OP = string_from_cstring(INTERP, #OP, 0); \
+        method_pmc = VTABLE_find_method(interpreter, VALUE, OP); \
+        REG_PMC(2) = VALUE; \
+        REG_PMC(5) = SELF; \
+        VTABLE_invoke(interpreter, method_pmc, next); \
+        REG_PMC(2) = SELF; \
+        return REG_PMC(5);
+
+pmclass PyObject dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of various PMCs because
+they will be used frequently here.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            dynclass_PyObject  = Parrot_PMC_typenum(INTERP, "PyObject");
+            dynclass_PyBoolean = Parrot_PMC_typenum(INTERP, "PyBoolean");
+            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
+            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
+        }
+    }
+
+/*
+
+=item C<PMC* "__abs__"()>
+
+Returns the absolute value of C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __abs__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        VTABLE_absolute(INTERP, SELF, ret);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__add__"(PMC *value)>
+
+Adds C<*value> to C<SELF> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __add__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_ADD);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__and__"(PMC *value)>
+
+Returns the result of the logical C<AND> of C<SELF> and C<*value>.
+
+=cut
+
+*/
+
+    METHOD PMC* __and__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BAND);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__cmp__"(PMC *value)>
+
+Returns the result of comparing C<SELF> with C<*value>.
+
+=cut
+
+*/
+
+    METHOD PMC* __cmp__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        VTABLE_set_integer_native(INTERP, ret,
+            mmd_dispatch_i_pp(INTERP, SELF, value, MMD_CMP));
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__div__"(PMC *value)>
+
+Divides C<SELF> by C<*value> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __div__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_DIVIDE);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__divmod__"(PMC *value)>
+
+Divides C<SELF> by C<*value> and returns the remainder.
+
+=cut
+
+*/
+
+    METHOD PMC* __divmod__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_MOD);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__float__"()>
+
+Returns the float value of C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __float__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyFloat);
+        FLOATVAL value = VTABLE_get_number(INTERP, SELF);
+        VTABLE_set_number_native(INTERP, ret, value);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__floordiv__"(PMC *value)>
+
+Floor divides C<SELF> by C<*value> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __floordiv__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_DIVIDE);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__int__"()>
+
+Returns the integer value of C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __int__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        INTVAL value = VTABLE_get_integer(INTERP, SELF);
+        VTABLE_set_integer_native(INTERP, ret, value);
+        return ret;
+    }
+
+/*
+
+=item C<void "__invert__"(PMC *value)>
+
+Calculates the bitwise negation and return the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __invert__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        VTABLE_bitwise_not(INTERP, SELF, ret);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__lshift__"(PMC *value)>
+
+Bitwise shift left (C<<<<<>>>) of the integer by C<*value> and
+returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __lshift__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BSL);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__mod__"(PMC *value)>
+
+Return the modulus of C<SELF> with C<*value>.
+
+=cut
+
+*/
+
+    METHOD PMC* __mod__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_MOD);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__mul__"(PMC *value)>
+
+Return the value of C<SELF> multiplied by C<*value>.
+
+=cut
+
+*/
+
+    METHOD PMC* __mul__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_MULTIPLY);
+        return ret;
+    }
+
+/*
+
+=item C<void "__neg__"(PMC *value)>
+
+Calculates the negation and return the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __neg__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        VTABLE_neg(INTERP, SELF, ret);
+        return ret;
+    }
+
+/*
+
+=item C<void "__nonzero__"(PMC *value)>
+
+Determine if a given value is "True" or "False"
+
+=cut
+
+*/
+
+    METHOD PMC* __nonzero__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyBoolean);
+        VTABLE_set_integer_native(INTERP, ret,
+            VTABLE_get_bool(INTERP, SELF));
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__or__"(PMC *value)>
+
+Returns the result of the logical C<OR> of C<SELF> and C<*value>.
+
+=cut
+
+*/
+
+    METHOD PMC* __or__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BOR);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__radd__"(PMC *value)>
+
+Adds C<*value> to C<SELF> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __radd__(PMC *value) {
+        RIGHT(INTERP, SELF, __add__, value);
+    }
+
+/*
+
+=item C<PMC* "__rand__"(PMC *value)>
+
+Returns the result of the logical C<AND> of C<*value> and C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __rand__(PMC *value) {
+        RIGHT(INTERP, SELF, __and__, value);
+    }
+
+/*
+
+=item C<PMC* "__rdiv__"(PMC *value)>
+
+Divides C<*value> by C<SELF> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __rdiv__(PMC *value) {
+        RIGHT(INTERP, SELF, __div__, value);
+    }
+
+/*
+
+=item C<void "__repr__"(PMC *value)>
+
+Return the string representation of this PMC.
+
+=cut
+
+*/
+
+    METHOD PMC* __repr__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        VTABLE_set_string_native(INTERP, ret,
+            VTABLE_get_repr(INTERP, SELF));
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__rfloordiv__"(PMC *value)>
+
+Floor divides C<*value> by C<SELF> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __rfloordiv__(PMC *value) {
+        RIGHT(INTERP, SELF, __floordiv__, value);
+    }
+
+/*
+
+=item C<PMC* "__rlshift__"(PMC *value)>
+
+Bitwise shift left (C<<<<<>>>) of C<*value> by the integer and
+returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __rlshift__(PMC *value) {
+        RIGHT(INTERP, SELF, __lshift__, value);
+    }
+
+/*
+
+=item C<PMC* "__rmod__"(PMC *value)>
+
+Return the modulus of C<*value> with C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __rmod__(PMC *value) {
+        RIGHT(INTERP, SELF, __mod__, value);
+    }
+
+/*
+
+=item C<PMC* "__rmul__"(PMC *value)>
+
+Return the value of C<*value> multiplied by C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __rmul__(PMC *value) {
+        RIGHT(INTERP, SELF, __mul__, value);
+    }
+
+/*
+
+=item C<PMC* "__ror__"(PMC *value)>
+
+Returns the result of the logical C<OR> of C<*value> and C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __ror__(PMC *value) {
+        RIGHT(INTERP, SELF, __or__, value);
+    }
+
+/*
+
+=item C<PMC* "__rrshift__"(PMC *value)>
+
+Bitwise shift right (C<<<>>>>>) of C<*value> by the integer and
+returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __rrshift__(PMC *value) {
+        RIGHT(INTERP, SELF, __rshift__, value);
+    }
+
+/*
+
+=item C<PMC* "__rshift__"(PMC *value)>
+
+Bitwise shift right (C<<<>>>>>) of the integer by C<*value> and
+returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __rshift__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BSR);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__rsub__"(PMC *value)>
+
+Subtracts C<SELF> from C<*value> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __rsub__(PMC *value) {
+        RIGHT(INTERP, SELF, __sub__, value);
+    }
+
+/*
+
+=item C<PMC* "__rxor__"(PMC *value)>
+
+Returns the result of the bitwise C<XOR> of C<*value> and C<SELF>.
+
+=cut
+
+*/
+
+    METHOD PMC* __rxor__(PMC *value) {
+        RIGHT(INTERP, SELF, __xor__, value);
+    }
+
+/*
+
+=item C<void "__str__"(PMC *value)>
+
+Return the string representation of this PMC.
+
+=cut
+
+*/
+
+    METHOD PMC* __str__() {
+        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        VTABLE_set_string_native(INTERP, ret,
+            VTABLE_get_string(INTERP, SELF));
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__sub__"(PMC *value)>
+
+Subtracts C<*value> from C<SELF> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __sub__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_SUBTRACT);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "__xor__"(PMC *value)>
+
+Returns the result of the bitwise C<XOR> of C<SELF> and C<*value>.
+
+=cut
+
+*/
+
+    METHOD PMC* __xor__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BXOR);
+        return ret;
+    }
+
+/*
+
+=item C<STRING *get_repr()>
+
+Returns the string representation of the integer.
+
+=cut
+
+*/
+
+    STRING* get_repr () {
+        return VTABLE_get_string(INTERP, SELF);
+    }
+
+/*
+
+=item C<void logical_and(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of the logical C<AND> of the scalar and
+C<*value>.
+
+=cut
+
+*/
+
+    void logical_and (PMC* value,  PMC* dest) {
+        if (DYNSELF.get_bool()) {
+            VTABLE_set_pmc(INTERP, dest, value);
+        }
+        else {
+            VTABLE_set_pmc(INTERP, dest, SELF);
+        }
+    }
+
+/*
+
+=item C<void logical_or(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of the logical C<OR> of the scalar and
+C<*value>.
+
+=cut
+
+*/
+
+    void logical_or (PMC* value,  PMC* dest) {
+        if (DYNSELF.get_bool()) {
+            VTABLE_set_pmc(INTERP, dest, SELF);
+        }
+        else {
+            VTABLE_set_pmc(INTERP, dest, value);
+        }
+    }
+
+/*
+
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+
+    void morph (INTVAL type) {
+        SELF->vtable = Parrot_base_vtables[type];
+        DYNSELF.init();
+    }
+
+/*
+
+=item C<void set_integer_native (INTVAL value)>
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL value) {
+        if (SELF->vtable->base_type != dynclass_PyInt) {
+            DYNSELF.morph(dynclass_PyInt);
+        }
+        DYNSELF.set_integer_native(value);
+    }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the floating-point value.
+
+=cut
+
+*/
+
+    void set_number_native (FLOATVAL value) {
+        if (SELF->vtable->base_type != dynclass_PyFloat) {
+            DYNSELF.morph(dynclass_PyFloat);
+        }
+        DYNSELF.set_number_native(value);
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the PMC C<*value>, calling the appropriate C<set_*> method
+according to the type of C<*value>.
+
+=cut
+
+*/
+
+    void set_pmc (PMC* value) {
+        if (SELF->vtable->base_type == dynclass_PyObject) {
+            DYNSELF.morph(value->vtable->base_type);
+            DYNSELF.set_pmc(value);
+        }
+        else {
+            internal_exception(ILL_INHERIT,
+                   "set_pmc not implemented in class '%s'\n",
+                   string_to_cstring(INTERP, VTABLE_name(INTERP, pmc)));
+
+        }
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
