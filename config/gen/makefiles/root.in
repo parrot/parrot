@@ -93,7 +93,7 @@ NONGEN_HEADERS = ${TEMP_nongen_headers}
 GEN_MAKEFILES = \
     Makefile \
     languages/Makefile \
-    docs/Makefile \
+#CONDITIONED_LINE(perldoc):    docs/Makefile \
     dynclasses/Makefile \
     dynoplibs/Makefile \
     languages/cola/Makefile \
@@ -988,15 +988,25 @@ $(AST_O_FILES) : $(IMCC_H_FILES) $(AST_H_FILES) $(ALL_H_FILES)
 #
 ###############################################################################
 
-docs : docs.dummy
+#CONDITIONED_LINE(perldoc):docs : docs.dummy
+#CONDITIONED_LINE(notperldoc):docs : docs.stub
 
+#CONDITIONED_LINE(perldoc):html : html.dummy
+#CONDITIONED_LINE(notperldoc):html : html.stub
+
+html.stub:
+	echo "Perldoc is required, but not detected."
+
+docs.stub:
+	echo "Perldoc is required, but not detected."
+	
 docs.dummy :
 	$(MAKE_C) docs
 
 docs-clean :
 	$(MAKE_C) docs clean
 
-html :
+html.dummy :
 	$(MAKE_C) docs html
 
 html-clean :

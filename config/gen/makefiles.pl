@@ -90,34 +90,39 @@ sub makefiles {
   genfile('config/gen/makefiles/parrot_compiler.in', 'languages/parrot_compiler/Makefile',
           commentType => '#', replace_slashes => 1);
 
-
-  # set up docs/Makefile, partly based on the .ops in the root dir
-
-  opendir OPS, "ops" or die "opendir ops: $!";
-  my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
-  closedir OPS;
-
-  my $pod = join " ", map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
-
-  Configure::Data->set(pod => $pod);
-
-  genfile('config/gen/makefiles/docs.in',      'docs/Makefile',
-          commentType => '#');
-
-  Configure::Data->set(pod => undef);
-
-  open MAKEFILE, ">> docs/Makefile" or die "open >> docs/Makefile: $!";
-
-  foreach my $ops (@ops) {
-      my $pod = $ops;
-      $pod =~ s/\.ops$/.pod/;
-      print MAKEFILE <<"EOM";
+  my $perldoc = Configure::Data->get('perldoc');
+  if ($perldoc) {
+    # set up docs/Makefile, partly based on the .ops in the root dir
+  
+    opendir OPS, "ops" or die "opendir ops: $!";
+    my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
+    closedir OPS;
+  
+    my $pod = join " ", map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
+  
+    Configure::Data->set(pod => $pod);
+  
+    genfile('config/gen/makefiles/docs.in',      'docs/Makefile',
+            commentType => '#');
+  
+    Configure::Data->set(pod => undef);
+  
+    open MAKEFILE, ">> docs/Makefile" or die "open >> docs/Makefile: $!";
+  
+    foreach my $ops (@ops) {
+        my $pod = $ops;
+        $pod =~ s/\.ops$/.pod/;
+        print MAKEFILE <<"EOM";
 ops/$pod: ../ops/$ops
 	perldoc -u ../ops/$ops > ops/$pod
-EOM
-  }
 
-  close MAKEFILE
+EOM
+    }
+  
+    close MAKEFILE
+    } else {
+        print "\nNo Perldoc, not generating a docs makefile.\n";
+    }
 }
 
 1;
