@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef _MSC_VER
+#ifdef PARROT_HAS_HEADER_SYSEXITS
 #  include <sysexits.h>
 #else
 #  define EX_DATAERR 1
@@ -13,7 +13,7 @@
 #  define EX_IOERR 1
 #  define EX_USAGE 1
 #  define EX_UNAVAILABLE 1
-#endif
+#endif  /* PARROT_HAS_HEADER_SYSEXITS */
 
 #include "parrot/parrot.h"
 
