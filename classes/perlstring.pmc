@@ -405,8 +405,10 @@ pmclass PerlString extends perlscalar {
 		}
 		break;
 	    case 3:	/* reset key, iterate from end */
-		ret->cache.int_val = n;
+		ret->cache.int_val = n-1;
 		PMC_data(key) = (char *)s->strstart + s->bufused;
+		(const char *)PMC_data(key) =
+			    s->encoding->skip_backward( PMC_data(key), 1);
 		break;
 	}
 	return ret;
@@ -428,5 +430,18 @@ pmclass PerlString extends perlscalar {
 		res->strstart, 1) - (const char *)res->strstart;
 	return res;
 
+    }
+    INTVAL get_integer_keyed(PMC* key) {
+	STRING *s = SELF->cache.string_val;
+	if ((char*)PMC_data(key) >= (char *)s->strstart &&
+		(char *)PMC_data(key) <= (char *)s->strstart + s->bufused) {
+	    if (s->encoding->index == enum_encoding_singlebyte)
+		return *(unsigned char*) PMC_data(key);
+	    else
+		return s->encoding->decode(PMC_data(key));
+	}
+	else
+	    return s->encoding->decode(s->encoding->skip_forward(s->strstart,
+			key->cache.int_val));
     }
 }
