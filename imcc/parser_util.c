@@ -72,20 +72,22 @@ iNEW(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, char * typ
  * between new and newsub.
  *
  *  Example:
- *   P0 = newsub _f         ::=      newsub, P0, .Sub, _f
- *   P0 = newclosure _c     ::=      newsub, P0, .Closure, _c
+ *   P0 = newsub _func            ::=   newsub, P0, .Sub, _func
+ *   P0 = newclosure _clos        ::=   newsub, P0, .Closure, _clos
+ *   P0 = newsub _func, _ret      ::=   newsub, .Sub, .RetContinuation, _func, _ret
+ *   P0 = newclosure _clos, _ret  ::=   newsub, .Closure, .RetContinuation, _clos, _ret
  *
- * XXX: Support the return continuation form of newsub
- * XXX: IMCC is really due for a refactor. :(
+ * XXX: Currently the 3 arg version of newsub ignores the Px target on the assign.
+ *      Fix the PASM opcode. 
  */
 
 Instruction *
 iNEWSUB(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, int type,
-        SymReg *init, int emit)
+        SymReg *subinit, SymReg *retinit, int emit)
 {
     char fmt[256];
     SymReg *regs[IMCC_MAX_REGS];
-    SymReg *pmc;
+    SymReg *subpmc, *retpmc;
     int i, nargs;
     int pmc_num;
     const char * classnm = NULL;
@@ -103,26 +105,53 @@ iNEWSUB(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, int typ
             string_from_cstring(interpreter, classnm, 0));
 
     sprintf(fmt, "%d", pmc_num);
-    pmc = mk_const(str_dup(fmt), 'I');
+    subpmc = mk_const(str_dup(fmt), 'I');
 
     if (pmc_num <= 0)
         fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", classnm);
     sprintf(fmt, "%%s, %d\t # .%s", pmc_num, classnm);
-    r0->usage = U_NEW;
 
-    regs[0] = r0;
-    regs[1] = pmc;
-    if (init) {
-        regs[2] = init;
-        nargs = 3;
+    /* 1st form:   px = newsub _foo */
+    if(!retinit) {
+        r0->usage = U_NEW;
+        regs[0] = r0;
+        regs[1] = subpmc;
+        if (subinit) {
+            regs[2] = subinit;
+            nargs = 3;
+        }
+        else
+            nargs = 2;
     }
-    else
-        nargs = 2;
+    /* 2nd form:   px = newsub _foo, _retcont
+     *
+     * XXX: Currently px is ignored, this op sets P0/P1 implicitly
+     */
+    else {
+        if(!subinit) { /* sanity check */
+            fataly(1, sourcefile, line, "iNEWSUB: NULL $0 for newsub\n");
+        }
+
+        /* The return continuation */
+        pmc_num = pmc_type(interpreter,
+                string_from_cstring(interpreter, "RetContinuation", 0));
+
+        sprintf(fmt, "%d", pmc_num);
+        retpmc = mk_const(str_dup(fmt), 'I');
+
+        regs[0] = subpmc;
+        regs[1] = retpmc;
+        regs[2] = subinit;
+        regs[3] = retinit;
+        nargs = 4;
+    }
+
     i = nargs;
     while (i < IMCC_MAX_REGS)
 	regs[i++] = NULL;
-    return INS(interpreter, unit, "newsub", NULL, regs, nargs,0, emit);
+    return INS(interpreter, unit, "newsub", NULL, regs, nargs, 0, emit);
 }
+
 
 void
 op_fullname(char * dest, const char * name, SymReg * args[],
@@ -233,7 +262,7 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name, const char *
             switch (op_info->dirs[i+1]) {
                 case PARROT_ARGDIR_INOUT:
                     dirs |= 1 << (16 + i);
-                    /* goon */
+                    /* go on */
                 case PARROT_ARGDIR_IN:
                     dirs |= 1 << i ;
                     break;

@@ -375,7 +375,7 @@ class:
                    t1 = mk_const(str_dup(buf), 'S');
                    p1 = mk_pasm_reg(str_dup("P1"));
                    iNEWSUB(interp, cur_unit, p1, NEWSUB,
-                        mk_address(((Method*)s->p)->label->name, U_add_once), 1);
+                        mk_address(((Method*)s->p)->label->name, U_add_once), NULL, 1);
                    iINDEXSET(interp, cur_unit, p0, t1, p1);
                 }
              }
@@ -705,7 +705,14 @@ assignment:
     |  target '=' NEW classname COMMA var { $$ = iNEW(interp, cur_unit, $1, $4, $6, 1); }
     |  target '=' NEW classname		{ $$ = iNEW(interp, cur_unit, $1, $4, NULL, 1); }
     |  target '=' newsub IDENTIFIER     { $$ = iNEWSUB(interp, cur_unit, $1, $3,
-                                                 mk_address($4, U_add_once), 1); }
+                                                 mk_address($4, U_add_once), NULL, 1); }
+    |  target '=' newsub IDENTIFIER COMMA
+                     IDENTIFIER         { /* XXX: Fix 4arg version of newsub PASM op
+                                           * to use $1 instead of implicit P0
+                                           */
+                                          $$ = iNEWSUB(interp, cur_unit, NULL, $3,
+                                                 mk_address($4, U_add_once),
+                                                 mk_address($5, U_add_once), 1); }
     |  target '=' DEFINED var	        { $$ = MK_I(interp, cur_unit, "defined",2, $1,$4); }
     |  target '=' DEFINED var '[' keylist ']' { keyvec=KEY_BIT(2);
                                      $$ = MK_I(interp, cur_unit, "defined", 3, $1, $4, $6); }
