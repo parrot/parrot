@@ -34,10 +34,12 @@
  * Returns the position just past the current argument in a PASM
  * instruction. This is not the same as na(), above, which is intended
  * for debugger commands. This function is used for eval. */
-static const char* nextarg(const char* command)
+static const char* 
+nextarg(const char* command)
 {
-    while (*command && (isalnum((int) *command) || *command == ',' || *command == ']'))
-        command++;
+    while (*command && (isalnum((int) *command) || *command == ',' ||
+        *command == ']'))
+            command++;
     while (*command && isspace((int) *command))
         command++;
     return command;
@@ -46,9 +48,12 @@ static const char* nextarg(const char* command)
 /* skip_ws
  *
  * Returns the pointer past any whitespace */
-static const char* skip_ws(const char* str)
+
+static const char*
+skip_ws(const char* str)
 {
-    while (*str && isspace((int) *str)) str++;
+    while (*str && isspace((int) *str))
+        str++;
     return str;
 }
 
@@ -56,10 +61,14 @@ static const char* skip_ws(const char* str)
  *
  * Returns the pointer past the current debugger command. (This is an
  * alternative to the na() macro above.) */
-static const char* skip_command(const char* str)
+
+static const char*
+skip_command(const char* str)
 {
-    while (*str && !isspace((int) *str)) str++;
-    while (*str && isspace((int) *str)) str++;
+    while (*str && !isspace((int) *str))
+        str++;
+    while (*str && isspace((int) *str))
+        str++;
     return str;
 }
 
@@ -67,10 +76,14 @@ static const char* skip_command(const char* str)
  *
  * Parse an integer out of a string and return a pointer to just after
  * the int. */
-static const char* parse_int(const char* str, int* intP)
+
+static const char*
+parse_int(const char* str, int* intP)
 {
     char* end;
+
     *intP = strtol(str, &end, 0);
+
     return end;
 }
 
@@ -79,20 +92,27 @@ static const char* parse_int(const char* str, int* intP)
  * Parse a double-quoted string out of a C string and return a pointer
  * to just after the string. The parsed string is converted to a
  * Parrot STRING. */
-static const char* parse_string(struct Parrot_Interp *interpreter,
-                                const char* str, STRING** strP)
+static const char*
+parse_string(struct Parrot_Interp *interpreter,
+    const char* str, STRING** strP)
 {
     const char* string;
-    if (*str != '"') return NULL;
+
+    if (*str != '"')
+        return NULL;
     str++;
     string = str;
     while (*str && *str != '"') {
-        if (*str == '\\' && str[1]) str += 2;
-        else str++;
+        if (*str == '\\' && str[1])
+            str += 2;
+        else
+            str++;
     }
 
     *strP = string_make(interpreter, string, str - string, NULL, 0, NULL);
-    if (*str) str++;
+
+    if (*str)
+        str++;
     return str;
 }
 
@@ -101,25 +121,30 @@ static const char* parse_string(struct Parrot_Interp *interpreter,
  * Parse an aggregate key out of a string and return a pointer to just
  * after the key. Currently only string and integer keys are
  * allowed. */
-static const char* parse_key(struct Parrot_Interp *interpreter,
-                             const char* str, PMC** keyP)
+static const char*
+parse_key(struct Parrot_Interp *interpreter,
+    const char* str, PMC** keyP)
 {
     *keyP = NULL;
-    if (*str != '[') return NULL;
+    if (*str != '[')
+        return NULL;
     str++; /* Skip [ */
     if (*str == '"') {
         STRING* string;
         str = parse_string(interpreter, str, &string);
         *keyP = key_new_string(interpreter, string);
-    } else if (isdigit((int) *str)) {
+    }
+    else if (isdigit((int) *str)) {
         int value;
         str = parse_int(str, &value);
         *keyP = key_new_integer(interpreter, (INTVAL) value);
-    } else {
+    }
+    else {
         return NULL;
     }
 
-    if (*str != ']') return NULL;
+    if (*str != ']')
+        return NULL;
     return ++str;
 }
 
@@ -127,15 +152,24 @@ static const char* parse_key(struct Parrot_Interp *interpreter,
  *
  * Convert the command at the beginning of a string into a numeric
  * value that can be used as a switch key for fast lookup. */
-static const char* parse_command(const char* command, unsigned long* cmdP)
+static const char*
+parse_command(const char* command, unsigned long* cmdP)
 {
     int i;
     unsigned long c = 0;
-    if (*command == '\0') return 0;
+
+    if (*command == '\0')
+        return 0;
+
     for (i = 0; *command && isalpha((int) *command); command++, i++)
         c += (tolower((int) *command) + (i + 1)) * ((i + 1) * 255);
-    if (c == 0) c = -1; /* Nonempty and did not start with a letter */
+
+    /* Nonempty and did not start with a letter */
+    if (c == 0)
+        c = -1;
+
     *cmdP = c;
+
     return command;
 }
 
@@ -1787,7 +1821,8 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
             PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg, regnum, key);
             break;
         default:
-            fprintf(stderr, "Unrecognized print option: must be 'int', 'num', 'str', 'pmc', or a register\n");
+            fprintf(stderr, "Unrecognized print option: must be 'int', 'num',
+                'str', 'pmc', or a register\n");
     }
 
     interpreter->DOD_block_level--;
@@ -1934,6 +1969,7 @@ PDB_help(const char *command)
     fprintf(stderr,"\tlist (l) -- list the source code file\n");
     fprintf(stderr,"\trun (r) -- run the programm\n");
     fprintf(stderr,"\tbreak (b) -- add a breakpoint\n");
+    fprintf(stderr,"\twatch (w) -- add a watchpoint\n");
     fprintf(stderr,"\tdelete (d) -- delete a breakpoint\n");
     fprintf(stderr,"\tcontinue (c) -- continue the program execution\n");
     fprintf(stderr,"\tnext (n) -- run the next instruction\n");
