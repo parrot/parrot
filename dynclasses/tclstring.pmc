@@ -13,15 +13,24 @@
 
 #include "parrot/parrot.h"
 
-/* This shouldn't be necessary, IMO */
-#define enum_class_TclString -1
-
-/* this is, I'm sure, terribly inefficient. */
-#define TclString_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclString", 9)))
-#define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
-#define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
+static INTVAL dynclass_TclString;
+static INTVAL dynclass_TclFloat;
+static INTVAL dynclass_TclInt;
+static STRING *true, *false, *yes, *no;
 
 pmclass TclString extends TclObject dynpmc group tcl_group {
+
+    void class_init () {
+        if (pass) {
+            dynclass_TclString = Parrot_PMC_typenum(INTERP,"TclString");
+            dynclass_TclInt    = Parrot_PMC_typenum(INTERP,"TclInt");
+            dynclass_TclFloat  = Parrot_PMC_typenum(INTERP,"TclFloat");
+            true  = string_from_const_cstring(INTERP, "true",4);
+            false = string_from_const_cstring(INTERP, "false",5);
+            yes   = string_from_const_cstring(INTERP, "yes",3);
+            no    = string_from_const_cstring(INTERP, "no",2);
+        }
+    }
 
     void init () {
         PMC_str_val(SELF) = string_make_empty(INTERP,enum_stringrep_one,0);
@@ -65,8 +74,19 @@ pmclass TclString extends TclObject dynpmc group tcl_group {
     }
 
     INTVAL get_bool () {
-        /* This is the perl truth value - fissit */
-        return string_bool(INTERP, PMC_str_val(SELF));
+ 
+        STRING* s = (STRING*) PMC_str_val(SELF);
+        if (!string_compare(INTERP,s,true)) {
+          return 1;
+        } else if (!string_compare(INTERP,s,false)) {
+          return 0;
+        } else if (!string_compare(INTERP,s,yes)) {
+          return 1;
+        } else if (!string_compare(INTERP,s,no)) {
+          return 0;
+        }
+
+        return 0; /* XXX Throw exception about invalid boolean type. */
     }
 
     INTVAL is_same (PMC* other) {
@@ -78,12 +98,12 @@ pmclass TclString extends TclObject dynpmc group tcl_group {
     }
 
     void set_integer_native (INTVAL value) {
-        DYNSELF.morph(TclInt_type);
+        DYNSELF.morph(dynclass_TclInt);
         DYNSELF.set_integer_native(value);
     }
 
     void set_number_native (FLOATVAL value) {
-        DYNSELF.morph(TclFloat_type);
+        DYNSELF.morph(dynclass_TclFloat);
         DYNSELF.set_number_native(value);
     }
 
