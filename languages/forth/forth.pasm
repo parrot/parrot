@@ -126,11 +126,17 @@ InitializeCoreOps:
     #
 
 # <
+    .AddCoreOp(Int_LT,"<")
 # <=
+    .AddCoreOp(Int_LE,"<=")
 # <>
+    .AddCoreOp(Int_NE,"<>")
 # =
+    .AddCoreOp(Int_EQ,"=")
 # >
+    .AddCoreOp(Int_GT,">")
 # >=
+    .AddCoreOp(Int_GE,">=")
 # 0<
 # 0<=
 # 0<>
@@ -687,6 +693,78 @@ Int_Slash_Mod:
     mod .IntStack, .TempInt2, .TempInt
     save .IntStack
     div .IntStack, .TempInt2, .TempInt
+    save .IntStack
+    branch DoneInterpretWord
+Int_GT:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    gt .TempInt, .IntStack, Int_is_GT
+    set .IntStack, 0
+    branch Int_GT_end
+ Int_is_GT:
+    set .IntStack, 1
+ Int_GT_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_GE:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    ge .TempInt, .IntStack, Int_is_GE
+    set .IntStack, 0
+    branch Int_GE_end
+ Int_is_GE:
+    set .IntStack, 1
+ Int_GE_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_NE:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    ne .TempInt, .IntStack, Int_is_NE
+    set .IntStack, 0
+    branch Int_NE_end
+ Int_is_NE:
+    set .IntStack, 1
+ Int_NE_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_EQ:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    eq .TempInt, .IntStack, Int_is_EQ
+    set .IntStack, 0
+    branch Int_EQ_end
+ Int_is_EQ:
+    set .IntStack, 1
+ Int_EQ_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_LT:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    lt .TempInt, .IntStack, Int_is_LT
+    set .IntStack, 0
+    branch Int_LT_end
+ Int_is_LT:
+    set .IntStack, 1
+ Int_LT_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_LE:
+    restore .IntStack
+    set .TempInt, .IntStack
+    restore .IntStack
+    le .TempInt, .IntStack, Int_is_LE
+    set .IntStack, 0
+    branch Int_LE_end
+ Int_is_LE:
+    set .IntStack, 1
+ Int_LE_end:
     save .IntStack
     branch DoneInterpretWord
 
