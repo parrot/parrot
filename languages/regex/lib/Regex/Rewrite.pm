@@ -100,14 +100,18 @@ sub rewrite_other {
 sub rewrite_multi_match {
     my ($self, $op, $min, $max, $greedy, $R, @rest) = @_;
 
-    if (($min == 0) && ($max == 1)) {
+    if (($min == 0) && defined($max) && ($max == 1)) {
         return $self->rewrite_optional($op, $R, $greedy, @rest);
-    } elsif (($min == 0) && ($max == -1)) {
+    } elsif (($min == 0) && (!defined($max) || ($max == -1))) {
         return $self->rewrite_star($op, $R, $greedy, @rest);
-    } elsif (($min == 1) && ($max == -1) && $self->can('rewrite_plus')) {
-        return $self->rewrite_plus($op, $R, $greedy, @rest);
+    } elsif (($min == 1) && (!defined($max) || $max == -1) && $self->can('rewrite_plus')) {
+        if ($greedy) {
+            return $self->rewrite_plus($op, $R, @rest);
+        } else {
+            return $self->rewrite_nongreedy_plus($op, $R, @rest);
+        }
     } elsif ($min > 0) {
-        my $newmax = ($max == -1) ? -1 : $max - $min;
+        my $newmax = (!defined($max) || $max == -1) ? -1 : $max - $min;
         # Hmm... this duplicates R. That could make the code huge.
         return (
                 $self->rewrite_finite($op, $R, $min, @rest),

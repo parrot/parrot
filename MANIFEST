@@ -454,6 +454,7 @@ languages/regex/Makefile
 languages/regex/README
 languages/regex/lib/Regex.pm
 languages/regex/lib/Regex/CodeGen.pm
+languages/regex/lib/Regex/CodeGen/IMCC.pm
 languages/regex/lib/Regex/CodeGen/Pasm.pm
 languages/regex/lib/Regex/CodeGen/Re.pm
 languages/regex/lib/Regex/CodeGen/Rx.pm
@@ -465,6 +466,7 @@ languages/regex/lib/Regex/Ops/List.pm
 languages/regex/lib/Regex/Ops/Tree.pm
 languages/regex/lib/Regex/Optimize.pm
 languages/regex/lib/Regex/Parse.pm
+languages/regex/lib/Regex/Parse/P6C.pm
 languages/regex/lib/Regex/PreOptimize.pm
 languages/regex/lib/Regex/Rewrite.pm
 languages/regex/lib/Regex/Rewrite/Stackless.pm

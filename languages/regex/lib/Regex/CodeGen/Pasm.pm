@@ -5,20 +5,33 @@ use strict;
 
 my $fail_label = Regex::Ops::Tree::mark('FAIL');
 
-my $R_TMP = 'I0';
-my $R_POS = "I1";
-my $R_LEN = "I2";
+sub init {
+    my $self = shift;
+    $self->SUPER::init();
+    $self->{R_STARTS} ||= 'P0';
+    $self->{R_ENDS} ||= 'P1';
+    $self->{R_STACK} ||= 'P2';
+    $self->{R_TMP} ||= 'I0';
+    $self->{R_POS} ||= 'I1';
+    $self->{R_LEN} ||= 'I2';
+    $self->{R_INPUT} ||= 'S0';
+    return $self;
+}
+
+sub pushop { "push" };
+sub popop { "pop" };
 
 sub output_preamble {
     my $self = shift;
 
-    my @ops = ('new P0, .PerlArray',
-               'new P1, .PerlArray',
-               "set $R_POS, 0",
-               "length $R_LEN, S0",
-               'set P0[0], 0');
+    my @ops = ("new ?R_STARTS, .IntList",
+               "new ?R_ENDS, .IntList",
+               "new ?R_STACK, .IntList",
+               "set ?R_POS, 0",
+               "length ?R_LEN, ?R_INPUT",
+               "set ?R_STARTS[0], 0");
     unshift(@ops,
-            'set S0, P0[1]', 'bsr REGEX', 'bsr printResults', 'end',
+            "set ?R_INPUT, ?R_STARTS[1]", 'bsr REGEX', 'bsr printResults', 'end',
             result_printer(),
             ($self->{startLabel} || 'REGEX').":")
       if $self->{DEBUG} || $self->{definePrintResults};
@@ -66,18 +79,18 @@ END
 
 sub output_match_succeeded {
     return ('set I0, 1',
-            "set P1[0], $R_POS");
+            "set ?R_ENDS[0], ?R_POS");
 }
 
 sub output_match_failed {
     return ('set I0, 0',
-            'set P1[0], -1');
+            "set ?R_ENDS[0], -2");
 }
 
 sub value {
     my $name = shift;
-    return $R_POS if $name eq 'pos';
-    return $R_TMP if $name eq 'tmp';
+    return '?R_POS' if $name eq 'pos';
+    return '?R_TMP' if $name eq 'tmp';
     return $name;
 }
 
@@ -105,6 +118,34 @@ sub dbprint {
 }
 
 ############### SIMPLE OUTPUT ##############
+
+sub output_advance {
+    my ($self, $distance, $failLabel) = @_;
+    $failLabel = $self->output_label_use($failLabel);
+    return ("add ?R_POS, $distance # pos++",
+            "ge ?R_POS, ?R_LEN, $failLabel # past end of input?",
+            "set ?R_STARTS[0], ?R_POS # group 0 start := pos");
+}
+
+sub output_increment {
+    my ($self, $distance, $failLabel) = @_;
+    return () if $distance == 0;
+
+    my $comment;
+    if ($distance == 1) {
+        $comment = "pos++";
+    } elsif ($distance == -1) {
+        $comment = "pos--";
+    } elsif ($distance > 0) {
+        $comment = "pos += $distance";
+    } elsif ($distance < 0) {
+        $comment = "pos -= ".(-$distance);
+    }
+
+    return ($self->dbprint("Changing pos: %I1 -> "),
+            "add ?R_POS, $distance # $comment",
+            $self->dbprint("%I1\n"));
+}
 
 sub output_print {
     my ($self, $what) = @_;
@@ -160,42 +201,14 @@ sub output_unless {
     return "unless $reg, " . $self->output_label_use($dest);
 }
 
-sub output_advance {
-    my ($self, $distance, $failLabel) = @_;
-    $failLabel = $self->output_label_use($failLabel);
-    return ("add $R_POS, $distance # pos++",
-            "ge $R_POS, $R_LEN, $failLabel # past end of input?",
-            "set P0[0], $R_POS # group 0 start := pos");
-}
-
-sub output_increment {
-    my ($self, $distance, $failLabel) = @_;
-    return () if $distance == 0;
-
-    my $comment;
-    if ($distance == 1) {
-        $comment = "pos++";
-    } elsif ($distance == -1) {
-        $comment = "pos--";
-    } elsif ($distance > 0) {
-        $comment = "pos += $distance";
-    } elsif ($distance < 0) {
-        $comment = "pos -= ".(-$distance);
-    }
-
-    return ($self->dbprint("Changing pos: %I1 -> "),
-            "add $R_POS, $distance # $comment",
-            $self->dbprint("%I1\n"));
-}
-
 sub output_check {
     my ($self, $needed, $failLabel) = @_;
     my $fail = $self->output_label_use($failLabel);
     if ($needed == 1) {
-        return "ge $R_POS, $R_LEN, $fail # need $needed more chars";
+        return "ge ?R_POS, ?R_LEN, $fail # need $needed more chars";
     } else {
-        return "sub I0, $R_LEN, $R_POS # need $needed more chars",
-               "lt I0, $needed, $fail";
+        return "sub ?R_TMP, ?R_LEN, ?R_POS # need $needed more chars",
+               "lt ?R_TMP, $needed, $fail";
     }
 }
 
@@ -203,59 +216,54 @@ sub output_match {
     my ($self, $code, $failLabel) = @_;
     my $comment = Regex::Ops::Tree::isplain($code) ? " # match '".chr($code)."'" : "";
     return (
-            "ord I0, S0, $R_POS # I0 := S0[pos]",
-            "ne I0, $code, ".$self->output_label_use($failLabel).$comment,
+            "ord ?R_TMP, ?R_INPUT, ?R_POS # tmp = INPUT[pos]",
+            "ne ?R_TMP, $code, ".$self->output_label_use($failLabel).$comment,
            );
 }
 
 sub output_setstart {
     my ($self, $group, $value) = @_;
-    $value = $R_POS if $value eq 'pos';
-    return "set P0[$group], $value # open group $group";
+    $value = value($value);
+    return "set ?R_STARTS[$group], $value # open group $group";
 }
 
 sub output_setend {
     my ($self, $group, $value) = @_;
-    $value = $R_POS if $value eq 'pos';
-    return "set P1[$group], $value # close group $group";
+    $value = value($value);
+    return "set ?R_ENDS[$group], $value # close group $group";
 }
 
 sub output_getstart {
     my ($self, $reg, $group) = @_;
     $reg = value($reg);
-    return "set $reg, P0[$group] # get group $group start";
+    return "set $reg, ?R_STARTS[$group] # get group $group start";
 }
 
 sub output_getend {
     my ($self, $reg, $group) = @_;
     $reg = value($reg);
-    return "set $reg, P1[$group] # get group $group end";
+    return "set $reg, ?R_ENDS[$group] # get group $group end";
 }
 
 sub output_delete {
     my ($self, $n) = @_;
-    return "set P1[$n], -2 # delete group $n";
+    return "set ?R_ENDS[$n], -2 # delete group $n";
 }
 
 sub output_atend {
     my ($self, $failLabel) = @_;
     my $fail = $self->output_label_use($failLabel);
-    return ("le I0, $R_LEN, $fail # at end?");
+    return ("le ?R_TMP, ?R_LEN, $fail # at end?");
 }
 
 sub output_pushmark {
     my ($self) = @_;
+    my @ops;
     if ($self->{DEBUG}) {
-	my @ops = (qq(print "PUSHED ).(@_>1?$_[1]:"mark").qq(\\n"));
-	if (@_ > 1) {
-	    push @ops, "save \"$_[1]\"";
-	} else {
-	    push @ops, "save \"mark\"";
-	}
-        return (@ops, $self->dbgoto('DUMPSTACK'));
-    } else {
-	return "save -1 # pushmark";
+	push @ops, (qq(print "PUSHED ).(@_>1?$_[1]:"mark").qq(\\n"));
     }
+    push @ops, $self->pushop . " ?R_STACK, -1 # pushmark";
+    return @ops;
 }
 
 sub output_pushindex {
@@ -268,17 +276,18 @@ sub output_pushint {
     my ($self, $reg) = @_;
     $reg = value($reg);
 
+    my @ops = ($self->pushop . " ?R_STACK, $reg # pushindex");
     if ($self->{DEBUG}) {
-	return ("save $reg", 'print "PUSHED "', "print $reg", 'print "\n"',
-                $self->dbgoto('DUMPSTACK'));
-    } else {
-	return "save $reg # pushindex";
+	push @ops, 'print "PUSHED "', "print $reg", 'print "\n"',
+                   $self->dbgoto('DUMPSTACK');
     }
+    return @ops;
 }
 
 use vars qw($DEBUG_LABEL);
 sub output_popindex {
     my $self = shift;
+
     my ($reg, $fallback);
     if (@_ == 1) {
         ($reg, $fallback) = ('pos', @_);
@@ -292,32 +301,16 @@ sub output_popindex {
 
     $reg = value($reg);
 
+    my @ops = ($self->popop . " ?R_TMP, ?R_STACK # popindex");
     if ($self->{DEBUG}) {
-	my $index_popped = { name => 'LABEL', label => '@_DEBUG_' . ++$DEBUG_LABEL };
-	return ("print \"POPPED: \"",
-		"entrytype I0, 0",
-		"ne I0, 3, ".$self->output_label_use($index_popped),
-		"restore S10",
-		"print S10",
-		"print \"\\n\"",
-		"print \"  \"",
-                $self->dbgoto('DUMPSTACK'),
-		"branch ".$self->output_label_use($fallback),
-		$self->output_label_def($index_popped),
-		"restore I0",
-		"set $R_POS, I0",
-                $self->dbgoto('DUMPSTRING'),
-		"print \"  \"",
-                $self->dbgoto('DUMPSTACK'),
-               );
-    } else {
-        # FIXME: Still have extra copy in many cases
-        my @ops = ("restore I0 # popindex",
-                   "eq I0, -1, ".$self->output_label_use($fallback)." # was a mark?");
-        push @ops, "set $reg, I0 # nope, set pos := popped index"
-          unless $reg eq 'I0';
-        return @ops;
+        push @ops, 'print "POPPED: "', "print ?R_TMP", 'print "\n"';
     }
+
+    # FIXME: Still have extra copy in many cases
+    push @ops, "eq ?R_TMP, -1, ".$self->output_label_use($fallback)." # was a mark?";
+    push @ops, "set $reg, ?R_TMP # nope, set pos := popped index"
+      unless $reg eq '?R_TMP';
+    return @ops;
 }
 
 sub output_peekindex {
@@ -335,10 +328,9 @@ sub output_peekindex {
 
     $reg = value($reg);
 
-    return ("restore I0 # popindex",
-            "save I0 # put it back (slow peekindex)",
-            "eq I0, -1, ".$self->output_label_use($fallback)." # was a mark?",
-            "set $reg, I0 # nope, set pos := popped index");
+    return ("set ?R_TMP, ?R_STACK[-1\] # peekindex",
+            "eq ?R_TMP, -1, ".$self->output_label_use($fallback)." # was a mark?",
+            "set $reg, ?R_TMP # nope, set pos := popped index");
 }
 
 sub output_popint {
@@ -346,12 +338,12 @@ sub output_popint {
     $reg = value($reg);
     if ($self->{DEBUG}) {
 	return ("print \"POPPED INT: \"",
-		"restore $reg",
+		$self->popop . " $reg, ?R_STACK",
                 "print $reg",
                 'print "\n"',
                );
     } else {
-        return ("restore $reg # popint");
+        return ($self-> popop . " $reg, ?R_STACK # popint");
     }
 }
 

@@ -15,6 +15,7 @@ use Regex::Generate;
 use Regex::Rewrite::Stackless;
 #use Regex::CodeGen::Rx;
 use Regex::CodeGen::Pasm;
+use Regex::CodeGen::IMCC;
 
 use strict;
 
@@ -42,7 +43,13 @@ sub tree_to_list {
 
 sub list_to_pasm {
     my ($code, %options) = @_;
-    my $cgen = Regex::CodeGen::Pasm->new(%options);
+    my $cgen;
+
+    if (($options{output} || '') eq 'IMCC') {
+        $cgen = Regex::CodeGen::IMCC->new(%options);
+    } else {
+        $cgen = Regex::CodeGen::Pasm->new(%options);
+    }
     return $cgen->output(@$code);
 }
 

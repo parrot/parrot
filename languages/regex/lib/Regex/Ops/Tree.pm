@@ -177,6 +177,20 @@ sub dfa_safe {
 # R|S
 package Regex::Ops::Tree::alternate;
 
+sub init {
+    my ($self) = @_;
+
+    if (@{ $self->{args} } == 0) {
+        delete $self->{name};
+        delete $self->{args};
+        return $self->op('nop', [], %$self);
+    } elsif (@{ $self->{args} } == 1 && 2 == keys %$self) {
+        return $self->{args}->[0];
+    } else {
+        return $self;
+    }
+}
+
 sub minlen {
     my $op = shift;
     my $min;

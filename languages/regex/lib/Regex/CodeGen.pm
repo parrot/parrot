@@ -39,6 +39,7 @@ sub output {
             $label .= $self->output_label_def($op);
         } else {
             foreach my $line ($self->render($op)) {
+                $line =~ s/\?(\w+)/$self->{$1}/g;
                 if (length($label) >= 8) {
                     push @r, $label;
                     $label = '';

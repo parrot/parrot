@@ -331,25 +331,56 @@ sub rewrite_star {
     }
 }
 
+# R+ ->       pushmark
+#       loop: R or rback
+#             push 0
+#             goto loop
+#      rback: popindex -> junk or lastback
+#
+# (back is R.back)
+#
+#
 sub rewrite_plus {
-    my ($self, $op, $R, $greedy, $lastback) = @_;
-    my $back = $self->genlabel('plus_back');
+    my ($self, $op, $R, $lastback) = @_;
 
-    my @ops;
-    if ($greedy) {
-        my $loop = $self->genlabel('plus_loop');
-        my (undef, @R_ops) = $self->rewrite($R, $back);
-        @ops = (
-                         aop('pushmark', [ "+" ]),
-                $loop => @R_ops,
-                         aop('pushindex'),
-                         aop('goto', [ $loop ]),
-                $back => aop('popindex', [ $lastback ]),
-               );
-    } else {
-        my (undef, @R_ops) = $self->rewrite($R, $lastback);
-        @ops = ( $back => @R_ops );
-    }
+    my $loop = $self->genlabel('plus_loop');
+    my $rfail = $self->genlabel('plus_rfail');
+    my ($R_back, @R_ops) = $self->rewrite($R, $rfail);
+    my @ops = (
+                        aop('pushmark', [ "+" ]),
+               $loop => @R_ops,
+                        aop('pushint', [ 0 ]),
+                        aop('goto', [ $loop ]),
+              $rfail => aop('popindex', [ '?R_TMP', $lastback ]),
+              );
+
+    return ($R_back, @ops);
+}
+
+#
+# R+? ->        pushmark
+#         back: R or rfail
+#               push 0
+#               goto next
+#        rfail: popindex -> junk or lastback
+#               goto R.back
+#
+sub rewrite_nongreedy_plus {
+    my ($self, $op, $R, $lastback) = @_;
+
+    my $back = $self->genlabel('plus_backloop');
+    my $rfail = $self->genlabel('plus_rfail');
+    my $next = $self->genlabel('plus_next');
+    my ($R_back, @R_ops) = $self->rewrite($R, $rfail);
+    my @ops = (
+                        aop('pushmark', [ "+" ]),
+               $back => @R_ops,
+                        aop('pushint', [ 0 ]),
+                        aop('goto', [ $next ]),
+              $rfail => aop('popindex', [ '?R_TMP', $lastback ]),
+                        aop('goto', [ $R_back ]),
+               $next =>
+              );
 
     return ($back, @ops);
 }
@@ -429,6 +460,7 @@ sub rewrite_seq {
 
     my @ops;
     foreach (@_) {
+#        $DB::single = 1 if /multi_match/;
         my ($back, @rewritten) = $self->rewrite($_, $fallback);
         push @ops, @rewritten;
         $fallback = $back;
