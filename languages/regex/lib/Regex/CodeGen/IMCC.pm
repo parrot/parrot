@@ -452,13 +452,29 @@ sub output_rule_fail {
             ".return (<rx_match>)");
 }
 
-# There is no language-independent way of calling a rule, because this
-# requires following the host language's calling conventions. If
-# you're trying to trace through a compilation, then look for this
-# method to be overridden in your language-specific code generation
-# subclass, eg languages/perl6/P6C/IMCC/ExtRegex/CodeGen.pm
-sub output_call_rule {
-    die "unimplemented";
+sub output_call_setup {
+    my ($self, $name, $uid) = @_;
+    return ".local pmc $uid";
+}
+
+sub output_call {
+    my ($self, $name, $mode, $uid) = @_;
+    return split(/\n/, <<"END");
+$uid = _$name($mode, <rx_input>, <rx_pos>, <rx_stack>)
+<rx_pos> = $uid\['!POS']
+END
+}
+
+sub output_call_result {
+    my ($self, $uid, $name, $fail) = @_;
+    my $fail_label = $self->output_label_use($fail);
+    my @ops;
+    if (defined $name) {
+        push @ops, "<rx_match>['$name'] = $uid";
+    }
+    return (@ops,
+            "<rx_tmp> = $uid\['!RESULT']",
+            "unless <rx_tmp>, $fail_label");
 }
 
 1;

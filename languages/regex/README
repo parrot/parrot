@@ -42,13 +42,24 @@ Or you can have it render the tree back to a regular expression:
 
 All of this really ought to be in a usage message.
 
-To run any of the generated code, you now need the Match and
-MatchRange PMCs. They should be generated automatically now by the
-root makefile, but if for some reason they aren't, run 'make' in
-parrot/dynclasses/ to generate them.
+To run any of the generated code, you need the Match and MatchRange
+PMCs. They should be generated automatically now by the root makefile,
+but if for some reason they aren't, run 'make' in parrot/dynclasses/
+to generate them.
 
-New stuff (CURRENTLY BROKEN): now you can use the compiler as an
-embedded Parrot compiler. Run 'make regex-compiler.pbc' to generate
+The above commands only generate subroutines for matching regular
+expressions. They don't provide fun test programs to try out. For
+that, use the test.pl script with the -c flag to generate a test.pbc
+file that will accept an input string on the command line:
+
+  perl test.pl -c --expr='a*x'
+  ../../parrot test.pbc baax
+ (output)
+  Match found
+  0: 1..3
+
+New stuff: now you can use the compiler as an embedded Parrot
+compiler. Run 'make regex-compiler.pbc' to generate
 regex-compiler.pbc. Then run ../../parrot 01_basic.imc, ../../parrot
 02_date.imc, etc. These will dynamically load in the regex-compiler as
 the compiler for the "regex" language, and then use it to compile some
@@ -80,6 +91,12 @@ but if you format it nicely it should make more sense:
 
 All of the <?foo> things are there so that the rules get nicely
 captured -- by default, nested rule calls are *not* capturing.
+
+The above should now also work with --language=pir as well (actually,
+that's the default).
+
+If you use the -d flag while generating PIR code, you'll get a very
+verbose description of its matching progress.
 
 STATUS
 ======

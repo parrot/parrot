@@ -905,6 +905,7 @@ sub rewrite_external {
 sub describe_seq { undef };
 sub describe_check { undef };
 sub describe_group { "group $_[3]" }
+sub describe_rule { undef }
 
 sub wrap {
     my ($self, $op, $back, @ops) = @_;

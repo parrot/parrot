@@ -62,6 +62,9 @@ my $tree_opt = 1;
 my $list_opt = 1;
 my $language;
 my $testfile;
+my $pattern;
+
+# Hm. What versions of perl provide Getopt::Long as a builtin?
 foreach (@ARGV) {
     if (/^(-h|--help)$/) {
         usage(0);
@@ -72,6 +75,8 @@ foreach (@ARGV) {
         $list_opt = 0;
     } elsif (/--language=(.*)/) {
         $language = $1;
+    } elsif (/--expr=(.*)/) {
+        $pattern = $1;
     } elsif (/--optimize=(.*)/) {
         my $opts = $1;
         $tree_opt = ($opts =~ /t/i);
@@ -86,11 +91,13 @@ foreach (@ARGV) {
 }
 
 usage "not enough args: testfile required"
-  if ! defined $testfile;
+  if ! defined $testfile && ! defined $pattern;
 
-open(SPEC, $testfile) or die "open $testfile: $!";
-my $pattern = <SPEC>;
-chomp($pattern);
+if (defined $testfile) {
+    open(SPEC, $testfile) or die "open $testfile: $!";
+    $pattern = <SPEC>;
+    chomp($pattern);
+}
 
 generate_regular($pattern);
 exit(0) if $compile;
@@ -199,7 +206,9 @@ skipPrint:
 .end
 END
 
-    $driver->output_rule(*PIR, '_regex', $trees->[0], $ctx, DEBUG => $DEBUG);
+    for my $tree (@$trees) {
+        $driver->output_rule(*PIR, '_regex', $tree, $ctx, DEBUG => $DEBUG);
+    }
 
     close PIR;
 }
