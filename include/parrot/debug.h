@@ -160,14 +160,22 @@ void PDB_get_command(struct Parrot_Interp *interpreter);
 void PDB_print(struct Parrot_Interp *interpreter, const char *command);
 
 void PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, int regnum);
+void PDB_print_int_frame(struct Parrot_Interp *interpreter,
+                         struct IRegFrame *int_reg, int regnum);
 
 void PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, int regnum);
+void PDB_print_num_frame(struct Parrot_Interp *interpreter,
+                         struct NRegFrame *num_reg, int regnum);
 
 void PDB_print_string(struct Parrot_Interp *interpreter,
                       struct SReg *string_reg, int regnum);
+void PDB_print_string_frame(struct Parrot_Interp *interpreter,
+                            struct SRegFrame *string_reg, int regnum);
 
 void PDB_print_pmc(struct Parrot_Interp *interpreter,
                    struct PReg *pmc_reg, int regnum, PMC* key);
+void PDB_print_pmc_frame(struct Parrot_Interp *interpreter,
+                         struct PRegFrame *pmc_reg, int regnum, PMC* key);
 
 void PDB_debug(struct Parrot_Interp *interpreter);
 

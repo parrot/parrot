@@ -1896,7 +1896,7 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
                 i, depth);
 
     na(command);
-    PDB_print_int(interpreter, (struct IReg *)&chunk->IRegFrame[depth],
+    PDB_print_int_frame(interpreter, &chunk->IRegFrame[depth],
             atoi(command));
 }
 
@@ -1920,7 +1920,7 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
     PIO_eprintf(interpreter, "Float stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_num(interpreter, (struct NReg*)&chunk->NRegFrame[depth],
+    PDB_print_num_frame(interpreter, &chunk->NRegFrame[depth],
             atoi(command));
 }
 
@@ -1945,7 +1945,7 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
                 i, depth);
 
     na(command);
-    PDB_print_string(interpreter, (struct SReg *)&chunk->SRegFrame[depth],
+    PDB_print_string_frame(interpreter, &chunk->SRegFrame[depth],
             atoi(command));
 }
 
@@ -1969,7 +1969,7 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
     PIO_eprintf(interpreter, "PMC stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_pmc(interpreter, (struct PReg *)&chunk->PRegFrame[depth],
+    PDB_print_pmc_frame(interpreter, &chunk->PRegFrame[depth],
             atoi(command), NULL);
 }
 
@@ -2124,6 +2124,32 @@ PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, int regnu
     }
 }
 
+/* PDB_print_int_frame
+ * print the whole or a specific value of a integer register frame structure.
+ */
+void
+PDB_print_int_frame(struct Parrot_Interp *interpreter, struct IRegFrame *int_reg, int regnum)
+{
+    int i,j = 0, k = NUM_REGISTERS/2;
+
+    if (regnum >= NUM_REGISTERS/2 || regnum < -1) {
+        PIO_eprintf(interpreter, "No such register I%d", regnum);
+        return;
+    }
+    else if (regnum != -1) {
+        j = regnum;
+        k = regnum + 1;
+    }
+    else {
+        PIO_eprintf(interpreter, "Integer Registers:\n");
+    }
+
+    for (i = j; i < k; i++) {
+        PIO_eprintf(interpreter, "I%i =\t",i);
+        PIO_eprintf(interpreter, "%11vi\n",int_reg->registers[i]);
+    }
+}
+
 /* PDB_print_num
  * print the whole or a specific value of a float register structure.
  */
@@ -2133,6 +2159,32 @@ PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, int regnu
     int i,j = 0, k = NUM_REGISTERS;
 
     if (regnum >= NUM_REGISTERS || regnum < -1) {
+        PIO_eprintf(interpreter, "No such register N%d", regnum);
+        return;
+    }
+    else if (regnum != -1) {
+        j = regnum;
+        k = regnum + 1;
+    }
+    else {
+        PIO_eprintf(interpreter, "Float Registers:\n");
+    }
+
+    for (i = j; i < k; i++) {
+        PIO_eprintf(interpreter, "N%i =\t",i);
+        PIO_eprintf(interpreter, "%20.4f\n",num_reg->registers[i]);
+    }
+}
+
+/* PDB_print_num_frame
+ * print the whole or a specific value of a float register frame structure.
+ */
+void
+PDB_print_num_frame(struct Parrot_Interp *interpreter, struct NRegFrame *num_reg, int regnum)
+{
+    int i,j = 0, k = NUM_REGISTERS/2;
+
+    if (regnum >= NUM_REGISTERS/2 || regnum < -1) {
         PIO_eprintf(interpreter, "No such register N%d", regnum);
         return;
     }
@@ -2177,6 +2229,33 @@ PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
     }
 }
 
+/* PDB_print_string_frame
+ * print the whole or a specific value of a string register structure.
+ */
+void
+PDB_print_string_frame(struct Parrot_Interp *interpreter, struct SRegFrame *string_reg,
+                 int regnum)
+{
+    int i,j = 0, k = NUM_REGISTERS/2;
+
+    if (regnum >= NUM_REGISTERS/2 || regnum < -1) {
+        PIO_eprintf(interpreter, "No such register S%d", regnum);
+        return;
+    }
+    else if (regnum != -1) {
+        j = regnum;
+        k = regnum + 1;
+    }
+    else {
+        PIO_eprintf(interpreter, "String Registers:\n");
+    }
+
+    for (i = j; i < k; i++) {
+        PIO_eprintf(interpreter, "S%i =\n",i);
+        dump_string(interpreter, string_reg->registers[i]);
+    }
+}
+
 static void
 print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
 {
@@ -2203,6 +2282,39 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
     int i,j = 0, k = NUM_REGISTERS;
 
     if (regnum >= NUM_REGISTERS || regnum < -1) {
+        PIO_eprintf(interpreter, "No such register P%d", regnum);
+        return;
+    }
+    else if (regnum != -1) {
+        j = regnum;
+        k = regnum + 1;
+    }
+    else {
+        PIO_eprintf(interpreter, "PMC Registers:\n");
+    }
+
+    for (i = j; i < k; i++) {
+        PMC* pmc = pmc_reg->registers[i];
+
+        PIO_eprintf(interpreter, "P%i", i);
+        if (key) trace_key_dump(interpreter, key);
+        PIO_eprintf(interpreter, " =");
+
+        if (key) pmc = VTABLE_get_pmc_keyed(interpreter, pmc, key);
+        print_pmc(interpreter, pmc);
+    }
+}
+
+/* PDB_print_pmc_frame
+ * print the whole or a specific value of a PMC register frame structure.
+ */
+void
+PDB_print_pmc_frame(struct Parrot_Interp *interpreter, struct PRegFrame *pmc_reg,
+              int regnum, PMC* key)
+{
+    int i,j = 0, k = NUM_REGISTERS/2;
+
+    if (regnum >= NUM_REGISTERS/2 || regnum < -1) {
         PIO_eprintf(interpreter, "No such register P%d", regnum);
         return;
     }
