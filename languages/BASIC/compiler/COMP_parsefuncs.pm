@@ -312,8 +312,12 @@ print CODE<<FANDB;
 @e	bsr DEREF
 	bsr CAST_TO_INT
 	set P7, P6
+	pushp
 @e2	bsr DEREF		# Got both
 	bsr CAST_TO_INT
+	save P6
+	popp
+	restore P6
 	bsr SCREEN_COLOR
 FANDB
 	} elsif (@e2 and not @e) {
@@ -328,8 +332,12 @@ BNOTF
 	print CODE<<FNOTB;
 	bsr SCREEN_GETBACK	# F and no B
 	set P8, P6
+	pushp
 @e	bsr DEREF
 	bsr CAST_TO_INT
+	save P6
+	popp
+	restore P6
 	set P7, P6
 	set P6, P8
 	bsr SCREEN_COLOR
