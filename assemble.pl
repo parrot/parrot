@@ -71,6 +71,7 @@ my $listing="PARROT ASSEMBLY LISTING - ".scalar(localtime)."\n\n";
 # read source and assemble
 my $pc=0; my $op_pc=0;
 my ($bytecode,%label,%fixup,%constants,@constants);
+my (%local_label, %local_fixup, $last_label);
 my $line=0;
 while(<>) {
     $line++;
@@ -86,21 +87,48 @@ while(<>) {
     }
     if(m/^((\S+):)?\s*(.+)?/) {
         my($label,$code)=($2,$3);
-        if(defined($label) && $label ne "") {
-            if(exists($label{$label})) {
-                error("'$label' already defined!");
-            }
-            if(exists($fixup{$label})) {
-                # backpatch everything with this PC.
-                while(scalar(@{$fixup{$label}})) {
-                    my $op_pc=shift(@{$fixup{$label}});
-                    my $offset=shift(@{$fixup{$label}});
-                    substr($bytecode,$offset,4)=pack('l',($pc-$op_pc)/4);
-                }
-                delete($fixup{$label});  
-            }
-            $label{$label}=$pc; # store it.
-        }
+	if(defined($label) && $label ne "") {
+	    if($label=~m/^\$/) {
+		# a local label
+		if(exists($local_label{$label})) {
+		    error("local label '$label' already defined in $last_label!");
+		}
+		if(exists($local_fixup{$label})) {
+		    # backpatch everything with this PC.
+		    while(scalar(@{$local_fixup{$label}})) {
+			my $op_pc=shift(@{$local_fixup{$label}});
+			my $offset=shift(@{$local_fixup{$label}});
+			substr($bytecode,$offset,4)=pack('l',($pc-$op_pc)/4);
+		    }
+		    delete($local_fixup{$label});  
+		}
+		$local_label{$label}=$pc;
+	    } else {
+		# a global label
+		if(exists($label{$label})) {
+		    error("'$label' already defined!");
+		}
+		if(exists($fixup{$label})) {
+		    # backpatch everything with this PC.
+		    while(scalar(@{$fixup{$label}})) {
+			my $op_pc=shift(@{$fixup{$label}});
+			my $offset=shift(@{$fixup{$label}});
+			substr($bytecode,$offset,4)=pack('l',($pc-$op_pc)/4);
+		    }
+		    delete($fixup{$label});  
+		}
+
+		# clear out any local labels
+		%local_label = ();
+		if(keys(%local_fixup)) {
+		    # oops, some local labels are unresolved
+		    error("These local labels were undefined in $last_label: ".
+			  join(",",sort(keys(%local_fixup))));
+		}
+		$label{$label}=$pc; # store it.
+		$last_label=$label;
+	    }
+	}
         next if(!defined($code));
         1 while $code=~s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
         $code=~s/,/ /g;
@@ -121,7 +149,7 @@ while(<>) {
 		    } elsif(m/^((-?\d+)|(0b[01]+)|(0x[0-9a-f]+))$/i) {
 			# integer
 			push @arg_t,'ic';
-		    } elsif(m/^[A-Za-z_][\w]*$/i) {
+		    } elsif(m/^[\$A-Za-z_][\w]*$/i) {
 			# label
 			push @arg_t,'ic';
 		    } else {
@@ -173,13 +201,24 @@ while(<>) {
                 $pc+=$sizeof{$rtype}
             } elsif($rtype eq "D") {
                 # a destination
-                if(!exists($label{$args[$_]})) {
-                    # we have not seen it yet...put it on the fixup list
-                    push(@{$fixup{$args[$_]}},$op_pc,$pc);
-                    $args[$_]=0xffffffff;
-                } else {                    
-                    $args[$_]=($label{$args[$_]}-$op_pc)/4;
-                }
+		if($args[$_]=~/^\$/) {
+		    # a local label
+		    if(!exists($local_label{$args[$_]})) {
+			# we have not seen it yet...put it on the fixup list
+			push(@{$local_fixup{$args[$_]}},$op_pc,$pc);
+			$args[$_]=0xffffffff;
+		    } else {                    
+			$args[$_]=($local_label{$args[$_]}-$op_pc)/4;
+		    }
+		} else {
+		    if(!exists($label{$args[$_]})) {
+			# we have not seen it yet...put it on the fixup list
+			push(@{$fixup{$args[$_]}},$op_pc,$pc);
+			$args[$_]=0xffffffff;
+		    } else {                    
+			$args[$_]=($label{$args[$_]}-$op_pc)/4;
+		    }
+		}
                 $pc+=$sizeof{$rtype};
 	    } elsif($rtype eq 's') {
 		$args[$_]=~s/[\[\]]//g;
