@@ -762,19 +762,19 @@ CODE
 0.500000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ntoi_i_n");
+output_is(<<CODE, <<OUTPUT, "set_i_n");
 	set	N0, 0.0
-	ntoi	I0, N0
+	set	I0, N0
 	print	I0
 	print	"\\n"
 
 	set	N1, 2147483647.0
-	ntoi	I1, N1
+	set	I1, N1
 	print	I1
 	print	"\\n"
 
 	set	N2, -2147483648.0
-	ntoi	I2, N2
+	set	I2, N2
 	print	I2
 	print	"\\n"
         end

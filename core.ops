@@ -451,6 +451,10 @@ These operations load registers from constants or other registers.
 
 =item B<set>(i, ic)
 
+=item B<set>(i, n)
+
+=item B<set>(i, nc)
+
 =item B<set>(p, i)
 
 =item B<set>(p, ic)
@@ -458,6 +462,10 @@ These operations load registers from constants or other registers.
 =item B<set>(n, n)
 
 =item B<set>(n, nc)
+
+=item B<set>(n, i)
+
+=item B<set>(n, ic)
 
 =item B<set>(p, n)
 
@@ -501,8 +509,20 @@ inline op set(i, i|ic) {
   goto NEXT();
 }
 
+op set (i, n|nc) {
+  FLOATVAL number;
+  number = $2;
+  $1 = (INTVAL)number;
+  goto NEXT();
+}
+
 inline op set(n, n|nc) {
   $1 = $2;
+  goto NEXT();
+}
+
+inline op set(n, i|ic) {
+  $1 = (FLOATVAL)$2;
   goto NEXT();
 }
 
@@ -570,53 +590,6 @@ inline op set(s, p, i|ic) {
   $1 = $2->vtable->get_string_index(interpreter, $2, $3);
   goto NEXT();
 }
-
-=back
-
-=cut
-
-
-###############################################################################
-
-=head2 Conversion operations
-
-These operations load registers of one type with values from registers of
-another type, performing the appropriate type conversion along the way.
-
-=over 4
-
-=cut
-
-
-########################################
-
-=item B<iton>(n, i)
-
-Load $1 with the FLOATVAL corresponding to the INTVAL from $2.
-
-=cut
-
-inline op iton(n, i) {
-  $1 = (FLOATVAL)$2;
-  goto NEXT();
-}
-
-
-########################################
-
-=item B<ntoi>(i, n)
-
-Load $1 with the INTVAL corresponding to the truncated FLOATVAL from $2.
-
-=cut
-
-op ntoi(i, n) {
-  FLOATVAL number;
-  number = $2;
-  $1 = (INTVAL)number;
-  goto NEXT();
-}
-
 
 =back
 

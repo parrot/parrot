@@ -918,19 +918,19 @@ CODE
 5
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "iton_n_i");
+output_is(<<CODE, <<OUTPUT, "set_n_i");
 	set	I0, 0
-	iton	N0, I0
+	set	N0, I0
 	print	N0
 	print	"\\n"
 
 	set	I1, 2147483647
-	iton	N1, I1
+	set	N1, I1
 	print	N1
 	print	"\\n"
 
 	set	I2, -2147483648
-	iton	N2, I2
+	set	N2, I2
 	print	N2
 	print	"\\n"
         end
