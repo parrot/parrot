@@ -1402,7 +1402,7 @@ pf_debug_unpack (struct Parrot_Interp *interpreter,
     code = (struct PackFile_ByteCode *)PackFile_find_segment(self->pf,
             code_name);
     if (!code || code->base.type != PF_BYTEC_SEG)
-        internal_exception(1, "Code '%s' not found for debug seg '%s'\n",
+        internal_exception(1, "Code '%s' not found for debug segment '%s'\n",
                 code_name, self->name);
     code->debug = debug;
     debug->code = code;
@@ -1474,7 +1474,7 @@ Parrot_switch_to_cs_by_nr(struct Parrot_Interp *interpreter, opcode_t seg)
             n++;
         }
     }
-    internal_exception(1, "Segment nr %d not found\n", (int) seg);
+    internal_exception(1, "Segment number %d not found\n", (int) seg);
 }
 
 /* switch to a byte code seg, return old */
