@@ -129,10 +129,23 @@ the subroutine.
 
 .namespace [ "PGE::Match" ]
 
+.sub "new"
+    .param string target
+    .param pmc rule_coro
+
+    .local pmc self
+    find_type $I0, "PGE::Match"
+    new self, $I0
+    self."_init"(target, rule_coro)
+
+    .return(self)
+.end
+
 .sub _init method
     .param string target
     .param pmc rulecor
     .local pmc state, rephash, caphash
+    
     $P0 = new .PerlString                  # set .target
     $P0 = target
     classoffset $I0, self, "PGE::Match"       

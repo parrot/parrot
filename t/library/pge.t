@@ -23,10 +23,10 @@ output_is(<<'CODE', <<'OUT', "character class membership");
     load_bytecode "library/PGE/Class.pir"
 
     .local pmc vowels
-    $I0 = find_type "PGE::Class::Discrete"
-    new vowels, $I0
+    .local pmc new_sub
 
-    set vowels, "aeiou"
+    find_global new_sub, "PGE::Class::Discrete", "new"
+    vowels = new_sub("aeiou")
 
     $I1 = vowels["o"]
     if $I1 goto OK1
@@ -48,16 +48,15 @@ ok 2
 OUT
 
 # 2
-output_is(<<'CODE', <<'OUT', "character class membership: method forms");
+output_is(<<'CODE', <<'OUT', "character class membership: method form");
 ##PIR##
 .sub _main
     load_bytecode "library/PGE/Class.pir"
 
     .local pmc vowels
-    $I0 = find_type "PGE::Class::Discrete"
-    new vowels, $I0
-
-    vowels.set_chars("aeiou")
+    .local pmc new_sub
+    find_global new_sub, "PGE::Class::Discrete", "new"
+    vowels = new_sub("aeiou")
 
     $I1 = vowels.matches("o")
     if $I1 goto OK1

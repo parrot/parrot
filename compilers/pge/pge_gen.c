@@ -533,11 +533,11 @@ pge_gen(PGE_Exp* e)
     emit("    .param string target\n");
     emit("    .local pmc match\n");
     emit("    .local pmc rulecor\n");
+    emit("    .local pmc newmeth\n");
     emit("  class_loaded:\n");
-    emit("    find_type $I0, \"PGE::Match\"\n");
-    emit("    new match, $I0\n");
     emit("    newsub rulecor, .Coroutine, _PGE_Rule_cor\n");
-    emit("    match.\"_init\"(target, rulecor)\n");
+    emit("    find_global newmeth, \"PGE::Match\", \"new\"\n");
+    emit("    match = newmeth(target, rulecor)\n");
     emit("    match.\"_next\"()\n");
     emit("    .return(match)\n");
     emit(".end\n\n");

@@ -127,14 +127,10 @@ This class represents a discrete set of characters, such as [aeiou] (or
 <[aeiou]> in Perl 6-land).  To use this class:
 
     # create the character class
+    .local pmc new_sub
     .local pmc class
-    find_type $I0, "PGE::Class::Discrete"
-    new class, $I0
-
-    # assign the characters it will match
-    class = "aeiou"
-    # or
-    class.set_chars("aeiou")
+    find_global new_sub, "PGE::Class::Discrete", "new"
+    class = new_sub("aeiou")
 
     # decide whether it matches a character
     .local int matches
@@ -145,38 +141,22 @@ This class represents a discrete set of characters, such as [aeiou] (or
 Ranges ("a-m") are not supported.  That means the three characters "a", "-",
 and "m".  
 
-Also keep in mind that you can't (yet) do:
-
-    matches = class[$S0]
-
-Because of how parrot creates keys.  Use the method form or make a Key object
-in that case.
-
 =cut
 
-.sub __init method
+.sub "new"
+    .param string chars
+    .local pmc me
+
+    find_type $I0, "PGE::Class::Discrete"
+    new me, $I0
+
     .local int offset
-    classoffset offset, self, "PGE::Class::Discrete"
+    classoffset offset, me, "PGE::Class::Discrete"
 
     $P0 = new String
-    setattribute self, offset, $P0
-    .return()
-.end
-
-.sub __set_string_native method
-    .param string list
-    .local int offset
-    classoffset offset, self, "PGE::Class::Discrete"
-    getattribute $P0, self, offset
-
-    $P0 = list
-    .return()
-.end
-
-.sub set_chars method
-    .param string list
-    self = list
-    .return()
+    $P0 = chars
+    setattribute me, offset, $P0
+    .return(me)
 .end
 
 .sub __get_integer_keyed method
@@ -206,30 +186,23 @@ it matches exactly when its child doesn't.  To create this class:
 
     # create the character class
     .local pmc class
-    find_type $I0, "PGE::Class::Invert"
-    new class, $I0
-
-    # assign a child object
-    assign class, some_other_p6ge_class
-    # or
-    class.set_child(some_other_p6ge_class)
+    .local pmc new_sub
+    find_global new_sub, "PGE::Class::Invert", "new"
+    class = new_sub(some_other_pge_class)
 
 =cut
 
-.sub __set_pmc method
+.sub "new"
     .param pmc child
+    .local pmc me
+
+    find_type $I0, "PGE::Class::Invert"
+    new me, $I0
 
     .local int offset
-    classoffset offset, self, "PGE::Class::Invert"
-    setattribute self, offset, child
-    .return()
-.end
-
-.sub set_child method
-    .param pmc child
-
-    assign self, child
-    .return()
+    classoffset offset, me, "PGE::Class::Invert"
+    setattribute me, offset, child
+    .return(me)
 .end
 
 .sub __get_integer_keyed method
