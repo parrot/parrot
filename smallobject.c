@@ -21,7 +21,7 @@
 
 INTVAL
 contained_in_pool(struct Parrot_Interp *interpreter,
-            struct Small_Object_Pool *pool, void *ptr)
+                  struct Small_Object_Pool *pool, void *ptr)
 {
     struct Small_Object_Arena *arena;
     
@@ -37,7 +37,7 @@ contained_in_pool(struct Parrot_Interp *interpreter,
 /* We're out of traceable objects. Try a DOD, then get some more if needed */
 void
 more_traceable_objects(struct Parrot_Interp *interpreter, 
-                struct Small_Object_Pool *pool)
+                       struct Small_Object_Pool *pool)
 {
     Parrot_do_dod_run(interpreter);
     /* requires that num_free_objects be updated in Parrot_do_dod_run.
@@ -50,7 +50,7 @@ more_traceable_objects(struct Parrot_Interp *interpreter,
 /* We're out of non-traceable objects. Get some more */
 void
 more_non_traceable_objects(struct Parrot_Interp *interpreter, 
-                struct Small_Object_Pool *pool)
+                           struct Small_Object_Pool *pool)
 {
     (*pool->alloc_objects)(interpreter, pool);
 }
@@ -58,7 +58,7 @@ more_non_traceable_objects(struct Parrot_Interp *interpreter,
 /* Add an unused object back to the free pool for later reuse */
 void
 add_free_object(struct Parrot_Interp *interpreter,
-                 struct Small_Object_Pool *pool, void *to_add)
+                struct Small_Object_Pool *pool, void *to_add)
 {
     /* This code is copied to add_free_pmc and add_free_buffer */
     *(void **)to_add = pool->free_list;
@@ -134,7 +134,8 @@ alloc_objects(struct Parrot_Interp *interpreter,
         pool->objects_per_alloc *= GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR;
         pool->replenish_level =
             (size_t)(pool->total_objects * GC_DEBUG_REPLENISH_LEVEL_FACTOR);
-    } else {
+    }
+    else {
         pool->objects_per_alloc *= UNITS_PER_ALLOC_GROWTH_FACTOR;
         pool->replenish_level =
             (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
@@ -143,7 +144,7 @@ alloc_objects(struct Parrot_Interp *interpreter,
 
 struct Small_Object_Pool *
 new_small_object_pool(struct Parrot_Interp *interpreter,
-                  size_t object_size, size_t objects_per_alloc)
+                      size_t object_size, size_t objects_per_alloc)
 {
     struct Small_Object_Pool *pool;
 

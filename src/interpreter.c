@@ -59,7 +59,6 @@ runops_generic(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
 static void
 init_prederef(struct Parrot_Interp *interpreter)
 {
-
     interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT();
     if (interpreter->op_lib->op_count != interpreter->op_count)
         internal_exception(PREDEREF_LOAD_ERROR,

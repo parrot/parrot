@@ -325,7 +325,7 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     Buffer *b;
     char *tail;
 
-#ifdef LEA_DEBUG
+#  ifdef LEA_DEBUG
     /* check/clear tail, e.g. on changes in string.c or res.c */
     for (cur_arena = pool->last_Arena;
          NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -340,7 +340,7 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
             b = (Buffer *)((char *)b + object_size);
         }
     }
-#endif
+#  endif
 
     for (cur_arena = pool->last_Arena;
          NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -574,9 +574,9 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
         }
     }
     /* update mem stats */
-#if 0
+#  if 0
     interpreter->memory_allocated = mallinfo().uordblks;
-#endif
+#  endif
 #endif /* GC_IS_MALLOC */
     /* Note it */
     interpreter->dod_runs++;

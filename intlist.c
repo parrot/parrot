@@ -178,3 +178,13 @@ intlist_dump(FILE *fp, IntList *list, int verbose)
     list_dump(fp, (List *)list, verbose);
 #endif
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
