@@ -13,7 +13,7 @@
 
 struct PerlScalarData { 
     INTVAL  intdata;  
-    NUMVAL  numdata;   
+    FLOATVAL  numdata;   
     STRING* stringdata; 
 };
 
@@ -36,23 +36,23 @@ static STRING* Parrot_scalar_name (struct Parrot_Interp *interpreter, PMC* pmc) 
 }
 
 static PMC* Parrot_scalar_new (struct Parrot_Interp *interpreter, PMC* pmc) {
-    pmc->data = memory_allocate_aligned(sizeof(struct PerlScalarData));
+    pmc->data = mem_allocate_aligned(sizeof(struct PerlScalarData));
 }
 
 static void Parrot_scalar_clone (struct Parrot_Interp *interpreter, PMC* pmc, PMC* dest) {
-    dest->vtable->destroy(dest); /* MAY NOT BE NEEDED */
+    dest->vtable->destroy(interpreter, dest); /* MAY NOT BE NEEDED */
     dest->vtable = pmc->vtable;
-    dest->vtable->new(dest);     /* Similarly, may not be needed */
+    dest->vtable->new(interpreter, dest);     /* Similarly, may not be needed */
     dest->flags &= ~(PS_STRING_OK | PS_INTEGER_OK | PS_NUMBER_OK);
     dest->flags |= pmc->flags & (PS_STRING_OK | PS_INTEGER_OK | PS_NUMBER_OK);
 
     /* Copy stuff across */
-    ((struct PerlScalarData)(dest->data))->numdata = 
-	((struct PerlScalarData)(pmc->data))->numdata;
-    ((struct PerlScalarData)(dest->data))->intdata = 
-	((struct PerlScalarData)(pmc->data))->intdata;
-    ((struct PerlScalarData)(dest->data))->stringdata = 
-	string_copy(((struct PerlScalarData)(pmc->data))->stringdata);
+    ((struct PerlScalarData*)(dest->data))->numdata = 
+	((struct PerlScalarData*)(pmc->data))->numdata;
+    ((struct PerlScalarData*)(dest->data))->intdata = 
+	((struct PerlScalarData*)(pmc->data))->intdata;
+    ((struct PerlScalarData*)(dest->data))->stringdata = 
+	string_copy(interpreter, ((struct PerlScalarData*)(pmc->data))->stringdata);
 
 }
 
@@ -70,63 +70,75 @@ static void Parrot_scalar_destroy (struct Parrot_Interp *interpreter, PMC* pmc) 
 
 static INTVAL Parrot_scalar_get_integer (struct Parrot_Interp *interpreter, PMC* pmc) {
     if (pmc->flags & PS_INTEGER_OK) {
-        return ((struct PerlScalarData)(pmc->data))->intdata;
+        return ((struct PerlScalarData *)(pmc->data))->intdata;
     } else if (pmc->flags & PS_NUMBER_OK) {
 	pmc->flags |= PS_INTEGER_OK;
-	return ((struct PerlScalarData)(pmc->data))->intdata 
-	    = (INTVAL)((struct PerlScalarData)(pmc->data)->numdata);
-    } else if (pmc->flags & CACHE_STRING) {
+	return ((struct PerlScalarData*)(pmc->data))->intdata 
+	    = (INTVAL)(((struct PerlScalarData*)(pmc->data))->numdata);
+    } else if (pmc->flags & PS_STRING_OK) {
 	pmc->flags |= PS_INTEGER_OK;
         printf("String atoi will go here when implemented\n");
         exit(1);
     } else {
 	/* ENODATA! */
         pmc->flags |= PS_INTEGER_OK;
-        return ((struct PerlScalarData)(pmc->data))->intdata = 0;
+        return ((struct PerlScalarData*)(pmc->data))->intdata = 0;
     }
 }
 
 static FLOATVAL Parrot_scalar_get_number (struct Parrot_Interp *interpreter, PMC* pmc) {
     if (pmc->flags & PS_NUMBER_OK) {
-        return pmc->data->numdata;
+        return ((struct PerlScalarData*)(pmc->data))->numdata;
     } else if (pmc->flags & PS_INTEGER_OK) {
-        pmc->flags |= PS_NUMBER_OK
-        return pmc->data->numdata = (FLOATVAL)pmc->data->intdata;
+        pmc->flags |= PS_NUMBER_OK;
+        return ((struct PerlScalarData*)(pmc->data))->numdata = 
+               (FLOATVAL)(((struct PerlScalarData*)(pmc->data))->intdata);
     } else if (pmc->flags & PS_STRING_OK) {
         printf("String aton will go here when implemented\n");
         exit(1);
-    } else {
-        pmc->flags |= PS_NUMBER_OK | PS_INTEGER_OK;
-	pmc->data->intval = 0;
-        return pmc->data->numval = 0.0;
     }
+    pmc->flags |= PS_NUMBER_OK | PS_INTEGER_OK;
+    ((struct PerlScalarData*)(pmc->data))->intdata = 0;
+    return ((struct PerlScalarData*)(pmc->data))->numdata = 0.0;
 }
 
 static STRING* Parrot_scalar_get_string (struct Parrot_Interp *interpreter, PMC* pmc) {
     if (pmc->flags & PS_STRING_OK) {
-        return pmc->data->stringval;
+	    return ((struct PerlScalarData*)(pmc->data))->stringdata;
     } else if (pmc->flags & PS_NUMBER_OK) {
-        char* buf = mem_allocate_aligned((INTVAL)log(pmc->data->numdata)+1);
-        sprintf(buf, "%d", pmc->data->numdata); /* Hack */
-        pmc->data->stringdata = string_make(interpreter, buf, strlen(buf), 0, 0, 0);
+        char* buf = mem_allocate_aligned((INTVAL)log(
+	     ((struct PerlScalarData*)(pmc->data))->numdata
+                        )+1);
+        sprintf(buf, "%d", ((struct PerlScalarData*)(pmc->data))->numdata); /* Hack */
+	    ((struct PerlScalarData*)(pmc->data))->stringdata = 
+              string_make(interpreter, buf, strlen(buf), 0, 0, 0);
         free(buf);
-        return pmc->data->stringdata;
+        return ((struct PerlScalarData*)(pmc->data))->stringdata;
     } else if (pmc->flags & PS_INTEGER_OK) {
-        char* buf = mem_allocate_aligned((INTVAL)log(pmc->data->intdata)+1);
-        sprintf(buf, "%i", pmc->data->intdata); /* Hack */
-        pmc->data->stringdata = string_make(interpreter, buf, strlen(buf), 0, 0, 0);
+        char* buf = mem_allocate_aligned((INTVAL)log(
+	     ((struct PerlScalarData*)(pmc->data))->intdata
+                        )+1);
+        sprintf(buf, "%i", ((struct PerlScalarData*)(pmc->data))->intdata); /* Hack */
+	    ((struct PerlScalarData*)(pmc->data))->stringdata = 
+              string_make(interpreter, buf, strlen(buf), 0, 0, 0);
         free(buf);
+        return ((struct PerlScalarData*)(pmc->data))->stringdata;
     } else {
         /* Empty? */
         pmc->flags |= PS_STRING_OK | PS_NUMBER_OK | PS_INTEGER_OK;
-	pmc->data->intval = pmc->data->numval = 0;
-        return pmc->data->stringdata = string_make(interpreter, "", 0, 0, 0, 0);
+        ((struct PerlScalarData*)(pmc->data))->intdata =
+            ((struct PerlScalarData*)(pmc->data))->numdata = 0;
+        return ((struct PerlScalarData*)(pmc->data))->stringdata = string_make(interpreter, "", 0, 0, 0, 0);
     }
 }
 
 static BOOLVAL Parrot_scalar_get_bool (struct Parrot_Interp *interpreter, PMC* pmc) {
-    if (pmc->flags & PS_NUMBER_OK) { return (BOOLVAL)pmc->data->numval; }
-    if (pmc->flags & PS_INTEGER_OK) { return (INTVAL)pmc->data->intval; }
+    if (pmc->flags & PS_NUMBER_OK) { 
+        return (BOOLVAL)(((struct PerlScalarData*)(pmc->data))->numdata);
+    }
+    if (pmc->flags & PS_INTEGER_OK) {
+        return (BOOLVAL)(((struct PerlScalarData*)(pmc->data))->intdata);
+    }
     if (!pmc->flags & PS_STRING_OK) { return 0; }
     /* I don't know what happens here */
 }
@@ -135,17 +147,19 @@ static void* Parrot_scalar_get_value (struct Parrot_Interp *interpreter, PMC* pm
     return pmc->data;
 }
 
-static BOOLVAL Parrot_scalar_is_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC* pmc2) {
+static BOOLVAL Parrot_scalar_is_same (struct Parrot_Interp *interpreter, PMC* pmc1, PMC* pmc2) {
     if (pmc1->flags & PS_NUMBER_OK) {
-	return pmc1->data->numval == pmc2->vtable->get_number(pmc2); 
+        return ((struct PerlScalarData*)(pmc1->data))->numdata 
+                        == pmc2->vtable->get_number(interpreter, pmc2);
     } else if (pmc1->flags & PS_INTEGER_OK) { 
-	return pmc1->data->intval == pmc2->vtable->get_integer(pmc2);
+        return ((struct PerlScalarData*)(pmc1->data))->intdata 
+                        == pmc2->vtable->get_integer(interpreter, pmc2);
     } else if (pmc1->flags & PS_STRING_OK) {
 	/* Urgh */
 	/* return string_compare(pmc1->data->stringval, pmc2->vtable->get_string(pmc2) */
     } 
     /* pmc1 is false */
-    return !pmc2->vtable->get_bool(pmc2);
+    return !pmc2->vtable->get_bool(interpreter, pmc2);
 }
 
 static void Parrot_scalar_set_integer_1 (struct Parrot_Interp *interpreter, PMC* pmc, INTVAL integer) {
@@ -475,7 +489,7 @@ void Parrot_scalar_init (void) {
 			Parrot_scalar_repeat_5,
 		},
 	};
-    whoami = Parrot_string_make(NULL, /* This is a screamingly huge hack */
+    whoami = string_make(NULL, /* This is a screamingly huge hack */
 				"PerlScalar",
 				10, 0, 0, 0);
     Parrot_base_vtables[enum_class_scalar] = temp_base_vtable;
