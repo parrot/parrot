@@ -41,9 +41,9 @@ D: Numerous improvements and proposals.
 N: Bernhard Schmalhofer
 D: Bugfixes, Getopt_Long.imc
 
-N: Brent Dax
+N: Brent Royal-Gordon
 D: Configure, Parrot_sprintf, embedding, early regex engine.
-D: Youngest Parrot hacker to hold a pumpkin (Configure).
+D: Early contributions under the name Brent Dax.
 E: brent@brentdax.com
 W: http://www.brentdax.com/
 
