@@ -90,7 +90,8 @@ while (<>) {
     my $tpass = 0;
     if (@conds) {
 	# need to map conditions, as signals and conditions don't quite mesh
-	my %map = (Division_impossible => 'Invalid_operation',);
+	my %map = (Division_impossible => 'Invalid_operation',
+		   Division_undefined => 'Invalid_operation');
 	foreach (@conds) {
 	    if ($map{$_}) {
 		$_ = $map{$_};

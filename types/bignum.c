@@ -1801,7 +1801,65 @@ with a fixed fractional part
 void
 BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	  BN_CONTEXT *context) {
-    BIGNUM* rem = BN_new(PINT_ 1);
+    BIGNUM* rem;
+    /* Check for special values */
+    if (one->digits == 0 || two->digits == 0) {
+        if (am_NAN(one) || am_NAN(two)) {
+            if (am_sNAN(one) || am_sNAN(two)) {
+                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                            "sNAN in divide");
+            }
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        if (am_INF(one) && am_INF(two)) {
+            BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                        "Inf / Inf in divide");
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        if (am_INF(one)) {
+            if (BN_is_zero(PINT_ two, context)) {
+                BN_nonfatal(PINT_ context, BN_DIVISION_BY_ZERO,
+                            "Inf / 0 in divide");
+            }
+            BN_set_inf(PINT_ result);
+            result->sign = 1 & (one->sign ^ two->sign);
+            return;
+        }
+        /* so we're left with x / Inf */
+        result->digits = 1;
+        result->expn = 0;
+        BN_setd(result, 0, 0);
+        result->sign = 1 & (one->sign ^ two->sign);
+        return;
+    }
+
+    if (BN_is_zero(PINT_ two, context)) {
+        if (BN_is_zero(PINT_ one, context)) {
+            BN_nonfatal(PINT_ context, BN_DIVISION_UNDEFINED,
+                        " 0 / 0 in divide");
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+
+        BN_nonfatal(PINT_ context, BN_DIVISION_BY_ZERO,
+                    "division by zero in divide");
+        BN_set_inf(PINT_ result);
+        result->sign = 1 & (one->sign ^ two->sign);
+        return;
+    }
+
+    /* We're left with the case that only arg 1 is zero */
+    if (BN_is_zero(PINT_ one, context) ) {
+        result->expn = 0;
+        result->digits = 1;
+        BN_setd(result, 0 ,0);
+        result->sign = 1 & (one->sign ^ two->sign);
+        return;
+    }
+
+    rem = BN_new(PINT_ 1);
     BN_arith_setup(PINT_ result, one, two, context, NULL);
     BN_idivide(PINT_ result, one, two, context, BN_DIV_DIVIDE, rem);
 
@@ -1916,7 +1974,65 @@ Places the integer part of one / two into result.
 void
 BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 		   BN_CONTEXT *context) {
-    BIGNUM* rem = BN_new(PINT_ 1);
+    BIGNUM* rem;
+    /* Check for special values (same as divide...) */
+    if (one->digits == 0 || two->digits == 0) {
+        if (am_NAN(one) || am_NAN(two)) {
+            if (am_sNAN(one) || am_sNAN(two)) {
+                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                            "sNAN in divide-integer");
+            }
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        if (am_INF(one) && am_INF(two)) {
+            BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                        "Inf / Inf in divide-integer");
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        if (am_INF(one)) {
+            if (BN_is_zero(PINT_ two, context)) {
+                BN_nonfatal(PINT_ context, BN_DIVISION_BY_ZERO,
+                            "Inf / 0 in divide-integer");
+            }
+            BN_set_inf(PINT_ result);
+            result->sign = 1 & (one->sign ^ two->sign);
+            return;
+        }
+        /* so we're left with x / Inf */
+        result->digits = 1;
+        result->expn = 0;
+        BN_setd(result, 0, 0);
+        result->sign = 1 & (one->sign ^ two->sign);
+        return;
+    }
+
+    if (BN_is_zero(PINT_ two, context)) {
+        if (BN_is_zero(PINT_ one, context)) {
+            BN_nonfatal(PINT_ context, BN_DIVISION_UNDEFINED,
+                        " 0 / 0 in divide-integer");
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+
+        BN_nonfatal(PINT_ context, BN_DIVISION_BY_ZERO,
+                    "division by zero in divide-integer");
+        BN_set_inf(PINT_ result);
+        result->sign = 1 & (one->sign ^ two->sign);
+        return;
+    }
+
+    /* We're left with the case that only arg 1 is zero */
+    if (BN_is_zero(PINT_ one, context) ) {
+        result->expn = 0;
+        result->digits = 1;
+        BN_setd(result, 0 ,0);
+        result->sign = 1 & (one->sign ^ two->sign);
+        return;
+    }
+    
+    rem = BN_new(PINT_ 1);
     BN_arith_setup(PINT_ result, one, two, context, NULL);
     BN_idivide(PINT_ result, one, two, context, BN_DIV_DIVINT, rem);
   
@@ -1926,6 +2042,9 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	!(rem->digits == 0 && BN_getd(rem, 0) == 0)) {
 	BN_nonfatal(PINT_ context, BN_DIVISION_IMPOSSIBLE,
 		  "divide-integer requires more precision than available");
+        BN_set_qNAN(PINT_ result);
+        BN_destroy(PINT_ rem);
+        return;
     }
     BN_destroy(PINT_ rem);
     if (result->expn != 0) {
@@ -1933,7 +2052,7 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	BN_grow(PINT_ result, result->expn + result->digits);
 	for (i=0; i<result->digits; i++) {
 	    BN_setd(result, result->expn + result->digits -1 -i,
-		    BN_getd(result, i));
+		    BN_getd(result, result->digits - 1- i));
 	}
 	for (i=0; i<result->expn; i++) {
 	    BN_setd(result, i ,0);
@@ -1956,6 +2075,44 @@ BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	      BN_CONTEXT *context) {
     BIGNUM* fake;
 
+    /* Check for special values */
+    if (one->digits == 0 || two->digits == 0) {
+        if (am_NAN(one) || am_NAN(two)) {
+            if (am_sNAN(one) || am_sNAN(two)) {
+                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                            "sNAN in remainder");
+            }
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        /* Infinities, first cover Inf rem x and Inf rem Inf */
+        if (am_INF(one)) {
+            BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                        "x rem Inf in remainder");
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        /* now cover x rem Inf => 0 */
+        result->expn = 0;
+        result->digits = 1;
+        BN_setd(result, 0,0);
+        result->sign = one->sign;
+        return;
+    }
+
+    if (BN_is_zero(PINT_ two, context)) {
+        if (BN_is_zero(PINT_ one, context)) {
+            BN_nonfatal(PINT_ context, BN_DIVISION_UNDEFINED,
+                        "0 rem 0 in remainder");
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                    "x rem 0 in remainder");
+        BN_set_qNAN(PINT_ result);
+        return;
+    }
+
     if (BN_is_zero(PINT_ one, context)) {
 	result->digits = 1;
 	result->sign = 0;
@@ -1971,8 +2128,11 @@ BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (fake->expn >0 && context->precision > 0 &&
 	fake->expn + result->digits > context->precision &&
 	!(result->digits == 0 && BN_getd(result, 0) == 0)) {
-	BN_EXCEPT(PINT_ BN_DIVISION_IMPOSSIBLE,
-		  "remainder requires more precision than available");
+        BN_nonfatal(PINT_ context, BN_DIVISION_IMPOSSIBLE,
+                    "remainder requires more precision than available");
+        BN_set_qNAN(PINT_ result);
+        BN_destroy(PINT_ fake);
+        return;
     }
 
 
@@ -1991,20 +2151,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     BIGNUM *div,*t1, *t2;
     int s2, value;
 
-    /* Are we doing something stupid, can we skip all the hassle? */
-    if (BN_is_zero(PINT_ one, context)) {
-	if (BN_is_zero(PINT_ two, context)){
-	    BN_EXCEPT(PINT_ BN_DIVISION_UNDEFINED, "0/0 in division");
-	}
-	result->digits = 1; /* 0/ x, return 0 */
-	result->sign = 0;
-	BN_setd(result, 0, 0);
-	return;
-    }
-    if (BN_is_zero(PINT_ two, context)) {
-	BN_EXCEPT(PINT_ BN_DIVISION_BY_ZERO, "x/0 in division");
-    }
-    /* That's quite enough shortcuts for now... */
+    /* We assume we've been given something to divide */
 
     /* Make some temporaries, set all signs to positive for simplicity */
     /* We use result as a tempory, and store the reversed result in t2 */
