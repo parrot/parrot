@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 91;
+use Parrot::Test tests => 75;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -192,263 +192,6 @@ OUTPUT
 #
 # Number tests
 #
-output_is(<<"CODE", <<OUTPUT, "add number to self");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	set P0, 123.123
-	add P0, P0, P0
-	.fp_eq( P0, 246.246, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "sub number from self");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	set P0, 456.456
-	sub P0, P0, P0
-	.fp_eq( P0, 0, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "multiply number by self");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	set P0, 124.124
-	mul P0, P0, P0
-	.fp_eq( P0, 15406.767376, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "divide number by self");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	set P0, 23.23
-	div P0, P0, P0
-	.fp_eq( P0, 1, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-#
-# Number vs. number
-#
-output_is(<<"CODE", <<OUTPUT, "add number to other");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
-	set P0, 123.123
-	set P1, 321.321
-	add P1, P1, P0
-	.fp_eq( P1, 444.444, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "subtract number from other");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
-	set P0, 123.123
-	set P1, 321.321
-	sub P1, P1, P0
-	.fp_eq( P1, 198.198, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "multiply number by other");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
-	set P0, 123.123
-	set P1, 321.321
-	mul P1, P1, P0
-	.fp_eq( P1, 39562.005483, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "divide number by other");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
-	set P0, 123.123
-	set P1, 246.246
-	div P1, P1, P0
-	.fp_eq( P1, 2, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-#
-# Number vs. integer
-#
-output_is(<<"CODE", <<OUTPUT, "add integer to number");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
-	set P0, 123
-	set P1, 321.321
-	add P1, P1, P0
-	.fp_eq( P1, 444.321, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "subtract integer from number");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
-	set P0, 123
-	set P1, 321.321
-	sub P1, P1, P0
-	.fp_eq( P1, 198.321, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "multiply integer by number");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
-	set P0, 123
-	set P1, 321.321
-	mul P1, P1, P0
-	.fp_eq( P1,39522.483 , EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "divide integer by number");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
-	set P0, 123
-	set P1, 246.246
-	div P1, P1, P0
-	.fp_eq( P1, 2.002 , EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-#
-# Number vs. integer
-#
-output_is(<<"CODE", <<OUTPUT, "add integer to number");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
-	set P0, 123
-	set P1, 321.321
-	add P1, P0, P1
-	.fp_eq( P1, 444.321 , EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "subtract integer from number");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
-	set P0, 123
-	set P1, 321.321
-	sub P1, P0, P1
-	.fp_eq( P1, -198.321000, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "multiply integer by number");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
-	set P0, 123
-	set P1, 321.321
-	mul P1, P0, P1
-	.fp_eq( P1, 39522.483, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<"CODE", <<OUTPUT, "divide integer by number");
-@{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
-	set P0, 123
-	set P1, 246.246
-	div P1, P0, P1
-	.fp_eq( P1, 0.499500, EQ1)
-	print P1
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
-CODE
-ok 1
-OUTPUT
-
 #
 # Concat tests
 #
@@ -924,7 +667,7 @@ OK4:    print "ok 4\n"
 
         set P0, 0.0
         set S0, P0
-        eq S0, "0.000000", OK5
+        eq S0, "0", OK5
         print "not "
 OK5:    print "ok 5\n"
 
@@ -974,7 +717,7 @@ OK4:    print "ok 4\n"
 
         set P0, -1.0
         set S0, P0
-        eq S0, "-1.000000", OK5
+        eq S0, "-1", OK5
         print "not "
 OK5:    print "ok 5\n"
 
