@@ -30,6 +30,8 @@ classes/perlundef.pmc
 classes/pmc2c.pl
 classes/pointer.pmc
 classes/sub.pmc
+config/auto/alignptrs.pl
+config/auto/alignptrs/test_c.in
 config/auto/byteorder.pl
 config/auto/byteorder/test_c.in
 config/auto/cgoto.pl
@@ -116,6 +118,7 @@ docs/running.pod
 docs/strings.pod
 docs/tests.pod
 docs/vtables.pod
+dod.c
 editor/pasm.el
 editor/pasm.vim
 embed.c
@@ -170,14 +173,17 @@ examples/pxs/QtHelloWorld.pasm
 exceptions.c
 global_setup.c
 hash.c
+headers.c
 include/parrot/chartype.h
 include/parrot/debug.h
+include/parrot/dod.h
 include/parrot/embed.h
 include/parrot/encoding.h
 include/parrot/events.h
 include/parrot/exceptions.h
 include/parrot/global_setup.h
 include/parrot/hash.h
+include/parrot/headers.h
 include/parrot/interp_guts.h
 include/parrot/interpreter.h
 include/parrot/io.h
@@ -189,6 +195,7 @@ include/parrot/op.h
 include/parrot/oplib.h
 include/parrot/packfile.h
 include/parrot/parrot.h
+include/parrot/perltypes.h
 include/parrot/pmc.h
 include/parrot/pxs.h
 include/parrot/regfuncs.h
@@ -197,6 +204,7 @@ include/parrot/resources.h
 include/parrot/runops_cores.h
 include/parrot/rx.h
 include/parrot/rxstacks.h
+include/parrot/smallobject.h
 include/parrot/stacks.h
 include/parrot/string.h
 include/parrot/string_funcs.h
@@ -301,6 +309,7 @@ languages/parrot_compiler/gentable.pl
 languages/parrot_compiler/parrot.pasm
 languages/parrot_compiler/sample.pasm
 languages/perl6/MANIFEST
+languages/perl6/Makefile
 languages/perl6/P6C/Addcontext.pm
 languages/perl6/P6C/Builtins.pm
 languages/perl6/P6C/Context.pm
@@ -424,6 +433,7 @@ rx.c
 rx.dev
 rx.ops
 rxstacks.c
+smallobject.c
 stacks.c
 string.c
 sub.c
