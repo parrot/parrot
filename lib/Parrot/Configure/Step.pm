@@ -26,12 +26,12 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 sub integrate {
     my($orig, $new)=@_;
-    
+
     unless(defined $new) {
         warn "String to be integrated in to '$orig' undefined";
         return $orig;
     }
-    
+
 	while($new =~ s/:add\{([^}]+)\}//) {
 		$orig .= $1;
 	}
@@ -43,7 +43,7 @@ sub integrate {
 	if($new =~ /\S/) {
 		$orig =  $new;
 	}
-    
+
     return $orig;
 }
 
@@ -175,7 +175,7 @@ sub _run_command {
 
     # Mostly copied from Parrot::Test.pm
     foreach ($out, $err) {
-        $_ = 'NUL:' if $^O eq 'MSWin32' and $_ eq '/dev/null';
+        $_ = 'NUL:' if $_ and $^O eq 'MSWin32' and $_ eq '/dev/null';
     }
 
     if ( $out and $err and $out eq $err ) {
@@ -203,7 +203,7 @@ sub _run_command {
 
     if ($verbose) {
         foreach ($out, $err) {
-            if ((defined($_)) && ($_ ne '/dev/null') 
+            if ((defined($_)) && ($_ ne '/dev/null')
                  && ($_ ne 'NUL:') && (!m/^&/)) {
                 local *OUT;
                 open OUT, $_;

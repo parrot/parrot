@@ -565,6 +565,7 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
         /* got a NULL PMC */
         pmc = PMCNULL;
         *info->thaw_ptr = pmc;
+        *seen = 1;
         return pmc;
     }
 
