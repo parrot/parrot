@@ -315,8 +315,9 @@ examples/assembly/life${exe} : examples/assembly/life$(O) $(O_DIRS) $(O_FILES)
 
 examples/mops/mops$(O) : examples/mops/mops.c
 
-examples/mops/mops${exe} : examples/mops/mops$(O) platform$(O)
-	$(LINK) $(LINKFLAGS) ${ld_out}examples/mops/mops${exe} examples/mops/mops$(O) platform$(O) $(C_LIBS)
+examples/mops/mops${exe} : examples/mops/mops$(O)
+	$(LINK) $(LINKFLAGS) ${ld_out}examples/mops/mops${exe} \
+	examples/mops/mops$(O) blib/lib/libparrot$(A) $(C_LIBS)
 
 
 ###############################################################################

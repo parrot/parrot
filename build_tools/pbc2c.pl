@@ -232,7 +232,6 @@ main(int argc, char **argv) {
     Parrot_init(interpreter, (void*) &dummy_var);
 
     run_native = run_compiled;
-    interpreter = make_interpreter(NO_FLAGS);
     pf          = PackFile_new();
 
     if( !PackFile_unpack(interpreter, pf, (opcode_t *)program_code,
