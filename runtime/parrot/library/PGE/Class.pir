@@ -1,6 +1,6 @@
 =head1 NAME
 
-p6ge_charclass.pir - implementation of character class vtables
+PGE::Class - implementation of character class vtables
 
 =head1 DESCRIPTION
 
