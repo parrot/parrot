@@ -31,18 +31,16 @@ print_warning(struct Parrot_Interp *interpreter, STRING *msg)
     int line;
     struct PackFile_Debug * debugs = interpreter->code->cur_cs->debugs;
 
+    if (!msg)
+        return -1;
     if (debugs) {
         file = debugs->filename;
         line = find_line(interpreter, debugs);
     }
     else {
-        file = "(unknown)";
+        file = "(unknown file)";
         line = 0;
     }
-
-
-    if (!msg)
-        return -1;
 
     if (PIO_eprintf(interpreter, "%S at %s line %d.\n", msg, file, line))
         return -2;

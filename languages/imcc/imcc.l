@@ -119,7 +119,7 @@ SP              [ ]
                        return LINECOMMENT;
                }
 <cmt2>[^"]+    { BEGIN(cmt3);
-                      valp->s = strdup(yytext);
+                      valp->s = str_dup(yytext);
                       return FILECOMMENT;
                }
 <cmt3>["]{EOL}    { BEGIN(prev_state) ; line++; }
