@@ -1,0 +1,72 @@
+=head1 TITLE
+
+sdl_constants.imc - PIR interface to SDL constants
+
+=head1 SYNOPSIS
+
+	.include "library/sdl.pasm"
+	.include "library/sdl_constants.imc"
+
+=head1 DESCRIPTION
+
+This library gives a procedural interface to SDL constants.  The interface is
+simple and likely to change in the future.  Watch this space for updates.
+
+=head1 FUNCTIONS
+
+This library provides the following function:
+
+=over 4
+
+=item _sdl_constant( name )
+
+given a constant of the appropriate name, returns the integer value
+corresponding to that constant.  You should probably never use the value
+directly; instead use it with something like _SDL_loop() or _new_SDL_Screen(),
+when you need to pass a value corresponding to an event type, a key symbol, or
+a flag.
+
+This does not yet support all constants properly.  As well, it should probably
+be more specific.
+
+=back
+
+=cut
+
+.pcc_sub _sdl_constant
+	.param string name
+
+	.local pmc constants
+	new constants, .PerlHash
+
+	# event types -- should be in sdl_contants_events
+	set constants['SDL_KEYDOWN'],   2
+	set constants['SDL_KEYUP'],     3
+	set constants['SDL_QUIT'],     12
+
+	# key symbols -- should be in sdl_constants_keys (or keysyms?)
+	set constants['SDLK_ESCAPE'],  27
+	set constants['SDLK_LEFT'],    32
+	set constants['SDLK_UP'],     273
+	set constants['SDLK_DOWN'],   274
+	set constants['SDLK_RIGHT'] , 275
+	set constants['SDLK_LEFT'],   276
+
+	.local int value
+	set value, constants[name]
+
+	.pcc_begin_return
+		.return value
+	.pcc_end_return
+.end
+
+=head1 AUTHOR
+
+Written and maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt>.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, The Perl Foundation.
+
+=cut

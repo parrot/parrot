@@ -8,34 +8,68 @@ sdl_types.imc - PIR interface to SDL types
 	.include "library/sdl_types.imc"
 
 	# create a new screen
-	.local pmc screen_settings
+	.sym pmc screen_settings
 	new screen_settings, .PerlHash
 	set screen_settings['width'],  640
 	set screen_settings['height'], 480
 	set screen_settings['bpp'],      0
 	set screen_settings['flags'],    0
 
-	.local object screen
+	.sym object screen
 	screen = _new_SDL_Screen( screen_settings )
 
 	# create a new rectangle
-	.local object rect
+	.sym object rect
 	rect   = _new_SDL_Rect()
 
 	# create a new color
-	.local int color
+	.sym int color
 	color  = _new_SDL_Color( 0, 0, 255 )
 
 	# load an image into a new SDL Surface
-	.local object image
-	image  = _load_SDL_Image( "my_image.png" )
+	.sym object image
+	image  = _new_SDL_Image( "my_image.png" )
+
+	# create a new SDL Surface (not quite right yet)
+	.sym pmc surface
+	surface = _new_SDL_Surface()
+
+	# query a surface (not quite right yet)
+	.sym int width
+	.sym int height
+
+	width  = _SDL_Surface_width( surface )
+	height = _SDL_Surface_height( surface )
+
+	# loop over incoming events and call callbacks
+	.include "library/sdl_constants.imc"
+
+	.sym pmc event_handlers
+	new event_handlers, .OrderedHash
+
+	.sym pmc key_handlers
+	new key_handlers, .OrderedHash
+
+	.sym int event_type
+	event_type = _sdl_constant( 'SDL_KEYDOWN' )
+
+	.sym int key
+	key = _sdl_constant( 'SDLK_SPACE' )
+
+	.sym pmc callback
+	newsub callback, .Sub, _callback_label
+
+	set key_handlers[key], callback
+	set event_handlers[event_type], key_handlers
+
+	_SDL_loop( event_handlers )
 
 =head1 DESCRIPTION
 
 The functions in this library create, initialize, and return Parrot-compatible
 SDL data structures.
 
-B<Note:>  expect changes as there's lots of SDL wrapper yet to write.
+B<Note:>  expect changes as there's lots of wrapper yet to write.
 
 =cut
 
@@ -81,21 +115,20 @@ This function returns a C<ManagedStruct> pmc.
 .pcc_sub _new_SDL_Screen prototyped
 	.param pmc args
 
-	.local pmc SetVideoMode
-
+	.sym pmc SetVideoMode
 	SetVideoMode = global "SDL::SetVideoMode"
 
-	.local int width
-	.local int height
-	.local int bpp
-	.local int flags
+	.sym int width
+	.sym int height
+	.sym int bpp
+	.sym int flags
 
 	width  = args['width']
 	height = args['height']
 	bpp    = args['bpp']
 	flags  = args['flags']
 
-	.local pmc screen
+	.sym pmc screen
 
 	.pcc_begin prototyped
 		.arg width
@@ -107,7 +140,7 @@ This function returns a C<ManagedStruct> pmc.
 	.pcc_end
 
 	.pcc_begin_return
-	.return screen
+		.return screen
 	.pcc_end_return
 .end
 
@@ -139,8 +172,8 @@ the height of the Rect, in pixels
 
 For example:
 
-	.local object rect
-	rect      = _new_SDL_Rect()
+	.sym pmc rect
+	rect           = _new_SDL_Rect()
 
 	rect['x']      = 0
 	rect['y']      = 0
@@ -149,7 +182,7 @@ For example:
 
 =cut
 
-.pcc_sub _new_SDL_Rect prototyped
+.sub _SDL_Rect_layout prototyped
 	.local pmc layout
 
 	new layout, .OrderedHash
@@ -166,25 +199,20 @@ For example:
 	push layout, 0
 	push layout, 0
 
-	.local pmc rect
+	.pcc_begin_return
+		.return layout
+	.pcc_end_return
+.end
+
+.sub _new_SDL_Rect prototyped
+	.sym pmc layout
+	layout = _SDL_Rect_layout()
+
+	.sym pmc rect
 	new rect, .ManagedStruct, layout
 
-	.local int size
-	set size, 0
-
-	.local int item_size
-	sizeof item_size, .DATATYPE_INT16
-	add size, item_size
-	add size, item_size
-
-	sizeof item_size, .DATATYPE_UINT16
-	add size, item_size
-	add size, item_size
-
-	set rect, size
-
 	.pcc_begin_return
-	.return rect
+		.return rect
 	.pcc_end_return
 .end
 
@@ -236,10 +264,10 @@ the returned PMC will be null, in whatever sense that makes sense to SDL.
 .pcc_sub _new_SDL_Image prototyped
 	.param string filename
 
-	.local pmc SDL_IMG_Load
+	.sym pmc SDL_IMG_Load
 	SDL_IMG_Load    = global "SDL::IMG_Load"
 
-	.local object image
+	.sym pmc image
 
 	.pcc_begin prototyped
 		.arg filename
@@ -248,7 +276,367 @@ the returned PMC will be null, in whatever sense that makes sense to SDL.
 	.pcc_end
 
 	.pcc_begin_return
-	.return image
+		.return image
+	.pcc_end_return
+.end
+
+.pcc_sub _new_SDL_Event prototyped
+	.sym pmc layout
+	new layout, .OrderedHash
+
+	.local int size
+	.local int element_size
+
+	# this is the only element in common in the SDL_Event union
+	set layout['type'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+
+	# SDL_KeyboardEvent is the largest struct in the SDL_Event union
+	set layout['which'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['state'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['padding'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['scancode'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['padding_a'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['padding_b'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['padding_c'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['sym'], .DATATYPE_INT
+	push layout, 0
+	push layout, 0
+	set layout['mod'], .DATATYPE_INT
+	push layout, 0
+	push layout, 0
+	set layout['unicode'], .DATATYPE_UINT16
+	push layout, 0
+	push layout, 0
+
+	.sym pmc event
+	new event, .ManagedStruct, layout
+
+	.pcc_begin_return
+		.return event
+	.pcc_end_return
+.end
+
+=item _SDL_Wait_Event()
+
+XXX - not ready to expose this one yet
+
+=cut
+
+.pcc_sub _SDL_WaitEvent
+	.sym pmc event
+	event     = _new_SDL_Event()
+
+	.sym pmc WaitEvent
+	WaitEvent = global "SDL::WaitEvent"
+
+	.pcc_begin prototyped
+		.arg event
+		.nci_call WaitEvent
+		.result event
+	.pcc_end
+
+	# dunno what this is
+	.local string type
+	typeof type, event
+
+	.pcc_begin_return
+		.return event
+	.pcc_end_return
+.end
+
+=item _SDL_loop( event_callbacks )
+
+given an .OrderedHash associating SDL event constants to .Sub objects, loops
+around input, calling the callbacks when their associated events come in.
+
+For events that have secondary distinguishing information -- for example, key
+events, the value of the .OrderedHash should itself be an .OrderedHash,
+associating the distinguishing constants to their callbacks.
+
+=cut
+
+.pcc_sub _SDL_loop prototyped
+	.param pmc events
+
+	.sym pmc event
+
+loop:
+	event = _SDL_WaitEvent()
+
+	.sym int type
+	set type, event['type']
+
+	if type == 0 goto loop
+
+	exists $I0, events[type]
+	if $I0 == 0 goto loop
+
+	.sym Sub callback
+
+	if type == 2 goto _key_event
+	if type == 3 goto _key_event
+
+	set callback, events[type]
+	goto _have_callback
+
+_key_event:
+	.sym pmc key_events
+	set key_events, events[type]
+
+	.sym int key
+	set key, event['sym']
+
+	if $I0 == 0 goto loop
+
+	set callback, key_events[key]
+
+_have_callback:
+	.sym int result
+
+	.pcc_begin prototyped
+		.pcc_call callback
+		.result result
+	.pcc_end
+
+	if result != 0 goto loop
+
+	.pcc_begin_return
+	.pcc_end_return
+.end
+
+=item _new_SDL_Surface()
+
+XXX - exists, but not quite right and not public
+
+=cut
+
+.sub _new_SDL_Surface prototyped
+	.sym pmc layout
+	.sym pmc surface
+
+	layout = _SDL_Surface_layout()
+	new surface, .ManagedStruct, layout
+
+	.pcc_begin_return
+		.return surface
+	.pcc_end_return
+.end
+
+.sub _SDL_Surface_height prototyped
+	.param pmc surface
+
+	.pcc_begin_return
+		.return 56
+	.pcc_end_return
+.end
+
+.sub _SDL_Surface_width prototyped
+	.param pmc surface
+
+	.pcc_begin_return
+		.return 100
+	.pcc_end_return
+.end
+
+.sub _SDL_Color_layout prototyped
+	.sym pmc layout
+
+	new layout, .OrderedHash
+	set layout['r'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['g'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['b'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['unused'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+
+	.pcc_begin_return
+		.return layout
+	.pcc_end_return
+.end
+
+.sub _SDL_Palette_layout prototyped
+	.sym pmc layout
+
+	new layout, .OrderedHash
+	set layout['ncolors'], .DATATYPE_INT
+	push layout, 0
+	push layout, 0
+	set layout['colors'], .DATATYPE_STRUCT_PTR
+
+	.sym pmc c_layout
+	c_layout = _SDL_Color_layout()
+	set $P0, layout[-1]
+	setprop $P0, '_struct', c_layout
+	push layout, 0
+	push layout, 0
+
+	.pcc_begin_return
+		.return layout
+	.pcc_end_return
+.end
+
+.sub _SDL_PixelFormat_layout prototyped
+	.sym pmc layout
+	new layout, .OrderedHash
+	set layout['palette'], .DATATYPE_STRUCT_PTR
+
+	set $P0, layout[-1]
+	.sym pmc p_layout
+	p_layout = _SDL_Palette_layout()
+
+	.sym pmc palette
+	new palette, .UnManagedStruct, p_layout
+
+	setprop $P0, '_struct', palette
+	push layout, 0
+	push layout, 0
+
+	set layout['BytesPerPixel'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['Rloss'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['Gloss'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['Bloss'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['Aloss'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['Rshift'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['Gshift'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['Bshift'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['Ashift'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set layout['Rmask'], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+	set layout['Gmask'], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+	set layout['Bmask'], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+	set layout['Amask'], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+	set layout['colorkey'], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+	set layout['alpha'], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+
+	.pcc_begin_return
+		.return layout
+	.pcc_end_return
+.end
+
+.sub _SDL_Surface_layout prototyped
+	.sym pmc layout
+	new layout, .OrderedHash
+	set layout['flags'], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+
+	# SDL_PixelFormat struct pointer
+	set layout['format'], .DATATYPE_STRUCT_PTR
+	set $P0, layout[-1]
+
+	.sym pmc pf_layout
+	pf_layout = _SDL_PixelFormat_layout()
+
+	.sym pmc pf
+	new pf, .UnManagedStruct, pf_layout
+	setprop $P0, '_struct', pf
+
+	push layout, 0
+	push layout, 0
+
+	set layout['w'], .DATATYPE_INT
+	push layout, 0
+	push layout, 0
+	set layout['h'], .DATATYPE_INT
+	push layout, 0
+	push layout, 0
+	set layout['pitch'], .DATATYPE_UINT16
+	push layout, 0
+	push layout, 0
+	set layout['pixels'], .DATATYPE_PTR
+	push layout, 0
+	push layout, 0
+	set layout['offset'], .DATATYPE_INT
+	push layout, 0
+	push layout, 0
+
+	# private_hwdata struct pointer
+	set layout['hwdata'], .DATATYPE_STRUCT_PTR
+	push layout, 0
+	push layout, 0
+
+	# SDL_Rect struct (inline, so needs more work here)
+	.sym pmc rect
+	rect = _new_SDL_Rect()
+
+	push layout, .DATATYPE_STRUCT
+	set $P0, layout[-1]
+	setprop $P0, '_struct', rect
+	push layout, 0
+	push layout, 0
+
+	set layout['unused1'], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+	set layout['locked'], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+
+	# SDL_BlitMap struct pointer
+	set layout['map'], .DATATYPE_STRUCT_PTR
+	push layout, 0
+	push layout, 0
+
+	set layout['format_version'], .DATATYPE_UINT
+	push layout, 0
+	push layout, 0
+	set layout['refcount'], .DATATYPE_INT
+	push layout, 0
+	push layout, 0
+
+	.pcc_begin_return
+		.return layout
 	.pcc_end_return
 .end
 

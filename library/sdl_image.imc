@@ -1,0 +1,275 @@
+=head1 TITLE
+
+_sdl_image.imc - PIR interface to SDL images
+
+=head1 SYNOPSIS
+
+	.include "library/sdl.pasm"
+	.include "library/sdl_image.imc"
+	_init_SDL_Image()
+
+	# create a new image
+	.sym pmc image
+	image = _new_SDL_Image( 'path/to/image.png' )
+
+	# get the position of the image
+	.sym int x
+	.sym int y
+	x = _SDL_Image_get_x( image )
+	y = _SDL_Image_get_y( image )
+
+	# set the position of an image
+	.sym int x
+	.sym int y
+	x = 100
+	y = 100
+	_SDL_Image_set_x( image, x )
+	_SDL_Image_set_y( image, y )
+
+	# draw an image onto a surface
+	# surface is an SDL_Surface, bg_color is an SDL_Color
+	.sym pmc prev_rect
+	.sym pmc cur_rect
+	(prev_rect, cur_rect) = _SDL_Image_draw( image, surface, bg_color )
+
+	# now call UpdateRect(s) with both rectangles...
+
+=head1 DESCRIPTION
+
+This library provides mostly-object-oriented access to SDL images.  These
+objects keep track of their most recent position
+
+=head1 FUNCTIONS
+
+This library provides the following functions:
+
+=over 4
+
+=item _init_SDL_Image()
+
+Initializes this library.  You must call this manually before you use any
+features.  At some opint in the future, this will happen automatically.  Ask
+Dan how.
+
+=cut
+
+.sub _init_SDL_Image prototyped
+	.sym pmc class
+	newclass class, 'SDL_Image'
+	addattrib $I0, class, 'image'
+	addattrib $I0, class, 'rect'
+	addattrib $I0, class, 'old_rect'
+	addattrib $I0, class, 'src_rect'
+	.pcc_begin_return
+	.pcc_end_return
+.end
+
+=item _SDL_Image_new( filename )
+
+Given the path to a file to load, creates and returns a new SDL_Image object.
+
+B<Note:> right now, the height and width of this image are almost definitely
+wrong.  I'm working on this with Leo, or vice versa.
+
+=cut
+
+.sub _SDL_Image_new prototyped
+	.param string filename
+	.sym   pmc    image
+	.sym   pmc    old_rect
+	.sym   pmc    src_rect
+	.sym   pmc    rect
+	.sym   int    width
+	.sym   int    height
+
+	image    = _new_SDL_Image( filename )
+	old_rect = _new_SDL_Rect()
+	src_rect = _new_SDL_Rect()
+	rect     = _new_SDL_Rect()
+	width    = _SDL_Surface_width( image )
+	height   = _SDL_Surface_height( image )
+
+	set rect['w'],     width
+	set src_rect['w'], width
+	set old_rect['w'], width
+	set rect['h'],     height
+	set src_rect['h'], height
+	set old_rect['h'], height
+
+	.sym int class_type
+	find_type class_type, 'SDL_Image' 
+
+	.sym pmc instance
+	new instance, class_type
+	set instance["SDL_Image\x00image"],    image
+	set instance["SDL_Image\x00old_rect"], old_rect
+	set instance["SDL_Image\x00src_rect"], src_rect
+	set instance["SDL_Image\x00rect"],     rect
+
+	.pcc_begin_return
+		.return instance
+	.pcc_end_return
+.end
+
+=item _SDL_Image_draw( image, screen, bg_color )
+
+Draws over the previous position of the C<image> on the C<screen> (an SDL
+Surface) with the color specified in C<bg_color>, then draws the C<image> to
+its new position.
+
+This returns two SDL Rects, the previous position and the current position.
+Update the appropriate surface with these rects if you want to see the image.
+
+=cut
+
+.sub _SDL_Image_draw prototyped
+	.param pmc screen
+	.param pmc surface
+	.param int bg_color
+
+	.sym   pmc rect
+	.sym   pmc old_rect
+	.sym   pmc image
+	.sym   pmc src_rect
+	.sym   pmc previous_rect
+
+	set rect,     surface["SDL_Image\x00rect"]
+	set old_rect, surface["SDL_Image\x00old_rect"]
+	set image,    surface["SDL_Image\x00image"]
+	set src_rect, surface["SDL_Image\x00src_rect"]
+
+	previous_rect = _new_SDL_Rect()
+	set $I0, old_rect['w']
+	set previous_rect['w'], $I0
+	set $I0, old_rect['h']
+	set previous_rect['h'], $I0
+	set $I0, old_rect['x']
+	set previous_rect['x'], $I0
+	set $I0, old_rect['y']
+	set previous_rect['y'], $I0
+
+	.sym pmc BlitSurface
+	BlitSurface = global "SDL::BlitSurface"
+
+	.sym pmc FillRect
+	FillRect = global "SDL::FillRect"
+
+	.pcc_begin prototyped
+		.arg screen
+		.arg old_rect
+		.arg bg_color
+		.nci_call FillRect
+	.pcc_end
+
+	.sym int x
+	.sym int y
+	set x, rect['x']
+	set y, rect['y']
+
+	set old_rect['x'], x
+	set old_rect['y'], y
+	set surface["SDL_Image\x00old_rect"], old_rect
+
+	.pcc_begin prototyped
+		.arg image
+		.arg src_rect
+		.arg screen
+		.arg rect
+		.nci_call BlitSurface
+	.pcc_end
+
+	.pcc_begin_return
+		.return previous_rect
+		.return rect
+	.pcc_end_return
+.end
+
+=item _SDL_Image_set_x( image, x )
+
+Sets the current x coordinate of the C<image> to the integer C<x>.
+
+=cut
+
+.sub _SDL_Image_set_x prototyped
+	.param pmc image
+	.param int x
+
+	.sym   pmc rect
+	set rect, image["SDL_Image\x00rect"] 
+	set rect['x'], x
+	set image["SDL_Image\x00rect"], rect
+
+	.pcc_begin_return
+	.pcc_end_return
+.end
+
+=item _SDL_Image_set_y( image, y )
+
+Sets the current y coordinate of the C<image> to the integer C<y>.
+
+=cut
+
+.sub _SDL_Image_set_y prototyped
+	.param pmc image
+	.param int y
+
+	.sym   pmc rect
+	set rect, image["SDL_Image\x00rect"] 
+	set rect['y'], y
+	set image["SDL_Image\x00rect"], rect
+
+	.pcc_begin_return
+	.pcc_end_return
+.end
+
+=item _SDL_Image_get_x( image )
+
+Returns the current x coordinate of the C<image> as an integer.
+
+=cut
+
+.sub _SDL_Image_get_x prototyped
+	.param pmc image
+
+	.sym   int x
+	.sym   pmc rect
+	set rect, image["SDL_Image\x00rect"] 
+	set x, rect['x']
+
+	.pcc_begin_return
+		.return x
+	.pcc_end_return
+.end
+
+=item _SDL_Image_get_y( image )
+
+Returns the current y coordinate of the C<image> as an integer.
+
+=cut
+
+.sub _SDL_Image_get_y prototyped
+	.param pmc image
+	.sym   int y
+	.sym   pmc rect
+
+	set rect, image["SDL_Image\x00rect"] 
+	set y, rect['y']
+	set image["SDL_Image\x00rect"], rect
+
+	.pcc_begin_return
+		.return y
+	.pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Written and maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt>.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut

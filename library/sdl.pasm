@@ -21,6 +21,13 @@ dlfunc P2, P1, 'SDL_DisplayFormat', 'pp'
 store_global 'SDL::DisplayFormat', P2
 dlfunc P2, P1, 'SDL_UpperBlit', 'ipppp'
 store_global 'SDL::BlitSurface', P2
+dlfunc P2, P1, 'SDL_WaitEvent', 'ip'
+store_global 'SDL::WaitEvent', P2
+dlfunc P2, P1, 'SDL_GetKeyName', 'ti'
+store_global 'SDL::GetKeyName', P2
+
+# now load the SDL_image library
+# should be broken out into library/sdl/image.pasm or somesuch
 loadlib P1, 'libSDL_image'
 dlfunc P2, P1, 'IMG_Load', 'pt'
 store_global 'SDL::IMG_Load', P2
