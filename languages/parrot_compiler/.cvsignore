@@ -1,2 +1,3 @@
 Makefile
 *.pbc
+parrot_compiler.pasm
