@@ -10,7 +10,7 @@ classes/float.pmc - Floating-point number
 
 C<Float> extends C<scalar> to provide floating-point number operations.
 
-=head2 Methods
+=head2 Functions
 
 =over 4
 
@@ -689,6 +689,27 @@ Used to unarchive the number.
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
             PMC_num_val(SELF) = io->vtable->shift_float(INTERP, io);
+    }
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<METHOD PMC* cos()>
+
+Return a new PMC of the type of C<SELF> with the cosine of SELF.
+
+=cut
+
+*/
+
+    METHOD PMC* cos() {
+        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_num_val(d) = cos((double)PMC_num_val(SELF));
+        return d;
     }
 
 }

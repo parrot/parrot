@@ -27,7 +27,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting already sorted numbers");
     .local int i
     .local int j
     .local pmc tmp
-    
+    .local pmc sort
+
     new array, .PerlArray
     push array, 0
     push array, 1
@@ -40,7 +41,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting already sorted numbers");
     push array, 8
     push array, 9
 
-    simple( array )
+    sort = find_global "Data::Sort", "simple"
+    sort( array )
     i = 0
     j = array
 LOOP:
@@ -71,8 +73,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers");
     .local pmc array
     .local int i
     .local int j
-    .local pmc tmp
-    
+    .local pmc tmp, sort
+
     new array, .PerlArray
     push array, 9
     push array, 8
@@ -85,7 +87,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers");
     push array, 1
     push array, 0
 
-    simple( array )
+    sort = find_global "Data::Sort", "simple"
+    sort( array )
     i = 0
     j = array
 LOOP:
@@ -116,8 +119,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers (2)");
     .local pmc array
     .local int i
     .local int j
-    .local pmc tmp
-    
+    .local pmc tmp, sort
+
     new array, .PerlArray
     push array, 4
     push array, 7
@@ -130,7 +133,9 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers (2)");
     push array, 9
     push array, 0
 
-    simple( array )
+    sort = find_global "Data::Sort", "simple"
+    sort( array )
+
     i = 0
     j = array
 LOOP:
@@ -161,8 +166,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting sorted strings");
     .local pmc array
     .local int i
     .local int j
-    .local pmc tmp
-    
+    .local pmc tmp, sort
+
     new array, .PerlArray
     push array, "alpha"
     push array, "bravo"
@@ -173,7 +178,9 @@ pir_output_is(<<'CODE', <<'OUT', "sorting sorted strings");
     push array, "golf"
     push array, "hotel"
 
-    simple( array )
+    sort = find_global "Data::Sort", "simple"
+    sort( array )
+
     i = 0
     j = array
 LOOP:
@@ -202,8 +209,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
     .local pmc array
     .local int i
     .local int j
-    .local pmc tmp
-    
+    .local pmc tmp, sort
+
     new array, .PerlArray
     push array, "charlie"
     push array, "hotel"
@@ -214,7 +221,9 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
     push array, "bravo"
     push array, "echo"
 
-    simple( array )
+    sort = find_global "Data::Sort", "simple"
+    sort( array )
+
     i = 0
     j = array
 LOOP:
@@ -243,8 +252,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting different types");
     .local pmc array
     .local int i
     .local int j
-    .local pmc tmp
-    
+    .local pmc tmp, sort
+
     new array, .PerlArray
     push array, 0.1
     push array, "charlie"
@@ -267,7 +276,9 @@ pir_output_is(<<'CODE', <<'OUT', "sorting different types");
     push array, 0
     push array, "echo"
 
-    simple( array )
+    sort = find_global "Data::Sort", "simple"
+    sort( array )
+
     i = 0
     j = array
 LOOP:
@@ -308,15 +319,17 @@ pir_output_is(<<'CODE', <<'OUT', "sorting letters");
     .local pmc array
     .local int i
     .local int j
-    .local pmc tmp
-    
+    .local pmc tmp, sort
+
     new array, .PerlArray
     push array, "w"
     push array, "x"
     push array, "h"
     push array, "y"
 
-    simple( array )
+    sort = find_global "Data::Sort", "simple"
+    sort( array )
+
     i = 0
     j = array
 LOOP:
@@ -341,8 +354,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting PerlString letters");
     .local pmc array
     .local int i
     .local int j
-    .local pmc tmp
-    
+    .local pmc tmp, sort
+
     new array, .PerlArray
     new tmp, .PerlString
     set tmp, "w"
@@ -360,7 +373,9 @@ pir_output_is(<<'CODE', <<'OUT', "sorting PerlString letters");
     set tmp, "y"
     push array, tmp
 
-    simple( array )
+    sort = find_global "Data::Sort", "simple"
+    sort( array )
+
     i = 0
     j = array
 LOOP:
@@ -385,8 +400,8 @@ pir_output_is(<<'CODE', <<'OUT', "sorting strings");
     .local pmc array
     .local int i
     .local int j
-    .local pmc tmp
-    
+    .local pmc tmp, sort
+
     new array, .PerlArray
     new tmp, .PerlString
     push array, "hello"
@@ -397,7 +412,9 @@ pir_output_is(<<'CODE', <<'OUT', "sorting strings");
     push array, "bbbbbb"
     push array, "aaaa1"
 
-    simple( array )
+    sort = find_global "Data::Sort", "simple"
+    sort( array )
+
     i = 0
     j = array
 LOOP:

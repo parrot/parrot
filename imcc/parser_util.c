@@ -261,6 +261,46 @@ check_op(Interp *interpreter, char *fullname,
     return op;
 }
 
+int Parrot_is_builtin(Interp *, char *func, char *sig);
+
+static Instruction *
+maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
+        SymReg **r, int n)
+{
+    Instruction *ins;
+    char sig[16];
+    int i, bi;
+    SymReg *sub, *meth, *rr[10];
+
+    assert(n < 15);
+    for (i = 0; i < n; ++i) {
+        sig[i] = r[i]->set;
+        rr[i] = r[i];
+    }
+    sig[i] = '\0';
+    bi = Parrot_is_builtin(interpreter, name, sig);
+    if (bi < 0)
+        return NULL;
+    /*
+     * create a method see imcc.y target = sub_call
+     * cos Px, Py  => Px = Py.cos()
+     */
+    if (1) {    /* method */
+        meth = mk_sub_address(interpreter, str_dup(name));
+        ins = IMCC_create_itcall_label(interpreter);
+        sub = ins->r[0];
+        IMCC_itcall_sub(interpreter, meth);
+        sub->pcc_sub->object = rr[1];
+        for (i = 2; i < n; ++i) {
+            add_pcc_arg(sub, rr[i]);
+        }
+        add_pcc_result(sub, rr[0]);
+        emitb(unit, ins);
+        return ins;
+    }
+    return NULL;
+}
+
 /*
  * Is instruction a parrot opcode?
  */
@@ -335,6 +375,11 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     }
     else
         strcpy(fullname, name);
+    if (op < 0 && emit) {
+        ins = maybe_builtin(interpreter, unit, name, r, n);
+        if (ins)
+            return ins;
+    }
     if (op < 0) {
         IMCC_fataly(interpreter, E_SyntaxError,
             "op not found '%s' (%s<%d>)\n",

@@ -131,6 +131,41 @@ Parrot_get_global(Parrot_Interp interpreter, STRING *class,
 
 /*
 
+=item C<PMC* Parrot_get_name(Interp* interpreter, STRING *name)>
+
+Find the name in lexicals, globals, and builtins. If the name
+isn't found throw and exception or return Undef, depending on
+the interpreter's errors setting.
+
+=cut
+
+*/
+
+PMC *
+Parrot_get_name(Interp* interpreter, STRING *name)
+{
+    PMC *g, *pad;
+
+    pad = scratchpad_get_current(interpreter);
+    g = scratchpad_find(interpreter, pad, name);
+    if (g)
+        return g;
+    g = Parrot_find_global(interpreter, NULL, name);
+    if (g)
+        return g;
+    g = Parrot_find_builtin(interpreter, name);
+    if (g)
+        return g;
+    if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
+        real_exception(interpreter, NULL, E_NameError,
+                "Name '%Ss' not found", name);
+    }
+
+    return pmc_new(interpreter, enum_class_Undef);
+}
+
+/*
+
 =item C<PMC* Parrot_global_namespace(Interp *, PMC *globals, STRING *ns)>
 
 Return the stash hash of the given namespace in C<globals>.

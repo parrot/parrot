@@ -335,6 +335,25 @@ op find_global(out PMC, in PMC, in STR) {
     goto NEXT();
 }
 
+=item B<find_name>(out PMC, in STR)
+
+Find the name $2 in lexical, global or builtin namespace and
+store it in $1. If the name doesn't exist
+either throws an exception or sets $1 to undef, depending on current
+errors settings, s. B<errorson>.
+
+=cut
+
+op find_name(out PMC, in STR) {
+    opcode_t * next;
+    if (!$2)
+	internal_exception(1, "Tried to get null name");
+
+    next = expr NEXT();
+    $1 = Parrot_get_name(interpreter, $2);
+    goto NEXT();
+}
+
 =back
 
 =cut

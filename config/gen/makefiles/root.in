@@ -311,7 +311,7 @@ AST_O_FILES = \
     $(AST_DIR)/ast_main$(O) \
     $(AST_DIR)/node$(O)
 
-# generated list of header files 
+# generated list of header files
 GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) ${TEMP_cg_h}
 ICU_H_FILES       = ${icu_headers}
 ALL_H_FILES       = $(GENERAL_H_FILES)
@@ -396,6 +396,7 @@ INTERP_O_FILES = \
     $(SRC_DIR)/vtables$(O) \
     $(SRC_DIR)/pic$(O) \
     $(SRC_DIR)/mmd$(O) \
+    $(SRC_DIR)/builtin$(O) \
     $(SRC_DIR)/mmd_fallback$(O) \
     $(SRC_DIR)/extend$(O) \
     $(SRC_DIR)/py_func$(O)  \
@@ -490,6 +491,7 @@ all : flags_dummy $(PARROT) runtime/parrot/include/parrotlib.pbc runtime/parrot/
 	$(PERL) build_tools/c2str.pl $< > $@
 
 STR_FILES = \
+    $(SRC_DIR)/builtin.str \
     $(SRC_DIR)/inter_cb.str \
     $(SRC_DIR)/inter_misc.str \
     $(SRC_DIR)/global.str \
@@ -859,6 +861,8 @@ $(SRC_DIR)/memory$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/mmd$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/mmd.str
+
+$(SRC_DIR)/builtin$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/builtin.str
 
 $(SRC_DIR)/mmd_fallback$(O) : $(GENERAL_H_FILES)
 
@@ -1238,9 +1242,9 @@ test-clean :
 	$(RM_F) t/stress/*.o
 	$(RM_F) t/stress/*.stabs.s
 	$(RM_F) t/src/*.c
-	$(RM_F) $(IMCC_DIR)/t/*/*.out 
-	$(RM_F) $(IMCC_DIR)/t/*/*.imc 
-	$(RM_F) $(IMCC_DIR)/t/*/*.pbc 
+	$(RM_F) $(IMCC_DIR)/t/*/*.out
+	$(RM_F) $(IMCC_DIR)/t/*/*.imc
+	$(RM_F) $(IMCC_DIR)/t/*/*.pbc
 	$(RM_F) $(IMCC_DIR)/t/*/*.o
 	$(RM_F) $(IMCC_DIR)/t/*/*.stabs.s
 	$(RM_F) $(IMCC_DIR)/t/*/*.pasm

@@ -1431,3 +1431,5 @@ trans_charset_s_sc_ic          1400
 bytelength_i_s                 1401
 bytelength_i_sc                1402
 get_mro_p_p                    1403
+find_name_p_s                  1404
+find_name_p_sc                 1405

@@ -60,7 +60,7 @@ Set the bound object live.
         Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
         PMC *p2 = REG_PMC(2);
         REG_PMC(2) = PMC_pmc_val(SELF);
-        func(INTERP, SELF);
+        SUPER(next);
         REG_PMC(2) = p2;
         return next;
     }

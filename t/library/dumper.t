@@ -563,6 +563,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping objects");
     .pcc_begin_return
     .pcc_end_return
 .end
+.namespace [""]
 .include "library/dumper.imc"
 CODE
 "VAR1" => PerlArray (size:2) [
@@ -625,11 +626,11 @@ pir_output_is( << 'CODE', << 'OUT', "dumping strings");
 
     .local pmc pmc_string, pmc_perl_string
     .local string string_1
-    
+
     pmc_string = new .String
     pmc_string = "This is a String PMC"
     push array, pmc_string
-    
+
     pmc_perl_string = new .PerlString
     pmc_perl_string = "This is a PerlString PMC"
     push array, pmc_perl_string

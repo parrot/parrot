@@ -1877,6 +1877,7 @@ imcc/t/syn/scope.t                                []
 imcc/t/syn/tail.t                                 []
 imcc/unit.h                                       []
 include/parrot/autoprefix.h			  [devel]include
+include/parrot/builtin.h			  [devel]include
 include/parrot/caches.h                           [devel]include
 include/parrot/charset.h			  [devel]include
 include/parrot/datatypes.h                        [devel]include
@@ -2737,6 +2738,7 @@ runtime/parrot/include/DWIM.imc                   [main]doc
 runtime/parrot/library/Getopt/Long.imc            [main]doc
 runtime/parrot/include/README                     [main]doc
 runtime/parrot/library/parrotlib.imc              [runtime]
+src/builtin.c                                     []
 src/byteorder.c                                   []
 src/call_list.txt                                 [devel]doc
 src/charset.c					  []

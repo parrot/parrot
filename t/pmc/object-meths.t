@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -888,3 +888,50 @@ Bound_NCI
 abc
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "six ways to call a method");
+.sub main @MAIN
+    .local pmc x, y, cl, m
+    x = new Float
+    x = 1.0
+    # opcode syntax
+    print "opcode        "
+    y = cos x
+    print y
+    print "\n"
+    # function call syntax
+    print "function      "
+    y = "cos"(x)
+    print y
+    print "\n"
+    # method call
+    print "method        "
+    y = x."cos"()
+    print y
+    print "\n"
+    # same as class method
+    cl = getclass "Float"
+    print "class method  "
+    y = cl."cos"(x)
+    print y
+    print "\n"
+    # bound class nethod
+    print "bound class m "
+    m = getattribute cl, "cos"	# m = Float.cos
+    y = m(x)
+    print y
+    print "\n"
+    # bound object nethod
+    m = getattribute x, "cos"	# m = x.cos
+    print "bound obj met "
+    y = m()
+    print y
+    print "\n"
+.end
+CODE
+opcode        0.540302
+function      0.540302
+method        0.540302
+class method  0.540302
+bound class m 0.540302
+bound obj met 0.540302
+OUTPUT

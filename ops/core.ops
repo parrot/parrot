@@ -436,6 +436,7 @@ inline op invokecc() {
   opcode_t *dest;
   PMC * p = REG_PMC(0);
   dest = expr NEXT();
+  REG_PMC(2) = NULL;
   REG_PMC(1) = new_ret_continuation_pmc(interpreter, dest);
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
 
@@ -446,6 +447,7 @@ inline op invokecc(in PMC) {
   opcode_t *dest;
   PMC * p = $1;
   dest = expr NEXT();
+  REG_PMC(2) = NULL;
   REG_PMC(1) = new_ret_continuation_pmc(interpreter, dest);
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
   goto ADDRESS(dest);

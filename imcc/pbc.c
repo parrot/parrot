@@ -461,18 +461,24 @@ fixup_bsrs(Interp *interpreter)
                 addr = jumppc + bsr->color;
                 if (bsr->set == 'p') {
                     /*
-                     * first try with matching namespace
+                     * check in matching namespace
                      */
                     lab = find_global_label(bsr->name, s, &pc, &s1);
                     /*
-                     * if failed, use any matching name
+                     * if failed change opcode:
+                     * set_p_pc  => find_name p_sc
                      */
-                    if (!lab)
-                        lab = find_global_label(bsr->name, NULL, &pc, &s1);
                     if (!lab) {
-                        IMCC_fatal(interpreter, 1, "fixup_bsrs: "
-                                "couldn't find sub 1 '%s'\n",
-                                bsr->name);
+                        int op = interpreter->op_lib->op_code("find_name_p_sc", 1);
+                        int col;
+                        assert(op);
+                        interpreter->code->byte_code[addr] = op;
+                        col = add_const_str(interpreter, bsr);
+                        interpreter->code->byte_code[addr+2] = col;
+                        IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "fixup const PMC"
+                                " find_name sub '%s' const nr: %d\n", bsr->name,
+                            col);
+                        continue;
                     }
                     pmc_const = s1->pmc_const;
                     if (pmc_const < 0) {

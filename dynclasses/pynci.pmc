@@ -19,6 +19,7 @@ Extends Parrot's NCI to include attributes, implemented as properties.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/method_util.h"
 
 pmclass PyNCI extends NCI extends PyFunc dynpmc group python_group {
 
@@ -36,6 +37,24 @@ Return attribute named C<name>.
         return VTABLE_getprop(INTERP, SELF, idx);
     }
 
+/*
+
+=item C<void *invoke(void *next)>
+
+Calls the associated C function, returning C<*next>.
+
+XXX Due to different calling schemes (object in P2 vs P5)
+the inherited NCI.invoke() can't be used. --leo
+
+=cut
+
+*/
+
+    void* invoke (void * next) {
+        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
+        func(INTERP, SELF);
+        return next;
+    }
 }
 
 /*

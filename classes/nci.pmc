@@ -113,7 +113,9 @@ Returns whether the NCI is defined.
 
 =item C<void *invoke(void *next)>
 
-Calls the associated C function, returning C<*next>.
+Calls the associated C function, returning C<*next>. If
+the invocant is a class, the PMC arguments are
+shifted down.
 
 =cut
 
@@ -121,6 +123,19 @@ Calls the associated C function, returning C<*next>.
 
     void* invoke (void * next) {
         Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
+        PMC *obj;
+        /*
+         * if the invocant is a class shift down arguments
+         */
+        obj = REG_PMC(2);
+        if (PObj_is_class_TEST(obj) || obj->vtable->class == obj) {
+            INTVAL i, n;
+            REG_PMC(2) = REG_PMC(5);    /* obj = 1st arg */
+            n = --REG_INT(3);             /* argcP */
+            for (i = 0; i < n; ++i) {
+                REG_PMC(i) = REG_PMC(i+1);
+            }
+        }
         func(INTERP, SELF);
         return next;
     }

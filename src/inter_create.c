@@ -225,6 +225,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 
     /* setup stdio PMCs */
     PIO_init(interpreter);
+    /* init builtin function struct */
+    Parrot_init_builtins(interpreter);
 
     /* Done. Return and be done with it */
 
