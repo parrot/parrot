@@ -95,7 +95,7 @@ There are a few categories of documentation, each with different intents. It'll 
 
 =item * PDDs
 
-These are Perl Design Documents, and can be found in /docs/pdds/. A Perl Design Document (PDD) is a readily available record  of the Perl community's thought process in regards to a specific structure related to Perl development. They serve three purposes:
+These are Parrot Design Documents, and can be found in /docs/pdds/. A Parrot Design Document (PDD) is a readily available record  of the Perl community's thought process in regards to a specific structure related to Perl development. They serve three purposes:
 
 =over 4
 
