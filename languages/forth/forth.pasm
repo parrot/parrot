@@ -180,6 +180,10 @@ InitializeCoreOps:
 
     set .SpecialWords["if"], 1
     set .SpecialWords["then"], 2
+    set .SpecialWords["begin"], 3
+    set .SpecialWords["until"], 4
+    set .SpecialWords["again"], 5
+    set .SpecialWords["exit"], 6
 
     .AddCoreOp(Int_Dot,".")
     .AddCoreOp(Int_Dot_Stack,".s")
@@ -221,10 +225,8 @@ InitializeCoreOps:
     .AddCoreOp(Int_LShift, "lshift")
     .AddCoreOp(Int_RShift, "rshift")
     .AddUserOp("2*", "2 *")
-#   set .UserOps["2*"], "2 *" # 2*
 # d2*
-#    .AddUserOp("2/", "2 /")
-#    set .UserOps["2/"], "2 /" # 2/
+    .AddUserOp("2/", "2 /")
 # d2/
 
     #
@@ -344,11 +346,13 @@ InitializeCoreOps:
     #
 
     .AddCoreOp(Int_Drop,"drop")
-    set .UserOps["nip"], "swap drop" # nip
+    .AddUserOp("nip", "swap drop")
+#    set .UserOps["nip"], "swap drop" # nip
     .AddCoreOp(Int_Dup,"dup")
     .AddCoreOp(Int_Over, "over")
     set .UserOps["tuck"], "swap over"
     .AddCoreOp(Int_Swap,"swap")
+    .AddCoreOp(Stack_Depth, "depth")
 # pick
 # rot
 # -rot
@@ -985,6 +989,11 @@ Int_Over:
     .PushInt 
     branch DoneInterpretWord
 
+Stack_Depth:
+    depth .IntStack
+    .PushInt
+    branch DoneInterpretWord
+
 DoneInterpretWord:
     ret
 
@@ -1161,8 +1170,8 @@ AddSpecialWord:
     ne .CurrentWord, "if", NotIf
     .IncNestLevel
     .GetNestLevel
-    concat .NewBodyString, "restore P27\n"
-    concat .NewBodyString, "unless P27, endif"
+    concat .NewBodyString, "restore P17\n"
+    concat .NewBodyString, "unless P17, endif"
     set .TempString, .NestLevel
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n" 
@@ -1178,17 +1187,39 @@ AddSpecialWord:
     branch EndSpecWord
   NotThen:
     ne .CurrentWord, "else", NotElse
+    branch EndSpecWord    
   NotElse:
+    ne .CurrentWord, "exit", NotExit
+    concat .NewBodyString, "ret\n"
+    branch EndSpecWord    
+  NotExit:
+    ne .CurrentWord, "begin", NotBegin
+    .IncNestLevel
+    .GetNestLevel
+    concat .NewBodyString, "begin"
+    set .TempString, .NestLevel
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, ":\n" 
+    branch EndSpecWord    
+  NotBegin:
+    ne .CurrentWord, "again", NotAgain
+    .GetNestLevel
+    concat .NewBodyString, "branch begin"
+    set .TempString, .NestLevel
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, "\n"
+    branch EndSpecWord    
+  NotAgain:
     branch EndSpecWord    
 EndSpecWord:
     ret
 
 AddIntConstant:
-    concat .NewBodyString, "new P27, .Integer\n"
-    concat .NewBodyString, "set P27, "
+    concat .NewBodyString, "new P17, .Integer\n"
+    concat .NewBodyString, "set P17, "
     concat .NewBodyString, .CurrentWord
     concat .NewBodyString, "\n"
-    concat .NewBodyString, "save P27\n"
+    concat .NewBodyString, "save P17\n"
 #    concat .NewBodyString, "set I27, "
 #    concat .NewBodyString, .CurrentWord
 #    concat .NewBodyString, "\n"
@@ -1196,20 +1227,20 @@ AddIntConstant:
     ret
 
 AddFloatConstant:
-    concat .NewBodyString, "new P27, .Float\n"
-    concat .NewBodyString, "set P27, "
+    concat .NewBodyString, "new P17, .Float\n"
+    concat .NewBodyString, "set P17, "
     concat .NewBodyString, .CurrentWord
     concat .NewBodyString, "\n"
-    concat .NewBodyString, "save P27\n"
+    concat .NewBodyString, "save P17\n"
     ret
 
 AddStringConstant:
     # Should really be a String, but we don't have that yet
-    concat .NewBodyString, "new P27, .PerlString\n"
-    concat .NewBodyString, "set P27, "
+    concat .NewBodyString, "new P17, .PerlString\n"
+    concat .NewBodyString, "set P17, "
     concat .NewBodyString, .CurrentWord
     concat .NewBodyString, "\n"
-    concat .NewBodyString, "save P27\n"
+    concat .NewBodyString, "save P17\n"
     ret
 
 AddPlainWord:
