@@ -1,6 +1,15 @@
 Here's the list of things that we know are broken, or
 are admittedly hackish stopgap measures or need to be fixed.
 
+Bytecode
+
+- Byteordering works for most stuff except floating point (N regs)
+  Cross platform bytecode doesn't convert floats yet
+
+IO
+
+- Async core isn't there yet, even though it is rumoured to be
+
 GC issues (copying allocator)
 
 - immobile strings/buffers get freed during GC
