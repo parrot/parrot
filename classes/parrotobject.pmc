@@ -159,6 +159,54 @@ Return the class of this object.
     PMC* get_class() {
         return GET_CLASS(PMC_data(SELF), SELF);
     }
+
+/*
+
+=item C<void visit(visit_info *info)>
+
+This is used by freeze/thaw to visit the contents of the object.
+
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the object.
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the object.
+
+=item C<void thawfinish(visit_info *info)>
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        PMC **class_data, **pos;
+        INTVAL i, n;
+
+        class_data = (PMC **)PMC_data(SELF);
+
+        /* 1) visit class */
+        pos = class_data + POD_CLASS;
+        (info->visit_pmc_now)(interpreter, *pos, info);
+
+        /* 2) visit the attributes */
+        n = ATTRIB_COUNT(SELF);
+        for (i = POD_FIRST_ATTRIB; i < n; ++i) {
+            info->thaw_ptr = class_data + i;
+            (info->visit_pmc_now)(interpreter, class_data[i], info);
+        }
+    }
+    void freeze(visit_info *info) {
+        Parrot_default_freeze(INTERP, SELF, info);
+    }
+    void thaw(visit_info *info) {
+        Parrot_default_thaw(INTERP, SELF, info);
+    }
+    void thawfinish(visit_info *info) {
+    }
 }
 
 /*

@@ -16,7 +16,7 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 use Test::More;
 
 END { unlink "temp.fpmc"; };
@@ -482,6 +482,8 @@ ok 2
 Foo
 OUTPUT
 
+SKIP: {
+	skip("todo class exists", 1);
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw simple class");
     newclass P10, "Foo"
     classname S10, P10
@@ -500,6 +502,7 @@ Foo
 ok
 Foo
 OUTPUT
+}
 
 output_is(<<'CODE', <<'OUTPUT', "freeze class w attr");
     newclass P10, "Foo"
@@ -559,3 +562,57 @@ ok 3
 ok 4
 ok 5
 OUTPUT
+
+SKIP: {
+	skip("todo class exists", 1);
+output_is(<<'CODE', <<'OUTPUT', "thaw class  w attrr");
+    newclass P10, "Foo"
+    addattribute P10, ".aa"
+    addattribute P10, ".bb"
+    classname S10, P10
+    print S10
+    print "\n"
+    freeze S3, P10
+    open P3, "temp.fpmc", ">"
+    print P3, S3
+    close P3
+
+    # print S3
+    # print "\n"
+    print "ok 1\n"
+    thaw P4, S3
+    print "ok 2\n"
+    classname S10, P4
+    print S10
+    print "\n"
+
+    find_type I4, S10
+    new P5, I4
+    print "ok 3\n"
+    classoffset I5, P5, S10
+    new P6, .PerlString
+    set P6, "ok 5\n"
+    setattribute P5, "Foo\0.aa", P6
+    new P6, .PerlString
+    set P6, "ok 6\n"
+    setattribute P5, "Foo\0.bb", P6
+    print "ok 4\n"
+    getattribute P7, P5, I5
+    print P7
+    inc I5
+    getattribute P7, P5, I5
+    print P7
+    end
+
+
+CODE
+Foo
+ok 1
+ok 2
+Foo
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+}

@@ -161,6 +161,8 @@ Create the class from the thawed parents and attributes array.
 
         class_data = (PMC **)PMC_data(SELF);
 
+        if (info->extra_flags == EXTRA_CLASS_EXISTS)
+            PIO_eprintf(INTERP, "class exists\n");
         /* 2) direct parents array */
         pos = class_data + PCD_PARENTS;
         (info->visit_pmc_now)(interpreter, *pos, info);
@@ -205,7 +207,7 @@ Create the class from the thawed parents and attributes array.
              */
             new_type = pmc_type(INTERP, class_name);
             if (new_type > enum_type_undef) {
-                /* exists */
+                /* info->extra_flags = EXTRA_CLASS_EXISTS; */
             }
             else {
                 class = *info->thaw_ptr;
@@ -222,7 +224,7 @@ Create the class from the thawed parents and attributes array.
         PMC **class_data = (PMC **)PMC_data(SELF);
 
         /*
-         * we now have to plain array: parents and attributes
+         * we now have two plain arrays: parents and attributes
          * TODO if class did exists compare these with the
          *      information in the class
          * TODO don't thaw directly into class array - this destroys
