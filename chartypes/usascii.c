@@ -15,7 +15,8 @@
 struct chartype_digit_map_t usascii_digit_map = { 0x30, 0x39, 0 };
 
 static UINTVAL
-usascii_transcode_from_unicode(UINTVAL c)
+usascii_transcode_from_unicode(const CHARTYPE *from, const CHARTYPE *to,
+                               UINTVAL c)
 {
     if (c > 127) {
         internal_exception(INVALID_CHARACTER,
