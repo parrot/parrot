@@ -165,14 +165,14 @@ sub readjit($) {
             $asm =~ s/CUR_OPCODE/jit_info->cur_op/g;
             $asm =~ s/cur_opcode/jit_info->cur_op/g;
             $asm =~ s/MAP\[(\d)\]/MAP($1)/g;
-	    # XXX set extern if the code calls a function
-	    $extern = 1 if $asm =~ /call_func/;
+	    # set extern if the code calls a function
+	    $extern = -1 if $asm =~ /CALL_FUNCTION/;
             unless ($jit_cpu) {
                 # no address of
                 $asm =~ s/&([INSP])REG/$1REG/g;
                 $asm =~ s/&CONST/CONST/g;
                 # Use the macro
-                $asm =~ s/call_func\(\s*jit_info\s*,\s*\(void\*\)\s*(.*)\)/CALL("$1")/g;
+                $asm =~ s/CALL_FUNCTION\(\s*jit_info\s*,\s*\(void\*\)\s*(.*)\)/CALL("$1")/g;
                 # The ->u.(string|float) is unnecessary.
                 $asm =~ s/\)->u\.(\w+)/)/g;
                 $asm =~ s/CONST\((\d)\)\s*([><=!]=?)\s*CONST\((\d)\)/RCONST($1)->u.number $2 RCONST($3)->u.number/ if ($asm =~ /CONST.*CONST/);

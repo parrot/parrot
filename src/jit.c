@@ -48,25 +48,12 @@ extern int jit_op_count(void);
 #  define ALLOCATE_REGISTERS_PER_SECTION 1
 #endif
 
-#if ALLOCATE_REGISTERS_PER_SECTION
-#  undef PRESERVED_INT_REGS
-#  undef PRESERVED_FLOAT_REGS
-#endif
-
 #ifndef PRESERVED_INT_REGS
-#  if ALLOCATE_REGISTERS_PER_SECTION
-#    define PRESERVED_INT_REGS INT_REGISTERS_TO_MAP
-#  else
-#    define PRESERVED_INT_REGS 0
-#  endif
+#  define PRESERVED_INT_REGS 0
 #endif
 
 #ifndef PRESERVED_FLOAT_REGS
-#  if ALLOCATE_REGISTERS_PER_SECTION
-#    define PRESERVED_FLOAT_REGS FLOAT_REGISTERS_TO_MAP
-#  else
-#    define PRESERVED_FLOAT_REGS 0
-#  endif
+#  define PRESERVED_FLOAT_REGS 0
 #endif
 
 #if defined __GNUC__ || defined __IBMC__
@@ -363,7 +350,8 @@ This C<Parrot_jit_vtable_n_op()> does use register mappings.
 */
 
 #ifndef EXTCALL
-#  define EXTCALL(op) op_jit[*(op)].extcall
+#  define EXTCALL(op) (op_jit[*(op)].extcall >= 1)
+#  define CALLS_C_CODE(op) (op_func[op].extcall == -1)
 #endif
 
 static void
@@ -966,6 +954,13 @@ The latter is used if F<jit_emit.h> defines C<Parrot_jit_emit_get_base_reg_no>.
 */
 
 #if defined(Parrot_jit_emit_get_base_reg_no)
+#  define JIT_USE_OFFS 1
+#else
+#  define JIT_USE_OFFS 0
+#endif
+
+#if JIT_USE_OFFS
+
 static size_t
 reg_offs(Interp * interpreter, int typ, int i)
 {
@@ -996,7 +991,7 @@ reg_addr(Interp * interpreter, int typ, int i)
 
 =item C<static void
 Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter)>
+                          Interp * interpreter, int volatiles)>
 
 Load registers for the current section from parrot to processor registers.
 
@@ -1005,22 +1000,27 @@ Load registers for the current section from parrot to processor registers.
 */
 
 
-#if defined(Parrot_jit_emit_get_base_reg_no)
 
 static void
 Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter)
+                          Interp * interpreter, int volatiles)
 {
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
+#if JIT_USE_OFFS
     void (*mov_f[4])(Interp *, int, int, size_t)
         = { Parrot_jit_emit_mov_rm_offs, 0, 0, Parrot_jit_emit_mov_rm_n_offs};
+    size_t offs;
+#else
+    void (*mov_f[4])(Interp *, int, char *)
+        = { Parrot_jit_emit_mov_rm, 0, 0, Parrot_jit_emit_mov_rm_n};
+    char *m;
+#endif
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
     int first = 1;
     int base_reg = 0;   /* -O3 warning */
-    size_t offs;
 
     maps[0] = jit_info->intval_map;
     maps[3] = jit_info->floatval_map;
@@ -1030,15 +1030,22 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
         if (maps[typ]) {
             for (i = ru[typ].registers_used-1; i >= 0; --i) {
                 int us = ru[typ].reg_usage[i];
-                if ((i >= lasts[typ] && ru[typ].reg_dir[us]) ||
-                        (ru[typ].reg_dir[us] & PARROT_ARGDIR_IN)) {
+                int is_used = i >= lasts[typ] && ru[typ].reg_dir[us];
+                if ((is_used && volatiles) ||
+                    (!volatiles &&
+                         ((ru[typ].reg_dir[us] & PARROT_ARGDIR_IN)))) {
                     if (first) {
                         base_reg = Parrot_jit_emit_get_base_reg_no(
                                 jit_info->native_ptr);
                         first = 0;
                     }
+#if JIT_USE_OFFS
                     offs = reg_offs(interpreter, typ, us);
                     (mov_f[typ])(interpreter, maps[typ][i], base_reg, offs);
+#else
+                    m = reg_addr(interpreter, typ, us);
+                    (mov_f[typ])(interpreter, maps[typ][i], m);
+#endif
                 }
             }
         }
@@ -1055,7 +1062,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
 
 =item C<static void
 Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter)>
+                          Interp * interpreter, int volatiles)>
 
 Save registers for the current section.
 
@@ -1065,18 +1072,24 @@ Save registers for the current section.
 
 static void
 Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter)
+                          Interp * interpreter, int volatiles)
 {
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
+#if JIT_USE_OFFS
     void (*mov_f[4])(Interp * ,int, size_t, int)
         = { Parrot_jit_emit_mov_mr_offs, 0, 0, Parrot_jit_emit_mov_mr_n_offs};
+    size_t offs;
+#else
+    void (*mov_f[4])(Interp * , char *, int)
+        = { Parrot_jit_emit_mov_mr, 0, 0, Parrot_jit_emit_mov_mr_n};
+    char *m;
+#endif
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
     int first = 1;
     int base_reg = 0; /* -O3 warning */
-    size_t offs;
 
     maps[0] = jit_info->intval_map;
     maps[3] = jit_info->floatval_map;
@@ -1084,109 +1097,26 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
         if (maps[typ])
             for (i = 0; i < ru[typ].registers_used; ++i) {
                 int us = ru[typ].reg_usage[i];
-                if ((i >= lasts[typ] && ru[typ].reg_dir[us]) ||
-                    ru[typ].reg_dir[us] & PARROT_ARGDIR_OUT) {
+                int is_used = i >= lasts[typ] && ru[typ].reg_dir[us];
+                if ((is_used && volatiles) ||
+                    (!volatiles &&
+                     (ru[typ].reg_dir[us] & PARROT_ARGDIR_OUT))) {
                     if (first) {
                         base_reg = Parrot_jit_emit_get_base_reg_no(
                                 jit_info->native_ptr);
                         first = 0;
                     }
+#if JIT_USE_OFFS
                     offs = reg_offs(interpreter, typ, us);
                     (mov_f[typ])(interpreter, base_reg, offs, maps[typ][i]);
-                }
-            }
-    }
-}
-
 #else
-
-static void
-Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter)
-{
-    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
-    Parrot_jit_register_usage_t *ru = sect->ru;
-    int i, typ;
-    void (*mov_f[4])(Interp *, int, char *)
-        = { Parrot_jit_emit_mov_rm, 0, 0, Parrot_jit_emit_mov_rm_n};
-    int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
-    char * maps[] = {0, 0, 0, 0};
-    maps[0] = jit_info->intval_map;
-    maps[3] = jit_info->floatval_map;
-
-#if EXEC_CAPABLE
-    if (jit_info->objfile) {
-        mov_f[0] = Parrot_exec_emit_mov_rm;
-        mov_f[3] = Parrot_exec_emit_mov_rm_n;
-    }
-#endif
-
-    for (typ = 0; typ < 4; typ++) {
-        if (maps[typ]) {
-            for (i = ru[typ].registers_used-1; i >= 0; --i) {
-                int us = ru[typ].reg_usage[i];
-                if ((i >= lasts[typ] && ru[typ].reg_dir[us]) ||
-                        (ru[typ].reg_dir[us] & PARROT_ARGDIR_IN)) {
-                    char *m = reg_addr(interpreter, typ, us);
-                    (mov_f[typ])(interpreter, maps[typ][i], m);
-                }
-            }
-        }
-    }
-
-    /* The total size of the loads. This is used for branches to
-     * the same section - these skip the load asm bytes */
-    sect->load_size = jit_info->native_ptr -
-        (jit_info->arena.start +
-         jit_info->arena.op_map[jit_info->op_i].offset);
-}
-
-/*
-
-=item C<static void
-Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter)>
-
-Save registers for the current section.
-
-=cut
-
-*/
-
-static void
-Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-                          Interp * interpreter)
-{
-    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
-    Parrot_jit_register_usage_t *ru = sect->ru;
-    int i, typ;
-    void (*mov_f[4])(Interp * , char *, int)
-        = { Parrot_jit_emit_mov_mr, 0, 0, Parrot_jit_emit_mov_mr_n};
-    int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
-    char * maps[] = {0, 0, 0, 0};
-    maps[0] = jit_info->intval_map;
-    maps[3] = jit_info->floatval_map;
-
-#if EXEC_CAPABLE
-    if (jit_info->objfile) {
-        mov_f[0] = Parrot_exec_emit_mov_mr;
-        mov_f[3] = Parrot_exec_emit_mov_mr_n;
-    }
-#endif
-
-    for (typ = 0; typ < 4; typ++) {
-        if (maps[typ])
-            for (i = 0; i < ru[typ].registers_used; ++i) {
-                int us = ru[typ].reg_usage[i];
-                if ((i >= lasts[typ] && ru[typ].reg_dir[us]) ||
-                    ru[typ].reg_dir[us] & PARROT_ARGDIR_OUT) {
-                    char *m = reg_addr(interpreter, typ, us);
+                    m = reg_addr(interpreter, typ, us);
                     (mov_f[typ])(interpreter, m, maps[typ][i]);
+#endif
                 }
             }
     }
 }
-#endif
 
 /*
 
@@ -1365,7 +1295,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
 
         /* Load mapped registers for this section, if JIT */
         if (!jit_seg && cur_section->isjit) {
-            Parrot_jit_load_registers(jit_info, interpreter);
+            Parrot_jit_load_registers(jit_info, interpreter, 0);
         }
 
         /* The first opcode of each section doesn't have a previous one since
@@ -1407,7 +1337,14 @@ build_asm(Interp *interpreter, opcode_t *pc,
                         !cur_opcode_byte) &&
                     cur_section->isjit &&
                     !jit_seg) {
-                Parrot_jit_save_registers(jit_info, interpreter);
+                Parrot_jit_save_registers(jit_info, interpreter, 0);
+            }
+            else if (CALLS_C_CODE(cur_opcode_byte)) {
+                /*
+                 * a JITted function with a function call, we have to
+                 * save volatile registers
+                 */
+                Parrot_jit_save_registers(jit_info, interpreter, 1);
             }
 
             /* Generate native code for current op */
@@ -1416,6 +1353,13 @@ build_asm(Interp *interpreter, opcode_t *pc,
             }
             (op_func[cur_opcode_byte].fn) (jit_info, interpreter);
 
+            if (CALLS_C_CODE(cur_opcode_byte)) {
+                /*
+                 * restore volatiles only - and TODO only if next
+                 *      whouldn't load registers anyway
+                 */
+                Parrot_jit_load_registers(jit_info, interpreter, 1);
+            }
             /* Update the previous opcode */
             jit_info->prev_op = cur_op;
 
@@ -1445,7 +1389,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
 
         /* Save mapped registers back to the Parrot registers */
         if (!jit_seg && cur_section->isjit)
-            Parrot_jit_save_registers(jit_info, interpreter);
+            Parrot_jit_save_registers(jit_info, interpreter, 0);
 
         /* update the offset for saved registers */
         jit_info->arena.op_map[jit_info->op_i].offset =
