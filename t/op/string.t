@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 126;
+use Parrot::Test tests => 127;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2310,6 +2310,34 @@ CODE
 
 a
 a--b
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "eq_addr/ne_addr");
+        set S0, "Test"
+        set S1, S0
+        eq_addr S1, S0, OK1
+        print "not "
+OK1:    print "ok 1\n"
+        set S1, "Test"
+        eq_addr S1, S0, BAD2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        ne_addr S1, S0, OK3
+        print "not "
+OK3:    print "ok 3\n"
+        set S0, S1
+        ne_addr S1, S0, BAD4
+        branch OK4
+BAD4:   print "not "
+OK4:    print "ok 4\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT
 
 1;
