@@ -84,6 +84,8 @@ void alloc_objects(struct Parrot_Interp *, struct Small_Object_Pool *);
 struct Small_Object_Pool * new_small_object_pool(struct Parrot_Interp *,
                                                  size_t, size_t);
 
+int Parrot_is_const_pmc(Parrot_Interp, PMC *);
+
 #endif /* PARROT_SMALLOBJECT_H */
 
 /*

@@ -425,7 +425,27 @@ sub is_const($$) {
     my @consts = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
     my %consts;
     @consts{@consts} = (1) x @consts;
-    exists $consts{$section};
+    exists $consts{$section} || $meth eq 'morph';
+}
+
+sub standard_body($$$$$$$) {
+    my ($vtbl, $classname, $methodname, $OUT, $HOUT, $cfile, $body) = @_;
+    my $type = $vtbl->[0];
+    my $parameters = $vtbl->[2];
+    $parameters = ", $parameters" if $parameters;
+    my $retval = "($type) 0";
+    my $ret = $type eq 'void' ? '' : "return $retval;" ;
+    my $ln = 1 + ($OUT =~ tr/\n/\n/);
+    my $line = $suppress_lines ? '' : "#line $ln \"$cfile\"\n";
+    my $decl = "$type Parrot_${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
+    $$HOUT .= "extern $decl;\n";
+    return <<EOC;
+$line
+    $decl {
+        $body
+	$ret
+    }
+EOC
 }
 
 =head2 filter
@@ -598,45 +618,33 @@ EOC
       if (exists $methodbody{ $methodname }) {
 	    $OUT .= $methodbody{ $methodname } . "\n\n";
 	  if ($isconst) {
-	    my $type = $_->[0];
-	    my $parameters = $_->[2];
-	    $parameters = ", $parameters" if $parameters;
-	    my $retval = "($type) 0";
-	    my $ret = $type eq 'void' ? '' : "return $retval;" ;
-	    my $ln = 1 + ($OUT =~ tr/\n/\n/);
-	    my $line = $suppress_lines ? '' : "#line $ln \"$cfile\"\n";
-	    my $decl = "$type Parrot_Const${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
-	    $HOUT .= "extern $decl;\n";
-	    $OUT .= <<EOC;
-$line
-    $decl {
+	      my $body = <<EOC;
 	internal_exception(WRITE_TO_CONSTCLASS,
 		"$methodname() in Const$classname");
-	$ret
-    }
 EOC
+	      if ($methodname eq 'morph') {
+		  $body = <<EOC;
+    if (Parrot_is_const_pmc(interpreter, pmc))
+	internal_exception(WRITE_TO_CONSTCLASS,
+		"$methodname() in Const$classname");
+    else
+        Parrot_${classname}_$methodname(interpreter, pmc, type);
+EOC
+	      }
+
+	    $OUT .= standard_body($_, "Const$classname", $methodname,
+		$OUT, \$HOUT, $cfile, $body);
 	  }
       }
       elsif ($classname eq 'default') {
 	# generate default body
-        my $type = $_->[0];
-        my $parameters = $_->[2];
-	$parameters = ", $parameters" if $parameters;
-	my $retval = "($type) 0";
-	my $ret = $type eq 'void' ? '' : "return $retval;" ;
-	my $ln = 1 + ($OUT =~ tr/\n/\n/);
-	my $line = $suppress_lines ? '' : "#line $ln \"$cfile\"\n";
-	my $decl = "$type Parrot_default_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
-	$HOUT .= "extern $decl;\n";
-	$OUT .= <<EOC;
-$line
-    $decl {
+	  my $body = <<EOC;
 	internal_exception(ILL_INHERIT,
 		"$methodname() not implemented in class '%s'",
 		caller(interpreter, pmc));
-	$ret
-    }
 EOC
+	  $OUT .= standard_body($_, "$classname", $methodname,
+		$OUT, \$HOUT, $cfile, $body);
 
       }
   }

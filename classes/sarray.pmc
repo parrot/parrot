@@ -29,6 +29,10 @@ pmclass SArray const_too {
         PMC_data(SELF) = NULL;
     }
 
+    void morph(INTVAL type) { /* Const classes must have a morph */
+	SUPER(type);
+    }
+
     void mark () {
 	HASH_ENTRY *e;
 	int i, start, end;
