@@ -57,8 +57,8 @@ Parrot_vsprintf(struct Parrot_Interp *interpreter, char *targ, const char *pat,
     STRING *ret = Parrot_vsprintf_c(interpreter, pat, args);
     string_transcode(interpreter, ret, NULL, NULL, &ret);
 
-    memcpy(targ, ret->strstart, ret->strlen);
-    targ[ret->strlen] = '\0';
+    memcpy(targ, ret->strstart, ret->bufused);
+    targ[ret->bufused] = '\0';
 }
 
 void
