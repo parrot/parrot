@@ -69,9 +69,11 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
     info(interpreter, 2, "find_basic_blocks\n");
     init_basic_blocks(unit);
     for(i = 0; i < HASH_SIZE; i++) {
-        SymReg * r = unit->hash[i];
-        if (r && (r->type & VTADDRESS)) {
-            r->last_ins = NULL;
+        SymReg * r;
+        for(r = unit->hash[i]; r; r = r->next) {
+            if (r && (r->type & VTADDRESS)) {
+                r->last_ins = NULL;
+            }
         }
     }
 
