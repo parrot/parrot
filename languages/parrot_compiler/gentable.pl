@@ -27,9 +27,9 @@ foreach $op (@$Parrot::OpLib::core::ops) {
     $fix = undef;
     $size = scalar($op->size) - 1;
     print FILE uc($op->full_name) . ":\n";
-    $load .= "    set_keyed P2,\"" . $op->full_name . '",' . $opnum . "\n";
+    $load .= "    set P2,\"" . $op->full_name . '",' . $opnum . "\n";
     $load .= "    set_addr I1," . uc($op->full_name) . "\n";
-    $load .= "    set_keyed P7," . $opnum++ . ",I1\n";
+    $load .= "    set P7," . $opnum++ . ",I1\n";
     if (($op->jump) && ($op->arg_type($size) eq 'ic')) {
         $size--;
         $fix = "    bsr HANDLE_ARG_LABEL\n";
@@ -45,6 +45,9 @@ print FILE "LOAD:\n" . $load . "\n    ret\n\n";
 
 #
 # $Log$
+# Revision 1.3  2002/06/03 20:25:07  grunblatt
+# s/[gs]et_keyed/set/
+#
 # Revision 1.2  2002/06/01 08:15:03  grunblatt
 # * Use and abuse of array and hashes.
 # * Gets the input and output file names from the command line:

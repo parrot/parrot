@@ -43,18 +43,18 @@ MAIN:
     new P6,.PerlHash
     new P7,.PerlArray
     new P31,.PerlHash
-    set_keyed P31,"a",0x7
-    set_keyed P31,"n",0xa
-    set_keyed P31,"r",0xd
-    set_keyed P31,"t",0x9
-    set_keyed P31,"\\",0x5c
+    set P31,"a",0x7
+    set P31,"n",0xa
+    set P31,"r",0xd
+    set P31,"t",0x9
+    set P31,"\\",0x5c
 
     bsr LOAD
     # Get the name of the input file
-    get_keyed S15,P0,1
+    set S15,P0,1
     open I20,S15
     # Get the name of the output file
-    get_keyed S15,P0,2
+    set S15,P0,2
     open P1,S15,">"
     bsr READ
     end
@@ -79,7 +79,7 @@ HANDLE_LABEL:
     substr S1, S0, 0, I0
     # set the label position
     length I30,S28
-    set_keyed P6,S1,I30
+    set P6,S1,I30
 
 HANDLE_OPCODE:
     inc I0
@@ -88,12 +88,12 @@ HANDLE_OPCODE:
     substr S1, S0, I0, I1
     add I0, I0, I1
     inc I0
-    get_keyed I3,P2,S1
+    set I3,P2,S1
     # pack the opcode number
     pack S28,I24,I3
     set I22,4
     # handle opcode arguments
-    get_keyed I3,P7,I3
+    set I3,P7,I3
     jsr I3
 
 HANDLE_ARG_LABEL:
@@ -106,13 +106,13 @@ HANDLE_ARG_LABEL:
     # update the label count
     inc I31
     # save the label
-    set_keyed P3,I31,S2
+    set P3,I31,S2
     length I30,S28
     dec I30,I22
     # save the address of the opcode
-    set_keyed P4,I31,I30
+    set P4,I31,I30
     # save the address of label 
-    set_keyed P5,I31,I22
+    set P5,I31,I22
     # add a noop
     pack S28,I24,0
     ret
@@ -198,7 +198,7 @@ ESCAPE:
 
 ESCAPE_IT:
     substr S12,S2,I7,1
-    get_keyed I6, P31, S12
+    set I6, P31, S12
     pack S2,1,I6,I4
     inc I4
     substr S12,S2,0,I4
@@ -216,16 +216,16 @@ FINISH_ESCAPE:
 
 FIXUP:
     # get the last label found
-    get_keyed S11,P3,I31
+    set S11,P3,I31
     # if the length is 0 return
     length I15,S11
     eq 0,I15,ENDFIXUP
     # get the address of the opcode to apply the fixup
-    get_keyed I15,P4,I31
+    set I15,P4,I31
     # get the address within the opcode to apply the fixup
-    get_keyed I16,P5,I31
+    set I16,P5,I31
     # get the position marked by the label
-    get_keyed I17,P6,S11
+    set I17,P6,S11
     # calculate the offset
     sub I18,I17,I15
     div I18,I18,I24
@@ -266,6 +266,9 @@ OUTPUT:
 
 #
 # $Log$
+# Revision 1.3  2002/06/03 20:25:07  grunblatt
+# s/[gs]et_keyed/set/
+#
 # Revision 1.2  2002/06/01 08:15:03  grunblatt
 # * Use and abuse of array and hashes.
 # * Gets the input and output file names from the command line:
