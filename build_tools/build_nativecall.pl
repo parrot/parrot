@@ -5,6 +5,7 @@
 my %ret_count;
 %ret_count = (p => [0,0,0,1,0],        # Returning a pointer that we PMC stuff
 	      i => [0,1,0,0,0],        # Returning an int
+	      3 => [0,1,0,0,0],        # Returning an int pointer
 	      l => [0,1,0,0,0],        # Returning a long
 	      c => [0,1,0,0,0],        # returning a char
 	      s => [0,1,0,0,0],        # returning a short
@@ -17,9 +18,12 @@ my %ret_count;
 
 my (%ret_type) = (p => "void *",
 		  i => "int",
+		  3 => "int *",
 		  l => "long",
+		  4 => "long *",
 		  c => "char",
 		  s => "short",
+                  2 => "short *",
                   f => "float",
                   d => "double",
                   t => "char *",
@@ -28,9 +32,12 @@ my (%ret_type) = (p => "void *",
 
 my (%proto_type) = (p => "void *",
 		    i => "int",
+		    3 => "int *",
 		    l => "long",
+		    4 => "long *",
 		    c => "char",
 		    s => "short",
+                    2 => "short *",
 		    f => "float",
 		    d => "double",
 		    t => "char *",
@@ -43,9 +50,12 @@ my (%other_decl) = (p => "PMC *final_destination = pmc_new(interpreter, enum_cla
 
 my (%ret_type_decl) = (p => "void *",
 		       i => "int",
+		       3 => "int *",
 		       l => "long",
+		       4 => "long *",
 		       c => "char",
 		       s => "short",
+                       2 => "short *",
                        f => "float",
                        d => "double",
                        t => "char *",
@@ -54,9 +64,12 @@ my (%ret_type_decl) = (p => "void *",
 
 my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nPMC_REG(5) = final_destination;",
 		    i => "INT_REG(5) = return_data;",
+		    3 => "INT_REG(5) = *return_data;",
 		    l => "INT_REG(5) = return_data;",
+		    4 => "INT_REG(5) = *return_data;",
 		    c => "INT_REG(5) = return_data;",
 		    s => "INT_REG(5) = return_data;",
+                    2 => "INT_REG(5) = *return_data;",
                     f => "NUM_REG(5) = return_data;",
                     d => "NUM_REG(5) = return_data;",
 		    v => "",
@@ -64,6 +77,9 @@ my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nPMC_REG(5)
 
 my (%func_call_assign) = (p => "return_data = ",
 			  i => "return_data = ",
+			  3 => "return_data = ",
+			  2 => "return_data = ",
+			  4 => "return_data = ",
 			  l => "return_data = ",
 			  c => "return_data = ",
 			  s => "return_data = ",
@@ -203,10 +219,19 @@ sub make_arg {
     /i/ && do {my $regnum = $reg_ref->{i}++;
 	       return "(int)INT_REG($regnum)";
               };
+    /3/ && do {my $regnum = $reg_ref->{i}++;
+	       return "&(int)INT_REG($regnum)";
+              };
     /l/ && do {my $regnum = $reg_ref->{i}++;
 	       return "(long)INT_REG($regnum)";
               };
+    /4/ && do {my $regnum = $reg_ref->{i}++;
+	       return "&(long)INT_REG($regnum)";
+              };
     /s/ && do {my $regnum = $reg_ref->{i}++;
+	       return "(short)INT_REG($regnum)";
+              };
+    /2/ && do {my $regnum = $reg_ref->{i}++;
 	       return "(short)INT_REG($regnum)";
               };
     /f/ && do {my $regnum = $reg_ref->{n}++;

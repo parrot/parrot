@@ -6,6 +6,9 @@
 # s - short
 # i - int
 # l - long
+# 2 - pointer to short
+# 3 - pointer to int
+# 4 - pointer to long
 # NUM reg stuff
 # f - float
 # d - double
@@ -40,6 +43,14 @@ v	piiii
 i	pppp
 i	ppi
 p	It
+i	4i
+i	4
+i	42p
+i	lp
+i	lsp
+i	pll
+i	ilsp
+i	pl
 # These are needed for parrotio.pmc
 i	IP
 v	IP
