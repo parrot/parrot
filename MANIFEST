@@ -35,8 +35,8 @@ config_h.in
 core.ops
 disassemble.pl
 docs/Makefile.in
-docs/ParrotFAQ.htm
 docs/embed.pod
+docs/faq.pod
 docs/intro.pod
 docs/jit.pod
 docs/overview.pod
