@@ -1,5 +1,8 @@
 languages/regex: Compile regular expressions into optimized bytecode.
 
+NOTE: This Is Not The Matching Engine You're Looking For. See the
+bottom of this readme, in the section "WHAT ABOUT P6GE?"
+
 RUNNING
 =======
 
@@ -23,6 +26,11 @@ can enable just one or the other using 't' for Tree and 'l' for List:
   perl regex.pl --optimize=t '(a*|b)a'
   perl regex.pl --optimize=l '(a*|b)a'
 
+To do the same thing, only generating perl5 backend code instead of
+PIR code:
+
+  perl regex.pl --language=perl5 '(a*|b)a'
+
 For development, it may also be useful to dump out the tree (remember,
 by default it will be the optimized tree):
 
@@ -35,28 +43,57 @@ Or you can have it render the tree back to a regular expression:
 All of this really ought to be in a usage message.
 
 To run any of the generated code, you now need the Match and
-MatchRange PMCs. Run 'make' in parrot/dynclasses/ to generate these.
-It will probably only work on Linux and similar architectures
-currently; sorry.
+MatchRange PMCs. They should be generated automatically now by the
+root makefile, but if for some reason they aren't, run 'make' in
+parrot/dynclasses/ to generate them.
 
-New stuff: now you can use the compiler as an embedded Parrot compiler.
-Run 'make regex-compiler.pbc' to generate regex-compiler.pbc. Then run
-../../parrot 01_basic.imc, ../../parrot 02_date.imc, etc. These will
-dynamically load in the regex-compiler as the compiler for the "regex"
-language, and then use it to compile some code and execute it.
+New stuff (CURRENTLY BROKEN): now you can use the compiler as an
+embedded Parrot compiler. Run 'make regex-compiler.pbc' to generate
+regex-compiler.pbc. Then run ../../parrot 01_basic.imc, ../../parrot
+02_date.imc, etc. These will dynamically load in the regex-compiler as
+the compiler for the "regex" language, and then use it to compile some
+code and execute it.
+
+Also, I have hacked in multiple rule definitions into the silly
+frontend parser. I don't intend to stick with this syntax for long,
+since I want to get to a point soon where I can bootstrap this
+engine's own parser, but for now you can define rules with
+'&rulename=...'. So to compile a simple expression parser:
+
+  perl regex.pl --language=perl5 '&expr=<?term>\*<?expr>|<?term>\/<?expr>|<?term>&term=<?atom>\+<?term>|<?atom>\-<?term>|<?atom>&atom=[0-9]+|\(<?expr>\)&default=<?expr>'
+
+Sorry, no closure actions yet. Coming soon. And yes, that is a mess,
+but if you format it nicely it should make more sense:
+
+  &expr = <?term> \* <?expr>
+        | <?term> \/ <?expr>
+        | <?term>
+
+  &term = <?atom> \+ <?term>
+        | <?atom> \- <?term>
+        | <?atom>
+
+  &atom = [0-9]+
+        | \( <?expr> \)
+
+  &default = <?expr>
+
+All of the <?foo> things are there so that the rules get nicely
+captured -- by default, nested rule calls are *not* capturing.
 
 STATUS
 ======
 
 Everything should be more or less working, though many operators are
-untested. Theoretically, this release should support:
+untested. Theoretically, this release should support (using Perl5
+syntax here):
 
  RS      - sequences
  R|S     - alternation
  R*      - greedy Kleene closure
- R*?     - nongreedy/parsimonious Kleene closure
+ R*?     - nongreedy (parsimonious) Kleene closure
  R?      - greedy optional
- R??     - nongreedy/parsimonious optional
+ R??     - nongreedy (parsimonious) optional
  R+      - greedy one or more ("more or one")
  R+?     - nongreedy one or more
  (R)     - capturing groups
@@ -84,6 +121,7 @@ Missing perl5 features:
  (?(cond)R|S)
          - conditional expression
  (R?)*   - empty match suppression
+ <rule>  - rule invocation (Perl6 feature)
 
 Missing perl6 features:
 :
@@ -97,25 +135,21 @@ hypotheticals - code refs with two entry points (enter and backtrack)
 %var     - hash key alternatives
 <%var>   - as above, but values are always regexps
 <!...>   - negation (what is this?) (is this just negative lookahead?)
-<rule>   - rule invocation
 ...      - and many, many, many more
 
 Other features I'd like to have:
- (?1)    - recursive expressions
  @A =~   - array matching
  ?       - reentrant, suspendable, coroutinish regexes
  ?       - two-dimensional regexes
 
-Regular expressions are compiled down to regular opcodes (not the
-rx_* set of opcodes). P0 and P1 are PerlArrays containing the starting
-and ending indexes, respectively, of () groups. The user stack is used
-as the backtracking stack. See rx.ops for a good description of how
-operators are converted to code sequences (except I don't use the rx_*
-ops that it describes). Marks are the value -1; indices are
-nonnegative integers. (Except in debugging mode, when marks are
-instead strings describing what they're marking.) For details on
-exactly how things are translated with this compiler, read Rewrite.pm
-and Rewrite/Stackless.pm.
+Regular expressions are compiled down to regular opcodes (not the rx_*
+set of opcodes). A *Array PMC of some sort is used as the backtracking
+stack. See rx.ops for a good description of how operators are
+converted to code sequences (except I don't use the rx_* ops that it
+describes). Marks are the value -1; indices are nonnegative integers.
+(Except in debugging mode, when marks are instead strings describing
+what they're marking.) For details on exactly how things are
+translated with this compiler, read Rewrite.pm.
 
 "Local" variables:
  * One integer temporary, not preserved between tree op rewrites
@@ -134,17 +168,8 @@ Optimizations implemented (notation: parentheses here are non-capturing):
 
 Future plans:
 
-test.pl generates stack cleanup code, but regex.pl does not. I'm still
-not sure exactly where that code ought to go, because especially when
-I really start on Perl6 regular expressions, the ability to resume a
-match will be critical.
-
 Relatively soon, I would like to add array-based regular
 expressions. A simple cut of this should be nearly trivial.
-
-I'd really like to put in recursive regular expressions. See
-<http://www.puffinry.freeserve.co.uk/regex-extension.html>.
-UPDATE: Looks like Larry liked the idea too. Perl6 has 'em.
 
 Near-term optimizations planned:
 
@@ -164,19 +189,27 @@ Near-term optimizations planned:
     f    -> $start_S
     else -> backtrack
 
- Multi-character literals: currently, "abc" expands to "match a then
- match b then match c". I don't plan to do a substring match anytime
- soon, but I would like to eliminate two of the three end-of-input tests.
+ Length check suppression: if you try to match /abc/, the unoptimized
+ engine will check to be sure there's at least one character left,
+ then match 'a', then check to be sure there's still at least one
+ character left, then match 'b', etc. The tree optimization pass will
+ transform this into: check if there are at least 3 characters left,
+ then match 'a', then match 'b', then match 'c'. Obviously, this
+ particular case might be further optimized by doing some kind of
+ fixed substring match (or a Boyer-Moore "skip a number of characters
+ determined by the input and the fixed substring"), but this
+ optimization works for more general cases (such as
+ C<< a.[0-9](x|\w) >>).
 
 Longer-term optimization vague ideas:
 
- Find maximal subsequences of regex ops that can be converted to
- DFAs. Translate them into in-line DFAs. The jump tables above are a
+ Find maximal subtrees of regex ops that can be converted to DFAs.
+ Translate them into in-line DFAs. The jump tables above are a
  primitive form of this. The hard part is figuring out whether a DFA
  would produce exactly the same results as an NFA for a given
- expression. (It's a cost/benefit game. Some expressions
- trivially behave the same, some trivially behave differently, and some
- are difficult to determine.)
+ expression. (It's a cost/benefit game. Some expressions trivially
+ behave the same, some trivially behave differently, and some are
+ difficult to determine.)
 
 BUGS
 ====
@@ -197,3 +230,67 @@ of the development of this compiler, see
 http://0xdeadbeef.net/wiki/wiki.pl?FinkBlog
 
 Original author: Steve Fink <steve@fink.com>
+
+WHAT ABOUT P6GE?
+================
+
+This rule compiler is not the officially blessed one. That would be
+Patrick Michaud's p6ge, which you can find in compilers/p6ge. This
+engine predates p6ge by a year or two, but never managed to generate
+sufficient interest to get anyone else involved. Patrick must have
+been aware of this engine, since I told him about it both personally
+and in a message to perl6-internals, but he has never acknowledged its
+existence nor explained why he felt the need to start from scratch. I
+have to conclude that he either looked at it and didn't like the
+design or the implementation; or he just wanted to start from scratch
+so that he could fully understand the system he was working on. All of
+which are perfectly good reasons, so I bear no ill will towards the
+official effort.
+
+I am assuming that p6ge is going to get the momentum of the community
+behind it, so I would advise anyone interested in working on a rule
+engine to look there first. (Look for discussion on the
+perl6-internals and perl6-compiler mailing lists.) However, I still
+intend to work on this engine for a while longer, and welcome any
+interested participants. (Send any requests/comments/suggestions
+either to perl6-internals or directly to me at steve@fink.com.) So
+far, I have only briefly looked at p6ge, but I think this
+languages/regex engine has enough of a different approach that it is
+still valuable for gathering lessons -- and may still make the most
+sense in the long run.
+
+That last statement demands a bit of explanation, so here's an excerpt
+of a mail I sent out after my first look at p6ge (remember, p6ge has
+probably advanced past this point by now):
+
+It sounds like languages/regex handles pretty much exactly the same
+things as p6ge, probably a few more and a few less. I haven't actually
+looked at the code, but from the description I'd guess that the main
+differences are:
+ 
+  - p6ge is implemented in C; l/rx in Perl5
+  - p6ge generates PIR; l/rx has both PIR and Perl5 backends
+  - p6ge uses coroutines and continuations; I have always been too
+    wary of their stability, so I use plain subs (with a 'mode'
+    parameter to tell it whether to try to match or backtrack)
+  - Both allow you to "continue" a match to find all other possible
+    matches, but that's really because it falls out of any sane
+    implementation (you have to keep all that state around somehow
+    anyway)
+  - l/rx uses match objects (dynclasses/match.pmc) and automatically
+    generates a parse tree out of them
+  - p6ge has built-in "dump out the matching info" routines; I make my
+    test harnesses generate their own. I'm jealous.
+  - The feature sets are nearly identical.Makes sense, I suppose --
+    low-hanging fruit and all that.
+  - It sounds like the internal design is rather different. I try hard
+    to compile down to very minimalistic PIR ops. It sounds like p6ge
+    uses lots of higher-level operations, to do things like processing
+    a whole chunk at a time. (Although on the other hand, p6ge uses
+    more native Parrot flow control mechanisms than I do.)
+  - Closely related to the above, I have a number of optimizations
+    already implemented, but I suspect p6ge will end up with a very
+    different set of optimizations.
+  - I have on average about 5 hours a week to work on l/rx; Patrick
+    has quite a bit more :-) (Which does NOT mean that I work faster;
+    my engine is at least a year older than p6ge.)
