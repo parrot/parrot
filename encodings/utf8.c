@@ -47,6 +47,7 @@ const char Parrot_utf8skip[256] = {
 typedef unsigned char utf8_t;
 #endif
 
+static void iter_init(Interp *, String *src, String_iter *iter);
 /*
 
 =item C<static UINTVAL
@@ -475,7 +476,15 @@ become_encoding(Interp *interpreter, STRING *src)
 static UINTVAL
 codepoints(Interp *interpreter, STRING *src)
 {
-    return src->strlen;
+    String_iter iter;
+    /*
+     * this is used to initially calculate src->strlen,
+     * therefore we must scan the whole string
+     */
+    iter_init(interpreter, src, &iter);
+    while (iter.bytepos < src->bufused)
+        iter.get_and_advance(interpreter, &iter);
+    return iter.charpos;
 }
 
 static UINTVAL

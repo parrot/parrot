@@ -85,8 +85,8 @@ PackFile_Constant_dump(Interp *interpreter,
         PIO_printf(interpreter, "    [ 'PFC_STRING', {\n");
         PIO_printf(interpreter, "        FLAGS    => 0x%04lx,\n",
                    (long)PObj_get_FLAGS(self->u.string));
-        PIO_printf(interpreter, "        REPRESENTATION => %ld,\n",
-                   self->u.string->representation);
+        PIO_printf(interpreter, "        CHARSET  => %ld,\n",
+                   self->u.string->charset);
         PIO_printf(interpreter, "        SIZE     => %ld,\n",
                    (long)self->u.string->bufused);
         /* TODO: Won't do anything reasonable for most encodings */
@@ -140,7 +140,7 @@ PackFile_Constant_dump(Interp *interpreter,
 /*
 
 =item C<void
-PackFile_Fixup_dump(Interp *interpreter, 
+PackFile_Fixup_dump(Interp *interpreter,
                     struct PackFile_FixupTable *ft)>
 
 Dumps the fix-up table C<ft>.
@@ -150,7 +150,7 @@ Dumps the fix-up table C<ft>.
 */
 
 void
-PackFile_Fixup_dump(Interp *interpreter, 
+PackFile_Fixup_dump(Interp *interpreter,
                     struct PackFile_FixupTable *ft)
 {
     opcode_t i;
