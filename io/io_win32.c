@@ -308,18 +308,18 @@ PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
  */
 INTVAL
 PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-               INTVAL hi, INTVAL lo, INTVAL whence)
+               PIOOFF_T off, INTVAL whence)
 {
-    LARGE_INTEGER p, offset;
-    offset.LowPart = lo;
-    offset.HighPart = hi;
-    p.LowPart = SetFilePointer(io->fd, offset.LowPart,
+    LARGE_INTEGER offset;
+    offset.QuadPart = off;
+    /* offset.HighPart gets overwritten */
+    offset.LowPart = SetFilePointer(io->fd, offset.LowPart,
                                &offset.HighPart, whence);
-    if (p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
+    if (offset.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
         /* Error - exception */
         return -1;
     }
-    io->fpos = p.QuadPart;
+    io->fpos = offset.QuadPart;
     return 0;
 }
 

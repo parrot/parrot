@@ -50,7 +50,7 @@ size_t PIO_unix_write(theINTERP, ParrotIOLayer *layer,
                       ParrotIO *io, const void *buffer, size_t len);
 INTVAL PIO_unix_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s);
 INTVAL PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                     INTVAL hi, INTVAL lo, INTVAL whence);
+                     PIOOFF_T offset, INTVAL whence);
 PIOOFF_T PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
 
@@ -386,23 +386,17 @@ PIO_unix_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
 
 /*
  * Hard seek
- * FIXME: 64bit support, ignoring 'hi' 32bits for now
  */
 INTVAL
 PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-              INTVAL hi, INTVAL lo, INTVAL whence)
+              PIOOFF_T offset, INTVAL whence)
 {
     PIOOFF_T pos;
     errno = 0;
-    /* Whenever Configure defines a constant we can use here. */
-#  ifndef _HAVE_LARGEFILESUPPORT_BLAH
-    if ((pos = lseek(io->fd, (PIOOFF_T)lo, whence)) >= 0) {
+    if ((pos = lseek(io->fd, offset, whence)) >= 0) {
         io->lpos = io->fpos;
         io->fpos = pos;
     }
-#  else
-    /* Use llseek, lseek64, etc. from Configure */
-#  endif
     /* Seek clears EOF */
     io->flags &= ~PIO_F_EOF;
     return (((INTVAL)pos != -1) ? 0 : -1);

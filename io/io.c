@@ -620,19 +620,17 @@ PIO_write(theINTERP, PMC *pmc, void *buffer, size_t len)
 
 
 /*
- * 64 bit support wrapper. Some platforms/filesystems don't
- * support large files. Pass hi as 0 for 32bit seek. There is
- * a 1 and 2 arg version of seek opcode.
+ * Iterate down the stack to the first layer implementing "Seek" API
  */
 INTVAL
-PIO_seek(theINTERP, PMC *pmc, INTVAL hi, INTVAL lo, INTVAL w)
+PIO_seek(theINTERP, PMC *pmc, PIOOFF_T offset, INTVAL w)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
 
     while (l) {
         if (l->api->Seek) {
             ParrotIO *io = PMC_data(pmc);
-            return (*l->api->Seek) (interpreter, l, io, hi, lo, w);
+            return (*l->api->Seek) (interpreter, l, io, offset, w);
         }
         l = PIO_DOWNLAYER(l);
     }
@@ -801,6 +799,25 @@ Parrot_IOData_mark(theINTERP, ParrotIOData *piodata)
             pobject_lives(interpreter, (PObj *)table[i]);
         }
     }
+}
+
+PIOOFF_T
+PIO_make_offset(INTVAL offset)
+{
+    return offset;
+}
+
+PIOOFF_T
+PIO_make_offset32(INTVAL hi, INTVAL lo)
+{
+    return ((PIOOFF_T)hi << 32) | lo;
+}
+
+PIOOFF_T
+PIO_make_offset_pmc(theINTERP, PMC *pmc)
+{
+    /* XXX: Maybe use bignums here */
+    return VTABLE_get_integer(interpreter, pmc);
 }
 
 /*

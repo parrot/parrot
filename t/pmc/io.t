@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "open/close");
@@ -269,4 +269,22 @@ output_is(<<'CODE', <<'OUTPUT', 'puts method');
        end
 CODE
 ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'seek/tell');
+       open P0, "temp.file", ">"
+       print P0, "Hello "
+       tell I0, P0
+       print P0, "World!"
+       seek P0, I0, 0
+       print P0, "Parrot!\n"
+       close P0
+       print "ok 1\n"
+       open P0, "temp.file", "<"
+       read S0, P0, 65635
+       print S0
+       end
+CODE
+ok 1
+Hello Parrot!
 OUTPUT

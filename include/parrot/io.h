@@ -250,8 +250,7 @@ struct _ParrotIOLayerAPI {
     INTVAL          (*Flush)(theINTERP, ParrotIOLayer * layer,
                              ParrotIO * io);
     INTVAL          (*Seek)(theINTERP, ParrotIOLayer * layer,
-                            ParrotIO * io, INTVAL hi, INTVAL lo,
-                            INTVAL whence);
+                            ParrotIO * io, PIOOFF_T offset, INTVAL whence);
     PIOOFF_T        (*Tell)(theINTERP, ParrotIOLayer * layer,
                             ParrotIO * io);
     INTVAL          (*SetBuf)(theINTERP, ParrotIOLayer * layer,
@@ -283,7 +282,7 @@ struct _ParrotIOLayerAPI {
 #define PIO_null_read (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const void *, size_t))0
 #define PIO_null_read_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
 #define PIO_null_flush (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_seek (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, INTVAL, INTVAL, INTVAL))0
+#define PIO_null_seek (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, PIOOFF_T, INTVAL))0
 #define PIO_null_tell (PIOOFF_T (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_setbuf (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, size_t))0
 #define PIO_null_setlinebuf (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
@@ -326,8 +325,7 @@ extern INTVAL PIO_write(theINTERP, PMC *, void *, size_t);
 extern INTVAL PIO_setbuf(theINTERP, PMC *, size_t);
 extern INTVAL PIO_setlinebuf(theINTERP, PMC *);
 extern INTVAL PIO_puts(theINTERP, PMC *, const char *);
-extern INTVAL PIO_seek(theINTERP, PMC *, INTVAL hi,
-                       INTVAL lo, INTVAL whence);
+extern INTVAL PIO_seek(theINTERP, PMC *, PIOOFF_T offset, INTVAL whence);
 extern INTVAL PIO_eof(theINTERP, PMC *);
 
 extern INTVAL PIO_putps(theINTERP, PMC *io, STRING *s);
@@ -359,6 +357,9 @@ extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 #  define PIO_getblksize(x)   PIO_stdio_getblksize(x)
 #endif
 
+PIOOFF_T PIO_make_offset(INTVAL offset);
+PIOOFF_T PIO_make_offset32(INTVAL hi, INTVAL lo);
+PIOOFF_T PIO_make_offset_pmc(theINTERP, PMC *pmc);
 
 #endif
 

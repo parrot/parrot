@@ -378,30 +378,67 @@ inline op readline(out STR, in PMC) {
 
 ##########################################
 
-=item B<seek>(out INT, in PMC, in INT, in INT)
+=item B<seek>(in PMC, in INT, in INT)
 
-32bit seek:
-Set file position to offset $3 on IO stream $2. 'whence' is
-indicated by the value in $4.
+seek:
+Set file position to offset $2 on IO stream $1. 'whence' is
+indicated by the value in $3.
 
-=item B<seek>(out INT, in PMC, in INT, in INT, in INT)
+=item B<seek>(in PMC, in INT, in INT, in INT)
 
 64bit seek:
-Set file position to offset ($3 << 32 | $4) on IO stream $2. 'whence' is
-indicated by the value in $4.
+Set file position to offset ($2 << 32 | $3) on IO stream $1. 'whence' is
+indicated by the value in $4. This allows 64-bit seeks with only 32-bit
+INTVALS.
 
 =cut
 
-op seek(out INT, in PMC, in INT, in INT) {
-  if ($2) {
-    $1 = (INTVAL)PIO_seek(interpreter, $2, 0, $3, $4);
+op seek(in PMC, in INT, in INT) {
+  if ($1) {
+    if (PIO_seek(interpreter, $1, PIO_make_offset($2), $3) < 0) {
+      /* XXX: seek error */
+    }
   }
   goto NEXT();
 }
 
-op seek(out INT, in PMC, in INT, in INT, in INT) {
+op seek(in PMC, in INT, in INT, in INT) {
+  if ($1) {
+    if (PIO_seek(interpreter, $1, PIO_make_offset32($2, $3), $4) < 0) {
+      /* XXX: seek error */
+    }    
+  }
+  goto NEXT();
+}
+
+=item B<tell>(out INT, in PMC)
+
+tell:
+Get the current file position of stream $2 and store it in $1.
+On systems where INTVAL is 32bit the result will be truncated if the 
+position is beyond 2 GiB
+
+=item B<tell>(out INT, out INT, in PMC)
+
+64bit tell:
+Get the current file positon of stream $3 in two parts of 32-bit each
+($1 = pos >> 32, $2 = pos & 0xffff).
+
+=cut
+
+op tell(out INT, in PMC) {
   if ($2) {
-    $1 = (INTVAL)PIO_seek(interpreter, $2, $3, $4, $5);
+    $1 = (INTVAL)PIO_tell(interpreter, $2);
+  }
+  goto NEXT();
+}
+
+op tell(out INT, out INT, in PMC) {
+  if ($3) {
+    PIOOFF_T pos;
+    pos = PIO_tell(interpreter, $3);
+    $1 = (INTVAL)(pos >> 32);
+    $2 = (INTVAL)(pos & 0xffff);
   }
   goto NEXT();
 }

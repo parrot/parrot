@@ -52,7 +52,7 @@ size_t PIO_stdio_write(theINTERP, ParrotIOLayer *layer,
 INTVAL PIO_stdio_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                       const char *s);
 INTVAL PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                     INTVAL hi, INTVAL lo, INTVAL whence);
+                     PIOOFF_T offset, INTVAL whence);
 PIOOFF_T PIO_stdio_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
 
@@ -237,16 +237,15 @@ PIO_stdio_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
 
 /*
  * Hard seek
- * FIXME: 64bit support, ignoring 'hi' 32bits for now
  */
 INTVAL
 PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-              INTVAL hi, INTVAL lo, INTVAL whence)
+              PIOOFF_T offset, INTVAL whence)
 {
     PIOOFF_T pos;
     errno = 0;
 
-    if ((pos = fseek(io->fd, (PIOOFF_T)lo, whence)) >= 0) {
+    if ((pos = fseek(io->fd, offset, whence)) >= 0) {
         io->lpos = io->fpos;
         io->fpos = pos;
     }
