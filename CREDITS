@@ -71,6 +71,9 @@ D: JIT and EXEC subsystems
 
 N: David M. Loyd
 
+N: Dennis Rieks
+D: Win32 config and build
+
 N: Goplat
 D: Win98 and other fixes.
 

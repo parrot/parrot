@@ -330,12 +330,12 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', 'puts method');
        set S5, "ok 2\n"
-       getstdout P5
-       can I0, P5, "puts"
+       getstdout P2
+       can I0, P2, "puts"
        if I0, ok1
        print "not "
 ok1:   print "ok 1\n"
-       find_method P0, P5, "puts"
+       find_method P0, P2, "puts"
        invoke
        end
 CODE

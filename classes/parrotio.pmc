@@ -48,23 +48,15 @@ Class initialization.
         Parrot_PerlUndef_class_init(interp, enum_class_PerlUndef);
 
         enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_close), "close", "iIP");
+                         F2DPTR(PIO_flush), "flush", "vIO");
         enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_flush), "flush", "vIP");
+                         F2DPTR(PIO_setbuf), "setbuf", "iIOi");
         enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_read), "read", "iIPii");
+                         F2DPTR(PIO_setlinebuf), "setlinebuf", "iIO");
         enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_write), "write", "iIPii");
+                         F2DPTR(PIO_puts), "puts", "iIOt");
         enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_setbuf), "setbuf", "iIPi");
-        enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_setlinebuf), "setlinebuf", "iIP");
-        enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_puts), "puts", "iIPt");
-        enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_seek), "seek", "iIPiii");
-        enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_eof), "eof", "iIP");
+                         F2DPTR(PIO_eof), "eof", "iIO");
     }
 
 /*

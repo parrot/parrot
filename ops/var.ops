@@ -244,24 +244,12 @@ Store global $3 as global symbol $2 in namespace $1
 =cut
 
 op store_global(in STR, in PMC) {
-    /* XXX: All globals should go through an API */
-    PMC * globals = interpreter->globals->stash_hash;
-    VTABLE_set_pmc_keyed_str(interpreter, globals, $1, $2);
+    Parrot_store_global(interpreter, NULL, $1, $2);
     goto NEXT();
 }
 
 op store_global(in STR, in STR, in PMC) {
-    /* XXX: All globals should go through an API */
-    PMC * globals = interpreter->globals->stash_hash;
-    PMC * stash;
-    if (!VTABLE_exists_keyed_str(interpreter, globals, $1)) {
-	stash = pmc_new(interpreter, enum_class_OrderedHash);
-	VTABLE_set_pmc_keyed_str(interpreter, globals, $1, stash);
-    }
-    else {
-        stash = VTABLE_get_pmc_keyed_str(interpreter, globals, $1);
-    }
-    VTABLE_set_pmc_keyed_str(interpreter, stash, $2, $3);
+    Parrot_store_global(interpreter, $1, $2, $3);
     goto NEXT();
 }
 

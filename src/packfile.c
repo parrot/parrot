@@ -2776,22 +2776,6 @@ Unpack a constant PMC (currently Subs only).
 
 */
 
-static PMC*
-add_global(Parrot_Interp interpreter, PMC *globals, STRING *names)
-{
-    PMC *stash;
-
-    if (!VTABLE_exists_keyed_str(interpreter, globals, names)) {
-        stash = pmc_new(interpreter, enum_class_OrderedHash);
-        VTABLE_set_pmc_keyed_str(interpreter, globals, names,
-                stash);
-    }
-    else {
-        stash = VTABLE_get_pmc_keyed_str(interpreter, globals,
-                names);
-    }
-    return stash;
-}
 
 static void
 store_sub_in_namespace(Parrot_Interp interpreter, struct PackFile *pf,
@@ -2830,8 +2814,7 @@ global_ns:
                 names = pfc_const->u.string;
                 if (!string_length(interpreter, names))
                     goto global_ns;
-                stash = add_global(interpreter, globals, names);
-                VTABLE_set_pmc_keyed_str(interpreter, stash, key, sub_pmc);
+                Parrot_store_global(interpreter, names, key, sub_pmc);
                 break;
             case PFC_KEY:
                 part = pfc_const->u.key;
@@ -2840,7 +2823,7 @@ global_ns:
 #if TRACE_PACKFILE_PMC
                     PIO_printf(interpreter, "key part %Ss\n", s);
 #endif
-                    stash = add_global(interpreter, globals, s);
+                    stash = Parrot_global_namespace(interpreter, globals, s);
                     globals = stash;
                 }
                 VTABLE_set_pmc_keyed_str(interpreter, stash, key, sub_pmc);

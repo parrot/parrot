@@ -13,7 +13,9 @@
 #if !defined(PARROT_GLOBAL_H_GUARD)
 #define PARROT_GLOBAL_H_GUARD
 
-PMC *Parrot_find_global(Parrot_Interp, STRING *class, STRING *globalname);
+PMC *Parrot_find_global(Interp *, STRING *class, STRING *globalname);
+PMC *Parrot_global_namespace(Interp *, PMC *globals, STRING *ns);
+void Parrot_store_global(Interp *, STRING *class, STRING *globalname, PMC *pmc);
 
 #endif /* PARROT_GLOBAL_H_GUARD */
 

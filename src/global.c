@@ -87,6 +87,59 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 #endif
 }
 
+/*
+
+=item C<PMC* Parrot_global_namespace(Interp *, PMC *globals, STRING *ns)>
+
+Return the stash hash of the given namespace in C<globals>.
+If it doesn't exist yet, add it to the stash C<globals>.
+
+=cut
+
+*/
+
+PMC*
+Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *names)
+{
+    PMC *stash;
+
+    if (!VTABLE_exists_keyed_str(interpreter, globals, names)) {
+        stash = pmc_new(interpreter, enum_class_OrderedHash);
+        VTABLE_set_pmc_keyed_str(interpreter, globals, names,
+                stash);
+    }
+    else {
+        stash = VTABLE_get_pmc_keyed_str(interpreter, globals,
+                names);
+    }
+    return stash;
+}
+
+/*
+
+=item C<void
+Parrot_store_global(Parrot_Interp, STRING *class, STRING *globalname, PMC *)>
+
+Store the given PMC as global C<globalname> in the namespace C<class>. If
+C<class> is NULL, the top-level global namespace is used.
+
+=cut
+
+*/
+
+void
+Parrot_store_global(Interp *interpreter, STRING *class,
+        STRING *globalname, PMC *pmc)
+{
+    PMC *globals = interpreter->globals->stash_hash;
+    PMC *stash;
+    if (class) {
+        stash = Parrot_global_namespace(interpreter, globals, class);
+    }
+    else
+        stash = globals;
+    VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
+}
 
 /*
 
