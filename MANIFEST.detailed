@@ -133,6 +133,7 @@
 [devel]doc	docs/dev/dod.dev
 [devel]doc	docs/dev/infant.dev
 [main]doc	docs/dev/jit_i386.dev
+[main]doc       docs/dev/longopt.dev
 [main]doc	docs/dev/rx.dev
 [main]doc	docs/embed.pod
 [main]doc	docs/faq.pod
@@ -1262,6 +1263,7 @@
 [devel]include	include/parrot/jit.h
 [devel]include	include/parrot/key.h
 [devel]include	include/parrot/list.h
+[devel]include	include/parrot/longopt.h
 [devel]include	include/parrot/memory.h
 [devel]include	include/parrot/method_util.h
 [devel]include	include/parrot/misc.h
@@ -1736,6 +1738,7 @@
 [devel]		lib/Text/Balanced.pm
 []		libnci.def
 []		list.c
+[]		longopt.c
 []		make.pl
 []		malloc.c
 []		malloc-trace.c

@@ -10,6 +10,7 @@
  *  References:
  */
 #include "parrot/embed.h"
+#include "parrot/longopt.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +19,21 @@
 #define unsetopt(flag) Parrot_setflag(interpreter, flag, 0)
 
 char *parseflags(Parrot_Interp interpreter, int *argc, char **argv[]);
+
+static struct longopt_opt_decl options[] = {
+    { 'b', 'b', 0,       { "--bounds-checks", NULL } },
+    { 'd', 'd', 0,       { "--debugging", NULL } },
+    { 'h', 'h', 0,       { "--help", NULL } },
+    { 'j', 'j', 0,       { "--jit", NULL } },
+    { 'p', 'p', 0,       { "--profiling", NULL } },
+    { 'P', 'P', 0,       { "--predereferencing", NULL } },
+    { 'g', 'g', 0,       { "--no-computed-goto", NULL } },
+    { 't', 't', 0,       { "--tracing", NULL } },
+    { 'v', 'v', 0,       { "--version", NULL } },
+    { '.', '.', 0,       { "--wait", NULL } },
+    {'\0', 128, 0,       { "--gc-debug", NULL } },
+    {'\0',   0, 0,       { NULL } }
+};
 
 static void usage(void);
 
@@ -58,20 +74,28 @@ main(int argc, char *argv[])
 char *
 parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
 {
+    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+    
     if (*argc == 1) {
         usage();
     }
 
-    /* skip the program name arg */
-    (*argc)--;
-    (*argv)++;
+    ++*argv;
+    --*argc;
+    opt.opt_index = 0;
+    
 
 #ifdef HAVE_COMPUTED_GOTO
     setopt(PARROT_CGOTO_FLAG);
 #endif
 
-    while ((*argc) && (*argv)[0][0] == '-') {
-        switch ((*argv)[0][1]) {
+    while (longopt_get(*argc, *argv, options, &opt)) {
+        if (opt.opt_id == -1) {
+            fprintf(stderr, "parrot: %s\n", opt.opt_error);
+            Parrot_exit(1);
+        }
+        
+        switch (opt.opt_id) {
         case 'b':
             setopt(PARROT_BOUNDS_FLAG);
             break;
@@ -107,35 +131,27 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
                     * attach a debuggger. */
             fgetc(stdin);
             break;
-        case '-':
-            if ((*argv)[0][2] == '\0') {
-                (*argc)--;
-                (*argv)++;
-                goto OUT;
-            } else if (strncmp((*argv)[0], "--gc-debug", 10) == 0) {
+        case 128:
 #if DISABLE_GC_DEBUG
-                Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG,
-                            "PARROT_GC_DEBUG is set but the binary was "
-                            "compiled with DISABLE_GC_DEBUG.");
+            Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG,
+                        "PARROT_GC_DEBUG is set but the binary was "
+                        "compiled with DISABLE_GC_DEBUG.");
 #endif
-                setopt(PARROT_GC_DEBUG_FLAG);
-                break;
-            }
-        case '\0':             /* bare '-' means read from stdin */
-            goto OUT;
-        default:
-            fprintf(stderr, "parrot: Invalid flag %c used\n",
-                    (*argv)[0][1]);
-            Parrot_exit(1);
+            setopt(PARROT_GC_DEBUG_FLAG);
+            break;
         }
-
-        (*argc)--;
-        (*argv)++;
     }
+    *argv += opt.opt_index;
+    *argc -= opt.opt_index;
 
   OUT:
 
-    return (*argv)[0];
+    if ((*argv)[0])
+        return (*argv)[0];
+    else {
+        usage();
+        return 0;   /* This won't happen */
+    }
 }
 
 static void
@@ -149,17 +165,18 @@ usage(void)
 
     fprintf(stderr,
 "Usage: parrot [switches] [--] programfile [arguments]\n\
-  -b    Activate bounds checks\n\
-  -d    Activate debugging\n\
-  -h    Display this message\n\
-  -j    Activate Just-In-Time compiler\n\
-  -p    Activate profiling\n\
-  -P    Activate predereferencing\n\
-  -g    %s\n\
-  -t    Activate tracing\n\
-  -v    Display version information\n\
-  -.    Wait for a keypress (gives Windows users time to attach a debugger)\n\
-  --gc-debug\n\
+  -b  --bounds-checks           Activate bounds checks\n\
+  -d  --debugging               Activate debugging\n\
+  -h  --help                    Display this message\n\
+  -j  --jit                     Activate Just-In-Time compiler\n\
+  -p  --profiling               Activate profiling\n\
+  -P  --predereferencing        Activate predereferencing\n\
+  -g  --no-computed-goto        %s\n\
+  -t  --tracing                 Activate tracing\n\
+  -v  --version                 Display version information\n\
+  -.  --wait                    Wait for a keypress (gives Windows users\n\
+                                    time to attach a debugger)\n\
+      --gc-debug\n\
         Enable garbage collection debugging mode. This may also be enabled\n\
         by setting the environment variable $PARROT_GC_DEBUG to 1.\n\
 \n",
