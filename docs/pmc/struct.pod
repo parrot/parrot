@@ -23,18 +23,30 @@ The datatype is defined by constants declared in B<datatypes.pasm>.
 
 =item Array Size
 
-The second initializer item if set to a value greater then 1 defines
+The second initializer item, if set to a value greater then 1, defines
 the struct element to consist of an array of the given data type.
 
 =item Byte Offset
 
-The third initializer is the byte offset of the data item in the
-structure. This entry can be 0 if packing of the structure is aligned to
-the items sizes. Otherwise these offsets must be set correctly as Parrot
-doesn't know, how your C compiler packs arbitray data. Parrot only knows
-the size of each item.
+The third initializer is the byte offset of the data item in the structure.
+This entry can be 0 if packing of the structure is aligned to the item's sizes
+or the alignment is the item's size. Otherwise these offsets must be set
+correctly as Parrot doesn't know, how your C compiler packs arbitray data.
+Parrot only knows the size of each item.
 
 =back
+
+=head2 Alignment
+
+Parrot tries to do The Right Thing that is currently align items at
+their size.
+
+  struct {
+    char c;
+    int  i;
+  }
+
+The B<i> above is aligned at 4 (for i386 or such).
 
 =head2 Example
 
@@ -46,7 +58,7 @@ The C structure
     int    i[4];
   };
 
-is declared with this initializer:
+can be declared with this initializer:
 
   new P2, .PerlArray
   .include "datatypes.pasm"
@@ -59,6 +71,20 @@ is declared with this initializer:
   push P2, .DATATYPE_INT
   push P2, 4	# 4 elem array
   push P2, 0
+
+=head2 Named Structure Elements
+
+The initializer can be an OrderedHash PMC too. When all elements are
+defined in the correct order this can be used to define and access
+struct elements by name and by index:
+
+  new P2, .OrderedHash
+  .include "datatypes.pasm"
+  set P2["d"], .DATATYPE_DOUBLE
+  push P2, 0	# no array i.e. 1 element
+  push P2, 0	# calculate offset by just adding item size
+  set P2["f"], .DATATYPE_FLOAT
+  ...
 
 =head1 Calculating the Size of a Structure
 
@@ -82,7 +108,18 @@ in the following example:
   set P5, I6	# allocate size
 
 If packing of structure items produces holes, they have to be accounted
-for.
+for - but see below.
+
+The calculation can be simplified a bit, by accessing the offset of the
+last item and only adding the size of that. (When an initializer is
+assigned to the struct, zero offsets are recalculated).
+
+So for above example:
+
+  set I6, P2[8]	# offset of 3rd struct element i[4]
+  sizeof I7, .DATATYPE_INT
+  mul I7, 4
+  add I6, I7	# I6 is now the total size
 
 =head1 Accessing Structure Items
 
@@ -95,12 +132,16 @@ n-th array element.
   set P5[0], N0		# set d
   set N0, P5[0]		# get d
 
+  set N0, P5["d"]       # get d if initializer is an OrderedHash
+
   set P5[1], N1		# set f
   set N1, P5[1]		# get f
-
+  set N1, P5["f"]       # get f if initializer is an OrderedHash
 
   set P5[2;0], I2	# set i[0]
   set I3, P5[2;3]	# get i[3]
+
+  set P5["i"; 2]        # set i[2] if initializer is an OrderedHash
 
 =head1 Passing A Structure to a C function
 
@@ -124,7 +165,7 @@ a pointer to the structure is passed with the B<p> signature char:
 
 =head1 BUGS
 
-Only a few datatypes are implemented.
+Only a few datatypes are implemented. Alignment is buggy.
 
 =head1 FILES
 

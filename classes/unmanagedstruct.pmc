@@ -14,6 +14,7 @@
  *     Initial revision by sean 2002/08/04
  *  Notes:
  *  References:
+ *     F<docs/pmc/struct.pod>
  */
 
 #include "parrot/parrot.h"
