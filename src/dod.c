@@ -700,6 +700,26 @@ trace_mem_block(struct Parrot_Interp *interpreter,
 }
 #endif
 
+static PARROT_INLINE void
+profile_dod_start(Parrot_Interp interpreter)
+{
+    if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+        interpreter->profile->dod_time = Parrot_floatval_time();
+    }
+}
+
+static PARROT_INLINE void
+profile_dod_end(Parrot_Interp interpreter)
+{
+    if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+        RunProfile *profile = interpreter->profile;
+        FLOATVAL now = Parrot_floatval_time();
+
+        profile->data[PARROT_PROF_DOD].numcalls++;
+        profile->data[PARROT_PROF_DOD].time += now - profile->dod_time;
+        profile->starttime += now - profile->dod_time;
+    }
+}
 
 /* See if we can find some unused headers */
 void
@@ -714,6 +734,8 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, int trace_stack)
         return;
     }
     Parrot_block_DOD(interpreter);
+    if (interpreter->profile)
+        profile_dod_start(interpreter);
 
 #if ARENA_DOD_FLAGS
     clear_live_counter(interpreter, interpreter->arena_base->pmc_pool);
@@ -767,6 +789,8 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, int trace_stack)
     }
     /* Note it */
     interpreter->dod_runs++;
+    if (interpreter->profile)
+        profile_dod_end(interpreter);
     Parrot_unblock_DOD(interpreter);
     return;
 }

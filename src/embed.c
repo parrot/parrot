@@ -333,6 +333,22 @@ prof_sort_f(const void *a, const void *b)
     return 0;
 }
 
+static const char *
+op_name(Parrot_Interp interpreter, int k)
+{
+    switch (k) {
+        case PARROT_PROF_DOD:
+            return "DOD";
+        case PARROT_PROF_GC:
+            return "GC";
+        case PARROT_PROF_EXCEPTION:
+            return "EXCEPTION";
+        default:
+            break;
+    }
+    return interpreter->op_info_table[k - PARROT_PROF_EXTRA].full_name;
+}
+
 static void
 print_profile(int status, void *p)
 {
@@ -365,10 +381,8 @@ print_profile(int status, void *p)
 
                 k = interpreter->profile->data[j].op;
                 PIO_printf(interpreter, "  %5d  %-20s  %7vu  %10vf  %10vf\n",
-                        k,
-                        k == (int)interpreter->op_count ?
-                        "Exception" :
-                        interpreter->op_info_table[k].full_name,
+                        k - PARROT_PROF_EXTRA,
+                        op_name(interpreter, k),
                         n,
                         t,
                         (FLOATVAL)(t / n)

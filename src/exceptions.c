@@ -362,11 +362,12 @@ real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
      */
     if (interpreter->profile &&
             Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        interpreter->profile->data[*interpreter->cur_pc].time +=
-                Parrot_floatval_time() - interpreter->profile->starttime;
-        interpreter->cur_pc = (opcode_t*) &interpreter->op_count;
-        interpreter->profile->starttime = Parrot_floatval_time();
-        interpreter->profile->data[interpreter->op_count].numcalls++;
+        RunProfile *profile = interpreter->profile;
+        FLOATVAL now = Parrot_floatval_time();
+        profile->data[profile->cur_op].time += now - profile->starttime;
+        profile->cur_op = PARROT_PROF_EXCEPTION;
+        profile->starttime = now;
+        profile->data[PARROT_PROF_EXCEPTION].numcalls++;
     }
 
     /*

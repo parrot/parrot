@@ -147,6 +147,26 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
 }
 
 
+static PARROT_INLINE void
+profile_gc_start(Parrot_Interp interpreter)
+{
+    if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+        interpreter->profile->gc_time = Parrot_floatval_time();
+    }
+}
+
+static PARROT_INLINE void
+profile_gc_end(Parrot_Interp interpreter)
+{
+    if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+        RunProfile *profile = interpreter->profile;
+        FLOATVAL now = Parrot_floatval_time();
+
+        profile->data[PARROT_PROF_GC].numcalls++;
+        profile->data[PARROT_PROF_GC].time += now - profile->gc_time;
+        profile->starttime += now - profile->gc_time;
+    }
+}
 
 /** Compaction Code **/
 
@@ -168,6 +188,8 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
         return;
     }
     Parrot_block_GC(interpreter);
+    if (interpreter->profile)
+        profile_gc_start(interpreter);
 
     /* We're collecting */
     interpreter->mem_allocs_since_last_collect = 0;
@@ -351,6 +373,8 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
     pool->guaranteed_reclaimable = 0;
     pool->possibly_reclaimable = 0;
+    if (interpreter->profile)
+        profile_gc_end(interpreter);
     Parrot_unblock_GC(interpreter);
 
 }

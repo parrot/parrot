@@ -83,9 +83,17 @@ typedef STRING_FUNCS *(**string_funcs)();      /* String function table */
 #endif
 
 /*
- * one entry per op + extra
+ * ProfData have these extra items in front followed by
+ * one entry per op at (op + extra)
  */
-#define PARROT_PROF_EXTRA 1
+
+typedef enum {
+     PARROT_PROF_DOD,
+     PARROT_PROF_GC,
+     PARROT_PROF_EXCEPTION,
+     PARROT_PROF_EXTRA
+} profile_extra_enum;
+
 /*
  * data[op_count] is time spent for exception handling
  */
@@ -95,8 +103,11 @@ typedef struct ProfData {
     FLOATVAL time;
 } ProfData;
 
-typedef struct RunProfile {
+typedef struct _RunProfile {
     FLOATVAL starttime;
+    FLOATVAL dod_time;
+    FLOATVAL gc_time;
+    opcode_t cur_op;
     ProfData *data;
 } RunProfile;
 

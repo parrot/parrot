@@ -62,7 +62,6 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*=for api interpreter runops_slow_core
  *
  * With tracing.
- * With profiling.
  * With bounds checking.
  */
 
@@ -114,10 +113,6 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 
     while (pc) {/* && pc >= code_start && pc < code_end) {*/
         interpreter->cur_pc = pc;
-        if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-            interpreter->profile->data[*pc].numcalls++;
-            interpreter->profile->starttime = Parrot_floatval_time();
-        }
 
         DO_OP(pc, interpreter);
 
@@ -129,10 +124,6 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #else
             trace_op(interpreter, code_start, code_end, pc);
 #endif
-        }
-        if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-            interpreter->profile->data[*interpreter->cur_pc].time +=
-                Parrot_floatval_time() - interpreter->profile->starttime;
         }
     }
 #ifdef USE_TRACE_INTERP
@@ -149,8 +140,29 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
        "Error: Control left bounds of byte-code block (now at location %d)!\n",
        (int)(pc - code_start));
        }*/
-#undef code_stat
+#undef code_start
 #undef code_end
+    return pc;
+}
+
+opcode_t *
+runops_profile_core(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+    opcode_t *code_start, *code_end, cur_op;
+    RunProfile *profile = interpreter->profile;
+
+    while (pc) {/* && pc >= code_start && pc < code_end) */
+        interpreter->cur_pc = pc;
+        profile->cur_op = cur_op = *pc + PARROT_PROF_EXTRA;
+        profile->data[cur_op].numcalls++;
+        profile->starttime = Parrot_floatval_time();
+
+        DO_OP(pc, interpreter);
+
+        /* profile->cur_op may be different, if exception was thrown */
+        profile->data[profile->cur_op].time +=
+            Parrot_floatval_time() - profile->starttime;
+    }
     return pc;
 }
 

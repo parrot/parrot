@@ -493,9 +493,10 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
                 core = runops_slow_core;
 
                 if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+                    core = runops_profile_core;
                     if (interpreter->profile == NULL) {
                         interpreter->profile = (RunProfile *)
-                            mem_sys_allocate(sizeof(RunProfile));
+                            mem_sys_allocate_zeroed(sizeof(RunProfile));
                         interpreter->profile->data = (ProfData *)
                             mem_sys_allocate_zeroed((interpreter->op_count +
                                         PARROT_PROF_EXTRA) * sizeof(ProfData));
@@ -622,10 +623,12 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
         offset = handle_exception(interpreter);
     }
     if (interpreter->profile &&
-            interpreter->cur_pc == (opcode_t*)&interpreter->op_count &&
             Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        interpreter->profile->data[*interpreter->cur_pc].time +=
-            Parrot_floatval_time() - interpreter->profile->starttime;
+        RunProfile *profile = interpreter->profile;
+        if (profile->cur_op == PARROT_PROF_EXCEPTION) {
+            profile->data[PARROT_PROF_EXCEPTION].time +=
+                Parrot_floatval_time() - profile->starttime;
+        }
     }
 #endif
     runops_ex(interpreter, offset);
@@ -996,8 +999,10 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         Parrot_destroy_vtable(interpreter, Parrot_base_vtables[i]);
     mmd_destroy(interpreter);
 
-    if (interpreter->profile)
+    if (interpreter->profile) {
+        mem_sys_free(interpreter->profile->data);
         mem_sys_free(interpreter->profile);
+    }
 
     /* deinit op_lib */
     (void) PARROT_CORE_OPLIB_INIT(0);
