@@ -76,6 +76,8 @@ SV* output_bytecode(SV* sv) {
     outbyte = malloc(tmp);
 
     /* AFTER ALL THAT! */
+    /* XXX JMG Need to free this block at some point */
+    pf->header = malloc(sizeof(struct PackFile_Header));
     PackFile_pack(pf, outbyte);
 
     /* Now format the output as an SV */
@@ -83,7 +85,6 @@ SV* output_bytecode(SV* sv) {
 
     // PackFile_destroy(pf);
     return out;
-    
 }
 
 MODULE = Parrot::PakFile2		PACKAGE = Parrot::PakFile2		
