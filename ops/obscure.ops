@@ -4,6 +4,8 @@
 
 #include <math.h>
 
+VERSION = 0.3;
+
 =head1 NAME
 
 obscure.ops

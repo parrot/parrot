@@ -75,6 +75,125 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *), struct P
     }
 }
 
+/*=for api interpreter init_prederef
+ */
+
+static void *       prederef_oplib_handle = NULL;
+static oplib_init_f prederef_oplib_init   = NULL;
+static op_lib_t *   prederef_oplib        = NULL;
+static INTVAL       prederef_op_count     = 0;
+static op_info_t *  prederef_op_info      = NULL;
+static op_func_t *  prederef_op_func      = NULL;
+
+void
+init_prederef(struct Parrot_Interp * interpreter)
+{
+  char file_name[50];
+  char func_name[50];
+
+  sprintf(file_name, "lib%s_prederef_%d_%d.so", PARROT_CORE_OPLIB_NAME,
+    PARROT_CORE_OPLIB_MAJOR_VERSION, PARROT_CORE_OPLIB_MINOR_VERSION);
+
+  sprintf(func_name, "Parrot_DynOp_%s_prederef_%d_%d",
+    PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION,
+    PARROT_CORE_OPLIB_MINOR_VERSION);
+
+  /*
+  ** Get a handle to the library file:
+  */
+
+  prederef_oplib_handle = Parrot_dlopen(file_name);
+
+  if (!prederef_oplib_handle) {
+    fprintf(stderr, "Unable to dynamically load oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+      file_name, PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, PARROT_CORE_OPLIB_MINOR_VERSION);
+
+    exit(1);
+  }
+
+  /*
+  ** Look up the init function:
+  */
+
+  prederef_oplib_init   = Parrot_dlsym(prederef_oplib_handle, func_name);
+
+  if (!prederef_oplib_init) {
+    fprintf(stderr, "No exported symbol for oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+      func_name, file_name,
+      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, PARROT_CORE_OPLIB_MINOR_VERSION);
+
+    exit(1);
+  }
+
+  /*
+  ** Run the init function to get the oplib info:
+  */
+
+  prederef_oplib        = prederef_oplib_init();
+
+  if (!prederef_oplib) {
+    fprintf(stderr, "No oplib info returned by oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+      func_name, file_name,
+      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, PARROT_CORE_OPLIB_MINOR_VERSION);
+    exit(1);
+  }
+
+  /*
+  ** Validate the op count:
+  */
+
+  prederef_op_count     = prederef_oplib->op_count;
+
+  if (prederef_op_count <= 0) {
+    fprintf(stderr, "Illegal op count (%d) from oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+      prederef_op_count, file_name,
+      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, PARROT_CORE_OPLIB_MINOR_VERSION);
+    exit(1);
+  }
+
+  /*
+  ** Validate the op info table:
+  */
+
+  prederef_op_info      = prederef_oplib->op_info_table;
+
+  if (!prederef_op_info) {
+    fprintf(stderr, "No op info table in oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+      file_name,
+      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, PARROT_CORE_OPLIB_MINOR_VERSION);
+    exit(1);
+  }
+
+  /*
+  ** Validate the op func table:
+  */
+
+  prederef_op_func      = prederef_oplib->op_func_table;
+
+  if (!prederef_op_func) {
+    fprintf(stderr, "No op func table in oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+      file_name,
+      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, PARROT_CORE_OPLIB_MINOR_VERSION);
+    exit(1);
+  }
+}
+
+/*=for api interpreter stop_prederef
+ */
+
+void
+stop_prederef(void)
+{
+  prederef_op_func      = NULL;
+  prederef_op_info      = NULL;
+  prederef_op_count     = 0;
+
+  Parrot_dlclose(prederef_oplib_handle);
+
+  prederef_oplib        = NULL;
+  prederef_oplib_init   = NULL;
+  prederef_oplib_handle = NULL;
+}
 
 /*=for api interpreter prederef
  */
@@ -84,13 +203,13 @@ prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
 {
   size_t      offset = pc_prederef - interpreter->prederef_code;
   opcode_t *  pc     = ((opcode_t *)interpreter->code->byte_code) + offset;
-  op_info_t * opinfo = &core_opinfo_prederef[*pc];
+  op_info_t * opinfo = &prederef_op_info[*pc];
   int         i;
 
   for (i = 0; i < opinfo->arg_count; i++) {
     switch (opinfo->types[i]) {
       case PARROT_ARG_OP:
-        pc_prederef[i] = (void *)core_opfunc_prederef[pc[i]];
+        pc_prederef[i] = (void *)prederef_op_func[pc[i]];
         break;
   
       case PARROT_ARG_I:
@@ -179,9 +298,13 @@ runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc, void ** pc_pr
 
     code_start_prederef = pc_prederef;
 
+    init_prederef(interpreter);
+
     while (pc_prederef) {
       pc_prederef = ((op_func_prederef_t)*pc_prederef)(pc_prederef, interpreter);
     }
+
+    stop_prederef();
 
     if (pc_prederef == 0) {
       pc = 0;
@@ -225,10 +348,10 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code, size_t offset
             int i;
 
             if (interpreter->profile == NULL) {
-                interpreter->profile = (INTVAL *)mem_sys_allocate(core_numops * sizeof(INTVAL));
+                interpreter->profile = (INTVAL *)mem_sys_allocate(interpreter->op_count * sizeof(INTVAL));
             }
 
-            for (i = 0; i < core_numops; i++) {
+            for (i = 0; i < interpreter->op_count; i++) {
                 interpreter->profile[i] = 0;
             }
         }
@@ -352,8 +475,10 @@ make_interpreter(INTVAL flags) {
     
     /* Load the core op func and info tables */
 
-    interpreter->opcode_funcs = core_opfunc;
-    interpreter->opcode_info  = core_opinfo;
+    interpreter->op_lib        = PARROT_CORE_OPLIB_INIT();
+    interpreter->op_count      = interpreter->op_lib->op_count;
+    interpreter->op_func_table = interpreter->op_lib->op_func_table;
+    interpreter->op_info_table = interpreter->op_lib->op_info_table;
     
     /* In case the I/O system needs something */
     Init_IO(interpreter);

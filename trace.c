@@ -23,13 +23,13 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t 
     INTVAL i;
 
     fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc,
-        interpreter->opcode_info[*pc].full_name);
+        interpreter->op_info_table[*pc].full_name);
 
-    if (interpreter->opcode_info[*pc].arg_count > 1) {
+    if (interpreter->op_info_table[*pc].arg_count > 1) {
         fprintf(stderr, "; ARGS=(");
-        for(i = 1; i < interpreter->opcode_info[*pc].arg_count; i++) {
+        for(i = 1; i < interpreter->op_info_table[*pc].arg_count; i++) {
             if (i > 1) { fprintf(stderr, ", "); }
-            switch(interpreter->opcode_info[*pc].types[i]) {
+            switch(interpreter->op_info_table[*pc].types[i]) {
             case PARROT_ARG_IC:
                 fprintf(stderr, "%ld", (long) *(pc + i));
                 break;

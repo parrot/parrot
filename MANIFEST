@@ -60,6 +60,7 @@ include/parrot/jit.h
 include/parrot/key.h
 include/parrot/memory.h
 include/parrot/op.h
+include/parrot/oplib.h
 include/parrot/packfile.h
 include/parrot/parrot.h
 include/parrot/pmc.h

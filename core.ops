@@ -2,6 +2,8 @@
 ** core.ops
 */
 
+VERSION = 0.3;
+
 =head1 NAME
 
 core.ops

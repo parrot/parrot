@@ -96,10 +96,24 @@ sub read_ops
     $seen_pod = 1 if m|^=|;
 
     unless ($seen_op or m|^(inline\s+)?op\s+|) {
+      if (m/^\s*VERSION\s*=\s*(\d+\.\d+)\s*;\s*$/) {
+        if (exists $self->{VERSION}) {
+          die "VERSION MULTIPLY DEFINED!";
+        }
+
+        $self->version($1);
+
+        $_ = '';
+      }
+
       $self->{PREAMBLE} .= $_ unless $seen_pod or $count; # Lines up to first op def.
       next;
     };
   
+
+    die "No 'VERSION = ...;' line found before beginning of ops in file '$orig'!\n"
+      unless defined $self->version;
+
     #
     # Handle start-of-op:
     #
@@ -308,6 +322,51 @@ sub preamble
   my $self = shift;
 
   return $self->{PREAMBLE};
+}
+
+
+#
+# version()
+#
+
+sub version
+{
+  my $self = shift;
+
+  if (@_) {
+    $self->{VERSION} = shift;
+  }
+  else {
+    return $self->{VERSION};
+  }
+}
+
+
+#
+# major_version()
+#
+
+sub major_version
+{
+  my $self = shift;
+
+  $self->{VERSION} =~ m/^(\d+)\.\d+$/;
+
+  return $1;
+}
+
+
+#
+# minor_version()
+#
+
+sub minor_version
+{
+  my $self = shift;
+
+  $self->{VERSION} =~ m/^\d+\.(\d+)$/;
+
+  return $1;
 }
 
 

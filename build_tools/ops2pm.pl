@@ -79,6 +79,8 @@ open MODULE, ">$module"
 # Print the preamble for the MODULE file:
 #
 
+my $version = $ops->version;
+
 my $preamble = <<END_C;
 #! perl -w
 #
@@ -92,7 +94,9 @@ use strict;
 
 package Parrot::OpLib::$package;
 
-use vars qw(\$ops);
+use vars qw(\$VERSION \$ops);
+
+\$VERSION = "$version";
 
 END_C
 

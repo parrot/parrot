@@ -195,12 +195,12 @@ main(int argc, char **argv) {
             printf("  CODE   OP FULL NAME  CALLS\n");
             printf("  -----  ------------  ------------\n");
 
-            for (i = 0; i < core_numops; i++) {
+            for (i = 0; i < interpreter->op_count; i++) {
                 if(interpreter->profile[i] > 0) {
                     op_count++;
                     call_count += interpreter->profile[i];
 
-                    printf("  %5d  %-12s  %12ld\n",i, core_opinfo[i].full_name,
+                    printf("  %5d  %-12s  %12ld\n",i, interpreter->op_info_table[i].full_name,
                         interpreter->profile[i]);
                 }
 

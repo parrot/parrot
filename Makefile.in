@@ -44,9 +44,12 @@ all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe} docs
 
 #XXX This target is not portable to Win32
 
-shared: libparrot.so
+shared: libparrot.so libcore_prederef_0_3.so
 
 libparrot.so: $(O_FILES)
+	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
+
+libcore_prederef_0_3.so: core_ops_prederef$(O)
 	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
 
 $(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm Parrot/PMC.pm
@@ -63,7 +66,7 @@ examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
 Parrot/Jit.pm: Parrot/Jit/${jitarchname}.pm
 	$(PERL) -MFile::Copy=cp -e 'cp q|Parrot/Jit/${jitarchname}.pm|, q|Parrot/Jit.pm|'
 
-Parrot/OpLib/core.pm: core.ops ops2pm.pl
+Parrot/OpLib/core.pm: core.ops ops2pm.pl Parrot/OpsFile.pm Parrot/Op.pm
 	$(PERL) ops2pm.pl core.ops vtable.ops
 
 Parrot/PMC.pm: include/parrot/pmc.h pmc_pm.pl
@@ -119,12 +122,12 @@ stacks$(O): $(H_FILES)
 
 core_ops$(O): $(H_FILES) core_ops.c
 
-core_ops.c $(INC)/oplib/core_ops.h: core.ops vtable.ops ops2c.pl
+core_ops.c $(INC)/oplib/core_ops.h: core.ops vtable.ops ops2c.pl Parrot/OpsFile.pm Parrot/Op.pm
 	$(PERL) ops2c.pl C core.ops vtable.ops
 
 core_ops_prederef$(O): $(H_FILES) core_ops_prederef.c
 
-core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h: core.ops vtable.ops ops2c.pl
+core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h: core.ops vtable.ops ops2c.pl Parrot/OpsFile.pm Parrot/Op.pm
 	$(PERL) ops2c.pl CPrederef core.ops vtable.ops
 
 vtable.ops: make_vtable_ops.pl
@@ -165,6 +168,7 @@ clean:
 	$(RM_F) Parrot/OpLib/core.pm
 	$(RM_F) Parrot/Jit.pm
 	$(RM_F) include/parrot/jit_struct.h
+	$(RM_F) libparrot.so libcore_prederef_0_3.so
 	cd docs && $(MAKE) clean && cd ..
 	cd classes && $(MAKE) clean && cd ..
 	cd languages && $(MAKE) clean && cd ..

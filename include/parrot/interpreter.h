@@ -16,6 +16,7 @@
 #include "parrot/parrot.h"
 
 #include "parrot/op.h"
+#include "parrot/oplib.h"
 
 struct Parrot_Interp {
     struct IReg *int_reg;            /* Current top of int reg stack */
@@ -35,12 +36,15 @@ struct Parrot_Interp {
     struct Arenas *arena_base;            /* Pointer to this */
                                           /* interpreter's arena */
 
-    op_info_t * opcode_info;              /* Opcode info table (name, nargs, arg types) */
-    opcode_t     *(**opcode_funcs)();     /* Opcode function table */
+    op_lib_t *  op_lib;                   /* Opcode library */
+    INTVAL      op_count;                 /* The number of ops */
+    op_info_t * op_info_table;            /* Opcode info table (name, nargs, arg types) */
+    opcode_t     *(**op_func_table)();    /* Opcode function table */
+
     STRING_FUNCS *(**string_funcs)();     /* String function table */
-    INTVAL flags;				  /* Various interpreter flags
-                                           that signal that runops
-                                           should do something */
+    INTVAL flags;				          /* Various interpreter flags
+                                             that signal that runops
+                                             should do something */
     INTVAL * profile;                     /* The array where we keep the profile counters */
 
     INTVAL resume_flag;

@@ -1,6 +1,8 @@
 use Parrot::Vtable;
 my %vtable = parse_vtable();
 
+print "VERSION = 0.3;\n\n";
+
 while (<DATA>) {
     next if /^#/ or /^$/;
     my @params = split;

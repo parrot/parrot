@@ -37,6 +37,11 @@ typedef void SYNC;
 #define JIT_ARCHNAME "${jitarchname}"
 #define JIT_CAPABLE  ${jitcapable}
 
+#define PARROT_CORE_OPLIB_NAME          "core"
+#define PARROT_CORE_OPLIB_MAJOR_VERSION 0
+#define PARROT_CORE_OPLIB_MINOR_VERSION 3
+#define PARROT_CORE_OPLIB_INIT          Parrot_DynOp_core_0_3
+
 ${headers}
 
 

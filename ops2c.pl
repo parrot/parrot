@@ -34,7 +34,7 @@ my $prefix  = $trans->prefix;
 my $suffix  = $trans->suffix;
 my $defines = $trans->defines;
 
-my $file = 'core.ops';
+my $file = shift @ARGV;
 
 my $base = $file;
 $base =~ s/\.ops$//;
@@ -48,10 +48,14 @@ my $source  = "${base}_ops${suffix}.c";
 #
 # Read the input file:
 #
-$file = shift @ARGV;
+
 die "$0: Could not read ops file '$file'!\n" unless -e $file;
 
 my $ops = new Parrot::OpsFile $file;
+
+my $version = $ops->version;
+my $major_version = $ops->major_version;
+my $minor_version = $ops->minor_version;
 
 for $file (@ARGV) {
     die "$0: Could not read ops file '$file'!\n" unless -e $file;
@@ -101,11 +105,9 @@ END_C
 print HEADER $preamble;
 print HEADER <<END_C;
 #include "parrot/parrot.h"
+#include "parrot/oplib.h"
 
-extern INTVAL    ${base}_numops${suffix};
-
-extern op_func${suffix}_t ${base}_opfunc${suffix}\[$num_entries];
-extern op_info_t ${base}_opinfo${suffix}\[$num_entries];
+extern op_lib_t * Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}(void);
 
 END_C
 
@@ -165,7 +167,7 @@ INTVAL ${base}_numops${suffix} = $num_ops;
 ** Op Function Table:
 */
 
-op_func${suffix}_t ${base}_opfunc${suffix}\[$num_entries] = {
+static op_func${suffix}_t op_func_table\[$num_entries] = {
 END_C
 
 print SOURCE @op_func_table;
@@ -188,7 +190,7 @@ print SOURCE <<END_C;
 ** Op Info Table:
 */
 
-op_info_t ${base}_opinfo${suffix}\[$num_entries] = {
+static op_info_t op_info_table\[$num_entries] = {
 END_C
 
 $index = 0;
@@ -219,6 +221,23 @@ END_C
 
 print SOURCE <<END_C;
 };
+
+/*
+** op lib descriptor:
+*/
+
+static op_lib_t op_lib = {
+  "$base",
+  $major_version,
+  $minor_version,
+  $num_ops,
+  op_info_table,
+  op_func_table
+};
+
+op_lib_t * Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}(void) {
+  return &op_lib;
+}
 
 END_C
 
