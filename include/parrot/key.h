@@ -32,8 +32,10 @@ struct _key_atom {
 typedef struct _key KEY;
 
 struct _key {
-    KEY_ATOM atom;
     KEY* next;
+    INTVAL pad;
+    UINTVAL flags;
+    KEY_ATOM atom;
 };
 
 KEY * key_new(Interp *interpreter);

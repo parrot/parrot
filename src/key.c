@@ -30,6 +30,7 @@ key_new(Interp *interpreter)
 
     key->atom.type = enum_key_undef;
     key->next = NULL;
+    key->flags = BUFFER_immobile_FLAG;
 
     return key;
 }
