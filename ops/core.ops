@@ -135,7 +135,7 @@ descriptor into $1.
 =cut
 
 inline op open(out INT, in STR) {
-  $1 = (INTVAL)fopen(($2)->bufstart, "r+");
+  $1 = (INTVAL)fopen(string_to_cstring(interpreter, ($2)), "r+");
   if (!$1) {
     perror("Can't open");
     exit(1);
@@ -145,7 +145,7 @@ inline op open(out INT, in STR) {
 }
 
 inline op open(out INT, in STR, in STR) {
-  $1 = (INTVAL)fopen(($2)->bufstart, ($3)->bufstart);
+  $1 = (INTVAL)fopen(string_to_cstring(interpreter, ($2)), string_to_cstring(interpreter, ($3)));
   goto NEXT();
 }
 
@@ -246,7 +246,7 @@ inline op print(in NUM) {
 op print(in STR) {
   STRING *s = $1;
   if (s && string_length(s)) {
-    printf("%.*s", (int)string_length(s), (char *) s->bufstart);
+    printf("%s", string_to_cstring(interpreter, (s)));
   }
   goto NEXT();
 }
@@ -255,7 +255,7 @@ op print(in PMC) {
   PMC *p = $1;
   STRING *s = (p->vtable->get_string(interpreter, p));
   if (s) {
-    printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+    printf("%s", string_to_cstring(interpreter, (s)));
   }
   goto NEXT();
 }
@@ -304,7 +304,7 @@ op print(in INT, in STR) {
 	default: file = (FILE *)$1;
   }
   if (s && string_length(s)) {
-    fprintf(file, "%.*s",(int)string_length(s),(char *) s->bufstart);
+    fprintf(file, "%s", string_to_cstring(interpreter, (s)));
   }
   goto NEXT();
 }
@@ -323,7 +323,7 @@ op print(in INT, in PMC) {
 	default: file = (FILE *)$1;
   }
   if (s) {
-    fprintf(file, "%.*s",(int)string_length(s),(char *) s->bufstart);
+    fprintf(file, "%s", string_to_cstring(interpreter, (s)));
   }
   goto NEXT();
 }

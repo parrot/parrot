@@ -27,6 +27,7 @@ STRING *Parrot_string_replace(Parrot, STRING *, INTVAL, INTVAL,
                              const STRING *, STRING **);
 INTVAL Parrot_string_compare(Parrot, const STRING *, const STRING *);
 Parrot_Bool Parrot_string_bool(const STRING *);
+const char *Parrot_string_cstring(const STRING *);
 
 /* Declarations of other functions */
 UINTVAL Parrot_string_length(const STRING *);
@@ -45,6 +46,7 @@ STRING *Parrot_string_transcode(struct Parrot_Interp *, const STRING *src,
                                 STRING **dest_ptr);
 void Parrot_string_init(void);
 INTVAL Parrot_string_index(const STRING *, UINTVAL idx);
+const char *Parrot_string_to_cstring(struct Parrot_Interp *, STRING *);
 
 #ifdef PARROT_IN_CORE
 
@@ -56,6 +58,7 @@ INTVAL Parrot_string_index(const STRING *, UINTVAL idx);
 #define string_replace          Parrot_string_replace
 #define string_compare          Parrot_string_compare
 #define string_bool             Parrot_string_bool
+#define string_cstring          Parrot_string_cstring
 
 #define string_length           Parrot_string_length
 #define string_ord              Parrot_string_ord
@@ -69,6 +72,7 @@ INTVAL Parrot_string_index(const STRING *, UINTVAL idx);
 #define string_transcode        Parrot_string_transcode
 #define string_init             Parrot_string_init
 #define string_index            Parrot_string_index
+#define string_to_cstring       Parrot_string_to_cstring
 
 #endif
 

@@ -802,6 +802,21 @@ string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
                             NULL, 0, NULL);
 }
 
+const char *
+string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
+{
+    char *cstring;
+
+    if (s->buflen == s->bufused)
+        string_grow(interpreter, s, 1);
+
+    cstring = s->bufstart;
+
+    cstring[s->bufused] = 0;
+
+    return cstring;
+}
+
 
 /*
  * Local variables:
