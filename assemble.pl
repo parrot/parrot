@@ -1145,7 +1145,7 @@ usage: $0 [options] file [file...]
     -E              Preprocess input files and terminate processing
     -h,--help       Print this message
     -o,--output     Write file
-    -c,-checksyntax Check syntax only, do not generate bytecode
+    -c,--checksyntax Check syntax only, do not generate bytecode
 
   _EOF_
 }
