@@ -76,7 +76,7 @@ sub check_dev {
 
     return unless ($file =~ /^[^\/]*\.c$/);
 
-    my $dev_file = $file; $dev_file =~ s/\.c$/.dev/g;
+    my $dev_file = $file; $dev_file =~ s/(.*)\.c$/docs\/dev\/$1.dev/g;
     return if -f $dev_file;
     
     warning($file, 0, ".dev file not found for $file.");
