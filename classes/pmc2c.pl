@@ -310,11 +310,11 @@ EOC
       my $initline = 1+count_newlines($OUT)+1;
       $OUT .= qq(#line $initline "$cfile"\n) unless $suppress_lines;
       $HOUT .= <<EOH;
-void $initname (INTVAL);
+void $initname (int);
 EOH
       $OUT .= <<EOC;
 
-void $initname (INTVAL entry) {
+void $initname (int entry) {
 
     struct _vtable temp_base_vtable = {
         NULL,
