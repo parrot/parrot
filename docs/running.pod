@@ -76,6 +76,12 @@ management debugging enabled. (Collectively called GC_DEBUG, this is
 accomplished by either passing the --gc-debug flag to the parrot
 binary, or setting the environment variable $PARROT_GC_DEBUG.)
 
+To speed up the test, compile imcc (in languages/imcc), and then use
+it to compile the test files:
+
+  make -C languages/imcc
+  make test IMCC=languages/imcc/imcc
+
 To look at a test more closely, run the appropriate test file in the
 t/ directory:
 
@@ -108,6 +114,10 @@ that are unnecessary most of the time, allowing for a significant speed gain.
 It's intended to be used as a quick check during development, lowering the
 barrier to checking tests. A C<make test> should be performed before
 submitting patches, just in case it is affected.
+
+These days, quicktest is rapidly becoming (already?) obsoleted by the
+IMCC= flag to 'make test'. IMCC takes so little time to compile the
+tests that the quick* targets don't offer any advantages.
 
 Instead of recompiling the .pasm files to .pbc files each time
 the test is run, C<make quicktest> checks to see if the .pasm file is
