@@ -104,7 +104,7 @@ To finish up adding a built-in class:
 
 =item 1.
 
-Add classes/YOURCLASS.pmc to MANIFEST.detailed
+Add classes/YOURCLASS.pmc to the MANIFEST
 
 =item 2.
 
