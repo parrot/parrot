@@ -701,12 +701,12 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
         next[i] = 5;
 
     REG_INT(0) = 1;     /* kind of a prototyped call */
-    REG_INT(1) = 0;     /* nada in P3 */
-    REG_INT(2) = 0;     /* params in P regs */
-    ret = *sig++;
-    REG_INT(3) = ret == 'v' ? 0 : -2;   /* return expected */
-    REG_INT(4) = 0;     /* no hash */
+    REG_INT(1) = 0;     /* # of I params */
+    REG_INT(2) = 0;     /* # of S params */
+    REG_INT(3) = 0;     /* # of P params */
+    REG_INT(4) = 0;     /* # of N params */
 
+    ret = *sig++;
     va_start(ap, sig);
     while (*sig) {
         switch (*sig++) {
@@ -714,16 +714,19 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
                 break;
             case 'I':       /* REG_INT */
                 REG_INT(next[0]++) = va_arg(ap, INTVAL);
+                ++REG_INT(1);
                 break;
             case 'S':       /* REG_STR */
                 REG_STR(next[1]++) = va_arg(ap, STRING*);
+                ++REG_INT(2);
                 break;
             case 'P':       /* REG_PMC */
-                REG_INT(2) = 1;     /* params in P regs */
                 REG_PMC(next[2]++) = va_arg(ap, PMC*);
+                ++REG_INT(3);
                 break;
             case 'N':       /* REG_NUM */
                 REG_NUM(next[3]++) = va_arg(ap, FLOATVAL);
+                ++REG_INT(4);
                 break;
             default:
                 internal_exception(1,
