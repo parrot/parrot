@@ -74,6 +74,9 @@ RANKSPEC        \[[,]*\]
 "float"         return(FLOAT);
 "new"           return(NEW);
 "defined"       return(DEFINED);
+"addr"          return(ADDR);
+"global"        return(GLOBAL);
+"clone"         return(CLONE);
 "string"        return(STRING);
 "call"          return(CALL);
 "print"         return(PRINT);
@@ -85,9 +88,9 @@ RANKSPEC        \[[,]*\]
 "<<"            return(SHIFT_LEFT);
 ">>"            return(SHIFT_RIGHT);
 "~~"            return(LOG_XOR);
-"<"            return(RELOP_LT);
+"<"             return(RELOP_LT);
 "<="            return(RELOP_LTE);
-">"            return(RELOP_GT);
+">"             return(RELOP_GT);
 ">="            return(RELOP_GTE);
 "=="            return(RELOP_EQ);
 "!="            return(RELOP_NE);

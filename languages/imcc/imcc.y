@@ -28,7 +28,15 @@ long        line;
  * many are polymorphic.
  */
 SymReg * iMOVE(SymReg *r0, SymReg*r1) {
-    emitb(mk_instruction("set %s, %s", r0, r1, NULL, NULL, IF_unary));
+    if (r0->set == 'P' && r1->set != 'P') {
+	/* r0 needs read access because set Px, Ax calls Px's set
+	 * method, instead of just clobbering it. */
+	emitb(mk_instruction("set %s, %s", r0, r1, NULL, NULL,
+			     IF_r0_write|IF_r0_read|IF_r1_read));
+    }
+    else {
+	emitb(mk_instruction("set %s, %s", r0, r1, NULL, NULL, IF_unary));
+    }
     return r0;
 }
 
@@ -147,7 +155,8 @@ SymReg * iBRANCH(SymReg * r0) {
 }
 
 SymReg * iLABEL(SymReg * r0) {
-    Instruction *i = emitb(mk_instruction("%s:", r0, NULL, NULL, NULL, IF_r0_read)); /* IF_r0_read ? */
+    Instruction *i = emitb(mk_instruction("%s:", r0, NULL, NULL, NULL,
+					  0)); /* IF_r0_read ? */
     i->type = ITLABEL;
     return r0;
 }
@@ -214,7 +223,9 @@ SymReg * iINDEXSET(SymReg * r0, SymReg * r1, SymReg * r2) {
         emitb(mk_instruction("substr %s, %s, 1, %s", r0, r1, r2, NULL, IF_binary));
     }
     else if (r0->set == 'P') {
-	emitb(mk_instruction("set %s[%s], %s", r0, r1, r2, NULL, IF_binary));
+	/* XXX: SEAN: is "read" right for setting an array?  */
+	emitb(mk_instruction("set %s[%s], %s", r0, r1, r2, NULL,
+			     IF_r0_read | IF_r1_read | IF_r2_read));
     }
     else {
         fprintf(stderr, "FIXME: Internal error, unsupported indexed set operation\n");
@@ -264,6 +275,57 @@ SymReg * iDEFINED(SymReg * r0, SymReg * r1) {
     return r0;
 }
 
+SymReg * iSET_ADDR(SymReg * r0, SymReg * r1) {
+    if (r0->set == 'I') {
+	emitb(mk_instruction("set_addr %s, %s", r0, r1, NULL, NULL,
+			     IF_r0_write));
+    }
+    else {
+	fprintf(stderr, "line %ld: Syntax error, set_addr destination must be int register\n", line);
+	exit(EX_DATAERR);
+    }
+    return r0;
+}
+
+SymReg * iSET_GLOBAL(SymReg * r0, SymReg * r1) {
+    if (r0->set == 'S' && r1->set == 'P') {
+	emitb(mk_instruction("store_global %s, %s", r1, r0,
+			     NULL, NULL, IF_r0_read | IF_r1_read));
+    }
+    else {
+	fprintf(stderr, "line %ld: store_global arguments must be PMC, string\n",
+		line);
+	exit(EX_DATAERR);
+    }
+    return r0;
+}
+
+SymReg * iGET_GLOBAL(SymReg * r0, SymReg * r1) {
+    if (r0->set == 'P' && r1->set == 'S') {
+	emitb(mk_instruction("find_global %s, %s", r0, r1,
+			     NULL, NULL, IF_r0_write | IF_r1_read));
+    }
+    else {
+	fprintf(stderr, "line %ld: find_global arguments must be PMC, string\n",
+		line);
+	exit(EX_DATAERR);
+    }
+    return r0;
+}
+
+SymReg * iCLONE(SymReg * r0, SymReg * r1) {
+    if (r0->set == r1->set && (r0->set == 'S' || r0->set == 'P')) {
+	emitb(mk_instruction("clone %s, %s", r0, r1,
+			     NULL, NULL, IF_r0_write | IF_r1_read));
+    }
+    else {
+	fprintf(stderr, "line %ld: clone arguments must be PMCs or strings\n",
+		line);
+	exit(EX_DATAERR);
+    }
+    return r0;
+}
+
 SymReg * iEMIT(char * assembly) {
     emitb(mk_instruction(assembly, NULL, NULL, NULL, NULL, 0)); 
     return 0;
@@ -300,13 +362,14 @@ void relop_to_op(int relop, char * op) {
 %token <i> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM PUSH POP INC DEC
 %token <i> SHIFT_LEFT SHIFT_RIGHT INT FLOAT STRING DEFINED LOG_XOR
 %token <i> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
+%token <i> GLOBAL ADDR CLONE
 %token <s> EMIT LABEL
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC
 %type <i> type program globals classes class subs sub sub_start relop
 %type <s> classname
 %type <sr> labels label statements statement
 %type <sr> instruction assignment if_statement
-%type <sr> target reg const var rc
+%type <sr> target reg const var rc string
 
 %start program 
 
@@ -428,6 +491,10 @@ assignment:
     |  labels var '[' var ']' '=' var           { $$ = iINDEXSET($2, $4, $7); }
     |  labels target '=' NEW classname          { $$ = iNEW($2, $5); }
     |  labels target '=' DEFINED var            { $$ = iDEFINED($2, $5); }
+    |  labels target '=' CLONE var              { $$ = iCLONE($2, $5); }
+    |  labels target '=' ADDR IDENTIFIER        { $$ = iSET_ADDR($2, mk_address($5)); }
+    |  labels target '=' GLOBAL string          { $$ = iGET_GLOBAL($2, $5); }
+    |  labels GLOBAL string '=' var             { $$ = iSET_GLOBAL($3, $5); }
     ;
 
 if_statement:
@@ -483,6 +550,12 @@ const:
        { $$ = mk_const($1, 'S'); }
     ;
  
+string:
+       SREG
+       { $$ = mk_symreg($1, 'S'); }
+    |  STRINGC
+       { $$ = mk_const($1, 'S'); }
+    ;
 %%
 
 extern FILE *yyin;
