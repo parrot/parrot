@@ -37,7 +37,6 @@ init_world(void)
 
     /* We need a hash */
     Parrot_base_classname_hash = pmc_new(NULL, enum_class_PerlHash);
-    Parrot_base_classname_hash->vtable->init(NULL, Parrot_base_classname_hash);
 
     /* Now start filling the hash */
 
