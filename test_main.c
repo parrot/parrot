@@ -94,7 +94,7 @@ main(int argc, char **argv) {
 
 #ifndef HAS_HEADER_SYSMMAN
         program_code = (opcode_t*)mem_sys_allocate(program_size);
-        _read(fd, (void*)program_code, program_size);
+        read(fd, (void*)program_code, program_size);
 #else
         program_code = (opcode_t*)mmap(0, program_size, PROT_READ, MAP_SHARED, fd, 0);
 #endif
