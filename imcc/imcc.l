@@ -86,7 +86,7 @@ DOT		[.]
 SIGN            [-+]
 FLOATNUM        {SIGN}?{DIGITS}{DOT}{DIGIT}*([eE]{SIGN}?{DIGITS})?
 LETTERDIGIT     [a-zA-Z0-9_]
-LABELLETTERDIGIT     ([a-zA-Z0-9_]|"::")
+LABELLETTERDIGIT     ([a-zA-Z0-9_#]|"::")
 ID              {LETTER}{LABELLETTERDIGIT}*
 STRINGCONSTANT  \"(\\\"|[^"\n]*)*\"
 CHARCONSTANT    \'[^'\n]*\'
