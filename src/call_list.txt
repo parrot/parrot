@@ -247,6 +247,11 @@ i	IPP
 # examples/japh/japh11.pasm
 v	Iiiip
 
+#required for mod_parrot
+i   tp
+v   tiiiptt
+i   Pip
+
 # PyBuiltins
 P	IOPP
 P	IOPPP
