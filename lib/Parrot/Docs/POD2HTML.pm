@@ -229,6 +229,61 @@ sub do_middle
 	return 1;
 }
 
+=item C<>
+
+Reimplemented to avoid a bug in C<Pod::Simple::HTML>.
+
+=cut
+
+sub do_pod_link 
+{
+	my $self = shift;
+	my $link = shift;
+	my $to = $link->attr('to');
+	my $section = $link->attr('section');
+	
+	return undef unless
+		( defined $to and length $to ) or
+		( defined $section and length $section );
+	
+	if ( defined $to and length $to ) 
+	{
+		$to = $self->resolve_pod_page_link($to, $section);
+		
+		return undef unless defined $to and length $to;
+	}
+	
+	if ( defined $section and length($section .= '') ) 
+	{
+		$section =~ tr/ /_/;
+		$section =~ tr/\x00-\x1F\x80-\x9F//d if 'A' eq chr(65);
+		$section = $self->unicode_escape_url($section);
+		# Turn char 1234 into "(1234)"
+		$section = '_' unless length $section;
+	}
+	
+	foreach my $it ($to, $section) 
+	{
+		next unless defined $it;
+
+		$it =~ s/([^\x00-\xFF])/join '', map sprintf('%%%02X',$_), unpack 'C*', $1/eg;
+		$it =~ s/([^\._abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/sprintf('%%%02X',ord($1))/eg;
+		# Yes, stipulate the list without a range, so that this can work right on
+		#  all charsets that this module happens to run under.
+		# Altho, hmm, what about that ord?  Presumably that won't work right
+		#  under non-ASCII charsets.  Something should be done about that.
+	}
+	
+	my $out;
+	
+	$out = $to if defined $to and length $to;
+	$out .= "#" . $section if defined $section and length $section;
+	
+	return undef unless length $out;
+	
+	return $out;  
+}
+
 =item C<resolve_pod_page_link($to, $section)>
 
 Resolves the POD link. Perl modules are converted to paths.
