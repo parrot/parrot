@@ -50,7 +50,7 @@ sub parrot_version
 
   foreach (@parrot_version) {
     die "Illegal version component: '$_' in VERSION file!"
-      unless m/^[1-9]*[0-9a-zA-Z]$/;
+      unless m/^[1-9]*[0-9a-zA-Z_]$/;
   }
 
   if (@parrot_version == 4) {
