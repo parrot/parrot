@@ -229,10 +229,8 @@ SP              [ ]
 "newcont"       return(NEWCONT);
 "newcor"        return(NEWCOR);
 "newsub"        return(NEWSUB);
-"defined"       return(DEFINED);
 "addr"          return(ADDR);
 "global"        return(GLOBALOP);
-"clone"         return(CLONE);
 "object"        return(OBJECTV);
 "pmc"           return(PMCV);
 "string"        return(STRINGV);
@@ -265,6 +263,7 @@ SP              [ ]
 ">>="           return(SHR_ASSIGN);
 "<<="           return(SHL_ASSIGN);
 ">>>="          return(SHR_U_ASSIGN);
+".="            return(CONCAT_ASSIGN);
 
 <emit,INITIAL>".macro" {
         return read_macro(valp, interp);

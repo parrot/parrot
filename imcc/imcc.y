@@ -107,6 +107,19 @@ MK_I(struct Parrot_Interp *interpreter, IMC_Unit * unit, const char * fmt, int n
     return INS(interpreter, unit, opname, fmt, r, n, keyvec, 1);
 }
 
+static Instruction*
+func_ins(Parrot_Interp interp, IMC_Unit *unit, SymReg *lhs, char *op,
+           SymReg ** r, int n, int keyv, int emit)
+{
+    int i;
+    /* shift regs up by 1 */
+    for (i = n - 1; i >= 0; --i)
+        r[i+1] = r[i];
+    r[0] = lhs;
+    /* shift keyvec */
+    keyv <<= 1;
+    return INS(interp, unit, op, "", r, n+1, keyv, emit);
+}
 /*
  * special instructions
  *
@@ -249,12 +262,12 @@ itcall_sub(SymReg* sub)
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
 %token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
-%token <t> PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN
+%token <t> PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN CONCAT_ASSIGN
 %token <t> BAND_ASSIGN BOR_ASSIGN BXOR_ASSIGN
 %token <t> SHR_ASSIGN SHL_ASSIGN SHR_U_ASSIGN
-%token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV OBJECTV DEFINED LOG_XOR
+%token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV OBJECTV  LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
-%token <t> GLOBAL GLOBALOP ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
+%token <t> GLOBAL GLOBALOP ADDR RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
@@ -275,6 +288,7 @@ itcall_sub(SymReg* sub)
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub
 %type <t> pcc_proto pcc_sub_proto proto
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
+%type <i> func_assign
 %type <i> opt_invocant
 %type <sr> target reg const var string
 %type <sr> key keylist _keylist
@@ -827,13 +841,6 @@ assignment:
                               $$ = iNEWSUB(interp, cur_unit, NULL, $3,
                                            mk_sub_address($4),
                                            mk_sub_address($6), 1); }
-   | target '=' DEFINED var
-                        { $$ = MK_I(interp, cur_unit, "defined", 2, $1, $4); }
-   | target '=' DEFINED var '[' keylist ']'
-                        { keyvec=KEY_BIT(2);
-                          $$ = MK_I(interp, cur_unit, "defined", 3,$1,$4,$6); }
-   | target '=' CLONE var
-                        { $$ = MK_I(interp, cur_unit, "clone",2, $1, $4); }
    | target '=' ADDR IDENTIFIER
                         { $$ = MK_I(interp, cur_unit, "set_addr",
                                     2, $1, mk_label_address(cur_unit, $4)); }
@@ -847,13 +854,6 @@ assignment:
                         { expect_pasm = 1; }
      pasm_args
                         { $$ = INS(interp, cur_unit, "new",0,regs,nargs,keyvec,1); }
-   | DEFINED target COMMA var
-                        { $$ = MK_I(interp, cur_unit, "defined", 2, $2, $4); }
-   | DEFINED target COMMA var '[' keylist ']'
-                        { keyvec=KEY_BIT(2);
-                          $$ = MK_I(interp, cur_unit, "defined", 3, $2, $4, $6); }
-   | CLONE target COMMA var
-                        { $$ = MK_I(interp, cur_unit, "clone", 2, $2, $4); }
      /* Subroutine call the short way */
    | target '=' sub_call
          {
@@ -871,6 +871,7 @@ assignment:
            current_call = NULL;
          }
    | op_assign
+   | func_assign
    ;
 
 op_assign:
@@ -882,6 +883,8 @@ op_assign:
                    { $$ = MK_I(interp, cur_unit, "mul", 2, $1, $3); }
    | target DIV_ASSIGN var
                    { $$ = MK_I(interp, cur_unit, "div", 2, $1, $3); }
+   | target CONCAT_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "concat", 2, $1, $3); }
    | target BAND_ASSIGN var
                    { $$ = MK_I(interp, cur_unit, "band", 2, $1, $3); }
    | target BOR_ASSIGN var
@@ -894,6 +897,14 @@ op_assign:
                    { $$ = MK_I(interp, cur_unit, "shl", 2, $1, $3); }
    | target SHR_U_ASSIGN var
                    { $$ = MK_I(interp, cur_unit, "lsr", 2, $1, $3); }
+   ;
+
+func_assign:
+   target '=' PARROT_OP pasm_args
+                   { $$ = func_ins(interp, cur_unit, $1, $3,
+                                   regs,nargs,keyvec,1);
+                     free($3);
+                   }
    ;
 
 the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
