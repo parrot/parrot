@@ -131,6 +131,13 @@ typedef enum {
 } parrot_bignum_extended_flags;
 
 /*Capn' Cut-n-paste functions */
+/* public functions generally return either BIGNUM* if they create a
+   bignumber or void if they merely operate on them, errors are reported
+   through the context->flags and the exception mechanism.
+
+   BN_round returns an int, to make the internals a bit clearer, it
+   doesn't actually carry any meaning.
+*/
 BIGNUM* BN_from_string(PINTD_ char*, BN_CONTEXT*);
 BIGNUM* BN_new(PINTD_ INTVAL length);
 void BN_grow(PINTD_ BIGNUM *in, INTVAL length);
@@ -166,9 +173,10 @@ void BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
               BIGNUM* expn, BN_CONTEXT* context);
 INTVAL BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT*);
 INTVAL BN_is_zero(PINTD_ BIGNUM* test, BN_CONTEXT *);
-void BN_set_qNAN(PINTD_ BIGNUM* bn);
-void BN_set_sNAN(PINTD_ BIGNUM* bn);
-void BN_really_zero(PINTD_ BIGNUM* bn, int);
+int BN_set_qNAN(PINTD_ BIGNUM* bn);
+int BN_set_sNAN(PINTD_ BIGNUM* bn);
+int BN_set_inf(PINTD_ BIGNUM* bn);
+int BN_really_zero(PINTD_ BIGNUM* bn, int);
 /*
  * Local variables:
  * c-indentation-style: bsd

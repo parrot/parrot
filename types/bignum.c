@@ -132,30 +132,29 @@ typedef struct { /* Used to restore INTENT(IN) arguments to functions */
     BIGNUM two;
 } BN_SAVE_PREC;
 
-void
+int
 BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
               BN_CONTEXT *context);
-void
+int
 BN_idivide (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context,
             BN_DIV_ENUM operation, BIGNUM* rem);
 INTVAL BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng);
-void BN_strip_lead_zeros(PINTD_ BIGNUM* victim);
-void BN_strip_tail_zeros(PINTD_ BIGNUM* victim);
+int BN_strip_lead_zeros(PINTD_ BIGNUM* victim);
+int BN_strip_tail_zeros(PINTD_ BIGNUM* victim);
 int BN_round_up(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
 int BN_round_down(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
-void BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context);
-void BN_set_inf(PINTD_ BIGNUM* bn);
-void
+int BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context);
+int
 BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context, BN_SAVE_PREC* restore);
-void
+int
 BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context, BN_SAVE_PREC* restore);
-void BN_iadd(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
-void BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
-void BN_align(PINTD_ BIGNUM* one, BIGNUM* two);
+int BN_iadd(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
+int BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
+int BN_align(PINTD_ BIGNUM* one, BIGNUM* two);
 INTVAL
 BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg);
-void
+int
 BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context);
 
 /* Creation and memory management */
@@ -274,21 +273,21 @@ qNAN is represented as having zero digits, an undefined exponent
 and only the qNAN bit set.
 
 =cut*/
-void BN_set_inf(PINTD_ BIGNUM* bn) {
+int BN_set_inf(PINTD_ BIGNUM* bn) {
     assert(bn != NULL);
     bn->digits = 0;
     bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_INF_FLAG;
     return;
 }
 
-void BN_set_qNAN(PINTD_ BIGNUM* bn) {
+int BN_set_qNAN(PINTD_ BIGNUM* bn) {
     assert(bn != NULL);
     bn->digits = 0;
     bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_qNAN_FLAG;
     return;
 }
 
-void BN_set_sNAN(PINTD_ BIGNUM* bn) {
+int BN_set_sNAN(PINTD_ BIGNUM* bn) {
     assert(bn != NULL);
     bn->digits = 0;
     bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_qNAN_FLAG | BN_sNAN_FLAG;
@@ -307,7 +306,7 @@ and the sign of I<bn>:
  ROUND_FLOOR => same as round down, if sign is 0, -Inf otherwise
 
 =cut*/
-void
+int
 BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
     int massive = 0; /* 0 => inf, 1=> 99999999999 etc...*/
     switch (context->rounding) {
@@ -922,7 +921,7 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
 Removes any zeros before the msd and after the lsd
 
 =cut*/
-void
+int
 BN_strip_lead_zeros(PINTD_ BIGNUM* bn) {
     INTVAL msd, i;
   
@@ -942,7 +941,7 @@ Does not remove zeros before the decimal point.
 
 =cut*/
 
-void
+int
 BN_strip_tail_zeros(PINTD_ BIGNUM *bn) {
     INTVAL lsd, i;
 
@@ -974,7 +973,7 @@ Convert the number to a plain integer *if* precision such that this
 is possible.
 
 =cut*/
-void
+int
 BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
     /* Normal bignum */
     if (bn->expn > 0 && bn->digits + bn->expn <= context->precision) {
@@ -1001,7 +1000,7 @@ Sets any number which should be zero to a cannonical zero.
 To check if a number is equal to zero, use BN_is_zero.
 
 =cut*/
-void
+int
 BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero) {
     INTVAL i;
     if (bn->digits == 0) return;
@@ -1299,7 +1298,7 @@ If overflow or underflow occurs during rounding, the numbers will be
 modified to the appropriate representation and will not be restorable.
 
 =cut*/
-void
+int
 BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                BN_CONTEXT *context, BN_SAVE_PREC* restore) {
     BN_strip_lead_zeros(PINT_ one);
@@ -1318,7 +1317,7 @@ Rounds result, one, two, checks for zeroness and makes integers.
 Fixes one and two so they don't gain precision by mistake.
 
 =cut*/
-void
+int
 BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                  BN_CONTEXT *context, BN_SAVE_PREC* restore) {
     INTVAL i;
@@ -1362,7 +1361,7 @@ Adds zero digits so that decimal points of each number are at the same
 place.
 
 =cut*/
-void
+int
 BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
     INTVAL i;
     INTVAL diff;
@@ -1517,7 +1516,7 @@ length.  Returns a result without reference to the signs of its
 arguments.  Cannot cope with special values.
 
 =cut*/
-void
+int
 BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
               BN_CONTEXT *context) {
     INTVAL i;
@@ -1648,7 +1647,7 @@ coefficients of equal length.  Sets sign of result as appropriate.
 Cannot cope with special values.
 
 =cut*/
-void
+int
 BN_isubtract (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
               BN_CONTEXT *context) {
     INTVAL i;
@@ -1877,7 +1876,7 @@ BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 Multiplication without the rounding and other set up.
 
 */
-void
+int
 BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
               BN_CONTEXT *context) {
     INTVAL i,j;
@@ -2346,7 +2345,7 @@ BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 }
 
 /* Does the heavy work for the various division wossnames */
-void
+int
 BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context, BN_DIV_ENUM operation, BIGNUM* rem){
     INTVAL i, j, divided, newexpn;
