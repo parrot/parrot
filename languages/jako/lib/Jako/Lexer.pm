@@ -143,8 +143,8 @@ sub scan_line
     # Type:
     #
 
-    if ($text =~ m{^(int|num|obj|str)(?!\w)(.*)$}) {
-      my $type = $1 eq 'obj' ? 'P' : uc substr($1, 0, 1);
+    if ($text =~ m{^(int|num|pmc|str)(?!\w)(.*)$}) {
+      my $type = uc substr($1, 0, 1);
       push @tokens, Jako::Token->new(
         $file, $line, 'type', $type, $1);
       $text = $2;
@@ -227,7 +227,19 @@ sub scan_line
     }
 
     #
-    # Ops:
+    # (Prefix) Ops:
+    #
+
+    if ($text =~ m{^(new)(?!\w)(.*)$}) {
+      push @tokens, Jako::Token->new(
+        $file, $line, 'new', 'pmc', $1);
+      $text = $2;
+      next;
+    }
+
+    
+    #
+    # (Infix) Ops:
     #
 
     if ($text =~ m{^( \|= | &= | <<= | >>= )(.*)$}x) {

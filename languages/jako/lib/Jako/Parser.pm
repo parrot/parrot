@@ -46,6 +46,7 @@ use Jako::Construct::Statement::Decrement;
 use Jako::Construct::Statement::Goto;
 use Jako::Construct::Statement::Increment;
 use Jako::Construct::Statement::LoopControl;
+use Jako::Construct::Statement::New;
 use Jako::Construct::Statement::Return;
 
 
@@ -741,6 +742,7 @@ sub parse
     #
     #   <ident> = <value>;
     #   <ident> = <ident> = ... = <value>;
+    #   <ident> = new <ident>;
     #
  
     if ($token->is_ident and $self->get(1)->is_assign) {
@@ -757,13 +759,32 @@ sub parse
         $self->require_assign;
       }
 
-      my $right = Jako::Construct::Expression::Value->new($block, $self->require_value);
+      my $constructing;
+      my $right;
+
+      if ($self->skip_new) {
+        $constructing = 1;
+        $right = Jako::Construct::Expression::Value::Identifier->new($block, $self->require_ident)
+      }
+      else {
+        $constructing = 0;
+        $right = Jako::Construct::Expression::Value->new($block, $self->require_value);
+      }
 
       $self->require_semicolon;
 
       foreach my $left (@left) {
-        my $assign = Jako::Construct::Statement::Assign->new($block, $left, $right);
+        if ($constructing) {
+          my $new = Jako::Construct::Statement::New->new($block, $left, $right);
+          $constructing = 0;
+        }
+        else {
+          my $assign = Jako::Construct::Statement::Assign->new($block, $left, $right);
+        }
+        
+        $right = $left;
       }
+
       next;
     }
 

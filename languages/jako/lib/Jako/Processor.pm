@@ -375,6 +375,7 @@ sub skip_close_bracket { return shift->skip('close-bracket'); }
 sub skip_close_paren   { return shift->skip('close-paren');   }
 sub skip_ident         { return shift->skip('ident');         }
 sub skip_literal       { return shift->skip('literal');       }
+sub skip_new           { return shift->skip('new');           }
 sub skip_open_brace    { return shift->skip('open-brace');    }
 sub skip_open_bracket  { return shift->skip('open-bracket');  }
 sub skip_open_paren    { return shift->skip('open-paren');    }
