@@ -28,7 +28,7 @@ pop_entry(QUEUE *queue) {
  * but the synched pop_entry checks again and returns NULL, if
  * queue is empty
  */
-PARROT_INLINE QUEUE_ENTRY *
+QUEUE_ENTRY *
 peek_entry(QUEUE *queue) {
     return queue->head;
 }
