@@ -214,6 +214,7 @@ pmclass SArray {
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
         HASH_ENTRY *e = (HASH_ENTRY *) PMC_data(SELF);
+	PMC *ret;
 
 	if (*key < 0) {
 	    *key += e[1].val.int_val;
@@ -221,9 +222,25 @@ pmclass SArray {
 	if (*key < e[0].val.int_val || *key >= e[1].val.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + *key);
-	if (e->type != enum_hash_pmc)
-	    internal_exception(OUT_OF_BOUNDS, "SArray: Not a pmc!\n");
-        return e->val.pmc_val;
+	switch (e->type) {
+	    case enum_hash_int:
+		ret = pmc_new(INTERP, enum_class_PerlUndef);
+		VTABLE_set_integer_native(INTERP, ret, e->val.int_val);
+		return ret;
+	    case enum_hash_num:
+		ret = pmc_new(INTERP, enum_class_PerlUndef);
+		VTABLE_set_number_native(INTERP, ret, e->val.num_val);
+		return ret;
+	    case enum_hash_string:
+		ret = pmc_new(INTERP, enum_class_PerlUndef);
+		VTABLE_set_string_native(INTERP, ret, e->val.string_val);
+		return ret;
+	    case enum_hash_pmc:
+		return e->val.pmc_val;
+	    default:
+		internal_exception(OUT_OF_BOUNDS, "SArray: Not a pmc!\n");
+	}
+	return NULL;
     }
 
     PMC* get_pmc_keyed(PMC* key) {
