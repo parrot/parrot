@@ -1301,7 +1301,6 @@ include/parrot/misc.h                             [devel]include
 include/parrot/nci.h                              [devel]include
 include/parrot/objects.h                          [devel]include
 include/parrot/op.h                               [devel]include
-include/parrot/objects.h			  [devel]include
 include/parrot/oplib.h                            [devel]include
 include/parrot/packfile.h                         [devel]include
 include/parrot/parrot.h                           [devel]include
@@ -1791,7 +1790,6 @@ misc.c                                            []
 nci_test.c                                        []
 objects.c                                         []
 object.ops                                        []
-objects.c					  []
 obscure.ops                                       []
 ops2c.pl                                          [devel]
 ops2cgc.pl                                        [devel]
