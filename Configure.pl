@@ -49,7 +49,7 @@ Options:
 
    --ask                Have Configure ask for commonly-changed info
    --nomanicheck        Don't check the MANIFEST
-   --debugging          Enable debugging (NYI)
+   --debugging          Enable debugging
    --cc=(compiler)      Use the given compiler
    --ld=(linker)        Use the given linker
    --intval=(type)      Use the given type for INTVAL

@@ -9,6 +9,7 @@ use vars qw(@steps);
 	init/data.pl
 	init/miniparrot.pl
 	init/hints.pl
+	init/debug.pl
 	inter/progs.pl
 	inter/types.pl
 	inter/ops.pl
