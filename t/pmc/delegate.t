@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 
 # basic functionality - setting and getting types
@@ -98,3 +98,68 @@ CODE
 42
 OUTPUT
 
+# math
+output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
+    new P0, .delegate
+    set P0, 1
+    new P2, .PerlInt
+    add P2, P0, 1
+    print P2	# yeah 1+1 = 3
+    print "\n"
+    end
+.pcc_sub __set_integer_native:
+    # cant keep state yet
+    # just return
+    print I5
+    print "\n"
+    invoke P1
+.pcc_sub __add_int:
+    print I5
+    print "\n"
+    set P5, 3
+    invoke P1
+CODE
+1
+1
+3
+OUTPUT
+
+# math
+output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
+    new P0, .delegate
+    set P0, 1
+    new P1, .PerlInt
+    set P1, 1
+    new P2, .PerlInt
+    set P2, 777
+    add P2, P0, P1
+    print P2	# yeah 1+1 = 3
+    print "\n"
+    end
+.pcc_sub __set_integer_native:
+    # cant keep state yet
+    # just print arg and return
+    print I5
+    print "\n"
+    invoke P1
+.pcc_sub __add:
+    print "in __add\n"
+    print P2	# self - this triggers __get_string
+    print "\n"
+    print P5	# value
+    print "\n"
+    print P6	# dest
+    print "\n"
+    set P6, 3
+    invoke P1
+.pcc_sub __get_string:
+    set S5, "one"
+    invoke P1
+CODE
+1
+in __add
+one
+1
+777
+3
+OUTPUT
