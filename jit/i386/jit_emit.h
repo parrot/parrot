@@ -3149,10 +3149,10 @@ char floatval_map[] = { 1,2,3,4 };
  * globber these regs
  * to be save the following line should be enabled:
  *
- * # define PRESERVED_FLOAT_REGS 0
  *
  */
 
+# define PRESERVED_FLOAT_REGS 0
 
 /*
  * if jit_emit_noop is defined, it does align a jump target
