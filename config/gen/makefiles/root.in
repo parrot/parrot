@@ -297,6 +297,8 @@ IO_O_FILES = \
     io/io_passdown$(O)
 
 INTERP_O_FILES = \
+    $(SRC)/charset$(O) \
+    $(SRC)/encoding$(O) \
     $(SRC)/exceptions$(O) \
     $(SRC)/global_setup$(O) \
     $(SRC)/interpreter$(O)  \
@@ -889,6 +891,10 @@ $(SRC)/utils$(O) : $(GENERAL_H_FILES)
 $(SRC)/spf_render$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/spf_vtable$(O) : $(GENERAL_H_FILES)
+
+$(SRC)/encoding$(O) : $(SRC)/encoding.c $(GENERAL_H_FILES)
+
+$(SRC)/charset$(O) : $(SRC)/charset.c $(GENERAL_H_FILES)
 
 $(OPS)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS)/core_ops.c
 
