@@ -87,6 +87,9 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
     int i;
     unsigned long c = 0;
 
+    /* Skip trailing spaces */
+    while (*command && isspace(*command))
+        command++;
     /* get a number from what the user typed */
     for (i = 0; ((command[i] != 32) && command[i]) ; i++)
         c += (command[i] + (i + 1)) * ((i + 1) * 255);
