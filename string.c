@@ -46,7 +46,7 @@ void
 string_grow(STRING* s, IV newsize) {
     IV newsize_in_bytes = string_max_bytes(s, newsize);
     if (s->buflen < newsize_in_bytes) {
-        mem_sys_realloc(s->bufstart, newsize_in_bytes);
+        s->bufstart = mem_sys_realloc(s->bufstart, newsize_in_bytes);
     }
     s->buflen = newsize_in_bytes;
 }
