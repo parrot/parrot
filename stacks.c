@@ -235,10 +235,10 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
             *stack_p = chunk = new_chunk;
 
             /* Need to initialize this pointer before the collector sees it */
-            chunk->buffer = NULL;
-            chunk->buffer = new_buffer_header(interpreter);
+            new_chunk->buffer = NULL;
+            new_chunk->buffer = new_buffer_header(interpreter);
 
-            Parrot_allocate(interpreter, chunk->buffer,
+            Parrot_allocate(interpreter, new_chunk->buffer,
                             sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
         }
         else {
