@@ -4,3 +4,4 @@ fingerprint.c
 jit_cpu.c
 nci.c
 platform.c
+platform_asm.s

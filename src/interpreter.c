@@ -538,6 +538,10 @@ prepare_for_run(Parrot_Interp interpreter)
     }
 }
 
+#ifdef PARROT_EXEC_OS_AIX
+extern void* aix_get_toc( );
+#endif
+
 /*
 
 =item C<static opcode_t *
@@ -553,8 +557,22 @@ static opcode_t *
 runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
 #if JIT_CAPABLE
+#  ifdef PARROT_EXEC_OS_AIX
+    /* AIX calling convention requires that function-call-by-ptr be made
+       through the following struct: */
+    struct { jit_f functPtr; void *toc; void *env; } ptrgl_t;
+    ptrgl_t.functPtr = (jit_f) D2FPTR(init_jit(interpreter, pc));
+    ptrgl_t.env = NULL;
+
+    /* r2 (TOC) needs to point back here so we can return from non-JIT
+       functions */
+    ptrgl_t.toc = aix_get_toc( );
+
+    ((jit_f) D2FPTR(&ptrgl_t)) (interpreter, pc);
+#  else
     jit_f jit_code = (jit_f) D2FPTR(init_jit(interpreter, pc));
     (jit_code) (interpreter, pc);
+#  endif
 #endif
     return NULL;
 }
@@ -1488,7 +1506,7 @@ setup_event_func_ptrs(Parrot_Interp interpreter)
     if (!interpreter->evc_func_table) {
         interpreter->evc_func_table = mem_sys_allocate(sizeof(void *) * n);
         for (i = 0; i < n; ++i)
-            interpreter->evc_func_table[i] =
+            interpreter->evc_func_table[i] = (op_func_t)
                 ((void**)lib->op_func_table)[CORE_OPS_check_events__];
     }
 }
@@ -2224,7 +2242,8 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
      */
     if ((int)interpreter->run_core == cg_lib->core_type) {
         for (i = n_old; i < n_tot; ++i)
-            interpreter->evc_func_table[i] = ops_addr[CORE_OPS_check_events__];
+            interpreter->evc_func_table[i] =
+                (op_func_t)ops_addr[CORE_OPS_check_events__];
         interpreter->save_func_table = (void *) ops_addr;
     }
     /*

@@ -1,7 +1,5 @@
-my $libs = Configure::Data->get('libs');
-if ( $libs !~ /-lpthreads/ ) {
-    $libs .= ' -lpthreads';
-}
 Configure::Data->set(
-    libs => $libs,
+    cc => 'xlc_r',
+    link => 'xlc_r',
+    platform_asm => 1,
 );

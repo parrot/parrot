@@ -10,7 +10,14 @@
 #include <sys/mman.h>
 #include <limits.h>
 #ifndef CACHELINESIZE
-#  define CACHELINESIZE 0x10
+   /* TODO this should be determined by configure */
+#  if PARROT_EXEC_OS_AIX
+     /* for POWER3 */
+#    define CACHELINESIZE 0x80
+#  else
+     /* for PowerPC */
+#    define CACHELINESIZE 0x10
+#  endif
 #endif
 
 typedef enum {
@@ -650,8 +657,14 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     _emit_bx(jit_info->native_ptr, 1, 0);
     */
 
+#   if PARROT_EXEC_OS_AIX
+    /* support AIX calling convention using compiler intermediary _ptrgl */
+    jit_emit_mov_ri_i(jit_info->native_ptr, ISR1, (long)
+            *((long*)(interpreter->op_func_table[*(jit_info->cur_op)])));
+#   else
     jit_emit_mov_ri_i(jit_info->native_ptr, ISR1, 
             (long)(interpreter->op_func_table[*(jit_info->cur_op)]));
+#   endif
     jit_emit_mtctr(jit_info->native_ptr, ISR1);
     jit_emit_bctrl(jit_info->native_ptr);
 }
@@ -789,7 +802,11 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
 #if JIT_EMIT == 0
 
 #  define REQUIRES_CONSTANT_POOL 0
-#  define INT_REGISTERS_TO_MAP 24
+#  ifdef PARROT_EXEC_OS_AIX
+#    define INT_REGISTERS_TO_MAP 23
+#  else
+#    define INT_REGISTERS_TO_MAP 24
+#  endif
 #  define FLOAT_REGISTERS_TO_MAP 29
 
 /* Reserved:
@@ -797,6 +814,7 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
  * r14 op_map
  * r15 code_start
  * r31 zero
+ * r2 TOC (AIX only)
  */
 
 #ifndef JIT_IMCC
@@ -804,12 +822,41 @@ char intval_map[INT_REGISTERS_TO_MAP] =
 
     { r16, r17, r18, r19, r20, r21, r22, r23,
       r24, r25, r26, r27, r28, r29, r30,
-      r2, r3, r4, r5, r6, r7, r8, r9, r10 };
+#  ifndef PARROT_EXEC_OS_AIX
+      /* AIX calling convention reserves r2 */
+      r2,
+#  endif
+      r3, r4, r5, r6, r7, r8, r9, r10 };
 
 char floatval_map[FLOAT_REGISTERS_TO_MAP] =
     { r13, r14, r15, r16, r17, r18, r19, r20, r21,
       r22, r23, r24, r25, r26, r27, r28, r29, r30,
       r31, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10 };
+
+#ifdef __IBMC__
+
+void ppc_flush_line(char *_sync);
+void ppc_sync(void);
+
+#else
+
+void
+ppc_flush_line(char *_sync)
+{
+    __asm__ __volatile__ (
+    "dcbf 0,%0"
+    :
+    : "r" ((long)_sync)
+    );
+}
+
+void
+ppc_sync(void)
+{
+    __asm__ __volatile__ ("sync");
+}
+
+#endif
 
 static void
 ppc_sync_cache (void *_start, void *_end)
@@ -818,16 +865,10 @@ ppc_sync_cache (void *_start, void *_end)
     char *end = (char *)((((int)_end)+CACHELINESIZE-1) &~(CACHELINESIZE - 1));
     char *_sync;
 
-#ifndef __IBMC__
     for (_sync = start; _sync < end; _sync += CACHELINESIZE) {
-        __asm__ __volatile__ (
-        "dcbf 0,%0"
-        :
-        : "r" ((long)_sync)
-        );
+        ppc_flush_line(_sync);
     }
-    __asm__ __volatile__ ("sync");
-#endif /* __IBMC__ */
+    ppc_sync();
 }
 
 #endif /* JIT_EMIT == 0 */
