@@ -202,7 +202,7 @@ void gen_statement(AST * p) {
                 if(!eval_expr(p->arg1))
                     gen_expr(p->arg1, NULL, cur_method->sym->type);
 
-	       	printf("\t# Push return val and jump\n\tpush %s\n",
+	       	printf("\t# Push return val and jump\n\tsave %s\n",
                         NAME(p->arg1->targ) );
             }
             /* Simple optimization that works most of the time.
@@ -639,10 +639,7 @@ void gen_method_call(AST * p) {
         if(p->targ == NULL)
             p->targ = new_temp(p->arg1->targ->type);
         printf("\t#Get return val in %s\n", p->targ->name);
-#if 0
-        printf("\tpop %s %s\n", p->targ->typename->name, p->targ->name);
-#endif
-        printf("\tpop %s\n", p->targ->name);
+        printf("\trestore %s\n", p->targ->name);
     }
 }
 
