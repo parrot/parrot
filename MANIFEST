@@ -1655,6 +1655,7 @@ lib/Parrot/Makefile.PL
 lib/Parrot/Op.pm
 lib/Parrot/OpTrans.pm
 lib/Parrot/OpTrans/C.pm
+lib/Parrot/OpTrans/CGP.pm
 lib/Parrot/OpTrans/CGoto.pm
 lib/Parrot/OpTrans/CPrederef.pm
 lib/Parrot/OpTrans/Compiled.pm
