@@ -1,0 +1,187 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+ROADMAP
+
+=head1 PURPOSE
+
+As of this writing, there is no one place in which all remaining
+parrot work is documented. There are various TODO files, the RT queue,
+comments in the source code and the documentation. This document is a
+first pass at unifying this information and providing a single point of
+reference for anyone interested in the current state of the parrot, whether
+they are developers looking for items to work on, or external users looking
+for an idea of when they can expect a release.
+
+This document is not meant to contain all the metadata regarding particular
+tasks, but merely provide a summary of the tasks.
+
+=head1 OVERVIEW
+
+The tasks that are remaining are broken down into the following categories,
+roughly listed in the order which a task might progress.
+
+=head2 METADATA
+
+Each task has certain metadata associated with it which must be tracked. 
+
+=head2 DESIGN
+
+These are pending design decisions which must be made before any code can
+be written to implement them.
+
+=head2 TODO
+
+Any item, whether visible to parrot users or hidden behind an API, that has 
+already been designed (but not implemented) belongs here.
+
+=head2 BUGFIX
+
+Any items which have been implemented but don't work as expected.
+
+=head2 PORTABILITY
+
+Any items which are specific to a particular platform or require special
+attention for cross-platform compatibilty.
+
+=head2 DOCUMENTATION
+
+Any items pertaining to source, API, or user level documentation.
+
+=head2 HIGH LEVEL LANGUAGES
+
+Parrot currently ships with several partial language implementations. Any
+tasks which are specific to those languages, or affect cross-language
+compatibility will be listed here.
+
+=head1 ISSUES
+
+=head2 METADATA
+
+=over 4
+
+=item *
+
+To be included: docs/pmc, docs/resources, docs/*.pod, anything in CVS not
+in docs, RT. (That is, quite a bit.)
+
+=back
+
+=head2 DESIGN
+
+=over 4
+
+=item *
+
+PDD10 (Embedding) must be completed.
+
+=item *
+
+PDD12 (Assembly) must be completed.
+
+=item *
+
+PDD13 (Bytecode) must be completed.
+
+=item *
+
+Describe the behavior of init_pmc_props. L<PDD02>
+
+=item *
+
+Describe the behavior of the serialization functions. (freeze, thaw,
+thawfinish, visit). L<PDD02>
+
+=item *
+
+Describe the behavior of C<share>. L<PDD02>
+
+=item *
+
+Describe the components of a C<struct PMC_EXT>. L<PDD04>
+
+=back
+
+=head2 TODO
+
+=over 4
+
+=item *
+
+Create opcode_process.pl L<PDD05>
+
+=item *
+
+Fill in the remaining functions from the EDA, verify that the test
+suite still passes, integrate the library into the rest of Parrot,
+provide PMC types and suitable opcodes.  Conversion to and from Parrot
+strings, conversion to and from floating point types, sprintf output
+of bignumbers. L<PDD14>
+
+=item *
+
+Implement the parrot equivalent of perl5's C<$0>, based on recent
+(January 2005) mailing list activity.
+
+=item *
+
+C<load_bytecode> does not search the library path to load the file.
+L<ops/core.ops>
+
+=item *
+
+The debugger needs to clone the interpreter to "allow people to play into the
+debugger and then continue the normal execution of the program."
+L<ops/debug.ops>
+
+=item *
+
+parrot doesn't catch the exception thrown by the op C<cmod>.
+L<ops/math.ops>
+
+=item *
+
+C<rx_compile> op is documented but unimplemented. L<ops/rx.ops>
+
+=item *
+
+There is no way to do a case insenstive match. L<ops/rx.ops>
+
+=back
+
+=head2 BUGFIX
+
+=head2 PORTABILITY
+
+=over 4
+
+=item *
+
+ParrotIO uses integral file descriptors, which may not be portable.
+L<ops/io.ops>
+
+=back
+
+=head2 DOCUMENTATION
+
+=head2 HIGH LEVEL LANGUAGES
+
+=over 4
+
+=item *
+
+Items in languages/tcl/TODO must be completed.
+
+=item *
+
+Pass the pie-thon test suite.
+
+=back 
+
+=head1 FUTURE
+
+This document should eventually be obsoleted by use of the RT ticketing
+system. Every task that is to be done should be documented in the system, and
+reports generated based on that information. 
