@@ -107,7 +107,7 @@ void clear_tables(void);
 unsigned int  hash_str(const char * str);
 void free_life_info(SymReg *r);
 
-SymReg * _find_sym(Namespace * namespace, SymReg * hash[], const char * name);
+SymReg * _find_sym(Namespace * ns, SymReg * hash[], const char * name);
 char * _mk_fullname(Namespace * ns, const char * name);
 char * mk_fullname(const char * name);
 void push_namespace(char * name);

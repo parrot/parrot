@@ -43,12 +43,12 @@ Instruction * iNEW(SymReg * r0, char * type, int emit) {
 
 /* TODO get rid of nargs */
 void
-op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
+op_fullname(char * dest, const char * name, SymReg * args[], int narg) {
     int i;
 
     strcpy(dest, name);
     dest += strlen(name);
-    for (i = 0; i < nargs && args[i]; i++) {
+    for (i = 0; i < narg && args[i]; i++) {
         *dest++ = '_';
         if (args[i]->type == VTADDRESS) {
             *dest++ = 'i';
@@ -71,11 +71,11 @@ op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
     *dest = '\0';
 }
 
-int check_op(char *fullname, char *name, SymReg *regs[])
+int check_op(char *fullname, char *name, SymReg *r[])
 {
-    int op, nargs;
-    for (nargs = 0; regs[nargs]; nargs++) ;
-    op_fullname(fullname, name, regs, nargs);
+    int op, narg;
+    for (narg = 0; regs[narg]; narg++) ;
+    op_fullname(fullname, name, r, narg);
     op = interpreter->op_lib->op_code(fullname, 1);
     return op;
 
@@ -97,11 +97,12 @@ int is_op(char *name)
  *
  * s. e.g. imc.c for usage
  */
-Instruction * INS(char * name, char *fmt, SymReg **regs, int n,
-	int keys, int emit) {
+Instruction * INS(char * name, char *fmt, SymReg **r, int n,
+	int keys, int emit)
+{
     nargs = n;
     keyvec = keys;
-    return iANY(name, fmt, regs, emit);
+    return iANY(name, fmt, r, emit);
 }
 
 /* imcc_compile(interp*, const char*)
@@ -111,70 +112,79 @@ Instruction * INS(char * name, char *fmt, SymReg **regs, int n,
  */
 extern void* yy_scan_string(const char *);
 
-static void *imcc_compile(Parrot_Interp interpreter, const char *s)
+static void *imcc_compile(Parrot_Interp interp, const char *s)
 {
     /* imcc always compiles to interp->code->byte_code
-     * save old pointer, make new
+     * save old cs, make new
      */
-    size_t code_size = interpreter->code->byte_code_size;
-    void *code = interpreter->code->byte_code;
+    struct PackFile_ByteCode * eval_cs = Parrot_new_eval_cs(interp);
+    struct PackFile_ByteCode *old_cs;
+#ifdef EVAL_TEST
     opcode_t *pc;
+#endif
 
+    old_cs = Parrot_switch_to_cs(interp, eval_cs);
+    sourcefile = eval_cs->base.name;
+    /* spit out the sourcefile */
+    if (Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) {
+        FILE *fp = fopen(sourcefile, "w");
+        if (fp) {
+            fputs(s, fp);
+            fclose(fp);
+        }
+    }
     /* reset line number */
-    line = 0;
+    line = 1;
     yy_scan_string(s);
     /* s. also e_pbc_open for reusing code/consts ... */
     emit_open(1, NULL);
-    /* XXX this may move an existing byte_code */
     /* XXX where to put constants */
     yyparse();
     emit_close();
 
-    pc = (opcode_t *) ((char*)interpreter->code->byte_code + code_size);
-    /* XXX test */
-    /* runops_slow_core(interpreter, pc);
+#ifdef EVAL_TEST
+    pc = (opcode_t *) interp->code->byte_code;
     while (pc) {
-        DO_OP(pc, interpreter);
+        DO_OP(pc, interp);
     }
-    */
-    /* XXX restore old byte_code, */
-    /*interpreter->code->byte_code_size = code_size; */
-    interpreter->code->byte_code = code;
-    return pc;
+#endif
+    /* restore old byte_code, */
+    (void)Parrot_switch_to_cs(interp, old_cs);
+    return eval_cs;
 }
 
-void *imcc_compile_pasm(Parrot_Interp interpreter, const char *s)
+static void *imcc_compile_pasm(Parrot_Interp interp, const char *s)
 {
     pasm_file = 1;
     expect_pasm = 0;
-    return imcc_compile(interpreter, s);
+    return imcc_compile(interp, s);
 }
 
-void *imcc_compile_pir (Parrot_Interp interpreter, const char *s)
+static void *imcc_compile_pir (Parrot_Interp interp, const char *s)
 {
     pasm_file = 0;
     expect_pasm = 0;
-    return imcc_compile(interpreter, s);
+    return imcc_compile(interp, s);
 }
 
 /* tell the parrot core, which compilers we provide */
-void register_compilers(Parrot_Interp interpreter)
+void register_compilers(Parrot_Interp interp)
 {
-    STRING *pasm = string_make(interpreter, "PASM", 4, NULL,0,NULL);
-    STRING *pir = string_make(interpreter, "PIR", 3, NULL,0,NULL);
+    STRING *pasm = string_make(interp, "PASM", 4, NULL,0,NULL);
+    STRING *pir = string_make(interp, "PIR", 3, NULL,0,NULL);
     PMC * func;
     Parrot_csub_t pa = (Parrot_csub_t) F2DPTR(imcc_compile_pasm);
     Parrot_csub_t pi = (Parrot_csub_t) F2DPTR(imcc_compile_pir);
 
-    func = pmc_new(interpreter, enum_class_Compiler);
-    Parrot_compreg(interpreter, pasm, func);
-    func->vtable->set_string_keyed(interpreter, func, (PMC*)F2DPTR(pa),
-          string_make(interpreter, "pIt", 3, NULL,0,NULL));
+    func = pmc_new(interp, enum_class_Compiler);
+    Parrot_compreg(interp, pasm, func);
+    func->vtable->set_string_keyed(interp, func, (PMC*)F2DPTR(pa),
+          string_make(interp, "pIt", 3, NULL,0,NULL));
 
-    func = pmc_new(interpreter, enum_class_Compiler);
-    Parrot_compreg(interpreter, pir, func);
-    func->vtable->set_string_keyed(interpreter, func, (PMC*)F2DPTR(pi),
-          string_make(interpreter, "pIt", 3, NULL,0,NULL));
+    func = pmc_new(interp, enum_class_Compiler);
+    Parrot_compreg(interp, pir, func);
+    func->vtable->set_string_keyed(interp, func, (PMC*)F2DPTR(pi),
+          string_make(interp, "pIt", 3, NULL,0,NULL));
 }
 
 /*

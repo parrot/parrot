@@ -44,9 +44,9 @@ void pop_namespace(char * name) {
 /* symbolic registers */
 
 /* Makes a new SymReg from its varname and type */
-SymReg * _mk_symreg(SymReg*hash[],char * name, char t) {
+SymReg * _mk_symreg(SymReg* hsh[],char * name, char t) {
     SymReg * r;
-    if((r = _get_sym(hash, name))) {
+    if((r = _get_sym(hsh, name))) {
 	free(name);
         return r;
     }
@@ -61,7 +61,7 @@ SymReg * _mk_symreg(SymReg*hash[],char * name, char t) {
     r->type = VTREG;
 
     if(name[0])
-        _store_symreg(hash,r);
+        _store_symreg(hsh,r);
     return r;
 }
 
@@ -124,8 +124,8 @@ mk_const_ident(char *name, char t, SymReg *val)
 }
 
 /* Makes a new constant*/
-SymReg * _mk_const(SymReg *hash[], char * name, char t) {
-    SymReg * r = _mk_symreg(hash, name, t);
+SymReg * _mk_const(SymReg *hsh[], char * name, char t) {
+    SymReg * r = _mk_symreg(hsh, name, t);
     r->type = VTCONST;
     return r;
 }
@@ -135,18 +135,18 @@ SymReg * mk_const(char * name, char t) {
 }
 
 /* Makes a new address */
-SymReg * _mk_address(SymReg *hash[], char * name, int uniq) {
+SymReg * _mk_address(SymReg *hsh[], char * name, int uniq) {
     SymReg * r;
     if (uniq == U_add_all) {
 
         r = calloc(1, sizeof(SymReg));
         r->type = VTADDRESS;
         r->name = name;
-        _store_symreg(hash,r);
+        _store_symreg(hsh,r);
         return r;
     }
 
-    if(uniq && (r = _get_sym(hash, name)) &&
+    if(uniq && (r = _get_sym(hsh, name)) &&
             r->type == VTADDRESS &&
             r->lhs_use_count            /* we use this for labes/subs */
       ) {
@@ -157,7 +157,7 @@ SymReg * _mk_address(SymReg *hash[], char * name, int uniq) {
             fataly(1, "mk_address", line,
                     "Subroutine '%s' already defined\n", name);
     }
-    r = _mk_symreg(hash, name, 0);
+    r = _mk_symreg(hsh, name, 0);
     r->type = VTADDRESS;
     if (uniq)
         r->lhs_use_count++;
@@ -283,20 +283,20 @@ void free_sym(SymReg *r)
  */
 
 /* Stores a symbol into the hash */
-void _store_symreg(SymReg *hash[], SymReg * r) {
-    int index = hash_str(r->name) % HASH_SIZE;
-    r->next = hash[index];
-    hash[index] = r;
+void _store_symreg(SymReg *hsh[], SymReg * r) {
+    int i = hash_str(r->name) % HASH_SIZE;
+    r->next = hsh[i];
+    hsh[i] = r;
 }
 void store_symreg(SymReg * r) {
     _store_symreg(hash, r);
 }
 
 /* Gets a symbol from the hash */
-SymReg * _get_sym(SymReg * hash[], const char * name) {
+SymReg * _get_sym(SymReg * hsh[], const char * name) {
     SymReg * p;
-    int index = hash_str(name) % HASH_SIZE;
-    for(p = hash[index]; p; p = p->next) {
+    int i = hash_str(name) % HASH_SIZE;
+    for(p = hsh[i]; p; p = p->next) {
 	if(!strcmp(name, p->name))
 	    return p;
     }
@@ -311,10 +311,10 @@ SymReg * find_sym(const char * name) {
     return _find_sym(namespace, hash, name);
 }
 
-static void _delete_sym(SymReg * hash[], const char * name) {
+static void _delete_sym(SymReg * hsh[], const char * name) {
     SymReg ** p;
-    int index = hash_str(name) % HASH_SIZE;
-    for(p = &hash[index]; *p; p = &(*p)->next) {
+    int i = hash_str(name) % HASH_SIZE;
+    for(p = &hsh[i]; *p; p = &(*p)->next) {
         SymReg * deadmeat = *p;
 	if(!strcmp(name, deadmeat->name)) {
             *p = deadmeat->next;

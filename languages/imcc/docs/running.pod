@@ -8,6 +8,8 @@ IMCC - running
 
 =item 0.1 initial
 
+=item 0.0.9.10 changed run options
+
 =back
 
 =head1 OVERVIEW
@@ -26,15 +28,19 @@ This document describes imcc's command line options.
 
 Assume PASM input on stdin.
 
-=item -c, --create-pbc
+=item -c, --pbc
+
+Assume PBC file on stdin, run it.
 
 =item -d, --debug
 
-More I<-d> give more debug output
+More I<-d> give more debug output. One I<-d> turns on parrot debugging.
 
 =item -h --help
 
 =item -o outputfile
+
+Act like assembler. Don't run code, except B<-r> is given too.
 
 =item -r, --run-pbc
 
@@ -66,21 +72,38 @@ imcc.
 
 =head1 <file>
 
-If the file ends in B<.pbc> it will be interpreted.
+If the file ends in B<.pbc> it will be interpreted immediately.
 If the file ends in B<.pasm> it is parsed as PASM code else as PIR
-code.
+code then it get's run, except B<-o> was given.
 If the B<file> is a single dash, input from B<stdin> is read.
 
 =head2 Generated files
 
-If B<-r> or B<-c> are not present, a PASM file is generated. If the
-B<-o> option is not used, either F<a.pasm> or F<a.pbc> in the current
-working dir are created.
+If debugging is enabled these files are generated:
+
+  file.stabs.s ... stabsfile for the program
+  file.o ... object file with debug information
+  EVAL_n ... source of B<compile> op nr. I<N>
+  EVAL_n.stabs.s ... stabsfile for this block
+  EVAL_n.o ... object file with debug information
 
 =head1 [arguments ...]
 
 Optional arguments passed to the running program as ARGV, only useful
-for the B<-r> option.
+for running the program.
+
+=head1 Operation table
+
+ Commandline		Action		Output
+ ---------------------------------------------
+ imcc x.imc		run
+ imcc x.pasm		run
+ imcc x.pbc		run
+ -o x.pasm x.imc	ass		x.pasm
+ -o x.pbc  x.imc	ass		x.pbc
+ -o x.pbc  x.pasm	ass		x.pbc
+ -o x.pbc -r x.pasm	ass/run		x.pbc
+
 
 =head1 BUGS
 

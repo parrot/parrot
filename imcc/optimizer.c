@@ -136,7 +136,7 @@ static void if_branch()
                 if ((neg_op = get_neg_op(last->op, &args)) != 0) {
                     Instruction * tmp;
                     last->r[reg] = go;
-                    tmp = INS(neg_op, "", last->r, args, 0, 0);
+                    tmp = INS((char*)neg_op, "", last->r, args, 0, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
                     free(last->op);
@@ -236,7 +236,7 @@ static int used_once()
 }
 
 static int
-max_loop_depth()
+max_loop_depth(void)
 {
     int i, d;
     d = 0;
@@ -370,7 +370,8 @@ is_invariant(Instruction *ins)
     return 0;
 }
 
-Basic_block *
+#ifdef MOVE_INS_1_BL
+static Basic_block *
 find_outer(Basic_block * blk)
 {
     int bb = blk->index;
@@ -383,6 +384,7 @@ find_outer(Basic_block * blk)
                 return bb_list[loop_info[i]->entry];
     return 0;
 }
+#endif
 
 /* move the instruction ins before loop in bb */
 static int
@@ -393,8 +395,12 @@ move_ins_out(Instruction **ins, Basic_block *bb)
 
     /* check loop_info, where this loop started
      * actually, this moves instruction to block 0 */
-
-    pred = bb_list[0]; /* find_outer(bb); */
+#ifdef MOVE_INS_1_BL
+    pred = find_outer(bb);
+#else
+    UNUSED(bb);
+    pred = bb_list[0];
+#endif
     if (!pred) {
         debug(1, "outer loop not found (CFG?)\n");
         return 0;

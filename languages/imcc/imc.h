@@ -78,7 +78,7 @@ EXTERN SymReg** reglist;
 
 EXTERN char * sourcefile;	/* current file */
 EXTERN char * function;	/* current function */
-EXTERN long        line;	/* and line */
+EXTERN int        line;	/* and line */
 EXTERN char optimizer_opt[20];
 EXTERN int dont_optimize;
 

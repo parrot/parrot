@@ -32,7 +32,7 @@ static Instruction * last_ins;
 typedef struct comp_unit_t {
     Instruction * instructions;
     Instruction * last_ins;
-    SymReg * hash[HASH_SIZE];
+    SymReg ** hash[HASH_SIZE];
 } comp_unit_t;
 
 static comp_unit_t *comp_unit;
@@ -41,13 +41,17 @@ static int n_comp_units;
 void
 open_comp_unit(void)
 {
-    comp_unit = realloc(comp_unit, sizeof(n_comp_units+1) *
+    if (!n_comp_units)
+        comp_unit = mem_sys_allocate(sizeof(n_comp_units+1) *
+            sizeof(comp_unit_t));
+    else
+        comp_unit = realloc(comp_unit, sizeof(n_comp_units+1) *
             sizeof(comp_unit_t));
     comp_unit[n_comp_units].last_ins = last_ins;
     comp_unit[n_comp_units].instructions = instructions;
     last_ins = instructions = NULL;
-    memset(comp_unit[n_comp_units].hash, 0, HASH_SIZE * sizeof(SymReg*));
-    hash = comp_unit[n_comp_units].hash;
+    comp_unit[n_comp_units].hash[0] = calloc(HASH_SIZE, sizeof(SymReg*));
+    hash = comp_unit[n_comp_units].hash[0];
     if (!n_comp_units)
         ghash = hash;
     n_comp_units++;
@@ -63,26 +67,32 @@ close_comp_unit(void)
     instructions = comp_unit[n_comp_units].instructions;
     last_ins = comp_unit[n_comp_units].last_ins;
     clear_tables();
-    if (n_comp_units)
-        hash = comp_unit[n_comp_units-1].hash;
+    free(comp_unit[n_comp_units].hash[0]);
+    if (n_comp_units) {
+        hash = comp_unit[n_comp_units-1].hash[0];
+    }
+    else {
+        free(comp_unit);
+        comp_unit = NULL;
+    }
 }
 
 /* find a symbol on all hashes */
 SymReg *
-_find_sym(Namespace * namespace, SymReg * hash[], const char * name) {
+_find_sym(Namespace * nspace, SymReg * hsh[], const char * name) {
     Namespace * ns;
     int n;
     SymReg *p;
 
     for (n = n_comp_units - 1; n >= 0; n--) {
-        for (ns = namespace; ns; ns = ns->parent) {
+        for (ns = nspace; ns; ns = ns->parent) {
             char * fullname = _mk_fullname(ns, name);
-            p = _get_sym(comp_unit[n].hash, fullname);
+            p = _get_sym(comp_unit[n].hash[0], fullname);
             free(fullname);
             if (p) {
         ret_p:
                 /* outer scope symbol */
-                if (hash != comp_unit[n].hash && (p->type & VTIDENTIFIER)) {
+                if (hsh != comp_unit[n].hash[0] && (p->type & VTIDENTIFIER)) {
                     SymReg *new = mk_ident(str_dup(p->name), p->set);
                     new->type |= VT_REGP;
                     new->reg = p;
@@ -91,7 +101,7 @@ _find_sym(Namespace * namespace, SymReg * hash[], const char * name) {
                 return p;
             }
         }
-        p = _get_sym(comp_unit[n].hash, name);
+        p = _get_sym(comp_unit[n].hash[0], name);
         if (p)
             goto ret_p;
     }
@@ -239,7 +249,7 @@ Instruction * emitb(Instruction * i) {
         i->prev = last_ins;
 	last_ins = i;
     }
-
+    i->line = line - 1;         /* lexer is in next line already */
     return i;
 }
 
@@ -331,14 +341,14 @@ char * ins_string(Instruction * ins) {
 }
 
 static char *output;
-int e_file_open(char *file)
+static int e_file_open(char *file)
 {
     freopen(file, "w", stdout);
     output = file;
     return 1;
 }
 
-int e_file_close() {
+static int e_file_close(void) {
     printf("\n\n");
     fclose(stdout);
     info(1, "assembly module %s written.\n", output);
@@ -346,7 +356,7 @@ int e_file_close() {
 
 }
 
-int e_file_emit(Instruction * ins) {
+static int e_file_emit(Instruction * ins) {
     if ((ins->type & ITLABEL) || ! *ins->op)
 	printf(ins_fmt(ins));
     else
@@ -378,7 +388,7 @@ int emit_flush() {
 
     if (n_spilled > 0 && instructions) {
         SymReg *p31;
-        Instruction *spill;
+        Instruction *spill_ins;
         p31 = mk_pasm_reg(str_dup("P31"));
         ins = instructions;
         while (ins
@@ -386,8 +396,8 @@ int emit_flush() {
                     || strcmp(ins->fmt, "saveall") == 0)) {
             ins = ins->next;
         }
-        spill = iNEW(p31, str_dup("PerlArray"), 0);
-        insert_ins(ins, spill);
+        spill_ins = iNEW(p31, str_dup("PerlArray"), 0);
+        insert_ins(ins, spill_ins);
     }
     for (ins = instructions; ins; ins = ins->next) {
         (emitters[emitter]).emit(ins);

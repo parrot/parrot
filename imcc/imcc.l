@@ -18,7 +18,6 @@
 #include "parser.h"
 
 #define YY_NO_UNPUT
-extern long line;
 
 int state;
 %}

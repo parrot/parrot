@@ -20,8 +20,8 @@
 #include "parser.h"
 
 
-static int pbc, write_pbc;
-FILE *yyin;
+static int run_pbc, write_pbc;
+extern FILE *yyin;
 
 static void usage(FILE *fp)
 {
@@ -51,12 +51,13 @@ static void imcc_version(void)
 
 /* most stolen from test_main.c */
 static char *
-parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
+parseflags(Parrot_Interp interp, int *argc, char **argv[])
 {
     if (*argc == 1) {
 	usage(stderr);
 	exit(1);
     }
+    run_pbc = 1;
 
     /* skip the program name arg */
     (*argc)--;
@@ -87,13 +88,13 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
                 setopt(PARROT_TRACE_FLAG);
                 break;
             case 'd':
-                if (!Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+                if (!Interp_flags_TEST(interp, PARROT_DEBUG_FLAG))
                     setopt(PARROT_DEBUG_FLAG);
                 else
                     IMCC_DEBUG++;
                 break;
             case 'w':
-                Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG);
+                Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
                 break;
             case 'G':
                 gc_off = 1;
@@ -112,10 +113,10 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
                 imcc_version();
                 break;
             case 'r':
-                pbc = 1;
+                run_pbc = 1;
                 break;
             case 'c':
-                write_pbc = 1;
+                run_pbc = 2;
                 break;
             case 'v':
                 IMCC_VERBOSE++;
@@ -124,11 +125,17 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
                 yydebug = 1;
                 break;
             case 'o':
+                run_pbc = 0;
                 if ((*argv)[0][2])
                     output = str_dup((*argv)[0]+2);
                 else {
                     (*argc)--;
-                    output = str_dup((++(*argv))[0]);
+                    if (*argc)
+                        output = str_dup((++(*argv))[0]);
+                    else {
+                        fatal(1, "main", "Missing output arg\n");
+                        goto DONE;
+                    }
                 }
                 break;
 
@@ -143,7 +150,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
                     goto DONE;
                 } else if (strncmp((*argv)[0], "--gc-debug", 10) == 0) {
 #if DISABLE_GC_DEBUG
-                    Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG,
+                    Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
                             "PARROT_GC_DEBUG is set but the binary was "
                             "compiled with DISABLE_GC_DEBUG.");
 #endif
@@ -181,7 +188,7 @@ int main(int argc, char * argv[])
     interpreter->DOD_block_level++;
 
     sourcefile = parseflags(interpreter, &argc, &argv);
-    /* register compilers to parrot core */
+    /* register PASM and PIR compilers to parrot core */
     register_compilers(interpreter);
 
     /* default optimizations, s. optimizer.c */
@@ -191,8 +198,9 @@ int main(int argc, char * argv[])
     if (!sourcefile || !*sourcefile) {
         fatal(EX_NOINPUT, "main", "No source file specified.\n" );
     }
-    else if (!strcmp(sourcefile, "-"))
+    else if (!strcmp(sourcefile, "-")) {
         yyin = stdin;
+    }
     else {
         char *ext;
         if(!(yyin = fopen(sourcefile, "r")))    {
@@ -206,24 +214,29 @@ int main(int argc, char * argv[])
                 write_pbc = 1;
         }
         else if (ext && strcmp (ext, ".pbc") == 0) {
-            pbc = 2;
+            run_pbc = 2;
             write_pbc = 0;
         }
     }
 
-    if (!output)
-        output = str_dup(write_pbc | pbc ? "a.pbc" : "a.pasm");
+    if (output) {
+        char *ext;
+        ext = strrchr(output, '.');
+        if (ext && strcmp (ext, ".pbc") == 0) {
+            write_pbc = 1;
+        }
+    }
 
     if (IMCC_VERBOSE) {
         info(1,"Reading %s", yyin == stdin ? "stdin":sourcefile);
-        if (pbc)
+        if (run_pbc)
             info(1, ", executing");
         if (write_pbc)
             info(1, " and writing %s\n", output);
         else
             info(1,"\n");
     }
-    if (pbc == 2) {
+    if (run_pbc == 2) {
         pf = Parrot_readbc(interpreter, sourcefile);
         if (!pf)
             fatal(1, "main", "Packfile loading failed\n");
@@ -233,7 +246,7 @@ int main(int argc, char * argv[])
         info(1, "using optimization '%s'\n", optimizer_opt);
 
         line = 1;
-        emit_open(write_pbc | pbc, output);
+        emit_open(write_pbc | run_pbc, output);
 
         debug(1, "Starting parse...\n");
 
@@ -265,7 +278,7 @@ int main(int argc, char * argv[])
         info(1, "%s written.\n", output);
         free(packed);
     }
-    if (pbc) {
+    if (run_pbc) {
         if (!gc_off)
             interpreter->DOD_block_level--;
         info(1, "Running...\n");
@@ -274,6 +287,7 @@ int main(int argc, char * argv[])
     }
     Parrot_destroy(interpreter);
     free(output);
+    Parrot_exit(0);
 
     return 0;
 }

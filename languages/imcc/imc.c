@@ -168,13 +168,13 @@ static int reg_sort_f(const void *a, const void *b) {
     }
 }
 
-static void sort_reglist()
+static void sort_reglist(void)
 {
     qsort(reglist, n_symbols, sizeof(SymReg*), reg_sort_f);
 }
 /* make a linear list of IDENTs and VARs, set n_symbols */
 
-void build_reglist() {
+void build_reglist(void) {
     int i, count, unused;
 
     /* count symbols */

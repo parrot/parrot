@@ -19,12 +19,12 @@ void fatal(int code, const char *func, const char *fmt, ...)
 }
 
 
-void fataly(int code, const char *func, int line, const char *fmt, ...)
+void fataly(int code, const char *func, int lin, const char *fmt, ...)
 {
     va_list ap;
 
     va_start(ap, fmt);
-    fprintf(stderr, "error:imcc:%s file %s line %d: ", func, sourcefile, line);
+    fprintf(stderr, "error:imcc:%s file %s line %d: ", func, sourcefile, lin);
     vfprintf(stderr, fmt, ap);
     va_end(ap);
     exit(code);

@@ -51,6 +51,7 @@
 
 struct subs {
     size_t size;
+    int ins_line;
     SymReg * labels[HASH_SIZE];
     SymReg * bsrs[HASH_SIZE];
 };
@@ -65,26 +66,29 @@ static struct globals {
 static int nsubs;
 
 int e_pbc_open(char *dummy) {
-    int ok = 0;
-    /* TODO free the old stuff
-     * should we keep labels, consts and so on for eval?
+    /* TODO check code segment
+     * if different, start new subs, remember old for intersegment branches
      */
-#if 0
+    UNUSED(dummy);
+#if 1
     globals.subs = NULL;
     nsubs = 0;
 #endif
-    return ok;
+    return 0;
 }
 
-/* get size of bytecode in ops till now */
-static int get_old_size(void)
+/* get size/line of bytecode in ops till now */
+static int get_old_size(int *ins_line)
 {
     int i;
     size_t size;
-    if (globals.subs == 0)
+    *ins_line = 0;
+    if (globals.subs == 0 || interpreter->code->byte_code == NULL)
         return 0;
-    for (i = 0, size = 0; i < nsubs; i++)
+    for (i = 0, size = 0; i < nsubs; i++) {
         size += globals.subs[i]->size;
+        *ins_line += globals.subs[i]->ins_line;
+    }
     return size;
 }
 
@@ -316,7 +320,7 @@ add_const_str(char *str) {
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type =
         PFC_STRING;
-    interpreter->code->const_table->constants[k]->string =
+    interpreter->code->const_table->constants[k]->u.string =
         string_make(interpreter, buf, (UINTVAL) l, NULL,
                 PObj_constant_FLAG, NULL);
     store_str_const(buf, k);
@@ -335,7 +339,7 @@ add_const_num(char *buf) {
 
     interpreter->code->const_table->constants[k]->type =
         PFC_NUMBER;
-    interpreter->code->const_table->constants[k]->number =
+    interpreter->code->const_table->constants[k]->u.number =
         (FLOATVAL)atof(buf);
     store_num_const(buf, k);
     return k;
@@ -358,7 +362,7 @@ add_const_key(opcode_t key[], int size, char *s_key) {
         fatal(1, "add_onst_key", "PackFile_Constant error\n");
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type = PFC_KEY;
-    interpreter->code->const_table->constants[k]->key = pfc->key;
+    interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
     store_key_const(s_key, k);
     debug(1, "\t=> %s #%d size %d\n", s_key, k, size);
     debug(1, "\t %x /%x %x/ /%x %x/\n", key[0],key[1],key[2],key[3],key[4]);
@@ -501,11 +505,13 @@ int e_pbc_emit(Instruction * ins) {
     static opcode_t * pc, npc;
     op_info_t *op_info;
     int op, i;
+    static struct PackFile_Debug *debug_seg;
+    static int ins_line;
 
     /* first instruction, do initialisation ... */
     if (ins == instructions) {
         int code_size = store_labels();
-        int oldsize = get_old_size();
+        int oldsize = get_old_size(&ins_line);
         int bytes;
 
         debug(1, "code_size(ops) %d  oldsize %d\n", code_size, oldsize);
@@ -515,8 +521,15 @@ int e_pbc_emit(Instruction * ins) {
         interpreter->code->byte_code =
             mem_sys_realloc(interpreter->code->byte_code, bytes);
         interpreter->code->byte_code_size = bytes;
+        interpreter->code->cur_cs->code = interpreter->code->byte_code;
+        interpreter->code->cur_cs->base.byte_count = bytes;
         pc = (opcode_t*) interpreter->code->byte_code + oldsize;
         npc = 0;
+        /* add debug if necessary */
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+            debug_seg = Parrot_new_debug_seg(interpreter,
+                    interpreter->code->cur_cs, sourcefile);
+        }
     }
     if (ins->op && *ins->op) {
         /* fixup local jumps */
@@ -529,6 +542,10 @@ int e_pbc_emit(Instruction * ins) {
                 debug(1, "branch label %d jump %d %s %d\n",
                         npc, label->color, addr->name,addr->color);
             }
+        }
+        /* add debug line info */
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+            debug_seg->lines[ins_line++] = (opcode_t) ins->line;
         }
         /* Start generating the bytecode */
         *pc++ = op = (opcode_t)ins->opnum;
@@ -568,10 +585,17 @@ int e_pbc_emit(Instruction * ins) {
 }
 
 int e_pbc_close(){
-    int ok = 0;
+    int i;
 
     fixup_bsrs();
-    return ok;
+    /* TODO XXX free labels and consts at end of prog, not here */
+    for (i = 0; i < nsubs; i++) {
+        mem_sys_free(globals.subs[i]);
+    }
+    mem_sys_free(globals.subs);
+    globals.subs = NULL;
+    nsubs = 0;
+    return 0;
 }
 
 /*

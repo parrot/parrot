@@ -25,6 +25,7 @@ typedef struct _Instruction {
     struct _Instruction * next;
     int opnum;		/* parrot op #*/
     int opsize;		/* parrot op size */
+    int line;		/* source code line# */
 } Instruction;
 
 
@@ -65,7 +66,7 @@ typedef enum {
  */
 #ifdef _PARSER
 Instruction * _mk_instruction(const char *,const char *, SymReg **, int);
-Instruction * iANY(char * name, char *fmt, SymReg **r, int emit);
+Instruction * iANY(char * name, const char *fmt, SymReg **r, int emit);
 #else
 #define _mk_instruction(a,b,c,d) dont_use(a,b)
 #define iANY(a,b,c,d) dont_use(a,b)
@@ -103,3 +104,5 @@ int emit_open(int type, char *file);
 int emit_flush(void);
 int emit_close(void);
 
+void open_comp_unit(void);
+void close_comp_unit(void);

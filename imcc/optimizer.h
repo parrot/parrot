@@ -2,6 +2,6 @@
 #define __OPTIMIZER_H
 void pre_optimize(void);
 int optimize(void);
-void post_optimize();
+void post_optimize(void);
 
 #endif

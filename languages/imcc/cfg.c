@@ -192,7 +192,7 @@ static void add_instruc_reads(Instruction *ins, SymReg *r0)
  * as long as P1 is used (not overwritten, by new or clone)
  */
 
-static void propagate_alias()
+static void propagate_alias(void)
 {
     Instruction *ins, *curr;
     SymReg *r0, *r1;
@@ -414,7 +414,7 @@ void compute_dominators () {
 
 }
 
-void free_dominators()
+static void free_dominators(void)
 {
     int i;
 
@@ -429,7 +429,7 @@ void free_dominators()
 
 
 static void
-sort_loops()
+sort_loops(void)
 {
     int i, j, changed;
     Loop_info *li;
@@ -541,7 +541,7 @@ void mark_loop (Edge* e){
     n_loops++;
 }
 
-void free_loops()
+static void free_loops(void)
 {
     int i;
     for (i = 0; i < n_loops; i++) {
@@ -584,10 +584,10 @@ void init_basic_blocks() {
 void clear_basic_blocks() {
     int i;
     for (i=0; i < n_basic_blocks; i++)
-	free(bb_list[i]);
-   free(bb_list);
-   bb_list = NULL;
-   free_edge();
+        free(bb_list[i]);
+    free(bb_list);
+    bb_list = NULL;
+    free_edge();
     free_dominators();
     free_loops();
 }
@@ -624,14 +624,14 @@ Basic_block* make_basic_block(Instruction* ins) {
    return bb;
 }
 
-Life_range* make_life_range(SymReg *r, int index) {
+Life_range* make_life_range(SymReg *r, int idx) {
    Life_range *l;
 
-    l = calloc(1, sizeof(Life_range));
-   if (l==NULL) {
+   l = calloc(1, sizeof(Life_range));
+   if (l == NULL) {
         fatal(1, "make_life_range","Out of mem\n");
    }
-   r->life_info[index] = l;
+   r->life_info[idx] = l;
    return l;
 }
 /*

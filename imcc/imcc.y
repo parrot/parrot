@@ -22,8 +22,6 @@
 
 #define YYDEBUG 1
 
-int         yylex();
-
 
 /*
  * Choosing instructions for Parrot is pretty easy since
@@ -56,7 +54,6 @@ static SymReg ** RR(int n, ...)
 #define R3(r0,r1,r2) 	RR(nargs=3,r0,r1,r2)
 #define R4(r0,r1,r2,r3) RR(nargs=4,r0,r1,r2,r3)
 
-Instruction * iANY(char * name, char *fmt, SymReg **r, int emit);
 
 /*
  * MK_I: build and emitb instruction by iANY
@@ -67,9 +64,10 @@ Instruction * iANY(char * name, char *fmt, SymReg **r, int emit);
  *   op
  *
  */
-static Instruction * MK_I(char * fmt, SymReg ** r) {
+static Instruction * MK_I(const char * fmt, SymReg ** r) {
     char opname[64];
-    char *p, *q;
+    char *p;
+    const char *q;
     for (p = opname, q = fmt; *q && *q != ' '; )
 	*p++ = *q++;
     *p = 0;
@@ -90,7 +88,7 @@ static Instruction * MK_I(char * fmt, SymReg ** r) {
  */
 
 
-static void clear_state()
+static void clear_state(void)
 {
     nargs = 0;
     keyvec = 0;
@@ -164,9 +162,9 @@ SymReg * macro(char *name)
 }
 
 static Instruction *
-multi_keyed(char *name, SymReg ** regs, int nr, int emit)
+multi_keyed(char *name, SymReg ** r, int nr, int emit)
 {
-    int i, keys, kv, n;
+    int i, keyf, kv, n;
     char buf[16];
     static int p = 0;
     SymReg *preg[IMCC_MAX_REGS];    /* px,py,pz */
@@ -175,10 +173,10 @@ multi_keyed(char *name, SymReg ** regs, int nr, int emit)
 
     /* count keys in keyvec */
     kv = keyvec;
-    for (i = keys = 0; i < nr; i++, kv >>= 1)
+    for (i = keyf = 0; i < nr; i++, kv >>= 1)
         if (kv & 1)
-            keys++;
-    if (keys <= 1)
+            keyf++;
+    if (keyf <= 1)
         return 0;
     /* XXX what to do, if we don't emit instruction? */
     assert(emit);
@@ -205,15 +203,15 @@ multi_keyed(char *name, SymReg ** regs, int nr, int emit)
         kv >>= 1;
         if (kv & 1) {
             /* we have a keyed operand */
-            if (regs[i]->set != 'P') {
+            if (r[i]->set != 'P') {
                 fataly(EX_SOFTWARE, "multi_keyed", line,"not an aggregate\n");
             }
             nargs = 3;
             /* don't emit LHS yet */
             if (i == 0) {
                 keyvec = 1 << 1;
-                nreg[0] = regs[i];
-                nreg[1] = regs[i+1];
+                nreg[0] = r[i];
+                nreg[1] = r[i+1];
                 nreg[2] = preg[n];
                 /* set p_k px */
                 ins = iANY(str_dup("set"), 0, nreg, 0);
@@ -221,8 +219,8 @@ multi_keyed(char *name, SymReg ** regs, int nr, int emit)
             else {
                 keyvec = 1 << 2;
                 nreg[0] = preg[n];
-                nreg[1] = regs[i];
-                nreg[2] = regs[i+1];
+                nreg[1] = r[i];
+                nreg[2] = r[i+1];
                 /* set py|z p_k */
                 iANY(str_dup("set"), 0, nreg, 1);
             }
@@ -233,14 +231,14 @@ multi_keyed(char *name, SymReg ** regs, int nr, int emit)
             nargs = 2;
             keyvec = 0;
             if (i == 0) {
-                nreg[0] = regs[i];
+                nreg[0] = r[i];
                 nreg[1] = preg[n];
                 /* set n, px */
                 ins = iANY(str_dup("set"), 0, nreg, 0);
             }
             else {
                 nreg[0] = preg[n];
-                nreg[1] = regs[i];
+                nreg[1] = r[i];
                 /* set px, n */
                 iANY(str_dup("set"), 0, nreg, 1);
             }
@@ -257,7 +255,7 @@ multi_keyed(char *name, SymReg ** regs, int nr, int emit)
     return ins;
 }
 
-Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
+Instruction * iANY(char * name, const char *fmt, SymReg **r, int emit) {
     char fullname[64];
     int i;
     int dirs = 0;
@@ -265,16 +263,16 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
     Instruction * ins;
 
 #if 1
-    ins = multi_keyed(name, regs, nargs, emit);
+    ins = multi_keyed(name, r, nargs, emit);
     if (ins)
         return ins;
 #endif
-    op_fullname(fullname, name, regs, nargs);
+    op_fullname(fullname, name, r, nargs);
     op = interpreter->op_lib->op_code(fullname, 1);
     if (op < 0)         /* maybe we got a fullname */
         op = interpreter->op_lib->op_code(name, 1);
     if (op >= 0) {
-        op_info_t * info = &interpreter->op_info_table[op];
+        op_info_t * op_info = &interpreter->op_info_table[op];
 	char format[128];
 	int len;
 
@@ -282,8 +280,8 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
         /* info->arg_count is offset by one, first is opcode
          * build instruction format
          * set LV_in / out flags */
-        for (i = 0; i < info->arg_count-1; i++) {
-            switch (info->dirs[i+1]) {
+        for (i = 0; i < op_info->arg_count-1; i++) {
+            switch (op_info->dirs[i+1]) {
                 case PARROT_ARGDIR_INOUT:
                     /* inout is actually in for imcc, the PMC has to exist
                      * previously, so:
@@ -314,21 +312,21 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
 	format[len] = '\0';
         if (fmt && *fmt)
             strcpy(format, fmt);
-        memset(regs + nargs, 0, sizeof(*regs) * (IMCC_MAX_REGS - nargs));
+        memset(r + nargs, 0, sizeof(*r) * (IMCC_MAX_REGS - nargs));
 #if 1
         debug(1,"%s %s\t%s\n", name, format, fullname);
 #endif
         /* make the instruction */
 
-        ins = _mk_instruction(name, format, regs, dirs);
+        ins = _mk_instruction(name, format, r, dirs);
         if (emit)
              emitb(ins);
         ins->keys |= keyvec;
         /* fill iin oplib's info */
         ins->opnum = op;
-        ins->opsize = info->arg_count;
+        ins->opsize = op_info->arg_count;
         /* set up branch flags */
-        if (info->jump) {
+        if (op_info->jump) {
             if (!strcmp(name, "bsr") || !strcmp(name, "ret")) {
                 /* ignore subcalls and ret
                  * because they saveall
@@ -345,7 +343,7 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
         }
         else if (!strcmp(name, "set") && nargs == 2) {
             /* set Px, Py: both PMCs have the same address */
-            if (regs[0]->set == 'P' && regs[1]->set == 'P')
+            if (r[0]->set == 'P' && r[1]->set == 'P')
                 ins->type |= ITALIAS;
         }
         else if (!strcmp(name, "set_addr")) {
@@ -643,7 +641,7 @@ string: SREG				{ $$ = mk_symreg($1, 'S'); }
 int yyerror(char * s)
 {
     fprintf(stderr, "last token = [%s]\n", yylval.s);
-    fprintf(stderr, "(error) line %ld: %s\n", line, s );
+    fprintf(stderr, "(error) line %d: %s\n", line, s );
     fprintf(stderr, "Didn't create output asm.\n" );
     exit(EX_UNAVAILABLE);
 }

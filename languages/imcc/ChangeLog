@@ -1,3 +1,11 @@
+- 2003-01-20	leo
+	* version 0.0.9.10
+	* the -r command line option is now optional, default mode now
+	  is running the program, except when a -o output is given
+	* the -c option now means: assume PBC on stdin and run it.
+	* imcc_compile
+	* generate file/line info for programs and compile ops
+
 - 2003-01-14	leo
 
 	* version 0.0.9.9.
