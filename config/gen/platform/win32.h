@@ -33,7 +33,7 @@ void Parrot_setenv(const char *name, const char *value);
 
 void *Parrot_dlopen(const char *filename);
 const char *Parrot_dlerror(void);
-void *Parrot_dlsym(void *handle, char *symbol);
+void *Parrot_dlsym(void *handle, const char *symbol);
 int Parrot_dlclose(void *handle);
 
 

@@ -3440,8 +3440,7 @@ inline op callnative(out PMC, in PMC, in STR) {
   int ret;
   const char * name = string_to_cstring(interpreter, ($3));
   void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(
-                                                ($2)->data,        
-						(char *)name));
+                                                ($2)->data, name));
   if(p == NULL) {
      const char * err = Parrot_dlerror();
      if(err != NULL) {
@@ -3469,8 +3468,7 @@ inline op callnative(out PMC, in PMC, in PMC, in STR) {
   int ret;
   const char * name = string_to_cstring(interpreter, ($4));
   void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(
-                                                ($2)->data,
-						(char *)name));
+                                                ($2)->data, name));
   if(p == NULL) {
      const char * err = Parrot_dlerror();
      if(err != NULL) {

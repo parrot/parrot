@@ -100,7 +100,7 @@ Parrot_dlerror(void)
 */
 
 void *
-Parrot_dlsym(void *handle, char *symbol)
+Parrot_dlsym(void *handle, const char *symbol)
 {
     void *addr;
 
