@@ -207,7 +207,7 @@ PIO_win32_isatty(PIOHANDLE fd)
 }
 
 
-static void
+static INTVAL
 PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     /*
@@ -219,7 +219,7 @@ PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
      * Windows 9x: The function does nothing if hFile is a handle to console output. That is because console output is not buffered.
      * The function returns TRUE, but it does nothing.
      */
-    FlushFileBuffers(io->fd);
+    return FlushFileBuffers(io->fd);
 }
 
 
