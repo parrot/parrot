@@ -3,9 +3,11 @@
 # Create 2 coroutines
 #
 set_addr I0, MYCOROUTINE 
-new P0, .ParrotCoroutine, I0 
+new P0, .Coroutine
+set P0, I0 
 save P0
-new P0, .ParrotCoroutine, I0 
+new P0, .Coroutine
+set P0, I0 
 # Calling convention says P0 will contain the sub so..
 print "Calling 1st co-routine\n"
 callco
