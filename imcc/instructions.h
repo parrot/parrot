@@ -54,7 +54,7 @@ typedef enum {
     IF_unary   = (IF_r0_write|IF_r1_read),           /* templ for unary  op */
     IF_inplace = (IF_r0_write|IF_r0_read),    /* templ for inplace unary  op */
     /* the branch flags are the lowe 16 bits of type
-     * for uperr 16 see ITXX above */
+     * for upper 16 see ITXX above */
     IF_r0_branch  = (1 << 0),
     IF_r1_branch  = (1 << 1),
     IF_r2_branch  = (1 << 2),
