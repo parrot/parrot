@@ -85,16 +85,28 @@ Stack_Chunk_t *
 cst_new_stack_chunk(Parrot_Interp interpreter, Stack_Chunk_t *chunk)
 {
     Stack_Chunk_t *new_chunk;
-    struct Small_Object_Pool *pool;
 
     /*
-     * get buffer directly from pool, we don't need zeroed
-     * memory
+     * TODO get buffer directly from pool, we don't need zeroed
+     *      memory
+     *
+     * For now, we need zeroed memory - register marking
+     * with junk PMC or STRING pointers fails. We need an upper bound
+     * of used registers per kind, so that we mark only valid registers
+     * This also means, that the register allocator has to allocate
+     * always from reg 0 up.
+     * Still better is to just allocate smaller chunks if needed
      */
+#if 0
+    struct Small_Object_Pool *pool;
+
     pool = get_bufferlike_pool(interpreter, chunk->size);
     new_chunk = pool->get_free_object(interpreter, pool);
     PObj_bufstart(new_chunk) = NULL;
     PObj_buflen  (new_chunk) = 0;
+#else
+    new_chunk = new_bufferlike_header(interpreter, chunk->size);
+#endif
 
     new_chunk->size = chunk->size;
     new_chunk->name = chunk->name;
@@ -146,19 +158,32 @@ new_register_frame(Interp* interpreter, Stack_Chunk_t **stack_p)
 {
     Stack_Chunk_t *chunk = *stack_p, *new_chunk;
     Caches *ic = interpreter->caches;
+    int i;
+    struct parrot_regs_t *bp;
 
     if (ic->frame_cache) {
         /*
          * frame_cache holds the stack top, next in chain is in bufstart
          */
         new_chunk = ic->frame_cache;
+        bp = (struct parrot_regs_t *)STACK_DATAP(new_chunk);
         ic->frame_cache = PObj_bufstart(ic->frame_cache);
+        for (i = 0; i < NUM_REGISTERS; i++) {
+            /*
+             * we could have stale PMCs or strings in cached frame
+             * so we have to clear all
+             */
+            BP_REG_PMC(bp, i) = PMCNULL;
+            BP_REG_STR(bp, i) = NULL;
+        }
     }
-    else
+    else {
         new_chunk = cst_new_stack_chunk(interpreter, chunk);
+        bp = (struct parrot_regs_t *)STACK_DATAP(new_chunk);
+    }
     new_chunk->prev = chunk;
     *stack_p = new_chunk;
-    return STACK_DATAP(new_chunk);
+    return bp;;
 }
 
 void

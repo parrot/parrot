@@ -348,7 +348,7 @@ a sleep opcode.
  * each ALLOCATIONS_INIT allocations of any object an incremental
  * step is triggered
  */
-#define ALLOCATIONS_INIT      1024*4
+#define ALLOCATIONS_INIT      1024*2
 
 /*
  * a mark step does allocations * throttle work
@@ -387,7 +387,7 @@ typedef enum {          /* these states have to be in execution order */
     GC_IMS_COLLECT,     /* collect buffer memory */
     GC_IMS_FINISHED,    /* update statistics */
     GC_IMS_CONSUMING,   /* when we have plenty of free objects */
-    GC_IMS_DEAD         /* gc is alreadz shutdown */
+    GC_IMS_DEAD         /* gc is already shutdown */
 
 } gc_ims_state_enum;
 
@@ -454,6 +454,11 @@ gc_ims_get_free_object(Interp *interpreter,
     Gc_ims_private *g_ims;
 
     arena_base = interpreter->arena_base;
+    g_ims = arena_base->gc_private;
+    if (++g_ims->allocations >= g_ims->alloc_trigger) {
+        g_ims->allocations = 0;
+        parrot_gc_ims_run_increment(interpreter);
+    }
     /* if we don't have any objects */
     if (!pool->free_list)
         (*pool->alloc_objects) (interpreter, pool);
@@ -470,11 +475,6 @@ gc_ims_get_free_object(Interp *interpreter,
     if (GC_DEBUG(interpreter))
         PObj_version((Buffer*)ptr) = arena_base->dod_runs;
 #endif
-    g_ims = arena_base->gc_private;
-    if (++g_ims->allocations >= g_ims->alloc_trigger) {
-        g_ims->allocations = 0;
-        parrot_gc_ims_run_increment(interpreter);
-    }
     return ptr;
 }
 

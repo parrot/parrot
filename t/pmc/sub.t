@@ -1337,7 +1337,7 @@ output_is(<<'CODE', <<'OUTPUT', "caller introspection");
     print "Bar bar\n"
     $P1 = getinterp
     $P0 = $P1["sub"]
-    print "caller: "
+    print "subname: "
     print $P0
     print "\n"
     foo()
@@ -1362,7 +1362,7 @@ tb_end:
 CODE
 main foo
 Bar bar
-caller: bar
+subname: bar
 Bar foo
 caller 0 foo
 caller 1 bar
