@@ -14,7 +14,7 @@
 
 
 /*
- *=for api interpreter dump_pmc
+ *=for api interpreter trace_pmc_dump
  * Prints a PMC to stderr
  */
 
