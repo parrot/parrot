@@ -1,62 +1,109 @@
 If you submit a language compiler please write a one-liner below
 indicating roughly the state of your language. Does it have
 samples, do they work? Is there a README and an easy way
-to build it?
+to build it? The fields are: (N) Language name, (A) authors/maintainers, (D)
+description, (S) status, (M) maintained, (V) last compatible Parrot version.
 
 
-BASIC
+N: BASIC
+A: Clint Pierce
+D: BASIC Interpreter written in pure Parrot
+S: Functional, includes samples such as Eliza and Hunt the Wumpus
+M: Yes
+V: 0.0.11
 
-befunge
+N: befunge
+A: Jerome Quelin
+D: Functioning -93 interpreter (input routines may be funky).
+S: Samples working, README explain how to build/use.
+S: (waiting for Parrot objects for a befunge-98 version).
+M: Yes
+V: 0.0.11
 
-Befunge-93
+N: bf
 
-bf
+N: Cola
+A: Melvin Smith
+D: Java like language with some hybrid Perl features like regex
+D: operators planned.
+S: Functioning, all samples working, lacks IO routines
+M: Yes 
+V: 0.0.11
 
-Cola		Functioning, all samples working, lacks IO routines
-		Status: Maintained
+N: forth
 
-forth
+N: IMCC
+A: Melvin Smith
+A: Angel Faus
+A: Leopold Toetsch
+D: The PIR and PASM compiler for Parrot
+S: Functioning, all samples working
+M: Yes (integral to Parrot)
+V: 0.0.11
 
-IMCC		Functioning, all samples working
-		Status: Maintained but moving up to main directory soon
+N: Jako
+A: Gregor Purdy
+D: C/Perl like language, first compiler for Parrot
+S: Functioning, although not all examples work. Calling conventions and NCI
+S: have changed since the Jako subroutine and NCI code
+S: generation was written, causing some breakage.
+M: Yes 
+V: 0.0.11
 
-Jako		Functioning, although not all examples work.
-		Status: Lightly maintained, calling conventions and NCI
-		have changed since the Jako subroutine and NCI code
-		generation was written, causing some breakage.
+N: miniperl
 
-miniperl
+N: Ook
+A: Jerome Quelin
+D: Functioning compiler targeting pasm.
+S: Samples working, README explain how to build/use.
+M: Yes 
+V: 0.0.11
 
-ook
+N: OpenComal
+D: Compiler emiting parrot being added to interpreter
+S: Under development; nowhere near anything yet
+W: http://www.josvisser.nl/opencomal
+V: 0.0.11
 
-OpenComal	Compiler emiting parrot being added to interpreter
-		Status: Under development; nowhere near anything yet
-		URL: http://www.josvisser.nl/opencomal
-		Parrot Version: 0.0.11
+N: parrot_compiler
 
-parrot_compiler
+N: Perl6
+A: Sean O'Rourke
+D: Perl6 compiler written in Perl5
+S: Largely functional, but changing rapidly
+M: Yes 
+V: 0.0.11
 
-Perl6
+N: plot
 
-plot
+N: Python
+A: Michal J Wallace
+S: Mostly working except for classes/exec/import. For licensing 
+S: reasons, not in parrot's cvs tree.
+M: Yes
+W: http://pirate.tangentcode.com/
+V: 0.0.11
 
-Python		Mostly working except for classes/exec/import. For licensing 
-		reasons, not in parrot's cvs tree. See http://pirate.tangentcode.com/
-		Parrot Version: 0.0.11
+N: regex
 
-regex
+N: Ruby
 
-Ruby
+N: Scheme
+S: Functioning, as far as implemented. Lists and functions are working
+S: but many functions are missing implementation.
+M: Yes
 
-Scheme          Functioning, as far as implemented.
-                Status: Lightly maintained. Lists and functions are working
-                but many functions are missing implementation.
+N: tcl
+A: Will Coleda
+S: passes all tests, but all examples do not currently work.
+S: heavily under construction
+M: Yes
+V: 0.0.11
 
-tcl		passes all tests, but all examples do not currently work.
-		heavily under construction, but maintained
-
-URM		Functioning, all examples working
-		Language standard is stable and not expected
-		to change soon.
-		Maintained 
+N: URM
+A: Marcus Thiesen
+S: Functioning, all examples working
+S: Language standard is stable and not expected to change soon.
+M: Yes
+V: 0.0.11
 
