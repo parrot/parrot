@@ -119,7 +119,7 @@ CHARCONSTANT    \'[^'\n]*\'
 "<="            return(LOGICAL_LTE);
 ">="            return(LOGICAL_GTE);
 [\t\f\r ]+        ;
-.               { fprintf(stderr, "TOK[%c]\n", yytext[0]); return yytext[0]; }
+.               return yytext[0];
 %%
 
 #ifdef yywrap
