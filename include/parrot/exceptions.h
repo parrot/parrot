@@ -41,6 +41,7 @@ void internal_exception(int exitcode, const char * format, ... );
 #define PIO_NOT_IMPLEMENTED 1
 #define ALLOCATION_ERROR 1
 #define INTERNAL_PANIC 1
+#define OUT_OF_BOUNDS 1
 
 #endif
 

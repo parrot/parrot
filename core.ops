@@ -2,6 +2,16 @@
 ** core.ops
 */
 
+/* This convoluted mess avoids costly runtime creation of KEY
+and KEY_PAIR structures. */
+
+#define MAKE_KEY(k,k_p,v,c,t) if (v) {\
+        k_p.type = c;\
+        k_p.cache.t = v;\
+        k.size = 1;\
+        k.keys[0] = &k_p;\
+    }
+
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -471,36 +481,7 @@ These operations load registers from constants or other registers.
 
 Set $1 to $2.
 
-=item B<set>(out INT, in PMC, in INT)
-
-=item B<set>(out NUM, in PMC, in INT)
-
-=item B<set>(out STR, in PMC, in INT)
-
-=item B<set>(out PMC, in INT, in INT)
-
-=item B<set>(out PMC, in NUM, in INT)
-
-=item B<set>(out PMC, in STR, in INT)
-
-Set $1 to index $1 of array $2
-
-=item B<set>(out INT, in PMC, in INT)
-
-=item B<set>(out NUM, in PMC, in INT)
-
-=item B<set>(out STR, in PMC, in INT)
-
-=item B<set>(out PMC, in INT, in INT)
-
-=item B<set>(out PMC, in NUM, in INT)
-
-=item B<set>(out PMC, in STR, in INT)
-
-Set $1 to index $3 of hash $2
-
 =cut
-
 
 inline op set(out INT, in INT) {
   $1 = $2;
@@ -557,68 +538,32 @@ inline op set(out INT, in PMC) {
   goto NEXT();
 }
 
+=item B<set_keyed>(out PMC, out PMC, in PMC, in PMC)
+
+    $1[$2] = $3[$4];
+
+=cut
+
+inline op set_keyed (out PMC, in PMC, in PMC, in PMC)  {
+    KEY_PAIR src_key_p, dest_key_p;
+    KEY src_key, dest_key;
+
+    MAKE_KEY(src_key, src_key_p, $2, enum_key_pmc, pmc_val);
+    MAKE_KEY(dest_key, dest_key_p, $4, enum_key_pmc, pmc_val);
+
+    $1->vtable->set_keyed(interpreter, 
+                    $1, $2 ? &src_key : NULL, $3, $4 ? &dest_key : NULL);
+    goto NEXT();
+}
+
+=item B<clone>(out PMC, in PMC)
+
+Copies a PMC $1 to $2.
+
+=cut
+
 inline op clone(out PMC, in PMC) {
   $2->vtable->clone(interpreter, $2, $1);
-  goto NEXT();
-}
-
-inline op set(out PMC, in INT, in INT) {
-  $1->vtable->set_integer_index(interpreter, $1, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out PMC, in NUM, in INT) {
-  $1->vtable->set_number_index(interpreter, $1, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out PMC, in STR, in INT) {
-  $1->vtable->set_string_index(interpreter, $1, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out INT, in PMC, in INT) {
-  $1 = $2->vtable->get_integer_index(interpreter, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out NUM, in PMC, in INT) {
-  $1 = $2->vtable->get_number_index(interpreter, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out STR, in PMC, in INT) {
-  $1 = $2->vtable->get_string_index(interpreter, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out PMC, in INT, in STR) {
-  $1->vtable->set_integer_index_s(interpreter, $1, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out PMC, in NUM, in STR) {
-  $1->vtable->set_number_index_s(interpreter, $1, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out PMC, in STR, in STR) {
-  $1->vtable->set_string_index_s(interpreter, $1, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out INT, in PMC, in STR) {
-  $1 = $2->vtable->get_integer_index_s(interpreter, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out NUM, in PMC, in STR) {
-  $1 = $2->vtable->get_number_index_s(interpreter, $2, $3);
-  goto NEXT();
-}
-
-inline op set(out STR, in PMC, in STR) {
-  $1 = $2->vtable->get_string_index_s(interpreter, $2, $3);
   goto NEXT();
 }
 
