@@ -124,6 +124,22 @@ Returns an integer representation of the number (by casting).
 
 /*
 
+/*
+
+=item C<INTVAL get_bool()>
+
+Evaluates the number as a boolean, i.e. it's true if it's not zero.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return (INTVAL)(PMC_num_val(SELF) != 0.0);
+    }
+
+/*
+
 =item C<STRING* get_string()>
 
 Returns a Parrot string representation of the number.

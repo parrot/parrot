@@ -16,7 +16,7 @@ Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
 
 =cut
 
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 42;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -699,4 +699,112 @@ output_is(<<'CODE', <<'OUTPUT', "+- zero");
 CODE
 0
 -0.000000
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive float");
+##PIR##
+.sub _main
+    .local pmc float_1
+    float_1 = new Float
+    float_1 = 123.123
+    print float_1
+    if float_1 goto IS_TRUE
+      print " is false\n"
+    end
+    IS_TRUE:
+      print " is true\n"
+    end
+.end
+CODE
+123.123 is true
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative float");
+##PIR##
+.sub _main
+    .local pmc float_1
+    float_1 = new Float
+    float_1 = -123.123
+    print float_1
+    if float_1 goto IS_TRUE
+      print " is false\n"
+    end
+    IS_TRUE:
+      print " is true\n"
+    end
+.end
+CODE
+-123.123 is true
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive integer");
+##PIR##
+.sub _main
+    .local pmc float_1
+    float_1 = new Float
+    float_1 = 1
+    print float_1
+    if float_1 goto IS_TRUE
+      print " is false\n"
+    end
+    IS_TRUE:
+      print " is true\n"
+    end
+.end
+CODE
+1 is true
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative integer");
+##PIR##
+.sub _main
+    .local pmc float_1
+    float_1 = new Float
+    float_1 = -1
+    print float_1
+    if float_1 goto IS_TRUE
+      print " is false\n"
+    end
+    IS_TRUE:
+      print " is true\n"
+    end
+.end
+CODE
+-1 is true
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0");
+##PIR##
+.sub _main
+    .local pmc float_1
+    float_1 = new Float
+    float_1 = 0
+    print float_1
+    if float_1 goto IS_TRUE
+      print " is false\n"
+    end
+    IS_TRUE:
+      print " is true\n"
+    end
+.end
+CODE
+0 is false
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0.000");
+##PIR##
+.sub _main
+    .local pmc float_1
+    float_1 = new Float
+    float_1 = 0.000
+    print float_1
+    if float_1 goto IS_TRUE
+      print " is false\n"
+    end
+    IS_TRUE:
+      print " is true\n"
+    end
+.end
+CODE
+0 is false
 OUTPUT
