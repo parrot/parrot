@@ -35,8 +35,7 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
         return -1;
     }
 
-    if (PIO_write
-        (interpreter, PIO_STDERR(interpreter), targ->bufstart,
+    if (PIO_write(interpreter, PIO_STDERR(interpreter), targ->bufstart,
          targ->bufused) < 0) {
         return -2;
     }
@@ -74,8 +73,7 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
         return -1;
     }
 
-    if (PIO_write
-        (interpreter, PIO_STDERR(interpreter), targ->bufstart,
+    if (PIO_write(interpreter, PIO_STDERR(interpreter), targ->bufstart,
          targ->bufused) < 0) {
         return -2;
     }
