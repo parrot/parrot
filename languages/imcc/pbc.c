@@ -642,13 +642,22 @@ constant_folding(struct Parrot_Interp *interpreter)
     int i;
 
     /* go through all consts of current sub */
-    for(i = 0; i < HASH_SIZE; i++)
+    for(i = 0; i < HASH_SIZE; i++) {
+        /* normally constants are in ghash ... */
         for(r = ghash[i]; r; r = r->next) {
             if (r->type & VTCONST) {
                 add_1_const(interpreter, r);
             }
-
         }
+        /* ... but keychains 'K' are in hash, they may contain
+         * variables and constants
+         */
+        for(r = hash[i]; r; r = r->next) {
+            if (r->type & VTCONST) {
+                add_1_const(interpreter, r);
+            }
+        }
+    }
 }
 
 
