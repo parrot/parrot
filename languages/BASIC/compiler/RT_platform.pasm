@@ -76,6 +76,19 @@ NOTWIN: call _ANSI_SCREEN_COLOR
 END:	restoreall
 	ret
 .end
+.sub _inkey_string		# string inkey$(void)
+	saveall
+	.local string sys
+	sysinfo sys, 4
+	ne sys, "MSWin32", NOTWIN
+	call _WIN32_INKEY
+	branch END
+END:	restoreall
+	ret
+
+NOTWIN: print "Not supported yet\n"
+	end
+.end
 ## Problem in ANSI
 #SCREEN_GETFORE:
 #	sysinfo S0, 4

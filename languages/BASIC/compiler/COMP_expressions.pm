@@ -17,7 +17,7 @@ my $currentexpr;
 		erdev$		erl		err
 		exp	    	fileattr	fix
 		fre		freefile	hex$
-		inkey_NOTYET$
+		inkey$
 		space_NOTYET$
 		time_NOTYET$
 		inp		input$

@@ -9,6 +9,10 @@
 	invoke
 	store_global "kernel32", P1
 	store_global "Win32handle", P5
+	set I0, 1
+	set I5, -10
+	invoke
+	store_global "Win32Inputhandle", P5
 	$P0= new PerlHash
 	store_global "Win32console", $P0
 	call _WIN32_CONSOLE_INFO
@@ -225,6 +229,77 @@
 	set I0, 1
 	invoke
 	call _WIN32_CONSOLE_INFO  # refresh this.
+	restoreall
+	ret
+.end
+.const int SIZEOF_INPUT_RECORD = 20
+.const int NUMBER_OF_EVENTS = 128
+# buffer is INPUT_RECORD * EVENTS
+.const int INPUT_BUFFER = 2560
+.sub _WIN32_INKEY	# string Win32_inkey(void)
+	saveall
+	set S0, ""
+	set I9, 0
+	find_global P1, "kernel32"
+	dlfunc P0, P1, "SetConsoleMode", "ipi"
+	set I0, 1
+	find_global P5, "Win32Inputhandle"
+	set I5, 0
+	invoke
+INKEY:  
+	dlfunc P9, P1,  "PeekConsoleInputA",  "ippip"
+        dlfunc P10, P1, "ReadConsoleInputA", "ippip"
+	find_global P5, "Win32Inputhandle"
+	P6=new ManagedStruct
+	P7=new ManagedStruct
+	set P6, INPUT_BUFFER
+	set P7, SIZEOF_DWORD
+
+	# Are there any events?
+	set P0, P9	# Peek
+	set I0, 1
+	set I5, NUMBER_OF_EVENTS	# sizeof read buffer
+	invoke
+
+	# Peek down the event queue to see if there's a key event
+	set I0, P7[0]   # Number of events.
+	eq I0, 0, NO_EVENTS
+	set I5, -1
+NEXT_EVENT:
+	inc I5
+	eq I5, I0, END_EVENTS
+	mul I7, I5, SIZEOF_INPUT_RECORD
+	set I1, P6[I7]
+	ne I1, 1, NEXT_EVENT
+
+	# Got a key event, was it a key down?
+	add I8, I7, SIZEOF_DWORD
+	set I1, P6[I8]
+	ne I1, 1, NEXT_EVENT	# Nope, a key up
+
+	# Is it a special-key thingy? (shift, alt...)
+	add I8, I7, 14
+	set I1, P6[I8]
+	eq I1, 0, NEXT_EVENT
+
+	# Cool.  Grab the key.
+	set I9, I1
+	chr S0, I9
+
+	# I6 is the event we're interested in!
+	# 
+	# There *was* a key event.  Pull everything up to that event
+	#
+	inc I5
+	set P0, P10	# ReadConsoleInput
+        set I0, 1
+	find_global P5, "Win32Inputhandle"
+	invoke
+	branch END
+
+NO_EVENTS:
+END_EVENTS:
+END:	.return S0
 	restoreall
 	ret
 .end
