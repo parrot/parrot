@@ -550,9 +550,11 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
 
             if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
                 if (interpreter->profile == NULL) {
-                    interpreter->profile = (ProfData *)
-                        mem_sys_allocate_zeroed(interpreter->op_count *
-                                sizeof(ProfData));
+                    interpreter->profile = (RunProfile *)
+                        mem_sys_allocate(sizeof(RunProfile));
+                    interpreter->profile->data = (ProfData *)
+                        mem_sys_allocate_zeroed((interpreter->op_count +
+                                    PARROT_PROF_EXTRA) * sizeof(ProfData));
                 }
             }
         }
@@ -658,6 +660,12 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
     if (setjmp(the_exception.destination)) {
         /* an exception was thrown */
         offset = handle_exception(interpreter);
+    }
+    if (interpreter->profile &&
+            interpreter->profile->lastpc == (opcode_t*)&interpreter->op_count &&
+            Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+        interpreter->profile->data[*interpreter->profile->lastpc].time +=
+            Parrot_floatval_time() - interpreter->profile->starttime;
     }
 #endif
     runops_ex(interpreter, offset);

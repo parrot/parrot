@@ -75,8 +75,6 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
     opcode_t *code_start;
     opcode_t *code_end;
-    opcode_t *lastpc = NULL;
-    FLOATVAL starttime = 0;
 #ifdef USE_TRACE_INTERP
     Interp * trace_i;
     struct Parrot_Context *trace_ctx;
@@ -115,9 +113,9 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 
     while (pc && pc >= code_start && pc < code_end) {
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-            interpreter->profile[*pc].numcalls++;
-            lastpc = pc;
-            starttime = Parrot_floatval_time();
+            interpreter->profile->data[*pc].numcalls++;
+            interpreter->profile->lastpc = pc;
+            interpreter->profile->starttime = Parrot_floatval_time();
         }
 
         DO_OP(pc, interpreter);
@@ -132,8 +130,8 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
         }
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-            interpreter->profile[*lastpc].time +=
-                Parrot_floatval_time() - starttime;
+            interpreter->profile->data[*interpreter->profile->lastpc].time +=
+                Parrot_floatval_time() - interpreter->profile->starttime;
         }
     }
 #ifdef USE_TRACE_INTERP

@@ -285,6 +285,20 @@ real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
     STRING *msg;
     opcode_t *dest;     /* absolute address of handler */
 
+
+    /*
+     * if profiling remember end time of lastop and
+     * generate entry for exception
+     */
+    if (interpreter->profile &&
+            Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+        interpreter->profile->data[*interpreter->profile->lastpc].time +=
+                Parrot_floatval_time() - interpreter->profile->starttime;
+        interpreter->profile->lastpc = (opcode_t*) &interpreter->op_count;
+        interpreter->profile->starttime = Parrot_floatval_time();
+        interpreter->profile->data[interpreter->op_count].numcalls++;
+    }
+
     /*
      * make exception message
      */

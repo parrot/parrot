@@ -401,24 +401,28 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         PIO_printf(interpreter, "  CODE   OP FULL NAME            CALLS  TOTAL TIME    AVG TIME\n");
         PIO_printf(interpreter, "  -----  -----------------     -------  ----------  ----------\n");
 
-        for (j = 0; j < interpreter->op_count; j++)
-            interpreter->profile[j].op = j;
-        qsort(interpreter->profile, interpreter->op_count,
+        for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++)
+            interpreter->profile->data[j].op = j;
+        qsort(interpreter->profile->data, interpreter->op_count +
+                PARROT_PROF_EXTRA,
                 sizeof(ProfData), prof_sort_f);
-        for (j = 0; j < interpreter->op_count; j++) {
-            if (interpreter->profile[j].numcalls > 0) {
+        for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
+            UINTVAL n = interpreter->profile->data[j].numcalls;
+            FLOATVAL t = interpreter->profile->data[j].time;
+            if (n > 0) {
                 op_count++;
-                call_count += interpreter->profile[j].numcalls;
-                sum_time += interpreter->profile[j].time;
+                call_count += n;
+                sum_time += t;
 
-                k = interpreter->profile[j].op;
+                k = interpreter->profile->data[j].op;
                 PIO_printf(interpreter, "  %5d  %-20s  %7vu  %10vf  %10vf\n",
                         k,
+                        k == interpreter->op_count ?
+                        "Exception" :
                         interpreter->op_info_table[k].full_name,
-                        interpreter->profile[j].numcalls,
-                        interpreter->profile[j].time,
-                        (FLOATVAL)(interpreter->profile[j].time /
-                                   (FLOATVAL)interpreter->profile[j].numcalls)
+                        n,
+                        t,
+                        (FLOATVAL)(t / n)
                         );
             }
         }

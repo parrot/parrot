@@ -68,11 +68,24 @@ typedef opcode_t *(**op_func_table)(); /* Opcode function table */
 typedef STRING_FUNCS *(**string_funcs)();      /* String function table */
 #endif
 
+/*
+ * one entry per op + extra
+ */
+#define PARROT_PROF_EXTRA 1
+/*
+ * data[op_count] is time spent for exception handling
+ */
 typedef struct ProfData {
     int op;
     UINTVAL numcalls;
     FLOATVAL time;
 } ProfData;
+
+typedef struct RunProfile {
+    opcode_t *lastpc;
+    FLOATVAL starttime;
+    ProfData *data;
+} RunProfile;
 
 typedef struct Parrot_Context {
     struct IRegChunk *int_reg_top;    /* Current top chunk of int reg stack */
@@ -125,7 +138,7 @@ typedef struct Parrot_Interp {
                                  * signal that runops should do
                                  * something */
 
-    ProfData *profile;          /* The array where we keep the
+    RunProfile *profile;        /* The structure and array where we keep the
                                  * profile counters */
 
     INTVAL resume_flag;
