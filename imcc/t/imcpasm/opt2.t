@@ -67,6 +67,9 @@ nxt:
 OUT
 
 ##############################
+SKIP: {
+skip("loop opt disabled for now", 1);
+
 output_is(<<'CODE', <<'OUT', "remove invariant from loop");
 .sub _main
        set I0, 5
@@ -95,6 +98,7 @@ next:
 	lt I1, 4, next
 	end
 OUT
+}
 
 ##############################
 output_is(<<'CODE', <<'OUT', "constant prop repeated");

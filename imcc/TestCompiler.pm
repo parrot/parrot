@@ -67,13 +67,16 @@ sub generate_functions {
 	    $desc = "($file line $line)";
 	}
 
+      my $s = $PConfig{slash};
+      my $rxs = $s;
+      $rxs =~ s,\\,\\\\,;
+      
 	my $by_f = per_test('.imc',$count);
 	my $gen_pasm;
-	$gen_pasm = 1 if ($by_f =~ m!/imcpasm/!);
+	$gen_pasm = 1 if ($by_f =~ m!${rxs}imcpasm${rxs}!);
 	my $opt = '';
-	$opt = "-O$1" if ($by_f =~ m!/imcpasm/opt(.)!);
-	$opt = "-O1" if ($by_f =~ m!/imcpasm/cfg!);
-
+	$opt = "-O$1" if ($by_f =~ m!${rxs}imcpasm${rxs}opt(.)!);
+	$opt = "-O1" if ($by_f =~ m!${rxs}imcpasm${rxs}cfg!);
 	$output =~ s/\cM\cJ/\n/g;
 	if ($gen_pasm) {
 	    $output =~ s/^\s*$//gm;
@@ -88,7 +91,6 @@ sub generate_functions {
 	my $out_f = per_test('.out',$count);
 
 	my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-	my $s = $PConfig{slash};
 	my $exe = $PConfig{exe};
 	#my $PARROT = $ENV{PARROT} || "..${s}parrot$exe";	# XXX
 	my $PARROT = $ENV{PARROT} || ".${s}parrot$exe";	# XXX
