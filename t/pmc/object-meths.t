@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown");
@@ -187,21 +187,21 @@ output_is(<<'CODE', <<'OUTPUT', "methods: self");
 .sub _main
     .local pmc A
     .local pmc B
-    
+
     newclass A, "A"
     newclass B, "B"
-    
+
     find_type I0, "A"
     find_type I1, "B"
-    
+
     new A, I0
     new B, I1
-    
+
     setprop A, "B", B
-    
+
     A."foo"()
     B."foo"()
-    
+
     end
 .end
 
@@ -209,37 +209,142 @@ output_is(<<'CODE', <<'OUTPUT', "methods: self");
 
 .sub foo method
     .local pmc B
-    
-    self = P2
+
     print "A::foo\n"
     getprop B, "B", self
 
     self."blah"()
     B."blah"()
     self."blah"()
-    
-    .pcc_begin_return
-    .pcc_end_return
+
 .end
 
 .sub blah method
     print "A::blah\n"
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .namespace ["B"]
 
 .sub foo method
     print "B::foo\n"
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .sub blah method
     print "B::blah\n"
+.end
+CODE
+A::foo
+A::blah
+B::blah
+A::blah
+B::foo
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "methods: self w arg");
+##PIR##
+.sub _main
+    .local pmc A
+    .local pmc B
+
+    newclass A, "A"
+    newclass B, "B"
+
+    find_type I0, "A"
+    find_type I1, "B"
+
+    new A, I0
+    new B, I1
+
+    A."foo"(B)
+    B."foo"()
+
+    end
+.end
+
+.namespace ["A"]
+
+.sub foo method
+    .param pmc B
+
+    print "A::foo\n"
+
+    self."blah"()
+    B."blah"()
+    self."blah"()
+
+.end
+
+.sub blah method
+    print "A::blah\n"
+.end
+
+.namespace ["B"]
+
+.sub foo method
+    print "B::foo\n"
+.end
+
+.sub blah method
+    print "B::blah\n"
+.end
+CODE
+A::foo
+A::blah
+B::blah
+A::blah
+B::foo
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "methods: self w arg and ret");
+##PIR##
+.sub _main
+    .local pmc A
+    .local pmc B
+
+    newclass A, "A"
+    newclass B, "B"
+
+    find_type I0, "A"
+    find_type I1, "B"
+
+    new A, I0
+    new B, I1
+
+    .local pmc r
+    r = A."foo"(B)
+    r."foo"()
+
+    end
+.end
+
+.namespace ["A"]
+
+.sub foo method
+    .param pmc B
+
+    print "A::foo\n"
+
+    self."blah"()
+    B."blah"()
+    self."blah"()
     .pcc_begin_return
+    .return B
     .pcc_end_return
+
+.end
+
+.sub blah method
+    print "A::blah\n"
+.end
+
+.namespace ["B"]
+
+.sub foo method
+    print "B::foo\n"
+.end
+
+.sub blah method
+    print "B::blah\n"
 .end
 CODE
 A::foo
