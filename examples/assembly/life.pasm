@@ -4,6 +4,12 @@
 # Play conway's (no, not *him*. The other conway) game
 # of life
 #
+	# First the generation count
+	set I2, 100
+	# Note the time
+	time N5
+	# If true, we don't print
+	set I12, 1
 	set S0,  "               "
 	set S1,  "    *          "
 	set S2,  "    *      *   "
@@ -36,18 +42,27 @@
 	concat S15, S15, S13
 	concat S15, S15, S14
 	bsr dump
-	sleep 1
 	set I0, 0
-loop:	ge I0, 10000, getout
+loop:	ge I0, I2, getout
 	inc I0
 
 	bsr generate
 
 	bsr dump
-	sleep 1
 	branch loop
 
-getout:	end
+getout:	time N6
+	sub N7, N6, N5
+	print I2
+	print " generations in "
+	print N7
+ 	print " seconds. "
+	set N8, I2
+	div N1, N8, N7
+	print N1
+	print " generations/sec"
+
+	end
 
 # S15 has the incoming string, S0 is scratch, S1 is scratch, S2 is scratch
 #
@@ -156,6 +171,7 @@ done:
 
 # S15 has the incoming string, S0 is scratch
 dump:
+	if I12, dumpend
 	save I0
 	save I1
 	print "\n\n\n\n\n\n\n\n\n\n\n"
@@ -171,4 +187,5 @@ printloop:
 	ge I1, 0 printloop
 	restore I1
 	restore I0
+dumpend:
 	ret
