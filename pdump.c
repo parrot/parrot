@@ -13,13 +13,12 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-void PackFile_dump(struct Parrot_Interp *interpreter, struct PackFile *pf);
 void PackFile_ConstTable_dump(struct Parrot_Interp *,
                                      struct PackFile_ConstTable *);
 static void
 const_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
 {
-    PIO_printf(interpreter, "CONST => [\n");
+    PIO_printf(interpreter, "%s => [\n", segp->name);
     PackFile_ConstTable_dump(interpreter,
             (struct PackFile_ConstTable *)segp);
     PIO_printf(interpreter, "],\n");
@@ -176,18 +175,13 @@ main(int argc, char **argv)
     if (header) {
         Parrot_exit(0);
     }
-    if (pf->header->dir_format == 0)
-        PackFile_dump(interpreter, pf);
-    else {
-        /* install a dumper function */
-        if (!terse)
-            pf->PackFuncs[PF_CONST_SEG].dump = const_dump;
-        if (disas)
-            pf->PackFuncs[PF_BYTEC_SEG].dump = disas_dump;
-        /* do a directory dump, which dumps segs then */
-        PackFile_Segment_dump(interpreter,
-                (struct PackFile_Segment *)pf->directory);
-    }
+    /* install a dumper function */
+    if (!terse)
+        pf->PackFuncs[PF_CONST_SEG].dump = const_dump;
+    if (disas)
+        pf->PackFuncs[PF_BYTEC_SEG].dump = disas_dump;
+    /* do a directory dump, which dumps segs then */
+    PackFile_Segment_dump(interpreter, &pf->directory.base);
 
     Parrot_exit(0);
     return 0;

@@ -127,10 +127,12 @@ int e_pbc_open(void *param) {
      * we need some segments
      */
     if (!interpreter->code->cur_cs) {
-        seg = PackFile_Segment_new_seg(interpreter->code, PF_BYTEC_SEG,
+        seg = PackFile_Segment_new_seg(&interpreter->code->directory,
+                PF_BYTEC_SEG,
                 BYTE_CODE_SEGMENT_NAME, 1);
         cs->seg = interpreter->code->cur_cs = (struct PackFile_ByteCode*)seg;
-        seg = PackFile_Segment_new_seg(interpreter->code, PF_CONST_SEG,
+        seg = PackFile_Segment_new_seg(&interpreter->code->directory,
+                PF_CONST_SEG,
                 CONSTANT_SEGMENT_NAME , 1);
         interpreter->code->const_table = (struct PackFile_ConstTable*) seg;
     }
@@ -163,7 +165,8 @@ make_jit_info(struct Parrot_Interp *interpreter)
         name = malloc(strlen(globals.cs->seg->base.name) + 5);
         sprintf(name, "%s_JIT", globals.cs->seg->base.name);
         globals.cs->jit_info =
-            PackFile_Segment_new_seg(interpreter->code, PF_UNKNOWN_SEG, name, 1);
+            PackFile_Segment_new_seg(&interpreter->code->directory,
+                    PF_UNKNOWN_SEG, name, 1);
         free(name);
     }
     size = n_basic_blocks + (old = old_blocks());

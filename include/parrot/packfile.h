@@ -172,6 +172,9 @@ struct PackFile_Directory {
 };
 
 struct PackFile {
+    /* the packfile is its own directory */
+    struct PackFile_Directory   directory;
+    struct PackFile_Directory   *dirp;  /* for freeing */
     opcode_t *src;              /* the possible mmap()ed start of the PF */
     size_t   size;              /* size in bytes */
     INTVAL is_mmap_ped;         /* don't free it, munmap it at destroy */
@@ -179,7 +182,6 @@ struct PackFile {
     struct PackFile_Header     * header;
 
     /* directory hold all Segments */
-    struct PackFile_Directory  * directory;
     /* TODO make this reallocatable */
     struct PackFile_funcs      PackFuncs[PF_MAX_SEG];
     struct PackFile_ByteCode   * cur_cs;   /* current byte code seg */
@@ -215,8 +217,8 @@ opcode_t PackFile_unpack(struct Parrot_Interp *interpreter,
                          struct PackFile *self, opcode_t *packed,
                          size_t packed_size);
 
-INTVAL PackFile_add_segment (struct PackFile *pf,
-                             struct PackFile_Segment *seg);
+INTVAL PackFile_add_segment (struct PackFile_Directory *,
+        struct PackFile_Segment *);
 
 struct PackFile_Segment * PackFile_find_segment (struct PackFile *pf,
                                                  const char *name);
@@ -224,7 +226,7 @@ struct PackFile_Segment * PackFile_find_segment (struct PackFile *pf,
 struct PackFile_Segment *
 PackFile_remove_segment_by_name (struct PackFile *pf, const char *name);
 
-INTVAL PackFile_map_segments (struct PackFile *pf,
+INTVAL PackFile_map_segments (struct PackFile_Directory *dir,
                               PackFile_map_segments_func_t callback,
                               void* usr_data);
 
@@ -232,7 +234,7 @@ INTVAL PackFile_map_segments (struct PackFile *pf,
 ** PackFile_Segment Functions:
 */
 
-struct PackFile_Segment * PackFile_Segment_new_seg(struct PackFile *pf,
+struct PackFile_Segment * PackFile_Segment_new_seg(struct PackFile_Directory *,
         UINTVAL type, const char *name, int add);
 void PackFile_Segment_destroy(struct PackFile_Segment * self);
 size_t PackFile_Segment_packed_size(struct PackFile_Segment * self);

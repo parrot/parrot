@@ -379,9 +379,9 @@ PackFile_destroy(struct PackFile *pf)
     if (pf->is_mmap_ped)
         munmap(pf->src, pf->size);
 #endif
-    directory_destroy ((struct PackFile_Segment *)pf->directory);
     mem_sys_free(pf->header);
-    mem_sys_free(pf);
+    mem_sys_free(pf->dirp);
+    directory_destroy (&pf->directory.base);
     return;
 }
 
@@ -550,9 +550,9 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
             return 0;
         }
         (void)PackFile_fetch_op(self, &cursor); /* pad */
-        self->directory->base.file_offset = (size_t)(cursor - self->src);
+        self->directory.base.file_offset = (size_t)(cursor - self->src);
         cursor = PackFile_Segment_unpack(interpreter,
-                (struct PackFile_Segment *) self->directory, cursor);
+                &self->directory.base, cursor);
     }
     self->byte_code = self->cur_cs->base.data;
 #ifdef PARROT_HAS_HEADER_SYSMMAN
@@ -567,24 +567,24 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
 
 /*
 ** PackFile_map_segments
-**   for each segment in the packfile 'pf' the callbackfunction 'callback'
+**   for each segment in the directory 'dir' the callbackfunction 'callback'
 **   is called. The pointer 'user_data' is append to each call.
 **   If a callback returns non-zero the processing of segments is stopped,
 **   and this value is returned
 */
 
 INTVAL
-PackFile_map_segments (struct PackFile *pf,
+PackFile_map_segments (struct PackFile_Directory *dir,
                        PackFile_map_segments_func_t callback,
                        void *user_data)
 {
     INTVAL ret;
     size_t i;
-    struct PackFile_Directory *dir = pf->directory;
 
-    for (i=0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; i++) {
         ret = callback (dir->segments[i], user_data);
-        if (!ret) return ret;
+        if (ret)
+            return ret;
     }
 
     return 0;
@@ -592,16 +592,15 @@ PackFile_map_segments (struct PackFile *pf,
 
 /*
 ** PackFile_add_segment
-**   adds the Segment 'seg' to the PackFile 'pf'.
+**   adds the Segment 'seg' to the directory 'dir'
 **   The PackFile becomes the owner of the segment; that means its
 **   getting destroyed, when the packfile gets destroyed.
 */
 
 INTVAL
-PackFile_add_segment (struct PackFile *pf, struct PackFile_Segment *seg)
+PackFile_add_segment (struct PackFile_Directory *dir,
+        struct PackFile_Segment *seg)
 {
-    struct PackFile_Directory *dir = pf->directory;
-
 
     dir->segments = mem_sys_realloc (dir->segments,
                   sizeof (struct PackFile_Segment *) * (dir->num_segments+1));
@@ -620,7 +619,7 @@ PackFile_add_segment (struct PackFile *pf, struct PackFile_Segment *seg)
 struct PackFile_Segment *
 PackFile_find_segment (struct PackFile *pf, const char *name)
 {
-    struct PackFile_Directory *dir = pf->directory;
+    struct PackFile_Directory *dir = &pf->directory;
     size_t i;
 
     for (i=0; i < dir->num_segments; i++) {
@@ -641,7 +640,7 @@ PackFile_find_segment (struct PackFile *pf, const char *name)
 struct PackFile_Segment *
 PackFile_remove_segment_by_name (struct PackFile *pf, const char *name)
 {
-    struct PackFile_Directory *dir = pf->directory;
+    struct PackFile_Directory *dir = &pf->directory;
     size_t i;
 
     for (i=0; i < dir->num_segments; i++) {
@@ -740,8 +739,11 @@ PackFile_new(INTVAL is_mapped)
     pf->const_table = NULL;
     pf_register_standard_funcs(pf);
     /* create the master directory, all subirs go there */
-    pf->directory = (struct PackFile_Directory *)
-        PackFile_Segment_new_seg(pf, PF_DIR_SEG, DIRECTORY_SEGMENT_NAME, 0);
+    pf->directory.base.pf = pf;
+    pf->dirp = (struct PackFile_Directory *)
+        PackFile_Segment_new_seg(&pf->directory,
+            PF_DIR_SEG, DIRECTORY_SEGMENT_NAME, 0);
+    pf->directory = *pf->dirp;
     pf->fetch_op = (opcode_t (*)(opcode_t)) NULLfunc;
     pf->fetch_iv = (INTVAL (*)(INTVAL)) NULLfunc;
     pf->fetch_nv = (void (*)(unsigned char *, unsigned char *)) NULLfunc;
@@ -896,15 +898,16 @@ pf_register_standard_funcs(struct PackFile *pf)
 }
 
 struct PackFile_Segment *
-PackFile_Segment_new_seg(struct PackFile *pf, UINTVAL type,
+PackFile_Segment_new_seg(struct PackFile_Directory *dir, UINTVAL type,
         const char *name, int add)
 {
+    struct PackFile *pf = dir->base.pf;
     PackFile_Segment_new_func_t f = pf->PackFuncs[type].new_seg;
     struct PackFile_Segment * seg = (f)(pf, name, add);
     segment_init (seg, pf, name);
     seg->type = type;
     if (add)
-        PackFile_add_segment(pf, seg);
+        PackFile_add_segment(dir, seg);
     return seg;
 }
 /*
@@ -1025,11 +1028,10 @@ directory_unpack (struct Parrot_Interp *interpreter,
 {
     size_t i;
     struct PackFile_Directory *dir = (struct PackFile_Directory *) segp;
-    struct PackFile      * self = dir->base.pf;
+    struct PackFile      * pf = dir->base.pf;
     opcode_t *pos;
-    int wordsize = self->header->wordsize;
 
-    dir->num_segments = PackFile_fetch_op (self, &cursor);
+    dir->num_segments = PackFile_fetch_op (pf, &cursor);
     dir->segments = mem_sys_realloc (dir->segments,
             sizeof(struct PackFile_Segment *) * dir->num_segments);
 
@@ -1038,38 +1040,38 @@ directory_unpack (struct Parrot_Interp *interpreter,
         size_t tmp;
         UINTVAL type;
         char *name;
-        type = PackFile_fetch_op (self, &cursor);
+        type = PackFile_fetch_op (pf, &cursor);
         /* get name */
-        name = PackFile_fetch_cstring(self, &cursor);
+        name = PackFile_fetch_cstring(pf, &cursor);
 
         if (type >= PF_MAX_SEG)
             type = PF_UNKNOWN_SEG;
         /* create it */
-        seg = PackFile_Segment_new_seg(self, type, name, 0);
+        seg = PackFile_Segment_new_seg(dir, type, name, 0);
         mem_sys_free(name);
 
         /* make compat/shorthand pointers */
         switch (type) {
             case PF_FIXUP_SEG:
                 /* TODO check multiple */
-                self->fixup_table = (struct PackFile_FixupTable *)seg;
+                pf->fixup_table = (struct PackFile_FixupTable *)seg;
                 break;
             case PF_BYTEC_SEG:
-                if (!self->cur_cs)
-                    self->cur_cs = (struct PackFile_ByteCode*)seg;
+                if (!pf->cur_cs)
+                    pf->cur_cs = (struct PackFile_ByteCode*)seg;
                 break;
             case PF_CONST_SEG:
-                if (!self->const_table)
-                    self->const_table = (struct PackFile_ConstTable*)seg;
+                if (!pf->const_table)
+                    pf->const_table = (struct PackFile_ConstTable*)seg;
             default:
                 break;
         }
 
-        seg->file_offset = PackFile_fetch_op(self, &cursor);
-        seg->op_count = PackFile_fetch_op(self, &cursor);
+        seg->file_offset = PackFile_fetch_op(pf, &cursor);
+        seg->op_count = PackFile_fetch_op(pf, &cursor);
 
-        pos = self->src + seg->file_offset;
-        tmp = PackFile_fetch_op (self, &pos);
+        pos = pf->src + seg->file_offset;
+        tmp = PackFile_fetch_op (pf, &pos);
         if (seg->op_count != tmp) {
             fprintf (stderr,
                     "%s: Size in directory (%d) doesn't match size "
@@ -1088,12 +1090,12 @@ directory_unpack (struct Parrot_Interp *interpreter,
         dir->segments[i] = seg;
     }
 
-    if ((cursor - self->src) % 4)
-        cursor += 4 - (cursor - self->src) % 4;
+    if ((cursor - pf->src) % 4)
+        cursor += 4 - (cursor - pf->src) % 4;
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; i++) {
         opcode_t *csave = cursor;
-        size_t tmp = PackFile_fetch_op(self, &cursor); /* check len again */
+        size_t tmp = PackFile_fetch_op(pf, &cursor); /* check len again */
         cursor = csave;
         pos = PackFile_Segment_unpack (interpreter, dir->segments[i],
                 cursor);
@@ -1379,7 +1381,7 @@ Parrot_new_debug_seg(struct Parrot_Interp *interpreter,
         sprintf(name, "%s_DB", cs->base.name);
         debug = (struct PackFile_Debug *)
             PackFile_Segment_new_seg(
-            interpreter->code, PF_DEBUG_SEG, name, 1);
+            &interpreter->code->directory, PF_DEBUG_SEG, name, 1);
         mem_sys_free(name);
         debug->base.data = mem_sys_allocate(size * sizeof(opcode_t));
         debug->filename = mem_sys_allocate(strlen(filename) + 1);
@@ -1399,8 +1401,8 @@ Parrot_new_eval_cs(struct Parrot_Interp *interpreter)
     struct PackFile_Segment *new_cs;
 
     sprintf(name, "EVAL_" INTVAL_FMT, ++interpreter->code->eval_nr);
-    new_cs = PackFile_Segment_new_seg(interpreter->code, PF_BYTEC_SEG,
-            name, 1);
+    new_cs = PackFile_Segment_new_seg(&interpreter->code->directory,
+            PF_BYTEC_SEG, name, 1);
     return (struct PackFile_ByteCode *) new_cs;
 }
 
@@ -1408,8 +1410,7 @@ Parrot_new_eval_cs(struct Parrot_Interp *interpreter)
 void
 Parrot_switch_to_cs_by_nr(struct Parrot_Interp *interpreter, opcode_t seg)
 {
-    struct PackFile_Directory *dir =
-        (struct PackFile_Directory *)interpreter->code->directory;
+    struct PackFile_Directory *dir = &interpreter->code->directory;
     size_t i, num_segs;
     opcode_t n;
 
@@ -1643,7 +1644,7 @@ void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
     if (!self) {
         self = interpreter->code->fixup_table =
             (struct PackFile_FixupTable  *) PackFile_Segment_new_seg(
-                    interpreter->code, PF_FIXUP_SEG,
+                    &interpreter->code->directory, PF_FIXUP_SEG,
                     FIXUP_TABLE_SEGMENT_NAME, 1);
     }
     i = self->fixup_count;
