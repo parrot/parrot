@@ -9,15 +9,19 @@ Common vtable format for all variables
    Maintainer: Dan Sugalski <dan@sidhe.org>
    Class: Internals
    PDD Number: 2
-   Version: 1.1
+   Version: 1.2
    Status: Developing
-   Last Modified: 13 May 2002
+   Last Modified: 22 June 2002
    PDD Format: 1
    Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item 1.2
+
+22 June 2002
 
 =item 1.1
 
@@ -32,6 +36,11 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item 1.2
+
+Many cleanups and clarifications.  Much detail added.  Many missing
+methods added.
 
 =item 1.1
 
@@ -64,23 +73,35 @@ that you need to either know what functions are available and what
 they do, or have some method of finding out. It's faster if you know
 which vtable entry does what, so that's the method perl's using.
 
+The actual vtable structure contains pointers to functions that
+implement the methods for that particular vtable.  All pointers
+must point to valid functions with appropriate prototypes.
+
 =head1 IMPLEMENTATION
 
 =head2 vtable functions
+
+This is a list of each of the vtable methods, their prototypes, and
+a description of the method.
 
 The following functions are singleton functions. (There are no keyed
 versions of these)
 
 =over 4
 
-=item void init(INTERP, PMC)
+=item void init(INTERP, PMC* self)
 
 The init vtable method takes an unused PMC as a parameter, and turns
 it into a PMC appropriate for the class owning the vtable. Called as a
 class method.  There is also a form that accepts a PMC initializer as
 a third argument.
 
-=item void morph(INTERP, PMC, type)
+=item void init_pmc(INTERP, PMC* self, PMC* initializer)
+
+This form of the init method takes a single initializer parameter.
+XXX - What is the initializer used for?
+
+=item void morph(INTERP, PMC* self, INTVAL type)
 
 turns the PMC into a PMC of type C<type>. If the morphing can't be
 reasonably done, for example if an integer is asked to turn into a
@@ -92,7 +113,7 @@ coercing a PMC to a particular type, and isn't meant as a general
 purpose casting tool. Compilers should only emit valid
 transformations.
 
-=item PMC *mark(INTERP, PMC, PMC)
+=item PMC* mark(INTERP, PMC* self, PMC* tail)
 
 Called by the DOD when its sweeping through the PMCs and has detected
 that this PMC is both alive and has a custom mark routine. The second
@@ -111,7 +132,7 @@ C level either.
 
 This routine may B<not> throw an exception.
 
-=item void destroy(INTERP, PMC)
+=item void destroy(INTERP, PMC* self)
 
 This method is called by the DOD when it determines that a PMC is
 dead, and that PMC has marked itself as having a destroy method.
@@ -124,235 +145,994 @@ This method may I<not> throw an exception. It will be ignored if it does.
 
 =back
 
-The following functions have two forms, a plain form and a _keyed
-form. The keyed form takes a KEY for I<each> PMC parameter. 
+The following functions have a plain form, a _keyed form, and
+a _keyed_int form. The keyed forms take a KEY* or INTVAL* for I<each> PMC
+parameter.  The KEY*/INTVAL* parameter for each PMC is NULL if there is no
+key for that PMC; this means that that arguement is unkeyed.
+
+In some cases, the caller I<must> provide a non-NULL 
+key.  Those cases are explicitly stated below.  In the other cases, you may
+have to implement the keyed vtable methods and check for a NULL B<self> key even 
+if you are implementing a non-aggregate type.  If the B<self> key is non-
+NULL and the PMC class is a non-aggregate type, the _keyed_* methods
+should throw an exception.
+
+If you do not implement the _keyed_int methods, the default will convert
+the INTVAL into a KEY and call the corresponding _keyed method.
+
+The keyed methods should I<NOT> assume that the key pointer will be
+valid after the method exits.  The pointer may be to a
+stack variable in the calling function.
 
 =over 4
 
-=item INTVAL type(INTERP, PMC) 
+=item INTVAL type(INTERP, PMC* self) 
 
 Return the type of the PMC. Type is a unique tag associated with the
 PMC when the PMC's class is loaded. Negative numbers are considered
 interpreter-specific, non-public types.
 
-=item UINTVAL subtype(INTERP, PMC, type)
+=item INTVAL type_keyed(INTERP, PMC* self, KEY* key)
+
+=item INTVAL type_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Return the type of the PMC indexed by B<key>.  The B<key> parameter
+is guaranteed not to be NULL for this method.
+
+=item UINTVAL subtype(INTERP, PMC* self, INTVAL type)
 
 Returns the subtype of a PMC. (Note that this may be unimplemented,
 and may go away) This is intended to return information about the
 PMC--what type of number or string it is, whether it's a scalar, hash,
 array, or list, and suchlike things.
 
-=item STRING *name(INTERP, PMC) 
+=item UINTVAL subtype_keyed(INTERP, PMC* self, KEY* key, INTVAL type)
+
+=item UINTVAL subtype_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL type)
+
+Return the subtype of the PMC indexed by B<key>.  The B<key> parameter
+is guaranteed not to be NULL for this method.
+
+=item STRING* name(INTERP, PMC) 
 
 Return the name of the class for the PMC.
 
-=item PMC *clone(INTERP, PMC) 
+=item STRING* name_keyed(INTERP, PMC* self, KEY* key)
 
-Return a clone of the specified PMC. If the PMC is fake, for example
+=item STRING* name_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Return the name of the class of the PMC indexed by B<key>.  
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item PMC* clone(INTERP, PMC* self)
+
+Return a clone of yourself.
+
+=item PMC* clone_keyed(INTERP, PMC* self, KEY* key)
+
+=item PMC* clone_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Return a clone of the PMC indexed by B<key>. If the PMC is fake, for example
 we're asking for a clone of an element of an integer array, this must
-return an appropriate real  PMC that holds the fake information.
+return an appropriate real PMC that holds the fake information.
+The B<key> parameter is guaranteed not to be NULL for this method.
 
-=item PMC *find_method(INTERP, PMC, string) 
+=item PMC* find_method(INTERP, PMC* self, STRING* method_name) 
 
 Returns a subroutine PMC for the passed method name. This subroutine
 PMC may be cached, so the method I<must> return an equivalent sub PMC
 each time, or be capable of dealing with the returned sub PMCs being
 reused.
 
-=item INTVAL get_integer(INTERP, PMC) 
+=item PMC* find_method_keyed(INTERP, PMC* self, KEY* key, STRING* method_name)
+
+=item PMC* find_method_keyed_int(INTERP, PMC* self, INTVAL* key, STRING* method_name)
+
+Returns a subroutine PMC for the passed method name. This subroutine
+PMC may be cached, so the method I<must> return an equivalent sub PMC
+each time, or be capable of dealing with the returned sub PMCs being
+reused.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item INTVAL get_integer(INTERP, PMC* self)
 
 Returns the native integer value of the PMC.
 
-=item NUMVAL get_number(INTERP, PMC) 
+=item INTVAL get_integer_keyed(INTERP, PMC* self, KEY* key)
 
-Returns the native float value of the PMC.
+=item INTVAL get_integer_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-=item BIGNUM *get_bignum(INTERP, PMC) 
+Returns the native integer value of the PMC indexed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item FLOATVAL get_number(INTERP, PMC* self)
+
+Returns the native floating-point value of the PMC.
+
+=item FLOATVAL get_number_keyed(INTERP, PMC* self, KEY* key)
+
+=item FLOATVAL get_number_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the native floating-point value of the PMC indexed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item BIGNUM* get_bignum(INTERP, PMC* self)
 
 Returns the value of the PMC as a bignum.
 
-=item STRING *get_string(INTERP, PMC) 
+=item BIGNUM* get_bignum_keyed(INTERP, PMC* self, KEY* key)
+
+=item BIGNUM* get_bignum_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the bignum value of the PMC indexed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item STRING* get_string(INTERP, PMC* self)
 
 Returns the native string value of the PMC. This may be in the
 encoding of the PMC's choice.
 
-=item INTVAL get_bool(INTERP, PMC) 
+=item STRING* get_string_keyed(INTERP, PMC* self, KEY* key)
+
+=item STRING* get_string_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the string value of the PMC indexed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item INTVAL get_bool(INTERP, PMC* self)
 
 Returns the constant TRUE if the PMC is true, or FALSE if the PMC is
 false.
 
-=item INTVAL elements(INTERP, PMC)
+=item INTVAL get_bool_keyed(INTERP, PMC* self, KEY* key)
+
+=item INTVAL get_bool_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the constant TRUE if the PMC indexed by B<key> is true,
+or FALSE if the PMC indexed by B<key> is false.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item INTVAL elements(INTERP, PMC* self)
 
 Returns the number of elements in the PMC.
 
-=item PMC *get_pmc(INTERP, PMC)
+=item INTVAL elements_keyed(INTERP, PMC* self, KEY* key)
+
+=item INTVAL elements_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the number of elements in the PMC indexed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item PMC* get_pmc(INTERP, PMC* self)
 
 Returns the PMC for this PMC. While this may seem nonsensical, it's
-useful in several circumstances. If the PMC is being accessed with a
-key, it returns the PMC for the thing being accessed. If the thing
-being accessed may return something odd, for example a reference, it
-may return a value different than the PMC that get_pmc is being called
+useful in several circumstances. If the thing being accessed may 
+return something odd, for example a reference, it may return a 
+value different than the PMC that get_pmc is being called
 on.
 
-=item INTVAL is_same(INTERP, PMC, PMC)
+=item PMC* get_pmc_keyed(INTERP, PMC* self, KEY* key)
+
+=item PMC* get_pmc_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the PMC indexed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item INTVAL is_same(INTERP, PMC* self, PMC* value)
 
 Returns TRUE if the PMCs are the same, and FALSE if
 they're not. In this case, "the same" means identical at a low
 level. For plain equality, use the is_equal method.
 
-=item void set_integer(INTERP, PMC, INTVAL)
+=item INTVAL is_same_keyed(INTERP, PMC* self, KEY* key, PMC* value, PMC* value_key)
 
-Sets the PMC to the integer value passed. What the PMC does with the
-passed in integer depends on the class.
+=item INTVAL is_same_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
 
-=item void set_number(INTERP, PMC, NUMVAL)
+Returns TRUE if the PMC keyed by B<key> is the same as the
+PMC in B<value> keyed by B<value_key>.  At least one of the
+two keys is guaranteed not to be NULL.
 
-Sets the PMC to the numeric value passed in.
+=item void set_integer(INTERP, PMC* self, PMC* value)
 
-=item void set_bignum(INTERP, PMC, BIGNUM *)
+Sets the PMC to the integer value of the PMC in B<value>.
+What the PMC does with the passed in integer depends on the class.
+
+=item void set_integer_native(INTERP, PMC* self, INTVAL value)
+
+Sets the PMC to the integer value passed.
+
+=item void set_integer_same(INTERP, PMC* self, PMC* value)
+
+Sets the PMC to the integer value of the PMC in B<value>.
+In this case, B<value> is guaranteed to be of the same type
+as B<self> so optimizations may be made.
+
+=item void set_integer_keyed(INTERP, PMC* self, KEY* key, INTVAL value)
+
+=item void set_integer_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL value)
+
+Sets the PMC indexed by B<key> to the integer value passed in B<value>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void set_number(INTERP, PMC* self, PMC* value)
+
+Sets the PMC to the floating-point value of the PMC in B<value>.
+
+=item void set_number_native(INTERP, PMC* self, FLOATVAL value)
+
+Sets the PMC to the floating-point value passed.
+
+=item void set_number_same(INTERP, PMC* self, PMC* value)
+
+Sets the PMC to the floating-point value of the PMC in B<value>.
+In this case, B<value> is guaranteed to be of the same type
+as B<self> so optimizations may be made.
+
+=item void set_number_keyed(INTERP, PMC* self, KEY* key, FLOATVAL value)
+
+=item void set_number_keyed_int(INTERP, PMC* self, INTVAL* key, FLOATVAL value)
+
+Sets the PMC indexed by B<key> to the floating-point value passed in B<value>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void set_bignum(INTERP, PMC* self, PMC* value)
+
+Sets the PMC to the bignum value of B<value>.
+
+=item void set_bignum_native(INTERP, PMC* self, BIGNUM* value)
 
 Sets the PMC to the passed in bignum value.
 
-=item void set_string(INTERP, PMC, STRING *)
+=item void set_bignum_same(INTERP, PMC* self, PMC* value)
+
+Sets the PMC to the bignum value of B<value>.
+In this case, B<value> is guaranteed to be of the same type
+as B<self> so optimizations may be made.
+
+=item void set_bignum_keyed(INTERP, PMC* self, KEY* key, BIGNUM* value)
+
+=item void set_bignum_keyed_int(INTERP, PMC* self, INTVAL* key, BIGNUM* value)
+
+Sets the PMC indexed by B<key> to the bignum value passed in B<value>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void set_string(INTERP, PMC* self, PMC* value)
+
+Sets the PMC to the string value of B<value>.
+
+=item void set_string_native(INTERP, PMC* self, STRING* value)
 
 Sets the PMC to the passed in string value.
 
-=item void set_pmc(INTERP, PMC, PMC)
+=item void set_string_unicode(INTERP, PMC* self, STRING* value)
 
-Assigns the source PMC to the destination PMC. 
+Sets the PMC to the passed in string value.
 
-=item void set_same(INTERP, PMC, PMC)
+=item void set_string_other(INTERP, PMC* self, STRING* value)
+
+Sets the PMC to the passed in string value.
+
+=item void set_string_same(INTERP, PMC* self, PMC* value)
+
+Sets the PMC to the string value of B<value>.
+In this case, B<value> is guaranteed to be of the same type
+as B<self> so optimizations may be made.
+
+=item void set_string_keyed(INTERP, PMC* self, KEY* key, STRING* value)
+
+=item void set_string_keyed_int(INTERP, PMC* self, INTVAL* key, STRING* value)
+
+Sets the PMC indexed by B<key> to the string value passed in B<value>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void set_pmc(INTERP, PMC* self, PMC* value)
+
+Assigns the value of source PMC to the value of the PMC in B<value>.
+
+=item void set_pmc_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
+
+=item void set_pmc_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
+
+Sets the value of the PMC keyed by B<key> to the value of the PMC
+in B<value> keyed by B<value_key>.  At least one of the two keys
+is guaranteed not to be NULL.
+
+=item void set_same(INTERP, PMC* self, PMC* value)
 
 A shortcut version of C<set_pmc> in those cases where the interpreter
 knows the source and destination PMCs are of the same type.
 
-=back
+=item void set_same_keyed(INTERP, PMC* self, KEY* key, PMC* value, PMC* value_key)
 
-The following vtable functions come in multiple flavors, one for each
-numeric type (INTVAL, NUMVAL, BIGNUM) and a PMC. Each flavor has a
-keyed and non-keyed version.
+Sets the value keyed by B<key> to the value of B<value> keyed by B<value_key>.
+Both B<self> and B<value> are guaranteed to be of the same type so optimizations
+may be made.
 
-Each function does what its name implies and puts the result in
-dest.
+At least one of the two keys is guaranteed not to be NULL.
 
-=over 4
+Because the two PMCs are guaranteed to be of the same type, this method may
+throw an exception if the PMC class is a non-aggregate type.
 
-=item void add(INTERP, PMC, value, dest)
+=item INTVAL pop_integer(INTERP, PMC* self)
 
-=item void subtract(INTERP, PMC, value, dest)
+Returns the integer value of the last item on the list, removing that item.
 
-=item void multiply(INTERP, PMC, value, dest)
+=item INTVAL pop_integer_keyed(INTERP, PMC* self, KEY* key)
 
-=item void divide(INTERP, PMC, value, dest)
+=item INTVAL pop_integer_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-=item void modulus(INTERP, PMC, value, dest)
+Returns the integer value of the last item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
 
-=back
+=item FLOATVAL pop_float(INTERP, PMC* self)
 
-The following vtable functions have a variation for INTVAL and PMC
-values.  They have keyed and non-keyed versions.
+Returns the floating-point value of the last item on the list, 
+removing that item.
 
-Each function does what its name implies and puts the result in
-dest.
+=item FLOATVAL pop_float_keyed(INTERP, PMC* self, KEY* key)
 
-=over 4
+=item FLOATVAL pop_float_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-=item void bitwise_or(INTERP, PMC, value, dest)
+Returns the floating-point value of the last item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
 
-=item void bitwise_and(INTERP, PMC, value, dest)
+=item BIGNUM* pop_bignum(INTERP, PMC* self)
 
-=item void bitwise_xor(INTERP, PMC, value, dest)
+Returns the bignum value of the last item on the list, 
+removing that item.
 
-=back
+=item BIGNUM* pop_bignum_keyed(INTERP, PMC* self, KEY* key)
 
-The following vtable functions all have a keyed and non-keyed version.
+=item BIGNUM* pop_bignum_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-=over 4
+Returns the bignum value of the last item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
 
-=item void bitwise_not(INTERP, PMC, dest)
+=item STRING* pop_string(INTERP, PMC* self)
 
-Applies a bitwise negation to PMC and stores the result in dest.
+Returns the string value of the last item on the list, 
+removing that item.
 
-=item void concatenante(INTERP, PMC, value, dest)
+=item STRING* pop_string_keyed(INTERP, PMC* self, KEY* key)
 
-There are two forms of this, where value is a STRING and where it's a
-PMC. In either case, a PMC representing the two source values
-concatenated together is placed in dest.
+=item STRING* pop_string_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-=item INTVAL is_equal(INTERP, PMC, PMC)
+Returns the string value of the last item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item PMC* pop_pmc(INTERP, PMC* self)
+
+Returns the PMC value of the last item on the list,
+removing that item.
+
+=item PMC* pop_pmc_keyed(INTERP, PMC* self, KEY* key)
+
+=item PMC* pop_pmc_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the PMC value of the last item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void push_integer(INTERP, PMC* self, INTVAL value)
+
+Add the passed in integer value to the end of the list.
+
+=item void push_integer_keyed(INTERP, PMC* self, KEY* key, INTVAL value)
+
+=item void push_integer_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL value)
+
+Add the passed in integer value to the end of the list keyed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void push_float(INTERP, PMC* self, FLOATVAL value)
+
+Add the passed in floating-point number to the end of the list.
+
+=item void push_float_keyed(INTERP, PMC* self, KEY* key, FLOATVAL value)
+
+=item void push_float_keyed_int(INTERP, PMC* self, INTVAL* key, FLOATVAL value)
+
+Add the passed in floating-point value to the end of the list keyed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void push_bignum(INTERP, PMC* self, BIGNUM* value)
+
+Add the passed in bignum to the end of the list.
+
+=item void push_bignum_keyed(INTERP, PMC* self, KEY* key, BIGNUM* value)
+
+=item void push_bignum_keyed_int(INTERP, PMC* self, INTVAL* key, BIGNUM* value)
+
+Add the passed in bignum to the end of the list keyed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void push_string(INTERP, PMC* self, STRING* value)
+
+Add the passed in string to the end of the list.
+
+=item void push_string_keyed(INTERP, PMC* self, KEY* key, STRING* value)
+
+=item void push_string_keyed_int(INTERP, PMC* self, INTVAL* key, STRING* value)
+
+Add the passed in bignum to the end of the list keyed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void push_pmc(INTERP, PMC* self, PMC* value)
+
+Add the passed in PMC to the end of the list.
+
+=item void push_pmc_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
+
+=item void push_pmc_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
+
+Add the passed in PMC to the end of the list keyed by B<key>.
+At least one of the two keys is guaranteed not to be NULL.  If B<key> is
+NULL then the method will use B<self>.  If B<value_key> is NULL then the
+method will use B<value>.
+
+=item INTVAL shift_integer(INTERP, PMC* self)
+
+Returns the integer value of the first item on the list, removing that item.
+
+=item INTVAL shift_integer_keyed(INTERP, PMC* self, KEY* key)
+
+=item INTVAL shift_integer_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the integer value of the fisrt item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item FLOATVAL shift_float(INTERP, PMC* self)
+
+Returns the floating-point value of the first item on the list, 
+removing that item.
+
+=item FLOATVAL shift_float_keyed(INTERP, PMC* self, KEY* key)
+
+=item FLOATVAL shift_float_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the floating-point value of the first item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item BIGNUM* shift_bignum(INTERP, PMC* self)
+
+Returns the bignum value of the first item on the list, 
+removing that item.
+
+=item BIGNUM* shift_bignum_keyed(INTERP, PMC* self, KEY* key)
+
+=item BIGNUM* shift_bignum_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the bignum value of the first item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item STRING* shift_string(INTERP, PMC* self)
+
+Returns the string value of the first item on the list, 
+removing that item.
+
+=item STRING* shift_string_keyed(INTERP, PMC* self, KEY* key)
+
+=item STRING* shift_string_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the string value of the first item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item PMC* shift_pmc(INTERP, PMC* self)
+
+Returns the PMC value of the first item on the list,
+removing that item.
+
+=item PMC* shift_pmc_keyed(INTERP, PMC* self, KEY* key)
+
+=item PMC* shift_pmc_keyed_int(INTERP, PMC* self, INTVAL* key)
+
+Returns the PMC value of the first item of the list keyed by B<key>,
+removing that item from the list. 
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void unshift_integer(INTERP, PMC* self, INTVAL value)
+
+Add the passed in integer value to the beginning of the list.
+
+=item void unshift_integer_keyed(INTERP, PMC* self, KEY* key, INTVAL value)
+
+=item void unshift_integer_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL value)
+
+Add the passed in integer value to the beginning of the list keyed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void unshift_float(INTERP, PMC* self, FLOATVAL value)
+
+Add the passed in floating-point number to the beginning of the list.
+
+=item void unshift_float_keyed(INTERP, PMC* self, KEY* key, FLOATVAL value)
+
+=item void unshift_float_keyed_int(INTERP, PMC* self, INTVAL* key, FLOATVAL value)
+
+Add the passed in floating-point value to the beginning of the list keyed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void unshift_bignum(INTERP, PMC* self, BIGNUM* value)
+
+Add the passed in bignum to the beginning of the list.
+
+=item void unshift_bignum_keyed(INTERP, PMC* self, KEY* key, BIGNUM* value)
+
+=item void unshift_bignum_keyed_int(INTERP, PMC* self, INTVAL* key, BIGNUM* value)
+
+Add the passed in bignum to the beginning of the list keyed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void unshift_string(INTERP, PMC* self, STRING* value)
+
+Add the passed in string to the beginning of the list.
+
+=item void unshift_string_keyed(INTERP, PMC* self, KEY* key, STRING* value)
+
+=item void unshift_string_keyed_int(INTERP, PMC* self, INTVAL* key, STRING* value)
+
+Add the passed in bignum to the beginning of the list keyed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void unshift_pmc(INTERP, PMC* self, PMC* value)
+
+Add the passed in PMC to the beginning of the list.
+
+=item void unshift_pmc_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
+
+=item void unshift_pmc_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
+
+Add the passed in PMC to the beginning of the list keyed by B<key>.
+At least one of the two keys is guaranteed not to be NULL.
+
+=item void splice ???
+
+XXX - Interface undetermined
+
+=item void add(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void add_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+=item void add_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
+
+=item void add_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Add B<self> to B<value> and store the result in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.
+
+=item void add_same(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Add B<self> to B<value> and store the result in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.  In this case, it is guaranteed that B<self> and B<value> are of
+the same type.
+
+=item void add_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void add_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Add the value in B<self> keyed by B<key> to the value in B<value> keyed by
+B<value_key> and store the result in B<dest> keyed by B<dest_key>.
+
+At least one of the three keys is guaranteed to not be NULL.
+
+=item void subtract(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void subtract_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+=item void subtract_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
+
+=item void subtract_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Subtract B<self> from B<value> and store the result in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.
+
+=item void subtract_same(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Subtract B<self> from B<value> and store the result in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.  In this case, it is guaranteed that B<self> and B<value> are of
+the same type.
+
+=item void subtract_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void subtract_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Subtract the value in B<self> keyed by B<key> from the value in B<value> keyed by
+B<value_key> and store the result in B<dest> keyed by B<dest_key>.
+
+At least one of the three keys is guaranteed to not be NULL.
+
+=item void multiply(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void multiply_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+=item void multiply_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
+
+=item void multiply_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Multiply B<value> by B<self> and store the result in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.
+
+=item void multiply_same(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Multiply B<value> by B<self> and store the result in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.  In this case, it is guaranteed that B<self> and B<value> are of
+the same type.
+
+=item void multiply_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void multiply_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Multiply the value in B<self> keyed by B<key> by the value in B<value> keyed by
+B<value_key> and store the result in B<dest> keyed by B<dest_key>.
+
+At least one of the three keys is guaranteed to not be NULL.
+
+=item void divide(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void divide_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+=item void divide_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
+
+=item void divide_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Divide B<self> by B<value> and store the result in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.
+
+=item void divide_same(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Divide B<self> by B<value> and store the result in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.  In this case, it is guaranteed that B<self> and B<value> are of
+the same type.
+
+=item void divide_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void divide_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Divide the value in B<self> keyed by B<key> by the value in B<value> keyed by
+B<value_key> and store the result in B<dest> keyed by B<dest_key>.
+
+At least one of the three keys is guaranteed to not be NULL.
+
+=item void modulus(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void modulus_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+=item void modulus_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
+
+=item void modulus_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Divide B<self> by B<value> and store the remainder in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.
+
+=item void modulus_same(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Divide B<self> by B<value> and store the remainder in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be
+made.  In this case, it is guaranteed that B<self> and B<value> are of
+the same type.
+
+=item void modulus_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void modulus_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Divide the value in B<self> keyed by B<key> by the value in B<value> keyed by
+B<value_key> and store the remainder in B<dest> keyed by B<dest_key>.
+
+At least one of the three keys is guaranteed to not be NULL.
+
+=item void neg(INTERP, PMC* self, PMC* dest)
+
+Negate the sign of B<self> and store the result in B<dest>.  Note that
+B<self> and B<dest> may refer to the same PMC, in which case 
+optimizations I<may> be made.
+
+=item void bitwise_or(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void bitwise_or_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+Calculate the bitwise-OR of B<self> and B<value> and store the result
+in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
+optimizations I<may> be made.
+
+=item void bitwise_or_same(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Calculate the bitwise-OR of B<self> and B<value> and store the result
+in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
+optimizations I<may> be made.  In this case, it is guaranteed that
+B<self> and B<value> are of the same type.
+
+=item void bitwise_and(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void bitwise_and_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+Calculate the bitwise-AND of B<self> and B<value> and store the result
+in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
+optimizations I<may> be made.
+
+=item void bitwise_and_same(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Calculate the bitwise-AND of B<self> and B<value> and store the result
+in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
+optimizations I<may> be made.  In this case, it is guaranteed that
+B<self> and B<value> are of the same type.
+
+=item void bitwise_xor(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void bitwise_xor_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+Calculate the bitwise-XOR of B<self> and B<value> and store the result
+in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
+optimizations I<may> be made.
+
+=item void bitwise_xor_same(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Calculate the bitwise-XOR of B<self> and B<value> and store the result
+in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
+optimizations I<may> be made.  In this case, it is guaranteed that
+B<self> and B<value> are of the same type.
+
+=item void bitwise_not(INTERP, PMC* self, PMC* dest)
+
+Applies a bitwise negation to B<self> and stores the result in B<dest>.
+Note that B<self> and B<dest> may refer to the same PMC; in that case
+optimizations I<may> be made.
+
+=item void concatenate(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void concatenate_native(INTERP, PMC* self, STRING* value, PMC* dest)
+
+=item void concatenate_unicode(INTERP, PMC* self, STRING* value, PMC* dest)
+
+=item void concatenate_other(INTERP, PMC* self, STRING* value, PMC* dest)
+
+Concatenate the strings in B<self> and B<value> and store the result
+in B<dest>.
+Note that B<self> and B<dest> may refer to the same PMC; in that case
+optimizations I<may> be made.
+
+=item void concatenate_same(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Concatenate the strings in B<self> and B<value> and store the result
+in B<dest>.
+Note that B<self> and B<dest> may refer to the same PMC; in that case
+optimizations I<may> be made.  In this case, B<self> and B<value>
+are guaranteed to be of the same type.
+
+=item void concatenate_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void concatenate_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Concatentate the string in B<value> keyed by B<value_key> onto the string in B<self> keyed by
+B<key> and store the result in B<dest> keyed by B<dest_key>.
+
+At least one of the three keys is guaranteed to not be NULL.
+
+=item INTVAL is_equal(INTERP, PMC* self, PMC* value)
 
 Returns TRUE if the two PMCs are generically equivalent, or
 FALSE if they aren't. 
 
-=item INTVAL cmp(INTERP, PMC, PMC)
+=item INTVAL is_equal_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
 
-=item INTVAL cmp_num(INTERP, PMC, PMC)
+Returns TRUE if the PMC at B<self> keyed by B<key> is generally
+equivalent to the PMC at B<value> keyed by B<value_key>, or
+FALSE if they aren't.
 
-=item INTVAL cmp_string(INTERP, PMC, PMC)
+=item INTVAL cmp(INTERP, PMC* self, PMC* value)
 
-Compares the two PMCs. Returns -1 if the left PMC is smaller, 0 if they
-are equal, and 1 if the right PMC is smaller. C<cmp> compares the
-two as PMCs (whatever that means for the class), C<cmp_num> compares
-them numerically, and C<cmp_string> compares them as strings.
+Compares the two PMCs as PMCs (whatever that means for the class).
+Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+if B<value> is smaller.
 
-=item void logical_or(INTERP, PMC, value, dest)
+=item INTVAL cmp_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
 
-Does a short-circuiting logical or, storing the winner in
-dest. 
+=item INTVAL cmp_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
 
-=item void logical_and(INTERP, PMC, value, dest)
+Compares the PMC at B<self> keyed by B<key> with the PMC at B<value> keyed by
+B<value_key> as PMCs (whatever that means for the class).
+Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+if B<value> is smaller.
 
-Does a short-circuiting logical and, storing the winner in
-dest. 
+At least one key is guaranteed to be not NULL.
 
-=item void logical_xor(INTERP, PMC, value, dest)
+=item INTVAL cmp_num(INTERP, PMC* self, PMC* value)
 
-Does a logical xor on the two parameters, storing the result in
-dest.
+Compares the two PMCs numerically.
+Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+if B<value> is smaller.
 
-=item void logical_not(INTERP, PMC, dest)
+=item INTVAL cmp_num_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
 
-Does a logical not on PMC and stores the result in dest.
+=item INTVAL cmp_num_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
 
-=item void repeat(INTERP, PMC, value, dest)
+Compares the PMC at B<self> keyed by B<key> with the PMC at B<value> keyed by
+B<value_key> numerically.
+Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+if B<value> is smaller.
 
-Where value can be either an INTVAL or a PMC. Updates dest with
-the value of the leftmost PMC repeated value times.
+At least one key is guaranteed to be not NULL.
 
-=item void increment(INTERP, PMC)
+=item INTVAL cmp_string(INTERP, PMC* self, PMC* value)
+
+Compares the two PMCs as strings.
+Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+if B<value> is smaller.
+
+=item INTVAL cmp_string_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
+
+=item INTVAL cmp_string_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
+
+Compares the PMC at B<self> keyed by B<key> with the PMC at B<value> keyed by
+B<value_key> numerically.
+Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+if B<value> is smaller.
+
+At least one key is guaranteed to be not NULL.
+
+=item void logical_or(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Does a short-circuiting logical-OR of B<self> and B<value>, storing
+the winner in B<dest>. 
+
+=item void logical_or_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void logical_or_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Does a short-circuiting logical-OR of B<self> keyed by B<key> and 
+B<value> keyed by B<value_key>, storing the winner in B<dest> keyed
+by B<dest_key>. 
+
+At least one key is guaranteed to be not NULL.
+
+=item void logical_and(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Does a short-circuiting logical-AND of B<self> and B<value>, storing
+the winner in dest.
+
+=item void logical_and_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void logical_and_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Does a short-circuiting logical-AND of B<self> keyed by B<key> and 
+B<value> keyed by B<value_key>, storing the winner in B<dest> keyed
+by B<dest_key>. 
+
+At least one key is guaranteed to be not NULL.
+
+=item void logical_xor(INTERP, PMC* self, PMC* value, PMC* dest)
+
+If exactly one of B<self> or B<value> is true, store it in B<dest>.  Else
+set B<dest> to be false.
+
+=item void logical_xor_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void logical_xor_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+If exactly one of B<self> keyed by B<key> or B<value> keyed by B<value_key>
+is true, store it in B<dest> keyed by B<dest_key>.  Else set B<dest> 
+keyed by B<dest_key> to be false.
+
+At least one key is guaranteed to be not NULL.
+
+=item void logical_not(INTERP, PMC* self, PMC* dest)
+
+Does a logical-NOT on B<self> and stores the result in B<dest>.
+
+=item void logical_not_keyed(INTERP, PMC* self, KEY* key, PMC* dest, KEY* dest_key)
+
+=item void logical_not_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* dest, INTVAL* dest_key)
+
+Does a logical-NOT on B<self> keyed by B<key> and stores the result 
+in B<dest> keyed by B<dest_key>.
+
+At least one key is guaranteed to be not NULL.
+
+=item void repeat(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void repeat_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+Repeat the string value of B<self> B<value> times and store the
+resultant string in B<dest>.
+
+=item void repeat_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void repeat_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Repeat the string in B<self> keyed by B<key> by the quantity
+of B<value> keyed by B<value_key> and store the result in
+B<dest> keyed by B<dest_key>.
+
+At least one key is guaranteed to be not NULL.
+
+=item void repeat_int_keyed(INTERP, PMC* self, KEY* key, INTVAL value, PMC* dest, KEY* dest_key)
+
+=item void repeat_int_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key)
+
+Repeat the string in B<self> keyed by B<key> B<value> times
+and store the result in B<dest> keyed by B<dest_key>.
+
+At least one key is guaranteed to be not NULL.
+
+=item void increment(INTERP, PMC* self)
 
 Autoincrement the PMC.
 
-=item void decrement(INTERP, PMC)
+=item void decrement(INTERP, PMC* self)
 
 Autodecrement the PMC.
 
-=item INTVAL exists(INTERP, PMC, key)
+=item INTVAL exists_keyed(INTERP, PMC* self, KEY* key)
 
 This is only valid for keyed access. Returns TRUE or
 FALSE if the key exists or doesn't in the aggregate being
 queried.
 
-=item INTVAL defined(INTERP, PMC)
+The key is guaranteed to not be NULL.
 
-Checks to see if the PMC is defined. Returns TRUE or
-FALSE.
+=item INTVAL defined(INTERP, PMC* self)
 
-=item void delete(INTERP, PMC, key)
+Checks to see if the PMC is defined. Returns TRUE or FALSE.
+
+=item INTVAL defined_keyed(INTERP, PMC* self, KEY* key)
+
+Returns TRUE if the value of B<self> keyed by B<key> is defined,
+FALSE otherwise.
+
+The key is guaranteed to be not NULL.
+
+=item void delete_keyed(INTERP, PMC* self, KEY* key)
 
 Delete the specified entry from the aggregate.
 
-=item KEY *nextkey(INTERP, PMC, key)
+The key is guaranteed to be not NULL.
+
+=item KEY *nextkey_keyed(INTERP, PMC* self, KEY* key)
 
 Given the passed in key for the PMC, return the next key.
 
-=item void substr(INTERP, PMC, offset, length, dest)
+The key is guaranteed to be not NULL.
 
-Place the value of the substring of PMC into dest.
+=item void substr(INTERP, PMC* self, INTVAL offset, INTVAL length, PMC* dest)
 
-=item STRING *substr_str(INTERP, PMC, offset, length)
+Place the value of the substring of B<self> into B<dest>.
+
+=item void substr_keyed(INTERP, PMC* self, KEY* key, INTVAL length, PMC* dest, KEY* dest_key)
+
+=item void substr_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL length, PMC* dest, INTVAL* dest_key)
+
+Place the value of the substring of B<self> keyed by B<key> into
+B<dest> keyed by B<dest_key>.
+
+At least one key is guaranteed to be not NULL.
+
+=item STRING* substr_str(INTERP, PMC* self, INTVAL offset, INTVAL length)
 
 Return a substring of the passed in PMC.
+
+=item STRING* substr_str_keyed(INTERP, PMC* self, KEY* key, INTVAL offset, INTVAL length)
+
+=item STRING* substr_str_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL offset, INTVAL length)
+
+Return a substring of B<self> keyed by B<key>.
+
+The key is guaranteed to be not NULL.
 
 =back
 
