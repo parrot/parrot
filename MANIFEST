@@ -38,6 +38,7 @@ chartypes/usascii.c
 classes/Makefile.in
 classes/default.pmc
 classes/genclass.pl
+classes/intqueue.pmc
 classes/parrotpointer.pmc
 classes/perlarray.pmc
 classes/perlhash.pmc
@@ -110,8 +111,8 @@ include/parrot/parrot.h
 include/parrot/pmc.h
 include/parrot/register.h
 include/parrot/resources.h
-include/parrot/rx.h
 include/parrot/runops_cores.h
+include/parrot/rx.h
 include/parrot/stacks.h
 include/parrot/string.h
 include/parrot/trace.h
