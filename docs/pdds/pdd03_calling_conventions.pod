@@ -60,23 +60,33 @@ languages.
 
 =head2 Responsibility for environment preservation
 
-The caller is responsible for preserving any environment it is
-interested in keeping. This includes any and all registers, lexical
-scoping and scratchpads, opcode libraries, and so forth.
+Parrot uses a fully continuation passing style for control flow. As
+such there is no 'return' environment as such. The object being
+invoked is responsible for any saving of registers -- parrot itself
+makes no guarantees here.
 
-But due to the nature of the calling scheme (CPS - continuation
-passing style) these duties are handled by the implementation itself.
-The invocation of a continuation swaps in the context that was
-captured, when the continuation was created, which restores e.g. the
-lexical pad stack or the register frame pointer.
-
-But please note, that because of the register usage in function
-returns, all registers not used as return values should be considered
-as volatile.
+The return continuation PMC type, used to create return continuations
+used for call/return style programming, guarantees that registers
+16-31 will be set such that the contents of those registers are
+identical to the content of the registers when the return continuation
+was I<created>. Note that if a return continuation object is created
+explicitly, rather than by an invocation op, 
 
 =head2 Calling conventions
 
-The following registers are used in calling all subs and methods
+The following registers are used in calling all subs and methods. The
+registers must be set by the I<caller>, either explicitly or
+implicitly. (Implicit setting of these registers may be done by ops
+which document they do so. For example the callcc op notes that it
+creates and provides a return continuation) Some, but not all, of the
+registers are passed in to the callee. Parrot does, however, consume
+some of these values.
+
+Note that registers 16-31 of each of the four types are, for security
+reasons, I<never> passed into the invoked subroutine, method, or
+continuation. They are guaranteed to be garbage.
+
+The registers as set up by the I<caller>:
 
 =over 4
 
@@ -90,9 +100,7 @@ Holds the return continuation for the caller.
 
 =item P2
 
-Holds the object the sub was called on. (For method calls) This
-register I<must> be null (either NULL or the Null PMC) for non-method
-calls.
+Holds the object the sub was called on. (For method calls)
 
 =item P3
 
@@ -176,6 +184,42 @@ numeric, and PMC parameters are in the parameter list up until
 overflow occurs. Once overflow occurs the parameters must be taken in
 the exact order that they appear in the signature.
 
+The registers of the above set as seen by the callee are:
+
+=over 4
+
+=item P3
+
+I<Only> if there are overflow parameters. Otherwise garbage
+
+=item S0
+
+=item I0
+
+=item I1-I4
+
+I<Only> if I0 indicates that a prototyped call was made. Otherwise garbage
+
+=item used parameter registers P5 through P15
+
+=item used parameter registers I5 through I15
+
+=item used parameter registers S5 through S15
+
+=item used parameter registers N5 through N15
+
+=back
+
+Note particularly that P0-P2 are not passed. They are consumed by
+Parrot and placed into the interpreter structure, and may be fetched
+with the interpinfo op if necessary. Fetching the return continuation
+may be expensive, and should only be done if truly necessary.
+
+The I<callee> must assume that any unused registers are garbage. This
+includes registers which could hold a parameter but don't due to lack
+of parameters. (For example, if only one PMC parameter is passed then
+PMC registers 6-15 are garbage)
+
 =head2 Prototyped parameters
 
 A sub or method can be called in two ways--either prototyped or
@@ -212,7 +256,7 @@ None.
 
 =head1 VERSION
 
-1.5
+1.4
 
 =head2 CURRENT
 
@@ -228,10 +272,6 @@ None.
 =head2 HISTORY
 
 =over 4
-
-=item Version 1.5
-
-16 November 2004
 
 =item Version 1.4
 
@@ -258,10 +298,6 @@ None. First version
 =head1 CHANGES
 
 =over 4
-
-=item Version 1.5
-
-Removed necessity of C<savetop> / C<restoretop>.
 
 =item Version 1.4
 
