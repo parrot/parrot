@@ -36,6 +36,7 @@
 #include "sets.h"
 #include "cfg.h"
 #include "stacks.h"
+#include "unit.h"
 #include "debug.h"
 
 
