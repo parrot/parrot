@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 output_is(<<'CODE', <<'OUTPUT', "built in");
     new P0, .Integer
@@ -238,4 +238,45 @@ CODE
 ok 1
 ok 2
 -42
+OUTPUT
+
+my $temp = "temp.imc";
+END { unlink $temp; };
+
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+.sub Integer_divide_Integer
+    .param pmc left
+    .param pmc right
+    .param pmc lhs
+    lhs = 42
+.end
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub");
+##PIR##
+.sub _main
+
+.include "pmctypes.pasm"
+.include "mmd.pasm"
+
+    .local pmc divide
+    load_bytecode "temp.imc"
+    divide = global "Integer_divide_Integer"
+    mmdvtregister .MMD_DIVIDE, .Integer, .Integer, divide
+
+    $P0 = new Integer
+    $P1 = new Integer
+    $P2 = new Integer
+    $P1 = 10
+    $P2 = 3
+    $P0 = $P1 / $P2
+    print $P0
+    print "\n"
+    end
+.end
+
+CODE
+42
 OUTPUT

@@ -937,6 +937,10 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
      */
     dest = VTABLE_invoke(interpreter, sub, NULL);
     if (dest) {
+        struct Parrot_Sub *s = PMC_sub(sub);
+        if (interpreter->code->cur_cs != s->seg) {
+            Parrot_switch_to_cs(interpreter, s->seg, 1);
+        }
         offset = dest - interpreter->code->byte_code;
         runops(interpreter, offset);
     }
