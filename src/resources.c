@@ -375,7 +375,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     /* The general stack's circular, so we need to be careful */
     while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
         for (i = 0; i < cur_stack->used; i++) {
-            if (STACK_ENTRY_PMC == cur_stack->entry[i].entry_type) {
+            if (STACK_ENTRY_PMC == cur_stack->entry[i].entry_type &&
+                cur_stack->entry[i].entry.pmc_val) {
                 last = mark_used(cur_stack->entry[i].entry.pmc_val, last);
             }
         }
@@ -464,7 +465,8 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     /* The general stack's circular, so we need to be careful */
     while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
         for (i = 0; i < cur_stack->used; i++) {
-            if (STACK_ENTRY_STRING == cur_stack->entry[i].entry_type) {
+            if (STACK_ENTRY_STRING == cur_stack->entry[i].entry_type &&
+                cur_stack->entry[i].entry.string_val) {
                 buffer_lives((Buffer *)cur_stack->entry[i].entry.string_val);
             }
         }
