@@ -5,18 +5,33 @@
 ;; This package provides Emacs support for PIR.
 ;; It defines PIR mode, a major mode for editing PIR code.
 
-;; See the documentation of `octave-mode' and `octave-help' for further
-;; information. 
+;; To begin using this mode for all `.imc' files that you edit,
+;; put this file in your `load-path' and add the following lines
+;; to your `.emacs' file:
 
-(require 'regexp-opt)
+;;   (autoload 'pir-mode \"pir-mode\" nil t)
+;;   (add-to-list 'auto-mode-alist '("\\.imc\\'" . pir-mode))
+
+;; If you have any problems with this, you're on your own,
+;; You could always try asking on perl6-internals@perl.org.
+
 ;;; Code:
-(add-to-list 'auto-mode-alist '("\\.imc\\'" . pir-mode))
+(require 'regexp-opt)
+(require 'cl)
 
-(defvar pir-mode-hook nil)
+(unless (fboundp 'line-beginning-position)
+  (defalias 'line-beginning-position 'point-at-bol))
+(unless (fboundp 'line-end-position)
+  (defalias 'line-end-position 'point-at-eol))
 
 (defgroup pir nil
   "Mode for editing PIR code."
   :group 'languages)
+
+(defcustom pir-mode-hook nil
+  "*Hook run when entering PIR mode."
+  :type 'hook
+  :group 'pir)
 
 (defcustom pir-comment-char ?#
   "*The `comment-start' character assumed by PIR mode."
@@ -27,7 +42,36 @@
   "*The default comment column for PIR code."
   :type 'integer
   :group 'pir)
-  
+
+(defcustom pir-block-comment-start
+  (concat (make-string 2 pir-comment-char) " ")
+  "String to insert to start a new PIR comment on an empty line."
+  :type 'string
+  :group 'pir)
+
+(defcustom pir-auto-indent-flag nil
+  "*Non-nil means indent line after a semicolon or space in PIR mode."
+  :type 'boolean
+  :group 'pir)
+
+(defcustom pir-auto-newline nil
+  "*Non-nil means automatically newline after a semicolon in PIR mode."
+  :type 'boolean
+  :group 'pir)
+
+(defcustom pir-blink-matching-block t
+  "*Control the blinkin of matching PIR block keywords.
+Non-nil means show matching begin of block when inserting a space,
+newline or semicolon after an end keyword."
+  :type 'boolean
+  :group 'pir)
+
+(defcustom pir-basic-indent 8
+  "*Extra indentation applied to statements in PIR block structures."
+  :type 'integer
+  :group 'pir)
+
+
 (defvar pir-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c;"     'pir-comment-region)
@@ -53,7 +97,6 @@
     (define-key map "\C-c\M-\C-h" 'pir-mark-block)
     (define-key map "\C-c]" 'pir-close-block)
     (define-key map "\C-c\C-f" 'pir-insert-defun)
-    
     map)
   "Keymap for PIR major mode.")
 
@@ -88,9 +131,7 @@
   "Menu for PIR mode.")
 
 
-(defvar pir-mode-syntax-table nil
-  "Syntax table for PIR major mode.")
-(setq   pir-mode-syntax-table
+(defvar pir-mode-syntax-table
   (let ((st (make-syntax-table)))
     (modify-syntax-entry ?_  "w"  st)
     (modify-syntax-entry ?\\ "\\" st)
@@ -99,7 +140,8 @@
     (modify-syntax-entry ?$  "'" st)
     (modify-syntax-entry ?,  "."  st)
     (modify-syntax-entry ?.  ". p"  st)
-    st))
+    st)
+  "Syntax table for PIR major mode.")
 
 (defvar pir-PMC-keyword-symbols
   '("Array" "Boolean" "Compiler" "Continuation" "Coroutine" "CSub"
@@ -175,127 +217,96 @@
 (defvar pir-register-regexp "[INPS]\\([12][0-9]\\|3[01]\\|[0-9]\\)")
 (defvar pir-dollar-register-regexp "\\$[INPS][0-9]+")
 
-(defvar pir-directives)
-(setq pir-directives
-      '("method" "non_prototyped" "prototyped" "@LOAD" "@MAIN"))
+(defvar pir-directives
+  '("method" "non_prototyped" "prototyped" "@LOAD" "@MAIN"))
 
-(defvar pir-dotted-directives)
-(setq pir-dotted-directives
+(defvar pir-dotted-directives
   '(".sub" ".pcc_sub" ".end" ".emit" ".eom" ".const" ".namespace"
     ".endnamespace" ".result" ".arg" ".return" ".include"
     ".pcc_begin" ".pcc_end" ".pcc_begin_return" ".pcc_end_return"
     ".pcc_begin_yield" ".pcc_end_yield"))
 
-(defvar pir-variable-declarations)
-(setq pir-variable-declarations
-      '(".local" ".sym" ".param"))
+(defvar pir-variable-declarations
+  '(".local" ".sym" ".param"))
 
-(defvar pir-begin-keywords)
-(setq pir-begin-keywords
+(defvar pir-begin-keywords
   '(".sub" ".emit" ".pcc_begin_yield" ".pcc_begin_return"
     ".pcc_begin" ".namespace"))
 
-(defvar pir-end-keywords)
-(setq pir-end-keywords
+(defvar pir-end-keywords
   '(".end" ".eom" ".pcc_end_yield" ".pcc_end_return"
     ".pcc_end" ".endnamespace"))
 
-(defvar pir-block-match-alist)
-(setq   pir-block-match-alist
+(defvar pir-block-match-alist
   '((".sub" ".end" 1)
     (".emit" ".eom" 1)
     (".pcc_begin_yield" ".pcc_end_yield" 0)
     (".pcc_begin_return" ".pcc_end_return" 0)
     (".pcc_begin" ".pcc_end" 0)
-    (".namespace" ".endnamespace" 0)))
-;  "Alist with IMCC's matching block keywords.
-;Has IMCC's begin keywords as keys and a list of the matching end keywords as
-;associated values.")
+    (".namespace" ".endnamespace" 0))
+  "Alist of IMCC's matching block keywords.
+Has IMCC's begin keywords as keys and a list of the matching end keywords as
+associated values.")
 
-(defvar pir-block-offset-alist)
-(setq pir-block-offset-alist
-      (mapcan (lambda (blockspec)
-		(let ((offset (caddr blockspec)))
-		  `((,(car blockspec) . ,offset)
-		    (,(cadr blockspec) . ,offset))))
-	      pir-block-match-alist))
+(defvar pir-block-offset-alist
+  (mapcan (lambda (blockspec)
+	    (let ((offset (caddr blockspec)))
+	      `((,(car blockspec) . ,offset)
+		(,(cadr blockspec) . ,offset))))
+	  pir-block-match-alist))
 
-(defvar pir-open-directives)
-(setq pir-open-directives
+(defvar pir-open-directives
   (mapcar #'car pir-block-match-alist))
 
-(defvar pir-close-directives)
-(setq pir-close-directives
+(defvar pir-close-directives
   (mapcar #'cadr pir-block-match-alist))
 
-(defvar pir-block-begin-regexp)
-(setq pir-block-begin-regexp
-      (regexp-opt pir-begin-keywords 'paren))
-(defvar pir-block-end-regexp)
-(setq pir-block-end-regexp
+(defvar pir-block-begin-regexp
+  (regexp-opt pir-begin-keywords 'paren))
+
+(defvar pir-block-end-regexp
   (regexp-opt pir-end-keywords 'paren))
-(defvar pir-block-begin-or-end-regexp)
-(setq pir-block-begin-or-end-regexp
-   (concat "\\(?:"pir-block-begin-regexp "\\|"
-	          pir-block-end-regexp "\\)"))
 
-(defvar pir-function-header-regexp)
-(setq pir-function-header-regexp
-  "\\.\\(.sub\\)\\s-+\\(\\sw+\\)")
-;  "Regexp to match a PIR function header.")
+(defvar pir-block-begin-or-end-regexp
+  (concat "\\(?:" pir-block-begin-regexp "\\|"
+	  pir-block-end-regexp "\\)"))
 
+(defvar pir-function-header-regexp "\\.\\(.sub\\)\\s-+\\(\\sw+\\)"
+  "Regexp to match a PIR function header.")
 
-(defvar pir-font-lock-keywords)
-(setq pir-font-lock-keywords
-      `((,(concat "^\\s *\\(.sub\\)\\s +\\(\\sw+\\)"
-		  "\\(\\s +" (regexp-opt pir-directives 'paren) "\\)?")
-	 (1 font-lock-keyword-face)
-	 (2 font-lock-function-name-face t t)
-	 (4 font-lock-keyword-face t t))
-	(,(concat "\\s-*" (regexp-opt pir-variable-declarations 'paren)
-		  "\\(?:\\s +" (regexp-opt pir-type-keywords 'paren)
-		  "\\(?:\\s +\\(\\sw+\\)\\)?\\)?")
-	 (1 font-lock-keyword-face)
-	 (2 font-lock-type-face nil t)
-	 (3 font-lock-variable-name-face nil t))
-	(,(concat "^\\s *\\(.const\\)\\s +"
-		  (regexp-opt pir-type-keywords 'paren)
-		  "\\(\\s +\\(\\sw+\\)\\)?")
-	 (1 font-lock-keyword-face)
-	 (2 font-lock-type-face nil t)
-	 (4 font-lock-constant-face nil t))
-	(,pir-block-begin-or-end-regexp . font-lock-keyword-face)
-	  
-	(,pir-dollar-register-regexp . font-lock-variable-name-face)
-	(,pir-register-regexp . font-lock-variable-name-face)
-	(,(regexp-opt pir-dotted-directives 'paren) . font-lock-keyword-face)
-	(,(regexp-opt pir-ops 'words) . font-lock-keyword-face)
-	("\\s-*\\(\\sw+\\)\\s=*"
-	 (1 font-lock-variable-name-face))
-	))
+(defvar pir-font-lock-keywords
+  `((,(concat "^\\s *\\(.sub\\)\\s +\\(\\sw+\\)"
+	      "\\(\\s +" (regexp-opt pir-directives 'paren) "\\)?")
+     (1 font-lock-keyword-face)
+     (2 font-lock-function-name-face t t)
+     (4 font-lock-keyword-face t t))
+    (,(concat "\\s-*" (regexp-opt pir-variable-declarations 'paren)
+	      "\\(?:\\s +" (regexp-opt pir-type-keywords 'paren)
+	      "\\(?:\\s +\\(\\sw+\\)\\)?\\)?")
+     (1 font-lock-keyword-face)
+     (2 font-lock-type-face nil t)
+     (3 font-lock-variable-name-face nil t))
+    (,(concat "^\\s *\\(.const\\)\\s +"
+	      (regexp-opt pir-type-keywords 'paren)
+	      "\\(\\s +\\(\\sw+\\)\\)?")
+     (1 font-lock-keyword-face)
+     (2 font-lock-type-face nil t)
+     (4 font-lock-constant-face nil t))
+    (,pir-block-begin-or-end-regexp . font-lock-keyword-face)
 
-(defcustom pir-auto-indent-flag nil
-  "*Non-nil means indent line after a semicolon or space in PIR mode."
-  :type 'boolean
-  :group 'pir)
-
-(defcustom pir-blink-matching-block t
-  "*Control the blinkin of matching PIR block keywords.
-Non-nil means show matching begin of block when inserting a space,
-newline or semicolon after an end keyword."
-  :type 'boolean
-  :group 'pir)
-
-(defcustom pir-basic-indent 8
-  "*Extra indentation applied to statements in PIR block structures."
-  :type 'integer
-  :group 'pir)
+    (,pir-dollar-register-regexp . font-lock-variable-name-face)
+    (,pir-register-regexp . font-lock-variable-name-face)
+    (,(regexp-opt pir-dotted-directives 'paren) . font-lock-keyword-face)
+    (,(regexp-opt pir-ops 'words) . font-lock-keyword-face)
+    ("\\s-*\\(\\sw+\\)\\s-*"
+     (1 font-lock-variable-name-face)))
+  "Expressions to highlight in PIR mode.")
 
 (defvar pir-imenu-generic-expression
   (list
    (list nil pir-function-header-regexp 2))
   "Imenu expression for PIR mode.  See `imenu-generic-expression'.")
-  
+
 (defun pir-comment ()
   "Convert an empty comment to a `larger' kind, or start a new one.
 These are the known comment classes:
@@ -377,7 +388,7 @@ keywords. (When I've set them up.)
 
 Keybindings
 ===========
-\\{octave-mode-map}
+\\{pir-mode-map}
 
 Variables you can use to customize PIR mode
 ===========================================
@@ -399,8 +410,7 @@ To begin using this mode for all `.imc' files that you edit, add the
 following lines to your `.emacs' file:
 
   (autoload 'pir-mode \"pir-mode\" nil t)
-  (setq auto-mode-alist
-        (cons '(\"\\\\.imc$\" . pir-mode) auto-mode-alist))
+  (add-to-list 'auto-mode-alist '(\"\\\\.imc\\\\'\" . pir-mode))
 
 If you have any problems with this, you're on your own. You could always
 try asking on perl6-internals@perl.org."
@@ -409,14 +419,14 @@ try asking on perl6-internals@perl.org."
   (use-local-map pir-mode-map)
   (setq major-mode 'pir-mode)
   (setq mode-name "PIR")
-  
+
   (set-syntax-table pir-mode-syntax-table)
-  
+
   (setlocalq font-lock-defaults '(pir-font-lock-keywords))
   (setlocalq indent-line-function 'pir-indent-line)
-  (setlocalq pir-mode-basic-indent 'pir-mode-basic-indent)
+  (setlocalq pir-basic-indent pir-basic-indent)
   (setlocalq require-final-newline t)
-  
+
   (setlocalq comment-start "# ")
   (setlocalq comment-end "")
   (setlocalq comment-column pir-comment-column)
@@ -430,8 +440,6 @@ try asking on perl6-internals@perl.org."
   (setlocalq fill-paragraph-function 'pir-fill-paragraph)
   (setlocalq adaptive-fill-regexp nil)
   (setlocalq fill-column 72)
-  
-  (setlocalq font-lock-defaults '(pir-font-lock-keywords))
 
   (setlocalq imenu-generic-expression pir-imenu-generic-expression)
   (setq      imenu-case-fold-search nil)
@@ -440,7 +448,7 @@ try asking on perl6-internals@perl.org."
 
   (pir-initialize-completions)
   (pir-add-pir-menu)
-  
+
   (run-hooks 'pir-mode-hook))
 
 (defun pir-describe-major-mode ()
@@ -508,8 +516,8 @@ See `comment-region'."
 (defun pir-uncomment-region (beg end &optional arg)
   "Uncomment each line in the region as PIR code."
   (interactive "r\nP")
-  (or arg (setq arg1))
-  (octave-comment-region beg end (- arg)))
+  (or arg (setq arg 1))
+  (pir-comment-region beg end (- arg)))
 
 
 ;;; Indentation
@@ -1163,8 +1171,6 @@ variables."
   (easy-menu-add pir-mode-menu-map pir-mode-map))
 
 
-
-(provide 'pir-mode)
 (provide 'pir-mode)
 
 ;;; pir-mode.el ends here
