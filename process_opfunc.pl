@@ -94,14 +94,16 @@ print OUTPUT <<EOF;
 EOF
 
 
-my($name, $footer, @param_sub);
+my($name, $footer, @param_sub, $op_type);
 while (<INPUT>) {
 
     if (/^AUTO_OP/) {
+	$op_type = 'AUTO';
 	($name, $footer) = emit_auto_header($_);
     }
 
     if (/^MANUAL_OP/) {
+	$op_type = 'MANUAL';
 	($name, $footer) = emit_manual_header($_);
     }
 
@@ -112,7 +114,6 @@ while (<INPUT>) {
 	next;
     }
 
-    s/RETVAL/return_offset/;
 
     s/RETURN\(0\);/return 0;/;
 
@@ -120,7 +121,7 @@ while (<INPUT>) {
 
     s/\bP(\d+)\b/$param_sub[$1]/g;
 
-    if (/^}/) {
+    if (/^}/ && $op_type eq 'AUTO' ) {
         print OUTPUT $footer, "\n";
 	next;
     }
