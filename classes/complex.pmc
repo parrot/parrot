@@ -433,7 +433,7 @@ to C<value>.
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
         STRING* s = VTABLE_get_string(INTERP, key);
-        return DYNSELF.set_number_keyed_str(s, value);
+        DYNSELF.set_number_keyed_str(s, value);
     }
 
     void set_number_keyed_str (STRING* key, FLOATVAL value) {

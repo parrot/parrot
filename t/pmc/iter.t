@@ -1013,8 +1013,8 @@ output_is(<<'CODE', <<'OUTPUT', "xrange iterator");
 .sub main
     .include "iterator.pasm"
         # xrange(10, 14)
-	new P2, .Slice
-	slice P1, P2[10 .. 14]
+	new P2, .Slice [10 .. 14]
+	new P1, .Iterator,  P2
 
 	set P1, .ITERATE_FROM_START
 #	I0 = P1."len"()
@@ -1041,8 +1041,8 @@ output_is(<<'CODE', <<'OUTPUT', "xrange iterator ..n");
 .sub main
     .include "iterator.pasm"
         # xrange(4)
-	new P2, .Slice
-	slice P1, P2[ .. 4]
+	new P2, .Slice [ .. 4]
+	new P1, .Iterator,  P2
 
 	set P1, .ITERATE_FROM_START
 #	I0 = P1."len"()
@@ -1200,9 +1200,9 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - xrange");
     .local pmc hash
     .local pmc value
     .local pmc xr
-    xr = new Slice
+    xr = new Slice[0 .. 10]
     .local pmc sl
-    sl = slice xr[0 .. 10]
+    sl = new Iterator, xr
     hash = new PerlHash
     null value
     hash."fromkeys"(sl, value)

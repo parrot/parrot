@@ -828,11 +828,15 @@ assignment:
                         { $$ = iINDEXSET(interp, cur_unit, $1, $3, $6); }
    | target '=' NEW classname COMMA var
                         { $$ = iNEW(interp, cur_unit, $1, $4, $6, 1); }
+   | target '=' NEW classname '[' keylist ']'
+                        { $$ = iNEW(interp, cur_unit, $1, $4, $6, 1); }
    | target '=' NEW classname
                         { $$ = iNEW(interp, cur_unit, $1, $4, NULL, 1); }
    | target '=' NEW var
                         { $$ = MK_I(interp, cur_unit, "new", 2, $1, $4); }
    | target '=' NEW var COMMA var
+                        { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
+   | target '=' NEW var '[' keylist ']'
                         { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
    | target '=' newsub IDENTIFIER
                         { $$ = iNEWSUB(interp, cur_unit, $1, $3,
@@ -853,10 +857,12 @@ assignment:
                         { $$ = MK_I(interp, cur_unit, "store_global",2, $2,$4); }
        /* NEW and is here because it is both PIR and PASM keywords so we
         * have to handle the token here (or badly hack the lexer). */
-   | NEW
-                        { expect_pasm = 1; }
-     pasm_args
-                        { $$ = INS(interp, cur_unit, "new",0,regs,nargs,keyvec,1); }
+   | NEW target COMMA var
+                        { $$ = MK_I(interp, cur_unit, "new", 2, $2, $4); }
+   | NEW target COMMA var COMMA var
+                        { $$ = MK_I(interp, cur_unit, "new", 3, $2, $4, $6); }
+   | NEW target COMMA var '[' keylist ']'
+                        { $$ = MK_I(interp, cur_unit, "new", 3, $2, $4, $6); }
      /* Subroutine call the short way */
    | target '=' sub_call
          {

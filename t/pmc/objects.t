@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 46;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1372,10 +1372,85 @@ ok 4
 MyInt2(42)
 OUTPUT
 
-TODO: {
-  local $TODO = "methods can't be overidden in derived classes";
-
 output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 2");
+##PIR##
+.sub main @MAIN
+  .local pmc MyInt
+  .local pmc MyInt2
+  getclass $P0, "Integer"
+  print "ok 1\n"
+  subclass MyInt, $P0, "MyInt"
+  getclass $P1, "MyInt"
+  subclass MyInt2, $P1, "MyInt2"
+  print "ok 2\n"
+  .local pmc i
+  $I0 = find_type "MyInt2"
+  i = new $I0
+  $I0 = isa i, "Integer"
+  print $I0
+  $I0 = isa i, "MyInt"
+  print $I0
+  $I0 = isa i, "MyInt2"
+  print $I0
+  print "\n"
+  print "ok 3\n"
+  i = 42	# set_integer is inherited from Integer
+  print "ok 4\n"
+  $I0 = i	# get_integer is overridden below
+  print $I0
+  print "\n"
+  $S0 = i 	# get_string is overridden below
+  print $S0
+  print "\n"
+.end
+
+.namespace ["MyInt2"]
+# subclassing methods from MyInt is ok
+# this one changes the value a bit
+.sub __get_integer method
+   $I0 = classoffset self, "MyInt"
+   $P0 = getattribute self, $I0
+   $I0 = $P0
+   inc $I0            # <<<<<
+   .pcc_begin_return
+   .return $I0
+   .pcc_end_return
+.end
+.namespace ["MyInt"]
+.sub __get_integer method
+   $I0 = classoffset self, "MyInt"
+   $P0 = getattribute self, $I0
+   $I0 = $P0
+   .pcc_begin_return
+   .return $I0
+   .pcc_end_return
+.end
+.sub __get_string method
+   $I0 = classoffset self, "MyInt"
+   $P0 = getattribute self, $I0
+   $I0 = $P0
+   $S1 = $I0
+   $S0 = typeof self
+   $S0 .= "("
+   $S0 .= $S1
+   $S0 .= ")"
+   .pcc_begin_return
+   .return $S0
+   .pcc_end_return
+.end
+CODE
+ok 1
+ok 2
+111
+ok 3
+ok 4
+43
+MyInt2(42)
+OUTPUT
+
+TODO: {
+  local $TODO = "methods can't be overidden in derived class only";
+output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 3");
 ##PIR##
 .sub main @MAIN
   .local pmc MyInt
