@@ -590,10 +590,11 @@ EOFTEST
 }
 
 sub run_interactive {
-    my $in;
+    my $in = '';
     # Delay loading Term::ReadLine if we don't need it.
-    eval <<'END';
-    use Term::ReadLine;
+    my $parser = get_parser();
+    eval {
+    require Term::ReadLine;
 
     my $term = new Term::ReadLine $0 or die $!;
     my $prompt = '> ';
@@ -621,7 +622,7 @@ sub run_interactive {
 	$in = '';
 	$prompt = '> ';
     }
-END
+};
     die $@ if $@;
 }
 
