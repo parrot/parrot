@@ -1,0 +1,180 @@
+
+# This is a comment in a test script for Parakeet.  Like shell
+# comments, they consume the whole line after the hash
+
+# 1 trace  # un/comment to toggle Parrot VM tracing (very verbose!)
+           # You can sprinkle these anywhere to trace code.
+           # Also useful are:
+
+# 1 seeing    # Dump PIR code during compilation
+# 1 debug     # Toggle Parrot VM debugging
+# 1 profile   # Toggle Parrot VM profiling
+# 1 bounds    # Toggle Parrot VM bounds checking
+# debug-init  # use to init debugger
+# debug-break # Break into debugger, seems to segfault on debug_break op for now.
+
+"Welcome!" println
+
+# You can inspect a word with 'see'
+
+# see println
+
+# Here is a simple function definition.
+
+func bob "bob" println end
+
+# now execute it.
+
+bob  # it prints the word "bob"
+
+# When you 'see' a function, it shows you the PIR source
+
+# see bob
+
+# Here is a simple class definition.  Methods are words bound to
+# objects.
+
+class A
+  meth testMethod 1 end  # leaves an integer on stack
+end
+
+# Instances of classes are created with 'new'
+
+A new var a
+
+# Methods on objects are bound and called with '->'
+
+a -> testMethod println # print the integer left by testMethod
+
+# When you 'see' a class, it shows you the PIR source:
+
+see A
+
+# subclass and call base method
+
+class B
+  extends A
+end
+
+B new var b
+b -> testMethod println
+
+# subclass and override base method
+
+class C 
+  extends A
+  meth testMethod 2 end
+end
+
+C new var c
+c -> testMethod println  # prints 2
+
+# another for multi-inheritance
+
+class X 
+  meth xciting "exciting!" end
+end
+
+# multi-inheritance
+
+class D
+  extends C 
+  extends X
+end
+
+D new var d
+d -> testMethod println
+d -> xciting println
+
+# Some more boring tests:
+ 
+# 1 trace
+
+class TestWords
+
+  meth testStack
+    3 4 depth 2 == assert
+    dup depth 3 == assert
+    drop drop drop depth 0 == assert
+    "Passed!" println
+  end
+
+  meth testMathWords
+    2 2 + 4 == assert
+    2 2 - 0 == assert
+    2 2 * 4 == assert
+    8 2 / 4 == assert
+    2 8 % 2 == assert
+    "Passed!" println
+  end
+
+  meth testCompareWords
+    2 2 == 1 == assert
+    2 2 != 0 == assert
+    2 2 cmp 0 == assert
+    "Passed!" println
+  end
+
+  # whitespace and newlines are meaningless in code
+
+  meth testMathWordsUnreadable 2 2 + 4 == assert 2 2 - 0 == assert 2 2 * 4
+  == assert 8 2 / 4 == assert 2 8 % 2 == assert 2 2 == 1 == assert 2 2
+  != 0 == assert 2 2 cmp 0 == assert "Passed!" println end
+
+  meth testBoolWords
+    1 1 and 1 == assert
+    0 0 and 0 == assert
+    1 0 or 1 == assert
+    1 0 xor 1 == assert
+    1 not 0 == assert  
+    0 not 1 == assert
+    "Passed!" println
+  end
+
+  meth testOnStack     # ( 4 -- )
+    4 == assert
+    "Passed!" println
+  end
+
+  meth testDoLoop     # prints 0 to 3
+    4 0 do i 
+      i println 
+    loop
+    "Passed!" println
+  end
+
+  meth testLocalVars  # ( i i -- )
+    var x
+    var y
+    x println
+    y println
+    99 var x
+    x println
+    "Passed!" println
+  end
+
+  meth testSelf
+    self var z
+    z -> testDoLoop
+    "Passed!" println
+  end
+
+end
+
+# create a new TestWords instance
+
+TestWords new var tests
+
+# now call individual test methods
+
+tests -> testStack
+tests -> testMathWords
+tests -> testCompareWords
+tests -> testMathWordsUnreadable
+tests -> testBoolWords
+4 tests -> testOnStack
+tests -> testDoLoop
+3 4 tests -> testLocalVars
+
+"Goodbye!" println
+
