@@ -645,7 +645,7 @@ $(DIS) : $(SRC)/disassemble$(O) $(LIBPARROT)
 #
 
 $(PDUMP) : $(SRC)/pdump$(O) $(SRC)/packdump$(O) $(LIBPARROT)
-	$(LINK) -o $(PDUMP) $(SRC)/pdump$(O) $(SRC)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(PDUMP) $(SRC)/pdump$(O) $(SRC)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
 # pbc_info
