@@ -21,6 +21,16 @@ void Parrot_free_memalign(void *);
 #  define Parrot_memalign_if_possible(a, s) malloc(a)
 #endif
 
+#ifdef PARROT_HAS_EXEC_PROTECT
+void *mem_alloc_executable(size_t);
+void mem_free_executable(void *);
+void *mem_realloc_executable(void *, size_t);
+#else
+#define mem_alloc_executable mem_sys_allocate
+#define mem_free_executable mem_sys_free
+#define mem_realloc_executable mem_sys_realloc
+#endif
+
 /*
 ** Miscellaneous:
 */

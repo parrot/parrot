@@ -35,18 +35,19 @@ unless (${isreg}) {
 EOP
 }
 
+print OUT "\n/* from config/auto/jit */\n";
+print OUT "#define PARROT_HAS_EXEC_PROTECT\n" if ${has_exec_protect};
+
 if (${jit_i386} && ${jit_i386} eq 'fcomip') {
     print OUT <<'END';
-
-/* from config/auto/jit */
 #ifdef I386
 #  define PARROT_HAS_JIT_FCOMIP
 #endif
-
 END
 }
 
     print OUT <<'END';
+
 #ifdef __powerpc__
 #  define PARROT_VA_TO_VAPTR(x) (x)
 #else
