@@ -17,7 +17,7 @@ number types and C<PerlInt> and C<PerlNum>.
 
 =cut
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 26;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -618,7 +618,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "gcd");
+output_is(<<'CODE', <<OUTPUT, "gcd(int,int,int)");
         set I0, 125
         set I1, 15
         gcd I2, I1, I0
@@ -628,4 +628,235 @@ OK1:    print "ok 1\n"
         end
 CODE
 ok 1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "is gcd(int,int,int) transitive?");
+        set I0, 125
+        set I1, 15
+        gcd I2, I1, I0
+	
+	neg I0
+        gcd I3, I1, I0
+        eq I2, I3, OK1
+	print I2
+        print " not "
+	print I3
+OK1:    print "ok 1\n"
+
+	neg I1
+        gcd I3, I1, I0
+        eq I2, I3, OK2
+	print I2
+        print " not "
+	print I3
+OK2:    print "ok 2\n"
+
+	neg I0
+	neg I1
+        gcd I3, I1, I0
+        eq I2, I3, OK3
+	print I2
+        print " not "
+	print I3
+OK3:    print "ok 3\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "gcd num (with whole numbers)");
+        set N0, 125.0
+        set N1, 15.0
+        gcd I0, N1, N0
+        eq I0, 5, OK1
+        print "not "
+OK1:    print "ok 1\n"
+        end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "gcd num (2)");
+        set N0, 12.3
+        set N1, 24.6
+        gcd I0, N1, N0
+        eq I0, 12, OK1
+	print I0
+        print " not "
+OK1:    print "ok 1\n"
+        end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "is gcd(int,num,num) transitive?");
+        set N0, 125
+        set N1, 15
+        gcd I2, N1, N0
+	
+	neg N0
+        gcd I3, N1, N0
+        eq I2, I3, OK1
+	print I2
+        print " not "
+	print I3
+OK1:    print "ok 1\n"
+
+	neg N1
+        gcd I3, N1, N0
+        eq I2, I3, OK2
+	print I2
+        print " not "
+	print I3
+OK2:    print "ok 2\n"
+
+	neg N0
+	neg N1
+        gcd I3, N1, N0
+        eq I2, I3, OK3
+	print I2
+        print " not "
+	print I3
+OK3:    print "ok 3\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+
+output_is(<<'CODE', <<OUTPUT, "gcd - 5 args version");
+        set I3, +100
+        set I4,  +35
+        gcd I0, I1, I2, I3, I4
+	bsr output
+	
+        set I3, +100
+        set I4,  -35
+        gcd I0, I1, I2, I3, I4
+	bsr output
+
+        set I3, -100
+        set I4,  -35
+        gcd I0, I1, I2, I3, I4
+	bsr output
+
+        set I3, -100
+        set I4,  +35
+        gcd I0, I1, I2, I3, I4
+	bsr output
+
+        set I4, +100
+        set I3,  +35
+        gcd I0, I1, I2, I3, I4
+	bsr output
+	
+        set I4, +100
+        set I3,  -35
+        gcd I0, I1, I2, I3, I4
+	bsr output
+
+        set I4, -100
+        set I3,  -35
+        gcd I0, I1, I2, I3, I4
+	bsr output
+
+        set I4, -100
+        set I3,  +35
+        gcd I0, I1, I2, I3, I4
+	bsr output
+	
+	print "done\n"
+	end
+		
+output:
+	#I5 = I1*I3 + I2*I4
+	mul I5, I1, I3
+	mul I6, I2, I4
+	add I5, I6
+	
+	print I0
+        print " = "
+	print I5
+        print " = "
+	print I1
+        print "*"
+	print I3
+        print " + "
+	print I2
+        print "*"
+	print I4
+        print "\n"
+        ret
+CODE
+5 = 5 = -1*100 + 3*35
+5 = 5 = -1*100 + -3*-35
+5 = 5 = 1*-100 + -3*-35
+5 = 5 = 1*-100 + 3*35
+5 = 5 = 3*35 + -1*100
+5 = 5 = -3*-35 + -1*100
+5 = 5 = -3*-35 + 1*-100
+5 = 5 = 3*35 + 1*-100
+done
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "is gcd(int,int,int,int,int) transitive?");
+        set I0, 130
+        set I1, -35
+	gcd I7, I0, I1
+	
+	# +, +
+        gcd I2, I3, I4, I0, I1
+	mul I5, I3, I0
+	mul I6, I4, I1
+	add I5, I5, I6
+	ne I2, I5, NOK1
+        eq I2, I7, OK1
+NOK1:
+        print " not "
+OK1:    print "ok 1\n"
+
+	# -, +
+	neg I0
+        gcd I2, I3, I4, I0, I1
+	mul I5, I3, I0
+	mul I6, I4, I1
+	add I5, I5, I6
+	ne I2, I5, NOK2
+        eq I2, I7, OK2
+NOK2:
+        print " not "
+OK2:    print "ok 2\n"
+
+	# -, -
+	neg I1
+        gcd I2, I3, I4, I0, I1
+	mul I5, I3, I0
+	mul I6, I4, I1
+	add I5, I5, I6
+	ne I2, I5, NOK3
+        eq I2, I7, OK3
+NOK3:
+        print " not "
+OK3:    print "ok 3\n"
+
+	# +, -
+	neg I0
+        gcd I2, I3, I4, I0, I1
+	mul I5, I3, I0
+	mul I6, I4, I1
+	add I5, I5, I6
+	ne I2, I5, NOK4
+        eq I2, I7, OK4
+NOK4:
+        print " not "
+OK4:    print "ok 4\n"
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT

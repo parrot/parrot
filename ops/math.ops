@@ -1260,8 +1260,6 @@ Implementations of various mathematical operations
 
 =item B<gcd>(out INT, in INT, in INT)
 
-=item B<gcd>(out INT, in NUM, in NUM)
-
 Greatest Common divisor of $2 and $3.
 
 =cut
@@ -1270,8 +1268,8 @@ inline op gcd(out INT, in INT, in INT) :advanced_math {
 
   UINTVAL q = 0;
   UINTVAL c = 0;
-  INTVAL temp2 = $2;
-  INTVAL temp3 = $3;
+  INTVAL temp2 = $2 < 0 ? -$2 : $2;
+  INTVAL temp3 = $3 < 0 ? -$3 : $3;
   while (temp3 != 0) {
     q = (UINTVAL)floor( (FLOATVAL)temp2/temp3 );
     c = temp2 - temp3*q;
@@ -1279,22 +1277,6 @@ inline op gcd(out INT, in INT, in INT) :advanced_math {
     temp3 = c;
   }
   $1 = temp2;
-  goto NEXT();
-}
-
-inline op gcd(out INT, in NUM, in NUM) :advanced_math {
-
-  FLOATVAL q = 0;
-  FLOATVAL c = 0;
-  FLOATVAL temp2 = $2;
-  FLOATVAL temp3 = $3;
-  while (temp3 != 0) {
-    q = floor( (FLOATVAL)temp2/temp3 );
-    c = temp2 - temp3*q;
-    temp2 = temp3;
-    temp3 = c;
-  }
-  $1 = (INTVAL)temp2;
   goto NEXT();
 }
 
