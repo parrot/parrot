@@ -16,6 +16,27 @@
 ** Structure Definitions:
 */
 
+
+/*
+** Bytes that we don't have to reorder
+*/
+#define PACKFILE_HEADER_BYTES 16
+
+struct PackFile_Header {
+    char wordsize;
+    char major;
+    char minor;
+    char flags;
+    char pad[4];
+    char byteorder[8];
+    /* Start words/opcodes on 8-byte boundary */
+    opcode_t magic;
+    opcode_t opcodetype; 
+    opcode_t fixup_ss;  
+    opcode_t const_ss;
+    opcode_t bytecode_ss;
+};
+
 struct PackFile_FixupTable {
     opcode_t dummy;
 };
@@ -118,6 +139,17 @@ BOOLVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                          struct PackFile_Constant *self,
                                          opcode_t *packed,
                                          opcode_t packed_size);
+
+/*
+** Byte Ordering Functions (byteorder.c)
+*/
+void endian_matrix(char * buf);
+INTVAL endianize(INTVAL w, unsigned char * o);
+void endianize_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
+                        int wsize);
+INTVAL endianize_fetch_int(char * s, char * o);
+void endianize_put_int(const char * s, char * o);
+
 
 #endif /* PACKFILE_H */
 
