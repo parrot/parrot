@@ -367,6 +367,8 @@ architecture, the jit_emit functions B<should> follow this syntax:
 
 jit_emit_I<<op>>_I<<args>>_I<<type>>
 
+=over 4
+
 =item I<<op>>
 
 This is the operation like B<mov>, B<add> or B<bxor>. In normal cases
@@ -413,6 +415,8 @@ A float argument.
 
 Examples:
 
+=over 4
+
 =item B<jit_emit_sub_rm_i>
 
 Subtract integer at memory from integer processor register.
@@ -420,6 +424,10 @@ Subtract integer at memory from integer processor register.
 =item B<jit_emit_mov_ri_ni>
 
 Move integer constant (immediate) to floating point register.
+
+=back
+
+=back
 
 =head1 ALPHA Notes
 
