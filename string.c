@@ -275,7 +275,8 @@ string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
     unmake_COW(interpreter,s);
 
     /* Don't check buflen, if we are here, we already checked. */
-    Parrot_reallocate_string(interpreter, s, s->buflen + addlen);
+    Parrot_reallocate_string(interpreter, s,
+                             s->buflen + string_max_bytes(s,addlen));
     return s;
 }
 
@@ -486,6 +487,16 @@ string_compute_strlen(STRING *s)
 {
     s->strlen = s->encoding->characters(s->strstart, s->bufused);
     return s->strlen;
+}
+
+/*=for api string string_max_bytes
+ * returns the number of bytes required to safely contain
+ * n characters in the string's encoding
+ */
+INTVAL
+string_max_bytes(STRING *s, INTVAL nchars)
+{
+    return (nchars * s->encoding->max_bytes);
 }
 
 /*=for api string string_concat
@@ -901,6 +912,41 @@ string_bool(const STRING *s)
     }
 
     return 1;                   /* it must be true */
+}
+
+/*=for api string string_nprintf
+ * like Parrot_snprintf, but writes to, and returns, a STRING.
+ *
+ * bytelen does _not_ include space for a (non-existent) trailing null.
+ * dest may be a null pointer, in which case a new native string will
+ * be created. If bytelen is zero, the behaviour becomes more
+ * sprintf-ish than snprintf-like.  bytelen is measured in dest's encoding.
+ */
+STRING*
+string_nprintf(struct Parrot_Interp *interpreter,
+               STRING *dest, INTVAL bytelen, const char *format, ...)
+{
+    STRING *output;
+    const ENCODING *dest_encoding;
+    va_list args;
+
+    va_start(args, format);
+    output = Parrot_vsprintf_c(interpreter, format, args);
+    va_end(args);
+
+    dest_encoding = (dest != NULL) ? dest->encoding : NULL;
+    string_transcode(interpreter, output, dest_encoding, NULL, &output);
+
+    if(bytelen > 0 && bytelen < (INTVAL)string_length(output)) {
+        string_substr(interpreter, output, 0, bytelen, &output);
+    }
+
+    if(dest == NULL) {
+        return output;
+    } else {
+        string_set(interpreter, dest, output);
+        return dest;
+    }
 }
 
 /* A number is such that:

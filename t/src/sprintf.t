@@ -112,6 +112,23 @@ int do_test(struct Parrot_Interp* interpreter) {
     S = Parrot_sprintf_c(interpreter, "== %08vd\n", ival);
     printf("%08d %s", (int) ival,
            string_to_cstring(interpreter, S));
+     /* test string_nprintf() */
+     {
+ 	STRING *S2;
+ 	ival = 1000000;
+ 	S = string_nprintf(interpreter, NULL, 0, "== %d\n", (int) ival);
+ 	printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
+ 	S2 = string_from_c_string(interpreter,"Parrot", 0);
+ 	S = string_nprintf(interpreter, S2, 0, "== %d\n", (int) ival);
+ 	printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
+ 	printf("%s\n", (S == S2) ? "ok" : "different?!?");
+ 	S = string_nprintf(interpreter, NULL, 42, "== %d\n", (int) ival);
+ 	printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
+ 	S = string_nprintf(interpreter, NULL, 6, "== %d\n", (int) ival);
+ 	printf("100 %s\n", string_to_cstring(interpreter, S));
+ 	S = string_nprintf(interpreter, S2, 6, "== %d\n", (int) ival);
+ 	printf("100 %s\n", string_to_cstring(interpreter, S));
+     }
 
     /* Test we've not left junk behind on the stack */
     S = Parrot_sprintf_c(interpreter, "That's all, %s\n", "folks!");
@@ -151,6 +168,12 @@ Hello, Hello, Pa!
 00025 == 00025
 25 == 25
 -0000001 == -0000001
+1000000 == 1000000
+1000000 == 1000000
+ok
+1000000 == 1000000
+100 == 100
+100 == 100
 That's all, folks!
 OUTPUT
 

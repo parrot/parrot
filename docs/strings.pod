@@ -138,10 +138,9 @@ A string is false if it
 
 Otherwise the string will be true.
 
-B<Not implemented>: 
 To format output into a string, use
 
-    STRING* string_nprintf(STRING* dest, INTVAL len, char* format, ...) 
+    STRING* string_nprintf(struct Parrot_Interp *, STRING* dest, INTVAL len, char* format, ...) 
 
 C<dest> may be a null pointer, in which case a new B<native> string will
 be created. If C<len> is zero, the behaviour becomes more C<sprintf>ish

@@ -18,6 +18,7 @@
 /* Declarations of accessors */
 
 INTVAL string_compute_strlen(STRING *);
+INTVAL string_max_bytes(STRING*, INTVAL);
 STRING *string_concat(struct Parrot_Interp *, STRING *, STRING *, UINTVAL);
 STRING *string_append(struct Parrot_Interp *, STRING *, STRING *, UINTVAL);
 STRING *string_from_c_string(struct Parrot_Interp *, const void *, UINTVAL);
@@ -28,6 +29,8 @@ STRING *string_substr(struct Parrot_Interp *, STRING *, INTVAL,
                       INTVAL, STRING **);
 STRING *string_replace(struct Parrot_Interp *, STRING *, INTVAL, INTVAL,
                        STRING *, STRING **);
+STRING *string_nprintf(struct Parrot_Interp *,
+                       STRING *, INTVAL, const char *, ...);
 INTVAL string_compare(struct Parrot_Interp *, STRING *, STRING *);
 INTVAL string_bool(const STRING *);
 const char *Parrot_string_cstring(const STRING *);
