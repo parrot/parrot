@@ -1,0 +1,16 @@
+This directory contains some tests for Sean O'Rourke
+Perl 6 parser.
+
+Just run the tests like any other perl program.
+
+The tests take an optional parameter --grammar
+to specify the grammar file to use.  Like this:
+
+   perl ./basic.t --grammar FOO
+
+If the --force parameter is used, the grammar
+is created at runtime.  Note: this is slow!
+
+cheers,
+John Kingsley
+johnk@magma.ca

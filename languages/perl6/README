@@ -1,0 +1,57 @@
+Files
+=====
+
+prd-perl6.pl		interactive and batch interface to compiler
+test.pl			test suite
+Makefile
+README
+mkdistro.sh		bundle things up.
+P6C/Addcontext.pm	Context propagation.
+P6C/Builtins.pm		"built-in" function code and prototypes
+P6C/Context.pm		evaluation context structure
+P6C/IMCC.pm		code generation (and a few other things)
+P6C/Nodes.pm		parse tree node types
+P6C/Parser.pm		the grammar
+P6C/Tree.pm		functions translating parser output to tree
+P6C/Util.pm		miscellaneous utility functions
+t/compiler		compiler tests
+t/parser		parser tests
+
+Notes
+=====
+
+To get started, type "make test".  All the compiler test cases pass on
+my machine (Linux PPC, Perl 5.6.1), and compile in less than five
+seconds each.  However, your mileage may vary for a number of reasons:
+
+- I've heard it's unusably slow on Windows.
+- If you have Perl <= 5.005_03, "$a += 3" may fail to parse.
+- my Parse::RecDescent is hacked for speed -- mail me for a patch if
+  you want.
+- my Parrot tree contains a few minor changes that may not have made
+  it to CVS yet.
+
+Take a look at t/compiler/1.t for an idea of the kinds of operations
+currently supported.  For more details, see the POD documentation in
+P6C/*.pm, and the comments in P6C/IMCC.pm.
+
+Overview
+========
+
+The compiler currently operates in four passes.  The first (Parser.pm)
+takes the source and produces a very raw parse tree.  The second
+(Tree.pm) turns this data structure into a more manageable parse tree.
+The third pass (Addcontext.pm) figures out context information,
+storing it in the parse tree nodes.  The final pass (IMCC.pm) uses
+this context to emit IMCC code (higher-level than assembler).
+
+The resulting code is then run through imcc (parrot/languages/imcc), which
+handles register allocation and spilling, and then finally assembled
+by the parrot assembler (parrot/assembler.pl).
+
+Nodes.pm is probably the best place to start.  If you're not sure
+where to go from there, you might look for "XXX:", which I use to mark
+things that need fixing.  If you're interested in getting involved,
+drop me an email.
+
+/s
