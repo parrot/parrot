@@ -30,15 +30,15 @@ PMCs are detected in the following order
 
 =over 4
 
-=item Global Stash
+=item Global stash
 
-=item System Stack
+=item System stack
 
-=item current PMC Register set
+=item Current PMC register set
 
 =item Stashes
 
-=item PMC Resiter stack
+=item PMC register stack
 
 =item General/User stack
 
@@ -70,7 +70,7 @@ the following order
 
 =over 4
 
-=item current String register set
+=item Current String register set
 
 =item String register set stack
 
@@ -126,13 +126,14 @@ For example:
 
 =over 4
 
-=item Garbage Collection Algorithms for Automatic Dynamic Memory Management by Jones and Lins
+=item Garbage Collection Algorithms for Automatic Dynamic Memory Management
+by Jones and Lins
 
 =item http://www.cs.utexas.edu/users/oops/papers.html
 
 =back
 
-Also, the dev.perl6.org web site has an archive of the per6-internals
+Also, the dev.perl.org web site has an archive of the perl6-internals
 mailing list which contains numerous discussions on the
 Parrot garbage collector.
 
