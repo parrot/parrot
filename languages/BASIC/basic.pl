@@ -1,9 +1,16 @@
 #!/usr/bin/perl -w
-
 #
-# Test Harness...
+# $Id$
+# $Log$
+# Revision 1.7  2002/05/24 03:59:46  clintp
+# Screwed up ID strings
 #
 
+# Loads and runs the BASIC interpreter.
+#
+# Subsequent runs can be done with:
+#    parrot.exe out.pbc
+#
 open(T, ">test.pasm") || die;
 
 $a=<<'EOF';
