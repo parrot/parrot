@@ -38,62 +38,61 @@ The C code is:
 
         .local string b
         .local int    x, y, k
-        .local num    r, i, z, Z, t, c, C, temp1, temp2
+        .local num    r, i, z, Z, t, c, C
 
-	b = " .:,;!/>)|&IH%*#"
-	set y, 30
+        b = " .:,;!/>)|&IH%*#"
+        y = 30
 
 YREDO:  #  C = y*0.1 - 1.5
-        mul C, y, 0.1
-	sub C, C, 1.5
+        C = y * 0.1
+        C -= 1.5
 
-	set x, 0
+        x = 0
 
 XREDO:  # c = x*0.04 - 2
-	mul c, x, 0.04
-	sub c, c, 2.0
-	set z, 0
-	set Z, 0
+        c = x * 0.04
+        c -= 2
+        z = 0
+        Z = 0
 
-        set r, c
-        set i, C
+        r = c
+        i = C
 
-        set k, 0
+        k = 0
 
 KREDO:  # t = z*z - Z*Z + r
-        mul temp1, z, z
-        mul temp2, Z, Z
-        sub t, temp1, temp2
-        add t, t, r
+        $N1 = z * z
+        $N2 = Z * Z
+        t = $N1 - $N2
+        t += r
 
         # Z = 2*z*Z + i
-        add Z, Z, Z
-        mul Z, Z, z
-        add Z, Z, i
+        Z = 2 * Z
+        Z = z * Z
+        Z += i
 
         # z = t
-        set z, t
+        z = t
 
         # if (z*z + Z*Z > 10) break;
-        mul temp1, z, z
-        mul temp2, Z, Z
-        add temp1, temp1, temp2
-        gt temp1, 10.0, PRINT
+        $N1 = z * z
+        $N2 = Z * Z
+        $N1 += $N2
+        if $N1 > 10 goto PRINT
 
-	inc k
-	lt k, 112, KREDO
+        inc k
+        if k < 112 goto KREDO
 
-PRINT:  mod I4, k, 16
-        substr S2, b, I4, 1
-	print S2
+PRINT:  $I1 = k % 16
+        $S1 = substr b, $I1, 1
+        print $S1
 
-	inc x
-	lt x, 75, XREDO
+        inc x
+        if x < 75 goto XREDO
 
-	print "\n"
-	dec y
-	gt y, 0, YREDO
+        print "\n"
+        dec y
+        if y > 0 goto YREDO
 
-END:
-
+END:   
 .end
