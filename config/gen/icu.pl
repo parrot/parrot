@@ -20,11 +20,30 @@ use Cwd qw(cwd);
 
 $description="Configuring ICU if requested...";
 
-@args=qw(buildicu verbose icudatadir icuplatform icuconfigureargs);
+@args=qw(buildicu verbose icudatadir icuplatform icuconfigureargs
+         icushared icuheaders);
 
 sub runstep {
-  my ($buildicu, $verbose, $icudatadir, $icuplatform, $icuconfigureargs) = @_;
+  my ($buildicu, $verbose, $icudatadir, $icuplatform, $icuconfigureargs,
+           $icushared, $icuheaders) = @_;
   my $icu_configure_command;
+  my @icu_headers = qw(ucnv.h utypes.h uchar.h);
+
+  if (defined($icushared) && defined($icuheaders)) {
+    $icuheaders =~ s![\\/]$!!;
+    my $c_libs = Configure::Data->get('libs');
+    $c_libs .= " $icushared";
+    Configure::Data->set(
+        icu_headers => join(' ', map {"$icuheaders/unicode/$_"} @icu_headers),
+        blib_lib_libsicuuc_a => '',
+        blib_lib_libsicudata_a => '',
+	libs => $c_libs,
+        cc_inc => Configure::Data->get(qw(cc_inc))." -I$icuheaders",
+	icudatadir => '',
+	TEMP_icu_make => ''
+    );
+    return;
+  }
 
   if( !defined $icudatadir )
   {

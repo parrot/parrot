@@ -36,7 +36,7 @@ data it is setting.
 
 =item C<--verbose=2>
 
-Tells Configure.pl to output information about i<every> setting added or 
+Tells Configure.pl to output information about i<every> setting added or
 changed.
 
 =item C<--nomanicheck>
@@ -185,6 +185,28 @@ Pass the given arguments to ICU's configuration script, instead of the default.
 
 Use the given directory to locate ICU's data file(s) at runtime
 
+If you have an installed unicode package, you can use these two options instead:
+
+=item C<--icushared=(linkeroption)>
+
+Linker command to link against ICU library version 2.6.
+
+E.g.
+
+   --icushared='-L /opt/openoffice/program -licudata -licuuc'
+
+(The libs in openoffice are actually version 2.2 and do not work)
+
+=item C<--icuheaders=(header_dir)>
+
+Location of ICU header files without the /unicode suffix. The header files must match your platform, especially F<platform.h> must be present.
+
+E.g.
+
+--icuheaders='/home/lt/icu/'
+
+You might also need '--nomanicheck'.
+
 =back
 
 Other Options (may not be implemented)
@@ -298,6 +320,11 @@ ICU Options:
    --icuplatform=(platform)   Platform name to pass to ICU's runConfigureICU
    --icuconfigureargs=(args)  Arguments to pass to ICU's configuration script
    --icudatadir=(path)        Directory to locate ICU's data file(s)
+
+                       For using a system ICU, these options can be used
+
+   --icuheaders=(header_dir)  Location of headers w/o /unicode
+   --icushared=(linkeroption)>  Full linker command
 
 Other Options (may not be implemented):
 
