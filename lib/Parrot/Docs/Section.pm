@@ -167,7 +167,7 @@ sub write_html
         Parrot::Docs::HTMLPage->header(
             $self->name, $self->html_navigation, '../resources'));
     $index->append($index_html);
-    $index->append(Parrot::Docs::HTMLPage->footer);
+    $index->append(Parrot::Docs::HTMLPage->footer('', '../resources'));
     
     return $self->html_link . "<br>\n";
 }

@@ -327,6 +327,40 @@ sub is_docs_link
 	return $self->type =~ /Licence|info|docu|Text|TODO|status|MANIFEST|README/;
 }
 
+=item C<title()>
+
+Returns the title of the file.
+
+=cut
+
+sub title
+{
+	my $self = shift;
+
+	return $self->name unless $self->contains_pod;
+	
+	my $text = $self->read;
+	
+	return '' 
+		unless $text =~ /^=head1\s+(?:NAME|TITLE|TITEL)\s*[\n\r]+([^\n\r]+)/smo;
+	
+	$text = $1;
+	# Tidy it up a bit.
+	$text =~ s/^\s+//o;
+	$text =~ s/\s+$//o;
+	$text =~ s/\s*-$//o;
+	
+	# There was not text, just another POD command (=head2 probably).
+	return '' if $text =~ /^=\w/o;
+	
+	return $text unless $text =~ /-/o;
+	
+	# There has to be some space each side of the dash.
+	my ($path, $desc) = split /\s+--?\s+/, $text, 2;
+	
+	return $desc;
+}
+
 =item C<short_description()>
 
 Returns a short description of the file extracted from the C<NAME> section
@@ -386,26 +420,7 @@ sub short_description
 	# TODO - The abstract section above was added later. The two searches 
 	# could be combined.
 	
-	my $text = $self->read;
-	
-	return '' 
-		unless $text =~ /^=head1\s+(?:NAME|TITLE|TITEL)\s*[\n\r]+([^\n\r]+)/smo;
-	
-	$text = $1;
-	# Tidy it up a bit.
-	$text =~ s/^\s+//o;
-	$text =~ s/\s+$//o;
-	$text =~ s/\s*-$//o;
-	
-	# There was not text, just another POD command (=head2 probably).
-	return '' if $text =~ /^=\w/o;
-	
-	return $text unless $text =~ /-/o;
-	
-	# There has to be some space each side of the dash.
-	my ($path, $desc) = split /\s+--?\s+/, $text, 2;
-	
-	return $desc;
+	return $self->title;
 }
 
 =back

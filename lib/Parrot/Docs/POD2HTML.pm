@@ -574,7 +574,8 @@ sub do_end
 {
     my $self = shift;
     
-    print {$self->{'output_fh'}} Parrot::Docs::HTMLPage->footer;
+    print {$self->{'output_fh'}} 
+        Parrot::Docs::HTMLPage->footer('', $self->{RESOURCES_URL});
         
     return 1;
 }
@@ -618,7 +619,7 @@ sub write_html
     $self->{TARGET} = $target;
     
     # Use our own method for consistency.
-    $self->{'Title'} = $file->short_description;
+    $self->{'Title'} = $file->title;
     
     $rel_path = $self->append_html_suffix($rel_path);
         

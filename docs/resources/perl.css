@@ -1,0 +1,247 @@
+/* CSS File for Modern Browsers */
+
+/* also, perl-ns4.css stops ns4 from crashing. */
+
+BODY {
+        font-family:helvetica,sans-serif;
+        font-size:14px;
+  	font-weight:normal;
+	width: 730px;
+	background-color: #FFF;
+        
+        }
+
+UL	{
+	list-style-type: square;
+	}
+
+
+A       {
+	color: #003399;
+	/* color: #0055BB; */
+        text-decoration: none;
+        }
+
+.RIGHT   {
+	text-align: right;
+        }
+
+.HOME   {
+	text-align: right;
+        text-decoration: underline;
+        }
+
+.error  {
+	color: #DD0000;
+	}
+
+A:visited {
+	color: #663399;
+	}
+
+/* specify link and visited so the 'hover' style doesn't apply to
+   other links, like those which are just NAME anchors. */
+A:link:hover {
+        text-decoration: underline;
+        color: #8B0000; /* dark red */
+        }
+A:visited:hover {
+        text-decoration: underline;
+        color: #8B0000; /* dark red */
+        }
+
+TD	{
+        font-size:14px;
+	}
+
+.SHADED {
+        background-color: #d2b48c;
+        font-size:14px;
+        font-weight: bold;
+        font-family:helvetica,sans-serif;
+        }
+
+/* Header */
+.BANNER {
+        font-weight: bold;
+        font-size:18px;
+	color: #fff;
+        font-family:helvetica,sans-serif;
+        background-color:#191970;
+        padding-top: .5em;
+        padding-left:.5em;
+        padding-bottom:.5em;
+        border-bottom: 4px solid #39f;
+        border-top: 4px solid #39f; 
+        letter-spacing: 2px;
+
+
+	/* not valid CSS
+ 	line-spacing: 2px; */
+        }
+
+/* Navigation */
+#NAV {
+ 	width: 180px;
+        font-size:12px;
+        margin:0em; 
+        margin-top: -1px; 
+        padding:7px;
+        background-color:#eee;
+        border-right:1px solid #191970;
+        border-left:1px solid #191970;
+        }
+
+aaxSIDE   {
+	width: 175px;
+	}
+
+#MAIN {
+        font-size:12px;
+        margin-top:1em;
+        margin-left:1em;
+	}
+
+#MAIN TD { 
+        font-size:12px;
+	}
+
+.INDENT {
+        font-size:12px;
+        margin-left:1em;
+        }
+
+.BEGINNER  {
+        font-size:12px;
+        border:1px solid orange;
+	background-color: #fffacd; /* lemonchiffon */
+        padding:10px;
+	width: 400px;
+        margin-top: 1.5em;
+	}
+
+.NAVITEM  {
+        padding-bottom:.5em;
+        padding-top:1em;
+	width: 180px;
+	}
+
+.MENU  {
+        padding-bottom:1em;
+	width: 180px;
+        border-bottom:1px solid #191970;
+	}
+
+.TOPIC {
+        font-weight: bolder;
+        font-size: 16px;
+	color: #191970;
+        font-family:helvetica,sans-serif;
+        text-decoration: underline;
+	padding-bottom: 4px;
+        }
+
+.NAVLINE  {
+        font-size:12px;
+	}
+.SMALL  {
+        font-size: xx-small;
+        }
+
+.TITLE  {
+	color: #ccff66;
+	}
+
+.ITEMS  {
+        font-size:14px;
+        }
+
+.CR  {
+        border-left: 1px solid #191970;
+        border-right: 1px solid #191970;
+        border-bottom: 1px solid #191970;
+	width: 180px;
+        background-color:#eee;
+	color: #333;
+        padding:7px;
+        font-size: x-small;
+        }
+
+.DESCRIPTION  {
+        padding-bottom:1em;
+        padding-right:1em;
+        }
+
+
+.TAGLINE {
+        letter-spacing: 2.5px;
+        color: #666;
+        font-size: 14px;
+        font-family: Verdana, Sans-Serif;
+        font-weight: 800;
+        font-style: italic;
+        padding-top: 3px;
+        border-top:2px solid #191970;
+	margin-top: -10px
+        }
+
+/* for perl-directory style */
+.PDFOOTER {
+        font-size: 12px;
+        padding-top: 0px;
+        padding-bottom: 2px;
+	margin-bottom: 12px
+        }
+
+/* for default style */
+.FOOTER {
+        font-size: 12px;
+        padding-top: 3px;
+        border-top:2px solid #191970;
+	margin-top: -10px
+        }
+
+
+
+
+HR      {
+	color: #191970;
+	text-align: center;  /* what does this do on a HR? */
+        padding-top: .5em;
+        padding-bottom:.5em;
+	}
+
+.CAMEL  {
+	float: right;
+	/* margin-top: -5em; */
+	}
+
+H3     {
+	color: #000;
+        font-size: 14px;
+        font-family:verdana,helvetica,sans-serif;
+        font-weight: bolder;
+	}
+	
+TR      {
+	vertical-align: top;
+	}
+
+TD.NOVERTPAD {
+	padding-top: 0;
+	padding-bottom: 0;
+	}
+
+IMG.border {
+        border-width: 1px;
+        border-color: #191970;
+        border-style: solid;
+        padding: 4px;
+        margin: 2px;
+        background: white;
+        }
+
+.newsitem { 
+  width: 80%;
+  text-align: justify;
+}
