@@ -11,35 +11,35 @@ sub test {
 
 test(<<'CODE', 'func()');
 def foo():
-	print 0.1, 0.02
-	print 1.1, 1.02
+    print 0.1, 0.02
+    print 1.1, 1.02
 
 if __name__ == "__main__":
-	foo()
+    foo()
 CODE
 
 test(<<'CODE', 'func(a, b)');
 def foo(a,b):
-	c = 3
-	print a,b,c
+    c = 3
+    print a,b,c
 
 if __name__ == "__main__":
-	a = 1
-	b = 2
-	foo(a, b)
-	print foo(1, 2)
+    a = 1
+    b = 2
+    foo(a, b)
+    print foo(1, 2)
 CODE
 
 test(<<'CODE', 'func(a, b=x, c=y)');
 def foo(a,b="x",c=3+4):
-	print a,b,c
+    print a,b,c
 
 if __name__ == "__main__":
-	a = 1
-	b = 2
-	foo(a)
-	foo(a, b)
-	foo(a, b, 2)
+    a = 1
+    b = 2
+    foo(a)
+    foo(a, b)
+    foo(a, b, 2)
 CODE
 
 test(<<'CODE', 'abs() builtin opcode');
@@ -82,21 +82,21 @@ CODE
 test(<<'CODE', 'range 1');
 if __name__ == '__main__':
     for i in range(10):
-	print i,
+        print i,
     print
 CODE
 
 test(<<'CODE', 'range 2');
 if __name__ == '__main__':
     for i in range(2,5):
-	print i,
+        print i,
     print
 CODE
 
 test(<<'CODE', 'range 3');
 if __name__ == '__main__':
     for i in range(2,10,3):
-	print i,
+        print i,
     print
 CODE
 
@@ -104,7 +104,7 @@ test(<<'CODE', 'range 3 negative step');
 
 def main():
     for i in range(10, 0, -2):
-	print i
+        print i
 
 if __name__ == '__main__':
     main()
@@ -115,10 +115,10 @@ SKIP:
 test(<<'CODE', 'range 3 0 step');
 def main():
     try:
-	for i in range(1,2,0):
-	    print i
+        for i in range(1,2,0):
+            print i
     except ValueError,e:
-	print e
+        print e
 if __name__ == '__main__':
     main()
 
@@ -246,42 +246,42 @@ CODE
 
 test(<<'CODE', 'max(x,...)');
 if __name__ == '__main__':
-	print max(1,2)
-	print max(1,2,3,4,5)
-	print max(list("bcaBCA"))
+    print max(1,2)
+    print max(1,2,3,4,5)
+    print max(list("bcaBCA"))
 CODE
 
 test(<<'CODE', 'max(seq)');
 if __name__ == '__main__':
-	print max([1,2])
-	print max([1,2,3,4,5])
-	print max("bcaBCA")
+    print max([1,2])
+    print max([1,2,3,4,5])
+    print max("bcaBCA")
 CODE
 
 test(<<'CODE', 'min(x,...)');
 if __name__ == '__main__':
-	print min(1,2)
-	print min(1,2,3,4,5)
-	print min(list("bcaBCA"))
+    print min(1,2)
+    print min(1,2,3,4,5)
+    print min(list("bcaBCA"))
 CODE
 
 test(<<'CODE', 'min(seq)');
 if __name__ == '__main__':
-	print min([1,2])
-	print min([1,2,3,4,5])
-	print min("bcaBCA")
+    print min([1,2])
+    print min([1,2,3,4,5])
+    print min("bcaBCA")
 CODE
 
 test(<<'CODE', 'named arguments 1');
 def f(i=0, j=1):
-	print i, j
+    print i, j
 
 if __name__ == '__main__':
-	f(j=4, i=20)
-	f(i=4, j=20)
-	f()
-	#f(j=4)
-	#f(17, j=4)
+    f(j=4, i=20)
+    f(i=4, j=20)
+    f()
+    #f(j=4)
+    #f(17, j=4)
 CODE
 
 test(<<'CODE', 'lambda(x)');

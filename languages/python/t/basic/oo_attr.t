@@ -15,9 +15,9 @@ if __name__ == '__main__':
     i=5
     print i is i
     if i is i:
-	print "ok"
+        print "ok"
     if not i is 2:
-	print "ok"
+        print "ok"
 CODE
 
 test(<<'CODE', 'object id');
@@ -47,7 +47,7 @@ CODE
 test(<<'CODE', 'object attr');
 class C(object):
     def f(self):
-	print self.i
+        print self.i
 
 def main():
     c = C()
@@ -61,7 +61,7 @@ test(<<'CODE', 'override __repr__');
 
 class C(int):
     def __repr__(self):
-	return "C(%d)" % self.i
+        return "C(%d)" % self.i
 
 def main():
     c = C()
@@ -74,13 +74,13 @@ CODE
 test(<<'CODE', 'override __iter__');
 class C(object):
     def __iter__(self):
-	print "in iter"
-	yield 1
+        print "in iter"
+        yield 1
 
 def main():
     c = C()
     for i in c:
-	print i
+        print i
 
 main()
 CODE
@@ -88,16 +88,16 @@ CODE
 test(<<'CODE', 'override __iter__ 2');
 class C(object):
     def __iter__(self):
-	print "in iter"
-	yield 1
-	yield 2
-	yield 3
-	yield 4
+        print "in iter"
+        yield 1
+        yield 2
+        yield 3
+        yield 4
 
 def main():
     c = C()
     for i in c:
-	print i,
+        print i,
     print "ok"
 
 main()
@@ -106,11 +106,11 @@ CODE
 test(<<'CODE', 'override __iter__  next');
 class C(object):
     def __iter__(self):
-	print "in iter"
-	yield 1
-	yield 2
-	yield 3
-	yield 4
+        print "in iter"
+        yield 1
+        yield 2
+        yield 3
+        yield 4
 
 def main():
     c = C()
@@ -125,12 +125,12 @@ CODE
 test(<<'CODE', 'override __iter__  next, self.a');
 class C(object):
     def __iter__(self):
-	print "in iter"
-	self.a = 42
-	yield 1
-	yield 2
-	yield 3
-	yield 4
+        print "in iter"
+        self.a = 42
+        yield 1
+        yield 2
+        yield 3
+        yield 4
 
 def main():
     c = C()
@@ -173,7 +173,7 @@ test(<<'CODE', 'repr in parent');
 
 class C(int):
     def __repr__(self):
-	return "C(%d)" % self.i
+        return "C(%d)" % self.i
 class D(C):
     pass
 def main():
