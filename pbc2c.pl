@@ -186,7 +186,7 @@ FINDENTERN:
 	my $instr_pc = shift @pc_list;
 	# block leader found, start new block
 	if(exists $leaders{$instr_pc}) {
-	    substr($byte_code, $instr_pc, sizeof('op')) = $enternative;
+	    #substr($byte_code, $instr_pc, sizeof('op')) = $enternative;
 	    push @blocks, [$instr_pc ];
 	}
 	else {

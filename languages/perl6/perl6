@@ -731,9 +731,11 @@ sub pass4($$) {
 	"$PConfig{cc_warn} -c $HERE/$filebase.c $PConfig{'cc_o_out'} ".
 	"$HERE/$filebase$PConfig{o}";
 	verbose(1, "compiling $cmd");
-	if (system($cmd)) {
-	    mydie($?, $cmd);
-	}
+	warnings(sub {
+	    if (system($cmd)) {
+		mydie($?, $cmd);
+	    }
+	}, $fw);
 	# XXX running --shared needs
 	#
 	# export LD_LIBRARY_PATH=../../blib/lib

@@ -3015,7 +3015,7 @@ inline op defined(out INT, in PMC) {
 
 inline op defined(out INT, in PMC, in INTKEY) {
   INTVAL key = $3;
-  $1 = $2 ? $2->vtable->defined_keyed_int(interpreter, $2, &$3) : 0;
+  $1 = $2 ? $2->vtable->defined_keyed_int(interpreter, $2, &key) : 0;
   goto NEXT();
 }
 
@@ -3026,7 +3026,7 @@ inline op defined(out INT, in PMC, in KEY) {
 
 inline op exists(out INT, in PMC, in INTKEY) {
   INTVAL key = $3;
-  $1 = $2 ? $2->vtable->exists_keyed_int(interpreter, $2, &$3) : 0;
+  $1 = $2 ? $2->vtable->exists_keyed_int(interpreter, $2, &key) : 0;
   goto NEXT();
 }
 
