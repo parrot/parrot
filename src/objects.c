@@ -178,6 +178,9 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
             pmc_new(interpreter, enum_class_OrderedHash));
     VTABLE_set_pmc_keyed_int(interpreter, class_array, PCD_ATTRIBUTES,
             pmc_new(interpreter, enum_class_OrderedHash));
+    VTABLE_set_pmc_keyed_int(interpreter, class_array, PCD_CLASS_ATTRIBUTES,
+            pmc_new(interpreter, enum_class_Array));
+                             
 
     /* Set the classname, if we have one */
     classname_pmc = pmc_new(interpreter, enum_class_PerlString);
@@ -319,7 +322,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
             class_name);
 
     /* Note the number of used slots */
-    object->cache.int_val = POD_FIRST_ATTRIB;
+    object->cache.int_val = POD_FIRST_ATTRIB + attrib_count;
 
     PMC_data(object) = new_object_array;
     PObj_flag_SET(is_PMC_ptr, object);

@@ -24,6 +24,7 @@ typedef enum {
     PCD_ALL_PARENTS,    /* array in search order */
     PCD_ATTRIB_OFFS,    /* class => offset hash */
     PCD_ATTRIBUTES,      /* class::attrib => offset hash */
+    PCD_CLASS_ATTRIBUTES, /* Class attribute array */
     PCD_MAX
 } PARROT_CLASS_DATA_ENUM;
 

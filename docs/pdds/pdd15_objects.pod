@@ -251,9 +251,13 @@ the start of the attribute array where that class' attributes start.
 =item 4
 
 The class attribute name hash. Keys are the fully qualified attribute
-names (in whatever format the language governing the class wants) and
-the values are the offset from the beginning of the attribute array of
-the particular attribute.
+names and the values are the offset from the beginning of the
+attribute array of the particular attribute.
+
+=item 5
+
+The class attribute array. This is an array of unqualified attribute
+names.
 
 =back
 
@@ -330,7 +334,7 @@ up to the class that provides the PMC.
 
 =item callmethod Sz
 
-Call a method. If the method name is provided, we find the PMC for the named
+call a method. If the method name is provided, we find the PMC for the named
 method and put it in the sub/method slot. If no name is provided we
 assume that all the calling conventions have already been set up and
 the method PMC is already in the proper place.
@@ -371,16 +375,16 @@ Remove class Py from the parent list of Px. All parent classes of Py
 which aren't parent classes of what remains of Px's parent list are
 removed, as are their attributes.
 
-=item addattribute Px, Sy, Sz
+=item addattribute Px, Sy
 
-Add attribute Sy, with a fully-qualified name Sz, to class Px. This
-will add the attribute slot to all objects of class Px and children of
-class Px, with a default value of C<Null>.
+Add attribute Sy to class Px. This will add the attribute slot to all
+objects of class Px and children of class Px, with a default value of
+C<Null>.
 
-=item removeattribute Px, Sy, Sz
+=item removeattribute Px, Sy
 
-Remove the attribute Sy (fully qualified name Sz) from class Px, all
-objects of class Px, and all objects of a child of class Px.
+Remove the attribute Sy from class Px, all objects of class Px, and
+all objects of a child of class Px.
 
 =item instantiate Px, Py, Sz
 
@@ -556,6 +560,10 @@ objects, and potentially recompiling code with fixed attribute offsets
 embedded in it. Most OO languages don't allow attribute changes to
 existing classes, though parrot's base attribute system does allow
 this.
+
+The fully qualified name of an attribute is the classname, a null, and
+the attribute name. Parrot synthesizes the fully-qualified name where
+it needs to.
 
 =item Method
 
