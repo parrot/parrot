@@ -1054,8 +1054,8 @@ int main(int argc, char * argv[])
     fflush(stdout);
     fprintf(stderr, "%ld lines compiled.\n", line);
     fprintf(stderr, "Execing IMCC\n");
-    system("../imcc/imcc a.imc -o a.pasm");
-    /*system("perl int2pasm.pl a.imc > a.pasm");*/
+    system("../imcc/imcc -o a.pasm a.imc");
+    system("../imcc/imcc -c -o a.pbc a.imc");
     return 0;
 }
 

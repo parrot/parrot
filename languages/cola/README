@@ -167,19 +167,23 @@ Using the Compiler
 
 	make
 
-  Build imcc:
+  Building imcc:
 
-        cd ../imcc ; make ; cp imcc ../cola
+        IMCC is built automatically now when you build Parrot.
 
   Usage:
 
 	colac examples/mandelbrot.cola
 
-  Then copy "a.pasm" to your Parrot directory, assemble it and run
-  as usual. In case you need help there to, try:
+  This will call imcc to generate 2 types of output. a.pasm and a.pbc
+  You can run the .pbc (bytecode) immediately with Parrot:
+
+        parrot a.pbc
+
+  You can also see the Parrot assembly in "a.pasm" which should be compilable
+  with the reference assembler:
 
         assemble.pl a.pasm > a.pbc
-        parrot a.pbc
 
   Currently colac is a short Perl pre-processor that includes
   classes for any import statements (using System;)
