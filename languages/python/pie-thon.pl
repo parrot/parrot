@@ -19,12 +19,12 @@ $lambda_count = 0;
 my %builtin_ops = (
     abs => 'o',
     iter => 'o',
-    complex => 's',   # special
 );
 
 my %builtins = (
     AssertionError => 1,
     bool => 1,
+    complex => 1,
     callable => 1,
     chr => 1,
     dict => 1,
@@ -50,12 +50,15 @@ my %builtins = (
 # the new way type system
 my %type_map = (
     bool  => 'Py_bool',
+    complex  => 'Py_complex',
     float => 'Py_float',
     int   => 'Py_int',
     long  => 'Py_long',
     str   => 'Py_str',
-    tuple => 'Py_tuple',
+
+    dict  => 'Py_dict',
     list  => 'Py_list',
+    tuple => 'Py_tuple',
 );
 
 
@@ -962,7 +965,7 @@ EOC
 sub ret_val {
     my $a = shift;
     my %rets = (
-	'__repr__' => 'S',
+	'__repr__' => 'S',      # XXX don't - can't be overriden then
 	'lower'    => 'S',
 	'id'       => 'I',
     );

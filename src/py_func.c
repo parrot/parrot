@@ -60,15 +60,13 @@ parrot_py_chr(Interp *interpreter, PMC *pmc)
     return s;
 }
 
-static PMC *
-dict_from_tuple_array(Interp *interpreter, PMC *ar)
+static void
+dict_from_tuple_array(Interp *interpreter, PMC *dict, PMC *ar)
 {
     INTVAL i, el;
-    PMC *dict;
     /*
      * ar is an array of tuples which are key/value pairs
      */
-    dict = pmc_new(interpreter, enum_class_PerlHash);
     el = VTABLE_elements(interpreter, ar);
     for (i = 0; i < el; ++i) {
         PMC *tupl = VTABLE_get_pmc_keyed_int(interpreter, ar, i);
@@ -83,34 +81,20 @@ dict_from_tuple_array(Interp *interpreter, PMC *ar)
         value = VTABLE_get_pmc_keyed_int(interpreter, tupl, 1);
         VTABLE_set_pmc_keyed(interpreter, dict, key, value);
     }
-    return dict;
 }
 
-static PMC *
-parrot_py_dict(Interp *interpreter, PMC *arg)
+void
+Parrot_py_fill_dict(Interp *interpreter, PMC *dict, PMC *arg)
 {
-    INTVAL argcP;
-    /*
-     * no arguments: return a new hash
-     */
-    if ((argcP = REG_INT(3)) == 0)
-        return pmc_new(interpreter, enum_class_PerlHash);
-    if (argcP > 1) {
-            real_exception(interpreter, NULL, E_TypeError,
-                    "TypeError: dict expected at most 1 arguments, got %d",
-                    (int)argcP);
-    }
     switch (arg->vtable->base_type) {
-        case enum_class_PerlHash:
-            return arg;
         case enum_class_FixedPMCArray:  /* sequence from BUILD_TUPLE */
         case enum_class_PerlArray:      /* sequence from BUILD_LIST */
         case enum_class_ResizablePMCArray:
-            return dict_from_tuple_array(interpreter, arg);
+            dict_from_tuple_array(interpreter, dict, arg);
+            break;
         default:
             internal_exception(1, "Unimplemented dict argument");
     }
-    return NULL;
 }
 
 #define VTABLE_modulus(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_MOD)
@@ -557,7 +541,6 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *assert_e = CONST_STRING(interpreter, "AssertionError");
     STRING *callable = CONST_STRING(interpreter, "callable");
     STRING *chr      = CONST_STRING(interpreter, "chr");
-    STRING *dict     = CONST_STRING(interpreter, "dict");
     STRING *divmod   = CONST_STRING(interpreter, "divmod");
     STRING *enumerate= CONST_STRING(interpreter, "enumerate");
     STRING *filter   = CONST_STRING(interpreter, "filter");
@@ -565,7 +548,6 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *hex      = CONST_STRING(interpreter, "hex");
     STRING *id       = CONST_STRING(interpreter, "id");
     STRING *isa      = CONST_STRING(interpreter, "isinstance");
-    STRING *list     = CONST_STRING(interpreter, "list");
     STRING *map      = CONST_STRING(interpreter, "map");
     STRING *max      = CONST_STRING(interpreter, "max");
     STRING *min      = CONST_STRING(interpreter, "min");
@@ -575,12 +557,15 @@ parrot_py_create_funcs(Interp *interpreter)
 
     /* types */
     STRING *Py_bool  = CONST_STRING(interpreter, "Py_bool");
+    STRING *Py_complex  = CONST_STRING(interpreter, "Py_complex");
     STRING *Py_float = CONST_STRING(interpreter, "Py_float");
     STRING *Py_int   = CONST_STRING(interpreter, "Py_int");
     STRING *Py_long  = CONST_STRING(interpreter, "Py_long");
     STRING *Py_str   = CONST_STRING(interpreter, "Py_str");
-    STRING *Py_tuple = CONST_STRING(interpreter, "Py_tuple");
+
+    STRING *Py_dict  = CONST_STRING(interpreter, "Py_dict");
     STRING *Py_list  = CONST_STRING(interpreter, "Py_list");
+    STRING *Py_tuple = CONST_STRING(interpreter, "Py_tuple");
     PMC* class;
     /*
      * new types interface, just place a class object as global
@@ -588,6 +573,8 @@ parrot_py_create_funcs(Interp *interpreter)
      */
     class = Parrot_base_vtables[enum_class_Boolean]->data;
     Parrot_store_global(interpreter, NULL, Py_bool, class);
+    class = Parrot_base_vtables[enum_class_Complex]->data;
+    Parrot_store_global(interpreter, NULL, Py_complex, class);
     class = Parrot_base_vtables[enum_class_PerlNum]->data;
     Parrot_store_global(interpreter, NULL, Py_float, class);
     class = Parrot_base_vtables[enum_class_PerlInt]->data;
@@ -596,16 +583,17 @@ parrot_py_create_funcs(Interp *interpreter)
     Parrot_store_global(interpreter, NULL, Py_long, class);
     class = Parrot_base_vtables[enum_class_PerlString]->data;
     Parrot_store_global(interpreter, NULL, Py_str, class);
+
     class = Parrot_base_vtables[enum_class_FixedPMCArray]->data;
     Parrot_store_global(interpreter, NULL, Py_tuple, class);
     class = Parrot_base_vtables[enum_class_ResizablePMCArray]->data;
     Parrot_store_global(interpreter, NULL, Py_list, class);
-
+    class = Parrot_base_vtables[enum_class_PerlHash]->data;
+    Parrot_store_global(interpreter, NULL, Py_dict, class);
 
     parrot_py_global(interpreter, F2DPTR(parrot_py_assert_e), assert_e, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_chr), chr, pip);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_dict), dict, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_divmod), divmod, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_enumerate), enumerate, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);

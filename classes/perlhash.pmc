@@ -45,10 +45,10 @@ int_compare(Parrot_Interp interp, void *a, void *b)
 }
 
 static PMC*
-fromkeys(Interp *interpreter, PMC *self, PMC *keys)
+fromkeys(Interp *interpreter, PMC *dict, PMC *keys)
 {
     INTVAL elems, dod_disabled, i;
-    PMC *iter, *value;
+    PMC *iter, *value, *self;
 
     /*
      * if the number of keys is bigger then the current PMC
@@ -62,6 +62,7 @@ fromkeys(Interp *interpreter, PMC *self, PMC *keys)
         Parrot_block_GC(interpreter);
         dod_disabled = 1;
     }
+    self = pmc_new(interpreter, enum_class_PerlHash);
     value = pmc_new(interpreter, enum_class_None);
 
     /*
@@ -159,6 +160,35 @@ Class initialization. Allocates the memory for the hash.
             enter_nci_method(INTERP, enum_class_PerlHash,
                     F2DPTR(fromkeys), "fromkeys", "PIOP");
         }
+    }
+/*
+
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a PerlHash Class object. Return a new
+C<dict> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        int argcP = REG_INT(3);
+        PMC *res = pmc_new(interpreter, enum_class_PerlHash);
+        PMC *arg;
+        if (argcP) {
+            if (argcP > 1) {
+                real_exception(interpreter, NULL, E_TypeError,
+                        "TypeError: dict expected at most 1 arguments, got %d",
+                        (int)argcP);
+            }
+            arg = REG_PMC(5);
+            if (arg->vtable->base_type == enum_class_PerlHash)
+                res = arg; /* a dict was passed, return it */
+            else
+                Parrot_py_fill_dict(interpreter, res, arg);
+        }
+        REG_PMC(5) = res;
+        return next;
     }
 /*
 

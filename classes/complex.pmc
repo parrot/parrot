@@ -192,6 +192,34 @@ complex_locate_keyed_num(Parrot_Interp interp, PMC* self, STRING *key) {
 }
 
 pmclass Complex {
+/*
+
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a Complex Class object. Return a new
+C<complex> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        int argcP = REG_INT(3);
+        PMC *res = pmc_new(interpreter, enum_class_Complex);
+        if (argcP == 1) {
+            PMC *arg = REG_PMC(5);
+            if (arg->vtable->base_type == enum_class_PerlString) {
+                VTABLE_set_string_native(INTERP, res, PMC_str_val(arg));
+            }
+            else
+                RE(res) = VTABLE_get_number(interpreter, arg);
+        }
+        else if (argcP == 2) {
+            RE(res) = VTABLE_get_number(interpreter, REG_PMC(5));
+            IM(res) = VTABLE_get_number(interpreter, REG_PMC(6));
+        }
+        REG_PMC(5) = res;
+        return next;
+    }
 
 /*
 
