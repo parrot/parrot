@@ -1514,6 +1514,7 @@ imcc/debug.c                            []
 imcc/debug.h                            []
 imcc/docs/calling_conventions.pod       [main]doc
 imcc/docs/imcc.pod                      [main]doc
+imcc/docs/imcfaq.pod                    [main]doc
 imcc/docs/macros.pod                    [main]doc
 imcc/docs/operation.pod                 [main]doc
 imcc/docs/parsing.pod                   [main]doc
