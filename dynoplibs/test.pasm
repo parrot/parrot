@@ -1,4 +1,4 @@
-    bounds 1	# be sure we run with plain func core
+    #bounds 1	# be sure we run with plain func core
     .include "iglobals.pasm"
     print "in test\n"
     loadlib P1, "myops_ops"

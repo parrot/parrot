@@ -166,6 +166,8 @@ print SOURCE $ops->preamble($trans);
 if ($suffix =~ /cg/) {
 	print SOURCE <<END_C;
 
+static void **ops_addr;
+
 opcode_t *
 $cg_func$base(opcode_t *cur_op, struct Parrot_Interp *interpreter)
 {
@@ -175,7 +177,7 @@ $cg_func$base(opcode_t *cur_op, struct Parrot_Interp *interpreter)
     opcode_t *cur_opcode = cur_op;
 #endif
 
-    static void *ops_addr[] = {
+    static void *l_ops_addr[] = {
 END_C
 
 } elsif ($suffix =~ /switch/) {
@@ -294,13 +296,17 @@ if ($suffix =~ /cg/) {
     }
 #endif
 /* #endif */
+
+    if (!ops_addr)
+	ops_addr = l_ops_addr;
+    if (cur_opcode == 0) {
+        return (opcode_t *)ops_addr ;
+    }
 END_C
 }
 
 if ($suffix =~ /cgp/) {
     print SOURCE <<END_C;
-    if (cur_opcode == 0)
-      return (opcode_t *)ops_addr;
 #ifdef __GNUC__
 # ifdef I386
     else if (cur_opcode == (opcode_t *) 1)
@@ -586,9 +592,14 @@ $init_func(int init) {
     if (init) {
 END_C
 
-if ($suffix =~ /cgp/) {
+if ($suffix =~ /cg/) {
 print SOURCE <<END_C;
-	op_lib.op_func_table = (op_func_t *) cgp_$base(0, 0);
+        if (init == 1) {
+	    if (!op_lib.op_func_table)
+	        op_lib.op_func_table = (op_func_t *) $cg_func$base(0, 0);
+	}
+	else
+	    ops_addr = (void**) init;
 END_C
 }
 

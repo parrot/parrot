@@ -1057,6 +1057,9 @@ sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
 /*
  * dynamic loading stuff
  */
+#if defined HAVE_COMPUTED_GOTO
+static void dynop_register_cg(Parrot_Interp, PMC*, op_lib_t *, op_lib_t *);
+#endif
 
 /*=for api interpreter dynop_register
  *
@@ -1107,7 +1110,43 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     core->op_info_table = interpreter->op_info_table = new_info_table;
     core->op_count = interpreter->op_count = n_old + n_new;
     /* done for plain core */
+#if defined HAVE_COMPUTED_GOTO
+    dynop_register_cg(interpreter, lib_pmc, lib, core);
+#endif
 }
+
+#if defined HAVE_COMPUTED_GOTO
+/*
+ * register op_lib with CGOTO core
+ */
+static void
+dynop_register_cg(Parrot_Interp interpreter, PMC* lib_pmc,
+        op_lib_t *lib, op_lib_t *core)
+{
+    op_lib_t *cg_lib;
+    void **ops_addr;
+    size_t i, n_old, n_new;
+
+    n_new = lib->op_count;
+    n_old = core->op_count;
+
+    cg_lib = PARROT_CORE_CG_OPLIB_INIT(1);
+    /* TODO check if the lib_pmc exists with a _cg flavor */
+
+    /* if not install wrappers */
+    ops_addr = mem_sys_allocate(n_old * sizeof(void *));
+    n_old -= n_new;
+    for (i = 0; i < n_old; ++i)
+        ops_addr[i] = ((void **)cg_lib->op_func_table)[i];
+    /* fill new entries with the wrapper op */
+    for (i = n_old; i < n_old + n_new; ++i)
+        ops_addr[i] = ((void **)cg_lib->op_func_table)[5];
+    /*
+     * tell the cg_core about the new jump table
+     */
+    PARROT_CORE_CG_OPLIB_INIT((int) ops_addr);
+}
+#endif
 
 /*
  * Local variables:

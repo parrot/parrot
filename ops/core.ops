@@ -3,6 +3,8 @@
 */
 
 #include "parrot/dynext.h"
+#include "parrot/interp_guts.h"
+
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -72,9 +74,11 @@ Check the event queue and run event handlers if there are unhandled events.
 Note: Do B<not> use this opcode. It is for internal use only.
 (Must be op #4).
 
-=item B<load_opcode_lib>(in STR)
+=item B<wrapper__>()
 
-TODO: Load the opcode library $1.
+Internal opcode to wrap unknown ops from loaded opcode libs.
+Don't use.
+(Must be op #5).
 
 =item B<load_bytecode>(in STR)
 
@@ -108,8 +112,10 @@ inline op check_events__() {
   goto ADDRESS(this);	/* force this being a branch op */
 }
 
-inline op load_opcode_lib(in STR) {
-  goto NEXT();
+inline op wrapper__() {
+    opcode_t *pc = CUR_OPCODE;
+    DO_OP(pc, interpreter);
+    goto ADDRESS(pc);
 }
 
 inline op reserved(in INT) {
