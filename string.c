@@ -672,6 +672,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 
 /*=for api string string_chopn
  * chop off the last n characters of s.
+ * if n is negative, cut the string after +n characters
  */
 STRING *
 string_chopn(STRING *s, INTVAL n)
@@ -682,16 +683,23 @@ string_chopn(STRING *s, INTVAL n)
 
     true_n = (UINTVAL)n;
     if (n < 0) {
-        true_n = 0;
-    }
-    if (true_n > s->strlen) {
+        n = -n;
+        true_n = (UINTVAL)n;
+        if (true_n > s->strlen)
         true_n = s->strlen;
+        bufend = s->encoding->skip_forward(strstart, true_n);
+        s->bufused = bufend - strstart;
+        s->strlen = true_n;
     }
+    else {
+        if (true_n > s->strlen)
+            true_n = s->strlen;
 
     bufend = s->encoding->skip_backward(bufend, true_n);
 
     s->bufused = bufend - strstart;
     s->strlen = s->strlen - true_n;
+    }
 
     return s;
 }

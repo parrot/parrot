@@ -139,7 +139,7 @@ int_to_str(char *buf1, char *buf2, HUGEINTVAL num, char base)
             buf2[i] = (char)('0' + cur);
         }
         else {
-            buf2[i] = (char)('a' + cur);
+            buf2[i] = (char)('a' + cur - 10);
         }
 
         i++;
@@ -329,26 +329,24 @@ Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat,
                         switch (ch) {
                         case 'h':
                             info.type = SIZE_SHORT;
-                            break;
+                            continue;
 
                         case 'l':
                             info.type = SIZE_LONG;
-                            break;
+                            continue;
 
                         case 'H':
                             info.type = SIZE_HUGE;
-                            break;
+                            continue;
 
                         case 'v':
                             info.type = SIZE_XVAL;
-                            break;
+                            continue;
 
                         default:
                             info.phase = PHASE_TERM;
                         }
 
-                        info.phase = PHASE_TERM;
-                        continue;
 
                     /*@fallthrough@ */ case PHASE_TERM:
                         switch (ch) {
@@ -438,12 +436,21 @@ Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat,
                             /* STRINGS */
                         case 's':
                             chptr = va_arg(*args, char *);
+                            if (info.prec)
+                                targ = string_concat(interpreter, targ,
+                                     string_make(interpreter, chptr,
+                                         info.prec, NULL,0,NULL),0);
+                            else
                             targ = string_concat(interpreter, targ,
                                                  cstr2pstr(chptr), 0);
                             break;
 
                         case 'S':
                             string = va_arg(*args, STRING *);
+                            if (info.prec)
+                                targ = string_concat(interpreter, targ,
+                                    string_chopn(string, -info.prec), 0);
+                            else
                             targ = string_concat(interpreter, targ, string, 0);
                             break;
 
@@ -451,8 +458,10 @@ Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat,
                             pmc = va_arg(*args, PMC *);
                             targ =
                                 string_concat(interpreter, targ,
-                                              pmc->vtable->
-                                              get_string(interpreter, pmc), 0);
+                                  string_chopn(
+                                  pmc->vtable->get_string(interpreter, pmc),
+                                  -info.prec),
+                                  0);
                             break;
 
                         }

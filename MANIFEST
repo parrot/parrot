@@ -601,6 +601,7 @@ t/pmc/pmc.t
 t/pmc/sub.t
 t/src/basic.t
 t/src/intlist.t
+t/src/sprintf.t
 test_main.c
 tools/dev/check_source_standards.pl
 tools/dev/genrpt.pl

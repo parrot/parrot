@@ -103,6 +103,7 @@ output_is(<<'CODE', <<OUTPUT, "chopn, OOB values");
 	chopn	S1, 4
 	print	S1
 	print	"\n"
+	# -length cuts now
 	chopn	S1, -4
 	print	S1
 	print	"\n"
@@ -113,7 +114,7 @@ output_is(<<'CODE', <<OUTPUT, "chopn, OOB values");
 CODE
 A string of length 21
 A string of lengt
-A string of lengt
+A st
 ** nothing **
 OUTPUT
 
@@ -192,7 +193,7 @@ CODE
 Parrot
 
 Parrot
-Parrot
+P
 OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "substr_s_s|sc_i|ic_i|ic" );
