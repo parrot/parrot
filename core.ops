@@ -3,10 +3,10 @@
 */
 
 /* This (now even more) convoluted mess avoids costly runtime creation
- * of KEY and KEY_PAIR structures, and can be used in an expression.
+ * of KEY structures, and can be used in an expression.
  */
 
-#define MAKE_KEY(k,k_p,v,c,t) (k_p.type = c, k_p.cache.t = v, k.size = 1, k.keys = &k_p, &k)
+#define MAKE_KEY(k,v,c,t) (k.atom.type = c, k.atom.val.t = v, k.next = NULL, &k)
 
 VERSION = PARROT_VERSION;
 
@@ -598,97 +598,85 @@ inline op set(out INT, in PMC) {
 }
 
 inline op get_keyed(out INT, in PMC, in INT) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_int, int_val);
+  MAKE_KEY(key, $3, enum_key_int, int_val);
   $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out INT, in PMC, in NUM) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_num, num_val);
+  MAKE_KEY(key, $3, enum_key_num, num_val);
   $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out INT, in PMC, in STR) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_string, struct_val);
+  MAKE_KEY(key, $3, enum_key_string, struct_val);
   $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out NUM, in PMC, in INT) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_int, int_val);
+  MAKE_KEY(key, $3, enum_key_int, int_val);
   $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out NUM, in PMC, in NUM) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_num, num_val);
+  MAKE_KEY(key, $3, enum_key_num, num_val);
   $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out NUM, in PMC, in STR) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_string, struct_val);
+  MAKE_KEY(key, $3, enum_key_string, struct_val);
   $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out STR, in PMC, in INT) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_int, int_val);
+  MAKE_KEY(key, $3, enum_key_int, int_val);
   $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out STR, in PMC, in NUM) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_num, num_val);
+  MAKE_KEY(key, $3, enum_key_num, num_val);
   $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out STR, in PMC, in STR) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_string, struct_val);
+  MAKE_KEY(key, $3, enum_key_string, struct_val);
   $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out PMC, in PMC, in INT) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_int, int_val);
+  MAKE_KEY(key, $3, enum_key_int, int_val);
   $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out PMC, in PMC, in NUM) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_num, num_val);
+  MAKE_KEY(key, $3, enum_key_num, num_val);
   $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
   goto NEXT();
 }
 
 inline op get_keyed(out PMC, in PMC, in STR) {
-  KEY_PAIR key_p;
   KEY key;
-  MAKE_KEY(key, key_p, $3, enum_key_string, struct_val);
+  MAKE_KEY(key, $3, enum_key_string, struct_val);
   $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
   goto NEXT();
 }
@@ -718,11 +706,10 @@ inline op set(out PMC, inconst KEY, inconst INT) {
 =cut
 
 inline op set_keyed (out PMC, in PMC, in PMC, in PMC)  {
-    KEY_PAIR src_key_p, dest_key_p;
     KEY src_key, dest_key;
 
-    MAKE_KEY(src_key, src_key_p, $2, enum_key_pmc, pmc_val);
-    MAKE_KEY(dest_key, dest_key_p, $4, enum_key_pmc, pmc_val);
+    MAKE_KEY(src_key, $2, enum_key_pmc, pmc_val);
+    MAKE_KEY(dest_key, $4, enum_key_pmc, pmc_val);
 
     $1->vtable->set_pmc_keyed(interpreter, 
                     $1, $2 ? &src_key : NULL, $3, $4 ? &dest_key : NULL);
@@ -730,120 +717,108 @@ inline op set_keyed (out PMC, in PMC, in PMC, in PMC)  {
 }
 
 inline op set_keyed (out PMC, in INT, in INT)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_int, int_val);
+    MAKE_KEY(key, $2, enum_key_int, int_val);
 
     $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in NUM, in INT)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_num, num_val);
+    MAKE_KEY(key, $2, enum_key_num, num_val);
 
     $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in STR, in INT)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_string, struct_val);
+    MAKE_KEY(key, $2, enum_key_string, struct_val);
 
     $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in INT, in NUM)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_int, int_val);
+    MAKE_KEY(key, $2, enum_key_int, int_val);
 
     $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in NUM, in NUM)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_num, num_val);
+    MAKE_KEY(key, $2, enum_key_num, num_val);
 
     $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in STR, in NUM)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_string, struct_val);
+    MAKE_KEY(key, $2, enum_key_string, struct_val);
 
     $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in INT, in STR)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_int, int_val);
+    MAKE_KEY(key, $2, enum_key_int, int_val);
 
     $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in NUM, in STR)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_num, num_val);
+    MAKE_KEY(key, $2, enum_key_num, num_val);
 
     $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in STR, in STR)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_string, struct_val);
+    MAKE_KEY(key, $2, enum_key_string, struct_val);
 
     $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in INT, in PMC)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_int, int_val);
+    MAKE_KEY(key, $2, enum_key_int, int_val);
 
     $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in NUM, in PMC)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_num, num_val);
+    MAKE_KEY(key, $2, enum_key_num, num_val);
 
     $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
     goto NEXT();
 }
 
 inline op set_keyed (out PMC, in STR, in PMC)  {
-    KEY_PAIR key_p;
     KEY key;
 
-    MAKE_KEY(key, key_p, $2, enum_key_string, struct_val);
+    MAKE_KEY(key, $2, enum_key_string, struct_val);
 
     $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
     goto NEXT();

@@ -35,6 +35,7 @@ INTVAL Parrot_string_ord(const STRING *, INTVAL idx);
 FLOATVAL Parrot_string_to_num(const STRING *);
 INTVAL Parrot_string_to_int(const STRING *);
 STRING * Parrot_string_from_int(struct Parrot_Interp *, INTVAL i);
+STRING * Parrot_string_from_num(struct Parrot_Interp *, FLOATVAL f);
 STRING * Parrot_string_grow(struct Parrot_Interp *, STRING * s, INTVAL addlen);
 void Parrot_string_destroy(STRING *);
 STRING *Parrot_string_make(struct Parrot_Interp *, const void *buffer,
@@ -65,6 +66,7 @@ const char *Parrot_string_to_cstring(struct Parrot_Interp *, STRING *);
 #define string_to_num           Parrot_string_to_num
 #define string_to_int           Parrot_string_to_int
 #define string_from_int         Parrot_string_from_int
+#define string_from_num         Parrot_string_from_num
 #define string_grow             Parrot_string_grow
 #define string_destroy          Parrot_string_destroy
 #define string_make             Parrot_string_make

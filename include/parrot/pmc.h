@@ -32,11 +32,13 @@ struct PMC {
     VTABLE *vtable;
     INTVAL flags;
     DPOINTER *data;
-    union {                   /* cache.* is intended to just be *shortcuts* to*/
-        INTVAL int_val;       /* commonly-accessed data, *not* pointers to */
-        FLOATVAL num_val;     /* completely different data.  That's why it's */
-        DPOINTER *struct_val; /* referred to as a "cache". */
-    } cache;
+
+    /* cache.* is intended to just be *shortcuts* to*/
+    /* commonly-accessed data, *not* pointers to */
+    /* completely different data.  That's why it's */
+    /* referred to as a "cache". */
+    UnionVal cache;
+    
     SYNC *synchronize;
     /* This flag determines the next PMC in the 'used' list during 
        dead object detection in the GC. It is a linked list, which is 

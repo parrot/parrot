@@ -7,10 +7,51 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
+ *     PerlHash values should probably only be allowed to be PMCs.
  *  References:
+ *     pdd08_keys.pod
  */
 
 #include "parrot/parrot.h"
+
+static PMC* undef = NULL;
+
+static STRING* make_hash_key_helper(Interp* interpreter, KEY * key)
+{
+    if (key == NULL) {
+        internal_exception(OUT_OF_BOUNDS, "Cannot use NULL key for PerlHash!\n");
+        return NULL;
+    }
+
+    if (key->next != NULL) {
+        internal_exception(OUT_OF_BOUNDS, "PerlHash does not support compound keys!\n");
+        return NULL;
+    }
+
+    switch (key->atom.type) {
+    case enum_key_int:
+        return string_from_int(interpreter, key->atom.val.int_val);
+    case enum_key_num:
+        return string_from_num(interpreter, key->atom.val.num_val);
+    case enum_key_pmc: {
+        PMC* pmc = key->atom.val.pmc_val;
+        return string_copy(interpreter,
+                           pmc->vtable->get_string(interpreter, pmc));
+    }
+    case enum_key_string:
+        return string_copy(interpreter, key->atom.val.string_val);
+    default:
+        internal_exception(OUT_OF_BOUNDS, "Cannot make hash key from type %d\n", key->atom.type);
+    }
+
+    return NULL;
+}
+
+static STRING* make_hash_key(Interp* interpreter, KEY * key)
+{
+        STRING* s = make_hash_key_helper(interpreter, key);
+        return s;
+}
 
 pmclass PerlHash {
 
@@ -23,56 +64,41 @@ pmclass PerlHash {
     }
 
     void init (INTVAL size) {
-	SELF->data = key_new(INTERP);
-	key_set_size(INTERP,SELF->data,0);
+        if (undef == NULL) {
+            undef = pmc_new(INTERP, enum_class_PerlUndef);
+            undef->flags |= PMC_constant_FLAG;
+        }
+        SELF->flags |= PMC_custom_mark_FLAG;
+	SELF->data = new_hash(INTERP);
     }
 
-    void clone (PMC* dest) { 
-    }
-
-    void morph (INTVAL type) {
-    }
-
-    BOOLVAL move_to (void * destination) {
-        return 0; /* You can't move me, I don't have anything to move! */
-    }
-
-    INTVAL real_size () {
-	return 0; /* ->data is unused */
-    }
-
-    void destroy () {
-	key_destroy(INTERP,SELF->data);
+    /* The end of used parameter is passed into the mark_used function of
+     * the garbage collector.
+     */
+    PMC* mark (PMC *end_of_used_list) {
+        return mark_hash(INTERP, SELF->data, end_of_used_list);
     }
 
     INTVAL get_integer () {
-	return SELF->cache.int_val;
+	return hash_size(INTERP, SELF->data);
     }
 
     INTVAL get_integer_keyed (KEY * key) {
-        KEY_PAIR* kp;
-        INTVAL ix;
-        PMC* value;
-        internal_exception(OUT_OF_BOUNDS, "Hash not implemented yet!\n");
-
-        if (!key) {
-            return 0;
+        PMC* valpmc;
+        STRING* key_string = make_hash_key(INTERP, key);
+        KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
+        if (atom == NULL) {
+            /* XXX Warning: use of uninitialized value */
+            return undef->vtable->get_integer(INTERP, undef);
         }
-
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
-
-        if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if (atom->type == enum_key_int) return atom->val.int_val;
+        if (atom->type == enum_key_pmc) {
+            valpmc = atom->val.pmc_val;
+            return valpmc->vtable->get_integer(INTERP, valpmc);
         }
-        if (ix < 0) {
-            ix += SELF->cache.int_val;
-        }
-
-        value = ((PMC**)(SELF->data))[ix];
-        return value->vtable->get_integer(INTERP, value);
+        /* XXX This should convert to an integer if possible */
+        internal_exception(OUT_OF_BOUNDS, "Cannot fetch integer out of non-integer key!\n");
+        return -1;
     }
 
     FLOATVAL get_number () {
@@ -80,29 +106,21 @@ pmclass PerlHash {
     }
 
     FLOATVAL get_number_keyed (KEY * key) {
-        KEY_PAIR* kp;
-        INTVAL ix;
-        PMC* value;
-        internal_exception(OUT_OF_BOUNDS, "Hash not implemented yet!\n");
-
-        if (!key) {
-            return 0;
+        PMC* valpmc;
+        STRING* key_string = make_hash_key(INTERP, key);
+        KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
+        if (atom == NULL) {
+            /* XXX Warning: Use of uninitialized value */
+            return undef->vtable->get_number(INTERP, undef);
         }
-
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
-
-        if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if (atom->type == enum_key_num) return atom->val.num_val;
+        /* XXX This should convert to a number if possible */
+        if (atom->type == enum_key_pmc) {
+            valpmc = atom->val.pmc_val;
+            return valpmc->vtable->get_number(INTERP, valpmc);
         }
-        if (ix < 0) {
-            ix += SELF->cache.int_val;
-        }
-
-        value = ((PMC**)(SELF->data))[ix];
-        return value->vtable->get_number(INTERP, value);
+        internal_exception(OUT_OF_BOUNDS, "Cannot fetch number out of non-numeric key!\n");
+        return 0.0;
     }
 
     STRING* get_string () {
@@ -110,29 +128,21 @@ pmclass PerlHash {
     }
 
     STRING* get_string_keyed (KEY * key) {
-        KEY_PAIR* kp;
-        INTVAL ix;
-        PMC* value;
-        internal_exception(OUT_OF_BOUNDS, "Hash not implemented yet!\n");
-
-        if (!key) {
-            return 0;
+        PMC* valpmc;
+        STRING* key_string = make_hash_key(INTERP, key);
+        KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
+        if (atom == NULL) {
+            /* XXX Warning: use of uninitialized value */
+            return undef->vtable->get_string(INTERP, undef);
         }
-
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
-
-        if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if (atom->type == enum_key_string) return atom->val.string_val;
+        /* XXX This should convert to a string */
+        if (atom->type == enum_key_pmc) {
+            valpmc = atom->val.pmc_val;
+            return valpmc->vtable->get_string(INTERP, valpmc);
         }
-        if (ix < 0) {
-            ix += SELF->cache.int_val;
-        }
-
-        value = ((PMC**)(SELF->data))[ix];
-        return value->vtable->get_string(INTERP, value);
+        internal_exception(OUT_OF_BOUNDS, "Cannot fetch string out of non-string key!\n");
+        return NULL;
     }
 
     BOOLVAL get_bool () {
@@ -152,130 +162,83 @@ pmclass PerlHash {
     }
 
     void set_integer (PMC* value) {
-	INTVAL size = value->vtable->get_integer(INTERP,value);
-	key_set_size(INTERP,SELF->data,size);
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
     }
 
     void set_integer_native (INTVAL size) {
-	key_set_size(INTERP,SELF->data,size);
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
     }
 
     void set_integer_bigint (BIGINT value) {
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
     }
 
     void set_integer_same (PMC * value) {
-	INTVAL size = value->cache.int_val;
-	key_set_size(INTERP,SELF->data,size);
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
     }
 
     void set_integer_keyed (KEY * key, INTVAL value) {
-        KEY_PAIR* kp;
-        INTVAL ix;
-        PMC* pmc2;
-
-        if (!key) {
-            return;
-        }
-
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
-
-        if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-        if (ix < 0) {
-            ix += SELF->cache.int_val;
-        }
-
-        pmc2 = ((PMC**)(SELF->data))[ix];
-        pmc2->vtable->set_integer_native(INTERP, pmc2, value);
+        STRING* key_string = make_hash_key(INTERP, key);
+        KEY_ATOM atom;
+        atom.type = enum_key_int;
+        atom.val.int_val = value;
+        hash_put(INTERP, SELF->data, key_string, &atom);
     }
 
     void set_number (PMC * value) {
-	INTVAL size = (INTVAL)value->cache.num_val;
-	key_set_size(INTERP,SELF->data,size);
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
     }
 
     void set_number_native (FLOATVAL size) {
-	key_set_size(INTERP,SELF->data,(INTVAL)size);
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
     }
 
     void set_number_bigfloat (BIGFLOAT value) {
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
     }
 
     void set_number_same (PMC * value) {
-	INTVAL size = value->cache.int_val;
-	key_set_size(INTERP,SELF->data,size);
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
     }
 
     void set_number_keyed (KEY * key, FLOATVAL value) {
-        KEY_PAIR* kp;
-        INTVAL ix;
-        PMC* pmc2;
-
-        if (!key) {
-            return;
-        }
-
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
-
-        if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-        if (ix < 0) {
-            ix += SELF->cache.int_val;
-        }
-
-        pmc2 = ((PMC**)(SELF->data))[ix];
-        pmc2->vtable->set_number_native(INTERP, pmc2, value);
+        STRING* key_string = make_hash_key(INTERP, key);
+        KEY_ATOM atom;
+        atom.type = enum_key_num;
+        atom.val.num_val = value;
+        hash_put(INTERP, SELF->data, key_string, &atom);
     }
 
     void set_string (PMC * value) {
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
     }
 
     void set_string_native (STRING * value) {
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
     }
 
     void set_string_unicode (STRING * value) {
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
     }
 
     void set_string_other (STRING * value) {
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
     }
 
     void set_string_same (PMC * value) {
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
     }
 
     void set_string_keyed (KEY * key, STRING * value) {
-        KEY_PAIR* kp;
-        INTVAL ix;
-        PMC* pmc2;
-
-        if (!key) {
-            return;
-        }
-
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
-
-        if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-        if (ix < 0) {
-            ix += SELF->cache.int_val;
-        }
-
-        pmc2 = ((PMC**)(SELF->data))[ix];
-        pmc2->vtable->set_string_native(INTERP, pmc2, value);
+        STRING* key_string = make_hash_key(INTERP, key);
+        KEY_ATOM atom;
+        atom.type = enum_key_string;
+        atom.val.string_val = value;
+        hash_put(INTERP, SELF->data, key_string, &atom);
     }
 
     void set_value (void* value) {
+        internal_exception(INTERNAL_PANIC, "Cannot set hash to value\n");
     }
 
     void add (PMC * value, PMC* dest) {

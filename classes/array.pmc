@@ -12,17 +12,19 @@
 
 #include "parrot/parrot.h"
 
-static INTVAL kp2int(struct Parrot_Interp *interpreter, KEY_PAIR kp) {
-    switch ((int)kp.type) {
+static INTVAL atom2int(Interp *interpreter, KEY_ATOM* atom) {
+    switch ((int)atom->type) {
         case enum_key_undef:
         default:
             return 0;
         case enum_key_int:
-            return kp.cache.int_val;
+            return atom->val.int_val;
         case enum_key_num:
-            return (INTVAL)kp.cache.num_val;
+            return (INTVAL)atom->val.num_val;
         case enum_key_pmc:
-            return kp.cache.pmc_val->vtable->get_integer(interpreter, kp.cache.pmc_val);
+            return atom->val.pmc_val->vtable->get_integer(interpreter, atom->val.pmc_val);
+        case enum_key_string:
+            return string_to_int(atom->val.struct_val);
     }
 }
 
@@ -88,7 +90,7 @@ pmclass Array {
     }
 
     INTVAL get_integer_keyed (KEY * key) {
-        KEY_PAIR* kp;
+        KEY_ATOM* kp;
         INTVAL ix;
         PMC* value;
 
@@ -96,8 +98,8 @@ pmclass Array {
             return 0;
         }
 
-        kp = &key->keys[0];
-        ix = kp2int(INTERP, *kp);
+        kp = &key->atom;
+        ix = atom2int(INTERP, kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -112,7 +114,7 @@ pmclass Array {
     }
 
     FLOATVAL get_number_keyed (KEY * key) {
-        KEY_PAIR* kp;
+        KEY_ATOM* kp;
         INTVAL ix;
         PMC* value;
 
@@ -120,8 +122,8 @@ pmclass Array {
             return 0;
         }
 
-        kp = &key->keys[0];
-        ix = kp2int(INTERP, *kp);
+        kp = &key->atom;
+        ix = atom2int(INTERP, kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -136,7 +138,7 @@ pmclass Array {
     }
 
     STRING* get_string_keyed (KEY * key) {
-        KEY_PAIR* kp;
+        KEY_ATOM* kp;
         INTVAL ix;
         PMC* value;
 
@@ -144,8 +146,8 @@ pmclass Array {
             return 0;
         }
 
-        kp = &key->keys[0];
-        ix = kp2int(INTERP, *kp);
+        kp = &key->atom;
+        ix = atom2int(INTERP, kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -186,7 +188,7 @@ pmclass Array {
     }
 
     void set_integer_keyed (KEY * key, INTVAL value) {
-        KEY_PAIR* kp;
+        KEY_ATOM* kp;
         INTVAL ix;
         PMC* mypmc;
 
@@ -194,8 +196,8 @@ pmclass Array {
             return;
         }
 
-        kp = &key->keys[0];
-        ix = kp2int(INTERP, *kp);
+        kp = &key->atom;
+        ix = atom2int(INTERP, kp);
 
         if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -220,7 +222,7 @@ pmclass Array {
     }
 
     void set_number_keyed (KEY * key, FLOATVAL value) {
-        KEY_PAIR* kp;
+        KEY_ATOM* kp;
         INTVAL ix;
         PMC* mypmc;
 
@@ -228,8 +230,8 @@ pmclass Array {
             return;
         }
 
-        kp = &key->keys[0];
-        ix = kp2int(INTERP, *kp);
+        kp = &key->atom;
+        ix = atom2int(INTERP, kp);
 
         if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -240,7 +242,7 @@ pmclass Array {
     }
 
     void set_string_keyed (KEY * key, STRING * value) {
-        KEY_PAIR* kp;
+        KEY_ATOM* kp;
         INTVAL ix;
         PMC* mypmc;
 
@@ -248,8 +250,8 @@ pmclass Array {
             return;
         }
 
-        kp = &key->keys[0];
-        ix = kp2int(INTERP, *kp);
+        kp = &key->atom;
+        ix = atom2int(INTERP, kp);
 
         if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -264,7 +266,7 @@ pmclass Array {
             src = src->vtable->get_pmc_keyed(INTERP, src, src_key);
         }
         if (dest_key) {
-            INTVAL ix = kp2int(INTERP, dest_key->keys[0]);
+            INTVAL ix = atom2int(INTERP, &dest_key->atom);
             PMC* dest = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
             dest->vtable->set_pmc(INTERP, dest, src);
         } 

@@ -3,7 +3,6 @@
 use Parrot::Test tests => 8;
 use Test::More;
 
-SKIP: { skip("Hashes unimplemented", 8);
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
 	new P0, PerlHash
 	set S0, "one"
@@ -180,7 +179,5 @@ ok 1
 ok 2
 ok 3
 OUTPUT
-
-} # SKIP
 
 1;

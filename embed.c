@@ -167,7 +167,6 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     INTVAL i;
     PMC *userargv;
     KEY key;
-    KEY_PAIR key_p;
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         fprintf(stderr, "*** Parrot VM: Debugging enabled. ***\n");
@@ -204,9 +203,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     /* immediately anchor pmc to root set */
     interpreter->pmc_reg.registers[0] = userargv;
 
-    key.size = 1;
-    key.keys = &key_p;
-    key_p.type = enum_key_int;
+    key.atom.type = enum_key_int;
+    key.next = NULL;
 
     for (i = 0; i < argc; i++) {
         STRING* arg = string_make(interpreter, argv[i], strlen(argv[i]),
@@ -216,7 +214,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
             fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
-        key_p.cache.int_val = i;
+        key.atom.val.int_val = i;
         userargv->vtable->set_string_keyed(interpreter, userargv, &key, arg);
     }
 

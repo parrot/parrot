@@ -116,6 +116,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/chartype.h"
 #include "parrot/string.h"
 #include "parrot/key.h"
+#include "parrot/hash.h"
 #include "parrot/vtable.h"
 #include "parrot/register.h"
 #include "parrot/regfuncs.h"

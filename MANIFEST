@@ -102,6 +102,7 @@ examples/mops/mops.rb
 examples/mops/mops.scheme
 exceptions.c
 global_setup.c
+hash.c
 hints/cygwin.pl
 hints/darwin.pl
 hints/dec_osf.pl
@@ -114,6 +115,7 @@ include/parrot/encoding.h
 include/parrot/events.h
 include/parrot/exceptions.h
 include/parrot/global_setup.h
+include/parrot/hash.h
 include/parrot/interp_guts.h
 include/parrot/interpreter.h
 include/parrot/io.h

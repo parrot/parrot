@@ -65,7 +65,7 @@ $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h \
 $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
 $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 $(INC)/oplib/core_ops_prederef.h $(INC)/runops_cores.h $(INC)/trace.h \
-$(INC)/pmc.h $(INC)/key.h $(INC)/resources.h $(INC)/platform.h ${cg_h} \
+$(INC)/pmc.h $(INC)/key.h $(INC)/hash.h $(INC)/resources.h $(INC)/platform.h ${cg_h} \
 $(INC)/interp_guts.h ${jit_h} $(INC)/rx.h $(INC)/rxstacks.h \
 $(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h
 
@@ -87,7 +87,7 @@ IO_O_FILES = io/io$(O) io/io_stdio$(O) io/io_unix$(O) io/io_win32$(O)
 INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 				 register$(O) core_ops$(O) core_ops_prederef$(O) memory$(O) \
 				 packfile$(O) stacks$(O) string$(O) encoding$(O) \
-				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) \
+				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
 				 platform$(O) ${jit_o} resources$(O) rx$(O) rxstacks$(O) \
 				 embed$(O) warnings$(O) misc$(O) ${cg_o} \
 				 packout$(O) byteorder$(O)

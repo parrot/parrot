@@ -40,6 +40,14 @@ typedef enum {
 #include "parrot/op.h"
 #include "parrot/oplib.h"
 
+typedef union UnionVal {
+    INTVAL int_val;
+    FLOATVAL num_val;
+    DPOINTER* struct_val;
+    STRING* string_val;
+    PMC* pmc_val;
+} UnionVal;
+
 typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;

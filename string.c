@@ -787,6 +787,21 @@ string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
                             NULL, 0, NULL);
 }
 
+/* Stolen, with modifications, from perlnum.pmc */
+STRING *
+string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
+{
+    char buff[200];
+    STRING* s;
+#ifdef HAS_SNPRINTF
+    snprintf(buff, sizeof(buff), FLOATVAL_FMT, f);
+#else
+    sprintf(buff, FLOATVAL_FMT, f);  /* XXX buffer overflow! */
+#endif
+    s = string_make(interpreter, buff, strlen(buff), NULL, 0, NULL);
+    return s;
+}
+
 const char *
 string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 {
