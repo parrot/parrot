@@ -249,6 +249,9 @@ sub make_arg {
     /s/ && do {my $regnum = $reg_ref->{i}++;
 	       return "(short)INT_REG($regnum)";
               };
+    /c/ && do {my $regnum = $reg_ref->{i}++;
+	       return "(char)INT_REG($regnum)";
+              };
     /2/ && do {my $regnum = $reg_ref->{i}++;
 	       return "(short*)&INT_REG($regnum)";
               };

@@ -1,4 +1,4 @@
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 14;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -339,6 +339,44 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_4i");
   end
 CODE
 42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_i_i3");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_ii3", "ii3"
+  set I5, 6
+  set I6, 7
+  invoke
+  print I5
+  print "\n"
+  print I6
+  print "\n"
+  end
+CODE
+42
+4711
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_t_b");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_tb", "tb"
+  set S5, "ko\n"
+  invoke
+  print S5
+  end
+CODE
+ok worked
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_t_B");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_tB", "tB"
+  set S5, "ko\n"
+  invoke
+  print S5
+  end
+CODE
+ok done
 OUTPUT
 
 } # SKIP

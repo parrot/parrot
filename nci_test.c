@@ -41,6 +41,21 @@ char *nci_tt(void *p) {
     s[1] = ((char*) p)[0];
     return s;
 }
+
+static char b[] = "xx worked\n";
+char *nci_tb(void *p) {
+    b[0] = ((char*) p)[1];
+    b[1] = ((char*) p)[0];
+    return b;
+}
+
+static char B[] = "xx done\n";
+char *nci_tB(void **p) {
+    B[0] = (*(char**) p)[1];
+    B[1] = (*(char**) p)[0];
+    return B;
+}
+
 void * nci_pp(void *p) {
     return p;
 }
@@ -52,6 +67,12 @@ int nci_iiii(int i1, int i2, int i3) {
 
 int nci_i4i(long * l, int i) {
     return (int) (*l * i);
+}
+
+int nci_ii3(int a, int *b) {
+    int r = a * *b;
+    *b = 4711;
+    return r;
 }
 
 #ifdef TEST
