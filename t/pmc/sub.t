@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -404,6 +404,33 @@ _ret:
     printerr ":end"
     end
 _func:
+    warningsoff 1
+    new P0, .PerlUndef
+    set I0, P0
+    invoke P1
+CODE
+/^Use of uninitialized value in integer context at.*:main:back:Use of un.*$/sm
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2 - updatecc");
+    # the Continuation in PMC is created with warnings off
+    newsub .Sub, .Continuation, _func, _ret
+    # turn warnings on in main
+    warningson 1
+    new P10, .PerlUndef
+    set I0, P10
+    printerr ":main"
+    # update the state of the return continuation
+    updatecc
+    invoke
+_ret:
+    printerr ":back:"
+    new P10, .PerlUndef
+    set I0, P10
+    printerr ":end"
+    end
+_func:
+    # turn off warnings in the sub
     warningsoff 1
     new P0, .PerlUndef
     set I0, P0

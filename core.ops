@@ -1122,6 +1122,12 @@ Call the subroutine in P0 and generate a new return continuation in P1.
 
 Call the subroutine in $1 and generate a new return continuation in P1.
 
+=item B<updatecc>()
+
+Update the state of the return continuation in P1. This is necessary,
+when any context stuff was changed between creating the return continuation
+and invoke'ing it.
+
 =cut
 
 inline op invoke() {
@@ -1162,6 +1168,14 @@ inline op invokecc(in PMC) {
 }
 
 
+inline op updatecc() {
+  struct Parrot_Sub *sub = (struct Parrot_Sub*)
+  	PMC_data(interpreter->pmc_reg.registers[1]);
+  sub->ctx.warns = buffer_copy_if_diff(interpreter, interpreter->ctx.warns,
+    	sub->ctx.warns);
+  /* FIXME: update stacks too */
+  goto NEXT();
+}
 ########################################
 
 =item B<set_addr>(out INT, in INT)

@@ -176,6 +176,7 @@ docs/pmc/array.pod
 docs/pmc/perlarray.pod
 docs/pmc/perlhash.pod
 docs/pmc/perlstring.pod
+docs/pmc/subs.pod
 docs/running.pod
 docs/strings.pod
 docs/tests.pod

@@ -1,0 +1,106 @@
+=head1 NAME
+
+Subs - Parrot Subroutines
+
+=head1 DESCRIPTION
+
+Parrot comes with different subroutine and alike classes which implement
+CPS (Continuation Passing Style) and PCC (Parrot Calling Conventions)
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head2 Class Tree
+
+  Sub
+    Closure
+      Continuation
+	Coroutine
+      Eval
+
+=head2 Items in the Subs Context
+
+  Subtype	Controlstack	PadStack   UserStack  Warnings
+  ------------------------------------------------------------
+  Sub                -             -           -         X
+  Closure                          X                     X
+  Continuation       X             X           X         X
+  Coroutine          X             X           X         X
+
+=head1 SYNOPSIS
+
+=head2 Creation
+
+Create a subroutine of class C<Sub> and assign the subroutine address to it:
+
+  new P0, .Sub
+  set_addr I0, _sub_label
+  set P0, I0
+
+This can be done with one opcode:
+
+  newsub P0, .Sub, _sub_label
+
+Create a subroutine (in P0) and a return continuation (in P1):
+
+  newsub .Sub, .Continuation, _sub_label, ret_label
+
+=head2 Invocation i.e. calling the sub
+
+  invoke	# call the subroutine in P0 (P1 was created earlier)
+
+  invokecc	# call sub in P0 and create return continuation in P1
+
+=head2 Returning from a sub
+
+  invoke P1	# call return continuation in P1
+
+=head2 All together now
+
+The following scheme can be uesd, if a subroutine is called once or
+performance doesn't matter:
+
+    newsub P0, .Sub, _sub_label	# create subroutine
+    set I5, 42			# pass an argument
+    invokecc			# create ret continuation and call sub
+    end				# fin.
+  _sub_label:
+    print I5			# do something with parameters
+    invoke P1			# return
+
+If a subroutine is called several times e.g. inside a loop, the creation of
+the return continuation shall be done outside the loop, if performance
+is an issue:
+
+    newsub .Sub, .Continuation, _sub_label, ret_label
+    set I16, 1000000
+    set I17, 0
+  lp:
+    pushtopi		# preserve counter vars
+    invoke
+  ret_label:
+    poptopi
+    inc I17
+    lt I17, I16, lp
+    end
+  _sub_label:
+    # do_something
+    invoke P1
+
+If items in the interpreter context are changed between creation of
+subroutine/return continuation and invocation, the C<updatecc> opcode
+should be used.
+
+    newsub .Sub, .Continuation, _sub_label, ret_label
+    ...
+    warningson 1
+    ...
+    updatecc
+    invoke
+    ...
+
+=head1 FILES
+
+F<docs/pdds/pdd03_calling_conventions.pod>, F<t/pmc/sub.t>
+
+=head1 AUTHOR
+
+Leopold Toetsch <lt@toetsch.at>
