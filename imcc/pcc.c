@@ -85,14 +85,18 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
         SymReg *sub, SymReg *i0, SymReg *p3, int first, int type)
 {
     SymReg *check_sub, *regs[IMCC_MAX_REGS], *check_type, *what, *check_pmc;
-    char buf[128];
+    char buf[256];
+    char * s;
     SymReg *err_nparam, *err_type;
 
     /*
      * generate check subroutine if not done yet
      */
-    what = mk_symreg(str_dup("_#what"), 'I');
-    strcpy(buf, "_#check_params");
+    s = str_dup("?what");
+    *s = IMCC_INTERNAL_CHAR; /* Avoid an sprintf/copy */
+    what = mk_symreg(s, 'I');
+    strcpy(buf, "_?check_params");
+    buf[1] = IMCC_INTERNAL_CHAR;  /* Avoid an sprintf/copy */
     check_sub = _get_sym(ghash, buf);
     if (!check_sub) {
 
@@ -103,7 +107,9 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
          * first time check: amount of params, elements in P3
          * we can globber I0
          */
-        err_nparam = mk_address(str_dup("_#check_err_nparam"), U_add_uniq_label);
+        s = str_dup("_?check_err_nparam");
+        s[1] = IMCC_INTERNAL_CHAR;
+        err_nparam = mk_address(s, U_add_uniq_label);
         if (p3) {
             if (!i0)
                 i0 = mk_pasm_reg(str_dup("I0"));
@@ -131,13 +137,14 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
         pcc_emit_err(interpreter, unit, err_nparam, "\"wrong param count\"");
     }
 
-    strcpy(buf, "_#check_param_type");
-    check_type = _get_sym(ghash, buf);
+    s = str_dup("_?check_param_type");
+    s[1] = IMCC_INTERNAL_CHAR;  /* Avoid sprintf call */
+    check_type = _get_sym(ghash, s);
     if (!check_type && type) {
         /*
          * type check entry to check sub
          */
-        check_type = mk_address(str_dup(buf), U_add_uniq_label);
+        check_type = mk_address(s, U_add_uniq_label);
         INS_LABEL(unit, check_type, 1);
         /*
          * param type check, we get the entry type in what
@@ -147,7 +154,10 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
         regs[1] = p3;
         regs[2] = mk_const(str_dup("0"), 'I');
         INS(interpreter, unit, "typeof", NULL, regs, 3, 4, 1);
-        err_type = mk_address(str_dup("_#check_err_type"), U_add_uniq_label);
+
+        s = str_dup("_?check_err_type");
+        s[1] = IMCC_INTERNAL_CHAR;   /* Avoid sprintf */
+        err_type = mk_address(s, U_add_uniq_label);
         regs[0] = i0;
         regs[1] = what;
         regs[2] = err_type;
@@ -157,8 +167,9 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
         /*
          * PMC type check entry to check sub
          */
-        check_pmc = mk_address(str_dup("_#check_param_type_pmc"),
-                U_add_uniq_label);
+        s = str_dup("_?check_param_type_pmc");
+        s[1] = IMCC_INTERNAL_CHAR;    /* Avoid sprintf */
+        check_pmc = mk_address(s, U_add_uniq_label);
         INS_LABEL(unit, check_pmc, 1);
         /*
          * either type = enum_type_PMC || > 0
@@ -196,9 +207,15 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
     sprintf(buf, "%d", type);
     regs[1] = mk_const(str_dup(buf), 'I');
     ins = insINS(interpreter, unit, ins, "set", regs, 2);
-    strcpy(buf, enum_type_PMC == type ?
-            "_#check_param_type_pmc" : "_#check_param_type");
+    if(enum_type_PMC == type)
+        sprintf(buf, "_%ccheck_param_type_pmc", IMCC_INTERNAL_CHAR);
+    else
+        sprintf(buf, "_%ccheck_param_type", IMCC_INTERNAL_CHAR);
     check_type = _get_sym(ghash, buf);
+    if(!check_type) {
+        PIO_eprintf(NULL, "imcc: fatal: pcc_emit_check_param: symbol %s not found\n", buf);        
+        exit(1);
+    }
     regs[0] = check_type;
     ins = insINS(interpreter, unit, ins, "bsr", regs, 1);
     return ins;
@@ -241,7 +258,7 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 	/* subroutine can handle both */
 	i0 = mk_pasm_reg(str_dup("I0"));
 	regs[0] = i0;
-	sprintf(buf, "_#sub_%s_p1", sub->name);
+	sprintf(buf, "_%csub_%s_p1", IMCC_INTERNAL_CHAR, sub->name);
         regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
 	ins = insINS(interpreter, unit, ins, "if", regs, 2);
 
@@ -334,7 +351,7 @@ overflow:
         if (ps != pe) {
             if (!proto) {
                 /* branch to the end */
-                sprintf(buf, "_#sub_%s_p0", sub->name);
+                sprintf(buf, "_%csub_%s_p0", IMCC_INTERNAL_CHAR, sub->name);
                 regs[0] = label2 = mk_address(str_dup(buf), U_add_uniq_label);
                 ins = insINS(interpreter, unit, ins, "branch", regs, 1);
                 tmp = INS_LABEL(unit, label1, 0);
@@ -532,7 +549,6 @@ check_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     int call_found, ret_found;
     int i, j, matching;
     struct pcc_sub_t *call, *ret;
-
     UNUSED(unit);
     /*
      * currently only with -Oc
@@ -609,6 +625,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     Instruction *tmp;
     int lin;
     char buf[128];
+    char * s;
     /*
      * emited code is
      *   $I2 = i+5    # once
@@ -646,10 +663,23 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
      *
      */
 
-    i0 = mk_symreg(str_dup("#i0"), 'I');        /* TODO cache syms */
-    i1 = mk_symreg(str_dup("#i1"), 'I');
+    s = str_dup("?i0");
+    s[0] = IMCC_INTERNAL_CHAR;
+    i0 = mk_symreg(s, 'I');        /* TODO cache syms */
+
+    s = str_dup("?i1");
+    s[0] = IMCC_INTERNAL_CHAR;
+    i1 = mk_symreg(s, 'I');
+
+    s = str_dup("?i0");
+    s[0] = IMCC_INTERNAL_CHAR;
+
     i2 = mk_pasm_reg(str_dup("I2"));
-    py = mk_symreg(str_dup("#py"), 'P');
+
+    s = str_dup("?py");
+    s[0] = IMCC_INTERNAL_CHAR;
+    py = mk_symreg(s, 'P');
+
     p3 = mk_pasm_reg(str_dup("P3"));
     /* first time */
     if (!(*flatten)++) {
@@ -659,13 +689,13 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         ins = insINS(interpreter, unit, ins, "set", regs, 2);
     }
     lin = ins->line;
-    sprintf(buf, "_#arg_loop_%d_%d", lin, i);
+    sprintf(buf, "_%carg_loop_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
     loop = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "_#next_arg_%d_%d", lin, i);
+    sprintf(buf, "_%cnext_arg_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
     next = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "_#over_flow_%d_1_%d", lin, i);
+    sprintf(buf, "_%cover_flow_%d_1_%d", IMCC_INTERNAL_CHAR, lin, i);
     over1 = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "_#over_flow_%d_%d", lin, i);
+    sprintf(buf, "_%cover_flow_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
     over = mk_address(str_dup(buf), U_add_uniq_label);
 
     if (arg->type & VT_FLATTEN) {

@@ -77,11 +77,11 @@ imcc_globals_destroy(int ex, void *param)
 {
     struct cs_t *cs, *prev_cs;
     struct subs *s, *prev_s;
-    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    struct Parrot_Interp *interp = (struct Parrot_Interp *)param;
     SymReg **h;
 
     UNUSED(ex);
-    UNUSED(interpreter);
+    UNUSED(interp);
     cs = globals.cs;
     while (cs) {
         s = cs->subs;
@@ -299,6 +299,7 @@ find_label_cs(struct Parrot_Interp *interpreter, char *name)
         PackFile_find_fixup_entry(interpreter, enum_fixup_label, name);
     return fe != NULL;
 }
+
 /* store global labels and bsr for later fixup
  * return size in ops
  */
@@ -405,7 +406,7 @@ store_labels(struct Parrot_Interp *interpreter, IMC_Unit * unit, int *src_lines,
                         addr->name);
             glabel = addr->name;
             /* append inter_cs jump */
-            sprintf(buf, "_#isc_%d", globals.inter_seg_n++);
+            sprintf(buf, "_%cisc_%d", IMCC_INTERNAL_CHAR, globals.inter_seg_n++);
             addr->name = str_dup(buf);
             INS_LABEL(unit, addr, 1);
             /* this is the new location */
@@ -423,7 +424,7 @@ store_labels(struct Parrot_Interp *interpreter, IMC_Unit * unit, int *src_lines,
 }
 
 
-/* get a globale label, return the pc (absolute) */
+/* get a global label, return the pc (absolute) */
 static SymReg *
 find_global_label(char *name, int *pc)
 {

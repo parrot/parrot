@@ -54,9 +54,16 @@ pop_namespace(char * name)
 
 /* symbolic registers */
 
-/* Makes a new SymReg from its varname and type */
+/* Makes a new SymReg from its varname and type
+ *
+ * char * name is a malloced string that will
+ * be used if the symbol needs to be created, or
+ * freed if an old symbol is found.
+ * This is a potentially dangerous semantic that
+ * should be changed.
+ */
 SymReg *
-_mk_symreg(SymReg* hsh[],char * name, int t)
+_mk_symreg(SymReg* hsh[], char * name, int t)
 {
     SymReg * r;
     if((r = _get_sym(hsh, name)) && r->set == t) {
@@ -332,6 +339,16 @@ SymReg * mk_address(char * name, int uniq)
     return _mk_address(h, name, uniq);
 }
 
+/*
+ * Make and store a new address label for a sub.
+ */
+SymReg * mk_sub_label(char * name)
+{
+    return _mk_address(ghash, name, U_add_uniq_sub);
+}
+
+
+
 /* link keys to a keys structure = SymReg
  *
  * we might have
@@ -472,6 +489,9 @@ void
 _store_symreg(SymReg *hsh[], SymReg * r)
 {
     int i = hash_str(r->name) % HASH_SIZE;
+#if IMC_TRACE
+    printf("    store [%s]\n", r->name);
+#endif
     r->next = hsh[i];
     hsh[i] = r;
 }
@@ -489,6 +509,9 @@ _get_sym(SymReg * hsh[], const char * name)
     SymReg * p;
     int i = hash_str(name) % HASH_SIZE;
     for(p = hsh[i]; p; p = p->next) {
+#if IMC_TRACE_HIGH
+        printf("   [%s]\n", p->name);
+#endif
 	if(!strcmp(name, p->name))
 	    return p;
     }

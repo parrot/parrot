@@ -294,7 +294,7 @@ pasm_inst: {clear_state();}
                                           free($2); }
     | PCC_SUB LABEL              {
                                    char *name = str_dup($2);
-                                   $$ = iSUBROUTINE(cur_unit, mk_address($2, U_add_uniq_sub));
+                                   $$ = iSUBROUTINE(cur_unit, mk_sub_label($2));
                                    $$->r[1] = mk_pcc_sub(name, 0);
                                  }
     | /* none */                 { $$ = 0;}
@@ -394,7 +394,7 @@ sub:
         IDENTIFIER pcc_sub_proto '\n'
         {
           char *name = str_dup($3);
-          Instruction *i = iSUBROUTINE(cur_unit, mk_address($3, U_add_uniq_sub));
+          Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label($3));
           i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
           i->r[1]->pcc_sub->prototyped = $4;
         }
@@ -423,7 +423,7 @@ sub_start:
         SUB                           { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
         IDENTIFIER '\n'
         { $$ = 0;
-          iSUBROUTINE(cur_unit, mk_address($3, U_add_uniq_sub));
+          iSUBROUTINE(cur_unit, mk_sub_label($3));
         }
     ;
 */
@@ -433,7 +433,7 @@ pcc_sub:
         IDENTIFIER pcc_sub_proto '\n'
         {
           char *name = str_dup($3);
-          Instruction *i = iSUBROUTINE(cur_unit, mk_address($3, U_add_uniq_sub));
+          Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label($3));
           i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
           i->r[1]->pcc_sub->prototyped = $4;
         }
@@ -455,7 +455,7 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
               SymReg * r;
               Instruction *i;
 
-              sprintf(name, "_#pcc_sub_call_%d", line - 1);
+              sprintf(name, "_%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, line - 1);
               $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
               r->pcc_sub->prototyped = $2;
               /* this mid rule action has the semantic value of the
@@ -527,7 +527,7 @@ pcc_ret: PCC_BEGIN_RETURN '\n' {
                 if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
                     fataly(EX_SOFTWARE, sourcefile, line,
                         "pcc_return not inside pcc subroutine\n");
-                sprintf(name, "_#pcc_sub_ret_%d", line - 1);
+                sprintf(name, "_%cpcc_sub_ret_%d", IMCC_INTERNAL_CHAR, line - 1);
                 $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
                 i = iLABEL(cur_unit, r);
                 i->type = ITPCCSUB | ITLABEL;
@@ -545,7 +545,7 @@ pcc_yield: PCC_BEGIN_YIELD '\n' {
                     fataly(EX_SOFTWARE, sourcefile, line,
                         "pcc_yield not inside pcc subroutine\n");
                 ins->r[1]->pcc_sub->calls_a_sub = 1;
-                sprintf(name, "_#pcc_sub_yield_%d", line - 1);
+                sprintf(name, "_%cpcc_sub_yield_%d", IMCC_INTERNAL_CHAR, line - 1);
                 $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
                 i = iLABEL(cur_unit, r);
                 i->type = ITPCCSUB | ITLABEL | ITPCCYIELD;
@@ -712,7 +712,7 @@ assignment:
               char name[128];
               SymReg * r;
               Instruction *i;
-              sprintf(name, "_#pcc_sub_call_%d", line - 1);
+              sprintf(name, "_%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, line - 1);
               r = mk_pcc_sub(str_dup(name), 0);
               current_call = i = iLABEL(cur_unit, r);
               i->type = ITCALL | ITPCCSUB;
@@ -735,7 +735,7 @@ sub_call:
             char name[128];           
             SymReg * r; 
             Instruction *i;
-            sprintf(name, "_#pcc_sub_call_%d", line - 1);
+            sprintf(name, "_%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, line - 1);
             r = mk_pcc_sub(str_dup(name), 0);
             current_call = i = iLABEL(cur_unit, r);
             i->type = ITCALL | ITPCCSUB;
