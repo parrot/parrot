@@ -189,7 +189,7 @@ pmclass PerlHash {
 	    if (!nextkey)
             return entry->val.pmc_val;
 	    return entry->val.pmc_val->vtable->get_pmc_keyed(INTERP,
-		    entry, nextkey);
+		    entry->val.pmc_val, nextkey);
 
         }
         internal_exception(OUT_OF_BOUNDS,

@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Test::More;
 
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
@@ -535,6 +535,21 @@ ok 3
 ok 4
 ok 5
 ok 6
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Getting PMCs from compound keys");
+    new P0, .PerlHash
+    new P1, .PerlHash
+    new P2, .PerlInt
+    set P2, 12
+    set P1["b"], P2
+    set P0["a"], P1
+    set P3, P0["a";"b"]
+    print P3
+    print "\n"
+    end
+CODE
+12
 OUTPUT
 
 1;
