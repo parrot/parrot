@@ -1354,6 +1354,11 @@ sub read_source {
       unshift( @include, @{$options{'include'}} );
     }
 
+if($file eq '-') {
+    $handle = *{STDIN};
+    $found=1;
+}
+else {
     if(open($handle, "<$file")) {
         $found=1;
     }
@@ -1365,6 +1370,7 @@ sub read_source {
 	    }
         }
     }
+}
     error("Cannot open $file for input!",$ofile,$oline) if(!$found);
     while(<$handle>) {
 	chomp;
