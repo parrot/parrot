@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 5;
+use TestCompiler tests => 9;
 
 ##############################
 
@@ -598,4 +598,108 @@ In method 1
 In method 2
 In method 1
 In method 2
+OUT
+
+sub repeat {
+    my ($template, $count, %substs) = @_;
+    my ($code, $n, $start);
+    foreach (split(/\n/, $template)) {
+	$n = $count;
+	$start = 0;
+        if (/^(.*)=(\w+)=(.*)/) {
+            my ($pre, $key, $post) = ($1, $2, $3);
+	    if ($key eq 'ARGS') {
+		my @params;
+		for my $i (0..$n-1) {
+                    (my $new = $substs{$key}) =~ s/\<index\>/$i/g;
+		    push @params, $new;
+		}
+		$code .= $pre . join(',', @params) . "$post\n";
+		next;
+	    }
+	    $start = $n / 2 if ($key eq 'TESTS2');
+            for my $i ($start..$n-1) {
+                (my $new = $substs{$key}) =~ s/\<index\>/$i/g;
+                $code .= "$pre$new$post\n";
+            }
+        } else {
+            $code .= "$_\n";
+        }
+    }
+
+    return $code;
+}
+    my $template2 = <<'TEMPLATE';
+.sub _main
+    new P3, .PerlInt
+    new P4, .PerlInt
+    =LOCALS=
+    =INITS=
+    _sub(=ARGS=)
+    =TESTS2=
+    P5 = P3
+    P5 = P4
+    end
+fail:
+    print "failed\n"
+    end
+.end
+.pcc_sub _sub prototyped
+    =PARAMS=
+    =TESTS=
+    print "all params ok\n"
+    .pcc_begin_return
+    .pcc_end_return
+fail:
+    print "failed\n"
+    end
+.end
+TEMPLATE
+
+my $code = repeat($template2, 18,
+               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               INITS => 'a<index> = <index>',
+               ARGS => 'a<index>',
+               PARAMS => '.param PerlInt a<index>',
+               TESTS => "set I0, a<index>\nne I0, <index>, fail",
+               TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
+
+output_is($code, <<'OUT', "overflow pmcs 18 spill");
+all params ok
+OUT
+
+my $code = repeat($template2, 22,
+               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               INITS => 'a<index> = <index>',
+               ARGS => 'a<index>',
+               PARAMS => '.param PerlInt a<index>',
+               TESTS => "set I0, a<index>\nne I0, <index>, fail",
+               TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
+
+output_is($code, <<'OUT', "overflow pmcs 22 spill");
+all params ok
+OUT
+
+$code = repeat($template2, 40,
+               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               INITS => 'a<index> = <index>',
+               ARGS => 'a<index>',
+               PARAMS => '.param PerlInt a<index>',
+               TESTS => "set I0, a<index>\nne I0, <index>, fail",
+               TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
+
+output_is($code, <<'OUT', "overflow pmcs 40 spill");
+all params ok
+OUT
+
+$code = repeat($template2, 60,
+               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               INITS => 'a<index> = <index>',
+               ARGS => 'a<index>',
+               PARAMS => '.param PerlInt a<index>',
+               TESTS => "set I0, a<index>\nne I0, <index>, fail",
+               TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
+
+output_is($code, <<'OUT', "overflow pmcs 60 spill");
+all params ok
 OUT

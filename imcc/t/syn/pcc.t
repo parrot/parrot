@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 40;
+use TestCompiler tests => 41;
 
 ##############################
 # Parrot Calling Conventions
@@ -774,8 +774,6 @@ output_is($code, <<'OUT', "overflow integers");
 all params ok
 OUT
 
-SKIP: {
-    skip "massive spilling not yet implemented", 1;
 $code = repeat($template, 40,
                LOCALS => '.local int a<index>',
                INITS => 'a<index> = <index>',
@@ -785,7 +783,6 @@ $code = repeat($template, 40,
 output_is($code, <<'OUT', "overflowed spilled integers");
 all params ok
 OUT
-}
 
 $code = repeat($template, 18,
                LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
@@ -797,6 +794,18 @@ $code = repeat($template, 18,
 output_is($code, <<'OUT', "overflow pmcs");
 all params ok
 OUT
+
+$code = repeat($template, 40,
+               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               INITS => 'a<index> = <index>',
+               ARGS => '.arg a<index>',
+               PARAMS => '.param PerlInt a<index>',
+               TESTS => "set I0, a<index>\nne I0, <index>, fail");
+
+output_is($code, <<'OUT', "overflow pmcs 40");
+all params ok
+OUT
+
 
 output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 1");
 .pcc_sub _main prototyped
