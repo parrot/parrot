@@ -1103,15 +1103,30 @@ Removes the element at C<*key>.
 
 =item C<INTVAL is_equal (PMC* value)>
 
-The C<==> operation. Currently just returns C<0>.
+The C<==> operation. Compares two array to hold equal elements.
 
 =cut
 
 */
 
     INTVAL is_equal (PMC* value) {
-    /* XXX */
-        return 0;
+        INTVAL j, n;
+
+        if (value->vtable->base_type != enum_class_PerlArray) /* XXX */
+            return 0;
+        n = SELF.elements();
+        if (VTABLE_elements(INTERP, value) != n)
+            return 0;
+        for (j = 0; j < n; ++j) {
+            PMC *item1, *item2;
+            item1 = SELF.get_pmc_keyed_int(j);
+            item2 = VTABLE_get_pmc_keyed_int(INTERP, value, j);
+            if (item1 == item2)
+                continue;
+            if (!mmd_dispatch_i_pp(INTERP, item1, item2, MMD_EQ))
+                return 0;
+        }
+        return 1;
     }
 
 /*

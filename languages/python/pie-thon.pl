@@ -27,6 +27,7 @@ my %builtins = (
     callable => 1,
     chr => 1,
     dict => 'v',
+    divmod => 1,
     enumerate => 1,
     hash => 1,
     id => 1,
@@ -1380,7 +1381,8 @@ sub Slice
 {
     my ($n, $c, $cmt, $sl_n) = @_;
     my ($v, $w, $vv, $ww);
-    $vv = $ww = 0;
+    $vv = 0;
+    $ww =  "";
     if ($sl_n & 2) {
 	$w = pop @stack;
 	$ww = $w->[1];
@@ -1412,4 +1414,7 @@ EOC
 
 sub SLICE_plus_3 {
     return Slice(@_, 3);
+}
+sub SLICE_plus_0 {
+    return Slice(@_, 0);
 }

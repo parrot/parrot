@@ -114,6 +114,24 @@ parrot_py_dict(Interp *interpreter, PMC *argv)
     return NULL;
 }
 
+#define VTABLE_modulus(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_MOD)
+#define VTABLE_subtract(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_SUBTRACT)
+#define VTABLE_divide(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_DIVIDE)
+static PMC *
+parrot_py_divmod(Interp *interpreter, PMC *nom, PMC *denom)
+{
+    PMC *tupl = pmc_new(interpreter, enum_class_PerlArray); /* XXX */
+    PMC *pmod =  pmc_new(interpreter, enum_class_PerlInt);
+    PMC *pdiv =  pmc_new(interpreter, enum_class_PerlInt);
+    VTABLE_modulus(interpreter, nom, denom, pmod);
+    VTABLE_subtract(interpreter, nom, pmod, pdiv);
+    VTABLE_divide(interpreter, pdiv, denom, pdiv);
+    VTABLE_set_integer_native(interpreter, tupl, 2);
+    VTABLE_set_pmc_keyed_int( interpreter, tupl, 0, pdiv);
+    VTABLE_set_pmc_keyed_int( interpreter, tupl, 1, pmod);
+    return tupl;
+}
+
 static PMC *
 parrot_py_list(Interp *interpreter, PMC *argv)
 {
@@ -553,6 +571,7 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *callable = CONST_STRING(interpreter, "callable");
     STRING *chr      = CONST_STRING(interpreter, "chr");
     STRING *dict     = CONST_STRING(interpreter, "dict");
+    STRING *divmod   = CONST_STRING(interpreter, "divmod");
     STRING *enumerate= CONST_STRING(interpreter, "enumerate");
     STRING *filter   = CONST_STRING(interpreter, "filter");
     STRING *hash     = CONST_STRING(interpreter, "hash");
@@ -570,6 +589,7 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_chr), chr, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_dict), dict, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_divmod), divmod, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_enumerate), enumerate, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);

@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -151,6 +151,30 @@ def check_functions(i=0, j=0):
     check(complex(3*i, 4*j), 3*i+4j*j)
     check(dict([(1,2), (3,4)]), {1: 2, 3: 4})
     check(dict.fromkeys("abc"), {'a': None, 'b': None, 'c': None})
+
+def main():
+    check_functions()
+    check_functions(j=10, i=10)
+    for i in range(0,500,249):
+	print "i:", i
+        check_functions(j=long(i*1000000), i=i*1000000)
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'check_functions divmod');
+show = True
+
+def check(a, b):
+    if __debug__:
+        if show:
+            print `a`, "==", `b`
+    if not a == b:
+        raise AssertionError("%.30r != %.30r" % (a, b))
+
+def check_functions(i=0, j=0):
+    check(divmod(7, 4), (1, 3))
 
 def main():
     check_functions()
