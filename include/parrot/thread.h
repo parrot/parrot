@@ -114,7 +114,7 @@ void pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s);
 void pt_clone_code(Parrot_Interp d, Parrot_Interp s);
 void pt_add_to_interpreters(Parrot_Interp first, Parrot_Interp new_interp);
 void pt_thread_yield(void);
-void * pt_thread_join(UINTVAL);
+void * pt_thread_join(Parrot_Interp, UINTVAL);
 void pt_thread_detach(UINTVAL);
 void pt_thread_kill(UINTVAL);
 void pt_join_threads(Parrot_Interp);

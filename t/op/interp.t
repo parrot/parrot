@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -242,7 +242,7 @@ from 1 interp
 OUTPUT
 
 SKIP: {
-  skip("No thread config yet" ,4) unless $^O eq 'linux';
+  skip("No thread config yet", 5) unless $^O eq 'linux';
 
 output_is(<<'CODE', <<'OUTPUT', "interp identity");
     getinterp P2
@@ -288,6 +288,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 1");
     print "thread "
     print I5
     print "\n"
+    set I3, 0   # no retval
     invoke P1	# ret and be done with thread
 
 # output from threads could be reversed
@@ -341,6 +342,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 2");
     typeof S0, P0
     print S0
     print "\n"
+    set I3, 0
     invoke P1	# ret and be done with thread
 
 CODE
@@ -384,6 +386,75 @@ CODE
 start 1
 in thread
 done
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "join, get retval");
+##PIR##
+.sub _main
+    .const int MAX = 1000
+    .sym pmc kid
+    .sym pmc Adder
+    Adder = global "_add"
+    kid = new ParrotThread
+    .sym pmc from
+    from = new PerlInt
+    from = 0
+    .sym pmc to
+    to = new PerlInt
+    to = MAX
+    .sym pmc Thread_new
+    find_method Thread_new, kid, "thread3"
+    .pcc_begin prototyped
+    .arg kid
+    .arg Adder
+    .arg from
+    .arg to
+    .nci_call Thread_new
+    .pcc_end
+
+    .sym int tid
+    tid = kid
+    .sym pmc Thread_join
+    find_method Thread_join, kid, "join"
+    .pcc_begin prototyped
+    .arg tid
+    .nci_call Thread_join
+    .sym pmc result
+    .result result
+    .pcc_end
+    print result
+    print "\n"
+    # sum = n * (n + 1)/2
+    .sym pmc Mul
+    Mul = new PerlInt
+    assign Mul, to
+    inc Mul
+    Mul = to * Mul
+    Mul = Mul / 2
+    print Mul
+    print "\n"
+    end
+.end
+
+.sub _add prototyped
+   .param pmc self
+   .param pmc sub
+   .param pmc from
+   .param pmc to
+   .sym   pmc sum
+   sum = new PerlInt
+loop:
+    add sum, from
+    inc from
+    le from, to, loop
+
+    .pcc_begin_return
+    .return sum
+    .pcc_end_return
+.end
+CODE
+500500
+500500
 OUTPUT
 
 }

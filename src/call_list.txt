@@ -20,7 +20,7 @@
 # void stuff
 # v - void
 # P - void *
-# B - void ** 
+# B - void **
 
 # special stuff
 # 0 - insert a NULL (pointer) - doesn't comsume a register
@@ -162,6 +162,7 @@ v	P
 
 # Needed for parrot threads
 v	IPP
+P	Ii
 
 # Oddball ones for postgres
 p	ptiLTLLi

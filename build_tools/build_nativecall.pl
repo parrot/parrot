@@ -39,7 +39,7 @@ my (%ret_type) = (p => "void *",
 		  v => "void",
 #		  b => "void *",
 #		  B => "void **",
-#		  P => "void *",
+		  P => "void *",
                  );
 
 my (%proto_type) = (p => "void *",
@@ -82,7 +82,7 @@ my (%ret_type_decl) = (p => "void *",
 		       v => "void *",
 #		       b => "void *",
 #		       B => "void **",
-#		       P => "void *",
+		       P => "void *",
                      );
 
 my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nREG_PMC(5) = final_destination;",
@@ -94,6 +94,7 @@ my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nREG_PMC(5)
                     2 => "REG_INT(5) = *return_data;",
                     f => "REG_NUM(5) = return_data;",
                     d => "REG_NUM(5) = return_data;",
+                    P => "REG_PMC(5) = return_data;",
 		    v => "",
 		    t => "final_destination = string_from_cstring(interpreter, return_data, 0);\nREG_STR(5) = final_destination;",
 #		    b => "final_destination->bufstart = return_data;\nREG_STR(5) = final_destination",
@@ -288,7 +289,7 @@ sub make_arg {
 	       push @extra_preamble, "char **tempvar$tempnum = Parrot_make_cpa(interpreter, REG_PMC($regnum));\n";
 	       push @extra_postamble, "Parrot_destroy_cpa(tempvar$tempnum);\n";
 	       return "tempvar$tempnum";
-              
+
               };
 }
 

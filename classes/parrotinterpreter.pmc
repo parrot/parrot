@@ -150,7 +150,7 @@ pmclass ParrotInterpreter need_ext {
         enter_nci_method(INTERP, method_table,
                          F2DPTR(pt_thread_yield), "yield", "v");
         enter_nci_method(INTERP, method_table,
-                         F2DPTR(pt_thread_join), "join", "vi");
+                         F2DPTR(pt_thread_join), "join", "PIi");
         enter_nci_method(INTERP, method_table,
                          F2DPTR(pt_thread_detach), "detach", "vi");
         enter_nci_method(INTERP, method_table,

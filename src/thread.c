@@ -28,6 +28,7 @@ thread_func(void *arg)
 {
     PMC *self = (PMC*) arg;
     UINTVAL tid;
+    PMC *ret_val = NULL;
 
     Parrot_Interp interpreter = PMC_data(self);
     runops(interpreter, (opcode_t *)self->cache.struct_val -
@@ -42,17 +43,20 @@ thread_func(void *arg)
         UNLOCK(interpreter_array_mutex);
         PANIC("thread finished: interpreter mismatch");
     }
-    if ((interpreter->thread_data->state & THREAD_STATE_DETACHED) ||
-        (interpreter->thread_data->state & THREAD_STATE_JOINED)) {
+    if (interpreter->thread_data->state & THREAD_STATE_DETACHED) {
         interpreter_array[tid] = NULL;
         Parrot_really_destroy(0, interpreter);
     }
+    else {
+        /*
+         * TODO check signature
+         */
+        if (REG_INT(3))
+            ret_val = REG_PMC(5);
+    }
     UNLOCK(interpreter_array_mutex);
 
-    /*
-     * TODO pass return value
-     */
-    return NULL;
+    return ret_val;
 }
 
 /*
@@ -200,7 +204,7 @@ pt_check_tid(UINTVAL tid, const char *from)
  * join (wait for) a joinable thread
  */
 void*
-pt_thread_join(UINTVAL tid)
+pt_thread_join(Parrot_Interp parent, UINTVAL tid)
 {
     Parrot_Interp interpreter;
     int state;
@@ -214,6 +218,13 @@ pt_thread_join(UINTVAL tid)
         UNLOCK(interpreter_array_mutex);
         JOIN(interpreter->thread_data->thread, retval);
         LOCK(interpreter_array_mutex);
+        if (retval) {
+            /* clone the PMC into caller */
+            PMC *parent_ret = VTABLE_clone(parent, (PMC*)retval);
+            retval = parent_ret;
+        }
+        interpreter_array[tid] = NULL;
+        Parrot_really_destroy(0, interpreter);
         UNLOCK(interpreter_array_mutex);
         return retval;
     }
@@ -222,7 +233,8 @@ pt_thread_join(UINTVAL tid)
      */
     state = interpreter->thread_data->state;
     UNLOCK(interpreter_array_mutex);
-    internal_exception(1, "join: illegal thread state %d tid %d", state, tid);
+    internal_exception(1, "join: illegal thread state %d tid %d",
+            state, tid);
     return NULL;
 }
 
