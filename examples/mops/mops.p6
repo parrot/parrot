@@ -11,8 +11,6 @@
 
 sub main() {
 	my ($I1, $I2, $I3, $I4, $I5, $N1, $N2, $N4, $N5);
-$ts = 42;
-$te = 66;
 $I2 = 0;                      # set    I2, 0
 $I3 = 1;                      # set    I3, 1
 $I4 = 1000000;              # set    I4, 100000000
@@ -28,14 +26,12 @@ print "Estimated ops: ",$I5,"\n"; # print  "Estimated ops: "
                               # print  I5
                               # print  "\n"
                               #
-time($ts);           # time N1
-$N1 = $ts;
+$N1 = time;
                               #
 $I4 = $I4 - $I3              # sub    I4, I4, I3
       while ($I4>0);             # if     I4, REDO
                               #
-time($te);           # time   N5
-$N5 = $te;
+$N5 = time;
                               #
 $N2 = $N5 - $N1;              # sub    N2, N5, N1
                               #
