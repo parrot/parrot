@@ -46,8 +46,8 @@ if ($operation eq 'unparse' || $operation eq 'render') {
     exit;
 }
 
-my @code = Regex::tree_to_list($tree, %options);
+my $code = Regex::tree_to_list($tree, %options);
 
-my @asm = Regex::list_to_pasm(\@code, %options);
+my @asm = Regex::list_to_pasm($code, %options);
 
 print join("\n", @asm), "\n";
