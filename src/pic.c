@@ -38,6 +38,9 @@ this opcode function is available. Called from C<do_prederef>.
 */
 
 
+#define N_STATIC_TYPES 500
+static INTVAL pmc_type_numbers[N_STATIC_TYPES];
+
 void
 parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
 {
@@ -59,7 +62,16 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
                 if (type <= 0)
                     real_exception(interpreter, NULL, NO_CLASS,
                             "Class '%Ss' not found", class);
-                (*(INTVAL *)cur_opcode[2]) = type;
+                if (type > N_STATIC_TYPES)
+                    internal_exception(1, "Unimp: too many classes");
+                /*
+                 * the prederef bytecode needs the address of
+                 * an INTVAL holding the type
+                 *
+                 * TODO if beyond limit use a malloced array
+                 */
+                pmc_type_numbers[type] = type;
+                pc_pred[2] = pmc_type_numbers + type;
                 op = PARROT_OP_new_p_ic;
             }
             break;

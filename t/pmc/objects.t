@@ -1871,9 +1871,9 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Wrong way to create new objects");
+output_like(<<'CODE', <<'OUTPUT', "Wrong way to create new objects");
     new P0, .ParrotObject
     end
 CODE
-Can't create new ParrotObject; use the registered class instead
+/Can't create new ParrotObject/
 OUTPUT
