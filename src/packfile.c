@@ -33,7 +33,7 @@ structure of the frozen bytecode.
 #define TRACE_PACKFILE 0
 #define TRACE_PACKFILE_PMC 0
 
-#define PF_USE_FREEZE_THAW 0
+#define PF_USE_FREEZE_THAW 1
 
 /*
 ** Static functions
@@ -371,6 +371,7 @@ mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
     PMC *sub_pmc;
+    PMC *p;
     STRING *name;
 
     ft = cs->fixups;
@@ -389,6 +390,12 @@ mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
                 name = PMC_sub(sub_pmc)->name;
                 if (name)
                     pobject_lives(interpreter, (PObj *)name);
+                p = PMC_sub(sub_pmc)->name_space;
+                if (!PMC_IS_NULL(p))
+                    pobject_lives(interpreter, (PObj *)p);
+                p = PMC_sub(sub_pmc)->multi_signature;
+                if (!PMC_IS_NULL(p))
+                    pobject_lives(interpreter, (PObj *)p);
                 break;
         }
     }

@@ -274,6 +274,39 @@ mk_ident(Interp *interp, char * name, int t)
     return r;
 }
 
+static SymReg*
+mk_pmc_const_2(Parrot_Interp interp, IMC_Unit *unit, SymReg *left, SymReg *rhs)
+{
+    SymReg *r[IMCC_MAX_REGS];
+    char *name;
+    int len;
+
+    if (IMCC_INFO(interp)->state->pasm_file) {
+        IMCC_fataly(interp, E_SyntaxError,
+                "Ident as PMC constant",
+                " %s\n", left->name);
+    }
+    r[0] = left;
+    /* strip delimiters */
+    name = str_dup(rhs->name + 1);
+    len = strlen(name);
+    name[len - 1] = '\0';
+    free(rhs->name);
+    rhs->name = name;
+    rhs->set = 'P';
+    rhs->pmc_type = left->pmc_type;
+    switch (rhs->pmc_type) {
+        case enum_class_Sub:
+        case enum_class_Coroutine:
+            r[1] = rhs;
+            rhs->usage = U_FIXUP;
+            INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+            return NULL;
+    }
+    r[1] = rhs;
+    INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+    return NULL;
+}
 /* Makes a new identifier constant with value val */
 SymReg *
 mk_const_ident(Interp *interp,
@@ -281,10 +314,20 @@ mk_const_ident(Interp *interp,
 {
     SymReg *r;
 
-    if (global)
+    if (global) {
+        if (t == 'P') {
+            IMCC_fataly(interp, E_SyntaxError,
+                    "global PMC constant not allowed");
+        }
         r = _mk_symreg(IMCC_INFO(interp)->ghash, name, t);
-    else
+    }
+    else {
+        if (t == 'P') {
+            r = mk_ident(interp, name, t);
+            return mk_pmc_const_2(interp, cur_unit, r, val);
+        }
         r = mk_ident(interp, name, t);
+    }
     r->type = VT_CONSTP;
     r->reg = val;
     return r;

@@ -17,7 +17,7 @@ Contains a lot of Perl PMC related tests.
 
 =cut
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 23;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -496,4 +496,31 @@ PerlInt
 Integer
 OUT
 
-1;
+pir_output_is(<<'CODE', <<'OUT', "pmc constant 1");
+.sub main @MAIN
+    .const Integer i = "42"
+    print i
+    print "\n"
+.end
+CODE
+42
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "pmc constant 2");
+.sub main @MAIN
+    .const .Integer i = "42"
+    print i
+    print "\n"
+.end
+CODE
+42
+OUT
+
+output_is(<<'CODE', <<'OUT', "pmc constant PASM");
+    .const .Integer P0 = "42"
+    print P0
+    print "\n"
+    end
+CODE
+42
+OUT

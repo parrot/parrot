@@ -134,16 +134,19 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
     constant[len - 1] = '\0';
     strcpy(name, constant + 1);
     free(constant);
-    rhs = mk_const(interp, name, 'p');
-    r[1] = rhs;
     switch (type_enum) {
         case enum_class_Sub:
+        case enum_class_Coroutine:
+            rhs = mk_const(interp, name, 'p');
+            r[1] = rhs;
+            rhs->pmc_type = type_enum;
             rhs->usage = U_FIXUP;
             return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
     }
-    IMCC_fataly(interp, E_SyntaxError,
-        "Unknown PMC constant type %d", type_enum);
-    return NULL;
+    rhs = mk_const(interp, name, 'P');
+    r[1] = rhs;
+    rhs->pmc_type = type_enum;
+    return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
 }
 
 static Instruction*

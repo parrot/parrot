@@ -34,7 +34,7 @@
  *
  */
 
-#define PF_USE_FREEZE_THAW 0
+#define PF_USE_FREEZE_THAW 1
 
 /*
  * globals store the state between individual e_pbc_emit calls
@@ -596,13 +596,15 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         int offs, int end)
 {
     int k;
+#if ! PF_USE_FREEZE_THAW
     char buf[256];
     opcode_t *rc;
+    char *class;
+#endif
     struct PackFile_Constant *pfc;
     SymReg *ns;
     int ns_const = -1;
     char *real_name;
-    char *class;
     struct PackFile_ConstTable *ct;
     struct PackFile *pf;
 
@@ -873,6 +875,42 @@ IMCC_int_from_reg(Interp *interpreter, SymReg *r)
 }
 
 static void
+make_pmc_const(Interp *interpreter, SymReg *r)
+{
+    STRING *s, *s5;
+    PMC *p, *class, *p2;
+    INTVAL i2, i3;
+    int k;
+
+    s = string_from_cstring(interpreter, r->name, 0);
+    /* preserver registers */
+    i2 = REG_INT(2);
+    i3 = REG_INT(3);
+    s5 = REG_STR(5);
+    p2 = REG_PMC(2);
+
+    class = REG_PMC(2) = Parrot_base_vtables[r->pmc_type]->class;
+    REG_INT(2) = 1;
+    REG_INT(3) = 0;
+    REG_STR(5) = s;
+    /* TODO create constant PMCs
+     * maybe VTABLE_instantiate_const
+     */
+    p = VTABLE_instantiate(interpreter, class);
+    /* restore regs */
+    REG_INT(2) = i2;
+    REG_INT(3) = i3;
+    REG_INT(2) = i2;
+    REG_STR(5) = s5;
+    REG_PMC(2) = p2;
+    /* append PMC constant */
+    k = PDB_extend_const_table(interpreter);
+    interpreter->code->const_table->constants[k]->type = PFC_PMC;
+    interpreter->code->const_table->constants[k]->u.key = p;
+    r->color = k;
+}
+
+static void
 add_1_const(Interp *interpreter, SymReg *r)
 {
     if (r->color >= 0)
@@ -893,11 +931,19 @@ add_1_const(Interp *interpreter, SymReg *r)
             for (r = r->nextkey; r; r = r->nextkey)
                 if (r->type & VTCONST)
                     add_1_const(interpreter, r);
+            break;
+        case 'P':
+            make_pmc_const(interpreter, r);
+            IMCC_debug(interpreter, DEBUG_PBC_CONST,
+                    "PMC const %s\tcolor %d\n",
+                    r->name, r->color);
+            break;
         default:
             break;
     }
-    if (r /*&& r->set != 'I' */)
-        IMCC_debug(interpreter, DEBUG_PBC_CONST,"const %s\tcolor %d use_count %d\n",
+    if (r)
+        IMCC_debug(interpreter, DEBUG_PBC_CONST,
+                "const %s\tcolor %d use_count %d\n",
                 r->name, r->color, r->use_count);
 
 }

@@ -100,6 +100,7 @@ Class method to construct an Integer according to passed arguments.
     PMC* instantiate() {
         PMC *class = REG_PMC(2);
         int argcP = REG_INT(3);
+        int argcS = REG_INT(2);
         int base;
         PMC *res, *arg;
         STRING *num;
@@ -108,7 +109,12 @@ Class method to construct an Integer according to passed arguments.
 
         type = class->vtable->base_type;
         if (!argcP) {
-            return pmc_new(INTERP, type);
+            res = pmc_new(INTERP, type);
+            if (argcS) {
+                /* TODO bigint overflow */
+                PMC_int_val(res) = string_to_int(INTERP, REG_STR(5));
+            }
+            return res;
         }
         base = 10;
         if (argcP == 2)

@@ -29,7 +29,7 @@ contiguous region of memory.
 
 #define TRACE_PACKFILE_PMC 0
 
-#define PF_USE_FREEZE_THAW 0
+#define PF_USE_FREEZE_THAW 1
 
 extern struct PackFile_Directory *directory_new (Interp*, struct PackFile *pf);
 
