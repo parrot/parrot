@@ -22,18 +22,18 @@ char *parseflags(Parrot_Interp interpreter, int *argc, char **argv[]);
 
 static struct longopt_opt_decl options[] = {
     { 'b', 'b', 0,       { "--bounds-checks" } },
-    { 'd', 'd', 0,       { "--debugging" } },
+    { 'd', 'd', 0,       { "--debug" } },
     { 'h', 'h', 0,       { "--help" } },
     { 'j', 'j', 0,       { "--jit" } },
-    { 'p', 'p', 0,       { "--profiling" } },
-    { 'P', 'P', 0,       { "--predereferencing" } },
+    { 'p', 'p', 0,       { "--profile" } },
+    { 'P', 'P', 0, { "--prederefrenced-core" } },
     { 'S', 'S', 0,       { "--switched-core" } },
     { 'g', 'g', 0,       { "--no-computed-goto" } },
-    { 't', 't', 0,       { "--tracing" } },
+    { 't', 't', 0,       { "--trace" } },
     { 'v', 'v', 0,       { "--version" } },
     { '.', '.', 0,       { "--wait" } },
     {'\0', 128, 0,       { "--gc-debug" } },
-    {'\0',   0, 0,       { } }
+    {'\0',   0, 0,       { NULL } }
 };
 
 static void usage(void);
@@ -170,14 +170,14 @@ usage(void)
     fprintf(stderr,
 "Usage: parrot [switches] [--] programfile [arguments]\n\
   -b  --bounds-checks           Activate bounds checks\n\
-  -d  --debugging               Activate debugging\n\
+  -d  --debug                   Activate debugging\n\
   -h  --help                    Display this message\n\
   -j  --jit                     Activate Just-In-Time compiler\n\
-  -p  --profiling               Activate profiling\n\
-  -P  --predereferencing        Activate predereferencing\n\
+  -p  --profile                 Activate profiling\n\
+  -P  --predereferenced_core    Activate predereferencing\n\
   -S  --switched_core           Activate switched core\n\
   -g  --no-computed-goto        %s\n\
-  -t  --tracing                 Activate tracing\n\
+  -t  --trace                   Activate tracing\n\
   -v  --version                 Display version information\n\
   -.  --wait                    Wait for a keypress (gives Windows users\n\
                                     time to attach a debugger)\n\

@@ -40,18 +40,18 @@ static void help(void)
     "    -h --help\n"
     "    -V --version\n"
     "   <VM options>\n"
-    "    -b --bounds\n"
+    "    -b --bounds-checks\n"
     "    -j --jit\n"
     "    -p --profile\n"
     "    -P --prederefrenced-core\n"
     "    -S --switched-core\n"
     "    -g --no-computed-goto\n"
-    "    -t --tracing\n"
+    "    -t --trace\n"
     "    -d --debug=HEXFLAGS\n"
     "    -w --warnings\n"
     "    -G --no-gc\n"
     "       --gc-debug\n"
-    "    -.           Read a keystroke before starting\n"
+    "    -. --wait    Read a keystroke before starting\n"
     "   <Compiler options>\n"
     "    -v --verbose\n"
     "    -o --output=FILE\n"
@@ -75,17 +75,17 @@ static void imcc_version(void)
 
 #define OPT_GC_DEBUG 128
 static struct longopt_opt_decl options[] = {
-    { 'b', 'b', 0, { "--bounds" } },
+    { 'b', 'b', 0,       { "--bounds-checks" } },
     { 'j', 'j', 0, { "--jit" } },
     { 'p', 'p', 0, { "--profile" } },
     { 'P', 'P', 0, { "--prederefrenced-core" } },
     { 'S', 'S', 0, { "--switched-core" } },
     { 'g', 'g', 0, { "--no-computed-goto" } },
-    { 't', 't', 0, { "--tracing" } },
+    { 't', 't', 0, { "--trace" } },
     { 'd', 'd', OPTION_required_FLAG, { "--debug" } },
     { 'w', 'w', 0, { "--warnings" } },
     { 'G', 'G', 0, { "--no-gc" } },
-    { '.', '.', 0, { } },
+    { '.', '.', 0, { "--wait" } },
     { 'a', 'a', 0, { "--pasm" } },
     { 'h', 'h', 0, { "--help" } },
     { 'V', 'V', 0, { "--version" } },
@@ -95,8 +95,8 @@ static struct longopt_opt_decl options[] = {
     { 'y', 'y', 0, { "--yydebug" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
     { 'O', 'O', OPTION_required_FLAG, { "--optimize" } },
-    { OPT_GC_DEBUG, '\0', 0, { "--gc-debug" } },
-    { 0, 0, 0, { } }
+    { '\0', OPT_GC_DEBUG, 0, { "--gc-debug" } },
+    { 0, 0, 0, { NULL } }
 };
 
 /* most stolen from test_main.c */
