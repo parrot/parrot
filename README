@@ -54,5 +54,15 @@ You can test the assembler and interpreter by running
 There is some documentation in docs/, but this is a very early alpha
 release, so for the most part, you're on your own.
 
+
+MAILING LISTS
+-------------
+
+The mailing list for parrot is currently perl6-internals.  Subscribe
+by sending mail to perl6-internals-subscribe@perl.org.
+It is archived at http://archive.develooper.com/perl6-internals@perl.org/
+
+
+
 Have fun,
 The Parrot team.
