@@ -395,7 +395,7 @@ F<languages/jako> subdirectory:
 
   % languages/jako/jakoc fib.jako > fib.pasm
   % perl assemble.pl fib.pasm > fib.pbc
-  % ./test_parrot fib.pbc
+  % ./parrot fib.pbc
  The first 20 fibonacci numbers are:
  1
  1

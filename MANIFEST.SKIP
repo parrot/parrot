@@ -31,6 +31,6 @@ CVS/[^/]+$
 ^docs/packfile-perl\.pod$
 ^docs/core_ops\.pod$
 
-^test_parrot$
+^parrot$
 ^pdump$
 ^blib/
