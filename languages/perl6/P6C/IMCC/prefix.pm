@@ -189,6 +189,12 @@ sub gen_sub_call_imcc {
     my ($x) = @_;
     my $func = $P6C::IMCC::funcs{$x->name};
     my $ctx = $x->{ctx};
+
+    my $subname = "&" . $x->name;
+    my $subtmp = gentmp 'pmc';
+    code(<<END);
+	find_lex $subtmp, "$subname"
+END
     if ($x->args) {
 	my $args = $x->args->val;
 	
@@ -203,13 +209,24 @@ sub gen_sub_call_imcc {
 		.", expected ".@{$func->args};
 	}
 
-	foreach (reverse @$args) {
+	code(<<END);
+	.pcc_begin non_prototyped
+END
+	foreach (@$args) {
 	    code("\t.arg	$_\n");
 	}
+    } else {
+    code(<<END);
+	.pcc_begin non_prototyped
+END
     }
 
-    my $mname = P6C::IMCC::mangled_name($x->name);
-    code("\tcall	$mname\n");
+
+    my $ret_label = genlabel 'ret_label';
+    code(<<END);
+	.pcc_call	$subtmp
+$ret_label:
+END
     
     # Now handle return value.
     
@@ -225,12 +242,16 @@ sub gen_sub_call_imcc {
 	.result $results[$i]
 END
 	}
+	code(<<END);
+	.pcc_end
+END
 	return tuple_in_context([@results], $ctx);
 
     } elsif ($rettype eq 'PerlArray') {
 	my $ret = gentmp 'pmc';
 	code(<<END);
 	.result $ret
+	.pcc_end
 END
 	# XXX: this is not nice, but it's more useful than returning
 	# array-lengths.
@@ -257,6 +278,7 @@ END
 	my $ret = gentmp 'pmc';
 	code(<<END);
 	.result $ret
+	.pcc_end
 END
 	return scalar_in_context($ret, $ctx);
 
@@ -550,6 +572,9 @@ sub wrap_with_catch {
     my $try = genlabel 'try';
     my $cont = newtmp 'Continuation';
     my $label = $endblock;
+    my $subtmp = gentmp 'pmc';
+    my $startcatch = genlabel 'ret_label';
+    my $endcatch = genlabel 'ret_label';
     my $catch;
     my $result;
     my $ret = gentmp 'pmc';
@@ -561,8 +586,12 @@ sub wrap_with_catch {
     code(<<END);
        $addr = addr $label
        $cont = $addr
+       find_lex $subtmp, "&install_catch"
+       .pcc_begin non_prototyped
        .arg $cont
-       call __install_catch
+       .pcc_call $subtmp
+$startcatch:
+       .pcc_end
        goto $try
 END
     if ($catcher) {
@@ -616,7 +645,11 @@ END
     }
     # Reached end of block => no exception.  Pop the continuation.
     code(<<END);
-	call __pop_catch
+       find_lex $subtmp, "&pop_catch"
+       .pcc_begin non_prototyped
+       .pcc_call $subtmp
+$endcatch:
+       .pcc_end
 $endblock:
 END
     return $ret;
@@ -717,6 +750,7 @@ sub prefix_given {
 
     emit_label name => $label, type => 'break';
     pop_scope;
+    return undef_in_context($x->{ctx});
 }
 
 sub prefix_defined {

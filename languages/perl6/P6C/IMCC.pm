@@ -162,8 +162,30 @@ sub emit {			# emit all code
     die "Must define main" unless $funcs{main};
     print <<'END';
 .sub __main
+	new_pad 0
 	call __setup
-	call _main
+END
+    # XXX: This is hackish. The builtins should really be global multimethods,
+    # and closures shouldn't be excluded by name. This'll do until it can be
+    # refactored to use imcc lexicals and globals everywhere.
+
+    foreach my $name (keys %funcs) {
+	next if $name =~ /closure/;
+        my $mangled_name = mangled_name($name);
+        my $local_name = $name . "_sub";
+        my $lexical_name = "&" . $name;
+        print <<END;
+	.local Sub $local_name
+	newsub $local_name, .Sub, $mangled_name
+	store_lex -1, "$lexical_name", $local_name
+END
+    }
+    print <<'END';
+	.pcc_begin non_prototyped
+	.pcc_call main_sub
+main_ret_label:
+	.pcc_end
+	pop_pad
 	end
 .end
 END
@@ -175,7 +197,7 @@ END
 	    next;
 	}
 	$name = mangled_name($name);
-	print ".sub $name\n";
+	print ".pcc_sub $name non_prototyped\n";
 	$sub->emit;
 	print ".end\n";
     }
@@ -839,13 +861,15 @@ sub call_closure {
     my ($thing, $args) = @_;
     my $argval = $args ? $args->val : newtmp('PerlArray');
     my $func = $thing->val;
+    my $ret_label = genlabel 'ret_label';
     my $ret = gentmp 'pmc';
     code(<<END);
+	.pcc_begin non_prototyped
 	.arg	$argval
-	# .arg	$func
-	# call	__CALL_CLOSURE
-	invoke $func
+	.pcc_call $func
+$ret_label:
 	.result $ret
+	.pcc_end
 END
     return $ret;
 }
@@ -985,10 +1009,6 @@ sub pop_scope {
 
 sub emit {
     my $x = shift;
-    print <<END;
-	saveall
-# Parameters:
-END
     foreach (@{$x->args}) {
 	my ($t, $pname) = @$_;
 	my $ptype = P6C::IMCC::paramtype($t);
@@ -1017,8 +1037,7 @@ END
     }
     print $x->{code};
     print <<END;
-	restoreall
-	ret
+	end
 END
 }
 
@@ -1592,7 +1611,9 @@ sub val {
 	$ret = $x->block->val;
 	unless ($ctx->{noreturn}) {
 	    code(<<END);
+	.pcc_begin_return
 	.return $ret
+	.pcc_end_return
 END
 	    emit_label type => 'return';
 	}
@@ -1621,7 +1642,9 @@ END
 
 	unless ($ctx->{noreturn}) {
 	    code(<<END);
+	.pcc_begin_return
 	.return $ret
+	.pcc_end_return
 END
 	    emit_label type => 'return' unless $ctx->{noreturn};
 	}

@@ -17,7 +17,8 @@ use P6C::Parser;
 use vars '%builtin_names';
 BEGIN {
     my @names = qw(print1 exit warn die print sleep time substr length
-		   index map grep join reverse defined);
+		   index map grep join reverse defined install_catch 
+		   pop_catch);
     @builtin_names{@names} = (1) x @names;
 }
 
@@ -27,7 +28,7 @@ sub is_builtin {
 
 sub declare {
     my $hash = shift;
-    for (qw(print1 exit sleep)) {
+    for (qw(print1 exit sleep install_catch pop_catch)) {
 	$hash->{$_} = new P6C::IMCC::Sub args => [['PerlUndef', 'a']],
 	    rettype => [];
 	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'PerlUndef';
@@ -92,122 +93,123 @@ sub emit {
 
 print <<'END';
 
-.emit
-
-_substr:
-    pushp
-    pushi
-    pushs
-# get arr
-    restore P0
+.pcc_sub _substr non_prototyped
+    .param object params
+    $P0 = params
 # n paras
-    set I0, P0
-    set S0, P0[0]
-    set I1, P0[1]
-    eq I0, 2, __substr_2
-    set I2, P0[2]
-    gt I0, 4, __substr_die
-    lt I0, 2, __substr_die
-    length I3, S0
-    set I4, I3
-    ge I2, 0, __substr_34
+    $I0 = params
+    $S0 = params[0]
+    $I1 = params[1]
+    if $I0 == 2 goto substr_2
+    $I2 = params[2]
+    if $I0 > 4 goto substr_die
+    if $I0 < 2 goto substr_die
+    length $I3, $S0
+    $I4 = $I3
+    if $I2 >= 0 goto substr_34
 # len negative, leave -len of string
-    sub I3, I3, I1
-    add I3, I3, I2
-    set I2, I3
-__substr_34:
-    set S1, ""
+    $I3 = $I3 - $I1
+    $I3 = $I3 + $I2
+    $I2 = $I3
+substr_34:
+    $S1 = ""
 # # offset >= len?
-    ge I1, I4, __substr_ret
-    eq I0, 4, __substr_4
-__substr_3:
-    substr S1, S0, I1, I2
-__substr_ret:
-    new P1, .PerlString
-    set P1, S1
-    save P1
-    pops
-    popi
-    popp
-    ret
-__substr_4:
-    set S2, P0[3]
-    substr S1, S0, I1, I2, S2
-    set P0[2], S1
-    branch __substr_ret
-__substr_2:
-    length I2, S0
-    sub I2, I2, I1
-    branch __substr_3
-__substr_die:
-    set S0, "wrong number of args for substr"
-    new P0, .PerlArray
-    set P0[0], S0
-    save P0
-    bsr _die
-    branch __substr_ret
+    if $I1 >= $I4 goto substr_ret
+    if $I0 == 4 goto substr_4
+substr_3:
+    substr $S1, $S0, $I1, $I2
+substr_ret:
+    $P1 = new PerlString
+    $P1 = $S1
+    .pcc_begin_return
+    .return $P1
+    .pcc_end_return
+substr_4:
+    $S2 = params[3]
+    substr $S1, $S0, $I1, $I2, $S2
+    params[2] = $S1
+    goto substr_ret
+substr_2:
+    length $I2, $S0
+    sub $I2, $I2, $I1
+    goto substr_3
+substr_die:
+    set $S0, "wrong number of args for substr"
+    $P0 = new PerlArray
+    $P0[0] = $S0
+    find_lex $P2, "&die"
+    .pcc_begin non_prototyped
+    .arg $P0
+    .pcc_call $P2
+substr_ret_label:
+    .pcc_end
+    goto substr_ret
+    end
+.end
 
-_length:
-    pushp
-    pushs
-    pushi
-    restore P0
-    set S0, P0
-    length I0, S0
-    new P1, .PerlInt
-    set P1, I0
-    save P1
-    popi
-    pops
-    popp
-    ret
+.pcc_sub _length non_prototyped
+    .param object s
+    $S0 = s
+    length $I0, $S0
+    $P1 = new PerlInt
+    set $P1, $I0
+    .pcc_begin_return
+    .return $P1
+    .pcc_end_return
+    end
+.end
 
-_reverse:
-    pushp
-    pushi
-    restore P0
-    set I0, P0
-    dec I0
-    set I1, 0
-    new P1, .PerlArray
-__reverse_loopstart:
-    set P2, P0[I0]
-    set P1[I1], P2
-    inc I1
-    dec I0
-    le 0, I0, __reverse_loopstart
-    save P1
-    popi
-    popp
-    ret
+.pcc_sub _reverse non_prototyped
+    .param object orig_array
+    $I0 = orig_array
+    dec $I0
+    $I1 = 0
+    $P1 = new PerlArray
+reverse_loopstart:
+    $P2 = orig_array[$I0]
+    $P1[$I1] = $P2
+    inc $I1
+    dec $I0
+    if 0 <= $I0 goto reverse_loopstart
+    .pcc_begin_return
+    .return $P1
+    .pcc_end_return
+    end
+.end
 
-_join:
-    saveall
-    restore P3
-    set I1, P3
-    gt I1, 1, __join_next
+.pcc_sub _join non_prototyped
+    .param object params
+    .local int num_params
+    num_params = params
+    if num_params > 1 goto join_next
 # Empty args:
-    set S0, ""
-    branch __join_ret
+    $S0 = ""
+    goto join_ret
 # At least one arg:
-__join_next:
-    set S1, P3[0]		# separator
-    set S0, P3[1]		# accumulated string
-    set I0, 2			# arg number
-    branch __join_test
-__join_loopstart:
-    set S2, P3[I0]
-    concat S0, S1
-    concat S0, S2
-    inc I0
-__join_test:
-    ne I1, I0, __join_loopstart
-__join_ret:
-    new P2, .PerlString
-    set P2, S0
-    save P2
-    restoreall
-    ret
+join_next:
+    .local string separator
+    separator = params[0]	# separator
+    $S0 = params[1]		# accumulated string
+    .local int counter
+    counter = 2			# arg number
+    goto join_test
+join_loopstart:
+    $S2 = params[counter]
+    concat $S0, separator
+    concat $S0, $S2
+    inc counter
+join_test:
+    if num_params != counter goto join_loopstart
+join_ret:
+    $P2 = new PerlString
+    $P2 = $S0
+    .pcc_begin_return
+    .return $P2
+    .pcc_end_return
+    end
+.end
+
+.emit
 
 _grep:
     pushp
@@ -346,146 +348,153 @@ __map_closure:
     popp
     ret
 
-_index:
-    pushp
-    pushs
-    pushi
-    restore P0
-    set I2, P0
-    lt I2, 2, __index_numarg_error
-    set S0, P0[0]
-    set S1, P0[1]
-    set I0, 0
-    new P1, .PerlInt
-    set P1, I0
-    lt I3, 3, __index_2_arg
-    index I0, S0, S1
-    set P1, I0
-    branch __index_end
-__index_2_arg:
-    set I1, P0[2]
-    index I0, S0, S1, I1
-    set P1, I0
-__index_end:
-    save P1
-    popi
-    pops
-    popp
-    ret
-__index_numarg_error:
-    set S0, "wrong number of args for index"
-    new P0, .PerlArray
-    set P0[0], S0
-    save P0
-    bsr _die
-    branch __index_end
+.eom
 
-_time:
-    pushn
-    pushp
-    new P1, .PerlNum
-    time N1
-    set P1, N1
-    save P1
-    popp
-    popn
-    ret
+.pcc_sub _index non_prototyped
+    .param object params
+    $I2 = params
+    if $I2 < 2 goto index_numarg_error
+    $S0 = params[0]
+    $S1 =  params[1]
+    $I0 = 0
+    $P1 = new PerlInt
+    $P1 = $I0
+    if $I3 < 3 goto index_2_arg
+    index $I0, $S0, $S1
+    $P1 = $I0
+    goto index_end
+index_2_arg:
+    $I1 = params[2]
+    index $I0, $S0, $S1, $I1
+    $P1 = $I0
+index_end:
+    .pcc_begin_return
+    .return $P1
+    .pcc_end_return
+    end
+index_numarg_error:
+    $S0 = "wrong number of args for index"
+    $P0 = new PerlArray
+    $P0[0] = $S0
+    find_lex $P2, "&die"
+    .pcc_begin non_prototyped
+    .arg $P0
+    .pcc_call $P2
+pcc_ret_label:
+    .pcc_end
+    goto index_end
+.end
 
-_sleep:
-    pushp
-    pushi
-    restore P0
-    set I0, P0
-    sleep I0
-    popi
-    popp
-    ret
+.pcc_sub _time non_prototyped
+    $P1 = new PerlNum
+    time $N1
+    set $P1, $N1
+    .pcc_begin_return
+    .return $P1
+    .pcc_end_return
+    end
+.end
 
-_print1:
-    pushp
-    restore P31
-    print P31
+.pcc_sub _sleep non_prototyped
+    .param object wait
+    $I0 = wait
+    sleep $I0
+    .pcc_begin_return
+    .pcc_end_return
+    end
+.end
+
+.pcc_sub _print1 non_prototyped
+    .param object p
+    print p
     print "\n"
-    popp
-    ret
+    .pcc_begin_return
+    .pcc_end_return
+    end
+.end
 
-_print:
-    pushi
-    pushp
-    restore P3
-    set I0, P3
-    set I1, 0
-_print_loopstart:
-    eq I0, I1, _print_loopend
-    set P0, P3[I1]
-    print P0
-    inc I1
-    branch _print_loopstart
-_print_loopend:
-    popp
-    popi
-    ret
+.pcc_sub _print non_prototyped
+    .param object params
+    .local int num_elem
+    .local int counter
+    num_elem = params
+    counter = 0
+print_loopstart:
+    if counter == num_elem goto print_loopend
+    $P0 = params[counter]
+    print $P0
+    inc counter
+    goto print_loopstart
+print_loopend:
+    .pcc_begin_return
+    .pcc_end_return
+    end
+.end
 
-_exit:
-    pushp
-    restore P0
-    print P0
+.pcc_sub _exit non_prototyped
+    .param object message
+    print message
     print "\n"
     end
-    ret
+.end
 
-_die:
-    pushp
-    pushi
+.pcc_sub _die non_prototyped
+    .param object params
 
     # setup $!: ####################
-    new P0, .PerlString
-    restore P3
-    set I0, P3
-    eq I0, 0, _die_unknown
-    new P1, .PerlString
-    set I1, 0
-_die_loopstart:
-    eq I0, I1, _die_loopend
-    set P1, P3[I1]
-    concat P0, P0, P1
-    inc I1
-    branch _die_loopstart
-_die_unknown:
-    set P0, "Unknown error."
-_die_loopend:
-    store_global "_SV__BANG_", P0
+    .local object dollar_bang
+    dollar_bang = new PerlString
+    .local int num_params
+    num_params = params
+    if num_params == 0 goto die_unknown
+    $P1 = new PerlString
+    .local int counter
+    counter = 0
+die_loopstart:
+    if num_params == counter goto die_loopend
+    $P1 = params[counter]
+    dollar_bang = dollar_bang . $P1
+    inc counter
+    goto die_loopstart
+die_unknown:
+    dollar_bang = "Unknown error."
+die_loopend:
+    store_global "_SV__BANG_", dollar_bang
 
     # Look for a CATCH handler: ###
-    find_global P1, "_AV_catchers"
-    set I0, P1
-    eq I0, 0, _die_nohandler
+    .local object try_stack
+    find_global try_stack, "_AV_catchers"
+    $I0 = try_stack
+    if $I0 == 0 goto die_nohandler
 
     # Remove top catch handler
-    dec I0
-    set P0, P1[I0]
-    set P1, I0
-    store_global "_AV_catchers", P1
-# Implicitly refers to continuation in P0
-    invoke
-_die_nohandler:
-    print P0
+    dec $I0
+    $P0 = try_stack[$I0]
+    try_stack = $I0
+    store_global "_AV_catchers", try_stack
+    invoke $P0
+
+die_nohandler:
+    print dollar_bang
     print "\nDied (no handler).\n"
     end
-    ret
+.end
 
-_warn:
-    bsr _print
-    ret
+.pcc_sub _warn non_prototyped
+    .param object params
+    find_lex $P0, "&print"
+    .pcc_begin non_prototyped
+    .arg params
+    .pcc_call $P0
+warn_ret_label:
+    .result $P1
+    .pcc_end
+    .pcc_begin_return
+    .return $P1
+    .pcc_end_return
+.end
 
-__CALL_CLOSURE:
-    pushp
-    restore P0
-    restore P1
-    save P1
-    invoke
-    popp
-    ret
+.emit
 
  __setup:
     save P0			# == argv
@@ -526,32 +535,31 @@ __setup_arg_end:
     popp
     ret
 
-__install_catch:
-    pushp
-    pushi
-    # gross continuation-creating sequence:
-    restore P0
-    find_global P2, "_AV_catchers"
-    set I1, P2
-    set P2[I1], P0
-    store_global "_AV_catchers", P2
-    popi
-    popp
-    ret
-
-__pop_catch:
-    pushp
-    pushi
-    find_global P2, "_AV_catchers"
-    set I1, P2
-    dec I1
-    set P2, I1
-    store_global "_AV_catchers", P2
-    popi
-    popp
-    ret
-
 .eom
+
+.pcc_sub _install_catch non_prototyped
+    .param object continuation
+    .local object try_stack
+    find_global try_stack, "_AV_catchers"
+    $I1 = try_stack
+    try_stack[$I1] = continuation
+    store_global "_AV_catchers", try_stack
+    .pcc_begin_return
+    .pcc_end_return
+    end
+.end
+
+.pcc_sub _pop_catch non_prototyped
+    .local object try_stack
+    find_global try_stack, "_AV_catchers"
+    $I1 = try_stack
+    dec $I1
+    try_stack = $I1
+    store_global "_AV_catchers", try_stack
+    .pcc_begin_return
+    .pcc_end_return
+    end
+.end
 
 END
 
