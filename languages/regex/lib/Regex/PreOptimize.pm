@@ -4,6 +4,7 @@
 
 package Regex::PreOptimize;
 use Regex::Ops::Tree qw(rop);
+use Carp qw(croak);
 use strict;
 
 sub new {
@@ -52,46 +53,91 @@ sub pass1 {
 	# Pull out common prefixes, and convert alternation with null
 	# expressions to optional matches:
         #
-        # aR|aS => a(R|S)
-        # R|    => R?
-        # |R    => R??
+        # opt(aR|aS) => a(R|S)
+        # opt(R|)    => opt(R)?
+        # opt(|R)    => opt(R)??
         #
-	my ($R, $S) = ($self->pass1($t->{args}->[0]),
-		       $self->pass1($t->{args}->[1]));
-	my ($R0, @Rrest);
-	my ($S0, @Srest);
-        @{$t->{args}} = ($R, $S);
-	return $t if ! ref $R;
-	return $t if ! ref $S;
+        my @children = map { $self->pass1($_) } @{ $t->{args} };
+        if (@children == 1) {
+            return $children[0];
+        }
 
-	if ($R->{name} eq 'seq') {
-            ($R0, @Rrest) = @{ $R->{args} };
-	} else {
-	    $R0 = $R;
-	}
+        for (@children) { croak "nonref alternative?" if ! ref $_; };
 
-	if ($S->{name} eq 'seq') {
-            ($S0, @Srest) = @{ $S->{args} };
-	} else {
-	    $S0 = $S;
-	}
+        # opt(|R) -> opt(R)??
+        # opt(|R|S) -> opt(R|S)??
+        # opt(|||R|S) -> opt(R|S)??
+        # opt(|||) -> ()
+        if ($children[0]->{name} eq 'nop') {
+            pop(@children) while $children[0]->{name} eq 'nop';
+            if (@children == 0) {
+                return rop('nop', []);
+            } elsif (@children == 1) {
+                return rop('multi_match', [0,1,0,$children[0]]);
+            } else {
+                @{ $t->{args} } = @children;
+                return rop('multi_match', [0,1,0,$self->pass1($t)]);
+            }
+        }
 
-	return $t unless matchsame($R0, $S0);
+        # opt(R|) -> opt(R)?
+        # opt(R|S|) -> opt(R|S)?
+        # opt(R|S||) -> opt(R|S)?
+        if ($children[-1]->{name} eq 'nop') {
+            pop(@children) while $children[-1]->{name} eq 'nop';
+            if (@children == 1) {
+                return rop('multi_match', [0,1,1,$children[0]]);
+            } else {
+                @{ $t->{args} } = @children;
+                return rop('multi_match', [0,1,1,$self->pass1($t)]);
+            }
+        }
 
-	my $Rrest = rop('seq', \@Rrest);
-	my $Srest = rop('seq', \@Srest);
-	my $alt;
-	if (@Rrest == 0) {
-	    # (|S) --> S??
-	    $alt = rop('multi_match', [ 0, 1, 0, $Srest ]);
-	} elsif (@Srest == 0) {
-	    # (R|) --> R?
-	    $alt = rop('multi_match', [0, 1, 1, $Rrest]);
-	} else {
-	    $alt = rop('alternate', [ $Rrest, $Srest ]);
-	}
+        # opt(aR|aS) -> a opt(R|S)
+        # opt(aR|aS|aT) -> a opt(R|S|T)
+        # opt(aR|aS|bT) -> (a opt(R|S) | opt(bT))
+        # opt(R|...) -> (opt(R)|opt(...)) (when R is not a sequence)
+        my $R = shift(@children);
 
-	return $self->pass1(rop('seq', [ $R0, $alt ]));
+        # opt(R|...) -> (opt(R)|opt(...)) (R is not a sequence)
+        if ($R->{name} ne 'seq') {
+            my $subtree = $self->pass1(rop('alternate', \@children));
+            @{ $t->{args} } = ($R, $subtree);
+            return $t;
+        }
+
+        # Find as many things as possible that match a first
+        my ($R0, @Rrest) = @{ $R->{args} };
+        my @shrunken = ();
+        while (@children) {
+            last unless $children[0]->{name} eq 'seq';
+            my ($S0, @Srest) = @{ $children[0]->{args} };
+            last unless matchsame($R0, $S0);
+            my $S = shift(@children);
+            @{ $S->{args} } = @Srest;
+            push @shrunken, $S;
+        }
+
+        # None, so use opt(R|...) -> (opt(R)|opt(...))
+        if (@shrunken == 0) {
+            my $subtree = $self->pass1(rop('alternate', \@children));
+            @{ $t->{args} } = ($R, $subtree);
+            return $t;
+        }
+
+        # Have at least one to combine with, but possibly not all
+        @{ $R->{args} } = @Rrest;
+        my $subtree = $self->pass1(rop('alternate', [ $R, @shrunken ]));
+        my $opt = rop('seq', [ $R0, $subtree ]);
+        if (@children == 0) {
+            # Nothing left, so the original alternation disappears
+            return $opt;
+        }
+
+        # Something left: opt(aR|aS|T|...) -> a opt(R|S) | opt(T|...)
+        my $leftovers = $self->pass1(rop('alternate', \@children));
+        @{ $t->{args} } = ($opt, $leftovers);
+        return $t;
     } else {
         # Find all subtrees, and recurse through them.
         foreach my $arg (@{ $t->{args} }) {
@@ -240,10 +286,14 @@ sub add_checks {
             }
         }
     } elsif ($type eq 'multi_match') {
-        my ($min, $max, undef, $R) = @{ $t->{args} };
-        if ($max < 0) { $guarantee = 0; }
+        # R<min,max>: R is guaranteed to have 1/max as many available
+        # as the whole thing does. If max is unknown, we cannot
+        # guarantee anything.
+        my $R = $t->{args}->[3];
+        my $max = $t->maxlen();
+        if (!defined($max) || $max < 0) { $guarantee = 0; }
         else { $guarantee /= $max; }
-        $t->{args}->[3] = $self->add_checks($R, $guarantee, $follow_min);
+        $t->{args}->[3] = $self->add_checks($R, int($guarantee), $follow_min);
         return $t;
     } else {
         # If we're scanning, we'll eat up any possible guarantee.

@@ -427,7 +427,6 @@ package Regex::Ops::Tree;
 
 sub dump_tree {
     my ($op) = @_;
-    $DB::single = 1;
     my $ref = $op->reftree();
     return dump_ref($ref);
 }

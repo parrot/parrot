@@ -105,7 +105,7 @@ sub dbprint {
     my ($self, $what) = @_;
     return () unless $self->{DEBUG};
     my @ops;
-    foreach my $part ($what =~ /((?:\%\w+)|[^\%]+)/g) {
+    foreach my $part ($what =~ /((?:\%\??\w+)|[^\%]+)/g) {
         if ($part =~ /^%/) {
             push @ops, $self->output_print(substr($part, 1));
         } else {
@@ -142,9 +142,9 @@ sub output_increment {
         $comment = "pos -= ".(-$distance);
     }
 
-    return ($self->dbprint("Changing pos: %I1 -> "),
+    return ($self->dbprint("Changing pos: %?R_POS -> "),
             "add ?R_POS, $distance # $comment",
-            $self->dbprint("%I1\n"));
+            $self->dbprint("%?R_POS\n"));
 }
 
 sub output_add {
@@ -162,6 +162,7 @@ sub output_set {
 
 sub output_print {
     my ($self, $what) = @_;
+    $what = value($what);
     return ("print $what");
 }
 
@@ -231,10 +232,17 @@ sub output_check {
 sub output_match {
     my ($self, $code, $failLabel) = @_;
     my $comment = Regex::Ops::Tree::isplain($code) ? " # match '".chr($code)."'" : "";
-    return (
-            "ord ?R_TMP, ?R_INPUT, ?R_POS # tmp = INPUT[pos]",
-            "ne ?R_TMP, $code, ".$self->output_label_use($failLabel).$comment,
-           );
+    my @ops =
+      (
+       "ord ?R_TMP, ?R_INPUT, ?R_POS # tmp = INPUT[pos]",
+       "ne ?R_TMP, $code, ".$self->output_label_use($failLabel).$comment,
+      );
+    if ($self->{DEBUG}) {
+        push @ops, 'print "matched('.chr($code).') at "';
+        push @ops, 'print rx_pos';
+        push @ops, 'print "\n"';
+    }
+    return @ops;
 }
 
 sub output_classmatch {
@@ -295,7 +303,8 @@ sub output_delete {
 sub output_atend {
     my ($self, $failLabel) = @_;
     my $fail = $self->output_label_use($failLabel);
-    return ("lt ?R_POS, ?R_LEN, $fail # at end?");
+    return ($self->dbprint("At end: %?R_POS >= %?R_LEN?\n"),
+            "lt ?R_POS, ?R_LEN, $fail # at end?");
 }
 
 sub output_pushmark {

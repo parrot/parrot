@@ -22,8 +22,8 @@ sub init {
 #    
 #}
 
-sub pushop { ".push" };
-sub popop { ".pop" };
+sub pushop { "push" };
+sub popop { "pop" };
 
 sub output_preamble {
     my $self = shift;
@@ -34,15 +34,15 @@ sub output_preamble {
                 "length ?R_LEN, ?R_INPUT # cache the length in ?R_LEN",
                 "set ?R_STARTS[0], 0");
 
-    if ($self->{DEBUG} || $self->{definePrintResults}) {
-        unshift(@ops,
-                "set ?R_INPUT, ?R_STARTS[1]",
-                'bsr REGEX',
-                'bsr printResults',
-                'end',
-                result_printer(),
-                ($self->{startLabel} || 'REGEX').":");
-    }
+#     if ($self->{DEBUG} || $self->{definePrintResults}) {
+#         unshift(@ops,
+#                 "set ?R_INPUT, ?R_STARTS[1]",
+#                 'bsr REGEX',
+#                 'bsr printResults',
+#                 'end',
+#                 result_printer(),
+#                 ($self->{startLabel} || 'REGEX').":");
+#     }
 
     return @ops;
 }
@@ -66,7 +66,7 @@ printGroup:
     set $I5, $P0
     lt $I0, $I5, groupDefined
     set $I16, 0
-    .ret
+    ret
 groupDefined:
     set $I3, $P0[I0]
     set $I4, $P1[I0]
@@ -80,7 +80,7 @@ groupDefined:
     print "\n"
 skipPrint:
     set $I16, 1
-    .ret
+    ret
 END
     return split(/\n/, $code);
 }
@@ -96,7 +96,7 @@ sub output_match_failed {
 }
 
 sub output_terminate {
-#    return ".ret";
+#    return "ret";
     return "";
 }
 

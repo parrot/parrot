@@ -140,7 +140,7 @@ sub dbprint {
     my ($self, $what) = @_;
     return () unless $self->{DEBUG};
     my @ops;
-    foreach my $part ($what =~ /((?:\%\w+)|[^\%]+)/g) {
+    foreach my $part ($what =~ /((?:\%\??\w+)|[^\%]+)/g) {
         if ($part =~ /^%/) {
             push @ops, aop('print', [ substr($part, 1) ]);
         } else {
@@ -199,7 +199,7 @@ sub rewrite_group {
                         aop('pushint', [ 'I0' ]),
                         aop('setstart', [ $group, 'pos' ]),
                         @R_ops,
-                        $self->dbprint("setting end[$group] := %I1\n"),
+                        $self->dbprint("setting end[$group] := %?R_POS\n"),
                         aop('setend', [ $group, 'pos' ]),
                         aop('goto', [ $next ]),
               $rfail => $self->dbprint("R in group failed\n"),
@@ -228,12 +228,22 @@ sub rewrite_match {
     push @ops, aop('check', [ 1, $lastback ])
       unless ($op->{nocheck});
 
+    my @debugging;
+    if ($self->{DEBUG}) {
+        my $old_lastback = $lastback;
+        $lastback = $self->genlabel('debug_matchback');
+        @debugging = ($lastback =>
+                      $self->dbprint("failed to match $char at %?R_POS\n"),
+                      aop('goto', [ $old_lastback ]));
+    }
     push @ops, (
                      aop('match', [ $char, $lastback ]),
                      aop('increment', [ 1, $lastback ]),
                      aop('goto', [ $next ]),
-            $back => aop('increment', [ -1, $lastback ]),
+            $back => $self->dbprint("Unmatching $char\n"),
+                     aop('increment', [ -1, $lastback ]),
                      aop('goto', [ $lastback ]),
+                     @debugging,
             $next =>
                );
 
@@ -364,7 +374,8 @@ sub rewrite_alternate {
 
     my @ops;
     for my $i (0..$#args) {
-        push @ops, $tries[$i-1] unless $i == 0;
+        push @ops, $tries[$i-1] unless $i == 0; # Label for the try
+        push @ops, $self->dbprint("Trying alternative $i of 0..$#args\n");
         push @ops, @{ $iops[$i] };
         push @ops, aop('pushint', [ $i ]);
         push @ops, aop('goto', [ $next ]);
@@ -401,7 +412,7 @@ sub rewrite_alternate {
 
 sub rewrite_greedy_range {
     my ($self, $op, $R, $min, $max, $lastback) = @_;
-    $DB::single = 1;
+#    $DB::single = 1;
 
     my ($loop, $back, $check, $next) =
      map { $self->genlabel("gr_$_") } qw(loop back check next);
@@ -709,12 +720,12 @@ sub wrap {
     my $db_back = $self->genlabel($op->{name}."_back");
     my $db_start = $self->genlabel($op->{name}."_enter");
     return ( $db_back,
-                       $self->dbprint("-> $desc ENTER pos=%I1\n"),
+                       $self->dbprint("-> $desc ENTER pos=%?R_POS\n"),
                        aop('goto', [ $db_start ]),
-           $db_back => $self->dbprint("<- $desc BACK pos=%I1\n"),
+           $db_back => $self->dbprint("<- $desc BACK pos=%?R_POS\n"),
                        aop('goto', [ $back ]),
           $db_start => @ops,
-                       $self->dbprint(".. $desc NEXT pos=%I1\n"),
+                       $self->dbprint(".. $desc NEXT pos=%?R_POS\n"),
            );
 }
 
