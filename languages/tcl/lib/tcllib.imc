@@ -23,17 +23,20 @@ providing a compreg-compatible method.
 # expression codes - we use TCL_OK there, so move these out high enough
 # so there's no conflict.
 
-  .const int OP     = 20
-  .const int FUNC   = 21
+  .const int OP      = 20
+  .const int FUNC    = 21
+  # XXX Should be changed to OPERAND
   .const int INTEGER = 11
-  .const int FLOAT   = 12
-  .const int STRING  = 13
+ 
+  # Still not sure if these are going to be useful
   .const int BLOCK   = 14
   .const int CHUNK   = 15
   .const int COMMAND = 16
+
   .const int MAX_PRECEDENCE =  9
 
-# Constants for operator lookup.
+# Constants for operator/function lookup.
+
   .const int OPERATOR_BITAND = 30
   .const int OPERATOR_BITOR  = 31
   .const int OPERATOR_BITXOR = 32
@@ -50,63 +53,71 @@ providing a compreg-compatible method.
   .const int OPERATOR_SHL    = 43
   .const int OPERATOR_SHR    = 44
   .const int OPERATOR_UNEQUAL= 45
+  .const int FUNCTION_ATAN2  = 46
+  .const int FUNCTION_FMOD   = 47
+  .const int FUNCTION_POW    = 48
+  .const int OPERATOR_UMINUS = 49
+  .const int OPERATOR_UPLUS  = 50
+  .const int OPERATOR_BITNOT = 51
+  .const int OPERATOR_LOGNOT = 52
+  .const int FUNCTION_ABS    = 53
+  .const int FUNCTION_ACOS   = 54
+  .const int FUNCTION_ASIN   = 55
+  .const int FUNCTION_ATAN   = 56
+  .const int FUNCTION_COS    = 57
+  .const int FUNCTION_COSH   = 58
+  .const int FUNCTION_EXP    = 59
+  .const int FUNCTION_LOG    = 60
+  .const int FUNCTION_LOG10  = 61
+  .const int FUNCTION_ROUND  = 62
+  .const int FUNCTION_SIN    = 63
+  .const int FUNCTION_SINH   = 64
+  .const int FUNCTION_SQRT   = 65
+  .const int FUNCTION_TAN    = 66
+  .const int FUNCTION_TANH   = 67
+  .const int FUNCTION_RAND   = 68
 
 .namespace [ "_Tcl" ]
 
 .sub __prepare_lib @LOAD
 
   # Load any dependant libraries.
+  $P0 = loadlib "tclgroup"
   load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "runtime/parrot/library/Data/Escape.pbc"
+ 
+  .local int TclArray
+  TclArray = find_type "TclArray" # happy case.
 
-  .local string mode
-  .local string chunk
-  .local string contents
   .local pmc operators
   .local pmc math_funcs
   .local pmc precedence
-  .local Sub a_sub
-  .local int argc
-  .local int retcode
-  .local string retval
+
+  # XXX Should track how many args are needed for each of these.
 
   # Keep track of math functions
-  math_funcs = new PerlHash
+  math_funcs = new TclArray
 
-  a_sub = find_global "_Tcl", "__math_abs"
-  math_funcs["abs"] = a_sub
-  a_sub = find_global "_Tcl", "__math_acos"
-  math_funcs["acos"] = a_sub
-  a_sub = find_global "_Tcl", "__math_asin"
-  math_funcs["asin"] = a_sub
-  a_sub = find_global "_Tcl", "__math_atan"
-  math_funcs["atan"] = a_sub
-  a_sub = find_global "_Tcl", "__math_cos"
-  math_funcs["cos"] = a_sub
-  a_sub = find_global "_Tcl", "__math_cosh"
-  math_funcs["cosh"] = a_sub
-  a_sub = find_global "_Tcl", "__math_exp"
-  math_funcs["exp"] = a_sub
-  a_sub = find_global "_Tcl", "__math_log"
-  math_funcs["log"] = a_sub
-  a_sub = find_global "_Tcl", "__math_log10"
-  math_funcs["log10"] = a_sub
-  a_sub = find_global "_Tcl", "__math_sin"
-  math_funcs["sin"] = a_sub
-  a_sub = find_global "_Tcl", "__math_sinh"
-  math_funcs["sinh"] = a_sub
-  a_sub = find_global "_Tcl", "__math_sqrt"
-  math_funcs["sqrt"] = a_sub
-  a_sub = find_global "_Tcl", "__math_tan"
-  math_funcs["tan"] = a_sub
-  a_sub = find_global "_Tcl", "__math_tanh"
-  math_funcs["tanh"] = a_sub
+  math_funcs["abs"]   = FUNCTION_ABS
+  math_funcs["acos"]  = FUNCTION_ACOS
+  math_funcs["asin"]  = FUNCTION_ASIN
+  math_funcs["atan"]  = FUNCTION_ATAN
+  math_funcs["cos"]   = FUNCTION_COS
+  math_funcs["cosh"]  = FUNCTION_COSH
+  math_funcs["exp"]   = FUNCTION_EXP
+  math_funcs["log"]   = FUNCTION_LOG
+  math_funcs["log10"] = FUNCTION_LOG10
+  math_funcs["sin"]   = FUNCTION_SIN
+  math_funcs["sinh"]  = FUNCTION_SINH
+  math_funcs["sqrt"]  = FUNCTION_SQRT
+  math_funcs["tan"]   = FUNCTION_TAN
+  math_funcs["tanh"]  = FUNCTION_TANH
 
-  operators = new PerlHash
-  precedence = new PerlHash
+  operators = new TclArray
+  precedence = new TclArray
 
   # This precedence check should be shoved into [expr]. There's no need
-  # to make this generic. 
+  # to make it this generic. 
 
   operators["*"] = OPERATOR_MUL
   precedence["*"] = 1 
@@ -149,7 +160,7 @@ providing a compreg-compatible method.
   # (Presuming we don't do this from the .pmc definitions.)
 
   # XXX These go away when [proc] is a little smarter.
-  $P1 = new PerlHash
+  $P1 = new TclArray
   store_global "_Tcl", "proc_body", $P1
 
   # Global variable initialization
@@ -163,7 +174,7 @@ providing a compreg-compatible method.
   #store_lex 0, "tcl_version", $P0
  
   # Setup the default channelIds
-  $P1 = new PerlHash
+  $P1 = new TclArray
   $P2 = getstdin
   $P1["stdin"] = $P2
   $P2 = getstdout
@@ -224,7 +235,9 @@ __default_handler:
 # should probably move all this into another _template file.
 #
 
-  .include "languages/tcl/lib/backslash_newline_subst.imc"
+  .include "languages/tcl/lib/macros/is_space.imc"
+  .include "languages/tcl/lib/macros/boolean.imc"
+  .include "languages/tcl/lib/macros/match_close.imc"
   .include "languages/tcl/lib/commands/append.imc"
   .include "languages/tcl/lib/commands/array.imc"
   .include "languages/tcl/lib/commands/break.imc"
@@ -251,20 +264,6 @@ __default_handler:
   .include "languages/tcl/lib/commands/unset.imc"
   .include "languages/tcl/lib/commands/while.imc"
   .include "languages/tcl/lib/expression.imc"
-  .include "languages/tcl/lib/functions/abs.imc"
-  .include "languages/tcl/lib/functions/acos.imc"
-  .include "languages/tcl/lib/functions/asin.imc"
-  .include "languages/tcl/lib/functions/atan.imc"
-  .include "languages/tcl/lib/functions/cos.imc"
-  .include "languages/tcl/lib/functions/cosh.imc"
-  .include "languages/tcl/lib/functions/exp.imc"
-  .include "languages/tcl/lib/functions/log.imc"
-  .include "languages/tcl/lib/functions/log10.imc"
-  .include "languages/tcl/lib/functions/sin.imc"
-  .include "languages/tcl/lib/functions/sinh.imc"
-  .include "languages/tcl/lib/functions/sqrt.imc"
-  .include "languages/tcl/lib/functions/tan.imc"
-  .include "languages/tcl/lib/functions/tanh.imc"
   .include "languages/tcl/lib/get_var.imc"
   .include "languages/tcl/lib/interpret.imc"
   .include "languages/tcl/lib/match_close.imc"
