@@ -36,6 +36,20 @@ void mmd_fallback_multiply_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 void mmd_fallback_divide_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 void mmd_fallback_cmod_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 void mmd_fallback_mod_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_band_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_bor_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_bxor_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_bsl_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_bsr_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_concat_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_land_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_lor_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_lxor_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_repeat_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_streq_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_numeq_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_strcmp_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_numcmp_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 
 #endif
 

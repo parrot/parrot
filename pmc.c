@@ -183,7 +183,7 @@ void
 mmd_fallback_add_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     FLOATVAL result = (VTABLE_get_number(interp, left) +
-            VTABLE_get_number(interp, right));
+                       VTABLE_get_number(interp, right));
     VTABLE_set_number_native(interp, dest, result);
 
 }
@@ -193,7 +193,7 @@ mmd_fallback_subtract_pmc(Parrot_Interp interp,
         PMC *left, PMC *right, PMC *dest)
 {
     FLOATVAL result = (VTABLE_get_number(interp, left) -
-            VTABLE_get_number(interp, right));
+                       VTABLE_get_number(interp, right));
     VTABLE_set_number_native(interp, dest, result);
 
 }
@@ -203,14 +203,14 @@ mmd_fallback_multiply_pmc(Parrot_Interp interp,
         PMC *left, PMC *right, PMC *dest)
 {
     FLOATVAL result = (VTABLE_get_number(interp, left) *
-            VTABLE_get_number(interp, right));
+                       VTABLE_get_number(interp, right));
     VTABLE_set_number_native(interp, dest, result);
 }
 
 void
 mmd_fallback_divide_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest) {
     FLOATVAL result = (VTABLE_get_number(interp, left) /
-            VTABLE_get_number(interp, right));
+                       VTABLE_get_number(interp, right));
     VTABLE_set_number_native(interp, dest, result);
 
 }
@@ -219,17 +219,141 @@ void
 mmd_fallback_cmod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_number_native(interp, dest,
-            VTABLE_get_integer(interp, left) %
-            VTABLE_get_integer(interp, right));
+                             VTABLE_get_integer(interp, left) %
+                             VTABLE_get_integer(interp, right));
 }
 
 void
 mmd_fallback_mod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     FLOATVAL result = floatval_mod(VTABLE_get_number(interp, left),
-            VTABLE_get_number(interp, right));
+                                   VTABLE_get_number(interp, right));
     VTABLE_set_number_native(interp, dest, result);
 }
+
+void
+mmd_fallback_band_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) &
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_bor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) |
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_bxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) ^
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_bsl_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) <<
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_bsr_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) >>
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_concat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    STRING *left_str, *right_str, *total_string;
+    left_str = VTABLE_get_string(interp, left);
+    right_str = VTABLE_get_string(interp, right);
+    total_string = string_concat(interp, left_str, right_str, 0);
+    VTABLE_set_string_native(interp, dest, total_string);
+
+}
+
+void
+mmd_fallback_land_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) >>
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_lor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) >>
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_lxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) >>
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) >>
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_numeq_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) >>
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) >>
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    FLOATVAL left_float, right_float;
+    left_float = VTABLE_get_number(interp, left);
+    right_float = VTABLE_get_number(interp, right);
+
+    INTVAL cmp_val;
+
+
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) >>
+                              VTABLE_get_integer(interp, right));
+}
+
+void
+mmd_fallback_strcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) >>
+                              VTABLE_get_integer(interp, right));
+}
+
+
 
 /*
  * Local variables:
