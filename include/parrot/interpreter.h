@@ -100,6 +100,9 @@ typedef struct RunProfile {
     ProfData *data;
 } RunProfile;
 
+/* Forward decl for imc_info_t */
+struct _imc_info_t;
+
 typedef struct Parrot_Context {
     struct IRegChunk *int_reg_top;    /* Current top chunk of int reg stack */
     struct NRegChunk *num_reg_top;    /* Current top chunk of the float reg
@@ -164,7 +167,7 @@ typedef struct Parrot_Interp {
      * in the byte_code_segment, that is currently executed */
     void **prederef_code;       /* The predereferenced code */
     void *jit_info;             /* JITs data */
-    void *imcc_info;            /* imcc data */
+    struct _imc_info_t *imc_info;   /* imcc data */
     size_t current_line;        /* Which line we're executing in the
                                  * source */
     String *current_file;       /* The file we're currently in */
