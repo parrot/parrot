@@ -18,10 +18,22 @@ void
 save_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
     memcpy(ctx, &interp->ctx, sizeof(*ctx));
+}
+
+void
+cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
+{
+    memcpy(ctx, &interp->ctx, sizeof(*ctx));
     stack_mark_cow(ctx->pad_stack);
     stack_mark_cow(ctx->user_stack);
     stack_mark_cow(ctx->control_stack);
-    buffer_mark_COW(interp->ctx.warns);
+    buffer_mark_COW(ctx->warns);
+}
+
+void
+restore_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
+{
+    memcpy(&interp->ctx, ctx, sizeof(*ctx));
 }
 
 static void coro_error(Stack_Entry_t *e)
@@ -183,12 +195,6 @@ swap_context(struct Parrot_Interp *interp, struct PMC *sub)
 #endif
 }
 
-void
-restore_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
-{
-    memcpy(&interp->ctx, ctx, sizeof(*ctx));
-}
-
 struct Parrot_Sub *
 new_sub(struct Parrot_Interp *interp, size_t size)
 {
@@ -217,6 +223,14 @@ new_closure(struct Parrot_Interp *interp)
 
 struct Parrot_Sub *
 new_continuation(struct Parrot_Interp *interp)
+{
+    struct Parrot_Sub *cc = new_sub(interp, sizeof(struct Parrot_Sub));
+    cow_copy_context(interp, &cc->ctx);
+    return cc;
+}
+
+struct Parrot_Sub *
+new_ret_continuation(struct Parrot_Interp *interp)
 {
     struct Parrot_Sub *cc = new_sub(interp, sizeof(struct Parrot_Sub));
     save_context(interp, &cc->ctx);
@@ -256,9 +270,9 @@ new_coroutine(struct Parrot_Interp *interp)
 
 
 PMC *
-new_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)
+new_ret_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)
 {
-    PMC* continuation = pmc_new(interp, enum_class_Continuation);
+    PMC* continuation = pmc_new(interp, enum_class_RetContinuation);
     continuation->cache.struct_val = address;
     return continuation;
 }

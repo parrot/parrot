@@ -41,9 +41,9 @@ output_is(<<'CODE', <<'OUT', "tail recursive sub");
     .local int product
     product = 1
     .local Sub sub
-    .local Continuation cc
+    .local RetContinuation cc
     newsub sub, .Sub, _fact
-    newsub cc, .Continuation, ret
+    newsub cc, .RetContinuation, ret
    .pcc_begin prototyped
    .arg product
    .arg count
@@ -656,7 +656,7 @@ output_is(<<'CODE', <<'OUT', "sub calling another");
     newsub $P1, .Sub, _sub1       # (genFunction:378)
     store_lex -1, 'f', $P1        # (genFunction:380)
     find_lex $P5, 'f'             # (callingExpression:325)
-    newsub $P6, .Continuation, ret1# (callingExpression:331)
+    newsub $P6, .RetContinuation, ret1# (callingExpression:331)
     .pcc_begin non_prototyped     # (callingExpression:332)
     .pcc_call $P5, $P6            # (callingExpression:335)
 ret1:

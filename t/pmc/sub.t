@@ -5,7 +5,7 @@ use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
     print "main\n"
-    newsub .Sub, .Continuation, _func, _ret
+    newsub .Sub, .RetContinuation, _func, _ret
     invoke
 _ret:
     print "back\n"
@@ -295,7 +295,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "sub calling a sub");
     print "main\n"
-    newsub .Sub, .Continuation, _func1, ret1
+    newsub .Sub, .RetContinuation, _func1, ret1
     invoke
 ret1:
     print "back\n"
@@ -304,7 +304,7 @@ ret1:
 _func1:
     print "func1\n"
     pushbottomp
-    newsub .Sub, .Continuation, _func2, ret2
+    newsub .Sub, .RetContinuation, _func2, ret2
     invoke
 ret2:
     popbottomp
@@ -333,7 +333,7 @@ lp:
     save I16
     inc I16
     le I16, I17, lp
-    newsub .Sub, .Continuation, _func, ret
+    newsub .Continuation, .RetContinuation, _func, ret
     pushbottomi
     invoke
     popbottomi
@@ -374,7 +374,7 @@ output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
     new P0, .PerlUndef
     set I0, P0
     printerr "main:"
-    newsub .Sub, .Continuation, _func, _ret
+    newsub .Sub, .RetContinuation, _func, _ret
     invoke
 _ret:
     printerr ":back"
@@ -392,12 +392,12 @@ OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2");
     warningson 1
-    newsub .Sub, .Continuation, _func, _ret
+    newsub .Sub, .RetContinuation, _func, ret
     new P10, .PerlUndef
     set I0, P10
     printerr ":main"
     invoke
-_ret:
+ret:
     printerr ":back:"
     new P10, .PerlUndef
     set I0, P10
@@ -413,8 +413,8 @@ CODE
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2 - updatecc");
-    # the Continuation in PMC is created with warnings off
-    newsub .Sub, .Continuation, _func, _ret
+    # the RetContinuation in P1 is created with warnings off
+    newsub .Sub, .RetContinuation, _func, ret
     # turn warnings on in main
     warningson 1
     new P10, .PerlUndef
@@ -423,7 +423,7 @@ output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2 - updatecc");
     # update the state of the return continuation
     updatecc
     invoke
-_ret:
+ret:
     printerr ":back:"
     new P10, .PerlUndef
     set I0, P10

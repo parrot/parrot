@@ -49,13 +49,14 @@ struct Parrot_Sub * new_sub(struct Parrot_Interp * interp, size_t);
 struct Parrot_Sub * new_closure(struct Parrot_Interp * interp);
 struct Parrot_Sub * new_coroutine(struct Parrot_Interp * interp);
 struct Parrot_Sub * new_continuation(struct Parrot_Interp * interp);
+struct Parrot_Sub * new_ret_continuation(struct Parrot_Interp * interp);
 
-PMC * new_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address);
+PMC * new_ret_continuation_pmc(struct Parrot_Interp *, opcode_t * address);
 
-void save_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx);
-void swap_context(struct Parrot_Interp * , PMC *);
-void restore_context(struct Parrot_Interp * interp,
-                     struct Parrot_Context * ctx);
+void save_context(struct Parrot_Interp *, struct Parrot_Context *);
+void cow_copy_context(struct Parrot_Interp* , struct Parrot_Context *);
+void swap_context(struct Parrot_Interp *, PMC *);
+void restore_context(struct Parrot_Interp *, struct Parrot_Context *);
 
 PMC * scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth);
 

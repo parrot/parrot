@@ -15,17 +15,21 @@ F<docs/pdds/pdd03_calling_conventions.pod>.
       Continuation
 	Coroutine
       Eval
+      RetContinuation
 
 =head2 Items in the Subs Context
 
   Subtype	Controlstack	PadStack   UserStack  Warnings
   ------------------------------------------------------------
-  Sub                -             -           -         X
-  Closure            -             X           -         X
-  Continuation       X             X           X         X
-  Coroutine          X             X           X         X
+  Sub                -             -           -         C
+  Closure            -             C           -         C
+  Continuation       C             C           C         C
+  Coroutine          C             C           C         C
+  RetContinuation    X             X           X         X
 
-"X" ... is in context, "-" ... isn't.
+  "C" ... COWed copy is in context
+  "X" ... is in context
+  "-" ... isn't.
 
 =head1 SYNOPSIS
 
@@ -43,7 +47,7 @@ This can be done with one opcode:
 
 Create a subroutine (in P0) and a return continuation (in P1):
 
-  newsub .Sub, .Continuation, _sub_label, ret_label
+  newsub .Sub, .RetContinuation, _sub_label, ret_label
 
 =head2 Invocation i.e. calling the sub
 
@@ -72,7 +76,7 @@ If a subroutine is called several times, for instance inside a loop,
 the creation of the return continuation can be done outside the loop if
 performance is an issue:
 
-    newsub .Sub, .Continuation, _sub_label, ret_label
+    newsub .Sub, .RetContinuation, _sub_label, ret_label
     set I16, 1000000
     set I17, 0
   lp:
@@ -92,7 +96,7 @@ the subroutine/return continuation and its invocation, the C<updatecc>
 opcode should be used, so that the state of the return continuation
 matches that of the interpreter:
 
-    newsub .Sub, .Continuation, _sub_label, ret_label
+    newsub .Sub, .RetContinuation, _sub_label, ret_label
     ...
     warningson 1
     ...

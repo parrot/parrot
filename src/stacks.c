@@ -90,10 +90,6 @@ chunk_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top, int depth)
     Stack_Chunk_t *new_top = NULL;
     Stack_Chunk_t *last = NULL;
     do {
-        /* XXX intermediate hack to speed up return continuation,
-         * the chunk would need a refcount to be sure
-         */
-        PObj_COW_CLEAR( (Buffer *) old_chunk);
         new_chunk = new_bufferlike_header(interp, sizeof(Stack_Chunk_t));
         if (new_top == NULL) {
             new_top = new_chunk;
