@@ -23,28 +23,17 @@ EOF
 my $decls;
 for (vtbl_enumerate(%vtbl)) {
     my $proto = $_->[2];
-    my $howmany = $_->[3];
-    for my $i (1..$howmany) {
-        my $thisproto = $proto;
-        # I am Jack's crufty code
-        $thisproto =~ s[(\S+) (\S+)]
-                       ["$1 Parrot_${classname}_$2".($howmany > 1 ? "_$i":"")]e;
-        print "static $thisproto {\n";
-        print "}\n\n";
-    }
-    if ($howmany > 1) {
-        my $name = $_->[1];
-        $decls .= "$_->[0] Parrot_${classname}_${name}_array[] = ";
-        $decls .= "{\n";
-        $decls .= "\tParrot_${classname}_${name}_$_,\n" for 1..$howmany;
-        $decls .= "};\n";
-    }
+    my $thisproto = $proto;
+    # I am Jack's crufty code
+    $thisproto =~ s[(\S+) (\S+)]
+                   [$1 Parrot_${classname}_$2];
+    print "static $thisproto {\n";
+    print "}\n\n";
 }
 
 print "void Parrot_${classname}_init (void) {\n";
 #print $decls;
 
-# I am Jack's contorted attempt at portability
 print <<EOF;
     struct _vtable temp_base_vtable = {
         NULL,
@@ -57,14 +46,7 @@ print <<EOF;
 EOF
     
 for (vtbl_enumerate(%vtbl)) {
-    if ($_->[3] > 1) {
-        print "\t\t{\n";
-        my $name = $_->[1];
-        print "\t\t\tParrot_${classname}_${name}_$_,\n" for 1..$_->[3];
-        print "\t\t},\n";
-    } else {
-        print "\t\tParrot_${classname}_$_->[1],\n";
-    }
+    print "\t\tParrot_${classname}_$_->[1],\n";
 }
 print "\t};\n";
 print "\tParrot_base_vtables[enum_class_$classname] = temp_base_vtable;\n";
