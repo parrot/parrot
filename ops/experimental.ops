@@ -124,6 +124,72 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
 
 ###############################################################################
 
+=head2 random number operations
+
+Implementations of various random number operations
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<rand>(out NUM, in NUM)
+
+=item B<rand>(out NUM)
+
+=item B<rand>(out INT, in INT)
+
+=item B<rand>(out INT)
+
+=item B<srand>(in NUM)
+
+Generate random numbers based on the Random PMC.
+
+=cut
+
+inline op rand(out NUM, in NUM) {
+  FLOATVAL n = $2;
+  PMC * r = pmc_new_noinit(interpreter, enum_class_Random);
+  $1 = VTABLE_get_number(interpreter,r);
+  $1 *= $2;
+  goto NEXT();
+}
+
+inline op rand(out INT, in INT) {
+  INTVAL n = $2;
+  PMC * r = pmc_new_noinit(interpreter, enum_class_Random);
+  FLOATVAL resultnum;
+  resultnum = VTABLE_get_number(interpreter,r);
+  $1 = (INTVAL)(resultnum * (FLOATVAL)n);
+  goto NEXT();
+}
+
+inline op rand(out NUM) {
+  PMC * r = pmc_new_noinit(interpreter, enum_class_Random);
+  $1 = VTABLE_get_number(interpreter,r);
+  goto NEXT();
+}
+
+inline op rand(out INT) {
+  PMC *r = pmc_new_noinit(interpreter, enum_class_Random);
+  $1 = VTABLE_get_integer(interpreter,r);
+  goto NEXT();
+}
+
+inline op srand(in INT) {
+  INTVAL i = $1;
+  PMC * r = pmc_new_noinit(interpreter, enum_class_Random);
+  VTABLE_set_integer_native(interpreter,r,i);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
