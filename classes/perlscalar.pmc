@@ -91,6 +91,9 @@ according to the type of C<*value>.
             case enum_class_PerlUndef:
                 (void) VTABLE_get_pmc(interpreter, value);
                 break;
+            default:
+                DYNSELF.set_pmc(value);
+                break;
         }
     }
 

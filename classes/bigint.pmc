@@ -62,6 +62,10 @@ bigint_get_self(Interp *interpreter, PMC *self) {
     return PMC_struct_val(self);
 }
 
+static void
+bigint_set_self(Interp *interpreter, PMC *self, BIGNUM *value) {
+    mpz_set(BN(self), value);
+}
 static long
 bigint_get_long(Interp *interpreter, PMC *self) {
     if (mpz_fits_slong_p(BN(self)))
@@ -116,6 +120,12 @@ bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
     /* this is mpz_fdiv_q */
     mpz_div(BN(dest), BN(self), BN(value));
 }
+static void
+bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_mod(BN(dest), BN(self), BN(value));
+}
 
 static void
 bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
@@ -159,6 +169,11 @@ bigint_set_double(Interp *interpreter, PMC *self, double value) {
 static void
 bigint_set_str(Interp *interpreter, PMC *self, char* value) {
     internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_set_self(Interp *interpreter, PMC *self, BIGNUM *value) {
+    internal_exception(1, "no bigint lib loaded");
+    return NULL;
 }
 static BIGNUM*
 bigint_get_self(Interp *interpreter, PMC *self) {
@@ -205,6 +220,11 @@ bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
 }
 static void
 bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
     internal_exception(1, "no bigint lib loaded");
 }
@@ -304,7 +324,7 @@ Sets the value of the integer to the integer value of C<*value>.
 */
 
     void set_pmc(PMC *value) {
-        PMC_struct_val(SELF) = VTABLE_get_bignum(INTERP, value);
+        bigint_set_self(INTERP, SELF, bigint_get_self(INTERP, value));
     }
 
 /*
@@ -421,7 +441,7 @@ MMD_DEFAULT: {
         bigint_add_bigint_int(INTERP, SELF, value, dest);
     }
 
-    void mul(PMC* value, PMC* dest) {
+    void multiply(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_mul_bigint(INTERP, SELF, value, dest);
             }
@@ -431,13 +451,46 @@ MMD_DEFAULT: {
 
     }
 
-    void mul_int(INTVAL value, PMC* dest) {
+    void multiply_int(INTVAL value, PMC* dest) {
         bigint_mul_bigint_int(INTERP, SELF, value, dest);
     }
 
-    void div(PMC* value, PMC* dest) {
+    void divide(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_div_bigint(INTERP, SELF, value, dest);
+                if (mpz_fits_slong_p(BN(dest))) {
+                    VTABLE_morph(INTERP, dest, enum_class_PerlInt);
+                    VTABLE_set_integer_native(INTERP, dest,
+                         mpz_get_si(BN(dest)));
+                }
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp");
+             }
+
+    }
+    void modulus(PMC* value, PMC* dest) {
+MMD_BigInt: {
+                bigint_mod_bigint(INTERP, SELF, value, dest);
+                if (mpz_fits_slong_p(BN(dest))) {
+                    VTABLE_morph(INTERP, dest, enum_class_PerlInt);
+                    VTABLE_set_integer_native(INTERP, dest,
+                         mpz_get_si(BN(dest)));
+                }
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp");
+             }
+
+    }
+    void cmodulus(PMC* value, PMC* dest) {
+MMD_BigInt: {
+                bigint_mod_bigint(INTERP, SELF, value, dest);
+                if (mpz_fits_slong_p(BN(dest))) {
+                    VTABLE_morph(INTERP, dest, enum_class_PerlInt);
+                    VTABLE_set_integer_native(INTERP, dest,
+                         mpz_get_si(BN(dest)));
+                }
             }
 MMD_DEFAULT: {
                  internal_exception(1, "unimp");
@@ -445,7 +498,8 @@ MMD_DEFAULT: {
 
     }
 
-    void div_int(INTVAL value, PMC* dest) {
+
+    void divide_int(INTVAL value, PMC* dest) {
         bigint_div_bigint_int(INTERP, SELF, value, dest);
     }
 

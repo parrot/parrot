@@ -378,6 +378,9 @@ EOC
 	if ($tos->[2] eq 'P' && $tos->[1] =~ /^\$/) {
 	    $pmc = $tos->[1];
 	}
+	elsif ($builtins{$tos->[1]}) {
+	    $pmc = $tos->[1];
+	}
 	else {
 	    print <<"EOC";
 	$c = new $DEFVAR \t# case 1
@@ -393,6 +396,13 @@ EOC
     }
     $globals{$c} = 1;
     $names{$c} = 1;
+    if ($builtins{$pmc}) {
+	print <<"EOC";
+	global "$c" = $pmc \t# case 2b
+	$c = $pmc
+EOC
+	return;
+    }
     # a temp - store it
     if ($pmc =~ /^\$/) {
 	print <<"EOC";

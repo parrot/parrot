@@ -56,6 +56,11 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
                         mem_sys_free(escaped);
                 }
             }
+            else if (pmc->vtable->base_type == enum_class_BigInt) {
+                STRING *s = VTABLE_get_string(interpreter, pmc);
+                    PIO_eprintf(interpreter, "BigInt=PMC(%#p: %Ss",
+                            pmc, s);
+            }
             else if (pmc->vtable->base_type == enum_class_Complex) {
                 STRING *s = VTABLE_get_string(interpreter, pmc);
                     PIO_eprintf(interpreter, "Complex=PMC(%#p: (%Ss)",
