@@ -1,4 +1,5 @@
 config.h
+feature.h
 has_header.h
 vtable.h
 platform.h
