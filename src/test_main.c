@@ -1,14 +1,23 @@
-/* test_main.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     A sample test program (and the main function of Parrot)
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/test_main.c - A sample test program
+
+=head1 DESCRIPTION
+
+THIS FILE IS NO LONGER USED.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 #include "parrot/embed.h"
 #include "parrot/longopt.h"
 #include <stdio.h>
@@ -45,6 +54,17 @@ static void usage(void);
 
 static void version(void);
 
+/*
+
+=item C<int
+main(int argc, char *argv[])>
+
+Loads the file and runs the code.
+
+=cut
+
+*/
+
 int
 main(int argc, char *argv[])
 {
@@ -75,6 +95,17 @@ main(int argc, char *argv[])
     Parrot_exit(0);
     return 0;
 }
+
+/*
+
+=item C<char *
+parseflags(Parrot_Interp interpreter, int *argc, char **argv[])>
+
+Parses the command-line.
+
+=cut
+
+*/
 
 char *
 parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
@@ -166,6 +197,17 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
     }
 }
 
+/*
+
+=item C<static void
+usage(void)>
+
+Returns the user help.
+
+=cut
+
+*/
+
 static void
 usage(void)
 {
@@ -199,6 +241,17 @@ usage(void)
     Parrot_exit(0);
 }
 
+/*
+
+=item C<static void
+version(void)>
+
+Returns the version information.
+
+=cut
+
+*/
+
 static void
 version(void)
 {
@@ -217,6 +270,23 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 
     Parrot_exit(0);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<imcc/main.c>.
+
+=head1 HISTORY
+
+This file used to be the C<parrot> executable, but F<imcc/main.c>
+performs that role.
+
+=cut
+
+*/
 
 /*
  * Local variables:

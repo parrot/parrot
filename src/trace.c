@@ -1,22 +1,40 @@
-/* trace.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Tracing support for runops_cores.c.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/trace.c - Tracing
+
+=head1 DESCRIPTION
+
+Tracing support for the C<runops_slow_core()> function in F<src/runops_cores.c>.
+
+This is turned on with Parrot's C<-t> option.
+
+src/test_main.c
+
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/trace.h"
 
-
 /*
- *=for api interpreter trace_pmc_dump
- * Prints a PMC to stderr
- */
+
+=item C<void
+trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)>
+
+Prints a PMC to C<stderr>.
+
+=cut
+
+*/
 
 void
 trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
@@ -48,9 +66,15 @@ trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
 }
 
 /*
- *=for api interpreter trace_key_dump
- * Prints a key to stderr.
- */
+
+=item C<void
+trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)>
+
+Prints a key to C<stderr>.
+
+=cut
+
+*/
 
 void
 trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
@@ -111,10 +135,19 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
 }
 
 /*
- *=for api interpreter trace_op_dump
- * TODO: This isn't really part of the API, but here's its documentation.
- * Prints the PC, OP and ARGS. Used by trace_op
- */
+
+=item C<void
+trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
+              opcode_t *pc)>
+
+TODO: This isn't really part of the API, but here's its documentation.
+
+Prints the PC, OP and ARGS. Used by C<trace_op()>.
+
+=cut
+
+*/
+
 void
 trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
               opcode_t *pc)
@@ -221,15 +254,21 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
     PIO_eprintf(interpreter, "\n");
 }
 
-
-
 /*
- *=for api interpreter trace_op
- * TODO: This isn't really part of the API, but here's its documentation.
- * Prints the PC, OP and ARGS. Used by runops_trace.
- *
- * With bounds checking.
- */
+
+=item C<void
+trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
+         opcode_t *code_end, opcode_t *pc)>
+
+TODO: This isn't really part of the API, but here's its documentation.
+
+Prints the PC, OP and ARGS. Used by C<runops_trace()>. With bounds
+checking.
+
+=cut
+
+*/
+
 void
 trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
          opcode_t *code_end, opcode_t *pc)
@@ -250,6 +289,17 @@ trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
     PIO_flush(interpreter, PIO_STDERR(interpreter));
 }
 
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/trace.h>
+
+=cut
+
+*/
 
 /*
  * Local variables:

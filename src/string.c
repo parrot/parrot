@@ -1,23 +1,29 @@
-/* string.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     This is the api definitions for the string subsystem
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *
- *  ********************************************************
- *  bufstart and buflen are used by the memory subsystem
- *  The string functions may only use buflen to determine,
- *  if there is some space left beyond bufused. This is the
- *  *only* valid usage of these two data members, beside
- *  setting bufstart/buflen for external strings.
- *  ********************************************************
- *
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/string.c - Parrot Strings
+
+=head1 DESCRIPTION
+
+This is the API definitions for the string subsystem
+
+Note:
+
+C<bufstart> and C<buflen> are used by the memory subsystem The string
+functions may only use C<buflen> to determine, if there is some space
+left beyond C<bufused>. This is the I<only> valid usage of these two
+data members, beside setting C<bufstart>/C<buflen> for external strings.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
@@ -45,13 +51,23 @@ static const CHARTYPE *string_unicode_type;
 
 #define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
-/* String COW support */
+/* 
 
-/* make a copy of string's data:
- * copy used string data from strstart to a newly
- * allocated string
- * the header stays the same
- */
+=back
+
+=head2 String COW support
+
+=over 4
+
+=item C<static void
+unmake_COW(struct Parrot_Interp *interpreter, STRING *s)>
+
+If C<*s> is COW then the memory is copied over and the COW flag is
+cleared.
+
+=cut
+
+*/
 
 static void
 unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
@@ -85,6 +101,17 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
     }
 }
 
+/*
+
+=item C<static void copy_string_header(struct Parrot_Interp *interpreter,
+                               String *dest, String *src)>
+
+Copies the string header from C<*src> to C<*dest>.
+
+=cut
+
+*/
+
 static void copy_string_header(struct Parrot_Interp *interpreter,
                                String *dest, String *src)
 {
@@ -98,9 +125,18 @@ static void copy_string_header(struct Parrot_Interp *interpreter,
 #endif
 }
 
-/* clone a string header without allocating a new buffer
- * i.e. create a 'copy-on-write' string
- */
+/*
+
+=item C<static STRING *
+make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)>
+
+Creates a COW string by cloning a string header without allocating a new
+buffer.
+
+=cut
+
+*/
+
 static STRING *
 make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
 {
@@ -120,6 +156,18 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
     return d;
 }
 
+/*
+
+=item C<static void
+make_COW_reference_from_header(struct Parrot_Interp *interpreter,
+        STRING *s, STRING *d)>
+
+Makes C<*d> a COW reference to C<*s>.
+
+=cut
+
+*/
+
 static void
 make_COW_reference_from_header(struct Parrot_Interp *interpreter,
         STRING *s, STRING *d) {
@@ -134,9 +182,17 @@ make_COW_reference_from_header(struct Parrot_Interp *interpreter,
     }
 }
 
-/*=for api string string_set
- * set the contents of dest to the contents of src
- */
+/*
+
+=item C<STRING *
+string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)>
+
+Set the contents of C<*dest> to the contents of C<*src>.
+
+=cut
+
+*/
+
 STRING *
 string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
 {
@@ -156,12 +212,25 @@ string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
     return dest;
 }
 
+/*
 
-/* Basic string stuff - creation, enlargement, etc. */
+=back
 
-/*=for api string string_init
- * set up the native string vtable
- */
+=head2 Basic String Functions
+
+Creation, enlargement, etc.
+
+=over 4
+
+=item C<void
+string_init(void)>
+
+Initializes the Parrot string subsystem.
+
+=cut
+
+*/
+
 void
 string_init(void)
 {
@@ -171,9 +240,18 @@ string_init(void)
     string_unicode_type = chartype_lookup("unicode");
 }
 
-/*=for api string string_append
- * Take in two strings and append the second string to the first
- */
+/*
+
+=item C<STRING *
+string_append(struct Parrot_Interp *interpreter, STRING *a,
+              STRING *b, UINTVAL Uflags)>
+
+Take in two strings and append the second string to the first.
+
+=cut
+
+*/
+
 STRING *
 string_append(struct Parrot_Interp *interpreter, STRING *a,
               STRING *b, UINTVAL Uflags)
@@ -217,9 +295,19 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
     return string_copy(interpreter, b);
 }
 
-/*=for api string string_from_cstring
- * Make a String from a passed in C string
- */
+/*
+
+=item C<
+STRING *
+string_from_cstring(struct Parrot_Interp *interpreter, const void *buffer,
+                     UINTVAL len)>
+
+Make a C<STRING *> from a passed in C string.
+
+=cut
+
+*/
+
 STRING *
 string_from_cstring(struct Parrot_Interp *interpreter, const void *buffer,
                      UINTVAL len) {
@@ -228,10 +316,20 @@ string_from_cstring(struct Parrot_Interp *interpreter, const void *buffer,
                        NULL, 0, NULL);
 }
 
-/*=for api string string_make
- * allocate memory for the string, copy information into it
- * and compute its string length
- */
+/*
+
+=item C<STRING *
+string_make(struct Parrot_Interp *interpreter, const void *buffer,
+            UINTVAL len, const ENCODING *encoding, UINTVAL flags,
+            const CHARTYPE *type)>
+
+Allocate memory for the string, copy information into it and compute its
+string length.
+
+=cut
+
+*/
+
 STRING *
 string_make(struct Parrot_Interp *interpreter, const void *buffer,
             UINTVAL len, const ENCODING *encoding, UINTVAL flags,
@@ -286,9 +384,17 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     return s;
 }
 
-/*=for api string string_grow
- * grow the string buffer by addlen bytes
- */
+/*
+
+=item C<STRING *
+string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen)>
+
+Grow the string buffer by C<addlen> bytes.
+
+=cut
+
+*/
+
 STRING *
 string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
     unmake_COW(interpreter,s);
@@ -299,23 +405,44 @@ string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
     return s;
 }
 
-/* Ordinary user-visible string operations */
+/*
 
-/*=for api string string_length
- * Return the length of the string (in characters)
- */
+=back
+
+=head2 Ordinary user-visible string operations
+
+=over 4
+
+=item C<UINTVAL
+string_length(const STRING *s)>
+
+Return the length of the string (in characters).
+
+=cut
+
+*/
+
 UINTVAL
 string_length(const STRING *s)
 {
     return s ? s->strlen : 0;
 }
 
-/*=for api string string_index
- * return the character (or glyph, depending upon the string's encoding)
- * This is to abstract the process of finding the Nth character in a (possibly
- * unicode or JIS-encoded) string, the idea being that once the encoding
- * functions are fleshed out, this function can DTRT.
- */
+/*
+
+=item C<INTVAL
+string_index(const STRING *s, UINTVAL idx)>
+
+Return the character (or glyph, depending upon the string's encoding)
+This is to abstract the process of finding the Nth character in a
+(possibly unicode or JIS-encoded) string, the idea being that once the
+encoding functions are fleshed out, this function can do the right
+thing.
+
+=cut
+
+*/
+
 INTVAL
 string_index(const STRING *s, UINTVAL idx)
 {
@@ -331,10 +458,19 @@ string_index(const STRING *s, UINTVAL idx)
     }
 }
 
-/* string_str_index_multibyte:  Helper function for string_str_index.
- * This implements a naive substring search, but one that is guaranteed to
- * work for all encodings.
- */
+/*
+
+=item C<static INTVAL
+string_str_index_multibyte(struct Parrot_Interp *interpreter,
+        const STRING *str, const STRING *find, UINTVAL start)>
+
+Helper function for C<string_str_index()>. This implements a naive
+substring search, but one that is guaranteed to work for all encodings.
+
+=cut
+
+*/
+
 static INTVAL
 string_str_index_multibyte(struct Parrot_Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)
@@ -373,11 +509,20 @@ string_str_index_multibyte(struct Parrot_Interp *interpreter,
     return -1;
 }
 
-/* string_str_index_singlebyte: Helper function for string_str_index.
- * This is optimized for the simple case where both strings are in
- * encoding_singlebyte.  It implements the Boyer-Moore string search
- * algorithm.
- */
+/*
+
+=item C<static INTVAL
+string_str_index_singlebyte(struct Parrot_Interp *interpreter,
+        const STRING *str, const STRING *find, UINTVAL start)>
+
+Helper function for C<string_str_index()>. This is optimized for the
+simple case where both strings are in C<encoding_singlebyte>.  It
+implements the Boyer-Moore string search algorithm.
+
+=cut
+
+*/
+
 static INTVAL
 string_str_index_singlebyte(struct Parrot_Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)
@@ -432,11 +577,20 @@ string_str_index_singlebyte(struct Parrot_Interp *interpreter,
     return -1;
 }
 
-/*=for api string string_str_index
- * Return the character position of s2 in s at or after start.
- * The return value is a (0 based) offset in characters, not bytes.
- * If s2 is not found, then return -1
- */
+/*
+
+=item C<INTVAL
+string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
+        const STRING *s2, UINTVAL start)>
+
+Return the character position of C<*s2> in C<*s> at or after C<start>.
+The return value is a (0 based) offset in characters, not bytes. If
+C<*s2> is not found, then return -1.
+
+=cut
+
+*/
+
 INTVAL
 string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
         const STRING *s2, UINTVAL start)
@@ -465,12 +619,18 @@ string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
     }
 }
 
+/*
 
+=item C<INTVAL
+string_ord(const STRING *s, INTVAL idx)>
 
-/*=for api string string_ord
- * Return the codepoint at a given index into a string. Negative
- * indexes are treated as counting from the end of the string.
- */
+Return the codepoint at a given index into a string. Negative indexes
+are treated as counting from the end of the string.
+
+=cut
+
+*/
+
 INTVAL
 string_ord(const STRING *s, INTVAL idx)
 {
@@ -508,18 +668,36 @@ string_ord(const STRING *s, INTVAL idx)
     return -1;
 }
 
-/*=for api string string_copy
- * create a copy of the argument passed in
- */
+/*
+
+=item C<STRING *
+string_copy(struct Parrot_Interp *interpreter, STRING *s)>
+
+create a copy of the argument passed in.
+
+=cut
+
+*/
+
 STRING *
 string_copy(struct Parrot_Interp *interpreter, STRING *s)
 {
     return make_COW_reference(interpreter, s);
 }
 
-/*=for api string string_transcode
- * create a transcoded copy of the argument passed in
- */
+/*
+
+=item C<STRING *
+string_transcode(struct Parrot_Interp *interpreter,
+                 STRING *src, const ENCODING *encoding,
+                 const CHARTYPE *type, STRING **dest_ptr)>
+
+Create a transcoded copy of the argument passed in.
+
+=cut
+
+*/
+
 STRING *
 string_transcode(struct Parrot_Interp *interpreter,
                  STRING *src, const ENCODING *encoding,
@@ -591,11 +769,23 @@ string_transcode(struct Parrot_Interp *interpreter,
     return dest;
 }
 
-/* vtable despatch functions */
+/*
 
-/*=for api string string_compute_strlen
- * calculate the length (in characters) of the string
- */
+=back
+
+=head2 Vtable Despatch Functions
+
+=over 4
+
+=item C<INTVAL
+string_compute_strlen(STRING *s)>
+
+Calculate the length (in characters) of the string.
+
+=cut
+
+*/
+
 INTVAL
 string_compute_strlen(STRING *s)
 {
@@ -603,22 +793,39 @@ string_compute_strlen(STRING *s)
     return s->strlen;
 }
 
-/*=for api string string_max_bytes
- * returns the number of bytes required to safely contain
- * nchars characters in the string's encoding
- */
+/*
+
+=item C<INTVAL
+string_max_bytes(STRING *s, INTVAL nchars)>
+
+Returns the number of bytes required to safely contain C<nchars>
+characters in the string's encoding.
+
+=cut
+
+*/
+
 INTVAL
 string_max_bytes(STRING *s, INTVAL nchars)
 {
     return (nchars * s->encoding->max_bytes);
 }
 
-/*=for api string string_concat
- * Concatenate two strings. If necessary, convert the second string's
- * encoding and/or type to match those of the first string. If either
- * string is NULL, return a copy of the non-NULL string. If both
- * strings are NULL, create and return a new zero-length string.
- */
+/*
+
+=item C<STRING *
+string_concat(struct Parrot_Interp *interpreter, STRING *a,
+              STRING *b, UINTVAL Uflags)>
+
+Concatenate two strings. If necessary, convert the second string's
+encoding and/or type to match those of the first string. If either
+string is C<NULL>, return a copy of the non-C<NULL> string. If both
+strings are C<NULL>, create and return a new zero-length string.
+
+=cut
+
+*/
+
 STRING *
 string_concat(struct Parrot_Interp *interpreter, STRING *a,
               STRING *b, UINTVAL Uflags)
@@ -666,10 +873,19 @@ string_concat(struct Parrot_Interp *interpreter, STRING *a,
     return result;
 }
 
-/*=for api string string_repeat
- * repeat the string I<s> I<num> times, storing result in I<d>.
- * Allocates I<d> if needed, also returns d.
+/*
+
+=item C<STRING *
+string_repeat(struct Parrot_Interp *interpreter, const STRING *s, UINTVAL num,
+              STRING **d)>
+
+Repeat the string C<*s> I<num> times, storing result in C<**d>. Allocates
+I<**d> if needed, also returns C<*d>.
+
+=cut
+
 */
+
 STRING *
 string_repeat(struct Parrot_Interp *interpreter, const STRING *s, UINTVAL num,
               STRING **d)
@@ -698,10 +914,20 @@ string_repeat(struct Parrot_Interp *interpreter, const STRING *s, UINTVAL num,
     return dest;
 }
 
-/*=for api string string_substr
- * substr out the offset of src for length and store it in d.  Also return d.
- * Allocate memory for d if necessary.
- */
+/*
+
+=item C<STRING *
+string_substr(struct Parrot_Interp *interpreter, STRING *src,
+              INTVAL offset, INTVAL length, STRING **d, int replace_dest)>
+
+Take the substring of length C<length> from C<offset> of C<*src> and
+store it in C<**d>.  Also return C<*d>. Allocate memory for C<**d> if
+necessary.
+
+=cut
+
+*/
+
 STRING *
 string_substr(struct Parrot_Interp *interpreter, STRING *src,
               INTVAL offset, INTVAL length, STRING **d, int replace_dest)
@@ -772,15 +998,30 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
 }
 
 /*
- * This should follow the Perl semantics for:
- *      substr EXPR, OFFSET, LENGTH, REPLACEMENT
- * Replace substring of src with rep, returning what was there before.
- * Replacing a slice with a longer string grows the string;
- *      a shorter string shrinks it.
- * Replacing 2 past the end of the string is undefined.
- *      however replacing 1 past does a concat.
- * A negative offset is allowed to replace from the end.
- */
+
+=item C<STRING *
+string_replace(struct Parrot_Interp *interpreter, STRING *src,
+              INTVAL offset, INTVAL length, STRING *rep, STRING **d)>
+
+This should follow the Perl semantics for:
+
+    substr EXPR, OFFSET, LENGTH, REPLACEMENT
+      
+Replace substring of C<*src> with C*rep>, returning what was there
+before.
+
+Replacing a slice with a longer string grows the string; a shorter
+string shrinks it.
+
+Replacing 2 past the end of the string is undefined. However replacing 1
+past does a concat.
+
+A negative offset is allowed to replace from the end.
+
+=cut
+
+*/
+
 STRING *
 string_replace(struct Parrot_Interp *interpreter, STRING *src,
               INTVAL offset, INTVAL length, STRING *rep, STRING **d)
@@ -898,10 +1139,18 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     return dest;
 }
 
-/*=for api string string_chopn
- * chop off the last n characters of s.
- * if n is negative, cut the string after +n characters
- */
+/*
+
+=item C<STRING *
+string_chopn(STRING *s, INTVAL n)>
+
+Chops off the last C<n> characters of C<*s>. If C<n> is negative, cut
+the string after C<+n> characters.
+
+=cut
+
+*/
+
 STRING *
 string_chopn(STRING *s, INTVAL n)
 {
@@ -928,11 +1177,22 @@ string_chopn(STRING *s, INTVAL n)
     return s;
 }
 
-/*=for api string string_compare
- * compare two strings, performing type and encoding conversions if
- * necessary.
- * return -1, 0, 1 if s1 < , == , > s2
- */
+/*
+
+=item C<INTVAL
+string_compare(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2)>
+
+Compare two strings, performing type and encoding conversions if
+necessary.
+
+Returns the standard -1, 0, 1 comparison result, indicating whether
+C<*s1> was C<<<>>, C<==>, C<<>>> C<*s2>.
+
+=cut
+
+*/
+
 INTVAL
 string_compare(struct Parrot_Interp *interpreter, STRING *s1,
                STRING *s2)
@@ -1002,10 +1262,19 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
     return cmp;
 }
 
-/*=for api hash_string_equal
- * compare 2 strings, which are non-null and properly transcoded
- * return 0 if equal
- */
+/*
+
+=item C<INTVAL
+hash_string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)>
+
+Compare 2 strings, which are non-null and properly transcoded.
+
+Note that this function returns 0 if the strings are equal.
+
+=cut
+
+*/
+
 INTVAL
 hash_string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
 {
@@ -1039,10 +1308,21 @@ hash_string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
     return 0;
 }
 
-/*=for api string string_equal
- * compare two strings, performing type and encoding conversions if
- * necessary, like string_compare, but just return 0 = equal else unequal
- */
+/*
+
+=item C<INTVAL
+string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)>
+
+Compare two strings, performing type and encoding conversions if
+necessary.
+
+Note that this function returns 0 if the strings are equal and 1
+otherwise.
+
+=cut
+
+*/
+
 INTVAL
 string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
 {
@@ -1072,9 +1352,18 @@ string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
 }
 
 /*
- * Make string writable with specified minimum length
- * Encoding and type are required in case a new string has to be created
- */
+
+=item C<static void
+make_writable(struct Parrot_Interp *interpreter, STRING **s,
+              const size_t len, const ENCODING *enc, const CHARTYPE *type)>
+
+Make string writable with specified minimum length. Encoding and type
+are required in case a new string has to be created.
+
+=cut
+
+*/
+
 static void
 make_writable(struct Parrot_Interp *interpreter, STRING **s,
               const size_t len, const ENCODING *enc, const CHARTYPE *type)
@@ -1087,10 +1376,20 @@ make_writable(struct Parrot_Interp *interpreter, STRING **s,
         unmake_COW(interpreter, *s);
 }
 
-/*=for api string string_bitwise_and
- * and two strings, performing type and encoding conversions if
- * necessary. If *dest != NULL reuse dest, else create a new result
- */
+/*
+
+=item C<STRING *
+string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2, STRING **dest)>
+
+Perform a bitwise C<and> on two strings, performing type and encoding
+conversions if necessary. If C<*dest != NULL> then C<**dest> is reused,
+otherwise a new string is created.
+
+=cut
+
+*/
+
 STRING *
 string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
                STRING *s2, STRING **dest)
@@ -1144,10 +1443,20 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
     return res;
 }
 
-/*=for api string string_bitwise_or
- * or two strings, performing type and encoding conversions if
- * necessary. If *dest != NULL reuse dest, else create a new result
- */
+/*
+
+=item C<STRING *
+string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2, STRING **dest)>
+
+Perform a bitwise C<or> on two strings, performing type and encoding
+conversions if necessary. If C<*dest != NULL> then C<**dest> is reused,
+otherwise a new string is created.
+
+=cut
+
+*/
+
 STRING *
 string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
                STRING *s2, STRING **dest)
@@ -1223,10 +1532,20 @@ string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
     return res;
 }
 
-/*=for api string string_bitwise_xor
- * or two strings, performing type and encoding conversions if
- * necessary. If *dest != NULL reuse dest, else create a new result
- */
+/*
+
+=item C<STRING *
+string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2, STRING **dest)>
+
+Perform a bitwise C<xor> on two strings, performing type and encoding
+conversions if necessary. If C<*dest != NULL> then C<**dest> is reused,
+otherwise a new string is created.
+
+=cut
+
+*/
+
 STRING *
 string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
                STRING *s2, STRING **dest)
@@ -1302,7 +1621,17 @@ string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
     return res;
 }
 
-/* A string is "true" if it is equal to anything but "" and "0" */
+/*
+
+=item C<INTVAL
+string_bool(const STRING *s)>
+
+A string is "true" if it is equal to anything other than "" or "0".
+
+=cut
+
+*/
+
 INTVAL
 string_bool(const STRING *s)
 {
@@ -1330,14 +1659,25 @@ string_bool(const STRING *s)
     return 1;                   /* it must be true */
 }
 
-/*=for api string string_nprintf
- * like Parrot_snprintf, but writes to, and returns, a STRING.
- *
- * bytelen does _not_ include space for a (non-existent) trailing null.
- * dest may be a null pointer, in which case a new native string will
- * be created. If bytelen is zero, the behaviour becomes more
- * sprintf-ish than snprintf-like.  bytelen is measured in dest's encoding.
- */
+/*
+
+=item C<STRING*
+string_nprintf(struct Parrot_Interp *interpreter,
+               STRING *dest, INTVAL bytelen, const char *format, ...)>
+
+This is like C<Parrot_snprintf()> except that it writes to and returns a
+C<STRING *>.
+
+Note that C<bytelen> does I<not> include space for a (non-existent)
+trailing C<'\0'>. C<dest> may be a C<NULL> pointer, in which case a new
+native string will be created. If C<bytelen> is 0, the behaviour becomes
+more C<sprintf>-ish than C<snprintf>-like. C<bytelen> is measured in the
+encoding of C<*dest>.
+
+=cut
+
+*/
+
 STRING*
 string_nprintf(struct Parrot_Interp *interpreter,
                STRING *dest, INTVAL bytelen, const char *format, ...)
@@ -1366,17 +1706,50 @@ string_nprintf(struct Parrot_Interp *interpreter,
     }
 }
 
-/* A number is such that:
-  sign           =  '+' | '-'
-  digit          =  "Any code point considered a digit by the chartype"
-  indicator      =  'e' | 'E'
-  digits         =  digit [digit]...
-  decimal-part   =  digits '.' [digits] | ['.'] digits
-  exponent-part  =  indicator [sign] digits
-  numeric-string =  [sign] decimal-part [exponent-part]
+/*
 
-  An integer is the appropriate integer representation of such a number,
-  rounding towards zero.
+=item C<INTVAL
+string_to_int(const STRING *s)>
+
+A number is such that:
+
+=over 4
+
+=item C<sign>
+
+'+' | '-'
+
+=item C<digit>
+
+"Any code point considered a digit by the chartype."
+
+=item C<indicator>
+
+'e' | 'E'
+
+=item C<digits>
+
+digit [digit]...
+
+=item C<decimal-part>
+
+digits '.' [digits] | ['.'] digits
+
+=item C<exponent-part>
+
+indicator [sign] digits
+
+=item C<numeric-string>
+
+[sign] decimal-part [exponent-part]
+
+=back
+
+An integer is the appropriate integer representation of such a number,
+rounding towards zero.
+
+=cut
+
 */
 
 INTVAL
@@ -1422,6 +1795,17 @@ string_to_int(const STRING *s)
     return (INTVAL) string_to_num(s);
 #endif
 }
+
+/*
+
+=item C<FLOATVAL
+string_to_num(const STRING *s)>
+
+Same as C<string_to_int()> except that a C<FLOATVAL> is returned.
+
+=cut
+
+*/
 
 FLOATVAL
 string_to_num(const STRING *s)
@@ -1513,13 +1897,34 @@ string_to_num(const STRING *s)
     return f;
 }
 
+/*
+
+=item C<STRING *
+string_from_int(struct Parrot_Interp * interpreter, INTVAL i)>
+
+Returns a string representation of C<i>.
+
+=cut
+
+*/
+
 STRING *
 string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
     char buf[128];
     return int_to_str(interpreter, buf, i, 10);
 }
 
-/* Stolen, with modifications, from perlnum.pmc */
+/*
+
+=item C<STRING *
+string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)>
+
+Calls C<Parrot_sprintf_c()> to return a string representation of C<f>.
+
+=cut
+
+*/
+
 STRING *
 string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
 {
@@ -1528,6 +1933,17 @@ string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
        awfully hard to overflow. */
     return Parrot_sprintf_c(interpreter, "%vg", f);
 }
+
+/*
+
+=item C<char *
+string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)>
+
+Returns a C string for C<*s>.
+
+=cut
+
+*/
 
 char *
 string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
@@ -1570,17 +1986,35 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 }
 
 /*
-   free up a string returned by string_to_cstring. Hopefully this can
-   be a noop at some point, as it's got all sorts of leak potential otherwise.
- */
+
+=item C<void
+string_cstring_free(void *ptr)>
+
+Free a string created by C<string_to_cstring()>. 
+
+Hopefully this can be a go away at some point, as it's got all sorts of
+leak potential otherwise.
+
+=cut
+
+*/
+
 void
 string_cstring_free(void *ptr) {
     free(ptr);
 }
 
-/*for api string_pin
- * replace the managed buffer memory by system memory
- */
+/*
+
+=item C<void
+string_pin(struct Parrot_Interp * interpreter, STRING * s)>
+
+Replace the managed buffer memory by system memory.
+
+=cut
+
+*/
+
 void
 string_pin(struct Parrot_Interp * interpreter, STRING * s) {
     void *memory;
@@ -1609,9 +2043,17 @@ string_pin(struct Parrot_Interp * interpreter, STRING * s) {
         (PObj_immobile_FLAG | PObj_sysmem_FLAG));
 }
 
-/*for api string_unpin
- * undo a string_pin: used managed memory
- */
+/*
+
+=item C<void
+string_unpin(struct Parrot_Interp * interpreter, STRING * s)>
+
+Undo a C<string_pin()> so that the string once again uses managed
+memory.
+
+=cut
+
+*/
 
 void
 string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
@@ -1647,6 +2089,17 @@ string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
     mem_sys_free(memory);
 }
 
+/*
+
+=item C<void
+string_iterator_init(struct string_iterator_t *i, const STRING *s)>
+
+Initialize a string iterator.
+
+=cut
+
+*/
+
 void
 string_iterator_init(struct string_iterator_t *i, const STRING *s)
 {
@@ -1657,6 +2110,19 @@ string_iterator_init(struct string_iterator_t *i, const STRING *s)
     i->decode_and_advance = s->encoding->decode_and_advance;
     i->set_position = s->encoding->set_position;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/string.h>, F<include/parrot/string_funcs.h>,
+F<docs/strings.pod>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

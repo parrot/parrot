@@ -1,19 +1,22 @@
-/* thread.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Thread handling stuff
- *  Data Structure and Algorithms:
- *     Threads are created by creating new ParrotInterpreter objects.
- *  History:
- *     2003.12.18 leo initial rev
- *  Notes:
- *  References:
- *     classes/parrotinterpreter.pmc
- *     docs/dev/events.pod
- *
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/thread.c - Thread handling stuff
+
+=head1 DESCRIPTION
+
+Threads are created by creating new C<ParrotInterpreter> objects.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
@@ -21,9 +24,18 @@
 static int running_threads;
 
 void Parrot_really_destroy(int exit_code, void *interpreter);
+
 /*
- * the actual thread function
- */
+
+=item C<static void*
+thread_func(void *arg)>
+
+The actual thread function.
+
+=cut
+
+*/
+
 static void*
 thread_func(void *arg)
 {
@@ -61,13 +73,23 @@ thread_func(void *arg)
 }
 
 /*
- * helper functions used also for running plain interpreters
- */
 
-/*
- * copy / clone interpreter packfile / code
- * all resources are created in the destination interpreter
- */
+=back
+
+=head2 Helper functions used also for running plain interpreters
+
+=over 4
+
+=item C<void
+pt_clone_code(Parrot_Interp d, Parrot_Interp s)>
+
+Copy/clone the packfile/code from interpreter C<s> to C<d>. All
+resources are created in C<d>.
+
+=cut
+
+*/
+
 void
 pt_clone_code(Parrot_Interp d, Parrot_Interp s)
 {
@@ -76,8 +98,16 @@ pt_clone_code(Parrot_Interp d, Parrot_Interp s)
 }
 
 /*
- * setup code, create ret continuation
- */
+
+=item C<void
+pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)>
+
+Setup code, create a C<RetContinuation> PMC.
+
+=cut
+
+*/
+
 void
 pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
 {
@@ -92,11 +122,23 @@ pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
 }
 
 /*
- * ParrotThread emthods
- *
- * pt_thread_run
- * run the sub PMC in a separate thread using interpreter in dest_interp
- */
+
+=back
+
+=head2 ParrotThread methods
+
+=over 4
+
+=item C<int
+pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)>
+
+Run the C<*sub> PMC in a separate thread using interpreter in
+C<*dest_interp>.
+
+=cut
+
+*/
+
 int
 pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 {
@@ -134,10 +176,16 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 }
 
 /*
- * run a type 1 thread
- * nothing is shared, both interpreters are free running
- * w/o any communication
- */
+
+=item C<int
+pt_thread_run_1(Parrot_Interp interp, PMC* dest_interp, PMC* sub)>
+
+Runs a type 1 thread. Nothing is shared, both interpreters are free
+running without any communication.
+
+=cut
+
+*/
 
 int
 pt_thread_run_1(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
@@ -147,9 +195,17 @@ pt_thread_run_1(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 }
 
 /*
- * run a type 2 thread
- * no shared variables, threads are communicating by sending messages
- */
+
+=item C<int
+pt_thread_run_2(Parrot_Interp interp, PMC* dest_interp, PMC* sub)>
+
+Runs a type 2 thread. No shared variables, threads are communicating by
+sending messages.
+
+=cut
+
+*/
+
 int
 pt_thread_run_2(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 {
@@ -158,9 +214,17 @@ pt_thread_run_2(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 }
 
 /*
- * run a type 3 thread
- * threads may have shared variables and are managed in a thread pool
- */
+
+=item C<int
+pt_thread_run_3(Parrot_Interp interp, PMC* dest_interp, PMC* sub)>
+
+Run a type 3 thread. Threads may have shared variables and are managed
+in a thread pool.
+
+=cut
+
+*/
+
 int
 pt_thread_run_3(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 {
@@ -169,9 +233,15 @@ pt_thread_run_3(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 }
 
 /*
- * pt_thread_yield
- * religuish the processor
- */
+
+=item C<void
+pt_thread_yield(void)>
+
+Relinquishes hold on the processor.
+
+=cut
+
+*/
 
 void
 pt_thread_yield(void)
@@ -180,9 +250,17 @@ pt_thread_yield(void)
 }
 
 /*
- * helper, check if tid is valid - caller holds mutex
- * return interpreter for tid
- */
+
+=item C<static Parrot_Interp
+pt_check_tid(UINTVAL tid, const char *from)>
+
+Helper function. Check if C<tid> is valid. The caller holds the mutex.
+Returns the interpreter for C<tid>.
+
+=cut
+
+*/
+
 static Parrot_Interp
 pt_check_tid(UINTVAL tid, const char *from)
 {
@@ -202,6 +280,17 @@ pt_check_tid(UINTVAL tid, const char *from)
 }
 
 
+/*
+
+=item C<static void
+mutex_unlock(void *arg)>
+
+Unlocks the mutex C<*arg>.
+
+=cut
+
+*/
+
 static void
 mutex_unlock(void *arg)
 {
@@ -209,8 +298,16 @@ mutex_unlock(void *arg)
 }
 
 /*
- * join (wait for) a joinable thread
- */
+
+=item C<void*
+pt_thread_join(Parrot_Interp parent, UINTVAL tid)>
+
+Join (wait for) a joinable thread.
+
+=cut
+
+*/
+
 void*
 pt_thread_join(Parrot_Interp parent, UINTVAL tid)
 {
@@ -288,9 +385,17 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
 }
 
 /*
- * possibly wait for other running threads - called when destructing
- * the passed interpreter
- */
+
+=item C<void
+pt_join_threads(Parrot_Interp interpreter)>
+
+Possibly wait for other running threads. This is called when destroying
+C<interpreter>.
+
+=cut
+
+*/
+
 void
 pt_join_threads(Parrot_Interp interpreter)
 {
@@ -332,9 +437,16 @@ pt_join_threads(Parrot_Interp interpreter)
 }
 
 /*
- * helper for detach and kill
- * return interpreter, if it didn't finish yet
- */
+
+=item C<static Parrot_Interp
+detach(UINTVAL tid)>
+
+Helper for detach and kill.
+
+Returns the interpreter, if it didn't finish yet.
+
+*/
+
 static Parrot_Interp
 detach(UINTVAL tid)
 {
@@ -358,9 +470,18 @@ detach(UINTVAL tid)
     UNLOCK(interpreter_array_mutex);
     return interpreter;
 }
+
 /*
- * detach (make non-joinable) thread
- */
+
+=item C<void
+pt_thread_detach(UINTVAL tid)>
+
+Detaches (make non-joinable) the thread.
+
+=cut
+
+*/
+
 void
 pt_thread_detach(UINTVAL tid)
 {
@@ -368,8 +489,16 @@ pt_thread_detach(UINTVAL tid)
 }
 
 /*
- * kill a thread
- */
+
+=item C<void
+pt_thread_kill(UINTVAL tid)>
+
+Kills the thread.
+
+=cut
+
+*/
+
 void
 pt_thread_kill(UINTVAL tid)
 {
@@ -384,13 +513,23 @@ pt_thread_kill(UINTVAL tid)
 }
 
 /*
- * threaded interpreter book-keeping
- */
 
-/*
- * all threaded interpreters are stored in an array
- * assumes that caller holds LOCK
- */
+=back
+
+=head2 Threaded interpreter book-keeping
+
+=over 4
+
+=item C<void
+pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)>
+
+All threaded interpreters are stored in an array. Assumes that caller
+holds LOCK.
+
+=cut
+
+*/
+
 void
 pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
 {
@@ -447,17 +586,29 @@ pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
 }
 
 /*
- * DOD sync functions
- */
 
-/*
- * DOD is gonna start the mark phase.
- * In the presence of shared PMCs, we can only run one DOD run at a time
- * because interpreter->dod_mark_ptr may be changed
- * TODO have a count of shared PMCs and check it during DOD
- * TODO evaluate, if a interpreter lock is cheaper, when dod_mark_ptr
- *      is updated
- */
+=back
+
+=head2 DOD Synchronization Functions
+
+=over 4
+
+=item C<void
+pt_DOD_start_mark(Parrot_Interp interpreter)>
+
+DOD is gonna start the mark phase. In the presence of shared PMCs, we
+can only run one DOD run at a time because
+C<<interpreter->dod_mark_ptr>> may be changed.
+
+TODO - Have a count of shared PMCs and check it during DOD.
+
+TODO - Evaluate, if a interpreter lock is cheaper, when C<dod_mark_ptr>
+is updated.
+
+=cut
+ 
+*/
+
 void
 pt_DOD_start_mark(Parrot_Interp interpreter)
 {
@@ -475,8 +626,16 @@ pt_DOD_start_mark(Parrot_Interp interpreter)
 }
 
 /*
- * DOD is finished for the root set
- */
+
+=item C<void
+pt_DOD_mark_root_finished(Parrot_Interp interpreter)>
+
+DOD is finished for the root set.
+
+=cut
+
+*/
+
 void
 pt_DOD_mark_root_finished(Parrot_Interp interpreter)
 {
@@ -492,8 +651,16 @@ pt_DOD_mark_root_finished(Parrot_Interp interpreter)
 }
 
 /*
- * DODs mark phase is done
- */
+
+=item C<void
+pt_DOD_stop_mark(Parrot_Interp interpreter)>
+
+DOD's mark phase is done.
+
+=cut
+
+*/
+
 void
 pt_DOD_stop_mark(Parrot_Interp interpreter)
 {
@@ -505,6 +672,23 @@ pt_DOD_stop_mark(Parrot_Interp interpreter)
      *     depending on their resource statistics
      */
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+2003.12.18 leo initial rev
+
+=head1 SEE ALSO
+
+F<classes/parrotinterpreter.pmc>, F<docs/dev/events.pod>.
+
+=cut
+
+*/
+
 /*
  * Local variables:
  * c-indentation-style: bsd

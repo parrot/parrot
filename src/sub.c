@@ -1,23 +1,37 @@
-/*  sub.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Sub-routines, continuations, co-routines and other fun stuff...
- *  Data Structure and Algorithms:
- *  History:
- *     Initial version by Melvin on 2002/06/6
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/sub.c - Subroutines
+
+=head1 DESCRIPTION
+
+Sub-routines, continuations, co-routines and other fun stuff...
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-
 /*
- * Save current "context" of interpreter.
- */
+
+=item C<void
+save_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)>
+
+Save the current "context" of interpreter.
+
+=cut
+
+*/
+
 void
 save_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
@@ -25,11 +39,19 @@ save_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 }
 
 /*
- * Save current context of interpreter and mark it copy-on-write
- * We mark the pads and stacks, not the actual context struct.
- * This is used for continuations. Stacks are COW marked to delay
- * stack copying until continuation is activated.
- */
+
+=item C<void
+cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)>
+
+Save current context of interpreter and mark it copy-on-write. We mark
+the pads and stacks, not the actual context struct. This is used for
+continuations. Stacks are COW marked to delay stack copying until
+continuation is activated.
+
+=cut
+
+*/
+
 void
 cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
@@ -45,13 +67,32 @@ cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 }
 
 /*
- * Set context of interpreter from a context buffer
- */
+
+=item C<void
+restore_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)>
+
+Set context of interpreter from a context buffer.
+
+=cut
+
+*/
+
 void
 restore_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
     memcpy(&interp->ctx, ctx, sizeof(*ctx));
 }
+
+/*
+
+=item C<void
+mark_context(struct Parrot_Interp* interpreter, struct Parrot_Context* ctx)>
+
+Marks the context C<*ctx>.
+
+=cut
+
+*/
 
 void
 mark_context(struct Parrot_Interp* interpreter, struct Parrot_Context* ctx)
@@ -65,15 +106,36 @@ mark_context(struct Parrot_Interp* interpreter, struct Parrot_Context* ctx)
     mark_pmc_register_stack(interpreter, &ctx->pmc_reg_stack);
 }
 
+/*
+
+=item C<static void coro_error(Stack_Entry_t *e)>
+
+Coroutine error.
+
+=cut
+
+*/
+
 static void coro_error(Stack_Entry_t *e)
 {
     internal_exception(1, "Coroutine popped main stack");
 }
 
 /*
- * the final ctx_stack = interp_stack + saved_stack
- * which then gets swapped with the interp_stack
- */
+
+=item C<static void
+prepend_stack(struct Parrot_Interp *interp,
+                struct Stack_Chunk **interp_stack,
+                struct Stack_Chunk **ctx_stack,
+                struct Stack_Chunk *saved_stack)>
+
+The final C<ctx_stack> = C<interp_stack> + C<saved_stack>, which then
+gets swapped with the C<interp_stack>.
+
+=cut
+
+*/
+
 static void
 prepend_stack(struct Parrot_Interp *interp,
                 struct Stack_Chunk **interp_stack,
@@ -111,9 +173,21 @@ prepend_stack(struct Parrot_Interp *interp,
 }
 
 /*
- * swap interp and ctx stack and save the coroutine only parts of
- * the stack in saved_stack, so effectively undoing above action
- */
+
+=item C<static void
+restore_stack(struct Parrot_Interp *interp,
+                struct Stack_Chunk **interp_stack,
+                struct Stack_Chunk **ctx_stack,
+                struct Stack_Chunk **saved_stack)>
+
+Swap C<**interp_stack> and C<**ctx_stack> and save the coroutine only
+parts of the stack in C<**saved_stack>, so effectively undoing
+C<prepend_stack()>.
+
+=cut
+
+*/
+
 static void
 restore_stack(struct Parrot_Interp *interp,
                 struct Stack_Chunk **interp_stack,
@@ -181,9 +255,19 @@ restore_stack(struct Parrot_Interp *interp,
 }
 
 /*
- * XXX: If this routine is specific to coroutine, we should change
- *      the argument to Parrot_Coroutine.
- */
+
+=item C<void
+swap_context(struct Parrot_Interp *interp, struct PMC *sub)>
+
+Swaps the context.
+
+XXX: If this routine is specific to coroutine, we should change
+the C<*sub> argument to C<Parrot_Coroutine>.
+
+=cut
+
+*/
+
 void
 swap_context(struct Parrot_Interp *interp, struct PMC *sub)
 {
@@ -244,6 +328,17 @@ swap_context(struct Parrot_Interp *interp, struct PMC *sub)
 #endif
 }
 
+/*
+
+=item C<struct Parrot_Sub *
+new_sub(struct Parrot_Interp *interp, size_t size)>
+
+Returns a new C<Parrot_Sub>.
+
+=cut
+
+*/
+
 struct Parrot_Sub *
 new_sub(struct Parrot_Interp *interp, size_t size)
 {
@@ -257,8 +352,18 @@ new_sub(struct Parrot_Interp *interp, size_t size)
 }
 
 /*
- * XXX: Need to document semantics in detail
- */
+
+=item C<struct Parrot_Sub *
+new_closure(struct Parrot_Interp *interp)>
+
+Returns a new C<Parrot_Sub> with its own sctatchpad.
+
+XXX: Need to document semantics in detail.
+
+=cut
+
+*/
+
 struct Parrot_Sub *
 new_closure(struct Parrot_Interp *interp)
 {
@@ -273,6 +378,18 @@ new_closure(struct Parrot_Interp *interp)
     return newsub;
 }
 
+/*
+
+=item C<struct Parrot_Sub *
+new_continuation(struct Parrot_Interp *interp)>
+
+Returns a new C<Parrot_Sub> with its own COW version of the current
+context.
+
+=cut
+
+*/
+
 struct Parrot_Sub *
 new_continuation(struct Parrot_Interp *interp)
 {
@@ -280,6 +397,17 @@ new_continuation(struct Parrot_Interp *interp)
     cow_copy_context(interp, &cc->ctx);
     return cc;
 }
+
+/*
+
+=item C<struct Parrot_Sub *
+new_ret_continuation(struct Parrot_Interp *interp)>
+
+Returns a new C<Parrot_Sub> with its own copy of the current context.
+
+=cut
+
+*/
 
 struct Parrot_Sub *
 new_ret_continuation(struct Parrot_Interp *interp)
@@ -290,8 +418,18 @@ new_ret_continuation(struct Parrot_Interp *interp)
 }
 
 /*
- * XXX: Need to document semantics in detail
- */
+
+=item C<struct Parrot_Sub *
+new_coroutine(struct Parrot_Interp *interp)>
+
+Returns a new C<Parrot_Coroutine>.
+
+XXX: Need to document semantics in detail.
+
+=cut
+
+*/
+
 struct Parrot_Sub *
 new_coroutine(struct Parrot_Interp *interp)
 {
@@ -324,6 +462,16 @@ new_coroutine(struct Parrot_Interp *interp)
     return (struct Parrot_Sub *)co;
 }
 
+/*
+
+=item C<PMC *
+new_ret_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)>
+
+Returns a new C<RetContinuation> PMC.
+
+=cut
+
+*/
 
 PMC *
 new_ret_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)
@@ -334,8 +482,23 @@ new_ret_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)
 }
 
 /*
- * Uses scope_index to find and return the appropriate scope.
- */
+
+=back
+
+=head2 Scratchpad Functions
+
+=over 4
+
+=item C<static struct Parrot_Lexicals *
+scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad,
+                 INTVAL scope_index)>
+
+Uses C<scope_index> to find and return the appropriate scope.
+
+=cut
+
+*/
+
 static struct Parrot_Lexicals *
 scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad,
                  INTVAL scope_index)
@@ -353,8 +516,16 @@ scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad,
 }
 
 /*
- * Returns a pointer to the current scratchpad.
- */
+
+=item C<PMC *
+scratchpad_get_current(struct Parrot_Interp * interp)>
+
+Returns a pointer to the current scratchpad.
+
+=cut
+
+*/
+
 PMC *
 scratchpad_get_current(struct Parrot_Interp * interp)
 {
@@ -362,11 +533,19 @@ scratchpad_get_current(struct Parrot_Interp * interp)
 }
 
 /*
- * Returns the position of the lexical variable corresponding to
- * name. If such a variable can not be found the length of the list
- * is returned (i.e. the position that this new lexical should be
- * stored in).
- */
+
+=item C<static INTVAL
+lexicals_get_position(struct Parrot_Interp * interp,
+                      struct Parrot_Lexicals *lex, STRING* name)>
+
+Returns the position of the lexical variable corresponding to C<*name>.
+If such a variable can not be found the length of the list is returned
+(i.e. the position that this new lexical should be stored in).
+
+=cut
+
+*/
+
 static INTVAL
 lexicals_get_position(struct Parrot_Interp * interp,
                       struct Parrot_Lexicals *lex, STRING* name)
@@ -385,9 +564,18 @@ lexicals_get_position(struct Parrot_Interp * interp,
 }
 
 /*
- * Returns first lexical scope and position where name is found, or
- * NULL if it can not be found.
- */
+
+=item C<static struct Parrot_Lexicals *
+scratchpad_find(struct Parrot_Interp* interp, PMC* pad, STRING * name,
+                INTVAL * position)>
+
+Returns first lexical scope and position where C<*name> is found, or
+C<NULL> if it can not be found.
+
+=cut
+
+*/
+
 static struct Parrot_Lexicals *
 scratchpad_find(struct Parrot_Interp* interp, PMC* pad, STRING * name,
                 INTVAL * position)
@@ -409,8 +597,16 @@ scratchpad_find(struct Parrot_Interp* interp, PMC* pad, STRING * name,
 }
 
 /*
- * Creates and initializes a new Scratchpad PMC.
- */
+
+=item C<PMC*
+scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)>
+
+Creates and initializes a new C<Scratchpad> PMC.
+
+=cut
+
+*/
+
 PMC*
 scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
 {
@@ -458,12 +654,20 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
 }
 
 /*
- * Routines for storing and reading lexicals in Scratchpad's. These
- * take both a name and a position, however in general only one of
- * these will be considered. This is to support both by name access
- * and by position (which is faster). If by position access is intended
- * name should be passed as NULL.
- */
+
+=item C<void
+scratchpad_store(struct Parrot_Interp * interp, PMC * pad,
+                 STRING * name, INTVAL position, PMC* value)>
+
+Routines for storing and reading lexicals in C<Scratchpad> PMCs. These
+take both a name and a position, however in general only one of these
+will be considered. This is to support both by name access and by
+position (which is faster). If by position access is intended name
+should be passed as C<NULL>.
+
+=cut
+
+*/
 
 void
 scratchpad_store(struct Parrot_Interp * interp, PMC * pad,
@@ -486,6 +690,20 @@ scratchpad_store(struct Parrot_Interp * interp, PMC * pad,
 
     list_assign(interp, lex->values, position, value, enum_type_PMC);
 }
+
+/*
+
+=item C<void
+scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad,
+                       INTVAL scope_index, STRING * name, INTVAL position,
+                       PMC* value)>
+
+Stores C<*value> with name C<*name> or index C<position> in the
+scratchpad at C<scope_index>.
+
+=cut
+
+*/
 
 void
 scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad,
@@ -512,6 +730,18 @@ scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad,
     list_assign(interp, lex->values, position, value, enum_type_PMC);
 }
 
+/*
+
+=item C<PMC *
+scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name,
+               INTVAL position)>
+
+Finds and returns the value for name C<*name> in scratchpad C<*pad>.
+
+=cut
+
+*/
+
 PMC *
 scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name,
                INTVAL position)
@@ -528,6 +758,18 @@ scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name,
 
     return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);
 }
+
+/*
+
+=item C<PMC *
+scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad,
+                     INTVAL scope_index, STRING * name, INTVAL position)>
+
+Finds and returns the value for name C<*name> in scratchpad C<*pad>.
+
+=cut
+
+*/
 
 PMC *
 scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad,
@@ -550,6 +792,17 @@ scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad,
     return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);
 }
 
+/*
+
+=item C<void
+lexicals_mark(struct Parrot_Interp * interp, struct Parrot_Lexicals *lex)>
+
+Calls C<list_mark()> on the lexical's names and values.
+
+=cut
+
+*/
+
 void
 lexicals_mark(struct Parrot_Interp * interp, struct Parrot_Lexicals *lex)
 {
@@ -559,6 +812,17 @@ lexicals_mark(struct Parrot_Interp * interp, struct Parrot_Lexicals *lex)
         list_mark(interp, lex->values);
 }
 
+/*
+
+=item C<void
+scratchpad_delete(Parrot_Interp interp, PMC *pad, STRING *name)>
+
+Deletes scratchpad C<*pad>.
+
+=cut
+
+*/
+
 void
 scratchpad_delete(Parrot_Interp interp, PMC *pad, STRING *name)
 {
@@ -567,6 +831,23 @@ scratchpad_delete(Parrot_Interp interp, PMC *pad, STRING *name)
     if (lex)
         list_assign(interp, lex->names, pos, NULL, enum_type_STRING);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/sub.h>.
+
+=head1 HISTORY
+
+Initial version by Melvin on 2002/06/6.
+
+=cut
+
+*/
+
 /*
  * Local variables:
  * c-indentation-style: bsd
