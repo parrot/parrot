@@ -118,9 +118,8 @@ Can't find a float type with size 8, conversion ops might fail!
 END
   }
 
-  #Get HUGEINTVAL, note that we fallback to shorter integers
-  #if we can't get a 64-bit type
-  foreach my $type ('long long', '__int64', 'long', 'int') {
+  #Get HUGEINTVAL, note that we prefer standard types
+  foreach my $type ('long', 'int', 'long long', '__int64') {
     my %results;
 
     Configure::Data->set('int8_t' => $type);
