@@ -44,6 +44,8 @@ struct PMC {
 
 typedef struct PMC PMC;
 
+typedef void STRING_FUNCS;
+
 #include "global_setup.h"
 #include "string.h"
 #include "interpreter.h"

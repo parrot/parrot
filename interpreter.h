@@ -28,6 +28,7 @@ struct Perl_Interp {
                                         // interpreter's arena
   IV *(*(*opcode_funcs)[2048])();			// Opcode
                                        // function table
+  STRING_FUNCS *(*(*string_funcs)[64])();  // String function table
 };
 
 struct Perl_Interp *make_interpreter();
