@@ -187,22 +187,18 @@ string belong? You shouldn't copy the same string to different places,
 thus rendering COW to a noop, nor are you allowed to free this same
 string more then once, B<gdb> i.e. your debugger will tell you why.
 
-Both allocation schemes therefore use a I<Buffer_Tail>. After the end of the
-actual variable length string there is some space for a flag, to remember,
-what to do with such strings.
+Both allocation schemes therefore use a part of the allocated string to
+do this bookkeeping.
 
-Copying GC marks such COW strings with I<TAIL_moved> and stores the new
-address in the buffer header, so other users of this string can be
-updated to reuse the same string (XXX one or all other users?).
+Copying GC uses a I<Buffer_Tail> after the end of the actual variable
+length string and marks such COW strings with I<TAIL_moved> and stores
+the new address in the buffer header, so other users of this string can
+be updated to reuse the same string (XXX one or all other users?).
 
-The malloc()/free() approach stores a usage flag there. Only if all
-users of this string are dead, one and only one buffer header using this
-string is allowed to free this string. And additionally this header is
-not allowed to free the string immediately, then, if so, the I<Buffer_Tail>
-would be gone too. At best, the last - in terms of detecting - user of
-such a dead COW string should free it, but that would cause more
-overhead as it could be useful, so currently this string will be freed
-during the next DOD run.
+The malloc()/free() approach stores a refcount at I<bufstart>. During
+DOD all dead users increment the refcount, living users set it to an
+huge value. During freeing the buffer, the string is only freed, if the
+refcount reached zero.
 
 =head1 Simplified Figure
 
