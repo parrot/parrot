@@ -76,7 +76,7 @@ sub runstep {
     $icushared = `$icuconfig --ldflags`;
     chomp $icushared;
     $icushared =~ s/-licui18n//;
-    $icushared =~ s/-licudata//;
+    # $icushared =~ s/-licudata//;
 
     # location of header files
     $icuheaders = `$icuconfig --prefix`;
