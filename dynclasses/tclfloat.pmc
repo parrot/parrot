@@ -38,16 +38,38 @@ pmclass TclFloat extends tclobject dynpmc group tclgroup {
         return NULL;
     }
 
-    /* XXX add ".0" if it's an int. */
+
     STRING* get_string () {
         char* buff = mem_sys_allocate(80);
+        int buflen,checklen;
+        int check_flag;
+
         STRING* s;
 #ifdef HAS_SNPRINTF
         snprintf(buff,80,FLOATVAL_FMT,PMC_num_val(SELF));
 #else
         sprintf(buff,FLOATVAL_FMT,PMC_num_val(SELF));  /* XXX buffer overflow! */
 #endif
-        s = string_make(INTERP,buff,strlen(buff),"iso-8859-1",0);
+        check_flag = 1;
+        checklen = buflen = strlen(buff); 
+        while (check_flag && buflen) {
+               if (buff[buflen-1] == 48) {  /* 0 */
+                       buflen--;
+               } else  {
+                       check_flag = 0;
+               }
+        }
+        /* if the last entry is now a ".", then add one zero back in. */
+        if (buff[buflen-1] == 46) {
+          buflen++;
+        }
+
+        /* paranoid? */
+        if (buflen > checklen) {
+              buflen = checklen;
+        }
+        buff[buflen] = 0; /* should this be necessary? */
+        s = string_make(INTERP,buff,buflen,"iso-8859-1",0);
         mem_sys_free(buff);
         return s;
     }
