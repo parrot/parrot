@@ -1096,6 +1096,10 @@ testr : test_prep
 mopstest : test_prep
 	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/mops.pasm
 
+# all benchmarks
+testbench: test_prep
+	$(PERL) t/harness t/benchmarks.t
+
 # Running the game of live
 lifetest : test_prep
 	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/life.pasm
