@@ -1,15 +1,19 @@
-# Sample Parrot IR code generated from mandelbrot.cola
+# Cola (0.0.6.1) generated
 #
 .sub _MAIN
 	.arg ""
 	call Mandelbrot__Main
+	end
 	ret
 .sub Console__WriteLine
+	saveall
 	.param string	s
 	.arg s
 	call __puts
-LBL0:	ret
+LBL0:	restoreall
+	ret
 .sub Mandelbrot__Main
+	saveall
 	.local int	k
 	.local float	i
 	.local float	c
@@ -81,7 +85,8 @@ LBL5:
 	dec y
 	goto LBL2
 LBL4:
-LBL1:	ret
+LBL1:	restoreall
+	ret
 
 .emit
 

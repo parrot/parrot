@@ -43,19 +43,17 @@ RANKSPEC        \[[,]*\]
     }
 
 ^".emit2"\n {
-    fprintf(stderr, "EMIT\n");
         BEGIN(emit2);
     }
 
 <emit2>^".eom"\n {
-    fprintf(stderr, "EOM\n");
         BEGIN(INITIAL);
     }
  
 <emit2>.|\n      ;
 
 [\n]            line++;
-#.*\n           line++;    /* COMMENT */
+#.*\n           line++;
 
 ".sym"          return(SYM);
 ".arg"          return(ARG);
@@ -66,18 +64,22 @@ RANKSPEC        \[[,]*\]
 ".local"        return(LOCAL);
 ".param"        return(PARAM);
 "branch"        return(BRANCH);
+"end"           return(END);
 "goto"          return(GOTO);
 "if"            return(IF);
 "int"           return(INT);
 "inc"           return(INC);
 "dec"           return(DEC);
 "float"         return(FLOAT);
+"new"           return(NEW);
 "string"        return(STRING);
 "call"          return(CALL);
 "print"         return(PRINT);
 "push"          return(PUSH);
 "pop"           return(POP);
 "ret"           return(RET);
+"saveall"       return(SAVEALL);
+"restoreall"    return(RESTOREALL);
 "<<"            return(SHIFT_LEFT);
 ">>"            return(SHIFT_RIGHT);
 "<"            return(RELOP_LT);
@@ -110,6 +112,7 @@ RANKSPEC        \[[,]*\]
 
 {STRINGCONSTANT} {
         yylval.s = str_dup(yytext);
+        fprintf(stderr, "STRINGC [%s]\n", yytext);
         return(STRINGC);
     }
 
