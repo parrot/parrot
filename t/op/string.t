@@ -1305,7 +1305,7 @@ OUTPUT
 
 output_is(<<'CODE',<<OUTPUT,"index, multibyte matching");
     set S0, "\xAB"
-    find_chartype I0, "usascii"
+    find_chartype I0, "8859-1"
     set_chartype S0, I0
     find_encoding I0, "singlebyte"
     set_encoding S0, I0
@@ -1335,7 +1335,7 @@ OUTPUT
 output_is(<<'CODE',<<OUTPUT,"index, multibyte matching 2");
     set S0, "\xAB\xBA"
     set S1, "foo\xAB\xAB\xBAbar"
-    find_chartype I0, "usascii"
+    find_chartype I0, "8859-1"
     set_chartype S0, I0
     find_encoding I0, "singlebyte"
     set_encoding S0, I0
