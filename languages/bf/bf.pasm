@@ -1,7 +1,7 @@
 # $Id$
 # A Brainfuck interpreter
 # By Leon Brocard <acme@astray.com>
-# 
+#
 # See http://www.catseye.mb.ca/esoteric/bf/
 # for more information on this silly language
 
@@ -16,12 +16,12 @@
 
   # Read the file into S1
 SOURCE:
-  open I0, S0
+  open P1, S0, "<"
 SOURCE_LOOP:
-  readline S2, I0
+  readline S2, P1
   concat S1, S2
   if S2, SOURCE_LOOP
-  close I0
+  close P1
 
   length I30, S1
 
@@ -101,7 +101,8 @@ NOTCLOSE:
 
 NOTDOT:
   ne S0, ",", NEXT
-  readline S31, 0
+  getstdin P30
+  readline S31, P30
   ord I2, S31
   set P0[I1], I2
   branch NEXT

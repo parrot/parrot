@@ -182,9 +182,9 @@ OUTPUT
 
 output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_t");
   loadlib P1, "libnci.so"
-  print 2, "loaded\n"
+  printerr "loaded\n"
   dlfunc P0, P1, "nci_it", "it"
-  print 2, "dlfunced\n"
+  printerr "dlfunced\n"
   set I0, 1	# prototype used - unchecked
   set I1, 0	# items on stack - unchecked
   set S5, "ko\n"
@@ -195,13 +195,13 @@ output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_t");
   ne I2, 0, nok_2
   ne I3, 0, nok_2
   ne I4, 0, nok_2
-  print 2, "ok 2\n"
+  printerr "ok 2\n"
   end
-nok_1: print 2, "nok 1\n"
-  print 2, I5
-  print 2, "\n"
+nok_1: printerr "nok 1\n"
+  printerr I5
+  printerr "\n"
   end
-nok_2: print 2, "nok 2\n"
+nok_2: printerr "nok 2\n"
   end
 CODE
 loaded

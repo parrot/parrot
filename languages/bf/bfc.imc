@@ -148,7 +148,8 @@ NOTCLOSE:
 
 NOTDOT:
   if char != "," goto NEXT
-  code = code . "readline S31, 0\n"
+  code = code . "getstdin P30\n"
+  code = code . "readline S31, P30\n"
   code = code . "ord I2, S31\n"
   code = code . "set P0[I1], I2\n"
   goto NEXT

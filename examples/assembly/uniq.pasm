@@ -49,11 +49,11 @@ GO:
 
   set I1, 1 # count
   # Read the file into S1
-  open I0, S0
-  readline S2, I0
+  open P1, S0, "<"
+  readline S2, P1
 
 SOURCE_LOOP:
-  readline S1, I0
+  readline S1, P1
 
   eq S1, S2, MATCH
 

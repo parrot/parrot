@@ -192,13 +192,11 @@ CODE
 OUTPUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "find file in runtime includes");
+output_is(<<'CODE', '1', "find file in runtime includes");
     .include "stdio.pasm"
-    print .PIO_STDOUT_FILENO, "ok\n"
+    print .PIO_STDOUT_FILENO
     end
 CODE
-ok
-OUT
 
 open FOO, ">macro.tempfile";   # Clobber previous
 close FOO;

@@ -36,8 +36,8 @@ Close IO object $1
 =cut
 
 inline op close(in PMC) {
-	PIO_close(interpreter, $1);
-	goto NEXT();
+  PIO_close(interpreter, $1);
+  goto NEXT();
 }
 
 ########################################
@@ -55,7 +55,6 @@ inline op fdopen(out PMC, in INT, in STR) {
 #ifdef PIO_OS_UNIX
   /* These char * need to go away soon */
   const char * mode;
-  ParrotIO *io;
   mode = string_to_cstring(interpreter, $3);
 
   $1 = PIO_fdopen(interpreter, $2, mode);
@@ -73,12 +72,63 @@ inline op fdopen(out PMC, in INT, in STR) {
   goto NEXT();
 }
 
+=item B<getfd>(out INT, in PMC)
+
+Get the file descriptor out of the ParrotIO object $2 and store it in $1
+
+XXX: integral file descriptors may not exist outside of the UNIX
+     platform.
+
+=cut
+
+inline op getfd(out INT, in PMC) {
+  $1 = PIO_getfd(interpreter, $2);
+  goto NEXT();
+}
+
+=item B<getstdin>(out PMC)
+
+Create a new ParrotIO object for the stdin file descriptor and
+store it in $1
+
+=item B<getstdout>(out PMC)
+
+Create a new ParrotIO object for the stdout file descriptor and
+store it in $1
+
+=item B<getstderr>(out PMC)
+
+Create a new ParrotIO object for the stderr file descriptor and
+store it in $1
+
+=cut
+
+inline op getstdin(out PMC) {
+  $1 = new_io_pmc(interpreter, PIO_STDIN(interpreter));
+  goto NEXT();
+}
+
+inline op getstdout(out PMC) {
+  $1 = new_io_pmc(interpreter, PIO_STDOUT(interpreter));
+  goto NEXT();
+}
+
+inline op getstderr(out PMC) {
+  $1 = new_io_pmc(interpreter, PIO_STDERR(interpreter));
+  goto NEXT();
+}
+
 #########################################
 
 =item B<open>(out PMC, in STR, in STR)
 
 Open URL (file, address, database, in core image) named $2 with
 Perl style mode string in $3 and create an IO object in $1.
+
+=item B<open>(out PMC, in STR)
+
+Open URL (file, address, database, in core image) named $2 with
+read/write mode and create an IO object in $1.
 
 =cut
 
@@ -98,63 +148,16 @@ inline op open(out PMC, in STR, in STR) {
   goto NEXT();
 }
 
-=item B<open>(out INT, in STR)
+inline op open(out PMC, in STR) {
+  /* These char * need to go away soon */
+  const char * path;
 
-Open file named $2 for reading and writing and save the file
-descriptor into $1.
+  path = string_to_cstring(interpreter, $2);
 
-=item B<open>(out INT, in STR, in STR)
-
-Open file named $2 with flags $3 and mode 0644 (rw-r--r--), and save the file
-descriptor into $1.
-
-=cut
-
-op open(out INT, in STR) {
-  char *path = string_to_cstring(interpreter, $2);
-  PMC *io = PIO_open(interpreter, path, "+<");
+  $1 = PIO_open(interpreter, path, "+<");
   /* string_cstring_free(path); */
-  if (io) {
-    $1 = PIO_getfd(interpreter, io);
-  }
-  else {
-    $1 = -1;
-  }
-  goto NEXT();
-}
-
-op open(out INT, in STR, in STR) {
-  char *path = string_to_cstring(interpreter, $2);
-  char *mode = string_to_cstring(interpreter, $3);
-  PMC *io = PIO_open(interpreter, path, mode);
-  /* string_cstring_free(mode); */
-  /* string_cstring_free(path); */
-  if (io) {
-    $1 = PIO_getfd(interpreter, io);
-  }
-  else {
-    $1 = -1;
-  }
-  goto NEXT();
-}
-
-########################################
-
-=item B<close>(inout INT)
-
-Close file opened on file descriptor $1.
-
-=cut
-
-inline op close(inout INT) {
-  ParrotIOTable table;
-  ParrotIO     *io;
-
-  if ($1 >= 0) {
-    table = ((ParrotIOData*)interpreter->piodata)->table;
-    io = table[$1];
-    table[$1] = NULL;
-    PIO_close(interpreter, new_io_pmc(interpreter, io));
+  if(!$1) {
+    $1 = pmc_new(interpreter, enum_class_PerlUndef);
   }
   goto NEXT();
 }
@@ -170,17 +173,6 @@ inline op close(inout INT) {
 =item B<print>(in STR)
 
 Print $1 to standard output.
-
-=item B<print>(in INT, in INT)
-
-=item B<print>(in INT, in NUM)
-
-=item B<print>(in INT, in STR)
-
-=item B<print>(in INT, in PMC)
-
-Print $2 to the file specified by file descriptor $1; for $1 equal to
-0, 1 or 2, we use stdin, stdout or stderr respectively.
 
 =cut
 
@@ -213,113 +205,107 @@ op print(in PMC) {
   goto NEXT();
 }
 
-
-op print(in INT, in INT) {
-  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
-  STRING *s = Parrot_sprintf_c(interpreter, INTVAL_FMT, $2);
-  PIO_putps(interpreter, new_io_pmc(interpreter, io), s);
-  goto NEXT();
-}
-
-op print(in INT, in NUM) {
-  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
-  STRING *s = Parrot_sprintf_c(interpreter, "%f", (double)$2);
-  PIO_putps(interpreter, new_io_pmc(interpreter, io), s);
-  goto NEXT();
-}
-
-op print(in INT, in STR) {
-  STRING *s = $2;
-  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
-  if (s && string_length(s)) {
-    PIO_putps(interpreter, new_io_pmc(interpreter, io), s);
-  }
-  goto NEXT();
-}
-
-op print(in INT, in PMC) {
-  PMC *p = $2;
-  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
-  STRING *s = (p->vtable->get_string(interpreter, p));
-  if (s) {
-    PIO_putps(interpreter, new_io_pmc(interpreter, io), s);
-  }
-  goto NEXT();
-}
-
-op flush(in INT) {
-  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
-  PIO_flush(interpreter, new_io_pmc(interpreter, io));
-  goto NEXT();
-}
-
 ##########################################
 
-=item B<print>(in PMC, in STR)
+=item B<printerr>(in INT)
 
-Print String $2 on the IO stream object $1.
-
-=cut
-
-op print(in PMC, in STR) {
-  if ($2 && $1) {
-    PIO_write(interpreter, $1, ($2)->strstart, string_length($2));
-  }
-  goto NEXT();
-}
-
-##########################################
+=item B<printerr>(in NUM)
 
 =item B<printerr>(in STR)
 
-Print $1 to interp.stderr IO stream (unbuffered)
+=item B<printerr>(in PMC)
+
+Print $1 to standard error.
 
 =cut
+
+op printerr(in INT) {
+  PIO_eprintf(interpreter, INTVAL_FMT, (double)$1);
+  goto NEXT();
+}
+
+op printerr(in NUM) {
+  PIO_eprintf(interpreter, "%f", (double)$1);
+  goto NEXT();
+}
 
 op printerr(in STR) {
-  if ($1) {
+  STRING *s = $1;
+  if (s && string_length(s)) {
     PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDERR(interpreter)),
-              $1);
+              s);
   }
   goto NEXT();
 }
 
-########################################
+op printerr(in PMC) {
+  PMC *p = $1;
+  STRING *s = (VTABLE_get_string(interpreter, p));
+  if (s) {
+    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)),
+              s);
+  }
+  goto NEXT();
+}
 
-=item B<puts>(in STR)
+##########################################
 
-=item B<puts>(in INT)
+=item B<print>(in PMC, in INT)
 
-=item B<puts>(in NUM)
+=item B<print>(in PMC, in NUM)
 
-Print $1 to standard output stream
-This will go away when print ops are all migrated to
-use ParrotIO instead of STDIO. Right now ParrotIO is
-not stable enough to replace STDIO.
+=item B<print>(in PMC, in STR)
+
+=item B<print>(in PMC, in PMC)
+
+Print $2 on the IO stream object $1.
 
 =cut
 
-op puts(in STR) {
+op print(in PMC, in INT) {
   if ($1) {
-    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)),
-             $1);
+    STRING *s = Parrot_sprintf_c(interpreter, INTVAL_FMT, $2);
+    PIO_putps(interpreter, $1, s);
+  }
+  else {
+    /* Handle error here */
   }
   goto NEXT();
 }
 
-op puts(in INT) {
-  STRING * s = string_from_int(interpreter, $1);
-  PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)), s);
+op print(in PMC, in NUM) {
+  if ($1) {
+    STRING *s = Parrot_sprintf_c(interpreter, "%f", (double)$2);
+    PIO_putps(interpreter, $1, s);
+  }
+  else {
+    /* Handle error here */
+  }
   goto NEXT();
 }
 
-op puts(in NUM) {
-  STRING * s = Parrot_sprintf_c(interpreter, "%f", $1);
-  PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)), s);
+op print(in PMC, in STR) {
+  if ($2 && $1) {
+    PIO_putps(interpreter, $1, $2);
+  }
+  else {
+    /* Handle error here */
+  }
   goto NEXT();
 }
 
-########################################
+op print(in PMC, in PMC) {
+  if ($2 && $1) {
+    STRING *s = VTABLE_get_string(interpreter, $2);
+    PIO_putps(interpreter, $1, s);
+  }
+  else {
+    /* Handle error here */
+  }
+  goto NEXT();
+}
+
+##########################################
 
 =item B<read>(out STR, in INT)
 
@@ -372,7 +358,7 @@ op read(out STR, in PMC, in INT) {
   goto NEXT();
 }
 
-=item B<readline>(out STR, in INT)
+=item B<readline>(out STR, in PMC)
 
 Read a line up to EOL from filehandle $2.
 This switches the filehandle to linebuffer-mode.
@@ -381,18 +367,15 @@ If for some reason the line's longer than 64K you get only 64K
 
 =cut
 
-inline op readline(out STR, in INT) {
+inline op readline(out STR, in PMC) {
   ParrotIO *io;
   size_t len = 0;
   $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
   memset(($1)->strstart, 0, 65535);
 
-  if ($2 >= 0) {
-    PMC *pmc;
-    io = ((ParrotIOData*)interpreter->piodata)->table[$2];
-    pmc = new_io_pmc(interpreter, io);
-    PIO_setlinebuf(interpreter, pmc);
-    len = PIO_read(interpreter, pmc, ($1)->strstart, 65534);
+  if ($2) {
+    PIO_setlinebuf(interpreter, $2);
+    len = PIO_read(interpreter, $2, ($1)->strstart, 65534);
     ($1)->strlen = ($1)->bufused = len;
   }
   goto NEXT();
@@ -428,14 +411,7 @@ op seek(out INT, in PMC, in INT, in INT, in INT) {
   goto NEXT();
 }
 
-
 ########################################
-
-
-
-
-
-
 
 =back
 

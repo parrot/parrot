@@ -1,7 +1,9 @@
 # Simple cat util to test PIO read/write
 # This does not use STDIO
+	getstdin P0
+	getstdout P1
 REDO:
-	read S0, 256 
-	puts S0
-	branch REDO
+	readline S0, P0
+	print S0
+	if S0, REDO
 	end
