@@ -105,6 +105,10 @@ op printerr(in STR) {
 
 =item B<puts>(in STR)
 
+=item B<puts>(in INT)
+
+=item B<puts>(in NUM)
+
 Print $1 to standard output stream
 This will go away when print ops are all migrated to
 use ParrotIO instead of STDIO. Right now ParrotIO is
@@ -116,6 +120,24 @@ op puts(in STR) {
   if (($1) && string_length($1)) {
     PIO_write(interpreter, PIO_STDOUT(interpreter), ($1)->bufstart,
 			string_length($1));
+  }
+  goto NEXT();
+}
+
+op puts(in INT) {
+  STRING * s = string_from_int(interpreter, $1);
+  if (string_length(s)) {
+    PIO_write(interpreter, PIO_STDOUT(interpreter), s->bufstart,
+			string_length(s));
+  }
+  goto NEXT();
+}
+
+op puts(in NUM) {
+  STRING * s = Parrot_sprintf_c(interpreter, "%Vf", $1);
+  if (string_length(s)) {
+    PIO_write(interpreter, PIO_STDOUT(interpreter), s->bufstart,
+			string_length(s));
   }
   goto NEXT();
 }
