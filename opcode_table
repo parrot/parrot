@@ -18,6 +18,9 @@
 #      s       String constant?
 #      S       String register
 #      D       Destination 
+#
+# $Id$
+#
 
 
 # This must be opcode zero
