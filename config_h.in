@@ -24,7 +24,7 @@ typedef void SYNC;
 #define FRAMES_PER_INT_REG_CHUNK FRAMES_PER_CHUNK
 #define FRAMES_PER_STR_REG_CHUNK FRAMES_PER_CHUNK
 
-#define MASK_CHUNK_LOW_BITS 0xfffff000
+#define MASK_CHUNK_LOW_BITS (~0xfff)
 
 
 ${headers}
