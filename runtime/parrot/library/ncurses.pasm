@@ -1,5 +1,4 @@
 .pcc_sub @LOAD __ncurses_init:
-saveall
 loadlib P1, 'libform'
 dlfunc P2, P1, 'new_field', 'piiiiii'
 store_global 'ncurses::new_field', P2
@@ -649,5 +648,4 @@ dlfunc P2, P1, 'mcprint', 'iti'
 store_global 'ncurses::mcprint', P2
 dlfunc P2, P1, 'has_key', 'ii'
 store_global 'ncurses::has_key', P2
-restoreall
-invoke P1
+returncc
