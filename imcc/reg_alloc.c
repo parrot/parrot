@@ -80,6 +80,8 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 
     imcc_init_tables(interpreter);
     allocated = 0;
+    if (!unit->instructions)
+        return;
 
 #if IMC_TRACE
     fprintf(stderr, "reg_alloc.c: imc_reg_alloc\n");

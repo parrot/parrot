@@ -489,34 +489,39 @@ exp_Assign(Interp* interpreter, nodeType *p)
     SymReg *regs[IMCC_MAX_REGS], *lr, *rr;
     nodeType *var = CHILD(p);
     nodeType *rhs = var->next;
-    int assigned = 0;
+    int need_assign = 0, need_store = 0;
     char buf[128];
 
-    lr = var->expand(interpreter, var);
     if (rhs->expand == exp_Binary) {
         /*
          * set the destination node, where the binary places
          * the result
          */
         rhs->dest = var;
-        rr = rhs->expand(interpreter, rhs);
-        assigned = 1;
+        lr = rhs->expand(interpreter, rhs);
     }
     else if (rhs->expand == exp_Const) {
         const char *pmc;
         /* need a new value, because the name might be aliased by
          * a = b
          */
-        rr = node_to_pmc(interpreter, rhs);
+        lr = node_to_pmc(interpreter, rhs);
+        ins = cur_unit->last_ins;
+        need_store = 1;
     }
     else {
         rr = rhs->expand(interpreter, rhs);
+        need_store = 1;
+        need_assign = 1;
     }
-    ins = cur_unit->last_ins;
-    if (!assigned) {
+    if (need_assign) {
+        lr = var->expand(interpreter, var);
+        ins = cur_unit->last_ins;
         regs[0] = lr;
         regs[1] = rr;
         ins = insINS(interpreter, cur_unit, ins, "set", regs, 2);
+    }
+    if (need_store) {
         regs[0] = get_const("-1", 'I');
         sprintf(buf, "\"%s\"", var->u.r->name);
         regs[1] = get_const(buf, 'S');
