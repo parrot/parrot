@@ -516,7 +516,10 @@ string_transcode(struct Parrot_Interp *interpreter,
     char *destend;
 
     if (!encoding) {
-        encoding = encoding_lookup_index(0);
+        if (type) 
+            encoding = encoding_lookup(type->default_encoding);
+        else 
+            encoding = encoding_lookup_index(0);
         /* XXX This is a hack. I had thought it was:
          * encoding = encoding_lookup(src->type->default_encoding);
          * but that seems really stupid, because transcoding two strings
