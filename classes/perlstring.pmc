@@ -472,6 +472,7 @@ pmclass PerlString {
     INTVAL cmp_num(PMC* value) {
 	/* XXX: need to add this, but there's no way to get to it from
 	 * Parrot assembly, so it can wait. */
+        return 0;
     }
 
     void repeat (PMC* value, PMC* dest) {

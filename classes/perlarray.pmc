@@ -895,9 +895,11 @@ pmclass PerlArray {
     }
     
     INTVAL is_equal_keyed (KEY* key, PMC* value, KEY* value_key) {
+        return 0;
     }
 
     INTVAL is_equal_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+        return 0;
     }
 
     void logical_or (PMC* value, PMC* dest) {
