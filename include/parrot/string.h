@@ -23,8 +23,8 @@ struct parrot_string_t {
     UINTVAL flags;
     UINTVAL bufused;
     UINTVAL strlen;
-    ENCODING *encoding;
-    CHARTYPE *type;
+    const ENCODING *encoding;
+    const CHARTYPE *type;
     INTVAL language;
 };
 
