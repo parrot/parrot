@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
@@ -286,6 +286,21 @@ DONE:
         end
 CODE
 done
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "String as keys");
+        new P0,.PerlHash
+        new P1,.PerlArray
+        new P2,.PerlArray
+        set P1[4],"string"
+        set P0,"one",P1
+        set P2,P0,"one"
+        set S0,P2[4]
+        print S0
+        print "\\n"
+        end   
+CODE
+string
 OUTPUT
 
 1;

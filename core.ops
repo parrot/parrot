@@ -757,7 +757,7 @@ inline op set (out PMC, in STR, in PMC)  {
 
     MAKE_KEY(key, $2, enum_key_string, struct_val);
 
-    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
+    $1->vtable->set_pmc_keyed(interpreter, $1, NULL, $3, &key);
     goto NEXT();
 }
 
