@@ -58,7 +58,7 @@
  *     Invariants:
  *
  *     There is always space in list->prev to insert an element.
- *     
+ *
  *     The 'list' chunk is never empty unless the entire list is
  *     empty.
  *
@@ -189,7 +189,7 @@ rebuild_chunk_list(Interp *interpreter, IntList *list)
     IntList_Chunk* lastChunk = list->prev;
     size_t len = 0;
     /* allocate a new chunk_list buffer, old one my have moved
-     * firsr, count chunks */
+     * first, count chunks */
     while (1) {
         len++;
         if (chunk == lastChunk) break;
@@ -241,7 +241,7 @@ push_chunk(Interp* interpreter, IntList* list)
      */
     if (list->n_chunks >= chunk_list_size(list) ||
             list->collect_runs != interpreter->collect_runs)
-    rebuild_chunk_list(interpreter, list);
+        rebuild_chunk_list(interpreter, list);
     else {
         /* add the appended = last chunk = list->prev to chunk_list */
         chunk_list_ptr(list, list->n_chunks) = list->prev;
@@ -372,7 +372,7 @@ intlist_get(Interp* interpreter, IntList* list, INTVAL idx)
 {
     IntList_Chunk* chunk;
     INTVAL length = list->length;
-    
+
     if (idx >= length || -idx > length) {
         internal_exception(OUT_OF_BOUNDS,
                           "Invalid index, must be " INTVAL_FMT ".." INTVAL_FMT,
@@ -394,26 +394,14 @@ static void
 intlist_extend(Interp* interpreter, IntList* list, INTVAL length)
 {
     IntList_Chunk* chunk = list->prev;
-    INTVAL to_add = length - list->length;
-
-    while (to_add > 0) {
-        INTVAL available = INTLIST_CHUNK_SIZE - chunk->end;
-        INTVAL end;
-
-        /* Zero out all newly added elements */
-        end = (to_add <= available) ? chunk->end + to_add : INTLIST_CHUNK_SIZE;
-        memset(&((INTVAL*)chunk->buffer.bufstart)[chunk->end],
-               0,
-               sizeof(INTVAL) * (end - chunk->end));
-        to_add -= end - chunk->end;
-        chunk->end = end;
-
-        if (to_add > 0) push_chunk(interpreter, list);
-
+    INTVAL idx = length - list->length + chunk->end;
+    INTVAL chunks_to_add = idx / INTLIST_CHUNK_SIZE;
+    for (; chunks_to_add ; chunks_to_add--) {
+        chunk->end = INTLIST_CHUNK_SIZE;
+        push_chunk(interpreter, list);
         chunk = chunk->next;
     }
-
-    assert(length >= list->length);
+    chunk->end = idx % INTLIST_CHUNK_SIZE;
     list->length = length;
 }
 
@@ -422,7 +410,7 @@ intlist_assign(Interp* interpreter, IntList* list, INTVAL idx, INTVAL val)
 {
     IntList_Chunk* chunk;
     INTVAL length = list->length;
-    
+
     if (idx < -length) {
         internal_exception(OUT_OF_BOUNDS,
                           "Invalid index, must be " INTVAL_FMT ".." INTVAL_FMT,
@@ -447,7 +435,7 @@ intlist_assign(Interp* interpreter, IntList* list, INTVAL idx, INTVAL val)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
