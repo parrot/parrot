@@ -5,7 +5,7 @@
  *  Overview:
  *      This is the Parrot IO subsystem API.  Generic IO stuff
  *      goes here, each specific layer goes in its own file...
- *      (io_unix, io_win32, io_stdio, io_utf8, etc.)
+ *      (io_unix, io_win32, io_buf, io_stdio, io_utf8, etc.)
  *  Data Structure and Algorithms:
  *      Uses the IO PMC defined in io.h
  *      Uses ParrotIO structs in io.h 
@@ -166,7 +166,7 @@ PIO_init_stacks(theINTERP)
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_win32_layer), NULL);
 #endif
 #if 0
-    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_stdio_layer), NULL);
+    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), NULL);
 #endif
 
     /* Note: All layer pushes should be done before init calls */

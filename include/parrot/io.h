@@ -164,7 +164,7 @@ extern ParrotIOLayer pio_unix_layer;
 #else
 extern ParrotIOLayer pio_win32_layer;
 #endif
-extern ParrotIOLayer pio_stdio_layer;
+extern ParrotIOLayer pio_buf_layer;
 
 /* This is list of valid layers */
 extern ParrotIOLayer *pio_registered_layers;
