@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_eh - clear_eh");
@@ -500,5 +500,11 @@ back in main
 Lexical 'nix' not found
 OUTPUT
 
+output_is(<<'CODE', '', "exit exception");
+    noop
+    exit 0
+    print "not reached\n"
+    end
+CODE
 1;
 

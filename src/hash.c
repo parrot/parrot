@@ -237,6 +237,8 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 {
     BucketIndex bucket_index;
 
+#if 0
+    /* key is verified in the vtable, value is an auto variable */
     if (key == NULL) {
         internal_exception(INTERNAL_PANIC, "NULL key\n");
         return NULLBucketIndex;
@@ -246,6 +248,7 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
         internal_exception(INTERNAL_PANIC, "NULL value\n");
         return NULLBucketIndex;
     }
+#endif
 
     bucket_index = hash->free_list;
     if (bucket_index != NULLBucketIndex) {

@@ -250,7 +250,7 @@ pmclass Array need_ext {
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-	    SELF.set_integer_keyed_int(ix, value);
+	    DYNSELF.set_integer_keyed_int(ix, value);
 	    return;
 	}
         box = SELF.get_pmc_keyed_int(ix);

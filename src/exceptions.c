@@ -103,6 +103,7 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
     Stack_entry_type type;
     STRING *message;
     char *m;
+    int exit_status;
     /* for now, we don't check the exception class and we don't
      * look for matching handlers
      */
@@ -123,14 +124,23 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
         }
     } while (1);
     m = string_to_cstring(interpreter, message);
+    exit_status = 1;
     if (m && *m) {
         fputs(m, stderr);
         if (m[strlen(m)-1] != '\n')
             fprintf(stderr, "%c", '\n');
     }
-    else
-        fprintf(stderr, "No exception handler and no message\n");
-    Parrot_exit(1);
+    else {
+        INTVAL severity =
+            VTABLE_get_integer_keyed_int(interpreter, exception, 2);
+        if (severity == EXCEPT_exit) {
+            exit_status =
+                (int)VTABLE_get_integer_keyed_int(interpreter, exception, 1);
+        }
+        else
+            fprintf(stderr, "No exception handler and no message\n");
+    }
+    Parrot_exit(exit_status);
 
     return NULL;
 }

@@ -75,7 +75,8 @@ typedef enum {
     EXCEPT_error = 2,
     EXCEPT_severe = 3,
     EXCEPT_fatal = 4,
-    EXCEPT_doomed = 5
+    EXCEPT_doomed = 5,
+    EXCEPT_exit = 6
 } exception_severity;
 
 /* &end_gen */

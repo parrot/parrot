@@ -511,6 +511,12 @@ Only valid inside an exception handler. Rethrow the exception $1.
 
 Die with severity $1 and error $2.
 
+=item B<exit>(in INT)
+
+Exit the interpreter with exit_status $1. If you want to communicate an
+extended exit status, create an exception with severity B<EXCEPT_exit>
+and throw it.
+
 =cut
 
 inline op set_eh(in PMC) {
@@ -535,12 +541,14 @@ inline op rethrow(in PMC) {
 }
 
 inline op die_hard(in INT, in INT) {
-  /* XXX a quick hack to test setjmp/longjmp */
-  extern void do_exception(exception_severity severity, long error);
   do_exception($1, $2);
   restart NEXT();
 }
 
+inline op exit(in INT) {
+  do_exception(EXCEPT_exit, $1);
+  restart NEXT();
+}
 =back
 
 =cut
