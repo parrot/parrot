@@ -72,7 +72,7 @@ static void help(void)
 {
     printf("pdump - dump or convert parrot bytecode (PBC) files\n");
     printf("usage:\n");
-    printf("pdump [-t] [-d] [-h] file.pbc\n");
+    printf("pdump [-tdh] [--terse|--disassemble|--header-only] file.pbc\n");
     printf("pdump -o converted.pbc file.pbc\n\n");
     printf("\t-d ... disassemble bytecode segments\n");
     printf("\t-h ... dump header only\n");
@@ -83,6 +83,14 @@ static void help(void)
     exit(0);
 }
 
+static struct longopt_opt_decl options[] = {
+    { 'h', 'h', 0,       { "--header-only" } },
+    { '?', '?', 0, { "--help" } },
+    { 't', 't', 0, { "--terse" } },
+    { 'd', 'd', 0, { "--disassemble" } },
+    { 'o', 'o', OPTION_required_FLAG, { "--output" } }
+};
+
 int
 main(int argc, char **argv)
 {
@@ -92,60 +100,42 @@ main(int argc, char **argv)
     int disas = 0;
     int convert = 0;
     int header = 0;
-    char *file;
+    const char *file;
+    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+    int status;
 
     if (argc < 2) {
         help();
     }
-    argc--;
-    argv++;
-    while (argc > 1) {
-        if (strcmp(*argv, "-t") == 0) {
-            argc--;
-            argv++;
-            terse = 1;
-        }
-        else if (strcmp(*argv, "-d") == 0) {
-            argc--;
-            argv++;
-            disas = 1;
-        }
-        else if (memcmp(*argv, "-o", 2) == 0) {
-            if ((*argv)[2])
-                file = *argv+2;
-            else {
-                argc--;
-                argv++;
-                if (argc > 1)
-                    file = *argv;
-                else {
-                    fprintf(stderr, "Missing file param\n");
-                    exit(1);
-                }
-            }
-            argc--;
-            argv++;
-            convert = 1;
-        }
-        else if (strcmp(*argv, "-h") == 0) {
-            argc--;
-            argv++;
-            header = 1;
-        }
-        else if (strcmp(*argv, "-?") == 0) {
-            help();
-        }
-        else if (**argv == '-') {
-            printf("Unknown option '%s' ignored\n", *argv);
-            argc--;
-            argv++;
-        }
-        else
-            break;
-    }
-
     interpreter = make_interpreter(NO_FLAGS);
     Parrot_init(interpreter, (void *)&terse);
+    while ((status = longopt_get(interpreter,
+                    argc, argv, options, &opt)) > 0) {
+        switch (opt.opt_id) {
+            case 'h':
+                header = 1;
+                break;
+            case 't':
+                terse = 1;
+                break;
+            case 'd':
+                disas = 1;
+                break;
+            case 'o':
+                file = opt.opt_arg;
+                convert = 1;
+                break;
+            case '?':
+                help();
+                break;
+        }
+    }
+    if (status == -1) {
+        help();
+    }
+    argc -= opt.opt_index;
+    argv += opt.opt_index;
+
 
     pf = Parrot_readbc(interpreter, *argv);
 

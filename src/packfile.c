@@ -575,7 +575,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         }
         else if (header->bytecode_ss == 0) {
             /* Must have at least one instruction */
-            PIO_eprintf(NULL, 
+            PIO_eprintf(NULL,
                 "Packfile_unpack: No bytecode present in bytecode segment.\n");
             return 0;
         }
@@ -692,9 +692,9 @@ PackFile_remove_segment_by_name (struct PackFile *pf, const char *name)
         if (strcmp (seg->name, name) == 0) {
             dir->num_segments--;
             if (i != dir->num_segments) {
-                /* We're not the last segment, so we need to move things */ 
+                /* We're not the last segment, so we need to move things */
                 memmove(dir->segments[i], dir->segments[i+1],
-                       (dir->num_segments - i) * 
+                       (dir->num_segments - i) *
                        sizeof (struct PackFile_Segment *));
             }
             dir->segments = mem_sys_realloc (dir->segments,
@@ -868,17 +868,17 @@ static void default_dump (struct Parrot_Interp *interpreter,
     size_t i;
 
     default_dump_header(interpreter, self);
-    i = self->file_offset + 4;
+    i = self->data ? 0: self->file_offset + 4;
     if (i % 8)
         PIO_printf(interpreter, "\n %04x:  ", (int) i);
 
-    for ( ; i < (self->size ? self->file_offset+self->size + 4 :
+    for ( ; i < (self->data ? self->size :
             self->file_offset + self->op_count); i++) {
         if (i % 8 == 0) {
             PIO_printf(interpreter, "\n %04x:  ", (int) i);
         }
         PIO_printf(interpreter, "%08lx ", (unsigned long)
-                self->data[i]);
+                self->data ? self->data[i] : self->pf->src[i]);
     }
     PIO_printf(interpreter, "\n]\n");
 }
