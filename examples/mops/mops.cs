@@ -3,10 +3,10 @@ using System;
 
 class App {
 	public static int Main(String[] args) {
-		long i1, i5;
+		int i1, i5;
 		// int i2 = 0;
-		long i3 = 1;
-		long i4 = 100000000;
+		int i3 = 1;
+		int i4 = 100000000;
 		DateTime start, end;
 		double n1, n2;
 		Console.WriteLine("Iterations:    {0}", i4);
