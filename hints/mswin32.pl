@@ -10,6 +10,8 @@
 		$c{cc_o_out} = '-Fo';
 		$c{cc_exe_out} = '-Fe';
 		$c{ld_out} = '/OUT:';
+		$c{cc_ldflags} = '/link';
+		$c{cc_ldflags} = '/link';
 		$c{cc_debug} = '-Zi';
 		$c{ld_debug} = '-debug';
 		$c{platform} = 'win32';
