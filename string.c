@@ -532,7 +532,7 @@ string_concat(struct Parrot_Interp *interpreter, STRING *a,
         if (a != NULL) {
             /* XXX
              * string_transcode may here be used as string_copy, which is
-             * the only case, where string_transcodes STRING isn't
+             * the only case, where string_transcode STRING isn't
              * const */
             return string_transcode(interpreter, b, a->encoding, a->type,
                                     NULL);

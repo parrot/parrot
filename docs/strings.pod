@@ -25,7 +25,7 @@ actually means.
 The most basic way of creating a string is through the function
 C<string_make>:
 
-    STRING* string_make(void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type)
+    STRING* string_make(struct Parrot_Interp *, const void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type)
 
 In here you pass a pointer to a buffer of a given encoding, and the
 number of bytes in that buffer to examine, the encoding, (see below for
@@ -34,25 +34,21 @@ values of the C<flags> and C<type> field. These should usually be zero.
 In return, you'll get a brand new Parrot string. This string will
 have its own private copy of the buffer, so you don't need to keep it.
 
-=over 3 
+=over 3
 
 =item *
 
 I<Hint>: Nothing stops you doing
 
-    string_make(NULL, 0, ... 
+    string_make(interpreter, NULL, 0, ...
 
 =back
 
 If you already have a string, you can make a copy of it by calling
 
-    STRING* string_copy(STRING* s)
+    STRING* string_copy(struct Parrot_Interp *, STRING* s)
 
 This is itself implemented in terms of C<string_make>.
-
-When a string is done with, it can be destroyed using the destroyer
-
-    void string_destroy(STRING *s)
 
 =head2 String Manipulation Functions
 
@@ -62,15 +58,15 @@ a string, so it doesn't make sense to give the values in bytes.
 
 To find out the length of a string, use
 
-    INTVAL string_length(STRING *s)
+    INTVAL string_length(const STRING *s)
 
-You I<may> explicitly use C<< s->strlen >> for this since it is such a 
+You I<may> explicitly use C<< s->strlen >> for this since it is such a
 useful operation.
 
 To concatenate two strings - that is, to add the contents of string
 C<b> to the end of string C<a>, use:
 
-    STRING* string_concat(STRING* a, STRING *b, INTVAL flag)
+    STRING* string_concat(struct Parrot_Interp *, STRING* a, STRING *b, INTVAL flag)
 
 C<a> is updated, and is also returned as a convenience. If the flag is
 set to a non-zero value, then C<b> will be transcoded to C<a>'s encoding
@@ -80,7 +76,7 @@ a Big-5 string.
 
 To repeat a string, (ie, turn 'xyz' into 'xyzxyzxyz') use:
 
-    STRING* string_repeat(struct Parrot_Interp *, STRING* s, INTVAL n, STRING** d)
+    STRING* string_repeat(struct Parrot_Interp *, const STRING* s, UINTVAL n, STRING** d)
 
 Which will repeat string I<s> n times and store the result into I<d>, which it
 also returns.  If I<*d> or I<**d> is NULL, a new string will be allocated
@@ -103,7 +99,7 @@ same encoding as C<src>.)
 
 To retrieve a single character of the string, call
 
-    INTVAL string_ord(STRING* s, INTVAL n)
+    INTVAL string_ord(const STRING* s, INTVAL n)
 
 The result will be returned from the function. It checks for the existence of
 C<s>, and tests for C<n> being out of range. Currently it applies the method
@@ -127,7 +123,7 @@ be compared.
 
 To test a string for truth, use:
 
-    BOOLVAL string_bool(struct Parrot_Interp *, STRING* s);
+    BOOLVAL string_bool(STRING* s);
 
 A string is false if it
 
@@ -140,7 +136,7 @@ Otherwise the string will be true.
 
 To format output into a string, use
 
-    STRING* string_nprintf(struct Parrot_Interp *, STRING* dest, INTVAL len, char* format, ...) 
+    STRING* string_nprintf(struct Parrot_Interp *, STRING* dest, INTVAL len, char* format, ...)
 
 C<dest> may be a null pointer, in which case a new B<native> string will
 be created. If C<len> is zero, the behaviour becomes more C<sprintf>ish
@@ -204,8 +200,8 @@ by how much to grow the allocation buffer.
 
 =head2 C<strstart>
 
-This stores the actual start of the string. In the case of COW strings 
-holding references to portions of a larger string, (for example, in regex 
+This stores the actual start of the string. In the case of COW strings
+holding references to portions of a larger string, (for example, in regex
 match variables), this is a pointer into the start of the string.
 
 =head2 C<strlen>
@@ -220,7 +216,7 @@ vtable.
 =head2 C<encoding>
 
 This is a vtable of functions; the vtable should normally be taken from
-the array C<Parrot_string_vtable>. Entries in this array specify the 
+the array C<Parrot_string_vtable>. Entries in this array specify the
 encoding of the string, from the following C<enum>:
 
     enum {
@@ -235,7 +231,7 @@ encoding of the string, from the following C<enum>:
 The "native" string type is whatever happens when you set C<LANG=C> in
 your shell; it's usually ISO-8859-1 in most English-speaking machines.
 A character equals a byte equals eight bits. No shifts, no wide
-characters, nothing. 
+characters, nothing.
 
 UTF8, UTF16, and UTF32 are what they sound like. UTF16 and UTF32 should
 use the native endianness of the machine.
@@ -262,7 +258,7 @@ The L</String Manipulation Functions> above are implemented in terms of
 string vtables to create encoding abstraction; here's an example of one:
 
     STRING*
-    string_concat(STRING* a, STRING* b, INTVAL flags) {
+    string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL flags) {
         return (ENC_VTABLE(a).concat)(a, b, flags);
     }
 
@@ -276,7 +272,7 @@ function for C<a>, we look up its vtable and retrieve the C<concat>
 entry from that vtable. This produces a function pointer we can throw
 the arguments at.
 
-To get the actual position in the array from the vtable, use the 
+To get the actual position in the array from the vtable, use the
 C<which> entry, which returns an C<INTVAL> index into
 C<Parrot_string_vtable>.
 
@@ -312,7 +308,7 @@ otherwise, add your own type.
 =item 2
 
 Add the unqualified name of the function (C<frobnicate>), together with
-your type, to C<string_vtable> in F<string.h>. 
+your type, to C<string_vtable> in F<string.h>.
 
 =item 3
 
@@ -365,9 +361,9 @@ simply returns the C<INTVAL> it is passed; C<string_utf8_max_bytes>, on the
 other hand, returns three times the value that it is passed because a
 UTF8 character may occupy up to three bytes.
 
-To grow a string to a specified size, use 
+To grow a string to a specified size, use
 
-    void string_grow(STRING *s, INTVAL newsize)
+    void string_grow(struct Parrot_Interp *, STRING *s, INTVAL newsize)
 
 The size is given in characters; C<string_max_bytes> is called to turn
 this into a size in bytes, and then the buffer is grown to accomodate
@@ -405,3 +401,23 @@ fall for that, because "native" doesn't necessarily mean ISO-8859-1.
 Fill this in later; if anyone wants to implement new encodings at this
 stage they must be mad.
 
+=head1 Work In Progress
+
+The transcoding section is out of sync with the code.
+
+Should the following functions be mentioned?
+C<string_append>,
+C<string_from_c_string>,
+C<string_from_int>,
+C<string_from_num>,
+C<string_index>,
+C<string_replace>,
+C<string_set>,
+C<string_str_index>,
+C<string_to_cstring>,
+C<string_to_int>,
+C<string_to_num>,
+C<string_transcode>.
+
+C<string_bool> is here said to return C<BOOLVAL>.  But the code is
+returning C<INTVAL> (2002Dec).  Which is the right thing?
