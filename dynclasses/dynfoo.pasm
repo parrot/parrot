@@ -1,4 +1,5 @@
-	load_pmc "foo", P0
+	null P0
+	loadlib P1, "foo"
 	print "ok 1\n"
 	find_type I0, "Foo"
 	print I0

@@ -14,56 +14,26 @@
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 
-/*
- * if this pmc class isn't already in our global vtable
- * reallocate it and assign class enum
- */
-int
-Parrot_dynext_setup_pmc(Interp *interp, dynext_pmc_info_t *info)
-{
-    int i;
-
-    for (i = 1; i < (int)enum_class_max; i++) {
-        if (!string_compare(interp, info->class_name,
-                    Parrot_base_vtables[i]->whoami)) {
-            info->class_enum = i;
-            return DYNEXT_INIT_EXISTS;
-        }
-    }
-#if 0
-    Parrot_base_vtables = mem_sys_realloc(
-            Parrot_base_vtables, sizeof(VTABLE *) * (enum_class_max + 1));
-#endif
-    info->class_enum = (*info->class_max)++;
-
-    return DYNEXT_INIT_OK;
-}
 
 /*
- * register a dynamic class pmc in the interpreter's registry
+ * dynamic library loader
+ * the initializer is currently unused
+ *
+ * calls Parrot_lib_load_%s which performs the registration of the lib once
+ *       Parrot_lib_init_%s gets called (if exists) to perform thread specific setup
  */
-int
-Parrot_dynext_init_pmc (Interp *interp, dynext_pmc_info_t *info)
-{
-    PMC *classname_hash;
-    PMC *key;
 
-    classname_hash = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, (INTVAL)IGLOBALS_CLASSNAME_HASH);
-    key = key_new_string(interp, info->class_name);
-    VTABLE_set_integer_keyed(interp, classname_hash, key, info->class_enum);
-    return DYNEXT_INIT_OK;
-}
-
-int
-Parrot_load_pmc(Interp *interpreter, STRING *lib, PMC *initializer)
+PMC *
+Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 {
-    STRING *path, *init_func;
+    STRING *path, *load_func_name, *init_func_name;
     void * handle;
-    void (*func)(Interp *, int, void *);
-    char *cpath, *cinit_func;
-    dynext_pmc_info_t info;
+    PMC *(*load_func)(Interp *);
+    void (*init_func)(Interp *, PMC *);
+    char *cpath, *cinit_func_name, *cload_func_name;
+    PMC *lib_pmc;
 
+    UNUSED(initializer);
     /* TODO runtime path for dynamic extensions */
     /* TODO $SO extension */
 #ifndef RUNTIME_DYNEXT
@@ -73,7 +43,7 @@ Parrot_load_pmc(Interp *interpreter, STRING *lib, PMC *initializer)
 #  define SO_EXTENSION ".so"
 #endif
 
-    path = Parrot_sprintf_c(interpreter, "%s%Ss_pmc%s",
+    path = Parrot_sprintf_c(interpreter, "%s%Ss%s",
             RUNTIME_DYNEXT,
             lib,
             SO_EXTENSION);
@@ -81,29 +51,24 @@ Parrot_load_pmc(Interp *interpreter, STRING *lib, PMC *initializer)
     handle = Parrot_dlopen(cpath);
     if (!handle) {
         const char * err = Parrot_dlerror();
-        fprintf(stderr, "%s\n", err);
-        return -1;
+        fprintf(stderr, "Couldn't load '%s': %s\n", cpath, err ? err : "unknow reason");
+        return NULL;
     }
     string_cstring_free(cpath);
-    init_func = Parrot_sprintf_c(interpreter, "Parrot_dynext_%Ss_init", lib);
-    cinit_func = string_to_cstring(interpreter, init_func);
-    func = (void (*)(Interp *, int, void*))D2FPTR(Parrot_dlsym(handle, cinit_func));
-    if (!func) {
+    load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_load", lib);
+    cload_func_name = string_to_cstring(interpreter, load_func_name);
+    load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle, cload_func_name));
+    if (!load_func) {
         fprintf(stderr, "Failed to find symbol '%s' in native library\n",
-                cinit_func);
-        return -1;
+                cload_func_name);
+        return NULL;
     }
-    string_cstring_free(cinit_func);
+    string_cstring_free(cload_func_name);
+    lib_pmc = (*load_func)(interpreter);
     /*
-     * setup init info structure */
-    info.class_name = lib;
-    info.initializer = initializer;
-    info.class_max = &enum_class_max;
-    info.base_vtable = Parrot_base_vtables;
-    /* TODO error checks */
-    (*func)(interpreter, DYNEXT_SETUP_PMC, (void *) &info);
-    (*func)(interpreter, DYNEXT_INIT_PMC, (void *) &info);
-    return 0;
+     * TODO call init, if it exists
+     */
+    return lib_pmc;
 }
 
 /*

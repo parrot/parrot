@@ -200,10 +200,10 @@ pmc_register(Parrot_Interp interp, STRING *name)
     classname_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                                               IGLOBALS_CLASSNAME_HASH);
     key = key_new_string(interp, name);
-    
-    type = ++enum_class_max;
+
+    type = enum_class_max++;
     VTABLE_set_integer_keyed(interp, classname_hash, key, type);
-    
+
     UNLOCK(class_count_mutex);
     return type;
 }

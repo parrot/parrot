@@ -813,51 +813,30 @@ EOC
       my $lc_classname = lc $classname;
       $OUT .= <<EOC;
 /*
- * This init function will be called to setup/init/whatever
- * is needed to get this extension running
+ * This load function will be called to do global (once) setup
+ * whatever is needed to get this extension running
  */
 #include "parrot/dynext.h"
 
-int Parrot_dynext_${lc_classname}_init(Interp *interp, int action, void *param)
+int Parrot_lib_${lc_classname}_load(Interp *interpreter)
 {
-    dynext_pmc_info_t *info = (dynext_pmc_info_t*) param;
-    int ok;
-    int i;
     STRING *whoami;
+    PMC *pmc;
+    INTVAL type;
 
     /*
-     * These are globals. As the shared lib is linked against libparrot
-     * the shared libs has its own globals, so we must initialize these
-     * yep, that's ugly
+     * TODO which PMC type to return
      */
-    for (i = 1; i < *(info->class_max); i++)
-	Parrot_base_vtables[i] = info->base_vtable[i];
-    enum_class_max = *info->class_max;
-    switch (action) {
-	case DYNEXT_SETUP_PMC:
-	    string_init();	/* default type/encoding */
-	    /* one time setup code */
+    pmc = new_pmc_header(interpreter);
+    add_pmc_ext(interpreter, pmc);
+    string_init();	 /* default type/encoding */
 
-	    /* for all PMCs we want to register:
-	     */
-	    whoami = string_from_cstring(interp, "$classname", 0);
-	    info->class_name = whoami;
-	    ok = Parrot_dynext_setup_pmc(interp, info);
-	    if (ok == DYNEXT_INIT_OK) {
-		$initname(interp, info->class_enum);
-		/* set our class enum */
-		Parrot_base_vtables[info->class_enum]->base_type =
-		    info->class_enum;
-		/* copy vtable back to caller */
-		info->base_vtable[info->class_enum] =
-		    Parrot_base_vtables[info->class_enum];
-	    }
-	    return ok;
-	case DYNEXT_INIT_PMC:
-	    /* per interpreter/thread init code */
-	    return Parrot_dynext_init_pmc(interp, info);
-    }
-    return DYNEXT_INIT_ERR;	/* error, unsupported action */
+    /* for all PMCs we want to register:
+    */
+    whoami = string_from_cstring(interpreter, "$classname", 0);
+    type = pmc_register(interpreter, whoami);
+    /* do class_init code */
+    $initname(interpreter, type);
 }
 
 EOC

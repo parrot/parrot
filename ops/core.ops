@@ -926,12 +926,6 @@ Opcodes for interfacing with C functions in shared libraries.
 
 ########################################
 
-=item B<load_pmc>(in STR, in PMC)
-
-Load in a pmc extension library. $1 is the name of the extension library,
-$2 is an initializer that may have additional information for the PMCs
-in that extension.
-
 =item B<loadlib>(out PMC, in STR)
 
 Load a dynamic link library named $2 and store it in $1.
@@ -968,27 +962,9 @@ XXX: leo N/Y
 
 =cut
 
-inline op load_pmc(in STR, in PMC) {
-  int err = Parrot_load_pmc(interpreter, $1, $2);
-  if (err)
-      internal_exception(-1, "Failed to load dynamic PMC extension");
-  goto NEXT();
-}
-
 inline op loadlib(out PMC, in STR) {
-  PMC * pmc;
-  void * p;
-  const char * s = string_to_cstring(interpreter, ($2));
-  p = Parrot_dlopen(s);
-  if(p == NULL) {
-     const char * err = Parrot_dlerror();
-     fprintf(stderr, "%s\n", err);
-     PANIC("Failed to load native library");
-  }
-  pmc = new_pmc_header(interpreter);
-  add_pmc_ext(interpreter, pmc);
-  PMC_data(pmc) = (void *)p;
-  $1 = pmc;
+
+  $1 = Parrot_load_lib(interpreter, $2, NULL);
   goto NEXT();
 }
 
