@@ -16,6 +16,7 @@
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
+#include <assert.h>
 
 /***************************************
 Determine the size of the buffer needed in order to pack the PackFile into a
@@ -123,9 +124,7 @@ PackFile_ConstTable_pack(struct PackFile_Segment *seg, opcode_t *cursor)
     *cursor++ = self->const_count;
 
     for (i = 0; i < self->const_count; i++) {
-        PackFile_Constant_pack(self->constants[i], cursor);
-
-        cursor += PackFile_Constant_pack_size(self->constants[i]);
+        cursor = PackFile_Constant_pack(self->constants[i], cursor);
     }
 
     return cursor;
@@ -160,13 +159,15 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 (Note this padding is not yet implemented for FLOATVALs.)
 ***************************************/
 
-void
+/* this will go away soon */
+extern size_t cstring_packed_size(const char *s);
+
+opcode_t *
 PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
 {
     char *charcursor;
     size_t i;
     opcode_t padded_size;
-    opcode_t packed_size;
     struct PMC *key;
 
     *cursor++ = self->type;
@@ -187,9 +188,6 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
             padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
         }
 
-        /* Include space for flags, encoding, type, and size fields.  */
-        packed_size = 4 + padded_size / sizeof(opcode_t);
-
         *cursor++ = PObj_get_FLAGS(self->u.string); /* only constant_FLAG */
         *cursor++ = self->u.string->encoding->index;
         *cursor++ = self->u.string->type->index;
@@ -205,20 +203,14 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
             charcursor += self->u.string->bufused;
 
             if (self->u.string->bufused % sizeof(opcode_t)) {
-                for (i = 0;
-                     i <
-                     (sizeof(opcode_t) -
+                for (i = 0; i < (sizeof(opcode_t) -
                       (self->u.string->bufused % sizeof(opcode_t))); i++) {
-                    charcursor[i] = 0;
+                    *charcursor++ = 0;
                 }
             }
         }
-        /* If cursor is needed below, uncomment the following and
-         * ignore the gcc -Wcast-align warning.  charcursor is
-         * guaranteed to be aligned correctly by the padding logic
-         * above.
-         * cursor = (opcode_t *) charcursor;
-         */
+        assert( ((int)charcursor & 3) == 0);
+        LVALUE_CAST(char *, cursor) = charcursor;
         break;
 
     case PFC_PMC:
@@ -229,14 +221,12 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
             case enum_class_Continuation:
             case enum_class_Coroutine:
                 {
-                    size_t len;
                     char *s = ((struct Parrot_Sub*)PMC_sub(key))->packed;
-                    len = strlen(s) + 1;
-
                     strcpy((char *) cursor, s);
 #if TRACE_PACKFILE_PMC
                     fprintf(stderr, "PMC_packed '%s'\n", (char*) cursor);
 #endif
+                    cursor += cstring_packed_size(s);
                 }
                 break;
             default:
@@ -246,9 +236,8 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
         break;
 
     case PFC_KEY:
-        packed_size = sizeof(opcode_t);
         for (i = 0, key = self->u.key; key; key = PMC_data(key), i++)
-            packed_size += 2 * sizeof(opcode_t);
+            ;
         /* number of key components */
         *cursor++ = i;
         /* and now type / value per component */
@@ -297,6 +286,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
         Parrot_exit(1);
         break;
     }
+    return cursor;
 }
 
 /*

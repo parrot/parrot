@@ -76,8 +76,9 @@ static opcode_t * pf_debug_unpack (struct Parrot_Interp *,
 static void pf_debug_destroy (struct PackFile_Segment *self);
 
 /* internal definitions */
-#define ROUND_UP(val,size) ((((val) + (size - 1))/(size)) * (size))
+#define ROUND_UP(val,size) (((val) + ((size) - 1))/(size))
 
+size_t cstring_packed_size(const char *s);
 /******************************************************************************
 
 =head1 PackFile Manipulation Functions
@@ -94,7 +95,8 @@ frozen bytecode.
 */
 
 
-static size_t cstring_packed_size(const char *s)
+size_t
+cstring_packed_size(const char *s)
 {
     UINTVAL str_len;
 
@@ -102,7 +104,7 @@ static size_t cstring_packed_size(const char *s)
         return 0;
 
     str_len = strlen(s);
-    return ROUND_UP(str_len + 1, sizeof(opcode_t)) / sizeof(opcode_t);
+    return ROUND_UP(str_len + 1, sizeof(opcode_t));
 }
 
 /***************************************
@@ -1035,7 +1037,7 @@ directory_packed_size (struct PackFile_Segment *self)
         UINTVAL str_len;
         size += 3;        /* type, offset, size */
         str_len = strlen (dir->segments[i]->name);
-        size += ROUND_UP(str_len + 1, sizeof(opcode_t)) / sizeof(opcode_t);
+        size += ROUND_UP(str_len + 1, sizeof(opcode_t));
     }
     if (align && size % align)
         size += (align - size % align);   /* pad/align it */
@@ -1069,7 +1071,7 @@ directory_pack (struct PackFile_Segment *self, opcode_t *cursor)
         size_t str_len = strlen (seg->name);
         *cursor++ = seg->type;
         strcpy ((char *)cursor, seg->name);
-        cursor += ROUND_UP(str_len + 1, sizeof(opcode_t)) / sizeof(opcode_t);
+        cursor += ROUND_UP(str_len + 1, sizeof(opcode_t));
         *cursor++ = seg->file_offset;
         *cursor++ = seg->op_count;
     }

@@ -327,8 +327,7 @@ struct PackFile_Constant *PackFile_Constant_new(void);
 
 size_t PackFile_Constant_pack_size(struct PackFile_Constant * self);
 
-void PackFile_Constant_pack(struct PackFile_Constant * self,
-                            opcode_t * packed);
+opcode_t * PackFile_Constant_pack(struct PackFile_Constant *, opcode_t *);
 
 void PackFile_Constant_destroy(struct PackFile_Constant * self);
 
