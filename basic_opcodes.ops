@@ -311,7 +311,7 @@ AUTO_OP print_s {
 }
 
 // LEN Ix, Sx
-AUTO_OP length_s_i {
+AUTO_OP length_i_s {
   INT_REG(P1) = string_length(STR_REG(P2));
 }
 
