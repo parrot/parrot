@@ -1032,7 +1032,6 @@ dynclasses-test :
 dynclasses-clean :
 	$(MAKE_C) dynclasses clean
 
-
 ###############################################################################
 #
 # language implementation targets:
@@ -1051,7 +1050,14 @@ languages-clean :
 	$(MAKE_C) languages clean
 
 
-${TEMP_icu_make}
+###############################################################################
+#
+# compiler implementation targets:
+#
+###############################################################################
+
+compilers-clean :
+	$(MAKE_C) compilers/pge clean
 
 ###############################################################################
 #
@@ -1201,7 +1207,7 @@ nokfile :
 ###############################################################################
 
 clean : test-clean progclean languages-clean docs-clean dynclasses-clean \
- examples-clean imcc-clean
+ examples-clean imcc-clean compilers-clean
 	${TEMP_cg_r}
 	$(RM_F) *.s *~ $(FLUID_FILES) \
     examples/assembly/mops$(EXE) examples/assembly/mops.c \
