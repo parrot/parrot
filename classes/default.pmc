@@ -170,7 +170,6 @@ pmclass default abstract noinit {
         return DYNSELF.get_string_keyed(r_key);
     }
 
-
     INTVAL get_bool_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_bool_keyed(r_key);
@@ -218,6 +217,11 @@ pmclass default abstract noinit {
     void set_string_keyed_int (INTVAL key, STRING* string) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_string_keyed(r_key, string);
+    }
+
+    void set_bool_keyed_int (INTVAL key, INTVAL value) {
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.set_bool_keyed(r_key, value);
     }
 
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
