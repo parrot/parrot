@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 36;
+use TestCompiler tests => 37;
 
 ##############################
 # Parrot Calling Conventions
@@ -1393,4 +1393,15 @@ N 1
 proto 0
 P 0
 OUT
+
+output_is(<<'CODE', "mongueur\nmonger\n", "multiple declaration in a .sym/.local directive");
+.sub main
+.sym string s, t
+  s = "mongueur\n"
+  t = "monger\n"
+  print s
+  print t
+  end
+.end
+CODE
 

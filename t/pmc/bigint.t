@@ -84,9 +84,13 @@ output_is(<<'CODE', <<'OUT', "set/get int");
    set I1, P0
    print I1
    print "\n"
+   get_repr S0, P0
+   print S0
+   print "\n"
    end
 CODE
 999999
+999999L
 OUT
 
 output_is(<<"CODE", <<'OUT', "set int, get double");

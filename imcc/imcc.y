@@ -247,6 +247,7 @@ IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
 %}
 
 %union {
+    IdList * idlist;
     int t;
     char * s;
     SymReg * sr;
@@ -305,6 +306,7 @@ IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
 %token <sr> VAR
 %token <t> LINECOMMENT
 %token <s> FILECOMMENT
+%type <idlist> id_list
 
 %nonassoc CONCAT DOT
 %nonassoc  <t> POINTY
@@ -738,12 +740,40 @@ instruction:
                    { $$ = $2; }
     ;
 
+id_list : IDENTIFIER 
+         {
+            IdList* l = malloc(sizeof(IdList)); 
+            l->next = NULL;
+            l->id = $1;
+            $$ = l;
+         }
+        
+        | id_list COMMA IDENTIFIER
+        {  IdList* l = malloc(sizeof(IdList)); 
+           l->id = $3;
+           l->next = $1;
+           $$ = l;
+        }
+        ;
+
 labeled_inst:
      assignment
    | if_statement
    | NAMESPACE IDENTIFIER            { push_namespace($2); }
    | ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
-   | LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3); is_def=0; }
+   | LOCAL           { is_def=1; } type id_list 
+     {
+        IdList* l = $4;
+         while(l) {
+             IdList* l1;
+             mk_ident(l->id, $3); 
+             l1 = l;
+             l = l->next;
+             free(l1);
+     }
+    is_def=0; $$=0;
+    
+   }
    | CONST { is_def=1; } type IDENTIFIER '=' const
                                     { mk_const_ident($4, $3, $6, 0);is_def=0; }
    | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const

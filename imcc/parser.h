@@ -7,8 +7,13 @@
 #define EXTERN extern
 #endif
 
-#include "imcparser.h"
+typedef struct _IdList {
+    char* id;
+    struct _IdList*  next;
+} IdList;
 
+
+#include "imcparser.h"
 
 EXTERN int expect_pasm;
 EXTERN int pasm_file;

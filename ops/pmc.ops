@@ -203,6 +203,18 @@ op valid_type(out INT, in INT) {
     goto NEXT();
 }
 
+
+=item B<get_repr>(out STR, in PMC)
+
+Set $1 to a string reprentation of $2
+
+=cut
+
+op get_repr(out STR, in PMC) {
+    $1 = $2->vtable->get_repr(interpreter, $2);
+    goto NEXT();
+}
+
 =back
 
 =cut

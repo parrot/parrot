@@ -113,7 +113,9 @@ Define a I<compilation unit> containing PASM code.
 =item .sym <type> <identifier>
 
 Define a local name B<identifier> for this I<compilation unit> and of
-the given B<type>.
+the given B<type>. You can define multiple identifiers of the same type by separating
+them with commas:
+  .sym int i, j
 
 =item .const <type> <identifier> = <const>
 
