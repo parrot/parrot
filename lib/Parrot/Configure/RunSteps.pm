@@ -33,7 +33,7 @@ use vars qw(@steps);
 	gen/myconfig.pl
 	gen/platform.pl
 	gen/libparrot_def.pl
-        gen/core_pmcs.pl
+    gen/core_pmcs.pl
 );
 
 sub runsteps {
@@ -50,12 +50,14 @@ sub runsteps {
 		require "config/$_";
 		print "\n$Configure::Step::description";
 
+        $Configure::Step::result='done';
+
 		{
 			local $_;
 			Configure::Step::runstep(@args{@Configure::Step::args});
 		}
 
-		print "done." unless m{^inter/} && $args{ask};
+		print "$Configure::Step::result." unless m{^inter/} && $args{ask};
 	}
 }
 
