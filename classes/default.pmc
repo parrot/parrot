@@ -1632,4 +1632,11 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
         return NULL;
     }
+
+    void* invoke_pmc (PMC* sub, void* next) {
+	internal_exception(ILL_INHERIT,
+		"invoke() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+        return NULL;
+    }
 }

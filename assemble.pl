@@ -1043,7 +1043,8 @@ sub to_bytecode {
       }
     }
     $_->[0][0] .= $suffixes
-      unless defined $self->{fullops}{$_->[0][0]};
+      unless $_->[0][0] =~ /\Q$suffixes\E$/;
+#      unless defined $self->{fullops}{$_->[0][0]};
     $self->{line_to_pc}{$_->[1]}=$pc;
     $pc += scalar @{$_->[0]};
   }

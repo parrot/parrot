@@ -180,7 +180,7 @@ CODE
 OUTPUT
 
 output_is(gentest_advance('a', <<'CODE'), <<'OUTPUT', 'stack (pushmark)');
-		rx_pushmark I1
+		rx_pushmark
 		rx_pushindex I1
 		rx_literal S0, I1, "a", ADVANCE
 		rx_popindex I1, ADVANCE

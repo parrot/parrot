@@ -330,3 +330,4 @@ STRING* substr_str_keyed(PMC* key, INTVAL offset, INTVAL length)
 STRING* substr_str_keyed_int(INTVAL* key, INTVAL offset, INTVAL length)
 
 void* invoke(void* next)
+void* invoke_pmc(PMC* sub, void* next)

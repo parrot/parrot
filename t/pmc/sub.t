@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs");
@@ -28,6 +28,52 @@ func:
     dec I5
     save I5
     invoke
+    inc I5
+    print I5
+    print " done\n"
+endfunc:
+    popi
+    ret
+CODE
+3
+2
+1
+0
+1 done
+2 done
+3 done
+done 1
+1
+0
+1 done
+done 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PASM subs with invoke_p");
+    new P0, .Sub
+    set_addr I3, func
+    set P0, I3
+    set I5, 3
+    save I5
+    invoke P0
+    print "done 1\n"
+    set I5, 1
+    clone P1, P0
+    set P0, P1
+    save I5
+    invoke P1
+    print "done 2\n"
+    end
+
+func:
+    pushi
+    restore I5
+    print I5
+    print "\n"
+    eq I5, 0, endfunc
+    dec I5
+    save I5
+    invoke P0
     inc I5
     print I5
     print " done\n"

@@ -493,7 +493,7 @@ Sets register $1 to the current address plus the offset $2.
 =cut
 
 inline op set_addr(out INT, in INT) {
-  $1 = PTR2OPCODE_T(CUR_OPCODE + $2);
+  $1 = PTR2OPCODE_T(expr OFFSET($2));
   goto NEXT();
 }
 
@@ -3789,7 +3789,7 @@ stack for later returning.
 =cut
 
 inline op bsr (in INT) {
-  stack_push(interpreter, &interpreter->ctx.control_stack, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto OFFSET($1);
 }
 
@@ -3805,7 +3805,7 @@ location onto the call stack for later returning.
 
 inline op jsr(in INT) {
   opcode_t * loc;
-  stack_push(interpreter, &interpreter->ctx.control_stack, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   loc = INTVAL2PTR(opcode_t *, $1);
   goto ADDRESS(loc);
 }
@@ -4269,7 +4269,7 @@ op runinterp(inout PMC, in INT) {
 }
 
 op enternative() {
-  goto ADDRESS(( run_native(interpreter, CUR_OPCODE, interpreter->code->byte_code) ));
+  goto ADDRESS(( run_native(interpreter, expr OFFSET(0), interpreter->code->byte_code) ));
 }
 
 ########################################
@@ -4576,7 +4576,16 @@ inline op invoke() {
   opcode_t *dest;
   PMC * p = interpreter->ctx.pmc_reg.registers[0];
 
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, CUR_OPCODE + 1);
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
+
+  goto ADDRESS(dest);
+}
+
+inline op invoke(in PMC) {
+  opcode_t *dest;
+  PMC * p = $1;
+
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
 
   goto ADDRESS(dest);
 }
