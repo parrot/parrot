@@ -1,0 +1,41 @@
+cls
+
+print "Foreground test:"
+color 0, 15: print "Black 0"
+color 1, 15: print "Blue  1"
+color 2, 15: print "Green 2"
+color 3, 15: print "Cyan  3"
+color 4, 15: print "Red   4"
+color 5, 15: print "Magenta 5"
+color 6, 15: print "Brown 6"
+color 7, 15: print "White 7"
+color 8, 15: print "Grey  8"
+color 9, 15: print "Light Blue      9"
+color 10, 15: print "Light Green   10"
+color 11, 15: print "Light Cyan    11"
+color 12, 15: print "Light Red     12"
+color 13, 15: print "Light Magenta 13"
+color 14, 15: print "Yellow        14"
+color 15, 15: print "White         15"
+
+print "Background test:"
+locate 40, 2:color 0, 0: print "Black 0"
+locate 40, 3:color 0, 1: print "Blue  1"
+locate 40, 4:color 0, 2: print "Green 2"
+locate 40, 5:color 0, 3: print "Cyan  3"
+locate 40, 6:color 0, 4: print "Red   4"
+locate 40, 7:color 0, 5: print "Magenta 5"
+locate 40, 8:color 0, 6: print "Brown 6"
+locate 40, 9:color 0, 7: print "White 7"
+locate 40, 10:color 0, 8: print "Grey  8"
+locate 40, 11:color 0, 9: print "Light Blue      9"
+locate 40, 12:color 0, 10: print "Light Green   10"
+locate 40, 13:color 0, 11: print "Light Cyan    11"
+locate 40, 14:color 0, 12: print "Light Red     12"
+locate 40, 15:color 0, 13: print "Light Magenta 13"
+locate 40, 16:color 0, 14: print "Yellow        14"
+locate 40, 17:color 0, 15: print "White         15"
+	
+
+color 0, 15
+end
