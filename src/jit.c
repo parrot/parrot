@@ -957,6 +957,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         jit_info = interpreter->jit_info =
             mem_sys_allocate(sizeof(Parrot_jit_info_t));
 
+    jit_info->objfile = NULL;
 #if EXEC_CAPABLE
     if (objfile) {
         op_func = op_exec;
