@@ -15,6 +15,9 @@ sub new {
 }
 
 #------------------------------------------------------------------------------
+#
+# To guarantee unique labels for branching.
+#
 
 sub _gensym {
   return sprintf "G%04d",shift->{gensym}++;
@@ -60,42 +63,62 @@ sub _add_inst {
 }
 
 #------------------------------------------------------------------------------
+#
+# This is not the correct approach to register allocation by any stretch
+# of the imagination. The right way, however, will have to wait until we have
+# true scopes.
+#
+
+my %vars;          # Register allocation
+my $var_count = 0; # Keep track of the number of registers...
+
+#
+# %vars will map variable name to register name.
+#
+sub __allocate_register {
+  my $name = shift;
+  my $value = "P".$var_count++;
+  $vars{$value}=$name;
+  $value;
+}
+
+sub _allocate_registers {
+  my $self = shift;
+  my $tree = $self->{tree};
+  for my $inst (@$tree) {
+    next unless $inst->{instruction} eq 'allocate';
+    for(@{$inst->{values}}) {
+      my $var = __allocate_register($_);
+      $self->_add_inst('','new',[$var,'PerlInt']);
+    }
+  }
+}
+
+#------------------------------------------------------------------------------
 
 sub generate {
   my $self = shift;
   my $tree = $self->{tree};
-  my $inst;
-  my %vars;
-  my $var_count;
 
-  for $inst (@$tree) {
-    next unless $inst->{instruction} eq 'allocate';
-    for(@{$inst->{values}}) {
-      my $var = "P".$var_count++;
-      $self->_add_inst('','new',[$var,'PerlInt']);
-      $vars{$_} = $var;
-    }
-  }
+  $self->_allocate_registers();
 
-  for $inst (@$tree) {
+  for my $inst (@$tree) {
     my $instruction = $inst->{instruction};
     if($instruction eq 'print') {
       for(@{$inst->{values}}) {
         $self->_add_inst('','print',[$vars{$_}]);
       }
     }
-#    elsif($instruction eq 'allocate') {
-#      $self->_add_inst('','set',[$_,$inst->{values}[0]]);
-#    }
     elsif($instruction eq 'assign') {
-      $self->_add_inst('','set',[ $vars{$inst->{values}[0]},
-                                  $inst->{values}[1],
-                                ]
-                      );
+      $self->_add_inst('',
+        'set',[ $vars{$inst->{values}[0]},
+                $inst->{values}[1],
+              ]
+      );
     }
   }
 
-  $self->_add_inst('',"end");
+  $self->_add_inst('','end');
   $self->_format_columns();
 }
 

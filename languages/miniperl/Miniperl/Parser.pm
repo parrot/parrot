@@ -9,117 +9,113 @@ $VERSION   = '0.01';
 
 use Data::Dumper;
 
+sub new {
+  my ($class) = @_;
+  bless {
+    index  => 0,
+    tree   => [],
+  },$class;
+}
+
+sub _cur {
+  my $self = shift;
+  my $offset = shift || 0;
+  $self->{tokens}[$self->{index}+$offset];
+}
+
+sub _next {
+  my $self = shift;
+  $self->{tokens}[$self->{index}++];
+}
+
+sub _push {
+  my $self = shift;
+  my $href = shift;
+  push @{$self->{tree}},$href;
+}
+
+#-------------------------------------
+
 sub __scalar_value {
   my $token = shift;
-  return 1 if $token =~ /[-]?\d+/;
-  return 1 if $token =~ /[-]?\d+\.\d+/;
-  return 1 if $token =~ /[-]?\d+\.\d+[eE][-]?\d+/;
+  return 1 if $token =~ /[-]?\d+(\.\d+)?/;
   return 1 if $token =~ /^['"]/;
   return 1 if $token =~ /^q\(/;
   return undef;
 }
 
 sub __allocate {
-  my ($tokens,$temp,$count) = @_;
-  #
-  # my $a
-  # my ($foo)
-  # my ($foo,@bar)
-  #
-  $count++;
-  if($tokens->[$count] eq '(') { # Grab a comma-separated list of variables
+  my $self = shift;
+  $self->{index}++;
+  if($self->_cur eq '(') { # Grab a comma-separated list of variables
     my @temp;
-    $count++;
-    while($tokens->[$count] ne ')') {
-      push @temp,$tokens->[$count];
-      $count++;
-      $count++ if $tokens->[$count] eq ',';
+    $self->{index}++;
+    while($self->_cur ne ')') {
+      push @temp,$self->_next;
+      $self->{index}++ if $self->_cur eq ',';
     }
-    push @$temp,{
+    $self->_push({
       instruction => 'allocate',
-      values => \@temp,
-    };
+      values      => \@temp,
+    });
   }
   else { # Grab the single variable
-    push @$temp,{
+    $self->_push({
       instruction => 'allocate',
-      values => [
-        $tokens->[$count++],
+      values      => [
+        $self->_next,
       ]
-    };
+    });
   }
-  $count;
 }
 
 sub __assign {
-  my ($tokens,$temp,$count) = @_;
-  my $val_1    = $tokens->[$count++];
-  my $operator = $tokens->[$count++];
-  my $val_2    = $tokens->[$count++];
-  push @$temp,{
+  my $self = shift;
+  my $val_1    = $self->_next;
+  my $operator = $self->_next;
+  my $val_2    = $self->_next;
+  $self->_push({
     instruction => 'assign',
     values => [ $val_1,
                 $val_2
               ]
-  };
-  $count;
+  });
 }
 
 sub __print {
-  my ($tokens,$temp,$count) = @_;
-  $count++;
-  my @temp = $tokens->[$count++];
-  while($tokens->[$count] ne ';') {
-    push @temp,$tokens->[$count++];
+  my $self = shift;
+  $self->{index}++;
+  my @temp = $self->_next;
+  while($self->_cur ne ';') {
+    push @temp,$self->_next;
   }
-  push @$temp,{
+  $self->_push({
     instruction => 'print',
-    values => \@temp,
-  };
-  $count++;
-  $count;
+    values      => \@temp,
+  });
 }
 
 sub _build_tree {
-  my ($tokens,$count) = @_;
-  my $temp   = [];
+  my $self = shift;
 
-  while($count < @$tokens) {
-    #
-    # my $a;
-    # my ($foo);
-    # my ($foo,@bar);
-    #
-    if($tokens->[$count] eq 'my') {
-      $count = __allocate($tokens,$temp,$count);
+  while($self->{index} < @{$self->{tokens}}) {
+    if   ($self->_cur eq 'my')    { $self->__allocate(); }
+    elsif($self->_cur eq 'print') { $self->__print(); }
+
+    elsif($self->_cur    =~ /^[\$]\w+/ and
+          $self->_cur(1) eq '=') {
+      $self->__assign();
     }
-    #
-    # $foo = {scalar}
-    #
-    elsif($tokens->[$count]   =~ /^[\$]\w+/ and
-          $tokens->[$count+1] eq '=' and
-          __scalar_value($tokens->[$count+2])) {
-      $count = __assign($tokens,$temp,$count);
-    }
-    #
-    # print ;
-    # print <foo>+ ;
-    #
-    elsif($tokens->[$count] eq 'print') {
-      $count = __print($tokens,$temp,$count);
-    }
-    else {
-    }
-    $count++;
+    $self->{index}++;
   }
-
-  return ($count,$temp);
 }
 
 sub parse {
-  my $tokens = shift;
-  my (undef,$tree) = _build_tree($tokens,0);
-  return $tree;
+  my ($self,$tokens) = @_;
+
+  $self->{tokens} = $tokens;
+  $self->_build_tree();
+  return $self->{tree};
 }
 
 1;
