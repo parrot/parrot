@@ -270,7 +270,7 @@ offset of the new attribute
 
 Remove attribute $2 from class $1, specified either by name or offset
 
-=back
+=cut
 
 op addattrib(out INT, in PMC, in STR) {
     if (!PObj_is_class_TEST($2))
