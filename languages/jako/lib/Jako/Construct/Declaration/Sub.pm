@@ -72,7 +72,7 @@ sub new
   #
 
   if (defined $sym) {
-    SYNTAX_ERROR("Redeclaration of identifier '%s'. Previous declaration on line %d of file '%s'.",
+    $self->SYNTAX_ERROR("Redeclaration of identifier '%s'. Previous declaration on line %d of file '%s'.",
       $self->name, $sym->line, $sym->file);
   }
 
