@@ -95,7 +95,7 @@ sub generate_pbc_for {
       $can_skip_compile = 0 if (not -e $by_f);
     }
   }
-  $ENV{IMCC} = 'parrot' . $PConfig{exe};
+  $ENV{IMCC} = ${directory} . 'parrot' . $PConfig{exe};
 
   if (!$can_skip_compile) {
       open ASSEMBLY, "> $as_f" or die "Unable to open '$as_f'";
