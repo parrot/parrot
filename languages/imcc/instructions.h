@@ -73,6 +73,8 @@ Instruction * iANY(char * name, const char *fmt, SymReg **r, int emit);
 #endif
 Instruction * INS(char * name, char *fmt, SymReg **regs, int nargs, int keyv,
 	int emit);
+Instruction * INS_LABEL(SymReg * r0, int emit);
+
 Instruction * iNEW(SymReg * r0, char * type, int emit);
 Instruction * emitb(Instruction *);
 int instruction_reads(Instruction *, SymReg *);

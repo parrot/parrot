@@ -90,11 +90,21 @@ typedef enum {
 
 /*
 ** PackFile_FixupTable:
-*    not implemented yet
 */
+struct PackFile_FixupEntry {
+    opcode_t type;              /* who knows, what fixups we need */
+    union {
+        struct t0 {             /* type 0 entries */
+            opcode_t code_seg;  /* segment nr# */
+            opcode_t offset;    /* offset in segment */
+        } t0;
+    } u;
+};
+
 struct PackFile_FixupTable {
     struct PackFile_Segment base;
-    opcode_t dummy;
+    opcode_t fixup_count;
+    struct PackFile_FixupEntry ** fixups;
 };
 
 #define PFC_NONE    '\0'
@@ -216,13 +226,18 @@ size_t PackFile_write_fingerprint (void *cursor);
 
 void PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
 
-INTVAL PackFile_FixupTable_unpack(struct PackFile_FixupTable * self,
-                                  opcode_t * packed, opcode_t packed_size);
+INTVAL PackFile_FixupTable_unpack(struct Parrot_Interp *,
+        struct PackFile_FixupTable * self, opcode_t * , opcode_t );
 
 opcode_t PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 
 void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
                               opcode_t * packed);
+
+/* create new fixup entry */
+void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *, opcode_t seg,
+                opcode_t offs);
+
 /*
 ** PackFile_ByteCode Functions:
 */
@@ -230,6 +245,7 @@ void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
 struct PackFile_ByteCode * Parrot_new_eval_cs(struct Parrot_Interp *);
 struct PackFile_ByteCode * Parrot_switch_to_cs(struct Parrot_Interp *,
     struct PackFile_ByteCode *);
+void Parrot_switch_to_cs_by_nr(struct Parrot_Interp *, opcode_t seg);
 void Parrot_pop_cs(struct Parrot_Interp *);
 
 /* Debug stuff */

@@ -95,6 +95,16 @@ static void clear_state(void)
     memset(regs, 0, sizeof(regs));
 }
 
+
+Instruction * INS_LABEL(SymReg * r0, int emit)
+{
+    Instruction *i = _mk_instruction("","%s:", R1(r0), 0);
+    if (emit)
+        emitb(i);
+    i->type = ITLABEL;
+    return i;
+}
+
 static Instruction * iLABEL(SymReg * r0) {
     Instruction *i = emitb(_mk_instruction("","%s:", R1(r0), 0));
     i->type = ITLABEL;

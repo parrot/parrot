@@ -275,7 +275,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
  * and evaluation of opcode continues
  */
 void
-runops(struct Parrot_Interp *interpreter, size_t offset)
+runops_int(struct Parrot_Interp *interpreter, size_t offset)
 {
     int lo_var_ptr;
     opcode_t *(*core) (struct Parrot_Interp *, opcode_t *);
@@ -283,7 +283,7 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
     interpreter->resume_offset = offset;
     interpreter->resume_flag = 1;
 
-    while (interpreter->resume_flag) {
+    while (interpreter->resume_flag & 1) {
         unsigned int slow;
         opcode_t *pc = (opcode_t *)
             interpreter->code->byte_code + interpreter->resume_offset;
@@ -339,6 +339,35 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
          * is ok.
          */
         interpreter->lo_var_ptr = (void *)&lo_var_ptr;
+    }
+}
+
+void
+runops(struct Parrot_Interp *interpreter, size_t offset)
+{
+    interpreter->resume_flag = 2;
+
+    while (interpreter->resume_flag & 2) {
+        interpreter->resume_flag = 0;
+        runops_int(interpreter, offset);
+
+        if (interpreter->resume_flag & 2) {
+            /* inter segment jump
+             * resume_offset = entry in fixup table
+             */
+            struct PackFile_FixupTable *ft = interpreter->code->fixup_table;
+            opcode_t seg;
+
+            if ((opcode_t)interpreter->resume_offset >= ft->fixup_count)
+                internal_exception(1, "Illegal fixup after branch_cs\n");
+            seg = ft->fixups[interpreter->resume_offset]->u.t0.code_seg;
+            offset = ft->fixups[interpreter->resume_offset]->u.t0.offset;
+            Parrot_switch_to_cs_by_nr(interpreter, seg);
+            if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+                PIO_eprintf(interpreter, "*** Resume at seg %d ofs %d\n",
+                        (int)seg, (int)offset);
+            }
+        }
     }
 }
 

@@ -26,7 +26,7 @@ pmclass Eval extends Sub {
        PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
        struct PackFile_ByteCode *old_cs;
        struct PackFile_ByteCode *eval_cs = (struct PackFile_ByteCode *)
-		((struct Parrot_Sub *)SELF->data)->init;
+	   ((struct Parrot_Sub *)SELF->data)->init;
 
        if (pad) {
 	   /* put the correct pad in place */
@@ -39,8 +39,19 @@ pmclass Eval extends Sub {
 	       STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
        /* switch to code segment */
        old_cs = Parrot_switch_to_cs(interpreter, eval_cs);
-       runops(interpreter, 0);
-       (void)Parrot_switch_to_cs(interpreter, old_cs);
+       if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+	   PIO_eprintf(interpreter, "*** invoking %s\n",
+		   eval_cs->base.name);
+       }
+       runops_int(interpreter, 0);
+       if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+	   PIO_eprintf(interpreter, "*** back from %s\n",
+		   eval_cs->base.name);
+       }
+       if (interpreter->resume_flag & 2)
+	   next = 0;
+       else
+	   (void)Parrot_switch_to_cs(interpreter, old_cs);
        return next;
    }
 }

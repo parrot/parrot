@@ -110,7 +110,6 @@ PackFile_new(void)
         PackFile_destroy(pf);
         return NULL;
     }
-    pf->fixup_table->dummy = 0;
 
     /* Create constant table */
     pf->const_table = const_new (pf);
@@ -412,7 +411,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         return 0;
     }
 
-    if (!PackFile_FixupTable_unpack(self->fixup_table, cursor,
+    if (!PackFile_FixupTable_unpack(interpreter, self->fixup_table, cursor,
                                     header->fixup_ss)) {
         PIO_eprintf(NULL,
                 "PackFile_unpack: Error reading fixup table segment!\n");
@@ -1048,6 +1047,28 @@ Parrot_new_eval_cs(struct Parrot_Interp *interpreter)
     return new_cs;
 }
 
+/* switch to a byte code seg nr seg */
+void
+Parrot_switch_to_cs_by_nr(struct Parrot_Interp *interpreter, opcode_t seg)
+{
+    struct PackFile_Directory *dir =
+        (struct PackFile_Directory *)interpreter->code->directory;
+    size_t i, num_segs;
+    opcode_t n;
+
+    num_segs = dir->num_segments;
+    /* TODO make an index of code segments for faster look up */
+    for (i = n = 0; i < num_segs; i++) {
+        if (dir->segments[i]->flags == PF_BYTEC_SEG) {
+            if (n == seg) {
+                Parrot_switch_to_cs(interpreter, (struct PackFile_ByteCode *)
+                        dir->segments[i]);
+                return;
+            }
+            n++;
+        }
+    }
+}
 /* switch to a byte code seg, return old */
 struct PackFile_ByteCode *
 Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
@@ -1098,25 +1119,61 @@ Clear a PackFile FixupTable.
 void
 PackFile_FixupTable_clear(struct PackFile_FixupTable *self)
 {
+    opcode_t i;
     if (!self) {
         PIO_eprintf(NULL, "PackFile_FixupTable_clear: self == NULL!\n");
         return;
     }
 
-    default_destroy (&self->base);
+    for (i = 0; i < self->fixup_count; i++) {
+        mem_sys_free(self->fixups[i]);
+    }
+
+    if (self->fixup_count) {
+        mem_sys_free(self->fixups);
+    }
+
+    self->fixups = NULL;
+    self->fixup_count = 0;
 
     return;
+}
+
+static void
+fixup_destroy (struct PackFile_Segment *self)
+{
+    struct PackFile_FixupTable *ft = (struct PackFile_FixupTable *) self;
+    PackFile_FixupTable_clear(ft);
+    default_destroy(self);
 }
 
 static size_t
 fixup_packed_size (struct PackFile_Segment *self)
 {
-    return 0;
+    struct PackFile_FixupTable *ft = (struct PackFile_FixupTable *) self;
+    size_t size = 0;
+    opcode_t i;
+
+    size += sizeof(opcode_t); /* fixup_count */
+    for (i = 0; i < ft->fixup_count; i++) {
+        size += sizeof(opcode_t); /* fixup_entry type */
+        switch (ft->fixups[i]->type) {
+            case 0:
+                size += 2 * sizeof(opcode_t); /* seg, offs */
+                break;
+            default:
+                internal_exception(1, "Unknown fixup type\n");
+                return 0;
+        }
+    }
+    return size;
 }
+
 static size_t
 fixup_pack (struct PackFile_Segment *self,
             opcode_t *dest, size_t offset, size_t size)
 {
+    /* TODO */
     return 0;
 }
 
@@ -1132,10 +1189,12 @@ fixup_new (struct PackFile *pf)
     fixup = mem_sys_allocate(sizeof(struct PackFile_FixupTable));
 
     segment_init (&fixup->base, pf, FIXUP_TABLE_SEGMENT_NAME,
-                  (PackFile_Segment_destroy_func_t)PackFile_FixupTable_clear,
+                  fixup_destroy,
                   fixup_packed_size, fixup_pack);
 
     fixup->base.flags = PF_FIXUP_SEG;
+    fixup->fixup_count = 0;
+    fixup->fixups = NULL;
     return fixup;
 }
 
@@ -1145,8 +1204,6 @@ fixup_new (struct PackFile *pf)
 
 Unpack a PackFile FixupTable from a block of memory.
 
-NOTE: There is no format defined for FixupTables yet.
-
 Returns one (1) if everything is OK, else zero (0).
 
 =cut
@@ -1154,15 +1211,74 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 INTVAL
-PackFile_FixupTable_unpack(struct PackFile_FixupTable *self, opcode_t *packed,
-                           opcode_t packed_size)
+PackFile_FixupTable_unpack(struct Parrot_Interp *interpreter,
+        struct PackFile_FixupTable *self, opcode_t *packed,
+        opcode_t packed_size)
 {
-    UNUSED(self);
-    UNUSED(packed);
-    UNUSED(packed_size);
+    opcode_t *cursor;
+    opcode_t i;
+    struct PackFile * pf;
+
+    if (!self) {
+        PIO_eprintf(interpreter, "PackFile_FixupTable_unpack: self == NULL!\n");
+        return 0;
+    }
+
+    PackFile_FixupTable_clear(self);
+    /* compat - no fixups */
+    if (!packed_size)
+        return 1;
+
+    pf = self->base.pf;
+    cursor = packed;
+    self->fixup_count = PackFile_fetch_op(pf, cursor++);
+
+    self->fixups =
+        mem_sys_allocate_zeroed(self->fixup_count *
+                         sizeof(struct PackFile_FixupEntry *));
+
+    if (!self->fixups) {
+        PIO_eprintf(interpreter,
+                "PackFile_FixupTable_unpack: Could not allocate memory for array!\n");
+        self->fixup_count = 0;
+        return 0;
+    }
+
+    for (i = 0; i < self->fixup_count; i++) {
+        self->fixups[i] = mem_sys_allocate(sizeof(struct PackFile_FixupEntry));
+        self->fixups[i]->type = PackFile_fetch_op(pf, cursor++);
+        switch (self->fixups[i]->type) {
+            case 0:
+                self->fixups[i]->u.t0.code_seg =
+                    PackFile_fetch_op(pf, cursor++);
+                self->fixups[i]->u.t0.offset = PackFile_fetch_op(pf, cursor++);
+                break;
+            default:
+                PIO_eprintf(interpreter,
+                        "PackFile_FixupTable_unpack: Unknown fixup type!\n");
+                return 0;
+        }
+    }
+
     return 1;
 }
 
+void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
+        opcode_t seg, opcode_t offs)
+{
+
+    struct PackFile_FixupTable *self = interpreter->code->fixup_table;
+    opcode_t i = self->fixup_count;
+
+    self->fixup_count++;
+    self->fixups =
+        mem_sys_realloc(self->fixups, self->fixup_count *
+                         sizeof(struct PackFile_FixupEntry *));
+    self->fixups[i] = mem_sys_allocate(sizeof(struct PackFile_FixupEntry));
+    self->fixups[i]->type = 0;
+    self->fixups[i]->u.t0.code_seg = seg;
+    self->fixups[i]->u.t0.offset = offs;
+}
 /*
 
 =back

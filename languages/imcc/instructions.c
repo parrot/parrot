@@ -343,7 +343,8 @@ char * ins_string(Instruction * ins) {
 static char *output;
 static int e_file_open(char *file)
 {
-    freopen(file, "w", stdout);
+    if (strcmp(file, "-"))
+        freopen(file, "w", stdout);
     output = file;
     return 1;
 }

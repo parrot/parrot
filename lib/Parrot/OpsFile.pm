@@ -349,8 +349,11 @@ sub make_op
 	$restart = 1;
 	$next = 1;
       }
+      elsif($short_name eq 'branch_cs' || $short_name eq 'invoke') {
+	$restart = 1;
+      }
 
-                    $body =~ s/\$(\d+)/{{\@$1}}/mg;
+      $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
       if ($ENV{PARROT_NO_LINE}) {
         $op->body($body);

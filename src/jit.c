@@ -810,7 +810,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
 
 
     /* XXX assume, we restart */
-    if (pc != code_start && interpreter->jit_info) {
+    if (interpreter->jit_info) {
         jit_info = interpreter->jit_info;
         return (jit_f)D2FPTR(jit_info->arena.start);
     }

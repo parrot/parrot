@@ -3774,6 +3774,19 @@ inline op branch (in INT) {
 }
 
 
+=item B<branch_cs>(in INT)
+
+Intersegment branch to location in fixup table $1.
+
+=cut
+
+inline op branch_cs (in INT) {
+  interpreter->resume_offset = $1;
+  interpreter->resume_flag = 2;
+  goto ADDRESS(0);
+}
+
+
 ########################################
 
 =item B<bsr>(in INT)

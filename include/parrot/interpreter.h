@@ -182,12 +182,8 @@ void Parrot_init(Parrot_Interp, void*);
 void Parrot_destroy(Parrot_Interp);
 INTVAL interpinfo(struct Parrot_Interp *interpreter, INTVAL what);
 
-
-#if 0
-void runops_generic();
-#endif
-
 void runops(struct Parrot_Interp *, size_t offset);
+void runops_int(struct Parrot_Interp *, size_t offset);
 
 VAR_SCOPE opcode_t *(*run_native)(struct Parrot_Interp * interpreter,
                                   opcode_t * cur_opcode,

@@ -38,8 +38,6 @@ CODE
 back
 OUT
 
-SKIP: {
-  skip("not yet: jump to different code seg", 1);
 output_is(<<'CODE', <<'OUT', "intersegment branch");
 # #!/usr/bin/perl -w
 # my $i= 5;
@@ -66,5 +64,4 @@ LAB:
 CODE
 7
 OUT
-}
 

@@ -53,13 +53,16 @@ struct cs_t {
     struct subs *subs;                  /* current sub data */
     struct subs *first;                 /* first sub of code seg */
     struct cs_t *prev;                  /* prev cs */
+    struct cs_t *next;                  /* next cs */
 };
 
 static struct globals {
     SymReg * str_consts[HASH_SIZE];
     SymReg * num_consts[HASH_SIZE];
     SymReg * key_consts[HASH_SIZE];
-    struct cs_t *cs;
+    struct cs_t *cs;                     /* current cs */
+    struct cs_t *first;                  /* first cs */
+    int inter_seg_n;
 } globals;
 
 
@@ -107,8 +110,13 @@ int e_pbc_open(char *dummy) {
     }
     cs = mem_sys_allocate(sizeof(struct cs_t));
     cs->prev = globals.cs;
+    cs->next = NULL;
     cs->subs = NULL;
     cs->first = NULL;
+    if (!globals.first)
+        globals.first = cs;
+    else
+        cs->prev->next = cs;
     cs->seg = interpreter->code->cur_cs;
     globals.cs = cs;
     return 0;
@@ -191,6 +199,26 @@ static void store_key_const(char * str, int idx)
 }
 
 
+static int find_label_cs(char *name, opcode_t *seg, opcode_t *pc)
+{
+    struct cs_t *cs;
+    struct subs *s;
+    SymReg * r;
+    opcode_t n;
+
+    *pc = 0;
+    for (n = 0, cs = globals.first; cs; cs = cs->next, n++) {
+        for (s = cs->first; s; s = s->next) {
+            if ( (r = _get_sym(s->labels, name)) ) {
+                *pc += r->color;    /* here pc was stored */
+                *seg = n;
+                return 1;
+            }
+            *pc += s->size;
+        }
+    }
+    return 0;
+}
 /* store global labels and bsr for later fixup
  * return size in ops
  */
@@ -232,6 +260,62 @@ static int store_labels(void)
         pc += ins->opsize;
     }
 
+    /* 3. pass, look for intersegment jumps
+     * if found, rewrite code:
+     *
+     *   if x, non_local1
+     *
+     *   if x, taken1
+     *   ...
+     *   end/ret # after instructions apppend:
+     *   taken1:
+     *     inter_cs fixup_for_non_local1
+     *
+     * and generate a fixup table entry
+     */
+    for (ins = instructions; ins ; ins = ins->next) {
+        SymReg *addr, *label;
+        if (!ins->op || !*ins->op)
+            continue;
+        /* if no jump */
+        if ((addr = get_branch_reg(ins)) == 0)
+            continue;
+        /* branch found */
+        label = _get_sym(globals.cs->subs->labels, addr->name);
+        /* maybe global */
+        if (label)
+            continue;
+        if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
+                strcmp(ins->op, "branch_cs")) {
+            char buf[64];
+            Instruction *il;
+            SymReg *r[IMCC_MAX_REGS];
+            opcode_t code_seg, offset;
+
+            debug(1, "inter_cs found for '%s'\n", addr->name);
+            /* find symbol */
+            if (!find_label_cs(addr->name, &code_seg, &offset))
+                fatal(1, "store_labels", "inter_cs label '%s' not found\n",
+                        addr->name);
+            debug(1, "inter_cs label '%s' found seg %d ofs %d\n",
+                        addr->name, (int)code_seg, (int)offset);
+            /* append inter_cs jump */
+            free(addr->name);
+            sprintf(buf, "#isc_%d", globals.inter_seg_n);
+            addr->name = str_dup(buf);
+            il = INS_LABEL(addr, 1);
+            /* this is the new location */
+            store_label(addr, code_size);
+            /* increase code_size by 2 ops */
+            code_size += 2;
+            /* add inter_cs jump */
+            sprintf(buf, "%d", globals.inter_seg_n);
+            r[0] = mk_const(str_dup(buf), 'I');
+            INS("branch_cs", "", r, 1, 0, 1);
+            /* finally generate fixup table entry */
+            PackFile_FixupTable_new_entry_t0(interpreter, code_seg, offset);
+        }
+    }
     /* return code size */
     return code_size;
 }
@@ -589,7 +673,8 @@ int e_pbc_emit(Instruction * ins) {
                 debug(1, "branch label %d jump %d %s %d\n",
                         npc, label->color, addr->name,addr->color);
             }
-            else if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr")) {
+            else if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
+                strcmp(ins->op, "branch_cs")) {
                 /* TODO make intersegment branch */
                 fatal(1, "e_pbc_emit", "label not found for '%s'\n",
                             addr->name);
