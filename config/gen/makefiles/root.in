@@ -795,7 +795,7 @@ $(SRC)/inter_cb$(O) : $(SRC)/inter_cb.c $(GENERAL_H_FILES) \
     $(SRC)/inter_cb.str
 
 $(SRC)/inter_misc$(O) : $(SRC)/inter_misc.c $(GENERAL_H_FILES) \
-    $(SRC)/inter_misc.src
+    $(SRC)/inter_misc.str
 
 $(SRC)/inter_create$(O) : $(SRC)/inter_create.c $(GENERAL_H_FILES)
 

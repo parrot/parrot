@@ -14,7 +14,9 @@
 #define PARROT_CACHES_H_GUARD
 
 #define DISABLE_METH_CACHE 0
-#define DISABLE_RETC_RECYCLING 0
+
+/* turn off this hack, we need something better */
+#define DISABLE_RETC_RECYCLING 1
 
 /*
  * object method cache entry

@@ -50,7 +50,7 @@ mem_sys_allocate(size_t size)
 }
 
 void *
-mem__internal_allocate(size_t size, char *file, int line)
+mem__internal_allocate(size_t size, const char *file, int line)
 {
     void *ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -85,7 +85,7 @@ mem_sys_allocate_zeroed(size_t size)
 }
 
 void *
-mem__internal_allocate_zeroed(size_t size, char *file, int line)
+mem__internal_allocate_zeroed(size_t size, const char *file, int line)
 {
     void *ptr = calloc(1, (size_t)size);
     if (!ptr)
@@ -124,7 +124,7 @@ mem__sys_realloc(void *from, size_t size)
 }
 
 void *
-mem__internal_realloc(void *from, size_t size, char *file, int line)
+mem__internal_realloc(void *from, size_t size, const char *file, int line)
 {
     void *ptr = realloc(from, size);
     if (!ptr)
@@ -158,7 +158,7 @@ mem_sys_free(void *from)
 }
 
 void
-mem__internal_free(void *from, char *file, int line)
+mem__internal_free(void *from, const char *file, int line)
 {
 #ifdef DETAIL_MEMORY_DEBUG
     printf("Internal free of %p (%s/%d)\n", from, file, line);
