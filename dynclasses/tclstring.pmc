@@ -1,0 +1,153 @@
+/* TclString.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the TclString base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     Please remove unneeded entries.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+/* This shouldn't be necessary, IMO */
+#define enum_class_TclString -1
+
+/* this is, I'm sure, terribly inefficient. */
+#define TclString_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclString", 9)))
+#define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
+#define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
+
+pmclass TclString extends tclobject dynpmc {
+
+    void init () {
+        PMC_str_val(SELF) = string_make_empty(INTERP,enum_stringrep_one,0);
+        PObj_custom_mark_SET(SELF);
+    }
+
+    void mark () {
+        if (PMC_str_val(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
+    }
+
+    PMC* clone () {
+        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PObj_custom_mark_SET(dest);
+        PMC_str_val(dest) = string_copy(INTERP,PMC_str_val(SELF));
+        return dest;
+
+    }
+
+    STRING* get_string () {
+	return (STRING*) PMC_str_val(SELF);
+    }
+
+    INTVAL get_integer () {
+        STRING* s = (STRING*) PMC_str_val(SELF);
+        return string_to_int(INTERP, s);
+    }
+
+    FLOATVAL get_number () {
+        STRING* s = (STRING*) PMC_str_val(SELF);
+        return string_to_num(INTERP, s);
+    }
+
+    BIGNUM* get_bignum () {
+	/* XXX */
+        return NULL;
+    }
+
+    INTVAL get_bool () {
+        /* This is the perl truth value - fissit */
+        return string_bool(INTERP, PMC_str_val(SELF));
+    }
+
+    INTVAL is_same (PMC* other) {
+        STRING* s1 = (STRING*)PMC_str_val(SELF);
+        STRING* s2 = (STRING*)PMC_str_val(other);
+        return (INTVAL)( other->vtable == SELF->vtable &&
+                          s1->bufused   == s2->bufused  &&
+            (memcmp(s1->strstart,PObj_bufstart(s2),(size_t)s1->bufused)==0));
+    }
+
+    void set_integer_native (INTVAL value) {
+        DYNSELF.morph(TclInt_type);
+        DYNSELF.set_integer_native(value);
+    }
+
+    void set_number_native (FLOATVAL value) {
+        DYNSELF.morph(TclFloat_type);
+        DYNSELF.set_number_native(value);
+    }
+
+    void set_string_native (STRING * value) {
+        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF), value);
+    }
+
+    void set_string_same (PMC * value) {
+        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF),
+        PMC_str_val(value));
+    }
+
+    # math ops? keep or kill?
+    # bitwise ops
+
+    void concatenate (PMC* value, PMC* dest) {
+        STRING* s = PMC_str_val(SELF);
+        VTABLE_morph(INTERP, dest, TclString_type);
+        PMC_str_val(dest) =
+            string_concat(INTERP, s, VTABLE_get_string(INTERP, value), 0);
+    }
+
+
+    voiid concatenate_native (STRING* value, PMC* dest) {
+        STRING* s = PMC_str_val(SELF);
+        VTABLE_morph(INTERP, dest, TclString_type);
+        PMC_str_val(dest) = string_concat(INTERP, s, value, 0);
+    }
+
+    INTVAL is_equal (PMC* value) {
+        return (INTVAL)( 0 == string_compare(INTERP,
+                                             PMC_str_val(SELF),
+                                             VTABLE_get_string(INTERP, value)
+                                            ));
+    }
+
+    INTVAL cmp(PMC* value) {
+        return string_compare(INTERP, PMC_str_val(SELF),
+                  VTABLE_get_string(INTERP, value));
+    }
+
+    void repeat (PMC* value, PMC* dest) {
+        DYNSELF.morph(TclString_type);
+        VTABLE_morph(INTERP, dest, TclString_type);
+        PMC_str_val(dest) =
+           string_repeat(INTERP, PMC_str_val(SELF),
+                         (UINTVAL)VTABLE_get_integer(INTERP, value), NULL
+                        );
+    }
+
+    void repeat_int (INTVAL value, PMC* dest) {
+        DYNSELF.morph(TclString_type);
+        VTABLE_morph(INTERP, dest, TclString_type);
+        PMC_str_val(dest) = string_repeat(INTERP,
+        PMC_str_val(SELF), (UINTVAL)value, NULL);
+    }
+
+
+    void substr (INTVAL offset, INTVAL length, PMC* dest) {
+        DYNSELF.morph(TclString_type);
+        VTABLE_morph(INTERP, dest, TclString_type);
+        PMC_str_val(dest) = string_substr(INTERP,
+            PMC_str_val(SELF), offset, length, NULL, 0);
+    }
+
+    STRING* substr_str (INTVAL offset, INTVAL length) {
+        return string_substr(INTERP, PMC_str_val(SELF), offset,
+            length, NULL, 0);
+    }
+
+}

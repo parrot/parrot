@@ -10,7 +10,9 @@ SO = ${so}
 
 # add your dynamic pmcs here
 
-all: foo$(SO) subproxy$(SO)
+all: foo$(SO) subproxy$(SO)  \
+tclobject$(SO) tclstring$(SO) tclint$(SO) tclfloat$(SO) \
+tcllist$(SO) tclarray$(SO) 
 
 .SUFFIXES: .pmc .c $(SO)
 

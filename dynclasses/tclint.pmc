@@ -1,0 +1,457 @@
+/* TclInt.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the TclInt base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     Please remove unneeded entries.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+/* This shouldn't be necessary, IMO */
+#define enum_class_TclInt -1
+
+/* this is, I'm sure, terribly inefficient. */
+#define TclString_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclString", 9)))
+#define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
+#define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
+
+pmclass TclInt extends tclobject dynpmc {
+
+    void init () {
+      PMC_int_val(SELF) = 0;
+    }
+
+    void share () {
+        /*
+         * assume that the access to a long is atomic.
+         * Perl integers are most often (1) equal to C longs,
+         * not C ints, and this makes a difference in 64-bit
+         * platforms where longs are 64-bit but ints are 32-bit.
+         * (1) Not equal when Perl integers have been configured
+         *     to be software-emulated long longs.
+         */
+        if (sizeof(INTVAL) != sizeof(long))
+            SUPER();
+    }
+
+    FLOATVAL get_number () {
+        return (FLOATVAL)PMC_int_val(SELF);
+    }
+
+    BIGNUM* get_bignum () {
+        /* XXX */
+        return NULL;
+    }
+
+
+    STRING* get_string () {
+        return string_from_int(INTERP, PMC_int_val(SELF));
+    }
+
+    void set_integer_same (PMC * value) {
+        PMC_int_val(SELF) = PMC_int_val(value);
+    }
+
+    void set_number (PMC* value) {
+        DYNSELF.morph(TclFloat_type);
+        DYNSELF.set_number(value);
+    }
+
+    void set_number_native (FLOATVAL value) {
+        DYNSELF.morph(TclFloat_type);
+        DYNSELF.set_number_native(value);
+    }
+
+    void set_bignum (PMC* value) {
+	/* XXX */
+        PMC_struct_val(SELF) = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
+    }
+
+    void set_bignum_native (BIGNUM* value) {
+        /* XXX */
+        PMC_struct_val(SELF) = value; /* Maybe we need a copy */
+    }
+
+    void set_string (PMC* value) {
+        DYNSELF.morph(TclString_type);
+        DYNSELF.set_string(value);
+    }
+
+    void set_string_native (STRING* value) {
+        DYNSELF.morph(TclString_type);
+        DYNSELF.set_string_native(value);
+    }
+
+    void add (PMC* value, PMC* dest) {
+        INTVAL pmci;
+        int vtype = VTABLE_type(INTERP, value);
+        FLOATVAL valf;
+        FLOATVAL sumf;
+
+        pmci = PMC_int_val(SELF);
+        valf = VTABLE_get_number(INTERP, value);
+        sumf = pmci + valf;
+        if (vtype == TclFloat_type) {
+            VTABLE_set_number_native(INTERP, dest, sumf);
+            return;
+        }
+
+        {
+            INTVAL vali = (INTVAL) valf;
+            INTVAL   sumi = pmci + vali;
+            if (sumf == sumi)
+                VTABLE_set_integer_native(INTERP, dest, sumi);
+            else {
+                /* TODO BIG* promotion */
+                VTABLE_set_number_native(INTERP, dest, sumf);
+            }
+            return;
+
+        }
+    }
+
+    void subtract (PMC* value, PMC* dest) {
+        INTVAL pmci;
+        int vtype = VTABLE_type(INTERP, value);
+        FLOATVAL valf;
+        FLOATVAL diff;
+
+        pmci = PMC_int_val(SELF);
+        valf = VTABLE_get_number(INTERP, value);
+        diff = pmci - valf;
+
+        if (vtype == TclFloat_type) {
+            VTABLE_set_number_native(INTERP, dest, diff);
+            return;
+        }
+
+        {
+            INTVAL vali = (INTVAL) valf;
+            INTVAL   difi = pmci - vali;
+            if (diff == difi)
+                VTABLE_set_integer_native(INTERP, dest, difi);
+            else {
+                /* TODO BIG* promotion */
+                VTABLE_set_number_native(INTERP, dest, diff);
+            }
+            return;
+
+        }
+    }
+
+/*
+
+    void subtract_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) - value
+        );
+    }
+
+    void multiply (PMC* value, PMC* dest) {
+        INTVAL pmci;
+        int vtype = VTABLE_type(INTERP, value);
+        FLOATVAL valf;
+        FLOATVAL mulf;
+
+        pmci = PMC_int_val(SELF);
+
+        valf = VTABLE_get_number(INTERP, value);
+        mulf = pmci * valf;
+
+        if (vtype == TclFloat_type) {
+            VTABLE_set_number_native(INTERP, dest, mulf);
+            return;
+        }
+
+        {
+            INTVAL vali = (INTVAL) valf;
+            INTVAL   muli = pmci * vali;
+            if (mulf == muli)
+                VTABLE_set_integer_native(INTERP, dest, muli);
+            else {
+                /* TODO BIG* promotion */
+                VTABLE_set_number_native(INTERP, dest, mulf);
+            }
+            return;
+
+        }
+    }
+
+    void multiply_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) * value
+        );
+    }
+
+    void divide (PMC* value, PMC* dest) {
+        INTVAL pmci;
+        int vtype = VTABLE_type(INTERP, value);
+        FLOATVAL valf;
+        FLOATVAL divf;
+
+        /* TODO: Is this the appropriate way to throw the exception? */
+
+        pmci = PMC_int_val(SELF);
+        valf = VTABLE_get_number(INTERP, value);
+            if (valf == 0.0) {
+                internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            return;
+        }
+
+        divf = pmci / valf;
+        if (vtype == TclFloat_type) {
+            VTABLE_set_number_native(INTERP, dest, divf);
+            return;
+        }
+        {
+            INTVAL vali = (INTVAL) valf;
+            INTVAL   divi = pmci / vali;
+            /* if result is an integer or zero yield an integer */
+            if (divf == divi || !pmci)
+                VTABLE_set_integer_native(INTERP, dest, divi);
+            else {
+                /* TODO BIG* promotion */
+                VTABLE_set_number_native(INTERP, dest, divf);
+            }
+            return;
+
+        }
+    }
+
+    void divide_int (INTVAL value, PMC* dest) {
+        INTVAL pmci, divi;
+        FLOATVAL valf, divf;
+
+        pmci = PMC_int_val(SELF);
+        /* TODO exception */
+        divf = (FLOATVAL)pmci / value;
+        divi = pmci / value;
+        if (divf == divi || !pmci)
+            VTABLE_set_integer_native(INTERP, dest, divi);
+        else {
+            /* TODO BIG* promotion */
+            VTABLE_set_number_native(INTERP, dest, divf);
+        }
+    }
+
+    void cmodulus (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+                                  PMC_int_val(SELF) %
+                                  VTABLE_get_integer(INTERP, value));
+    }
+
+    void cmodulus_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) % value);
+    }
+
+    void modulus (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            intval_mod(PMC_int_val(SELF),
+            VTABLE_get_integer(INTERP, value)));
+    }
+
+    void modulus_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            intval_mod(PMC_int_val(SELF), value));
+    }
+
+    void neg (PMC* dest) {
+        if (!dest)
+            PMC_int_val(SELF) = -PMC_int_val(SELF);
+        else
+            VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
+    }
+
+    void bitwise_or (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) |
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_or_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) | value
+        );
+    }
+
+    void bitwise_and (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) &
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_and_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) & value
+        );
+    }
+
+    void bitwise_xor (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) ^
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_xor_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) ^ value
+        );
+    }
+
+    void bitwise_not (PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest, ~PMC_int_val(SELF));
+    }
+
+    void bitwise_shr (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) >>
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_shr_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) >> value
+        );
+    }
+
+    void bitwise_shl (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) <<
+            VTABLE_get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_shl_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) << value
+        );
+    }
+
+    INTVAL is_equal (PMC* value) {
+        return (INTVAL)(PMC_int_val(SELF) ==
+            VTABLE_get_integer(INTERP, value));
+    }
+
+    INTVAL cmp(PMC* value) {
+        if (value->vtable == Parrot_base_vtables[TclString_type]) {
+            FLOATVAL fdiff = PMC_int_val(SELF)
+                - VTABLE_get_number(INTERP, value);
+            if (fdiff == 0) {
+                INTVAL idiff = PMC_int_val(SELF)
+                    - VTABLE_get_integer(INTERP, value);
+                return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+            } else {
+                return fdiff > 0 ? 1 : -1;
+            }
+        }
+        else if (value->vtable == Parrot_base_vtables[TclFloat_type]) {
+            FLOATVAL diff;
+            diff = (FLOATVAL)PMC_int_val(SELF)
+                - VTABLE_get_number(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+        else {
+            /* int */
+            INTVAL diff = PMC_int_val(SELF)
+                - VTABLE_get_integer(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+    }
+
+    INTVAL cmp_num(PMC* value) {
+        if (value->vtable == Parrot_base_vtables[TclString_type]) {
+            FLOATVAL fdiff = PMC_int_val(SELF)
+                - VTABLE_get_number(INTERP, value);
+            if (fdiff == 0) {
+                INTVAL idiff = PMC_int_val(SELF)
+                    - VTABLE_get_integer(INTERP, value);
+                return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+            } else {
+                return fdiff > 0 ? 1 : -1;
+            }
+        }
+        else if (value->vtable == Parrot_base_vtables[TclFloat_type]) {
+            FLOATVAL diff;
+            diff = (FLOATVAL)PMC_int_val(SELF)
+                - VTABLE_get_number(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+        else {
+            /* int */
+            INTVAL diff = PMC_int_val(SELF)
+                - VTABLE_get_integer(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+    }
+
+    void logical_not (PMC* value) {
+        VTABLE_set_integer_native(INTERP, value, !PMC_int_val(SELF));
+    }
+
+
+    /* XXX we want exceptions here? */
+    void repeat (PMC* value, PMC* dest) {
+        internal_exception(INVALID_OPERATION,
+            "repeat() not implemented in class 'TclInt'\n");
+    }
+
+    void repeat_int (INTVAL value, PMC* dest) {
+        internal_exception(INVALID_OPERATION,
+        "repeat() not implemented in class 'TclInt'\n");
+    }
+
+
+    void increment () {
+        PMC_int_val(SELF) ++;
+    }
+
+    void decrement () {
+        PMC_int_val(SELF) --;
+    }
+
+/*
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
+    }
+
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL)
+            PMC_int_val(SELF) = io->vtable->shift_integer(INTERP, io);
+    }
+*/
+
+    void set_integer_native (INTVAL value) {
+        PMC_int_val(SELF) = value;
+    }
+
+    INTVAL get_integer () {
+        return PMC_int_val(SELF);
+    }
+
+}
+
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

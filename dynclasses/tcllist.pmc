@@ -1,0 +1,386 @@
+/* TclList.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the TclList base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+/* Need a get_string that DTRT, tcl-ways. */
+
+#include "parrot/parrot.h"
+
+/* This shouldn't be necessary, IMO */
+#define enum_class_TclList -1
+
+/* this is, I'm sure, terribly inefficient. */
+#define TclString_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclString", 9)))
+#define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
+#define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
+
+
+
+
+/*
+
+=item C<static PMC *
+Parrot_TclList_set_pmc_ptr(Interp *interpreter, List *list, INTVAL key)>
+
+Returns the PMC pointer for the element at index C<key>.
+
+=cut
+
+*/
+
+static PMC *
+Parrot_TclList_set_pmc_ptr(Interp *interpreter, List *list, INTVAL key)
+{
+    void * ret = list_get(interpreter, list, key, enum_type_PMC);
+    PMC *value;
+
+    /* assign into a sparse or past end */
+    if (ret == 0 || ret == (void*) -1 || *(PMC**)ret == 0) {
+        value = pmc_new(interpreter, TclString_type);
+        list_assign(interpreter, list, key, value, enum_type_PMC);
+    }
+    else
+        value = *(PMC**) ret;
+    return value;
+}
+
+/*
+
+=item C<static PMC* retval(Interp *interpreter, void *ret)>
+
+Processes C<*ret>, returning the appropriate PMC, or raising an
+exception if necessary.
+
+=cut
+
+*/
+
+static PMC* retval(Interp *interpreter, void *ret)
+{
+    PMC *value;
+    if (ret == 0)
+    internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
+    if (ret == (void*) -1)
+        value = pmc_new(interpreter, TclString_type);
+    else {
+        value = *(PMC**) ret;
+	if (value == NULL)
+	  value = pmc_new(interpreter, TclString_type);
+    }
+    return value;
+}
+
+pmclass TclList extends Array need_ext does array dynpmc {
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+Converts C<value> to a C<TclInt> and assigns it to the array at index
+C<key>.
+
+=cut
+
+*/
+
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+        PMC *src = pmc_new_noinit(INTERP, TclInt_type);
+        PMC_int_val(src) = value;
+        list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
+    }
+
+/*
+
+=item C<void set_integer_keyed(PMC *key, INTVAL value)>
+
+Assigns C<value> to the array at index C<*key>.
+
+=cut
+
+*/
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        INTVAL ix;
+
+        ix = key_integer(INTERP, key);
+        if (ix >= DYNSELF.elements() || ix < -DYNSELF.elements())
+        list_set_length(INTERP, (List *) PMC_data(SELF), ix+1);
+        SUPER(key, value);
+    }
+
+/*
+
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
+
+Assigns C<value> to the array at index C<key>.
+
+=cut
+
+*/
+
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+        PMC * ptr = Parrot_TclList_set_pmc_ptr(INTERP,
+            (List *) PMC_data(SELF), key);
+        VTABLE_set_number_native(INTERP, ptr, value);
+    }
+
+/*
+
+=item C<void set_number_keyed(PMC *key, FLOATVAL value)>
+
+Assigns C<value> to the array at index C<*key>.
+
+=cut
+
+*/
+
+    void set_number_keyed (PMC* key, FLOATVAL value) {
+        INTVAL ix;
+
+        ix = key_integer(INTERP, key);
+        if (ix >= DYNSELF.elements() || ix < -DYNSELF.elements())
+        list_set_length(INTERP, (List *) PMC_data(SELF), ix+1);
+        SUPER(key, value);
+    }
+
+/*
+
+=item C<void set_string_keyed_int(INTVAL key, STRING *value)>
+
+Assigns C<*value> to the array at index C<key>.
+
+=cut
+
+*/
+
+    void set_string_keyed_int (INTVAL key, STRING* value) {
+        PMC * ptr = Parrot_TclList_set_pmc_ptr(INTERP,
+            (List *) PMC_data(SELF), key);
+        VTABLE_set_string_native(INTERP, ptr, value);
+    }
+
+/*
+
+=item C<void set_string_keyed (PMC *key, STRING *value)>
+
+Assigns C<*value> to the array at index C<*key>.
+
+=cut
+
+*/
+
+    void set_string_keyed (PMC* key, STRING* value) {
+        INTVAL ix;
+
+        ix = key_integer(INTERP, key);
+        if (ix >= DYNSELF.elements() || ix < -DYNSELF.elements())
+        list_set_length(INTERP, (List *) PMC_data(SELF), ix+1);
+        SUPER(key, value);
+    }
+
+/*
+
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *src)>
+
+Assigns C<*src> to the array at index C<key>.
+
+=cut
+
+*/
+
+    void set_pmc_keyed_int (INTVAL key, PMC* src) {
+        list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
+    }
+
+/*
+
+=item C<void set_pmc_keyed (PMC *key, PMC *value)>
+
+Assigns C<*value> to the array at index C<*key>.
+
+=cut
+
+*/
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        INTVAL ix;
+
+        ix = key_integer(INTERP, key);
+        if (ix >= DYNSELF.elements() || ix < -DYNSELF.elements())
+        list_set_length(INTERP, (List *) PMC_data(SELF), ix+1);
+        SUPER(key, value);
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Returns the integer value of the element at index C<key>.
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
+            if (PARROT_WARNINGS_test(interpreter,
+                                     PARROT_WARNINGS_UNDEF_FLAG)) {
+                Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                            "Use of uninitialized value");
+            }
+            return 0;
+        }
+        else
+            return SUPER(key);
+    }
+
+/*
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
+Returns the floating-point value of the element at index C<key>.
+
+=cut
+
+*/
+
+    FLOATVAL get_number_keyed_int (INTVAL key) {
+        if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
+            if (PARROT_WARNINGS_test(interpreter,
+                                     PARROT_WARNINGS_UNDEF_FLAG)) {
+                Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                            "Use of uninitialized value");
+            }
+            return 0.0;
+        }
+        else
+            return SUPER(key);
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns the number of elements in the array as a Parrot string.
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        return string_from_int(INTERP, DYNSELF.elements());
+    }
+
+/*
+
+=item C<STRING *get_string_keyed_int(INTVAL key)>
+
+Returns the Parrot string value of the element at index C<key>.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed_int (INTVAL key) {
+        if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
+            if (PARROT_WARNINGS_test(interpreter,
+                                     PARROT_WARNINGS_UNDEF_FLAG)) {
+                Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                            "Use of uninitialized value");
+            }
+            return string_make_empty(INTERP,enum_stringrep_one,0);
+        }
+        else
+            return SUPER(key);
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+Returns the PMC value of the element at index C<key>.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
+            if (PARROT_WARNINGS_test(interpreter,
+                                     PARROT_WARNINGS_UNDEF_FLAG)) {
+                Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                            "Use of uninitialized value");
+            }
+            return NULL;
+        }
+        else
+            return SUPER(key);
+    }
+/*
+
+=item C<void unshift_integer(INTVAL value)>
+
+Extends the array by adding an element of value C<value> to the start
+of the array.
+
+=cut
+
+*/
+
+    void unshift_integer (INTVAL value) {
+        PMC * val = pmc_new(INTERP,TclInt_type);
+        list_unshift(INTERP, (List*)PMC_data(SELF), val, enum_type_PMC);
+        VTABLE_set_integer_native(INTERP, val, value);
+    }
+/*
+
+=item C<void unshift_float(FLOATVAL value)>
+
+Extends the array by adding an element of value C<value> to the start
+of the array.
+
+=cut
+
+*/
+
+    void unshift_float (FLOATVAL value) {
+        PMC * val = pmc_new(INTERP,TclFloat_type);
+        list_unshift(INTERP, (List*)PMC_data(SELF), val, enum_type_PMC);
+        VTABLE_set_number_native(INTERP, val, value);
+    }
+
+/*
+
+=item C<void unshift_string(STRING *value)>
+
+Extends the array by adding an element of value C<*value> to the start
+of the array.
+
+=cut
+
+*/
+
+    void unshift_string (STRING *value) {
+        PMC * val = pmc_new(INTERP,TclString_type);
+        list_unshift(INTERP, (List*)PMC_data(SELF), val, enum_type_PMC);
+        VTABLE_set_string_native(INTERP, val, value);
+    }
+
+
+
+
+}

@@ -1,0 +1,276 @@
+/* TclFloat.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the TclFloat base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     Please remove unneeded entries.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+/* This shouldn't be necessary, IMO */
+#define enum_class_TclFloat -1
+
+/* this is, I'm sure, terribly inefficient. */
+#define TclString_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclString", 9)))
+#define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
+#define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
+
+
+
+pmclass TclFloat extends tclobject dynpmc {
+
+    void init () {
+        PMC_num_val(SELF) = 0.0;
+    }
+
+    INTVAL get_integer () {
+        return (INTVAL)PMC_num_val(SELF);
+    }
+
+    BIGNUM* get_bignum () {
+        /* XXX */
+        return NULL;
+    }
+
+    /* XXX add ".0" if it's an int. */
+    STRING* get_string () {
+        char* buff = mem_sys_allocate(80);
+        STRING* s;
+#ifdef HAS_SNPRINTF
+        snprintf(buff,80,FLOATVAL_FMT,PMC_num_val(SELF));
+#else
+        sprintf(buff,FLOATVAL_FMT,PMC_num_val(SELF));  /* XXX buffer overflow! */
+#endif
+        s = string_make(INTERP,buff,strlen(buff),"iso-8859-1",0);
+        mem_sys_free(buff);
+        return s;
+    }
+
+    INTVAL get_bool () {
+        return (INTVAL)(PMC_num_val(SELF) != 0.0);
+    }
+
+    void set_integer_native (INTVAL value) {
+        DYNSELF.morph(TclInt_type);
+        DYNSELF.set_integer_native(value);
+    }
+
+    void set_number_native (FLOATVAL value) {
+        PMC_num_val(SELF) = value;
+    }
+
+    void set_number_same (PMC* value) {
+        PMC_num_val(SELF) = PMC_num_val(value);
+    }
+
+    void set_bignum_native (BIGNUM* value) {
+      /* XXX */
+    }
+
+    void set_bignum_same (PMC* value) {
+      /* XXX */
+    }
+
+    void set_string_native (STRING * value) {
+        DYNSELF.morph(TclString_type);
+        DYNSELF.set_string_native(value);
+    }
+
+    void add (PMC* value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) +
+            VTABLE_get_number(INTERP, value)
+        );
+    }
+
+    void add_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) + value);
+    }
+
+    void add_bignum (BIGNUM* value, PMC* dest) {
+        /* XXX */
+    }
+
+    void add_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) + value);
+    }
+
+    void subtract (PMC* value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) -
+            VTABLE_get_number(INTERP, value)
+        );
+    }
+
+    void subtract_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) - (FLOATVAL)value
+        );
+    }
+
+    void subtract_bignum (BIGNUM* value, PMC* dest) {
+        /* XXX */
+    }
+
+    void subtract_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) - value);
+    }
+
+    void multiply (PMC* value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) *
+            VTABLE_get_number(INTERP, value)
+        );
+    }
+
+    void multiply_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) * value
+        );
+    }
+
+    void multiply_bignum (BIGNUM* value, PMC* dest) {
+       /* XXX */
+    }
+
+    void multiply_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) * value);
+    }
+
+    void divide (PMC* value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) /
+            VTABLE_get_number(INTERP, value)
+        );
+    }
+
+    void divide_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) / value
+        );
+    }
+
+    void divide_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) / value
+        );
+    }
+
+    void cmodulus (PMC* value, PMC* dest) {
+        FLOATVAL f = VTABLE_get_number(INTERP, value);
+        VTABLE_set_number_native(INTERP, dest,
+            fmod(PMC_num_val(SELF), f));
+    }
+
+    void cmodulus_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            fmod(PMC_num_val(SELF), value));
+    }
+
+    void cmodulus_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            fmod(PMC_num_val(SELF), value));
+    }
+
+    void modulus (PMC* value, PMC* dest) {
+        FLOATVAL f = VTABLE_get_number(INTERP, value);
+        VTABLE_set_number_native(INTERP, dest,
+            floatval_mod(PMC_num_val(SELF), f));
+    }
+
+    void modulus_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            floatval_mod(PMC_num_val(SELF), value));
+    }
+
+    void modulus_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            floatval_mod(PMC_num_val(SELF), value));
+    }
+
+    void neg (PMC * dest) {
+        if (!dest)
+            PMC_num_val(SELF) = -PMC_num_val(SELF);
+        else
+            VTABLE_set_number_native(INTERP, dest, -PMC_num_val(SELF));
+    }
+
+    INTVAL is_equal (PMC* value) {
+        return (INTVAL)(PMC_num_val(SELF) == VTABLE_get_number(INTERP, value));
+    }
+
+    INTVAL cmp(PMC* value) {
+        FLOATVAL diff;
+        diff = PMC_num_val(SELF) - VTABLE_get_number(INTERP, value);
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    }
+
+    INTVAL cmp_num(PMC* value) {
+        FLOATVAL diff;
+        diff = PMC_num_val(SELF) - VTABLE_get_number(INTERP, value);
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    }
+
+    /* XXX why except? */
+    void repeat (PMC* value, PMC* dest) {
+        internal_exception(INVALID_OPERATION,
+            "repeat() not implemented in class 'TclFloat'\n");
+    }
+
+    void repeat_int (INTVAL value, PMC* dest) {
+        internal_exception(INVALID_OPERATION,
+            "repeat() not implemented in class 'TclFloat'\n");
+    }
+
+    void increment () {
+        PMC_num_val(SELF) ++;
+    }
+
+    void decrement () {
+        PMC_num_val(SELF) --;
+    }
+
+/*
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_float(INTERP, io, PMC_num_val(SELF));
+    }
+
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL)
+            PMC_num_val(SELF) = io->vtable->shift_float(INTERP, io);
+    }
+*/
+
+
+    FLOATVAL get_number () {
+        return PMC_num_val(SELF);
+    }
+
+
+}
+
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
+

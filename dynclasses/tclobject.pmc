@@ -1,0 +1,88 @@
+/* tclobject.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the tclobject base class
+ *  Data Structure and Algorithms:
+ *    The following primary native types exist that we wish to track:
+ *    strings, integers, floats, lists {@array}, arrays, {%hash}.
+ *    when parsing code, everything starts out as a string. When we ask
+ *    for another representation, we do the conversion once and store it.
+ *    this way, the next time it's needed, we can just return it. Several
+ *    commands may generate a native type without first going through the
+ *    string representation - by avoiding conversion to and from string,
+ *    we can maintain a speed enhancement.
+ *  History:
+ *    This class was designed to hide all the various native types that
+ *    we want to be able to pass around in tcl - at one point, the
+ *    interpreter passed along everything as strings, and then converted
+ *    them using parrot's builtin conversions. By putthem them into the
+ *    this pmc, we can override the default behavior (e.g. add a ".0" to
+ *    the string representation of floats that happen to be integers), and
+ *    put all of our type conversions into a single location.
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+/* this is, I'm sure, terribly inefficient. */
+#define TclString_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclString", 9)))
+#define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
+#define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
+
+pmclass tclobject abstract noinit dynpmc {
+
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+        if (SELF->vtable->base_type == TclString_type) {
+            PObj_custom_mark_CLEAR(SELF);
+            SELF->vtable = Parrot_base_vtables[type];
+            return;
+        }
+        if (type == TclString_type) {
+            /*
+             * if we morph to a string, first clear str_val
+             * so that after changing the vtable a parallel
+             * reader doesn't get a garbage pointer
+             */
+            PMC_str_val(SELF) = NULL;
+            PObj_custom_mark_SET(SELF);
+            SELF->vtable = Parrot_base_vtables[type];
+            return;
+        }
+        SELF->vtable = Parrot_base_vtables[type];
+    }
+
+    void set_pmc (PMC* value) {
+        INTVAL base_type;
+
+        base_type = value->vtable->base_type;
+
+        DYNSELF.morph(value->vtable->base_type);
+
+        if (base_type == TclInt_type) {
+              DYNSELF.set_integer_same(value);
+        } else if(base_type == TclFloat_type) {
+              DYNSELF.set_number_same(value);
+        } else if(base_type == TclString_type) {
+              DYNSELF.set_string_same(value);
+        }
+    }
+
+    /* Be sure to override these where appropriate. */
+    void set_integer_native (INTVAL value) {
+        DYNSELF.morph(TclInt_type);
+        PMC_int_val(SELF) = value;
+    }
+    void set_number_native (FLOATVAL value) {
+        DYNSELF.morph(TclFloat_type);
+        PMC_num_val(SELF) = value;
+    }
+    void set_string_native (STRING* value) {
+        DYNSELF.morph(TclString_type);
+        PMC_str_val(SELF) = string_copy(INTERP, value);
+    }
+}
