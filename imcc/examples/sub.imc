@@ -1,0 +1,13 @@
+# Hello sub (simple call convention)
+#
+.sub _main
+	P0 = newsub _foo
+	invoke
+	end
+.end
+
+.sub _foo
+	print "_foo\n"
+	ret
+.end
+
