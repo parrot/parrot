@@ -254,7 +254,7 @@
 #define emitm_fdtoi(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0322, rs)
 
 /* Floating point tests */
-#define emitm_fcmpd(pc, rs1, rs2, rd) emitm_3c(pc, 2, rd, 064, rs1, 0112, rs2)
+#define emitm_fcmpd(pc, rs1, rs2) emitm_3c(pc, 2, 0, 065, rs1, 0122, rs2)
 
 /* Jump and Link */
 
@@ -264,6 +264,7 @@
 /* RET */
 #define emitm_ret(pc) emitm_jumpl_i(pc, emitm_i(7), 8, emitm_g(0))
 
+/* integer conditions */
 #define emitm_ba   010
 #define emitm_bn   000
 #define emitm_bne  011
@@ -281,8 +282,32 @@
 #define emitm_bvc  017
 #define emitm_bvs  007
 
-/* Branch */
+/* floating-point conditions */
+#define emitm_fba   010
+#define emitm_fbn   000
+#define emitm_fbu   007
+#define emitm_fbg   006
+#define emitm_fbug  005
+#define emitm_fbl   004
+#define emitm_fbul  003
+#define emitm_fblg  002
+#define emitm_fbne  001
+#define emitm_fbe   011
+#define emitm_fbue  012
+#define emitm_fbge  013
+#define emitm_fbuge 014
+#define emitm_fble  015
+#define emitm_fbule 016
+#define emitm_fbo   017
+
+#define emitm_icc   02
+#define emitm_fcc   06
+
+/* Branch on integer condition codes */
 #define emitm_bicc(pc, a, cond, disp22) emitm_2b(pc, a, cond, 02, disp22)
+
+/* Branch on floating-point condition codes */
+#define emitm_fbfcc(pc, a, cond, disp22) emitm_2b(pc, a, cond, 06, disp22)
 
 #define jit_emit_mov_rr_i(pc, dst, src) emitm_mov_r(pc, src, dst)
 #define jit_emit_mov_rr_n(pc, dst, src) { \
@@ -364,8 +389,8 @@ Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
 }
 
 /* Generate conditional branch to offset from current parrot op */
-static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
-                            opcode_t disp)
+static void Parrot_jit_branch(Parrot_jit_info_t *jit_info, int branch, int cond,
+                              int annul, opcode_t disp)
 {
     int offset;
     opcode_t opcode;
@@ -384,7 +409,7 @@ static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
             internal_exception(JIT_ERROR,
                            "Branches beyond 8 Megabytes not yet supported\n");
         offset /= 4;
-        emitm_bicc(jit_info->native_ptr, annul, cond, offset);
+        emitm_2b(jit_info->native_ptr, annul, cond, branch, offset);
         return;
     }
 
@@ -398,8 +423,16 @@ static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
             jit_info->arena.fixups->skip =
                 jit_info->optimizer->cur_section->branch_target->load_size;
 
-    emitm_bicc(jit_info->native_ptr, annul, cond, 0);
+    emitm_2b(jit_info->native_ptr, annul, cond, branch, 0);
 }
+
+/* Generate branch on integer condition codes */
+#define Parrot_jit_bicc(jit_info, cond, annul, disp) \
+        Parrot_jit_branch(jit_info, emitm_icc, cond, annul, disp)
+
+/* Generate branch on floating-point condition codes */
+#define Parrot_jit_fbfcc(jit_info, cond, annul, disp) \
+        Parrot_jit_branch(jit_info, emitm_fcc, cond, annul, disp)
 
 /* This function loads a value */
 static void jit_emit_load_i(Parrot_jit_info_t *jit_info,

@@ -583,122 +583,218 @@ Parrot_branch_ic {
     emitm_nop(NATIVECODE);
 }
 
-TEMPLATE Parrot_cmp_ix_ix_ic {
+TEMPLATE Parrot_cmp_x_x_ic {
     if(MAP[1] && MAP[2]){
-        emitm_subcc_r(NATIVECODE, MAP[1], MAP[2], emitm_g(0));
+        emitm_<op>(NATIVECODE, MAP[1], MAP[2] <nill>);
     }
     else if (MAP[1]) {
-        jit_emit_load_i(jit_info, interpreter, 2, ISR2);
-        emitm_subcc_r(NATIVECODE, MAP[1], ISR2, emitm_g(0));
+        jit_emit_load<_N>(jit_info, interpreter, 2, ISR2);
+        emitm_<op>(NATIVECODE, MAP[1], ISR2 <nill>);
     }
     else if (MAP[2]) {
-        jit_emit_load_i(jit_info, interpreter, 1, ISR1);
-        emitm_subcc_r(NATIVECODE, ISR1, MAP[2], emitm_g(0));
+        jit_emit_load<_N>(jit_info, interpreter, 1, ISR1);
+        emitm_<op>(NATIVECODE, ISR1, MAP[2] <nill>);
     }
     else {
-        jit_emit_load_i(jit_info, interpreter, 1, ISR1);
-        jit_emit_load_i(jit_info, interpreter, 2, ISR2);
-        emitm_subcc_r(NATIVECODE, ISR1, ISR2, emitm_g(0));
+        jit_emit_load<_N>(jit_info, interpreter, 1, ISR1);
+        jit_emit_load<_N>(jit_info, interpreter, 2, ISR2);
+        emitm_<op>(NATIVECODE, ISR1, ISR2 <nill>);
     }
 
-    Parrot_jit_bicc(jit_info, emitm_<a>, 0, *INT_CONST[3]);
+    Parrot_jit_<branch>(jit_info, emitm_<a>, 0, *INT_CONST[3]);
     emitm_nop(NATIVECODE);
 }
 
 Parrot_eq_ic_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/be/
+    Parrot_cmp_x_x_ic  s/<a>/be/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_eq_i_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/be/
+    Parrot_cmp_x_x_ic  s/<a>/be/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_eq_ic_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/be/
+    Parrot_cmp_x_x_ic  s/<a>/be/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_eq_i_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/be/
+    Parrot_cmp_x_x_ic  s/<a>/be/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_ne_ic_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bne/
+    Parrot_cmp_x_x_ic  s/<a>/bne/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_ne_i_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bne/
+    Parrot_cmp_x_x_ic  s/<a>/bne/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_ne_ic_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bne/
+    Parrot_cmp_x_x_ic  s/<a>/bne/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_ne_i_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bne/
+    Parrot_cmp_x_x_ic  s/<a>/bne/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_lt_ic_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bl/
+    Parrot_cmp_x_x_ic  s/<a>/bl/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_lt_i_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bl/
+    Parrot_cmp_x_x_ic  s/<a>/bl/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_lt_ic_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bl/
+    Parrot_cmp_x_x_ic  s/<a>/bl/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_lt_i_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bl/
+    Parrot_cmp_x_x_ic  s/<a>/bl/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_le_ic_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/ble/
+    Parrot_cmp_x_x_ic  s/<a>/ble/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_le_i_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/ble/
+    Parrot_cmp_x_x_ic  s/<a>/ble/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_le_ic_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/ble/
+    Parrot_cmp_x_x_ic  s/<a>/ble/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_le_i_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/ble/
+    Parrot_cmp_x_x_ic  s/<a>/ble/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_gt_ic_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bg/
+    Parrot_cmp_x_x_ic  s/<a>/bg/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_gt_i_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bg/
+    Parrot_cmp_x_x_ic  s/<a>/bg/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_gt_ic_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bg/
+    Parrot_cmp_x_x_ic  s/<a>/bg/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_gt_i_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bg/
+    Parrot_cmp_x_x_ic  s/<a>/bg/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_ge_ic_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bge/
+    Parrot_cmp_x_x_ic  s/<a>/bge/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_ge_i_ic_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bge/
+    Parrot_cmp_x_x_ic  s/<a>/bge/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_ge_ic_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bge/
+    Parrot_cmp_x_x_ic  s/<a>/bge/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
 }
 
 Parrot_ge_i_i_ic {
-    Parrot_cmp_ix_ix_ic  s/<a>/bge/
+    Parrot_cmp_x_x_ic  s/<a>/bge/ s/<op>/subcc_r/ s/<branch>/bicc/ s/<_N>/_i/ s/<nill>/, emitm_g(0)/
+}
+
+Parrot_eq_n_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbe/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_eq_nc_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbe/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_eq_n_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbe/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_eq_nc_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbe/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_ne_n_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbne/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_ne_nc_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbne/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_ne_n_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbne/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_ne_nc_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbne/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_lt_n_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbl/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_lt_nc_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbl/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_lt_n_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbl/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_lt_nc_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbl/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_le_n_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fble/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_le_nc_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fble/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_le_n_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fble/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_le_nc_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fble/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_gt_n_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbg/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_gt_nc_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbg/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_gt_n_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbg/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_gt_nc_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbg/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_ge_n_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbge/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_ge_nc_n_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbge/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_ge_n_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbge/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
+}
+
+Parrot_ge_nc_nc_ic {
+    Parrot_cmp_x_x_ic  s/<a>/fbge/ s/<op>/fcmpd/ s/<branch>/fbfcc/ s/<_N>/_n/ s/ISR/FSR/ s/<nill>//
 }
 
 TEMPLATE Parrot_iscmp_ix_ix_ix {
