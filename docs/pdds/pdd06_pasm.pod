@@ -572,15 +572,12 @@ while for I and N registers it is 0
 
 =item save tx
 
-Push register X onto the generic stack
+Push register or constant X onto the generic stack
 
 =item restore tx
 
-Restore register X from the generic stack
-
-=item entrytype Ix, iy
-
-Put the type of stack entry Y into integer register X
+Restore register X from the generic stack by popping off the topmost
+entry. The type of this entry must match the register type.
 
 =item saveall
 
@@ -604,16 +601,23 @@ As L<restoreall> but only affects registers 16-31.
 
 Sets a named marker for the stacks for later use.
 
+=item entrytype Ix, iy
+
+Put the type of generic stack entry Y into integer register X
+
+=item depth Ix
+
+Get the current depth of the generic stack
+
 =item lookback tx, Iy
 
-Fetch the entry that's at position Y from the top of the stack. This
-does not remove an entry from the stack, merely fetches the entry off
-it.
+Fetch the entry that's at position Y from the top of the generic stack. This
+does not remove an entry from the stack, merely fetches the entry off it.
 
-0 is the entry from the top of the stack, 1 is the entry immediately
+0 is the entry at the top of the stack, 1 is the entry immediately
 previous to that, and so on. Entry -1 is the very bottom-most entry in
-the stack. (While the stack may be a tree when looked at from the bottom up, you
-don't have access to any other branches when looking this way)
+the stack. (While the stack may be a tree when looked at from the bottom up, 
+you don't have access to any other branches when looking this way).
 
 =item warp [string]
 
@@ -638,7 +642,7 @@ global scopes, as well as storing data into those slots.  A static
 scope is captured by a scratchpad.  The current dynamic scope is
 represented by the state of the lexical stack (which contains
 scratchpads).  For more detail on these ops see the generated
-documentation in F<docs/core_ops.pod>.
+documentation in F<docs/ops/var.pod>.
 
 =over 4
 
@@ -756,7 +760,15 @@ Find the method Z for object Y, and return a PMC for it in X.
 
 =item set_attribute Px, ty, tz
 
-=item can Px, ty
+=item can Ix, Py, Sz
+
+Sets X to TRUE if object Y can perform method Z; otherwise, X is set to
+FALSE.
+
+=item does Ix, Py, Sz
+
+Sets X to TRUE if object Y can implements interface Z; otherwise, X is 
+set to FALSE.
 
 =item isa Px, ty
 
