@@ -25,8 +25,8 @@ enum {
     enum_class_IntQueue,
     enum_class_Sub,
     enum_class_Coroutine,
-    enum_class_Closure,
     enum_class_Continuation,
+    enum_class_CSub,
     enum_class_max = 100
 };
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
@@ -114,6 +114,7 @@ typedef enum {
 
 /* Prototypes */
 PMC *pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type);
+PMC *pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type);
 PMC *pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type,
                         INTVAL size);
 

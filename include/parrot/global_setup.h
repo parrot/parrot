@@ -28,8 +28,8 @@ void Parrot_Pointer_class_init(INTVAL);
 void Parrot_IntQueue_class_init(INTVAL);
 void Parrot_Sub_class_init(INTVAL);
 void Parrot_Coroutine_class_init(INTVAL);
-void Parrot_Closure_class_init(INTVAL);
 void Parrot_Continuation_class_init(INTVAL);
+void Parrot_CSub_class_init(INTVAL);
 
 void init_world(void);
 

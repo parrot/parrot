@@ -326,4 +326,4 @@ STRING* substr_str(INTVAL offset, INTVAL length)
 STRING* substr_str_keyed(KEY* key, INTVAL offset, INTVAL length)
 STRING* substr_str_keyed_int(INTVAL* key, INTVAL offset, INTVAL length)
 
-INTVAL invoke()
+void* invoke(void* next)

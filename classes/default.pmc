@@ -2476,14 +2476,13 @@ pmclass default noinit {
         return SELF->vtable->substr_str_keyed(INTERP, SELF, &r_key, offset, length);
     }
 
-    INTVAL invoke() {
+    void* invoke (void* next) {
 	/* 
          * FIXME: should be an exception instead: 
          * "Invoking something that can not be invoked" ??
          */
 
-        /* returning 0 should mean the interpretor will move on to the next op */
-        return 0;
-
+        /* move on to the next op */
+        return next;
     }
 }

@@ -125,7 +125,7 @@ my @IO_O_FILES = Object( input => [qw(
 )]);
 
 my @CLASS_O_FILES = map { Object(input=>"classes/$_") } qw(
-  array coroutine default intqueue pointer sub
+  array coroutine default intqueue pointer sub csub continuation
   perlarray perlhash perlint perlnum perlstring perlundef
 );
 

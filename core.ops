@@ -3934,12 +3934,15 @@ may not be used by the particular class. For example:
 =cut
 
 op new(out PMC, in INT) {
-  PMC* newpmc;
   if ($2 <0 || $2 >= enum_class_max) {
     abort(); /* Deserve to lose */
   }
-  newpmc = pmc_new(interpreter, $2);
-  $1 = newpmc;
+
+  /* Why?? If we're creating a continuation, the continuation PMC
+   * needs to be in the destination register before its init method
+   * copies the registers. */
+  $1 = pmc_new_noinit(interpreter, $2);
+  $1->vtable->init(interpreter, $1);
   goto NEXT();
 }
 
@@ -4114,20 +4117,14 @@ initialization routine for it.
 
 Load a dynamic link library named $2 and store it in $1.
 
-=item B<callnative>(out PMC, in PMC, in STR)
+=item B<dlfunc>(out PMC, in PMC, in STR)
 
-Call a native routine given a library handle.
-$2 contains the handle returned from loadlib, $3 is the
-unmangled name of the extension API routine.
-Warning: This is probably unportable right now since
-some systems need pre-pended _ on symbol names,
-and potentially others might have to be linked statically.
+Look up symbol $3 in library $2, and put the corresponding sub object
+in $1.
 
-=item B<callnative>(out PMC, in PMC, in PMC, in STR)
+=item B<invoke>()
 
-Same as the 3 argument version except that $3 is a PMC
-representing an "object." For methods (not static routines)
-this would be the this/self pointer.
+Call the subroutine in P0, as described in PDD03.
 
 =cut
 
@@ -4167,58 +4164,22 @@ inline op loadlib(out PMC, in STR) {
   goto NEXT();
 }
 
-
-inline op callnative(out PMC, in PMC, in STR) {
-  /* 
-   * These are just for fun, ideally we can cache the routine
-   * for calling without dylsym() everytime. These will
-   * do for a starting point.
-   */
-  PMC * fun;
-  int ret;
+op dlfunc (out PMC, in PMC, in STR) {
   const char * name = string_to_cstring(interpreter, ($3));
+  extern PMC * Parrot_new_csub(struct Parrot_Interp * ,
+			       void (*p)(Interp *, PMC *));
+
   void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(
                                                 ($2)->data, name));
   if(p == NULL) {
      const char * err = Parrot_dlerror();
      if(err != NULL) {
          fprintf(stderr, "%s\n", err);
-         PANIC("Failed to link native method");
      }
+     PANIC("Failed to link native method");
   }
 
-  fun = new_pmc_header(interpreter);
-  fun->data = F2DPTR(p);
-  $1 = fun;
-
-  /* Now that it is cached, call it */
-  (*p)(interpreter, NULL);
-  goto NEXT();
-}
-
-inline op callnative(out PMC, in PMC, in PMC, in STR) {
-  /* 
-   * These are just for fun, ideally we can cache the routine
-   * for calling without dylsym() everytime. These will
-   * do for a starting point.
-   */
-  PMC * fun;
-  int ret;
-  const char * name = string_to_cstring(interpreter, ($4));
-  void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(
-                                                ($2)->data, name));
-  if(p == NULL) {
-     const char * err = Parrot_dlerror();
-     if(err != NULL) {
-         fprintf(stderr, "%s\n", err);
-         PANIC("Failed to link native method");
-     }
-  }
-  fun = new_pmc_header(interpreter);
-  fun->data = F2DPTR(p);
-  $1 = fun;
-  /* Now that it is cached, call it */
-  (*p)(interpreter, $3->data);
+  $1 = Parrot_new_csub(interpreter, p);
   goto NEXT();
 }
 
@@ -4226,90 +4187,21 @@ inline op invoke() {
   opcode_t *dest;
   PMC * p = interpreter->ctx.pmc_reg.registers[0];
 
-  /*
-   * FIXME: the stack manipulation code (this push and the pop below) should
-   * be moved to the vtable method. (I think ?)
-   */
-  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(), STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
 
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p);
-  if(dest == 0) {
-    /*
-     * invoke returned 0 (means nothing more needs to be done), so just
-     * move on to the next instruction
-     */
-    stack_pop(interpreter, &interpreter->ctx.control_stack, NULL, STACK_ENTRY_DESTINATION);
-    goto NEXT();
-  }
-  else {
-    /* 
-     * invoke returned non 0, so it should have returned a and address
-     * so that's our next
-     */
     goto ADDRESS(dest);
-  }
 }
 
-inline op call() {
-  /* This op will be a vtable entry */
-  struct Parrot_Sub * sub = (struct Parrot_Sub*)interpreter->ctx.pmc_reg.registers[0]->data;
-  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-  goto ADDRESS(sub->init);
-}
+=item B<find_method>(out PMC, in PMC, in STR)
 
-inline op callco() {
-  /* This op will be a vtable entry */
-  struct Parrot_Coroutine * co = (struct Parrot_Coroutine*)interpreter->ctx.pmc_reg.registers[0]->data;
-  /* FIXME: Here we need to switch in the co-routines context and save the
-   * interpreter's context.
-   */
-  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-  /* Resuming co-routine or fresh call? */
-  if(!co->resume) {
-     goto ADDRESS(co->init);
-  }
-  else {
-     goto ADDRESS(co->resume);
-  }
-}
+Looks up method $3 in $2's vtable, placing the corresponding method
+PMC in $1.
 
-inline op yield() {
-  opcode_t *dest;
-  struct Parrot_Coroutine * co = (struct Parrot_Coroutine*)interpreter->ctx.pmc_reg.registers[0]->data;
-  /* suspend the co-routine */
-  co->resume = expr NEXT();
-  stack_pop(interpreter, &interpreter->ctx.control_stack, &dest, STACK_ENTRY_DESTINATION);
-  goto ADDRESS(dest);
-}
+=cut
 
-inline op capturecc(out PMC) {
-  struct Parrot_Continuation * cc;
-  $1 = new_pmc_header(interpreter);
-  /*
-   * Capture continuation -after- setting $1 since it captures
-   * register state.
-   */
-  cc = new_continuation(interpreter, expr NEXT());
-  $1->vtable = YOU_LOSE_VTABLE;
-  $1->data = (void*)cc;
-  goto NEXT();
-}
-
-inline op callcc(in PMC) {
-  if($1) {
-    struct Parrot_Continuation * cc = (struct Parrot_Continuation*)$1->data;
-    if(cc) {
-      restore_context(interpreter, &cc->ctx);
-      goto ADDRESS(cc->continuation);
-    }
-    else {
-      abort();
-    }
-  }
-  else {
-    abort();
-  }
-  return 0;
+op find_method(out PMC, in PMC, in STR) {
+    $1 = $2->vtable->find_method(interpreter, $2, $3);
+    goto NEXT();
 }
 
 =item B<warningson>(in INT)

@@ -1,0 +1,57 @@
+/* CSub.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the CSub base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *     Initial revision by sean 2002/08/04 
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+pmclass CSub {
+
+    INTVAL type () {
+        return enum_class_CSub;
+    }
+
+    STRING* name () {
+        return whoami;
+    }
+
+    PMC* clone () {
+        return Parrot_new_csub(INTERP, (Parrot_csub_t)SELF->cache.struct_val);
+    }
+
+    PMC* get_pmc () {
+        return SELF;
+    }
+
+    INTVAL is_same (PMC* value) {
+        return SELF == value;
+    }
+
+    void set_same (PMC* value) {
+        SELF->cache.struct_val = value->cache.struct_val;
+    }
+
+    INTVAL is_equal (PMC* value) {
+        return (SELF->vtable == value->vtable
+                && SELF->cache.struct_val == value->cache.struct_val);
+    }
+
+    INTVAL defined () {
+        return SELF->cache.struct_val != NULL;
+    }
+
+    void * invoke (void * next) {
+        Parrot_csub_t func = (Parrot_csub_t)SELF->cache.struct_val;
+        func(INTERP, SELF);
+        return next;
+    }
+}

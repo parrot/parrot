@@ -1,0 +1,92 @@
+/* Continuation.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the Continuation base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *     Initial revision by sean 2002/08/04 
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+pmclass Continuation {
+
+    void init () {
+        struct Parrot_Continuation * cc;
+        cc = new_continuation(interpreter, 0);
+        SELF->data = cc;
+        SELF->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+    }
+
+    void destroy () {
+        mem_sys_free(SELF->data);
+    }
+
+    void set_integer_native (INTVAL value) {
+        ((struct Parrot_Continuation *)SELF->data)->continuation
+            = (opcode_t *)value;
+    }
+
+    PMC* mark (PMC* end_of_used_list) {
+        return mark_stack(
+            ((struct Parrot_Continuation *)SELF->data)->ctx.user_stack,
+            end_of_used_list
+        );
+    }
+
+    INTVAL type () {
+        return enum_class_Continuation;
+    }
+
+    STRING* name () {
+        return whoami;
+    }
+
+    PMC* clone () {
+        PMC * ret = new_pmc_header(INTERP);
+        struct Parrot_Continuation * retc
+            = mem_sys_allocate(sizeof(struct Parrot_Continuation));
+        ret->vtable = &Parrot_base_vtables[enum_class_Continuation];
+        ret->data = retc;
+        memcpy(retc, SELF->data, sizeof(struct Parrot_Continuation));
+        /* we may have copied our stack already, so we need to re-COW
+         * it */
+        stack_mark_cow(retc->ctx.user_stack);
+        stack_mark_cow(retc->ctx.control_stack);
+        return ret;
+    }
+
+    PMC* get_pmc () {
+        return SELF;
+    }
+
+    INTVAL is_same (PMC* value) {
+        return SELF == value;
+    }
+
+    void set_same (PMC* value) {
+        SELF->data = value->data;
+    }
+
+    INTVAL is_equal (PMC* value) {
+        return (SELF->vtable == value->vtable
+                && memcmp(value->data, SELF->data,
+                          sizeof(struct Parrot_Continuation)) == 0);
+    }
+
+    INTVAL defined () {
+        return ((struct Parrot_Continuation *)SELF->data)->continuation != NULL;
+    }
+
+    void* invoke (void* next) {
+        struct Parrot_Continuation * cc
+            = (struct Parrot_Continuation*)SELF->data;
+        restore_context(interpreter, &cc->ctx);
+        return cc->continuation; /* interp will jump to this address */
+    }
+}

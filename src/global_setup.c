@@ -32,6 +32,8 @@ init_world(void)
     Parrot_IntQueue_class_init(enum_class_IntQueue);
     Parrot_Sub_class_init(enum_class_Sub);
     Parrot_Coroutine_class_init(enum_class_Coroutine);
+    Parrot_CSub_class_init(enum_class_CSub);
+    Parrot_Continuation_class_init(enum_class_Continuation);
 
     /* Now register the names of the PMCs */
 
@@ -84,6 +86,14 @@ init_world(void)
     MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_Coroutine].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
                                                           Parrot_base_classname_hash, &key, enum_class_Coroutine);
+
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_Continuation].name(NULL, NULL));
+    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
+                                                          Parrot_base_classname_hash, &key, enum_class_Continuation);
+
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_CSub].name(NULL, NULL));
+    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
+                                                          Parrot_base_classname_hash, &key, enum_class_CSub);
 
 }
 

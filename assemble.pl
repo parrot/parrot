@@ -138,6 +138,8 @@ sub new {
   $self->{constants}{IntQueue} = 8;
   $self->{constants}{Sub} = 9;
   $self->{constants}{Coroutine} = 10;
+  $self->{constants}{Continuation} = 11;
+  $self->{constants}{CSub} = 12;
   $self;
 }
 

@@ -16,7 +16,9 @@ chartype.c
 chartypes/unicode.c
 chartypes/usascii.c
 classes/array.pmc
+classes/continuation.pmc
 classes/coroutine.pmc
+classes/csub.pmc
 classes/default.pmc
 classes/genclass.pl
 classes/intqueue.pmc
@@ -194,6 +196,7 @@ include/parrot/io.h
 include/parrot/jit.h
 include/parrot/key.h
 include/parrot/memory.h
+include/parrot/method_util.h
 include/parrot/misc.h
 include/parrot/op.h
 include/parrot/oplib.h
@@ -413,6 +416,7 @@ lib/Text/Balanced.pm
 make.pl
 math.ops
 memory.c
+method_util.c
 misc.c
 obscure.ops
 ops2c.pl
@@ -461,6 +465,7 @@ t/pmc/perlarray.t
 t/pmc/perlhash.t
 t/pmc/perlstring.t
 t/pmc/pmc.t
+t/pmc/sub.t
 test_main.c
 tools/dev/check_source_standards.pl
 tools/dev/lib_deps.pl
