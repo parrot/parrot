@@ -383,7 +383,7 @@ while (my $file = shift @ARGV) {
   my $base = $file;
   $base =~ s/\.pmc$//;
   my $cfile = "$base.c";
-  my $hfile = "$base.h";
+  my $hfile = "pmc_$base.h";
 
   die "$0: Could not read class file '$file'!\n" unless -e $file;
 
@@ -644,7 +644,7 @@ EOC
 
   my $includes = '';
   foreach my $class (keys %visible_supers) {
-      $includes .= qq(#include "\L$class.h"\n);
+      $includes .= qq(#include "pmc_\L$class.h"\n);
   }
 
 
@@ -751,7 +751,7 @@ void $initname (Interp * interp, int entry) {
 
     struct _vtable temp_base_vtable = {
         NULL,	/* package */
-        enum_class_$classname,
+        entry,
         NULL,	/* whoami */
         NULL,	/* method_table */
         $vtbl_flag, /* flags */

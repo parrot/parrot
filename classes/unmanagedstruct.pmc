@@ -56,6 +56,10 @@ pmclass UnManagedStruct extends default need_ext {
 
     }
 
+    INTVAL get_integer() {
+       return (INTVAL)*(INTVAL *)PMC_data(SELF);
+    }
+
     /* May cause segfaults if value is out of bounds */
     void set_integer_keyed (PMC* key, INTVAL value) {
 	INTVAL ix;
@@ -68,5 +72,11 @@ pmclass UnManagedStruct extends default need_ext {
 	((char *)PMC_data(SELF))[ix]=(0xff & value);
 	return;
     }
+
+    INTVAL set_integer(INTVAL value) {
+       *(INTVAL *)PMC_data(SELF) = value;
+    }
+
+    
 
 }
