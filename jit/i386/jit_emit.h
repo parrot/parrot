@@ -872,9 +872,9 @@ static unsigned char *lastpc;
         emitm_fl_3(pc, emit_b001, emit_b001, sti); \
     } \
 }
-/* FLD ST,ST(i), optimiized FSTP(N+1);FLD(N) => FST(N+1)  */
+/* FLD ST,ST(i), optimized FSTP(N+1);FLD(N) => FST(N+1)  */
 #define emitm_fld(pc, sti) { \
-    if ((unsigned char *)(pc) == (lastpc + 2) && \
+    if (0&&(unsigned char *)(pc) == (lastpc + 2) && \
             (int)(*lastpc) == (int)0xDD && \
             (int)lastpc[1] == (int)(0xD8+sti+1)) \
         lastpc[1] = 0xD0+sti+1; \
@@ -1203,16 +1203,32 @@ static unsigned char *lastpc;
 
 #define jit_emit_finit(pc) { *((pc)++) = 0xdb; *((pc)++) = 0xe3; }
 
-/* ST(i) += MEM */
-#define jit_emit_add_rm_n(pc, r, m) { \
+/* ST(i) op= MEM */
+
+#if NUMVAL_SIZE == 12
+#define jit_emit_xxx_rm_n(op, pc, r, m) { \
+    emitm_fld(pc, (r)); \
+    jit_emit_fload_m_n(pc, m); \
+    emitm_f ## op ## p(pc, 1); \
+    emitm_fstp(pc, (r+1)); \
+}
+#else
+#define jit_emit_xxx_rm_n(op, pc, r, m) { \
     if (r) { \
         emitm_fxch(pc, r); \
-        emitm_fadd_m(pc, 0,0,0, m); \
+        emitm_f ## op ## _m(pc, 0,0,0, m); \
         emitm_fxch(pc, r); \
     } else { \
-        emitm_fadd_m(pc, 0,0,0, m); \
+        emitm_f ## op ## _m(pc, 0,0,0, m); \
     } \
 }
+#endif
+
+#define jit_emit_add_rm_n(pc, r, m) jit_emit_xxx_rm_n(add, pc, r, m)
+#define jit_emit_sub_rm_n(pc, r, m) jit_emit_xxx_rm_n(sub, pc, r, m)
+#define jit_emit_mul_rm_n(pc, r, m) jit_emit_xxx_rm_n(mul, pc, r, m)
+#define jit_emit_div_rm_n(pc, r, m) jit_emit_xxx_rm_n(div, pc, r, m)
+
 #define jit_emit_add_ri_n(pc, r, nc) jit_emit_add_rm_n(pc, r, nc)
 
 /* ST(r1) += ST(r2) */
@@ -1232,16 +1248,6 @@ static unsigned char *lastpc;
     } \
 }
 
-/* ST(i) -= MEM */
-#define jit_emit_sub_rm_n(pc, r, m) { \
-    if (r) { \
-        emitm_fxch(pc, r); \
-        emitm_fsub_m(pc, 0,0,0, m); \
-        emitm_fxch(pc, r); \
-    } else { \
-        emitm_fsub_m(pc, 0,0,0, m); \
-    } \
-}
 
 #define jit_emit_sub_ri_n(pc, r, nc) jit_emit_sub_rm_n(pc, r, nc)
 
@@ -1276,16 +1282,6 @@ static unsigned char *lastpc;
     emitm_fstp(pc, (r+1)); \
 }
 
-/* ST(i) *= MEM */
-#define jit_emit_mul_rm_n(pc, r, m) { \
-    if (r) { \
-        emitm_fxch(pc, r); \
-        emitm_fmul_m(pc, 0,0,0, m); \
-        emitm_fxch(pc, r); \
-    } else { \
-        emitm_fmul_m(pc, 0,0,0, m); \
-    } \
-}
 #define jit_emit_mul_ri_n(pc, r, nc) jit_emit_mul_rm_n(pc, r, nc)
 
 /* ST(r1) *= ST(r2) */
@@ -1302,17 +1298,6 @@ static unsigned char *lastpc;
     } \
     else { \
         emitm_fmul(pc, r2); \
-    } \
-}
-
-/* ST(i) /= MEM */
-#define jit_emit_div_rm_n(pc, r, m) { \
-    if (r) { \
-        emitm_fxch(pc, r); \
-        emitm_fdiv_m(pc, 0,0,0, m); \
-        emitm_fxch(pc, r); \
-    } else { \
-        emitm_fdiv_m(pc, 0,0,0, m); \
     } \
 }
 
@@ -1379,14 +1364,9 @@ static unsigned char *lastpc;
 /* TODO config option, if fcomi* is available */
 /* compare ST(r) <-> mem */
 #define jit_emit_cmp_rm_n(pc, r, mem) { \
-    if (r) { \
-        emitm_fxch(pc, r); \
-        emitm_fcom_m(pc, emit_None, emit_None, emit_None, mem); \
-        emitm_fxch(pc, r); \
-    } \
-    else { \
-        emitm_fcom_m(pc, emit_None, emit_None, emit_None, mem); \
-    } \
+    jit_emit_fload_m_n(pc, mem); \
+    emitm_fld(pc, (r+1)); \
+    emitm_fcompp(pc); \
     emitm_fstw(pc); \
     emitm_sahf(pc); \
 }
@@ -2093,7 +2073,8 @@ void * Parrot_jit_build_call_func(struct Parrot_Interp *, String *);
 
 void *
 Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
-        String *signature) {
+        String *signature)
+{
 
     Parrot_jit_info_t jit_info;
     char *sig, *pc;
