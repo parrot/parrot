@@ -2,6 +2,7 @@
 # format of this file.
 ChangeLog                                         []
 Configure.pl                                      []
+CREDITS                                           []
 DEVELOPING                                        []
 KNOWN_ISSUES                                      [main]doc
 LICENSES/Artistic                                 [main]doc
@@ -1574,6 +1575,7 @@ jit/sun4/jit_emit.h                               []
 jit2h.pl                                          []
 jit_debug.c                                       []
 key.c                                             []
+languages/LANGUAGES.STATUS                        []
 languages/BASIC/compiler/BASIC_README             [BASIC]
 languages/BASIC/compiler/COMP_assignments.pm      [BASIC]
 languages/BASIC/compiler/COMP_expressions.pm      [BASIC]
