@@ -16,6 +16,18 @@
 #include "parrot/method_util.h"
 
 /*
+ * Create a new native sub. (new way)
+ */
+PMC *
+Parrot_new_nci(struct Parrot_Interp *interp, Parrot_csub_t func, String *signature)
+{
+    PMC *ret = pmc_new(interp, enum_class_NCI);
+    ret->cache.struct_val = (DPOINTER *)F2DPTR(func);
+    ret->data = build_call_func(interp, signature);
+    return ret;
+}
+
+/*
  * Create a new native sub.
  */
 PMC *

@@ -20,6 +20,7 @@
 INTVAL string_compute_strlen(STRING *);
 STRING *string_concat(struct Parrot_Interp *, STRING *, STRING *, UINTVAL);
 STRING *string_append(struct Parrot_Interp *, STRING *, STRING *, UINTVAL);
+STRING *string_from_c_string(struct Parrot_Interp *, const void *, UINTVAL);
 STRING *string_repeat(struct Parrot_Interp *, const STRING *, UINTVAL,
                       STRING **);
 STRING *string_chopn(STRING *, INTVAL);

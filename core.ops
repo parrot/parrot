@@ -4275,10 +4275,11 @@ initialization routine for it.
 
 Load a dynamic link library named $2 and store it in $1.
 
-=item B<dlfunc>(out PMC, in PMC, in STR)
+=item B<dlfunc>(out PMC, in PMC, in STR, in STR)
 
-Look up symbol $3 in library $2, and put the corresponding sub object
-in $1.
+Look up symbol $3 in library $2 with signature $3, and put the
+corresponding sub object in $1. Note that you need the signature so we
+can build or find an appropriate thunking function.
 
 =item B<invoke>()
 
@@ -4321,7 +4322,7 @@ inline op loadlib(out PMC, in STR) {
   goto NEXT();
 }
 
-op dlfunc (out PMC, in PMC, in STR) {
+op dlfunc (out PMC, in PMC, in STR, in STR) {
   const char * name = string_to_cstring(interpreter, ($3));
 
   Parrot_csub_t p = (Parrot_csub_t)D2FPTR(Parrot_dlsym(($2)->data, name));
@@ -4333,7 +4334,7 @@ op dlfunc (out PMC, in PMC, in STR) {
      PANIC("Failed to link native method");
   }
 
-  $1 = Parrot_new_csub(interpreter, p);
+  $1 = Parrot_new_nci(interpreter, p, $4);
   goto NEXT();
 }
 

@@ -2,7 +2,7 @@
 
 use strict;
 use lib '.';
-use YAML;
+use Data::Dumper;
 use Term::ReadLine;
 use Parse::RecDescent;
 use Ruby;
@@ -21,8 +21,19 @@ while(defined($text = $term->readline($prompt))) {
     $::RD_TRACE = 0;
     print "Trace off\n";
   }
+  elsif($text =~ /^<(.*)/) {
+      my ($fh, $file_data);
+      open $fh, $text;
+      local $/;
+      $file_data = <$fh>;
+#      $file_data =~ s/\cJ/ /g;
+#      $file_data =~ s/\cM/ /g;
+      print $file_data, "\n";
+      my $return = Data::Dumper->Dump($grammar->program($file_data));
+      print $return;
+  }
   else {
-    my $return = Dump($grammar->program($text));
+    my $return = Data::Dumper->Dump($grammar->program($text));
     print $return;
   }
 }

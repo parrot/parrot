@@ -1,0 +1,62 @@
+/* NCI.pmc
+ *  Copyright: 2002 Yet Another Society
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     The vtable functions for the native C call functions
+ *  Data Structure and Algorithms:
+ *  History:
+ *     Initial revision by sean 2002/08/04
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+pmclass NCI {
+
+    void init () {
+    }
+
+    INTVAL type () {
+        return enum_class_NCI;
+    }
+
+    STRING* name () {
+        return whoami;
+    }
+
+    PMC* clone () {
+        return Parrot_new_csub(INTERP, (Parrot_csub_t)D2FPTR(SELF->cache.struct_val));
+    }
+
+    PMC* get_pmc () {
+        return SELF;
+    }
+
+    INTVAL is_same (PMC* value) {
+        return SELF == value;
+    }
+
+    void set_same (PMC* value) {
+        SELF->cache.struct_val = value->cache.struct_val;
+	SELF->data = value->data;
+    }
+
+    INTVAL is_equal (PMC* value) {
+        return (SELF->vtable == value->vtable
+                && SELF->cache.struct_val == value->cache.struct_val
+		&& SELF->data == value->data);
+    }
+
+    INTVAL defined () {
+        return SELF->data != NULL;
+    }
+
+    void* invoke (void * next) {
+        Parrot_csub_t func = (Parrot_csub_t)SELF->data;
+        func(INTERP, SELF);
+        return next;
+    }
+}

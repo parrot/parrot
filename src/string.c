@@ -202,6 +202,15 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
     return string_copy(interpreter, b);
 }
 
+/*=for api string string_from_c_string
+ * Make a String from a passed in C string
+ */
+STRING *
+string_from_c_string(struct Parrot_Interp *interpreter, const void *buffer,
+                     UINTVAL buflen) {
+    return string_make(interpreter, buffer, buflen ? buflen : strlen(buffer),
+                       NULL, 0, NULL);
+}
 
 /*=for api string string_make
  * allocate memory for the string, copy information into it
