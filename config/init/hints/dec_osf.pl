@@ -21,13 +21,18 @@ Configure::Data->set(
     libs => $libs,
 );
 
+for my $ldflags (qw(ld_load_flags ld_share_flags)) {
+    my $f = Configure::Data->get($ldflags);
+    if ($f =~ s/ -s / /) {
+	Configure::Data->set($ldflags => $f);
+    }
+}
+
 my $linkflags = Configure::Data->get('linkflags');
 if ( $linkflags !~ /-expect_unresolved/ ) {
     $linkflags = "-expect_unresolved '*' -O4 -msym -std $linkflags";
+    Configure::Data->set(linkflags => $linkflags);
 }
-Configure::Data->set(
-    linkflags => $linkflags,
-);
 
 # Required because of ICU using c++.
 Configure::Data->set(
