@@ -883,6 +883,20 @@ Returns the pointer to the actual C C<struct>.
 
 /*
 
+=item C<void set_pointer(void* value)>
+
+Set the pointer to the actual C C<struct>.
+
+=cut
+
+*/
+
+    void set_pointer(void* value) {
+        PMC_data(SELF) = value;
+    }
+
+/*
+
 =item C<void set_integer_keyed_int(INTVAL ix, INTVAL value)>
 
 Sets the value of the element at index C<ix> to C<value>.

@@ -92,6 +92,9 @@
 .constant CellPMC	P20
 
 VeryBeginning:
+    # pop off the buffer layer so the prompt gets printed
+    getstdout P0
+    pop S0, P0
 
     # We need a PMC for the compiler
     compreg .PASMCompiler, "PASM"

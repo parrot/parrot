@@ -86,6 +86,8 @@ Define "main" entry point to start execution.
 =item * @LOAD
 
 Run this subroutine during the B<load_library> opcode.
+B<@LOAD> is ignored, if another subroutine in that file is marked with
+B<@MAIN>.
 
 =item * method
 

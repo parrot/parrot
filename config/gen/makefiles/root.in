@@ -585,7 +585,7 @@ $(LIBPARROT) : $(O_FILES)
 
 blib/lib/libparrot$(SO) : $(O_FILES)
 	$(MKDIR) blib blib/lib
-	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)
+	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
 
 $(TEST_PROG_SO) : $(PARROT_MAIN)$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
 	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) $(PARROT_MAIN)$(O) $(LIBPARROT) $(C_LIBS)

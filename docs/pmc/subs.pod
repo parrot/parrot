@@ -93,6 +93,8 @@ e.g.
      ...
      invoke P1
 
+B<@LOAD> is ignored, if another subroutine in that file is marked with
+B<@MAIN>.
 
 =head2 Invocation i.e. calling the sub
 
