@@ -1,6 +1,6 @@
-# Sample co-routines in Parrot
+# Sample sub-routines in Parrot
 #
-# Create 2 coroutines
+# Create 2 subroutines
 #
 set_addr I0, SUB 
 new P0, .ParrotSub, I0 
@@ -13,7 +13,7 @@ restore P0
 call
 end
 
-# A coroutine
+# A subroutine
 SUB:
 print "Hello subroutine\n"
 ret
