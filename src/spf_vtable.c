@@ -173,7 +173,7 @@ getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     case SIZE_PSTR:
         {
             STRING *s = (STRING *)va_arg(*arg, STRING *);
-            return string_copy(interpreter, s);
+            return s ? string_copy(interpreter, s) : cstr2pstr("(null)");
 
         }
 

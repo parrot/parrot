@@ -407,6 +407,10 @@ make_interpreter(Interp_flags flags)
     /* Get an empty interpreter from system memory */
     interpreter = mem_sys_allocate_zeroed(sizeof(struct Parrot_Interp));
 
+    /* PANIC will fail until this is done */
+    SET_NULL(interpreter->piodata);
+    PIO_init(interpreter);
+
     interpreter->DOD_block_level = 1;
     interpreter->GC_block_level = 1;
 
@@ -502,9 +506,6 @@ make_interpreter(Interp_flags flags)
         string_make(interpreter, "(unknown file)", 14, NULL, 0, NULL);
     interpreter->current_package =
         string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
-
-    SET_NULL(interpreter->piodata);
-    PIO_init(interpreter);
 
     SET_NULL_P(interpreter->code, struct PackFile *);
     SET_NULL_P(interpreter->profile, ProfData *);
