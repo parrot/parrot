@@ -6,13 +6,13 @@
 
 typedef enum {
     CTX_UNK,		/* unknown context */
-    CTX_INT,
-    CTX_NUM,
-    CTX_STR,
-    CTX_PMC,
-    CTX_KEY,
     CTX_BOOL,
-    CTX_VOID
+    CTX_VOID,
+    CTX_INT = 'I',
+    CTX_NUM = 'N',
+    CTX_STR = 'S',
+    CTX_PMC = 'P',
+    CTX_KEY = 'K'
 } context_type;
 
 typedef struct nodeType_t* (*node_opt_t)    (struct nodeType_t*);
@@ -63,7 +63,7 @@ void IMCC_dump_nodes(Interp *, nodeType *);
 nodeType * IMCC_expand_nodes(Interp*, nodeType *);
 void IMCC_free_nodes(Interp*, nodeType *);
 
-int IMCC_find_node_type(const char *name);
+int IMCC_find_node_nr(const char *name);
 
 
 #endif /* PARROT_AST_H_GUARD */

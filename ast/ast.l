@@ -79,15 +79,15 @@ SP              [ ]
 
 {WS}+		/* eat white space */ ;
 "Py_Module"        {
-			valp->t = IMCC_find_node_type(yytext);
+			valp->t = IMCC_find_node_nr(yytext);
 			return MODULE;
 		   }
 "Function"         {
-			valp->t = IMCC_find_node_type(yytext);
+			valp->t = IMCC_find_node_nr(yytext);
 			return FUNCTION;
 		   }
 {ID}		   {
-			valp->t = IMCC_find_node_type(yytext);
+			valp->t = IMCC_find_node_nr(yytext);
 			if (valp->t)
 			    return IDENTIFIER;
 			DUP_AND_RET(valp, NAME);

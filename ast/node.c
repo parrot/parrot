@@ -29,8 +29,18 @@ static nodeType* create_1(int nr, nodeType *self, nodeType *p);
 static nodeType* create_Func(int nr, nodeType *self, nodeType *p);
 static nodeType* create_Name(int nr, nodeType *self, nodeType *p);
 static void set_const(nodeType *p);
+static nodeType* node_to_pmc(Interp*, Instruction **ins, nodeType *p);
 
 static int show_context;
+
+/*
+ * for now, Undef morphs to wrong types that don't implement
+ * all needed vtables
+ */
+#define UNDEF_TYPE "PerlUndef"
+#define INT_TYPE "PerlInt"
+#define FLOAT_TYPE "PerlNum"
+#define STRING_TYPE "PerlString"
 
 /*
  * constant node handling
@@ -51,6 +61,10 @@ dump_Const(nodeType *p, int l)
 static nodeType*
 exp_Const(Interp* interpreter, nodeType *p)
 {
+    if (p->ctx == CTX_PMC) {
+        Instruction *ins = cur_unit->last_ins;
+        return node_to_pmc(interpreter, &ins, p);
+    }
     return p;
 }
 
@@ -156,6 +170,20 @@ ctx_Var(nodeType *p, context_type ctx)
     return CTX_PMC;     /* Python - else check options */
 }
 
+static int
+is_symmetric(char *op)
+{
+    /*
+     * Python abuses add as concat and mul as repeat
+     * so only arithmethic PMCs are symmetric
+     */
+    return 0;   /* if python */
+
+    return strcmp(op, "add") == 0 ||
+           strcmp(op, "mul") == 0
+           ? 1 : 0;
+}
+
 static context_type
 ctx_Binary(nodeType *p, context_type ctx)
 {
@@ -168,13 +196,23 @@ ctx_Binary(nodeType *p, context_type ctx)
 
     lc = ctx_default(left, ctx);
     rc = ctx_default(right, ctx);
-    if (lc == rc) {
-        p->ctx = CTX_PMC;   /* XXX Python because of overlflow */
+    /*
+     * if both types are the same, we have to convert the left
+     * to a PMC, *if* we are generating Python code, or more
+     * generally, if overflow to BigInt should happen
+     */
+    if (lc == rc) {     /* && if overflow_to_bigint */
+        p->ctx = CTX_PMC;
         left->ctx = CTX_PMC;
     }
-    else
+    else {
+        /*
+         * some mixed types - convert both to PMCs for now
+         * for Perl we could swap left and right, *if*
+         * the operations is symmetric
+         */
         p->ctx = left->ctx = right->ctx = CTX_PMC;
-
+    }
     return p->ctx;
 }
 
@@ -283,12 +321,39 @@ insert_find_global(Interp* interpreter, nodeType *var)
 }
 
 /*
+ * promote a Const or Var to a PMC node, if it isn't yet a PMC
+ */
+static nodeType*
+node_to_pmc(Interp* interpreter, Instruction **ins, nodeType *p)
+{
+    SymReg *regs[IMCC_MAX_REGS];
+    const char *pmc;
+    nodeType *temp;
+
+    switch (p->u.r->set) {
+        case 'I': pmc = INT_TYPE; break;
+        case 'S': pmc = FLOAT_TYPE; break;
+        case 'N': pmc = STRING_TYPE; break;
+        default:  return p;
+    }
+    temp = IMCC_new_temp_node(interpreter, 'P', &p->loc);
+    *ins = insert_new(interpreter, temp, pmc);
+    regs[0] = temp->u.r;
+    regs[1] = p->u.r;
+    *ins = insINS(interpreter, cur_unit, *ins, "set", regs, 2);
+    return temp;
+}
+/*
  * node expand aka code creation functions
  */
 
 static nodeType*
 exp_Var(Interp* interpreter, nodeType *p)
 {
+    if (p->ctx == CTX_PMC) {
+        Instruction *ins = cur_unit->last_ins;
+        return node_to_pmc(interpreter, &ins, p);
+    }
     return p;
 }
 
@@ -311,7 +376,7 @@ exp_default(Interp* interpreter, nodeType *p)
  * statement nodes don't have a result
  * expression nodes return the result node
  *
- * assign returns the rhs so that assignes can get chained together
+ * assign returns the rhs so that assigns can get chained together
  * [Python] assign is a statement with possibly multiple LHS
  *          ast2past.py has converted multiple LHS to chained
  *          assignment operations so that this matches a more "natural"
@@ -338,6 +403,10 @@ exp_Assign(Interp* interpreter, nodeType *p)
      *      Assign is wrong too, as "a = b" implies "(a is b) == True"
      */
     insINS(interpreter, cur_unit, ins, "set", regs, 2);
+    /*
+     * TODO store in lexicals if needed, i.e. if its not a leaf function
+     * node
+     */
     return rhs;
 }
 
@@ -350,31 +419,6 @@ exp_Args(Interp* interpreter, nodeType *p)
     return NULL;
 }
 
-static int
-is_symmetric(char *op)
-{
-    /*
-     * Python abuses add as concat and mul as repeat
-     * so only arithmethic PMCs are symmetric
-     */
-    return 0;   /* if python */
-
-    return strcmp(op, "add") == 0 ||
-           strcmp(op, "mul") == 0
-           ? 1 : 0;
-}
-
-static nodeType*
-node_to_pmc(Interp* interpreter, Instruction **ins, nodeType *p)
-{
-    SymReg *regs[IMCC_MAX_REGS];
-    nodeType *temp = IMCC_new_temp_node(interpreter, 'P', &p->loc);
-    *ins = insert_new(interpreter, temp, "Undef");
-    regs[0] = temp->u.r;
-    regs[1] = p->u.r;
-    *ins = insINS(interpreter, cur_unit, *ins, "set", regs, 2);
-    return temp;
-}
 
 /*
  * Op
@@ -400,7 +444,7 @@ exp_Binary(Interp* interpreter, nodeType *p)
     right = right->expand(interpreter, right);
     /*
      * then get the current instruction pointer
-     * and append the binary
+     * and append the binary operation
      */
     ins = cur_unit->last_ins;
     if (!p->dest) {
@@ -413,26 +457,9 @@ exp_Binary(Interp* interpreter, nodeType *p)
          * else create a temp of the same type as the left operand
          */
         reg_set = left->u.r->set;
-        /*
-         * TODO if context handling is done expansion of
-         *      the left and right node should do the right thing
-         */
-        if (right->u.r->set == 'P' && reg_set != 'P') {
-            reg_set = 'P';
-            /* when it's a symmetric opcode, swap left and right
-             */
-            if (is_symmetric(op->u.r->name)) {
-                nodeType *temp = left;
-                left = right;
-                right = temp;
-            }
-            else {
-                left = node_to_pmc(interpreter, &ins, left);
-            }
-        }
         dest = IMCC_new_temp_node(interpreter, reg_set, &p->loc);
         if (dest->u.r->set == 'P')
-            ins = insert_new(interpreter, dest, "Undef");
+            ins = insert_new(interpreter, dest, UNDEF_TYPE);
     }
     p->dest = dest;
     regs[0] = dest->u.r;
@@ -532,7 +559,7 @@ exp_Py_Local(Interp* interpreter, nodeType *var)
     if (var->u.r->type == VTADDRESS)
         insert_find_global(interpreter, var);
     else
-        insert_new(interpreter, var, "Undef");
+        insert_new(interpreter, var, UNDEF_TYPE);
     return NULL;
 }
 
@@ -702,7 +729,7 @@ create_1(int nr, nodeType *self, nodeType *child)
 
 /*
  * make a function node
- * this sets the function symbol of the calle to VTADDRESS
+ * this sets the function symbol of the caller to VTADDRESS
  * which is used to create the find_global of the caller
  */
 static nodeType*
@@ -714,10 +741,12 @@ create_Func(int nr, nodeType *self, nodeType *child)
     r = child->u.r;
     last = cur_unit->prev;      /* XXX  ->caller */
     r = _get_sym(last->hash, r->name);
-    /* mark the name being a subroutine name
-     * s. Py_Local
-     */
-    r->type = VTADDRESS;
+    if (r) {
+        /* mark the name being a subroutine name
+         * s. Py_Local
+         */
+        r->type = VTADDRESS;
+    }
     return self;
 }
 
@@ -741,7 +770,7 @@ create_Name(int nr, nodeType *self, nodeType *child)
 
 /*
 
-=item C<int IMCC_find_node_type(const char *name)>
+=item C<int IMCC_find_node_nr(const char *name)>
 
 Returns the index in C<ast_list> of the given node name or 0 if the node name
 doesn't exist.
@@ -751,7 +780,7 @@ doesn't exist.
 */
 
 int
-IMCC_find_node_type(const char *name)
+IMCC_find_node_nr(const char *name)
 {
     node_names search, *r;
 

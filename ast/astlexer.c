@@ -759,7 +759,7 @@ case 4:
 YY_RULE_SETUP
 #line 81 "ast/ast.l"
 {
-			valp->t = IMCC_find_node_type(yytext);
+			valp->t = IMCC_find_node_nr(yytext);
 			return MODULE;
 		   }
 	YY_BREAK
@@ -767,7 +767,7 @@ case 5:
 YY_RULE_SETUP
 #line 85 "ast/ast.l"
 {
-			valp->t = IMCC_find_node_type(yytext);
+			valp->t = IMCC_find_node_nr(yytext);
 			return FUNCTION;
 		   }
 	YY_BREAK
@@ -775,7 +775,7 @@ case 6:
 YY_RULE_SETUP
 #line 89 "ast/ast.l"
 {
-			valp->t = IMCC_find_node_type(yytext);
+			valp->t = IMCC_find_node_nr(yytext);
 			if (valp->t)
 			    return IDENTIFIER;
 			DUP_AND_RET(valp, NAME);
