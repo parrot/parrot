@@ -274,13 +274,14 @@ sub output_pushint {
     my ($self, $reg, $db_desc) = @_;
     $reg = value($reg);
 
-    my @ops = ($self->pushop . " <rx_stack>, $reg # pushindex");
     if ($self->{DEBUG}) {
         my $desc = $db_desc ? " ($db_desc)" : "";
-	push @ops, 'print "PUSHED "', "print $reg", qq(print "$desc\\n"),
-                   $self->dbgoto('DUMPSTACK');
+        return ("set <rx_tmp>, <rx_stack>",
+                $self->pushop . " <rx_stack>, $reg",
+                $self->dbprint("PUSHED[\%<<rx_tmp>>] INT: \%<$reg>$desc\n"),
+               );
     }
-    return @ops;
+    return $self->pushop . " <rx_stack>, $reg";
 }
 
 sub output_save {
@@ -292,7 +293,7 @@ sub output_save {
 sub output_restore {
     my ($self, $reg) = @_;
     $reg = value($reg);
-    return ("save $reg");
+    return ("restore $reg");
 }
 
 sub output_refresh {
@@ -351,14 +352,14 @@ sub output_peekindex {
 }
 
 sub output_popint {
-    my ($self, $reg) = @_;
+    my ($self, $reg, $db_desc) = @_;
     $reg = value($reg);
     if ($self->{DEBUG}) {
-	return ("print \"POPPED INT: \"",
-		$self->popop . " $reg, <rx_stack>",
-                "print $reg",
-                'print "\n"',
-               );
+        my $desc = $db_desc ? " ($db_desc)" : "";
+        return ("set <rx_tmp>, <rx_stack>",
+                $self->popop . " $reg, <rx_stack>",
+                $self->dbprint("POPPED[\%<<rx_tmp>>] INT: \%<$reg>$desc\n"),
+                );
     } else {
         return ($self-> popop . " $reg, <rx_stack> # popint");
     }
