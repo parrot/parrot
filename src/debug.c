@@ -860,7 +860,12 @@ PDB_delete_condition(struct Parrot_Interp *interpreter,
 void
 PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i)
 {
-    interpreter->pdb->breakpoint_skip = i - 1;
+    if (i == 0) {
+        interpreter->pdb->breakpoint_skip = i;
+    }
+    else {
+        interpreter->pdb->breakpoint_skip = i - 1;
+    }
 }
 
 /* PDB_program_end
