@@ -64,10 +64,29 @@ set_graphemes(Interp *interpreter, STRING *source_string,
 }
 
 static STRING *
-from_charset(Interp *interpreter, STRING *source_string, STRING *dest)
+from_charset(Interp *interpreter, STRING *src, STRING *dest)
 {
-    internal_exception(UNIMPLEMENTED, "Can't do this yet");
-    return NULL;
+    UINTVAL offs, c;
+    String_iter iter;
+
+    if (dest) {
+        Parrot_reallocate_string(interpreter, dest, src->strlen);
+        dest->bufused = src->strlen;
+        dest->strlen  = src->strlen;
+    }
+    ENCODING_ITER_INIT(interpreter, src, &iter);
+    for (offs = 0; offs < src->strlen; ++offs) {
+        c = iter.get_and_advance(interpreter, &iter);
+        if (c >= 0x100) {
+            EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
+        }
+        if (dest)
+            ENCODING_SET_BYTE(interpreter, dest, offs, c);
+    }
+    if (dest)
+        return dest;
+    src->charset = Parrot_ascii_charset_ptr;
+    return src;
 }
 
 static STRING *

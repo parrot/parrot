@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 28;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -399,5 +399,49 @@ output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i ascii to iso-8859-1");
 CODE
 abc
 iso-8859-1
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to unicode");
+    set S0, "abc_ä_"
+    find_charset I0, "unicode"
+    trans_charset S1, S0, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    length I2, S1
+    print I2
+    print "\n"
+    end
+CODE
+abc_\xc3\xa4_
+unicode
+6
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i unicode to iso-8859-1");
+    set S0, unicode:"abc_\xe4_"
+    bytelength I2, S0	# XXX its 7 for utf8 only
+    print I2
+    print "\n"
+    find_charset I0, "iso-8859-1"
+    trans_charset S1, S0, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    length I2, S1
+    print I2
+    print "\n"
+    end
+CODE
+7
+abc_ä_
+iso-8859-1
+6
 OUTPUT
 

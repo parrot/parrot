@@ -154,11 +154,11 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
     UINTVAL charcount = 0;
     UINTVAL len = string_length(interpreter, string);
     /* Well, not right now */
-    codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+    codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
     switch (codepoint) {
     case 'x':
         ++*offset;
-        codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+        codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
         if (codepoint >= '0' && codepoint <= '9') {
             workchar = codepoint - '0';
         } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -171,7 +171,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         ++*offset;
         if (*offset < len) {
             workchar *= 16;
-            codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+            codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
             if (codepoint >= '0' && codepoint <= '9') {
                 workchar += codepoint - '0';
             } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -188,7 +188,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         return workchar;
     case 'c':
         ++*offset;
-        codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+        codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
         if (codepoint >= 'A' && codepoint <= 'Z') {
             workchar = codepoint - 'A' + 1;
         } else {
@@ -198,7 +198,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         return workchar;
     case 'u':
         ++*offset;
-        codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+        codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
         if (codepoint >= '0' && codepoint <= '9') {
             workchar = codepoint - '0';
         } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -212,7 +212,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         for (charcount = 1; charcount < 4; charcount++) {
             if (*offset < len) {
                 workchar *= 16;
-                codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+                codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
                 if (codepoint >= '0' && codepoint <= '9') {
                     workchar += codepoint - '0';
                 } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -230,7 +230,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         return workchar;
     case 'U':
         ++*offset;
-        codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+        codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
         if (codepoint >= '0' && codepoint <= '9') {
             workchar = codepoint - '0';
         } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -244,7 +244,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         for (charcount = 1; charcount < 8; charcount++) {
             if (*offset < len) {
                 workchar *= 16;
-                codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+                codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
                 if (codepoint >= '0' && codepoint <= '9') {
                     workchar += codepoint - '0';
                 } else if (codepoint >= 'a' && codepoint <= 'f') {
@@ -274,7 +274,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         ++*offset;
         if (*offset < len) {
             workchar *= 8;
-            codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+            codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
             if (codepoint >= '0' && codepoint <= '7') {
                 workchar += codepoint - '0';
             } else {
@@ -286,7 +286,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
         ++*offset;
         if (*offset < len) {
             workchar *= 8;
-            codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+            codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
             if (codepoint >= '0' && codepoint <= '7') {
                 workchar += codepoint - '0';
             } else {

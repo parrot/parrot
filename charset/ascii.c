@@ -137,10 +137,35 @@ from_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
 }
 
 STRING *
-ascii_to_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
+ascii_to_unicode(Interp *interpreter, STRING *src, STRING *dest)
 {
-    internal_exception(UNIMPLEMENTED,
-            "to_unicode for iso-8859-1 not implemented");
+    UINTVAL offs, c;
+    String_iter iter;
+
+    if (dest) {
+        dest->charset = Parrot_unicode_charset_ptr;
+        dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, dest);
+        Parrot_reallocate_string(interpreter, dest, src->strlen);
+        ENCODING_ITER_INIT(interpreter, dest, &iter);
+        for (offs = 0; offs < src->strlen; ++offs) {
+            c = ENCODING_GET_BYTE(interpreter, src, offs);
+            if (iter.bytepos >= PObj_buflen(dest) - 4) {
+                UINTVAL need = (src->strlen - offs) * 1.5;
+                if (need < 16)
+                    need = 16;
+                Parrot_reallocate_string(interpreter, dest,
+                        PObj_buflen(dest) + need);
+            }
+            iter.set_and_advance(interpreter, &iter, c);
+        }
+        dest->bufused = iter.bytepos;
+        dest->strlen  = iter.charpos;
+        return dest;
+    }
+    else {
+        internal_exception(UNIMPLEMENTED,
+                "to_unicode inplace for iso-8859-1 not implemented");
+    }
     return NULL;
 }
 

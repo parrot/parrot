@@ -155,10 +155,27 @@ inline op repeat (in PMC, in PMC, in INT) :base_mem {
 
 Set $1 to the length (in characters) of the string in $2.
 
+=item B<bytelength>(out INT, in STR)
+
+Set $1 to the length (in bytes) of the string in $2.
+
 =cut
 
 inline op length(out INT, in STR) :base_mem {
   $1 = string_length(interpreter, $2);
+  goto NEXT();
+}
+
+inline op bytelength(out INT, in STR) :base_mem {
+  UINTVAL n;
+  STRING *s = $2;
+  if (!s)
+    n = 0;
+  else {
+    n = s->bufused;
+    assert(n == ENCODING_BYTES(interpreter, $2));
+  }
+  $1 = n;
   goto NEXT();
 }
 

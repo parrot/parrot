@@ -50,10 +50,19 @@ get_graphemes_inplace(Interp *interpreter, STRING *source_string,
 }
 
 static STRING*
-to_charset(Interp *interpreter, STRING *src, CHARSET *new_charset, STRING *dest)
+to_charset(Interp *interpreter, STRING *src,
+        CHARSET *new_charset, STRING *dest)
 {
-    UNIMPL;
-    return NULL;
+    charset_converter_t conversion_func;
+
+    if ((conversion_func = Parrot_find_charset_converter(interpreter,
+                    src->charset, new_charset))) {
+         return conversion_func(interpreter, src, dest);
+    }
+    else {
+        return new_charset->from_charset(interpreter, src, dest);
+
+    }
 }
 
 static STRING*
@@ -64,8 +73,16 @@ to_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
 }
 
 static STRING*
-from_charset(Interp *interpreter, STRING *source_string, STRING *dest)
+from_charset(Interp *interpreter, STRING *src, STRING *dest)
 {
+    if (src->charset == Parrot_unicode_charset_ptr) {
+        if (!dest) {
+            /* inplace ok */
+            return src;
+        }
+        Parrot_reuse_COW_reference(interpreter, src, dest);
+        return dest;
+    }
     UNIMPL;
     return NULL;
 }

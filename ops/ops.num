@@ -1428,3 +1428,5 @@ trans_charset_s_s_i            1397
 trans_charset_s_s_ic           1398
 trans_charset_s_sc_i           1399
 trans_charset_s_sc_ic          1400
+bytelength_i_s                 1401
+bytelength_i_sc                1402

@@ -318,12 +318,6 @@ no_set:
             mem_sys_free((void*)data_dir); /* cast away the constness */
     }
 
-/* --- Perhaps these should be uncommented - Leo
-    encoding_init();
-    chartype_init();
-    string_native_type = chartype_lookup("usascii");
-    string_unicode_type = chartype_lookup("unicode");
-*/
     /*
      * initialize the constant string table
      */
@@ -615,16 +609,8 @@ string_make(Interp *interpreter, const void *buffer,
             "string_make: no charset name specified");
     }
 
-    if (strcmp(charset_name, "iso-8859-1") == 0 ) {
-        charset = Parrot_iso_8859_1_charset_ptr;
-    }
-    else if (strcmp(charset_name, "ascii") == 0 ) {
-        charset = Parrot_ascii_charset_ptr;
-    }
-    else if (strcmp(charset_name, "binary") == 0 ) {
-        charset = Parrot_binary_charset_ptr;
-    }
-    else {
+    charset = Parrot_find_charset(interpreter, charset_name);
+    if (!charset) {
         internal_exception(UNIMPLEMENTED,
                 "Can't make '%s' charset strings", charset_name);
     }
@@ -2284,6 +2270,8 @@ string_unescape_cstring(Interp * interpreter,
     UINTVAL offs, d;
     Parrot_UInt4 r;
     UINTVAL flags;
+    String_iter iter;
+    ENCODING *encoding;
 
     if (delimiter && clength)
         --clength;
@@ -2293,6 +2281,15 @@ string_unescape_cstring(Interp * interpreter,
     else
         flags |= PObj_private7_FLAG;  /* Pythonic unicode flag */
     result = string_make(interpreter, cstring, clength, charset, flags);
+    result->strlen = clength;
+
+    ENCODING_ITER_INIT(interpreter, result, &iter);
+    /*
+     * reset encoding so that the destination encoding isn't used
+     * TODO if an encoding is given too just use it
+     */
+    encoding = result->encoding;
+    result->encoding = Parrot_fixed_8_encoding_ptr;
 
     for (offs = d = 0; offs < clength; ++offs) {
         r = CHARSET_GET_CODEPOINT(interpreter, result, offs);
@@ -2306,13 +2303,19 @@ string_unescape_cstring(Interp * interpreter,
             --offs;
         }
         if (d == offs) {
+            /* we did it in place - no action */
             ++d;
+            iter.bytepos++;
+            iter.charpos++;
             continue;
         }
-        CHARSET_SET_CODEPOINT(interpreter, result, d++, r);
+        assert(d < offs);
+        iter.set_and_advance(interpreter, &iter, r);
+        ++d;
     }
+    result->encoding = encoding;
     result->strlen = d;
-    result->bufused = string_max_bytes(interpreter, result, d);
+    result->bufused = iter.bytepos;
 
     return result;
 }
