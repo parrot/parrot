@@ -59,7 +59,7 @@ foreach my $i ( qw(is isnt like) ) {
 
     _run_command("./miniperlc $scheme_f >$as_f"); # JMG
     _run_command("(cd ../.. ; $PConfig{perl} assemble.pl languages/miniperl/$as_f --output languages/miniperl/$by_f)"); # JMG
-    _run_command( "(cd ../.. ; ./parrot languages/miniperl/$by_f)", 'STDOUT' => $out_f, 'STDERR' => $out_f); # JMG
+    _run_command( "(cd ../.. ; ./$PConfig{test_prog} languages/miniperl/$by_f)", 'STDOUT' => $out_f, 'STDERR' => $out_f); # JMG
 
     my $prog_output;
     open OUTPUT, "< $out_f";

@@ -85,7 +85,7 @@ languages/jako/primes.jako
 languages/jako/queens.jako
 languages/jako/sub.jako
 languages/Makefile.in
-languages/scheme/Makefile
+languages/scheme/Makefile.in
 languages/scheme/Scheme/Generator.pm
 languages/scheme/Scheme/Parser.pm
 languages/scheme/Scheme/Test.pm
@@ -98,7 +98,7 @@ languages/scheme/t/arith/nested.t
 languages/scheme/t/io/basic.t
 languages/scheme/t/logic/basic.t
 languages/scheme/t/harness
-languages/miniperl/Makefile
+languages/miniperl/Makefile.in
 languages/miniperl/Miniperl/Generator.pm
 languages/miniperl/Miniperl/Parser.pm
 languages/miniperl/Miniperl/Test.pm

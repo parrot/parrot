@@ -208,6 +208,8 @@ buildfile("Makefile");
 buildfile("classes/Makefile");
 buildfile("languages/Makefile");
 buildfile("languages/jako/Makefile");
+buildfile("languages/miniperl/Makefile");
+buildfile("languages/scheme/Makefile");
 # and Parrot::Config
 buildconfigpm();
 # and the types file

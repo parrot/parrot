@@ -4,11 +4,11 @@
 # $Id$
 #
 
-DIR=languages/scheme
+DIR=languages/miniperl
 TOOL_DIR=../..
 ASM=./assemble.pl
-SCHEMEC=./schemec
-INTERP=./test_parrot
+MINIPERLC=./miniperlc
+INTERP=./${test_prog}
 
 #
 # Default target:
@@ -17,8 +17,8 @@ INTERP=./test_parrot
 default: test
 #	echo "make: Makefile: no default target"
 
-foo: foo.scheme schemec
-	$(SCHEMEC) foo.scheme > foo.pasm
+foo: foo.mpl miniperlc
+	$(MINIPERLC) foo.mpl > foo.pasm
 	cd $(TOOL_DIR); perl $(ASM) $(DIR)/foo.pasm > $(DIR)/foo.pbc
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/foo.pbc
 	cat foo.pasm
@@ -27,14 +27,14 @@ foo: foo.scheme schemec
 # Compilation:
 #
 
-test.pasm: test.scheme schemec
-	$(SCHEMEC) test.scheme > test.pasm
+test.pasm: test.mpl miniperlc
+	$(MINIPERLC) test.mpl > test.pasm
 
-and.pasm: and.scheme schemec
-	$(SCHEMEC) and.scheme > and.pasm
+and.pasm: and.mpl miniperlc
+	$(MINIPERLC) and.mpl > and.pasm
 
-foo.pasm: foo.scheme schemec
-	$(SCHEMEC) foo.scheme > foo.pasm
+foo.pasm: foo.mpl miniperlc
+	$(MINIPERLC) foo.mpl > foo.pasm
 
 #
 # Assembly:
@@ -60,12 +60,12 @@ clean:
 foo.pasm foo.pbc \
 t/*/*.pasm \
 t/*/*.pbc \
-t/*/*.scheme \
+t/*/*.mpl \
 t/*/*.out
 
 over:
-	@$(MAKE) clean
-	@$(MAKE) all
+	@make clean
+	@make all
 
 test:
 	t/harness

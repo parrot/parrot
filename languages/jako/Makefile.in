@@ -8,7 +8,7 @@ DIR=languages/jako
 TOOL_DIR=../..
 ASM=perl -I ../../ ../../assemble.pl
 JAKOC=./jakoc
-INTERP=../../parrot
+INTERP=../../${test_prog}
 
 .SUFFIXES: .jako .pasm .pbc
 
