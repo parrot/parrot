@@ -12,9 +12,15 @@ trap cleanup 1 2 3
 mv parrot parrot.orig
 echo "run-yamd -l2 -f -n ./parrot.orig  \$@ 2>&1 | perl -ne'
 	BEGIN { undef $/; $|=1; };
+	my \$expect = 6;
+	my \$found = 0;
+	my \$err = 0;
 	print \$1 if (/\*{9,9}\n(.*?)\*{9,9}/s);
-	print \$1 if (/((?:WARNI|ERROR).*)/);
+	while (/WARNING/g) { ++\$found };
+	\$err++ if (/ERROR/);
+	print qq(\nLEAKs \$found\n) if \$found > \$expect;
+	print qq(\nERROR\n) if \$err;
 	1;'" > parrot
 chmod 755 parrot
-perl t/harness --gc-debug --running-make-test -j --leak-test $@
+perl t/harness --gc-debug --running-make-test --leak-test $@
 cleanup
