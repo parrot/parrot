@@ -21,7 +21,7 @@ Handles class and object manipulation.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* #include "objects.str" */
+/*  #include "objects.str" */
 #ifndef _S
 #  define _S(s) const_string(interpreter, s)
 #endif
@@ -36,6 +36,8 @@ clone_array(Parrot_Interp interpreter, PMC *source_array)
     count = VTABLE_elements(interpreter, source_array);
     /*
      * preserve type, we have OrderedHash and Array
+     * XXX this doesn't preserve the keys of the ordered hash
+     *     (but the keys aren't used -leo)
      */
     new_array = pmc_new(interpreter, source_array->vtable->base_type);
     VTABLE_set_integer_native(interpreter, new_array, count);
@@ -465,7 +467,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
 
 static PMC*
 get_init_meth(Parrot_Interp interpreter, PMC *class,
-         STRING *prop_str , STRING **meth_str)
+         const STRING *prop_str , STRING **meth_str)
 {
     PMC *prop;
     STRING *meth;
@@ -515,6 +517,10 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
         /*
          * 1) if class has a CONSTRUCT property run it on the object
          *    no redispatch
+         *
+         *  TODO if the first meth is found, save registers, do all init
+         *       calls and after the last one restore registers.
+         *
          */
         STRING *meth_str;
         PMC *meth = get_init_meth(interpreter, class, _S("CONSTRUCT"),

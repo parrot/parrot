@@ -146,10 +146,19 @@ Return the hashed value of the string C<value>.
 
 */
 
+/* see also string.c */
+#define  USE_HASH_VAL 1
+
 static size_t
 key_hash_STRING(Interp *interpreter, Hash *hash, void *value)
 {
-	return string_hash(interpreter, hash, (STRING *)value);
+    STRING *s = value;
+#if USE_HASH_VAL
+    if (PObj_constant_TEST(s) && s->hashval) {
+        return s->hashval ^ hash->seed;
+    }
+#endif
+    return string_hash(interpreter, hash, s);
 }
 
 /*

@@ -27,6 +27,8 @@ strings.
 #include "parrot/parrot.h"
 #include <assert.h>
 
+#define USE_HASH_VAL 1
+
 /*
  * this extra size is in the hope, that some concat ops might
  * follow in a sequence.
@@ -733,6 +735,13 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
                 PObj_bufstart(s) = s->strstart = const_cast(buffer);
                 PObj_buflen(s)   = s->strlen = s->bufused = len;
                 PObj_bufstart_external_SET(s);
+#if USE_HASH_VAL
+                if (flags & PObj_constant_FLAG) {
+                    Hash hash;
+                    hash.seed = 0;
+                    s->hashval = string_hash(interpreter, &hash, s);
+                }
+#endif
                 return s;
             }
         }
@@ -757,6 +766,13 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
             else {
                 s->strlen = s->bufused = 0;
             }
+#if USE_HASH_VAL
+                if (flags & PObj_constant_FLAG) {
+                    Hash hash;
+                    hash.seed = 0;
+                    s->hashval = string_hash(interpreter, &hash, s);
+                }
+#endif
         }
         else {
             string_fill_from_buffer(interpreter, buffer, len, encoding_name, s);
@@ -2813,7 +2829,6 @@ random at start time?
 
 */
 
-#define USE_HASH_VAL 0
 size_t
 string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
 {
@@ -2827,11 +2842,6 @@ string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
 
     if (!s)
         return 0;
-#if USE_HASH_VAL
-    if (PObj_constant_TEST(s) && s->hashval) {
-        return s->hashval ^ hash->seed;
-    }
-#endif
 
     switch (s->representation) {
         case enum_stringrep_one:
@@ -2956,7 +2966,7 @@ string_unescape_cstring(struct Parrot_Interp * interpreter,
 {
     size_t clength = strlen(cstring);
     STRING *result;
-    int offs, d;
+    unsigned int offs, d;
     Parrot_UInt4 r;
     Parrot_unescape_cb char_at;
     char_setter_func set_char_at;
@@ -3007,6 +3017,13 @@ string_unescape_cstring(struct Parrot_Interp * interpreter,
     }
     result->strlen = d;
     result->bufused = string_max_bytes(interpreter, result, d);
+#if USE_HASH_VAL
+    {
+        Hash hash;
+        hash.seed = 0;
+        result->hashval = string_hash(interpreter, &hash, result);
+    }
+#endif
     return result;
 }
 
