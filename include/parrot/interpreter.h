@@ -267,7 +267,8 @@ typedef struct Parrot_Interp {
     int lazy_dod;                       /* flag that indicates whether we should stop
                                            when we've seen all impatient PMCs */
     PMC* DOD_registry;          /* registered PMCs added to the root set */
-    struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
+    MMD_table *binop_mmd_funcs; /* Table of MMD functions */
+    UINTVAL n_binop_mmd_funcs;   /* function count */
     PMC** nci_method_table;     /* Method table PMC for NCI stubs per class */
     struct _Caches * caches;            /* s. caches.h */
     STRING **const_cstring_table;       /* CONST_STRING(x) items */

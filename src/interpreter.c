@@ -1755,8 +1755,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     string_init(interpreter);
 
     /* Set up the MMD struct */
-    interpreter->binop_mmd_funcs =
-        mem_sys_allocate_zeroed(sizeof(struct MMD_table));
+    interpreter->binop_mmd_funcs = NULL;
 
     /* Go and init the MMD tables */
     register_fallback_methods(interpreter);

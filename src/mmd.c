@@ -54,12 +54,12 @@ dump_mmd(Interp *interpreter, INTVAL function)
 {
     UINTVAL x, y;
     UINTVAL offset, x_funcs, y_funcs;
-    MMD_table *table = interpreter->binop_mmd_funcs;
+    MMD_table *table = interpreter->binop_mmd_funcs + function;
     funcptr_t func, def;
 
-    x_funcs = table->x[function];
-    y_funcs = table->y[function];
-    def = table->default_func[function];
+    x_funcs = table->x;
+    y_funcs = table->y;
+    def = table->default_func;
     if (!def) {
         printf("default for %d not registered\n", (int)function);
         return;
@@ -76,7 +76,7 @@ dump_mmd(Interp *interpreter, INTVAL function)
         printf("%3d ", (int)y);
         for (x = 0; x < x_funcs; ++x) {
             offset = x_funcs * y + x;
-            func = table->mmd_funcs[function][offset];
+            func = table->mmd_funcs[offset];
             printf("%c",
                     func == def ?  '.' :
                     (UINTVAL)func & 1 ?  'P' :
@@ -87,7 +87,7 @@ dump_mmd(Interp *interpreter, INTVAL function)
     for (y = 0; y < y_funcs; ++y) {
         for (x = 0; x < x_funcs; ++x) {
             offset = x_funcs * y + x;
-            func = table->mmd_funcs[function][offset];
+            func = table->mmd_funcs[offset];
             if (func && func != def && !((UINTVAL) func & 1))
                 printf("%3d %3d: %p\n", (int)x, (int)y, (void*) func);
         }
@@ -101,20 +101,20 @@ get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
 {
     funcptr_t func;
     UINTVAL offset, x_funcs, y_funcs;
-    MMD_table *table = interpreter->binop_mmd_funcs;
-    x_funcs = table->x[function];
-    y_funcs = table->y[function];
+    MMD_table *table = interpreter->binop_mmd_funcs + function;
+    x_funcs = table->x;
+    y_funcs = table->y;
 
     if (left_type < x_funcs) {
         if (right_type < y_funcs) {
             offset = x_funcs * right_type + left_type;
-            func = table->mmd_funcs[function][offset];
+            func = table->mmd_funcs[offset];
         }
         else {
-            func = table->mmd_funcs[function][left_type];
+            func = table->mmd_funcs[left_type];
         }
     } else {
-        func = table->default_func[function];
+        func = table->default_func;
     }
     /*
      * empty slots are filled with the default function, so we really
@@ -334,66 +334,25 @@ installed that matches the left and right types for a call).
 
 void
 mmd_add_function(Interp *interpreter,
-        INTVAL funcnum, funcptr_t function)
+        INTVAL func_nr, funcptr_t function)
 {
-    UINTVAL func_count = funcnum + 1;
-    UINTVAL cur_func_count = interpreter->binop_mmd_funcs->tables;
+    INTVAL i;
+    if (func_nr >= (INTVAL)interpreter->n_binop_mmd_funcs) {
+        interpreter->binop_mmd_funcs = mem_sys_realloc(
+                interpreter->binop_mmd_funcs,
+                (func_nr + 1) * sizeof(MMD_table));
 
-    /*    printf("Default for %i is %p\n", funcnum, function); */
-
-    /* Is the new function past where we have expanded to? If so, make
-       all the tables bigger
-    */
-    if (func_count > cur_func_count) {
-        UINTVAL *new_x;
-        UINTVAL *new_y;
-        funcptr_t *new_default;
-        UINTVAL *new_func_count;
-        funcptr_t **new_functable;
-
-        /* All this stuff should be checked to make sure it succeeds. */
-        new_x = mem_sys_allocate_zeroed(sizeof(UINTVAL) * func_count);
-        new_y = mem_sys_allocate_zeroed(sizeof(UINTVAL) * func_count);
-        new_func_count = mem_sys_allocate_zeroed(sizeof(UINTVAL) * func_count);
-        new_default = mem_sys_allocate_zeroed(sizeof(funcptr_t) * func_count);
-        new_functable = mem_sys_allocate_zeroed(sizeof(funcptr_t) * func_count);
-
-        /* Now copy the data over */
-        memcpy(new_x, interpreter->binop_mmd_funcs->x,
-                sizeof(UINTVAL) * cur_func_count);
-        memcpy(new_y, interpreter->binop_mmd_funcs->y,
-                sizeof(UINTVAL) * cur_func_count);
-        memcpy(new_func_count, interpreter->binop_mmd_funcs->funcs_in_table,
-                sizeof(UINTVAL) * cur_func_count);
-        memcpy(new_default, interpreter->binop_mmd_funcs->default_func,
-                sizeof(funcptr_t) * cur_func_count);
-        memcpy(new_functable, interpreter->binop_mmd_funcs->mmd_funcs,
-                sizeof(funcptr_t) * cur_func_count);
-
-        /* free old if any */
-        if (interpreter->binop_mmd_funcs->x)
-            mem_sys_free(interpreter->binop_mmd_funcs->x);
-        if (interpreter->binop_mmd_funcs->y)
-            mem_sys_free(interpreter->binop_mmd_funcs->y);
-        if (interpreter->binop_mmd_funcs->funcs_in_table)
-            mem_sys_free(interpreter->binop_mmd_funcs->funcs_in_table);
-        if (interpreter->binop_mmd_funcs->default_func)
-            mem_sys_free(interpreter->binop_mmd_funcs->default_func);
-        if (interpreter->binop_mmd_funcs->mmd_funcs)
-            mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs);
-
-        /* And set the values */
-        interpreter->binop_mmd_funcs->x = new_x;
-        interpreter->binop_mmd_funcs->y = new_y;
-        interpreter->binop_mmd_funcs->default_func = new_default;
-        interpreter->binop_mmd_funcs->funcs_in_table = new_func_count;
-        interpreter->binop_mmd_funcs->mmd_funcs = new_functable;
-        interpreter->binop_mmd_funcs->tables = func_count;
-
+        for (i = interpreter->n_binop_mmd_funcs; i <= func_nr; ++i)  {
+            MMD_table *table = interpreter->binop_mmd_funcs + i;
+            table->x = table->y = 0;
+            table->mmd_funcs = NULL;
+        }
+        interpreter->n_binop_mmd_funcs = func_nr + 1;
     }
+
     /* We mark the new function by adding in the default function
        pointer */
-    interpreter->binop_mmd_funcs->default_func[funcnum] = function;
+    interpreter->binop_mmd_funcs[func_nr].default_func = function;
 
 }
 
@@ -416,20 +375,21 @@ mmd_expand_x(Interp *interpreter, INTVAL function, INTVAL new_x)
     UINTVAL y;
     funcptr_t default_func;
     UINTVAL i;
+    MMD_table *table = interpreter->binop_mmd_funcs + function;
 
     /* Is the Y 0? If so, nothing to expand, so just set the X for
        later use */
-    if (interpreter->binop_mmd_funcs->y[function] == 0) {
-        interpreter->binop_mmd_funcs->x[function] = new_x;
+    if (table->y == 0) {
+        table->x = new_x;
         return;
     }
 
     /* The Y is not zero. Bleah. This means we have to expand the
        table in an unpleasant way. */
 
-    x = interpreter->binop_mmd_funcs->x[function];
-    y = interpreter->binop_mmd_funcs->y[function];
-    default_func = interpreter->binop_mmd_funcs->default_func[function];
+    x = table->x;
+    y = table->y;
+    default_func = table->default_func;
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
@@ -446,14 +406,14 @@ mmd_expand_x(Interp *interpreter, INTVAL function, INTVAL new_x)
         newoffset = i * new_x;
         oldoffset = i * x;
         memcpy(new_table + newoffset,
-               interpreter->binop_mmd_funcs->mmd_funcs[function] + oldoffset,
+               table->mmd_funcs + oldoffset,
                sizeof(funcptr_t) * x);
     }
-    if (interpreter->binop_mmd_funcs->mmd_funcs[function])
-        mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs[function]);
-    interpreter->binop_mmd_funcs->x[function] = new_x;
+    if (table->mmd_funcs)
+        mem_sys_free(table->mmd_funcs);
+    table->x = new_x;
     /* Set the old table to point to the new table */
-    interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
+    table->mmd_funcs = new_table;
 }
 
 /*
@@ -475,19 +435,11 @@ mmd_expand_y(Interp *interpreter, INTVAL function, INTVAL new_y)
     UINTVAL y;
     funcptr_t default_func;
     UINTVAL i;
+    MMD_table *table = interpreter->binop_mmd_funcs + function;
 
-#if 0
-    /* Is the X 0? If so, nothing to expand, so just set the Y for
-       later use */
-    if (interpreter->binop_mmd_funcs->x[function] == 0) {
-        interpreter->binop_mmd_funcs->y[function] = new_y;
-        return;
-    }
-#endif
-
-    x = interpreter->binop_mmd_funcs->x[function];
-    y = interpreter->binop_mmd_funcs->y[function];
-    default_func = interpreter->binop_mmd_funcs->default_func[function];
+    x = table->x;
+    y = table->y;
+    default_func = table->default_func;
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
@@ -497,13 +449,13 @@ mmd_expand_y(Interp *interpreter, INTVAL function, INTVAL new_y)
     }
 
     /* Then copy the old table over, if it existed in the first place. */
-    if (interpreter->binop_mmd_funcs->mmd_funcs[function]) {
-        memcpy(new_table, interpreter->binop_mmd_funcs->mmd_funcs[function],
+    if (table->mmd_funcs) {
+        memcpy(new_table, table->mmd_funcs,
                sizeof(funcptr_t) * x * y);
-        mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs[function]);
+        mem_sys_free(table->mmd_funcs);
     }
-    interpreter->binop_mmd_funcs->y[function] = new_y;
-    interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
+    table->y = new_y;
+    table->mmd_funcs = new_table;
 
 }
 
@@ -593,25 +545,23 @@ future.
 
 void
 mmd_register(Interp *interpreter,
-             INTVAL type,
+             INTVAL function,
              INTVAL left_type, INTVAL right_type,
              funcptr_t funcptr)
 {
 
-    INTVAL cur_x, cur_y;
     INTVAL offset;
-    cur_x = interpreter->binop_mmd_funcs->x[type];
-    cur_y = interpreter->binop_mmd_funcs->y[type];
-    if (cur_x <= left_type) {
-        mmd_expand_x(interpreter, type, left_type + 1);
+    MMD_table *table = interpreter->binop_mmd_funcs + function;
+    if ((INTVAL)table->x <= left_type) {
+        mmd_expand_x(interpreter, function, left_type + 1);
     }
 
-    if (cur_y <= right_type) {
-        mmd_expand_y(interpreter, type, right_type + 1);
+    if ((INTVAL)table->y <= right_type) {
+        mmd_expand_y(interpreter, function, right_type + 1);
     }
 
-    offset = interpreter->binop_mmd_funcs->x[type] * right_type + left_type;
-    *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset) = funcptr;
+    offset = table->x * right_type + left_type;
+    table->mmd_funcs[offset] = funcptr;
 }
 
 void
@@ -638,18 +588,12 @@ Frees all the memory allocated used the MMD subsystem.
 void
 mmd_destroy(Parrot_Interp interpreter)
 {
-    if (interpreter->binop_mmd_funcs->tables) {
+    if (interpreter->n_binop_mmd_funcs) {
         UINTVAL i;
-        for (i = 0; i <interpreter->binop_mmd_funcs->tables; ++i) {
-            if (interpreter->binop_mmd_funcs->mmd_funcs[i])
-                mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs[i]);
+        for (i = 0; i <interpreter->n_binop_mmd_funcs; ++i) {
+            if (interpreter->binop_mmd_funcs[i].mmd_funcs)
+                mem_sys_free(interpreter->binop_mmd_funcs[i].mmd_funcs);
         }
-        mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs);
-
-        mem_sys_free(interpreter->binop_mmd_funcs->x);
-        mem_sys_free(interpreter->binop_mmd_funcs->y);
-        mem_sys_free(interpreter->binop_mmd_funcs->default_func);
-        mem_sys_free(interpreter->binop_mmd_funcs->funcs_in_table);
     }
     mem_sys_free(interpreter->binop_mmd_funcs);
 }
