@@ -74,15 +74,6 @@ decisions made during the course of the development of Parrot. The intent is
 to keep discussion of implementation-specific issues separate from the 
 basic design issues discussed in the PDDs.
 
-=item F<parrot_assembly.pod>
-
-The master list of Parrot assembly operations; not all of these have
-been implemented, so you should stick to those listed in the documentation
-in F<ops/> when writing Parrot assembly.
-
-There is significant overlap between this file and F<pdds/pdd06_pasm.pod>;
-they may well be merged at some point in the future
-
 =item F<vtables.pod>
 
 A brief introduction to the vtable at the heart of all PMCs, and how

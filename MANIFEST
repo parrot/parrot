@@ -216,7 +216,6 @@ docs/jit.pod                                      [main]doc
 docs/memory_internals.pod                         [main]doc
 docs/mmd.pod                                      [main]doc
 docs/overview.pod                                 [main]doc
-docs/parrot_assembly.pod                          [main]doc
 docs/parrot.pod                                   [main]doc
 docs/parrotbyte.pod                               [main]doc
 docs/pdds/pdd_template.pod                        [main]doc
