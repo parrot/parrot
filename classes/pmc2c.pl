@@ -498,6 +498,28 @@ $line
 EOC
 }
 
+sub standard_ref_body($$$$$$) {
+    my ($vtbl, $classname, $methodname, $OUT, $HOUT, $cfile) = @_;
+    my $type = $vtbl->[0];
+    my $parameters = $vtbl->[2];
+    my $n=0;
+    my @args = grep {$n++ & 1 ? $_ : 0} split / /, $parameters;
+    my $arg = '';
+    $arg = ", ". join(' ', @args) if @args;
+    $parameters = ", $parameters" if $parameters;
+    my $body = "VTABLE_$methodname(interpreter, PMC_ptr2p(pmc)$arg)";
+    my $ret = $type eq 'void' ? "$body;" : "return $body;" ;
+    my $ln = 1 + ($OUT =~ tr/\n/\n/);
+    my $line = $suppress_lines ? '' : "#line $ln \"$cfile\"\n";
+    my $decl = "$type Parrot_${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
+    $$HOUT .= "extern $decl;\n";
+    return <<EOC;
+$line
+    $decl {
+	$ret
+    }
+EOC
+}
 =head2 filter
 
 The filter function choreographs the previous functions actions on the
@@ -652,7 +674,12 @@ EOC
   {
       my $methodname = $_->[1];
       my $isconst;
-      push @methods, "Parrot_$methodloc->{$methodname}_$methodname";
+      if (!exists $methodbody{ $methodname } && $classname eq 'Ref') {
+	  push @methods, "Parrot_Ref_$methodname";
+      }
+      else {
+	  push @methods, "Parrot_$methodloc->{$methodname}_$methodname";
+      }
       if ($flags{const_too}) {
 	  if (is_const($methodname, $_->[3]) &&
 	      exists $methodbody{ $methodname }) {
@@ -696,6 +723,10 @@ EOC
 	  $OUT .= standard_body($_, "$classname", $methodname,
 		$OUT, \$HOUT, $cfile, $body);
 
+      }
+      elsif ($classname eq 'Ref') {
+	  $OUT .= standard_ref_body($_, "$classname", $methodname,
+		$OUT, \$HOUT, $cfile);
       }
   }
 
