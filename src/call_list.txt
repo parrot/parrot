@@ -51,6 +51,8 @@ i	lsp
 i	pll
 i	ilsp
 i	pl
+i	4i
+
 # These are needed for parrotio.pmc
 i	IP
 v	IP
