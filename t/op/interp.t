@@ -34,21 +34,27 @@ calling
 In 2
 ending
 OUTPUT
+
+# Need to disable DOD while trace is on, as there's a non-zero chance that a
+# DOD sweep would occur, causing a bonus "DOD" line in the output, which makes
+# the test fail.
 output_like(<<'CODE', <<'OUTPUT', "restart trace");
 	printerr "ok 1\n"
+	sweepoff
 	set I0, 1
 	trace I0
 	printerr "ok 2\n"
 	dec I0
 	trace I0
+	sweepon
 	printerr "ok 3\n"
 	end
 CODE
 /^ok\s1\n
-(?:\s+7.*)?\n
+(?:\s+8.*)?\n
 ok\s2\n
-(?:\s+9.*)?\n
-(?:\s+11.*)?\n
+(?:\s+10.*)?\n
+(?:\s+12.*)?\n
 ok\s3\n$/x
 OUTPUT
 
