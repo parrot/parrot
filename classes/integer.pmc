@@ -1,0 +1,18 @@
+/* integer.pmc
+ *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info $Id$
+ *  Overview:
+ *	Integer PMC class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *      This class is for languages that want a value-restricted
+ *      integer type without going to an I register.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass Integer extends mmd_default {
+
+}

@@ -12,14 +12,14 @@
  */
 
 #include "parrot/parrot.h"
-typedef PMC *(*pmc_mmd_f)(PMC *, PMC *);
-typedef STRING *(*string_mmd_f)(PMC *, PMC *);
-typedef INTVAL (*intval_mmd_f)(PMC *, PMC *);
-typedef FLOATVAL (*floatval_mmd_f)(PMC *, PMC *);
+typedef void (*pmc_mmd_f)(struct Parrot_Interp *, PMC *, PMC *, PMC *);
+typedef STRING *(*string_mmd_f)(struct Parrot_Interp *, PMC *, PMC *);
+typedef INTVAL (*intval_mmd_f)(struct Parrot_Interp *, PMC *, PMC *);
+typedef FLOATVAL (*floatval_mmd_f)(struct Parrot_Interp *, PMC *, PMC *);
 
-PMC *
+void
 mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL function)
+		 PMC *left, PMC *right, PMC *dest, INTVAL function)
 {
     pmc_mmd_f real_function;
     INTVAL left_type, right_type;
@@ -29,7 +29,7 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
     offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
     real_function = (pmc_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
             function] + offset);
-    return (*real_function)(left, right);
+    return (*real_function)(interpreter, left, right, dest);
 }
 
 STRING *
@@ -44,7 +44,7 @@ mmd_dispatch_string(struct Parrot_Interp *interpreter,
     offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
     real_function = (string_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
             function] + offset);
-    return (*real_function)(left, right);
+    return (*real_function)(interpreter, left, right);
 }
 
 INTVAL
@@ -59,7 +59,7 @@ mmd_dispatch_intval(struct Parrot_Interp *interpreter,
     offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
     real_function = (intval_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
             function] + offset);
-    return (*real_function)(left, right);
+    return (*real_function)(interpreter, left, right);
 }
 
 FLOATVAL
@@ -75,7 +75,7 @@ mmd_dispatch_numval(struct Parrot_Interp *interpreter,
     offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
     real_function = (floatval_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
             function] + offset);
-    return (*real_function)(left, right);
+    return (*real_function)(interpreter, left, right);
 }
 
 /* Add a new binary MMD function to the table */

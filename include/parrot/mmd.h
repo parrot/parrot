@@ -13,7 +13,7 @@
 #if !defined(PARROT_MMD_H_GUARD)
 #define PARROT_MMD_H_GUARD
 
-PMC *mmd_dispatch_pmc(struct Parrot_Interp *, PMC *, PMC *, INTVAL);
+void mmd_dispatch_pmc(struct Parrot_Interp *, PMC *, PMC *, PMC *, INTVAL);
 STRING *mmd_dispatch_string(struct Parrot_Interp *, PMC *, PMC *, INTVAL);
 INTVAL mmd_dispatch_intval(struct Parrot_Interp *, PMC *, PMC *, INTVAL);
 FLOATVAL mmd_dispatch_numval(struct Parrot_Interp *, PMC *, PMC *, INTVAL);

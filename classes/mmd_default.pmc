@@ -1,0 +1,32 @@
+/* mmd_default.pmc
+ *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info $Id$
+ *  Overview:
+ *	MMD dispatching base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *      This class provides MMD versions of all the binary operators
+ *      for PMC classes to inherit from.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass mmd_default extends default {
+
+  void add(PMC* value, PMC* dest) {
+  }
+
+  void subtract(PMC* value, PMC* dest) {
+  }
+
+  void multiply(PMC* value, PMC* dest) {
+  }
+
+  void divide(PMC* value, PMC*dest) {
+  }
+
+  
+
+}
