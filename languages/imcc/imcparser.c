@@ -2866,9 +2866,8 @@ yyreturn:
 int yyerror(char * s)
 {
     /* fprintf(stderr, "last token = [%s]\n", yylval.s); */
-    fprintf(stderr, "(error) line %d: %s\n", line, s );
-    fprintf(stderr, "Didn't create output asm.\n" );
-    exit(EX_UNAVAILABLE);
+    fataly(EX_UNAVAILABLE, sourcefile, line, "%s\n", s);
+    return 0;
 }
 
 /*
