@@ -36,6 +36,8 @@ DONE:   time   N5
         print  N2
         print  "\n"
 
+        if     I4, BUG
+
         set    N1, I5
         div    N1, N1, N2
         set    N2, 1000000.0
@@ -47,3 +49,5 @@ DONE:   time   N5
 
         end
 
+BUG:    print "This can't happen\n"
+        end

@@ -415,7 +415,12 @@ END
         else {
             print "    0,\n";
             print "    {\n";
-            print "      {0, 0},\n";
+            if ($k == 6 or $k == 10) {
+                # The two string_substitution_t values in the struct:
+                print "      {0, 0, 0},\n";
+            } else {
+                print "      {0, 0},\n";
+            }
             print "    }\n";
         }
 
