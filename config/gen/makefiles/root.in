@@ -168,9 +168,8 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O)  \
 	nci$(O) cpu_dep$(O) ${asmfun_o} tsq$(O) longopt$(O) events$(O) \
 	dynext$(O) utils$(O) vtables$(O) mmd$(O) extend$(O)
 
-O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) \
-	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES) \
-	$(IMCC_O_FILES)
+O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) \
+	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
 
 OPS_FILES = ${ops} $(GEN_OPSFILES)
 
@@ -205,7 +204,10 @@ MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
 
 TEST_PROG = ${test_prog}${exe}
 TEST_PROG_SO = ${test_prog}_so${exe}
+PARROT_LIBS = ${parrot_libs}
 LIBPARROT = ${blib_lib_libparrot_a}
+LIBCLASSES = classes/classes$(A)
+LIBIMCC = $(IMCC_DIR)/imcc$(A)
 # utils
 DIS=disassemble${exe}
 PDUMP = pdump${exe}
@@ -255,8 +257,8 @@ flags_dummy:
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
-$(TEST_PROG) : $(PARROT_MAIN)$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
-	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(LIBPARROT) $(C_LIBS)
+$(TEST_PROG) : $(PARROT_MAIN)$(O) $(GEN_HEADERS) $(LIBPARROT) $(LIBIMCC) $(LIBCLASSES) lib/Parrot/OpLib/core.pm
+	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(PARROT_LIBS) $(C_LIBS)
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -338,8 +340,8 @@ $(TEST_PROG_SO) : $(PARROT_MAIN)$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/co
 
 pdb$(O) : $(GENERAL_H_FILES)
 
-$(PDB) : pdb$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDB) pdb$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
+$(PDB) : pdb$(O) $(LIBPARROT) $(LIBCLASSES)
+	$(LINK) ${ld_out}$(PDB) pdb$(O) $(LINKFLAGS) $(PARROT_LIBS) $(C_LIBS)
 
 #
 # Parrot Disassembler
@@ -347,20 +349,20 @@ $(PDB) : pdb$(O) $(LIBPARROT)
 
 disassemble$(O) : $(GENERAL_H_FILES)
 
-$(DIS) : disassemble$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(DIS) disassemble$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
+$(DIS) : disassemble$(O) $(LIBPARROT) $(LIBCLASSES)
+	$(LINK) ${ld_out}$(DIS) disassemble$(O) $(LINKFLAGS) $(PARROT_LIBS) $(C_LIBS)
 
 #
 # Parrot Dump
 #
 
-$(PDUMP) : pdump$(O) packdump$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDUMP) pdump$(O) packdump$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
+$(PDUMP) : pdump$(O) packdump$(O) $(LIBPARROT) $(LIBCLASSES)
+	$(LINK) ${ld_out}$(PDUMP) pdump$(O) packdump$(O) $(LINKFLAGS) $(PARROT_LIBS) $(C_LIBS)
 
 
 # pbc_info
-$(PINFO) : pbc_info$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PINFO) pbc_info$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
+$(PINFO) : pbc_info$(O) $(LIBPARROT) $(LIBCLASSES)
+	$(LINK) ${ld_out}$(PINFO) pbc_info$(O) $(LINKFLAGS) $(PARROT_LIBS) $(C_LIBS)
 
 ###############################################################################
 #
@@ -388,8 +390,8 @@ examples/assembly/mops.pbc : examples/assembly/mops.pasm
 examples/assembly/mops.c : examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
-examples/assembly/mops${exe} : examples/assembly/mops$(O) $(LIBPARROT)
-	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(LIBPARROT) $(C_LIBS)
+examples/assembly/mops${exe} : examples/assembly/mops$(O) $(LIBPARROT) $(LIBCLASSES) $(LIBIMCC)
+	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(PARROT_LIBS) $(C_LIBS)
 
 examples/assembly/life.pbc : examples/assembly/life.pasm
 	$(MAKE_C) examples/assembly life.pbc
@@ -397,8 +399,8 @@ examples/assembly/life.pbc : examples/assembly/life.pasm
 examples/assembly/life.c : examples/assembly/life.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/life.pbc > examples/assembly/life.c
 
-examples/assembly/life${exe} : examples/assembly/life$(O) $(LIBPARROT)
-	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/life${exe} examples/assembly/life$(O) $(LIBPARROT) $(C_LIBS)
+examples/assembly/life${exe} : examples/assembly/life$(O) $(LIBPARROT) $(LIBCLASSES) $(LIBIMCC)
+	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/life${exe} examples/assembly/life$(O) $(PARROT_LIBS) $(C_LIBS)
 
 ###############################################################################
 #
@@ -410,7 +412,7 @@ examples/mops/mops$(O) : examples/mops/mops.c
 
 examples/mops/mops${exe} : examples/mops/mops$(O)
 	$(LINK) $(LINKFLAGS) ${ld_out}examples/mops/mops${exe} \
-	examples/mops/mops$(O) $(LIBPARROT) $(C_LIBS)
+	examples/mops/mops$(O) $(PARROT_LIBS) $(C_LIBS)
 
 
 ###############################################################################
@@ -608,6 +610,10 @@ $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c: $(IMCC_DIR)/imcc.l
 
 $(IMCC_O_FILES) : $(IMCC_H_FILES) $(ALL_H_FILES)
 
+$(LIBIMCC) : $(IMCC_O_FILES)
+	$(RM_RF) $@
+	$(AR_CR) ${ar_out}$@ ${ar_extra} $(IMCC_O_FILES)
+	$(RANLIB) $@
 
 ################ docs, test and maintainer targets
 
@@ -629,6 +635,7 @@ languages-test :
 $(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(NONGEN_HEADERS)
 	$(MAKE_C) classes
 
+$(LIBCLASSES) : $(CLASS_O_FILES)
 
 ###############################################################################
 #
@@ -833,7 +840,7 @@ miniparrot-update :
 ###############################################################################
 
 exec : exec_start$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) exec_start$(O) $(LIBPARROT) $(C_LIBS)
+	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) exec_start$(O) $(PARROT_LIBS) $(C_LIBS)
 
 exec_so : exec_start$(O) blib/lib/libparrot$(SO)
 	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) exec_start$(O) -lparrot $(C_LIBS) -pthread

@@ -209,8 +209,8 @@ sub generate_functions {
       print SOURCE $source;
       close SOURCE;
 
-      my $libparrot = $PConfig{blib_lib_libparrot_a};
-      $libparrot =~ s/\$\(A\)/$PConfig{a}/;
+      my $parrot_libs = "$PConfig{parrot_libs}";
+      $parrot_libs =~ s/\$\(A\)/$PConfig{a}/g;
 
       my ($cmd, $exit_code);
       $cmd = "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} -I./include -c " .
@@ -219,7 +219,7 @@ sub generate_functions {
       $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
 
       $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} $obj_f " .
-             "$PConfig{ld_out}$exe_f $libparrot $PConfig{libs}";
+             "$PConfig{ld_out}$exe_f $parrot_libs $PConfig{libs}";
       $exit_code = _run_command($cmd, 'STDOUT' => $build_f, 'STDERR' => $build_f);
       $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
 
