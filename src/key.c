@@ -143,7 +143,7 @@ key_integer(struct Parrot_Interp *interpreter, PMC *key)
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
         return reg->vtable->get_integer(interpreter, reg);
     default:
-        internal_exception(INVALID_OPERATION, "Not an integer!\n");
+        internal_exception(INVALID_OPERATION, "Key not an integer!\n");
         return 0;
     }
 }
@@ -165,7 +165,7 @@ key_number(struct Parrot_Interp *interpreter, PMC *key)
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
         return reg->vtable->get_number(interpreter, reg);
     default:
-        internal_exception(INVALID_OPERATION, "Not a number!\n");
+        internal_exception(INVALID_OPERATION, "Key not a number!\n");
         return 0;
     }
 }
@@ -187,7 +187,7 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
         return reg->vtable->get_string(interpreter, reg);
     default:
-        internal_exception(INVALID_OPERATION, "Not a string!\n");
+        internal_exception(INVALID_OPERATION, "Key not a string!\n");
         return 0;
     }
 }
@@ -201,7 +201,7 @@ key_pmc(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_pmc_FLAG | KEY_register_FLAG:
         return interpreter->ctx.pmc_reg.registers[key->cache.int_val];
     default:
-        internal_exception(INVALID_OPERATION, "Not a PMC!\n");
+        internal_exception(INVALID_OPERATION, "Key not a PMC!\n");
         return 0;
     }
 }
