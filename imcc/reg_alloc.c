@@ -467,13 +467,6 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
                 if (r->color < 28)
 #endif
                     unit->reglist[count++] = r;
-                /* rearange I/N registers
-                 * XXX not here, do it, when reading the source
-                 * .nciarg, ... !!!1 */
-                if ((optimizer_level & OPT_PASM) && pasm_file &&
-                        (unit->reglist[count-1]->set == 'I' ||
-                        unit->reglist[count-1]->set == 'N'))
-                    unit->reglist[count-1]->color = -1;
             }
         }
     }

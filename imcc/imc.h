@@ -202,6 +202,8 @@ void IMCC_ast_compile(Interp *interpreter, FILE *fp);
 Instruction * IMCC_create_itcall_label(Interp *);
 void IMCC_itcall_sub(Interp* interpreter, SymReg* sub);
 
+STRING * IMCC_string_from_reg(Interp *interpreter, SymReg *r);
+
 #endif /* PARROT_IMCC_IMC_H_GUARD */
 
 

@@ -502,15 +502,12 @@ fixup_bsrs(Interp *interpreter)
     }
 }
 
-/* add constant string to constant_table */
-static int
-add_const_str(Interp *interpreter, SymReg *r)
+STRING *
+IMCC_string_from_reg(Interp *interpreter, SymReg *r)
 {
-    int k;
     char *buf = r->name;
     STRING *s = NULL;
     char *charset = NULL;
-
     /*
      * TODO strip delimiters in lexer, this needs adjustment in printint strings
      */
@@ -527,13 +524,23 @@ add_const_str(Interp *interpreter, SymReg *r)
     else if (*buf == '\'') {   /* TODO handle python raw strings */
         buf++;
         s = string_make(interpreter, buf, strlen(buf) - 1, "iso-8859-1",
-						PObj_constant_FLAG);
+                PObj_constant_FLAG);
     }
     else {
         /* unquoted bare name - ascii only for now */
         s = string_unescape_cstring(interpreter, buf, 0, NULL);
     }
+    return s;
+}
 
+/* add constant string to constant_table */
+static int
+add_const_str(Interp *interpreter, SymReg *r)
+{
+    int k;
+    STRING *s;
+
+    s = IMCC_string_from_reg(interpreter, r);
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type = PFC_STRING;
     interpreter->code->const_table->constants[k]->u.string = s;
