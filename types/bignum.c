@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include "bignum.h"
 #include <assert.h>
+#include <string.h> /* XXX:ajg fixme later*/
 
 /*=head1 When in parrot
 
@@ -74,6 +75,11 @@ Get value of digit at pos.
 #define CHECK_UNDERFLOW(expn, sub, min) \
     (((min) - (expn) > (-(sub))) ? 1 : 0)
 
+#define am_INF(bn)  ((bn)->flags & BN_INF_FLAG   )
+#define am_NAN(bn)  ((bn)->flags & (BN_sNAN_FLAG | BN_qNAN_FLAG)   )
+#define am_sNAN(bn) ((bn)->flags & BN_sNAN_FLAG  )
+#define am_qNAN(bn) ( (bn)->flags & BN_qNAN_FLAG  )
+
 /* This can be called while within a debugger, don't use in normal
    operation */
 char* BN_lazygdbprint(BIGNUM* foo) {
@@ -107,7 +113,7 @@ void BN_strip_tail_zeros(PINTD_ BIGNUM* victim);
 int BN_round_up(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
 int BN_round_down(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
 void BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context);
-void BN_really_zero(PINTD_ BIGNUM* bn);
+void BN_set_inf(PINTD_ BIGNUM* bn);
 void
 BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context, BN_SAVE_PREC* restore);
 void
@@ -224,6 +230,42 @@ BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos) {
     if (pos > bn->digits || pos < 0) return -1;
     return BN_getd(bn, pos);
 }
+
+/*=head2 BN_set_(inf|qNAN|sNAN)(bignum)
+
+Sets its argument to appropriate value.
+
+Infinity is represented as having zero digits, an undefined exponent
+and private I<flags> set to BN_inf_FLAGS.
+
+sNAN is represented as having zero digits, an undefined exponent, an
+undefined sign and both qNAN and sNAN bits set.
+
+qNAN is represented as having zero digits, an undefined exponent
+and only the qNAN bit set.
+
+=cut*/
+void BN_set_inf(PINTD_ BIGNUM* bn) {
+    assert(bn != NULL);
+    bn->digits = 0;
+    bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_INF_FLAG;
+    return;
+}
+
+void BN_set_qNAN(PINTD_ BIGNUM* bn) {
+    assert(bn != NULL);
+    bn->digits = 0;
+    bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_qNAN_FLAG;
+    return;
+}
+
+void BN_set_sNAN(PINTD_ BIGNUM* bn) {
+    assert(bn != NULL);
+    bn->digits = 0;
+    bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_qNAN_FLAG | BN_sNAN_FLAG;
+    return;
+}
+
 
 /*=head2 BIGNUM *BN_copy(BIGNUM* one, BIGNUM* two)
 
@@ -451,6 +493,7 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
     INTVAL adj_exp = 0; /* as bn->expn is relative to 0th digit */
     INTVAL cur_dig = 0;
     assert(bn!=NULL);
+    /* Special values have digits set to zero, so this should be enough */
     *dest = (char*)BN_alloc(PINT_ bn->digits + 5 + BN_D_PER_INT);
     if (dest == NULL) {
 	BN_EXCEPT(PINT_ BN_INSUFFICIENT_STORAGE,
@@ -459,6 +502,24 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
 
     cur = *dest;
 
+    /* Do we have a special value? */
+    if (am_NAN(bn)) {
+        if (am_qNAN(bn)) {
+            strcpy(cur, "qNaN");
+        }
+        else { /* must be signalling */
+            strcpy(cur, "sNaN");
+        }
+        return 1;
+    }
+
+    if (am_INF(bn)) {
+        if (bn->sign) *cur++ = '-';
+        strcpy(cur, "Infinity");
+        return 1;
+    }
+
+    /* Nope, nothing out of the ordinary, full steam ahead! */
     adj_exp = bn->digits + bn->expn -1;
     /* For values near to zero, we do not use exponential notation */
     if (bn->expn <= 0 && adj_exp >= -6) {
@@ -547,35 +608,41 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
     return 0;
 }
 
-/*=head2 BIGNUM* BN_from_string(char* string) 
+/*=head2 BIGNUM* BN_from_string(char* string, context) 
 
 Convert a scientific string to a BIGNUM.  This function deals entirely
 with common-or-garden C byte strings, so the library can work
 anywhere.  Another version will be eventually required to cope with
 the parrot string fun.
 
-This is the Highly Pedantic string conversion.
+This is the Highly Pedantic string conversion.  If I<context> has
+I<extended> as a true value, then the full range of extended number is
+made available, and any string which does not match the numeric syntax
+is converted to a quiet NaN.
 
 Does not yet check for exponent overflow.
 
 =cut*/
 BIGNUM*
-BN_from_string(PINTD_ char* s2) {
+BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
     BIGNUM *result;
     BIGNUM *temp;
 
     INTVAL pos = 0;             /* current digit in buffer */
-    INTVAL negative = 0;        /* is it negative */
-    INTVAL seen_dot = 0;        /* have we seen a '.' */
-    INTVAL seen_e = 0;          /* have we seen an 'E' or 'e' */
-    INTVAL exp_sign = 0;        /* is the exponent negative */
-    INTVAL in_exp = 0;          /* are we reading exponent digits */
-    INTVAL in_number = 0;       /* are we reading coeff digits */
+    int negative = 0;        /* is it negative */
+    int seen_dot = 0;        /* have we seen a '.' */
+    int seen_e = 0;          /* have we seen an 'E' or 'e' */
+    int exp_sign = 0;        /* is the exponent negative */
+    int in_exp = 0;          /* are we reading exponent digits */
+    int in_number = 0;       /* are we reading coeff digits */
     INTVAL exponent = 0;        /* the exponent */
     INTVAL fake_exponent = 0;   /* adjustment for digits after a '.' */
     INTVAL i = 0;               
-    INTVAL non_zero_digits = 0; /* have we seen *any* digits */
-    INTVAL seen_plus = 0;       /* was number prefixed with '+' */
+    int non_zero_digits = 0; /* have we seen *any* digits */
+    int seen_plus = 0;       /* was number prefixed with '+' */
+    int infinity =0;
+    int qNAN = 0;
+    int sNAN = 0;
 
     temp = BN_new(PINT_ 1);     /* We store coeff reversed in temp */
   
@@ -607,8 +674,13 @@ BN_from_string(PINTD_ char* s2) {
 	    /* we've not yet seen any digits */
 	    if (*s2 == '-') {
 		if (seen_plus || negative || seen_dot) {
-		    BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX,
-			      "Incorrect number format");
+                    if (!context->extended) {
+                        BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX,
+                                  "Incorrect number format");
+                    }
+                    else {
+                        qNAN = 1; break;
+                    }
 		}
 		negative = 1;
 	    }
@@ -617,11 +689,49 @@ BN_from_string(PINTD_ char* s2) {
 	    }
 	    else if (*s2 == '+') {
 		if (seen_plus || negative || seen_dot) {
-		    BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX,
-			      "Incorrect number format");
+                    if (!context->extended) {
+                        BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX,
+                                  "Incorrect number format");
+                    }
+                    else {
+                        qNAN = 1; break;
+                    }
 		}
 		seen_plus = 1; /* be very quiet */
 	    }
+            else if (context->extended) {
+                if (*s2 == 'i' || *s2 == 'I') {
+                    if (!strncasecmp("inf", s2, 4)) { /* We include the \0 */
+                        infinity = 1;
+                        /* For certain, restricted values of infinity */
+                        break;
+                    }
+                    else if (!strncasecmp("infinity", s2, 9)) {
+                        infinity = 1;
+                        break;
+                    }
+                    else {
+                        qNAN = 1;
+                        break;
+                    }
+                }
+                else if (*s2 == 'n' || *s2 == 'N') {
+                    qNAN = 1; /* Don't need to check, as default.. */
+                    break;
+                }
+                else if (*s2 == 's' || *s2 == 'S') {
+                    if (!strncasecmp("snan", s2, 5)) {
+                        sNAN = 1;
+                        break;
+                    }
+                    else {
+                        qNAN = 1;
+                        break;
+                    }                    
+                }
+                qNAN = 1;
+                break;
+            } /* don't know, not in extended mode... */
 	    else {
 		BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX,
 			  "Incorrect number format");
@@ -644,48 +754,77 @@ BN_from_string(PINTD_ char* s2) {
 		    exp_sign = -1;
 		}
 		else {
-		    BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX,
-			      "Incorrect number format");
+                    if (!context->extended) {
+                        BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX,
+                                  "Incorrect number format");
+                    }
+                    else {
+                        qNAN = 1; break;
+                    }
 		}
 	    }
 	    else { /* We fall through here if we don't recognise something */
-		BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX,
-			  "c Incorrect number format");
+                if (!context->extended) {
+                    BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX,
+                              "c Incorrect number format");
+                }
+                else {
+                    qNAN = 1; break;
+                }
 	    }
 	}
 	s2++; /* rinse, lather... */
     }
   
-    if (in_number && !pos) { /* Only got zeros */
-	pos = 1;
-	BN_setd(temp, 0, 0);
-    }
-
-    if (pos==0) { /* This includes ".e+20" */
-	BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX, "no digits in string");
+    if (!(qNAN || sNAN || infinity)) {
+        if (in_number && !pos) { /* Only got zeros */
+            pos = 1;
+            BN_setd(temp, 0, 0);
+        }
+        
+        if (pos==0) { /* This includes ".e+20" */
+            if (!context->extended) {
+                BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX, "no digits in string");
+            }
+            else {
+                qNAN = 1;
+            }
+        }
     }
 
     /* copy reversed string of digits backwards into result */
-    temp->digits = pos;
-    result = BN_new(pos+1);
-
-    for (i=0; i< temp->digits; i++) {
-	BN_setd(result, i, BN_getd(temp, temp->digits-i-1));
+    if (!(qNAN || sNAN || infinity)) { /* Normal */
+        temp->digits = pos;
+        result = BN_new(pos+1);
+        
+        for (i=0; i< temp->digits; i++) {
+            BN_setd(result, i, BN_getd(temp, temp->digits-i-1));
+        }
+        
+        result->sign = negative;
+        result->digits = pos;
+        if (exp_sign == -1) {
+            result->expn = fake_exponent - exponent;
+        }
+        else {
+            result->expn = fake_exponent + exponent;
+        }
     }
-  
-    result->sign = negative;
-    result->digits = pos;
+    else { /* Special */
+        if (infinity) {
+            BN_set_inf(PINT_ result);
+        }
+        else if (sNAN) {
+            BN_set_sNAN(PINT_ result);
+        }
+        else {
+            BN_set_qNAN(PINT_ result);
+        }
+    }
+
 
     BN_destroy(PINT_ temp);
-
-    if (exp_sign == -1) {
-	result->expn = fake_exponent - exponent;
-    }
-    else {
-	result->expn = fake_exponent + exponent;
-    }
-
-    BN_really_zero(PINT_ result);
+    BN_really_zero(PINT_ result,context);
     return result;
 }
 
@@ -776,7 +915,7 @@ BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
     }
 }
 
-/*=item BN_really_zero(BIGNUM* victim)
+/*=item BN_really_zero(BIGNUM* victim, context)
 
 Sets any number which should be zero to a cannonical zero.
 
@@ -784,14 +923,15 @@ To check if a number is equal to zero, use BN_is_zero.
 
 =cut*/
 void
-BN_really_zero(PINTD_ BIGNUM* bn) {
+BN_really_zero(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
     INTVAL i;
+    if (bn->digits == 0) return;
     for (i=0; i< bn->digits; i++)
 	if (BN_getd(bn, i) != 0) return;
   
     bn->digits = 1;
     bn->expn = 0;
-    bn->sign = 0;
+    if (!context->extended) bn->sign = 0;
     return;
 }
 
@@ -983,7 +1123,7 @@ BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
 	else {
 	    BN_round(PINT_ bn, &temp_context);
 	}
-	BN_really_zero(PINT_ bn);
+	BN_really_zero(PINT_ bn, context);
 
 	/* XXX: if using warning flags on context, | with temp context here */
     }
@@ -1086,7 +1226,7 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     context->flags = lost_save;
 
     BN_strip_lead_zeros(PINT_ result);
-    BN_really_zero(PINT_ result);
+    BN_really_zero(PINT_ result, context);
     BN_make_integer(PINT_ result, context);
 }
 
@@ -1200,12 +1340,12 @@ BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
     /* Make sure we don't do work we don't need, or add precision where
        it isn't wanted */
-    if (BN_is_zero(PINT_ one)) {
+    if (BN_is_zero(PINT_ one, context)) {
 	BN_copy(PINT_ result, two);
 	result->sign = 0;
 	return;
     }
-    else if (BN_is_zero(PINT_ two)) {
+    else if (BN_is_zero(PINT_ two, context)) {
 	BN_copy(PINT_ result, one);
 	result->sign = 0;
 	return;
@@ -1267,12 +1407,12 @@ BN_isubtract (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     int carry, dig;
     /* Make sure we don't do work we don't need, or add precision where
        it isn't wanted */
-    if (BN_is_zero(PINT_ one)) {
+    if (BN_is_zero(PINT_ one, context)) {
 	BN_copy(PINT_ result, two);
 	result->sign = 1;
 	return;
     }
-    else if (BN_is_zero(PINT_ two)) {
+    else if (BN_is_zero(PINT_ two, context)) {
 	BN_copy(PINT_ result, one);
 	result->sign = 0;
 	return;
@@ -1494,7 +1634,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (context->rounding == ROUND_HALF_EVEN) {
 	if (result->digits > context->precision) {
 	    /* We collected precision + 1 digits... */
-	    BN_really_zero(PINT_ rem);
+	    BN_really_zero(PINT_ rem, context);
 	    if (BN_getd(result, 0) > 5) {
 		BN_round_up(PINT_ result, context);
 	    }
@@ -1533,7 +1673,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	context->traps = save_lost;
     }
 
-    BN_really_zero(PINT_ result);
+    BN_really_zero(PINT_ result, context);
 
     BN_strip_tail_zeros(PINT_ result);
 
@@ -1571,7 +1711,7 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     BN_arith_setup(PINT_ result, one, two, context, NULL);
     BN_idivide(PINT_ result, one, two, context, BN_DIV_DIVINT, rem);
   
-    BN_really_zero(PINT_ rem);
+    BN_really_zero(PINT_ rem, context);
     if (result->expn >0 && context->precision > 0 &&
 	result->expn + result->digits > context->precision &&
 	!(rem->digits == 0 && BN_getd(rem, 0) == 0)) {
@@ -1593,7 +1733,7 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	result->expn = 0;
     }
 
-    BN_really_zero(PINT_ result);
+    BN_really_zero(PINT_ result, context);
     BN_make_integer(PINT_ result, context);
 }
 
@@ -1607,7 +1747,7 @@ BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	      BN_CONTEXT *context) {
     BIGNUM* fake;
 
-    if (BN_is_zero(PINT_ one)) {
+    if (BN_is_zero(PINT_ one, context)) {
 	result->digits = 1;
 	result->sign = 0;
 	BN_setd(result, 0, 0);
@@ -1618,7 +1758,7 @@ BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     fake = BN_new(1);
     BN_idivide(PINT_ fake, one, two, context, BN_DIV_REMAIN, result);
 
-    BN_really_zero(PINT_ result);
+    BN_really_zero(PINT_ result, context);
     if (fake->expn >0 && context->precision > 0 &&
 	fake->expn + result->digits > context->precision &&
 	!(result->digits == 0 && BN_getd(result, 0) == 0)) {
@@ -1643,8 +1783,8 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     int s2, value;
 
     /* Are we doing something stupid, can we skip all the hassle? */
-    if (BN_is_zero(PINT_ one)) {
-	if (BN_is_zero(PINT_ two)){
+    if (BN_is_zero(PINT_ one, context)) {
+	if (BN_is_zero(PINT_ two, context)){
 	    BN_EXCEPT(PINT_ BN_DIVISION_UNDEFINED, "0/0 in division");
 	}
 	result->digits = 1; /* 0/ x, return 0 */
@@ -1652,7 +1792,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	BN_setd(result, 0, 0);
 	return;
     }
-    if (BN_is_zero(PINT_ two)) {
+    if (BN_is_zero(PINT_ two, context)) {
 	BN_EXCEPT(PINT_ BN_DIVISION_BY_ZERO, "x/0 in division");
     }
     /* That's quite enough shortcuts for now... */
@@ -1903,8 +2043,8 @@ BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
 }
 
 INTVAL
-BN_is_zero(BIGNUM* foo) {
-    BN_really_zero(foo);
+BN_is_zero(BIGNUM* foo, BN_CONTEXT* context) {
+    BN_really_zero(foo, context);
     if (foo->digits == 1 && foo->expn == 0 && BN_getd(foo, 0) == 0) {
 	return 1;
     }

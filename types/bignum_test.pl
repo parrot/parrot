@@ -28,8 +28,8 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int lost) {
     exit(1);
   }
 
-  one = BN_from_string(lef);
-  two = BN_from_string(rih);
+  one = BN_from_string(lef, &context);
+  two = BN_from_string(rih, &context);
 
   result = BN_new(1);
   

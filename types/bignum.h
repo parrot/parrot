@@ -48,12 +48,12 @@ typedef UINTVAL BN_NIB;
 */
 
 typedef struct {
-  BN_NIB* buffer;   /* string of nibbles */
-  UINTVAL nibs;     /* nibs allocated, in sizeof(BN_NIB) */
-  UINTVAL flags;    /* May store, say +Inf */
-  INTVAL digits;    /* digits used */
-  int sign;         /* sign of number, 0=> positive or zero, 1 => negative */
-  INTVAL expn;      /* exponent of number */
+    BN_NIB* buffer; /* string of nibbles */
+    UINTVAL nibs;   /* nibs allocated, in sizeof(BN_NIB) */
+    UINTVAL flags;  /* private flags store: 001 Inf,  010 qNAN, 110 sNAN */
+    INTVAL digits;  /* digits used */
+    int sign;       /* sign of number, 0=> positive or zero, 1 => negative */
+    INTVAL expn;    /* exponent of number */
 } parrot_bignum_t;
 
 #define BIGNUM parrot_bignum_t
@@ -119,7 +119,15 @@ typedef enum {
     /* expn becomes smaller than min allowed */
 } BN_EXCEPTIONS;
 
+/* Flags for extended values (private flags of buffer struct) */
+typedef enum {
+    BN_INF_FLAG  = 1, /* 001 */
+    BN_qNAN_FLAG = 2, /* 010 (quiet)     */
+    BN_sNAN_FLAG = 4  /* 100 (signaling) */
+} parrot_bignum_extended_flags;
+
 /*Capn' Cut-n-paste functions */
+BIGNUM* BN_from_string(PINTD_ char*, BN_CONTEXT*);
 BIGNUM* BN_new(PINTD_ INTVAL length);
 void BN_grow(PINTD_ BIGNUM *in, INTVAL length);
 void BN_destroy(PINTD_ BIGNUM *bn);
@@ -153,8 +161,10 @@ INTVAL BN_to_int(PINTD_ BIGNUM* bignum, BN_CONTEXT* context);
 void BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
               BIGNUM* expn, BN_CONTEXT* context);
 INTVAL BN_comp (PINTD_ BIGNUM *one, BIGNUM *two);
-INTVAL BN_is_zero(PINTD_ BIGNUM* test);
-
+INTVAL BN_is_zero(PINTD_ BIGNUM* test, BN_CONTEXT *);
+void BN_set_qNAN(PINTD_ BIGNUM* bn);
+void BN_set_sNAN(PINTD_ BIGNUM* bn);
+void BN_really_zero(PINTD_ BIGNUM* bn, BN_CONTEXT*);
 /*
  * Local variables:
  * c-indentation-style: bsd
