@@ -15,6 +15,15 @@ if (${jit_i386} && ${jit_i386} eq 'fcomip') {
 	print OUT "#endif\n";
 }
 
+if (${jitcpuarch} eq 'ppc') {
+    print OUT <<'END';
+#define VA_TO_VAPTR(x) (x)
+END
+} else {
+    print OUT <<'END';
+#define VA_TO_VAPTR(x) (&(x))
+END
+}
 
 #endif guard
 print OUT "\n\n#endif\n"
