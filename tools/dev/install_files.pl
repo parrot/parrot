@@ -114,6 +114,10 @@ use File::Basename qw(dirname);
 use File::Copy;
 use File::Spec;
 use strict;
+use lib 'lib';
+use Parrot::Config;
+
+my $exe = $PConfig{'exe'};
 
 # When run from the makefile, which is probably the only time this
 # script will ever be used, all of these defaults will get overridden.
@@ -170,6 +174,10 @@ while(<>) {
         $dest = File::Spec->catdir($options{libdir}, $dest);
     } elsif ($meta{bin}) {
         $dest = File::Spec->catdir($options{bindir}, $dest);
+        if ($exe) {
+           $src .= $exe;
+           $dest .= $exe;
+        }
     } elsif ($meta{include}) {
         $dest = File::Spec->catdir($options{includedir}, $dest);
     } else {

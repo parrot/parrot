@@ -314,7 +314,7 @@ op find_global(out PMC, in PMC, in STR) {
     opcode_t * next;
     if (PMC_IS_NULL($2))
 	internal_exception(1, "Tried to get from null namespace.");
-    if (PMC_IS_NULL($3))
+    if (!$3)
 	internal_exception(1, "Tried to get null global.");
 
     next = expr NEXT();

@@ -35,7 +35,7 @@ pir_output_is(<<'CODE', <<OUT, "spawnw, _config");
     .local pmc conf_hash
     conf_hash = _config()
     .local string slash
-    slash = conf_hash["slash"]
+    slash = conf_hash["slash_exec"]
     .local string parrot
     parrot = conf_hash["test_prog"]
     .local string cmd

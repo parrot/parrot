@@ -23,6 +23,7 @@
                 PQ    => '"',
                 make_c=> '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
 		ncilib_link_extra => '-def:src/libnci_test.def',
+		slash_exec => '\\',
 	);
 
 	if( $is_msvc ) {

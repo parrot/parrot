@@ -128,6 +128,7 @@ sub runstep {
     cp            => 'cp',
     lns           => $Config{lns},        # soft link
     slash         => '/',
+    slash_exec    => '/',
 
     VERSION       => $main::parrot_version,
     MAJOR         => $main::parrot_version[0],
