@@ -259,21 +259,27 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_get with big key");
 #include "parrot/embed.h"
 #define BIGLEN 999999
 
+int do_test(Interp *interpreter);
+
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
-    STRING *key;
-    HASH_ENTRY _value;
-    HASH_ENTRY *value = &_value;
-    char *big;
-
     interpreter = Parrot_new();
 
     if ( interpreter == NULL ) return 1;
     interpreter->lo_var_ptr = &interpreter;
 
     Parrot_init(interpreter);
+    return do_test(interpreter);
+}
+
+int do_test(Interp *interpreter)
+[
+    HASH _hash;
+    HASH *hash = &_hash;
+    STRING *key;
+    HASH_ENTRY _value;
+    HASH_ENTRY *value = &_value;
+    char *big;
 
     new_hash(interpreter, &hash);
 
