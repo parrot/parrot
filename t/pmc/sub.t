@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 47;
 use Test::More;
 use Parrot::Config;
 
@@ -669,6 +669,36 @@ output_is(<<'CODE', <<'OUTPUT', "equality of closures");
 OK1:  print "ok 1\n"
 
       new P2, .Closure
+      set_addr I3, f2
+      set P2, I3
+      eq P0, P2, BAD2
+      branch OK2
+BAD2: print "not "
+OK2:  print "ok 2\n"
+      end
+
+f1: 
+      print "Test\n"
+      end
+
+f2:
+      new P1, .PerlUndef
+      end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "equality of subs");
+      new P0, .Sub
+      set_addr I3, f1
+      set P0, I3
+      clone P1, P0
+      eq P0, P1, OK1
+      print "not "
+OK1:  print "ok 1\n"
+
+      new P2, .Sub
       set_addr I3, f2
       set P2, I3
       eq P0, P2, BAD2
