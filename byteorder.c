@@ -19,6 +19,23 @@
 #include "parrot/parrot.h"
 
 /*
+ * The byteorder matrix in parrot is 0 based
+ * because it is used as a transformation.
+ * Expect the following the generate warning on 32 bit.
+ * We should probably move this to Configure
+ */
+void
+endian_matrix(char * buf) {
+    unsigned long l;
+    char * c = (char *)&l;
+    if(sizeof(long) > 4)
+        l = (0x07060504L << 32) | (0x03020100);    
+    else
+        l = 0x03020100;
+    memcpy(buf, c, sizeof(long));
+}
+
+/*
  * Arbitrary byte order handler.
  * This routine should work for any size
  * and combination of char and word. We can't
@@ -40,24 +57,24 @@ INTVAL
 endianize(INTVAL w, unsigned char * o) {
     unsigned char * b = (unsigned char *)&w;
     INTVAL r;
-    char * rp = (unsigned char *)&r;
+    char * rb = (unsigned char *)&r;
     int nibbles = sizeof(INTVAL) / sizeof(char);
     
-    rp[0] = b[o[0]];
+    rb[0] = b[o[0]];
     /*
      * Optimizer should decide these at compile time;
      * even a dumb compiler should do constant evaluation
      */
     if(nibbles >= 2) {
-        rp[1] = b[o[1]];
+        rb[1] = b[o[1]];
         if(nibbles >= 4) {
-            rp[2] = b[o[2]];
-            rp[3] = b[o[3]];
+            rb[2] = b[o[2]];
+            rb[3] = b[o[3]];
             if(nibbles >= 8) {
-                rp[4] = b[o[4]];
-                rp[5] = b[o[5]];
-                rp[6] = b[o[6]];
-                rp[7] = b[o[7]];
+                rb[4] = b[o[4]];
+                rb[5] = b[o[5]];
+                rb[6] = b[o[6]];
+                rb[7] = b[o[7]];
             }
         }
     }
@@ -71,14 +88,28 @@ endianize(INTVAL w, unsigned char * o) {
  * size, use endianize_buf() if word size is larger/smaller
  * such as handling a bytecode stream that was generated on
  * a platform with different word size.
-
+ */
 void
-endianize_buf(unsigned char * b, unsigned char * rb, unsigned char * o,
-                        int targwsize, int destwsize) {
+endianize_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
+                        int wsize) {
+    rb[0] = b[o[0]];
+    if(wsize >= 2) {
+        rb[1] = b[o[1]];
+        if(wsize >= 4) {
+            rb[2] = b[o[2]];
+            rb[3] = b[o[3]];
+            if(wsize >= 8) {
+                rb[4] = b[o[4]];
+                rb[5] = b[o[5]];
+                rb[6] = b[o[6]];
+                rb[7] = b[o[7]];
+            }
+        }
+    }
 }
 
 
- *
+/*
  * Fetch/Put directly on bytestream, need to implement...
 
 INTVAL
