@@ -164,8 +164,9 @@ http://oss.software.ibm.com/developerworks/opensource/icu/project/
 
 =head2 PMC
 
-
-PMC stands for Parrot Magic Cookie. (Or cracker, your choice) It's the 
+PMC is an acronym for Parrot Magic Cookie. (Or Cracker, your choice.)  
+PMC classes are the primitives that Parrot-based languages use
+to represent their fundamental types, such as Perl's scalar values.
 
 =head2 Vtable
 
