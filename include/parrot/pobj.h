@@ -252,19 +252,15 @@ typedef enum PObj_enum {
 
     /* PMC specific FLAGs */
 
-    /* Set to true if the PMC data pointer points to something that
-     * looks like a string or buffer pointer */
-    PObj_is_buffer_ptr_FLAG = 1 << 24,
-    /* Set to true if the data pointer points to a PMC */
-    PObj_is_PMC_ptr_FLAG = 1 << 25,
-    /* When both the is_PMC_ptr and is_buffer_ptr flags
-       are set, we assume that data is pointing to a buffer of PMCs, and
-       will run through that buffer and mark all the PMCs in it as live */
-    PObj_is_buffer_of_PMCs_ptr_FLAG = (1 << 24 | 1 << 25),
+    /* Set to true if the PMC data pointer points to a malloced
+     * array of PObjs
+     */
+    PObj_data_is_PMC_array_FLAG = 1 << 24,
+    /* unused */
+    PObj_is_unused_ptr_FLAG = 1 << 25,
     /* a PMC that needs special handling in DOD, i.e one that has either:
      * - metadata
-     * - is_PMC_ptr_FLAG
-     * - is_buffer_ptr_FLAG
+     * - data_is_PMC_array_FLAG
      * - custom_mark_FLAG
      */
     b_PObj_is_special_PMC_FLAG = 1 << 26,
@@ -295,9 +291,9 @@ typedef enum PObj_enum {
 #  define d_PObj_is_special_PMC_FLAG    ((UINTVAL)0x04)
 
 /*
- * arenas are constant sized ~32 byte object size, ~16K objects
+ * arenas are constant sized ~32 byte object size, ~32K objects
  */
-# define ARENA_SIZE (32*1024*16)
+# define ARENA_SIZE (32*1024*32)
 # define ARENA_ALIGN ARENA_SIZE
 # define ARENA_MASK (~ (ARENA_SIZE-1) )
 
@@ -447,11 +443,10 @@ typedef enum PObj_enum {
     if ((PObj_get_FLAGS(o) & \
                 (PObj_active_destroy_FLAG | \
                  PObj_custom_mark_FLAG | \
-                 PObj_is_PMC_ptr_FLAG | \
+                 PObj_data_is_PMC_array_FLAG  | \
                  PObj_is_PMC_EXT_FLAG | \
-                 PObj_needs_early_DOD_FLAG | \
-                 PObj_is_buffer_of_PMCs_ptr_FLAG | \
-                 PObj_is_buffer_ptr_FLAG))) \
+                 PObj_needs_early_DOD_FLAG \
+                 ))) \
         DOD_flag_SET(is_special_PMC, o); \
     else \
         DOD_flag_CLEAR(is_special_PMC, o); \
@@ -460,13 +455,18 @@ typedef enum PObj_enum {
 #define PObj_is_special_PMC_TEST(o) DOD_flag_TEST(is_special_PMC, o)
 #define PObj_is_special_PMC_SET(o) DOD_flag_SET(is_special_PMC, o)
 
-#define PObj_is_buffer_ptr_SET(o) PObj_special_SET(is_buffer_ptr, o)
-#define PObj_is_buffer_ptr_CLEAR(o) PObj_special_CLEAR(is_buffer_ptr, o)
+#define PObj_data_is_PMC_array_SET(o) do { \
+    PObj_special_SET(data_is_PMC_array, o); \
+    PObj_flag_SET(active_destroy, o); \
+    } while(0)
 
-#define PObj_is_buffer_of_PMCs_ptr_SET(o) \
-    PObj_special_SET(is_buffer_of_PMCs_ptr, o)
-#define PObj_is_buffer_of_PMCs_ptr_CLEAR(o) \
-    PObj_special_CLEAR(is_buffer_of_PMCs_ptr, o)
+#define PObj_data_is_PMC_array_CLEAR(o) do {\
+    PObj_special_CLEAR(data_is_PMC_array, o); \
+    PObj_flag_CLEAR(active_destroy, o); \
+    } while (0)
+
+#define PObj_data_is_PMC_array_TEST(o) \
+    PObj_flag_TEST(data_is_PMC_array, o)
 
 #define PObj_needs_early_DOD_TEST(o) PObj_flag_TEST(needs_early_DOD, o)
 #define PObj_needs_early_DOD_SET(o) PObj_special_SET(needs_early_DOD, o)

@@ -227,7 +227,7 @@ Creates and returns a copy of the array.
 
         PMC_data(dest) = mem_sys_allocate(size * sizeof(PMC*));
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(PMC*));
-        PObj_custom_mark_destroy_SETALL(dest);
+        PObj_data_is_PMC_array_SET(dest);
         return dest;
     }
 
@@ -249,9 +249,10 @@ Marks the array as live.
         data = (PMC **) PMC_data(SELF);
         end = PMC_int_val(SELF);
         for(i = 0; i < end; i++) {
-            if(data[i] != PMCNULL && data[i] != SELF) {
-                pobject_lives(INTERP, (PObj *) data[i]);
-            }
+            PMC *p = data[i];
+            if (p == PMCNULL || p == SELF)
+                continue;
+            pobject_lives(INTERP, (PObj *) p);
         }
     }
 
@@ -484,7 +485,7 @@ Resizes the array to C<size> elements.
         for(i = 0; i < size; i++)
             data[i] = PMCNULL;
         PMC_data(SELF) = data;
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_data_is_PMC_array_SET(SELF);
     }
 
     void set_pmc(PMC *value) {
@@ -501,7 +502,7 @@ Resizes the array to C<size> elements.
         PMC_data(SELF) = mem_sys_allocate(size * sizeof(PMC*));
         mem_sys_memcopy(PMC_data(SELF), PMC_data(value), size*sizeof(PMC*));
         PMC_int_val2(SELF) = size;
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_data_is_PMC_array_SET(SELF);
     }
 /*
 

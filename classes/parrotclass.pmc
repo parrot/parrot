@@ -70,11 +70,10 @@ Initializes the class.
 
     void init () {
         /* No attributes to start with */
-        PMC_int_val(SELF) = 0;
+        PMC_int_val(SELF) = ATTRIB_COUNT(SELF) = 0;
         /* But we are a class, really */
         PObj_is_class_SET(SELF);
-        /* And, coincidentally, data points to a PMC. Fancy that... */
-        PObj_flag_SET(is_PMC_ptr, SELF);
+        PObj_data_is_PMC_array_SET(SELF);
         /* s. Parrot_new_class() for more initialization */
     }
 

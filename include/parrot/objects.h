@@ -63,56 +63,37 @@ void Parrot_set_class_constructor(Parrot_Interp, STRING *, INTVAL, STRING *);
 void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STRING *);
 void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 
-/* XXX kwoo:  Can the code in the #if 0 get removed now, or is it historically
- *      important?
+/* Objects, classes and PMCarrays all use the same data scheme:
+ * PMC_data() holds a malloced array, PMC_int_val() is the size of it
+ * this simplifies DOD mark a lot
  */
-/* Get and set attributes. */
-#if 0
-/* Old way */
-#define get_attrib_num(x, y) VTABLE_get_pmc_keyed_int(interpreter, x, y)
-#define set_attrib_num(x, y, z) VTABLE_set_pmc_keyed_int(interpreter, x, y, z)
-#define get_attrib_count(x) VTABLE_elements(interpreter, x)
-#define new_attrib_array() pmc_new(interpreter, enum_class_Array)
-#define set_attrib_array_size(x, y) VTABLE_set_integer_native(interpreter, (x), (y))
-#define resize_attrib_array(x, y)  VTABLE_set_integer_native(interpreter, (x), (y))
-#define set_attrib_flags(x)
-#define SLOTTYPE PMC
+#define SLOTTYPE PMC*
+#define get_attrib_num(x, y)    ((PMC **)x)[y]
+#define set_attrib_num(x, y, z) ((PMC **)x)[y] = z
+#define get_attrib_count(x)     PMC_int_val2(x)
+#define new_attrib_array() Dont_use
+#define set_attrib_flags(x) PObj_data_is_PMC_array_SET(x)
+#define set_attrib_array_size(o, y) do { \
+    PMC_data(o) = mem_sys_allocate_zeroed((sizeof(PMC *)*(y))); \
+    PMC_int_val(o) = y; \
+} while (0)
 
-#else
-/* These are the new way */
-#define get_attrib_num(x, y) *((PMC **)PObj_bufstart(x)+y)
-#define set_attrib_num(x, y, z) { PMC **foo = (PMC **)PObj_bufstart(x); foo[y] = z; }
-#define get_attrib_count(x) (PObj_buflen(x) / sizeof(PMC *))
-#define new_attrib_array() new_buffer_header(interpreter)
-#define set_attrib_flags(x) PObj_is_buffer_of_PMCs_ptr_SET(x)
-#define set_attrib_array_size(x, y) Parrot_allocate_zeroed(interpreter, x, (sizeof(PMC *)*(y)))
-#define resize_attrib_array(x, y) Parrot_reallocate(interpreter, x, (sizeof(PMC *)*(y)))
-#define SLOTTYPE Buffer
-#endif /* 0 */
-#endif /* PARROT_OBJECTS_H_GUARD */
+#define resize_attrib_array(o, y) do { \
+    PMC_data(o) = mem_sys_realloc(PMC_data(o), (sizeof(PMC *)*(y))); \
+    PMC_int_val(o) = y; \
+} while (0)
 
-#if 0
 /*
  * class = 1st element in object array
  */
 
-#  define ATTRIB_COUNT(obj) PMC_int_val(obj)
+#  define ATTRIB_COUNT(obj) PMC_int_val2(obj)
 #  define SET_CLASS(arr, obj, class) \
-       set_attrib_num(obj, POD_CLASS, class)
+       set_attrib_num(arr, POD_CLASS, class)
 #  define GET_CLASS(arr, obj) \
-       get_attrib_num(obj, POD_CLASS)
-#else
+       get_attrib_num(arr, POD_CLASS)
 
-/*
- * class is in the PMC
- */
-
-#  define SET_CLASS(arr, obj, class) PObj_bufstart(obj) = class
-#  define GET_CLASS(arr, obj) PObj_bufstart(obj)
-#  define ATTRIB_COUNT(obj) PObj_buflen(obj)
-
-#endif /* 0 */
-
+#endif /* PARROT_OBJECTS_H_GUARD */
 /*
  * Local variables:
  * c-indentation-style: bsd

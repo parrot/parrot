@@ -160,7 +160,7 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
     set_attrib_num(class_slots, PCD_ATTRIBUTES, attr_offset_hash);
     set_attrib_num(class_slots, PCD_ATTRIB_OFFS, class_offset_hash);
     /* And note the totals */
-    PMC_int_val(class) = cur_offset - POD_FIRST_ATTRIB;
+    ATTRIB_COUNT(class) = cur_offset - POD_FIRST_ATTRIB;
 }
 
 /*
@@ -186,7 +186,8 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
         void * __ptr;
     } __ptr_u;
 
-    vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), PCD_OBJECT_VTABLE);
+    vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class),
+            PCD_OBJECT_VTABLE);
     vtable = PMC_struct_val(vtable_pmc);
     deleg_pmc_vtable = Parrot_base_vtables[enum_class_deleg_pmc];
     object_vtable = Parrot_base_vtables[enum_class_ParrotObject];
@@ -249,7 +250,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
                        STRING *child_class_name)
 {
     PMC *child_class;
-    PMC *child_class_array;
+    SLOTTYPE *child_class_array;
     PMC *classname_pmc;
     PMC *parents, *temp_pmc;
     int parent_is_class;
@@ -275,13 +276,13 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
 
     child_class = pmc_new(interpreter, enum_class_ParrotClass);
     /* Hang an array off the data pointer */
-    child_class_array = PMC_data(child_class) = new_attrib_array();
+    set_attrib_array_size(child_class, PCD_MAX);
+    child_class_array = PMC_data(child_class);
     set_attrib_flags(child_class);
     /* We will have five entries in this array */
-    set_attrib_array_size(child_class_array, PCD_MAX);
 
     /* We have the same number of attributes as our parent */
-    PMC_int_val(child_class) = PMC_int_val(base_class);
+    ATTRIB_COUNT(child_class) = ATTRIB_COUNT(base_class);
 
     /* Our parent class array has a single member in it */
     parents = pmc_new(interpreter, enum_class_Array);
@@ -357,14 +358,15 @@ Creates a new class, named C<class_name>.
 void
 Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 {
-    PMC *class_array;
+    SLOTTYPE *class_array;
     PMC *classname_pmc;
 
     /* Hang an array off the data pointer, empty of course */
-    class_array = PMC_data(class) = new_attrib_array();
-    set_attrib_flags(class);
+    set_attrib_array_size(class, PCD_MAX);
+    class_array = PMC_data(class);
+    /* set_attrib_flags(class); init does it */
+
     /* We will have five entries in this array */
-    set_attrib_array_size(class_array, PCD_MAX);
     /* Our parent class array has nothing in it */
     set_attrib_num(class_array, PCD_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
@@ -713,20 +715,19 @@ instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)
     object->vtable = PMC_struct_val(vtable_pmc);
 
     /* Grab the attribute count from the parent */
-    attrib_count = PMC_int_val(class);
+    attrib_count = ATTRIB_COUNT(class);
 
     class_array = PMC_data(class);
     class_name = get_attrib_num(class_array, PCD_CLASS_NAME);
 
     /* Build the array that hangs off the new object */
-    new_object_array = new_attrib_array();
-    PMC_data(object) = new_object_array;
-
     /* First presize it */
-    set_attrib_array_size(new_object_array,
+    set_attrib_array_size(object,
                           attrib_count + POD_FIRST_ATTRIB);
-    /* then activate marking it - set_attrib_flags(object); */
-    PObj_flag_SET(custom_mark, object);
+    new_object_array = PMC_data(object);
+
+    /* turn marking on */
+    set_attrib_flags(object);
     /* 0 - class PMC, 1 - class name */
     SET_CLASS(new_object_array, object, class);
     set_attrib_num(new_object_array, POD_CLASS_NAME, class_name);
@@ -1265,7 +1266,7 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
      * while there are already child class attrs
      */
     idx = VTABLE_elements(interpreter, attr_hash);
-    assert(PMC_int_val(class) == idx);
+    assert(ATTRIB_COUNT(class) == idx);
     /*
      * attr_hash is an OrderedHash so the line below could be:
      *
@@ -1282,7 +1283,7 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     VTABLE_set_integer_keyed_str(interpreter, attr_hash,
             full_attr_name, idx);
     assert(idx + 1 == VTABLE_elements(interpreter, attr_hash));
-    PMC_int_val(class) = idx + 1;
+    ATTRIB_COUNT(class) = idx + 1;
     return idx;
 }
 

@@ -160,8 +160,8 @@ Calls the delegated C<init()> method.
         noarg_noreturn(INTERP, SELF, class, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 
-    void mark() {
-        /* don't delegate mark */
+    void destroy() {
+        /* don't delegate destroy */
     }
 }
 

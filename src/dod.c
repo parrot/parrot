@@ -91,7 +91,7 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
         hi_prio = 0;
 
     if (obj->pmc_ext) {
-        if (hi_prio) {
+        if (1 || hi_prio) {
             PMC* tptr = interpreter->dod_trace_ptr;
             if (PMC_next_for_GC(tptr) == tptr) {
                 PMC_next_for_GC(obj) = obj;
@@ -243,7 +243,8 @@ trace_active_PMCs(Interp *interpreter, int trace_stack)
     struct Stash *stash = 0;
 
     /* We have to start somewhere, the interpreter globals is a good place */
-    interpreter->dod_mark_ptr = current = interpreter->iglobals;
+    interpreter->dod_trace_ptr = interpreter->dod_mark_ptr = current =
+        interpreter->iglobals;
 
     /* mark it as used  */
     pobject_lives(interpreter, (PObj *)interpreter->iglobals);
@@ -329,10 +330,9 @@ Returns whether the tracing process wasn't aborted.
 static int
 trace_children(Interp *interpreter, PMC *current)
 {
-    PMC *prev = NULL;
-    unsigned i = 0;
-    UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
-        | PObj_custom_mark_FLAG;
+    PMC *prev = NULL, *next;
+    INTVAL i = 0;
+    UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
 
     int lazy_dod = interpreter->lazy_dod;
 
@@ -368,28 +368,14 @@ trace_children(Interp *interpreter, PMC *current)
          * largest percentage of PMCs won't have anything in their data
          * pointer that we need to trace */
         if (bits) {
-            if (bits == PObj_is_PMC_ptr_FLAG) {
-                if (PMC_data(current)) {
-                    pobject_lives(interpreter, PMC_data(current));
-                }
-            }
-            else if (bits == PObj_is_buffer_ptr_FLAG) {
-                if (PMC_data(current)) {
-                    pobject_lives(interpreter, PMC_data(current));
-                }
-            }
-            else if (bits == PObj_is_buffer_of_PMCs_ptr_FLAG) {
-                /* buffer of PMCs */
-                Buffer *trace_buf = PMC_data(current);
+            if (bits == PObj_data_is_PMC_array_FLAG) {
+                /* malloced array of PMCs */
+                PMC **data = PMC_data(current);
 
-                if (trace_buf) {
-                    PMC **cur_pmc = PObj_bufstart(trace_buf);
-
-                    /* Mark the damn buffer as used! */
-                    pobject_lives(interpreter, trace_buf);
-                    for (i = 0; i < PObj_buflen(trace_buf) / sizeof(*cur_pmc); i++) {
-                        if (cur_pmc[i]) {
-                            pobject_lives(interpreter, (PObj *)cur_pmc[i]);
+                if (data) {
+                    for (i = 0; i < PMC_int_val(current); i++) {
+                        if (data[i]) {
+                            pobject_lives(interpreter, (PObj *)data[i]);
                         }
                     }
                 }

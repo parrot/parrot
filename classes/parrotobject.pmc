@@ -66,34 +66,9 @@ C<Parrot_instantiate_object()>.
             "use the registered class instead");
     }
 
-    void init_pmc() {
-        SELF.init();
-    }
-
     void* invoke(void* next) {
         SELF.init();
         return next;
-    }
-
-    void mark() {
-        SLOTTYPE *attrib_array = PMC_data(SELF);
-        UINTVAL i;
-
-        /* mark saved registers area */
-        Parrot_delegate_mark(INTERP, SELF);
-
-        if (attrib_array) {
-            PMC *cur_pmc;
-
-            pobject_lives(interpreter, GET_CLASS(attrib_array, SELF));
-            pobject_lives(interpreter, attrib_array);
-            for (i = 1; i < ATTRIB_COUNT(SELF); i++) {
-                cur_pmc = get_attrib_num(attrib_array, i);
-                if (cur_pmc) {
-                    pobject_lives(interpreter, (PObj *)cur_pmc);
-                }
-            }
-        }
     }
 
 /*
