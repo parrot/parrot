@@ -30,7 +30,6 @@ output_is(<<'CODE', <<'OUT', "eval pir");
 	compile P0, $P0, $S1
 	invoke
 	print "back\n"
-	noop	# filler to avoid realloc of code ;-)
 	end
 .end
 CODE

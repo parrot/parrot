@@ -279,10 +279,15 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
      *
      * if a compile command was found, write global fixup records
      * for all local labels
+     * and write fixup records for global _labels.
      */
     for (ins = instructions; ins ; ins = ins->next) {
         SymReg *addr, *label;
-        if ((ins->type & ITLABEL) && has_compile) {
+        if ((ins->type & ITLABEL) &&
+                (has_compile || *ins->r[0]->name == '_')) {
+            /* XXX labels should be mangled with current subroutine name
+             * they should only be reachable from eval's in current sub
+             */
             PackFile_FixupTable_new_entry_t0(interpreter,
                     ins->r[0]->name, ins->r[0]->color + oldsize);
         }
