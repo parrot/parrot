@@ -20,11 +20,12 @@ WIN32_CONSOLE_SETUP:
 WIN32_CONSOLE_INFO:
 	set P1, P24["kernel32"]		      # 65
 	dlfunc P0, P1, "GetConsoleScreenBufferInfo", "ipp"
-	set P6, P24["handle"]
-	new P5, .ManagedStruct
-	set P5, .SIZEOF_CONSOLE_SCREEN_BUFFER_INFO
+	set P5, P24["handle"]
+	new P6, .ManagedStruct
+	set P6, .SIZEOF_CONSOLE_SCREEN_BUFFER_INFO
 	set I0, 1
 	invoke
+	set P5, P6
 	set P0, P24["console"]
 	set I0, 0		# dwSize.X
 	bsr UMS_GET_SHORT
@@ -78,27 +79,29 @@ WIN32_CONSOLE_CLEAR:
 	set P2, P24["kernel32"]		      
 	dlfunc P0, P2, "FillConsoleOutputCharacterA", "ipcilp"
 	set I0, 1
-	new P5, .ManagedStruct
-	set P5, .SIZEOF_DWORD
-	set I5, 0			# Coords
+	set P5, P24["handle"]
+	new P6, .ManagedStruct
+	set P6, .SIZEOF_DWORD
+	set I5, 32			# Char (space)
 	set I1, P1["xbuf"]
 	set I2, P1["ybuf"]
 	mul I6, I1, I2			# Length
-	set I7, 32			# Char
-	set P6, P24["handle"]	# Handle
+	set I7, 0			# Coords
 	invoke
 	# Now, re-fill screen with whatever attribute is currently
 	# in effect.
 	dlfunc P0, P2, "FillConsoleOutputAttribute", "ipiilp"
 	set I0, 1
-	new P5, .ManagedStruct
-	set P5, .SIZEOF_DWORD
-	set I5, 0			# Coords
+	set P5, P24["handle"]	# Handle
+
+	new P6, .ManagedStruct
+	set P6, .SIZEOF_DWORD
+	set I5, P1["attr"]		# Attrib
 	set I1, P1["xbuf"]
 	set I2, P1["ybuf"]
 	mul I6, I1, I2			# Length
-	set I7, P1["attr"]		# Attrib
-	set P6, P24["handle"]	# Handle
+	set I7, 0			# Coords
+
 	invoke
 	ret
 
