@@ -129,12 +129,12 @@ static void if_branch()
                 if ((neg_op = get_neg_op(last->op)) != 0) {
                     Instruction * tmp;
                     last->r[reg] = go;
-                    tmp = iANY(neg_op, "", last->r, 0);
+                    tmp = INS(neg_op, "", last->r, 2, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
                     free(last->op);
                     last->op = strdup(neg_op);
-                    delete_ins(tmp, 1);
+                    free_ins(tmp);
 
                     /* delete branch */
                     ostat.deleted_ins++;
@@ -383,7 +383,7 @@ move_ins_out(Instruction **ins, Basic_block *bb)
 
         regs[0] = 0;
         sprintf(buf, "# Invar moved: %s",ins_string(out->next));
-        tmp = iANY("", buf, regs, 0);
+        tmp = INS("", buf, regs, 0, 0);
         insert_ins((*ins)->prev, tmp);
     }
     ostat.invariants_moved++;

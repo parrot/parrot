@@ -116,13 +116,14 @@ Directives
   ops at all, but instructions to the compiler.
 
    .class <IDENTIFIER>
+   .endclass <IDENTIFIER>
 
    .namespace <IDENTIFIER>
+   .endnamespace <IDENTIFIER>
 
    .sym <type> <IDENTIFIER>
 
    .sub <IDENTIFIER>
-
    .end
 
    .local <type> <IDENTIFIER>
