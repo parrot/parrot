@@ -320,23 +320,6 @@ op print(in INT, in PMC) {
 
 ########################################
 
-=item B<puts>(in STR)
-
-Print $1 to standard output stream
-
-=cut
-
-op puts(in STR) {
-  STRING *s = $1;
-  if (s && string_length(s)) {
-    PIO_puts(interpreter, pio_stdout, (const char *) s->bufstart);
-  }
-  goto NEXT();
-}
-
-
-########################################
-
 =item B<read>(out INT, in INT)
 
 Read an INTVAL from file descriptor $2 into $1.

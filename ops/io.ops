@@ -89,13 +89,33 @@ op print(in PMC, in STR) {
 
 =item B<printerr>(in STR)
 
-Print $1 to pio_stderr IO stream (unbuffered)
+Print $1 to interp.stderr IO stream (unbuffered)
 
 =cut
 
 op printerr(in STR) {
   if ($1) {
-    PIO_write(interpreter, pio_stderr, ($1)->bufstart, string_length($1));
+    PIO_write(interpreter, PIO_STDERR(interpreter), ($1)->bufstart,
+			string_length($1));
+  }
+  goto NEXT();
+}
+
+########################################
+
+=item B<puts>(in STR)
+
+Print $1 to standard output stream
+This will go away when print ops are all migrated to
+use ParrotIO instead of STDIO. Right now ParrotIO is
+not stable enough to replace STDIO.
+
+=cut
+
+op puts(in STR) {
+  STRING *s = $1;
+  if (s && string_length(s)) {
+    PIO_puts(interpreter, PIO_STDOUT(interpreter), (const char *) s->bufstart);
   }
   goto NEXT();
 }

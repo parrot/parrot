@@ -533,7 +533,10 @@ make_interpreter(INTVAL flags) {
     interpreter->op_func_table = interpreter->op_lib->op_func_table;
     interpreter->op_info_table = interpreter->op_lib->op_info_table;
     
-    /* In case the I/O system needs something */
+    /* Set I/O data to NULL first or else PIO_init will
+     * assume this interpreter is already initialized.
+     */
+    interpreter->piodata = NULL;
     PIO_init(interpreter);
     
     /* Done. Return and be done with it */
