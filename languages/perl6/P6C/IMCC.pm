@@ -853,7 +853,7 @@ END
 	} else {
 	    my $val = $x->thing->val;
 	    my $tmp = newtmp 'PerlUndef';
-	    my $tmp2 = gentmp 'PerlUndef';
+	    my $tmp2 = newtmp 'PerlUndef';
 	    code(<<END);
 	$tmp = $val
 	$tmp2 = $tmp $op
@@ -866,12 +866,23 @@ END
 	my $op = $inplace_op{$x->op}
 	    or die $x->op().' increment not understood';
 	$ret = $x->thing->val;
-	code("\t$op $ret\n");
-	unless ($x->thing->isa('P6C::variable')
-		&& is_scalar($x->thing->type)) {
+	if ($x->thing->isa('P6C::variable')
+	    && is_scalar($x->thing->type)) {
+	    code(<<END);
+	$ret = clone $ret
+	$op $ret
+END
+	} else {
+	    $op = $outaplace_op{$x->op};
+	    code(<<END);
+	$ret = clone $ret
+	$ret = $ret $op
+END
 	    # Complex expression => can't just do increment.
+	    my $desttype = $x->thing->can('type') ? 
+		$x->thing->type : 'PerlUndef';
 	    $x->thing->assign(new P6C::Register reg => $ret,
-			      type => $x->thing->type);
+			      type => $desttype);
 	}
 	return $ret;
     }
@@ -1305,16 +1316,8 @@ sub assign {
 	code("\t$name = $tmpv\n");
 	return $tmpv;		# XXX: is this okay?
     } else {
-	# If we assign a PMC to a PMC (or a string to a string...), we
-	# have to remember to clone it before it's modified.  Why not
-	# do so here?
 	code("# ASSIGN TO ".$x->name."\n");
-	if (is_pmc($x->type) && $thing->can('type') && is_pmc($thing->type)
-	    && $thing->type ne 'PerlArray') { # XXX: can't clone arrays.
-	    code("\t$name = clone $tmpv\n");
-	} else {
-	    code("\t$name = $tmpv\n");
-	}
+	code("\t$name = $tmpv\n");
 	return $name;
     }
 }
@@ -1499,7 +1502,7 @@ sub assign {
     my $lhs = $x->thing->val;
     my $lctx = $thing->{ctx};
 
-    if ($lctx->is_scalar) {
+    if (!$lctx || $lctx->is_scalar) {
 	# XXX: This isn't quite right, since we're taking lhs's
 	# C<val>.  But it works for simple @arrays.
 	my $itmp = gentmp $temptype{$type};

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 10;
+use P6C::TestCompiler tests => 11;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "Basic hello.");
@@ -30,6 +30,36 @@ CODE
 2
 23
 8
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Binary bit ops");
+sub main() {
+    my $x = 2;
+    my $y = $x;
+    my @z = ($x, $y);
+    ++$x;
+    print $x _ ' ' _ $y _ "\n";
+    $x++;
+    print $x _ ' ' _ $y _ "\n";
+    $y++;
+    print $x _ ' ' _ $y _ "\n";
+    ++$y;
+    print $x _ ' ' _ $y _ "\n";
+    print @z[0] _ ' ' _ @z[1] _ "\n";
+    @z[0]++;
+    ++@z[1];
+    print $x _ ' ' _ $y _ "\n";
+    print @z[0] _ ' ' _ @z[1] _ "\n";
+}
+CODE
+3 2
+4 2
+4 3
+4 4
+2 2
+4 4
+3 3
 OUT
 
 ##############################

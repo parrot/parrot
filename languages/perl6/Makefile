@@ -1,11 +1,12 @@
-compile=perl -I../../lib prd-perl6.pl --batch --imc
+myperl=perl -I../../lib
+compile=$(myperl) prd-perl6.pl --batch --imc
 imcc=../imcc/imcc
 asm=perl ../../assemble.pl
 
 all: imcc
 
 test:
-	for t in t/*/*.t; do perl -I../../lib $$t; done
+	$(myperl) -MTest::Harness -e 'runtests(@ARGV)' t/compiler/*.t
 
 imcc:
 	cd ../imcc; $(MAKE)
