@@ -473,7 +473,7 @@ sub lit_q
 sub int_reg_q
 {
   my ($value) = @_;
-  return $value =~ m/^I\d+$/;
+  return $value =~ m/^(\$\$)?I\d+$/;
 }
 
 
@@ -484,7 +484,7 @@ sub int_reg_q
 sub num_reg_q
 {
   my ($value) = @_;
-  return $value =~ m/^N\d+$/;
+  return $value =~ m/^(\$\$)?N\d+$/;
 }
 
 
@@ -495,7 +495,7 @@ sub num_reg_q
 sub poly_reg_q
 {
   my ($value) = @_;
-  return $value =~ m/^P\d+$/;
+  return $value =~ m/^(\$\$)?P\d+$/;
 }
 
 
@@ -506,7 +506,7 @@ sub poly_reg_q
 sub str_reg_q
 {
   my ($value) = @_;
-  return $value =~ m/^S\d+$/;
+  return $value =~ m/^(\$\$)?S\d+$/;
 }
 
 
@@ -517,7 +517,7 @@ sub str_reg_q
 sub reg_q
 {
   my ($value) = @_;
-  return $value =~ m/^[INPS]\d+$/;
+  return $value =~ m/^(\$\$)?[INPS]\d+$/;
 }
 
 
@@ -528,7 +528,7 @@ sub reg_q
 sub var_q
 {
   my ($value) = @_;
-  return $value =~ m/^\$/;
+  return $value =~ m/^\$[^\$]/;
 }
 
 
@@ -559,11 +559,15 @@ sub type_of
 
   return substr($value, 0, 1) if reg_q($value);
 
+  if ($value =~ m/^\$\$([INPS])\d+$/) { # IMCC "VIRTUAL" REGISTERS ($$I99 to jakoc, $I99 to imcc)
+    return $1;
+  }
+
   return 'S' if str_lit_q($value);
   return 'N' if num_lit_q($value);
   return 'I' if int_lit_q($value);
 
-  if ($value =~ m/^\$/) {
+  if ($value =~ m/^\$[^\$]/) { # IMCC VARIABLES ($FOO to jakoc, FOO to imcc)
     my $ident = find_ident(substr($value, 1, ));
     confess "Cannot find identifier '$value' to determine type!" unless defined $ident;
     return $ident->{IDENT}{TYPE};
@@ -674,8 +678,8 @@ sub op_comp
     #
 
     if ($a_type eq 'I' and num_q($b)) {
-      emit_code('set', ['N0', $a]);
-      $a = 'N0';
+      emit_code('set', ['$$N0', $a]);
+      $a = '$$N0'; # XXX: Could confuse type_of()
     }
   } else {
     #
@@ -684,11 +688,11 @@ sub op_comp
 
     if ($a_type ne $b_type) {
       if ($a_type eq 'I') {
-        emit_code('set', ['N0', $a]);
-        $a = 'N0';
+        emit_code('set', ['$$N0', $a]);
+        $a = '$$N0'; # XXX: Could confuse type_of()
       } elsif ($b_type eq 'I') {
-        emit_code('set', ['N0', $b]);
-        $b = 'N0';
+        emit_code('set', ['$$N0', $b]);
+        $b = '$$N0'; # XXX: Could confuse type_of()
       } else {
         confess "jakoc: Internal compiler error. Expected to have to use iton op.";
       }
@@ -1998,29 +2002,29 @@ sub do_add
       if ($dest eq $b && int_q($a)) {
         emit_code('add', [$dest, $a]);
       } else {
-        my $temp = int_q($a) ? 'I0' : 'N0';
+        my $temp = int_q($a) ? '$$I0' : '$$N0';
         emit_code('set', [$temp, $a]);
         emit_code('add', [$dest, $temp, $b]);
       }
     } else {
-      printf(STDERR "jakoc: Syntax error in addition on line %d!\n", $line);
+      printf(STDERR "jakoc: Syntax error (can't determine type of '$b') in addition on line %d!\n", $line);
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_or_num_lit_q($b)) {
       if ($dest eq $a && int_q($b)) {
         emit_code('add', [$dest, $b]);
       } else {
-        my $temp = int_q($b) ? 'I0' : 'N0';
+        my $temp = int_q($b) ? '$$I0' : '$$N0';
         emit_code('set', [$temp, $b]);
         emit_code('add', [$dest, $a, $temp]);
       }
     } elsif (reg_q($b) or var_q($b)) {
       emit_code('add', [$dest, $a, $b]);
     } else {
-      printf(STDERR "jakoc: Syntax error in addition on line %d!\n", $line);
+      printf(STDERR "jakoc: Syntax error (can't determine type of '$b') in addition on line %d!\n", $line);
     }
   } else {
-    printf(STDERR "jakoc: Syntax error in addition on line %d!\n", $line);
+    printf(STDERR "jakoc: Syntax error (can't determine type of '$a') in addition on line %d!\n", $line);
   }
 }
 
@@ -2070,7 +2074,7 @@ sub do_sub
       if ($dest eq $b && int_q($a)) {
         emit_code('sub', [$dest, $a]);
       } else {
-        my $temp = int_q($a) ? 'I0' : 'N0';
+        my $temp = int_q($a) ? '$$I0' : '$$N0';
         emit_code('set', [$temp, $a]);
         emit_code('sub', [$dest, $temp, $b]);
       }
@@ -2082,7 +2086,7 @@ sub do_sub
       if ($dest eq $a && int_q($b)) {
         emit_code('sub', [$dest, $b]);
       } else {
-        my $temp = int_q($b) ? 'I0' : 'N0';
+        my $temp = int_q($b) ? '$$I0' : '$$N0';
         emit_code('set', [$temp, $b]);
         emit_code('sub', [$dest, $a, $temp]);
       }
@@ -2139,7 +2143,7 @@ sub do_mul
       $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
       emit_code('set', [$dest, $temp]);
     } elsif (reg_q($b) or var_q($b)) {
-      my $temp = int_q($a) ? 'I0' : 'N0';
+      my $temp = int_q($a) ? '$$I0' : '$$N0';
       emit_code('set', [$temp, $a]);
       emit_code('mul', [$dest, $temp, $b]);
     } else {
@@ -2147,7 +2151,7 @@ sub do_mul
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_or_num_lit_q($b)) {
-      my $temp = int_q($b) ? 'I0' : 'N0';
+      my $temp = int_q($b) ? '$$I0' : '$$N0';
       emit_code('set', [$temp, $b]);
       emit_code('mul', [$dest, $a, $temp]);
     } elsif (reg_q($b) or var_q($b)) {
@@ -2173,23 +2177,36 @@ sub do_div
 
   ($dest, $a, $b) = map_args($dest, $a, $b);
 
+  if (type_of($dest) ne type_of($a)) {
+    my $temp = int_q($dest) ? '$$I0' : '$$N0';
+    emit_code('set', [$temp, $a]);
+    $a = $temp;
+  }
+
+  if (type_of($dest) ne type_of($a)) {
+    my $temp = int_q($dest) ? '$$I1' : '$$N1';
+    emit_code('set', [$temp, $b]);
+    $b = $temp;
+  }
+
+  #
+  # TODO: Should we really do the calculation in N if a or b is N,
+  # then convert that to I if dest is I?
+  #
+
   if (int_or_num_lit_q($a)) {
     if (int_or_num_lit_q($b)) {
       my $temp = $a / $b;
-      $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
+      $temp .= ".0" if (num_q($dest) and not $temp =~ m/\./);
       emit_code('set', [$dest, $temp]);
     } elsif (reg_q($b) or var_q($b)) {
-      my $temp = int_q($a) ? 'I0' : 'N0';
-      emit_code('set', [$temp, $a]);
-      emit_code('div', [$dest, $temp, $b]);
+      emit_code('div', [$dest, $a, $b]);
     } else {
       printf(STDERR "jakoc: Syntax error in division on line %d!\n", $line);
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_or_num_lit_q($b)) {
-      my $temp = int_q($b) ? 'I0' : 'N0';
-      emit_code('set', [$temp, $b]);
-      emit_code('div', [$dest, $a, $temp]);
+      emit_code('div', [$dest, $a, $b]);
     } elsif (reg_q($b) or var_q($b)) {
       emit_code('div', [$dest, $a, $b]);
     } else {
@@ -2222,7 +2239,7 @@ sub do_mod
     if (int_lit_q($b)) {
       emit_code('set', [$dest, $a % $b]);
     } elsif (reg_q($b) or var_q($b)) {
-      my $temp = 'I0';
+      my $temp = '$$I0';
       emit_code('set', [$temp, $a]);
       emit_code('mod', [$dest, $temp, $b]);
     } else {
@@ -2230,7 +2247,7 @@ sub do_mod
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_lit_q($b)) {
-      my $temp = 'I0';
+      my $temp = '$$I0';
       emit_code('set', [$temp, $b]);
       emit_code('mod', [$dest, $a, $temp]);
     } elsif (reg_q($b) or var_q($b)) {
