@@ -36,7 +36,7 @@ sub runstep {
   $jitarchname                 =~ s/-(net|free|open)bsd$/-bsd/i;
   my $jitcapable               =  0;
 
-  if (-e "lib/Parrot/Jit/$jitarchname.pm") {
+  if (-e "jit/$cpuarch/core.jit") {
     $jitcapable = 1;
   }
 
