@@ -240,21 +240,6 @@ inline op classname(out STR, in PMC) {
 
 =cut
 
-###############################################################################
-
-=item B<instantiate>(out PMC, in PMC)
-
-Instantiate an object of class $2. Creates a brand-new PMC and puts that
-PMC into register $1.
-
-=cut
-
-inline op instantiate(out PMC, in PMC) {
-
-  $1 = Parrot_instantiate_object(interpreter, $2);
-  goto NEXT();
-}
-
 
 
 =back
