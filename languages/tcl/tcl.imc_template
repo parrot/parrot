@@ -1,5 +1,4 @@
-# This file generated automatically by tcl.pl
-#
+# ${HEADER}
 
 # setup some global constants
 
@@ -14,20 +13,20 @@
 # so there's no conflict.
   .const int OPFUNC = 10
 
-  # XXX Replace all these with a single VALUE type?
+  # ${XXX Replace all these with a single VALUE type?}
   .const int INTEGER = 11
 
-  # XXX none of these are currently used.
+  # ${XXX none of these are currently used.}
   .const int FLOAT   = 12
   .const int STRING  = 13
 
-  # XXX end replace.
+  # ${XXX end replace.}
   .const int BLOCK   = 14
   .const int CHUNK   = 15
   .const int COMMAND = 16
 
-# misc
- .const int MAX_PRECEDENCE = 9
+  # misc
+  .const int MAX_PRECEDENCE = 9
 
 #
 # _main
@@ -35,26 +34,26 @@
 # Setup the information the interpreter needs to run, 
 # then parse and interpret the tcl code we were passed.
 
-.sub _main
+.sub _main @MAIN
   .param pmc argv
+
+  load_bytecode "languages/tcl/lib/tclword.imc"
 
   .local string filename
   .local string mode
   .local string chunk
   .local string contents
-  .local PerlHash commands
-  .local PerlHash operands
-  .local PerlHash math_funcs
-  .local PerlHash precedence
+  .local pmc commands
+  .local pmc operands
+  .local pmc math_funcs
+  .local pmc precedence
   .local Sub a_sub
   .local int argc
   .local int retcode
   .local string retval
 
-setup:
-
   # Keep track of all the builtin commands
-  commands = new PerlHash  
+  commands = new PerlHash
 
 ${COMMANDS}
 
@@ -63,7 +62,7 @@ ${COMMANDS}
 
 ${FUNCTIONS}
 
-  # XXX should auto-gen these with tcl.pl also
+  # ${XXX should auto-gen these with tcl.pl also}
   operands = new PerlHash
   precedence = new PerlHash
 
@@ -130,7 +129,20 @@ ${FUNCTIONS}
   $P1 = new PerlHash
   global "proc_args" = $P1 
 
-
+  # Setup the default channelIds
+  $P1 = new PerlHash
+  $P2 = getstdin
+  $P1["stdin"] = $P2
+  $P2 = getstdout
+  $P1["stdout"] = $P2
+  $P2 = getstderr
+  $P1["stderr"] = $P2
+  global "channels" = $P1  
+  
+  # Setup the id # for channels..
+  $P1 = new PerlInt
+  $P1 = 1
+  global "next_channel_id" = $P1
 
   # If no file was specified, read from stdin.
   argc = argv
@@ -158,6 +170,16 @@ realdone:
   end
  
 .end
+
+# This handler is just supposed to get us back to the next
+# instruction. It's our job to deal with it in the calling
+# code, then.
+.emit
+__default_handler:
+  set P4, P5["_invoke_cc"]
+  set P5, P5["_P5"]
+  invoke P4
+.eom
 
 .include "library/dumper.imc"
 ${INCLUDES}
