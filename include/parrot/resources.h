@@ -15,10 +15,26 @@
 
 #include "parrot/parrot.h"
 
+struct Memory_Block {
+    size_t free;
+    size_t size;
+    struct Memory_Block *prev;
+    struct Memory_Block *next;
+    char *start;
+    char *top;
+};
+
+struct Memory_Pool {
+    struct Memory_Block *top_block;
+    void (*compact)(struct Parrot_Interp *, struct Memory_Pool *);
+    size_t minimum_block_size;
+    UINTVAL align_1;    /* alignment (must be power of 2) minus one */
+};
+
 PMC *new_pmc_header(struct Parrot_Interp *);
 void free_pmc(PMC *);
 
-STRING *new_string_header(struct Parrot_Interp *);
+STRING *new_string_header(struct Parrot_Interp *, UINTVAL flags);
 Buffer *new_tracked_header(struct Parrot_Interp *, size_t size);
 Buffer *new_buffer_header(struct Parrot_Interp *);
 void free_buffer(Buffer *);
@@ -30,75 +46,56 @@ void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
 
 void *Parrot_allocate(struct Parrot_Interp *, void *, size_t size);
-void *Parrot_allocate_about(struct Parrot_Interp *, void *, size_t size);
-void *mem_allocate(struct Parrot_Interp *, size_t *req_size);
-void *Parrot_alloc_new_block(struct Parrot_Interp *, size_t, UINTVAL);
-
-void Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter);
+void *Parrot_allocate_string(struct Parrot_Interp *, STRING *, size_t size);
 
 void Parrot_do_dod_run(struct Parrot_Interp *);
 void Parrot_go_collect(struct Parrot_Interp *);
 
 void *Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize);
-void *Parrot_reallocate_about(struct Parrot_Interp *interpreter, void *from, size_t tosize);
+void *Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *, size_t tosize);
 
 void buffer_lives(Buffer *);
 
-void Parrot_initialize_free_pools(struct Parrot_Interp *);
+void Parrot_initialize_resource_pools(struct Parrot_Interp *);
+void Parrot_initialize_memory_pools(struct Parrot_Interp *);
 
 #define STRING_HEADERS_PER_ALLOC 128
 #define PMC_HEADERS_PER_ALLOC 128
 #define BUFFER_HEADERS_PER_ALLOC 128
 
 struct PMC_Arena {
-    size_t free;         /* Count of PMCs free in this arena */
-    size_t used;         /* Count of PMCs used in this arena */
+    size_t used;         /* Count of PMCs in this arena */
     struct PMC_Arena *prev;
     struct PMC_Arena *next;
-    PMC *start_PMC;        /* Next PMC in the arena ready to allocate */
+    PMC *start_PMC;      /* Pointer to array of PMCs */
     size_t *GC_data;     /* Actually an array with one element per PMC */
 };
 
-struct STRING_Arena {
-    size_t free;
-    size_t used;
-    struct STRING_Arena *prev;
-    struct STRING_Arena *next;
-    STRING *start_STRING;
-};
-
 struct Buffer_Arena {
-    size_t free;
     size_t used;
     struct Buffer_Arena *prev;
     struct Buffer_Arena *next;
     Buffer *start_Buffer;
 };
 
-/* The free header pool */
-struct free_pool {
-    Buffer pool_buffer;
-    size_t entries_in_pool;
-    void (*replenish)(struct Parrot_Interp *, struct free_pool *);
+/* Tracked resource pool */
+struct Resource_Pool {
+    void *last_Arena;
+    Buffer free_pool_buffer;
+    size_t unit_size;     /* size in bytes of an individual pool item */
+    size_t units_per_alloc; 
+    size_t free_entries;
+    void (*replenish)(struct Parrot_Interp *, struct Resource_Pool *);
 };
         
-struct Memory_Pool {
-    size_t free;
-    size_t size;
-    struct Memory_Pool *prev;
-    struct Memory_Pool *next;
-    char *start;
-    char *top;
-};
-
 struct Arenas {
-    struct PMC_Arena *last_PMC_Arena;
-    struct STRING_Arena *last_STRING_Arena;
-    struct Buffer_Arena *last_Buffer_Arena;
     struct Memory_Pool *memory_pool;
-    struct free_pool *string_header_pool;
-    struct free_pool *pmc_pool;
-    struct free_pool *buffer_header_pool;
+    struct Memory_Pool *string_pool;
+    struct Memory_Pool *constant_string_pool;
+    struct Resource_Pool *string_header_pool;
+    struct Resource_Pool *pmc_pool;
+    struct Resource_Pool *buffer_header_pool;
+    struct Resource_Pool *constant_string_header_pool;
 };
 
 struct Stash {
