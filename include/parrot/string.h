@@ -32,7 +32,7 @@ typedef struct {
     void *bufstart;
     UINTVAL buflen;
     UINTVAL flags;
-};
+} Buffer;
 
 /* Buffer flags */
 typedef enum BUFFER_flag {
