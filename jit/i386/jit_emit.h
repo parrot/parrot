@@ -2193,7 +2193,8 @@ store:
         }
     }
     /* push interpreter */
-    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
             offsetof(struct PMC, vtable));

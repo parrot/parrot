@@ -31,7 +31,7 @@ TBD
     if $I0 > 1 goto END
 
     load_bytecode "library/Data/Escape.imc"
-    
+
     newclass $P0, "Stream::Base"
     addattribute $P0, 'source'
     addattribute $P0, 'includes'
@@ -60,14 +60,15 @@ END:
 .end
 
 .sub setSource method
-    newsub P0, .Sub, __set_pmc
-    invoke
+    .param pmc src
+    newsub $P0, .Sub, __set_pmc
+    $P0(src)
 .end
 
 .sub close method
     .local pmc temp
 
-    # reset source    
+    # reset source
     classoffset $I0, self, "Stream::Base"
     new temp, .PerlUndef
     setattribute self, $I0, temp
@@ -90,7 +91,7 @@ Returns nothing.
     .local string str
     .local int i
     .local pmc escape
-    
+
     escape = find_global "Data::Escape", "String"
 LOOP:
     i = self."connected"()
@@ -111,7 +112,7 @@ END:
     .param pmc to
     .local string str
     .local int i
-    
+
 LOOP:
     i = self."connected"()
     unless i goto END
@@ -204,10 +205,10 @@ NO_BUFFER:
     add $I0, aIncludes
     getattribute includes, self, $I0
     isnull includes, SELF
-    
+
     $I0 = includes
     if $I0 > 0 goto INCLUDE
-    
+
 SELF:
     ret = self."rawRead"()
 
@@ -222,17 +223,17 @@ DONE:
 INCLUDE_CHECK:
     $I0 = includes
     if $I0 == 0 goto DONE
-    
+
 INCLUDE:
     .local pmc stream
-    
+
     stream = includes[0]
-    
+
     ret = stream."read"()
-    
+
     isnull ret, INCLUDE_DEL
     branch DONE
-    
+
 INCLUDE_DEL:
     shift $P0, includes
     $I0 = includes
@@ -259,7 +260,7 @@ Please have a look at F<examples/streams/Include.imc> to see how it works.
     push includes, stream
 
     self."flush"()
-        
+
     .pcc_begin_return
     .pcc_end_return
 .end
@@ -274,20 +275,20 @@ Used to flush the stream when including another stream.
     .local int i
     .local string str
     .local pmc includes
-    
+
     can i, self, "write"
     unless i goto CANT
-    
+
     classoffset $I0, self, "Stream::Base"
     add $I0, aIncludes
     getattribute includes, self, $I0
-    
+
     i = includes
     if i == 0 goto CANT
-    
+
     null str
     i = self."write"( str )
-    
+
 CANT:
     .pcc_begin_return
     .return i
@@ -307,7 +308,7 @@ Reads the specified number of bytes from the stream.
 
     classoffset $I0, self, "Stream::Base"
     add $I0, aBuffer
-    
+
     # get buffer
     getattribute buffer, self, $I0
 
@@ -318,10 +319,10 @@ Reads the specified number of bytes from the stream.
     null $P0
     setattribute self, $I0, $P0
     branch OK
-    
+
 CREATE:
     buffer = new .PerlString
-    
+
 OK:
     ret = buffer
 
@@ -333,7 +334,7 @@ LOOP:
     concat ret, $S0
     branch LOOP
 DONE:
-    
+
     $I0 = length ret
     if $I0 <= requested goto END
 
@@ -347,7 +348,7 @@ DONE:
     assign buffer, $S0
     classoffset $I0, self, "Stream::Base"
     add $I0, aBuffer
-    setattribute self, $I0, buffer    
+    setattribute self, $I0, buffer
 
 END:
     .pcc_begin_return
@@ -363,7 +364,7 @@ Returns or sets the byte buffer.
 
 .sub byte_buffer method
     .param pmc buf
-    
+
     classoffset $I0, self, "Stream::Base"
     add $I0, aBuffer
 

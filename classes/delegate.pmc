@@ -182,12 +182,12 @@ useful defaults and don't throw exceptiions.
         STRING *meth = const_string(interpreter,
                 PARROT_VTABLE_NEW_EXTENDED_METHNAME );
         PMC *sub = find_meth(interpreter, SELF, meth);
+
         if (PMC_IS_NULL(sub)) {
             /* run default fallback that constructs an empty object */
             return SUPER();
         }
-        return (PMC*) Parrot_run_meth_fromc_args_save(interpreter, sub,
-                pmc, meth, "P");
+        return (PMC*) Parrot_run_meth_fromc(interpreter, sub, SELF, meth);
     }
 }
 

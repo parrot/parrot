@@ -17,7 +17,7 @@
  * interpreter register layout - only during conversion
  */
 
-#define INDIRECT_REGS 0
+#define INDIRECT_REGS 1
 
 /*
  * DOD/GC switches

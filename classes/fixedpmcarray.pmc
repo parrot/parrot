@@ -47,7 +47,7 @@ runops_fast_cmp(Interp *interpreter, PMC *sub, PMC *left, PMC *right)
     runops_int(interpreter, offset);
 }
 
-#define RUN_FAST_CMP
+/* #define RUN_FAST_CMP */
 static int
 sort_ext_compare(void *a, void *b)
 {
@@ -55,10 +55,11 @@ sort_ext_compare(void *a, void *b)
     PMC *pb = *(PMC**)b;
 #ifdef RUN_FAST_CMP
     runops_fast_cmp(the_interp, sort_cmp_pmc, pa, pb);
-#else
-    Parrot_runops_fromc_args(the_interp, sort_cmp_pmc, "IPP", pa, pb);
-#endif
     return INTERP_REG_INT(the_interp, 5);
+#else
+    return Parrot_runops_fromc_args_save_reti(the_interp,
+        sort_cmp_pmc, "IPP", pa, pb);
+#endif
 }
 
 pmclass FixedPMCArray need_ext does array {
@@ -78,6 +79,7 @@ METHOD void sort(PMC *cmp_func) {
     INTVAL type;
     PMC *s;
 
+    the_interp = interpreter;
     if (REG_INT(3) == 0) {
         first = ((PMC**)PMC_data(SELF))[0];
         /* XXX simulate MMD inheritance: Int isa TT */
@@ -91,7 +93,6 @@ METHOD void sort(PMC *cmp_func) {
 default_sort:
         func = sort_compare;
 use_func:
-        the_interp = interpreter;
         qsort(PMC_data(SELF), PMC_int_val(SELF), sizeof(PMC *),
                 (int (*)(const void*, const void*))func);
     }
@@ -127,30 +128,24 @@ use_sub:
          * save registers once, as the compare function will be called
          * repeatedly
          */
-        regs = Parrot_save_register_frames(interpreter, cmp_func);
         func = sort_ext_compare;
         sort_cmp_pmc = cmp_func;
 #ifdef RUN_FAST_CMP
         REG_PMC(1) = new_ret_continuation_pmc(interpreter, NULL);
-        /* don't recycle it */
-        PObj_get_FLAGS(REG_PMC(1)) &= ~PObj_private2_FLAG;
-        /* and don't mark it, its just a ret continuation */
-        PObj_flag_CLEAR(custom_mark, REG_PMC(1));
         /* TODO create one exception frame */
 #endif
         /*
-         * TODO fix SEGV with JIT
+         * TODO fix errors with JIT or prederefed core
          */
         if (run_core == PARROT_JIT_CORE) {
 #ifdef HAVE_COMPUTED_GOTO
-            interpreter->run_core = PARROT_CGP_CORE;
+            interpreter->run_core = PARROT_CGOTO_CORE;
 #else
-            interpreter->run_core = PARROT_SWITCH_CORE;
+            interpreter->run_core = PARROT_FAST_CORE;
 #endif
         }
         qsort(PMC_data(SELF), PMC_int_val(SELF), sizeof(PMC *),
                 (int (*)(const void*, const void*))func);
-        Parrot_restore_register_frames(interpreter, regs);
         interpreter->run_core = run_core;
     }
 }

@@ -7,24 +7,24 @@ Stream::Writer - a PIR sub as target for a Stream
 version 0.1
 
 =head1 SYNOPSIS
-    
+
     # create the stream
     find_type I0, "Stream::Writer"
     new stream, I0
-    
+
     # set the source sub
     newsub temp, .Sub, _reader
     stream."source"( temp )
 
     stream."write"( "hello, world" )
-    
+
     ...
-    
+
     .sub _reader method
 	.local string str
 	str = self."read"()
     .end
-    
+
 =head1 DESCRIPTION
 
 =cut
@@ -34,10 +34,10 @@ version 0.1
 .sub __onload @LOAD
     find_type $I0, "Stream::Writer"
     if $I0 > 1 goto END
-    
+
     load_bytecode "library/Stream/Base.imc"
-    
-    getclass $P0, "Stream::Base" 
+
+    getclass $P0, "Stream::Base"
     subclass $P1, $P0, "Stream::Writer"
 
     addattribute $P1, "writer"
@@ -57,7 +57,7 @@ END:
     getprop source, "CALL", P0
     source()
 
-    # close the source    
+    # close the source
     source = find_global "Stream::Base", "close"
     P2 = self
     source()
@@ -72,7 +72,7 @@ END:
 
 .sub __init method
     .local pmc status
-    
+
     new status, .PerlInt
     set status, 0
     classoffset $I0, self, "Stream::Writer"
@@ -111,7 +111,7 @@ END:
 .sub connected method
     .local pmc status
     .local int ret
-    
+
     classoffset $I0, self, "Stream::Writer"
     inc $I0
     getattribute status, self, $I0
@@ -139,7 +139,7 @@ END:
     getattribute status, self, $I0
 
     if status == 0 goto END
-    
+
     if status == 2 goto WRITE
     status = 2
     self."write"( "" )
@@ -147,7 +147,7 @@ WRITE:
 
     classoffset $I0, self, "Stream::Writer"
     setattribute self, $I0, P1
-    
+
     source = self."source"()
     isnull source, END
     typeof $I0, source
@@ -169,14 +169,13 @@ END:
     .local string str
     .local pmc cont
     .local pmc writer
-    
+
     cont = self."source"()
     isnull cont, END_OF_STREAM
 
     classoffset $I0, self, "Stream::Writer"
     getattribute writer, self, $I0
 
-    savetop
     newsub cont, .Continuation, _CONT
     self."setSource"( cont )
 
@@ -185,7 +184,7 @@ END:
 _CONT:
     .result str
     .pcc_end
-    
+
     .pcc_begin_return
     .return str
     .pcc_end_return

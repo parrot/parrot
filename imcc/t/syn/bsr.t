@@ -233,6 +233,8 @@ output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
 .sub _test
    I6 = 5	# count
    I5 = 1	# product
+   I0 = 1       # protoyped
+   I1 = 2       # 2 int args
    P0 = new Sub
    P0 = addr _fact
    saveall
@@ -252,6 +254,8 @@ _fact:
    dec I6
    branch _fact
 fin:
+   I0 = 1
+   I1 = 1
    invoke P1
 .end
 
@@ -272,8 +276,10 @@ output_is(<<'CODE', <<'OUT', "coroutine");
     invoke co
     print "\n"
     end
-
-_routine:
+.end
+.sub _routine
+   .local pmc co
+    co = P0
     print " "
     invoke co
     print "."

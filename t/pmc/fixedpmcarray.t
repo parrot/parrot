@@ -267,6 +267,8 @@ output_like(<<'CODE',
 ##PIR##
 .sub main @MAIN
      .local pmc compares
+     # XXX doesnt work wit prederef of JIT
+     bounds 1
      compares = new .PerlInt
      compares = 0
      global "compares" = compares

@@ -21,6 +21,12 @@ use Parrot::Test tests => 76;
 use Test::More;
 use Parrot::Config;
 
+my $temp = "temp.pasm";
+
+END {
+    unlink($temp, 'temp.pbc');
+};
+
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
     print "main\n"
     newsub .Sub, .RetContinuation, _func, _ret
@@ -542,7 +548,6 @@ in sub
 back
 OUTPUT
 
-my $temp = "temp.pasm";
 open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub _sub1:
@@ -1092,7 +1097,6 @@ ok
 OUTPUT
 }
 
-unlink($temp, 'temp.pbc');
 
 $temp = "temp.imc";
 open S, ">$temp" or die "Can't write $temp";
@@ -1168,7 +1172,6 @@ main
 back
 OUTPUT
 
-unlink($temp);
 
 output_like(<<'CODE', <<'OUTPUT', "warn on in main");
 ##PIR##

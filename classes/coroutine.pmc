@@ -159,7 +159,6 @@ end           # terminate the runloop
     PMC* shift_pmc() {
         PMC *res;
         struct Parrot_coro * sub = PMC_coro(SELF);
-        void * regs = Parrot_save_register_frames(interpreter, SELF);
         opcode_t offset, *call_hook;
         PMC *ex;
         PMC *p5 = REG_PMC(5);
@@ -172,6 +171,7 @@ end           # terminate the runloop
          * running via runops creates an exception frame
          *  but we should catch exceptions here to free the register
          *  frame
+         * XXX
          */
         runops(interpreter, offset);
         res = REG_PMC(5);
@@ -181,10 +181,8 @@ end           # terminate the runloop
          */
         if (REG_INT(3) == 1 &&
                 res == Parrot_base_vtables[enum_class_None]->data) {
-            Parrot_restore_register_frames(interpreter, regs);
             real_exception(interpreter, NULL, E_StopIteration, "StopIteration");
         }
-        Parrot_restore_register_frames(interpreter, regs);
         return res;
     }
 

@@ -632,41 +632,81 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     new P5, .PerlString		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
     set I5, 0			# set first attrib
+    set I0, 1
+    set I1, 1
+    set I2, 0
+    set I3, 1
+    set I4, 0
     # register preserving is optimized away :)
     callmethodcc
     set S0, "Foo::set"
     new P5, .PerlString
     set P5, "j\n"
     set I5, 1			# set 2nd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 0
+    set I3, 1
+    set I4, 0
     callmethodcc
 
     set S0, "Bar::set"
     new P5, .PerlString
     set P5, "k\n"
     set I5, 0			# set first attrib
+    set I0, 1
+    set I1, 1
+    set I2, 0
+    set I3, 1
+    set I4, 0
     callmethodcc
     set S0, "Bar::set"
     new P5, .PerlString
     set P5, "l\n"
     set I5, 1			# set 2nd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 0
+    set I3, 1
+    set I4, 0
     callmethodcc
 
     # now retrieve attributes
     set S0, "Foo::get"
     set I5, 0			# get first attrib
+    set I0, 1
+    set I1, 1
+    set I2, 0
+    set I3, 0
+    set I4, 0
     callmethodcc
     print P5			# return result
     set S0, "Foo::get"
     set I5, 1			# get 2nd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 0
+    set I3, 0
+    set I4, 0
     callmethodcc
     print P5			# return result
 
     set S0, "Bar::get"
     set I5, 0			# get first attrib
+    set I0, 1
+    set I1, 1
+    set I2, 0
+    set I3, 0
+    set I4, 0
     callmethodcc
     print P5			# return result
     set S0, "Bar::get"
     set I5, 1			# get 2nd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 0
+    set I3, 0
+    set I4, 0
     callmethodcc
     print P5			# return result
     end
@@ -692,6 +732,8 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     classoffset I3, P2, "Bar"
     add I4, I3, I5
     setattribute P2, I4, P5	# so always put new PMCs in
+    set I0, 0
+    set I3, 0
     invoke P1
 
 .pcc_sub Bar::get:
@@ -699,6 +741,8 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     classoffset I3, P2, "Bar"
     add I4, I3, I5
     getattribute P5, P2, I4
+    set I0, 0
+    set I3, 1
     invoke P1
 CODE
 in Foo::set
@@ -748,45 +792,95 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set P5, "i\n"		# attribute slots have reference semantics
     set S5, "Foo"
     set I5, 0			# set first attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 1
+    set I4, 0
     # register preserving is optimized away :)
     callmethodcc
     new P5, .PerlString
     set P5, "j\n"
     set I5, 1			# set 2nd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 1
+    set I4, 0
     callmethodcc
 
     new P5, .PerlString
     set P5, "k\n"
     set S5, "Bar"
     set I5, 0			# set first attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 1
+    set I4, 0
     callmethodcc
     new P5, .PerlString
     set P5, "l\n"
     set I5, 1			# set 2nd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 1
+    set I4, 0
     callmethodcc
     new P5, .PerlString
     set P5, "m\n"
     set I5, 2			# set 3rd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 1
+    set I4, 0
     callmethodcc
 
     # now retrieve attributes
     set S0, "get"
     set S5, "Foo"
     set I5, 0			# get first attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 0
+    set I4, 0
     callmethodcc
     print P5			# return result
     set I5, 1			# get 2nd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 0
+    set I4, 0
     callmethodcc
     print P5			# return result
 
     set S5, "Bar"
     set I5, 0			# get first attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 0
+    set I4, 0
     callmethodcc
     print P5			# return result
     set I5, 1			# get 2nd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 0
+    set I4, 0
     callmethodcc
     print P5			# return result
     set I5, 2			# get 3rd attrib
+    set I0, 1
+    set I1, 1
+    set I2, 1
+    set I3, 0
+    set I4, 0
     callmethodcc
     print P5			# return result
     end
@@ -799,6 +893,8 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     classoffset I3, P2, S5
     add I4, I3, I5
     setattribute P2, I4, P5
+    set I0, 0
+    set I3, 0
     invoke P1
 
 # Pattr = get(obj: SClass, Iattr_idx)
@@ -806,6 +902,8 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     classoffset I3, P2, S5
     add I4, I3, I5
     getattribute P5, P2, I4
+    set I0, 0
+    set I3, 1
     invoke P1
 
 CODE
@@ -1574,6 +1672,8 @@ output_is(<<'CODE', <<'OUTPUT', "new_extended");
     classoffset I0, P10, "Foo"	# better should clone the argument
     setattribute P10, I0, P5	# the first attribute is the internal __value
     set P5, P10			# set return value
+    set I0, 0
+    set I3, 1
     invoke P1
 CODE
 42

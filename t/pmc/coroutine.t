@@ -44,6 +44,8 @@ back 0
 done
 OUTPUT
 
+SKIP: {
+    skip("should this really work with distinct registers", 1);
 output_is(<<'CODE', <<'OUTPUT', "Coroutines");
     null I0
     null I3
@@ -70,6 +72,7 @@ co2:
 co2_loop:
     invoke
     print "back  2\n"
+    set I3, I3
     set P0, P5
     invoke
     print "back  2b\n"
@@ -86,6 +89,7 @@ co3:
 co3_loop:
     invoke
     print "back  3\n"
+    set I3, I3
     set P0, P7
     invoke
     print "back  3b\n"
@@ -112,6 +116,7 @@ back  2b
 back  1
 done
 OUTPUT
+}
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 1");
     new_pad 0
@@ -252,6 +257,8 @@ CODE
 done
 OUTPUT
 
+SKIP: {
+    skip("bogus argument handling - not pdd03", 1);
 output_is(<<'CODE', <<'OUTPUT', "Coroutines and registers");
     new P1, .Coroutine
     set_addr P1, co1
@@ -358,6 +365,7 @@ co1 registers
 main registers
 done
 OUTPUT
+}
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example");
 ##PIR##

@@ -591,6 +591,7 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     jit_emit_lwz(pc, r15,  offsetof(struct PackFile, byte_code), ISR1)
 
 #  define jit_emit_branch_to_opcode(pc, D) \
+    jit_emit_lwz(pc, r13, offsetof(Interp, ctx.bp), r16); \
     jit_emit_sub_rrr(jit_info->native_ptr, ISR1, D, r15); \
     jit_emit_lwzx(jit_info->native_ptr, ISR1, ISR1, r14); \
     jit_emit_mtctr(jit_info->native_ptr, ISR1); \
@@ -657,7 +658,6 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     jit_emit_stwu(jit_info->native_ptr, r1, -PPC_JIT_FRAME_SIZE, r1);
     jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
     jit_emit_mov_rr(jit_info->native_ptr, r16, r3);  /* interp */
-    jit_emit_mov_rr(jit_info->native_ptr, r13, r3);  /* fp */
     if (!jit_info->objfile) {
         jit_emit_load_op_map(jit_info->native_ptr);
     }
@@ -857,7 +857,7 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
  * r3 - r10 allocated
  * r11 ISR1
  * r12 ISR2 
- * r13 Parrot register frame pointer - now interpreter
+ * r13 Parrot register frame pointer
  * r14 op_map
  * r15 code_start
  * r16 interpreter

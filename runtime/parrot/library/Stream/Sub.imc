@@ -7,21 +7,21 @@ Stream::Sub - a PIR sub as source for a Stream
 version 0.1
 
 =head1 SYNOPSIS
-    
+
     # create the stream
     find_type I0, "Stream::Sub"
     new stream, I0
-    
+
     # set the source sub
     newsub temp, .Sub, _test
     stream."source"( temp )
-    
+
     ...
-    
+
     .sub _test method
 	self."write"( "hello, world" )
     .end
-    
+
 =head1 DESCRIPTION
 
 Like every stream, Stream::Sub as has a C<read> method.
@@ -56,13 +56,13 @@ The stream will be disconnected automatically if the provided sub returns.
     .local int i
     .local pmc base
     .local pmc sub
-    
+
     find_type i, "Stream::Sub"
     if i > 1 goto END
-    
+
     load_bytecode "library/Stream/Base.imc"
-    
-    getclass base, "Stream::Base" 
+
+    getclass base, "Stream::Base"
     subclass sub, base, "Stream::Sub"
 
     addattribute sub, "write_cont"
@@ -92,7 +92,7 @@ END:
 
     classoffset I0, self, "Stream::Sub"
     getattribute write, self, I0
-    
+
     newsub ret, .Continuation, _sub_write_ret
     assign self, ret
 
@@ -117,17 +117,16 @@ _sub_write_ret:
     .local string str
 
     temp = self."source"()
-    typeof I0, temp
-    if I0 == .PerlUndef goto END
-    classoffset I0, self, "Stream::Sub"
-    P0 = clone P1
-    setattribute self, I0, P0
+    typeof $I0, temp
+    if $I0 == .PerlUndef goto END
+    classoffset $I0, self, "Stream::Sub"
+    $P0 = clone P1
+    setattribute self, $I0, $P0
 
-    updatecc
     str = temp( self )
 
 END:
-    # return a null string to indicate end of stream    
+    # return a null string to indicate end of stream
     null str
 
     .pcc_begin_return

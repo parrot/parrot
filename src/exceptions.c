@@ -308,16 +308,19 @@ void *
 throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 {
     PMC *handler;
-    struct Parrot_cont * cc;
     void *address;
 
     handler = find_exception_handler(interpreter, exception);
     if (!handler)
         return NULL;
-    cc = PMC_cont(handler);
-    /* put the continuation ctx in the interpreter */
-    restore_context(interpreter, &cc->ctx);
-    /* preserve P5 register */
+    /* create return continuation with current context */
+    if (dest) {
+        VTABLE_set_pmc_keyed_int(interpreter, exception, 4,
+                new_ret_continuation_pmc(interpreter, dest));
+    }
+    /* put the handler aka continuation ctx in the interpreter */
+    address = VTABLE_invoke(interpreter, handler, NULL);
+    /* XXX preserve P5 register */
     VTABLE_set_pmc_keyed_int(interpreter, exception, 3, REG_PMC(5));
 #if 0
     /* remember handler */
@@ -325,13 +328,9 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
     VTABLE_set_pmc_keyed(interpreter, exception, key, handler);
 #endif
     /* generate and place return continuation */
-    if (dest) {
-        VTABLE_set_pmc_keyed_int(interpreter, exception, 4,
-                new_ret_continuation_pmc(interpreter, dest));
-    }
     /* put exception object in P5 */
     REG_PMC(5) = exception;
-    address = VTABLE_get_pointer(interpreter, handler);
+    /* address = VTABLE_get_pointer(interpreter, handler); */
     if (PObj_get_FLAGS(handler) & PObj_private0_FLAG) {
         /* its a C exception handler */
         Parrot_exception *jb = (Parrot_exception *) address;
@@ -356,17 +355,16 @@ void *
 rethrow_exception(Parrot_Interp interpreter, PMC *exception)
 {
     PMC *handler;
-    struct Parrot_cont * cc;
+    void *address;
 
     if (exception->vtable->base_type != enum_class_Exception)
         PANIC("Illegal rethrow");
     handler = find_exception_handler(interpreter, exception);
-    cc = PMC_cont(handler);
-    restore_context(interpreter, &cc->ctx);
+    address = VTABLE_invoke(interpreter, handler, NULL);
     /* put exception object in P5 */
     REG_PMC(5) = exception;
     /* return the address of the handler */
-    return VTABLE_get_pointer(interpreter, handler);
+    return address;
 }
 
 /*

@@ -72,12 +72,9 @@ B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
 =cut
 
 .sub _dumper
-    saveall
     _global_dumper()
-    restoreall
-    find_global P2, "Data::Dumper", "global"
-    S0 = "dumper"
-    callmethod
+    find_global $P2, "Data::Dumper", "global"
+    $P2."dumper"()
 .end
 
 =item _register_dumper( id, sub )
@@ -106,12 +103,10 @@ This function returns nothing.
 =cut
 
 .sub _register_dumper
-    saveall
+    # XXX argument passing
     _global_dumper()
-    restoreall
-    find_global P2, "Data::Dumper", "global"
-    S0 = "registerDumper"
-    callmethod
+    find_global $P2, "Data::Dumper", "global"
+    $P2."registerDumper"()
 .end
 
 =item dumper =_global_dumper() B<(internal)>

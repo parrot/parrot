@@ -58,7 +58,7 @@ static const char regsets[] = "ISPN";
 /* forward def */
 static Instruction *
 pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
-        SymReg *arg, int i, int *flatten);
+        SymReg *arg, int i, int *flatten, SymReg **last);
 
 
 
@@ -217,7 +217,7 @@ pcc_put_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         struct pcc_sub_t *pcc_sub, int n, int proto, SymReg **args)
 {
     int next[4], i, j, set;
-    SymReg *p3, *regs[IMCC_MAX_REGS], *arg, *arg_reg, *reg;
+    SymReg *p3, *regs[IMCC_MAX_REGS], *arg, *arg_reg, *reg, *last;
     char buf[128];
     Instruction *tmp;
     int flatten;
@@ -316,7 +316,8 @@ flatten:
         /* if we had a flattening arg, we must continue emitting
          * code to do all at runtime
          */
-        ins = pcc_emit_flatten(interpreter, unit, ins, arg_reg, i, &flatten);
+        ins = pcc_emit_flatten(interpreter, unit, ins, arg_reg, i, &flatten,
+                &last);
     } /* for i */
 
     /* set prototyped: I0  (1=prototyped, 0=non-prototyped) */
@@ -332,7 +333,19 @@ flatten:
 
     /* set items in PRegs: I3 */
     if (flatten) {
-        regs[0] = get_pasm_reg("I3");;
+        SymReg *i3;
+        /* if I3 > 16 set it to 16 */
+        i3 = get_pasm_reg("I3");;
+        regs[0] = i3;
+        regs[1] = mk_const(str_dup("16"), 'I');
+        regs[2] = last;
+        ins = insINS(interpreter, unit, ins, "lt", regs, 3);
+        ins = insINS(interpreter, unit, ins, "set", regs, 2);
+        tmp = INS_LABEL(unit, last, 0);
+        insert_ins(unit, ins, tmp);
+        ins = tmp;
+        /* finally subtract 5 */
+        regs[0] = i3;
         regs[1] = mk_const(str_dup("5"), 'I');
         ins = insINS(interpreter, unit, ins, "sub", regs, 2);
     }
@@ -640,7 +653,7 @@ insert_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins, S
 
 static Instruction *
 pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
-        SymReg *arg, int i, int *flatten)
+        SymReg *arg, int i, int *flatten, SymReg **last)
 {
 
     SymReg *regs[IMCC_MAX_REGS];
@@ -723,6 +736,8 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     over1 = mk_address(str_dup(buf), U_add_uniq_label);
     sprintf(buf, "%cover_flow_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
     over = mk_address(str_dup(buf), U_add_uniq_label);
+    sprintf(buf, "%carg_last_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
+    *last = mk_address(str_dup(buf), U_add_uniq_label);
 
     if (arg->type & VT_FLATTEN) {
         regs[0] = i0;
@@ -1036,6 +1051,7 @@ move_cc:
                 proto, sub->pcc_sub->ret, 0);
 }
 
+#if !INDIRECT_REGS
 /*
  * When all 32 regs of one kind are saved, we need to get the return
  * value(s) around the register frame restore
@@ -1065,6 +1081,7 @@ preserve_return_value(Parrot_Interp interpreter, IMC_Unit * unit,
     insert_ins(unit, ins, tmp);
     return tmp;
 }
+
 /*
  * optimize register save op (savetop/restoretop)
  * for PCC
@@ -1196,6 +1213,7 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
             break;
     }
 }
+#endif
 
 /*
  * special peephole optimizer for code generated mainly by

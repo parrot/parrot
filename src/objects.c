@@ -579,12 +579,8 @@ do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
     meth_str = CONST_STRING(interpreter, "__init__");
     meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
     if (meth) {
-        void *data = Parrot_save_register_frames(interpreter, meth);
-        REG_STR(0) = meth_str;
-        REG_PMC(2) = object;
-        /* args are just passed on */
-        Parrot_runops_fromc(interpreter, meth);
-        Parrot_restore_register_frames(interpreter, data);
+        /* this passes arguments according to pdd03 */
+        Parrot_run_meth_fromc(interpreter, meth, object, meth_str);
     }
 }
 
@@ -732,18 +728,8 @@ instantiate_py_object(Interp* interpreter, PMC* class, void* next)
         STRING *meth_str = CONST_STRING(interpreter, "__new__");
         PMC *meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
         if (meth) {
-            void *data = Parrot_save_register_frames(interpreter, meth);
-            REG_STR(0) = meth_str;
-            REG_PMC(2) = class;
-#if 0
-            /* args are just passed on */
-            PIO_eprintf(interpreter, "__new__ class %Ss nargs = %d\n",
-                    VTABLE_name(interpreter, class),
-                    (int)REG_INT(3));
-#endif
-            Parrot_runops_fromc(interpreter, meth);
-            object = REG_PMC(5);
-            Parrot_restore_register_frames(interpreter, data);
+            object = Parrot_run_meth_fromc(interpreter,
+                    meth, class, meth_str);
         }
     }
     if (!object)  {

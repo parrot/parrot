@@ -100,11 +100,14 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
                  ||  pmc->vtable->base_type == enum_class_Sub) {
                 PIO_eprintf(interpreter, "%S=PMC(%#p Adr:%#p)",
                         VTABLE_name(interpreter, pmc), pmc,
-                        PMC_struct_val(pmc));
+                        VTABLE_get_pointer(interpreter, pmc));
             }
             else if (PObj_is_object_TEST(pmc)) {
                 PIO_eprintf(interpreter, "Object(%Ss)=PMC(%#p)",
                         VTABLE_name(interpreter, pmc), pmc);
+            }
+            else if (pmc->vtable->base_type == enum_class_delegate) {
+                PIO_eprintf(interpreter, "delegate=PMC(%#p)", pmc);
             }
             else {
                 PIO_eprintf(interpreter, "%S=PMC(%#p)",

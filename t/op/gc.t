@@ -364,6 +364,8 @@ output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
      #print "Chosen "
      #print x
      #print " from arr1\n"
+     # XXX need this these closures have different state
+     newsub choose, .Closure, _choose
      y = choose(arr2)
      #print "Chosen "
      #print y
@@ -411,7 +413,7 @@ the_end:
      if choices goto have_choices
      $P1 = find_lex "old_fail"
      store_lex "fail", $P1
-     invokecc $P1
+     $P1()
 have_choices:
      newsub $P2, .Closure, new_fail
      store_lex "fail", $P2
@@ -468,17 +470,14 @@ output_is(<<'CODE', <<OUTPUT, "Recursion and exceptions");
   .param int n
   .local int n1
   n1 = n + 1
-  newsub $P0, .Exception_Handler, _catch
+  newsub $P0, .Exception_Handler, catch
   set_eh $P0
   n = self."b11"(n1)
   clear_eh
+catch:
   .pcc_begin_return
   .return n
   .pcc_end_return
-.end
-.sub _catch
-    set P2, P5["_invoke_cc"]
-    invoke P2
 .end
 CODE
 ok 1

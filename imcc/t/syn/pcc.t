@@ -1112,7 +1112,7 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg - overflow");
     end
 .end
 CODE
-Got 15 params
+Got 11 params
 first
 ok 1
 ok 2

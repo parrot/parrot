@@ -925,7 +925,7 @@ Parrot_branch_i {
 
 TEMPLATE Parrot_set_or_clone_s_sc {
 ; string_copy(Interp *interpreter, STRING *s)
-    jit_emit_mov_rr(NATIVECODE, r3, r13);
+    jit_emit_mov_rr(NATIVECODE, r3, r16);
     jit_emit_mov_ri_i(NATIVECODE, r4, CONST(2)->u.string);
 
     jit_emit_call_func(NATIVECODE, (void*) string_copy);
@@ -947,7 +947,7 @@ Parrot_set_s_s {
 }
 
 Parrot_clone_s_s {
-    jit_emit_mov_rr(NATIVECODE, r3, r13);
+    jit_emit_mov_rr(NATIVECODE, r3, r16);
     jit_emit_mov_rm_i(NATIVECODE, r4, &STRING_REG[2]);
 
     jit_emit_call_func(NATIVECODE, (void*) string_copy);

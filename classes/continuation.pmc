@@ -170,7 +170,8 @@ Restores the "context" and calls the superclass's C<invoke()>.
 #endif
         restore_context(interpreter, &cc->ctx);
 #if INDIRECT_REGS
-        copy_regs(interpreter, caller_regs);
+        if (PMC_struct_val(SELF))
+            copy_regs(interpreter, caller_regs);
 #endif
         if (interpreter->code->cur_cs != cc->seg) {
             Parrot_switch_to_cs(interpreter, cc->seg, 1);

@@ -334,7 +334,6 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 
     /* mark caches and freelists */
     mark_object_cache(interpreter);
-    mark_saved_regs(interpreter);
 
     /* Now mark the class hash */
     pobject_lives(interpreter, (PObj *)interpreter->class_hash);

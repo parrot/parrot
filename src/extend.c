@@ -548,7 +548,7 @@ void Parrot_PMC_set_cstringn(Parrot_INTERP interp, Parrot_PMC pmc, const char *v
 
 =item C<void
 Parrot_PMC_set_cstringn_intkey(Parrot_INTERP interp, Parrot_PMC pmc,
-                               Parrot_Int key, 
+                               Parrot_Int key,
                                const char *value, Parrot_Int length)>
 
 Assign the passed-in length-noted string to the passed-in PMC.
@@ -651,7 +651,9 @@ void Parrot_call(Parrot_INTERP interpreter, Parrot_PMC sub,
     va_start(ap, argcount);
 
     /* Will all the arguments fit into registers? */
+    REG_INT(0) = 0;
     if (argcount < 12) {
+        REG_INT(3) = argcount;
         for (inreg = 0; inreg < argcount; inreg++) {
             REG_PMC(inreg + 5) = va_arg(ap, Parrot_PMC);
         }
@@ -659,6 +661,7 @@ void Parrot_call(Parrot_INTERP interpreter, Parrot_PMC sub,
         /* Nope, so we need an overflow array */
         Parrot_PMC overflow;
         Parrot_Int ocount;
+        REG_INT(3) = 11;
         REG_PMC(3) = overflow = Parrot_PMC_new(interpreter,
                                   Parrot_PMC_typenum(interpreter, "Array"));
         Parrot_PMC_set_intval(interpreter, overflow, argcount - 11);

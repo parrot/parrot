@@ -394,6 +394,7 @@ FLOATVAL Parrot_runops_fromc_args_save_retf(Parrot_Interp, PMC *,
 void* Parrot_runops_fromc_arglist_save(Parrot_Interp, PMC *,
         const char *sig, va_list);
 
+void* Parrot_run_meth_fromc(Parrot_Interp, PMC *sub, PMC* obj, STRING *meth);
 void Parrot_run_meth_fromc_save(Parrot_Interp, PMC *sub,
         PMC* obj, STRING *meth);
 void* Parrot_run_meth_fromc_args_save(Parrot_Interp, PMC *sub,
