@@ -5,6 +5,11 @@
 use strict;
 
 my(%opcodes, %labels);
+my ($output, $opt_c);
+if (@ARGV and $ARGV[0] eq "-c") {
+    shift @ARGV;
+    $opt_c = 1;
+}
 
 my %pack_type;
 %pack_type = (i => 'l',
@@ -52,14 +57,16 @@ emit_constants_section();
 
 # Now assemble
 $pc = 0;
+my $line = 0;
 while ($_ = shift @code) {
+    $line++;
     chomp;
     s/,/ /g;
 
     my ($opcode, @args) = split /\s+/, $_;
 
     if (!exists $opcodes{lc $opcode}) {
-	die "No opcode $opcode";
+	die "No opcode $opcode at line $line:\n  <$_>\n";
     }
     if (@args != $opcodes{$opcode}{ARGS}) {
 	die "wrong arg count--got ". scalar @args. " needed " . $opcodes{$opcode}{ARGS};
@@ -78,14 +85,16 @@ while ($_ = shift @code) {
         $args[2] = fixup($args[2]) if $args[2] =~ /[a-zA-Z]/;
     }
 
-    print pack "l", $opcodes{$opcode}{CODE};
+    $output .= pack "l", $opcodes{$opcode}{CODE};
     foreach (0..$#args) {
 	$args[$_] =~ s/^[INPS]?(\d+)$/$1/i;
 	my $type = $pack_type{$opcodes{$opcode}{TYPES}[$_]};
-	print pack $type, $args[$_];
+	$output .= pack $type, $args[$_];
     }
     $pc += 1+@args;
 }
+
+print $output unless (defined $opt_c and $opt_c);
 
 sub fixup {
     my $l = shift;
@@ -100,10 +109,10 @@ sub constantize {
     return $constants{$s} = $#constants;
 }
 
-sub emit_magic { print pack($pack_type{i}, 0x13155a1) }
+sub emit_magic { $output .= pack($pack_type{i}, 0x13155a1) }
 
 # Dummy for now.
-sub emit_fixup_section { print pack($pack_type{i}, 0) }
+sub emit_fixup_section { $output .= pack($pack_type{i}, 0) }
 
 sub emit_constants_section {
     # First, compute how big it's going to be.
@@ -116,17 +125,17 @@ sub emit_constants_section {
     }
 
     $size += $sizeof_packi if @constants; # That's for the number of constants
-    print pack($pack_type{i}, $size);
+    $output .= pack($pack_type{i}, $size);
     return unless @constants; # Zero means end of segment.
 
     # Then spit out how many constants there are, so we can allocate
-    print pack($pack_type{i}, scalar @constants);
+    $output .= pack($pack_type{i}, scalar @constants);
 
     # Now emit each constant
     for (@constants) {
-        print pack($pack_type{i},0) x 3; # Flags, encoding, type
-        print pack($pack_type{i},length($_)); # Strlen followed by that many bytes.
-        print $_;
-        print "\0" x (length($_) % $sizeof_packi); # Padding;
+        $output .= pack($pack_type{i},0) x 3; # Flags, encoding, type
+        $output .= pack($pack_type{i},length($_)); # Strlen followed by that many bytes.
+        $output .= $_;
+        $output .= "\0" x (length($_) % $sizeof_packi); # Padding;
     }
 }
