@@ -343,6 +343,8 @@ c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub");
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
+void Parrot_call(Parrot_Interp interpreter, PMC* sub,
+                 Parrot_Int argcount, ...);
 /* also both the test PASM and main print to stderr
  * so that buffering in PIO isn't and issue
  */
@@ -399,6 +401,8 @@ c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub, catch exception");
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
+void Parrot_call(Parrot_Interp interpreter, PMC* sub,
+                 Parrot_Int argcount, ...);
 /* also both the test PASM and main print to stderr
  * so that buffering in PIO isn't and issue
  */
@@ -406,7 +410,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub, catch exception");
 int main(int argc, char* argv[]) {
     Parrot_Interp interpreter;
     struct PackFile *pf;
-    PMC *key, *sub, *arg;
+    PMC *key, *sub;
     Parrot_exception jb;
 
     interpreter = Parrot_new();
