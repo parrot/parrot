@@ -8,8 +8,11 @@
 #define DEBUG_CFG    0x0010
 #define DEBUG_OPT1   0x0020
 #define DEBUG_OPT2   0x0040
+#define DEBUG_SPILL  0x0080
 
 #define DEBUG_AST    0x0100
+#define DEBUG_REG    0x0200
+#define DEBUG_REG2   0x0400
 
 #define DEBUG_PBC    0x1000
 #define DEBUG_PBC_CONST    0x2000
