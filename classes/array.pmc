@@ -147,9 +147,6 @@ pmclass Array {
     void set_number_index (FLOATVAL value, INTVAL idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
-//	if(idx >= key_size(INTERP,key)) {
-//	    key_set_size(INTERP,key,idx+1);
-//	}
 	key_pair.type = enum_key_num;
 	key_pair.cache.num_val = value;
 	key_set_element_value_i(INTERP,key,idx,&key_pair);
@@ -173,9 +170,6 @@ pmclass Array {
     void set_string_index (STRING * value, INTVAL idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
-//	if(idx >= key_size(INTERP,key)) {
-//	    key_set_size(INTERP,key,idx+1);
-//	}
 	key_pair.type = enum_key_string;
 	key_pair.cache.struct_val = value;
 	key_set_element_value_i(INTERP,key,idx,&key_pair);
