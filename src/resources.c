@@ -24,6 +24,14 @@
 #define UNITS_PER_ALLOC_GROWTH_FACTOR 4
 #define REPLENISH_LEVEL_GROWTH_FACTOR 2
 
+/*  Memory pools (Buffer and string data)
+ *    RECLAMATION_FACTOR is the proportion of the total bytes allocated
+ *      that must be available for reclamation before a compaction run will
+ *      be initiated. This parameter is stored in the per-pool structure,
+ *      and can therefore be modified for each pool if required.
+ */
+#define RECLAMATION_FACTOR 0.20
+
 /* Function prototypes for static functions */
 static void *mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
                           struct Memory_Pool *pool);
@@ -35,7 +43,8 @@ static void *alloc_new_block(struct Parrot_Interp *, size_t,
 static struct Resource_Pool *
 new_resource_pool(struct Parrot_Interp *interpreter, size_t free_pool_size,
                   size_t unit_size, size_t units_per_alloc,
-             void (*replenish)(struct Parrot_Interp *, struct Resource_Pool *))
+             void (*replenish)(struct Parrot_Interp *, struct Resource_Pool *),
+                  struct Memory_Pool *mem_pool)
 {
     struct Resource_Pool *pool;
     size_t temp_len;
@@ -59,6 +68,7 @@ new_resource_pool(struct Parrot_Interp *interpreter, size_t free_pool_size,
     pool->units_per_alloc = units_per_alloc;
     pool->replenish_level =  units_per_alloc / INITIAL_REPLENISH_LEVEL_FACTOR;
     pool->replenish = replenish;
+    pool->mem_pool = mem_pool;
     return pool;
 }
 
@@ -526,8 +536,12 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
             if (!(b->flags & (BUFFER_immune_FLAG | BUFFER_neonate_FLAG | 
                               BUFFER_live_FLAG | BUFFER_on_free_list_FLAG)) &&
                 (!(b->flags & BUFFER_constant_FLAG) || 
-                 (b->flags & BUFFER_COW_FLAG))) {
+                 (b->flags & BUFFER_COW_FLAG))) 
+            {
                 interpreter->active_Buffers--;
+                if (pool->mem_pool) {
+                    pool->mem_pool->reclaimable += b->buflen;
+                }
                 b->flags = BUFFER_on_free_list_FLAG;
                 add_to_free_pool(interpreter, pool, b);
             }
@@ -613,7 +627,8 @@ Parrot_initialize_resource_pools(struct Parrot_Interp *interpreter)
     interpreter->arena_base->buffer_header_pool =
         new_resource_pool(interpreter, 256, sizeof(Buffer),
                           BUFFER_HEADERS_PER_ALLOC,
-                          alloc_more_buffer_headers);
+                          alloc_more_buffer_headers,
+                          interpreter->arena_base->memory_pool);
     /* Re-allocate the temporary buffer header from the new pool */
     old_b = interpreter->arena_base->buffer_header_pool->free_pool_buffer;
     new_b = new_buffer_header(interpreter);
@@ -625,19 +640,22 @@ Parrot_initialize_resource_pools(struct Parrot_Interp *interpreter)
     interpreter->arena_base->string_header_pool = 
         new_resource_pool(interpreter, 256, sizeof(STRING), 
                           STRING_HEADERS_PER_ALLOC,
-                          alloc_more_buffer_headers);
+                          alloc_more_buffer_headers,
+                          interpreter->arena_base->string_pool);
     
     /* Init the PMC header pool */
     interpreter->arena_base->pmc_pool =
         new_resource_pool(interpreter, 256, sizeof(PMC),
                           PMC_HEADERS_PER_ALLOC,
-                          alloc_more_pmc_headers);
+                          alloc_more_pmc_headers,
+                          NULL);
 
     /* Init the constant string header pool */
     interpreter->arena_base->constant_string_header_pool = 
         new_resource_pool(interpreter, 256, sizeof(STRING),
                           STRING_HEADERS_PER_ALLOC,
-                          alloc_more_buffer_headers);
+                          alloc_more_buffer_headers,
+                          interpreter->arena_base->constant_string_pool);
 }
 
 INLINE static UINTVAL
@@ -668,9 +686,11 @@ new_sized_resource_pool(struct Parrot_Interp *interpreter,
     }
 
     if (sized_pools[idx] == NULL)
-        sized_pools[idx] = new_resource_pool(interpreter, 256, unit_size,
-                                             SIZED_HEADERS_PER_ALLOC,
-                                             alloc_more_buffer_headers);
+        sized_pools[idx] = 
+            new_resource_pool(interpreter, 256, unit_size,
+                              SIZED_HEADERS_PER_ALLOC,
+                              alloc_more_buffer_headers,
+                              interpreter->arena_base->memory_pool);
 
     return sized_pools[idx];
     /* FIXME! Sized buffer headers are currently not collected! */
@@ -690,19 +710,6 @@ new_tracked_header(struct Parrot_Interp *interpreter, size_t size)
     buffer->bufstart = NULL;
     buffer->buflen = 0;
     return buffer;
-}
-
-/* Figure out how much memory's been allocated total for buffered
- * things */
-static UINTVAL
-calc_total_size(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
-{
-    UINTVAL size = 0;
-    struct Memory_Block *block;
-    for (block = pool->top_block; NULL != block; block = block->prev) {
-        size += block->size;
-    }
-    return size;
 }
 
 /* Compact the buffer pool */
@@ -729,7 +736,7 @@ compact_buffer_pool(struct Parrot_Interp *interpreter,
 
     /* Find out how much memory we've used so far. We're guaranteed to
      * use no more than this in our collection run */
-    total_size = calc_total_size(interpreter, pool);
+    total_size = pool->total_allocated;
     /* Snag a block big enough for everything */
     new_block = alloc_new_block(interpreter, total_size, NULL);
   
@@ -802,6 +809,8 @@ compact_buffer_pool(struct Parrot_Interp *interpreter,
         pool->top_block = new_block;
         new_block->next = NULL;
         new_block->prev = NULL;
+        pool->total_allocated = total_size;
+        pool->reclaimable = 0;
     }
 }
 
@@ -830,7 +839,7 @@ compact_string_pool(struct Parrot_Interp *interpreter,
 
     /* Find out how much memory we've used so far. We're guaranteed to
        use no more than this in our collection run */
-    total_size = calc_total_size(interpreter, pool);
+    total_size = pool->total_allocated;
     /* Snag a block big enough for everything */
     new_block = alloc_new_block(interpreter, total_size, NULL);
 
@@ -888,6 +897,8 @@ compact_string_pool(struct Parrot_Interp *interpreter,
         pool->top_block = new_block;
         new_block->next = NULL;
         new_block->prev = NULL;
+        pool->total_allocated = total_size;
+        pool->reclaimable = 0;
     }
 }
 
@@ -900,36 +911,45 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
     compact_string_pool(interpreter, interpreter->arena_base->string_pool);
 }
 
+/* Create a new memory pool */
+static struct Memory_Pool *
+new_memory_pool(size_t align, size_t min_block, 
+                void (*compact)(struct Parrot_Interp *, struct Memory_Pool *))
+{
+    struct Memory_Pool *pool;
+
+    pool = mem_sys_allocate(sizeof(struct Memory_Pool));
+    if (pool) {
+        pool->top_block = NULL;
+        pool->compact = compact;
+        pool->minimum_block_size = min_block;
+        pool->align_1 = align - 1;
+        pool->total_allocated = 0;
+        pool->reclaimable = 0;
+        pool->reclaim_factor = RECLAMATION_FACTOR;
+    }
+    return pool;
+}
+
 /* Initialize the managed memory pools */
 void
 Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
 {
     /* Buffers */
     interpreter->arena_base->memory_pool = 
-        mem_sys_allocate(sizeof(struct Memory_Pool));
-    interpreter->arena_base->memory_pool->top_block = NULL;
-    interpreter->arena_base->memory_pool->compact = &compact_buffer_pool;
-    interpreter->arena_base->memory_pool->minimum_block_size = 16384;
-    interpreter->arena_base->memory_pool->align_1 = BUFFER_ALIGNMENT - 1;
+        new_memory_pool(BUFFER_ALIGNMENT, 16384, 
+                        &compact_buffer_pool);
     alloc_new_block(interpreter, 8192, 
                     interpreter->arena_base->memory_pool);
 
     /* Strings */
     interpreter->arena_base->string_pool = 
-        mem_sys_allocate(sizeof(struct Memory_Pool));
-    interpreter->arena_base->string_pool->top_block = NULL;
-    interpreter->arena_base->string_pool->compact = &compact_string_pool;
-    interpreter->arena_base->string_pool->minimum_block_size = 32768;
-    interpreter->arena_base->string_pool->align_1 = STRING_ALIGNMENT - 1;
+        new_memory_pool(STRING_ALIGNMENT, 32768, 
+                        &compact_string_pool);
 
     /* Constant strings - not compacted */
     interpreter->arena_base->constant_string_pool = 
-        mem_sys_allocate(sizeof(struct Memory_Pool));
-    interpreter->arena_base->constant_string_pool->top_block = NULL;
-    interpreter->arena_base->constant_string_pool->compact = NULL;
-    interpreter->arena_base->constant_string_pool->minimum_block_size = 8192;
-    interpreter->arena_base->constant_string_pool->align_1 =
-        CONSTANT_STRING_ALIGNMENT - 1;
+        new_memory_pool(CONSTANT_STRING_ALIGNMENT, 8192, NULL);
 }
 
 /* Allocate a new memory block. We allocate the larger of however much
@@ -974,6 +994,7 @@ alloc_new_block(struct Parrot_Interp *interpreter,
             pool->top_block->next = new_block;
         }
         pool->top_block = new_block;
+        pool->total_allocated += alloc_size;
     }
     return new_block;
 }
@@ -1102,8 +1123,12 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
         interpreter->mem_allocs_since_last_collect++;
     }
     if (pool->top_block->free < size) {
-        if (pool->compact) {
-          (*pool->compact)(interpreter, pool);
+        /* Compact the pool if allowed and worthwhile */
+        if (pool->compact &&
+            (pool->reclaimable > 
+             (size_t)(pool->total_allocated * pool->reclaim_factor))) 
+        {
+              (*pool->compact)(interpreter, pool);
         }
         if (pool->top_block->free < size) {
             alloc_new_block(interpreter, size, pool);

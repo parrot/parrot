@@ -29,6 +29,9 @@ struct Memory_Pool {
     void (*compact)(struct Parrot_Interp *, struct Memory_Pool *);
     size_t minimum_block_size;
     UINTVAL align_1;    /* alignment (must be power of 2) minus one */
+    size_t total_allocated; /* total bytes allocated to this pool */
+    size_t reclaimable;     /* bytes that can be reclaimed (approximate) */
+    FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
 };
 
 PMC *new_pmc_header(struct Parrot_Interp *);
@@ -85,6 +88,7 @@ struct Resource_Pool {
     size_t free_pool_size;  /* total number of slots in the free pool */
     size_t replenish_level; /* minimum free entries before replenishing */
     void (*replenish)(struct Parrot_Interp *, struct Resource_Pool *);
+    struct Memory_Pool *mem_pool;
 };
         
 struct Arenas {
