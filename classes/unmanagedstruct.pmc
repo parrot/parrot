@@ -84,7 +84,10 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
     ix *= 3;
     if (!next)
 	return p;
-    count = (size_t) key_integer(interpreter, next);
+    if (PObj_get_FLAGS(next) & KEY_integer_FLAG)
+        count = key_integer(interpreter, next);
+    else
+        count = 1;
     outer_init = init = PMC_pmc_val(pmc);
     max = (size_t) VTABLE_get_integer_keyed_int(interpreter, init, ix + 1);
     if (*type == enum_type_struct_ptr || *type == enum_type_struct) {

@@ -1,4 +1,4 @@
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -711,6 +711,59 @@ CODE
 33
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested, unaligned, named");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pi", "pi"
+  # this test function returns a struct { char; {char; int} char }
+  set I5, 7
+  invoke
+.include "datatypes.pasm"
+  # the nested structure
+  new P3, .OrderedHash
+  set P3["i"], .DATATYPE_CHAR
+  push P3, 0
+  push P3, 0
+  set P3["j"], .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  new P4, .UnManagedStruct, P3
+  # outer structure
+  new P2, .OrderedHash
+  set P2["x"], .DATATYPE_CHAR
+  push P2, 0
+  push P2, 0
+  set P2["_y"], .DATATYPE_STRUCT
+  # attach the unmanged struct as property
+  set P1, P2[-1]
+  setprop P1, "_struct", P4
+  push P2, 0
+  push P2, 0
+  set P2["z"], .DATATYPE_CHAR
+  push P2, 0
+  push P2, 0
+  # attach struct initializer
+  assign P5, P2
+  set I0, P5["x"]
+  print I0
+  print "\n"
+  # get item _y.i
+  set I0, P5["_y";"i"]
+  print I0
+  print "\n"
+  # _y.j
+  set I0, P5["_y"; "j"]
+  print I0
+  print "\n"
+  set I0, P5["z"]
+  print I0
+  print "\n"
+  end
+CODE
+32
+127
+12345
+33
+OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_ip", "ip"

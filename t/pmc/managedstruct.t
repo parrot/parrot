@@ -207,6 +207,15 @@ output_is(<<'CODE', <<'OUTPUT', "nested struct offsets");
   set I0, P3[5]
   print I0
   print "\n"
+
+  # check struct size
+  set I0, P5
+  print I0
+  print "\n"
+  # nested
+  set I0, P4
+  print I0
+  print "\n"
   end
 CODE
 0
@@ -214,6 +223,8 @@ CODE
 12
 0
 4
+16
+8
 OUTPUT
 
 }

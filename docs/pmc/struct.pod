@@ -90,41 +90,17 @@ struct elements by name and by index:
   set P2["f"], .DATATYPE_FLOAT
   ...
 
-=head1 Calculating the Size of a Structure
+=head1 Size of a Structure
 
 For ManagedStruct (a new structure passed over to a C function) the
-storage for data items has to be allocated. This can be done like
-in the following example:
+storage for data items has to be allocated. This is done
+automatically, when the initializer is attached to the Struct PMC.
 
-=head2 Example
+The size can be obtained by:
 
-  new P5, .ManagedStruct, P2
+  new P5, .ManagedStruct, P2   # P2 be some initializer
 
-  set I6, 0
-  sizeof I7, .DATATYPE_DOUBLE
-  add I6, I7
-  sizeof I7, .DATATYPE_FLOAT
-  add I6, I7
-  sizeof I7, .DATATYPE_INT
-  mul I7, 4
-  add I6, I7
-  sizeof I7, .DATATYPE_CSTR
-  add I6, I7
-
-  set P5, I6	# allocate size
-
-If packing of structure items produces holes, they have to be accounted
-for - but see below.
-
-The calculation can be simplified a bit, by accessing the offset of the
-last item and only adding the size of that. (When an initializer is
-assigned to the struct, zero offsets are recalculated).
-
-So for above example:
-
-  set I6, P2[11]	# offset of 4rd struct element *s
-  sizeof I7, .DATATYPE_CSTR
-  add I6, I7	# I6 is now the total size
+  set I0, P5	# allocated size
 
 =head1 Accessing Structure Items
 
@@ -170,6 +146,100 @@ Passing constant strings like above is safe though.
 
   set P5["s"], S0  # S0 shouldn't move until function call
 
+=head2 Callback Functions in the C Library
+
+Given a C function that returns a structure containing a callback
+function like in this example:
+
+  static struct {
+      int (*f)(char *);
+  } t = {
+       call_back
+  };
+  return &t;
+
+The PASM would look like:
+
+  push P2, .DATATYPE_FUNC_PTR
+  # attach function signature property to this type
+  set P1, P2[-1]
+  new P3, .PerlString
+  set P3, "it"
+  setprop P1, "_signature", P3
+  push P2, 0
+  push P2, 0
+  # P5 is the return UnManagedStruct PMC
+  assign P5, P2
+  # now we get a callable NCI PMC
+  set P0, P5[0]
+  set S5, "hello call_back"
+  # call the call_back function
+  invoke
+
+=head2 Nested Structures or Pointers to Nested Structures
+
+Each contained structure needs its own UnManagedStruct initializer.
+The UnManagedStruct of the contained structures has to be attached to
+the structure type PMC as the property B<"_struct">.
+
+If a C function returns a pointer to this structure:
+
+  static struct xt {
+      char x;
+      struct yt {
+	  char i;
+	  int  j;
+      } _y;
+      char z;
+  } _x;
+
+... access to elements could look like:
+
+  # the nested structure
+  new P3, .OrderedHash
+  set P3["i"], .DATATYPE_CHAR
+  push P3, 0
+  push P3, 0
+  set P3["j"], .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  new P4, .UnManagedStruct, P3
+
+  # outer structure
+  new P2, .OrderedHash
+  set P2["x"], .DATATYPE_CHAR
+  push P2, 0
+  push P2, 0
+  set P2["_y"], .DATATYPE_STRUCT
+
+  # attach the unmanaged struct as property to the type PMC
+  set P1, P2[-1]		# last element
+  setprop P1, "_struct", P4
+  push P2, 0
+  push P2, 0
+  set P2["z"], .DATATYPE_CHAR
+  push P2, 0
+  push P2, 0
+
+  # attach struct initializer to return value in P5
+  assign P5, P2
+
+  # now access values
+  set I0, P5[0]		# x
+  set I0, P5[1;0] 	# _y.i
+  set I0, P5[1;1]       # _y.j
+  set I0, P5[2]		# z
+
+  # or by name
+  set I0, P5["x"]
+  set I0, P5["_y"; "i"]
+  set I0, P5["_y"; "j"]
+  set I0, P5["z"]
+
+If the structure has a pointer to another structure the datatype is:
+
+  push P2, .DATATYPE_STRUCT_PTR
+
 =head1 Passing A Structure to a C function
 
 For a shared library B<libnci.so> (or whatever) and a C function
@@ -192,7 +262,9 @@ a pointer to the structure is passed with the B<p> signature char:
 
 =head1 BUGS
 
-Only a few datatypes are implemented. Alignment is buggy.
+Not all datatypes are implemented. Alignment is barely tested on
+different machines. Arrays of structures aren't handled yet. Passing
+nested structures to C isn't finished.
 
 =head1 FILES
 
@@ -201,7 +273,7 @@ F<classes/unmanagedstruct.pmc>, F<classes/managedstruct.pmc>
 =head1 SEE ALSO
 
 F<docs/pdds/pdd03_calling_conventions.pod>
-F<t/pmc/nci.t>
+F<t/pmc/nci.t>, F<src/nci_test.c>
 
 =head1 AUTHOR
 
