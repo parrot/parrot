@@ -217,6 +217,60 @@ int get_pmc_num(struct Parrot_Interp *interp, char *pmc_type)
 }
 
 /*
+ * Try to find valid op doing the same operation
+ *
+ * e.g. add_n_i_n => add_n_n_i
+ *      div_n_ic_n => div_n_nc_n
+ *      div_n_i_n => set_n_i ; div_n_n_n
+ */
+int
+try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r, int n, int emit)
+{
+    char fullname[64];
+    SymReg *s;
+    int changed = 0;
+    if (n == 3 && regs[0]->set == 'N') {
+        if (r[1]->set == 'I' && r[2]->set == 'N') {
+            if (!strcmp(name, "add") ||
+                    !strcmp(name, "mul")
+               ) {
+                /*
+                 * symmetric ops, swap args */
+                s = r[1];
+                r[1] = r[2];
+                r[2] = s;
+                changed = 1;
+            }
+            else if (r[1]->type & VTCONST) {
+                /* make a number const */
+                s = mk_const(str_dup(r[1]->name), 'N');
+                r[1] = s;
+                changed = 1;
+            }
+            else if (emit) {
+                /* emit set_n_ix */
+                SymReg *rr[IMCC_MAX_REGS];
+                char buf[128];
+                static int temp;
+
+                sprintf(buf, "__imcc_temp_%d", ++temp);
+                rr[0] = mk_symreg(str_dup(buf), 'N');
+                rr[1] = r[1];
+                nargs = 2;
+                INS(interpreter, "set", NULL, rr, 2, 0, 1);
+                nargs = 3;
+                r[1] = rr[0];
+                changed = 1;
+            }
+        }
+    }
+    if (changed) {
+        op_fullname(fullname, name, r, n);
+        return interpreter->op_lib->op_code(fullname, 1);
+    }
+    return -1;
+}
+/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
