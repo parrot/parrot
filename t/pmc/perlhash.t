@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
 
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
@@ -478,6 +478,63 @@ ok 2
 ok 3
 ok 4
 ok 5
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Compound keys");
+    new P0, .PerlHash
+    new P1, .PerlHash
+    new P2, .PerlArray
+    set P1["b"], "ab"
+    set P0["a"], P1
+    set S0, P0["a";"b"]
+    eq S0, "ab", ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    set P2[20], 77
+    set P1["n"], P2
+    set I0, P0["a";"n";20]
+    eq I0, 77, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    set S0, "a"
+    set S1, "n"
+    set I0, 20
+    set I0, P0[S0;S1;I0]
+    eq I0, 77, ok3
+    print "not "
+ok3:
+    print "ok 3\n"
+    set P0["c"], P2
+    set P2[33], P1
+    set S0, P0["c";33;"b"]
+    eq S0, "ab", ok4
+    print "not "
+ok4:
+    print "ok 4\n"
+    set S0, "c"
+    set I1, 33
+    set S2, "b"
+    set S0, P0[S0;I1;S2]
+    eq S0, "ab", ok5
+    print "not "
+ok5:
+    print "ok 5\n"
+    set P1["b"], 47.11
+    set N0, P0["c";I1;S2]
+    eq N0, 47.11, ok6
+    print "not "
+ok6:
+    print "ok 6\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
 OUTPUT
 
 1;
