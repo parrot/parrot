@@ -6,16 +6,17 @@
 # Then compile.
 use strict;
 use Getopt::Std;
-our @basic=();
-use vars qw(%code %options @basic);
 use vars qw( @tokens @tokdsc);
+use vars qw(%code %options @basic);
 use vars qw( @syms @type );
 use vars qw( %labels $runtime_jump $debug  $sourceline);
+use COMP_toker;
+use COMP_parser;
+use COMP_assignments;
+use COMP_expressions;
 
-require "COMP_toker.pm";
-require "COMP_parser.pm";
-require "COMP_assignments.pm";
-require "COMP_expressions.pm";
+our @basic=();
+
 
 $SIG{__DIE__}=sub {
 	print "At BASIC source line $main::sourceline:\n";
@@ -29,7 +30,6 @@ getopts('d', \%options);
 $debug=1 if $options{d};
 
 if (@ARGV) {
-	print "File: $ARGV[0]\n";
 	open(D, $ARGV[0]) || die;
 	@basic=<D>;
 	chomp(@basic);
@@ -84,6 +84,7 @@ INIT
 	}
 	print CODE<<EOD;
 	.sub ${seg}_debug
+		saveall
 		.param int debline
 		find_global \$P0, "DEBUGGER"
 		set \$I0, \$P0["step"]
@@ -100,6 +101,7 @@ INIT
 		.arg debline
 		call _DEBUGGER_STOP_FOR_REAL
 	DEBUGGER_DONE:
+		restoreall
 		ret
 	
 	.end	# End debug segment
@@ -109,6 +111,7 @@ EOD
 if ($debug) {
 	print CODE<<FOO;
 .sub _DEBUG_INIT
+	saveall
 	\$P0=new PerlArray
 	find_global \$P1, "DEBUGGER"
 FOO
@@ -125,6 +128,7 @@ FOO
 	\$P0=new PerlArray
 	set \$P1["watch"], \$P0  # Watch
 	store_global "DEBUGGER", \$P1
+	restoreall
 	ret
 .end
 FOO
