@@ -38,7 +38,7 @@ struct _vtable {
 
 EOF
 
-print OUT vtbl_enum(%vtable);
+print OUT vtbl_defs(%vtable);
 print OUT "\n";
 
 print OUT "\n#endif\n";

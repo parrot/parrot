@@ -1,7 +1,13 @@
 package Parrot::Vtable;
 use Exporter;
 @Parrot::Vtable::ISA = qw(Exporter);
-@Parrot::Vtable::EXPORT = qw(parse_vtable vtbl_enum vtbl_struct);
+@Parrot::Vtable::EXPORT = qw(parse_vtable vtbl_defs vtbl_struct);
+
+my(%type_counts) = (unique => 1,
+		    int => 5,
+		    float =>5,
+		    num =>7,
+		    str => 5);
 
 sub parse_vtable {
     my (%vtbl, @order);
@@ -16,6 +22,7 @@ sub parse_vtable {
         my $tn = shift @line; # Type and name;
         my ($type, $name) = $tn =~ /(.*?)\s+(\w+)/;
         $vtbl{$name}{type} = $type;
+	$vtbl{$name}{meth_type} = $meth_type;
         $vtbl{$name}{proto} = "$type (*$name)(PMC* pmc";
         for (@line) {
             my ($argtype, $argname) = /(.*?)\s+(\w+)/;
@@ -30,12 +37,17 @@ sub parse_vtable {
     return %vtbl;
 }
 
-sub vtbl_enum {
+sub vtbl_defs {
     my %vtbl = @_;
-    my $rv = "enum {\n";
-    $rv .= "\twant_vtbl_$_,\n" for @{$vtbl{order}};
-    substr($rv, -2) = "\n";
-    $rv .= "};\n";
+    my $rv;
+    my $offset = 0;
+
+    # First, typedef all the methods.
+    for (@{$vtbl{order}}) {
+        my $decl = "VTABLE_" . uc($_);
+        $rv .= "#define $decl $offset\n";
+	$offset += $type_counts{$vtbl{$_}{meth_type}};
+    }
     return $rv;
 }
 

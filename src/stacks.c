@@ -10,7 +10,18 @@
  *  References:
  */
 
-struct Stack_Entry *push_generic_entry(
+/* Push something on the generic stack. Return a pointer to the entry */
+struct Stack_Entry *push_generic_entry(struct Perl_Interp *interpreter, void *thing, IV type, void *cleanup) {
+    
+}
+
+/* Pop off an entry and return a pointer to the contents*/
+void *pop_generic_entry(struct Perl_Interp *interpreter, void *where, IV type) {
+}
+
+/* Pop off an entry and throw it out */
+void toss_generic_entry(struct Perl_Interp *interpreter, IV type) {
+}
 
 /*
  * Local variables:
@@ -21,3 +32,4 @@ struct Stack_Entry *push_generic_entry(
  *
  * vim: expandtab shiftwidth=4:
 */
+i

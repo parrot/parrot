@@ -48,6 +48,7 @@ include/parrot/strutf32.h
 include/parrot/strutf8.h
 include/parrot/transcode.h
 include/parrot/unicode.h
+include/parrot/vtable.h
 interpreter.c
 languages/jako/Makefile
 languages/jako/bench.jako
