@@ -219,7 +219,7 @@ The type indicator is also used to disambiguate operators and function calls
 from operands. We can easily remove it for operands, but how to cleanly
 remove this for operators? 
 
-TBD: strings, floats as operaands - (many of the math funcs return floats
+TBD: strings, floats as operands - (many of the math funcs return floats
 but you can't specify them, and not everything takes them 
 (try, for example, [expr sin(1) + sin(1)] vs [expr sin(1) * sin(1)].)
 
