@@ -29,6 +29,7 @@ KEY_ATOM *hash_get(Interp * interpreter, HASH *hash, STRING *key);
 void hash_put(Interp * interpreter, HASH *hash, STRING *key, KEY_ATOM * value);
 void hash_delete(Interp * interpreter, HASH *hash, STRING *key);
 PMC *mark_hash(Interp * interpreter, HASH *hash, PMC * end_of_used_list);
+UINTVAL new_bucket(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value);
 void dump_hash(Interp * interpreter, HASH *hash);
 
 #endif
