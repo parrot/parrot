@@ -23,7 +23,8 @@ typedef enum {
     PARROT_BOUNDS_FLAG   = 0x04,  /* We're tracking byte code bounds */
     PARROT_PROFILE_FLAG  = 0x08,  /* We're gathering profile information */
     PARROT_PREDEREF_FLAG = 0x10,  /* We're using the prederef runops */
-    PARROT_JIT_FLAG      = 0x20   /* We're using the jit runops */
+    PARROT_JIT_FLAG      = 0x20,  /* We're using the jit runops */
+    PARROT_CGOTO_FLAG    = 0x40   /* We're using the computed goto runops */
 } Interp_flags;
 
 #define Interp_flags_SET(interp, flag)   (/*@i1@*/ (interp)->flags |= (flag))

@@ -59,6 +59,7 @@ typedef SYNC     Sync;
 
 #define PARROT_CORE_OPLIB_NAME "core"
 #define PARROT_CORE_OPLIB_INIT Parrot_DynOp_core_${MAJOR}_${MINOR}_${PATCH}
+#define PARROT_CORE_PREDEREF_OPLIB_INIT Parrot_DynOp_core_prederef_${MAJOR}_${MINOR}_${PATCH}
 
 #define INTVAL_FMT "${intvalfmt}"
 #define FLOATVAL_FMT "${floatvalfmt}"

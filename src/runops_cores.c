@@ -30,12 +30,29 @@
 opcode_t *
 runops_fast_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
-#ifdef HAVE_COMPUTED_GOTO
-    pc = cg_core(pc, interpreter);
-#else
     while (pc) {
         DO_OP(pc, interpreter);
     }
+    return pc;
+}
+
+/*=for api interpreter runops_cgoto_core
+ * run parrot operations until the program is complete, using the computed
+ * goto core (if available).
+ *
+ * No bounds checking.
+ * No profiling.
+ * No tracing.
+ */
+
+opcode_t *
+runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+#ifdef HAVE_COMPUTED_GOTO
+    pc = cg_core(pc, interpreter);
+#else
+    fprintf(stderr, "Computed goto unavailable in this configuration.\n");
+    exit(1);
 #endif
     return pc;
 }

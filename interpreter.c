@@ -106,6 +106,9 @@ static op_func_t *prederef_op_func = NULL;
 static void
 init_prederef(struct Parrot_Interp *interpreter)
 {
+#ifndef DYNAMIC_OPLIBS
+    extern op_lib_t * PARROT_CORE_PREDEREF_OPLIB_INIT(void);
+#endif
     char file_name[50];
     char func_name[50];
 
@@ -122,6 +125,7 @@ init_prederef(struct Parrot_Interp *interpreter)
      * Get a handle to the library file:
      */
 
+#ifdef DYNAMIC_OPLIBS
     prederef_oplib_handle = Parrot_dlopen(file_name);
 
     if (!prederef_oplib_handle) {
@@ -135,8 +139,10 @@ init_prederef(struct Parrot_Interp *interpreter)
      */
 
     prederef_oplib_init =
-        (oplib_init_f)(ptrcast_t)Parrot_dlsym(prederef_oplib_handle,
-                                              func_name);
+        (oplib_init_f)(ptrcast_t)Parrot_dlsym(prederef_oplib_handle,func_name);
+#else
+    prederef_oplib_init = PARROT_CORE_PREDEREF_OPLIB_INIT;
+#endif
 
     if (!prederef_oplib_init) {
         internal_exception(PREDEREF_LOAD_ERROR,
@@ -208,7 +214,9 @@ stop_prederef(void)
     prederef_op_info = NULL;
     prederef_op_count = 0;
 
+#ifdef DYNAMIC_OPLIBS
     Parrot_dlclose(prederef_oplib_handle);
+#endif
 
     prederef_oplib = NULL;
     prederef_oplib_init = (oplib_init_f)NULLfunc;
@@ -420,7 +428,12 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
         which |= (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) ? 0x02 : 0x00;
         which |= (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))   ? 0x04 : 0x00;
 
-        core = which ? runops_slow_core : runops_fast_core;
+        if (which)
+            core = runops_slow_core;
+        else if (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG))
+            core = runops_cgoto_core;
+        else
+            core = runops_fast_core;
 
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
             unsigned int i;

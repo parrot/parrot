@@ -20,17 +20,15 @@ Interprets a Parrot bytecode file.
 
   parrot foo.pbc
 
-C<parrot> has two alternate modes of operation: prederef mode
-(C<parrot -P>) and jit mode (C<parrot -j>).
+C<parrot> has four different opcode dispatchers: normal, computed
+goto, prederef, and JIT. The default mode is normal, or computed goto
+if that is supported by your compiler (gcc supports it). You may pass
+the C<-g> flag to C<parrot> to use the normal dispatcher even if you
+have computed goto available. Prederef mode is specified with C<-P>,
+JIT mode with C<-j>.
 
-Jit mode works for any program that doesn't use the stack ops.
-That's because we use fixed address for registers, this problem will
-be solved soon.
-
-Prederef mode should work for all programs.
-
-It previously only worked as a shared library. To revert to that
-state, add C<#define DYNAMIC_OPLIBS> to the top of interpreter.c.
+Prederef mode previously only worked as a shared library. To revert to
+that state, add C<#define DYNAMIC_OPLIBS> to the top of interpreter.c.
 Then, on most Unix platforms:
 
   make clean

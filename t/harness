@@ -11,7 +11,7 @@ use Test::Harness qw(runtests);
 
 use Getopt::Std;
 my %opts;
-getopts('jP', \%opts);
+getopts('gjP', \%opts);
 $ENV{TEST_PROG_ARGS} = join(' ', map { "-$_" } keys %opts );
 
 $ENV{PARROT_QUICKTEST} = grep $_ eq 'quick', @ARGV;

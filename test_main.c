@@ -14,6 +14,7 @@
 #include <stdlib.h>
 
 #define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2);
+#define unsetopt(flag) Parrot_setflag(interpreter, flag, 0)
 
 char *parseflags(Parrot interpreter, int *argc, char **argv[]);
 
@@ -62,6 +63,10 @@ parseflags(Parrot interpreter, int *argc, char **argv[])
     (*argc)--;
     (*argv)++;
 
+#ifdef HAVE_COMPUTED_GOTO
+    setopt(PARROT_CGOTO_FLAG);
+#endif
+
     while ((*argc) && (*argv)[0][0] == '-') {
         switch ((*argv)[0][1]) {
         case 'b':
@@ -75,6 +80,9 @@ parseflags(Parrot interpreter, int *argc, char **argv[])
             break;
         case 'P':
             setopt(PARROT_PREDEREF_FLAG);
+            break;
+        case 'g':
+            unsetopt(PARROT_CGOTO_FLAG);
             break;
         case 't':
             setopt(PARROT_TRACE_FLAG);
@@ -119,6 +127,12 @@ parseflags(Parrot interpreter, int *argc, char **argv[])
 static void
 usage(void)
 {
+#ifdef HAVE_COMPUTED_GOTO
+    char* cgoto_info = "Deactivate computed goto";
+#else
+    char* cgoto_info = "(already disabled) Deactivate computed goto";
+#endif
+
     fprintf(stderr,
 "Usage: parrot [switches] [--] programfile [arguments]\n\
   -b    Activate bounds checks\n\
@@ -127,9 +141,11 @@ usage(void)
   -j    Activate Just-In-Time compiler\n\
   -p    Activate profiling\n\
   -P    Activate predereferencing\n\
+  -g    %s\n\
   -t    Activate tracing\n\
   -v    Display version information\n\
-  -.    Wait for a keypress (gives Windows users time to attach a debugger)\n\n"
+  -.    Wait for a keypress (gives Windows users time to attach a debugger)\n\n",
+            cgoto_info
     );
 
     exit(0);
