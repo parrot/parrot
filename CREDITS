@@ -111,7 +111,7 @@ N: Jens Rieks
 D: dumper and sort library
 
 N: Jerome Quelin
-D: befunge interpreter, ook compiler.
+D: parrotbug, befunge interpreter, ook compiler.
 E: jquelin@cpan.org
 S: Lyon, France
 

@@ -15,7 +15,7 @@ use File::Spec;
 use Getopt::Long;
 
 
-my $VERSION = "0.6.0";
+my $VERSION = "0.6.1";
 
 # These are the standard addresses for reporting bugs.
 my %std_to = 
@@ -722,7 +722,7 @@ It is designed to be used interactively. Normally no arguments will
 be needed.
 
 
-=head1 Command-line switches
+=head1 COMMAND-LINE SWITCHES
 
 
 =head2 Options
@@ -731,54 +731,54 @@ Note: you will be prompted if the program miss some information.
 
 =over 4
 
-=item C<--nok>
+=item B<--nok>
 
 Report unsuccessful build on this system to parrot developpers.
 
-=item C<--ok>
+=item B<--ok>
 
 Report successful build on this system to parrot developpers Only use
-C<-ok> if B<everything> was ok; if there were B<any> problems at all,
+C<--ok> if B<everything> was ok; if there were B<any> problems at all,
 use C<--nok>.
 
-=item C<--subject>
+=item B<--subject>
 
 Subject of the report. You will be prompted if you don't supply one on
 the command-line.
 
-=item C<--category>
+=item B<--category>
 
 Category of the bug report. You will be prompted if you don't supply
 one on the command-line.
 
-=item C<--severity>
+=item B<--severity>
 
 Severity of the bug report. You will be prompted if you don't supply
 one on the command-line.
 
-=item C<--address>
+=item B<--address>
 
 Your email address. The program will try to guess one if you don't
 provide one, but you'll still need to validate it.
 
-=item C<--editor>
+=item B<--editor>
 
 Editor to use for editing the bug report.
 
-=item  C<--ack>, C<--noack>
+=item B<--ack>, B<--noack>
 
 Don't send a bug received acknowledgement.
 
-=item C<--input-file>
+=item B<--input-file>
 
 File containing the body of the report. Use this to quickly send a
 prepared message.
 
-=item C<--output-file>
+=item B<--output-file>
 
 File where parrotbug will save its bug report, if you ask it to do so.
 
-=item C<--to>
+=item B<--to>
 
 Email adress to send report to. (for testing purposes only)
 
@@ -792,33 +792,38 @@ supplied, then you will be prompted for what to do.
 
 =over 4
 
-=item C<--dump>
+=item B<--dump>
 
 Dump formatted report on standard output.
 
-=item C<--save>
+=item B<--save>
 
 Save message to a file, in order for you to send it later from your
 own. See C<--output> flag.
 
-=item C<--send>
+=item B<--send>
 
 Try to send a mail with the report.
 
-=item C<--help>
+=item B<--help>
 
 Print a short synopsis and exit.
 
-=item C<--version>
+=item B<--version>
 
 Print version information and exit.
 
 =back
 
 
-=head1 HISTORY
+=head1 AUTHORS
 
-This utility borrows heavily from perlbug.
+Jerome Quelin (E<lt>jquelin@cpan.orgE<gt>), with lots of good stuff taken from perlbug.
+
+
+=head1 SEE ALSO
+
+perlbug(1), parrot(1), diff(1), patch(1)
 
 =cut
 
