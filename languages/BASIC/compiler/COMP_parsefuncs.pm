@@ -1238,8 +1238,7 @@ EOH
 		} else {
 			s/\(\)//g;
 			$_=changename($_);
-			$_=~s/\$/_string/g;
-			#print "Marking ${_}${seg}\n";
+			#print STDERR "Marking ${_}${seg}\n";
 			$arrays{"${_}${seg}"}=1;
 			push @{$code{$seg}->{code}},<<PUSHARR;
 	.param PerlHash array_$englishname

@@ -84,7 +84,7 @@ sub isuserfunc {
 	return 0
 }
 sub isarray {
-	#print "Looking up $_[0]$seg...";
+	#print STDERR "Looking up $_[0]$seg...\n";
 	$_ =(grep /^\Q$_[0]$seg\E$/i, keys %arrays );
 	#print "$_\n";
 	return $_;

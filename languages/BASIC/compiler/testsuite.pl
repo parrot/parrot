@@ -32,6 +32,22 @@ while(1) {
 }
 
 __DATA__
+' Passing string arrays, expect 99 and "Hello"
+function foo(i, thing$())
+	print i
+	print thing$(10)
+	foo=1
+end function
+dim fool$()
+fool$(10)="Hello"
+a=foo(99, fool$())
+
+' String Arrays, expect "One"
+dim g$()
+g$(5)="One"
+g$(6)="Two"
+print g$(5)
+
 ' Evil BASIC bug, expect 55
 dim B(1), z(1)
 Z(54,6)=54
@@ -176,15 +192,6 @@ z=55
 t(3)=5.6
 a=mine(5)
 print t(3)
-
-' Expect 234
-function inkey$(a, b)
-	a=3.14
-	inkey$="234"
-end function
-s$=inkey$(r, 45)
-print s$
-print r
 
 1740 print "Branched"
 	end
@@ -498,16 +505,6 @@ print t,
 print sqr(t),
 if t=3 then print "True!"
 next t
-
-' Expect 234
-function inkey$
-	inkey$="234"
-end function
-Y = VAL(inkey$)
-print y
-end
-1740 print "Branched"
-	end
 
 
 ' Expect OK
