@@ -27,6 +27,7 @@
 		# The logo gets printed to STDERR; hence the redirection.
 		my $cc_output = `$cc 2>&1`;
 		$ccflags =~ s/-O1 // if $cc_output =~ m/Standard/;
+                $ccflags =~ s/-Gf/-GF/ if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
 		
 
 		Configure::Data->set(
