@@ -260,6 +260,7 @@ languages/scheme/t/harness
 languages/scheme/t/io/basic.t
 languages/scheme/t/logic/basic.t
 lib/Parrot/Assembler.pm
+lib/Parrot/Assembler/Utils.pm
 lib/Parrot/BuildUtil.pm
 lib/Parrot/Jit/alpha-bsd.pm
 lib/Parrot/Jit/alpha-linux.pm
@@ -270,6 +271,7 @@ lib/Parrot/Jit/i386-nojit.pm
 lib/Parrot/Jit/i386Generic.pm
 lib/Parrot/Jit/sun4-solaris.pm
 lib/Parrot/Jit/sun4Generic.pm
+lib/Parrot/Makefile.PL
 lib/Parrot/Op.pm
 lib/Parrot/OpTrans.pm
 lib/Parrot/OpTrans/C.pm
@@ -282,6 +284,8 @@ lib/Parrot/PackFile.pm
 lib/Parrot/PackFile/ConstTable.pm
 lib/Parrot/PackFile/Constant.pm
 lib/Parrot/PackFile/FixupTable.pm
+lib/Parrot/Packfile.pm
+lib/Parrot/Packfile.xs
 lib/Parrot/String.pm
 lib/Parrot/Test.pm
 lib/Parrot/Vtable.pm
@@ -294,6 +298,7 @@ make_vtable_ops.pl
 manicheck.pl
 memory.c
 misc.c
+newasm
 obscure.ops
 ops2c.pl
 ops2cgc.pl

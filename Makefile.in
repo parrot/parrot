@@ -89,7 +89,8 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 				 packfile$(O) stacks$(O) string$(O) encoding$(O) \
 				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) \
 				 platform$(O) ${jit_o} resources$(O) rx$(O) rxstacks$(O) \
-				 embed$(O) warnings$(O) misc$(O) ${cg_o}
+				 embed$(O) warnings$(O) misc$(O) ${cg_o} \
+				 packout$(O)
 
 O_FILES = $(INTERP_O_FILES) \
 	      $(IO_O_FILES) \
@@ -379,6 +380,11 @@ $(INC)/jit_struct.h : jit2h.pl lib/Parrot/OpLib/core.pm lib/Parrot/Jit.pm jit/${
 	$(PERL) jit2h.pl ${jitcpuarch} > $(INC)/jit_struct.h
 
 docs : docs/.dummy
+
+newasm : $(TEST_PROG) lib/Parrot/.dummy
+
+lib/Parrot/.dummy :
+	cd lib/Parrot && $(PERL) Makefile.PL && $(MAKE) && cd ..
 
 docs/.dummy :
 	cd docs && $(MAKE) && cd ..

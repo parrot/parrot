@@ -1,0 +1,194 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib './lib';
+use lib './lib/Parrot/blib/lib';
+use lib './lib/Parrot/blib/arch/auto/Parrot/Packfile';
+use Parrot::Packfile;
+use Parrot::Assembler::Utils;
+use strict;
+use Parrot::OpLib::core;
+use Parrot::Types;
+
+my %ops;
+my %fullops;
+for (@$Parrot::OpLib::core::ops) {
+    my $argtype = join "_", @{$_->{ARGS}}[1..$#{$_->{ARGS}}];
+    ${$ops{$_->{NAME}}}{$argtype} = $_->{CODE};
+    $fullops{$_->{NAME}.($argtype &&"_$argtype") } = $_->{CODE};
+}
+
+# The first pass over the code detaches keys and saves labels
+my @asm;
+my $pc = 0;
+while (<>) {
+    next if /^\s*#/;
+    chomp;
+    $_ = detach_key($_);
+    s/,\s*$//; # In case of comments, trailing commas, etc.
+    push @asm, $_;
+    define_labels($_);
+}
+
+# Reset variables
+$pc = 0;
+my $lineno = 0;
+my $bc;
+
+# The second pass expands labels and ops, removes constants and emits
+# bytecode
+for (@asm) {
+    $lineno++;
+    $_ = replace_labels($_);
+    $_ = expand_op($_);
+    $bc .= emit($_);
+}
+my %labels;
+my %const_table;
+my @const_table;
+my $packfile = {
+    bytecode => $bc,
+    constants => \@const_table
+};
+
+print Parrot::Packfile::output_bytecode($packfile);
+
+exit;
+
+#------------------------------------------------------------------------------
+
+sub detach_key {
+    local $_ = shift;
+    my $output = "";
+    s/^(\s*\w+:)// and $output .= $1; # label
+    s/^(\s*)// and $output .= $1;
+    return $output unless $_;
+    s/(\w+\s*)// and $output .= $1;   # Op
+
+    # Run through the args looking for keys
+    my @args;
+    Parrot::Assembler::Utils::map_args {
+        my ($arg_t, $arg, $extra) = @_;
+        push @args, $arg;
+        if ($arg_t eq "key") {
+            $extra =~ s/\[/[k:/;
+            push @args, $extra;
+        }
+    } $_;
+    return $output." ".join ", ",@args;
+}
+
+sub define_labels {
+    local $_ = shift;
+
+    # If we find a label, store its PC
+    if (s/^(\s*(\w+):)//) {
+        die "Redefined label $2 at line $.\n" if exists $labels{$2};
+        $labels{$2} = $pc;
+    }
+
+    s/^(\s*)//;
+    return unless $_;
+
+    # Count the op
+ 
+    s/(\w+\s*)//;
+    $pc++;
+
+    # Now count the number of args
+    Parrot::Assembler::Utils::map_args {
+        $pc++;
+    } $_;
+}
+
+sub replace_labels {
+    local $_ = shift;
+    my $output;
+
+    s/^(\s*(\w+):)//;
+    s/^(\s*)// and $output .= $1;
+    return unless $_;
+
+    # Count the op
+    s/(\w+\s*)// and $output .= $1;
+    my $ops_pc = $pc;
+    $pc++;
+
+    my @args;
+    Parrot::Assembler::Utils::map_args {
+        my ($arg_t, $arg, $extra) = @_;
+        $pc++;
+        if ($arg_t eq "label") {
+            if (defined $labels{$arg}) {
+                push @args, $labels{$arg} - $ops_pc;
+            } else {
+                die "Undefined label $arg used at line $lineno\n";
+            }
+        } else {
+            push @args, $arg;
+        }
+    } $_;
+    return $output." ".join ", ",@args;
+}
+
+sub expand_op {
+    local $_ = shift;
+    s/^\s*//;
+    return unless $_;
+
+    s/(\w+)\s*//;
+    die "Don't know op $1" unless $ops{$1};
+    my $op = $1;
+
+    # Now let's look at the arguments
+    my @args;
+    my @arg_t;
+    Parrot::Assembler::Utils::map_args {
+        push @arg_t, $_[0];
+        push @args, $_[1];
+    } $_;
+    my $type_specifier = join "_", @arg_t;
+    my $complete = $op;
+    $complete .="_$type_specifier" if $type_specifier;
+    warn "Can't find op $complete at line $lineno\n" 
+        unless exists $ops{$op}{$type_specifier};
+    return $complete." ".join ",",@args;
+}
+
+sub emit {
+    local $_ = shift;
+    my $rv;
+    s/^\s*//;
+    return unless $_;
+
+    s/(\w+)\s*//;
+    die "Can't find op $1\n" unless exists $fullops{$1};
+    $rv .= pack_op($fullops{$1}); 
+    Parrot::Assembler::Utils::map_args {
+        my ($arg_t, $arg) = @_;
+        if ($arg_t =~ /^[ispn]$/) {
+            $arg =~ /(\d+)/;
+            $rv .= pack_op($1);
+        } elsif ($arg_t =~ /^([spn])c$/) {
+            my $type = $1;
+            if ($type eq "s") {
+                $arg = eval $arg;
+            }
+            $rv .= pack_op(constantize($arg, $type));
+        } elsif ($arg_t eq "ic") {
+            $rv .= pack_op($arg);
+        } elsif ($arg_t eq "r") {
+            my %r_types = ("I" => 0, "N"=>1, "S"=>2, "P"=>3);
+            $arg=~/([PSNI])(\d+)/i;
+            $rv .= pack_op($r_types{uc $1} >> 6 + $2);
+        }
+    } $_;
+    return $rv;
+}
+
+sub constantize {
+    my ($arg, $type) = @_;
+    return $const_table{$type}{$arg} if exists $const_table{$type}{$arg};
+    push @const_table, [uc $type, $arg];
+    return $const_table{$type}{$arg} = $#const_table;
+}
