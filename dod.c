@@ -474,7 +474,7 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
 #else
             if (PObj_on_free_list_TEST(b))
                 ; /* if its on free list, do nothing */
-            else if (PObj_is_live_TEST(b))
+            else if (PObj_live_TEST(b))
 #endif
             {
                 /* its live */
