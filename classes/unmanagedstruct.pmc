@@ -169,14 +169,30 @@ ret_string(Parrot_Interp interpreter, char *p, int type)
 }
 
 static PMC*
-ret_pmc(Parrot_Interp interpreter, char *p, int type)
+ret_pmc(Parrot_Interp interpreter, PMC* pmc, char *p, int type, INTVAL idx)
 {
     char *cstr;
     size_t len;
+    PMC *ret, *init, *ptr;
 
     switch (type) {
 	case enum_type_func_ptr:
-	    return *(PMC**) p;
+	    /* this is a raw function pointer - not a PMC */
+	    ret = *(PMC**) p;
+	    /* now check if initializer has a signature attached */
+	    init = PMC_pmc_val(pmc);
+	    ptr = VTABLE_get_pmc_keyed_int(interpreter, init, idx*3);
+	    if (ptr->pmc_ext && ptr->metadata) {
+		PMC *sig = VTABLE_getprop(interpreter, ptr,
+			string_from_cstring(interpreter, "_signature", 0));
+		if (VTABLE_defined(interpreter, sig)) {
+		    STRING *sig_str = VTABLE_get_string(interpreter, sig);
+		    ret = pmc_new(interpreter, enum_class_NCI);
+		    VTABLE_set_string_keyed(interpreter, ret,
+			    *(PMC**)p, sig_str);
+		}
+	    }
+	    return ret;
 	default:
 	    internal_exception(1, "returning unhandled pmc type in struct");
     }
@@ -424,13 +440,14 @@ pmclass UnManagedStruct extends default need_ext {
     PMC* get_pmc_keyed_int (INTVAL key) {
 	int type;
 	char *p = char_offset_int(interpreter, pmc, key, &type);
-	return ret_pmc(interpreter, p, type);
+	return ret_pmc(interpreter, pmc, p, type, key);
     }
 
     PMC* get_pmc_keyed (PMC* key) {
 	int type;
 	char *p = char_offset_key(interpreter, pmc, key, &type);
-	return ret_pmc(interpreter, p, type);
+	return ret_pmc(interpreter, pmc, p, type,
+			key_2_idx(interpreter, pmc, key));
     }
 
     INTVAL get_integer() {

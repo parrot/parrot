@@ -1,4 +1,4 @@
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 23;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -560,10 +560,39 @@ output_is(<<'CODE', <<'OUTPUT', "nci_p_i - func_ptr*");
   # P1 isnt a real PMC, its only suited for passing on to
   # the NCI PMC as a Key
   set P1, P5[0]
-  # TODO handled that inside the struct PMC
-  # e.g. attach a function signature property to the initializer
+  # if no signatur was given, do it manually
+  # s. below for another method
   new P0, .NCI
   set P0[P1], "it"
+  set S5, "hello call_back"
+  invoke
+  print I5
+  print "\n"
+  end
+CODE
+hello call_back
+4711
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_p_i - func_ptr* with signature");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pi", "pi"
+  # this test function returns a struct { int (*f)(char *) }
+  set I5, 5
+  invoke
+  new P2, .PerlArray
+.include "datatypes.pasm"
+  push P2, .DATATYPE_FUNC_PTR
+  # attach function signature property to this type
+  set P1, P2[-1]
+  new P3, .PerlString
+  set P3, "it"
+  setprop P1, "_signature", P3
+  push P2, 0
+  push P2, 0
+  assign P5, P2
+  # now we get a callable NCI PMC
+  set P0, P5[0]
   set S5, "hello call_back"
   invoke
   print I5
