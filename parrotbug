@@ -15,7 +15,7 @@ use File::Spec;
 use Getopt::Long;
 
 
-my $VERSION = "0.3.1";
+my $VERSION = "0.4.0";
 
 # These are the standard addresses for reporting bugs.
 my %std_to = 
@@ -41,6 +41,7 @@ version() if $opts{version};
 explain_parrotbug() unless $opts{quiet};
 query_missing_info();
 what_next();
+unlink $tmpfile;
 exit;
 
 
@@ -463,7 +464,10 @@ EOF
 
 
 # Display everything collected.
-sub dump_message { print format_message(); }
+sub dump_message { 
+    print "==> Dumping message...\n";
+    print format_message();
+}
 
 
 # Format the message with everything collected and return it.
@@ -553,8 +557,26 @@ EOF
 }
 
 
+# Save message to file.
+sub save_message {
+    print "\n==> Saving message to file...\n";
+    if ( ! $opts{output} ) {
+        print "Enter filename to save bug report: ";
+        $opts{output} = <STDIN>;
+    }
+
+    open OUTPUT, ">$opts{output}" or die "Cannot open '$opts{output}': $!";
+    print OUTPUT format_message();
+    close OUTPUT or die "Cannot open '$opts{output}': $!";
+
+    print "Message saved.\n";
+}
+
+
 # Send message to final recipient.
 sub send_message {
+    print "==> Sending message to recipiend...\n";
+
     # On linux certain mail implementations won't accept the subject
     # as "~s subject" and thus the Subject header will be corrupted
     # so don't use Mail::Send to be safe
@@ -582,9 +604,9 @@ equivalent, and the perl package Mail::Send has not been installed, so
 I can't send your bug report. We apologize for the inconvenience.
 
 So you may attempt to find some way of sending your message, it has
-been left in the file 'tmpfile'.
+been left in the file '$tmpfile'.
 EOF
-# '
+
 	open(SENDMAIL, "|$sendmail -t -oi") || die "'|$sendmail -t -oi' failed: $!";
 
 	print SENDMAIL <<EOT;
