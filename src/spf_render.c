@@ -145,7 +145,7 @@ handle_flags(struct Parrot_Interp *interpreter,
             /* signed and zero padded */
             if (info->flags & FLAG_ZERO
                 && (string_ord(str,0) == '-' || string_ord(str,0) == '+')) {
-                STRING *temp;
+                STRING *temp = 0;
                 string_substr(interpreter, str, 1, len-1, &temp);
                 string_chopn(str, -1);
                 string_append(interpreter, str, fill, 0);

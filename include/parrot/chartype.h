@@ -16,8 +16,8 @@
 typedef Parrot_UInt (*Parrot_CharType_Transcoder)(Parrot_UInt c);
 
 enum {
-    enum_chartype_unicode,
     enum_chartype_usascii,
+    enum_chartype_unicode,
     enum_chartype_MAX
 };
 
@@ -45,7 +45,7 @@ const Parrot_CharType Parrot_chartype_lookup(const char *name);
 
 #define chartype_lookup Parrot_chartype_lookup
 
-CHARTYPE_TRANSCODER chartype_lookup_transcoder(const CHARTYPE *from, 
+CHARTYPE_TRANSCODER chartype_lookup_transcoder(const CHARTYPE *from,
                                                const CHARTYPE *to);
 
 #endif

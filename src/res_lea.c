@@ -54,12 +54,13 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
         /* COWable objects (i.e. strings) use an int at bufstart
          * for refcounting in DOD */
         size = ((size + pad + sizeof(int)) & ~pad);
-        p = realloc((char *)str->bufstart - sizeof(int), size);
-        str->strstart = str->bufstart = (char *)p + sizeof(int);
+        p = realloc((char *)str->bufstart, size);
+        str->strstart = (char *)p + sizeof(int);
+        str->bufstart = p;
         /* usable size at bufstart */
         str->buflen = size - sizeof(int);
     }
-    return str->bufstart;
+    return str->strstart;
 }
 
 void *
@@ -75,7 +76,8 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
         size = ((size + pad + sizeof(int)) & ~pad);
         p = calloc(1, size);
         *(int*)p = 0;
-        str->strstart = str->bufstart = (char *)p + sizeof(int);
+        str->strstart = (char *)p + sizeof(int);
+        str->bufstart = p;
         str->buflen = size - sizeof(int);
     }
     return str;

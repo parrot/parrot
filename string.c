@@ -7,6 +7,15 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
+ *
+ *  ********************************************************
+ *  bufstart and buflen are used by the memory subsystem
+ *  The string functions may only use buflen to determine,
+ *  if there is some space left beyond bufused. This is the
+ *  *only* valid usage of these two data members, beside
+ *  setting bufstart/buflen for external strings.
+ *  ********************************************************
+ *
  *  References:
  */
 
@@ -49,7 +58,7 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
          * independant of the original COW data */
         s->flags &= ~BUFFER_constant_FLAG;
         Parrot_allocate_string(interpreter, s, size);
-        mem_sys_memcopy(s->bufstart, p, size);
+        mem_sys_memcopy(s->strstart, p, size);
         s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_external_FLAG |
                 BUFFER_bufstart_external_FLAG);
         if (interpreter) {
@@ -95,7 +104,8 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
 }
 
 static void
-make_COW_reference_from_header(struct Parrot_Interp *interpreter, STRING *s, STRING *d) {
+make_COW_reference_from_header(struct Parrot_Interp *interpreter,
+        STRING *s, STRING *d) {
     if (s->flags & BUFFER_constant_FLAG) {
         s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
         copy_string_header(interpreter, d, s);
@@ -107,6 +117,28 @@ make_COW_reference_from_header(struct Parrot_Interp *interpreter, STRING *s, STR
     }
 }
 
+/*for api string string_set
+ * set the contents of dest to the contents of src
+ */
+STRING *
+string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
+{
+    if (dest && dest != src) {
+        /* they are different, dest is not an external string */
+#ifdef GC_IS_MALLOC
+        if (!(dest->flags &
+                    (BUFFER_external_FLAG |
+                     BUFFER_bufstart_external_FLAG |
+                     BUFFER_COW_FLAG)) && dest->bufstart) {
+            mem_sys_free(dest->bufstart);
+        }
+#endif
+        make_COW_reference_from_header(interpreter, src, dest);
+    }
+    else
+        dest = make_COW_reference(interpreter, src);
+    return dest;
+}
 
 
 /* Basic string stuff - creation, enlargement, etc. */
@@ -602,9 +634,9 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
     }
 
     /* do in-place i.e. make a COW string */
-    dest = make_COW_reference(interpreter,  src);
+    dest = string_set(interpreter, *d, src);
     if (src->encoding->index == enum_encoding_singlebyte) {
-        dest->strstart = (char *)dest->bufstart + true_offset;
+        dest->strstart = (char *)dest->strstart + true_offset;
         dest->bufused = true_length;
     }
     else {

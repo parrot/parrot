@@ -43,6 +43,7 @@ STRING *string_make(struct Parrot_Interp *, const void *buffer,
                     UINTVAL buflen, const ENCODING *, UINTVAL flags,
                     const CHARTYPE *);
 STRING *string_copy(struct Parrot_Interp *, STRING *);
+STRING *string_set(struct Parrot_Interp *, STRING *d, STRING *s);
 STRING *string_transcode(struct Parrot_Interp *, STRING *src,
                          const ENCODING *, const CHARTYPE *,
                          STRING **dest_ptr);

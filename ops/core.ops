@@ -213,7 +213,7 @@ character set.
 inline op chr (out STR, in INT) {
   STRING *s;
   s = string_make(interpreter, &$1, (UINTVAL)1, NULL, 0, NULL);
-  *(char *)s->bufstart = $2;
+  *(char *)s->strstart = $2;
   s->strlen = 1;
   $1 = s;
   goto NEXT();

@@ -337,22 +337,23 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
-            if (cleanup) {
-                /* clear COWed external FLAG */
-                b->flags &= ~(UINTVAL)BUFFER_external_FLAG;
-                /* the real external flag */
-                if (b->flags & BUFFER_bufstart_external_FLAG)
-                    b->flags |= BUFFER_external_FLAG;
-                /* if cleanup, i.e. Parrot_destroy, constants are dead too */
-                b->flags &=
+            if (!(b->flags & BUFFER_on_free_list_FLAG)) {
+                if (cleanup) {
+                    /* clear COWed external FLAG */
+                    b->flags &= ~(UINTVAL)BUFFER_external_FLAG;
+                    /* the real external flag */
+                    if (b->flags & BUFFER_bufstart_external_FLAG)
+                        b->flags |= BUFFER_external_FLAG;
+                    /* if cleanup (Parrot_destroy) constants are dead too */
+                    b->flags &=
                         ~(UINTVAL)(BUFFER_constant_FLAG | BUFFER_live_FLAG);
-            }
+                }
 
-            if ((b->flags & BUFFER_strstart_FLAG) && b->bufstart &&
-                    !(b->flags & (BUFFER_external_FLAG
-                                    | BUFFER_on_free_list_FLAG))) {
-                refcount = &((int *)b->bufstart)[-1];
-                *refcount = 0;
+                if ((b->flags & BUFFER_strstart_FLAG) && b->bufstart &&
+                        !(b->flags & BUFFER_external_FLAG)) {
+                    refcount = ((int *)b->bufstart);
+                    *refcount = 0;
+                }
             }
             b = (Buffer *)((char *)b + object_size);
         }
@@ -374,10 +375,11 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
-            if (b->bufstart && (b->flags & BUFFER_strstart_FLAG) &&
-                    !(b->flags & (BUFFER_external_FLAG
-                                    | BUFFER_on_free_list_FLAG))) {
-                refcount = &((int *)b->bufstart)[-1];
+            if (!(b->flags & BUFFER_on_free_list_FLAG) &&
+                    (b->flags & BUFFER_strstart_FLAG) &&
+                    b->bufstart &&
+                    !(b->flags & (BUFFER_external_FLAG))) {
+                refcount = ((int *)b->bufstart);
                 /* mark users of this bufstart by incrementing refcount */
                 if (b->flags & BUFFER_live_FLAG)
                     *refcount = 1 << 29;        /* ~infinite usage */
@@ -403,7 +405,6 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
 
 #ifdef GC_IS_MALLOC
     if (!cleanup) {
-        clear_cow(interpreter, pool, 0);
         used_cow(interpreter, pool, 0);
     }
 #endif /* GC_IS_MALLOC */
@@ -447,6 +448,11 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
             b = (Buffer *)((char *)b + object_size);
         }
     }
+#ifdef GC_IS_MALLOC
+    if (!cleanup) {
+        clear_cow(interpreter, pool, 0);
+    }
+#endif /* GC_IS_MALLOC */
     interpreter->active_Buffers += total_used;
     pool->num_free_objects = pool->total_objects - total_used;
 }

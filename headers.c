@@ -94,7 +94,7 @@ add_free_buffer(struct Parrot_Interp *interpreter,
                 (BUFFER_external_FLAG | BUFFER_on_free_list_FLAG)))
     {
         if (buffer->flags & BUFFER_strstart_FLAG) {
-            int *refcount = &((int *)buffer->bufstart)[-1];
+            int *refcount = ((int *)buffer->bufstart);
 
             if (!--(*refcount))
                 free(refcount); /* the actual bufstart */
