@@ -23,6 +23,8 @@ GetOptions("action=s"     => \$action,
 if ($action) {
     &{$action}();
 } else {
+    (-d "miniparrot") || mkdir("miniparrot");
+    
     print "** $0: reconfiguring parrot for miniparrot build\n";
     run_command("perl Configure.pl --miniparrot");
     
