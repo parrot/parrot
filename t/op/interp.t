@@ -299,7 +299,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "thread type 2");
-    set I5, 1
+    set I5, 10
     set S5, " interp\n"
     new P7, .PerlString
     set P7, "from "
@@ -311,6 +311,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 2");
     find_global P6, "_foo"
     print "ok 2\n"
     new P5, .ParrotThread
+    set I3, 3
     find_method P0, P5, "thread2"
     invoke	# start the thread
 
@@ -348,10 +349,10 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 2");
 CODE
 ok 1
 ok 2
-hello from 2 thread
+hello from 1 thread
 ParrotThread tid 1
 Sub
-from 1 interp
+from 10 interp
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "thread - kill");
@@ -363,6 +364,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread - kill");
     print I10
     print "\n"
     find_method P0, P5, "thread3"
+    set I3, 2
     invoke	# start the thread
     sleep 1
 

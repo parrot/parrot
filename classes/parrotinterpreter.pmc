@@ -21,11 +21,11 @@
 #include <assert.h>
 
 /*
- * copy / clone interpreter registers
+ * copy / clone all interpreter registers
  * all resources are created in the destination interpreter
  */
 static void
-clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
+clone_regs_interp(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 {
     int i;
     mem_sys_memcopy(d->int_reg.registers,
@@ -37,7 +37,7 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 	    d->string_reg.registers[i] =
 		string_copy(d, s->string_reg.registers[i]);
 	/*
-	 * clone PMCS - ignore the shared case for now
+	 * clone PMCS and strings
 	 */
 	if (!PMC_IS_NULL(s->pmc_reg.registers[i])) {
 	    PMC *sp = s->pmc_reg.registers[i];
@@ -51,6 +51,70 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 	    }
 	}
     }
+}
+
+
+static int
+need_reg(Parrot_Interp s, int i, int i3)
+{
+    if (i == 0 || i == 1)       /* Sub, RetCont */
+        return 1;
+    /*
+     * P2 has the object accoring to pdd03 - not yet
+     */
+    if (i == 3 && i3 >= 11 && !PMC_IS_NULL(s->pmc_reg.registers[i]))
+        return 1;               /* overflow if present */
+    if (i >= 5 && i < 5 + i3)   /* i3 params */
+        return 1;
+    return 0;
+}
+
+/*
+ * copy / clone thread start params
+ * all resources are created in the destination interpreter
+ */
+static void
+clone_regs_thread(Parrot_Interp d, Parrot_Interp s, PMC *dest)
+{
+    int i;
+    /*
+     * I3 has the number of PMCs
+     */
+    int i3 = s->int_reg.registers[3];
+
+    for (i = 0; i < NUM_REGISTERS/2; i++) {
+	/*
+	 * clone PMCS
+         * we have to know the thread function signature to
+         * clone only param registers
+	 */
+#if 0
+        /* wait for imcc fixes - PMC count is still in I2
+         */
+        if (!need_reg(s, i, i3))
+            continue;
+#endif
+	if (!PMC_IS_NULL(s->pmc_reg.registers[i])) {
+	    PMC *sp = s->pmc_reg.registers[i];
+	    /* special case, dont clone SELF again - ugly */
+	    if ((sp->vtable->base_type == enum_class_ParrotInterpreter ||
+                 sp->vtable->base_type == enum_class_ParrotThread))
+		d->pmc_reg.registers[i] = dest;
+	    else {
+		PMC* dp = VTABLE_clone(d, sp);
+		d->pmc_reg.registers[i] = dp;
+	    }
+	}
+    }
+}
+
+static void
+clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
+{
+    if (dest->vtable->base_type == enum_class_ParrotThread)
+        clone_regs_thread(d, s, dest);
+    else
+        clone_regs_interp(d, s, dest);
 }
 
 void
