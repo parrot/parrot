@@ -80,9 +80,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     string_cstring_free(cload_func_name);
     if (!load_func) {
         /* seems to be a native/NCI lib */
-        lib_pmc = new_pmc_header(interpreter);
-        add_pmc_ext(interpreter, lib_pmc);
-        PMC_data(lib_pmc) = handle;
+        lib_pmc = pmc_new(interpreter, enum_class_ConstParrotLibrary);
     }
     else {
         lib_pmc = (*load_func)(interpreter);
@@ -90,6 +88,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
          * TODO call init, if it exists
          */
     }
+    PMC_data(lib_pmc) = handle;
     return lib_pmc;
 }
 

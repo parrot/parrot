@@ -178,6 +178,7 @@ use lib 'lib';
 use lib "$FindBin::Bin/..";
 use lib "$FindBin::Bin/../lib";
 use Parrot::Vtable;
+use Parrot::Pmc2c qw( dynext_load_code );
 use strict;
 
 my $default = parse_vtable("$FindBin::Bin/../vtable.tbl");
@@ -844,36 +845,7 @@ EOH
       }
   }
   if (exists $flags{dynpmc}) {
-      my $lc_classname = lc $classname;
-      $OUT .= <<EOC;
-/*
- * This load function will be called to do global (once) setup
- * whatever is needed to get this extension running
- */
-#include "parrot/dynext.h"
-
-PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
-{
-    STRING *whoami;
-    PMC *pmc;
-    INTVAL type;
-
-    /*
-     * TODO which PMC type to return
-     */
-    pmc = new_pmc_header(interpreter);
-    add_pmc_ext(interpreter, pmc);
-
-    /* for all PMCs we want to register:
-    */
-    whoami = string_from_cstring(interpreter, "$classname", 0);
-    type = pmc_register(interpreter, whoami);
-    /* do class_init code */
-    $initname(interpreter, type);
-    return pmc;
-}
-
-EOC
+      $OUT .= dynext_load_code($classname, "$initname(interpreter, type);");
   }
 
   return ($OUT, $HOUT);

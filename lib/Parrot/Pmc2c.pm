@@ -2,7 +2,7 @@ package Parrot::Pmc2c;
 use vars qw(@EXPORT_OK @writes %writes );
 
 use base qw( Exporter );
-@EXPORT_OK = qw(gen_c gen_h gen_ret);
+@EXPORT_OK = qw(gen_c gen_h gen_ret dynext_load_code);
 
 BEGIN {
     @writes = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
@@ -244,19 +244,15 @@ sub methods() {
     $cout;
 }
 
-sub lib_load_code() {
-    my $self = shift;
-    my $cout;
-    my $classname = $self->{class};
+# util
+sub dynext_load_code {
+    my ($classname, $call_class_init ) = @_;
     my $lc_classname = lc $classname;
-    # TODO multiple (e.g. Const subclasses
-    my $call_class_init =
-        "Parrot_${classname}_class_init(interpreter, type);\n";
-    $cout = <<"EOC";
+    return <<"EOC";
 /*
-* This load function will be called to do global (once) setup
-* whatever is needed to get this extension running
-*/
+ * This load function will be called to do global (once) setup
+ * whatever is needed to get this extension running
+ */
 #include "parrot/dynext.h"
 
 PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
@@ -266,23 +262,34 @@ PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
     INTVAL type;
 
     /*
-    * TODO which PMC type to return
-    */
-    pmc = new_pmc_header(interpreter);
-    add_pmc_ext(interpreter, pmc);
+     * create a library PMC
+     */
+    pmc = pmc_new(interpreter, enum_class_ConstParrotLibrary);
+    /*
+     * TODO stuff some info into this PMCs props
+     */
 
-    /* for all PMCs we want to register:
-    */
+    /*
+     * for all PMCs we want to register:
+     */
     whoami = string_from_cstring(interpreter, "$classname", 0);
     type = pmc_register(interpreter, whoami);
     /* do class_init code */
     $call_class_init
+
     return pmc;
 }
 
 EOC
+}
 
-    return $cout;
+sub lib_load_code() {
+    my $self = shift;
+    my $classname = $self->{class};
+    # TODO multiple (e.g. Const subclasses)
+    my $call_class_init =
+        "Parrot_${classname}_class_init(interpreter, type);\n";
+    return dynext_load_code($classname, $call_class_init);
 }
 
 sub init_func() {
