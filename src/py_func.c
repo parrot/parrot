@@ -110,6 +110,99 @@ parrot_py_filter(Interp *interpreter, PMC *func, PMC *list)
 }
 
 static PMC *
+parrot_py_map(Interp *interpreter, PMC *func, PMC *list)
+{
+    PMC *res, *iter;
+    INTVAL i, n;
+    STRING *s;
+    INTVAL type;
+    int none_func;
+
+    type = list->vtable->base_type;
+    iter = NULL;
+    switch (type) {
+        case enum_class_String:
+        case enum_class_PerlString:
+            res = pmc_new(interpreter, type);
+            break;
+        case enum_class_Iterator:
+            iter = list;
+            /* fall through */
+        default:
+            res = pmc_new(interpreter, enum_class_PerlArray);
+            break;
+    }
+    if (!iter)
+        iter = pmc_new_init(interpreter, enum_class_Iterator, list);
+    VTABLE_set_integer_native(interpreter, iter, 0);
+    i = 0;
+    none_func = PMC_IS_NULL(func) ||
+        func == Parrot_base_vtables[enum_class_None]->data;
+    while (VTABLE_get_bool(interpreter, iter)) {
+        PMC *item = VTABLE_shift_pmc(interpreter, iter);
+        if (!none_func) {
+            /* run filter func -
+             * TODO save registers once around loop
+             */
+            item = Parrot_runops_fromc_args_save(interpreter, func,
+                    "PP", item);
+        }
+        VTABLE_set_pmc_keyed_int(interpreter, res, i++, item);
+    }
+    return res;
+}
+
+static PMC *
+parrot_py_reduce(Interp *interpreter, PMC *func, PMC *list /*, PMC *init */)
+{
+    PMC *res, *iter;
+    INTVAL i, n;
+    STRING *s;
+    INTVAL type;
+    int none_func;
+    PMC *init = NULL;
+
+    type = list->vtable->base_type;
+    iter = NULL;
+    switch (type) {
+        case enum_class_String:
+        case enum_class_PerlString:
+            res = pmc_new(interpreter, type);
+            break;
+        case enum_class_Iterator:
+            iter = list;
+            /* fall through */
+        default:
+            res = pmc_new(interpreter, enum_class_Undef);
+            break;
+    }
+    if (!iter)
+        iter = pmc_new_init(interpreter, enum_class_Iterator, list);
+    VTABLE_set_integer_native(interpreter, iter, 0);
+    i = 0;
+    none_func = PMC_IS_NULL(func) ||
+        func == Parrot_base_vtables[enum_class_None]->data;
+    if (none_func) {
+        /* TODO TypeError: 'NoneType' object is not callable  */
+    }
+    if (!init) {
+        if (!VTABLE_get_bool(interpreter, iter))
+            return res;
+        init = VTABLE_shift_pmc(interpreter, iter);
+    }
+    VTABLE_assign_pmc(interpreter, res, init);
+    while (VTABLE_get_bool(interpreter, iter)) {
+        PMC *item = VTABLE_shift_pmc(interpreter, iter);
+            /* run filter func -
+             * TODO save registers once around loop
+             */
+        res = Parrot_runops_fromc_args_save(interpreter, func,
+                    "PPP", res, item);
+    }
+    return res;
+}
+
+static PMC *
 parrot_py_hash(Interp *interpreter, PMC *pmc)
 {
     PMC *h = pmc_new_noinit(interpreter, enum_class_PerlInt);
@@ -238,51 +331,37 @@ Initialize Python builtin functions.
 static void
 parrot_py_create_funcs(Interp *interpreter)
 {
+    STRING *pip = CONST_STRING(interpreter, "PIP");
+    STRING *pipp = CONST_STRING(interpreter, "PIPP");
+    STRING *pippp = CONST_STRING(interpreter, "PIPPP");
+
     STRING *callable     = CONST_STRING(interpreter, "callable");
-    STRING *callable_sig = CONST_STRING(interpreter, "PIP");
-
     STRING *chr     = CONST_STRING(interpreter, "chr");
-    STRING *chr_sig = CONST_STRING(interpreter, "PIP");
-
     STRING *hash     = CONST_STRING(interpreter, "hash");
-    STRING *hash_sig = CONST_STRING(interpreter, "PIP");
-
     STRING *iter     = CONST_STRING(interpreter, "iter");
     STRING *iter_sig = CONST_STRING(interpreter, "PIP");
-
     STRING *filter     = CONST_STRING(interpreter, "filter");
-    STRING *filter_sig = CONST_STRING(interpreter, "PIPP");
 
+    STRING *map     = CONST_STRING(interpreter, "map");
+    /* TODO vararg stuff :( */
     STRING *range_1     = CONST_STRING(interpreter, "range_1");
-    STRING *range_1_sig = CONST_STRING(interpreter, "PIP");
-
     STRING *range_2     = CONST_STRING(interpreter, "range_2");
-    STRING *range_2_sig = CONST_STRING(interpreter, "PIPP");
-
     STRING *range_3     = CONST_STRING(interpreter, "range_3");
-    STRING *range_3_sig = CONST_STRING(interpreter, "PIPPP");
 
+    STRING *reduce     = CONST_STRING(interpreter, "reduce");
     STRING *tuple     = CONST_STRING(interpreter, "tuple");
-    STRING *tuple_sig = CONST_STRING(interpreter, "PIP");
 
-    parrot_py_global(interpreter, F2DPTR(parrot_py_callable),
-            callable, callable_sig);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_chr),
-            chr, chr_sig);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_hash),
-            hash, hash_sig);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_iter),
-            iter, iter_sig);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_filter),
-            filter, filter_sig);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_range_1),
-            range_1, range_1_sig);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_range_2),
-            range_2, range_2_sig);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_range_3),
-            range_3, range_3_sig);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_tuple),
-            tuple, tuple_sig);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_chr), chr, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_iter), iter, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_range_1), range_1, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_range_2), range_2, pipp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_range_3), range_3, pippp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_reduce), reduce, pipp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_tuple), tuple, pipp);
 }
 
 /*

@@ -220,32 +220,41 @@ Sets the string's value to the value of the specified C<PerlString>.
 
 Adds C<*value> to the string and returns the result in C<*dest>.
 
+When Python mode is enabled does concat :(
+
 =cut
 
 */
 
     void add (PMC * value, PMC* dest) {
-        int vtype = VTABLE_type(INTERP, value);
+MMD_PerlNum: {
+	     if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
+		 SELF.concatenate(value, dest);
+		 return;
+	     }
+	     VTABLE_set_number_native(INTERP, dest,
+		     VTABLE_get_number(INTERP, SELF) +
+		     PMC_num_val(value)
+		     );
+	 }
+MMD_DEFAULT: {
+	     FLOATVAL pmcf, valf;
+	     INTVAL  pmci, vali;
 
-        INTVAL val_type;
+	     if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
+		 SELF.concatenate(value, dest);
+		 return;
+	     }
+	     pmcf = VTABLE_get_number(INTERP, SELF);
+	     pmci = VTABLE_get_integer(INTERP, SELF);
+	     valf = VTABLE_get_number(INTERP, value);
+	     vali = VTABLE_get_integer(INTERP, value);
 
-        if (vtype == enum_class_PerlNum) {
-            VTABLE_set_number_native(INTERP, dest,
-                VTABLE_get_number(INTERP, SELF) +
-                PMC_num_val(value)
-            );
-        }
-        else {
-            FLOATVAL pmcf = VTABLE_get_number(INTERP, SELF);
-            INTVAL pmci = VTABLE_get_integer(INTERP, SELF);
-            FLOATVAL valf = VTABLE_get_number(INTERP, value);
-            INTVAL vali = VTABLE_get_integer(INTERP, value);
-
-            if (pmcf == pmci && valf == vali)
-                VTABLE_set_integer_native(INTERP, dest, pmci + vali);
-            else
-                VTABLE_set_number_native(INTERP, dest, pmcf + valf);
-        }
+	     if (pmcf == pmci && valf == vali)
+		 VTABLE_set_integer_native(INTERP, dest, pmci + vali);
+	     else
+		 VTABLE_set_number_native(INTERP, dest, pmcf + valf);
+	 }
     }
 
 /*
@@ -765,14 +774,3 @@ Used to unarchive the string.
  *
  * vim: expandtab shiftwidth=4:
 */
-
-
-
-
-
-
-
-
-
-
-

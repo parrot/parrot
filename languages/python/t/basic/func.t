@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 21;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -154,6 +154,50 @@ test(<<'CODE', 'filter no func ar');
 def main():
     for i in filter(None, (0,1,2,0,3,0,4,0)):
 	print i
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'filter func');
+def f(x):
+    return x < 5
+
+def main():
+    for i in filter(f, range(10)):
+	print i
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'map None');
+def main():
+    for i in map(None, range(3)):
+	print i
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'map func');
+def f(x):
+    return x+2
+
+def main():
+    for i in map(f, range(3)):
+	print i
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'reduce');
+def f(x,y):
+    return x+y
+
+def main():
+    print reduce(f, "abc")
+
 if __name__ == '__main__':
     main()
 CODE
