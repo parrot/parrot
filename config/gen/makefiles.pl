@@ -69,6 +69,8 @@ sub makefiles {
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/befunge.in',   'languages/befunge/Makefile',
           commentType => '#', replace_slashes => 1);
+  genfile('config/gen/makefiles/cola.in',      'languages/cola/Makefile',
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/ook.in',       'languages/ook/Makefile',
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/urm.in',       'languages/urm/Makefile',

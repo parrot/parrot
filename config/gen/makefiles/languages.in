@@ -49,11 +49,11 @@ clean: BASIC.clean befunge.clean bf.clean cola.clean forth.clean jako.clean m4.c
 
 BASIC : BASIC.dummy
 BASIC.dummy:
-	# don't know how to build
+	# don't know how to build BASIC
 BASIC.test:
-	# Don't know how to test
+	# Don't know how to test BASIC
 BASIC.clean:
-	# Don't know how to clean
+	# Don't know how to clean BASIC
 
 befunge : befunge.dummy
 befunge.dummy:
@@ -105,7 +105,7 @@ m4.clean:
 
 miniperl : miniperl.dummy
 miniperl.dummy:
-	# missing t/harness
+	# miniperl is missing t/harness
 	# $(MAKE_C) miniperl
 miniperl.test:
 	$(MAKE_C) miniperl test
@@ -124,7 +124,7 @@ parrot_compiler: parrot_compiler.dummy
 parrot_compiler.dummy:
 	$(MAKE_C) parrot_compiler
 parrot_compiler.test:
-	# no target test in Makefile
+	# no target test in parrot_compiler/Makefile
 	# (MAKE_C) parrot_compiler test
 parrot_compiler.clean:
 	$(MAKE_C) parrot_compiler clean

@@ -1,0 +1,93 @@
+#
+# Makefile for languages/cola
+#
+PARROT = ..${slash}..${slash}parrot${exe}
+PERL   = ${perl}
+RM_F  = ${rm_f}
+RM_RF  = ${rm_rf}
+
+CC 	= ${cc}
+CFLAGS 	= ${ccflags}
+DEBUG 	= ${cc_debug}
+LINK 	= ${link}
+
+YACC 	= ${yacc}
+LEX 	= ${lex}
+
+# Libraries:  Ordinarily, no special libraries are needed
+# for cola, but one of the following settings might be helpful
+# in some cases.
+# Use the same libraries as Parrot:
+# LIBS 	= ${libs}
+# You might need these for some versions of flex and/or yacc:
+# LIBS = -ll -ly
+# Ordinarily, no special libraries are needed for cola.
+LIBS 	=
+
+# These manual settings might be helpful in some situations.
+# Visual C++
+# CC = cl
+#
+# GCC
+# CC = gcc -Wall -pedantic
+#
+# GCC with Electric Fence
+# CC = gcc -efence -Wall -pedantic
+# LIBS = -lefence
+
+HEADERS = cola.h parser.h
+
+default :
+	chmod 775 colac
+	$(MAKE) colacc
+
+nogen : gen.o semant.o sym.o type.o
+	$(CC) $(DEBUG) -c parser.c
+	$(CC) $(DEBUG) -c lexer.c
+	$(CC) $(DEBUG) -o colacc parser.o lexer.o gen.o semant.o sym.o type.o $(LIBS)
+
+clean :
+	$(RM_F) core
+	$(RM_F) *.o
+	$(RM_F) parser.output
+	$(RM_F) colacc
+
+# Don't run this target unless you have bison and flex
+# installed to regenerate the needed files.
+realclean:
+	$(RM_F) parser.h
+	$(RM_F) lexer.c parser.c
+
+publish :
+	$(PERL) publish.pl < MANIFEST
+
+dist :
+	$(PERL) distribution.pl < MANIFEST
+
+parser.c : cola.y
+	$(YACC) -d -o parser.c cola.y
+
+lexer.c : cola.l $(HEADERS)
+	$(LEX) cola.l
+
+lexer.o : lexer.c $(HEADERS)
+	$(CC) $(DEBUG) -c lexer.c
+
+parser.o : parser.c $(HEADERS)
+	$(CC) $(DEBUG) -c parser.c
+
+semant.o : semant.c $(HEADERS)
+	$(CC) $(DEBUG) -c semant.c
+
+sym.o : sym.c $(HEADERS)
+	$(CC) $(DEBUG) -c sym.c
+
+type.o : type.c $(HEADERS)
+	$(CC) $(DEBUG) -c type.c
+
+gen.o : gen.c $(HEADERS)
+	$(CC) $(DEBUG) -c gen.c
+
+colacc : parser.o lexer.o gen.o semant.o sym.o type.o
+	$(CC) $(DEBUG) -o colacc parser.o lexer.o gen.o semant.o sym.o type.o $(LIBS)
+
