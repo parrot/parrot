@@ -15,7 +15,7 @@
 #define PARROT_GLOBAL_SETUP_H_GUARD
 
 void
-init_world();
+init_world(void);
 
 #endif
 

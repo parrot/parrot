@@ -24,8 +24,6 @@ print OUT <<'EOF';
 
 #define VTABLE_SIZE 512
 
-typedef void* (*vtable_func_t)();
-
 #define YOU_LOSE_VTABLE NULL
 
 EOF

@@ -52,13 +52,13 @@ typedef void **(*op_func_prederef_t)();
 */
 
 typedef struct {
-    op_type_t  type;
-    char *     name;
-    char *     full_name;
-    char *     func_name;
-    char *     body;
-    INTVAL     arg_count; /* Includes opcode as one arg */
-    arg_type_t types[PARROT_MAX_ARGS];
+    op_type_t    type;
+    const char * name;
+    const char * full_name;
+    const char * func_name;
+    const char * body;
+    INTVAL       arg_count; /* Includes opcode as one arg */
+    arg_type_t   types[PARROT_MAX_ARGS];
 } op_info_t;
 
 

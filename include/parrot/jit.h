@@ -37,7 +37,7 @@ typedef struct {
 } temp_int_substitution_t;
 
 typedef struct {
-    char *assembly;
+    const char *assembly;
     int size;
     int nargop;
     /* &interpreter->xxx->register[pc[x]] */
