@@ -6,6 +6,7 @@ LICENSES/Artistic
 LICENSES/gpl.txt
 MANIFEST
 MANIFEST.SKIP
+MANIFEST.detailed
 NEWS
 README
 RELEASE_INSTRUCTIONS
@@ -1740,6 +1741,7 @@ packdump.c
 packfile.c
 packout.c
 parrot.c
+parrot.spec
 pbc2c.pl
 pdb.c
 pdump.c
@@ -1814,8 +1816,10 @@ test_main.c
 tools/dev/check_source_standards.pl
 tools/dev/extract_file_descriptions.pl
 tools/dev/genrpt.pl
+tools/dev/install_files.pl
 tools/dev/lib_deps.pl
 tools/dev/manicheck.pl
+tools/dev/mk_manifests.pl
 tools/dev/mk_native_pbc
 tools/dev/parrot_coverage.pl
 tools/dev/rebuild_miniparrot.pl
