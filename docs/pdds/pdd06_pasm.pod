@@ -964,6 +964,104 @@ Fetches the 'current package' marker.
 
 =back
 
+=head2 Foreign library access
+
+These are the ops we use to load in and interface to non-parrot
+libraries.
+
+=over 4
+
+=item loadlib Px, Sy
+
+Load in the library whose name is specified by y, and put a handle to
+it into P register x.
+
+=item dlfunc Pw, Px, Sy, Sz
+
+Find a routine named Z, in library Y (which you did, of course, open
+with loadlib), and put a sub PMC onto X for it. You can call this sub
+as if it were any other parrot subroutine.
+
+Z has the function signature, which tells Parrot how to build the
+interface from parrot (and parrot's calling conventions) to the
+calling conventions of the library routine. Yes, this does mean that
+you must know the function signature, but if you don't know that why
+the heck would you be invoking the function, right?
+
+The signature is a series of 1 or more characters, representing the
+types for the call. The first character is the return type, while the
+rest are the parameters. The types are:
+
+=over 4
+
+=item v 
+
+Void. As a return type indicates that there I<is> no return type. As
+a parameter indicates that there are no parameters. Can't be mixed
+with other parameter types.
+
+=item c
+
+Char. This is an integer type, taken from (or put into) an I register.
+
+=item s
+
+short. An integer type, taken from 0 or put into an I register
+
+=item i
+
+int. An integer type.
+
+=item l
+
+long. An integer type. You know the drill.
+
+=item f
+
+float. F register denizen.
+
+=item d
+
+double. F register, double-precision floating point type
+
+=item p
+
+PMC thingie. A generic pointer, taken from or stuck into a PMC's
+data pointer. If this is a return type, parrot will create a new
+UnManagedStruct PMC type, which is just a generic "pointer so some
+damn thing or other" PMC type which Parrot does I<no> management of.
+
+=item t
+
+string pointer. Taken from, or stuck into, a string
+register. (Converted to a null-terminated C string before passing in)
+
+=back
+
+So the signature for, for example, this SDL routine:
+
+   int SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect);
+
+would be C<ipppp>, since it returns an integer and takes four
+pointers. Presumably prevous calls would have set those pointers up
+properly.
+
+Do note that parrot makes no guarantees as to the behaviour of the
+libraries, and currently does no type checking on the input
+parameters. We will fix that later.
+
+The generated routine follows the calling conventions in PDD03. Note
+that int, string, pmc, and float parameters are counted
+separately. So if you have a signature of C<ippiidd> the return goes
+into I5, and the parameters come from P5, P6, I5, I6, N5, and N6,
+respectively. A signature of C<ipdiidp> has the identical same set of
+registers used (and in the same order).
+
+=item invoke
+
+Invoke a subroutine in P0. Presumes that all the registers are set up
+right for the call.
+
 =head1 ATTACHMENTS
 
 =head1 REFERENCES
