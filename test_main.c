@@ -24,6 +24,9 @@ main(int argc, char **argv) {
     int debugging;
     int predereferencing;
     int jit;
+    int from_stdin;
+    int from_file;
+    char *filename;
 
     struct Parrot_Interp *interpreter;
     init_world();
@@ -48,6 +51,9 @@ main(int argc, char **argv) {
     debugging        = 0;
     predereferencing = 0;
     jit              = 0;
+    from_stdin       = 0;
+    from_file        = 0;
+    filename         = NULL;
 
     while (argc > 1 && argv[1][0] == '-') {
         if (argv[1][1] == 'b' && argv[1][2] == '\0') {
@@ -92,6 +98,19 @@ main(int argc, char **argv) {
             }
             argc--;
         }
+        else if (argv[1][1] == 'f') {
+            if (strcmp("-", argv[2]) == 0) {
+                from_stdin = 1;
+            }
+            else {
+                filename = malloc(strlen(argv[2])+1);
+                filename = strcpy(filename, argv[2]);
+            }
+            for (i = 3; i < argc; i++) {
+                argv[i-2] = argv[i];
+            }
+            argc -= 2;
+        }
         else {
             fprintf(stderr, "%s: Invalid switch: %s\n", argv[0], argv[1]);
             exit(1);
@@ -133,11 +152,11 @@ main(int argc, char **argv) {
     
     /* If we got only the program name, complain */
 
-    if (argc == 1) {
+    if (argc == 1 && !filename && !from_stdin) {
         fprintf(stderr, "%s: usage: %s prog\n", argv[0], argv[0]);
         exit(1);
     }
-    /* Otherwise load in the program they gave and try that */
+    /* Otherwise load in the program they gave and try that, or - */
     else {
         opcode_t *program_code;        
         size_t program_size;
@@ -145,25 +164,58 @@ main(int argc, char **argv) {
         int fd;
         struct PackFile * pf;
 
-        if (stat(argv[1], &file_stat)) {
-            printf("can't stat %s, code %i\n", argv[1], errno);
-            return 1;
+        if (from_stdin) {
+            char *cursor;
+            INTVAL read_result;
+            INTVAL read_last;
+
+            program_size = 1024;
+            
+            program_code = (opcode_t*)malloc(1024);
+            cursor = (char*)program_code;
+
+            while ((read_result = read(0, cursor, 1024)) > 0) {
+                read_last = read_result;
+                program_size += 1024;
+                realloc(program_code, program_size);
+                cursor = (char*)program_code + program_size - 1024;
+            }
+
+            if (read_result == 0) {
+                program_size = program_size - 2048 + read_last;
+            }
+            else if (read_result < 0) {
+                fprintf(stderr, "Problem reading from stdin\n");
+                exit(1);
+            }
         }
-        fd = open(argv[1], O_RDONLY);
-        if (!fd) {
-            printf("Can't open, error %i\n", errno);
-            return 1;
-        }
-        
-        program_size = file_stat.st_size;
+        else { /* read from file */
+            if (!filename) {
+                filename = malloc(strlen(argv[1])+1);
+                strcpy(filename, argv[1]);
+            }
+
+            if (stat(filename, &file_stat)) {
+                printf("can't stat %s, code %i\n", argv[1], errno);
+                return 1;
+            }
+            fd = open(filename, O_RDONLY);
+            if (!fd) {
+                printf("Can't open, error %i\n", errno);
+                return 1;
+            }
+            
+            program_size = file_stat.st_size;
 
 #ifndef HAS_HEADER_SYSMMAN
-        program_code = (opcode_t*)mem_sys_allocate(program_size);
-        read(fd, (void*)program_code, program_size);
+            program_code = (opcode_t*)mem_sys_allocate(program_size);
+            read(fd, (void*)program_code, program_size);
 #else
-        program_code = 
-            (opcode_t *) mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
+            program_code = 
+                (opcode_t *) mmap(0, program_size, PROT_READ,
+                                  MAP_SHARED, fd, (off_t)0);
 #endif
+        } /* end reading from file */
 
         if (!program_code) {
             printf("Can't mmap, code %i\n", errno);
