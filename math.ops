@@ -1,0 +1,161 @@
+/*
+** math.ops
+*/
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+math.ops
+
+=cut
+
+=head1 DESCRIPTION
+
+Parrot's library of math ops.
+
+=cut
+
+
+########################################
+
+=head2 Other mathematical operations
+
+Implementations of various mathematical operations
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<gcd>(out INT, in INT, in INT)
+
+=item B<gcd>(out INT, in NUM, in NUM)
+
+Greatest Common divisor of $2 and $3.
+
+=cut
+
+inline op gcd(out INT, in INT, in INT) {
+
+UINTVAL q = 0;
+UINTVAL c = 0;
+  while ($3 != 0) {
+    q = floor( (FLOATVAL)$2/$3 );
+    c = $2 - $3*q;
+    $2 = $3;
+    $3 = c;
+  }
+  $1 = $2;
+  goto NEXT();
+}
+
+inline op gcd(out INT, in NUM, in NUM){ 
+
+UINTVAL q = 0;
+UINTVAL c = 0;
+  while ($3 != 0) {
+    q = floor( (FLOATVAL)$2/$3 );
+    c = $2 - $3*q;
+    $2 = $3;
+    $3 = c;
+  }
+  $1 = $2;
+  goto NEXT();
+}
+
+########################################
+
+=item B<lcm>(out INT, in INT, in INT)
+
+=item B<lcm>(out NUM, in INT, in INT)
+
+Least Common Multiple 
+
+=cut
+
+inline op lcm(out INT, in INT, in INT) {
+
+UINTVAL q = 0;
+UINTVAL c = 0;
+INTVAL saved_var2 = $2;
+INTVAL saved_var3 = $3;
+  while ($3 != 0) {
+    q = floor( (FLOATVAL)$2/$3 );
+    c = $2 - $3*q;
+    $2 = $3;
+    $3 = c;
+  }
+  saved_var2 = saved_var2/$2;
+  $1 = saved_var2*saved_var3;
+  goto NEXT();
+}
+
+inline op lcm(out NUM, in INT, in INT) {
+
+UINTVAL q = 0;
+UINTVAL c = 0;
+INTVAL saved_var2 = $2;
+INTVAL saved_var3 = $3;
+  while ($3 != 0) {
+    q = floor( (FLOATVAL)$2/$3 );
+    c = $2 - $3*q;
+    $2 = $3;
+    $3 = c;
+  }
+  saved_var2 = saved_var2/$2;
+  $1 = (FLOATVAL)saved_var2*saved_var3;
+  goto NEXT();
+}
+
+
+########################################
+
+=item B<fact>(out INT, in INT)
+
+=item B<fact>(out NUM, in INT)
+
+Factorial, n!. Calculates the product of 1 to N.
+
+=cut
+
+inline op fact(out INT, in INT) {
+
+UINTVAL i = $2;
+UINTVAL q = 1;
+  while(i>0) {
+    q = q*i;
+    i--;
+  }
+  $1 = q;
+  goto NEXT();
+}
+
+inline op fact(out NUM, in INT) {
+
+UINTVAL i = $2;
+UINTVAL q = 1;
+  while(i>0) {
+    q = q*i;
+    i--;
+  }
+  $1 = q;
+  goto NEXT();
+}
+
+
+########################################
+
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2002 Yet Another Society. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut
