@@ -13,7 +13,11 @@ Parrot_signbit(double x)
        int i[2];
    } u;
    u.d = x;
+#if PARROT_BIGENDIAN
+   return u.i[0] < 0;
+#else
    return u.i[1] < 0;
+#endif
 }
 
 #if NUMVAL_SIZE == 12
