@@ -486,19 +486,19 @@ inline op set_addr(out INT, in INT) {
 
 ########################################
 
-=item B<exchange>(out INT, out INT)
+=item B<exchange>(inout INT, inout INT)
 
-=item B<exchange>(out NUM, out NUM)
+=item B<exchange>(inout NUM, inout NUM)
 
-=item B<exchange>(out PMC, out PMC)
+=item B<exchange>(inout PMC, inout PMC)
 
-=item B<exchange>(out STR, out STR)
+=item B<exchange>(inout STR, inout STR)
 
 Exchange the contents of registers $1 and $2
 
 =cut
 
-op exchange(out INT, out INT) {
+op exchange(inout INT, inout INT) {
    INTVAL temp;
    temp = $1;
    $1 = $2;
@@ -506,7 +506,7 @@ op exchange(out INT, out INT) {
    goto NEXT();
 }
 
-op exchange(out PMC, out PMC) {
+op exchange(inout PMC, inout PMC) {
    PMC *temp;
    temp = $1;
    $1 = $2;
@@ -514,7 +514,7 @@ op exchange(out PMC, out PMC) {
    goto NEXT();
 }
 
-op exchange(out NUM, out NUM) {
+op exchange(inout NUM, inout NUM) {
    FLOATVAL temp;
    temp = $1;
    $1 = $2;
@@ -522,7 +522,7 @@ op exchange(out NUM, out NUM) {
    goto NEXT();
 }
 
-op exchange(out STR, out STR) {
+op exchange(inout STR, inout STR) {
    STRING *temp;
    temp = $1;
    $1 = $2;
