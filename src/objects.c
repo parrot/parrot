@@ -378,9 +378,8 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
 
     /* See if we get lucky and its in the class of the PMC */
     FQ_method = string_concat(interpreter,
-            VTABLE_get_string(interpreter,
-                VTABLE_get_pmc_keyed_int(interpreter,
-                    (PMC *)PMC_data(class), PCD_CLASS_NAME)),
+            VTABLE_get_string_keyed_int(interpreter,
+                    (PMC *)PMC_data(class), PCD_CLASS_NAME),
             shortcut_name, 0);
 
     method = find_global(interpreter, FQ_method);
@@ -402,9 +401,8 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
                 classsearch_array, searchoffset);
 
         FQ_method = string_concat(interpreter,
-                VTABLE_get_string(interpreter,
-                    VTABLE_get_pmc_keyed_int(interpreter,
-                        (PMC *)PMC_data(curclass), PCD_CLASS_NAME)),
+                VTABLE_get_string_keyed_int(interpreter,
+                        (PMC *)PMC_data(curclass), PCD_CLASS_NAME),
                 shortcut_name, 0);
         method = find_global(interpreter, FQ_method);
     }
@@ -421,9 +419,8 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     PMC *attr_hash;
 
     class_array = (PMC*) PMC_data(class);
-    class_name = VTABLE_get_string(interpreter,
-            VTABLE_get_pmc_keyed_int(interpreter,
-            class_array, PCD_CLASS_NAME));
+    class_name = VTABLE_get_string_keyed_int(interpreter,
+            class_array, PCD_CLASS_NAME);
     /*
      * our attributes start at offset found in hash at PCD_ATTRIB_OFFS
      */
