@@ -1,25 +1,79 @@
 RM_F = ${rm_f}
 PERL = ${perl}
-PARROT = ..${slash}..${slash}parrot
+PARROT = parrot${exe}
+RELPATH = ../../
+MYPATH = languages/tcl/
 
-DEPS = $(PARROT) \
-lib/parse.imc \
+DEPS = $(RELPATH)$(PARROT) \
 lib/backslash_newline_subst.imc \
 lib/backslash_subst.imc \
-lib/match_close.imc \
-lib/var_subst.imc \
+lib/commands/append.imc \
+lib/commands/array.imc \
+lib/commands/break.imc \
+lib/commands/catch.imc \
+lib/commands/continue.imc \
+lib/commands/error.imc \
+lib/commands/eval.imc \
+lib/commands/exit.imc \
+lib/commands/expr.imc \
+lib/commands/for.imc \
+lib/commands/format.imc \
+lib/commands/global.imc \
+lib/commands/if.imc \
+lib/commands/incr.imc \
+lib/commands/proc.imc \
+lib/commands/puts.imc \
+lib/commands/rename.imc \
+lib/commands/return.imc \
+lib/commands/set.imc \
+lib/commands/source.imc \
+lib/commands/time.imc \
+lib/commands/while.imc \
+lib/expression.imc \
+lib/functions/abs.imc \
+lib/functions/acos.imc \
+lib/functions/asin.imc \
+lib/functions/atan.imc \
+lib/functions/cos.imc \
+lib/functions/cosh.imc \
+lib/functions/exp.imc \
+lib/functions/log.imc \
+lib/functions/log10.imc \
+lib/functions/sin.imc \
+lib/functions/sinh.imc \
+lib/functions/sqrt.imc \
+lib/functions/tan.imc \
+lib/functions/tanh.imc \
+lib/get_var.imc \
+lib/interpret.imc \
 lib/macros/debug.imc \
 lib/macros/is_space.imc \
-lib/macros/substitution.imc \
-lib/commands/exit.imc \
-lib/commands/puts.imc \
-lib/commands/set.imc \
-lib/commands/incr.imc \
-lib/commands/append.imc \
-lib/commands/rename.imc
+lib/match_close.imc \
+lib/ops/bitand.imc \
+lib/ops/bitor.imc \
+lib/ops/bitxor.imc \
+lib/ops/div.imc \
+lib/ops/equal.imc \
+lib/ops/gt.imc \
+lib/ops/gte.imc \
+lib/ops/lt.imc \
+lib/ops/lte.imc \
+lib/ops/minus.imc \
+lib/ops/mod.imc \
+lib/ops/mul.imc \
+lib/ops/plus.imc \
+lib/ops/shl.imc \
+lib/ops/shr.imc \
+lib/ops/unequal.imc \
+lib/parse.imc \
+lib/string_to_list.imc \
+lib/substitution.imc \
+lib/var_subst.imc \
+tcl.imc_template \
+tcl.pl
 
 tcl.pbc: tcl.imc
-	$(PARROT) --output=tcl.pbc tcl.imc
+	(cd $(RELPATH) && $(PARROT) --output=$(MYPATH)tcl.pbc $(MYPATH)tcl.imc)
 
 tcl.imc: tcl.pl $(DEPS)
 	$(PERL) tcl.pl > tcl.imc

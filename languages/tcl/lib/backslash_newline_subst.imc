@@ -4,14 +4,18 @@
 # Given a string, change
 #
 # \<newline>whiteSpace into a single space.
-# Copyright (c) 2002-2003 by William J. Coleda
 
 .sub __backslash_newline_subst
-
   .param string buffer
 
-  .include "lib/macros/is_space.imc"
-  
+  .include "languages/tcl/lib/macros/is_space.imc"
+  .include "languages/tcl/lib/macros/debug.imc"
+ 
+  .const int debug = 0
+
+  .debug("PREBUFFER:\n")
+  .debug(buffer)
+ 
   .local string bs_nl
   .local int marker
   .local int pos
@@ -22,8 +26,10 @@
   .local int a_byte
  
   bs_nl = ""
+  # \
   chr a_char, 92
   concat bs_nl, a_char
+  # <NL>
   chr a_char, 10
   concat bs_nl, a_char
   marker=0
@@ -46,7 +52,6 @@ loop_inner:
 
   ord a_byte, buffer, pos
 
-
   .is_space(a_byte,retval)
  
   if retval == 1 goto loop_inner
@@ -54,11 +59,16 @@ loop_inner:
   # delete the items from marker to pos
 
   diff = pos - marker
-  substr buffer,marker,diff,""
+  substr buffer,marker,diff," "
   goto loop_outer
 
 my_end:
+
+  .debug("POSTBUFFER:\n")
+  .debug(buffer)
+
   .pcc_begin_return
-    .return buffer
+  .return buffer
   .pcc_end_return
+
 .end

@@ -1,0 +1,63 @@
+###
+# [time]
+
+.sub __cmd_time
+  .param PerlArray argv
+ 
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+ 
+  .local int argc 
+  argc = argv
+
+  .local string retval
+  .local int return_type
+
+  .local string script
+  .local int count
+
+  count = 1
+
+  if argc == 1 goto run
+  if argc == 2 goto twoargs
+
+  return_type = TCL_ERROR
+  retval =  "bad call to return"
+  goto real_done
+
+twoargs:
+  # verify this is a number?
+  count = argv[1]
+
+run:
+  script = argv[0]
+
+  # is it cheating to parse it here?
+  $P1 = __parse(script)
+
+  time $N1 
+  $I1 = count
+loop:
+  if $I1 == 0 goto done
+  ($I0,$S0) = __interpret($P1)
+  if $I0 != TCL_OK goto done
+  dec $I1
+  goto loop
+
+done:
+  time $N2
+  $N3 = $N2 - $N1
+
+  $N3 = $N3 * 1000000
+  $N3 = $N3 / count
+  $I2 = $N3
+  retval = $I2
+  retval = retval . " microseconds per iteration"
+
+real_done:
+
+  .pcc_begin_return
+  .return TCL_RETURN
+  .return retval
+  .pcc_end_return
+.end

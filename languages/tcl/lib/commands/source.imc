@@ -1,0 +1,65 @@
+###
+# [source]
+
+.sub __cmd_source
+  .param PerlArray argv
+ 
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+
+  .local int argc 
+  argc = argv
+
+  if argc != 1 goto fail
+
+  .local string contents
+  .local string retval
+  .local string chunk
+  .local int code
+  .local string filename
+  .local string type
+  .local ParrotIO handle
+
+  $P1 = argv[0] 
+  typeof type, $P1
+  if type != "ParrotIO" goto file
+  handle = $P1
+  goto loop
+
+file:
+  filename = $P1
+  .debug("Trying to read filename: '")
+  .debug(filename)
+  .debug("'\n")
+  $S1="<"
+  open handle, filename, $S1
+  isnull $P1, badfile
+  contents = ""
+ 
+loop:
+  read chunk, handle, 1024
+  if chunk == "" goto gotfile
+  contents = contents . chunk
+  goto loop
+
+gotfile:
+  $P1 = __parse(contents)
+  (code,retval) = __interpret($P1)
+  goto done
+ 
+badfile:
+  code = TCL_ERROR
+  retval = "couldn't read file \""
+  retval = retval . filename
+  retval = retval . "\": no such file or directory\n"
+  goto done
+
+fail:
+  code = TCL_ERROR
+  retval =  "bad call to source\n"
+done:
+  .pcc_begin_return
+  .return code
+  .return retval
+  .pcc_end_return
+.end

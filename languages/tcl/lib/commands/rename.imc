@@ -1,20 +1,23 @@
 ###
 # [rename]
-# Copyright (c) 2002-2003 by William J. Coleda
 
-.sub __cmd_rename 
+.sub __cmd_rename
   .param PerlArray argv
   
-  .include "lib/macros/debug.imc"
-  .local int debug
-  debug = 0
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
 
   .local int argc 
   argc = argv
 
+  .local int return_type
+  .local string retval
+  return_type = TCL_OK
+  retval = ""
+
   .local string oldName
   .local string newName
-  .local pmc commands
+  .local PerlHash commands
  
   if argc != 2 goto error
   oldName = argv[0]
@@ -44,12 +47,15 @@ delete:
   # fall through to a bad call.
 
 error:
-  print "wrong # args: should be \"rename oldName newName\""
+  return_type = TCL_ERROR
+  retval = "wrong # args: should be \"rename oldName newName\""
 
 done:
 
   store_global "commands", commands
+
   .pcc_begin_return
-  .return ""
+  .return return_type
+  .return retval
   .pcc_end_return
 .end

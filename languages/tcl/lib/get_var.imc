@@ -1,0 +1,71 @@
+###
+# get_var - return the value of the variable specified
+# by the parameters - Param 1 is the name of the var.
+# param2, if it exists, is the index of the variable.
+# (as with the [procs], the args are passed in as a
+# perlarray
+
+# XXXXXXXXXX!!!!!!!!!
+# this code isn't our code - it's cut and paste from 
+# cmd_set - all the right logic is buried in it, just need to
+# clean it up (and then rewrite cmd_set to call this code)
+# (when doing a get, anyway)
+
+.sub __get_var
+  .param PerlArray argv
+
+  .local int argc
+  argc = argv
+
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+
+  .local string name
+  .local pmc lexical
+
+  .local string index
+  .local string type
+
+  .local PerlString value
+  .local string retval
+
+  name=argv[0] 
+  if argc == 1 goto get_scalar
+  index=argv[1] 
+
+get_indexed:
+  print "indexed\n"
+  find_lex lexical, -1, name
+  typeof type, lexical
+  if type != "PerlHash" goto get_indexed_bad
+
+get_indexed_ok:
+  retval = lexical[index]
+  goto done
+
+get_indexed_bad:
+  print "That's not an array variable, putz"
+  goto done
+
+get_scalar:
+  find_lex lexical, -1, name
+  typeof type, lexical
+  if type != "PerlHash" goto get_scalar_ok
+
+  print "Can't do that, that's an array variable\n"
+  goto done
+
+get_scalar_ok:
+  retval = lexical
+  goto done
+
+done:
+   .debug("retval is '")
+   .debug(retval)
+   .debug("'\n")
+    
+  .pcc_begin_return
+  .return 0
+  .return retval
+  .pcc_end_return
+.end

@@ -1,0 +1,18 @@
+????-??-??
+	
+	* Initial CVS version
+
+2004-03-15
+
+	* More builtin procs supported, notably:
+		proc, expr, for, format, 
+		while, break, continue, return, source
+	* Initial expr support
+		Decimal operands, most operators, most builtin math funcs,
+		precedence, parens for grouping
+	* split __parse into separate parse/interpret stages
+	* Use improved imcc syntax where possible
+	* more tests
+	* changed substitution macro mess to pcc sub mess
+	* support various return codes (TCL_OK, TCL_ERROR, etc.)
+	* cleaned up examples/

@@ -1,0 +1,436 @@
+.sub __interpret
+  .param PerlArray orig_commands
+  # An array of commands to interpret.
+
+  .local PerlArray commands
+  clone commands, orig_commands
+
+  .include "languages/tcl/lib/macros/debug.imc"
+
+  # our running return value
+  # XXX really need to support more than a string
+
+  #_dumper("original-commands",orig_commands)
+
+  .local int return_type
+  return_type = TCL_OK
+  .local string retval
+  retval = ""
+
+  .local PerlArray orig_command
+  .local PerlArray command
+
+  .const int debug = 0
+
+END_SCOPE:
+  .debug("interpret::END_SCOPE:\n")
+  
+  .debug("return type='")
+  .debug(return_type)
+  .debug("'\n")
+
+  if return_type != TCL_OK goto DONE
+
+  $I0 = commands
+  if $I0 == 0 goto DONE
+
+  shift orig_command, commands
+  clone command, orig_command
+
+  .local PerlArray cooked_command
+  cooked_command = new PerlArray
+
+cooking:
+  .debug("cooking:\n")
+  $I0 = command 
+  .debug("command has ")
+  .debug($I0)
+  .debug(" elements\n")
+
+  if $I0 == 0 goto cooked
+  shift $S0, command
+
+  # foreach word, perform all substitutions.
+  # XXX
+
+  # If the word starts with a " or a {, then it was a block -
+  # strip off the first/last chars
+  # There is undoubtedly a better way to do this.
+ 
+  # If we ended up with an empty string, we're already cooked!
+  length $I0,$S0
+  if $I0 == 0 goto done_subst
+ 
+  ord $I0, $S0
+
+  $I1 = 0
+  if $I0 != 123 goto baste
+  $I1 = 1 
+
+braise:
+  .debug("braise:\n")
+  substr $S2,$S0,0,1,""
+  substr $S2,$S0,-1,1,""
+  # Don't do any substitutions on a {} block
+  if $I1 == 1 goto done_subst
+  goto subst
+
+baste:
+  .debug("baste:\n")
+  if $I0 == 34 goto braise
+
+subst:
+  .debug("subst:\n")
+  # First, initialize our variables that manage the broken up string
+  .local PerlArray tcl_words
+  tcl_words = __substitution_init($S0)
+
+command_subst:
+  .debug("command_subst:\n")
+  tcl_words = __substitution_iter_reset(tcl_words)
+
+command_subst_loop:
+  .debug("command_subst_loop:\n")
+  .local int trip
+  (tcl_words, trip) = __substitution_iter_next(tcl_words)
+  if trip == 1 goto variable_subst
+
+  # If so, split the word at the boundaries, replace the [...] with the
+  # result of a call to parse on the ...
+  # Should be a macro so we can use it again where we need to.
+
+  #XXX Now, we already found this once when we figured out how
+  # big the word was. We should probably build this word then, rather
+  # than constructing it by hand.
+  $S0 = __substitution_get_current_word(tcl_words)
+  .debug("current word=")
+  .debug($S0)
+  .debug("\n")
+  
+  # XXX
+  # the Tcl man page says that command subsitution
+  #  happens before backslash susbstitution. However, the string:
+  #  "foo \[" is a valid consruct in tcl - that means that we have
+  #  to be smart enough to know that an escaped \[ isn't really a
+  #  [ . So, we can either switch the order in which things are 
+  # interpreted, or we can try to be smart when finding commands.
+  # ... For now, we'll try to be smart here, as I don't want to mess
+  # with the precedence listed in the man page.
+
+  .local int brace_index_open
+  .local int brace_index_close
+  .local int escape_index
+  .local int escaped
+  .local int char
+
+  escaped = 0
+
+  index brace_index_open, $S0, "["
+  if brace_index_open == -1 goto command_subst_loop
+ 
+  # We have a possible start of a command. make sure it's
+  # not escaped.
+  escape_index = brace_index_open
+  dec escape_index
+command_subst_escape_loop:
+  if escape_index < 0 goto command_subst_escape_done
+  ord char, $S0, escape_index
+  # backslash
+  if char != 92 goto command_subst_escape_done
+
+  # It's a toggle. 
+  escaped = 1 - escaped
+  dec escape_index
+
+  goto command_subst_escape_loop
+
+command_subst_escape_done:
+  if escaped == 1 goto command_subst_loop
+
+  brace_index_close = __match_close($S0,brace_index_open)
+  
+  # Ok. we know the [] goes from open to close. now, get the output of
+  # That parse, and use it to replace...
+
+  .local int command_length_inner
+  .local int command_length_outer
+
+  command_length_outer = brace_index_close - brace_index_open
+  inc brace_index_open
+  command_length_inner = command_length_outer - 2
+
+  .local string sub_command
+  substr sub_command,$S0,brace_index_open,command_length_inner
+  .debug("command of [")
+  .debug(sub_command)
+  .debug("]\n")
+
+  .local pmc parsed_body
+  parsed_body = __parse(sub_command)
+
+  (return_type,retval) = __interpret(parsed_body)
+
+  $I0 = return_type
+  $S0 = retval
+
+  if return_type != TCL_OK goto bad_sub_command
+
+  .debug("gives output of \"")
+  .debug(retval)
+  .debug("\"\n")
+
+  dec brace_index_open
+
+  .debug("calling __substitution_replace(tcl_words,\"")
+  .debug(retval)
+  .debug("\",")
+  .debug(brace_index_open)
+  .debug(",")
+  .debug(command_length_outer)
+  .debug(")")
+  tcl_words = __substitution_replace(tcl_words,retval,brace_index_open,command_length_outer)
+  goto command_subst_loop
+
+
+variable_subst:
+  # XXX for all raw segments, is there a $ ? (loop)
+  # If so, find the boundaries of the variable name, split the word at the
+  # boundaries, replace the varname with the value of the variable
+  # note that the $index(name) syntax requires name to have a few subst.
+  # passes done on it before we know the real index name - This can be delayed
+  # until we actually support arrays.
+  
+  .debug("variable_subst:\n")
+
+  tcl_words = __substitution_iter_reset(tcl_words)
+variable_subst_loop:   
+  .debug("variable_subst_loop:\n")
+  (tcl_words,trip) =  __substitution_iter_next(tcl_words)
+
+  if trip == 1 goto backslash_subst 
+  .local string var_current_word
+  var_current_word = __substitution_get_current_word(tcl_words)
+  .debug("variable_subst, current word is=")
+  .debug(var_current_word)
+  .debug("\n")
+  .local int var_start_at
+  .local int var_length
+  .local string var_replace_str 
+  .debug("var_current_word=")
+  .debug(var_current_word)
+  .debug("\n")
+  (var_start_at,var_length,var_replace_str) = __var_subst(var_current_word)
+  .debug("var_start_at:")
+  .debug(var_start_at)
+  .debug("\n")
+
+  .debug("var_replace_str:")
+  .debug(var_replace_str)
+  .debug("\n")
+
+  .debug("var_length:")
+  .debug(var_length)
+  .debug("\n")
+
+  if var_length == -1 goto variable_subst_loop 
+  tcl_words = __substitution_replace(tcl_words,var_replace_str,var_start_at,var_length)
+  goto variable_subst_loop
+
+backslash_subst:
+  .debug("backslash_subst:\n")
+
+  tcl_words = __substitution_iter_reset(tcl_words)
+
+backslash_subst_loop:
+  .debug("backslash_subst_loop:\n")
+
+  # For all raw segments, is there a \ ? (loop)
+  # If so, replace the raw \code with the cooked value, splitting the raw
+  # into raw/cooked.
+  # Since we know this is the last level of substitution, we can just fixup
+  # everything in this chunk, and move on to the next chunk.
+
+  (tcl_words,trip) = __substitution_iter_next(tcl_words)
+  if trip == 1 goto reintegrate
+  $S1 = __substitution_get_current_word(tcl_words)
+  $S1 = __backslash_subst($S1)
+
+  tcl_words = __substitution_set_current_word(tcl_words,$S1)
+  goto backslash_subst_loop
+
+reintegrate:
+  .debug("reintegrate:\n")
+  # XXX walk the list of raw/cooked segments. Everything is done to crispy
+  # perfection now, so simply shove everything back into $S0 by appending it
+  # I'm sure this is inefficient, patches welcome. =-)
+
+  $S0 = __substitution_integrate(tcl_words)
+
+done_subst:
+  .debug("done_subst:\n")
+
+  push cooked_command, $S0
+  goto cooking
+
+cooked:
+  .debug("cooked:\n")
+
+  shift $S0, cooked_command
+  .debug("procedure='") 
+  .debug($S0)
+  .debug("'\n")
+ 
+  .debug("command: ")
+  .debug($S0)
+  .debug(" has ") 
+  $I0 = cooked_command
+  .debug($I0)
+  .debug(" arguments\n")
+
+  # get the sub we need..
+  .local pmc global_cmds
+  .local pmc my_cmd
+  global_cmds = global "commands"
+  my_cmd = global_cmds[$S0]
+
+  # isnull not working?! (XXX)
+  # isnull my_cmd, user_command
+  typeof $S1, my_cmd
+  if $S1 == "PerlUndef" goto user_command
+
+  #
+  # XXX Need to leave this with verbose calling syntax until
+  # IMCC supports short version for Sub objects.
+  # 
+  .pcc_begin prototyped
+    .arg cooked_command
+    .pcc_call my_cmd
+    inevercallthislabelbutitsrequired:
+    .result return_type
+    .result retval
+  .pcc_end
+
+  .debug("retval of '")
+  .debug(retval)
+  .debug("'\n")
+  .debug ("got return type of: '")
+  .debug(return_type)
+  .debug("'\n")
+cooked2:
+
+  goto END_SCOPE
+
+user_command:
+  .debug("user_command:\n")
+  .local pmc proc_body
+  .local pmc proc_args
+  proc_body = global "proc_body" 
+  proc_args = global "proc_args" 
+
+  .local PerlArray parsed_body
+  .local PerlArray argument_list
+ 
+  parsed_body   = proc_body[$S0]
+  argument_list = proc_args[$S0]
+
+  # XXX ISNULL flaky
+  # isnull parsed_body, no_command
+  typeof $S1, parsed_body
+  if $S1 == "PerlUndef" goto no_command
+
+  .local int cooked_len
+  cooked_len = cooked_command
+  $I3 = argument_list
+  .debug ("$I3=")
+  .debug ($I3)
+  .debug ("\n")
+  .debug ("cooked_len")
+  .debug (cooked_len)
+  .debug ("\n")
+  if cooked_len != $I3 goto bad_user_args
+
+  .debug("creating new pad\n")
+  new_pad 1
+ 
+  .local int arg_loop_var
+  .local string arg_var_name
+  .local PerlString arg_var_value
+  arg_loop_var =0
+arg_loop:
+  .debug("arg_loop_var:")
+  .debug(arg_loop_var)
+  .debug("\n")
+
+  .debug("cooked_len:")
+  .debug(cooked_len)
+  .debug("\n")
+
+  if arg_loop_var >= cooked_len goto args_done
+ 
+  #new arg_var_value, .PerlString
+
+  arg_var_name = argument_list[arg_loop_var]
+  arg_var_value = cooked_command[arg_loop_var]
+  .debug("setting: ")
+  .debug(arg_var_name)
+  .debug(" to ")
+  .debug(arg_var_value)
+  .debug("\n")
+    
+  .local pmc copied_var
+  clone copied_var, arg_var_value
+
+  store_lex -1, arg_var_name, copied_var
+  inc arg_loop_var
+  goto arg_loop
+args_done:
+  .debug("about to interpret our user defined sub.\n")
+  #_dumper("UDF = ",parsed_body)
+  # P0 is the current Sub
+  (return_type,retval) = __interpret(parsed_body)
+  # Getting a TCL_RETURN or a TCL_OK here is fine - both indicate
+  # that we returned from the user's proc properly.
+  # we'll cheat for now and morph a return from a proc into an OK.
+  if return_type != TCL_RETURN goto donemorph
+  return_type = TCL_OK
+donemorph:
+  if return_type != TCL_OK goto bad_sub_command
+  pop_pad
+
+  goto END_SCOPE
+
+bad_user_args:
+  .debug("bad_user_args:\n")
+  # XXX This needs to be smart enough to say:
+  # called "foo" with too many arguments
+  # vs.
+  # no value given for parameter "i" to "foo"
+  return_type = TCL_ERROR
+  retval ="called \""
+  retval = retval . $S0
+  retval = retval . "\" with wrong # of arguments\n"
+  goto END_SCOPE
+
+bad_sub_command:
+  .debug("bad_sub_command:\n")
+  retval = $S0
+  return_type = $I0
+  goto DONE
+
+no_command:
+  .debug("no_command:\n")
+  return_type = TCL_ERROR
+  retval = "invalid command name \""
+  retval = retval . $S0
+  retval = retval . "\"\n"
+
+DONE:
+  .debug("final retval is '")
+  .debug(retval)
+  .debug("'\n")
+  .pcc_begin_return
+  .return return_type
+  .return retval
+  .pcc_end_return
+
+.end

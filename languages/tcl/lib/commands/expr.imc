@@ -1,0 +1,68 @@
+###
+# [expr]
+
+#
+# expr arg [... arg arg]
+
+.sub __cmd_expr
+  .param PerlArray argv
+  
+  .local string expr
+  .local int argc
+  .local int looper
+
+  .local string retval
+  .local int return_type
+
+  expr = ""
+  looper = 0
+  argc = argv
+
+loop:
+  if looper == argc goto loop_done
+  $S0 = argv[looper]
+  concat expr, $S0
+  inc looper
+  if looper == argc goto loop_done
+  concat expr," "
+
+  goto loop
+
+loop_done:
+  # XXX Assume happy case - we need to be able to get information
+  # out of __expression. Did an error occur? if it did, then we'd
+  # return something other than the TCL_OK
+  
+  $P1 = __expression(expr)
+  $I0 = $P1[0]
+  return_type = $I0
+  retval = $P1[1] 
+  if $I0 == TCL_ERROR goto done
+  return_type = TCL_OK
+  # any other return types are going to be values...
+  if $I0 == INTEGER goto done
+  if $I0 != FLOAT goto die_horribly
+
+ 
+get_float:
+  # XXX this is not the best place for this formatting code.
+  # is there a "." in this to-string'd float? that is, is it an int?
+  index $I0, retval, "."
+  if $I0 != -1 goto done
+  retval = retval . ".0"
+
+  goto done
+
+die_horribly:
+  return_type = TCL_ERROR
+  retval = "Unknown type '" 
+  $S0 = return_type
+  retval = retval . $S0
+  retval = retval . "' returned by expression"
+
+done:
+  .pcc_begin_return
+  .return return_type
+  .return retval
+  .pcc_end_return
+.end

@@ -1,0 +1,383 @@
+#
+# substitution - provides a way to handle tcl's requirements for mangling a
+#                string. represent a string as a list of strings. As we
+#                manipulate each string chunk, split it into smaller chunks
+#                (maintaining the list).  As each section has a substitution
+#                performed on it, the substituted part is marked as cooked,
+#                which stops any further substituion from being done on it. 
+#                Once all the various types of substitution are done, then
+#                the "reintegrate" function is used to return the fixedup
+#                string. 
+
+# The PerlArray that we're using as our data structure has the following
+# structure:
+#
+# 0:current_pointer - which of the many hunks of string are we looking at?
+# 1:start_pointer - which chunk index is the first chunk
+# 2:last_pointer  - which chunk index comes BEFORE the current_chunk: 
+#                 - (-1 if we're at the beginning of the chunks)
+# 3:iterator      - Internal flag used for iterating.
+# 4:next_array    - For the given array, which chunk is the next chunk?
+# 5:string_array  - an array of string hunks.
+# 6:cooked_array  - corresponds to the string_array - if the hunk is cooked,
+#                 - then there's no more substitution allowed.
+
+.sub __substitution_init
+  .param string input
+
+  .local PerlArray this
+
+  this = new PerlArray
+
+  .local int current_pointer
+  .local int start_pointer
+  .local int last_pointer
+  .local int iterator
+  .local PerlArray next_array
+  .local PerlArray string_array
+  .local PerlArray cooked_array
+  
+  current_pointer = 0
+  start_pointer = 0
+  last_pointer = -1
+  iterator = 0
+  next_array = new PerlArray
+  next_array[0] = -1
+  string_array = new PerlArray
+  string_array[0] = input
+  cooked_array = new PerlArray
+  cooked_array[0] = 0
+
+  this[0] = current_pointer
+  this[1] = start_pointer
+  this[2] = last_pointer
+  this[3] = iterator
+  this[4] = next_array
+  this[5] = string_array
+  this[6] = cooked_array
+
+  .pcc_begin_return
+  .return this
+  .pcc_end_return
+.end
+
+.sub __substitution_iter_reset
+  .param PerlArray this
+
+  .local int current_pointer
+  .local int start_pointer
+  .local int last_pointer
+  .local int iterator
+
+  # here's hoping PIR optimizes this.
+  start_pointer = this[1]
+  current_pointer = start_pointer
+  last_pointer = -1
+  iterator = 0
+ 
+  this[0] = current_pointer
+  this[1] = start_pointer
+  this[2] = last_pointer
+  this[3] = iterator
+
+  .pcc_begin_return 
+  .return this
+  .pcc_end_return
+.end
+
+.sub __substitution_iter_next
+  .param PerlArray this
+
+  .local int cooked_flag
+  .local int trip
+
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+
+  trip = 0
+
+  .local int last_pointer
+  .local int iterator
+  .local int current_pointer
+  .local PerlArray next_array
+  .local PerlArray cooked_array
+
+  #_dumper(this)
+
+  current_pointer = this[0]
+  last_pointer = this[2]
+  iterator = this[3]
+  next_array = this[4]
+  cooked_array = this[6]
+
+  if last_pointer != -1 goto loop
+  # check iterator - if 1, then we've already started looping
+  if iterator == 1 goto loop
+  iterator = 1 
+  cooked_flag = cooked_array[current_pointer]
+  if cooked_flag == 0 goto done
+
+  # get next uncooked string chunk, if possible
+loop:
+  .debug("sub_next_loop:\n")
+  last_pointer = current_pointer
+  current_pointer = next_array[current_pointer]
+  
+  if current_pointer == -1 goto oops
+  cooked_flag = cooked_array[current_pointer]
+  if cooked_flag == 0 goto done
+  goto loop
+
+oops:
+  .debug("sub_next_oops:\n")
+  # did we walk off the edge of our structure?
+  trip = 1
+
+done:
+  .debug("sub_next_done:\n")
+  # update the fields we may have changed.
+  this[0] = current_pointer
+  this[2] = last_pointer
+  this[3] = iterator
+
+  .pcc_begin_return
+  .return this
+  .return trip
+  .pcc_end_return
+.end
+
+.sub __substitution_replace
+  .param PerlArray this
+  .param string replacement
+  .param int startat
+  .param int howlong
+
+  .local int current_pointer
+  .local int start_pointer
+  .local int last_pointer
+  .local int iterator
+  .local PerlArray next_array
+  .local PerlArray string_array
+  .local PerlArray cooked_array
+
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+
+  current_pointer = this[0]
+  start_pointer = this[1]
+  last_pointer = this[2]
+  iterator = this[3]
+  next_array = this[4]
+  string_array = this[5] 
+  cooked_array = this[6]
+
+  .local int temp_start
+  .local int save_temp_start
+  .local int local_current
+  .local string original_string
+  .local string temp_string
+  .local int offset
+  .local int tmp_length
+  .local int original_string_len
+  .local int save_pointer
+  .local int save_last_pointer
+  .local int looper
+  .local int save_next
+  .local int did_first
+
+  did_first = 0
+ 
+  original_string = string_array[current_pointer]
+  .debug("original string=")
+  .debug(original_string)
+  .debug ("\n")
+  length original_string_len, original_string
+
+  .debug ("length of original string=")
+  .debug (original_string_len)
+  .debug ("\n")
+  temp_start = string_array
+  .debug ("temp_start=")
+  .debug (temp_start)
+  .debug ("\n")
+  save_temp_start = temp_start
+  local_current = temp_start
+  dec local_current
+  .debug ("local_current=")
+  .debug (local_current)
+  .debug ("\n")
+  
+  # If we start at >0 , then we need to first add a substr from the left of
+  # our replacement to the new list.
+  save_last_pointer = last_pointer
+  if startat == 0 goto middle
+begin:
+  .debug("sub_rep_begin:\n")
+  inc local_current
+  did_first = 1
+  substr temp_string, original_string, 0, startat
+
+  string_array[local_current] = temp_string
+  cooked_array[local_current] = 0
+
+
+middle:
+  .debug("sub_rep_middle:\n")
+  inc local_current
+  save_pointer = local_current
+  string_array[local_current] = replacement
+  cooked_array[local_current] = 1
+  
+  .debug("startat=")
+  .debug(startat)
+  .debug("\n")
+  .debug("howlong=")
+  .debug(howlong)
+  .debug("\n")
+  # Original string - XXXXX
+  #                   01234
+  # start at 2,3        123
+  # two + three  = 5 == length of original string
+  # offset, however, needs to be 4, as that's the last position
+  offset = startat + howlong
+  .debug("offset=")
+  .debug(offset)
+  .debug("\n")
+
+  if offset == original_string_len goto fixup
+
+end:
+  .debug("sub_rep_end:\n")
+
+  inc local_current
+
+  #dec offset
+  tmp_length = original_string_len - offset
+  inc tmp_length
+
+  substr temp_string, original_string, offset, tmp_length
+  string_array[local_current] = temp_string 
+  cooked_array[local_current] = 0
+
+fixup:
+  .debug("fixup:\n")
+  if last_pointer == -1 goto fixup2
+  next_array[last_pointer] = temp_start
+fixup2:
+  .debug("fixup2:\n")
+  if current_pointer != start_pointer goto fixup3
+  start_pointer = temp_start
+fixup3:
+  .debug("fixup3:\n")
+  save_next = next_array[current_pointer]
+  current_pointer = save_pointer
+
+fixup_loop:
+  .debug("fixup_loop:\n")
+  looper = temp_start
+  inc temp_start
+  next_array[looper] = temp_start
+
+  if temp_start >= local_current goto fixup_loop_done
+  goto fixup_loop
+
+fixup_loop_done:
+  .debug("fixup_loop_done:\n")
+  next_array[local_current] = save_next
+
+ if did_first !=1 goto lastp_done
+ last_pointer = local_current
+ dec last_pointer
+
+lastp_done:
+  .debug("lastp_done:\n")
+
+  # save out changes to our data structure
+
+  this[0] = current_pointer
+  this[1] = start_pointer
+  this[2] = last_pointer
+  this[3] = iterator
+  this[4] = next_array
+  this[5] = string_array
+  this[6] = cooked_array
+
+  .debug("Current word is now=")
+  $S0 = string_array[current_pointer]
+  .debug($S0)
+  .debug("\n")
+  .debug("last word is now=")
+  $S0 = string_array[last_pointer]
+  .debug($S0)
+  .debug("\n")
+  
+  .pcc_begin_return
+  .return this
+  .pcc_end_return
+.end
+
+.sub __substitution_get_current_word
+  .param PerlArray this
+   
+  .local int current_pointer
+  .local PerlArray string_array
+
+  current_pointer = this[0]
+  string_array = this[5] 
+
+  .local string result 
+
+   result = string_array[current_pointer]  
+  .pcc_begin_return
+  .return result
+  .pcc_end_return 
+.end
+
+.sub __substitution_set_current_word
+  .param PerlArray this
+  .param string input
+
+  .local int current_pointer
+  .local PerlArray string_array
+
+  current_pointer = this[0]
+  string_array = this[5]
+  string_array[current_pointer] = input
+
+  this[5] = string_array
+
+  .pcc_begin_return
+  .return this
+  .pcc_end_return
+.end
+
+.sub __substitution_integrate
+  .param PerlArray this
+  
+  .local string result
+
+  .local int pointer
+  .local string curstring
+
+  result = ""
+  pointer = this[1]
+  $P5 = this[5]
+  $P4 = this[4]
+
+loop:
+  if pointer == -1 goto done
+  curstring = $P5[pointer]
+
+  result = result . curstring
+
+  pointer = $P4[pointer]
+
+  goto loop
+
+done:
+
+  .pcc_begin_return
+  .return result
+  .pcc_end_return
+.end
+

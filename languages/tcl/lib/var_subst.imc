@@ -5,6 +5,13 @@
 # the length of the string being removed, and a string containing
 # the replacement string, where the original string is:
 #
+
+#
+# XXX - expr also has a way to get at variables. Before we add ANY
+# other types of variables, these two bits of code need to be
+# merged into a single bit. Non trivial at the moment.
+#
+
 # $var
 #
 # and the replacement string is the value of $var
@@ -16,18 +23,30 @@
 #   support lexical scopes
 #   support ${variable} syntax
 #   remove ords, just use raw ascii
-# Copyright (c) 2002-2003 by William J. Coleda
 
+.sub __var_subst
+  .param string arg
+  .local string word
 
-.sub __var_subst prototyped 
-  .param string word
+  # Need to make a copy, presumably because arg is REALLY a PerlString
+  # that we munge.
+  clone word, arg
+
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+
+  .debug("var_subst:called with word=")
+  .debug(word)
+  .debug("\n")
 
   .local int start_pos
   .local int replace_len
   .local string replace_str
 
+  .local int ii
   .local int temppos
   .local string varname
+  .local string sigil
 
   # .local string varindex  -- not currently used
   start_pos = 0
@@ -35,63 +54,64 @@
   replace_str = ""
 
 outer:
-  #print "VAR_SUBST\n"
+ .debug("var_subst:outer\n")
 
-  $S1 = "$"
-  index start_pos, word, $S1
+
+  sigil = "$"
+  index start_pos, word, sigil
+  .debug("var_subst:start_pos=")
+  .debug(start_pos)
+  .debug("\n")
   if start_pos == -1 goto done
   temppos = start_pos
 
 inner:
+  
   inc temppos
 
   # get last index pos
-  length $I0, word
-  $I0 = $I0 - 1
+  length ii, word
+  dec ii
 
-  if temppos > $I0 goto inner_done
+  if temppos > ii goto inner_done
 
-  ord $I0, word, temppos
+  ord ii, word, temppos
 
-  ord $I1, "A"
-  ord $I2, "Z"
-  if $I0 < $I1  goto check2
-  if $I0 <= $I2 goto inner
+  # A
+  if ii < 65 goto check2 
+  # Z
+  if ii <= 90 goto inner
 
 check2:
-
-  ord $I1, "a"
-  ord $I2, "z"
-  if $I0 < $I1  goto check3
-  if $I0 <= $I2 goto inner
+  # a
+  if ii < 97  goto check3
+  # z
+  if ii <= 122  goto inner
 
 check3:
-
-  ord $I1, "0"
-  ord $I2, "9"
-  if $I0 < $I1  goto check4
-  if $I0 <= $I2 goto inner
+  # 0
+  if ii < 48  goto check4
+  # 9
+  if ii <= 57 goto inner
 
 check4:
-
-  ord $I1, "_"
-  if I0 == $I1  goto inner
+  if ii == 95  goto inner
 
 inner_done:
 
-#  # copy pre var string
-#  print "VARSUBSTR1\n" 
-#  substr $S1, word, 0, search, ""
-#  concat output, $S1
-#
-#  # delete the $
-#
-#  print "VARSUBSTR2\n" 
-#  substr word, 0, 1, ""
-#
+  # Once we get here, we could also have a () to deal with..
+
+  # I'm not particularly happy with the way tcl matches up these ()'s...
+  # It appears to grab the last possible ), regardless of where in the word
+  # It may occur.
+  if ii != 40 goto gotword
+  print "This looks like an array variable. Barfing!\n"
+  #index $I1, word, ")", -1
+
+
+gotword:
+  .debug("var_subst:gotword\n")
   # get the varname
-
-
   replace_len = temppos - start_pos
 
   # the name of the var is one shorter than the $...
@@ -100,14 +120,16 @@ inner_done:
 
 #
 #  print "VARSUBSTR3\n" 
-   substr $S1, word, start_pos, replace_len, ""
+   .local string tmp_str
+   substr tmp_str, word, start_pos, replace_len, ""
 
-  # XXX If the find lex fails, then we need to catch the exception.
-  # (when did this start excepting?)
+  .local PerlArray temp_array
+  temp_array = new PerlArray 
+  temp_array[0] = tmp_str
 
-  find_lex $P1, $S1
-
-  replace_str = $P1
+  (ii,replace_str) = __cmd_set(temp_array) 
+  $P1 = new PerlArray
+  $P1[0] =  replace_str
 
 #  concat output, $S2
 #
@@ -120,18 +142,21 @@ done:
 
   #concat output, word
 
-  #print "start_pos = "
-  #print start_pos
-  #print "\nreplace_len = "
-  #print replace_len
-  #print "\nreplace_str = "
-  #print replace_str
-  #print "\n"
+  .debug ("var_subst:start_pos=")
+  .debug (start_pos)
+  .debug("\n")
+  .debug ("var_subst:replace_len=")
+  .debug (replace_len)
+  .debug("\n")
+  .debug ("var_subst:replace_str=")
+  .debug (replace_str)
+  .debug("\n")
+
 
   .pcc_begin_return
-    .return start_pos
-    .return replace_len
-    .return replace_str
+  .return start_pos
+  .return replace_len
+  .return replace_str
   .pcc_end_return
 
 .end

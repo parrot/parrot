@@ -1,0 +1,22 @@
+###
+# [format]
+
+#
+# format string arg arg arg
+
+.sub __cmd_format
+  .param PerlArray argv
+  
+  .local string format
+
+  # pull off the format string.
+  shift format, argv
+
+  sprintf $S0, format, argv 
+
+done:
+  .pcc_begin_return
+  .return TCL_OK
+  .return $S0
+  .pcc_end_return
+.end

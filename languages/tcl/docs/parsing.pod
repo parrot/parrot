@@ -104,8 +104,6 @@ substitutions performed on it before it's used to lookup a value.
 Various \ substitutions, except for backslash-newline, which is done before
 anything else when we first get our script.
 
-=back
-
 =head2 EXECUTE_COMMAND
 
 At this point, each of the words is as cooked as it's going to be. Put the

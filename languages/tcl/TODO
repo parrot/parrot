@@ -2,59 +2,193 @@
 
 =over 4
 
-=item *
+=item release
 
+OK AFTER HERE - ONCE DONE HERE, then update config.in for our Main Makefile -
+delete any crufty files. Do a fresh checkout from CVS - overrwrite all my changes
+in languages/tcl - make sure a fresh build works, following the CVS directions I
+provide for Leo.... then ship it to Leo for publication to the list.
+Put in a version number. put in a CHANGELOG.
+Thank wossisname for the maintenance path, encourage other patches?
+
+
+=item unfinished commands
+
+array, error, and catch are currently not finished, though preliminary 
+subs exist for them.
+
+=item expr
+
+TBD: octal, hex. (there's no way to convert go programmatically from an
+octal or hex string in parrot to a int?)
+
+TBD: strings, floats as operaands - (many of the math funcs return floats
+but you can't specify them, and not everything takes them 
+(try, for example, [expr sin(1) + sin(1)] vs [expr sin(1) * sin(1)].)
+
+TBD: blocks, commands, and strings as operands
+
+TBD: logical binary ops & ternary op (need deferred evaluation) ; unary ops;
+ops that work on strings only.
+
+TBD: functions that take > 1 arg.
+
+TBD: Argument type requirements - Currently works ONLY on bitand - esp need
+to get any that require int-only args, as we can now /generate/ floats,
+even if we cannot specify them.
+
+=item release
+
+still missing a few files from the manifest/makefile.in (all the ops,
+the functions, check the new commands)
+
+=item release
+
+Cut a new release for Leo to add to the repo.
+
+=item misc
+
+tclsh normally does some extra processing that we aren't doing, namely
+.tclshrc/tclshrc.tcl, setting of variables argc, argv, argv0, and
+tcl_interactive... see also "man n tclvars"
+
+=item misc
+
+interactive tclsh mode currently only waits for EOF and then runs all
+commands entered. should have sane defaults for tcl_prompt1, tcl_prompt2
+and respect them, and process intermediate input.
+
+=item misc
+
+use shebang magic in the examples to make them directly runnable.
+(see power.tcl for an example - this really should be done in the same
+way the generated makefiles are)
+
+=item misc
+
+octal, hex, and unicode escapes are not supported. (Not sure parrot is
+ready for this yet)
+
+=item speed
+
+fact.tcl is currently about 8-12x slower with us than than tclsh on OS X.
+
+=item tests 
+
+run a tcl test suite and pass one test.
+
+=item parrot
+
+Parrot exception handlers are currently fubar and can't be enabled.
+ so referencing an unknown
+tcl variable will cause a parrot error. (this is quite bad, but won't
+be terrible until catch gets implemented)
+
+=item parrot
+
+array variables - we're very close to supporting them, but the inability
+to trap exceptions in parrot is stopping us from cleaning things up.
+
+=item proc
+
+doesn't handle varargs. (needs [list])
+
+throw a tcl error if the user-defined proc is called with the wrong # args
+
+=item misc
+
+(aside - expression needs better error handling support, and perhaps
+a rethunk on how we're passing data around - FYI, if we're going to be using
+PerlInt, PerlNum, etc, we need to make sure they stringify as tcl
+expects them to - a PerlNum of 5 -> "5" instead of "5.0", e.g.)
+
+With this, write error. (which needs global vars first)
+
+Then make sure that if the script ends with a non TCL_OK status, that 
+the return value that percolated up is printed out.
+
+If the return type of the outermost script is not OK, return the
+appropriate code to the system.
+
+Then write catch.
+
+Then think about stacktraces.
+
+=item cleanup
+ 
 Fix the makefiles in examples/ and t/ so that they are nicely generated like
 the primary makefile.
 
-=item *
+=item misc
 
-scalar variables - (new_pad, find_lex, store_lex) - for global (tcl, not imc) variables, we only need one pad for now. I think. need to know how static depth pads interacted with the #@#$ stack.
+list variables - stringToList already exists (had to write it for "proc"s
+argument handling.) - need to write listToString, need to be able to save
+Lists as variables. 
 
-=item *
+(That last comment seems to assume that I'm not going to want to pass
+around just strings, but instead have real variables types: a laudable but
+currently undone goal. For example, we could do the following:
 
-return, stacktraces, errors...
+	arrays  - PerlHash
+	lists   - PerlArray
+	strings - PerlString
+	ints    - PerlInt
+        floats  - PerlNum
 
-=item *
+right now, anything in an expression is done as a parrot int, and anything
+returned from command is a parrot string. Should start passing around a 
+pmc as the value for both of these, and have anything that needs to 
+perate on a value be smart enough to know how to convert it to the 
+appropriate type.  Expressions are a bit harder because we need an additional
+bit of information. (is this an op, an operand, or "a chunk that is yet to
+be evaluated)
 
-array variables (this is going to require writing PMCs, I think.)
-
-=item *
-
-list variables (non fast, we can just use strings. A real implmementation will
-use an array type PMC under the hood, I think.)
-
-=item *
+=item missing procs
 
 Here's a list of commands from the 7.3 Ousterhout book that have yet to be
 implemented. Just because something is implemented doesn't mean it's a full
 implementation, either. That's what the test suite is for. =-) I've tried
 to group them so that any procs that depend on another proc to really work
 are so listed, and that related procs are grouped together. Some are SMOPs
-at this point, others require me to add features, or refactor. Many will
-require updating after features are added - "unset", for example, will need
-to be fixed when arrays are supported.
+at this point, others require me to add features, or refactor. Many already
+implemented procs will require updating after procs/features are added.
 
-a partial version of "expr" and "proc" must happen RSN.
+  catch, error 
 
-  eval source
-  unset
-  array 
-  proc -> upvar uplevel global trace
-  expr -> if while for foreach
-  list -> concat llength linsert lreplace lrange lappend
-          lsearch lsort split join
-  regexp regsub -> switch
-  cd file glob pwd pid
-  seek tell open close eof flush read gets
-  format string scan
-  catch error return break continue
-  info time trace* exec
-  auto_mkindex*
-  unknown history
+  upvar, uplevel, global - should be pretty easy with the lexical pad
+      support in parrot.
+
+  foreach  {list}
+
+  switch  {regexp regsub glob}
+
+  array (lib/commands/array.imc exists, haven't touched it recently)
+
+  list {concat, llength, linsert, lreplace, lrange, lappend,
+          lsearch, lsort, split, join}
+
+  cd, file, pwd, pid, glob
+
+  seek, tell, open, close, eof, flush, read, gets
+
+  open close (puts channelid)
+
+  string
+
+  scan {list}
+
+  info, exec
+
+  auto_mkindex*, trace*
+
+  unknown, history [ only in interactive mode ]
+
+  regexp, regsub
+ 
+  unset   (How do you remove a variable from the lexical scope ? - )
 
   * isn't a recent distro of tcl
-
+  
   And, here are more from a more recent tcl in no order.
 
   after bgerror binary case clock dde
@@ -66,34 +200,35 @@ a partial version of "expr" and "proc" must happen RSN.
   safe socket subst tcltest
   tclvars update variable vwait
 
-=item *
+=item tests
 
-Long term goal: Run the tcl test suite. Preferably an older one, it'll probably be easier to pass. (I wonder how much of the test suite is tied up to the implementation - I'm ok with failing tests that suck. =-)
+Long term goal: Run the tcl test suite. Will an  older one, be easier to pass?
 
-=item *
+The sooner we can do this, the better, as I only want to have tests for
+internals, not for any Tcl.
 
-Get imcc to report on where the error is pre-macro expansion.
-(if you introduce an error into the is_space macro, for example,
- the error is reported in a completely
-different location -  presumably the error checking occurs post macro-subst.)
+=item misc
 
-=item *
+Think about making "debug" something that's handled by C<tcl.pl> instead
+of in PIR.. It can't be good to have all those branches.
+
+=item parrot
 
 Get imcc to complain if you call a macro without passing all the arguments.
 
-=item *
+=item parrot
 
-Get imcc to complain if you try to define the same .local symbol twice.
+Get imcc to NOT require a useless label when using the calling conventions:
 
-=item *
+This is pretty much a dead issue since we hardly use the .pcc_call style
+anymore. (yay, Melvin!) There are two cases where we MUST use it, in
+interpret when we call the appropriate command sub or op sub.
+
+=item misc
 
 Optimizations... I'm primarily concerned about functionality at this point,
-and have probably got some brain dead stuff that can be optimized now. There are
-more clever things, like keeping track of where a [ ] pair is - I have to find
-it twice (once for determining where the word ends, once for finding it so I 
-can execute it.) Could save a bit of time, I'm sure, if someone clued up the
-parser.
+and have probably got some brain dead stuff that can be optimized now. 
 
-=back
+=back 4
 
 =cut

@@ -1,0 +1,60 @@
+###
+# [proc]
+
+.sub __cmd_proc
+  .param PerlArray argv
+
+  #_dumper("proc called with",argv)
+
+  .local int argc 
+  argc = argv
+
+  if argc != 3 goto error
+
+  .local int return_type
+  .local string retval
+  return_type = TCL_OK
+  retval = ""
+
+  .local string name
+  .local string args
+  .local string body
+
+  name = argv[0]
+  args = argv[1]
+  body = argv[2]
+
+  .local PerlArray arg_list
+
+  arg_list = __stringToList(args)
+
+  # Save the parsed body.
+
+  .local PerlArray parsed_body
+  parsed_body = __parse(body) 
+  #_dumper("proc generated parsed body of",parsed_body)
+
+  # Now, shove the parsed routine into the global hash...
+  $P0 = global "proc_body"
+  $P2 = global "proc_args"
+  
+  $P0[name] = parsed_body
+  $P2[name] = arg_list
+ 
+  # XXX in retrospect, we shouldn't have to push this back into the globals.
+  
+  global "proc_body" = $P0
+  global "proc_args" = $P2
+
+  goto done
+ 
+error:
+  return_type = TCL_ERROR
+  retval = "wrong # args: should be \"proc name args body\"\n"
+
+done:
+  .pcc_begin_return
+  .return return_type
+  .return retval
+  .pcc_end_return
+.end

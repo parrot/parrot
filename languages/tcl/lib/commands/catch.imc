@@ -1,0 +1,55 @@
+###
+# [catch]
+
+# XXX only handles the one arg form of error right now.
+# need global vars before setting errorInfo, and stack tracing isn't
+# ready yet.
+# (So, the usage statement lies)
+
+.sub __cmd_catch
+  .param PerlArray argv
+ 
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+
+  .local int argc 
+  argc = argv
+
+  .local int return_type
+  .local string retval
+  .local string varname
+  .local string code
+
+  if argc ==0 goto badargs
+  if argc > 2 goto badargs
+  code = argv[0]
+  $P1 = __parse(code)
+  ($I0,$S0) = __interpret($P1)
+  print "script returned value='"
+  print $S0
+  print "'\n"
+  retval = $I0
+
+  if argc==1 goto done
+  # XXX This should probably use the "set" command for better
+  # error handling on bad var names.
+  varname = argv[1]
+  print "setting varname:"
+  print varname
+  print "\n"
+  $P0 = new PerlString
+  $P0 = $S0
+  store_lex -1, varname, $P0
+  _dumper($P0)
+  goto done
+
+badargs:
+  return_type = TCL_ERROR
+  retval = "wrong # args: should be \"catch command ?varName?\""
+
+done:
+  .pcc_begin_return
+  .return return_type
+  .return retval
+  .pcc_end_return
+.end

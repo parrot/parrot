@@ -1,5 +1,47 @@
-A measly set of tests. Should eventually try to run the tcl test suite, ja?
+=pod
 
-It occurs to me that the "expected" output should be driven by running through
-the tcl through tclsh until we start using the tcl test suite.
-(Except that not everyone is going to have a copy of tcl lying around)
+=head1 DESCRIPTION
+
+A measly set of tests. 
+
+=head1 TODO
+
+=over 4
+
+=item commands
+
+cmd_expr should check prededence, parens, etc, as well as all the
+defined ops and functions.
+
+=item macros
+
+	debug
+	is_space
+
+=item funcs
+
+	backslash_subst.imc:.pcc_sub __backslash_subst prototyped
+	
+	match_close.imc:.pcc_sub __match_close prototyped
+	
+	substitution.imc:.pcc_sub __substitution_init prototyped
+	substitution.imc:.pcc_sub __substitution_iter_reset prototyped
+	substitution.imc:.pcc_sub __substitution_iter_next prototyped
+	substitution.imc:.pcc_sub __substitution_replace prototyped
+	substitution.imc:.pcc_sub __substitution_integrate prototyped
+	substitution.imc:.pcc_sub __substitution_get_current_word prototyped
+	substitution.imc:.pcc_sub __substitution_set_current_word prototyped
+	
+	var_subst.imc:.pcc_sub __var_subst prototyped 
+
+=item won't test
+
+These functions are big enough that it probably doesn't make sense to test
+them independantly of tcl.pbc.
+
+Though, given that,  perhaps they could be refactored.
+
+	interpret.imc:.pcc_sub __interpret prototyped [*]
+	parse.imc:.pcc_sub __parse prototyped [*]
+
+=cut

@@ -1,0 +1,163 @@
+# This file generated automatically by tcl.pl
+#
+
+# setup some global constants
+
+# return codes
+ .const int TCL_OK = 0
+ .const int TCL_ERROR = 1
+ .const int TCL_RETURN = 2
+ .const int TCL_BREAK = 3
+ .const int TCL_CONTINUE = 4
+
+# expression codes - we use TCL_OK there, so move these out high enough
+# so there's no conflict.
+  .const int OPFUNC = 10
+
+  # XXX Replace all these with a single VALUE type?
+  .const int INTEGER = 11
+
+  # XXX none of these are currently used.
+  .const int FLOAT   = 12
+  .const int STRING  = 13
+
+  # XXX end replace.
+  .const int BLOCK   = 14
+  .const int CHUNK   = 15
+  .const int COMMAND = 16
+
+# misc
+ .const int MAX_PRECEDENCE = 9
+
+#
+# _main
+#
+# Setup the information the interpreter needs to run, 
+# then parse and interpret the tcl code we were passed.
+
+.sub _main
+  .param pmc argv
+
+  .local string filename
+  .local string mode
+  .local string chunk
+  .local string contents
+  .local PerlHash commands
+  .local PerlHash operands
+  .local PerlHash math_funcs
+  .local PerlHash precedence
+  .local Sub a_sub
+  .local int argc
+  .local int retcode
+  .local string retval
+
+setup:
+
+  # Keep track of all the builtin commands
+  commands = new PerlHash  
+
+${COMMANDS}
+
+  # Keep track of math functions
+  math_funcs = new PerlHash
+
+${FUNCTIONS}
+
+  # XXX should auto-gen these with tcl.pl also
+  operands = new PerlHash
+  precedence = new PerlHash
+
+  newsub a_sub, .Sub, __operand_mul
+  operands["*"] = a_sub
+  precedence["*"] = 1 
+  newsub a_sub, .Sub, __operand_div
+  operands["/"] = a_sub
+  precedence["/"] = 1 
+  newsub a_sub, .Sub, __operand_mod
+  operands["%"] = a_sub
+  precedence["%"] = 1 
+  newsub a_sub, .Sub, __operand_plus
+  operands["+"] = a_sub
+  precedence["+"] = 2
+  newsub a_sub, .Sub, __operand_minus
+  operands["-"] = a_sub
+  precedence["-"] = 2 
+  newsub a_sub, .Sub, __operand_shl
+  operands["<<"] = a_sub
+  precedence["<<"] = 3 
+  newsub a_sub, .Sub, __operand_shr
+  operands[">>"] = a_sub
+  precedence[">>"] = 3 
+  newsub a_sub, .Sub, __operand_lt
+  operands["<"] = a_sub
+  precedence["<"] = 4
+  newsub a_sub, .Sub, __operand_gt
+  operands[">"] = a_sub
+  precedence[">"] = 4
+  newsub a_sub, .Sub, __operand_lte
+  operands["<="] = a_sub
+  precedence["<="] = 4 
+  newsub a_sub, .Sub, __operand_gte
+  operands[">="] = a_sub
+  precedence[">="] = 4
+  newsub a_sub, .Sub, __operand_equal
+  operands["=="] = a_sub
+  precedence["=="] = 5
+  newsub a_sub, .Sub, __operand_unequal
+  operands["!="] = a_sub
+  precedence["!="] = 5 
+  newsub a_sub, .Sub, __operand_bitand
+  operands["&"] = a_sub
+  precedence["&"] = 7
+  newsub a_sub, .Sub, __operand_bitxor
+  operands["^"] = a_sub
+  precedence["^"] =  8
+  newsub a_sub, .Sub, __operand_bitor
+  operands["|"] = a_sub
+  precedence["|"] = 9
+
+  # start with a new pad...
+  new_pad 0
+
+  global "commands" = commands
+  global "operands" = operands
+  global "functions" = math_funcs
+  global "precedence" = precedence
+  
+  # Setup the Global containers for user-defined procs
+  $P1 = new PerlHash
+  global "proc_body" = $P1
+  $P1 = new PerlHash
+  global "proc_args" = $P1 
+
+
+
+  # If no file was specified, read from stdin.
+  argc = argv
+  if argc > 1 goto open_file
+  getstdin $P1
+  $P2 = new PerlArray
+  $P2[0] = $P1
+  (retcode,retval) = __cmd_source($P2)
+  close $P1
+  goto done
+
+open_file: 
+  filename = argv[1]
+  $P2 = new PerlArray
+  $P2[0] = filename
+  (retcode,retval) = __cmd_source($P2)
+
+done:
+  if retcode != TCL_ERROR goto realdone
+  print retval
+  exit 1
+
+realdone:
+  # don't fall off the end of main, it's rude.
+  end
+ 
+.end
+
+.include "library/dumper.imc"
+${INCLUDES}

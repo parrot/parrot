@@ -4,15 +4,15 @@
 # given a string and a starting position,
 # return the position at which the leading { or " 
 # closes, including the last character.
-# Copyright (c) 2002-2003 by William J. Coleda
 
 .sub __match_close
-  .param int start_pos
   .param string buffer
+  .param int start_pos
 
-  .local int debug
-  debug = 0
-  .include "lib/macros/debug.imc"
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+
+  #_dumper(buffer,"match_close_buffer")
 
   .local int opener
   .local int closer
@@ -23,6 +23,9 @@
   .local int position
   .local int bufferlen
   .local int position
+  .local int hierarchical
+
+  hierarchical = 0 
 
   position = start_pos
 
@@ -31,22 +34,27 @@
   .debug("\n")
 
   length bufferlen, buffer
+  .debug("buffer={")
+  .debug(buffer)
+  .debug("}\n")
   .debug("bufferlen=")
   .debug(bufferlen)
   .debug("\n")
   ord opener, buffer, start_pos
   .debug("opener=")
+  .debug(opener)
   .debug("\n")
   closer = -1
 
   # {}
   if opener != 123 goto trycommand
+  hierarchical = 1
   closer = 125
   goto gotcloser 
 
   # []
 trycommand:
-  .debug("match_close:trycommand")
+  .debug("match_close:trycommand:\n")
   if opener != 91 goto tryquote
   closer = 93
   goto gotcloser 
@@ -54,12 +62,21 @@ trycommand:
   # ""
 tryquote: 
   .debug("match_close:tryquote:\n")
-  if opener != 34 goto gotcloser
+  if opener != 34 goto tryparen
   closer = 34
+
+tryparen: 
+  .debug("match_close:tryparen:\n")
+  if opener != 40 goto gotcloser
+  hierarchical = 1
+  closer = 41
 
 gotcloser: 
   .debug("match_close:gotcloser:\n")
   if closer == -1 goto die1 
+  .debug("closer='")
+  .debug(closer)
+  .debug("'\n")
 
   count = 1
   state = 1
@@ -110,31 +127,42 @@ decr:
 
 # found another opener
 incr:
-  #debug("match_close:incr:\n")
+  .debug("match_close:incr:\n")
+  if hierarchical == 0 goto outer
   count = count + 1
   goto outer
 
 outer_done:
   .debug("match_close:outer_done:\n")
+  .debug("position='")
+  .debug(position)
+  .debug("'\n")
+  .debug("start_pos='")
+  .debug(start_pos)
+  .debug("'\n")
 
   $I1 = position - start_pos
   # off by two?
   inc $I1
-  goto match_close_end
+  .debug("length='")
+  .debug($I1)
+  .debug("'\n") 
+  goto done
 
 die1:
   .debug("match_close:die1\n")
+  # invalid opening match char
   $I1 = -1
-  goto match_close_end
+  goto done
 
 die2:
   .debug("match_close:die2\n")
+  # no closing char found
   $I1 = -2
-  goto match_close_end
 
-match_close_end:
+done:
+  .debug("match_close:done\n")
   .pcc_begin_return
-    .return $I1
+  .return $I1
   .pcc_end_return
-
 .end

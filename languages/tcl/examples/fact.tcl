@@ -1,16 +1,11 @@
-
-set n 15
-
-proc fact {n} {
-  set i = 0
-  set f = 1
-
-  while { i <= n } {
-    incr i
-    set f [expr $f * i]
-  }
-
-  return f
+proc fact { number } {
+  set val 1
+  while {$number}  {
+    set val [expr $val * $number]
+    incr number -1
+  } 
+  return $val
 }
 
-puts "Factorial of $n is: [fact $n]"
+set a [fact 10]
+puts "Factorial of 10 is $a"

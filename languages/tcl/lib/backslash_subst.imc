@@ -19,11 +19,12 @@
 # \xhh
 # \uhhhh
 #
-# Copyright (c) 2002-2003 by William J. Coleda
 
 .sub __backslash_subst
-
   .param string buffer
+
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
   
   .local string bs
   .local int marker
@@ -37,8 +38,10 @@
   marker=0
 
 loop_outer:
+  .debug("bs_loop_outer:\n")
   length buffer_length, buffer
   if marker > buffer_length goto my_end
+  .debug("still looping\n")
   index pos, buffer, bs, marker
   if pos == -1 goto my_end
 
@@ -47,14 +50,17 @@ loop_outer:
   if marker > buffer_length goto my_end
 
   inc marker
+  .debug("get next byte\n")
+  if marker > buffer_length goto my_end
   ord next_byte, buffer, marker
-
+  .debug("got next byte\n")
   # n
   if next_byte != 110 goto bs_a
   replace_str = "\n"
   goto bs_done
 
 bs_a:
+  .debug("bs_a:\n")
   if next_byte != 97 goto bs_b
   chr replace_str, 7
   goto bs_done
@@ -97,8 +103,10 @@ bs_done:
   goto loop_outer
 
 my_end:
+  .debug("bs_my_end\n")
+
   .pcc_begin_return
-    .return buffer
+  .return buffer
   .pcc_end_return
 
 .end

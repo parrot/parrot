@@ -3,6 +3,3 @@ default:
 
 %:%.tcl
 	../../../parrot ../tcl.pbc $@.tcl
-
-foo-t:
-	../../../parrot -t ../tcl.pbc foo.tcl

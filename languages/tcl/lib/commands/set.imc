@@ -1,45 +1,161 @@
 ###
 # [set]
-# Copyright (c) 2002-2003 by William J. Coleda
 
-.sub __cmd_set 
+# XXX don't forget to add in hooks so that we can't do:
+# set b 2
+# set b(c) 4
+
+.sub __cmd_set
   .param PerlArray argv
 
-  .include "lib/macros/debug.imc"
-  .local int debug
-  debug = 0
+  .local pmc lexical
+  .local int len
+  .local string type
+  
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+
+  #.local Exception_Handler ignore
+  #newsub ignore, .Exception_Handler, __ignore
 
   .local int argc 
   argc = argv
-  
-  .local pmc value
+
+  .local string var
+  .local string key
+
+  .local PerlString value
   .local string retval
+  retval = TCL_OK
+  .local int return_type
  
   if argc == 0 goto error
 
-  $S1 = argv[0] 
-
+  .local string arg0
+  arg0 = argv[0] 
   if argc == 2 goto setting
   if argc == 1 goto getting
   if argc > 2 goto error
 
 getting:
-  find_lex $P1, $S1
-  retval = $P1
+  # Is this an array variable?
+  # ends with )
+  .local int char
+
+  ord char, arg0, -1
+  if char != 41 goto get_scalar
+  # contains a (
+  index char, arg0, "("
+  if char == -1 goto get_scalar
+
+get_array:
+  substr var, arg0, 0, char
+  length len, arg0
+
+  len = len - char
+  len = len - 2
+  inc char
+  substr key, arg0, char, len
+
+  find_lex lexical, -1, var
+  typeof type, lexical
+  if type != "PerlHash" goto get_array_bad
+
+get_array_ok:
+  retval = lexical[key]
+  goto done
+
+get_array_bad:
+  return_type = TCL_ERROR
+  retval =  "That's not an array variable, putz"
+  goto done
+
+get_scalar:
+  .debug("trying to get value of")
+  .debug(arg0)
+  .debug("\n")
+  find_lex lexical, -1, arg0
+  typeof type, lexical
+  if type == "PerlHash" goto get_scalar_bad
+  goto get_scalar_ok
+
+get_scalar_bad:
+  return_type = TCL_ERROR
+  retval = "Can't do that, that's an array variable\n"
+  goto done
+
+get_scalar_ok:
+  retval = lexical
   .debug("Trying to get value of: ")
-  .debug($S1)
+  .debug(arg0)
   .debug("\n")
   goto done
 
 setting:
-  value = new PerlString
+  # Is this an array variable?
+  # ends with )
+  ord char, arg0, -1
+  if char != 41 goto set_scalar
+  # contains a (
+  index char, arg0, "("
+  if char == -1 goto set_scalar
+set_array:
+  substr var, arg0, 0, char
+  length len, arg0
+
+  len = len - char
+  len = len - 2
+  inc char
+  substr key, arg0, char, len
+
+  # We need to check to see if this variable already
+  # exists, as we cannot switch between array and scalar.
+  #set_eh ignore
+  find_lex lexical, -1, var
+  #clear_eh
+
+  .local int bool
+  defined bool, lexical
+  unless bool, set_array_new
+
+  typeof type, lexical 
+  if type != "PerlHash" goto set_array_bad
+  goto set_array_ok
+
+set_array_new:
+  lexical = new PerlHash
+  goto set_array_ok
+
+set_array_bad:
+  return_type = TCL_ERROR
+  retval = "That's not an array variable, punk!\n"
+  goto done
+
+set_array_ok:
+  .debug("set_array_ok:\n")
+
+  lexical[key] =  value
+
+  store_lex -1, var, lexical
+
+  .debug("array variable is '")
+  .debug(var)
+  .debug("' key is '")
+  .debug(key)
+  .debug("'\n")
+ 
+  goto done
+
+set_scalar:
+  new value, .PerlString
   value = argv[1]
+
   .debug("Trying to save value of: ")
   .debug(value)
   .debug("\ninto")
-  .debug($S1)
+  .debug(arg0)
   .debug("\n")
-  store_lex 0, $S1, value
+  store_lex -1, arg0, value
   retval = value
 
   goto done 
@@ -47,10 +163,19 @@ setting:
   # fall through to a bad call.
 
 error:
-  print "wrong # args: should be \"set varName ?newValue?\"\n"
+  return_type =TCL_ERROR 
+  retval = "wrong # args: should be \"set varName ?newValue?\"\n"
 
 done:
   .pcc_begin_return
-    .return retval
+  .return 0
+  .return retval
   .pcc_end_return
+.end
+
+# Should move this definition into a more global file.
+.sub __ignore
+  #print "Exception Handler Triggered\n"
+  set P2, P5["_invoke_cc"]
+  invoke P2
 .end

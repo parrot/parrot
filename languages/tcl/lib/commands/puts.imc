@@ -1,32 +1,34 @@
 ###
 # [puts]
-# Copyright (c) 2002-2003 by William J. Coleda
 
-.sub __cmd_puts 
+.sub __cmd_puts
   .param PerlArray argv
 
   .local int argc 
   argc = argv
-  #print "puts got "
-  #print argc
-  #print " args\n"
   if argc == 0 goto error
+
+  .local int return_type  
+  .local string retval
+
+  return_type = TCL_OK
+  retval = ""
  
-  S1 = argv[0] 
+  $S1 = argv[0] 
   if argc == 2 goto twoarg
-  print S1
+  print $S1
   if argc == 1 goto newline
   if argc > 2 goto error
 
 twoarg:
-  if S1 != "-nonewline" goto error
-  S2 = argv[1]
-  print S2
+  if $S1 != "-nonewline" goto error
+  $S2 = argv[1]
+  print $S2
   goto done 
 
-
 error:
-  print "Bad call to puts: \n"
+  return_type = TCL_ERROR
+  retval = "Bad call to puts: \n"
   goto done
 
 newline:
@@ -34,6 +36,7 @@ newline:
 
 done:
   .pcc_begin_return
-  .return ""
+  .return return_type
+  .return retval
   .pcc_end_return
 .end

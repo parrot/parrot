@@ -1,19 +1,20 @@
 ###
 # [append]
-# Copyright (c) 2002-2003 by William J. Coleda
 
 #
 # append var [...]
 
-.sub __cmd_append 
+.sub __cmd_append
   .param PerlArray argv
   
-  .include "lib/macros/debug.imc"
-  .local int debug
-  debug = 1
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
 
   .local int argc 
   argc = argv
+
+  .local int return_type
+  return_type = TCL_OK
 
   .local string value
   .local int looper
@@ -22,7 +23,7 @@
   looper = 1
 
   $S1 = argv[0] 
-  find_lex $P1, $S1
+  find_lex $P1, -1, $S1
   value = $P1 
 
 loop:
@@ -37,17 +38,19 @@ loop_done:
 
   $P1 = new PerlString
   $P1 = value
-  store_lex 0, $S1, $P1
+  store_lex -1, $S1, $P1
 
   goto done 
 
   # fall through to a bad call.
 
 error:
-  print "wrong # args: should be \"append varName ?value value ...?\""
+  return_type = TCL_ERROR 
+  value = "wrong # args: should be \"append varName ?value value ...?\""
 
 done:
   .pcc_begin_return
-    .return value
+  .return return_type
+  .return value
   .pcc_end_return
 .end

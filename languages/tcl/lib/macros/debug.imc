@@ -1,6 +1,10 @@
 # It would be nice if we could print out arbitrary strings and have everything
 # automagically prefixed with "DEBUG: "
-# Copyright (c) 2002-2003 by William J. Coleda
+
+# It'd be nice if we could take varargs, ala:
+
+# _debug("there are ", $I0, " items");
+# not sure how hard calling conventions'd make this.
 
 .macro debug(MESSAGE)
    
@@ -8,6 +12,5 @@
   print .MESSAGE 
 
 .local $DONE:
-  noop
 
 .endm

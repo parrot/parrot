@@ -1,0 +1,55 @@
+###
+# [while]
+
+.sub __cmd_while
+  .param PerlArray argv
+ 
+  .local int argc 
+  argc = argv
+
+  #_dumper("while called with",argv)
+
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+  # XXX no bad arg handling...
+
+  .local string code
+  .local string condition
+  .local string retval
+  .local pmc parsed_code
+  .local int return_type
+
+  retval = "" 
+  condition = argv[0]
+  code = argv[1]
+
+while_loop:
+  .debug("while - while loop:\n")
+  parsed_code = __parse(code)
+  $P0 = __expression(condition)
+  # XXX Happy case - expression could have failed.
+  $S0 = $P0[1]
+  $I0 = __expr_boolean($S0)
+  if $I0 == 0 goto done
+  (return_type,$S0) = __interpret(parsed_code)
+  if return_type == TCL_BREAK goto done
+  if return_type == TCL_RETURN goto done
+
+  goto while_loop
+
+done:
+  if return_type == TCL_RETURN goto done_cleaned
+  if return_type == TCL_ERROR  goto done_cleaned
+
+  return_type = TCL_OK
+
+done_cleaned:
+  retval = $S0
+  # while always returns "", regardless of the code it may have executed
+  # XXX - (unless there's an error)
+
+  .pcc_begin_return
+  .return return_type
+  .return retval
+  .pcc_end_return
+.end

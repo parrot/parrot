@@ -1,0 +1,105 @@
+###
+# [if]
+
+.sub __cmd_if
+  .param PerlArray argv
+ 
+  .local int argc 
+  argc = argv
+
+  .local PerlArray elseifs
+  elseifs = new PerlArray
+  .local string retval
+  .local string code
+  .local string condition
+  .local string body
+  .local string else
+  .local int return_type
+
+  .local int counter
+
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+  
+  # XXX each one of this argv[counter] sets should be protected
+  # against getting past the end of the input array... 
+ 
+  counter = 0
+  condition = argv[counter]
+  inc counter
+  body = argv[counter]
+  inc counter
+  if body != "then" goto get_elseifs 
+  body = argv[counter]
+  inc counter
+get_elseifs:
+  $S0 = argv[counter]
+  if $S0 != "elseif" goto get_else
+  $P1 = new PerlArray
+  inc counter
+  $P2 = argv[counter]
+  $P1[0] = $P2
+  inc counter
+  $P2 = argv[counter]
+  $P1[1] = $P2
+  push elseifs, $P1
+  inc counter
+  goto get_elseifs
+get_else:
+  $S0 = argv[counter]
+  if $S0 != "else" goto get_final
+  inc counter
+  $S0 = argv[counter]
+get_final:
+  else = $S0
+
+
+  $P0 = __expression(condition)
+  # XXX happy case.
+  $S0 = $P0[1]
+  $I0 = __expr_boolean($S0)
+
+  if $I0 == 0 goto do_elseifs 
+  code = body 
+  goto done
+ 
+do_elseifs:
+  .debug("do_elseifs:\n")
+  $I1 = elseifs
+  if $I1 == 0 goto do_else
+  $I2 = 0
+elseif_loop:
+  .debug("elseif_loop:\n")
+  if $I2 == $I1 goto do_else
+  $P1 = elseifs[$I2]
+  condition = $P1[0]
+  $P0 = __expression(condition)
+  #XXX happy case
+  $S0 = $P0[1]
+  $I0 = __expr_boolean($S0)
+  if $I0 == 1 goto done_elseifs
+  inc $I2
+  goto elseif_loop  
+
+done_elseifs:
+  .debug("done_elseifs:\n")
+  code = $P1[1]
+  goto done
+
+do_else:
+  .debug("do_else:\n")
+  code = else
+
+done:
+  .debug("do_else:\n")
+  .debug("GOING TO RUN CODE='")
+  .debug(code)
+  .debug("'\n")
+  $P1 = __parse(code)
+  (return_type,retval) = __interpret($P1)
+
+  .pcc_begin_return
+  .return return_type
+  .return retval
+  .pcc_end_return
+.end

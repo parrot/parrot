@@ -1,10 +1,26 @@
 ###
 # [exit]
-# Copyright (c) 2002-2003 by William J. Coleda
 
 .sub __cmd_exit
-  # we don't care about our arguments. just yet.
-  end 
-  
-  # We don't bother with .pcc_begin_return, etc. - we just end'ed!  
+  .param PerlArray argv
+
+  .local int argc
+  argc = argv
+
+  .local int exit_code
+  exit_code = 0
+
+  if argc > 2 goto badargs
+  if argc == 0 goto exit
+
+  exit_code = argv[0]
+
+exit:
+  exit exit_code
+
+badargs:
+  .pcc_begin_return
+    .return TCL_ERROR
+    .return "wrong # args: should be \"exit ?returnCode?\"\n"
+  .pcc_end_return
 .end

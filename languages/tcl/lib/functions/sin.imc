@@ -1,0 +1,29 @@
+# [expr sin()]
+
+.sub __math_sin
+  .param PerlArray argv
+
+  # requires 1 args, numeric only
+
+  .local pmc result 
+  result = new PerlArray
+
+  # XXX assuming numeric
+
+  # XXX also assuming 1 arg
+  pop $P0, argv
+
+  $I0 = $P0[1]
+
+  sin $N1, $I0
+
+  result[0] = FLOAT
+  result[1] = $N1
+
+  push argv, result
+
+  .pcc_begin_return
+  .return argv
+  .return FLOAT
+  .pcc_end_return   
+.end

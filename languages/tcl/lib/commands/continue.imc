@@ -1,0 +1,36 @@
+###
+# [continue]
+
+.sub __cmd_continue
+  .param PerlArray argv
+ 
+  .include "languages/tcl/lib/macros/debug.imc"
+  .const int debug = 0
+
+  .local int argc 
+  argc = argv
+
+  .local int return_type
+
+  .local string retval
+
+  if argc == 0 goto noargs
+
+  return_type = TCL_ERROR
+  retval = "wrong # args: should be \"break\"\n"
+  goto done
+
+noargs:
+  return_type = TCL_CONTINUE
+  retval = "" 
+
+ # The sole purpose of this command (and break, and continue) is to 
+ # generate a specific return code. Normally, when a proc finishes TCL_OK
+ # control passes to the next item in the queue.
+
+done:
+  .pcc_begin_return
+  .return return_type
+  .return retval
+  .pcc_end_return
+.end

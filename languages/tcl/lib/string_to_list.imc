@@ -1,0 +1,29 @@
+.sub __stringToList
+  .param string str
+  # buffer contains the string we are working on.
+
+  .local int buflen
+  length buflen, str
+
+  .local PerlArray list
+  list = new PerlArray
+ 
+  .local PerlArray parsed_str
+
+  parsed_str = __parse(str)
+  
+  $I0 = parsed_str
+  if $I0 == 0 goto done
+
+  shift list, parsed_str
+
+  # XXX If there is more than one entry in the parsed_str array, then
+  # there's probably an error condition we need to raise.
+
+done:
+  .pcc_begin_return
+  .return list
+  .pcc_end_return
+  ret
+
+.end

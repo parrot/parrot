@@ -1,0 +1,110 @@
+###
+# [array]
+
+.sub __cmd_array
+  .param PerlArray argv
+
+  # XXX this command was half implemented, need to revisit it.
+   
+  .local int argc 
+  argc = argv
+
+  .local int ret_code
+  ret_code = 0
+  .local string ret_value
+  ret_value = ""
+
+  if argc < 2 goto error
+  .local string array_name
+  .local PerlHash the_array
+  .local int is_array
+
+  shift array_name, argv
+
+  #.local Exception_Handler ignore
+  #newsub ignore, .Exception_Handler, __ignore
+
+  # For some reason, when we actually have an exception,
+  # the subcommand is coming back as "lexical "q" not found".
+  # Apparently there are side effects when using an exception
+  # handler that IMCC doesn't catch?
+
+  # In trying to track down why argv was apparently updating, I added
+  # In this dumper call (which I should macroize, dammit)
+  # In doing that, I get:
+
+  #--> Dumping 'before'
+  #[PerlArray] Illegal PMC enum (-1) in new
+
+  # Which is bad. Ugh.
+
+  # Why doesn't this work?
+ 
+  #_dumper(argv,"before") 
+
+  #print "About to ignore exception\n"
+  #set_eh ignore
+  find_lex the_array, -1, array_name
+  #clear_eh
+  #print "... and we're back\n"
+
+  #_dumper(argv,"after")
+ 
+  defined $I0, the_array
+  if $I0 == 0 goto array_no
+
+  typeof $S0, the_array
+
+  if $S0 != "PerlHash" goto array_no
+  is_array = 1
+  goto array1
+array_no:
+  is_array = 0
+
+array1:
+
+  #print "HERE?\n" 
+  .local string subcommand
+  shift subcommand, argv
+
+  #print "subcommand is '"
+  #print subcommand
+  #print " \n"
+
+  argc = argv
+
+  if subcommand == "anymore" goto NOTDONEYET
+  if subcommand == "donesearch" goto NOTDONEYET
+  if subcommand == "exists" goto exists
+  if subcommand == "get" goto NOTDONEYET
+  if subcommand == "names" goto NOTDONEYET
+  if subcommand == "nextelement" goto NOTDONEYET
+  if subcommand == "set" goto NOTDONEYET
+  if subcommand == "size" goto NOTDONEYET
+  if subcommand == "startsearch" goto NOTDONEYET
+  if subcommand == "statistics" goto NOTDONEYET
+  if subcommand == "unset" goto NOTDONEYET
+
+  goto error
+
+# Is this really an array?
+exists:
+  ret_value = is_array 
+  goto done
+
+NOTDONEYET:
+  print "Array subcommand '"
+  print subcommand
+  print "' not implemented yet.\n"
+  goto done
+
+error:
+  print "Bad call to array: \n"
+  goto done
+
+done:
+  .pcc_begin_return
+  .return ret_code
+  .return ret_value
+  .pcc_end_return
+.end
