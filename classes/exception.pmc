@@ -1,0 +1,41 @@
+/* exception.pmc
+ *  Copyright: 2002-2003 Yet Another Society
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     This is the exception base class
+ *  Data Structure and Algorithms:
+ *     As we are still lacking objects, this class is based
+ *     on a PerlHash. This will probably change.
+ *     An exception object has these attributes:
+ *     - _message ... textual representation
+ *     - _type    ... exception type (s. exceptions.h, except_type.pasm)
+ *     - _severity .. exception severity (s. -""-, except_severity.pasm)
+ *     - _P5      ... contents of REG_PMC(5)
+ *     Optional:
+ *     - _C_file ...  origin of exception
+ *     - _C_line ...    in C code
+ *     - _P_file ...  origin of exception
+ *     - _P_line ....   in PASM/PIR/Perl ... source
+ *     - _return_cc . return continuation
+ *     - any information attached by the HL. This shouldn't start
+ *       with an underscore (that is reserved for Parrot's internal
+ *       usage.
+ *  History:
+ *     Initial revision by leo 2003.07.10
+ *  Notes:
+ *     When an exception handler is called, the exception object is
+ *     passed as REG_PMC(5), the original contents of this register
+ *     is in the exception object's _P5 attribute.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+pmclass Exception extends PerlHash {
+
+    STRING* name() {
+        return whoami;
+    }
+}

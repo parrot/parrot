@@ -1085,6 +1085,51 @@ inline op updatecc() {
 }
 ########################################
 
+=item Exception handling
+
+=over 4
+
+=item B<set_eh>(in PMC)
+
+Push the exception handler in $1 on the control stack.
+
+=item B<clear_eh>()
+
+Clear out the most recently placed exception.
+
+=item B<throw>(in PMC)
+
+Throw the exception in $1.
+
+=item B<rethrow>(in PMC)
+
+Only valid inside an exception handler. Rethrow the exception $1.
+
+=back
+
+=cut
+
+inline op set_eh(in PMC) {
+  push_exception(interpreter, $1);
+  goto NEXT();
+}
+
+inline op clear_eh() {
+  pop_exception(interpreter);
+  goto NEXT();
+}
+
+inline op throw(in PMC) {
+  throw_exception(interpreter, $1);
+  restart NEXT();
+}
+
+inline op rethrow(in PMC) {
+  rethrow_exception(interpreter, $1);
+  goto NEXT();
+}
+
+########################################
 =item B<set_addr>(out INT, in INT)
 
 Sets register $1 to the current address plus the offset $2.

@@ -1,0 +1,25 @@
+/* exception_handler.pmc
+ *  Copyright: 2002-2003 Yet Another Society
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     This is the exception_handler class
+ *  Data Structure and Algorithms:
+ *  History:
+ *     Initial revision by leo 2003.07.10
+ *  Notes:
+ *     When an exception handler is called, the exception object is
+ *     passed as REG_PMC(5), the original contents of this register
+ *     is in the exception object's _P5 attribute.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+pmclass Exception_Handler extends Continuation {
+
+    STRING* name() {
+        return whoami;
+    }
+}

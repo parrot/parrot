@@ -83,6 +83,26 @@ describe them as well.\n\n");
     dumpcore();
 }
 
+void
+push_exception(Parrot_Interp interpreter, PMC *handler)
+{
+}
+
+void
+pop_exception(Parrot_Interp interpreter)
+{
+}
+
+void
+throw_exception(Parrot_Interp interpreter, PMC *handler)
+{
+}
+
+void
+rethrow_exception(Parrot_Interp interpreter, PMC *handler)
+{
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd
