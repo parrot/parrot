@@ -14,6 +14,8 @@
 
 #include "parrot/parrot.h"
 
+#define INT2KEY(i,k) ((k) ? key_new_integer((i), *(k)) : NULL)
+
 static PMC* undef = NULL;
 
 static STRING* make_hash_key(Interp* interpreter, PMC * key)
@@ -291,5 +293,51 @@ pmclass PerlHash {
     /* == operation */
     INTVAL is_equal (PMC* value) {
         return 0;
+    }
+
+    INTVAL exists_keyed(PMC* key) {
+	STRING * sx;
+	HASH * h = (HASH *)SELF->data;
+	HASH_ENTRY * he;
+	sx = key_string(INTERP, key);
+	key = key_next(INTERP, key);
+	he = hash_get(INTERP, h, sx);
+	if (he == NULL)
+	    return 0;		/* no such key */
+	if (key == NULL)
+	    return 1;		/* lookup stops here */
+	return he->val.pmc_val->vtable->exists_keyed(INTERP, he->val.pmc_val,
+						     key);
+    }
+
+    INTVAL defined_keyed(PMC* key) {
+	STRING * sx;
+	HASH * h = (HASH *)SELF->data;
+	HASH_ENTRY * he;
+	sx = key_string(INTERP, key);
+	key = key_next(INTERP, key);
+	he = hash_get(INTERP, h, sx);
+	if (he == NULL)
+	    return 0;		/* no such key */
+	if (key == NULL)
+	    return he->val.pmc_val->vtable->defined(INTERP, he->val.pmc_val);
+	return he->val.pmc_val->vtable->defined_keyed(INTERP, he->val.pmc_val,
+						      key);
+    }
+
+    void delete_keyed(PMC* key) {
+	STRING * sx;
+	HASH * h = (HASH *)SELF->data;
+	HASH_ENTRY * he;
+	sx = key_string(INTERP, key);
+	key = key_next(INTERP, key);
+	he = hash_get(INTERP, h, sx);
+	if (he == NULL)
+	    ;		/* no such key */
+	else if (key == NULL)
+	    hash_delete(INTERP, h, sx);
+	else
+	    he->val.pmc_val->vtable->delete_keyed(INTERP, he->val.pmc_val,
+						  key);
     }
 }
