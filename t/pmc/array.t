@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 11;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -190,7 +190,7 @@ output_is(<<'CODE', <<OUTPUT, "defined");
     print "\n"
     new P2, .Key
     set P2, 3
-    set P0[3], 4 
+    set P0[3], 4
     defined I0, P0[P2]
     print I0
     print "\n"
@@ -230,7 +230,7 @@ output_is(<<'CODE', <<OUTPUT, "exists");
     print "\n"
     new P2, .Key
     set P2, 3
-    set P0[3], 4 
+    set P0[3], 4
     exists I0, P0[P2]
     print I0
     print "\n"
@@ -343,4 +343,60 @@ ok 3
 ok 4
 OUTPUT
 
+output_is(<<'CODE', <<OUT, "multikeyed access I arg");
+	new P0, .Array
+	set P0, 1
+	new P1, .Array
+	set P1, 1
+	set P0[0], P1
+	set P0[0;0], 20
+	set P2, P0[0]
+	typeof S0, P2
+	print S0
+	print "\n"
+	set I2, P0[0;0]
+	print I2
+	set I3, 0
+	set I2, P0[I3;0]
+	print I2
+	set I2, P0[0;I3]
+	print I2
+	set I2, P0[I3;I3]
+	print I2
+	print "\n"
+	end
+CODE
+Array
+20202020
+OUT
+
+output_is(<<'CODE', <<OUT, "multikeyed access P arg");
+	new P0, .Array
+	set P0, 1
+	new P1, .Array
+	set P1, 1
+	new P3, .PerlInt
+	set P3, 20
+	set P0[0], P1
+	set P0[0;0], P3
+	set P2, P0[0]
+	typeof S0, P2
+	print S0
+	print "\n"
+	set I2, P0[0;0]
+	print I2
+	set I3, 0
+	set I2, P0[I3;0]
+	print I2
+	set I2, P0[0;I3]
+	print I2
+	set I2, P0[I3;I3]
+	print I2
+	print "\n"
+	end
+CODE
+Array
+20202020
+OUT
+1;
 1;

@@ -335,9 +335,22 @@ pmclass Array {
 		(void*)src, enum_type_PMC);
     }
 
-    void set_pmc_keyed (PMC* key, PMC* src) {
-	INTVAL idx = key_integer(INTERP, key);
-	SELF.set_pmc_keyed_int(idx, src);
+    void set_pmc_keyed (PMC* key, PMC* value) {
+	INTVAL ix = key_integer(INTERP, key);
+        PMC* nextkey;
+        PMC* box;
+
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+	    VTABLE_set_pmc_keyed_int(INTERP, SELF, ix, value);
+	    return;
+	}
+        box = SELF.get_pmc_keyed_int(ix);
+        if (box == NULL) {
+	    /* autovivify an Array */
+	    box = pmc_new(INTERP, DYNSELF.type());
+	}
+	VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
     }
 
     void push_integer (INTVAL value) {
