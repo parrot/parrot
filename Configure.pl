@@ -150,14 +150,18 @@ if (!defined $osname) {
 }
 
 $jitarchname              =  "$cpuarch-$osname";
-$jitarchname		  =~ s/i[456]86/i386/i;
+$jitarchname		      =~ s/i[456]86/i386/i;
 $jitarchname              =~ s/-(net|free|open)bsd$/-bsd/i;
+$jitcapable               = 0;
 
 if (-e "Parrot/Jit/$jitarchname.pm") {
-    $jitcapable  = 1;
+    my $objdump_test = `objdump -V`;
+    if(defined($objdump_test)){
+       $jitcapable = 1 if($objdump_test =~ /GNU\s+objdump/)
+    }
 }
-else {
-    $jitcapable  = 0;
+
+unless($jitcapable){
     $jitarchname = 'i386-nojit';
 }
 
