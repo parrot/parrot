@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 6;
+use TestCompiler tests => 10;
 
 ##############################
 # Parrot Calling Conventions
@@ -180,5 +180,122 @@ ok:
 CODE
 in meth
 ok
+done
+OUT
+
+output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
+
+.sub _main
+    .local pmc class
+    .local pmc obj
+    newclass class, "Foo"
+    find_type $I0, "Foo"
+    new obj, $I0
+    .pcc_begin prototyped
+    .invocant obj
+    .meth_call "_meth"
+    .pcc_end
+    print "done\n"
+    end
+.end
+
+.namespace [ "Foo" ]
+.sub _meth
+    print "in meth\n"
+.end
+CODE
+in meth
+done
+OUT
+
+output_is(<<'CODE', <<'OUT', "explicit meth call syntax, meth var");
+
+.sub _main
+    .local pmc class
+    .local pmc obj
+    .local string meth
+    newclass class, "Foo"
+    find_type $I0, "Foo"
+    new obj, $I0
+    meth = "_meth"
+    .pcc_begin prototyped
+    .invocant obj
+    .meth_call meth
+    .pcc_end
+    print "done\n"
+    end
+.end
+
+.namespace [ "Foo" ]
+.sub _meth
+    print "in meth\n"
+.end
+CODE
+in meth
+done
+OUT
+output_is(<<'CODE', <<'OUT', "explicit meth call syntax, args");
+
+.sub _main
+    .local pmc class
+    .local pmc obj
+    newclass class, "Foo"
+    find_type $I0, "Foo"
+    new obj, $I0
+    .pcc_begin prototyped
+    .arg "hello"
+    .arg "\n"
+    .invocant obj
+    .meth_call "_meth"
+    .result $S0
+    .pcc_end
+    print $S0
+    print "done\n"
+    end
+.end
+
+.namespace [ "Foo" ]
+.sub _meth
+    .param string p1
+    .param string p2
+    print "in meth\n"
+    print p1
+    print p2
+    .pcc_begin_return
+    .return "ok\n"
+    .pcc_end_return
+.end
+CODE
+in meth
+hello
+ok
+done
+OUT
+
+output_is(<<'CODE', <<'OUT', "explicit meth call syntax, retcont");
+
+.sub _main
+    .local pmc class
+    .local pmc obj
+    newclass class, "Foo"
+    find_type $I0, "Foo"
+    new obj, $I0
+    .local pmc retc
+    newsub retc, .RetContinuation, label
+    .pcc_begin prototyped
+    .invocant obj
+    .meth_call "_meth", retc
+label:
+    .pcc_end
+    print "done\n"
+    end
+.end
+
+.namespace [ "Foo" ]
+.sub _meth
+    print "in meth\n"
+.end
+CODE
+in meth
 done
 OUT

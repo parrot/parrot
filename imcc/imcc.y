@@ -254,7 +254,7 @@ itcall_sub(SymReg* sub)
 %token <t> GLOBAL GLOBALOP ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
-%token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL
+%token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> PROTOTYPED NON_PROTOTYPED MAIN LOAD IMMEDIATE POSTCOMP METHOD
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -272,6 +272,7 @@ itcall_sub(SymReg* sub)
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub
 %type <t> pcc_proto pcc_sub_proto proto
 %type <i> instruction assignment if_statement labeled_inst opt_label
+%type <i> opt_invocant
 %type <sr> target reg const var string
 %type <sr> key keylist _keylist
 %type <sr> vars _vars var_or_i _var_or_i label_op
@@ -508,7 +509,7 @@ pcc_sub_call:
      PCC_BEGIN pcc_proto '\n'
          {
             char name[128];
-            SymReg * r;
+            SymReg * r, *r1;
             Instruction *i;
 
             sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
@@ -518,27 +519,34 @@ pcc_sub_call:
              * sub SymReg.
              * This is used below to append args & results
              */
-            i = iLABEL(cur_unit, r);
+            current_call = i = iLABEL(cur_unit, r);
             i->type = ITPCCSUB;
             /*
              * if we are inside a pcc_sub mark the sub as doing a
              * sub call; the sub is in r[1] of the first ins
              */
-            if (cur_unit->instructions->r[1] && cur_unit->instructions->r[1]->pcc_sub)
-                cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
+            r1 = cur_unit->instructions->r[1];
+            if (r1 && r1->pcc_sub)
+                r1->pcc_sub->calls_a_sub = 1;
          }
      pcc_args
+     opt_invocant
      pcc_call
      opt_label
      pcc_results
-     PCC_END       { $$ = 0; }
+     PCC_END       { $$ = 0; current_call = NULL; }
    ;
 
 opt_label:
-     /* empty */   { $$ = NULL;  $<sr>-2 ->pcc_sub->label = 0; }
-   | label '\n'    { $$ = NULL;  $<sr>-2 ->pcc_sub->label = 1; }
+     /* empty */   { $$ = NULL;  current_call->r[0]->pcc_sub->label = 0; }
+   | label '\n'    { $$ = NULL;  current_call->r[0]->pcc_sub->label = 1; }
    ;
 
+opt_invocant:
+     /* empty */   { $$ = NULL; }
+   | INVOCANT var '\n'
+                   { $$ = NULL;  current_call->r[0]->pcc_sub->object = $2; }
+   ;
 pcc_proto:
      PROTOTYPED     {  $$ = P_PROTOTYPED ; }
    | NON_PROTOTYPED {  $$ = P_NON_PROTOTYPED ; }
@@ -561,21 +569,33 @@ proto: pcc_proto
 pcc_call:
      PCC_CALL var COMMA var '\n'
          {
-            add_pcc_sub($<sr>-1, $2);
-            add_pcc_cc($<sr>-1, $4);
+            add_pcc_sub(current_call->r[0], $2);
+            add_pcc_cc(current_call->r[0], $4);
          }
    | PCC_CALL var '\n'
-         {  add_pcc_sub($<sr>-1, $2); }
+         {  add_pcc_sub(current_call->r[0], $2); }
    | NCI_CALL var '\n'
          {
-            add_pcc_sub($<sr>-1, $2);
-            $<sr>-1 ->pcc_sub->nci = 1;
+            add_pcc_sub(current_call->r[0], $2);
+            current_call->r[0]->pcc_sub->nci = 1;
+         }
+   | METH_CALL target '\n'
+         {  add_pcc_sub(current_call->r[0], $2); }
+   | METH_CALL STRINGC '\n'
+         {  add_pcc_sub(current_call->r[0], mk_const($2,'S')); }
+   | METH_CALL target COMMA var '\n'
+         {  add_pcc_sub(current_call->r[0], $2);
+            add_pcc_cc(current_call->r[0], $4);
+         }
+   | METH_CALL STRINGC COMMA var '\n'
+         {  add_pcc_sub(current_call->r[0], mk_const($2,'S'));
+            add_pcc_cc(current_call->r[0], $4);
          }
    ;
 
 pcc_args:
      /* empty */                       {  $$ = 0; }
-   | pcc_args pcc_arg '\n'             {  add_pcc_arg($<sr>0, $2);}
+   | pcc_args pcc_arg '\n'             {  add_pcc_arg(current_call->r[0], $2);}
    ;
 
 pcc_arg:
@@ -585,7 +605,7 @@ pcc_arg:
 
 pcc_results:
      /* empty */                       {  $$ = 0; }
-   | pcc_results pcc_result '\n'       {  if($2) add_pcc_result($<sr>-3, $2); }
+   | pcc_results pcc_result '\n'       {  if($2) add_pcc_result(current_call->r[0], $2); }
    ;
 
 pcc_result:

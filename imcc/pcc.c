@@ -821,6 +821,10 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
         else
             add_pcc_sub(sub, sub->pcc_sub->sub);
     }
+    else  {
+        if (sub->pcc_sub->object)
+            meth_call = 1;
+    }
 
     /*
      * insert arguments

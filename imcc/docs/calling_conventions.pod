@@ -1,6 +1,6 @@
 =head1 NAME
 
-IMCC - calling conventions
+PIR - calling conventions
 
 =head1 VERSION
 
@@ -12,11 +12,13 @@ IMCC - calling conventions
 
 =item 0.3 updated parrot calling conventions and invoke
 
+=item 0.4 methods and shortcuts documented
+
 =back
 
 =head1 OVERVIEW
 
-This document describes subroutine calling conventions.
+This document describes subroutine and method calling conventions.
 
 =head1 DESCRIPTION
 
@@ -26,7 +28,7 @@ subroutines.
 
 =head1 Parrot calling conventions - CPS
 
-=head2 PASM Subroutines
+=head2 Explicitely Calling PASM Subroutines
 
   newsub $P0, .Sub, _sub_label
   newsub $P1, .Continuation, ret_addr
@@ -41,7 +43,21 @@ subroutines.
   .result r
   .pcc_end
 
-  .pcc_sub _sub_label [Subpragma, ...]
+=head2 The Short Way
+
+  ...  # variable decls
+  r = _sub_label(x, y, z)
+  (r1[, r2 ...]) = _sub_label(x, y, z)
+  _sub_label(x, y, z)
+
+Instead of the label a Subroutine object can be used too:
+
+   find_global $P0, "_sub_label"
+   $P0(args)
+
+=head2 Subroutines
+
+  .sub _sub_label [Subpragma, ...]
    .param int a # I5
    .param int b # I6
    .param int c # I7
@@ -55,7 +71,7 @@ subroutines.
 =head3 Subpragma
 
 This is a comma separated list of zero or more items with the
-following meaing:
+following meaning:
 
 =over 4
 
@@ -71,6 +87,10 @@ Define "main" entry point to start execution.
 
 Run this subroutine during the B<load_library> opcode.
 
+=item * method
+
+Declare subroutine being a method.
+
 =back
 
 Notes:
@@ -82,7 +102,6 @@ Notes:
 If a subroutine definition has no prototyped specifier, code gets
 emitted to receive parameters by both flavors.
 
-
 =item * B<newsub>
 
 Currently needs the B<.Class> syntax, i.e. a B<dot> in front of the
@@ -91,7 +110,9 @@ class name.
 =item * B<pcc_call>
 
 Takes either 2 arguments: the sub and the return continuation, or the
-sub only. For the latter case an B<invokecc> gets emitted.
+sub only. For the latter case an B<invokecc> gets emitted. Providing
+an explicit return continuation is more efficient, if its created
+outside of a loop and the call is done inside a loop.
 
 =item * Saved Regs:
 
@@ -112,6 +133,59 @@ instruction of the subroutine, this declaration pair can be omitted.
 Parrot provides an B<invoke P1> as last instruction automatically.
 
 =back
+
+=head2 Calling Methods
+
+The syntax is very similar to subroutine calls. The call is done with
+C<meth_call> which must immediately be preceded by the C<.invocant>:
+
+   .local pmc class
+   .local pmc obj
+   newclass class, "Foo"
+   find_type $I0, "Foo"
+   new obj, $I0
+  .pcc_begin prototyped|non_prototyped
+  .arg x	# I5
+  .arg y	# I6
+  .arg z	# I7
+  .invocant obj
+  .meth_call "_method" [, $P1 ]	# r = obj."_method"(x, y, z)
+  .local int r  # optional - new result var
+  .result r
+  .pcc_end
+
+The return continuation is optional. The method can be a string
+constant or a string variable.
+
+=head2 Shortcuts
+
+  r = obj."_method"(args)
+  (r1, r2) = obj."_method"(args)
+  obj."_method"(args)
+
+=head2 Methods
+
+  .namespace [ "Foo" ]
+
+  .sub _sub_label method [,Subpragma, ...]
+   .param int a # I5
+   .param int b # I6
+   .param int c # I7
+   ...
+   self."_other_meth()
+  ...
+  .pcc_begin_return
+   .return xy   # e.g. I5
+  .pcc_end_return
+  ...
+  .end
+
+The variable "self" automatically refers to the invocating object, if the
+subroutine declaration contains "method".
+
+Restore namespace to the global namespace:
+
+  .namespace [ "" ]
 
 =head2 NCI
 
@@ -134,9 +208,6 @@ F<pdd03_calling_conventions.pod>, saves the registers and invokes the
 function.  The B<.arg> pseudo ops put the given argument into
 increasing registers of the appropriate type.
 
-=head2 Status
-
-Partially implemented, s. t/*/pcc.t.
 
 =head1 Exception handlers
 
@@ -221,7 +292,8 @@ branch from the B<ret> statement back is ignored in the CFG.
 
 =head1 FILES
 
-F<imcc.y>, F<t/syn/bsr.t>
+F<imcc/imcc.y>, F<imcc/t/syn/bsr.t>, F<imcc/t/syn/pcc.t>,
+F<imcc/t/syn/objects.t>
 
 =head1 AUTHOR
 
