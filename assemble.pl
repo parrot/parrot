@@ -437,7 +437,7 @@ if($options{'listing'}) {
 ###############################
 
 sub error {
-    my($message,$file,$Line)=@_;
+    my($message,$file,$line)=@_;
     print STDERR "Error ($file:$line): $message\n";
     exit;
 }
