@@ -38,6 +38,10 @@ OUT
 
 ##############################
 output_is(<<'CODE', <<'OUT', "Argument context");
+sub zero() {
+    print1('zero');
+}
+
 sub one($x) {
     print1('one ' _$x);
 }
@@ -54,6 +58,10 @@ sub main() {
     one 1, one 2;
     two 1, 2, two 3, 4;
     three 1, 2, 3, one 4, two 5, 6;
+    zero; zero();
+    one 1; one(1);
+    my $x = 1.1;
+    one $x - 0.1; one($x - 0.1);
 }
 
 CODE
@@ -64,6 +72,12 @@ two 3 4
 three 1 2 3
 one 4
 two 5 6
+zero
+zero
+one 1
+one 1
+one 1.000000
+one 1.000000
 OUT
 
 ##############################

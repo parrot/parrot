@@ -331,7 +331,8 @@ sub P6C::subscriptable::tree {
 	return ['topical', maybe_tree($x->[4])];
     } else {
 	my $args = $x->[4]->tree;
-	$args = new P6C::ValueList vals => [flatten_leftop($args, ',')];
+	$args = new P6C::ValueList
+	    vals => [$args ? flatten_leftop($args, ',') : ()];
 	return P6C::prefix->new(name => $x->[1]->tree,
 				args => $args);
     }

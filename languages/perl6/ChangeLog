@@ -202,3 +202,8 @@
 	    - cloning cleanup (Leo).
 	    - less temporaries for a couple assignments (Leo).
 	    - context for sub-calls with parens was wrong.
+
+2002-08-23
+
+	* Fixes:
+	    - no-arg subs were failing with '()'.
