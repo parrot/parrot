@@ -151,22 +151,34 @@ C<is_base_object> bit can be assumed to ultimately be derived from
 this base object, and thus behave like a base object. If the bit's
 not set, it's not safe to assume so.
 
+Note that object access doesn't allow you to alter the object's
+structure, just get info and get/set attributes values. Object
+structure alteration has to be done via the class either directly or
+via the alterations to a parent class which get delegated down.
+
 =over 4
 
-=item Get attribute 
+=item Get attribute by slot
 
 Fetch the value for an attribute from the object's attribute catalog
 
-=item Set attribute
+=item Set attribute by slot
 
 Set the value of an object's attribute slot
 
 =item get attribute catalog
 
 Get the catalog of attrbutes. This is a hash of classes and attribute
-offsets for the fixed attributes, and a 
+offsets for the fixed attributes, and a hash of fully qualified
+attribute name and offset pairs. (A fully qualified attribute name is
+of the form CLASS::ATTRIBUTE) Generally the class base offset is used
+most often, as most attributes are created at compile time for a
+class. The fully qualified form is indended mostly for attributes
+added to classes at runtime.
 
 =item get class base offset
+
+This gets the base attribute offset for a class. 
 
 =back
 
