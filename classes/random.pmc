@@ -31,6 +31,31 @@ pmclass Random singleton {
 	Rand_PMC = (PMC*) ptr;
     }
 
+    /*
+     * seed interface
+     */
+    void set_integer_native(INTVAL seed) {
+	Parrot_srand(seed);
+    }
+
+    /*
+     * INTVAL rand interface
+     */
+    INTVAL get_integer() {
+	return Parrot_int_rand(0);  /* -2^31..2^31 */
+    }
+
+    INTVAL get_integer_keyed_int(INTVAL max) {
+	return Parrot_range_rand(0, max, 0);	/* 0 ... max */
+    }
+
+    /*
+     * FLOATVAL rand interface
+     */
+    FLOATVAL get_number() {
+	return Parrot_float_rand(0);  /* 0..1 */
+    }
+
 }
 
 

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 90;
+use Parrot::Test tests => 92;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2492,6 +2492,61 @@ ok: print "ok\n"
     end
 CODE
 ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "rand int");
+    new P0, .Random
+    time I1
+    set P0, I1	# seed
+    set I0, P0
+    set I1, P0
+    ne I0, I1, ok1
+    print "not "
+ok1:print "ok 1\n"
+    set I2, P0[100]
+    ne I0, I2, ok2
+    print "not "
+ok2:print "ok 2\n"
+    ge I2, 0, ok3
+    print "not "
+ok3:print "ok 3\n"
+    lt I2, 100, ok4
+    print "not "
+ok4:print "ok 4\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "rand float");
+    new P0, .Random
+    set N0, P0
+    set N1, P0
+    ne N0, N1, ok1
+    print "not "
+ok1:print "ok 1\n"
+    ge N0, 0, ok2
+    print "not "
+ok2:print "ok 2\n"
+    lt N0, 1.0, ok3
+    print "not "
+ok3:print "ok 3\n"
+    ge N1, 0, ok4
+    print "not "
+ok4:print "ok 4\n"
+    lt N1, 1.0, ok5
+    print "not "
+ok5:print "ok 5\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
 OUTPUT
 
 1;
