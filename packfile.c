@@ -105,7 +105,7 @@ INLINE opcode_t
 PackFile_fetch_op(struct PackFile *pf, opcode_t *stream) {
     if(pf->transform == NULL)
         return *stream;
-    return endian_fetch_intval(*stream, pf->transform);
+    return endian_fetch_op(*stream, pf->transform);
 }
 
 /***************************************

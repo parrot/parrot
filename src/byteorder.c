@@ -42,13 +42,17 @@ endian_matrix(unsigned char * buf) {
     memcpy(buf, u.c, sizeof(opcode_t));
 }
 
+
 /*
- * Arbitrary byte order handler.
+ * Arbitrary byte order handlers.
+ */
+ 
+/*
  * This routine should work for any size
  * and combination of char and word. We can't
  * always assume a char is 8 bits.
  *
- * Takes word (w) and a byteorder matrix in a
+ * Takes INTVAL (w) and a byteorder matrix in a
  * character array, and reorders the word.
  * Benchmarking put this at 75% the speed
  * of the conditionally compiled routines
@@ -69,6 +73,40 @@ endian_fetch_intval(INTVAL w, unsigned char * o) {
 
     if(!o)
         return w;
+        
+    rb[0] = b[o[0]];
+    /*
+     * Optimizer should decide these at compile time;
+     * even a dumb compiler should do constant evaluation
+     */
+    if(nibbles >= 2) {
+        rb[1] = b[o[1]];
+        if(nibbles >= 4) {
+            rb[2] = b[o[2]];
+            rb[3] = b[o[3]];
+            if(nibbles >= 8) {
+                rb[4] = b[o[4]];
+                rb[5] = b[o[5]];
+                rb[6] = b[o[6]];
+                rb[7] = b[o[7]];
+            }
+        }
+    }
+    return r;
+}
+
+/*
+ * Same as above for opcode_t
+ */
+opcode_t
+endian_fetch_op(opcode_t op, unsigned char * o) {
+    unsigned char * b = (unsigned char *)&op;
+    INTVAL r;
+    unsigned char * rb = (unsigned char *)&r;
+    int nibbles = sizeof(INTVAL) / sizeof(char);
+
+    if(!o)
+        return op;
         
     rb[0] = b[o[0]];
     /*
