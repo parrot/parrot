@@ -2,8 +2,14 @@
 
 A from scratch implementation of Tcl on Parrot.
 
-To build the tcl interpreter, first build the required dynamic pmcs:
-From the top level parrot directory, run: C<(cd dynpmcs && make)>
+To build the tcl interpreter, first build parrot.  From the top level
+parrot directory:
+
+ perl Configure.pl && make
+
+Then, build the PGE library: (also from the top level parrot directory)
+
+ (cd compilers/pge && make)
 
 Then, type C<make> in this directory. This will
 generate the file C<tcl.pbc> which can then be used to run tcl programs.
@@ -16,7 +22,8 @@ in the root development directory.>
 =head2 Examples
 
 To run an example, change to the C<examples>, and type C<make>
-for instructions
+for instructions. Running examples from here automatically handles
+cd'ing to the proper directory to run.
 
 =head2 Test Suite
 
@@ -33,4 +40,4 @@ Various documentation (in various states of decay at the moment):
  docs/*
  TODO
 
-=cugt
+=cut
