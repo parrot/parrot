@@ -1,96 +1,147 @@
-package Miniperl::Generator;
+package Generator;
 
 use strict;
+use vars qw($VERSION);
 use Data::Dumper;
+
+$VERSION = '0.01';
+
+sub _init {
+  my $self = shift;
+  $self->{p} = {};
+  $self->{p_count} = 0;
+  $self->{s} = {};
+  $self->{s_count} = 0;
+  $self->{code} = [];
+  $self->{gen_register} = 0;
+}
 
 sub new {
   my $class = shift;
-  my $tree  = shift;
-  my $self = {
-    tree     => $tree,
-    register => [(0) x 32],
-    gensym   => 0,
-  };
+  my $self = { };
+  $self->{tree} = $_[0] if defined $_[0];
   bless $self,$class;
-}
-
-#------------------------------------------------------------------------------
-#
-# To guarantee unique labels for branching.
-#
-
-sub _gensym {
-  return sprintf "G%04d",shift->{gensym}++;
+  $self->_init;
+  $self;
 }
 
 #------------------------------------------------------------------------------
 
-sub __max_lengths {
-  my $colref = shift;
-  my @max_len=(0)x3;
-  for my $row(@$colref) {
-    for(0..$#{$row}) {
-      $max_len[$_]=length($row->[$_]) if length $row->[$_] > $max_len[$_];
-    }
-  }
-  @max_len;
+sub __allocate_s {
+  my ($self,$value) = @_;
+
+  warn "Tried to allocate an array at line: ".(caller(1))[2]."\n";
+  push @{$self->{code}},[
+    '', 'new_key', $self->{s}{$value}, "# $value"
+  ];
 }
 
-sub _format_columns {
-  my $self    = shift;
-  my $colref  = $self->{instruction};
-  my @max_len = __max_lengths($colref);
+sub __allocate_p {
+  my ($self,$value) = @_;
 
-  for my $row(@$colref) {
-    my $label;
-    $label = $row->[0]; $label .= ":" if $label;
-    print $label . ' ' x ($max_len[0]-length($label)+2);
-    if(defined $row->[1]) {
-      $label = $row->[1];
-      print $label . ' ' x ($max_len[1]-length($label)+2);
-      $label = $row->[2];
-      print join ", ",@$label if $label;
-    }
-    print "\n";
-  }
+  push @{$self->{code}},[
+    '', 'new', $self->{p}{$value}, 'PerlInt', "# $value"
+  ];
 }
 
-#------------------------------------------------------------------------------
-
-sub _add_inst {
+sub _temp_register {
   my $self = shift;
-  push @{$self->{instruction}},[@_];
+  return $self->_register(
+    '$__TEMP'.sprintf("%04d",$self->{gen_register}++)
+  );
+}
+
+sub _register {
+  my ($self,$value) = @_;
+
+  if($value =~ /^\$/) {
+    return $self->{p}{$value} if defined $self->{p}{$value};
+
+    $self->{p}{$value}='P'.$self->{p_count}++;
+    $self->__allocate_p($value);
+    return $self->{p}{$value};
+  }
+  return $self->{s}{$value} if defined $self->{s}{$value};
+
+  $self->{s}{$value}='S'.$self->{s_count}++;
+  $self->__allocate_s($value);
+  return $self->{s}{$value};
 }
 
 #------------------------------------------------------------------------------
-#
-# This is not the correct approach to register allocation by any stretch
-# of the imagination. The right way, however, will have to wait until we have
-# true scopes.
-#
 
-my %vars;          # Register allocation
-my $var_count = 0; # Keep track of the number of registers...
+my %operators = (
+  '=' => \&__assign,
+  '+' => \&__binop,
+  '-' => \&__binop,
+  '*' => \&__binop,
+  '/' => \&__binop,
+  '%' => \&__binop,
+  '_' => \&__binop,
+);
 
-#
-# %vars will map variable name to register name.
-#
-sub __allocate_register {
-  my $name = shift;
-  my $value = "P".$var_count++;
-  $vars{$name}=$value;
-  $value;
+my %op_names = (
+  '+' => 'add',
+  '-' => 'sub',
+  '*' => 'mul',
+  '/' => 'div',
+  '%' => 'mod',
+  '_' => 'concat',
+);
+
+sub __expression {
+  my $self = shift;
+  my $rhs  = shift;
+
+  if($rhs->[1] =~ /^[\$@]/) {
+    $rhs = $self->_register($rhs->[1]);
+  }
+  elsif($rhs->[1] =~ /^[0-9'"]|-?\d/) {
+    $rhs = $rhs->[1];
+  }
+  else {
+    my $temp = $self->_temp_register();
+    $operators{$rhs->[1]}->($self,$rhs,$temp);
+    $rhs = $temp;
+  }
+  $rhs;
 }
 
-sub _allocate_registers {
+sub __assign {
+  my ($self,$expr) = @_;
+  my $lhs = $expr->[2];
+  my $rhs = $expr->[3];
+
+  if($lhs->[1] =~ /^[\$@]/) {
+    $lhs = $self->_register($lhs->[1]);
+  }
+  elsif($lhs->[1] =~ /^[0-9'"]|-?\d/) {
+    print STDERR "*** Attempt to assign to a constant\n";
+    return;
+  }
+
+  $rhs = $self->__expression($rhs);
+
+  push @{$self->{code}},[ '', 'set', $lhs, $rhs ];
+}
+
+sub __binop {
+  my ($self,$expr,$reg) = @_;
+  my $lhs = $self->__expression($expr->[2]);
+  my $rhs = $self->__expression($expr->[3]);
+
+  push @{$self->{code}},[ '', $op_names{$expr->[1]}, $reg, $lhs, $rhs, ];
+  return $reg;
+}
+
+#------------------------------------------------------------------------------
+
+sub _prettyprint {
   my $self = shift;
-  my $tree = $self->{tree};
-  for my $inst (@$tree) {
-    next unless $inst->{instruction} eq 'allocate';
-    for(@{$inst->{values}}) {
-      my $var = __allocate_register($_);
-      $self->_add_inst('','new',[$var,'PerlInt']);
-    }
+
+  warn "\n";
+  for(@{$self->{code}}) {
+    warn join("\t",@$_)."\n";
   }
 }
 
@@ -98,33 +149,17 @@ sub _allocate_registers {
 
 sub generate {
   my $self = shift;
-  my $tree = $self->{tree};
+  $self->{tree} = $_[0] if defined $_[0];
+  $self->_init;
 
-
-  $self->_allocate_registers();
-#print Dumper($tree);exit;
-#print Dumper(\%vars);
-
-  for my $inst (@$tree) {
-    my $instruction = $inst->{instruction};
-    if($instruction eq 'print') {
-      for(@{$inst->{values}}) {
-        $self->_add_inst('','print',[$vars{$_}]);
-      }
-    }
-    elsif($instruction eq 'assign') {
-#print Dumper($inst);exit;
-      $self->_add_inst('',
-        'set',[ $vars{$inst->{values}[0]},
-                $inst->{values}[1],
-              ]
-      );
-#print Dumper($inst);exit;
-    }
+  for(@{$self->{tree}}) {
+    $operators{$_->[1]}->($self,$_);
   }
+  push @{$self->{code}},[ '', 'end' ];
 
-  $self->_add_inst('','end');
-  $self->_format_columns();
+#  $self->_prettyprint;
+
+  $self->{code};
 }
 
 1;
@@ -132,18 +167,17 @@ __END__
 
 =head1 NAME
 
-Miniperl::Generator - The Miniperl code generator
+Generator - Perl extension for Miniperl code generator
 
 =head1 SYNOPSIS
 
-  use Miniperl:Generator;
-
-  my @code = Miniperl::Generator->new($code_tree)->generate();
+  use Generator;
+  my $generator = Generator->new($tree);
+  my $code_ref = $generator->generate();
 
 =head1 DESCRIPTION
 
-The code generator reads in a tree structure, and walks that to generate the
-output.
+This walks the tree and generates code
 
 =head1 AUTHOR
 
@@ -151,6 +185,6 @@ Jeffrey Goff, jgoff@speakeasy.net
 
 =head1 SEE ALSO
 
-L<Miniperl>, L<Miniperl::Tokenizer>
+perl6(1).
 
 =cut

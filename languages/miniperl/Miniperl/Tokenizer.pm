@@ -1,77 +1,88 @@
-package Miniperl::Tokenizer;
+package Tokenizer;
 
 use strict;
-use vars qw($VERSION @ISA @EXPORT_OK);
+use vars qw($VERSION);
 
-$VERSION   = '0.01';
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(tokenize);
+$VERSION = '0.01';
 
-use Data::Dumper;
+#------------------------------------------------------------------------------
+
+sub new {
+  my $class = shift;
+  my $self = { };
+  if(defined $_[0]) {
+    unless(open FILE,"< $_[0]") {
+      $self->{text} = join '',<FILE>;
+      return undef;
+    }
+    close FILE;
+  }
+  bless $self,$class;
+}
+
+#------------------------------------------------------------------------------
 
 sub tokenize {
-  my $file = shift;
-  my $text;
-  my $tokref;
-  my $token = '';
+  my $self = shift;
+  $self->{text} = $_[0] if defined $_[0];
 
-  open SOURCE,"<$file";
-  while(<SOURCE>) {
-    next if /^\s*;/;
-    $text .= $_;
-  }
-  close SOURCE;
-
-  for my $ch (split //,$text) {
-    if($ch =~ /[()]/ or
-       $ch =~ /[+*]/ or
-       $ch eq '/' or
-       $ch eq '[' or
-       $ch eq ']' or
-       $ch eq ';') {
-      push @$tokref,$token;
-      $token = $ch;
-    } elsif($token =~ /^(['"])/ and
-            $ch    eq $1) {
-      $token .= $ch;
-      push @$tokref,$token;
-      $token = '';
-    } elsif($token =~ /^(['"])/ and
-            $ch    ne $1) {
-      $token .= $ch;
-    } elsif($ch =~ /[\$@%]/) {   # Scalars must start with a '$' sigil
-      push @$tokref,$token;
-      $token = $ch;
-    } elsif($ch    =~ /^[a-zA-Z]/ and # Alpha can be an ident
-            $token =~ /^[\$@%]/) {  # But idents are after sigils
-      $token .= $ch;
-    } elsif($ch    eq '-' and
-            $token =~ /^[-]\d+(\.\d+)?[eE]/) { # Dashes could be a neg. expt
-      $token .= $ch;
-    } elsif($ch    eq '=' and
-            $token =~ /^[<>]/) {  # Equal sign can follow '<','>'
-      $token .= $ch;
-    } elsif($ch eq '.' and
-            $token =~ /^\d+$/ or  # Decimal point can follow digits
-            $token =~ /^-\d+$/) { # Decimal point can follow a dash
-      $token .= $ch;
-    } elsif($ch     =~ /\d/ and
-            ($token =~ /^[-]/ or  # Digits can follow a dash
-             $token =~ /^\./  or  # Digits can follow a decimal point
-             $token =~ /^\d/)) {  # Digits can follow other digits
-      $token .= $ch;
-    } elsif($ch    =~ /[a-zA-Z]/ and
-            $token =~ /^\w/) {    # Letters can follow other letters
-      $token .= $ch;
-    } elsif($ch    =~ /\s/ and
-            $token =~ /^\s/) {    # White can follow white
-      $token .= $ch;
-    } else {
-      push @$tokref,$token;
-      $token = $ch;
+  my $tokref = [];
+  my $in_quote = 0;
+  for my $ch (split //,$self->{text}) {
+    if($ch =~ /^['"]/) {
+      if($in_quote) {
+        $tokref->[-1] .= $ch;
+        $in_quote = 0 unless $tokref->[-1] =~ /\\['"]$/;
+      }
+      else {
+        push @$tokref,$ch;
+        $in_quote = 1;
+      }
+      next;
     }
+    elsif($in_quote) {
+      $tokref->[-1] .= $ch;
+      next;
+    }
+
+    if($ch =~ /^[-+\/\*%]/) {
+      if($tokref->[-1] and $tokref->[-1] eq '^') {
+        $tokref->[-1] .= $ch;
+        next;
+      }
+    }
+    elsif($ch =~ /^[{\[;\$\@\%\]}^]/) {
+    }
+    elsif($ch eq '=') {
+      if($tokref->[-1] =~ /^[-+\/*^%]/) {
+        $tokref->[-1] .= $ch;
+        next;
+      }
+    }
+    elsif($ch eq '.') {
+      if($tokref->[-1] =~ /^-?\d/) {
+        $tokref->[-1] .= $ch;
+        next;
+      }
+    }
+    elsif($ch =~ /\s/) {
+      next;
+    }
+    elsif($ch =~ /\d/) {
+      if(@$tokref and $tokref->[-1] =~ /^\d/) {
+        $tokref->[-1] .= $ch;
+        next;
+      }
+    }
+    elsif($ch =~ /\w/) {
+      if(@$tokref and $tokref->[-1] =~ /^(\w|\$|\@|\%)/) {
+        $tokref->[-1] .= $ch;
+        next;
+      }
+    }
+    push @$tokref,$ch;
   }
-  return [grep { /\S/ } @$tokref];
+  $tokref;
 }
 
 1;
@@ -79,17 +90,18 @@ __END__
 
 =head1 NAME
 
-Scheme::Tokenizer - The Scheme tokenizer
+Miniperl::Tokenizer - Miniperl6 tokenizer
 
 =head1 SYNOPSIS
 
-  use Scheme:Tokenizer;
-
-  my @code = Scheme::Tokenizer->new($file_name)->tokenize();
+  use Miniperl::Tokenizer;
+  my $tok = Miniperl::Tokenizer->new([$file_name]); # Optional file name
+  $out_aref = $tok->tokenize([$string]); # Optional string
 
 =head1 DESCRIPTION
 
-The tokenizer takes a file and splits it into tokens.
+The tokenizer takes either a text string (directly in tokenize()) or a file
+in the new() member function. This gets broken into perl6 tokens.
 
 =head1 AUTHOR
 
@@ -97,6 +109,6 @@ Jeffrey Goff, jgoff@speakeasy.net
 
 =head1 SEE ALSO
 
-L<Scheme>, L<Scheme::Parser>, L<Scheme::Generator>
+parrot(1).
 
 =cut

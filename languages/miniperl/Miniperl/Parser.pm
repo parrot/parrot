@@ -1,26 +1,27 @@
-package Miniperl::Parser;
+package Parser;
 
 use strict;
-use vars qw($VERSION @ISA @EXPORT_OK);
+use vars qw($VERSION);
 
-$VERSION   = '0.01';
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(parse);
-
-use Data::Dumper;
+$VERSION = '0.01';
 
 sub new {
-  my ($class) = @_;
-  bless {
-    index  => 0,
-    tree   => [],
-  },$class;
+  my $class = shift;
+  my $self = { };
+  $self->{tokens} = $_[0] if defined $_[0];
+  bless $self,$class;
 }
+
+#------------------------------------------------------------------------------
 
 sub _cur {
   my $self = shift;
-  my $offset = shift || 0;
-  $self->{tokens}[$self->{index}+$offset];
+  $self->{tokens}[$self->{index}];
+}
+
+sub _peek {
+  my $self = shift;
+  $self->{tokens}[$self->{index}+1];
 }
 
 sub _next {
@@ -28,94 +29,133 @@ sub _next {
   $self->{tokens}[$self->{index}++];
 }
 
-sub _push {
+#------------------------------------------------------------------------------
+
+sub __minus {
   my $self = shift;
-  my $href = shift;
-  push @{$self->{tree}},$href;
+ 
+  $self->_next;              # Skip the minus sign
+  if($self->_cur =~ /^\d/) { # Negative number
+    return [ 'SCALAR', -$self->_next ];
+  }
+  return [ 'SCALAR', '-', $self->_value ];
 }
 
-#-------------------------------------
+sub __plus {
+  my $self = shift;
+
+  $self->_next;             # Skip the plus sign
+  return $self->_value;
+}
+
+sub __scalar {
+  my $self = shift;
+
+  my $value = [ 'SCALAR', $self->_next ];
+  if($self->_cur and $self->_cur =~ /^[-+*\/%=]/) {
+    my $operator = $self->_next;
+    return [ 'SCALAR', $operator, $value, $self->_value ];
+  }
+  return $value;
+}
+
+sub __list {
+  my $self = shift;
+
+  if($self->_peek and $self->_peek eq '[') {
+    my $name = $self->_next;   # @foo
+    $self->_next;              # [
+    my $index = $self->_value; # {value}
+    $self->_next;              # ]
+    my $value = [ 'SCALAR', $name, $index ];
+    if($self->_cur and $self->_cur =~ /^[-+*\/%=]/) {
+      my $operator = $self->_next;
+      return [ 'SCALAR', $operator, $value, $self->_value ];
+    }
+    return $value;
+  }
+  else {
+    return [ 'LIST', $self->_next ];
+  }
+}
 
 sub __scalar_value {
-  my $token = shift;
-  return 1 if $token =~ /[-]?\d+(\.\d+)?/;
-  return 1 if $token =~ /^['"]/;
-  return 1 if $token =~ /^q\(/;
-  return undef;
+  my $self = shift;
+
+  if($self->_peek and $self->_peek =~ /^[-+*\/%=]/) {
+    my $value = [ 'SCALAR', $self->_next ];
+    my $operator = $self->_next;
+    return [ 'SCALAR', $operator, $value, $self->_value ];
+  }
+  return [ 'SCALAR', $self->_next ];
 }
 
-sub __allocate {
+my %value_operations = (
+  '-' => \&__minus,
+  '+' => \&__plus,
+  '$' => \&__scalar,
+  '@' => \&__list,
+  'DEFAULT' => \&__scalar_value,
+);
+
+sub _value {
   my $self = shift;
-  $self->{index}++;
-  if($self->_cur eq '(') { # Grab a comma-separated list of variables
-    my @temp;
-    $self->{index}++;
-    while($self->_cur ne ')') {
-      push @temp,$self->_next;
-      $self->{index}++ if $self->_cur eq ',';
-    }
-    $self->_push({
-      instruction => 'allocate',
-      values      => \@temp,
-    });
+
+  $self->_cur =~ /^(.)/;
+  if(exists $value_operations{$1}) {
+    return $value_operations{$1}->($self);
   }
-  else { # Grab the single variable
-    $self->_push({
-      instruction => 'allocate',
-      values      => [
-        $self->_next,
-      ]
-    });
+  else {
+    return $value_operations{'DEFAULT'}->($self);
   }
 }
 
-sub __assign {
-  my $self = shift;
-  my $val_1    = $self->_next;
-  my $operator = $self->_next;
-  my $val_2    = $self->_next;
-  $self->_push({
-    instruction => 'assign',
-    values => [ $val_1,
-                $val_2
-              ]
-  });
-}
+#------------------------------------------------------------------------------
 
 sub __print {
-  my $self = shift;
-  $self->{index}++;
-  my @temp = $self->_next;
-  while($self->_cur ne ';') {
-    push @temp,$self->_next;
-  }
-  $self->_push({
-    instruction => 'print',
-    values      => \@temp,
-  });
+  my $self     = shift;
+  my $operator = $self->_next;
+  my $value    = $self->_value;
+  $self->_next; # Skip the semicolon terminator
+  return [ 'SCALAR', $operator, $value ];
 }
 
-sub _build_tree {
+sub __expression {
+  my $self  = shift;
+  my $value = $self->_value;
+
+  $self->_next; # Skip the semicolon terminator
+  return $value;
+}
+
+my %operations = (
+  'print' => \&__print,
+);
+
+sub _parse {
   my $self = shift;
+  $self->{tokens} = $_[0] if defined $_[0];
 
-  while($self->{index} < @{$self->{tokens}}) {
-    if   ($self->_cur eq 'my')    { $self->__allocate(); }
-    elsif($self->_cur eq 'print') { $self->__print(); }
-
-    elsif($self->_cur    =~ /^[\$]\w+/ and
-          $self->_cur(1) eq '=') {
-      $self->__assign();
-    }
-    $self->{index}++;
+  if(exists $operations{$self->_cur}) {
+    return $operations{$self->_cur}->($self);
+  }
+  else {
+    return $self->__expression;
   }
 }
+
+#------------------------------------------------------------------------------
 
 sub parse {
-  my ($self,$tokens) = @_;
-
-  $self->{tokens} = $tokens;
-  $self->_build_tree();
-  return $self->{tree};
+  my $self = shift;
+  $self->{index} = 0;
+  $self->{tokens} = $_[0] if defined $_[0];
+  
+  my $aref;
+  while($self->{index} < @{$self->{tokens}}) {
+    push @$aref,$self->_parse;
+  }
+  $aref;
 }
 
 1;
@@ -123,17 +163,17 @@ __END__
 
 =head1 NAME
 
-Miniperl::Parser - The Miniperl token parser
+Parser - Perl extension for Miniperl parser
 
 =head1 SYNOPSIS
 
-  use Miniperl::Parser qw(parse);
-
-  my @code = parse($tokens);
+  use Parser;
+  my $parser = Parser->new([$token_ref]);
+  my $tree = $parser->parse([$token_ref]);
 
 =head1 DESCRIPTION
 
-The parser reads a list of tokens and turns it into a tree structure.
+Either new() or parse() accepts a $token_ref, but of course at least one has to.
 
 =head1 AUTHOR
 
@@ -141,6 +181,6 @@ Jeffrey Goff, jgoff@speakeasy.net
 
 =head1 SEE ALSO
 
-L<Miniperl>, L<Miniperl::Tokenizer>, L<Miniperl::Generator>
+perl6(1).
 
 =cut
