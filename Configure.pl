@@ -495,6 +495,8 @@ could take a while):
 
 END
 
+RETRY:
+
 {
     my %newc;
 
@@ -508,12 +510,23 @@ END
     unlink('test.c');
 }
 
+if($c{ptrsize} != $c{intvalsize}) {
+    print <<"END";
+
+Hmm, I see your chosen INTVAL isn't the same size as your pointers.  Parrot should
+still compile and run, but you may see a ton of warnings.  I'll give you a chance
+to change your INTVAL size.
+
+END
+
+    goto RETRY unless $c{iv} eq prompt("What should your integer type be?", 'iv');
+
 print <<"END";
 
 Figuring out the formats to pass to pack() for the various Parrot internal
 types...
 END
-
+}
 
 #
 # Alas perl5.7.2 doesn't have an INTVAL flag for pack().
@@ -778,8 +791,6 @@ sub prompt {
     }
 
     $c{$field}=$input||$c{$field};
-
-    print "$field=$c{$field}\n";
 }
 
 
