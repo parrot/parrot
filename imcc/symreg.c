@@ -549,9 +549,14 @@ clear_globals()
     SymReg * p, *next;
 
     for(i = 0; i < HASH_SIZE; i++) {
-        for(p = ghash[i]; p; p = p->next)
+        for(p = ghash[i]; p; ) {
+	    next = p->next;
             if (p->type & VTADDRESS)
                 p->first_ins = p->last_ins = NULL;
+            free_sym(p);
+            p = next;
+        }
+        ghash[i] = NULL;
     }
 }
 
