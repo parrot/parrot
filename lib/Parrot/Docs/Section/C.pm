@@ -207,18 +207,12 @@ sub new
 			'Strings', 
 			'',
 			$self->c_item(
-				'String character types', 
-				'pairs' => ['chartype'],
-				'contents' => ['chartypes']
-			),
-			$self->c_item(
 				'', 
-				'pairs' => ['string'],
+				'pairs' => ['string_primitives', 'string'],
 				'headers' => ['string_funcs']
 			),
 			$self->c_item(
 				'String encodings', 
-				'pairs' => ['encoding'],
 				'contents' => ['encodings']
 			),
 			$self->c_header_item('', 'unicode'),

@@ -1,14 +1,58 @@
+/*
+Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/string_primitives.c - String Primitives
+
+=head1 DESCRIPTION
+
+This file collects together all the functions that call into the ICU
+API.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 #include "parrot/parrot.h"
 #include <unicode/ucnv.h>
 #include <unicode/utypes.h>
 #include <unicode/uchar.h>
 #include <assert.h>
 
+/*
+
+=item C<void
+string_set_data_directory(const char *dir)>
+
+Sets the ICU data directory.
+
+=cut
+
+*/
+
 void
 string_set_data_directory(const char *dir)
 {
     u_setDataDirectory(dir);
 }
+
+/*
+
+=item C<void
+string_fill_from_buffer(struct Parrot_Interp *interpreter, const void *buffer,
+            UINTVAL len, const char *encoding_name, STRING *s)>
+
+Creates a Parrot string from an "external" buffer.
+
+=cut
+
+*/
 
 void
 string_fill_from_buffer(struct Parrot_Interp *interpreter, const void *buffer,
@@ -156,14 +200,37 @@ NSLog(@"%x", outstart[1]);
 }
 */
 
-/* Returns -1 if not a digit. Not that as written, Parrot_char_digit_value can correctly
-   return the decimal digit value of characters for which Parrot_char_is_digit returned
-   false. */
+/*
+
+=item C<UINTVAL 
+Parrot_char_digit_value(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns the decimal digit value of the specified character if it is a decimal
+digit character. If not, then -1 is returned. 
+
+Note that as currently written, C<Parrot_char_digit_value()> can
+correctly return the decimal digit value of characters for which
+C<Parrot_char_is_digit()> returns false.
+
+=cut
+
+*/
 
 UINTVAL Parrot_char_digit_value(struct Parrot_Interp *interpreter, UINTVAL character)
 {
 	return u_charDigitValue(character);
 }
+
+/*
+
+=item C<INTVAL
+Parrot_char_is_alnum(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is an alphanumeric character.
+
+=cut
+
+*/
 
 INTVAL
 Parrot_char_is_alnum(struct Parrot_Interp *interpreter, UINTVAL character)
@@ -171,11 +238,33 @@ Parrot_char_is_alnum(struct Parrot_Interp *interpreter, UINTVAL character)
 	return u_isalnum(character);
 }
 
+/*
+
+=item C<INTVAL
+Parrot_char_is_alpha(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is an letter character.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_char_is_alpha(struct Parrot_Interp *interpreter, UINTVAL character)
 {
 	return u_isalpha(character);
 }
+
+/*
+
+=item C<INTVAL
+Parrot_char_is_ascii(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is an ASCII character.
+
+=cut
+
+*/
 
 INTVAL
 Parrot_char_is_ascii(struct Parrot_Interp *interpreter, UINTVAL character)
@@ -183,11 +272,34 @@ Parrot_char_is_ascii(struct Parrot_Interp *interpreter, UINTVAL character)
 	return (character < 128);
 }
 
+/*
+
+=item C<INTVAL
+Parrot_char_is_blank(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is a "blank" or "horizontal
+space", a character that visibly separates words on a line.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_char_is_blank(struct Parrot_Interp *interpreter, UINTVAL character)
 {
 	return u_isblank(character);
 }
+
+/*
+
+=item C<INTVAL
+Parrot_char_is_cntrl(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is a control character.
+
+=cut
+
+*/
 
 INTVAL
 Parrot_char_is_cntrl(struct Parrot_Interp *interpreter, UINTVAL character)
@@ -195,11 +307,34 @@ Parrot_char_is_cntrl(struct Parrot_Interp *interpreter, UINTVAL character)
 	return u_iscntrl(character);
 }
 
+/*
+
+=item C<INTVAL
+Parrot_char_is_digit(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is a digit character.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_char_is_digit(struct Parrot_Interp *interpreter, UINTVAL character)
 {
 	return u_isdigit(character);
 }
+
+/*
+
+=item C<INTVAL
+Parrot_char_is_graph(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is a a "graphic" character
+(printable, excluding spaces).
+
+=cut
+
+*/
 
 INTVAL
 Parrot_char_is_graph(struct Parrot_Interp *interpreter, UINTVAL character)
@@ -207,11 +342,33 @@ Parrot_char_is_graph(struct Parrot_Interp *interpreter, UINTVAL character)
 	return u_isgraph(character);
 }
 
+/*
+
+=item C<INTVAL
+Parrot_char_is_lower(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is a lowercase letter.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_char_is_lower(struct Parrot_Interp *interpreter, UINTVAL character)
 {
 	return u_islower(character);
 }
+
+/*
+
+=item C<INTVAL
+Parrot_char_is_print(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is a printable character.
+
+=cut
+
+*/
 
 INTVAL
 Parrot_char_is_print(struct Parrot_Interp *interpreter, UINTVAL character)
@@ -219,11 +376,33 @@ Parrot_char_is_print(struct Parrot_Interp *interpreter, UINTVAL character)
 	return u_isprint(character);
 }
 
+/*
+
+=item C<INTVAL
+Parrot_char_is_punct(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is a punctuation character.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_char_is_punct(struct Parrot_Interp *interpreter, UINTVAL character)
 {
 	return u_ispunct(character);
 }
+
+/*
+
+=item C<INTVAL
+Parrot_char_is_space(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is a space character.
+
+=cut
+
+*/
 
 INTVAL
 Parrot_char_is_space(struct Parrot_Interp *interpreter, UINTVAL character)
@@ -231,14 +410,66 @@ Parrot_char_is_space(struct Parrot_Interp *interpreter, UINTVAL character)
 	return u_isspace(character);
 }
 
+/*
+
+=item C<INTVAL
+Parrot_char_is_upper(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is an uppercase character.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_char_is_upper(struct Parrot_Interp *interpreter, UINTVAL character)
 {
 	return u_isupper(character);
 }
 
+/*
+
+=item C<INTVAL
+Parrot_char_is_xdigit(struct Parrot_Interp *interpreter, UINTVAL character)>
+
+Returns whether the specified character is a hexadecimal digit character.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_char_is_xdigit(struct Parrot_Interp *interpreter, UINTVAL character)
 {
 	return u_isxdigit(character);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item F<include/parrot/string_primitives.h>
+
+=item F<include/parrot/string.h>
+
+=item F<src/string.c>
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
