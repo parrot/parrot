@@ -195,7 +195,7 @@ blib/lib/libparrot$(SO) : blib_lib $(O_DIRS) $(O_FILES)
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)
 
 $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
-	$(LD) $(LD_OUT)$(TEST_PROG) test_main$(O) blib/lib/libparrot$(A) $(LDFLAGS) $(C_LIBS)
+	$(LD) $(LDFLAGS) $(LD_OUT)$(TEST_PROG) test_main$(O) blib/lib/libparrot$(A) $(C_LIBS)
 
 # XXX The dependancies on SO.MAJOR.MINOR and SO.VERSION are removed 
 #     because those should be done at "make install" and not "make shared"
@@ -445,7 +445,7 @@ languages.dummy :
 #
 ###############################################################################
 
-test : $(TEST_PROG) libparrot.a assemble.pl test_dummy
+test : $(TEST_PROG) ${blib_lib_libparrot_a} assemble.pl test_dummy
 
 test_dummy :
 	$(PERL) t/harness $(TEST_PROG_ARGS)

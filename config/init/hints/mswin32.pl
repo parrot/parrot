@@ -31,6 +31,7 @@
 			ld_shared  => '-dll',
       ld_shared_flags=> '-def:libparrot.def',
 			ld_out     => '-out:',
+			ldflags    => '-nologo',
       blib_lib_libparrot_a => '',
 			cp         => 'copy',
 			slash      => '\\',
