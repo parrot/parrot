@@ -28,6 +28,34 @@
 #include "parser.h"
 
 
+/* Local definitions and static data for PCC code emitter.
+ * This is more for making the code self-documenting than
+ * making it easily configurable.
+ */
+
+/* For PCC prototyped subs, the params go in registers
+ * 5-15 for each set (P,I,N,S)
+ */
+#define FIRST_PARAM_REG 5
+#define LAST_PARAM_REG 15
+
+#define REG_PROTO_FLAG    0
+#define REG_I_PARAM_COUNT 1
+#define REG_S_PARAM_COUNT 2
+#define REG_P_PARAM_COUNT 3
+#define REG_N_PARAM_COUNT 4
+
+#define REGSET_I 0
+#define REGSET_S 1
+#define REGSET_P 2
+#define REGSET_N 3
+#define REGSET_MAX 4
+
+static const char regsets[] = "ISPN";
+
+
+
+
 /*
  * Utilty instruction routine. Creates and inserts an instruction
  * into the current block in one call.
@@ -231,8 +259,7 @@ void
 expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *arg, *sub;
-    int next[4], i, j, n;
-    char types[] = "ISPN";
+    int next[4], i, set, nargs;
     int proto, ps, pe;
     Instruction *tmp;
     SymReg *p3, *i0, *regs[IMCC_MAX_REGS], *label1, *label2;
@@ -264,30 +291,24 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 
     }
     for (proto = ps; proto <= pe; ++proto) {
-	for (i = 0; i < 4; i++)
-	    next[i] = 5;
+	for (i = 0; i < REGSET_MAX; i++)
+	    next[i] = FIRST_PARAM_REG;
 	/* insert params */
-	n = sub->pcc_sub->nargs;
-	for (i = 0; i < n; i++) {
+	nargs = sub->pcc_sub->nargs;
+	for (i = 0; i < nargs; i++) {
 	    arg = sub->pcc_sub->args[i];
 	    if (proto == 1 ||
-		    (arg->set == 'P' && next[2] < 16)) {
-		for (j = 0; j < 4; j++) {
-		    if (arg->set == types[j]) {
-			if (next[j] == 16) {
+		    (arg->set == 'P' && next[REGSET_P] < 16)) {
+		for (set = 0; set < REGSET_MAX; set++) {
+		    if (arg->set == regsets[set]) {
+			if (next[set] > LAST_PARAM_REG) {
 #if IMC_TRACE
-                            PIO_eprintf(NULL, "expand_sub nextreg[%d]: switching to arg overflow\n", next[j]);
+                            PIO_eprintf(NULL, "expand_sub nextreg[%d]: switching to arg overflow\n", next[set]);
 #endif
 			    goto overflow;
                         }
-                        else if(next[j] >= 17) {
-                            PIO_eprintf(NULL,
-                                "imcc internal error: next reg(%d) > 16 for PCC convention\n",
-                                    next[j]);
-                            abort();
-                        }
-			if (arg->color == next[j]) {
-			    next[j]++;
+			if (arg->color == next[set]) {
+			    next[set]++;
 			    break;
 			}
                         /* if unprototyped check param count */
@@ -302,8 +323,8 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
                          */
                         if (sub->pcc_sub->calls_a_sub) {
                             regs[0] = arg;
-                            arg->reg->want_regno = next[j];
-                            sprintf(buf, "%c%d", arg->set, next[j]++);
+                            arg->reg->want_regno = next[set];
+                            sprintf(buf, "%c%d", arg->set, next[set]++);
                             regs[1] = mk_pasm_reg(str_dup(buf));
                             /* e.g. set $I0, I5 */
                             ins = insINS(interpreter, unit, ins, "set", regs, 2);
@@ -313,7 +334,7 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
                              * if no sub is called from here
                              * just use the passed register numbers
                              */
-                            arg->reg->color = next[j]++;
+                            arg->reg->color = next[set]++;
                         }
 			break;
 		    }
@@ -386,8 +407,7 @@ void
 expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS], *p3;
-    int next[4], i, j, n, arg_count;
-    char types[] = "ISPN";
+    int next[4], i, set, n, arg_count;
     Instruction *tmp;
     char buf[128];
     int n_p3;
@@ -438,15 +458,15 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
                     /* goon */
                 case VTCONST:
 lazy:
-                    for (j = 0; j < 4; j++) {
-                        if (arg->set == types[j]) {
-                            if (next[j] == 16)
+                    for (set = 0; set < REGSET_MAX; set++) {
+                        if (arg->set == regsets[set]) {
+                            if (next[set] > LAST_PARAM_REG)
                                 goto overflow;
-                            if (arg->color == next[j]) {
-                                next[j]++;
+                            if (arg->color == next[set]) {
+                                next[set]++;
                                 break;
                             }
-                            sprintf(buf, "%c%d", arg->set, next[j]++);
+                            sprintf(buf, "%c%d", arg->set, next[set]++);
                             reg = mk_pasm_reg(str_dup(buf));
                             regs[0] = reg;
                             regs[1] = arg;
@@ -458,9 +478,9 @@ lazy:
                     break;
                 default:
                     if (arg->type & VTREGISTER) {
-                        for (j = 0; j < 4; j++)
-                            if (arg->set == types[j]) {
-                                arg->reg->want_regno = next[j];
+                        for (set = 0; set < REGSET_MAX; set++)
+                            if (arg->set == regsets[set]) {
+                                arg->reg->want_regno = next[set];
                                 sub->pcc_sub->ret[i]->used = arg->reg;
                                 break;
                             }
@@ -489,11 +509,16 @@ overflow:
         }
 
     }
+
     /*
      * setup I regs
      */
+
+    /* If prototyped, I0 = 1, else I0 = 0 */
     ins = set_I_const(interpreter, unit, ins, 0, sub->pcc_sub->prototyped);
-    for (i = 0; i < 4; i++)
+
+    /* Setup argument counts */
+    for (i = 0; i < REGSET_MAX; i++)
         ins = set_I_const(interpreter, unit, ins, i + 1, next[i] - 5);
 
     /*
@@ -674,8 +699,10 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     s = str_dup("?i0");
     s[0] = IMCC_INTERNAL_CHAR;
 
+    i2 = mk_pasm_reg(str_dup("I3"));
+/*
     i2 = mk_pasm_reg(str_dup("I2"));
-
+*/
     s = str_dup("?py");
     s[0] = IMCC_INTERNAL_CHAR;
     py = mk_symreg(s, 'P');
@@ -780,8 +807,7 @@ void
 expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *arg, *sub, *reg, *arg_reg, *regs[IMCC_MAX_REGS];
-    int next[4], i, j, n;
-    char types[] = "ISPN";
+    int next[4], i, set, n;
     Instruction *tmp, *call_ins;
     int need_cc;
     char buf[128];
@@ -797,8 +823,8 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     tail_call = check_tail_call(interp, unit, ins);
     if (tail_call)
         debug(interp, DEBUG_OPT1, "found tail call %I \n", ins);
-    for (i = 0; i < 4; i++)
-        next[i] = 5;
+    for (i = 0; i < REGSET_MAX; i++)
+        next[i] = FIRST_PARAM_REG;
     call_ins = ins;
     sub = ins->r[0];
     p3 = NULL;
@@ -854,16 +880,16 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
                 case VT_CONSTP:
                 case VTCONST:
 lazy:
-                    for (j = 0; j < 4; j++) {
-                        if (arg_reg->set == types[j]) {
+                    for (set = 0; set < REGSET_MAX; set++) {
+                        if (arg_reg->set == regsets[set]) {
                             if (arg_reg->type != VTCONST &&
-                                    arg_reg->color == next[j]) {
-                                next[j]++;
+                                    arg_reg->color == next[set]) {
+                                next[set]++;
                                 break;
                             }
-                            if (next[j] == 16)
+                            if (next[set] == 16)
                                 goto overflow;
-                            sprintf(buf, "%c%d", arg_reg->set, next[j]++);
+                            sprintf(buf, "%c%d", arg_reg->set, next[set]++);
                             reg = mk_pasm_reg(str_dup(buf));
                             regs[0] = reg;
                             regs[1] = arg_reg;
@@ -878,13 +904,13 @@ lazy:
                 default:
                     if (arg->type & VTREGISTER) {
                         /* TODO for now just emit a register move */
-                        for (j = 0; j < 4; j++)
-                            if (arg->set == types[j]) {
-                                if (j == 2 &&
+                        for (set = 0; set < REGSET_MAX; set++)
+                            if (arg->set == regsets[set]) {
+                                if (set == 2 &&
                                         (flatten ||
                                          (arg_reg->type & VT_FLATTEN)))
                                     goto flatten;
-                                arg_reg->want_regno = next[j];
+                                arg_reg->want_regno = next[set];
                                 sub->pcc_sub->args[i]->used = arg_reg;
                                 break;
                             }
@@ -972,21 +998,31 @@ move_cc:
     }
     else if (!sub->pcc_sub->nci)
         need_cc = 1;
-    /* set prototyped: I0 */
-    ins = set_I_const(interp, unit, ins, 0, sub->pcc_sub->prototyped);
-    /* set items in P3: I1 */
-    ins = set_I_const(interp, unit, ins, 1, n_p3);
-    /* set items in PRegs: I2 */
+
+    /* set prototyped: I0  (1=prototyped, 0=non-prototyped) */
+    ins = set_I_const(interp, unit, ins, REG_PROTO_FLAG, sub->pcc_sub->prototyped);
+
+    /* Ireg param count in: I1 */
+    ins = set_I_const(interp, unit, ins, REG_I_PARAM_COUNT,
+                                            next[REGSET_I] - FIRST_PARAM_REG);
+
+    /* Sreg param count in: I2 */
+    ins = set_I_const(interp, unit, ins, REG_S_PARAM_COUNT,
+                                            next[REGSET_S] - FIRST_PARAM_REG);
+
+    /* set items in PRegs: I3 */
     if (flatten) {
-        regs[0] = mk_pasm_reg(str_dup("I2"));;
+        regs[0] = mk_pasm_reg(str_dup("I3"));;
         regs[1] = mk_const(str_dup("5"), 'I');
         ins = insINS(interp, unit, ins, "sub", regs, 2);
     }
     else
-        ins = set_I_const(interp, unit, ins, 2, next[2] - 5);
-    /* return type 0=void, or -n-1: I3 */
-    ins = set_I_const(interp, unit, ins, 3,
-            sub->pcc_sub->nret ? -1 - sub->pcc_sub->nret : 0);
+        ins = set_I_const(interp, unit, ins, 3, next[2] - FIRST_PARAM_REG);
+
+    /* Nreg param count in: I4 */
+    ins = set_I_const(interp, unit, ins, REG_N_PARAM_COUNT,
+                                            next[REGSET_N] - FIRST_PARAM_REG);
+
 #if 0
     /* TODO method calls */
     /* meth hash value: I4 */
@@ -1031,15 +1067,15 @@ move_cc:
     for (i = 0; i < n; i++) {
         arg = sub->pcc_sub->ret[i];
         if (sub->pcc_sub->prototyped == 1 ||
-                (arg->set == 'P' && next[2] < 16)) {
-            for (j = 0; j < 4; j++) {
-                if (arg->set == types[j]) {
-                    if (arg->reg->color == next[j]) {
-                        next[j]++;
+                (arg->set == 'P' && next[2] <= LAST_PARAM_REG)) {
+            for (set = 0; set < REGSET_MAX; set++) {
+                if (arg->set == regsets[set]) {
+                    if (arg->reg->color == next[set]) {
+                        next[set]++;
                         break;
                     }
-                    arg->reg->want_regno = next[j];
-                    sprintf(buf, "%c%d", arg->set, next[j]++);
+                    arg->reg->want_regno = next[set];
+                    sprintf(buf, "%c%d", arg->set, next[set]++);
                     reg = mk_pasm_reg(str_dup(buf));
                     regs[0] = arg;
                     regs[1] = reg;

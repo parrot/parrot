@@ -792,7 +792,7 @@ assignment:
      '(' targetlist  ')' '=' IDENTIFIER '(' arglist ')'
          {
             current_call->r[0]->pcc_sub->sub = mk_sub_address($6);
-            current_call->r[0]->pcc_sub->prototyped = 0;
+            current_call->r[0]->pcc_sub->prototyped = 1;
             if(cur_unit->type == IMC_PCCSUB)
                cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
 
@@ -812,7 +812,7 @@ sub_call:
            i->type = ITCALL | ITPCCSUB;
            $$ = i;
            current_call->r[0]->pcc_sub->sub = mk_sub_address($1);
-           current_call->r[0]->pcc_sub->prototyped = 0;
+           current_call->r[0]->pcc_sub->prototyped = 1;
            if(cur_unit->type == IMC_PCCSUB)
               cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
         }
