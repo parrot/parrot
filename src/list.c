@@ -1,5 +1,3 @@
-#include <parrot/parrot.h>
-
 /*
  * list.c
  *  Copyright: (c) 2002 Leopold Toetsch <lt@toetsch.at>
@@ -162,6 +160,7 @@
  *
  */
 
+#include "parrot/parrot.h"
 #include <assert.h>
 
 /* internals */
