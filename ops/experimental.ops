@@ -194,6 +194,7 @@ inline op islt(out INT, in PMC, in PMC) {
 }
 
 =item B<iseq>(out INT, in PMC, in PMC)
+=item B<iseq>(out INT, in INT, in INT)
 
 Sets $1 to 1 if $2 is equal to $3
 
@@ -204,7 +205,13 @@ inline op iseq(out INT, in PMC, in PMC) {
   goto NEXT();
 }
 
+inline op iseq(out INT, in INT, in INT) {
+  $1 = ($2 == $3) ? 1 : 0;
+  goto NEXT();
+}
+
 =item B<isne>(out INT, in PMC, in PMC)
+=item B<isne>(out INT, in INT, in INT)
 
 Sets $1 to 1 if $2 is not equal to $3
 
@@ -212,6 +219,11 @@ Sets $1 to 1 if $2 is not equal to $3
 
 inline op isne(out INT, in PMC, in PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) != 0);
+  goto NEXT();
+}
+
+inline op isne(out INT, in INT, in INT) {
+  $1 = ($2 == $3) ? 0 : 1;
   goto NEXT();
 }
 
