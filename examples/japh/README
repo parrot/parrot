@@ -3,6 +3,9 @@ string. Some are obfuscated, some are horribly platform dependend.
 
 To run them all:
 
+$ make -C examples/compilers  # [1]
 $ for f in examples/japh/japh*.pasm; do ./parrot $f ; done
+
+Note: japh16 is using a shared lib, which is built by [1]
 
 leo
