@@ -166,22 +166,26 @@ CFETCH: pushi
         restore I0            # Line number to fetch.
         set I2, I0
         eq I0, -1, CFETCHSTART
-        set S0, P22[I0]
+	set S0, I0
+        set S0, P22[S0]
         ne S0, "", CFETCHEND
 
         # Not found.  Let's see if this is a +1
         dec I0
-        set S0, P22[I0]
+	set S0, I0
+        set S0, P22[S0]
         ne S0, "", CFETCHNEXT
         branch CNOTFOUND
 
 CFETCHNEXT:
-        set I1, P23[I0]  # Okay, got the line before
+	set S0, I0
+        set I1, P23[S0]  # Okay, got the line before
         inc I1
         gt I1, I28, COVERFLOW
         set I0, P24[I1]  # Next line number is...
         eq I0, 0, COVERFLOW
-        set S0, P22[I0]  # Fetch it.
+	set S0, I0
+        set S0, P22[S0]  # Fetch it.
         ne S0, "", CFETCHEND
         branch CNOTFOUND       # This is a should-not-happen, I think.
 
@@ -190,7 +194,8 @@ CFETCHSTART:
         gt I6, I28, COVERFLOW
         set I0, P24[I6]
         eq I0, 0, COVERFLOW
-        set S0, P22[I0]  # Fetch line
+	set S0, I0
+        set S0, P22[S0]  # Fetch line
         ne S0, "", CFETCHEND
         branch CNOTFOUND       # This is a should-not-happen, I think.
 
@@ -241,7 +246,8 @@ ONELNCK:
 CLOAD:  set I0, 0
 CNEXT:  gt I0, I28, CEND
         set I3, P24[I0]   # Get the next line
-        set S1, P22[I3]   # Get the line code itself
+	set S1, I3
+        set S1, P22[S1]   # Get the line code itself
 	inc I0
 	eq I3, I1, CNEXT	# Skip this, it's being replaced.
 	save S1
@@ -271,9 +277,10 @@ STOREC: eq I5, 0, DONEADD
         restore S0              # Code line
         set I1, S0              # Line Number
 
-        set P22[I1], S0   # The line itself
+	set S1, I1
+        set P22[S1], S0   # The line itself
         inc I28
-        set P23[I1], I28   # Index back to array
+        set P23[S1], I28   # Index back to array
         set P24[I28], I1
         dec I5
         branch STOREC

@@ -898,7 +898,8 @@ I_LIST:
 
 
 LIST_ONE_LINE:
-	set S0, P22[I2]
+	set S0, I2
+	set S0, P22[S0]
 	print S0
 	print "\n"
 	branch END_LIST
@@ -917,7 +918,8 @@ LIST_RANGE:
 DO_I_LIST:  set I0, 0
 DOLISTL: gt I0, I28, END_LIST
         set I1, P24[I0]   # Get the next line
-        set S0, P22[I1]   # Get the line code itself
+	set S0, I1
+        set S0, P22[S0]   # Get the line code itself
 	eq I3, -1, LIST_SHOW
 	lt I2, I1, LIST_NEXT
 	gt I3, I1, LIST_NEXT
