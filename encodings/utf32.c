@@ -33,7 +33,7 @@ static void *
 utf32_encode (const void *ptr, UINTVAL c) {
     utf32_t *u32ptr = (utf32_t*)ptr;
 
-    if (c < 0 || c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
+    if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
         INTERNAL_EXCEPTION(INVALID_CHARACTER,
                            "Invalid character for UTF-32 encoding\n");
     }

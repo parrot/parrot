@@ -60,7 +60,7 @@ static void *
 utf16_encode (const void *ptr, UINTVAL c) {
     utf16_t *u16ptr = (utf16_t*)ptr;
 
-    if (c < 0 || c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
+    if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
         INTERNAL_EXCEPTION(INVALID_CHARACTER,
                            "Invalid character for UTF-16 encoding\n");
     }

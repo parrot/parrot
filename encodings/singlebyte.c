@@ -30,7 +30,7 @@ static void *
 singlebyte_encode (const void *ptr, UINTVAL c) {
     byte_t *bptr = (byte_t*)ptr;
 
-    if (c < 0 || c > 255) {
+    if (c > 255) {
         INTERNAL_EXCEPTION(INVALID_CHARACTER,
                            "Invalid character for single byte encoding\n");
     }

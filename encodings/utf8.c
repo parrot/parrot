@@ -82,7 +82,7 @@ utf8_encode (const void *ptr, UINTVAL c) {
     UINTVAL len = UNISKIP(c);
     utf8_t *u8end = u8ptr + len - 1;
 
-    if (c < 0 || c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
+    if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
         INTERNAL_EXCEPTION(INVALID_CHARACTER,
                            "Invalid character for UTF-8 encoding\n");
     }
