@@ -186,6 +186,9 @@ char PDB_break(struct Parrot_Interp *interpreter);
 void PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
     const char *command);
 
+void PDB_delete_condition(struct Parrot_Interp *interpreter, 
+                          PDB_breakpoint_t *breakpoint);
+
 void PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i);
 
 char *PDB_escape(const char *string, INTVAL length);

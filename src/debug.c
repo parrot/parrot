@@ -423,15 +423,17 @@ PDB_condition_t *
 PDB_cond(struct Parrot_Interp *interpreter, const char *command)
 {
     PDB_condition_t *condition;
-    int i;
+    int i, reg_number;
     char str[255];
 
     /* Allocate new condition */
     condition = (PDB_condition_t *)mem_sys_allocate(sizeof(PDB_condition_t));
 
     /* return if no more arguments */
-    if (!(command && *command))
+    if (!(command && *command)) {
+        free(condition);
         return NULL;
+    }
 
     switch (*command) {
         case 'i':
@@ -452,11 +454,17 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
             break;
         default:
             PIO_eprintf(interpreter, "First argument must be a register\n");
+            free(condition);
             return NULL;
     }
 
     /* get the register number */
     condition->reg = atoi(++command);
+    if (condition->reg >= NUM_REGISTERS ) {
+        PIO_eprintf(interpreter, "Out-of-bounds register\n");
+        free(condition);
+        return NULL;
+    }
 
     /* the next argument might have no spaces between the register and the
      * condition. */
@@ -500,6 +508,7 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
             break;
         default:
 INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
+            free(condition);
             return NULL;
     }
 
@@ -512,12 +521,23 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
         na(command);
 
     /* return if no more arguments */
-    if (!(command && *command))
+    if (!(command && *command)) {
+        free(condition);
         return NULL;
+    }
 
     if (!((isdigit((int)*command)) || (*command == '"'))) {
+    /* It's a register - we check and store the register number
+       XXX  We don't currently check that the register type
+       XXX  matches that of the first register */
+        reg_number = (int)atoi(++command);
+        if (reg_number >= (int) NUM_REGISTERS || reg_number < 0) {
+            PIO_eprintf(interpreter, "Out-of-bounds register\n");
+            free(condition);
+            return NULL;
+        }
         condition->value = (void *)mem_sys_allocate(sizeof(int));
-        *(int *)condition->value = (int)atoi(++command);
+        *(int *)condition->value = reg_number;
     }
     /* If the first argument was an integer */
     else if (condition->type & PDB_cond_int) {
@@ -763,7 +783,35 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
             line = line->next;
 
         breakpoint->skip = -1;
+        if (breakpoint->condition) {
+            PDB_delete_condition(interpreter, breakpoint);
+            breakpoint->condition = NULL;
+        }
+
     }
+}
+
+/* PDB_delete_condition
+ * delete a condition associated with a breakpoint
+ */
+void
+PDB_delete_condition(struct Parrot_Interp *interpreter, 
+                     PDB_breakpoint_t *breakpoint)
+{
+    if (breakpoint->condition->value) {
+        if (breakpoint->condition->type & 4) {
+            /* 'value' is a string, so we need to be careful */
+            PObj_external_CLEAR((STRING*)breakpoint->condition->value);
+            PObj_on_free_list_SET((STRING*)breakpoint->condition->value);
+            /* it should now be properly garbage collected after
+               we destroy the condition */
+        }
+        else {
+            /* 'value' is a float or an int, so we can just free it */
+            free(breakpoint->condition->value);
+        }
+    }
+    free(breakpoint->condition);
 }
 
 /* PDB_skip_breakpoint
