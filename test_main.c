@@ -3,7 +3,7 @@
  *  CVS Info
  *     $Id$
  *  Overview:
- *     A sample test program
+ *     A sample test program (and the main function of Parrot)
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
@@ -132,7 +132,7 @@ usage(void)
 #ifdef HAVE_COMPUTED_GOTO
     const char* cgoto_info = "Deactivate computed goto";
 #else
-    const char* cgoto_info = "(already disabled) Deactivate computed goto";
+    const char* cgoto_info = "Deactivate computed goto (not available on this platform)";
 #endif
 
     fprintf(stderr,
