@@ -83,6 +83,8 @@ sub makefiles {
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/dynoplibs.in',   'dynoplibs/Makefile',
           commentType => '#', replace_slashes => 1);
+  genfile('config/gen/makefiles/parrot_compiler.in', 'languages/parrot_compiler/Makefile',
+          commentType => '#', replace_slashes => 1);
 
 
   # set up docs/Makefile, partly based on the .ops in the root dir

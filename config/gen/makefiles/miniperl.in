@@ -11,6 +11,7 @@ IMCC=../../parrot${exe}
 ASM=$(IMCC) -a --output-pbc
 MINIPERLC=$(PERL) miniperlc
 INTERP=./${test_prog}
+RM_F = ${rm_f}
 
 #
 # Default target:
@@ -58,7 +59,7 @@ foo.pbc: foo.pasm
 all: test.pbc and.pbc foo.pbc
 
 clean:
-	rm -f \
+	$(RM_F) \
 foo.pasm foo.pbc \
 t/*/*.pasm \
 t/*/*.pbc \

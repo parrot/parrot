@@ -1,0 +1,13 @@
+PERL = ${perl}
+RM_F = ${rm_f}
+PARROT = ../../parrot
+
+all :
+	$(PARROT) -o parrot.pbc parrot.pasm
+	$(PARROT) parrot.pbc < sample.pasm > sample.pbc
+	$(PARROT) sample.pbc
+
+clean :
+	$(RM_F) core
+	$(RM_F) *.pbc
+

@@ -90,6 +90,7 @@ GEN_MAKEFILES = \
     Makefile \
     languages/Makefile \
     docs/Makefile \
+    languages/parrot_compiler/Makefile \
     languages/jako/Makefile \
     languages/miniperl/Makefile \
     languages/scheme/Makefile \
