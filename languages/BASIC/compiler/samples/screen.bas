@@ -1,5 +1,18 @@
-cls
+for i = 0 to 23: print: next i
 
+print "This program will perform tests of the basic screen functionality."
+print "It is functional on Win32 consoles, and ANSI terminals.  There are"
+print "differences (subtle and non) about the way things display."
+print 
+print "You appear to be running: ";
+_STARTASM
+	sysinfo S0, 4
+	print S0
+_ENDASM
+print :print 
+Input "Press <enter> to continue", a$
+
+cls
 print "Foreground test:"
 color 0, 15: print "Black 0"
 color 1, 15: print "Blue  1"
@@ -18,7 +31,9 @@ color 13, 15: print "Light Magenta 13"
 color 14, 15: print "Yellow        14"
 color 15, 15: print "White         15"
 
-print "Background test:"
+color 0, 15
+locate 40,1: print "Background test:"
+
 locate 40, 2:color 0, 0: print "Black 0"
 locate 40, 3:color 0, 1: print "Blue  1"
 locate 40, 4:color 0, 2: print "Green 2"
@@ -35,7 +50,46 @@ locate 40, 14:color 0, 12: print "Light Red     12"
 locate 40, 15:color 0, 13: print "Light Magenta 13"
 locate 40, 16:color 0, 14: print "Yellow        14"
 locate 40, 17:color 0, 15: print "White         15"
-	
 
+locate 1, 19
+print "The colors should appear as described.  On ANSI terminals, there"
+print "are only 8 background colors.  Win32 Consoles will see 16."
+print
+
+color 0, 15
+
+input "Press <enter> for a colorful display", a$
+
+cls
+vert = 10
+horiz = 40
+vertval=0
+horizval=0
+colors = 0
+
+
+for p = 1 to 26 step 1
+	increase = .6
+	vfact=0
+	hfact=0
+	vertval=0
+	horizval=0
+	for i=1 to 360 
+		vo = vfact*sin(vertval)
+		ho = hfact*cos(horizval)
+		locate horiz+ho, vert + vo
+		c=colors mod 7
+		color c+7,15
+		print "*";
+		vertval=vertval+increase
+		horizval=horizval+increase
+
+		vfact=vfact+.03
+		hfact=hfact+.12
+		colors=colors+(6/360)
+	next i
+next p
+
+locate 1,23
 color 0, 15
 end
