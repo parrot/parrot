@@ -137,8 +137,8 @@ typedef struct Parrot_Interp {
     void **prederef_code;       /* The predereferenced code */
     size_t current_line;        /* Which line we're executing in the
                                  * source */
-    void *current_file;         /* The file we're currently in */
-    void *current_package;      /* The package we're currently in */
+    String *current_file;       /* The file we're currently in */
+    String *current_package;    /* The package we're currently in */
 
     /* Some counters for the garbage collector.xs */
     size_t  dod_runs;           /* Number of times we've

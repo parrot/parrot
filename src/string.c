@@ -32,16 +32,32 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
     else
 #endif
     if (s->flags & (BUFFER_COW_FLAG|BUFFER_constant_FLAG)) {
-        /* Change the size of the buffer so that it only
-         * has as much data as we really want to copy.
-         * This avoids wasted data when we un-cow something. */
+        interpreter->GC_block_level++;
+        interpreter->DOD_block_level++;
+
+        /* Make the copy point to only the portion of the string that
+         * we are actually using. */
         s->bufstart = s->strstart;
         s->buflen = s->bufused;
+
         /* Create new pool data for this header to use, 
          * independant of the original COW data */
         Parrot_reallocate_string(interpreter, s, s->buflen);
         s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_constant_FLAG);
+        interpreter->GC_block_level--;
+        interpreter->DOD_block_level--;
     }
+}
+
+static void copy_string_header(String *dest, String *src)
+{
+#if GC_DEBUG
+    UINTVAL version = dest->version;
+    memcpy(dest, src, sizeof(String));
+    dest->version = version;
+#else
+    memcpy(dest, src, sizeof(String));
+#endif
 }
 
 /* clone a string header without allocating a new buffer
@@ -55,13 +71,13 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
         d = new_string_header(interpreter, 
                               s->flags & ~(UINTVAL)BUFFER_constant_FLAG);
         s->flags |= BUFFER_COW_FLAG;
-        memcpy(d, s, sizeof (STRING));
+        copy_string_header(d, s);
         d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG|BUFFER_selfpoolptr_FLAG);
     }
     else {
         d = new_string_header(interpreter, s->flags);
         s->flags |= BUFFER_COW_FLAG;
-        memcpy(d, s, sizeof (STRING));
+        copy_string_header(d, s);
     }
     return d;
 }
@@ -187,7 +203,8 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
  */
 STRING *
 string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
-    unmake_COW(interpreter, s);
+    unmake_COW(interpreter,s);
+
     /* Don't check buflen, if we are here, we already checked. */
     Parrot_reallocate_string(interpreter, s, s->buflen + addlen);
     return s;

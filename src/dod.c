@@ -14,6 +14,11 @@
 
 #include "parrot/parrot.h"
 
+#if GC_DEBUG
+/* Set when walking the system stack */
+int CONSERVATIVE_POINTER_CHASING = 0;
+#endif
+
 static size_t find_common_mask(size_t val1, size_t val2);
 
 PMC *
@@ -22,7 +27,10 @@ mark_used(PMC *used_pmc, PMC *current_end_of_list)
     /* If the PMC we've been handed has already been marked as live
      * (ie we put it on the list already) we just return. Otherwise we
      * could get in some nasty loops */
-    if (used_pmc->next_for_GC) {
+    /* Also, be sure to check that we don't mark PMCs that are already 
+     * part of the free list. This can happen with a conservative marking
+     * routine which marks dead PMCs as live, such as a C stack walk */
+    if (used_pmc->next_for_GC || used_pmc->flags & PMC_on_free_list_FLAG) {
         return current_end_of_list;
     }
 
@@ -64,7 +72,13 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     last = mark_used(current, last);
 
     /* Find important stuff on the system stack */
+#if GC_DEBUG
+    CONSERVATIVE_POINTER_CHASING = 1;
     last = trace_system_stack(interpreter,last);
+    CONSERVATIVE_POINTER_CHASING = 0;
+#else
+    last = trace_system_stack(interpreter,last);
+#endif
 
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
@@ -147,16 +161,6 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         cur_stack = cur_stack->prev;
     }
 
-    cur_stack = (Stack_Chunk_t *)interpreter->ctx.intstack;
-
-    while (cur_stack) {
-        if(cur_stack->buffer){
-            buffer_lives(cur_stack->buffer);
-        }
-
-        cur_stack = cur_stack->prev;
-    }
-
     /* Okay, we've marked the whole root set, and should have a
      * good-sized list 'o things to look at. Run through it */
     prev = NULL;
@@ -222,6 +226,12 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
         }
     }
 
+    /* The interpreter has a few strings of its own */
+    if (interpreter->current_file)
+        buffer_lives((Buffer*)interpreter->current_file);
+    if (interpreter->current_package)
+        buffer_lives((Buffer*)interpreter->current_package);
+
     /* Now walk the string stack. Make sure to walk from top down
      * since stack may have segments above top that we shouldn't walk. */
     for (cur_chunk = interpreter->ctx.string_reg_top;
@@ -277,7 +287,10 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
          cur_arena = cur_arena->prev) {
         PMC *pmc_array = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
-            /* If it's not live or on the free list, put it on the free list */
+            /* If it's not live or on the free list, put it on the free list.
+             * Note that it is technically possible to have a PMC be both
+             * on_free_list and live, because of our conservative stack-walk
+             * collection. We must be wary of this case. */
             if (!(pmc_array[i].flags & (PMC_live_FLAG | PMC_on_free_list_FLAG |
                                        PMC_constant_FLAG))) {
                 add_free_pmc(interpreter,
@@ -311,7 +324,10 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
          cur_arena = cur_arena->prev) {
         Buffer *b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
-            /* If this thing is not live and not dead yet, make it dead now. */
+            /* If it's not live or on the free list, put it on the free list.
+             * Note that it is technically possible to have a Buffer be both
+             * on_free_list and live, because of our conservative stack-walk
+             * collection. We must be wary of this case. */
             if (!(b->flags & ( BUFFER_on_free_list_FLAG
                              | BUFFER_constant_FLAG
                              | BUFFER_live_FLAG )))
@@ -390,14 +406,21 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
 
         /* Do a quick approximate range check by bit-masking */
         if((ptr & mask) == prefix){
+            /* Note that what we find on the stack is not guaranteed to be 
+             * a live pmc/buffer, and could very well have its bufstart/vtable 
+             * destroyed due to the linked list of free headers... */
             if (pmc_min <= ptr && ptr < pmc_max && 
                 is_pmc_ptr(interpreter,(void *)ptr))
             {
+                /* ...so ensure that mark_used checks PMC_on_free_list_FLAG 
+                 * before adding it to the next_for_GC list, to have 
+                 * vtable->mark() called. */
                 last = mark_used((PMC *)ptr, last);
-            } 
-            else if (buffer_min <= ptr && ptr < buffer_max && 
+            } else if (buffer_min <= ptr && ptr < buffer_max && 
                 is_buffer_ptr(interpreter,(void *)ptr))
             {
+                /* ...and since buffer_lives doesn't care about bufstart, 
+                 * it doesn't really matter if it sets a flag */
                 buffer_lives((Buffer *)ptr);
             }
         }

@@ -25,6 +25,9 @@ struct parrot_string_t {
     void *bufstart;
     UINTVAL buflen;
     UINTVAL flags;
+#if GC_DEBUG
+    UINTVAL version;
+#endif
     UINTVAL bufused;
     void *strstart;
     UINTVAL strlen;
@@ -42,6 +45,9 @@ typedef struct {
     void *bufstart;
     UINTVAL buflen;
     UINTVAL flags;
+#if GC_DEBUG
+    UINTVAL version;
+#endif
 } Buffer;
 
 typedef struct parrot_string_t String;

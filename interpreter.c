@@ -566,9 +566,6 @@ make_interpreter(Interp_flags flags)
     interpreter->ctx.pmc_reg_base->prev = NULL;
     Parrot_clear_p(interpreter);
 
-    interpreter->DOD_block_level--;
-    interpreter->GC_block_level--;
-
     /* Stack for lexical pads */
     interpreter->ctx.pad_stack = new_stack(interpreter);
 
@@ -589,18 +586,24 @@ make_interpreter(Interp_flags flags)
     interpreter->op_func_table = interpreter->op_lib->op_func_table;
     interpreter->op_info_table = interpreter->op_lib->op_info_table;
 
-    /* Set I/O data to NULL first or else PIO_init will
-     * assume this interpreter is already initialized.
-     */
-    interpreter->piodata = NULL;
-    PIO_init(interpreter);
-
     /* Set up defaults for line/package/file */
     interpreter->current_line = 0;
     interpreter->current_file =
         string_make(interpreter, "(unknown file)", 14, NULL, 0, NULL);
     interpreter->current_package =
         string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
+
+    /* Okay, we've finished doing anything that might trigger GC. (The
+     * top of the stack hasn't been set yet, so we cannot allow GC to
+     * run up until now -- we might miss system stack values. */
+    interpreter->DOD_block_level--;
+    interpreter->GC_block_level--;
+
+    /* Set I/O data to NULL first or else PIO_init will
+     * assume this interpreter is already initialized.
+     */
+    interpreter->piodata = NULL;
+    PIO_init(interpreter);
 
     /* Done. Return and be done with it */
 

@@ -101,7 +101,19 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     /* Don't let it point to garbage memory */
     buffer->bufstart = NULL;
     buffer->flags = BUFFER_selfpoolptr_FLAG;
-    
+#if GC_DEBUG
+    buffer->version++;
+#endif
+
+    /* If you get the "Live buffer 0xnnnnnnn version m found on free
+     * list" message, try setting a conditional breakpoint on the
+     * following line. The condition should be
+     *   (buffer == 0xnnnnnnnn) && (version == m)
+     * By looking at the stack trace, you can figure out what the
+     * buffer was being used for. Remember, though, that it might just
+     * be stale stack litter that is triggering the warning, and not a
+     * bug at all. */
+
     return buffer;
 }
 void 
