@@ -398,7 +398,7 @@ END
 foreach ('intvalsize', 'opcode_t_size') {
     my $which = $_ eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
     my $format;
-    if (($] >= 5.006) && ($c{$_} == $c{longsize}) ) {
+    if (($] >= 5.006) && ($c{$_} == $c{longsize}) && ($c{$_} == $Config{longsize}) ) {
         $format = 'l!';
     }
     elsif ($c{$_} == 4) {
