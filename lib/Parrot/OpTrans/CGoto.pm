@@ -18,6 +18,11 @@ sub defines
   return <<END;
 #define REL_PC     ((size_t)(cur_opcode - interpreter->code->byte_code))
 #define CUR_OPCODE cur_opcode
+#define IREG(i) interpreter->ctx.int_reg.registers[cur_opcode[i]]
+#define NREG(i) interpreter->ctx.num_reg.registers[cur_opcode[i]]
+#define PREG(i) interpreter->ctx.pmc_reg.registers[cur_opcode[i]]
+#define SREG(i) interpreter->ctx.string_reg.registers[cur_opcode[i]]
+#define CONST(i) interpreter->code->const_table->constants[cur_opcode[i]]
 END
 }
 
@@ -117,18 +122,18 @@ sub goto_pop
 my %arg_maps = (
   'op' => "cur_opcode[%ld]",
 
-  'i'  => "interpreter->ctx.int_reg.registers[cur_opcode[%ld]]",
-  'n'  => "interpreter->ctx.num_reg.registers[cur_opcode[%ld]]",
-  'p'  => "interpreter->ctx.pmc_reg.registers[cur_opcode[%ld]]",
-  's'  => "interpreter->ctx.string_reg.registers[cur_opcode[%ld]]",
-  'k'  => "interpreter->ctx.pmc_reg.registers[cur_opcode[%ld]]",
-  'ki'  => "interpreter->ctx.int_reg.registers[cur_opcode[%ld]]",
+  'i'  => "IREG(%ld)",
+  'n'  => "NREG(%ld)",
+  'p'  => "PREG(%ld)",
+  's'  => "SREG(%ld)",
+  'k'  => "PREG(%ld)",
+  'ki' => "IREG(%ld)",
 
   'ic' => "cur_opcode[%ld]",
-  'nc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->number",
+  'nc' => "CONST(%ld)->number",
   'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
-  'sc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->string",
-  'kc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->key",
+  'sc' => "CONST(%ld)->string",
+  'kc' => "CONST(%ld)->key",
   'kic' => "cur_opcode[%ld]"
 );
 

@@ -95,6 +95,11 @@ print JITCPU<<END_C;
 #define JIT_EMIT 1
 #include"parrot/jit_emit.h"
 
+#define IREG(i) interpreter->ctx.int_reg.registers[jit_info->cur_op[i]]
+#define NREG(i) interpreter->ctx.num_reg.registers[jit_info->cur_op[i]]
+#define PREG(i) interpreter->ctx.pmc_reg.registers[jit_info->cur_op[i]]
+#define SREG(i) interpreter->ctx.string_reg.registers[jit_info->cur_op[i]]
+#define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
 END_C
 
 %core_ops = readjit("jit/$cpuarch/core.jit");
