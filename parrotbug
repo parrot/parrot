@@ -15,7 +15,7 @@ use File::Spec;
 use Getopt::Long;
 
 
-my $VERSION = "0.4.1";
+my $VERSION = "0.5.0";
 
 # These are the standard addresses for reporting bugs.
 my %std_to = 
@@ -326,7 +326,7 @@ EOT
         $editor = $opts{editor};
 
     } else {
-        ask_for_editor(<<EOT) unless $opts{editor};
+        ask_for_editor(<<EOT);
 You will probably want to use an editor to enter the report. If the
 default editor proposed below is the editor you want to use, then just
 press the 'Enter' key, otherwise type in the name of the editor you
@@ -365,6 +365,7 @@ sub ask_for_editor {
     my $entry = <STDIN>;
     chomp $entry;
     $editor = $entry if $entry ne "";
+    $opts{editor} = $editor;
 }
 
 
@@ -464,9 +465,45 @@ EOT
 
 
 # Display everything collected.
-sub dump_message { 
+sub dump_report { 
     print "==> Dumping message...\n";
     print format_message();
+}
+
+
+# Last chance to edit report.
+sub edit_report {
+    # Prompt for editor to use if none supplied.
+    unless ( $opts{editor} ) {
+        ask_for_editor(<<EOT);
+You will probably want to use an editor to modify the report. If the
+default editor proposed below is the editor you want to use, then just
+press the 'Enter' key, otherwise type in the name of the editor you
+would like to use.
+EOT
+    }
+
+    $tmpfile ||= $opts{input};
+    my $err = 0;
+    my $body;
+    do {
+        edit_bug_report( $tmpfile );
+        # Slurp bug report.
+        open BODY, "<$tmpfile" or die "Can't open '$tmpfile': $!";
+        {
+            local $/;
+            $body = <BODY>;
+        }
+        close BODY or die "Can't close '$tmpfile': $!";
+        unless ( $body ) {
+            print "\nYou provided an empty bug report!\n";
+            print "Press 'Enter' to continue...\n";
+            scalar <STDIN>;
+        }
+        die "Aborting.\n" if $err++ == 5;
+    } until ( $body );
+
+    $report{body} = $body;
 }
 
 
@@ -558,7 +595,7 @@ EOT
 
 
 # Save message to file.
-sub save_message {
+sub save_report {
     print "\n==> Saving message to file...\n";
     if ( ! $opts{output} ) {
         print "Enter filename to save bug report: ";
@@ -574,7 +611,7 @@ sub save_message {
 
 
 # Send message to final recipient.
-sub send_message {
+sub send_report {
     print "==> Sending message to recipiend...\n";
 
     # On linux certain mail implementations won't accept the subject
@@ -641,9 +678,9 @@ EOT
 # Check whether actions have been provided on comand-line, otherwise
 # prompt for what to do with bug report.
 sub what_next {
-    dump_message() if $opts{dump};
-    save_message() if $opts{save};
-    send_message() if $opts{send};
+    dump_report() if $opts{dump};
+    save_report() if $opts{save};
+    send_report() if $opts{send};
 
     return if $opts{dump} || $opts{save} || $opts{send};
 
@@ -654,10 +691,10 @@ sub what_next {
         print "Action (send,display,edit,save,quit): ";
         $action = <STDIN>;
        sw: for ($action) {
-             dump_message(), last sw if /^d/i;
-             edit_message(), last sw if /^e/i;
-             save_message(), last sw if /^sa/i;
-             send_message(), last sw if /^se/i;
+             dump_report(), last sw if /^d/i;
+             edit_report(), last sw if /^e/i;
+             save_report(), last sw if /^sa/i;
+             send_report(), last sw if /^se/i;
              print "Uh?\n" unless /^q/i;
          };
     } until ( $action =~ /^q/i );
