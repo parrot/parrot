@@ -1,5 +1,5 @@
 saveall
-loadlib P1, 'libform.so'
+loadlib P1, 'libform'
 dlfunc P2, P1, 'new_field', 'piiiiii'
 store_global 'ncurses::new_field', P2
 dlfunc P2, P1, 'dup_field', 'ppii'
@@ -116,7 +116,7 @@ dlfunc P2, P1, 'data_ahead', 'lp'
 store_global 'ncurses::data_ahead', P2
 dlfunc P2, P1, 'data_behind', 'lp'
 store_global 'ncurses::data_behind', P2
-loadlib P1, 'libncurses.so'
+loadlib P1, 'libncurses'
 dlfunc P2, P1, 'keybound', 'tii'
 store_global 'ncurses::keybound', P2
 dlfunc P2, P1, 'curses_version', 't'

@@ -43,31 +43,53 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 #  define SO_EXTENSION ".so"
 #endif
 
-    path = Parrot_sprintf_c(interpreter, "%s%Ss%s",
-            RUNTIME_DYNEXT,
+    /*
+     * first look in current dir
+     */
+    path = Parrot_sprintf_c(interpreter, "%Ss%s",
             lib,
             SO_EXTENSION);
     cpath = string_to_cstring(interpreter, path);
     handle = Parrot_dlopen(cpath);
     if (!handle) {
+        /*
+         * then in runtime/ ...
+         */
+        /* TODO only if not an absolute path */
+        string_cstring_free(cpath);
+        path = Parrot_sprintf_c(interpreter, "%s%Ss%s",
+                RUNTIME_DYNEXT,
+                lib,
+                SO_EXTENSION);
+        cpath = string_to_cstring(interpreter, path);
+        handle = Parrot_dlopen(cpath);
+    }
+    if (!handle) {
         const char * err = Parrot_dlerror();
         fprintf(stderr, "Couldn't load '%s': %s\n", cpath, err ? err : "unknow reason");
+        /*
+         * XXX internal_exception? return a PerlUndef?
+         */
+        string_cstring_free(cpath);
         return NULL;
     }
     string_cstring_free(cpath);
     load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_load", lib);
     cload_func_name = string_to_cstring(interpreter, load_func_name);
     load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle, cload_func_name));
-    if (!load_func) {
-        fprintf(stderr, "Failed to find symbol '%s' in native library\n",
-                cload_func_name);
-        return NULL;
-    }
     string_cstring_free(cload_func_name);
-    lib_pmc = (*load_func)(interpreter);
-    /*
-     * TODO call init, if it exists
-     */
+    if (!load_func) {
+        /* seems to be a native/NCI lib */
+        lib_pmc = new_pmc_header(interpreter);
+        add_pmc_ext(interpreter, lib_pmc);
+        PMC_data(lib_pmc) = handle;
+    }
+    else {
+        lib_pmc = (*load_func)(interpreter);
+        /*
+         * TODO call init, if it exists
+         */
+    }
     return lib_pmc;
 }
 

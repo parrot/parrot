@@ -13,14 +13,8 @@ else {
          Test::Builder->expected_tests());
 }
 
-sub gen_test($) {
-  local $_ = shift;
-  s/\.so/$PConfig{so}/;
-  $_;
-}
-
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_d_d");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_d_d");
+  loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_dd", "dd"
   print "dlfunced\n"
@@ -50,8 +44,8 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_f_ff");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_f_ff");
+  loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_fff", "fff"
   print "dlfunced\n"
@@ -82,8 +76,8 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_sc");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_i_sc");
+  loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_isc", "isc"
   print "dlfunced\n"
@@ -115,8 +109,8 @@ ok 2
 OUTPUT
 
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_s_sc");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_s_sc");
+  loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_ssc", "ssc"
   print "dlfunced\n"
@@ -147,8 +141,8 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_c_sc");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_c_sc");
+  loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_csc", "csc"
   print "dlfunced\n"
@@ -180,8 +174,8 @@ ok 2
 OUTPUT
 
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_t");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_i_t");
+  loadlib P1, "libnci"
   printerr "loaded\n"
   dlfunc P0, P1, "nci_it", "it"
   printerr "dlfunced\n"
@@ -210,8 +204,8 @@ ok
 ok 2
 OUTPUT
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_t_t");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_t_t");
+  loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_tt", "tt"
   print "dlfunced\n"
@@ -240,8 +234,8 @@ ok worked
 ok 2
 OUTPUT
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_d_d - stress test");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_d_d - stress test");
+  loadlib P1, "libnci"
   print "loaded\n"
   set I10, 100000
   print "dlfunced\n"
@@ -275,8 +269,8 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_d_d - clone");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_d_d - clone");
+  loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_dd", "dd"
   print "dlfunced\n"
@@ -317,8 +311,8 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_iii");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_i_iii");
+  loadlib P1, "libnci"
   dlfunc P0, P1, "nci_iiii", "iiii"
   set I0, 1	# prototype used - unchecked
   set I1, 0	# items on stack - unchecked
@@ -334,8 +328,8 @@ CODE
 2
 OUTPUT
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_4i");
-  loadlib P1, "libnci.so"
+output_is(<<'CODE', <<'OUTPUT', "nci_i_4i");
+  loadlib P1, "libnci"
   dlfunc P0, P1, "nci_i4i", "i4i"
   set I5, 6
   set I6, 7

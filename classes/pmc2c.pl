@@ -818,7 +818,7 @@ EOC
  */
 #include "parrot/dynext.h"
 
-int Parrot_lib_${lc_classname}_load(Interp *interpreter)
+PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
 {
     STRING *whoami;
     PMC *pmc;
@@ -829,7 +829,6 @@ int Parrot_lib_${lc_classname}_load(Interp *interpreter)
      */
     pmc = new_pmc_header(interpreter);
     add_pmc_ext(interpreter, pmc);
-    string_init();	 /* default type/encoding */
 
     /* for all PMCs we want to register:
     */
@@ -837,6 +836,7 @@ int Parrot_lib_${lc_classname}_load(Interp *interpreter)
     type = pmc_register(interpreter, whoami);
     /* do class_init code */
     $initname(interpreter, type);
+    return pmc;
 }
 
 EOC

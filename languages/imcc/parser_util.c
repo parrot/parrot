@@ -219,7 +219,7 @@ INS(struct Parrot_Interp *interpreter, char *name, const char *fmt, SymReg **r,
             /* emit a debug seg, if this op is seen */
             PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
         }
-        if (!strcmp(name, "loadlib")) {
+        else if (!strcmp(name, "loadlib")) {
             SymReg *r1 = r[1];   /* lib name */
             STRING *lib = string_from_cstring(interpreter, r1->name + 1,
                 strlen(r1->name) - 2);
