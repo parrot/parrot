@@ -185,7 +185,7 @@ INTVAL interpinfo(struct Parrot_Interp *interpreter, INTVAL what);
 void runops_generic();
 #endif
 
-void runops(struct Parrot_Interp *, struct PackFile *, size_t offset);
+void runops(struct Parrot_Interp *, size_t offset);
 
 VAR_SCOPE opcode_t *(*run_native)(struct Parrot_Interp * interpreter,
                                   opcode_t * cur_opcode,

@@ -305,7 +305,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     setup_argv(interpreter, argc, argv);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
-    runops(interpreter, interpreter->code, 0);
+    runops(interpreter,  0);
 
     /*
      * If any profile information was gathered, print it out:

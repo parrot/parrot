@@ -54,22 +54,6 @@ runops_generic(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
     }
 }
 
-/*=for api interpreter init_prederef
- *
- * interpreter->op_lib = prederefed oplib
- *
- * the "normal" op_lib has a copy in the interpreter structure
- */
-static void
-init_prederef(struct Parrot_Interp *interpreter)
-{
-    interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT();
-    if (interpreter->op_lib->op_count != interpreter->op_count)
-        internal_exception(PREDEREF_LOAD_ERROR,
-                           "Illegal op count (%d) in prederef oplib\n",
-                           (int)interpreter->op_lib->op_count);
-}
-
 /*=for api interpreter load_oplib
  *
  * dynamically load an op_lib extension
@@ -113,16 +97,7 @@ unload_oplib(void *handle)
     Parrot_dlclose(handle);
 }
 #endif
-/*=for api interpreter stop_prederef
- *
- * Unload the prederef oplib.
- */
 
-static void
-stop_prederef(struct Parrot_Interp *interpreter)
-{
-    interpreter->op_lib = PARROT_CORE_OPLIB_INIT();
-}
 
 /*=for api interpreter prederef
  *
@@ -216,6 +191,43 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
     return pc_prederef;
 }
 
+/*=for api interpreter init_prederef
+ *
+ * interpreter->op_lib = prederefed oplib
+ *
+ * the "normal" op_lib has a copy in the interpreter structure
+ */
+static void
+init_prederef(struct Parrot_Interp *interpreter)
+{
+    interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT();
+    if (interpreter->op_lib->op_count != interpreter->op_count)
+        internal_exception(PREDEREF_LOAD_ERROR,
+                "Illegal op count (%d) in prederef oplib\n",
+                (int)interpreter->op_lib->op_count);
+    if (!interpreter->prederef_code) {
+        size_t N = interpreter->code->byte_code_size;
+        size_t i;
+        void **temp = (void **)mem_sys_allocate(N * sizeof(void *));
+
+        for (i = 0; i < N; i++) {
+            temp[i] = (void *)(ptrcast_t)prederef;
+        }
+
+        interpreter->prederef_code = temp;
+    }
+}
+
+/*=for api interpreter stop_prederef
+ *
+ * Unload the prederef oplib.
+ */
+
+static void
+stop_prederef(struct Parrot_Interp *interpreter)
+{
+    interpreter->op_lib = PARROT_CORE_OPLIB_INIT();
+}
 
 static void
 runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
@@ -254,22 +266,18 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
  * (at the time of implementation that only occurs for interpreter
  * flag changing ops).
  */
-static void
-runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc,
-                void **pc_prederef)
+static opcode_t *
+runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
-    opcode_t *code_start;
+    opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     UINTVAL code_size;          /* in opcodes */
     opcode_t *code_end;
     void **code_start_prederef;
-
-    code_start = interpreter->code->byte_code;
-    code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
-    code_end = interpreter->code->byte_code + code_size;
-
-    code_start_prederef = pc_prederef;
+    void **pc_prederef;
 
     init_prederef(interpreter);
+    code_start_prederef = interpreter->prederef_code + (pc - code_start);
+    pc_prederef = code_start_prederef;
 
     while (pc_prederef) {
         pc_prederef =
@@ -285,25 +293,22 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc,
     else {
         pc = code_start + (pc_prederef - code_start_prederef);
     }
-
-    if (pc && (pc < code_start || pc >= code_end)) {
-        internal_exception(INTERP_ERROR,
-                           "Error: Control left bounds of byte-code block (now at location %d)!\n",
-                           (int)(pc - code_start));
-    }
+    return pc;
 }
 
 
 /*=for api interpreter runops
- * run parrot operations until the program is complete
+ * run parrot operations of loaded code segment until an end opcode is reached
+ * run core is selected depending on the Interp_flags
+ * when restart opcode are encountered a different core my be selected
+ * and evaluation of opcode continues
  */
 void
-runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
+runops(struct Parrot_Interp *interpreter, size_t offset)
 {
     int lo_var_ptr;
     opcode_t *(*core) (struct Parrot_Interp *, opcode_t *);
 
-    interpreter->code = code;
     interpreter->resume_offset = offset;
     interpreter->resume_flag = 1;
 
@@ -319,8 +324,17 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
                     PARROT_PROFILE_FLAG |
                     PARROT_TRACE_FLAG));
 
-        if (slow)
+        if (slow) {
             core = runops_slow_core;
+
+            if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+                if (interpreter->profile == NULL) {
+                    interpreter->profile = (ProfData *)
+                        mem_sys_allocate_zeroed(interpreter->op_count *
+                                sizeof(ProfData));
+                }
+            }
+        }
         else if (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG)) {
             core = runops_cgoto_core;
             /* clear stacktop, it gets set in runops_cgoto_core beyond the
@@ -333,36 +347,14 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
                 interpreter->lo_var_ptr = 0;
 #endif
         }
+        else if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
+            core = runops_prederef;
+        }
         else
             core = runops_fast_core;
 
-        if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-            if (interpreter->profile == NULL) {
-                interpreter->profile = (ProfData *)
-                    mem_sys_allocate_zeroed(interpreter->op_count *
-                            sizeof(ProfData));
-            }
-        }
 
-        if (!slow && Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
-            offset = pc - (opcode_t *)interpreter->code->byte_code;
-
-            if (!interpreter->prederef_code) {
-                size_t N = interpreter->code->byte_code_size;
-                size_t i;
-                void **temp = (void **)mem_sys_allocate(N * sizeof(void *));
-
-                for (i = 0; i < N; i++) {
-                    temp[i] = (void *)(ptrcast_t)prederef;
-                }
-
-                interpreter->prederef_code = temp;
-            }
-
-            runops_prederef(interpreter, pc,
-                    interpreter->prederef_code + offset);
-        }
-        else if (!slow && Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
+        if (!slow && Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
 #if !JIT_CAPABLE
             internal_exception(JIT_UNAVAILABLE,
                     "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
@@ -378,11 +370,6 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
          * is ok.
          */
         interpreter->lo_var_ptr = (void *)&lo_var_ptr;
-    }
-
-    if (interpreter->prederef_code) {
-        free(interpreter->prederef_code);
-        interpreter->prederef_code = NULL;
     }
 }
 
@@ -570,7 +557,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         mem_sys_free(interpreter->profile);
     if (interpreter->prederef_code)
         free(interpreter->prederef_code);
-    /* TODO cleanup JIT structures */
 
     mem_sys_free(interpreter->warns);
 
