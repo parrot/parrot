@@ -158,9 +158,10 @@ sub same {
 
 # Propagate context for statements in a block.
 sub block_ctx {
-    my $x = shift;
+    my ($x, $ctx) = @_;
+    return unless @$x > 0;
     my $voidctx = new P6C::Context type => 'void';
-    foreach my $stmt (@$x) {
+    foreach my $stmt (@{$x}[0..$#{$x} - 1]) {
 	if ($stmt->isa('P6C::label')) {
 	    $voidctx->{label} = $stmt->name;
 	    $stmt->ctx_right($voidctx);
@@ -169,6 +170,11 @@ sub block_ctx {
 	$stmt->ctx_right($voidctx);
 	delete $voidctx->{label};
     }
+    # Last statement == value of block
+    $ctx->{last_stmt} = 1;
+    $ctx->{label} = $voidctx->{label};
+    $x->[-1]->ctx_right($ctx);
+    delete $ctx->{last_stmt};
 }
 
 1;

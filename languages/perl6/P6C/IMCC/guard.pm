@@ -18,6 +18,8 @@ sub guard_if {
     my $x = shift;
     my $test = $x->test->val;
     my $end = genlabel 'guard_if';
+    my $ret;
+    $ret = newtmp 'PerlUndef' unless $x->{ctx}->type eq 'void';
     if ($x->name eq 'unless') {
 	code(<<END);
 	if $test goto $end
@@ -25,21 +27,23 @@ END
     } else {
 	my $foo = genlabel;
 	code(<<END);
-	if $test goto $foo
-	goto $end
-$foo:
+	unless $test goto $end
 END
     }
-    $x->expr->val;
+    if (defined $ret) {
+	$ret = $x->expr->val;
+    } else {
+	$x->expr->val;
+    }
     code(<<END);
 $end:
 END
-    return undef;
+    return $ret;
 }
 
 sub guard_while {
     my $x = shift;
-    common_while($x->name, sub { $x->test->val }, sub { $x->expr->val },
-		 $x->{ctx});
+    return common_while($x->name, sub { $x->test->val }, sub { $x->expr->val },
+			$x->{ctx});
 }
 

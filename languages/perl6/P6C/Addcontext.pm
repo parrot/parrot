@@ -104,7 +104,6 @@ sub P6C::Binop::ctx_right {
 
     } elsif ($op eq '=') {
 	# Special-case assignment operator to enforce context l -> r
-
 	# Propagate context:
 	$x->l->ctx_left($x->r, $ctx);
 	# give incoming context to left side
@@ -340,6 +339,8 @@ sub P6C::incr::ctx_right {
 ##############################
 sub ifunless_context {
     my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
+    $x->{ctx}{noreturn} = 1;
     my $boolctx = new P6C::Context type => 'bool';
     foreach (@{$x->args}) {
 	my ($sense, $test, $block) = @$_;
@@ -347,7 +348,7 @@ sub ifunless_context {
 	if (ref $test) {
 	    $test->ctx_right($boolctx);
 	}
-	$block->ctx_right($ctx);
+	$block->ctx_right($x->{ctx});
     }
 }
 
@@ -383,7 +384,9 @@ END
     }
     $x->args->vals(0, [@stream_result]);
     # Get the body:
+    $ctx->{noreturn} = 1;
     $body->ctx_right($ctx);
+    delete $ctx->{noreturn};
 }
 
 sub foreach_context {
@@ -414,8 +417,13 @@ BEGIN {
 
     $P6C::Context::CONTEXT{return} = new P6C::Context type => 'PerlArray';
     $P6C::Context::CONTEXT{print1} = new P6C::Context type => ['PerlUndef'];
-    for (qw(try do CATCH BEGIN END INIT AUTOLOAD PRE POST NEXT LAST FIRST)) {
+    for (qw(try do CATCH BEGIN END INIT AUTOLOAD PRE POST NEXT LAST FIRST
+	    default)) {
 	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'void';
+	$P6C::Context::CONTEXT{$_}{noreturn} = 1;
+    }
+    for (qw(while when)) {
+	$P6C::Context::CONTEXT{$_}{noreturn} = 1;
     }
 }
 
@@ -434,6 +442,7 @@ sub arg_context {
 sub P6C::prefix::ctx_right {
     my ($x, $ctx) = @_;
     my $proto = arg_context($x->name, $ctx);
+    $x->{ctx} = $ctx->copy;
 
     if (ref($proto) eq 'CODE') {
 	# blech.
@@ -441,8 +450,6 @@ sub P6C::prefix::ctx_right {
     } elsif (ref $x->args) {
 	$x->args->ctx_right($proto);
     }
-
-    $x->{ctx} = $ctx->copy;
 }
 
 ##############################
@@ -564,7 +571,10 @@ sub P6C::sub_def::ctx_right {
 	$argctx = new P6C::Context type => [@types];
     }
     $P6C::Context::CONTEXT{$x->name} = $argctx;
-    $x->closure->ctx_right($ctx);
+    $x->{ctx} = $ctx->copy;
+    $x->{ctx}{is_sub_def} = 1;
+    delete $x->{ctx}{noreturn};
+    $x->closure->ctx_right($x->{ctx});
 }
 
 ##############################
@@ -573,9 +583,13 @@ sub get_closure_params {
     my ($x) = @_;
     my @params;
     if (defined($x->params)) {
-	# Explicit parameter list in "-> $foo, $bar { ... }"
-	foreach (flatten_leftop($x->params, ';')) {
-	    push @params, flatten_leftop($_, ',');
+	if (UNIVERSAL::isa($x->params, 'P6C::params')) {
+	    @params = map { $_->var } @{$x->params->req}; # XXX:
+	} else {
+	    # Explicit parameter list in "-> $foo, $bar { ... }"
+	    foreach (flatten_leftop($x->params, ';')) {
+		push @params, flatten_leftop($_, ',');
+	    }
 	}
     } else {
 	my %impl;
@@ -607,12 +621,27 @@ sub setup_catch_blocks {
     }
 }
 
+sub is_anon_sub {
+    my ($x, $ctx) = @_;
+    return !($ctx->{noreturn}
+	     || $ctx->{is_sub_def}
+	     || ($ctx->{last_stmt} && $x->bare));
+}
+
+sub is_noreturn {
+    my ($x, $ctx) = @_;
+    return $ctx->{noreturn} || ($ctx->{last_stmt} && $x->bare);
+}
+
 sub P6C::closure::ctx_right {
     my ($x, $ctx) = @_;
 
-    # If we're not in void context, we must have an anonymous sub, so
-    # deal with it.
-    if ($ctx->type ne 'void') {
+    $x->{ctx} = $ctx->copy;
+    $x->{ctx}{is_anon_sub} = is_anon_sub($x, $ctx);
+    $x->{ctx}{noreturn} = is_noreturn($x, $ctx);
+    delete $x->{ctx}{is_sub_def};
+
+    if ($x->{ctx}{is_anon_sub}) {
 	my @params = get_closure_params($x);
 	if (@params) {
 	    my $vals = new P6C::variable(name => '@_',
@@ -644,9 +673,13 @@ sub P6C::closure::ctx_right {
 	# Look for CATCH blocks in the current block:
 	setup_catch_blocks($x);
 
-	P6C::Context::block_ctx($x->block);
+	if ($x->{ctx}{noreturn}) {
+	    P6C::Context::block_ctx($x->block, $x->{ctx});
+	} else {
+	    P6C::Context::block_ctx($x->block,
+				    new P6C::Context type => 'PerlArray');
+	}
     }
-    $x->{ctx} = $ctx->copy;
 }
 
 ##############################
@@ -660,9 +693,10 @@ sub P6C::ValueList::ctx_right {
 
     if ($ctx->is_tuple) {
 	my $min = @{$ctx->type} < @{$x->vals} ? @{$ctx->type} : @{$x->vals};
+	my $newctx = $ctx->copy;
 	for my $i (0 .. $min - 1) {
-	    $x->vals($i)->ctx_right(new P6C::Context
-				      type => $ctx->type->[$i]);
+	    $newctx->type($ctx->type->[$i]);
+	    $x->vals($i)->ctx_right($newctx);
 	}
 	my $voidctx = new P6C::Context type => 'void';
 	for my $i ($min .. $#{$x->vals}) {
@@ -670,7 +704,7 @@ sub P6C::ValueList::ctx_right {
 	}
 
     } elsif ($ctx->is_array) {
-	my $actx = new P6C::Context;
+	my $actx = $ctx->copy;
 	if ($ctx->flatten) {
 	    $actx->type('PerlArray');
 	} else {
@@ -681,7 +715,8 @@ sub P6C::ValueList::ctx_right {
 	}
 
     } elsif ($ctx->is_scalar || $ctx->type eq 'void') {
-	my $voidctx = new P6C::Context type => 'void';
+	my $voidctx = $ctx->copy;
+	$voidctx->type('void');
 	for my $i (0 .. $#{$x->vals} - 1) {
 	    $x->vals($i)->ctx_right($voidctx);
 	}
@@ -697,13 +732,15 @@ sub P6C::ValueList::ctx_right {
 sub P6C::guard::ctx_right {
     my ($x, $ctx) = @_;
     $x->test->ctx_right(new P6C::Context type => 'bool');
-    $x->expr->ctx_right(new P6C::Context type => 'void');
+    $x->expr->ctx_right($ctx);
+    $x->{ctx} = $ctx->copy;
 }
 
 ##############################
 sub P6C::loop::ctx_right {
     my ($x, $ctx) = @_;
-    my $voidctx = new P6C::Context type => 'void';
+    my $voidctx = $ctx->copy;
+    $voidctx->type('void');
     # Remember that these can all be missing.
     $x->init->ctx_right($voidctx) if $x->init;
     $x->test->ctx_right(new P6C::Context type => 'bool') if $x->test;
@@ -711,6 +748,7 @@ sub P6C::loop::ctx_right {
     for (@{$x->block}) {
 	$_->ctx_right($voidctx);
     }
+    $x->{ctx} = $ctx->copy;
 }
 
 ##############################

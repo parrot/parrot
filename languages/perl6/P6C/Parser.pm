@@ -62,8 +62,6 @@ recognized.  The hash values are currently unimportant.
 
 use vars qw(%WANT %CLASSES $FUNCTION_ARGS $grammar $err_handler);
 
-%WANT = ();
-%CLASSES = ();
 $err_handler = undef;
 
 sub Precompile {

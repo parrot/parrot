@@ -96,8 +96,9 @@ sub import {
 		  gentmp genlabel newtmp mangled_name
 		  code
 		  add_function set_function exists_function_def
-		  exists_function_decl set_function_params
-		  gen_counted_loop scalar_in_context do_flatten_array);
+		  exists_function_decl set_function_params set_function_return
+		  gen_counted_loop scalar_in_context do_flatten_array
+		  array_in_context tuple_in_context undef_in_context);
     my @external = qw(init compile emit);
     my $caller = caller;
     no strict 'refs';
@@ -134,7 +135,7 @@ sub compile {			# compile input (don't emit)
     my $ctx = new P6C::Context type => 'void';
     if (ref $x eq 'ARRAY') {
 	# propagate context:
-	P6C::Context::block_ctx($x);
+	P6C::Context::block_ctx($x, $ctx);
 	# generate code:
 	foreach my $stmt (@$x) {
 	    $stmt->val;
@@ -211,6 +212,8 @@ be a list of C<P6C::param> objects.  XXX: there is currently no way to
 handle variable parameter lists.  This is a limitation of the current
 parameter-passing scheme, not just this interface.
 
+=item B<set_function_return($ret)>
+
 =back
 
 =cut
@@ -248,6 +251,10 @@ sub set_function($) {	       # switch to function, returning old one
 
 sub set_function_params {
     $funcs{$curfunc}->maybe_set_params(@_);
+}
+
+sub set_function_return {
+    $funcs{$curfunc}->set_return(@_);
 }
 
 =head2 Name lookup
@@ -585,6 +592,10 @@ can be used in indexing expressions in the loop body.
 Emit the code to return a scalar C<$val> in the right way for context
 C<$ctx>.
 
+=item B<array_in_context($val, $ctx)>
+
+=item B<tuple_in_context(\@vals, $ctx)>
+
 =item B<do_flatten_array($vals)>
 
 Emit code to evaluate each item in C<@$vals>, which are assumed to be
@@ -616,17 +627,108 @@ sub scalar_in_context {
     } elsif ($ctx->is_array) {
 	my $a = newtmp 'PerlArray';
 	code(<<END);
-# scalar_in_context ARRAY
 	$a = 1
 	$a\[0] = $x
 END
 	return $a;
     } elsif ($ctx->is_tuple) {
-	code("# scalar_in_context TUPLE\n");
 	return [$x];
     } else {
-	code("# scalar_in_context SCALAR\n");
 	return $x;
+    }
+}
+
+sub array_in_context {
+    my ($x, $ctx) = @_;
+    if ($ctx->type eq 'void') {
+	return undef;
+    } elsif ($ctx->is_array) {
+	return $x;
+    } elsif ($ctx->is_tuple) {
+	my $len = gentmp 'int';
+	my $end = genlabel;
+	my @tuple = map { gentmp 'pmc' } 1..@{$ctx->type};
+	code(<<END);
+	$len = $x
+END
+	for my $i (0..$#tuple) {
+	    code(<<END);
+	if $i == $len goto $end
+	$tuple[$i] = $x\[$i]
+END
+	}
+	code(<<END);
+$end:
+END
+	return [@tuple];
+    } elsif ($ctx->is_scalar) {
+	my $itmp = gentmp 'int';
+	code(<<END);
+	$itmp = $x
+	$x = new PerlInt
+	$x = $itmp
+END
+	return $x;
+    } else {
+	unimp "Return type ".$ctx->type;
+    }
+}
+
+sub tuple_in_context {
+    my ($x, $ctx) = @_;
+    if ($ctx->type eq 'void') {
+	return undef;
+    } elsif ($ctx->is_tuple) {
+	# Make sure we return enough items (XXX: is this necessary?)
+	if (@$x <= @{$ctx->type}) {
+	    return @{$x}[0..$#{$ctx->type}];
+	} else {
+	    my @ret = @$x;
+	    for my $i (@ret .. @{$ctx->type} - 1) {
+		push @ret, newtmp 'PerlUndef';
+	    }
+	    return [@ret];
+	}
+    } elsif ($ctx->is_array) {
+	my $res = newtmp 'PerlArray';
+	my $n = @$x;
+	my $ptmp = gentmp 'pmc';
+	code(<<END);
+	$res = $n
+END
+	for my $i (0 .. $n - 1) {
+	    code(<<END);
+	$res\[$i] = $x->[$i]
+END
+	}
+	return $res;
+    } elsif ($ctx->is_scalar) {
+	if (@$x == 0) {
+	    return newtmp 'PerlUndef';
+	} else {
+	    my $ret = gentmp 'PerlUndef';
+	    code(<<END);
+	$ret = $x->[0]
+END
+	    return $ret;
+	}
+    } else {
+	unimp "Return type ".$ctx->type;
+    }
+}
+
+sub undef_in_context {
+    my $ctx = shift;
+    if (!defined($ctx) || $ctx->type eq 'void') {
+	return undef;
+    } elsif ($ctx->is_tuple) {
+	return [];
+    } elsif ($ctx->is_array) {
+	return newtmp 'PerlArray';
+    } elsif ($ctx->is_scalar) {
+	return newtmp 'PerlUndef';
+    } else {
+	unimp "Return type ".$ctx->type;
     }
 }
 
@@ -694,7 +796,8 @@ Emit a complete function body, minus the C<.sub> directive.
 package P6C::IMCC::Sub;
 use Class::Struct 'P6C::IMCC::Sub'
     => { scopes => '@',		# scope stack
-	 args => '@'		# arguments, in order passed
+	 args => '@',		# arguments, in order passed
+	 rettype => '$',	# return type (scalar, array, tuple)
        };
 #	{scopelevel}		# current scope number
 #	{oldscopes}		# other closed scopes in this sub.
@@ -789,6 +892,11 @@ sub maybe_set_params {
     }
 }
 
+sub set_return {
+    my ($x, $r) = @_;
+    $x->rettype($r);
+}
+
 sub pop_scope {
     my $x = shift;
     push @{$x->{oldscopes}}, shift @{$x->scopes};
@@ -871,6 +979,7 @@ sub val {
 	code("\t$tmp = ".@{$x->vals}."\n");
 	for my $i (0..$#{$x->vals}) {
 	    my $item = $x->vals($i)->val;
+	    confess Data::Dumper::Dumper($x->vals($i)) unless $item;
 	    code(<<END);
 	$tmp\[$i] = $item
 END
@@ -1373,7 +1482,7 @@ sub val {
     my @params;
 
     push_scope;
-    if ($ctx->type ne 'void' && defined $x->block) {
+    if ($ctx->{is_anon_sub}) {
 	# We need to create an anonymous sub.
 	$name = genlabel 'closure';
 	add_function($name);
@@ -1396,6 +1505,13 @@ sub val {
     }
 
     set_function_params(@params);
+    if ($ctx->{noreturn}) {
+	warn "NORETURN in IMCC\n";
+    } elsif (UNIVERSAL::isa($x->block, 'P6C::regex')) {
+	set_function_return('PerlUndef');
+    } else {
+	set_function_return('PerlArray');
+    }
 
     # If it's just a declaration, we're done:
     unless (defined $x->block) {
@@ -1404,8 +1520,18 @@ sub val {
     }
 
     my $ret;
+    unless ($ctx->{noreturn}) {
+	declare_label type => 'return';
+    }
     if (UNIVERSAL::isa($x->block, 'P6C::regex')) {
-	$x->block->val;
+	$ret = $x->block->val;
+	unless ($ctx->{noreturn}) {
+	    code(<<END);
+	.return $ret
+END
+	    set_function_return('PerlUndef');
+	    emit_label type => 'return';
+	}
     } else {
 	my @catchers;
 	foreach (@{$x->block}) {
@@ -1416,14 +1542,27 @@ sub val {
 	}
 	if (@catchers) {
 	    die "Only one catch block per block, please" if @catchers > 1;
-	    wrap_with_catch($x, $catchers[0]);
-	} else {
-	    foreach my $stmt (@{$x->block}) {
+	    $ret = wrap_with_catch($x, $catchers[0]);
+	    die unless $ret || $ctx->{noreturn};
+	} elsif (@{$x->block} > 0) {
+	    foreach my $stmt (@{$x->block}[0..$#{$x->block} - 1]) {
 		$stmt->val;
 	    }
+	    $ret = $x->block->[-1]->val;
+	    confess unless $ret || $ctx->{noreturn};
+	} else {
+	    $ret = newtmp 'PerlUndef';
+	}
+
+	unless ($ctx->{noreturn}) {
+	    code(<<END);
+	.return $ret
+END
+	    set_function_return('PerlArray');
+	    emit_label type => 'return' unless $ctx->{noreturn};
 	}
     }
-    if ($ctx->type ne 'void') {
+    if ($ctx->{is_anon_sub}) {
 	# Create a closure.
 	set_function($ofunc);
 	$ret = newtmp 'Sub';
@@ -1631,12 +1770,14 @@ sub call_closure {
     my ($thing, $args) = @_;
     my $argval = $args ? $args->val : newtmp('PerlArray');
     my $func = $thing->val;
+    my $ret = gentmp 'pmc';
     code(<<END);
 	.arg	$argval
 	.arg	$func
 	call	__CALL_CLOSURE
+	.result $ret
 END
-    return undef;		# XXX: return values not implemented.
+    return $ret;
 }
 
 # Slice value.  Probably doesn't handle every single case, but it
@@ -1650,8 +1791,7 @@ sub val {
     }
     if ($x->subscripts(0)->type eq 'Sub') {
 	# Function call
-	call_closure($x->thing, $x->subscripts(0)->indices);
-	return undef;
+	return call_closure($x->thing, $x->subscripts(0)->indices);
     }
     code("# Base for indexing\n");
     my $thing = $x->thing->val;
@@ -1814,7 +1954,8 @@ END
 END
     emit_label name => $label, type => 'last';
     pop_scope;
-    return undef;
+    confess Data::Dumper::Dumper($x->{ctx}) unless UNIVERSAL::can($x->{ctx}, 'type');
+    return undef_in_context($x->{ctx});
 }
 
 ######################################################################
@@ -1822,7 +1963,7 @@ sub P6C::label::val {
     my ($x) = @_;
     declare_label name => $x->name;
     emit_label name => $x->name;
-    return undef;
+    return undef_in_context(undef);
 }
 
 ######################################################################

@@ -741,7 +741,7 @@ sub P6C::closure::tree {
     my ($block, $arg_index);
     $block = $x->[$#{$x}]->tree;
     if (@$x == 2) {		# bare block
-	return new P6C::closure params => undef, block => $block;
+	return new P6C::closure params => undef, block => $block, bare => 1;
     } if (@$x == 5) {		# no parens
 	$arg_index = 3;
     } else {			# with parens

@@ -2,6 +2,7 @@
 # Prefix operators (i.e. functions and control structures)
 package P6C::IMCC::prefix;
 use SelfLoader;
+use strict;
 use Data::Dumper;
 use P6C::IMCC ':all';
 use P6C::Util ':all';
@@ -61,6 +62,12 @@ sub prefix_if {
     my $x = shift;
     my $end = genlabel "endif";
     my $nextlab;
+    my $ret;
+    my $val;
+    my $haselse;
+    unless ($x->{ctx}->type eq 'void') {
+	$ret = gentmp 'pmc';
+    }
     foreach (@{$x->args}) {
 	my ($sense, $test, $block) = @$_;
 	$sense ||= $x->name;
@@ -69,7 +76,9 @@ sub prefix_if {
 	}
 	$nextlab = genlabel 'if';
 	if (!ref $test) {
-	    val_noarg($block);
+	    $val = val_noarg($block);
+	    code("\t$ret = $val\n") if defined $ret;
+	    $haselse = 1;
 	} else {
 	    my $v = $test->val;
 	    if ($sense =~ /if$/) { # (els)?if
@@ -81,7 +90,8 @@ END
 	if $v goto $nextlab
 END
 	    }
-	    val_noarg($block);
+	    $val = val_noarg($block);
+	    code("\t$ret = $val\n") if defined $ret;
 	    code(<<END);
 # IF
 	goto $end
@@ -90,9 +100,12 @@ END
     }
     code(<<END);
 $nextlab:
+END
+    code("\t$ret = new PerlUndef\n") if defined $ret && !$haselse;
+    code(<<END);
 $end:		# END OF @{[$x->name]}
 END
-    return undef;
+    return $ret;
 }
 
 sub common_while {
@@ -128,7 +141,7 @@ END
     # Redo comes between the test and the body
     emit_label name => $label, type => 'redo';
 
-    $genbody->();
+    my $ret = $genbody->();
     goto_label type => 'next';
 
     emit_label name => $label, type => 'last';
@@ -137,7 +150,7 @@ END
 $end:
 END
     pop_scope;
-    return undef;
+    return $ret;
 }
 
 sub prefix_while {
@@ -194,60 +207,45 @@ sub gen_sub_call_imcc {
     my $mname = P6C::IMCC::mangled_name($x->name);
     code("\tcall	$mname\n");
     
-    # Now handle return value.  For now, everything returns an array,
-    # from which we extract the relevant bits.
-    return undef;
+    # Now handle return value.
     
-    my $res = gentmp 'PerlArray';
-    code(<<END);
-	.result $res
-END
-
-    if ($ctx->is_tuple) {
-	my @tuple = map { newtmp $_ } @{$ctx->type};
-	# Gather enough of $res to fill tuple.
-	my $len = gentmp 'int';
-	my $end = genlabel;
-	code(<<END);
-	$len = $res
-END
-	for my $i (0..$#tuple) {
+    my $rettype = $func->rettype;
+    if (!defined($rettype)) {
+	warn 'XXX: probably shouldn\'t happen...';
+	$func->rettype($rettype = 'PerlArray');
+    }
+    if (ref($rettype) eq 'ARRAY') {
+	my @results = map { gentmp $_ } @{$ctx->type};
+	for my $i (0 .. $#results) {
 	    code(<<END);
-	if $i == $len goto $end
-	$tuple[$i] = $res\[$i]
+	.result $results[$i]
 END
 	}
+	return tuple_in_context([@results], $ctx);
+
+    } elsif ($rettype eq 'PerlArray') {
+	my $ret = gentmp 'pmc';
 	code(<<END);
-$end:
+	.result $ret
 END
-	return [@tuple];
-    } elsif ($ctx->is_array) {
-	return $res;
-    } elsif ($ctx->is_scalar) {
-	# XXX: this should really just return the number of elements
-	# in @_, I think, but this is more useful since we don't have
-	# wantarray.
-	my $label = genlabel;
-	my $itmp = gentmp 'int';
-	my $scalar_res = newtmp 'PerlUndef';
+	return array_in_context($ret, $ctx);
+
+    } elsif (is_scalar($rettype)) {
+	my $ret = gentmp 'pmc';
 	code(<<END);
-	$itmp = $res
-	if $itmp == 0 goto $label
-	$scalar_res = $res\[0]
-$label:
+	.result $ret
 END
-	return $scalar_res;
-    } elsif ($ctx->type eq 'void') {
-	# don't do anything.
-	return undef;
+	return scalar_in_context($ret, $ctx);
+
     } else {
-	unimp "Unknown return context";
+	unimp "Sub return type $rettype";
     }
 }
 
 sub prefix_for {
     my ($x) = @_;
     my $label = $x->{ctx}{label};
+    my $ret;
     # XXX: apo 4 explicitly says this is lazy, but we take a greedy
     # approach here.
     my ($streams, $body) = @{$x->args->vals};
@@ -300,7 +298,7 @@ $start:
 END
 	emit_label name => $label, type => 'redo';
 
-	val_noarg($body);
+	$ret = val_noarg($body);
 
 	emit_label name => $label, type => 'next';
 	emit_label name => $label, type => 'continue';
@@ -367,7 +365,7 @@ END
 	emit_label name => $label, type => 'redo';
 	
 	# Loop body:
-	val_noarg($body);
+	$ret = val_noarg($body);
 
 	emit_label name => $label, type => 'next';
 	emit_label name => $label, type => 'continue';
@@ -417,7 +415,7 @@ END
 	emit_label name => $label, type => 'redo';
 
 	# Generate loop body:
-	val_noarg($body);
+	$ret = val_noarg($body);
 
 	emit_label name => $label, type => 'next';
 	emit_label name => $label, type => 'continue';
@@ -428,7 +426,7 @@ END
     }
     emit_label name => $label, type => 'last';
     pop_scope;
-    return undef;
+    return $ret;
 }
 
 # unary minus.
@@ -449,11 +447,11 @@ sub val_noarg {
     # topicalizing control structures, but we don't support them yet,
     # anyways.
 
-    $block->{ctx} = new P6C::Context type => 'void';
     my $saveparam = $block->params;
     $block->params(new P6C::params req => [], opt => [], rest => undef);
-    $block->val;
+    my $ret = $block->val;
     $block->params($saveparam);
+    return $ret;
 }
 
 sub val_topical {
@@ -509,7 +507,7 @@ $end:
 END
     emit_label name => $label, type => 'last';
     pop_scope;
-    return undef;
+    return undef_in_context($x->{ctx});
 }
 
 sub wrap_with_catch {
@@ -570,29 +568,34 @@ END
     code(<<END);
 $try:
 END
-    val_noarg($block);
+    my $ret = val_noarg($block);
     # Reached end of block => no exception.  Pop the continuation.
     code(<<END);
 	call __pop_catch
 $endblock:
 END
-    return undef;
+    return $ret;
 }
 
 sub prefix_try {
     my ($x) = @_;
-    wrap_with_catch($x->args, undef);
+    return wrap_with_catch($x->args, undef);
 }
 
 sub simple_control {
     my ($x) = @_;
     goto_label type => $x->name, name => $x->args;
+    return undef_in_context($x->{ctx});
 }
 
 sub prefix_return {
     my ($x) = @_;
-#    goto_label type => 'return', label => undef, args => $x->val;
-    return undef;
+    my $val = $x->args->val;
+    code(<<END);
+	.return $val
+END
+    goto_label type => 'return';
+    return $val;
 }
 
 sub prefix_when {
@@ -610,18 +613,18 @@ END
     code(<<END);
 $next:
 END
-    val_noarg($block);
+    my $ret = val_noarg($block);
     goto_label type => 'break';
     emit_label name => $label, type => 'skip';
     pop_scope;
-    return undef;
+    return $ret;
 }
 
 sub prefix_default {
     my ($x) = @_;
-    val_noarg($x->args);
+    my $ret = val_noarg($x->args);
     goto_label type => 'break';
-    return undef;
+    return $ret;
 }
 
 sub prefix_given {
@@ -629,16 +632,14 @@ sub prefix_given {
     my $label = $x->{ctx}{label};
     my ($given, $block) = @{$x->args->vals};
 
-    if ($label) {
 	# Make sure "when" clauses can name their skip labels.
 	# REMEMBER: we may be labeling other people's "when's" -- it's
 	# their responsibility to re-label them later.
-	map_preorder {
-	    if ($_->isa('P6C::prefix') && $_->name eq 'when') {
-		$_->{ctx}{label} = $label;
-	    }
-	} $block;
-    }
+    map_preorder {
+	if ($_->isa('P6C::prefix') && $_->name eq 'when') {
+	    $_->{ctx}{label} = $label;
+	}
+    } $block;
 
     push_scope;
     declare_label name => $label, type => 'break';

@@ -161,3 +161,11 @@
 	* Broken (me, probably):
 	    - "$x = @xs" will leave $x undefined.
 	
+2002-08-19
+
+	* Additions:
+	    - return values (documentation coming).
+
+	* Test-failures:
+	    - 3.{2,4-7}, a.2 -- register clobbering.
+	    - 8.3 -- not sure

@@ -261,7 +261,6 @@ sub output_tree {
 	print OUT Dumper($x);
 	close OUT;
     } else {
-	P6C::IMCC::init();
 	if ($o{'add-main'}) {
 	    P6C::IMCC::add_function('main');
 	    P6C::IMCC::set_function('main');
@@ -333,6 +332,7 @@ sub pass1($$$) {
     $in = <IN>;
     close(IN);
     verbose(2, "Parsing");
+    P6C::IMCC::init() unless $o{tree};
     my $result = warnings(sub {$parser->$::rule($in,0,$f)}, $fw);
     output_tree($result, $f, $fw);
 }

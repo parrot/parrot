@@ -479,7 +479,7 @@ statement is reached.
 =cut
 
 use Class::Struct P6C::sub_def => { qw(qual $ name $ props @ closure $) };
-use Class::Struct P6C::closure => { qw(params $ block $) };
+use Class::Struct P6C::closure => { qw(params $ block $ bare $) };
 use Class::Struct P6C::yadda => { qw(msg $) }; # i.e. "..."
 
 =item B<guard>
