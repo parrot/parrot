@@ -131,7 +131,8 @@ handle_flags(struct Parrot_Interp *interpreter,
             fill = cstr2pstr(" ");
         }
 
-        string_repeat(interpreter, fill, info->width - (len - 1), &fill);
+        if (info->width > len - 1)
+            string_repeat(interpreter, fill, info->width - (len - 1), &fill);
 
         if (info->flags & FLAG_MINUS) { /* left-align */
             string_append(interpreter, str, fill, 0);
@@ -206,7 +207,7 @@ STRING *
 Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                       SPRINTF_OBJ * obj)
 {
-    INTVAL i;
+    INTVAL i, len, old;
     STRING *targ = string_make(interpreter, NULL, 0, NULL, 0, NULL);
 
     /* ts is used almost universally as an intermediate target;
@@ -214,13 +215,22 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
      * as a target by gen_sprintf_call.
      */
     STRING *ts;
+    STRING *substr = NULL;
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
 
-    for (i = 0; i < (INTVAL) string_length(pat); i++) {
+    for (i = old = len = 0; i < (INTVAL) string_length(pat); i++) {
         if (string_ord(pat, i) == '%') {        /* % */
+            if (len) {
+                string_substr(interpreter, pat, old, len, &substr);
+                string_append(interpreter, targ, substr, 0);
+            }
+            len = 0;
+            old = i;
             if (string_ord(pat, i + 1) == '%') {
                 i++;
+                len += 2;
+                continue;
             }
             else {
                 /* hoo boy, here we go... */
@@ -242,16 +252,16 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
 
 /*  This can be really hard to understand, so I'll try to explain beforehand.
  *  A rough grammar for a printf format is:
- *    
+ *
  *  grammar Parrot::PrintF_Format {
  *      rule format {
  *          <other_stuff> ( <field> <other_stuff> )*
  *      }
- *      
+ *
  *      rule other_stuff {
  *          <[^\%]> | \%\%
  *      }
- *     
+ *
  *      rule field {
  *          \%
  *          <flags>?
@@ -260,7 +270,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
  *          <size>?
  *          <term>
  *      }
- *     
+ *
  *      rule flags {
  *          <[
  *              +       # prefix with a + if necessary
@@ -270,17 +280,17 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
  *              \#      # 0, 0x on octal, hex; force decimal point on float
  *          ]>+
  *      }
- *      
+ *
  *      rule width {
  *          [\d|\*]+    # minimum width
  *      }
- *      
+ *
  *      rule prec {
  *          [\d|\*]+    # width on integers;
  *                      # number of digits after decimal on floats;
  *                      # maximum width on strings
  *      }
- *      
+ *
  *      rule size {
  *          <[
  *              h       # short (or float)
@@ -292,7 +302,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
  *              S       # Parrot string (only with %s)
  *          ]>
  *      }
- *      
+ *
  *      rule term {
  *          <[
  *              c       # char
@@ -305,28 +315,28 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
  *              B       # binary with capital B (if #)
  *              u       # unsigned integer
  *              p       # pointer
- *              
+ *
  *              e       # 1e1
  *              E       # 1E1
  *              f       # 1.0
  *              g       # 1, 0.1, 1e1
  *              G       # 1, 0.1, 1E1
- *              
+ *
  *              s       # string
  *          ]>
  *      }
  *  }
- *  
+ *
  *      Complication: once upon a time, %P existed.  Now you should
  *      use %Ps, %Pd or %Pf, but we still need to support the old form.
  *      The same is true of %S--%Ss is the best form, but %S is still
  *      supported.
- *  
+ *
  *  The implementation of Parrot_vsprintf is surprisingly similar to this
- *  regex, even though the two were developed semi-independently.  
+ *  regex, even though the two were developed semi-independently.
  *  Parrot_vsprintf keeps track of what it expects to see next (the
- *  'phase')--flags, width, precision, size, or field type (term).  If it 
- *  doesn't find a character that fits whatever it's expecting, it sets 
+ *  'phase')--flags, width, precision, size, or field type (term).  If it
+ *  doesn't find a character that fits whatever it's expecting, it sets
  *  info.phase to the next thing and tries it.  The first four phases just
  *  set flags--the last does all the work.
  */
@@ -600,7 +610,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                                 i--;
                                 goto CASE_s;
                                 /* case 's' will see the SIZE_PMC or SIZE_PSTR
-                                 * and assume it was %Ps (or %Ss).  Genius, 
+                                 * and assume it was %Ps (or %Ss).  Genius,
                                  * no?
                                  */
                             }
@@ -623,13 +633,16 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                 }
             }
 
+            old = i;
             i--;
         }
         else {
-            STRING *substr = NULL;
-            string_substr(interpreter, pat, i, 1, &substr);
-            string_append(interpreter, targ, substr, 0);
+            len++;
         }
+    }
+    if (len) {
+        string_substr(interpreter, pat, old, len, &substr);
+        string_append(interpreter, targ, substr, 0);
     }
 
     return targ;
@@ -639,7 +652,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -17,13 +17,19 @@
  *=for api interpreter dump_pmc
  * Prints a PMC to stderr
  */
- 
+
 void
 dump_pmc(struct Parrot_Interp *interpreter, PMC* pmc) {
     if(pmc) {
         if(pmc->vtable) {
-            PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%PS\" Num:%Pg Int:%Pd)",
-                pmc->vtable->name(interpreter, pmc), pmc, pmc, pmc, pmc);
+            if (pmc->vtable == Parrot_base_vtables + enum_class_PerlString) {
+                PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%PS\")",
+                        pmc->vtable->name(interpreter, pmc), pmc, pmc);
+            }
+            else {
+                PIO_eprintf(interpreter, "%S=PMC(%#p Num:%Pg Int:%Pd)",
+                        pmc->vtable->name(interpreter, pmc), pmc, pmc, pmc);
+            }
         }
         else {
             PIO_eprintf(interpreter, "PMC(NULL)");
@@ -38,7 +44,7 @@ dump_pmc(struct Parrot_Interp *interpreter, PMC* pmc) {
  *=for api interpreter trace_key_dump
  * Prints a key to stderr.
  */
- 
+
 void
 trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
 {
@@ -46,7 +52,7 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
     STRING *s;
 
     PIO_eprintf(interpreter, "[");
-                
+
     while (key) {
         switch (key->flags & KEY_type_FLAGS) {
         case 0:
@@ -61,7 +67,9 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
             s = key->cache.string_val;
             /* XXX do it w/o degrading to C string */
             escaped = PDB_escape(s->bufstart, s->strlen);
-            PIO_eprintf(interpreter, "\"%s\"", escaped);
+            PIO_eprintf(interpreter, "\"%s\"", escaped?escaped:"(null)");
+                if (escaped)
+                    free(escaped);
             break;
         case KEY_integer_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "I%vd=%vd", key->cache.int_val,
@@ -74,7 +82,10 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
         case KEY_string_FLAG|KEY_register_FLAG:
             s = interpreter->ctx.string_reg.registers[key->cache.int_val];
             escaped = PDB_escape(s->bufstart, s->strlen);
-            PIO_eprintf(interpreter, "S%vd=\"%s\"", key->cache.int_val, escaped);
+            PIO_eprintf(interpreter, "S%vd=\"%s\"", key->cache.int_val,
+                    escaped ? escaped : "(null");
+                if (escaped)
+                    free(escaped);
             break;
         case KEY_pmc_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "P%vd=", key->cache.int_val);
@@ -83,18 +94,18 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
         default:
             PIO_eprintf(interpreter, "??");
         }
-        
+
         key = key->data;
-        
+
         if (key) PIO_eprintf(interpreter, ";");
     }
-    
+
     PIO_eprintf(interpreter, "]");
 }
 
 /*
  *=for api interpreter trace_op_dump
- * TODO: This isn't really part of the API, but here's its documentation. 
+ * TODO: This isn't really part of the API, but here's its documentation.
  * Prints the PC, OP and ARGS. Used by trace_op
  */
 void
@@ -129,8 +140,10 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 escaped = PDB_escape(interpreter->code->const_table->
                                      constants[*(pc + i)]->string->strstart,
                                      interpreter->code->const_table->
-                                     constants[*(pc + i)]->string->strlen);
-                PIO_eprintf(interpreter, "\"%s\"", escaped);
+                                     constants[*(pc + i)]->string->bufused);
+                PIO_eprintf(interpreter, "\"%s\"", escaped ? escaped : "(null)");
+                if (escaped)
+                    free(escaped);
                 break;
             case PARROT_ARG_KC:
                 trace_key_dump(interpreter, interpreter->code->const_table->constants[*(pc + i)]->key);
@@ -148,17 +161,23 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_P:
                 /* what does a PMC register look like? */
-                PIO_eprintf(interpreter, "P%vd=", *(pc + i));
-                dump_pmc(interpreter, interpreter->ctx.pmc_reg.registers[*(pc + i)]);
+                if (i > 1) {
+                    PIO_eprintf(interpreter, "P%vd=", *(pc + i));
+                    dump_pmc(interpreter, interpreter->ctx.pmc_reg.registers[*(pc + i)]);
+                }
+                else
+                    PIO_eprintf(interpreter, "P%vd", *(pc + i));
                 break;
             case PARROT_ARG_S:
                 if (interpreter->ctx.string_reg.registers[*(pc + i)]) {
                     escaped = PDB_escape(interpreter->ctx.string_reg.
                                          registers[*(pc + i)]->strstart,
                                          interpreter->ctx.string_reg.
-                                         registers[*(pc + i)]->strlen);
+                                         registers[*(pc + i)]->bufused);
                     PIO_eprintf(interpreter, "S%vd=\"%s\"", *(pc + i),
-                            escaped);
+                            escaped ? escaped : "(null)");
+                    if (escaped)
+                        free(escaped);
                 }
                 else {
                     PIO_eprintf(interpreter, "S%vd=(null)", *(pc + i));
@@ -195,7 +214,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
 
 /*
  *=for api interpreter trace_op
- * TODO: This isn't really part of the API, but here's its documentation. 
+ * TODO: This isn't really part of the API, but here's its documentation.
  * Prints the PC, OP and ARGS. Used by runops_trace.
  *
  * With bounds checking.
@@ -225,7 +244,7 @@ trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

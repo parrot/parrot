@@ -22,14 +22,14 @@ struct Parrot_Interp *
 Parrot_new(void)
 {
     /* global_setup.c:init_world sets up some vtable stuff.
-       We need it called before we make an interpreter, but 
+       We need it called before we make an interpreter, but
        it must only be called once.                         */
 
     if (!world_inited) {
         world_inited = 1;
         init_world();
     }
-    
+
     /* interpreter.c:make_interpreter builds a new Parrot_Interp. */
     return make_interpreter(NO_FLAGS);
 }
@@ -85,7 +85,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
 #ifdef HAS_HEADER_SYSMMAN
     int fd = -1;
-#endif    
+#endif
 
     if (filename == NULL || strcmp(filename, "-") == 0) {
         /* read from STDIN */
@@ -114,7 +114,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 #else   /* HAS_HEADER_SYSSTAT */
 
         /* otherwise, we will read it 1k at a time */
-        program_size = 0;  
+        program_size = 0;
 
 #endif  /* HAS_HEADER_SYSSTAT */
 
@@ -156,7 +156,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
         cursor = (char *)program_code;
 
-        while ((read_result = 
+        while ((read_result =
                 PIO_read(interpreter, io, cursor, chunk_size)) > 0) {
             program_size += read_result;
             chunk_size = 1024;
@@ -181,7 +181,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     else {
         /* if we've gotten here, we opted not to use PIO to read the file.
          * use mmap */
-        
+
 #ifdef HAS_HEADER_SYSMMAN
 
         fd = open(filename, O_RDONLY | O_BINARY);
@@ -221,12 +221,12 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     }
 
 #ifdef HAS_HEADER_SYSMMAN
-    
+
     if (fd >= 0) {
         munmap(program_code, program_size);
         close(fd);
     }
-    
+
 #endif
 
     return pf;
@@ -249,7 +249,7 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
                 "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
                 argc);
     }
-    
+
     userargv = pmc_new(interpreter, enum_class_PerlArray);
     /* immediately anchor pmc to root set */
     interpreter->ctx.pmc_reg.registers[0] = userargv;
@@ -290,7 +290,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         }
     }
 
-#if !defined(JIT_CAPABLE) || !JIT_CAPABLE 
+#if !defined(JIT_CAPABLE) || !JIT_CAPABLE
 
     /* No JIT here--make sure they didn't ask for it. */
 
@@ -299,14 +299,14 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
                 "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
         exit(1);
     }
-    
+
 #endif
 
     /* Set up @ARGS (or whatever this language calls it).
        XXX Should this be Array or PerlArray?             */
 
     setup_argv(interpreter, argc, argv);
-    
+
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     runops(interpreter, interpreter->code, 0);
 
@@ -331,18 +331,18 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
                 call_count += interpreter->profile[j].numcalls;
                 sum_time += interpreter->profile[j].time;
 
-                PIO_printf(interpreter, "  %5vu  %-12s  %6vu  %10vf  %10vf\n", j, 
+                PIO_printf(interpreter, "  %5vu  %-12s  %6vu  %10vf  %10vf\n", j,
                        interpreter->op_info_table[j].full_name,
                        interpreter->profile[j].numcalls,
                        interpreter->profile[j].time,
-                       (FLOATVAL)(interpreter->profile[j].time / 
+                       (FLOATVAL)(interpreter->profile[j].time /
                            (FLOATVAL)interpreter->profile[j].numcalls)
                 );
             }
         }
 
         PIO_printf(interpreter, "  -----  ------------  ------  ----------  ----------\n");
-        PIO_printf(interpreter, "  %5vu  %-12s  %6vu  %10vf  %10vf\n", 
+        PIO_printf(interpreter, "  %5vu  %-12s  %6vu  %10vf  %10vf\n",
             op_count,
             "",
             call_count,
@@ -352,20 +352,20 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     }
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        /* Give the souls brave enough to activate debugging an earful 
+        /* Give the souls brave enough to activate debugging an earful
          * about GC. */
         PIO_eprintf(interpreter, "\
 *** Parrot VM: Dumping GC info ***\n\
-\tTotal memory allocated: %p\n\
-\tTotal DOD runs:         %p\n\
-\tTotal collector runs:   %p\n\
-\tActive PMCs:            %p\n\
-\tActive buffers:         %p\n\
-\tTotal PMCs:             %p\n\
-\tTotal buffers:          %p\n\
+\tTotal memory allocated: %d\n\
+\tTotal DOD runs:         %d\n\
+\tTotal collector runs:   %d\n\
+\tActive PMCs:            %d\n\
+\tActive buffers:         %d\n\
+\tTotal PMCs:             %d\n\
+\tTotal buffers:          %d\n\
 \tSince last collection:\n\
-\t\tHeader allocations:   %p\n\
-\t\tMemory allocations:   %p\n\
+\t\tHeader allocations:   %d\n\
+\t\tMemory allocations:   %d\n\
 \n",
             interpreter->memory_allocated,
             interpreter->dod_runs,

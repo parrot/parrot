@@ -7,18 +7,18 @@
  *     may use to retrieve arguments.
  *  Data Structure and Algorithms:
  *  History:
- *     When I was first working on this implementation of 
- *     sprintf, I ran into a problem.  I wanted to re-use the 
- *     implementation for a Parrot bytecode-level sprintf, but 
+ *     When I was first working on this implementation of
+ *     sprintf, I ran into a problem.  I wanted to re-use the
+ *     implementation for a Parrot bytecode-level sprintf, but
  *     that couldn't be done, since it used va_* directly.  For
- *     a while I thought about generating two versions of the 
+ *     a while I thought about generating two versions of the
  *     source with a Perl script, but that seemed like overkill.
- *     Eventually I came across this idea--pass in a specialized 
+ *     Eventually I came across this idea--pass in a specialized
  *     vtable with methods for extracting things from the arglist,
  *     whatever it happened to be.  This is the result.
  *  Notes:
  *     In the future, it may be deemed desirable to similarly
- *     vtable-ize appending things to the string, allowing for 
+ *     vtable-ize appending things to the string, allowing for
  *     faster PIO_printf &c, as well as a version that writes
  *     directly to a C string.  However, at this point neither
  *     of those is needed.
@@ -143,25 +143,32 @@ getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
     va_list *arg = (va_list *) (obj->data);
 
     switch (size) {
-    case SIZE_REG:{
-            char *cstr = (char *)va_arg(*arg, char *);
-            return cstr2pstr(cstr);
-        }
+        case SIZE_REG:
+            {
+                char *cstr = (char *)va_arg(*arg, char *);
+                return cstr2pstr(cstr);
+            }
 
-    case SIZE_PSTR:
-        return string_copy(interpreter, (STRING *)
-                           va_arg(*arg, STRING *));
+        case SIZE_PSTR:
+            {
+                STRING *s =  (STRING *) va_arg(*arg, STRING *);
+                return string_make(interpreter, s->strstart, s->bufused,0,
+                        BUFFER_external_FLAG, 0);
+            }
 
-    case SIZE_PMC:{
-            PMC *pmc = (PMC *) va_arg(*arg, PMC *);
-            return pmc->vtable->get_string(interpreter, pmc);
-        }
+        case SIZE_PMC:
+            {
+                PMC *pmc = (PMC *) va_arg(*arg, PMC *);
+                STRING *s = pmc->vtable->get_string(interpreter, pmc);
+                return string_make(interpreter, s->strstart, s->bufused,0,
+                        BUFFER_external_FLAG, 0);
+            }
 
-    default:
-        internal_exception(INVALID_CHARACTER,
-                           "Internal sprintf doesn't recognize size %d for a string",
-                           size);
-        return NULL;
+        default:
+            internal_exception(INVALID_CHARACTER,
+                    "Internal sprintf doesn't recognize size %d for a string",
+                    size);
+            return NULL;
     }
 }
 
@@ -184,13 +191,13 @@ SPRINTF_OBJ va_core = {
 static STRING *
 getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 {
+    STRING *s;
     PMC *tmp = ((PMC *) obj->data)->vtable->get_pmc_keyed_int(interpreter,
-                                                              ((PMC *) obj->data),
-                                                              &(obj->index));
+            ((PMC *) obj->data),
+            &(obj->index));
     obj->index++;
-    return string_substr(interpreter,
-                         tmp->vtable->get_string(interpreter, tmp), 0, 1,
-                         NULL);
+    s = tmp->vtable->get_string(interpreter, tmp);
+    return string_make(interpreter, s->strstart, 1, 0, BUFFER_external_FLAG, 0);
 }
 
 static HUGEINTVAL
@@ -273,11 +280,14 @@ static STRING *
 getstring_pmc(struct Parrot_Interp *interpreter,
               INTVAL size, SPRINTF_OBJ * obj)
 {
+    STRING *s;
     PMC *tmp = ((PMC *) obj->data)->vtable->get_pmc_keyed_int(interpreter,
-                                                              ((PMC *) obj->data),
-                                                              &(obj->index));
+            ((PMC *) obj->data),
+            &(obj->index));
     obj->index++;
-    return (STRING *)(tmp->vtable->get_string(interpreter, tmp));
+    s =  (STRING *)(tmp->vtable->get_string(interpreter, tmp));
+    return string_make(interpreter, s->strstart, s->bufused,0,
+            BUFFER_external_FLAG, 0);
 }
 
 static void *
@@ -300,7 +310,7 @@ SPRINTF_OBJ pmc_core = {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

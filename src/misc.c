@@ -21,12 +21,12 @@
 
 /* All the other sprintf variants are implemented in terms of
  * Parrot_vsprintf_s.
- * 
+ *
  * NAMING CONVENTION:
  *  Parrot_v?n?sprintf - a (nearly) drop-in replacement for v?n?sprintf.
  *  Parrot_v?sprintf_c - takes a C-string format, returns a Parrot string.
  *  Parrot_v?sprintf_s - takes a Parrot string format, returns a Parrot string.
- * 
+ *
  *  So the _ means "returns Parrot string" and the other letter indicates the
  *      type for the format.  :^)
  */
@@ -65,15 +65,22 @@ void
 Parrot_vsnprintf(struct Parrot_Interp *interpreter, char *targ,
                  size_t len, const char *pat, va_list args)
 {
-    STRING *ret = Parrot_vsprintf_c(interpreter, pat, args);
-    string_transcode(interpreter, ret, NULL, NULL, &ret);
+    STRING *ret;
+    if (len == 0)
+        return;
+    len--;
+    if (len) {
+        ret = Parrot_vsprintf_c(interpreter, pat, args);
+        string_transcode(interpreter, ret, NULL, NULL, &ret);
 
-    if (len > ret->bufused) {
-        len = ret->bufused;
+        if (len > ret->bufused) {
+            len = ret->bufused;
+        }
+
+        if (len)
+            memcpy(targ, ret->strstart, len);
     }
-
-    memcpy(targ, ret->strstart, len);
-    targ[len + 1] = 0;
+    targ[len] = 0;
 }
 
 STRING *
@@ -145,7 +152,7 @@ Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat, PMC * ary)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

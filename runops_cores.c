@@ -72,13 +72,19 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_end;
     opcode_t *lastpc = NULL;
     FLOATVAL starttime = 0;
+    Interp * trace_i;
 
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
     code_end = interpreter->code->byte_code + code_size;
 
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-        trace_op(interpreter, code_start, code_end, pc);
+        trace_i = make_interpreter(0);
+        Parrot_init(trace_i, (void*)& starttime);
+        mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
+                sizeof(struct Parrot_Context));
+        trace_i->code = interpreter->code;
+        trace_op(trace_i, code_start, code_end, pc);
     }
 
     while (pc && pc >= code_start && pc < code_end) {
@@ -91,7 +97,9 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
         DO_OP(pc, interpreter);
 
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-            trace_op(interpreter, code_start, code_end, pc);
+            mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
+                    sizeof(struct Parrot_Context));
+            trace_op(trace_i, code_start, code_end, pc);
         }
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
             interpreter->profile[*lastpc].time +=
@@ -107,7 +115,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
