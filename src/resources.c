@@ -478,6 +478,9 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
             : interpreter->arena_base->memory_pool;
     str->bufstart = mem_allocate(interpreter, &req_size, pool,
             STRING_ALIGNMENT - 1);
+    if (str->bufstart == NULL) {
+        internal_exception(ALLOCATION_ERROR, "Out of memory");
+    }
     str->buflen = req_size;
     str->strstart = str->bufstart;
     return str;

@@ -26,6 +26,7 @@
 .constant TempInt       I5
 .constant TempInt2	I6
 .constant TempInt3      I7
+.constant InternalInt	I27
 
 .constant Status	I12
 
@@ -52,19 +53,21 @@
 
 .constant CoreOps       P0
 .constant UserOps       P1
+.constant SpecialWords	P5
 
-.constant CompiledWordPMC P2
-.constant PASMCompiler	P3
+.constant CompiledWordPMC P3
+.constant PASMCompiler	P4
+.constant LinePMC	P2
 
 .constant TempPMC	P27
 
-#
+    # We need a PMC for the compiler
+    compreg .PASMCompiler, "PASM"
 
     bsr InitializeCoreOps
-    compreg P3, "PASM"
 
     set .Mode, .InterpretMode
-    getstdin P2
+    getstdin .LinePMC
 
 Prompt:
     eq .Mode, .InterpretMode, InterpretPrompt
@@ -73,7 +76,7 @@ Prompt:
 InterpretPrompt:
     print .InterpretPrompt
 DonePromptString:
-    readline .Commands, P2
+    readline .Commands, .LinePMC
     bsr Chop
     bsr Interpret
     branch Prompt
@@ -108,6 +111,7 @@ InitializeCoreOps:
     #
     new .CoreOps, .PerlHash
     new .UserOps, .PerlHash
+    new .SpecialWords, .PerlHash
 
     .AddCoreOp(Int_Dot,".")
     .AddCoreOp(Int_Dot_Stack,".s")
@@ -148,9 +152,11 @@ InitializeCoreOps:
     .AddCoreOp(Int_Invert, "invert")
     .AddCoreOp(Int_LShift, "lshift")
     .AddCoreOp(Int_RShift, "rshift")
-    set .UserOps["2*"], "2 *" # 2*
+    .AddUserOp("2*", "2 *")
+#   set .UserOps["2*"], "2 *" # 2*
 # d2*
-    set .UserOps["2/"], "2 /" # 2/
+#    .AddUserOp("2/", "2 /")
+#    set .UserOps["2/"], "2 /" # 2/
 # d2/
 
     #
@@ -530,7 +536,6 @@ Interpret:
 StartInterpret:
     bsr CollectWord
     bsr EatLeadingWhitespace
-
     ne .CurrentWord, "\\", MaybeComment
     set .Commands, ""
     branch DoneInterpret
@@ -569,11 +574,6 @@ MaybeCompileWord:
     eq .CurrentWord, ":", DoneInterpretWord
     ne .CurrentWord, ";", DoCompileStuff
     set .Mode, .InterpretMode
-    print "compiled "
-    print .CompileWord
-    print " "
-    print " from "
-    print .CompileBuffer
     set .UserOps[.CompileWord], .CompileBuffer
     set .CompileWord, ""
     set .CompileBuffer, ""
@@ -981,19 +981,28 @@ CompileString:
     set .NewBodyString, ""
 
 CompileWord:
+    # No space!
+    bsr EatLeadingWhitespace
+
     # Get the next word in the command buffer
     bsr CollectWord
+
     # Identify it and add the text for it into the 
     bsr IdentifyAndCompileWord
-    
+
     # If the buffer's not empty, then go back and process it
     length .TempInt, .Commands    
     if .TempInt, CompileWord
+
+    # Add in the return
+    concat .NewBodyString, "end\n"
 
     # Compile the string
     compile .CompiledWordPMC, .PASMCompiler, .NewBodyString
 
     # And we're done
+    restore .Commands
+    restore .NewBodyString
     ret
 
 IdentifyAndCompileWord:
@@ -1026,15 +1035,35 @@ NotString:
     ret
 
 CheckForWord:
+    set .TempInt, .CoreOps[.CurrentWord]
+    set .Status, 0
+    if .TempInt, GoodWord
     set .Status, 1
+  GoodWord:
     ret
+
 CheckForSpecialWord:
+    set .TempInt, .SpecialWords[.CurrentWord]
+    set .Status, 0
+    if .TempInt, GoodSpecialWord
     set .Status, 1
+  GoodSpecialWord:
     ret
+# We cheat and do an string->int->string conversion and see
+# if the results are the same. If so, it's an integer. (This is, I should
+# note, very very wrong for non-decimal bases, which Forth is happy
+# to do)
 CheckForInt:
+    set .TempInt, .CurrentWord
+    set .TempString, .TempInt
+    set .Status, 0
+    eq .TempString, .CurrentWord, LeaveIntCheck
     set .Status, 1
+  LeaveIntCheck:
     ret
+
 CheckForFloat:
+    # No float for you!
     set .Status, 1
     ret
 CheckForString:
@@ -1046,10 +1075,15 @@ AddSpecialWord:
     ret
 
 AddIntConstant:
-    concat .NewBodyString, "new P27, .Integer\n"
-    concat .NewBodyString, "set P27, "
+#    concat .NewBodyString, "new P27, .Integer\n"
+#    concat .NewBodyString, "set P27, "
+#    concat .NewBodyString, .CurrentWord
+#    concat .NewBodyString, "\n"
+#    concat .NewBodyString, "save P27\n"
+    concat .NewBodyString, "set I27, "
     concat .NewBodyString, .CurrentWord
     concat .NewBodyString, "\n"
+    concat .NewBodyString, "save I27\n"
     ret
 
 AddFloatConstant:
@@ -1057,6 +1091,7 @@ AddFloatConstant:
     concat .NewBodyString, "set P27, "
     concat .NewBodyString, .CurrentWord
     concat .NewBodyString, "\n"
+    concat .NewBodyString, "save P27\n"
     ret
 
 AddStringConstant:
@@ -1065,6 +1100,7 @@ AddStringConstant:
     concat .NewBodyString, "set P27, "
     concat .NewBodyString, .CurrentWord
     concat .NewBodyString, "\n"
+    concat .NewBodyString, "save P27\n"
     ret
 
 AddPlainWord:
@@ -1074,5 +1110,6 @@ AddPlainWord:
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n"
     ret
+
 AddControlStruct:
     ret

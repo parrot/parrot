@@ -776,7 +776,6 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 
     true_offset = (UINTVAL)offset;
     true_length = (UINTVAL)length;
-
     if (rep->encoding != src->encoding || rep->type != src->type) {
         rep = string_transcode(interpreter, rep, src->encoding, src->type,
                                NULL);
@@ -818,7 +817,6 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
      * for this case
      * -leo
      */
-
     dest =
         string_make(interpreter, NULL, true_length * src->encoding->max_bytes,
                     src->encoding, 0, src->type);
@@ -842,7 +840,6 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 
     if(diff >= 0
         || ((INTVAL)src->bufused - (INTVAL)src->buflen) <= diff) {
-
         unmake_COW(interpreter, src);
 
         if(diff != 0) {
