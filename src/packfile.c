@@ -331,26 +331,22 @@ do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)
 /*
  * while the PMCs should be constant, there possible contents like
  * a property isn't conctructed const so we have to mark them
- * XXX marks only the 1st PackFile
  */
-void
-mark_const_subs(Parrot_Interp interpreter)
+static void
+mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
 {
     opcode_t i, ci;
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
-    struct PackFile *self;
     PMC *sub_pmc;
 
-    self = interpreter->code;
-    if (!self || !self->cur_cs)
-        return;
-    ft = self->cur_cs->fixups;
+    ft = cs->fixups;
     if (!ft)
         return;
-    ct = self->cur_cs->consts;
+    ct = cs->consts;
     if (!ct)
         return;
+    /* fprintf(stderr, "mark %s\n", cs->base.name); */
     for (i = 0; i < ft->fixup_count; i++) {
         switch (ft->fixups[i]->type) {
             case enum_fixup_sub:
@@ -360,6 +356,41 @@ mark_const_subs(Parrot_Interp interpreter)
                 break;
         }
     }
+}
+
+static INTVAL
+find_code_iter(struct PackFile_Segment *seg, void *user_data)
+{
+    if (seg->type == PF_DIR_SEG) {
+	PackFile_map_segments((struct PackFile_Directory*)seg,
+                find_code_iter, user_data);
+    }
+    else if (seg->type == PF_BYTEC_SEG) {
+        Parrot_Interp interp = (Parrot_Interp)user_data;
+        mark_1_seg(interp, (struct PackFile_ByteCode *)seg);
+    }
+    return 0;
+}
+
+void
+mark_const_subs(Parrot_Interp interpreter)
+{
+    struct PackFile *self;
+    struct PackFile_ByteCode   * cur_cs;
+    struct PackFile_Directory *dir;
+
+    self = interpreter->code;
+    if (!self || !self->cur_cs)
+        return;
+    /*
+     * locate top level dir
+     */
+    for (dir = &self->directory; dir->base.dir ; dir = dir->base.dir)
+        ;
+    /*
+     * iterate over all dir/segs
+     */
+    PackFile_map_segments(dir, find_code_iter, interpreter);
 }
 
 /*

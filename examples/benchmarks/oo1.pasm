@@ -18,12 +18,14 @@
 # reuse exception               2.00          1.37
 # reuse regsave mem                           1.25
 # anchor P1                                   1.36
+# Dan's new object layout                     1.05
 
 # parrot -j oo1.pasm
 # find_global hack                            1.51
 # reuse exception                             1.30
 # reuse regsave mem                           1.23
 # anchor P1                                   1.32
+# Dan's new object layout                     1.00
 
 
 # parrot -C oo1-prop.pasm

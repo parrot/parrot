@@ -35,6 +35,7 @@ string or PMC not otherwise rooted it could be collected too early.
 
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 typedef struct _reg_store {
     struct IReg int_reg;
@@ -55,7 +56,8 @@ Saves the registers to the C<regsave struct>.
 */
 
 typedef struct regsave {
-    struct regsave *prev;
+    struct regsave *prev;       /* free list ptr */
+    struct regsave *next;       /* mark list ptr */
     reg_store      regs;
 } regsave;
 
@@ -63,7 +65,8 @@ typedef struct regsave {
  * TODO move this into interpreter
  */
 
-static regsave *reg_save_top;
+static regsave *reg_save_top;   /* the free list */
+static regsave *reg_save_mark;  /* the mark list */
 
 PARROT_INLINE static struct regsave *
 save_regs(Parrot_Interp interp) {
@@ -76,6 +79,8 @@ save_regs(Parrot_Interp interp) {
         save = mem_sys_allocate(sizeof(struct regsave));
         save->prev = NULL;
     }
+    save->next = reg_save_mark;
+    reg_save_mark = save;
     mem_sys_memcopy(&save->regs, interp, sizeof(reg_store));
     return save;
 }
@@ -97,12 +102,35 @@ restore_regs(Parrot_Interp interpreter, struct regsave *data) {
     mem_sys_memcopy(interpreter, &data->regs, sizeof(reg_store));
     data->prev = reg_save_top;
     reg_save_top = data;
+    assert(reg_save_mark == data);
+    reg_save_mark = data->next;
 
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         PIO_eprintf(interpreter, "# return\n");
     }
 }
 
+
+static void
+mark_regs(Parrot_Interp interpreter)
+{
+    struct regsave *p = reg_save_mark;
+    int j;
+    PObj *reg;
+
+    for (; p; p = p->next) {
+        struct PReg *pf = &p->regs.pmc_reg;
+        struct SReg *sf = &p->regs.string_reg;
+        for (j = 0; j < NUM_REGISTERS; j++) {
+            reg = (PObj*) pf->registers[j];
+            if (reg)
+                pobject_lives(interpreter, reg);
+            reg = (PObj*) sf->registers[j];
+            if (reg)
+                pobject_lives(interpreter, reg);
+        }
+    }
+}
 /*
 
 =item C<PARROT_INLINE static PMC *
@@ -227,6 +255,9 @@ Calls the delegated C<init()> method.
         noarg_noreturn(INTERP, SELF, class, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 
+    void mark() {
+        mark_regs(INTERP);
+    }
 }
 
 /*

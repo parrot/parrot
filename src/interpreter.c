@@ -1027,6 +1027,7 @@ save_regs(Parrot_Interp interp) {
 	internal_exception(ALLOCATION_ERROR, "No memory for save struct");
     }
     mem_sys_memcopy(save, interp, sizeof(struct regsave));
+    Parrot_block_DOD(interp);
     return save;
 }
 
@@ -1045,6 +1046,7 @@ PARROT_INLINE static void
 restore_regs(Parrot_Interp interp, struct regsave *data) {
     mem_sys_memcopy(interp, data, sizeof(struct regsave));
     mem_sys_free(data);
+    Parrot_unblock_DOD(interp);
 }
 
 /*

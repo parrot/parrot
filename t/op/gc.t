@@ -16,7 +16,7 @@ Tests garbage collection with the C<interpinfo> operation.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -213,4 +213,44 @@ init
 inc
 back from _inc
 ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
+    newclass P9, "Source"
+    newclass P10, "Source::Buffer"
+    find_type I9,"Source"
+    new P12, I9
+
+    set S20, P12
+    print S20
+    set S20, P12
+    print S20
+    end
+
+.namespace ["Source"]
+.pcc_sub __get_string:	# buffer
+    getprop P12, "buf", P2
+    sweep 1
+    typeof I12, P12
+    ne I12, .PerlUndef, buffer_ok
+    find_type I12, "Source::Buffer"
+    new P12, I12
+    new P14, .PerlString
+    set P14, "hello\n"
+    setprop P12, "buf", P14
+    setprop P2, "buffer", P12
+buffer_ok:
+    set S5, P12
+    invoke P1
+
+.namespace ["Source::Buffer"]
+.pcc_sub __get_string:
+    sweep 1
+    getprop P12, "buf", P2
+    set S16, P12
+    set S5, S16
+    invoke P1
+CODE
+hello
+hello
 OUTPUT

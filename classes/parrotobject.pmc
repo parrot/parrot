@@ -68,6 +68,25 @@ C<Parrot_instantiate_object()>.
             "use the registered class instead");
     }
 
+    void mark() {
+        Buffer *trace_buf = PMC_data(SELF);
+        UINTVAL i;
+
+        /* mark saved registers area */
+        Parrot_delegate_mark(INTERP, SELF);
+
+        if (trace_buf) {
+            PMC **cur_pmc = trace_buf->bufstart;
+
+            pobject_lives(interpreter, trace_buf);
+            for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++) {
+                if (cur_pmc[i]) {
+                    pobject_lives(interpreter, (PObj *)cur_pmc[i]);
+                }
+            }
+        }
+    }
+
 /*
 
 =item C<void init_pmc(PMC *init)>

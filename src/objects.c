@@ -334,7 +334,7 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     /* Our parent class array has nothing in it */
     set_attrib_num(class_array, PCD_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
-    set_attrib_num(class_array, PCD_ALL_PARENTS, 
+    set_attrib_num(class_array, PCD_ALL_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
     set_attrib_num(class_array, PCD_ATTRIB_OFFS,
             pmc_new(interpreter, enum_class_OrderedHash));
@@ -506,7 +506,8 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /* Build the array that hangs off the new object */
     new_object_array = new_attrib_array();
     PMC_data(object) = new_object_array;
-    set_attrib_flags(object);
+    /* set_attrib_flags(object); */
+    PObj_custom_mark_SET(object);
 
     /* Presize it */
     set_attrib_array_size(new_object_array,
@@ -791,7 +792,7 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     }
 
     /* If not, time to walk through the parent class array. Wheee */
-    classsearch_array = get_attrib_num((SLOTTYPE *)PMC_data(class), 
+    classsearch_array = get_attrib_num((SLOTTYPE *)PMC_data(class),
                                        PCD_ALL_PARENTS);
     classcount = VTABLE_elements(interpreter, classsearch_array);
 
