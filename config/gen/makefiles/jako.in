@@ -11,7 +11,7 @@ DIR=languages/jako
 TOOL_DIR=../..
 ASM=$(PERL) -I ../../lib ../../assemble.pl
 IMCC=imcc
-JAKOC=$(PERL) jakoc
+JAKOC=$(PERL) -I lib jakoc
 INTERP=../../${test_prog}
 
 .SUFFIXES: .jako .imc .pasm .pbc
