@@ -19,14 +19,6 @@
 		PQ    => '"'
 	);
 
-	# If yacc or lex is not in the path, then set them to 'REM'.
-	# Need to move this into its own program, to auto-detect.
-	foreach ( qw( yacc lex ) ) {
-		my $cmd = Configure::Data->get($_);
-		`$cmd -h 2>&1`;
-		Configure::Data->set($_, 'REM') if $?;
-	}
-
 	if( $is_msvc ) {
 		# Check the output of cl.exe to see if it contains the
 		# string 'Standard' and remove the -O1 option if it does.
