@@ -160,7 +160,7 @@ ICU is a C and C++ library that provides support for Unicode on a
 variety of platforms.  It was added to Parrot with the 0.0.8 release to
 provide future unicode support.
 
-http://oss.software.ibm.com/developerworks/opensource/icu/project/
+http://oss.software.ibm.com/icu/index.html
 
 =head2 PMC
 
