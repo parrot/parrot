@@ -64,21 +64,21 @@
 # }
 
 MAIN:	
-	set I5, P0, 1           #I5 = argv[0]
+	set I5, P0[1]           #I5 = argv[0]
 	new P0, .PerlArray
 	new P1, .PerlArray
 	new P2, .PerlArray
 	new P3, .PerlArray
-	set P0, 0, P1	      #P0 = [[],[],[]]
-	set P0, 1, P2
-	set P0, 2, P3
+	set P0[0], P1	      #P0 = [[],[],[]]
+	set P0[1], P2
+	set P0[2], P3
 
 	set I0, 0
 loop_populate:
 	add I1, I0, 1
-	set P1, I0, I1	      #P0=[[1,2,3,...],[0,0,0...],[0,0,0...]]
-	set P2, I0, 0
-	set P3, I0, 0
+	set P1[I0] I1	      #P0=[[1,2,3,...],[0,0,0...],[0,0,0...]]
+	set P2[I0], 0
+	set P3[I0], 0
 	inc I0
 	lt  I0, I5, loop_populate
 	set I1, I5  # size
@@ -98,8 +98,8 @@ PRINT:	# vars used: I1, I2, I3, I4, I5, I6, P1
 loop_rows:
 	set I2, 0
 loop_cols:
-	set P1,P0,I2       #P1 = P0[j]
-	set I4,P1,I1       #I4 = cursize; cursize=array[j][i]
+	set P1,P0[I2]       #P1 = P0[j]
+	set I4,P1[I1]       #I4 = cursize; cursize=array[j][i]
 	
 	sub I5, I0, I4           #I5 = size-cursize
 	repeat S0, " ", I5
@@ -128,25 +128,25 @@ done_loop:
 # I3 = dest_col
 MOVE:	#vars used: I4, I5, I6, I7, I8, P1, P2
 	set I4, 0                         #I4 = i
-	set P1, P0, I2              #P1 = array[start_col]
+	set P1, P0[I2]              #P1 = array[start_col]
 loop_find_start_row:
-	set I7, P1, I4              #I7 = array[start_col][i]
+	set I7, P1[I4]              #I7 = array[start_col][i]
 	ne I7, 0, found_start_row
 	inc I4                            #  i++
 	lt I4, I0, loop_find_start_row    #  i < size
 found_start_row:
 	set I5, I4			  #I5 = start_row = i
-	set P2, P0, I3              #P2 = array[dest_col]
+	set P2, P0[I3]              #P2 = array[dest_col]
 	set I4, 0			  #  for( i = 0
 loop_find_dest_row:
-	set I8, P2, I4	          #I8 = array[dest_col][i]
+	set I8, P2[I4]	          #I8 = array[dest_col][i]
 	ne I8, 0, found_dest_row          #  if(array[dest_col][i])
 	inc I4   			  #  i++
 	lt I4, I0, loop_find_dest_row     #  i < size
 found_dest_row:
 	sub I6, I4, 1                     #I6 = dest_row = i - 1
-	set P2, I6, I7		  # array[dc][dr]=array[sc][sr]
-	set P1, I5, 0               # array[sc][sr]=0
+	set P2[I6], I7		  # array[dc][dr]=array[sc][sr]
+	set P1[I5], 0               # array[sc][sr]=0
 	bsr PRINT
 	ret
 
