@@ -111,7 +111,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
         case '\0':             /* bare '-' means read from stdin */
             goto OUT;
         default:
-            fprintf(stderr, "parrot: Invalid flag %c used",
+            fprintf(stderr, "parrot: Invalid flag %c used\n",
                     (*argv)[0][1]);
             exit(1);
         }
