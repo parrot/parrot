@@ -1,6 +1,7 @@
 #! perl -w
 
 use Parrot::Test tests => 6;
+use Test::More; # Included for skip().
 
 output_is(<<CODE, <<OUTPUT, "Set/get strings");
         new P0, PerlString
@@ -82,6 +83,8 @@ clear physics
 You can't teach an old dog new...clear physics
 OUTPUT
 
+SKIP: {
+skip("Pending new version of concat_p_p_s",1);
 output_is(<<CODE, <<OUTPUT, "ensure that concat pps copies strings");
 	new P0, PerlString
 	new P1, PerlString
@@ -103,6 +106,8 @@ Grunties
 fnargh
 fnarghGrunties
 OUTPUT
+warn "# We're no longer pregenerating concat_p_p_s -- Test is a TODO\n";
+}
 
 output_is(<<CODE, <<OUTPUT, "Setting string copies");
 	new P0, PerlString

@@ -13,64 +13,85 @@ my(%expand) = (
 );
 
 my (%types)  = (
+    unique => [""],
     int   => ["PMC *", "INTVAL", "BIGINT", "PMC *"],
     float => ["PMC *", "FLOATVAL", "BIGFLOAT", "PMC *"],
     num   => ["PMC *", "INTVAL", "BIGINT", "FLOATVAL", "BIGFLOAT", "PMC *"],
     str   => ["PMC *", "STRING *", "STRING *", "STRING *", "PMC *"]
 );
 
-
 sub parse_vtable {
-    my (%vtbl, @order);
-    open IN, shift || "vtable.tbl" or die "Can't open vtable table! $!\n";
-    while (<IN>) {
-        next if /^#/ or !/\S/;
-        chomp;
-        s/\s+$//;
-	next unless $_;
-        my (@line) = split /\t+/, $_;
-	my $meth_type = shift @line; # Method type
-        my $tn = shift @line; # Type and name;
-        my ($type, $name) = $tn =~ /(.*?)\s+(\w+)/;
+    my $file = defined $_[0] ? shift() : 'vtable.tbl';
+    my %vtable;
+    open INPUT, "< $file" or die "Can't open < $file: $!\n";
+    while(<INPUT>) {
+	chomp;
+	next if /^\s*#/ or /^\s*$/;
+	my ($names,$args) = $_ =~ /^(.*)\((.*)\)/;
+	#
+	# Split the names, then make sure '*'s precede the appropriate name.
+	#
+	my @names;
+	for(split /\s+/,$names) {
+	    s/^\s+//; s/\s+$//;
+	    if($_ eq '*') {
+		$names[-1] .= '*';
+	    }
+	    else {
+		push @names,$_;
+	    }
+	}
+	my $function     = $names[-1];
+	my $return_value = @names>1?$names[-2]:'void'; # Default to 'void'
+	my $signature    = @names>2?$names[-3]:'unique'; # Default to 'unique'
+	my @args;
+	if($args=~/\S/) {
+	    for (split /,/,$args) {
+	        s/^\s+//; s/\s+$//;
+	        my ($foo,$bar) = /^(.*)\s(\w+)$/;
+	        push @args,{type=>$foo,name=>$bar};
+	    }
+	}
 
-        # You are in a maze of twisty multimethods, all different.
-        for my $i (0..$#{$expand{$meth_type}}) {
-            my $expand_name = $name;
+	for(0..$#{$expand{$signature}}) {
+	    my $func_name = $function;
+	    my $cur_sig   = $expand{$signature}[$_];
+	    my $cur_param;
+	    $cur_param = $types{$signature}[$_] if
+	      defined $types{$signature}[$_];
 
-            # If we're in a multimethod, we need to expand the name if
-            # it's not the default argument type of "object".
-            if ($meth_type ne "unique") { 
-                if ($expand{$meth_type}[$i] eq "object") {
-                    $vtbl{$expand_name}{meth_type} = $meth_type; # For reference
-                } else {
-                    $expand_name .= "_".$expand{$meth_type}[$i] 
-                }
-            }
-            $vtbl{$expand_name}{type} = $type;
-            $vtbl{$expand_name}{proto} = "$type (*$expand_name)(struct Parrot_Interp *interpreter, PMC* pmc";
-
-            # Parse the function parameters
-            for (@line) {
-                my ($argtype, $argname) = /(.*?)\s+(\w+)$/;
-
-                # In multimethods, we need to rewrite the type of
-                # parameters called "value".
-                $argtype = $types{$meth_type}[$i]
-                    if $argname eq "value" and $meth_type ne "unique";
-
-                # Add the function parameters to the prototype
-                push @{$vtbl{$expand_name}{args}},
-                    { type => $argtype, name => $argname };
-                $vtbl{$expand_name}{proto} .= ", $argtype $argname";
-            }
-            $vtbl{$expand_name}{proto} .=")";
-            
-            # So they're ordered according to their position in the file
-            push @order, $expand_name;
-        }
+	    if($cur_sig ne 'object' and $cur_sig ne '') {
+		$func_name .= "_$cur_sig";
+	    }
+	    my $proto =
+"$return_value (*$func_name)(struct Parrot_Interp* interpreter, PMC* pmc";
+	    $vtable{$func_name} = {
+	        type  => $return_value,
+	        proto => $proto,
+            };
+	    push @{$vtable{order}},$func_name;
+	    if(@args>0) {
+		#
+		# Gets rid of aliasing in the data structure.
+		#
+	        for(@args) {
+  	            push @{$vtable{$func_name}{args}},{
+		        type => $_->{type}, name => $_->{name}
+    	    	    };
+	        }
+	        $vtable{$func_name}{args}[0]{type} = $cur_param
+		    if $cur_param ne '';
+	        my $params = join ", ",
+	    		       map { "$_->{type} $_->{name}" }
+	    		       @{$vtable{$func_name}{args}};
+	        $vtable{$func_name}{proto} .= ", $params";
+	    }
+	    $vtable{$func_name}{proto} .= ')';
+	}
     }
-    $vtbl{order} = [@order];
-    return %vtbl;
+    close INPUT;
+
+    return %vtable;
 }
 
 sub vtbl_struct {
