@@ -462,27 +462,6 @@ Branch if $1 is greater than $2.
 
 =cut
 
-inline op gt(in INT, in INT, labelconst INT) :base_core {
-  if ($1 > $2) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-inline op gt(in NUM, in NUM, labelconst INT) :base_core {
-  if ($1 > $2) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-op gt(in STR, in STR, labelconst INT) :base_core {
-  if (string_compare(interpreter, $1, $2) > 0) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
 op gt(in PMC, in PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) > 0) {
     goto OFFSET($3);
@@ -549,27 +528,6 @@ op gt_num (in PMC, in PMC, labelconst INT) :base_core {
 Branch if $1 is greater than or equal to $2.
 
 =cut
-
-inline op ge(in INT, in INT, labelconst INT) :base_core {
-  if ($1 >= $2) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-inline op ge(in NUM, in NUM, labelconst INT) :base_core {
-  if ($1 >= $2) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-op ge(in STR, in STR, labelconst INT) :base_core {
-  if (string_compare(interpreter, $1, $2) >= 0) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
 
 op ge(in PMC, in PMC, labelconst INT) :base_core {
   if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) >= 0) {
@@ -887,21 +845,6 @@ Sets $1 to 1 if $2 is greater than $3
 
 =cut
 
-inline op isgt(out INT, in INT, in INT) {
-  $1 = $2 > $3;
-  goto NEXT();
-}
-
-inline op isgt(out INT, in NUM, in NUM) {
-  $1 = $2 > $3;
-  goto NEXT();
-}
-
-inline op isgt(out INT, in STR, in STR) {
-  $1 = string_compare(interpreter, $2, $3) > 0;
-  goto NEXT();
-}
-
 inline op isgt(out INT, in PMC, in PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) > 0);
   goto NEXT();
@@ -918,21 +861,6 @@ inline op isgt(out INT, in PMC, in PMC) {
 Sets $1 to 1 if $2 is greater than or equal to $3
 
 =cut
-
-inline op isge(out INT, in INT, in INT) {
-  $1 = $2 >= $3;
-  goto NEXT();
-}
-
-inline op isge(out INT, in NUM, in NUM) {
-  $1 = $2 >= $3;
-  goto NEXT();
-}
-
-inline op isge(out INT, in STR, in STR) {
-  $1 = string_compare(interpreter, $2, $3) >= 0;
-  goto NEXT();
-}
 
 inline op isge(out INT, in PMC, in PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) >= 0);

@@ -32,6 +32,8 @@ PMC * imcc_compile_pir(Parrot_Interp interp, const char *s);
 PMC * imcc_compile_pasm(Parrot_Interp interp, const char *s);
 PMC * imcc_compile(Parrot_Interp interp, const char *s);
 void *imcc_compile_file(Parrot_Interp interp, const char *s);
+static const char * try_rev_cmp(Parrot_Interp, IMC_Unit * unit, char *name,
+        SymReg ** r);
 
 /*
  * P = new type, [init]
@@ -297,6 +299,18 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     op = interpreter->op_lib->op_code(fullname, 1);
     if (op < 0)         /* maybe we got a fullname */
         op = interpreter->op_lib->op_code(name, 1);
+    if (op < 0) {         /* still wrong, try reverse compare */
+        const char *n_name = try_rev_cmp(interpreter, unit, name, r);
+        if (n_name) {
+            union {
+                const void * __c_ptr;
+                void * __ptr;
+            } __ptr_u;
+            name = const_cast(n_name);
+            op_fullname(fullname, name, r, n, keyvec);
+            op = interpreter->op_lib->op_code(fullname, 1);
+        }
+    }
     if (op < 0)         /* still wrong, try to find an existing op */
         op = try_find_op(interpreter, unit, name, r, n, keyvec, emit);
     if (op < 0) {
@@ -703,9 +717,6 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
         name = "cmp";
         changed = 1;
     }
-    /*
-     * TODO handle eq_i_n_ic too
-     */
     if (n == 3 && r[0]->set == 'N') {
         if (r[1]->set == 'I') {
             changed |= change_op(interpreter, unit, r, 1, emit);
@@ -713,6 +724,13 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
         if (r[2]->set == 'I' && r[2]->type != VTADDRESS) {
             changed |= change_op(interpreter, unit, r, 2, emit);
         }
+    }
+    /*
+     * handle eq_i_n_ic
+     */
+    else if (n == 3 && r[1]->set == 'N' && r[0]->set == 'I' &&
+            r[2]->type == VTADDRESS) {
+        changed |= change_op(interpreter, unit, r, 0, emit);
     }
     else if (n == 2 && r[0]->set == 'N' && r[1]->set == 'I') {
         /*
@@ -726,6 +744,38 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
         return interpreter->op_lib->op_code(fullname, 1);
     }
     return -1;
+}
+
+static const char *
+try_rev_cmp(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
+        SymReg ** r)
+{
+    static struct br_pairs {
+        const char *op;
+        const char *nop;
+        int to_swap;
+    } br_pairs[] = {
+        { "gt", "lt", 0 },
+        { "ge", "le", 0 },
+        { "isgt", "islt", 1 },
+        { "isge", "isle", 1 },
+    };
+    unsigned int i;
+    int to_swap;
+    SymReg *t;
+
+    UNUSED(interpreter);
+    UNUSED(unit);
+    for (i = 0; i < sizeof(br_pairs)/sizeof(br_pairs[0]); i++) {
+        if (strcmp(name, br_pairs[i].op) == 0) {
+            to_swap =  br_pairs[i].to_swap;
+            t = r[to_swap];
+            r[to_swap] = r[to_swap + 1];
+            r[to_swap + 1] = t;
+            return br_pairs[i].nop;
+        }
+    }
+    return NULL;
 }
 
 Instruction *

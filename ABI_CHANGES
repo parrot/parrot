@@ -26,7 +26,15 @@ either a FLOATVAL constant or with a sequence of opcodes, e.g.:
                          add N0, N1, $N0
   sin N0, 2           => sin N0, 2.0
 
-While these opcodes are valid to use, these are no more listed in
+The compare and branch opcodes gt, ge, isgt, and isge for I, N, S
+arguments are not emitted any more. They are replaced with their
+counterparts with swapped arguments, e.g. :
+
+  gt I0, I1, L1	      => lt I1, I0, L1
+  isge I0, 100, I2    => isle I0, I2, 100
+
+
+While all these opcodes are valid to use, these are no more listed in
 ops/ops.num nor generated. Compilers shouldn't emit these opcodes, as
 it's slightly inefficient to create the equivalent opcodes.
 

@@ -66,12 +66,13 @@ static int clone_remove(Interp *, IMC_Unit *);
 void
 pre_optimize(Interp *interpreter, IMC_Unit * unit)
 {
-    info(interpreter, 2, "pre_optimize\n");
-    /* TODO integrate all in one pass */
-    strength_reduce(interpreter, unit);
-    if (!dont_optimize)
-        if_branch(interpreter, unit);
-    info(interpreter, 2, "pre_optimize done\n");
+    if (optimizer_level & OPT_PRE) {
+        info(interpreter, 2, "pre_optimize\n");
+        /* TODO integrate all in one pass */
+        strength_reduce(interpreter, unit);
+        if (!dont_optimize)
+            if_branch(interpreter, unit);
+    }
 }
 
 int
@@ -176,7 +177,7 @@ if_branch(Interp *interpreter, IMC_Unit * unit)
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
                     free(last->op);
-                    last->op = str_dup(neg_op);
+                    last->op = str_dup(tmp->op);
                     free_ins(tmp);
 
                     /* delete branch */
