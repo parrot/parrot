@@ -18,6 +18,7 @@
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
 # P - pointer to a PMC-register
 # special stuff
+# 0 - insert a NULL (pointer) - doesn't comsume a register
 # I - Parrot_Interp param
 #
 #Return params
@@ -148,3 +149,4 @@ i	iii
 i	i3
 t	b
 t	B
+v	P

@@ -145,6 +145,10 @@ sub generate_functions {
 
 	my $run_pbc = 0;
 	if ($args =~ s/--run-pbc//) {
+	    # native tests with --run-pbc don't make sense
+	    if ($as_f =~ /native_pbc/) {
+		return $Builder->ok(1, $desc);
+	    }
 	    my $pbc_f = per_test('.pbc', $count);
 	    $run_pbc = 1;
 	    $args = "$args -o $pbc_f -r -r";

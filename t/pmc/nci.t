@@ -1,4 +1,4 @@
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -439,6 +439,20 @@ CODE
 42.000000
 100.000000
 47.110000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_v_P");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_vP", "vP"
+  new P5, .PerlString
+  set P5, "ok\n"
+  invoke
+  null P5
+  invoke
+  end
+CODE
+ok
+got null
 OUTPUT
 
 } # SKIP

@@ -4,6 +4,7 @@
 
 my %ret_count;
 %ret_count = (p => [0,0,0,1,0],        # Returning a pointer that we PMC stuff
+              P => [0,0,0,1,0],	       # PMC
 	      i => [0,1,0,0,0],        # Returning an int
 	      3 => [0,1,0,0,0],        # Returning an int pointer
 	      l => [0,1,0,0,0],        # Returning a long
@@ -32,6 +33,7 @@ my (%ret_type) = (p => "void *",
 		  v => "void",
 #		  b => "void *",
 #		  B => "void **",
+#		  P => "void *",
                  );
 
 my (%proto_type) = (p => "void *",
@@ -72,22 +74,23 @@ my (%ret_type_decl) = (p => "void *",
 		       v => "void *",
 #		       b => "void *",
 #		       B => "void **",
+#		       P => "void *",
                      );
 
-my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nPMC_REG(5) = final_destination;",
-		    i => "INT_REG(5) = return_data;",
-		    3 => "INT_REG(5) = *return_data;",
-		    l => "INT_REG(5) = return_data;",
-		    4 => "INT_REG(5) = *return_data;",
-		    c => "INT_REG(5) = return_data;",
-                    2 => "INT_REG(5) = *return_data;",
-                    f => "NUM_REG(5) = return_data;",
-                    d => "NUM_REG(5) = return_data;",
+my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nREG_PMC(5) = final_destination;",
+		    i => "REG_INT(5) = return_data;",
+		    3 => "REG_INT(5) = *return_data;",
+		    l => "REG_INT(5) = return_data;",
+		    4 => "REG_INT(5) = *return_data;",
+		    c => "REG_INT(5) = return_data;",
+                    2 => "REG_INT(5) = *return_data;",
+                    f => "REG_NUM(5) = return_data;",
+                    d => "REG_NUM(5) = return_data;",
 		    v => "",
-		    t => "final_destination = string_from_cstring(interpreter, return_data, 0);\nSTR_REG(5) = final_destination;",
-#		    b => "final_destination->bufstart = return_data;\nSTR_REG(5) = final_destination",
-#		    B => "final_destination->bufstart = *return_data;\nSTR_REG(5) = final_destination",
-		    s => "INT_REG(5) = return_data;",
+		    t => "final_destination = string_from_cstring(interpreter, return_data, 0);\nREG_STR(5) = final_destination;",
+#		    b => "final_destination->bufstart = return_data;\nREG_STR(5) = final_destination",
+#		    B => "final_destination->bufstart = *return_data;\nREG_STR(5) = final_destination",
+		    s => "REG_INT(5) = return_data;",
                    );
 
 my (%func_call_assign) = (p => "return_data = ",
@@ -102,6 +105,7 @@ my (%func_call_assign) = (p => "return_data = ",
                           d => "return_data = ",
 			  b => "return_data = ",
 			  t => "return_data = ",
+			  P => "return_data = ",
 #			  B => "return_data = ",
 		          v => "",
                           );
@@ -133,19 +137,6 @@ print NCI <<'HEAD';
 
 #include "parrot/parrot.h"
 
-#if !defined(INT_REG)
-#  define INT_REG(x) interpreter->int_reg.registers[x]
-#endif
-#if !defined(NUM_REG)
-#  define NUM_REG(x) interpreter->num_reg.registers[x]
-#endif
-#if !defined(STR_REG)
-#  define STR_REG(x) interpreter->string_reg.registers[x]
-#endif
-#if !defined(PMC_REG)
-#  define PMC_REG(x) interpreter->pmc_reg.registers[x]
-#endif
-
 #if defined(HAS_JIT) && defined(I386)
 #  include "parrot/exec.h"
 #  include "parrot/jit.h"
@@ -159,11 +150,11 @@ print NCI <<'HEAD';
 static void
 set_return_val(struct Parrot_Interp *interpreter, int stack, int ints,
                int strings, int pmcs, int nums) {
-    INT_REG(0) = stack;
-    INT_REG(1) = ints;
-    INT_REG(2) = strings;
-    INT_REG(3) = pmcs;
-    INT_REG(4) = nums;
+    REG_INT(0) = stack;
+    REG_INT(1) = ints;
+    REG_INT(2) = strings;
+    REG_INT(3) = pmcs;
+    REG_INT(4) = nums;
 }
 
 HEAD
@@ -232,49 +223,49 @@ close NCI;
 sub make_arg {
     my ($argtype, $reg_ref) = @_;
     /p/ && do {my $regnum = $reg_ref->{p}++;
-	       return "PMC_data(PMC_REG($regnum))";
+	       return "PMC_data(REG_PMC($regnum))";
               };
     /i/ && do {my $regnum = $reg_ref->{i}++;
-	       return "(int)INT_REG($regnum)";
+	       return "(int)REG_INT($regnum)";
               };
     /3/ && do {my $regnum = $reg_ref->{i}++;
-	       return "(int*)&INT_REG($regnum)";
+	       return "(int*)&REG_INT($regnum)";
               };
     /l/ && do {my $regnum = $reg_ref->{i}++;
-	       return "(long)INT_REG($regnum)";
+	       return "(long)REG_INT($regnum)";
               };
     /4/ && do {my $regnum = $reg_ref->{i}++;
-	       return "(long*)&INT_REG($regnum)";
+	       return "(long*)&REG_INT($regnum)";
               };
     /s/ && do {my $regnum = $reg_ref->{i}++;
-	       return "(short)INT_REG($regnum)";
+	       return "(short)REG_INT($regnum)";
               };
     /c/ && do {my $regnum = $reg_ref->{i}++;
-	       return "(char)INT_REG($regnum)";
+	       return "(char)REG_INT($regnum)";
               };
     /2/ && do {my $regnum = $reg_ref->{i}++;
-	       return "(short*)&INT_REG($regnum)";
+	       return "(short*)&REG_INT($regnum)";
               };
     /f/ && do {my $regnum = $reg_ref->{n}++;
-	       return "(float)NUM_REG($regnum)";
+	       return "(float)REG_NUM($regnum)";
               };
     /d/ && do {my $regnum = $reg_ref->{n}++;
-	       return "(double)NUM_REG($regnum)";
+	       return "(double)REG_NUM($regnum)";
               };
     /t/ && do {my $regnum = $reg_ref->{s}++;
-	       return "string_to_cstring(interpreter, STR_REG($regnum))";
+	       return "string_to_cstring(interpreter, REG_STR($regnum))";
               };
     /b/ && do {my $regnum = $reg_ref->{s}++;
-	       return "STR_REG($regnum)->bufstart";
+	       return "REG_STR($regnum)->bufstart";
               };
     /B/ && do {my $regnum = $reg_ref->{s}++;
-	       return "&(STR_REG($regnum)->bufstart)";
+	       return "&(REG_STR($regnum)->bufstart)";
               };
     /I/ && do {
 	       return "interpreter";
               };
     /P/ && do {my $regnum = $reg_ref->{p}++;
-               return "PMC_REG($regnum)";
+               return "REG_PMC($regnum) == PMCNULL ? NULL : REG_PMC($regnum)";
               };
 
 }
@@ -354,11 +345,11 @@ static void pcf_$funcname(struct Parrot_Interp *interpreter, PMC *self) {
     pointer = self->cache.struct_val;
     return_data = ($ret_type)(*pointer)($params);
     $ret_reg  = return_data;
-    INT_REG(0) = $stack_returns;
-    INT_REG(1) = $int_returns;
-    INT_REG(2) = $string_returns;
-    INT_REG(3) = $pmc_returns;
-    INT_REG(4) = $num_returns;
+    REG_INT(0) = $stack_returns;
+    REG_INT(1) = $int_returns;
+    REG_INT(2) = $string_returns;
+    REG_INT(3) = $pmc_returns;
+    REG_INT(4) = $num_returns;
     return;
 }
 EOR

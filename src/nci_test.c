@@ -19,6 +19,7 @@ int nci_iiii(int i1, int i2, int i3);
 int nci_i4i(long * l, int i);
 int nci_ii3(int a, int *b);
 void * nci_pi(int test);
+void  nci_vP(void *pmc);
 
 double nci_dd(double d) {
     return d * 2.0;
@@ -117,6 +118,14 @@ void * nci_pi(int test) {
             }
     }
     return NULL;
+}
+
+void nci_vP(void *pmc)
+{
+    if (pmc)
+        puts("ok");
+    else
+        puts("got null");
 }
 
 #ifdef TEST

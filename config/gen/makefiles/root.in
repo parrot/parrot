@@ -855,7 +855,7 @@ exec_so : $(SRC)/exec_start$(O) blib/lib/libparrot$(SO)
 ###### OS depend targets ##########
 # libnci.so used by t/pmc/nci.t
 
-src/libnci$(O): $(SRC)/nci_test.c
+$(SRC)/libnci$(O): $(SRC)/nci_test.c
 
 libnci$(SO): $(SRC)/nci_test$(O) parrot${exe}
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) \
