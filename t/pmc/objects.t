@@ -1040,7 +1040,6 @@ ok
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "get attrib by name subclass");
-    loadlib P10, "myops_ops"
     newclass P0, "Bar"
     addattribute P0, "j"
     subclass P1, P0, "Foo"
@@ -1067,7 +1066,6 @@ bar j
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set attrib by name subclass");
-    loadlib P10, "myops_ops"
     newclass P0, "Bar"
     addattribute P0, "j"
     subclass P1, P0, "Foo"
