@@ -1,13 +1,36 @@
-To build the tcl interpreter, type "make" in this directory. 
+=head1 ParTcl
 
-To run an example, cd to examples, and type "make" for instructions
+A from scratch implementation of Tcl on Parrot.
 
-To run the test suite, type "make test".
+To build the tcl interpreter, first build the required dynamic pmcs:
+From the top level parrot directory, run: C<(cd dynpmcs && make)>
 
-#To run the test suite with TODOs failing, type "make devtest"
-#(This doesn't currently do anything, as todo tests are failing.)
+Then, type C<make> in this directory. This will
+generate the file C<tcl.pbc> which can then be used to run tcl programs.
 
-Look in the docs directory.
+I<Note - due to a bug in the current parrot implementation, you must be
+in the root development directory.>
 
-The TODO file lists many broken things, also check out docs/howto.pod
+ ./parrot languages/tcl/tcl.pbc foo.tcl
 
+=head2 Examples
+
+To run an example, change to the C<examples>, and type C<make>
+for instructions
+
+=head2 Test Suite
+
+To run the test suite, type "make test". Note - if any tests fail, try
+setting the environment variable C<TEST_PROG_ARGS> to C<-G> and retry.
+
+If the tests now pass, there's a GC bug that needs to be reported to
+the perl6-internals list.
+
+=head2 Documentation
+
+Various documentation (in various states of decay at the moment):
+
+ docs/*
+ TODO
+
+=cugt

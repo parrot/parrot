@@ -1,38 +1,95 @@
-=head1 Plan of Attack
+=head1 In no particular order....
 
-Why do we still have tcl.imc_template? should be generating tcllib.imc,
-not tcl.imc. 
+=over 4
 
-clean up expr so that it's not passing around
-type indicators. - just use PMCs everywhere. This should speed us up quite
-a bit, as it will reduce the need for an Array PMC for every operand.
+=item REMOVE Perl*
+
+Mostly done. All that seems to be left is PerlUndef. Much was already
+converted to the internal types. PerlUndef removal will probably result
+(finally) in the use of null checks where it's being used for that, and
+TclObject where it's being used for shimmering.
+
+=item WRITE [list] !!!
+
+SYNOPSIS
+       list ?arg arg ...?
+_________________________________________________________________
+
+DESCRIPTION
+       This  command  returns  a  list  comprised of all the args, or an empty
+       string if no args are specified.  Braces and backslashes get  added  as
+       necessary,  so that the lindex command may be used on the result to re-
+       extract the original arguments, and also so that eval may  be  used  to
+       execute the resulting list, with arg1 comprising the command's name and
+       the other args comprising its arguments.  List produces  slightly  dif-
+       ferent  results  than  concat:   concat  removes  one level of grouping
+       before forming the list, while list works directly  from  the  original
+       arguments.  For example, the command
+              list a b {c d e} {f {g h}}
+       will return
+              a b {c d e} {f {g h}}
+       while concat with the same arguments will return
+              a b c d e f {g h}
+
+
+=item GC bug
+
+yet another GC bug has crept in. do a checkin/update to give leo something
+to track down.
+
+=item new .local syntax
+
+Clean up our .local declarations with the new syntax.
+
+=item function calls...
+
+I do a lot of function calls that should probably be inlined as macros
+(or removed as functions entirely) for speed. I had gotten rid of macros
+ages past, but there's a LOT that goes on when
+using the calling conventions...
+
+match_close is almost entirely macro-ized, modulo a bug in parse - 
+switch to macro... the app behaves differently, even if that code
+path is never executed. I suspect register stomping.
+
+possible macro get_var, also. and whatever's left in expression.imc
+(__expr_get_*)
+
+=item Why do we still have tcl.imc_template?
+
+if we keep it, should be generating lib/tcllib.imc anyway, not tcl.imc. 
+
+=item Freeze/Thaw of TclWord would ...
+
+allow us to build a braindead compile
+option - given a chunk of tcl, generate a chunk of PIR that we can 
+emit to be saved, compiled, and then run again.
+
+=item tail call optimizations
 
 tail call optimizations - there are several cases where I could use this
 and save myself a call. Possible to do right now with PASM - wait for
 PIR support before welding in.
 
-Freeze/Thaw of TclWord would allow us to build a braindead compile
-option - given a chunk of tcl, generate a chunk of PIR that we can 
-emit to be saved, compiled, and then run again.
+=item string manipulation
 
 Look around and see if we can avoid doing as many substr's, particularly
 in __parse. (every substring we don't actually need takes up more
 resources. better to just index things until we're sure we need
 the substring.
 
-Clean up expr. MUUUUCH room for improvement there.
+=item provide a way to access existing library PIR from Tcl.
 
-provide a way to access existing library PIR from Tcl.
-
-Add benchmarks?
-
-=over 4
-
-When converting to Tcl*, be sure to take advantage of morphing. Right now,
-we're kind of avoiding morphing. (like, having separate new PerlInt and 
-PerlString conditionally depending on the code path.) (fixed in string)
+=item add benchmarks?
 
 =item Dynamic Tcl PMCs, build, switch.
+
+We are currently using Perl* pmcs in a few more places. In some cases,
+we need Resizable PMCs, and the core versions are not fully implemented.
+
+When  converting to Tcl*, be sure to take advantage of morphing. Right now,
+we're kind of avoiding morphing. (like, having separate new PerlInt and 
+PerlString conditionally depending on the code path.) (fixed in string)
 
 Ok. First, we need to build the dyn pmcs using the new build "group" tag.
 
@@ -41,15 +98,13 @@ Then, we need to go through and eliminate all references to Perl:
 
 We need to also make sure that we /take/ any PMC and try to do the right
 thing. Don't /require/ that someone pass in a TclString when a PerlString
-will work fine, thanks.
+will work fine, thanks. This is now a bigger issue when using the [list] ops.
+if someone passes in a fixed list and we need to resize it... what do we do?
 
 =item implement [list]
 
-This should now be blindingly simple, given an actual TclList PMC.
-
-=head1 TODO (big pile)
-
-=over 4
+This should be blindingly simple, given an actual TclList PMC. (which we don't
+quite have yet.
 
 =item given freeze/thaw for objects...
 
@@ -83,7 +138,7 @@ or a command, invalidate that. (mostly done!)
 
 Move TclWord namespace into _Tcl::Word, less clutter?
 
-=item (LOW) varnames
+=item (LOW) PIR varnames
 
 Bitten by overuse of generic IMC vars like $I0 - should reduce their usage as
 much as possible to simplify upkeep.
@@ -137,7 +192,6 @@ update docs/* - with the parser/interpreter split, things are different.
 
 Then, we can simplify anything that is dealing with numbers to just pass
 around the Numbers.
-
 
 Then, we need to verify that things like [expr 2a + 2b] fail to produce 4.
 (That is, Tcl is pickier about numifying than Perl)
@@ -256,6 +310,21 @@ out.
 
 =item expr
 
+Clean up expr. MUUUUCH room for improvement there.
+
+expr - parse/interpret split - This is working for expr - change any other 
+thing that calls __expression to use the _p, _i variants, delete the original 
+proc. Once we've done that, determine a better structure to use as the inter
+mediate representation between the two.
+
+clean up expr so that it's not passing around
+type indicators. - just use PMCs everywhere. (Though we may still need
+to have CONST vs. VARIABLE types.
+
+The type indicator is also used to disambiguate operators and function calls
+from operands. We can easily remove it for operands, but how to cleanly
+remove this for operators? 
+
 TBD: big rethunk.
 
 TBD: octal, hex. (there's no way to convert programmatically from an
@@ -274,7 +343,16 @@ TBD: functions that take > 1 arg.
 
 TBD: Argument type requirements - Currently works ONLY on bitand - esp need
 to get any that require int-only args, as we can now /generate/ floats,
-even if we cannot specify them.
+even if we cannot specify them. {This probably requires switching to Tcl*
+PMCs and putting the logic in there hidden under MMD}
+
+(aside - expression needs better error handling support, and perhaps
+a rethunk on how we're passing data around - FYI, if we're going to be using
+PerlInt, PerlNum, etc, we need to make sure they stringify as tcl
+expects them to - a PerlNum of 5 -> "5" instead of "5.0", e.g.)
+
+cmd_expr.t should check prededence, parens, etc, as well as all the
+defined ops and functions.
 
 =item misc
 
@@ -299,11 +377,6 @@ run a tcl test suite (7.6p2 ?) and pass one test.
 (then, pass most of them.) (then, retarget against tcl-latest)
 
 =item misc
-
-(aside - expression needs better error handling support, and perhaps
-a rethunk on how we're passing data around - FYI, if we're going to be using
-PerlInt, PerlNum, etc, we need to make sure they stringify as tcl
-expects them to - a PerlNum of 5 -> "5" instead of "5.0", e.g.)
 
 complete [error] (need global var support)
 
@@ -400,12 +473,6 @@ which calls "def", which uses:
 $tcl_platform, [info exists] , [info commands], unset, array vars,
 open, global, uplevel (GAH), regsub (GAH), fconfigure (GAH), file (GAH)
 exec (GAH)
-
-
-=item test commands
-
-cmd_expr should check prededence, parens, etc, as well as all the
-defined ops and functions.
 
 =item test macros?
 
