@@ -6,14 +6,18 @@ use Parrot::Configure::Step;
 
 $description="Setting up Configure's data structures...";
 
-@args=();
+@args=('debugging');
 
 sub runstep {
+  my ($debugging) = @_;
+
   package Configure::Data;
   use Config;
   use Data::Dumper;
   
   my(%c)=(
+    debugging     => $debugging ? 1 : 0,
+
     cc            => $Config{cc},
     ccflags       => $Config{ccflags},
     ld            => $Config{ld},

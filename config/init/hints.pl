@@ -15,7 +15,7 @@ sub runstep {
     die $@ if $@;
   }
   else {
-    print "no hints";
+    print "(no hints) ";
   }
 }
 
