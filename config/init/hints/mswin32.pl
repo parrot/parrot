@@ -16,7 +16,8 @@
 	Configure::Data->set(
 		rm_f  => '$(PERL) -MExtUtils::Command -e rm_f',
 		rm_rf => '$(PERL) -MExtUtils::Command -e rm_rf',
-		PQ    => '"'
+                PQ    => '"',
+                make_c=> '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"'
 	);
 
 	if( $is_msvc ) {
@@ -59,12 +60,15 @@
 	if( $is_bcc ) {
 		Configure::Data->set(
 			o => '.obj',
+                        a => '.lib',
+                        so => '.dll',
+                        cc => ${cc},
 			ccflags => '-O2 -w-8066 -DWIN32 -DNO_STRICT -DNDEBUG -D_CONSOLE',
 			cc_o_out => '-o',
 			cc_exe_out => '-e',
 			cc_debug => '-v',
 			
-			ld => 'bcc32.exe',
+			ld => ${cc},
 			ldflags => '',
 			ld_out => '-e',
 			cc_ldflags => '',
@@ -72,8 +76,18 @@
 			ld_shared => '-WD',
 			libs => 'import32.lib cw32.lib',
 			
+                        link => ${cc},
+                        linkflags => '',
+
 			cp => 'copy',
-			slash => '\\'
+                        ar => 'tlib',
+                        ar_flags => '',
+                        ar_out => '',
+                        ar_extra => '/au',
+                        slash => '\\',
+                        make_and => "\n\t",
+
+                        blib_lib_libparrot_a => 'blib\lib\libparrot.lib',
 		);
 	}
 	elsif( $is_mingw ) {

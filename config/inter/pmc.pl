@@ -90,8 +90,9 @@ E_NOTE
   }
 
   # build list of libraries for link line in Makefile
-  (my $pmc_classes_o   = $pmc_o   ) =~ s/^| / classes\//g;
-  (my $pmc_classes_pmc = $pmc_list) =~ s/^| / classes\//g;
+  my $slash = Configure::Data->get('slash');
+  (my $pmc_classes_o   = $pmc_o   ) =~ s/^| / classes${slash}/g;
+  (my $pmc_classes_pmc = $pmc_list) =~ s/^| / classes${slash}/g;
 
   # Gather the actual names (with MixedCase) of all of the
   # non-abstract built-in PMCs.

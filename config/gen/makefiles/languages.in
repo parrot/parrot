@@ -1,4 +1,6 @@
-MAKE = ${make}
+PERL = ${perl}
+${make_set_make}
+MAKE_C = ${make_c}
 
 all : regex befunge bf cola ook perl6 urm
 	@echo "SKIPPED: scheme (nothing to make, but should not default to make test)"
@@ -17,7 +19,7 @@ complete-test: jako.test regex.test scheme.test befunge.test bf.test cola.test o
 jako: jako.dummy
 
 jako.dummy:
-	cd jako && $(MAKE) && cd ..
+	$(MAKE_C) jako
 
 jako.test:
 	cd jako && $(MAKE) test && cd ..
@@ -25,7 +27,10 @@ jako.test:
 scheme: scheme.dummy
 
 scheme.dummy:
-	cd scheme && $(MAKE) && cd ..
+	$(MAKE_C) scheme
+
+scheme.test:
+	$(MAKE_C) scheme test
 
 scheme.test:
 	cd scheme && $(MAKE) test && cd ..
@@ -33,31 +38,31 @@ scheme.test:
 regex: regex.dummy
 
 regex.dummy:
-	cd regex && $(MAKE) && cd ..
+	$(MAKE_C) regex
 
 regex.test :
-	cd regex && $(MAKE) test && cd ..
+	$(MAKE_C) regex test
 
 befunge : befunge.dummy
 
 befunge.dummy:
-	cd befunge && $(MAKE) && cd ..
+	$(MAKE_C) befunge
 
 befunge.test:
-	cd befunge && $(MAKE) test && cd ..
+	$(MAKE_C) befunge test
 
 bf : bf.dummy
 
 bf.dummy:
-	cd bf && $(MAKE) && cd ..
+	$(MAKE_C) bf
 
 bf.test:
-	cd bf && $(MAKE) test && cd ..
+	$(MAKE_C) bf test
 
 cola : cola.dummy
 
 cola.dummy:
-	cd cola && $(MAKE) && cd ..
+	$(MAKE_C) cola
 
 cola.test:
 	cd cola && $(MAKE) test && cd ..
@@ -65,18 +70,18 @@ cola.test:
 ook : ook.dummy
 
 ook.dummy:
-	cd ook && $(MAKE) && cd ..
+	$(MAKE_C) ook
 
 ook.test:
-	cd ook && $(MAKE) test && cd ..
+	$(MAKE_C) ook test
 
 perl6 : perl6.dummy
 
 perl6.dummy:
-	cd perl6 && $(MAKE) && cd ..
+	$(MAKE_C) perl6
 
 perl6.test:
-	cd perl6 && $(MAKE) test && cd ..
+	$(MAKE_C) perl6 test
 
 urm: urm.dummy
 
@@ -87,8 +92,8 @@ urm.test:
 	cd urm && $(MAKE) test && cd ..
 
 clean:
-	cd jako && $(MAKE) clean && cd ..
-	cd scheme && $(MAKE) clean && cd ..
+	$(MAKE_C) jako clean
+	$(MAKE_C) scheme clean
 
 update:
 	cvs -q update -dP

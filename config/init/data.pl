@@ -71,9 +71,12 @@ sub runstep {
     ar            => $Config{ar},
     ar_flags      => 'cr',
     ar_out        => '',                  # for Win32
+    ar_extra      => '',                  # for Borland C
     ranlib        => $Config{ranlib},
     make          => $Config{make},
     make_set_make => $Config{make_set_make},
+    make_and      => '&&',
+    make_c        => '$(PERL) -e \'chdir shift @ARGV; system q{$(MAKE)}, @ARGV; exit $$? >> 8;\'',
 
     cp            => 'cp',
     slash         => '/',

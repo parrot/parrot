@@ -140,6 +140,12 @@ sub genfile {
 			last;
 
 		}
+                if ($options{replace_slashes}) {
+                    s{(/+)}{
+                        my $len = length $1;
+                        my $slash = Configure::Data->get('slash');
+                        '/' x ($len/2) . ($len%2 ? $slash : ''); }eg;
+                }
 		s{
             \$\{(\w+)\}
         }{

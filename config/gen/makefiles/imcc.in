@@ -44,7 +44,7 @@ LINKFLAGS=${linkflags} ${ld_debug}
 # do it for you.
 #
 ${make_set_make}
-
+MAKE_C = ${make_c}
 
 all : flags_dummy imcc${exe}
 
@@ -53,7 +53,7 @@ flags_dummy:
 	@$(PERL) ../../tools/dev/cc_flags.pl ./CFLAGS echo $(CFLAGS) xx$(O) -c xx.c
 
 ../../$(PARROTLIB):
-	cd ..${slash}.. && $(MAKE) $(PARROTLIB) && cd languages${slash}imcc
+	$(MAKE_C) ../.. $(PARROTLIB)
 
 # The .flag files are needed because we are keeping some derived files in CVS,
 # which does not keep accurate timestamps on the files, relative to each other.

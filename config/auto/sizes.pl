@@ -118,7 +118,7 @@ END
     };
 
     # clear int8_t on error
-    if($@) {
+    if($@ || !exists $results{hugeintval}) {
       Configure::Data->set('int8_t' => undef);
       next;
     }

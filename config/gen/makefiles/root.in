@@ -236,6 +236,7 @@ LINTOPTS =
 # do it for you.
 #
 ${make_set_make}
+MAKE_C = ${make_c}
 
 .c$(O) :
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
@@ -284,7 +285,7 @@ static : $(GEN_HEADERS) $(LIBPARROT)
 $(LIBPARROT) : $(O_FILES)
 	$(RM_F) $@
 	$(MKDIR) blib blib/lib
-	$(AR_CR) ${ar_out}$@ $(O_FILES)
+	$(AR_CR) ${ar_out}$@ ${ar_extra} $(O_FILES)
 	$(RANLIB) $@
 
 blib/lib/libparrot$(SO) : $(O_FILES)
@@ -381,7 +382,7 @@ fingerprint.c : fingerprint_c.pl lib/Parrot/OpLib/core.pm
 ###############################################################################
 
 examples/assembly/mops.pbc : examples/assembly/mops.pasm
-	cd examples && cd assembly && $(MAKE) mops.pbc PERL=$(PERL) && cd .. && cd ..
+	$(MAKE_C) examples/assembly mops.pbc
 
 examples/assembly/mops.c : examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
@@ -390,7 +391,7 @@ examples/assembly/mops${exe} : examples/assembly/mops$(O) $(LIBPARROT)
 	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(LIBPARROT) $(C_LIBS)
 
 examples/assembly/life.pbc : examples/assembly/life.pasm
-	cd examples && cd assembly && $(MAKE) life.pbc PERL=$(PERL) && cd .. && cd ..
+	$(MAKE_C) examples/assembly life.pbc
 
 examples/assembly/life.c : examples/assembly/life.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/life.pbc > examples/assembly/life.c
@@ -605,23 +606,23 @@ $(IMCC_DIR_SL)%${o} : $(IMCC_DIR_SL)%.c
 
 ################ docs, test and maintainer targets
 
-docs : docs/.dummy
+docs : docs.dummy
 
-docs/.dummy :
-	cd docs && $(MAKE) && cd ..
+docs.dummy :
+	$(MAKE_C) docs
 
 languages : languages.dummy
 
 languages.dummy :
-	cd languages && $(MAKE) && cd ..
+	$(MAKE_C) languages
 
 languages-test :
-	cd languages && $(MAKE) test && cd ..
+	$(MAKE_C) languages test
 
 # If anything in the classes directory is out of date,
 # then run `make` in sub-dir to rebuild only the out of date files.
 $(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(NONGEN_HEADERS)
-	cd classes && $(MAKE) && cd ..
+	$(MAKE_C) classes
 
 
 ###############################################################################
@@ -715,9 +716,9 @@ clean : testclean progclean
 	        examples/assembly/mops${exe} examples/assembly/mops.c \
 	        examples/assembly/mops$(O) examples/assembly/mops.pbc \
 	        examples/mops/mops$(O) examples/mops/mops${exe}
-	cd docs && $(MAKE) clean && cd ..
-	cd classes && $(MAKE) clean && cd ..
-	cd languages && $(MAKE) clean && cd ..
+	$(MAKE_C) docs clean
+	$(MAKE_C) classes clean
+	$(MAKE_C) languages clean
 
 progclean:
 	$(RM_F) $(O_FILES) \
@@ -726,7 +727,7 @@ progclean:
 	        $(PDB) pdb$(O) \
 	        $(DIS) disassemble$(O)
 	$(RM_RF) blib
-	cd classes && $(MAKE) progclean && cd ..
+	$(MAKE_C) classes progclean
 
 testclean :
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out t/op/*.o t/op/*.stabs.s \
@@ -799,7 +800,7 @@ release : MANIFEST MANIFEST.generated
 rpms : release
 	sudo cp parrot-$(VERSION).tar.gz /usr/src/*/SOURCES
 	sudo cp parrot.spec /usr/src/*/SPECS
-	cd /usr/src/*/SPECS && sudo rpm -ba parrot.spec
+	cd /usr/src/*/SPECS ${make_and} sudo rpm -ba parrot.spec
 
 ###############################################################################
 #

@@ -10,29 +10,29 @@ $description="Generating Makefiles...";
 
 sub runstep {
   genfile('config/gen/makefiles/root.in',      'Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/classes.in',   'classes/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/languages.in', 'languages/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/jako.in',      'languages/jako/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/miniperl.in',  'languages/miniperl/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/scheme.in',    'languages/scheme/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/perl6.in',     'languages/perl6/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/imcc.in',      'languages/imcc/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/bf.in',        'languages/bf/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/befunge.in',   'languages/befunge/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/ook.in',       'languages/ook/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/urm.in',       'languages/urm/Makefile',
-          commentType => '#');
+          commentType => '#', replace_slashes => 1);
 
 
   # set up docs/Makefile, partly based on the .ops in the root dir
