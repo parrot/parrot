@@ -153,7 +153,12 @@ True if the sub is being called with prototyped parameters.
 
 =item I1
 
-The number of items pushed onto the parameter list.
+The number of items pushed onto the parameter list held in P3. Since
+the parameter list is all the parameters that won't fit into
+registers, the count in I1 should reflect I<only> those items held in
+the list in P3. If there are 14 parameters and 11 of them are in PMC
+registers (as they should be) then there will be three parameters in
+the overflow list, and I1 will be set to 3.
 
 =item I2
 
