@@ -172,7 +172,7 @@ constant or a string variable.
    .param int b # I6
    .param int c # I7
    ...
-   self."_other_meth()
+   self."_other_meth"()
   ...
   .pcc_begin_return
    .return xy   # e.g. I5
