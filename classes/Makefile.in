@@ -65,7 +65,7 @@ $(INC)/vtable.h: vtable.tbl vtable_h.pl
 	$(PERL) vtable_h.pl
 
 clean:
-	$(RM_F) *$(O) *$(O)
+	$(RM_F) *.c *$(O)
 
 distclean:
 	perl -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
