@@ -1,11 +1,30 @@
 #!/usr/bin/perl -w
 
-=head2 New Assembler
+=head2 Parrot Assembler
 
-The Macro layer has now been added. Macro syntax has changed slightly, to
-distinguish it from the regular syntax. All items that can be expanded, such
-as macro invocations, constants, and formal arguments within macros, are
-prefaced by '.'.
+The Parrot Assembler's job is to take .pasm (Parrot Assembly) files and assemble
+them into Parrot bytecode. Plenty of references for Parrot assembly syntax
+already exist, so we won't go into details there. The assembler does its job
+by reading a .pasm file, extracting numeric and string constants from it, and
+reassembling the bits into bytecode.
+
+The first pass goes through and expands constants, macros, and local labels.
+Syntax is described later on, in the 'Macro' section. The next pass goes through
+and collects the numeric and string constants along with the definition points
+and PCs of labels.
+
+The final pass replaces label occurrences with the appropriate PC offset and
+accumulates the (finally completely numeric) bytecode onto the output string.
+The XS portion takes the constants and bytecode, generates a header, tacks the
+constants and bytecode on, and finally prints out the string.
+
+=head1 Macro
+
+The Parrot assebler's macro layer has now been more-or-less defined, with one
+or two additions to come. The addition of the '.' preface will hopefully make
+things easier to parse, inasmuch as everything within an assembler file that
+needs to be expanded or processed by the macro engine will have a period ('.')
+prepended to it.
 
 The macro layer implements constants, macros, and local labels. Including files
 will be done later on, but this handles most of the basic needs we have for
