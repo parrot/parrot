@@ -1,19 +1,15 @@
 # a JapH compiler "_japhc" compiles this program:
-    set S6, "pJ pa pP pH pn e "
+    set S5, "pJ pa pP pH pn e "
 # into executable bytecode and runs it
-    newsub P5, .Sub, _japhc
-    # register compiler
-    compreg "JaPH_Compiler", P5
-    # get compiler
-    compreg P1, "JaPH_Compiler"
+    find_global P0, "_japhc"
     # compile program
-    compile P0, P1, S6
+    invokecc
     # run program
-    invoke P0
+    invoke P5
     end
 
 # compile program in S5, return executable
-_japhc:
+.pcc_sub _japhc:
     ## print S5
     ## print "\n"
     length I1, S5

@@ -47,6 +47,7 @@
     set P2, 82
     div P0, P1, P2
     end
+.namespace ["Integer"]
 .pcc_sub  __divide:
     set I3, P2
     set I1, 5
@@ -64,11 +65,12 @@ _x:
     branch I17
     pack S0, 380, I0, I17
     print S0
+.namespace [""]
 _init:
     dlfunc P0, P1, "mmd_register", "vIiiip"
     dlvar P5, P1, "Parrot_delegate_divide"
-    set I5, 3
-    set I6, 14
+    set I5, 9
+    set I6, 31
     set I7, I6
     invoke
     ret

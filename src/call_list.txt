@@ -242,3 +242,6 @@ i	pt33
 
 # For python
 i	IPP
+
+# examples/japh/japh11.pasm
+v	Iiiip

@@ -101,31 +101,35 @@ add_const_str(Parrot_Interp interpreter,
      * TODO strip delimiters in lexer, this needs adjustment in printint strings
      */
     if (*buf == '"') {
-        buf++;
-        l = unescape(buf);
-        if (l)
-        buf[--l] = '\0';
+	buf++;
+	l = unescape(buf);
+	if (l)
+	    buf[--l] = '\0';
     }
     else if (*buf == '\'') {
-        buf++;
-        l = strlen(buf);
-        if (l)
-            buf[--l] = '\0';
+	buf++;
+	l = strlen(buf);
+	if (l)
+	    buf[--l] = '\0';
     }
     else {
-        l = unescape(buf);
+	l = unescape(buf);
     }
 
     /* Update the constant count and reallocate */
     k = ++consts->const_count;
-    consts->constants = mem_sys_realloc(consts->constants,
-            k * sizeof(struct PackFile_Constant *));
+    if (consts->constants == NULL)
+	consts->constants = mem_sys_allocate(
+		k * sizeof(struct PackFile_Constant *));
+    else
+	consts->constants = mem_sys_realloc(consts->constants,
+		k * sizeof(struct PackFile_Constant *));
 
     /* Allocate a new constant */
     consts->constants[--k] = PackFile_Constant_new();
     consts->constants[k]->type = PFC_STRING;
     consts->constants[k]->u.string =
-        string_make(interpreter, buf, (UINTVAL) l, "iso-8859-1", 0 );
+	string_make(interpreter, buf, (UINTVAL) l, "iso-8859-1", 0 );
     free(o);
     return k;
 }
