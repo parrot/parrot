@@ -18,10 +18,6 @@
 
 pmclass Compiler extends NCI {
 
-    STRING* name () {
-        return whoami;
-    }
-
     void* invoke (void * code_ptr) {
 	/*
 	 * compile source code

@@ -35,10 +35,6 @@ pmclass Scratchpad {
 	    mem_sys_free(PMC_data(SELF));
     }
 
-    STRING* name () {
-        return whoami;
-    }
-
     void clone (PMC *ret) {
         PObj_custom_mark_destroy_SETALL(ret);
 	PMC_data(ret) = mem_sys_allocate(SELF->cache.int_val *

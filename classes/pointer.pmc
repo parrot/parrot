@@ -33,14 +33,6 @@ pmclass Pointer {
         (*mark_function)(INTERP, PMC_data(SELF));
     }
 
-    INTVAL type () {
-        return enum_class_Pointer;
-    }
-
-    STRING* name () {
-        return whoami;
-    }
-
     void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = PMC_data(SELF);

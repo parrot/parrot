@@ -37,12 +37,8 @@ void Parrot_PerlUndef_class_init(Parrot_Interp, int);
 
 pmclass ParrotIO {
 
-    STRING* name () {
-	return whoami;
-    }
-
     void class_init () {
-        PMC *method_table;;
+        PMC *method_table;
 
         /* These classes are needed now so make sure they are inited */
         Parrot_NCI_class_init(interp, enum_class_NCI);
@@ -70,7 +66,7 @@ pmclass ParrotIO {
         enter_nci_method(INTERP, method_table,
                          F2DPTR(PIO_eof), "eof", "iIP");
 
-        ((ParrotIOData *)(INTERP->piodata))->method_table = method_table;
+        Parrot_base_vtables[enum_class_ParrotIO].method_table = method_table;
     }
 
     void init () {
@@ -96,10 +92,4 @@ pmclass ParrotIO {
 	return !PIO_eof(INTERP, SELF);
     }
 
-    PMC* find_method (STRING* name) {
-        PMC* method_table = ((ParrotIOData *)(INTERP->piodata))->method_table;
-
-	return VTABLE_get_pmc_keyed(INTERP, method_table,
-				    key_new_string(INTERP, name));
-    }
 }

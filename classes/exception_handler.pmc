@@ -19,7 +19,8 @@
 
 pmclass Exception_Handler extends Continuation {
 
-    STRING* name() {
-        return whoami;
+    INTVAL type() {		/* pmc2c.pl doesn't like empty classes */
+	return SELF->vtable->base_type;
     }
+
 }

@@ -26,10 +26,6 @@ pmclass PerlString extends perlscalar {
 	    pobject_lives(INTERP, (PObj *)SELF->cache.string_val);
     }
 
-    STRING* name() {
-        return whoami;
-    }
-
     void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);
         dest->cache.string_val = string_copy(INTERP,SELF->cache.string_val);

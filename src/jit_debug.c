@@ -134,8 +134,8 @@ write_types(FILE *stabs)
 
     fprintf(stabs, ".stabs \"PMCType:T(0,%d)=e", i++);
     for (j = 0; j < enum_class_max; ++j) {
-        if (Parrot_base_vtables[j].name) {
-            STRING* name = (*Parrot_base_vtables[j].name)(NULL, NULL);
+        if (Parrot_base_vtables[j].whoami) {
+            STRING* name = Parrot_base_vtables[j].whoami;
             fwrite(name->strstart, name->strlen, 1, stabs);
             fprintf(stabs, ":%d,", j);
         }

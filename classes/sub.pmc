@@ -16,10 +16,6 @@
 
 pmclass Sub {
 
-   STRING* name () {
-	return whoami;
-   }
-
    void init () {
        PMC_data(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
        SELF->cache.struct_val = NULL;

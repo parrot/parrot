@@ -39,10 +39,6 @@ pmclass ParrotInterpreter {
 	return next;
     }
 
-    STRING* name() {
-	return whoami;
-    }
-
     PMC* get_pmc_keyed_int(INTVAL key) {
 	struct Parrot_Interp * new_interp =
 	    (struct Parrot_Interp *)PMC_data(SELF);

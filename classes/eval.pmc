@@ -18,10 +18,6 @@
 
 pmclass Eval extends Closure {
 
-    STRING* name () {
-	return whoami;
-    }
-
     void destroy () {
 	/* TODO
 	 * when this PMC gets out of scope

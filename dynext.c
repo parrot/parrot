@@ -25,9 +25,9 @@ Parrot_dynext_setup_pmc(Interp *interp, dynext_pmc_info_t *info)
 
     for (i = 1; i < (int)enum_class_max; i++) {
         if (!string_compare(interp, info->class_name,
-                    Parrot_base_vtables[i].name(interp, NULL))) {
+                    Parrot_base_vtables[i].whoami)) {
             info->class_enum = i;
-            return DYNEXT_INIT_OK;
+            return DYNEXT_INIT_EXISTS;
         }
     }
 #if 0

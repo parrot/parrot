@@ -16,14 +16,6 @@
 
 pmclass CSub {
 
-    INTVAL type () {
-        return enum_class_CSub;
-    }
-
-    STRING* name () {
-        return whoami;
-    }
-
     void clone (PMC *dest) {
 	dest->cache.struct_val = SELF->cache.struct_val;
     }

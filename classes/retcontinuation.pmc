@@ -24,10 +24,6 @@ pmclass RetContinuation extends Continuation {
 	PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-    STRING* name () {
-	return whoami;
-    }
-
     void clone(PMC *ret) {
 	struct Parrot_Sub * sub;
 	sub = PMC_data(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));

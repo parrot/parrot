@@ -105,10 +105,6 @@ pmclass Array {
         list_mark(INTERP, (List *) PMC_data(SELF));
     }
 
-    STRING* name() {
-        return whoami;
-    }
-
     void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = list_clone(INTERP, (List *) PMC_data(SELF));

@@ -19,10 +19,6 @@ pmclass PerlInt extends perlscalar {
         SELF->cache.int_val = 0;
     }
 
-    STRING* name() {
-        return whoami;
-    }
-
     FLOATVAL get_number () {
         return (FLOATVAL)SELF->cache.int_val;
     }

@@ -14,13 +14,8 @@
 
 pmclass ParrotObject {
 
-    INTVAL type () {
-        return enum_class_ParrotObject;
+    INTVAL type() {		/* pmc2c.pl doesn't like empty classes */
+	return SELF->vtable->base_type;
     }
-
-    STRING* name() {
-        return whoami;
-    }
-
 
 }

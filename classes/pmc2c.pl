@@ -579,7 +579,6 @@ EOC
 
 $pre
 ${includes}
-static STRING* whoami;
 
 EOC
 
@@ -590,21 +589,20 @@ EOC
 void $initname (Interp *, int);
 EOH
       $OUT .= <<EOC;
-
 void $initname (Interp * interp, int entry) {
 
     struct _vtable temp_base_vtable = {
-        NULL,
+        NULL,	/* package */
         enum_class_$classname,
-        0, /* int_type - change me */
-        0, /* float_type - change me */
-        0, /* num_type - change me */
-        0, /* string_type - change me */
+        NULL,	/* whoami */
+        NULL,	/* method_table */
+        0, /* reserved */
+        0, /* reserved */
         $methodlist
         };
 
-   if (!whoami)
-       whoami = string_make(interp,
+   if (!temp_base_vtable.whoami)
+       temp_base_vtable.whoami = string_make(interp,
 	   "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);
 
    Parrot_base_vtables[entry] = temp_base_vtable;
@@ -627,6 +625,7 @@ int Parrot_dynext_${lc_classname}_init(Interp *interp, int action, void *param)
     dynext_pmc_info_t *info = (dynext_pmc_info_t*) param;
     int ok;
     int i;
+    STRING *whoami;
 
     /*
      * These are globals. As the shared lib is linked against libparrot
@@ -643,18 +642,18 @@ int Parrot_dynext_${lc_classname}_init(Interp *interp, int action, void *param)
 
 	    /* for all PMCs we want to register:
 	     */
-	    if (!whoami)
-		whoami = string_make(interp,
-		"$classname", @{[length($classname)]}, 0,
-		PObj_constant_FLAG, 0);
+	    whoami = string_from_cstring(interp, "$classname", 0);
 	    info->class_name = whoami;
 	    ok = Parrot_dynext_setup_pmc(interp, info);
-	    $initname(interp, info->class_enum);
-	    /* set our class enum */
-	    Parrot_base_vtables[info->class_enum].base_type = info->class_enum;
-	    /* copy vtable back to caller */
-	    info->base_vtable[info->class_enum] =
-		Parrot_base_vtables[info->class_enum];
+	    if (ok == DYNEXT_INIT_OK) {
+		$initname(interp, info->class_enum);
+		/* set our class enum */
+		Parrot_base_vtables[info->class_enum].base_type =
+		    info->class_enum;
+		/* copy vtable back to caller */
+		info->base_vtable[info->class_enum] =
+		    Parrot_base_vtables[info->class_enum];
+	    }
 	    return ok;
 	case DYNEXT_INIT_PMC:
 	    /* per interpreter/thread init code */

@@ -1,4 +1,4 @@
-/* 
+/*
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
@@ -26,10 +26,6 @@ enum {
 
 pmclass UnManagedStruct {
 
-    STRING* name () {
-	return whoami;
-    }
-
     INTVAL is_equal (PMC* value) {
 	return (SELF->vtable == value->vtable
 		&& PMC_data(SELF) == PMC_data(value));
@@ -43,10 +39,10 @@ pmclass UnManagedStruct {
     INTVAL get_integer_keyed(PMC* key) {
 	INTVAL ix;
 
-	if (!key) 
+	if (!key)
             return -1;
 	ix = key_integer(INTERP, key);
-	if (ix < 0) 
+	if (ix < 0)
             return -1;
 	return  (unsigned char)((char *)PMC_data(SELF))[ix];
 
@@ -56,10 +52,10 @@ pmclass UnManagedStruct {
     void set_integer_keyed (PMC* key, INTVAL value) {
 	INTVAL ix;
 
-	if (!key) 
+	if (!key)
             return;
 	ix = key_integer(INTERP, key);
-	if (ix < 0) 
+	if (ix < 0)
             return;
 	((char *)PMC_data(SELF))[ix]=(0xff & value);
 	return;

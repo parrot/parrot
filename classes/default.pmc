@@ -137,10 +137,7 @@ pmclass default abstract noinit {
     }
 
     STRING* name () {
-	internal_exception(ILL_INHERIT,
-		"name() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
+        return SELF->vtable->whoami;
     }
 
     STRING* name_keyed (PMC* key) {
@@ -173,9 +170,9 @@ pmclass default abstract noinit {
     }
 
     PMC* find_method(STRING* method_name) {
-	internal_exception(ILL_INHERIT,
-		"find_method() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
+	if (SELF->vtable->method_table)
+	    return VTABLE_get_pmc_keyed(INTERP, SELF->vtable->method_table,
+		    key_new_string(INTERP, method_name));
         return NULL;
     }
 

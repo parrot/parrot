@@ -69,10 +69,10 @@ struct _vtable {
     /* XXX - What on earth are these for??? */
     struct PACKAGE *package;
     INTVAL base_type;
-    INTVAL int_type;
-    INTVAL float_type;
-    INTVAL num_type;
-    INTVAL string_type;
+    STRING* whoami;
+    PMC* method_table;
+    INTVAL reserved1;
+    INTVAL reserved2;
 
     /* Vtable Functions */
 

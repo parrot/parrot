@@ -16,14 +16,6 @@
 
 pmclass IntList {
 
-    INTVAL type () {
-        return enum_class_IntList;
-    }
-
-    STRING* name() {
-        return whoami;
-    }
-
     void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = intlist_clone(INTERP, (IntList *) PMC_data(SELF));

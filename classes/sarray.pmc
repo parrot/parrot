@@ -60,10 +60,6 @@ pmclass SArray {
 	PMC_data(SELF) = NULL;
     }
 
-    STRING* name() {
-        return whoami;
-    }
-
     void clone (PMC *dest) {
 	HASH_ENTRY *e, *d;
 	int i, start, end;

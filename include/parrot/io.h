@@ -166,7 +166,6 @@ struct _ParrotIOLayer {
 struct _ParrotIOData {
     ParrotIOTable table;
     ParrotIOLayer *default_stack;
-    PMC *method_table;
 };
 
 

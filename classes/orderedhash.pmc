@@ -25,10 +25,6 @@ pmclass OrderedHash extends PerlArray {
 	PerlHash.SUPER();
     }
 
-    STRING* name() {
-        return whoami;
-    }
-
     void mark () {
         SUPER();
         PerlHash.SUPER();

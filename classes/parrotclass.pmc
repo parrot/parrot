@@ -22,7 +22,7 @@
    3: A hash, the keys are the classname/attrib name pair (separated
       by a NULL), while the value is the offset to the attribute
    4: The class name PMC
-   
+
 */
 
 #include "parrot/parrot.h"
@@ -42,13 +42,5 @@ pmclass ParrotClass {
     PObj_flag_SET(is_PMC_ptr, SELF);
   }
 
-  INTVAL type () {
-    return enum_class_ParrotClass;
-  }
-  
-  STRING* name() {
-    return whoami;
-  }
-  
-    
+
 }

@@ -293,10 +293,6 @@ pmclass Timer {
 	mem_sys_free(t);
     }
 
-    STRING* name() {
-        return whoami;
-    }
-
     INTVAL get_integer_keyed_int(INTVAL key) {
 	parrot_timer_t *t = SELF->cache.struct_val;
 

@@ -15,10 +15,6 @@
 
 pmclass PerlUndef extends PerlInt {
 
-    STRING* name () {
-        return whoami;
-    }
-
     INTVAL get_integer () {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in integer context");

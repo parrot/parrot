@@ -16,10 +16,6 @@
 
 pmclass Coroutine extends Continuation {
 
-    STRING* name () {
-        return whoami;
-    }
-
     void init () {
         PMC_data(SELF) = new_coroutine(INTERP);
         SELF->cache.struct_val = NULL;

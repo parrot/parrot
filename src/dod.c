@@ -290,12 +290,14 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
 
     /* The interpreter has a few strings of its own */
     if (interpreter->current_file)
-        pobject_lives(interpreter, (Buffer *)interpreter->current_file);
+        pobject_lives(interpreter, (PObj *)interpreter->current_file);
     if (interpreter->current_package)
-        pobject_lives(interpreter, (Buffer *)interpreter->current_package);
-    for (i = 1; i < (UINTVAL)enum_class_max; i++)
-        pobject_lives(interpreter, (Buffer *)Parrot_base_vtables[i].name
-                (interpreter, 0));
+        pobject_lives(interpreter, (PObj *)interpreter->current_package);
+    for (i = 1; i < (UINTVAL)enum_class_max; i++) {
+        pobject_lives(interpreter, (PObj *)Parrot_base_vtables[i].whoami);
+    if (Parrot_base_vtables[i].method_table)
+        pobject_lives(interpreter, (PObj *)Parrot_base_vtables[i].method_table);
+    }
 
     /* Now walk the string stack. Make sure to walk from top down since stack
      * may have segments above top that we shouldn't walk. */

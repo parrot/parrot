@@ -19,10 +19,6 @@ pmclass PerlNum extends perlscalar {
         SELF->cache.num_val = 0.0;
     }
 
-    STRING* name() {
-        return whoami;
-    }
-
     INTVAL get_integer () {
         return (INTVAL)SELF->cache.num_val;
     }

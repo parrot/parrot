@@ -38,10 +38,6 @@ Parrot_PerlArray_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
 
 pmclass PerlArray extends Array {
 
-    STRING* name() {
-        return whoami;
-    }
-
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
 		(List *) PMC_data(SELF), key);
@@ -103,7 +99,7 @@ pmclass PerlArray extends Array {
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            if (PARROT_WARNINGS_test(interpreter, 
+            if (PARROT_WARNINGS_test(interpreter,
                                      PARROT_WARNINGS_UNDEF_FLAG)) {
                 Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
                             "Use of uninitialized value");
@@ -116,7 +112,7 @@ pmclass PerlArray extends Array {
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            if (PARROT_WARNINGS_test(interpreter, 
+            if (PARROT_WARNINGS_test(interpreter,
                                      PARROT_WARNINGS_UNDEF_FLAG)) {
                 Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
                             "Use of uninitialized value");
@@ -133,7 +129,7 @@ pmclass PerlArray extends Array {
 
     STRING* get_string_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            if (PARROT_WARNINGS_test(interpreter, 
+            if (PARROT_WARNINGS_test(interpreter,
                                      PARROT_WARNINGS_UNDEF_FLAG)) {
                 Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
                             "Use of uninitialized value");
@@ -146,7 +142,7 @@ pmclass PerlArray extends Array {
 
     PMC* get_pmc_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            if (PARROT_WARNINGS_test(interpreter, 
+            if (PARROT_WARNINGS_test(interpreter,
                                      PARROT_WARNINGS_UNDEF_FLAG)) {
                 Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
                             "Use of uninitialized value");

@@ -18,6 +18,7 @@ typedef enum  {
 
 typedef enum  {
     DYNEXT_INIT_OK,
+    DYNEXT_INIT_EXISTS,
     DYNEXT_INIT_ERR
 } dynex_enum_err_t;
 

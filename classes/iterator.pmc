@@ -32,10 +32,6 @@ pmclass Iterator {
 	     pobject_lives(INTERP, (PObj *) PMC_data(SELF));
     }
 
-    STRING* name () {
-        return whoami;
-    }
-
     void clone (PMC* dest) {
 	/* XXX TODO */
     }

@@ -60,10 +60,6 @@ pmclass Key {
         key_mark(INTERP, SELF);
     }
 
-    STRING* name () {
-        return whoami;
-    }
-
     INTVAL get_integer () {
         return key_integer(INTERP, SELF);
     }

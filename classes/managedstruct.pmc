@@ -1,4 +1,4 @@
-/* 
+/*
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
@@ -25,10 +25,6 @@ pmclass ManagedStruct extends UnManagedStruct {
       if (PMC_data(SELF)) {
         mem_sys_free(PMC_data(SELF));
       }
-    }
-
-    STRING* name () {
-        return whoami;
     }
 
     /* Returns -1 for out-of-bounds access */
@@ -66,11 +62,11 @@ pmclass ManagedStruct extends UnManagedStruct {
             mem_sys_free(PMC_data(SELF));
             PMC_data(SELF) = NULL;
             SELF->cache.int_val = 0;
-        } 
+        }
         else if (value && (! PMC_data(SELF))) {
             PMC_data(SELF) = mem_sys_allocate_zeroed(value);
             SELF->cache.int_val = value;
-        } 
+        }
         else if (value && PMC_data(SELF)) {
             PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF), value);
             SELF->cache.int_val = value;

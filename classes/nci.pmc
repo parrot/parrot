@@ -29,10 +29,6 @@ pmclass NCI {
 	PMC_data(SELF) = build_call_func(INTERP, SELF, value);
     }
 
-    STRING* name () {
-        return whoami;
-    }
-
     void destroy() {
 	if (PMC_data(SELF))
 	    mem_sys_free(PMC_data(SELF));

@@ -116,7 +116,7 @@ Return the (native) parrot type of datatype $2.
 
 inline op typeof(out STR, in INT) {
     if ($2 > 0 && $2 < enum_class_max)
-		$1 = Parrot_base_vtables[$2].name(interpreter, 0);
+		$1 = Parrot_base_vtables[$2].whoami;
     else
 		$1 = Parrot_get_datatype_name(interpreter, $2);
     goto NEXT();
@@ -183,8 +183,12 @@ PMC in $1.
 =cut
 
 op find_method(out PMC, in PMC, in STR) {
+    opcode_t * resume = expr NEXT();
     $1 = $2->vtable->find_method(interpreter, $2, $3);
-    goto NEXT();
+    if (!$1)
+        real_exception(interpreter, resume, METH_NOT_FOUND,
+            "Method '%s' not found", string_to_cstring(interpreter, $3));
+    restart ADDRESS(resume);
 }
 
 ########################################

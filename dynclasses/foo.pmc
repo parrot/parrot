@@ -11,10 +11,6 @@
 
 pmclass Foo dynpmc {
 
-    STRING* name () {
-	return whoami;
-    }
-
     INTVAL get_integer() {
 	return 42;
     }

@@ -69,10 +69,6 @@ pmclass PerlHash {
         return entry->type;
     }
 
-    STRING* name() {
-        return whoami;
-    }
-
     void clone (PMC *ret) {
         PObj_custom_mark_SET(ret);
         hash_clone(INTERP, (HASH *)PMC_casv(SELF), (HASH **)&PMC_casv(ret));
