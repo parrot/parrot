@@ -28,10 +28,10 @@ init_world(void)
     Parrot_PerlString_class_init(enum_class_PerlString);
     Parrot_PerlArray_class_init(enum_class_PerlArray);
     Parrot_PerlHash_class_init(enum_class_PerlHash);
-    Parrot_ParrotPointer_class_init(enum_class_ParrotPointer);
+    Parrot_Pointer_class_init(enum_class_Pointer);
     Parrot_IntQueue_class_init(enum_class_IntQueue);
-    Parrot_ParrotSub_class_init(enum_class_ParrotSub);
-    Parrot_ParrotCoroutine_class_init(enum_class_ParrotCoroutine);
+    Parrot_Sub_class_init(enum_class_Sub);
+    Parrot_Coroutine_class_init(enum_class_Coroutine);
 
     /* Now register the names of the PMCs */
 
@@ -90,10 +90,10 @@ init_world(void)
                                                           Parrot_base_classname_hash, key, enum_class_PerlHash);
 
     key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_ParrotPointer].name(NULL, NULL);
+        Parrot_base_vtables[enum_class_Pointer].name(NULL, NULL);
     key->atom.type = enum_key_string;
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_ParrotPointer);
+                                                          Parrot_base_classname_hash, key, enum_class_Pointer);
 
     key->atom.val.string_val = (STRING*)
         Parrot_base_vtables[enum_class_IntQueue].name(NULL, NULL);
@@ -102,16 +102,16 @@ init_world(void)
                                                           Parrot_base_classname_hash, key, enum_class_IntQueue);
 
     key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_ParrotSub].name(NULL, NULL);
+        Parrot_base_vtables[enum_class_Sub].name(NULL, NULL);
     key->atom.type = enum_key_string;
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_ParrotSub);
+                                                          Parrot_base_classname_hash, key, enum_class_Sub);
 
     key->atom.val.string_val = (STRING*)
-        Parrot_base_vtables[enum_class_ParrotCoroutine].name(NULL, NULL);
+        Parrot_base_vtables[enum_class_Coroutine].name(NULL, NULL);
     key->atom.type = enum_key_string;
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_ParrotCoroutine);
+                                                          Parrot_base_classname_hash, key, enum_class_Coroutine);
 
 }
 
