@@ -50,7 +50,7 @@ typedef enum {
 
 #if JIT_EMIT
 
-enum { JIT_PPC_CALL };
+enum { JIT_PPC_CALL, JIT_PPC_BRANCH };
 
 #define emit_op(op) (op << 2)
 
@@ -340,7 +340,7 @@ enum { JIT_PPC_CALL };
 
 #define emit_fadd(pc, D, A, B) emit_3a(pc, 63, D, A, B, 0, 21, 0)
 #define emit_fsub(pc, D, A, B) emit_3a(pc, 63, D, A, B, 0, 20, 0)
-#define emit_fmul(pc, D, A, B) emit_3a(pc, 63, D, A, B, 0, 25, 0)
+#define emit_fmul(pc, D, A, B) emit_3a(pc, 63, D, A, 0, B, 25, 0)
 #define emit_fdiv(pc, D, A, B) emit_3a(pc, 63, D, A, B, 0, 18, 0)
 
 #define emit_fabs(pc, D, A)    emit_3reg_x(pc, 63, D, 0, A, 264, 0)
@@ -358,6 +358,76 @@ enum { JIT_PPC_CALL };
 #define emit_lfd_r(pc, reg, addr) \
   emit_lfd(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
+
+/* compare operation.
+ *
+ *  +--------------------------------------------------------------------+
+ *  |  Opcode  | BF   | |L |     A     |     B     |                     |
+ *  +--------------------------------------------------------------------+
+ * 0          5 6    8 9 10 11       15 16       20 21                 31
+ *
+ * opcode = 31 for integer, 63 for floating point
+ * bf is the comparison result field to use (we just always use 0)
+ */
+
+#define _emit_cmp(pc, t, bf, ra, rb) \
+  *(pc++) = t << 2 | ((int)bf) >> 1; \
+  *(pc++) = (char)(bf << 7 | ra); \
+  *(pc++) = (char)(rb << 3); \
+  *(pc++) = 0
+
+#define emit_cmp(pc, ra, rb) _emit_cmp(pc, 31, 0, ra, rb)
+#define emit_fcmp(pc, ra, rb) _emit_cmp(pc, 63, 0, ra, rb)
+
+/* Branch conditional to immediate
+ *
+ *  +--------------------------------------------------------------------+
+ *  |    19    |     BO     |     BI     |     BO               | AA | LK |
+ *  +--------------------------------------------------------------------+
+ * 0          5 6         10 11        15 16                      30   31
+ *
+ * Branch flags.  A 10-bit quantity representing BO and BI.  BO is 12
+ * for true and 4 for false.  BI indicates the comparison type (lt=0,
+ * gt = 1, eq = 2).  BO is the relative or absolute displacement,
+ * divided by four.
+ */
+
+#define _BLT 0
+#define _BGT 1
+#define _BEQ 2
+#define _BYES (12 << 5)
+#define _BNO (4 << 5)
+
+typedef enum {
+    BLT = _BYES | _BLT,
+    BGE = _BNO | _BLT,
+    BGT = _BYES | _BGT,
+    BLE = _BNO | _BGT,
+    BEQ = _BYES | _BEQ,
+    BNE = _BNO | _BEQ
+} branch_t;
+
+#define _emit_bc(pc, opt, bd, aa, lk) \
+  *(pc++) = 16 << 2 | ((int)opt) >> 8; \
+  *(pc++) = (char)(opt&0xff); \
+  *(pc++) = (char)(bd >> 8); \
+  *(pc++) = (char)(bd | aa << 1 | lk)
+
+static void
+emit_bc(Parrot_jit_info_t * jit_info, branch_t cond, opcode_t disp) {
+    opcode_t opcode = jit_info->op_i + disp;
+    int offset;
+    if(opcode <= jit_info->op_i) {
+        offset = jit_info->arena.op_map[opcode].offset -
+            (jit_info->native_ptr - jit_info->arena.start);
+    } else {
+        offset = 0;
+        Parrot_jit_newfixup(jit_info); 
+        jit_info->arena.fixups->type = JIT_PPC_BRANCH;
+        jit_info->arena.fixups->param.opcode = opcode;
+    }
+    _emit_bc(jit_info->native_ptr, cond, offset, 0, 0);
+}
 
 /* Store a CPU register back to a Parrot register. */
 
@@ -442,8 +512,19 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                 *(fixup_ptr++) |= (char)(d >> 29) & 3;
                 *(fixup_ptr++) = (char)(d >> 16);
                 *(fixup_ptr++) = (char)(d >> 8);
-                *(fixup_ptr++) |= (char)d; 
+                *(fixup_ptr++) |= (char)d & ~3;
                 break;
+
+            case JIT_PPC_BRANCH:
+                fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
+                /* I guess param.fptr is number of insns? */
+                d = jit_info->arena.op_map[fixup->param.opcode].offset
+                    - fixup->native_offset;
+                fixup_ptr += 2;
+                *(fixup_ptr++) = (char)(d >> 8);
+                *(fixup_ptr++) |= (char)d&~3;
+                break;
+
             default:
                 internal_exception(JIT_ERROR, "Unknown fixup type:%d\n",
                                    fixup->type);

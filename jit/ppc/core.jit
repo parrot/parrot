@@ -1,6 +1,7 @@
 ;
 ; ppc/core.jit
 ;
+;
 ; $Id$
 ;
 
@@ -17,7 +18,7 @@ Parrot_set_i_ic {
         emit_imm32(NATIVECODE, MAP[1], *INT_CONST[2]);
     }
     else {
-        emit_imm32(NATIVECODE, MAP[1], *INT_CONST[2]);
+        emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
         emit_stw_r(NATIVECODE, r12, &INT_REG[1]); 
     }
 }
@@ -36,6 +37,12 @@ Parrot_set_i_i {
         emit_lwz_r(NATIVECODE, r12, &INT_REG[2]); 
         emit_stw_r(NATIVECODE, r12, &INT_REG[1]); 
     }
+}
+
+Parrot_set_n_nc {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+	emit_lfd(NATIVECODE, r12, 0, r12);
+        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]); 
 }
 
 Parrot_neg_i_i {
@@ -106,7 +113,7 @@ Parrot_bor_i_i {
     }
     else if (MAP[2]) {
         emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
-        emit_or(NATIVECODE, r12, r12, MAP[1]);
+        emit_or(NATIVECODE, r12, r12, MAP[2]);
         emit_stw_r(NATIVECODE, r12, &INT_REG[1]);
     }
     else {
@@ -166,7 +173,7 @@ Parrot_add_i_i {
     }
     else if (MAP[2]) {
         emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
-        emit_add(NATIVECODE, r12, r12, MAP[1]);
+        emit_add(NATIVECODE, r12, r12, MAP[2]);
         emit_stw_r(NATIVECODE, r12, &INT_REG[1]);
     }
     else {
@@ -226,7 +233,7 @@ Parrot_bxor_i_i {
     }
     else if (MAP[2]) {
         emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
-        emit_xor(NATIVECODE, r12, r12, MAP[1]);
+        emit_xor(NATIVECODE, r12, r12, MAP[2]);
         emit_stw_r(NATIVECODE, r12, &INT_REG[1]);
     }
     else {
@@ -286,7 +293,7 @@ Parrot_div_i_i {
     }
     else if (MAP[2]) {
         emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
-        emit_divw(NATIVECODE, r12, r12, MAP[1]);
+        emit_divw(NATIVECODE, r12, r12, MAP[2]);
         emit_stw_r(NATIVECODE, r12, &INT_REG[1]);
     }
     else {
@@ -346,7 +353,7 @@ Parrot_band_i_i {
     }
     else if (MAP[2]) {
         emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
-        emit_and(NATIVECODE, r12, r12, MAP[1]);
+        emit_and(NATIVECODE, r12, r12, MAP[2]);
         emit_stw_r(NATIVECODE, r12, &INT_REG[1]);
     }
     else {
@@ -406,7 +413,7 @@ Parrot_mul_i_i {
     }
     else if (MAP[2]) {
         emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
-        emit_mullw(NATIVECODE, r12, r12, MAP[1]);
+        emit_mullw(NATIVECODE, r12, r12, MAP[2]);
         emit_stw_r(NATIVECODE, r12, &INT_REG[1]);
     }
     else {
@@ -466,7 +473,7 @@ Parrot_sub_i_i {
     }
     else if (MAP[2]) {
         emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
-        emit_subf(NATIVECODE, r12, r12, MAP[1]);
+        emit_subf(NATIVECODE, r12, r12, MAP[2]);
         emit_stw_r(NATIVECODE, r12, &INT_REG[1]);
     }
     else {
@@ -567,12 +574,537 @@ Parrot_sub_n_n {
         emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
 }
 
-/*
- * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil 
- * End:
- *
- * vim: expandtab shiftwidth=4:
- */
+Parrot_gt_i_i_ic {
+; First, emit the compare op:
+    if (MAP[1] && MAP[2]) {
+        emit_cmp(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]); 
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else if (MAP[2]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BGT, *INT_CONST[3]);
+}
+
+Parrot_gt_i_ic_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+
+    if (MAP[1]) {
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BGT, *INT_CONST[3]);
+}
+
+Parrot_gt_ic_i_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[1]);
+
+    if (MAP[2]) {
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r12, r11);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BGT, *INT_CONST[3]);
+}
+
+Parrot_gt_ic_ic_ic {
+    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+    emit_cmp(NATIVECODE, r12, r11);
+    emit_bc(jit_info, BGT, *INT_CONST[3]);
+}
+
+Parrot_eq_i_i_ic {
+; First, emit the compare op:
+    if (MAP[1] && MAP[2]) {
+        emit_cmp(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]); 
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else if (MAP[2]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+}
+
+Parrot_eq_i_ic_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+
+    if (MAP[1]) {
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+}
+
+Parrot_eq_ic_i_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[1]);
+
+    if (MAP[2]) {
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r12, r11);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+}
+
+Parrot_eq_ic_ic_ic {
+    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+    emit_cmp(NATIVECODE, r12, r11);
+    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+}
+
+Parrot_ge_i_i_ic {
+; First, emit the compare op:
+    if (MAP[1] && MAP[2]) {
+        emit_cmp(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]); 
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else if (MAP[2]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BGE, *INT_CONST[3]);
+}
+
+Parrot_ge_i_ic_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+
+    if (MAP[1]) {
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BGE, *INT_CONST[3]);
+}
+
+Parrot_ge_ic_i_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[1]);
+
+    if (MAP[2]) {
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r12, r11);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BGE, *INT_CONST[3]);
+}
+
+Parrot_ge_ic_ic_ic {
+    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+    emit_cmp(NATIVECODE, r12, r11);
+    emit_bc(jit_info, BGE, *INT_CONST[3]);
+}
+
+Parrot_lt_i_i_ic {
+; First, emit the compare op:
+    if (MAP[1] && MAP[2]) {
+        emit_cmp(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]); 
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else if (MAP[2]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BLT, *INT_CONST[3]);
+}
+
+Parrot_lt_i_ic_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+
+    if (MAP[1]) {
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BLT, *INT_CONST[3]);
+}
+
+Parrot_lt_ic_i_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[1]);
+
+    if (MAP[2]) {
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r12, r11);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BLT, *INT_CONST[3]);
+}
+
+Parrot_lt_ic_ic_ic {
+    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+    emit_cmp(NATIVECODE, r12, r11);
+    emit_bc(jit_info, BLT, *INT_CONST[3]);
+}
+
+Parrot_le_i_i_ic {
+; First, emit the compare op:
+    if (MAP[1] && MAP[2]) {
+        emit_cmp(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]); 
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else if (MAP[2]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BLE, *INT_CONST[3]);
+}
+
+Parrot_le_i_ic_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+
+    if (MAP[1]) {
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BLE, *INT_CONST[3]);
+}
+
+Parrot_le_ic_i_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[1]);
+
+    if (MAP[2]) {
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r12, r11);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BLE, *INT_CONST[3]);
+}
+
+Parrot_le_ic_ic_ic {
+    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+    emit_cmp(NATIVECODE, r12, r11);
+    emit_bc(jit_info, BLE, *INT_CONST[3]);
+}
+
+Parrot_ne_i_i_ic {
+; First, emit the compare op:
+    if (MAP[1] && MAP[2]) {
+        emit_cmp(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]); 
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else if (MAP[2]) {
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_lwz_r(NATIVECODE, r12, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BNE, *INT_CONST[3]);
+}
+
+Parrot_ne_i_ic_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+
+    if (MAP[1]) {
+        emit_cmp(NATIVECODE, MAP[1], r12);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[1]);
+        emit_cmp(NATIVECODE, r11, r12);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BNE, *INT_CONST[3]);
+}
+
+Parrot_ne_ic_i_ic {
+    emit_imm32(NATIVECODE, r12, *INT_CONST[1]);
+
+    if (MAP[2]) {
+        emit_cmp(NATIVECODE, r12, MAP[2]);
+    }
+    else {
+        emit_lwz_r(NATIVECODE, r11, &INT_REG[2]);
+        emit_cmp(NATIVECODE, r12, r11);
+    }
+; Now the branch. XXX: need to handle large displacements.
+    emit_bc(jit_info, BNE, *INT_CONST[3]);
+}
+
+Parrot_ne_ic_ic_ic {
+    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
+    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
+    emit_cmp(NATIVECODE, r12, r11);
+    emit_bc(jit_info, BNE, *INT_CONST[3]);
+}
+
+Parrot_gt_n_n_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BGT, *INT_CONST[3]);
+}
+
+Parrot_gt_n_nc_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BGT, *INT_CONST[3]);
+}
+
+Parrot_gt_nc_n_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BGT, *INT_CONST[3]);
+}
+
+Parrot_gt_nc_nc_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BGT, *INT_CONST[3]);
+}
+
+Parrot_eq_n_n_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+}
+
+Parrot_eq_n_nc_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+}
+
+Parrot_eq_nc_n_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+}
+
+Parrot_eq_nc_nc_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+}
+
+Parrot_ge_n_n_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BGE, *INT_CONST[3]);
+}
+
+Parrot_ge_n_nc_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BGE, *INT_CONST[3]);
+}
+
+Parrot_ge_nc_n_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BGE, *INT_CONST[3]);
+}
+
+Parrot_ge_nc_nc_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BGE, *INT_CONST[3]);
+}
+
+Parrot_lt_n_n_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BLT, *INT_CONST[3]);
+}
+
+Parrot_lt_n_nc_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BLT, *INT_CONST[3]);
+}
+
+Parrot_lt_nc_n_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BLT, *INT_CONST[3]);
+}
+
+Parrot_lt_nc_nc_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BLT, *INT_CONST[3]);
+}
+
+Parrot_le_n_n_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BLE, *INT_CONST[3]);
+}
+
+Parrot_le_n_nc_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BLE, *INT_CONST[3]);
+}
+
+Parrot_le_nc_n_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BLE, *INT_CONST[3]);
+}
+
+Parrot_le_nc_nc_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BLE, *INT_CONST[3]);
+}
+
+Parrot_ne_n_n_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BNE, *INT_CONST[3]);
+}
+
+Parrot_ne_n_nc_ic {
+    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BNE, *INT_CONST[3]);
+}
+
+Parrot_ne_nc_n_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BNE, *INT_CONST[3]);
+}
+
+Parrot_ne_nc_nc_ic {
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+    emit_lfd(NATIVECODE, r11, 0, r12);
+    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+    emit_lfd(NATIVECODE, r12, 0, r12);
+    emit_fcmp(NATIVECODE, r11, r12);
+    emit_bc(jit_info, BNE, *INT_CONST[3]);
+}
+
