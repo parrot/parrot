@@ -70,8 +70,8 @@ trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
                         PMC_struct_val(pmc));
             }
             else if (PObj_is_object_TEST(pmc)) {
-                /* don't call name, which calls delegate's __get_name
-                 * and changes the trace
+                /* don't call name, which calls delegate's __name
+                 * and changes the trace - or fails
                  */
                 PIO_eprintf(interpreter, "Object=PMC(%#p)", pmc);
             }

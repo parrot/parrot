@@ -21,11 +21,13 @@ Handles class and object manipulation.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/*  #include "objects.str" */
+#undef _S
+/* #include "objects.str" */
 #ifndef _S
 #  define _S(s) const_string(interpreter, s)
 #endif
 
+#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 static PMC *
 clone_array(Parrot_Interp interpreter, PMC *source_array)
 {
@@ -470,6 +472,10 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
          const STRING *prop_str , STRING **meth_str)
 {
     PMC *prop;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
     STRING *meth;
 #if 0
     prop = VTABLE_getprop(interpreter, class, prop_str);
@@ -482,7 +488,7 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
     if ( !(props = PMC_metadata(class)))
         return NULL;
     b = hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(props), prop_str);
+                (Hash*) PMC_struct_val(props), const_cast(prop_str));
     if (!b)
         return NULL;
     meth = PMC_str_val((PMC*) b->value);

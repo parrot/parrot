@@ -146,7 +146,7 @@ Parrot_UInt4
 string_unescape_one(Parrot_unescape_cb cb, Parrot_UInt4 *offset,
         Parrot_UInt4 input_length, void *string)
 {
-    return u_unescapeAt(cb, offset, input_length, string);
+    return u_unescapeAt(cb, (int32_t*) offset, input_length, string);
 }
 
 /*
