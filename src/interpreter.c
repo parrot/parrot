@@ -480,6 +480,9 @@ make_interpreter(Interp_flags flags)
     SET_NULL(interpreter->piodata);
     PIO_init(interpreter);
 
+    /* must be set after if this is not the first interpreter */
+    SET_NULL(interpreter->parent_interpreter);
+
     interpreter->DOD_block_level = 1;
     interpreter->GC_block_level = 1;
 
@@ -620,6 +623,12 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     struct Stash *stash, *next_stash;
 
     UNUSED(exit_code);
+    /* we destroy all child interpreters and the last one too,
+     * if the --leak-test commandline was given
+     */
+    if (! (interpreter->parent_interpreter ||
+                Interp_flags_TEST(interpreter, PARROT_DESTROY_FLAG)))
+        return;
 
     /* buffer headers, PMCs */
     Parrot_destroy_header_pools(interpreter);

@@ -20,6 +20,9 @@
 
 char *parseflags(Parrot_Interp interpreter, int *argc, char **argv[]);
 
+#define OPT_GC_DEBUG     128
+#define OPT_DESTROY_FLAG 129
+
 static struct longopt_opt_decl options[] = {
     { 'b', 'b', 0,       { "--bounds-checks" } },
     { 'd', 'd', 0,       { "--debug" } },
@@ -32,7 +35,8 @@ static struct longopt_opt_decl options[] = {
     { 't', 't', 0,       { "--trace" } },
     { 'v', 'v', 0,       { "--version" } },
     { '.', '.', 0,       { "--wait" } },
-    {'\0', 128, 0,       { "--gc-debug" } },
+    {'\0', OPT_GC_DEBUG, 0,       { "--gc-debug" } },
+    {'\0', OPT_DESTROY_FLAG, 0,   { "--leak-test", "--destroy-at-end" } },
     {'\0',   0, 0,       { NULL } }
 };
 
@@ -135,13 +139,16 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
                     * attach a debuggger. */
             fgetc(stdin);
             break;
-        case 128:
+        case OPT_GC_DEBUG:
 #if DISABLE_GC_DEBUG
             Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG,
                         "PARROT_GC_DEBUG is set but the binary was "
                         "compiled with DISABLE_GC_DEBUG.");
 #endif
             setopt(PARROT_GC_DEBUG_FLAG);
+            break;
+        case OPT_DESTROY_FLAG:
+            setopt(PARROT_DESTROY_FLAG);
             break;
         }
     }

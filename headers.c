@@ -362,12 +362,6 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
     struct Small_Object_Arena *cur_arena, *next;
     int i, j, start;
 
-    /* TODO: -lt make a command line option for cleaning up:
-     * - the last interpreter may just die
-     * - created interpreters should always get destroyed
-     * - move the check to interpreter.c
-    */
-    return;
     /* const/non const COW strings life in different pools
      * so in first pass
      * COW refcount is done, in 2. refcounting
@@ -407,7 +401,9 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
             if (i == 2 && pool) {
                 for (cur_arena = pool->last_Arena; cur_arena;) {
                     next = cur_arena->prev;
-#if ! ARENA_DOD_FLAGS
+#if ARENA_DOD_FLAGS
+                    mem_sys_free(cur_arena->dod_flags);
+#else
                     mem_sys_free(cur_arena->start_objects);
 #endif
                     mem_sys_free(cur_arena);
@@ -421,7 +417,9 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
     pool = interpreter->arena_base->pmc_ext_pool;
     for (cur_arena = pool->last_Arena; cur_arena;) {
         next = cur_arena->prev;
-#if ! ARENA_DOD_FLAGS
+#if ARENA_DOD_FLAGS
+        mem_sys_free(cur_arena->dod_flags);
+#else
         mem_sys_free(cur_arena->start_objects);
 #endif
         mem_sys_free(cur_arena);

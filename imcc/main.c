@@ -73,7 +73,8 @@ static void imcc_version(void)
 #define setopt(flag) Parrot_setflag(interp, flag, (*argv)[0]+2)
 #define unsetopt(flag) Parrot_setflag(interp, flag, 0)
 
-#define OPT_GC_DEBUG 128
+#define OPT_GC_DEBUG     128
+#define OPT_DESTROY_FLAG 129
 static struct longopt_opt_decl options[] = {
     { 'b', 'b', 0,       { "--bounds-checks" } },
     { 'j', 'j', 0, { "--jit" } },
@@ -96,6 +97,7 @@ static struct longopt_opt_decl options[] = {
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
     { 'O', 'O', OPTION_required_FLAG, { "--optimize" } },
     { '\0', OPT_GC_DEBUG, 0, { "--gc-debug" } },
+    {'\0', OPT_DESTROY_FLAG, 0,   { "--leak_test", "--destroy-at-end" } },
     { 0, 0, 0, { NULL } }
 };
 
@@ -207,6 +209,9 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 #endif
                     setopt(PARROT_GC_DEBUG_FLAG);
                     break;
+            case OPT_DESTROY_FLAG:
+                setopt(PARROT_DESTROY_FLAG);
+                break;
 
             default:
                 fatal(1, "main", "Invalid flag '%s' used."

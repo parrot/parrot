@@ -27,7 +27,8 @@ typedef enum {
     PARROT_CGOTO_FLAG    = 0x40,  /* We're using the computed goto runops */
     PARROT_GC_DEBUG_FLAG = 0x80,  /* We're debugging memory management */
     PARROT_EXTERN_CODE_FLAG = 0x100,    /* reusing anothers interps code */
-    PARROT_SWITCH_FLAG = 0x200  /* We're using the switched runops */
+    PARROT_SWITCH_FLAG   = 0x200, /* We're using the switched runops */
+    PARROT_DESTROY_FLAG  = 0x400  /* the last interpreter shall cleanup */
 } Parrot_Interp_flag;
 
 struct Parrot_Interp;
@@ -167,6 +168,7 @@ typedef struct Parrot_Interp {
 
     PDB_t *pdb;                 /* Debug system */
     void *lo_var_ptr;           /* Pointer to memory on runops system stack */
+    struct Parrot_Interp * parent_interpreter;
 
     /* per interpreter global vars */
     INTVAL world_inited;        /* Parrot_init is done */
