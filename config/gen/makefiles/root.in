@@ -582,9 +582,11 @@ $(INC)/jit_emit.h: jit/${jitcpuarch}/jit_emit.h
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|jit/${jitcpuarch}/jit_emit.h|, q|$(INC)/jit_emit.h|${PQ}
 $(INC)/exec_dep.h: jit/${jitcpuarch}/exec_dep.h
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|jit/${jitcpuarch}/exec_dep.h|, q|$(INC)/exec_dep.h|${PQ}
-jit_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h jit/${jitcpuarch}/core.jit
+jit_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h \
+		jit/${jitcpuarch}/core.jit jit2h.pl
 	$(PERL) jit2h.pl ${jitcpuarch} jit_cpu.c
-exec_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h jit/${jitcpuarch}/core.jit ${exec_h} $(INC)/exec_dep.h
+exec_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h \
+		jit/${jitcpuarch}/core.jit ${exec_h} $(INC)/exec_dep.h jit2h.pl
 	$(PERL) jit2h.pl ${jitcpuarch} exec_cpu.c
 
 ######## imcc files deps
@@ -652,31 +654,31 @@ test_prep : $(LIBPARROT) $(TEST_PROG)
 
 # src tests
 src_tests :
-	$(PERL) t/harness $(SRC_TEST_FILES)
+	-$(PERL) t/harness $(SRC_TEST_FILES)
 
 # normal (cgoto) runloop
 testg :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) $(TEST_FILES)
+	-$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) $(TEST_FILES)
 
 # prederef / CGP runloop
 testP :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -P $(TEST_FILES)
+	-$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -P $(TEST_FILES)
 
 # JIT core
 testj :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -j $(TEST_FILES)
+	-$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -j $(TEST_FILES)
 
 # switched core
 testS :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -S $(TEST_FILES)
+	-$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -S $(TEST_FILES)
 
 # bounds checking slow core
 testb :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -b $(TEST_FILES)
+	-$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -b $(TEST_FILES)
 
 # normal core, write and run pbc
 testr :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) --run-pbc $(TEST_FILES)
+	-$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) --run-pbc $(TEST_FILES)
 mopstest :
 	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/mops.pasm
 
@@ -687,11 +689,11 @@ test_imcc :
 	$(MAKE_C) $(IMCC_DIR) test
 
 fulltest_imcc :
-	$(MAKE_C) $(IMCC_DIR) test
-	$(MAKE_C) $(IMCC_DIR) testj
-	$(MAKE_C) $(IMCC_DIR) testP
-	$(MAKE_C) $(IMCC_DIR) testS
-	$(MAKE_C) $(IMCC_DIR) testb
+	-$(MAKE_C) $(IMCC_DIR) test
+	-$(MAKE_C) $(IMCC_DIR) testj
+	-$(MAKE_C) $(IMCC_DIR) testP
+	-$(MAKE_C) $(IMCC_DIR) testS
+	-$(MAKE_C) $(IMCC_DIR) testb
 	$(MAKE_C) $(IMCC_DIR) testr
 
 # For reporting success or failure with different configurations
