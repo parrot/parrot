@@ -37,6 +37,7 @@ classes/managedstruct.pmc
 classes/multiarray.pmc
 classes/nci.pmc
 classes/parrotclass.pmc
+classes/parrotobject.pmc
 classes/perlarray.pmc
 classes/perlhash.pmc
 classes/perlint.pmc
