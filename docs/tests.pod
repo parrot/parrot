@@ -8,9 +8,17 @@ into a new test suite.
 
 =head2 How to write a test
 
-First, find an appropriate file in C<t/op/*.t>, or create a new one.
+First, find an appropriate file in F<t/op/*.t> (for basic ops) or
+F<t/pmc/*.t> (for anything to do with PMCs). If there isn't an
+appropriate file, create one.
 
-Add a test by:
+Near the top of each file, you'll see a line like:
+
+  use Parrot::Test tests => 8;
+
+This sets up the test harness used to assemble and run the tests,
+and lets it know how many tests you plan to run. New tests should be
+added by:
 
   incrementing the number of planned tests.
   putting some code in like this:
