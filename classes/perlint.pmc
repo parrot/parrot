@@ -333,6 +333,15 @@ MMD_PerlInt: {
         else
             overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
     }
+MMD_Integer: {
+        INTVAL a = PMC_int_val(SELF);
+        INTVAL b = PMC_int_val(value);
+        INTVAL c = a + b;
+        if ((c^a) >= 0 || (c^b) >= 0)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
+    }
 MMD_Complex: {
         if (dest != SELF) {
             VTABLE_morph(INTERP, dest, enum_class_Complex);
@@ -349,10 +358,6 @@ MMD_Complex: {
     }
 MMD_BigInt: {
             overflow_p(INTERP, SELF, value, dest, MMD_ADD);
-        }
-MMD_Integer: {
-        VTABLE_set_integer_native(INTERP, dest,
-            PMC_int_val(SELF) + PMC_int_val(value));
         }
 MMD_PerlUndef: {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
@@ -379,35 +384,53 @@ Subtracts C<*value> from the integer and returns the result in C<*dest>.
 
 */
     void subtract (PMC* value, PMC* dest) {
-        INTVAL pmci;
-        int vtype = VTABLE_type(INTERP, value);
-        FLOATVAL valf;
-        FLOATVAL diff;
+MMD_PerlInt: {
+        INTVAL a = PMC_int_val(SELF);
+        INTVAL b = PMC_int_val(value);
+        INTVAL c = a - b;
+        if ((c^a) >= 0 || (c^b) >= 0)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_SUBTRACT_INT);
+    }
+MMD_Integer: {
+        INTVAL a = PMC_int_val(SELF);
+        INTVAL b = PMC_int_val(value);
+        INTVAL c = a - b;
+        if ((c^a) >= 0 || (c^b) >= 0)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_SUBTRACT_INT);
+    }
+MMD_Complex: {
+        if (dest != SELF) {
+            VTABLE_morph(INTERP, dest, enum_class_Complex);
+            VTABLE_set_number_native(INTERP, dest,
+                    PMC_int_val(SELF) -
+                    VTABLE_get_number_keyed_int(INTERP, value, 0));
+            VTABLE_set_number_keyed_int(INTERP, dest, 1,
+                    VTABLE_get_number_keyed_int(INTERP, value, 1));
 
-        /* XXX overflow, MMD */
-        pmci = PMC_int_val(SELF);
-        if (vtype == enum_class_PerlUndef) {
-            VTABLE_set_integer_native(INTERP, dest, pmci);
-            return;
         }
-
-        valf = VTABLE_get_number(INTERP, value);
-        diff = pmci - valf;
-        if (vtype == enum_class_PerlNum) {
-            VTABLE_set_number_native(INTERP, dest, diff);
-            return;
+        else {
+            internal_exception(1, "Complex: unimp sub self");
         }
-        {
-            INTVAL vali = (INTVAL) valf;
-            INTVAL   difi = pmci - vali;
-            if (diff == difi)
-                VTABLE_set_integer_native(INTERP, dest, difi);
-            else {
-                /* TODO BIG* promotion */
-                VTABLE_set_number_native(INTERP, dest, diff);
-            }
-            return;
-
+    }
+MMD_BigInt: {
+            overflow_p(INTERP, SELF, value, dest, MMD_SUBTRACT);
+        }
+MMD_PerlUndef: {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+            "Use of uninitialized value in integer context");
+        VTABLE_set_integer_native(INTERP, dest, PMC_int_val(SELF));
+        }
+MMD_PerlNum: {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_int_val(SELF) - PMC_num_val(value));
+        }
+MMD_DEFAULT: {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_int_val(SELF) - VTABLE_get_number(INTERP, value));
         }
     }
 
