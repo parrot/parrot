@@ -26,7 +26,9 @@ sub read {
 sub _parse {
   my $self = shift;
 
+  my $ln = 0;
   for(@{$self->{text}}) {
+    $ln++;
     if(/^\s*#/) {
       push @{$self->{lines}},{comment=>1,value=>$_};
       next;
@@ -42,7 +44,7 @@ sub _parse {
     # {label}? {instruction} {instruction_parameters}? 
     #
     s/^\s+//;
-    if(s/^(\w+):\s+//) {
+    if(s/^(\w+):\s*//) {
       $line->{label} = $1;
     }
     if(s/^(\w+)\s*//) {
@@ -53,7 +55,8 @@ sub _parse {
     # Collect arbitrary parameters
     #
     while(/\S/) {
-      if(s/^([a-zA-Z][a-zA-Z0-9]+)//) {                # global label
+      my $current_line = $_;
+      if(s/^(\w+)//) {                                 # global label
         push @{$line->{parameter}},{type=>'label_global',value=>$1};
       }
       elsif(s/^(\$\w+)//) {                            # local label
@@ -74,6 +77,10 @@ sub _parse {
       }
       s/^\s+//; # Remove the optional whitespace between parameters
       s/^,//;   # Remove the optional comma
+      s/^#.*$//;# Remove the optional comment
+      if($_ eq $current_line) {
+          die "Unable to parse input at line $ln: $_\n";
+      }
     }
 
     push @{$self->{lines}},$line;
@@ -333,7 +340,7 @@ sub optimize {
   my $lines = $self->{lines};
 
   for(@$lines) {
-    next if $_->{blank} or $_->{comment};
+    next if $_->{blank} or $_->{comment} or !$_->{instruction};
     next if $self->_constant_fold($_);
     next if $self->_strength_reduce($_);
   }
@@ -342,6 +349,7 @@ sub optimize {
   for(my $i = 0; $i<@$lines; $i++) {
     next if $lines->[$i]{blank};
     next if $lines->[$i]{comment};
+    next unless $lines->[$i]{instruction};
     push @foo,$lines->[$i];
     if(@foo==2) {
       $self->_peephole(@foo);
