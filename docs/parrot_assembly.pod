@@ -255,14 +255,21 @@ These ops handle manipulating the data in registers
 
 Create a new PMC of class y stored in PMC register x.
 
-=item iton Nx, Iy
+=item set tx, ty
 
-Copy the integer value from register y to the numeric register x.
+Copy the value of ty into tx, making appropriate conversions.
 
-=item ntoi Ix, Ny
+The following cases provide exceptions to this rule:
 
-Copy the number from register y to register x. Copy is truncated, and
-may be capped if it is too large or small for an integer.
+=item set Px, Py
+
+Copies the pmc pointer in Py into Px, both registers now refer to
+the B<same> pmc.  Use L<clone> to copy pmc contents.
+
+=item clone Px, Py
+
+Performs a "deeper" copy of Py into Px, using the vtable appropriate
+to the class of Py.
 
 =item tostring Sx, ty, Iz
 
