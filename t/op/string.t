@@ -140,7 +140,6 @@ CODE
 fishbone
 OUTPUT
 
-SKIP: { skip("TODO: printing empty string reg segfaults",1);
 output_is(<<"CODE", <<'OUTPUT', "clear_s");
 @{[ set_str_regs( sub {"BOO $_[0]\\n"} ) ]}
 	clear_s
@@ -150,7 +149,6 @@ output_is(<<"CODE", <<'OUTPUT', "clear_s");
 CODE
 done
 OUTPUT
-}
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {

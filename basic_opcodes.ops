@@ -431,7 +431,7 @@ AUTO_OP set_s_sc {
 /* PRINT Sx */
 AUTO_OP print_s {
   STRING *s = STR_REG(P1); 
-  printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+  if (s) printf("%.*s",(int)string_length(s),(char *) s->bufstart);
 }
 
 /* PRINT sc */
