@@ -256,7 +256,7 @@ inline op print(in NUM) {
 op print(in STR) {
   STRING *s = $1;
   if (s && string_length(s)) {
-    printf("%s", string_to_cstring(interpreter, (s)));
+    fwrite(s->strstart, s->strlen, 1, stdout);
   }
   goto NEXT();
 }
@@ -265,7 +265,7 @@ op print(in PMC) {
   PMC *p = $1;
   STRING *s = (p->vtable->get_string(interpreter, p));
   if (s) {
-    printf("%s", string_to_cstring(interpreter, (s)));
+    fwrite(s->strstart, s->strlen, 1, stdout);
   }
   goto NEXT();
 }
@@ -314,7 +314,7 @@ op print(in INT, in STR) {
     default: file = OPCODE_T2PTR(FILE *, $1);
   }
   if (s && string_length(s)) {
-    fprintf(file, "%s", string_to_cstring(interpreter, (s)));
+    fwrite(s->strstart, s->strlen, 1, stdout);
   }
   goto NEXT();
 }
@@ -333,7 +333,7 @@ op print(in INT, in PMC) {
     default: file = OPCODE_T2PTR(FILE *, $1);
   }
   if (s) {
-    fprintf(file, "%s", string_to_cstring(interpreter, (s)));
+    fwrite(s->strstart, s->strlen, 1, stdout);
   }
   goto NEXT();
 }
