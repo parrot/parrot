@@ -4,6 +4,9 @@ use subs qw(fetchvar);
 use vars qw(@builtins @keywords);
 use strict;
 
+my $retcount;
+my $currentexpr;
+
 @builtins=qw( 	abs      	asc      	atn
 	      	cdbl		chr$		cint
 		clng		command$	cos
@@ -25,7 +28,7 @@ use strict;
 		    right$ rnd rtrim$
 		    sadd screen seek setmem sgn sin spc sqr
 			stick str$ strig string$
-		    tab tan timer
+		    tab$ tan timer
 		    ubound ucase$ val varptr varptr$ varseg
 		   );
 @keywords=qw(	access alias any append as
@@ -121,27 +124,157 @@ sub precedence {
 	return 0;  # Not an operator
 
 }
+sub false {
+	my($type)=@_;
+	if ($type eq "N") {
+		return "0.0";
+	} else {
+		return qq{""};
+	}
+}
+my $eqnum=0;
 my %opsubs=(
-	'+' => "EXPR_ADD",
-	'-' => "EXPR_SUB",
-	'*' => "EXPR_MUL",
-	'/' => "EXPR_DIV",
-	'=' => "EXPR_EQ",
-	'<=' => "EXPR_LE",
-	'>=' => "EXPR_GE",
-	'<>' => "EXPR_NE",
-	'<' => "EXPR_LT",
-	'>' => "EXPR_GT",
-	'and' => "AND",
-	'or' => "OR",
-	'not' => "NOT",
-	'xor' => "XOR",
-	'eqv' => "EQV",
-	'imp' => "IMP",
+	'+' => sub { 
+		my ($a1, $a2, $result)=@_;
+		if ($result=~/S/) {
+			return("\tconcat $result, $a2, $a1", $result);
+		} else {
+			return("\t$result = $a1 + $a2", $result);
+		}
+	},
+	'-' => sub {
+		return("\t$_[2] = $_[1] - $_[0]", $_[2]);
+	},
+	'*' => sub {
+		return("\t$_[2] = $_[0] * $_[1]", $_[2]);
+	},
+	'/' => sub {
+		return("\t$_[2] = $_[1] / $_[0]", $_[2]);
+	},
+	'=' => sub {
+		my ($a1, $a2, $result, $op)=@_;
+		$op="eq" unless $op;
+		$result=~s/S/N/;
+		$eqnum++;
+		return(<<CODE, $result); 
+	set $result, 1.0
+	$op $a2, $a1, EQ_$eqnum
+	set $result, 0.0
+EQ_$eqnum: noop
+CODE
+	},
+	'and' => sub {
+		my($a1,$a2,$result,$op,$ot1,$ot2)=@_;
+		$result=~s/S/N/;
+		$eqnum++;
+		$ot1=false($ot1);
+		$ot2=false($ot2);
+		return(<<CODE, $result);
+	set $result, 0.0
+	eq $a1, $ot1, EQ_$eqnum
+	eq $a2, $ot2, EQ_$eqnum
+	set $result, 1.0
+EQ_$eqnum: noop
+CODE
+	},
+	'or' => sub {
+		my($a1,$a2,$result,$op,$ot1,$ot2)=@_;
+		$result=~s/S/N/;
+		$eqnum++;
+		$ot1=false($ot1);
+		$ot2=false($ot2);
+		return(<<CODE, $result);
+	# OR $a1, $a2
+	set $result, 0.0
+	ne $a1, $ot1, EQ_$eqnum
+	ne $a2, $ot2, EQ_$eqnum
+	branch EQ_${eqnum}_false
+EQ_$eqnum: set $result, 1.0
+EQ_${eqnum}_false: noop
+CODE
+	},
+	'not' => sub {
+		my($a1,$a2,$result,$op,$ot1,$ot2)=@_;
+		$result=~s/S/N/;
+		$eqnum++;
+		$ot1=false($ot1);
+		return(<<CODE, $result);
+	# FIXME
+	eq $a1, $ot1, TRUE_${eqnum}
+	set $result, 0.0
+	branch NOT_${eqnum}
+TRUE_${eqnum}: set $result, 1.0
+NOT_${eqnum}: noop
+CODE
+		die "$a1,$a2,$result,$op,$ot1,$ot2\n";
+	},
+	'xor' => sub {
+		my($a1,$a2,$result,$op,$ot1,$ot2)=@_;
+		$result=~s/S/N/;
+		$eqnum++;
+		$ot1=false($ot1);
+		$ot2=false($ot2);
+		return(<<CODE, $result);
+	# XOR $a1, $a2
+	set $result, 0.0
+	eq $a1, $ot1, EQ_${eqnum}_a
+	inc $result
+EQ_${eqnum}_a:
+	eq $a2, $ot2, EQ_$eqnum
+	inc $result
+EQ_$eqnum: ne $result, 2.0, EQ_${eqnum}_end
+	set $result, 0.0
+EQ_${eqnum}_end: noop
+CODE
+	},
+	'eqv' => sub {
+		my($a1,$a2,$result,$op,$ot1,$ot2)=@_;
+		$result=~s/S/N/;
+		$eqnum++;
+		$ot1=false($ot1);
+		$ot2=false($ot2);
+		return(<<CODE, $result);
+	# EQV $a1, $a2
+	set $result, 0.0
+	eq $a1, $ot1, EQ_${eqnum}_a
+	inc $result
+EQ_${eqnum}_a:
+	eq $a2, $ot2, EQ_$eqnum
+	dec $result
+EQ_$eqnum: eq $result, 0.0, EQ_${eqnum}_ok
+	set $result, 0.0
+	branch EQ_${eqnum}_end
+EQ_${eqnum}_ok: set $result, 1.0
+EQ_${eqnum}_end: noop
+CODE
+	},
+	'imp' => sub {
+		my($a1,$a2,$result,$op,$ot1,$ot2)=@_;
+		$result=~s/S/N/;
+		$eqnum++;
+		$ot1=false($ot1);
+		$ot2=false($ot2);
+		($a1,$a2,$ot1,$ot2)=($a2,$a1,$ot2,$ot1);
+		return(<<CODE, $result);
+	# IMP $a1, $a2
+	set $result, 1.0
+	eq $a1, $ot1, EQ_${eqnum}_end
+	ne $a2, $ot2, EQ_${eqnum}_end
+	set $result, 0.0
+EQ_${eqnum}_end: noop
+CODE
+	},
 	'.' => "NULL",
 	'mod' => "MOD",
 	'^' => "POW",	
 );
+%opsubs=(%opsubs, 
+	'<=' => sub { &{$opsubs{"="}}(@_[0..2], "le") },
+	'>=' => sub { &{$opsubs{"="}}(@_[0..2], "ge") },
+	'<>' => sub { &{$opsubs{"="}}(@_[0..2], "ne") },
+	'<' => sub { &{$opsubs{"="}}(@_[0..2], "lt") },
+	'>' => sub { &{$opsubs{"="}}(@_[0..2], "gt") });
+
 sub convert_to_rpn {
 	my(@expr)=@_;
 
@@ -201,7 +334,8 @@ sub fixup {
 		if ($this->[0] eq '-' and $this->[1] eq "PUN") {
 			if (! defined $prev->[0] or $prev->[0] eq "(") {
 				$unary=1;
-			} elsif (precedence($prev->[0],$next->[0])) {
+			} elsif (precedence($prev->[0],$next->[0]) 
+				  and not isarray($prev->[0])) { 
 				$unary=1;
 			} elsif (iskeyword($syms[PREV]) and not isbuiltin($syms[PREV]) ) {
 				$unary=1;
@@ -215,11 +349,28 @@ sub fixup {
 #			print "Argthing $prev->[0]\n";
 			$argthing=1;
 		}
+		if ($this->[0] eq 'not' and $this->[1] ne "STRING") {
+			push(@expr, [ "0.0", "INT"],   # Cheating, making not a binary op
+				[ "not", "PUN"] );
+			next;
+		}
 
 		if ($unary) {
-			push(@expr, [ "-1", "INT" ],
+			push(@expr, [ "-1.0", "INT" ],
 				    [ "*", "PUN"] );
 			next;
+		}
+		# Sadly, IMCC wants INTs to be INTs.
+		if ($this->[1] eq "INT") {
+			$this->[0].=".0";
+		}
+
+		if ($this->[1] eq "BARE") {
+			my %lookup = ( '#' => "_hash",
+				  	'!' => "",
+					'&' => "_amp",
+					'%' => "_percent");
+			$this->[0]=~s/(%|!|\#|&)$/$lookup{$1}/e;
 		}
 
 		push(@expr, $foo[$t]);
@@ -265,64 +416,86 @@ PROCEXP_NOFEED:
 			($syms[CURR] eq ',' and $type[CURR] ne "STRING"));
 		last if ($syms[CURR] eq ';');
 		push(@expr, [ $syms[CURR], $type[CURR] ]);
-		if (hasargs($syms[CURR]) and $syms[NEXT] ne "(") {
+		if ( (isbuiltin($syms[CURR]) or isuserfunc($syms[CURR]))
+			and $syms[NEXT] ne "(" and $type[CURR] ne "STRING") {
 			push(@expr, [ "(", "PUN" ]); # Make sure no-arg funcs have at
 			push(@expr, [ ")", "PUN" ]); # least token parenthesis...
 		}
 		feedme();
 	}
 	barf();
+	$currentexpr=join(' ', map { $_->[0] } @expr);
 	return(@expr);
 }
 sub pushthing {
-	my($code, $toreg, $sym, $type,$lhs)=@_;
+	my($code, $optype, $sym, $type, $oldresult)=@_;
 	my $ts="INVALID";
 
 	if ($type ne "RESULT") {
 		if ($type=~/STRING|INT|FLO|BARE/) {
-			$sym=qq{"$sym"} if $type =~ /BARE|STRING/;
-			push @$code, qq{\tnew $toreg, .PerlHash};
-			push @$code, qq{\tset $toreg\["type"], "$type"};
-			push @$code, qq{\tset $toreg\["value"], $sym};
-		}  elsif ($type eq "STARTARG") {
+			$$optype="N";
+			if ($type=~/STRING/) {
+				$$optype="S";
+				$sym=qq{"$sym"};
+			}
+			if ($type=~/BARE/) {
+				if ($sym=~s/\$$/_string/) {	
+					$$optype="S";
+				} else {
+					$$optype="N";
+				}
+				#print "Registering $sym\n";
+				$main::code{$main::seg}->{declarations}->{$sym}=1;
+			}
+			return $sym;
+		} elsif ($type eq "STARTARG") {
 			return;
 		} else {
-			die "Bad type for $sym?";
+			die "Bad type for $sym? in expression '$currentexpr'";
 		}
 	} else {
-		if (@$code[-1] eq "\tpush P9, $toreg") {
-			pop @$code;
-		} else {
-			push @$code, qq{\tpop $toreg, P9};
-		}
+		return $oldresult;
 	}
 }
 sub pushargs {
-	my($code,$work)=@_;
+	my($code,$optype,$work)=@_;
 
 	return unless @$work;
+	my @args=();
 
 #	print "Work has ", scalar @$work, " things on it.\n";
 	while($$work[-1]->[0] ne "STARTARG") {
 		my $item=pop @$work;
 		if ($item->[1] eq "RESULT") {
-			push @$code, qq{\tpop P0, P9\t# (arg) Result of $item->[0]};
-			push @$code, qq{\tpush P8, P0};
+			my $a1=pushthing($code, $optype, @$item);
+			push @args, [ $a1, $item->[0] ];
 		} else {
-			pushthing($code, "P1", @$item);
-			push @$code, qq{\tpush P8, P1\t# (arg) $item->[0]};
+			my $a1=pushthing($code, $optype, @$item);
+			push @args, [ $a1, $item->[0] ];
 		}
-
+	}
+	foreach(@args) {
+		push @$code, qq{\t.arg $_->[0]\t\t# $_->[1]};
 	}
 	pop @$work;  # REmove startarg tag...
+	return scalar @args;
 }
-sub generate_code {
+sub optype_of {
+	my($func)=@_;
+	if ($func=~/\$$/) {
+		return "S";
+	} else {
+		return "N";
+	}
+}
+sub generate_code {   # Will return a result register, or something.
 	my($lhs,@stream)=@_;
 	my(@code,@work);
 
 	my $oneop=0;
 	my $result;		# Result from prior operation
-	push @code, "\tbsr EXPRINIT\t# Set P9 properly";
+	my $optype="N";
+	my $result="";
 	foreach my $token (@stream) {
 		my($sym,$type,$op)=@$token;
 		#print "Dealing with $sym $type $op\n";
@@ -333,71 +506,160 @@ sub generate_code {
 		}
 		next if ($sym eq ",");  # Commas get ignored, args to stack
 
-		if (hasargs($sym)) {
-			#print "It has args?\n";
-			pushargs(\@code, \@work);
+		if (isarray($sym) and $lhs) {
+			my $ac=pushargs(\@code, \$optype, \@work);
+			my $extern=$sym;
+			$optype=optype_of($extern);
+			push @code, qq{\t.arg $ac\t\t\t# argc};
+			push @code, qq{\tINSERT NEW VALUE HERE};
+			push @code, qq{\t.arg "$extern"\t\t# array name};
+			push @code, "\tcall _ARRAY_ASSIGN";
+			return("~Array", "$optype", @code);
+		} elsif (hasargs($sym)) {
+			my $ac=pushargs(\@code, \$optype, \@work);
+			my $extern=$sym;
+			$optype=optype_of($extern);
 			if (isarray($sym)) {
-				push @code, qq{\tset S0, "$sym"};
-				push @code, "\tbsr ARRAY_LOOKUP";
-				push @work, [ "result of $sym()", "RESULT" ];
-				push @code, "\tpush P9, P0\t# Result of $sym()";
+				push @code, qq{\t.arg $ac\t\t\t# argc};
+				push @code, qq{\t.arg "$extern"\t\t# array name};
+				push @code, "\tcall _ARRAY_LOOKUP_$optype";
+				push @code, "\t.result \$$optype$retcount";
+				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 			} elsif (isbuiltin($sym)) {
-				$_=$sym;
-				s/\$//g; tr/a-z/A-Z/;
-				push @code, "\tbsr REVERSEARGS";
-				push @code, qq{\tbsr BUILTIN_$_};
-				push @work, [ "result of $sym()", "RESULT" ];
-				push @code, "\tpush P9, P6\t# Result of $sym() ";
+				$extern=~s/\$/_string/g; $extern=~tr/a-z/A-Z/;
+				push @code, qq{\t.arg $ac\t\t\t# argc};
+				push @code, qq{\tcall  _BUILTIN_$extern};
+				push @code, "\t.result \$$optype$retcount";
+				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 			} else {
-				push @code, qq{set S0, "$sym"};
-				push @code, "\tbsr REVERSEARGS";
-				push @code, "\tbsr USERFUNC";
-				push @work, [ "result of $sym()", "RESULT" ];
-				push @code, "\tpush P9, P6\t# Result of $sym()";
+				$extern=~s/\$/_string/g; $extern=~tr/a-z/A-Z/;
+				push @code, qq{\t.arg $ac\t\t\t# argc};
+				push @code, qq{\tcall  _USERFUNC_$extern};
+				push @code, "\t.result $optype$retcount";
+				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 			}
+			$retcount++;
 		} else {
 			my($op1,$op2)=(pop @work, pop @work);
-
-			pushthing(\@code, "P6", @$op1);
-			pushthing(\@code, "P7", @$op2);
+			my($a1, $a2, $ot1, $ot2);
+			$ot1=$ot2=$optype;
+			$a1=pushthing(\@code, \$ot1, @$op1);
+			$a2=pushthing(\@code, \$ot2, @$op2);
+			$optype=$ot2;
 			if (exists $opsubs{$sym}) {
-				push @code, "\tbsr $opsubs{$sym}";
+				if (! ref $opsubs{$sym}) {
+					die "No op code yet for $sym\n";
+				} else {
+					my($code, $return)=&{$opsubs{$sym}}($a1, $a2, "\$$optype$retcount", "", $ot1, $ot2);
+					($optype)=$return=~/([N|S])/;
+					push @code, $code;
+				}
 			} else {
 				die "Op $sym not implemented?";
 			}
-			push @work, [ "($op1->[0] $sym $op2->[0])", "RESULT" ];
-			push @code, "\tpush P9, P6";
+			push @work, [ "($op1->[0] $sym $op2->[0])", "RESULT", "\$$optype$retcount" ];
+			$retcount++;
 		}
 	}
+
 	if (@work) {
 		$_=pop @work;
-		pushthing(\@code, "P6", $_->[0], $_->[1],$lhs);
-		push @code, "** Dummy **";
+		$result=pushthing(\@code, \$optype, @$_);
 	}
-	pop @code;
-	push @code, "\t# Result is in P6";
 
-	s/$/\n/ for @code;
+	return( $result, $optype, @code );
+}
+sub build_assignment {
+	my($left, $leftexpr, $right, $rightexpr, $righttype)=@_;
+	my(@ass);
 
-	return @code;
+	if ($left =~ /^\w+$/) {
+		if ($left =~ /(_percent|_amp)$/) {
+			@ass=(
+				@$rightexpr,
+				"\tset \$I0, $right\t# Truncate",
+				"\tset \$N0, \$I0",
+				"\t$left = \$N0",
+			);
+		} else {
+			# Simple a=expr case.
+			@ass=(
+				@$rightexpr,
+				"\t$left = $right",
+				
+			);
+		}
+	} else {
+		s/INSERT NEW VALUE HERE/.arg $right\t\t\t# Value to receive/g for @$leftexpr;
+		s/--TYPE--/$righttype/g for @$leftexpr;
+
+		@ass=(
+			@$rightexpr,
+			@$leftexpr,
+		);
+	}
+
+	return @ass;
 }
 sub EXPRESSION {
 	my(%opts);
 	%opts=%{$_[0]} if @_;
-	
-	my(@expr, @stream);
-	@expr=get_expression(%opts);	# Get expression tokens
-	@expr=fixup(@expr);		# Repair unary -, functions, etc...
+	my(@expr, @stream, @left, $whole);
+	my($assignto, $result);
+	$retcount=0;
+	$whole="";
+	my $type="";
 
-#	print "Evaluating: ";foreach(@expr) { print $_->[0];" " } print "\n";
-#	foreach(@expr) { print $_->[1]," " } print "\n";
+	if ($opts{assign}) {
+		#print STDERR "Assign\n";
+		$opts{lhs}=1;
+		@expr=get_expression(%opts);	# Get expression tokens
+		$whole.=join(' ', map { $_->[0] } @expr);
+		@expr=fixup(@expr);		# Repair unary -, functions, etc...
+		@stream=convert_to_rpn(@expr);	# Get infix into RPN
+		($assignto, $type, @left)=generate_code($opts{lhs},@stream);	# Generate PASM code stream
+		feedme();  # Eat the =
+		$whole.=" = ";
 
-	@stream=convert_to_rpn(@expr);	# Get infix into RPN
+		$opts{lhs}=0;
+		@expr=get_expression(%opts);	# Get expression tokens
+		$whole.=join(' ', map { $_->[0] } @expr);
+		@expr=fixup(@expr);		# Repair unary -, functions, etc...
+		@stream=convert_to_rpn(@expr);	# Get infix into RPN
+		($result,$type,@stream)=generate_code(0, @stream);	# Generate PASM code stream
 
-#	print "Evaluation stream: "; foreach(@stream) {	print $_->[0]," "; } print "\n";
-
-	@stream=generate_code($opts{lhs},@stream);	# Generate PASM code stream
-
-	return(@stream);
+		@stream=build_assignment($assignto, \@left, $result, \@stream, $type);
+		$result=$assignto;
+	} elsif ($opts{stuff}) {
+		#print STDERR "Stuff\n";
+		$opts{lhs}=1;
+		feedme();
+		# Do the left-hand side
+		@expr=get_expression(%opts);	# Get expression tokens
+		#print STDERR Dumper(\@expr);
+		$whole.=join(' ', map { $_->[0] } @expr);
+		@expr=fixup(@expr);		# Repair unary -, functions, etc...
+		@stream=convert_to_rpn(@expr);	# Get infix into RPN
+		#print STDERR "Stream:", join(' ', map { $_->[0] } @stream), "\n";
+		($assignto, $type, @left)=generate_code($opts{lhs},@stream);	# Generate PASM code stream
+		#print STDERR "Left: @left \n";
+		if ($opts{choose}) {
+			$opts{stuff}=~s/X/$type/g;
+		}
+		# The rhs was passed in
+		@stream=build_assignment($assignto, \@left, $opts{stuff}, [], $type);
+		
+		$result=$assignto;
+	} else {
+		#print STDERR "Extract\n";
+		@expr=get_expression(%opts);	# Get expression tokens
+		$whole.=join(' ', map { $_->[0] } @expr);
+		@expr=fixup(@expr);		# Repair unary -, functions, etc...
+		@stream=convert_to_rpn(@expr);	# Get infix into RPN
+		($result,$type,@stream)=generate_code(0, @stream);	# Generate PASM code stream
+	}
+	s/$/\n/ for @stream;
+	@stream=("\t#\n", "\t# Evaluating   $whole\n", "\t# Result in $result of type $type\n", @stream);		
+	return($result, $type, @stream);
 }
 1;

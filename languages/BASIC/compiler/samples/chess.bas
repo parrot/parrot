@@ -131,7 +131,19 @@
 3300 IF MZ = 1 THEN 2000
 3500 REM: coup de l'ordinateur  ' Computer's move
 3520 GOSUB 8800			' Initilaize the move tree
+_STARTASM
+ 	time I0
+ 	print "Start time: "
+ 	print I0
+ 	print "\n"
+_ENDASM
 3530 GOSUB 10000		' Seek?
+_STARTASM
+ 	time I0
+ 	print "End time: "
+ 	print I0
+ 	print "\n"
+_ENDASM
 3540 IF Z2 = 0 THEN 3650
 3545 IF W = 1 THEN 3660		' Stalemate
 3550 IF W = -32766 THEN 3630	' Player wins?
@@ -490,7 +502,7 @@
 12220 REM
 12230 BA(FA + 1) = BA(FA + 1) + 1
 12240 BL(FA + 1, J) = BL(FA + 1, J) + 1
-12250 bogus=FA * (BV(J)) * (3.5 - FA * (5.5 - I)):w=w+bogus  ' Bug here.  W/o parens, runs amok
+12250 w=w+FA * (BV(J)) * (3.5 - FA * (5.5 - I))
 12260 GOTO 12420
 12270 REM
 12280 IF (I - 5.5) * FA <> 2.5 THEN 12300
@@ -512,25 +524,25 @@
 12440 REM
 12460 FA = SGN(M(T))
 12470 IF FA = 0 THEN 12500
-12480 bogus=INT(M(T) * BA(FA + 1) / (BA(FA + 1) + 1) * (M0 - M) * .0001):w=w+M(T)+bogus
+12480 w=w+M(T)+INT(M(T) * BA(FA + 1) / (BA(FA + 1) + 1) * (M0 - M) * .0001)
 12500 REM
-12510 bogus=INT(ZT(KR(2), KL(2)) * (43000 - M + M(T)) * .001): w=w+bogus
-12520 bogus=INT(ZT(KR(0), KL(0)) * (43000 - M - M(T)) * .001): w=w-bogus
-12550 bogus=(T7(2) * T7(2) * 12):w=w+bogus
-12560 bogus=(T7(0) * T7(0) * 12):w=w-bogus
+12510 w=w+INT(ZT(KR(2), KL(2)) * (43000 - M + M(T)) * .001)
+12520 w=w-INT(ZT(KR(0), KL(0)) * (43000 - M - M(T)) * .001)
+12550 w=w+(T7(2) * T7(2) * 12)
+12560 w=w-(T7(0) * T7(0) * 12)
 12590 FOR I = 1 TO 8
 12600 FOR J = 0 TO 2
 12610 FA = J - 1
 12620 IF FA = 0 THEN 12880
 12630 IF BL(J, I) = 0 THEN 12830
-12640 bogus=FA * (BL(J, I) - 1) * 8:w=w-bogus
+12640 w=w-FA * (BL(J, I) - 1) * 8
 12650 IIS = 0
 12660 IF BL(J, I - 1) > 0 THEN 12710
 12670 IF BL(J, I + 1) > 0 THEN 12710
 12690 W = W - FA * 20
 12700 IIS = 1
 12710 IF BL(2 - J, I) > 0 THEN 12880
-12730 bogus=FA * TL(2 - J, I) * TL(2 - J, I) * 3:w=w-bogus
+12730 w=w-FA * TL(2 - J, I) * TL(2 - J, I) * 3
 12740 IF BL(2 - J, I - 1) > 0 THEN 12790
 12750 IF BL(2 - J, I + 1) > 0 THEN 12790
 12770 W = W + FA * 18
@@ -540,12 +552,10 @@
 12810 W = W - FA * 10
 12820 GOTO 12890
 12830 IF BL(2 - J, I) > 0 THEN 12880
-12850 bogus=TL(2, I) * TL(2, I) * 8:w=w+bogus
-12860 bogus=TL(0, I) * TL(0, I) * 8:w=w-bogus
+12850 w=w+TL(2, I) * TL(2, I) * 8
+12860 w=w-TL(0, I) * TL(0, I) * 8
 12870 GOTO 12890
 12880 NEXT J
 12890 NEXT I
 12900 RETURN
 15000 END
-
-

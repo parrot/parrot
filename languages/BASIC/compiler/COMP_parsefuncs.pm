@@ -8,6 +8,8 @@ use vars qw( %arrays );
 use vars qw( $funcname $subname );
 use vars qw( %labels $branchseq @selects);
 use vars qw( @data $sourceline );
+use vars qw( %code $debug );
+
 
 my @fors=();
 my @whiles=();
@@ -100,52 +102,52 @@ my $inputcounts=0;
 sub input_read_assign {
 	my($prompt,$filedesc,$noreloop)=@_;
 	my @values=();
+
+	push @{$code{$seg}->{code}}, $prompt; 
+	my $sf=1;
+	if ($filedesc) {
+		# FIXME, P17 is still global
+		push @{$code{$seg}->{code}}, qq{\tset I1, P17["$filedesc"]\n};
+		push @{$code{$seg}->{code}}, qq{\teq I1, 0, ERR_BADF\n};
+		$sf=0;
+	} else {
+		push @{$code{$seg}->{code}}, "\t.arg $filedesc   # STDIN\n";
+	}
+
+	push @{$code{$seg}->{code}},<<INP1;
+	call _READLINE
+	.result \$S0
+	.arg $sf
+	.arg \$S0
+	call _SPLITLINE
+	.result \$P99
+	set \$I0, \$P99
+INP1
+
+	# Bug here...FIXME.. I'm using $vars before it's set.
+	$vars=1;
+	if ($noreloop) {
+		push @{$code{$seg}->{code}}, "\tne \$I0, $vars, ERR_INPFIELDS\n";
+	} else {
+		push @{$code{$seg}->{code}}, "\tne \$I0, $vars, INPUT_$inputcounts  # Re-prompt\n";
+	}
+
 	$loop=0;
+	barf();		# We're too far in already...
 	while($type[CURR] !~ /COMP|COMM|STMT/) {
 		die if $loop++>20;
-		@lhs=EXPRESSION({ lhs => 1});
-		push @values, [ @lhs ];
+		push @{$code{$seg}->{code}}, "\tpop \$S99, \$P99\n";
+		push @{$code{$seg}->{code}}, "\tset \$N99, \$S99\n";
+
+		my($result, $type, @code)=EXPRESSION({ stuff => "\$X99", choose => 1 });
+		push @{$code{$seg}->{code}}, "@code";
 		feedme();
 		if ($syms[CURR] eq ",") {
 			feedme();
 			next;
 		}
 	}
-	die "No input values" unless @values;
-	my $vars=@values;
-	print CODE $prompt;
-	my $sf=1;
-	if ($filedesc) {
-		print CODE qq{\tset I1, P17["$filedesc"]\n};
-		print CODE qq{\teq I1, 0, ERR_BADF\n};
-		$sf=0;
-	} else {
-		print CODE "\tset I1, $filedesc   # STDIN\n";
-	}
-	
-	print CODE<<INP1;
-	bsr READLINE
-	set I0, $sf
-	bsr SPLITLINE   # Array of values from input
-	set I0, P1
-INP1
-	if ($noreloop) {
-		print CODE "\tne I0, $vars, ERR_INPFIELDS\n";
-	} else {
-		print CODE "\tne I0, $vars, INPUT_$inputcounts  # Re-prompt\n";
-	}
 
-	print CODE "\tset P12, P1\n";
-	foreach my $expr (reverse @values) {
-	 	print CODE <<INP2;
-@{$expr}
-	pop P0, P12
-	set P2, P6
-	set P6, P0	      # Swap P0, P6
-	set P0, P2
-	bsr ASSIGNMENT        # P0 = P6
-INP2
-	}
 }
 sub parse_input {
 	feedme();
@@ -185,10 +187,10 @@ sub parse_input {
 
 my $ons=0;
 sub parse_on {
-	my(@expr)=EXPRESSION;  # The switch...
+	my($result, $type, @code)=EXPRESSION;  # The switch...
 	feedme();
 	my $branch=$syms[CURR];  # goto or gosub
-	print CODE "\t# On X $branch...\n";
+	push @{$code{$seg}->{code}}, "\t# On X $branch...\n";
 	feedme();
 	$loop=0;
 	@onlab=();
@@ -203,31 +205,32 @@ sub parse_on {
 		push(@onlab, $syms[CURR]);
 		feedme();
 	}
-	print CODE<<ON;
-@expr	bsr DEREF
-	bsr UNSTUFF	# Sets S0/I0/N0 and S2 (type)
-	set S1, S2
-	bsr MAKEINT
-	gt I0, 255, ERR_ON_RANGE
-	lt I0,   0, ERR_ON_RANGE	
+	push @{$code{$seg}->{code}},<<ON;
+@code	lt $result, 0.0, ONERR_${ons}
+	gt $result, 255.0, ONERR_${ons}
+	branch ONOK_${ons}
+ONERR_${ons}:
+	call _ERR_ON_RANGE
+	end
+ONOK_${ons}:
 ON
 	$i=1;
 	for my $jumps (@onlab) {
-		print CODE "\tne I0, $i, ON_${ons}_$i\n";
+		push @{$code{$seg}->{code}}, "\tne $result, $i.0, ON_${ons}_$i\n";
 		if ($branch eq "gosub") {
-			print CODE qq{\tbsr $labels{$jumps}\t# $branch $jumps\n};
-			print CODE qq{\tne S0, "", RUNTIME_JUMP\n};
-			print CODE qq{\tbranch ON_END_$ons\n};
+			push @{$code{$seg}->{code}}, qq{\tbsr $labels{$jumps}\t# $branch $jumps\n};
+			push @{$code{$seg}->{code}}, qq{\tne S0, "", RUNTIME_JUMP\n};
+			push @{$code{$seg}->{code}}, qq{\tbranch ON_END_$ons\n};
 		} elsif ($branch eq "goto") {
-			print CODE qq{\tbranch $labels{$jumps}\t# $branch $jumps\n};
+			push @{$code{$seg}->{code}}, qq{\tbranch $labels{$jumps}\t# $branch $jumps\n};
 		} else {
 			die "Illegal branch type, only GOSUB/GOTO allowed";
 		}
-		print CODE "ON_${ons}_$i:\n";
+		push @{$code{$seg}->{code}}, "ON_${ons}_$i:\n";
 		$i++;
 	}
 	if ($branch eq "gosub") {
-		print CODE "\tnoop\nON_END_${ons}:\n";
+		push @{$code{$seg}->{code}}, "\tnoop\nON_END_${ons}:\n";
 	}
 	$ons++;
 }
@@ -241,14 +244,13 @@ sub parse_randomize {
 	set I12, S0
 PROMPTRND
 	} else {
-		@e=EXPRESSION();
-		print CODE<<COMPRND;
-@e	bsr DEREF
-	bsr UNSTUFF
-	set S1, S2
-	bsr MAKEINT
-	set I12, I0
-COMPRND
+		($result, $type, @code)=EXPRESSION();
+		push @{$code{$seg}->{code}},<<EOR;
+@code	find_global \$P0, "RANDSEED"
+	set \$I0, $result
+	set \$P0["value"], \$I0
+	store_global "RANDSEED", \$P0
+EOR
 		feedme();
 	}
 }
@@ -402,7 +404,11 @@ sub fdprint {
 		print CODE qq{\tset I1, P17["$fd"]\n};
 		print CODE qq{\tbsr PRINTLINE\n};
 	} else {
-		print CODE qq{\tset S3,"$string"\n\tbsr DISP_SCREEN\n};
+		push @{$code{$seg}->{code}}, <<PRINT;
+	.arg "$string"
+	.arg 1
+	call _BUILTIN_DISPLAY
+PRINT
 	}
 
 }
@@ -411,6 +417,7 @@ sub parse_print {
 	my $expr=0;
 	my $c=0;
 	my $fd="";
+	my ($result, $type, @CODE);
 	feedme();
 	if ($syms[CURR] eq "#") { 
 		feedme();
@@ -451,11 +458,13 @@ sub parse_print {
 			next;
 		}
 		last if $expr;
-		print CODE EXPRESSION({nofeed => 1});
+		($result, $type, @code)=EXPRESSION({nofeed => 1});
 		feedme();
-		print CODE "\tbsr DEREF\n";
-		print CODE qq{\tset S1, "$fd"\n};  # Either blank or an FD.
-		print CODE "\tbsr DISPLAY_EXPRESSION\n";
+		push @{$code{$seg}->{code}}, <<PRINT;
+@code	.arg $result
+	.arg 1
+	call _BUILTIN_DISPLAY
+PRINT
 		#print "After Expression have $type[CURR] $syms[CURR]\n";
 		$eol=0;
 		$expr=1;
@@ -467,20 +476,19 @@ sub parse_print {
 	barf();
 }
 sub parse_read {
-	feedme();
 	while($type[CURR] !~ /COMP|COMM|STMT/) {
-		@lhs=EXPRESSION({ lhs => 1});
-		feedme();
-		print CODE<<EOASS;
-@lhs
-	bsr READ	      # Read into P0
-	set P2, P6
-	set P6, P0	      # Swap P0, P6
-	set P0, P2
-	bsr ASSIGNMENT        # P0 = P6
+		push @{$code{$seg}->{code}}, <<EOASS;
+	call _READ
+	.result \$S99
+	set \$N99, \$S99
+EOASS
+	($result, $type, @code)=EXPRESSION({ stuff => '$X99', choose => 1 });
+	feedme();
+	push @{$code{$seg}->{code}}, <<EOASS;
+@code
 EOASS
 		if ($syms[CURR] eq ",") {
-			feedme();
+			#feedme();
 			next;
 		}
 	}
@@ -488,19 +496,15 @@ EOASS
 sub parse_swap {
 	my(@f, @s);
 	feedme();
-	@f=EXPRESSION({lhs => 1});
+	my($leftres, $lefttype, @left)=EXPRESSION({lhs => 1});
 	feedme();
 	die "Expected ',': $syms[CURR]" unless $syms[CURR] eq ",";
 	feedme();
-	@s=EXPRESSION({lhs => 1});
-	print CODE<<SWAP;
-	# The swap!
-	# P0=P6
-@f	
-	set P12, P6	# Store me.
-@s	
-	set P13, P6	# Me too
-	bsr SWAP
+	my($rightres, $righttype, @right)=EXPRESSION({lhs => 1});
+	push @{$code{$seg}->{code}}, <<SWAP;
+	\$${righttype}99 = $rightres
+	$rightres = $leftres
+	$leftres = \$${righttype}99
 SWAP
 }
 
@@ -529,10 +533,8 @@ OUTDATA:while($type[CURR] !~ /COMP|COMM|STMT/) {
 				$syms[CURR]="-$syms[CURR]";
 			}
 		}
-		if ($type[CURR] =~ /STRING|BARE/) {
+		if ($type[CURR] =~ /STRING|BARE|INT|FLO/) {
 			push @ld, { type => "STRING", value => qq{"$syms[CURR]"} };
-		} elsif ($type[CURR] =~ /INT|FLO/ ) {
-			push @ld, { type => $type[CURR], value => $syms[CURR] };
 		} elsif ($type[CURR] eq "PUN") {
 			my $s=$syms[CURR];
 			while(1) {
@@ -558,12 +560,12 @@ sub parse_restore {
 	if ($type[NEXT] eq "BARE" or $type[NEXT] eq "INT") {
 		feedme();
 		create_label();
-		print CODE qq{\tset S0, "$labels{$syms[CURR]}"\n};
+		push @{$code{$seg}->{code}}, qq{\t.arg "$labels{$syms[CURR]}"\n};
 	} else {
-		print CODE qq{\tset S0, ""\n};
+		push @{$code{$seg}->{code}}, qq{\t.arg ""\n};
 	}
 	feedme();
-	print CODE "\tbsr RESTORE\n";
+	push @{$code{$seg}->{code}}, "\tcall _RESTORE\n";
 }
 
 sub parse_exit {
@@ -765,22 +767,24 @@ ENDCASE
 
 
 
-
+my $false;
 my $whilecounter=0;
 sub parse_while {
 	$whilecounter++;
 	push(@whiles, { jump => $whilecounter });
-	print CODE "WHILE_$whilecounter:\n";
-	print CODE EXPRESSION;
-	print CODE<<BRANCH
-	bsr TRUTH
-	eq I1, 0, AFTERWHILE_$whilecounter
+	my($result, $type, @code)=EXPRESSION();
+	$false="0.0";
+	$false=qq{""} if ($type eq "S");
+
+	push @{$code{$seg}->{code}}, "WHILE_$whilecounter:\n";
+	push @{$code{$seg}->{code}}, <<BRANCH;
+@code	eq $result, $false, AFTERWHILE_$whilecounter
 BRANCH
 }
 sub parse_wend {
 	$_=pop(@whiles);
 	$_=$_->{jump};
-	print CODE<<LOOPUP;
+	push @{$code{$seg}->{code}}, <<LOOPUP;
 	branch WHILE_$_
 AFTERWHILE_$_:
 LOOPUP
@@ -789,46 +793,48 @@ my $docounter=0;
 sub parse_do {
 	$docounter++;
 	if ($syms[NEXT] eq "until" or $syms[NEXT] eq "while") {
+		my $false="0.0";
 		feedme();  # At the while/until
 		my $which=$syms[CURR];
-		print CODE "DO_$docounter:\n";
-		print CODE EXPRESSION, "\tbsr TRUTH\n";
+		push @{$code{$seg}->{code}}, "DO_$docounter:\n";
+		my($result, $type, @code)=EXPRESSION();
+		$false=qq{""} if $type eq "S";
 		if ($which eq "while") {
-			$_="eq I1, 0, AFTERDO_$docounter";
+			$_="@code eq $result, $false, AFTERDO_$docounter";
 		} else {
-			$_="eq I1, 1, AFTERDO_$docounter";
+			$_="@code ne $result, $false, AFTERDO_$docounter";
 		}
-		print CODE "\t$_\n";
+		push @{$code{$seg}->{code}}, "\t$_\n";
 		push(@dos, { jump => $docounter, needstmt => 0 });
 	} else {
-		print CODE "DO_$docounter:\n";
+		push @{$code{$seg}->{code}}, "DO_$docounter:\n";
 		push(@dos, { jump => $docounter, needstmt => 1 });
 	}
 }
 sub parse_goto {
 	feedme;
 	create_label();
-	print CODE "\tbranch $labels{$syms[CURR]}\t# Goto $syms[CURR]\n";
+	push @{$code{$seg}->{code}}, "\tbranch $labels{$syms[CURR]}\t# Goto $syms[CURR]\n";
 }
 sub parse_gosub {
 	feedme;
 	create_label();
-	print CODE<<GOSUB;
+
+	push @{$code{$seg}->{code}}, <<GOSUB;	
 	bsr $labels{$syms[CURR]}\t# GOSUB $syms[CURR]
-	ne S0, "", RUNTIME_JUMP
+	ne JUMPLABEL, "", RUNTIME_JUMP
 GOSUB
 }
 sub parse_return {
 	if ($type[NEXT] ne "BARE") {
-		print CODE<<RETURN1;
-	set S0, ""
+		push @{$code{$seg}->{code}}, <<RETURN1;
+	set JUMPLABEL, ""
 	ret
 RETURN1
 	} else {
 		feedme();   # Special "Return Label"
-		create_label();
-		print CODE<<RETURN2;
-	set S0, "$labels{$syms[CURR]}"  # Return $syms[CURR]
+		push @{$code{$seg}->{code}}, <<RETURN2;
+	set JUMPLABEL, "$labels{$syms[CURR]}"  # Return $syms[CURR]
 	ret
 RETURN2
 	}
@@ -836,24 +842,26 @@ RETURN2
 sub parse_loop {
 	my $do=pop @dos;
 	if ($do->{needstmt} and not ( $syms[NEXT]=~/while|until/ ) ) {
-		print CODE "\nbranch DO_$do->{jump}\t# Unconditional\n";
-		print CODE "AFTERDO_$do->{jump}:\n";
+		push @{$code{$seg}->{code}}, "\nbranch DO_$do->{jump}\t# Unconditional\n";
+		push @{$code{$seg}->{code}}, "AFTERDO_$do->{jump}:\n";
 		return;
 	}
 	if ($do->{needstmt}) {
+		my $false="0.0";
 		feedme();
 		my $which=$syms[CURR];
-		print CODE EXPRESSION, "\tbsr TRUTH\n";
+		my($result, $type, @code)=EXPRESSION();
+		$false=qq{""} if $type eq "S";
 		if ($which eq "while") {
-			$_="eq I1, 1, DO_$do->{jump}";
+			$_="@code ne $result, $false, DO_$do->{jump}";
 		} else {
-			$_="eq I1, 0, DO_$do->{jump}";
+			$_="@code eq $result, $false, DO_$do->{jump}";
 		}
-		print CODE "\t$_\n";
+		push @{$code{$seg}->{code}}, "\t$_\n";
 	} else {
-		print CODE "\tbranch DO_$do->{jump}\n";
+		push @{$code{$seg}->{code}}, "\tbranch DO_$do->{jump}\n";
 	}
-	print CODE "AFTERDO_$do->{jump}:\n";
+	push @{$code{$seg}->{code}}, "AFTERDO_$do->{jump}:\n";
 }
 
 sub parse_type {
@@ -1052,18 +1060,12 @@ DIMTYPE
 				}
 			}
 			$arrays{$var}=1;
-			print CODE<<DIMARR;
+			push @{$code{$seg}->{code}}, <<DIMARR;
 	# Set aside storage for Array $var
-	set P1, P10[I25]
-	set P0, P1["ARRAY"]
-	new P1, .PerlHash
-	new P2, .PerlHash
-	set P2["_type"], "$type"
-	set P2["type"], "ARRAY"
-$ut	set P2["elements"], P1
-	new P1, .PerlArray
-	set P2["keys"], P1
-	set P0["$var"], P2
+	\$P0 = new PerlHash
+	find_global \$P1, "BASICARR"
+	set \$P1["$var"], \$P0
+	store_global "BASICARR", \$P1
 	#
 DIMARR
 			if ($syms[NEXT] eq ",") {
@@ -1077,86 +1079,46 @@ DIMARR
 			die "Unknown dim type: $syms[CURR] at source line $sourceline";
 		}
 }
-my $forcounter=0;
+my $forloop=0;
 sub parse_for {   # for var = start to finish [step increment]
-	feedme();
-	my $counter=$syms[CURR];
-	feedme();
-	die "Expected = at source line $sourceline" if ($syms[CURR] ne "=");
-	$counttype=typeof($counter);
-	die "Only INT or FLO allowed at $sourceline" unless ($counttype =~ /INT|FLO/);
-	
-	my @start=EXPRESSION;
-	feedme();
-	die "Syntax err in for: $syms[CURR] at source line $sourceline" unless $syms[CURR] eq "to";
-	my @end=EXPRESSION;
-	feedme();
-	
-	my @step=(
-qq{	new P6, .PerlHash
-},qq{	set P6["type"], "INT"
-},qq{	set P6["value"], 1
-},);
-	if ($syms[CURR] eq "step") {
-		@step=EXPRESSION;
-	}
-	$ocounter=$counter;
-	$counter=~s/%&!\#//g;
-	$forcounter++;
-	push(@{$fors[$scopes]}, { jump => $forcounter, variable => $ocounter} );
-	
-	print CODE<<EOFOR;
-	# Set up for loop $counter.  Pre-evaluate everything.
-@start	bsr DEREF
-	set P0, P11[I25]
-	set P1, P0["FOR"]
-	set P0, P1["$counttype"]
-	new P2, .PerlHash
-	set P2["start"], P6
-	set P0["$counter"], P2
-	
-@end	bsr DEREF
-	set P0, P11[I25]
-	set P1, P0["FOR"]
-	set P0, P1["$counttype"]
-	set P2, P0["$counter"]
-	set P2["finish"], P6
-	
-@step	bsr DEREF
-	set P0, P11[I25]
-	set P1, P0["FOR"]
-	set P0, P1["$counttype"]
-	set P2, P0["$counter"]
-	set P2["step"], P6
+	my($endexpr, $stepexpr, @stepcode);
 
-	# Set initial values
- 	new P0, .PerlHash
- 	set P0["type"], "BARE"
- 	set P0["value"], "$counter" # ?!?
- 	
- 	set P1, P11[I25]	# Fetch start
-	set P2, P1["FOR"]
-	set P1, P2["$counttype"]
-	set P2, P1["$counter"]
-	set P2["variable"], P0  # Save me for later!
-	set P6, P2["start"]
-	bsr ASSIGNMENT          # P0 = P6
+	$forloop++;
+	feedme();
+
+	# The initial assignment.  Type of course will be a float.
+	($result, $type, @code)=EXPRESSION({ lhs => 1, assign => 1});
+	push @{$code{$seg}->{code}}, @code;
+
+	die "TO expected at source line $sourceline" unless ($syms[CURR] ne "to");
+
+	feedme();
+	# The destination value
+	($endexpr, $type, @code)=EXPRESSION();
+
+	feedme();
+	if ($syms[CURR] eq "step") {
+		($stepexpr, $type, @stepcode)=EXPRESSION();
+	} else {
+		$stepexpr="1.0";
+	}
+	$main::code{$main::seg}->{declarations}->{"FORLOOP_END_$forloop"}=1;
+	$main::code{$main::seg}->{declarations}->{"FORLOOP_STEP_$forloop"}=1;
+	push @{$code{$seg}->{code}}, <<COND;
+@code	set FORLOOP_END_$forloop, $endexpr
+@stepcode
+	set FORLOOP_STEP_$forloop, $stepexpr
+FOR_$forloop:
+	gt FORLOOP_STEP_$forloop, 0.0, FOR_GT_$forloop
+	lt $result, FORLOOP_END_$forloop, AFTER_NEXT_$forloop
+	branch FOR_LOOP_BODY_$forloop
+FOR_GT_$forloop:
+	gt $result, FORLOOP_END_$forloop, AFTER_NEXT_$forloop
+FOR_LOOP_BODY_$forloop:
+COND
+	debug() if $debug;
 	
-	# Check sign
-	set S0, "$counter"
-	set S2, "$counttype"
-	bsr FOR_SIGN            # Save for later...
-	
- 	set P1, P11[I25]	# Fetch start
-	set P2, P1["FOR"]
-	set P1, P2["$counttype"]
-	set P2, P1["$counter"]
-	set P2["direction"], I0 # Save sign for later.
-	
-	eq I0, 0, AFTER_NEXT_$forcounter
-	
-FOR_LOOP_$forcounter:
-EOFOR
+	push @{$fors[$scopes]}, { var => $result, num => $forloop, inc => $stepexpr };
 }
 sub parse_next {    # next [a[,b[,c]...]
 	feedme();
@@ -1165,20 +1127,18 @@ sub parse_next {    # next [a[,b[,c]...]
 	$ps=pop @{$fors[$scopes]};
 	
 	if ($type[CURR] ne "BARE") {   # next  (no variable)
-		$var=$ps->{variable};
-		$vartype=typeof($var);
-		($ovar=$var)=~s/%&!\#//g;
-		parse_next_helper($ovar, $var, $vartype, $ps);
+		push @{$code{$seg}->{code}}, <<NEXT;
+	add $ps->{var}, $ps->{var}, FORLOOP_STEP_$ps->{num}
+	branch FOR_$ps->{num}
+AFTER_NEXT_$ps->{num}: noop
+NEXT
 	} else {    # next var
 		while (1) {
-		
-			$var=$syms[CURR];
-			$vartype=typeof($var);
-			($ovar=$var)=~s/%&!\#//g;
-			if ($ps->{variable} ne $ovar) {
-				die "Cross-nested loops.  Expected '$ps->{variable}' got '$ovar'";
-			}
-			parse_next_helper($ovar, $var, $vartype, $ps);
+			push @{$code{$seg}->{code}}, <<NEXT;
+	add $ps->{var}, $ps->{var}, FORLOOP_STEP_$ps->{num}
+	branch FOR_$ps->{num}
+AFTER_NEXT_$ps->{num}: noop
+NEXT
 			if ($syms[NEXT] eq ",") {
 				feedme();
 				feedme();
@@ -1188,52 +1148,6 @@ sub parse_next {    # next [a[,b[,c]...]
 			last;
 		}
 	}
-}
-sub parse_next_helper {
-	my($ovar, $var, $vartype, $ps)=@_;
-	print CODE<<EOINC
-	#
-	# NEXT $ovar
-	#			
-
-	new P6, .PerlHash
-	set P6["type"], "BARE"
-	set P6["value"], "$ovar"
-	
-	set S0, "step"
-	set S1, "$var"
-	set S2, "$vartype"
-	bsr PUSHSTEP		# Creates a reasonable P7
-	bsr EXPR_ADD		# Leaves result in P6
-
-	set P1, P11[I25]
-	set P2, P1["FOR"]
-	set P1, P2["$vartype"]
-	set P2, P1["$var"]
-	set P0, P2["variable"]
-	bsr ASSIGNMENT		# P0 = P6
-
-	new P6, .PerlHash
-	set P6["type"], "BARE"
-	set P6["value"], "$var"	# Where we are, P6
-
-	set S2, "$vartype"
-	set S1, "$var"
-	set S0, "finish"
-	bsr PUSHSTEP		# Where we're going, P7
-
-	set P1, P11[I25]
-	set P2, P1["FOR"]
-	set P1, P2["$vartype"]
-	set P2, P1["$var"]
-	set I1, P2["direction"]   # -1/1
-	bsr WHICH_COMPARE	  # Actually *do* the comparison, indirectly
-	
-	set I0, P6["value"]
-	eq I0, 1, FOR_LOOP_$ps->{jump}
-		
-AFTER_NEXT_$ps->{jump}:
-EOINC
 }
 sub parse_call {
 	# Subroutines are disguised as user-defined functions,
@@ -1367,6 +1281,7 @@ POSTSCRIPT
 }
 
 sub parse_function_dispatch {
+	return;
 			print FUNC<<FUNCDISP;
 				
 	#
@@ -1402,6 +1317,7 @@ SUB_DISPATCH_END:
 SUBEND
 }
 sub parse_struct_copy_dispatch {
+	goto RTJUMP;
 	print CODE <<SCOPYDIS;
 	
 	#
@@ -1441,45 +1357,50 @@ DISP
 	print " not found\\n"
 	end
 DISP2
-	print CODE<<RTB;
+RTJUMP:
+	push @{$code{$seg}->{code}}, <<RTB;
 	# Several statements need to make branches
 	# that are only discovered at runtime.
 RUNTIME_JUMP:
 RTB
 	foreach(sort keys %labels) {
-		print CODE qq|\teq S0, "$labels{$_}", $labels{$_}\n|;
+		push @{$code{$seg}->{code}}, qq|\teq JUMPLABEL, "$labels{$_}", $labels{$_}\n|;
 	}
-	print CODE<<RTBE;
+	push @{$code{$seg}->{code}}, <<RTBE;
 	print "Runtime branch of "
-	print S0
+	print JUMPLABEL
 	print " not found\\n"
 	end
 RTBE
 }
 sub parse_data_setup {
-	print CODE<<DATAPREP;
+	push @{$code{_data}->{code}},<<DATAPREP;
 	# Prepare the Read/Data stuff
-DATA_SETUP:
+	saveall
+	find_global \$P1, "RESTOREINFO"
+	find_global \$P2, "READDATA"
 DATAPREP
 	my $counter=0;
 	foreach my $ld (@data) {
 		my $line=$ld->{line};
 		if (length $line) {
-			print CODE qq{\tset P16["$line"], $counter\n};
+			push @{$code{_data}->{code}}, qq{\tset \$P1["$line"], $counter\n};
 		}
 		foreach (@{$ld->{data}}) {
 			my($t,$v)=($_->{type}, $_->{value});
-			print CODE<<ADDDATA;
-	new P0, .PerlHash
-	set P0["type"], "$t"
-	set P0["value"], $v
-	push P15, P0
+			push @{$code{_data}->{code}},<<ADDDATA;
+	push \$P2, $v
 ADDDATA
 			$counter++;
 		}
 	}
 
-	print CODE "\tret\n";
+	push @{$code{_data}->{code}},<<DATADONE;
+	store_global "RESTOREINFO", \$P1
+	store_global "READDATA", \$P2
+	restoreall
+	ret
+DATADONE
 }
 sub typeof {
 	my($var)=@_;

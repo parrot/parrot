@@ -54,12 +54,12 @@ ANOTHERFRAME_USER:
 	typeof S2, P0
 	eq S2, "PerlUndef", NOVARFOUND   #  ANOTHERFRAME
 	#print "** Reference to a user variable type on RHS! **\n"
-	set S0, P0["_type"]         # CAP 10/28
+	set S0, P0[._TYPE]         # CAP 10/28
 	set S1, "USER"
 	ret
 
 GOTVAR:
-	set S2, P0["ref"]
+	set S2, P0[.REF]
 	ne S2, "", REFERENCELOOK
 	eq S1, "INT", SETINT
 	eq S1, "FLO", SETFLO
@@ -67,15 +67,15 @@ GOTVAR:
 	print "Should not happen #52\n"
 	branch GEN_ERROR
 
-SETINT: set I0, P0["value"]
+SETINT: set I0, P0[.VALUE]
 	branch VARLOOKEND
-SETFLO: set N0, P0["value"]
+SETFLO: set N0, P0[.VALUE]
 	#print "Found the value "
 	#print N0
 	#print "\n"
 	branch VARLOOKEND
 SETSTRING:
-	set S0, P0["value"]
+	set S0, P0[.VALUE]
 	#print "Found the value "
 	#print S0
 	#print "\n"
@@ -109,8 +109,8 @@ FLODEF:	set N0, 0.0
 
 DISPASS:ret
 	pushs
-	set S1, P0["type"]
-	set S0, P6["type"]
+	set S1, P0[.TYPE]
+	set S0, P6[.TYPE]
 	
 	print "In ASSIGNMENT "
 	print "Left-hand type: '"
@@ -129,7 +129,7 @@ DISPASS:ret
 ASSIGNMENT:
 	#print "In assignment\n"
 	bsr DISPASS
-	set S1, P0["type"]
+	set S1, P0[.TYPE]
 	ne S1, "BARE", NOBARE          # Left-hand side is not BARE...
 	# The right-hand side is a simple bareword
 	pushp
@@ -139,18 +139,18 @@ ASSIGNMENT:
 	restore P6
 	#bsr DISPASS
 	eq S2, "USER", USERRIGHT # 10/28
-	set S1, P0["value"]     # The name of the variable as a string (w/sigil)
+	set S1, P0[.VALUE]     # The name of the variable as a string (w/sigil)
 	bsr SETVAR		
 	ret
 	
 USERRIGHT:	# 10/28
 	#print "User-thingy now on right-hand side.  We now have:\n"
 	bsr DISPASS
-	set S0, P0["type"]
+	set S0, P0[.TYPE]
 	eq S0, "USER", NOBARE
 	# Thing on right is a bareword.  Presumably it's a user-type variable.
 	ne S0, "BARE", ERRTYPASS
-	set S0, P0["value"]
+	set S0, P0[.VALUE]
 	bsr VARLOOKUP		# P0 comes back as side-effect!
 	bsr DISPASS
 	# Fall through.
@@ -159,14 +159,14 @@ USERRIGHT:	# 10/28
 	# Try a direct assignment from one to the other.  Yeech.
 	#  P0  <=  P6
 NOBARE: #print "Direct assignment?!?!\n"
-	set S0, P6["type"]
+	set S0, P6[.TYPE]
 	eq S0, "BARE", INDIRECT_ASS
 	typeof S1, P0
 	eq S1, "PerlUndef", USERASSTYPMIS1   # mundane = usertype
-	set S1, P0["type"]
+	set S1, P0[.TYPE]
 	ne S0, S1, USERASSTYPMIS1
 	
-	set P0["type"], S0
+	set P0[.TYPE], S0
 	eq S0, "INT", NB_INTASS
 	eq S0, "STRING", NB_STRASS
 	eq S0, "FLO", NB_FLOASS
@@ -175,35 +175,35 @@ NOBARE: #print "Direct assignment?!?!\n"
 	branch GEN_ERROR
 	
 NB_INTASS:
-	set I0, P6["value"]
-	set P0["value"], I0
+	set I0, P6[.VALUE]
+	set P0[.VALUE], I0
 	ret
 NB_FLOASS:
-	set N0, P6["value"]
-	set P0["value"], N0
+	set N0, P6[.VALUE]
+	set P0[.VALUE], N0
 	ret
 NB_STRASS:
-	set S0, P6["value"]
-	set P0["value"], S0
+	set S0, P6[.VALUE]
+	set P0[.VALUE], S0
 	ret
 NB_USERASS:
 	# I'm surely going to hell for this.
-	set S0, P6["type"]	# Make types match
-	set P0["type"], S0
-	set S0, P6["_type"]
-	set S1, P0["_type"]
+	set S0, P6[.TYPE]	# Make types match
+	set P0[.TYPE], S0
+	set S0, P6[._TYPE]
+	set S1, P0[._TYPE]
 	ne S0, S1, ERR_USERASSTYPMIS
 	#print "Copying a "
 	#print S0
 	#print "\n"
 	bsr STRUCT_COPY
-	set P0["storage"], P1
+	set P0[.STORAGE], P1
 	ret
 	
 	# The thing on the left (P0) is not a bareword (reftype?).
 	# the thing on the right (P6) is a bareword.
 INDIRECT_ASS:
-	set S0, P6["value"]
+	set S0, P6[.VALUE]
 	pushp
 	pushs
 	bsr VARLOOKUP
@@ -229,18 +229,18 @@ USERASSTYPMIS1:
 UATM_INT:
 	ne S0, "FLO", ERR_USERASSTYPMIS
 	#print "Casting RHS to INT"
-	set N0, P6["value"]
+	set N0, P6[.VALUE]
 	set I0, N0
-	set P6["value"], I0
-	set P6["type"], "INT"
+	set P6[.VALUE], I0
+	set P6[.TYPE], "INT"
 	branch NOBARE
 UATM_FLO:
 	ne S0, "INT", ERR_USERASSTYPMIS
 	#print "Casting RHS to FLO\n"
-	set I0, P6["value"]
+	set I0, P6[.VALUE]
 	set N0, I0
-	set P6["value"], N0
-	set P6["type"], "FLO"
+	set P6[.VALUE], N0
+	set P6[.TYPE], "FLO"
 	branch NOBARE
 	
 ERR_USERASSTYPMIS:
@@ -283,9 +283,9 @@ SETFOLLOW:
 	set P0, P1[S1]  # Get variable info
 	typeof S3, P0
 	ne S3, "PerlUndef", SETALREADY
-	new P0, .PerlHash
+	new P0, .PerlArray
 SETALREADY:
-	set S3, P0["ref"]
+	set S3, P0[.REF]
 	eq S3, "", SETHERE
 	#print "Setting a var, following a ref.\n"
 	set S1, S3
@@ -303,7 +303,7 @@ SETINTVAR: eq S4, "INT", SETINTNOCAST
 	eq S4, "STRING", SETINT_FROMSTRING
 	set I0, N0
 SETINTNOCAST:
-	set P0["value"], I0
+	set P0[.VALUE], I0
 	branch SETEND
 SETINT_FROMSTRING:			# Should probably be an error.
 	set I0, S0
@@ -313,7 +313,7 @@ SETFLOVAR: eq S4, "FLO", SETFLONOCAST
 	eq S4, "STRING", SETFLO_FROMSTRING
 	set N0, I0
 SETFLONOCAST:
-	set P0["value"], N0
+	set P0[.VALUE], N0
 	#print "Assigning Value of "
 	#print N0
 	#print "\n"
@@ -326,7 +326,7 @@ SETSTRINGVAR:
 	eq S4, "INT", STRING_INT_CONV
 	eq S4, "FLO", STRING_FLO_CONV
 SETSTRING2:
-	set P0["value"], S0
+	set P0[.VALUE], S0
 	#print "("
 	#print S0
 	#print ") "
@@ -357,7 +357,7 @@ SETREFERENCE:
 	#print "\n"
 	
 	ne S5, S2, ERRREFTYPEMISMATCH
-	set P0["ref"], S0
+	set P0[.REF], S0
 	
 SETEND:	set P1[S1], P0
 	ret

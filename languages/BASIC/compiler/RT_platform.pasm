@@ -19,29 +19,29 @@ SCREEN_CLEAR:
 	branch ANSI_SCREEN_CLEAR
 
 SCREEN_SETXCUR:
-	set I1, P6["value"]
+	set I1, P6[.VALUE]
 	sysinfo S0, 4
 	eq S0, "MSWin32", WIN32_SCREEN_SETXCUR
 	branch ANSI_SCREEN_SETXCUR
 
 SCREEN_SETYCUR:
-	set I1, P6["value"]
+	set I1, P6[.VALUE]
 	sysinfo S0, 4
 	eq S0, "MSWin32", WIN32_SCREEN_SETYCUR
 	branch ANSI_SCREEN_SETYCUR
 
 	# X in P7, Y in P6
 SCREEN_LOCATE:
-	set I1, P6["value"]
-	set I0, P7["value"]
+	set I1, P6[.VALUE]
+	set I0, P7[.VALUE]
 	set I14, I1
 	sysinfo S0, 4
 	eq S0, "MSWin32", WIN32_SCREEN_LOCATE
 	branch ANSI_SCREEN_LOCATE
 
 SCREEN_COLOR:
-	set I1, P6["value"]
-	set I0, P7["value"]
+	set I1, P6[.VALUE]
+	set I0, P7[.VALUE]
 	sysinfo S0, 4
 	eq S0, "MSWin32", WIN32_SCREEN_COLOR
 	branch ANSI_SCREEN_COLOR
@@ -54,9 +54,9 @@ SCREEN_GETFORE:
 	ne S0, "MSWin32", SCREEN_GETFORE_NOTWIN
 	bsr WIN32_SCREEN_GETFORE
 SCREEN_GETFORE_NOTWIN:
-	new P6, .PerlHash
-	set P6["type"], "INT"
-	set P6["value"], I0
+	new P6, .PerlArray
+	set P6[.TYPE], "INT"
+	set P6[.VALUE], I0
 	ret
 
 SCREEN_GETBACK:
@@ -65,7 +65,7 @@ SCREEN_GETBACK:
 	ne S0, "MSWin32", SCREEN_GETBACK_NOTWIN
 	bsr WIN32_SCREEN_GETBACK
 SCREEN_GETBACK_NOTWIN:
-	new P6, .PerlHash
-	set P6["type"], "INT"
-	set P6["value"], I0
+	new P6, .PerlArray
+	set P6[.TYPE], "INT"
+	set P6[.VALUE], I0
 	ret

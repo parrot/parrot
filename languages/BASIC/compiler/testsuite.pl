@@ -9,6 +9,10 @@ while(1) {
 		local $/="";
 		$_=<DATA>;
 	}
+	if (/function/ or /end sub/ or /type / or /select/) {
+		print "Skipped\n";
+		next;
+	}
 	last unless $_;
 	last if /STOPPLEASE/;
 	@c=m/^'\s*(.*)/gm;
@@ -28,9 +32,211 @@ while(1) {
 }
 
 __DATA__
-print mid$("Hello", 2, 1)
+' Logical Operators 
+print "      AND   OR    XOR   EQV   IMP   a & ! b"
+for i = 0 to 1
+for j = 0 to 1
+print i; j;
+if i and j then a$="True  " else a$="False "
+if i or  j then b$="True  " else b$="False "
+if i xor j then c$="True  " else c$="False "
+if i eqv j then d$="True  " else d$="False "
+if i imp j then e$="True  " else e$="False "
+if i and not j then f$="True   " else f$="False "
+print a$;b$;c$;d$;e$;f$
+next j,i
 
-STOPPLEASE
+' Unary minus goodness
+Dim t7(1),w(10)
+w=20
+w(2)=5
+t7(0)=0
+w=w-(T7(0) * T7(0) * 12)
+' Expect 20
+print w
+' Expect -20
+print -w
+' Expect -5
+print -w(2)
+' Expect 3
+print 5-2
+' Expect 3 also
+print 5+-2
+' Expect 0
+print 6-abs(-6)
+
+
+' Some register confusion, expect .PTFCDR
+Dim c(10), a$(10), u(10)
+510 FOR I = 0 TO 6
+520 READ A$(I), U(I)
+    print A$(I);
+530 NEXT I
+540 DATA ".",0,"P",100,"T",500,"F",350
+550 DATA "C",325,"D",900,"R",20000
+
+' Read/data  Hello World -
+10 read a$
+print a$
+if a$ = "-" then end
+goto 10
+100 data "Hello", "World", "-", 56.6
+
+' Compilation bug, expect "Ok"
+i$="N"
+if i$="N" then goto 35
+end
+35 print "Ok"
+end
+
+' Compilation bug, expect "Ok"
+dim s(1)
+goto 10
+INPUT S(0, 1), S(0, 2), S(0, 3), S(0, 4)
+10 print "Ok"
+end
+
+' Odd bug in static strings.  Expect "Ok"
+dim O(1)
+IF E$ <> "O" THEN 5030
+print "Wrong!"
+end
+5030 print "Ok"
+	end
+
+' Equals bug, should print = greeting
+dim a$(1)
+a$(2)="World"
+a$="Hello"
+A$ = A$ + "=" + A$(2)
+print a$
+
+
+' Do/While/Loop stuff.  All 5
+a=0
+do while a<5
+	a=a+1
+loop
+print a
+a=0
+do until a>4
+	a=a+1
+loop
+print a
+a=0
+do
+	a=a+1
+loop while a<5
+print a
+a=0
+do
+	a=a+1
+loop until a>4
+print a
+
+
+' Swap
+a$="Hello"
+b$="Goodbye"
+print a$,b$
+swap a$,b$
+print a$,b$
+
+' Bubble sort cities
+TRUE=1
+FALSE=0
+DIM A$(4)
+A$(1) = "New York"
+A$(2) = "Boston"
+A$(3) = "Chicago"
+A$(4) = "Seattle"
+Max = 4 'UBOUND(A$)
+Exchange=TRUE           ' Force first pass through the array.
+WHILE Exchange          ' Sort until no elements are exchanged.
+   Exchange=FALSE
+   ' Compare the array elements by pairs. When two are exchanged,
+   ' force another pass by setting Exchange to TRUE.
+   FOR I = 2 TO Max
+      IF A$(I-1) > A$(I) THEN
+         Exchange = TRUE
+         B$=A$(I-1)
+         A$(I-1)=A$(I)
+         A$(I)=B$
+         ' SWAP A$(I - 1), A$(I)
+      END IF
+   NEXT
+WEND
+ ' CLS
+FOR I = 1 TO 4
+   PRINT A$(I)
+NEXT I
+END
+
+' mid/left/right  2-9, 1-5, 6-0
+t$="1234567890"
+print mid$(t$, 2, 8)
+print left$(t$, 5)
+print right$(t$, 5)
+' instr
+s1$="The longer string"
+found$="longer"
+bogus$="not"
+print "Found  (5): ", instr(s1$, found$)
+print "Bogus  (0): ", instr(s1$, bogus$)
+print "Null   (1): ", instr(s1$, "")
+print "Start (11): ", instr(6, s1$, " ")
+print "Inval  (0): ", instr(4, bogus$, "t")
+' instr() tests
+s1$="Mixed case"
+print ucase$(s1$);" Upper"
+print lcase$(s1$);" Lower"
+a$="   Flush   "
+print ">";ltrim$(a$)
+print rtrim$(a$);"<"
+' A's and -'s
+print string$(10,75-10)
+print string$(20, "-")
+
+' ON..GOTO   200! and then Oats..
+t=2
+on t goto 100, 200, 300
+print "No match\n"
+FIN:
+for i = 1 to 3
+	on i gosub oats, peas, beans
+next i
+print
+end
+100 print "100!"
+    goto FIN
+200 print "200!"
+    goto FIN
+300 print "300!"
+    goto FIN
+oats:
+	print "Oats",
+	return
+peas:
+	print "Peas",
+	return
+beans:
+	print "Beans",
+	return
+
+' Truth
+s$="Hello"
+if s$ then print "This is true" else print "Oops (string)"
+s$=""
+if s$ then print "Should not happen (string)"
+i%=0
+if i% then print "Should not happen (int)"
+i%=54
+if i% then print "This is true" else print "Oops (int)"
+i=0
+if i then print "Should not happen (flo)"
+i=55
+if i then print "This is true" else print "Oops (flo)"
+
 ' Expect OK
 if 2 > 1 then
 	print "Ok"
@@ -38,7 +244,64 @@ else
 	print "All is not right"
 end if
 
-STOPPLEASE
+' Count from 9 to 0, print 5
+dim y(10)
+i=10
+tloop:
+	y(i)=i
+	i=i-1
+	print i
+	if i then goto tloop
+print y(5)
+
+
+' Column alignment
+print "Hello";tab$(15);"World"
+print "Foo";tab$(15);"Stuff"
+print "I am the very model of a modern";tab$(15);"More"
+print "Hello","Again",d
+dim c$(1)
+for i = 1 to 20 : read c$(i) : next
+print
+for i = 1 to 20 step 4
+  print c$(i);tab$(12);c$(i+1);tab$(22);c$(i+2);tab$(32);c$(i+3)
+next
+print
+data "ABANDON","CHART","COMPUTER"
+data "DAMAGES","DESTRUCT","DOCK","IDLE","IMPULSE","LRSCAN","NAVIGATE","PHASERS","QUIT"
+data "SHIELDS","SOS","SRSCAN","STATUS","TORPEDO","TRANSFER","VISUAL","WARP"
+
+' Random number distribution
+randomize timer
+max=10
+dim a(max)
+for i = 0 to 100
+	b=rnd*max+1
+	a(b)=a(b)+1
+next i
+for i = 1 to max
+	print ,
+	for j = 0 to a(i)
+		print "*";
+	next j
+	print 
+next i
+
+' Trig
+w=15
+dim a$(w)
+for i = 0 to (22/7)*2 step 0.40
+	for j = 1 to w*2
+		a$(j)=" "
+	next j
+	a$(w+w*sin(i)+1)="*"
+	a$(w+w*cos(i)+1)="+"
+	for j = 1 to w*2
+		print a$(j);
+	next j
+	print
+next i
+
 ' Expect Correct
 DIM A(1,1)
 RO=1
@@ -47,10 +310,27 @@ IF A(RO,5)=0 THEN GOSUB 20: REM GOO
 20 print "Correct"
    return
 
-' Three random numbers
-print str$(rnd)
-print str$(rnd())
-print str$(rnd(1))
+' Expect Hello A World
+print "Hello " + chr$(65);
+print " World"
+
+' Expect 21 and "Correct"
+print 1+int(20)
+if t = 6 then 
+	print "Hi"
+elseif t=1 then
+	print "Wrong"
+else
+	print "Correct"
+end if
+if p$ = "Hello" then print "Whoa"
+
+' Count by .5's and True! after 3
+for t=1 to 10 step 0.5
+print t,
+print sqr(t),
+if t=3 then print "True!"
+next t
 
 ' Expect 234
 function inkey$
@@ -61,6 +341,20 @@ print y
 end
 1740 print "Branched"
 	end
+
+
+' Expect OK
+if 2 > 1 then
+	print "Ok"
+else
+	print "All is not right"
+end if
+
+' Three random numbers
+print str$(rnd)
+print str$(rnd())
+print str$(rnd(1))
+
 
 ' Expect Hello A World
 print "Hello " + chr$(65);
@@ -77,9 +371,6 @@ function a$
 end function
 print a$
 
-' Expect 7
-t%=7
-print t%*1
 
 ' Changed ref'd var from 5 to 12
 function myfunc(a)
@@ -797,20 +1088,6 @@ for i = -1 to 1
 	print "Sign of ";i;" is ",sgn(i)
 next i
 
-' Trig
-w=15
-dim a$(w)
-for i = 0 to (22/7)*2 step 0.40
-	for j = 1 to w*2
-		a$(j)=" "
-	next j
-	a$(w+w*sin(i)+1)="*"
-	a$(w+w*cos(i)+1)="+"
-	for j = 1 to w*2
-		print a$(j);
-	next j
-	print
-next i
 
 ' "shared" Whoa, 66666, Goodbye, 909090, 101010
 type struct
@@ -860,15 +1137,15 @@ _ENDASM
 print "Goodbye, world"
 
 ' Column alignment
-print "Hello";tab(15);"World"
-print "Foo";tab(15);"Stuff"
-print "I am the very model of a modern";tab(15);"More"
+print "Hello";tab$(15);"World"
+print "Foo";tab$(15);"Stuff"
+print "I am the very model of a modern";tab$(15);"More"
 print "Hello","Again",d
 dim c$(1)
 for i = 1 to 20 : read c$(i) : next
 print
 for i = 1 to 20 step 4
-  print c$(i);tab (12);c$(i+1);tab (22);c$(i+2);tab (32);c$(i+3)
+  print c$(i);tab$(12);c$(i+1);tab$(22);c$(i+2);tab$(32);c$(i+3)
 next
 print
 data "ABANDON","CHART","COMPUTER"
@@ -914,3 +1191,4 @@ select case t
 		print "WRONG!"
 end select
 print "All done."
+

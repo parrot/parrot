@@ -8,12 +8,14 @@ use constant CURR => 1;
 use constant NEXT => 0;
 use subs qw(dumpq EXPRESSION);
 use Data::Dumper;
+use vars qw( %code $seg $debug );
 
 require "COMP_parsefuncs.pm";
 
 sub init {
         @type[0..2]=("","","");
         @syms[0..2]=("","","");
+	$seg="_basicmain";
 }
 sub feedme {
 	my $type=shift @tokdsc;
@@ -39,8 +41,7 @@ sub dumps {
 sub usersub { 0; }
 
 sub runtime_init {
-	print CODE <<INIT;
-.include "RT_initialize.pasm"
+	push @{$code{$seg}->{code}}, <<INIT;
 	#
 	# Program Begins Here
 	# I must not fear. Fear is the mind-killer. Fear is the little-death 
@@ -56,29 +57,13 @@ sub runtime_init {
 INIT
 }
 sub runtime_shutdown {
-	print CODE <<SHUTDOWN;
+	push @{$code{$seg}->{code}}, <<SHUTDOWN;
 	#
 	# ###################
 	# Program Termination
 	# ###################
-	end
-	#
-	# Pull in the runtime libraries
-	#
-.include "RT_expr.pasm"
-.include "RT_math.pasm"
-.include "RT_variables.pasm"
-.include "RT_builtins.pasm"
-.include "RT_userfunc.pasm"
-.include "RT_aggregates.pasm"
-.include "RT_support.pasm"
-.include "RT_io.pasm"
-.include "RT_platform.pasm"
-.include "RT_debugger.pasm"
-	# 
-	# Pull in user-defined functions
-	#
-.include "TARG_localfuncs.pasm"
+	ret	# back to _main
+
 SHUTDOWN
 }
 
@@ -104,10 +89,15 @@ sub parse {
 	my $elseline="a";
 	my (@ifstack);
 	my(@lhs, @rhs);
+	my($result, $type, @code);
 
-	print CODE "set .LINE, $sourceline\n";
+	#print CODE "set .LINE, $sourceline\n";
 	trace() if $opts{trace};
-	debug() if $opts{debug};
+	if ($opts{debug}) {
+		push @{$code{$seg}->{code}},"\tbsr DEBUG_INIT\n";
+		$debug=1;
+		debug();
+	}
 
 	
 PARSE:
@@ -116,9 +106,9 @@ PARSE_NOFEED:
 	if ($type[CURR] eq "STMT" or $type[CURR] eq "COMM") {
 		$sourceline++;
 		unless ($type[PREV] eq "STMT") {
-			print CODE "set .LINE, $sourceline\n";
+			#print CODE "set .LINE, $sourceline\n";
 			trace() if $opts{trace};
-			debug() if $opts{debug};
+			debug() if $debug;
 		}
 	}
 	feedme;
@@ -183,26 +173,23 @@ PARSE_NOFEED:
 	#
 	# Handle all of the IF-THEN logic
 	#
+	my $false="0.0";
 	if ($syms[CURR] eq "if") {
-		print CODE "\t# if()\n";
-		#print "In IF, pushing $ifline onto stack\n";
-		push(@ifstack, $ifline);
-		print CODE EXPRESSION;
+		($result, $type, @code)=EXPRESSION();
+		$false=qq{""} if $type eq "S";
+		push @{$code{$seg}->{code}},<<EXPR;
+@code	eq $result, $false, IFBRANCH_$ifline
+EXPR
 		feedme();
-		#print "Post 'if' token is $syms[CURR]\n";
+		push(@ifstack, $ifline);
 		die "No then at $sourceline --  $syms[CURR]" if ($syms[CURR] ne "then");
 		$singleif=1 if ($type[NEXT] ne "STMT" and $type[NEXT] ne "COMM");
 		#print "Single if!\n" if $singleif;
-		print CODE<<TRUTHTEST;
-	bsr TRUTH
-	eq I1, 0, IFBRANCH_$ifline
-	# The expression was true...
-TRUTHTEST
 		$ifline++;
 		if ($type[NEXT] eq "INT") {  # if x then linenumber
 			feedme;
 			create_label();
-			print CODE "\tbranch $labels{$syms[CURR]}\t# Goto $syms[CURR]\n";
+			push @{$code{$seg}->{code}}, "\tbranch $labels{$syms[CURR]}\t# Goto $syms[CURR]\n";
 		}
 		$elsetag++;
 		goto PARSE;
@@ -211,14 +198,14 @@ TRUTHTEST
 		my $c;
 		$c=pop @ifstack;
 		push(@{$elsestack->{$elsetag}}, $elseline);
-		print CODE "\tbranch ELSEBRANCH_$elseline\n";
-		print CODE "IFBRANCH_$c:\n";
-		print CODE EXPRESSION;
+		($result, $type, @code)=EXPRESSION();
+		$false=qq{""} if $type eq "S";
+		push @{$code{$seg}->{code}}, <<CODE;
+	branch ELSEBRANCH_$elseline
+IFBRANCH_$c:
+@code	eq $result, $false, IFBRANCH_$ifline
+CODE
 		feedme();
-		print CODE<<TRUTHTEST;
-	bsr TRUTH
-	eq I1, 0, IFBRANCH_$ifline
-TRUTHTEST
 		push(@ifstack, $ifline);
 		$ifline++;
 		$elseline++;
@@ -231,9 +218,11 @@ TRUTHTEST
 			die "ELSE without corresponding IF at line $sourceline\n";
 		}
 		push(@{$elsestack->{$elsetag}}, $elseline);
-		print CODE "\tbranch ELSEBRANCH_$elseline\n";
-		print CODE "\t# The expression was not true...\n";
-		print CODE "IFBRANCH_$c:\n";
+		push @{$code{$seg}->{code}}, <<CODE;
+	branch ELSEBRANCH_$elseline
+	# The expression was not true...
+	IFBRANCH_$c:
+CODE
 		$elseline++;
 		goto PARSE;
 	}
@@ -251,10 +240,10 @@ TRUTHTEST
 			if ($_ < 0 ) {
 				# print "Else was done, skipping...\n";
 			} else {
-				print CODE "IFBRANCH_$_:\n";
+				push @{$code{$seg}->{code}}, "IFBRANCH_$_:\n";
 			}
 			while($_=pop(@{$elsestack->{$elsetag}})) {
-				print CODE "ELSEBRANCH_$_:\n";
+				push @{$code{$seg}->{code}}, "ELSEBRANCH_$_:\n";
 			}
 			feedme;
 			$elsetag--;
@@ -267,7 +256,7 @@ TRUTHTEST
 			print CODE "CASE_$s->{jump}_FIN:\n";
 			goto PARSE;
 		}
-		print CODE "\tend\n";
+		push @{$code{$seg}->{code}}, "\tend\n";
 		goto PARSE;
 	}
 	die "Unkown keyword $syms[CURR]/$type[CURR] source line $sourceline";
@@ -280,10 +269,9 @@ BARE:	# Check for user-subroutine
 	if ($syms[NEXT] eq ":") {
 		create_label();
 		label_defined($syms[CURR]);
-		print CODE "$labels{$syms[CURR]}:   # For user branch ($syms[CURR])\n";
-		print CODE "\tset .LINE, $sourceline\n";
+		push @{$code{$seg}->{code}}, "$labels{$syms[CURR]}:   # For user branch ($syms[CURR])\n";
 		trace() if ($opts{trace});
-		debug() if ($opts{debug});
+		debug() if $debug;
 		$currline="$labels{$syms[CURR]}";
 		feedme;  # Get the :
 		goto PARSE
@@ -304,26 +292,16 @@ BARE:	# Check for user-subroutine
 	if ($syms[CURR] eq "_startasm") {
 		feedme;
 		#$syms[CURR]=~s/^\n|\n$//gm;
-		print CODE "\t#\n\t# User-included assembly\n$syms[CURR]\n\t# End assembly\n\t#\n";
+		push @{$code{$seg}->{code}}, "\t#\n\t# User-included assembly\n$syms[CURR]\n\t# End assembly\n\t#\n";
 		feedme;
 		
 		goto PARSE;
 	}
 		
 	# DO ME LAST
-	#
-	@lhs=EXPRESSION({ lhs => 1});
-	feedme();	# Grab the = 
-	@rhs=EXPRESSION;
-	print CODE<<EOASS;
-@lhs
-	set P0, P10[I25]
-	set P0["right"], P6   # Results of RHS evaluation (target of store)
-@rhs
-	set P1, P10[I25]
-	set P0, P1["right"]   
-	bsr ASSIGNMENT        # P0 = P6
-EOASS
+	# (Assignments.)
+	($result, $type, @code)=EXPRESSION({ lhs => 1, assign => 1});
+	push @{$code{$seg}->{code}}, @code;
 	goto PARSE;
 	# Got a bareword.  
 	# This should be an assignment
@@ -341,7 +319,7 @@ EOASS
 =pod wrongway
 UNK:	if (($type[CURR] eq "STMT" or $type[CURR] eq "COMM" or $type[CURR] eq "STMT") and $singleif) {
 		while($_=pop(@ifstack)) {
-			print CODE "IFBRANCH_$_:\n";
+			push @{$code{$seg}->{code}}, "IFBRANCH_$_:\n";
 		}
 =cut
 UNK:	if (($type[CURR] eq "STMT" or $type[CURR] eq "COMM") and $singleif) {
@@ -350,12 +328,12 @@ UNK:	if (($type[CURR] eq "STMT" or $type[CURR] eq "COMM") and $singleif) {
 		if ($_ < 0 ) {
 			# print "Else was done, skipping...\n";
 		} else {
-			print CODE "IFBRANCH_$_:\n";
+			push @{$code{$seg}->{code}}, "IFBRANCH_$_:\n";
 		}
 		while($_=pop(@{$elsestack->{$elsetag}})) {
-			print CODE "ELSEBRANCH_$_:\n";
+			push @{$code{$seg}->{code}}, "ELSEBRANCH_$_:\n";
 		}
-		print CODE "\t# $syms[CURR]\n" if $type[CURR] eq "COMM";
+		push @{$code{$seg}->{code}}, "\t# $syms[CURR]\n" if $type[CURR] eq "COMM";
 		$elsetag--;
 		$singleif=0;
 		goto PARSE
@@ -372,10 +350,9 @@ UNK:	if (($type[CURR] eq "STMT" or $type[CURR] eq "COMM") and $singleif) {
 		create_label();
 		$currline="$labels{$syms[CURR]}";
 		label_defined($syms[CURR]);
-		print CODE "$labels{$syms[CURR]}:   # For user branch ($syms[CURR])\n";
-		print CODE "\tset .LINE, $sourceline\n";
+		push @{$code{$seg}->{code}}, "$labels{$syms[CURR]}:   # For user branch ($syms[CURR])\n";
 		trace() if ($opts{trace});
-		debug() if ($opts{debug});
+		debug() if $debug;
 		goto PARSE
 	}
 	#
@@ -395,7 +372,7 @@ FINISH
 		parse_struct_copy_dispatch();
 		parse_data_setup();
 		check_branches();
-		debug_init($opts{debug});
+		debug_init($debug);
 		
 		return;
 	}
@@ -412,7 +389,8 @@ print 2, "\\n"
 TRACE
 }
 sub debug {
-	print CODE<<DEBUG;
+	push @{$code{$seg}->{code}}, <<DEBUG;
+	set \$I100, $sourceline
 	bsr DEBUGGER
 DEBUG
 }
@@ -431,23 +409,25 @@ sub label_defined {
 	$labdef{$_[0]}++;
 }
 sub debug_init {
-	if (! $_[0]) {
-		print CODE "DEBUG_INIT:\n\tret\n";
-		return;
-	}
-	print CODE "DEBUG_INIT:\n\tnew P0, .PerlArray\n";
+	return unless $debug;
+	push @{$code{$seg}->{code}},<<START;
+DEBUG_INIT:
+	\$P0=new PerlArray
+	find_global \$P1, "DEBUGGER"
+START
 	foreach(0..@main::basic) {
 		my $line=$main::basic[$_];
 		$line=~s/"/'/g;
-		print CODE "\tset P0[",$_+1,"], \"$line\"\n";
+		push @{$code{$seg}->{code}}, "\tset \$P0[",$_+1,"], \"$line\"\n";
 	}
-	print CODE<<DEBEND;
-	set P25["code"], P0
-	set P25["step"], 1   # Turn on stepping mode
-	new P0, .PerlHash
-	set P25["break"], P0  # Breakpoints
-	new P0, .PerlArray
-	set P25["watch"], P0  # Watch
+	push @{$code{$seg}->{code}},<<DEBEND;
+	set \$P1["code"], \$P0
+	set \$P1["step"], 1   # Turn on stepping mode
+	\$P0=new PerlHash
+	set \$P1["break"], \$P0  # Breakpoints
+	\$P0=new PerlArray
+	set \$P1["watch"], \$P0  # Watch
+	store_global "DEBUGGER", \$P1
 	ret
 DEBEND
 

@@ -17,9 +17,9 @@ use strict;
 sub ASSIGNMENT_FUNC {
 	my($varname)=@_;	# P6 already has the RHS Loaded...
 	print CODE<<ASS_FUNC;
-	new P0, .PerlHash
-	set P0["type"], "BARE"
-	set P0["value"], "$varname"
+	new P0, .PerlArray
+	set P0[.TYPE], "BARE"
+	set P0[.VALUE], "$varname"
 	bsr ASSIGNMENT	# Do this type manually
 ASS_FUNC
 	return;

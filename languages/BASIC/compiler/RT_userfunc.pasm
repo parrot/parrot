@@ -133,15 +133,15 @@ UF_LOADUSERSTRUCT:
 
 UF_FINISHUSER:
 	# Roll this one by hand.  We want a reference...
-	set S5, P0["_type"]
+	set S5, P0[._TYPE]
 	ne S5, S0, UF_ERRMISMATCH
-	set P1, P0["storage"]
+	set P1, P0[.STORAGE]
 	
 	new P3, .PerlHash
-	set P3["_type"], S5
-	set P3["type"], "USER"
-	set P2, P0["storage"]
-	set P3["storage"], P2
+	set P3[._TYPE], S5
+	set P3[.TYPE], "USER"
+	set P2, P0[.STORAGE]
+	set P3[.STORAGE], P2
 	
 	set P1, P10[I25]   
 	set P2, P1["USER"]

@@ -214,32 +214,32 @@ POW:	bsr SETUP_MATH_BINARY
 	set S0, "FLO"
 	branch MATHOPEND
 
-SETUPINT:set I0, P6["value"]
-	set I1, P7["value"]
+SETUPINT:set I0, P6[.VALUE]
+	set I1, P7[.VALUE]
 	ret
-SETUPFLO:set N0, P6["value"]
-	set N1, P7["value"]
+SETUPFLO:set N0, P6[.VALUE]
+	set N1, P7[.VALUE]
 	ret
 SETUPSTRING:
-	set S0, P6["value"]
-	set S1, P7["value"]
+	set S0, P6[.VALUE]
+	set S1, P7[.VALUE]
 	ret
 
 	# Take results from math op, push to stack
 	#    Type in S0
 	#    Results in N5/I5
 MATHOPEND:
-	new P6, .PerlHash
-	set P6["type"], S0
+	new P6, .PerlArray
+	set P6[.TYPE], S0
 	eq S0, "INT", MATHOPENDINT
 	eq S0, "STRING", MATHOPENDSTRING
-	set P6["value"], N5
+	set P6[.VALUE], N5
 	branch MATHOPEND2
 MATHOPENDINT:
-	set P6["value"], I5
+	set P6[.VALUE], I5
 	branch MATHOPEND2
 MATHOPENDSTRING:
-	set P6["value"], S5
+	set P6[.VALUE], S5
 MATHOPEND2:
 	ret
 
@@ -259,16 +259,16 @@ RETURNBOOL:
 	# make sure we're using STRING/INT/FLO and not 
 	# references or arrays or anything nasty
 SETUP_MATH_BINARY:
-	set S0, P7["type"]
+	set S0, P7[.TYPE]
 	ne S0, "BARE", SETUP_MATH_UNARY
-	set S0, P7["value"]
+	set S0, P7[.VALUE]
 	bsr VARLOOKUP
 	bsr VARSTUFF
 	set P7, P0
 SETUP_MATH_UNARY:
-	set S0, P6["type"]
+	set S0, P6[.TYPE]
 	ne S0, "BARE", SETUP_MATH_DONE
-	set S0, P6["value"]
+	set S0, P6[.VALUE]
 	bsr VARLOOKUP
 	bsr VARSTUFF
 	set P6, P0
