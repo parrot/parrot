@@ -336,6 +336,9 @@ examples/benchmarks/gc_waves_headers.pasm         [main]doc
 examples/benchmarks/gc_waves_sizeable_data.pasm   [main]doc
 examples/benchmarks/gc_waves_sizeable_headers.pasm [main]doc
 examples/benchmarks/hash-utf8.pasm                [main]doc
+examples/benchmarks/oo1.pasm                      [main]doc
+examples/benchmarks/oo1.pl                        [main]doc
+examples/benchmarks/oo1.py                        [main]doc
 examples/benchmarks/primes.c                      [main]doc
 examples/benchmarks/primes.pasm                   [main]doc
 examples/benchmarks/primes.pl                     [main]doc
@@ -2220,6 +2223,7 @@ lib/Parrot/Distribution.pm                        [devel]
 lib/Parrot/Docs/Directory.pm                      [devel]
 lib/Parrot/Docs/File.pm                           [devel]
 lib/Parrot/Docs/Group.pm                          [devel]
+lib/Parrot/Docs/HTMLPage.pm                       [devel]
 lib/Parrot/Docs/Item.pm                           [devel]
 lib/Parrot/Docs/POD2HTML.pm                       [devel]
 lib/Parrot/Docs/Section.pm                        [devel]
