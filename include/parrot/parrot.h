@@ -66,7 +66,7 @@
 #endif
 
 #ifdef HAS_HEADER_SETJMP
-#	include <setjmp.h>
+#  include <setjmp.h>
 typedef jmp_buf Parrot_jump_buff;
 #endif
 
@@ -177,15 +177,15 @@ typedef void (*funcptr_t)(void);
  * samples by reducing various numbers, and causing DOD and allocation runs
  * to occur more frequently. It does significantly reduce performance. */
 #ifndef DISABLE_GC_DEBUG
-#define DISABLE_GC_DEBUG 0
+#  define DISABLE_GC_DEBUG 0
 #endif
 
 /* Helpful internal macro for testing whether we are currently
  * debugging garbage collection and memory management */
 #if DISABLE_GC_DEBUG
-#    define GC_DEBUG(interp) 0
+#  define GC_DEBUG(interp) 0
 #else
-#    define GC_DEBUG(interp) Interp_flags_TEST((interp), PARROT_GC_DEBUG_FLAG)
+#  define GC_DEBUG(interp) Interp_flags_TEST((interp), PARROT_GC_DEBUG_FLAG)
 #endif
 
 /* If you're really digging into things, then turn on GC_VERBOSE to

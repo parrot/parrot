@@ -51,15 +51,15 @@ STRING *Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat,
     /* The size of all our buffers (and the maximum width of a float
      * field).
      */
-#   define PARROT_SPRINTF_BUFFER_SIZE 4096
+#  define PARROT_SPRINTF_BUFFER_SIZE 4096
 
     /* The maximum floating-point precision--hopefully this and the
      * width cap will help head off buffer overruns.
      */
-#   define PARROT_SPRINTF_MAX_PREC 3 * PARROT_SPRINTF_BUFFER_SIZE / 4
+#  define PARROT_SPRINTF_MAX_PREC 3 * PARROT_SPRINTF_BUFFER_SIZE / 4
 
-#   define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), NULL, PObj_external_FLAG, NULL)
-#   define char2pstr(ch)   string_make(interpreter, &ch , 1,            NULL, PObj_external_FLAG, NULL)
+#  define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), NULL, PObj_external_FLAG, NULL)
+#  define char2pstr(ch)   string_make(interpreter, &ch , 1,            NULL, PObj_external_FLAG, NULL)
 
     /* SPRINTF DATA STRUCTURE AND FLAGS */
 

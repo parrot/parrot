@@ -59,11 +59,11 @@ typedef enum {
 
 #define MIN_ITEMS 4		/* smallest chunk can hold */
 #ifdef LIST_TEST
-#define LD_MAX 4                /* log2(MAX_ITEMS) */
-#define MAX_ITEMS 16  	        /* biggest chunk can hold */
+#  define LD_MAX 4                /* log2(MAX_ITEMS) */
+#  define MAX_ITEMS 16  	        /* biggest chunk can hold */
 #else
-#define LD_MAX 10               /* log2(MAX_ITEMS) */
-#define MAX_ITEMS 1024  	/* biggest chunk can hold */
+#  define LD_MAX 10               /* log2(MAX_ITEMS) */
+#  define MAX_ITEMS 1024  	/* biggest chunk can hold */
 #endif
 #define MAX_MASK (MAX_ITEMS-1)
 
@@ -93,3 +93,12 @@ void list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
 #endif
 
 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

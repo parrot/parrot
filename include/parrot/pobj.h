@@ -47,7 +47,7 @@ typedef Buffer PObj;
 #define bufstart obj.u.b.bufstart
 #define buflen   obj.u.b.buflen
 #if ! DISABLE_GC_DEBUG
-#define version obj.version
+#  define version obj.version
 #endif
 
 struct parrot_string_t {

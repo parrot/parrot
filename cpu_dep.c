@@ -14,9 +14,9 @@
 
 #ifdef __ia64__
 
-#include <ucontext.h>
+#  include <ucontext.h>
 extern void *flush_reg_store(void);
-#define BACKING_STORE_BASE 0x80000fff80000000
+#  define BACKING_STORE_BASE 0x80000fff80000000
 
 #endif
 
@@ -31,11 +31,11 @@ trace_system_areas(struct Parrot_Interp *interpreter)
 	int insns[4];
         double align_hack[2];
     } u = { {
-#ifdef __sparcv9
+#  ifdef __sparcv9
                             0x81580000, /* flushw */
-#else
+#  else
                             0x91d02003, /* ta ST_FLUSH_WINDOWS */
-#endif
+#  endif
                             0x81c3e008, /* retl */
 			    0x01000000  /* nop */
     } };
@@ -57,14 +57,14 @@ trace_system_areas(struct Parrot_Interp *interpreter)
 				(size_t)current_regstore_top);
 #else
 
-#ifdef HAS_HEADER_SETJMP
+#  ifdef HAS_HEADER_SETJMP
     Parrot_jump_buff env;
 
     /* this should put registers in env, which then get marked in
      * trace_system_stack below
      */
     setjmp(env);
-#endif
+#  endif
 
 #endif
 
@@ -80,3 +80,13 @@ trace_system_stack(struct Parrot_Interp *interpreter)
     trace_mem_block(interpreter, (size_t)lo_var_ptr,
 			   (size_t)&lo_var_ptr);
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

@@ -62,10 +62,12 @@ SV* output_bytecode(SV* sv) {
             pf_const->constants[i]->type = PFC_STRING;
             pf_const->constants[i]->string = 
                 string_make(NULL, str, len, NULL, 0, NULL);
-        } else if (*type == 'N') {
+        }
+        else if (*type == 'N') {
             pf_const->constants[i]->type = PFC_NUMBER;
             pf_const->constants[i]->number = SvNV(val);
-        } else {
+        }
+        else {
             Perl_croak(aTHX_ "Don't know what to do with type %s\n", type);
         }
     }
