@@ -222,9 +222,8 @@ PIO_init_stacks(theINTERP)
 #ifdef PIO_OS_STDIO
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_stdio_layer), PMCNULL);
 #endif
-#if 0
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), PMCNULL);
-#endif
+
     /* Note: All layer pushes should be done before init calls */
     for (p = interpreter->piodata->default_stack; p; p = p->down) {
         if (p->api->Init) {
