@@ -201,6 +201,17 @@ bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
     }
 }
 
+static void
+bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_mod_ui(BN(dest), BN(self), value);
+    if (mpz_fits_slong_p(BN(dest))) {
+        long iresult = mpz_get_si(BN(dest));
+        VTABLE_morph(interpreter, dest, enum_class_Integer);
+        VTABLE_set_integer_native(interpreter, dest, iresult);
+    }
+}
 static INTVAL
 bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
 {
@@ -335,6 +346,11 @@ bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
     internal_exception(1, "no bigint lib loaded");
 }
+static void
+bigint_mod_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
 static INTVAL
 bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
 {
@@ -359,8 +375,7 @@ bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
 }
 #endif
 
-/* XXX derive from perlscalar because of morph */
-pmclass BigInt extends perlscalar {
+pmclass BigInt {
 
 /*
 
@@ -396,6 +411,9 @@ BigInt object.
         return res;
     }
 
+    void morph(INTVAL new_type) {
+        pmc_reuse(INTERP, SELF, new_type, 0);
+    }
 
     void init () {
         bigint_init(INTERP, SELF);
@@ -691,6 +709,9 @@ MMD_DEFAULT: {
 MMD_BigInt: {
                 bigint_mod_bigint(INTERP, SELF, value, dest);
             }
+MMD_Integer: {
+                bigint_mod_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+             }
 MMD_DEFAULT: {
                  internal_exception(1, "unimp mod");
              }
@@ -700,6 +721,9 @@ MMD_DEFAULT: {
 MMD_BigInt: {
                 bigint_mod_bigint(INTERP, SELF, value, dest);
             }
+MMD_Integer: {
+                bigint_mod_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+             }
 MMD_DEFAULT: {
                  internal_exception(1, "unimp cmod");
              }

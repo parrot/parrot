@@ -72,6 +72,9 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
     INTVAL has_ext = 0, new_flags = 0;
     PMC_EXT hold_ext;
 
+    if (pmc->vtable->base_type == new_type)
+        return pmc;
+
     /* First, is the destination a singleton? No joy for us there */
     if (Parrot_base_vtables[new_type]->flags & VTABLE_PMC_IS_SINGLETON) {
          internal_exception(ALLOCATION_ERROR,
