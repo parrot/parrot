@@ -1772,7 +1772,12 @@ yyreduce:
 
   case 37:
 #line 360 "imcc.y"
-    { yyval.i = 0; }
+    { yyval.i = NULL;  yyvsp[-2].sr ->pcc_sub->label = 0; }
+    break;
+
+  case 38:
+#line 361 "imcc.y"
+    { yyval.i = NULL;  yyvsp[-4].sr ->pcc_sub->label = 1; }
     break;
 
   case 39:
@@ -2454,7 +2459,7 @@ yyreduce:
     }
 
 /* Line 1016 of /usr/share/bison/yacc.c.  */
-#line 2458 "imcparser.c"
+#line 2463 "imcparser.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
