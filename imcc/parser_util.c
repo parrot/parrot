@@ -414,7 +414,7 @@ imcc_compile(Parrot_Interp interp, const char *s)
      */
     struct PackFile *pf_save = interp->code;
     struct PackFile *pf = PackFile_new(0);
-    char *source = sourcefile;
+    const char *source = sourcefile;
     char name[64];
 #ifdef EVAL_TEST
     opcode_t *pc;
@@ -493,7 +493,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 {
     struct PackFile *pf_save = interp->code;
     struct PackFile *pf;
-    char *source = sourcefile;
+    const char *source = sourcefile;
     char *ext;
     int pasm = pasm_file;
     FILE *new;

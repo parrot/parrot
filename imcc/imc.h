@@ -148,8 +148,8 @@ struct _imc_pragmas {
 
 EXTERN struct _imc_pragmas pragmas;
 
-EXTERN char * sourcefile;	/* current file */
-EXTERN char * function;	/* current function */
+EXTERN const char * sourcefile;	/* current file */
+EXTERN const char * function;	/* current function */
 EXTERN int        line;	/* and line */
 EXTERN int optimizer_level;
 EXTERN int dont_optimize;
