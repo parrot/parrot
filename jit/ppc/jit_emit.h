@@ -440,7 +440,7 @@ emit_bc(Parrot_jit_info_t * jit_info, branch_t cond, opcode_t disp) {
             (jit_info->native_ptr - jit_info->arena.start);
         if (jit_info->optimizer->cur_section->branch_target ==
             jit_info->optimizer->cur_section)
-                offset + 
+                offset +=
                     jit_info->optimizer->cur_section->branch_target->load_size;
     } else {
         offset = 0;
