@@ -570,7 +570,7 @@ emit_word(char *pc, unsigned int word) {
     return pc;
 }
 
-static void emit_jump_to_op(Parrot_jit_info *jit_info, arm_cond_t cond,
+static void emit_jump_to_op(Parrot_jit_info_t *jit_info, arm_cond_t cond,
                             opcode_t disp) {
     opcode_t opcode = jit_info->op_i + disp;
     int offset = 0;
@@ -634,7 +634,7 @@ emit_load_constant (char *pc,
     return pc;
 }   
 
-static void Parrot_jit_int_load(Parrot_jit_info *jit_info,
+static void Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
                                 struct Parrot_Interp *interpreter,
                                 arm_cond_t cond,
                                 int param,
@@ -677,7 +677,7 @@ static void Parrot_jit_int_load(Parrot_jit_info *jit_info,
     }
 }
 
-static void Parrot_jit_int_store(Parrot_jit_info *jit_info,
+static void Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
                                  struct Parrot_Interp *interpreter,
                                  arm_cond_t cond,
                                  int param,
@@ -716,7 +716,7 @@ static void Parrot_jit_int_store(Parrot_jit_info *jit_info,
 }
 
 static void
-Parrot_jit_arith_const_alternate (Parrot_jit_info *jit_info, 
+Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info, 
                                   struct Parrot_Interp *interpreter,
                                   arm_cond_t cond,
                                   enum constant_state alternate_on,
@@ -775,7 +775,7 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info *jit_info,
    registers, and v4 can do some things conditionally)
 */
 static void
-Parrot_jit_jumpif_const (Parrot_jit_info *jit_info, 
+Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info, 
                          struct Parrot_Interp *interpreter,
                          int src, int const_val, int where_to,
                          arm_cond_t when) {
@@ -802,7 +802,7 @@ Parrot_jit_jumpif_const (Parrot_jit_info *jit_info,
     emit_jump_to_op (jit_info, when, where_to);
 }
 
-void Parrot_jit_dofixup(Parrot_jit_info *jit_info,
+void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp * interpreter)
 {
     Parrot_jit_fixup *fixup = jit_info->fixups;
@@ -837,7 +837,7 @@ void Parrot_jit_dofixup(Parrot_jit_info *jit_info,
 */
 
 void
-Parrot_jit_begin(Parrot_jit_info *jit_info,
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  struct Parrot_Interp * interpreter)
 {
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG12_ip, REG13_sp);
@@ -887,7 +887,7 @@ need to adr beyond:
     .L2:                      ; next instruction - return point from func.
 */
 void
-Parrot_jit_normal_op(Parrot_jit_info *jit_info,
+Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, r1, r4);
@@ -917,7 +917,7 @@ Parrot_jit_normal_op(Parrot_jit_info *jit_info,
 }
 
 static void
-Parrot_jump_to_op_in_reg(Parrot_jit_info *jit_info,
+Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
                          struct Parrot_Interp * interpreter,
                          arm_register_t reg) {
     /* This is effectively the pseudo-opcode ldr - ie load relative to PC.
@@ -941,7 +941,7 @@ Parrot_jump_to_op_in_reg(Parrot_jit_info *jit_info,
 /* We get back address of opcode in bytecode.
    We want address of equivalent bit of jit code, which is stored as an
    address at the same offset in a jit table. */
-void Parrot_jit_cpcf_op(Parrot_jit_info *jit_info,
+void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
