@@ -40,6 +40,8 @@ for (@{$vtbl}) {
     print "    $retval $methname ($args) {\n";
     if($methname eq "name") {
         print "        return whoami\;\n";
+    } elsif($retval !~ /void/) {
+        print "        return ($retval)0;\n";
     }
     print "    }\n\n";
 }
