@@ -9,7 +9,7 @@ RM_F = ${rm_f}
 
 DIR=languages/scheme
 TOOL_DIR=../..
-ASM=$(PERL) -I ../../lib ../../assemble.pl
+ASM = ../../parrot
 SCHEMEC=$(PERL) schemec
 INTERP=./${test_prog}
 
