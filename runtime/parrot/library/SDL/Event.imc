@@ -70,7 +70,7 @@ away.
 	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
 
 	.local pmc layout
-	layout = fetch_layout( 'Event' )
+	layout = fetch_layout( 'Event::Generic' )
 
 	.local pmc event
 	new event, .ManagedStruct, layout
@@ -90,12 +90,34 @@ this directly, unless you're working with raw SDL calls.
 
 .sub event method
 
+	.param string name
+	
+        .local int offset
+        classoffset offset, self, 'SDL::Event'
+
+        .local pmc event
+        getattribute event, self, offset
+
+	if argcS == 0 goto END
+
+	.local pmc  fetch_layout
+	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
+
+	.local pmc layout
+	.local string ename
+	
+	ename = 'Event::'
+	concat ename, name
+
+	layout = fetch_layout( ename )
+	#new event, .ManagedStruct, layout
+	assign event, layout
+
 	.local int offset
 	classoffset offset, self, 'SDL::Event'
+	setattribute self, offset, event
 
-	.local pmc event
-	getattribute event, self, offset
-
+END:
 	.pcc_begin_return
 		.return event
 	.pcc_end_return
@@ -182,7 +204,7 @@ C<unknown> instead.
 .sub event_keyname method
 
 	.local pmc event
-	event = self.'event'()
+	event = self.'event'( 'Keyboard' )
 
 	.local int key_sym
 	key_sym = event['sym']
@@ -250,7 +272,7 @@ use_wait:
 	GetEvent = find_global 'SDL::NCI', 'WaitEvent'
 
 loop:
-	event    = self.'event'()
+	event    = self.'event'( 'Generic' )
 	continue = GetEvent( event )
 
 	if continue goto dispatch

@@ -114,6 +114,8 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
 	store_global 'SDL::NCI', 'LockSurface', sdl_function
 	dlfunc sdl_function, libsdl, 'SDL_UnlockSurface', 'vp'
 	store_global 'SDL::NCI', 'UnlockSurface', sdl_function
+	dlfunc sdl_function, libsdl, 'SDL_CreateRGBSurface', 'piiiiiiii'
+	store_global 'SDL::NCI', 'CreateRGBSurface', sdl_function
 .end
 
 =item _init_image()
@@ -201,8 +203,32 @@ success:
 	set  layout[ 'type' ], .DATATYPE_UINT8
 	push layout, 0
 	push layout, 0
+	set  layout[ 'pad0' ], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set  layout[ 'pad1' ], .DATATYPE_UINT16
+	push layout, 0
+	push layout, 0
+	set  layout[ 'pad2' ], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+	set  layout[ 'pad3' ], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+	set  layout[ 'pad4' ], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+	set  layout[ 'pad5' ], .DATATYPE_UINT32
+	push layout, 0
+	push layout, 0
+
+	set  layouts[ 'Event::Generic' ], layout
 
 	# SDL_KeyboardEvent is the largest struct in the SDL_Event union
+	layout = new OrderedHash
+	set  layout[ 'type' ], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
 	set  layout[ 'which' ], .DATATYPE_UINT8
 	push layout, 0
 	push layout, 0
@@ -234,7 +260,27 @@ success:
 	push layout, 0
 	push layout, 0
 
-	set  layouts[ 'Event' ], layout
+	set  layouts[ 'Event::Keyboard' ], layout
+
+	# SDL_MouseButtonEvent
+	layout = new OrderedHash
+	set  layout[ 'type' ], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set  layout[ 'button' ], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set  layout[ 'state' ], .DATATYPE_UINT8
+	push layout, 0
+	push layout, 0
+	set  layout[ 'x' ], .DATATYPE_UINT16
+	push layout, 0
+	push layout, 0
+	set  layout[ 'y' ], .DATATYPE_UINT16
+	push layout, 0
+	push layout, 0
+
+	set  layouts[ 'Event::MouseButton' ], layout
 .end
 
 .sub _set_Rect_layout method
@@ -588,6 +634,9 @@ built_struct:
 	if $I0 goto found
 	layout = new OrderedHash
 
+	print "SDL::fetch_layout warning: layout '"
+	print layout_name
+	print "' not found!\n"
 	goto found_done
 	
 found:
