@@ -60,7 +60,7 @@ foreach (keys(%real_type)) {
 
 
 # get opcodes
-my %opcodes = Parrot::Opcode::read_ops();
+my %opcodes = Parrot::Opcode::read_ops(-f "../opcode_table" ? "../opcode_table" : "opcode_table");
 
 constantize(Parrot::Opcode::fingerprint()); # Make it constant zero.
 
