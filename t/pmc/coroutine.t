@@ -70,7 +70,7 @@ done
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals");
-     new_pad 0
+    new_pad 0
     new_pad 1
 
     new P20, .PerlInt
