@@ -845,6 +845,7 @@ include_file (void* interp, char *file_name)
 
 /* XXX: use this code for miniparrot */
 #if !defined(_PARROTLIB)
+    {
     extern const char* Parrot_imcc_include_paths[];
     STRING *str = Parrot_library_fallback_locate(interp, file_name, Parrot_imcc_include_paths);
 
@@ -857,7 +858,9 @@ include_file (void* interp, char *file_name)
 	else
 	    string_cstring_free(s);
     }
+    }
 #else
+    {
     STRING* name = string_from_cstring(interp, file_name, strlen(file_name));
     STRING* result = Parrot_library_query(interp, "include_file_location", name);
 
@@ -866,7 +869,7 @@ include_file (void* interp, char *file_name)
 	sourcefile = strdup(string_to_cstring(interp, result));
 	file = fopen( sourcefile, "r" );
     }
-
+    }
 #endif
 
     if (!file)
