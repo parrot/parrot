@@ -68,6 +68,7 @@ typedef STRING_FUNCS *(**string_funcs)();      /* String function table */
 #endif
 
 typedef struct ProfData {
+    int op;
     UINTVAL numcalls;
     FLOATVAL time;
 } ProfData;
