@@ -349,6 +349,18 @@ FLOATVAL PF_fetch_number(struct PackFile *pf, opcode_t **stream);
 STRING*  PF_fetch_string(Parrot_Interp, struct PackFile *pf, opcode_t **stream);
 char *   PF_fetch_cstring(struct PackFile *pf, opcode_t **stream);
 
+size_t   PF_size_opcode(void);
+size_t   PF_size_integer(void);
+size_t   PF_size_number(void);
+size_t   PF_size_string(STRING *);
+size_t   PF_size_cstring(const char *);
+
+opcode_t* PF_store_opcode(opcode_t *, opcode_t);
+opcode_t* PF_store_integer(opcode_t *, INTVAL);
+opcode_t* PF_store_number (opcode_t *, FLOATVAL *);
+opcode_t* PF_store_string (opcode_t *, STRING *);
+opcode_t* PF_store_cstring(opcode_t *, const char *);
+
 void PackFile_assign_transforms(struct PackFile *pf);
 
 /*

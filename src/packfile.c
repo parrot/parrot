@@ -75,10 +75,11 @@ static opcode_t * pf_debug_unpack (struct Parrot_Interp *,
         struct PackFile_Segment *self, opcode_t *);
 static void pf_debug_destroy (struct PackFile_Segment *self);
 
-/* internal definitions */
+/*
+ * round val up to whole opcode_t, return result in opcodes
+ */
 #define ROUND_UP(val,size) (((val) + ((size) - 1))/(size))
 
-size_t cstring_packed_size(const char *s);
 /******************************************************************************
 
 =head1 PackFile Manipulation Functions
@@ -95,17 +96,6 @@ frozen bytecode.
 */
 
 
-size_t
-cstring_packed_size(const char *s)
-{
-    UINTVAL str_len;
-
-    if (!s)
-        return 0;
-
-    str_len = strlen(s);
-    return ROUND_UP(str_len + 1, sizeof(opcode_t));
-}
 
 /***************************************
 
@@ -1218,11 +1208,12 @@ pf_debug_new (struct PackFile *pf, const char * name, int add)
     debug->filename = NULL;
     return (struct PackFile_Segment *)debug;
 }
+
 static size_t
 pf_debug_packed_size (struct PackFile_Segment *self)
 {
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
-    return cstring_packed_size(debug->filename);
+    return PF_size_cstring(debug->filename);
 }
 
 static opcode_t *
@@ -1230,7 +1221,7 @@ pf_debug_pack (struct PackFile_Segment *self, opcode_t *cursor)
 {
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
     strcpy ((char *)cursor, debug->filename);
-    cursor += cstring_packed_size(debug->filename);
+    cursor += PF_size_cstring(debug->filename);
     return cursor;
 }
 
@@ -1418,7 +1409,7 @@ fixup_packed_size (struct PackFile_Segment *self)
         switch (ft->fixups[i]->type) {
             case enum_fixup_label:
             case enum_fixup_sub:
-                size += cstring_packed_size(ft->fixups[i]->name);
+                size += PF_size_cstring(ft->fixups[i]->name);
                 size ++; /* offset */
                 break;
             default:
@@ -1442,7 +1433,7 @@ fixup_pack (struct PackFile_Segment *self, opcode_t *cursor)
             case enum_fixup_label:
             case enum_fixup_sub:
                 strcpy ((char *)cursor, ft->fixups[i]->name);
-                cursor += cstring_packed_size(ft->fixups[i]->name);
+                cursor += PF_size_cstring(ft->fixups[i]->name);
                 *cursor++ = ft->fixups[i]->offset;
                 break;
             default:
@@ -1813,19 +1804,11 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
     switch (self->type) {
 
     case PFC_NUMBER:
-        packed_size = (sizeof(FLOATVAL) + sizeof(opcode_t) - 1)/
-            sizeof(opcode_t);
+        packed_size = PF_size_number();
         break;
 
     case PFC_STRING:
-        padded_size = self->u.string->bufused;
-
-        if (padded_size % sizeof(opcode_t)) {
-            padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
-        }
-
-        /* Include space for flags, encoding, type, and size fields.  */
-        packed_size = 4 + (size_t)padded_size / sizeof(opcode_t);
+        packed_size = PF_size_string(self->u.string);
         break;
 
     case PFC_KEY:
@@ -1846,7 +1829,7 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
             case enum_class_Closure:
             case enum_class_Continuation:
             case enum_class_Coroutine:
-                packed_size = cstring_packed_size(
+                packed_size = PF_size_cstring(
                         ((struct Parrot_Sub*)PMC_sub(component))->packed);
                 break;
             default:

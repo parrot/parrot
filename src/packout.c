@@ -159,58 +159,23 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 (Note this padding is not yet implemented for FLOATVALs.)
 ***************************************/
 
-/* this will go away soon */
-extern size_t cstring_packed_size(const char *s);
 
 opcode_t *
 PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
 {
-    char *charcursor;
-    size_t i;
-    opcode_t padded_size;
     struct PMC *key;
+    size_t i;
 
     *cursor++ = self->type;
 
     switch (self->type) {
 
     case PFC_NUMBER:
-        padded_size = (sizeof(FLOATVAL) + sizeof(opcode_t) - 1) /
-            sizeof(opcode_t);
-        mem_sys_memcopy(cursor, &self->u.number, sizeof(FLOATVAL));
-        cursor += padded_size;
+        cursor = PF_store_number(cursor, &self->u.number);
         break;
 
     case PFC_STRING:
-        padded_size = self->u.string->bufused;
-
-        if (padded_size % sizeof(opcode_t)) {
-            padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
-        }
-
-        *cursor++ = PObj_get_FLAGS(self->u.string); /* only constant_FLAG */
-        *cursor++ = self->u.string->encoding->index;
-        *cursor++ = self->u.string->type->index;
-        *cursor++ = self->u.string->bufused;
-
-        /* Switch to char * since rest of string is addressed by
-         * characters to ensure padding.  */
-        charcursor = (char *)cursor;
-
-        if (self->u.string->strstart) {
-            mem_sys_memcopy(charcursor, self->u.string->strstart,
-                            self->u.string->bufused);
-            charcursor += self->u.string->bufused;
-
-            if (self->u.string->bufused % sizeof(opcode_t)) {
-                for (i = 0; i < (sizeof(opcode_t) -
-                      (self->u.string->bufused % sizeof(opcode_t))); i++) {
-                    *charcursor++ = 0;
-                }
-            }
-        }
-        assert( ((int)charcursor & 3) == 0);
-        LVALUE_CAST(char *, cursor) = charcursor;
+        cursor = PF_store_string(cursor, self->u.string);
         break;
 
     case PFC_PMC:
@@ -222,11 +187,10 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
             case enum_class_Coroutine:
                 {
                     char *s = ((struct Parrot_Sub*)PMC_sub(key))->packed;
-                    strcpy((char *) cursor, s);
 #if TRACE_PACKFILE_PMC
                     fprintf(stderr, "PMC_packed '%s'\n", (char*) cursor);
 #endif
-                    cursor += cstring_packed_size(s);
+                    cursor = PF_store_cstring(cursor, s);
                 }
                 break;
             default:

@@ -15,20 +15,41 @@
  *                     byte-ordering
  *     PF_fetch_<type> read items and possibly convert the foreign
  *                     format
+ *     PF_size_<type>  return the needed size in opcode_t units
+ *
  *  References:
  */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 #define TRACE_PACKFILE 0
 #define TRACE_PACKFILE_PMC 0
 
-#define ROUND_UP(val,size) ((((val) + (size - 1))/(size)) * (size))
+/*
+ * round val up to whole size, return result in bytes
+ */
+#define ROUND_UP_B(val,size) ((((val) + (size - 1))/(size)) * (size))
+
+/*
+ * round val up to whole opcode_t, return result in opcodes
+ */
+#define ROUND_UP(val,size) (((val) + ((size) - 1))/(size))
+
 /*
 
 =head1 pf_items
 
-Parrot data items fetch and store functions
+Parrot data items fetch and store functions.
+
+PF_fetch_<item> functions retrieve the datatype item from the opcode
+stream and convert byteordering or binary format on the fly, depending
+on the packfile header.
+
+PF_store_<item> functions write the datatype item to the stream as is.
+These functions don't check the available size.
+
+PF_size_<item> functions return the store size of item in opcode_t units.
 
 =over 4
 
@@ -148,6 +169,14 @@ fetch_op_mixed(opcode_t b)
 
 Fetch an opcode_t from the stream, converting byteorder if needed.
 
+=item PF_store_opcode
+
+Store an opcode_t to stream as is.
+
+=item PF_size_opcode
+
+Return size of item in opcode_t units, which is 1 per definitionem.
+
 =cut
 
 ***************************************/
@@ -165,15 +194,35 @@ PF_fetch_opcode(struct PackFile *pf, opcode_t **stream) {
     return o;
 }
 
+opcode_t*
+PF_store_opcode(opcode_t *cursor, opcode_t val)
+{
+    *cursor++ = val;
+    return cursor;
+}
+
+size_t
+PF_size_opcode(void)
+{
+    return 1;
+}
+
 /***************************************
 
 =item PF_fetch_integer
 
-Fetch an INTVAL from the stream, converting
-byteorder if needed.
+Fetch an INTVAL from the stream, converting byteorder if needed.
 
 XXX assumes sizeof(INTVAL) == sizeof(opcode_t) - we don't have
     INTVAL size in PF header
+
+=item PF_store_integer
+
+Store an INTVAL to stream as is.
+
+=item PF_size_integer
+
+Return store size of INTVAL in opcode_t units.
 
 =cut
 
@@ -193,6 +242,19 @@ PF_fetch_integer(struct PackFile *pf, opcode_t **stream) {
 }
 
 
+opcode_t*
+PF_store_integer(opcode_t *cursor, INTVAL val)
+{
+    *cursor++ = (opcode_t)val; /* XXX */
+    return cursor;
+}
+
+size_t
+PF_size_integer(void)
+{
+    size_t s = sizeof(INTVAL) / sizeof(opcode_t);
+    return s ? s : 1;
+}
 
 /***************************************
 
@@ -201,6 +263,14 @@ PF_fetch_integer(struct PackFile *pf, opcode_t **stream) {
 Fetch a FLOATVAL from the stream, converting
 byteorder if needed. Then advance stream pointer by
 amount of packfile float size.
+
+=item PF_store_number
+
+Write a FLOATVAL to the opcode stream as is.
+
+=item PF_size_number
+
+Return store size of FLOATVAL in opcode_t units.
 
 =cut
 
@@ -239,6 +309,23 @@ PF_fetch_number(struct PackFile *pf, opcode_t **stream) {
     }
     return f;
 }
+
+opcode_t*
+PF_store_number(opcode_t *cursor, FLOATVAL *val)
+{
+    opcode_t padded_size  = (sizeof(FLOATVAL) + sizeof(opcode_t) - 1) /
+        sizeof(opcode_t);
+    mem_sys_memcopy(cursor, val, sizeof(FLOATVAL));
+    cursor += padded_size;
+    return cursor;
+}
+
+size_t
+PF_size_number(void)
+{
+    return ROUND_UP(sizeof(FLOATVAL), sizeof(opcode_t));
+}
+
 /*
 
 =item PF_fetch_string
@@ -251,6 +338,14 @@ Opcode format is:
   opcode_t type
   opcode_t size
   *  data
+
+=item PF_store_string
+
+Write a STRING to the opcode stream.
+
+=item PF_size_string
+
+Report store size of STRING in opcode_t units.
 
 =cut
 */
@@ -288,9 +383,58 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
                                flags,
                                chartype_lookup_index(type));
 
-    size = ROUND_UP(size, wordsize) / sizeof(opcode_t);
+    size = ROUND_UP_B(size, wordsize) / sizeof(opcode_t);
     *cursor += size;
     return s;
+}
+
+opcode_t*
+PF_store_string(opcode_t *cursor, STRING *s)
+{
+    opcode_t padded_size = s->bufused;
+    char *charcursor;
+    size_t i;
+
+    if (padded_size % sizeof(opcode_t)) {
+        padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
+    }
+
+    *cursor++ = PObj_get_FLAGS(s); /* only constant_FLAG */
+    *cursor++ = s->encoding->index;
+    *cursor++ = s->type->index;
+    *cursor++ = s->bufused;
+
+    /* Switch to char * since rest of string is addressed by
+     * characters to ensure padding.  */
+    charcursor = (char *)cursor;
+
+    if (s->strstart) {
+        mem_sys_memcopy(charcursor, s->strstart, s->bufused);
+        charcursor += s->bufused;
+
+        if (s->bufused % sizeof(opcode_t)) {
+            for (i = 0; i < (sizeof(opcode_t) -
+                        (s->bufused % sizeof(opcode_t))); i++) {
+                *charcursor++ = 0;
+            }
+        }
+    }
+    assert( ((int)charcursor & 3) == 0);
+    LVALUE_CAST(char *, cursor) = charcursor;
+    return cursor;
+}
+
+size_t
+PF_size_string(STRING *s)
+{
+    opcode_t padded_size = s->bufused;
+
+    if (padded_size % sizeof(opcode_t)) {
+        padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
+    }
+
+    /* Include space for flags, encoding, type, and size fields.  */
+    return 4 + (size_t)padded_size / sizeof(opcode_t);
 }
 
 /*
@@ -299,8 +443,17 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
 
 Fetch a cstring from bytecode and return an allocated copy
 
+=item PF_store_cstring
+
+Write a 0-terminate string to the stream.
+
+=item PF_size_cstring
+
+Return store size of a C-string in opcode_t units.
+
 =cut
 */
+
 char *
 PF_fetch_cstring(struct PackFile *pf, opcode_t **cursor)
 {
@@ -309,9 +462,27 @@ PF_fetch_cstring(struct PackFile *pf, opcode_t **cursor)
     int wordsize = pf->header->wordsize;
 
     strcpy(p, (char*) (*cursor));
-    (*cursor) += ROUND_UP(str_len, wordsize) / sizeof(opcode_t);
+    (*cursor) += ROUND_UP_B(str_len, wordsize) / sizeof(opcode_t);
     return p;
 }
+
+opcode_t*
+PF_store_cstring(opcode_t *cursor, const char *s)
+{
+    strcpy((char *) cursor, s);
+    return cursor + PF_size_cstring(s);
+}
+
+size_t
+PF_size_cstring(const char *s)
+{
+    size_t str_len;
+
+    assert(s);
+    str_len = strlen(s);
+    return ROUND_UP(str_len + 1, sizeof(opcode_t));
+}
+
 /*
 
 =back
