@@ -2,6 +2,23 @@ package P6C::TestCompiler;
 
 my $PARROT = '../..';
 my $PERL = $ENV{PERL} || 'perl';
+my $ERR = 'a.err';
+my $testno = 0;
+my $code;
+
+sub dumperr {
+    open IN, $ERR;
+    print STDERR <IN>;
+    close IN;
+    open O, ">test-$testno.p6";
+    print O $code;
+    close O;
+    for my $ext (qw(pasm pbc imc err)) {
+	rename "a.$ext", "test-$testno.$ext";
+    }
+    print STDERR "See test-$testno.{p6,imc,pasm,pbc} for output,",
+	"and test-$testno.err for errors\n";
+}
 
 sub import {
     my $pkg = caller;
@@ -24,21 +41,26 @@ sub mysystem($$) {
 }
 
 sub output_is {
-    my ($code, $out, $desc) = @_;
+    $code = shift;
+    ++$testno;
+    my ($out, $desc) = @_;
     unless ($desc) {
 	(undef, my $file, my $line) = caller;
 	$desc = "($file line $line)";
     }
-    open(O, "| perl prd-perl6.pl --batch --imc > a.imc 2>/dev/null") or die $!;
+    open(O, "| perl prd-perl6.pl --batch --imc > a.imc 2>$ERR") or die $!;
     print O $code;
     unless (close O) {
-	ok(0, "$desc: parse: $!");
+	ok(0, "$desc: compile error: $!");
+	dumperr;
 	return;
     }
-    (mysystem("$PARROT/languages/imcc/imcc a.imc a.pasm 2>/dev/null", $desc)
-     && mysystem("$PERL $PARROT/assemble.pl a.pasm > a.pbc", $desc)
-     && mysystem("$PARROT/parrot a.pbc > a.output", $desc))
-	or return 0;
+    unless(mysystem("$PARROT/languages/imcc/imcc a.imc a.pasm 2>$ERR", $desc)
+	   && mysystem("$PERL $PARROT/assemble.pl a.pasm > a.pbc 2>$ERR",$desc)
+	   && mysystem("$PARROT/parrot a.pbc > a.output 2>$ERR", $desc)) {
+	dumperr;
+	return;
+    }
     open(I, 'a.output');
     my $result = join '', <I>;
     ok($out eq $result, $desc);
