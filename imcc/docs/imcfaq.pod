@@ -42,7 +42,7 @@ earlier) included only the raw Parrot assembler that compiled Parrot Assembly
 language. This was considered the reference assembler. The Cola compiler, on the
 other hand, targeted its own little back end compiler that included a register
 allocator, basic block tracking and medium level expression parsing. The backend compiler
-was eventually named IMCC and benefitted from contributions from Angel Faus, Leo
+was eventually named IMCC and benefited from contributions from Angel Faus, Leo
 Toetsch, Steve Fink and Sean O'Rourke. The first version of Perl6 written by Sean
 used IMCC as its backend and that's how it currently exists.
 
@@ -165,7 +165,7 @@ the module and assemble it to bytecode.
 =head4 Dump PASM to screen (my favorite shortcut).
 
 	parrot -o - hello.imc
-	
+
 
 =head2 Does IMCC do variable interpolation in strings?
 
@@ -278,7 +278,7 @@ directive like so:
 Parrot will fixup the symbol references at runtime.
 
 
- 
+
 
 =head1 IMCC ADVANCED TOPICS
 
@@ -409,7 +409,7 @@ have to track them.
 
 =head2 That sounds easy, but how would it look?
 
-I'd be surpised if you are writing a compiler and can't figure this one out by
+I'd be surprised if you are writing a compiler and can't figure this one out by
 yourself, but I'll be nice since this IS supposed to be documentation.
 It does help to actually see how IMCC does it.
 
@@ -506,7 +506,7 @@ Here is the IMCC workaround until we have explicit .class syntax and bytecode fr
 	   # Call TestClass constructor
 	   $P100 = self[2]
 	   P2 = self       # For method calling convention P2 is the object
-	   invoke $P100    # Leave P1 with ret continuatio (tail chain)
+	   invoke $P100    # Leave P1 with ret continuation (tail chain)
 	   .pcc_begin_return
 	   .pcc_end_return
 	.end
