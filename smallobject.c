@@ -66,7 +66,6 @@ void
 add_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool, void *to_add)
 {
-    /* This code is copied to add_free_pmc */
     PObj_flags_SETTO((PObj *)to_add, PObj_on_free_list_FLAG);
     *(void **)to_add = pool->free_list;
     pool->free_list = to_add;
@@ -78,7 +77,6 @@ void *
 get_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
-    /* This code is copied to get_free_pmc and get_free_buffer */
     void *ptr;
 
     /* if we don't have any objects */
@@ -87,6 +85,11 @@ get_free_object(struct Parrot_Interp *interpreter,
 
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
+    pool->num_free_objects--;
+#if ! DISABLE_GC_DEBUG
+    if (GC_DEBUG(interpreter))
+        ((Buffer*)ptr)->version++;
+#endif
     return ptr;
 }
 
@@ -133,9 +136,9 @@ alloc_objects(struct Parrot_Interp *interpreter,
         add_free_object (interpreter, pool, object);
         object = (void *)((char *)object + pool->object_size);
     }
+    pool->total_objects += pool->objects_per_alloc;
 
     /* Allocate more next time */
-    pool->total_objects += pool->objects_per_alloc;
     if (GC_DEBUG(interpreter)) {
         pool->objects_per_alloc *= GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR;
         pool->replenish_level =
@@ -147,7 +150,7 @@ alloc_objects(struct Parrot_Interp *interpreter,
         pool->replenish_level =
                 (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
     }
-    /* check alloc size agains maximum and set new allocation data */
+    /* check alloc size against maximum */
     size = pool->object_size * pool->objects_per_alloc;
 
     if (size > POOL_MAX_BYTES) {

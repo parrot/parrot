@@ -49,7 +49,6 @@ Tests
 
 Utilities
 
-- disassemble.c dumps core
 - assemble.pl rolls its own packfile packing
 
 Classes
