@@ -27,7 +27,7 @@ mem_allocate_aligned(IV size) {
     
   mem = malloc(max_to_alloc);
   if (((IV)mem & mask) < (IV)mem) {
-    mem = (void *)((IV)mem & mask + mask + 1);
+    mem = (void *)(((IV)mem & mask) + ~mask + 1);
   } 
   return mem;
 }
