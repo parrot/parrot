@@ -831,6 +831,10 @@ assignment:
                         { $$ = iNEW(interp, cur_unit, $1, $4, $6, 1); }
    | target '=' NEW classname
                         { $$ = iNEW(interp, cur_unit, $1, $4, NULL, 1); }
+   | target '=' NEW var
+                        { $$ = MK_I(interp, cur_unit, "new", 2, $1, $4); }
+   | target '=' NEW var COMMA var
+                        { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
    | target '=' newsub IDENTIFIER
                         { $$ = iNEWSUB(interp, cur_unit, $1, $3,
                                           mk_sub_address($4), NULL, 1); }

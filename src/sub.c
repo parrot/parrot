@@ -420,7 +420,9 @@ Returns a new C<Parrot_Sub> with its own copy of the current context.
 struct Parrot_Sub *
 new_ret_continuation(struct Parrot_Interp *interp)
 {
-    struct Parrot_Sub *cc = new_sub(interp, sizeof(struct Parrot_Sub));
+    struct Parrot_Sub *cc =
+        mem_sys_allocate_zeroed(sizeof(struct Parrot_Sub));
+    cc->seg = interp->code->cur_cs;
     save_context(interp, &cc->ctx);
     return cc;
 }

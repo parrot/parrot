@@ -1422,3 +1422,4 @@ callmethod_s    1394
 callmethod_sc   1395
 callmethodcc_s  1396
 callmethodcc_sc 1397
+set_addr_p_i	1398

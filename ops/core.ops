@@ -459,6 +459,10 @@ Sets register $1 to the current address plus the offset $2.
 
 Sets PMC in register $1 to the current address plus the offset $2.
 
+=item B<set_addr>(in PMC, invar INT)
+
+Sets PMC in register $1 to the absolut address $2 obtained from B<get_addr>.
+
 =item B<get_addr>(out INT, in PMC)
 
 Sets $1 to the absolute address of the Sub-PMC $2.
@@ -472,6 +476,11 @@ inline op set_addr(out INT, inconst INT) {
 
 inline op set_addr(in PMC, inconst INT) {
   $1->vtable->set_pointer(interpreter, $1, (CUR_OPCODE + $2));
+  goto NEXT();
+}
+
+inline op set_addr(in PMC, invar INT) {
+  $1->vtable->set_pointer(interpreter, $1, (void* )$2);
   goto NEXT();
 }
 
