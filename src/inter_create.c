@@ -155,14 +155,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* initialize classes - this needs mmd func table */
     Parrot_init(interpreter);
 
-#if PARROT_CATCH_NULL
-    /* Initialize once only. For now all interpreters share the NULL PMC.
-     * Adding to interpreter-local storage will add a deref overhead.
-     * init_null will return the NULL PMC, but ignore for now since it is global.
-     */
-    pmc_init_null(interpreter);
-#endif
-
     /* context data */
     /* Initialize interpreter's flags */
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);

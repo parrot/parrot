@@ -184,6 +184,7 @@ P	IPP
 P	IPPP
 P	IO
 S	IO
+i       P
 
 # the following are use by t/pmc/nci.t
 f	ff
@@ -201,7 +202,7 @@ v	IOP
 P	Ii
 
 # PerlHash fromkeys
-P	IOPP
+P	IOP
 
 # Oddball ones for postgres
 p	ptiLTLLi

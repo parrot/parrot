@@ -144,6 +144,17 @@ Sets $1 to 1 or 0, depending on whether $2 is true or not
 
 =cut
 
+=item B<issame>(out INT, in PMC, in PMC)
+
+Sets $1 to 1 or 0, dependig on the identity of the 2 objects.
+
+=cut
+
+inline op issame(out INT, in PMC, in PMC) {
+    $1 = &$2 == &$3;
+    goto NEXT();
+}
+
 inline op istrue(out INT, in PMC) {
     $1 = VTABLE_get_bool(interpreter, $2);
     goto NEXT();
@@ -202,7 +213,10 @@ Sets $1 to 1 if $2 is equal to $3
 =cut
 
 inline op iseq(out INT, in PMC, in PMC) {
-  $1 = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_EQ);
+  if (&$2 == &$3)
+    $1 = 1;
+  else
+    $1 = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_EQ);
   goto NEXT();
 }
 
@@ -220,7 +234,10 @@ Sets $1 to 1 if $2 is not equal to $3
 =cut
 
 inline op isne(out INT, in PMC, in PMC) {
-  $1 = !mmd_dispatch_i_pp(interpreter, $2, $3, MMD_EQ);
+  if (&$2 == &$3)
+    $1 = 0;
+  else
+    $1 = !mmd_dispatch_i_pp(interpreter, $2, $3, MMD_EQ);
   goto NEXT();
 }
 

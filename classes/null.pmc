@@ -21,7 +21,7 @@ really slowing down the bytecode execution.
 
 #include "parrot/parrot.h"
 
-pmclass Null {
+pmclass Null singleton {
 
 /*
 
@@ -34,6 +34,14 @@ Overrides the default to do nothing.
 */
 
     void init () {
+    }
+
+    void* get_pointer() {
+        return PMCNULL;
+    }
+
+    void set_pointer(void* p) {
+        PMCNULL = p;
     }
 
 }

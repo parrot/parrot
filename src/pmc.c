@@ -22,33 +22,7 @@ src/pmc.c - The base vtable calling functions
 static PMC* get_new_pmc_header(Parrot_Interp, INTVAL base_type, UINTVAL flags);
 
 
-#if PARROT_CATCH_NULL
 PMC * PMCNULL;
-Parrot_mutex init_null_mutex;
-
-/*
-
-=item C<PMC *
-pmc_init_null(Interp * interpreter)>
-
-Initializes C<PMCNULL>, C<Null> PMC.
-
-=cut
-
-*/
-
-PMC *
-pmc_init_null(Interp * interpreter)
-{
-    LOCK(init_null_mutex);
-    if(!PMCNULL)
-       PMCNULL = get_new_pmc_header(interpreter, enum_class_Null,
-               PObj_constant_FLAG);
-    PMCNULL->vtable = Parrot_base_vtables[enum_class_Null];
-    UNLOCK(init_null_mutex);
-    return PMCNULL;
-}
-#endif
 
 /*
 
@@ -190,6 +164,25 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type,
         PANIC("Null vtable used");
     }
 
+    /* we only have one global Env object, living in the interpreter */
+    if (vtable->flags & VTABLE_PMC_IS_SINGLETON) {
+        /*
+         * singletons (monadic objects) exist only once, the interface
+         * with the class is:
+         * - get_pointer: return NULL or a pointer to the single instance
+         * - set_pointer: set the only instance once
+         *
+         * - singletons are created in the constant pmc pool
+         */
+        pmc = (vtable->get_pointer)(interpreter, NULL);
+        /* LOCK */
+        if (!pmc) {
+            pmc = new_pmc_header(interpreter, PObj_constant_FLAG);
+            pmc->vtable = vtable;
+            VTABLE_set_pointer(interpreter, pmc, pmc);
+        }
+        return pmc;
+    }
     if (vtable->flags & VTABLE_IS_CONST_FLAG) {
         /* put the normal vtable in, so that the pmc can be initialized first
          * parrot or user code has to set the _ro property then,
@@ -245,38 +238,6 @@ PMC *
 pmc_new_noinit(Interp *interpreter, INTVAL base_type)
 {
     PMC *pmc;
-    /* we only have one global Env object, living in the interpreter */
-    if (Parrot_base_vtables[base_type]->flags & VTABLE_PMC_IS_SINGLETON) {
-        if (base_type == enum_class_Env) {
-            /* XXX need probably a lock around this code
-             */
-            pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
-                    (INTVAL)IGLOBALS_ENV_HASH);
-            if (!pmc) {
-                pmc = get_new_pmc_header(interpreter, base_type,
-                        PObj_constant_FLAG);
-                VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
-                        (INTVAL)IGLOBALS_ENV_HASH, pmc);
-            /* UNLOCK */}
-            return pmc;
-        }
-        /*
-         * singletons (monadic objects) exist only once, the interface
-         * with the class is:
-         * - get_pointer: return NULL or a pointer to the single instance
-         * - set_pointer: set the only instance once
-         *
-         * - singletons are created in the constant pmc pool
-         */
-        pmc = (Parrot_base_vtables[base_type]->get_pointer)(interpreter, NULL);
-        /* LOCK */
-        if (!pmc) {
-            pmc = get_new_pmc_header(interpreter, base_type,
-                    PObj_constant_FLAG);
-            VTABLE_set_pointer(interpreter, pmc, pmc);
-        }
-        return pmc;
-    }
     pmc = get_new_pmc_header(interpreter, base_type, 0);
     return pmc;
 }
@@ -464,15 +425,17 @@ Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
     VTABLE *vtable = Parrot_base_vtables[type];
     STRING *class_name;
     INTVAL pos, len, parent_type;
+    PMC *class;
     /*
      * class interface - a PMC is it's own class
      * XXX use a separate vtable entry?
      *
      * put an instance of this PMC into data
      */
-    PMC *class = vtable->data = new_pmc_header(interpreter,
-            PObj_constant_FLAG);
-    class->vtable = vtable;
+    class = get_new_pmc_header(interpreter, type, PObj_constant_FLAG);
+    vtable->data = class;
+    PMC_pmc_val(class)   = (void*)0xdeadbeef;
+    PMC_struct_val(class)= (void*)0xdeadbeef;
     /*
      * register mmds for this type
      */

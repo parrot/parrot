@@ -67,6 +67,15 @@ information see F<src/pmc.c>.
     INTVAL type () {
 	return SELF->vtable->base_type;
     }
+
+    INTVAL is_equal(PMC* other) {
+MMD_None: {
+        return 1;
+        }
+MMD_DEFAULT: {
+        return 0;
+        }
+    }
 }
 
 /*

@@ -418,6 +418,12 @@ parrot_py_hash(Interp *interpreter, PMC *pmc)
     return h;
 }
 
+static INTVAL
+parrot_py_id(PMC *pmc)
+{
+    return (INTVAL) pmc;
+}
+
 static PMC *
 parrot_py_iter(Interp *interpreter, PMC *pmc)
 {
@@ -538,6 +544,7 @@ Initialize Python builtin functions.
 static void
 parrot_py_create_funcs(Interp *interpreter)
 {
+    STRING *ip   =     CONST_STRING(interpreter, "iP");
     STRING *pip   =    CONST_STRING(interpreter, "PIP");
     STRING *pipp   =   CONST_STRING(interpreter, "PIPP");
     STRING *pippp   =  CONST_STRING(interpreter, "PIPPP");
@@ -549,6 +556,7 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *enumerate= CONST_STRING(interpreter, "enumerate");
     STRING *filter   = CONST_STRING(interpreter, "filter");
     STRING *hash     = CONST_STRING(interpreter, "hash");
+    STRING *id       = CONST_STRING(interpreter, "id");
     STRING *list     = CONST_STRING(interpreter, "list");
     STRING *longf    = CONST_STRING(interpreter, "long");
     STRING *map      = CONST_STRING(interpreter, "map");
@@ -565,6 +573,7 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_enumerate), enumerate, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_id), id, ip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_long), longf, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);

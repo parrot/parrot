@@ -1060,13 +1060,11 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - string");
 .sub main @MAIN
     .include "iterator.pasm"
     .local pmc hash
-    .local pmc value
     .local pmc str
     str = new PerlString
     str = "abcdef"
     hash = new PerlHash
-    null value
-    hash."fromkeys"(str, value)
+    hash."fromkeys"(str)
     $I0 = hash
     print $I0
     print " "
@@ -1091,7 +1089,6 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - array");
 .sub main @MAIN
     .include "iterator.pasm"
     .local pmc hash
-    .local pmc value
     .local pmc ar
     ar = new PerlArray
     push ar, "a"
@@ -1100,8 +1097,7 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - array");
     push ar, "d"
     push ar, "e"
     hash = new PerlHash
-    null value
-    hash."fromkeys"(ar, value)
+    hash."fromkeys"(ar)
     $I0 = hash
     print $I0
     print " "
@@ -1153,7 +1149,6 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - array slice");
 .sub main @MAIN
     .include "iterator.pasm"
     .local pmc hash
-    .local pmc value
     .local pmc ar
     ar = new PerlArray
     push ar, "a"
@@ -1164,8 +1159,7 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - array slice");
     .local pmc sl
     sl = slice ar[1 ..]
     hash = new PerlHash
-    null value
-    hash."fromkeys"(sl, value)
+    hash."fromkeys"(sl)
     $I0 = hash
     print $I0
     print " "
@@ -1189,14 +1183,12 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - xrange");
 .sub main @MAIN
     .include "iterator.pasm"
     .local pmc hash
-    .local pmc value
     .local pmc xr
     xr = new Slice[0 .. 10]
     .local pmc sl
     sl = new Iterator, xr
     hash = new PerlHash
-    null value
-    hash."fromkeys"(sl, value)
+    hash."fromkeys"(sl)
     $I0 = hash
     print $I0
     print " "
@@ -1255,14 +1247,12 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - xrange get_iter");
 .sub main @MAIN
     .include "iterator.pasm"
     .local pmc hash
-    .local pmc value
     .local pmc xr
     xr = new Slice[0 .. 10]
     .local pmc sl
     sl = new Iterator, xr
     hash = new PerlHash
-    null value
-    hash."fromkeys"(sl, value)
+    hash."fromkeys"(sl)
     $I0 = hash
     print $I0
     print " "

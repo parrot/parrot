@@ -27,8 +27,9 @@ my %builtins = (
     callable => 1,
     chr => 1,
     dict => 'v',
-    hash => 1,
     enumerate => 1,
+    hash => 1,
+    id => 1,
     filter => 1,
     list => 'v',
     long => 'v',
@@ -731,7 +732,7 @@ sub UNARY_NOT
     if ($opcode eq 'JUMP_IF_FALSE') {
 	print "\t\t$cmt\n";
 	$code_l++;
-	JUMP_IF_TRUE($arg, $rest);
+	JUMP_IF_TRUE($arg, $rest, "\t# JUMP_IF_FALSE");
     }
     else {
 	my $tos = pop @stack;
@@ -782,6 +783,9 @@ sub COMPARE_OP
     my ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
     my $targ = "pc_xxx";
     my $label = '';
+    if (!defined $op) {
+	goto plain;
+    }
     if ($opcode eq 'Label') {
 	$label = "pc_" . $code[$code_l]->[3] . ":";
 	$code_l++;
@@ -816,6 +820,7 @@ sub COMPARE_OP
 	$op = $c;
     }
     else {
+plain:
 	$code_l-- if ($label ne '');
 	# plain compare, no branch
 	my %is_map = (
@@ -825,6 +830,7 @@ sub COMPARE_OP
 	    '>=' => 'isge',
 	    '<' => 'islt',
 	    '<=' => 'isle',
+	    'is' => 'issame',
 	);
 	my $res = temp('I');
 	my $pres = temp('P');
@@ -832,7 +838,7 @@ sub COMPARE_OP
 	my $lp = promote($l);
 	my $rp = promote($r);
 	print <<EOC;
-	$res = $op $lp, $rp
+	$res = $op $lp, $rp $cmt
 	$pres = new .Boolean
 	$pres = $res # ugly
 EOC
@@ -919,6 +925,7 @@ sub ret_val {
     my $a = shift;
     my %rets = (
 	'__repr__' => 'S',
+	'id'       => 'I',
     );
     return $rets{$a} if defined $rets{$a};
     return 'P';
@@ -1010,8 +1017,14 @@ EOC
 EOC
     }
     else {
+	my $ret_type = ret_val($func);
+	my $ret_string = "";
+	if ($ret_type ne 'None') {
+	    $t = temp($ret_type);
+	    $ret_string = "$t = ";
+	}
 	print <<EOC;
-	$func($args)  $cmt
+	$ret_string$func($args)  $cmt
 EOC
     }
     my $opcode = $code[$code_l]->[2];

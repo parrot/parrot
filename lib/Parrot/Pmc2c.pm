@@ -1063,6 +1063,11 @@ sub body
 {
     my ($self, $method, $line) = @_;
     my $meth = $method->{meth};
+    # existing methods get emitted
+    if ($self->SUPER::implements($meth)) {
+        my $n = $self->{has_method}{$meth};
+        return $self->SUPER::body($self->{methods}[$n]);
+    }
     my $decl = $self->decl($self->{class}, $method, 0);
     my $l = "";
     my $ret = gen_ret($method);
