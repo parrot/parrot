@@ -1,0 +1,92 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+docs/pdds/pdd17_basic_types.pod - Document parrot's basic PMC types
+
+=head1 ABSTRACT
+
+This PDD documents the base Parrot PMC types and their behaviours.
+
+=head1 DESCRIPTION
+
+Parrot has a number of basic PMC types that all programs can guarantee
+will be available to them. (With the possible exception of parrot
+programs executing on an embedded device or other restricted environment)
+
+=head2 Scalar types
+
+=over 4
+
+=item Undef
+
+=item Integer
+
+=item Float
+
+=item String
+
+=item Boolean
+
+=item BigNum
+
+=item ParrotClass
+
+=item ParrotObject
+
+=back
+
+=head2 Array types
+
+=head2 Hash types
+
+=over 4
+
+=item Env
+
+=back
+
+=head1 IMPLEMENTATION
+
+
+
+=head1 FOOTNOTES
+
+List of footnotes to the text.
+
+=head1 REFERENCES
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 17
+    Version: 1.0
+    Status: Developing
+    Last Modified: 2004/06/11
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.0
+
+None. First version
+
+=back
+

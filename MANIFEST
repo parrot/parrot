@@ -271,6 +271,7 @@ docs/pdds/pdd13_bytecode.pod                      [main]doc
 docs/pdds/pdd14_bignum.pod                        [main]doc
 docs/pdds/pdd15_objects.pod                       [main]doc
 docs/pdds/pdd16_native_call.pod                   [main]doc
+docs/pdds/pdd17_basic_types.pod			  [main]doc
 docs/pdds/pdd_template.pod                        [main]doc
 docs/pmc/array.pod                                [main]doc
 docs/pmc/iterator.pod                             [main]doc
