@@ -180,6 +180,8 @@ i	IPt
 
 # Py_func signatures
 P	IP
+P	IPP
+P	IPPP
 
 # the following are use by t/pmc/nci.t
 f	ff

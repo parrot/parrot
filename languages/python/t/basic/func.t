@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 14;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -84,4 +84,46 @@ if __name__ == '__main__':
     for i in range(10):
 	print i,
     print
+CODE
+
+test(<<'CODE', 'range 2');
+if __name__ == '__main__':
+    for i in range(2,5):
+	print i,
+    print
+CODE
+
+test(<<'CODE', 'range 3');
+if __name__ == '__main__':
+    for i in range(2,10,3):
+	print i,
+    print
+CODE
+
+test(<<'CODE', 'range 3 negative step');
+
+def main():
+    for i in range(10, 0, -2):
+	print i
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'tuple 1');
+def main():
+    print tuple("abcd")[1]
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'tuple iter');
+def main():
+    s = "abcd"
+    i = iter(s)
+    print tuple(i)[2]
+
+if __name__ == '__main__':
+    main()
 CODE

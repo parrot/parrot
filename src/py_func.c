@@ -21,6 +21,12 @@ Python functions.
 #include "parrot/parrot.h"
 #include "py_func.str"
 
+/*
+
+Python Library Reference 2.1 Built-in Functions
+
+*/
+
 static PMC *
 parrot_py_callable(Interp *interpreter, PMC *pmc)
 {
@@ -74,12 +80,24 @@ parrot_py_hash(Interp *interpreter, PMC *pmc)
 }
 
 static PMC *
+parrot_py_iter(Interp *interpreter, PMC *pmc)
+{
+    return pmc_new_init(interpreter, enum_class_Iterator, pmc);
+}
+
+static PMC *
 parrot_py_range(Interp *interpreter, int start, int end, int step)
 {
     PMC *ar = pmc_new(interpreter, enum_class_PerlArray);
     int i, k;
-    for (i = k = 0; i != end; i += step, ++k)
-        VTABLE_set_integer_keyed_int(interpreter, ar, k, i);
+    if (step < 0) {
+        for (i = start, k = 0; i > end; i += step, ++k)
+            VTABLE_set_integer_keyed_int(interpreter, ar, k, i);
+    }
+    else {
+        for (i = start, k = 0; i < end; i += step, ++k)
+            VTABLE_set_integer_keyed_int(interpreter, ar, k, i);
+    }
     return ar;
 }
 
@@ -89,6 +107,62 @@ parrot_py_range_1(Interp *interpreter, PMC *pmc)
 
     INTVAL end = VTABLE_get_integer(interpreter, pmc);
     return parrot_py_range(interpreter, 0, end, 1);
+}
+
+static PMC *
+parrot_py_range_2(Interp *interpreter, PMC *st, PMC *pmc)
+{
+
+    INTVAL start = VTABLE_get_integer(interpreter, st);
+    INTVAL end = VTABLE_get_integer(interpreter, pmc);
+    return parrot_py_range(interpreter, start, end, 1);
+}
+
+static PMC *
+parrot_py_range_3(Interp *interpreter, PMC *sta, PMC *pmc, PMC *ste)
+{
+
+    INTVAL start = VTABLE_get_integer(interpreter, sta);
+    INTVAL end = VTABLE_get_integer(interpreter, pmc);
+    INTVAL step = VTABLE_get_integer(interpreter, ste);
+    return parrot_py_range(interpreter, start, end, step);
+}
+
+static PMC *
+parrot_py_tuple(Interp *interpreter, PMC *pmc)
+{
+    PMC *ar;
+    INTVAL i, n;
+    STRING *s;
+
+    switch (pmc->vtable->base_type) {
+        case enum_class_PerlArray:
+            return pmc;
+        case enum_class_String:
+        case enum_class_PerlString:
+            ar = pmc_new(interpreter, enum_class_PerlArray);
+            s = PMC_str_val(pmc);
+            n = string_length(interpreter, s);
+            VTABLE_set_integer_native(interpreter, ar, n);
+            for (i = 0; i < n; ++i) {
+                VTABLE_set_string_keyed_int(interpreter, ar, i,
+                    string_substr(interpreter, s, i, 1, NULL, 0));
+            }
+            return ar;
+        case enum_class_Iterator:
+            ar = pmc_new(interpreter, enum_class_PerlArray);
+            /* reset iterator */
+            VTABLE_set_integer_native(interpreter, pmc, 0);
+            i = 0;
+            while (VTABLE_get_bool(interpreter, pmc)) {
+                PMC *item = VTABLE_shift_pmc(interpreter, pmc);
+                VTABLE_set_pmc_keyed_int(interpreter, ar, i++, item);
+            }
+            return ar;
+        default:
+            internal_exception(1, "unimplemented tuple type\n");
+    }
+    return NULL;
 }
 
 static void
@@ -121,8 +195,20 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *hash     = CONST_STRING(interpreter, "hash");
     STRING *hash_sig = CONST_STRING(interpreter, "PIP");
 
+    STRING *iter     = CONST_STRING(interpreter, "iter");
+    STRING *iter_sig = CONST_STRING(interpreter, "PIP");
+
     STRING *range_1     = CONST_STRING(interpreter, "range_1");
     STRING *range_1_sig = CONST_STRING(interpreter, "PIP");
+
+    STRING *range_2     = CONST_STRING(interpreter, "range_2");
+    STRING *range_2_sig = CONST_STRING(interpreter, "PIPP");
+
+    STRING *range_3     = CONST_STRING(interpreter, "range_3");
+    STRING *range_3_sig = CONST_STRING(interpreter, "PIPPP");
+
+    STRING *tuple     = CONST_STRING(interpreter, "tuple");
+    STRING *tuple_sig = CONST_STRING(interpreter, "PIP");
 
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable),
             callable, callable_sig);
@@ -130,8 +216,16 @@ parrot_py_create_funcs(Interp *interpreter)
             chr, chr_sig);
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash),
             hash, hash_sig);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_iter),
+            iter, iter_sig);
     parrot_py_global(interpreter, F2DPTR(parrot_py_range_1),
             range_1, range_1_sig);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_range_2),
+            range_2, range_2_sig);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_range_3),
+            range_3, range_3_sig);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_tuple),
+            tuple, tuple_sig);
 }
 
 /*

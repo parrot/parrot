@@ -319,6 +319,9 @@ sub is_builtin {
 sub LOAD_GLOBAL {
     my ($n, $c, $cmt) = @_;
     my $p = temp('P');
+    if ($c eq 'range') {
+    	$c = 'range_1';
+    }
     if (is_builtin($c)) {
     print <<EOC;
 	# builtin $c $cmt
@@ -329,7 +332,7 @@ EOC
 	print <<EOC;
 	$p = global "$c" $cmt
 EOC
-	push @stack, [-1, $p, 'P'];
+	push @stack, [$c, $p, 'P'];
     }
     # print_stack();
 }
@@ -344,7 +347,7 @@ EOC
 	return;
     }
     if ($c eq 'range') {
-	$c = 'range_1';
+    	$c = 'range_1';
     }
     if ($globals{$c}) {
 	print <<"EOC";
@@ -358,7 +361,7 @@ EOC
 	$c = global "$c"
 EOC
     }
-    push @stack, [$n, $c, 'P'];
+    push @stack, [$c, $c, 'P'];
 }
 
 sub PRINT_ITEM
@@ -663,14 +666,18 @@ sub CALL_FUNCTION
     my $args = join ', ', @args;
     my $t;
     my $func = $tos->[1];
-    if ($func eq 'range') {
-	$func = "${func}_$n";	# range_1 .. range_3
-	unless ($globals{$func}) {
-	    $globals{$func} = 1;
-	    print <<"EOC";
+    my $name = $tos->[0];
+    if ($name =~ /^range/) {
+	$func = $name;
+	if ($func =~ s/^(range)_\d+/$1/) {
+	    $func = "${func}_$n";	# range_1 .. range_3
+	    unless ($globals{$func}) {
+		$globals{$func} = 1;
+		print <<"EOC";
 	.local NCI $func
 	$func = global "$func"
 EOC
+	    }
 	}
     }
     if ($tos->[2] eq 'F') {	# builtin
@@ -778,6 +785,10 @@ EOC
     push @stack, [-1, $ar, 'P'];
 }
 
+sub BUILD_LIST
+{
+    BUILD_TUPLE(@_)
+}
 sub BUILD_MAP
 {
     my ($n, $c, $cmt) = @_;
@@ -891,6 +902,17 @@ sub STORE_SUBSCR
 EOC
 }
 
+sub BINARY_SUBSCR
+{
+    my ($n, $c, $cmt) = @_;
+    my $w = pop @stack;
+    my $v = pop @stack;
+    my $x = temp('P');
+    print <<EOC;
+	$x = $v->[1]\[$w->[1]\] $cmt
+EOC
+    push @stack, [-1, $x, 'P'];
+}
 # exceptions
 sub SETUP_EXCEPT
 {
@@ -905,10 +927,23 @@ sub SETUP_EXCEPT
 	set_eh $eh
 EOC
 }
+sub SETUP_FINALLY
+{
+    my ($n, $c, $cmt) = @_;
+    SETUP_EXCEPT($n, $c, $cmt);
+}
 sub END_FINALLY
 {
     my ($n, $c, $cmt) = @_;
     print <<EOC;
-	clear_eh $cmt
+	throw P5 $cmt
+EOC
+}
+
+sub BUILD_CLASS
+{
+    my ($n, $c, $cmt) = @_;
+    print <<EOC;
+	# TODO $cmt
 EOC
 }
