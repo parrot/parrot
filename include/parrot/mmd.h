@@ -40,7 +40,7 @@ typedef struct _MMD_table {
    (and, or, xor, lshift, rshift), concat, logical (and, or, xor),
    repeat, eq, cmp */
 
-/* &gen_from_def(vtable_constants.pasm) subst(s/^MMD/VTABLE/) */
+/* &gen_from_def(mmd.pasm) */
 
 #define MMD_ADD 0
 #define MMD_SUBTRACT 1
@@ -65,6 +65,8 @@ typedef struct _MMD_table {
 #define MMD_SOR 20
 #define MMD_SAND 21
 #define MMD_SXOR 22
+
+#define MMD_USER_FIRST 23
 
 /* &end_gen */
 #endif /* PARROT_MMD_H_GUARD */

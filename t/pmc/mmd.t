@@ -37,11 +37,11 @@ output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 .sub _main
 
 .include "pmctypes.pasm"
-.include "vtable_constants.pasm"
+.include "mmd.pasm"
 
     .local pmc divide
     divide = global "Integer_divide_PerlInt"
-    mmdvtregister .VTABLE_DIVIDE, .Integer, .PerlInt, divide
+    mmdvtregister .MMD_DIVIDE, .Integer, .PerlInt, divide
 
     $P0 = new PerlInt
     $P1 = new Integer
@@ -72,11 +72,11 @@ output_is(<<'CODE', <<'OUTPUT', "1+1=3");
 .sub _main
 
 .include "pmctypes.pasm"
-.include "vtable_constants.pasm"
+.include "mmd.pasm"
 
     .local pmc add
     add = global "add"
-    mmdvtregister .VTABLE_ADD, .Integer, .Integer, add
+    mmdvtregister .MMD_ADD, .Integer, .Integer, add
 
     $P0 = new Integer
     $P1 = new Integer
@@ -108,11 +108,11 @@ output_is(<<'CODE', <<'OUTPUT', "PASM divide - override builtin");
 .sub _main
 
 .include "pmctypes.pasm"
-.include "vtable_constants.pasm"
+.include "mmd.pasm"
 
     .local pmc divide
     divide = global "Integer_divide_Integer"
-    mmdvtregister .VTABLE_DIVIDE, .Integer, .Integer, divide
+    mmdvtregister .MMD_DIVIDE, .Integer, .Integer, divide
 
     $P0 = new Integer
     $P1 = new Integer
@@ -140,11 +140,11 @@ output_is(<<'CODE', <<'OUTPUT', "INTVAL return numeq");
 .sub _main
 
 .include "pmctypes.pasm"
-.include "vtable_constants.pasm"
+.include "mmd.pasm"
 
     .local pmc comp
     comp = global "Float_cmp_Integer"
-    mmdvtregister .VTABLE_NUMCMP, .Float, .Integer, comp
+    mmdvtregister .MMD_NUMCMP, .Float, .Integer, comp
 
     $P1 = new Float
     $P2 = new Integer
@@ -172,12 +172,12 @@ output_is(<<'CODE', <<'OUTPUT', "mmdvtfind");
 .sub _main
 
 .include "pmctypes.pasm"
-.include "vtable_constants.pasm"
+.include "mmd.pasm"
 
     .local pmc comp
     comp = global "Float_cmp_Integer"
-    mmdvtregister .VTABLE_NUMCMP, .Float, .Integer, comp
-    $P0 = mmdvtfind .VTABLE_NUMCMP, .Float, .Integer
+    mmdvtregister .MMD_NUMCMP, .Float, .Integer, comp
+    $P0 = mmdvtfind .MMD_NUMCMP, .Float, .Integer
     isnull $P0, nok
     print "ok 1\n"
     ne_addr $P0, comp, nok
@@ -205,12 +205,12 @@ output_is(<<'CODE', <<'OUTPUT', "mmdvtfind - invoke it");
 .sub _main
 
 .include "pmctypes.pasm"
-.include "vtable_constants.pasm"
+.include "mmd.pasm"
 
     .local pmc comp
     comp = global "Float_cmp_Integer"
-    mmdvtregister .VTABLE_NUMCMP, .Float, .Integer, comp
-    $P0 = mmdvtfind .VTABLE_NUMCMP, .Float, .Integer
+    mmdvtregister .MMD_NUMCMP, .Float, .Integer, comp
+    $P0 = mmdvtfind .MMD_NUMCMP, .Float, .Integer
     isnull $P0, nok
     print "ok 1\n"
     ne_addr $P0, comp, nok
