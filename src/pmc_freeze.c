@@ -296,7 +296,7 @@ todo_list_init(Parrot_Interp interpreter, visit_info *info)
     /* we must use PMCs here, so that they get marked properly */
     info->todo = pmc_new(interpreter, enum_class_Array);
     info->seen = pmc_new_noinit(interpreter, enum_class_PerlHash);
-    hash = new_hash_x(interpreter, int_compare, key_hash_int,
+    hash = new_hash_x(interpreter, enum_type_INTVAL, 0, Hash_key_type_int, int_compare, key_hash_int,
             (hash_mark_key_fn) NULL);
     hash->entry_type = enum_type_int;
     PObj_custom_mark_SET(info->seen);
