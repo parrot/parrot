@@ -75,7 +75,7 @@ sub Fix_normal_call() {
 sub Fix_cpcf_call() {
     # return value from function cur_opcode in %o0, jump to *cur_opcode, which
     # has been modified by jit to contain corresponding jit code
-    return Parrot::Jit->Assemble("ld [\%o0], \%o0\njmpl \%o0, \%g0\n");
+    return Parrot::Jit->Assemble("ld [\%o0], \%o0\njmpl \%o0, \%g0\nnop\n");
 }
 
 sub Assemble($) {
@@ -148,7 +148,7 @@ sub write_as($$) {
 
     print $out <<'END';
 .globl main
-        .type    main,@function
+        .type    main,#function
 main:
 END
     print $out $code;
