@@ -197,6 +197,8 @@ get_op_lib_init(int core_op, int which, PMC *lib)
                 init_func = PARROT_CORE_CG_OPLIB_INIT;
                 break;
 #endif
+            case PARROT_EXEC_CORE:      /* normal func core */
+            case PARROT_JIT_CORE:      /* normal func core */
             case PARROT_SLOW_CORE:      /* normal func core */
             case PARROT_FAST_CORE:      /* normal func core */
                 init_func = PARROT_CORE_OPLIB_INIT;

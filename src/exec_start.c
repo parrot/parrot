@@ -81,7 +81,7 @@ main(int argc, char **argv) {
     Parrot_exec_run = 1;
     /* s. packfile.c (PackFile_ConstTable_unpack()) */
     exec_const_table = &const_table;
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if (!interpreter) {
         return 1;
     }
