@@ -255,6 +255,41 @@ OK_21:	print "ok 21\n"
 	eq I2, I0, OK_22
 	print "not "
 OK_22:	print "ok 22\n"
+
+# Now try this for NUM, STR and PMC:
+
+        set N2, P0[11]
+        eq N2, 0.0, OK_23
+        print "not "
+OK_23:  print "ok 23\n"
+
+        set N2, P0[-11]
+        eq N2, 0.0, OK_24
+        print "not "
+OK_24:  print "ok 24\n"
+
+        set S2, P0[12]
+        eq S2, "", OK_25
+        print "not "
+OK_25:  print "ok 25\n"
+
+        set S2, P0[-12]
+        eq S2, "", OK_26
+        print "not "
+OK_26:  print "ok 26\n"
+
+        set P2, P0[13]
+        typeof S2, P2
+        eq S2, "PerlUndef", OK_27 
+        print "not "
+OK_27:  print "ok 27\n"
+
+        set P2, P0[-13]
+        typeof S2, P2
+        eq S2, "PerlUndef", OK_28 
+        print "not "
+OK_28:  print "ok 28\n"
+
 	end
 CODE
 ok 1
@@ -279,6 +314,12 @@ ok 19
 ok 20
 ok 21
 ok 22
+ok 23
+ok 24
+ok 25
+ok 26
+ok 27
+ok 28
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Bracketed access test suite");
