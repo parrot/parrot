@@ -705,7 +705,8 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
 #ifdef HAS_SNPRINTF
                     snprintf(buf, sizeof(buf), "P" INTVAL_FMT, pc[j]);
 #else
-                    sprintf(buf, "P" INTVAL_FMT, pc[j]);  /* XXX buffer overflow! */
+                    /* XXX buffer overflow! */
+                    sprintf(buf, "P" INTVAL_FMT, pc[j]);  
 #endif
                     strcpy(&pfile->source[pfile->size], buf);
                     pfile->size += strlen(buf);
@@ -720,60 +721,75 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
                                 break;
                             case KEY_integer_FLAG:
 #ifdef HAS_SNPRINTF
-                                snprintf(buf, sizeof(buf), INTVAL_FMT, k->cache.int_val);
+                                snprintf(buf, sizeof(buf), INTVAL_FMT, 
+                                    k->cache.int_val);
 #else
-                                sprintf(buf, INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+                                /* XXX buffer overflow! */
+                                sprintf(buf, INTVAL_FMT, k->cache.int_val);
 #endif
                                 strcpy(&pfile->source[pfile->size], buf);
                                 pfile->size += strlen(buf);
                                 break;
                             case KEY_number_FLAG:
 #ifdef HAS_SNPRINTF
-                                snprintf(buf, sizeof(buf), FLOATVAL_FMT, k->cache.num_val);
+                                snprintf(buf, sizeof(buf), FLOATVAL_FMT, 
+                                    k->cache.num_val);
 #else
-                                sprintf(buf, FLOATVAL_FMT, k->cache.num_val);  /* XXX buffer overflow! */
+                                /* XXX buffer overflow! */
+                                sprintf(buf, FLOATVAL_FMT, k->cache.num_val);
 #endif
                                 strcpy(&pfile->source[pfile->size], buf);
                                 pfile->size += strlen(buf);
                                 break;
                             case KEY_string_FLAG:
                                 pfile->source[pfile->size++] = '"';
-                                strcpy(&pfile->source[pfile->size], string_to_cstring(interpreter, k->cache.string_val));
-                                pfile->size += string_length(k->cache.string_val);
+                                strcpy(&pfile->source[pfile->size], 
+                                    string_to_cstring(interpreter, 
+                                        k->cache.string_val));
+                                pfile->size += 
+                                    string_length(k->cache.string_val);
                                 pfile->source[pfile->size++] = '"';
                                 break;
                             case KEY_integer_FLAG|KEY_register_FLAG:
 #ifdef HAS_SNPRINTF
-                                snprintf(buf, sizeof(buf), "I" INTVAL_FMT, k->cache.int_val);
+                                snprintf(buf, sizeof(buf), "I" INTVAL_FMT, 
+                                    k->cache.int_val);
 #else
-                                sprintf(buf, "I" INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+                                /* XXX buffer overflow! */
+                                sprintf(buf, "I" INTVAL_FMT, k->cache.int_val);
 #endif
                                 strcpy(&pfile->source[pfile->size], buf);
                                 pfile->size += strlen(buf);
                                 break;
                             case KEY_number_FLAG|KEY_register_FLAG:
 #ifdef HAS_SNPRINTF
-                                snprintf(buf, sizeof(buf), "N" INTVAL_FMT, k->cache.int_val);
+                                snprintf(buf, sizeof(buf), "N" INTVAL_FMT, 
+                                    k->cache.int_val);
 #else
-                                sprintf(buf, "N" INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+                                /* XXX buffer overflow! */
+                                sprintf(buf, "N" INTVAL_FMT, k->cache.int_val);
 #endif
                                 strcpy(&pfile->source[pfile->size], buf);
                                 pfile->size += strlen(buf);
                                 break;
                             case KEY_string_FLAG|KEY_register_FLAG:
 #ifdef HAS_SNPRINTF
-                                snprintf(buf, sizeof(buf), "S" INTVAL_FMT, k->cache.int_val);
+                                snprintf(buf, sizeof(buf), "S" INTVAL_FMT, 
+                                    k->cache.int_val);
 #else
-                                sprintf(buf, "S" INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+                                /* XXX buffer overflow! */
+                                sprintf(buf, "S" INTVAL_FMT, k->cache.int_val);
 #endif
                                 strcpy(&pfile->source[pfile->size], buf);
                                 pfile->size += strlen(buf);
                                 break;
                             case KEY_pmc_FLAG|KEY_register_FLAG:
 #ifdef HAS_SNPRINTF
-                                snprintf(buf, sizeof(buf), "P" INTVAL_FMT, k->cache.int_val);
+                                snprintf(buf, sizeof(buf), "P" INTVAL_FMT,
+                                    k->cache.int_val);
 #else
-                                sprintf(buf, "P" INTVAL_FMT, k->cache.int_val);  /* XXX buffer overflow! */
+                                /* XXX buffer overflow! */
+                                sprintf(buf, "P" INTVAL_FMT, k->cache.int_val);
 #endif
                                 strcpy(&pfile->source[pfile->size], buf);
                                 pfile->size += strlen(buf);
@@ -792,7 +808,8 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
 #ifdef HAS_SNPRINTF
                     snprintf(buf, sizeof(buf), "I" INTVAL_FMT, pc[j]);
 #else
-                    sprintf(buf, "I" INTVAL_FMT, pc[j]);  /* XXX buffer overflow! */
+                    /* XXX buffer overflow! */
+                    sprintf(buf, "I" INTVAL_FMT, pc[j]);
 #endif
                     strcpy(&pfile->source[pfile->size], buf);
                     pfile->size += strlen(buf);
@@ -803,7 +820,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
 #ifdef HAS_SNPRINTF
                     snprintf(buf, sizeof(buf), INTVAL_FMT, pc[j]);
 #else
-                    sprintf(buf, INTVAL_FMT, pc[j]);  /* XXX buffer overflow! */
+                    sprintf(buf, INTVAL_FMT, pc[j]); /* XXX buffer overflow! */
 #endif
                     strcpy(&pfile->source[pfile->size], buf);
                     pfile->size += strlen(buf);
