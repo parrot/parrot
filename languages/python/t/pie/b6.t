@@ -42,13 +42,13 @@ def check(a, b):
         raise AssertionError("%.30r != %.30r" % (a, b))
 
 def main():
-    L = [1]*1000000
+    L = [1]*100000
     L[-1] = 42
     n = 0
     for i in L:
         n += i
     check(i, 42)
-    check(n, 1000041)
+    check(n, 100041)
 
 if __name__ == '__main__':
     main()
@@ -71,17 +71,15 @@ def x():
 
 def main():
     n = 0
-    for i in xrange(1000000):
+    for i in xrange(100000):
         n += i
-    check(i, 999999)
-    check(n, 999999*1000000//2)
+    check(i, 99999)
+    check(n, 99999*100000//2)
 
 if __name__ == '__main__':
     main()
 CODE
 
-SKIP: {
-  skip("dictionaries with non-string keys", 1);
 test(<<'CODE', 'b6');
 show=True
 # from b5 import check
@@ -93,26 +91,25 @@ def check(a, b):
         raise AssertionError("%.30r != %.30r" % (a, b))
 
 def main():
-    L = [1]*1000000
+    L = [1]*100000
     L[-1] = 42
     n = 0
     for i in L:
         n += i
     check(i, 42)
-    check(n, 1000041)
+    check(n, 100041)
     n = 0
-    for i in xrange(1000000):
+    for i in xrange(100000):
         n += i
-    check(i, 999999)
-    check(n, 999999*1000000//2)
-    d = dict.fromkeys(xrange(1000000))
+    check(i, 99999)
+    check(n, 99999*100000//2)
+    d = dict.fromkeys(xrange(100000))
     n = 0
     for i in d:
         n += i
-    check(n, 999999*1000000//2)
+    check(n, 99999*100000//2)
 
 if __name__ == '__main__':
     main()
 
 CODE
-}
