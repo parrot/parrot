@@ -7,15 +7,17 @@ O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
 #comment 'ADD C COMPILER FLAGS HERE'
-C_FLAGS = ${ccflags} ${cc_debug}
+CFLAGS = ${ccflags} ${cc_debug}
 
 C_LIBS = ${libs}
 
-
-CC = ${cc} $(C_FLAGS)
+CC = ${cc}
 LD = ${ld}
 PERL = ${perl}
 TEST_PROG = test_prog${exe}
+
+.c.o:
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 all : $(TEST_PROG)
 
@@ -28,37 +30,28 @@ $(TEST_PROG): test_main$(O) $(O_FILES)
 	$(LD) $(C_LIBS) ${ld_debug} ${ld_out}$(TEST_PROG) $(O_FILES) test_main$(O)
 
 test_main$(O): $(H_FILES)
-	$(CC) -o $*$(O) -c $*.c
 
 global_setup$(O): $(H_FILES)
-	$(CC) -o $*$(O) -c $*.c
 
 string$(O): $(H_FILES)
-	$(CC) -o $*$(O) -c $*.c
-	
+
 strnative$(O): $(H_FILES)
-	$(CC) -o $*$(O) -c $*.c
-	
+
 interp_guts.h: opcode_table build_interp_starter.pl
 	$(PERL) build_interp_starter.pl
 
 interpreter$(O): interpreter.c $(H_FILES) interp_guts.h
 
 memory$(O): $(H_FILES)
-	$(CC) -o $*$(O) -c $*.c
 
 bytecode$(O): $(H_FILES)
-	$(CC) -o $*$(O) -c $*.c
-	
+
 parrot$(O): $(H_FILES)
-	$(CC) -o $*$(O) -c $*.c
-	
+
 register$(O): $(H_FILES)
-	$(CC) -o $*$(O) -c $*.c
-	
+
 basic_opcodes$(O): $(H_FILES) basic_opcodes.c
-	$(CC) -o $*$(O) -c $*.c
-	
+
 basic_opcodes.c: basic_opcodes.ops process_opfunc.pl interp_guts.h
 	$(PERL) process_opfunc.pl basic_opcodes.ops
 
