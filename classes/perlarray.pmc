@@ -77,7 +77,7 @@ pmclass PerlArray {
     }
 
     STRING* get_string () {
-	return (STRING*)SELF->cache.struct_val;
+	return NULL;
     }
 
     STRING* get_string_index ( INTVAL index ) {
@@ -86,7 +86,11 @@ pmclass PerlArray {
 	return key_pair->cache.struct_val;
     }
 
-    BOOLVAL get_bool () = default;
+    BOOLVAL get_bool () {
+	KEY* key = SELF->cache.struct_val;
+	INTVAL size = key_size(INTERP,key);
+	return (size != 0);
+    }
 
     void* get_value () {
         return &SELF->cache;
