@@ -105,7 +105,7 @@ lp:
 #       14 }
 
 #       16 $stream->enqueue(undef);
-    $P4 = new PerlUndef
+    $P4 = new Undef
     push stream, $P4
 
 #       17 $kid->join;
@@ -176,7 +176,7 @@ ewhile:
     $I1 = defined kid
     unless $I1 goto no_kid2
 
-    $P4 = new PerlUndef
+    $P4 = new Undef
     push downstream, $P4
 
 #       33     $kid->join           if $kid;

@@ -11,8 +11,8 @@ classes/undef.pmc - Generic undefined value
 This is Parrot's generic undef type. This PMC has no defined value.
 It returns a numeric value of 0, a boolean of false, and an empty string.
 When assigned a number, integer, or string it morphs to a Number,
-Integer, or String PMC respectively, and when assigned a generic PMC 
-it morphs into a PMC of the passed-in type and does a same-type assignment 
+Integer, or String PMC respectively, and when assigned a generic PMC
+it morphs into a PMC of the passed-in type and does a same-type assignment
 from there.
 
 =head2 Methods
@@ -77,6 +77,9 @@ pmclass Undef extends default {
     return 0;
   }
 
+    void share () {
+        /* see classes/integer.pmc */
+    }
 }
 
 /*
