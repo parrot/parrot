@@ -282,7 +282,7 @@ $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
 #
 # Parrot Debugger
 #
-PDB=pdb
+PDB=pdb${exe}
 
 pdb$(O) : $(GENERAL_H_FILES)
 
@@ -292,7 +292,7 @@ $(PDB) : pdb$(O) $(LIBPARROT)
 #
 # Parrot Disassembler
 #
-DIS=disassemble
+DIS=disassemble${exe}
 
 disassemble$(O) : $(GENERAL_H_FILES)
 
