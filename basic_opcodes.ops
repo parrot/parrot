@@ -40,6 +40,12 @@ AUTO_OP div_i {
                            INT_REG(P3);
 }
 
+// MOD Ix, Iy, Iz  
+AUTO_OP mod_i {
+  INT_REG(P1) = INT_REG(P2) %
+                           INT_REG(P3);
+}
+
 // EQ Ix, Iy, EQ_BRANCH, NE_BRANCH
 MANUAL_OP eq_i_ic {
   if (INT_REG(P1) == INT_REG(P2)) {
