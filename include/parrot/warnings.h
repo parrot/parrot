@@ -16,7 +16,7 @@ typedef enum {
 #define PARROT_WARNINGS_off(interp, flag) \
         (/*@i1*/(interp)->warns->classes &= ~(flag))
 #define PARROT_WARNINGS_test(interp, flag) \
-	(/*@i1*/(interp)->warns->classes & (flag))
+        (/*@i1*/(interp)->warns->classes & (flag))
 
 
 #if defined(PARROT_IN_CORE)

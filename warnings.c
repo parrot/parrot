@@ -53,7 +53,7 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
         return 2;
     }
 
-	targ = Parrot_vsprintf_s(interpreter, message, &args);
+    targ = Parrot_vsprintf_s(interpreter, message, &args);
     if (!targ) {
         return -1;
     }

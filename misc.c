@@ -95,7 +95,7 @@ static void
 uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num, char base)
 {
     int i = 0, cur2;
-	char cur;
+    char cur;
 
     do {
         cur = (char)(num % base);
@@ -122,7 +122,7 @@ int_to_str(char *buf1, char *buf2, HUGEINTVAL num, char base)
 {
     BOOLVAL neg;
     int i = 0, cur2;
-	char cur;
+    char cur;
 
     if (num < 0) {
         neg = 1;

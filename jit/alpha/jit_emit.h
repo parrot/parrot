@@ -155,8 +155,7 @@ emit_l_c(Parrot_jit_info *jit_info,
     char *pc = jit_info->native_ptr;
     long high,low;
 
-    if ((*address < -0x7fffffff) || (*address > 0x7fffffff))
-    {
+    if ((*address < -0x7fffffff) || (*address > 0x7fffffff)) {
 
         Parrot_jit_newfixup(jit_info);
         jit_info->fixups->type = JIT_ALPHASTART;
@@ -165,13 +164,14 @@ emit_l_c(Parrot_jit_info *jit_info,
         high = 0;
         pc = emit_l_s(pc, LDH, target, REG27_t12, &high);
         pc = emit_l_s(pc, LDA, target, target, &high);
-    } else if ((*address < -0x7fff) || (*address > 0x7fff))
-    {
+    }
+    else if ((*address < -0x7fff) || (*address > 0x7fff)) {
         high = 0;
         calculate_displacement(&high, address, &high, &low);
         pc = emit_l_s(pc, LDH, target, REG31_zero, &high);
         pc = emit_l_s(pc, LDA, target, target, &low);
-    } else {
+    }
+    else {
         pc = emit_l_s(pc, LDA, target, REG31_zero, address);
     }
     return pc;
@@ -238,8 +238,7 @@ emit_arithmetic(char *pc,
 
     char base1 = 0,base2 = 0x04;
 
-    if (type == SUBQ)
-    {
+    if (type == SUBQ) {
         base1 = 0x20; 
         base2 = 0x05;
         type = ADDQ;

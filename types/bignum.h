@@ -62,11 +62,11 @@ typedef struct {
 /* CONTEXT: defines the context for the operation, precision and rounding */
 
 typedef enum {
-  ROUND_HALF_UP,
-  ROUND_DOWN,
-  ROUND_HALF_EVEN,
-  ROUND_CEILING,
-  ROUND_FLOOR
+    ROUND_HALF_UP,
+    ROUND_DOWN,
+    ROUND_HALF_EVEN,
+    ROUND_CEILING,
+    ROUND_FLOOR
 } BN_ROUNDING;
 
 /* Flags for exception triggers and exception signals */

@@ -181,12 +181,12 @@ void PackFile_assign_transforms(struct PackFile *pf) {
         /* FIXME: Use the float_type from bytecode header to decide vtable */
         pf->fetch_nv = fetch_buf_be_8;
     }
-#if TRACE_PACKFILE
+#  if TRACE_PACKFILE
     else {
         fprintf(stderr, "header->byteorder [%d] native byteorder [%d]\n",
             pf->header->byteorder, PARROT_BIGENDIAN);
     }
-#endif
+#  endif
 #endif    
 }
 

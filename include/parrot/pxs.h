@@ -29,5 +29,12 @@ INTVAL PXS_findop(Parrot_Interp_t, const char *);
 #define PXSCALL(f) void f(Parrot_Interp_t interp, void * object) 
 
 
-
-
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

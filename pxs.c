@@ -8,32 +8,28 @@
 
 int
 PXS_initargs(Parrot_Interp_t interp) {
-  INTVAL numargs;
-  stack_pop(interp, interp->user_stack, &numargs, STACK_ENTRY_INT);
-  return numargs;
+    INTVAL numargs;
+    stack_pop(interp, interp->user_stack, &numargs, STACK_ENTRY_INT);
+    return numargs;
 }
 
 void
 PXS_reti(Parrot_Interp_t interp, INTVAL i) {
-
     stack_push(interp, interp->user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
 }
 
 void 
 PXS_retn(Parrot_Interp_t interp, FLOATVAL f) {
-
     stack_push(interp, interp->user_stack, &f, STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
 }
 
 void
 PXS_rets(Parrot_Interp_t interp, STRING * s) {
-
     stack_push(interp, interp->user_stack, s, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
 }
 
 void
 PXS_retp(Parrot_Interp_t interp, PMC * p) {
-
     stack_push(interp, interp->user_stack, p, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 }
 
@@ -84,23 +80,32 @@ PMC * PXS_pointer(Parrot_Interp_t interp, void * object) {
 }
 
 void * PXS_api[] = {
-   PXS_initargs, 
-   PXS_reti, 
-   PXS_retn, 
-   PXS_rets, 
-   PXS_retp, 
-   PXS_shifti,
-   PXS_shiftn,
-   PXS_shifts,
-   PXS_shiftp,
-   PXS_findop
+    PXS_initargs, 
+    PXS_reti, 
+    PXS_retn, 
+    PXS_rets, 
+    PXS_retp, 
+    PXS_shifti,
+    PXS_shiftn,
+    PXS_shifts,
+    PXS_shiftp,
+    PXS_findop
 };
 
 /*
 void ** PXS_api(void)
 {
-   return &_PXS_api[0];
+    return &_PXS_api[0];
 }
 */
 
 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -19,6 +19,7 @@ use strict;
 use File::Find;
 
 my %defined_in;
+my %referenced_in;
 my %ansi_c89_symbol;
 my %ansi_c89_header;
 
@@ -182,8 +183,9 @@ sub do_object {
             
             if ($type eq 'U') {
                 $defined_in{$symbol} ||= undef;
+		push @{$referenced_in{$symbol}}, $obj;
             } else {
-                $defined_in{$symbol} = "$obj";
+                $defined_in{$symbol} .= "$obj ";
             }
         }
         
@@ -201,8 +203,8 @@ sub do_object {
     printf("Found %d symbols defined within the %d supplied object files.\n", scalar(@internal_symbols), scalar(@files));
     printf("Found %d external symbols\n", scalar(@external_symbols));
     printf("Of these, %d are not defined by ANSI C89:\n", scalar(@non_ansi_external_symbols));
-    
-    print "    $_\n" foreach (@non_ansi_external_symbols);
+
+    print "    $_ (in " . (join ',', @{$referenced_in{$_}}) . ")\n" foreach (@non_ansi_external_symbols);
 }
 
     

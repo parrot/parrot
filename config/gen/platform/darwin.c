@@ -71,7 +71,6 @@ Parrot_setenv(const char *name, const char *value)
 void *
 Parrot_dlopen(const char *filename)
 {
-
     int dyld_result;
     NSObjectFileImage ofile;
     NSModule handle = NULL;
@@ -103,7 +102,6 @@ Parrot_dlerror(void)
 void *
 Parrot_dlsym(void *handle, char *symbol)
 {
-
     void *addr;
 
     if (NSIsSymbolNameDefined(symbol))

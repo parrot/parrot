@@ -379,7 +379,8 @@ hash_put(Interp *interpreter, HASH *hash, STRING* key, KEY_ATOM* value)
     if (bucket) {
         /* Replacing old value */
         memcpy(&bucket->value, value, sizeof(KEY_ATOM));
-    } else {
+    }
+    else {
         /* Create new bucket */
         hash->entries++;
         bucket = new_bucket(interpreter, hash, key, value);

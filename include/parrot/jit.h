@@ -14,7 +14,7 @@ jit_f build_asm(struct Parrot_Interp *, opcode_t *, opcode_t *, opcode_t *);
 /* Platform generic fixup information */
 typedef struct Parrot_jit_fixup_t {
     int type;
-    ptrdiff_t native_offset;	/* Where to apply fixup */
+    ptrdiff_t native_offset;    /* Where to apply fixup */
     union { 
         opcode_t opcode;
         void (*fptr)(void);
@@ -25,8 +25,8 @@ typedef struct Parrot_jit_fixup_t {
 
 /* Hold native code offsets/addresses */
 typedef union {
-    void *ptr;		/* Pointer to native code */
-    ptrdiff_t offset;	/* Offset of native code from arena_start */
+    void *ptr;          /* Pointer to native code */
+    ptrdiff_t offset;   /* Offset of native code from arena_start */
 } Parrot_jit_opmap;
 
 enum {
@@ -61,11 +61,11 @@ typedef struct {
 typedef struct {
     opcode_t *cur_op;
     opcode_t op_i;
-    Parrot_jit_opmap *op_map;	/* Maps opcode offsets to native code */
+    Parrot_jit_opmap *op_map;   /* Maps opcode offsets to native code */
     UINTVAL map_size;
-    char *native_ptr;		/* Current pointer to native code */
-    char *arena_start;		/* Start of current native code segment */
-    ptrdiff_t arena_size;	/* in bytes */
+    char *native_ptr;           /* Current pointer to native code */
+    char *arena_start;          /* Start of current native code segment */
+    ptrdiff_t arena_size;       /* in bytes */
     Parrot_jit_fixup *fixups;   /* List of fixupes */
     Parrot_jit_optimizer_t *optimizer; /* Optimizer information */
 } Parrot_jit_info;

@@ -247,3 +247,13 @@ PDB_help(const char *);
 #define c_disassemble   1903830
 
 #endif
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
