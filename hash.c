@@ -71,11 +71,6 @@ static FIXME_INLINE HASHBUCKET* lookupBucket(HASH* hash, HashIndex slot)
     return getBucket(hash, ((BucketIndex*) hash->buffer.bufstart)[slot]);
 }
 
-static FIXME_INLINE BucketIndex bucketIndex(HASH* hash, HASHBUCKET* bucket)
-{
-    return bucket - (HASHBUCKET*) hash->bucket_pool->bufstart;
-}
-
 /*=for api key key_hash
 
 Return the hashed value of the string
@@ -183,7 +178,7 @@ expand_hash(Interp *interpreter, HASH *hash)
     for (bi = old_pool_size; bi < new_pool_size; bi++) {
         bucket = getBucket(hash, bi);
         bucket->next = hash->free_list;
-        hash->free_list = bucketIndex(hash, bucket);
+        hash->free_list = bi;
     }
 
     /* NULL out new space in table */
@@ -225,9 +220,11 @@ expand_hash(Interp *interpreter, HASH *hash)
     hash->hash_size = new_size;
 }
 
-static HASHBUCKET *
+UINTVAL
 new_bucket(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
 {
+    UINTVAL bucket_index;
+    
     if (key == NULL) {
         internal_exception(INTERNAL_PANIC, "NULL key\n");
         return NULL;
@@ -238,12 +235,14 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
         return NULL;
     }
 
-    if (hash->free_list != NULLBucketIndex) {
-        HASHBUCKET *bucket = getBucket(hash, hash->free_list);
+    bucket_index = hash->free_list;
+    if (bucket_index != NULLBucketIndex) {
+        HASHBUCKET *bucket = getBucket(hash, bucket_index);
+        
         hash->free_list = bucket->next;
         bucket->key = key;
         memcpy(&bucket->value, value, sizeof(*value));
-        return bucket;
+        return bucket_index;
     }
 
     /* Free list is empty. Need to expand the hashtable. */
@@ -330,6 +329,7 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
 {
     BucketIndex* table;
     UINTVAL hashval;
+    UINTVAL bucket_index; 
     BucketIndex chain;
     HASHBUCKET* bucket;
 
@@ -350,10 +350,11 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
     else {
         /* Create new bucket */
         hash->entries++;
-        bucket = new_bucket(interpreter, hash, key, value);
+        bucket_index = new_bucket(interpreter, hash, key, value);
+        bucket = getBucket(hash, bucket_index);
         table = (BucketIndex*) hash->buffer.bufstart;
         bucket->next = table[hashval % hash->hash_size];
-        table[hashval % hash->hash_size] = bucketIndex(hash, bucket);
+        table[hashval % hash->hash_size] = bucket_index;
     }
     /*      dump_hash(interpreter, hash); */
 }
