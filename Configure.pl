@@ -39,6 +39,10 @@ data it is setting.
 Tells Configure.pl to output information about i<every> setting added or
 changed.
 
+=item C<--verbose-step={N|regex}>
+
+Run C<--verbose=2> for step number C<N> or matching description.
+
 =item C<--nomanicheck>
 
 Tells Configure.pl not to run the MANIFEST check.
@@ -250,7 +254,7 @@ $parrot_version = parrot_version();
 my %args;
 
 for(@ARGV) {
-  my($key, $value)=/--(\w+)(?:=(.*))?/;
+  my($key, $value)=/--([-\w]+)(?:=(.*))?/;
   $key   = 'help' unless defined $key;
   $value = 1      unless defined $value;
 
@@ -274,6 +278,8 @@ General Options:
    --version            Show version information
    --verbose            Output extra information
    --verbose=2          Output every setting change
+   --verbose-step=N     Set verbose for step N only
+   --verbose-step=regex Set verbose for step matching description
    --nomanicheck        Don't check the MANIFEST
 
    --ask                Have Configure ask for commonly-changed info

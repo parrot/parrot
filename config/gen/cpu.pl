@@ -28,7 +28,7 @@ sub runstep {
   return if $miniparrot;
 
   my $cpu = Configure::Data->get('cpuarch');
-  print "\n\t(cpu = '$cpu') " if $verbose;
+  print "\t(cpu = '$cpu') " if $verbose;
   my $f;
   if (-d "config/gen/cpu/$cpu" && -e ($f = "config/gen/cpu/$cpu/auto.pl")) {
     require $f;

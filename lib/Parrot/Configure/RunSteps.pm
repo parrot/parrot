@@ -76,15 +76,32 @@ sub runsteps {
         warn $_[0] unless $_[0] =~ /^Subroutine runstep redefined at config/
     };
 
+    my $verbose = $args{verbose};
+    my $n = 0;
+
     for(@steps) {
-                #print "$_\n";
+
         die "No config/$_" unless -e "config/$_";
         require "config/$_";
         print "\n$Configure::Step::description";
         print '.' x (70-length $Configure::Step::description);
+	++$n;
+	if ($args{'verbose-step'}) {
+	    if ($args{'verbose-step'} =~ /^\d+$/ &&
+		    $n == $args{'verbose-step'}) {
+		$args{verbose} = 2;
+	    }
+	    elsif ($Configure::Step::description =~ /$args{'verbose-step'}/) {
+		$args{verbose} = 2;
+	    }
+	}
+	# cc_build uses this verbose setting
+	Configure::Data->set('verbose' => $args{verbose}) if $n > 2;
+
         print "\n" if $args{verbose} && $args{verbose} == 2;
 
         $Configure::Step::result='done';
+
 
         {
             local $_;
@@ -93,6 +110,8 @@ sub runsteps {
 
         print "..." if $args{verbose} && $args{verbose} == 2;
         print "$Configure::Step::result." unless m{^inter/} && $args{ask};
+
+	$args{verbose} = $verbose;
     }
 }
 

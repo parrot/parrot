@@ -23,11 +23,17 @@ $description="Moving platform files into place...";
 @args=qw(miniparrot verbose);
 
 sub runstep {
+  my ($miniparrot, $verbose) = @_;
   my $platform=lc $^O;
   $platform =~ s/^ms//;
 
-  $platform="ansi" if defined($_[0]);
+  $platform="ansi" if defined($miniparrot);
   $platform="generic" unless -d "config/gen/platform/$platform";
+
+  print " platform='$platform' " if $verbose;
+
+  my $generated = Configure::Data->get('TEMP_generated');
+  print " ($generated) " if $verbose;
 
   # headers are merged into platform.h
   my @headers = qw/
@@ -41,7 +47,6 @@ sub runstep {
 
   open PLATFORM_H, "> include/parrot/platform.h"
       or die "Can't open include/parrot/platform.h: $!";
-  print " platform='$platform' " if $_[1];
 
   print PLATFORM_H <<HERE;
 #if !defined(PARROT_PLATFORM_H_GUARD)
