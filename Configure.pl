@@ -188,9 +188,6 @@ buildconfigpm();
 # and the types file
 buildfile("Types_pm", "Parrot");
 
-# Temporary hack
-system("make include/parrot/vtable.h");
-
 # and now we figure out how big our things are
 print <<"END";
 
@@ -201,6 +198,8 @@ END
 {
 	my %newc;
 
+       open NEEDED, ">include/parrot/vtable.h";
+       close NEEDED;
 	buildfile("testparrotsizes_c");
 	compiletestc("testparrotsizes");
 	%newc=eval(runtestc()) or die "Can't run the test program: $!";
@@ -210,6 +209,7 @@ END
 	@c{qw(stacklow intlow numlow strlow pmclow)} = lowbitmask(@c{qw(stackchunk iregchunk nregchunk sregchunk pregchunk)});
 
 	unlink('testparrotsizes.c', "test_siz$c{exe}", "test$c{o}");
+       unlink("include/parrot/vtable.h");
 }
 
 # rewrite the config file with the updated info

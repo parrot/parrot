@@ -103,7 +103,7 @@ clean:
 	$(RM_F) $(TEST_PROG) $(PDISASM) $(PDUMP)
 	cd docs; make clean
 
-test:	.test_dummy
+test: $(TEST_PROG) assemble.pl .test_dummy
 
 .test_dummy:
 	$(PERL) t/harness
