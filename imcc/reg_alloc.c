@@ -330,14 +330,13 @@ sort_reglist(IMC_Unit *unit)
 }
 
 /*
- * regs are sorted now according to their start line of usage
- * which means they are sorted by basic block numbers too
+ * Registers are now sorted according to the line on which their usage
+ * starts, which means that they are sorted by basic block numbers too.
  *
- * run through them and allocate all that don't overlap
- * in one bunch
+ * Run through them and allocate all that don't overlap in one bunch.
  *
- * registers 28-30 are reserved for short range temps, which
- * get allocate immediately
+ * Registers 28-30 are reserved for short range temps, which
+ * get allocated immediately
  */
 
 #define ALLOCATE_HACK
@@ -426,7 +425,7 @@ next_block:
 /* make a linear list of IDENTs and VARs, set n_symbols
  * TODO
  *   split the whole life analysis into 4, one per register kind
- *   registers of different kind never interfer, but the reglist
+ *   registers of different kind never interfere, but the reglist
  *   has them all
  */
 
@@ -494,14 +493,13 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     }
 }
 
-/* creates the interference graph between the variables.
+/* Creates the interference graph between the variables.
  *
- * data structure is a 2-d array 'interference_graph' bitmap where
+ * Data structure is a 2-d array 'interference_graph' bitmap where
  * row/column indices represent the same index in the list of all
  * symbols (unit->reglist) in the current compilation unit.
  *
- * two variables interfere when they are alive at the
- * same time
+ * Two variables interfere when they are alive at the same time.
  */
 
 static void
@@ -676,20 +674,21 @@ interferes(Interp *interpreter, IMC_Unit * unit, SymReg * r0, SymReg * r1)
 
     int i;
 
-    /* Register doesn't interfere with itself
+    /* Registers don't interfere with themselves
     */
     if (r0 == r1)
         return 0;
 
-    /* different register sets don't interfer */
+    /* Different register sets don't interfere with each other */
     if (r0->set != r1->set)
         return 0;
-    /* if the first time r0 appears is after (or in the same instruction)
-     * than the last appearance of r1, then they can't interfere.
+    /* If the first time r0 appears is in the same instruction as the
+     * last appearance of r1, or after its last appearance, then they 
+     * can't interfere.
      *
-     * even if r0 and r1 are called in the same instruction, and even
-     * if this instrucion does modify r0, if it's value is never used
-     * later, then they can share the same register
+     * Even if r0 and r1 are called in the same instruction, and even
+     * if this instrucion does modify r0, if its value is never used
+     * later, then they can share the same register.
      */
 
     /* Now: */
@@ -704,13 +703,13 @@ interferes(Interp *interpreter, IMC_Unit * unit, SymReg * r0, SymReg * r1)
         l0 = r0->life_info[i];
         l1 = r1->life_info[i];
 
-        /* one or both are not alive in this block, so we have
+        /* One or both are not alive in this block, so we have
          * no conflict
          */
         if (!l0->first_ins || !l1->first_ins)
             continue;
 
-        /* if the registers don't overlap, i.e first_x > last_y
+        /* If the registers don't overlap, i.e first_x > last_y
          * then no interference
          */
         if (l0->first_ins->index > l1->last_ins->index)
@@ -719,7 +718,7 @@ interferes(Interp *interpreter, IMC_Unit * unit, SymReg * r0, SymReg * r1)
             continue;
 
 #if 1
-        /* if they only overlap one instruction and one is used RHS only
+        /* If they only overlap one instruction and one is used RHS only
          * and the other LHS, then that's ok
          * same if both are LHS
          */
@@ -786,9 +785,9 @@ simplify (IMC_Unit * unit)
 }
 #endif
 
-/* Puts the remaining nodes on the stack, on the correct order.
+/* Puts the remaining nodes on the stack, in the correct order.
  *
- * We count how many times does a symbol appear (weighted by the probability
+ * We count how many times a symbol appears (weighted by the probability
  * that this particular point of code will be reached) and choose the symbol
  * with the lower score until all are in the stack.
  *
@@ -935,10 +934,10 @@ ig_find_color(Interp* interpreter, IMC_Unit *unit, int x, char *avail)
     return 0;
 }
 /*
- * Color the graph assigning registers to each symbol:
+ * Color the graph, assigning registers to each symbol:
  *
- * We just proceed poping items from the stack, and assigning
- * a free color to the them.
+ * We just proceed popping items from the stack and assigning
+ * a free color to them.
  *
  * If we run out of colors, then we need to spill the top node.
  */
@@ -1026,10 +1025,9 @@ map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[], int typ)
 
 #if ! DOIT_AGAIN_SAM
 /* update bb and life_info after spilling
- * this saves 4 costy routines
- * NOTE {lhs_,}use_count are not set again, this is save, when no
- *      further optimization pass follows
- *
+ * this saves 4 costly routines
+ * NOTE {lhs_,}use_count are not set again. This is safe as long as
+ *      no further optimization pass follows
  */
 static void
 update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
@@ -1244,7 +1242,7 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
 #endif
             /* if all symbols are in one basic_block, we need a new
              * symbol, so that the life_ranges are minimal
-             * It would be nice, to detect, when changing the symbol
+             * It would be nice to detect when changing the symbol
              * is necessary.
              */
             sprintf(buf, "%s_%d", old_sym->name, n++);
