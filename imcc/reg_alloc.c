@@ -41,7 +41,7 @@ static void build_interference_graph(Parrot_Interp, IMC_Unit *);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
 static int interferes(Interp *, IMC_Unit *, SymReg * r0, SymReg * r1);
-static int map_colors(IMC_Unit *, int x, unsigned int * graph, int colors[], int typ);
+static void map_colors(IMC_Unit *, int x, unsigned int * graph, char colors[], int typ);
 #ifdef DO_SIMPLIFY
 static int simplify (IMC_Unit *);
 #endif
@@ -893,6 +893,48 @@ allocate_wanted_regs(IMC_Unit * unit)
     }
 }
 /*
+ * find available color for register #x in available colors
+ */
+static int
+ig_find_color(Interp* interpreter, IMC_Unit *unit, int x, char *avail)
+{
+    int c, t;
+    SymReg *r;
+    static const char types[] = "ISPN";
+
+    static const char assignable[4][5] = {
+       /* 0  1  2  3  4  */
+        { 0, 0, 0, 0, 0, },     /* I */
+        { 0, 1, 1, 1, 1, },     /* S */
+        { 0, 0, 0, 1, 1, },     /* P */
+        { 1, 1, 1, 1, 1, },     /* N */
+    };
+
+
+    UNUSED(interpreter);
+    r = unit->reglist[x];
+    t = strchr(types, r->set) - types;
+
+    /* please note: c is starting at 1 for R0 */
+    if (!(r->usage & U_NON_VOLATILE)) {
+        /* 1) 5-15 volatile range
+         * XXX allocate down to work around continuation bug
+         * */
+        for (c = 16; c >= 6; c--)
+            if (avail[c])
+                return c;
+        /* some lower regs are usable too 0...4 */
+        for (c = 1; c <= 5; c++)
+            if (avail[c] && assignable[t][c - 1])
+                return c;
+    }
+    /* 2) try upper non-volatiles, 16...31 */
+    for (c = 17; c <= 32; c++)
+        if (avail[c])
+            return c;
+    return 0;
+}
+/*
  * Color the graph assigning registers to each symbol:
  *
  * We just proceed poping items from the stack, and assigning
@@ -905,8 +947,9 @@ static int
 try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     int x = 0;
-    int color, colors[MAX_COLOR];
-    int free_colors, t;
+    int color;
+    char avail[MAX_COLOR + 1];
+    int t;
     unsigned int *graph = unit->interference_graph;
     SymReg ** reglist = unit->reglist;
 
@@ -915,28 +958,23 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 
 	for (t = 0; t < 4; t++) {
 	    int typ = "INSP"[t];
-	    memset(colors, 0, sizeof(colors));
 	    if (reglist[x]->set == typ && reglist[x]->color == -1) {
-		free_colors = map_colors(unit, x, graph, colors, typ);
-		if (free_colors > 0) {
-		    for (color = 0; color < MAX_COLOR; color++) {
-                        int c = (color + MAX_COLOR/2) % MAX_COLOR;
-			if (!colors[c]) {
-			    reglist[x]->color = c;
+                map_colors(unit, x, graph, avail, typ);
+                color = ig_find_color(interpreter, unit, x, avail);
+                if (color) {
+                    reglist[x]->color = color - 1;
 
-                            IMCC_debug(interpreter, DEBUG_IMC,
-                                    "#[%s] provisionally gets color [%d]"
-                                     "(%d free colors, score %d)\n",
-					reglist[x]->name, c,
-                                        free_colors, reglist[x]->score);
-			    break;
-			}
-		    }
+                    IMCC_debug(interpreter, DEBUG_IMC,
+                            "#[%s] provisionally gets color [%d]"
+                            "(score %d)\n",
+                            reglist[x]->name, color - 1,
+                            reglist[x]->score);
+                    break;
 		}
 
 		if (reglist[x]->color == -1) {
                     IMCC_debug(interpreter, DEBUG_IMC,
-                            "# no more colors free = %d\n", free_colors);
+                            "# no more colors\n");
 
 		    /* It has been impossible to assign a color
                      * to this node, return it so it gets spilled
@@ -958,22 +996,21 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 /*
  * map_colors: calculates what colors can be assigned to the x-th symbol.
  */
-static int
-map_colors(IMC_Unit* unit, int x, unsigned int *graph, int colors[], int typ)
+static void
+map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[], int typ)
 {
     int y = 0, n_symbols;
     SymReg * r;
-    int color, free_colors;
 
     n_symbols = unit->n_symbols;
-    memset(colors, 0, sizeof(colors[0]) * MAX_COLOR);
+    memset(avail, 1, MAX_COLOR + 1);
     /* reserved for spilling */
     if (typ == 'P')
-        colors[31] = 1;
+        avail[31+1] = 0;
 #ifdef ALLOCATE_HACK
-    colors[28] = 1;     /* for immediate allocation */
-    colors[29] = 1;     /* for immediate allocation */
-    colors[30] = 1;     /* for immediate allocation */
+    avail[28+1] = 0;     /* for immediate allocation */
+    avail[29+1] = 0;     /* for immediate allocation */
+    avail[30+1] = 0;     /* for immediate allocation */
 #endif
     for (y = 0; y < n_symbols; y++) {
         if (! ig_test(x, y, n_symbols, graph))
@@ -982,13 +1019,9 @@ map_colors(IMC_Unit* unit, int x, unsigned int *graph, int colors[], int typ)
         if (   r
     	    && r->color != -1
 	    && r->set == typ) {
-    	    colors[r->color] = 1;
+    	    avail[r->color+1] = 0;
     	}
     }
-    for (color = free_colors = 0; color < MAX_COLOR; color++)
-	if (!colors[color])
-	    free_colors++;
-    return free_colors;
 }
 
 #if ! DOIT_AGAIN_SAM

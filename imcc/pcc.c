@@ -449,8 +449,6 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         sprintf(buf, "%d", CURRENT_OBJECT);
         regs[1] = get_const(interp, buf, 'I');
         ins = insINS(interp, unit, ins, "interpinfo", regs, 2);
-        regs[1] = get_pasm_reg(interp, "P2");
-        ins = insINS(interp, unit, ins, "set", regs, 2);
     }
     /*
      * check if there is a return

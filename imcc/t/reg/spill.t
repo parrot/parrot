@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 4;
+use TestCompiler tests => 5;
 
 ##############################
 
@@ -423,4 +423,179 @@ err:
 .end
 CODE
 ok
+OUT
+
+output_is(<<'CODE', <<'OUT', "bug #32996");
+
+.namespace ["Foo"]
+
+.sub __biginit prototyped, @MAIN
+	newclass $P0, "Foo"
+	$I1 = find_type "Foo"
+	$P1 = new $I1
+	$P1.method1()
+	$P1.method2()
+
+	$P2 = new $I1
+	$P2.method1()
+	$P2.method2()
+
+	$P3 = new $I1
+	$P3.method1()
+	$P3.method2()
+
+	$P4 = new $I1
+	$P4.method1()
+	$P4.method2()
+
+	$P5 = new $I1
+	$P5.method1()
+	$P5.method2()
+
+	$P6 = new $I1
+	$P6.method1()
+	$P6.method2()
+
+	$P7 = new $I1
+	$P7.method1()
+	$P7.method2()
+
+	$P8 = new $I1
+	$P8.method1()
+	$P8.method2()
+
+	$P9 = new $I1
+	$P9.method1()
+	$P9.method2()
+
+	$P10 = new $I1
+	$P10.method1()
+	$P10.method2()
+
+	$P11 = new $I1
+	$P11.method1()
+	$P11.method2()
+
+	$P12 = new $I1
+	$P12.method1()
+	$P12.method2()
+
+	$P13 = new $I1
+	$P13.method1()
+	$P13.method2()
+
+	$P14 = new $I1
+	$P14.method1()
+	$P14.method2()
+
+	$P15 = new $I1
+	$P15.method1()
+	$P15.method2()
+
+	$P1.method1()
+	$P1.method2()
+	$P2.method1()
+	$P2.method2()
+	$P3.method1()
+	$P3.method2()
+	$P4.method1()
+	$P4.method2()
+	$P5.method1()
+	$P5.method2()
+	$P6.method1()
+	$P6.method2()
+	$P7.method1()
+	$P7.method2()
+	$P8.method1()
+	$P8.method2()
+	$P9.method1()
+	$P9.method2()
+	$P10.method1()
+	$P10.method2()
+	$P11.method1()
+	$P11.method2()
+	$P12.method1()
+	$P12.method2()
+	$P13.method1()
+	$P13.method2()
+	$P14.method1()
+	$P14.method2()
+	$P15.method1()
+	$P15.method2()
+
+	end
+.end
+
+.sub method1 prototyped, method
+	print "In method 1\n"
+	.pcc_begin_return
+	.pcc_end_return
+.end
+
+.sub method2 prototyped, method
+	print "In method 2\n"
+	.pcc_begin_return
+	.pcc_end_return
+.end
+CODE
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
+In method 1
+In method 2
 OUT
