@@ -489,10 +489,32 @@ PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)
 
     switch(cmd) {
        case PIOCTL_CMDSETRECSEP: io->recsep = arg;
+
        case PIOCTL_CMDGETRECSEP: return io->recsep;
-       case PIOCTL_CMDSETBUFTYPE: return -3; /* XXX FIXME */
-       case PIOCTL_CMDGETBUFTYPE: return -4; /* XXX FIXME */
-       case PIOCTL_CMDSETBUFSIZE: return -5; /* XXX FIXME */
+
+       case PIOCTL_CMDSETBUFTYPE:
+            if(arg == PIOCTL_NONBUF) {
+               PIO_setbuf(interpreter, pmc, 0); 
+               return 0;
+            }
+            else if(arg == PIOCTL_LINEBUF) {
+               PIO_setlinebuf(interpreter, pmc); 
+               return 0;
+            }
+            else if(arg == PIOCTL_BLKBUF) {
+               PIO_setbuf(interpreter, pmc, PIO_UNBOUND); 
+               return 0;
+            }
+            else return -3;
+
+       case PIOCTL_CMDGETBUFTYPE:
+            if(io->flags & PIO_F_LINEBUF) return PIOCTL_LINEBUF;
+            if(io->flags & PIO_F_BLKBUF) return PIOCTL_BLKBUF;
+            return PIOCTL_NONBUF;
+
+       case PIOCTL_CMDSETBUFSIZE:
+            return PIO_setbuf(interpreter, pmc, arg);
+
        case PIOCTL_CMDGETBUFSIZE:
              if(b) return b->size;
              else return -6;

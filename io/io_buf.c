@@ -112,6 +112,8 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
 {
     ParrotIOLayer *l = layer;
     ParrotIOBuf *b = &io->b;
+    if(!l)
+        l = io->stack;
     /* If there is a buffer, make sure we flush before
      * dinking around with the buffer.
      */
@@ -146,9 +148,14 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
 
 
 static INTVAL
-PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io)
+PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     int err;
+    ParrotIOLayer * l;
+
+    l = layer;
+    if(!l)
+        l = io->stack;
 
     /* already linebuffering */
     if (io->flags & PIO_F_LINEBUF)
