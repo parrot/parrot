@@ -6,8 +6,8 @@ INC=../include/parrot
 H_FILES = $(INC)/parrot.h default.h
 
 
-O_FILES = default$(O) perlint$(O) perlstring$(O) perlnum$(O) perlarray$(O) \
-perlhash$(O) perlundef$(O) parrotpointer$(O) intqueue$(O)
+O_FILES = default$(O) array$(O) perlint$(O) perlstring$(O) perlnum$(O) \
+perlarray$(O) perlhash$(O) perlundef$(O) parrotpointer$(O) intqueue$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -25,6 +25,11 @@ PMC2C=$(PERL) pmc2c.pl
 	$(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<
 
 all : $(O_FILES)
+
+array.c array.h: array.pmc 
+	$(PMC2C) array.pmc
+
+array$(O): $(H_FILES)
 
 default.c default.h: default.pmc
 	$(PMC2C) default.pmc

@@ -41,6 +41,7 @@ chartype.c
 chartypes/unicode.c
 chartypes/usascii.c
 classes/Makefile.in
+classes/array.pmc
 classes/default.pmc
 classes/genclass.pl
 classes/intqueue.pmc
@@ -221,6 +222,7 @@ t/op/interp.t
 t/op/macro.t
 t/op/number.t
 t/op/pmc.t
+t/op/pmc_array.t
 t/op/pmc_perlarray.t
 t/op/pmc_perlhash.t
 t/op/pmc_perlstring.t
