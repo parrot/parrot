@@ -22,7 +22,7 @@ PMC *
 Parrot_new_csub(struct Parrot_Interp * interp, Parrot_csub_t func)
 {
     PMC * ret = pmc_new(interp, enum_class_CSub);
-    ret->cache.struct_val = (DPOINTER*)func;
+    ret->cache.struct_val = (DPOINTER*)F2DPTR(func);
     return ret;
 }
 
