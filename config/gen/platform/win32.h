@@ -16,6 +16,10 @@ typedef HUGEINTVAL Parrot_OFF_T;
 #  define S_ISREG(m) ((m & S_IFMT) == S_IFREG)
 #endif
 
+#define PARROT_HAS_PLATFORM_INIT_CODE
+
+void Parrot_platform_init_code(void);
+
 /* These disable certain Level 4 Warnings */
 #pragma warning( disable: 4100 ) /* disables 'unreferenced formal parameter'
                                   * warnings */

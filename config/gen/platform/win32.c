@@ -22,6 +22,12 @@ Parrot_intval_time(void)
 ** Parrot_floatval_time()
 */
 
+void
+Parrot_platform_init_code(void)
+{
+ SetErrorMode(SEM_NOGPFAULTERRORBOX); 
+}
+
 FLOATVAL
 Parrot_floatval_time(void)
 {

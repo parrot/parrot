@@ -27,6 +27,10 @@ init_world(Interp *interpreter)
     PMC *classname_hash;
     PMC *self;
 
+#ifdef PARROT_HAS_PLATFORM_INIT_CODE
+    Parrot_platform_init_code();
+#endif
+
     string_init();              /* Set up the string subsystem */
 
     /* allocate core vtable */
