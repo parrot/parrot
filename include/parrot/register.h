@@ -77,6 +77,11 @@ void Parrot_push_n(struct Parrot_Interp *);
 void Parrot_push_s(struct Parrot_Interp *);
 void Parrot_push_p(struct Parrot_Interp *);
 
+void Parrot_clone_i(struct Parrot_Interp *);
+void Parrot_clone_n(struct Parrot_Interp *);
+void Parrot_clone_s(struct Parrot_Interp *);
+void Parrot_clone_p(struct Parrot_Interp *);
+
 void Parrot_pop_i(struct Parrot_Interp *);
 void Parrot_pop_n(struct Parrot_Interp *);
 void Parrot_pop_s(struct Parrot_Interp *);

@@ -1678,6 +1678,35 @@ AUTO_OP pushp() {
   Parrot_push_p(interpreter);
 }
 
+########################################
+
+=item B<clonei>()
+
+=item B<clonen>()
+
+=item B<clonep>()
+
+=item B<clones>()
+
+Save all the registers of the type indicated in the name of the operation.
+
+=cut
+
+AUTO_OP clonei() {
+  Parrot_clone_i(interpreter);
+}
+
+AUTO_OP clonen() {
+  Parrot_clone_n(interpreter);
+}
+
+AUTO_OP clones() {
+  Parrot_clone_s(interpreter);
+}
+
+AUTO_OP clonep() {
+  Parrot_clone_p(interpreter);
+}
 
 =back
 
