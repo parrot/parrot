@@ -29,7 +29,9 @@ TBD
     
     find_type i, "Stream::Combiner"
     if i > 1 goto END
-    
+
+    load_bytecode "library/Stream/Base.imc"
+
     getclass base, "Stream::Base"
     subclass comb, base, "Stream::Combiner"
     
