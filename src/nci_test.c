@@ -73,6 +73,7 @@ int nci_ip(void *p) {
 /* test calls this with a string */
 int nci_it(void *p) {
     fprintf(stderr, "%c%c\n", ((char*) p)[1], ((char *) p)[0]);
+    fflush(stderr);
     return 2;
 }
 
@@ -103,6 +104,7 @@ void * nci_pp(void *p) {
 
 int nci_iiii(int i1, int i2, int i3) {
     fprintf(stderr, "%d %d %d\n", i1, i2, i3);
+    fflush(stderr);
     return 2;
 }
 
