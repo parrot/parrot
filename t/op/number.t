@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 31;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
 	set	N0, 1.0
@@ -157,9 +157,16 @@ output_is(<<'CODE', <<'OUTPUT', "abs(n, i|ic|n|nc)");
 	set	I0, -1
 	abs	N0, I0
 	abs	N1, -1
-	set	N2, -1
-	abs	N2, N2
-	abs	N3, -1.0
+        set     I1, 1
+        abs     N2, I1
+        abs     N3, 1
+	set	N4, -1
+	abs	N4, N4
+	abs	N5, -1.0
+        set     N6, 1.0
+        abs     N6, N6
+        abs     N7, 1.0
+
 	print N0
 	print "\n"
 	print N1
@@ -168,8 +175,20 @@ output_is(<<'CODE', <<'OUTPUT', "abs(n, i|ic|n|nc)");
 	print "\n"
 	print N3
 	print "\n"
+	print N4
+	print "\n"
+	print N5
+	print "\n"
+	print N6
+	print "\n"
+	print N7
+	print "\n"
 	end
 CODE
+1.000000
+1.000000
+1.000000
+1.000000
 1.000000
 1.000000
 1.000000
@@ -711,6 +730,24 @@ CODE
 5.000000
 OUTPUT
 
+output_is(<<CODE, <<OUTPUT, "inc_n_n");
+	set	N0, 0.0
+        set     N1, 0.5
+        set     N2, -1.0
+
+	inc	N0, N1
+	print	N0
+	print	"\\n"
+
+	inc	N0, N2
+	print	N0
+	print	"\\n"
+        end
+CODE
+0.500000
+-0.500000
+OUTPUT
+
 output_is(<<CODE, <<OUTPUT, "inc_n_nc");
 	set	N0, 0.0
 
@@ -744,6 +781,24 @@ output_is(<<CODE, <<OUTPUT, "dec_n");
 CODE
 -1.000000
 -5.000000
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "dec_n_n");
+	set	N0, 0.0
+        set     N1, 2.0
+        set     N2, -1.0
+
+	dec	N0, N1
+	print	N0
+	print	"\\n"
+
+	dec	N0, N2
+	print	N0
+	print	"\\n"
+        end
+CODE
+-2.000000
+-1.000000
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "dec_n_nc");
