@@ -98,8 +98,27 @@ a third argument.
 
 =item void init_pmc(INTERP, PMC* self, PMC* initializer)
 
-This form of the init method takes a single initializer parameter.
-XXX - What is the initializer used for?
+This form of the init method takes a single initializer parameter. The
+initializer is an array that contains keys and values. The meaning of
+the keys and their corresponding values is left up to the PMC.
+
+Keys are either strings or integers. If strings, the PMC is
+responsible for figuring out what the string represents. If integers,
+it means the meaning has been pre-figured based on meta-information
+from the class. 
+
+For example, if a class has the known properties "Size", "Dimension"
+and "Color", they may be assigned the values 100, 101, and 102. If the
+creator if the PMC knows enough about the class to make the
+translation to numbers it may, otherwise the strings may be used. So
+for the declaration:
+
+   my @foo Size(12), Dimension(3), Color("Green");
+
+the init array may be [100, 12, 101, 3, 102, "Green"] or ["Size", 12,
+"Dimension", 3, "Color", "Green"]. Note that, in all cases, the array
+is an array of PMCs. (So you get either an int PMC or a string PMC in
+the list of keys)
 
 =item void morph(INTERP, PMC* self, INTVAL type)
 
