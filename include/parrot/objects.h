@@ -21,6 +21,8 @@ PMC *Parrot_add_parent(Parrot_Interp, PMC *, PMC *);
 PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);
 PMC *Parrot_multi_subclass(Parrot_Interp, PMC *, STRING *);
 PMC *Parrot_instantiate_object(Parrot_Interp, PMC *);
+PMC *Parrot_new_method_cache(Parrot_Interp);
+PMC *Parrot_find_method_with_cache(Parrot_Interp, PMC *, STRING *);
 
 #endif
 

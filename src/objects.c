@@ -186,6 +186,30 @@ Parrot_multi_subclass(Parrot_Interp interpreter, PMC *base_class_array,
     return NULL;
 }
 
+/*=for api objects Parrot_new_method_cache
+ *
+ * Create a new method cache PMC.
+ */
+PMC *
+Parrot_new_method_cache(Parrot_Interp interpreter) {
+    return NULL;
+}
+
+/*=for api objects Parrot_find_method
+ *
+ * Find a method PMC for a named method, given the class PMC, current
+ * interpreter, and name of the method.
+ *
+ * This routine should use the current scope's method cache, if there
+ * is one. If not, it creates a new method cache
+ *
+ */
+PMC *
+Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
+                              STRING *method_name) {
+    return NULL;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd
