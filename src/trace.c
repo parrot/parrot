@@ -157,14 +157,14 @@ trace_key_dump(Interp *interpreter, PMC *key)
             break;
         case KEY_integer_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "I%vd=%vd", PMC_int_val(key),
-                    interpreter->int_reg.registers[PMC_int_val(key)]);
+                    REG_INT(PMC_int_val(key)));
             break;
         case KEY_number_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "I%vd=%vd", PMC_int_val(key),
-                    interpreter->num_reg.registers[PMC_int_val(key)]);
+                    REG_NUM(PMC_int_val(key)));
             break;
         case KEY_string_FLAG|KEY_register_FLAG:
-            s = interpreter->string_reg.registers[PMC_int_val(key)];
+            s = REG_STR(PMC_int_val(key));
             escaped = PDB_escape(PObj_bufstart(s), s->strlen);
             PIO_eprintf(interpreter, "S%vd=\"%s\"", PMC_int_val(key),
                     escaped ? escaped : "(null");
@@ -173,7 +173,7 @@ trace_key_dump(Interp *interpreter, PMC *key)
             break;
         case KEY_pmc_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "P%vd=", PMC_int_val(key));
-            trace_pmc_dump(interpreter, interpreter->pmc_reg.registers[PMC_int_val(key)]);
+            trace_pmc_dump(interpreter, REG_PMC(PMC_int_val(key)));
             break;
         default:
             PIO_eprintf(interpreter, "??");

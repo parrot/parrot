@@ -31,7 +31,7 @@ Returns C<PARROT_FUNCTION_CORE>.
 
 =cut
 
-sub core_type 
+sub core_type
 {
     return 'PARROT_FUNCTION_CORE';
 }
@@ -42,7 +42,7 @@ Returns an empty string.
 
 =cut
 
-sub core_prefix 
+sub core_prefix
 {
     return "";
 }
@@ -59,10 +59,10 @@ sub defines
 #undef CONST
 #define REL_PC     ((size_t)(cur_opcode - interpreter->code->byte_code))
 #define CUR_OPCODE cur_opcode
-#define IREG(i) interpreter->int_reg.registers[cur_opcode[i]]
-#define NREG(i) interpreter->num_reg.registers[cur_opcode[i]]
-#define PREG(i) interpreter->pmc_reg.registers[cur_opcode[i]]
-#define SREG(i) interpreter->string_reg.registers[cur_opcode[i]]
+#define IREG(i) REG_INT(cur_opcode[i])
+#define NREG(i) REG_NUM(cur_opcode[i])
+#define PREG(i) REG_PMC(cur_opcode[i])
+#define SREG(i) REG_STR(cur_opcode[i])
 #define CONST(i) interpreter->code->const_table->constants[cur_opcode[i]]
 END
 }
@@ -73,7 +73,7 @@ Reimplements the superclass method so that C<$where> is suitably cast.
 
 =cut
 
-sub gen_goto 
+sub gen_goto
 {
     my ($self, $where_str) = @_;
 
@@ -86,7 +86,7 @@ Returns the C code for C<ADDRESS($address)>. Called by C<goto_address()>.
 
 =cut
 
-sub expr_address 
+sub expr_address
 {
     my ($self, $addr) = @_;
 
@@ -99,7 +99,7 @@ Returns the C code for C<OFFSET($offset)>. Called by C<goto_offset()>.
 
 =cut
 
-sub expr_offset 
+sub expr_offset
 {
     my ($self, $offset) = @_;
 
@@ -112,7 +112,7 @@ Returns the C code for C<POP()>. Called by C<goto_offset()>.
 
 =cut
 
-sub expr_pop 
+sub expr_pop
 {
     my ($self) = @_;
 

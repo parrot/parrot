@@ -36,10 +36,10 @@ sub defines
 {
     return <<END;
 #define REL_PC (cur_opcode - start_code)
-#define IREG(i) interpreter->int_reg.registers[i]
-#define NREG(i) interpreter->num_reg.registers[i]
-#define PREG(i) interpreter->pmc_reg.registers[i]
-#define SREG(i) interpreter->string_reg.registers[i]
+#define IREG(i) REG_INT(i)
+#define NREG(i) REG_NUM(i)
+#define PREG(i) REG_PMC(i)
+#define SREG(i) REG_STR(i)
 #define CONST(i) interpreter->code->const_table->constants[i]
 END
 }
@@ -56,11 +56,11 @@ sub pc
 {
     my $self = shift;
 
-    if (@_) 
+    if (@_)
     {
         $self->{PC} = shift;
     }
-    else 
+    else
     {
         return $self->{PC};
     }
@@ -78,11 +78,11 @@ sub args
 {
     my $self = shift;
 
-    if (@_) 
+    if (@_)
     {
         $self->{ARGS} = [ @_ ];
     }
-    else 
+    else
     {
         return $self->{ARGS};
     }
@@ -144,15 +144,15 @@ sub goto_offset
 {
     my ($self, $offset) = @_;
 
-    if ($offset =~ /^-?\d+$/) 
+    if ($offset =~ /^-?\d+$/)
     {
         return sprintf("goto PC_%d", $self->pc + $offset);
-    } 
-    else 
+    }
+    else
     {
         return sprintf("cur_opcode = &&PC_%d; cur_opcode += %s; goto switch_label", $self->pc, $offset);
     }
-    
+
     #print STDERR "pbcc: map_ret_rel($offset)\n";
 }
 
@@ -177,7 +177,7 @@ my %arg_maps = (
     's'  => "SREG(%ld)",
     'k'  => "PREG(%ld)",
     'ki' => "IREG(%ld)",
-    
+
     'ic' => "%ld",
     'nc' => "CONST(%ld)->u.number",
     'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",

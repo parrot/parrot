@@ -281,10 +281,10 @@ END_C
 
 if ($jit_cpu) {
     print JITCPU<<END_C;
-#define IREG(i) interpreter->int_reg.registers[jit_info->cur_op[i]]
-#define NREG(i) interpreter->num_reg.registers[jit_info->cur_op[i]]
-#define PREG(i) interpreter->pmc_reg.registers[jit_info->cur_op[i]]
-#define SREG(i) interpreter->string_reg.registers[jit_info->cur_op[i]]
+#define IREG(i) REG_INT(jit_info->cur_op[i])
+#define NREG(i) REG_NUM(jit_info->cur_op[i])
+#define PREG(i) REG_PMC(jit_info->cur_op[i])
+#define SREG(i) REG_STR(jit_info->cur_op[i])
 #define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
 END_C
 }

@@ -231,13 +231,13 @@ write_vars(FILE *stabs, Interp *interpreter)
     /* fake static var stabs */
     for (i = 0; i < NUM_REGISTERS; i++) {
         fprintf(stabs, ".stabs \"I%d:S(0,12)\"," N_STSYM ",0,0,%p\n", i,
-                (char*)&interpreter->int_reg.registers[i]);
+                (char*)&REG_INT(i));
         fprintf(stabs, ".stabs \"N%d:S(0,13)\"," N_STSYM ",0,0,%p\n", i,
-                (char*)&interpreter->num_reg.registers[i]);
+                (char*)&REG_NUM(i));
         fprintf(stabs, ".stabs \"S%d:S(0,16)\"," N_STSYM ",0,0,%p\n", i,
-                (char*)&interpreter->string_reg.registers[i]);
+                (char*)&REG_STR(i));
         fprintf(stabs, ".stabs \"P%d:S*(0,19)\"," N_STSYM ",0,0,%p\n", i,
-                (char*)&interpreter->pmc_reg.registers[i]);
+                (char*)&REG_PMC(i));
     }
 }
 

@@ -84,26 +84,26 @@ prederef_args(void **pc_prederef, Interp *interpreter,
         case PARROT_ARG_I:
             if (arg < 0 || arg >= NUM_REGISTERS)
                 internal_exception(INTERP_ERROR, "Illegal register number");
-            pc_prederef[i] = (void *)&interpreter->int_reg.registers[arg];
+            pc_prederef[i] = (void *)&REG_INT(arg);
             break;
 
         case PARROT_ARG_N:
             if (arg < 0 || arg >= NUM_REGISTERS)
                 internal_exception(INTERP_ERROR, "Illegal register number");
-            pc_prederef[i] = (void *)&interpreter->num_reg.registers[arg];
+            pc_prederef[i] = (void *)&REG_NUM(arg);
             break;
 
         case PARROT_ARG_K:
         case PARROT_ARG_P:
             if (arg < 0 || arg >= NUM_REGISTERS)
                 internal_exception(INTERP_ERROR, "Illegal register number");
-            pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[arg];
+            pc_prederef[i] = (void *)&REG_PMC(arg);
             break;
 
         case PARROT_ARG_S:
             if (arg < 0 || arg >= NUM_REGISTERS)
                 internal_exception(INTERP_ERROR, "Illegal register number");
-            pc_prederef[i] = (void *)&interpreter->string_reg.registers[arg];
+            pc_prederef[i] = (void *)&REG_STR(arg);
             break;
 
         case PARROT_ARG_KIC:

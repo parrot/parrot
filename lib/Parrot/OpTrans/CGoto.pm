@@ -72,10 +72,10 @@ sub defines
 #undef CONST
 #define REL_PC     ((size_t)(cur_opcode - interpreter->code->byte_code))
 #define CUR_OPCODE cur_opcode
-#define IREG(i) interpreter->int_reg.registers[cur_opcode[i]]
-#define NREG(i) interpreter->num_reg.registers[cur_opcode[i]]
-#define PREG(i) interpreter->pmc_reg.registers[cur_opcode[i]]
-#define SREG(i) interpreter->string_reg.registers[cur_opcode[i]]
+#define IREG(i) REG_INT(cur_opcode[i])
+#define NREG(i) REG_NUM(cur_opcode[i])
+#define PREG(i) REG_PMC(cur_opcode[i])
+#define SREG(i) REG_STR(cur_opcode[i])
 #define CONST(i) interpreter->code->const_table->constants[cur_opcode[i]]
 END
 }
