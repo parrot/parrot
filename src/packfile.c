@@ -736,17 +736,12 @@ PackFile_new(INTVAL is_mapped)
 
     /* Other fields empty for now */
     pf->byte_code = NULL;
-    pf->eval_nr = 0;
+    pf->cur_cs = NULL;
+    pf->const_table = NULL;
     pf_register_standard_funcs(pf);
+    /* create the master directory, all subirs go there */
     pf->directory = (struct PackFile_Directory *)
         PackFile_Segment_new_seg(pf, PF_DIR_SEG, DIRECTORY_SEGMENT_NAME, 0);
-    /* add default segments */
-    pf->const_table = (struct PackFile_ConstTable *)
-        PackFile_Segment_new_seg(pf, PF_CONST_SEG, CONSTANT_SEGMENT_NAME, 1);
-    pf->cur_cs = (struct PackFile_ByteCode*)
-        PackFile_Segment_new_seg(pf, PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, 1);
-    pf->need_wordsize = 0;
-    pf->need_endianize = 0;
     pf->fetch_op = (opcode_t (*)(opcode_t)) NULLfunc;
     pf->fetch_iv = (INTVAL (*)(INTVAL)) NULLfunc;
     pf->fetch_nv = (void (*)(unsigned char *, unsigned char *)) NULLfunc;
@@ -1047,19 +1042,10 @@ directory_unpack (struct Parrot_Interp *interpreter,
         /* get name */
         name = PackFile_fetch_cstring(self, &cursor);
 
-        switch (type) {
-            case PF_CONST_SEG:
-                seg = (struct PackFile_Segment *)self->const_table;
-                break;
-            default:
-                if ( (seg = PackFile_find_segment(self, name)))
-                    break;
-                /* fall through */
-                if (type >= PF_MAX_SEG)
-                    type = PF_UNKNOWN_SEG;
-                /* create it */
-                seg = PackFile_Segment_new_seg(self, type, name, 0);
-        }
+        if (type >= PF_MAX_SEG)
+            type = PF_UNKNOWN_SEG;
+        /* create it */
+        seg = PackFile_Segment_new_seg(self, type, name, 0);
         mem_sys_free(name);
 
         /* make compat/shorthand pointers */
@@ -1068,6 +1054,13 @@ directory_unpack (struct Parrot_Interp *interpreter,
                 /* TODO check multiple */
                 self->fixup_table = (struct PackFile_FixupTable *)seg;
                 break;
+            case PF_BYTEC_SEG:
+                if (!self->cur_cs)
+                    self->cur_cs = (struct PackFile_ByteCode*)seg;
+                break;
+            case PF_CONST_SEG:
+                if (!self->const_table)
+                    self->const_table = (struct PackFile_ConstTable*)seg;
             default:
                 break;
         }

@@ -43,8 +43,8 @@ struct PackFile_Header {
     opcode_t magic;
     opcode_t opcodetype;
     opcode_t dir_format;        /* was fixup_ss */
-    opcode_t const_ss;          /* old format data */
-    opcode_t bytecode_ss;
+    opcode_t _unused_const_ss;          /* old format data */
+    opcode_t _unused_bytecode_ss;
 };
 
 /*

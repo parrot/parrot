@@ -105,6 +105,7 @@ void imcc_globals_destroy(int ex, void *param)
 int e_pbc_open(void *param) {
     struct cs_t *cs;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    struct PackFile_Segment *seg;
 
     /* make a new code segment
      */
@@ -122,7 +123,17 @@ int e_pbc_open(void *param) {
         globals.first = cs;
     else
         cs->prev->next = cs;
-    cs->seg = interpreter->code->cur_cs;
+    /*
+     * we need some segments
+     */
+    if (!interpreter->code->cur_cs) {
+        seg = PackFile_Segment_new_seg(interpreter->code, PF_BYTEC_SEG,
+                BYTE_CODE_SEGMENT_NAME, 1);
+        cs->seg = interpreter->code->cur_cs = (struct PackFile_ByteCode*)seg;
+        seg = PackFile_Segment_new_seg(interpreter->code, PF_CONST_SEG,
+                CONSTANT_SEGMENT_NAME , 1);
+        interpreter->code->const_table = (struct PackFile_ConstTable*) seg;
+    }
     globals.cs = cs;
     return 0;
 }
