@@ -4,14 +4,26 @@
 # python 2.3.3
 
 # perl oo1.pl                   0.8
-# python pp1.py                 1.2 (first time)
-# python pp1.py                 0.5
+# python oo1.py                 1.2 (first time)
+# python oo1.py                 0.51
 
 # parrot -C oo1.pasm
 # original list fixed           4.9 leaks mem ~ 110 M used
 # don't clone vtable            4.4
 # Dan's vtable cache            4.3
-# Dan's vtable cache -O3        3.8
+# Dan's vtable cache     -O3    3.8
+# list MIN_ITEMS 4->16          2.25
+# find_global hack              2.16
+# find_global hack       -O3    1.60
+
+# parrot -j oo1.pasm
+# find_global hack       -O3    1.51
+
+
+# parrot -C oo1-prop.pasm
+#   invokecc             -O3    0.75
+#   RetCont out of loop  -O3    0.57
+# parrot -j oo1-prop.pasm       0.54
 
     newclass P1, "Foo"
     find_global P2, "init"

@@ -48,9 +48,37 @@ This should be public, but for right now it's internal.
 */
 
 static PMC *
-find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname) {
+find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
+{
     PMC *stash;
-    if (NULL != class) {
+#if 1
+    /*
+     * we are cheating a bit and use PerlHash internals to avoid
+     * hash lookup duplication
+     */
+    HashBucket *b;
+    stash = interpreter->globals->stash_hash;
+    if (class) {
+        b = hash_get_bucket(interpreter,
+                (Hash*) PMC_struct_val(stash), class);
+        if (!b)
+            return NULL;
+        stash = b->value;
+        b = hash_get_bucket(interpreter,
+                (Hash*) PMC_struct_val(stash), globalname);
+        if (!b)
+            return NULL;
+        return VTABLE_get_pmc_keyed_int(interpreter, stash,
+                PMC_int_val((PMC*)b->value));
+    }
+    b = hash_get_bucket(interpreter,
+                (Hash*) PMC_struct_val(stash), globalname);
+    if (!b)
+        return NULL;
+    return b->value;
+
+#else
+    if (class) {
         if (!VTABLE_exists_keyed_str(interpreter,
                                      interpreter->globals->stash_hash,
                                      class)) {
@@ -68,6 +96,7 @@ find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname) {
     }
     return VTABLE_get_pmc_keyed_str(interpreter,
             stash, globalname);
+#endif
 }
 
 /* Take the class and completely rebuild the atttribute stuff for
@@ -444,25 +473,17 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     INTVAL attrib_count;
     PMC *class_array;
     PMC *class;
-    INTVAL class_enum;
     PMC *class_name;
     PMC *vtable_pmc;
 
     class = object->vtable->data;
-    /* * remember PMC type */
-    class_enum = object->vtable->base_type;
-    /* put in the real vtable
-     * XXX we are leaking ths vtable
+    /*
+     * put in the real vtable
      */
 
-    vtable_pmc = VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(class), PCD_OBJECT_VTABLE);
+    vtable_pmc = VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(class),
+            PCD_OBJECT_VTABLE);
     object->vtable = PMC_struct_val(vtable_pmc);
-
-    /*    object->vtable = Parrot_base_vtables[class_enum];*/
-    //    object->vtable = Parrot_clone_vtable(interpreter,
-    //      Parrot_base_vtables[enum_class_ParrotObject]);
-    /* and set type of class */
-    //object->vtable->base_type = class_enum;
 
     /* Grab the attribute count from the parent */
     attrib_count = class->cache.int_val;

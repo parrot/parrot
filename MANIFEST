@@ -337,6 +337,7 @@ examples/benchmarks/gc_waves_sizeable_data.pasm   [main]doc
 examples/benchmarks/gc_waves_sizeable_headers.pasm [main]doc
 examples/benchmarks/hash-utf8.pasm                [main]doc
 examples/benchmarks/oo1.pasm                      [main]doc
+examples/benchmarks/oo1-prop.pasm                 [main]doc
 examples/benchmarks/oo1.pl                        [main]doc
 examples/benchmarks/oo1.py                        [main]doc
 examples/benchmarks/primes.c                      [main]doc
