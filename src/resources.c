@@ -702,10 +702,10 @@ Parrot_go_collect(struct Parrot_Interp *interpreter) {
 
   /* Collect the PMC header pool */
   memcpy(cur_spot,
-	 interpreter->arena_base->buffer_header_pool->pool_buffer.bufstart, 
-	 interpreter->arena_base->buffer_header_pool->pool_buffer.buflen);
-  interpreter->arena_base->buffer_header_pool->pool_buffer.bufstart = cur_spot;
-  cur_size = interpreter->arena_base->buffer_header_pool->pool_buffer.buflen;
+	 interpreter->arena_base->pmc_pool->pool_buffer.bufstart, 
+	 interpreter->arena_base->pmc_pool->pool_buffer.buflen);
+  interpreter->arena_base->pmc_pool->pool_buffer.bufstart = cur_spot;
+  cur_size = interpreter->arena_base->pmc_pool->pool_buffer.buflen;
   if (cur_size & 0x0f) {
     cur_size &= ~0x0f;
     cur_size += 16;
