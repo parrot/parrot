@@ -1,0 +1,298 @@
+
+=head1 Introduction
+
+Jako is a simple malleable language. It has very little built-in functionality,
+but it is very easy to build a reasonable language out of it.
+
+
+=head1 Constructs
+
+The basic constructs of Jako are predefined, but the ways in which they
+combine are programmer-defined.
+
+
+=head2 Words
+
+A word is a contiguous string of characters matching the Perl regular
+expression C<m/[A-Za-z][A-Za-z0-9_]*/>. Words can be used as the names of types,
+variables and constants, and can also be used as I<key words>.
+
+
+=head2 Symbols
+
+Symbols are 
+
+
+=head2 Expressions
+
+=head2 Blocks / Environments
+
+A named block can be executed by passing it to C<eval>.
+
+The section "A Mathematical Note" of [MEYER-2001] presents a model of a class as
+a set of name-value bindings.
+
+Lesson 3, "Semantic Building Blocks" of [MEAD-2001] describes the environment
+(or context) of a program at a specific point in its execution in a similar way.
+
+A block is an environment. Names not explicitly bound in that environment are
+implicitly bound if they are explicitly bound in an ancestor environment.
+
+    bind env E word N any V := { E.N = V; }
+
+
+=head2 Blocklists
+
+Parentheses are used to delimit blocklists. A parenthetical list of expressions
+is semantically equivalent to the same number of single-expression blocks, one
+after the other. That is,
+
+    (a < b, 5, i++)
+
+is exactly the same as
+
+    {a < b} {5} {i++}
+
+
+=head1 Definitions
+
+  def
+
+
+=head1 Intrinsic Flow Control Statements
+
+=head2 if
+
+=head2 goto
+
+    def goto label L := ...
+
+
+=head1 Defining Conventional Constructs
+
+Even though Jako doesn't have conventional constructs built-in, it is very
+easy to define them using the facilities Jako does provide:
+
+=head2 Eiffel-like loops
+
+Translating from Eiffel notation to a Perl-like notation yields something like
+this:
+
+    from {...} invariant (...) variant {...} until (...) loop {...} end;
+
+where each C<{...}> represents a block of statements and each C<(...)>
+represents a single boolean expression.
+
+Since the body of the loop is delimited by the braces, we can get rid
+of the C<end> keyword:
+
+    from {...} invariant (...) variant {...} until (...) loop {...};
+
+Since we are used to using C<redo> to go back to the top of the loop
+block and re-do the current iteration, we'll replace C<loop> with C<do>:
+
+    from {...} invariant (...) variant {...} until (...) do {...};
+
+Eiffel's C<variant> clause is equivalent to the Perl C<continue> clause:
+
+    from {...} invariant (...) continue {...} until (...) do {...};
+
+But, we like to see that clause at the end:
+
+    from {...} invariant (...) until (...) do {...} continue {...};
+
+Since we've adopted the Perlish C<continue> in place of C<variant>, now
+C<invariant> seems out of place, but C<check> seems to fit nicely:
+
+    from {...} check (...) until (...) do {...} continue {...};
+
+
+=head2 while
+
+With this Jako definition:
+
+    def while block W ( do? block D ( continue? block C )? )? := {
+      var R: typeof(D); # TODO: typeof(D) == block, we want type of *last statement of* D.
+      CONT: goto :LAST unless eval W;
+      REDO: R = eval D;
+      NEXT: eval C;
+            goto :CONT;
+      LAST: return R;
+    }
+
+we can write Perlish while loops:
+
+    i = 0;
+    while (x[i] < y[i]) do {
+      print "$i\n";
+    } continue {
+      i++
+    }
+
+In fact, we can even write very concise C<while> loops, given the
+optionality of the C<do> and C<continue> blocks and the equivalence of
+C<(x;y)> to C<{x} {y}>:
+
+    i = 0;
+    while (x[i] < y[i]; print "$i\n"; i++);
+
+(which almost looks like a C<for> loop).
+
+
+=head2 for
+
+This Jako definition:
+
+    def for block F while? block W continue? block C do? block D := {
+      var R: typeof(D); # TODO: typeof(D) == block, we want type of *last statement of* D.
+      FOR:  eval F;
+      CONT: goto :LAST unless eval W;
+      REDO: R = eval D;
+      NEXT: eval C;
+            goto :CONT;
+      LAST: return R;
+    }
+
+allows us to write C<for> loops the way we are used to, such as:
+
+    for (i = 0; i < l; i++) { print x[i], "\n" }
+
+which is really shorthand for:
+
+    for { i = 0 } { i < l } { i++ } { print x[i], "\n" }
+
+or, more verbosely:
+
+    for {
+      i = 0;
+    } while {
+      i < l
+    } continue {
+      i++
+    } do {
+      print x[i], "\n"
+    }
+
+
+=head2 redo, next and last
+
+We can define the familiar loop control statements given the consistency of label
+definitions above:
+
+    def redo ( label L )? := {
+      goto L:REDO; # if L not given, means "goto :REDO"
+    }
+
+    def next ( label L )? := {
+      goto L:NEXT; # if L not given, means "goto :NEXT"
+    }
+
+    def last ( label L )? := {
+      goto L:LAST; # if L not given, means "goto :LAST"
+    }
+
+TODO: Allow C<x = next>?  -- What would that mean?
+
+
+=head2 if, then, elseif and else
+
+    def if block I then? block T ( elsif block EI then? block ET )* (else block E)? := {
+      var R: typeof(...);
+      IF:    goto +:NEXT unless eval I; # "+" --> forward-only
+      REDO:  R = eval T;
+             goto +:LAST;
+      NEXT:  {
+        *:IF:    goto :*:NEXT unless eval *EI;
+        *:REDO:  R = eval *ET;
+                 goto LAST;
+        *:NEXT:
+      } over elsif
+      REDO:  R = eval E;
+      LAST: return R;
+    }
+
+
+=head1 Object-Oriented Programming
+
+A class is an environment template. An instance is an environment built from such a
+template. Method application is the execution of code within the instance's environment.
+For example:
+
+    y = foo.x
+
+means to find 'x' in the environment 'foo' and point 'y' in the current environment at
+it.
+
+Issues: Multiple inheritance for blocks that represent classes vs. single parents for
+blocks that represent general code sequences.
+
+Analogy:
+
+    closure : block  ::  instance : class
+
+Instantiation as environment cloning.
+
+
+=head2 self
+
+The word 'self' means the enclosing environment (instance, in the case of an object
+method).
+
+The word 'class' means the enclosing environment's enclosing environment.
+
+Problem:
+
+    class {
+        method x {
+            {
+                self.y;      # Looks in method
+            }
+            self.z;          # Looks in instance
+        }
+        int y;
+        int z;
+    }
+
+
+=head1 To Do
+
+=over 4
+
+=item *
+
+Templates and generic programming
+
+=item *
+
+Multiple inheritance, renaming and redefinition.
+
+=item *
+
+Run-time definition and modification of environments.
+
+=item *
+
+=back
+
+
+=head1 References
+
+=over 4
+
+=item [MEAD-2001]
+
+Mead, Jerud J. and Shende, Anil M. I<Persuasive Programming>, A|B|F Content, Wilsonville, OR, 2001.
+
+=item [MEYER-1997]
+
+Meyer, Bertrand. "Object-Oriented Software Construction, Second Edition," Prentice Hall PTR,
+Upper Saddle River, NJ, 1997.
+
+=item [MEYER-2001]
+
+Meyer, Bertrand. "Overloading vs. Object Technology," I<Journal of Object-Oriented
+Programming>, October/November 2001 (Vol 14, No. 4).
+
+=back
+
+
