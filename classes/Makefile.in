@@ -19,6 +19,7 @@ C_LIBS = ${libs}
 CC = ${cc}
 PERL = ${perl}
 MAKE_F=${make}
+PMC2C=$(PERL) pmc2c.pl
 
 .c$(O):
 	$(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<
@@ -26,42 +27,42 @@ MAKE_F=${make}
 all : $(O_FILES)
 
 default.c default.h: default.pmc
-	$(PERL) pmc2c.pl default.pmc
+	$(PMC2C) default.pmc
 
 default$(O): $(H_FILES)
 
 perlint.c perlint.h: perlint.pmc 
-	$(PERL) pmc2c.pl perlint.pmc
+	$(PMC2C) perlint.pmc
 
 perlint$(O): $(H_FILES)
 
 perlnum.c perlnum.h: perlnum.pmc 
-	$(PERL) pmc2c.pl perlnum.pmc
+	$(PMC2C) perlnum.pmc
 
 perlnum$(O): $(H_FILES)
 
 perlstring.c perlstring.h: perlstring.pmc 
-	$(PERL) pmc2c.pl perlstring.pmc
+	$(PMC2C) perlstring.pmc
 
 perlstring$(O): $(H_FILES)
 
 perlarray.c perlarray.h: perlarray.pmc 
-	$(PERL) pmc2c.pl perlarray.pmc
+	$(PMC2C) perlarray.pmc
 
 perlarray$(O): $(H_FILES)
 
 perlhash.c perlhash.h: perlhash.pmc 
-	$(PERL) pmc2c.pl perlhash.pmc
+	$(PMC2C) perlhash.pmc
 
 perlhash$(O): $(H_FILES)
 
 perlundef.c perlundef.h: perlundef.pmc 
-	$(PERL) pmc2c.pl perlundef.pmc
+	$(PMC2C) perlundef.pmc
 
 perlundef$(O): $(H_FILES)
 
 parrotpointer.c: parrotpointer.pmc
-	$(PERL) pmc2c.pl parrotpointer.pmc
+	$(PMC2C) parrotpointer.pmc
 
 parrotpointer$(O): $(H_FILES)
 

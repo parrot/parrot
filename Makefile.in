@@ -96,7 +96,7 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 ###############################################################################
 
 CFLAGS = ${ccflags} ${cc_warn} ${cc_debug} ${cc_inc} ${cc_hasjit}
-LDFLAGS = ${ldflags}
+LDFLAGS = ${ldflags} ${ld_debug}
 
 C_LIBS = ${libs}
 
