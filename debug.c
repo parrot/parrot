@@ -2367,8 +2367,10 @@ PDB_help(struct Parrot_Interp *interpreter, const char *command)
 
     switch (c) {
         case c_disassemble:
+            PIO_eprintf(interpreter,"No documentation yet");
             break;
         case c_load:
+            PIO_eprintf(interpreter,"No documentation yet");
             break;
         case c_list:
             PIO_eprintf(interpreter, 
@@ -2398,7 +2400,11 @@ The command returns a number which is the breakpoint identifier.");
             PIO_eprintf(interpreter,"No documentation yet");
             break;
         case c_delete:
-            PIO_eprintf(interpreter,"No documentation yet");
+            PIO_eprintf(interpreter,
+"Delete a breakpoint.\n\n\
+The breakpoint to delete must be specified by its breakpoint number.\n
+Deleted breakpoints are gone completely. If instead you want to\n\
+temporarily disable a breakpoint, use \"disable\".\n");
             break;
         case c_disable:
             PIO_eprintf(interpreter,
@@ -2411,16 +2417,30 @@ with the \"enable\" command.\n");
             PIO_eprintf(interpreter,"Re-enable a disabled breakpoint.\n");
             break;
         case c_continue:
-            PIO_eprintf(interpreter,"No documentation yet");
+            PIO_eprintf(interpreter,
+"Continue the program execution.\n\n\
+Without arguments, the program runs until a breakpoint is found\n\
+(or until the program terminates for some other reason).\n\n\
+If a number is specified, then skip that many breakpoints.\n\n\
+If the program has terminated, then \"continue\" will do nothing;\n\
+use \"run\" to re-run the program.\n");
             break;
         case c_next:
-            PIO_eprintf(interpreter,"No documentation yet");
+            PIO_eprintf(interpreter,"
+Execute a specified number of instructions.\n\n\
+If a number is specified with the command (e.g. \"next 5\"), then\n\
+execute that number of instructions, unless the program reaches a\n\
+breakpoint, or stops for some other reason.\n\n\
+If no number is specified, it defaults to 1.\n");
             break;
         case c_eval:
             PIO_eprintf(interpreter,"No documentation yet");
             break;
         case c_trace:
-            PIO_eprintf(interpreter,"No documentation yet");
+            PIO_eprintf(interpreter,
+"Similar to \"next\", but prints additional trace information.\n\
+This is the same as the information you get when running Parrot with\n\
+the -t option.\n");
             break;
         case c_print:
             PIO_eprintf(interpreter,"No documentation yet");
