@@ -362,6 +362,7 @@ wait_for_wakeup(Parrot_Interp interpreter, void *next)
     while (sleeping) {
         entry = wait_for_entry(interpreter->task_queue);
         event = (parrot_event* )entry->data;
+        mem_sys_free(entry);
         if (event->type == EVENT_TYPE_SLEEP && event->data == next)
             sleeping = 0;
         next = do_event(interpreter, event, next);
