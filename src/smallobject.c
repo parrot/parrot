@@ -267,6 +267,11 @@ add_to_free_list(Interp *interpreter,
 #else
         PObj_flags_SETTO((PObj *)object, PObj_on_free_list_FLAG);
 #endif
+        /*
+         * during GC buflen is used to check for objects on the
+         * free_list
+         */
+        PObj_buflen((PObj*)object) = 0;
         pool->add_free_object (interpreter, pool, object);
         object = (void *)((char *)object + pool->object_size);
     }
