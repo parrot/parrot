@@ -7,12 +7,12 @@ H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h \
 $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
 $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
-$(INC)/runops_cores.h $(INC)/trace.h $(INC)/oplib/vtable_ops.h \
+$(INC)/runops_cores.h $(INC)/trace.h \
 $(INC)/pmc.h $(INC)/resources.h $(INC)/platform.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
 core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) encoding$(O) \
-chartype$(O) runops_cores$(O) trace$(O) vtable_ops$(O) pmc$(O) \
+chartype$(O) runops_cores$(O) trace$(O) pmc$(O) \
 encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
 encodings/utf32$(O) chartypes/unicode$(O) chartypes/usascii$(O) resources$(O) \
 platform$(O) classes/perlint$(O) classes/perlstring$(O) classes/perlnum$(O)
@@ -54,10 +54,7 @@ examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
 	cd examples/assembly; make mops.pbc PERL=$(PERL)
 
 Parrot/OpLib/core.pm: core.ops ops2pm.pl
-	$(PERL) ops2pm.pl core.ops
-
-Parrot/OpLib/vtable.pm: vtable.ops ops2pm.pl
-	$(PERL) ops2pm.pl vtable.ops
+       $(PERL) ops2pm.pl core.ops vtable.ops
 
 examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
@@ -111,14 +108,11 @@ stacks$(O): $(H_FILES)
 
 core_ops$(O): $(H_FILES) core_ops.c
 
-core_ops.c $(INC)/oplib/core_ops.h: core.ops ops2c.pl
-	$(PERL) ops2c.pl core.ops
+core_ops.c $(INC)/oplib/core_ops.h: core.ops vtable.ops ops2c.pl
+       $(PERL) ops2c.pl core.ops vtable.ops
 
 vtable.ops: make_vtable_ops.pl
 	$(PERL) make_vtable_ops.pl > vtable.ops
-
-vtable_ops.c $(INC)/oplib/vtable_ops.h: vtable.ops ops2c.pl
-	$(PERL) ops2c.pl vtable.ops
 
 $(INC)/config.h: Configure.pl config_h.in
 	$(PERL) Configure.pl
@@ -136,7 +130,7 @@ clean:
 	$(RM_F) *.s core_ops.c $(TEST_PROG) $(PDISASM) $(PDUMP)
 	$(RM_F) $(INC)/vtable.h
 	$(RM_F) $(INC)/oplib/core_ops.h
-	$(RM_F) $(INC)/oplib/vtable_ops.h vtable_ops.c vtable.ops
+       $(RM_F) vtable.ops
 	$(RM_F) $(TEST_PROG) $(PDISASM) $(PDUMP)
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
 	$(RM_F) examples/assembly/mops$(EXE) examples/assembly/mops.c

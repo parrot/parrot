@@ -9,16 +9,20 @@
 use strict;
 use Parrot::OpsFile;
 
+sub Usage {
+    print STDERR <<_EOF_;
+usage: $0 input.ops [input2.ops ...]\n";
+_EOF_
+    exit 1;
+}
 
 #
 # Process command-line argument:
 #
 
-if (@ARGV != 1) {
-  die "ops2c.pl: usage: perl ops2c.pl input.ops\n";
-}
+Usage() unless @ARGV;
 
-my $file = $ARGV[0];
+my $file = 'core.ops';
 
 my $base = $file;
 $base =~ s/\.ops$//;
@@ -32,10 +36,22 @@ my $source  = "${base}_ops.c";
 #
 # Read the input file:
 #
+$file = shift @ARGV;
+die "$0: Could not read ops file '$file'!\n" unless -e $file;
 
 my $ops = new Parrot::OpsFile $file;
 
-die "ops2c.pl: Could not read ops file '$file'!\n" unless $ops;
+for $file (@ARGV) {
+    die "$0: Could not read ops file '$file'!\n" unless -e $file;
+    my $temp_ops = new Parrot::OpsFile $file;
+    for(@{$temp_ops->{OPS}}) {
+       push @{$ops->{OPS}},$_;
+    }
+}
+my $cur_code = 0;
+for(@{$ops->{OPS}}) {
+   $_->{CODE}=$cur_code++;
+}
 
 my $num_ops     = scalar $ops->ops;
 my $num_entries = $num_ops + 1; # For trailing NULL
