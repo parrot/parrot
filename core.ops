@@ -2905,8 +2905,17 @@ inline op exists(out INT, in PMC, in KEY) {
 
 =back
 
+
+=item delete(inout PMC, in KEY)
+
+Delete the specified entry $2 from aggregate $1.
+
 =cut
 
+inline op delete(inout PMC, in KEY) {
+  $1->vtable->delete_keyed(interpreter, $1, $2);
+  goto NEXT();
+}
 ###############################################################################
 
 =head2 Interpreter flag modification operations

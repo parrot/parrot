@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -794,6 +794,22 @@ CODE
 1
 0
 1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "delete");
+    new P0, .PerlHash
+    set P0["a"], 1
+    exists I0, P0["a"]
+    print I0
+    print "\n"
+    delete P0["a"]
+    exists I0, P0["a"]
+    print I0
+    print "\n"
+    end
+CODE
+1
+0
 OUTPUT
 
 1;
