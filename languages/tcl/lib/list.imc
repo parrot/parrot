@@ -13,6 +13,10 @@
   .local string position
   position = pmc_position
 
+  .local int TclString,TclInt
+  TclString = find_type "TclString"
+  TclInt = find_type "TclInt"
+
   .local int is_end
   is_end = 1
 
