@@ -664,6 +664,8 @@ END
         print "Note, the sizeof Perl5 INTs appear to be different from Parrot's\n";
         print "for this configuration, if this is expected, ignore this.\n";
     }
+    
+    unlink 'testbyteorder.c';
 }
 
 
