@@ -408,7 +408,7 @@ docs : docs/.dummy
 #newasm : $(TEST_PROG) lib/Parrot/.dummy
 
 lib/Parrot/.dummy :
-	cd lib/Parrot && $(PERL) Makefile.PL && $(MAKE) && cd ..
+	cd lib && cd Parrot && $(PERL) Makefile.PL && $(MAKE) && cd .. && cd ..
 
 docs/.dummy :
 	cd docs && $(MAKE) && cd ..
