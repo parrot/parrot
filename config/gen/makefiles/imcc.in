@@ -38,9 +38,9 @@ LD = ${ld}
 LD_SHARED = ${ld_shared}
 LD_OUT = ${ld_out}
 LINK = ${link}
-LINKFLAGS=${linkflags}
+LINKFLAGS=${linkflags} ${ld_debug}
 
-all : imcc
+all : imcc${exe}
 
 ../../$(PARROTLIB): ../../parrot$(EXE)
 	cd ../.. && $(MAKE) $(PARROTLIB)
@@ -63,7 +63,7 @@ clean:
 	$(RM_F) core
 	$(RM_F) $(IMCC_O_FILES)
 	$(RM_F) imcparser.output
-	$(RM_F) imcc
+	$(RM_F) imcc${exe}
 	$(RM_F) t/*/*.out t/*/*.imc
 
 realclean: clean
@@ -71,9 +71,9 @@ realclean: clean
 	$(RM_F) imcparser.*
 	$(RM_F) imclexer.*
 
-imcc: $(O_FILES)
-	$(LINK) $(LD_OUT)imcc $(LINKFLAGS) $(O_FILES) $(C_LIBS)
+imcc${exe}: $(O_FILES)
+	$(LINK) $(LD_OUT)imcc${exe} $(LINKFLAGS) $(O_FILES) $(C_LIBS)
 
-test:	imcc
+test:	imcc${exe}
 	$(PERL) t/harness
 

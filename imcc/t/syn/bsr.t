@@ -1,7 +1,6 @@
 #!perl
 use strict;
 use TestCompiler tests => 10;
-use Test::More qw(skip);
 
 ##############################
 # this tests register allocation/preserving of local bsr calls

@@ -1,7 +1,6 @@
 #!perl
 use strict;
 use TestCompiler tests => 3;
-use Test::More qw(skip);
 
 ##############################
 output_is(<<'CODE', <<'OUT', "namespace 1");

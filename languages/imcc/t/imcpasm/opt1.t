@@ -1,7 +1,6 @@
 #!perl
 use strict;
 use TestCompiler tests => 49;
-use Test::More qw(skip);
 
 # these tests are run with -O1 by TestCompiler and show
 # generated PASM code for various optimizations at level 1
@@ -506,6 +505,8 @@ CODE
 OUT
 
 ##############################
+SKIP: {
+skip("printf float output is unportable!", 1) if $^O eq 'MSWin32';
 output_is(<<'CODE', <<'OUT', "constant add big nums");
    add N0, 10.0e20, 15.0e21
    end
@@ -513,7 +514,7 @@ CODE
    set N0, 1.6e+22
    end
 OUT
-
+}
 
 ##############################
 SKIP: {

@@ -1,7 +1,6 @@
 #!perl
 use strict;
 use TestCompiler tests => 2;
-use Test::More qw(skip);
 
 # these tests are run with -O2 by TestCompiler and show
 # generated PASM code for various optimizations at level 2

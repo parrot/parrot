@@ -1,16 +1,26 @@
 package TestCompiler;
 use strict;
 use lib '../../lib';
+use vars qw(@EXPORT @ISA);
 use Parrot::Config;
+require Exporter;
 require Test::Builder;
+require Test::More;
+
+@EXPORT = ( qw(skip) );
+@ISA = qw(Exporter);
 
 my $Builder = Test::Builder->new;
 
 $| = 1;
 
+*skip = \&Test::More::skip;
+
 sub import {
   my( $class, $plan, @args ) = @_;
   $Builder->plan( $plan, @args );
+
+  __PACKAGE__->export_to_level( 2, __PACKAGE__ );
 }
 
 sub per_test {

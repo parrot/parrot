@@ -429,6 +429,7 @@ void compute_spilling_costs () {
         }
         r->score += 1000 * max_depth;
 done:
+        ; /* for MSVC 5 */
     }
 
     if (IMCC_DEBUG & DEBUG_IMC)

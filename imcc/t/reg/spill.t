@@ -1,7 +1,6 @@
 #!perl
 use strict;
 use TestCompiler tests => 2;
-use Test::More qw(skip);
 
 ##############################
 
