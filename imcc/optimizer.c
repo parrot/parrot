@@ -44,6 +44,10 @@
  *  because Px where different before
  *
  */
+
+/* buggy - turned off */
+#define  DO_LOOP_OPTIMIZATION 0
+
 static void if_branch(struct Parrot_Interp *, IMC_Unit *);
 
 static int branch_branch(struct Parrot_Interp *interpreter, IMC_Unit *);
@@ -59,7 +63,9 @@ static void subst_constants_if(struct Parrot_Interp *interpreter, IMC_Unit *);
 
 static int constant_propagation(struct Parrot_Interp *interpreter, IMC_Unit *);
 static int used_once(struct Parrot_Interp *, IMC_Unit *);
+#if DO_LOOP_OPTIMIZATION
 static int loop_optimization(struct Parrot_Interp *, IMC_Unit *);
+#endif
 static int clone_remove(struct Parrot_Interp *, IMC_Unit *);
 
 void
@@ -82,7 +88,7 @@ int
 cfg_optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     UNUSED(interpreter);
- 
+
     if (dont_optimize)
         return 0;
     if (optimizer_level & OPT_PRE) {
@@ -109,7 +115,7 @@ optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
             return 1;
         if (used_once(interpreter, unit))
             return 1;
-#if 0
+#if DO_LOOP_OPTIMIZATION
         if (loop_optimization(interpreter, unit))
             return 1;
 #endif
@@ -995,16 +1001,6 @@ used_once(Parrot_Interp interpreter, IMC_Unit * unit)
     return opt;
 }
 
-static int
-max_loop_depth(IMC_Unit * unit)
-{
-    int i, d;
-    d = 0;
-    for (i = 0; i < unit->n_basic_blocks; i++)
-        if (unit->bb_list[i]->loop_depth > d)
-            d = unit->bb_list[i]->loop_depth;
-    return d;
-}
 
 static int reason;
 enum check_t { CHK_INV_NEW, CHK_INV_SET, CHK_CLONE };
@@ -1109,6 +1105,18 @@ is_ins_save(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins, SymReg
         debug(interpreter, DEBUG_OPT2, "ins not save var %s reason %d %I\n",
                 r->name, reason, ins);
     return save;
+}
+
+#if DO_LOOP_OPTIMIZATION
+static int
+max_loop_depth(IMC_Unit * unit)
+{
+    int i, d;
+    d = 0;
+    for (i = 0; i < unit->n_basic_blocks; i++)
+        if (unit->bb_list[i]->loop_depth > d)
+            d = unit->bb_list[i]->loop_depth;
+    return d;
 }
 
 static int
@@ -1252,6 +1260,7 @@ loop_optimization(struct Parrot_Interp *interpreter, IMC_Unit * unit)
     prev_depth = 0;
     return 0;
 }
+#endif
 
 static int
 check_clone(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)

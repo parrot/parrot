@@ -1386,3 +1386,5 @@ err_s_i 1358
 err_s_ic        1359
 compreg_s_p     1360
 compreg_sc_p    1361
+peek_s  1362
+peek_s_p        1363

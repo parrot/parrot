@@ -9,7 +9,10 @@
  */
 #include <sys/types.h>
 #include <sys/wait.h>
-INTVAL Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
+
+INTVAL
+Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command)
+{
     pid_t child;
     child = fork();
     /* Did we fail? */
@@ -27,10 +30,12 @@ INTVAL Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
         /* child. Be horribly profligate with memory, since we're
            about to be something else */
         int status;
-        status = execlp("sh", "sh", "-c", string_to_cstring(interpreter, command), NULL);
+        status = execlp("sh", "sh", "-c",
+			string_to_cstring(interpreter, command), NULL);
         /* if we get here, something's horribly wrong... */
         if (status) {
             exit(status);
         }
     }
+    return 1;	/* make gcc happy */
 }
