@@ -34,6 +34,14 @@ C<Parrot::Pmc2c>.
 #define VTABLE_subtract(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_SUBTRACT)
 #define VTABLE_multiply(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_MULTIPLY)
 #define VTABLE_divide(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_DIVIDE)
+#define VTABLE_modulus(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_MOD)
+#define VTABLE_cmodulus(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_CMOD)
+#define VTABLE_bitwise_and(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_BAND)
+#define VTABLE_bitwise_ors(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_SOR)
+#define VTABLE_bitwise_ands(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_SAND)
+#define VTABLE_bitwise_xors(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_SXOR)
+#define VTABLE_bitwise_shl(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_BSL)
+#define VTABLE_bitwise_shr(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_BSR)
 
 pmclass Ref does ref {
 
