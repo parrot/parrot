@@ -88,18 +88,18 @@ my $normal_call = Parrot::Jit->call(2,"V*CUR_OPCODE[0]V&INTERPRETER[0]") . Parro
 
 for ($i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]};
+
+    my $op = $Parrot::OpLib::core::ops->[$i];
+
     $precompiled = 0;
     if (!defined $body) {
         $precompiled = 1;
-        # TODO: Add metadata in core.ops to the opcodes that change the program control flow
-        if ($core_opfunc[$i] =~ m/^Parrot_(eq_|ne_|lt_|le_|gt_|ge_|if_|ret|bsr_|jump_|branch)/) {
+        if ($op->may_jump) {
             $body = $cpcf_call;
         } else {
             $body = $normal_call;
         }
     }
-
-    my $op = $Parrot::OpLib::core::ops->[$i];
 
     $bytecode = "";
     $move     = 0;

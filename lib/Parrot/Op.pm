@@ -20,7 +20,13 @@ sub new
   my $class = shift;
   my ($code, $type, $name, @args) = @_;
 
-  my $self = { CODE => $code, TYPE => $type, NAME => $name, ARGS => [ @args ], BODY => '' };
+  my $self = { CODE => $code,
+               TYPE => $type,
+               NAME => $name,
+               ARGS => [ @args ],
+               BODY => '',
+               MAY_JUMP => 0,
+             };
 
   return bless $self, $class;
 }
@@ -126,6 +132,19 @@ sub body
   return $self->{BODY};
 }
 
+#
+# may_jump()
+#
+
+sub may_jump
+{
+  my $self = shift;
+  if (@_) {
+    $self->{MAY_JUMP} = shift;
+  }
+
+  return $self->{MAY_JUMP};
+}
 
 #
 # full_body()
@@ -225,8 +244,9 @@ return value (S is the op size).
 
 =head2 full_name
 
-For argumentless ops, its the same as name. For ops with arguments, an underscore
-followed by underscore-separated argument types are appended to the name.
+For argumentless ops, it's the same as name. For ops with arguments,
+an underscore followed by underscore-separated argument types are
+appended to the name.
 
 =head2 func_name
 
