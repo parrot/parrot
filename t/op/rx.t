@@ -209,8 +209,8 @@ CODE
 >
 OUTPUT
 
-TODO: {
-	local $TODO="Pending some sort of lowercasing op";
+SKIP: {
+	skip("Pending some sort of lowercasing op",1);
 	output_is(gentest('HeLlO', <<'CODE', 'i'), <<'OUTPUT', 'case-insensitive regexen (/i)');
 		rx_literal P0, "hel", $advance
 		rx_oneof P0, "lmno", $advance
