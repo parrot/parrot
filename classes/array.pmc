@@ -541,7 +541,7 @@ pmclass Array {
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
 	PMC *ret = key;
 
-	SELF->cache.int_val = SELF.elements();
+	INTVAL n = SELF.elements();
 	PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
 	PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
 	switch (what) {
@@ -549,7 +549,7 @@ pmclass Array {
 		ret->cache.int_val = 0;
 		break;
 	    case 1:	/* next key */
-		if (ret->cache.int_val < SELF->cache.int_val)
+		if (ret->cache.int_val < n)
 		    ++ret->cache.int_val;
 		break;
 	    case 2:	/* prev key */
@@ -557,7 +557,7 @@ pmclass Array {
 		    --ret->cache.int_val;
 		break;
 	    case 3:	/* reset key, iterate from end */
-		ret->cache.int_val = SELF->cache.int_val - 1;
+		ret->cache.int_val = n - 1;
 		break;
 	}
 	return ret;

@@ -135,6 +135,12 @@ pmclass SArray {
         return e->val.int_val;
     }
 
+    INTVAL get_integer_keyed (PMC* key) {
+	/* simple int keys only */
+	INTVAL k = key_integer(INTERP, key);
+	return SELF.get_integer_keyed_int(&k);
+    }
+
     INTVAL shift_integer() {
         HASH_ENTRY *e = (HASH_ENTRY *) PMC_data(SELF);
 
@@ -158,6 +164,11 @@ pmclass SArray {
 	if (e->type != enum_hash_num)
 	    internal_exception(OUT_OF_BOUNDS, "SArray: Not a num!\n");
         return e->val.num_val;
+    }
+
+    FLOATVAL get_number_keyed (PMC* key) {
+	INTVAL k = key_integer(INTERP, key);
+	return SELF.get_number_keyed_int(&k);
     }
 
     FLOATVAL shift_float() {
@@ -185,6 +196,11 @@ pmclass SArray {
         return e->val.string_val;
     }
 
+    STRING* get_string_keyed(PMC* key) {
+	INTVAL k = key_integer(INTERP, key);
+	return SELF.get_string_keyed_int(&k);
+    }
+
     STRING* shift_string() {
         HASH_ENTRY *e = (HASH_ENTRY *) PMC_data(SELF);
 
@@ -208,6 +224,11 @@ pmclass SArray {
 	if (e->type != enum_hash_pmc)
 	    internal_exception(OUT_OF_BOUNDS, "SArray: Not a pmc!\n");
         return e->val.pmc_val;
+    }
+
+    PMC* get_pmc_keyed(PMC* key) {
+	INTVAL k = key_integer(INTERP, key);
+	return SELF.get_pmc_keyed_int(&k);
     }
 
     PMC* shift_pmc() {
@@ -326,5 +347,32 @@ pmclass SArray {
         DYNSELF.set_pmc_keyed_int(&nextix, value, NULL);
     }
 
+    PMC* nextkey_keyed (PMC* key, INTVAL what) {
+	PMC *ret = key;
+        HASH_ENTRY *e;
+
+	PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
+	PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
+	if (!PMC_data(SELF))
+	    return ret;
+	e = (HASH_ENTRY *) PMC_data(SELF);
+	switch (what) {
+	    case 0:	/* reset key, iterate from start */
+		ret->cache.int_val = e[0].val.int_val;
+		break;
+	    case 1:	/* next key */
+		if (ret->cache.int_val < e[1].val.int_val)
+		    ++ret->cache.int_val;
+		break;
+	    case 2:	/* prev key */
+		if (ret->cache.int_val >= e[0].val.int_val)
+		    --ret->cache.int_val;
+		break;
+	    case 3:	/* reset key, iterate from end */
+		ret->cache.int_val = e[1].val.int_val - 1;
+		break;
+	}
+	return ret;
+    }
 }
 
