@@ -172,7 +172,7 @@ static SymReg * macro(char *name)
 /*
  * new P, .SomeThing
  */
-static Instruction * iNEW(SymReg * r0, char * type) {
+Instruction * iNEW(SymReg * r0, char * type, int emit) {
     char fmt[256];
     SymReg *pmc = macro(type);
     /* XXX check, if type exists, but aove keyed search
@@ -181,9 +181,11 @@ static Instruction * iNEW(SymReg * r0, char * type) {
     r0->usage = U_NEW;
     if (!strcmp(type, "PerlArray") || !strcmp(type, "PerlHash"))
         r0->usage |= U_KEYED;
-    MK_I(fmt, R2(r0, pmc));	/* new_p_ic */
     free(type);
-    return 0;
+    regs[0] = r0;
+    regs[1] = pmc;
+    nargs = 2;
+    return iANY("new", fmt+4, regs, emit);
 }
 
 /* TODO get rid of nargs */
@@ -215,60 +217,6 @@ op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
     }
     *dest = '\0';
 }
-#if 0
-#define OP_HASH_SIZE 1511
-typedef struct hop {
-    op_info_t * info;
-    struct hop *next;
-} HOP;
-static HOP **hop;
-static void hop_init();
-
-static void store_op(op_info_t *info, int full) {
-    HOP *p = malloc(sizeof(HOP));
-    int index = hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
-    p->info = info;
-    p->next = hop[index];
-    hop[index] = p;
-}
-int get_op(const char * name, int full) {
-    HOP * p;
-    int index = hash_str(name) % OP_HASH_SIZE;
-    if (!hop) {
-        hop = calloc(OP_HASH_SIZE, sizeof(HOP*));
-        hop_init();
-    }
-    for(p = hop[index]; p; p = p->next) {
-	if(!strcmp(name, full ? p->info->full_name : p->info->name))
-	    return p->info - interpreter->op_info_table;
-    }
-    return -1;
-}
-static void hop_init() {
-    int i;
-    op_info_t * info = interpreter->op_info_table;
-    /* store full names */
-    for (i = 0; i < interpreter->op_count; i++)
-        store_op(info + i, 1);
-    /* plus one short name */
-    for (i = 0; i < interpreter->op_count; i++)
-        if (get_op(info[i].name, 0) == -1)
-            store_op(info + i, 0);
-}
-void hop_deinit()
-{
-    HOP *p, *next;
-    int i;
-    for (i = 0; i < OP_HASH_SIZE; i++)
-        for(p = hop[i]; p; ) {
-            next = p->next;
-            free(p);
-            p = next;
-    }
-    free(hop);
-    hop = 0;
-}
-#endif
 
 int check_op(char *fullname, char *name, SymReg *regs[])
 {
@@ -284,6 +232,13 @@ int is_op(char *name)
 {
     return interpreter->op_lib->op_code(name, 0) >= 0;
 }
+
+Instruction * INS(char * name, char *fmt, SymReg **regs, int n, int keys) {
+    nargs = n;
+    keyvec = keys;
+    return iANY(name, fmt, regs, 0);
+}
+
 
 Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
     char fullname[64];
@@ -340,7 +295,10 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
         debug(1,"%s %s\t%s\n", name, format, fullname);
 #endif
         /* make the instruction */
-        ins = emitb(_mk_instruction(name, format, regs, dirs));
+
+        ins = _mk_instruction(name, format, regs, dirs);
+        if (emit)
+             emitb(ins);
         ins->keys |= keyvec;
         /* fill iin oplib's info */
         ins->opnum = op;
@@ -375,7 +333,7 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
                 fullname, name, nargs);
     }
     clear_state();
-    return NULL;
+    return ins;
 }
 
 %}
@@ -436,7 +394,7 @@ pasm_args:
 
 emit:
       EMIT   pasmcode                    { $$ = 0;}
-       EOM				{ emit_flush(); clear_tables();$$=0;}
+       EOM 				{ emit_flush(); clear_tables();$$=0;}
     ;
 
 nls:
@@ -547,7 +505,7 @@ assignment:
     |  target '=' var '~' var		{ $$ = MK_I("bxor", R3($1, $3, $5)); }
     |  target '=' var '[' keylist ']'   { $$ = iINDEXFETCH($1, $3, $5); }
     |  var '[' keylist ']' '=' var	{ $$ = iINDEXSET($1, $3, $6); }
-    |  target '=' NEW classname		{ $$ = iNEW($1, $4); }
+    |  target '=' NEW classname		{ $$ = iNEW($1, $4, 1); }
     |  target '=' DEFINED var	{ $$ = MK_I("defined %s, %s",R2($1,$4)); }
     |  target '=' CLONE var		{ $$ = MK_I("clone %s, %s",R2($1, $4));
     }
@@ -771,88 +729,6 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
     return (*argv)[0];
 }
 
-#ifdef OPTEST
-#define USE_HOP
-
-#define OP_HASH_SIZE 1511
-typedef struct hop {
-    op_info_t * info;
-    struct hop *next;
-} HOP;
-static HOP **hop;
-
-static void store_op(op_info_t *info) {
-    HOP *p = malloc(sizeof(HOP));
-    int index = hash_str(info->full_name) % OP_HASH_SIZE;
-    p->info = info;
-    p->next = hop[index];
-    hop[index] = p;
-}
-static void hop_init() {
-    int i;
-    op_info_t * info = interpreter->op_info_table;
-    for (i = 0; i < interpreter->op_count; i++)
-        store_op(info + i);
-}
-int get_op(const char * name) {
-    HOP * p;
-    int index = hash_str(name) % OP_HASH_SIZE;
-    if (!hop) {
-        hop = calloc(OP_HASH_SIZE, sizeof(HOP*));
-        hop_init();
-    }
-    for(p = hop[index]; p; p = p->next) {
-	if(!strcmp(name, p->info->full_name))
-	    return p->info - interpreter->op_info_table;
-    }
-    return -1;
-}
-void hop_deinit()
-{
-    HOP *p, *next;
-    int i;
-    for (i = 0; i < OP_HASH_SIZE; i++)
-        for(p = hop[i]; p; ) {
-            next = p->next;
-            free(p);
-            p = next;
-    }
-    free(hop);
-    hop = 0;
-}
-
-
-static void test_ops()
-{
-    int i,j,n = interpreter->op_count;
-    op_info_t * info = interpreter->op_info_table;
-    int op;
-
-    printf("testing op_code for %d ops 10000 times\n", n);
-    /* 10.000 runs for 889 ops: 8.3-8.5 s */
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < 10000 ; j++) {
-#ifdef USE_HOP
-            op = get_op(info[i].full_name);
-            if (op != i) {
-                printf("Op %d %s not found\n", i, info[i].full_name);
-                exit(1);
-            }
-#else
-            op = interpreter->op_lib->op_code(info[i].full_name);
-            if (i != op) {
-                printf("Op %d %s not found\n", i, info[i].full_name);
-                exit(1);
-            }
-#endif
-        }
-    }
-#ifdef USE_HOP
-    hop_deinit();
-#endif
-}
-
-#endif
 
 int main(int argc, char * argv[])
 {
@@ -863,10 +739,6 @@ int main(int argc, char * argv[])
     Parrot_init(interpreter, (void*)&stacktop);
     pf = PackFile_new();
     interpreter->code = pf;
-#ifdef OPTEST
-    test_ops();
-    exit(0);
-#endif
     interpreter->DOD_block_level++;
 
     sourcefile = parseflags(interpreter, &argc, &argv);

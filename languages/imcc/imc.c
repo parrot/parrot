@@ -46,13 +46,13 @@ void allocate() {
     todo = 1;
     while (todo) {
         build_reglist();
-    find_basic_blocks();
-    build_cfg();
+        find_basic_blocks();
+        build_cfg();
 
-	compute_dominators();
-	find_loops();
+        compute_dominators();
+        find_loops();
 
-	life_analysis();
+        life_analysis();
         /* optimize, as long as there is something to do -
          * but not, if we found a set_addr, which means
          * we have probably a CATCH handler */
@@ -65,22 +65,23 @@ void allocate() {
     }
     todo = 1;
     while (todo) {
-	build_interference_graph();
+        build_interference_graph();
         compute_spilling_costs();
         /* simplify until no changes can be made */
         while (simplify()) {}
         order_spilling();          /* puts the remaing item on stack */
 
-	to_spill = try_allocate();
+        to_spill = try_allocate();
 
-	if ( to_spill >= 0 ) {
+        if ( to_spill >= 0 ) {
             spill(to_spill);
+            life_analysis();
         }
         else {
             /* the process is finished */
             todo = 0;
-	}
-     }
+        }
+    }
     if (IMCC_VERBOSE > 1 || IMCC_DEBUG)
         print_stat();
     free_reglist();
@@ -566,12 +567,14 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
 /* Rewrites the instructions list, inserting spill code in every ocurrence
  * of the symbol.
  */
+
+
 void spill(int spilled) {
 
-    Instruction * tmp, *last, *ins;
+    Instruction * tmp, *ins;
     int i;
     int needs_fetch, needs_store;
-    SymReg * old_symbol;
+    SymReg * old_symbol, *p31;
     char * buf;
     SymReg *regs[IMCC_MAX_REGS];
 
@@ -583,41 +586,45 @@ void spill(int spilled) {
     debug(1, "#Spilling [%s]:\n", reglist[spilled]->name);
 
     old_symbol = reglist[spilled];
+    p31 = mk_pasm_reg(str_dup("P31"));
 
     n_spilled++;
 
-    for(last = 0, ins = instructions; ins; last = ins, ins = ins->next) {
+    for(ins = instructions; ins; ins = ins->next) {
 
 	needs_store = 0;
 	needs_fetch = 0;
 
-	if (instruction_reads (ins, old_symbol) )
+	if (instruction_reads (ins, old_symbol) && !(ins->flags & ITSPILL))
 	    needs_fetch = 1;
 
-	if (instruction_writes (ins, old_symbol) )
+	if (instruction_writes (ins, old_symbol) && !(ins->flags & ITSPILL))
 	    needs_store = 1;
 
 	if (needs_fetch) {
 	    regs[0] = old_symbol;
-	    for (i = 1; i < IMCC_MAX_REGS; i++)
-		regs[i] = 0;
-	    sprintf(buf, "%%s, P31[%d] #FETCH", n_spilled); /*ouch*/
-	    tmp = iANY("set", buf, regs, 0);
+            regs[1] = p31;
+            sprintf(buf, "%d", n_spilled);
+            regs[2] = mk_const(str_dup(buf), 'I');
+	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", old_symbol->name);
+	    tmp = INS("set", buf, regs, 3, 4);
 	    tmp->bbindex = ins->bbindex;
+            tmp->flags |= ITSPILL;
             /* insert tmp before actual ins */
-            insert_ins(last, tmp);
-            /* inserted is new last */
-	    last = tmp;
+            insert_ins(ins->prev, tmp);
 	}
 	if (needs_store) {
-	    regs[0] = old_symbol;
-	    for (i = 1; i < IMCC_MAX_REGS; i++)
-		regs[i] = 0;
-	    sprintf(buf, "P31[%d], %%s #STORE", n_spilled);
-	    tmp = iANY("set", buf, regs, 0);
+            regs[0] = p31;
+            sprintf(buf, "%d", n_spilled);
+            regs[1] = mk_const(str_dup(buf), 'I');
+	    regs[2] = old_symbol;
+	    sprintf(buf, "%%s[%%s], %%s #STORE %s", old_symbol->name);
+	    tmp = INS("set", buf, regs, 3, 2);
 	    tmp->bbindex = ins->bbindex;
+            tmp->flags |= ITSPILL;
             /* insert tmp after ins */
             insert_ins(ins, tmp);
+            ins = tmp;
 	}
     }
 

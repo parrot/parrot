@@ -204,7 +204,7 @@ static char * ins_fmt(Instruction * ins) {
                     strcat(regb[i], ";");
             }
             regstr[i] = regb[i];
-	}
+        }
 	else
 	    regstr[i] = ins->r[i]->name;
 
@@ -283,11 +283,14 @@ int emit_open(int type, char *file)
 
 int emit_flush() {
 
+    SymReg *p31;
     Instruction * ins, *next;
     Instruction *spill = 0;
     /* first instruction should be ".sub" -- make sure we allocate P31
      * _after_ subroutine entry.  And after the "saveall", or any
      * other assortment of pushes. */
+    p31 = mk_pasm_reg(str_dup("P31"));
+
     ins = instructions;
     if (n_spilled > 0 && n_instructions > 0) {
         (emitters[emitter]).emit(ins);
@@ -298,19 +301,23 @@ int emit_flush() {
             (emitters[emitter]).emit(ins);
 	    ins = ins->next;
         }
-	spill = _mk_instruction("new", "P31, .PerlArray", 0, 0);
+	spill = iNEW(p31, str_dup("PerlArray"), 0);
         (emitters[emitter]).emit(spill);
     }
     for (; ins; ins = ins->next) {
         (emitters[emitter]).emit(ins);
     }
-    for (ins = instructions; ins; ) {
+    /* XXX imcc -r breaks with free'ing, when
+     * spilled
+     * XXX if first == spilled?
+     */
+    for (ins = instructions; 0 && ins; ) {
 	next = ins->next;
 	free_ins(ins);
 	ins = next;
     }
     instructions = NULL;
-    if (spill)
+    if (0 && spill)     /* XXX */
         free_ins(spill);
     n_instructions = 0;
     return 0;

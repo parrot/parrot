@@ -1,75 +1,66 @@
-#ifndef BISON_IMCPARSER_H
-# define BISON_IMCPARSER_H
-
-#ifndef YYSTYPE
 typedef union {
     int t;
     char * s;
     SymReg * sr;
     Instruction *i;
-} yystype;
-# define YYSTYPE yystype
-# define YYSTYPE_IS_TRIVIAL 1
-#endif
-# define	CALL	257
-# define	GOTO	258
-# define	ARG	259
-# define	RET	260
-# define	PRINT	261
-# define	IF	262
-# define	UNLESS	263
-# define	NEW	264
-# define	END	265
-# define	SAVEALL	266
-# define	RESTOREALL	267
-# define	SUB	268
-# define	NAMESPACE	269
-# define	CLASS	270
-# define	ENDCLASS	271
-# define	SYM	272
-# define	LOCAL	273
-# define	PARAM	274
-# define	PUSH	275
-# define	POP	276
-# define	INC	277
-# define	DEC	278
-# define	SHIFT_LEFT	279
-# define	SHIFT_RIGHT	280
-# define	INTV	281
-# define	FLOATV	282
-# define	STRINGV	283
-# define	DEFINED	284
-# define	LOG_XOR	285
-# define	RELOP_EQ	286
-# define	RELOP_NE	287
-# define	RELOP_GT	288
-# define	RELOP_GTE	289
-# define	RELOP_LT	290
-# define	RELOP_LTE	291
-# define	GLOBAL	292
-# define	ADDR	293
-# define	CLONE	294
-# define	RESULT	295
-# define	RETURN	296
-# define	POW	297
-# define	COMMA	298
-# define	LABEL	299
-# define	EMIT	300
-# define	EOM	301
-# define	IREG	302
-# define	NREG	303
-# define	SREG	304
-# define	PREG	305
-# define	IDENTIFIER	306
-# define	STRINGC	307
-# define	INTC	308
-# define	FLOATC	309
-# define	REG	310
-# define	MACRO	311
-# define	PARROT_OP	312
-# define	VAR	313
+} YYSTYPE;
+#define	CALL	258
+#define	GOTO	259
+#define	ARG	260
+#define	RET	261
+#define	PRINT	262
+#define	IF	263
+#define	UNLESS	264
+#define	NEW	265
+#define	END	266
+#define	SAVEALL	267
+#define	RESTOREALL	268
+#define	SUB	269
+#define	NAMESPACE	270
+#define	CLASS	271
+#define	ENDCLASS	272
+#define	SYM	273
+#define	LOCAL	274
+#define	PARAM	275
+#define	PUSH	276
+#define	POP	277
+#define	INC	278
+#define	DEC	279
+#define	SHIFT_LEFT	280
+#define	SHIFT_RIGHT	281
+#define	INTV	282
+#define	FLOATV	283
+#define	STRINGV	284
+#define	DEFINED	285
+#define	LOG_XOR	286
+#define	RELOP_EQ	287
+#define	RELOP_NE	288
+#define	RELOP_GT	289
+#define	RELOP_GTE	290
+#define	RELOP_LT	291
+#define	RELOP_LTE	292
+#define	GLOBAL	293
+#define	ADDR	294
+#define	CLONE	295
+#define	RESULT	296
+#define	RETURN	297
+#define	POW	298
+#define	COMMA	299
+#define	LABEL	300
+#define	EMIT	301
+#define	EOM	302
+#define	IREG	303
+#define	NREG	304
+#define	SREG	305
+#define	PREG	306
+#define	IDENTIFIER	307
+#define	STRINGC	308
+#define	INTC	309
+#define	FLOATC	310
+#define	REG	311
+#define	MACRO	312
+#define	PARROT_OP	313
+#define	VAR	314
 
 
 extern YYSTYPE yylval;
-
-#endif /* not BISON_IMCPARSER_H */

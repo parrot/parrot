@@ -6,8 +6,9 @@ enum INSTYPE {    /*instruction type can be   */
     ITOP =     0x20000, /*            normal op     */
     ITCALL =   0x40000, /*            function call */
     ITLABEL =  0x80000, /*            label         */
-    ITALIAS = 0x160000, /*   set P,P  */
-    ITADDR  = 0x320000, /*   set_addr P, adrr  */
+    ITALIAS = 0x100000, /*   set P,P  */
+    ITADDR  = 0x200000, /*   set_addr P, addr*/
+    ITSPILL = 0x400000  /*   set P31,x ; set x, p31 spilling */
 };
 
 
@@ -68,6 +69,8 @@ Instruction * _mk_instruction(const char *,const char *, SymReg **, int);
 #define _mk_instruction(a,b,c,d) dont_use(a,b)
 #endif
 Instruction * iANY(char * name, char *fmt, SymReg **r, int emit);
+Instruction * INS(char * name, char *fmt, SymReg **regs, int nargs, int keyv);
+Instruction * iNEW(SymReg * r0, char * type, int emit);
 Instruction * emitb(Instruction *);
 int instruction_reads(Instruction *, SymReg *);
 int instruction_writes(Instruction *, SymReg *);
