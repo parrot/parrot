@@ -87,6 +87,9 @@ Note that for the following types you can set the size of the array by
 using the VTABLE_set_integer_native() method. Assigning an integer to
 the array as a whole sets the array to that size.
 
+Note that size-changing operations, such as push, pop, shift, unshift,
+and splice, on fixed arrays will result in an exception.
+
 =over 4
 
 =item FixedBooleanArray
@@ -99,19 +102,35 @@ A dynamically sized array which holds only Boolean values.
 
 =item FixedIntegerArray
 
+A statically sized array which holds only Integer values.
+
 =item ResizeableIntegerArray
+
+A dynamically sized array which holds only Integer values.
 
 =item FixedFloatArray
 
+A statically sized array which holds only Float values.
+
 =item ResizeableFloatArray
+
+A dynamically sized array which holds only Float values.
 
 =item FixedPMCArray
 
+A statically sized array which holds only PMC values.
+
 =item ResizeablePMCArray
+
+A dynamically sized array which holds only PMC values.
 
 =item FixedStringArray
 
+A statically sized array which holds only String values.
+
 =item ResizeableStringArray
+
+A dynamically sized array which holds only String values.
 
 =head2 Hash types
 
