@@ -1,8 +1,13 @@
 MAKE = ${make}
 
-all : jako scheme
+all : imcc jako scheme
 
-jako: jako.dummy
+imcc: imcc.dummy
+
+imcc.dummy:
+	cd imcc && $(MAKE) && cd ..
+
+jako: jako.dummy imcc.dummy
 
 jako.dummy:
 	cd jako && $(MAKE) && cd ..
@@ -13,6 +18,7 @@ scheme.dummy:
 	cd scheme && $(MAKE) && cd ..
 
 clean:
+	cd imcc && $(MAKE) clean && cd ..
 	cd jako && $(MAKE) clean && cd ..
 	cd scheme && $(MAKE) clean && cd ..
 
