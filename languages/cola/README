@@ -217,6 +217,10 @@ Intermediate Code
 
 Register Allocation
 
+  Done via graph-coloring. Cola emits intermediate code that uses
+  named locals/globals and symbolic temporary registers. IMCC
+  handles the allocation and spilling.
+
   See imcc/README
 
 Optimization
