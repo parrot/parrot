@@ -11,8 +11,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "new_hash");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY value;
 
@@ -22,7 +21,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -48,8 +47,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_destroy");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY value;
 
@@ -59,7 +57,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -86,8 +84,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_put");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY value;
 
@@ -97,14 +94,14 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
 	return 1;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", NULL);
+    key = string_from_cstring(interpreter, "fortytwo", 0);
     value.type = enum_hash_int;
     value.val.int_val = 42;
     hash_put(interpreter, hash, key, &value);
@@ -126,8 +123,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_get");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY _value;
     HASH_ENTRY *value = &_value;
@@ -138,7 +134,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -168,8 +164,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_get with NULL key");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY _value;
     HASH_ENTRY *value = &_value;
@@ -180,7 +175,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -218,8 +213,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_get with empty string key");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY _value;
     HASH_ENTRY *value = &_value;
@@ -230,14 +224,14 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
 	return 1;
     }
 
-    key = string_from_cstring(interpreter, "", NULL);
+    key = string_from_cstring(interpreter, "", 0);
     value->type = enum_hash_int;
     value->val.int_val = 42;
     hash_put(interpreter, hash, key, value);
@@ -274,14 +268,13 @@ int main(int argc, char* argv[]) {
 
 int do_test(Interp *interpreter)
 {
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY _value;
     HASH_ENTRY *value = &_value;
     char *big;
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -315,8 +308,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_size");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY value;
 
@@ -326,24 +318,24 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
 	return 1;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", NULL);
+    key = string_from_cstring(interpreter, "fortytwo", 0);
     value.type = enum_hash_int;
     value.val.int_val = 42;
     hash_put(interpreter, hash, key, &value);
 
-    key = string_from_cstring(interpreter, "twocents", NULL);
+    key = string_from_cstring(interpreter, "twocents", 0);
     value.type = enum_hash_num;
     value.val.num_val = 0.02;
     hash_put(interpreter, hash, key, &value);
 
-    key = string_from_cstring(interpreter, "blurb", NULL);
+    key = string_from_cstring(interpreter, "blurb", 0);
     value.type = enum_hash_string;
     value.val.string_val = key;
     hash_put(interpreter, hash, key, &value);
@@ -367,8 +359,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_set_size");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY value;
 
@@ -378,7 +369,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -405,8 +396,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_delete");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY value;
 
@@ -416,24 +406,24 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
 	return 1;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", NULL);
+    key = string_from_cstring(interpreter, "fortytwo", 0);
     value.type = enum_hash_int;
     value.val.int_val = 42;
     hash_put(interpreter, hash, key, &value);
 
-    key = string_from_cstring(interpreter, "twocents", NULL);
+    key = string_from_cstring(interpreter, "twocents", 0);
     value.type = enum_hash_num;
     value.val.num_val = 0.02;
     hash_put(interpreter, hash, key, &value);
 
-    key = string_from_cstring(interpreter, "blurb", NULL);
+    key = string_from_cstring(interpreter, "blurb", 0);
     value.type = enum_hash_string;
     value.val.string_val = key;
     hash_put(interpreter, hash, key, &value);
@@ -460,10 +450,8 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_clone");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
-    HASH _hash2;
-    HASH *hash2 = &_hash2;
+    HASH *hash;
+    HASH *hash2;
     STRING *key;
     HASH_ENTRY _value;
     HASH_ENTRY *value = &_value;
@@ -474,14 +462,14 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
 	return 1;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", NULL);
+    key = string_from_cstring(interpreter, "fortytwo", 0);
     value->type = enum_hash_int;
     value->val.int_val = 42;
     hash_put(interpreter, hash, key, value);
@@ -490,7 +478,7 @@ int main(int argc, char* argv[]) {
 
     printf("%i\n", value->val.int_val);
 
-    hash_clone(interpreter, hash, &hash2);
+    hash2 = hash_clone(interpreter, hash);
 
     value = hash_get(interpreter, hash2, key);
 
@@ -504,7 +492,7 @@ CODE
 42
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "dump_hash");
+c_output_like(<<'CODE', <<'OUTPUT', "dump_hash");
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -512,8 +500,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "dump_hash");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH _hash;
-    HASH *hash = &_hash;
+    HASH *hash;
     STRING *key;
     HASH_ENTRY value;
 
@@ -523,24 +510,24 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    new_hash(interpreter, &hash);
+    hash = new_hash(interpreter);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
 	return 1;
     }
 
-    key = string_from_cstring(interpreter, "fortytwo", NULL);
+    key = string_from_cstring(interpreter, "fortytwo", 0);
     value.type = enum_hash_int;
     value.val.int_val = 42;
     hash_put(interpreter, hash, key, &value);
 
-    key = string_from_cstring(interpreter, "twocents", NULL);
+    key = string_from_cstring(interpreter, "twocents", 0);
     value.type = enum_hash_num;
     value.val.num_val = 0.02;
     hash_put(interpreter, hash, key, &value);
 
-    key = string_from_cstring(interpreter, "blurb", NULL);
+    key = string_from_cstring(interpreter, "blurb", 0);
     value.type = enum_hash_string;
     value.val.string_val = key;
     hash_put(interpreter, hash, key, &value);
@@ -551,8 +538,8 @@ int main(int argc, char* argv[]) {
 }
 
 CODE
-Hashtable[3/16]
-  Bucket 3: type(-100)
-  Bucket 12: type(-98) -> type(-99)
-  Bucket 16: type(0) -> type(0) -> type(0) -> type(0) -> type(0) -> type(0) -> type(0) -> type(0) -> type(0)
+/Hashtable\[3\/16\]
+  Bucket 3: \([0-9a-f]*\)
+  Bucket 12: \([0-9a-f]*\) -> \([0-9a-f]*\)
+  Bucket 16: \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\) -> \(0\)/
 OUTPUT
