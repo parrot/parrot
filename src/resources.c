@@ -303,6 +303,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     Stack_chunk *cur_stack, *start_stack;
     struct PRegChunk *cur_chunk;
     Stack_entry *entry;
+    struct Stash *stash;
 
     /* We have to start somewhere, and the global stash is a good
      * place */
@@ -317,6 +318,13 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         if (interpreter->pmc_reg.registers[i]) {
             last = mark_used(interpreter->pmc_reg.registers[i], last);
         }
+    }
+
+    /* Walk through the stashes */
+    stash = interpreter->perl_stash;
+    while (stash) {
+        last = mark_used(stash->stash_hash, last);
+        stash = stash->parent_stash;
     }
 
     /* Now walk the pmc stack. Make sure to walk from top down
