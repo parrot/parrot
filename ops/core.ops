@@ -187,9 +187,9 @@ If $2 is empty, throws an exception.
 
 =item B<ord>(out INT, in STR, in INT)
 
-Three-argument form returns character $3 of string $2 in register 1.
+Three-argument form returns character $3 of string $2 in register $1.
 If $2 is empty, throws an exception.
-If $3 is greater than the length of string $2, throws an exception
+If $3 is greater than the length of string $2, throws an exception.
 If $3 is less then zero but greater than the negative of the length, counts
 backwards through the string, such that -1 is the last character, -2 is the
 second-to-last character, and so on.
@@ -464,7 +464,7 @@ inline op clone(out STR, in STR) {
 
 =item B<set_addr>(out INT, in INT)
 
-Sets register $1 to the current address plus the offset $2
+Sets register $1 to the current address plus the offset $2.
 
 =cut
 
@@ -1640,7 +1640,7 @@ Also:
 This op is provided for those who need it (such as speed-sensitive
 applications with heavy use of mod, but using it only with positive
 arguments), but a more mathematically useful mod based on ** floor(x/y)
-and defined with y == 0 is provided by the mod_i op.
+and defined with y == 0 is provided by the mod op.
 
   [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
       Language*, Second Edition. Prentice Hall, 1988.
@@ -1677,7 +1677,7 @@ defined.
 
 This op is provided for those who need it, but a more mathematically
 useful numeric mod based on floor(x/y) instead of truncate(x/y) and
-defined with y == 0 is provided by the mod_n op.
+defined with y == 0 is provided by the mod op.
 
   [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
       Language*, Second Edition. Prentice Hall, 1988.
@@ -2158,8 +2158,6 @@ inline op substr(inout STR, in INT, in INT, in STR) {
 }
 
 
-=back
-
 =cut
 
 ########################################
@@ -2228,8 +2226,6 @@ inline op index(out INT, in STR, in STR, in INT) {
     $1 = -1;
     goto NEXT();
 }
-
-=back
 
 =cut
 
@@ -3230,7 +3226,7 @@ inline op pushp() {
 
 =head2 Register stack operations
 
-These operations effect individual registers.
+These operations affect individual registers.
 
 =over 4
 
@@ -3241,7 +3237,7 @@ These operations effect individual registers.
 
 =item B<entrytype>(out INT, in INT)
 
-Gets the type of entry $2 of the stack and puts it in $1
+Gets the type of entry $2 of the user stack and puts it in $1.
 
 =cut
 
@@ -3279,7 +3275,7 @@ op depth(out INT) {
 
 =item B<save>(in PMC)
 
-Save register or constant $1 onto the stack.
+Save register or constant $1 onto the user stack.
 
 =cut
 
@@ -3311,7 +3307,7 @@ inline op save(in STR) {
 
 =item B<savec>(in PMC)
 
-Save a clone of register or constant $1 onto the stack.
+Save a clone of register or constant $1 onto the user stack.
 
 =cut
 
@@ -3331,7 +3327,7 @@ inline op savec(in STR) {
 
 =item B<restore>(out STR)
 
-Restore register $1 from the appropriate register stack.
+Restore register $1 from the user stack.
 
 =cut
 
@@ -3462,12 +3458,10 @@ inline op bsr (in INT) {
 
 ########################################
 
-=item B<jsr>()
+=item B<jsr>(in INT)
 
-Jump to the location specified by register X. Push the current
+Jump to the location specified by register $1. Push the current
 location onto the call stack for later returning.
-
-TODO: Implement this, or delete the entry.
 
 =cut
 
@@ -3479,7 +3473,7 @@ inline op jsr(in INT) {
 
 ########################################
 
-=item B<jump>(out INT)
+=item B<jump>(in INT)
 
 Jump to the address held in register $1.
 
@@ -3549,7 +3543,7 @@ Opcodes which need to be sorted into better categories.
 
 =item B<sweep>()
 
-Trigger a dead object detection sweep
+Trigger a dead object detection (DOD) sweep.
 
 =cut
 
@@ -3561,7 +3555,7 @@ op sweep() {
 
 =item B<collect>()
 
-Trigger a GC collection
+Trigger a garbage collection.
 
 =cut
 
@@ -3583,7 +3577,7 @@ op sweepoff() {
 
 =item B<sweepon>()
 
-Re-enable DOD sweeps
+Re-enable DOD sweeps.
 
 =cut
 
@@ -3596,7 +3590,7 @@ op sweepon() {
 
 =item B<collectoff>()
 
-Disable GC runs (nestable)
+Disable GC runs (nestable).
 
 =cut
 
@@ -3607,7 +3601,7 @@ op collectoff() {
 
 =item B<collecton>()
 
-Re-enable GC
+Re-enable GC.
 
 =cut
 
@@ -3622,7 +3616,35 @@ op collecton() {
 
 =item B<interpinfo>(out INT, in INT)
 
-Fetch some piece of information about the interpreter and put it in $1
+Fetch some piece of information about the interpreter and put it in $1.
+Possible values for $2 are:
+
+=over 4
+
+=item 1 The total amount of allocatable memory allocated. This figure
+does not include memory used for headers or for the interpreter's internal
+structures.
+
+=item 2 The number of dead object detection runs performed.
+
+=item 3 The number of garbage collection runs performed.
+
+=item 4 The number of active PMCs.
+
+=item 5 The number of active buffers.
+
+=item 6 The total number of PMCs allocated.
+
+=item 7 The total number of buffers allocated.
+
+=item 8 The number of headers (PMC or buffer) that have been allocated
+since the last DOD run.
+
+=item 9 The amount of memory allocated since the last GC run.
+
+=item 10 The total amount of memory copied during garbage collections.
+
+=back
 
 =cut
 
@@ -3643,10 +3665,10 @@ op interpinfo(out INT, in INT) {
     case TOTAL_BUFFERS:   $1 = interpreter->total_Buffers;
                           break;
     case HEADERS_ALLOC_SINCE_COLLECT:
-    $1 = interpreter->mem_allocs_since_last_collect;
+    $1 = interpreter->header_allocs_since_last_collect;
     break;
     case MEM_ALLOCS_SINCE_COLLECT:
-    $1 = interpreter->header_allocs_since_last_collect;
+    $1 = interpreter->mem_allocs_since_last_collect;
     break;
     case TOTAL_COPIED: $1 = interpreter->memory_collected;
 		       break;
@@ -3658,7 +3680,24 @@ op interpinfo(out INT, in INT) {
 
 =item B<stringinfo>(out INT, in STR, in INT)
 
-Extract string header information.
+Extract some information about string $2 and store it in $1.
+Possible values for $3 are:
+
+=over 4
+
+=item 1 The location of the string buffer header.
+
+=item 2 The location of the start of the string.
+
+=item 3 The length of the string buffer (in bytes).
+
+=item 4 The flags attached to the string (if any).
+
+=item 5 The amount of the string buffer used (in bytes).
+
+=item 6 The length of the string (in characters).
+
+=back
 
 =cut
 
@@ -3685,7 +3724,7 @@ inline op stringinfo(out INT, in STR, in INT) {
 
 =item B<newinterp>(out PMC, in INT)
 
-Create a new interpreter and store it in a PMC
+Create a new interpreter and store it in a PMC.
 
 =cut
 
@@ -3703,7 +3742,7 @@ op newinterp(out PMC, in INT) {
 
 =item B<runinterp>(inout PMC, in INT)
 
-Take a built interpreter and run the code starting at offset $2
+Take a built interpreter and run the code starting at offset $2.
 
 =cut
 
@@ -3728,12 +3767,12 @@ vtable types. The assembler allows you to specify PMCs by type
 name as well as by integer - you should do this for compatibility,
 to avoid problems if the base types get reassigned. For example:
 
-  new P0, PerlScalar
+  new P0, .PerlScalar
 
 Optionally a size may be passed to the constructor which may or
 may not be used by the particular class. For example:
 
-  new P0, PerlStruct, 64
+  new P0, .PerlStruct, 64
 
 =cut
 
@@ -3759,7 +3798,7 @@ op new(out PMC, in INT, in INT) {
 
 =item B<destroy>(in PMC)
 
-Destroy the PMC
+Destroy the PMC.
 
 =cut
 
@@ -3778,7 +3817,9 @@ op destroy(in PMC) {
 
 =item B<find_type>(out INT, in STR)
 
-Find the PMC type by name
+Find the PMC type by name.
+
+TODO: Implement this! (or remove the op).
 
 =cut
 
@@ -3793,7 +3834,7 @@ op find_type(out INT, in STR) {
 
 =item B<ret>()
 
-Pop the location off the top of the stack and go there.
+Pop the location off the top of the call stack and go there.
 
 =cut
 
@@ -3806,7 +3847,7 @@ inline op ret() {
 
 =item B<sleep>(in INT)
 
-Sleep for $1 seconds
+Sleep for $1 seconds.
 
 =cut
 
@@ -3823,7 +3864,7 @@ inline op sleep(in INT) {
 
 =item B<setline>(in INT)
 
-Set the current line number we're executing code for
+Set the line number for which we're currently executing code.
 
 =cut
 
@@ -3834,7 +3875,7 @@ inline op setline(in INT) {
 
 =item B<getline>(out INT)
 
-Get the current line number
+Get the current line number.
 
 =cut
 
@@ -3845,7 +3886,7 @@ inline op getline(out INT) {
 
 =item B<setfile>(in STR)
 
-Sets the current file we're executing code for
+Set the name of the file for which we're currently executing code.
 
 =cut
 
@@ -3856,7 +3897,7 @@ inline op setfile(in STR) {
 
 =item B<getfile>(out STR)
 
-Gets the current file we're executing code for
+Get the name of the current file.
 
 =cut
 
@@ -3867,7 +3908,7 @@ inline op getfile(out STR) {
 
 =item B<setpackage>(in STR)
 
-Sets the current package we're executing code for
+Set the name of the package for which we're currently executing code.
 
 =cut
 
@@ -3878,7 +3919,7 @@ inline op setpackage(in STR) {
 
 =item B<getpackage>(out STR)
 
-Gets the current package we're executing code for
+Get the name of the current package.
 
 =cut
 
@@ -3894,7 +3935,7 @@ initialization routine for it.
 
 =item B<loadlib>(in PMC, in STR)
 
-Load a dynamic link library
+Load a dynamic link library named $2 and store it in $1.
 
 =item B<callnative>(out PMC, in PMC, in STR)
 
