@@ -1,0 +1,71 @@
+
+=head1 The Parrot String API
+
+This document describes how Parrot abstracts the programmer's interface
+to string types. All strings used in the Parrot core should use the
+Parrot C<STRING> structure; Parrot programmers should not deal with
+C<char *> or other string-like types outside of this abstraction without
+very good reason.
+
+=head1 Interface functions on C<STRING>s
+
+In fact, programmers should hardly ever even access members of the
+C<STRING> structure directly. The reason for this is that the
+interpretation of the data inside the structure will be a function of
+the data's encoding. The idea is that Parrot's strings are
+encoding-aware so your functions don't need to be; if you break the
+abstraction, you suddenly have to start worrying about what the data
+actually means.
+
+=head2 String Constructors
+
+The most basic way of creating a string is through the function
+C<string_make>:
+
+    STRING* string_make(char *buffer, IV buflen, IV encoding, IV flags, IV type)
+
+
+=head1 Elements of the C<STRING> structure
+
+Those implementing the C<STRING> API will obviously need to know about
+how the C<STRING> structure works. You can find the definition of this
+structure in F<string.h>:
+
+    struct parrot_string {
+      void *bufstart;
+      IV buflen;
+      IV bufused;
+      IV flags;
+      IV strlen;
+      IV encoding;
+      IV type;
+      IV unused;
+    };
+
+Let's look at each element of this structure in turn.
+
+=head2 C<bufstart>
+
+=head2 C<buflen>
+
+=head2 C<bufused>
+
+=head2 C<flags>
+
+=head2 C<strlen>
+
+=head2 C<encoding>
+
+    enum {
+        enc_native,
+        enc_utf8,
+        enc_utf16,
+        enc_utf32,
+        enc_foreign,
+        enc_max
+    };
+
+=head2 C<type>
+
+=head2 C<unused>
+
