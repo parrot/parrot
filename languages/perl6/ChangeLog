@@ -191,4 +191,14 @@
 	    - allow comma-separated expressions in "loop(;;)"
 	    - docs and tweaks for perl6 driver (Leo)
 
+2002-08-22
+
+	* Additions:
+	    - more exception tests (Leo).
 	
+	* Fixes:
+	    - maybe_comma tweaks (Leo).
+	    - remove debugging warning.
+	    - cloning cleanup (Leo).
+	    - less temporaries for a couple assignments (Leo).
+	    - context for sub-calls with parens was wrong.

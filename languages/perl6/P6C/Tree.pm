@@ -23,7 +23,7 @@ use strict;
 use Carp 'confess';
 use P6C::Nodes;
 use Data::Dumper;
-use P6C::Util 'unimp';
+use P6C::Util qw(unimp flatten_leftop);
 
 ######################################################################
 
@@ -330,8 +330,10 @@ sub P6C::subscriptable::tree {
 	# XXX: fixme
 	return ['topical', maybe_tree($x->[4])];
     } else {
+	my $args = $x->[4]->tree;
+	$args = new P6C::ValueList vals => [flatten_leftop($args, ',')];
 	return P6C::prefix->new(name => $x->[1]->tree,
-				args => $x->[4]->tree);
+				args => $args);
     }
 }
 
@@ -788,7 +790,7 @@ sub P6C::maybe_decl::tree {
 ##############################
 sub P6C::maybe_comma::tree {
     my $x = shift;
-    if (@$x == 2) {
+    if (@$x == 2 && ref $x->[1]) {
 	return $x->[1]->tree;
     }
     return new P6C::ValueList vals => [];

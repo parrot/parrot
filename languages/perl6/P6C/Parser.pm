@@ -526,7 +526,7 @@ comma:		  <leftop: <matchrule:@{[@arg ? $arg[0] : 'scalar_expr']}>
 			comma_op <matchrule:@{[@arg?$arg[0]:'scalar_expr']}> >
 comma_op:	  ','
 maybe_comma:	  comma[@{[@arg ? $arg[0] : ()]}]
-		|
+		| '' # Nothing.
 bare_arglist:	  ...!'(' maybe_comma
 
 semi:		  <leftop: expr semi_op expr>

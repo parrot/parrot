@@ -922,6 +922,7 @@ END
 	for my $v (values %$_) {
 	    next unless ref($v) eq 'ARRAY';
 	    my ($n, $t) = @$v;
+	    $t = P6C::IMCC::paramtype($t);
 	    print "\t.local $t $n\n";
 	}
     }
@@ -1507,7 +1508,7 @@ sub val {
 
     set_function_params(@params);
     if ($ctx->{noreturn}) {
-	warn "NORETURN in IMCC\n";
+	# Do nothing.
     } elsif (UNIVERSAL::isa($x->block, 'P6C::rule')) {
 	set_function_return('PerlUndef');
     } else {
@@ -1639,18 +1640,31 @@ END
     }
 }
 
+sub need_cloning {
+    my ($x, $other) = @_;
+       # If $other is non-scalar and we're assigning to a scalar,
+       # there's no need to clone (either we'll get something
+       # like an array-length, or it will become an
+       # auto-reference).
+    return 0 if (is_scalar($x->type) &&
+           ($other->can('type') && !is_scalar($other->type)));
+    return 1;
+}
+
 sub assign {
     my ($x, $thing) = @_;
     my ($name, $global) = findvar($x->name);
-    my $tmpv = $thing->val;
+    my $tmpv;
+    my $do_clone = need_cloning($x, $thing);
+    if (!$global && $thing->isa('P6C::sv_literal')) {
+	$tmpv = $thing->lval;
+	$do_clone = 0;
+    } else {
+	$tmpv = $thing->val;
+    }
     if ($global) {
 	my $clonev;
-	if (is_scalar($x->type)
-	    && !($thing->can('type') && !is_scalar($thing->type))) {
-	    # If $thing is non-scalar and we're assigning to a scalar,
-	    # there's no need to clone (either we'll get something
-	    # like an array-length, or it will become an
-	    # auto-reference).
+	if ($do_clone) {
 	    $clonev = gentmp 'PerlUndef';
 	    code(<<END)
 	$clonev = clone $tmpv
@@ -1662,19 +1676,18 @@ END
 	$name = $tmpv
 END
 	}
-	return $clonev;	# XXX: is this okay?
+	return $clonev;		# XXX: is this okay?
 
     } else {
-	if (is_scalar($x->type) &&
-	    ($thing->can('type') && !is_scalar($thing->type))) {
+	if ($do_clone) {
+	    code(<<END);
+# ASSIGN TO @{[$x->name(), $global ? " (global)" : ""]}
+	$name = clone $tmpv
+END
+	} else {
 	    # assign non-scalar to scalar => no need to clone.
 	    code(<<END);
 	$name = $tmpv
-END
-	} else {
-		code(<<END);
-# ASSIGN TO @{[$x->name(), $global ? " (global)" : ""]}
-	$name = clone $tmpv
 END
 	}
 	return $name;
@@ -1712,6 +1725,13 @@ sub val {
 sub assign {
     my ($x, $thing) = @_;
 
+    # optimize simple decls
+    if ($thing->isa('P6C::sv_literal')) {
+	add_localvar($x->vars->name, $x->vars->type);
+	$x->vars->assign($thing);
+	return undef;
+    }
+    
     my $tmpv = $thing->val;
 
     if (ref $x->vars ne 'ARRAY') {

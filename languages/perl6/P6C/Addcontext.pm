@@ -264,8 +264,16 @@ sub P6C::subscript_exp::ctx_right {
     my $index = $x->subscripts(0);
     if ($index->type eq 'Sub') {
 	# Closure.
+	my $ictx;
+	if ($x->thing->can('name')) {
+	    print STDERR $x->thing->name, "\n";
+	    $ictx = arg_context($x->thing->name);
+	} else {
+	    print STDERR Data::Dumper::Dumper($x->thing);
+	    $ictx = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
+	}
 	$x->thing->ctx_right(new P6C::Context type => 'PerlUndef');
-	$index->ctx_right($P6C::Context::DEFAULT_ARGUMENT_CONTEXT);
+	$index->ctx_right($ictx);
 
     } else {
 	# The base variable is indexed as a $index->type, so give it that

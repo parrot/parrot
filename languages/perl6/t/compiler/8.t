@@ -1,10 +1,69 @@
 #!perl
 
 use strict;
-use P6C::TestCompiler tests => 3;
+#use P6C::TestCompiler skip_all => "store_global";
+use P6C::TestCompiler tests => 6;
 
 ##############################
-output_is(<<'CODE', <<'OUT', "Exceptions");
+output_is(<<'CODE', <<'OUT', "Exceptions 1");
+sub main() {
+    try {
+	print1 "dying";
+	die;
+	print1 "foo";
+    }
+    print1 "alive";
+}
+CODE
+dying
+alive
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Exceptions 2");
+sub main() {
+    try {
+	print1 "dying";
+	die;
+	print1 "foo";
+    }
+    print1 "alive";
+    die;
+}
+CODE
+dying
+alive
+Unknown error.
+Died (no handler).
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Exceptions 3");
+sub main() {
+    try {
+	try {
+	    print "dying\n";
+	    die;
+	    print "foo\n";
+	}
+	print "survived\n";
+	die "again";
+	print "what?\n";
+    }
+    print "Yup\n";
+    die;
+    print "huh?\n";
+}
+CODE
+dying
+survived
+Yup
+Unknown error.
+Died (no handler).
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Exceptions 4");
 sub unpleasant {
     die "ugh";
 }
@@ -33,7 +92,7 @@ Died (no handler).
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "Exceptions 2");
+output_is(<<'CODE', <<'OUT', "Exceptions 5");
 sub foo {
     die "eek";
 }
@@ -67,7 +126,7 @@ eek, eh?
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "Exceptions 3");
+output_is(<<'CODE', <<'OUT', "Exceptions 6");
 sub main() {
     CATCH { default { print "foo\n" } }
     for 1..5 {
