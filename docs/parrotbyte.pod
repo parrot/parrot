@@ -50,7 +50,7 @@ unless otherwise specified.
   |         Opcode Type (Perl = 0x5045524c)   |
   +----------+----------+----------+----------+
 
-The asterix for the offset states, from here we have opcodes. The
+The asterisk for the offset states, from here we have opcodes. The
 given offsets are for 32 bit opcode types only.
 
 =head1 PBC Format 1 and Format 0
@@ -155,7 +155,7 @@ Debug segment
 
 This is not determined yet.
 
-=head2 Unkown (default) and byte code segments
+=head2 Unknown (default) and byte code segments
 
 These have only the common segment header and the opcode stream
 appended. The opcode stream is a F<mmap()>ed memory region, if your
