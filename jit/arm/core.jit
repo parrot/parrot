@@ -47,29 +47,13 @@ Parrot_end {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Parrot_set_i_i {
-    if (MAP[1] && MAP[2]) {
-        NATIVECODE = emit_mov(NATIVECODE, MAP[1], MAP[2]);
-    }
-    else if (MAP[1]) {
-        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, MAP[1]);
-    }
-    else if (MAP[2] {
-        Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, MAP[2]);
-    }
-    else {
-        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
-        Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
-    }
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
 }
 
 Parrot_set_i_ic {
-    if (MAP[1]) {
-        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
-    }
-    else {
-        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
-        Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
-    }
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
