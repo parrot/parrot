@@ -35,7 +35,7 @@ class App {
 		Console.WriteLine("Elapsed Time:  {0}", n2);
 		n1 = i5;
 		n1 /= n2;
-		n2 = 100000.0;
+		n2 = 1000000.0;
 		n1 /= n2;
 		Console.WriteLine("M op/s:        {0}", n1);
 		return 0;
