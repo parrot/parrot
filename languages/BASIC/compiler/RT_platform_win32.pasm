@@ -86,9 +86,6 @@ WIN32_CONSOLE_CLEAR:
 	set I1, P1["xbuf"]
 	set I2, P1["ybuf"]
 	mul I6, I1, I2			# Length
-	print "Length: "
-	print I6
-	print "\n"
 	set I7, 32			# Char
 	set P6, P24["handle"]	# Handle
 	invoke
