@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 # It would be very embarrassing if these didn't work...
 open FOO, ">temp.file";
@@ -45,6 +45,24 @@ output_is(<<'CODE', <<'OUTPUT', "open & print");
        end
 CODE
 -122.200000FooBar
+OUTPUT
+
+open FOO, ">temp.file";  # Clobber previous contents
+close FOO;
+
+output_is(<<'CODE', <<'OUTPUT', "3-arg open");
+       open I1, "temp.file", "w"
+       print "Foobar\n"
+       close I1
+
+       open I3, "temp.file", "r"
+       readline S1, I3
+       close I3
+
+       print S1
+       end
+CODE
+Foobar
 OUTPUT
 unlink("temp.file");
 1; # HONK
