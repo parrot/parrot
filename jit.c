@@ -9,12 +9,6 @@
 #define JIT_EMIT 0
 #include "parrot/jit_emit.h"
 
-#ifdef ARM
-#ifdef __linux
-#include <asm/unistd.h>
-#endif
-#endif
-
 /*
  * optimize_jit()
  */

@@ -6,6 +6,12 @@
  * $Id$
  */
 
+#ifdef ARM
+#ifdef __linux
+#include <asm/unistd.h>
+#endif
+#endif
+
 /*  Registers
  *
  *  r0  Argument/result/scratch register 0.
