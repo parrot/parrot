@@ -436,7 +436,7 @@ pasm_args:
 
 emit:
       EMIT   pasmcode                    { $$ = 0;}
-       EOM '\n'				{ emit_flush(); clear_tables();$$=0;}
+       EOM				{ emit_flush(); clear_tables();$$=0;}
     ;
 
 nls:
