@@ -302,12 +302,12 @@ pmclass PerlNum extends perlscalar {
 
     void repeat (PMC* value, PMC* dest) {
 	internal_exception(INVALID_OPERATION,
-		"repeat() not implemented for PerlNum\n");
+		"repeat() not implemented in class 'PerlNum'\n");
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
 	internal_exception(INVALID_OPERATION,
-		"repeat() not implemented for PerlNum\n");
+		"repeat() not implemented in class 'PerlNum'\n");
     }
 
     void increment () {
