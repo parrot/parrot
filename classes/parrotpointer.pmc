@@ -11,7 +11,7 @@
  */
 
 #include "parrot/parrot.h"
-#define ERROR fprintf(stderr, "An illegal operation was performed on a ParrotPointer (vtable function at %s line %d).\n", __FILE__, __LINE__); exit(1); return 0;
+#define ERROR fprintf(stderr, "An illegal operation was performed on a ParrotPointer (vtable function at %s line %d).\n", __FILE__, __LINE__); exit(1); return;
 
 pmclass ParrotPointer {
    INTVAL type () {
