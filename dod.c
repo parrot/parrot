@@ -485,15 +485,9 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     struct Small_Object_Pool *header_pool;
     int j;
     /* XXX these should go into the interpreter */
-    static int skip = 0;
-    static int last_total_free = 0;
     int total_free = 0;
 
     if (interpreter->DOD_block_level) {
-        return;
-    }
-    if (skip) {
-        skip = 0;
         return;
     }
     Parrot_block_DOD(interpreter);
@@ -540,10 +534,6 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     }
     /* Note it */
     interpreter->dod_runs++;
-    /* if we don't have more free objects then last, skip next DOD run */
-    if (total_free < last_total_free)
-        skip = 1;
-    last_total_free = total_free;
     Parrot_unblock_DOD(interpreter);
     return;
 }

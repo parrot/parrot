@@ -664,6 +664,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 }
 
 #ifdef GC_IS_MALLOC
+#if 0
 struct mallinfo {
     int arena;                  /* non-mmapped space allocated from system */
     int ordblks;                /* number of free chunks */
@@ -677,6 +678,7 @@ struct mallinfo {
     int keepcost;               /* top-most, releasable (via malloc_trim)
                                  * space */
 };
+#endif
 extern struct mallinfo mallinfo(void);
 #endif /* GC_IS_MALLOC */
 INTVAL
