@@ -1,29 +1,76 @@
 =head1 TODO
 
-=head2 Some items may be listed with a (PRIORITY). 
-
 =over 4
+
+=item builtins
+
+for any of the builtins that take a fixed number of ops, remove the
+call to C<foldup> and simply define the C<.params>
+
+=item rename
+
+jens doesn't think we can delete a global 
+but we could replace it with
+a null PMC, and have that be a check before any function call.
+
+=item given freeze/thaw for objects...
+
+Once freeze/thaw is working for tclwords (currently waiting on parrot
+support), rewrite proc to preparse
+once and cache the result in the generated sub rather than reparsing
+each time.
+
+=item upvar, uplevel
+
+set a global lexical level - normally inc'd whenever a UDF proc is called,
+dec'd whenever a UDF is exited. 
+
+Then, anything that set/get's a lexical should do so from the global level
+that we're using.
+
+	uplevel ?level? arg ?arg ...?
+	upvar ?level? otherVar myVar ?otherVar myVar ...?
+
+How do we do this and play nice with other languages?
+
+=item TclWord
+
+implement C<is_const> to allow for some optimizations in the compiler.
+when adding words, default to true, but if at any point we add a variable
+or a command, invalidate that. (mostly done!)
+
+Move TclWord namespace into _Tcl::Word, less clutter.
 
 =item (LOW) varnames
 
-Bit by overuse of generic IMC vars like $I0 - should reduce their usage as much as
-possible to simplify upkeep
+Bitten by overuse of generic IMC vars like $I0 - should reduce their usage as
+much as possible to simplify upkeep
 
-=item globals
+=item [[list]] proc
 
-since all my procs have globals anyway... why not use those globals to figure out who
-to call when and ditch the globals we're using to track the methods.
+doesn't handle varargs.
 
-This would also encourage us to make user level procs "real" procs, rather than the
-odd interpreted things they are at the moment.
+throw a tcl error if the user-defined proc is called with the wrong # args
 
-JR doesn't think we can delete a global (see rename), but we could replace it with
-a null PMC, and have that be a check before any function call.
+support default values (e.g.: proc joe {{drink coffee}} { slurp $drink } )
 
-=item (HIGH) sync with CVS
+=item compiler vs. interpreter
 
-once I get access, I should apply some of the local updates I have, start
-getting all my local changes out of there.
+Given that our interpreter is already compiling anonymous subs on the fly,
+it should be possible to further extend this to make an actual compiler,
+where the _compiler emits PIR. So, the resulting call from, say, [source]
+would be:
+
+	# Note this a change from _parse's current signature 
+	(parsed_data_structure,tcl_status,error) = _parse(tcl_code)
+	(pir_code,tcl_status,error) = _compile(parsed_data_structure)
+	
+And now that we have the pir_code, we can either emit the necessary
+PIR (ala parrot's -o option) or we can compile and run it.
+
+Caveat: how to support -o with user defined procs - right now, proc is defining
+the sub on the fly, where, with a compiler, we may want to defer compilation,
+and simply be able to extract the generated PIR.
 
 =item (LOW) speed
 
@@ -41,33 +88,12 @@ tests so they're consistent.
 
 =item PIR tests failing systematically
 
-=item Tests
-
-Remove the pir_substitution.t test, and replace it with tests for the
-tclword object.
+=item Add tests for the tclword object.
 
 =item 
 
 update docs/* - with the parser/interpreter split, things are different.
 (And, hopefully, easier.)
-
-=item Global namespace pollution
-
-Every sub I create has an implicit
-global in the main space. This implies that I should have ALL of my tcl's stuff
-in a separate (hidden?) namespace. 
-
-Investigate how this is to work with the multi-language namespace discussion
-that occurred months ago on the list, as I recall I should put everything under
-a toplevel "TCL" namespace, and automatically handle this under the covers, so
-that a namespace of "Foo" in perl is really "TCL::Foo" in parrot, etc.
-
-(and to get a something else, you'd use the psuedo top level like
-Parrot::Java::java::lang::String)
-
-=item parrot
-
-is there a way to rename a .sub ?
 
 =item TCL Pmcs
 
@@ -91,13 +117,7 @@ a big PITA, because of the inter-related PMCs.
 
 =item test suite patches
 
-jq has done some work here, think it's applied. need to get my own stuff 
-in languages/tcl applied, and make an announcement to the list about it.
-
-Announced. Still waiting for application before submitting all my updated
-test patches...
-
-Applied. need to patch testall so that it's not so cranky about people
+need to patch testall so that it's not so cranky about people
 who don't play nice with the new tests...
 
 =item Tcl PMCs
@@ -142,42 +162,18 @@ Now, go through all the commands, ops, and functions to cleanup how
 we handle these objects - remember that TclList and TclArray are NOT
 currently descended from tclobject, and this may bollux some things up.
 
-=item compiler vs. interpreter
-
-Need to start moving towards a compiler mentality rather than an 
-interpreter mentality - I think that we can re-use the work that's
-been done so far as an interpreter to keep eval working. 
-
-need to puzzle out exactly how the compilation step is going to work.
-Obviously, we still need to keep parse, nearly as it. The trick, then,
-will be to replace the interpreter proc with a compiler proc - all of the
-individual command subs will need to be replaced with "things that return
-generate PIR". We can then (for everything except eval) spit out the code.
-This MAY speed things up.  << NOTE - won't be able to tell if you're going
-faster unless you have a benchmark.>> 
-
-This is a bit of PITA since starting down this road means pretty major
-changes to what's already in place - can't do it incrementally easily
-since we're currently bootstrapping as if someone had called us with
-[source <file>]
-
-Also, should be able to specify a command line arg, ala parrot's -o that
-lets you generate an output file of .pbc
-
-Also, register the combo _parse/_compiler step as a compiler with compreg
-so that others can call us.
-
-=item SArray vs. TclList
+=item SArray vs. PerlArray/TclList
 
 investigate using SArray vs. TclList for speed. (many times we don't
 know how many slots we're going to need ahead of time, though.) - looks like
 we might be able to use them for the expression stuff that we are passing
-around.... which, now that we have real Tcl PMCs, can probably go the way
-of the dodo.
+around.... which, now that we have real Tcl PMCs, can probably go away
+
+(most uses of PerlArray are gone, now that we are using foldup)
 
 =item parrot question
 
-  unset (How do you remove a variable from the lexical scope ?) From
+unset (How do you remove a variable from the lexical scope ?) From
 p6i -  you can delete it from the Hash object. (great, except how
 do i access the hash if I'm using the default new_pad variant?)
 
@@ -204,7 +200,7 @@ do i access the hash if I'm using the default new_pad variant?)
 
 keep track of channels, include stdin, stdout, stderr - keep in a
 global hash of name to ParrotIO pmcs. Tie in with "puts" and other
-chanel based commands.
+chanel based commands. (some progress made here.)
 
 =item given [list]
 
@@ -230,7 +226,9 @@ Need unicode support for \u escapes, and for "string wordend",
 
 =item expr
 
-TBD: octal, hex. (there's no way to convert go programmatically from an
+TBD: big rethunk.
+
+TBD: octal, hex. (there's no way to convert programmatically from an
 octal or hex string in parrot to a int?)
 
 TBD: strings, floats as operaands - (many of the math funcs return floats
@@ -275,14 +273,6 @@ ready for this yet)
 
 run a tcl test suite (7.6p2 ?) and pass one test.
 (then, pass most of them.) (then, retarget against tcl-latest)
-
-=item proc
-
-doesn't handle varargs. (needs [list])
-
-throw a tcl error if the user-defined proc is called with the wrong # args
-
-support default values (e.g.: proc joe {{drink coffee}} { slurp $drink } )
 
 =item misc
 
@@ -428,19 +418,7 @@ defined ops and functions.
 
 =item test internal funcs
 
-	backslash_subst.imc:.pcc_sub __backslash_subst prototyped
-	
 	match_close.imc:.pcc_sub __match_close prototyped
-	
-	substitution.imc:.pcc_sub __substitution_init prototyped
-	substitution.imc:.pcc_sub __substitution_iter_reset prototyped
-	substitution.imc:.pcc_sub __substitution_iter_next prototyped
-	substitution.imc:.pcc_sub __substitution_replace prototyped
-	substitution.imc:.pcc_sub __substitution_integrate prototyped
-	substitution.imc:.pcc_sub __substitution_get_current_word prototyped
-	substitution.imc:.pcc_sub __substitution_set_current_word prototyped
-	
-	var_subst.imc:.pcc_sub __var_subst prototyped 
 
 =back 4
 
