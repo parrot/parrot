@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -49,6 +49,12 @@ CODE
 test( <<'CODE', 'assign a,b' );
 a = b = 2
 print a, b
+CODE
+
+test( <<'CODE', 'sub I, P' );
+a = 1 + 2
+a = 4 - a
+print a, a * 2
 CODE
 
 test( <<'CODE', 'void call' );

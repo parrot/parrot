@@ -266,6 +266,26 @@ exp_Args(Interp* interpreter, nodeType *p)
     return NULL;
 }
 
+static int
+is_symmetric(char *op)
+{
+    return strcmp(op, "add") == 0 ||
+           strcmp(op, "mul") == 0
+           ? 1 : 0;
+}
+
+static nodeType*
+node_to_pmc(Interp* interpreter, Instruction **ins, nodeType *p)
+{
+    SymReg *regs[IMCC_MAX_REGS];
+    nodeType *temp = IMCC_new_temp_node(interpreter, 'P', &p->loc);
+    *ins = insert_new(interpreter, temp, "Undef");
+    regs[0] = temp->u.r;
+    regs[1] = p->u.r;
+    *ins = insINS(interpreter, cur_unit, *ins, "set", regs, 2);
+    return temp;
+}
+
 /*
  * Op
  * left
@@ -294,15 +314,33 @@ exp_Binary(Interp* interpreter, nodeType *p)
      */
     ins = cur_unit->last_ins;
     if (!p->dest) {
+        int reg_set;
         /*
          * p->dest is currently unused - if the optimizer can figure out that
          * the destination can get assigned directly, C<dest> will
          * hold the destination of the binary
          *
-         * else creae a temp of the same type as the left operand
-         * TODO check mixed types
+         * else create a temp of the same type as the left operand
          */
-        dest = IMCC_new_temp_node(interpreter, left->u.r->set, &p->loc);
+        reg_set = left->u.r->set;
+        /*
+         * TODO if context handling is done expansion of
+         *      the left and right node should do the right thing
+         */
+        if (right->u.r->set == 'P' && reg_set != 'P') {
+            reg_set = 'P';
+            /* when it's a symmetric opcode, swap left and right
+             */
+            if (is_symmetric(op->u.r->name)) {
+                nodeType *temp = left;
+                left = right;
+                right = temp;
+            }
+            else {
+                left = node_to_pmc(interpreter, &ins, left);
+            }
+        }
+        dest = IMCC_new_temp_node(interpreter, reg_set, &p->loc);
         if (dest->u.r->set == 'P')
             ins = insert_new(interpreter, dest, "Undef");
     }
