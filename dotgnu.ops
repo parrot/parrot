@@ -99,17 +99,17 @@ inline op conv_u4(out INT, in PMC) {
   goto NEXT();
 }
 
-inline op conv_i8(inout PMC, in INT) {
+inline op conv_i8(in PMC, in INT) {
   $1->vtable->set_integer_native(interpreter, $1,$2);
   goto NEXT();
 }
 
-inline op conv_i8(inout PMC, in PMC) {
+inline op conv_i8(in PMC, in PMC) {
   $1->vtable->set_integer_same(interpreter, $1,$2);
   goto NEXT();
 }
 
-inline op conv_i8(inout PMC, in NUM) {
+inline op conv_i8(in PMC, in NUM) {
   $1->vtable->set_integer_native(interpreter, $1,$2);
   goto NEXT();
 }

@@ -29,13 +29,13 @@ Parrot's IO API
 
 ########################################
 
-=item B<close>(inout PMC)
+=item B<close>(in PMC)
 
 Close IO object $1
 
 =cut
 
-inline op close(inout PMC) {
+inline op close(in PMC) {
 	PIO_close(interpreter, (ParrotIO*)(PMC_data($1)));
 	goto NEXT();
 }
@@ -58,6 +58,11 @@ inline op fdopen(out PMC, in INT, in STR) {
   mode = string_to_cstring(interpreter, $3);
 
   ParrotIO *io = PIO_fdopen(interpreter, $2, mode);
+  /* string_cstring_free(mode); */
+  /* TODO all results from sring_to_cstring() need freeing
+     but this generates ugly warnings WRT discarding the const
+     qualifier -lt
+   */
   if(io) {
     $1 = new_io_pmc(interpreter, io);
   }
@@ -89,6 +94,8 @@ inline op open(out PMC, in STR, in STR) {
   mode = string_to_cstring(interpreter, $3);
 
   io = PIO_open(interpreter, path, mode);
+  /* string_cstring_free(mode); */
+  /* string_cstring_free(path); */
   if(io) {
     $1 = new_io_pmc(interpreter, io);
   }
@@ -113,6 +120,7 @@ descriptor into $1.
 op open(out INT, in STR) {
   char *path = string_to_cstring(interpreter, $2);
   ParrotIO *io = PIO_open(interpreter, path, "+<");
+  /* string_cstring_free(path); */
   if (io) {
     $1 = PIO_getfd(interpreter, io);
   }
@@ -126,6 +134,8 @@ op open(out INT, in STR, in STR) {
   char *path = string_to_cstring(interpreter, $2);
   char *mode = string_to_cstring(interpreter, $3);
   ParrotIO *io = PIO_open(interpreter, path, mode);
+  /* string_cstring_free(mode); */
+  /* string_cstring_free(path); */
   if (io) {
     $1 = PIO_getfd(interpreter, io);
   }
