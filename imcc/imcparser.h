@@ -100,24 +100,28 @@
      NCI_CALL = 323,
      PROTOTYPED = 324,
      NON_PROTOTYPED = 325,
-     LABEL = 326,
-     EMIT = 327,
-     EOM = 328,
-     IREG = 329,
-     NREG = 330,
-     SREG = 331,
-     PREG = 332,
-     IDENTIFIER = 333,
-     STRINGC = 334,
-     INTC = 335,
-     FLOATC = 336,
-     REG = 337,
-     MACRO = 338,
-     ENDM = 339,
-     PARROT_OP = 340,
-     VAR = 341,
-     LINECOMMENT = 342,
-     FILECOMMENT = 343
+     MAIN = 326,
+     LOAD = 327,
+     IMMEDIATE = 328,
+     POSTCOMP = 329,
+     LABEL = 330,
+     EMIT = 331,
+     EOM = 332,
+     IREG = 333,
+     NREG = 334,
+     SREG = 335,
+     PREG = 336,
+     IDENTIFIER = 337,
+     STRINGC = 338,
+     INTC = 339,
+     FLOATC = 340,
+     REG = 341,
+     MACRO = 342,
+     ENDM = 343,
+     PARROT_OP = 344,
+     VAR = 345,
+     LINECOMMENT = 346,
+     FILECOMMENT = 347
    };
 #endif
 #define LOW_PREC 258
@@ -188,24 +192,28 @@
 #define NCI_CALL 323
 #define PROTOTYPED 324
 #define NON_PROTOTYPED 325
-#define LABEL 326
-#define EMIT 327
-#define EOM 328
-#define IREG 329
-#define NREG 330
-#define SREG 331
-#define PREG 332
-#define IDENTIFIER 333
-#define STRINGC 334
-#define INTC 335
-#define FLOATC 336
-#define REG 337
-#define MACRO 338
-#define ENDM 339
-#define PARROT_OP 340
-#define VAR 341
-#define LINECOMMENT 342
-#define FILECOMMENT 343
+#define MAIN 326
+#define LOAD 327
+#define IMMEDIATE 328
+#define POSTCOMP 329
+#define LABEL 330
+#define EMIT 331
+#define EOM 332
+#define IREG 333
+#define NREG 334
+#define SREG 335
+#define PREG 336
+#define IDENTIFIER 337
+#define STRINGC 338
+#define INTC 339
+#define FLOATC 340
+#define REG 341
+#define MACRO 342
+#define ENDM 343
+#define PARROT_OP 344
+#define VAR 345
+#define LINECOMMENT 346
+#define FILECOMMENT 347
 
 
 
@@ -222,7 +230,7 @@ typedef union {
     SymbolTable * symtab;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 226 "imcc/imcparser.h"
+#line 234 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
