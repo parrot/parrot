@@ -47,7 +47,7 @@ sub new
 
   $block->push_content($self);
 
-  printf STDERR "%s: Created new module '%s'.\n", __PACKAGE__, $ident->value;
+#  printf STDERR "%s: Created new module '%s'.\n", __PACKAGE__, $ident->value;
 
   return $self;
 }
@@ -74,7 +74,7 @@ sub compile
 
   my $namespace = "MODULE"; # TODO: Don't we need to do better than this?
 
-  printf STDERR "%s: Compiling module '%s'.\n", __PACKAGE__, $self->name;
+#  printf STDERR "%s: Compiling module '%s'.\n", __PACKAGE__, $self->name;
   
   #
   # Import our symbols into our parent block:
@@ -82,7 +82,7 @@ sub compile
 
   my $name = $self->name;
 
-  printf STDERR "%s: About to copy symbol table to parent block.\n", __PACKAGE__;
+#  printf STDERR "%s: About to copy symbol table to parent block.\n", __PACKAGE__;
 
   foreach my $symbol_name ($self->symbol_names) {
     # TODO: Warn here that we are skipping one already in the parent block?
@@ -93,7 +93,7 @@ sub compile
     $self->block->set_symbol($new_name, $self->get_symbol($symbol_name));
   }
 
-  printf STDERR "%s: Finished copying symbol table to parent block.\n", __PACKAGE__;
+#  printf STDERR "%s: Finished copying symbol table to parent block.\n", __PACKAGE__;
 
   return 1 unless $self->content;
 
