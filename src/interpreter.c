@@ -868,7 +868,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     struct Stash *stash, *next_stash;
 
     UNUSED(exit_code);
-    /* if something needs timely destruction (e.g. closing PIOs)
+    /* if something needs destruction (e.g. closing PIOs)
      * we must destroy it now:
      * no DOD run, so everything is considered dead
      */
@@ -878,16 +878,14 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      */
     Parrot_IOData_mark(interpreter, interpreter->piodata);
 
-    if (interpreter->has_early_DOD_PMCs)
-        free_unused_pobjects(interpreter, interpreter->arena_base->pmc_pool);
-
-    /* we destroy all child interpreters and the last one too,
-     * if the --leak-test commandline was given
-     */
+    free_unused_pobjects(interpreter, interpreter->arena_base->pmc_pool);
 
     /* Now the PIOData gets also cleared */
     PIO_finish(interpreter);
 
+    /* we destroy all child interpreters and the last one too,
+     * if the --leak-test commandline was given
+     */
     if (! (interpreter->parent_interpreter ||
                 Interp_flags_TEST(interpreter, PARROT_DESTROY_FLAG)))
         return;
