@@ -12,14 +12,14 @@
  *  History:
  *     Initial proposal by leo 2003.07.15
  *     Initial revision        2003.07.17
+ *     Switch to events        2004.01.07
  *  Synopsis:
  *     new P0, .Timer
  *     set P0[.PARROT_TIMER_SEC], I_seconds        # whole seconds
  *     set P0[.PARROT_TIMER_USEC], I_micro seconds # and/or micro seconds
  *     set P0[.PARROT_TIMER_NSEC], N_seconds_frac  # or fraction in seconds
  *     set P0[.PARROT_TIMER_REPEAT], I_repeat      # 0 = one shot ...
- *     set_addr I0, _subroutine
- *     set P0, I0                                  # set timer handler sub
+ *     set P0[.PARROT_TIMER_HANDLER], P_sub        # set handler sub PMC
  *     invoke P0                                   # start timer
  *     set P0[.PARROT_TIMER_RUNNING], 1            # same
  *
@@ -50,10 +50,6 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-/*
- * for now we keep all stuff inside the pmc
- */
-
 /* interface constants */
 /* &gen_from_enum(timer.pasm) */
 typedef enum {
@@ -67,192 +63,33 @@ typedef enum {
 } parrot_timer_enum_t;
 /* &end_gen */
 
-/* internal run state */
-typedef enum {
-    PARROT_TIMER_STATE_STOPPED,
-    PARROT_TIMER_STATE_NEW,
-    PARROT_TIMER_STATE_RUNNING,
-    PARROT_TIMER_STATE_FIRE
-} parrot_timer_state_t;
-
-typedef struct parrot_timer_t {
-    int flags;
-    int ticks;
-    int value;
-    int repeat;
-    int state;
-    union {
-	INTVAL pasm_code;
-	void *c_code;
-    } handler;
-    PMC *self;
-    struct parrot_timer_t *next;
-    struct parrot_timer_t *prev;
-} parrot_timer_t;
-
-/* XXX next 2 should probably go into interpreter */
-/* linked list of running timers */
-static parrot_timer_t *rtimer = 0;
-/* handle of system timer */
-static void *handle = (void *) -1;
-
-/* add timer to running */
 static void
-add_timer(parrot_timer_t *t)
+add_timer(Parrot_Interp interpreter, PMC *pmc)
 {
-    parrot_timer_t *next = rtimer;
-    rtimer = t;
-    t->next = next;
-    if (next) {
-	next->prev = t;
-    }
-    t->state = PARROT_TIMER_STATE_RUNNING;
-    PObj_needs_early_DOD_SET(t->self);
-}
-
-static int
-timer_is_running(parrot_timer_t *tp)
-{
-    parrot_timer_t *t;
-    /* be paranoid, check run lis too */
-    for (t = rtimer; t; t = t->next)
-	if (t == tp)
-	    return 1;
-    return 0;
-}
-
-/* del timer from running */
-static void
-del_timer(parrot_timer_t *t)
-{
-    parrot_timer_t *next = t->next;
-    parrot_timer_t *prev = t->prev;
-
-    if (!timer_is_running(t))
-	return;
-    if (prev)
-	prev->next = next;
-    else
-	rtimer = next;
-    if (next)
-	next->prev = prev;
-    t->ticks = 0;
-    t->state = PARROT_TIMER_STATE_STOPPED;
-    PObj_needs_early_DOD_CLEAR(t->self);
-}
-
-/* TODO move this to misc.c (or util.c?), s. also math.ops */
-static UINTVAL
-gcd(UINTVAL a, UINTVAL b)
-{
-
-    UINTVAL q = 0;
-    UINTVAL c = 0;
-    while (b != 0) {
-	q = (UINTVAL)floor( (FLOATVAL)a/b );
-	c = a - b*q;
-	a = b;
-	b = c;
-    }
-    return a;
+    parrot_timer_event *t = pmc->cache.struct_val;
+    /* TODO handle interval, repeat count */
+    if (!PMC_IS_NULL(t->sub))
+	Parrot_new_timer_event(interpreter, t->abs_time, 0, t->sub);
 }
 
 static void
-recalc_ticks(void)
+del_timer(Parrot_Interp interpreter, PMC *pmc)
 {
-    UINTVAL ms, oms;
-    parrot_timer_t *t;
-
-    oms = get_sys_timer_ms(handle);
-    t = rtimer;
-    if (t) {
-	if (t->state == PARROT_TIMER_STATE_NEW)
-	    t->state = PARROT_TIMER_STATE_STOPPED;
-	if (oms && t->ticks)
-	    ms = oms*t->ticks;	/* time left */
-	else
-	    ms = t->value;
-	if (t->next) {
-	    for (t = t->next; t; t = t->next) {
-		if (t->state == PARROT_TIMER_STATE_NEW)
-		    t->state = PARROT_TIMER_STATE_STOPPED;
-		if (oms && t->ticks) {
-		    ms = gcd(oms*t->ticks, ms);
-		}
-		else
-		    ms = gcd(t->value, ms);
-	    }
-	}
-	for (t = rtimer; t; t = t->next) {
-	    int ot = t->ticks;
-	    if (oms && ot)
-		t->ticks = t->ticks * ((double)oms / (double)ms);
-	    else
-		t->ticks = t->value / ms;
-	    if (!t->ticks) {
-		internal_exception(1, "Timer ticks are zero\n");
-	    }
-	}
-    }
-    else
-	ms = 0;
-
-    if (ms)
-	start_sys_timer_ms(handle, ms);
-    else
-	stop_sys_timer_ms(handle);
+    /* TODO find timer in queue, set inactive flag */
 }
 
-static void
-do_alarm_handler(void)
-{
-    parrot_timer_t *t;
-    UINTVAL ms;
-    int recalc = 0;
 
-    ms = get_sys_timer_ms(handle);
-    for (t = rtimer; t; t = t->next) {
-	if (!--t->ticks) {
-	    t->state = PARROT_TIMER_STATE_FIRE;
-	    if (t->repeat) {
-		t->ticks = t->value/ms;
-		if (t->repeat != -1)
-		    t->repeat--;
-	    }
-	}
-    }
-    /* do this in a separate loop, and always start over:
-     * the timer handler function might add/stop timers
-     */
-again:
-    for (t = rtimer; t; t= t->next) {
-	if (t->state == PARROT_TIMER_STATE_FIRE) {
-	    t->state = PARROT_TIMER_STATE_RUNNING;
-	    /* TODO setup event */
-	    goto again;
-	}
-	if (!t->ticks && !t->repeat) {
-	    del_timer(t);
-	    recalc = 1;
-	    goto again;
-	}
-    }
-    if (recalc)
-	recalc_ticks();
-}
-
-pmclass Timer {
-    void class_init() {
-	if (handle == (void *) -1)
-	    handle = new_sys_timer_ms();
-    }
+pmclass Timer does event {
 
     void init() {
-	parrot_timer_t *t = mem_sys_allocate_zeroed(sizeof(parrot_timer_t));
-	t->state = PARROT_TIMER_STATE_NEW;
-	t->self = SELF;
+	/*
+	 * t->abs_time actually is relative, its converted to an
+	 * absolute time, when the timer is started
+	 */
+	parrot_timer_event *t =
+	    mem_sys_allocate_zeroed(sizeof(parrot_timer_event));
 	SELF->cache.struct_val = t;
-        PObj_active_destroy_SET(SELF);
+	PObj_active_destroy_SET(SELF);
 	interpreter->has_early_DOD_PMCs = 1;
     }
 
@@ -264,6 +101,7 @@ pmclass Timer {
 	INTVAL i;
 	INTVAL val;
 	FLOATVAL nval;
+	PMC *pval;
 
 	SELF.init();
 	for (i = 0; i < n; i += 2) {
@@ -273,7 +111,6 @@ pmclass Timer {
 		case PARROT_TIMER_USEC:
 		case PARROT_TIMER_REPEAT:
 		case PARROT_TIMER_RUNNING:
-		case PARROT_TIMER_HANDLER:
 		    val =
 			VTABLE_get_integer_keyed_int(interpreter, init, i+1);
 		    SELF.set_integer_keyed_int(key, val);
@@ -283,103 +120,108 @@ pmclass Timer {
 			VTABLE_get_number_keyed_int(interpreter, init, i+1);
 		    SELF.set_number_keyed_int(key, nval);
 		    break;
+		case PARROT_TIMER_HANDLER:
+		    pval =
+			VTABLE_get_pmc_keyed_int(interpreter, init, i+1);
+		    SELF.set_pmc_keyed_int(key, pval);
+		    break;
 	    }
 	}
     }
 
     void destroy() {
-	parrot_timer_t *t = SELF->cache.struct_val;
-	del_timer(t);
+	parrot_timer_event *t = SELF->cache.struct_val;
+	del_timer(INTERP, SELF);
 	mem_sys_free(t);
     }
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-	parrot_timer_t *t = SELF->cache.struct_val;
+	parrot_timer_event *t = SELF->cache.struct_val;
 
 	switch(key) {
 	    case PARROT_TIMER_SEC:
-		return t->value/1000;
+		return (INTVAL)t->abs_time;
 		break;
 	    case PARROT_TIMER_USEC:
-		return (t->value % 1000) * 1000;
+		return (t->abs_time - (INTVAL)t->abs_time) *1000000.0;
 		break;
 	    case PARROT_TIMER_REPEAT:
-		return t->repeat;
-		break;
 	    case PARROT_TIMER_RUNNING:
-		return timer_is_running(t);
-		break;
-	    case PARROT_TIMER_HANDLER:
-		return t->handler.pasm_code;
+		return 0;
 		break;
 	}
 	return -1;
     }
 
+    PMC* get_pmc_keyed_int(INTVAL key) {
+	parrot_timer_event *t = SELF->cache.struct_val;
+	switch(key) {
+	    case PARROT_TIMER_HANDLER:
+		return t->sub;
+		break;
+	    default:
+		return PMCNULL;
+	}
+	return PMCNULL;
+    }
+
     FLOATVAL get_number_keyed_int(INTVAL key) {
-	parrot_timer_t *t = SELF->cache.struct_val;
+	parrot_timer_event *t = SELF->cache.struct_val;
 
 	switch(key) {
 	    case PARROT_TIMER_NSEC:
-		return (FLOATVAL)t->value/1000.0;
+		return t->abs_time;
 		break;
 	}
 	return -1.0;
     }
 
-    void set_integer_native(INTVAL value) {
-	parrot_timer_t *t = SELF->cache.struct_val;
-	t->handler.pasm_code = value;
-    }
-
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-	parrot_timer_t *t = SELF->cache.struct_val;
+	parrot_timer_event *t = SELF->cache.struct_val;
 
 	switch(key) {
 	    case PARROT_TIMER_SEC:
-		t->value = value * 1000;
+		t->abs_time = value;
 		break;
 	    case PARROT_TIMER_USEC:
-		t->value += value / 1000;
+		t->abs_time += value / 1000000.0;
 		break;
 	    case PARROT_TIMER_REPEAT:
-		t->repeat = value;
+		/* t->repeat = value; */
 		break;
 	    case PARROT_TIMER_RUNNING:
 		if (value) {
-		    if (!timer_is_running(t)) {
-			add_timer(t);
-			recalc_ticks();
-		    }
+		    add_timer(INTERP, SELF);
 		}
 		else {
-		    if (timer_is_running(t)) {
-			del_timer(t);
-			recalc_ticks();
-		    }
+		    del_timer(INTERP, SELF);
 		}
 		break;
+	}
+    }
+
+    void set_pmc_keyed_int(INTVAL key, PMC* value) {
+	parrot_timer_event *t = SELF->cache.struct_val;
+	switch(key) {
 	    case PARROT_TIMER_HANDLER:
-		t->handler.pasm_code = value;
+		t->sub = value;
+		break;
+	    default:
 		break;
 	}
     }
 
     void* invoke(void *next) {
-	parrot_timer_t *t = SELF->cache.struct_val;
-	if (!timer_is_running(t)) {
-	    add_timer(t);
-	    recalc_ticks();
-	}
+	add_timer(INTERP, SELF);
 	return next;
     }
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-	parrot_timer_t *t = SELF->cache.struct_val;
+	parrot_timer_event *t = SELF->cache.struct_val;
 
 	switch(key) {
 	    case PARROT_TIMER_NSEC:
-		t->value = (INTVAL) (value * 1000.0);
+		t->abs_time = value;
 		break;
 	}
     }
