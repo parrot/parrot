@@ -96,11 +96,14 @@ sub _generate_pir_for {
             print "\\n"
             match."_print"()\n); 
     }
+    else {
+        $captures = "";
+    }
     return qq(
         .sub _P6GE_Test
             .local pmc p6rule_compile
             load_bytecode "compilers/p6ge/p6ge.pir"
-            p6rule_compile = global "_p6ge_compile"
+            find_global p6rule_compile, "P6GE", "_p6ge_compile"
 
             .local string target
             .local string pattern
