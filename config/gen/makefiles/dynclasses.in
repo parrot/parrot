@@ -41,7 +41,7 @@ all :
 	@$(BUILD) generate $(PMCS)
 	@$(BUILD) compile $(PMCS)
 	@$(BUILD) linklibs $(PMCS)
-	@$(BUILD) copy --destination=$(DESTDIR) $(PMCS)
+	@$(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
 test : all
 	cd .. ; perl -Ilib t/harness t/dynclass/*.t
