@@ -446,6 +446,56 @@ not an instance method.
 
 /*
 
+=item C<INTVAL is_equal(PMC *value)>
+
+The C<==> operation.
+
+Check if two dictionaries hold the same keys and values.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+        PMC *iter = VTABLE_get_iter(INTERP, SELF);
+        INTVAL j, n;
+
+        if (value->vtable->base_type != SELF->vtable->base_type)
+            return 0;
+        n = SELF.elements();
+        if (VTABLE_elements(INTERP, value) != n)
+            return 0;
+        for (j = 0; j < n; ++j) {
+            STRING *key = VTABLE_shift_string(INTERP, iter);
+            PMC *item1, *item2;
+            if (!VTABLE_exists_keyed_str(INTERP, value, key))
+                return 0;
+            item1 = SELF.get_pmc_keyed_str(key);
+            item2 = VTABLE_get_pmc_keyed_str(INTERP, value, key);
+            if (item1 == item2)
+                continue;
+            if (!mmd_dispatch_i_pp(INTERP, item1, item2, MMD_EQ))
+                return 0;
+        }
+        return 1;
+    }
+
+/*
+
+=item C<INTVAL exists_keyed_str(STRING *key)>
+
+=cut
+
+*/
+
+    INTVAL exists_keyed_str(STRING* key) {
+        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
+                                        key);
+        return b != NULL;
+    }
+
+/*
+
 =item C<void set_pmc_keyed(PMC *key, PMC *value)>
 
 =cut

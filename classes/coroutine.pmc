@@ -18,7 +18,7 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
 =item private0 call flip flop
 
-=item private3 called first time, used for python
+=item private3 restore current sub after "flop".  Used by generators.
 
 =back
 
@@ -64,13 +64,6 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
 pmclass Coroutine extends Sub {
 
-    void class_init() {
-        if (pass) {
-            enter_nci_method(INTERP, enum_class_Coroutine,
-                    F2DPTR(Parrot_Coroutine_shift_pmc), "next", "PIO");
-        }
-    }
-
 /*
 
 =item C<void init()>
@@ -85,9 +78,6 @@ Initializes the co-routine.
         PMC_coro(SELF) = new_coroutine(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
-
-        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE))
-            PObj_get_FLAGS(SELF) |= SUB_FLAG_GENERATOR;
     }
 
 /*
@@ -105,23 +95,7 @@ Swaps the "context".
         struct PackFile_ByteCode *wanted_seg;
         void * dest = sub->address;
         int argcP = REG_INT(3);
-        /* python calls the coroutine initially during
-         * setup
-         */
-        if (PObj_get_FLAGS(SELF) & SUB_FLAG_GENERATOR) {
-            PMC *ret = SELF.get_iter();
-            struct Parrot_coro *cor = PMC_coro(ret);
-            struct Stack_Chunk *pad_stack = cor->ctx.pad_stack;
-            PMC *pad = stack_peek(INTERP, pad_stack, NULL);
-            INTVAL i;
 
-            for (i = 0; i < argcP; ++i) {
-                scratchpad_store_by_index(INTERP, pad, -1, i, REG_PMC(5+i));
-            }
-            REG_PMC(5) = ret;
-            cor->caller_seg = interpreter->code->cur_cs;
-            return next;
-        }
         sub->address = next;
         /* if calling the Coro we need the segment of the Coro */
         if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
@@ -131,6 +105,7 @@ Swaps the "context".
         }
         else {
             wanted_seg = sub->caller_seg;
+            sub->caller_seg = interpreter->code->cur_cs;
         }
         swap_context(interpreter, SELF);
 
@@ -138,86 +113,6 @@ Swaps the "context".
             Parrot_switch_to_cs(interpreter, wanted_seg, 1);
         }
         return dest;
-    }
-
-/*
-
-=item C<PMC* shift_pmc>)
-
-Run the coroutine until it yields a value. The call to the coroutine
-is actually done via the C<call_hook> below, a piece of code at the
-end of a coroutine:
-
-set P0, P5    # get the real coroutine
-invokecc      # run that code
-end           # terminate the runloop
-
-=cut
-
-*/
-
-    PMC* shift_pmc() {
-        PMC *res;
-        struct Parrot_coro * sub = PMC_coro(SELF);
-        opcode_t offset, *call_hook;
-        PMC *ex;
-        PMC *p5 = REG_PMC(5);
-
-        REG_PMC(5) = SELF;
-        assert(sub->end);
-        call_hook = sub->end - 5;
-        offset = call_hook - interpreter->code->byte_code;
-        /*
-         * running via runops creates an exception frame
-         *  but we should catch exceptions here to free the register
-         *  frame
-         * XXX
-         */
-        runops(interpreter, offset);
-        res = REG_PMC(5);
-        REG_PMC(5) = p5;
-        /*
-         * the generator returned None, when it's finished
-         */
-        if (REG_INT(3) == 1 &&
-                res == Parrot_base_vtables[enum_class_None]->data) {
-            real_exception(interpreter, NULL, E_StopIteration, "StopIteration");
-        }
-        return res;
-    }
-
-/*
-
-Iterator interface
-
-=item C<INTVAL elements ()>
-
-Return much, we don't know.
-
-*/
-
-    INTVAL elements () {
-        return (2^31) - 1;
-    }
-
-    PMC* get_iter () {
-        if (PObj_get_FLAGS(SELF) & SUB_FLAG_GENERATOR) {
-            struct Parrot_coro * sub = PMC_coro(SELF);
-            PMC *ret = pmc_new(INTERP, enum_class_Coroutine);
-            struct Parrot_coro * coro = PMC_coro(ret);
-            coro->end = sub->end;
-            coro->address = sub->address;
-
-            PObj_get_FLAGS(ret) |= SUB_FLAG_FIXUP_DONE; /* fixup done */
-            PObj_get_FLAGS(ret) &= ~SUB_FLAG_GENERATOR;
-            PObj_flag_CLEAR(custom_mark, SELF);
-            return ret;
-        }
-        return SELF;
-    }
-
-    INTVAL get_bool () {
-        return 1;
     }
 
 /*

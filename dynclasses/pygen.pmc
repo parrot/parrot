@@ -158,6 +158,7 @@ Sets the value of the NEXT function.
 
     void set_pmc (PMC* value) {
         PMC_pmc_val(SELF) = value;
+        PObj_get_FLAGS(value) |= SUB_FLAG_GENERATOR;
     }
 
 /*

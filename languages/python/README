@@ -22,8 +22,7 @@ Outstanding Parrot archicture/design issues:
 Benchmark status/issues:
 
   b1: passes.  Would perform better if xranges were implemented as an iter.
-  b2: co-routine issue.  main calls izip which calls PI which 
-      yields to izip which yields to... PI?  WTF?
+  b2: passes.
   b3: need to implement __new__
   b4: there is no b4!
   b5: awaiting completion of float, complex, ...

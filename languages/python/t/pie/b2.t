@@ -164,6 +164,7 @@ def main():
         print y,
         if x in tests:
             checks[x] = pi.a1
+    print
     if tests != checks:
         raise RuntimeError
 
