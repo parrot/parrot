@@ -280,49 +280,42 @@ Example:
 
 Print the interpreter registers. The syntax is:
 
-  print TYPE [NUM]
+  print VALUE
 
-Where C<TYPE> is one of:
+C<VALUE> may be:
 
 =over 4
 
-=item C<i> or C<int>
+=item A register name: C<I3>
 
-integer registers
+Prints out the single register specified.
 
-=item C<n> or C<num>
+=item A register type: C<i>, C<n>, C<s>, or C<p>
 
-number registers
+Prints out all registers of the given type
 
-=item C<s> or C<str>
+=item An aggregate key: C<P0[1]>
 
-string registers
-
-=item C<p> or C<pmc>
-
-PMC registers
+Looks up the given (integer- or string-valued) key in a PMC register.
 
 =back
 
-You can optionally give a register number (C<NUM>) to print a single
-register, otherwise the whole range (0..31) will be printed out.
-
 For PMC registers, the command will print the number, the
 class of the PMC (in square brackets) and its string 
-representation (when available). It prints nothing for 
+representation (when available). It prints <null pmc> for 
 unitialized PMC registers.
 
 Example:
 
   # prints the content of I2
-  (pdb) p i 2
+  (pdb) p i2
   Integer Registers:
-   2 =              0
+  I2 =              0
 
   # prints the content of P0
-  (pdb) p p 0
+  (pdb) p P0
   PMC Registers:
-   0 = [PerlArray]
+  P0 = [PerlArray]
    
   # prints the content of all string registers
   (pdb) p s
@@ -332,6 +325,7 @@ Example:
           Flags   =                  0
           Bufused =                  4
           Strlen  =                  4
+          Offset  =                  0
           String  =       Just
    1 =
           Buflen  =                  8
