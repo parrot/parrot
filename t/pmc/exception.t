@@ -16,7 +16,7 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 30;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "push_eh - clear_eh");
@@ -318,36 +318,6 @@ something happend
 back in 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "throw from a sub");
-    print "main\n"
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
-    newsub P0, .Sub, _sub
-    invokecc
-    print "back in main\n"
-    end
-
-_sub:
-    new P30, .Exception
-    set P30["_message"], "something happend"
-    throw P30
-    print "back in sub\n"
-    invoke P1
-_handler:
-    print "catched it\n"
-    set S0, P5["_message"]
-    print S0
-    print "\n"
-    set P2, P5["_invoke_cc"]	# the return continuation
-    invoke P2
-CODE
-main
-catched it
-something happend
-back in sub
-back in main
-OUTPUT
-
 output_is(<<'CODE', <<OUT, "die_hard");
     newsub P0, .Exception_Handler, _handler
     set_eh P0
@@ -415,40 +385,6 @@ Lexical 'no_such_thing' not found
 resumed
 /
 OUT
-
-output_is(<<'CODE', <<'OUTPUT', "rethrow");
-    print "main\n"
-    newsub P20, .Exception_Handler, _handler1
-    set_eh P20
-    newsub P21, .Exception_Handler, _handler2
-    set_eh P21
-
-    new P30, .Exception
-    set P30["_message"], "something happend"
-    throw P30
-    print "back in main\n"
-    end
-_handler1:
-    print "catched it in 1\n"
-    set S0, P5["_message"]
-    print S0
-    print "\n"
-    set P2, P5["_invoke_cc"]	# the return continuation
-    invoke P2
-_handler2:
-    print "catched it in 2\n"
-    set S0, P5["_message"]
-    print S0
-    print "\n"
-    rethrow P5
-CODE
-main
-catched it in 2
-something happend
-catched it in 1
-something happend
-back in main
-OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "clear_eh, set_eh again");
@@ -625,11 +561,114 @@ output_is(<<'CODE', <<'OUTPUT', "pushaction");
     print "ok 3\n"
     end
 .pcc_sub action:
-    print "in action\n"
+    print "in action I5 = "
+    print I5
+    print "\n"
     returncc
 CODE
 ok 1
 ok 2
-in action
+in action I5 = 0
 ok 3
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "pushaction, throw");
+    push_eh handler
+    print "ok 1\n"
+    .const .Sub P10 = "action"
+    pushaction P10
+    print "ok 2\n"
+    new P10, .Exception
+    throw P10
+    print "never\n"
+handler:
+    print "ok 3\n"
+    end
+.pcc_sub action:
+    print "in action I5 = "
+    print I5
+    print "\n"
+    returncc
+CODE
+ok 1
+ok 2
+in action I5 = 1
+ok 3
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pushaction, sub exit");
+.sub main
+    print "main\n"
+    foo()
+    print "back\n"
+.end
+
+.sub foo
+   .const .Sub ac = "action"
+    pushaction ac
+    print "foo\n"
+.end
+
+.sub action
+    .param int i
+    print "in action I5 = "
+    print i
+    print "\n"
+.end
+CODE
+main
+foo
+in action I5 = 0
+back
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pushaction, sub exit - capture CC");
+.sub main
+    print "main\n"
+    foo()
+    print "back\n"
+.end
+
+.sub foo
+   .const .Sub ac = "action"
+    pushaction ac
+    .include "interpinfo.pasm"
+    .local pmc cc
+    cc = interpinfo .INTERPINFO_CURRENT_CONT
+    print "foo\n"
+.end
+
+.sub action
+    print "never\n"
+.end
+CODE
+main
+foo
+back
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pushaction, sub exit - capture CC, ret");
+.sub main
+    print "main\n"
+    foo()
+    print "back\n"
+.end
+
+.sub foo
+   .const .Sub ac = "action"
+    pushaction ac
+    .include "interpinfo.pasm"
+    .local pmc cc
+    cc = interpinfo .INTERPINFO_CURRENT_CONT
+    print "foo\n"
+    invoke cc
+.end
+
+.sub action
+    print "never\n"
+.end
+CODE
+main
+foo
+back
 OUTPUT

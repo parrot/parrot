@@ -76,6 +76,23 @@ the frame pointer in the stack frame cache.
 
     void* invoke (void* next) {
         Stack_Chunk_t *stack_p;
+        Stack_Chunk_t *ctr_stack, *stack_now;
+        /*
+         * unwind control stack
+         */
+        stack_now = interpreter->ctx.control_stack;
+        ctr_stack = PMC_cont(SELF)->ctx.control_stack;
+        while (stack_now != ctr_stack) {
+            if (!stack_now || !ctr_stack)
+                internal_exception(1, "Control stack damaged");
+            /*
+             * this automagically runs all pushed action
+             * handler during pop - see cleanup stuff
+             * in stack_pop
+             */
+            (void)stack_pop(interpreter, &stack_now,
+                            NULL, NO_STACK_ENTRY_TYPE);
+        }
 
         stack_p = interpreter->ctx.reg_stack;
         next = SUPER(next);

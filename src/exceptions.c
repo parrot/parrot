@@ -160,6 +160,10 @@ push_exception(Interp * interpreter, PMC *handler)
 static void
 run_cleanup_action(Interp *interpreter, Stack_Entry_t *e)
 {
+    /*
+     * this is called during normal stack_pop of the control
+     * stack - run the action subroutine with an INTVAL arg of 0
+     */
     PMC *sub = UVal_pmc(e->entry);
     Parrot_runops_fromc_args(interpreter, sub, "vI", 0);
 }
@@ -225,7 +229,13 @@ find_exception_handler(Interp * interpreter, PMC *exception)
         if (!e)
             break;
         if (e->entry_type == STACK_ENTRY_ACTION) {
+            /*
+             * Clear automatic cleanup routine run in stack_pop
+             * and run the action sburoutine with an INTVAL argument
+             * of 1
+             */
             PMC *sub = UVal_pmc(e->entry);
+            e->cleanup = STACK_CLEANUP_NULL;
             Parrot_runops_fromc_args(interpreter, sub, "vI", 1);
         }
         (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
