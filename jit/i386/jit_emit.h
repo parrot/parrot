@@ -913,7 +913,7 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 
 /* SHR */
 
-#  define jit_emit_shr_ri_i(pc, reg, imm) \
+#  define jit_emit_lsr_ri_i(pc, reg, imm) \
     { pc = emit_shift_i_r(pc, emit_b101, imm, reg); }
 
 #  define emitm_shrl_i_m(pc, imm, b, i, s, d) \
@@ -941,8 +941,9 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 
 /* SAR */
 
-#  define jit_emit_lsr_ri_i(pc, reg, imm) \
+#  define jit_emit_shr_ri_i(pc, reg, imm) \
     { pc = emit_shift_i_r(pc, emit_b111, imm, reg); }
+
 
 #  define emitm_sarl_i_m(pc, imm, b, i, s, d) \
     { pc = emit_shift_i_m(pc, emit_b111, imm, b, i, s, d); }
