@@ -376,7 +376,9 @@ sub assign_expr {
     }
 
     my $targ;
-        
+    
+    print STDERR "[$left] [$right]\n";
+    
     # Check to see if target is indirection
     # Only strings are supported for now, hence the
     # hard-coded hackfu.
@@ -385,7 +387,7 @@ sub assign_expr {
         $offset = &reg_assign($3, 'i32');
            my $saverval = $3;
         $op = &op_to_parrot($targ, $2);
-        if( $right =~ /^(\S+|"[^"\n]*["\n])/ ) {
+        if( $right =~ /^(\S+|"[^"\n]*["\n])$/ ) {
             my $src = &reg_assign($1, $type);
             print "\t$op $targ, $offset, 1, $src\n";
             #if(&is_rval($saverval)) { &free_reg($offset); }
@@ -403,14 +405,14 @@ sub assign_expr {
     # which is easier than doing correct register allocation
     # via graph coloring.
     # FIXME: This regex has outlived its usefulness!
-    if( $right =~ m{^("[^"\n]*["\n]|[^"]+)\s+([-+*/%])\s+("[^"\n"]*["\n]|[^"]+)} ) {
+    if( $right =~ m{^("[^"\n]*["\n]|[^"]+)\s+([-+*/%])\s+("[^"\n"]*["\n]|[^"]+)$} ) {
         my ($arg2, $arg3) = (&reg_assign($1, $type), &reg_assign($3, $type));
         $op = &op_to_parrot($targ, $2);
         print "\t$op $targ, $arg2, $arg3\n";
         if(&is_rval($1)) { &free_reg($arg2); }
         if(&is_rval($3)) { &free_reg($arg3); }
     }
-    elsif( $right =~ m{(\$?\w+)(\[\])(\$?\w+)} ) {
+    elsif( $right =~ m{(\$?\w+)(\[\])(\$?\w+)$} ) {
         my ($arg2, $arg3) = (&reg_assign($1, $type), &reg_assign($3, $type));
         $op = &op_to_parrot($targ, $2);
         if($op eq 'substr') {
