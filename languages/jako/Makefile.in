@@ -6,7 +6,7 @@
 
 DIR=languages/jako
 TOOL_DIR=../..
-ASM=perl -I ../../ ../../assemble.pl
+ASM=perl -I ../../lib ../../assemble.pl
 JAKOC=./jakoc
 INTERP=../../${test_prog}
 
