@@ -1,10 +1,10 @@
 /*
  * optimizer.c
  *
- * pre_optimizer  run before CFG
- * optimizer      after CFG is built
- * post_optimizer after register allocation
- *
+ * Optimization occurs in three stages:
+ *  1) pre_optimizer -- runs before control flow graph (CFG) is built
+ *  2) optimizer     -- runs after CFG is built, but before register allocation
+ *  3) post_optimizer -- runs after register allocation
  */
 #include <string.h>
 #include "imc.h"
@@ -15,7 +15,7 @@
  * pre_optimizer
  * -------------
  *
- * runs before CFG is built
+ * Runs before CFG is built.
  *
  * if_branch ... converts if/branch/label
  * unused_label ... deletes them (as L1 above)
@@ -30,9 +30,9 @@
  *
  * used_once ... deletes assignments, when LHS is unused
  * dead_code_remove ... deletes e.g. blocks that are not entered from
- *                      somewhere or ins after a branch, which aren't
- *                      reachable
- * loop_optimization ... pull invariants out of loops
+ *                      somewhere or instructions after a branch which 
+ *                      aren't reachable
+ * loop_optimization ... pulls invariants out of loops
  * TODO e.g. constant_propagation
  *
  * post_optimizer: currently pcc_optimize in pcc.c
@@ -192,8 +192,8 @@ if_branch(Interp *interpreter, IMC_Unit * unit)
     }
 }
 
-/* these are run after constant simplification, so it is
- * guaranteed, that one operand is non constant, if opsize == 4
+/* These are run after constant simplification, so it is
+ * guaranteed that one operand is non constant if opsize == 4
  */
 static void
 strength_reduce(Interp *interpreter, IMC_Unit * unit)
@@ -1056,7 +1056,7 @@ loop_one(Interp *interpreter, IMC_Unit * unit, int bnr)
     int changed = 0;
 
     if (bnr == 0) {
-        warning(interpreter, "loop_one", "wrong loop depth in block 0\n");
+        IMCC_warning(interpreter, "loop_one", "wrong loop depth in block 0\n");
         return 0;
     }
     IMCC_debug(interpreter, DEBUG_OPT2, "loop_one blk %d\n", bnr);
@@ -1098,7 +1098,7 @@ loop_optimization(Interp *interpreter, IMC_Unit * unit)
             prev_depth = l-1;
             IMCC_debug(interpreter, DEBUG_OPT2,"after loop_opt\n");
             if (IMCC_INFO(interpreter)->debug>1)
-                dump_instructions(unit);
+                dump_instructions(interpreter, unit);
             return changed;
         }
     }
