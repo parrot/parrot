@@ -1041,81 +1041,78 @@ sub
 		 'expr', 4,
 sub
 #line 97 "lib/Regex/Grammar.y"
-{ return register('seq', register('start', $_[2]),
-                            $_[3],
-                            register('end', $_[2]));
-   }
+{ return register('group', $_[3], $_[2]) }
 	],
 	[#Rule 20
 		 'expr', 5,
 sub
-#line 102 "lib/Regex/Grammar.y"
+#line 99 "lib/Regex/Grammar.y"
 { return $_[4]; }
 	],
 	[#Rule 21
 		 'range', 5,
 sub
-#line 106 "lib/Regex/Grammar.y"
+#line 103 "lib/Regex/Grammar.y"
 { return { min => $_[2], max => $_[4] }; }
 	],
 	[#Rule 22
 		 'range', 4,
 sub
-#line 108 "lib/Regex/Grammar.y"
+#line 105 "lib/Regex/Grammar.y"
 { return { min => 0, max => $_[3] }; }
 	],
 	[#Rule 23
 		 'range', 4,
 sub
-#line 110 "lib/Regex/Grammar.y"
+#line 107 "lib/Regex/Grammar.y"
 { return { min => $_[2], max => -1 }; }
 	],
 	[#Rule 24
 		 'number', 2,
 sub
-#line 113 "lib/Regex/Grammar.y"
+#line 110 "lib/Regex/Grammar.y"
 { return $_[1] * 10 + $_[2]; }
 	],
 	[#Rule 25
 		 'number', 1,
 sub
-#line 114 "lib/Regex/Grammar.y"
+#line 111 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	],
 	[#Rule 26
 		 'charclass', 4,
 sub
-#line 117 "lib/Regex/Grammar.y"
+#line 114 "lib/Regex/Grammar.y"
 { $_[3] .= '-'; return $_[3]; }
 	],
 	[#Rule 27
 		 'charclass', 3,
 sub
-#line 118 "lib/Regex/Grammar.y"
+#line 115 "lib/Regex/Grammar.y"
 { return $_[2]; }
 	],
 	[#Rule 28
 		 'charclass', 1,
 sub
-#line 119 "lib/Regex/Grammar.y"
+#line 116 "lib/Regex/Grammar.y"
 { return 'ANY'; }
 	],
 	[#Rule 29
 		 'classpieces', 2,
 sub
-#line 122 "lib/Regex/Grammar.y"
+#line 119 "lib/Regex/Grammar.y"
 { $_[1] .= $_[2]; return $_[1]; }
 	],
 	[#Rule 30
 		 'classpieces', 0,
 sub
-#line 123 "lib/Regex/Grammar.y"
+#line 120 "lib/Regex/Grammar.y"
 { return ''; }
 	],
 	[#Rule 31
 		 'classpiece', 3,
 sub
-#line 127 "lib/Regex/Grammar.y"
+#line 124 "lib/Regex/Grammar.y"
 { my $s = $_[1];
       my $p = $s;
       $s .= $p while ($p++ ne $_[3]);
@@ -1125,7 +1122,7 @@ sub
 	[#Rule 32
 		 'classpiece', 1,
 sub
-#line 133 "lib/Regex/Grammar.y"
+#line 130 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	]
 ],
@@ -1133,7 +1130,7 @@ sub
     bless($self,$class);
 }
 
-#line 136 "lib/Regex/Grammar.y"
+#line 133 "lib/Regex/Grammar.y"
 
 
 1;

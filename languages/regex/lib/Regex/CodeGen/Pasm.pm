@@ -56,6 +56,11 @@ sub output_end {
     return "set_keyed P1, $n, I1";
 }
 
+sub output_delete {
+    my ($self, $n) = @_;
+    return "set_keyed P1, $n, -2";
+}
+
 sub output_atend {
     my ($self, $failLabel) = @_;
     return ("le I0, I2, ".$self->output_label_use($failLabel));
@@ -63,21 +68,55 @@ sub output_atend {
 
 sub output_pushmark {
     my ($self) = @_;
-    return "save -1";
+    if ($self->{DEBUG}) {
+	my @ops = ('print "PUSHED: "');
+	if (@_ > 1) {
+	    push @ops, "save \"$_[1]\"";
+	} else {
+	    push @ops, "save \"mark\"";
+	}
+	return (@ops, 'bsr DUMPSTACK');
+    } else {
+	return "save -1";
+    }
 }
 
 sub output_pushindex {
     my ($self) = @_;
-    return "save I1";
+    if ($self->{DEBUG}) {
+	return ("save I1", 'print "PUSHED: "', 'bsr DUMPSTACK');
+    } else {
+	return "save I1";
+    }
 }
 
+use vars qw($DEBUG_LABEL);
 sub output_popindex {
     my ($self, $fallback) = @_;
     die "Must always have fallback defined!" if ! $fallback;
 
-    return ("restore I0",
-            "eq I0, -1, ".$self->output_label_use($fallback),
-            "set I1, I0");
+    if ($self->{DEBUG}) {
+	my $index_popped = [ 'label', '@_DEBUG_' . ++$DEBUG_LABEL ];
+	return ("print \"POPPED: \"",
+		"entrytype I0, 0",
+		"ne I0, 3, ".$self->output_label_use($index_popped),
+		"restore S10",
+		"print S10",
+		"print \"\\n\"",
+		"print \"  \"",
+		"bsr DUMPSTACK",
+		"branch ".$self->output_label_use($fallback),
+		$self->output_label_def($index_popped),
+		"restore I0",
+		"set I1, I0",
+		"bsr DUMPSTRING",
+		"print \"  \"",
+		"bsr DUMPSTACK");
+    } else {
+	return ("restore I0",
+		"eq I0, -1, ".$self->output_label_use($fallback),
+		"set I1, I0");
+    }
 }
 
 1;

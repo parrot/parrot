@@ -33,6 +33,26 @@ sub rewrite_try {
     return $self->rewrite($R, $lastback);
 }
 
+# This is much complicated by the need to delete groups that are backtracked
+# through.
+sub rewrite_group {
+    my ($self, $R, $group, $lastback) = @_;
+    my $doit = $self->mark("group");
+    my $back = $self->mark("group_back");
+
+    my ($R_back, @R_ops) = $self->rewrite($R, $back);
+
+    my @ops = (         aop_goto($doit),
+	       $back => aop_delete($group),
+	                aop_goto($lastback),
+	       $doit => aop_start($group),
+	                @R_ops,
+	                aop_end($group),
+	       );
+
+    return ($R_back, @ops);
+}
+
 sub rewrite_other {
     my ($self, $op, $lastback) = @_;
     return bless [ @$op, $lastback ], 'asm_op';

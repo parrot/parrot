@@ -58,16 +58,18 @@ sub rewrite_alternate {
     my ($R_back, @R_ops) = $self->rewrite($R, $fail);
     my ($S_back, @S_ops) = $self->rewrite($S, $fail);
 
-    return $S_back, (
-                     aop_pushmark(),
+    return $back, (
+                     aop_pushmark("|"),
                      aop_pushindex(),
                      @R_ops,
+                     aop_pushmark("|R"),
+                     aop_pushindex(),
                      aop_goto($next),
             $back => aop_popindex($S_back),
                      aop_popindex($R_back),
             $fail => aop_popindex($lastback),
                      @S_ops,
-                     aop_pushmark(),
+                     aop_pushmark("|S"),
             $next =>
                     );
 }
@@ -84,7 +86,7 @@ sub rewrite_star {
         my $loop = $self->mark('loop');
         @ops =
 (
-                aop_pushmark(),
+                aop_pushmark("*"),
        $loop => aop_pushindex(),
                 @R_ops,
                 aop_goto($loop),
@@ -113,7 +115,7 @@ sub rewrite_plus {
         my $loop = $self->mark('plus_loop');
         my (undef, @R_ops) = $self->rewrite($R, $back);
         @ops = (
-                         aop_pushmark(),
+                         aop_pushmark("+"),
                 $loop => @R_ops,
                          aop_pushindex(),
                          aop_goto($loop),
@@ -143,7 +145,7 @@ sub rewrite_greedy_optional {
     my ($R_back, @R_ops) = $self->rewrite($R, $next);
 
     my @ops = (
-                        aop_pushmark(),
+                        aop_pushmark("?"),
                         @R_ops,
                         aop_pushindex(),
                         aop_goto($next),
@@ -162,7 +164,7 @@ sub rewrite_nongreedy_optional {
     my ($R_back, @R_ops) = $self->rewrite($R, $next);
 
     my @ops = (
-                        aop_pushmark(),
+                        aop_pushmark("??"),
                         aop_pushindex(),
                         aop_goto($next),
                $back => aop_popindex($lastback),

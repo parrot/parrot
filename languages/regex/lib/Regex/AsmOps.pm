@@ -13,8 +13,11 @@ use vars qw(@AsmOps @EXPORT);
     [ "onfail(R)" ],
     [ "bytematch(b)" => "return if start of input is b, advance 1 char" ],
     [ "classmatch(charclass)" => "return if start of input is charclass, advance 1" ],
+
     [ "start(n)" => "mark start of n-th paren match" ],
     [ "end(n)" => "mark end of n-th paren match" ],
+    [ "delete(n)" => "delete record of n-th paren match" ],
+
     [ "goto(label)" => "unconditional jump to label" ],
     [ "label(name)" => "declare a label" ],
     [ "incr(name)" => "???" ],

@@ -94,10 +94,7 @@ expr : expr '|' expr
      | expr range '?'
    { return register('multi_match', $_[2]->{min}, $_[2]->{max}, FALSE, $_[1]); }
      | '(' { ++$::paren } expr ')'
-   { return register('seq', register('start', $_[2]),
-                            $_[3],
-                            register('end', $_[2]));
-   }
+   { return register('group', $_[3], $_[2]) }
      | '(' '?' ':' expr ')'
    { return $_[4]; }
 ;

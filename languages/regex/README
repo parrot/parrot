@@ -3,17 +3,77 @@ languages/regex: Compile regular expressions into optimized bytecode.
 CURRENT STATUS
 ==============
 
-This won't work very well without a couple of other patches that I'll
-be sending to the list Real Soon Now.
+Everything should be more or less working, though many operators are
+untested. Theoretically, this release should support:
 
-Somewhat buggy. The 're' style regular expressions are less buggy, but
-also useless to anyone else because the supporting code isn't in the
-tree (and probably never will be; if anything, I'll merge it in with
-the rx code. Copies available on request, though.)
+ RS      - sequences
+ R|S     - alternation
+ R*      - greedy Kleene closure
+ R*?     - nongreedy/parsimonious Kleene closure
+ R?      - greedy optional
+ R??     - nongreedy/parsimonious optional
+ R+      - greedy one or more (more or one?)
+ R+?     - nongreedy one or more
+ (R)     - capturing groups
+ (?:R)   - noncapturing grouping
+ a       - codepoint literals
 
-Alternation does not work for complex expressions.
+Regular expressions are compiled down to regular opcodes, not to the
+rx_* set of opcodes. P0 and P1 are PerlArrays containing the starting
+and ending indexes, respectively, of () groups. The user stack is used
+as the backtracking stack. See rx.ops for a good description of how
+operators are converted to code sequences. Marks are the value '-1';
+indices are nonnegative integers. (Except in debugging mode, when
+marks are instead strings describing what they're marking.)
 
-The test harness depends on more of those patches I talked about.
+Optimizations implemented (notation: parentheses here non-capturing):
+
+ aR|aS    -> a(R|S)
+ R|       -> R?
+ |R       -> R??
+
+Future plans:
+
+Relatively soon, I would like to add array-based regular
+expressions. A simple cut of this should be nearly trivial.
+
+Near-term optimizations planned:
+
+ Simple subexpression alternation: the code for alternations can be
+ simplified if the subexpressions do not contain backtrack points.
+
+ Disjunctive alternation: if you see R|S, and know that only one of R
+ or S will ever hold at a given point in any input, then no
+ backtracking information needs to be kept. For example, consider
+ cat|fish (or somewhat more generally, cR|fS). The input cannot both
+ start with c and f, so just matching 'c' first. If it matches, keep
+ it and never go back to trying 'f'. Otherwise, forget about it
+ completely and try 'f'.
+
+ As a follow-on to the above, implement jump tables.
+    c    -> $start_R
+    f    -> $start_S
+    else -> backtrack
+
+ Multi-character literals: currently, "abc" expands to "match a then
+ match b then match c". I don't plan to do a substring match anytime
+ soon, but I would like to eliminate two of the three end-of-input tests.
+
+Longer-term optimization vague ideas:
+
+ Find maximal subsequences of regex ops that can be converted to
+ DFAs. Translate them into in-line DFAs. The jump tables above are a
+ primitive form of this. The hard part is figuring out whether a DFA
+ would produce exactly the same results as an NFA for a given
+ expression.
+
+BUGS
+====
+
+I suspect I'm making a mess of the user stack when regular expressions
+succeed. I need to add a preamble that remembers the depth of the
+initial stack, and a postamble that pops stuff off until it's back to
+the original depth.
 
 DEVELOPER NOTES
 ===============

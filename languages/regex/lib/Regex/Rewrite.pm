@@ -87,6 +87,11 @@ sub rewrite_seq {
     return @_;
 }
 
+sub rewrite_group {
+    my ($self, $R, $group) = @_;
+    return rop_seq(aop_start($group), $R, aop_end($group));
+}
+
 sub rewrite_other {
     my ($self, $op) = @_;
     return (bless $op, 'asm_op');
