@@ -22,11 +22,17 @@ unicode_transcode_to(const char *to) {
     return NULL;
 }
 
+static BOOLVAL
+unicode_is_digit(INTVAL c) {
+    return isdigit(c) ? 1 : 0; /* FIXME - Other code points are also digits */
+}
+
 const CHARTYPE unicode_chartype = {
     "unicode",
     "utf32",
     unicode_transcode_from,
-    unicode_transcode_to
+    unicode_transcode_to,
+    unicode_is_digit
 };
 
 /*

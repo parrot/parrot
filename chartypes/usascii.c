@@ -45,11 +45,17 @@ usascii_transcode_to(const char *to) {
     }
 }
 
+static BOOLVAL
+usascii_is_digit(INTVAL c) {
+    return isdigit(c) ? 1 : 0;
+}
+
 const CHARTYPE usascii_chartype = {
     "usascii",
     "singlebyte",
     usascii_transcode_from,
-    usascii_transcode_to
+    usascii_transcode_to,
+    usascii_is_digit
 };
 
 /*

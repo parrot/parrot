@@ -220,7 +220,7 @@ string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL fl
     if(a != NULL) {
         if (b == NULL || b->strlen == 0) {
             return a;
-        }  
+        }
         if (a->type != b->type || a->encoding != b->encoding) {
             b = string_transcode(interpreter, b, a->encoding, a->type, NULL);
         }
@@ -332,22 +332,138 @@ string_compare(struct Parrot_Interp *interpreter, STRING* s1, STRING* s2) {
     return cmp;
 }
 
+/* A number is such that:
+  sign           =  '+' | '-'
+  digit          =  '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+  indicator      =  'e' | 'E'
+  digits         =  digit [digit]...
+  decimal-part   =  digits '.' [digits] | ['.'] digits
+  exponent-part  =  indicator [sign] digits
+  numeric-string =  [sign] decimal-part [exponent-part]
+
+  An integer is the appropriate integer representation of such a number,
+  rounding towards zero.
+*/
+
 INTVAL string_to_int (struct Parrot_Interp *interpreter, STRING *s) {
-    if (s == NULL) {
-        return 0;
+    INTVAL i = 0;
+
+    if (s) {
+        char *start = s->bufstart;
+        char *end = start + s->bufused;
+        int sign = 1;
+        BOOLVAL in_number = 0;
+
+        while (start < end) {
+            INTVAL c = s->encoding->decode(start);
+
+            if (s->type->is_digit(c)) {
+                in_number = 1;
+                i = i * 10 + (c - '0');
+            }
+            else if (!in_number) {
+                /* we've not yet seen any digits */
+                if (c == '-') {
+                    sign = -1;
+                }
+                else {
+                    sign = 1;
+                }
+            }
+            else {
+                break;
+            }
+
+            start = s->encoding->skip_forward(start, 1);
+        }
+
+        i = i * sign;
     }
-    else {
-        return s->encoding->extract_int(s->bufstart, s->bufused);
-    }
+
+    return i;
 }
 
 FLOATVAL string_to_num (struct Parrot_Interp *interpreter, STRING *s) {
-    if (s == NULL) {
-        return 0.0;
+    FLOATVAL f = 0.0;
+
+    if (s) {
+        char *start = s->bufstart;
+        char *end = start + s->bufused;
+        int sign = 1;
+        BOOLVAL seen_dot = 0;
+        BOOLVAL seen_e = 0;
+        int exp_sign = 0;
+        BOOLVAL in_exp = 0;
+        BOOLVAL in_number = 0;
+        INTVAL exponent = 0;
+        INTVAL fake_exponent = 0;
+
+        while (start < end) {
+            INTVAL c = s->encoding->decode(start);
+
+            if (s->type->is_digit(c)) {
+                if (in_exp) {
+                    exponent = exponent * 10 + (c - '0');
+                    if (!exp_sign) {
+                        exp_sign = 1;
+                    }
+                }
+                else {
+                    /* We're somewhere in the main string of numbers */
+                    in_number = 1;
+                    f = f * 10 + (c - '0');
+                    if (seen_dot) {
+                        fake_exponent--;
+                    }
+                }
+            }
+            else if (!in_number) {
+                /* we've not yet seen any digits */
+                if (c == '-') {
+                    sign = -1;
+                }
+                else if (c == '.') {
+                    seen_dot = 1;
+                }
+                else {
+                    seen_dot = 0;
+                    sign = 1;
+                }
+            }
+            else {
+                /* we've seen some digits, are we done yet? */
+                if (!seen_dot && c == '.' && !in_exp) {
+                    seen_dot = 1;
+                }
+                else if (!seen_e && (c == 'e' || c == 'E')) {
+                    seen_e = 1;
+                    in_exp = 1;
+                }
+                else if (seen_e && !exp_sign) {
+                    if (c == '+') {
+                        exp_sign = 1;
+                    }
+                    else if (c == '-') {
+                        exp_sign = -1;
+                    }
+                    else {
+                        break; /* e-- is silly */
+                    }
+                }
+                else {
+                    break; /* run out of number, all done */
+                }
+            }
+
+            start = s->encoding->skip_forward(start, 1);
+        }
+
+        exponent = fake_exponent + exponent * exp_sign;
+
+        f = f * sign * pow(10, exponent); /* ugly, oh yeah */
     }
-    else {
-        return s->encoding->extract_num(s->bufstart, s->bufused);
-    }
+
+    return f;
 }
 
 /*

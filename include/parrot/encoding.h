@@ -18,8 +18,6 @@ typedef struct {
     INTVAL max_bytes;
     INTVAL (*characters)(const void *ptr, INTVAL bytes);
     INTVAL (*decode)(const void *ptr);
-    INTVAL (*extract_int)(const void *ptr, INTVAL length);
-    FLOATVAL (*extract_num)(const void *ptr, INTVAL length);
     void *(*encode)(void *ptr, INTVAL c);
     void *(*skip_forward)(void *ptr, INTVAL n);
     void *(*skip_backward)(void *ptr, INTVAL n);

@@ -20,6 +20,7 @@ typedef struct {
     const char *default_encoding;
     CHARTYPE_TRANSCODER (*transcode_from)(const char *from);
     CHARTYPE_TRANSCODER (*transcode_to)(const char *to);
+    BOOLVAL (*is_digit)(INTVAL c);
 } CHARTYPE;
 
 const CHARTYPE *

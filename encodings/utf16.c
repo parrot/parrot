@@ -56,16 +56,6 @@ utf16_decode (const void *ptr) {
     return c;
 }
 
-static INTVAL
-utf16_extract_int (const void *ptr, INTVAL length) {
-    return 0; /* XXX: Write me! */
-}
-
-static FLOATVAL
-utf16_extract_num (const void *ptr, INTVAL length) {
-    return 0.0; /* XXX: Write me! */
-}
-
 static void *
 utf16_encode (void *ptr, INTVAL c) {
     utf16_t *u16ptr = ptr;
@@ -137,8 +127,6 @@ const ENCODING utf16_encoding = {
     UTF16_MAXLEN,
     utf16_characters,
     utf16_decode,
-    utf16_extract_int,
-    utf16_extract_num,
     utf16_encode,
     utf16_skip_forward,
     utf16_skip_backward

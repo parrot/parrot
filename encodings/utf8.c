@@ -76,16 +76,6 @@ utf8_decode (const void *ptr) {
     return c;
 }
 
-static INTVAL
-utf8_extract_int (const void *ptr, INTVAL length) {
-    return 0;/* XXX: write me! */
-}
-
-static FLOATVAL
-utf8_extract_num (const void *ptr, INTVAL length) {
-    return 0.0; /* XXX: write me! */
-}
-
 static void *
 utf8_encode (void *ptr, INTVAL c) {
     utf8_t *u8ptr = ptr;
@@ -134,8 +124,6 @@ const ENCODING utf8_encoding = {
     UTF8_MAXLEN,
     utf8_characters,
     utf8_decode,
-    utf8_extract_int,
-    utf8_extract_num,
     utf8_encode,
     utf8_skip_forward,
     utf8_skip_backward

@@ -56,6 +56,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <ctype.h>
 
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1
