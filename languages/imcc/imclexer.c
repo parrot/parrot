@@ -961,7 +961,7 @@ YY_RULE_SETUP
         if (expect_pasm == 2)
 	  BEGIN(INITIAL);
         expect_pasm = 0;
-        if (frames) line++;
+        line++;
         return '\n';
     }
 	YY_BREAK
