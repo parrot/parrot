@@ -699,10 +699,11 @@ C<what>.
         }
 
         if (!n)
-            ret->cache.int_val = -1;
-
-        if (ret->cache.int_val > 0)
-            PMC_data(key) = string_pointer_to_index(INTERP, s, ret->cache.int_val);
+            PMC_int_val(ret) = -1;
+    
+        if (PMC_int_val(ret) > 0)
+            PMC_data(key) = string_pointer_to_index(INTERP, s, 
+                                                    PMC_int_val(ret));
          /* else do what? */
 
         return ret;
