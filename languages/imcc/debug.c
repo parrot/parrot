@@ -131,6 +131,7 @@ void dump_loops() {
                 fprintf(stderr, "%d ", j);
         fprintf(stderr, "\n");
     }
+    fprintf(stderr, "\n");
 }
 
 void

@@ -299,7 +299,12 @@ iANY(struct Parrot_Interp *interpreter, char * name,
                     /* inout is actually in for imcc, the PMC has to exist
                      * previously, so:
                      * goon
+                     *     except: set_p_p_k? keyed fetch
                      */
+                     if (i == 0 && r[i]->set == 'P' && (keyvec & KEY_BIT(2))) {
+                        dirs |= 1 << (16 + i);
+                        break;
+                     }
                      if (r[i]->set != 'P')
                         dirs |= 1 << (16 + i);
 	    case PARROT_ARGDIR_IN:

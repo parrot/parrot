@@ -16,6 +16,19 @@
 #include "imc.h"
 #include "optimizer.h"
 
+/* recalculate CFG and register life for all syms, with this
+ * set to 1, the old and slow routines are used
+ * with 0, this info is recalced on the fly during spilling
+ */
+#define DOIT_AGAIN_SAM 0
+
+#define SPILL_STRESS 0
+
+#if SPILL_STRESS
+# undef MAX_COLOR
+# define MAX_COLOR 8
+#endif
+
 static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
 static void print_stat(void);
@@ -98,13 +111,15 @@ void allocate(struct Parrot_Interp *interpreter) {
             allocated = 0;
             spill(interpreter, to_spill);
             /*
-             * TODO build the new cfg/reglist on the fly in spill() and
+             * build the new cfg/reglist on the fly in spill() and
              * do life analysis there for only the involved regs
              */
+#if DOIT_AGAIN_SAM
             find_basic_blocks();
             build_cfg();
             build_reglist();
             life_analysis();
+#endif
         }
         else {
             /* the process is finished */
@@ -676,15 +691,60 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
     return free_colors;
 }
 
+#if ! DOIT_AGAIN_SAM
+/* update bb and life_info after spilling
+ * this saves 4 costy routines
+ * NOTE {lhs_,}use_count are not set again, this is save, when no
+ *      further optimization pass follows
+ */
+static void
+update_life(Instruction *ins, SymReg *r, int needs_fetch, int needs_store,
+        int add)
+{
+    Life_range *l;
+    int i;
+
+    /* add this sym to reglist, if not there */
+    if (add) {
+        reglist = realloc(reglist, (n_symbols + 1) * sizeof(SymReg *));
+        reglist[n_symbols++] = r;
+    }
+
+    r->first_ins = r->last_ins = ins;
+    if (needs_fetch) {
+        /* prev instructions is a fetch then and the first usage of this reg */
+        r->first_ins = ins->prev;
+        /* if this ins was the first of a BB, then the fetch is the
+         * first ins then
+         */
+        if (ins == bb_list[ins->bbindex]->start)
+            bb_list[ins->bbindex]->start = ins->prev;
+    }
+    if (needs_store) {
+        /* next ins is a store then, and ends life of this reg */
+        r->last_ins = ins->next;
+        if (ins == bb_list[ins->bbindex]->end)
+            bb_list[ins->bbindex]->end = ins->next;
+    }
+    /* now set life_info */
+    free_life_info(r);
+    r->life_info = calloc(n_basic_blocks, sizeof(Life_range*));
+    for (i=0; i < n_basic_blocks; i++)
+        make_life_range(r, i);
+    l = r->life_info[ins->bbindex];
+    l->first_ins = r->first_ins;
+    l->last_ins = r->last_ins;
+}
+#endif
+
 /* Rewrites the instructions list, inserting spill code in every ocurrence
  * of the symbol.
  */
 
-
 void spill(struct Parrot_Interp *interpreter, int spilled) {
 
     Instruction * tmp, *ins;
-    int i, n;
+    int i, n, dl;
     int needs_fetch, needs_store;
     SymReg * old_symbol, *p31, *new_symbol;
     char * buf;
@@ -698,11 +758,14 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
     debug(DEBUG_IMC, "#Spilling [%s]:\n", reglist[spilled]->name);
 
     new_symbol = old_symbol = reglist[spilled];
+    if (old_symbol->usage & U_SPILL)
+        fatal(1, "spill", "double spill - program too complex\n");
     new_symbol->usage |= U_SPILL;
     p31 = mk_pasm_reg(str_dup("P31"));
 
     n_spilled++;
     n = 0;
+    dl = 0;     /* line corr */
 
     for(ins = instructions; ins; ins = ins->next) {
 
@@ -714,6 +777,8 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
 
 	if (instruction_writes (ins, old_symbol) && !(ins->flags & ITSPILL))
 	    needs_store = 1;
+        if (dl)
+            ins->index += dl;
 
 	if (needs_fetch) {
 	    regs[0] = new_symbol;
@@ -724,8 +789,11 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
 	    tmp = INS(interpreter, "set", buf, regs, 3, 4, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
+            tmp->index = ins->index;
+            ins->index++;
             /* insert tmp before actual ins */
             insert_ins(ins->prev, tmp);
+            dl++;
 	}
         /* change all occurance of old_symbol to new */
         for (i = 0; old_symbol != new_symbol && ins->r[i] &&
@@ -743,7 +811,8 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
             tmp->flags |= ITSPILL;
             /* insert tmp after ins */
             insert_ins(ins, tmp);
-            ins = tmp;
+            tmp->index = ins->index + 1;
+            dl++;
 	}
         /* if all symbols are in one basic_block, we need a new
          * symbol, so that the life_ranges are minimal
@@ -751,18 +820,27 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
          * is necessary.
          */
         if (needs_fetch || needs_store) {
+#if ! DOIT_AGAIN_SAM
+            /* update life info of prev sym */
+            update_life(ins, new_symbol, needs_fetch, needs_store,
+                    old_symbol != new_symbol);
+#endif
             sprintf(buf, "%s_%d", old_symbol->name, n++);
             new_symbol = mk_symreg(str_dup(buf), old_symbol->set);
             new_symbol->usage |= U_SPILL;
+            if (needs_store)    /* advance past store */
+                ins = tmp;
         }
     }
 
     free(buf);
 
+#if DOIT_AGAIN_SAM
     /* update index */
     for(i = 0, ins = instructions; ins; ins = ins->next) {
 	ins->index = i++;
     }
+#endif
     if (IMCC_DEBUG & DEBUG_IMC)
         dump_instructions();
 
