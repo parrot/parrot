@@ -367,6 +367,9 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_lwz(pc, D, disp, A) \
     jit_emit_2reg(pc, 32, D, A, disp)
 
+#  define jit_emit_lwzx(pc, D, A, B) \
+    jit_emit_3reg_x(pc, 31, D, A, B, 23, 0)
+
 #  define jit_emit_stw(pc, S, disp, A) \
     jit_emit_2reg(pc, 36, S, A, disp)
 
@@ -589,11 +592,21 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 #  define jit_emit_branch_to_opcode(pc, D) \
     jit_emit_sub_rrr(jit_info->native_ptr, ISR1, D, r15); \
-    jit_emit_add_rrr(jit_info->native_ptr, ISR1, r14, ISR1); \
-    jit_emit_lwz(jit_info->native_ptr, ISR1, 0, ISR1); \
+    jit_emit_lwzx(jit_info->native_ptr, ISR1, ISR1, r14); \
     jit_emit_mtctr(jit_info->native_ptr, ISR1); \
     jit_emit_bctrl(jit_info->native_ptr)
 
+#if PARROT_EXEC_OS_AIX /* support AIX calling convention using compiler intermediary _ptrgl */
+#  define jit_emit_call_func(pc, addr) \
+    jit_emit_mov_ri_i(jit_info->native_ptr, ISR1, (long)*((long*)(addr))); \
+    jit_emit_mtctr(jit_info->native_ptr, ISR1); \
+    jit_emit_bctrl(jit_info->native_ptr);
+#else
+#  define jit_emit_call_func(pc, addr) \
+    jit_emit_mov_ri_i(jit_info->native_ptr, ISR1, (long)(addr)); \
+    jit_emit_mtctr(jit_info->native_ptr, ISR1); \
+    jit_emit_bctrl(jit_info->native_ptr);
+#endif
 
 #  if EXEC_CAPABLE
 #   define load_nc(pc, D, disp) \
@@ -607,16 +620,21 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 #endif /* JIT_EMIT */
 
+void Parrot_ppc_jit_restore_nonvolatile_registers(void);
+
 /*
  * r13 - r31 are preserved i.e. 19 GPRs
+ * f14 - f31 are preserved
+ * (these are all of the nonvolatile registers)
  */
-#define PPC_JIT_REGISTER_SAVE_SPACE (4*19)
+#define PPC_JIT_GP_REGISTER_SAVE_SPACE (4*19)
+#define PPC_JIT_FP_REGISTER_SAVE_SPACE (8*18)
 /*
  * 24 linkage area
  * 32 param area i.e.enough for 8 args
  * 12 round up so that sum is divisible by 16
  */
-#define PPC_JIT_FRAME_SIZE (PPC_JIT_REGISTER_SAVE_SPACE + 68)
+#define PPC_JIT_FRAME_SIZE (PPC_JIT_GP_REGISTER_SAVE_SPACE + PPC_JIT_FP_REGISTER_SAVE_SPACE + 68)
 
 #if JIT_EMIT == 2
 /*
@@ -627,8 +645,14 @@ void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
 {
+    int i;
     jit_emit_mflr(jit_info->native_ptr, r0);
-    jit_emit_stmw(jit_info->native_ptr, r13, -PPC_JIT_REGISTER_SAVE_SPACE, r1);
+    jit_emit_stmw(jit_info->native_ptr, r13, -PPC_JIT_GP_REGISTER_SAVE_SPACE, r1);
+
+    for( i = 1; i <= 18; ++i )
+    {
+        jit_emit_stfd(jit_info->native_ptr, (i + 13), (-PPC_JIT_GP_REGISTER_SAVE_SPACE - i*8), r1);
+    }
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1);
     jit_emit_stwu(jit_info->native_ptr, r1, -PPC_JIT_FRAME_SIZE, r1);
     jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
@@ -673,16 +697,8 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     _emit_bx(jit_info->native_ptr, 1, 0);
     */
 
-#   if PARROT_EXEC_OS_AIX
-    /* support AIX calling convention using compiler intermediary _ptrgl */
-    jit_emit_mov_ri_i(jit_info->native_ptr, ISR1, (long)
-            *((long*)(interpreter->op_func_table[*(jit_info->cur_op)])));
-#   else
-    jit_emit_mov_ri_i(jit_info->native_ptr, ISR1,
-            (long)(interpreter->op_func_table[*(jit_info->cur_op)]));
-#   endif
-    jit_emit_mtctr(jit_info->native_ptr, ISR1);
-    jit_emit_bctrl(jit_info->native_ptr);
+    jit_emit_call_func(jit_info->native_ptr,
+                       interpreter->op_func_table[*(jit_info->cur_op)]);
 }
 
 void
@@ -827,11 +843,11 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
 
 #  define REQUIRES_CONSTANT_POOL 0
 #  ifdef PARROT_EXEC_OS_AIX
-#    define INT_REGISTERS_TO_MAP 22
+#    define INT_REGISTERS_TO_MAP 14
 #  else
-#    define INT_REGISTERS_TO_MAP 23
+#    define INT_REGISTERS_TO_MAP 14
 #  endif
-#  define FLOAT_REGISTERS_TO_MAP 12
+#  define FLOAT_REGISTERS_TO_MAP 18
 
 /* 
  * Register usage
@@ -859,22 +875,22 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
 char intval_map[INT_REGISTERS_TO_MAP] =
 
     { r17, r18, r19, r20, r21, r22, r23,
-      r24, r25, r26, r27, r28, r29, r30,
+      r24, r25, r26, r27, r28, r29, r30
 #  ifndef PARROT_EXEC_OS_AIX
       /* AIX calling convention reserves r2 */
-      r2,
+      /* r2, */
 #  endif
-      r3, r4, r5, r6, r7, r8, r9, r10 };
+      /* r3, r4, r5, r6, r7, r8, r9, r10 */ };
 /*
- * f14 - f31 are not preserved currently
- * f1  - f11 are usable without preserving
+ * f0, f13 are used as scratch registers
+ * f1  - f12 are (additional) volatile registers
+ * f14 - f31 are not nonvolatile, and preserved in begin/end
  */
 char floatval_map[FLOAT_REGISTERS_TO_MAP] =
     { 
-      f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12
-      /* not currently saved - so don't use */     
-      /* f14, f15, f16, f17, f18, f19, f20, f21,
-      f22, f23, f24, f25, f26, f27, f28, f29, f30, f31 */ 
+      /* f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12 */
+      f14, f15, f16, f17, f18, f19, f20, f21,
+      f22, f23, f24, f25, f26, f27, f28, f29, f30, f31 
     };
 
 void ppc_flush_line(char *_sync);

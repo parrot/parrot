@@ -10,8 +10,12 @@
 Parrot_end {
     jit_emit_lwz(NATIVECODE, r1, 0, r1);
     jit_emit_lwz(NATIVECODE, r0, 8, r1);
+
+	jit_emit_call_func(NATIVECODE, (void *)Parrot_ppc_jit_restore_nonvolatile_registers);
+
     jit_emit_mtlr(NATIVECODE, r0);
-    jit_emit_lmw(NATIVECODE, r13, -PPC_JIT_REGISTER_SAVE_SPACE, r1);
+    jit_emit_lmw(NATIVECODE, r13, -PPC_JIT_GP_REGISTER_SAVE_SPACE, r1);
+
     jit_emit_blr(NATIVECODE);
 }
 
@@ -919,3 +923,34 @@ Parrot_branch_i {
     jit_emit_blr(NATIVECODE);
 }
 
+TEMPLATE Parrot_set_or_clone_s_sc {
+; string_copy(Interp *interpreter, STRING *s)
+    jit_emit_mov_rr(NATIVECODE, r3, r13);
+    jit_emit_mov_ri_i(NATIVECODE, r4, CONST(2)->u.string);
+
+    jit_emit_call_func(NATIVECODE, (void*) string_copy);
+
+    jit_emit_mov_mr_i(NATIVECODE, &STRING_REG[1], r3);
+}
+
+Parrot_set_s_sc {
+    Parrot_set_or_clone_s_sc
+}
+
+Parrot_clone_s_sc {
+    Parrot_set_or_clone_s_sc
+}
+
+Parrot_set_s_s {
+	jit_emit_mov_rm_i(NATIVECODE, ISR1, &STRING_REG[2]); 
+	jit_emit_mov_mr_i(NATIVECODE, &STRING_REG[1], ISR1); 
+}
+
+Parrot_clone_s_s {
+    jit_emit_mov_rr(NATIVECODE, r3, r13);
+    jit_emit_mov_rm_i(NATIVECODE, r4, &STRING_REG[2]);
+
+    jit_emit_call_func(NATIVECODE, (void*) string_copy);
+
+    jit_emit_mov_mr_i(NATIVECODE, &STRING_REG[1], r3);
+}
