@@ -79,6 +79,26 @@ END
 }
 
 # Alternation
+#   Creates a backtracking label.
+#   Code for an alternation looks like this:
+#	    push offset
+#	    <code for alt 1, fail => goto fail1>
+#	    push 1	(== last branch)
+#	    goto succ
+#	fail1:
+#	    <code for alt 2, fail => goto fail2>
+#	    ...
+#	failN:		(== fail alt)
+#	    pop offset
+#	    goto fail
+#	backtrack:	(backtrack alternation)
+#	    pop last_alt
+#	    pop offset
+#	    re-push offset
+#	    if last_alt == 1 goto fail1
+#	    ...
+#	    if last_alt == n goto failN
+#	next:
 sub P6C::rx_alt::rx_val {
     my ($x, $ctx) = @_;
 
@@ -146,6 +166,14 @@ END
     return $bt;
 }
 
+# Sequence
+#   Does not create a backtracking label.
+#
+#	<code for element 1, fail => fail>
+#	...
+#	<code for element N, fail => fail>
+#   next:
+#
 sub P6C::rx_seq::rx_val {
     my ($x, $ctx) = @_;
     my %ctx = %$ctx;
@@ -159,6 +187,22 @@ sub P6C::rx_seq::rx_val {
     return $ctx{fail};
 }
 
+# @array == literal alternation
+#
+#	Note: this should probably be a special opcode that builds an
+#	Aho-Corasic matcher to do all branches at once.
+#
+#   Code:
+#	
+#	push pos
+#	current = -1
+#   back:
+#	current++
+#	pop pos
+#	if which == last goto fail
+#	push pos
+#	rx_literal @array[current], fail => back
+#
 sub rx_alt_array {
     my ($x, $ctx) = @_;
     my $which = gentmp 'int';
@@ -184,6 +228,12 @@ END
     return $bt;    
 }
 
+# Any atom.
+#
+#   For regex-aware items, just emit their code.
+#   For an embedded closure, just emit its code.
+#   For anything else, put its value in a string temporary, and match
+#   against that.
 sub P6C::rx_atom::rx_val {
     my ($x, $ctx) = @_;
     if ($x->capture) {
@@ -195,17 +245,13 @@ sub P6C::rx_atom::rx_val {
 	$ctx{failatom} = $ctx{fail};
 	$ctx{failatom_depth} = 0;
 	$ctx{fail} = $x->atom->rx_val({ %ctx });
+    } elsif (ref($x->atom) eq 'ARRAY') {
+	# codeblock
+	$_->val for @{$x->atom};
+
     } else {
 	my $lit;
 	if (ref($x->atom) eq 'ARRAY') {
-	    # codeblock
-	    # XXX: since we don't support return values, blocks in
-	    # regexes will have undefined values.  Make them the empty
-	    # string.
-	    $lit = '""';
-
-	    $_->val for @{$x->atom};
-
 	} elsif ($x->atom->isa('P6C::sv_literal') && is_string($x->atom->type)) {
 	    # Literal string => avoid going through temporaries.
 	    $lit = $x->atom->lval;
@@ -231,6 +277,31 @@ END
     return $ctx{fail};		# can't backtrack
 }
 
+# Greedy repeat with runtime limits.
+#
+#   Note: I doubt this is actually right.  For example, the first
+#   repetition should probably backtrack into the rep when it fails
+#   instead of failing the whole <$n,$m>.
+#
+#	push mark
+#	count = n
+#   min:
+#	if --count < 0 goto saw_min
+#	<code for item, succ => min>
+#   saw_min:
+#	push mark
+#	count = count - m
+#   max:
+#	if --count < 0 goto succ
+#	push pos
+#	<code for item, succ => max, fail => internal_fail>
+#   external_fail:
+#	pop pos, fail => backtrack min
+#	push pos
+#	goto backtrack for item
+#   internal_fail:
+#	pop pos, fail => backtrack min
+#
 sub do_var_repeat {
     my ($x, $ctx) = @_;
     my $n = ref($x->min) ? $x->min->val : $x->min;
@@ -284,6 +355,41 @@ END
     return $loopfailex;
 }
 
+# Frugal quantifier
+#
+#   Note: +? and *? currently don't backtrack into the item they
+#   modify.  <n,m> is not right.  I need to think about this more and
+#   rewrite it if we don't move over to using languages/regex for
+#   this...
+#
+#   For +?:
+#
+#	<code for item, fail => fail>
+#	goto succ
+#   back:
+#	<code for item, fail => fail>
+#
+#   For ??:
+#
+#	goto succ
+#   back:
+#	<code for item, fail => fail>
+#
+#   For <n,m>:
+#
+#	push mark
+#	count = -1
+#   min:
+#	if ++count == n goto min_done
+#	<code for item, succ => min, fail => fail>
+#   min_done:
+#	--count
+#	goto succ
+#   max:		(== backtrack destination)
+#	if ++count == m goto backtrack_min_item
+#	<code for item, succ => next, fail => backtrack min>
+#   succ:
+#
 sub do_frugal_rep {
     my ($x, $ctx) = @_;
 #	unimp 'Frugal quantifier {'.$x->min.','.$x->max.'}';
@@ -365,10 +471,10 @@ $mindone:
 	goto $ctx->{succ}
 $loop2:
 	inc $count
-	if $count > $m goto $ctx->{fail}
+	if $count > $m goto $bt
 END
 	    %loopctx = %$ctx;
-	    $loopctx{fail} = $loop2;
+	    $loopctx{fail} = $bt;
 	    $x->thing->rx_val({ %loopctx });
 	    $bt = $loop2;
 	}
@@ -381,6 +487,52 @@ END
     return $bt;
 }
 
+# Greedy repetition
+#
+#   * and +:
+#
+#	push mark
+#   loop:
+#	push pos
+#	<code for item, fail => loop_fail, succ => loop>
+#   external_fail:		(== backtracking target)
+#	pop pos, fail => fail
+#	push pos
+#	goto backtrack_item
+#
+#   loop_fail:
+#	pop pos, fail => fail
+#
+#   ?:
+#
+#	push mark
+#	push pos
+#	<code for item, fail => next>
+#   next:			(== backtracking target)
+#	pop pos, fail => fail
+#
+#
+#   <n,m>:
+#
+#	push mark
+#	count = -1
+#   min:
+#	if ++count == n goto min_done
+#	<code for item, succ => min, fail => fail>
+#   min_done:
+#	push mark
+#	--count
+#   max:
+#	if ++count == m goto max_done
+#	push pos
+#	<code for item, fail => fail_max, succ => max>
+#   external_fail:		(== backtracking target)
+#	pop pos, fail => backtrack_min_item
+#	push pos
+#	goto backtrack_max_item
+#   fail_max:
+#	pop pos, fail => backtrack_min_item
+#
 sub P6C::rx_repeat::rx_val {
     my ($x, $ctx) = @_;
     my $bt;
@@ -520,6 +672,7 @@ END
     return $bt;
 }
 
+# Single character
 sub rx_char {
     my ($ctx, $char) = @_;
     code(<<END);
@@ -527,65 +680,97 @@ sub rx_char {
 END
 }
 
+# Negate a simple rule.
 sub rx_not {
     my ($ctx, $func) = @_;
-    my $maybe_succ = '';
-    if (!defined($ctx->{succ})) {
-	$ctx->{succ} = genlabel;
-	$maybe_succ = "$ctx->{succ}:\n";
-    }
     @{$ctx}{qw(succ fail)} = @{$ctx}{qw(fail succ)};
     $func->($ctx);
     @{$ctx}{qw(succ fail)} = @{$ctx}{qw(fail succ)};
     code(<<END);
 	goto $ctx->{fail}	# rx_not
-$maybe_succ
 END
 }
 
+# - meta-characters
+# - escaped characters
 sub P6C::rx_meta::rx_val {
     my ($x, $ctx) = @_;    
-    if ($x->name eq '.') {
+    my $op = $x->name;
+    my $need_succ;
+    if ($op eq '.') {
 	code(<<END);
 	rx_advance $ctx->{str}, $ctx->{pos}, $ctx->{fail}
 END
 
-    } elsif (length $x->name == 1) {
-	my %rx_not = (N => ord("\n"), T => ord("\t"),
-		      R => ord("\r"), F => ord("\f"),
-		      E => 27);
+    } elsif (length $op == 1) {
+	# XXX: '\n' is supposed to be a _logical_ newline.
+	my %rx_esc = (n => ord("\n"), t => ord("\t"),
+		      r => ord("\r"), f => ord("\f"),
+		      e => 27);
 	my %meta_op = qw(w rx_is_w
 			 d rx_is_d
 			 s rx_is_s
 			 b rx_zwa_boundary);
-	if (exists $rx_not{$1}) {
-	    # XXX: doesn't handle "\r\n".
-	    rx_not($ctx, sub { rx_char($ctx, $rx_not{$1}) });
+	if (exists $rx_esc{$op}) {
+	    rx_char($ctx, $rx_esc{$op});
 
-	} elsif (exists $meta_op{$1}) {
+	} elsif (exists $rx_esc{lc($op)}) {
+	    if (!defined($ctx->{succ})) {
+		$ctx->{succ} = genlabel;
+		$need_succ = 1;
+	    }
+	    rx_not($ctx, sub { rx_char($ctx, $rx_esc{lc($op)}) });
+
+	} elsif (exists $meta_op{$op}) {
 	    code(<<END);
-	$meta_op{$1} $ctx->{str}, $ctx->{pos}, $ctx->{fail}
+	$meta_op{$op} $ctx->{str}, $ctx->{pos}, $ctx->{fail}
 END
+	} elsif (exists $meta_op{lc($op)}) {
+	    # Inverted meta-char
+	    if (!defined($ctx->{succ})) {
+		$ctx->{succ} = genlabel;
+		$need_succ = 1;
+	    }
+	    rx_not($ctx, sub {
+		       code(<<END);
+	$meta_op{$op} $ctx->{str}, $ctx->{pos}, $ctx->{fail}
+END
+		   });
+	} elsif ($op =~ /\w/) {
+	    # \<alpha> probably means something we don't understand.
+	    unimp "Regex escape sequence `$op'";
 	} else {
-	    unimp "Regex escape sequence $1" unless exists $meta_op{$1};
+	    # Escaped "special" character
+	    rx_char($ctx, ord($op));
 	}
 
-    } elsif ($x->name =~ /^X\{?([\da-fA-F0-9]+)/) {
+    } elsif ($op =~ /^X\{?([\da-fA-F0-9]+)/) {
+	# Negated hex
+	if (!defined($ctx->{succ})) {
+	    $ctx->{succ} = genlabel;
+	    $need_succ = 1;
+	}
 	rx_not($ctx, sub { rx_char($ctx, hex $1) });
 	
     } elsif ($x->name =~ /^x\{?([\da-fA-F0-9]+)/) {
+	# Normal hex
 	rx_char($ctx, hex $1);
 	
-    } elsif ($x->name =~ /^0([0-7]+)/) {
+    } elsif ($op =~ /^0([0-7]+)/) {
+	# octal
 	rx_char($ctx, oct $1);
 	
     } else {
-	unimp "Regex meta-sequence `\\".$x->name."'";
+	unimp "Regex meta-sequence `\\$op'";
     }
     maybe_fallthrough($ctx->{succ});
+    code(<<END) if $need_succ;
+$ctx->{succ}:
+END
     return $ctx->{fail};
 }
 
+# Beginning of string
 sub P6C::rx_beg::rx_val {
     my ($x, $ctx) = @_;
     code(<<END);
@@ -595,6 +780,7 @@ END
     return $ctx->{fail};
 }
 
+# End of string
 sub P6C::rx_end::rx_val {
     my ($x, $ctx) = @_;    
     code(<<END);
@@ -603,6 +789,97 @@ END
     maybe_fallthrough($ctx->{succ});
     return $ctx->{fail};
 }
+
+# non-trivial character class
+sub P6C::rx_charclass::rx_val {
+    my ($x, $ctx) = @_;
+    unimp 'Complex or named character class.';
+}
+
+# enumerated character class.
+sub P6C::rx_oneof::rx_val {
+    my ($x, $ctx) = @_;
+    my $rep = $x->rep;
+    my $inv = $x->negated;
+    $rep =~ s/(.)-(.)/join '', map { chr } ord($1) .. ord($2)/eg;
+    my $bmp = gentmp 'pmc';
+    $rep =~ s/(?<!\\)"/\\"/g;
+    code(<<END);
+	rx_makebmp $bmp, "$rep"
+END
+    if ($inv) {
+	rx_not($ctx, sub { 
+		   code(<<END);
+	rx_oneof_bmp $ctx->{str}, $ctx->{pos}, $bmp, $ctx->{fail}
+END
+	       });
+    } else {
+	code(<<END);
+	rx_oneof_bmp $ctx->{str}, $ctx->{pos}, $bmp, $ctx->{fail}
+END
+	maybe_fallthrough($ctx->{succ});
+    }
+    return $ctx->{fail};
+}
+
+# Various <X> assertions:
+# - <'literal string'>
+# - <{ code assertion }>
+sub P6C::rx_assertion::rx_val {
+    my ($x, $ctx) = @_;
+    if ($x->thing->isa('P6C::sv_literal')) {
+	# Literal string result.
+	my $str = $x->thing->lval;
+	$str =~ s/^['"]//;
+	$str =~ s/['"]$//;
+	$str =~ s/(?<!\\)"/\\"/g;
+	if ($x->negated) {
+	    rx_not($ctx, sub {
+		       code(<<END);
+	rx_literal $ctx->{str}, $ctx->{pos}, "$str", $ctx->{fail}
+END
+		   });
+	} else {
+	    code(<<END);
+	rx_literal $ctx->{str}, $ctx->{pos}, "$str", $ctx->{fail}
+END
+	    maybe_fallthrough($ctx->{succ});
+	}
+    } else {
+	my $res = $x->thing->val;
+	my $failop = $x->negated ? 'if' : 'unless';
+	code(<<END);
+	$failop $res goto $ctx->{fail}
+END
+	maybe_fallthrough($ctx->{succ});
+    }
+    return $ctx->{fail};
+}
+
+# Call another rule
+sub P6C::rx_call::rx_val {
+    my ($x, $ctx) = @_;
+    unimp "Call to non-static rule" if ref $x->name;
+
+    $x->{ctx}{rx_thing} = $ctx->{str};
+    $x->{ctx}{rx_pos} = $ctx->{pos};
+    code(<<END);
+	push $ctx->{str}
+	push $ctx->{pos}
+END
+    my $ret = gen_sub_call($x);
+    code(<<END);
+	pop $ctx->{pos}
+	pop $ctx->{str}
+	unless $ret goto $ctx->{fail}
+END
+    maybe_fallthrough($ctx->{succ});
+    return $ctx->{fail};	# XXX: can't backtrack into called rule
+}
+
+############################################################
+# backtrack-limiting operators
+# XXX: this needs to be redone.  Don't use these yet.
 
 sub rx_unwind {
     my ($label, $level, $ctx) = @_;
@@ -649,87 +926,6 @@ END
 $ctx->{succ}:
 END
     return $bt;
-}
-
-sub P6C::rx_charclass::rx_val {
-    my ($x, $ctx) = @_;
-    unimp 'Complex or named character class.';
-}
-
-sub P6C::rx_oneof::rx_val {
-    my ($x, $ctx) = @_;
-    my $rep = $x->rep;
-    my $inv = $x->negated;
-    $rep =~ s/(.)-(.)/join '', map { chr } ord($1) .. ord($2)/eg;
-    my $bmp = gentmp 'pmc';
-    $rep =~ s/(?<!\\)"/\\"/g;
-    code(<<END);
-	rx_makebmp $bmp, "$rep"
-END
-    if ($inv) {
-	rx_not($ctx, sub { 
-		   code(<<END);
-	rx_oneof_bmp $ctx->{str}, $ctx->{pos}, $bmp, $ctx->{fail}
-END
-	       });
-    } else {
-	code(<<END);
-	rx_oneof_bmp $ctx->{str}, $ctx->{pos}, $bmp, $ctx->{fail}
-END
-	maybe_fallthrough($ctx->{succ});
-    }
-    return $ctx->{fail};
-}
-
-sub P6C::rx_assertion::rx_val {
-    my ($x, $ctx) = @_;
-    if ($x->thing->isa('P6C::sv_literal')) {
-	# Literal string result.
-	my $str = $x->thing->lval;
-	$str =~ s/^['"]//;
-	$str =~ s/['"]$//;
-	$str =~ s/(?<!\\)"/\\"/g;
-	if ($x->negated) {
-	    rx_not($ctx, sub {
-		       code(<<END);
-	rx_literal $ctx->{str}, $ctx->{pos}, "$str", $ctx->{fail}
-END
-		   });
-	} else {
-	    code(<<END);
-	rx_literal $ctx->{str}, $ctx->{pos}, "$str", $ctx->{fail}
-END
-	    maybe_fallthrough($ctx->{succ});
-	}
-    } else {
-	my $res = $x->thing->val;
-	my $failop = $x->negated ? 'if' : 'unless';
-	code(<<END);
-	$failop $res goto $ctx->{fail}
-END
-	maybe_fallthrough($ctx->{succ});
-    }
-    return $ctx->{fail};
-}
-
-sub P6C::rx_call::rx_val {
-    my ($x, $ctx) = @_;
-    unimp "Call to non-static rule" if ref $x->name;
-
-    $x->{ctx}{rx_thing} = $ctx->{str};
-    $x->{ctx}{rx_pos} = $ctx->{pos};
-    code(<<END);
-	push $ctx->{str}
-	push $ctx->{pos}
-END
-    my $ret = gen_sub_call($x);
-    code(<<END);
-	pop $ctx->{pos}
-	pop $ctx->{str}
-	unless $ret goto $ctx->{fail}
-END
-    maybe_fallthrough($ctx->{succ});
-    return $ctx->{fail};	# XXX: can't backtrack into called rule
 }
 
 1;

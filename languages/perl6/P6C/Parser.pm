@@ -247,7 +247,7 @@ BEGIN {
     $FLUSH	= qr/\w+|[^\s\w;}#'"]+/;
     $NUMPART	= qr/(?!_)[\d_]+(?<!_)/;
     $HEXCHAR	= qr/[a-fA-F0-9]{2,4}/;
-    $RXESCAPED	= qr/\\(?:[Xx]$HEXCHAR|0[0-7]{1,3}|[Xx]\{$HEXCHAR\}|[Pp]\{\w+\})/o;
+    $RXESCAPED	= qr/\\(?:[Xx]$HEXCHAR|0[0-7]{1,3}|[Xx]\{$HEXCHAR\}|[Pp]\{\w+\}|.)/o;
     $RXASSERTION= qr/:{1,3}|\^{1,2}|\${1,2}/;
     $RXATOM	= qr/(?:[\w_]|\\.)+/;
     $RXCHARCLASS= qr/\[(?:[^\]\\]|\\.)+\]/;

@@ -227,3 +227,14 @@
 	
 	* Test-failures:
 	    - none.  That's right.  None (on Linux/PPC, w/imcc patch).
+
+2002-08-25
+
+	* Additions:
+	    - t/rx/special.t -- escape sequences
+	    - better regex documentation
+
+	* Fixes:
+	    - disabled parser tests
+	    - escaped char parsing
+	    - misc regex compiling bugs

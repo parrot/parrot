@@ -853,6 +853,8 @@ sub P6C::rx_maybe_hypo::tree {
 	    return new P6C::rx_beg;
 	} elsif ($x->[1] eq '$') {
 	    return new P6C::rx_end;
+	} elsif ($x->[1] eq '^^' || $x->[1] eq '$$') {
+	    unimp 'BOL or EOL';
 	} else {
 	    # Cut
 	    return new P6C::rx_cut level => length($x->[1]);
