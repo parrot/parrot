@@ -218,13 +218,19 @@ string_max_bytes(STRING* s, INTVAL iv) {
  */
 STRING*
 string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL flags) {
-    if (a->type != b->type || a->encoding != b->encoding) {
-        b = string_transcode(interpreter, b, a->encoding, a->type, NULL);
+    if(a != NULL) {
+        if (a->type != b->type || a->encoding != b->encoding) {
+            b = string_transcode(interpreter, b, a->encoding, a->type, NULL);
+        }
+        string_grow(a, a->strlen + b->strlen);
+        mem_sys_memcopy((void*)((ptrcast_t)a->bufstart + a->bufused), b->bufstart, b->bufused);
+        a->strlen = a->strlen + b->strlen;
+        a->bufused = a->bufused + b->bufused;
     }
-    string_grow(a, a->strlen + b->strlen);
-    mem_sys_memcopy((void*)((ptrcast_t)a->bufstart + a->bufused), b->bufstart, b->bufused);
-    a->strlen = a->strlen + b->strlen;
-    a->bufused = a->bufused + b->bufused;
+    else {
+      return string_make(interpreter,
+                         b->bufstart,b->buflen,b->encoding,flags,b->type);
+    }
     return a;
 }
 
