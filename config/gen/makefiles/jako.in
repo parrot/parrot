@@ -9,10 +9,9 @@ RM_F = ${rm_f}
 
 DIR=languages/jako
 TOOL_DIR=../..
-IMCC=../imcc/imcc${exe}
-ASM=$(IMCC) -a --output-pbc
 JAKOC=$(PERL) -I lib jakoc
 INTERP=../../${test_prog}
+ASM=$(INTERP) -a --output-pbc
 
 .SUFFIXES: .jako .imc .pasm .pbc
 
@@ -70,29 +69,24 @@ examples/sub.imc:        examples/sub.jako        jakoc
 #
 
 .imc.pasm:
-	$(IMCC) -o $@ $< || (rm -f $@ && false)
+	$(INTERP) -o $@ $< || (rm -f $@ && false)
 
-../imcc/imcc:
-
-imcc: ../imcc/imcc${exe}
-	@cd ../imcc && $(MAKE) && cd ../jako
-
-examples/bench.pasm:      examples/bench.imc      imcc
-examples/board.pasm:      examples/board.imc      imcc
-examples/euclid.pasm:     examples/euclid.imc     imcc
-examples/fact.pasm:       examples/fact.imc       imcc
-examples/fib.pasm:        examples/fib.imc        imcc
-examples/hello.pasm:      examples/hello.imc      imcc
-examples/leibniz.pasm:    examples/leibniz.imc    imcc
-examples/life.pasm:       examples/life.imc       imcc
-examples/mandelbrot.pasm: examples/mandelbrot.imc imcc
-examples/mandelzoom.pasm: examples/mandelzoom.imc imcc
-examples/mops.pasm:       examples/mops.imc       imcc
-examples/nci.pasm:        examples/nci.imc        imcc
-examples/pmc.pasm:        examples/pmc.imc        imcc
-examples/primes.pasm:     examples/primes.imc     imcc
-examples/queens.pasm:     examples/queens.imc     imcc
-examples/sub.pasm:        examples/sub.imc        imcc
+examples/bench.pasm:      examples/bench.imc
+examples/board.pasm:      examples/board.imc
+examples/euclid.pasm:     examples/euclid.imc
+examples/fact.pasm:       examples/fact.imc
+examples/fib.pasm:        examples/fib.imc
+examples/hello.pasm:      examples/hello.imc
+examples/leibniz.pasm:    examples/leibniz.imc
+examples/life.pasm:       examples/life.imc
+examples/mandelbrot.pasm: examples/mandelbrot.imc
+examples/mandelzoom.pasm: examples/mandelzoom.imc
+examples/mops.pasm:       examples/mops.imc
+examples/nci.pasm:        examples/nci.imc
+examples/pmc.pasm:        examples/pmc.imc
+examples/primes.pasm:     examples/primes.imc
+examples/queens.pasm:     examples/queens.imc
+examples/sub.pasm:        examples/sub.imc
 
 
 #

@@ -141,22 +141,53 @@ sub generate_functions {
 	}
 
 	$TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
+	my $args = $TEST_PROG_ARGS;
+
+	my $run_pbc = 0;
+	if ($args =~ s/--run-pbc//) {
+	    $run_pbc = 1;
+	}
 
 	# native tests are just run
 	if ($as_f =~ /native_pbc/) {
 	    $as_f = per_test('.pbc',$count);
+	    $run_pbc = 0;
 	}
 	else {
 	    $pbc_generator->( $assembly, $directory, $count, $as_f );
 	}
 
-        my $cmd = "$PARROT ${TEST_PROG_ARGS} $as_f";
-        my $exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
+        my $cmd;
+        my $exit_code = 0;
+	my $pass = 0;
+
+	if ($run_pbc) {
+	    # generate pbc and run that file
+	    my $pbc_f = per_test('.pbc', $count);
+	    $cmd = "$PARROT -o $pbc_f $as_f";
+	    $exit_code = _run_command($cmd);
+	    # $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
+	    # compile tests like pmc_76 may fail
+	    # because they may test parser features
+	    if ($assembly =~ /##OK_PBC##/) {
+		$pass = $Builder->ok(1, $desc);
+	    }
+	    else {
+		$cmd = "$PARROT ${args} $pbc_f";
+		$exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
+	    }
+	}
+	else {
+	    $cmd = "$PARROT ${args} $as_f";
+	    $exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
+	}
 
 	my $meth = $Test_Map{$func};
-	my $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
-	$Builder->diag("'$cmd' failed with exit code $exit_code")
-	  if $exit_code and not $pass;
+	unless ($pass) {
+	    $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
+	    $Builder->diag("'$cmd' failed with exit code $exit_code")
+	      if $exit_code and not $pass;
+        }
 
 	unless($ENV{POSTMORTEM}) {
 	    unlink $out_f;

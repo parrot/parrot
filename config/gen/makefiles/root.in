@@ -647,6 +647,7 @@ fulltest_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -j $(TEST_PROG_ARGS)
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -P $(TEST_PROG_ARGS)
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) --run-pbc $(TEST_PROG_ARGS)
 
 # Common prep for all test targets
 test_prep : $(LIBPARROT) $(TEST_PROG)
