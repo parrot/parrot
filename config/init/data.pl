@@ -63,7 +63,6 @@ sub runstep {
 
     # should we have a dependancy upon arc to generate .a's?
     blib_lib_libparrot_a => 'blib/lib/libparrot$(A)',
-    parrot_libs   => 'blib/lib/libparrot$(A) classes/classes$(A) blib/lib/libparrot$(A) languages/imcc/imcc$(A)',
 
     perl          => $^X,
     test_prog     => 'parrot',

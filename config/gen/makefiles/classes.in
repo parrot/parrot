@@ -1,5 +1,4 @@
 O = ${o}
-A = ${a}
 RM_F = ${rm_f}
 
 INC=../include/parrot
@@ -20,18 +19,11 @@ CC = ${cc}
 PERL = ${perl}
 MAKE_F=${make}
 PMC2C=$(PERL) pmc2c.pl
-AR_CR = ${ar} ${ar_flags}
-RANLIB = ${ranlib}
 
 .c$(O):
 	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
-all : classes$(A)
-
-classes$(A) : $(O_FILES)
-	$(RM_F) $@
-	$(AR_CR) ${ar_out}$@ ${ar_extra} $(O_FILES)
-	$(RANLIB) $@
+all : $(O_FILES)
 
 ${pmc_build}
 

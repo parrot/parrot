@@ -63,7 +63,7 @@
                         a => '.lib',
                         so => '.dll',
                         cc => ${cc},
-                        ccflags => '-q -O2 -w-8066 -DWIN32 -DNO_STRICT -DNDEBUG -D_CONSOLE',
+			ccflags => '-O2 -w-8066 -DWIN32 -DNO_STRICT -DNDEBUG -D_CONSOLE',
 			cc_o_out => '-o',
 			cc_exe_out => '-e',
 			cc_debug => '-v',
@@ -83,7 +83,7 @@
                         ar => 'tlib',
                         ar_flags => '',
                         ar_out => '',
-                        ar_extra => '/a',
+                        ar_extra => '/au',
                         slash => '\\',
                         make_and => "\n\t",
 
