@@ -3,9 +3,9 @@ PERL    = ${perl}
 PARROT  = .${slash}parrot${exe}
 RELPATH = ..${slash}..${slash}
 MYPATH  = languages${slash}tcl${slash}
+LIBPATH  = $(MYPATH)lib${slash}
 
 DEPS = $(RELPATH)$(PARROT) \
-lib/tcllib.imc \
 lib/backslash_newline_subst.imc \
 lib/commands/append.imc \
 lib/commands/array.imc \
@@ -67,15 +67,21 @@ lib/ops/shr.imc \
 lib/ops/unequal.imc \
 lib/parse.imc \
 lib/string_to_list.imc \
-lib/tclword.imc \
 tcl.imc_template \
 tcl.pl
 
 tcl.pbc: tcl.imc
 	(cd $(RELPATH) && $(PARROT) --output=$(MYPATH)tcl.pbc $(MYPATH)tcl.imc)
 
-tcl.imc: tcl.pl $(DEPS)
+tcl.imc: tcl.pl lib/tcllib.pbc
 	$(PERL) tcl.pl > tcl.imc
+
+lib/tcllib.pbc: $(DEPS) lib/tclword.pbc lib/tcllib.imc
+	(cd $(RELPATH) && $(PARROT) --output=$(LIBPATH)tcllib.pbc $(LIBPATH)tcllib.imc)
+
+lib/tclword.pbc: $(DEPS) lib/tclword.imc
+	(cd $(RELPATH) && $(PARROT) --output=$(LIBPATH)tclword.pbc $(LIBPATH)tclword.imc)
+
 
 test:	tcl.pbc
 	cd t && $(PERL) -MTest::Harness -e 'runtests(glob("*.t"))' && cd ..
@@ -84,7 +90,7 @@ devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 clean:
-	$(RM_F) tcl.imc tcl.pbc
+	$(RM_F) tcl.imc tcl.pbc lib/*.pbc
 
 distclean: clean
 	$(RM_F) Makefile

@@ -6,8 +6,4 @@ default:
 	@echo "to run <foo>.tcl, type 'make <foo>'"
 
 %:%.tcl
-	cd $(UP_PATH) && $(PARROT) -G $(DOWN_PATH)tcl.pbc $(DOWN_PATH)examples${slash}$@.tcl
-
-bench:
-	time multi.pl 100 power.tcl
-	time multi.pl 100 tclsh power.tcl
+	cd $(UP_PATH) && $(PARROT) $(DOWN_PATH)tcl.pbc $(DOWN_PATH)examples${slash}$@.tcl
