@@ -266,7 +266,7 @@ parrot_utils: $(PDUMP) $(DIS) $(PINFO) $(PDB)
 
 flags_dummy:
 	echo Compiling with:
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CFLAGS) xx$(O) -c xx.c
+	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) xx$(O) -c xx.c
 
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
