@@ -8,7 +8,10 @@
  *  History:
  *     Initial revision by sean 2002/08/04
  *  Notes:
+ *     Invoking a NCI function changes some registers according to pdd03.
+ *     The caller has to preserve registers if needed.
  *  References:
+ *     docs/pdds/pdd03_calling_conventions.pod
  */
 
 #include "parrot/parrot.h"

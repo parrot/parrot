@@ -88,16 +88,17 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
     }
     pmc = get_new_pmc_header(interpreter, base_type,
             interpreter->arena_base->pmc_pool);
+    /* TODO have a bit in the vtable defining if a pmc_ext is needed */
     switch (base_type) {
         case enum_class_PerlInt:
         case enum_class_PerlNum:
         case enum_class_PerlString:
         case enum_class_PerlUndef:
+        case enum_class_Boolean:
+        case enum_class_PerlHash:
+        case enum_class_Exception:
             break;
         default:
-            /* TODO optimize this, mainly only aggregates need
-             * the extra header part
-             */
             add_pmc_ext(interpreter, pmc);
             break;
     }
