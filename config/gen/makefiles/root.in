@@ -159,7 +159,7 @@ mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 libparrot$(A) : $(O_DIRS) $(O_FILES)
 	$(AR_CRS) $@ $(O_FILES)
 
-$(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(O_DIRS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm lib/Parrot/.dummy
+$(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(O_DIRS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
 	$(LD) ${ld_out}$(TEST_PROG) $(LDFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
 
 lib_deps_object : $(O_DIRS) $(O_FILES)
@@ -405,9 +405,6 @@ jit_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h jit/${jitcpuarch}/core.jit
 docs : docs/.dummy
 
 #newasm : $(TEST_PROG) lib/Parrot/.dummy
-
-lib/Parrot/.dummy :
-	cd lib && cd Parrot && $(PERL) Makefile.PL && $(MAKE) && cd .. && cd ..
 
 docs/.dummy :
 	cd docs && $(MAKE) && cd ..

@@ -380,10 +380,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Parrot::Types; # For pack_op()
 use Parrot::OpLib::core;
-
-use lib "$FindBin::Bin/lib/Parrot/blib/lib";
-use lib "$FindBin::Bin/lib/Parrot/blib/arch/auto/Parrot/PakFile2";
-use Parrot::PakFile2;
+use Parrot::Config;
 
 =head2 Assembler class
 
@@ -658,6 +655,133 @@ sub _to_keyed_integer {
   $operator->[0][0] =~ s/^([a-zA-Z]+)/${1}_keyed_integer/;
 }
 
+=item constant_table
+
+Constant table returns a hash with the length in bytes of the constant table 
+and the constant table packed.
+
+=cut
+
+sub constant_table {
+    my $self = shift;
+
+    # $constl = the length in bytes of the constant table 
+    my ($constl, $wordsize);
+    my $const = "";
+
+    $constl = $wordsize = $PConfig{'opcode_t_size'};
+    my $packtype = $PConfig{'packtype_op'};
+    
+    for(@{$self->{constants}}) {
+        # if it's a string constant.
+        if ($_->[0] eq 'S') {
+            # Length of the string in bytes.
+            my $slen = length($_->[1]);
+            # The number of bytes to fill in the last opcode_t holding the string constant.
+            my $fill = ($slen % $wordsize) ? $wordsize - $slen % $wordsize : 0;
+            # Length of the whole constant.
+            $constl += 6 * $wordsize + $slen + $fill;
+            # Constant type, S
+            $const .= pack($packtype,0x73);
+            # The size of the Parrot string.
+            $const .= pack($packtype, 3 * $wordsize + $slen + $fill + $wordsize);
+            # Flags
+            $const .= pack($packtype,0x0);
+            # Encoding
+            $const .= pack($packtype,0x0);
+            # Type
+            $const .= pack($packtype,0x0);
+            # Length of string alone in bytes
+            $const .= pack($packtype,$slen);
+            # The string it self.
+            $const .= $_->[1] . "\0" x $fill;
+        }
+        # if it's a float constant.
+        elsif ($_->[0] eq 'N') {
+            # The size of the whole constant.
+            $constl += 2 * $wordsize + $PConfig{numvalsize}; 
+            # Constant type, N
+            $const .= pack($packtype,0x6e);
+            # Sizeof the Parrot floatval.
+            $const .= pack($packtype,$PConfig{numvalsize});
+            # The number if self.
+            $const .= pack($PConfig{'packtype_n'},$_->[1]);
+        }
+    }
+
+    return ('table' => $const,
+            'length' => $constl);
+}
+ 
+    
+=item output_bytecode
+
+Returns a string with the Packfile. 
+
+First process the constants and generate the constant table to be able to make 
+the packfile header, then return all.
+
+=cut
+
+sub output_bytecode {
+    my $self = shift;
+    my $wordsize;
+
+    $wordsize = $PConfig{'opcode_t_size'};
+    my $packtype = $PConfig{'packtype_op'};
+    
+    my %const_table = constant_table($self);
+
+    my $packfile_header = {
+        wordsize    => $wordsize, # unsigned char wordsize
+        byteorder   => 0x00, # unsigned char byteorder
+        major       => 0x00, # unsigned char major
+        minor       => 0x00, # unsigned char minor
+
+        flags       => 0x00, # unsigned char flags
+        floattype   => 0x00, # unsigned char floattype
+        pad         => [
+            0x19, # unsigned char pad[0]
+            0x40, # unsigned char pad[1]
+
+            0xe4, # unsigned char pad[2]
+            0x73, # unsigned char pad[3]
+            0x09, # unsigned char pad[4]
+            0x08, # unsigned char pad[5]
+
+            0x00, # unsigned char pad[6]
+            0x00, # unsigned char pad[7]
+            0x00, # unsigned char pad[8]
+            0x00  # unsigned char pad[9]
+        ],
+
+        magic       => 0x0131_55a1, # opcode_t magic
+        opcodetype  => 0x5045_524c, # opcode_t opcodetype
+        fixup_ss    => 0x0000_0000, # opcode_t fixup_ss
+        const_ss    => $const_table{'length'}, # opcode_t const_ss
+        bytecode_ss => $self->{num_constants}, # opcode_t bytecode_ss
+    };
+
+    my $packfile_string = "CCCCCC".("C"x10).$packtype x5;
+
+    return pack($packfile_string,
+        $packfile_header->{wordsize},    # C
+        $packfile_header->{byteorder},   # C
+        $packfile_header->{major},       # C
+        $packfile_header->{minor},       # C
+        $packfile_header->{flags},       # C
+        $packfile_header->{floattype},   # C
+        @{$packfile_header->{pad}},      # "C" x 10
+        $packfile_header->{magic},
+        $packfile_header->{opcodetype},
+        $packfile_header->{fixup_ss},
+        $packfile_header->{const_ss},
+        $packfile_header->{bytecode_ss}) .
+        $const_table{'table'} .
+        pack ($packtype,length($self->{bytecode})) .
+        $self->{bytecode};
+}
+
 =item to_bytecode
 
 Take the content array ref and turn it into a ragged AoAoA of operations with
@@ -850,12 +974,14 @@ sub to_bytecode {
   $self->_generate_bytecode(); # XXX merged, but I'm not going to worry about
                                # XXX it right now.
 
-  return Parrot::PakFile2::output_bytecode({
+  return output_bytecode({
     bytecode  => $self->{bytecode},
-    constants => $self->{ordered_constants}
+    constants => $self->{ordered_constants},
+    num_constants => $self->{num_constants}
   });
 }
 
+    
 package main;
 
 use strict;
