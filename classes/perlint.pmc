@@ -213,22 +213,29 @@ pmclass PerlInt extends perlscalar {
     }
 
     void modulus (PMC* value, PMC* dest) {
-	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    internal_exception(INVALID_OPERATION,
-		    "modulus() not implemented for PerlNum\n");
-	}
-	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL f = VTABLE_get_number(INTERP, value);
-	    INTVAL   i = VTABLE_get_integer(INTERP, value);
-	    if(f != i) {
-		internal_exception(INVALID_OPERATION,
-			"modulus() not implemented for PerlNum\n");
-	    }
-	}
-	VTABLE_set_integer_native(INTERP, dest,
-	    SELF->cache.int_val %
-	    VTABLE_get_integer(INTERP, value)
-	);
+        INTVAL i;
+        FLOATVAL f;
+        switch(VTABLE_type(INTERP, value)) {
+            case enum_class_PerlNum:
+                internal_exception(INVALID_OPERATION,
+		    "modulus() not implemented for mix of INTs and FLOATs\n");
+                break;
+            case enum_class_PerlString:
+                /* Is the string an integer or a number? */
+                f = VTABLE_get_number(INTERP, value);
+                i = VTABLE_get_integer(INTERP, value);
+                if(f != i) {
+                    internal_exception(INVALID_OPERATION,
+                     "modulus() not implemented for mix of INTs and FLOATs\n");
+                }
+                break;
+        }
+        /* If we're here, then we can assume that get_integer will return 
+         *  something sensible
+         */
+        VTABLE_set_integer_native(INTERP, dest,
+                                  SELF->cache.int_val %
+                                  VTABLE_get_integer(INTERP, value));
     }
 
     void modulus_int (INTVAL value, PMC* dest) {
@@ -434,12 +441,12 @@ pmclass PerlInt extends perlscalar {
 
     void repeat (PMC* value, PMC* dest) {
 	internal_exception(INVALID_OPERATION,
-		"repeat() not implemented for PerlInt\n");
+		"repeat() not implemented in class 'PerlInt'\n");
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
 	internal_exception(INVALID_OPERATION,
-		"repeat() not implemented for PerlInt\n");
+		"repeat() not implemented in class 'PerlInt'\n");
     }
 
     void increment () {
