@@ -555,7 +555,6 @@ sub body
     my $cout = "";
     my $classname = $self->{class};
     my $meth = $method->{meth};
-    $cout .= $self->line_directive($method->{line}, $self->{file});
     my $body = $method->{body};
     $body =~ s/^\t/        /mg;
     $body =~ s/^[ ]{4}//mg;
@@ -600,7 +599,12 @@ EOH
     }
     $cout .= $header_decls;
     $cout .= $self->decl($classname, $method, 0);
+    # This is the part that comes from the PMC file.
+    $cout .= $self->line_directive($method->{line}, $self->{file});
     $cout .= "{$standard_body\n}\n";
+    # We are back to generated code immediately here
+    $cout .= $self->line_directive(2 + $line + count_newlines($cout),
+				   $out_name);
     $cout .= $additional_bodies;
     $cout .= "\n\n";
 }
@@ -1039,7 +1043,7 @@ sub body
     my ($self, $method, $line, $out_name) = @_;
     my $meth = $method->{meth};
     my $n = $self->{has_method}{$meth};
-    return $self->SUPER::body($self->{methods}[$n]);
+    return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
 }
 
 =back
@@ -1140,7 +1144,7 @@ sub body
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n]);
+        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
     }
     my $parameters = $method->{parameters};
     my $n=0;
@@ -1215,7 +1219,7 @@ sub body
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n]);
+        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
     }
     my $parameters = $method->{parameters};
     my $n=0;
@@ -1290,7 +1294,7 @@ sub body
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n]);
+        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
     }
     my $decl = $self->decl($self->{class}, $method, 0);
     my $ret = "";
@@ -1350,7 +1354,7 @@ sub body
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n]);
+        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
     }
     my $decl = $self->decl($self->{class}, $method, 0);
     my $ret = gen_ret($method);
@@ -1450,7 +1454,7 @@ sub body
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n]);
+        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
     }
     my $decl = $self->decl($self->{class}, $method, 0);
     my $parameters = $method->{parameters};
@@ -1525,7 +1529,7 @@ sub body
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n]);
+        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
     }
     my $parameters = $method->{parameters};
     my $n=0;
