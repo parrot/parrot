@@ -427,24 +427,27 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
 extern void* yy_scan_string(const char *);
 extern SymReg *cur_namespace; /* s. imcc.y */
 
+/* XXX */
+struct PackFile_ByteCode *
+PF_create_default_segs(Parrot_Interp interpreter, int add);
+
 static void *
 imcc_compile(Parrot_Interp interp, const char *s)
 {
     /* imcc always compiles to interp->code->byte_code
      * save old cs, make new
      */
-    struct PackFile *pf_save = interp->code;
-    struct PackFile *pf = PackFile_new(0);
     const char *source = sourcefile;
     char name[64];
-#ifdef EVAL_TEST
-    opcode_t *pc;
-#endif
+    struct PackFile_ByteCode *old_cs, *new_cs;
+    PMC *sub;
+    parrot_sub_t sub_data;
 
+    sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->eval_nr);
+    new_cs = PF_create_default_segs(interp, 0);
+    old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
     cur_namespace = NULL;
     IMCC_INFO(interp)->cur_namespace = NULL;
-    interp->code = pf;  /* put new packfile in place */
-    sprintf(name, "EVAL_" INTVAL_FMT, ++pf_save->eval_nr);
     sourcefile = name;
     /* spit out the sourcefile */
     if (Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) {
@@ -463,22 +466,23 @@ imcc_compile(Parrot_Interp interp, const char *s)
     yyparse((void *) interp);
     imc_compile_all_units(interp);
 
-#ifdef EVAL_TEST
-    pc = (opcode_t *) interp->code->byte_code;
-    while (pc) {
-        DO_OP(pc, interp);
-    }
-#endif
     PackFile_fixup_subs(interp);
-    if (pf_save) {
+    if (old_cs) {
         /* restore old byte_code, */
-        (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
-        /* append new packfile to current directory */
-        PackFile_add_segment(&interp->code->directory,
-            &pf->directory.base);
+        (void)Parrot_switch_to_cs(interp, old_cs, 0);
     }
     sourcefile = source;
-    return pf;
+
+    /*
+     * create sub PMC
+     */
+    sub = pmc_new(interp, enum_class_Eval);
+    sub_data = PMC_sub(sub);
+    sub_data->seg = new_cs;
+    sub_data->address = new_cs->base.data;
+    sub_data->end = new_cs->base.data + new_cs->base.size;
+    sub_data->name = string_from_cstring(interp, name, 0);
+    return sub;
 }
 
 static void *
@@ -570,6 +574,13 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     fclose(new);
     string_cstring_free(fullname);
     return pf;
+}
+
+void * IMCC_compile_file (Parrot_Interp interp, const char *s);
+void *
+IMCC_compile_file (Parrot_Interp interp, const char *s)
+{
+    return imcc_compile_file(interp, s);
 }
 
 /* Register additional compilers with the interpreter */

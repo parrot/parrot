@@ -102,7 +102,8 @@ imcc_globals_destroy(int ex, void *param)
 }
 
 static struct PackFile_Segment *
-create_seg(struct PackFile_Directory *dir, pack_file_types t, const char *name)
+create_seg(struct PackFile_Directory *dir, pack_file_types t,
+        const char *name, int add)
 {
     char *buf;
     struct PackFile_Segment *seg;
@@ -111,26 +112,31 @@ create_seg(struct PackFile_Directory *dir, pack_file_types t, const char *name)
     len = strlen(name) + strlen(sourcefile) + 2;
     buf = malloc(len);
     sprintf(buf, "%s_%s", name, sourcefile);
-    seg = PackFile_Segment_new_seg(dir, t, buf, 1);
+    seg = PackFile_Segment_new_seg(dir, t, buf, add);
     free(buf);
     return seg;
 }
 
-static struct PackFile_ByteCode *
-create_default_segs(Parrot_Interp interpreter)
+/* XXX */
+struct PackFile_ByteCode *
+PF_create_default_segs(Parrot_Interp interpreter, int add);
+
+struct PackFile_ByteCode *
+PF_create_default_segs(Parrot_Interp interpreter, int add)
 {
     struct PackFile_Segment *seg;
     struct PackFile *pf = interpreter->code;
     struct PackFile_ByteCode *cur_cs;
 
-    seg = create_seg(&pf->directory, PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME);
-    cur_cs = pf->cur_cs = (struct PackFile_ByteCode*)seg;
+    seg = create_seg(&pf->directory, PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, add);
+    cur_cs = (struct PackFile_ByteCode*)seg;
 
-    seg = create_seg(&pf->directory, PF_FIXUP_SEG, FIXUP_TABLE_SEGMENT_NAME);
+    seg = create_seg(&pf->directory, PF_FIXUP_SEG, FIXUP_TABLE_SEGMENT_NAME,
+            add);
     cur_cs->fixups = (struct PackFile_FixupTable *)seg;
     cur_cs->fixups->code = cur_cs;
 
-    seg = create_seg(&pf->directory, PF_CONST_SEG, CONSTANT_SEGMENT_NAME);
+    seg = create_seg(&pf->directory, PF_CONST_SEG, CONSTANT_SEGMENT_NAME, add);
     cur_cs->consts = pf->const_table = (struct PackFile_ConstTable*) seg;
     cur_cs->consts->code = cur_cs;
 
@@ -168,7 +174,8 @@ e_pbc_open(void *param)
      * we need some segments
      */
     if (!interpreter->code->cur_cs) {
-        cs->seg = create_default_segs(interpreter);
+        cs->seg = interpreter->code->cur_cs =
+            PF_create_default_segs(interpreter, 1);
     }
     globals.cs = cs;
     return 0;

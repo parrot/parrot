@@ -2,6 +2,9 @@
 use strict;
 use TestCompiler tests => 7;
 
+SKIP: {
+	skip("changed eval semantics - see t/pmc/eval.t", 7);
+
 ##############################
 output_is(<<'CODE', <<'OUT', "eval pasm");
 .sub _test
@@ -142,3 +145,4 @@ hello
 hello
 back
 OUT
+}

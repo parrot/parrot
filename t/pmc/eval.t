@@ -16,16 +16,16 @@ Tests on-the-fly PASM compilation and invocation.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 6;
 use Test::More;
 
-# PASM1 is like PASM but appends an C<end> opcode
-
 output_is(<<'CODE', <<'OUTPUT', "eval_sc");
-	compreg P1, "PASM1"	# get compiler
-	set S1, "in eval\n"
-	compile P0, P1, "print S1"
-	invoke			# eval code P0
+	compreg P1, "PASM"	# get compiler
+	set S5, "in eval\n"
+	set I0, 1
+	set I2, 1
+	compile P0, P1, "print S5\ninvoke P1\n"
+	invokecc			# eval code P0
 	print "back again\n"
 	end
 CODE
@@ -33,31 +33,6 @@ in eval
 back again
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "eval_s - check nci globbered reg");
-	compreg P1, "PASM1"
-	set I0, 40
-	set S1, "inc I0\ninc I0"
-	compile P0, P1, S1
-	invoke
-	print I0
-	print "\n"
-	end
-CODE
-42
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "eval_s - check nci param S5 ");
-	compreg P1, "PASM1"
-	set S1, "hello "
-	set S5, "concat S1, 'parrot'"
-	compile P0, P1, S5
-	invoke
-	print S1
-	print "\n"
-	end
-CODE
-hello parrot
-OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "call subs in evaled code ");
     set S5, ".pcc_sub _foo:\n"
@@ -141,7 +116,7 @@ output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub");
     .local pmc the_sub
     .local string code
     code = "print \"ok\\n\"\n"
-    code .= "end\n"
+    code .= "invoke P1\n"
     the_sub = my_compiler("_foo", code)
     the_sub()
     the_sub = global "_foo"
@@ -176,7 +151,7 @@ output_is(<<'CODE', <<'OUTPUT', "bug #31467");
      $P1['builtin'] = $P0
 
      $P2 = compreg "PIR"
-     $S0 = ".sub main\nprint \"dynamic\\n\"\nend\n.end"
+     $S0 = ".sub main\nprint \"dynamic\\n\"\ninvoke P1\n.end"
      $P0 = compile $P2, $S0
      $P1['dynamic'] = $P0
 
@@ -185,7 +160,7 @@ output_is(<<'CODE', <<'OUTPUT', "bug #31467");
      $S0 = ".sub main\n$P1 = find_global\"funcs\"\n"
      $S0 .= "$P0 = $P1['dynamic']\n$P0()\n"
      $S0 .= "$P0 = $P1['builtin']\n$P0()\n"
-     $S0 .= "end\n.end"
+     $S0 .= "invoke P1\n.end"
 
      $P2 = compreg "PIR"
      $P0 = compile $P2, $S0
@@ -195,8 +170,6 @@ output_is(<<'CODE', <<'OUTPUT', "bug #31467");
 
   .sub _builtin
       print "builtin\n"
-      .pcc_begin_return
-      .pcc_end_return
   .end
 CODE
 dynamic

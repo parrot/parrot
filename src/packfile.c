@@ -2061,6 +2061,7 @@ Parrot_switch_to_cs(Interp *interpreter,
     interpreter->code->cur_cs = new_cs;
     new_cs->prev = cur_cs;
     interpreter->code->byte_code = new_cs->base.data;
+    interpreter->code->const_table = new_cs->consts;
     interpreter->prederef.code       = new_cs->prederef.code;
     interpreter->prederef.branches   = new_cs->prederef.branches;
     interpreter->prederef.n_branches = new_cs->prederef.n_branches;
@@ -3077,10 +3078,16 @@ directory.
 
 */
 
+/*
+ * intermediate hook during changes
+ */
+void * IMCC_compile_file (Parrot_Interp interp, const char *s);
+
 void
 Parrot_load_bytecode(Interp *interpreter, const char *filename)
 {
     const char *ext;
+    struct PackFile * pf;
 
 #if TRACE_PACKFILE
     fprintf(stderr, "packfile.c: parrot_load_bytecode()\n");
@@ -3088,16 +3095,16 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
 
     ext = strrchr(filename, '.');
     if (ext && strcmp (ext, ".pbc") == 0) {
-        struct PackFile * pf;
         pf = PackFile_append_pbc(interpreter, filename);
         do_sub_pragmas(interpreter, pf, PBC_LOADED);
     }
     else {
+#if 0
         PMC * compiler, *code;
-        PMC *key = key_new_cstring(interpreter, "FILE"); /* see imcc/parser_util.c */
+        /* see imcc/parser_util.c */
+        PMC *key = key_new_cstring(interpreter, "FILE");
         PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
                 interpreter->iglobals, IGLOBALS_COMPREG_HASH);
-        struct PackFile *pf;
         STRING *file;
 
         compiler = VTABLE_get_pmc_keyed(interpreter, compreg_hash, key);
@@ -3107,10 +3114,14 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
         }
         file = string_from_cstring(interpreter, filename, 0);
 #if TRACE_PACKFILE
-        fprintf(stderr, "packfile.c: VTABLE: compiler->invoke '%s'\n", filename);
+        fprintf(stderr, "packfile.c: VTABLE: compiler->invoke '%s'\n",
+                filename);
 #endif
         code = VTABLE_invoke(interpreter, compiler, file);
         pf = VTABLE_get_pointer(interpreter, code);
+#else
+        pf = IMCC_compile_file(interpreter, filename);
+#endif
         if (pf) {
             if (pf != interpreter->code)
                 PackFile_add_segment(&interpreter->code->directory,

@@ -20,147 +20,19 @@ evaluation and execution.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/runops_cores.h"
-#include "parrot/interp_guts.h"
-#include "parrot/packfile.h"
 
 pmclass Eval extends Closure {
 
-/*
-
-=item C<void set_pointer(void *value)>
-
-Sets the pointer to the PackFile.
-
-=cut
-
-*/
-
-    void set_pointer (void* value) {
-        PMC_struct_val(SELF) = value;
+    void init() {
+        SUPER();
+        PObj_active_destroy_SET(SELF);
     }
 
-/*
-
-=item C<void *get_pointer()>
-
-Returns the pointer PackFile.
-
-=cut
-
-*/
-
-    void* get_pointer () {
-        return PMC_struct_val(SELF);
-    }
-/*
-
-=item C<void destroy()>
-
-TODO - When this PMC gets out of scope it should destroy the attached
-PackFile.
-
-=cut
-
-*/
-
-    void destroy () {
+    void destroy() {
+        /* TODO destroy bytecode in seg */
     }
 
-/*
 
-=item C<void *invoke (void *next)>
-
-Invokes the PMC's code.
-
-=cut
-
-*/
-
-    void* invoke (void* next) {
-        struct PackFile_ByteCode *old_cs;
-        struct PackFile *eval_pf = VTABLE_get_pointer(interpreter, SELF);
-#if EXEC_CAPABLE
-        extern int Parrot_exec_run;
-        if (Interp_core_TEST(interpreter, PARROT_EXEC_CORE)) {
-            Parrot_exec_run = 2;
-        }
-#endif
-
-        /* switch to code segment */
-        old_cs = Parrot_switch_to_cs(interpreter, eval_pf->cur_cs, 1);
-        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-            PIO_eprintf(interpreter, "*** invoking %s\n",
-                eval_pf->cur_cs->base.name);
-        }
-        runops_int(interpreter, 0);
-        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-            PIO_eprintf(interpreter, "*** back from %s\n",
-                eval_pf->cur_cs->base.name);
-        }
-        /* restore ctx */
-        interpreter->ctx.pad_stack =
-            (PMC_sub(SELF))->pad_stack;
-        /* if code jumped to different code segment, branch_cs
-         * is setting the resum_flag to 2, so that the
-         * runloop was left
-         */
-        if (interpreter->resume_flag & 2) {
-            interpreter->resume_flag = 1;
-            next = 0;
-        }
-        else
-            (void)Parrot_switch_to_cs(interpreter, old_cs, 1);
-        return next;
-    }
-
-/*
-
-=item C<INTVAL get_integer_keyed(PMC *key)>
-
-Returns the pointer to the start of the PMC's code as an integer.
-
-C<*key> is ignored.
-
-=cut
-
-*/
-
-    INTVAL get_integer_keyed (PMC* key) {
-        struct PackFile *pf = VTABLE_get_pointer(interpreter, SELF);
-        opcode_t *code = pf->byte_code;
-        /*
-        int i = 0;
-        for (i=0; i < 16; i++) {
-            printf("At %p there is an %i\n", code+i, *(code+i));
-        }
-        */
-        return (INTVAL) code;
-    }
-
-/*
-
-=item C<STRING *get_string()>
-
-Returns the PMC's code as a Parrot string.
-
-=cut
-
-*/
-
-    STRING* get_string () {
-        size_t size;
-        opcode_t *packed;
-        struct PackFile *pf = VTABLE_get_pointer(interpreter, SELF);
-        STRING *s;
-
-        size = PackFile_pack_size(pf) * sizeof(opcode_t);
-        packed = (opcode_t*) mem_sys_allocate(size);
-        PackFile_pack(pf, packed);
-        s = string_make(interpreter, packed, size, "iso-8859-1", 0);
-        mem_sys_free(packed);
-        return s;
-    }
 }
 
 /*
