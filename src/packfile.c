@@ -27,6 +27,18 @@ structure of the frozen bytecode.
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/packfile.h"
+
+/*
+ * XXX copy from imcc/symreg.h
+ */
+enum VARTYPE {		/* variable type can be */
+    VT_START_SLICE = 1 << 10,   /* x .. y slice range */
+    VT_END_SLICE   = 1 << 11,
+    VT_START_ZERO  = 1 << 12,   /* .. y 0..start */
+    VT_END_INF     = 1 << 13,   /* x..  start..inf */
+    VT_SLICE_BITS  = VT_START_SLICE | VT_END_SLICE | VT_START_ZERO | VT_END_INF
+};
+
 #include <assert.h>
 
 #define TRACE_PACKFILE 0
@@ -2968,13 +2980,19 @@ PackFile_Constant_unpack_key(Interp *interpreter,
     INTVAL components;
     PMC *head;
     PMC *tail;
-    opcode_t type, op;
+    opcode_t type, op, slice_bits;
     struct PackFile *pf = constt->base.pf;
 
     components = (INTVAL)PF_fetch_opcode(pf, &cursor);
     head = tail = NULL;
 
     while (components-- > 0) {
+        type = PF_fetch_opcode(pf, &cursor);
+        slice_bits = type & VT_SLICE_BITS;
+        type &= ~VT_SLICE_BITS;
+        if (!head && slice_bits) {
+            head = tail = constant_pmc_new(interpreter, enum_class_Slice);
+        }
         if (tail) {
             PMC_data(tail)
                 = constant_pmc_new_noinit(interpreter, enum_class_Key);
@@ -2986,7 +3004,6 @@ PackFile_Constant_unpack_key(Interp *interpreter,
 
         VTABLE_init(interpreter, tail);
 
-        type = PF_fetch_opcode(pf, &cursor);
         op = PF_fetch_opcode(pf, &cursor);
         switch (type) {
         case PARROT_ARG_IC:
@@ -3012,6 +3029,14 @@ PackFile_Constant_unpack_key(Interp *interpreter,
             break;
         default:
             return 0;
+        }
+        if (slice_bits) {
+            if (slice_bits & VT_START_SLICE)
+                PObj_get_FLAGS(tail) |= KEY_start_slice_FLAG;
+            if (slice_bits & VT_END_SLICE)
+                PObj_get_FLAGS(tail) |= KEY_end_slice_FLAG;
+            if (slice_bits & (VT_START_ZERO | VT_END_INF))
+                PObj_get_FLAGS(tail) |= KEY_inf_slice_FLAG;
         }
     }
 

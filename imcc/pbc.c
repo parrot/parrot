@@ -678,7 +678,7 @@ build_key(Interp *interpreter, SymReg *reg)
             case VTPASM:       /* P[S0] */
             case VTREG:        /* P[S0] */
                 if (r->set == 'I')
-                    *pc++ = PARROT_ARG_I;        /* register type */
+                    *pc++ = PARROT_ARG_I | slice_bits;    /* register type */
                 else if (r->set == 'S')
                     *pc++ = PARROT_ARG_S;
                 else
@@ -697,7 +697,7 @@ build_key(Interp *interpreter, SymReg *reg)
             case VTCONST:
                 switch (r->set) {
                     case 'S':                       /* P["key"] */
-                        *pc++ = PARROT_ARG_SC;      /* str constant */
+                        *pc++ = PARROT_ARG_SC | slice_bits;  /* str constant */
                         *pc++ = r->color;       /* constant idx */
                         debug(interpreter, DEBUG_PBC_CONST,
                                 " keypart SC %s #%d slice %s\n",
@@ -705,7 +705,7 @@ build_key(Interp *interpreter, SymReg *reg)
                                 slice_deb(slice_bits));
                         break;
                     case 'I':                       /* P[;42;..] */
-                        *pc++ = PARROT_ARG_IC;      /* int constant */
+                        *pc++ = PARROT_ARG_IC | slice_bits;  /* int constant */
                         *pc++ = r->color = atol(r->name);   /* value */
                         debug(interpreter, DEBUG_PBC_CONST,
                                 " keypart IC %s #%d slice %s\n",

@@ -22,11 +22,19 @@ typedef enum {
     KEY_pmc_FLAG = PObj_private3_FLAG,
     KEY_register_FLAG = PObj_private4_FLAG,
 
+    KEY_start_slice_FLAG = PObj_private5_FLAG,
+    KEY_end_slice_FLAG = PObj_private6_FLAG,
+    KEY_inf_slice_FLAG = PObj_private7_FLAG,
+
     KEY_type_FLAGS = KEY_integer_FLAG |
                      KEY_number_FLAG |
                      KEY_string_FLAG |
                      KEY_pmc_FLAG |
-                     KEY_register_FLAG
+                     KEY_register_FLAG |
+                     KEY_start_slice_FLAG |
+                     KEY_end_slice_FLAG |
+                     KEY_inf_slice_FLAG
+
 } KEY_flags;
 
 PMC *key_new(struct Parrot_Interp *interpreter);

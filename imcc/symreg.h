@@ -19,6 +19,7 @@ enum VARTYPE {		/* variable type can be */
     VT_CONSTP	= 1 << 7,	/* pointer to constant value */
     VT_PCC_SUB  = 1 << 8,	/* PCC subroutine call */
     VT_FLATTEN  = 1 << 9,	/* .flatten_arg IDENT | VTIDENT ... */
+    /* XXX s. src/packfile.c */
     VT_START_SLICE = 1 << 10,   /* x .. y slice range */
     VT_END_SLICE   = 1 << 11,
     VT_START_ZERO  = 1 << 12,   /* .. y 0..start */
