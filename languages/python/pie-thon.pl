@@ -1365,17 +1365,17 @@ sub ROT_THREE
     my $v = pop @stack;
     my $w = pop @stack;
     my $x = pop @stack;
-    push @stack, $w;
-    push @stack, $x;
     push @stack, $v;
+    push @stack, $x;
+    push @stack, $w;
 }
 
 sub STORE_SUBSCR
 {
     my ($n, $c, $cmt) = @_;
-    my $w = pop @stack;
-    my $v = pop @stack;
     my $x = pop @stack;
+    my $v = pop @stack;
+    my $w = pop @stack;
     my $key = $x->[1];
     if ($v->[0] eq 'hash') {
 	if ($key =~ /^\d+$/) {

@@ -121,6 +121,8 @@ Returns the PMC value of the element at index C<key>.
     PMC* get_pmc_keyed_int (INTVAL key) {
         PMC **data;
         if (key < 0)
+            key += PMC_int_val(SELF);
+        if (key < 0)
             internal_exception(OUT_OF_BOUNDS,
                 "ResizablePMCArray: index out of bounds!\n");
         if (key >= PMC_int_val(SELF))
@@ -142,12 +144,14 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 */
 
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
-        if (key < 0)
-            internal_exception(OUT_OF_BOUNDS,
-                "ResizablePMCArray: index out of bounds!\n");
         /*
          * TODO in python mode, only .append is allowed
          */
+        if (key < 0)
+            key += PMC_int_val(SELF);
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS,
+                "ResizablePMCArray: index out of bounds!\n");
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         ((PMC**)PMC_data(SELF))[key] = src;
@@ -229,6 +233,43 @@ The C<==> operation. Compares two array to hold equal elements.
         }
         return 1;
     }
+/*
+
+=item C<void multiply_int(INTVAL value,  PMC *dest)>
+
+Python (b6.main):
+
+ # L = [1] * 1000000
+
+  4           0 LOAD_CONST               1 (1)
+              3 BUILD_LIST               1
+              6 LOAD_CONST               2 (1000000)
+              9 BINARY_MULTIPLY
+             10 STORE_FAST               2 (L)
+
+Build a list by duplicating the passed list N times. Only implemented for
+list.elements == 1.
+
+=cut
+
+*/
+
+    void multiply_int (INTVAL value,  PMC* dest) {
+        INTVAL k = DYNSELF.elements();
+        INTVAL i;
+        PMC *elem;
+        PMC **data;
+
+        if (k != 1)
+            internal_exception(1, "multiply_int: unimplemented list size");
+        elem = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
+        pmc_reuse(INTERP, dest, enum_class_ResizablePMCArray, 0);
+        VTABLE_set_integer_native(INTERP, dest, value);
+        data = PMC_data(dest);
+        for (i = 0; i < value; ++i)
+            data[i] = elem;
+    }
+
 
 }
 
