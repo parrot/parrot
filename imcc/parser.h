@@ -12,9 +12,21 @@ typedef struct _IdList {
     struct _IdList*  next;
 } IdList;
 
+typedef enum _AsmState {
+    AsmDefault,
+    AsmInDef,
+    AsmInReturn,
+    AsmInYield
+} AsmState;
+
+
+
+
 
 #include "imcparser.h"
 
+EXTERN SymReg* sr_return;
+EXTERN AsmState asm_state;
 EXTERN int expect_pasm;
 EXTERN int pasm_file;
 EXTERN int is_def;

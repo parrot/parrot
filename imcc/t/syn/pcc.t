@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 37;
+use TestCompiler tests => 39;
 
 ##############################
 # Parrot Calling Conventions
@@ -1405,3 +1405,77 @@ output_is(<<'CODE', "mongueur\nmonger\n", "multiple declaration in a .sym/.local
 .end
 CODE
 
+output_is(<<'CODE', "42\n", "oneliner return");
+.sub _main
+.sym int a, b
+  (a, b) = _sub()   
+  print a
+  print b
+  print "\n"
+  _sub1()
+  end
+.end
+
+.sub _sub prototyped
+.return ( 4,  2 )
+.end
+
+.sub _sub1 prototyped
+.return ( )
+.end
+CODE
+
+output_is(<<'CODE', <<'OUT', "oneliner yield");
+.sub _main
+  .local int i
+  i=5
+  newsub $P0, .Coroutine, _addtwo
+  newsub $P1, .Continuation, after_loop
+  .pcc_begin prototyped
+  .arg $P1
+  .arg i
+  .pcc_call $P0
+ ret_addr:
+  .result $I2
+  .pcc_end
+    print $I2
+    print "\n"
+    savetop
+    invoke
+    goto ret_addr
+    restoretop
+ after_loop:
+  print "done in main\n"
+  end
+.end
+
+.pcc_sub _addtwo
+  .param Continuation when_done
+  .param int a
+  .local int i
+  i = 0
+ loop:
+    if i >= 10 goto done
+    $I5 = a+i
+    .yield ( $I5 )
+    i = i + 1
+    goto loop
+ done:
+  print "done in coroutine\n"
+  invoke when_done
+  end
+.end
+CODE
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+done in coroutine
+done in main
+OUT

@@ -208,6 +208,7 @@ SP              [ ]
 <emit,INITIAL>"@POSTCOMP"    return(POSTCOMP);
 
 ".result"       return(RESULT);
+".yield"       return(YIELDT);
 ".return"       return(RETURN);
 ".class"        return(CLASS);
 ".endclass"     return(ENDCLASS);

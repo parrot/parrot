@@ -281,6 +281,26 @@ IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
         cur_unit->instructions->r[1]->pcc_sub->calls_a_sub |= 1;
 }
 
+static void
+begin_return_or_yield(int yield)
+{
+    Instruction *i, *ins;
+    char name[128];
+    ins = cur_unit->instructions;
+    if(!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
+       fataly(EX_SOFTWARE, sourcefile, line,
+              "yield or return directive outside pcc subroutine\n");
+    if(yield)
+       ins->r[1]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
+    sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d", IMCC_INTERNAL_CHAR, cnr++);
+    sr_return = mk_pcc_sub(str_dup(name), 0);
+    i = iLABEL(cur_unit, sr_return);
+    i->type = yield ? ITPCCSUB | ITLABEL | ITPCCYIELD : ITPCCSUB | ITLABEL ;
+    asm_state = yield ? AsmInYield : AsmInReturn;
+}
+
+
+
 %}
 
 %union {
@@ -310,7 +330,7 @@ IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
 %token <t> SHR_ASSIGN SHL_ASSIGN SHR_U_ASSIGN
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV OBJECTV  LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
-%token <t> GLOBAL GLOBALOP ADDR RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
+%token <t> GLOBAL GLOBALOP ADDR RESULT RETURN YIELDT POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
@@ -323,13 +343,14 @@ IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
 %type <t> type newsub ptr
 %type <i> program class class_body member_decls member_decl field_decl
 %type <i> method_decl class_namespace
-%type <i> global constdef sub emit pcc_sub sub_body pcc_ret pcc_yield
+%type <i> global constdef sub emit pcc_sub sub_body pcc_ret
 %type <i> compilation_units compilation_unit pmc_const
 %type <s> classname relop
 %type <i> labels _labels label statements statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub
+%type <t> pcc_return_many
 %type <t> pcc_proto pcc_sub_proto proto
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> func_assign
@@ -340,7 +361,9 @@ IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args
 %type <symlist> targetlist arglist
+%type <i> var_returns
 %token <sr> VAR
+%type <t> begin_ret_or_yield end_ret_or_yield
 %token <t> LINECOMMENT
 %token <s> FILECOMMENT
 %type <idlist> id_list
@@ -691,58 +714,43 @@ pcc_result:
          {  mk_ident($4, $3); is_def=0; $$=0; }
    ;
 
+begin_ret_or_yield: PCC_BEGIN_RETURN { $$ = 0 } | PCC_BEGIN_YIELD { $$ = 1 } ;
+end_ret_or_yield:   PCC_END_RETURN              | PCC_END_YIELD ;
+
 pcc_ret:
-     PCC_BEGIN_RETURN '\n'
-         {
-            Instruction *i, *ins;
-            SymReg *r;
-            char name[128];
-            ins = cur_unit->instructions;
-            if(!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
-               fataly(EX_SOFTWARE, sourcefile, line,
-                      "pcc_return not inside pcc subroutine\n");
-            sprintf(name, "%cpcc_sub_ret_%d", IMCC_INTERNAL_CHAR, cnr++);
-            $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
-            i = iLABEL(cur_unit, r);
-            i->type = ITPCCSUB | ITLABEL;
-         }
+    begin_ret_or_yield   '\n'
+    { begin_return_or_yield($1); }
      pcc_returns
-     PCC_END_RETURN
-         {  $$ = 0; }
+     end_ret_or_yield 
+         { $$ = 0;  asm_state = AsmDefault; }
+   | pcc_return_many { asm_state = AsmDefault; $$ = 0;  }
+
    ;
 
-pcc_yield:
-     PCC_BEGIN_YIELD '\n'
-         {
-            Instruction *i, *ins;
-            SymReg *r;
-            char name[128];
-            ins = cur_unit->instructions;
-            if(!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
-               fataly(EX_SOFTWARE, sourcefile, line,
-                      "pcc_yield not inside pcc subroutine\n");
-            ins->r[1]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
-            sprintf(name, "%cpcc_sub_yield_%d", IMCC_INTERNAL_CHAR, cnr++);
-            $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
-            i = iLABEL(cur_unit, r);
-            i->type = ITPCCSUB | ITLABEL | ITPCCYIELD;
-         }
-     pcc_returns
-     PCC_END_YIELD
-         {  $$ = 0; }
-   ;
 
 pcc_returns:
      /* empty */   {  $$ = 0; }
    | pcc_returns '\n'
-                   {  if($1) add_pcc_return($<sr>0, $1); }
+                   {  if($1) add_pcc_return(sr_return, $1); }
    | pcc_returns pcc_return '\n'
-                   {  if($2) add_pcc_return($<sr>0, $2); }
+                   {  if($2) add_pcc_return(sr_return, $2); }
    ;
 
 pcc_return:
      RETURN var    {  $$ = $2; }
    ;
+
+pcc_return_many:
+    RETURN  '(' {  if(asm_state == AsmDefault)   begin_return_or_yield(0); } var_returns  ')' { asm_state = AsmDefault; $$ = 0;  }
+  | YIELDT  '(' {  if(asm_state == AsmDefault)   begin_return_or_yield(1); } var_returns  ')' { asm_state = AsmDefault; $$ = 0;  }
+  ;
+
+var_returns:
+    /* empty */ { $$ = 0; }
+  | var                     {  add_pcc_return(sr_return, $1);    }
+  | var_returns COMMA var   {  add_pcc_return(sr_return, $3);    }
+  ;
+
 
 statements:
      statement
@@ -847,7 +855,6 @@ labeled_inst:
    | sub_call      {  $$ = 0; current_call = NULL; }
    | pcc_sub_call  {  $$ = 0; }
    | pcc_ret
-   | pcc_yield
    | /* none */                        { $$ = 0;}
    ;
 
