@@ -387,13 +387,14 @@ languages/perl6/P6C/Tree.pm
 languages/perl6/P6C/Tree/String.pm
 languages/perl6/P6C/Util.pm
 languages/perl6/README
+languages/perl6/doc/overview.pod
+languages/perl6/doc/debugging.pod
 languages/perl6/examples/bnf.p6
 languages/perl6/examples/life-ar.p6
 languages/perl6/examples/life.p6
 languages/perl6/examples/mandel.p6
 languages/perl6/examples/qsort.p6
 languages/perl6/mkdistro.sh
-languages/perl6/overview.pod
 languages/perl6/pconfig.pl
 languages/perl6/perl6
 languages/perl6/perl6re/Perl6RE.bnf

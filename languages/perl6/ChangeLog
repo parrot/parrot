@@ -372,3 +372,10 @@
 	* Fixes:
 	    - hyper-ops use length of longer of two operands (rather than
 	      one side arbitrarily) (John Williams)
+
+2002-09-26
+
+	* Additions:
+	    - debugging.pod (Leo Toetsch)
+	    - moved debugging.pod, overview.pod to doc subdirectory
+	    - "perl6 --version" prints imcc version as well

@@ -6,6 +6,7 @@ The following files may be of interest to someone new to the compiler:
 perl6			driver program
 ChangeLog		development history, including outstanding
 			issues
+doc/*			(some) useful documentation
 P6C/Addcontext.pm	Context propagation (type checking)
 P6C/Builtins.pm		"built-in" function code and prototypes
 P6C/Context.pm		evaluation context structure
@@ -54,10 +55,10 @@ handles register allocation and spilling, and then finally assembled
 by the parrot assembler (parrot/assembler.pl).
 
 If you want to get started in parser development, you should probably
-start by reading overview.pod.  If you're not sure where to go from
-there, you can look for "XXX:" in the code, which is used to mark things
-that need fixing.  If you're interested in getting involved, drop Sean
-an email.
+start by reading doc/overview.pod.  If you're not sure where to go
+from there, you can look for "XXX:" in the code, which is used to mark
+things that need fixing.  If you're interested in getting involved,
+drop Sean an email.
 
 Features
 ========

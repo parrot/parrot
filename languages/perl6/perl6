@@ -175,6 +175,8 @@ GetOptions(\%OPT,qw{
 # print version of parts and exit
 sub version {
     print "perl6 driver $VERSION\n\n";
+    system("$IMCC -V");
+    print "\n";
     system("$PARROT -v");
     exit(0);
 }
