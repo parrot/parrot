@@ -177,6 +177,7 @@ my(%c)=(
 
     opcode_t      => ($Config{ivtype} || 'long'),
     longsize      => undef,
+    byteorder     => $Config{byteorder},
 
     intvalfmt     => '%ld',
     floatvalfmt     => '%f',
