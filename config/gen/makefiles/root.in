@@ -391,7 +391,7 @@ core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm
 
 core_ops_prederef$(O) : $(GENERAL_H_FILES) core_ops_prederef.c
 
-core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
+core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h
 	$(PERL) ops2c.pl CPrederef $(OPS_FILES)
 
 ${cg_c}
