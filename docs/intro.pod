@@ -381,9 +381,9 @@ C<$> sigils, replaced the Perlish C<until> with a more common C<while>,
 replaced C<my> with C<var int> and I was nearly done.
 
 The Jako compiler, C<jakoc>, ships with Parrot in the
-C<little_languages> subdirectory:
+C<languages> subdirectory:
 
-  % perl little_languages/jakoc fib.jako > fib.pasm
+  % perl languages/jakoc fib.jako > fib.pasm
   % perl assemble.pl fib.pasm > fib.pbc
   % ./test_prog fib.pbc
  The first 20 fibonacci numbers are:
