@@ -3428,6 +3428,146 @@ inline op restoreall() {
 
 ###############################################################################
 
+=head2 Fast access ops
+
+The fast access ops are shortcuts to common operations implemented in PMCs.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<push>(inout PMC, in INT)
+
+=item B<push>(inout PMC, in NUM)
+
+=item B<push>(inout PMC, in STR)
+
+=item B<push>(inout PMC, in PMC)
+
+Push $2 onto the end of the aggregate PMC $1, if that operation is defined.
+
+=cut
+
+inline op push (inout PMC, in INT) {
+    $1->vtable->push_integer(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op push (inout PMC, in NUM) {
+    $1->vtable->push_float(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op push (inout PMC, in STR) {
+    $1->vtable->push_string(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op push (inout PMC, in PMC) {
+    $1->vtable->push_pmc(interpreter, $1, $2);
+    goto NEXT();
+}
+
+=item B<pop>(out INT, inout PMC)
+
+=item B<pop>(out NUM, inout PMC)
+
+=item B<pop>(out STR, inout PMC)
+
+=item B<pop>(out PMC, inout PMC)
+
+Pop off last entry in the aggregate $2, placing the result in $1.
+
+=cut
+
+inline op pop (out INT, inout PMC) {
+    $1 = $2->vtable->pop_integer(interpreter, $2);
+    goto NEXT();
+}
+
+inline op pop (out NUM, inout PMC) {
+    $1 = $2->vtable->pop_float(interpreter, $2);
+    goto NEXT();
+}
+
+inline op pop (out STR, inout PMC) {
+    $1 = $2->vtable->pop_string(interpreter, $2);
+    goto NEXT();
+}
+
+inline op pop (out PMC, inout PMC) {
+    $1 = $2->vtable->pop_pmc(interpreter, $2);
+    goto NEXT();
+}
+
+=item B<unshift>(inout PMC, in INT)
+
+=item B<unshift>(inout PMC, in NUM)
+
+=item B<unshift>(inout PMC, in STR)
+
+=item B<unshift>(inout PMC, in PMC)
+
+Unshift $2 onto the end of the aggregate PMC $1, if that operation is defined.
+
+=cut
+
+inline op unshift (inout PMC, in INT) {
+    $1->vtable->unshift_integer(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op unshift (inout PMC, in NUM) {
+    $1->vtable->unshift_float(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op unshift (inout PMC, in STR) {
+    $1->vtable->unshift_string(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op unshift (inout PMC, in PMC) {
+    $1->vtable->unshift_pmc(interpreter, $1, $2);
+    goto NEXT();
+}
+
+=item B<shift>(out INT, inout PMC)
+
+=item B<shift>(out NUM, inout PMC)
+
+=item B<shift>(out STR, inout PMC)
+
+=item B<shift>(out PMC, inout PMC)
+
+Shift off last entry in the aggregate $2, placing the result in $1.
+
+=cut
+
+inline op shift (out INT, inout PMC) {
+    $1 = $2->vtable->shift_integer(interpreter, $2);
+    goto NEXT();
+}
+
+inline op shift (out NUM, inout PMC) {
+    $1 = $2->vtable->shift_float(interpreter, $2);
+    goto NEXT();
+}
+
+inline op shift (out STR, inout PMC) {
+    $1 = $2->vtable->shift_string(interpreter, $2);
+    goto NEXT();
+}
+
+inline op shift (out PMC, inout PMC) {
+    $1 = $2->vtable->shift_pmc(interpreter, $2);
+    goto NEXT();
+}
+
+###############################################################################
+
 =head2 Control flow
 
 The control flow opcodes check conditions and manage program flow.

@@ -174,6 +174,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/pmc.h"
 #include "parrot/events.h"
 #include "parrot/stacks.h"
+#include "parrot/intlist.h"
 #include "parrot/smallobject.h"
 #include "parrot/headers.h"
 #include "parrot/dod.h"

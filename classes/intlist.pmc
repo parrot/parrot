@@ -1,0 +1,173 @@
+/* intlist.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the IntList class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+#define THROW_UNSUPPORTED internal_exception(INTERP_ERROR, "Operation not supported\n")
+
+pmclass IntList {
+
+    INTVAL type () {
+        return enum_class_PerlArray;
+    }
+
+    STRING* name() {
+        return whoami;
+    }
+
+    PMC* clone () { 
+        THROW_UNSUPPORTED;
+        return NULL;
+    }
+
+    void init () {
+        SELF->data = intlist_new(INTERP);
+        SELF->cache.int_val = 0;
+        SELF->flags |= PMC_custom_mark_FLAG;
+    }
+
+    /* The end_of_used_list parameter is passed into the mark_used
+     * function of the garbage collector. */
+    PMC* mark (PMC *end_of_used_list) {
+        return intlist_mark(INTERP, (IntList *) SELF->data,
+                             end_of_used_list);
+    }
+
+    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
+        if (!key) return;
+        intlist_assign(INTERP, (IntList*) SELF->data, *key, value);
+    };
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        INTVAL ix;
+
+        if (!key) return;
+
+        ix = key_integer(INTERP, key);
+        intlist_assign(INTERP, (IntList*) SELF->data, ix, value);
+    };
+
+
+    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
+        INTVAL ix;
+
+        if (!key) return;
+
+        intlist_assign(INTERP, (IntList*) SELF->data, *key, (INTVAL) value);
+    };
+
+    void set_number_keyed (PMC* key, FLOATVAL value) {
+        INTVAL ix;
+
+        if (!key) return;
+
+        ix = key_integer(INTERP, key);
+        intlist_assign(INTERP, (IntList*) SELF->data, ix, (INTVAL) value);
+    };
+
+    void set_string_keyed_int (INTVAL* key, STRING* value) {
+        THROW_UNSUPPORTED;
+    };
+
+    void set_string_keyed (PMC* key, STRING* value) {
+        THROW_UNSUPPORTED;
+    };
+
+    void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
+        INTVAL ix;
+        INTVAL value;
+
+        if (!key) return;
+
+        value = src->vtable->get_integer_keyed_int(INTERP, src, src_key);
+        intlist_assign(INTERP, (IntList*) SELF->data, *key, value);
+    };
+
+    void set_pmc_keyed (PMC* key, PMC* src, PMC* src_key) {
+        INTVAL ix;
+        INTVAL value;
+
+        if (!key) return;
+
+        ix = key_integer(INTERP, key);
+
+        value = src->vtable->get_integer_keyed(INTERP, src, src_key);
+        intlist_assign(INTERP, (IntList*) SELF->data, ix, value);
+    };
+
+    INTVAL get_integer () {
+        return intlist_length(INTERP, (IntList*) SELF->data);
+    };
+
+    INTVAL get_integer_keyed_int (INTVAL* key) {
+        return intlist_get(INTERP, (IntList*) SELF->data, *key);
+    };
+
+    INTVAL get_integer_keyed (PMC* key) {
+        INTVAL ix;
+        if (!key) return 0;
+        ix = key_integer(INTERP, key);
+        return intlist_get(INTERP, (IntList*) SELF->data, ix);
+    }
+
+    FLOATVAL get_number_keyed_int (INTVAL* key) {
+        THROW_UNSUPPORTED;
+        return 0.0;
+    }
+
+    FLOATVAL get_number_keyed (PMC* key) {
+        THROW_UNSUPPORTED;
+        return 0.0;
+    }
+
+    STRING* get_string_keyed_int (INTVAL* key) {
+        THROW_UNSUPPORTED;
+        return NULL;
+    }
+
+    STRING* get_string_keyed (PMC* key) {
+        THROW_UNSUPPORTED;
+        return NULL;
+    }
+
+    PMC* get_pmc_keyed_int (INTVAL* key) {
+        THROW_UNSUPPORTED;
+        return NULL;
+    }
+
+    PMC* get_pmc_keyed (PMC* key) {
+        THROW_UNSUPPORTED;
+        return NULL;
+    }
+
+    void push_integer (INTVAL value) {
+        intlist_push(INTERP, (IntList*) SELF->data, value);
+    }
+
+    void push_float (FLOATVAL value) {
+        intlist_push(INTERP, (IntList*) SELF->data, (INTVAL) value);
+    }
+
+    INTVAL pop_integer() {
+        return intlist_pop(INTERP, (IntList*) SELF->data);
+    }
+
+    INTVAL pop_integer_keyed(PMC* key) {
+        THROW_UNSUPPORTED;
+        return 0;
+    }
+
+    INTVAL pop_integer_keyed_int(INTVAL* key) {
+        THROW_UNSUPPORTED;
+        return 0;
+    }
+}

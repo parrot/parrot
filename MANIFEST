@@ -23,6 +23,7 @@ classes/coroutine.pmc
 classes/csub.pmc
 classes/default.pmc
 classes/genclass.pl
+classes/intlist.pmc
 classes/intqueue.pmc
 classes/key.pmc
 classes/multiarray.pmc
@@ -206,6 +207,7 @@ include/parrot/exceptions.h
 include/parrot/global_setup.h
 include/parrot/hash.h
 include/parrot/headers.h
+include/parrot/intlist.h
 include/parrot/interp_guts.h
 include/parrot/interpreter.h
 include/parrot/io.h
@@ -235,6 +237,7 @@ include/parrot/sub.h
 include/parrot/trace.h
 include/parrot/unicode.h
 include/parrot/warnings.h
+intlist.c
 interpreter.c
 io.ops
 io/TODO
@@ -589,12 +592,14 @@ t/op/time.t
 t/op/trans.t
 t/pmc/array.t
 t/pmc/boolean.t
+t/pmc/intlist.t
 t/pmc/perlarray.t
 t/pmc/perlhash.t
 t/pmc/perlstring.t
 t/pmc/pmc.t
 t/pmc/sub.t
 t/src/basic.t
+t/src/intlist.t
 test_main.c
 tools/dev/check_source_standards.pl
 tools/dev/genrpt.pl
