@@ -1,0 +1,305 @@
+=head1 NAME
+
+SDL::Constants - constants used in Parrot SDL
+
+=head1 SYNOPSIS
+
+SDL defines several constants, especially for initialization flags and key
+names.  This library provides access to them.
+
+=head1 DESCRIPTION
+
+This library contains and declares constants for Parrot's NCI bindings to the
+SDL library.  You shouldn't need to use these directly, but they're here if you
+do.
+
+=head2 The Constants
+
+This library declares the following constants:
+
+=over 4
+
+=cut
+
+.namespace [ 'SDL::Constants' ]
+
+.sub _initialize @LOAD
+
+	# load the constants
+	_load_key_names()
+
+	.pcc_begin_return
+	.pcc_end_return
+.end
+
+=item * SDL::Constant::key_names
+
+An array of values and key names.  If you receive a key value from an event
+handler, look up the number in this array to find the symbolic name of the key.
+For example, C<8> corresponds to C<backspace>.
+
+=cut
+
+.sub _load_key_names prototyped
+	.local pmc key_names
+
+	key_names = new SArray
+	key_names = 323
+	store_global 'SDL::Constants', 'key_names', key_names
+
+	# list created with:
+	# $ cat /usr/include/SDL/SDL_keysym.h |
+	#   perl -wne 'next unless /SDLK_/; m/_F\d/ || tr/A-Z/a-z/;
+	#		/_(.*?)\s+=\s(\d*)/ && print qq{\tkey_names[ $2 ] = \'$1\'\n}'
+	
+	key_names[   0 ] = 'unknown'
+	key_names[   0 ] = 'first'
+	key_names[   8 ] = 'backspace'
+	key_names[   9 ] = 'tab'
+	key_names[  12 ] = 'clear'
+	key_names[  13 ] = 'return'
+	key_names[  19 ] = 'pause'
+	key_names[  27 ] = 'escape'
+	key_names[  32 ] = 'space'
+	key_names[  33 ] = 'exclaim'
+	key_names[  34 ] = 'quotedbl'
+	key_names[  35 ] = 'hash'
+	key_names[  36 ] = 'dollar'
+	key_names[  38 ] = 'ampersand'
+	key_names[  39 ] = 'quote'
+	key_names[  40 ] = 'leftparen'
+	key_names[  41 ] = 'rightparen'
+	key_names[  42 ] = 'asterisk'
+	key_names[  43 ] = 'plus'
+	key_names[  44 ] = 'comma'
+	key_names[  45 ] = 'minus'
+	key_names[  46 ] = 'period'
+	key_names[  47 ] = 'slash'
+	key_names[  48 ] = '0'
+	key_names[  49 ] = '1'
+	key_names[  50 ] = '2'
+	key_names[  51 ] = '3'
+	key_names[  52 ] = '4'
+	key_names[  53 ] = '5'
+	key_names[  54 ] = '6'
+	key_names[  55 ] = '7'
+	key_names[  56 ] = '8'
+	key_names[  57 ] = '9'
+	key_names[  58 ] = 'colon'
+	key_names[  59 ] = 'semicolon'
+	key_names[  60 ] = 'less'
+	key_names[  61 ] = 'equals'
+	key_names[  62 ] = 'greater'
+	key_names[  63 ] = 'question'
+	key_names[  64 ] = 'at'
+	key_names[  91 ] = 'leftbracket'
+	key_names[  92 ] = 'backslash'
+	key_names[  93 ] = 'rightbracket'
+	key_names[  94 ] = 'caret'
+	key_names[  95 ] = 'underscore'
+	key_names[  96 ] = 'backquote'
+	key_names[  97 ] = 'a'
+	key_names[  98 ] = 'b'
+	key_names[  99 ] = 'c'
+	key_names[ 100 ] = 'd'
+	key_names[ 101 ] = 'e'
+	key_names[ 102 ] = 'f'
+	key_names[ 103 ] = 'g'
+	key_names[ 104 ] = 'h'
+	key_names[ 105 ] = 'i'
+	key_names[ 106 ] = 'j'
+	key_names[ 107 ] = 'k'
+	key_names[ 108 ] = 'l'
+	key_names[ 109 ] = 'm'
+	key_names[ 110 ] = 'n'
+	key_names[ 111 ] = 'o'
+	key_names[ 112 ] = 'p'
+	key_names[ 113 ] = 'q'
+	key_names[ 114 ] = 'r'
+	key_names[ 115 ] = 's'
+	key_names[ 116 ] = 't'
+	key_names[ 117 ] = 'u'
+	key_names[ 118 ] = 'v'
+	key_names[ 119 ] = 'w'
+	key_names[ 120 ] = 'x'
+	key_names[ 121 ] = 'y'
+	key_names[ 122 ] = 'z'
+	key_names[ 127 ] = 'delete'
+	key_names[ 160 ] = 'world_0'
+	key_names[ 161 ] = 'world_1'
+	key_names[ 162 ] = 'world_2'
+	key_names[ 163 ] = 'world_3'
+	key_names[ 164 ] = 'world_4'
+	key_names[ 165 ] = 'world_5'
+	key_names[ 166 ] = 'world_6'
+	key_names[ 167 ] = 'world_7'
+	key_names[ 168 ] = 'world_8'
+	key_names[ 169 ] = 'world_9'
+	key_names[ 170 ] = 'world_10'
+	key_names[ 171 ] = 'world_11'
+	key_names[ 172 ] = 'world_12'
+	key_names[ 173 ] = 'world_13'
+	key_names[ 174 ] = 'world_14'
+	key_names[ 175 ] = 'world_15'
+	key_names[ 176 ] = 'world_16'
+	key_names[ 177 ] = 'world_17'
+	key_names[ 178 ] = 'world_18'
+	key_names[ 179 ] = 'world_19'
+	key_names[ 180 ] = 'world_20'
+	key_names[ 181 ] = 'world_21'
+	key_names[ 182 ] = 'world_22'
+	key_names[ 183 ] = 'world_23'
+	key_names[ 184 ] = 'world_24'
+	key_names[ 185 ] = 'world_25'
+	key_names[ 186 ] = 'world_26'
+	key_names[ 187 ] = 'world_27'
+	key_names[ 188 ] = 'world_28'
+	key_names[ 189 ] = 'world_29'
+	key_names[ 190 ] = 'world_30'
+	key_names[ 191 ] = 'world_31'
+	key_names[ 192 ] = 'world_32'
+	key_names[ 193 ] = 'world_33'
+	key_names[ 194 ] = 'world_34'
+	key_names[ 195 ] = 'world_35'
+	key_names[ 196 ] = 'world_36'
+	key_names[ 197 ] = 'world_37'
+	key_names[ 198 ] = 'world_38'
+	key_names[ 199 ] = 'world_39'
+	key_names[ 200 ] = 'world_40'
+	key_names[ 201 ] = 'world_41'
+	key_names[ 202 ] = 'world_42'
+	key_names[ 203 ] = 'world_43'
+	key_names[ 204 ] = 'world_44'
+	key_names[ 205 ] = 'world_45'
+	key_names[ 206 ] = 'world_46'
+	key_names[ 207 ] = 'world_47'
+	key_names[ 208 ] = 'world_48'
+	key_names[ 209 ] = 'world_49'
+	key_names[ 210 ] = 'world_50'
+	key_names[ 211 ] = 'world_51'
+	key_names[ 212 ] = 'world_52'
+	key_names[ 213 ] = 'world_53'
+	key_names[ 214 ] = 'world_54'
+	key_names[ 215 ] = 'world_55'
+	key_names[ 216 ] = 'world_56'
+	key_names[ 217 ] = 'world_57'
+	key_names[ 218 ] = 'world_58'
+	key_names[ 219 ] = 'world_59'
+	key_names[ 220 ] = 'world_60'
+	key_names[ 221 ] = 'world_61'
+	key_names[ 222 ] = 'world_62'
+	key_names[ 223 ] = 'world_63'
+	key_names[ 224 ] = 'world_64'
+	key_names[ 225 ] = 'world_65'
+	key_names[ 226 ] = 'world_66'
+	key_names[ 227 ] = 'world_67'
+	key_names[ 228 ] = 'world_68'
+	key_names[ 229 ] = 'world_69'
+	key_names[ 230 ] = 'world_70'
+	key_names[ 231 ] = 'world_71'
+	key_names[ 232 ] = 'world_72'
+	key_names[ 233 ] = 'world_73'
+	key_names[ 234 ] = 'world_74'
+	key_names[ 235 ] = 'world_75'
+	key_names[ 236 ] = 'world_76'
+	key_names[ 237 ] = 'world_77'
+	key_names[ 238 ] = 'world_78'
+	key_names[ 239 ] = 'world_79'
+	key_names[ 240 ] = 'world_80'
+	key_names[ 241 ] = 'world_81'
+	key_names[ 242 ] = 'world_82'
+	key_names[ 243 ] = 'world_83'
+	key_names[ 244 ] = 'world_84'
+	key_names[ 245 ] = 'world_85'
+	key_names[ 246 ] = 'world_86'
+	key_names[ 247 ] = 'world_87'
+	key_names[ 248 ] = 'world_88'
+	key_names[ 249 ] = 'world_89'
+	key_names[ 250 ] = 'world_90'
+	key_names[ 251 ] = 'world_91'
+	key_names[ 252 ] = 'world_92'
+	key_names[ 253 ] = 'world_93'
+	key_names[ 254 ] = 'world_94'
+	key_names[ 255 ] = 'world_95'
+	key_names[ 256 ] = 'kp0'
+	key_names[ 257 ] = 'kp1'
+	key_names[ 258 ] = 'kp2'
+	key_names[ 259 ] = 'kp3'
+	key_names[ 260 ] = 'kp4'
+	key_names[ 261 ] = 'kp5'
+	key_names[ 262 ] = 'kp6'
+	key_names[ 263 ] = 'kp7'
+	key_names[ 264 ] = 'kp8'
+	key_names[ 265 ] = 'kp9'
+	key_names[ 266 ] = 'kp_period'
+	key_names[ 267 ] = 'kp_divide'
+	key_names[ 268 ] = 'kp_multiply'
+	key_names[ 269 ] = 'kp_minus'
+	key_names[ 270 ] = 'kp_plus'
+	key_names[ 271 ] = 'kp_enter'
+	key_names[ 272 ] = 'kp_equals'
+	key_names[ 273 ] = 'up'
+	key_names[ 274 ] = 'down'
+	key_names[ 275 ] = 'right'
+	key_names[ 276 ] = 'left'
+	key_names[ 277 ] = 'insert'
+	key_names[ 278 ] = 'home'
+	key_names[ 279 ] = 'end'
+	key_names[ 280 ] = 'pageup'
+	key_names[ 281 ] = 'pagedown'
+	key_names[ 282 ] = 'F1'
+	key_names[ 283 ] = 'F2'
+	key_names[ 284 ] = 'F3'
+	key_names[ 285 ] = 'F4'
+	key_names[ 286 ] = 'F5'
+	key_names[ 287 ] = 'F6'
+	key_names[ 288 ] = 'F7'
+	key_names[ 289 ] = 'F8'
+	key_names[ 290 ] = 'F9'
+	key_names[ 291 ] = 'F10'
+	key_names[ 292 ] = 'F11'
+	key_names[ 293 ] = 'F12'
+	key_names[ 294 ] = 'F13'
+	key_names[ 295 ] = 'F14'
+	key_names[ 296 ] = 'F15'
+	key_names[ 300 ] = 'numlock'
+	key_names[ 301 ] = 'capslock'
+	key_names[ 302 ] = 'scrollock'
+	key_names[ 303 ] = 'rshift'
+	key_names[ 304 ] = 'lshift'
+	key_names[ 305 ] = 'rctrl'
+	key_names[ 306 ] = 'lctrl'
+	key_names[ 307 ] = 'ralt'
+	key_names[ 308 ] = 'lalt'
+	key_names[ 309 ] = 'rmeta'
+	key_names[ 310 ] = 'lmeta'
+	key_names[ 311 ] = 'lsuper'
+	key_names[ 312 ] = 'rsuper'
+	key_names[ 313 ] = 'mode'
+	key_names[ 314 ] = 'compose'
+	key_names[ 315 ] = 'help'
+	key_names[ 316 ] = 'print'
+	key_names[ 317 ] = 'sysreq'
+	key_names[ 318 ] = 'break'
+	key_names[ 319 ] = 'menu'
+	key_names[ 320 ] = 'power'
+	key_names[ 321 ] = 'euro'
+	key_names[ 322 ] = 'undo'
+
+	.pcc_begin_return
+	.pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Written by Jens Rieks, maintained by chromatic, E<lt>chromatic at wgz dot
+orgE<gt>.  Please send patches, feedback, and suggestions to the Perl 6
+Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, The Perl Foundation.
+
+=cut

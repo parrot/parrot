@@ -4,335 +4,213 @@ move_parrot_logo.imc - move a Parrot logo with the SDL Parrot bindings
 
 =head1 SYNOPSIS
 
-To run this file, be in the Parrot directory and run the following command:
+To run this file, run the following command from the Parrot directory:
 
 	$ parrot examples/sdl/move_parrot_logo.imc
 	$
 
 =cut
 
-.sub _main
-	_init()
-	_MAIN()
+.sub _main @MAIN
+	load_bytecode "library/SDL/App.imc"
+	load_bytecode "library/SDL/Color.imc"
+	load_bytecode "library/SDL/Rect.imc"
+	load_bytecode "library/SDL/Image.imc"
+	load_bytecode "library/SDL/Sprite.imc"
+	load_bytecode "library/SDL/EventHandler.imc"
+	load_bytecode "library/SDL/Event.imc"
+
+	.local pmc app_args
+	new app_args, .PerlHash
+	set app_args[ 'width'  ], 640
+	set app_args[ 'height' ], 480
+	set app_args[ 'bpp'    ],   0
+	set app_args[ 'flags'  ],   0
+
+	.local pmc app
+	.local int app_type
+
+	find_type app_type, 'SDL::App'
+	app = new app_type, app_args
+
+	.local pmc main_screen
+	main_screen = app.'surface'()
+
+	.local pmc color_args
+	color_args = new PerlHash
+
+	color_args[ 'r' ] = 0
+	color_args[ 'g' ] = 0
+	color_args[ 'b' ] = 0
+
+	.local pmc black
+	.local int color_type
+
+	find_type color_type, 'SDL::Color'
+	black = new color_type, color_args
+
+	.local pmc image
+	.local int image_type
+	.local pmc filename
+
+	new filename, .PerlString
+	filename = 'examples/sdl/parrot_small.png'
+
+	find_type image_type, 'SDL::Image'
+	image = new image_type, filename
+
+	.local pmc sprite_args
+	sprite_args = new PerlHash
+	sprite_args[ 'surface'  ] = image
+	sprite_args[ 'source_x' ] =     0
+	sprite_args[ 'source_y' ] =     0
+	sprite_args[ 'dest_x'   ] =   270
+	sprite_args[ 'dest_y'   ] =   212
+	sprite_args[ 'bgcolor'  ] = black
+
+	.local pmc sprite
+	.local int sprite_type
+
+	find_type sprite_type, 'SDL::Sprite'
+	sprite = new sprite_type, sprite_args
+
+	.local pmc parent_class
+	.local pmc class_type
+	getclass parent_class, 'SDL::EventHandler'
+	subclass class_type, parent_class, 'MoveLogo::EventHandler'
+
+	.local pmc event_handler
+	.local int handler_type
+
+	find_type handler_type, 'MoveLogo::EventHandler'
+	event_handler = new handler_type
+
+	.local pmc event
+	.local int event_type
+
+	find_type event_type, 'SDL::Event'
+	event = new event_type
+
+	.local pmc handler_args
+	handler_args = new .PerlHash
+	handler_args[ 'screen' ] = main_screen
+	handler_args[ 'sprite' ] = sprite
+
+	event_handler.'draw_screen'( main_screen, sprite )
+	event.'process_events'( event_handler, handler_args )
+
+.end
+
+.namespace [ 'MoveLogo::EventHandler' ]
+
+.sub draw_screen method
+	.param pmc screen
+	.param pmc sprite
+
+	.local pmc prev_rect
+	.local pmc rect
+	.local pmc rect_array
+	rect_array = new Array
+	set rect_array, 2
+
+	(prev_rect, rect) = sprite.'draw_undraw'( screen )
+
+	set rect_array[ 0 ], prev_rect
+	set rect_array[ 1 ], rect
+
+	screen.'update_rects'( rect_array )
+
+.end
+
+.sub key_down_down method
+	.param pmc event_args
+
+	.local pmc screen
+	.local pmc sprite
+
+	screen = event_args[ 'screen' ]
+	sprite = event_args[ 'sprite' ]
+
+	.local int y
+	y = sprite.'y'()
+	if y == 424 goto _draw
+	inc y
+	sprite.'y'( y )
+
+_draw:
+	self.'draw_screen'( screen, sprite )
+
+.end
+
+.sub key_down_up method
+	.param pmc event_args
+
+	.local pmc screen
+	.local pmc sprite
+
+	screen = event_args[ 'screen' ]
+	sprite = event_args[ 'sprite' ]
+
+	.local int y
+	y = sprite.'y'()
+	if y == 0 goto _draw
+	dec y
+	sprite.'y'( y )
+
+_draw:
+	self.'draw_screen'( screen, sprite )
+
+.end
+
+.sub key_down_left method
+	.param pmc event_args
+
+	.local pmc screen
+	.local pmc sprite
+
+	screen = event_args[ 'screen' ]
+	sprite = event_args[ 'sprite' ]
+
+	.local int x
+	x = sprite.'x'()
+	if x == 0 goto _draw
+	dec x
+	sprite.'x'( x )
+
+_draw:
+	self.'draw_screen'( screen, sprite )
+
+.end
+
+.sub key_down_right method
+	.param pmc event_args
+
+	.local pmc screen
+	.local pmc sprite
+
+	screen = event_args[ 'screen' ]
+	sprite = event_args[ 'sprite' ]
+
+	.local int x
+	x = sprite.'x'()
+	if x == 540 goto _draw
+	inc x
+	sprite.'x'( x )
+
+_draw:
+	self.'draw_screen'( screen, sprite )
+
+.end
+
+.sub key_down_escape method
+	.param pmc event_args
+
 	end
-.end
-
-.include "library/sdl_types.imc"
-.include "library/sdl_constants.imc"
-.include "library/sdl_image.imc"
-
-.pcc_sub _init prototyped
-	.include "library/sdl.pasm"
-	_init_SDL_Image()
-	.pcc_begin_return
-	.pcc_end_return
-.end
-
-.sub _MAIN
-	.sym pmc SDL_Init
-	.sym pmc SDL_BlitSurface
-
-	SDL_Init        = global "SDL::Init"
-	SDL_BlitSurface = global "SDL::BlitSurface"
-
-	.pcc_begin prototyped
-		.arg 32
-		.nci_call SDL_Init
-	.pcc_end
-
-	.sym pmc screen_settings
-	new screen_settings, .PerlHash
-	set screen_settings['width'],  640
-	set screen_settings['height'], 480
-	set screen_settings['bpp'],      0
-	set screen_settings['flags'],    0
-
-	.sym object screen
-	screen = _new_SDL_Screen( screen_settings )
-	global "MP_screen" = screen
-
-	.sym pmc screen_rect
-	new screen_rect, .PerlHash
-	set screen_rect['width'],  640
-	set screen_rect['height'], 480
-	set screen_rect['x'],        0
-	set screen_rect['y'],        0
-
-	global "MP_screen_rect" = screen_rect
-
-	.sym int bg_color
-	bg_color = _new_SDL_Color( 0, 0, 0 )
-
-	.sym object parrot
-	parrot = _SDL_Image_new( "examples/sdl/parrot_small.png" )
-	global "MP_parrot" = parrot
-
-	_SDL_Image_set_x( parrot, 270 )
-	_SDL_Image_set_y( parrot, 212 )
-
-	# make some subroutine objects
-	.sym Sub UpKey
-	.sym Sub DownKey
-	.sym Sub LeftKey
-	.sym Sub RightKey
-	.sym Sub Quit
-
-	newsub UpKey,    .Sub, _up_key
-	newsub DownKey,  .Sub, _down_key
-	newsub LeftKey,  .Sub, _left_key
-	newsub RightKey, .Sub, _right_key
-	newsub Quit,     .Sub, _quit
-
-	.sym pmc key_handlers
-	new key_handlers, .OrderedHash
-
-	$I0 = _sdl_constant( 'SDLK_UP' )
-	set key_handlers[$I0], UpKey
-	$I0 = _sdl_constant( 'SDLK_DOWN' )
-	set key_handlers[$I0], DownKey
-	$I0 = _sdl_constant( 'SDLK_LEFT' )
-	set key_handlers[$I0], LeftKey
-	$I0 = _sdl_constant( 'SDLK_RIGHT' )
-	set key_handlers[$I0], RightKey
-	$I0 = _sdl_constant( 'SDLK_ESCAPE' )
-	set key_handlers[$I0], Quit
-
-	.sym pmc event_handlers
-	new event_handlers, .OrderedHash
-	
-	$I0 = _sdl_constant( 'SDL_QUIT' )
-	set event_handlers[$I0], Quit
-	$I0 = _sdl_constant( 'SDL_KEYUP' )
-	set event_handlers[$I0], key_handlers
-	$I0 = _sdl_constant( 'SDL_KEYDOWN' )
-	set event_handlers[$I0], key_handlers
-
-	_update_screen( screen, screen_rect, parrot )
-	_SDL_loop( event_handlers )
-
-	.pcc_begin_return
-	.pcc_end_return
-.end
-
-.pcc_sub _up_key prototyped
-	.sym pmc screen
-	.sym pmc parrot
-	.sym pmc screen_rect
-
-	screen           = global 'MP_screen'
-	screen_rect      = global 'MP_screen_rect'
-	parrot           = global 'MP_parrot'
-
-	$I0 = _SDL_Image_get_y( parrot )
-	dec $I0
-	if $I0 > 0 goto y_okay
-	set $I0, 0
-
-y_okay:
-	_SDL_Image_set_y( parrot, $I0 )
-
-	_update_screen( screen, screen_rect, parrot )
-
-	.pcc_begin_return
-		.return 1
-	.pcc_end_return
-.end
-
-.pcc_sub _down_key
-	.sym pmc screen
-	.sym pmc parrot
-	.sym pmc screen_rect
-
-	screen           = global 'MP_screen'
-	screen_rect      = global 'MP_screen_rect'
-	parrot           = global 'MP_parrot'
-
-	$I0 = _SDL_Image_get_y( parrot )
-	inc $I0
-
-	if $I0 < 480 goto y_okay
-	set $I0, 480
-
-y_okay:
-	_SDL_Image_set_y( parrot, $I0 )
-
-	_update_screen( screen, screen_rect, parrot )
-
-	.pcc_begin_return
-		.return 1
-	.pcc_end_return
-.end
-
-.pcc_sub _left_key
-	.sym pmc screen
-	.sym pmc parrot
-	.sym pmc screen_rect
-
-	screen           = global 'MP_screen'
-	screen_rect      = global 'MP_screen_rect'
-	parrot           = global 'MP_parrot'
-
-	$I0 = _SDL_Image_get_x( parrot )
-	dec $I0
-
-	if $I0 > 0 goto x_okay
-	set $I0, 0
-
-x_okay:
-	_SDL_Image_set_x( parrot, $I0 )
-
-	_update_screen( screen, screen_rect, parrot )
-
-	.pcc_begin_return
-		.return 1
-	.pcc_end_return
-.end
-
-.pcc_sub _right_key
-	.sym pmc screen
-	.sym pmc parrot
-	.sym pmc screen_rect
-
-	screen           = global 'MP_screen'
-	screen_rect      = global 'MP_screen_rect'
-	parrot           = global 'MP_parrot'
-
-	$I0 = _SDL_Image_get_x( parrot )
-	inc $I0
-
-	if $I0 < 640 goto x_okay
-	set $I0, 640
-
-x_okay:
-	_SDL_Image_set_x( parrot, $I0 )
-
-	_update_screen( screen, screen_rect, parrot )
-	
-	.pcc_begin_return
-		.return 1
-	.pcc_end_return
-.end
-
-.pcc_sub _quit
-	.sym pmc SDL_Quit
-	.sym pmc SDL_FreeSurface
-	SDL_Quit        = global "SDL::Quit"
-	SDL_FreeSurface = global "SDL::FreeSurface"
-
-	.sym pmc screen
-	screen = global 'MP_screen'
-
-	.pcc_begin prototyped
-		.arg screen
-		.nci_call SDL_FreeSurface
-	.pcc_end
-
-	.pcc_begin prototyped
-		.nci_call SDL_Quit
-	.pcc_end
-
-	.pcc_begin_return
-		.return 0
-	.pcc_end_return
-.end
-
-.pcc_sub _update_screen prototyped
-	.param pmc    screen
-	.param pmc    screen_rect
-	.param pmc    parrot
-
-	.sym int bg_color
-	.sym pmc old_rect
-	.sym pmc new_rect
-
-	bg_color             = _new_SDL_Color( 0, 0, 0 )
-
-	.sym pmc old_rect
-	.sym pmc new_rect
-	(old_rect, new_rect) = _SDL_Image_draw( parrot, screen, bg_color )
-
-	.sym pmc UpdateRect
-	UpdateRect   = global "SDL::UpdateRect"
-
-	.sym int x
-	.sym int y
-	.sym int w
-	.sym int h
-
-	set x, old_rect['x']
-	set y, old_rect['y']
-	set w, old_rect['width']
-	set h, old_rect['height']
-
-	.pcc_begin prototyped
-		.arg screen
-		.arg x
-		.arg y
-		.arg w
-		.arg h
-		.nci_call UpdateRect
-	.pcc_end 
-
-	set x, new_rect['x']
-	set y, new_rect['y']
-	set w, new_rect['width']
-	set h, new_rect['height']
-
-	.pcc_begin prototyped
-		.arg screen
-		.arg x
-		.arg y
-		.arg w
-		.arg h
-		.nci_call UpdateRect
-	.pcc_end 
-
-	.pcc_begin_return
-	.pcc_end_return
-.end
-
-.pcc_sub _blank_rect prototyped
-	.param pmc screen
-	.param pmc rect
-	.param int color
-
-	.sym pmc SDL_FillRect
-	SDL_FillRect   = global "SDL::FillRect"
-	
-	.pcc_begin prototyped
-		.arg screen
-		.arg rect
-		.arg color
-		.nci_call SDL_FillRect
-	.pcc_end
-
-	.pcc_begin_return
-	.pcc_end_return
-.end
-
-.pcc_sub _blank_screen prototyped
-	.param pmc screen
-	.param pmc rect
-	.param object color
-
-	.sym pmc SDL_FillRect
-	SDL_FillRect   = global "SDL::FillRect"
-
-	.pcc_begin prototyped
-		.arg screen
-		.arg rect
-		.arg color
-		.nci_call SDL_FillRect
-	.pcc_end
-
-	.pcc_begin_return
-	.pcc_end_return
 .end
 
 =head1 AUTHOR
 
-chromatic, E<lt>chromatic at wgz dot orgE<gt>, with help Leo TE<ouml>tsch, as
-usual.
+chromatic, E<lt>chromatic at wgz dot orgE<gt>.
 
 =head1 COPYRIGHT
 
