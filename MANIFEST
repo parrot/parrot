@@ -208,7 +208,6 @@ docs/dev/longopt.dev                              [main]doc
 docs/dev/pmc_freeze.pod                           [devel]doc
 docs/dev/rx.dev                                   [main]doc
 docs/embed.pod                                    [main]doc
-docs/extend.pod                                   [main]doc
 docs/faq.pod                                      [main]doc
 docs/gettingstarted.pod                           [main]doc
 docs/glossary.pod                                 [main]doc

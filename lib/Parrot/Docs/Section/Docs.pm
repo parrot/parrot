@@ -57,7 +57,6 @@ sub new
 			$self->new_item('', 'docs/jit.pod'),
 			$self->new_item('', 'docs/packfile-c.pod'),
 			$self->new_item('', 'docs/packfile-perl.pod'),
-			$self->new_item('', 'docs/extend.pod'),
 			$self->new_item('', 'docs/running.pod'),
 			$self->new_item('', 'docs/debug.pod'),
 			$self->new_item('', 'docs/debugger.pod'),
@@ -66,7 +65,7 @@ sub new
 		),
 		$self->new_group('Development Documentation', '', 'docs/dev'),
 		$self->new_group('PMC Documentation', '', 'docs/pmc'),
-		$self->new_group('Perl Design Documents (PDD)', '', 'docs/pdds'),
+		$self->new_group('Parrot Design Documents (PDD)', '', 'docs/pdds'),
 	);
 }
 

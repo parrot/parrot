@@ -816,7 +816,7 @@ Parrot_unregister_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)
 
 =head1 SEE ALSO
 
-See F<include/parrot/extend.h> and F<docs/extend.pod>.
+See F<include/parrot/extend.h> and F<docs/pdds/pdd11_extending.pod>.
 
 =head1 HISTORY
 

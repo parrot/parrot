@@ -9,7 +9,7 @@
  *  History:
  *  Notes:
  *  References:
- *      extend.c, docs/extend.pod.
+ *      extend.c, docs/pdds/pdd11_extending.pod.
  */
 
 #if !defined(PARROT_EXTEND_H_GUARD)
