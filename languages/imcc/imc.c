@@ -15,7 +15,9 @@
 #include <assert.h>
 #include "imc.h"
 #include "optimizer.h"
+#define JIT_IMCC
 #include "parrot/jit.h"
+#include "parrot/jit_emit.h"
 
 static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
@@ -38,6 +40,7 @@ void allocate(struct Parrot_Interp *interpreter) {
         return;
 
     init_tables(interpreter);
+    allocated = 0;
 
     debug(DEBUG_IMC, "\n------------------------\n");
     debug(DEBUG_IMC, "processing sub %s\n", function);
@@ -97,8 +100,10 @@ void allocate(struct Parrot_Interp *interpreter) {
         order_spilling();          /* puts the remaing item on stack */
 
         to_spill = try_allocate();
+        allocated = 1;
 
         if ( to_spill >= 0 ) {
+            allocated = 0;
             spill(interpreter, to_spill);
             build_reglist();
             life_analysis();
@@ -770,141 +775,166 @@ int neighbours(int node) {
  *       so they are save.
  */
 
+#ifndef EXTCALL
+#  define EXTCALL(op) op_jit[*(op)].extcall
+#endif
+
+#ifndef INT_REGISTERS_TO_MAP
+#  define INT_REGISTERS_TO_MAP 0
+#endif
+
+#ifndef FLOAT_REGISTERS_TO_MAP
+#  define FLOAT_REGISTERS_TO_MAP 0
+#endif
+
+#ifndef PRESERVED_INT_REGS
+#  define PRESERVED_INT_REGS MAX_MAPPED
+#endif
+
+#ifndef PRESERVED_FLOAT_REGS
+#  define PRESERVED_FLOAT_REGS MAX_MAPPED
+#endif
+
 static void
 allocate_jit(struct Parrot_Interp *interpreter)
 {
-    int i, j, f, k;
-/* int to_map[] = { INT_REGISTERS_TO_MAP, 0, 0,
- *      FLOAT_REGISTERS_TO_MAP };
- *      XXX communicate these with jit_emit.h
- */
-    int to_map[] = { 4, 0, 0, 4 };
+    int c, j, k, typ;
+    int to_map[4] = {0,0,0,0};
+#define MAX_MAPPED 32
+    int preserved[] =
+    {PRESERVED_INT_REGS, MAX_MAPPED, MAX_MAPPED, PRESERVED_FLOAT_REGS};
     const char *types = "IPSN";
-    Instruction * ins, *next, *last, *tmp, *prev;
-    SymReg * r, *cpu[64], *regs[IMCC_MAX_REGS];       /* XXX */
-    /* TODO
-     * cpu, par, reads, writes may be more then the actual mapped registers
-     * because register get reused and may have the same color
-     */
-    int reads[64], writes[64], nr, nw;
-    static SymReg *par[64];       /* XXX */
-    static int ncpu;
+    Instruction * ins, *last, *tmp, *prev;
+    SymReg * r;
+    SymReg * regs[IMCC_MAX_REGS];
+    static SymReg  *cpu[4][MAX_MAPPED];
+    static SymReg  *par[4][MAX_MAPPED];
+    int reads[4][MAX_MAPPED], writes[4][MAX_MAPPED], nr, nw;
+    int maxc[4] = {0,0,0,0};
 
-    for (j = 0; j < ncpu; j++)
-        free(par[j]);
-    for(i = ncpu = 0; i < HASH_SIZE; i++) {
-        r = hash[i];
-        /* Add each mapped register to cpu reglist */
-        for(; r; r = r->next) {
-            if ((r->type & VTREGISTER) && r->set != 'K') {
-                if (r->color >= 0 &&
-                        r->color < to_map[strchr(types, r->set) - types]) {
-                    r->color = -1 - r->color;
-                    cpu[ncpu++] = r;
-                }
+    assert(INT_REGISTERS_TO_MAP < MAX_MAPPED);
+    assert(FLOAT_REGISTERS_TO_MAP < MAX_MAPPED);
+    to_map[0] = INT_REGISTERS_TO_MAP;
+    to_map[3] = FLOAT_REGISTERS_TO_MAP;
+    /* make a list of mapped cpu regs */
+    if (cpu[0][0] == NULL) {
+        for (typ = 0; typ < 4; typ++)
+            for (k = 0; k < to_map[typ]; k++) {
+                char name[16];
+                sprintf(name, "%c%d#c", types[typ], k);
+                cpu[typ][k] = mk_pasm_reg(str_dup(name));
+                cpu[typ][k]->color = -1 - k;
+                sprintf(name, "%c%d#p", types[typ], k);
+                par[typ][k] = mk_pasm_reg(str_dup(name));
             }
-        }
-    }
-    assert(ncpu <= 64);
-    /* generate a list of parrot registers */
-    for (j = 0; j < ncpu; j++) {
-        par[j] = malloc(sizeof(SymReg));
-        memcpy(par[j], cpu[j], sizeof(SymReg));
-        par[j]->color = -1 - cpu[j]->color;
     }
     prev = last = NULL;
     nr = nw = 0;
+    /* change all mappable registers to mapped ones */
+    for (j = 0; j < n_symbols; j++) {
+        r = reglist[j];
+        typ = strchr(types, r->set) - types;
+        if (r->color < to_map[typ]) {
+            if (r->color >= maxc[typ])
+                maxc[typ] = r->color + 1;
+            r->color = -1 - r->color;
+        }
+
+    }
+    to_map[0] = maxc[0];
+    to_map[3] = maxc[3];
+    /* clear all used regs at beginning */
+    for (typ = 0; typ < 4; typ++)
+        for (j = 0; j < to_map[typ]; j++) {
+            regs[0] = cpu[typ][j];
+            regs[1] = par[typ][j];
+            tmp = INS(interpreter, "set", "%s, %s\t# init",
+                    regs, 2, 0, 0);
+            insert_ins(NULL, tmp);
+        }
+    /* TODO restore regs before end if non main */
     for (ins = instructions; ins; prev = ins, ins = ins->next) {
-        if (ins->opnum >= 0 &&
-                op_jit[ins->opnum].extcall == 1) {  /* XXX i386 */
-            for (k = 0; k < ncpu; k++)
-                reads[k] = writes[k] = 999;
-            /* TODO non preserved regs */
-            for (last = next = ins;
-                    next && op_jit[next->opnum].extcall == 1;
-                    next = next->next) {
-                for (j = 0; j < ncpu; j++) {
-                    if (instruction_reads(next, cpu[j]) &&
-                            instruction_writes(next, cpu[j])) {
-                        /* or set reads[j] - could be faster */
-                        for (k = f = 0; k < nr; k++) {
-                            if (reads[k] == j) {
-                                f = 1;
-                                break;
-                            }
-                        }
-                        if (!f)
-                            reads[nr++] = j;
-                        for (k = f = 0; k < nr; k++) {
-                            if (writes[k] == j) {
-                                f = 1;
-                                break;
-                            }
-                        }
-                        if (!f)
-                            writes[nw++] = j;
-                        for (k = 0; next->r[k] && k < IMCC_MAX_REGS; k++)
-                            if (next->r[k] == cpu[j])
-                                next->r[k] = par[j];
+        /* clear preserved regs, set rw of non preserved regs */
+        for (typ = 0; ins != instructions && typ < 4; typ++)
+            for (k = 0; k < to_map[typ]; k++) {
+                reads[typ][k] = writes[typ][k] =
+                    k >= preserved[typ];
+            }
+        /* if extern, go through regs and check the usage */
+        if (ins->opnum >= 0 && EXTCALL(&ins->opnum)) {
+            nr = nw = 1;
+            /* TODO stop at basic block end */
+            for (last = ins; ins && ins->opnum >= 0 && EXTCALL(&ins->opnum);
+                    ins = ins->next) {
+                ins->type |= ITEXT;
+                for (j = 0; j < n_symbols; j++) {
+                    r = reglist[j];
+                    if (r->color >= 0)
+                        continue;
+                    typ = strchr(types, r->set) - types;
+                    c = -1 - r->color;
+                    if (instruction_reads(ins, r) &&
+                            instruction_writes(ins, r)) {
+                        reads[typ][c] = 1;
+                        writes[typ][c] = 1;
+                        nr = nw = 1;
                     }
-                    else if (instruction_reads(next, cpu[j])) {
-                        for (k = f = 0; k < nr; k++) {
-                            if (reads[k] == j) {
-                                f = 1;
-                                break;
-                            }
-                        }
-                        if (!f)
-                            reads[nr++] = j;
-                        for (k = 0; next->r[k] && k < IMCC_MAX_REGS; k++)
-                            if (next->r[k] == cpu[j])
-                                next->r[k] = par[j];
+                    else if (instruction_reads(ins, r)) {
+                        reads[typ][c] = 1;
+                        nr = 1;
                     }
-                    else if (instruction_writes(next, cpu[j])) {
-                        for (k = 0; next->r[k] && k < IMCC_MAX_REGS; k++)
-                            if (next->r[k] == cpu[j])
-                                next->r[k] = par[j];
-                        for (k = f = 0; k < nr; k++) {
-                            if (writes[k] == j) {
-                                f = 1;
-                                break;
-                            }
-                        }
-                        if (!f)
-                            writes[nw++] = j;
+                    else if (instruction_writes(ins, r)) {
+                        writes[typ][c] = 1;
+                        nw = 1;
                     }
+                }
+                /* changed mapped regs to parrot regs */
+                for (j = 0; (r = ins->r[j]) && j < IMCC_MAX_REGS; j++) {
+                    typ = strchr(types, r->set) - types;
+                    if ((r->type & VTREGISTER) && r->color < 0)
+                        ins->r[j] = par[typ][-1 - r->color];
                 }
                 /* remember last extern opcode, all loads are inserted
                  * after this instruction
                  */
-                if (next->type & ITBRANCH) {
+                last = ins;
+                if (ins->type & ITBRANCH) {
                     break;
                 }
-                last = next;
             }
         }
         /* insert load ins after non JIT block */
         if (last && nw) {
-            for ( ; nw ; nw--) {
-                j = writes[nw-1];
-                regs[0] = cpu[j];
-                regs[1] = par[j];
-                tmp = INS(interpreter, "set", "%s, %s\t# load",
-                        regs, 2, 0, 0);
-                insert_ins(last, tmp);
-            }
-            last = NULL;
+            for (typ = 0; typ < 4; typ++)
+                for (j = 0; j < to_map[typ]; j++) {
+                    if (!writes[typ][j])
+                        continue;
+                    regs[0] = cpu[typ][j];
+                    regs[1] = par[typ][j];
+                    tmp = INS(interpreter, "set", "%s, %s\t# load",
+                            regs, 2, 0, 0);
+                    insert_ins(last, tmp);
+                }
+            nw = 0;
         }
         /* insert save ins before extern op */
         if (nr) {
-            for ( ; nr ; nr--) {
-                j = reads[nr-1];
-                regs[0] = par[j];
-                regs[1] = cpu[j];
-                tmp = INS(interpreter, "set", "%s, %s\t# save", regs, 2, 0, 0);
-                insert_ins(prev, tmp);
-            }
+            for (typ = 0; typ < 4; typ++)
+                for (j = 0; j < to_map[typ]; j++) {
+                    if (!reads[typ][j])
+                        continue;
+                    regs[0] = par[typ][j];
+                    regs[1] = cpu[typ][j];
+                    tmp = INS(interpreter, "set", "%s, %s\t# save",
+                            regs, 2, 0, 0);
+                    insert_ins(prev, tmp);
+                }
+            nr = 0;
         }
+        /* continue with/after last non JIT ins */
+        if (last)
+            ins = last;
+        last = NULL;
     }
 }
 

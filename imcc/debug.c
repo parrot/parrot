@@ -71,14 +71,15 @@ void dump_instructions() {
     int pc;
 
     fprintf(stderr, "\nDumping the instructions status:\n-------------------------------\n");
-    fprintf(stderr, "n\tblock\tdepth\tflags\ttype     opnum\tsize\tpc\tins\n");
+    fprintf(stderr, "nins blck deep flags\t    type opnr size   pc  X ins\n");
     for (pc = 0, ins = instructions; ins; ins = ins->next) {
 	bb = bb_list[ins->bbindex];
 
 	if (bb) {
-	     fprintf(stderr, "%i\t%d\t%d\t%x\t%8x %d\t%d\t%d\t",
+	     fprintf(stderr, "%4i %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
 		     ins->index, bb->index, bb->loop_depth,
-                     ins->flags, ins->type, ins->opnum, ins->opsize, pc);
+                     ins->flags, (ins->type & ~ITEXT), ins->opnum,
+                     ins->opsize, pc, ins->type & ITEXT ? 'X' : ' ');
 	}
 	else {
 	     fprintf(stderr, "\t");

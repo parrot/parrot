@@ -1000,6 +1000,9 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
 
    NWC
 */
+
+#ifndef JIT_IMCC
+
 char intval_map[INT_REGISTERS_TO_MAP] =
     { r0, r1, r2, r3, r4, r5, r6, r7, r8, r12 };
 
@@ -1058,6 +1061,8 @@ arm_sync_d_i_cache (void *start, void *end) {
 #error "ARM needs to sync D and I caches, and I don't know how to on this OS"
 #endif
 }
+
+#endif
 
 #endif
 

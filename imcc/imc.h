@@ -81,6 +81,8 @@ EXTERN int        line;	/* and line */
 EXTERN int optimizer_level;
 EXTERN int dont_optimize;
 EXTERN int has_compile;
+EXTERN int allocated;
+
 
 enum {
 	OPT_NONE,

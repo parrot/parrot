@@ -2664,26 +2664,28 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
 }
 
 #else /* JIT_EMIT */
-
 #  define REQUIRES_CONSTANT_POOL 0
 #  define INT_REGISTERS_TO_MAP 4
 #  define FLOAT_REGISTERS_TO_MAP 4
+
+#ifndef JIT_IMCC
 
 char intval_map[] =
 /* we can't use ECX, shift ops need it, push ECX before shift doesn't
  * because, when ECX is mapped you get shrl %cl, %ecx */
     { emit_EBX, emit_EDI, emit_ESI, emit_EDX };
 
+/* ST(0) is used as a scratch register,
+ * using more then 4 registers breaks C<time N0>
+ */
+char floatval_map[] = { 1,2,3,4 };
+#endif
+
 /* of these registers that much (from 0 < n) are callee saved, i.e. are
  * not changed around external calls
  */
 
 #  define PRESERVED_INT_REGS 3
-
-/* ST(0) is used as a scratch register,
- * using more then 4 registers breaks C<time N0>
- */
-char floatval_map[] = { 1,2,3,4 };
 
 
 /*
@@ -2716,6 +2718,13 @@ char floatval_map[] = { 1,2,3,4 };
 #define MAP(i) OMAP(i)
 #undef MAP
 #define MAP(i) (i) >= 0 : 0 ? OMAP(i)
+
+
+/*
+ * I386 has JITed vtables, which have the vtable# in extcall.
+ * This Parrot_jit_vtable_n_op() doese use register mappings.
+ */
+#  define EXTCALL(op) (op_jit[*(op)].extcall == 1)
 
 #endif /* JIT_EMIT */
 

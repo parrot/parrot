@@ -151,6 +151,18 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
             case 'O':
                 strncpy(optimizer_opt, (*argv)[0]+2,sizeof(optimizer_opt));
                 optimizer_opt[sizeof(optimizer_opt)-1] = '\0';
+                if (strchr(optimizer_opt, '1'))
+                    optimizer_level |= OPT_PRE;
+                if (strchr(optimizer_opt, '2'))
+                    optimizer_level |= (OPT_CFG | OPT_PRE);
+                if (strchr(optimizer_opt, 'j')) {
+                    int one = 1;
+                    optimizer_level |= (OPT_J | OPT_PASM);
+                    Parrot_setflag(interp, PARROT_JIT_FLAG, &one);
+                }
+                if (strchr(optimizer_opt, 'p'))
+                    optimizer_level |= OPT_PASM;
+
                 break;
             case '-':
                 if ((*argv)[0][2] == '\0') {
@@ -204,17 +216,6 @@ int main(int argc, char * argv[])
         strcpy(optimizer_opt, "0");
         optimizer_level = 0;
     }
-    else {
-        if (strchr(optimizer_opt, '1'))
-            optimizer_level |= OPT_PRE;
-        if (strchr(optimizer_opt, '2'))
-            optimizer_level |= (OPT_CFG | OPT_PRE);
-        if (strchr(optimizer_opt, 'j'))
-            optimizer_level |= (OPT_J | OPT_PASM);
-        if (strchr(optimizer_opt, 'p'))
-            optimizer_level |= OPT_PASM;
-    }
-
 
     if (!sourcefile || !*sourcefile) {
         fatal(EX_NOINPUT, "main", "No source file specified.\n" );

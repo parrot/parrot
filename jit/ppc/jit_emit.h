@@ -689,7 +689,9 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
  * r15 code_start
  */
 
+#ifndef JIT_IMCC
 char intval_map[INT_REGISTERS_TO_MAP] =
+
     { r16, r17, r18, r19, r20, r21, r22, r23,
       r24, r25, r26, r27, r28, r29, r30, r31,
       r2, r3, r4, r5, r6, r7, r8, r9, r10 };
@@ -715,6 +717,8 @@ ppc_sync_cache (void *_start, void *_end)
     }
     __asm__ __volatile__ ("sync");
 }
+
+#endif
 
 #endif
 

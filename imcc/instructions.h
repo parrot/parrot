@@ -8,7 +8,8 @@ enum INSTYPE {    /*instruction type can be   */
     ITLABEL =  0x80000, /*            label         */
     ITALIAS = 0x100000, /*   set P,P  */
     ITADDR  = 0x200000, /*   set_addr P, addr*/
-    ITSPILL = 0x400000  /*   set P31,x ; set x, p31 spilling */
+    ITSPILL = 0x400000, /*   set P31,x ; set x, p31 spilling */
+    ITEXT   = 0x800000  /*   instruction is extcall in JIT */
 };
 
 

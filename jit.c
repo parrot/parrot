@@ -260,10 +260,11 @@ set_register_usage(struct Parrot_Interp *interpreter,
 /*
  * I386 has JITed vtables, which have the vtable# in extcall.
  * This Parrot_jit_vtable_n_op() doese use register mappings.
+ *
+ * below is the standard define
  */
-#if defined(I386)
-#  define EXTCALL(op) (op_jit[*(op)].extcall == 1)
-#else
+
+#ifndef EXTCALL
 #  define EXTCALL(op) op_jit[*(op)].extcall
 #endif
 
@@ -482,11 +483,8 @@ sort_registers(struct Parrot_Interp *interpreter,
             for (i = 0; i < to_map[typ]; i++) {
                 ru[typ].reg_usage[i] = i;
                 /* set rn1, N1 */
-                if (ru[typ].registers_used == 1 &&
-                        ru[typ].reg_usage[i] ==
-                        (PARROT_ARGDIR_IN|PARROT_ARGDIR_OUT))
-                    ru[typ].registers_used = 2;
             }
+            ru[typ].registers_used = to_map[typ];
 #endif /* JIT_IMCC_OJ */
         }
         next = cur_section->next;
@@ -520,6 +518,9 @@ assign_registers(struct Parrot_Interp *interpreter,
     int i, op_arg, typ;
     opcode_t * cur_op;
     char * maps[] = {0, 0, 0, 0};
+#ifdef JIT_IMCC_OJ
+    int to_map[] = { INT_REGISTERS_TO_MAP, 0, 0, FLOAT_REGISTERS_TO_MAP };
+#endif
     maps[0] = intval_map;
     maps[3] = floatval_map;
 
@@ -542,11 +543,12 @@ assign_registers(struct Parrot_Interp *interpreter,
                 if (!maps[typ])
                     continue;
                 /* If the argument is in most used list for this typ */
-                for (i = 0; i < cur_section->ru[typ].registers_used; i++)
 #ifndef JIT_IMCC_OJ
+                for (i = 0; i < cur_section->ru[typ].registers_used; i++)
                     if (cur_op[op_arg] ==
                             (opcode_t)cur_section->ru[typ].reg_usage[i]) {
 #else /* JIT_IMCC_OJ */
+                for (i = 0; i < to_map[typ]; i++)
                     if (-1 - cur_op[op_arg] ==
                             (opcode_t)cur_section->ru[typ].reg_usage[i]) {
 #endif /* JIT_IMCC_OJ */

@@ -299,6 +299,8 @@ iANY(struct Parrot_Interp *interpreter, char * name,
                      * previously, so:
                      * goon
                      */
+                     if (r[i]->set != 'P')
+                        dirs |= 1 << (16 + i);
 	    case PARROT_ARGDIR_IN:
                     dirs |= 1 << i ;
 		break;

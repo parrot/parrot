@@ -506,6 +506,8 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
 #  define REQUIRES_CONSTANT_POOL 1
 #  define INT_REGISTERS_TO_MAP 21
 
+#ifndef JIT_IMCC
+
 char intval_map[INT_REGISTERS_TO_MAP] =
     { REG1_t0, REG2_t1, REG3_t2, REG4_t3, REG5_t4, REG6_t5, REG7_t6, REG12_s3,
       REG13_s4, REG14_s5, REG16_a0, REG17_a1, REG18_a2, REG19_a3, REG20_a4,
@@ -538,6 +540,8 @@ Parrot_jit_extend_arena(Parrot_jit_info_t *jit_info)
         ((char *)jit_info->constant_pool->slot_ptr - jit_info->arena.start);
     jit_info->arena.start = new_arena;
 }
+
+#endif
 
 #endif
 

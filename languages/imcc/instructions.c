@@ -397,7 +397,7 @@ static char * ins_fmt(Instruction * ins) {
 	    sprintf(regb[i], "%c%d", p->set, p->color);
 	    regstr[i] = regb[i];
 	}
-        else if ((optimizer_level & OPT_J) && p->set != 'K' &&
+        else if (allocated && (optimizer_level & OPT_J) && p->set != 'K' &&
                 p->color < 0 && (p->type & VTREGISTER)) {
 	    sprintf(regb[i], "r%c%d", tolower(p->set), -1 - p->color);
 	    regstr[i] = regb[i];
@@ -408,7 +408,7 @@ static char * ins_fmt(Instruction * ins) {
                 if (k->reg && k->reg->color >= 0)
                     sprintf(regb[i]+strlen(regb[i]), "%c%d",
                             k->reg->set, k->reg->color);        /* XXX */
-                else if ((optimizer_level & OPT_J) &&  k->reg &&
+                else if (allocated && (optimizer_level & OPT_J) &&  k->reg &&
                         k->reg->color < 0)
                     sprintf(regb[i]+strlen(regb[i]), "r%c%d",
                             tolower(k->reg->set), -1 - k->reg->color);
