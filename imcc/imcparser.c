@@ -879,22 +879,22 @@ static const unsigned short yyrline[] =
 {
        0,   439,   439,   439,   447,   448,   451,   452,   455,   455,
      457,   459,   464,   463,   472,   476,   485,   486,   487,   490,
-     490,   496,   498,   496,   506,   507,   508,   511,   511,   515,
-     515,   538,   539,   542,   546,   551,   552,   553,   556,   559,
-     560,   561,   564,   565,   565,   568,   568,   584,   585,   586,
-     589,   592,   593,   596,   596,   598,   599,   600,   603,   604,
-     607,   608,   611,   614,   616,   618,   620,   621,   622,   623,
-     623,   624,   624,   626,   626,   628,   629,   630,   631,   632,
-     633,   634,   635,   636,   637,   638,   639,   640,   643,   645,
-     646,   647,   650,   654,   656,   657,   658,   659,   660,   661,
-     662,   663,   664,   665,   666,   667,   668,   669,   670,   671,
-     672,   673,   674,   675,   676,   677,   678,   679,   680,   682,
-     684,   686,   687,   688,   688,   690,   691,   693,   696,   698,
-     699,   700,   701,   705,   707,   708,   709,   710,   711,   715,
-     716,   718,   719,   722,   723,   726,   727,   730,   731,   735,
-     737,   739,   741,   742,   745,   746,   749,   749,   753,   754,
-     757,   760,   761,   764,   765,   766,   767,   768,   771,   772,
-     773,   776,   777
+     490,   496,   498,   496,   507,   508,   509,   512,   512,   516,
+     516,   539,   540,   543,   547,   552,   553,   554,   557,   560,
+     561,   562,   565,   566,   566,   569,   569,   585,   586,   587,
+     590,   593,   594,   597,   597,   599,   600,   601,   604,   605,
+     608,   609,   612,   615,   617,   619,   621,   622,   623,   624,
+     624,   625,   625,   627,   627,   629,   630,   631,   632,   633,
+     634,   635,   636,   637,   638,   639,   640,   641,   644,   646,
+     647,   648,   651,   655,   657,   658,   659,   660,   661,   662,
+     663,   664,   665,   666,   667,   668,   669,   670,   671,   672,
+     673,   674,   675,   676,   677,   678,   679,   680,   681,   683,
+     685,   687,   688,   689,   689,   691,   692,   694,   697,   699,
+     700,   701,   702,   706,   708,   709,   710,   711,   712,   716,
+     717,   719,   720,   723,   724,   727,   728,   731,   732,   736,
+     738,   740,   742,   743,   746,   747,   750,   750,   754,   755,
+     758,   761,   762,   765,   766,   767,   768,   769,   772,   773,
+     774,   777,   778
 };
 #endif
 
@@ -1834,43 +1834,44 @@ yyreduce:
   case 22:
 #line 498 "imcc.y"
     {
-          Instruction *i =iSUBROUTINE(mk_address(yyvsp[-1].s, U_add_uniq_sub));
-          i->r[1] = yyval.sr = mk_pcc_sub(str_dup(yyvsp[-1].s), 0);
+          char *name = str_dup(yyvsp[-1].s);
+          Instruction *i = iSUBROUTINE(mk_address(yyvsp[-1].s, U_add_uniq_sub));
+          i->r[1] = yyval.sr = mk_pcc_sub(name, 0);
         }
     break;
 
   case 23:
-#line 503 "imcc.y"
+#line 504 "imcc.y"
     { yyval.i = 0; }
     break;
 
   case 24:
-#line 506 "imcc.y"
+#line 507 "imcc.y"
     { yyval.sr = 0; }
     break;
 
   case 25:
-#line 507 "imcc.y"
+#line 508 "imcc.y"
     { add_pcc_param(yyvsp[-2].sr, yyvsp[-1].sr);}
     break;
 
   case 26:
-#line 508 "imcc.y"
+#line 509 "imcc.y"
     { add_pcc_param(yyvsp[-3].sr, yyvsp[-1].sr);}
     break;
 
   case 27:
-#line 511 "imcc.y"
+#line 512 "imcc.y"
     { is_def=1; }
     break;
 
   case 28:
-#line 512 "imcc.y"
+#line 513 "imcc.y"
     { yyval.sr = mk_ident(yyvsp[0].s, yyvsp[-1].t); is_def=0; }
     break;
 
   case 29:
-#line 515 "imcc.y"
+#line 516 "imcc.y"
     {
               char name[128];
               SymReg * r;
@@ -1890,22 +1891,22 @@ yyreduce:
     break;
 
   case 30:
-#line 535 "imcc.y"
+#line 536 "imcc.y"
     { yyval.i = 0; }
     break;
 
   case 31:
-#line 538 "imcc.y"
+#line 539 "imcc.y"
     { yyval.t = 1; }
     break;
 
   case 32:
-#line 539 "imcc.y"
+#line 540 "imcc.y"
     { yyval.t = 0; }
     break;
 
   case 33:
-#line 542 "imcc.y"
+#line 543 "imcc.y"
     {
                   add_pcc_sub(yyvsp[-6].sr, yyvsp[-3].sr);
                   add_pcc_cc(yyvsp[-6].sr, yyvsp[-1].sr);
@@ -1913,64 +1914,64 @@ yyreduce:
     break;
 
   case 34:
-#line 546 "imcc.y"
+#line 547 "imcc.y"
     {
                   add_pcc_sub(yyvsp[-4].sr, yyvsp[-1].sr);
               }
     break;
 
   case 35:
-#line 551 "imcc.y"
+#line 552 "imcc.y"
     { yyval.sr = 0; }
     break;
 
   case 36:
-#line 552 "imcc.y"
+#line 553 "imcc.y"
     {  add_pcc_arg(yyvsp[-2].sr, yyvsp[-1].sr);}
     break;
 
   case 37:
-#line 553 "imcc.y"
+#line 554 "imcc.y"
     {  add_pcc_arg(yyvsp[-3].sr, yyvsp[-1].sr);}
     break;
 
   case 38:
-#line 556 "imcc.y"
+#line 557 "imcc.y"
     { yyval.sr = yyvsp[0].sr; }
     break;
 
   case 39:
-#line 559 "imcc.y"
+#line 560 "imcc.y"
     { yyval.sr = 0; }
     break;
 
   case 40:
-#line 560 "imcc.y"
+#line 561 "imcc.y"
     { if(yyvsp[-1].sr) add_pcc_result(yyvsp[-6].sr, yyvsp[-1].sr); }
     break;
 
   case 41:
-#line 561 "imcc.y"
+#line 562 "imcc.y"
     { if(yyvsp[-1].sr) add_pcc_result(yyvsp[-7].sr, yyvsp[-1].sr); }
     break;
 
   case 42:
-#line 564 "imcc.y"
+#line 565 "imcc.y"
     { yyval.sr = yyvsp[0].sr; }
     break;
 
   case 43:
-#line 565 "imcc.y"
+#line 566 "imcc.y"
     { is_def=1; }
     break;
 
   case 44:
-#line 565 "imcc.y"
+#line 566 "imcc.y"
     { mk_ident(yyvsp[0].s, yyvsp[-1].t);is_def=0; yyval.sr=0; }
     break;
 
   case 45:
-#line 568 "imcc.y"
+#line 569 "imcc.y"
     {
                 Instruction *i, *ins = instructions;
                 char name[128];
@@ -1986,539 +1987,539 @@ yyreduce:
     break;
 
   case 46:
-#line 581 "imcc.y"
+#line 582 "imcc.y"
     { yyval.i = 0; }
     break;
 
   case 47:
-#line 584 "imcc.y"
+#line 585 "imcc.y"
     { yyval.sr = 0; }
     break;
 
   case 48:
-#line 585 "imcc.y"
+#line 586 "imcc.y"
     { if(yyvsp[-1].sr) add_pcc_return(yyvsp[-2].sr, yyvsp[-1].sr); }
     break;
 
   case 49:
-#line 586 "imcc.y"
+#line 587 "imcc.y"
     { if(yyvsp[-1].sr) add_pcc_return(yyvsp[-3].sr, yyvsp[-1].sr); }
     break;
 
   case 50:
-#line 589 "imcc.y"
+#line 590 "imcc.y"
     { yyval.sr = yyvsp[0].sr; }
     break;
 
   case 53:
-#line 596 "imcc.y"
+#line 597 "imcc.y"
     { clear_state(); }
     break;
 
   case 54:
-#line 597 "imcc.y"
+#line 598 "imcc.y"
     { yyval.i = yyvsp[0].i; }
     break;
 
   case 55:
-#line 598 "imcc.y"
-    { yyval.i = 0; }
-    break;
-
-  case 56:
 #line 599 "imcc.y"
     { yyval.i = 0; }
     break;
 
+  case 56:
+#line 600 "imcc.y"
+    { yyval.i = 0; }
+    break;
+
   case 58:
-#line 603 "imcc.y"
+#line 604 "imcc.y"
     { yyval.i = NULL; }
     break;
 
   case 62:
-#line 611 "imcc.y"
+#line 612 "imcc.y"
     { yyval.i = iLABEL(mk_address(yyvsp[0].s, U_add_uniq_label)); }
     break;
 
   case 63:
-#line 615 "imcc.y"
+#line 616 "imcc.y"
     { yyval.i = yyvsp[-1].i; }
     break;
 
   case 67:
-#line 621 "imcc.y"
+#line 622 "imcc.y"
     { push_namespace(yyvsp[0].s); }
     break;
 
   case 68:
-#line 622 "imcc.y"
+#line 623 "imcc.y"
     { pop_namespace(yyvsp[0].s); }
     break;
 
   case 69:
-#line 623 "imcc.y"
-    { is_def=1; }
-    break;
-
-  case 70:
-#line 623 "imcc.y"
-    { mk_ident(yyvsp[0].s, yyvsp[-1].t);is_def=0; }
-    break;
-
-  case 71:
 #line 624 "imcc.y"
     { is_def=1; }
     break;
 
-  case 72:
+  case 70:
+#line 624 "imcc.y"
+    { mk_ident(yyvsp[0].s, yyvsp[-1].t);is_def=0; }
+    break;
+
+  case 71:
 #line 625 "imcc.y"
+    { is_def=1; }
+    break;
+
+  case 72:
+#line 626 "imcc.y"
     { mk_const_ident(yyvsp[-2].s, yyvsp[-3].t, yyvsp[0].sr);is_def=0; }
     break;
 
   case 73:
-#line 626 "imcc.y"
+#line 627 "imcc.y"
     { is_def=1; }
     break;
 
   case 74:
-#line 626 "imcc.y"
+#line 627 "imcc.y"
     { yyval.i = MK_I(interp, "restore",
 		                            R1(mk_ident(yyvsp[0].s, yyvsp[-1].t)));is_def=0; }
     break;
 
   case 75:
-#line 628 "imcc.y"
-    { yyval.i = MK_I(interp, "restore", R1(yyvsp[0].sr)); }
-    break;
-
-  case 76:
 #line 629 "imcc.y"
     { yyval.i = MK_I(interp, "restore", R1(yyvsp[0].sr)); }
     break;
 
-  case 77:
+  case 76:
 #line 630 "imcc.y"
-    { yyval.i = MK_I(interp, "save", R1(yyvsp[0].sr)); }
+    { yyval.i = MK_I(interp, "restore", R1(yyvsp[0].sr)); }
     break;
 
-  case 78:
+  case 77:
 #line 631 "imcc.y"
     { yyval.i = MK_I(interp, "save", R1(yyvsp[0].sr)); }
     break;
 
-  case 79:
+  case 78:
 #line 632 "imcc.y"
+    { yyval.i = MK_I(interp, "save", R1(yyvsp[0].sr)); }
+    break;
+
+  case 79:
+#line 633 "imcc.y"
     { yyval.i = MK_I(interp, "bsr",  R1(yyvsp[0].sr)); }
     break;
 
   case 80:
-#line 633 "imcc.y"
+#line 634 "imcc.y"
     { yyval.i = MK_I(interp, "branch",R1(yyvsp[0].sr)); }
     break;
 
   case 81:
-#line 634 "imcc.y"
+#line 635 "imcc.y"
     { yyval.i = MK_I(interp, "inc",R1(yyvsp[0].sr)); }
     break;
 
   case 82:
-#line 635 "imcc.y"
+#line 636 "imcc.y"
     { yyval.i = MK_I(interp, "dec",R1(yyvsp[0].sr)); }
     break;
 
   case 83:
-#line 636 "imcc.y"
+#line 637 "imcc.y"
     { yyval.i = MK_I(interp, "saveall" ,R0()); }
     break;
 
   case 84:
-#line 637 "imcc.y"
+#line 638 "imcc.y"
     { yyval.i = MK_I(interp, "restoreall" ,R0()); }
     break;
 
   case 85:
-#line 638 "imcc.y"
+#line 639 "imcc.y"
     { yyval.i = MK_I(interp, "end" ,R0()); }
     break;
 
   case 86:
-#line 639 "imcc.y"
+#line 640 "imcc.y"
     { yyval.i = iANY(interp, yyvsp[-1].s,0,regs, 1); free(yyvsp[-1].s); }
     break;
 
   case 87:
-#line 640 "imcc.y"
+#line 641 "imcc.y"
     { yyval.i = 0;}
     break;
 
   case 88:
-#line 644 "imcc.y"
+#line 645 "imcc.y"
     { yyval.t = 'I'; }
     break;
 
   case 89:
-#line 645 "imcc.y"
+#line 646 "imcc.y"
     { yyval.t = 'N'; }
     break;
 
   case 90:
-#line 646 "imcc.y"
+#line 647 "imcc.y"
     { yyval.t = 'S'; }
     break;
 
   case 91:
-#line 647 "imcc.y"
+#line 648 "imcc.y"
     { yyval.t = 'P'; free(yyvsp[0].s); }
     break;
 
   case 93:
-#line 655 "imcc.y"
+#line 656 "imcc.y"
     { yyval.i = MK_I(interp, "set", R2(yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 94:
-#line 656 "imcc.y"
+#line 657 "imcc.y"
     { yyval.i = MK_I(interp, "not", R2(yyvsp[-3].sr, yyvsp[0].sr));}
     break;
 
   case 95:
-#line 657 "imcc.y"
+#line 658 "imcc.y"
     { yyval.i = MK_I(interp, "neg", R2(yyvsp[-3].sr, yyvsp[0].sr));}
     break;
 
   case 96:
-#line 658 "imcc.y"
+#line 659 "imcc.y"
     { yyval.i = MK_I(interp, "bnot", R2(yyvsp[-3].sr, yyvsp[0].sr));}
     break;
 
   case 97:
-#line 659 "imcc.y"
+#line 660 "imcc.y"
     { yyval.i = MK_I(interp, "add", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 98:
-#line 660 "imcc.y"
+#line 661 "imcc.y"
     { yyval.i = MK_I(interp, "sub", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 99:
-#line 661 "imcc.y"
+#line 662 "imcc.y"
     { yyval.i = MK_I(interp, "mul", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 100:
-#line 662 "imcc.y"
+#line 663 "imcc.y"
     { yyval.i = MK_I(interp, "pow", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 101:
-#line 663 "imcc.y"
+#line 664 "imcc.y"
     { yyval.i = MK_I(interp, "div", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 102:
-#line 664 "imcc.y"
+#line 665 "imcc.y"
     { yyval.i = MK_I(interp, "mod", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 103:
-#line 665 "imcc.y"
+#line 666 "imcc.y"
     { yyval.i = MK_I(interp, "concat", R3(yyvsp[-4].sr,yyvsp[-2].sr,yyvsp[0].sr)); }
     break;
 
   case 104:
-#line 666 "imcc.y"
+#line 667 "imcc.y"
     { yyval.i = MK_I(interp, "shl", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 105:
-#line 667 "imcc.y"
+#line 668 "imcc.y"
     { yyval.i = MK_I(interp, "shr", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 106:
-#line 668 "imcc.y"
+#line 669 "imcc.y"
     { yyval.i = MK_I(interp, "lsr", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 107:
-#line 669 "imcc.y"
+#line 670 "imcc.y"
     { yyval.i = MK_I(interp, "and", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 108:
-#line 670 "imcc.y"
+#line 671 "imcc.y"
     { yyval.i = MK_I(interp, "or", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 109:
-#line 671 "imcc.y"
+#line 672 "imcc.y"
     { yyval.i = MK_I(interp, "xor", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 110:
-#line 672 "imcc.y"
+#line 673 "imcc.y"
     { yyval.i = MK_I(interp, "band", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 111:
-#line 673 "imcc.y"
+#line 674 "imcc.y"
     { yyval.i = MK_I(interp, "bor", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 112:
-#line 674 "imcc.y"
+#line 675 "imcc.y"
     { yyval.i = MK_I(interp, "bxor", R3(yyvsp[-4].sr, yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 113:
-#line 675 "imcc.y"
+#line 676 "imcc.y"
     { yyval.i = iINDEXFETCH(interp, yyvsp[-5].sr, yyvsp[-3].sr, yyvsp[-1].sr); }
     break;
 
   case 114:
-#line 676 "imcc.y"
+#line 677 "imcc.y"
     { yyval.i = iINDEXSET(interp, yyvsp[-5].sr, yyvsp[-3].sr, yyvsp[0].sr); }
     break;
 
   case 115:
-#line 677 "imcc.y"
+#line 678 "imcc.y"
     { yyval.i = iNEW(interp, yyvsp[-5].sr, yyvsp[-2].s, yyvsp[0].sr, 1); }
     break;
 
   case 116:
-#line 678 "imcc.y"
+#line 679 "imcc.y"
     { yyval.i = iNEW(interp, yyvsp[-3].sr, yyvsp[0].s, NULL,1); }
     break;
 
   case 117:
-#line 679 "imcc.y"
+#line 680 "imcc.y"
     { yyval.i = MK_I(interp, "defined",R2(yyvsp[-3].sr,yyvsp[0].sr)); }
     break;
 
   case 118:
-#line 680 "imcc.y"
+#line 681 "imcc.y"
     { keyvec=KEY_BIT(2);
                                      yyval.i = MK_I(interp, "defined", R3(yyvsp[-6].sr, yyvsp[-3].sr, yyvsp[-1].sr));}
     break;
 
   case 119:
-#line 682 "imcc.y"
+#line 683 "imcc.y"
     { yyval.i = MK_I(interp, "clone",R2(yyvsp[-3].sr, yyvsp[0].sr));
     }
     break;
 
   case 120:
-#line 684 "imcc.y"
+#line 685 "imcc.y"
     { yyval.i = MK_I(interp, "set_addr",
                                           R2(yyvsp[-3].sr, mk_address(yyvsp[0].s,U_add_once))); }
     break;
 
   case 121:
-#line 686 "imcc.y"
+#line 687 "imcc.y"
     { yyval.i = MK_I(interp, "find_global",R2(yyvsp[-3].sr,yyvsp[0].sr)); }
     break;
 
   case 122:
-#line 687 "imcc.y"
+#line 688 "imcc.y"
     { yyval.i = MK_I(interp, "store_global",R2(yyvsp[-2].sr,yyvsp[0].sr)); }
     break;
 
   case 123:
-#line 688 "imcc.y"
+#line 689 "imcc.y"
     { expect_pasm = 1; }
     break;
 
   case 124:
-#line 689 "imcc.y"
+#line 690 "imcc.y"
     { yyval.i = iANY(interp, "new",0,regs,1);  }
     break;
 
   case 125:
-#line 690 "imcc.y"
+#line 691 "imcc.y"
     { yyval.i = MK_I(interp, "defined", R2(yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 126:
-#line 691 "imcc.y"
+#line 692 "imcc.y"
     { keyvec=KEY_BIT(2);
                                        yyval.i = MK_I(interp, "defined", R3(yyvsp[-5].sr, yyvsp[-3].sr, yyvsp[-1].sr));}
     break;
 
   case 127:
-#line 693 "imcc.y"
+#line 694 "imcc.y"
     { yyval.i = MK_I(interp, "clone", R2(yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 128:
-#line 697 "imcc.y"
+#line 698 "imcc.y"
     {yyval.i=MK_I(interp, yyvsp[-3].s,R3(yyvsp[-4].sr,yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 129:
-#line 698 "imcc.y"
+#line 699 "imcc.y"
     {yyval.i= MK_I(interp, "if", R2(yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 130:
-#line 699 "imcc.y"
+#line 700 "imcc.y"
     {yyval.i= MK_I(interp, "unless",R2(yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 131:
-#line 700 "imcc.y"
+#line 701 "imcc.y"
     {yyval.i= MK_I(interp, "if", R2(yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 132:
-#line 701 "imcc.y"
+#line 702 "imcc.y"
     {yyval.i= MK_I(interp, "unless", R2(yyvsp[-2].sr, yyvsp[0].sr)); }
     break;
 
   case 133:
-#line 706 "imcc.y"
+#line 707 "imcc.y"
     { yyval.s = "eq"; }
     break;
 
   case 134:
-#line 707 "imcc.y"
+#line 708 "imcc.y"
     { yyval.s = "ne"; }
     break;
 
   case 135:
-#line 708 "imcc.y"
+#line 709 "imcc.y"
     { yyval.s = "gt"; }
     break;
 
   case 136:
-#line 709 "imcc.y"
+#line 710 "imcc.y"
     { yyval.s = "ge"; }
     break;
 
   case 137:
-#line 710 "imcc.y"
+#line 711 "imcc.y"
     { yyval.s = "lt"; }
     break;
 
   case 138:
-#line 711 "imcc.y"
+#line 712 "imcc.y"
     { yyval.s = "le"; }
     break;
 
   case 143:
-#line 722 "imcc.y"
+#line 723 "imcc.y"
     { yyval.sr = NULL; }
     break;
 
   case 144:
-#line 723 "imcc.y"
+#line 724 "imcc.y"
     { yyval.sr = yyvsp[0].sr; }
     break;
 
   case 145:
-#line 726 "imcc.y"
+#line 727 "imcc.y"
     { yyval.sr = regs[0]; }
     break;
 
   case 147:
-#line 730 "imcc.y"
+#line 731 "imcc.y"
     { regs[nargs++] = yyvsp[0].sr; }
     break;
 
   case 148:
-#line 731 "imcc.y"
+#line 732 "imcc.y"
     { regs[nargs++] = yyvsp[-3].sr;
                                           keyvec |= KEY_BIT(nargs);
                                           regs[nargs++] = yyvsp[-1].sr; yyval.sr = yyvsp[-3].sr; }
     break;
 
   case 149:
-#line 736 "imcc.y"
-    { yyval.sr = mk_address(yyvsp[0].s, U_add_once); }
-    break;
-
-  case 150:
 #line 737 "imcc.y"
     { yyval.sr = mk_address(yyvsp[0].s, U_add_once); }
     break;
 
-  case 151:
-#line 740 "imcc.y"
+  case 150:
+#line 738 "imcc.y"
     { yyval.sr = mk_address(yyvsp[0].s, U_add_once); }
     break;
 
-  case 152:
+  case 151:
 #line 741 "imcc.y"
     { yyval.sr = mk_address(yyvsp[0].s, U_add_once); }
     break;
 
+  case 152:
+#line 742 "imcc.y"
+    { yyval.sr = mk_address(yyvsp[0].s, U_add_once); }
+    break;
+
   case 156:
-#line 749 "imcc.y"
+#line 750 "imcc.y"
     { nkeys=0; }
     break;
 
   case 157:
-#line 750 "imcc.y"
+#line 751 "imcc.y"
     { yyval.sr = link_keys(nkeys, keys); }
     break;
 
   case 158:
-#line 753 "imcc.y"
+#line 754 "imcc.y"
     { keys[nkeys++] = yyvsp[0].sr; }
     break;
 
   case 159:
-#line 754 "imcc.y"
+#line 755 "imcc.y"
     { keys[nkeys++] = yyvsp[0].sr; yyval.sr =  keys[0]; }
     break;
 
   case 163:
-#line 764 "imcc.y"
+#line 765 "imcc.y"
     { yyval.sr = mk_symreg(yyvsp[0].s, 'I'); }
     break;
 
   case 164:
-#line 765 "imcc.y"
+#line 766 "imcc.y"
     { yyval.sr = mk_symreg(yyvsp[0].s, 'N'); }
     break;
 
   case 165:
-#line 766 "imcc.y"
+#line 767 "imcc.y"
     { yyval.sr = mk_symreg(yyvsp[0].s, 'S'); }
     break;
 
   case 166:
-#line 767 "imcc.y"
+#line 768 "imcc.y"
     { yyval.sr = mk_symreg(yyvsp[0].s, 'P'); }
     break;
 
   case 167:
-#line 768 "imcc.y"
+#line 769 "imcc.y"
     { yyval.sr = mk_pasm_reg(yyvsp[0].s); }
     break;
 
   case 168:
-#line 771 "imcc.y"
+#line 772 "imcc.y"
     { yyval.sr = mk_const(yyvsp[0].s, 'I'); }
     break;
 
   case 169:
-#line 772 "imcc.y"
+#line 773 "imcc.y"
     { yyval.sr = mk_const(yyvsp[0].s, 'N'); }
     break;
 
   case 170:
-#line 773 "imcc.y"
+#line 774 "imcc.y"
     { yyval.sr = mk_const(yyvsp[0].s, 'S'); }
     break;
 
   case 171:
-#line 776 "imcc.y"
+#line 777 "imcc.y"
     { yyval.sr = mk_symreg(yyvsp[0].s, 'S'); }
     break;
 
   case 172:
-#line 777 "imcc.y"
+#line 778 "imcc.y"
     { yyval.sr = mk_const(yyvsp[0].s, 'S'); }
     break;
 
@@ -2526,7 +2527,7 @@ yyreduce:
     }
 
 /* Line 1016 of /usr/share/bison/yacc.c.  */
-#line 2530 "imcparser.c"
+#line 2531 "imcparser.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -2745,7 +2746,7 @@ yyreturn:
 }
 
 
-#line 779 "imcc.y"
+#line 780 "imcc.y"
 
 
 
