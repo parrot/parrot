@@ -3,7 +3,6 @@ DESCRIPTION 'Parrot Interpreter'
 EXPORTS
 	Parrot_new
 	Parrot_init
-	Parrot_setflag
 	Parrot_setwarnings
 	Parrot_readbc
 	Parrot_loadbc
