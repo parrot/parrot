@@ -826,7 +826,7 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
 
 
     BN_destroy(PINT_ temp);
-    BN_really_zero(PINT_ result,context);
+    BN_really_zero(PINT_ result,context->extended);
     return result;
 }
 
@@ -925,7 +925,7 @@ To check if a number is equal to zero, use BN_is_zero.
 
 =cut*/
 void
-BN_really_zero(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
+BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero) {
     INTVAL i;
     if (bn->digits == 0) return;
     for (i=0; i< bn->digits; i++)
@@ -933,7 +933,7 @@ BN_really_zero(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
   
     bn->digits = 1;
     bn->expn = 0;
-    if (!context->extended) bn->sign = 0;
+    if (!allow_neg_zero) bn->sign = 0;
     return;
 }
 
@@ -1129,7 +1129,7 @@ BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
 	else {
 	    BN_round(PINT_ bn, &temp_context);
 	}
-	BN_really_zero(PINT_ bn, context);
+	BN_really_zero(PINT_ bn, context->extended);
 
 	/* XXX: if using warning flags on context, | with temp context here */
     }
@@ -1238,7 +1238,7 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                     | (flags_save & BN_F_LOST_DIGITS);
 
     BN_strip_lead_zeros(PINT_ result);
-    BN_really_zero(PINT_ result, context);
+    BN_really_zero(PINT_ result, context->extended);
     BN_make_integer(PINT_ result, context);
 }
 
@@ -1482,7 +1482,6 @@ Perform unary + on one.  Does all the rounding and what have you.
 =cut*/
 void
 BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
-    int extended_save;
     /* Check for special values */
     if (one->digits ==0) {
         if (am_sNAN(one)) BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
@@ -1500,11 +1499,7 @@ BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
 
     BN_arith_setup(PINT_ result, one, one, context, NULL);
     BN_copy(PINT_ result, one);
-    extended_save = context->extended;
-    context->extended = 0;
-    BN_really_zero(PINT_ result, context);
-    context->extended = extended_save;
-
+    BN_really_zero(PINT_ result, 0);
     BN_arith_cleanup(PINT_ result, one, one, context, NULL);
 }
 
@@ -1515,9 +1510,25 @@ Perform unary - on one.  Does all the rounding and what have you.
 =cut*/
 void
 BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
+    /* Check for special values */
+    if (one->digits ==0) {
+        if (am_sNAN(one)) BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                                      "sNAN in minus");
+        if (am_NAN(one)) {
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        else { /* Infinity */
+            BN_set_inf(PINT_ result);
+            result->sign = 1 & (1 ^ one->sign);
+            return;
+        }
+    }
+
     BN_arith_setup(PINT_ result, one, one, context, NULL);
     BN_copy(PINT_ result, one);
     result->sign = result->sign ? 0 : 1;
+    BN_really_zero(PINT_ result, 0);
     BN_arith_cleanup(PINT_ result, one, one, context, NULL);
 }
 
@@ -1530,31 +1541,55 @@ result = 1  => one > two
 result = -1 => two > one
 result = 0  => one == two
 
-This probably wants to use BN_comp internally.
-
 =cut*/
 void
 BN_compare (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	    BN_CONTEXT *context) {
     INTVAL cmp;
-  
-    BN_arith_setup(PINT_ result, one, two, context, NULL);
-    result->digits = 1;
-    result->expn = 0;
 
-    cmp = BN_comp(PINT_ one, two);
-
-    if (cmp == 0) {
-	BN_setd(result, 0, 0);
-	result->sign = 0;
-    }
-    else if (cmp > 0) {
-	BN_setd(result, 0, 1);
-	result->sign = 0;
+    /* Special values */
+    if (one->digits == 0 || two->digits ==0) {
+        /* NaN */
+        if (am_NAN(one) || am_NAN(two)) {
+            if (am_sNAN(one) || am_sNAN(two)) {
+                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                            "NaN in compare");
+            }
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        /* Otherwise at least one of the operands is an infinity */
+        if (one->sign != two->sign) {
+            cmp = one->sign ? -1 : 1;
+        }
+        else if (am_INF(one) && am_INF(two)) {
+            cmp = 0;
+        }
+        else if (am_INF(one)) {
+            cmp = one->sign ? -1 : 1;
+        }
+        else {
+            cmp = one->sign ? 1 : -1;
+        }
     }
     else {
-	BN_setd(result, 0, 1);
-	result->sign = 1;
+        BN_arith_setup(PINT_ result, one, two, context, NULL);
+        cmp = BN_comp(PINT_ one, two, context);        
+    }
+    result->digits = 1;
+    result->expn = 0;
+        
+    if (cmp == 0) {
+        BN_setd(result, 0, 0);
+        result->sign = 0;
+    }
+    else if (cmp > 0) {
+        BN_setd(result, 0, 1);
+        result->sign = 0;
+    }
+    else {
+        BN_setd(result, 0, 1);
+        result->sign = 1;
     }
     BN_arith_cleanup(PINT_ result, one, two, context, NULL);
 }
@@ -1668,7 +1703,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	if (result->digits > context->precision) {
             BN_nonfatal(PINT_ context, BN_ROUNDED, "Rounded in divide");
 	    /* We collected precision + 1 digits... */
-	    BN_really_zero(PINT_ rem, context);
+	    BN_really_zero(PINT_ rem, context->extended);
 	    if (BN_getd(result, 0) > 5) {
                 BN_nonfatal(PINT_ context, BN_INEXACT,
                             "Loss of precision in divide");
@@ -1735,7 +1770,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             | (flags_save & BN_F_LOST_DIGITS);
     }
 
-    BN_really_zero(PINT_ result, context);
+    BN_really_zero(PINT_ result, context->extended);
 
     BN_strip_tail_zeros(PINT_ result);
 
@@ -1773,7 +1808,7 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     BN_arith_setup(PINT_ result, one, two, context, NULL);
     BN_idivide(PINT_ result, one, two, context, BN_DIV_DIVINT, rem);
   
-    BN_really_zero(PINT_ rem, context);
+    BN_really_zero(PINT_ rem, context->extended);
     if (result->expn >0 && context->precision > 0 &&
 	result->expn + result->digits > context->precision &&
 	!(rem->digits == 0 && BN_getd(rem, 0) == 0)) {
@@ -1795,7 +1830,7 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	result->expn = 0;
     }
 
-    BN_really_zero(PINT_ result, context);
+    BN_really_zero(PINT_ result, context->extended);
     BN_make_integer(PINT_ result, context);
 }
 
@@ -1820,7 +1855,7 @@ BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     fake = BN_new(1);
     BN_idivide(PINT_ fake, one, two, context, BN_DIV_REMAIN, result);
 
-    BN_really_zero(PINT_ result, context);
+    BN_really_zero(PINT_ result, context->extended);
     if (fake->expn >0 && context->precision > 0 &&
 	fake->expn + result->digits > context->precision &&
 	!(result->digits == 0 && BN_getd(result, 0) == 0)) {
@@ -1893,7 +1928,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	    int cmp;
 	    BN_setd(t1, 0, j);
 	    BN_imultiply(PINT_ result, t1, two, context);
-	    cmp = BN_comp(PINT_ result, div);
+	    cmp = BN_comp(PINT_ result, div, context);
 	    if (cmp ==0) {
 		BN_setd(t2, value, j);
 		t2->digits++;
@@ -1972,7 +2007,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /* Comparison with no rounding etc. */
 INTVAL
-BN_comp (PINTD_ BIGNUM *one, BIGNUM *two) {
+BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context) {
     INTVAL i,j;
     int cmp;
 
@@ -1980,6 +2015,9 @@ BN_comp (PINTD_ BIGNUM *one, BIGNUM *two) {
     BN_strip_lead_zeros(PINT_ two);
 
     if (one->sign != two->sign) {
+        if (BN_is_zero(PINT_ one, context) && BN_is_zero(PINT_ two, context)) {
+            return 0; /* as -0 == 0 */
+        }
 	return one->sign ? -1 : 1;
     }
     else if (one->expn + one->digits > two->expn + two->digits) {
@@ -2106,7 +2144,7 @@ BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
 
 INTVAL
 BN_is_zero(BIGNUM* foo, BN_CONTEXT* context) {
-    BN_really_zero(foo, context);
+    BN_really_zero(foo, context->extended);
     if (foo->digits == 1 && foo->expn == 0 && BN_getd(foo, 0) == 0) {
 	return 1;
     }

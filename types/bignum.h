@@ -161,11 +161,11 @@ void BN_rescale(PINTD_ BIGNUM* result, BIGNUM* bignum, BIGNUM* expn, BN_CONTEXT*
 INTVAL BN_to_int(PINTD_ BIGNUM* bignum, BN_CONTEXT* context);
 void BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
               BIGNUM* expn, BN_CONTEXT* context);
-INTVAL BN_comp (PINTD_ BIGNUM *one, BIGNUM *two);
+INTVAL BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT*);
 INTVAL BN_is_zero(PINTD_ BIGNUM* test, BN_CONTEXT *);
 void BN_set_qNAN(PINTD_ BIGNUM* bn);
 void BN_set_sNAN(PINTD_ BIGNUM* bn);
-void BN_really_zero(PINTD_ BIGNUM* bn, BN_CONTEXT*);
+void BN_really_zero(PINTD_ BIGNUM* bn, int);
 /*
  * Local variables:
  * c-indentation-style: bsd
