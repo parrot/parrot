@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 4;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "open/close");
@@ -32,6 +32,33 @@ output_is(<<'CODE', <<'OUTPUT', "timely destruction");
 CODE
 a line
 1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "fdopen");
+	fdopen P0, 1, ">"
+	defined I0, P0
+	unless I0, nok
+	print P0, "ok\n"
+	close P0
+	end
+nok:
+	print "fdopen failed\n"
+	end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "fdopen - no close");
+	fdopen P0, 1, ">"
+	defined I0, P0
+	unless I0, nok
+	print P0, "ok\n"
+	end
+nok:
+	print "fdopen failed\n"
+	end
+CODE
+ok
 OUTPUT
 
 unlink("temp.file");
