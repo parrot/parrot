@@ -1317,6 +1317,7 @@ sub constantize_string {
     my $s = shift;
     my $p = shift || "";
     my $e = $encodings{$p};
+    $s=~s/\\(0\d*)/chr(oct($1))/eg;
     # handle \ characters in the constant
     my %escape = ('a'=>"\a",'n'=>"\n",'r'=>"\r",'t'=>"\t",'\\'=>'\\',);
     $s=~s/\\([anrt\\])/$escape{$1}/g;
