@@ -51,14 +51,14 @@ the garbage collector runs before you put it into a Parrot register or
 in something else that is itself within a Parrot register.
 
 To help in resolving these issues, the parrot binary accepts a
-C<--gc-debug> flag. This flag makes garbage collection occur as frequently as possible, 
-which maximizes the probability that any newborn objects will run afoul of the garbage
-collector.
+C<--gc-debug> flag. This flag makes garbage collection occur as frequently as
+possible, which maximizes the probability that any newborn objects will run
+afoul of the garbage collector.
 
-Within the C<--gc-debug> mode, there is another tool to help narrow down
-the problem. You you edit F<src/dod.c> and C<#define> the C<GC_VERBOSE> flag to 
-1. After recompiling C<parrot> the garbage collecter will perform additional checks.
-After the garbage collector has traced all objects to find which 
+Within the C<--gc-debug> mode, there is another tool to help narrow down the
+problem. You can edit F<src/dod.c> and C<#define> the C<GC_VERBOSE> flag to 1.
+After recompiling C<parrot>, the garbage collecter will perform additional
+checks. After the garbage collector has traced all objects to find which 
 ones are still alive, it will scan through all of the dead objects to see 
 if any of them believe they are alive (which will happen for infants, since 
 they come into existence marked live.) If it finds any, it will print them 
