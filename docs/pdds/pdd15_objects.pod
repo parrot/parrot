@@ -73,7 +73,7 @@ objects have:
 
 =item *
 
-An array of attributes
+An array of attributes. Note that attribute values are I<always> PMCs.
 
 =item *
 
@@ -403,19 +403,41 @@ class or not you've got bigger problems.
 
 =over 4
 
-=item find_method
+=item find_method(string *)
 
-=item isa
+Returns the PMC for the named method. If no method of this name
+exists, nor can be constructed, returns a Null PMC.
 
-=item can
+Note that for languages which support default fallback methods, such
+as Perl 5's AUTOLOAD, this would be the place to return it if a normal
+lookup fails.
 
-=item does
+=item isa(class *)
 
-=item getattr
+Returns true or false if the class passed in as a parameter is in the
+inheritance hierarchy of the object.
 
-=item setattr
+=item can(string *)
+
+Returns true or false if the object can perform the requested
+method. (Including with an AUTOLOAD)
+
+=item does(class *)
+
+Returns true or false to note whether the object in question
+implements the interface passed in.
+
+=item getattr(int)
+
+Returns the attribute at the passed-in offset for the object.
+
+=item setattr(int, PMC *)
+
+Sets the attribute for the passed-in offset to the passed-in PMC value
 
 =item getclass
+
+Returns the class PMC for the object.
 
 =back
 
