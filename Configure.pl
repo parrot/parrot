@@ -73,7 +73,7 @@ my(%c)=(
 
 	cc =>			$Config{cc},
 	#ADD C COMPILER FLAGS HERE
-	ccflags =>		$Config{ccflags}." -I./include",
+	ccflags =>		$Config{ccflags},
 	libs =>			$Config{libs},
 	cc_debug =>		'-g',
 	o =>			'.o',		# object files extension
@@ -202,6 +202,7 @@ END
 buildfile("config_h", "include/parrot");
 # and the makefile
 buildfile("Makefile");
+buildfile("classes/Makefile");
 # and Parrot::Config
 buildconfigpm();
 # and the types file
@@ -344,7 +345,7 @@ sub compiletestc {
     my $name;
     $name = shift;
     $name = "test" unless $name;
-    system("$c{cc} $c{ccflags} -o test_siz$c{exe} $name.c") and die "C compiler died!";
+    system("$c{cc} $c{ccflags} -I./include -o test_siz$c{exe} $name.c") and die "C compiler died!";
 }
 
 sub runtestc {

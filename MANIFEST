@@ -3,6 +3,7 @@ ChangeLog
 chartype.c
 chartypes/unicode.c
 chartypes/usascii.c
+classes/Makefile.in
 classes/genclass.pl
 classes/pmc2c.pl
 classes/perlint.pmc

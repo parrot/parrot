@@ -20,7 +20,7 @@ platform$(O) classes/perlint$(O) classes/perlstring$(O) classes/perlnum$(O)
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
 #comment 'ADD C COMPILER FLAGS HERE'
-CFLAGS = ${ccflags} ${cc_debug}
+CFLAGS = ${ccflags} ${cc_debug} -I./include
 
 C_LIBS = ${libs}
 
@@ -88,21 +88,6 @@ encoding/utf16$(O): $(H_FILES)
 
 encoding/utf32$(O): $(H_FILES)
 
-classes/perlint.c: classes/perlint.pmc 
-	$(PERL) classes/pmc2c.pl classes/perlint.pmc
-
-classes/perlint$(O): $(H_FILES)
-
-classes/perlnum.c: classes/perlnum.pmc 
-	$(PERL) classes/pmc2c.pl classes/perlnum.pmc
-
-classes/perlnum$(O): $(H_FILES)
-
-classes/perlstring.c: classes/perlstring.pmc 
-	$(PERL) classes/pmc2c.pl classes/perlstring.pmc
-
-classes/perlstring$(O): $(H_FILES)
-
 interpreter$(O): interpreter.c $(H_FILES)
 
 memory$(O): $(H_FILES)
@@ -134,9 +119,11 @@ docs: docs/.dummy
 docs/.dummy:
 	cd docs; make
 
+classes/perlint$(O):
+	cd classes; make
+
 clean:
-	$(RM_F) *$(O) classes/*$(O) chartypes/*$(O) encodings/*$(O)
-	$(RM_F) classes/*.c
+	$(RM_F) *$(O) chartypes/*$(O) encodings/*$(O)
 	$(RM_F) *.s core_ops.c $(TEST_PROG) $(PDISASM) $(PDUMP)
 	$(RM_F) $(INC)/vtable.h
 	$(RM_F) $(INC)/oplib/core_ops.h
@@ -147,6 +134,7 @@ clean:
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
 	$(RM_F) Parrot/OpLib/core.pm
 	cd docs; make clean
+	cd classes; make clean
 
 distclean:
 	perl -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
