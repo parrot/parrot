@@ -115,7 +115,7 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
         Parrot_do_dod_run(interpreter);
         /* Compact the pool if allowed and worthwhile */
         if (pool->compact) {
-            /* don't bother reclaiming if its just chicken feed */
+            /* don't bother reclaiming if it's just chicken feed */
             if (pool->possibly_reclaimable * pool->reclaim_factor
                     > size
                     /* don't bother reclaiming if it won't even be enough */
@@ -254,7 +254,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
                         if (PObj_COW_TEST(b)) {
                             /* Let the old buffer know how to find us */
                             *(Buffer **)(b->bufstart) = b;
-                            /* No guaranatees that our data is still COW, so
+                            /* No guarantees that our data is still COW, so
                              * assume not, and let the above code fix-up */
                             PObj_COW_CLEAR(b);
                             /* Finally, let the tail know that we've moved, so
