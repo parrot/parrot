@@ -577,6 +577,8 @@ sub body
     while ($total_body =~ s/\bMMD_(\w+):\s*//) {
         my $right_type = $1;
         my $body_part = extract_bracketed($total_body, '{');
+        die "Empty MMD body near '$total_body'"
+            if (!$body_part);
         $body_part = substr($body_part, 1, -1);
         if ($right_type eq 'DEFAULT') {
             $standard_body = $body_part
