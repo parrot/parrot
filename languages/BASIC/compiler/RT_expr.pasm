@@ -645,3 +645,17 @@ CTI_CONV:
 	set P6["type"], "INT"
 	set P6["value"], I0
 CTI_RET:ret
+
+	# Take the array in P8 and swap everything
+	# upside-down
+REVERSEARGS:
+	new P0, .PerlArray
+REVERSEARGS2:
+	set I0, P8
+	eq I0, 0, ENDREVERSE
+	pop P1, P8
+	push P0, P1
+	branch REVERSEARGS2
+ENDREVERSE:
+	set P8, P0
+	ret

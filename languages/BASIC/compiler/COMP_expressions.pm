@@ -1,10 +1,10 @@
 #!/usr/bin/perl -w
 
 use subs qw(fetchvar);
-use vars qw(%builtins @keywords);
+use vars qw(@builtins @keywords);
 use strict;
 
-%builtins=qw( 	abs      	asc      	atn
+@builtins=qw( 	abs      	asc      	atn
 	      	cdbl		chr$		cint
 		clng		command$	cos
 		csng		csrlin		cvd
@@ -14,15 +14,18 @@ use strict;
 		erdev$		erl		err
 		exp	    	fileattr	fix
 		fre		freefile	hex$
-		inkey$		inp		input$
+		inkey_NOTYET$
+		space_NOTYET$
+		time_NOTYET$
+		inp		input$
 		instr		int		ioctl$
 		    lbound lcase$ left$ len loc lof log lpos ltrim$
 		    mid$ mkd$ mkdmbf$ mki$ mkl$ mks$ mksmbf$
 		    peek pen play pmap point pos
 		    right$ rnd rtrim$
-		    sadd screen seek setmem sgn sin space$ spc sqr
+		    sadd screen seek setmem sgn sin spc sqr
 			stick str$ strig string$
-		    tab tan time$ timer
+		    tab tan timer
 		    ubound ucase$ val varptr varptr$ varseg
 		   );
 @keywords=qw(	access alias any append as
@@ -48,7 +51,9 @@ use strict;
 				return rmdir rset run
 			screen seek select case shared shell single sleep
 				sound static stop sub swap system step
-			then time$ timer troff tron type to
+			then 
+			time_NOTYET$ 
+			timer troff tron type to
 			uevent unlock until using
 			view
 			wait while wend width window write
@@ -60,7 +65,7 @@ sub dumpq {
 	print "Previous: $type[2] $syms[2]\n";
 }
 sub isbuiltin {		# Built in functions
-	return 1 if (exists $builtins{$_[0]});
+	return 1 if (grep /^\Q$_[0]\E$/i, @builtins );
 	return 0;
 }
 sub isuserfunc {
@@ -116,7 +121,27 @@ sub precedence {
 	return 0;  # Not an operator
 
 }
-
+my %opsubs=(
+	'+' => "EXPR_ADD",
+	'-' => "EXPR_SUB",
+	'*' => "EXPR_MUL",
+	'/' => "EXPR_DIV",
+	'=' => "EXPR_EQ",
+	'<=' => "EXPR_LE",
+	'>=' => "EXPR_GE",
+	'<>' => "EXPR_NE",
+	'<' => "EXPR_LT",
+	'>' => "EXPR_GT",
+	'and' => "AND",
+	'or' => "OR",
+	'not' => "NOT",
+	'xor' => "XOR",
+	'eqv' => "EQV",
+	'imp' => "IMP",
+	'.' => "NULL",
+	'mod' => "MOD",
+	'^' => "POW",	
+);
 sub convert_to_rpn {
 	my(@expr)=@_;
 
@@ -125,7 +150,7 @@ sub convert_to_rpn {
 	my (@stack,@stream);
 	my $i=-1;
 	foreach my $item (@expr) {
-		die if $i++ > 20;
+		die "Expression too complex at line $sourceline" if $i++ > 100;  # Arbitrary.
 		my($sym,$type)=@$item;
 		#print "Got a $sym...\n";
 		if ($sym eq "(") {
@@ -139,7 +164,8 @@ sub convert_to_rpn {
 			next;
 		}
 
-		if (! precedence($sym, exists $expr[$i+1]?$expr[$i+1]->[0]:"NOTARR")) {
+		if (	$type eq "STRING" or
+			not precedence($sym, exists $expr[$i+1]?$expr[$i+1]->[0]:"NOTARR")) {
 			push @stream, $item;  # Operands, etc..
 			next;
 		}
@@ -159,6 +185,7 @@ sub convert_to_rpn {
 	#print STDERR "Outta RPN convert\n";
 	return(@stream);
 }
+
 sub fixup {
 	my(@expr)=@_;
 
@@ -180,9 +207,12 @@ sub fixup {
 				$unary=1;
 			}
 		}
-		if ($this->[0] eq "("    and 
-			hasargs($prev->[0])   and 
-			$next->[0] ne ")"  ) {
+		if (
+			$this->[0] eq "("    and 
+			hasargs($prev->[0])	# This works, but damned if I know why. 
+			#and $next->[0] ne ")"  
+			){
+#			print "Argthing $prev->[0]\n";
 			$argthing=1;
 		}
 
@@ -235,6 +265,10 @@ PROCEXP_NOFEED:
 			($syms[CURR] eq ',' and $type[CURR] ne "STRING"));
 		last if ($syms[CURR] eq ';');
 		push(@expr, [ $syms[CURR], $type[CURR] ]);
+		if (hasargs($syms[CURR]) and $syms[NEXT] ne "(") {
+			push(@expr, [ "(", "PUN" ]); # Make sure no-arg funcs have at
+			push(@expr, [ ")", "PUN" ]); # least token parenthesis...
+		}
 		feedme();
 	}
 	barf();
@@ -245,17 +279,12 @@ sub pushthing {
 	my $ts="INVALID";
 
 	if ($type ne "RESULT") {
-		if ($type=~/STRING|INT|FLO|BARE/ or ($type eq "BARE" and $lhs)) {
+		if ($type=~/STRING|INT|FLO|BARE/) {
 			$sym=qq{"$sym"} if $type =~ /BARE|STRING/;
 			push @$code, qq{\tnew $toreg, .PerlHash};
 			push @$code, qq{\tset $toreg\["type"], "$type"};
 			push @$code, qq{\tset $toreg\["value"], $sym};
-		} elsif ($type=~/BARELY/) {
-			push @$code, qq{\tset S0, "$sym"};
-			push @$code, qq{\tbsr VARLOOKUP};
-			push @$code, qq{\tbsr VARSTUFF};
-			push @$code, qq{\tset $toreg, P0};
-		} elsif ($type eq "STARTARG") {
+		}  elsif ($type eq "STARTARG") {
 			return;
 		} else {
 			die "Bad type for $sym?";
@@ -268,22 +297,12 @@ sub pushthing {
 		}
 	}
 }
-my %opsubs=(
-	'+' => "EXPR_ADD",
-	'-' => "EXPR_SUB",
-	'*' => "EXPR_MUL",
-	'/' => "EXPR_DIV",
-	'=' => "EXPR_EQ",
-	'<=' => "EXPR_LE",
-	'>=' => "EXPR_GE",
-	'<>' => "EXPR_NE",
-	'<' => "EXPR_LT",
-	'>' => "EXPR_LT",
-);
 sub pushargs {
 	my($code,$work)=@_;
 
 	return unless @$work;
+
+#	print "Work has ", scalar @$work, " things on it.\n";
 	while($$work[-1]->[0] ne "STARTARG") {
 		my $item=pop @$work;
 		if ($item->[1] eq "RESULT") {
@@ -319,17 +338,20 @@ sub generate_code {
 			pushargs(\@code, \@work);
 			if (isarray($sym)) {
 				push @code, qq{\tset S0, "$sym"};
+				push @code, "\tbsr REVERSEARGS";
 				push @code, "\tbsr ARRAY_LOOKUP";
 				push @work, [ "result of $sym()", "RESULT" ];
 				push @code, "\tpush P9, P0\t# Result of $sym()";
 			} elsif (isbuiltin($sym)) {
 				$_=$sym;
 				s/\$//g; tr/a-z/A-Z/;
+				push @code, "\tbsr REVERSEARGS";
 				push @code, qq{\tbsr BUILTIN_$_};
 				push @work, [ "result of $sym()", "RESULT" ];
 				push @code, "\tpush P9, P6\t# Result of $sym() ";
 			} else {
 				push @code, qq{set S0, "$sym"};
+				push @code, "\tbsr REVERSEARGS";
 				push @code, "\tbsr USERFUNC";
 				push @work, [ "result of $sym()", "RESULT" ];
 				push @code, "\tpush P9, P6\t# Result of $sym()";
@@ -368,12 +390,12 @@ sub EXPRESSION {
 	@expr=get_expression(%opts);	# Get expression tokens
 	@expr=fixup(@expr);		# Repair unary -, functions, etc...
 
-	#print "Evaluating: ";foreach(@expr) { print $_->[0];" " } print "\n";
-	#foreach(@expr) { print $_->[1]," " } print "\n";
+#	print "Evaluating: ";foreach(@expr) { print $_->[0];" " } print "\n";
+#	foreach(@expr) { print $_->[1]," " } print "\n";
 
 	@stream=convert_to_rpn(@expr);	# Get infix into RPN
 
-	#print "Evaluation stream: "; foreach(@stream) {	print $_->[0]," "; } print "\n";
+#	print "Evaluation stream: "; foreach(@stream) {	print $_->[0]," "; } print "\n";
 
 	@stream=generate_code($opts{lhs},@stream);	# Generate PASM code stream
 

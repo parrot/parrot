@@ -9,10 +9,9 @@
 	#
 	
 	# Set I2, I3 to true/false
-LOGICAL:bsr POPZERO
+LOGICAL:bsr SETUP_MATH_BINARY	# P6, P7
 	bsr TRUTH
 	set I2, I1
-	bsr POPONE
 	set P6, P7
 	bsr TRUTH
 	set I3, I1
@@ -41,8 +40,7 @@ IMP:    bsr LOGICAL
 	eq I3, 0, RETURNBOOL_FALSE
 	branch RETURNBOOL_TRUE
 
-NOT:	bsr POPZERO
-	bsr TRUTH
+NOT:	bsr TRUTH
 	not I5, I1
 	set S0, "INT"
 	branch MATHOPEND
@@ -201,8 +199,7 @@ EXPR_DIV:
 	set S0, "FLO"	# Result is float too!
 	branch MATHOPEND
 
-MOD: 	bsr POPZERO
-	bsr POPONE
+MOD: 	bsr SETUP_MATH_BINARY
 	bsr CAST_TO_FLOAT
 	bsr SETUPFLO
 	mod N3, N1, N0
@@ -210,8 +207,7 @@ MOD: 	bsr POPZERO
 	set S0, "INT"
 	branch MATHOPEND
 
-POW:	bsr POPZERO
-	bsr POPONE
+POW:	bsr SETUP_MATH_BINARY
 	bsr CAST_TO_FLOAT
 	bsr SETUPFLO
 	pow N5, N1, N0

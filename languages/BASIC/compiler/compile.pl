@@ -13,6 +13,14 @@ require "COMP_parser.pm";
 require "COMP_assignments.pm";
 require "COMP_expressions.pm";
 
+$SIG{__DIE__}=sub {
+	print "At BASIC source line $main::sourceline:\n";
+	$_=$_[0];
+	s/^(.{1,50})(\S+)\s+(.*)/\t$1$2\n\t$3/;
+	print;
+	exit 1;
+};
+
 if (@ARGV) {
 	open(D, $ARGV[0]) || die;
 	@basic=<D>;
@@ -35,6 +43,8 @@ parse(@ARGV);
 
 close(CODE);
 close(FUNC);
+
+exit 0;
 
 =pod
 

@@ -429,7 +429,8 @@ sub parse_print {
 		}
 		last if (iskeyword($syms[CURR]) and not isbuiltin($syms[CURR]));
 		die "LOOP" if $c++>100;
-		if ($type[CURR] eq "STRING" and not $fd) {
+		if ($type[CURR] eq "STRING" and not $fd and
+			( $type[NEXT] eq "STMT" or $type[NEXT] eq "COMP" or $type[NEXT] eq "COMM" ) ) {
 			$eol=0;
 			fdprint($fd, $syms[CURR]);
 			feedme();

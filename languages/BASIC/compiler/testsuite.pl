@@ -19,28 +19,58 @@ while(1) {
 	close(OF);
 	if ( ! system("perl compile.pl _testsuite.bas")) {
 		system("perl testrun.pl > _output2");
+		open(O, "_output2") || die;
+		print <O>;
+		close(O);
+		print "\n";
 	}
-	open(O, "_output2") || die;
-	print <O>;
-	close(O);
-	print "\n";
+	
 }
 
 __DATA__
-' For loops.  3..6 nested in 1..3
-function foo
-	for y=3 to 6
-	print y,
-	next y
-	foo=99
-end function
-for t%=1 to 3
-  h=foo()
-  print "    ", t%
-next t%
-
+print mid$("Hello", 2, 1)
 
 STOPPLEASE
+' Expect OK
+if 2 > 1 then
+	print "Ok"
+else
+	print "All is not right"
+end if
+
+STOPPLEASE
+' Expect Correct
+DIM A(1,1)
+RO=1
+IF A(RO,5)=0 THEN GOSUB 20: REM GOO
+   end
+20 print "Correct"
+   return
+
+' Three random numbers
+print str$(rnd)
+print str$(rnd())
+print str$(rnd(1))
+
+' Expect 234
+function inkey$
+	inkey$="234"
+end function
+Y = VAL(inkey$)
+print y
+end
+1740 print "Branched"
+	end
+
+' Expect Hello A World
+print "Hello " + chr$(65);
+print " World"
+
+' Expect nothing
+Dim A(10)
+z=3
+c=c+a(z)
+
 ' String function, whoa
 function a$
 	a$="Whoa"
@@ -80,13 +110,6 @@ print t%
 ' Expect 9
 print (2+3*5-(6+abs(0-3)))+1
 
-' Expect Correct
-DIM A(1,1)
-RO=1
-IF A(RO,5)=0 THEN GOSUB 20: REM GOO
-   end
-20 print "Correct"
-   return
 
 ' Expect a Hello, World!
 print "Hello, ";	' COmment

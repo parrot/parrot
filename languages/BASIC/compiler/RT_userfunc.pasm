@@ -78,7 +78,7 @@ UF_LOADBARE:
 	# S1 = Variable name
 	# S2 = Type of current var (BARE)
 UF_LOADBAREVAR:
-	print 2, "Reference?\n"
+	#print 2, "Reference?\n"
 	set S2, "REF"
 	restore S0
 	branch UF_ARGLOADPROC

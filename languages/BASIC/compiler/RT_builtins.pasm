@@ -682,9 +682,6 @@ GETARGS:set I5, P8
 	eq I5, 0, ERRBADARGS
 	pop P0, P8   # Type
 	set S1, P0["type"]
-	#print "Pulling a "
-	#print S1
-	#print " as a function argument\n"
 	eq S1, "FLO", GETFLO
 	eq S1, "STRING", GETSTRING
 	eq S1, "INT", GETINT
@@ -694,19 +691,10 @@ GETARGS:set I5, P8
 	print "'\n"
 	branch GEN_ERROR
 GETFLO: set N0, P0["value"]
-	#print "Got "
-	#print N0
-	#print "\n"
 	branch ENDARGS
 GETINT: set I0, P0["value"]
-	#print "Got "
-	#print I0
-	#print "\n"
 	branch ENDARGS
 GETSTRING: set S0, P0["value"]
-	#print "Got "
-	#print S0
-	#print "\n"
 	branch ENDARGS
 GETBARE: 
 	set S0, P0["value"]
@@ -742,7 +730,7 @@ CLEARARGS:
 	#   Sets I3 = 1 End of arguments
 	#           = 0 There's more arguments
 ARGCK:	set I3, P8
-	eq I3, 0, ARGCKEND
+	ne I3, 0, ARGCKEND
 	set I3, 1
 ARGCKEND:ret
 

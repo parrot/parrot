@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#
+
 no warnings 'once';
 $parpath='../../../languages/imcc/imcc';
 if (! -d $parpath) {
