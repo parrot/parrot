@@ -75,7 +75,7 @@ pmclass Iterator {
 
     INTVAL get_bool () {
 	PMC *key = SELF->cache.struct_val;
-        return key && key->cache.int_val >= 0;
+        return key && key->cache.int_val != -1;
     }
 
     INTVAL elements () {
