@@ -21,6 +21,7 @@ def depth1(n, pea):
     p = (pea, pea)
     for i in xrange(n):
         p = (p, pea)
+    if n >= 99: return n, p
     try:
         n, p = depth1(n+1, p)
     except RuntimeError:
