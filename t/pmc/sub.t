@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 61;
+use Parrot::Test tests => 66;
 use Test::More;
 use Parrot::Config;
 
@@ -318,7 +318,7 @@ OUTPUT
 
 for my $R (0..4) {
 for my $N (254..258) {
-output_is(<<"CODE", <<'OUTPUT', "test COW");
+output_is(<<"CODE", <<'OUTPUT', "test COW $R $N");
     print "main\\n"
     set I16, 0
     set I17, $N	 	#~1 chunk full
@@ -941,7 +941,7 @@ CODE
 main
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'two @MAIN pragma');
+output_is(<<'CODE', <<'OUTPUT', 'two @MAIN pragmas');
 .pcc_sub _first:
     print "first\n"
     invoke P1
@@ -974,6 +974,63 @@ main
 first
 second
 OUTPUT
+
+my ($fpc, $cfg);
+$cfg = "include/parrot/config.h";
+open(I, $cfg) or die "Cant read $cfg: $!";
+while (<I>) {
+    if (/FRAMES_PER_CHUNK\s+(\d+)/) {
+	$fpc = $1;
+	last;
+    }
+}
+close I;
+die "Cant find FRAMES_PER_CHUNK in $cfg" unless ($fpc) ;
+for my $N ($fpc-2..$fpc+2) {
+output_is(<<"CODE", <<'OUTPUT', "test COW w strings $N");
+    print "main\\n"
+    set I16, 0
+    set I17, $N
+lp:
+    set S16, I16
+    savetop
+    inc I16
+    le I16, I17, lp
+    newsub P0, .Continuation, _func
+    invokecc
+
+lp2:
+    restoretop
+    set S0, I16
+    # triggers DOD with --gc-debug
+    ne S0, S16, nok
+    dec I16
+    if I16, lp2
+    print "ok\\n"
+    end
+nok:
+    print "not ok S0 = '"
+    print S0
+    print "' S16 = '"
+    print S16
+    print "'\\n"
+    end
+_func:
+    print "func\\n"
+    set I16, 0
+    set I17, @{[ $N+$fpc ]}
+lp3:
+    set S16, I16
+    savetop
+    inc I16
+    le I16, I17, lp3
+    invoke P1
+CODE
+main
+func
+ok
+OUTPUT
+}
 
 unlink($temp, 'temp.pbc');
 
