@@ -15,6 +15,8 @@
 static const CHARTYPE *string_native_type;
 static const CHARTYPE *string_unicode_type;
 
+#define EXTRA_SIZE 4
+
 /* Basic string stuff - creation, enlargement, destruction, etc. */
 
 /*=for api string string_init
@@ -26,6 +28,75 @@ string_init(void)
     string_native_type = chartype_lookup("usascii");
     string_unicode_type = chartype_lookup("unicode");
 }
+
+/*=for api string string_append
+ * Take in two strings and append the second string to the first
+ */
+STRING *
+string_append(struct Parrot_Interp *interpreter, STRING *a,
+              STRING *b, UINTVAL Uflags)
+{
+    STRING *temp;
+    UNUSED(Uflags);
+
+    /* If B isn't real, we just bail */
+    if (b == NULL || b->strlen == 0) {
+        return a;
+    }
+
+    /* Is A real? */
+    if (a != NULL && a->strlen != 0) {
+        /* If the destination's constant, then just fall back to
+           string_concat */
+        if (a->flags & BUFFER_constant_FLAG) {
+            return string_concat(interpreter, a, b, Uflags);
+        }
+        /* First, make sure B is the same type as A, transcoding
+           if we need to */
+        if (a->type != b->type || a->encoding != b->encoding) {
+            b = string_transcode(interpreter, b, a->encoding, a->type,
+                                 NULL);
+            b->flags |= BUFFER_neonate_FLAG;
+        }
+        /* make sure A's big enough for both */
+        if (a->buflen < a->bufused + b->bufused) {
+            a = string_grow(interpreter, a, ((a->bufused + b->bufused)
+                            - a->buflen) + EXTRA_SIZE);
+        }
+        /* Tack B on the end of A */
+        mem_sys_memcopy((void *)((ptrcast_t)a->bufstart + a->bufused),
+                        b->bufstart, b->bufused);
+        b->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
+        a->bufused += b->bufused;
+        a->strlen += b->strlen;
+        return a;
+    }
+    else {
+        /* A isn't real. Does it exist at all? */
+        if (a != NULL) {
+            if (a->flags & BUFFER_constant_FLAG) {
+                return string_concat(interpreter, a, b, Uflags);
+            }
+            /* There's at least a string header for A. Make it a copy
+               of B */
+            if (a->buflen < b->bufused) {
+                a = string_grow(interpreter, a, b->bufused + EXTRA_SIZE);
+            }
+            a->flags = b->flags;
+            a->flags &= ~(UINTVAL)BUFFER_constant_FLAG;
+            a->bufused = b->bufused;
+            a->strlen = b->strlen;
+            a->encoding = b->encoding;
+            a->type = b->type;
+            a->language = b->language;
+            memcpy(a->bufstart, b->bufstart, b->bufused);
+            return a;
+        }
+    }
+    /* If we got here, A was NULL. So clone B. */
+    return string_copy(interpreter, b);
+}
+
 
 /*=for api string string_make
  * allocate memory for the string, copy information into it

@@ -2063,7 +2063,7 @@ into $1.
 =cut
 
 inline op concat(inout STR, in STR) {
-  $1 = string_concat(interpreter, $1, $2, 1);
+  $1 = string_append(interpreter, $1, $2, 1);
   goto NEXT();
 }
 

@@ -32,7 +32,7 @@
 
         time   N1
 
-REDO:   dec    P4, 1
+REDO:   dec    P4
         if     P4, REDO
 
         print  "done\n"

@@ -8,19 +8,19 @@
 # $Id$
 #
 
-        new    P2, PerlInt
+        new    P2, .PerlInt
         set    P2, 0
-        new    P3, PerlInt
+        new    P3, .PerlInt
         set    P3, 1
-        new    P4, PerlInt
+        new    P4, .PerlInt
         set    P4, 100000000
         
         print  "Iterations:    "
         print  P4
         print  "\n"
 
-        new    P1, PerlInt
-        new    P5, PerlInt
+        new    P1, .PerlInt
+        new    P5, .PerlInt
         set    P1, 2
         mul    P5, P4, P1
 

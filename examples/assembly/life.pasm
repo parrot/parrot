@@ -26,21 +26,21 @@
 	set S13, "               "
 	set S14, "               "
 	set S15, ""
-	concat S15, S15, S0
-	concat S15, S15, S1
-	concat S15, S15, S2
-	concat S15, S15, S3
-	concat S15, S15, S4
-	concat S15, S15, S5
-	concat S15, S15, S6
-	concat S15, S15, S7
-	concat S15, S15, S8
-	concat S15, S15, S9
-	concat S15, S15, S10
-	concat S15, S15, S11
-	concat S15, S15, S12
-	concat S15, S15, S13
-	concat S15, S15, S14
+	concat S15, S0
+	concat S15, S1
+	concat S15, S2
+	concat S15, S3
+	concat S15, S4
+	concat S15, S5
+	concat S15, S6
+	concat S15, S7
+	concat S15, S8
+	concat S15, S9
+	concat S15, S10
+	concat S15, S11
+	concat S15, S12
+	concat S15, S13
+	concat S15, S14
 	bsr dump
 	set I0, 0
 loop:	ge I0, I2, getout
