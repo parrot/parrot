@@ -837,7 +837,7 @@ PackFile_Constant_unpack_number(struct PackFile * pf, struct PackFile_Constant *
 #if TRACE_PACKFILE
     fprintf(stderr, "FIXME: PackFile_Constant_unpack_number: assuming size of FLOATVAL!\n");
 #endif
-    self->number = PackFile_fetch_nv(self, (unsigned char *)cursor);
+    self->number = PackFile_fetch_nv(pf, (unsigned char *)cursor);
      
     self->type = PFC_NUMBER;
 /*    self->number = f.value; */
