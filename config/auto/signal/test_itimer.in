@@ -1,0 +1,30 @@
+/*
+ * setitimer test
+ */
+
+#include <sys/time.h>
+#include <signal.h>
+#include <stdio.h>
+
+volatile sig_atomic_t got_alarm = 0;
+
+void
+alarm_handler(int i) {
+    got_alarm = 1;
+}
+
+int main(int argc, char **argv) {
+    struct itimerval its, ots;
+    int ret;
+
+    signal(SIGALRM, alarm_handler);
+    memset(&its, 0, sizeof(its));
+    its.it_interval.tv_sec = 0;
+    its.it_value.tv_sec = 10;
+    ret = setitimer(ITIMER_REAL, &its, &ots);
+    if (ret)
+	    puts("err");
+    else
+	    puts("ok");
+    return 0;
+}

@@ -56,7 +56,7 @@ END
 
     print OUT <<'END';
 
-/* signal stuff */
+/* signal stuff from config/auto/signal */
 END
 
 if (${has_sigaction}) {
@@ -68,6 +68,12 @@ END
 if (${has___sighandler_t}) {
     print OUT <<'END';
 #define HAS___SIGHANDLER_T 1
+END
+}
+
+if (${has_setitimer}) {
+    print OUT <<'END';
+#define HAS_SETITIMER 1
 END
 }
 
