@@ -69,10 +69,10 @@ Get value of digit at pos.
     ( (x->buffer[(y) / BN_D_PER_NIB] >> \
      ( (y) % BN_D_PER_NIB)*4) & 15 )
 
-#define CHECK_OVERFLOW(expn, add, max, msg) \
-    if (max - expn < add) { BN_EXCEPT(PINT_ BN_OVERFLOW, msg); }
-#define CHECK_UNDERFLOW(expn, sub, min, msg) \
-    if (min - expn > (-sub)) { BN_EXCEPT(PINT_ BN_UNDERFLOW, msg); }
+#define CHECK_OVERFLOW(expn, add, max) \
+    (((max) - (expn) < (add)) ? 1 : 0)
+#define CHECK_UNDERFLOW(expn, sub, min) \
+    (((min) - (expn) > (-(sub))) ? 1 : 0)
 
 /* This can be called while within a debugger, don't use in normal
    operation */
@@ -115,6 +115,8 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *co
 void BN_iadd(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void BN_align(PINTD_ BIGNUM* one, BIGNUM* two);
+INTVAL
+BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg);
 
 /*=head1 Memory Management and BIGNUM creation
 
@@ -287,6 +289,122 @@ BN_PRINT_DEBUG (BIGNUM *bn, char* mesg) {
     printf("\n");
 }
 
+/*=head1 Errors
+
+=head2 BN_nonfatal(context, exception, message)
+
+When an exception condition occurs after which execution could
+continue.  If context specifies that death occurs, then so be it.
+
+=cut*/
+INTVAL
+BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
+    /* See extended standard for details */
+    switch (except) {
+    case BN_CONVERSION_OVERFLOW :
+        /* Asked to hold coeff|expn too large value */
+        context->flags |= BN_F_OVERFLOW | BN_F_INEXACT | BN_F_ROUNDED;
+        if (context->traps & (BN_F_OVERFLOW | BN_F_INEXACT | BN_F_ROUNDED) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_CONVERSION_SYNTAX:
+        /* string not conforming to numeric form */
+        context->flags |= BN_F_INVALID_OPERATION;
+        if (context->traps & (BN_F_INVALID_OPERATION) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_CONVERSION_UNDERFLOW:
+        /* expn of string too small to be held  */
+        context->flags |= BN_F_UNDERFLOW;
+        if (context->traps & (BN_F_UNDERFLOW) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_DIVISION_BY_ZERO:
+        /* dividend of div/div-int or pow zero  */
+        context->flags |= BN_F_DIVISION_BY_ZERO;
+        if (context->traps & (BN_F_DIVISION_BY_ZERO) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break; 
+    case BN_DIVISION_IMPOSSIBLE:
+        /* integer result of div-int or rem > precision */
+        context->flags |= BN_F_INVALID_OPERATION;
+        if (context->traps & (BN_F_INVALID_OPERATION) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_DIVISION_UNDEFINED:
+        /* div by zero with zero on top also */
+        context->flags |= BN_F_INVALID_OPERATION;
+        if (context->traps & (BN_F_INVALID_OPERATION) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_INEXACT:
+        /* some sort of rounding: with loss of information */
+        context->flags |= BN_F_INEXACT;
+        if (context->traps & (BN_F_INEXACT) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_INSUFFICIENT_STORAGE:
+        /* not enough space to hold intermediate results */
+        /* Often this will be raised directly (ie. fatally) */
+        context->flags |= BN_F_INVALID_OPERATION;
+        if (context->traps & (BN_F_INVALID_OPERATION) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_INVALID_CONTEXT:
+        /* context given was not valid (unknown round) */
+        context->flags |= BN_F_INVALID_OPERATION;
+        if (context->traps & (BN_F_INVALID_OPERATION) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_INVALID_OPERATION:
+        /* operation which is not valid */
+        context->flags |= BN_F_INVALID_OPERATION;
+        if (context->traps & (BN_F_INVALID_OPERATION) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_LOST_DIGITS:
+        /* digits lost in rounding  */
+        context->flags |= BN_F_LOST_DIGITS;
+        if (context->traps & (BN_F_LOST_DIGITS) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_OVERFLOW:
+        /* expn becomes larger than max allowed */
+        context->flags |= BN_F_OVERFLOW | BN_F_ROUNDED | BN_F_INEXACT;
+        if (context->traps & (BN_F_OVERFLOW | BN_F_ROUNDED | BN_F_INEXACT) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_ROUNDED:
+        /* something was rounded */
+        context->flags |= BN_F_ROUNDED;
+        if (context->traps & (BN_F_ROUNDED) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    case BN_UNDERFLOW:
+        /* expn becomes smaller than min allowed */
+        context->flags |= BN_F_UNDERFLOW | BN_F_ROUNDED | BN_F_INEXACT;
+        if (context->traps &(BN_F_UNDERFLOW | BN_F_ROUNDED | BN_F_INEXACT) ) {
+            BN_EXCEPT(PINT_ except, msg);
+        }
+        break;
+    default:
+        BN_EXCEPT(PINT_ BN_INVALID_OPERATION, "An unknown error occured");
+    }
+    
+}
 /*=head2 void BN_exception(BN_EXCEPTIONS exception, char* message)
 
 Throw `exception'.  Should be accessed via a BN_EXCEPT macro
@@ -624,8 +742,10 @@ BN_strip_tail_zeros(PINTD_ BIGNUM *bn) {
     for (i=0; i< bn->digits -lsd; i++) {
 	BN_setd(bn, i, BN_getd(bn, i+lsd));
     }
-    CHECK_OVERFLOW( bn->expn, lsd, BN_EXPN_MAX,
-		    "overflow when striping zeros");
+    
+    if (CHECK_OVERFLOW( bn->expn, lsd, BN_EXPN_MAX)) {
+        BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow when striping zeros");
+    }
     bn->expn += lsd;
     bn->digits -= lsd;
 }
@@ -709,15 +829,15 @@ BN_round (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
 	BN_round_as_integer(PINT_ bn, context);
 	return;
     }
-
     /* Rounding a BigNum or sdaNum*/
     if (bn->digits > context->precision) {
-	if (context->lost_digits) {
+        { /* Check for lost digits */
 	    INTVAL digit;
 	    for (digit = 0; digit < bn->digits - context->precision; digit++) {
 		if (BN_getd(bn, digit) != 0) {
-		    BN_EXCEPT(PINT_ BN_LOST_DIGITS,
-			      "digits lost while rounding" );
+                    BN_nonfatal(PINT_ context, BN_LOST_DIGITS,
+                                "digits lost while rounding");
+                    break;
 		}
 	    }
 	}
@@ -784,16 +904,18 @@ BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     if (carry) { /* We had 999999999 + 1, extend number */
 	INTVAL extra = bn->digits - context->precision;
 	BN_setd(bn, context->precision, carry);
-	CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX,
-		       "overflow while rounding");
+	if (CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX)) {
+            BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow while rounding");
+        }
 	bn->expn += extra;
 	bn->digits = context->precision +1;
 	return BN_round(PINT_ bn, context);
     }
     else {
 	INTVAL extra = bn->digits - context->precision;
-	CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX,
-		       "overflow while rounding");
+	if (CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX)) {
+            BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow while rounding");
+        }
 	bn->expn += extra;
 	bn->digits = context->precision;
 	return;
@@ -811,8 +933,9 @@ BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
 	BN_setd(bn, i, temp);
     }
     extra = bn->digits - context->precision;
-    CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX,
-		   "overflow while rounding");
+    if (CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX)) {
+        BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow while rounding");
+    }
     bn->expn += extra;
     bn->digits = context->precision;
 
@@ -833,13 +956,16 @@ BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
     BN_CONTEXT temp_context;
 
     if (bn->expn < context->precision) {
-	if (context->lost_digits) {
+        {
 	    /* Are we losing information? */
 	    for (i=0;
 		 i< (context->precision - bn->expn) && i<bn->digits;
 		 i++) {
-		if (BN_getd(bn, i) != 0)
-		    BN_EXCEPT(BN_LOST_DIGITS, "truncating IntVal");
+		if (BN_getd(bn, i) != 0) {
+                    BN_nonfatal(PINT_ context, BN_LOST_DIGITS,
+                                "digits lost while rounding");
+                    break;
+                }
 	    }
 	}
 
@@ -936,7 +1062,7 @@ void
 BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 		 BN_CONTEXT *context, BN_SAVE_PREC* restore) {
     INTVAL i;
-    INTVAL lost_save;
+    unsigned char lost_save;
     if (restore && one->digits != restore->one.digits) {
 	if (one->expn < restore->one.expn) {
 	    for (i=0; i<restore->one.digits; i++)
@@ -954,10 +1080,11 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	two->digits = restore->two.digits;
     }
     /* We don't raise lost_digits after an operation, only beforehand */
-    lost_save = context->lost_digits;
-    context->lost_digits = 0;
+    lost_save = context->traps;
+    context->traps &= ~(unsigned char)BN_F_LOST_DIGITS;
     BN_round(PINT_ result, context);
-    context->lost_digits = lost_save;
+    context->flags = lost_save;
+
     BN_strip_lead_zeros(PINT_ result);
     BN_really_zero(PINT_ result);
     BN_make_integer(PINT_ result, context);
@@ -1326,10 +1453,12 @@ BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
   
     i = one->expn + two->expn;
-    CHECK_OVERFLOW(result->expn, i, BN_EXPN_MAX,
-		   "overflow in multiplication");
-    CHECK_UNDERFLOW(result->expn,-i, BN_EXPN_MIN,
-		    "underflow in multipliaction");
+    if (CHECK_OVERFLOW(result->expn, i, BN_EXPN_MAX)) {
+        BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in multiplication");
+    }
+    if (CHECK_UNDERFLOW(result->expn,-i, BN_EXPN_MIN)) {
+        BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in multipliaction");
+    }
     result->expn = i;
   
     result->sign = 1 & (one->sign ^ two->sign);
@@ -1394,14 +1523,14 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     
     }
     else { /* Other roundings just need digits to play with */
-	INTVAL save_lost;
+	unsigned char save_lost;
 	/* We don't warn on lost digits here, as is after an operation */
-	save_lost = context->lost_digits;
-	context->lost_digits = 0;
+	save_lost = context->traps;
+	context->traps &= ~(unsigned char)BN_F_LOST_DIGITS;
 
 	BN_round(PINT_ result, context);
 
-	context->lost_digits = save_lost;
+	context->traps = save_lost;
     }
 
     BN_really_zero(PINT_ result);
@@ -1421,7 +1550,9 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 		BN_setd(result, j-i, BN_getd(result, j));
 	    }
 	}
-	CHECK_OVERFLOW(result->expn, i, BN_EXPN_MAX, "overflow in divide");
+	if (CHECK_OVERFLOW(result->expn, i, BN_EXPN_MAX)) {
+            BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in divide");
+        }
 	result->expn += i;
     }
   
@@ -1542,10 +1673,14 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
     /* First position to try to fill */
     newexpn = one->digits + one->expn - two->digits - two->expn;
-    CHECK_OVERFLOW(t1->expn, newexpn, BN_EXPN_MAX, "overflow in divide");
-    CHECK_UNDERFLOW(t1->expn, -newexpn, BN_EXPN_MIN, "underflow in divide");
+    if (CHECK_OVERFLOW(t1->expn, newexpn, BN_EXPN_MAX)) {
+        BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in divide");
+    }
+    if (CHECK_UNDERFLOW(t1->expn, -newexpn, BN_EXPN_MIN)) {
+        BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in divide");
+    }
     t1->expn = newexpn;
-
+        
     value = 0;
     for (;;) {
 	if (!(t2->digits % 10)) BN_grow(PINT_ t2, t2->digits+11);
@@ -1599,8 +1734,12 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	if (operation == BN_DIV_DIVINT|| operation == BN_DIV_REMAIN) {
 	    if (t1->expn ==0) break;
 	}
-	CHECK_OVERFLOW(t1->expn, 1, BN_EXPN_MAX, "overflow in divide");
-	CHECK_UNDERFLOW(t1->expn, -1, BN_EXPN_MIN, "underflow in divide");
+	if (CHECK_OVERFLOW(t1->expn, 1, BN_EXPN_MAX)) {
+            BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in divide");
+        }
+	if (CHECK_UNDERFLOW(t1->expn, -1, BN_EXPN_MIN)) {
+            BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in divide");
+        }
 	t1->expn--;
 	if (divided) BN_copy(PINT_ div, rem);
     }
@@ -1699,13 +1838,14 @@ void
 BN_rescale(PINTD_ BIGNUM* result, BIGNUM* one, BIGNUM* two,
 		BN_CONTEXT* context) {
     INTVAL expn;
-    INTVAL lost = context->lost_digits;
+    unsigned char lost = context->flags;
+    context->flags &= ~(unsigned char)BN_F_LOST_DIGITS;
 
     BN_arith_setup(PINT_ result, one, two, context, NULL);
 
-    context->lost_digits = 1;
     expn = BN_to_int(PINT_ two, context);
-    context->lost_digits = lost;
+
+    context->flags = lost;
 
     BN_arith_cleanup(PINT_ result, one, two, context, NULL);
 }
@@ -1738,7 +1878,7 @@ BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
     /* if e>0, if we'll lose precision we'll also be too big, so lose
        above anyway.  On the other hand, with e<0, we can lose digits <
        . from this so need to check that we don't lose precision */
-    if (bn->expn<0 && context->lost_digits) {
+    if (bn->expn<0 && context->flags & BN_F_LOST_DIGITS) {
 	BN_EXCEPT(PINT_ BN_LOST_DIGITS, "digits lost in conv -> int");
     }
 

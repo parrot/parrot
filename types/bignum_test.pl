@@ -15,7 +15,8 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int lost) {
   BN_CONTEXT context;
 
   context.precision = prec;
-  context.lost_digits = lost;
+  context.extended = 0;
+  context.traps = lost ? BN_F_LOST_DIGITS : 0;
   switch (round) {
   case 1 : context.rounding = ROUND_HALF_UP;
     break;

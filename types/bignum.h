@@ -19,6 +19,7 @@
 typedef long INTVAL;
 typedef unsigned long UINTVAL;
 typedef double FLOATVAL;
+typedef char BOOLVAL;
 #define PINTD_
 #define PINT_
 #define BN_alloc(x) malloc(x)
@@ -65,40 +66,57 @@ typedef enum {
   ROUND_HALF_EVEN
 } BN_ROUNDING;
 
+/* Flags for exception triggers and exception signals */
+#define BN_F_LOST_DIGITS 1
+#define BN_F_DIVISION_BY_ZERO 2
+#define BN_F_INEXACT 4
+#define BN_F_INVALID_OPERATION 8
+#define BN_F_OVERFLOW 16
+#define BN_F_ROUNDED 32
+#define BN_F_UNDERFLOW 64
+
+
 typedef struct {
-  INTVAL precision;     /* number of digs to retain (-ve values interesting)*/
-  BN_ROUNDING rounding; /* rounding type to perform */
-  int lost_digits;      /* 0 => round, 1 => raise exception */
-  UINTVAL flags;        /* records possible errors */
-} BN_CONTEXT;
+    INTVAL precision;     /* number of digs to retain */
+    BN_ROUNDING rounding; /* rounding type to perform */
+    BOOLVAL extended;     /* do we use extended or base semantics? */
+    unsigned char flags;       /* records possible errors */
+    unsigned char traps;       /* throw errors or not? */
+} parrot_bignum_context;
+
+#define BN_CONTEXT parrot_bignum_context
 
 /* Exceptional Conditions */
 
 typedef enum {
-  BN_CONVERSION_OVERFLOW = 1<<0,
-  /* Asked to hold coeff|expn too large value */
-  BN_CONVERSION_SYNTAX = 1<<1,
-  /* string not conforming to numeric form */
-  BN_CONVERSION_UNDERFLOW = 1<<2,
-  /* expn of string too small to be held  */
-  BN_DIVISION_BY_ZERO = 1<<3,
-  /* dividend of div/div-int or pow zero  */
-  BN_DIVISION_IMPOSSIBLE = 1<<4,
-  /* integer result of div-int or rem > precision */
-  BN_DIVISION_UNDEFINED = 1<<5,
-  /* div by zero with zero on top also */
-  BN_INSUFFICIENT_STORAGE = 1<<6,
-  /* not enough space to hold intermediate results */
-  BN_INVALID_CONTEXT = 1<<7,
-  /* context given was not valid (unknown round) */
-  BN_INVALID_OPERATION = 1<<8,
-  /* operation which is not valid */
-  BN_LOST_DIGITS = 1<<9,
-  /* digits lost in rounding  */
-  BN_OVERFLOW = 1<<10,
-  /* expn becomes larger than max allowed */
-  BN_UNDERFLOW = 1<<11
-  /* expn becomes smaller than min allowed */
+    BN_CONVERSION_OVERFLOW,
+    /* Asked to hold coeff|expn too large value */
+    BN_CONVERSION_SYNTAX,
+    /* string not conforming to numeric form */
+    BN_CONVERSION_UNDERFLOW,
+    /* expn of string too small to be held  */
+    BN_DIVISION_BY_ZERO,
+    /* dividend of div/div-int or pow zero  */
+    BN_DIVISION_IMPOSSIBLE,
+    /* integer result of div-int or rem > precision */
+    BN_DIVISION_UNDEFINED,
+    /* div by zero with zero on top also */
+    BN_INEXACT,
+    /* some sort of rounding, with loss of information */
+    BN_INSUFFICIENT_STORAGE,
+    /* not enough space to hold intermediate results */
+    BN_INVALID_CONTEXT,
+    /* context given was not valid (unknown round) */
+    BN_INVALID_OPERATION,
+    /* operation which is not valid */
+    BN_LOST_DIGITS,
+    /* digits lost in rounding  */
+    BN_OVERFLOW,
+    /* expn becomes larger than max allowed */
+    BN_ROUNDED,
+    /* something was rounded */
+    BN_UNDERFLOW
+    /* expn becomes smaller than min allowed */
 } BN_EXCEPTIONS;
 
 /*Capn' Cut-n-paste functions */
@@ -112,8 +130,8 @@ BIGNUM* BN_copy(PINTD_ BIGNUM*, BIGNUM*);
 BIGNUM* BN_new_from_int(PINTD_ INTVAL value);
 INTVAL BN_to_scientific_string(PINTD_ BIGNUM* bn, char **dest);
 INTVAL BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest);
-int BN_round (PINTD_ BIGNUM *victim, BN_CONTEXT* context);
-void BN_round_as_integer(PINTD_ BIGNUM*, BN_CONTEXT*);
+int BN_round (PINTD_ BIGNUM *victim, BN_CONTEXT *context);
+void BN_round_as_integer(PINTD_ BIGNUM *, BN_CONTEXT* );
 void BN_EXCEPT(PINTD_ BN_EXCEPTIONS, char*);
 void BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void

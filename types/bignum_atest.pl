@@ -78,7 +78,7 @@ while (<>) {
     chomp($ld_out);
 
     if (@conds && "@conds" =~ /Lost_digits/) {
-	if ($ld_out =~ /Exception 512/) {
+	if ($ld_out =~ /digits lost/) {
 	    print "$test lost_digits ok\n";
 	    $testspass++;
 	}
@@ -91,7 +91,7 @@ while (<>) {
 	}
     }
     else {
-	if ($ld_out !~ /Exception 512/) {
+	if ($ld_out !~ /digits lost/) {
 	    print "$test lost_digits ok\n";
 	    $testspass++;
 	}
