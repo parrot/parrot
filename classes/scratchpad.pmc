@@ -40,7 +40,7 @@ pmclass Scratchpad {
 
     void clone (PMC *ret) {
         PObj_custom_mark_destroy_SETALL(ret);
-	ret->data = mem_sys_allocate(SELF->cache.int_val * 
+	ret->data = mem_sys_allocate(SELF->cache.int_val *
                                      sizeof(struct Parrot_Lexicals));
 	ret->cache.int_val = SELF->cache.int_val;
 	mem_sys_memcopy(ret->data, SELF->data,
@@ -65,7 +65,7 @@ pmclass Scratchpad {
      *  - [INT;INT]    a scope, and a lexical position in that scope
      */
     PMC* get_pmc_keyed (PMC* key) {
-	INTVAL pad_index, position = 0;
+	INTVAL pad_index = 0, position = 0;
         STRING * name = NULL;
         PMC * ret = NULL;
         PMC * key2 = key_next(INTERP, key);
@@ -103,7 +103,7 @@ pmclass Scratchpad {
      * get_pmc_keyed supports are supported here.
      */
     void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
-	INTVAL pad_index, position = 0;
+	INTVAL pad_index = 0, position = 0;
         STRING * name = NULL;
         PMC * key2 = key_next(INTERP, key);
         PMC * name_key = key2 ? key2 : key;

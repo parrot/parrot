@@ -1095,7 +1095,7 @@ directory_unpack (struct Parrot_Interp *interpreter,
         if (seg->op_count != tmp) {
             fprintf (stderr,
                     "%s: Size in directory (%d) doesn't match size "
-                    "at offset (%d)\n", seg->name, (int)seg->op_count, 
+                    "at offset (%d)\n", seg->name, (int)seg->op_count,
                     (int)tmp);
         }
         if (i) {
@@ -1389,6 +1389,7 @@ Parrot_new_debug_seg(struct Parrot_Interp *interpreter,
     size_t len;
 
     if (cs->debug) {    /* it exists already, resize it */
+        debug = cs->debug;
         debug->base.data = mem_sys_realloc(debug->base.data, size *
                 sizeof(opcode_t));
     }
