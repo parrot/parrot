@@ -12,7 +12,7 @@ C<OrderedHash> extends C<PerlArray> to provide the functionality of
 C<PerlArray> (list in C<data>) and a C<PerlHash> (hash in
 C<struct_val>). The list holds the PMC values, the hash keys point to
 the index of the value in the list.
- 
+
 There are 2 iterator interfaces:
 
 =over 4
@@ -24,7 +24,7 @@ There are 2 iterator interfaces:
 =back
 
 See F<t/pmc/ordereredhash.t>.
- 
+
 If values are set by numeric index only, there is no hash key. Iterating
 over the hash doesn't show these values.
 
@@ -100,7 +100,7 @@ Creates and returns a clone of the ordered hash.
 
     PMC* clone () {
         PMC* dest = SUPER();
-        hash_clone(INTERP, (Hash *)PMC_struct_val(SELF), 
+        hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
             (Hash**)&PMC_struct_val(dest));
         return dest;
     }
@@ -122,7 +122,7 @@ Creates and returns a clone of the ordered hash.
             return DYNSELF.get_pmc_keyed_int(n);
         }
     }
-    
+
 /*
 
 =item C<PMC *get_pmc_keyed_str(STRING *key)>
@@ -165,7 +165,7 @@ Returns the integer value associated with C<*key>.
         INTVAL n = PerlHash.SELF.get_integer_keyed(key);
         return DYNSELF.get_integer_keyed_int(n);
     }
-    
+
 /*
 
 =item C<FLOATVAL get_number_keyed(PMC *key)>
@@ -307,7 +307,7 @@ Associates C<value> with C<*key>.
             return PerlHash.SUPER(key);
         }
     }
-    
+
 /*
 
 =item C<INTVAL exists_keyed_str(STRING *key)>
@@ -339,7 +339,7 @@ Returns whether the key C<*key> exists in the hash.
             return DYNSELF.defined_keyed_int(n);
         }
     }
-    
+
 /*
 
 =item C<INTVAL defined_keyed_str(STRING *key)>
@@ -370,14 +370,14 @@ Deletes the key C<*key> from the hash.
             SUPER(key);
         }
         else {
-            /* fetch index into the PerlArray 
+            PMC *new_undef = undef(INTERP);
+            /* fetch index into the PerlArray
                and delete the key in the PerlHash afterward */
             INTVAL n = PerlHash.SELF.get_integer_keyed(key);
             PerlHash.SUPER(key);
             /* remove the value from the PerlArray,
                but don't splice the PerlArray. We don't want to mess up
                the mapping from the PerlHash to the PerlArray */
-            PMC *new_undef = undef(INTERP);
             DYNSELF.set_pmc_keyed_int(n,new_undef);
         }
     }
