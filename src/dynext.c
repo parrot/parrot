@@ -259,7 +259,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
          * but currently only ops files have struct_val set
          */
         type = const_string(interpreter,
-                lib_pmc->cache.struct_val ? "Ops" : "PMC");
+                PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
     }
     /*
      *  call init, if it exists

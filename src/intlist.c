@@ -15,8 +15,8 @@ Here is the original documentation for intlist:
 The basic data structure is a variant of a doubly-linked list
 of 'chunks', where a chunk is a C<Buffer> header subclass
 containing the link pointers and other metadata for the chunk.
-As expected from it being a C<Buffer> header, the C<.bufstart> field
-points to the actual array of C<INTVAL>s. The handle used by
+As expected from it being a C<Buffer> header, the C<PObj_bufstart>
+field points to the actual array of C<INTVAL>s. The handle used by
 external code for one of these IntLists is just a pointer to a
 chunk, always called 'list' in this code.
 

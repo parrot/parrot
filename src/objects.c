@@ -210,7 +210,7 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
     set_attrib_num(class_slots, PCD_ATTRIBUTES, attr_offset_hash);
     set_attrib_num(class_slots, PCD_ATTRIB_OFFS, class_offset_hash);
     /* And note the totals */
-    class->cache.int_val = cur_offset - POD_FIRST_ATTRIB;
+    PMC_int_val(class) = cur_offset - POD_FIRST_ATTRIB;
     return;
 }
 
@@ -253,7 +253,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     set_attrib_array_size(child_class_array, PCD_MAX);
 
     /* We have the same number of attributes as our parent */
-    child_class->cache.int_val = base_class->cache.int_val;
+    PMC_int_val(child_class) = PMC_int_val(base_class);
 
     /* Our parent class array has a single member in it */
     parents = pmc_new(interpreter, enum_class_Array);
@@ -503,7 +503,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     object->vtable = PMC_struct_val(vtable_pmc);
 
     /* Grab the attribute count from the parent */
-    attrib_count = class->cache.int_val;
+    attrib_count = PMC_int_val(class);
 
     class_array = PMC_data(class);
     class_name = get_attrib_num(class_array, PCD_CLASS_NAME);
@@ -1034,11 +1034,11 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
      * while there are already child class attrs
      */
     idx = VTABLE_elements(interpreter, attr_hash);
-    assert(class->cache.int_val == idx);
+    assert(PMC_int_val(class) == idx);
     VTABLE_set_integer_keyed_str(interpreter, attr_hash,
             full_attr_name, idx);
     assert(idx + 1 == VTABLE_elements(interpreter, attr_hash));
-    class->cache.int_val = idx + 1;
+    PMC_int_val(class) = idx + 1;
     return idx;
 }
 

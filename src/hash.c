@@ -98,7 +98,7 @@ getBucket(Hash *hash, BucketIndex idx)
     if (idx == NULLBucketIndex)
         return NULL;
     /* TODO honor hash->value_size */
-    return &((HashBucket *)hash->bucket_pool->bufstart)[idx];
+    return &((HashBucket *) PObj_bufstart(hash->bucket_pool))[idx];
 }
 
 /*
@@ -115,7 +115,7 @@ Returns bucket index for hash index C<slot>.
 static PARROT_INLINE BucketIndex
 lookupBucketIndex(Hash *hash, HashIndex slot)
 {
-    return ((BucketIndex *)hash->buffer.bufstart)[slot];
+    return ((BucketIndex *) PObj_bufstart(&hash->buffer))[slot];
 }
 
 /*
@@ -400,7 +400,7 @@ mark_hash(Interp *interpreter, Hash *hash)
         pobject_lives(interpreter, (PObj *)hash->bucket_pool);
     }
 
-    if (!hash->buffer.bufstart|| !hash->bucket_pool->bufstart) {
+    if (!PObj_bufstart(&hash->buffer) || !PObj_bufstart(hash->bucket_pool)) {
         return;
     }
     if (!hash->mark_key && hash->entry_type != enum_hash_string &&
@@ -521,7 +521,7 @@ expand_hash(Interp *interpreter, Hash *hash)
     HashIndex hi;
     BucketIndex bi;
 
-    UINTVAL old_pool_size = hash->bucket_pool->buflen / sizeof(HashBucket);
+    UINTVAL old_pool_size = PObj_buflen(hash->bucket_pool) / sizeof(HashBucket);
     UINTVAL new_pool_size = new_size * MAXFULL_PERCENT / 100;
 
     Parrot_reallocate(interpreter, hash, new_size * sizeof(BucketIndex));
@@ -537,7 +537,7 @@ expand_hash(Interp *interpreter, Hash *hash)
     }
 
     /* NULL out new space in table */
-    memset((HashIndex *)hash->buffer.bufstart + old_size,
+    memset((HashIndex *) PObj_bufstart(&hash->buffer) + old_size,
            NULLBucketIndex, (new_size - old_size) * sizeof(BucketIndex));
 
     /* Warning: for efficiency, we cache the table in a local
@@ -549,7 +549,7 @@ expand_hash(Interp *interpreter, Hash *hash)
      * transcode to a canonical encoding, then you'll trigger GC.)
      * (And I'll probably forget to change this comment, but I think
      * I'm going to canonicalize key encodings on insertion.) */
-    table = (BucketIndex *)hash->buffer.bufstart;
+    table = (BucketIndex *) PObj_bufstart(&hash->buffer);
 
     /* Move buckets to new homes */
     for (hi = 0; hi < old_size; hi++) {
@@ -781,7 +781,7 @@ Called by interator.
 STRING *
 hash_get_idx(Interp *interpreter, Hash *hash, PMC * key)
 {
-    HashIndex i = key->cache.int_val;
+    HashIndex i = PMC_int_val(key);
     BucketIndex bi = (BucketIndex)PMC_data(key);
     HashBucket *b;
     /* locate initial */
@@ -805,7 +805,7 @@ hash_get_idx(Interp *interpreter, Hash *hash, PMC * key)
         }
         bi = lookupBucketIndex(hash, i);
     }
-    key->cache.int_val = i;
+    PMC_int_val(key) = i;
     PMC_data(key) = (void *)bi;
     return b->key;
 }
@@ -826,7 +826,7 @@ hash_get_bucket(Interp *interpreter, Hash *hash, void *okey)
 {
     void *key = promote_hash_key(interpreter, hash, okey, 0);
     UINTVAL hashval = (hash->hash_val)(interpreter, hash, key);
-    HashIndex *table = (HashIndex *)hash->buffer.bufstart;
+    HashIndex *table = (HashIndex *) PObj_bufstart(&hash->buffer);
     BucketIndex chain = table[hashval & hash->max_chain];
     return find_bucket(interpreter, hash, chain, key);
 }
@@ -893,13 +893,13 @@ hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)
     /*      dump_hash(interpreter, hash); */
 
     hashval = (hash->hash_val)(interpreter, hash, key);
-    table = (BucketIndex *)hash->buffer.bufstart;
+    table = (BucketIndex *) PObj_bufstart(&hash->buffer);
     assert(table);
     chain = table[hashval & hash->max_chain];
     bucket = find_bucket(interpreter, hash, chain, key);
 
     /*      fprintf(stderr, "Hash=%p buckets=%p chain=%p bucket=%p KEY=%s\n", */
-    /*              hash, hash->buffer.bufstart, chain, bucket, string_to_cstring(interpreter, key)); */
+    /*              hash, PObj_bufstart(&hash->buffer), chain, bucket, string_to_cstring(interpreter, key)); */
 
     if (bucket) {
         /* Replacing old value */
@@ -910,7 +910,7 @@ hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)
         hash->entries++;
         bucket_index = new_bucket(interpreter, hash, key, value);
         bucket = getBucket(hash, bucket_index);
-        table = (BucketIndex *)hash->buffer.bufstart;
+        table = (BucketIndex *) PObj_bufstart(&hash->buffer);
         bucket->next = table[hashval & hash->max_chain];
         table[hashval & hash->max_chain] = bucket_index;
     }
@@ -952,12 +952,12 @@ hash_delete(Interp *interpreter, Hash *hash, void *okey)
             if (prev)
                 prev->next = bucket->next;
             else {
-                BucketIndex *table = (BucketIndex *)hash->buffer.bufstart;
+                BucketIndex *table = (BucketIndex *) PObj_bufstart(&(hash->buffer));
                 table[slot] = bucket->next;
             }
             hash->entries--;
             /* put bucket on free list */
-            bi = bucket - ((HashBucket *)hash->bucket_pool->bufstart);
+            bi = bucket - (HashBucket *) PObj_bufstart(hash->bucket_pool);
             bucket->next = hash->free_list;
             hash->free_list = bi;
             Parrot_unblock_GC(interpreter);

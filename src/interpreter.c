@@ -328,7 +328,7 @@ get_op_lib_init(int core_op, int which, PMC *lib)
             internal_exception(1, "Couldn't find init_func for core %d", which);
         return init_func;
     }
-    return (oplib_init_f) D2FPTR(lib->cache.struct_val);
+    return (oplib_init_f) D2FPTR(PMC_struct_val(lib));
 }
 
 /*

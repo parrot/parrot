@@ -327,7 +327,7 @@ set_register_usage(struct Parrot_Interp *interpreter,
             while (key) {
                 UINTVAL flags = PObj_get_FLAGS(key);
                 if (flags & KEY_register_FLAG) {
-                    INTVAL n = key->cache.int_val;
+                    INTVAL n = PMC_int_val(key);
                     if (flags & KEY_integer_FLAG) {
                         typ = 0;
                         if (n < 0)

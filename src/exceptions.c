@@ -175,7 +175,7 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
         (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
                         NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_PMC) {
-            handler = e->entry.pmc_val;
+            handler = UVal_pmc(e->entry);
             if (handler &&
                     handler->vtable->base_type == enum_class_Exception_Handler) {
                 return handler;
@@ -268,7 +268,7 @@ new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
 {
     PMC *handler = pmc_new(interpreter, enum_class_Exception_Handler);
     PObj_get_FLAGS(handler) |= PObj_private0_FLAG;
-    handler->cache.struct_val = jb;
+    PMC_struct_val(handler) = jb;
     return handler;
 }
 
@@ -328,11 +328,11 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
     REG_PMC(5) = exception;
     if (PObj_get_FLAGS(handler) & PObj_private0_FLAG) {
         /* its a C exception handler */
-        Parrot_exception *jb = (Parrot_exception *) handler->cache.struct_val;
+        Parrot_exception *jb = (Parrot_exception *) PMC_struct_val(handler);
         longjmp(jb->destination, 1);
     }
     /* return the address of the handler */
-    return handler->cache.struct_val;
+    return PMC_struct_val(handler);
 }
 
 /*
@@ -360,7 +360,7 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
     /* put exception object in P5 */
     REG_PMC(5) = exception;
     /* return the address of the handler */
-    return handler->cache.struct_val;
+    return PMC_struct_val(handler);
 }
 
 /*
@@ -390,7 +390,7 @@ rethrow_c_exception(Parrot_Interp interpreter)
     /*
      * if there was no user handler, interpreter is already shutdown
      */
-    the_exception->resume = handler->cache.struct_val;
+    the_exception->resume = PMC_struct_val(handler);
     the_exception->error = VTABLE_get_integer_keyed_int(interpreter,
             exception, 1);
     the_exception->severity = VTABLE_get_integer_keyed_int(interpreter,

@@ -56,7 +56,7 @@ key_new_integer(struct Parrot_Interp *interpreter, INTVAL value)
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
-    key->cache.int_val = value;
+    PMC_int_val(key) = value;
 
     return key;
 }
@@ -78,7 +78,7 @@ key_new_number(struct Parrot_Interp *interpreter, FLOATVAL value)
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
-    key->cache.num_val = value;
+    PMC_num_val(key) = value;
 
     return key;
 }
@@ -100,7 +100,7 @@ key_new_string(struct Parrot_Interp *interpreter, STRING *value)
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
-    key->cache.string_val = value;
+    PMC_str_val(key) = value;
 
     return key;
 }
@@ -141,7 +141,7 @@ key_new_pmc(struct Parrot_Interp *interpreter, PMC *value)
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
-    key->cache.pmc_val = value;
+    PMC_pmc_val(key) = value;
 
     return key;
 }
@@ -162,7 +162,7 @@ key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
-    key->cache.int_val = value;
+    PMC_int_val(key) = value;
 
     return;
 }
@@ -185,7 +185,7 @@ key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_register_FLAG | flag;
-    key->cache.int_val = value;
+    PMC_int_val(key) = value;
 
     return;
 }
@@ -206,7 +206,7 @@ key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
-    key->cache.num_val = value;
+    PMC_num_val(key) = value;
 
     return;
 }
@@ -227,7 +227,7 @@ key_set_string(struct Parrot_Interp *interpreter, PMC *key, STRING *value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
-    key->cache.string_val = value;
+    PMC_str_val(key) = value;
 
     return;
 }
@@ -248,7 +248,7 @@ key_set_pmc(struct Parrot_Interp *interpreter, PMC *key, PMC *value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
-    key->cache.pmc_val = value;
+    PMC_pmc_val(key) = value;
 
     return;
 }
@@ -286,14 +286,14 @@ key_integer(struct Parrot_Interp *interpreter, PMC *key)
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_integer_FLAG:
-        return key->cache.int_val;
+        return PMC_int_val(key);
     case KEY_integer_FLAG | KEY_register_FLAG:
-        return interpreter->int_reg.registers[key->cache.int_val];
+        return interpreter->int_reg.registers[PMC_int_val(key)];
     case KEY_pmc_FLAG:
         return VTABLE_get_integer(interpreter,
-                                                       key->cache.pmc_val);
+                                                       PMC_pmc_val(key));
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        reg = interpreter->pmc_reg.registers[key->cache.int_val];
+        reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
         return VTABLE_get_integer(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not an integer!\n");
@@ -317,14 +317,14 @@ key_number(struct Parrot_Interp *interpreter, PMC *key)
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_number_FLAG:
-        return key->cache.num_val;
+        return PMC_num_val(key);
     case KEY_number_FLAG | KEY_register_FLAG:
-        return interpreter->num_reg.registers[key->cache.int_val];
+        return interpreter->num_reg.registers[PMC_int_val(key)];
     case KEY_pmc_FLAG:
         return VTABLE_get_number(interpreter,
-                                                      key->cache.pmc_val);
+                                                      PMC_pmc_val(key));
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        reg = interpreter->pmc_reg.registers[key->cache.int_val];
+        reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
         return VTABLE_get_number(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not a number!\n");
@@ -348,14 +348,14 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_string_FLAG:
-        return key->cache.string_val;
+        return PMC_str_val(key);
     case KEY_string_FLAG | KEY_register_FLAG:
-        return interpreter->string_reg.registers[key->cache.int_val];
+        return interpreter->string_reg.registers[PMC_int_val(key)];
     case KEY_pmc_FLAG:
         return VTABLE_get_string(interpreter,
-                                                      key->cache.pmc_val);
+                                                      PMC_pmc_val(key));
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        reg = interpreter->pmc_reg.registers[key->cache.int_val];
+        reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
         return VTABLE_get_string(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not a string!\n");
@@ -380,9 +380,9 @@ key_pmc(struct Parrot_Interp *interpreter, PMC *key)
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_pmc_FLAG:
-        return key->cache.pmc_val;
+        return PMC_pmc_val(key);
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        return interpreter->pmc_reg.registers[key->cache.int_val];
+        return interpreter->pmc_reg.registers[PMC_int_val(key)];
     default:
         internal_exception(INVALID_OPERATION, "Key not a PMC!\n");
         return 0;
@@ -453,7 +453,7 @@ key_mark(struct Parrot_Interp *interpreter, PMC *key)
     pobject_lives(interpreter, (PObj *) key);
     if ( ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_string_FLAG) ||
        ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_pmc_FLAG) )
-        pobject_lives(interpreter, (PObj *)key->cache.string_val);
+        pobject_lives(interpreter, (PObj *)PMC_str_val(key));
     if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG)
         return;
 

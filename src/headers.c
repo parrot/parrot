@@ -87,7 +87,7 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     Buffer *buffer = get_free_object(interpreter, pool);
 
     memset(buffer, 0, pool->object_size);
-    SET_NULL(buffer->bufstart);
+    SET_NULL(PObj_bufstart(buffer));
     return buffer;
 }
 
@@ -388,8 +388,8 @@ buffer_unmake_COW(struct Parrot_Interp *interpreter, Buffer *src)
 {
     if (PObj_COW_TEST(src)) {
         Buffer *b = new_buffer_header(interpreter);
-        Parrot_allocate(interpreter, b, src->buflen);
-        mem_sys_memcopy(b->bufstart, src->bufstart, src->buflen);
+        Parrot_allocate(interpreter, b, PObj_buflen(src));
+        mem_sys_memcopy(PObj_bufstart(b), PObj_bufstart(src), PObj_buflen(src));
         return b;
     }
     return src;
@@ -414,11 +414,11 @@ buffer_copy_if_diff(struct Parrot_Interp *interpreter, Buffer *src, Buffer *dst)
     /* if src and dst point to the same COWed bufstart,
      * src hadn't changed yet
      */
-    if (src->bufstart == dst->bufstart)
+    if (PObj_bufstart(src) == PObj_bufstart(dst))
         return dst;
     b = new_buffer_header(interpreter);
-    Parrot_allocate(interpreter, b, src->buflen);
-    mem_sys_memcopy(b->bufstart, src->bufstart, src->buflen);
+    Parrot_allocate(interpreter, b, PObj_buflen(src));
+    mem_sys_memcopy(PObj_bufstart(b), PObj_bufstart(src), PObj_buflen(src));
     return b;
 }
 
@@ -601,8 +601,8 @@ add_extra_buffer_header(struct Parrot_Interp *interpreter, void *buffer)
 {
     Buffer *headers = &interpreter->arena_base->extra_buffer_headers;
     void **ptr;
-    Parrot_reallocate(interpreter, headers, headers->buflen + sizeof(void *));
-    ptr = (void **)((char *)headers->bufstart + headers->buflen -
+    Parrot_reallocate(interpreter, headers, PObj_buflen(headers) + sizeof(void *));
+    ptr = (void **)((char *) PObj_bufstart(headers) + PObj_buflen(headers) -
             sizeof(void *));
     *ptr = buffer;
 }
@@ -627,11 +627,11 @@ Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
     add_extra_buffer_header(interpreter,
             &interpreter->arena_base->extra_buffer_headers);
 #else
-    interpreter->arena_base->extra_buffer_headers.bufstart  = NULL;
-    interpreter->arena_base->extra_buffer_headers.buflen    = 0;
+    PObj_bufstart(&interpreter->arena_base->extra_buffer_headers)  = NULL;
+    PObj_buflen(&interpreter->arena_base->extra_buffer_headers)    = 0;
     interpreter->arena_base->extra_buffer_headers.obj.flags = 0;
 #  if ! DISABLE_GC_DEBUG
-    interpreter->arena_base->extra_buffer_headers.pobj_version   = 0;
+    PObj_version(&interpreter->arena_base->extra_buffer_headers)   = 0;
 #  endif
 #endif
     /* Init the constant string header pool */
