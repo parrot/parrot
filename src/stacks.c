@@ -283,21 +283,21 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
     /* Store our thing */
     switch (type) {
         case STACK_ENTRY_INT:
-            entry->entry.int_val = *(Intval *)thing;
+            UVal_int(entry->entry) = *(Intval *)thing;
             break;
         case STACK_ENTRY_FLOAT:
-            entry->entry.num_val = *(Floatval *)thing;
+            UVal_num(entry->entry) = *(Floatval *)thing;
             break;
         case STACK_ENTRY_PMC:
-            entry->entry.pmc_val = (PMC *)thing;
+            UVal_pmc(entry->entry) = (PMC *)thing;
             break;
         case STACK_ENTRY_STRING:
-            entry->entry.string_val = (String *)thing;
+            UVal_str(entry->entry) = (String *)thing;
             break;
         case STACK_ENTRY_POINTER:
         case STACK_ENTRY_DESTINATION:
         case STACK_ENTRY_CORO_MARK:
-            entry->entry.struct_val = thing;
+            UVal_ptr(entry->entry) = thing;
             break;
         default:
             internal_exception(ERROR_BAD_STACK_TYPE,
@@ -343,21 +343,21 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
     /* Snag the value */
     switch (type) {
     case STACK_ENTRY_INT:
-        *(Intval *)where = entry->entry.int_val;
+        *(Intval *)where   = UVal_int(entry->entry);
         break;
     case STACK_ENTRY_FLOAT:
-        *(Floatval *)where = entry->entry.num_val;
+        *(Floatval *)where = UVal_num(entry->entry);
         break;
     case STACK_ENTRY_PMC:
-        *(PMC **)where = entry->entry.pmc_val;
+        *(PMC **)where     = UVal_pmc(entry->entry);
         break;
     case STACK_ENTRY_STRING:
-        *(String **)where = entry->entry.string_val;
+        *(String **)where  = UVal_str(entry->entry);
         break;
     case STACK_ENTRY_POINTER:
     case STACK_ENTRY_DESTINATION:
     case STACK_ENTRY_CORO_MARK:
-        *(void **)where = entry->entry.struct_val;
+        *(void **)where    = UVal_ptr(entry->entry);
         break;
     default:
         internal_exception(ERROR_BAD_STACK_TYPE,
@@ -418,9 +418,9 @@ stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
         case STACK_ENTRY_POINTER:
         case STACK_ENTRY_DESTINATION:
         case STACK_ENTRY_CORO_MARK:
-            return entry->entry.struct_val;
+            return UVal_ptr(entry->entry);
         default:
-            return (void *)entry->entry.pmc_val;
+            return (void *) UVal_pmc(entry->entry);
     }
 }
 

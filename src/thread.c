@@ -44,7 +44,7 @@ thread_func(void *arg)
     PMC *ret_val = NULL;
 
     Parrot_Interp interpreter = PMC_data(self);
-    runops(interpreter, (opcode_t *)self->cache.struct_val -
+    runops(interpreter, (opcode_t *) PMC_struct_val(self) -
             (opcode_t *)interpreter->code->byte_code);
     /*
      * thread is finito
@@ -156,7 +156,7 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
      * TODO thread pools
      */
 
-    dest_interp->cache.struct_val = sub->cache.struct_val;
+    PMC_struct_val(dest_interp) = PMC_struct_val(sub);
     pt_thread_prepare_for_run(interpreter, interp);
     /*
      * set regs according to pdd03

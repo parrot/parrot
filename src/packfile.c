@@ -445,10 +445,10 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self, int action)
                     case enum_class_Coroutine:
                         if (PObj_get_FLAGS(sub_pmc) & PObj_private1_FLAG)
                             continue;
-                        rel = (INTVAL) sub_pmc->cache.struct_val *
+                        rel = (INTVAL) PMC_struct_val(sub_pmc) *
                             sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
-                        sub_pmc->cache.struct_val = (void*) rel;
+                        PMC_struct_val(sub_pmc) = (void*) rel;
                         sub = (struct Parrot_Sub*) PMC_sub(sub_pmc);
                         rel = (INTVAL) sub->end * sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
@@ -2909,7 +2909,7 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     /* both start and end are relative, so are small -
      * cast for 64-bit compilers where sizeof(int)=4, sizeof(long)=8
      */
-    sub_pmc->cache.struct_val = (void *)(long) start;
+    PMC_struct_val(sub_pmc) = (void *)(long) start;
     sub = PMC_sub(sub_pmc);
     sub->end = (opcode_t*)(long)end;
     sub->packed = pmcs;
@@ -3090,7 +3090,7 @@ Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
         fprintf(stderr, "packfile.c: VTABLE: compiler->invoke '%s'\n", filename);
 #endif
         code = VTABLE_invoke(interpreter, compiler, file);
-        pf = code->cache.struct_val;
+        pf = PMC_struct_val(code);
         if (pf) {
             PackFile_add_segment(&interpreter->code->directory,
                     &pf->directory.base);

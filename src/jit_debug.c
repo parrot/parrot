@@ -15,7 +15,7 @@ When debugging JIT code with C<gdb>, do:
 =head1 DESCRIPTION
 
 Stabs is a file format for information that describes a program to a
-debugger. 
+debugger.
 
 For more information see the stabs documentation at
 http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
@@ -155,8 +155,8 @@ write_types(FILE *stabs)
                 "strstart:(0,15),%d,%d;"        /* fake a char* */
                 ";\""
                 "," N_LSYM ",0,0,0\n", i++, BYTE_SIZE(STRING),
-                BIT_OFFSET(STRING, bufstart), BIT_SIZE(void*),
-                BIT_OFFSET(STRING, buflen), BIT_SIZE(size_t),
+                BIT_OFFSET(STRING, obj.u._b._bufstart), BIT_SIZE(void*),
+                BIT_OFFSET(STRING, obj.u._b._buflen), BIT_SIZE(size_t),
                 BIT_OFFSET(STRING, obj.flags), BIT_SIZE(UINTVAL),
                 BIT_OFFSET(STRING, bufused), BIT_SIZE(UINTVAL),
                 BIT_OFFSET(STRING, strstart), BIT_SIZE(void*)

@@ -182,7 +182,7 @@ get_free_object(struct Parrot_Interp *interpreter,
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter) && pool !=
             interpreter->arena_base->pmc_ext_pool)
-        ((Buffer*)ptr)->pobj_version++;
+        PObj_version((Buffer*)ptr)++;
 #endif
     return ptr;
 }

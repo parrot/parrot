@@ -188,10 +188,10 @@ find_in_const(PMC *key, int type)
     int i;
     for (i = 0; i < ct->const_count; i++)
         if (type == PFC_STRING && ct->constants[i]->u.string ==
-            key->cache.string_val)
+            PMC_str_val(key))
             return i;
         else if (type == PFC_NUMBER && ct->constants[i]->u.number ==
-                 key->cache.num_val)
+                 PMC_num_val(key))
             return i;
     PIO_eprintf(NULL, "find_in_const: couldn't find const for key\n");
     Parrot_exit(1);
@@ -267,7 +267,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 *cursor++ = PARROT_ARG_IC;
-                *cursor++ = key->cache.int_val;
+                *cursor++ = PMC_int_val(key);
                 break;
             case KEY_number_FLAG:
                 *cursor++ = PARROT_ARG_NC;
@@ -280,19 +280,19 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
 
             case KEY_integer_FLAG | KEY_register_FLAG:
                 *cursor++ = PARROT_ARG_I;
-                *cursor++ = key->cache.int_val;
+                *cursor++ = PMC_int_val(key);
                 break;
             case KEY_number_FLAG | KEY_register_FLAG:
                 *cursor++ = PARROT_ARG_N;
-                *cursor++ = key->cache.int_val;
+                *cursor++ = PMC_int_val(key);
                 break;
             case KEY_string_FLAG | KEY_register_FLAG:
                 *cursor++ = PARROT_ARG_S;
-                *cursor++ = key->cache.int_val;
+                *cursor++ = PMC_int_val(key);
                 break;
             case KEY_pmc_FLAG | KEY_register_FLAG:
                 *cursor++ = PARROT_ARG_P;
-                *cursor++ = key->cache.int_val;
+                *cursor++ = PMC_int_val(key);
                 break;
             default:
                 PIO_eprintf(NULL, "PackFile_Constant_pack: "

@@ -74,10 +74,10 @@ C<Parrot_instantiate_object()>.
         Parrot_delegate_mark(INTERP, SELF);
 
         if (trace_buf) {
-            PMC **cur_pmc = trace_buf->bufstart;
+            PMC **cur_pmc = PObj_bufstart(trace_buf);
 
             pobject_lives(interpreter, trace_buf);
-            for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++) {
+            for (i = 0; i < ATTRIB_COUNT(SELF); i++) {
                 if (cur_pmc[i]) {
                     pobject_lives(interpreter, (PObj *)cur_pmc[i]);
                 }

@@ -298,47 +298,47 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
             for (i = 0; i < cur_buffer_arena->used; i++) {
                 /* ! (immobile | on_free_list | constant | external) */
-                if (b->buflen && PObj_is_movable_TESTALL(b)) {
+                if (PObj_buflen(b) && PObj_is_movable_TESTALL(b)) {
                     struct Buffer_Tail *tail =
-                            (struct Buffer_Tail *)((char *)b->bufstart +
-                            b->buflen);
+                            (struct Buffer_Tail *)((char *)PObj_bufstart(b) +
+                            PObj_buflen(b));
                     ptrdiff_t offset = 0;
 
                     /* we can't perform the math all the time, because
                      * strstart might be in unallocated memory */
                     if (PObj_is_string_TEST(b)) {
                         offset = (ptrdiff_t)((STRING *)b)->strstart -
-                                (ptrdiff_t)b->bufstart;
+                                (ptrdiff_t)PObj_bufstart(b);
                     }
                     /* buffer has already been moved; just change the header */
                     if (PObj_COW_TEST(b) && tail->flags & TAIL_moved_FLAG) {
                         /* Find out who else references our data */
-                        Buffer *hdr = *(Buffer **)(b->bufstart);
+                        Buffer *hdr = *(Buffer **)(PObj_bufstart(b));
 
                         /* Make sure they know that we own it too */
                         PObj_COW_SET(hdr);
                         /* Now make sure we point to where the other guy
                          * does */
-                        b->bufstart = hdr->bufstart;
+                        PObj_bufstart(b) = PObj_bufstart(hdr);
                         /* And if we're a string, update strstart */
                         /* Somewhat of a hack, but if we get per-pool
                          * collections, it should help ease the pain */
                         if (PObj_is_string_TEST(b)) {
-                            ((STRING *)b)->strstart = (char *)b->bufstart +
+                            ((STRING *)b)->strstart = (char *)PObj_bufstart(b) +
                                     offset;
                         }
                     }
                     else if (!PObj_external_TEST(b)) {
                         struct Buffer_Tail *new_tail =
                                 (struct Buffer_Tail *)((char *)cur_spot +
-                                b->buflen);
+                                PObj_buflen(b));
                         /* Copy our memory to the new pool */
-                        memcpy(cur_spot, b->bufstart, b->buflen);
+                        memcpy(cur_spot, PObj_bufstart(b), PObj_buflen(b));
                         new_tail->flags = 0;
                         /* If we're COW */
                         if (PObj_COW_TEST(b)) {
                             /* Let the old buffer know how to find us */
-                            *(Buffer **)(b->bufstart) = b;
+                            *(Buffer **)(PObj_bufstart(b)) = b;
                             /* No guarantees that our data is still COW, so
                              * assume not, and let the above code fix-up */
                             PObj_COW_CLEAR(b);
@@ -347,12 +347,12 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
                              * us and not re-copy */
                             tail->flags |= TAIL_moved_FLAG;
                         }
-                        b->bufstart = cur_spot;
+                        PObj_bufstart(b) = cur_spot;
                         if (PObj_is_string_TEST(b)) {
-                            ((STRING *)b)->strstart = (char *)b->bufstart +
+                            ((STRING *)b)->strstart = (char *)PObj_bufstart(b) +
                                     offset;
                         }
-                        cur_size = b->buflen + sizeof(struct Buffer_Tail);
+                        cur_size = PObj_buflen(b) + sizeof(struct Buffer_Tail);
                         cur_size = (cur_size + header_pool->align_1) &
                                 ~header_pool->align_1;
                         cur_spot += cur_size;
@@ -368,33 +368,33 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
      * other buffers COW-reference data with the buffers below, that data will
      * get duplicated during this collection run. */
     for (j = 0;
-            j < (INTVAL)(interpreter->arena_base->extra_buffer_headers.buflen /
+            j < (INTVAL)(PObj_buflen(&interpreter->arena_base->extra_buffer_headers) /
                     sizeof(Buffer *)); j++) {
         Buffer **buffers =
-                interpreter->arena_base->extra_buffer_headers.bufstart;
+                PObj_bufstart(&interpreter->arena_base->extra_buffer_headers);
         Buffer *b = buffers[j];
 
         /* ! (immobile | on_free_list | constant | external) */
-        if (b->bufstart && PObj_is_movable_TESTALL(b)) {
+        if (PObj_bufstart(b) && PObj_is_movable_TESTALL(b)) {
             struct Buffer_Tail *new_tail =
-                    (struct Buffer_Tail *)((char *)cur_spot + b->buflen);
+                    (struct Buffer_Tail *)((char *)cur_spot + PObj_buflen(b));
             /* we can't perform the math all the time, because strstart might
              * be in unallocated memory */
             ptrdiff_t offset = 0;
 
             if (PObj_is_string_TEST(b)) {
                 offset = (ptrdiff_t)((STRING *)b)->strstart -
-                        (ptrdiff_t)b->bufstart;
+                        (ptrdiff_t)PObj_bufstart(b);
             }
-            memcpy(cur_spot, b->bufstart, b->buflen);
+            memcpy(cur_spot, PObj_bufstart(b), PObj_buflen(b));
             new_tail->flags = 0;
-            b->bufstart = cur_spot;
-            cur_size = b->buflen;
+            PObj_bufstart(b) = cur_spot;
+            cur_size = PObj_buflen(b);
             cur_size = (cur_size + BUFFER_ALIGNMENT - 1) &
                     ~(BUFFER_ALIGNMENT - 1);
             cur_spot += cur_size;
             if (PObj_is_string_TEST(b)) {
-                ((STRING *)b)->strstart = (char *)b->bufstart + offset;
+                ((STRING *)b)->strstart = (char *)PObj_bufstart(b) + offset;
             }
         }
     }
@@ -490,13 +490,13 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
     void *mem;
 
     buffer = from;
-    copysize = (buffer->buflen > tosize ? tosize : buffer->buflen);
+    copysize = (PObj_buflen(buffer) > tosize ? tosize : PObj_buflen(buffer));
     if (!PObj_COW_TEST(buffer)) {
         interpreter->arena_base->memory_pool->guaranteed_reclaimable +=
-                buffer->buflen;
+                PObj_buflen(buffer);
     }
     interpreter->arena_base->memory_pool->possibly_reclaimable +=
-            buffer->buflen;
+            PObj_buflen(buffer);
     mem = mem_allocate(interpreter, &alloc_size,
             interpreter->arena_base->memory_pool, BUFFER_ALIGNMENT - 1);
 
@@ -506,10 +506,10 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
     if (copysize) {
-        memcpy(mem, buffer->bufstart, copysize);
+        memcpy(mem, PObj_bufstart(buffer), copysize);
     }
-    buffer->bufstart = mem;
-    buffer->buflen = tosize;
+    PObj_bufstart(buffer) = mem;
+    PObj_buflen(buffer) = tosize;
     return mem;
 }
 
@@ -535,15 +535,15 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
     void *mem;
     struct Memory_Pool *pool;
 
-    copysize = (str->buflen > tosize ? tosize : str->buflen);
+    copysize = (PObj_buflen(str) > tosize ? tosize : PObj_buflen(str));
 
     pool = PObj_constant_TEST(str)
             ? interpreter->arena_base->constant_string_pool
             : interpreter->arena_base->memory_pool;
     if (!PObj_COW_TEST(str)) {
-        pool->guaranteed_reclaimable += str->buflen;
+        pool->guaranteed_reclaimable += PObj_buflen(str);
     }
-    pool->possibly_reclaimable += str->buflen;
+    pool->possibly_reclaimable += PObj_buflen(str);
 
     mem = mem_allocate(interpreter, &alloc_size, pool, STRING_ALIGNMENT - 1);
 
@@ -553,11 +553,11 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
     if (copysize) {
-        memcpy(mem, str->bufstart, copysize);
+        memcpy(mem, PObj_bufstart(str), copysize);
     }
-    str->bufstart = mem;
-    str->buflen = alloc_size;
-    str->strstart = str->bufstart;
+    PObj_bufstart(str) = mem;
+    PObj_buflen(str) = alloc_size;
+    str->strstart = PObj_bufstart(str);
     return mem;
 }
 
@@ -577,11 +577,11 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 {
     size_t req_size = size;
 
-    ((Buffer *)buffer)->buflen = 0;
-    ((Buffer *)buffer)->bufstart = NULL;
-    ((Buffer *)buffer)->bufstart = mem_allocate(interpreter, &req_size,
+    PObj_buflen((Buffer *)buffer) = 0;
+    PObj_bufstart((Buffer *)buffer) = NULL;
+    PObj_bufstart((Buffer *)buffer) = mem_allocate(interpreter, &req_size,
             interpreter->arena_base->memory_pool, BUFFER_ALIGNMENT - 1);
-    ((Buffer *)buffer)->buflen = size;
+    PObj_buflen((Buffer *)buffer) = size;
     return buffer;
 }
 
@@ -624,20 +624,20 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
     size_t req_size = size;
     struct Memory_Pool *pool;
 
-    str->buflen = 0;
-    str->bufstart = NULL;
+    PObj_buflen(str) = 0;
+    PObj_bufstart(str) = NULL;
     str->strstart = NULL;
 
     pool = PObj_constant_TEST(str)
             ? interpreter->arena_base->constant_string_pool
             : interpreter->arena_base->memory_pool;
-    str->bufstart = mem_allocate(interpreter, &req_size, pool,
+    PObj_bufstart(str) = mem_allocate(interpreter, &req_size, pool,
             STRING_ALIGNMENT - 1);
-    if (str->bufstart == NULL) {
+    if (PObj_bufstart(str) == NULL) {
         internal_exception(ALLOCATION_ERROR, "Out of memory");
     }
-    str->buflen = req_size;
-    str->strstart = str->bufstart;
+    PObj_buflen(str) = req_size;
+    str->strstart = PObj_bufstart(str);
     return str;
 }
 

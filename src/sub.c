@@ -434,7 +434,7 @@ new_ret_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)
         PObj_get_FLAGS(continuation) |= (
                 PObj_private1_FLAG|PObj_private2_FLAG);
     }
-    continuation->cache.struct_val = address;
+    PMC_struct_val(continuation) = address;
     return continuation;
 }
 
@@ -462,9 +462,9 @@ scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad,
 {
     /* if scope_index is negative we count out from current pad */
     scope_index = scope_index < 0 ?
-        pad->cache.int_val + scope_index : scope_index;
+        PMC_int_val(pad) + scope_index : scope_index;
 
-    if (scope_index >= pad->cache.int_val || scope_index < 0) {
+    if (scope_index >= PMC_int_val(pad) || scope_index < 0) {
         internal_exception(-1, "Pad index out of range");
         return NULL;
     }
@@ -540,7 +540,7 @@ scratchpad_find(struct Parrot_Interp* interp, PMC* pad, STRING * name,
     INTVAL i, pos = 0;
     struct Parrot_Lexicals * lex = NULL;
 
-    for (i = pad->cache.int_val - 1; i >= 0; i--) {
+    for (i = PMC_int_val(pad) - 1; i >= 0; i--) {
         lex = &(((struct Parrot_Lexicals *)PMC_data(pad))[i]);
         pos = lexicals_get_position(interp, lex, name);
         if (pos == list_length(interp, lex->names))
@@ -572,11 +572,11 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
     Parrot_block_DOD(interp);
     pad_pmc = pmc_new(interp, enum_class_Scratchpad);
     if (base && depth < 0) {
-        depth = base->cache.int_val + depth + 1;
+        depth = PMC_int_val(base) + depth + 1;
     }
 
     if ((depth < 0)
-        || (base && depth > base->cache.int_val)
+        || (base && depth > PMC_int_val(base))
         || (!base && depth != 0)) {
         Parrot_unblock_DOD(interp);
         internal_exception(-1, "-scratch_pad: too deep\n");
@@ -594,7 +594,7 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
                sizeof(struct Parrot_Lexicals));
     }
 
-    pad_pmc->cache.int_val = depth + 1;
+    PMC_int_val(pad_pmc) = depth + 1;
 
     /* in case call to list_new triggers gc */
     ((struct Parrot_Lexicals *)PMC_data(pad_pmc))[depth].values = NULL;

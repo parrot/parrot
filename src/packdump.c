@@ -121,7 +121,7 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
                             "end_offs => %d, "
                             "packed => '%s'\n",
                             (char*)pmc->vtable->whoami->strstart,
-                            (int)pmc->cache.struct_val - code_start,
+                            (int)PMC_struct_val(pmc) - code_start,
                             (int)sub->end - code_start,
                             sub->packed);
                     break;

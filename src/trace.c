@@ -48,7 +48,7 @@ trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
                     PIO_eprintf(interpreter, "%S=PMC(%#p Str:(NULL))",
                         VTABLE_name(interpreter, pmc), pmc);
                 else {
-                    escaped = PDB_escape(s->bufstart, s->strlen);
+                    escaped = PDB_escape(PObj_bufstart(s), s->strlen);
                     PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%s\")",
                         VTABLE_name(interpreter, pmc), pmc,
                         escaped ? escaped : "(null)");
@@ -100,38 +100,38 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
         case 0:
             break;
         case KEY_integer_FLAG:
-            PIO_eprintf(interpreter, "%vi", key->cache.int_val);
+            PIO_eprintf(interpreter, "%vi", PMC_int_val(key));
             break;
         case KEY_number_FLAG:
-            PIO_eprintf(interpreter, "%vg", key->cache.num_val);
+            PIO_eprintf(interpreter, "%vg", PMC_num_val(key));
             break;
         case KEY_string_FLAG:
-            s = key->cache.string_val;
+            s = PMC_str_val(key);
             /* XXX do it w/o degrading to C string */
-            escaped = PDB_escape(s->bufstart, s->strlen);
+            escaped = PDB_escape(PObj_bufstart(s), s->strlen);
             PIO_eprintf(interpreter, "\"%s\"", escaped?escaped:"(null)");
                 if (escaped)
                     mem_sys_free(escaped);
             break;
         case KEY_integer_FLAG|KEY_register_FLAG:
-            PIO_eprintf(interpreter, "I%vd=%vd", key->cache.int_val,
-                    interpreter->int_reg.registers[key->cache.int_val]);
+            PIO_eprintf(interpreter, "I%vd=%vd", PMC_int_val(key),
+                    interpreter->int_reg.registers[PMC_int_val(key)]);
             break;
         case KEY_number_FLAG|KEY_register_FLAG:
-            PIO_eprintf(interpreter, "I%vd=%vd", key->cache.int_val,
-                    interpreter->num_reg.registers[key->cache.int_val]);
+            PIO_eprintf(interpreter, "I%vd=%vd", PMC_int_val(key),
+                    interpreter->num_reg.registers[PMC_int_val(key)]);
             break;
         case KEY_string_FLAG|KEY_register_FLAG:
-            s = interpreter->string_reg.registers[key->cache.int_val];
-            escaped = PDB_escape(s->bufstart, s->strlen);
-            PIO_eprintf(interpreter, "S%vd=\"%s\"", key->cache.int_val,
+            s = interpreter->string_reg.registers[PMC_int_val(key)];
+            escaped = PDB_escape(PObj_bufstart(s), s->strlen);
+            PIO_eprintf(interpreter, "S%vd=\"%s\"", PMC_int_val(key),
                     escaped ? escaped : "(null");
                 if (escaped)
                     mem_sys_free(escaped);
             break;
         case KEY_pmc_FLAG|KEY_register_FLAG:
-            PIO_eprintf(interpreter, "P%vd=", key->cache.int_val);
-            trace_pmc_dump(interpreter, interpreter->pmc_reg.registers[key->cache.int_val]);
+            PIO_eprintf(interpreter, "P%vd=", PMC_int_val(key));
+            trace_pmc_dump(interpreter, interpreter->pmc_reg.registers[PMC_int_val(key)]);
             break;
         default:
             PIO_eprintf(interpreter, "??");

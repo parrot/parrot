@@ -84,16 +84,16 @@ static void
 str_append(Parrot_Interp interpreter, STRING *s, const void *b, size_t len)
 {
     size_t used = s->bufused;
-    int need_free = (int)s->buflen - used - len;
+    int need_free = (int)PObj_buflen(s) - used - len;
     /*
      * grow by factor 1.5 or such
      */
     if (need_free <= 16) {
-        size_t new_size = (size_t) (s->buflen * 1.5);
-        if (new_size < s->buflen - need_free + 512)
-            new_size = s->buflen - need_free + 512;
+        size_t new_size = (size_t) (PObj_buflen(s) * 1.5);
+        if (new_size < PObj_buflen(s) - need_free + 512)
+            new_size = PObj_buflen(s) - need_free + 512;
         Parrot_reallocate_string(interpreter, s, new_size);
-        assert(s->buflen - used - len >= 15);
+        assert(PObj_buflen(s) - used - len >= 15);
     }
     mem_sys_memcopy((void *)((ptrcast_t)s->strstart + used), b, len);
     s->bufused += len;
@@ -315,16 +315,16 @@ static PARROT_INLINE void
 op_check_size(Parrot_Interp interpreter, STRING *s, size_t len)
 {
     size_t used = s->bufused;
-    int need_free = (int)s->buflen - used - len;
+    int need_free = (int)PObj_buflen(s) - used - len;
     /*
      * grow by factor 1.5 or such
      */
     if (need_free <= 16) {
-        size_t new_size = (size_t) (s->buflen * 1.5);
-        if (new_size < s->buflen - need_free + 512)
-            new_size = s->buflen - need_free + 512;
+        size_t new_size = (size_t) (PObj_buflen(s) * 1.5);
+        if (new_size < PObj_buflen(s) - need_free + 512)
+            new_size = PObj_buflen(s) - need_free + 512;
         Parrot_reallocate_string(interpreter, s, new_size);
-        assert(s->buflen - used - len >= 15);
+        assert(PObj_buflen(s) - used - len >= 15);
     }
 }
 
@@ -605,7 +605,7 @@ cleanup_next_for_GC_pool(Parrot_Interp interpreter,
 
         for (i = 0; i < arena->used; i++) {
             if (p->pmc_ext)
-                p->next_for_GC = NULL;
+                PMC_next_for_GC(p) = NULL;
             p = (PMC *)((char *)p + sizeof(PMC));
         }
     }
@@ -715,7 +715,7 @@ todo_list_init(Parrot_Interp interpreter, visit_info *info)
     new_hash_x(interpreter, &hash, enum_type_ptr, 0, Hash_key_type_int,
             int_compare, key_hash_int, (hash_mark_key_fn) NULL);
     PObj_custom_mark_SET(info->seen);
-    PMC_ptr1v(info->seen) = hash;
+    PMC_struct_val(info->seen) = hash;
 
     ft_init(interpreter, info);
 }
@@ -1058,8 +1058,8 @@ static void
 add_pmc_next_for_GC(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
 {
     if (pmc->pmc_ext) {
-        info->mark_ptr->next_for_GC = pmc;
-        info->mark_ptr = pmc->next_for_GC = pmc;
+        PMC_next_for_GC(info->mark_ptr) = pmc;
+        info->mark_ptr = PMC_next_for_GC(pmc) = pmc;
     }
 }
 
@@ -1094,14 +1094,14 @@ next_for_GC_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
      */
     if (pmc->pmc_ext) {
         /* already seen? */
-        if (pmc->next_for_GC) {
+        if (PMC_next_for_GC(pmc)) {
             seen = 1;
             goto skip;
         }
         /* put pmc at the end of the list */
-        info->mark_ptr->next_for_GC = pmc;
+        PMC_next_for_GC(info->mark_ptr) = pmc;
         /* make end self-referential */
-        info->mark_ptr = pmc->next_for_GC = pmc;
+        info->mark_ptr = PMC_next_for_GC(pmc) = pmc;
     }
 skip:
     *id = id_from_pmc(interpreter, pmc);
@@ -1143,7 +1143,7 @@ PARROT_INLINE static int
 todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         UINTVAL *id)
 {
-    HashBucket *b = hash_get_bucket(interpreter, PMC_ptr1v(info->seen), pmc);
+    HashBucket *b = hash_get_bucket(interpreter, PMC_struct_val(info->seen), pmc);
 
     if (b) {
         *id = (UINTVAL) b->value;
@@ -1152,7 +1152,7 @@ todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
 
     info->id += 4;      /* next id to freeze */
     *id = info->id;
-    hash_put(interpreter, PMC_ptr1v(info->seen), pmc, (void*)*id);
+    hash_put(interpreter, PMC_struct_val(info->seen), pmc, (void*)*id);
     /* remember containers */
     if (pmc->pmc_ext)
         list_push(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
@@ -1253,7 +1253,7 @@ visit_loop_next_for_GC(Parrot_Interp interpreter, PMC *current,
 
     visit_next_for_GC(interpreter, current, info);
     if (current->pmc_ext) {
-        for ( ; current != prev; current = current->next_for_GC) {
+        for ( ; current != prev; current = PMC_next_for_GC(current)) {
             VTABLE_visit(interpreter, current, info);
             prev = current;
         }
@@ -1413,7 +1413,7 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
      */
     LVALUE_CAST(ptrdiff_t, image->strstart) -= bufused;
     image->bufused = bufused;
-    assert(image->strstart >= image->bufstart);
+    assert(image->strstart >= PObj_bufstart(image));
 
     if (dod_block) {
         Parrot_unblock_DOD(interpreter);

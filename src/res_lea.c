@@ -127,23 +127,23 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t size)
 {
     Buffer * buffer = from;
     void *p;
-    size_t oldlen = buffer->buflen;
-    if (!buffer->bufstart) {
-        buffer->bufstart = xcalloc(1, size + sizeof(int));
-        LVALUE_CAST(int *, buffer->bufstart)++;
+    size_t oldlen = PObj_buflen(buffer);
+    if (!PObj_bufstart(buffer)) {
+        PObj_bufstart(buffer) = xcalloc(1, size + sizeof(int));
+        LVALUE_CAST(int *, PObj_bufstart(buffer))++;
     }
     else {
         if (!size) {    /* realloc(3) does free, if size == 0 here */
-            return buffer->bufstart;    /* do nothing */
+            return PObj_bufstart(buffer);    /* do nothing */
         }
-        p = xrealloc((int*)buffer->bufstart - 1, size + sizeof(int));
+        p = xrealloc((int*)PObj_bufstart(buffer) - 1, size + sizeof(int));
         *(LVALUE_CAST(int *, p)++) = 0;
-        if (size > buffer->buflen)
+        if (size > PObj_buflen(buffer))
             memset((char*)p + oldlen, 0, size - oldlen);
-        buffer->bufstart = p;
+        PObj_bufstart(buffer) = p;
     }
-    buffer->buflen = size;
-    return buffer->bufstart;
+    PObj_buflen(buffer) = size;
+    return PObj_bufstart(buffer);
 }
 
 /*
@@ -162,9 +162,9 @@ void *
 Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 {
     Buffer * b = buffer;
-    b->bufstart = xmalloc(size + sizeof(int));
-    *(LVALUE_CAST(int *, b->bufstart)++) = 0;
-    b->buflen = size;
+    PObj_bufstart(b) = xmalloc(size + sizeof(int));
+    *(LVALUE_CAST(int *, PObj_bufstart(b))++) = 0;
+    PObj_buflen(b) = size;
     return b;
 }
 
@@ -186,9 +186,9 @@ Parrot_allocate_zeroed(struct Parrot_Interp *interpreter, void *buffer,
         size_t size)
 {
     Buffer * b = buffer;
-    b->bufstart = xcalloc(1, size + sizeof(int));
-    *(LVALUE_CAST(int *, b->bufstart)++) = 0;  /*   *( (int*) b->bufstart ++ ) = 0 */
-    b->buflen = size;
+    PObj_bufstart(b) = xcalloc(1, size + sizeof(int));
+    *(LVALUE_CAST(int *, PObj_bufstart(b))++) = 0;  /*   *( (int*) PObj_bufstart(b) ++ ) = 0 */
+    PObj_buflen(b) = size;
     return b;
 }
 
@@ -212,15 +212,15 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
 {
     void *p;
     size_t pad;
-    if (!str->bufstart)
+    if (!PObj_bufstart(str))
         Parrot_allocate_string(interpreter, str, size);
     else if (size) {
         pad = STRING_ALIGNMENT - 1;
         size = ((size + pad + sizeof(int)) & ~pad);
-        p = xrealloc((char *)((int*)str->bufstart - 1), size);
-        str->bufstart = str->strstart = (char *)p + sizeof(int);
+        p = xrealloc((char *)((int*)PObj_bufstart(str) - 1), size);
+        PObj_bufstart(str) = str->strstart = (char *)p + sizeof(int);
         /* usable size at bufstart */
-        str->buflen = size - sizeof(int);
+        PObj_buflen(str) = size - sizeof(int);
     }
     return str->strstart;
 }
@@ -248,8 +248,8 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
     size = ((size + pad + sizeof(int)) & ~pad);
     p = xcalloc(1, size);
     *(int*)p = 0;
-    str->bufstart = str->strstart = (char *)p + sizeof(int);
-    str->buflen = size - sizeof(int);
+    PObj_bufstart(str) = str->strstart = (char *)p + sizeof(int);
+    PObj_buflen(str) = size - sizeof(int);
     return str;
 }
 

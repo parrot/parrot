@@ -99,7 +99,7 @@ the_test(struct Parrot_Interp *interpreter,
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
     value.type = enum_hash_int;
-    value.val.int_val = 42;
+    UVal_int(value.val) = 42;
     hash_put(interpreter, hash, key, &value);
 
     PIO_eprintf(interpreter, "ok\n");
@@ -135,11 +135,11 @@ the_test(struct Parrot_Interp *interpreter,
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
     value->type = enum_hash_int;
-    value->val.int_val = 42;
+    UVal_int(value->val) = 42;
     hash_put(interpreter, hash, key, value);
     value = hash_get(interpreter, hash, key);
 
-    PIO_eprintf(interpreter, "%i\n", (int)value->val.int_val);
+    PIO_eprintf(interpreter, "%i\n", (int) UVal_int(value->val));
 
     return NULL;
 }
@@ -180,11 +180,11 @@ the_test(struct Parrot_Interp *interpreter,
 
     key = string_from_cstring(interpreter, NULL, 0);
     value->type = enum_hash_int;
-    value->val.int_val = 42;
+    UVal_int(value->val) = 42;
     hash_put(interpreter, hash, key, value);
     value = hash_get(interpreter, hash, key);
 
-    PIO_eprintf(interpreter, "%i\n", (int)value->val.int_val);
+    PIO_eprintf(interpreter, "%i\n", (int) UVal_int(value->val));
 
     return NULL;
 }
@@ -217,11 +217,11 @@ the_test(struct Parrot_Interp *interpreter,
 
     key = string_from_cstring(interpreter, "", 0);
     value->type = enum_hash_int;
-    value->val.int_val = 42;
+    UVal_int(value->val) = 42;
     hash_put(interpreter, hash, key, value);
     value = hash_get(interpreter, hash, key);
 
-    PIO_eprintf(interpreter, "%i\n", value->val.int_val);
+    PIO_eprintf(interpreter, "%i\n", UVal_int(value->val));
 
     return NULL;
 }
@@ -298,17 +298,17 @@ the_test(struct Parrot_Interp *interpreter,
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
     value.type = enum_hash_int;
-    value.val.int_val = 42;
+    UVal_int(value.val) = 42;
     hash_put(interpreter, hash, key, &value);
 
     key = string_from_cstring(interpreter, "twocents", 0);
     value.type = enum_hash_num;
-    value.val.num_val = 0.02;
+    UVal_num(value.val) = 0.02;
     hash_put(interpreter, hash, key, &value);
 
     key = string_from_cstring(interpreter, "blurb", 0);
     value.type = enum_hash_string;
-    value.val.string_val = key;
+    UVal_str(value.val) = key;
     hash_put(interpreter, hash, key, &value);
 
     PIO_eprintf(interpreter, "%i\n", hash_size(interpreter, hash));
@@ -440,17 +440,17 @@ the_test(struct Parrot_Interp *interpreter,
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
     value.type = enum_hash_int;
-    value.val.int_val = 42;
+    UVal_int(value.val) = 42;
     hash_put(interpreter, hash, key, &value);
 
     key = string_from_cstring(interpreter, "twocents", 0);
     value.type = enum_hash_num;
-    value.val.num_val = 0.02;
+    UVal_num(value.val) = 0.02;
     hash_put(interpreter, hash, key, &value);
 
     key = string_from_cstring(interpreter, "blurb", 0);
     value.type = enum_hash_string;
-    value.val.string_val = key;
+    UVal_str(value.val) = key;
     hash_put(interpreter, hash, key, &value);
 
     dump_hash(interpreter, hash);

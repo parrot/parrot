@@ -148,7 +148,7 @@ pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
         add_pmc_ext(interpreter, pmc);
 
         if (pmc->vtable->flags & VTABLE_IS_SHARED_FLAG) {
-            PMC_sync(pmc) = mem_sys_allocate(sizeof(*pmc->synchronize));
+            PMC_sync(pmc) = mem_sys_allocate(sizeof(*PMC_sync(pmc)));
             PMC_sync(pmc)->owner = interpreter;
             MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
             PObj_is_PMC_shared_SET(pmc);
@@ -1042,7 +1042,7 @@ dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)
 
     if (!interpreter->DOD_registry)
         return; /* XXX or signal exception? */
-    hash = PMC_ptr1v(interpreter->DOD_registry);
+    hash = PMC_struct_val(interpreter->DOD_registry);
 
     bucket = hash_get_bucket(interpreter, hash, pmc);
     if (bucket) {

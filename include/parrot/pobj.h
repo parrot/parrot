@@ -88,10 +88,11 @@ typedef Buffer PObj;
 #define PMC_str_val(pmc)      (pmc)->obj.u._string_val
 
 /* BEGIN DEPRECATED BUFFER ACCESSORS */
-/* macros for accessing old buffer members */
-#define bufstart obj.u._b._bufstart
-#define buflen   obj.u._b._buflen
-/* END DEPRECATED BUFFER ACCESSORS */
+/* macros for accessing old buffer members
+ * #define bufstart obj.u._b._bufstart
+ * #define buflen   obj.u._b._buflen
+ * END DEPRECATED BUFFER ACCESSORS
+ */
 
 #if ! DISABLE_GC_DEBUG
 /* BEGIN DEPRECATED POBJ ACCESSOR */

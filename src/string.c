@@ -85,7 +85,7 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
          * also be sure not to allocate from the constant pool
          */
         PObj_flags_CLEARALL(&for_alloc);
-        Parrot_allocate_string(interpreter, &for_alloc, s->buflen);
+        Parrot_allocate_string(interpreter, &for_alloc, PObj_buflen(s));
         /*
          * now copy memory over
          */
@@ -93,9 +93,9 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
         /*
          * and finally use that string memory
          */
-        s->bufstart = for_alloc.bufstart;
-        s->strstart = for_alloc.strstart;
-        s->buflen   = for_alloc.buflen;
+        PObj_bufstart(s) = PObj_bufstart(&for_alloc);
+        s->strstart      = for_alloc.strstart;
+        PObj_buflen(s)   = PObj_buflen(&for_alloc);
         /* COW_FLAG | external_FLAG | bufstart_external_FLAG immobile_FLAG */
         PObj_is_external_CLEARALL(s);
     }
@@ -117,11 +117,11 @@ static void copy_string_header(struct Parrot_Interp *interpreter,
 {
 #if ! DISABLE_GC_DEBUG
     UINTVAL vers;
-    vers= dest->pobj_version;
+    vers= PObj_version(dest);
 #endif
     memcpy(dest, src, sizeof(String));
 #if ! DISABLE_GC_DEBUG
-    dest->pobj_version = vers;
+    PObj_version(dest) = vers;
 #endif
 }
 
@@ -201,8 +201,8 @@ string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
     if (dest && dest != src) {
         /* they are different, dest is not an external string */
 #ifdef GC_IS_MALLOC
-        if (!PObj_is_external_TESTALL(dest) && dest->bufstart) {
-            mem_sys_free((int*)dest->bufstart - 1);
+        if (!PObj_is_external_TESTALL(dest) && PObj_bufstart(dest)) {
+            mem_sys_free((int*)PObj_bufstart(dest) - 1);
         }
 #endif
         make_COW_reference_from_header(interpreter, src, dest);
@@ -277,9 +277,9 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
                                  NULL);
         }
         /* make sure A's big enough for both */
-        if (a->buflen < a->bufused + b->bufused) {
+        if (PObj_buflen(a) < a->bufused + b->bufused) {
             a = string_grow(interpreter, a, ((a->bufused + b->bufused)
-                            - a->buflen) + EXTRA_SIZE);
+                            - PObj_buflen(a)) + EXTRA_SIZE);
         }
         else
             unmake_COW(interpreter, a);
@@ -371,8 +371,8 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
            it was safe by setting PObj_external_FLAG.
            (The cast is necessary to pacify TenDRA's tcc.)
            */
-        s->bufstart = const_cast(buffer);
-        s->buflen = len;
+        PObj_bufstart(s) = const_cast(buffer);
+        PObj_buflen(s)   = len;
         PObj_bufstart_external_SET(s);
     }
     else {
@@ -383,7 +383,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
 
     if (buffer) {
         if (flags & PObj_external_FLAG) {
-            s->strstart = s->bufstart;
+            s->strstart = PObj_bufstart(s);
             PObj_bufstart_external_SET(s);
         }
         else {
@@ -416,7 +416,7 @@ string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
 
     /* Don't check buflen, if we are here, we already checked. */
     Parrot_reallocate_string(interpreter, s,
-                             s->buflen + string_max_bytes(s,addlen));
+                             PObj_buflen(s) + string_max_bytes(s,addlen));
     return s;
 }
 
@@ -1115,7 +1115,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     diff = (subend_off - substart_off) - rep->bufused;
 
     if(diff >= 0
-        || ((INTVAL)src->bufused - (INTVAL)src->buflen) <= diff) {
+        || ((INTVAL)src->bufused - (INTVAL)PObj_buflen(src)) <= diff) {
         unmake_COW(interpreter, src);
 
         if(diff != 0) {
@@ -1385,8 +1385,8 @@ make_writable(struct Parrot_Interp *interpreter, STRING **s,
 {
     if (!*s)
         *s = string_make(interpreter, NULL, len, enc, 0, type);
-    else if ((*s)->buflen < len)
-        string_grow(interpreter, *s, len - (*s)->buflen);
+    else if (PObj_buflen(*s) < len)
+        string_grow(interpreter, *s, len - PObj_buflen(*s));
     else if (PObj_is_cowed_TESTALL(*s))
         unmake_COW(interpreter, *s);
 }
@@ -2051,7 +2051,7 @@ char *
 string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 {
 #if 0
-    if (s->buflen == s->bufused) {
+    if (PObj_buflen(s) == s->bufused) {
         string_grow(interpreter, s, 1);
     }
     else
@@ -2136,10 +2136,10 @@ string_pin(struct Parrot_Interp * interpreter, STRING * s) {
      *          so probably only sysmem should be tested
      */
     unmake_COW(interpreter, s);
-    size = s->buflen;
+    size = PObj_buflen(s);
     memory = mem_sys_allocate(size);
-    mem_sys_memcopy(memory, s->bufstart, size);
-    s->bufstart = memory;
+    mem_sys_memcopy(memory, PObj_bufstart(s), size);
+    PObj_bufstart(s) = memory;
     /* Mark the memory as both from the system and immobile */
     PObj_flags_SETTO(s, PObj_get_FLAGS(s) |
         (PObj_immobile_FLAG | PObj_sysmem_FLAG));
@@ -2170,10 +2170,10 @@ string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
     }
 
     /* unmake_COW(interpreter, s); XXX -lt: can not be cowed ??? */
-    size = s->buflen;
+    size = PObj_buflen(s);
     /* We need a handle on the fixed memory so we can get rid of it
        later */
-    memory = s->bufstart;
+    memory = PObj_bufstart(s);
     /* Reallocate it the same size
      * NOTE can't use Parrot_reallocate_string because of the LEA
      * allocator, where this is a noop for the same size
@@ -2183,7 +2183,7 @@ string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
     Parrot_block_GC(interpreter);
     Parrot_allocate_string(interpreter, s, size);
     Parrot_unblock_GC(interpreter);
-    mem_sys_memcopy(s->bufstart, memory, size);
+    mem_sys_memcopy(PObj_bufstart(s), memory, size);
     /* Mark the memory as neither immobile nor system allocated */
     PObj_immobile_CLEAR(s);
     PObj_sysmem_CLEAR(s);

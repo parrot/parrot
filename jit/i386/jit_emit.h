@@ -3090,7 +3090,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                     offsetof(pobj_t, flags));
             /* mov %edx, (bufstart) %eax */
             emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
-                    offsetof(Buffer, bufstart));
+                        (size_t) &PObj_bufstart((STRING *) 0));
             /* place result in SReg */
             jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
 
