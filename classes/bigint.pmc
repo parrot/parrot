@@ -41,6 +41,10 @@ bigint_init(Interp *interpreter, PMC *self) {
     PMC_struct_val(self) = malloc(sizeof(BIGINT));
     mpz_init(BN(self));
 }
+static void
+bigint_clear(Interp *interpreter, PMC *self) {
+    mpz_clear(BN(self));
+}
 
 static void
 bigint_set_long(Interp *interpreter, PMC *self, long value) {
@@ -229,6 +233,10 @@ bigint_init(Interp *interpreter, PMC *self) {
     internal_exception(1, "no bigint lib loaded");
 }
 static void
+bigint_clear(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
 bigint_set_long(Interp *interpreter, PMC *self, long value) {
     internal_exception(1, "no bigint lib loaded");
 }
@@ -391,6 +399,12 @@ BigInt object.
 
     void init () {
         bigint_init(INTERP, SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+    void destroy () {
+        bigint_clear(INTERP, SELF);
+        mem_sys_free(PMC_struct_val(SELF));
     }
 
 /*
