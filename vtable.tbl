@@ -2,6 +2,7 @@
 
 void init()
 void init_pmc(PMC* initializer)
+void init_pmc_props(PMC* initializer, PMC* properties)
 void morph(INTVAL type)
 void mark()
 void destroy()

@@ -293,7 +293,7 @@ output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
    $I0 = addr _fact
    set P0, $I0
    saveall
-   invoke
+   invokecc
    save I5
    restoreall
    restore $I0
@@ -309,7 +309,7 @@ _fact:
    dec I6
    branch _fact
 fin:
-   ret
+   invoke P1
 .end
 
 CODE

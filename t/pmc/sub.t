@@ -1,101 +1,81 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
-output_is(<<'CODE', <<'OUTPUT', "PASM subs");
+output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
     new P0, .Sub
     set_addr I3, func
     set P0, I3
+
     set I5, 3
     save I5
-    invoke
-    print "done 1\n"
-    set I5, 1
-    clone P1, P0
-    set P0, P1
-    save I5
-    invoke
-    print "done 2\n"
-    end
 
-func:
-    pushi
+    invokecc
+
     restore I5
     print I5
     print "\n"
+    end
+
+func:
+    print I5
+    print "\n"
+
     eq I5, 0, endfunc
     dec I5
-    save I5
-    invoke
-    inc I5
-    print I5
-    print " done\n"
-endfunc:
-    popi
-    ret
-CODE
-3
-2
-1
-0
-1 done
-2 done
-3 done
-done 1
-1
-0
-1 done
-done 2
-OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PASM subs with invoke_p");
-    new P0, .Sub
-    set_addr I3, func
-    set P0, I3
-    set I5, 3
-    save I5
-    invoke P0
-    print "done 1\n"
-    set I5, 1
-    clone P1, P0
-    set P0, P1
-    save I5
+    save P1
+    invokecc   # recursive invoke
+    restore P1
+
+endfunc:
     invoke P1
-    print "done 2\n"
-    end
-
-func:
-    pushi
-    restore I5
-    print I5
-    print "\n"
-    eq I5, 0, endfunc
-    dec I5
-    save I5
-    invoke P0
-    inc I5
-    print I5
-    print " done\n"
-endfunc:
-    popi
-    ret
 CODE
 3
 2
 1
 0
-1 done
-2 done
-3 done
-done 1
-1
-0
-1 done
-done 2
+3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Continuations");
+output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc_p");
+    new P0, .Sub
+    set_addr I3, func
+    set P0, I3
+
+    set I5, 3
+    save I5
+
+    invokecc P0
+
+    restore I5
+    print I5
+    print "\n"
+    end
+
+func:
+    print I5
+    print "\n"
+
+    eq I5, 0, endfunc
+    dec I5
+
+    save P1
+    invokecc P0  # recursive invoke
+    restore P1
+
+endfunc:
+    invoke P1
+CODE
+3
+2
+1
+0
+3
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Continuation");
     new P5, .PerlInt
     set P5, 3
     store_global "foo", P5
@@ -128,7 +108,7 @@ here 0
 done
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "definedness of continuations");
+output_is(<<'CODE', <<'OUTPUT', "definedness of Continuation");
     new P1, .Continuation
     defined I1, P1
     print I1
@@ -163,52 +143,85 @@ main:
     set_addr I3, foo
     set P0, I3
 
-    new P1, .PerlInt
-    set P1, 5
+    new P11, .PerlInt
+    set P11, 5
 
-    invoke
-    set P0, P2 # move sub $f to P0 for invoke
+    invokecc
+    set P0, P2 # move sub $f to P0 for invokecc
 
-    new P1, .PerlInt
-    set P1, 3
+    new P11, .PerlInt
+    set P11, 3
 
-    invoke
+    save P0
+    invokecc
+    restore P0
+
     print P2
     print "\n"
 
-    invoke
+    save P0
+    invokecc
+    restore P0
+
     print P2
     print "\n"
 
-    invoke
+    invokecc
     print P2
     print "\n"
 
     end
 
-# foo takes a number n (P1) and returns a sub (in P2) that takes
-# a number i (P1) and returns n incremented by i.
+# foo takes a number n (P11) and returns a sub (in P2) that takes
+# a number i (P11) and returns n incremented by i.
 foo:
     new_pad 0
-    store_lex 0, "n", P1
+    store_lex 0, "n", P11
     new P2, .Sub	# P2 has now the lexical "n" in the pad
     set_addr I3, f
     set P2, I3
-    pop_pad
-    ret
+    invoke P1
 
-# expects arg in P1, returns incremented result in P2
+# expects arg in P11, returns incremented result in P2
 f:
     find_lex P2, "n"	# invoke-ing the Sub pushes the lexical pad
     			# of the closure on the pad stack
-    add P2, P1		# n += shift
-    pop_pad		# clean up
-    ret
+    add P2, P11		# n += shift
+    invoke P1
 
 CODE
 8
 11
 14
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PASM subs - tail invoke");
+    new P0, .Sub
+    set_addr I3, func1
+    set P0, I3
+
+    invokecc
+    print "done\n"
+    end
+
+func1:
+    print "in func1\n"
+
+    new P0, .Sub
+    set_addr I3, func2
+    set P0, I3
+
+    invoke    # tail invoke (reuses context already in P1)
+    print "this should not be called\n"
+
+func2:
+    print "in func2\n"
+    invoke P1
+
+CODE
+in func1
+in func2
+done
 OUTPUT
 
 1;

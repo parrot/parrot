@@ -64,6 +64,80 @@ inline op does(out INT, in PMC, in STR) {
   goto NEXT();
 }
 
+###############################################################################
+
+=item B<newclass>(out PMC, in STR)
+
+Creates a new Parrot-style class, named $2, and puts the new PMC for it
+into $1. (This
+is a real out--the contents of $1 is ignored, and the pointer for the new
+PMC is put in there) 
+
+=cut
+
+inline op newclass(out PMC, in STR) {
+  goto NEXT();
+}
+
+=item B<subclass>(out PMC, in PMC)
+=item B<subclass>(out PMC, in PMC, in STR)
+=item B<subclass>(out PMC, in STR)
+=item B<subclass>(out PMC, in STR, in STR)
+
+Create a new class, put in $1, that is a subclass of $2. $3, if available,
+is the name of the new class--if not, the subclass is an anonymous subclass.
+
+$1 is replaced--a new PMC for the subclass is generated and put in it.
+
+=cut
+
+inline op subclass(out PMC, in PMC, in STR) {
+  goto NEXT();
+}
+
+inline op subclass(out PMC, in PMC) {
+  goto NEXT();
+}
+
+inline op subclass(out PMC, in STR, in STR) {
+  goto NEXT();
+}
+
+inline op subclass(out PMC, in STR) {
+  goto NEXT();
+}
+
+
+=item B<singleton>(in PMC) 
+
+Take the object in $1 and put it into its own singleton class, which is
+an anonymous subclass of the object's current class.
+
+=cut
+
+inline op singleton(in PMC) {
+  goto NEXT();
+}
+
+=item B<class>(out PMC, in PMC) 
+
+Get the class PMC for the object in $2 and put it in $1.
+
+=cut
+
+inline op class(out PMC, in PMC) {
+  goto NEXT();
+}
+
+=item B<classname>(out STR, in PMC)
+
+Get the class name for the class in $2 and put it in $1
+
+=cut
+
+inline op classname(out STR, in PMC) {
+  goto NEXT();
+}
 
 ###############################################################################
 

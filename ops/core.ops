@@ -4811,6 +4811,25 @@ inline op invoke(in PMC) {
   goto ADDRESS(dest);
 }
 
+inline op invokecc() {
+  opcode_t *dest;
+  PMC * p = interpreter->pmc_reg.registers[0];
+  dest = expr NEXT();
+  interpreter->pmc_reg.registers[1] = new_continuation_pmc(interpreter, dest);
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
+
+  goto ADDRESS(dest);
+}
+
+inline op invokecc(in PMC) {
+  opcode_t *dest;
+  PMC * p = $1;
+  dest = expr NEXT();
+  interpreter->pmc_reg.registers[1] = new_continuation_pmc(interpreter, dest);
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
+  goto ADDRESS(dest);
+}
+
 inline op compile(OUT PMC, in PMC, in STR) {
   $1 = $2->vtable->invoke(interpreter, $2, $3);
   goto NEXT();

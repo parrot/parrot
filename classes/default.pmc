@@ -30,6 +30,10 @@ pmclass default abstract noinit {
         DYNSELF.init();
     }
 
+    void init_pmc_props (PMC* initializer, PMC* properties) {
+        DYNSELF.init();
+    }
+
     void morph (INTVAL type) {
 	internal_exception(ILL_INHERIT,
 		"morph() not implemented in class '%s'\n",

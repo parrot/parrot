@@ -49,6 +49,9 @@ struct Parrot_Coroutine * new_coroutine(struct Parrot_Interp * interp,
 struct Parrot_Continuation * new_continuation(struct Parrot_Interp * interp,
                                               opcode_t * address);
 
+PMC * new_continuation_pmc(struct Parrot_Interp * interp,
+                           opcode_t * address);
+
 void save_context(struct Parrot_Interp * interp,
                   struct Parrot_Context * ctx);
 

@@ -70,6 +70,15 @@ new_continuation(struct Parrot_Interp *interp, opcode_t *address)
     return cc;
 }
 
+
+PMC * 
+new_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)
+{
+    PMC* continuation = pmc_new(interp, enum_class_Continuation);
+    ((struct Parrot_Continuation*)PMC_data(continuation))->continuation = address;
+    return continuation;
+}
+
 /*
  * Uses scope_index to find and return the appropriate scope.
  */

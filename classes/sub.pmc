@@ -55,10 +55,6 @@ pmclass Sub {
                       STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
        }
 
-       /* return address that the interpreter should jump to */
-       stack_push(INTERP, &(INTERP->ctx.control_stack), next,
-		  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-
        return ((struct Parrot_Sub*)PMC_data(SELF))->init;
    }
 
