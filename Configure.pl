@@ -208,7 +208,7 @@ my(%c)=(
     ld_shared     => '-shared',
 
     perl          => $^X,
-    test_prog     => 'test_parrot',
+    test_prog     => 'parrot',
     debugging     => $opt_debugging,
     rm_f          => 'rm -f',
     rm_rf         => 'rm -rf',
