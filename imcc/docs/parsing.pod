@@ -137,6 +137,35 @@ Lexicals and named constants declared in an outer scope are visible and used,
 when not overridden by a C<.local> or C<.const> directive with the same name.
 S. F<t/syn/scope.t> for examples for this.
 
+Please note that variables declard with C<.local> in an outer scope only
+make the symbol available in inner scopes. It does not mean, that imcc
+keeps track of the usage of such variables, when they are used in
+different compilations units. Such variables have to be passed to other
+subs like other subroutine arguments - they are not intended to replace
+global variables.
+
+	.sub _main
+	    call _f
+	    call _g
+	    end
+	.end
+	.local int a
+	.sub _f
+	    a = 1
+	    I0 = 2
+	    ret
+	.end
+	.sub _g
+	    print a
+	    ret
+	.end
+
+will print 2 (both C<a> and C<I0> are getting the same register).
+
+The current behavior will be replaced by a consistent one in the future
+or tossed alltogether.
+
+
 Global labels and constants are kept in the global symbol table
 I<ghash>, which is the symbol table of the outmost compilation unit.
 
