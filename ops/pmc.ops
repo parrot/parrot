@@ -82,6 +82,18 @@ op new(out PMC, in INT, in PMC, in PMC) {
   $1->vtable->init_pmc_props(interpreter, $1, $3, $4);
   goto NEXT();
 }
+
+########################################
+
+=item B<morph>(in PMC, in INT)
+
+Have $1 turn itself into a PMC of type $2. 
+
+=cut
+
+inline op morph(in PMC, in INT) {
+  VTABLE_morph(interpreter, $1, $2);
+  goto NEXT();
 }
 
 ########################################
