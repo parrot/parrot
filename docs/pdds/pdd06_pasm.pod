@@ -482,7 +482,7 @@ new frame. The old frame is preserved.
 
 Pop the current frame of PMC registers off the stack.
 
-=item halfpopi
+=item halfpopp
 
 Pop the current frame of PMC registers off their stack, restoring
 registers 16-31
