@@ -54,6 +54,12 @@ You can test the assembler and interpreter by running
 There is some documentation in docs/, but this is a very early alpha
 release, so for the most part, you're on your own.
 
+CHANGES
+-------
+
+For documentation on the user-visible changes between this version and
+previous versions, please see NEWS. The full changelog is available
+as ChangeLog.
 
 MAILING LISTS
 -------------

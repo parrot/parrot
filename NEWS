@@ -1,0 +1,21 @@
+VERSION 0.0.2
+
+New in 0.0.2
+
+- Parrot now works on all core platforms
+- A large number of tests, in the standard Perl testing framework
+- A new minilanguage (Jako) which compiles to Parrot assembly
+- Documentation about the assembly language (docs/parrot_assembly.pod)
+
+- Separate modules for assembly (Parrot::Assemble) and bytecode
+  manipulation (Parrot::PackFile::*, packfile.c)
+- Assembler completely rewritten
+- Better operand-type guessing in the assembler
+- Assembler support for '\n' etc. in string constants
+- Code reformatted to match the coding standards
+- New ops for register-constant INTEGER comparisons
+- Macro expansion in the assembler
+- IVs and NVs renamed to more friendly INTVAL and NUMVAL
+- Hard-coded pack("") formats removed
+- Better handling of floating-point numbers in assembler
+- Moved floats to constant table (fixing many alignment issues)
