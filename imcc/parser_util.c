@@ -477,13 +477,14 @@ imcc_compile(Parrot_Interp interp, const char *s)
     }
 #endif
     PackFile_fixup_subs(interp);
-    /* restore old byte_code, */
-    if (pf_save)
+    if (pf_save) {
+        /* restore old byte_code, */
         (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
-    sourcefile = source;
-    /* append new packfile to current directory */
-    PackFile_add_segment(&interp->code->directory,
+        /* append new packfile to current directory */
+        PackFile_add_segment(&interp->code->directory,
             &pf->directory.base);
+    }
+    sourcefile = source;
     return pf;
 }
 

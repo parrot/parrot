@@ -24,6 +24,12 @@ Create F<classes/foo.c> and C<pmc_foo.h> from F<classes/foo.dump>:
 
     % perl classes/pmc2c2.pl -c classes/foo.pmc ...
 
+Create fooX.c and pmc_fooX.h from fooX.dump files, also create libfoo.c
+containing the initialization function for all fooX PMCs.
+
+    % perl classes/pmc2c2.pl --library libfoo -c \
+           classes/foo1.pmc classes/foo2.pmc ...
+
 =head1 DESCRIPTION
 
 The job of the PMC compiler is to take .pmc files and create C files which
@@ -52,6 +58,12 @@ Emit an empty body in the dump. This may be useful for debugging.
 =item C<--include=/path/to/pmc>
 
 Specify include path where to find PMCs.
+
+=item C<--library=libname>
+
+Specifiy the library name. This will create E<lt>libnameE<gt>.c and
+pmc_E<lt>libnameE<gt>.h. The initialization function will be named
+after libname and will initialize all PMCs in the library.
 
 =back
 
@@ -561,35 +573,17 @@ sub print_tree {
 sub gen_c {
     my $include = shift;
     my (@files) = @_;
-    foreach my $file (@files) {
-	my $class = read_dump($include, $file);
-        # finally append vtable.dump
-        $class->{vtable} = read_dump($include, "vtable.pmc");
-	my $generator = Parrot::Pmc2c->new($class, \%opt);
-	print Data::Dumper->Dump([$generator]) if $opt{debug} > 1;
 
-	my $hout = $generator->gen_h($file);
-        print $hout if $opt{debug};
-        my $h;
-        ($h = $file) =~ s/\.\w+$/.h/;
-        $h =~ s/(\w+)\.h$/pmc_$1.h/;
-        print "Writing $h\n" if $opt{verbose};
-        open H, ">$h" or die "Can't write '$h";
-        print H $hout;
-        close H;
-	my $cout = $generator->gen_c($file);
-        print $cout if $opt{debug};
-        my $c;
-        ($c = $file) =~ s/\.\w+$/.c/;
-        print "Writing $c\n" if $opt{verbose};
-        open C, ">$c" or die "Can't write '$c";
-        print C $cout;
-        close C;
-    }
+    my $library = Parrot::Pmc2c::Library->new
+      ( \%opt, read_dump($include, "vtable.pmc"),
+        map { $_, read_dump($include, $_) }
+            @files );
+
+    $library->write_all_files;
 }
 
 sub main {
-    my ($default, $dump, $gen_c, $result, $tree, $debug, $verbose, $nobody, $nolines, @include);
+    my ($default, $dump, $gen_c, $result, $tree, $debug, $verbose, $nobody, $nolines, @include, $library);
     $result = GetOptions(
 	"vtable"        => \$default,
 	"dump"          => \$dump,
@@ -600,12 +594,14 @@ sub main {
 	"debug+"        => \$debug,
 	"verbose+"      => \$verbose,
         "include=s"     => \@include,
+        "library=s"     => \$library,
     );
     $opt{debug} = $debug || 0;
     $opt{verbose} = $verbose || 0;
     $opt{nobody} = $nobody || 0;
     $opt{nolines} = $nolines || 0;
-    unshift @include, "$FindBin::Bin/..", $FindBin::Bin;
+    $opt{library} = $library;
+    unshift @include, ".", "$FindBin::Bin/..", $FindBin::Bin;
 
     $default and do {
 	dump_default();

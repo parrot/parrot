@@ -3087,8 +3087,9 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
         code = VTABLE_invoke(interpreter, compiler, file);
         pf = PMC_struct_val(code);
         if (pf) {
-            PackFile_add_segment(&interpreter->code->directory,
-                    &pf->directory.base);
+            if (pf != interpreter->code)
+                PackFile_add_segment(&interpreter->code->directory,
+                                     &pf->directory.base);
             fixup_subs(interpreter, pf, PBC_LOADED);
         }
         else

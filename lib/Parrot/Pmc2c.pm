@@ -105,33 +105,52 @@ sub class_name {
     $nclass;
 }
 
-=item C<dynext_load_code($classname, $call_class_init)>
+=item C<dynext_load_code($library_name, @classes)>
 
-C<$classname> is the name of a PMC.
+C<$library_name> is the name of the dynamic library to be created.
 
-C<$call_class_init> is the C code for a call to the PMC's class
-initialization method.
+C<@classes> are the names of the PMCs for which initialization
+code is to be generated.
 
 This function is exported.
 
 =cut
 
 sub dynext_load_code {
-    my ($classname, $call_class_init ) = @_;
-    my $lc_classname = lc $classname;
-    return <<"EOC";
+    my ($libname, @classes ) = @_;
+    my $lc_libname = lc $libname;
+    my $cout;
+
+    $cout .= <<"EOC";
 /*
  * This load function will be called to do global (once) setup
  * whatever is needed to get this extension running
  */
+#include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "parrot/dynext.h"
 
-PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter); /* don't warn */
-PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
+EOC
+    foreach my $class (@classes) {
+        my $lc_class = lc $class;
+        $cout .= <<"EOC";
+#include "pmc_${lc_class}.h"
+EOC
+    }
+    $cout .= <<"EOC";
+
+Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter); /* don't warn */
+Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter)
 {
-    STRING *whoami;
-    PMC *pmc;
-    INTVAL type;
+    Parrot_STRING whoami;
+    Parrot_PMC pmc;
+EOC
+    foreach my $class (@classes) {
+        $cout .= <<"EOC";
+    Parrot_Int type${class};
+EOC
+    }
+    $cout .= <<"EOC";
     int pass;
 
     /*
@@ -145,12 +164,27 @@ PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
     /*
      * for all PMCs we want to register:
      */
-    whoami = string_from_cstring(interpreter, "$classname", 0);
-    type = pmc_register(interpreter, whoami);
+EOC
+    foreach my $class (@classes) {
+        $cout .= <<"EOC";
+    whoami = string_from_cstring(interpreter, "$class", 0);
+    type${class} = pmc_register(interpreter, whoami);
+EOC
+    }
+    $cout .= <<"EOC";
+
     /* do class_init code */
     for (pass = 0; pass <= 1; ++pass) {
-        $call_class_init
+EOC
+    foreach my $class (@classes) {
+        my $lc_class = lc $class;
+        $cout .= <<"EOC";
+        Parrot_${class}_class_init(interpreter, type$class, pass);
+EOC
     }
+    $cout .= <<"EOC";
+    }
+
     return pmc;
 }
 
@@ -320,7 +354,7 @@ sub decl() {
         $pmc = ' pmc';
     }
     return <<"EOC";
-$extern$ret${newl}Parrot_${classname}_$meth(Parrot_Interp$interp, PMC*$pmc$args)$semi
+$extern$ret${newl}Parrot_${classname}_$meth(Interp*$interp, PMC*$pmc$args)$semi
 EOC
 }
 
@@ -497,10 +531,7 @@ Returns the C code for loading a library.
 sub lib_load_code() {
     my $self = shift;
     my $classname = $self->{class};
-    # TODO multiple (e.g. Const subclasses)
-    my $call_class_init =
-        "Parrot_${classname}_class_init(interpreter, type, pass);\n";
-    return dynext_load_code($classname, $call_class_init);
+    return dynext_load_code($classname, $classname);
 }
 
 =item C<pmc_is_dynpmc>
@@ -617,18 +648,18 @@ EOC
 	which is passed in entry to class_init.
     */
 EOC
-    # init vtable slot
-    if ($self->{flags}{dynpmc}) {
-        $cout .= <<"EOC";
-
-    temp_base_vtable.base_type = entry;
-EOC
-    }
     # declare auxiliary variables for dyncpmc IDs
     foreach my $dynclass (keys %init_mmds) {
         next if $dynclass eq $classname;
         $cout .= <<"EOC";
     int my_enum_class_$dynclass = Parrot_PMC_typenum(interp, "$dynclass");
+EOC
+    }
+    # init vtable slot
+    if ($self->{flags}{dynpmc}) {
+        $cout .= <<"EOC";
+
+    temp_base_vtable.base_type = entry;
 EOC
     }
     # init MMD "right" slots with the dynpmc types
@@ -652,7 +683,15 @@ EOC
 EOC
     }
     $cout .= <<"EOC";
-    if (!pass) {
+    if (pass == 0) {
+EOC
+    # init vtable slot
+    if ($self->{flags}{dynpmc}) {
+        $cout .= <<"EOC";
+        temp_base_vtable.base_type = entry;
+EOC
+    }
+    $cout .= <<"EOC";
         /*
          * Parrot_base_vtables is a true global - register just once
          */
@@ -676,7 +715,36 @@ EOC
 EOC
     $cout .= <<"EOC";
     $class_init_code
-    if (pass) {
+    if (pass == 1) {
+EOC
+    # declare auxiliary variables for dyncpmc IDs
+    foreach my $dynclass (keys %init_mmds) {
+        next if $dynclass eq $classname;
+        $cout .= <<"EOC";
+        int my_enum_class_$dynclass = Parrot_PMC_typenum(interp, "$dynclass");
+EOC
+    }
+    # init MMD "right" slots with the dynpmc types
+    foreach my $entry (@init_mmds) {
+        if ($entry->[1] eq $classname) {
+            $cout .= <<"EOC";
+        _temp_mmd_init[$entry->[0]].right = entry;
+EOC
+        }
+        else {
+            $cout .= <<"EOC";
+        _temp_mmd_init[$entry->[0]].right = my_enum_class_$entry->[1];
+EOC
+        }
+    }
+    # just to be safe
+    foreach my $dynclass (keys %init_mmds) {
+        next if $dynclass eq $classname;
+        $cout .= <<"EOC";
+        assert(my_enum_class_$dynclass != enum_class_default);
+EOC
+    }
+    $cout .= <<"EOC";
 #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
         Parrot_mmd_register_parents(interp, entry,
             _temp_mmd_init, N_MMD_INIT);
@@ -1327,6 +1395,138 @@ $decl {
 }
 
 EOC
+}
+
+=back
+
+=head1 Parrot::Pmc2c::Library
+
+This class is a wrapper around a collection of PMCs linked in the same
+dynamic library. A degenerate case is having an unnamed library with just ne
+PMC, which is the case used by the Parrot core.
+
+=head2 Parrot::Pmc2c::Library Instance Methods
+
+=over 4
+
+=cut
+
+package Parrot::Pmc2c::Library;
+
+=item C<new($opt, $vtable_dump, %pmcs)
+
+    $library = Parrot::Pmc2c::Library->new
+        ( $options,     # hash refernce, the same passet to other constructors
+          $vtable_dump, # vtable.dump
+          pmc1        => $pmc1_dump,
+          pmc2        => $pmc2_dump,
+          ... );
+
+Creates a new library object. If the C<$options> hash contains a
+C<library> key its value will be used for the library name.
+
+=cut
+
+sub new {
+    my ($class, $opt, $vtable_dump) = (shift, shift, shift);
+    my %pmcs = @_;
+
+    foreach my $file (keys %pmcs) {
+        $pmcs{$file}->{vtable} = $vtable_dump;
+        $pmcs{$file} = Parrot::Pmc2c->new($pmcs{$file}, $opt);
+    }
+
+    return bless { opt         => $opt,
+                   pmcs        => \%pmcs,
+                 }, $class;
+}
+
+=item C<write_all_files()>
+
+Writes C and header files for all the PMCs in the library,
+plus E<lt>libnameE<gt>.c and pmc_E<lt>libnameE<gt>.h if his object
+represents a named library.
+
+=cut
+
+sub write_all_files {
+    my $self = shift;
+    my %opt = %{$self->{opt}};
+    my $library = $opt{library} ? 1 : 0;
+
+    while (my @fc = each %{$self->{pmcs}}) {
+        my ($file, $generator) = @fc;
+	print Data::Dumper->Dump([$generator]) if $opt{debug} > 1;
+
+	my $hout = $generator->gen_h($file);
+        print $hout if $opt{debug};
+        my $h;
+        ($h = $file) =~ s/\.\w+$/.h/;
+        $h =~ s/(\w+)\.h$/pmc_$1.h/;
+        print "Writing $h\n" if $opt{verbose};
+        open H, ">$h" or die "Can't write '$h";
+        print H $hout;
+        close H;
+	my $cout = $generator->gen_c($file);
+        print $cout if $opt{debug};
+        my $c;
+        ($c = $file) =~ s/\.\w+$/.c/;
+        print "Writing $c\n" if $opt{verbose};
+        open C, ">$c" or die "Can't write '$c";
+        print C $cout;
+        close C;
+    }
+
+    if ($library) {
+	my $hout = $self->gen_h($opt{library});
+        my $h = "$opt{library}.h";
+        print "Writing $h\n" if $opt{verbose};
+        open H, ">$h" or die "Can't write '$h";
+        print H $hout;
+        close H;
+	my $cout = $self->gen_c($opt{library});
+        print $cout if $opt{debug};
+        my $c = "$opt{library}.c";
+        print "Writing $c\n" if $opt{verbose};
+        open C, ">$c" or die "Can't write '$c";
+        print C $cout;
+        close C;
+    }
+}
+
+=item C<gen_h>
+
+Writes the header file for the library.
+
+=cut
+
+sub gen_h {
+    my ($self, $file) = @_;
+    my $hout = Parrot::Pmc2c->dont_edit('various files');
+    my $lc_libname = lc $self->{opt}{library};
+
+    $hout .= <<"EOH";
+Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter);
+EOH
+
+    return $hout;
+}
+
+=item C<gen_c>
+
+Writes the C file for the library.
+
+=cut
+
+sub gen_c {
+    my ($self, $file) = @_;
+    my $cout = Parrot::Pmc2c->dont_edit('various files');
+
+    $cout .= Parrot::Pmc2c::dynext_load_code($self->{opt}{library},
+                                             map { $_->{class} }
+                                                 values %{$self->{pmcs}} );
+
+    return $cout;
 }
 
 =back

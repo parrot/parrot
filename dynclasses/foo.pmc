@@ -4,11 +4,6 @@
 
 #include "parrot/parrot.h"
 
-/*
- * the real class enum is created at load time
- */
-#define enum_class_Foo -1
-
 pmclass Foo dynpmc {
 
     INTVAL get_integer() {
