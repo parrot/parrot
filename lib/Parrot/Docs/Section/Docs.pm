@@ -61,15 +61,9 @@ sub new
 			$self->item('', 'docs/tests.pod'),
 			$self->item('', 'docs/embed.pod'),
 		),
-		$self->group('Development Documentation', '',
-			$self->item('', 'docs/dev'),
-		),
-		$self->group('PMC Documentation', '',
-			$self->item('', 'docs/pmc'),
-		),
-		$self->group('Perl Design Documents (PDD)', '',
-			$self->item('', 'docs/pdds'),
-		),
+		$self->group('Development Documentation', '', 'docs/dev'),
+		$self->group('PMC Documentation', '', 'docs/pmc'),
+		$self->group('Perl Design Documents (PDD)', '', 'docs/pdds'),
 	);
 }
 

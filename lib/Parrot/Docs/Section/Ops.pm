@@ -45,9 +45,7 @@ sub new
 			$self->item('', 'ops/ops.num'),
 			$self->item('', 'build_tools/ops2pm.pl'),
 		),
-		$self->group('Op Libs', '',
-			$self->item('', 'ops'),
-		),
+		$self->group('Op Libs', '', 'ops'),
 	);
 }
 

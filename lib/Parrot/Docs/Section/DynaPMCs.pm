@@ -40,12 +40,8 @@ sub new
 	
 	return $self->SUPER::new(
 		'Dynamic PMCs', 'dynapmc.html', '',
-		$self->group('Loading', '',
-			$self->item('', 'dynclasses'),
-		),
-		$self->group('Runtime', '',
-			$self->item('', 'runtime/parrot/include'),
-		)
+		$self->group('Loading', '', 'dynclasses'),
+		$self->group('Runtime', '', 'runtime/parrot/include'),
 	);
 }
 

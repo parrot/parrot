@@ -286,24 +286,9 @@ sub pod_as_html
 	
 	if ( $self->contains_pod )
 	{
-		$self->{POD_HTML} = '';
+		my $formatter = Parrot::Docs::POD2HTML->new;
 		
-		if ( $self->num_pod_errors == 0 )
-		{
-			my $formatter = Parrot::Docs::POD2HTML->new;
-		
-			$formatter->output_string(\$self->{POD_HTML});
-			$formatter->parse_file($self->path);
-		}
-
-		#$self->{POD_HTML} =~ s|</head>|<link rel="stylesheet" href="http://dev.perl.org/perl-styles.css" type="text/css" />\n</head>|s;
-		#$self->{POD_HTML} =~ s|<body>|<body>\n\n<table width=100%>\n<tr>\n<td valign="TOP"><a href="">Contents</a></td>\n<td align="RIGHT"><img src="http://www.parrotcode.org/images/parrot.small.png"></td>\n</tr>\n</table>\n<div class="pod">\n<a name="_top"></a>\n|s;
-		$self->{POD_HTML} =~ s|</pre>|\n\n</pre>|gs;
-		$self->{POD_HTML} =~ s|\s\*\s+\b| \*|gs;
-		$self->{POD_HTML} =~ s|</h(\d)| <a href="#_top"><img alt="^" border=0 src="http://www.parrotcode.org/images/up.gif"></a></h$1|gs;
-		$self->{POD_HTML} =~ s|<dt>|<dt><b>|gs;
-		$self->{POD_HTML} =~ s|</dt>|</b></dt>|gs;
-		#$self->{POD_HTML} =~ s|</body>|</div>\n\n</body>|s;
+		$self->{POD_HTML} = $formatter->html_for_file($self);
 	}
 	
 	return $self->{POD_HTML};

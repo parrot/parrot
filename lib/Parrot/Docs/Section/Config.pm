@@ -40,18 +40,10 @@ sub new
 	return $self->SUPER::new(
 		'Configuration', 'config.html', '',
 		$self->item('', 'Configure.pl'),
-		$self->group('Initialization', '',
-			$self->item('', 'config/init'),
-		),
-		$self->group('User Dialogues', '',
-			$self->item('', 'config/inter'),
-		),
-		$self->group('System Tests', '',
-			$self->item('', 'config/auto'),
-		),
-		$self->group('File Creation', '',
-			$self->item('', 'config/gen'),
-		),
+		$self->group('Initialization', '', 'config/init'),
+		$self->group('User Dialogues', '', 'config/inter'),
+		$self->group('System Tests', '', 'config/auto'),
+		$self->group('File Creation', '', 'config/gen'),
 	);
 }
 

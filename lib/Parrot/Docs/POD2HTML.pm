@@ -30,7 +30,8 @@ $Parrot::Docs::POD2HTML::VERSION = '1.0';
 
 =item C<do_beginning()>
 
-Does the beginning of the document.
+Reimplements the C<Pod::Simple::HTML> method to add a header to the start
+of the document.
 
 =cut
 
@@ -74,7 +75,8 @@ HEADER
 
 =item C<do_end()>
 
-Does the end of the document.
+Reimplements the C<Pod::Simple::HTML> method to add a footer to the end
+of the document.
 
 =cut
 
@@ -90,6 +92,30 @@ sub do_end
 FOOTER
 		
 	return 1;
+}
+
+=item C<html_for_file($file)>
+
+Returns the HTML for the specified file.
+
+=cut
+
+sub html_for_file
+{
+	my $self = shift;
+	my $file = shift;
+	my $string = "";
+	
+	$self->output_string(\$string);
+	$self->parse_file($file->path);
+	
+	$string =~ s|</pre>|\n\n</pre>|gs;
+	$string =~ s|\s\*\s+\b| \*|gs;
+	$string =~ s|</h(\d)| <a href="#_top"><img alt="^" border=0 src="http://www.parrotcode.org/images/up.gif"></a></h$1|gs;
+	$string =~ s|<dt>|<dt><b>|gs;
+	$string =~ s|</dt>|</b></dt>|gs;
+	
+	return $string;
 }
 
 =back

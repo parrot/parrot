@@ -104,12 +104,12 @@ sub write_html
 				my $file_html = $file->pod_as_html;
 
 				# TODO This is messy. 
-				# Make the CSS and images local.
 				
 				my $name = $target->name;
 				
 				$rel_path = $docs_file->parent->relative_path($target->parent_path);
 
+				# Make the CSS and images local.
 				$file_html =~ s|href="">Contents|href="$rel_path/$name/index.html">Contents|s;
 				$file_html =~ s|http://dev.perl.org|$rel_path/resources|s;
 				$file_html =~ s|http://www.parrotcode.org/images|$rel_path/resources|sg;
@@ -127,6 +127,7 @@ sub write_html
 			{
 				print "\n", $rel_path unless $silent;
 			
+				# Link to the actual file rather than the HTML version.
 				$index_html .= sprintf("<a href= \"%s\">%s</a><br>\n",
 					$target->relative_path($file->path), 
 					$source->relative_path($file->path));
