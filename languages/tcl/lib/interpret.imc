@@ -4,8 +4,6 @@ Given a pre-parsed chunk of Tcl, interpret it.
 
 =cut
 
-#.include "runtime/parrot/library/dumper.imc"
-
 .namespace [ "_Tcl" ]
 
 .sub __interpret
@@ -26,7 +24,6 @@ Given a pre-parsed chunk of Tcl, interpret it.
   .local pmc args,my_cmd,parsed_body,argument_list
 
 end_scope:
-  #print "end_scope:\n"
   inc command_num
   if command_num == num_commands goto done
   if return_type != TCL_OK goto done
@@ -35,9 +32,7 @@ end_scope:
   # this should stringify the tclword object, which performs
   # all necessary substitutions. 
   $P0 = command[0]
-  #print "#1 Blah?\n"
   (return_type,retval) = $P0.__get_pmc()
- 
 
   if return_type != TCL_OK goto done
   proc = retval 
