@@ -2,34 +2,45 @@ use strict;
 use File::Copy qw(copy move);
 
 # qq[] isn't guaranteed to work, but it's safer than "" as some platforms
-# (eg FreeBSD) have ""s embedded in their substution values
+# (eg FreeBSD) have ""s embedded in their substution values. q[] is used in
+# some places as Win32 paths have \'s in, which qq[] treats as escape sequences.
 # Config stuff
 our $CC = qq[${cc} -c];
 our $LD = qq[${ld}];
 our $LDFLAGS = qq[${ldflags}];
 our $LD_LOAD_FLAGS = qq[${ld_load_flags}];
-our $PERL = qq[${perl}];
+our $PERL = q[${perl}];
 our $LOAD_EXT = qq[${load_ext}];
 our $O = qq[${o}];
 our $LIBPARROT = qq[../src/extend${o}];
     # XXX: ultimately, this should be replaced with:
     #  $LIBPARROT = qq[-L../blib/lib -lparrot];
 our $CFLAGS = qq[${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}];
-our $PMC2C = qq[$PERL ${build_dir}${slash}classes${slash}pmc2c2.pl];
+
+# Here comes some stuff for Win32.
+our $PATHQUOTE = '';
+if ($^O eq 'MSWin32') {
+    $PATHQUOTE = '"';
+    $LD_LOAD_FLAGS =~ s/(def:)/def:..\\/ if $^O eq 'MSWin32';
+}
+
+# PMC2C Config
+our $PMC2C = "$PERL $PATHQUOTE" . q[${build_dir}${slash}classes${slash}pmc2c2.pl] . $PATHQUOTE;
 
 # Actual commands
 sub compile_cmd {
     my ($target, $source) = @_;
     "$CC $CFLAGS " .
     "${cc_o_out}" . $target . " " .
-    "-I${build_dir}${slash}include -I${build_dir}${slash}classes " .
+    "-I" . $PATHQUOTE . '${build_dir}${slash}include' . $PATHQUOTE . " " .
+    "-I" . $PATHQUOTE . '${build_dir}${slash}classes' . $PATHQUOTE . " " .
     $source;
 };
 
 sub partial_link_cmd {
     my ($target, @sources) = @_;
     "$LD $LDFLAGS $LD_LOAD_FLAGS $LIBPARROT ".
-    "-o " . $target . " " .
+    "${ld_out}" . $target . " " .
     join(" ", @sources);
 }
 
