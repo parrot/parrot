@@ -114,7 +114,7 @@ Directives
     item can be a const or non-const token.
 
   These are tokens that might not directly translate to a specific
-  opcode, and are intentionly left generic. Some of them aren't
+  opcode, and are intentionally left generic. Some of them aren't
   ops at all, but instructions to the compiler.
 
    .class <IDENTIFIER>

@@ -150,7 +150,7 @@ produce the include files for the various categories of ops and subs.
 
 NOTE: The B<oplib>, B<fnlib> and B<fn> sub properties are not implemented yet.
 
-NOTE: Type properties are not impelmented yet.
+NOTE: Type properties are not implemented yet.
 
 
 =item * Assignments
@@ -165,7 +165,7 @@ Conversions between B<int> and B<num> values are implicit.
 
 There are two kinds of conditional block: B<if> and B<unless>, with the latter
 being short for the more familiar B<if>, but with the condition inverted. In
-both cases, what follows the keyword is a parenthsized boolean expression and
+both cases, what follows the keyword is a parenthesized boolean expression and
 a block.
 
         if     (happy)   { smile(); }

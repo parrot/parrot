@@ -157,7 +157,7 @@ B<parrot>.
 
 Above option I<-k> tells perl6 to keep intermediate files. So you can
 run them with the appropriate command or you can run them with the perl6
-driver. Flags after I<-R> are passed on to the running programm: B<imcc>
+driver. Flags after I<-R> are passed on to the running program: B<imcc>
 or B<parrot>, though the former has some more options.
 
 	perl6 ../../examples/assembly/life.pasm
@@ -180,7 +180,7 @@ provide the intermediate files for one of the tests by running e.g.
 If particular tests fail, please provide the test summary plus
 symptomatic cases of failures.
 
-And finally, don't forget to report your OS environement including
+And finally, don't forget to report your OS environment including
 involved components like B<perl> and C compiler.
 
 Thanks.

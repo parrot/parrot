@@ -20,7 +20,7 @@ the following keywords are recognized:
 	LOAD progname [loads in progname.bas]
 	PRINT
 	PRINT expr
-	PRINT expr;   [supress newline]
+	PRINT expr;   [suppress newline]
 	DIM           [a no-op]
 	LET var=expr
 	INPUT var    
@@ -52,7 +52,7 @@ The following functions are supported in the full expression parser:
 	MID(X,Y,Z)
 		Return the string of X, starting at position Y (1-based),
 	        for length Z.
-	RIGHT(X,Y) Return rightmost Y charaters of X
+	RIGHT(X,Y) Return rightmost Y characters of X
 	LEFT(X,Y) Return leftmost Y characters of X
 	INSTR(X,Y) Return the position (1-based) where substring Y 
 	        begins in X
@@ -69,7 +69,7 @@ Additionally, the expression parser understands:
 		cause concatenation instead.
 	-       Unary minus
 	,       Construction of tuples.  5,I+34*2,"FOO",A$ will be
-		reduced to a 4-element list (comma-separaed) with all
+		reduced to a 4-element list (comma-separated) with all
 		possible evaluations done.
 	AND,OR  Logical
 	><<>=   Comparison (returns 1 or 0)
