@@ -104,7 +104,7 @@ uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num, char base)
             buf2[i] = (char)('0' + cur);
         }
         else {
-            buf2[i] = (char)('a' + cur);
+            buf2[i] = (char)('a' + cur - 10);
         }
 
         i++;
