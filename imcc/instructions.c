@@ -115,12 +115,18 @@ imcc_init_tables(Interp * interpreter)
 int
 ins_reads2(Instruction *ins, int t)
 {
-    size_t i;
+    size_t i, idx;
     const char types[] = "INPS";
+    char *p;
+
     if (ins->opnum == r_special[0])
         return 1;
+    p = strchr(types, t);
+    if (!p)
+        return 0;
+    idx = p - types;
     for (i = 1; i < sizeof(r_special)/sizeof(int); i += 4) {
-        if (ins->opnum == r_special[i + (strchr(types, t) - types)])
+        if (ins->opnum == r_special[i + idx])
             return 1;
     }
     return 0;
@@ -130,12 +136,18 @@ ins_reads2(Instruction *ins, int t)
 int
 ins_writes2(Instruction *ins, int t)
 {
-    size_t i;
+    size_t i, idx;
     const char types[] = "INPS";
+    char *p;
+
     if (ins->opnum == w_special[0])
         return 1;
+    p = strchr(types, t);
+    if (!p)
+        return 0;
+    idx = p - types;
     for (i = 1; i < sizeof(w_special)/sizeof(int); i += 4) {
-        if (ins->opnum == w_special[i + (strchr(types, t) - types)])
+        if (ins->opnum == w_special[i + idx])
             return 1;
     }
     return 0;

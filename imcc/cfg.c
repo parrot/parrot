@@ -579,6 +579,11 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
                         "Index %i of %i has NULL instruction\n",
 				ins->index, bb->end->index);
 	}
+        if (ins->opnum == -1) {
+            if (ins == bb->end)
+                break;
+            continue;
+        }
         /* restoreall and such */
         if (ins_writes2(ins, r->set))
             special = ins;
