@@ -1111,7 +1111,8 @@ libnci.dll: $(SRC)/nci_test$(O)
 	$(LD) $(LD_SHARED) libnci.def $(LDFLAGS) \
 	    $(LD_OUT)$@ $(SRC)/nci_test$(O)
 
-# ctags
+# vim ctags
+# this needs exuberant-ctags
 
 tags:	tags.dummy
 	$(RM_F) tags
