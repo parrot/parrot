@@ -9,21 +9,13 @@
 
   load_bytecode "languages/tcl/lib/tcllib.pbc"
 
-  .local pmc filename
-  .local string mode
-  .local string chunk
-  .local string contents
-  .local pmc math_funcs
-  .local Sub a_sub
-  .local int argc
-  .local int retcode
-  .local pmc retval
+  .local pmc filename,retval,math_funcs,source
+  .local string mode,chunk,contents
+  .local int argc,retcode
 
   # start with a new pad...
   new_pad 0
 
-  # Get the source method.
-  .local pmc source
   source = find_global "Tcl", "_source"
 
   # If no file was specified, read from stdin.
