@@ -1,0 +1,628 @@
+/*
+** stack.ops
+*/
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+stack.ops - Stack Ops
+
+=head1 DESCRIPTION
+
+Operations that manipulate Parrot's register, user and integer
+stacks.
+
+=cut
+
+###############################################################################
+
+=head2 Register stack operations
+
+These operations affect entire sets of registers.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<popi>()
+
+=item B<popn>()
+
+=item B<popp>()
+
+=item B<pops>()
+
+Restore all the registers of the type indicated in the name of the operation
+from the most recently B<push>ed register frames.
+
+A register frame holds only 16 registers, so we pop two frames from the 
+frame stack. We use the first frame to restore registers 16-31, and the 
+second frame to restore registers 0-15. By restoring in this order, we 
+ensure that a C<push> followed by a C<pop> returns the working set of 
+registers to their original state.
+
+=cut
+
+inline op popi() {
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op popn() {
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op pops() {
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op popp() {
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  goto NEXT();
+}
+
+########################################
+
+=item B<popbottomi>()
+
+=item B<popbottomn>()
+
+=item B<popbottomp>()
+
+=item B<popbottoms>()
+
+Restore registers 0-15 of the type indicated in the name of the operation
+from a register frame popped off the corresponding frame stack.
+
+=cut
+
+inline op popbottomi() {
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op popbottomn() {
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op popbottoms() {
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op popbottomp() {
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  goto NEXT();
+}
+
+########################################
+
+=item B<poptopi>()
+
+=item B<poptopn>()
+
+=item B<poptopp>()
+
+=item B<poptops>()
+
+Restore registers 16-31 of the type indicated in the name of the operation
+from a register frame popped off the corresponding frame stack.
+
+=cut
+
+inline op poptopi() {
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op poptopn() {
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op poptops() {
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op poptopp() {
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  goto NEXT();
+}
+
+
+########################################
+
+=item B<pushi>()
+
+=item B<pushn>()
+
+=item B<pushp>()
+
+=item B<pushs>()
+
+Save all the registers of the type indicated in the name of the operation
+on the appropriate register frame stack.
+
+A register frame holds only 16 registers, so we push two frames onto the 
+stack. The first frame holds the values from registers 0-15; the second
+frame holds the values from registers 16-31. 
+
+=cut
+
+inline op pushi() {
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op pushn() {
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op pushs() {
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op pushp() {
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  goto NEXT();
+}
+
+
+=cut
+
+########################################
+
+=item B<pushtopi>()
+
+=item B<pushtopn>()
+
+=item B<pushtopp>()
+
+=item B<pushtops>()
+
+Save registers 16-31 of the type indicated in the name of the operation
+on the appropriate register frame stack.
+
+=cut
+
+inline op pushtopi() {
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op pushtopn() {
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op pushtops() {
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op pushtopp() {
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  goto NEXT();
+}
+
+
+=cut
+
+########################################
+
+=item B<pushbottomi>()
+
+=item B<pushbottomn>()
+
+=item B<pushbottomp>()
+
+=item B<pushbottoms>()
+
+Save registers 0-15 of the type indicated in the name of the operation
+on the appropriate register frame stack.
+
+=cut
+
+inline op pushbottomi() {
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op pushbottomn() {
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op pushbottoms() {
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op pushbottomp() {
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  goto NEXT();
+}
+
+########################################
+
+=item B<saveall>()
+
+Save all of the registers onto the appropriate frame stacks.
+This op is equivalent to:
+
+        pushi
+        pushn
+        pushs
+        pushp
+
+(or some other permutation of these ops).
+
+=item B<restoreall>()
+
+Restore all the registers from the appropriate frame stacks.
+This op is equivalent to:
+
+        popi
+        popn
+        pops
+        popp
+
+(or some other permutation of these ops).
+
+=item B<savetop>()
+
+Save registers 16-31 of all the register sets on the appropriate frame stacks.
+This op is equivalent to:
+
+        pushtopi
+        pushtopn
+        pushtops
+        pushtopp
+
+(or some other permutation of these ops).
+
+=item  B<restoretop>()
+
+Restore registers 16-31 of all the register sets from the appropriate frame 
+stacks. This op is equivalent to:
+
+        poptopi
+        poptopn
+        poptops
+        poptopp
+
+(or some other permutation of these ops).
+
+=cut
+
+inline op saveall() {
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op restoreall() {
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op savetop() {
+  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op restoretop() {
+  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 User stack operations
+
+These operations affect individual registers.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<entrytype>(out INT, in INT)
+
+Gets the type of entry $2 of the user stack and puts it in $1.
+
+=cut
+
+op entrytype(out INT, in INT) {
+  Stack_Entry_t *entry;
+
+  entry = stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  if (!entry) {
+    internal_exception(99, "Stack Depth wrong\n");
+  }
+  $1 = get_entry_type(interpreter, entry);
+  goto NEXT();
+}
+
+########################################
+
+=item B<depth>(out INT)
+
+Puts the depth of the user stack in $1.
+
+=cut
+
+inline op depth(out INT) {
+  $1 = stack_height(interpreter, interpreter->ctx.user_stack);
+  goto NEXT();
+}
+
+#######################################
+
+=item B<lookback>(out INT, in INT)
+
+=item B<lookback>(out STR, in INT)
+
+=item B<lookback>(out NUM, in INT)
+
+=item B<lookback>(out PMC, in INT)
+
+Finds the entry in the user stack at offset $2 from the top and put it
+in register $1. Positive numbers count down from the top of the stack,
+negative numbers count up from the bottom. (0 is the topmost entry, -1
+is the bottom-most)
+
+=cut
+
+op lookback(out INT, in INT) {
+  Stack_Entry_t *entry =
+  	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  if (!entry)
+      internal_exception(99, "Stack depth wrong\n");
+  if (entry->entry_type != STACK_ENTRY_INT) {
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
+  }
+
+  $1 = entry->entry.int_val;
+  goto NEXT();
+}
+
+op lookback(out STR, in INT) {
+  Stack_Entry_t *entry =
+  	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  if (!entry)
+      internal_exception(99, "Stack depth wrong\n");
+  if (entry->entry_type != STACK_ENTRY_STRING) {
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
+  }
+
+  $1 = entry->entry.string_val;
+  goto NEXT();
+}
+
+op lookback(out NUM, in INT) {
+  Stack_Entry_t *entry =
+  	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  if (!entry)
+      internal_exception(99, "Stack depth wrong\n");
+  if (entry->entry_type != STACK_ENTRY_FLOAT) {
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
+  }
+
+  $1 = entry->entry.num_val;
+  goto NEXT();
+}
+
+op lookback(out PMC, in INT) {
+  Stack_Entry_t *entry =
+  	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
+  if (!entry)
+      internal_exception(99, "Stack depth wrong\n");
+  if (entry->entry_type != STACK_ENTRY_PMC) {
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
+  }
+
+  $1 = entry->entry.pmc_val;
+  goto NEXT();
+}
+
+########################################
+
+=item B<save>(in INT)
+
+=item B<save>(in NUM)
+
+=item B<save>(in STR)
+
+=item B<save>(in PMC)
+
+Save register or constant $1 onto the user stack.
+
+=cut
+
+inline op save(in INT) {
+  INTVAL i = $1;
+  stack_push(interpreter, &interpreter->ctx.user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
+  goto NEXT();
+}
+
+inline op save(in NUM) {
+  stack_push(interpreter, &interpreter->ctx.user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
+  goto NEXT();
+}
+
+inline op save(in PMC) {
+  stack_push(interpreter, &interpreter->ctx.user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+  goto NEXT();
+}
+
+inline op save(in STR) {
+  stack_push(interpreter, &interpreter->ctx.user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  goto NEXT();
+}
+
+########################################
+
+=item B<savec>(in STR)
+
+=item B<savec>(in PMC)
+
+Save a clone of register or constant $1 onto the user stack.
+
+=cut
+
+inline op savec(in STR) {
+  stack_push(interpreter, &interpreter->ctx.user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  goto NEXT();
+}
+
+########################################
+
+=item B<restore>(out INT)
+
+=item B<restore>(out NUM)
+
+=item B<restore>(out PMC)
+
+=item B<restore>(out STR)
+
+Restore register $1 from the user stack.
+
+=cut
+
+inline op restore(out INT) {
+  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
+                  STACK_ENTRY_INT);
+  goto NEXT();
+}
+
+inline op restore(out NUM) {
+  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
+                  STACK_ENTRY_FLOAT);
+  goto NEXT();
+}
+
+inline op restore(out PMC) {
+  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
+                  STACK_ENTRY_PMC);
+  goto NEXT();
+}
+
+inline op restore(out STR) {
+  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
+                  STACK_ENTRY_STRING);
+  goto NEXT();
+}
+
+########################################
+
+=item B<rotate_up>(in INT)
+
+Rotate the top $1 entries in the user stack by one. If $1 is positive,
+then the stack rotates upwards: the ($1)th entry becomes the ($1-1)th
+entry and so on, all the way up to the top of the stack, while the
+entry formerly at the top of the stack becomes the new ($1)th entry.
+If $1 is negative, the stack rotates downwards: the top entry becomes
+the second entry, the second becomes the third etc., while the former
+($1)th entry becomes the new top entry.
+
+=cut
+
+inline op rotate_up(in INT) {
+  rotate_entries(interpreter, &interpreter->ctx.user_stack, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<intsave>(in INT)
+
+Save register or constant $1 onto the high-speed int stack.
+
+=cut
+
+inline op intsave(in INT) {
+  intstack_push(interpreter, interpreter->ctx.intstack, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<intrestore>(out INT)
+
+Restore register $1 from the high-speed int stack.
+
+=cut
+
+inline op intrestore(out INT) {
+  $1=intstack_pop(interpreter, interpreter->ctx.intstack);
+  goto NEXT();
+}
+
+########################################
+
+=item B<intdepth>(out INT)
+
+Puts the depth of the high-speed int stack in $1.
+
+=cut
+
+inline op intdepth(out INT) {
+  $1=intstack_depth(interpreter, interpreter->ctx.intstack);
+  goto NEXT();
+}
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut

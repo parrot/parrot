@@ -84,6 +84,7 @@ for $file (@ARGV) {
     my $temp_ops = new Parrot::OpsFile $file;
     die "$0: Could not read ops file '$file'!\n" unless defined $temp_ops;
 
+    die "OPS invalid for $file" unless ref $temp_ops->{OPS};
     push @{$ops->{OPS}}, @{$temp_ops->{OPS}};
 }
 

@@ -1,0 +1,530 @@
+/*
+** set.ops
+*/
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+set.ops - Register Loading Ops
+
+=head1 DESCRIPTION
+
+These operations all set registers to various values.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<clone>(out STR, in STR)
+
+Make a clone of $2, and put it in $1. Doesn't affect what was in
+$1. Removes the constant flag on the copy, if there was one.
+
+=cut
+
+inline op clone(out STR, in STR) {
+  $1 = string_copy(interpreter, $2);
+  goto NEXT();
+}
+
+
+
+########################################
+
+=item B<exchange>(inout INT, inout INT)
+
+=item B<exchange>(inout NUM, inout NUM)
+
+=item B<exchange>(inout PMC, inout PMC)
+
+=item B<exchange>(inout STR, inout STR)
+
+Exchange the contents of registers $1 and $2
+
+=cut
+
+op exchange(inout INT, inout INT) {
+   INTVAL temp;
+   temp = $1;
+   $1 = $2;
+   $2 = temp;
+   goto NEXT();
+}
+
+op exchange(inout PMC, inout PMC) {
+   PMC *temp;
+   temp = $1;
+   $1 = $2;
+   $2 = temp;
+   goto NEXT();
+}
+
+op exchange(inout NUM, inout NUM) {
+   FLOATVAL temp;
+   temp = $1;
+   $1 = $2;
+   $2 = temp;
+   goto NEXT();
+}
+
+op exchange(inout STR, inout STR) {
+   STRING *temp;
+   temp = $1;
+   $1 = $2;
+   $2 = temp;
+   goto NEXT();
+}
+
+########################################
+
+=item B<set>(out INT, in INT)
+
+=item B<set>(out INT, in NUM)
+
+=item B<set>(out INT, in PMC)
+
+=item B<set>(out INT, in STR)
+
+=item B<set>(out NUM, in INT)
+
+=item B<set>(out NUM, in NUM)
+
+=item B<set>(out NUM, in PMC)
+
+=item B<set>(out NUM, in STR)
+
+=item B<set>(in PMC, in INT)
+
+=item B<set>(in PMC, in NUM)
+
+=item B<set>(out PMC, in PMC)
+
+=item B<set>(in PMC, in STR)
+
+=item B<set>(out STR, in INT)
+
+=item B<set>(out STR, in NUM)
+
+=item B<set>(out STR, in PMC)
+
+=item B<set>(out STR, in STR)
+
+Set $1 to $2.
+
+=cut
+
+inline op set(out INT, in INT) {
+  $1 = $2;
+  goto NEXT();
+}
+
+inline op set(out INT, in NUM) {
+  $1 = (INTVAL)($2);
+  goto NEXT();
+}
+
+inline op set(out INT, in STR) {
+  $1 = string_to_int($2);
+  goto NEXT();
+}
+
+inline op set(out NUM, in NUM) {
+  $1 = $2;
+  goto NEXT();
+}
+
+inline op set(out NUM, in INT) {
+  $1 = (FLOATVAL)$2;
+  goto NEXT();
+}
+
+inline op set(out NUM, in STR) {
+  $1 = string_to_num($2);
+  goto NEXT();
+}
+
+inline op set(out NUM, in PMC) {
+  $1 = $2->vtable->get_number(interpreter, $2);
+  goto NEXT();
+}
+
+inline op set(out STR, in PMC) {
+  $1 = $2->vtable->get_string(interpreter, $2);
+  goto NEXT();
+}
+
+inline op set(out STR, invar STR) {
+  $1 = $2;
+  goto NEXT();
+}
+
+inline op set(out STR, inconst STR) {
+  $1 = string_copy(interpreter, $2);
+  goto NEXT();
+}
+
+inline op set(out STR, in INT) {
+  $1 = string_from_int(interpreter, $2);
+  goto NEXT();
+}
+
+inline op set(out STR, in NUM) {
+  $1 = string_from_num(interpreter, $2);
+  goto NEXT();
+}
+
+inline op set(out PMC, in PMC) {
+  $1 = $2;
+  goto NEXT();
+}
+
+inline op set(in PMC, in INT) {
+  $1->vtable->set_integer_native(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op set(in PMC, in NUM) {
+  $1->vtable->set_number_native(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op set(in PMC, in STR) {
+  $1->vtable->set_string_native(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op set(out INT, in PMC) {
+  $1 = $2->vtable->get_integer(interpreter, $2);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+########################################
+
+=head2 PMC assignment operations: Px = x
+
+=over 4
+
+=item B<assign>(in PMC, in INT)
+
+=item B<assign>(in PMC, in NUM)
+
+=item B<assign>(in PMC, in PMC)
+
+=item B<assign>(in PMC, in STR)
+
+Assign a new value to a string by reusing the string header.
+
+=item B<assign>(out STR, in STR)
+
+=cut
+
+inline op assign(in PMC, in PMC) {
+  $1->vtable->set_pmc(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op assign(in PMC, in INT) {
+  $1->vtable->set_integer_native(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op assign(in PMC, in NUM) {
+  $1->vtable->set_number_native(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op assign(in PMC, in STR) {
+  $1->vtable->set_string_native(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op assign(out STR, in STR) {
+  $1 = string_set(interpreter, $1, $2);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+########################################
+
+=head2 Keyed set operations: Px[ INTKEY ] = Bx
+
+=over 4
+
+=item B<set>(in PMC, in INTKEY, in INT)
+
+=item B<set>(in PMC, in INTKEY, in NUM)
+
+=item B<set>(in PMC, in INTKEY, in STR)
+
+=item B<set>(in PMC, in INTKEY, in PMC)
+
+=cut
+
+inline op set (in PMC, in INTKEY, in INT)  {
+    $1->vtable->set_integer_keyed_int(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+inline op set (in PMC, in INTKEY, in NUM)  {
+    $1->vtable->set_number_keyed_int(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+inline op set (in PMC, in INTKEY, in STR)  {
+    $1->vtable->set_string_keyed_int(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+inline op set (in PMC, in INTKEY, in PMC)  {
+    $1->vtable->set_pmc_keyed_int(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+########################################
+
+=head2 Keyed get operations: Ax = Px[ INTKEY ]
+
+=over 4
+
+=item B<set>(out INT, in PMC, in INTKEY)
+
+=item B<set>(out NUM, in PMC, in INTKEY)
+
+=item B<set>(out STR, in PMC, in INTKEY)
+
+=item B<set>(out PMC, in PMC, in INTKEY)
+
+=cut
+
+inline op set (out INT, in PMC, in INTKEY)  {
+    $1 = $2->vtable->get_integer_keyed_int(interpreter, $2, $3);
+    goto NEXT();
+}
+
+inline op set (out NUM, in PMC, in INTKEY)  {
+    $1 = $2->vtable->get_number_keyed_int(interpreter, $2, $3);
+    goto NEXT();
+}
+
+inline op set (out STR, in PMC, in INTKEY)  {
+    $1 = $2->vtable->get_string_keyed_int(interpreter, $2, $3);
+    goto NEXT();
+}
+
+inline op set (out PMC, in PMC, in INTKEY) {
+    $1 = $2->vtable->get_pmc_keyed_int(interpreter, $2, $3);
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+########################################
+
+=head2 Keyed set operations: Px[ KEY ] = Bx
+
+=over 4
+
+=item B<set>(in PMC, in KEY, in INT)
+
+=item B<set>(in PMC, in KEY, in NUM)
+
+=item B<set>(in PMC, in KEY, in STR)
+
+=item B<set>(in PMC, in KEY, in PMC)
+
+=cut
+
+inline op set (in PMC, in KEY, in INT)  {
+    $1->vtable->set_integer_keyed(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+inline op set (in PMC, in KEY, in NUM)  {
+    $1->vtable->set_number_keyed(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+inline op set (in PMC, in KEY, in STR)  {
+    $1->vtable->set_string_keyed(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+inline op set (in PMC, in KEY, in PMC)  {
+    $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+########################################
+
+=head2 Keyed get operations: Ax = Px[ KEY ]
+
+=over 4
+
+=item B<set>(out INT, in PMC, in KEY)
+
+=item B<set>(out NUM, in PMC, in KEY)
+
+=item B<set>(out STR, in PMC, in KEY)
+
+=item B<set>(out PMC, in PMC, in KEY)
+
+=cut
+
+inline op set (out INT, in PMC, in KEY)  {
+    $1 = $2->vtable->get_integer_keyed(interpreter, $2, $3);
+    goto NEXT();
+}
+
+inline op set (out NUM, in PMC, in KEY)  {
+    $1 = $2->vtable->get_number_keyed(interpreter, $2, $3);
+    goto NEXT();
+}
+
+inline op set (out STR, in PMC, in KEY)  {
+    $1 = $2->vtable->get_string_keyed(interpreter, $2, $3);
+    goto NEXT();
+}
+
+inline op set (out PMC, in PMC, in KEY)  {
+    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, $3);
+    goto NEXT();
+}
+
+
+=item B<clone>(out PMC, in PMC)
+
+Makes a copy of the PMC in $2 and puts it in $1.
+
+=cut
+
+inline op clone(out PMC, in PMC) {
+  /* P6C emits clone P0, P0 */
+  if (&$1 != &$2) {
+      $1 = pmc_new_noinit(interpreter, $2->vtable->base_type);
+      $2->vtable->clone(interpreter, $2, $1);
+  }
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Register operations
+
+These operations effect entire sets of registers.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<null>(out STR)
+
+=item B<null>(out INT)
+
+=item B<null>(out PMC)
+
+=item B<null>(out NUM)
+
+Set register $1 to a null value, or zero for the numeric registers
+
+=cut
+
+inline op null(out STR) {
+  $1 = NULL;
+  goto NEXT();
+}
+
+inline op null(out INT) {
+  $1 = 0;
+  goto NEXT();
+}
+
+inline op null(out PMC) {
+  $1 = NULL;
+  goto NEXT();
+}
+
+inline op null(out NUM) {
+  $1 = 0;
+  goto NEXT();
+}
+
+########################################
+
+=item B<cleari>()
+
+=item B<clearn>()
+
+=item B<clearp>()
+
+=item B<clears>()
+
+Clear all the registers of the type indicated in the name of the operation.
+
+INTVAL ('i') and FLOATVAL ('n') registers clear to zero.
+
+PMC ('p') and STRING ('s') registers clear to NULL.
+
+=cut
+
+inline op cleari() {
+  Parrot_clear_i(interpreter);
+  goto NEXT();
+}
+
+inline op clearn() {
+  Parrot_clear_n(interpreter);
+  goto NEXT();
+}
+
+inline op clears() {
+  Parrot_clear_s(interpreter);
+  goto NEXT();
+}
+
+inline op clearp() {
+  Parrot_clear_p(interpreter);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut

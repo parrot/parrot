@@ -1,0 +1,258 @@
+/*
+** bit.ops
+*/
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+bit.ops - Bitwise Operations
+
+=head1 DESCRIPTION
+
+Operations that deal with bits directly, either individually 
+or in groups.
+
+=over 4
+
+=cut
+
+###############################################################################
+
+=item B<band>(inout INT, in INT)
+
+=item B<band>(in PMC, in INT)
+
+=item B<band>(in PMC, in PMC)
+
+Set the bits of $1 according to the B<and> of the corresponding bits from $1 and $2.
+
+=item B<band>(out INT, in INT, in INT)
+
+=item B<band>(in PMC, in PMC, in INT)
+
+=item B<band>(in PMC, in PMC, in PMC)
+
+Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
+
+=cut
+
+inline op band(inout INT, in INT) {
+  $1 &= $2;
+  goto NEXT();
+}
+
+inline op band(in PMC, in INT) {
+  $1->vtable->bitwise_and_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op band(in PMC, in PMC) {
+  $1->vtable->bitwise_and(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op band(out INT, in INT, in INT) {
+  $1 = $2 & $3;
+  goto NEXT();
+}
+
+inline op band(in PMC, in PMC, in INT) {
+  $2->vtable->bitwise_and_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op band(in PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_and(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<bnot>(out INT, in INT)
+
+=item B<bnot>(in PMC, in PMC)
+
+Set the bits of $1 to the B<not> of the corresponding bits from $2.
+
+=cut
+
+inline op bnot(out INT, in INT) {
+  $1 = ~ $2;
+  goto NEXT();
+}
+
+inline op bnot(in PMC, in PMC) {
+  $2->vtable->bitwise_not(interpreter, $2, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<bor>(inout INT, in INT)
+
+=item B<bor>(in PMC, in INT)
+
+=item B<bor>(in PMC, in PMC)
+
+Set the bits of $1 according to the B<or> of the corresponding bits from $1 and $2.
+
+=item B<bor>(out INT, in INT, in INT)
+
+=item B<bor>(in PMC, in PMC, in INT)
+
+=item B<bor>(in PMC, in PMC, in PMC)
+
+Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
+
+=cut
+
+inline op bor(inout INT, in INT) {
+  $1 |= $2;
+  goto NEXT();
+}
+
+inline op bor(in PMC, in INT) {
+  $1->vtable->bitwise_or_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bor(in PMC, in PMC) {
+  $1->vtable->bitwise_or(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bor(out INT, in INT, in INT) {
+  $1 = $2 | $3;
+  goto NEXT();
+}
+
+inline op bor(in PMC, in PMC, in INT) {
+  $2->vtable->bitwise_or_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op bor(in PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_or(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<shl>(out INT, in INT, in INT)
+
+=item B<shl>(in PMC, in PMC, in PMC)
+
+Set $1 to the value of $2 shifted left by $3 bits.
+
+=cut
+
+inline op shl(out INT, in INT, in INT) {
+  $1 = $2 << $3;
+  goto NEXT();
+}
+
+inline op shl(in PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_shl(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<shr>(out INT, in INT, in INT)
+
+=item B<shr>(in PMC, in PMC, in PMC)
+
+Set $1 to the value of $2 shifted right by $3 bits.
+
+=cut
+
+inline op shr(out INT, in INT, in INT) {
+  $1 = $2 >> $3;
+  goto NEXT();
+}
+
+inline op shr(in PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_shr(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<lsr>(out INT, in INT, in INT)
+
+Set $1 to the value of $2 logically shifted right by $3 bits.
+
+=cut
+
+inline op lsr(out INT, in INT, in INT) {
+  $1 = (INTVAL)((UINTVAL)$2 >> $3);
+  goto NEXT();
+}
+
+########################################
+
+=item B<bxor>(inout INT, in INT)
+
+=item B<bxor>(in PMC, in INT)
+
+=item B<bxor>(in PMC, in PMC)
+
+Set the bits of $1 according to the B<xor> of the corresponding bits from $1 and $2.
+
+=item B<bxor>(out INT, in INT, in INT)
+
+=item B<bxor>(in PMC, in PMC, in INT)
+
+=item B<bxor>(in PMC, in PMC, in PMC)
+
+Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
+
+=cut
+
+inline op bxor(inout INT, in INT) {
+  $1 ^= $2;
+  goto NEXT();
+}
+
+inline op bxor(in PMC, in INT) {
+  $1->vtable->bitwise_xor_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bxor(in PMC, in PMC) {
+  $1->vtable->bitwise_xor(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bxor(out INT, in INT, in INT) {
+  $1 = $2 ^ $3;
+  goto NEXT();
+}
+
+inline op bxor(in PMC, in PMC, in INT) {
+  $2->vtable->bitwise_xor_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op bxor(in PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_xor(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut

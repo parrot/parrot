@@ -8,37 +8,479 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-pmc.ops
+pmc.ops - PMC Operations
 
 =cut
 
 =head1 DESCRIPTION
 
-Library of ops to do PMC introspective things
+Operations that deal with PMCs, including creation and 
+destruction, manipulation, and introspection.
 
 =cut
 
-
 ###############################################################################
 
-=head2 Read ops
+=head2 Creation and Types
 
-Ops to read from PMC fields
+These operations are used to create PMCs and examine 
+type information.
 
 =over 4
 
 =cut
 
-
 ########################################
 
-=item B<pmcflags>(out INT, in PMC)
+=item B<new>(out PMC, in INT)
 
-Retrieve the flags from a PMC
+=item B<new>(out PMC, in INT, in PMC)
+
+Create a new PMC of class $2; look in F<core_pmcs.h> for the base
+vtable types. The assembler allows you to specify PMCs by type
+name as well as by integer - you should do this for compatibility,
+to avoid problems if the base types get reassigned. For example:
+
+  new P0, .PerlScalar
+
+Optionally a PMC may be passed to the constructor. It's up to the
+class, what to do with the intializer.
+s. PDD02 for more.
 
 =cut
 
-inline op pmcflags(out INT, in PMC) {
-  $1 = PObj_get_FLAGS($2);
+op new(out PMC, in INT) {
+  if ($2 <= 0 || $2 >= enum_class_max) {
+    internal_exception(1, "Illegal PMC enum (%d) in new\n", (int)$2);
+    abort(); /* Deserve to lose */
+  }
+
+  /* Why?? If we're creating a continuation, the continuation PMC
+   * needs to be in the destination register before its init method
+   * copies the registers. */
+  $1 = pmc_new_noinit(interpreter, $2);
+  $1->vtable->init(interpreter, $1);
   goto NEXT();
 }
+
+op new(out PMC, in INT, in PMC) {
+  if ($2 <= 0 || $2 >= enum_class_max) {
+    internal_exception(1, "Illegal PMC enum (%d) in new\n", (int)$2);
+  }
+  $1 = pmc_new_init(interpreter, $2, $3);
+  goto NEXT();
+}
+
+########################################
+
+=item B<typeof>(out STR, in PMC)
+
+=item B<typeof>(out INT, in PMC)
+
+Return the type of PMC in $2.
+
+=item B<typeof>(out INT, in PMC, in KEY)
+
+Return the type of the entry in aggregate PMC in $2 at key $3.
+
+=cut
+
+inline op typeof (out STR, in PMC) {
+  $1 = $2->vtable->name(interpreter, $2);
+  goto NEXT();
+}
+
+inline op typeof (out INT, in PMC) {
+  $1 = $2->vtable->type(interpreter, $2);
+  goto NEXT();
+}
+
+inline op typeof (out INT, in PMC, in KEY) {
+  $1 = $2->vtable->type_keyed(interpreter, $2, $3);
+  goto NEXT();
+}
+
+########################################
+
+=item B<typeof>(out STR, in INT)
+
+Return the (native) parrot type of datatype $2.
+
+=cut
+
+inline op typeof(out STR, in INT) {
+    if ($2 > 0 && $2 < enum_class_max)
+		$1 = Parrot_base_vtables[$2].name(interpreter, 0);
+    else
+		$1 = Parrot_get_datatype_name(interpreter, $2);
+    goto NEXT();
+}
+
+########################################
+
+=item B<find_type>(out INT, in STR)
+
+Find the PMC type or parrot data type by name.
+
+=cut
+
+op find_type(out INT, in STR) {
+    PMC * key = key_new_string(interpreter, $2);
+    PMC *classname_hash = VTABLE_get_pmc_keyed_int(interpreter,
+      interpreter->iglobals, IGLOBALS_CLASSNAME_HASH);
+
+    $1 = VTABLE_get_integer_keyed(interpreter, classname_hash, key);
+    if ($1 == enum_type_undef)
+	$1 = Parrot_get_datatype_enum(interpreter, $2);
+    goto NEXT();
+}
+
+########################################
+
+=item B<valid_type>(out INT, in INT)
+
+Check if the PMC type or parrot data type $2 is valid.
+
+=cut
+
+op valid_type(out INT, in INT) {
+    if ($2 > 0 && $2 < enum_class_max)
+        $1 = 1;
+    else if ($2 >= enum_first_type && $2 < enum_last_type)
+        $1 = 1;
+    else
+        $1 = 0;
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Basic Operations
+
+A few simple and common PMC operations.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<find_method>(out PMC, in PMC, in STR)
+
+Looks up method $3 in $2's vtable, placing the corresponding method
+PMC in $1.
+ 
+ =cut
+ 
+op find_method(out PMC, in PMC, in STR) {
+    $1 = $2->vtable->find_method(interpreter, $2, $3);
+    goto NEXT();
+}
+
+########################################
+
+=item B<defined>(out INT, in PMC)
+
+=item B<defined>(out INT, in PMC, in INTKEY)
+
+=item B<defined>(out INT, in PMC, in KEY)
+
+Test for PMC definedness.
+
+=item B<exists>(out INT, in PMC, in INTKEY)
+
+=item B<exists>(out INT, in PMC, in KEY)
+
+Test for key existence.
+
+=cut
+
+inline op defined(out INT, in PMC) {
+  $1 = $2 ? $2->vtable->defined(interpreter, $2) : 0;
+  goto NEXT();
+}
+
+inline op defined(out INT, in PMC, in INTKEY) {
+  $1 = $2 ? $2->vtable->defined_keyed_int(interpreter, $2, $3) : 0;
+  goto NEXT();
+}
+
+inline op defined(out INT, in PMC, in KEY) {
+  $1 = ($2 && $3) ? $2->vtable->defined_keyed(interpreter, $2, $3) : 0;
+  goto NEXT();
+}
+
+inline op exists(out INT, in PMC, in INTKEY) {
+  $1 = $2 ? $2->vtable->exists_keyed_int(interpreter, $2, $3) : 0;
+  goto NEXT();
+}
+
+inline op exists(out INT, in PMC, in KEY) {
+  $1 = ($2 && $3) ? $2->vtable->exists_keyed(interpreter, $2, $3) : 0;
+  goto NEXT();
+}
+
+########################################
+
+=item B<delete>(in PMC, in KEY)
+
+Delete the specified entry $2 from aggregate $1.
+
+=cut
+
+inline op delete(in PMC, in KEY) {
+  $1->vtable->delete_keyed(interpreter, $1, $2);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Fast access ops
+
+The fast access ops are shortcuts to common operations implemented in PMCs.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<push>(in PMC, in INT)
+
+=item B<push>(in PMC, in NUM)
+
+=item B<push>(in PMC, in STR)
+
+=item B<push>(in PMC, in PMC)
+
+Push $2 onto the end of the aggregate PMC $1, if that operation is defined.
+
+=cut
+
+inline op push (in PMC, in INT) {
+    $1->vtable->push_integer(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op push (in PMC, in NUM) {
+    $1->vtable->push_float(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op push (in PMC, in STR) {
+    $1->vtable->push_string(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op push (in PMC, in PMC) {
+    $1->vtable->push_pmc(interpreter, $1, $2);
+    goto NEXT();
+}
+
+########################################
+
+=item B<pop>(out INT, in PMC)
+
+=item B<pop>(out NUM, in PMC)
+
+=item B<pop>(out STR, in PMC)
+
+=item B<pop>(out PMC, in PMC)
+
+Pop off last entry in the aggregate $2, placing the result in $1.
+
+=cut
+
+inline op pop (out INT, in PMC) {
+    $1 = $2->vtable->pop_integer(interpreter, $2);
+    goto NEXT();
+}
+
+inline op pop (out NUM, in PMC) {
+    $1 = $2->vtable->pop_float(interpreter, $2);
+    goto NEXT();
+}
+
+inline op pop (out STR, in PMC) {
+    $1 = $2->vtable->pop_string(interpreter, $2);
+    goto NEXT();
+}
+
+inline op pop (out PMC, in PMC) {
+    $1 = $2->vtable->pop_pmc(interpreter, $2);
+    goto NEXT();
+}
+
+########################################
+
+=item B<unshift>(in PMC, in INT)
+
+=item B<unshift>(in PMC, in NUM)
+
+=item B<unshift>(in PMC, in STR)
+
+=item B<unshift>(in PMC, in PMC)
+
+Unshift $2 onto the end of the aggregate PMC $1, if that operation is defined.
+
+=cut
+
+inline op unshift (in PMC, in INT) {
+    $1->vtable->unshift_integer(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op unshift (in PMC, in NUM) {
+    $1->vtable->unshift_float(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op unshift (in PMC, in STR) {
+    $1->vtable->unshift_string(interpreter, $1, $2);
+    goto NEXT();
+}
+
+inline op unshift (in PMC, in PMC) {
+    $1->vtable->unshift_pmc(interpreter, $1, $2);
+    goto NEXT();
+}
+
+########################################
+
+=item B<shift>(out INT, in PMC)
+
+=item B<shift>(out NUM, in PMC)
+
+=item B<shift>(out STR, in PMC)
+
+=item B<shift>(out PMC, in PMC)
+
+Shift off last entry in the aggregate $2, placing the result in $1.
+
+=cut
+
+inline op shift (out INT, in PMC) {
+    $1 = $2->vtable->shift_integer(interpreter, $2);
+    goto NEXT();
+}
+
+inline op shift (out NUM, in PMC) {
+    $1 = $2->vtable->shift_float(interpreter, $2);
+    goto NEXT();
+}
+
+inline op shift (out STR, in PMC) {
+    $1 = $2->vtable->shift_string(interpreter, $2);
+    goto NEXT();
+}
+
+inline op shift (out PMC, in PMC) {
+    $1 = $2->vtable->shift_pmc(interpreter, $2);
+    goto NEXT();
+}
+
+########################################
+
+=item B<splice>(in PMC, in PMC, in INT, in INT)
+
+Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
+The values are put into the aggregate by a shallow copy. If the values would
+be reused, they have to be B<clone>d.
+
+=cut
+
+inline op splice(in PMC, in PMC, in INT, in INT) {
+    $1->vtable->splice(interpreter, $1, $2, $3, $4);
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Properties
+
+Ops to deal with PMC properties
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<setprop>(in PMC, in STR, in PMC)
+
+Set property $2 to value $3 for PMC $1
+
+=cut
+
+op setprop(in PMC, in STR, in PMC) {
+      $1->vtable->setprop(interpreter, $1, $2, $3);
+      goto NEXT();
+}
+
+########################################
+
+=item B<getprop>(out PMC, in STR, in PMC)
+
+Get property $2 of PMC $3 and put it in $1
+
+=cut
+
+op getprop(out PMC, in STR, in PMC) {
+   $1 = $3->vtable->getprop(interpreter, $3, $2);
+   goto NEXT();
+}
+
+########################################
+
+=item B<delprop>(in PMC, in STR)
+
+Delete property $2 from PMC $1
+
+=cut
+
+op delprop(in PMC, in STR) {
+   $1->vtable->delprop(interpreter, $1, $2);
+   goto NEXT();
+}
+
+########################################
+
+=item B<prophash>(out PMC, in PMC)
+
+Get a hash for the properties in PMC $2 and put it in $1
+
+=cut
+
+op prophash(out PMC, in PMC) {
+   $1 = $2->vtable->getprops(interpreter, $2);
+   goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut

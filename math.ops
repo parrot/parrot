@@ -6,18 +6,1159 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-math.ops
+math.ops - Mathematical Operations
 
 =cut
 
 =head1 DESCRIPTION
 
-Parrot's library of math ops.
+Operations that perform some sort of mathematics, including both basic 
+math and transcendental functions.
 
 =cut
 
+###############################################################################
+
+=head2 Arithmetic operations
+
+These operations store the results of arithmetic on other registers and
+constants into their destination register, $1.
+
+=over 4
+
+=cut
 
 ########################################
+
+=item B<abs>(inout INT)
+
+=item B<abs>(inout NUM)
+
+Set $1 to it's absolute value.
+
+=item B<abs>(out INT, in INT)
+
+=item B<abs>(out INT, in NUM)
+
+=item B<abs>(out NUM, in INT)
+
+=item B<abs>(out NUM, in NUM)
+
+Set $1 to absolute value of $2.
+
+=cut
+
+inline op abs( inout INT) {
+  $1 = abs( $1 );
+  goto NEXT();
+}
+
+inline op abs(inout NUM) {
+  $1 = fabs( $1 );
+  goto NEXT();
+}
+
+inline op abs(out INT, in INT) {
+  if ($2 < 0) {
+    $1 = - (INTVAL)$2;
+  }
+  else {
+    $1 = (INTVAL)$2;
+  }
+  goto NEXT();
+}
+
+inline op abs(out INT, in NUM) {
+  if ($2 < 0) {
+    $1 = - (INTVAL)$2;
+  }
+  else {
+    $1 = (INTVAL)$2;
+  }
+  goto NEXT();
+}
+
+inline op abs(out NUM, in INT) {
+  if ($2 < 0) {
+    $1 = - (FLOATVAL)$2;
+  }
+  else {
+    $1 = (FLOATVAL)$2;
+  }
+  goto NEXT();
+}
+
+inline op abs(out NUM, in NUM) {
+  if ($2 < 0) {
+    $1 = - (FLOATVAL)$2;
+  }
+  else {
+    $1 = (FLOATVAL)$2;
+  }
+  goto NEXT();
+}
+
+########################################
+
+=item B<add>(inout INT, in INT)
+
+=item B<add>(inout NUM, in INT)
+
+=item B<add>(inout NUM, in NUM)
+
+=item B<add>(in PMC, in INT)
+
+=item B<add>(in PMC, in NUM)
+
+=item B<add>(in PMC, in PMC)
+
+Increase $1 by the amount in $2.
+
+=item B<add>(out INT, in INT, in INT)
+
+=item B<add>(out NUM, in NUM, in INT)
+
+=item B<add>(out NUM, in NUM, in NUM)
+
+=item B<add>(in PMC, in PMC, in INT)
+
+=item B<add>(in PMC, in PMC, in NUM)
+
+=item B<add>(in PMC, in PMC, in PMC)
+
+Set $1 to the sum of $2 and $3.
+
+=cut
+
+inline op add(inout INT, in INT) {
+  $1 += $2;
+  goto NEXT();
+}
+
+inline op add(inout NUM, in INT) {
+  $1 += $2;
+  goto NEXT();
+}
+
+inline op add(inout NUM, in NUM) {
+  $1 += $2;
+  goto NEXT();
+}
+
+inline op add(in PMC, in INT) {
+  $1->vtable->add_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op add(in PMC, in NUM) {
+  $1->vtable->add_float(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op add(in PMC, in PMC) {
+  $1->vtable->add(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op add(out INT, in INT, in INT) {
+  $1 = $2 + $3;
+  goto NEXT();
+}
+
+inline op add(out NUM, in NUM, in INT) {
+  $1 = $2 + $3;
+  goto NEXT();
+}
+
+inline op add(out NUM, in NUM, in NUM) {
+  $1 = $2 + $3;
+  goto NEXT();
+}
+
+inline op add(in PMC, in PMC, in INT) {
+  $2->vtable->add_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op add(in PMC, in PMC, in NUM) {
+  $2->vtable->add_float(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op add (in PMC, in PMC, in PMC) {
+  $2->vtable->add(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<cmod>(out INT, in INT, in INT)
+
+NOTE: This "uncorrected mod" algorithm uses the C language's built-in
+mod operator (x % y), which is
+
+    ... the remainder when x is divided by y, and thus is zero
+    when y divides x exactly.
+    ...
+    The direction of truncation for / and the sign of the result
+    for % are machine-dependent for negative operands, as is the
+    action taken on overflow or underflow.
+                                                     -- [1], page 41
+
+Also:
+
+    ... if the second operand is 0, the result is undefined.
+    Otherwise, it is always true that (a/b)*b + a%b is equal to z. If
+    both operands are non-negative, then the remainder is non-
+    negative and smaller than the divisor; if not, it is guaranteed
+    only that the absolute value of the remainder is smaller than
+    the absolute value of the divisor.
+                                                     -- [1], page 205
+
+This op is provided for those who need it (such as speed-sensitive
+applications with heavy use of mod, but using it only with positive
+arguments), but a more mathematically useful mod based on ** floor(x/y)
+and defined with y == 0 is provided by the mod op.
+
+  [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
+      Language*, Second Edition. Prentice Hall, 1988.
+
+TODO: Doesn't the Parrot interpreter need to catch the exception?
+
+=cut
+
+inline op cmod(out INT, in INT, in INT) {
+  $1 = $2 % $3;
+  goto NEXT();
+}
+
+inline op cmod(out PMC, in PMC, in PMC) {
+  $2->vtable->modulus(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<cmod>(out NUM, in NUM, in NUM)
+
+NOTE: This "uncorrected mod" algorithm uses the built-in C math library's
+fmod() function, which computes
+
+    ... the remainder of dividing x by y. The return value is
+    x - n * y, where n is the quotient of x / y, rounded towards
+    zero to an integer.
+                                -- fmod() manpage on RedHat Linux 7.0
+
+In addition, fmod() returns
+
+    the remainder, unless y is zero, when the function fails and
+    errno is set.
+
+According to page 251 of [1], the result when y is zero is implementation-
+defined.
+
+This op is provided for those who need it, but a more mathematically
+useful numeric mod based on floor(x/y) instead of truncate(x/y) and
+defined with y == 0 is provided by the mod op.
+
+  [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
+      Language*, Second Edition. Prentice Hall, 1988.
+
+TODO: Doesn't the Parrot interpreter need to catch the exception?
+
+=cut
+
+inline op cmod(out NUM, in NUM, in NUM) {
+  $1 = fmod($2, $3);
+  goto NEXT();
+}
+
+########################################
+
+=item B<dec>(inout INT)
+
+=item B<dec>(inout NUM)
+
+=item B<dec>(in PMC)
+
+Decrease $1 by one.
+
+=cut
+
+inline op dec(inout INT) {
+  $1--;
+  goto NEXT();
+}
+
+inline op dec(inout NUM) {
+  $1--;
+  goto NEXT();
+}
+
+inline op dec(in PMC) {
+  $1->vtable->decrement(interpreter, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<div>(inout INT, in INT)
+
+=item B<div>(inout NUM, in INT)
+
+=item B<div>(inout NUM, in NUM)
+
+=item B<div>(in PMC, in INT)
+
+=item B<div>(in PMC, in NUM)
+
+=item B<div>(in PMC, in PMC)
+
+Divide $1 by $2.
+
+=item B<div>(out INT, in INT, in INT)
+
+=item B<div>(out NUM, in NUM, in INT)
+
+=item B<div>(out NUM, in NUM, in NUM)
+
+=item B<div>(in PMC, in PMC, in INT)
+
+=item B<div>(in PMC, in PMC, in NUM)
+
+=item B<div>(in PMC, in PMC, in PMC)
+
+Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
+result is truncated (NOT rounded or floored).
+
+=cut
+
+inline op div(inout INT, in INT) {
+  $1 /= $2;
+  goto NEXT();
+}
+
+inline op div(inout NUM, in INT) {
+  $1 /= $2;
+  goto NEXT();
+}
+
+inline op div(inout NUM, in NUM) {
+  $1 /= $2;
+  goto NEXT();
+}
+
+inline op div (in PMC, in INT) {
+  $1->vtable->divide_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op div (in PMC, in NUM) {
+  $1->vtable->divide_float(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op div(out INT, in INT, in INT) {
+  $1 = $2 / $3;
+  goto NEXT();
+}
+
+inline op div(out NUM, in NUM, in INT) {
+  $1 = $2 / $3;
+  goto NEXT();
+}
+
+inline op div(out NUM, in NUM, in NUM) {
+  $1 = $2 / $3;
+  goto NEXT();
+}
+
+inline op div (in PMC, in PMC, in INT) {
+  $2->vtable->divide_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op div (in PMC, in PMC, in NUM) {
+  $2->vtable->divide_float(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op div (in PMC, in PMC, in PMC) {
+  $2->vtable->divide(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<inc>(inout INT)
+
+=item B<inc>(inout NUM)
+
+=item B<inc>(in PMC)
+
+Increase $1 by one.
+
+=cut
+
+inline op inc(inout INT) {
+  $1++;
+  goto NEXT();
+}
+
+inline op inc(inout NUM) {
+  $1++;
+  goto NEXT();
+}
+
+inline op inc(in PMC) {
+  $1->vtable->increment(interpreter, $1);
+  goto NEXT();
+}
+
+
+########################################
+
+=item B<mod>(out INT, in INT, in INT)
+
+NOTE: This "corrected mod" algorithm is based on the C code on page 70
+of [1]. Assuming correct behavior of the built-in mod operator (%) with
+positive arguments, this algorithm implements a mathematically convenient
+version of mod, defined thus:
+
+  x mod y = x - y * floor(x / y)
+
+For more information on this definition of mod, see section 3.4 of [2],
+pages 81-85.
+
+References:
+
+  [1] Donald E. Knuth, *MMIXware: A RISC Computer for the Third
+      Millennium* Springer, 1999.
+
+  [2] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
+      Mathematics*, Second Edition. Addison-Wesley, 1994.
+
+=item B<mod>(in PMC, in PMC, in PMC)
+
+Sets $1 to the modulus of $2 and $3.
+
+=item B<mod>(in PMC, in INT)
+
+Sets $1 to the modulus of $1 and $2.
+
+=cut
+
+op mod(out INT, in INT, in INT) {
+  INTVAL y = $2;
+  INTVAL z = $3;
+  INTVAL s = 0;
+  INTVAL r;
+
+  if (z == 0) {
+    r = y;
+  }
+  else {
+    if (y < 0) { s += 2; y = -y; }
+    if (z < 0) { s += 1; z = -z; }
+
+    r = y % z;
+
+    switch (s) {
+      case 0 + 0:            break;
+      case 0 + 1: r = r - z; break;
+      case 2 + 0: r = z - r; break;
+      case 2 + 1: r = -r;    break;
+    }
+  }
+
+  $1 = r;
+  goto NEXT();
+}
+
+inline op mod (in PMC, in PMC, in PMC) {
+  $2->vtable->modulus(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op mod ( in PMC, in INT ) {
+  $1->vtable->modulus_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+
+########################################
+
+=item B<mod>(out NUM, in NUM, in NUM)
+
+NOTE: This "corrected mod" algorithm is based on the formula of [1]:
+
+  x mod y = x - y * floor(x / y)
+
+For more information on this definition of mod, see section 3.4 of [1],
+pages 81-85.
+
+References:
+
+  [1] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
+      Mathematics*, Second Edition. Addison-Wesley, 1994.
+
+=cut
+
+op mod(out NUM, in NUM, in NUM) {
+#ifdef __LCC__
+
+  /* Another workaround for buggy code generation in the lcc compiler-
+   * adding a temporary variable makes it pass the test.
+   */
+  FLOATVAL temp = $3 * floor($2 / $3);
+
+  $1 = $3
+     ? ($2 - temp)
+     : $2;
+#else
+  $1 = $3
+     ? ($2 - $3 * floor($2 / $3))
+     : $2;
+#endif
+  goto NEXT();
+}
+
+
+########################################
+
+=item B<mul>(inout INT, in INT)
+
+=item B<mul>(inout NUM, in INT)
+
+=item B<mul>(inout NUM, in NUM)
+
+=item B<mul>(in PMC, in INT)
+
+=item B<mul>(in PMC, in NUM)
+
+=item B<mul>(in PMC, in PMC)
+
+Set $1 to the product of $1 and $2.
+
+=item B<mul>(out INT, in INT, in INT)
+
+=item B<mul>(out NUM, in NUM, in INT)
+
+=item B<mul>(out NUM, in NUM, in NUM)
+
+=item B<mul>(in PMC, in PMC, in INT)
+
+=item B<mul>(in PMC, in PMC, in NUM)
+
+=item B<mul>(in PMC, in PMC, in PMC)
+
+Set $1 to the product of $2 and $3.
+
+=cut
+
+inline op mul(inout INT, in INT) {
+  $1 *= $2;
+  goto NEXT();
+}
+
+inline op mul(inout NUM, in INT) {
+  $1 *= $2;
+  goto NEXT();
+}
+
+inline op mul(inout NUM, in NUM) {
+  $1 *= $2;
+  goto NEXT();
+}
+
+inline op mul ( in PMC, in INT ) {
+  $1->vtable->multiply_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op mul ( in PMC, in NUM ) {
+  $1->vtable->multiply_float(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op mul (in PMC, in PMC) {
+  $1->vtable->multiply(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op mul(out INT, in INT, in INT) {
+  $1 = $2 * $3;
+  goto NEXT();
+}
+
+inline op mul(out NUM, in NUM, in INT) {
+  $1 = $2 * $3;
+  goto NEXT();
+}
+
+inline op mul(out NUM, in NUM, in NUM) {
+  $1 = $2 * $3;
+  goto NEXT();
+}
+
+inline op mul (in PMC, in PMC, in INT) {
+  $2->vtable->multiply_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op mul (in PMC, in PMC, in NUM) {
+  $2->vtable->multiply_float(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op mul (in PMC, in PMC, in PMC) {
+  $2->vtable->multiply(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<neg>(inout INT)
+
+=item B<neg>(inout NUM)
+
+Set $1 to its negative.
+
+=item B<neg>(out INT, in INT)
+
+=item B<neg>(out NUM, in NUM)
+
+=item B<neg>(in PMC, in PMC)
+
+Set $1 to the negative of $2.
+
+=cut
+
+inline op neg(inout INT) {
+  $1 = 0 - $1;
+  goto NEXT();
+}
+
+inline op neg(inout NUM) {
+  $1 = 0.0 - $1;
+  goto NEXT();
+}
+
+inline op neg(out INT, in INT) {
+  $1 = 0 - $2;
+  goto NEXT();
+}
+
+inline op neg(out NUM, in NUM) {
+  $1 = 0.0 - $2;
+  goto NEXT();
+}
+
+inline op neg(in PMC, in PMC) {
+  $2->vtable->neg(interpreter, $2, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<pow>(out NUM, in INT, in INT)
+
+=item B<pow>(out NUM, in INT, in NUM)
+
+=item B<pow>(out NUM, in NUM, in INT)
+
+=item B<pow>(out NUM, in NUM, in NUM)
+
+Set $1 to $2 raised to the power $3.
+
+=cut
+
+inline op pow(out NUM, in INT, in INT) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op pow(out NUM, in INT, in NUM) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op pow(out NUM, in NUM, in INT) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op pow(out NUM, in NUM, in NUM) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+########################################
+
+=item B<sub>(inout INT, in INT)
+
+=item B<sub>(inout NUM, in INT)
+
+=item B<sub>(inout NUM, in NUM)
+
+=item B<sub>(in PMC, in INT)
+
+=item B<sub>(in PMC, in NUM)
+
+=item B<sub>(in PMC, in PMC)
+
+Decrease $1 by the amount in $2.
+
+=item B<sub>(out INT, in INT, in INT)
+
+=item B<sub>(out NUM, in NUM, in INT)
+
+=item B<sub>(out NUM, in NUM, in NUM)
+
+=item B<sub>(in PMC, in PMC, in INT)
+
+=item B<sub>(in PMC, in PMC, in NUM)
+
+=item B<sub>(in PMC, in PMC, in PMC)
+
+Set $1 to $2 minus $3.
+
+=cut
+
+inline op sub(inout INT, in INT) {
+  $1 -= $2;
+  goto NEXT();
+}
+
+inline op sub(inout NUM, in INT) {
+  $1 -= $2;
+  goto NEXT();
+}
+
+inline op sub(inout NUM, in NUM) {
+  $1 -= $2;
+  goto NEXT();
+}
+
+inline op sub(in PMC, in INT) {
+  $1->vtable->subtract_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op sub(in PMC, in NUM) {
+  $1->vtable->subtract_float(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op sub(in PMC, in PMC) {
+  $1->vtable->subtract(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op sub(out INT, in INT, in INT) {
+  $1 = $2 - $3;
+  goto NEXT();
+}
+
+inline op sub(out NUM, in NUM, in INT) {
+  $1 = $2 - $3;
+  goto NEXT();
+}
+
+inline op sub(out NUM, in NUM, in NUM) {
+  $1 = $2 - $3;
+  goto NEXT();
+}
+
+inline op sub(in PMC, in PMC, in INT) {
+  $2->vtable->subtract_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op sub(in PMC, in PMC, in NUM) {
+  $2->vtable->subtract_float(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op sub (in PMC, in PMC, in PMC) {
+  $2->vtable->subtract(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Transcendental mathematical operations
+
+These operations perform various transcendental operations such as logarithmics
+and trigonometrics.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<acos>(out NUM, in INT)
+
+=item B<acos>(out NUM, in NUM)
+
+Set $1 to the arc cosine (in radians) of $2.
+
+=cut
+
+inline op acos(out NUM, in INT) {
+  $1 = acos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op acos(out NUM, in NUM) {
+  $1 = acos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<asec>(out NUM, in INT)
+
+=item B<asec>(out NUM, in NUM)
+
+Set $1 to the arc secant (in radians) of $2.
+
+=cut
+
+inline op asec(out NUM, in INT) {
+  $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
+  goto NEXT();
+}
+
+inline op asec(out NUM, in NUM) {
+  $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
+  goto NEXT();
+}
+
+########################################
+
+=item B<asin>(out NUM, in INT)
+
+=item B<asin>(out NUM, in NUM)
+
+Set $1 to the arc sine (in radians) of $2.
+
+=cut
+
+inline op asin(out NUM, in INT) {
+  $1 = asin((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op asin(out NUM, in NUM) {
+  $1 = asin((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<atan>(out NUM, in INT)
+
+=item B<atan>(out NUM, in NUM)
+
+=item B<atan>(out NUM, in INT, in INT)
+
+=item B<atan>(out NUM, in INT, in NUM)
+
+=item B<atan>(out NUM, in NUM, in INT)
+
+=item B<atan>(out NUM, in NUM, in NUM)
+
+The two-argument versions set $1 to the arc tangent (in radians) of $2.
+
+The three-argument versions set $1 to the arc tangent (in radians) of
+$2 / $3, taking account of the signs of the arguments in determining the
+quadrant of the result.
+
+=cut
+
+inline op atan(out NUM, in INT) {
+  $1 = atan((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op atan(out NUM, in NUM) {
+  $1 = atan((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op atan(out NUM, in INT, in INT) {
+  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op atan(out NUM, in INT, in NUM) {
+  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op atan(out NUM, in NUM, in INT) {
+  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op atan(out NUM, in NUM, in NUM) {
+  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+########################################
+
+=item B<cos>(out NUM, in INT)
+
+=item B<cos>(out NUM, in NUM)
+
+Set $1 to the cosine of $2 (given in radians).
+
+=cut
+
+inline op cos(out NUM, in INT) {
+  $1 = cos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op cos(out NUM, in NUM) {
+  $1 = cos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<cosh>(out NUM, in INT)
+
+=item B<cosh>(out NUM, in NUM)
+
+Set $1 to the hyperbolic cosine of $2 (given in radians).
+
+=cut
+
+inline op cosh(out NUM, in INT) {
+  $1 = cosh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op cosh(out NUM, in NUM) {
+  $1 = cosh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<exp>(out NUM, in INT)
+
+=item B<exp>(out NUM, in NUM)
+
+Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm.
+
+=cut
+
+inline op exp(out NUM, in INT) {
+  $1 = exp((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op exp(out NUM, in NUM) {
+  $1 = exp((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<ln>(out NUM, in INT)
+
+=item B<ln>(out NUM, in NUM)
+
+Set $1 to the natural (base I<e>) logarithm of $2.
+
+=cut
+
+inline op ln(out NUM, in INT) {
+  $1 = log((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op ln(out NUM, in NUM) {
+  $1 = log((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<log10>(out NUM, in INT)
+
+=item B<log10>(out NUM, in NUM)
+
+Set $1 to the base 10 logarithm of $2.
+
+=cut
+
+inline op log10(out NUM, in INT) {
+  $1 = log10((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op log10(out NUM, in NUM) {
+  $1 = log10((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<log2>(out NUM, in INT)
+
+=item B<log2>(out NUM, in NUM)
+
+Set $1 to the base 2 logarithm of $2.
+
+=cut
+
+op log2(out NUM, in INT) {
+   FLOATVAL temp = log((FLOATVAL)2.0);
+  $1 = log((FLOATVAL)$2) / temp;
+  goto NEXT();
+}
+
+op log2(out NUM, in NUM) {
+   FLOATVAL temp = log((FLOATVAL)2.0);
+  $1 = log((FLOATVAL)$2) / temp;
+  goto NEXT();
+}
+
+########################################
+
+=item B<sec>(out NUM, in INT)
+
+=item B<sec>(out NUM, in NUM)
+
+Set $1 to the secant of $2 (given in radians).
+
+=cut
+
+inline op sec(out NUM, in INT) {
+  $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op sec(out NUM, in NUM) {
+  $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<sech>(out NUM, in INT)
+
+=item B<sech>(out NUM, in NUM)
+
+Set $1 to the hyperbolic secant of $2 (given in radians).
+
+=cut
+
+inline op sech(out NUM, in INT) {
+  $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op sech(out NUM, in NUM) {
+  $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<sin>(out NUM, in INT)
+
+item B<sin>(out NUM, in NUM)
+
+Set $1 to the sine of $2 (given in radians).
+
+=cut
+
+inline op sin(out NUM, in INT) {
+  $1 = sin((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op sin(out NUM, in NUM) {
+  $1 = sin((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<sinh>(out NUM, in INT)
+
+=item B<sinh>(out NUM, in NUM)
+
+Set $1 to the hyperbolic sine of $2 (given in radians).
+
+=cut
+
+inline op sinh(out NUM, in INT) {
+  $1 = sinh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op sinh(out NUM, in NUM) {
+  $1 = sinh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<tan>(out NUM, in INT)
+
+=item B<tan>(out NUM, in NUM)
+
+Set $1 to the tangent of $2 (given in radians).
+
+=cut
+
+inline op tan(out NUM, in INT) {
+  $1 = tan((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op tan(out NUM, in NUM) {
+  $1 = tan((FLOATVAL)$2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<tanh>(out NUM, in INT)
+
+=item B<tanh>(out NUM, in NUM)
+
+Set $1 to the hyperbolic tangent of $2 (given in radians).
+
+=cut
+
+inline op tanh(out NUM, in INT) {
+  $1 = tanh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op tanh(out NUM, in NUM) {
+  $1 = tanh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
 
 =head2 Other mathematical operations
 
@@ -26,7 +1167,6 @@ Implementations of various mathematical operations
 =over 4
 
 =cut
-
 
 ########################################
 
@@ -77,11 +1217,10 @@ Least Common Multiple
 =cut
 
 inline op lcm(out INT, in INT, in INT) {
-
-UINTVAL q = 0;
-UINTVAL c = 0;
-INTVAL saved_var2 = $2;
-INTVAL saved_var3 = $3;
+  UINTVAL q = 0;
+  UINTVAL c = 0;
+  INTVAL saved_var2 = $2;
+  INTVAL saved_var3 = $3;
   while ($3 != 0) {
     q = (UINTVAL)floor( (FLOATVAL)$2/$3 );
     c = $2 - $3*q;
@@ -94,11 +1233,10 @@ INTVAL saved_var3 = $3;
 }
 
 inline op lcm(out NUM, in INT, in INT) {
-
-UINTVAL q = 0;
-UINTVAL c = 0;
-INTVAL saved_var2 = $2;
-INTVAL saved_var3 = $3;
+  UINTVAL q = 0;
+  UINTVAL c = 0;
+  INTVAL saved_var2 = $2;
+  INTVAL saved_var3 = $3;
   while ($3 != 0) {
     q = (UINTVAL)floor( (FLOATVAL)$2/$3 );
     c = $2 - $3*q;
@@ -109,7 +1247,6 @@ INTVAL saved_var3 = $3;
   $1 = (FLOATVAL)saved_var2*saved_var3;
   goto NEXT();
 }
-
 
 ########################################
 
@@ -122,10 +1259,10 @@ Factorial, n!. Calculates the product of 1 to N.
 =cut
 
 inline op fact(out INT, in INT) {
-/* Coercing a negative to a UINT can get pretty ugly
- * in this situation. */
-INTVAL i = $2;
-UINTVAL q = 1;
+  /* Coercing a negative to a UINT can get pretty ugly
+   * in this situation. */
+  INTVAL i = $2;
+  UINTVAL q = 1;
   while(i>0) {
     q = q*i;
     i--;
@@ -135,10 +1272,10 @@ UINTVAL q = 1;
 }
 
 inline op fact(out NUM, in INT) {
-/* Coercing a negative to a UINT can get pretty ugly
- * in this situation. */
-INTVAL i = $2;
-FLOATVAL q = 1;
+  /* Coercing a negative to a UINT can get pretty ugly
+   * in this situation. */
+  INTVAL i = $2;
+  FLOATVAL q = 1;
   while(i>0) {
     q = q*i;
     i--;
@@ -147,9 +1284,11 @@ FLOATVAL q = 1;
   goto NEXT();
 }
 
+=back
 
-########################################
+=cut
 
+###############################################################################
 
 =head1 COPYRIGHT
 
