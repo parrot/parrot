@@ -258,6 +258,7 @@ void                push_namespace(Symbol * ns);
 Symbol              *pop_namespace();
 void                init_symbol_tables();
 void                init_builtin_types();
+Symbol              *split(const char *, const char *);
 Symbol              *lookup_symbol(const char *);
 Symbol              *lookup_symbol_in_tab(SymbolTable *, const char *);
 Symbol              *lookup_symbol_scope(SymbolTable *, const char *, int);
