@@ -31,8 +31,8 @@
 
 #include "symreg.h"
 #include "instructions.h"
-#include "class.h"
 #include "symbol.h"
+#include "class.h"
 #include "sets.h"
 #include "cfg.h"
 #include "stacks.h"

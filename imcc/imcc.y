@@ -39,6 +39,18 @@
  * many are polymorphic.
  */
 
+/*
+ * Symbol tables and lists
+ * This won't scale to multiple namespaces, for now we just keep
+ * one symbol table per compilation file.
+ */
+SymbolTable global_sym_tab;
+
+/*
+ * No nested classes for now.
+ */
+static Class * current_class;
+
 
 /*
  * these are used for constructing one INS
@@ -193,6 +205,9 @@ static char * inv_op(char *op) {
     char * s;
     SymReg * sr;
     Instruction *i;
+    Symbol * sym;
+    SymbolList * symlist;
+    SymbolTable * symtab;
 }
 
 /* We need precedence for a few tokens to resolve a couple of conflicts */
@@ -294,12 +309,23 @@ emit:
     ;
 
 class:
-        CLASS class_body ENDCLASS
-        { $$ = 0; }
+        CLASS IDENTIFIER
+        { 
+           Symbol * sym = new_symbol($2);
+           current_class = new_class(sym);
+           sym->p = (void*)current_class;
+           store_symbol(&global_sym_tab, sym);
+        }
+        '\n' class_body ENDCLASS
+        {
+           $$ = 0;
+           current_class = NULL;
+        }
     ;
 
 class_body:
         member_decls
+    |   { $$ = 0; }
     ;
 
 member_decls:
@@ -310,18 +336,33 @@ member_decls:
 member_decl:
         field_decl
     |   method_decl
+    |   '\n' { $$ = 0; }
     ;
 
 field_decl:
-        FIELD type IDENTIFIER
+        FIELD type IDENTIFIER '\n'
         {
+           Symbol * sym = new_symbol($3);
+           if(lookup_field_symbol(current_class, $3)) {
+              fataly(EX_SOFTWARE, sourcefile, line,
+                 "field '%s' previously declared in class '%s'\n",
+                    $3, current_class->sym->name);
+           }
+           store_field_symbol(current_class, sym);
            $$ = 0;
         }
     ;
 
 method_decl:
-        METHOD IDENTIFIER
+        METHOD IDENTIFIER '\n'
         {
+           Symbol * sym = new_symbol($2);
+           if(lookup_method_symbol(current_class, $2)) {
+              fataly(EX_SOFTWARE, sourcefile, line,
+                 "method '%s' previously declared in class '%s'\n",
+                    $2, current_class->sym->name);
+           }
+           store_method_symbol(current_class, sym);
            $$ = 0;
         }
     ;
