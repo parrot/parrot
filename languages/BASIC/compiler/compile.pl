@@ -45,12 +45,12 @@ open(CODE, ">TARG_test.imc") || die;
 
 print CODE qq{.include "RT_initialize.pasm"\n};
 my $debug=0;
-foreach my $seg ("_main", keys %code) {
+foreach my $seg ("_main", "_basicmain", keys %code) {
 	next unless exists $code{$seg};
 	my @debdecl=();
 	$debug=1 if (grep /debug/, @ARGV);
 
-	print CODE ".sub $seg\n";
+	print CODE ".sub $seg\n\tsaveall\n";
 	if (exists $code{$seg}->{declarations}) {
 		foreach my $var (sort keys %{$code{$seg}->{declarations}}) {
 			if ($var=~/_string$/) {
@@ -91,7 +91,7 @@ DEBUGGER_DONE:
 	ret
 EOD
 	}
-	print CODE ".end\n";
+	print CODE "\trestoreall\n\tret\n.end\n";
 	delete $code{$seg};
 }
 print CODE<<RUNTIMESHUTDOWN;

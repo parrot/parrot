@@ -62,6 +62,7 @@ sub runtime_shutdown {
 	# ###################
 	# Program Termination
 	# ###################
+	restoreall
 	ret	# back to _main
 
 SHUTDOWN
@@ -279,15 +280,15 @@ BARE:	# Check for user-subroutine
 	
 	# function assignment...  WRONG-O!
 	#     Don't go looking for lhs expression, please.
-	if ($syms[NEXT] eq "=" and exists $functions{$syms[CURR]}) {
-		# Assignment statement
-		my $var=$syms[CURR];
-		feedme;  # Get the =
-		#print "Going to expression with $syms[CURR]\n";
-		print CODE EXPRESSION;		# Evaluate the expression all queued up.
-		ASSIGNMENT_FUNC($var);
-		goto PARSE_NOFEED;
-	}
+	#if ($syms[NEXT] eq "=" and exists $functions{$syms[CURR]}) {
+	#	# Assignment statement
+	#	my $var=$syms[CURR];
+	#	feedme;  # Get the =
+	#	#print "Going to expression with $syms[CURR]\n";
+	#	print CODE EXPRESSION;		# Evaluate the expression all queued up.
+	#	ASSIGNMENT_FUNC($var);
+	#	goto PARSE_NOFEED;
+	#}
 
 	if ($syms[CURR] eq "_startasm") {
 		feedme;

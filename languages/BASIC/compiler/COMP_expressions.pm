@@ -72,7 +72,13 @@ sub isbuiltin {		# Built in functions
 	return 0;
 }
 sub isuserfunc {
-	return 1 if (grep /^\Q$_[0]\E$/i, keys %functions );
+#	print "Isuserfunc $_[0] and $funcname..";
+	return 0 if $funcname eq $_[0];  # We're processing this, don't count!
+	if (grep /^\Q$_[0]\E$/i, keys %functions ) {
+#		print "Yes\n";
+		return 1;
+	}
+#	print "No\n";
 	return 0
 }
 sub isarray {
@@ -366,11 +372,7 @@ sub fixup {
 		}
 
 		if ($this->[1] eq "BARE") {
-			my %lookup = ( '#' => "_hash",
-				  	'!' => "",
-					'&' => "_amp",
-					'%' => "_percent");
-			$this->[0]=~s/(%|!|\#|&)$/$lookup{$1}/e;
+			$this->[0]=changename($this->[0]);
 		}
 
 		push(@expr, $foo[$t]);
@@ -463,22 +465,16 @@ sub pushargs {
 	return unless @$work;
 	my @args=();
 
-#	print "Work has ", scalar @$work, " things on it.\n";
 	while($$work[-1]->[0] ne "STARTARG") {
 		my $item=pop @$work;
-		if ($item->[1] eq "RESULT") {
-			my $a1=pushthing($code, $optype, @$item);
-			push @args, [ $a1, $item->[0] ];
-		} else {
-			my $a1=pushthing($code, $optype, @$item);
-			push @args, [ $a1, $item->[0] ];
-		}
+		my $a1=pushthing($code, $optype, @$item);
+		push @args, [ $a1, @$item ];
 	}
 	foreach(@args) {
-		push @$code, qq{\t.arg $_->[0]\t\t# $_->[1]};
+		push @$code, qq{\t.arg $_->[0]\t\t# $_->[0]};
 	}
 	pop @$work;  # REmove startarg tag...
-	return scalar @args;
+	return(scalar @args, @args);
 }
 sub optype_of {
 	my($func)=@_;
@@ -507,21 +503,21 @@ sub generate_code {   # Will return a result register, or something.
 		next if ($sym eq ",");  # Commas get ignored, args to stack
 
 		if (isarray($sym) and $lhs) {
-			my $ac=pushargs(\@code, \$optype, \@work);
+			my($ac,@args)=pushargs(\@code, \$optype, \@work);
 			my $extern=$sym;
 			$optype=optype_of($extern);
 			push @code, qq{\t.arg $ac\t\t\t# argc};
 			push @code, qq{\tINSERT NEW VALUE HERE};
-			push @code, qq{\t.arg "$extern"\t\t# array name};
+			push @code, qq{\t.arg "$extern$seg"\t\t# array name};
 			push @code, "\tcall _ARRAY_ASSIGN";
 			return("~Array", "$optype", @code);
 		} elsif (hasargs($sym)) {
-			my $ac=pushargs(\@code, \$optype, \@work);
+			my($ac,@args)=pushargs(\@code, \$optype, \@work);
 			my $extern=$sym;
 			$optype=optype_of($extern);
 			if (isarray($sym)) {
 				push @code, qq{\t.arg $ac\t\t\t# argc};
-				push @code, qq{\t.arg "$extern"\t\t# array name};
+				push @code, qq{\t.arg "$extern$seg"\t\t# array name};
 				push @code, "\tcall _ARRAY_LOOKUP_$optype";
 				push @code, "\t.result \$$optype$retcount";
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
@@ -535,8 +531,19 @@ sub generate_code {   # Will return a result register, or something.
 				$extern=~s/\$/_string/g; $extern=~tr/a-z/A-Z/;
 				push @code, qq{\t.arg $ac\t\t\t# argc};
 				push @code, qq{\tcall  _USERFUNC_$extern};
-				push @code, "\t.result $optype$retcount";
+				push @code, "\t.result \$$optype$retcount";
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
+				$retcount++;
+				foreach my $arg (@args) {
+					if ($arg->[2] eq "BARE") {
+						push @code, "\t.result $arg->[0]";
+					} else {
+						push @code, "\t.result \$"
+						. optype_of($arg->[0]) 
+						. "$retcount\t# Dummy, thrown away";
+						$retcount++;
+					}
+				}
 			}
 			$retcount++;
 		} else {
@@ -661,5 +668,16 @@ sub EXPRESSION {
 	s/$/\n/ for @stream;
 	@stream=("\t#\n", "\t# Evaluating   $whole\n", "\t# Result in $result of type $type\n", @stream);		
 	return($result, $type, @stream);
+}
+sub changename {
+	my($name)=@_;
+	my %lookup = ( '#' => "_hash",
+				  	'!' => "",
+					'&' => "_amp",
+					'%' => "_percent",
+					);
+	$name=~s/(%|!|\#|&)$/$lookup{$1}/e;
+	$name=~tr/A-Z/a-z/;
+	return $name;
 }
 1;

@@ -1064,7 +1064,7 @@ DIMTYPE
 	# Set aside storage for Array $var
 	\$P0 = new PerlHash
 	find_global \$P1, "BASICARR"
-	set \$P1["$var"], \$P0
+	set \$P1["$var$seg"], \$P0
 	store_global "BASICARR", \$P1
 	#
 DIMARR
@@ -1183,12 +1183,15 @@ sub parse_sub {
 
 sub parse_function {
 	feedme;
-	open(CODESAVE, ">&CODE") || die "Cannot save CODE: $!";
-	open(CODE, ">&FUNC") || die "Cannot connect CODE to FUNC: $!";
+	my $f;
 	$funcname=$syms[CURR];
-	#print "Function $funcname  $syms[CURR] CURR\n";
 	my $englishname=english_func($funcname);
 	$functions{$funcname}=$englishname;
+
+	$f="_USERFUNC_$funcname";
+	$f=changename($f);
+	$f=~s/\$/_string/g; $f=~tr/a-z/A-Z/;
+	$seg=$f;
 	CALL_BODY($englishname, "UF");
 }
 
@@ -1210,60 +1213,53 @@ sub CALL_BODY {
 				while($syms[CURR] ne ")") {
 					feedme();
 				}
-				push(@params, "ARRAY", $a);
+				push(@params, $a);
 			} else {
-				push(@params, typeof($syms[CURR]), $a);
+				push(@params, $a);  # Always here?
 			}
 		}
 	}
 	my $argcnt=@params;
-	print CODE <<FUNC_PREAMBLE;
-	#
-	# Function setup for $englishname( @params )
-${prefix}_$englishname:
-	set S5, S0    # Remember the name of the function...
-	bsr NEWFRAME
-	restore I5    # Depth of arguments
-	set I4, @{[ $argcnt/2 ]}     # Expected depth            <--- Compvar
-	ne I5, I4, UF_ERRARGCNT
-	new P5, .PerlArray
-FUNC_PREAMBLE
-		@params=reverse @params;
-		for($_=0; $_<=$#params; $_++) {
-			print CODE qq{\tset P5[$_], "$params[$_]"\n};
-		}
-		for(0..((@params-1)/2)) {
-			print CODE qq{\tbsr UF_ARGLOAD\n};
-		}
-		print CODE <<F_PREAMBLE2;
-	#destroy P5
-	#
-	# BEGIN $prefix code for $englishname
-	#
-F_PREAMBLE2
+	# The outer compiler will provide the framework for the
+	# function call.  We just have to unwind its arguments.
+	$_=scalar @params;
+	push @{$code{$seg}->{code}}, <<EOH;
+	.param int argc
+	eq argc, $_, ${englishname}_ARGOK
+	print "Function $englishname received "
+	print argc
+	print " arguments expected $_\\n"
+	end
+${englishname}_ARGOK:
+EOH
+	
+	foreach (@params) {
+		my $t=typeof($_);
+		$t="string" if $t eq "STRING";
+		$t="float" if $t eq "FLO";
+		$_=changename($_);
+		$_=~s/\$/_string/g; 
+		push @{$code{$seg}->{code}}, qq{\t.param $t $_\n};
+		push @{$code{$seg}->{args}}, $_;
+	}
+	return;
 }
 
 sub parse_endfunc {
 	feedme;
-	print CODE<<POSTSCRIPT;
-FUNC_EXIT_@{[ english_func($funcname)]}:
-	#
-	# Teardown code for $funcname
-	# 
-	#print "Exiting the user function $funcname\\n"
-	set S0, "$funcname"
-	bsr VARLOOKUP
-	bsr VARSTUFF		# Pack into P6
-	set P6, P0		# Curly shuffle.
-	bsr ENDFRAME
-	set I1, 0		# Function found, exectued OK.
-	branch UF_DISPATCH_END  # Return to caller.
-	#
-	#
-POSTSCRIPT
-	
-	open(CODE, ">&CODESAVE") || die "Can't re-open code FH: $!";
+	my $t=$seg;
+	$seg=~s/^_//;       # Remove the _
+	$seg=~tr/A-Z/a-z/;  # lowercase
+	$seg=~s/userfunc_//;
+	if (exists $code{$t}->{args}) {
+		foreach(@{$code{$t}->{args}}) {
+			push @{$code{$t}->{code}}, "\t.return $_\t# Returning arg\n";
+		}
+	}
+	push @{$code{$t}->{code}}, "\t.return $seg\n";
+	$seg="_basicmain";
 	$funcname="";
+	return;
 }
 sub parse_endsub {
 	feedme;
@@ -1376,7 +1372,6 @@ RTBE
 sub parse_data_setup {
 	push @{$code{_data}->{code}},<<DATAPREP;
 	# Prepare the Read/Data stuff
-	saveall
 	find_global \$P1, "RESTOREINFO"
 	find_global \$P2, "READDATA"
 DATAPREP
@@ -1398,14 +1393,11 @@ ADDDATA
 	push @{$code{_data}->{code}},<<DATADONE;
 	store_global "RESTOREINFO", \$P1
 	store_global "READDATA", \$P2
-	restoreall
-	ret
 DATADONE
 }
 sub typeof {
 	my($var)=@_;
-	return "INT" if ($var=~/[%&]$/);
-	return "FLO" if ($var=~/[!#]$/);
+	return "FLO" if ($var=~/[!#%&]$/);
 	return "STRING" if ($var=~/\$$/);
 	return "FLO"
 }

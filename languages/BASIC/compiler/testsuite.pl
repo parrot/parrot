@@ -9,7 +9,7 @@ while(1) {
 		local $/="";
 		$_=<DATA>;
 	}
-	if (/function/ or /end sub/ or /type / or /select/) {
+	if (/end sub/ or /type / or /select/) { # /function/
 		print "Skipped\n";
 		next;
 	}
@@ -32,6 +32,41 @@ while(1) {
 }
 
 __DATA__
+' Function Array scopes, expect 4, 5.6
+function mine(a)
+	dim t(6)
+	t(3)=2
+	mine=a*2
+	print t(3)*2
+end function
+dim t(7)
+t(3)=5.6
+a=mine(5)
+print t(3)
+
+
+STOPPLEASE
+' Passing arrays (expect 12)
+function arrfunc(x())
+	print x(4)
+	arrfunc=55
+end function
+dim g(10)
+g(4)=12
+y=arrfunc(g())
+
+STOPPLEASE
+' Expect 234
+function inkey$(a, b)
+	a=3.14
+	inkey$="234"
+end function
+s$=inkey$(r, 45)
+print s$
+print r
+
+1740 print "Branched"
+	end
 ' Logical Operators 
 print "      AND   OR    XOR   EQV   IMP   a & ! b"
 for i = 0 to 1
@@ -39,12 +74,23 @@ for j = 0 to 1
 print i; j;
 if i and j then a$="True  " else a$="False "
 if i or  j then b$="True  " else b$="False "
-if i xor j then c$="True  " else c$="False "
 if i eqv j then d$="True  " else d$="False "
 if i imp j then e$="True  " else e$="False "
 if i and not j then f$="True   " else f$="False "
 print a$;b$;c$;d$;e$;f$
 next j,i
+
+' Function Array scopes, expect 4, 5.6
+function mine(a)
+	dim t(6)
+	t(3)=2
+	mine=a*2
+	print t(3)*2
+end function
+dim t(7)
+t(3)=5.6
+a=mine(5)
+print t(3)
 
 ' Unary minus goodness
 Dim t7(1),w(10)

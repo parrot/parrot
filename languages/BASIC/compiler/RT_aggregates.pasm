@@ -12,8 +12,13 @@
 	call _ARRAY_BUILDKEY
 	.result key
 	set $P0, BASICARR[array]
+	ne key, "", ARR_NORMAL
+	.return $P0		# Return the whole array.
+	branch ARR_END
+ARR_NORMAL:
 	set $N0, $P0[key]
 	.return $N0
+ARR_END:
 	restoreall
 	ret
 .end
@@ -26,8 +31,13 @@
 	call _ARRAY_BUILDKEY
 	.result key
 	set $P0, BASICARR[array]
+	ne key, "", ARR_NORMAL
+	.return $P0
+	branch ARR_END
+ARR_NORMAL:
 	set $S0, $P0[key]
 	.return $S0
+ARR_END:
 	restoreall
 	ret
 .end
