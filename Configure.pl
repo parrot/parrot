@@ -259,6 +259,7 @@ EOF
     ops		  => "",
     
     configdate    => scalar localtime,
+    expnetworking => 'N',
 );
 
 # What's the platform shell quote character?
@@ -334,6 +335,8 @@ prompt("Which libraries would you like your C compiler to include?", 'libs');
 prompt("How big would you like integers to be?", 'iv');
 prompt("And your floats?", 'nv');
 prompt("What is your native opcode type?", 'opcode_t');
+print "\n\n  Experimental (unstable) features.\n\n";
+prompt("Would you like to enable the network API?", 'expnetworking');
 
 
 {
@@ -701,6 +704,13 @@ if ($c{nv} eq "double") {
 #
 # Also build Parrot/Config.pm
 #
+
+if($c{expnetworking} =~ /y/i) {
+	$c{expnetworking} = 1;
+}
+else {
+	$c{expnetworking} = 0;
+}
 
 print <<"END";
 

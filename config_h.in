@@ -85,6 +85,13 @@ typedef SYNC     Sync;
 #define JIT_ARCHNAME "${jitarchname}"
 #define JIT_CAPABLE  ${jitcapable}
 
+/*
+ * Switches to turn on/off new code so people can compile
+ * the core with minimal breakage.
+ */
+#define EXP_NETWORKING ${expnetworking}
+
+
 #define PARROT_CORE_OPLIB_NAME "core"
 #define PARROT_CORE_OPLIB_INIT Parrot_DynOp_core_${MAJOR}_${MINOR}_${PATCH}
 #define PARROT_CORE_PREDEREF_OPLIB_INIT Parrot_DynOp_core_prederef_${MAJOR}_${MINOR}_${PATCH}
