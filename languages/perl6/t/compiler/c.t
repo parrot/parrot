@@ -7,7 +7,7 @@ use Test::More;
 
 SKIP: {
 skip("running on a perl that does not understand 0b... notation", 1)
-    unless 2 == eval "0b010";
+    if $] < 5.006;
 output_is(<<'CODE', <<'OUT', "Binary");
 sub main() {
 	print 0b0110;
