@@ -41,7 +41,7 @@ const BucketIndex NULLBucketIndex = (BucketIndex)-1;
  * buckets indexed by hash(KEY) mod hash_size */
 const HashIndex NULLHashIndex = (HashIndex)-1;
 
-STRING * hash_get_idx(Interp *interpreter, HASH *hash, INTVAL idx);
+STRING * hash_get_idx(Interp *interpreter, HASH *hash, PMC *key);
 
 /* Is there a way to portably add inlining hints anymore? */
 #define FIXME_INLINE
@@ -339,24 +339,39 @@ hash_lookup(Interp *interpreter, HASH *hash, STRING *key)
     return find_bucket(interpreter, hash, chain, key);
 }
 
-/* given a zero based idx return a hash key
- * FIXME: this is suboptimal
+/*
+ * called by interator
  */
 STRING *
-hash_get_idx(Interp *interpreter, HASH *hash, INTVAL idx)
+hash_get_idx(Interp *interpreter, HASH *hash, PMC * key)
 {
-    HashIndex i;
-    INTVAL n = 0;
-    for (i = 0; i <= hash->max_chain; i++) {
-        BucketIndex bi = lookupBucketIndex(hash, i);
-        while (bi != NULLBucketIndex) {
-            HASHBUCKET *b = getBucket(hash, bi);
-            if (n++ == idx)
-                return b->key;
-            bi = b->next;
+    HashIndex i = key->cache.int_val;
+    BucketIndex bi = (BucketIndex)PMC_data(key);
+    HASHBUCKET *b;
+    /* locate initial */
+    if (bi == (BucketIndex)-2) { /* XXX */
+        bi = lookupBucketIndex(hash, i);
+        while (bi == NULLBucketIndex) {
+            ++i;
+            if (i > hash->max_chain)
+                return NULL;
+            bi = lookupBucketIndex(hash, i);
         }
     }
-    return NULL;
+    b = getBucket(hash, bi);
+    /* locate next */
+    bi = b->next;
+    while (bi == NULLBucketIndex) {
+        ++i;
+        if (i > hash->max_chain) {
+            i = -1;     /* set EOF flag */
+            break;
+        }
+        bi = lookupBucketIndex(hash, i);
+    }
+    key->cache.int_val = i;
+    PMC_data(key) = (void *)bi;
+    return b->key;
 }
 
 HASH_ENTRY *

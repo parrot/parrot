@@ -17,7 +17,7 @@
 #define INT2KEY(i,k) ((k) ? key_new_integer((i), *(k)) : NULL)
 
 static PMC* undef = NULL;
-STRING * hash_get_idx(Interp *interpreter, HASH *hash, INTVAL idx);
+STRING * hash_get_idx(Interp *interpreter, HASH *hash, PMC *key);
 
 static STRING* make_hash_key(Interp* interpreter, PMC * key)
 {
@@ -347,28 +347,25 @@ pmclass PerlHash {
 	switch (what) {
 	    case 0:	/* reset key, iterate from start */
 		ret->cache.int_val = 0;
+		if (!n)
+		    ret->cache.int_val = -1;
+		PMC_data(ret) = (void *)(UINTVAL)-2; /* XXX */
 		break;
 	    case 1:	/* next key */
-		if (ret->cache.int_val < n)
-		    ++ret->cache.int_val;
+		/* do nothing: hash_get_idx does increment the idx */
 		break;
-	    case 2:	/* prev key */
-		if (ret->cache.int_val >= 0)
-		    --ret->cache.int_val;
-		break;
-	    case 3:	/* reset key, iterate from end */
-		ret->cache.int_val = n - 1;
+	    default:
+		internal_exception(1, "Can't iterate from end\n");
 		break;
 	}
 	return ret;
     }
 
     /* used by iterator.pmc:
-     * return hash key for an integer idx in key
+     * return hash key string for key
      */
     STRING* shift_string_keyed(PMC *key) {
-	INTVAL idx = key_integer(INTERP, key);
 	HASH * h = (HASH *)PMC_data(SELF);
-	return hash_get_idx(INTERP, h, idx);
+	return hash_get_idx(INTERP, h, key);
     }
 }

@@ -114,8 +114,7 @@ pmclass Iterator {
     INTVAL get_bool () {
 	PMC *key = SELF->cache.struct_val;
 	PMC *agg = PMC_data(SELF);
-        return key && key->cache.int_val >= 0 &&
-	    key->cache.int_val < VTABLE_elements(INTERP, agg);
+        return key && key->cache.int_val >= 0;
     }
 
     INTVAL get_bool_keyed (PMC* key) {
@@ -363,7 +362,6 @@ pmclass Iterator {
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, 1);
         return ret;
-        return (STRING*)0;
     }
 
     STRING* shift_string_keyed (PMC* key) {

@@ -367,23 +367,30 @@ pmclass SArray {
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
 	PMC *ret = key;
         HASH_ENTRY *e;
+	INTVAL n = SELF.elements();
 
 	PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
 	PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
-	if (!PMC_data(SELF))
+	if (!n) {
+	    ret->cache.int_val = -1;
 	    return ret;
+	}
 	e = (HASH_ENTRY *) PMC_data(SELF);
 	switch (what) {
 	    case 0:	/* reset key, iterate from start */
 		ret->cache.int_val = e[0].val.int_val;
 		break;
 	    case 1:	/* next key */
-		if (ret->cache.int_val < e[1].val.int_val)
+		if (ret->cache.int_val < e[1].val.int_val - 1)
 		    ++ret->cache.int_val;
+		else
+		    ret->cache.int_val = -1;
 		break;
 	    case 2:	/* prev key */
 		if (ret->cache.int_val >= e[0].val.int_val)
 		    --ret->cache.int_val;
+		else
+		    ret->cache.int_val = -1;
 		break;
 	    case 3:	/* reset key, iterate from end */
 		ret->cache.int_val = e[1].val.int_val - 1;

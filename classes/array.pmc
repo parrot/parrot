@@ -547,10 +547,14 @@ pmclass Array {
 	switch (what) {
 	    case 0:	/* reset key, iterate from start */
 		ret->cache.int_val = 0;
+		if (!n)
+		    ret->cache.int_val = -1;
 		break;
 	    case 1:	/* next key */
-		if (ret->cache.int_val < n)
+		if (ret->cache.int_val < n - 1)
 		    ++ret->cache.int_val;
+		else
+		    ret->cache.int_val = -1;
 		break;
 	    case 2:	/* prev key */
 		if (ret->cache.int_val >= 0)
