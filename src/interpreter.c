@@ -68,7 +68,7 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *),
 
     code_start = (opcode_t *)interpreter->code->byte_code;
     code_size  = interpreter->code->byte_code_size;
-    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
+    code_end   = (opcode_t *)((char *)interpreter->code->byte_code + code_size);
 
     pc = core(interpreter, pc);
 
@@ -294,7 +294,7 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
 
     code_start = (opcode_t *)interpreter->code->byte_code;
     code_size  = interpreter->code->byte_code_size;
-    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
+    code_end   = (opcode_t *)((char *)interpreter->code->byte_code + code_size);
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
 #ifdef ALPHA
@@ -345,7 +345,7 @@ runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc,
 
     code_start = (opcode_t *)interpreter->code->byte_code;
     code_size  = interpreter->code->byte_code_size;
-    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
+    code_end   = (opcode_t *)((char *)interpreter->code->byte_code + code_size);
 
     code_start_prederef = pc_prederef;
 
