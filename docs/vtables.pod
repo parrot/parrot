@@ -226,7 +226,10 @@ Return a floating-point representation of yourself.
 
 =item C<get_string>
 
-Return a string representation of yourself.
+Return a string representation of yourself (a STRING* object), this
+should be a B<copy> of whatever string you are holding, not just a
+pointer to your own string so that anything that calls this method can
+happily modify this value without making a mess of your guts.
 
 =item C<get_bool>
 
