@@ -1,4 +1,3 @@
-
 saveall
 loadlib P1, 'libform.so'
 dlfunc P2, P1, 'new_field', 'piiiiii'
@@ -61,6 +60,8 @@ dlfunc P2, P1, 'field_buffer', 'tpi'
 store_global 'ncurses::field_buffer', P2
 dlfunc P2, P1, 'field_opts', 'lp'
 store_global 'ncurses::field_opts', P2
+dlfunc P2, P1, 'new_form', 'pb'
+store_global 'ncurses::new_form', P2
 dlfunc P2, P1, 'current_field', 'pp'
 store_global 'ncurses::current_field', P2
 dlfunc P2, P1, 'form_win', 'pp'
@@ -69,6 +70,8 @@ dlfunc P2, P1, 'form_sub', 'pp'
 store_global 'ncurses::form_sub', P2
 dlfunc P2, P1, 'free_form', 'ip'
 store_global 'ncurses::free_form', P2
+dlfunc P2, P1, 'set_form_fields', 'ipb'
+store_global 'ncurses::set_form_fields', P2
 dlfunc P2, P1, 'field_count', 'ip'
 store_global 'ncurses::field_count', P2
 dlfunc P2, P1, 'set_form_win', 'ipp'
@@ -114,8 +117,6 @@ store_global 'ncurses::data_ahead', P2
 dlfunc P2, P1, 'data_behind', 'lp'
 store_global 'ncurses::data_behind', P2
 loadlib P1, 'libncurses.so'
-# dlfunc P2, P1, 'is_term_resized', 'iii'
-# store_global 'ncurses::is_term_resized', P2
 dlfunc P2, P1, 'keybound', 'tii'
 store_global 'ncurses::keybound', P2
 dlfunc P2, P1, 'curses_version', 't'
@@ -124,12 +125,8 @@ dlfunc P2, P1, 'assume_default_colors', 'iii'
 store_global 'ncurses::assume_default_colors', P2
 dlfunc P2, P1, 'define_key', 'iti'
 store_global 'ncurses::define_key', P2
-# dlfunc P2, P1, 'key_defined', 'it'
-# store_global 'ncurses::key_defined', P2
 dlfunc P2, P1, 'keyok', 'iii'
 store_global 'ncurses::keyok', P2
-# dlfunc P2, P1, 'resize_term', 'iii'
-# store_global 'ncurses::resize_term', P2
 dlfunc P2, P1, 'resizeterm', 'iii'
 store_global 'ncurses::resizeterm', P2
 dlfunc P2, P1, 'use_default_colors', 'i'
@@ -514,10 +511,6 @@ dlfunc P2, P1, 'tigetstr', 'tt'
 store_global 'ncurses::tigetstr', P2
 dlfunc P2, P1, 'timeout', 'vi'
 store_global 'ncurses::timeout', P2
-# dlfunc P2, P1, 'touchline', 'ipii'
-# store_global 'ncurses::touchline', P2
-# dlfunc P2, P1, 'touchwin', 'ip'
-# store_global 'ncurses::touchwin', P2
 dlfunc P2, P1, 'typeahead', 'ii'
 store_global 'ncurses::typeahead', P2
 dlfunc P2, P1, 'ungetch', 'ii'
@@ -653,5 +646,4 @@ store_global 'ncurses::mcprint', P2
 dlfunc P2, P1, 'has_key', 'ii'
 store_global 'ncurses::has_key', P2
 restoreall
-
-#.end
+end
