@@ -645,41 +645,34 @@ Adds the attribute C<attr> to the class.
 
 */
 
+/* Life is ever so much easiser if a class keeps its attributes at the
+   end of the attribute array, since we don't have to insert and
+   reorder attributes. Inserting's no big deal, especially since we're
+   going to break horribly if you insert into a class that's been
+   subclassed, but it'll do for now */
+
 INTVAL
-Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr, STRING *full_attr_name)
+Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
 {
     PMC *class_array;
     STRING *class_name;
     INTVAL idx;
     PMC *offs_hash;
     PMC *attr_hash;
+    PMC *attr_array;
+    STRING *full_attr_name;
 
     class_array = (PMC*) PMC_data(class);
     class_name = VTABLE_get_string_keyed_int(interpreter,
             class_array, PCD_CLASS_NAME);
-    /*
-     * our attributes start at offset found in hash at PCD_ATTRIB_OFFS
-     */
-    offs_hash = VTABLE_get_pmc_keyed_int(interpreter,
-            class_array, PCD_ATTRIB_OFFS);
-    if (VTABLE_exists_keyed_str(interpreter, offs_hash, class_name))
-        idx = VTABLE_get_integer_keyed_str(interpreter, offs_hash, class_name);
-    else {
-        PMC* parent_array = VTABLE_get_pmc_keyed_int(interpreter,
-                class_array, PCD_ALL_PARENTS);
-        if (VTABLE_elements(interpreter, parent_array)) {
-            PMC *parent = VTABLE_get_pmc_keyed_int(interpreter,
-                    parent_array, 0);
-            PMC *parent_attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
-                    (PMC*) PMC_data(parent), PCD_ATTRIBUTES);
-            idx = VTABLE_elements(interpreter, parent_attr_hash);
-        }
-        else
-            idx = 0;
-        VTABLE_set_integer_keyed_str(interpreter, offs_hash, class_name, idx);
-    }
-    attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
-            class_array, PCD_ATTRIBUTES);
+    attr_array = VTABLE_get_pmc_keyed_int(interpreter, class_array, PCD_CLASS_ATTRIBUTES);
+    idx = VTABLE_elements(interpreter, attr_array);
+    VTABLE_set_integer_native(interpreter, attr_array, idx + 1);
+    VTABLE_set_string_keyed_int(interpreter, attr_array, idx, attr);
+    full_attr_name = string_concat(interpreter, class_name, string_from_cstring(interpreter, "\0", 1), 0);
+    full_attr_name = string_concat(interpreter, full_attr_name, attr, 0);
+    
+
     /*
      * TODO check if someone is trying to add attributes to a parent class
      * while there are already child class attrs

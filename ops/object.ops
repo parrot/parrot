@@ -267,15 +267,14 @@ inline op removeparent(in PMC, in PMC) {
     goto NEXT();
 }
 
-=item B<addattribute>(in PMC, in STR, in STR)
+=item B<addattribute>(in PMC, in STR)
 
-Add the attribute named $2 to the class $1. $3 is the fully-qualified
-attribute name.
+Add the attribute named $2 to the class $1.
 
 =cut
 
-inline op addattribute(in PMC, in STR, in STR) {
-    Parrot_add_attribute(interpreter, $1, $2, $3);
+inline op addattribute(in PMC, in STR) {
+    Parrot_add_attribute(interpreter, $1, $2);
     goto NEXT();
 }
 

@@ -766,9 +766,9 @@ $output_re = qr/^$output_re$/;
 output_like(<<'CODE',  $output_re , "float attributes");
    newclass P0, "Foo"
    find_type I1, "Foo"
-   addattribute P0, "b", "Foo::b"
-   addattribute P0, "l", "Foo::l"
-   addattribute P0, "a", "Foo::a"
+   addattribute P0, "b"
+   addattribute P0, "l"
+   addattribute P0, "a"
    new P1, I1
 
 
