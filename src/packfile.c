@@ -690,8 +690,13 @@ PackFile_remove_segment_by_name (struct PackFile *pf, const char *name)
     for (i=0; i < dir->num_segments; i++) {
         struct PackFile_Segment *seg = dir->segments[i];
         if (strcmp (seg->name, name) == 0) {
-            memmove (dir->segments[i], dir->segments[i+1],
-                   (--dir->num_segments) * sizeof (struct PackFile_Segment *));
+            dir->num_segments--;
+            if (i != dir->num_segments) {
+                /* We're not the last segment, so we need to move things */ 
+                memmove(dir->segments[i], dir->segments[i+1],
+                       (dir->num_segments - i) * 
+                       sizeof (struct PackFile_Segment *));
+            }
             dir->segments = mem_sys_realloc (dir->segments,
                        sizeof (struct PackFile_Segment *) * dir->num_segments);
             return seg;
