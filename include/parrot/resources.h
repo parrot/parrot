@@ -30,7 +30,7 @@ struct Memory_Pool {
     size_t minimum_block_size;
     size_t total_allocated; /* total bytes allocated to this pool */
     size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
-    size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed 
+    size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed
                                       * (above plus COW-freed bytes) */
     FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
 };
@@ -40,12 +40,13 @@ struct Memory_Pool {
 
 void *Parrot_allocate(struct Parrot_Interp *, void *, size_t size);
 void *Parrot_allocate_string(struct Parrot_Interp *, STRING *, size_t size);
-void *Parrot_reallocate(struct Parrot_Interp *interpreter, 
+void *Parrot_reallocate(struct Parrot_Interp *interpreter,
                         void *from, size_t tosize);
-void *Parrot_reallocate_string(struct Parrot_Interp *interpreter, 
+void *Parrot_reallocate_string(struct Parrot_Interp *interpreter,
                                STRING *, size_t tosize);
 
 void Parrot_initialize_memory_pools(struct Parrot_Interp *);
+void Parrot_destroy_memory_pools(struct Parrot_Interp *interpreter);
 
 void Parrot_go_collect(struct Parrot_Interp *);
 
@@ -83,7 +84,7 @@ struct Stash {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

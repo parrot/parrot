@@ -648,6 +648,7 @@ PackFile_Constant_new(void)
 =item destroy
 
 Delete a PackFile Constant.
+Dont't delete PMCs or STRINGs, they are destroyed via DOD/GC.
 
 =cut
 
@@ -660,34 +661,6 @@ PackFile_Constant_destroy(struct PackFile_Constant *self)
         PIO_eprintf(NULL, "PackFile_Constant_destroy: self == NULL!\n");
         return;
     }
-
-    switch (self->type) {
-    case PFC_NONE:
-        break;
-
-    case PFC_NUMBER:
-        self->number = 0.0;
-        break;
-
-    case PFC_STRING:
-        if (self->string) {
-            string_destroy(self->string);
-            self->string = NULL;
-        }
-        break;
-
-    case PFC_KEY:
-        self->key = NULL;
-        break;
-
-    default:
-        PIO_eprintf(NULL,
-                "PackFile_Constant_clear: Unrecognized type '%c' (%ld)!\n",
-                (char)self->type, self->type);
-        return;
-        break;
-    }
-
     mem_sys_free(self);
 
     return;
@@ -926,7 +899,8 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
 
     cursor = packed;
 
-    flags = (UINTVAL)PackFile_fetch_op(pf, cursor++);
+    /* don't let PBC mess our internals */
+    flags = 0 ; cursor++;
     encoding = PackFile_fetch_op(pf, cursor++);
     type = PackFile_fetch_op(pf, cursor++);
 

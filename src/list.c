@@ -140,24 +140,24 @@
 
 /* internals */
 static List_chunk *allocate_chunk(Interp *interpreter, List *list,
-                                  UINTVAL items, UINTVAL size);
+        UINTVAL items, UINTVAL size);
 #ifdef LIST_DEBUG
 static void list_dump(FILE *fp, List *list, INTVAL type);
 #endif
 static UINTVAL rebuild_chunk_list(Interp *interpreter, List *list);
 static List_chunk *alloc_next_size(Interp *interpreter, List *list,
-                                   int where, UINTVAL idx);
+        int where, UINTVAL idx);
 static List_chunk *add_chunk(Interp *interpreter, List *list,
-                             int where, UINTVAL idx);
+        int where, UINTVAL idx);
 static UINTVAL ld(UINTVAL x);
 static List_chunk *get_chunk(Interp *interpreter, List *list, UINTVAL *idx);
 static void split_chunk(Interp *interpreter, List *list,
-                        List_chunk *chunk, UINTVAL idx);
+        List_chunk *chunk, UINTVAL idx);
 static void
- list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx);
+  list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx);
 static void *list_item(Interp *interpreter, List *list, int type, INTVAL idx);
 static void list_append(Interp *interpreter, List *list, void *item,
-                        int type, UINTVAL idx);
+        int type, UINTVAL idx);
 
 #define chunk_list_size(list) \
                 (list->chunk_list.buflen / sizeof(List_chunk *))
@@ -232,8 +232,8 @@ rebuild_chunk_ptrs(List *list, int cut)
 
     cap = 0;
     for (prev = 0, chunk = list->first; chunk; chunk = chunk->next) {
-        /* skip empty chunks, first is empty, when all items
-         * get skipped due to list->start */
+        /* skip empty chunks, first is empty, when all items get skipped due
+         * to list->start */
         if (chunk->items == start) {
             if (prev)
                 prev->next = chunk->next;
@@ -268,9 +268,10 @@ rebuild_sparse(List *list)
 {
     List_chunk *chunk, *prev;
     int changes = 0;
+
     for (prev = 0, chunk = list->first; chunk; chunk = chunk->next) {
         if (prev && (prev->data.flags & sparse) &&
-            (chunk->data.flags & sparse)) {
+                (chunk->data.flags & sparse)) {
             prev->items += chunk->items;
             chunk->items = 0;
             changes++;
@@ -288,19 +289,20 @@ rebuild_other(Interp *interpreter, List *list)
 {
     List_chunk *chunk, *prev;
     int changes = 0;
+
     for (prev = 0, chunk = list->first; chunk; chunk = chunk->next) {
         /* two adjacent irregular chunks */
         if (prev && (prev->data.flags & no_power_2) &&
-            (chunk->data.flags & no_power_2)) {
-            /* TODO don't make chunks bigger then MAX_ITEMS,
-             * no  - make then but:
-             * if bigger, split them in a next pass */
+                (chunk->data.flags & no_power_2)) {
+            /* TODO don't make chunks bigger then MAX_ITEMS, no - make then
+             * but: if bigger, split them in a next pass */
             Parrot_reallocate(interpreter, (Buffer *)prev,
-                              (prev->items + chunk->items) * list->item_size);
-            mem_sys_memmove((char *)prev->data.bufstart +
-                            prev->items * list->item_size,
-                            (char *)chunk->data.bufstart,
-                            chunk->items * list->item_size);
+                    (prev->items + chunk->items) * list->item_size);
+            mem_sys_memmove(
+                    (char *)prev->data.bufstart +
+                    prev->items * list->item_size,
+                    (char *)chunk->data.bufstart,
+                    chunk->items * list->item_size);
             prev->items += chunk->items;
             chunk->items = 0;
             changes++;
@@ -320,17 +322,15 @@ rebuild_fix_ends(Interp *interpreter, List *list)
     chunk = list->first;
     /* first is irregular, next is empty */
     if (list->n_chunks <= 2 && (chunk->data.flags & no_power_2) &&
-        (!chunk->next || chunk->next->items == 0 ||
-         list->start + list->length <= chunk->items)) {
+            (!chunk->next || chunk->next->items == 0 ||
+                    list->start + list->length <= chunk->items)) {
         chunk->data.flags = 0;
         list->grow_policy = enum_grow_unknown;
         list->cap += chunk->data.buflen / list->item_size - chunk->items;
         chunk->items = chunk->data.buflen / list->item_size;
     }
-    /* XXX - still needed?
-     * - if last is empty and last->prev not full then delete last
-     * - combine small chunks if list is big
-     */
+    /* XXX - still needed? - if last is empty and last->prev not full then
+     * delete last - combine small chunks if list is big */
 }
 
 static UINTVAL
@@ -348,17 +348,16 @@ rebuild_chunk_list(Interp *interpreter, List *list)
         rebuild_fix_ends(interpreter, list);
     }
 
-    /* allocate a new chunk_list buffer, if old one has moved or
-     * is too small */
+    /* allocate a new chunk_list buffer, if old one has moved or is too small */
     len = list->n_chunks;
     if (list->collect_runs != interpreter->collect_runs ||
-        len > chunk_list_size(list)) {
+            len > chunk_list_size(list)) {
         /* round up to reasonable size */
         len = 1 << (ld(len) + 1);
         if (len < 4)
             len = 4;
-        Parrot_allocate(interpreter, &list->chunk_list,
-                        len * sizeof(List_chunk *));
+        Parrot_reallocate(interpreter, (Buffer *)list,
+                len * sizeof(List_chunk *));
         list->collect_runs = interpreter->collect_runs;
     }
 
@@ -371,18 +370,16 @@ rebuild_chunk_list(Interp *interpreter, List *list)
         chunk_list_ptr(list, len) = chunk;
         len++;
 
-        /* look, what type of chunks we have
-         * this is always correct: */
+        /* look, what type of chunks we have this is always correct: */
         chunk->n_chunks = 1;
         chunk->n_items = chunk->items;
 
         /* sparse hole or irregular chunk */
         if (chunk->data.flags & (sparse | no_power_2)) {
             List_chunk *next;
-            /* add next sparse or no_power_2 chunks up so that
-             * get_chunk will skip this range of chunks, when the idx
-             * is beyond this block.
-             */
+
+            /* add next sparse or no_power_2 chunks up so that get_chunk will
+             * skip this range of chunks, when the idx is beyond this block. */
             for (next = chunk->next; next; next = next->next)
                 if (next->data.flags & (sparse | no_power_2)) {
                     chunk->n_chunks++;
@@ -404,10 +401,8 @@ rebuild_chunk_list(Interp *interpreter, List *list)
                 first->data.flags = fixed_items;
                 list->grow_policy |= enum_grow_fixed;
             }
-            /* growing chunk block
-             * could optimize small growing blocks, they are probably
-             * not worth the effort.
-             */
+            /* growing chunk block could optimize small growing blocks, they
+             * are probably not worth the effort. */
             else if (prev->items == chunk->items >> 1) {
                 first->n_chunks++;
                 first->n_items += chunk->items;
@@ -423,7 +418,7 @@ rebuild_chunk_list(Interp *interpreter, List *list)
     }
     /* if we have some mixture of grow_policies, then set it to _mixed */
     if (list->grow_policy && list->grow_policy != enum_grow_growing &&
-        list->grow_policy != enum_grow_fixed)
+            list->grow_policy != enum_grow_fixed)
         list->grow_policy = enum_grow_mixed;
     return len;
 }
@@ -444,26 +439,23 @@ alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)
         /* don't add sparse chunk at start of list */
         if (!list->n_chunks) {
             list->grow_policy = enum_grow_fixed;
-            /* if wee need more, the next allocation will allocate
-             * the rest */
+            /* if wee need more, the next allocation will allocate the rest */
             items = MAX_ITEMS;
             size = items * list->item_size;
             do_sparse = 0;
         }
         else {
             items = idx - list->cap - 1;
-            /* round down
-             * this function will then be called again, to
-             * add the final real chunk, with the rest of the needed size */
+            /* round down this function will then be called again, to add the
+             * final real chunk, with the rest of the needed size */
             items &= ~(MAX_ITEMS - 1);
             list->grow_policy = enum_grow_mixed;
             /* allocate a dummy chunk holding many items virtually */
             size = list->item_size;
         }
     }
-    /* initial size for empty lists
-     * grow_policy is not yet known or was different
-     */
+    /* initial size for empty lists grow_policy is not yet known or was
+     * different */
     else if (!list->cap) {
 #ifdef ONLY_FIXED_ALLOCATIONS
         list->grow_policy = enum_grow_fixed;
@@ -556,12 +548,12 @@ ld(UINTVAL x)
 
 #else
     {
-        /*
-         * Based on branch-free nlz algorithm in chapter 5 of Henry
-         * S. Warren Jr's book "Hacker's Delight".
-         */
+        /* 
+         * Based on branch-free nlz algorithm in chapter 5 of Henry S. Warren
+         * Jr's book "Hacker's Delight". */
 
         unsigned int n = ((x - 0x100) >> 16) & 8;
+
         x <<= n;
         m = ((x - 0x1000) >> 16) & 4;
         n += m;
@@ -650,15 +642,15 @@ get_chunk(Interp *interpreter, List *list, UINTVAL *idx)
         return chunk;
     }
 
-    /* else look at chunks flags, what grow type follows and
-     * adjust chunks and idx */
+    /* else look at chunks flags, what grow type follows and adjust chunks and 
+     * idx */
     for (i = 0, chunk = list->first; chunk;) {
         /* if we have no more items, we have found the chunk */
         if (*idx < chunk->items)
             return chunk;
 
-        /* now look, if we can use the range of items in chunk_block:
-         * if idx is beyond n_items, skip n_chunks */
+        /* now look, if we can use the range of items in chunk_block: if idx
+         * is beyond n_items, skip n_chunks */
         if (*idx >= chunk->n_items) {
             i += chunk->n_chunks;
             *idx -= chunk->n_items;
@@ -735,21 +727,19 @@ split_chunk(Interp *interpreter, List *list, List_chunk *chunk, UINTVAL ix)
     if (chunk->items <= MAX_ITEMS) {
         /* it fits, just allocate */
         Parrot_reallocate(interpreter, (Buffer *)chunk,
-                          chunk->items * list->item_size);
+                chunk->items * list->item_size);
         chunk->data.flags |= no_power_2;
         chunk->data.flags &= ~sparse;
     }
     else {
-        /* split chunk->items:
-         * n3 = n*MAX_ITEMS after chunk
-         * n2 = MAX_ITEMS chunk
-         * n1 = rest before */
+        /* split chunk->items: n3 = n*MAX_ITEMS after chunk n2 = MAX_ITEMS
+         * chunk n1 = rest before */
         n2 = MAX_ITEMS;
         n3 = ((chunk->items - idx) / MAX_ITEMS) * MAX_ITEMS;
         n1 = chunk->items - n2 - n3;
         chunk->items = n2;
         Parrot_reallocate(interpreter, (Buffer *)chunk,
-                          chunk->items * list->item_size);
+                chunk->items * list->item_size);
         chunk->data.flags &= ~sparse;
         if (n3) {
             new_chunk = allocate_chunk(interpreter, list, n3, list->item_size);
@@ -785,10 +775,8 @@ list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx)
 
     chunk = get_chunk(interpreter, list, (UINTVAL *)&idx);
     assert(chunk);
-    /* if this is a sparse chunk:
-     * split in possibly 2 sparse parts before and after
-     * then make a real chunk, rebuild chunk list
-     * and set item */
+    /* if this is a sparse chunk: split in possibly 2 sparse parts before and
+     * after then make a real chunk, rebuild chunk list and set item */
     if (chunk->data.flags & sparse) {
         split_chunk(interpreter, list, chunk, idx);
         /* reget chunk and idx */
@@ -833,12 +821,12 @@ list_item(Interp *interpreter, List *list, int type, INTVAL idx)
     List_chunk *chunk;
 
     chunk = get_chunk(interpreter, list, (UINTVAL *)&idx);
-    /* if this is a sparse chunk
-     * return -1, the caller may decide to return 0 or undef or
-     * whatever */
+    /* if this is a sparse chunk return -1, the caller may decide to return 0
+     * or undef or whatever */
     if (chunk->data.flags & sparse) {
 #ifdef INTLIST_EMUL
         static int null = 0;
+
         return (void *)&null;
 #else
         return (void *)-1;
@@ -942,7 +930,7 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     INTVAL i, len, size, key;
 
     if (!init->vtable || init->vtable != Parrot_base_vtables +
-        enum_class_PerlArray)
+            enum_class_PerlArray)
         internal_exception(1, "Illegal initializer for init\n");
     len = init->vtable->elements(interpreter, init);
     if (len & 1)
@@ -951,8 +939,9 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
         key = init->vtable->get_integer_keyed_int(interpreter, init, &i);
         if (key == 0) {
             INTVAL val = i + 1;
-            size =
-                init->vtable->get_integer_keyed_int(interpreter, init, &val);
+
+            size = init->vtable->get_integer_keyed_int(interpreter,
+                    init, &val);
             break;
         }
     }
@@ -984,7 +973,7 @@ list_clone(Interp *interpreter, List *other)
 
     for (chunk = other->first, prev = 0; chunk; chunk = chunk->next) {
         new_chunk = allocate_chunk(interpreter, l,
-                                   chunk->items, chunk->data.buflen);
+                chunk->items, chunk->data.buflen);
         new_chunk->data.flags = chunk->data.flags;
         if (!prev)
             l->first = new_chunk;
@@ -1008,20 +997,20 @@ list_clone(Interp *interpreter, List *other)
                     s = ((STRING **)chunk->data.bufstart)[i];
                     if (s) {
                         ((STRING **)new_chunk->data.bufstart)[i] =
-                            string_copy(interpreter, s);
+                                string_copy(interpreter, s);
                     }
                 }
                 break;
             default:
                 mem_sys_memcopy(new_chunk->data.bufstart,
-                                chunk->data.bufstart, chunk->data.buflen);
+                        chunk->data.bufstart, chunk->data.buflen);
                 break;
             }
         }
     }
     if (other->user_data)
         l->user_data = other->user_data->vtable->clone(interpreter,
-                                                       other->user_data);
+                other->user_data);
     rebuild_chunk_list(interpreter, l);
     interpreter->DOD_block_level--;
     interpreter->GC_block_level--;
@@ -1034,15 +1023,24 @@ list_mark(Interp *interpreter, List *list, PMC *last)
 {
     List_chunk *chunk;
     PMC *p;
+    STRING *s;
     UINTVAL i;
 
     for (chunk = list->first; chunk; chunk = chunk->next) {
         buffer_lives(interpreter, (Buffer *)chunk);
-        if (list->item_type == enum_type_PMC && !(chunk->data.flags & sparse))
+        if (!(chunk->data.flags & sparse))
             for (i = 0; i < chunk->items; i++) {
-                p = ((PMC **)chunk->data.bufstart)[i];
-                if (p)
-                    last = mark_used(p, last);
+                if (list->item_type == enum_type_PMC) {
+                    p = ((PMC **)chunk->data.bufstart)[i];
+                    if (p)
+                        last = mark_used(p, last);
+                }
+                else if (list->item_type == enum_type_STRING) {
+                    s = ((STRING **)chunk->data.bufstart)[i];
+                    if (s)
+                        buffer_lives(interpreter, (Buffer *)s);
+                }
+
             }
     }
     buffer_lives(interpreter, (Buffer *)list);
@@ -1062,6 +1060,7 @@ void
 list_set_length(Interp *interpreter, List *list, INTVAL len)
 {
     UINTVAL idx;
+
     if (len < 0)
         len += list->length;
     if (len >= 0) {
@@ -1084,6 +1083,7 @@ list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
     List_chunk *chunk, *new_chunk, *rest;
 
     INTVAL items;
+
     assert(idx >= 0);
     idx += list->start;
     assert(n_items >= 0);
@@ -1107,24 +1107,25 @@ list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
         /* 1. cut this chunk at idx */
         list->grow_policy = enum_grow_mixed;
         /* allocate a sparse chunk, n_items big */
-        new_chunk =
-            allocate_chunk(interpreter, list, n_items, list->item_size);
+        new_chunk = allocate_chunk(interpreter, list, n_items,
+                list->item_size);
         new_chunk->data.flags |= sparse;
         items = chunk->items - idx;
         if (items) {
             /* allocate a small chunk, holding the rest of chunk beyond idx */
             chunk->data.flags = no_power_2;
             rest = allocate_chunk(interpreter, list, items,
-                                  items * list->item_size);
+                    items * list->item_size);
             rest->data.flags |= no_power_2;
             /* hang them together */
             rest->next = chunk->next;
             chunk->next = new_chunk;
             new_chunk->next = rest;
             /* copy data over */
-            mem_sys_memmove((char *)rest->data.bufstart,
-                            (char *)chunk->data.bufstart +
-                            idx * list->item_size, items * list->item_size);
+            mem_sys_memmove(
+                    (char *)rest->data.bufstart,
+                    (char *)chunk->data.bufstart + idx * list->item_size,
+                    items * list->item_size);
         }
         else {
             new_chunk->next = chunk->next;
@@ -1162,23 +1163,23 @@ list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
 #ifdef __LCC__
                     /* LCC has a bug where it can't handle all the temporary
                      * variables created in this one line.  adding an explicit
-                     * one fixes things.   No need to force this workaround
-                     * on less brain-damaged compilers though */
+                     * one fixes things.  No need to force this workaround on
+                     * less brain-damaged compilers though */
                     size_t tmp_size = (chunk->items - idx - n_items) *
-                        list->item_size;
+                            list->item_size;
 
-                    mem_sys_memmove((char *)chunk->data.bufstart +
-                                    idx * list->item_size,
-                                    (char *)chunk->data.bufstart +
-                                    (idx + n_items) * list->item_size,
-                                    tmp_size);
+                    mem_sys_memmove(
+                            (char *)chunk->data.bufstart +
+                            idx * list->item_size,
+                            (char *)chunk->data.bufstart +
+                            (idx + n_items) * list->item_size, tmp_size);
 #else
-                    mem_sys_memmove((char *)chunk->data.bufstart +
-                                    idx * list->item_size,
-                                    (char *)chunk->data.bufstart +
-                                    (idx + n_items) * list->item_size,
-                                    (chunk->items - idx -
-                                     n_items) * list->item_size);
+                    mem_sys_memmove(
+                            (char *)chunk->data.bufstart +
+                            idx * list->item_size,
+                            (char *)chunk->data.bufstart +
+                            (idx + n_items) * list->item_size,
+                            (chunk->items - idx - n_items) * list->item_size);
 #endif
                 }
             }
@@ -1211,6 +1212,7 @@ void
 list_push(Interp *interpreter, List *list, void *item, int type)
 {
     INTVAL idx = list->start + list->length++;
+
     list_append(interpreter, list, item, type, idx);
 }
 
@@ -1317,7 +1319,7 @@ list_get(Interp *interpreter, List *list, INTVAL idx, int type)
 
 void
 list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
-            INTVAL count)
+        INTVAL count)
 {
     List *value_list = (List *)value->data;
     INTVAL value_length = value_list->length;
@@ -1342,9 +1344,9 @@ list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
     /* replace count items at offset with values */
     for (i = j = 0; i < count && j < value_length; i++, j++) {
         void *val = list_get(interpreter, value_list, j, type);
-        /* no clone here, if the HL want's to reuse the values,
-         * the HL has to clone the values
-         */
+
+        /* no clone here, if the HL want's to reuse the values, the HL has to
+         * clone the values */
         if (type == enum_type_PMC)
             val = *(PMC **)val;
         else if (type == enum_type_STRING)
@@ -1357,6 +1359,7 @@ list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
         list_insert(interpreter, list, offset + i, value_length - j);
         for (; j < value_length; i++, j++) {
             void *val = list_get(interpreter, value_list, j, type);
+
             if (type == enum_type_PMC)
                 val = *(PMC **)val;
             else if (type == enum_type_STRING)

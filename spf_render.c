@@ -19,17 +19,18 @@
  * around for us.
  */
 #ifdef _WIN32
-#  define snprintf _snprintf
+#   define snprintf _snprintf
 #endif
 
 /* UTILITY FUNCTIONS */
 
-static void
-uint_to_str(struct Parrot_Interp *interpreter, STRING *out,
-            char *tc, UHUGEINTVAL num, char base)
+static STRING*
+uint_to_str(struct Parrot_Interp *interpreter,
+            char *tc, UHUGEINTVAL num, char base, int minus)
 {
     int i = 0, cur2;
     char cur;
+    STRING *out;
 
     do {
         cur = (char)(num % base);
@@ -50,30 +51,32 @@ uint_to_str(struct Parrot_Interp *interpreter, STRING *out,
      * with precision--the string was being reused without
      * being cleared first.
      */
-    if (string_compare(interpreter, out, cstr2pstr("-")) != 0) {
-        string_set(interpreter, out, cstr2pstr(""));
-    }
+    if (minus)
+        out = cstr2pstr("-");
+    else
+        out = cstr2pstr("");
 
     for (i = 0; i <= cur2; i++) {
         string_append(interpreter, out, char2pstr(tc[cur2 - i]), 0);
     }
+    return out;
 }
 
-static void
-int_to_str(struct Parrot_Interp *interpreter, STRING *out,
+static STRING *
+int_to_str(struct Parrot_Interp *interpreter,
            char *tc, HUGEINTVAL num, char base)
 {
-    string_set(interpreter, out, cstr2pstr(""));
+    int minus = 0;
 
     if (num < 0) {
-        string_append(interpreter, out, cstr2pstr("-"), 0);
+        minus = 1;
         num = -num;
     }
-    uint_to_str(interpreter, out, tc, (UHUGEINTVAL)num, base);
+    return uint_to_str(interpreter, tc, (UHUGEINTVAL) num, base, minus);
 }
 
 /* handle +, -, 0, #, space, width, and prec. */
-static void
+static STRING *
 handle_flags(struct Parrot_Interp *interpreter,
              SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)
 {
@@ -83,23 +86,26 @@ handle_flags(struct Parrot_Interp *interpreter,
         /* +, space */
         if (string_ord(str, 0) != '-') {
             if (info->flags & FLAG_PLUS) {
-                string_set(interpreter, str,
-                           string_concat(interpreter, cstr2pstr("+"), str, 0));
+                str = string_concat(interpreter, cstr2pstr("+"), str, 0);
                 len++;
             }
             else if (info->flags & FLAG_SPACE) {
-                string_set(interpreter, str,
-                           string_concat(interpreter, cstr2pstr(" "), str, 0));
+                str = string_concat(interpreter, cstr2pstr(" "), str, 0);
                 len++;
             }
         }
+        /* XXX
+         * cstr2pstr mostly uses literal chars, which should generate a
+         * string with BUFFER_external_FLAG
+         * TODO make 2 versions of this if needed
+         */
 
         /* # */
-        if (info->flags & FLAG_SHARP && prefix && prefix[0]) {
-            string_set(interpreter, str,
-                       string_concat(interpreter, cstr2pstr(prefix), str, 0));
+        if ((info->flags & FLAG_SHARP) && prefix && prefix[0]) {
+            str = string_concat(interpreter, cstr2pstr(prefix), str, 0);
             len += strlen(prefix);
         }
+        /* XXX sharp + fill ??? */
 
         /* precision */
         if (info->flags & FLAG_PREC) {
@@ -138,19 +144,19 @@ handle_flags(struct Parrot_Interp *interpreter,
         else {                  /* right-align */
             /* signed and zero padded */
             if (info->flags & FLAG_ZERO
-                && (string_ord(str, 0) == '-' || string_ord(str, 0) == '+')) {
+                && (string_ord(str,0) == '-' || string_ord(str,0) == '+')) {
                 STRING *temp;
-                string_substr(interpreter, str, 1, len - 1, &temp);
+                string_substr(interpreter, str, 1, len-1, &temp);
                 string_chopn(str, -1);
                 string_append(interpreter, str, fill, 0);
                 string_append(interpreter, str, temp, 0);
             }
             else {
-                string_set(interpreter, str,
-                           string_concat(interpreter, fill, str, 0));
+                str = string_concat(interpreter, fill, str, 0);
             }
         }
     }
+    return str;
 }
 
 
@@ -160,13 +166,14 @@ handle_flags(struct Parrot_Interp *interpreter,
  */
 
 static void
-gen_sprintf_call(struct Parrot_Interp *interpreter, STRING *ts, char *out,
+gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
                  SpfInfo info, char thingy)
 {
     int i = 0;
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
-    out[i++] = '%';
 
+    STRING *ts;
+    out[i++] = '%';
     if (info->flags) {
         if (info->flags & FLAG_MINUS) {
             out[i++] = '-';
@@ -189,7 +196,7 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, STRING *ts, char *out,
         if (info->width > PARROT_SPRINTF_BUFFER_SIZE - 1) {
             info->width = PARROT_SPRINTF_BUFFER_SIZE;
         }
-        uint_to_str(interpreter, ts, tc, info->width, 10);
+        ts = uint_to_str(interpreter, tc, info->width, 10, 0);
         strcpy(out + i, string_to_cstring(interpreter, ts));
         i = strlen(out);
     }
@@ -200,7 +207,7 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, STRING *ts, char *out,
         }
 
         out[i++] = '.';
-        uint_to_str(interpreter, ts, tc, info->prec, 10);
+        ts = uint_to_str(interpreter, tc, info->prec, 10, 0);
         strcpy(out + i, string_to_cstring(interpreter, ts));
         i = strlen(out);
     }
@@ -214,7 +221,7 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, STRING *ts, char *out,
 
 STRING *
 Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
-                      SPRINTF_OBJ *obj)
+                      SPRINTF_OBJ * obj)
 {
     INTVAL i, len, old;
     STRING *targ = string_make(interpreter, NULL, 0, NULL, 0, NULL);
@@ -228,7 +235,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
 
-    for (i = old = len = 0; i < (INTVAL)string_length(pat); i++) {
+    for (i = old = len = 0; i < (INTVAL) string_length(pat); i++) {
         if (string_ord(pat, i) == '%') {        /* % */
             if (len) {
                 string_substr(interpreter, pat, old, len, &substr);
@@ -258,7 +265,6 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                 struct spfinfo_t info = { 0, 0, 0, 0, 0 };
 
                 /* Reset temporaries */
-                ts = string_make(interpreter, NULL, 0, NULL, 0, NULL);
                 tc[0] = '\0';
 
 /*  This can be really hard to understand, so I'll try to explain beforehand.
@@ -352,7 +358,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
  *  set flags--the last does all the work.
  */
 
-                for (i++; i < (INTVAL)string_length(pat)
+                for (i++; i < (INTVAL) string_length(pat)
                      && info.phase != PHASE_DONE; i++) {
                     INTVAL ch = string_ord(pat, i);
 
@@ -490,28 +496,27 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                         case 'd':
                         case 'i':
                             theint = obj->getint(interpreter, info.type, obj);
-                            int_to_str(interpreter, ts, tc, theint, 10);
+                            ts = int_to_str(interpreter, tc, theint, 10);
 
-                            handle_flags(interpreter, &info, ts, 1, NULL);
+                            ts = handle_flags(interpreter, &info, ts, 1, NULL);
 
                             string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'o':
                             theint = obj->getint(interpreter, info.type, obj);
-                            int_to_str(interpreter, ts, tc, theint, 8);
+                            ts = int_to_str(interpreter, tc, theint, 8);
 
-                            handle_flags(interpreter, &info, ts, 1, "0");
+                            ts = handle_flags(interpreter, &info, ts, 1, "0");
 
                             string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'x':
-                            theuint =
-                                obj->getuint(interpreter, info.type, obj);
-                            uint_to_str(interpreter, ts, tc, theuint, 16);
+                            theuint = obj->getuint(interpreter, info.type, obj);
+                            ts = uint_to_str(interpreter, tc, theuint, 16, 0);
 
-                            handle_flags(interpreter, &info, ts, 1, "0x");
+                            ts = handle_flags(interpreter, &info, ts, 1, "0x");
 
                             string_append(interpreter, targ, ts, 0);
                             break;
@@ -519,9 +524,9 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                         case 'X':
                             theuint =
                                 obj->getuint(interpreter, info.type, obj);
-                            uint_to_str(interpreter, ts, tc, theuint, 16);
+                            ts = uint_to_str(interpreter, tc, theuint, 16, 0);
 
-                            handle_flags(interpreter, &info, ts, 1, "0X");
+                            ts = handle_flags(interpreter, &info, ts, 1, "0X");
 
                             string_append(interpreter, targ, ts, 0);
                             break;
@@ -529,18 +534,18 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                         case 'b':
                             theuint =
                                 obj->getuint(interpreter, info.type, obj);
-                            uint_to_str(interpreter, ts, tc, theuint, 2);
+                            ts = uint_to_str(interpreter, tc, theuint, 2, 0);
 
-                            handle_flags(interpreter, &info, ts, 1, "0b");
+                            ts = handle_flags(interpreter, &info, ts, 1, "0b");
 
                             string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'B':
                             theint = obj->getint(interpreter, info.type, obj);
-                            int_to_str(interpreter, ts, tc, theint, 2);
+                            ts = int_to_str(interpreter, tc, theint, 2);
 
-                            handle_flags(interpreter, &info, ts, 1, "0B");
+                            ts = handle_flags(interpreter, &info, ts, 1, "0B");
 
                             string_append(interpreter, targ, ts, 0);
                             break;
@@ -548,19 +553,19 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                         case 'u':
                             theuint =
                                 obj->getuint(interpreter, info.type, obj);
-                            uint_to_str(interpreter, ts, tc, theuint, 10);
+                            ts = uint_to_str(interpreter, tc, theuint, 10, 0);
 
-                            handle_flags(interpreter, &info, ts, 1, NULL);
+                            ts = handle_flags(interpreter, &info, ts, 1, NULL);
 
                             string_append(interpreter, targ, ts, 0);
                             break;
 
                         case 'p':
                             ptr = obj->getptr(interpreter, info.type, obj);
-                            uint_to_str(interpreter, ts, tc,
-                                        (HUGEINTVAL)(size_t)ptr, 16);
+                            ts = uint_to_str(interpreter, tc,
+                                       (HUGEINTVAL) (size_t) ptr, 16, 0);
 
-                            handle_flags(interpreter, &info, ts, 1, "0x");
+                            ts = handle_flags(interpreter, &info, ts, 1, "0x");
 
                             string_append(interpreter, targ, ts, 0);
                             break;
@@ -573,8 +578,8 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                         case 'G':
                             thefloat = obj->getfloat
                                 (interpreter, info.type, obj);
-                            gen_sprintf_call(interpreter, ts, tc, &info, ch);
-                            string_set(interpreter, ts, cstr2pstr(tc));
+                            gen_sprintf_call(interpreter, tc, &info, ch);
+                            ts = cstr2pstr(tc);
                             /* XXX lost precision if %Hg or whatever */
                             snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
                                      string_to_cstring(interpreter, ts),
@@ -588,14 +593,13 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                              * XXX this bug might also apply to %e and %E
                              */
 
-                            if (tolower(ch) == 'g') {
+                            if(tolower(ch) == 'g') {
                                 UINTVAL i;
-                                for (i = 0; i < strlen(tc); i++) {
-                                    if (tolower(tc[i]) == 'e' &&
-                                        (tc[i + 1] == '+'
-                                         || tc[i + 1] == '-')) {
-                                        tc[i + 2] = '\0';
-                                        strcat(tc, &(tc[i + 3]));
+                                for(i=0; i < strlen(tc); i++) {
+                                    if(tolower(tc[i]) == 'e' &&
+                                        (tc[i+1] == '+' || tc[i+1] == '-')) {
+                                        tc[i+2]='\0';
+                                        strcat(tc, &(tc[i+3]));
                                     }
                                 }
                             }
@@ -610,9 +614,8 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                             string = obj->getstring
                                 (interpreter, info.type, obj);
 
-                            string_set(interpreter, ts, string);
-
-                            handle_flags(interpreter, &info, ts, 0, NULL);
+                            ts = handle_flags(interpreter, &info, string,
+                                    0, NULL);
 
                             string_append(interpreter, targ, ts, 0);
 

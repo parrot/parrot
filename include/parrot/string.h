@@ -74,7 +74,8 @@ typedef enum BUFFER_flag {
     BUFFER_private7_FLAG = 1 << 7,
     /* The contents of the buffer can't be moved by the GC */
     BUFFER_immobile_FLAG = 1 << 8,
-    /* Marks the contents as coming from a non-Parrot source */
+    /* Marks the contents as coming from a non-Parrot source,
+     * also used for COWed strings */
     BUFFER_external_FLAG = 1 << 9,
     /* Mark the buffer as pointing to system memory */
     BUFFER_sysmem_FLAG = 1 << 10,
@@ -91,8 +92,9 @@ typedef enum BUFFER_flag {
     BUFFER_constant_FLAG = 1 << 15,
     /* For debugging, report when this buffer gets moved around */
     BUFFER_report_FLAG = 1 << 16,
-    /* Generation in the GC pools */
-    BUFFER_generation_FLAG = 1 << 17 | 1 << 18,
+    /* real external bufstart string */
+    BUFFER_bufstart_external_FLAG = 1 << 17,
+    BUFFER_unused_FLAG = 1 << 18,
     /* Buffer header has a strstart which needs to be updated with bufstart */
     BUFFER_strstart_FLAG = 1 << 19
 } BUFFER_flags;

@@ -135,6 +135,37 @@ PIO_init(theINTERP)
     }
 }
 
+void
+PIO_destroy(theINTERP)
+{
+    ParrotIOLayer *p, *down;
+    ParrotIO *io;
+    int i;
+
+    /* XXX is this all correct? */
+
+    fflush(stdout);
+    fflush(stdout);
+
+    for (i = 0 ; i < PIO_NR_OPEN; i++) {
+        if ( (io = GET_INTERP_IOD(interpreter)->table[i]) ) {
+#if 0
+            PIO_flush(interpreter, io);
+            PIO_close(interpreter, io);
+#endif
+            mem_sys_free(io);
+        }
+    }
+    for (p = GET_INTERP_IO(interpreter); p; ) {
+        down = p->down;
+        if (p->api->Delete)
+            (*p->api->Delete) (p);
+        //mem_sys_free(p);
+        p = down;
+    }
+    mem_sys_free(GET_INTERP_IOD(interpreter)->table);
+    mem_sys_free(interpreter->piodata);
+}
 
 /*
  * IO system destructor, flush streams, free structures, etc.
@@ -486,12 +517,15 @@ PIO_fdopen(theINTERP, PIOHANDLE fd, const char *sflags)
 INTVAL
 PIO_close(theINTERP, ParrotIO *io)
 {
+    INTVAL res;
     if (io) {
         ParrotIOLayer *l = io->stack;
         while (l) {
             if (l->api->Close) {
                 PIO_flush(interpreter, io);
-                return (*l->api->Close) (interpreter, l, io);
+                res =  (*l->api->Close) (interpreter, l, io);
+                mem_sys_free(io);
+                return res;
             }
             l = PIO_DOWNLAYER(l);
         }

@@ -3,7 +3,7 @@
  *  CVS Info
  *     $Id$
  *  Overview:
- *      Parrot IO subsystem 
+ *      Parrot IO subsystem
  *  Data Structure and Algorithms:
  *  History:
  *      Originally written by Melvin Smith
@@ -217,7 +217,7 @@ struct _ParrotIOLayerAPI {
     ParrotIOLayer * (*New)(ParrotIOLayer * proto);
     void            (*Delete)(ParrotIOLayer * l);
     INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
-    INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io); 
+    INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io);
     ParrotIO *      (*Open)(theINTERP, ParrotIOLayer * l,
                             const char * name, INTVAL flags);
     ParrotIO *      (*Open2_Unused)(theINTERP);
@@ -228,7 +228,7 @@ struct _ParrotIOLayerAPI {
     ParrotIO *      (*FDOpen)(theINTERP, ParrotIOLayer * l,
                               PIOHANDLE fd, INTVAL flags);
     INTVAL          (*Close)(theINTERP, ParrotIOLayer * l,
-                                ParrotIO * io); 
+                                ParrotIO * io);
     size_t          (*Write)(theINTERP, ParrotIOLayer * l,
                              ParrotIO * io, const void * buf,
                              size_t len);
@@ -261,7 +261,7 @@ struct _ParrotIOLayerAPI {
                            ParrotIO * io);
 };
 
-/* these are defined rather than using NULL because strictly-speaking, ANSI C 
+/* these are defined rather than using NULL because strictly-speaking, ANSI C
  * doesn't like conversions between function and non-function pointers. */
 #define PIO_null_push_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_pop_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
@@ -290,6 +290,7 @@ extern INTVAL pio_errno;
 
 /* io.c - If you add new layers, register them in init_layers() */
 extern void PIO_init(theINTERP);
+extern void PIO_destroy(theINTERP);
 extern INTVAL PIO_init_stacks(theINTERP);
 extern void PIO_atexit(theINTERP);
 extern INTVAL PIO_push_layer(theINTERP, ParrotIOLayer *, ParrotIO *);
@@ -355,7 +356,7 @@ extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

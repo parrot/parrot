@@ -25,7 +25,8 @@ typedef enum {
     PARROT_PREDEREF_FLAG = 0x10,  /* We're using the prederef runops */
     PARROT_JIT_FLAG      = 0x20,  /* We're using the jit runops */
     PARROT_CGOTO_FLAG    = 0x40,  /* We're using the computed goto runops */
-    PARROT_GC_DEBUG_FLAG = 0x80   /* We're debugging memory management */
+    PARROT_GC_DEBUG_FLAG = 0x80,  /* We're debugging memory management */
+    PARROT_EXTERN_CODE_FLAG = 0x100    /* reusing anothers interps code */
 } Parrot_Interp_flag;
 
 struct Parrot_Interp;
@@ -184,6 +185,7 @@ typedef struct Parrot_Interp {
 
 struct Parrot_Interp *make_interpreter(Interp_flags);
 void Parrot_init(Parrot_Interp, void*);
+void Parrot_destroy(Parrot_Interp);
 
 #if 0
 void runops_generic();

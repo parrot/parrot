@@ -22,6 +22,8 @@
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
 
+#define ATEXIT_DESTROY
+
 extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
 
 
@@ -389,9 +391,14 @@ env_var_set(const char* var)
     return ! (strcmp(value, "0") == 0);
 }
 
+#ifdef ATEXIT_DESTROY
+void Parrot_really_destroy(int exit_code, void *interpreter);
+#endif
+
 /*=for api interpreter make_interpreter
  *  Create the Parrot interpreter.  Allocate memory and clear the registers.
  */
+
 struct Parrot_Interp *
 make_interpreter(Interp_flags flags)
 {
@@ -430,6 +437,7 @@ make_interpreter(Interp_flags flags)
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
+    /* intialize classes */
     Parrot_init(interpreter, 0);
 
     /* Need an empty stash */
@@ -537,9 +545,111 @@ make_interpreter(Interp_flags flags)
     interpreter->resume_offset = 0;
 
     interpreter->prederef_code = (void **)NULL;
+#ifdef ATEXIT_DESTROY
+    on_exit(Parrot_really_destroy, (void*)interpreter);
+#endif
 
     return interpreter;
 }
+void
+Parrot_destroy(struct Parrot_Interp *interpreter)
+{
+#ifdef ATEXIT_DESTROY
+    UNUSED(interpreter);
+#else
+    Parrot_really_destroy(0, (void*) interpreter);
+#endif
+}
+
+void
+Parrot_really_destroy(int exit_code, void *vinterp)
+{
+    int i;
+    Interp *interpreter = (Interp*) vinterp;
+    UNUSED(exit_code);
+
+    /* buffer headers, PMCs */
+    Parrot_destroy_header_pools(interpreter);
+    /* memory pools in resources */
+    Parrot_destroy_memory_pools(interpreter);
+    /* mem subsystem is dead now */
+    mem_sys_free(interpreter->arena_base);
+    /* packfile */
+
+    if (!Interp_flags_TEST(interpreter, PARROT_EXTERN_CODE_FLAG))  {
+        struct PackFile *pf = interpreter->code;
+        if (pf)
+            PackFile_destroy(pf);
+    }
+
+    /* XXX walk the stash, pmc's are already dead */
+    mem_sys_free(interpreter->perl_stash);
+    if (interpreter->profile)
+        mem_sys_free(interpreter->profile);
+    mem_sys_free(interpreter->warns);
+
+    /* XXX move this to register.c */
+    for (i = 0; i< 4; i++) {
+        struct IRegChunk *top, *next;
+        switch(i) {
+            case 0:
+                top = interpreter->ctx.int_reg_top;
+                break;
+            case 1:
+                top = (struct IRegChunk*) interpreter->ctx.num_reg_top;
+                break;
+            case 2:
+                top = (struct IRegChunk*) interpreter->ctx.string_reg_top;
+                break;
+            case 3:
+                top = (struct IRegChunk*) interpreter->ctx.pmc_reg_top;
+                break;
+        }
+        for (; top ; ) {
+            next = top->next;
+            mem_sys_free(top);
+            top = next;
+        }
+    }
+    /* XXX move this to stacks.c */
+    for (i = 0; i< 3; i++) {
+        Stack_Chunk_t *top, *next;
+        switch(i) {
+            case 0:
+                top = interpreter->ctx.pad_stack;
+                break;
+            case 1:
+                top = interpreter->ctx.user_stack;
+                break;
+            case 2:
+                top = interpreter->ctx.control_stack;
+                break;
+        }
+        while (top->next)
+            top = top->next;
+        while(top) {
+            next = top->prev;
+            mem_sys_free(top);
+            top = next;
+        }
+    }
+    /* intstack */
+    {
+        IntStack top, next, chunk;
+        chunk = top = interpreter->ctx.intstack;
+        while(chunk != top) {
+            next = chunk->prev;
+            mem_sys_free(chunk);
+            chunk = next;
+        }
+        mem_sys_free(top);
+    }
+
+    PIO_destroy(interpreter);
+
+    mem_sys_free(interpreter);
+}
+
 
 /*
  * Local variables:

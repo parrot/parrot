@@ -17,7 +17,7 @@ sub list_diff (\@\@);
 sub read_manifest;
 
 SKIP: {
-  skip ('No CVS version', 1) unless -e 'CVS';
+  skip ('No CVS version', 2) unless -e 'CVS';
 
   local @cvs_entries;
   find(\&scan_cvs, '.');
@@ -50,7 +50,7 @@ sub scan_cvs {
     open CVS, 'CVS/Entries';
 
     while (<CVS>) {
-      chop; 
+      chop;
       next if m/^D/; # directories are will be further scanned
 
       my (undef, $entry, $rev) = split '/';

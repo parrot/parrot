@@ -53,7 +53,7 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     return pc;
 #else
     PIO_eprintf(interpreter,
-                "Computed goto unavailable in this configuration.\n");
+            "Computed goto unavailable in this configuration.\n");
     exit(1);
     return NULL;
 #endif
@@ -66,6 +66,10 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
  * With bounds checking.
  */
 
+/* using an extern interpreter for tracing is broken due
+ * to Parrot_destroy: cleanup of ctx fails
+ */
+
 opcode_t *
 runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
@@ -74,20 +78,33 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_end;
     opcode_t *lastpc = NULL;
     FLOATVAL starttime = 0;
-    Interp *trace_i;
+#ifdef USE_TRACE_INTERP
+    Interp * trace_i;
+    struct Parrot_Context *trace_ctx;
+#endif
 
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
     code_end = interpreter->code->byte_code + code_size;
 
+#ifdef USE_TRACE_INTERP
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         trace_i = make_interpreter(NO_FLAGS);
-        Parrot_init(trace_i, (void *)&starttime);
+        Parrot_init(trace_i, (void*)& starttime);
+        /* remeber old context */
+        trace_ctx = mem_sys_allocate(sizeof(struct Parrot_Context));
+        mem_sys_memcopy(trace_ctx, &trace_i->ctx,
+                sizeof(struct Parrot_Context));
+        /* copy in current */
         mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
-                        sizeof(struct Parrot_Context));
+                sizeof(struct Parrot_Context));
         trace_i->code = interpreter->code;
+        Interp_flags_SET(trace_i, PARROT_EXTERN_CODE_FLAG);
         trace_op(trace_i, code_start, code_end, pc);
     }
+#else
+    trace_op(interpreter, code_start, code_end, pc);
+#endif
 
     while (pc && pc >= code_start && pc < code_end) {
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
@@ -99,15 +116,27 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
         DO_OP(pc, interpreter);
 
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+#ifdef USE_TRACE_INTERP
             mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
-                            sizeof(struct Parrot_Context));
+                    sizeof(struct Parrot_Context));
             trace_op(trace_i, code_start, code_end, pc);
+#else
+            trace_op(interpreter, code_start, code_end, pc);
+#endif
         }
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
             interpreter->profile[*lastpc].time +=
                 Parrot_floatval_time() - starttime;
         }
     }
+#ifdef USE_TRACE_INTERP
+    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+        /* restore trace context */
+        mem_sys_memcopy(&trace_i->ctx, trace_ctx,
+                sizeof(struct Parrot_Context));
+        mem_sys_free(trace_ctx);
+    }
+#endif
 
     return pc;
 }

@@ -33,6 +33,9 @@ pmclass Coroutine {
     }
 
     void destroy () {
+	/* XXX stack_destroy for deeper stacks */
+	mem_sys_free(((struct Parrot_Coroutine *)SELF->data)->ctx.user_stack);
+	mem_sys_free(((struct Parrot_Coroutine *)SELF->data)->ctx.control_stack);
         mem_sys_free(SELF->data);
     }
 
@@ -71,19 +74,20 @@ pmclass Coroutine {
     INTVAL defined () {
         return ((struct Parrot_Coroutine*)SELF->data)->resume != NULL;
     }
-    
+
     void* invoke (void* next) {
         struct Parrot_Coroutine* co = (struct Parrot_Coroutine*)SELF->data;
         void * dest = co->resume;
         co->resume = (opcode_t *)next;
         return dest;
-    } 
+    }
 
     PMC* clone() {
         struct Parrot_Coroutine * retc;
         PMC * ret = new_pmc_header(INTERP);
         ret->vtable = &Parrot_base_vtables[enum_class_Coroutine];
         ret->data = retc = mem_sys_allocate(sizeof(struct Parrot_Coroutine));
+        ret->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
         memcpy(ret->data, SELF->data, sizeof(struct Parrot_Coroutine));
         stack_mark_cow(retc->ctx.user_stack);
         stack_mark_cow(retc->ctx.control_stack);

@@ -34,10 +34,6 @@ pmclass PerlString extends scalar {
         return dest;
     }
 
-    void destroy () {
-        string_destroy(SELF->data);
-    }
-
     void set_pmc (PMC* value) {
         SELF->cache.string_val = value->vtable->get_string(INTERP, value);
     }

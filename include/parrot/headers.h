@@ -3,7 +3,7 @@
  *  CVS Info
  *     $Id$
  *  Overview:
- *     Header management functions. Handles getting of various headers, 
+ *     Header management functions. Handles getting of various headers,
  *     and pool creation
  *  Data Structure and Algorithms:
  *  History:
@@ -23,19 +23,19 @@
 /** Header Management Functions **/
 
 /* pmc header small-object methods */
-void add_free_pmc(struct Parrot_Interp *interpreter, 
+void add_free_pmc(struct Parrot_Interp *interpreter,
                   struct Small_Object_Pool *pool, void *pmc);
-void *get_free_pmc(struct Parrot_Interp *interpreter, 
+void *get_free_pmc(struct Parrot_Interp *interpreter,
                    struct Small_Object_Pool *pool);
-void alloc_pmcs(struct Parrot_Interp *interpreter, 
+void alloc_pmcs(struct Parrot_Interp *interpreter,
                      struct Small_Object_Pool *pool);
 
 /* buffer header small-object methods */
-void add_free_buffer(struct Parrot_Interp *interpreter, 
+void add_free_buffer(struct Parrot_Interp *interpreter,
                      struct Small_Object_Pool *pool, void *buffer);
-void *get_free_buffer(struct Parrot_Interp *interpreter, 
+void *get_free_buffer(struct Parrot_Interp *interpreter,
                       struct Small_Object_Pool *pool);
-void alloc_buffers(struct Parrot_Interp *interpreter, 
+void alloc_buffers(struct Parrot_Interp *interpreter,
                         struct Small_Object_Pool *pool);
 
 /* pool creation and access functions */
@@ -59,10 +59,9 @@ int is_buffer_ptr(struct Parrot_Interp *, void *);
 int is_pmc_ptr(struct Parrot_Interp *, void *);
 
 /* miscellaneous functions */
-void free_pmc(PMC *);
-void free_buffer(Buffer *);
 void add_extra_buffer_header(struct Parrot_Interp *, void *);
 void Parrot_initialize_header_pools(struct Parrot_Interp *);
+void Parrot_destroy_header_pools(struct Parrot_Interp *interpreter);
 
 #endif /* PARROT_HEADERS_H */
 
@@ -70,7 +69,7 @@ void Parrot_initialize_header_pools(struct Parrot_Interp *);
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -21,7 +21,7 @@ rx.c / rx.h
 =head1 SUMMARY
 
 rx.c and rx.h set up functions to be used by the regular expression engine.
-They also define internal helper functions that add a layer of 
+They also define internal helper functions that add a layer of
 abstraction to
 the rx_is_X family of functions.  Please also see C<rx.ops>, C<rx.dev>,
 C<rxstacks.c>, and C<rxstacks.h>.
@@ -54,8 +54,8 @@ const char *RX_NEWLINES = "\r\n";       /* XXX Unicode defines a few more. */
 
 =item B<rx_is_word_character>(struct Parrot_Interp *interpreter, INTVAL ch)
 
-Checks to see if supplied char is a word character.  It uses the constant 
-RX_WORDCHARS to create a bitmap.  Please see rx.dev for a detailed 
+Checks to see if supplied char is a word character.  It uses the constant
+RX_WORDCHARS to create a bitmap.  Please see rx.dev for a detailed
 explanation of bitmap
 
 =cut
@@ -77,9 +77,9 @@ rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)
 
 =item B<rx_is_number_character>(struct Parrot_Interp *interpreter, INTVAL ch)
 
-Checks to see if supplied character is a number character.  This function 
-breaks abstraction to gain speed.  It's just a speed hack for now, it 
-will change when it needs to be changed (for different language 
+Checks to see if supplied character is a number character.  This function
+breaks abstraction to gain speed.  It's just a speed hack for now, it
+will change when it needs to be changed (for different language
 support/character encoding)
 
 =cut
@@ -144,7 +144,7 @@ rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch)
 
 =item B<bitmap_make>(struct Parrot_Interp *interpreter, STRING *str)
 
-Creates a bitmap from supplied string.  Please see rx.dev for more 
+Creates a bitmap from supplied string.  Please see rx.dev for more
 information on bitmaps.
 
 =cut
@@ -256,7 +256,7 @@ bitmap_match(Bitmap bmp, INTVAL ch)
         return 0;
     }
 
-    return (INTVAL)(bmp->bmp[ch >> 3] & (1 << (ch & 7)) ? 1 : 0);
+    return (INTVAL)( bmp->bmp[ch >> 3] & (1 << (ch & 7)) ? 1 : 0 );
 }
 
 /*
@@ -271,7 +271,9 @@ Frees up memory the bitmap allocated.
 void
 bitmap_destroy(Bitmap bmp)
 {
-    string_destroy(bmp->bigchars);
+    /* XXX */
+    if (bmp->bigchars && bmp->bigchars->bufstart)
+        mem_sys_free(bmp->bigchars->bufstart);
     mem_sys_free(bmp->bmp);
     mem_sys_free(bmp);
 }

@@ -16,6 +16,12 @@ static const CHARTYPE *string_native_type;
 static const CHARTYPE *string_unicode_type;
 
 #define EXTRA_SIZE 4
+/* work around warning:
+ * cast discards qualifiers from pointer target type
+ * s. usage below
+ */
+
+#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
 /* String COW support */
 
@@ -27,7 +33,7 @@ static const CHARTYPE *string_unicode_type;
 static void
 unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
 {
-    if (s->flags & (BUFFER_COW_FLAG | BUFFER_constant_FLAG)) {
+    if (s->flags & (BUFFER_COW_FLAG|BUFFER_constant_FLAG)) {
         void *p;
         UINTVAL size;
         if (interpreter) {
@@ -44,7 +50,8 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
         s->flags &= ~BUFFER_constant_FLAG;
         Parrot_allocate_string(interpreter, s, size);
         mem_sys_memcopy(s->bufstart, p, size);
-        s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_external_FLAG);
+        s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_external_FLAG |
+                BUFFER_bufstart_external_FLAG);
         if (interpreter) {
             interpreter->GC_block_level--;
             interpreter->DOD_block_level--;
@@ -52,9 +59,8 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
     }
 }
 
-static void
-copy_string_header(struct Parrot_Interp *interpreter,
-                   String *dest, String *src)
+static void copy_string_header(struct Parrot_Interp *interpreter,
+                               String *dest, String *src)
 {
     UINTVAL version;
 #if ! DISABLE_GC_DEBUG
@@ -76,7 +82,7 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
     if (s->flags & BUFFER_constant_FLAG) {
         d = new_string_header(interpreter,
                               s->flags & ~(UINTVAL)BUFFER_constant_FLAG);
-        s->flags |= BUFFER_COW_FLAG | BUFFER_external_FLAG;
+        s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
         copy_string_header(interpreter, d, s);
         d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG);
     }
@@ -89,11 +95,9 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
 }
 
 static void
-make_COW_reference_from_header(struct Parrot_Interp *interpreter, STRING *s,
-                               STRING *d)
-{
+make_COW_reference_from_header(struct Parrot_Interp *interpreter, STRING *s, STRING *d) {
     if (s->flags & BUFFER_constant_FLAG) {
-        s->flags |= BUFFER_COW_FLAG | BUFFER_external_FLAG;
+        s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
         copy_string_header(interpreter, d, s);
         d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG);
     }
@@ -105,7 +109,7 @@ make_COW_reference_from_header(struct Parrot_Interp *interpreter, STRING *s,
 
 
 
-/* Basic string stuff - creation, enlargement, destruction, etc. */
+/* Basic string stuff - creation, enlargement, etc. */
 
 /*=for api string string_init
  * set up the native string vtable
@@ -132,23 +136,26 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
     }
 
     /* Is A real? */
+    /* XXX w/o test for a->strlen s. below */
     if (a != NULL && a->strlen != 0) {
         /* If the destination's constant, then just fall back to
-         * string_concat */
+           string_concat */
         if (a->flags & BUFFER_constant_FLAG) {
             return string_concat(interpreter, a, b, Uflags);
         }
         /* First, make sure B is the same type as A, transcoding
-         * if we need to */
+           if we need to */
         if (a->type != b->type || a->encoding != b->encoding) {
-            b = string_transcode(interpreter, b, a->encoding, a->type, NULL);
+            b = string_transcode(interpreter, b, a->encoding, a->type,
+                                 NULL);
         }
-        unmake_COW(interpreter, a);
         /* make sure A's big enough for both */
         if (a->buflen < a->bufused + b->bufused) {
             a = string_grow(interpreter, a, ((a->bufused + b->bufused)
-                                             - a->buflen) + EXTRA_SIZE);
+                            - a->buflen) + EXTRA_SIZE);
         }
+        else
+            unmake_COW(interpreter, a);
 
         /* Tack B on the end of A */
         mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
@@ -160,17 +167,28 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
     else {
         /* A isn't real. Does it exist at all? */
         if (a != NULL) {
+/* XXX
+ * Why should appending an ascii string to an empty unicode string
+ * yield an ascii string (above transcodes b, which is always correct)?
+ * Why are the flags copied?
+ * I would just drop this and handle a->strlen == 0 like above
+ * -leo
+ */
             if (a->flags & BUFFER_constant_FLAG) {
                 return string_concat(interpreter, a, b, Uflags);
             }
             /* There's at least a string header for A. Make it a copy
-             * of B */
+               of B */
             if (a->buflen < b->bufused) {
                 a = string_grow(interpreter, a, b->bufused + EXTRA_SIZE);
             }
+            else
+                unmake_COW(interpreter, a);
             a->flags = b->flags;
             a->flags &= ~(UINTVAL)(BUFFER_constant_FLAG
-                                   | BUFFER_COW_FLAG | BUFFER_external_FLAG);
+                                   |BUFFER_COW_FLAG
+                                   |BUFFER_bufstart_external_FLAG
+                                   |BUFFER_external_FLAG);
             a->bufused = b->bufused;
             a->strlen = b->strlen;
             a->encoding = b->encoding;
@@ -195,6 +213,10 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
             const CHARTYPE *type)
 {
     STRING *s;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
 
     if (!type) {
         type = string_native_type;
@@ -207,12 +229,13 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     s = new_string_header(interpreter, flags);
     if (flags & BUFFER_external_FLAG) {
         /* The following cast discards the 'const'.  That raises
-         * a warning with gcc, but is ok since the caller indicated
-         * it was safe by setting BUFFER_external_FLAG.
-         * (The cast is necessary to pacify TenDRA's tcc.)
-         */
-        s->bufstart = (void *)buffer;
+           a warning with gcc, but is ok since the caller indicated
+           it was safe by setting BUFFER_external_FLAG.
+           (The cast is necessary to pacify TenDRA's tcc.)
+           */
+        s->bufstart = const_cast(buffer);
         s->buflen = buflen;
+        s->flags |= BUFFER_bufstart_external_FLAG;
     }
     else {
         Parrot_allocate_string(interpreter, s, buflen);
@@ -223,12 +246,12 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     if (buffer) {
         if (flags & BUFFER_external_FLAG) {
             s->strstart = s->bufstart;
-            s->bufused = buflen;
+            s->flags |= BUFFER_bufstart_external_FLAG;
         }
         else {
             mem_sys_memcopy(s->strstart, buffer, buflen);
-            s->bufused = buflen;
         }
+        s->bufused = buflen;
         (void)string_compute_strlen(s);
     }
     else {
@@ -242,22 +265,12 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
  * grow the string buffer by addlen bytes
  */
 STRING *
-string_grow(struct Parrot_Interp *interpreter, STRING *s, INTVAL addlen)
-{
-    unmake_COW(interpreter, s);
+string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
+    unmake_COW(interpreter,s);
 
     /* Don't check buflen, if we are here, we already checked. */
     Parrot_reallocate_string(interpreter, s, s->buflen + addlen);
     return s;
-}
-
-/*=for api string string_destroy
- * free the string's memory
- */
-void
-string_destroy(STRING *s)
-{
-    free_buffer((Buffer *)s);
 }
 
 /* Ordinary user-visible string operations */
@@ -283,14 +296,12 @@ string_index(const STRING *s, UINTVAL idx)
     if (s->encoding->index == enum_encoding_singlebyte) {
         /* This inlines the computations used for the case that the strings is
          * in a singlebyte encoding.
-         * This assumes that any singlebyte encoding uses is us-ascii, which 
-         * is wrong, but consistent with the result of calling
-         * s->encoding->decode */
-        return *((unsigned char *)s->strstart + idx);
+         * This assumes that any singlebyte encoding uses is us-ascii, which is wrong,
+         * but consistent withthe result of calling s->encoding->decode */
+        return *((unsigned char*) s->strstart + idx);
     }
     else {
-        return s->encoding->decode(s->encoding->
-                                   skip_forward(s->strstart, idx));
+        return s->encoding->decode(s->encoding->skip_forward(s->strstart, idx));
     }
 }
 
@@ -301,9 +312,13 @@ string_index(const STRING *s, UINTVAL idx)
  */
 INTVAL
 string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
-                 const STRING *s2, UINTVAL start)
+        const STRING *s2, UINTVAL start)
 {
-    INTVAL i, j, ls, lp;
+    INTVAL i,j,ls,lp;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
 
     if (!s || !string_length(s))
         return -1;
@@ -312,14 +327,14 @@ string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
 
     /* if different transcode to s */
     if (s->encoding != s2->encoding || s->type != s2->type)
-        s2 = string_transcode(interpreter, (STRING *)s2, s->encoding,
-                              s->type, NULL);
+        s2 = string_transcode(interpreter, const_cast(s2), s->encoding,
+                s->type, NULL);
 
     ls = string_length(s);
     lp = string_length(s2);
 
-    for (i = start; i <= ls - lp; i++) {
-        for (j = 0; j < lp; j++)
+    for(i = start; i <= ls - lp; i++) {
+        for(j = 0; j < lp; j++)
             if (string_ord(s, i + j) != string_ord(s2, j))
                 break;
         if (j == lp)
@@ -488,7 +503,7 @@ string_concat(struct Parrot_Interp *interpreter, STRING *a,
                                  a->encoding, 0, a->type);
             mem_sys_memcopy(result->strstart, a->strstart, a->bufused);
             mem_sys_memcopy((void *)((ptrcast_t)result->strstart + a->bufused),
-                            b->strstart, b->bufused);
+                             b->strstart, b->bufused);
             result->strlen = a->strlen + b->strlen;
             result->bufused = a->bufused + b->bufused;
         }
@@ -498,6 +513,10 @@ string_concat(struct Parrot_Interp *interpreter, STRING *a,
     }
     else {
         if (a != NULL) {
+            /* XXX
+             * string_transcode may here be used as string_copy, which is
+             * the only case, where string_transcodes STRING isn't
+             * const */
             return string_transcode(interpreter, b, a->encoding, a->type,
                                     NULL);
         }
@@ -583,12 +602,12 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
     }
 
     substart_off = (const char *)src->encoding->skip_forward(src->strstart,
-                                                             true_offset) -
+                                                       true_offset) -
         (char *)src->strstart;
     subend_off =
         (const char *)src->encoding->skip_forward((char *)src->strstart +
-                                                  substart_off,
-                                                  true_length) -
+                                            substart_off,
+                                            true_length) -
         (char *)src->strstart;
 
     if (subend_off < substart_off) {
@@ -597,7 +616,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
     }
 
     /* do in-place if possible */
-    dest = make_COW_reference(interpreter, src);
+    dest = make_COW_reference(interpreter,  src);
     dest->strstart = (char *)dest->strstart + substart_off;
     dest->bufused = subend_off - substart_off;
     dest->strlen = true_length;
@@ -620,7 +639,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
  */
 STRING *
 string_replace(struct Parrot_Interp *interpreter, STRING *src,
-               INTVAL offset, INTVAL length, STRING *rep, STRING **d)
+              INTVAL offset, INTVAL length, STRING *rep, STRING **d)
 {
     STRING *dest;
     UINTVAL substart_off;       /* Offset from start of string to our
@@ -650,7 +669,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
      */
     if (true_offset > src->strlen) {
         internal_exception(SUBSTR_OUT_OF_STRING,
-                           "Can only replace inside string or index after end of string");
+               "Can only replace inside string or index after end of string");
     }
     if (true_length > (src->strlen - true_offset)) {
         true_length = (UINTVAL)(src->strlen - true_offset);
@@ -658,18 +677,23 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 
     /* Save the substring that is replaced for the return value */
     substart_off = (const char *)src->encoding->skip_forward(src->strstart,
-                                                             true_offset) -
+                                                       true_offset) -
         (char *)src->strstart;
     subend_off =
         (const char *)src->encoding->skip_forward((char *)src->strstart +
-                                                  substart_off,
-                                                  true_length) -
+                                            substart_off,
+                                            true_length) -
         (char *)src->strstart;
 
     if (subend_off < substart_off) {
         internal_exception(SUBSTR_OUT_OF_STRING,
                            "subend somehow is less than substart");
     }
+
+    /* XXX if *d == NULL, dest is unused, we could drop below lines
+     * for this case
+     * -leo
+     */
 
     dest =
         string_make(interpreter, NULL, true_length * src->encoding->max_bytes,
@@ -692,20 +716,21 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
      */
     diff = (subend_off - substart_off) - rep->bufused;
 
-    if (diff >= 0 || ((INTVAL)src->bufused - (INTVAL)src->buflen) <= diff) {
+    if(diff >= 0
+        || ((INTVAL)src->bufused - (INTVAL)src->buflen) <= diff) {
 
         unmake_COW(interpreter, src);
 
-        if (diff != 0) {
-            mem_sys_memmove((char *)src->strstart + substart_off +
-                            rep->bufused, (char *)src->strstart + subend_off,
-                            src->buflen - (subend_off - diff));
+        if(diff != 0) {
+            mem_sys_memmove((char*)src->strstart + substart_off + rep->bufused,
+                                (char*)src->strstart + subend_off,
+                                src->bufused - subend_off);
             src->bufused -= diff;
         }
 
-        mem_sys_memcopy((char *)src->strstart + substart_off,
-                        rep->strstart, rep->bufused);
-        if (diff != 0)
+        mem_sys_memcopy((char*)src->strstart + substart_off,
+                                rep->strstart, rep->bufused);
+        if(diff != 0)
             (void)string_compute_strlen(src);
     }
     /*
@@ -718,12 +743,12 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 
         /* Move the end of old string that isn't replaced to new offset
          * first */
-        mem_sys_memmove((char *)src->strstart + subend_off + diff,
-                        (char *)src->strstart + subend_off,
-                        src->buflen - subend_off);
+        mem_sys_memmove((char*)src->strstart + subend_off + diff,
+                                (char*)src->strstart + subend_off,
+                                src->bufused - subend_off);
         /* Copy the replacement in */
         mem_sys_memcopy((char *)src->strstart + substart_off, rep->strstart,
-                        rep->bufused);
+                                rep->bufused);
         src->bufused += diff;
         (void)string_compute_strlen(src);
     }
@@ -771,7 +796,8 @@ string_chopn(STRING *s, INTVAL n)
  * necessary
  */
 INTVAL
-string_compare(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
+string_compare(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2)
 {
     const char *s1start;
     const char *s1end;
@@ -848,22 +874,6 @@ string_bool(const STRING *s)
     }
 
     return 1;                   /* it must be true */
-}
-
-/*=for api string string_set
- * Set the contents of one string to the contents of another.
- */
-STRING *
-string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
-{
-    if (dest) {
-        make_COW_reference_from_header(interpreter, src, dest);
-    }
-    else {
-        dest = make_COW_reference(interpreter, src);
-    }
-
-    return dest;
 }
 
 /* A number is such that:
@@ -973,7 +983,7 @@ string_to_num(const STRING *s)
                 if (!seen_dot && c == '.' && !in_exp) { /* XXX: ascii */
                     seen_dot = 1;
                 }
-                else if (!seen_e && (c == 'e' || c == 'E')) {   /* XXX: ascii */
+                else if (!seen_e && (c == 'e' || c == 'E')) { /* XXX: ascii */
                     seen_e = 1;
                     in_exp = 1;
                 }
@@ -1005,13 +1015,12 @@ string_to_num(const STRING *s)
 }
 
 STRING *
-string_from_int(struct Parrot_Interp *interpreter, INTVAL i)
-{
+string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
     char buf[128];
     char *ptr = &buf[127];
     int neg = 0;
 
-    if (i < 0) {
+    if(i < 0) {
         neg = 1;
         i = -i;
     }
@@ -1022,38 +1031,39 @@ string_from_int(struct Parrot_Interp *interpreter, INTVAL i)
     do {
         *--ptr = (char)('0' + i % 10);
     }
-    while (i /= 10);
+    while(i /= 10);
 
-    if (neg)
+    if(neg)
         *--ptr = '-';
 
     return string_make(interpreter, ptr, (UINTVAL)(127 - (ptr - buf)),
-                       NULL, 0, NULL);
+                            NULL, 0, NULL);
 }
 
 /* Stolen, with modifications, from perlnum.pmc */
 STRING *
-string_from_num(struct Parrot_Interp *interpreter, FLOATVAL f)
+string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
 {
     /* Too damn hard--hand it off to Parrot_sprintf, which'll probably
-     * use the system sprintf anyway, but has gigantic buffers that are
-     * awfully hard to overflow. */
+       use the system sprintf anyway, but has gigantic buffers that are
+       awfully hard to overflow. */
     return Parrot_sprintf_c(interpreter, "%vg", f);
 }
 
 const char *
-string_to_cstring(struct Parrot_Interp *interpreter, STRING *s)
+string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 {
-    unmake_COW(interpreter, s);
 
     if (s->buflen == s->bufused) {
         string_grow(interpreter, s, 1);
     }
+    else
+        unmake_COW(interpreter, s);
 
     s->flags |= BUFFER_immobile_FLAG;
     ((char *)s->strstart)[s->bufused] = 0;
     /* don't return local vars, return the right thing */
-    return (char *)s->strstart;
+    return (char*)s->strstart;
 }
 
 

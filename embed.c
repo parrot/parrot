@@ -171,6 +171,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
                     "Parrot VM: Problem reading packfile from PIO.\n");
             return NULL;
         }
+        PIO_close(interpreter, io);
     }
     else {
         /* if we've gotten here, we opted not to use PIO to read the file.
@@ -220,7 +221,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         munmap(program_code, program_size);
         close(fd);
     }
-
+#else
+    mem_sys_free(program_code);
 #endif
 
     return pf;
@@ -370,13 +372,6 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
             interpreter->mem_allocs_since_last_collect
         );
     }
-}
-
-void
-Parrot_destroy(struct Parrot_Interp *interp)
-{
-    /* XXX Leaks tons of memory. */
-    mem_sys_free(interp);
 }
 
 /* XXX Doesn't handle arguments with spaces */
