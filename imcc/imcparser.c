@@ -1968,7 +1968,7 @@ yyreduce:
               SymReg * r;
               Instruction *i;
 
-              sprintf(name, "#pcc_sub_call_%d", line - 1);
+              sprintf(name, "_#pcc_sub_call_%d", line - 1);
               yyval.sr = r = mk_pcc_sub(str_dup(name), 0);
               r->pcc_sub->prototyped = yyvsp[-1].t;
               /* this mid rule action has the semantic value of the
@@ -2094,7 +2094,7 @@ yyreduce:
                 if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
                     fataly(EX_SOFTWARE, sourcefile, line,
                         "pcc_return not inside pcc subroutine\n");
-                sprintf(name, "#pcc_sub_ret_%d", line - 1);
+                sprintf(name, "_#pcc_sub_ret_%d", line - 1);
                 yyval.sr = r = mk_pcc_sub(str_dup(name), 0);
                 i = iLABEL(cur_unit, r);
                 i->type = ITPCCSUB | ITLABEL;
@@ -2117,7 +2117,7 @@ yyreduce:
                     fataly(EX_SOFTWARE, sourcefile, line,
                         "pcc_yield not inside pcc subroutine\n");
                 ins->r[1]->pcc_sub->calls_a_sub = 1;
-                sprintf(name, "#pcc_sub_yield_%d", line - 1);
+                sprintf(name, "_#pcc_sub_yield_%d", line - 1);
                 yyval.sr = r = mk_pcc_sub(str_dup(name), 0);
                 i = iLABEL(cur_unit, r);
                 i->type = ITPCCSUB | ITLABEL | ITPCCYIELD;
@@ -2575,7 +2575,7 @@ yyreduce:
               char name[128];
               SymReg * r;
               Instruction *i;
-              sprintf(name, "#pcc_sub_call_%d", line - 1);
+              sprintf(name, "_#pcc_sub_call_%d", line - 1);
               r = mk_pcc_sub(str_dup(name), 0);
               current_call = i = iLABEL(cur_unit, r);
               i->type = ITCALL | ITPCCSUB;
@@ -2601,7 +2601,7 @@ yyreduce:
             char name[128];           
             SymReg * r; 
             Instruction *i;
-            sprintf(name, "#pcc_sub_call_%d", line - 1);
+            sprintf(name, "_#pcc_sub_call_%d", line - 1);
             r = mk_pcc_sub(str_dup(name), 0);
             current_call = i = iLABEL(cur_unit, r);
             i->type = ITCALL | ITPCCSUB;
