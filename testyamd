@@ -10,11 +10,11 @@ cleanup() {
 
 trap cleanup 1 2 3
 mv parrot parrot.orig
-echo "run-yamd -l2 -n ./parrot.orig $@ \$@ 2>&1 | perl -ne'
+echo "run-yamd -l2 -f -n ./parrot.orig  \$@ 2>&1 | perl -ne'
 	BEGIN { undef $/; $|=1; };
 	print \$1 if (/\*{9,9}\n(.*?)\*{9,9}/s);
 	print \$1 if (/((?:WARNI|ERROR).*)/);
 	1;'" > parrot
 chmod 755 parrot
-make test
+perl t/harness --gc-debug --running-make-test -j quick $@
 cleanup
