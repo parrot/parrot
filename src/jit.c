@@ -1385,6 +1385,14 @@ build_asm(Interp *interpreter, opcode_t *pc,
 #ifdef PARROT_PPC
     ppc_sync_cache(jit_info->arena.start, jit_info->native_ptr);
 #endif
+#ifdef PARROT_HPPA
+    hppa_sync_cache(jit_info->arena.start, jit_info->native_ptr);
+#endif
+#ifdef PARROT_IA64
+    ia64_sync_cache(jit_info->arena.start, jit_info->native_ptr);
+    return (jit_f)D2FPTR(&(jit_info->arena.start));
+#endif
+
 
     /* assume gdb is available: generate symbol information  */
 #if defined __GNUC__ || defined __IBMC__
