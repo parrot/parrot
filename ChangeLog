@@ -1,3 +1,36 @@
+2003-09-20    sfink
+
+	* updated the native_pbc test files (from Leo)
+	* built 0.0.11.1 release tarball
+
+2003-09-20    sfink
+
+	* CHANGES BUNDLED INTO 0.0.11:
+	* Executable output
+	* Dynamic PMC registration
+	* Trial exception system
+	* Beginnings of object system
+	* Iterators
+	* Ordered hashes
+	* I/O system improvements
+	* References
+	* Documentation for basic PMC types
+	* IMCC support of Parrot Calling Conventions
+	* Runtime loading of chartypes (and other string improvements)
+	* Conditional breakpoints
+	* Dramatically accelerated sweeps for finalizable objects
+	* Small PMCs (PMCs split into core and extensions)
+	* Loadable bytecode packfiles
+	* Constant PMCs
+	* Sub variants that deal with the stack correctly
+	* Switched runops core
+	* Line numbers in warnings
+	* Environment access
+	* Many documentation cleanups
+	* Conversion to CPS style!
+	* BASIC debugger and many other wacky features
+	* Filename, line number parsing support in IMCC
+
 2003-07-21 17:31 chromatic
 	* applied copyright patch from Josh Wilmes
 
