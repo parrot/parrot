@@ -1410,3 +1410,11 @@ find_global_p_s_sc      1382
 find_global_p_sc_sc     1383
 find_global_p_p_s       1384
 find_global_p_p_sc      1385
+gmtime_s_i      1386
+gmtime_s_ic     1387
+localtime_s_i   1388
+localtime_s_ic  1389
+decodetime_p_i  1390
+decodetime_p_ic 1391
+decodelocaltime_p_i     1392
+decodelocaltime_p_ic    1393

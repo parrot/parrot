@@ -41,6 +41,7 @@ void *Parrot_make_la(struct Parrot_Interp *, PMC *);
 void *Parrot_make_cpa(struct Parrot_Interp *, PMC *);
 void Parrot_destroy_la(long *);
 void Parrot_destroy_cpa(char **);
+PMC* tm_to_array(Parrot_Interp interpreter, struct tm *tm);
 
 /*
  * misc.c

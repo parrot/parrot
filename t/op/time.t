@@ -16,7 +16,7 @@ Tests the C<time> and C<sleep> operations.
 
 =cut
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 output_is(<<'CODE', <<'OUTPUT', "time_i");
 	time	I0
@@ -88,3 +88,17 @@ CODE
 /Cannot go back in time/
 OUT
 
+my $year;
+(undef, undef, undef, undef, undef, $year) = gmtime(time);
+$year += 1900;
+
+# don't run this test 1 tick before the year changes #'
+
+output_is(<<'CODE', $year, "decodelocaltime");
+    time I0
+    decodelocaltime P0, I0
+    .include "tm.pasm"
+    set I0, P0[.TM_YEAR]
+    print I0
+    end
+CODE

@@ -605,6 +605,46 @@ Parrot_destroy_cpa(char **array) {
     /* And then the holding array */
     mem_sys_free(array);
 }
+/*
+
+=item C<PMC* tm_to_array(Parrot_Interp, struct tm *)>
+
+Helper to convert a B<struct tm *> to an Array
+
+=cut
+
+*/
+
+/* &gen_from_enum(tm.pasm) */
+typedef enum {
+    TM_SEC,
+    TM_MIN,
+    TM_HOUR,
+    TM_MDAY,
+    TM_MON,
+    TM_YEAR,
+    TM_WDAY,
+    TM_YDAY,
+    TM_ISDST
+} tm_struct_enum;
+/* &end_gen */
+
+PMC*
+tm_to_array(Parrot_Interp interpreter, struct tm *tm)
+{
+  PMC *Array = pmc_new(interpreter, enum_class_Array);
+  VTABLE_set_integer_native(interpreter, Array, 12);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 0, tm->tm_sec);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 1, tm->tm_min);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 2, tm->tm_hour);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 3, tm->tm_mday);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 4, tm->tm_mon);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 5, tm->tm_year + 1900);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 6, tm->tm_wday);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 7, tm->tm_yday);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 8, tm->tm_isdst);
+  return Array;
+}
 
 /*
 
