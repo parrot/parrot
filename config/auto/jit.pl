@@ -127,6 +127,30 @@ sub runstep {
       );
     }
 
+    # test for executable malloced memory
+    if (-e "config/auto/jit/test_exec_$osname.in") {
+      print " (has_exec_protect ";
+      cc_gen("config/auto/jit/test_exec_$osname.in");
+      eval { cc_build(); };
+      if ($@) {
+	print " $@) ";
+      }
+      else {
+	if (cc_run(0) !~ /ok/ && cc_run(1) =~ /ok/) {
+	  Configure::Data->set(
+	    has_exec_protect => 1
+	  );
+	  print "yes) ";
+	}
+	else {
+	  print "no) ";
+	}
+      }
+      cc_clean();
+    }
+
+    # TODO use executable memory for this test if needed
+    #
     # test for some instructions
     if ($jitcpuarch eq 'i386') {
       cc_gen('config/auto/jit/test_c.in');
