@@ -24,7 +24,6 @@ output_like(<<'CODE', <<OUT, "setenv/getenv");
 CODE
 /hello polly/i
 OUT
-}
 
 output_is(<<'CODE', <<OUT, "envs are all the same");
     new P0, .Env
@@ -41,7 +40,7 @@ ok:
 CODE
 ok
 OUT
-
+}
 
 SKIP: {
     skip("no unsetenv", 1) unless $PConfig{"unsetenv"};
