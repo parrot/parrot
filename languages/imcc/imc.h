@@ -1,4 +1,4 @@
-#define IMCC_VERSION "0.0.2.0"
+#define IMCC_VERSION "0.0.4.0"
 
 
 #define HASH_SIZE 109
