@@ -19,12 +19,11 @@ Usage() if $ARGV[0] eq '--help';
 my %args;
 my @files;
 #
-# The C-style for loop is redundant but necessary when we add argument styles
-# like '-o foo', with whitespace.
+# Process arguments
 #
 for(my $i=0;$i<@ARGV;$i++) {
-    if($ARGV[$i] =~ /^--output=(.*)/) {
-        $args{output} = $1;
+    if($ARGV[$i] eq '--output') {
+        $args{output} = $ARGV[++$i];
     }
     elsif($ARGV[$i] eq '--checksyntax') {
         $args{checksyntax} = 1;
