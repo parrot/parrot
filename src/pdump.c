@@ -10,8 +10,8 @@
  *  References:
  */
 
-#include "parrot/packfile.h"
-#include "parrot/interpreter.h"
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 void PackFile_dump(struct Parrot_Interp *interpreter, struct PackFile *pf);
 void PackFile_ConstTable_dump(struct Parrot_Interp *,
@@ -60,26 +60,42 @@ PackFile_header_dump(struct Parrot_Interp *interpreter, struct PackFile *pf)
             PARROT_BIGENDIAN);
     PIO_printf(interpreter, "\tfloattype = %d", pf->header->floattype);
     PIO_printf(interpreter, "\t(interpreter's NUMVAL_SIZE = %d)\n",NUMVAL_SIZE);
+    PIO_printf(interpreter, "\t%s endianize, %s opcode, %s numval transform\n",
+            pf->need_endianize ? "**need**" : "no",
+            pf->need_wordsize ? "**need**" : "no",
+            pf->fetch_nv ? "**need**" : "no");
     PIO_printf(interpreter, "\tdirformat = %d\n", pf->header->dir_format);
     PIO_printf(interpreter, "]\n");
+}
+
+static void help(void)
+{
+    printf("pdump - dump or convert parrot bytecode (PBC) files\n");
+    printf("usage:\n");
+    printf("pdump [-t] [-d] [-h] file.pbc\n");
+    printf("pdump -o converted.pbc file.pbc\n\n");
+    printf("\t-d ... disassemble bytecode segments\n");
+    printf("\t-h ... dump header only\n");
+    printf("\t-t ... terse output\n");
+    printf("\n\t-o converted.pbc repacks a PBC file into platforms native\n");
+    printf("\t   binary format for better efficiency on reading "
+           "non native PBCs\n");
+    exit(0);
 }
 
 int
 main(int argc, char **argv)
 {
-    struct stat file_stat;
-    int fd;
-    opcode_t *packed;
-    off_t packed_size;
     struct PackFile *pf;
     struct Parrot_Interp *interpreter;
     int terse = 0;
     int disas = 0;
-    INTVAL is_mapped = 0;
+    int convert = 0;
+    int header = 0;
+    char *file;
 
     if (argc < 2) {
-        fprintf(stderr, "pdump: usage: pdump [-t] [-d] FILE\n");
-        return 1;
+        help();
     }
     argc--;
     argv++;
@@ -94,6 +110,31 @@ main(int argc, char **argv)
             argv++;
             disas = 1;
         }
+        else if (memcmp(*argv, "-o", 2) == 0) {
+            if ((*argv)[2])
+                file = *argv+2;
+            else {
+                argc--;
+                argv++;
+                if (argc > 1)
+                    file = *argv;
+                else {
+                    fprintf(stderr, "Missing file param\n");
+                    exit(1);
+                }
+            }
+            argc--;
+            argv++;
+            convert = 1;
+        }
+        else if (strcmp(*argv, "-h") == 0) {
+            argc--;
+            argv++;
+            header = 1;
+        }
+        else if (strcmp(*argv, "-?") == 0) {
+            help();
+        }
         else if (**argv == '-') {
             printf("Unknown option '%s' ignored\n", *argv);
             argc--;
@@ -103,51 +144,48 @@ main(int argc, char **argv)
             break;
     }
 
-    if (stat(*argv, &file_stat)) {
-        printf("can't stat %s, code %i\n", *argv, errno);
-        return 1;
-    }
-    fd = open(*argv, O_RDONLY | O_BINARY);
-    if (!fd) {
-        printf("Can't open, error %i\n", errno);
-        return 1;
-    }
-
     interpreter = make_interpreter(NO_FLAGS);
-    Parrot_init(interpreter, (void *)&file_stat);
+    Parrot_init(interpreter, (void *)&terse);
 
-    packed_size = file_stat.st_size;
+    pf = Parrot_readbc(interpreter, *argv);
 
-#ifndef HAS_HEADER_SYSMMAN
-    packed = (opcode_t *)mem_sys_allocate(packed_size);
-
-    if (!packed) {
-        printf("Can't allocate, code %i\n", errno);
-        return 1;
-    }
-
-    read(fd, (void *)packed, packed_size);
-#else
-    packed =
-        (opcode_t *)mmap(0, packed_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
-    is_mapped = 1;
-
-    if (!packed) {
-        printf("Can't mmap, code %i\n", errno);
-        return 1;
-    }
-    close(fd);
-#endif
-
-    pf = PackFile_new(is_mapped);
-
-    if (!PackFile_unpack(interpreter, pf, (opcode_t *)packed, packed_size)) {
-        printf("Can't unpack.\n");
+    if (!pf) {
+        printf("Can't read PBC\n");
         return 1;
     }
     interpreter->code = pf;
+    if (convert) {
+        size_t size;
+        opcode_t *pack;
+        FILE *fp;
+
+        size = PackFile_pack_size(interpreter->code) * sizeof(opcode_t);
+        pack = (opcode_t*) mem_sys_allocate(size);
+        if (!pack) {
+            printf("out of mem\n");
+            exit(1);
+        }
+        PackFile_pack(interpreter->code, pack);
+        if (strcmp (file, "-") == 0)
+            fp = stdout;
+        else if ((fp = fopen(file, "wb")) == 0) {
+            printf("Couldn't open %s\n", file);
+            exit(1);
+        }
+
+        if ((1 != fwrite(pack, size, 1, fp)) ) {
+            printf("Couldn't write %s\n", file);
+            exit(1);
+        }
+        fclose(fp);
+        free(pack);
+        Parrot_exit(0);
+    }
 
     PackFile_header_dump(interpreter, pf);
+    if (header) {
+        Parrot_exit(0);
+    }
     if (pf->header->dir_format == 0)
         PackFile_dump(interpreter, pf);
     else {
