@@ -119,9 +119,15 @@ static void Parrot_PerlInt_set_value (struct Parrot_Interp *interpreter, PMC* pm
 }
 
 static void Parrot_PerlInt_add (struct Parrot_Interp *interpreter, PMC* pmc, PMC * value,  PMC* dest) {
+    dest->vtable->set_integer_native(interpreter, dest, 
+            pmc->cache.int_val + value->vtable->get_integer(interpreter, value)
+    );
 }
 
 static void Parrot_PerlInt_add_int (struct Parrot_Interp *interpreter, PMC* pmc, INTVAL value,  PMC* dest) {
+    dest->vtable->set_integer_native(interpreter, dest, 
+            pmc->cache.int_val + value
+    );
 }
 
 static void Parrot_PerlInt_add_bigint (struct Parrot_Interp *interpreter, PMC* pmc, BIGINT value,  PMC* dest) {

@@ -56,6 +56,8 @@ typedef enum {
 
 /* XXX add various bit test macros once we have need of them */
 
+/* Prototypes */
+PMC* pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type);
 
 #endif
 

@@ -175,6 +175,8 @@ AUTO_OP ord(i,s|sc,i|ic) {
 
 =item B<print>(s|sc)
 
+=item B<print>(p)
+
 Print $1 to standard output.
 
 =cut
@@ -193,6 +195,17 @@ AUTO_OP print(s|sc) {
   STRING *s = $1;
   if (s) printf("%.*s",(int)string_length(s),(char *) s->bufstart);
 }
+
+AUTO_OP print(p) {
+  PMC *p = $1;
+  if (p->vtable != &Parrot_base_vtables[enum_class_PerlInt]) {
+    printf("This disgustingly ugly hack has served its purpose\n");
+    abort();
+  }
+  printf("%li",(long)(p->vtable->get_integer(interpreter, p)));
+}
+
+
 
 
 ########################################
@@ -312,6 +325,10 @@ These operations load registers from constants or other registers.
 
 =item B<set>(i, ic)
 
+=item B<set>(p, i)
+
+=item B<set>(p, ic)
+
 =item B<set>(n, n)
 
 =item B<set>(n, nc)
@@ -335,6 +352,10 @@ AUTO_OP set(n, n|nc) {
 
 AUTO_OP set(s, s|sc) {
   $1 = string_copy(interpreter, $2);
+}
+
+AUTO_OP set(p, i|ic) { 
+  $1->vtable->set_integer_native(interpreter, $1, $2);
 }
 
 =back
