@@ -53,10 +53,10 @@ sub scan_line
 
   my @tokens;
 
-  if ($text =~ m{^(\s*([a-zA-Z][a-zA-Z0-9_]*)\s*:)(.*)$}) {
+  if ($text =~ m{^(\s*([a-zA-Z][a-zA-Z0-9_]*)\s*:(?!:))(.*)$}) {
     push @tokens, Jako::Token->new(
       $file, $line, 'label', 'N', $2);
-    $text = $3;
+    $text = $3; # The "(?!:)" is non-capturing!
   }
 
   while (defined $text and $text ne '') {
@@ -284,6 +284,7 @@ sub scan_line
     #
 
     if ($text =~ m{^([a-zA-Z][a-zA-Z0-9_]*(::[a-zA-Z][a-zA-Z0-9_]*)*)(.*)$}) {
+#printf STDERR "IDENT [%s:%d]: '%s'\n", $file, $line, $1;
       push @tokens, Jako::Token->new(
         $file, $line, 'ident', undef, $1);
       $text = $3;
@@ -305,6 +306,26 @@ sub scan_line
 
 
 #
+# slurp_file()
+#
+
+sub slurp_file
+{
+  my $self = shift;
+  my ($file) = @_;
+
+  my $fh = FileHandle->new($file);
+
+  die "$0: IO Error. Unable to open file '$file' for reading.\n"
+    unless $fh;
+
+  my @lines = <$fh>;
+
+  return @lines;
+}
+
+
+#
 # scan_file()
 #
 
@@ -317,15 +338,41 @@ sub scan_file
 
   my $line = 0;
 
-  my $fh = FileHandle->new($file);
+  my @lines = $self->slurp_file($file);
+  unshift @lines, "#line 1 \"$file\"\n";
 
-  die "$0: IO Error. Unable to open file '$file' for reading.\n"
-    unless $fh;
+  while(@lines) {
+    $_ = shift @lines;
 
-  while(<$fh>) {
     $line++;
+
     last if m/^__EOF__\s*$/;
-    $self->scan_line($_, $file, $line);
+
+    if (m/^\s*use\s+([a-zA-Z_][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)*)\s*;\s*(.*?)\s*$/) {
+
+      my $use_file = $1;
+      my $leftover = $3;
+
+#print STDERR "use $use_file;\n";
+
+      $use_file =~ s{::}{/}g;
+      $use_file .= ".jako";
+
+      my @use_lines = $self->slurp_file($use_file);
+
+      unshift @use_lines, "#line 1 \"$use_file\"\n";
+      push @use_lines, "#line $line \"$file\"\n";
+      push @use_lines, defined $leftover ? "$leftover\n" : "\n";
+
+      unshift @lines, @use_lines;
+    }
+    elsif (m/^#line\s+(\d+)(\s+"(.*?)")?\s*$/) {
+      $line = $1 - 1; # Will be incremented next iteration
+      $file = $3 if defined $3;
+    }
+    else {
+      $self->scan_line($_, $file, $line);
+    }
   }
 
   push @{$self->{TOKENS}}, Jako::Token->new_eof($file, $line);

@@ -10,18 +10,9 @@
 #     http://archive.develooper.com/perl6-internals@perl.org/msg13935.html
 #
 
-sub num time   :op ();
-sub     sleep  :op (int n);
-sub     concat :op (str dest, str s);
-sub int length :op (str dest);
-sub str substr :op (str s, int i, int l);
-
-sub int initscr  :fnlib = "libcurses.so" ();
-sub int endwin   :fnlib = "libcurses.so" ();
-sub int curs_set :fnlib = "libcurses.so" (int x);
-sub int addstr   :fnlib = "libcurses.so" (str s);
-sub int refresh  :fnlib = "libcurses.so" ();
-sub int move     :fnlib = "libcurses.so" (int x, int y);
+use sys;
+use string;
+use Curses;
 
 var int foo; # Store result from above functions here.
 
@@ -68,14 +59,14 @@ sub int at (str cells, int row, int col)
   offset += col;
 
   var int len;
-  len = length(cells);
-  foo = move(0, 19);
-  foo = addstr("length(cells) == $len");
-  foo = move(0, 20);
-  foo = addstr("substr(cells, $offset, 1)");
-  foo = move(0, 25);
-  foo = refresh();
-  temp = substr(cells, offset, 1);
+  len = string::length(cells);
+  foo = Curses::move(0, 19);
+  foo = Curses::addstr("length(cells) == $len");
+  foo = Curses::move(0, 20);
+  foo = Curses::addstr("substr(cells, $offset, 1)");
+  foo = Curses::move(0, 25);
+  foo = Curses::refresh();
+  temp = string::substr(cells, offset, 1);
 
   return 1 if (temp == "*");
   return 0;
@@ -116,20 +107,23 @@ sub str generate (str cells)
 
       var str ch;
       if (current != 0) {
-        foo = move(0, 21);
-        foo = addstr("substr(\"   *     \", $count, 1)");
-        foo = move(0, 25);
-        foo = refresh();
-        ch = substr("   *     ", count, 1);
+        foo = Curses::move(0, 21);
+        foo = Curses::addstr("substr(\"   *     \", $count, 1)");
+        foo = Curses::move(0, 25);
+        foo = Curses::refresh();
+
+        ch = string::substr("   *     ", count, 1);
       }
       else {
-        foo = move(0, 21);
-        foo = addstr("substr(\"  **     \", $count, 1)");
-        foo = move(0, 25);
-        foo = refresh();
-        ch = substr("  **     ", count, 1);
+        foo = Curses::move(0, 21);
+        foo = Curses::addstr("substr(\"  **     \", $count, 1)");
+        foo = Curses::move(0, 25);
+        foo = Curses::refresh();
+
+        ch = string::substr("  **     ", count, 1);
       }
-      concat(temp, ch);
+
+      string::concat(temp, ch);
 
       col++;
     }
@@ -147,8 +141,8 @@ sub str generate (str cells)
 
 sub dump(str cells, int g)
 {
-  foo = move(0, 0);
-  foo = addstr("Generation $g of $G:");
+  foo = Curses::move(0, 0);
+  foo = Curses::addstr("Generation $g of $G:");
 
   var int row = 0;
   while (row < HEIGHT) {
@@ -158,43 +152,43 @@ sub dump(str cells, int g)
       current = at(cells, row, col);
 
       if (current == 1) {
-        addstr("*");
+        Curses::addstr("*");
       }
       else {
-        addstr(" ");
+        Curses::addstr(" ");
       }
     }
-    addstr("\n");
+    Curses::addstr("\n");
   }
 
-  foo = move(0, 25);
-  foo = refresh();
+  foo = Curses::move(0, 25);
+  foo = Curses::refresh();
 }
 
 
-foo = initscr();
-foo = curs_set(0);
+foo = Curses::initscr();
+foo = Curses::curs_set(0);
 
 var num start;
-start = time();
+start = sys::timen();
 
 var str cells = "";
 
-concat(cells, r00);
-concat(cells, r01);
-concat(cells, r02);
-concat(cells, r03);
-concat(cells, r04);
-concat(cells, r05);
-concat(cells, r06);
-concat(cells, r07);
-concat(cells, r08);
-concat(cells, r09);
-concat(cells, r10);
-concat(cells, r11);
-concat(cells, r12);
-concat(cells, r13);
-concat(cells, r14);
+string::concat(cells, r00);
+string::concat(cells, r01);
+string::concat(cells, r02);
+string::concat(cells, r03);
+string::concat(cells, r04);
+string::concat(cells, r05);
+string::concat(cells, r06);
+string::concat(cells, r07);
+string::concat(cells, r08);
+string::concat(cells, r09);
+string::concat(cells, r10);
+string::concat(cells, r11);
+string::concat(cells, r12);
+string::concat(cells, r13);
+string::concat(cells, r14);
 
 dump(cells, 0);
 
@@ -203,9 +197,9 @@ var int g = 0; # Number of generations so far.
 while (g < G) {
   cells = generate(cells);
   dump(cells, g);
-  sleep(1);
+  sys::sleep(1);
 }
 
-foo = curs_set(1);
-foo = endwin();
+foo = Curses::curs_set(1);
+foo = Curses::endwin();
 

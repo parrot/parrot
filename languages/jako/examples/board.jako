@@ -10,37 +10,38 @@
 # $Id$
 #
 
-sub print :op (str s);
+use sys;
 
 var int rank, file;
 var int temp;
 
 rank = 7;
 
-print("  +---+---+---+---+---+---+---+---+\n");
+sys::print("  +---+---+---+---+---+---+---+---+\n");
 
 while(rank >= 0) {
   temp = rank + 1;
   file = 0;
 
-  print("$temp |");
+  sys::print("$temp |");
 
   while(file < 8) {
     temp = rank + file;
     temp %= 2;
  
     if (temp == 1) {
-      print("   |");
+      sys::print("   |");
     } else {
-      print(" * |");
+      sys::print(" * |");
     }
 
     file++;
   }
 
-  print("\n");
-  print("  +---+---+---+---+---+---+---+---+\n");
+  sys::print("\n");
+  sys::print("  +---+---+---+---+---+---+---+---+\n");
   rank--;
 }
 
-print("    A   B   C   D   E   F   G   H  \n");
+sys::print("    A   B   C   D   E   F   G   H  \n");
+

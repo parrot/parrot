@@ -12,14 +12,14 @@
 # $Id$
 #
 
-sub print :op (str s);
+use sys;
 
 const int n = 100;
 
 var   int i =   2;
 
-print("Algorithm P (Naiive primality test)\n");
-print("  Printing primes up to $n...\n");
+sys::print("Algorithm P (Naiive primality test)\n");
+sys::print("  Printing primes up to $n...\n");
 
 NUMBER: while (i <= n) {
   var int m;
@@ -37,10 +37,10 @@ NUMBER: while (i <= n) {
     j++;
   }
 
-  print("$i  ");
+  sys::print("$i  ");
 } continue {
   i++;
 }
 
-print("\n");
+sys::print("\n");
 

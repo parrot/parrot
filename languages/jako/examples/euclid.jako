@@ -17,15 +17,15 @@
 # $Id$
 #
 
-sub print :op (str a);
+use sys;
 
 var int m, n, r;
 
 m = 96;
 n = 64;
 
-print("Algorithm E (Euclid's algorithm)\n");
-print("  Calculating gcd($m, $n) = ...\n");
+sys::print("Algorithm E (Euclid's algorithm)\n");
+sys::print("  Calculating gcd($m, $n) = ...\n");
 
 r = m % n;
 while (r != 0) {
@@ -34,4 +34,5 @@ while (r != 0) {
   r = m % n;
 } 
 
-print("  ... = $n\n");
+sys::print("  ... = $n\n");
+

@@ -10,10 +10,8 @@
 # $Id$
 #
 
-sub     print  :op (str s);
-sub str substr :op (str s, int i, int l);
-sub str concat :op (str s, str t);
-sub int length :op (str s);
+use sys;
+use string;
 
 const int NUM_FILES = 8;
 const int NUM_RANKS = 8;
@@ -37,18 +35,18 @@ sub str remove_queen (str board, int rank, int file)
   y = i + 1;
 
   var int z;
-  z = length(board);
+  z = string::length(board);
   z = z - y;
 
   var str prefix;
-  prefix = substr(board, 0, x);
+  prefix = string::substr(board, 0, x);
   var str suffix;
-  suffix = substr(board, y, z);
+  suffix = string::substr(board, y, z);
 
   var str temp;
   temp = prefix;
-  temp = concat(temp, " ");
-  temp = concat(temp, suffix);
+  temp = string::concat(temp, " ");
+  temp = string::concat(temp, suffix);
 
   return temp;
 }
@@ -96,18 +94,18 @@ sub str place_queen (str board, int rank, int file)
   y = i + 1;
 
   var int z;
-  z = length(board);
+  z = string::length(board);
   z = z - y;
 
   var str prefix;
-  prefix = substr(board, 0, x);
+  prefix = string::substr(board, 0, x);
   var str suffix;
-  suffix = substr(board, y, z);
+  suffix = string::substr(board, y, z);
 
   var str temp;
   temp = prefix;
-  temp = concat(temp, "Q");
-  temp = concat(temp, suffix);
+  temp = string::concat(temp, "Q");
+  temp = string::concat(temp, suffix);
 
   return temp;
 }
@@ -161,11 +159,11 @@ sub str at (str board, int rank, int file) {
   i += file;
  
   var int l;
-  l = length(board);
+  l = string::length(board);
 
 #  print("Board is $l characters long. Fetching character at index $i.\n");
 
-  temp = substr(board, i, 1);
+  temp = string::substr(board, i, 1);
 
   return temp;
 }
@@ -237,12 +235,12 @@ sub print_board (str board) {
 
   rank = 7;
 
-  print("  +---+---+---+---+---+---+---+---+\n");
+  sys::print("  +---+---+---+---+---+---+---+---+\n");
 
   while(rank >= 0) {
     temp = rank + 1;
 
-    print("$temp |");
+    sys::print("$temp |");
 
     file = 0;
     while(file < 8) {
@@ -251,26 +249,26 @@ sub print_board (str board) {
       result = queen_at(board, rank, file);
 
       if (result == 1) {
-        print(" Q |");
+        sys::print(" Q |");
       } else {
         temp = rank + file;
         temp %= 2;
  
         if (temp == 1) {
-          print("   |");
+          sys::print("   |");
         } else {
-          print(" * |");
+          sys::print(" * |");
         }
       }
       file++;
     }
 
-    print("\n");
-    print("  +---+---+---+---+---+---+---+---+\n");
+    sys::print("\n");
+    sys::print("  +---+---+---+---+---+---+---+---+\n");
     rank--;
   }
 
-  print("    A   B   C   D   E   F   G   H  \n");
+  sys::print("    A   B   C   D   E   F   G   H  \n");
 }
 
 
@@ -284,20 +282,20 @@ sub str new_board()
   var int rank = 0;
   var int file = 0;
 
-  print("Making new board with $NUM_RANKS ranks and $NUM_FILES files...\n");
+  sys::print("Making new board with $NUM_RANKS ranks and $NUM_FILES files...\n");
 
   while (rank < NUM_RANKS) {
     file = 0;
     while (file < NUM_FILES) {
-      board = concat(board, " ");
+      board = string::concat(board, " ");
       file++;
     }
     rank++;
   }
 
   var int l;
-  l = length(board);
-  print("Board length is $l.\n");
+  l = string::length(board);
+  sys::print("Board length is $l.\n");
 
   return board;
 }

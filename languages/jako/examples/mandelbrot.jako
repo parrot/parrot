@@ -28,8 +28,8 @@
 # license as the Parrot interpreter.
 #
 
-sub     print  :op (str s);
-sub str substr :op (str s, int i, int l);
+use sys;
+use string;
 
 var str b = " .:,;!/>)|&IH%*#";
 
@@ -104,8 +104,8 @@ temp_int_5 = 1;
 
 var str ch;
 
-ch = substr(b, temp_int_4, temp_int_5);
-print(ch);
+ch = string::substr(b, temp_int_4, temp_int_5);
+sys::print(ch);
 
 XLOOP:
 
@@ -113,7 +113,7 @@ goto XREDO;
 
 YLOOP:
 
-print("\n");
+sys::print("\n");
 goto YREDO;
 
 END:

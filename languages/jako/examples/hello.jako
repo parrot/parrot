@@ -10,6 +10,7 @@
 # $Id$
 #
 
-sub print :op (str s);
+use sys;
 
-print("Hello, world!\n");
+sys::print("Hello, world!\n");
+

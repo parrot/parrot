@@ -124,7 +124,8 @@ sub compile
 
 #    $self->DEBUG(0, "Calling %s%s...", $name, ($op ? ' (op $op)' : ' as op'));
 
-    $name = $op if defined $op;
+    $name = $op->value if defined $op;
+    $name =~ s/(^")|("$)//g; # Delete leading and trailing quotes;
 
     $name =~ s/^.*:://; # Delete namespaces from ops
 

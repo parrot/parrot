@@ -28,9 +28,8 @@
 # license as the Parrot interpreter.
 #
 
-sub     print  :op (str s);
-sub     sleep  :op (int n);
-sub str substr :op (str s, int i, int l);
+use sys;
+use string;
 
 const str CHARS = " .:,;!/>)|&IH%*#";
 const int DEPTH = 112;
@@ -132,13 +131,13 @@ sub print_mandel(int width, int height, num cx, num cy, num sx, num sy) {
 
       var str ch;
 
-      ch = substr(CHARS, temp_int_4, temp_int_5);
-      print(ch);
+      ch = string::substr(CHARS, temp_int_4, temp_int_5);
+      sys::print(ch);
     } continue {
       x += inc_x;
     }
 
-    print("\n");
+    sys::print("\n");
   } continue {
     y -= inc_y;
   }
@@ -174,22 +173,22 @@ sy = start_sy;
 
 var int i = 1;
 while (i < N) {
-  print(CLS);
+  sys::print(CLS);
   
-  print("ITER:   $i of $N\n");
-  print("WIDTH:  $WIDTH\n");
-  print("HEIGHT: $HEIGHT\n");
-  print("cx:     $cx\n");
-  print("cy:     $cy\n");
-  print("sx:     $sx\n");
-  print("sy:     $sy\n");
-  print("\n");
+  sys::print("ITER:   $i of $N\n");
+  sys::print("WIDTH:  $WIDTH\n");
+  sys::print("HEIGHT: $HEIGHT\n");
+  sys::print("cx:     $cx\n");
+  sys::print("cy:     $cy\n");
+  sys::print("sx:     $sx\n");
+  sys::print("sy:     $sy\n");
+  sys::print("\n");
  
   print_mandel(WIDTH, HEIGHT, cx, cy, sx, sy);
 
   sx  *= RATE;
   sy  *= RATE;
   i++;
-#  sleep(1);
+#  sys::sleep(1);
 }
 

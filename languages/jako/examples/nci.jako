@@ -9,21 +9,7 @@
 # license as Parrot.
 #
 
-module Curses
-  :fnlib = "libcurses.so"
-{
-  sub int initscr  :fn ();
-  sub int endwin   :fn ();
-  sub int curs_set :fn (int x);
-
-  sub int addstr   :fn (str s);
-  sub int refresh  :fn ();
-  sub int move     :fn (int x, int y);
-
-  sub int getch    :fn ();
-  sub int box      :fn (int screen, int v, int h);
-  sub int hline    :fn (int ch, int n);
-}
+use Curses;
 
 var int foo; # Store result from above functions here.
 

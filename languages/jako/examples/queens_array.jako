@@ -10,6 +10,8 @@
 # $Id$
 #
 
+use sys;
+
 const int NO_QUEEN      = -1;
 
 const int NUM_FILES     = 8;
@@ -60,36 +62,36 @@ sub print_board (int board) {
 
   rank = 7;
 
-  print("  +---+---+---+---+---+---+---+---+\n");
+  sys::print("  +---+---+---+---+---+---+---+---+\n");
 
   while(rank >= 0) {
     temp = rank + 1;
     file = 0;
 
-    print("$temp |");
+    sys::print("$temp |");
 
     while(file < 8) {
       if (board[file] == rank) {
-        print(" Q |");
+        sys::print(" Q |");
       } else {
         temp = rank + file;
         temp %= 2;
  
         if (temp == 1) {
-          print("   |");
+          sys::print("   |");
         } else {
-          print(" * |");
+          sys::print(" * |");
         }
       }
       file++;
     }
 
-    print("\n");
-    print("  +---+---+---+---+---+---+---+---+\n");
+    sys::print("\n");
+    sys::print("  +---+---+---+---+---+---+---+---+\n");
     rank--;
   }
 
-  print("    A   B   C   D   E   F   G   H  \n");
+  sys::print("    A   B   C   D   E   F   G   H  \n");
 }
 
 

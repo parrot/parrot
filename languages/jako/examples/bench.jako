@@ -21,8 +21,14 @@
 # $Id$
 #
 
+use sys;
+
 const int N = 100;
 var   int q = 1;
+
+var num start_time;
+
+start_time = sys::timen();
 
 while (q < N) {
   var int i, j, w = 1;
@@ -31,9 +37,19 @@ while (q < N) {
     i++;
     j += i;
     w++;
-#    print("$q, $w\n");
+#    sys::print("$q, $w\n");
   }
 
   q++;
 }
+
+var num end_time;
+
+end_time = sys::timen();
+
+var num elapsed;
+
+elapsed = end_time - start_time;
+
+sys::print("Elapsed: $elapsed\n");
 

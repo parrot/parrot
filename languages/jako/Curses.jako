@@ -1,5 +1,5 @@
 #
-# curses.jako
+# Curses.jako
 #
 # A Jako module for interfacing with the curses library.
 #
@@ -10,19 +10,19 @@
 # $Id$
 #
 
-module curses : fnlib = "libcurses.so" {
+module Curses
+  :fnlib = "libcurses.so"
+{
+  sub int initscr  :fn ();
+  sub int endwin   :fn ();
+  sub int curs_set :fn (int x);
 
-  sub int initscr  ();
-  sub int endwin   ();
-  sub int curs_set (int x);
+  sub int addstr   :fn (str s);
+  sub int refresh  :fn ();
+  sub int move     :fn (int x, int y);
 
-  sub int addstr   (str s);
-  sub int refresh  ();
-  sub int move     (int x, int y);
-
-  sub int getch    ();
-  sub int box      (int screen, int v, int h);
-  sub int hline    (int ch, int n);
-
+  sub int getch    :fn ();
+  sub int box      :fn (int screen, int v, int h);
+  sub int hline    :fn (int ch, int n);
 }
 

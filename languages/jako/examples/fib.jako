@@ -10,7 +10,7 @@
 # $Id$
 #
 
-sub print :op (str s);
+use sys;
 
 const int n = 24;
 
@@ -19,8 +19,8 @@ var   int b =  1;
 var   int f =  1; 
 var   int i =  3;
 
-print("Algorithm F2 (Fibonacci's function)\n");
-print("  Calculating fib($n) = ...\n");
+sys::print("Algorithm F2 (Fibonacci's function)\n");
+sys::print("  Calculating fib($n) = ...\n");
 
 while (i <= n) {
   f = a + b;
@@ -29,4 +29,5 @@ while (i <= n) {
   i++;
 }
 
-print("  ... = $f\n");
+sys::print("  ... = $f\n");
+

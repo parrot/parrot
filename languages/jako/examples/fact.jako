@@ -12,7 +12,7 @@
 # $Id$
 #
 
-sub print :op (str s);
+use sys;
 
 const int N = 15;
 
@@ -40,10 +40,10 @@ sub int fact(int n) {
 
 var int f;
 
-print("Algorithm F1 (The factorial function)\n");
-print("    Calculating fact($N) = ...\n");
+sys::print("Algorithm F1 (The factorial function)\n");
+sys::print("    Calculating fact($N) = ...\n");
 
 f = fact(N);
 
-print("    ... = $f\n");
+sys::print("    ... = $f\n");
 

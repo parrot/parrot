@@ -16,7 +16,7 @@
 # license as the Parrot interpreter.
 #
 
-sub print :op (str s);
+use sys;
 
 const num first_den =       1.0;
 const num last_den  = 1000000.0;
@@ -40,5 +40,5 @@ while (this_den <= last_den) {
 var num pi;
 pi = 4.0 * cur_frac;
 
-print("PI is (very) approximately: $pi\n");
+sys::print("PI is (very) approximately: $pi\n");
 

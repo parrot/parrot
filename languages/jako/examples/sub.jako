@@ -11,12 +11,12 @@
 # $Id$
 #
 
-sub print :op (str s);
+use sys;
 
 var int x;
 
 sub printit (int x) {
-  print("$x\n");
+  sys::print("$x\n");
 }
 
 x = 42;
