@@ -89,14 +89,16 @@ typedef enum {
     /* Set to true if the PMC has a private GC function. For PMCs the
      * GC system can't snoop into */
     PMC_private_GC_FLAG = 1 << 12,
+    /* Set to true if the PMC has a custom mark routine */
+    PMC_custom_mark_FLAG = 1 << 13,
     /* Are we live? */
-    PMC_live_FLAG = 1 << 13,
+    PMC_live_FLAG = 1 << 14,
     /* Are we on the free list */
-    PMC_on_free_list_FLAG = 1 << 14,
+    PMC_on_free_list_FLAG = 1 << 15,
     /* Our refcount */
-    PMC_refcount_field = 1 << 15 | 1 << 16,
+    PMC_refcount_field = 1 << 16 | 1 << 17,
     /* Constant flag */
-    PMC_constant_FLAG = 1 << 17
+    PMC_constant_FLAG = 1 << 18
 } PMC_flags;
 
 /* XXX add various bit test macros once we have need of them */
