@@ -17,6 +17,8 @@
 
 #include "parrot/parrot.h"
 
+typedef char* Bitmap;
+
 typedef enum rxflags {
 	enum_rxflags_none=0,
 	enum_rxflags_case_insensitive=1,
@@ -31,6 +33,11 @@ typedef enum rxdirection {
 } rxdirection;
 
 extern const INTVAL RX_MARK;
+extern const char * RX_WORDCHARS;
+extern const char * RX_NUMCHARS;
+extern const char * RX_SPACECHARS;
+
+#define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), 0, 0, 0)
 
 typedef struct rxinfo {
 	STRING *string;
@@ -52,9 +59,12 @@ typedef struct rxinfo {
 
 rxinfo * rx_allocate_info(struct Parrot_Interp *, STRING *);
 
-BOOLVAL  rx_is_word_character(char ch);
-BOOLVAL  rx_is_number_character(char ch);
-BOOLVAL  rx_is_whitespace_character(char ch);
+BOOLVAL  rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
+BOOLVAL  rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
+BOOLVAL  rx_is_whitespace_character(struct Parrot_Interp *, INTVAL ch);
+
+Bitmap make_bitmap(STRING* str);
+BOOLVAL check_bitmap(INTVAL ch, Bitmap bmp);
 
 STRING *rxP_get_substr(struct Parrot_Interp *, STRING *, INTVAL, INTVAL);
 
