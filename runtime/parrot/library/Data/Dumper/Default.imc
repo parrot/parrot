@@ -542,6 +542,17 @@ Dumps a UnManagedStruct PMC.
     .pcc_end_return
 .end
 
+=item style."pmcArray"( name, array )
+
+Dumps an Array.
+
+=cut
+
+.sub pmcArray
+    S0 = "pmcPerlArray"
+    callmethod
+.end
+
 =back
 
 =head1 AUTHOR
