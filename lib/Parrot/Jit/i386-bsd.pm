@@ -8,6 +8,9 @@ package Parrot::Jit;
 
 use base qw(Parrot::Jit::i386Generic);
 
+$OBJDUMP = "objdump -w -d";
+$AS      = "as";
+
 $OP_ARGUMENT_SIZE = 4;
 
 $Call_inmediate_arg_size = 5;

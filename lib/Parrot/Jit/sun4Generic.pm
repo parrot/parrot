@@ -15,9 +15,6 @@ use constant TMP_AS  => "t.s";
 
 use constant DUMMY_INSTR => 'nop';
 
-use constant OBJDUMP => "objdump -w -d";
-use constant AS      => "as";
-
 my $Argument = '[\&\*][a-zA-Z_]+\[\d+\]';
 my $Pointer_Argument = '\&[a-zA-Z_]+\[\d+\]';
 my $Literal_Argument = '\*[a-zA-Z_]+\[\d+\]';
@@ -161,8 +158,8 @@ sub assemble($$) {
 	print STDERR "Assembling:\n\n", (new IO::File $file)->getlines, "\n\n"
 		if DEBUG;
 
-	system AS." $file -o $obj";
-	die AS." $file failed" if (($? >> 8) != 0);
+	system $Parrot::Jit::AS." $file -o $obj";
+	die $Parrot::Jit::AS." $file failed" if (($? >> 8) != 0);
 }
 
 sub disassemble($$$$) {
@@ -172,8 +169,8 @@ sub disassemble($$$$) {
 
 	print STDERR "Disassembly:\n\n" if DEBUG;
 
-	my $objdump = new IO::File OBJDUMP." $obj |"
-		or die "Could not run ".OBJDUMP." $obj: $!";
+	my $objdump = new IO::File $Parrot::Jit::OBJDUMP." $obj |"
+		or die "Could not run ".$Parrot::Jit::OBJDUMP." $obj: $!";
 
 	while (<$objdump>) { last if /<main>:$/ }
 
