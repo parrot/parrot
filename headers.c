@@ -39,8 +39,8 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     /* clear flags, set is_PMC_FLAG */
     PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
     ((PMC *)pmc)->data = NULL;
-    ((PMC *)pmc)->metadata = NULL;
-    ((PMC *)pmc)->synchronize = NULL;
+    ((PMC *)pmc)->pmc_ext = NULL;
+    /* TODO check PMCs init method, if they clear the cache */
     return pmc;
 }
 
@@ -52,11 +52,8 @@ get_free_buffer(struct Parrot_Interp *interpreter,
 {
     Buffer *buffer = get_free_object(interpreter, pool);
 
-    /* Don't let it point to garbage memory */
-    buffer->bufstart = NULL;
-    buffer->buflen = 0;
-    /* Clear the flagpole (especially _on_free_list_FLAG) */
-    PObj_flags_CLEARALL(buffer);
+    memset(buffer, 0, pool->object_size);
+    SET_NULL(buffer->bufstart);
     return buffer;
 }
 
@@ -168,6 +165,24 @@ new_pmc_header(struct Parrot_Interp *interpreter)
 {
     return get_free_pmc(interpreter, interpreter->arena_base->pmc_pool);
 }
+
+
+PMC_EXT *
+new_pmc_ext(struct Parrot_Interp *interpreter)
+{
+    struct Small_Object_Pool *pool = interpreter->arena_base->pmc_ext_pool;
+    void *ptr = get_free_object(interpreter, pool);
+    memset(ptr, 0, sizeof(PMC_EXT));
+    return ptr;
+}
+
+void
+add_pmc_ext(struct Parrot_Interp *interpreter, PMC *pmc)
+{
+    pmc->pmc_ext = new_pmc_ext(interpreter);
+    PObj_is_PMC_EXT_SET(pmc);
+}
+
 
 STRING *
 new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
@@ -308,6 +323,8 @@ Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
     /* Init the constant string header pool */
     interpreter->arena_base->constant_string_header_pool =
             new_string_pool(interpreter, 1);
+    interpreter->arena_base->constant_string_header_pool->name =
+        "constant_string_header";
 
 
     /* Init the buffer header pool
@@ -317,14 +334,23 @@ Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
      * here for faster access in new_*_header
      */
     interpreter->arena_base->buffer_header_pool = new_buffer_pool(interpreter);
+    interpreter->arena_base->buffer_header_pool->name = "buffer_header";
 
     /* Init the string header pool */
     interpreter->arena_base->string_header_pool =
             new_string_pool(interpreter, 0);
+    interpreter->arena_base->string_header_pool->name = "string_header";
 
     /* Init the PMC header pool */
     interpreter->arena_base->pmc_pool = new_pmc_pool(interpreter);
+    interpreter->arena_base->pmc_pool->name = "pmc";
+    interpreter->arena_base->pmc_ext_pool =
+        new_small_object_pool(interpreter, sizeof(struct PMC_EXT), 1024);
+    interpreter->arena_base->pmc_ext_pool->more_objects =
+        alloc_objects;
+    interpreter->arena_base->pmc_ext_pool->name = "pmc_ext";
     interpreter->arena_base->constant_pmc_pool = new_pmc_pool(interpreter);
+    interpreter->arena_base->constant_pmc_pool->name = "constant_pmc";
     interpreter->arena_base->constant_pmc_pool->objects_per_alloc =
        CONSTANT_PMC_HEADERS_PER_ALLOC;
 }
@@ -336,8 +362,17 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
     struct Small_Object_Arena *cur_arena, *next;
     int i, j, start;
 
-    /* const/non const COW strings live in different pools * so in first pass
-     * * * * COW refcount is done, in 2. refcounting * in 3rd freeing */
+    /* TODO: -lt make a command line option for cleaning up:
+     * - the last interpreter may just die
+     * - created interpreters should always get destroyed
+     * - move the check to interpreter.c
+    */
+    return;
+    /* const/non const COW strings life in different pools
+     * so in first pass
+     * COW refcount is done, in 2. refcounting
+     * in 3rd freeing
+     */
 #ifdef GC_IS_MALLOC
     start = 0;
 #else
@@ -372,7 +407,9 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
             if (i == 2 && pool) {
                 for (cur_arena = pool->last_Arena; cur_arena;) {
                     next = cur_arena->prev;
+#if ! ARENA_DOD_FLAGS
                     mem_sys_free(cur_arena->start_objects);
+#endif
                     mem_sys_free(cur_arena);
                     cur_arena = next;
                 }
@@ -381,6 +418,16 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
 
         }
     }
+    pool = interpreter->arena_base->pmc_ext_pool;
+    for (cur_arena = pool->last_Arena; cur_arena;) {
+        next = cur_arena->prev;
+#if ! ARENA_DOD_FLAGS
+        mem_sys_free(cur_arena->start_objects);
+#endif
+        mem_sys_free(cur_arena);
+        cur_arena = next;
+    }
+    mem_sys_free(interpreter->arena_base->pmc_ext_pool);
     mem_sys_free(interpreter->arena_base->sized_header_pools);
 }
 

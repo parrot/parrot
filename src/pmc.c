@@ -73,8 +73,22 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
 PMC *
 pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 {
-    return get_new_pmc_header(interpreter, base_type,
+    PMC *pmc = get_new_pmc_header(interpreter, base_type,
             interpreter->arena_base->pmc_pool);
+    switch (base_type) {
+        case enum_class_PerlInt:
+        case enum_class_PerlNum:
+        case enum_class_PerlString:
+        case enum_class_PerlUndef:
+            break;
+        default:
+            /* TODO optimize this, mainly only aggregates need
+             * the extra header part
+             */
+            add_pmc_ext(interpreter, pmc);
+            break;
+    }
+    return pmc;
 }
 
 /*=for api pmc constant_pmc_new_noinit

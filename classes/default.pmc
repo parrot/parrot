@@ -48,7 +48,7 @@ pmclass default abstract noinit {
 
     PMC* getprop(STRING* key) {
         PMC* p_key = key_new_string(interpreter, key);
-	if (SELF->metadata) {
+	if (SELF->pmc_ext && SELF->metadata) {
 	  return (VTABLE_get_pmc_keyed(interpreter, SELF->metadata, p_key));
 	} else {
 	  PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
@@ -59,11 +59,13 @@ pmclass default abstract noinit {
 
     void setprop(STRING* key, PMC* value) {
         PMC* p_key;
-	if (SELF->metadata) {
+	if (SELF->pmc_ext && SELF->metadata) {
           p_key = key_new_string(interpreter, key);
 	  VTABLE_set_pmc_keyed(interpreter,
 			  SELF->metadata, p_key, value, NULL);
 	} else {
+          if (!SELF->pmc_ext)
+              add_pmc_ext(INTERP, SELF);
           /* first make new hash */
 	  SELF->metadata = pmc_new_noinit(interpreter, enum_class_PerlHash);
 	  VTABLE_init(interpreter, SELF->metadata);
@@ -76,7 +78,7 @@ pmclass default abstract noinit {
     }
 
     void delprop(STRING* key) {
-	if (SELF->metadata) {
+	if (SELF->pmc_ext && SELF->metadata) {
           PMC* p_key = key_new_string(interpreter, key);
 	  VTABLE_delete_keyed(interpreter, SELF->metadata, p_key);
 	}
@@ -84,6 +86,8 @@ pmclass default abstract noinit {
     }
 
     PMC* getprops() {
+        if (!SELF->pmc_ext)
+             add_pmc_ext(INTERP, SELF);
 	if (!SELF->metadata) {
 	  SELF->metadata = pmc_new_noinit(interpreter, enum_class_PerlHash);
 	  VTABLE_init(interpreter, SELF->metadata);

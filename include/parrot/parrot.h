@@ -177,7 +177,7 @@ typedef void (*funcptr_t)(void);
  * samples by reducing various numbers, and causing DOD and allocation runs
  * to occur more frequently. It does significantly reduce performance. */
 #ifndef DISABLE_GC_DEBUG
-#  define DISABLE_GC_DEBUG 0
+#  define DISABLE_GC_DEBUG 1
 #endif
 
 /* Helpful internal macro for testing whether we are currently
@@ -190,6 +190,7 @@ typedef void (*funcptr_t)(void);
 #endif
 
 #include "parrot/platform.h"
+#include "parrot/platform_interface.h"
 #include "parrot/global_setup.h"
 #include "parrot/interpreter.h"
 #include "parrot/encoding.h"

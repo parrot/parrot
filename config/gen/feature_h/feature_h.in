@@ -11,15 +11,19 @@
 	print OUT <<EOP;
 /* from config/auto/memalign */
 EOP
-if (${memalign}) {
-	print OUT <<EOP;
-#include <malloc.h>
-#define Parrot_memalign(a, s) memalign((a), (s))
-EOP
-} else {
-	print OUT <<EOP;
-#define Parrot_memalign(a, s) mem_sys_allocate(s)
-EOP
+if (${memalign} eq 'posix_memalign') {
+  print OUT <<'END'
+#define HAS_POSIX_MEMALIGN
+#define HAS_SOME_MEMALIGN
+
+END
+}
+elsif (${memalign} eq 'memalign') {
+  print OUT <<'END'
+#define HAS_MEMALIGN
+#define HAS_SOME_MEMALIGN
+
+END
 }
 
 	print OUT <<EOP;
@@ -38,6 +42,7 @@ if (${jit_i386} && ${jit_i386} eq 'fcomip') {
 #ifdef I386
 #  define HAS_JIT_FCOMIP
 #endif
+
 END
 }
 

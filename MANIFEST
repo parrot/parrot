@@ -71,6 +71,7 @@ config/auto/jit.pl
 config/auto/jit/test_c.in
 config/auto/memalign.pl
 config/auto/memalign/test_c.in
+config/auto/memalign/test_c2.in
 config/auto/pack.pl
 config/auto/sizes.pl
 config/auto/sizes/test_c.in
@@ -107,6 +108,7 @@ config/gen/platform/darwin.h
 config/gen/platform/generic.c
 config/gen/platform/generic.h
 config/gen/platform/ia64.s
+config/gen/platform/platform_interface.h
 config/gen/platform/win32.c
 config/gen/platform/win32.h
 config/init/data.pl

@@ -15,6 +15,24 @@
 
 #include "parrot/config.h"
 
+/*
+ * if define below is 1:
+ *
+ * live, on_free_list, special_PMC are kept in the pools arenas
+ * this needs aligned memory
+ */
+
+#define ARENA_DOD_FLAGS 1
+
+#if ARENA_DOD_FLAGS && ! defined(HAS_SOME_MEMALIGN)
+#  undef ARENA_DOD_FLAGS
+#  define ARENA_DOD_FLAGS 0
+#  ifdef DOD_C_SOURCE
+#    warning "ARENA_DOD_FLAGS disabled due to missing memalign()"
+#  endif
+#endif
+
+
 typedef union UnionVal {
     INTVAL int_val;             /* PMC unionval members */
     FLOATVAL num_val;
@@ -68,7 +86,11 @@ struct PMC {
     pobj_t obj;
     VTABLE *vtable;
     DPOINTER *data;
-    PMC *metadata;
+    struct PMC_EXT *pmc_ext;
+};
+
+struct PMC_EXT {
+    PMC *metadata;      /* properties */
 
     SYNC *synchronize;
     /* This flag determines the next PMC in the 'used' list during
@@ -77,24 +99,26 @@ struct PMC {
        guaranteed to have the tail element's next_for_GC point to itself,
        which makes much of the logic and checks simpler. We then have to
        check for PMC->next_for_GC == PMC to find the end of list. */
-    PMC *next_for_GC;         /* Yeah, the GC data should be out of
-                                 band, but that makes things really
-                                 slow when actually marking things for
-                                 the GC runs. Unfortunately putting
-                                 this here makes marking things clear
-                                 for the GC pre-run slow as well, as
-                                 we need to touch all the PMC
-                                 structs. (Though we will for flag
-                                 setting anyway) We can potentially
-                                 make this a pointer to the real GC
-                                 stuff, which'd merit an extra
-                                 dereference when setting, but let us
-                                 memset the actual GC data in a big
-                                 block */
+    PMC *next_for_GC;
+
+    /* Yeah, the GC data should be out of
+       band, but that makes things really slow when actually marking
+       things for the GC runs. Unfortunately putting this here makes
+       marking things clear for the GC pre-run slow as well, as we need
+       to touch all the PMC structs. (Though we will for flag setting
+       anyway) We can potentially make this a pointer to the real GC
+       stuff, which'd merit an extra dereference when setting, but let
+       us memset the actual GC data in a big block
+    */
 };
+
+typedef struct PMC_EXT PMC_EXT;
 
 /* macro for accessing union data */
 #define cache obj.u
+#define metadata pmc_ext->metadata
+#define next_for_GC pmc_ext->next_for_GC
+#define synchronize pmc_ext->synchronize
 
 /* PObj flags */
 typedef enum PObj_enum {
@@ -117,7 +141,7 @@ typedef enum PObj_enum {
     PObj_is_string_FLAG = 1 << 8,
     /* PObj is a PMC */
     PObj_is_PMC_FLAG = 1 << 9,
-    PObj_is_reserved1_FLAG = 1 << 10,
+    PObj_is_PMC_EXT_FLAG = 1 << 10,
     PObj_is_reserved2_FLAG = 1 << 11,
 
     /* Memory management FLAGs */
@@ -140,9 +164,9 @@ typedef enum PObj_enum {
     PObj_constant_FLAG = 1 << 17,
     /* Private flag for the GC system. Set if the PObj's in use as
      * far as the GC's concerned */
-    PObj_live_FLAG = 1 << 18,
+    b_PObj_live_FLAG = 1 << 18,
     /* Mark the object as on the free list */
-    PObj_on_free_list_FLAG = 1 << 19,
+    b_PObj_on_free_list_FLAG = 1 << 19,
 
     /* DOD/GC FLAGS */
 
@@ -172,9 +196,9 @@ typedef enum PObj_enum {
      * - is_buffer_ptr_FLAG
      * - custom_mark_FLAG
      */
-    PObj_is_special_PMC_FLAG = 1 << 26,
+    b_PObj_is_special_PMC_FLAG = 1 << 26,
 
-    PObj_is_impatient_FLAG = 1 << 27
+    b_PObj_is_impatient_FLAG = 1 << 27
 
 } PObj_flags;
 
@@ -184,6 +208,79 @@ typedef enum PObj_enum {
  * these macros
  */
 
+#if ARENA_DOD_FLAGS
+/*
+ * these 4 flags are kept in one nibble
+ */
+#  define d_PObj_live_FLAG              0x01
+#  define d_PObj_on_free_list_FLAG      0x02
+#  define d_PObj_is_special_PMC_FLAG    0x04
+#  define d_PObj_is_impatient_FLAG      0x08
+
+/*
+ * arenas are constant sized ~32 byte object size, ~128K objects
+ */
+# define ARENA_SIZE (32*1024*128)
+# define ARENA_ALIGN ARENA_SIZE
+# define ARENA_MASK (~ (ARENA_SIZE-1) )
+#if INTVAL_SIZE == 4
+# define ARENA_FLAG_SHIFT 3
+# define ARENA_FLAG_MASK 0x7
+# define ALL_LIVE_MASK 0x11111111
+# define ALL_FREE_MASK 0x22222222
+#elif INTVAL_SIZE == 8
+# define ARENA_FLAG_SHIFT 4
+# define ARENA_FLAG_MASK 0x0f
+# define ALL_LIVE_MASK 0x1111111111111111
+# define ALL_FREE_MASK 0x2222222222222222
+#else
+# error Unsupported INTVAL_SIZE
+#endif
+# define ARENA_OBJECTS(_pool) ( ARENA_SIZE / _pool->object_size )
+# define ARENA_FLAG_SIZE(_pool) \
+     (4*sizeof(INTVAL) + sizeof(INTVAL) * \
+      ((ARENA_OBJECTS(_pool) >> ARENA_FLAG_SHIFT )) )
+
+# define GET_ARENA(o) \
+     ((struct Small_Object_Arena *) (PTR2UINTVAL(o) & ARENA_MASK))
+# define GET_OBJ_N(arena, o) \
+     ((PTR2UINTVAL(o) - PTR2UINTVAL((arena)->start_objects)) \
+          / (arena)->object_size)
+
+# define DOD_flag_SET(flag, o) \
+  do { \
+      struct Small_Object_Arena *_arena = GET_ARENA(o); \
+      size_t _n = GET_OBJ_N(_arena, o); \
+      _arena->dod_flags[ _n >> ARENA_FLAG_SHIFT ] |= \
+         ((d_PObj_ ## flag ## _FLAG << (( _n & ARENA_FLAG_MASK ) << 2))); \
+  } \
+  while (0)
+# define DOD_flag_CLEAR(flag, o) \
+  do { \
+      struct Small_Object_Arena *_arena = GET_ARENA(o); \
+      size_t _n = GET_OBJ_N(_arena, o); \
+      _arena->dod_flags[ _n >> ARENA_FLAG_SHIFT ] &= \
+         ~((d_PObj_ ## flag ## _FLAG << (( _n & ARENA_FLAG_MASK ) << 2))); \
+  } \
+  while (0)
+
+#  define PObj_live_FLAG              d_PObj_live_FLAG
+#  define PObj_on_free_list_FLAG      d_PObj_on_free_list_FLAG
+#  define PObj_is_special_PMC_FLAG    d_PObj_is_special_PMC_FLAG
+#  define PObj_is_impatient_FLAG      d_PObj_is_impatient_FLAG
+
+#else
+
+#  define PObj_live_FLAG              b_PObj_live_FLAG
+#  define PObj_on_free_list_FLAG      b_PObj_on_free_list_FLAG
+#  define PObj_is_special_PMC_FLAG    b_PObj_is_special_PMC_FLAG
+#  define PObj_is_impatient_FLAG      b_PObj_is_impatient_FLAG
+
+#  define DOD_flag_TEST(flag, o)      PObj_flag_TEST(flag, o)
+#  define DOD_flag_SET(flag, o)       PObj_flag_SET(flag, o)
+#  define DOD_flag_CLEAR(flag, o)     PObj_flag_CLEAR(flag, o)
+
+#endif
 
 #define PObj_get_FLAGS(o) ((o)->obj.flags)
 
@@ -214,13 +311,13 @@ typedef enum PObj_enum {
 #define PObj_report_SET(o) PObj_flag_SET(report, o)
 #define PObj_report_CLEAR(o) PObj_flag_CLEAR(report, o)
 
-#define PObj_on_free_list_TEST(o) PObj_flag_TEST(on_free_list, o)
-#define PObj_on_free_list_SET(o) PObj_flag_SET(on_free_list, o)
-#define PObj_on_free_list_CLEAR(o) PObj_flag_CLEAR(on_free_list, o)
+#define PObj_on_free_list_TEST(o) DOD_flag_TEST(on_free_list, o)
+#define PObj_on_free_list_SET(o) DOD_flag_SET(on_free_list, o)
+#define PObj_on_free_list_CLEAR(o) DOD_flag_CLEAR(on_free_list, o)
 
-#define PObj_live_TEST(o) PObj_flag_TEST(live, o)
-#define PObj_live_SET(o) PObj_flag_SET(live, o)
-#define PObj_live_CLEAR(o) PObj_flag_CLEAR(live, o)
+#define PObj_live_TEST(o) DOD_flag_TEST(live, o)
+#define PObj_live_SET(o) DOD_flag_SET(live, o)
+#define PObj_live_CLEAR(o) DOD_flag_CLEAR(live, o)
 
 #define PObj_is_string_TEST(o) PObj_flag_TEST(is_string, o)
 #define PObj_is_string_SET(o) PObj_flag_SET(is_string, o)
@@ -234,40 +331,43 @@ typedef enum PObj_enum {
 #define PObj_sysmem_SET(o) PObj_flag_SET(sysmem, o)
 #define PObj_sysmem_CLEAR(o) PObj_flag_CLEAR(sysmem, o)
 
-#define PObj_is_impatient_TEST(o) PObj_flag_TEST(is_impatient, o)
-#define PObj_is_impatient_SET(o) PObj_flag_SET(is_impatient, o)
-#define PObj_is_impatient_CLEAR(o) PObj_flag_CLEAR(is_impatient, o)
+#define PObj_is_impatient_TEST(o) DOD_flag_TEST(is_impatient, o)
+#define PObj_is_impatient_SET(o) DOD_flag_SET(is_impatient, o)
+#define PObj_is_impatient_CLEAR(o) DOD_flag_CLEAR(is_impatient, o)
 
 #define PObj_special_SET(flag, o) do { \
     PObj_flag_SET(flag, o); \
-    PObj_flag_SET(is_special_PMC, o); \
+    DOD_flag_SET(is_special_PMC, o); \
 } while(0)
 #define PObj_special_CLEAR(flag, o) do { \
     PObj_flag_CLEAR(flag, o); \
-    if ((PObj_get_FLAGS(o) & (PObj_active_destroy_FLAG | PObj_is_PMC_ptr_FLAG | \
+    if ((PObj_get_FLAGS(o) & \
+                (PObj_active_destroy_FLAG | PObj_is_PMC_ptr_FLAG | \
                 PObj_is_buffer_ptr_FLAG)) || \
-            (PObj_is_PMC_TEST(o) && ((struct PMC*)(o))->metadata)) \
-        PObj_flag_SET(is_special_PMC, o); \
+            (PObj_is_PMC_TEST(o) && \
+             ((struct PMC*)(o))->pmc_ext && \
+             ((struct PMC*)(o))->metadata)) \
+        DOD_flag_SET(is_special_PMC, o); \
     else \
-        PObj_flag_CLEAR(is_special_PMC, o); \
+        DOD_flag_CLEAR(is_special_PMC, o); \
 } while (0)
-#define PObj_is_special_PMC_TEST(o) PObj_flag_TEST(is_special_PMC, o)
-#define PObj_is_special_PMC_SET(o) PObj_flag_SET(is_special_PMC, o)
+#define PObj_is_special_PMC_TEST(o) DOD_flag_TEST(is_special_PMC, o)
+#define PObj_is_special_PMC_SET(o) DOD_flag_SET(is_special_PMC, o)
 
 #define PObj_is_buffer_ptr_SET(o) PObj_special_SET(is_buffer_ptr, o)
 #define PObj_is_buffer_ptr_CLEAR(o) PObj_special_CLEAR(is_buffer_ptr, o)
 
 #define PObj_custom_mark_SET(o)   PObj_special_SET(custom_mark, o)
 #define PObj_custom_mark_CLEAR(o)   PObj_special_CLEAR(custom_mark, o)
+#define PObj_custom_mark_TEST(o)   PObj_flag_TEST(custom_mark, o)
 
 #define PObj_active_destroy_SET(o) PObj_flag_SET(active_destroy, o)
 #define PObj_active_destroy_TEST(o) PObj_flag_TEST(active_destroy, o)
 #define PObj_active_destroy_CLEAR(o) PObj_flag_CLEAR(active_destroy, o)
 
 #define PObj_is_PMC_TEST(o) PObj_flag_TEST(is_PMC, o)
-#define PObj_is_SPMC_TEST(o) PObj_flag_TEST(is_SPMC, o)
-#define PObj_is_any_PMC_TESTALL(o) (PObj_get_FLAGS(o) & \
-            (PObj_is_PMC_FLAG|PObj_is_SPMC_FLAG))
+#define PObj_is_PMC_EXT_TEST(o) PObj_flag_TEST(is_PMC_EXT, o)
+#define PObj_is_PMC_EXT_SET(o) PObj_special_SET(is_PMC_EXT, o)
 
 
 /* some combinations */
@@ -291,7 +391,7 @@ typedef enum PObj_enum {
         (PObj_live_FLAG | PObj_on_free_list_FLAG))
 
 #define PObj_is_movable_TESTALL(o) (!(PObj_get_FLAGS(o) & \
-        (PObj_immobile_FLAG | PObj_on_free_list_FLAG | \
+        (PObj_immobile_FLAG |  \
          PObj_constant_FLAG | PObj_external_FLAG)))
 
 #define PObj_custom_mark_destroy_SETALL(o) do { \

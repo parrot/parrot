@@ -149,8 +149,8 @@ write_types(FILE *stabs)
             i + 3, BIT_OFFSET(PMC, vtable), BIT_SIZE(void*));
     fprintf(stabs, "data:(0,14),%d,%d;",
             BIT_OFFSET(PMC, data), BIT_SIZE(void*));
-    fprintf(stabs, "metadata:*(0,%d),%d,%d;",
-            i, BIT_OFFSET(PMC, metadata), BIT_SIZE(void*));
+    fprintf(stabs, "pmc_ext:*(0,%d),%d,%d;",
+            i, BIT_OFFSET(PMC, pmc_ext), BIT_SIZE(void*));
     fprintf(stabs, ";\"");
     fprintf(stabs, "," N_LSYM ",0,0,0\n");
 
@@ -292,7 +292,7 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     fclose(stabs);
     /* run the stabs file through C<as> generating file.o */
     cmd = Parrot_sprintf_c(interpreter, "as %Ss -o %Ss", stabsfile, ofile);
-    
+
     {
     	char *temp = string_to_cstring(interpreter, cmd);
     	system(temp);

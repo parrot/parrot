@@ -38,6 +38,9 @@ l2:
 	interpinfo I1, 4
 	print I1
 	print " active PMCs\n"
+	interpinfo I1, 6
+	print I1
+	print " total  PMCs\n"
 
 	end
 

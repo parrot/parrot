@@ -126,6 +126,54 @@ Parrot_dlclose(void *handle)
 }
 
 /*
+ * memalign related stuff
+ */
+
+#if defined(HAS_POSIX_MEMALIGN)
+#include <stdlib.h>
+
+void *
+Parrot_memalign(size_t align, size_t size)
+{
+    void *p;
+    int i = posix_memalign(&p, align, size);
+    return i == 0 ? p : NULL;
+}
+
+void *
+Parrot_memalign_if_possible(size_t align, size_t size)
+{
+    void *p;
+    int i = posix_memalign(&p, align, size);
+    return i == 0 ? p : NULL;
+}
+
+#elif defined(HAS_MEMALIGN)
+#include <malloc.h>
+
+void *
+Parrot_memalign(size_t align, size_t size)
+{
+    return memalign(align, size);
+}
+
+void *
+Parrot_memalign_if_possible(size_t align, size_t size)
+{
+    return memalign(align, size);
+}
+
+#else
+#error "generic platform without memalign"
+#endif
+
+void
+Parrot_free_memalign(void *p)
+{
+    free(p);
+}
+
+/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4

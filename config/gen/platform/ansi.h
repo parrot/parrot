@@ -16,20 +16,12 @@
 ** Miscellaneous:
 */
 
-void Parrot_sleep(unsigned int seconds);
-INTVAL Parrot_intval_time(void);
-FLOATVAL Parrot_floatval_time(void);
-void Parrot_setenv(const char *name, const char *value);
 
 
 /*
 ** Dynamic Loading:
 */
 
-void *Parrot_dlopen(const char *filename);
-const char *Parrot_dlerror(void);
-void *Parrot_dlsym(void *handle, const char *symbol);
-int Parrot_dlclose(void *handle);
 
 /*
  * Local variables:

@@ -213,7 +213,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
             for (i = 0; i < cur_buffer_arena->used; i++) {
                 /* ! (immobile | on_free_list | constant | external) */
-                if (b->bufstart && PObj_is_movable_TESTALL(b)) {
+                if (b->buflen && PObj_is_movable_TESTALL(b)) {
                     struct Buffer_Tail *tail =
                             (struct Buffer_Tail *)((char *)b->bufstart +
                             b->buflen);
@@ -232,7 +232,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
                         /* Make sure they know that we own it too */
                         PObj_COW_SET(hdr);
-                        /* Now make sure we point to where the other guy 
+                        /* Now make sure we point to where the other guy
                          * does */
                         b->bufstart = hdr->bufstart;
                         /* And if we're a string, update strstart */
@@ -515,7 +515,7 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
 
     interpreter->arena_base->memory_pool =
             new_memory_pool(POOL_SIZE, &compact_pool);
-    alloc_new_block(interpreter, POOL_SIZE, 
+    alloc_new_block(interpreter, POOL_SIZE,
                     interpreter->arena_base->memory_pool);
 
     /* Constant strings - not compacted */

@@ -28,6 +28,9 @@
 
 #define ATEXIT_DESTROY
 
+#define PREDEREF_NORMAL         0
+#define PREDEREF_FOR_CGP        1
+#define PREDEREF_FOR_SWITCH     2
 
 static void setup_default_compreg(Parrot_Interp interpreter);
 
@@ -124,7 +127,8 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
             break;
 
         case PARROT_ARG_S:
-            pc_prederef[i] = (void *)&interpreter->ctx.string_reg.registers[pc[i]];
+            pc_prederef[i] =
+                (void *)&interpreter->ctx.string_reg.registers[pc[i]];
             break;
 
         case PARROT_ARG_KIC:
@@ -159,10 +163,10 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
             break;
         }
 
-        if (opinfo->types[i] != PARROT_ARG_IC && pc_prederef[i] == 0) {
+        if (pc_prederef[i] == 0) {
             internal_exception(INTERP_ERROR,
-                               "Prederef generated a NULL pointer for arg of type %d!\n",
-                               opinfo->types[i]);
+                    "Prederef generated a NULL pointer for arg of type %d!\n",
+                    opinfo->types[i]);
         }
     }
 
@@ -197,8 +201,8 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
     if (!interpreter->prederef_code) {
         size_t N = interpreter->code->cur_cs->base.size;
         size_t i;
-        /* void **temp = (void **)mem_sys_allocate(N * sizeof(void *)); */
-        void **temp = (void **)Parrot_memalign(256, N * sizeof(void *));
+        void **temp = (void **)Parrot_memalign_if_possible(256,
+                N * sizeof(void *));
 
         for (i = 0; i < N; i++) {
             temp[i] = (void *)(ptrcast_t)prederef;
@@ -206,7 +210,7 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
 
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
-        if (cgp == 2) {
+        if (cgp == PREDEREF_FOR_SWITCH) {
             opcode_t *pc = interpreter->code->cur_cs->base.data;
             size_t n;
             for (i = 0; i < N; ) {
@@ -219,7 +223,7 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
             }
         }
 #ifdef HAVE_COMPUTED_GOTO
-        if (cgp == 1) {
+        if (cgp == PREDEREF_FOR_CGP) {
             opcode_t *pc = interpreter->code->cur_cs->base.data;
             size_t n;
             for (i = 0; i < N; ) {
@@ -261,7 +265,7 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 #  ifdef HAVE_COMPUTED_GOTO
 #    ifdef __GNUC__
 #      ifdef I386
-    init_prederef(interpreter, 1);
+    init_prederef(interpreter, PREDEREF_FOR_CGP);
 #      endif
 #    endif
 #  endif
@@ -298,7 +302,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
 
-    init_prederef(interpreter, 0);
+    init_prederef(interpreter, PREDEREF_NORMAL);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
 
     while (pc_prederef) {
@@ -317,7 +321,7 @@ runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
 #ifdef HAVE_COMPUTED_GOTO
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
-    init_prederef(interpreter, 1);
+    init_prederef(interpreter, PREDEREF_FOR_CGP);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
     pc = cgp_core((opcode_t*)pc_prederef, interpreter);
     return pc;
@@ -334,7 +338,7 @@ runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
-    init_prederef(interpreter, 2);
+    init_prederef(interpreter, PREDEREF_FOR_SWITCH);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
     pc = switch_core((opcode_t*)pc_prederef, interpreter);
     return pc;
