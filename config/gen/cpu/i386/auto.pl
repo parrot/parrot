@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-config/gen/cpu/i386/auto-pl
+config/gen/cpu/i386/auto.pl
 
 =head1 DESCRIPTION
 
@@ -31,17 +31,9 @@ sub run_cpu {
 	    if (cc_run() =~ /ok/) {
 		Configure::Data->set('i386_has_mmx' => '1');
 		print " (MMX) " if ($verbose);
-		my $old = Configure::Data->get("TEMP_generated");
-		if (defined $old) {
-		    Configure::Data->set(
-			"TEMP_generated" => "$old $f"
-		    );
-		}
-		else {
-		    Configure::Data->set(
-			"TEMP_generated" => "$f"
-		    );
-		}
+	        Configure::Data->add(',',
+			"TEMP_generated" => $f
+		);
 	    }
 	}
 	cc_clean();

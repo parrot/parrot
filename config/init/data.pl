@@ -10,6 +10,10 @@ config/init/data.pl - Configuration Defaults
 
 Sets up the configuration system's default values and data structures.
 
+=head1 METHODS
+
+=over 4
+
 =cut
 
 package Configure::Step;
@@ -126,47 +130,90 @@ sub runstep {
     $c{ld_debug} .= " -pg ";
   }
 
+=item Configure::Data->get($key,...)
+
+Return value or hash slice for key.
+
+=cut
 
   *get=sub {
     shift;
     @c{@_};
   };
 
-  *set=defined($verbose) && $verbose == 2
-    ? sub {
+=item Configure::Data->set($key,$val, ...)
+
+Set config values
+
+=cut
+
+  *set = sub {
       shift;
+      my $verbose = $c{verbose} && $c{verbose} == 2;
       return unless (defined ($_[0]));
-      print "Setting Configuration Data:\n(\n";
+      print "Setting Configuration Data:\n(\n" if ($verbose);
       while (my ($key, $val) = splice @_, 0, 2) {
-	print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n";
+	print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n"
+	    if ($verbose);
         $c{$key}=$val;
       }
-      print ");\n"
-    }
-    : sub {
-      shift;
-      %c=(%c, @_);
+      print ");\n" if ($verbose);
     };
+
+=item Configure::Data->add($delim, $key,$val, ...)
+
+Append values delimited by C<$delim> to existing keys or set values.
+
+=cut
+
+  *add = sub {
+    my ($self, $delim) = (shift, shift);
+    while (my ($key, $val) = splice @_, 0, 2) {
+      my ($old) = $c{$key};
+      if (defined $old) {
+	$self->set($key, "$old$delim$val");
+      }
+      else {
+	$self->set($key, $val);
+      }
+    }
+  };
+
+=item Configure::Data->keys()
+
+Return config keys.
+
+=cut
 
   *keys=sub {
     return keys %c;
   };
 
+=item Configure::Data->dump()
+
+Dump config keys.
+
+=cut
+
   *dump=sub {
     Data::Dumper->Dump([\%c], ['*PConfig']);
   };
-  
+
+=item Configure::Data->clean()
+
+Delete keys matching /^TEMP_/ from config. These are used only temporarly
+e.g. as file lists for Makefile generation.
+
+=cut
+
   *clean=sub {
     delete $c{$_} for grep { /^TEMP_/ } keys %c;
   };
 }
 
+=back
+
+=cut
+
 1;
-
-
-
-
-
-
-
 

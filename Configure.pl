@@ -213,7 +213,7 @@ You might also need '--nomanicheck'.
 
 =back
 
-Other Options (may not be implemented)
+Other Options
 
 =over
 
@@ -232,6 +232,11 @@ Enable experimental networking. This is an unused option and should
 probably be removed.
 
 =back
+
+=head1 SEE ALSO
+
+F<config/init/data.pl>, F<lib/Parrot/Configure/RunSteps.pm>,
+F<lib/Parrot/Configure/Step.pm>, F<docs/configuration.pod>
 
 =cut
 

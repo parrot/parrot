@@ -13,7 +13,7 @@ be mostly of a single type, though some overlap is allowed (for example,
 allowing a probe to ask the user what to do in an exceptional
 situation).
 
-The directory F<config> contains subdirectories for each type of step. 
+The directory F<config> contains subdirectories for each type of step.
 Each step should consist of I<exactly one> .pl file and any number of
 supporting .c, .in, etc. files. Any supporting files should be in a
 folder whose name is the same as the basename of the step's .pl file;
@@ -169,7 +169,7 @@ A template for a new step might look like this:
 
 =head2 Command-line Arguments
 
-Command-line arguments look like C</--\w+(=.*)?/>; the equals sign
+Command-line arguments look like C</--[-\w]+(=.*)?/>; the equals sign
 separates the name and the value. If the value is omitted, it's assumed
 to be 1. The options C<--help> and C<--version> are built in to
 Configure; any others are defined by steps.
@@ -192,9 +192,14 @@ by calling methods on this package. The methods are listed below.
 
 Returns the values for the given keys.
 
-=item C<< Configure::Data->set(key, value, key, value, ...) >>
+=item C<< Configure::Data->set(key, value, [key, value, ...]) >>
 
 Sets the given keys to the given values.
+
+=item C<< Configure::Data->add(delim, key, value, [key, value, ...]) >>
+
+Sets the given keys to the given values or appends values delimited by
+I<delim> to existing keys.
 
 =item C<< Configure::Data->keys() >>
 
@@ -214,6 +219,8 @@ the configuration system's data.
 =item L<Parrot::Configure::RunSteps>
 
 =item L<Parrot::Configure::Step>
+
+=item F<config/init/data.pl>
 
 =back
 
