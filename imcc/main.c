@@ -54,6 +54,7 @@ static void imcc_version(void)
 #define setopt(flag) Parrot_setflag(interp, flag, (*argv)[0]+2)
 #define unsetopt(flag) Parrot_setflag(interp, flag, 0)
 
+#define OPT_GC_DEBUG 128
 static struct longopt_opt_decl options[] = {
     { 'b', 'b', 0, { "--bounds", NULL } },
     { 'j', 'j', 0, { "--jit", NULL } },
@@ -75,6 +76,7 @@ static struct longopt_opt_decl options[] = {
     { 'y', 'y', 0, { "--yydebug", NULL } },
     { 'o', 'o', OPTION_required_FLAG, { NULL } },
     { 'O', 'O', OPTION_required_FLAG, { NULL } },
+    { OPT_GC_DEBUG, OPT_GC_DEBUG, 0, { "--gc-debug", NULL } },
     { 0, 0, 0, { NULL } }
 };
 
@@ -177,6 +179,16 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                     optimizer_level |= OPT_PASM;
 
                 break;
+
+            case OPT_GC_DEBUG:
+#if DISABLE_GC_DEBUG
+                    Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                            "PARROT_GC_DEBUG is set but the binary was "
+                            "compiled with DISABLE_GC_DEBUG.");
+#endif
+                    setopt(PARROT_GC_DEBUG_FLAG);
+                    break;
+
             default:
                 fatal(1, "main", "Invalid flag '%s' used."
                         "\n\nhelp: imcc -h\n", (*argv)[0]);
