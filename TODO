@@ -73,7 +73,7 @@ Documentation
 Debugger
 --------
     Print the interpreter info
-    Add commands history and completition
+    Add commands history and completion
     Load the commands from a file
     Make breakpoints at labels
     Conditional breakpoints
