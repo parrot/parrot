@@ -128,6 +128,13 @@ Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *names)
 {
     PMC *stash;
 
+    /*
+     * this routine is called by PackFile_ConstTable_unpack too, which
+     * creates const table entries for global subs. During that the
+     * constant isn't yet created. Triggering a DOD run in the hash
+     * lookup dies then during mark_1_seg.
+     */
+    Parrot_block_DOD(interpreter);
     if (!VTABLE_exists_keyed_str(interpreter, globals, names)) {
         stash = pmc_new(interpreter, enum_class_OrderedHash);
         VTABLE_set_pmc_keyed_str(interpreter, globals, names,
@@ -137,6 +144,7 @@ Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *names)
         stash = VTABLE_get_pmc_keyed_str(interpreter, globals,
                 names);
     }
+    Parrot_unblock_DOD(interpreter);
     return stash;
 }
 

@@ -18,7 +18,7 @@ The resulting shared library should be copied to a location like:
 
    parrot/runtime/parrot/dynext/libnci.so
 
-At that location the shared library is loadable with the opcode 'loadlib'. 
+At that location the shared library is loadable with the opcode 'loadlib'.
 The functions in the library are available with the opcode 'dlfunc'.
 The variables in the library are available with the opcode 'dlvar'.
 
@@ -36,7 +36,9 @@ The name of a test function is usually 'nci_<signature>'. E.g. the function
 
 /*
 
-Declarations
+Declarations.
+
+*** If you add a new test function here, please update libnci.def too. ***
 
 */
 
@@ -106,32 +108,32 @@ Definitions
 
 */
 
-double 
+double
 nci_dd(double d) {
     return d * 2.0;
 }
 
-short 
+short
 nci_ssc(short l1, char l2) {
     return l1 * l2;
 }
 
-int 
+int
 nci_csc(short l1, char l2) {
     return l1 * l2;
 }
 
-int 
+int
 nci_isc(short l1, char l2) {
     return l1 * l2;
 }
 
-float 
+float
 nci_fff(float l1, float l2) {
     return l1 / l2;
 }
 
-int 
+int
 nci_ip(void *p) {
     typedef struct _dfi {
         double d;
@@ -147,7 +149,7 @@ nci_ip(void *p) {
 }
 
 /* test calls this with a string */
-int 
+int
 nci_it(void *p) {
     fprintf(stderr, "%c%c\n", ((char*) p)[1], ((char *) p)[0]);
     fflush(stderr);
@@ -182,12 +184,12 @@ nci_tB(void **p) {
     return B;
 }
 
-void * 
+void *
 nci_pp(void *p) {
     return p;
 }
 
-int 
+int
 nci_iiii(int i1, int i2, int i3) {
     fprintf(stderr, "%d %d %d\n", i1, i2, i3);
     fflush(stderr);
@@ -195,13 +197,13 @@ nci_iiii(int i1, int i2, int i3) {
     return 2;
 }
 
-int 
+int
 nci_i4i(long * l, int i) {
 
     return (int) (*l * i);
 }
 
-int 
+int
 nci_ii3(int a, int *bp) {
     int r = a * *bp;
     *bp = 4711;
@@ -209,7 +211,7 @@ nci_ii3(int a, int *bp) {
     return r;
 }
 
-static int 
+static int
 call_back(char *str) {
     puts(str);
     fflush(stdout);
@@ -217,7 +219,7 @@ call_back(char *str) {
     return 4711;
 }
 
-void * 
+void *
 nci_pi(int test) {
     switch (test) {
         case 0:
@@ -352,7 +354,7 @@ nci_pi(int test) {
     return NULL;
 }
 
-void 
+void
 nci_vP(void *pmc) {
     if (pmc)
         puts("ok");
@@ -410,7 +412,7 @@ nci_cb_D3(cb_D3_func cb, void* user_data) {
 }
 
 
-void 
+void
 nci_pip (int count, Rect_Like *rects) {
     int i;
     printf( "Count: %d\n", count);
@@ -419,7 +421,7 @@ nci_pip (int count, Rect_Like *rects) {
         rects[i].x, rects[i].y, rects[i].w, rects[i].h );
 }
 
-int 
+int
 nci_i33 (int *double_me, int *triple_me) {
     *double_me *= 2;
     *triple_me *= 3;
@@ -427,14 +429,14 @@ nci_i33 (int *double_me, int *triple_me) {
     return( *double_me + *triple_me );
 }
 
-void 
+void
 nci_vpii (Outer *my_data, int my_x, int my_y) {
     my_data->x            = my_x;
     my_data->nested->y    = my_y;
 }
 
 static int my_array[4];
-void * 
+void *
 nci_piiii (int alpha, int beta, int gamma, int delta) {
     static struct array_container
     {
@@ -454,14 +456,14 @@ nci_piiii (int alpha, int beta, int gamma, int delta) {
 }
 
 static int my_product;
-void * 
+void *
 nci_pii (int fac1, int fac2) {
    my_product = fac1 * fac2;
 
    return &my_product;
 }
 
-int 
+int
 nci_i( void ) {
 
    return my_product;
@@ -469,7 +471,7 @@ nci_i( void ) {
 
 /*
 
-=head1 Variables used for testing the opcode 'dlvar' 
+=head1 Variables used for testing the opcode 'dlvar'
 
 =cut
 
@@ -477,7 +479,7 @@ nci_i( void ) {
 
 int nci_dlvar_int = -4444;
 
-void 
+void
 nci_dlvar_vv( void ) {
     nci_dlvar_int *= 3;
 }
@@ -486,7 +488,7 @@ nci_dlvar_vv( void ) {
 
 char l2 = 4;
 float f2 = 4.0;
-int 
+int
 main() {
     short l1 = 3;
     float f, f1 = 3.0;
@@ -507,7 +509,7 @@ main() {
   F<docs/pdds/pdd16_native_call.pod>
   F<config/gen/makefiles/root.in>
   F<t/pmc/nci.t>
- 
+
 =cut
 
 */
