@@ -17,20 +17,20 @@ OK_1:	print "ok 1\n"
 	print "not "
 OK_2:	print "ok 2\n"
 
-	set_keyed P0,0,-7 # set P0[0], -7
-	get_keyed I0,P0,0 # set I0, P0[0]
+	set P0,0,-7 # set P0[0], -7
+	set I0,P0,0 # set I0, P0[0]
 	eq I0,-7,OK_3
 	print "not "
 OK_3:	print "ok 3\n"
 
-	set_keyed P0,0,3.7 # set P0[0], 3.7
-	get_keyed N0,P0,0 # set N0, P0[0]
+	set P0,0,3.7 # set P0[0], 3.7
+	set N0,P0,0 # set N0, P0[0]
 	eq N0,3.7,OK_4
 	print "not "
 OK_4:	print "ok 4\n"
 
-	set_keyed P0,0,"Buckaroo" # set P0[0], "Buckaroo"
-	get_keyed S0,P0,0 # set S0, P0[0]
+	set P0,0,"Buckaroo" # set P0[0], "Buckaroo"
+	set S0,P0,0 # set S0, P0[0]
 	eq S0,"Buckaroo",OK_5
 	print "not "
 OK_5:	print "ok 5\n"
