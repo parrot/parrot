@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) {
     Interp * interpreter;
 
     interpreter = Parrot_new(NULL);
-    Parrot_init(interpreter);
+    Parrot_init_stacktop(interpreter, &interpreter);
     do_test(interpreter);
 
     Parrot_exit(0);
@@ -217,7 +217,7 @@ int main ()
     Interp *interp = NULL;
 
     interp = Parrot_new (NULL);
-    Parrot_init(interp);
+    Parrot_init_stacktop(interp, &interp);
     interp->lo_var_ptr = &i; /* we don't have a run-loop so ... */
 
     for (i=0; i<10000; i++) {
