@@ -8,7 +8,7 @@
 
 /* Stuff to be parrot-like in source, even if not being used in parrot */
 #ifdef PARROT_IN_CORE
-#define PINT_ interpreter, 
+#define PINT_ interpreter,
 #define PINTD_ INTERP* interpreter,
 #define BN_alloc(i, x) malloc(x)
 #define BN_realloc(i, x, y) realloc(x, y)
@@ -23,6 +23,8 @@
 #define BN_free(x) free(x)
 #define BN_FATAL(x) bn_fatal_error(x)
 #define BN_EXCEPT(excp, mesg) BN_exception(excp, mesg)
+typedef unsigned int UINTVAL;
+typedef int INTVAL;
 #endif /* ifdef PARROT_IN_CORE else */
 
 /* Stuff configure should determine*/
@@ -37,7 +39,7 @@
 typedef UINTVAL BN_NIB;
 
 /* BIGNUM: 12345678901234xxxxxxxxxx , expn = -5, sign = 1
-           ^       ^        ^      
+           ^       ^        ^
  value = -123456789.01234
 
  buffer points to first caret (here an INTVAL)
@@ -155,11 +157,11 @@ void
 BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context);
 void BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context);
-void 
+void
 BN_compare (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
-void 
+void
 BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
-void 
+void
 BN_divide (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void
 BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
