@@ -779,10 +779,18 @@ typedef struct {
  * XXX RetContinution free_list handling is currently here
  */
 #define DISABLE_METH_CACHE 0
-#define DISBALE_RETC_RECYCLING 0
+#define DISBALE_RETC_RECYCLING 1
 void add_to_retc_free_list(Parrot_Interp, PMC*);
+void disable_retc_free_list(Parrot_Interp);
 PMC *get_retc_from_free_list(Parrot_Interp);
 void mark_object_cache(Parrot_Interp);
+
+void
+disable_retc_free_list(Parrot_Interp interpreter)
+{
+    Meth_cache *mc = interpreter->method_cache;
+    mc->dont_cache_retc = 1;
+}
 
 void
 add_to_retc_free_list(Parrot_Interp interpreter, PMC *sub)
@@ -792,6 +800,7 @@ add_to_retc_free_list(Parrot_Interp interpreter, PMC *sub)
      * from invokecc or callmethodcc
      */
     if (!(PObj_get_FLAGS(sub) & PObj_private2_FLAG) ||
+            mc->dont_cache_retc ||
             DISBALE_RETC_RECYCLING)
         return;
     PMC_struct_val(sub) = mc->retc_free_list;
@@ -807,7 +816,7 @@ get_retc_from_free_list(Parrot_Interp interpreter)
     Meth_cache *mc = interpreter->method_cache;
     PMC *retc;
 
-    if (!mc->retc_free_list)
+    if (!mc->retc_free_list || mc->dont_cache_retc)
         return NULL;
     retc = mc->retc_free_list;
     mc->retc_free_list = PMC_struct_val(retc);
