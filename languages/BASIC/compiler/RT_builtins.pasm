@@ -309,19 +309,7 @@ NOSTART:
 	.param string substr
 	length $I0, substr
 	eq $I0, 0, ENDINSTR
-	print "Index "
-	print $I0
-	print " full='"
-	print full
-	print "' substr='"
-	print substr
-	print "' start='"
-	print start
-	print "'\n"
 	index $I0, full, substr, start
-	print "Result = "
-	print $I0
-	print "\n"
 	set $N0, $I0
 	
 ENDINSTR:inc $N0
