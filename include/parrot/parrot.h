@@ -47,18 +47,6 @@
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1
 
-struct PMC {
-  VTABLE *vtable;
-  INTVAL flags;
-  DPOINTER *data;
-  union {
-    INTVAL int_val;
-    FLOATVAL num_val;
-    DPOINTER *struct_val;
-  } cache;
-  SYNC *synchronize;
-};
-
 typedef struct PMC PMC;
 typedef unsigned char BOOL;
 typedef void STRING_FUNCS;
@@ -75,6 +63,7 @@ typedef void REGEX;
 #include "parrot/packfile.h"
 #include "parrot/io.h"
 #include "parrot/op.h"
+#include "parrot/pmc.h"
 #include "parrot/events.h"
 #include "parrot/stacks.h"
 

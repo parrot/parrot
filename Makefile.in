@@ -7,12 +7,12 @@ H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h \
 $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
 $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
-$(INC)/runops_cores.h $(INC)/trace.h $(INC)/oplib/vtable_ops.h
+$(INC)/runops_cores.h $(INC)/trace.h $(INC)/oplib/vtable_ops.h $(INC)/pmc.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
 core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) strnative$(O) \
 strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) runops_cores$(O) \
-trace$(O) vtable_ops$(O)
+trace$(O) vtable_ops$(O) classes/intclass$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -76,6 +76,8 @@ strutf32$(O): $(H_FILES)
 
 transcode$(O): $(H_FILES)
 
+classes/intclass$(O): $(H_FILES)
+
 interpreter$(O): interpreter.c $(H_FILES)
 
 memory$(O): $(H_FILES)
@@ -120,6 +122,9 @@ clean:
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
 	$(RM_F) Parrot/OpLib/core.pm
 	cd docs; make clean
+
+distclean:
+	perl -MExtUtils::Manifest=filecheck -le '$ExtUtils::Manifest::Quiet=1;unlink $_ for filecheck()'
 
 test: $(TEST_PROG) assemble.pl .test_dummy
 

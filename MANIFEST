@@ -1,5 +1,7 @@
 assemble.pl
 ChangeLog
+classes/genclass.pl
+classes/intclass.c
 config_h.in
 Config_pm.in
 Configure.pl
@@ -36,6 +38,7 @@ include/parrot/memory.h
 include/parrot/op.h
 include/parrot/packfile.h
 include/parrot/parrot.h
+include/parrot/pmc.h
 include/parrot/register.h
 include/parrot/runops_cores.h
 include/parrot/stacks.h
@@ -63,6 +66,7 @@ languages/jako/queens.jako
 languages/jako/sub.jako
 Makefile.in
 MANIFEST
+make_vtable_ops.pl
 memory.c
 NEWS
 ops2c.pl

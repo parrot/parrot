@@ -26,19 +26,11 @@ print OUT <<'EOF';
 
 typedef void* (*vtable_func_t)();
 
-struct _vtable {
-  struct PACKAGE *package;
-  INTVAL base_type;
-  INTVAL int_type;
-  INTVAL float_type;
-  INTVAL num_type;
-  INTVAL string_type;
-  vtable_func_t vtable_funcs[VTABLE_SIZE];
-};
-
 EOF
 
-print OUT vtbl_defs(%vtable);
+print OUT vtbl_struct(%vtable);
+
+#print OUT vtbl_defs(%vtable);
 print OUT "\n";
 
 print OUT "\n#endif\n";

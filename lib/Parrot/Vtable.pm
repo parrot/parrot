@@ -1,7 +1,8 @@
 package Parrot::Vtable;
 use Exporter;
+use strict;
 @Parrot::Vtable::ISA = qw(Exporter);
-@Parrot::Vtable::EXPORT = qw(parse_vtable vtbl_defs vtbl_struct);
+@Parrot::Vtable::EXPORT = qw(parse_vtable vtbl_defs vtbl_struct vtbl_enumerate);
 
 my(%type_counts) = (unique => 1,
 		    int => 5,
@@ -11,7 +12,7 @@ my(%type_counts) = (unique => 1,
 
 sub parse_vtable {
     my (%vtbl, @order);
-    open IN, "vtable.tbl" or die "Can't open vtable table! $!\n";
+    open IN, shift || "vtable.tbl" or die "Can't open vtable table! $!\n";
     while (<IN>) {
         next if /^#/ or !/\S/;
         chomp;
@@ -37,6 +38,8 @@ sub parse_vtable {
     return %vtbl;
 }
 
+# This code is unused, but I'm keeping it around in case
+# we ever go back to using array-based vtables.
 sub vtbl_defs {
     my %vtbl = @_;
     my $rv;
@@ -62,9 +65,45 @@ sub vtbl_struct {
         $rv .= "typedef $f_proto;\n";
     }
     $rv .= "struct _vtable {\n";
-    $rv .= "\t${_}_method_t $_;\n" for @{$vtbl{order}};
+    $rv .= <<EOF;
+  struct PACKAGE *package;
+  INTVAL base_type;
+  INTVAL int_type;
+  INTVAL float_type;
+  INTVAL num_type;
+  INTVAL string_type;
+
+  /* vtable functions */
+
+EOF
+    for (vtbl_enumerate(%vtbl)) {
+        $rv.= "\t$_->[0] $_->[1];\n";
+    }
     $rv .= "};\n";
     return $rv;
+}
+
+# Returns an array of [type, name, prototype] arrays
+sub vtbl_enumerate {
+    my %vtbl = @_;
+    my @rv;
+    for (@{$vtbl{order}}) {
+        if ($vtbl{$_}{meth_type} eq "unique") {
+            my $proto = $vtbl{$_}{proto};
+            # Dirty hack
+            $proto =~ s/\(\*$_\)/$_ /;
+            push @rv, [ "${_}_method_t", $_, $proto];
+        } else {
+            my $name = $_;
+            for (1..$type_counts{$vtbl{$name}{meth_type}}) {
+                # And another one.
+                my $proto = $vtbl{$name}{proto};
+                $proto =~ s/\(\*$name\)/${name}_$_ /;
+                push @rv, ["${name}_method_t", "${name}_$_", $proto];
+            }
+        }
+    }
+    return @rv;
 }
 
 "SQUAWK";
