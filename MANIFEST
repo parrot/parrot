@@ -199,6 +199,10 @@ examples/benchmarks/gc_header_reuse.pasm
 examples/benchmarks/gc_waves_headers.pasm
 examples/benchmarks/gc_waves_sizeable_data.pasm
 examples/benchmarks/gc_waves_sizeable_headers.pasm
+examples/benchmarks/stress.pasm
+examples/benchmarks/stress.pl
+examples/benchmarks/stress2.pasm
+examples/benchmarks/stress2.pl
 examples/mops/README
 examples/mops/mops.c
 examples/mops/mops.cs
