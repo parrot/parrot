@@ -161,6 +161,10 @@
 [main]doc	docs/pdds/pdd14_bignum.pod
 [main]doc	docs/pdds/pdd15_objects.pod
 [main]doc	docs/pdds/pdd_template.pod
+[main]doc	docs/pmc/array.pod
+[main]doc	docs/pmc/perlarray.pod
+[main]doc	docs/pmc/perlhash.pod
+[main]doc	docs/pmc/perlstring.pod
 [main]doc	docs/running.pod
 [main]doc	docs/strings.pod
 [main]doc	docs/tests.pod

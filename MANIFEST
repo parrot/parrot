@@ -162,6 +162,10 @@ docs/pdds/pdd13_bytecode.pod
 docs/pdds/pdd14_bignum.pod
 docs/pdds/pdd15_objects.pod
 docs/pdds/pdd_template.pod
+docs/pmc/array.pod
+docs/pmc/perlarray.pod
+docs/pmc/perlhash.pod
+docs/pmc/perlstring.pod
 docs/running.pod
 docs/strings.pod
 docs/tests.pod

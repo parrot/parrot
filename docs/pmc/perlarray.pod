@@ -1,0 +1,202 @@
+# -*- cperl -*-
+
+=head1 Perl Array PMC
+
+=head2 Synopsis
+
+  new P0, .PerlArray   # PMC creation
+
+  set P0, 5            # set array size
+  set I1, P0           # get array size
+
+  set P0[4], "foo"     # set array position 4
+  set P0[-1], "gah!"   # set last array element
+
+  push P0, 3           # add 3 to the end of the array
+  pop  N0, P0          # remove last element of the array
+
+  shift P0, 2          # add 2 in the beginning of the array
+  unshift I0, P0       # remove first element of the array
+
+  defined I0, P0[1]    # check if element is defined
+  exists I0, P0[4]     # check if element exists
+
+  clone P1, P0         # copy/clone PMC
+
+=head2 Creation
+
+To create a new PMC with a PerlArray in register C<P0> use:
+
+   new P0, .PerlArray
+
+=head2 Size
+
+Perl array size can be initialized. For example, the empty array (size
+0) is set using:
+
+   set P0, 0
+
+and we can check the PerlArray size, putting the value on register
+C<I0> using
+
+   set I0, P0
+
+Arrays can be initialized with any size:
+
+   set P0, 5
+
+In fact, size is almost non-interesting because these arrays grow as
+soon as you access an index out of bounds or ask explicitly.
+
+=head2 Indexed access
+
+You can set the value 3 on the position 5 from the array using
+
+   set P0[5], 3
+
+In the same mood, to access the element use
+
+   set I0, P0[5]
+
+As in Perl, negative indexes are seen as indexes from the end of the
+array. This way, you can set the last element of the array to the
+value 7 using
+
+   set P0[-1], 7
+
+Note that these arrays are polymorphic: array elements can store any
+kind of element.
+
+=head2 Multidimensional arrays
+
+You can use Perl arrays inside Perl arrays:
+
+    new P0, .PerlArray
+    new P1, .PerlArray
+    set P1[0], "el1"
+    set P1[1], "el2"
+    set P0[0], P1      # First element for P0 is a perl array.
+    clone P2, P1
+    set P0[1], P2      # Second element for P0 is a perl array.
+
+This code creates a table like this:
+
+  el1  el2
+  el1  el2
+
+TODO: (bellow)
+
+Will this be possible? At the moment, gives an 'Array index out of
+bounds!'
+
+While you can do this manually, as shown in the above example, it is
+possible to use the following syntax:
+
+    new P0, .PerlArray
+    set P0[0;0], "el1"
+    set P0[0;1], "el2"
+    set P0[1;0], "el1"
+    set P0[1;1], "el2"
+
+This code would construct the same table. To fetch the elements you
+can use the same syntax:
+
+    set S0, P0[0;1]
+
+=head2 Stacking
+
+You can use the Perl arrays as stacks, where elements are added to
+higher positions on the array:
+
+  new P0, .PerlArray
+  push P0, 2        # set P0[0], 2
+  push P0, 3        # set P0[1], 3
+
+  pop I0, P0        # sets I0 to P0[1] and removes this element from
+                    # the array
+
+=head2 Shifting
+
+If you want to add or remove elements from the beginning of the array,
+use the shift or unshift commands:
+
+  new P0, .PerlArray
+  unshift P0, 2        # set P0[0], 2
+  unshift P0, 3        # set P0[1], 2; set P0[0], 3
+
+  shift I0, P0         # sets I0, P0[0], and moves all elements one
+                       # index down
+
+=head2 Trueness
+
+You can get a boolean value from a Perl Array.  If you use an empty
+Perl Array in a condition, it will return false (no elements).
+
+        new P0, .PerlArray
+        if P0, JUMP         # This will never succeed
+
+After adding a value (for example, P0[0] = 1), it will return a true
+value (the Perl Array has elements).
+
+        new P0, .PerlArray
+        set P0, 0, 1
+        if P0, JUMP         # This will succeed
+
+If you don't add a value, but force a size different from zero the the
+array, it will return a true value:
+
+        new P0, .PerlArray
+        set P0, 1
+        if P0, JUMP         # This will succeed
+
+You can test if there is a defined element on some array position using
+
+  defined I0, P0[1]
+
+for the position you want to test. On the other hand, if you want only
+to test if there is an element (rather than testing if it is defines)
+you should use the C<exists> keyword:
+
+  exists I0, P0[0]
+
+If you set the size of an array to something larger than its current
+value, extra elements do not exists. This means that:
+
+  new P0, .PerlArray
+  set P0, 2
+  set P0[0], 4
+  exists I0, P0[0]     # I0 == 1
+  exists I0, P0[1]     # I0 == 0
+
+=head2 Cloning
+
+As other PMCs, you can clone Perl arrays. If you try something like
+
+    new P0, .PerlArray
+    set P0[0], 1
+    set P0[1], 2
+
+    clone P1, P0
+
+C<P1> is a copy of C<P0>, where you can do whatever you want without
+changing the other array.
+
+TODO:
+
+Apparently, the copy will be deep. This means that copying an
+array of arrays you will get a new array with copies of arrays. Cool!
+
+The problem is: how do you shallow copy?
+
+=head2 TODO
+
+ - explain splicing;
+
+ - add multidimentional arrays on synopsis, as soon we know if they
+   work directly;
+
+=cut
+
+
+
+

@@ -1,0 +1,122 @@
+# -*- cperl -*-
+
+=head1 Perl String PMC
+
+=head2 Synopsis
+
+  ...
+
+=head2 Creation
+
+As with other PMC's, create the String with
+
+    new P0, .PerlString
+
+=head2 Using string value
+
+To set the string you can use the common way to set values on Parrot:
+
+    set P0, "string"
+
+And it works in the other direction too:
+
+    set S0, P0
+
+and now the string is on C<S0> register. You can set an integer or
+numeric value as if it was a string:
+
+    set P0, 3.1415926
+
+and if the content of the PMC string is numeric, you can go in the
+other way too:
+
+    set N0, P0
+
+This means that:
+
+    set P0, "foo"
+    set N0, P0
+
+will put '0' in C<N0>. In fact, this is very usefull: you can convert
+a numeric value to string using:
+
+    set P0, 3.1415926
+    set S0, P0
+
+=head2 Concatenating strings
+
+Concatenating strings is done using the C<concat> operator:
+
+    new P0, .PerlString
+    new P1, .PerlString
+    new P2, .PerlString
+
+    set P0, "Fred"
+    set P1, "Flinstone"
+
+    concat P2, P0, P1
+
+Then, P2 will hold "FredFlinstone" string. To speed-up things, you
+can use string registers instead:
+
+    new P0, .PerlString
+    new P1, .PerlString
+
+    set P0, "Fred "
+    set S0, "Flinstone"
+
+    concat P1, P0, S0
+
+Note that after concatenating the string, you can change original
+values without changing the concatenation result.
+
+=head2 Repeating strings
+
+Repeating strings can be done using the C<repeat> operator. It repeats
+its second argument the number of times passed as third
+argument. The result is stored on the string PMC passed as first
+argument:
+
+    new P0, .PerlString
+    set P0, "x"
+    new P1, .PerlInt
+    set P1, 12
+    new P2, .PerlString
+    repeat P2, P0, P1
+
+In this example C<P2> will become C<xxxxxxxxxxxx>.
+
+As you can set and get integers and numbers from a Perl String PMC,
+this is also valid:
+
+    new P0, .PerlString
+    set P0, "x"
+    new P1, .PerlString
+    set P1, 12
+    new P2, .PerlString
+    repeat P2, P0, P1
+
+=head2 Trueness
+
+Perl String PMC trueness values are like Perl scalar trueness. If it
+is empty (not initialized), contains an empty value or a 0, then it is
+evaluated as false. On other cases, it is true.
+
+    new P0, .PerlString
+    set P0, "foo"
+    if P0, TRUE          # this will succeed
+
+
+    new P0, .PerlString
+    set P0, "0"
+    if P0, TRUE          # this will fail
+
+=head2 TODO
+
+ - Complete synopsis
+
+ - Document: chopn
+
+=cut
+
+
