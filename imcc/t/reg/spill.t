@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 2;
+use TestCompiler tests => 3;
 
 ##############################
 
@@ -283,6 +283,7 @@ output_is(<<'CODE', <<'OUT', "pcc arg overflow 1");
   .param int i35
   .param int i36
   .param int i37
+  .param int i38
   .param int i39
   .param int i40
   print i1
