@@ -88,17 +88,28 @@ PIO_unix_init(theINTERP, ParrotIOLayer *layer)
 {
     ParrotIOData *d = GET_INTERP_IOD(interpreter);
     if (d != NULL && d->table != NULL) {
-        if ((PIO_STDIN(interpreter) =
-             PIO_unix_fdopen(interpreter, layer, STDIN_FILENO, 
-                             PIO_F_READ | PIO_F_SHARED))
-            && (PIO_STDOUT(interpreter) =
-                PIO_unix_fdopen(interpreter, layer, STDOUT_FILENO,
-                                PIO_F_WRITE | PIO_F_SHARED))
-            && (PIO_STDERR(interpreter) =
-                PIO_unix_fdopen(interpreter, layer, STDERR_FILENO,
-                                PIO_F_WRITE | PIO_F_SHARED))
-            )
-            return 0;
+        ParrotIO *io;
+
+        INTVAL has_early = interpreter->has_early_DOD_PMCs;
+
+        io = PIO_unix_fdopen(interpreter, layer, STDIN_FILENO, PIO_F_READ);
+        if (!io) return -1;
+        PIO_STDIN(interpreter) = new_io_pmc(interpreter, io);
+        PObj_needs_early_DOD_CLEAR(PIO_STDIN(interpreter));
+        
+        io = PIO_unix_fdopen(interpreter, layer, STDOUT_FILENO, PIO_F_WRITE);
+        if (!io) return -1;
+        PIO_STDOUT(interpreter) = new_io_pmc(interpreter, io);
+        PObj_needs_early_DOD_CLEAR(PIO_STDOUT(interpreter));
+        
+        io = PIO_unix_fdopen(interpreter, layer, STDERR_FILENO, PIO_F_WRITE);
+        if (!io) return -1;
+        PIO_STDERR(interpreter) = new_io_pmc(interpreter, io);
+        PObj_needs_early_DOD_CLEAR(PIO_STDERR(interpreter));
+
+        interpreter->has_early_DOD_PMCs = has_early;
+        
+        return 0;
     }
     return -1;
 }

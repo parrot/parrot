@@ -119,9 +119,21 @@ PIO_init(theINTERP)
 {
     /* Has interp been initialized already? */
     if (interpreter->piodata) {
-        /* memsub system is up and running:
-         * TODO: create stdio PMCs and store them away for later
-         */
+        /* memsub system is up and running: */
+        /* Init IO stacks and handles for interp instance.  */
+        if (PIO_init_stacks(interpreter) != 0) {
+            internal_exception(PIO_ERROR, "PIO init stacks failed.");
+        }
+
+        if (!PIO_STDIN(interpreter) || !PIO_STDOUT(interpreter)
+            || !PIO_STDERR(interpreter)) {
+            internal_exception(PIO_ERROR, "PIO init std handles failed.");
+        }
+
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+            PIO_eprintf(NULL, "PIO: IO system initialized.\n");
+        }
+
         return;
     }
 
@@ -133,19 +145,6 @@ PIO_init(theINTERP)
     if (GET_INTERP_IOD(interpreter)->table == NULL)
         internal_exception(PIO_ERROR, "PIO alloc table failure.");
 
-    /* Init IO stacks and handles for interp instance.  */
-    if (PIO_init_stacks(interpreter) != 0) {
-        internal_exception(PIO_ERROR, "PIO init stacks failed.");
-    }
-
-    if (!PIO_STDIN(interpreter) || !PIO_STDOUT(interpreter)
-        || !PIO_STDERR(interpreter)) {
-        internal_exception(PIO_ERROR, "PIO init std handles failed.");
-    }
-
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        PIO_eprintf(NULL, "PIO: IO system initialized.\n");
-    }
 }
 
 void
@@ -733,8 +732,7 @@ PIO_printf(theINTERP, const char *s, ...) {
 
     if(interpreter) {
         str=Parrot_vsprintf_c(interpreter, s, args);
-        ret=PIO_putps(interpreter,
-                new_io_pmc(interpreter, PIO_STDOUT(interpreter)), str);
+        ret=PIO_putps(interpreter, PIO_STDOUT(interpreter), str);
     }
     else {
         /* Be nice about this...
@@ -759,8 +757,7 @@ PIO_eprintf(theINTERP, const char *s, ...) {
     if(interpreter) {
         str=Parrot_vsprintf_c(interpreter, s, args);
 
-        ret=PIO_putps(interpreter,
-                      new_io_pmc(interpreter, PIO_STDERR(interpreter)), str);
+        ret=PIO_putps(interpreter, PIO_STDERR(interpreter), str);
     }
     else {
         /* Be nice about this...
@@ -778,20 +775,32 @@ INTVAL
 PIO_getfd(theINTERP, PMC *pmc)
 {
     INTVAL i;
-    ParrotIO *io = PMC_data(pmc);
 
     ParrotIOTable table = ((ParrotIOData*)interpreter->piodata)->table;
 
     for(i = 0; i < PIO_NR_OPEN; i++) {
-        if (table[i] == io) return i;
+        if (table[i] == pmc) return i;
         if (table[i] == NULL) {
-            table[i] = io;
+            table[i] = pmc;
             return i;
         }
     }
 
     /* XXX boe: increase size of the fdtable */
     return -1;
+}
+
+void
+Parrot_IOData_mark(theINTERP, ParrotIOData *piodata)
+{
+    INTVAL i;
+    ParrotIOTable table = piodata->table;
+
+    for (i = 0; i < PIO_NR_OPEN; i++) {
+        if (table[i]) {
+            pobject_lives(interpreter, (PObj *)table[i]);
+        }
+    }
 }
 
 /*

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "open/close");
@@ -259,4 +259,14 @@ CODE
 1.000000
 foo
 This is a test
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'puts method');
+       set S5, "ok\n"
+       getstdout P5
+       find_method P0, P5, "puts"
+       invoke
+       end
+CODE
+ok
 OUTPUT

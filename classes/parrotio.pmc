@@ -13,10 +13,64 @@
 
 #include "parrot/parrot.h"
 
+static void
+enter_nci_method(struct Parrot_Interp *interpreter, PMC *method_table,
+		 void *func, const char *name, const char *proto)
+{
+    PMC *method;
+
+    method = pmc_new(interpreter, enum_class_NCI);
+    VTABLE_set_string_keyed(interpreter, method, func,
+			    string_make(interpreter, proto, strlen(proto),
+					NULL, 0, NULL));
+    VTABLE_set_pmc_keyed(interpreter, method_table,
+			 key_new_string(interpreter,
+					string_make(interpreter, name,
+						    strlen(name), NULL,
+						    0, NULL)),
+			 method);
+}
+
+void Parrot_NCI_class_init(Parrot_Interp, int);
+void Parrot_PerlHash_class_init(Parrot_Interp, int);
+void Parrot_PerlUndef_class_init(Parrot_Interp, int);
+
 pmclass ParrotIO {
 
     STRING* name () {
 	return whoami;
+    }
+
+    void class_init () {
+        PMC *method_table;;
+
+        /* These classes are needed now so make sure they are inited */
+        Parrot_NCI_class_init(interp, enum_class_NCI);
+        Parrot_PerlHash_class_init(interp, enum_class_PerlHash);
+        Parrot_PerlUndef_class_init(interp, enum_class_PerlUndef);
+
+        method_table = pmc_new(INTERP, enum_class_PerlHash);
+
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(PIO_close), "close", "iIP");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(PIO_flush), "flush", "vIP");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(PIO_read), "read", "iIPii");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(PIO_write), "write", "iIPii");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(PIO_setbuf), "setbuf", "iIPi");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(PIO_setlinebuf), "setlinebuf", "iIP");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(PIO_puts), "puts", "iIPt");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(PIO_seek), "seek", "iIPiii");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(PIO_eof), "eof", "iIP");
+
+        ((ParrotIOData *)(INTERP->piodata))->method_table = method_table;
     }
 
     void init () {
@@ -42,5 +96,12 @@ pmclass ParrotIO {
 
     INTVAL get_bool() {
 	return !PIO_eof(INTERP, SELF);
+    }
+
+    PMC* find_method (STRING* name) {
+        PMC* method_table = ((ParrotIOData *)(INTERP->piodata))->method_table;
+
+	return VTABLE_get_pmc_keyed(INTERP, method_table,
+				    key_new_string(INTERP, name));
     }
 }

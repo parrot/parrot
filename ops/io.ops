@@ -104,17 +104,17 @@ store it in $1
 =cut
 
 inline op getstdin(out PMC) {
-  $1 = new_io_pmc(interpreter, PIO_STDIN(interpreter));
+  $1 = PIO_STDIN(interpreter);
   goto NEXT();
 }
 
 inline op getstdout(out PMC) {
-  $1 = new_io_pmc(interpreter, PIO_STDOUT(interpreter));
+  $1 = PIO_STDOUT(interpreter);
   goto NEXT();
 }
 
 inline op getstderr(out PMC) {
-  $1 = new_io_pmc(interpreter, PIO_STDERR(interpreter));
+  $1 = PIO_STDERR(interpreter);
   goto NEXT();
 }
 
@@ -189,8 +189,7 @@ inline op print(in NUM) {
 op print(in STR) {
   STRING *s = $1;
   if (s && string_length(s)) {
-    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)),
-              s);
+    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
   }
   goto NEXT();
 }
@@ -199,8 +198,7 @@ op print(in PMC) {
   PMC *p = $1;
   STRING *s = (VTABLE_get_string(interpreter, p));
   if (s) {
-    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)),
-              s);
+    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
   }
   goto NEXT();
 }
@@ -232,8 +230,7 @@ op printerr(in NUM) {
 op printerr(in STR) {
   STRING *s = $1;
   if (s && string_length(s)) {
-    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDERR(interpreter)),
-              s);
+    PIO_putps(interpreter, PIO_STDERR(interpreter), s);
   }
   goto NEXT();
 }
@@ -242,8 +239,7 @@ op printerr(in PMC) {
   PMC *p = $1;
   STRING *s = (VTABLE_get_string(interpreter, p));
   if (s) {
-    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)),
-              s);
+    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
   }
   goto NEXT();
 }
@@ -332,7 +328,7 @@ op read(out STR, in INT) {
     n = $2;
   $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
   memset(($1)->strstart, 0, n);
-  nr = PIO_read(interpreter, new_io_pmc(interpreter, PIO_STDIN(interpreter)),
+  nr = PIO_read(interpreter, PIO_STDIN(interpreter),
                 ($1)->strstart, (size_t)n);
   if(nr > 0)
     ($1)->strlen = ($1)->bufused = nr;

@@ -13,6 +13,7 @@
 # t - character string
 # PMC reg stuff
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
+# P - pointer to a PMC-register
 # special stuff
 # I - Parrot_Interp param
 #
@@ -39,3 +40,10 @@ v	piiii
 i	pppp
 i	ppi
 p	It
+# These are needed for parrotio.pmc
+i	IP
+v	IP
+i	IPi
+i	IPii
+i	IPiii
+i	IPt

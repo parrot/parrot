@@ -31,6 +31,7 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
 static size_t find_common_mask(size_t val1, size_t val2);
+static void trace_children(struct Parrot_Interp *interpreter, PMC *current);
 
 #if ARENA_DOD_FLAGS
 
@@ -38,6 +39,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 {
 
     struct Small_Object_Arena *arena = GET_ARENA(obj);
+    PMC *children = NULL;
     size_t n = GET_OBJ_N(arena, obj);
     size_t ns = n >> ARENA_FLAG_SHIFT;
     UINTVAL nm = (n & ARENA_FLAG_MASK) << 2;
@@ -50,14 +52,22 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
     if (*dod_flags & (PObj_is_special_PMC_FLAG << nm)) {
         if (((PMC*)obj)->pmc_ext) {
             /* put it on the end of the list */
-            interpreter->mark_ptr->next_for_GC = (PMC *)obj;
+            if (interpreter->mark_ptr)
+                interpreter->mark_ptr->next_for_GC = (PMC *)obj;
+            else
+                children = (PMC *)obj;
             /* Explicitly make the tail of the linked list be
              * self-referential */
             interpreter->mark_ptr = ((PMC*)obj)->next_for_GC = (PMC *)obj;
         }
         else if (PObj_custom_mark_TEST(obj))
             VTABLE_mark(interpreter, (PMC *) obj);
-        return;
+    }
+
+    /* children is only set if there isn't already a children trace active */
+    if (children) {
+        trace_children(interpreter, children);
+        interpreter->mark_ptr = NULL;
     }
 }
 
@@ -68,6 +78,8 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
  * individual pieces if they have private ones */
 void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 {
+    PMC *children = NULL;
+
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj)) {
         return;
@@ -90,7 +102,10 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
     if (PObj_is_special_PMC_TEST(obj)) {
         if (((PMC*)obj)->pmc_ext) {
             /* put it on the end of the list */
-            interpreter->mark_ptr->next_for_GC = (PMC *)obj;
+            if (interpreter->mark_ptr)
+                interpreter->mark_ptr->next_for_GC = (PMC *)obj;
+            else 
+                children = (PMC *)obj;
             /* Explicitly make the tail of the linked list be
              * self-referential */
             interpreter->mark_ptr = ((PMC*)obj)->next_for_GC = (PMC *)obj;
@@ -109,6 +124,12 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
                 obj, ((Buffer*)obj)->bufstart);
     }
 #endif
+
+    /* children is only set if there isn't already a children trace active */
+    if (children) {
+        trace_children(interpreter, children);
+        interpreter->mark_ptr = NULL;
+    }
 }
 
 #endif
@@ -118,7 +139,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 static void
 trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
 {
-    PMC *current, *prev = NULL;
+    PMC *current;
     /* Pointers to the currently being processed PMC, and
      * in the previously processed PMC in a loop.
      *
@@ -129,14 +150,12 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     unsigned int i = 0, j = 0;
     struct PRegChunk *cur_chunk = 0;
     struct Stash *stash = 0;
-    UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
-        | PObj_custom_mark_FLAG;
 
     /* We have to start somewhere, the interpreter globals is a good place */
     interpreter->mark_ptr = current = interpreter->iglobals;
 
     /* mark it as used  */
-    pobject_lives(interpreter, (PObj *)current);
+    pobject_lives(interpreter, (PObj *)interpreter->iglobals);
     pobject_lives(interpreter, interpreter->ctx.warns);
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
@@ -182,14 +201,28 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
             mark_stack(interpreter, stacks[j]);
 
     }
+
+    /* Walk the iodata */
+    Parrot_IOData_mark(interpreter, interpreter->piodata);
+
     /* Find important stuff on the system stack */
 #if TRACE_SYSTEM_AREAS
     if (trace_stack)
         trace_system_areas(interpreter);
 #endif
-
     /* Okay, we've marked the whole root set, and should have a good-sized
      * list 'o things to look at. Run through it */
+    trace_children(interpreter, current);
+}
+
+static void
+trace_children(struct Parrot_Interp *interpreter, PMC *current)
+{
+    PMC *prev = NULL;
+    unsigned i = 0;
+    UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
+        | PObj_custom_mark_FLAG;
+
     for (;  current != prev; current = current->next_for_GC) {
         UINTVAL bits = PObj_get_FLAGS(current) & mask;
 

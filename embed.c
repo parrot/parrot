@@ -87,7 +87,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
     if (filename == NULL || strcmp(filename, "-") == 0) {
         /* read from STDIN */
-        io = new_io_pmc(interpreter, PIO_STDIN(interpreter));
+        io = PIO_STDIN(interpreter);
         /* read 1k at a time */
         program_size = 0;
     }

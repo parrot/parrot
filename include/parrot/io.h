@@ -140,7 +140,7 @@ typedef struct _ParrotIOFilter ParrotIOFilter;
 typedef struct _ParrotIOBuf ParrotIOBuf;
 typedef struct _ParrotIO ParrotIO;
 typedef struct _ParrotIOData ParrotIOData;
-typedef struct _ParrotIO **ParrotIOTable;
+typedef PMC **ParrotIOTable;
 
 struct _ParrotIO {
     PIOHANDLE fd;               /* Low level OS descriptor      */
@@ -166,6 +166,7 @@ struct _ParrotIOLayer {
 struct _ParrotIOData {
     ParrotIOTable table;
     ParrotIOLayer *default_stack;
+    PMC *method_table;
 };
 
 
@@ -335,6 +336,8 @@ extern INTVAL PIO_printf(theINTERP, const char *s, ...);
 extern INTVAL PIO_eprintf(theINTERP, const char *s, ...);
 extern INTVAL PIO_getfd(theINTERP, PMC *io);
 extern PIOOFF_T PIO_tell(theINTERP, PMC *io);
+
+extern void Parrot_IOData_mark(theINTERP, ParrotIOData *piodata);
 
 /* Put platform specific macros here if you must */
 #ifdef PIO_OS_WIN32

@@ -688,7 +688,6 @@ make_interpreter(Interp_flags flags)
     SET_NULL(interpreter->piodata);
     PIO_init(interpreter);
 
-
     if (is_env_var_set("PARROT_GC_DEBUG")) {
 #if ! DISABLE_GC_DEBUG
         Interp_flags_SET(interpreter, PARROT_GC_DEBUG_FLAG);
@@ -826,12 +825,20 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      * no DOD run, so everything is considered dead
      */
 
+    /* XXX boe: This hack explicitly marks the piodata, these filehandles
+     *          need to be open until PIO_finish is called
+     */
+    Parrot_IOData_mark(interpreter, interpreter->piodata);
+
     if (interpreter->has_early_DOD_PMCs)
         free_unused_pobjects(interpreter, interpreter->arena_base->pmc_pool);
 
     /* we destroy all child interpreters and the last one too,
      * if the --leak-test commandline was given
      */
+
+    /* Now the PIOData gets also cleared */
+    PIO_finish(interpreter);
 
     if (! (interpreter->parent_interpreter ||
                 Interp_flags_TEST(interpreter, PARROT_DESTROY_FLAG)))
@@ -888,8 +895,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     stack_destroy(interpreter->ctx.control_stack);
     /* intstack */
     intstack_free(interpreter, interpreter->ctx.intstack);
-
-    PIO_finish(interpreter);
 
     mem_sys_free(interpreter);
 }

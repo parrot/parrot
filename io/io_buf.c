@@ -69,9 +69,10 @@ INTVAL
 PIO_buf_init(theINTERP, ParrotIOLayer *layer)
 {
     if (PIO_STDOUT(interpreter))
-        PIO_buf_setlinebuf(interpreter, layer, PIO_STDOUT(interpreter));
+        PIO_buf_setlinebuf(interpreter, layer, 
+                           PMC_data(PIO_STDOUT(interpreter)));
     if (PIO_STDIN(interpreter))
-        PIO_buf_setbuf(interpreter, layer, PIO_STDIN(interpreter),
+        PIO_buf_setbuf(interpreter, layer, PMC_data(PIO_STDIN(interpreter)),
                          PIO_UNBOUND);
     return 0;
 }

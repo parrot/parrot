@@ -36,6 +36,7 @@ my (%proto_type) = (p => "void *",
 		    t => "char *",
 		    v => "void",
 		    I => "struct Parrot_Interp *",
+		    P => "PMC *"
 		   );
 
 my (%other_decl) = (p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);");
@@ -121,8 +122,8 @@ print NCI <<'HEAD';
 /* All our static functions that call in various ways. Yes, terribly
    hackish, but that's just fine */
 
-static void 
-set_return_val(struct Parrot_Interp *interpreter, int stack, int ints, 
+static void
+set_return_val(struct Parrot_Interp *interpreter, int stack, int ints,
                int strings, int pmcs, int nums) {
     INT_REG(0) = stack;
     INT_REG(1) = ints;
@@ -150,8 +151,8 @@ while (<>) {
     }
 
     # Header
-    generate_func_header($ret, $args, (join ",", @arg), $ret_type{$ret}, 
-			 $ret_type_decl{$ret}, $func_call_assign{$ret}, 
+    generate_func_header($ret, $args, (join ",", @arg), $ret_type{$ret},
+			 $ret_type_decl{$ret}, $func_call_assign{$ret},
 			 $other_decl{$ret},  $ret_assign{$ret});
 
     # Body
@@ -220,6 +221,9 @@ sub make_arg {
     /I/ && do {
 	       return "interpreter";
               };
+    /P/ && do {my $regnum = $reg_ref->{p}++;
+               return "PMC_REG($regnum)";
+              };
 
 }
 
@@ -235,14 +239,14 @@ FOOTER
 }
 
 sub generate_func_header {
-    my ($return, $params, $call_params, $ret_type, $ret_type_decl, 
+    my ($return, $params, $call_params, $ret_type, $ret_type_decl,
 	$return_assign, $other_decl, $final_assign) = @_;
     $other_decl ||= "";
 
     if (defined $params) {
     my $proto = join ', ', map { $proto_type{$_} } split '', $params;
     print NCI <<HEADER;
-static void 
+static void
 pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self)
 {
     typedef $ret_type (*func_t)($proto);
@@ -257,7 +261,7 @@ HEADER
   }
   else {
     print NCI <<HEADER;
-static void 
+static void
 pcf_${return}(struct Parrot_Interp *interpreter, PMC *self)
 {
     $ret_type (*pointer)(void);

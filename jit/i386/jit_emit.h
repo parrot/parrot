@@ -2659,7 +2659,7 @@ count_regs(char *sig, char *sig_start)
     const char *typs[] = {
         "lisc", /* I */
         "t",    /* S */
-        "p",    /* P */
+        "pP",   /* P */
         "fd"   /* N */
     };
     int first_reg = 5;
@@ -2764,6 +2764,11 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                 emitm_movl_m_r(pc, emit_EAX, emit_EAX, 0, 1,
                         offsetof(struct PMC_EXT, data));
 #endif
+                emitm_pushl_r(pc, emit_EAX);
+                break;
+            case 'P':   /* push PMC * */
+                jit_emit_mov_rm_i(pc, emit_EAX,
+                        &PMC_REG(count_regs(sig, signature->strstart)));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'v':
