@@ -74,6 +74,9 @@ config/inter/ops.pl
 config/inter/progs.pl
 config/inter/types.pl
 core.ops
+debug.c
+debug.ops
+disassemble.c
 disassemble.pl
 docs/embed.pod
 docs/faq.pod
@@ -144,6 +147,7 @@ exceptions.c
 global_setup.c
 hash.c
 include/parrot/chartype.h
+include/parrot/debug.h
 include/parrot/embed.h
 include/parrot/encoding.h
 include/parrot/events.h

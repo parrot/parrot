@@ -48,6 +48,8 @@ typedef Parrot_Interp_flag Interp_flags;
 
 #include "parrot/rxstacks.h"
 
+#include "parrot/debug.h"
+
 typedef union UnionVal {
     INTVAL int_val;
     FLOATVAL num_val;
@@ -162,6 +164,8 @@ typedef struct Parrot_Interp {
                                    requests are there? */
     UINTVAL GC_block_level;     /* How many outstanding GC block
                                    requests are there? */
+
+    PDB_t *pdb;                 /* Debug system */
 } Interp;
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))

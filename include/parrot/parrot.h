@@ -132,6 +132,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/resources.h"
 #include "parrot/string_funcs.h"
 #include "parrot/misc.h"
+#include "parrot/debug.h"
 #endif
 
 /*

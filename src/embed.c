@@ -294,6 +294,52 @@ Parrot_destroy(struct Parrot_Interp *interp)
     free(interp);
 }
 
+void
+Parrot_debug(struct Parrot_Interp *interpreter)
+{
+    PDB_t *pdb;
+    const char *command;
+
+    pdb = (PDB_t *)mem_sys_allocate(sizeof(PDB_t));
+
+    interpreter->pdb = pdb;
+    pdb->cur_opcode = interpreter->code->byte_code;
+
+    while (!(pdb->state & PDB_EXIT)) {
+        PDB_get_command(interpreter);
+        command = pdb->cur_command;
+        PDB_run_command(interpreter,command);
+    }
+}
+
+void
+Parrot_disassemble(struct Parrot_Interp *interpreter)
+{
+    PDB_t *pdb;
+    PDB_line_t *line;
+    char *dis,*c;
+
+    pdb = (PDB_t *)mem_sys_allocate(sizeof(PDB_t));
+
+    interpreter->pdb = pdb;
+    pdb->cur_opcode = interpreter->code->byte_code;
+
+    PDB_disassemble(interpreter,NULL);
+    line = pdb->file->line;
+
+    while (line->next)
+    {
+        /* If it has a label print it */
+        if (line->label)
+            printf("L%li:\t",line->label->number);
+        c = pdb->file->source + line->source_offset;
+        while (*c != '\n'  && c)
+            printf("%c",*(c++));
+        printf("\n");
+        line = line->next;
+    }
+    return;
+}
 
 /*
  * Local variables:

@@ -67,7 +67,7 @@ $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 $(INC)/oplib/core_ops_prederef.h $(INC)/runops_cores.h $(INC)/trace.h \
 $(INC)/pmc.h $(INC)/key.h $(INC)/hash.h $(INC)/resources.h $(INC)/platform.h ${cg_h} \
 $(INC)/interp_guts.h ${jit_h} $(INC)/rx.h $(INC)/rxstacks.h \
-$(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h
+$(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h $(INC)/debug.h
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
@@ -90,7 +90,7 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
 				 platform$(O) ${jit_o} resources$(O) rx$(O) rxstacks$(O) \
 				 embed$(O) warnings$(O) misc$(O) ${cg_o} \
-				 packout$(O) byteorder$(O)
+				 packout$(O) byteorder$(O) debug$(O)
 
 O_FILES = $(INTERP_O_FILES) \
 	      $(IO_O_FILES) \
@@ -222,6 +222,25 @@ blib/lib/libcore_prederef$(SO) : blib/lib/libcore_prederef$(SO).${MAJOR}
 $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
 	$(LD) $(LD_OUT)$(TEST_PROG) test_main$(O) $(LDFLAGS) $(C_LIBS) -L blib/lib -lparrot
 
+#
+# Parrot Debugger
+#
+PDB=pdb
+
+pdb$(O) : $(GENERAL_H_FILES)
+
+$(PDB) : pdb$(O) $(O_FILES)
+	$(LD) ${ld_out}$(PDB) pdb$(O) $(O_FILES) $(C_LIBS) $(LDFLAGS)
+
+#
+# Parrot Disassembler
+#
+DIS=disassemble
+
+disassemble$(O) : $(GENERAL_H_FILES)
+
+$(DIS) : disassemble$(O) $(O_FILES)
+	$(LD) ${ld_out}$(DIS) disassemble$(O) $(O_FILES) $(C_LIBS) $(LDFLAGS)
 
 #
 # Parrot Dump
@@ -303,6 +322,8 @@ key$(O) : $(GENERAL_H_FILES)
 resources$(O) : $(GENERAL_H_FILES)
 
 platform$(O) : $(GENERAL_H_FILES)
+
+debug$(O) : $(GENERAL_H_FILES)
 
 string$(O) : $(GENERAL_H_FILES)
 
