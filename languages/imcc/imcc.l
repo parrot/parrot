@@ -91,7 +91,7 @@ STRINGCONSTANT  \"(\\\"|[^"\n]*)*\"
 CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
 EOL		\r?\n
-WS              [\t\f\r ]
+WS              [\t\f\r\x1a ]
 SP              [ ]
 
 %x emit
