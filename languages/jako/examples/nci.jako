@@ -1,0 +1,49 @@
+#
+# nci.jako
+#
+# Test out the Jako wrapping of Parrot's Native Call Interface
+# facility.
+#
+# Copyright (C) 2003 Gregor N. Purdy. All rights reserved.
+# This program is free software. Its use is subject to the same
+# license as Parrot.
+#
+
+sub int initscr  {fnlib = "libcurses.so"} ();
+sub int endwin   {fnlib = "libcurses.so"} ();
+sub int curs_set {fnlib = "libcurses.so"} (int x);
+
+sub int addstr   {fnlib = "libcurses.so"} (str s);
+sub int refresh  {fnlib = "libcurses.so"} ();
+sub int move     {fnlib = "libcurses.so"} (int x, int y);
+
+sub int getch    {fnlib = "libcurses.so"} ();
+sub int box      {fnlib = "libcurses.so"} (int screen, int v, int h);
+sub int hline    {fnlib = "libcurses.so"} (int ch, int n);
+
+sub str readline {op} (int fd);
+
+var int foo; # Store result from above functions here.
+
+var int screen;
+screen = initscr();
+
+foo = curs_set(0);
+foo = box(screen, 42, 42);
+foo = move(10, 20);
+foo = addstr("Hello, world!");
+foo = move(12, 15);
+foo = addstr("(Press any key to exit)");
+
+foo = move(8, 10);
+foo = hline(42, 33);
+
+foo = move(14, 10);
+foo = hline(42, 33);
+
+foo = refresh();
+
+foo = getch();
+
+foo = curs_set(1);
+foo = endwin();
