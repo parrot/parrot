@@ -3,9 +3,11 @@
 # Create 2 subroutines
 #
 set_addr I0, SUB 
-new P0, .ParrotSub, I0 
+new P0, .Sub
+set P0, I0
 save P0
-new P0, .ParrotSub, I0 
+new P0, .Sub
+set P0, I0 
 # Calling convention says P0 will contain the sub
 call
 restore P0
