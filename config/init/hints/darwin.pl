@@ -29,5 +29,4 @@ Configure::Data->set(
   ld_share_flags => '-dynamiclib',
   ld_load_flags => '-bundle -undefined suppress',
   memalign => 'some_memalign',
-  platform_asm => 1,
 );

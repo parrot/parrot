@@ -1,7 +1,7 @@
 .text
 	.align	12
-	.globl Parrot_ppc_jit_restore_nonvolatile_registers
-Parrot_ppc_jit_restore_nonvolatile_registers:
+	.globl _Parrot_ppc_jit_restore_nonvolatile_registers
+_Parrot_ppc_jit_restore_nonvolatile_registers:
 
     lfd     f14,-84(r1)
     lfd     f15,-92(r1)
