@@ -24,6 +24,25 @@ sub defines
   return <<END;
 #define REL_PC ((size_t)(cur_opcode - interpreter->prederef_code))
 #define CUR_OPCODE (((opcode_t *)interpreter->code->byte_code) + REL_PC)
+
+static inline opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
+                                           void** prederef_addr)
+{
+    ssize_t offset_in_ops;
+    if (prederef_addr == NULL) return NULL;
+    offset_in_ops = prederef_addr - interpreter->prederef_code;
+    return (opcode_t*) interpreter->code->byte_code + offset_in_ops;
+}
+
+static inline void** opcode_to_prederef(struct Parrot_Interp* interpreter,
+                                        opcode_t* opcode_addr)
+{
+    ssize_t offset_in_ops;
+    if (opcode_addr == NULL) return NULL;
+    offset_in_ops = opcode_addr - (opcode_t*) interpreter->code->byte_code;
+    return interpreter->prederef_code + offset_in_ops;
+}
+
 END
 }
 
@@ -48,7 +67,13 @@ sub opsarraytype { return 'void *' };
 sub expr_pop
 {
   my ($self) = @_;
-  return "(((opcode_t *)pop_dest(interpreter) - (opcode_t *)interpreter->code->byte_code) + interpreter->prederef_code)";
+  return "opcode_to_prederef(interpreter, pop_dest(interpreter))";
+}
+
+sub expr_address
+{
+  my ($self, $addr) = @_;
+  return "opcode_to_prederef(interpreter, $addr)";
 }
 
 # expr_offset and goto_offset
@@ -67,6 +92,11 @@ sub expr_offset {
 sub goto_offset {
     my ($self, $offset) = @_;
     return "return cur_opcode + $offset";
+}
+
+sub goto_address {
+    my ($self, $addr) = @_;
+    return "return opcode_to_prederef(interpreter, $addr)";
 }
 
 #

@@ -283,24 +283,24 @@ sub make_op
 
       $jumps ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
       $jumps ||= $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
-      $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
-      $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
+                 $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
+                 $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
 
       $jumps ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
-      $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
+                 $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
       $jumps ||= $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
       $jumps ||= $body =~ s/\bgoto\s+POP\(\)/{{=*}}/mg;
-      $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
-      $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
-      $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
-      $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
+                 $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
+                 $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
+                 $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
+                 $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
 
-      $body =~ s/\bHALT\(\)/{{=0}}/mg;
+                 $body =~ s/\bHALT\(\)/{{=0}}/mg;
 
       $jumps ||= $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg;
-      $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
+                 $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
 
-      $body =~ s/\$(\d+)/{{\@$1}}/mg;
+                 $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
       $op->body(qq{#line $line "$file"\n}.$body);
 
@@ -388,15 +388,10 @@ sub preamble
     s/goto\s+POP\(\)/{{=*}}/mg;
     s/HALT\(\)/{{=0}}/mg;
 
-    #borrowed from Parrot::Op
-    s/{{=\*}}/      $trans->goto_pop();       /mge;
-    s/{{=(.*?)}}/   $trans->goto_address($1); /mge;
-    s/{{\+=(.*?)}}/ $trans->goto_offset($1);  /mge;
-    s/{{-=(.*?)}}/  $trans->goto_offset(-$1); /mge;
-    s/{{\^\*}}/     $trans->expr_pop();       /mge;
-    s/{{\^(.*?)}}/  $trans->expr_address($1); /mge;
-    s/{{\^\+(.*?)}}/$trans->expr_offset($1);  /mge;
-    s/{{\^-(.*?)}}/ $trans->expr_offset(-$1); /mge;
+    # FIXME: This ought to throw errors when attempting to rewrite $n
+    # argument accesses and other things that make no sense in the
+    # preamble.
+    $_ = Parrot::Op->rewrite_body($_, $trans);
   }
 
   return $_;

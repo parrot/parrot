@@ -162,6 +162,45 @@ sub full_body
   return $body;
 }
 
+sub _substitute {
+  my $self = shift;
+  local $_ = shift;
+  my $trans = shift;
+
+  s/{{([a-z]+)\@([^{]*?)}}/ $trans->access_arg($1, $2, $self); /me;
+  s/{{\@([^{]*?)}}/   $trans->access_arg($self->arg_type($1), $1, $self); /me;
+
+  s/{{=0,=([^{]*?)}}/   $trans->restart_address($1) . "; {{=0}}"; /me;
+  s/{{=0,\+=([^{]*?)}}/ $trans->restart_offset($1)  . "; {{=0}}"; /me;
+  s/{{=0,-=([^{]*?)}}/  $trans->restart_offset(-$1) . "; {{=0}}"; /me;
+
+  s/{{=\*}}/            $trans->goto_pop();       /me;
+
+  s/{{\+=([^{]*?)}}/    $trans->goto_offset($1);  /me;
+  s/{{-=([^{]*?)}}/     $trans->goto_offset(-$1); /me;
+  s/{{=([^*][^{]*?)}}/  $trans->goto_address($1); /me;
+
+  s/{{\^\+([^{]*?)}}/   $trans->expr_offset($1);  /me;
+  s/{{\^-([^{]*?)}}/    $trans->expr_offset(-$1); /me;
+  s/{{\^([^{]*?)}}/     $trans->expr_address($1); /me;
+
+  return $_;
+}
+
+# Correctly handle nested substitions for {{...}} by making sure the ...
+# never contains '{', and repeating over the whole string until no more
+# substitutions can be made.
+sub rewrite_body {
+    my ($self, $body, $trans) = @_;
+
+    while (1) {
+        my $new_body = $self->_substitute($body, $trans);
+        last if $body eq $new_body;
+        $body = $new_body;
+    }
+
+    return $body;
+}
 
 #
 # source()
@@ -170,27 +209,7 @@ sub full_body
 sub source
 {
   my ($self, $trans) = @_;
-
-  my $full_body = $self->full_body;
-
-  $full_body =~ s/{{([a-z]+)\@(.*?)}}/ $trans->access_arg($1, $2, $self); /mge;
-  $full_body =~ s/{{\@(.*?)}}/ $trans->access_arg($self->arg_type($1), $1, $self); /mge;
-
-  $full_body =~ s/{{=0,=(.*?)}}/   $trans->restart_address($1) . "; " . $trans->goto_address(0); /mge;
-  $full_body =~ s/{{=0,\+=(.*?)}}/ $trans->restart_offset($1)  . "; " . $trans->goto_address(0); /mge;
-  $full_body =~ s/{{=0,-=(.*?)}}/  $trans->restart_offset(-$1) . "; " . $trans->goto_address(0); /mge;
-
-  $full_body =~ s/{{=\*}}/      $trans->goto_pop();       /mge; # NOTE: MUST BE FIRST
-
-  $full_body =~ s/{{\+=(.*?)}}/ $trans->goto_offset($1);  /mge;
-  $full_body =~ s/{{-=(.*?)}}/  $trans->goto_offset(-$1); /mge;
-  $full_body =~ s/{{=(.*?)}}/   $trans->goto_address($1); /mge;
-
-  $full_body =~ s/{{\^\+(.*?)}}/ $trans->expr_offset($1);  /mge;
-  $full_body =~ s/{{\^-(.*?)}}/  $trans->expr_offset(-$1); /mge;
-  $full_body =~ s/{{\^(.*?)}}/   $trans->expr_address($1); /mge;
-
-  return $full_body;
+  return $self->rewrite_body($self->full_body, $trans);
 }
 
 
