@@ -77,6 +77,16 @@ Parrot_set_n_nc {
     }
 }
 
+Parrot_set_p_pc {
+    if (MAP[1]) {
+        jit_emit_mov_rm_i(NATIVECODE, MAP[1], &PMC_CONST[2]);
+    }
+    else {
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &PMC_CONST[2]);
+        jit_emit_mov_MR_i(NATIVECODE, ROFFS_PMC(1), ISR1);
+    }
+}
+
 Parrot_set_n_i {
 ; store mapped int
     if (MAP[2]) {

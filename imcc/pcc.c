@@ -856,24 +856,38 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * function call syntax _f()
      */
     if (ins->type & ITCALL) {
-        if (!meth_call && sub->pcc_sub->sub->type == VTADDRESS) {
+        SymReg * the_sub = sub->pcc_sub->sub;
+        if (!meth_call && the_sub->type == VTADDRESS) {
 #if IMC_TRACE
             fprintf(stderr, "generating sub object [sub->name = %s]\n",
-                    sub->pcc_sub->sub->name);
+                    the_sub->name);
 #endif
             /*
              * sub->pcc_sub->sub is an actual subroutine name,
              * not a variable.
              */
             reg = mk_temp_reg('P');
-            tmp = iNEWSUB(interp, unit, reg, NEWSUB,
-                    sub->pcc_sub->sub, NULL, 0);
             add_pcc_sub(sub, reg);
+#if 0
+            tmp = iNEWSUB(interp, unit, reg, NEWSUB,
+                    the_sub, NULL, 0);
+#else
+            /*
+             * insert set_p_pc with the sub as constant
+             */
+            the_sub = dup_sym(the_sub);
+            the_sub->set = 'p';
+            the_sub->usage = U_FIXUP;
+            the_sub->type = VTCONST;
+            regs[0] = reg;
+            regs[1] = the_sub;
+            tmp = INS(interp, unit, "set_p_pc", "", regs, 2, 0, 0);
+#endif
             ins->type &= ~ITCALL;
             prepend_ins(unit, ins, tmp);
         }
         else
-            add_pcc_sub(sub, sub->pcc_sub->sub);
+            add_pcc_sub(sub, the_sub);
     }
 
 #if IMC_TRACE_HIGH
