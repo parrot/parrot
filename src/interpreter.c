@@ -902,16 +902,22 @@ Run parrot ops. Set exception handler and/or resume after exception.
 
 */
 
+#define STACKED_EXCEPTIONS 1
+
 void
 runops(struct Parrot_Interp *interpreter, size_t offset)
 {
     /*
-     * having stacked exceptions for each runlevel doesn't work
-     * (after a longjmp the interpreter is totally messed up)
-     * I don't know, if we even need this, so for now just one
-     * exception is created
+     * having stacked exceptions for each runlevel didn't work always
+     * (after a longjmp the interpreter was totally messed up)
+     *
+     * But these are necessary to catch exceptions in reentered
+     * run loops, e.g. if a delegate methods throws an exception
      */
-    if (!interpreter->exceptions) {
+#if ! STACKED_EXCEPTIONS
+    if (!interpreter->exceptions)
+#endif
+    {
         new_internal_exception(interpreter);
         if (setjmp(interpreter->exceptions->destination)) {
             /* an exception was thrown */
@@ -929,9 +935,9 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
     runops_ex(interpreter, offset);
     /*
      * pop off exception and put it onto the free list
-     * N/Y s. above
+     * s. above
      */
-    if (0) {
+    if (STACKED_EXCEPTIONS) {
         Parrot_exception *e = interpreter->exceptions;
         interpreter->exceptions = e->prev;
         interpreter->exc_free_list = e;

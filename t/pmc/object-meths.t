@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown");
@@ -353,3 +353,43 @@ B::blah
 A::blah
 B::foo
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "exceptions and different runloops");
+_main:
+    newsub P0, .Exception_Handler, _eh
+    set_eh P0
+
+    newclass P0, "Foo"
+
+    newsub P0, .Sub, __init
+    store_global "Foo", "__init", P0
+
+    print "new\n"
+    find_type I0, "Foo"
+    new P2, I0
+    print "back in main\n"
+    end
+
+_eh:
+    print "eh!\n"
+    set P0, P5["_invoke_cc"]
+    invoke P0
+
+__init:
+    set P10, P1
+    print "in __init\n"
+
+    # raise an exception
+    set S0, "qux"
+    callmethod
+
+    print "back in __init\n"
+    invoke P10
+CODE
+new
+in __init
+eh!
+back in __init
+back in main
+OUTPUT
+
