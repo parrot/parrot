@@ -39,7 +39,7 @@ To create a macro, the syntax is slightly different.
   .macro swap (A,B,TEMP) # . marks the directive
     set .TEMP,.A         # . marks the special variable.
     set .A,.B
-    set .B,TEMP
+    set .B,.TEMP
   .endm                  # And . marks the end of the macro.
 
 Macros support labels that are local to a given macro expansion, and the syntax
@@ -231,7 +231,9 @@ sub preprocess {
   my $reg_re   = qr([INSP]\d+);
   my $num_re   = qr([-+]?\d+(\.\d+([eE][-+]?\d+)?)?);
 
-  for(@{$self->{cur_contents}}) {
+  my @todo=@{$self->{cur_contents}};
+  while(scalar(@todo)) {
+    $_=shift(@todo);
     $line++;
 
     #
@@ -267,16 +269,19 @@ sub preprocess {
     elsif(/^\.include \s+
            "([^"]+)"
           /x) {                                # .include "{file}"
-#      if(-e $1) {
-#        open FOO,"< $1";
-#        while(<FOO>) {
-#          chomp;
-#        }
-#        close FOO;
-#      }
-#      else {
-#        print STDERR "Couldn't open '$1' for inclusion at line $line: $!.\n";
-#      }
+      if(-e $1) {
+        open FOO,"< $1";
+        my @include;
+        while(<FOO>) {
+          chomp;
+          push(@include,$_);
+        }
+        unshift(@todo,@include);
+        close FOO;
+      }
+      else {
+        print STDERR "Couldn't open '$1' for inclusion at line $line: $!.\n";
+      }
     }
     elsif(/^\.macro    \s+
            ($label_re) \s*
