@@ -27,9 +27,6 @@
 .constant TempInt2	I6
 .constant TempInt3      I7
 
-.constant StartOp	I12
-.constant EndOp		I13
-
 .constant InternalInt	I27
 
 .constant Status	I12
@@ -63,16 +60,11 @@
 .constant PASMCompiler	P4
 .constant LinePMC	P2
 
+.constant WorkTOS	P17
+
 .constant TempPMC	P27
 
 VeryBeginning:
-    set_addr .StartOp, VeryBeginning
-    set_addr .EndOp, VeryEnd
-    print "We go from "
-    print .StartOp
-    print " to "
-    print .EndOp
-    print "\n"
 
     # We need a PMC for the compiler
     compreg .PASMCompiler, "PASM"
@@ -115,12 +107,51 @@ DonePromptString:
     # Put the actual function address into the core ops hash, since
     # it is now a core op
     set .CoreOps[.OpName], .TempInt
-    print "Address for "
-    print .OpName
-    print " is "
-    print .TempInt
-    print "\n"
 .endm
+
+.macro PopInt
+    restore .WorkTOS
+    set .IntStack, .WorkTOS    
+.endm
+
+.macro PushInt
+    new .WorkTOS, .Integer
+    set .WorkTOS, .IntStack
+    save .WorkTOS
+.endm
+
+.macro PushTempInt
+    new .WorkTOS, .Integer
+    set .WorkTOS, .TempInt
+    save .WorkTOS
+.endm
+
+.macro PopNum
+    restore .WorkTOS
+    set .NumStack, .WorkTOS        
+.endm
+
+.macro PushNum
+    new .WorkTOS, .Float
+    set .WorkTOS, .NumStack
+    save .WorkTOS
+.endm
+
+#.macro PopStr
+#
+#.endm
+
+#.macro PushStr
+#
+#.endm
+
+#.macro PopP
+#    
+#.endm
+
+#.macro PushP
+#    
+#.endm
 
 InitializeCoreOps:
     #
@@ -618,11 +649,6 @@ MaybeInterpretWord:
 NotInt:
     set .TempInt, .CoreOps[.CurrentWord]
     eq .TempInt, 0, UserWord
-    print "Calling into "
-    print .CurrentWord
-    print " at "
-    print .TempInt
-    print "\n"
     jsr .TempInt
     branch DoneInterpretWord
 
@@ -633,302 +659,305 @@ UserWord:
 
     branch DoneInterpretWord
 PushInt:
-    save .IntStack
+    .PushInt
+#    save .IntStack
     branch DoneInterpretWord
 
 Int_One_Minus:
-    restore .IntStack
+    .PopInt
+#    restore .IntStack
     dec .IntStack
-    save .IntStack
+#    save .IntStack
+    .PushInt
     branch DoneInterpretWord
 Int_One_Plus:
-    restore .IntStack
+    .PopInt # was a restore
     inc .IntStack
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Dot:
-    restore .IntStack
+    .PopInt # was a restore
     print .IntStack
     print " "
     branch DoneInterpretWord
 Int_Dot_Stack:
     branch DoneInterpretWord
 Int_Dup:
-    restore .IntStack
-    save .IntStack
-    save .IntStack
+    .PopInt # was a restore
+    .PushInt # was a save intstack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Drop:
-    restore .IntStack
+    .PopInt # was a restore
     branch DoneInterpretWord
 Int_Swap:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt2, .IntStack
     set .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     set .IntStack, .TempInt2
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Quit:
     end
 Int_Abs:
-    restore .IntStack
+    .PopInt # was a restore
     ge .IntStack, 0, DoneIntAbs
     mul .IntStack, .IntStack, -1
 DoneIntAbs:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Max:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     ge .IntStack, .TempInt, Done_IntMax
     set .IntStack, .TempInt
 Done_IntMax:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Min:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     le .IntStack, .TempInt, Done_IntMin
-    save .IntStack
+    .PushInt # was a save intstack
     set .IntStack, .TempInt
 Done_IntMin:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Add:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     add .IntStack, .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Sub:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     sub .IntStack, .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Negate:
-    restore .IntStack
+    .PopInt # was a restore
     mul .IntStack, .IntStack, -1
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Mul:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     mul .IntStack, .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Div:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     div .IntStack, .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Mod:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     mod .IntStack, .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Slash_Mod:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt2, .IntStack
     mod .IntStack, .TempInt2, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     div .IntStack, .TempInt2, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_GT:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     gt .TempInt, .IntStack, Int_is_GT
     set .IntStack, 0
     branch Int_GT_end
  Int_is_GT:
     set .IntStack, 1
  Int_GT_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_GE:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     ge .TempInt, .IntStack, Int_is_GE
     set .IntStack, 0
     branch Int_GE_end
  Int_is_GE:
     set .IntStack, 1
  Int_GE_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_NE:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     ne .TempInt, .IntStack, Int_is_NE
     set .IntStack, 0
     branch Int_NE_end
  Int_is_NE:
     set .IntStack, 1
  Int_NE_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_EQ:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     eq .TempInt, .IntStack, Int_is_EQ
     set .IntStack, 0
     branch Int_EQ_end
  Int_is_EQ:
     set .IntStack, 1
  Int_EQ_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_LT:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     lt .TempInt, .IntStack, Int_is_LT
     set .IntStack, 0
     branch Int_LT_end
  Int_is_LT:
     set .IntStack, 1
  Int_LT_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_LE:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     le .TempInt, .IntStack, Int_is_LE
     set .IntStack, 0
     branch Int_LE_end
  Int_is_LE:
     set .IntStack, 1
  Int_LE_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_LT0:
-    restore .IntStack
+    .PopInt # was a restore
     lt .IntStack, 0, Int_is_LT0
     set .IntStack, 0
     branch Int_LT0_end
  Int_is_LT0:
     set .IntStack, 1
  Int_LT0_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_LE0:
-    restore .IntStack
+    .PopInt # was a restore
     le .IntStack, 0, Int_is_LE0
     set .IntStack, 0
     branch Int_LE0_end
  Int_is_LE0:
     set .IntStack, 1
  Int_LE0_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_NE0:
-    restore .IntStack
+    .PopInt # was a restore
     ne .IntStack, 0, Int_is_NE0
     set .IntStack, 0
     branch Int_NE0_end
  Int_is_NE0:
     set .IntStack, 1
  Int_NE0_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_EQ0:
-    restore .IntStack
+    .PopInt # was a restore
     eq .IntStack, 0, Int_is_EQ0
     set .IntStack, 0
     branch Int_EQ0_end
  Int_is_EQ0:
     set .IntStack, 1
  Int_EQ0_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_GT0:
-    restore .IntStack
+    .PopInt # was a restore
     gt .IntStack, 0, Int_is_GT0
     set .IntStack, 0
     branch Int_GT0_end
  Int_is_GT0:
     set .IntStack, 1
  Int_GT0_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_GE0:
-    restore .IntStack
+    .PopInt # was a restore
     ge .IntStack, 0, Int_is_GE0
     set .IntStack, 0
     branch Int_GE0_end
  Int_is_GE0:
     set .IntStack, 1
  Int_GE0_end:
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 
 Int_And:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     band .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Or:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     bor .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_XOr:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     bxor .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Invert:
-    restore .IntStack
+    .PopInt # was a restore
     bnot .IntStack, .IntStack
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_LShift:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     shl .IntStack, .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_RShift:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
+    .PopInt # was a restore
     shr .IntStack, .IntStack, .TempInt
-    save .IntStack
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 Int_Over:
-    restore .IntStack
+    .PopInt # was a restore
     set .TempInt, .IntStack
-    restore .IntStack
-    save .IntStack
-    save .TempInt
-    save .IntStack
+    .PopInt # was a restore
+    .PushInt # was a save intstack
+    .PushTempInt
+    .PushInt # was a save intstack
     branch DoneInterpretWord
 
 DoneInterpretWord:
@@ -1020,7 +1049,6 @@ CompileWord:
     concat .NewBodyString, "ret\n"
 
     # Compile the string
-    print .NewBodyString
     compile .CompiledWordPMC, .PASMCompiler, .NewBodyString
 
     # And we're done
@@ -1098,15 +1126,15 @@ AddSpecialWord:
     ret
 
 AddIntConstant:
-#    concat .NewBodyString, "new P27, .Integer\n"
-#    concat .NewBodyString, "set P27, "
-#    concat .NewBodyString, .CurrentWord
-#    concat .NewBodyString, "\n"
-#    concat .NewBodyString, "save P27\n"
-    concat .NewBodyString, "set I27, "
+    concat .NewBodyString, "new P27, .Integer\n"
+    concat .NewBodyString, "set P27, "
     concat .NewBodyString, .CurrentWord
     concat .NewBodyString, "\n"
-    concat .NewBodyString, "save I27\n"
+    concat .NewBodyString, "save P27\n"
+#    concat .NewBodyString, "set I27, "
+#    concat .NewBodyString, .CurrentWord
+#    concat .NewBodyString, "\n"
+#    concat .NewBodyString, "save I27\n"
     ret
 
 AddFloatConstant:
