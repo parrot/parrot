@@ -23,44 +23,59 @@ sub new {
   return $self;
 }
 
+sub __parse_expansion {
+  my ($self,$line,$line_num) = @_;
+
+  my ($macro,$value) = split /=/,$line;
+  $macro=~s/\s+$//;
+  $value=~s/^\s+//;
+  $self->{expansion}{$macro} = {
+    exp => $value,
+    line => $line_num-1,
+  };
+}
+
+sub __parse_dependency {
+  my ($self,$junkref,$line) = @_;
+  for(split /\s+/,$junkref->{dependent}) {
+    $self->{depend}{$_} = {
+      files => $junkref->{upon},
+      actions => $junkref->{action},
+      line => $line-1,
+    };
+  }
+  $junkref->{action} = [];
+  ($junkref->{dependent},$junkref->{upon}) = split /:/;
+  $junkref->{dependent} =~ s/\s+$//;
+  $junkref->{upon} =~ s/^\s+// if defined $junkref->{upon};
+}
+
 sub _parse_file {
   my $self = shift;
   my $line = 0;
-  my @action;
-  my ($dependent,$upon);
+  my $junkref = {
+    action => [],
+    dependent => '',
+    upon => '',
+  };
   for(@{$self->{line}}) {
     $line++;
     next if /^\s*$/;
     next if /^\s*#/;
     if(!/^\t/) {
       if(/=/) {
-        my ($macro,$value) = split /=/;
-        $macro=~s/\s+$//;
-        $value=~s/^\s+//;
-        $self->{expansion}{$macro} = {
-          exp => $value,
-          line => $line-1,
-        };
+        $self->__parse_expansion($_,$line);
       }
       elsif(/:/) {
-        for(split /\s+/,$dependent) {
-          $self->{depend}{$_} = {
-            files => $upon,
-            actions => [@action],
-            line => $line-1,
-          };
-        }
-        @action = ();
-        ($dependent,$upon) = split /:/;
-        $dependent =~ s/\s+$//;
-        $upon =~ s/^\s+// if defined $upon;
+        $self->__parse_dependency($junkref,$line);
       }
     }
     else {
       s/^\s+//;
-      push @action,$_;
+      push @{$junkref->{action}},$_;
     }
   }
+  $self->__parse_dependency($junkref,$line);
 }
 
 sub parse {
@@ -205,6 +220,7 @@ sub _unfold_lines {
       $line = $_;
     }
   }
+  push @{$self->{line}},$line;
   close FILE;
 }
 
