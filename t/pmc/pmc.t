@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 80;
+use Parrot::Test tests => 84;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2283,6 +2283,83 @@ OK2:    print "ok 2\n"
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "bor undef");
+    new P0, .PerlUndef
+    bor P0, 0b00001111
+    print  P0
+    print "\n"
+
+    new P0, .PerlUndef
+    new P1, .PerlInt
+    set P1, 0b11110000
+    bor P0, P1
+    print P0
+    print "\n"
+    end
+CODE
+15
+240
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "bxor undef");
+    new P0, .PerlUndef
+    bxor P0, 0b00001111
+    print  P0
+    print "\n"
+
+    new P0, .PerlUndef
+    new P1, .PerlInt
+    set P1, 0b11110000
+    bxor P0, P1
+    print P0
+    print "\n"
+    end
+CODE
+15
+240
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "band undef");
+    new P0, .PerlUndef
+    band P0, 0b00001111
+    print  P0
+    print "\n"
+
+    new P0, .PerlUndef
+    new P1, .PerlInt
+    set P1, 0b11110000
+    band P0, P1
+    print P0
+    print "\n"
+    end
+CODE
+0
+0
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "bnot");
+    new P0, .PerlUndef
+
+# We use band in these tests to null out the high bits, and make the
+# tests independent of the size of our INTVALs
+    bnot P0, P0
+    band P0, 0b01010101
+    print P0
+    print "\n"
+
+    new P0, .PerlUndef
+    new P1, .PerlInt
+    set P1, 0b01100110
+    bnot P0, P1
+    band P0, 0b10011001
+    print P0
+    print "\n"
+    end
+CODE
+85
+153
 OUTPUT
 
 1;
