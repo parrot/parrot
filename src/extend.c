@@ -788,7 +788,10 @@ runs.
 void
 Parrot_register_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)
 {
+    /* Better not trigger a DOD run with a potentially unanchored PMC */
+    Parrot_block_DOD(interpreter);
     dod_register_pmc(interpreter, pmc);
+    Parrot_unblock_DOD(interpreter);
 }
 
 /*
