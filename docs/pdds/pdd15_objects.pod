@@ -508,7 +508,7 @@ C<addparent> op to add in the rest of the immediate parents.
 
 Do be aware that, right now, you should I<not> add attributes or
 parents to a class that's been subclassed or has had objects
-instantiated. This will leave the internal structures of the classses
+instantiated. This will leave the internal structures of the classes
 and objects in an inconsistent state and things won't work at all the
 way you want them to. At the moment parrot won't warn if you do this,
 but it will soon. The restriction on parent list changes and attribute
