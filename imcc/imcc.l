@@ -812,7 +812,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     return 0;
 }
 
-#define _PARROTLIB
+/*#define _PARROTLIB*/
 
 #if !defined(_PARROTLIB)
 static FILE*
