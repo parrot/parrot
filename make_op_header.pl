@@ -6,6 +6,7 @@ while (<>) {
     next if /^\s*#/ or /^\s*$/;
     chomp;
     ($name, undef) = split /\s+/, $_;
+    print "#define $name Parrot_op_$name\n";
     print "IV *$name(IV *, struct Perl_Interp *);\n";
 }
 
