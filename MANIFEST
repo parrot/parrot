@@ -313,8 +313,8 @@ examples/mops/mops.ps                             [main]doc
 examples/mops/mops.py                             [main]doc
 examples/mops/mops.rb                             [main]doc
 examples/mops/mops.scheme                         [main]doc
-examples/pxs/PQt.C                                [main]doc
-examples/pxs/QtHelloWorld.pasm                    [main]doc
+examples/pni/PQt.C                                [main]doc
+examples/pni/QtHelloWorld.pasm                    [main]doc
 exceptions.c                                      []
 exec.c                                            []
 exec_save.c                                       []
