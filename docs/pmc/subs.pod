@@ -52,11 +52,47 @@ Create a subroutine (in P0) and a return continuation (in P1):
 
   newsub .Sub, .RetContinuation, _sub_label, ret_label
 
-Get a reference to a (possibly) external subroutine:
+=head2 Refering to existing Subs
+
+Subroutines denoted with B<.pcc_sub> (and all PIR B<.sub> subroutines that use
+Parrot Calling Conventions) are stored in the constant table
+and can be fetched with the B<find_global> opcode.
+
+E.g. get a reference to a (possibly) external subroutine:
 
   find_global P0, "_the_sub"
   ...
   .pcc_sub _the_sub:
+
+=head3 Program entry point
+
+Exactly one subroutine in the first executed source or byte code file
+may be flagged as the "main" subroutine, where executions starts.
+
+  .pcc_sub @MAIN _main:
+
+In the absence of a B<@MAIN> entry Parrot starts execution at the first
+statement.
+
+=head3 Automatically loaded initializer code
+
+If a subroutine is marked as B<@LOAD> this subroutine is run, before the
+B<load_bytecode> opcode returns.
+
+e.g.
+
+  .pcc_sub @MAIN _main:
+     print "in main\n"
+     load_bytecode "library_code.pasm"
+     ...
+
+# library_code.pasm
+
+     ...
+  .pcc_sub @LOAD _my_lib_init:
+     ...
+     invoke P1
+
 
 =head2 Invocation i.e. calling the sub
 

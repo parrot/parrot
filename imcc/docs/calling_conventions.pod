@@ -41,7 +41,7 @@ subroutines.
   .result r
   .pcc_end
 
-  .pcc_sub _sub_label [prototyped|non_prototyped]
+  .pcc_sub _sub_label [Subpragma, ...]
    .param int a # I5
    .param int b # I6
    .param int c # I7
@@ -52,6 +52,27 @@ subroutines.
   ...
   .end
 
+=head3 Subpragma
+
+This is a comma separated list of zero or more items with the
+following meaing:
+
+=over 4
+
+=item * B<prototyped>, B<non_prototyped>
+
+Specify calling convention
+
+=item * @MAIN
+
+Define "main" entry point to start execution.
+
+=item * @LOAD
+
+Run this subroutine during the B<load_library> opcode.
+
+=back
+
 Notes:
 
 =over 4
@@ -60,6 +81,7 @@ Notes:
 
 If a subroutine definition has no prototyped specifier, code gets
 emitted to receive parameters by both flavors.
+
 
 =item * B<newsub>
 
@@ -91,7 +113,7 @@ Proposed syntax:
   load_lib $P0, "libname"
   dlfunc $P1, $P0, "funcname", "signature"
   ...
-  .pcc_begin protoyped
+  .pcc_begin prototyped
   .arg x	# I5
   .arg y	# I6
   .arg z	# I7
