@@ -31,6 +31,7 @@ GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile docs/Makefile \
 	languages/scheme/Makefile
 
 GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
+	include/parrot/has_header.h \
 	lib/Parrot/Config.pm lib/Parrot/PMC.pm platform.c \
 	include/parrot/core_pmcs.h core_pmcs.c
 
@@ -76,7 +77,10 @@ GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 	$(INC)/rxstacks.h $(INC)/intlist.h $(INC)/embed.h $(INC)/warnings.h \
 	$(INC)/misc.h $(INC)/pmc.h $(INC)/key.h $(INC)/hash.h \
 	$(INC)/smallobject.h $(INC)/headers.h $(INC)/dod.h \
-	$(INC)/method_util.h $(INC)/list.h $(INC)/datatypes.h
+	$(INC)/method_util.h $(INC)/list.h $(INC)/datatypes.h \
+	$(INC)/regfuncs.h $(INC)/string_funcs.h $(INC)/encoding.h \
+	$(INC)/chartype.h $(INC)/oplib.h $(INC)/sub.h $(INC)/unicode.h \
+	$(INC)/perltypes.h
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
