@@ -1,4 +1,5 @@
 package P6C::TestCompiler;
+$| = 1;
 
 my $PARROT = '../..';
 my $PERL = $ENV{PERL} || 'perl';
@@ -15,20 +16,22 @@ my $code;
 my $out;
 
 sub dumperr {
+    my $file = shift;
+    my $name = "test-$file-$testno";
     open IN, $ERR;
     print STDERR <IN>;
     close IN;
-    open O, ">test-$testno.p6";
+    open O, ">$name.p6";
     print O $code;
     close O;
-    open O, ">test-$testno.out";
+    open O, ">$name.out";
     print O $out;
     close O;
     for my $ext (qw(pasm pbc imc err)) {
-	rename "a.$ext", "test-$testno.$ext";
+	rename "a.$ext", "$name.$ext";
     }
-    print STDERR "See test-$testno.{p6,imc,pasm,pbc,out},",
-	"and test-$testno.err for errors\n";
+    print STDERR "See $name.{p6,imc,pasm,pbc,out},",
+	"and $name.err for errors\n";
 }
 
 sub import {
@@ -58,24 +61,27 @@ sub output_is {
     $code = shift;
     ++$testno;
     ($out, my $desc) = @_;
-    unless ($desc) {
 	(undef, my $file, my $line) = caller;
+    unless ($desc) {
 	$desc = "($file line $line)";
     }
     open(O, "| perl prd-perl6.pl --batch --imc > a.imc 2>$ERR") or die $!;
     print O $code;
+    $file =~ s!^t/!!;
+    $file =~ s!/!_!g;
+    $file =~ s!\.t$!!;
     unless (close O) {
 	ok(0, "$desc: compile error: ".($?>>8));
 	if (($? & 255) == 2) {
 	    die "interrupted";
 	}
-	dumperr;
+	dumperr($file);
 	return;
     }
     unless(mysystem("$PARROT/languages/imcc/imcc a.imc a.pasm 2>$ERR", $desc)
 	   && mysystem("$PERL $PARROT/assemble.pl a.pasm > a.pbc 2>$ERR",$desc)
 	   && mysystem("$PARROT/$PARROT_BIN a.pbc > a.output 2>$ERR", $desc)) {
-	dumperr;
+	dumperr($file);
 	return;
     }
     open(I, 'a.output');
@@ -84,8 +90,8 @@ sub output_is {
 	ok(1, $desc);
     } else {
 	ok(0, $desc);
-	dumperr;
+	dumperr($file);
     }
 }
-
+# vim:set sw=4:
 1;

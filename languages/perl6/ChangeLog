@@ -73,3 +73,10 @@ Additions:
 - parser error messages (John Kingsley)
 - more parser tests (Kingsley) NOTE: these will generate
   "uninitialized value" warnings, but they are harmless.
+
+7/25/02
+=======
+
+Additions:
+- "clean" and "distclean" Makefile targets (Leopold Toetsch).
+- test-* files from different test don't clobber each other (Toetsch).

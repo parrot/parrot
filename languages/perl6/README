@@ -64,5 +64,7 @@ Contributors
 ============
 
 John Kingsley		Numerous bug fixes to the parser, parser
-			tests.
-Leopold Toetsch		5.005_03 compatibility fixes.
+			tests, parse error messages.
+
+Leopold Toetsch		5.005_03 compatibility fixes, test driver
+			cleanup.
