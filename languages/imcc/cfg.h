@@ -44,7 +44,7 @@ EXTERN int n_loops;
 
 /* Functions: */
 
-void find_basic_blocks (Parrot_Interp);
+void find_basic_blocks (Parrot_Interp, int first);
 void build_cfg(void);
 void bb_findadd_edge(Basic_block*, SymReg*);
 void bb_add_edge(Basic_block*, Basic_block*);

@@ -67,7 +67,7 @@ void allocate(struct Parrot_Interp *interpreter) {
 
     todo = first = 1;
     while (todo) {
-        find_basic_blocks(interpreter);
+        find_basic_blocks(interpreter, first);
         build_cfg();
 
         if (first && (IMCC_DEBUG & DEBUG_CFG))
@@ -79,7 +79,7 @@ void allocate(struct Parrot_Interp *interpreter) {
     todo = first = 1;
     while (todo) {
         if (!first) {
-            find_basic_blocks(interpreter);
+            find_basic_blocks(interpreter, 0);
             build_cfg();
         }
         first = 0;
@@ -122,7 +122,7 @@ void allocate(struct Parrot_Interp *interpreter) {
              * do life analysis there for only the involved regs
              */
 #if DOIT_AGAIN_SAM
-            find_basic_blocks(interpreter);
+            find_basic_blocks(interpreter, 0);
             build_cfg();
             build_reglist();
             life_analysis();

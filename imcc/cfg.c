@@ -20,7 +20,7 @@ static void propagate_need(Basic_block *bb, SymReg* r, int i);
 
 /* Code: */
 
-void find_basic_blocks (Parrot_Interp interpreter) {
+void find_basic_blocks (Parrot_Interp interpreter, int first) {
     Basic_block *bb;
     Instruction *ins;
     int nu = 0;
@@ -36,7 +36,7 @@ void find_basic_blocks (Parrot_Interp interpreter) {
     }
 
     ins = instructions;
-    if (ins->type == ITLABEL && ins->r[1]) {
+    if (first && ins->type == ITLABEL && ins->r[1]) {
         debug(DEBUG_CFG, "pcc_sub %s nparams %d\n",
                 ins->r[0]->name, ins->r[1]->pcc_sub->nargs);
         expand_pcc_sub(interpreter, ins);
@@ -75,13 +75,15 @@ void find_basic_blocks (Parrot_Interp interpreter) {
             add_instruc_writes(ins, p1);
         }
         if (ins->type & ITPCCSUB) {
-            if (ins->type & ITLABEL) {
-                expand_pcc_sub_ret(interpreter, ins);
-                ins->type &= ~ITLABEL;
-            }
-            else {
-                /* if this is a pcc_sub_call expand it */
-                expand_pcc_sub_call(interpreter, ins);
+            if (first) {
+                if (ins->type & ITLABEL) {
+                    expand_pcc_sub_ret(interpreter, ins);
+                    ins->type &= ~ITLABEL;
+                }
+                else {
+                    /* if this is a pcc_sub_call expand it */
+                    expand_pcc_sub_call(interpreter, ins);
+                }
             }
         }
         else if (ins->type & ITLABEL) {

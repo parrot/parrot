@@ -292,7 +292,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
         }
     }
 
-    find_basic_blocks(interpreter);
+    find_basic_blocks(interpreter, 0);
     /* allocate a jit_info packfile segment holding
      * some CFG and register usage info
      */

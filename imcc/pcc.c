@@ -102,7 +102,7 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
                 U_add_uniq_label);
         INS_LABEL(check_type, 1);
         /*
-         * param type check, we get the entry type in I31
+         * param type check, we get the entry type in what
          */
         /* typeof I0, P3[0] */
         regs[0] = i0;
@@ -168,7 +168,7 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 	i0 = mk_pasm_reg(str_dup("I0"));
 	regs[0] = i0;
 	sprintf(buf, "#sub_%s_p1", sub->name);
-	regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
+        regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
 	ins = insINS(interpreter, ins, "if", regs, 2);
 
     }
@@ -242,9 +242,6 @@ overflow:
 		ins = insINS(interpreter, ins, "shift", regs, 2);
 	    }
 	} /* n params */
-        /*
-         * TODO branch to end
-         */
         if (ps != pe) {
             if (!proto) {
                 /* branch to the end */
@@ -514,7 +511,7 @@ move_cc:
      * locate return label,
      * we must have one or the parser would have failed
      */
-    while (ins->type != ITLABEL)
+    if (ins->next->type == ITLABEL)
         ins = ins->next;
     ins = insINS(interpreter, ins, "restoretop", regs, 0);
     /*
