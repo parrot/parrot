@@ -89,7 +89,7 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
         if (l && l->api->Open) break;
     }
     if (!l) {
-        /* Now underlying layer found */
+        /* No underlying layer found */
         return NULL;
     }
 
@@ -99,7 +99,7 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
         return NULL;
     }
     /*
-     * We have an IO stream now setup stuff
+     * We have an IO stream. Now setup stuff
      * for our layer before returning it.
      */
     PIO_buf_setbuf(interpreter, l, io, PIO_UNBOUND);
@@ -109,7 +109,7 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
 
 /*
  * Don't pass setbuf() calls down the stack, top layer wins.
- * This doesn't mean other layers can't buffer, I just to
+ * This doesn't mean other layers can't buffer, I just need to
  * think about the mechanism for buffer control or if it even
  * makes sense this way. Most layers will not implement setbuf()...
  */
