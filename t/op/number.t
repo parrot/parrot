@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
@@ -992,5 +992,37 @@ ok 1
 ok 2
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "string -> num");
+    set S0, "1"
+    set S1, "12.0"
+    set S2, "-2.45"
+    set S3, "25e2"
+    set S4, "Banana"
+
+    set N0, S0
+    set N1, S1
+    set N2, S2
+    set N3, S3
+    set N4, S4
+
+    print N0
+    print "\n"
+    print N1
+    print "\n"
+    print N2
+    print "\n"
+    print N3
+    print "\n"
+    print N4
+    print "\n"
+
+    end
+CODE
+1.000000
+12.000000
+-2.450000
+2500.000000
+0.000000
+OUTPUT
 1;
 
