@@ -24,7 +24,30 @@ allows us to more easily handle [parser]
 
 #include "parrot/parrot.h"
 
+static INTVAL TclList,StringClass,IntegerClass,TclWord;
+static STRING *bs_nl, *nl, *cb, *cp, *space;
+static STRING *ConcatWords, *ConcatConst, *ConcatConst, *ConcatVariable;
+static STRING *ConcatChar, *ConcatCommand;
+
 pmclass TclParser dynpmc group tcl_group {
+
+    void class_init() {
+      if (pass) {
+          TclList = Parrot_PMC_typenum(INTERP, "TclList"); 
+          StringClass = Parrot_PMC_typenum(INTERP, "String"); 
+          IntegerClass = Parrot_PMC_typenum(INTERP, "Integer"); 
+          bs_nl = string_from_const_cstring(INTERP, "\\\n",2);
+          nl    = string_from_const_cstring(INTERP, "\n",1);
+          cb    = string_from_const_cstring(INTERP, "\175",1); 
+          cp    = string_from_const_cstring(INTERP, ")",1);
+          space = string_from_const_cstring(INTERP, " ",1);
+          ConcatWords = string_from_const_cstring(INTERP, "concat_words",12);
+          ConcatConst = string_from_const_cstring(INTERP, "concat_const",12);
+          ConcatVariable = string_from_const_cstring(INTERP, "concat_variable",15);
+          ConcatChar = string_from_const_cstring(INTERP, "concat_char",11);
+          ConcatCommand = string_from_const_cstring(INTERP, "concat_command", 14);
+      }
+    }
 
 /*
 
@@ -54,7 +77,6 @@ XXX: Skip the evaluate step, and just return an invokable.
 */
 
     METHOD PMC* parse(PMC *code, PMC *psw, PMC *bi) {
-      /* Get the types of TclWord and TclList  */
       INTVAL start_word=0;  /* position of the start of the word */ 
       INTVAL word_length; /* length of the word */
       INTVAL word_trailing_length;  /* include the last char in the word? */
@@ -63,22 +85,6 @@ XXX: Skip the evaluate step, and just return an invokable.
       INTVAL end_of_word; /* Boolean, is the word done? */
       PMC *commands; /* List of all the commands parsed */
       PMC *command;  /* The current command */ 
-      /* XXX bs_nl and Tcl* are constant. define them once in the PMC */
-      INTVAL TclList = Parrot_PMC_typenum(INTERP, "TclList"); 
-      INTVAL String = Parrot_PMC_typenum(INTERP, "String"); 
-      INTVAL Integer = Parrot_PMC_typenum(INTERP, "Integer"); 
-      INTVAL TclWord = Parrot_PMC_typenum(INTERP, "TclWord"); 
-      /* backslash newline */
-      STRING *bs_nl = string_from_const_cstring(INTERP, "\\\n",2);
-      STRING *nl    = string_from_const_cstring(INTERP, "\n",1);
-      STRING *cb    = string_from_const_cstring(INTERP, "\175",1); 
-      STRING *cp    = string_from_const_cstring(INTERP, ")",1);
-      STRING *space = string_from_const_cstring(INTERP, " ",1);
-      STRING *ConcatWords = string_from_const_cstring(INTERP, "concat_words",12);
-      STRING *ConcatConst = string_from_const_cstring(INTERP, "concat_const",12);
-      STRING *ConcatVariable = string_from_const_cstring(INTERP, "concat_variable",15);
-      STRING *ConcatChar = string_from_const_cstring(INTERP, "concat_char",11);
-      STRING *ConcatCommand = string_from_const_cstring(INTERP, "concat_command", 14);
       INTVAL bs_marker = 0; 
       INTVAL bs_pos;
       INTVAL bs_retval;
@@ -86,12 +92,15 @@ XXX: Skip the evaluate step, and just return an invokable.
       INTVAL bs_a_byte;
       INTVAL buffer_length;
       INTVAL old_length,chunk_start,escape_length,temppos;
+    
+      /* XXX running this in class_init is apparently too soon, so run it here */
+      TclWord = Parrot_PMC_typenum(INTERP, "TclWord"); 
  
       STRING *buffer = Parrot_PMC_get_string(INTERP, code);
       INTVAL preserve_whitespace = Parrot_PMC_get_intval(INTERP, psw);
       INTVAL block_interpolation = Parrot_PMC_get_intval(INTERP, bi);
-      STRING *Tcl,*parse;
-      PMC *parser,*retval,*word;
+      STRING *Tcl;
+      PMC *retval,*word;
       INTVAL I0,I1,I2;
       STRING *S0, *S1;
       PMC *P0,*P1,*P2,*P3,*P4;
@@ -390,11 +399,11 @@ handle_quote:
   /* XXX Really need to switch parse to not need PMC's passed in,
          basic types are really what we need */
 
-  P1 = pmc_new(INTERP, String);
+  P1 = pmc_new(INTERP, StringClass);
   Parrot_PMC_set_string(INTERP, P1, S0);
-  P2 = pmc_new(INTERP, Integer);
+  P2 = pmc_new(INTERP, IntegerClass);
   VTABLE_set_integer_native(INTERP,P2,1);
-  P3 = pmc_new(INTERP, Integer);
+  P3 = pmc_new(INTERP, IntegerClass);
   VTABLE_set_integer_native(INTERP,P3,0);
 
   P0 = Parrot_TclParser_parse(INTERP, SELF, P1, P2, P3);
@@ -602,13 +611,12 @@ handle_command_block:
     goto bad_block;
   }
 
-  /* if there's any word so far, save it*/
-  if (old_length == 0) {
-    goto command_save;
+  if (old_length) {
+      /* if there's any word so far, save it*/
+      S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
+      P1 = VTABLE_find_method(INTERP, word, ConcatConst);
+      Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
   }
-  S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
-  P1 = VTABLE_find_method(INTERP, word, ConcatConst);
-  Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
 
 command_save:
   /* Save this as a command (skip the []'s)*/
