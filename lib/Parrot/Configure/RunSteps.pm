@@ -14,6 +14,7 @@ use vars qw(@steps);
 	inter/ops.pl
 	inter/exp.pl
 	inter/pmc.pl
+    auto/alignptrs.pl
 	auto/headers.pl
 	auto/sizes.pl
 	auto/byteorder.pl

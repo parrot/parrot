@@ -40,6 +40,7 @@ struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 #define PARROT_OS_NAME         "${jitosname}"
 #define PARROT_BYTEORDER        ${byteorder}
 #define PARROT_BIGENDIAN        ${bigendian}
+#define PARROT_PTR_ALIGNMENT    ${ptr_alignment}
 
 typedef Parrot_Int INTVAL;
 typedef Parrot_UInt UINTVAL;

@@ -4,7 +4,7 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':auto';
 
-$description="Determining if your compiler supports unaligned pointer access...";
+$description="Determining your minimum pointer alignment...";
 
 @args=qw();
 
@@ -15,16 +15,18 @@ sub runstep {
   cc_clean();
 
   #if there are warnings, they are in $results
-  if ($results =~ /^(\d+)OK$/ and $1 ne "0") {
-    Configure::Data->set(
-      aligned_ptrs => 0,
-    );
+  
+  my $align = 999999;
+  
+  for my $result (split /\n/, $results) {
+    $align = $result if ($result =~ /^\d+$/ &&$result < $align);
   }
-  else {
-    Configure::Data->set(
-      aligned_ptrs => 1,
-    );
+  
+  if ($align == 999999) {
+    die "Can't determine alignment!\n";
   }
+  
+  Configure::Data->set(ptr_alignment => $align);
 }
 
 1;
