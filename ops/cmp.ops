@@ -90,6 +90,8 @@ op eq (in PMC, in INT, inconst INT) {
 
 =item B<ne>(in PMC, in PMC, inconst INT)
 
+=item B<ne>(in PMC, in INT, inconst INT)
+
 Branch if $1 is not equal to $2.
 
 =cut
@@ -117,6 +119,13 @@ op ne(in STR, in STR, inconst INT) {
 
 op ne(in PMC, in PMC, inconst INT) {
   if (! $1->vtable->is_equal(interpreter, $1, $2)) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ne (in PMC, in INT, inconst INT) {
+  if ($1->vtable->get_integer(interpreter, $1) != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -234,6 +243,8 @@ op le(in PMC, in INT, inconst INT) {
 
 =item B<gt>(in PMC, in PMC, inconst INT)
 
+=item B<gt>(in PMC, in INT, inconst INT)
+
 Branch if $1 is greater than $2.
 
 =cut
@@ -266,6 +277,13 @@ op gt(in PMC, in PMC, inconst INT) {
   goto NEXT();
 }
 
+op gt(in PMC, in INT, inconst INT) {
+  if ($1->vtable->get_integer(interpreter, $1) > $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 ########################################
 
 =item B<ge>(in INT, in INT, inconst INT)
@@ -275,6 +293,8 @@ op gt(in PMC, in PMC, inconst INT) {
 =item B<ge>(in STR, in STR, inconst INT)
 
 =item B<ge>(in PMC, in PMC, inconst INT)
+
+=item B<ge>(in PMC, in INT, inconst INT)
 
 Branch if $1 is greater than or equal to $2.
 
@@ -308,6 +328,13 @@ op ge(in PMC, in PMC, inconst INT) {
   goto NEXT();
 }
 
+op ge(in PMC, in INT, inconst INT) {
+  if ($1->vtable->get_integer(interpreter, $1) >= $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 =back
 
 =cut
@@ -332,6 +359,8 @@ their operands.
 =item B<cmp>(out INT, in STR, in STR)
 
 =item B<cmp>(out INT, in PMC, in PMC)
+
+=item B<cmp>(out INT, in PMC, in INT)
 
 Sets $1 to -1 if $2 < $3, +1 if $2 > $3, and 0 otherwise.
 
@@ -358,6 +387,14 @@ inline op cmp(out INT, in STR, in STR) {
 
 inline op cmp(out INT, in PMC, in PMC) {
   $1 = VTABLE_cmp(interpreter, $2, $3);
+  goto NEXT();
+}
+
+inline op cmp(out INT, in PMC, in INT) {
+  INTVAL l = VTABLE_get_integer(interpreter, $2);
+  $1 = l < $3 ? -1 :
+       l > $3 ? +1 :
+       0;
   goto NEXT();
 }
 

@@ -1280,3 +1280,11 @@ thaw_p_s	1252
 thaw_p_sc	1253
 addattrib_i_p_s	1254
 addattrib_i_p_sc	1255
+ne_p_i_ic       1256
+ne_p_ic_ic      1257
+gt_p_i_ic       1258
+gt_p_ic_ic      1259
+ge_p_i_ic       1260
+ge_p_ic_ic      1261
+cmp_i_p_i       1262
+cmp_i_p_ic      1263
