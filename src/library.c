@@ -67,7 +67,6 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     STRING *str, *name;
     char *csig;
 
-    Parrot_block_DOD(interpreter);
     if (!init_done) {	
 	library_init(interpreter);
         init_done = 1;
@@ -98,8 +97,6 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     va_start(args, func_name);
     ret = Parrot_runops_fromc_arglist_save(interpreter, sub, csig, args);
     va_end(args);
-
-    Parrot_unblock_DOD(interpreter);
     
     return ret;
 }
