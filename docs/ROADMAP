@@ -22,6 +22,14 @@ Strictly speaking, this document is not a roadmap - that requires input from
 the Architect and the Pumpking. However, its goal is to help improve project
 management for parrot, and enable an actual roadmap.
 
+=head1 NEXT RELEASE (0.1.2)
+
+This release has a ticket opened as [perl #33916].
+
+ http://rt.perl.org/rt3/Ticket/ModifyLinks.html?id=33916
+
+has a list of all the open issues which must be completed for this release.
+
 =head1 OVERVIEW
 
 The tasks that are remaining are broken down into the following categories,
@@ -116,22 +124,6 @@ Solidify design for Truly Evil speed hack for fast regex/string matching
 =item *
 
 multi key opcodes
-
-=item *
-
-PDD05 (Opcode Function specs) - Per Leo, this document is obsolete and must be re-implemented.
-
-=item *
-
-PDD10 (Embedding) must be completed.
-
-=item *
-
-PDD12 (Assembly) must be completed.
-
-=item *
-
-PDD13 (Bytecode) must be completed.
 
 =item *
 
