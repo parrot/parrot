@@ -144,6 +144,38 @@ fprintf(stderr,"set_number_bigfloat not implemented\n");
 fprintf(stderr,"set_value not implemented\n");
     }
 
+    void inc (PMC* value,  PMC* dest) {
+        SELF->cache.num_val += value->vtable->get_integer(INTERP, value);
+    }
+
+    void inc_native (INTVAL value, PMC* dest) {
+        SELF->cache.num_val += value;
+    }
+
+    void inc_same (PMC* value, PMC* dest) {
+        SELF->cache.num_val += value->cache.num_val;
+    }
+
+    void inc_bigint (PMC* value, PMC* dest) {
+      /* XXX: bigint magic */
+    }
+
+    void dec (PMC * value,  PMC* dest) {
+        SELF->cache.num_val -= value->vtable->get_integer(INTERP, value);
+    }
+
+    void dec_native (INTVAL value, PMC* dest) {
+        SELF->cache.num_val -= value;
+    }
+
+    void dec_same (PMC* value, PMC* dest) {
+        SELF->cache.num_val -= value->cache.num_val;
+    }
+
+    void dec_bigint (PMC* value, PMC* dest) {
+      /* XXX: bigint magic */
+    }
+    
     void add (PMC * value, PMC* dest) {
         if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
             dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
