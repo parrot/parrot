@@ -46,7 +46,7 @@ string_native_substr(STRING* src, IV offset, IV length, STRING* dest)
 	    dest->encoding = &(Parrot_string_vtable[enc_native]);
     
     /* Offset and length have already been "normalized" */
-    string_grow(dest, src->strlen - length);
+    string_grow(dest, length);
     mem_sys_memcopy(dest->bufstart, src->bufstart + offset, length);
     dest->strlen = dest->bufused = length;
     
