@@ -120,7 +120,7 @@ uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num, char base)
 static void
 int_to_str(char *buf1, char *buf2, HUGEINTVAL num, char base)
 {
-    BOOLVAL neg;
+    INTVAL neg;
     int i = 0, cur2;
     char cur;
 

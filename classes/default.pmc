@@ -2,7 +2,7 @@
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info $Id$
  *  Overview:
- *     These are the vtable functions for the default base class
+ *     These are the vtable functions for the default PMC class
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
@@ -13,632 +13,763 @@
 
 pmclass default noinit {
 
-   INTVAL type () {
-     return 0;
-   }
+    void init () {
+    }
 
-   STRING* name () {
-     return NULL;
-   }
+    void morph (INTVAL type) {
+    }
 
-   void init (INTVAL size) {
-   }
-
-   void clone (PMC* dest) {
-   }
-
-   void morph (INTVAL type) {
-   }
-
-   INTVAL real_size () {
-     return 0;
-   }
-
-   void destroy () {
-   }
-
-   /* The end of used parameter is passed into the mark_used function of
+    /* The end of used parameter is passed into the mark_used function of
     * the garbage collector.
     */
-   PMC* mark (PMC *end_of_used_list) {
-       PANIC("custom_mark flag set but no custom mark routine defined");
-       return NULL;
-   }
+    PMC* mark (PMC*end_of_used_list) {
+        PANIC("custom_mark flag set but no custom mark routine defined");
+        return NULL;
+    }
 
-   INTVAL get_integer () {
-     return SELF->cache.int_val;
-   }
+    void destroy () {
+    }
 
-   INTVAL get_integer_keyed (KEY * key) {
-     internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-     return 0;
-   }
+    INTVAL type () {
+        return SELF->vtable->base_type;
+    }
 
-   FLOATVAL get_number () {
-     return SELF->cache.num_val;
-   }
+    INTVAL type_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
 
-   FLOATVAL get_number_keyed (KEY * key) {
-     internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-     return 0.0;
-   }
+    UINTVAL subtype (INTVAL type) {
+        return 0;
+    }
 
-   STRING* get_string () {
-     STRING *s = string_copy(INTERP, SELF->cache.struct_val);
-     return s;
-   }
+    UINTVAL subtype_keyed (KEY* key, INTVAL type) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
 
-   STRING* get_string_keyed (KEY * key) {
-     internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-     return NULL;
-   }
+    STRING* name () {
+        return NULL;
+    }
 
-   BOOLVAL get_bool () {
-     /*  Everything has to be false */
-     if (   SELF->vtable->get_integer(INTERP, SELF) == 0 
-	 && SELF->vtable->get_number(INTERP, SELF) == 0.0
-	 && string_bool(SELF->vtable->get_string(INTERP, SELF)) == 0
-	    )
-       {
-	 return 0;
-       }
-     return 1;
-   }
+    STRING* name_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return NULL;
+    }
 
-   void* get_value () {
-     return SELF->cache.struct_val;
-   }
+    PMC* clone () {
+        PMC* dest;
+        dest = pmc_new(INTERP, SELF->vtable->base_type);
+	memcpy(&dest->cache, &SELF->cache, sizeof(UnionVal));
+        dest->data = SELF->data;
+        return dest;
+    }
 
-   PMC* get_pmc_keyed (KEY* key) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-       return NULL;
-   }
+    PMC* clone_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return NULL;
+    }
 
-   BOOLVAL is_same (PMC* pmc2) {
-     /* I think this should cover this correctly, is_same implies that
-	same B<data> used by each, but as meaning of data is a little
-	vtable reliant, I include that test as well */
-     return (BOOLVAL)(SELF->vtable == pmc2->vtable && &SELF->cache == &pmc2->cache);
-   }
+    PMC* find_method(STRING* method_name) {
+        return NULL;
+    }
 
-   /* The set methods merely make the appropriate part of the cache
+    PMC* find_method_keyed(KEY* key, STRING* method_name) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return NULL;
+    }
+
+    INTVAL get_integer () {
+        return SELF->cache.int_val;
+    }
+
+    INTVAL get_integer_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
+
+    FLOATVAL get_number () {
+        return SELF->cache.num_val;
+    }
+
+    FLOATVAL get_number_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0.0;
+    }
+
+    BIGNUM* get_bignum () {
+        return (BIGNUM*)SELF->cache.struct_val;
+    }
+
+    BIGNUM* get_bignum_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return NULL;
+    }
+
+    STRING* get_string () {
+        STRING*s = string_copy(INTERP, SELF->cache.struct_val);
+        return s;
+    }
+
+    STRING* get_string_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return NULL;
+    }
+
+    INTVAL get_bool () {
+        /*  Everything has to be 0 */
+        if (   SELF->vtable->get_integer(INTERP, SELF) == 0 
+            && SELF->vtable->get_number(INTERP, SELF) == 0.0
+            && string_bool(SELF->vtable->get_string(INTERP, SELF)) == 0
+            )
+        {
+            return 0;
+        }
+        return 1;
+    }
+
+    INTVAL get_bool_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
+
+    INTVAL elements () {
+        /* XXX maybe this should be one */
+        return 0;
+    }
+
+    INTVAL elements_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
+
+    PMC* get_pmc () {
+        return SELF;
+    }
+
+    PMC* get_pmc_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return NULL;
+    }
+
+    INTVAL is_same (PMC* pmc2) {
+    /* I think this should cover this correctly, is_same implies that
+        same B<data> used by each, but as meaning of data is a little
+        vtable reliant, I include that test as well */
+        return (INTVAL)(SELF->vtable == pmc2->vtable && &SELF->cache == &pmc2->cache);
+    }
+
+    INTVAL is_same_keyed (KEY* key, PMC* pmc2, KEY* pmc2_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }    
+
+    /* The set methods merely make the appropriate part of the cache
       be what it should be, more complex behaviour is left as an
       exercise for the inheriting class. */
 
-   void set_integer (PMC * value) {
-     SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
-   }
-
-   void set_integer_native (INTVAL value) {
-     SELF->cache.int_val = value;
-   }
-
-   void set_integer_bigint (BIGINT value) {
-     /*SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigInt]);*/
-     /* XXX: do something to copy the BigInt .. */
-   }
-
-   void set_integer_same (PMC * value) {
-     SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
-   }
-
-   void set_integer_keyed (KEY * key, INTVAL value) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-   }
-
-   void set_number (PMC * value) {
-     SELF->cache.num_val = value->vtable->get_number(INTERP, value);
-   }
-
-   void set_number_native (FLOATVAL value) {
-     SELF->cache.num_val = value;
-   }
-
-   void set_number_bigfloat (BIGFLOAT value) {
-     /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
-     /* will want to use bignum library to copy bignum... */
-   }
-
-   void set_number_same (PMC * value) {
-     SELF->cache.num_val = value->vtable->get_number(INTERP, value);
-   }
-
-   void set_number_keyed (KEY * key, FLOATVAL value) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-   }
-
-   void set_string (PMC * value) {
-     SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
-   }
-
-   void set_string_native (STRING * value) {
-     SELF->cache.struct_val = string_copy(INTERP, value);
-   }
+    void set_integer (PMC* value) {
+        SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
+    }
+
+    void set_integer_native (INTVAL value) {
+        SELF->cache.int_val = value;
+    }
+
+    void set_integer_bignum (BIGNUM* value) {
+        /* XXX: do something to copy the BigInt .. */
+    }
+
+    void set_integer_same (PMC* value) {
+        SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
+    }
+
+    void set_integer_keyed (KEY* key, INTVAL value) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    void set_number (PMC* value) {
+        SELF->cache.num_val = value->vtable->get_number(INTERP, value);
+    }
+
+    void set_number_native (FLOATVAL value) {
+        SELF->cache.num_val = value;
+    }
+
+    void set_number_bignum (BIGNUM* value) {
+        /* XXX: will want to use bignum library to copy bignum... */
+    }
+
+    void set_number_same (PMC* value) {
+        SELF->cache.num_val = value->vtable->get_number(INTERP, value);
+    }
+
+    void set_number_keyed (KEY* key, FLOATVAL value) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    void set_bignum (PMC* value) {
+        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+    }
+
+    void set_bignum_int (INTVAL value) {
+        /* XXX: bignum from int */
+    }
+
+    void set_bignum_native (BIGNUM* value) {
+        SELF->cache.struct_val = (DPOINTER*)value;
+    }
+
+    void set_bignum_float (FLOATVAL value) {
+        /* XXX */
+    }
 
-   void set_string_unicode (STRING * value) {
-     SELF->cache.struct_val = string_copy(INTERP, value);
-   }
+    void set_bignum_same (PMC* value) {
+        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+    }
 
-   void set_string_other (STRING * value) {
-     SELF->cache.struct_val = string_copy(INTERP, value);
-   }
+    void set_bignum_keyed (KEY* key, BIGNUM* src_value) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void set_string_same (PMC * value) {
-     SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
-   }
+    void set_string (PMC* value) {
+        SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
+    }
 
-   void set_string_keyed (KEY * key, STRING * string) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-   }
+    void set_string_native (STRING* value) {
+        SELF->cache.struct_val = string_copy(INTERP, value);
+    }
 
-   void set_value (void* value) {
-     SELF->cache.struct_val = value;
-   }
+    void set_string_unicode (STRING* value) {
+        SELF->cache.struct_val = string_copy(INTERP, value);
+    }
 
-   void set_pmc (PMC* value) {
-     SELF->cache.struct_val = value->vtable->get_value(INTERP, value);
-   }
+    void set_string_other (STRING* value) {
+        SELF->cache.struct_val = string_copy(INTERP, value);
+    }
 
-   void set_pmc_keyed (KEY* dest_key, PMC* src, KEY* src_key) {
-     if (dest_key) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-     }
-     SELF->vtable->set_pmc(INTERP, SELF,
-         src->vtable->get_pmc_keyed(INTERP, src, src_key)
-     );
-   }
+    void set_string_same (PMC* value) {
+        SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
+    }
 
-   void inc (PMC* value,  PMC* dest) {
-       SELF->cache.int_val += value->vtable->get_integer(INTERP, value);
-   }
+    void set_string_keyed (KEY* key, STRING* string) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void inc_native (INTVAL value, PMC* dest) {
-       SELF->cache.int_val += value;
-   }
+    void set_pmc (PMC* value) {
+        SELF->cache.struct_val = value->vtable->get_pmc(INTERP, value);
+    }
 
-   void inc_same (PMC* value, PMC* dest) {
-       SELF->cache.int_val += value->cache.int_val;
-   }
+    void set_pmc_keyed (KEY* dest_key, PMC* src, KEY* src_key) {
+        if (dest_key) {
+            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        }
+        SELF->vtable->set_pmc(INTERP, SELF,
+            src->vtable->get_pmc_keyed(INTERP, src, src_key)
+        );
+    }
 
-   void inc_bigint (BIGINT value, PMC* dest) {
-     /* XXX: bigint magic */
-   }
+    void set_same (PMC* value) {
+        /* XXX: This should be able to be optimized - DML */
+        SELF->cache.struct_val = value->vtable->get_pmc(INTERP, value);
+    }
 
-   void dec (PMC * value,  PMC* dest) {
-       SELF->cache.int_val -= value->vtable->get_integer(INTERP, value);
-   }
+    void set_same_keyed (KEY* dest_key, PMC* src, KEY* src_key) {
+        /* XXX: This should be able to be optimized - DML */
+        if (dest_key) {
+            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        }
+        SELF->vtable->set_pmc(INTERP, SELF,
+            src->vtable->get_pmc_keyed(INTERP, src, src_key)
+        );
+    }
 
-   void dec_native (INTVAL value, PMC* dest) {
-       SELF->cache.int_val -= value;
-   }
+    void add (PMC* value, PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-   void dec_same (PMC* value, PMC* dest) {
-       SELF->cache.int_val -= value->cache.int_val;
-   }
+        FLOATVAL result;
 
-   void dec_bigint (BIGINT value, PMC* dest) {
-     /* XXX: bigint magic */
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            + value->vtable->get_number(INTERP, value);
 
-   void add (PMC * value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-     FLOATVAL result;
+    void add_int (INTVAL value, PMC* dest) {
+        /* dest = SELF + value */
+        /* XXX: overflow detection, bignum promotion? */
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             + value->vtable->get_number(INTERP, value);
+        FLOATVAL result;
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            + value;
 
-   void add_int (INTVAL value,  PMC* dest) {
-     /* dest = SELF + value */
-     /* XXX: overflow detection, bignum promotion? */
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-     FLOATVAL result;
+    void add_bignum (BIGNUM* value, PMC* dest) {
+        /* XXX: bignum magic */
+    }
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             + value;
+    void add_float (FLOATVAL value, PMC* dest) {
+        /* dest = SELF + value */
+        /* XXX: overflow detection, bignum promotion? */
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        FLOATVAL result;
 
-   void add_bigint (BIGINT value,  PMC* dest) {
-     /* XXX: bigint magic */
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            + value;
 
-   void add_float (FLOATVAL value,  PMC* dest) {
-     /* dest = SELF + value */
-     /* XXX: overflow detection, bignum promotion? */
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-     FLOATVAL result;
+    void add_same (PMC* value,  PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             + value;
+        FLOATVAL result;
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            + value->vtable->get_number(INTERP, value);
 
-   void add_bigfloat (BIGFLOAT value,  PMC* dest) {
-     /* XXX: bigfloat magic */
-   }
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-   void add_same (PMC * value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+    void add_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+        PMC* dest_value, KEY* dest_value_key) {
 
-     FLOATVAL result;
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             + value->vtable->get_number(INTERP, value);
+    void subtract (PMC* value,  PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        FLOATVAL result;
 
-   void add_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
-                              PMC * dest_value, KEY * dest_value_key) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            - value->vtable->get_number(INTERP, value);
 
-   void subtract (PMC * value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-     FLOATVAL result;
+    void subtract_int (INTVAL value,  PMC* dest) {
+        /* dest = SELF - value */
+        /* XXX: overflow detection, bignum promotion? */
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             - value->vtable->get_number(INTERP, value);
+        FLOATVAL result;
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            - value;
 
-   void subtract_int (INTVAL value,  PMC* dest) {
-     /* dest = SELF - value */
-     /* XXX: overflow detection, bignum promotion? */
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-     FLOATVAL result;
+    void subtract_bignum (BIGNUM* value,  PMC* dest) {
+        /* XXX: bignum magic */
+    }
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             - value;
+    void subtract_float (FLOATVAL value,  PMC* dest) {
+        /* dest = SELF - value */
+        /* XXX: overflow detection, bignum promotion? */
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        FLOATVAL result;
 
-   void subtract_bigint (BIGINT value,  PMC* dest) {
-     /* XXX: bigint magic */
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            - value;
 
-   void subtract_float (FLOATVAL value,  PMC* dest) {
-     /* dest = SELF - value */
-     /* XXX: overflow detection, bignum promotion? */
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-     FLOATVAL result;
+    void subtract_same (PMC* value,  PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             - value;
+        FLOATVAL result;
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            - value->vtable->get_number(INTERP, value);
 
-   void subtract_bigfloat (BIGFLOAT value,  PMC* dest) {
-     /* XXX: bigfloat magic */
-   }
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-   void subtract_same (PMC * value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+    void subtract_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-     FLOATVAL result;
+    void multiply (PMC* value,  PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             - value->vtable->get_number(INTERP, value);
+        FLOATVAL result;
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            * value->vtable->get_number(INTERP, value);
 
-   void subtract_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
-                                   PMC * dest_value, KEY * dest_value_key) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-   }
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-   void multiply (PMC * value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+    void multiply_int (INTVAL value,  PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-     FLOATVAL result;
+        FLOATVAL result;
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             * value->vtable->get_number(INTERP, value);
+        result = SELF->vtable->get_number(INTERP, SELF)
+            * value;
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-   void multiply_int (INTVAL value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+    void multiply_bignum (BIGNUM* value,  PMC* dest) {
+        /* XXX: bignum magic */
+    }
 
-     FLOATVAL result;
+    void multiply_float (FLOATVAL value,  PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             * value;
+        FLOATVAL result;
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            * value;
 
-   void multiply_bigint (BIGINT value,  PMC* dest) {
-   }
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-   void multiply_float (FLOATVAL value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+    void multiply_same (PMC* value,  PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-     FLOATVAL result;
+        FLOATVAL result;
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             * value;
+        result = SELF->vtable->get_number(INTERP, SELF)
+            * value->vtable->get_number(INTERP, value);
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-   void multiply_bigfloat (BIGFLOAT value,  PMC* dest) {
-     /* XXX: bigfloat magic */
-   }
+    void multiply_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void multiply_same (PMC * value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+    void divide (PMC* value,  PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-     FLOATVAL result;
+        FLOATVAL result;
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             * value->vtable->get_number(INTERP, value);
+        result = SELF->vtable->get_number(INTERP, SELF)
+            / value->vtable->get_number(INTERP, value);
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-   void multiply_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
-                                   PMC * dest_value, KEY * dest_value_key) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-   }
+    void divide_int (INTVAL value,  PMC* dest) {
+        /* dest = SELF / value */
 
-   void divide (PMC * value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+        /* XXX: overflow detection, bignum promotion? */
 
-     FLOATVAL result;
+        FLOATVAL result;
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             / value->vtable->get_number(INTERP, value);
+        result = SELF->vtable->get_number(INTERP, SELF)
+            / value;
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-   void divide_int (INTVAL value,  PMC* dest) {
-     /* dest = SELF / value */
+    void divide_bignum (BIGNUM* value,  PMC* dest) {
+        /* XXX: bignum magic */
+    }
 
-     /* XXX: overflow detection, bignum promotion? */
+    void divide_float (FLOATVAL value,  PMC* dest) {
+        /* dest = SELF / value */
 
-     FLOATVAL result;
+        /* XXX: overflow detection, bignum promotion? */
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             / value;
+        FLOATVAL result;
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+        result = SELF->vtable->get_number(INTERP, SELF)
+            / value;
 
-   void divide_bigint (BIGINT value,  PMC* dest) {
-   }
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-   void divide_float (FLOATVAL value,  PMC* dest) {
-     /* dest = SELF / value */
+    void divide_same (PMC* value,  PMC* dest) {
+        /* XXX: overflow detection, bignum promotion? */
 
-     /* XXX: overflow detection, bignum promotion? */
+        FLOATVAL result;
 
-     FLOATVAL result;
+        result = SELF->vtable->get_number(INTERP, SELF)
+            / value->vtable->get_number(INTERP, value);
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             / value;
+        dest->vtable->set_number_native(INTERP, dest, result);
+    }
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+    void divide_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void divide_bigfloat (BIGFLOAT value,  PMC* dest) {
-   }
+    void modulus (PMC* value,  PMC* dest) {
+        /* This does perl-like modulus */
 
-   void divide_same (PMC * value,  PMC* dest) {
-     /* XXX: overflow detection, bignum promotion? */
+        INTVAL result;
 
-     FLOATVAL result;
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            % value->vtable->get_integer(INTERP, value);
 
-     result = SELF->vtable->get_number(INTERP, SELF)
-             / value->vtable->get_number(INTERP, value);
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
 
-     dest->vtable->set_number_native(INTERP, dest, result);
-   }
+    void modulus_int (INTVAL value,  PMC* dest) {
+        INTVAL result;
 
-   void divide_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
-                                 PMC * dest_value, KEY * dest_value_key) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-   }
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            % value;
 
-   void modulus (PMC * value,  PMC* dest) {
-     /* This does perl-like modulus */
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
 
-     INTVAL result;
+    void modulus_bignum (BIGNUM* value,  PMC* dest) {
+        /* XXX: Can't sleep, clown'll eat me */
+    }
 
-     result = SELF->vtable->get_integer(INTERP, SELF)
-             % value->vtable->get_integer(INTERP, value);
+    void modulus_float (FLOATVAL value,  PMC* dest) {
+        /* XXX: makes all arguments integers...*/
+        INTVAL result;
 
-     dest->vtable->set_integer_native(INTERP, dest, result);
-   }
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            % (INTVAL)value;
 
-   void modulus_int (INTVAL value,  PMC* dest) {
-     INTVAL result;
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
 
-     result = SELF->vtable->get_integer(INTERP, SELF)
-             % value;
+    void modulus_same (PMC* value,  PMC* dest) {
+        /* This does perl-like modulus */
+        INTVAL result;
 
-     dest->vtable->set_integer_native(INTERP, dest, result);
-   }
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            % value->vtable->get_integer(INTERP, value);
 
-   void modulus_bigint (BIGINT value,  PMC* dest) {
-     /*  lala, I can't hear you */
-   }
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
 
-   void modulus_float (FLOATVAL value,  PMC* dest) {
-     /* XXX: makes all arguments integers...*/
-     INTVAL result;
+    void modulus_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-     result = SELF->vtable->get_integer(INTERP, SELF)
-             % (INTVAL)value;
+    void concatenate (PMC* value,  PMC* dest) {
+        STRING* s = string_concat(INTERP,
+            SELF->vtable->get_string(INTERP, SELF),
+            value->vtable->get_string(INTERP, value), 0);
 
-     dest->vtable->set_integer_native(INTERP, dest, result);
-   }
+        dest->vtable->set_string_native(INTERP, dest, s);
+    }
 
-   void modulus_bigfloat (BIGFLOAT value,  PMC* dest) {
-     /*  Can't sleep, clown'll eat me */
-   }
+    void concatenate_native (STRING* value,  PMC* dest) {
+        /* dest = SELF (concat) value */
+        STRING* s = string_concat(INTERP,
+            SELF->vtable->get_string(INTERP, SELF),
+            value, 0);
 
-   void modulus_same (PMC * value,  PMC* dest) {
-     /* This does perl-like modulus */
-     INTVAL result;
+        dest->vtable->set_string_native(INTERP, dest, s);
+    }
 
-     result = SELF->vtable->get_integer(INTERP, SELF)
-             % value->vtable->get_integer(INTERP, value);
+    void concatenate_unicode (STRING* value,  PMC* dest) {
+        /* dest = SELF (concat) value */
+        STRING* s = string_concat(INTERP,
+            SELF->vtable->get_string(INTERP, SELF),
+            value, 0);
 
-     dest->vtable->set_integer_native(INTERP, dest, result);
-   }
+        dest->vtable->set_string_native(INTERP, dest, s);
+    }
 
-   void modulus_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
-                                  PMC * dest_value, KEY * dest_value_key) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-   }
+    void concatenate_other (STRING* value,  PMC* dest) {
+        /* dest = SELF (concat) value */
+        STRING* s = string_concat(INTERP,
+            SELF->vtable->get_string(INTERP, SELF),
+            value, 0);
 
-   void concatenate (PMC * value,  PMC* dest) {
-     STRING *s =
-       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
-		      value->vtable->get_string(INTERP, value), 0);
+        dest->vtable->set_string_native(INTERP, dest, s);
+    }
 
-     dest->vtable->set_string_native(INTERP, dest, s);
-   }
+    void concatenate_same (PMC* value,  PMC* dest) {
+        STRING* s = string_concat(INTERP,
+            SELF->vtable->get_string(INTERP, SELF),
+            value->vtable->get_string(INTERP, value), 0);
 
-   void concatenate_native (STRING * value,  PMC* dest) {
-     /* dest = SELF (concat) value */
-     STRING *s =
-       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
-		      value, 0);
+        dest->vtable->set_string_native(INTERP, dest, s);
+    }
 
-     dest->vtable->set_string_native(INTERP, dest, s);
-   }
+    void concatenate_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void concatenate_unicode (STRING * value,  PMC* dest) {
-     /* dest = SELF (concat) value */
-     STRING *s =
-       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
-		      value, 0);
+    INTVAL is_equal (PMC* value) {
+        /* I think we need to check everything, do the easiest first... */
+        if (SELF->vtable->get_integer(INTERP, SELF)
+                == value->vtable->get_integer(INTERP, value)
+            && SELF->vtable->get_number(INTERP, SELF)
+                == value->vtable->get_number(INTERP, value)
+            && 0 == string_compare(INTERP,
+                SELF->vtable->get_string(INTERP, SELF),
+                value->vtable->get_string(INTERP, value))
+            )
+        {
+            return 1;
+        }
+        return 0;
+    }
 
-     dest->vtable->set_string_native(INTERP, dest, s);
-   }
+    INTVAL is_equal_keyed (KEY* key, PMC* value, KEY* value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
 
-   void concatenate_other (STRING * value,  PMC* dest) {
-     /* dest = SELF (concat) value */
-     STRING *s =
-       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
-		      value, 0);
+    INTVAL cmp (PMC* value) {
+        /* XXX: What does this mean for this class? */
+        return 0;
+    }
 
-     dest->vtable->set_string_native(INTERP, dest, s);
-   }
+    INTVAL cmp_keyed (KEY* key, PMC* value, KEY* value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
 
-   void concatenate_same (PMC * value,  PMC* dest) {
-     STRING *s =
-       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
-		      value->vtable->get_string(INTERP, value), 0);
+    INTVAL cmp_num (PMC* value) {
+        /* XXX - Floating-point precision errors possible? */
+        FLOATVAL diff = value->vtable->get_number(INTERP, value) -
+                        SELF->vtable->get_number(INTERP, SELF);
 
-     dest->vtable->set_string_native(INTERP, dest, s);
-   }
+        return diff == 0.0 ? 0 : diff < 0.0 ? -1 : 1;
+    }
 
-   void concatenate_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
-                                      PMC * dest_value, KEY * dest_value_key) {
-       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
-   }
+    INTVAL cmp_num_keyed (KEY* key, PMC* value, KEY* value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
 
-   BOOLVAL is_equal (PMC* value) {
-     /* I think we need to check everything, do the easiest first... */
-     if (    SELF->vtable->get_integer(INTERP, SELF)
-	  == value->vtable->get_integer(INTERP, value)
-	  && SELF->vtable->get_number(INTERP, SELF)
-	  == value->vtable->get_number(INTERP, value)
-	  && 0 == string_compare(INTERP,
-			    SELF->vtable->get_string(INTERP, SELF),
-			    value->vtable->get_string(INTERP, value))
-	 )
-       {
-	 return 1;
-       }
-     return 0;
-   }
+    INTVAL cmp_string (PMC* value) {
+        return string_compare(INTERP, SELF->vtable->get_string(INTERP, SELF), value->vtable->get_string(INTERP, value));
+    }
 
-   void logical_or (PMC* value,  PMC* dest) {
+    INTVAL cmp_string_keyed (KEY* key, PMC* value, KEY* value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
+
+    void logical_or (PMC* value,  PMC* dest) {
         dest->vtable->set_integer_native(INTERP, dest, 
             SELF->vtable->get_bool(INTERP, SELF) ||
             value->vtable->get_bool(INTERP, value)
         );
-   }
+    }
 
-   void logical_and (PMC* value,  PMC* dest) {
+    void logical_or_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    void logical_and (PMC* value,  PMC* dest) {
         dest->vtable->set_integer_native(INTERP, dest, 
             SELF->vtable->get_bool(INTERP, SELF) &&
             value->vtable->get_bool(INTERP, value)
         );
-   }
+    }
 
-   void logical_not (PMC* dest) {
-     dest->vtable->
-       set_integer_native(INTERP, dest,
-			  !SELF->vtable->get_bool(INTERP, SELF));
-   }
+    void logical_and_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void match (PMC * value,  REGEX* re) {
-   }
+    void logical_xor (PMC* value,  PMC* dest) {
+        /* XXX - If get_bool returns something other than 0 or 1 we're in trouble - DML */
+        dest->vtable->set_integer_native(INTERP, dest, 
+            SELF->vtable->get_bool(INTERP, SELF) ^
+            value->vtable->get_bool(INTERP, value)
+        );
+    }
 
-   void match_native (STRING * value,  REGEX* re) {
-   }
+    void logical_xor_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void match_unicode (STRING * value,  REGEX* re) {
-   }
+    void logical_not (PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            ! SELF->vtable->get_bool(INTERP, SELF));
+    }
 
-   void match_other (STRING * value,  REGEX* re) {
-   }
+    void logical_not_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void match_same (PMC * value,  REGEX* re) {
-   }
+    void repeat (PMC* value,  PMC* dest) {
+        dest->vtable->set_string_native(INTERP, dest,
+            string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
+                (UINTVAL)value->vtable->get_integer(INTERP, value), NULL) );
+    }
 
-   void repeat (PMC * value,  PMC* dest) {
-     dest->vtable->set_string_native(INTERP, dest,
-	 string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
-		       (UINTVAL)value->vtable->get_integer(INTERP, value), NULL) );
-   }
+    void repeat_keyed (KEY* key, PMC* src_value, KEY* src_value_key, PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void repeat_native (STRING * value,  PMC* dest) {
-     /* dest = value (repeat) SELF */
-     dest->vtable->set_string_native(INTERP, dest,
-	 string_repeat(INTERP, value,
-		       (UINTVAL)SELF->vtable->get_integer(INTERP,SELF),
-		       NULL) );
-   }
+    void repeat_int (INTVAL value, PMC* dest) {
+        SELF->vtable->set_string_native(INTERP, dest,
+            string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
+                (UINTVAL)value, NULL) );    
+    }
 
-   void repeat_unicode (STRING * value,  PMC* dest) {
-     /* dest = value (repeat) SELF */
-     dest->vtable->set_string_native(INTERP, dest,
-	 string_repeat(INTERP, value,
-		       (UINTVAL)SELF->vtable->get_integer(INTERP,SELF),
-		       NULL) );
-   }
+    void repeat_int_keyed (KEY* key, INTVAL src_value, PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
-   void repeat_other (STRING * value,  PMC* dest) {
-     /* dest = value (repeat) SELF */
-     dest->vtable->set_string_native(INTERP, dest,
-	 string_repeat(INTERP, value,
-		       (UINTVAL)SELF->vtable->get_integer(INTERP,SELF),
-		       NULL) );
-   }
+    void increment () {
+        SELF->cache.int_val = SELF->vtable->get_integer(INTERP, SELF) + 1;
+    }
 
-   void repeat_same (PMC * value,  PMC* dest) {
-     dest->vtable->set_string_native(INTERP, dest,
-	 string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
-		       (UINTVAL)value->vtable->get_integer(INTERP, value), NULL) );
-  }
+    void increment_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
 
+    void decrement () {
+        SELF->cache.int_val = SELF->vtable->get_integer(INTERP, SELF) - 1;
+    }
+
+    void decrement_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    INTVAL exists_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    INTVAL defined () {
+        return 1;
+    }
+
+    INTVAL defined_keyed (KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
+    }
+
+    void delete_keyed(KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    KEY* nextkey_keyed(KEY* key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return NULL;
+    }
+
+    void substr(INTVAL offset, INTVAL length, PMC* dest) {
+    }
+
+    void substr_keyed(KEY* key, INTVAL offset, INTVAL length, PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    STRING* substr_str(INTVAL offset, INTVAL length) {
+        return string_substr(INTERP, SELF->vtable->get_string(INTERP,SELF),
+            offset, length, NULL);
+    }
+    
+    STRING* substr_str_keyed(KEY* key, INTVAL offset, INTVAL length) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return NULL;
+    }
 }

@@ -24,13 +24,13 @@ unicode_transcode_to(const char *to)
     return to ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL;  /* NOTE: This cheat silences unused var warnings on gcc */
 }
 
-static BOOLVAL
+static Parrot_Bool
 unicode_is_digit(UINTVAL c)
 {
-    return (BOOLVAL)(isdigit((int)c) ? 1 : 0);  /* FIXME - Other code points are also digits */
+    return (INTVAL)(isdigit((int)c) ? 1 : 0);  /* FIXME - Other code points are also digits */
 }
 
-static INTVAL
+static Parrot_Int
 unicode_get_digit(UINTVAL c)
 {
     return c - '0';             /* FIXME - many more digits than this... */

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 29;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
@@ -123,7 +123,7 @@ CODE
 42.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "add_n");
+output_is(<<CODE, <<OUTPUT, "add_n_n_n");
 	set	N0, 1.0
 	add	N1, N0, N0
 	print	N1
@@ -143,7 +143,28 @@ CODE
 6.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "sub_i");
+output_is(<<CODE, <<OUTPUT, "add_n_n");
+	set	N0, 1.0
+	add	N0, N0
+	print	N0
+	print	"\\n"
+
+	set	N1, 1.0
+	add	N0, N1
+	print	N0
+	print	"\\n"
+
+	add	N0, 3.0
+	print	N0
+	print	"\\n"
+        end
+CODE
+2.000000
+3.000000
+6.000000
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "sub_n_n_n");
 	set	N0, 424242.0
 	set	N1, 4200.0
 	sub	N2, N0, N1
@@ -153,6 +174,23 @@ output_is(<<CODE, <<OUTPUT, "sub_i");
 CODE
 420042.000000
 OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "sub_n_n");
+	set	N0, 424242.0
+	set	N1, 4200.0
+	sub	N0, N1
+	print	N0
+	print	"\\n"
+
+	sub	N0, N0
+	print	N0
+	print	"\\n"
+        end
+CODE
+420042.000000
+0.000000
+OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "abs(n, i|ic|n|nc)");
 	set	I0, -1
@@ -729,40 +767,6 @@ CODE
 5.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "inc_n_i");
-	set	N0, 0.0
-        set     I1, 1 
-        set     I2, -1
-
-	inc	N0, I1
-	print	N0
-	print	"\\n"
-
-	inc	N0, I2
-	print	N0
-	print	"\\n"
-        end
-CODE
-1.000000
-0.000000
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "inc_n_ic");
-	set	N0, 0.0
-
-	inc	N0, 1 
-	print	N0
-	print	"\\n"
-
-	inc	N0, -1
-	print	N0
-	print	"\\n"
-        end
-CODE
-1.000000
-0.000000
-OUTPUT
-
 output_is(<<CODE, <<OUTPUT, "dec_n");
 	set	N0, 0.0
 
@@ -780,40 +784,6 @@ output_is(<<CODE, <<OUTPUT, "dec_n");
 CODE
 -1.000000
 -5.000000
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "dec_n_i");
-	set	N0, 0.0
-        set     I1, 2
-        set     I2, -1
-
-	dec	N0, I1
-	print	N0
-	print	"\\n"
-
-	dec	N0, I2
-	print	N0
-	print	"\\n"
-        end
-CODE
--2.000000
--1.000000
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "dec_n_ic");
-	set	N0, 0.0
-
-	dec	N0, 1 
-	print	N0
-	print	"\\n"
-
-	dec	N0, -1
-	print	N0
-	print	"\\n"
-        end
-CODE
--1.000000
-0.000000
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "set_i_n");

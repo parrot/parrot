@@ -4,12 +4,12 @@
 #CC = cl
 DEBUG = -g
 # GCC
-CC = gcc -efence -Wall -pedantic
-#CC = gcc -Wall -pedantic
+#CC = gcc -efence -Wall -pedantic
+CC = gcc -Wall -pedantic
 YACC = bison -v -y
 LEX = flex
-#LIBS =
-LIBS = -lefence
+LIBS =
+#LIBS = -lefence
 #LIBS = -ll -ly
 
 HEADERS = cola.h parser.h

@@ -16,7 +16,7 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-static BOOLVAL world_inited = 0;
+static INTVAL world_inited = 0;
 
 struct Parrot_Interp *
 Parrot_new(void)

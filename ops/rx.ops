@@ -879,7 +879,7 @@ character, and the other one is not (usually C<\b>).
 
 op rx_zwa_boundary(in pmc, inconst int) {
 	RX_dUNPACK($1);
-	BOOLVAL one, two;
+	INTVAL one, two;
 
 	one=rx_is_word_character(interpreter, RxCurChar(rx));
 	RxAdvanceX(rx, -1);

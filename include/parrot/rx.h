@@ -52,7 +52,7 @@ typedef struct rxinfo {
     STRING *string;
     INTVAL index;
     INTVAL startindex;
-    BOOLVAL success;
+    INTVAL success;
 
     rxflags flags;
     UINTVAL minlength;
@@ -69,15 +69,15 @@ typedef struct rxinfo {
 
 rxinfo *rx_allocate_info(struct Parrot_Interp *, STRING *);
 
-INLINE BOOLVAL rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
-INLINE BOOLVAL rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
-INLINE BOOLVAL rx_is_whitespace_character(struct Parrot_Interp *, INTVAL ch);
-INLINE BOOLVAL rx_is_newline(struct Parrot_Interp *, INTVAL ch);
+INLINE INTVAL rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
+INLINE INTVAL rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
+INLINE INTVAL rx_is_whitespace_character(struct Parrot_Interp *, INTVAL ch);
+INLINE INTVAL rx_is_newline(struct Parrot_Interp *, INTVAL ch);
 
 Bitmap bitmap_make(struct Parrot_Interp *, STRING *);
 Bitmap bitmap_make_cstr(struct Parrot_Interp *, const char *);
 void bitmap_add(struct Parrot_Interp *, Bitmap, INTVAL);
-BOOLVAL bitmap_match(Bitmap, INTVAL);
+INTVAL bitmap_match(Bitmap, INTVAL);
 void bitmap_destroy(Bitmap);
 
 #define RX_dUNPACK(pmc)            rxinfo *rx=(rxinfo *)(pmc)->data

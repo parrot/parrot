@@ -6,18 +6,20 @@ use strict;
 
 my(%expand) = (
     unique => [""], # Dummy element, so we go through the loop exactly once
-    int    => [qw[object native bigint same]],
-    float  => [qw[object native bigfloat same]],
-    num    => [qw[object int bigint float bigfloat same]],
-    str    => [qw[object native unicode other same]]
+    int    => [qw[object native bignum same]],
+    float  => [qw[object native bignum same]],
+    bignum => [qw[object int native float same]],
+    num    => [qw[object int bignum float same]],
+    str    => [qw[object native unicode other same]],
 );
 
 my (%types)  = (
     unique => [""],
-    int   => ["PMC *", "INTVAL", "BIGINT", "PMC *"],
-    float => ["PMC *", "FLOATVAL", "BIGFLOAT", "PMC *"],
-    num   => ["PMC *", "INTVAL", "BIGINT", "FLOATVAL", "BIGFLOAT", "PMC *"],
-    str   => ["PMC *", "STRING *", "STRING *", "STRING *", "PMC *"]
+    int    => ["PMC *", "INTVAL", "BIGNUM *", "PMC *"],
+    float  => ["PMC *", "FLOATVAL", "BIGNUM *", "PMC *"],
+    bignum => ["PMC *", "INTVAL", "BIGNUM *", "FLOATVAL", "PMC *"],
+    num    => ["PMC *", "INTVAL", "BIGNUM *", "FLOATVAL", "PMC *"],
+    str    => ["PMC *", "STRING *", "STRING *", "STRING *", "PMC *"]
 );
 
 #

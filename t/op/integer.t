@@ -842,16 +842,16 @@ CODE
 5
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "inc_i_i");
+output_is(<<CODE, <<OUTPUT, "add_i_i");
 	set	I0, 0
         set     I1, 2
         set     I2, -2
 
-	inc	I0, I1
+	add	I0, I1
 	print	I0
 	print	"\\n"
 
-	inc	I0, I2
+	add	I0, I2
 	print	I0
 	print	"\\n"
         end
@@ -860,14 +860,14 @@ CODE
 0
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "inc_i_ic");
+output_is(<<CODE, <<OUTPUT, "add_i_ic");
 	set	I0, 0
 
-	inc	I0, 5
+	add	I0, 5
 	print	I0
 	print	"\\n"
 
-	inc	I0, -10
+	add	I0, -10
 	print	I0
 	print	"\\n"
         end
@@ -896,16 +896,16 @@ CODE
 -5
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "dec_i_i");
+output_is(<<CODE, <<OUTPUT, "sub_i_i");
 	set	I0, 0
         set     I1, 3
         set     I2, -3
  
-	dec	I0, I1
+	sub	I0, I1
 	print	I0
 	print	"\\n"
 
-	dec	I0, I2
+	sub	I0, I2
 	print	I0
 	print	"\\n"
         end
@@ -914,14 +914,14 @@ CODE
 0
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "dec_i_ic");
+output_is(<<CODE, <<OUTPUT, "sub_i_ic");
 	set	I0, 0
 
-	dec	I0, 5
+	sub	I0, 5
 	print	I0
 	print	"\\n"
 
-	dec	I0, -10
+	sub	I0, -10
 	print	I0
 	print	"\\n"
         end

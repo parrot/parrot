@@ -27,7 +27,7 @@ STRING *string_substr(struct Parrot_Interp *, const STRING *, INTVAL,
 STRING *string_replace(struct Parrot_Interp *, STRING *, INTVAL, INTVAL,
                        STRING *, STRING **);
 INTVAL string_compare(struct Parrot_Interp *, STRING *, STRING *);
-BOOLVAL string_bool(const STRING *);
+INTVAL string_bool(const STRING *);
 const char *Parrot_string_cstring(const STRING *);
 
 /* Declarations of other functions */

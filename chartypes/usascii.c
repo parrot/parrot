@@ -50,13 +50,13 @@ usascii_transcode_to(const char *to)
     }
 }
 
-static BOOLVAL
+static Parrot_Bool
 usascii_is_digit(UINTVAL c)
 {
-    return (BOOLVAL)(isdigit((int)c) ? 1 : 0);
+    return (INTVAL)(isdigit((int)c) ? 1 : 0);
 }
 
-static INTVAL
+static Parrot_Int
 usascii_get_digit(UINTVAL c)
 {
     return ((INTVAL)c) - '0';

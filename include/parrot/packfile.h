@@ -100,7 +100,7 @@ opcode_t PackFile_unpack(struct Parrot_Interp *interpreter,
 
 void PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
 
-BOOLVAL PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, opcode_t * packed, opcode_t packed_size);
+INTVAL PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, opcode_t * packed, opcode_t packed_size);
 
 opcode_t PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 
@@ -118,7 +118,7 @@ void PackFile_ConstTable_pack(struct PackFile * pf,
                               struct PackFile_ConstTable * self,
                               opcode_t * packed);
 
-BOOLVAL PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
+INTVAL PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
                                    struct PackFile * pf,
                                    struct PackFile_ConstTable * self,
                                    opcode_t * packed, opcode_t packed_size);
@@ -135,16 +135,16 @@ void PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed);
 
 void PackFile_Constant_destroy(struct PackFile_Constant * self);
 
-BOOLVAL PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
+INTVAL PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
                                  struct PackFile *packfile,
                                  struct PackFile_Constant *self,
                                  opcode_t *packed, opcode_t packed_size);
 
-BOOLVAL PackFile_Constant_unpack_number(struct PackFile * pf,
+INTVAL PackFile_Constant_unpack_number(struct PackFile * pf,
                                         struct PackFile_Constant * self,
                                         opcode_t * packed, opcode_t packed_size);
 
-BOOLVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
+INTVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                         struct PackFile * pf,
                                         struct PackFile_Constant *self,
                                         opcode_t *packed,

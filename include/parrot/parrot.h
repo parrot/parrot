@@ -75,11 +75,8 @@
 #define OPCODE_TYPE_MSNET 2e4e4554
 
 typedef struct PMC PMC;
-typedef unsigned char BOOLVAL;
 typedef void STRING_FUNCS;
-typedef void REGEX;
-typedef void *BIGINT;
-typedef void *BIGFLOAT;
+typedef void BIGNUM;
 
 /* define some shortcuts for dealing with function pointers */
 /* according to ANSI C, casting between function and non-function pointers is

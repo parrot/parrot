@@ -608,7 +608,7 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
 }
 
 /* A string is "true" if it is equal to anything but "" and "0" */
-BOOLVAL
+INTVAL
 string_bool(const STRING *s)
 {
     INTVAL len;
@@ -617,13 +617,15 @@ string_bool(const STRING *s)
     }
 
     len = string_length(s);
-
+	
     if (len == 0) {
         return 0;
     }
 
     if (len == 1) {
+
         UINTVAL c = s->encoding->decode(s->bufstart);
+
         if (s->type->is_digit(c) && s->type->get_digit(c) == 0) {
             return 0;
         }
@@ -654,7 +656,7 @@ string_to_int(const STRING *s)
         const char *start = s->bufstart;
         const char *end = start + s->bufused;
         int sign = 1;
-        BOOLVAL in_number = 0;
+        INTVAL in_number = 0;
 
         while (start < end) {
             UINTVAL c = s->encoding->decode(start);
@@ -694,11 +696,11 @@ string_to_num(const STRING *s)
         const char *start = s->bufstart;
         const char *end = start + s->bufused;
         int sign = 1;
-        BOOLVAL seen_dot = 0;
-        BOOLVAL seen_e = 0;
+        INTVAL seen_dot = 0;
+        INTVAL seen_e = 0;
         int exp_sign = 0;
-        BOOLVAL in_exp = 0;
-        BOOLVAL in_number = 0;
+        INTVAL in_exp = 0;
+        INTVAL in_number = 0;
         FLOATVAL exponent = 0;
         INTVAL fake_exponent = 0;
 

@@ -230,7 +230,7 @@ PackFile_destroy(struct PackFile *pf)
 }
 
 /* Internal function to check segment_size % sizeof(opcode_t) */
-static BOOLVAL
+static INTVAL
 PackFile_check_segment_size(opcode_t segment_size, const char *debug)
 {
 #if TRACE_PACKFILE
@@ -469,7 +469,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-BOOLVAL
+INTVAL
 PackFile_FixupTable_unpack(struct PackFile_FixupTable *self, opcode_t *packed,
                            opcode_t packed_size)
 {
@@ -535,7 +535,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-BOOLVAL
+INTVAL
 PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
                             struct PackFile * pf,
                             struct PackFile_ConstTable *self, opcode_t *packed,
@@ -576,7 +576,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
     }
 
     for (i = 0; i < self->const_count; i++) {
-        BOOLVAL rc;
+        INTVAL rc;
 #if TRACE_PACKFILE
         printf("PackFile_ConstTable_unpack(): Unpacking constant %ld...\n", i);
 #endif
@@ -742,7 +742,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-BOOLVAL
+INTVAL
 PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
                          struct PackFile *pf,
                          struct PackFile_Constant *self, opcode_t *packed,
@@ -751,7 +751,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
     opcode_t *cursor;
     opcode_t type;
     opcode_t size;
-    BOOLVAL rc = 1;
+    INTVAL rc = 1;
 
     UNUSED(packed_size);
 
@@ -807,7 +807,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-BOOLVAL
+INTVAL
 PackFile_Constant_unpack_number(struct PackFile * pf, struct PackFile_Constant *self,
                                 opcode_t *packed, opcode_t packed_size)
 {
@@ -867,7 +867,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-BOOLVAL
+INTVAL
 PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                 struct PackFile * pf,
                                 struct PackFile_Constant *self,

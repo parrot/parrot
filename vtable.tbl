@@ -1,52 +1,85 @@
 # $Id$
 # This is the main vtable data
 # Lines have the following format:
-# method type \tab return type name \tab type arg1 \tab type arg2
+# [keyed] <method-type> <return-type> <method_name>([<type> <pname>[, <type> <pname>...]])
 #
-# Method type is either int, float, num, str, or unique if the method
+# <method-type> is either int, float, num, str, or unique if the method
 # has a set of int entries, float entries, num entries, string
-# entries, or is a unique method
+# entries, or is a unique method.
+#
+# If keyed is specified, a keyed version will also be generated.
 #
 # So, for instance, a function with two arguments where the second
-# argument is a string PMC of some sort would look like this:
-# string void frob (INTVAL foo, STRING bar)
+# argument is a string would look like this:
+# str void frob (INTVAL foo, STRING* bar)
 #
 # Note that we don't include the source "PMC* pmc" - that's done implicitly.
 #
-# "value" in non-unique methods (multimethods) is a magic name. Its type
-# will be replaced appropriately.
+# A <pname> of "value" in non-unique methods (multimethods) is a magic name.
+# Its type will be replaced appropriately.
+#
+# A <method-name> that contains "keyed" will only generate a keyed version.  It
+# is not neccessary to specify keyed in that case.
 
-INTVAL type()
-STRING* name( )
-init(INTVAL size)
-void clone(PMC* dest)
-void morph (INTVAL type)
-INTVAL real_size ( )
-void destroy ( )
-PMC* mark (PMC* end_of_used_list)
-keyed unique INTVAL get_integer  (  )
+unique void init()
+unique void morph(INTVAL type)
+unique PMC* mark(PMC* end_of_used_list)
+unique void destroy()
+
+keyed unique INTVAL type()
+keyed unique UINTVAL subtype(INTVAL type)
+keyed unique STRING* name()
+keyed unique PMC* clone()
+keyed unique PMC* find_method(STRING* method_name)
+keyed unique INTVAL get_integer()
 keyed unique FLOATVAL get_number()
+keyed unique BIGNUM* get_bignum()
 keyed unique STRING* get_string()
-BOOLVAL get_bool()
-void* get_value()
-PMC* get_pmc_keyed() # KEY* gets added here by magic.
-BOOLVAL is_same(PMC* pmc2)
+keyed unique INTVAL get_bool()
+keyed unique INTVAL elements()
+
+keyed unique PMC* get_pmc()
+
+keyed unique INTVAL is_same(PMC* pmc2)
+
 keyed int void set_integer(INTVAL value)
 keyed float void set_number(FLOATVAL value)
+keyed bignum void set_bignum(BIGNUM* value)
 keyed str void set_string(STRING* value)
-void set_value (void* value)
-keyed unique void set_pmc (PMC* value)
-int void inc(INTVAL value,PMC* dest)
-int void dec(INTVAL value,PMC* dest)
+
+keyed unique void set_pmc(PMC* value)
+keyed unique void set_same(PMC* value)
+
 keyed num void add(PMC* value,PMC* dest)
 keyed num void subtract(PMC* value,PMC* dest)
 keyed num void multiply(PMC* value,PMC* dest)
 keyed num void divide(PMC* value,PMC* dest)
 keyed num void modulus(PMC* value,PMC* dest)
+
 keyed str void concatenate(PMC* value,PMC* dest)
-BOOLVAL is_equal(PMC* value)
-void logical_or(PMC* value,PMC* dest)
-void logical_and(PMC* value,PMC* dest)
-void logical_not(PMC* value)
-str void match(PMC* value, REGEX* re)
-str void repeat(PMC* value, PMC* dest)
+
+keyed unique INTVAL is_equal(PMC* value)
+keyed unique INTVAL cmp(PMC* value)
+keyed unique INTVAL cmp_num(PMC* value)
+keyed unique INTVAL cmp_string(PMC* value)
+
+keyed unique void logical_or(PMC* value, PMC* dest)
+keyed unique void logical_and(PMC* value, PMC* dest)
+keyed unique void logical_xor(PMC* value, PMC* dest)
+keyed unique void logical_not(PMC* dest)
+
+keyed unique void repeat(PMC* value, PMC* dest)
+keyed unique void repeat_int(INTVAL value, PMC* dest)
+
+keyed unique void increment()
+keyed unique void decrement()
+
+unique INTVAL exists_keyed()
+
+keyed unique INTVAL defined()
+
+unique void delete_keyed()
+unique KEY* nextkey_keyed()
+
+keyed unique void substr(INTVAL offset,INTVAL length,PMC* dest)
+keyed unique STRING* substr_str(INTVAL offset,INTVAL length)

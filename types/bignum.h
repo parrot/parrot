@@ -19,7 +19,6 @@
 typedef long INTVAL;
 typedef unsigned long UINTVAL;
 typedef double FLOATVAL;
-typedef char BOOLVAL;
 #define PINTD_
 #define PINT_
 #define BN_alloc(x) malloc(x)
@@ -84,7 +83,7 @@ typedef struct {
     INTVAL precision;     /* number of digs to retain */
     INTVAL elimit;        /* maximum exponent allowed */
     BN_ROUNDING rounding; /* rounding type to perform */
-    BOOLVAL extended;     /* do we use extended or base semantics? */
+    INTVAL extended;     /* do we use extended or base semantics? */
     unsigned char flags;       /* records possible errors */
     unsigned char traps;       /* throw errors or not? */
 } parrot_bignum_context;

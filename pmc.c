@@ -50,7 +50,7 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
         return NULL;
     }
 
-    pmc->vtable->init(interpreter, pmc, 0);
+    pmc->vtable->init(interpreter, pmc);
 
     /* Let the caller track this PMC */
     pmc->flags &= ~PMC_immune_FLAG;
@@ -88,7 +88,8 @@ pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type, INTVAL size)
         return NULL;
     }
 
-    pmc->vtable->init(interpreter, pmc, size);
+    /* XXX - pmc->vtable->init(interpreter, pmc, size); */
+    pmc->vtable->init(interpreter, pmc);
 
     /* Let the caller track this PMC */
     pmc->flags &= ~PMC_immune_FLAG;

@@ -14,36 +14,26 @@
 
 pmclass PerlInt {
 
-    INTVAL type () {
-        return 0;
+    void init () {
+        SELF->cache.int_val = 0;
+    }
+
+    void morph (INTVAL type) {
+    }
+
+    void destroy () {
+    /* Integers need no destruction! */
     }
 
     STRING* name() {
         return whoami;
     }
 
-    void init (INTVAL size) {
-        SELF->cache.int_val = 0;
-    }
-
-    void clone (PMC* dest) { 
-        dest->vtable = SELF->vtable;
+    PMC* clone () { 
+        PMC* dest;
+        dest = pmc_new(INTERP, SELF->vtable->base_type);
 	dest->cache.int_val = SELF->cache.int_val;
-    }
-
-    void morph (INTVAL type) {
-    }
-
-    BOOLVAL move_to (void * destination) {
-        return 0; /* You can't move me, I don't have anything to move! */
-    }
-
-    INTVAL real_size () {
-	return 0; /* ->data is unused */
-    }
-
-    void destroy () {
-    /* Integers need no destruction! */
+        return dest;
     }
 
     INTVAL get_integer () {
@@ -54,22 +44,22 @@ pmclass PerlInt {
         return (FLOATVAL)SELF->cache.int_val;
     }
 
+    BIGNUM* get_bignum () {
+        /* XXX */
+    }
+
     STRING* get_string () {
         return string_from_int(INTERP, SELF->cache.int_val);
     }
 
-    BOOLVAL get_bool () {
-        return (BOOLVAL)(pmc->cache.int_val != 0);
+    INTVAL get_bool () {
+        return (INTVAL)(pmc->cache.int_val != 0);
     }
 
-    void* get_value () {
-        return &SELF->cache; /* YAFIYGI */
-    }
-
-    BOOLVAL is_same (PMC* other) {
+    INTVAL is_same (PMC* pmc2) {
         /* Do you refer to exactly the same data that I do? */
-        return (BOOLVAL)( other->vtable == SELF->vtable /* You never know if you've been inherited...*/
-            && SELF->cache.int_val == other->cache.int_val );
+        return (INTVAL)( pmc2->vtable == SELF->vtable /* You never know if you've been inherited...*/
+            && SELF->cache.int_val == pmc2->cache.int_val );
     }
 
     void set_integer (PMC* value) {
@@ -80,9 +70,9 @@ pmclass PerlInt {
         SELF->cache.int_val = value;
     }
 
-    void set_integer_bigint (BIGINT value) {
+    void set_integer_bignum (BIGNUM* value) {
         SELF->cache.struct_val = value; /* Maybe we need a copy */
-        /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigInt]); */
+        /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBignum]); */
     }
 
     void set_integer_same (PMC * value) {
@@ -99,7 +89,7 @@ pmclass PerlInt {
 	SELF->cache.num_val = value;
     }
 
-    void set_number_bigfloat (BIGFLOAT value) {
+    void set_number_bignum (BIGNUM* value) {
 	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
     }
 
@@ -108,63 +98,58 @@ pmclass PerlInt {
 	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
     }
 
-    void set_string (PMC * value) {
+    void set_bignum (PMC* value) {
+        /* XXX not sure if this can be optimized further safely */
+        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
+    }
+    
+    void set_bignum_int (INTVAL value) {
+        /* XXX Make bignum from value */
+    }
+    
+    void set_bignum_native (BIGNUM* value) {
+        /* XXX Some of this bignum stuff is starting to look pretty redundant -DML */
+        SELF->cache.struct_val = value; /* Maybe we need a copy */
+        /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBignum]); */
+    }
+    
+    void set_bignum_float (FLOATVAL value) {
+        /* XXX */
+    }
+    
+    void set_bignum_same (PMC* value) {
+        /* XXX not sure if this can be optimized further safely */
+        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
+    }
+    
+    void set_string (PMC* value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
 	SELF->data = value->data;
     }
 
-    void set_string_native (STRING * value) {
+    void set_string_native (STRING* value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
 	SELF->data = value;
     }
 
-    void set_string_unicode (STRING * value) {
+    void set_string_unicode (STRING* value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
 	SELF->data = value;
     }
 
-    void set_string_other (STRING * value) {
+    void set_string_other (STRING* value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
 	SELF->data = value;
     }
 
-    void set_string_same (PMC * value) {
+    void set_string_same (PMC* value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
 	SELF->data = value->data;
     }
 
-    void set_value (void* value) {
-    }
-
-    void inc (PMC* value,  PMC* dest) {
-        SELF->cache.int_val += value->vtable->get_integer(INTERP, value);
-    }
-
-    void inc_native (INTVAL value, PMC* dest) {
-        SELF->cache.int_val += value;
-    }
-
-    void inc_same (PMC* value, PMC* dest) {
-        SELF->cache.int_val += value->cache.int_val;
-    }
-
-    void inc_bigint (BIGINT value, PMC* dest) {
-      /* XXX: bigint magic */
-    }
-
-    void dec (PMC * value,  PMC* dest) {
-        SELF->cache.int_val -= value->vtable->get_integer(INTERP, value);
-    }
-
-    void dec_native (INTVAL value, PMC* dest) {
-        SELF->cache.int_val -= value;
-    }
-
-    void dec_same (PMC* value, PMC* dest) {
-        SELF->cache.int_val -= value->cache.int_val;
-    }
-
-    void add (PMC * value, PMC* dest) {
+    void add (PMC* value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
 	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
             dest->vtable->set_number_native(INTERP, dest, 
@@ -201,22 +186,16 @@ pmclass PerlInt {
 
     void add_int (INTVAL value, PMC* dest) {
         dest->vtable->set_integer_native(INTERP, dest, SELF->cache.int_val + value);
-   }
-
-    void add_bigint (BIGINT value, PMC* dest) {
     }
 
-    void add_float (FLOATVAL value, PMC* dest) {
+    void add_bignum (BIGNUM* value, PMC* dest) {
     }
 
-    void add_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void add_same (PMC * value, PMC* dest) {
+    void add_same (PMC* value, PMC* dest) {
         dest->cache.int_val = SELF->cache.int_val + value->cache.int_val;
     }
 
-    void subtract (PMC * value, PMC* dest) {
+    void subtract (PMC* value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
 	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
             dest->vtable->set_number_native(INTERP, dest, 
@@ -257,20 +236,17 @@ pmclass PerlInt {
         );
     }
 
-    void subtract_bigint (BIGINT value, PMC* dest) {
+    void subtract_bignum (BIGNUM* value, PMC* dest) {
     }
 
     void subtract_float (FLOATVAL value, PMC* dest) {
     }
 
-    void subtract_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void subtract_same (PMC * value, PMC* dest) {
+    void subtract_same (PMC* value, PMC* dest) {
         dest->cache.int_val = SELF->cache.int_val - value->cache.int_val;
     }
 
-    void multiply (PMC * value, PMC* dest) {
+    void multiply (PMC* value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
 	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
             dest->vtable->set_number_native(INTERP, dest, 
@@ -311,20 +287,17 @@ pmclass PerlInt {
         );
     }
 
-    void multiply_bigint (BIGINT value, PMC* dest) {
+    void multiply_bignum (BIGNUM* value, PMC* dest) {
     }
 
     void multiply_float (FLOATVAL value, PMC* dest) {
     }
 
-    void multiply_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void multiply_same (PMC * value, PMC* dest) {
+    void multiply_same (PMC* value, PMC* dest) {
         dest->cache.int_val = SELF->cache.int_val * value->cache.int_val;
     }
 
-    void divide (PMC * value, PMC* dest) {
+    void divide (PMC* value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
 	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
             dest->vtable->set_number_native(INTERP, dest, 
@@ -364,20 +337,17 @@ pmclass PerlInt {
         );
     }
 
-    void divide_bigint (BIGINT value, PMC* dest) {
+    void divide_bignum (BIGNUM* value, PMC* dest) {
     }
 
     void divide_float (FLOATVAL value, PMC* dest) {
     }
 
-    void divide_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void divide_same (PMC * value, PMC* dest) {
+    void divide_same (PMC* value, PMC* dest) {
         dest->cache.int_val = SELF->cache.int_val / value->cache.int_val;
     }
 
-    void modulus (PMC * value, PMC* dest) {
+    void modulus (PMC* value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
 fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 	}
@@ -410,20 +380,17 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
         );
     }
 
-    void modulus_bigint (BIGINT value, PMC* dest) {
+    void modulus_bignum (BIGNUM* value, PMC* dest) {
     }
 
     void modulus_float (FLOATVAL value, PMC* dest) {
     }
 
-    void modulus_bigfloat (BIGFLOAT value, PMC* dest) {
-    }
-
-    void modulus_same (PMC * value, PMC* dest) {
+    void modulus_same (PMC* value, PMC* dest) {
         dest->cache.int_val = SELF->cache.int_val % value->cache.int_val;
     }
 
-    void concatenate (PMC * value, PMC* dest) {
+    void concatenate (PMC* value, PMC* dest) {
 	STRING* s;
 	s = string_concat(INTERP,
 			  SELF->vtable->get_string(INTERP, SELF),
@@ -434,7 +401,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 	dest->vtable->set_string_native(INTERP,dest,s);
     }
 
-    void concatenate_native (STRING * value, PMC* dest) {
+    void concatenate_native (STRING* value, PMC* dest) {
 	STRING* s;
 	s = string_concat(INTERP,
 			  SELF->vtable->get_string(INTERP, SELF),
@@ -445,7 +412,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 	dest->vtable->set_string_native(INTERP,dest,s);
     }
 
-    void concatenate_unicode (STRING * value, PMC* dest) {
+    void concatenate_unicode (STRING* value, PMC* dest) {
 	STRING* s;
 	s = string_concat(INTERP,
 			  SELF->vtable->get_string(INTERP, SELF),
@@ -456,7 +423,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 	dest->vtable->set_string_native(INTERP,dest,s);
     }
 
-    void concatenate_other (STRING * value, PMC* dest) {
+    void concatenate_other (STRING* value, PMC* dest) {
 	STRING* s;
 	s = string_concat(INTERP,
 			  SELF->vtable->get_string(INTERP, SELF),
@@ -467,7 +434,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 	dest->vtable->set_string_native(INTERP,dest,s);
     }
 
-    void concatenate_same (PMC * value, PMC* dest) {
+    void concatenate_same (PMC* value, PMC* dest) {
 	STRING* s;
 	s = string_concat(INTERP,
 			  SELF->vtable->get_string(INTERP, SELF),
@@ -479,12 +446,23 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
     }
 
     /* == operation */
-    BOOLVAL is_equal (PMC* value) {
-        return (BOOLVAL)(SELF->cache.int_val == value->vtable->get_integer(INTERP, value));
+    INTVAL is_equal (PMC* value) {
+        return (INTVAL)(SELF->cache.int_val == value->vtable->get_integer(INTERP, value));
     }
 
+    INTVAL cmp(PMC* value) {
+        INTVAL diff;
+        diff = value->vtable->get_integer(INTERP, value) - SELF->cache.int_val;
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    }
+
+    INTVAL cmp_num(PMC* value) {
+        INTVAL diff;
+        diff = value->vtable->get_integer(INTERP, value) - SELF->cache.int_val;
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    }
+    
     void logical_or (PMC* value, PMC* dest) {
-        /* No set_bool :( */
         dest->vtable->set_integer_native(INTERP, dest,
             SELF->cache.int_val || 
             value->vtable->get_bool(INTERP, value)
@@ -498,37 +476,28 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
         );
     }
 
+    void logical_xor (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            ( SELF->cache.int_val ? 1 : 0 ) ^ 
+            value->vtable->get_bool(INTERP, value)
+        );
+    }
+
     void logical_not (PMC* value) {
         SELF->cache.int_val = (INTVAL)(!value->vtable->get_bool(INTERP, value));
     }
 
-    void match (PMC * value,REGEX* re) {
+    void repeat (PMC* value, PMC* dest) {
     }
 
-    void match_native (STRING * value, REGEX* re) {
+    void repeat_int (INTVAL value, PMC* dest) {
     }
 
-    void match_unicode (STRING * value, REGEX* re) {
+    void increment () {
+        SELF->cache.int_val ++;
     }
-
-    void match_other (STRING * value, REGEX* re) {
-    }
-
-    void match_same (PMC * value,REGEX* re) {
-    }
-
-    void repeat (PMC * value, PMC* dest) {
-    }
-
-    void repeat_native (STRING * value, PMC* dest) {
-    }
-
-    void repeat_unicode (STRING * value, PMC* dest) {
-    }
-
-    void repeat_other (STRING * value, PMC* dest) {
-    }
-
-    void repeat_same (PMC * value, PMC* dest) {
+    
+    void decrement () {
+        SELF->cache.int_val --;
     }
 }
