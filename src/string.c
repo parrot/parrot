@@ -1426,9 +1426,11 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
         return res;
     }
 
+#if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+#endif
 
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
         s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
@@ -1495,9 +1497,11 @@ string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
         return res;
     }
 
+#if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+#endif
 
     if (s1 && s2) {
         if (s1->type != s2->type || s1->encoding != s2->encoding) {
@@ -1584,9 +1588,11 @@ string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
         return res;
     }
 
+#if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+#endif
 
     if (s1 && s2) {
         if (s1->type != s2->type || s1->encoding != s2->encoding) {
@@ -1669,9 +1675,11 @@ string_bitwise_not(struct Parrot_Interp *interpreter, STRING *s,
         return res;
     }
 
+#if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+#endif
 
     len = s->bufused;
     make_writable(interpreter, &res, len, s->encoding, s->type);
@@ -1963,7 +1971,7 @@ string_to_num(const STRING *s)
         exponent = fake_exponent + exponent * exp_sign;
 
         if(exponent < 0) {
-            exponent = -exponent; 
+            exponent = -exponent;
             exp_sign=-1;
         }
 
@@ -1977,13 +1985,13 @@ string_to_num(const STRING *s)
             exp_log *= exp_log;
             exponent >>= 1;
         }
-        
+
         if(exp_sign < 0)
             f /= exp_val;
         else
             f *= exp_val;
 
-        
+
         if(sign < 0)
             f = -f;
     }
