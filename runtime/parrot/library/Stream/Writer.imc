@@ -29,36 +29,27 @@ version 0.1
 
 =cut
 
-.sub __stream_writer_onload @LOAD
-    .local int i
-    .local pmc base
-    .local pmc sub
-    
-    find_type i, "Stream::Writer"
-    if i > 1 goto END
+.namespace ["Stream::Writer"]
+
+.sub __onload @LOAD
+    find_type $I0, "Stream::Writer"
+    if $I0 > 1 goto END
     
     load_bytecode "library/Stream/Base.imc"
     
-    getclass base, "Stream::Base" 
-    subclass sub, base, "Stream::Writer"
+    getclass $P0, "Stream::Base" 
+    subclass $P1, $P0, "Stream::Writer"
 
-    addattribute sub, "writer"
-    addattribute sub, "status"
-    
+    addattribute $P1, "writer"
+    addattribute $P1, "status"
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
-
-.namespace ["Stream::Writer"]
 
 =head1 METHODS
 
 =over 4
 
 =cut
-
-.include "library/dumper.imc"
 
 .sub _reader_stub method
     .local pmc source
@@ -72,14 +63,11 @@ END:
     source()
 
     # mark it as closed
-    classoffset I0, self, "Stream::Writer"
-    inc I0
+    classoffset $I0, self, "Stream::Writer"
+    inc $I0
     .local pmc status
-    getattribute status, self, I0
+    getattribute status, self, $I0
     status = 0
-    
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .sub __init method
@@ -87,25 +75,23 @@ END:
     
     new status, .PerlInt
     set status, 0
-#    setattribute self, "status", status    
-    classoffset I0, self, "Stream::Writer"
-    inc I0
-    setattribute self, I0, status
+    classoffset $I0, self, "Stream::Writer"
+    inc $I0
+    setattribute self, $I0, status
 .end
 
 .sub __set_pmc method
     .param pmc source
     .local pmc stub
     .local pmc status
-    
-    
+
     newsub stub, .Sub, _reader_stub
     setprop stub, "CALL", source
     self."setSource"( stub )
 
-    classoffset I0, self, "Stream::Writer"
-    inc I0
-    getattribute status, self, I0
+    classoffset $I0, self, "Stream::Writer"
+    inc $I0
+    getattribute status, self, $I0
     status = 1
 .end
 
@@ -115,22 +101,20 @@ END:
 
     null str
 LOOP:
-    I0 = self."connected"()
-    unless I0 goto END
+    $I0 = self."connected"()
+    unless $I0 goto END
     self."write"( str )
     branch LOOP
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .sub connected method
     .local pmc status
     .local int ret
     
-    classoffset I0, self, "Stream::Writer"
-    inc I0
-    getattribute status, self, I0
+    classoffset $I0, self, "Stream::Writer"
+    inc $I0
+    getattribute status, self, $I0
     ret = status
     .pcc_begin_return
     .return ret
@@ -148,11 +132,11 @@ END:
     .local pmc source
     .local pmc status
 
-    classoffset I0, self, "Stream::Writer"
-    P0 = clone P1
-    setattribute self, I0, P0
-    inc I0
-    getattribute status, self, I0
+    classoffset $I0, self, "Stream::Writer"
+    $P0 = clone P1
+    setattribute self, $I0, $P0
+    inc $I0
+    getattribute status, self, $I0
 
     if status == 0 goto END
     
@@ -161,13 +145,13 @@ END:
     self."write"( "" )
 WRITE:
 
-    classoffset I0, self, "Stream::Writer"
-    setattribute self, I0, P1
+    classoffset $I0, self, "Stream::Writer"
+    setattribute self, $I0, P1
     
     source = self."source"()
     isnull source, END
-    typeof I0, source
-    if I0 == .PerlUndef goto END
+    typeof $I0, source
+    if $I0 == .PerlUndef goto END
 
     source( str )
 END:
@@ -189,25 +173,26 @@ END:
     cont = self."source"()
     isnull cont, END_OF_STREAM
 
+    classoffset $I0, self, "Stream::Writer"
+    getattribute writer, self, $I0
+
+    savetop
     newsub cont, .Continuation, _CONT
     self."setSource"( cont )
-
-    classoffset I0, self, "Stream::Writer"
-    getattribute writer, self, I0
 
     .pcc_begin prototyped
     .pcc_call writer
 _CONT:
     .result str
     .pcc_end
-
+    
     .pcc_begin_return
     .return str
     .pcc_end_return
 END_OF_STREAM:
     null writer
-    classoffset I0, self, "Stream::Writer"
-    setattribute self, I0, writer
+    classoffset $I0, self, "Stream::Writer"
+    setattribute self, $I0, writer
     null str
     .pcc_begin_return
     .return str

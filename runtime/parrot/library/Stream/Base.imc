@@ -20,29 +20,29 @@ TBD
 
 =cut
 
-.sub __stream_base_onload prototyped, @LOAD
-    .local int i
-    .local pmc base
+.namespace ["Stream::Base"]
 
-    find_type i, "Stream::Base"
-    if i > 1 goto END
+.const int aSource = 0
+.const int aIncludes = 1
+.const int aBuffer = 2
+
+.sub __stream_base_onload prototyped, @LOAD
+    find_type $I0, "Stream::Base"
+    if $I0 > 1 goto END
 
     load_bytecode "library/Data/Escape.imc"
     
-    newclass base, "Stream::Base"
-    addattribute base, 'source'
-    addattribute base, 'includes'
+    newclass $P0, "Stream::Base"
+    addattribute $P0, 'source'
+    addattribute $P0, 'includes'
+    addattribute $P0, 'buffer'
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
-
-
-.namespace ["Stream::Base"]
 
 .sub __init method
     .local pmc close
 
+    # call our own close
     close = find_global "Stream::Base", "close"
     close()
 .end
@@ -54,19 +54,12 @@ END:
 .sub __set_pmc method
     .param pmc source
 
-#    print "base::assign '"
-#    typeof S0, source
-#    print S0
-#    print "'\n"
-    classoffset I0, self, "Stream::Base"
-    setattribute self, I0, source
+    classoffset $I0, self, "Stream::Base"
+    setattribute self, $I0, source
     null source
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .sub setSource method
-#    print "base::setSource\n"
     newsub P0, .Sub, __set_pmc
     invoke
 .end
@@ -75,14 +68,14 @@ END:
     .local pmc temp
 
     # reset source    
-    classoffset I0, self, "Stream::Base"
+    classoffset $I0, self, "Stream::Base"
     new temp, .PerlUndef
-    setattribute self, I0, temp
+    setattribute self, $I0, temp
 
     # reset includes
-    inc I0
+    inc $I0
     new temp, .PMCArray
-    setattribute self, I0, temp
+    setattribute self, $I0, temp
 .end
 
 =item stream."dump"() (debug aid)
@@ -144,14 +137,10 @@ Returns the currently set source.
     if argcI != 0 goto ERROR
     if argcS != 0 goto ERROR
     if argcN != 0 goto ERROR
-    classoffset I0, self, "Stream::Base"
-    getattribute ret, self, I0
+    classoffset $I0, self, "Stream::Base"
+    add $I0, aSource
+    getattribute ret, self, $I0
 
-#    print "base::source '"
-#    typeof S0, ret
-#    print S0
-#    print "'\n"
-    
     .pcc_begin_return
     .return ret
     .pcc_end_return
@@ -171,15 +160,16 @@ It is connected until the source sub returns.
 .sub connected method
     .local pmc stream
 
-    classoffset I0, self, "Stream::Base"
-    getattribute P0, self, I0
-    typeof I0, P0
-    if I0 == .PerlUndef goto NOT
+    classoffset $I0, self, "Stream::Base"
+    add $I0, aSource
+    getattribute $P0, self, $I0
+    typeof $I0, $P0
+    if $I0 == .PerlUndef goto NOT
 
-    can I0, P0, "connected"
-    unless I0 goto SKIP
-    I0 = P0."connected"()
-    unless I0 goto NOT
+    can $I0, $P0, "connected"
+    unless $I0 goto SKIP
+    $I0 = $P0."connected"()
+    unless $I0 goto NOT
 SKIP:
     .pcc_begin_return
     .return 1
@@ -200,16 +190,28 @@ Returns the read string, or a null string if the stream end has been reached.
     .local string ret
     .local pmc includes
 
-    classoffset I0, self, "Stream::Base"
-    inc I0
-    getattribute includes, self, I0
+    classoffset $I0, self, "Stream::Base"
+    add $I0, aBuffer
+    getattribute $P0, self, $I0
+    isnull $P0, NO_BUFFER
+    ret = $P0
+    null $P0
+    setattribute self, $I0, $P0
+    branch DONE
+NO_BUFFER:
 
-    I0 = includes
-    if I0 > 0 goto INCLUDE
+    classoffset $I0, self, "Stream::Base"
+    add $I0, aIncludes
+    getattribute includes, self, $I0
+    isnull includes, SELF
+    
+    $I0 = includes
+    if $I0 > 0 goto INCLUDE
     
 SELF:
     ret = self."rawRead"()
 
+    isnull includes, DONE
     isnull ret, INCLUDE_CHECK
 
 DONE:
@@ -218,8 +220,8 @@ DONE:
     .pcc_end_return
 
 INCLUDE_CHECK:
-    I0 = includes
-    if I0 == 0 goto DONE
+    $I0 = includes
+    if $I0 == 0 goto DONE
     
 INCLUDE:
     .local pmc stream
@@ -232,9 +234,9 @@ INCLUDE:
     branch DONE
     
 INCLUDE_DEL:
-    shift P0, includes
-    I0 = includes
-    if I0 > 0 goto INCLUDE
+    shift $P0, includes
+    $I0 = includes
+    if $I0 > 0 goto INCLUDE
     branch SELF
 .end
 
@@ -251,9 +253,9 @@ Please have a look at F<examples/streams/Include.imc> to see how it works.
     .param pmc stream
     .local pmc includes
 
-    classoffset I0, self, "Stream::Base"
-    inc I0
-    getattribute includes, self, I0
+    classoffset $I0, self, "Stream::Base"
+    add $I0, aIncludes
+    getattribute includes, self, $I0
     push includes, stream
 
     self."flush"()
@@ -276,9 +278,9 @@ Used to flush the stream when including another stream.
     can i, self, "write"
     unless i goto CANT
     
-    classoffset I0, self, "Stream::Base"
-    inc I0
-    getattribute includes, self, I0
+    classoffset $I0, self, "Stream::Base"
+    add $I0, aIncludes
+    getattribute includes, self, $I0
     
     i = includes
     if i == 0 goto CANT
@@ -289,6 +291,93 @@ Used to flush the stream when including another stream.
 CANT:
     .pcc_begin_return
     .return i
+    .pcc_end_return
+.end
+
+=item stream."read_bytes"( number )
+
+Reads the specified number of bytes from the stream.
+
+=cut
+
+.sub read_bytes method
+    .param int requested
+    .local string ret
+    .local pmc buffer
+
+    classoffset $I0, self, "Stream::Base"
+    add $I0, aBuffer
+    
+    # get buffer
+    getattribute buffer, self, $I0
+
+    # no buffer set?
+    isnull buffer, CREATE
+
+    # unset buffer
+    null $P0
+    setattribute self, $I0, $P0
+    branch OK
+    
+CREATE:
+    buffer = new .PerlString
+    
+OK:
+    ret = buffer
+
+LOOP:
+    $I0 = length ret
+    if $I0 >= requested goto DONE
+    $S0 = self."read"()
+    isnull $S0, DONE
+    concat ret, $S0
+    branch LOOP
+DONE:
+    
+    $I0 = length ret
+    if $I0 <= requested goto END
+
+    $S0 = ret
+    substr ret, $S0, 0, requested
+    substr $S0, $S0, requested
+    ret = clone ret
+    $I0 = length $S0
+    unless $I0 goto END
+
+    assign buffer, $S0
+    classoffset $I0, self, "Stream::Base"
+    add $I0, aBuffer
+    setattribute self, $I0, buffer    
+
+END:
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+=item stream."byte_buffer"() (B<internal>)
+
+Returns or sets the byte buffer.
+
+=cut
+
+.sub byte_buffer method
+    .param pmc buf
+    
+    classoffset $I0, self, "Stream::Base"
+    add $I0, aBuffer
+
+    if argcP != 0 goto SET
+
+    getattribute $P0, self, $I0
+
+    isnull $P0, END
+    branch END
+SET:
+    setattribute self, $I0, buf
+END:
+    .pcc_begin_return
+    .return $P0
     .pcc_end_return
 .end
 
