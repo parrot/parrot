@@ -47,6 +47,30 @@ a$="Hello"
 c$="WRONG"
 call mysub()
 
+
+STOPPLEASE
+' Expect 10
+sub second(b() )
+	b(5)=10
+end sub
+sub first(a() )
+	call second(a())
+end sub
+dim t(),f()
+call first(t())
+print t(5)
+
+
+' Expect OK
+y=59.7363
+x=19.506
+if ( y > 0 ) and (x > 0) then
+	print "OK"
+end if
+
+
+STOPPLEASE
+
 ' Passing string arrays, expect 99 and "Hello"
 function foo(i, thing$())
 	print i

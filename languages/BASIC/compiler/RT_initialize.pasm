@@ -19,6 +19,8 @@
 	store_global "PRINTCOL", $P0
 	$P0=new PerlHash
 	store_global "DEBUGGER", $P0
+	$P0=new PerlHash
+	store_global "COMMON", $P0
 
 	JUMPLABEL = ""
 

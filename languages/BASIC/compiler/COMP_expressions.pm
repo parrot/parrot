@@ -456,7 +456,7 @@ sub pushthing {
 					$$optype="N";
 				}
 				$main::code{$main::seg}->{declarations}->{$sym}=1
-					unless $main::code{$main::seg}->{declarations}->{$sym} or $main::common{$sym};
+					unless $main::code{$main::seg}->{declarations}->{$sym};
 			}
 			return $sym;
 		} elsif ($type eq "STARTARG") {
@@ -541,8 +541,10 @@ NEST_ARRAY_ASSIGN:		push @code, qq{\t.arg $ac\t\t\t# argc};
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 			} else {
 				$extern=~s/\$/_string/g; $extern=~tr/a-z/A-Z/;
+				push @code, qq{#SAVECOMMON};
 				push @code, qq{\t.arg $ac\t\t\t# argc};
 				push @code, qq{\tcall  _USERFUNC_${extern}_run};
+				push @code, qq{#RESTORECOMMON};
 				push @code, "\t.result \$$optype$retcount";
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 				$retcount++;

@@ -46,31 +46,6 @@ parse(@ARGV);
 open(CODE, ">TARG_test.imc") || die;
 
 print CODE qq{.include "RT_initialize.pasm"\n};
-#
-# Take care of the COMMON declarations
-#
-if (keys %common) {
-	my %code_copy=%code;
-	print CODE "# Declarations of common variables\n";
-	foreach my $seg ("_main", "_basicmain", keys %code) {
-		next unless exists $code{$seg};
-		if (exists $code{$seg}->{declarations}) {
-			foreach my $var (sort keys %{$code{$seg}->{declarations}}) {
-				next unless $code{$seg}->{declarations}->{$var} eq "COMMON";
-				if ($var=~/_string$/) {
-					print CODE ".local string $var\n";
-				} else {
-					print CODE ".local float $var\n";
-				}
-				delete $code{$seg}->{declarations}->{$var};
-			}
-		}
-		delete $code{$seg};
-	}
-	%code=%code_copy;
-}
-
-
 foreach my $seg ("_main", "_basicmain", keys %code) {
 	next unless exists $code{$seg};
 	my @debdecl=();
@@ -78,6 +53,7 @@ foreach my $seg ("_main", "_basicmain", keys %code) {
 
 	print CODE ".sub $seg\n";
 	if (exists $code{$seg}->{declarations}) {
+		print CODE "\t.local PerlHash _GLOBALS\n";
 		foreach my $var (sort keys %{$code{$seg}->{declarations}}) {
 			if ($var=~/_string$/) {
 				print CODE "\t.local string $var\n";
@@ -93,15 +69,80 @@ foreach my $seg ("_main", "_basicmain", keys %code) {
 	}
 	print CODE<<INIT;
 	.sub ${seg}_run			# Always jump here.
-@init		call ${seg}_main
+		call ${seg}_main
 		ret
 	.end
 INIT
+	my($edit,@saves);
 	print CODE "\t.sub ${seg}_main\n\t\tsaveall\n";
+
+	# If any "common" declared variables are in scope, set them up.
+	@saves=();
+	foreach my $var (keys %{$code{$seg}->{declarations}}) {
+		if (exists $main::common{$var}) {
+			push(@saves, $var);
+		}
+	}
+	if (@saves) {
+		print CODE qq{\t\t# Grab "COMMON" variables from global stash\n};
+		print CODE qq{\t\tfind_global _GLOBALS, "COMMON"\n};
+		foreach(@saves) {
+			print CODE qq{\t\t$_=_GLOBALS["$_"]\n};
+		}
+	}
+
+	# Emit the code for the segment
 	foreach(@{$code{$seg}->{code}}) {
 		s/#RTJ// if $runtime_jump;
+		if (/#SAVECOMMON/) {
+			@saves=();
+			$edit="";
+			foreach my $var (keys %{$code{$seg}->{declarations}}) {
+				if (exists $main::common{$var}) {
+					push(@saves, $var);
+				}
+			}
+			if (@saves) {
+				$edit.=qq{\tfind_global _GLOBALS, "COMMON"\n};
+				foreach(@saves) {
+					$edit.=qq{\t_GLOBALS["$_"]=$_\n};
+				}
+				$edit.=qq{\tstore_global "COMMON", _GLOBALS\n};
+			}
+			s/#SAVECOMMON/$edit/;
+		}		
+		if (/#RESTORECOMMON/) {
+			@saves=();
+			$edit="";
+			foreach my $var (keys %{$code{$seg}->{declarations}}) {
+				if (exists $main::common{$var}) {
+					push(@saves, $var);
+				}
+			}
+			if (@saves) {
+				$edit.=qq{\tfind_global _GLOBALS, "COMMON"\n};
+				foreach(@saves) {
+					$edit.=qq{\t$_=_GLOBALS["$_"]\n};
+				}
+			}
+			s/#RESTORECOMMON/$edit/;
+		}		
 		s/^/\t/gm;
 		print CODE;
+	}
+	# Put back all of the globals we've used in this sub
+	@saves=();
+	foreach my $var (keys %{$code{$seg}->{declarations}}) {
+		if (exists $main::common{$var}) {
+			push(@saves, $var);
+		}
+	}
+	if (@saves) {
+		print CODE qq{\t\tfind_global _GLOBALS, "COMMON"\n};
+		foreach(@saves) {
+			print CODE qq{\t_GLOBALS["$_"]=$_\n};
+		}
+		print CODE qq{\t\tstore_global "COMMON", _GLOBALS\n\t};
 	}
 	print CODE "\t\trestoreall\n\t\tret\n";
 	print CODE "\t.end\t# main segment\n";

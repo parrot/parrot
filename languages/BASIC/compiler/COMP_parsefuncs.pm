@@ -433,7 +433,7 @@ sub parse_print {
 	my $fd="";
 	my ($result, $type, @CODE);
 	feedme();
-	if ($syms[CURR] eq "#") { 
+	if ($syms[CURR] eq "#" and $type[CURR] eq "PUN") { 
 		feedme();
 		$fd=$syms[CURR];
 		feedme();
