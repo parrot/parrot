@@ -180,10 +180,10 @@ void key_set_size(struct Parrot_Interp *interpreter, KEY* key, INTVAL size) {
       return;
     }
     if(size > key->size) {
-      KEY_PAIR* pair = (KEY_PAIR*)realloc(key->keys,sizeof(KEY_PAIR)*size);
+      KEY_PAIR* pair = (KEY_PAIR*)realloc(key->keys,sizeof(KEY_PAIR *)*size);
       if(pair != NULL) {
 	INTVAL i;
-        key->keys = pair;
+        key->keys = (KEY_PAIR **)pair;
 	for(i=key->size;i<size;i++) {
 	  key->keys[i]->type = enum_key_undef;
 	}
@@ -197,7 +197,7 @@ void key_set_size(struct Parrot_Interp *interpreter, KEY* key, INTVAL size) {
       for(i=size;i<key->size;i++) {
         /* Memory leak in the making */
       }
-      key->keys = (KEY_PAIR*)realloc(key->keys,sizeof(KEY_PAIR)*size);
+      key->keys = (KEY_PAIR**)realloc(key->keys,sizeof(KEY_PAIR *)*size);
     }
     key->size = size;
   }
@@ -241,7 +241,7 @@ INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key,
 
   if(key != NULL) {
     if((idx >= 0) && (idx < key->size)) {
-      KEY_PAIR* pair = &key->keys[idx];
+      KEY_PAIR* pair = (KEY_PAIR *)&key->keys[idx];
       return pair->type;
     }
     else {
@@ -266,7 +266,7 @@ KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key,
 
   if(key != NULL) {
     if((idx >= 0) && (idx < key->size)) {
-      KEY_PAIR* pair = &key->keys[idx];
+      KEY_PAIR* pair = (KEY_PAIR *)&key->keys[idx];
       if(pair != NULL) {
         return pair;
       }
@@ -388,7 +388,7 @@ void key_chop(struct Parrot_Interp *interpreter, KEY* key) {
     if(key->size > 0) {
       /* Memory leak in the making */
       key->size--;
-      key->keys = (KEY_PAIR*)realloc(key->keys,sizeof(KEY_PAIR)*key->size);
+      key->keys = (KEY_PAIR**)realloc(key->keys,sizeof(KEY_PAIR *)*key->size);
     }
     else if(key->size == 0) {
       fprintf(stderr,
@@ -416,7 +416,7 @@ void key_inc(struct Parrot_Interp *interpreter, KEY* key, INTVAL idx) {
 
   if(key != NULL) {
     if((idx >= 0) && (idx < key->size)) {
-      KEY_PAIR* pair = &key->keys[idx];
+      KEY_PAIR* pair = (KEY_PAIR *)&key->keys[idx];
       pair->type++;
     }
     else {
