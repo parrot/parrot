@@ -50,8 +50,7 @@ pmclass PerlUndef extends PerlInt {
     }
 
     INTVAL get_bool () {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of uninitialized value in boolean context");
+        /* no warning: my $a; print $a if $a */
         return 0;
     }
 
