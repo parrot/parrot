@@ -80,16 +80,22 @@ True if the sub is being called with prototyped parameters.
 
 The number of items pushed onto the stack.
 
+=item I2
+
+The number of parameters in PMC registers.
+
 =back
 
-The following registers are used I<only> when calling a subroutine for
-which there is a compile-time prototype.
+The following registers, with the exception of P registers, are used
+I<only> when calling a subroutine for which there is a compile-time
+prototype. The first 27 PMC parameters may be passed in registers P5
+through P31.
 
 =over 4
 
 =item I5 through I31
 
-The first 27 integer parameters.
+The first 26 integer parameters.
 
 =item S5 through S31
 
