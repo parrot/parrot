@@ -23,6 +23,8 @@ sub runstep {
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/scheme.in',    'languages/scheme/Makefile',
           commentType => '#', replace_slashes => 1);
+  genfile('config/gen/makefiles/m4.in',        'languages/m4/Makefile',
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/perl6.in',     'languages/perl6/Makefile',
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/bf.in',        'languages/bf/Makefile',

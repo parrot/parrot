@@ -1,0 +1,176 @@
+=head1 NAME
+
+builtin.imc - builtin and user defined macros
+
+=head2 DESCRIPTION
+
+Copyright:  2004 Bernhard Schmalhofer.  All Rights Reserved.
+CVS Info:   $Id$
+History:    Ported from GNU m4 1.4
+References: http://www.gnu.org/software/m4/m4.html
+
+Code for all builtin macros, initialisation of symbol table, and
+expansion of user defined macros.
+
+=head1 SUBROUTINES
+
+=head2 void _builtin_init( PerlHash state )
+
+Initialise all builtin and predefined macros.
+
+=cut
+.sub _builtin_init prototyped             
+  .param PerlHash state
+
+  # Now generate a new macro and store it
+  .sym Sub define_builtin
+  define_builtin = newsub _define_builtin
+  .pcc_begin prototyped
+    .arg state
+    .arg 'incr'
+    .arg 'raufzählen'
+  .pcc_call define_builtin
+    ret_define_builtin_1:
+  .pcc_end
+  .pcc_begin_return
+    # void
+  .pcc_end_return
+.end
+
+=head2 void _define_builtin( PerlHash state, string name, string substitution )
+
+Add a builtin macro to the symbol table 
+
+=cut
+.sub _define_builtin prototyped            
+  .param PerlHash  state
+  .param string    name     
+  .param string    substitution
+
+  .sym pmc symtab
+  symtab = state['symtab']
+
+=for skip
+
+  print "name: "
+  print name
+  print "\n"
+  print "substitution: "
+  print substitution
+  print "\n"
+
+=cut
+
+  # Now store the passed macro
+  .sym pmc macro
+  macro = new PerlArray
+  macro = 2
+  macro[0] = name
+  macro[1] = substitution
+
+  symtab[name] = macro
+  .pcc_begin_return
+    # void
+  .pcc_end_return
+.end
+
+=head2 void define_user_macro( PerlHash state, string name, string substitution )
+
+Add a user defined or predefined macro.
+
+=cut
+.sub _define_user_macro prototyped             
+  .param PerlHash  state
+  .param string    name     
+  .param string    substitution
+
+  .sym pmc symtab
+  symtab = state['symtab']
+
+=for skip
+
+  print '_define_user_macro: '
+  print name
+  print ','
+  print substitution
+  print "\n"
+
+=cut
+
+  # Now store the passed macro
+  .sym pmc macro
+  macro = new PerlArray
+  macro = 2
+  macro[0] = name
+  macro[1] = substitution
+
+  symtab[name] = macro
+  .pcc_begin_return
+    # void
+  .pcc_end_return
+.end
+
+# List of builtin macros from GNU m4
+# static builtin
+# builtin_tab[] =
+# {
+# 
+#   /* name  GNUext	macros	blind	function */
+# 
+#   { "__file__",		TRUE,	FALSE,	FALSE,	m4___file__ },
+#   { "__line__",		TRUE,	FALSE,	FALSE,	m4___line__ },
+#   { "builtin",		TRUE,	FALSE,	TRUE,	m4_builtin },
+#   { "changecom",	FALSE,	FALSE,	FALSE,	m4_changecom },
+#   { "changequote",	FALSE,	FALSE,	FALSE,	m4_changequote },
+# #ifdef ENABLE_CHANGEWORD
+#   { "changeword",	TRUE,	FALSE,	FALSE,	m4_changeword },
+# #endif
+#   { "debugmode",	TRUE,	FALSE,	FALSE,	m4_debugmode },
+#   { "debugfile",	TRUE,	FALSE,	FALSE,	m4_debugfile },
+#   { "decr",		FALSE,	FALSE,	TRUE,	m4_decr },
+#   { "define",		FALSE,	TRUE,	TRUE,	m4_define },
+#   { "defn",		FALSE,	FALSE,	TRUE,	m4_defn },
+#   { "divert",		FALSE,	FALSE,	FALSE,	m4_divert },
+#   { "divnum",		FALSE,	FALSE,	FALSE,	m4_divnum },
+#   { "dnl",		FALSE,	FALSE,	FALSE,	m4_dnl },
+#   { "dumpdef",		FALSE,	FALSE,	FALSE,	m4_dumpdef },
+#   { "errprint",		FALSE,	FALSE,	FALSE,	m4_errprint },
+#   { "esyscmd",		TRUE,	FALSE,	TRUE,	m4_esyscmd },
+#   { "eval",		FALSE,	FALSE,	TRUE,	m4_eval },
+#   { "format",		TRUE,	FALSE,	FALSE,	m4_format },
+#   { "ifdef",		FALSE,	FALSE,	TRUE,	m4_ifdef },
+#   { "ifelse",		FALSE,	FALSE,	TRUE,	m4_ifelse },
+#   { "include",		FALSE,	FALSE,	TRUE,	m4_include },
+#   { "incr",		FALSE,	FALSE,	TRUE,	m4_incr },
+#   { "index",		FALSE,	FALSE,	TRUE,	m4_index },
+#   { "indir",		TRUE,	FALSE,	FALSE,	m4_indir },
+#   { "len",		FALSE,	FALSE,	TRUE,	m4_len },
+#   { "m4exit",		FALSE,	FALSE,	FALSE,	m4_m4exit },
+#   { "m4wrap",		FALSE,	FALSE,	FALSE,	m4_m4wrap },
+#   { "maketemp",		FALSE,	FALSE,	TRUE,	m4_maketemp },
+#   { "patsubst",		TRUE,	FALSE,	TRUE,	m4_patsubst },
+#   { "popdef",		FALSE,	FALSE,	TRUE,	m4_popdef },
+#   { "pushdef",		FALSE,	TRUE,	TRUE,	m4_pushdef },
+#   { "regexp",		TRUE,	FALSE,	TRUE,	m4_regexp },
+#   { "shift",		FALSE,	FALSE,	FALSE,	m4_shift },
+#   { "sinclude",		FALSE,	FALSE,	TRUE,	m4_sinclude },
+#   { "substr",		FALSE,	FALSE,	TRUE,	m4_substr },
+#   { "syscmd",		FALSE,	FALSE,	TRUE,	m4_syscmd },
+#   { "sysval",		FALSE,	FALSE,	FALSE,	m4_sysval },
+#   { "traceoff",		FALSE,	FALSE,	FALSE,	m4_traceoff },
+#   { "traceon",		FALSE,	FALSE,	FALSE,	m4_traceon },
+#   { "translit",		FALSE,	FALSE,	TRUE,	m4_translit },
+#   { "undefine",		FALSE,	FALSE,	TRUE,	m4_undefine },
+#   { "undivert",		FALSE,	FALSE,	FALSE,	m4_undivert },
+# 
+#   { 0,			FALSE,	FALSE,	FALSE,	0 },
+# };
+# 
+# static predefined const
+# predefined_tab[] =
+# {
+#   { "unix",	"__unix__",	"" },
+#   { NULL,	"__gnu__",	"" },
+# 
+#   { NULL,	NULL,		NULL },
+# };

@@ -2,21 +2,31 @@ PERL = ${perl}
 ${make_set_make}
 MAKE_C = ${make_c}
 
-all : regex befunge bf cola ook perl6 tcl urm
-	@echo "SKIPPED: scheme (nothing to make, but should not default to make test)"
-	@echo "SKIPPED: jako (fallen behind imcc changes)"
+all : befunge bf cola m4 ook perl6 regex tcl urm
+	@echo "SKIPPED: scheme: (nothing to make, but should not default to make test)"
+	@echo "SKIPPED: jako:   (fallen behind imcc changes)"
 
-complete-all : jako regex scheme befunge bf cola ook perl6 tcl urm
+complete-all : all jako scheme
 
-test: regex.test scheme.test befunge.test bf.test ook.test perl6.test tcl.test urm.test
+test: regex.test scheme.test befunge.test bf.test m4.test ook.test perl6.test tcl.test urm.test
 	@echo "SKIPPED: jako (fallen behind imcc changes)"
 	@echo "SKIPPED: cola (no make test)"
 
-complete-test: jako.test regex.test scheme.test befunge.test bf.test cola.test \
-        ook.test perl6.test tcl.test urm.test
+complete-test: test jako.test cola.test
+
+# This is a listing of all targets, that are meant to be called by users
+help:
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  all:          A lot of language implementations."
+	@echo "                     This is the default."
+	@echo "  test:         Test suite for a lot of languages."
+	@echo ""
 
 # Could someone please comment on the reason for all these *.dummy
 # targets?
+# I have no idea, Bernhard Schmalhofer
 jako: jako.dummy
 
 jako.dummy:
@@ -73,6 +83,14 @@ ook.dummy:
 ook.test:
 	$(MAKE_C) ook test
 
+m4 : m4.dummy
+
+m4.dummy:
+	$(MAKE_C) m4
+
+m4.test:
+	$(MAKE_C) m4 test
+
 perl6 : perl6.dummy
 
 perl6.dummy:
@@ -98,6 +116,7 @@ urm.test:
 clean:
 	$(MAKE_C) befunge clean
 	$(MAKE_C) jako clean
+	$(MAKE_C) m4 clean
 	$(MAKE_C) scheme clean
 
 update:

@@ -1,0 +1,252 @@
+=head1 NAME
+
+freeze.imc - reading and writing of state files
+
+=head1 DESCRIPTION
+
+Copyright:  2004 Bernhard Schmalhofer.  All Rights Reserved.
+CVS Info:   $Id$
+History:    Ported from GNU m4 1.4
+References: http://www.gnu.org/software/m4/m4.html
+
+Reading and writing state files. Invoced with the command line parameters
+'--reload-state' and '--freeze-state'
+
+=cut
+
+.include 'iterator.pasm'
+
+=head1 SUBROUTINES
+
+=head2 void produce_frozen_state( PerlHash state, string frozen_file )
+
+Dump a state file.
+
+=cut
+.sub _produce_frozen_state prototyped             
+  .param PerlHash   state
+  .param string     frozen_file    
+
+  .sym pmc symtab
+  symtab = state['symtab']
+
+  .sym PerlArray macro
+  .sym int       len
+  .sym string    name
+  .sym string    substitution
+
+  .sym pmc frozen_fh
+  open frozen_fh, frozen_file, ">"
+  .sym pmc iterator
+  iterator = new Iterator, symtab
+  set iterator, .ITERATE_FROM_START
+  iter_loop:
+  unless iterator, end_iter
+    shift macro, iterator
+    name         = macro[0]
+    substitution = macro[1]
+    print frozen_fh, 'T'
+    length len, name
+    print frozen_fh, len
+    print frozen_fh, ','
+    length len, substitution
+    print frozen_fh, len
+    print frozen_fh, "\n"
+    print frozen_fh, name
+    print frozen_fh, substitution
+    print frozen_fh, "\n"
+
+    branch iter_loop
+  end_iter:
+  close frozen_fh
+
+  .pcc_begin_return
+    # void
+  .pcc_end_return
+.end
+
+
+=head2 void reload_frozen_state( PerlHash state, string frozen_file )
+
+Read a frozen file
+
+TODO: Read in long files incrementally
+TODO: Support all flags
+TODO: Search for files in M4PATH
+For now we just read the whole file into a string.
+For now we just worry about the flags 'F', 'T' and 'V'.
+
+=cut
+.sub _reload_frozen_state prototyped             
+  .param PerlHash   state    
+  .param string     frozen_file    
+
+  # Read the file into the string file
+  .sym string content
+  # TODO: M4PATH
+  .sym pmc frozen_fh
+  open frozen_fh, frozen_file, "<"
+  if frozen_fh, READ_CONTENT
+    printerr "'"
+    printerr frozen_file
+    printerr "'"
+    printerr " not found\n"
+    # TODO: proper exception handling
+    end
+  READ_CONTENT:
+  read content, frozen_fh, 60000
+  close frozen_fh
+
+  # We have read in a file, now let's parse it.
+  .sym int    pos             # position in file
+  .sym string token           # interesting substring in file
+
+  # vars which will contain the extracted info
+  .sym int    name_len
+  .sym int    substitution_len   
+  .sym string name
+  .sym string substitution
+
+  # Set up some subroutines, which might get called in the parse loop
+  .sym Sub    define_builtin
+  define_builtin = newsub _define_builtin
+  .sym Sub    define_user_macro
+  define_user_macro = newsub _define_user_macro
+
+  # start the parse loop
+  goto CHECK_PARSING_FINISHED
+
+  HANDLE_NEXT_TOKEN:
+  if token != '\n' goto NOT_AN_EMPTY_LINE
+    # Ignore empty lines
+    goto CHECK_PARSING_FINISHED
+  NOT_AN_EMPTY_LINE:
+
+  if token != '#' goto NOT_A_COMMENT
+    # Skip everything up to the end of line
+    index pos, content, "\n"
+    inc pos
+    substr content, 0, pos, ''
+    goto CHECK_PARSING_FINISHED
+  NOT_A_COMMENT:
+
+  if token != 'V' goto NOT_A_VERSION_SPECIFICICATION
+    # Skip everything up to the end of line
+    # TODO: verify 'V1' and make some test cases
+    # TODO: Add version info to symtab
+    index pos, content, "\n"
+    inc pos
+    substr content, 0, pos, ''
+    goto CHECK_PARSING_FINISHED
+  NOT_A_VERSION_SPECIFICICATION:
+
+  if token != 'F' goto NOT_A_BUILTIN_MACRO
+    # Look for two numbers seperated by a ','
+    # We expect at least one digit
+    pos = 0
+    rx_is_d content, pos, UNEXPECTED
+  PERHAPS_ANOTHER_DIGIT_1:
+    rx_is_d content, pos, EXPECT_A_COMMA_1
+    goto PERHAPS_ANOTHER_DIGIT_1
+  EXPECT_A_COMMA_1:
+    substr token, content, 0, pos, '' 
+    name_len = token
+    pos = 0
+    rx_literal content, pos, ',', UNEXPECTED
+    substr content, 0, pos, '' 
+    pos = 0
+    # We expect at least another digit 
+    rx_is_d content, pos, UNEXPECTED
+  PERHAPS_ANOTHER_DIGIT_2:
+    rx_is_d content, pos, EXPECT_A_NEWLINE_1
+    goto PERHAPS_ANOTHER_DIGIT_2
+  EXPECT_A_NEWLINE_1:
+    substr token, content, 0, pos, '' 
+    substitution_len = token
+    pos = 0
+    rx_literal content, pos, "\n", UNEXPECTED
+    substr content, 0, pos, '' 
+    pos = 0
+    substr name, content, 0, name_len, '' 
+    substr substitution, content, 0, substitution_len, '' 
+    # We know the length, so we can extract the strings
+    .pcc_begin prototyped
+      .arg state
+      .arg name
+      .arg substitution
+    .pcc_call define_builtin
+      ret_define_builtin_1:
+    .pcc_end
+    pos = 0
+    rx_literal content, pos, "\n", UNEXPECTED
+    substr content, 0, pos, '' 
+    pos = 0
+    goto CHECK_PARSING_FINISHED
+  NOT_A_BUILTIN_MACRO:
+
+  if token != 'T' goto NOT_A_USER_DEFINED_MACRO
+    # Look for two numbers seperated by a ','
+    # We expect at least one digit
+    pos = 0
+    rx_is_d content, pos, UNEXPECTED
+  PERHAPS_ANOTHER_DIGIT_3:
+    rx_is_d content, pos, EXPECT_A_COMMA_2
+    goto PERHAPS_ANOTHER_DIGIT_3
+  EXPECT_A_COMMA_2:
+    substr token, content, 0, pos, '' 
+    name_len = token
+    pos = 0
+    rx_literal content, pos, ',', UNEXPECTED
+    substr content, 0, pos, '' 
+    pos = 0
+    # We expect at least another digit 
+    rx_is_d content, pos, UNEXPECTED
+  PERHAPS_ANOTHER_DIGIT_4:
+    rx_is_d content, pos, EXPECT_A_NEWLINE_2
+    goto PERHAPS_ANOTHER_DIGIT_4
+  EXPECT_A_NEWLINE_2:
+    substr token, content, 0, pos, '' 
+    substitution_len = token
+    pos = 0
+    rx_literal content, pos, "\n", UNEXPECTED
+    substr content, 0, pos, '' 
+    pos = 0
+    substr name, content, 0, name_len, '' 
+  # print "--------------------\n"
+  # print name
+  # print " OK5\n"
+  # print "--------------------\n"
+    substr substitution, content, 0, substitution_len, '' 
+    # We know the length, so we can extract the strings
+    .pcc_begin prototyped
+      .arg state
+      .arg name
+      .arg substitution
+    .pcc_call define_user_macro
+      ret_user_macro_1:
+    .pcc_end
+    pos = 0
+    rx_literal content, pos, "\n", UNEXPECTED
+    substr content, 0, pos, '' 
+    pos = 0
+    goto CHECK_PARSING_FINISHED
+  NOT_A_USER_DEFINED_MACRO:
+
+# TODO: handle the missing options
+  print 'unknown flag: '
+  print token
+  print "\n"
+
+  CHECK_PARSING_FINISHED:
+  substr token, content, 0, 1, ''
+  if token != '' goto HANDLE_NEXT_TOKEN
+    goto FINISHED
+  UNEXPECTED:
+  printerr "Found an unexpected character\n'"
+  printerr token
+  printerr "'\n"
+
+  FINISHED:
+  .pcc_begin_return
+  .pcc_end_return
+.end

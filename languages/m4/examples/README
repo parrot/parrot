@@ -1,0 +1,4 @@
+This dir contains various samble data and scripts.
+File with extension .frozen contain the freeze state of m4.
+
+only_builtins.frozen   - Waht you get when there are no used defined macros

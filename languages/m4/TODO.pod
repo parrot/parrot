@@ -1,0 +1,200 @@
+=head1 Documentation
+
+=over
+
+=item Prepare slides
+
+=back
+
+=head1 Testing
+
+=over
+
+=item Add tests for new features
+
+=back
+
+=head1 Perl5
+
+=over
+
+=item Create module Lamguage::m4 or Text::m4
+
+=back
+
+=head1 Features
+
+The feateres that need to be implemented are orded by chapters in the
+GNU m4 documentation.
+
+=head2 Chapter 1 Introduction and preliminaries
+
+=over
+
+=item Parsing of short options
+
+=item recognize unambigous long options
+
+=item Option -G or --traditional
+
+=item Option -E or --fatal-warnings
+
+=item Option -d or --debug
+
+=item Option -l or --arglength
+
+=item Option -o or --error-output
+
+=item Option -I or --include
+
+=item Option -e or --interactive
+
+=item Option -s or --synclines
+
+=item Option -P or --prefix-builtins
+
+=item Option -W or --word-regexp
+
+=item Option -H or --hash-size
+
+=item Option -L or --nesting-limit
+
+=item Option -Q or --quiet or --silent
+
+=item Option -B, -S, -T
+
+=item Option -N or --diversions
+
+=item Option -D or --define
+
+=item Option -t or --trace
+
+=back
+
+=head2 Chapter 2 Lexical and syntactic conventions
+
+=over
+
+=item Nested quoted strings
+
+=back
+
+=head2 Chapter 3 How to invoke macros
+
+=over
+
+=item Recognize builtin macros
+
+=item Recognize macros with arguments
+
+=item Rescanning evaluated macros
+
+=back
+
+=head2 Chapter 4 How to define new macros
+
+=over
+
+=item Stack for macro definitions
+
+=item Special arguments to macros
+
+=back
+
+=head2 Chapter 5 Conditionals, loops and recursion
+
+=over
+
+=item If and loops
+
+=item Recursions
+
+=back
+
+=head2 Chapter 6 How to debug macros and input
+
+=over
+
+=item Implement debugging options 
+
+=item tracing
+
+=back
+
+=head2 Chapter 7 Input control
+
+=over
+
+=back
+
+=head2 Chapter 8 File inclusions
+
+=over
+
+=item File inclusion
+
+=item include path
+
+=back
+
+=head2 Chapter 9 Diverting and undiverting output
+
+=over
+
+=item Diversions
+
+=back
+
+=head2 Chapter 10 Macros for text handling
+
+=over
+
+=item implement all of them
+
+=item Use POSIX regexes
+
+=item Implement the builtin function patsubst
+
+=back
+
+=head2 Chapter 11 Macros for doin arithmetic
+
+=over
+
+=item implent all of them
+
+=item Arithmetic expression parser, bc ???
+
+=back
+
+=head2 Chapter 12 Running UNIX commands
+
+=over
+
+=item Implement it
+
+=back
+
+=head2 Chapter 13 Micellaneous builtin Functions
+
+=over
+
+=item Implement all of them
+
+=back
+
+=head2 Chapter 14 Fast loading of frozen states
+
+=over
+
+=item more tests
+
+=back
+
+=head2 Chapter 15 Compatability with other versions of m4
+
+=over
+
+=item Document the differences between Parrot m4 and GNU m4
+
+=back

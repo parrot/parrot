@@ -1,0 +1,17 @@
+=head1 TITLE
+
+How does this thing work?
+
+=head1 Parrot stuff
+
+=head1 IMCC
+
+=head1 GNU m4
+
+=head1 Parrot m4
+
+=head1 SEE ALSO
+
+=head2 AUTHORS
+
+=cut

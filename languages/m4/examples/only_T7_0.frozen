@@ -1,0 +1,6 @@
+# This is a m4 frozen state file.
+# It used to test wether a pattern length of o is handled gracefully
+V1
+T7,0
+__gnu__
+# End of frozen state file

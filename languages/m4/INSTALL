@@ -1,0 +1,7 @@
+There source are part of the Parrot distribution.
+'libpcre' is required.
+
+There are no install routines yet.
+
+cd parrot/languages/m4; make; make test
+Proceed with reading the documentation in parrot/languages/m4/doc.

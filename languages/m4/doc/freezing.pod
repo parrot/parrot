@@ -1,0 +1,49 @@
+=head1 TITLE
+
+Saving and restoring the state of Parrot m4
+
+=head1 Why?
+
+Performance
+
+=head1 How?
+
+Command line args.
+  --freeze-state=s
+  --reload-state=s
+
+=head1 Format of the freeze file
+
+Each macro is desrcibed in two lines. The first line looks like 'F8,8'.
+The second looks like: 'translittranslit'
+The First letter is a flag:
+
+  C Change comment character
+  D A diversion, expects a negative number first
+  F a builtin macro
+  T a user defined macro 
+  Q Change quote character
+  V Validate version
+
+=head2 Example
+
+=head2 Explaination
+
+=head2 Syntax
+
+See languages/m4/tools/frozen2yaml.pl
+
+=head2 frozen2yaml
+
+Parses a frozen file and returns it's data as YAML.
+ perl frozen2yaml.pl ../examples/only_builtin.frozen   
+
+=head1 Using Parrot m4 with Introspector
+
+TODO: Install Introspector.
+
+=head1 SEE ALSO
+
+=head2 AUTHORS
+
+=cut

@@ -1,0 +1,29 @@
+=head1 TITLE
+
+Using Parrot m4
+
+=head1 What is Parrot m4?
+
+C<Parrot m4> is C<GNU m4> ported to C<Parrot>. It is implemented in the
+Parrot Intermediate Language (C<PIR>).
+GNU m4, and thus Parrot m4, is a macro processor.
+
+=head2 Installing Parrot m4
+
+Unpack the archive.
+
+=head1 Running the test suite
+
+  make test
+
+=head1 Running your own code
+
+=head2 Command line arguments
+
+=head2 A simple example
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+=cut

@@ -373,7 +373,7 @@ MAKE_C = ${make_c}
 
 all : flags_dummy $(TEST_PROG) docs
 
-# This should be a listing of all targets, that art meant to be called users
+# This is a listing of all targets, that are meant to be called by users
 help:
 	@echo ""
 	@echo "Following targets are available for the user:"

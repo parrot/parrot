@@ -1,0 +1,383 @@
+=head1 NAME
+
+m4.imc - An implementation of GNU m4 in PIR
+
+=head1 DESCRIPTION
+
+Copyright:  2004 Bernhard Schmalhofer.  All Rights Reserved.
+CVS Info:   $Id$
+Overview:   Main of Parrot m4.
+History:    Ported from GNU m4 1.4
+References: http://www.gnu.org/software/m4/m4.html
+
+=head1 SUBROUTINES
+
+=head2 _main
+
+Looks at the command line arguments and acts accordingly.
+
+=cut
+.sub _main prototyped
+  .param PerlArray argv
+
+  # name of the program
+  .sym string program_name
+  shift program_name, argv
+
+  # Specification of known command line arguments.
+  # The args are parsed with Getopt_Long.imc which should work 
+  # somewhat like the Perl5 module Getopt::Long.
+  .sym pmc opt_spec      
+  opt_spec = new PerlArray
+  # --version, boolean
+  push opt_spec, "version"
+  # --help, boolean
+  push opt_spec, "help"
+  # -G or --traditional, boolean
+  push opt_spec, "traditional"
+  # -E or --fatal-warnings, boolean
+  push opt_spec, "fatal-warnings"
+  # -d or --debug, string
+  push opt_spec, "debug=s"
+  # -l or --arglength, number
+  push opt_spec, "arglength=i"
+  # -o or --error-output, string
+  push opt_spec, "error-output=s"
+  # -I or --include, string
+  push opt_spec, "include=s"
+  # -e or --interactive, boolean
+  push opt_spec, "interactive"
+  # -s or --synclines, boolean
+  push opt_spec, "synclines"
+  # -P or --prefix-builtins, boolean
+  push opt_spec, "prefix-builtins"
+  # -W or --word-regexp, string
+  push opt_spec, "word-regexp=s"
+  # -H or --hash-size, integer
+  push opt_spec, "hash-size=i"
+  # -L or --nesting-limit, integer
+  push opt_spec, "nesting-limit=i"
+  # -Q or --quiet or --silent, boolean
+  push opt_spec, "quiet"
+  push opt_spec, "silent"
+  # -N or --diversions, integer
+  push opt_spec, "diversions=i"
+  # -D or --define, string
+  push opt_spec, "define=s"
+  # -U or --undefine, string
+  push opt_spec, "undefine=s"
+  # -t or --trace, string
+  push opt_spec, "trace=s"
+  # --freeze-state=m4.frozen, string
+  push opt_spec, "freeze-state=s"
+  # --reload-state=m4.frozen, string
+  push opt_spec, "reload-state=s"
+
+  # Make a copy of argv, because this can easier be handled in get_options
+  # TODO: eliminate need for copy
+  .sym pmc cloned_argv
+  cloned_argv = clone argv
+
+  # Now call get_options
+  .sym Sub get_options
+  get_options = newsub _get_options
+  .sym pmc opt
+  .pcc_begin prototyped
+    .arg cloned_argv
+    .arg opt_spec
+  .pcc_call get_options
+    ret_get_options_1:
+    .result opt
+  .pcc_end
+
+  # Now dow what the options want
+  .sym int is_defined
+
+  # Was '--version' passed ?
+  is_defined = defined opt["version"]
+  unless is_defined goto NO_VERSION_FLAG
+    print "Parrot m4 snapshot 2004-01-05\n"
+    end
+  NO_VERSION_FLAG: 
+
+  # Was '--help' passed ?
+  is_defined = defined opt["help"]
+  unless is_defined goto NO_HELP_FLAG
+    .sym Sub usage
+    usage = newsub _usage
+    .pcc_begin prototyped
+      .arg program_name
+    .pcc_call usage
+      ret_call_usage_1:
+    .pcc_end
+    end
+  NO_HELP_FLAG: 
+
+  # Was a yet unimplemented option passed?
+  .sym string unimplemented_option
+
+  unimplemented_option = "traditional"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "fatal-warnings"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "debug"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "arglength"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "error-output"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "include"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "interactive"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "synclines"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "prefix-builtins"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "word-regexp"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "hash-size"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "nesting-limit"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "quiet"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "silent"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "diversions"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "define"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "undefine"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  unimplemented_option = "trace"
+  is_defined = defined opt[unimplemented_option]
+  if is_defined goto UNIMPLEMENTED_OPTION
+
+  goto NO_UNIMPLEMENTED_OPTION
+  UNIMPLEMENTED_OPTION:
+    print "Sorry, the option '--"
+    print unimplemented_option
+    print "' is not implemented yet.\n"
+    end
+  NO_UNIMPLEMENTED_OPTION:
+
+  # TODO: In near future we propably should use objects here
+  # For now let's just just use a hash with all state information
+  .sym pmc state
+  state = new PerlHash
+  # init of input structures, creates state['file_stack']
+  .sym Sub input_init
+  input_init = newsub _input_init
+  .pcc_begin prototyped
+    .arg state
+  .pcc_call input_init
+    ret_input_init_1:
+  .pcc_end
+
+  # TODO: init of output structures
+
+  # First we set up a table of all symbols, that is macros 
+  .sym pmc symtab
+  symtab = new OrderedHash
+  state['symtab'] = symtab    
+
+  # TODO: read M4PATH with env.pmc 
+  # TODO: setup searchpath for m4-files
+  # TODO: handling of debuglevel
+  # TODO: enable suppression of warnings
+  # TODO: disabling of gnu_extension
+  # TODO: handling of sync lines
+  # TODO: prefix all builtins
+  # TODO: enable changing definition of what words are
+  # TODO: enable changing of quote characters
+  # TODO: enable changing of comment delimiters 
+  # TODO: error handling
+
+  # TODO: handle reading from STDIN, multiple input files
+  # check argc, we need at least one input file
+  .sym int argc
+  argc = cloned_argv
+  if argc >= 1 goto ARGC_IS_OK
+    .sym Sub usage
+    usage = newsub _usage
+    .pcc_begin prototyped
+      .arg program_name
+    .pcc_call usage
+      ret_call_usage_2:
+    .pcc_end
+    end
+  ARGC_IS_OK:
+
+  # Check wether the option --reload-state was passed
+  .sym string frozen_file
+  frozen_file = opt['reload-state']
+  .sym int string_len
+  length string_len, frozen_file
+  unless string_len > 0 goto BUILTIN_MACROS_INIT
+    .sym Sub reload_frozen_state
+    reload_frozen_state = newsub _reload_frozen_state
+    .pcc_begin prototyped
+      .arg state
+      .arg frozen_file
+    .pcc_call reload_frozen_state
+      ret_reload_frozen_state_1:
+    .pcc_end
+    goto COMMANDLINE_MACROS_INIT
+  BUILTIN_MACROS_INIT:
+  .sym Sub builtin_init
+  builtin_init = newsub _builtin_init
+  .pcc_begin prototyped
+    .arg state
+  .pcc_call builtin_init
+    ret_builtin_init_1:
+  .pcc_end
+
+  COMMANDLINE_MACROS_INIT:
+  # TODO: initialize list of macros from command line
+
+  INTERACTIVE_MODE_INIT:
+  # TODO: setup buffering for interactive mode
+
+  PATH_SEARCH:
+  # TODO: enable reading from STDIN
+  # TODO: look for files in M4PATH
+  # Name of the input file, usually with extension '.m4'
+  .sym string filename
+  .sym Sub push_file
+  push_file = newsub _push_file
+  REDO_FILENAME_LOOP:
+  argc = cloned_argv
+  unless argc > 0 goto LAST_FILENAME_LOOP
+    shift filename, cloned_argv
+    .pcc_begin prototyped
+      .arg filename
+      .arg state
+    .pcc_call push_file
+      ret_push_file_1:
+    .pcc_end
+    goto REDO_FILENAME_LOOP
+  LAST_FILENAME_LOOP:
+
+  # now we start to do some work
+  .sym Sub expand_input
+  expand_input = newsub _expand_input
+  .pcc_begin prototyped
+    .arg state
+  .pcc_call expand_input
+    ret_expand_input_1:
+  .pcc_end
+
+HANDLE_WRAPUP_TEXT:
+  # TODO: handle wrapup text, whatever that is
+
+CHECK_FROZEN_FLAG:
+  .sym string freeze_file
+  freeze_file = opt["freeze-state"]
+  length string_len, freeze_file
+  unless string_len > 0 goto MAKE_DIVERSION
+    .sym Sub produce_frozen_state
+    produce_frozen_state = newsub _produce_frozen_state
+    .pcc_begin prototyped
+      .arg state
+      .arg freeze_file
+    .pcc_call produce_frozen_state
+      ret_produce_frozen_state_1:
+    .pcc_end
+    goto FINISH_PROGRAM
+  MAKE_DIVERSION:
+  # TODO: make_diversion, undiver_all, whatever that does 
+
+  FINISH_PROGRAM:
+  end
+.end
+
+
+=head2 void _usage( string program_name )
+
+Prints an usage message.
+Pass the program name as the first parameter.
+There are no return values.
+
+TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
+
+=cut
+.sub _usage prototyped             
+  .param string program_name
+
+  print "Usage: ../../parrot "
+  print program_name
+  print " [OPTION]... FILE\n"
+  print "\n"
+  print "Currently only long options are available.\n"
+  print "\n"
+  print "Operation modes:\n"
+  print "      --help                   display this help and exit\n"
+  print "      --version                output version information and exit\n"
+  print "\n"
+  print "Frozen state files:\n"
+  print "      --freeze-state=FILE      dump a frozen state to FILE at end\n"
+  print "      --reload-state=FILE      reload a frozen state from FILE at start\n"
+  print "\n"
+  .pcc_begin_return
+    # void
+  .pcc_end_return
+.end
+
+
+# The needed subroutines are imported from files in 'src'
+# TODO: private namespaces for local subroutines in the included files
+#
+# The names of these source files should be consistent with 'GNU m4'.
+
+# subs for reading in input
+.include "src/input.imc"
+
+# subs for writing output
+.include "src/output.imc"
+
+# This contains the initialization and execution of the builtin macros.
+.include "src/builtin.imc"
+
+# A dummy implementation of Getopt::Long
+.include "Getopt_Long.imc"
+
+# This contains reading and writing of frozen files
+.include "src/freeze.imc"
+
+# Macros are expanded in there.
+.include "src/macro.imc"

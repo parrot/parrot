@@ -1,0 +1,31 @@
+=head1 NAME 
+
+output.imc - handle output for Parrot m4
+
+=head1 DESCRIPTION
+
+Copyright:  2004 Bernhard Schmalhofer. All Rights Reserved.
+CVS Info:   $Id$
+Overview:   output
+History:    Ported from GNU m4 1.4
+References: http://www.gnu.org/software/m4/m4.html
+
+=head1 SUBROUTINES
+
+=head2 void _shipout_text( PerlHash state )
+
+Does only a simple print rightnow.
+
+TODO: Support for sync lines.
+
+=cut
+.sub _shipout_text prototyped             
+  .param PerlHash state 
+  .param string   text 
+
+  print text
+
+  .pcc_begin_return
+    # Nothing to be returned
+  .pcc_end_return
+.end

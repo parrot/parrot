@@ -1,0 +1,15 @@
+=head1 TITLE
+
+State of implementation
+
+=head1 What works?
+
+=head1 What doesn't works?
+
+=head1 What are the differences to GNU m4?
+
+=head1 SEE ALSO
+
+=head2 AUTHORS
+
+=cut

@@ -1,0 +1,30 @@
+This is a Parrot m4, a Parrot port of GNU m4.
+Parrot m4 is written in the Parrot Intermediate Language PIR.
+For now it doesn't do much, but it is supposed to become 
+a drop in replacement for GNU m4.
+
+The purpose of the port is firstly educational, 
+and secondly a test case for more involved languages.
+Actually I found that m4 is already pretty involved
+
+LICENSE:
+
+This stuff is all GPL. See LICENSE.
+
+AUTHOR:
+
+Bernhard Schmalhofer <Bernhard.Schmalhofer!no_spam!gmx.de>
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
