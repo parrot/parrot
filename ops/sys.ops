@@ -132,7 +132,7 @@ Day of month (1-31)
 
 =item 4, .TM_MON
 
-Month of year (0-11)
+Month of year (1-12) (Note, B<actual> month, not month - 1)
 
 =item 5, .TM_YEAR
 
