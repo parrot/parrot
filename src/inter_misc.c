@@ -218,6 +218,9 @@ interpinfo(Interp *interpreter, INTVAL what)
         case IMPATIENT_PMCS:
             ret = arena_base->num_early_DOD_PMCs;
             break;
+        case EXTENDED_PMCS:
+            ret = arena_base->num_extended_PMCs;
+            break;
     }
     return ret;
 }

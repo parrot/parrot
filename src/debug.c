@@ -2746,10 +2746,14 @@ PDB_info(Interp *interpreter)
             interpinfo(interpreter, TOTAL_COPIED));
     PIO_eprintf(interpreter, "Active PMCs = %d\n",
             interpinfo(interpreter, ACTIVE_PMCS));
-    PIO_eprintf(interpreter, "Active buffers = %d\n",
-            interpinfo(interpreter, ACTIVE_BUFFERS));
+    PIO_eprintf(interpreter, "Extended PMCs = %d\n",
+            interpinfo(interpreter, EXTENDED_PMCS));
+    PIO_eprintf(interpreter, "Timely DOD PMCs = %d\n",
+            interpinfo(interpreter, IMPATIENT_PMCS));
     PIO_eprintf(interpreter, "Total PMCs = %d\n",
             interpinfo(interpreter, TOTAL_PMCS));
+    PIO_eprintf(interpreter, "Active buffers = %d\n",
+            interpinfo(interpreter, ACTIVE_BUFFERS));
     PIO_eprintf(interpreter, "Total buffers = %d\n",
             interpinfo(interpreter, TOTAL_BUFFERS));
     PIO_eprintf(interpreter, "Header allocations since last collect = %d\n",

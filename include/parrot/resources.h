@@ -118,6 +118,7 @@ struct Stash {
 #define TOTAL_COPIED 10
 #define IMPATIENT_PMCS 11
 #define LAZY_DOD_RUNS 12
+#define EXTENDED_PMCS 13
 
 /* &end_gen */
 
