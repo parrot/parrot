@@ -314,37 +314,37 @@ ret_pmc(Parrot_Interp interpreter, PMC* pmc, char *p, int type, INTVAL idx)
             ptr = VTABLE_get_pmc_keyed_int(interpreter, init, idx*3);
             if (ptr->pmc_ext && PMC_metadata(ptr)) {
                 PMC *sig = VTABLE_getprop(interpreter, ptr,
-                    string_from_cstring(interpreter, "_signature", 0));
+                        string_from_cstring(interpreter, "_signature", 0));
                 if (VTABLE_defined(interpreter, sig)) {
                     STRING *sig_str = VTABLE_get_string(interpreter, sig);
                     ret = pmc_new(interpreter, enum_class_NCI);
-                    VTABLE_set_string_keyed(interpreter, ret,
-                        *(PMC**)p, sig_str);
+                    VTABLE_set_pointer_keyed_str(interpreter, ret, sig_str,
+                            *(PMC**)p);
                 }
             }
             return ret;
-		case enum_type_struct_ptr:
+        case enum_type_struct_ptr:
 
-			/* check the metadata for an initializer */
-			init = PMC_pmc_val( pmc ); 
-           ptr  = VTABLE_get_pmc_keyed_int( interpreter, init, idx * 3 );
+            /* check the metadata for an initializer */
+            init = PMC_pmc_val(pmc);
+            ptr  = VTABLE_get_pmc_keyed_int(interpreter, init, idx * 3);
 
-			/* grab the struct from the metadata */
-           if (ptr->pmc_ext && PMC_metadata( ptr ))
-			{
-                ret = VTABLE_getprop( interpreter, ptr,
-                    string_from_cstring(interpreter, "_struct", 0 ));
-			}
-			else
-			{
-            	internal_exception( 1,
-					"no initializer available for nested struct\n" );
-			}
+            /* grab the struct from the metadata */
+            if (ptr->pmc_ext && PMC_metadata(ptr))
+            {
+                ret = VTABLE_getprop(interpreter, ptr,
+                        const_string(interpreter, "_struct"));
+            }
+            else
+            {
+                internal_exception(1,
+                        "no initializer available for nested struct\n");
+            }
 
-			/* assign the pointer */
-			PMC_data( ret ) = *(void**)p;
+            /* assign the pointer */
+            PMC_data(ret) = *(void**)p;
 
-			return ret;
+            return ret;
         default:
             internal_exception(1, "returning unhandled pmc type in struct");
     }

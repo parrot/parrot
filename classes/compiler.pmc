@@ -56,7 +56,7 @@ C<Eval> PMC with a new PackFile attached.
         /* return value PMC is in P5 */
         code_seg = REG_PMC(5);
         REG_PMC(5) = p5;
-    
+
         eval_pf = (struct PackFile *) PMC_data(code_seg);
         /* morph the Byte_cointer *pointer in code_seg to an invokable sub */
         code_seg->vtable = Parrot_base_vtables[enum_class_Eval];

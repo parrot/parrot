@@ -43,18 +43,18 @@ Initializes the NCI with a C<NULL> function pointer.
 
 /*
 
-=item C<void set_string_keyed(PMC *func, STRING *value)>
+=item C<void set_pointer_keyed_str(STRING *key, void *func)>
 
-Sets the specified function pointer and signature (C<*value>).
+Sets the specified function pointer and signature (C<*key>).
 
 =cut
 
 */
 
-    void set_string_keyed (PMC* func, STRING* value) {
-        /* key = func_ptr, value = signature */
-        PMC_struct_val(SELF) = (DPOINTER *)func;
-        PMC_data(SELF) = build_call_func(INTERP, SELF, value);
+    void set_pointer_keyed_str(STRING *key, void *func) {
+        /* key = signature */
+        PMC_struct_val(SELF) = func;
+        PMC_data(SELF) = build_call_func(INTERP, SELF, key);
     }
 
 /*
@@ -122,7 +122,7 @@ Calls the associated C function, returning C<*next>.
         func(INTERP, SELF);
         return next;
     }
-    
+
 /*
 
 =item C<INTVAL get_integer()>

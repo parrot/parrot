@@ -66,9 +66,10 @@ enter_nci_method(Parrot_Interp interpreter, int type,
     method_table = table[type];
 
     method = pmc_new(interpreter, enum_class_NCI);
-    VTABLE_set_string_keyed(interpreter, method, func,
+    VTABLE_set_pointer_keyed_str(interpreter, method,
             string_make(interpreter, proto, strlen(proto),
-                "iso-8859-1", PObj_constant_FLAG|PObj_external_FLAG));
+                "iso-8859-1", PObj_constant_FLAG|PObj_external_FLAG),
+            func);
     VTABLE_set_pmc_keyed_str(interpreter, method_table,
             string_make(interpreter, name,
                 strlen(name), "iso-8859-1",
@@ -103,8 +104,8 @@ Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
     nci = pmc_new(interpreter, enum_class_Compiler);
     VTABLE_set_pmc_keyed_str(interpreter, hash, type, nci);
     /* build native call interface fir the C sub in "func" */
-    VTABLE_set_string_keyed(interpreter, nci, func,
-            string_from_cstring(interpreter, "pIt", 0));
+    VTABLE_set_pointer_keyed_str(interpreter, nci,
+            const_string(interpreter, "pIt"), func);
 }
 
 

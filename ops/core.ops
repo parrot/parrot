@@ -1120,7 +1120,7 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
   }
   else {
       $1 = nci = pmc_new(interpreter, enum_class_NCI);
-      nci->vtable->set_string_keyed(interpreter, nci, (PMC*)F2DPTR(p), $4);
+      nci->vtable->set_pointer_keyed_str(interpreter, nci, $4, F2DPTR(p));
   }
   string_cstring_free(name);
   goto NEXT();
