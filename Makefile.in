@@ -103,7 +103,6 @@ clean:
 	$(RM_F) $(INC)/vtable.h
 	$(RM_F) $(INC)/oplib/core_ops.h
 	$(RM_F) $(TEST_PROG) $(PDISASM) $(PDUMP)
-	cd t; make clean
 	cd docs; make clean
 
 test:	.test_dummy
