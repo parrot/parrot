@@ -432,7 +432,7 @@ HASH *
 hash_clone(struct Parrot_Interp * interp, HASH * hash) {
     HASH * ret = new_hash(interp);
     HASHBUCKET ** table = (HASHBUCKET **)hash->buffer.bufstart;
-    int i;
+    UINTVAL i;
     for (i = 0; i < hash->num_buckets; i++) {
         HASHBUCKET * b = table[i];
         while (b) {
