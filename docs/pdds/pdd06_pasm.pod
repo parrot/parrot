@@ -261,19 +261,19 @@ Create a new PMC of class y stored in PMC register x.
 
 =item set tx, ty
 
-Copy the value of ty into tx, making appropriate conversions.
+Copies y into x. Note that strings and PMCs are referred to by
+pointer, so if you do something like:
 
-The following cases provide exceptions to this rule:
+   set S0, S1
 
-=item set Px, Py
-
-Copies the pmc pointer in Py into Px, both registers now refer to
-the B<same> pmc.  Use L<clone> to copy pmc contents.
+this will copy the pointer in S1 into S0, leaving B<both> registers
+pointing at the same string.
 
 =item clone Px, Py
+=item clone Sx, xy
 
-Performs a "deeper" copy of Py into Px, using the vtable appropriate
-to the class of Py.
+Performs a "deeper" copy of y into x, using the vtable appropriate
+to the class of Py if cloning a PMC.
 
 =item tostring Sx, ty, Iz
 

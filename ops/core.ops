@@ -444,6 +444,19 @@ These operations load registers from constants or other registers.
 
 =cut
 
+########################################
+
+=item B<clone>(out STR, in STR)
+
+Make a clone of $2, and put it in $1. Doesn't affect what was in
+$1. Removes the constant flag on the copy, if there was one.
+
+inline op clone(out STR, in STR) {
+  $1 = string_copy(interpreter, $2);
+  /* Remove the constant flag, just in case */
+  $1->flags = $1->flags & ~BUFFER_constant_FLAG;
+}
+
 
 ########################################
 
