@@ -183,7 +183,7 @@ my $index = 0;
 my ($prev_source, $prev_func_name, $prev_def);
 
 foreach my $op ($ops->ops) {
-    my $func_name  = $op->func_name;
+    my $func_name  = $op->func_name($trans);
     my $arg_types  = "$opsarraytype *, struct Parrot_Interp *";
     my $prototype  = "$opsarraytype * $func_name ($arg_types)";
     my $args       = "$opsarraytype *cur_opcode, struct Parrot_Interp * interpreter";
@@ -192,10 +192,10 @@ foreach my $op ($ops->ops) {
     $prev_def = '';
     if ($suffix =~ /cg/) {
 	$prev_def = $definition = "PC_$index:";
-	$comment =  "/* ". $op->func_name ." */";
+	$comment =  "/* ". $op->func_name($trans) ." */";
 	push @cg_jump_table, "        &&PC_$index,\n";
     } elsif ($suffix =~ /switch/) {
-	$comment =  "/* ". $op->func_name ." */";
+	$comment =  "/* ". $op->func_name($trans) ." */";
 	push @op_funcs, <<END_C;
 	case $index:	$comment
 END_C
@@ -377,7 +377,7 @@ END_C
 	my $name       = $op->name;
 	$names{$name} = 1;
 	my $full_name  = $op->full_name;
-	my $func_name  = $op->func_name;
+	my $func_name  = $op->func_name($trans);
 	my $body       = $op->body;
 	my $jump       = $op->jump || 0;
 	my $arg_count  = $op->size;
@@ -528,6 +528,7 @@ print SOURCE <<END_C;
 
 static op_lib_t op_lib = {
   "$base",		/* name */
+  "$suffix",		/* suffix */
   $core_type,	        /* core_type = PARROT_XX_CORE */
   0,			/* flags */
   $major_version,	/* major_version */

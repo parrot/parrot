@@ -91,9 +91,9 @@ sub full_name
 
 sub func_name
 {
-  my $self = shift;
+  my ($self, $trans) = @_;
 
-  return "Parrot_" . $self->full_name;
+  return $trans->prefix . $self->full_name;
 }
 
 

@@ -11,6 +11,8 @@ use Parrot::OpLib::core;
 use Parrot::Op;
 use Parrot::OpTrans::C;
 
+my $trans = Parrot::OpTrans::C->new;
+
 my %type_to_arg = (
     INT_CONST => 'ic',
     NUM_CONST => 'nc',
@@ -22,7 +24,7 @@ my %type_to_arg = (
 );
 
 my $core_numops = scalar(@$Parrot::OpLib::core::ops);
-my @core_opfunc = map { $_->func_name } @$Parrot::OpLib::core::ops;
+my @core_opfunc = map { $_->func_name($trans) } @$Parrot::OpLib::core::ops;
 my %opcodes;
 
 for(@$Parrot::OpLib::core::ops) {

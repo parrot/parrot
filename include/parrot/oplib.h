@@ -23,6 +23,7 @@
 
 typedef struct {
     const char *name;
+    const char *suffix;
     int      core_type;
     int      flags;
     int      major_version;

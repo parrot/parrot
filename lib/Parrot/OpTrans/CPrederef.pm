@@ -18,6 +18,7 @@ sub core_type {
     return 'PARROT_PREDEREF_CORE';
 }
 
+sub prefix { return 'Parrot_pred_'; }
 
 #
 # defines()
