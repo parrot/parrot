@@ -192,11 +192,6 @@ For PMCs:
 The PMC has some sort of active destructor, and will have that
 destructor called when the PMC is destroyed.
 
-=item PMC_is_container_FLAG
-
-This flag should be set if the PMC is a container of some sort--array,
-hash, or list.
-
 =item PMC_is_buffer_ptr_FLAG
 
 Set if the data pointer points to a Buffer struct, or something like

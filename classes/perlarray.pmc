@@ -58,13 +58,27 @@ static INTVAL atom2int(Interp *interpreter, KEY_ATOM* atom) {
 pmclass PerlArray {
 
     void init () {
-        SELF->flags |= PMC_is_container_FLAG;
+        SELF->flags |= PMC_custom_mark_FLAG;
         SELF->data = NULL;
         SELF->cache.int_val = 0;
         resize_array(INTERP, SELF, 0);
     }
 
     void morph (INTVAL type) {
+    }
+
+    PMC* mark (PMC* end_of_used_list) {
+	INTVAL i;
+	PMC ** array;
+	PMC * element;
+
+	fprintf(stderr, "Marking perlarray %p\n", SELF);
+	array = ((Buffer *) SELF->data)->bufstart;
+	for (i = 0; i < SELF->cache.int_val; i++) {
+	    if (array[i] != NULL)
+		end_of_used_list = mark_used(array[i], end_of_used_list);
+	}
+	return end_of_used_list;
     }
 
     void destroy () {

@@ -90,9 +90,6 @@ typedef enum {
 
     /* Set if the PMC has a destroy method that must be called */
     PMC_active_destroy_FLAG = 1 << 8,
-    /* Set if the PMC can hold multiple PMCs. (Hash, array, list,
-     * whatever) */
-    PMC_is_container_FLAG = 1 << 9,
     /* Set to true if the PMC data pointer points to something that
      * looks like a string or buffer pointer */
     PMC_is_buffer_ptr_FLAG = 1 << 10,
