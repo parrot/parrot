@@ -1,6 +1,6 @@
 "Cola" - A compiler for the Parrot/Perl6 VM
 
-  V0.0.11.1
+  V0.1.2
 
   I've started this compiler (I call it Cola) to simultaneously
   teach myself how to write a compiler (ok I admit I squeaked
@@ -12,32 +12,25 @@
   a language similar to C/C++/C#/Java.
 
   The Cola parser is LALR, developed with flex/bison. It targets
-  an intermediate language (PIR?) which can be found in
-  parrot/languages/imcc or alongside Cola on CPAN.
+  an intermediate language (PIR) which can be found in
+  parrot/imcc or alongside Cola on CPAN.
   IMCC does the register allocation/spill control, optimization
   and various other dirty things, before generating machine
   instructions. Currently the only target is Parrot.
 
 Where to Get the Latest Compiler
 
-  Cola is included in the Parrot distribution,
-  see http://www.parrotcode.org or http://dev.perl.org/perl6
-  At some point the distributions may diverge for some reason
-  so you can grab the latest tarball from CPAN.
-
+    This was a quick 2-week project in 2002 to show how to compile
+    to Parrot. Sometime in 2005 I plan to release a full implementation
+    of Cola to CPAN and will update the README accordingly.
     http://cpan.org/authors/id/M/ME/MELVIN
 
 The Syntax
 
-  Compatible (eventually, maybe) C# syntax.
+  Who knows? C# and Perl mix.
 
   The easiest way to see what it currently looks like is
   to read the examples.
-
-  I aim to eventually achieve C# source level compliance, targetted
-  to the Parrot runtime. Whether or not we do on the fly bytecode
-  interfacing with .NET later is a whole different rhinoceros.
-
 
 Supported Constructs
 
@@ -157,25 +150,22 @@ Using the Compiler
   You will need Flex and Bison installed to build the compiler.
   These are the GNU versions of the classic lex and yacc, but
   are more modern. The grammars should work with standard lex/yacc
-  but I've not tested this lately.
+  but I've not tested this lately. parser.c is provided pre-generated
+  so you do not actually need lex/yacc.
 
-  If for some odd reason you have Perl and Parrot but no Flex/Bison
-  send me an email <melvin.smith@mindspring.com> and I might take pity
-  on you and send you the generated parser C files.
+  Build Cola from the languages directory above this by typing:
 
-  Build colac by typing:
-
-	make
+	make languages
 
   Usage:
 
-	colac examples/mandelbrot.cola
+	colacc examples/mandelbrot.cola
 
-  NOTE: colac will expect you to have core.imc in the current directory
+  NOTE: colacc will expect you to have core.imc in the current directory
   when you execute it as it autoincludes it in generated code.
 
-  This will call imcc to generate 2 types of output. a.pasm and a.pbc
-  You can run the .pbc (bytecode) immediately with Parrot:
+  This will call Parrot (and imcc) to generate 2 types of output. a.pasm
+  and a.pbc. You can run the .pbc (bytecode) immediately with Parrot:
 
         parrot a.pbc
 
@@ -201,10 +191,10 @@ Using the Compiler
 Intermediate Code
 
 
-  Please see the README in the parrot/languages/imcc directory.
+  Please see the README in the parrot/imcc directory.
 
   For a nice sample of intermediate code, compile mandelbrot.cola or
-  calc.cola which actually does a limited form of parsing with Parrot!
+  calc.cola which actually does a limited form of parsing with Parrot.
 
 
 Register Allocation
@@ -213,7 +203,7 @@ Register Allocation
   named locals/globals and symbolic temporary registers. IMCC
   handles the allocation and spilling.
 
-  See imcc/README
+  See parrot/imcc/README
 
 Optimization
 
