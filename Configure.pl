@@ -303,7 +303,7 @@ if ($^O ne 'VMS' && $^O !~ /MSWin/i) {
   my $unwanted = join("|",qw(c gdbm dbm ndbm db));
   $c{libs} = (join " ",
 	      map { "$_" }
-	      grep {!/-l(?:$unwanted)/}
+	      grep {!/^-l(?:$unwanted)$/}
 	      split /\s/, $c{libs});
 }
 
