@@ -467,7 +467,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      * Map the header on top of the buffer later when we are sure
      * we have alignment done right.
      */
-    cursor = packed + PACKFILE_HEADER_BYTES/sizeof(opcode_t);
+    cursor = (opcode_t*)((char*)packed + PACKFILE_HEADER_BYTES);
     memcpy(header, packed, PACKFILE_HEADER_BYTES);
 
     if(header->wordsize != 4 && header->wordsize != 8) {
