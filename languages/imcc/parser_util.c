@@ -136,14 +136,17 @@ static void *imcc_compile(Parrot_Interp interp, const char *s)
     /* imcc always compiles to interp->code->byte_code
      * save old cs, make new
      */
-    struct PackFile_ByteCode * eval_cs = Parrot_new_eval_cs(interp);
-    struct PackFile_ByteCode *old_cs;
+    struct PackFile *pf_save = interp->code;
+    struct PackFile *pf = PackFile_new(0);
+    char *source = sourcefile;
+    char name[64];
 #ifdef EVAL_TEST
     opcode_t *pc;
 #endif
 
-    old_cs = Parrot_switch_to_cs(interp, eval_cs);
-    sourcefile = eval_cs->base.name;
+    interp->code = pf;  /* put new packfile in place */
+    sprintf(name, "EVAL_" INTVAL_FMT, ++pf_save->eval_nr);
+    sourcefile = name;
     /* spit out the sourcefile */
     if (Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) {
         FILE *fp = fopen(sourcefile, "w");
@@ -168,22 +171,36 @@ static void *imcc_compile(Parrot_Interp interp, const char *s)
     }
 #endif
     /* restore old byte_code, */
-    (void)Parrot_switch_to_cs(interp, old_cs);
-    return eval_cs;
+    (void)Parrot_switch_to_cs(interp, pf_save->cur_cs);
+    sourcefile = source;
+    /* append new packfile to current directory */
+    PackFile_add_segment(&interp->code->directory,
+            &pf->directory.base);
+    return pf;
 }
 
 static void *imcc_compile_pasm(Parrot_Interp interp, const char *s)
 {
+    int pasm = pasm_file;
+    void *pf;
+
     pasm_file = 1;
     expect_pasm = 0;
-    return imcc_compile(interp, s);
+    pf = imcc_compile(interp, s);
+    pasm_file = pasm;
+    return pf;
 }
 
 static void *imcc_compile_pir (Parrot_Interp interp, const char *s)
 {
+    int pasm = pasm_file;
+    void *pf;
+
     pasm_file = 0;
     expect_pasm = 0;
-    return imcc_compile(interp, s);
+    pf = imcc_compile(interp, s);
+    pasm_file = pasm;
+    return pf;
 }
 
 /* tell the parrot core, which compilers we provide */

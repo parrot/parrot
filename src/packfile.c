@@ -1515,18 +1515,6 @@ Parrot_new_debug_seg(struct Parrot_Interp *interpreter,
     return debug;
 }
 
-/* create a new code segment for eval */
-struct PackFile_ByteCode *
-Parrot_new_eval_cs(struct Parrot_Interp *interpreter)
-{
-    char name[64];
-    struct PackFile_Segment *new_cs;
-
-    sprintf(name, "EVAL_" INTVAL_FMT, ++interpreter->code->eval_nr);
-    new_cs = PackFile_Segment_new_seg(&interpreter->code->directory,
-            PF_BYTEC_SEG, name, 1);
-    return (struct PackFile_ByteCode *) new_cs;
-}
 
 /* switch to a byte code seg nr seg */
 void
@@ -1561,6 +1549,9 @@ Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
     if (!new_cs) {
         internal_exception(NO_PREV_CS, "No code segment to switch to\n");
     }
+    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))
+        PIO_eprintf(interpreter, "*** switching to %s\n",
+                new_cs->base.name);
     if (new_cs->base.pf != interpreter->code)
         interpreter->code = new_cs->base.pf;
     interpreter->code->cur_cs = new_cs;
@@ -1829,6 +1820,12 @@ PackFile_find_fixup_entry(Parrot_Interp interpreter, enum_fixup_t type,
     struct PackFile_Directory *dir = &interpreter->code->directory;
     struct PackFile_FixupEntry *ep, e;
     int found;
+
+    /*
+     * XXX when in eval, the dir is in cur_cs->prev
+     */
+    if (interpreter->code->cur_cs->prev)
+        dir = &interpreter->code->cur_cs->prev->base.pf->directory;
 
     e.type = type;
     e.name = name;

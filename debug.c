@@ -94,7 +94,7 @@ parse_int(const char* str, int* intP)
  * to just after the string. The parsed string is converted to a
  * Parrot STRING. */
 static const char*
-parse_string(struct Parrot_Interp *interpreter, 
+parse_string(struct Parrot_Interp *interpreter,
              const char* str, STRING** strP)
 {
     const char* string;
@@ -602,7 +602,7 @@ WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
         return NULL;
     }
 
-    /* We're not part of a list yet */ 
+    /* We're not part of a list yet */
     condition->next = NULL;
 
     return condition;
@@ -1299,7 +1299,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                 case KEY_string_FLAG:
                     dest[size++] = '"';
                     {
-                        char *temp = string_to_cstring(interpreter, 
+                        char *temp = string_to_cstring(interpreter,
                                                        k->cache.string_val);
                         strcpy(&dest[size], temp);
                         string_cstring_free(temp);
@@ -1400,7 +1400,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
         /* Grow it early*/
         if (pfile->size % default_size < regrow_size) {
             pfile->source = mem_sys_realloc(pfile->source,
-                                            (size_t)pfile->size 
+                                            (size_t)pfile->size
                                             + default_size);
             space += default_size;
         }
@@ -1433,7 +1433,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
             pline = pline->next;
 
         if (!(pline)) {
-            PIO_eprintf(interpreter, 
+            PIO_eprintf(interpreter,
                         "Label number %li out of bounds.\n", label->number);
             return;
         }
@@ -1678,118 +1678,52 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
 }
 
 /* PDB_eval
- * evals an instruction with fully qualified opcode name
- * and valid arguments, NO error checking.
+ * evals an instruction
  */
 void
 PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 {
     opcode_t *run;
-    char *c;
-    struct PackFile_ByteCode *eval_cs;
+    struct PackFile *eval_pf;
+    struct PackFile_ByteCode *old_cs;
 
-    c = mem_sys_allocate(strlen(command) + 1);
-    strcpy(c, command);
-    eval_cs = PDB_compile(interpreter, c);
+    eval_pf = PDB_compile(interpreter, command);
 
-    if (eval_cs) {
-        Parrot_switch_to_cs(interpreter, eval_cs);
-        run = eval_cs->base.data;
+    if (eval_pf) {
+        old_cs = Parrot_switch_to_cs(interpreter, eval_pf->cur_cs);
+        run = eval_pf->cur_cs->base.data;
         DO_OP(run,interpreter);
-        Parrot_pop_cs(interpreter);
+        Parrot_switch_to_cs(interpreter, old_cs);
+       /* TODO destroy packfile */
     }
 }
 
 /* PDB_compile
- * compiles one instruction with fully qualified opcode name
- * and valid arguments, NO error checking.
+ * compiles instructions with the PASM compiler
+ * append an "end" op
  *
  * this may be called from PDB_eval above or from the compile opcode
  * which generates a malloced string
  */
-struct PackFile_ByteCode *
-PDB_compile(struct Parrot_Interp *interpreter, char *command)
+struct PackFile *
+PDB_compile(struct Parrot_Interp *interpreter, const char *command)
 {
-    char buf[256];
-    char s[1], *c = buf;
-    char *orig = command;
-    op_info_t *op_info;
-    opcode_t *eval;
-    int op_number,i,k,l,j = 0;
-    struct PackFile_ByteCode * eval_cs = Parrot_new_eval_cs(interpreter);
-    /* Opcodes can't have more that 10 arguments, +1 for end */
-    eval = eval_cs->base.data = mem_sys_allocate(sizeof(opcode_t) * 11);
+    STRING *buf;
+    const char *end = "\nend\n";
+    PMC * compiler, *code;
+    PMC *key = key_new_cstring(interpreter, "PASM");
+    PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
+            interpreter->iglobals, IGLOBALS_COMPREG_HASH);
 
-    /* find_op needs a string with only the opcode name */
-    while (*command && !(isspace((int) *command)))
-        *(c++) = *(command++);
-    *c = '\0';
-    /* Find the opcode number */
-    op_number = interpreter->op_lib->op_code(buf, 1);
-    if (op_number < 0) {
-        PIO_eprintf(interpreter, "Invalid opcode '%s'\n", buf);
+    compiler = VTABLE_get_pmc_keyed(interpreter, compreg_hash, key);
+    if (!VTABLE_defined(interpreter, compiler)) {
+        fprintf(stderr, "Couldn't find PASM compiler");
         return NULL;
     }
-    /* Start generating the bytecode */
-    eval[j++] = (opcode_t)op_number;
-    /* Get the info for that opcode */
-    op_info = &interpreter->op_info_table[op_number];
+    buf = Parrot_sprintf_c(interpreter, "%s%s", command, end);
 
-    /* handle the arguments */
-    for (i = 1; i < op_info->arg_count; i++) {
-        command = nextarg(command);
-        switch (op_info->types[i]) {
-            /* If it's a register skip the letter that
-               precedes the register number */
-            case PARROT_ARG_I:
-            case PARROT_ARG_N:
-            case PARROT_ARG_S:
-            case PARROT_ARG_P:
-                command++;
-            case PARROT_ARG_IC:
-                eval[j++] = (opcode_t)atoi(command);
-                break;
-            case PARROT_ARG_NC:
-                k = PDB_extend_const_table(interpreter);
-
-                interpreter->code->const_table->constants[k]->type =PFC_NUMBER;
-                interpreter->code->const_table->constants[k]->u.number =
-                    (FLOATVAL)atof(command);
-                eval[j++] = (opcode_t)k;
-                break;
-            case PARROT_ARG_SC:
-                /* Separate the string */
-                *s = *command++;
-                c = buf;
-                while (*command != *s)
-                    *(c++) = *(command++);
-                *c = '\0';
-                l = PDB_unescape(buf);
-
-                k = PDB_extend_const_table(interpreter);
-
-                interpreter->code->const_table->constants[k]->type =PFC_STRING;
-                interpreter->code->const_table->constants[k]->u.string =
-                    string_make(interpreter, buf, (UINTVAL)l,
-                            NULL, PObj_constant_FLAG, NULL);
-
-                /* Add it to the bytecode */
-                eval[j++] = (opcode_t)k;
-                break;
-            case PARROT_ARG_KIC:
-                command++; /* Skip opening [ */
-                eval[j++] = (opcode_t)atoi(command);
-                break;
-            default:
-                PIO_eprintf(interpreter, "unknown operand at '%s'\n", command);
-                return NULL;
-                break;
-        }
-    }
-    eval[j++] = 0;      /* append end op */
-    eval_cs->base.size = j;
-    mem_sys_free(orig);
-    return eval_cs;
+    code = VTABLE_invoke(interpreter, compiler, buf);
+    return code->cache.struct_val;
 }
 
 /* PDB_extend_const_table
@@ -1847,7 +1781,7 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
                 PDB_print_stack_pmc(interpreter, command);
                 break;
             default:
-                PIO_eprintf(interpreter, 
+                PIO_eprintf(interpreter,
                             "Unknown argument \"%s\" to 'stack'\n", command);
                 break;
         }
@@ -2077,7 +2011,7 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
  * print the whole or a specific value of a integer register structure.
  */
 void
-PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, 
+PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg,
               int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
@@ -2104,7 +2038,7 @@ PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg,
  * print the whole or a specific value of a integer register frame structure.
  */
 void
-PDB_print_int_frame(struct Parrot_Interp *interpreter, 
+PDB_print_int_frame(struct Parrot_Interp *interpreter,
                     struct IRegFrame *int_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
@@ -2131,7 +2065,7 @@ PDB_print_int_frame(struct Parrot_Interp *interpreter,
  * print the whole or a specific value of a float register structure.
  */
 void
-PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, 
+PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg,
               int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
@@ -2158,7 +2092,7 @@ PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg,
  * print the whole or a specific value of a float register frame structure.
  */
 void
-PDB_print_num_frame(struct Parrot_Interp *interpreter, 
+PDB_print_num_frame(struct Parrot_Interp *interpreter,
                     struct NRegFrame *num_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
@@ -2212,7 +2146,7 @@ PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
  * print the whole or a specific value of a string register frame structure.
  */
 void
-PDB_print_string_frame(struct Parrot_Interp *interpreter, 
+PDB_print_string_frame(struct Parrot_Interp *interpreter,
                        struct SRegFrame *string_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
@@ -2288,7 +2222,7 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
  * print the whole or a specific value of a PMC register frame structure.
  */
 void
-PDB_print_pmc_frame(struct Parrot_Interp *interpreter, 
+PDB_print_pmc_frame(struct Parrot_Interp *interpreter,
                     struct PRegFrame *pmc_reg, int regnum, PMC* key)
 {
     int i,j = 0, k = NUM_REGISTERS/2;

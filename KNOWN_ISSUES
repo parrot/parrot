@@ -46,6 +46,9 @@ Utilities
   not capable of reading the dir_format=1 PBC format. Non native floats
   are also not implemented.
 
+- the Parrot debugger pdb: "eval" is b0rken, this needs linking
+  to libimcc (which we don't have yet ;-)
+
 Classes
 
 - To PerlClass or not to PerlClass, that is the question. The class

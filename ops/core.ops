@@ -150,22 +150,11 @@ inline op branch (in INT) {
 }
 
 
-=item B<branch_cs>(inconst INT)
-
-Intersegment branch to location in fixup table $1, $1 is an index into
-the current const_table holding the name of the label.
-
 =item B<branch_cs>(in STR)
 
 Intersegment branch to location in fixup table named $1.
 
 =cut
-
-inline op branch_cs (inconst INT) {
-  interpreter->resume_offset = $1;
-  interpreter->resume_flag = 2;
-  goto ADDRESS(0);
-}
 
 inline op branch_cs (in STR) {
     char * label = string_to_cstring(interpreter, $1);
@@ -174,10 +163,11 @@ inline op branch_cs (in STR) {
     string_cstring_free(label);
     if (!fe)
 	interpreter->resume_offset = -1;
-    else
+    else {
 	interpreter->resume_offset = fe->offset;
-    Parrot_switch_to_cs(interpreter, fe->seg);
-    interpreter->resume_flag = 1;
+        Parrot_switch_to_cs(interpreter, fe->seg);
+    }
+    interpreter->resume_flag = 2;
     goto ADDRESS(0);
 }
 

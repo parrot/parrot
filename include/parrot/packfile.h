@@ -291,7 +291,6 @@ struct PackFile_FixupEntry * PackFile_find_fixup_entry(struct Parrot_Interp *,
 ** PackFile_ByteCode Functions:
 */
 
-struct PackFile_ByteCode * Parrot_new_eval_cs(struct Parrot_Interp *);
 struct PackFile_ByteCode * Parrot_switch_to_cs(struct Parrot_Interp *,
     struct PackFile_ByteCode *);
 void Parrot_switch_to_cs_by_nr(struct Parrot_Interp *, opcode_t seg);

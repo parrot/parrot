@@ -68,7 +68,7 @@ static struct globals {
 } globals;
 
 
-static int add_const_str(struct Parrot_Interp *, char *str);
+static int add_const_str(struct Parrot_Interp *, char *str, int dup_sym);
 
 void imcc_globals_destroy(int ex, void *param);
 void imcc_globals_destroy(int ex, void *param)
@@ -297,23 +297,13 @@ static void store_key_const(char * str, int idx)
 }
 
 /* find a label in interpreters fixup table
- * return the index in the const_table of the name
  */
 static int
 find_label_cs(struct Parrot_Interp *interpreter, char *name)
 {
     struct PackFile_FixupEntry *fe =
         PackFile_find_fixup_entry(interpreter, enum_fixup_label, name);
-    int i;
-    struct PackFile *pf = interpreter->code;
-    if (!fe)
-        return -1;
-    for (i = 0; i < PF_NCONST(pf); i++) {
-        struct PackFile_Constant * c = PF_CONST(pf, i);
-        if (c->type == PFC_STRING && !strcmp(name, c->u.string->strstart))
-            return i;
-    }
-    return -1;
+    return fe != NULL;
 }
 /* store global labels and bsr for later fixup
  * return size in ops
@@ -409,32 +399,28 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             continue;
         if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
                 strcmp(ins->op, "branch_cs") && strcmp(ins->op, "newsub")) {
-            Instruction *il;
             char buf[64];
             SymReg *r[IMCC_MAX_REGS];
-            int fixup_const_nr;
+            char *glabel;
 
             debug(DEBUG_PBC_FIXUP, "inter_cs found for '%s'\n", addr->name);
             /* find symbol */
-            if ((fixup_const_nr = find_label_cs(interpreter, addr->name)) < 0)
+            if (!find_label_cs(interpreter, addr->name))
                 debug(DEBUG_PBC_FIXUP,
                         "store_labels", "inter_cs label '%s' not found\n",
                         addr->name);
-            fixup_const_nr = add_const_str(interpreter, addr->name);
-            debug(DEBUG_PBC_FIXUP, "inter_cs label '%s' const#%d\n",
-                    addr->name, fixup_const_nr);
+            glabel = addr->name;
             /* append inter_cs jump */
-            free(addr->name);
-            sprintf(buf, "#isc_%d", globals.inter_seg_n);
+            sprintf(buf, "#isc_%d", globals.inter_seg_n++);
             addr->name = str_dup(buf);
-            il = INS_LABEL(addr, 1);
+            INS_LABEL(addr, 1);
             /* this is the new location */
             store_label(addr, code_size);
             /* increase code_size by 2 ops */
             code_size += 2;
             /* add inter_segment jump */
-            sprintf(buf, "%d", fixup_const_nr);
-            r[0] = mk_const(str_dup(buf), 'I');
+            r[0] = mk_const(glabel, 'S');
+            r[0]->color = add_const_str(interpreter, glabel, 1);
             INS(interpreter, "branch_cs", "", r, 1, 0, 1);
         }
     }
@@ -554,7 +540,7 @@ static int unescape(char *string)
 
 /* add constant string to constants */
 static int
-add_const_str(struct Parrot_Interp *interpreter, char *str) {
+add_const_str(struct Parrot_Interp *interpreter, char *str, int dup_sym) {
     int k, l;
     SymReg * r;
     char *o;
@@ -576,9 +562,11 @@ add_const_str(struct Parrot_Interp *interpreter, char *str) {
         l = unescape(buf);
     }
 
-    if ( (r = _get_sym(globals.str_consts, buf)) != 0) {
-        free(o);
-        return r->color;
+    if (!dup_sym) {
+        if ( (r = _get_sym(globals.str_consts, buf)) != 0) {
+            free(o);
+            return r->color;
+        }
     }
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type =
@@ -774,7 +762,7 @@ static void add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
                 r->color = atoi(r->name);
             break;
         case 'S':
-            r->color = add_const_str(interpreter, r->name);
+            r->color = add_const_str(interpreter, r->name, 0);
             break;
         case 'N':
             r->color = add_const_num(interpreter, r->name);
@@ -886,7 +874,7 @@ e_pbc_emit(void *param, Instruction * ins)
                         npc, label->color, addr->name,addr->color);
             }
             else if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
-                    strcmp(ins->op, "branch_cs") && strcmp(ins->op, "newsub")) {
+                    strcmp(ins->op, "newsub")) {
                 /* TODO make intersegment branch */
                 fatal(1, "e_pbc_emit", "label not found for '%s'\n",
                         addr->name);

@@ -193,7 +193,7 @@ void PDB_next(struct Parrot_Interp *interpreter, const char *command);
 void PDB_trace(struct Parrot_Interp *interpreter, const char *command);
 
 void PDB_eval(struct Parrot_Interp *interpreter, const char *command);
-struct PackFile_ByteCode * PDB_compile(struct Parrot_Interp *, char *);
+struct PackFile * PDB_compile(struct Parrot_Interp *, const char *);
 
 int PDB_extend_const_table(struct Parrot_Interp *interpreter);
 
@@ -203,7 +203,7 @@ void PDB_continue(struct Parrot_Interp *interpreter, const char *command);
 
 char PDB_break(struct Parrot_Interp *interpreter);
 
-PDB_breakpoint_t* PDB_find_breakpoint(struct Parrot_Interp *interpreter, 
+PDB_breakpoint_t* PDB_find_breakpoint(struct Parrot_Interp *interpreter,
                                      const char *command);
 
 void PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
@@ -215,7 +215,7 @@ void PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
 void PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
     const char *command);
 
-void PDB_delete_condition(struct Parrot_Interp *interpreter, 
+void PDB_delete_condition(struct Parrot_Interp *interpreter,
                           PDB_breakpoint_t *breakpoint);
 
 void PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i);
