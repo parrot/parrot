@@ -108,7 +108,7 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
     case PFC_STRING:
         PIO_printf(interpreter, "    [ 'PFC_STRING', {\n");
         PIO_printf(interpreter, "        FLAGS    => 0x%04lx,\n",
-                   (long)self->string->flags);
+                   (long)PObj_get_FLAGS(self->string));
         PIO_printf(interpreter, "        ENCODING => %s,\n",
                    self->string->encoding->name);
         PIO_printf(interpreter, "        TYPE     => %s,\n",
