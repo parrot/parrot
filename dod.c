@@ -66,6 +66,14 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     struct Stash *stash;
     UINTVAL mask = PMC_is_PMC_ptr_FLAG | PMC_is_buffer_ptr_FLAG
             | PMC_custom_mark_FLAG;
+#ifdef HAS_HEADER_SETJMP
+    Parrot_jump_buff env;
+
+    /* this should put registers in env, which then get marked in
+     * trace_system_stack below
+     */
+    setjmp(env);
+#endif
 
     /* We have to start somewhere, and the global stash is a good place */
     last = current = interpreter->perl_stash->stash_hash;
