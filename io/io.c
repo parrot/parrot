@@ -64,7 +64,7 @@ alloc_pio_array(int numhandles)
 {
     ParrotIOTable newhandles;
     size_t size = numhandles * sizeof(ParrotIO *);
-    newhandles = (ParrotIOTable)mem_sys_allocate(size);
+    newhandles = (ParrotIOTable)mem_sys_allocate_zeroed(size);
     return newhandles;
 }
 
