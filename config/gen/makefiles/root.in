@@ -240,7 +240,7 @@ ${make_set_make}
 MAKE_C = ${make_c}
 
 .c$(O) :
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
+	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
 
 all : flags_dummy $(TEST_PROG) docs
 
@@ -608,8 +608,6 @@ $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c: $(IMCC_DIR)/imcc.l
 
 $(IMCC_O_FILES) : $(IMCC_H_FILES) $(ALL_H_FILES)
 
-$(IMCC_DIR)/%${o} : $(IMCC_DIR)/%.c
-	$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) -I$(IMCC_DIR) $(CFLAGS) ${cc_o_out}$@ -c $<
 
 ################ docs, test and maintainer targets
 
