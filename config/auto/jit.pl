@@ -62,6 +62,10 @@ sub runstep {
 
   if (-e "jit/$cpuarch/core.jit") {
     $jitcapable = 1;
+    if ($cpuarch =~ /sun4|sparc64/ && 
+	Configure::Data->get('intvalsize') > Configure::Data->get('ptrsize')) {
+	    $jitcapable = 0;
+	}
   }
 
   $jitcapable = $_[0] if defined $_[0];
