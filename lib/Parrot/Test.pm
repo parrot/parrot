@@ -1,5 +1,26 @@
 #
 
+package Parrot::Test::EvilSubWrapper;
+#This chamber of horrors allows us to goto a subroutine
+#  and still be able to perform actions afterwards.
+#  Inspired by something I read about on the Conway
+#  Channel.  --BD  01/07/2002
+
+sub new {
+	my($class, $action, $destruct)=@_;
+
+	bless {action => $action, destruct => $destruct}, $class;
+}
+
+sub subr {
+	$_[0]->{action}
+}
+
+sub DESTROY {
+	goto &{$_[0]->{destruct}};
+}
+
+
 package Parrot::Test;
 
 use strict;
@@ -72,9 +93,21 @@ foreach my $i ( qw(is isnt like) ) {
     close OUTPUT;
 
     @_ = ( $prog_output, $output, $desc );
-    #goto &{"Test::More::$i"};
-    my $ok = &{"Test::More::$i"}( @_ );
-    if( $ok ) { foreach my $i ( $as_f, $by_f, $out_f ) { unlink $i } }
+
+    my $func=new Parrot::Test::EvilSubWrapper(
+        \&{"Test::More::$i"},
+        sub {
+		unless($ENV{POSTMORTERM}) {
+			foreach my $i ( $as_f, $by_f, $out_f ) {
+				unlink $i;
+			}
+		}
+	}
+    );
+
+    goto &{$func->subr};
+#    my $ok = &{"Test::More::$i"}( @_ );
+#    if($ok) { foreach my $i ( $as_f, $by_f, $out_f ) { unlink $i } }
   }
 }
 
