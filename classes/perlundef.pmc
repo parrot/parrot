@@ -47,11 +47,22 @@ pmclass PerlUndef {
       return 0;
    }
 
+   INTVAL get_integer_index (INTVAL index) {
+   }
+
    FLOATVAL get_number () {
       return 0;
    }
 
+   FLOATVAL get_number_index (INTVAL index) {
+      return 0;
+   }
+
    STRING* get_string () {
+      return NULL;
+   }
+
+   STRING* get_string_index (INTVAL index) {
       return NULL;
    }
 
@@ -86,6 +97,9 @@ pmclass PerlUndef {
       /* Do nothing; Can't happen? */ 
    }
 
+   void set_integer_index (INTVAL value, INTVAL index) {
+   }
+
    void set_number (PMC * value) {
       pmc->vtable = &Parrot_base_vtables[enum_class_PerlNum];
       pmc->vtable->set_number(interpreter, pmc, value);
@@ -103,6 +117,9 @@ pmclass PerlUndef {
 
    void set_number_same (PMC * value) {
       /* Do nothing; Can't happen? */ 
+   }
+
+   void set_number_index (FLOATVAL value, INTVAL index) {
    }
 
    void set_string (PMC * value) {
@@ -127,6 +144,9 @@ pmclass PerlUndef {
 
    void set_string_same (PMC * value) {
       /* Do nothing; Can't happen? */ 
+   }
+
+   void set_string_index (STRING * value, INTVAL index) {
    }
 
    void set_value (void* value) {

@@ -1,8 +1,8 @@
-/* PerlString.pmc
+/* PerlArray.pmc
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
- *     $Id: genclass.pl,v 1.5 2001/11/16 21:57:28 simon Exp   Overview:
- *     These are the vtable functions for the PerlString base class
+ *     $Id: genclass.pl,v 1.5 2001/11/16 21:57:28 jgoff Exp   Overview:
+ *     These are the vtable functions for the PerlArray base class
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
@@ -11,7 +11,7 @@
 
 #include "parrot/parrot.h"
 
-pmclass PerlString {
+pmclass PerlArray {
 
     INTVAL type () {
         return 0;
@@ -22,12 +22,11 @@ pmclass PerlString {
     }
 
     void init () {
-	SELF->cache.struct_val = string_make(INTERP,NULL,0,NULL,0,NULL);
+	SELF->cache.struct_val = key_new(INTERP);
+	key_set_size(INTERP,SELF->cache.struct_val,1);
     }
 
     void clone (PMC* dest) { 
-	dest->vtable = SELF->vtable;
-	dest->cache.struct_val = string_copy(INTERP,SELF->cache.struct_val);
     }
 
     void morph (INTVAL type) {
@@ -42,34 +41,44 @@ pmclass PerlString {
     }
 
     void destroy () {
-	string_destroy(SELF->cache.struct_val);
+	key_destroy(INTERP,SELF->cache.struct_val);
     }
 
     INTVAL get_integer () {
-	STRING* s = (STRING*) SELF->cache.struct_val;
-	return string_to_int(interpreter, s);
+	KEY* key = SELF->cache.struct_val;
+	INTVAL size = key_size(INTERP,key);
+	return size;
     }
 
-    INTVAL get_integer_index () {
+    INTVAL get_integer_index ( INTVAL index ) {
+	KEY* key = SELF->cache.struct_val;
+	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,index);
+	return key_pair->cache.int_val;
     }
 
     FLOATVAL get_number () {
-	STRING* s = (STRING*) SELF->cache.struct_val;
-	return string_to_num(interpreter, s);
+	KEY* key = SELF->cache.struct_val;
+	INTVAL size = key_size(INTERP,key);
+	return (FLOATVAL)size;
     }
 
-    FLOATVAL get_number_index () {
+    FLOATVAL get_number_index ( INTVAL index ) {
+	KEY* key = SELF->cache.struct_val;
+	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,index);
+	return key_pair->cache.num_val;
     }
 
     STRING* get_string () {
 	return (STRING*)SELF->cache.struct_val;
     }
 
-    STRING* get_string_index () {
+    STRING* get_string_index ( INTVAL index ) {
+	KEY* key = SELF->cache.struct_val;
+	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,index);
+	return key_pair->cache.struct_val;
     }
 
     BOOLVAL get_bool () {
-fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
     }
 
     void* get_value () {
@@ -84,72 +93,94 @@ fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
     }
 
     void set_integer (PMC* value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
-	SELF->cache.int_val = value->vtable->get_integer(INTERP,value);
+	INTVAL size = value->vtable->get_integer(INTERP,value);
+	KEY* key = SELF->cache.struct_val;
+	key_set_size(INTERP,key,size);
     }
 
-    void set_integer_native (INTVAL value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
-	SELF->cache.int_val = value;
+    void set_integer_native (INTVAL size) {
+	KEY* key = SELF->cache.struct_val;
+	key_set_size(INTERP,key,size);
     }
 
     void set_integer_bigint (BIGINT value) {
     }
 
     void set_integer_same (PMC * value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
-	SELF->cache.int_val = value->vtable->get_integer(INTERP,value);
+	INTVAL size = value->cache.int_val;
+	KEY* key = SELF->cache.struct_val;
+	key_set_size(INTERP,key,size);
     }
 
     void set_integer_index (INTVAL value, INTVAL index) {
+	KEY* key = SELF->cache.struct_val;
+	KEY_PAIR key_pair;
+	if(index >= key_size(INTERP,key)) {
+	    key_set_size(INTERP,key,index);
+	}
+	key_pair.type = enum_key_int;
+	key_pair.cache.int_val = value;
+	key_set_element_value_i(INTERP,key,index,&key_pair);
     }
 
     void set_number (PMC * value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
-	SELF->cache.num_val = value->vtable->get_number(INTERP,value);
+	INTVAL size = (INTVAL)value->cache.num_val;
+	KEY* key = SELF->cache.struct_val;
+	key_set_size(INTERP,key,size);
     }
 
-    void set_number_native (FLOATVAL value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
-	SELF->cache.num_val = value;
+    void set_number_native (FLOATVAL size) {
+	KEY* key = SELF->cache.struct_val;
+	key_set_size(INTERP,key,(INTVAL)size);
     }
 
     void set_number_bigfloat (BIGFLOAT value) {
     }
 
     void set_number_same (PMC * value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
-	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
+	INTVAL size = value->cache.int_val;
+	KEY* key = SELF->cache.struct_val;
+	key_set_size(INTERP,key,size);
     }
 
     void set_number_index (FLOATVAL value, INTVAL index) {
+	KEY* key = SELF->cache.struct_val;
+	KEY_PAIR key_pair;
+	if(index >= key_size(INTERP,key)) {
+	    key_set_size(INTERP,key,index);
+	}
+	key_pair.type = enum_key_num;
+	key_pair.cache.num_val = value;
+	key_set_element_value_i(INTERP,key,index,&key_pair);
     }
 
     void set_string (PMC * value) {
-	SELF->cache.struct_val = (STRING*)value->cache.struct_val;
     }
 
     void set_string_native (STRING * value) {
-	SELF->cache.struct_val = (STRING*)value;
     }
 
     void set_string_unicode (STRING * value) {
-	SELF->cache.struct_val = (STRING*)value;
     }
 
     void set_string_other (STRING * value) {
-	SELF->cache.struct_val = (STRING*)value;
     }
 
     void set_string_same (PMC * value) {
-	SELF->cache.struct_val = (STRING*)value->cache.struct_val;
     }
 
-    void set_string_index (STRING* value, INTVAL index) {
+    void set_string_index (STRING * value, INTVAL index) {
+	KEY* key = SELF->cache.struct_val;
+	KEY_PAIR key_pair;
+	if(index >= key_size(INTERP,key)) {
+	    key_set_size(INTERP,key,index);
+	}
+	key_pair.type = enum_key_string;
+	key_pair.cache.struct_val = value;
+	key_set_element_value_i(INTERP,key,index,&key_pair);
     }
 
     void set_value (void* value) {
-	SELF->cache.struct_val = value;
     }
 
     void add (PMC * value, PMC* dest) {

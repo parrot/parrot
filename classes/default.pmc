@@ -40,10 +40,19 @@ pmclass default noinit {
    INTVAL get_integer () {
    }
 
+   INTVAL get_integer_index (INTVAL index) {
+   }
+
    FLOATVAL get_number () {
    }
 
+   FLOATVAL get_number_index (INTVAL index) {
+   }
+
    STRING* get_string () {
+   }
+
+   STRING* get_string_index (INTVAL index) {
    }
 
    BOOLVAL get_bool () {
@@ -67,6 +76,9 @@ pmclass default noinit {
    void set_integer_same (PMC * value) {
    }
 
+   void set_integer_index (INTVAL value, INTVAL index) {
+   }
+
    void set_number (PMC * value) {
    }
 
@@ -77,6 +89,9 @@ pmclass default noinit {
    }
 
    void set_number_same (PMC * value) {
+   }
+
+   void set_number_index (FLOATVAL value, INTVAL index) {
    }
 
    void set_string (PMC * value) {
@@ -92,6 +107,9 @@ pmclass default noinit {
    }
 
    void set_string_same (PMC * value) {
+   }
+
+   void set_string_index (STRING * string, INTVAL index) {
    }
 
    void set_value (void* value) {

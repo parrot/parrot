@@ -50,8 +50,14 @@ pmclass PerlInt {
         return SELF->cache.int_val;
     }
 
+    INTVAL get_integer_index (INTVAL index) {
+    }
+
     FLOATVAL get_number () {
         return (FLOATVAL)SELF->cache.int_val;
+    }
+
+    FLOATVAL get_number_index (INTVAL index) {
     }
 
     STRING* get_string () {
@@ -65,6 +71,9 @@ pmclass PerlInt {
 	s = string_make(INTERP,buff,strlen(buff),NULL,0,NULL);
 	free(buff);
 	return s;
+    }
+
+    STRING* get_string_index (INTVAL index) {
     }
 
     BOOLVAL get_bool () {
@@ -98,6 +107,9 @@ pmclass PerlInt {
         SELF->cache.int_val = value->cache.int_val;
     }
 
+    void set_integer_index (INTVAL index) {
+    }
+
     void set_number (PMC * value) {
         SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
 	SELF->cache.num_val = value->cache.num_val;
@@ -115,6 +127,9 @@ pmclass PerlInt {
     void set_number_same (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
 	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
+    }
+
+    void set_number_index (INTVAL index) {
     }
 
     void set_string (PMC * value) {
@@ -140,6 +155,9 @@ pmclass PerlInt {
     void set_string_same (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
 	SELF->cache.struct_val = value->cache.struct_val;
+    }
+
+    void set_string_index (INTVAL index) {
     }
 
     void set_value (void* value) {

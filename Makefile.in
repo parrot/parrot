@@ -12,7 +12,7 @@ $(INC)/pmc.h $(INC)/key.h $(INC)/resources.h $(INC)/platform.h \
 $(INC)/interp_guts.h
 
 CLASS_O_FILES = classes/default$(O) classes/perlint$(O) classes/perlstring$(O) \
-classes/perlnum$(O) classes/perlundef$(O)
+classes/perlnum$(O) classes/perlarray$(O) classes/perlundef$(O)
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
 core_ops$(O) core_ops_prederef$(O) memory$(O) packfile$(O) stacks$(O) string$(O) encoding$(O) \

@@ -22,6 +22,7 @@ init_world() {
     Parrot_PerlInt_class_init();
     Parrot_PerlNum_class_init();
     Parrot_PerlString_class_init();
+    Parrot_PerlArray_class_init();
 }
 
 /*

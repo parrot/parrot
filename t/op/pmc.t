@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L
@@ -763,6 +763,37 @@ CODE
 -3
 3.600000
 foo
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "array test");
+	new P0,PerlArray
+	set P0,1
+	set I0,P0
+	print I0
+	print "\n"
+
+	set P0,3,0
+	set I1,P0,0
+	print I1
+	print "\n"
+
+	set P0,2
+	set P0,3.7,1
+	set N1,P0,1
+	print N1
+	print "\n"
+
+	set P0,3
+	set P0,"hey",2
+	set S1,P0,2
+	print S1
+	print "\n"
+end
+CODE
+1
+3
+3.700000
+hey
 OUTPUT
 
 1;
