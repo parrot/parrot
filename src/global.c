@@ -241,6 +241,76 @@ Parrot_store_global(Interp *interpreter, STRING *class,
     Parrot_invalidate_method_cache(interpreter, class);
 }
 
+void
+Parrot_store_sub_in_namespace(Parrot_Interp interpreter, struct PackFile *pf,
+        PMC* sub_pmc, STRING* sub_name, PMC *name_space)
+{
+    PMC *globals = interpreter->globals->stash_hash;
+    INTVAL type, class_type;
+
+#if TRACE_PACKFILE_PMC
+    fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %s\n",
+            (char*)sub_name->strstart,
+            name_space ? (char*)name_space->strstart : "(none)");
+#endif
+    /*
+     * namespace is either s String or a Key PMC or NULL
+     */
+    if (!name_space) {
+global_ns:
+        VTABLE_set_pmc_keyed_str(interpreter, globals, sub_name, sub_pmc);
+    }
+    else {
+        STRING *names;
+        PMC * stash = NULL, *part;
+
+        type = name_space->vtable->base_type;
+        switch (type) {
+            case enum_class_String:
+                names = PMC_str_val(name_space);
+                if (!string_length(interpreter, names))
+                    goto global_ns;
+                /*
+                 * if the namespace is a class, call add_method
+                 * on that class PMC
+                 */
+                class_type = pmc_type(interpreter, names);
+                if (class_type > enum_type_undef) {
+                    PMC *class;
+                    VTABLE *vtable;
+                    vtable = Parrot_base_vtables[class_type];
+                    if (!vtable)
+                        internal_exception(1, "empty vtable '%Ss'", names);
+                    class = vtable->class;
+                    if (!class)
+                        internal_exception(1, "empty class '%Ss'", names);
+                    VTABLE_add_method(interpreter, class, sub_name, sub_pmc);
+                }
+                else
+                    Parrot_store_global(interpreter, names, sub_name, sub_pmc);
+                break;
+            case enum_class_Key:
+                part = name_space;
+                /*
+                 * TODO handle nested keys too with add_method
+                 */
+                for (; part; part = PMC_data(part)) {
+                    STRING *s = key_string(interpreter, part);
+#if TRACE_PACKFILE_PMC
+                    PIO_printf(interpreter, "key part %Ss\n", s);
+#endif
+                    stash = Parrot_global_namespace(interpreter, globals, s);
+                    globals = stash;
+                }
+                VTABLE_set_pmc_keyed_str(interpreter, stash, sub_name, sub_pmc);
+                break;
+            default:
+                internal_exception(1, "Unhandled namespace constant");
+        }
+
+    }
+}
+
 /*
 
 =back

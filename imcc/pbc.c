@@ -626,11 +626,12 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     ct = interpreter->code->const_table;
     k = PDB_extend_const_table(interpreter);
     pfc = ct->constants[k];
+    globals.cs->subs->pmc_const = k;
 
 #if PF_USE_FREEZE_THAW
     {
         INTVAL type;
-        STRING *name_space;
+        PMC *name_space;
         PMC *sub;
 
         type = (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
@@ -640,8 +641,20 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         sub = pmc_new(interpreter, type);
         PObj_get_FLAGS(sub) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
         PMC_sub(sub)->name = const_string(interpreter, real_name);
-        name_space = ns_const >= 0 ?
-            string_copy(interpreter, ct->constants[ns_const]->u.string) : NULL;
+        name_space = NULL;
+        if (ns_const >= 0 && ns_const < ct->const_count) {
+            switch (ct->constants[ns_const]->type) {
+                case PFC_KEY:
+                    name_space = ct->constants[ns_const]->u.key;
+                    break;
+                case PFC_STRING:
+                    name_space = constant_pmc_new(interpreter,
+                            enum_class_String);
+                    PMC_str_val(name_space) =
+                        ct->constants[ns_const]->u.string;
+                    break;
+            }
+        }
         PMC_sub(sub)->name_space = name_space;
         PMC_sub(sub)->address = (void*)offs;
         PMC_sub(sub)->end = (void*)len;
@@ -664,7 +677,6 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     if (!rc)
         IMCC_fatal(interpreter, 1,
             "add_const_pmc: PackFile_Constant error\n");
-    globals.cs->subs->pmc_const = k;
 
     IMCC_debug(interpreter, DEBUG_PBC_CONST,
             "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n\t%s\n",

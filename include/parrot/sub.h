@@ -49,7 +49,7 @@ typedef struct Parrot_sub {
     opcode_t *address;          /* start of bytecode, addr to continue */
     opcode_t *end;              /* end of bytecode */
     STRING   *name;             /* name of the sub */
-    STRING *name_space;         /* where this Sub is in */
+    PMC *name_space;            /* where this Sub is in */
     PMC *multi_signature;       /* list of types for MMD */
     char *packed;               /* to simplify packing Constant Subs
                                    that's a hack, until we use freeze
@@ -67,7 +67,7 @@ typedef struct Parrot_coro {
     opcode_t *address;          /* start of bytecode, addr to continue */
     opcode_t *end;
     STRING   *name;
-    STRING *name_space;         /* where this Sub is in */
+    PMC *name_space;         /* where this Sub is in */
     PMC *multi_signature;       /* list of types for MMD */
     char *packed;
     /* - end common */

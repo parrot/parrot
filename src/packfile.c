@@ -2896,86 +2896,6 @@ PackFile_Constant_unpack(Interp *interpreter,
     return cursor;
 }
 
-#if ! PF_USE_FREEZE_THAW
-static void
-store_sub_in_namespace(Parrot_Interp interpreter, struct PackFile *pf,
-        PMC* sub_pmc, STRING* key, int ns)
-{
-    PMC *globals = interpreter->globals->stash_hash;
-    INTVAL type;
-
-#if TRACE_PACKFILE_PMC
-    fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %d\n",
-            (char*)key->strstart, ns);
-#endif
-    /*
-     * namespace is a const table entry index
-     * -1 ... no namespace or
-     * type PFC_STRING .. a simple string
-     *      PFC_KEY   ... a Key chain
-     */
-    if (ns == -1) {
-global_ns:
-        VTABLE_set_pmc_keyed_str(interpreter, globals, key, sub_pmc);
-    }
-    else {
-        STRING *names;
-        PMC * stash = NULL, *part;
-        struct PackFile_Constant *pfc_const;
-
-        if (ns >= pf->const_table->const_count) {
-            internal_exception(1,
-                "store_sub_in_namespace: sub '%s' namespace #%d too big",
-                (char*)key->strstart, ns);
-        }
-        pfc_const = pf->const_table->constants[ns];
-        switch (pfc_const->type) {
-            case PFC_STRING:
-                names = pfc_const->u.string;
-                if (!string_length(interpreter, names))
-                    goto global_ns;
-                /*
-                 * if the namespace is a class, call add_method
-                 * on that class PMC
-                 */
-                type = pmc_type(interpreter, names);
-                if (type > enum_type_undef) {
-                    PMC *class;
-                    VTABLE *vtable;
-                    vtable = Parrot_base_vtables[type];
-                    if (!vtable)
-                        internal_exception(1, "empty vtable '%Ss'", names);
-                    class = vtable->class;
-                    if (!class)
-                        internal_exception(1, "empty class '%Ss'", names);
-                    VTABLE_add_method(interpreter, class, key, sub_pmc);
-                }
-                else
-                    Parrot_store_global(interpreter, names, key, sub_pmc);
-                break;
-            case PFC_KEY:
-                part = pfc_const->u.key;
-                /*
-                 * TODO handle nested keys too with add_method
-                 */
-                for (; part; part = PMC_data(part)) {
-                    STRING *s = key_string(interpreter, part);
-#if TRACE_PACKFILE_PMC
-                    PIO_printf(interpreter, "key part %Ss\n", s);
-#endif
-                    stash = Parrot_global_namespace(interpreter, globals, s);
-                    globals = stash;
-                }
-                VTABLE_set_pmc_keyed_str(interpreter, stash, key, sub_pmc);
-                break;
-            default:
-                internal_exception(1, "Unhandled namespace constant");
-        }
-
-    }
-}
-#endif
-
 /*
 
 =item C<opcode_t *
@@ -3028,25 +2948,15 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
          * XXX place this code in Sub.thaw ?
          */
         if (!(PObj_get_FLAGS(pmc) & SUB_FLAG_PF_ANON)) {
-            STRING *name, *name_space;
+            STRING *name;
             INTVAL type;
-            PMC *class;
+            PMC *class, *name_space;
             VTABLE *vtable;
 
             name_space = PMC_sub(pmc)->name_space;
             name       = PMC_sub(pmc)->name;
-            type = pmc_type(interpreter, name_space);
-            if (type > enum_type_undef) {
-                vtable = Parrot_base_vtables[type];
-                if (!vtable)
-                    internal_exception(1, "empty vtable '%Ss'", name_space);
-                class = vtable->class;
-                if (!class)
-                    internal_exception(1, "empty class '%Ss'", name_space);
-                VTABLE_add_method(interpreter, class, name, pmc);
-            }
-            else
-                Parrot_store_global(interpreter, name_space, name, pmc);
+            Parrot_store_sub_in_namespace(interpreter, pf,
+                pmc, name, name_space);
         }
     }
     /*
@@ -3139,7 +3049,23 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
      * finally place the sub in the global stash
      */
     if (!(flag & SUB_FLAG_PF_ANON)) {
-        store_sub_in_namespace(interpreter, pf, sub_pmc, sub->name, ns_const);
+        PMC *name_space = NULL;
+        STRING *ns;
+        if (ns_const >= 0 && ns_const < constt->const_count) {
+            switch (constt->constants[ns_const]->type) {
+                case PFC_KEY:
+                    name_space = constt->constants[ns_const]->u.key;
+                    break;
+                case PFC_STRING:
+                    name_space = constant_pmc_new(interpreter,
+                            enum_class_String);
+                    PMC_str_val(name_space) =
+                        constt->constants[ns_const]->u.string;
+                    break;
+            }
+        }
+        Parrot_store_sub_in_namespace(interpreter, pf,
+                sub_pmc, sub->name, name_space);
     }
 
     /*
