@@ -54,10 +54,19 @@ typedef enum {
     PMC_private7_FLAG   = 2 << 7,
 
     /* The rest of the flags are for use by Parrot */
+
+    /* Set if the PMC has a destroy method that must be called */
     PMC_active_destroy_FLAG	= 2 << 8,
+    /* Set if the PMC can hold multiple PMCs. (Hash, array, list,
+       whatever) */
     PMC_is_container_FLAG	= 2 << 9,
+    /* Set to true if the PMC data pointer points to something that
+       looks like a string or buffer pointer */
     PMC_is_buffer_ptr_FLAG	= 2 << 10,
+    /* Set to true if the data pointer points to a PMC */
     PMC_is_PMC_ptr_FLAG		= 2 << 11,
+    /* Set to true if the PMC has a private GC function. For PMCs the
+       GC system can't snoop into */
     PMC_private_GC_FLAG		= 2 << 12
 } PMC_flags;
 
