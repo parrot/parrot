@@ -459,7 +459,7 @@ Quick hack to emulate get_real() and get_imag():
 
 =item C<void set_number_keyed_int(INTVAL key, FLOATVAL v)>
 
-Set real or imag dependig on key
+Set real or imag depending on key
 
 */
 
@@ -737,7 +737,7 @@ MMD_Complex: {
 
         VTABLE_morph(INTERP, dest, enum_class_Complex);
         /* a little speed optimisation: cache an intermediate number;
-            i'm not sure the compiler does this */
+            I'm not sure the compiler does this */
         mod = (RE(value) * RE(value) + IM(value) * IM(value));
 
         re = (RE(SELF) * RE(value) + IM(SELF) * IM(value)) / mod;
@@ -787,7 +787,7 @@ Set C<dest> to the negated value of C<SELF>.
 
 =item C<INTVAL is_equal (PMC* value)>
 
-Compares the complex number with C<value> and returs true if they are equal.
+Compares the complex number with C<value> and returns true if they are equal.
 
 =cut
 
@@ -823,7 +823,7 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
 
 /*
 
-  TODO for better precision: hinted by vaxman according to "Numerival Recipes
+  TODO for better precision: hinted by vaxman according to "Numerical Recipes
   in Fortran 77", 2nd edition, Press, Vetterling, Teukolsky, Flannery,
   Cambridge University Press, 2001, pp. 171ff:
 
