@@ -520,8 +520,9 @@ $(IMCC_PROG) : $(LIBPARROT)        \
 	cd languages${slash}imcc && $(MAKE) && cd ..${slash}..
 	$(PERL) -MExtUtils::Command -e mv $(IMCC_PROG) $(TEST_PROG)
 	cd languages${slash}imcc && $(MAKE) && cd ..${slash}..
-	# the chmod doesn't work here, so move imcc and make it again :-(
-	# $(PERL) -MExtUtils::Command -e chmod 0755 $(TEST_PROG)
+
+# the chmod doesn't work here, so move imcc and make it again :-(
+# $(PERL) -MExtUtils::Command -e chmod 0755 $(TEST_PROG)
 
 
 ###############################################################################
