@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 76;
+use Parrot::Test tests => 83;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -1643,6 +1643,391 @@ L_BadId:
     end
 CODE
 All names and ids ok.
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "eq_p_p");
+      new P0, .PerlInt
+      new P1, .PerlInt
+
+      set P0, 10
+      set P1, 10
+
+      eq P0, P1, OK1
+      print "not "
+OK1:  print "ok 1\n"
+
+      set P0, 11
+      eq P0, P1, BAD2
+      branch OK2
+BAD2: print "not ok 2\n"
+OK2:  print "ok 2\n"
+
+      new P0, .PerlNum
+      new P1, .PerlNum
+
+      set N0, 4.5
+      set P0, N0
+      set P1, N0
+
+      eq P0, P1, OK3
+      print "not "
+OK3:  print "ok 3\n"
+
+      set P0, 0.0
+      eq P0, P1, BAD4
+      branch OK4
+BAD4: print "not ok 4\n"
+OK4:  print "ok 4\n"
+
+      new P0, .PerlString
+      new P1, .PerlString
+
+      set S0, "Artichoke"
+      set P0, S0
+      set P1, S0
+
+      eq P0, P1, OK5
+      print "not "
+OK5:  print "ok 5\n"
+
+      set P0, "Cabbage"
+      eq P0, P1, BAD6
+      branch OK6
+BAD6: print "not ok 6\n"
+OK6:  print "ok 6\n"
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "ne_p_p");
+      new P0, .PerlInt
+      new P1, .PerlInt
+
+      set P0, 1
+      set P1, 11
+
+      ne P0, P1, OK1
+      print "not "
+OK1:  print "ok 1\n"
+
+      set P0, 11
+      ne P0, P1, BAD2
+      branch OK2
+BAD2: print "not ok 2\n"
+OK2:  print "ok 2\n"
+
+      new P0, .PerlNum
+      new P1, .PerlNum
+
+      set N0, 4.5
+      set P0, N0
+      set P1, 0.0
+
+      ne P0, P1, OK3
+      print "not "
+OK3:  print "ok 3\n"
+
+      set P1, N0
+      ne P0, P1, BAD4
+      branch OK4
+BAD4: print "not ok 4\n"
+OK4:  print "ok 4\n"
+
+      new P0, .PerlString
+      new P1, .PerlString
+
+      set S0, "Artichoke"
+      set P0, S0
+      set P1, "Artichoke..."
+
+      ne P0, P1, OK5
+      print "not "
+OK5:  print "ok 5\n"
+
+      set P1, S0
+      ne P0, P1, BAD6
+      branch OK6
+BAD6: print "not ok 6\n"
+OK6:  print "ok 6\n"
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "lt_p_p");
+      new P0, .PerlInt
+      new P1, .PerlInt
+
+      set P0, 1
+      set P1, -1
+
+      lt P1, P0, OK1
+      print "not "
+OK1:  print "ok 1\n"
+
+      lt P0, P1, BAD2
+      branch OK2
+BAD2: print "not ok 2\n"
+OK2:  print "ok 2\n"
+
+      lt P1, P1, BAD3
+      branch OK3
+BAD3: print "not ok 3\n"
+OK3:  print "ok 3\n"
+
+      new P2, .PerlNum
+      new P3, .PerlNum
+
+      set P2, 12.49
+      set P3, 12.5
+
+      lt P2, P3, OK4
+      print "not "
+OK4:  print "ok 4\n"
+
+      lt P3, P2, BAD5
+      branch OK5
+BAD5: print "not ok 5\n"
+OK5:  print "ok 5\n"
+
+      lt P3, P3, BAD6
+      branch OK6
+BAD6: print "not ok 6\n"
+OK6:  print "ok 6\n"
+
+      end
+
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "le_p_p");
+      new P0, .PerlInt
+      new P1, .PerlInt
+
+      set P0, 1
+      set P1, -1
+
+      le P1, P0, OK1
+      print "not "
+OK1:  print "ok 1\n"
+
+      le P0, P1, BAD2
+      branch OK2
+BAD2: print "not ok 2\n"
+OK2:  print "ok 2\n"
+
+      le P1, P1, OK3
+      print "not "
+OK3:  print "ok 3\n"
+
+      new P2, .PerlNum
+      new P3, .PerlNum
+
+      set P2, 12.49
+      set P3, 12.5
+
+      le P2, P3, OK4
+      print "not "
+OK4:  print "ok 4\n"
+
+      le P3, P2, BAD5
+      branch OK5
+BAD5: print "not ok 5\n"
+OK5:  print "ok 5\n"
+
+      le P3, P3, OK6
+      print "not "
+OK6:  print "ok 6\n"
+
+      end
+
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "gt_p_p");
+      new P0, .PerlInt
+      new P1, .PerlInt
+
+      set P0, 10
+      set P1, 0
+
+      gt P0, P1, OK1
+      print "not "
+OK1:  print "ok 1\n"
+
+      gt P1, P0, BAD2
+      branch OK2
+BAD2: print "not ok 2\n"
+OK2:  print "ok 2\n"
+
+      gt P1, P1, BAD3
+      branch OK3
+BAD3: print "not ok 3\n"
+OK3:  print "ok 3\n"
+
+      new P2, .PerlNum
+      new P3, .PerlNum
+
+      set P2, 1000.0
+      set P3, 1000000.0
+
+      gt P3, P2, OK4
+      print "not "
+OK4:  print "ok 4\n"
+
+      gt P2, P3, BAD5
+      branch OK5
+BAD5: print "not ok 5\n"
+OK5:  print "ok 5\n"
+
+      gt P3, P3, BAD6
+      branch OK6
+BAD6: print "not ok 6\n"
+OK6:  print "ok 6\n"
+
+      end
+
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "ge_p_p");
+      new P0, .PerlInt
+      new P1, .PerlInt
+
+      set P0, 10
+      set P1, 0
+
+      ge P0, P1, OK1
+      print "not "
+OK1:  print "ok 1\n"
+
+      ge P1, P0, BAD2
+      branch OK2
+BAD2: print "not ok 2\n"
+OK2:  print "ok 2\n"
+
+      ge P1, P1, OK3
+      print "not "
+OK3:  print "ok 3\n"
+
+      new P2, .PerlNum
+      new P3, .PerlNum
+
+      set P2, 1000.0
+      set P3, 1000000.0
+
+      ge P3, P2, OK4
+      print "not "
+OK4:  print "ok 4\n"
+
+      ge P2, P3, BAD5
+      branch OK5
+BAD5: print "not ok 5\n"
+OK5:  print "ok 5\n"
+
+      ge P3, P3, OK6
+      print "not "
+OK6:  print "ok 6\n"
+
+      end
+
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "neg");
+      new P0, .PerlInt
+      new P1, .PerlInt
+
+      set P0, 12
+      neg P1, P0
+      print P1
+      print "\n"
+
+      new P0, .PerlNum
+      new P1, .PerlNum
+      set N0, -12.345678
+
+      set P0, N0
+      neg P1, P0
+      print P1
+      print "\n"
+
+      new P0, .PerlInt
+      new P1, .PerlNum
+
+      set P0, 1
+      neg P1, P0
+      print P1
+      print "\n"
+
+      new P0, .PerlNum
+      new P1, .PerlInt
+
+      set P0, 1.234567
+      neg P1, P0
+      print P1
+      print "\n"
+
+      new P0, .PerlInt
+      set P0, 25
+      neg P0, P0
+      print P0
+      print "\n"
+
+      new P0, .PerlNum
+      set P0, -12.098765
+      neg P0, P0
+      print P0
+      print "\n"
+
+      end
+
+CODE
+-12
+12.345678
+-1
+-1.234567
+-25
+12.098765
 OUTPUT
 
 1;
