@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.5  2002/05/25 02:36:14  clintp
+# Added autorun.bas, removed LOAD message, renamed intermediate compile files
+#
 # Revision 1.4  2002/05/22 17:54:21  clintp
 # Removed unneeded code, refactored
 #
@@ -960,9 +963,12 @@ I_NEW:  pushi
         new P23, PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
         new P24, PerlArray    # Array of line numbers
         set I28, -1	      # Array length
+	set I22, 1	      # Please stop executing
 	save I28
+	save I22
 	popi
 	pops
+	restore I22
 	restore I28
 	ret
 
@@ -985,9 +991,6 @@ I_LOAD:
 	bsr CLEAR
 	restore I5	# dummy
 	concat S0, ".bas"
-	print "LOADING "
-	print S0
-	print "..."
 
 	open P0, S0, "<"
 	ne I0, 0, ERR_IO
@@ -1038,7 +1041,6 @@ ENDLINES:
 
 ENDLINES2:
 	bsr CENDLOAD
-	print "DONE\n"
 	ret
 
 # INPUT numvar

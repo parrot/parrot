@@ -9,7 +9,7 @@ entirely in Parrot bytecode.  The NOTES below are intended for Parrot
 developers.
 
 This README will always reflect the *current* state of things.  You can 
-find the most recent version of BASIC at http://geeksalad.org/basic.
+find the most recent version of BASIC in the Parrot CVS repository.
 
 This BASIC is of the fairly old school.  Line numbers are required, and
 the following keywords are recognized:
@@ -109,24 +109,29 @@ of general interest, some only apply to BASIC:
 	basicvar.pasm		Storage/Retrieval of BASIC strings, numbers, 
 				code
 	instructions.pasm	BASIC instructions
-	sample.bas		Small BASIC example.
-	sample2.bas		Shows off some of the BASIC syntax and instructions
-	sample3.bas		More showing off.
+	sampleb.bas		Small BASIC example (my test program).
 
 	basic.pl		Perl Harness for compiling, starting BASIC 
-				in interactive mode.  Run this.
+				in interactive mode.  Run this.  It creates 
+				merged_interpreter.pasm and then basic.pbc
 
 	wumpus.bas		Hunt the Wumpus
 	eliza.bas  		Eliza
 
 NOTES
 -----
-Very large programs or very, very large expressions may expose Parrot's GC bugs
-quickly.  This will manifest itself in a SEGV, hang, garbled output).
-
 The expr.pasm module contains a full expression evaluator.  It's tied to BASIC through a 
 few subroutines (to do variable and function resolution) but otherwise it's a general-purpose
 evaluator.  Of special note is the Infix to Postfix notation conversion function.
+
+After running basic.pl, it's not necessary to do it again.  Skip the long compilation 
+step and just run:
+
+	..\..\parrot basic.pbc
+
+If a file named "autorun.bas" is found when the interpreter is loaded, it will be run
+automagically.  If you wish to exit the interpreter after the program has run, use 
+the QUIT statement in the program.  If you simply want to clear memory, use NEW.
 
 BUGS
 ----

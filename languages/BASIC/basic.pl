@@ -2,6 +2,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.8  2002/05/25 02:36:14  clintp
+# Added autorun.bas, removed LOAD message, renamed intermediate compile files
+#
 # Revision 1.7  2002/05/24 03:59:46  clintp
 # Screwed up ID strings
 #
@@ -11,7 +14,7 @@
 # Subsequent runs can be done with:
 #    parrot.exe out.pbc
 #
-open(T, ">test.pasm") || die;
+open(T, ">merged_basic.pasm") || die;
 
 $a=<<'EOF';
 
@@ -35,6 +38,12 @@ $a=<<'EOF';
 
 MAIN:
 	save 0  # Initialize the runtime stack!
+	save "LOAD autorun"
+	bsr RUNLINE
+	restore I0
+	save "RUN"
+	bsr RUNLINE
+	restore I0
 
 MAINLOOPR:
 	print "\n\nReady\n"
@@ -93,7 +102,7 @@ $a=~s/\bputs\b/print/g;   # puts() breaks things.
 print T $a;
 
 close(T);
-unlink "out.pbc";
-system("perl -I../../lib ../../assemble.pl test.pasm > out.pbc");
+unlink "basic.pbc";
+system("perl -I../../lib ../../assemble.pl merged_basic.pasm > basic.pbc");
 
-system("../../parrot out.pbc");
+system("../../parrot basic.pbc");
