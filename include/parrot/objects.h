@@ -15,6 +15,9 @@
 
 #include "parrot/parrot.h"
 
+#define PARROT_NAMESPACE_SEPARATOR "\0"
+#define PARROT_NAMESPACE_SEPARATOR_LENGTH 1
+
 PMC *Parrot_single_subclass(Parrot_Interp, PMC *, STRING *);
 PMC *Parrot_new_class(Parrot_Interp, STRING *);
 PMC *Parrot_class_lookup(Parrot_Interp, STRING *);

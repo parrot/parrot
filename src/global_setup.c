@@ -34,10 +34,10 @@ init_world(Interp *interpreter)
     string_init();              /* Set up the string subsystem */
 
     /* allocate core vtable */
-#if 0
+#if 1
     /* no - we can't move existing vtables */
     Parrot_base_vtables =
-        mem_sys_allocate(sizeof(VTABLE *) * enum_class_core_max);
+        mem_sys_allocate_zeroed(sizeof(VTABLE *) * enum_class_core_max);
 #endif
     enum_class_max = enum_class_core_max;
 

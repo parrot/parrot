@@ -104,6 +104,50 @@ Parrot_getenv(const char *name, int *free_it)
     return getenv(name);
 }
 
+
+/* The dl* functions showed up in OS X 10.3. If we have them, use
+   them, otherwise roll our own */
+#if defined(PARROT_HAS_HEADER_DLFCN)
+#include <dlfcn.h>
+void *
+Parrot_dlopen(const char *filename)
+{
+    return dlopen(filename, PARROT_DLOPEN_FLAGS);
+}
+
+
+/*
+** Parrot_dlerror()
+*/
+
+const char *
+Parrot_dlerror(void)
+{
+    return dlerror();
+}
+
+
+/*
+** Parrot_dlsym()
+*/
+
+void *
+Parrot_dlsym(void *handle, const char *symbol)
+{
+    return dlsym(handle, symbol);
+}
+
+
+/*
+** Parrot_dlclose()
+*/
+
+int
+Parrot_dlclose(void *handle)
+{
+    return dlclose(handle);
+}
+#else
 /*
 ** Parrot_dlopen()
 */
@@ -186,6 +230,8 @@ Parrot_dlclose(void *handle)
 {
     return 0;
 }
+
+#endif
 
 /*
  * itimer stuff
