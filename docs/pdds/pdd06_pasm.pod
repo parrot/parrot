@@ -1107,6 +1107,34 @@ parameters, for example)
 
 =back
 
+=head2 Runtime compilation
+
+These opcodes deal with runtime creation of bytecode and compilation
+of source code.
+
+=over 4
+
+=item compile Px, sy, sz
+
+Compile source string Y, with compiler unit Z, and stick a handle to
+a subroutine for the resulting bytecode segment (already loaded into
+the current interpreter) into X.
+
+Z will be the name of a compiler module of some sort, as registered
+with the compiler unit. This will be something like "Perl5", "Perl6",
+"Perl5RE", "Perl6RE", "Python", "Ruby"... you get the picture. 
+
+This is a high-level op, with the assumption that the resulting sub
+will be called. It's the equivalent of perl 5's string eval, except
+for the actual execution of the resulting code.
+
+=item compreg Sx, Py
+
+Register the sub Y as a parser/compiler function named X. It will be
+called whenever anyone invokes the compile op with the name X.
+
+=back
+
 =head1 ATTACHMENTS
 
 =head1 REFERENCES
