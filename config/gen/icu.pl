@@ -43,7 +43,7 @@ sub runstep {
     
     {
 	# disable STDERR
-        open OLDERR, ">&", \*STDERR;
+        open OLDERR, ">&STDERR";
 	open STDERR, ">d8e622ad2.log";
 	
 	# check if ICU is installed
@@ -54,7 +54,7 @@ sub runstep {
 	# reenable STDERR
 	close STDERR;
         unlink "d8e622ad2.log";
-	open STDERR, ">&", \*OLDERR;
+	open STDERR, ">&OLDERR";
     }
     
     if ($notfound) {
