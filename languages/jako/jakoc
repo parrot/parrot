@@ -1895,7 +1895,7 @@ sub do_add
       $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
       emit_code('set', [$dest, $temp]);
     } elsif (reg_q($b)) {
-      if ($dest eq $b) {
+      if ($dest eq $b && int_q($a)) {
         emit_code('inc', [$dest, $a]);
       } else {
         my $temp = int_q($a) ? 'I0' : 'N0';
@@ -1907,7 +1907,7 @@ sub do_add
     }
   } elsif (reg_q($a)) {
     if (int_or_num_q($b)) {
-      if ($dest eq $a) {
+      if ($dest eq $a && int_q($b)) {
         emit_code('inc', [$dest, $b]);
       } else {
         my $temp = int_q($b) ? 'I0' : 'N0';
@@ -1934,9 +1934,13 @@ sub do_inc
   my ($dest, $amount) = @_;
 
   if (defined $amount) {
-    push_source "$dest += $amount;";
-    ($dest, $amount) = map_args($dest, $amount);
-    emit_code('inc', [$dest, $amount]);
+    if (int_q($amount)) {
+      push_source "$dest += $amount;";
+      ($dest, $amount) = map_args($dest, $amount);
+      emit_code('inc', [$dest, $amount]);
+    } else {
+      do_add($dest, $dest, $amount);
+    }
   } else {
     push_source "$dest++;";
     ($dest, $amount) = map_args($dest);
@@ -1963,7 +1967,7 @@ sub do_sub
       $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
       emit_code('set', [$dest, $temp]);
     } elsif (reg_q($b)) {
-      if ($dest eq $b) {
+      if ($dest eq $b && int_q($a)) {
         emit_code('dec', [$dest, $a]);
       } else {
         my $temp = int_q($a) ? 'I0' : 'N0';
@@ -1975,7 +1979,7 @@ sub do_sub
     }
   } elsif (reg_q($a)) {
     if (int_or_num_q($b)) {
-      if ($dest eq $a) {
+      if ($dest eq $a && int_q($b)) {
         emit_code('dec', [$dest, $b]);
       } else {
         my $temp = int_q($b) ? 'I0' : 'N0';
@@ -2002,9 +2006,13 @@ sub do_dec
   my ($dest, $amount) = @_;
 
   if (defined $amount) {
-    push_source "$dest -= $amount;";
-    ($dest, $amount) = map_args($dest, $amount);
-    emit_code('dec', [$dest, $amount]);
+    if (int_q($amount)) {
+      push_source "$dest -= $amount;";
+      ($dest, $amount) = map_args($dest, $amount);
+      emit_code('dec', [$dest, $amount]);
+    } else {
+      do_sub($dest, $dest, $amount);
+    }
   } else {
     push_source "$dest--;";
     ($dest, $amount) = map_args($dest);
