@@ -21,6 +21,7 @@ use Parrot::OpsFile;
 use Parrot::OpTrans::Compiled;
 use Parrot::OpLib::core;
 use Parrot::Config;
+use Parrot::Key;
 
 my $trans = Parrot::OpTrans::Compiled->new;
 
@@ -196,6 +197,8 @@ FINDENTERN:
     print<<END_C; 
 static opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code);
 
+#include "parrot/embed.h"
+
 static char program_code[] = {
 END_C
 
@@ -216,12 +219,17 @@ END_C
 
 int
 main(int argc, char **argv) {
+    int dummy_var;
     struct Parrot_Interp *     interpreter;
     struct PackFile *          pf;
     INTVAL i;
     PMC *userargv;
 
-    init_world();
+    interpreter = Parrot_new();
+    if (!interpreter) {
+        return 1;
+    }
+    Parrot_init(interpreter, (void*) &dummy_var);
   
     run_native = run_compiled;
     interpreter = make_interpreter(NO_FLAGS);
