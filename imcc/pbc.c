@@ -634,9 +634,6 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
     }
     else
         real_name = r->name;
-    debug(interpreter, DEBUG_PBC_CONST,
-            "add_const_pmc_sub '%s' -> '%s' flags %d\n",
-            r->name, real_name, r->pcc_sub->pragma);
 
     /*
      * TODO use serialize api if that is done
@@ -655,6 +652,10 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type = PFC_PMC;
     interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
+
+    debug(interpreter, DEBUG_PBC_CONST,
+            "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n",
+            r->name, real_name, r->pcc_sub->pragma, k);
     /*
      * create entry in our fixup (=symbol) table
      * the offset is the index in the constant table of this Sub
