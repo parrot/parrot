@@ -337,6 +337,54 @@ inline op bxor(in PMC, in PMC, in PMC) {
   goto NEXT();
 }
 
+=item B<bxors>(inout STR, in STR)
+
+=item B<bxors>(in PMC, in STR)
+
+=item B<bxors>(in PMC, in PMC)
+
+Set the bits of $1 according to the B<xor> of the corresponding bits from $1 and $2.
+
+=item B<bxors>(out STR, in STR, in STR)
+
+=item B<bxors>(in PMC, in PMC, in STR)
+
+=item B<bxors>(in PMC, in PMC, in PMC)
+
+Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
+
+=cut
+
+inline op bxors(inout STR, in STR) {
+  string_bitwise_xor(interpreter, $1, $2, &$1);
+  goto NEXT();
+}
+
+inline op bxors(in PMC, in STR) {
+  $1->vtable->bitwise_xors_str(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bxors(in PMC, in PMC) {
+  $1->vtable->bitwise_xors(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bxors(out STR, in STR, in STR) {
+  $1 = string_bitwise_xor(interpreter, $2, $3, NULL);
+  goto NEXT();
+}
+
+inline op bxors(in PMC, in PMC, in STR) {
+  $2->vtable->bitwise_xors_str(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op bxors(in PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_xors(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
 =back
 
 =cut

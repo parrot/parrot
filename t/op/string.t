@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 113;
+use Parrot::Test tests => 116;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1893,6 +1893,89 @@ CODE
 egc
 abc
 EE
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bxors NULL string");
+ null S1
+ set S2, ""
+ bxors S1, S2
+    null S3
+ eq S1, S3, ok1
+ print "not "
+ok1: print "ok 1\n"
+ bxors S2, S1
+ eq S2, S3, ok2
+ print "not "
+ok2: print "ok 2\n"
+    null S1
+ set S2, "abc"
+    bxors S1, S2
+ eq S1, "abc", ok3
+ print "not "
+ok3: print "ok 3\n"
+    null S2
+    bxors S1, S2
+ eq S1, "abc", ok4
+ print "not "
+ok4: print "ok 4\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bxors 2");
+ set S1, "a2c"
+ set S2, "Dw"
+ bxors S1, S2
+ print S1
+ print "\n"
+ print S2
+ print "\n"
+    set S1, "abc"
+    set S2, "   X"
+    bxors S1, S2
+    print S1
+ print "\n"
+ print S2
+ print "\n"
+ end
+CODE
+%Ec
+Dw
+ABCX
+   X
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bxors 3");
+ set S1, "a2c"
+ set S2, "Dw"
+ bxors S0, S1, S2
+ print S0
+ print "\n"
+ print S1
+ print "\n"
+ print S2
+ print "\n"
+    set S1, "abc"
+    set S2, "   Y"
+    bxors S0, S1, S2
+ print S0
+ print "\n"
+    print S1
+ print "\n"
+ print S2
+ print "\n"
+ end
+CODE
+%Ec
+a2c
+Dw
+ABCY
+abc
+   Y
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
