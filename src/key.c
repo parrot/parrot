@@ -217,7 +217,7 @@ void key_destroy(struct Parrot_Interp *interpreter, KEY* key) {
 
 /*=for api key key_element_type
 
-return the type of element <index> of KEY <key>
+return the type of element <idx> of KEY <key>
 
 =cut
 */
@@ -240,7 +240,7 @@ INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key,
 
 /*=for api key key_element_value_i
 
-return the value of index <index> of KEY <key>
+return the value of index <idx> of KEY <key>
 
 =cut
 */
@@ -289,7 +289,7 @@ key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, STRING* idx) {
 
 /*=for api key key_set_element_value_i
 
-Set the value of index <index> of key <key> to integer <value>
+Set the value of index <idx> of key <key> to integer <value>
 
 =cut
 */
@@ -312,7 +312,7 @@ void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key,
 
 /*=for api key key_set_element_value_s
 
-Set the value of index <index> of key <key> to string <value>
+Set the value of index <idx> of key <key> to string <value>
 
 =cut
 */
@@ -386,7 +386,7 @@ void key_chop(struct Parrot_Interp *interpreter, KEY* key) {
 
 /*=for api key key_inc
 
-Increment the type of index <index> of key <key>
+Increment the type of index <idx> of key <key>
 
 =cut
 */
