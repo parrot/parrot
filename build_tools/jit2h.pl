@@ -334,7 +334,7 @@ for ($i = 0; $i < $core_numops; $i++) {
         if ($op->full_name eq 'new_p_ic') {
             $jit_func = "Parrot_jit_vtable_newp_ic_op";
             $opbody =~ /vtable->(\w+)/;
-            $extern = vtable_num($1);
+            $extern = 2;  # fake number
             #print "$jit_func $extern\n";
         }
         # jitable vtable funcs:

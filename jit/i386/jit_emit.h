@@ -15,6 +15,13 @@
 #  define JIT_CGP
 #endif
 
+/*
+ * if we have a delegated method like typeof_i_p, that returns an INTVAL
+ * and that is all in a sequence of JITted opcodes, and when these INTVAL
+ * is MAPped, we got a problem
+ */
+#  define  JIT_VTABLE_OPS 0
+
 /* EXEC_SHARED generates code to be used with libparrot.so
  * It grabs the real address of cgp_core from the gcc generated code
  * x/1i cgp_code
@@ -43,6 +50,8 @@ extern UINTVAL ld(UINTVAL);
 #define emit_EBP 6
 #define emit_ESI 7
 #define emit_EDI 8
+
+#  define INT_REGISTERS_TO_MAP 4
 
 #if JIT_EMIT
 
@@ -563,12 +572,14 @@ opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
     }
     else {
         /* if ECX is mapped, push EDX on stack */
-        if (jit_info->optimizer->cur_section->ru[0].registers_used == 5) {
+        if (jit_info->optimizer->cur_section->ru[0].registers_used ==
+                INT_REGISTERS_TO_MAP) {
             emitm_pushl_r(pc, emit_EDX);
             saved = 2;
         }
         /* if EDX is mapped, save it in ECX */
-        else if (jit_info->optimizer->cur_section->ru[0].registers_used == 4) {
+        else if (jit_info->optimizer->cur_section->ru[0].registers_used ==
+                INT_REGISTERS_TO_MAP - 1) {
             saved = 1;
             jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
         }
@@ -665,12 +676,14 @@ opt_div_rm(Parrot_jit_info_t *jit_info, int dest, void * mem, int is_div)
     }
     else {
         /* if ECX is mapped, push EDX on stack */
-        if (jit_info->optimizer->cur_section->ru[0].registers_used == 5) {
+        if (jit_info->optimizer->cur_section->ru[0].registers_used ==
+                INT_REGISTERS_TO_MAP) {
             emitm_pushl_r(pc, emit_EDX);
             saved = 2;
         }
         /* if EDX is mapped, save it in ECX */
-        else if (jit_info->optimizer->cur_section->ru[0].registers_used == 4) {
+        else if (jit_info->optimizer->cur_section->ru[0].registers_used ==
+                INT_REGISTERS_TO_MAP - 1) {
             saved = 1;
             jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
         }
@@ -965,7 +978,8 @@ opt_shift_rr(Parrot_jit_info_t *jit_info, int dest, int count, int op)
         int saved = 0;
         assert(count != emit_EAX);
         if (dest == emit_EAX) {
-            if (jit_info->optimizer->cur_section->ru[0].registers_used == 5) {
+            if (jit_info->optimizer->cur_section->ru[0].registers_used ==
+                    INT_REGISTERS_TO_MAP) {
                 emitm_pushl_r(pc, emit_ECX);
                 saved = 1;
             }
@@ -996,7 +1010,8 @@ opt_shift_rm(Parrot_jit_info_t *jit_info, int dest, void * count, int op)
     char *pc = jit_info->native_ptr;
     int saved = 0;
     /* if ECX is mapped, save it */
-    if (jit_info->optimizer->cur_section->ru[0].registers_used == 5) {
+    if (jit_info->optimizer->cur_section->ru[0].registers_used ==
+            INT_REGISTERS_TO_MAP) {
         emitm_pushl_r(pc, emit_ECX);
         saved = 1;
     }
@@ -1829,9 +1844,8 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
          * emit interpreter->code->byte_code
          */
         emitm_movl_m_r(jit_info->native_ptr,
-                emit_EDX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
-        jit_emit_mov_rr_i(jit_info->native_ptr, emit_ECX, emit_EDX);
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EBX, 0, 1,
                 offsetof(Interp, code));
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
                 offsetof(struct PackFile, byte_code));
@@ -1843,7 +1857,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
          *
          * TODO interleave these 2 calculations
          */
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EBX, 0, 1,
                 offsetof(Interp, jit_info));
         emitm_lea_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
                 offsetof(Parrot_jit_info_t, arena));
@@ -1901,7 +1915,8 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
     emitm_calll(jit_info->native_ptr, 0xdeafc0de);
 }
 
-#  ifndef NO_JIT_VTABLE_OPS
+
+#  if JIT_VTABLE_OPS
 
 #    undef Parrot_jit_vtable1_op
 #    undef Parrot_jit_vtable1r_op
@@ -1956,11 +1971,11 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     /* this is not callee saved, emit_EDX is 4th in intval_map
      * should also save floating regs back?
      */
-    if (ru[0].registers_used >= 4) {
+    if (ru[0].registers_used >= INT_REGISTERS_TO_MAP - 1) {
         emitm_pushl_r(jit_info->native_ptr, emit_EDX);
         saved = 1;
     }
-    if (ru[0].registers_used == 5) {
+    if (ru[0].registers_used == INT_REGISTERS_TO_MAP) {
         emitm_pushl_r(jit_info->native_ptr, emit_ECX);
         saved = 2;
     }
@@ -1992,12 +2007,12 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     }
 
     if (loaded_eax) {
-        jit_emit_mov_rr_i(jit_info->native_ptr, emit_ECX, emit_EAX);
+        jit_emit_mov_rr_i(jit_info->native_ptr, emit_EBX, emit_EAX);
     }
     else {
-        /* get interpreter into %ecx - mov offs(%ebp), %ecx */
+        /* get interpreter into %ebx - mov offs(%ebp), %ecx */
         emitm_movl_m_r(jit_info->native_ptr,
-                emit_ECX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+                emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
     }
     /* get the offset of the first vtable func */
     offset = offsetof(struct _vtable, init);
@@ -2009,13 +2024,13 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
         switch (op_info->types[i]) {
             case PARROT_ARG_S:
                 emitm_movl_m_r(jit_info->native_ptr,
-                        emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_STR(pi));
+                        emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_STR(pi));
                 emitm_pushl_r(jit_info->native_ptr, emit_EAX);
                 break;
             case PARROT_ARG_K:
             case PARROT_ARG_P:
                 emitm_movl_m_r(jit_info->native_ptr,
-                        emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_PMC(pi));
+                        emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_PMC(pi));
                 /* push $i, the left most Pi stays in eax, which is used
                  * below, to call the vtable method
                  */
@@ -2027,7 +2042,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                     emitm_pushl_r(jit_info->native_ptr, MAP(i));
                 else {
                     emitm_movl_m_r(jit_info->native_ptr,
-                            emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_INT(pi));
+                            emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_INT(pi));
                     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
                 }
                 break;
@@ -2045,7 +2060,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 }
                 else
                     jit_emit_fload_mb_n(jit_info->native_ptr,
-                            emit_ECX, REG_OFFS_NUM(pi));
+                            emit_EBX, REG_OFFS_NUM(pi));
                 goto store;
             case PARROT_ARG_NC:
                 /*
@@ -2113,7 +2128,7 @@ store:
         }
     }
     /* push interpreter */
-    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
             offsetof(struct PMC, vtable));
@@ -2134,7 +2149,6 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
     op_info_t *op_info = &interpreter->op_info_table[*jit_info->cur_op];
     int p1 = *(jit_info->cur_op + 1);
     Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
-    int saved = 0;
 
     /*
      * if we have an MAPped return value, we don't need the interpreter
@@ -2146,12 +2160,8 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
         ; /* nix */
     }
     else {
-        if (ru[0].registers_used == 5) {
-            emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-            saved = 2;
-        }
         emitm_movl_m_r(jit_info->native_ptr,
-                emit_ECX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+                emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
     }
     /* return result is in EAX or ST(0) */
     switch (op_info->types[1]) {
@@ -2162,30 +2172,28 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
             }
             else
                 emitm_movl_r_m(jit_info->native_ptr,
-                        emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_INT(p1));
+                        emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_INT(p1));
             break;
         case PARROT_ARG_S:
             emitm_movl_r_m(jit_info->native_ptr,
-                    emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_STR(p1));
+                    emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_STR(p1));
             break;
         case PARROT_ARG_P:
             emitm_movl_r_m(jit_info->native_ptr,
-                    emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_PMC(p1));
+                    emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_PMC(p1));
             break;
         case PARROT_ARG_N:
             if (MAP(1)) {
                 emitm_fstp(jit_info->native_ptr, (1 + MAP(1)));
             }
             else
-                jit_emit_fstore_mb_n(jit_info->native_ptr, emit_ECX,
+                jit_emit_fstore_mb_n(jit_info->native_ptr, emit_EBX,
                         REG_OFFS_NUM(p1));
             break;
         default:
             internal_exception(1, "jit_vtable1r: ill LHS");
             break;
     }
-    if (saved == 2)
-        emitm_popl_r(jit_info->native_ptr, emit_ECX);
 }
 
 /* emit a call to a vtable func
@@ -2346,14 +2354,14 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     extern char **Parrot_exec_rel_addr;
     extern int Parrot_exec_rel_count;
 
-    /* this is not callee saved, emit_EDX is 4th in intval_map
+    /* this is not callee saved, emit_EDX is 3rd in intval_map
      * should also save floating regs back?
      */
-    if (ru[0].registers_used >= 4) {
+    if (ru[0].registers_used >= INT_REGISTERS_TO_MAP - 1) {
         emitm_pushl_r(jit_info->native_ptr, emit_EDX);
         saved = 1;
     }
-    if (ru[0].registers_used == 5) {
+    if (ru[0].registers_used == INT_REGISTERS_TO_MAP) {
         emitm_pushl_r(jit_info->native_ptr, emit_ECX);
         saved = 2;
     }
@@ -2367,10 +2375,10 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
         internal_exception(1, "Illegal PMC enum (%d) in new\n", i2);
     /* get interpreter */
     emitm_movl_m_r(jit_info->native_ptr,
-            emit_ECX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+            emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
     /* push pmc enum and interpreter */
     emitm_pushl_i(jit_info->native_ptr, i2);
-    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
 #    if EXEC_CAPABLE
     if (jit_info->objfile) {
         CALL("pmc_new_noinit");
@@ -2380,16 +2388,13 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     {
         call_func(jit_info, (void (*)(void))pmc_new_noinit);
     }
-    /* interpreter in ECX might be globbered */
-    emitm_movl_m_r(jit_info->native_ptr,
-            emit_ECX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
     /* result = eax push pmc */
     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
     /* store in PMC too */
     emitm_movl_r_m(jit_info->native_ptr,
-            emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_PMC(p1));
+            emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_PMC(p1));
     /* push interpreter */
-    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
             offsetof(struct PMC, vtable));
@@ -2410,7 +2415,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 #    undef CONST
 #    undef CALL
 
-#  endif /* NO_JIT_VTABLE_OPS */
+#  endif /* JIT_VTABLE_OPS */
 
 # if EXEC_CAPABLE
 #  ifdef JIT_CGP
@@ -3147,14 +3152,20 @@ preg:
 #endif /* JIT_EMIT */
 #if JIT_EMIT == 0
 #  define REQUIRES_CONSTANT_POOL 0
-#  define INT_REGISTERS_TO_MAP 5
+/* #  define INT_REGISTERS_TO_MAP 4 definiton at top */
 #  define FLOAT_REGISTERS_TO_MAP 4
 
 #  ifndef JIT_IMCC
-
+/*
+ * register usage
+ * %edi, %esi ... mapped, preserved
+ * %edx, %ecx ... mapped, not preserved
+ * %ebx       ... base pointer for register access, preserved
+ * %eax       ... scratch, return value register
+ */
 char intval_map[] =
     /* Note: don't change order of these */
-    { emit_EBX, emit_EDI, emit_ESI, emit_EDX, emit_ECX };
+    { emit_EDI, emit_ESI, emit_EDX, emit_ECX };
 
 /* ST(0) is used as a scratch register,
  * using more then 4 registers breaks C<time N0>
@@ -3166,7 +3177,7 @@ char floatval_map[] = { 1,2,3,4 };
  * not changed around external calls
  */
 
-#  define PRESERVED_INT_REGS 3
+#  define PRESERVED_INT_REGS 2
 
 /* XXX
  * this 4 floatvals are currently assumed to be callee saved,
@@ -3226,7 +3237,9 @@ char floatval_map[] = { 1,2,3,4 };
  * I386 has JITed vtables, which have the vtable# in extcall.
  * This Parrot_jit_vtable_n_op() doese use register mappings.
  */
+#  if JIT_VTABLE_OPS
 #  define EXTCALL(op) (op_jit[*(op)].extcall == 1)
+#  endif
 
 #endif /* JIT_EMIT */
 #endif /* PARROT_I386_JIT_EMIT_H_GUARD */
