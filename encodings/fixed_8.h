@@ -15,12 +15,14 @@
 
 static void to_encoding(Interp *interpreter, STRING *source_string);
 static STRING *copy_to_encoding(Interp *interpreter, STRING *source_string);
-static UINTVAL get_codepoint(Interp *interpreter, STRING *source_string, UINTVAL offset);
+static UINTVAL get_codepoint(Interp *interpreter, const STRING *source_string, UINTVAL offset);
 static void set_codepoint(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL codepoint);
-static UINTVAL get_byte(Interp *interpreter, STRING *source_string, UINTVAL offset);
-static void set_byte(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL byte);
+static UINTVAL get_byte(Interp *interpreter, const STRING *source_string, UINTVAL offset);
+static void set_byte(Interp *interpreter, const STRING *source_string, UINTVAL offset, UINTVAL byte);
 static STRING *get_codepoints(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
+static STRING *get_codepoints_inplace(Interp *interpreter, STRING *source_string, STRING *dest_string, UINTVAL offset, UINTVAL count);
 static STRING *get_bytes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
+static STRING *get_bytes_inplace(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string);
 static void set_codepoints(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_codepoints);
 static void set_bytes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_bytes);
 static void become_encoding(Interp *interpreter, STRING *source_string);

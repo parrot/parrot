@@ -225,6 +225,7 @@ sub genfile {
 	\$\{(\w+)\}
       }{
 	if(defined(my $val=Configure::Data->get($1))) {
+          #use Data::Dumper;warn Dumper("val for $1 is ",$val);
 	  $val;
 	}
 	else {

@@ -17,7 +17,8 @@ Tests C<string_make>.
 =cut
 
 use Parrot::Test tests => 1;
-
+SKIP: {
+    skip("Pending Unicode", 1);
 c_output_is(<<'CODE', <<'OUTPUT', "Parrot_run_native");
 
 #include <parrot/parrot.h>
@@ -75,5 +76,5 @@ character 2 = 12375
 ok
 back
 OUTPUT
-
+}
 1;

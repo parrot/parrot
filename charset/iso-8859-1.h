@@ -27,7 +27,7 @@ static void upcase_first(Interp *interpreter, STRING *source_string);
 static void downcase_first(Interp *interpreter, STRING *source_string);
 static void titlecase_first(Interp *interpreter, STRING *source_string);
 static INTVAL compare(Interp *interpreter, STRING *lhs, STRING *rhs);
-static INTVAL cs_index(Interp *interpreter, STRING *source_string, STRING *search_string, UINTVAL offset);
+static INTVAL cs_index(Interp *interpreter, const STRING *source_string, const STRING *search_string, UINTVAL offset);
 static INTVAL cs_rindex(Interp *interpreter, STRING *source_string, STRING *search_string, UINTVAL offset);
 static UINTVAL validate(Interp *interpreter, STRING *source_string);
 static INTVAL is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset);
@@ -46,6 +46,7 @@ static INTVAL is_newline(Interp *interpreter, STRING *source_string, UINTVAL off
 static INTVAL find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset);
 static INTVAL find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset);
 static INTVAL find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset);
+static size_t compute_hash(Interp *interpreter, STRING *source_string);
 CHARSET *Parrot_charset_iso_8859_1_init(Interp *interpreter);
 
 

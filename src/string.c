@@ -23,6 +23,12 @@ strings.
 #include "parrot/parrot.h"
 #include <assert.h>
 
+#include "../encodings/fixed_8.h"
+#include "../charset/ascii.h"
+#include "../charset/binary.h"
+#include "../charset/iso-8859-1.h"
+
+
 /*
  * this extra size is in the hope, that some concat ops might
  * follow in a sequence.
@@ -37,15 +43,14 @@ strings.
 
 #define EXTRA_SIZE 256
 
-/* statics */
-static void _string_upscale(Interp *interpreter, STRING *s,
-    parrot_string_representation_t representation, UINTVAL capacity);
-static void _string_downscale(Interp *interpreter, STRING *s,
-    parrot_string_representation_t representation);
-static parrot_string_representation_t _string_smallest_representation(
-    Interp *interpreter, STRING *s);
+
+#define saneify_string(s) \
+    assert(s->encoding); \
+    assert(s->charset)
+
 
 /*
+
 
 =head2 String COW support
 
@@ -122,7 +127,7 @@ copy_string_header(Interp *interpreter, String *dest, String *src)
 /*
 
 =item C<static STRING *
-make_COW_reference(Interp *interpreter, STRING *s)>
+Parrot_make_COW_reference(Interp *interpreter, STRING *s)>
 
 Creates a copy-on-write string by cloning a string header without
 allocating a new buffer.
@@ -131,8 +136,8 @@ allocating a new buffer.
 
 */
 
-static STRING *
-make_COW_reference(Interp *interpreter, STRING *s)
+STRING *
+Parrot_make_COW_reference(Interp *interpreter, STRING *s)
 {
     STRING *d;
     if (s == NULL) {
@@ -153,11 +158,42 @@ make_COW_reference(Interp *interpreter, STRING *s)
     }
     return d;
 }
+/*
+
+=item C<static STRING *
+Parrot_reuse_COW_reference(Interp *interpreter, STRING *s, STRING *reuse)>
+
+Creates a copy-on-write string by cloning a string header without
+allocating a new buffer. Doesn't allocate a new string header, instead
+using the one passed in
+
+=cut
+
+*/
+
+void
+Parrot_reuse_COW_reference(Interp *interpreter, STRING *s, STRING *d)
+{
+    if (s == NULL) {
+        return;
+    }
+    if (PObj_constant_TEST(s)) {
+        PObj_constant_CLEAR(s);
+        PObj_is_cowed_SETALL(s);
+        copy_string_header(interpreter, d, s);
+        PObj_constant_CLEAR(d);
+    }
+    else {
+        PObj_COW_SET(s);
+        copy_string_header(interpreter, d, s);
+        PObj_sysmem_CLEAR(d);
+    }
+}
 
 /*
 
 =item C<static void
-make_COW_reference_from_header(Interp *interpreter,
+Parrot_make_COW_reference_from_header(Interp *interpreter,
         STRING *s, STRING *d)>
 
 Makes the second Parrot string a copy-on-write reference to first.
@@ -167,7 +203,7 @@ Makes the second Parrot string a copy-on-write reference to first.
 */
 
 static void
-make_COW_reference_from_header(Interp *interpreter,
+Parrot_make_COW_reference_from_header(Interp *interpreter,
         STRING *s, STRING *d)
 {
     if (PObj_constant_TEST(s)) {
@@ -207,10 +243,10 @@ string_set(Interp *interpreter, STRING *dest, STRING *src)
             mem_sys_free((INTVAL*)PObj_bufstart(dest) - 1);
         }
 #endif
-        make_COW_reference_from_header(interpreter, src, dest);
+        Parrot_make_COW_reference_from_header(interpreter, src, dest);
     }
     else
-        dest = make_COW_reference(interpreter, src);
+        dest = Parrot_make_COW_reference(interpreter, src);
     return dest;
 }
 
@@ -252,6 +288,12 @@ string_init(Parrot_Interp interpreter)
     } __ptr_u;
 
     if (!interpreter->parent_interpreter) {
+        /* Load in the basic encodings and charsets */
+        Parrot_encoding_fixed_8_init(interpreter);
+        Parrot_charset_binary_init(interpreter);
+        Parrot_charset_ascii_init(interpreter);
+        Parrot_charset_iso_8859_1_init(interpreter);
+
         /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
            set through the $PARROT_ICU_DATA_DIR environment variable. Need
            a way to specify this via the command line as well. */
@@ -282,7 +324,8 @@ no_set:
         if (free_data_dir)
             mem_sys_free((void*)data_dir); /* cast away the constness */
     }
-/*
+
+/* --- Perhaps these should be uncommented - Leo
     encoding_init();
     chartype_init();
     string_native_type = chartype_lookup("usascii");
@@ -327,8 +370,13 @@ Returns the capacity of the specified Parrot string.
 UINTVAL
 string_capacity(Interp *interpreter, STRING *s)
 {
+    if (s->encoding) {
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
-        (ptrcast_t)s->strstart) / (s->representation);
+                (ptrcast_t)s->strstart) / ENCODING_MAX_BYTES_PER_CODEPOINT(interpreter, s);
+    } else {
+        return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
+                (ptrcast_t)s->strstart);
+    }
 }
 
 /*
@@ -351,151 +399,17 @@ string_make_empty(Interp *interpreter,
 
     s = new_string_header(interpreter, 0);
 
-    s->representation = representation;
+    if (representation == enum_stringrep_one) {
+        s->encoding = PARROT_DEFAULT_ENCODING;
+        s->charset = PARROT_DEFAULT_CHARSET;
+    } else {
+        internal_exception(INVALID_CHARTYPE, "Unsupported representation");
+    }
 
     Parrot_allocate_string(interpreter,
         s, string_max_bytes(interpreter, s, capacity));
 
     return s;
-}
-
-/* downscale would need checks? */
-static void
-_string_upscale(Interp *interpreter, STRING *s,
-    parrot_string_representation_t representation, UINTVAL capacity)
-{
-    if (s->representation >= representation) {
-        if (capacity > s->strlen) {
-            string_grow(interpreter, s, capacity - s->strlen);
-        }
-    }
-    else { /* s->representation < representation */
-        STRING *temp;
-        UINTVAL needed_length = s->strlen;
-
-        if (capacity > needed_length)
-            needed_length = capacity;
-
-        temp = string_make_empty(interpreter, representation, needed_length);
-        string_append(interpreter, temp, s, s->obj.flags);
-        string_set(interpreter, s, temp);
-        s->hashval = 0;
-
-        /*
-        s->representation = temp->representation;
-        s->bufstart = temp->bufstart;
-        s->buflen   = temp->buflen;
-        s->strstart = temp->strstart;
-        s->bufused = temp->bufused;
-        s->obj.flags    = temp->obj.flags;
-        */
-    }
-}
-
-/* currently, doesn't do any checks to see if the downscale should be allowed.
-   thus, assumes caller has already checked. */
-static void
-_string_downscale(Interp *interpreter, STRING *s,
-    parrot_string_representation_t representation)
-{
-    if (s->representation <= representation) {
-        return; /* do nothing */
-    }
-    else { /* s->representation > representation */
-        UINTVAL count = s->strlen;
-
-        if (s->representation == enum_stringrep_four) {
-            Parrot_UInt4 *oldCursor = (Parrot_UInt4*)s->strstart;
-
-            if (representation == enum_stringrep_two) {
-                Parrot_UInt2 *newCursor = (Parrot_UInt2*)s->strstart;
-
-                while (count--) {
-                    *(newCursor++) = *(oldCursor++);
-                }
-            }
-            else { /* representation == enum_stringrep_one */
-                Parrot_UInt1 *newCursor = (Parrot_UInt1*)s->strstart;
-
-                while (count--) {
-                    *(newCursor++) = *(oldCursor++);
-                }
-            }
-        }
-        else {
-            /*
-             * s-> representation == enum_stringrep_two,
-             * representation == enum_stringrep_one
-             */
-            Parrot_UInt2 *oldCursor = (Parrot_UInt2*)s->strstart;
-            Parrot_UInt1 *newCursor = (Parrot_UInt1*)s->strstart;
-
-            while (count--) {
-                assert(*oldCursor <= 0xFF);
-                *(newCursor++) = *(oldCursor++);
-            }
-        }
-
-        s->representation = representation;
-        s->bufused = string_max_bytes(interpreter, s, s->strlen);
-    }
-}
-
-/* temporary */
-void Parrot_string_downscale(Interp *interpreter, STRING *s,
-    parrot_string_representation_t representation);
-
-void
-Parrot_string_downscale(Interp *interpreter, STRING *s,
-    parrot_string_representation_t representation)
-{
-    _string_downscale(interpreter, s, representation);
-}
-
-static parrot_string_representation_t
-_string_smallest_representation(Interp *interpreter, STRING *s)
-{
-    if (s->representation == enum_stringrep_one) {
-        return enum_stringrep_one;
-    }
-    else if (s->representation == enum_stringrep_two) {
-        Parrot_UInt2 *cur = (Parrot_UInt2 *)s->strstart;
-        Parrot_UInt2 *end = cur + s->strlen;
-
-        while (cur < end) {
-            if (*cur > 255) {
-                return enum_stringrep_two;
-            }
-            cur++;
-        }
-
-        return enum_stringrep_one;
-    }
-    else if (s->representation == enum_stringrep_four) {
-        Parrot_UInt4 *cur = (Parrot_UInt4 *)s->strstart;
-        Parrot_UInt4 *end = cur + s->strlen;
-        int saw_two = 0;
-
-        while (cur < end) {
-            if (*cur > 0xFFFF) {
-                return enum_stringrep_four;
-            }
-            else if (*cur > 255) {
-                saw_two = 1;
-            }
-            cur++;
-        }
-
-        if (saw_two) {
-            return enum_stringrep_two;
-        }
-        else {
-            return enum_stringrep_one;
-        }
-    }
-    else { /* trouble */
-        return enum_stringrep_unknown;
-    }
 }
 
 /*
@@ -527,6 +441,9 @@ string_append(Interp *interpreter,
     if (a == NULL)
         return string_copy(interpreter, b);
 
+    saneify_string(a);
+    saneify_string(b);
+
     a_capacity = string_capacity(interpreter, a);
     total_length = string_length(interpreter, a) +
         string_length(interpreter, b);
@@ -541,11 +458,6 @@ string_append(Interp *interpreter,
     total_length = string_length(interpreter, a)
         + string_length(interpreter, b);
 
-    if (a->representation < b->representation) {
-        _string_upscale(interpreter, a, b->representation, total_length);
-    }
-
-    if (a->representation >= b->representation) {
         /* make sure A's big enough for both */
         if (a_capacity < total_length)
         {
@@ -559,7 +471,7 @@ string_append(Interp *interpreter,
         /* A is now ready to receive the contents of B */
 
         /* if same rep, can memcopy */
-        if (a->representation == b->representation) {
+    if (a->encoding == b->encoding && a->charset == b->charset) {
             /* Tack B on the end of A */
             mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
                     b->strstart, b->bufused);
@@ -569,74 +481,7 @@ string_append(Interp *interpreter,
             return a;
         }
         else {
-            /* if not, need to loop
-             * fast_byte_append v. safe_byte_append
-             */
-            /* remember, this is the case of rep A > rep B */
-            if (a->representation == enum_stringrep_two)  {
-                /* B must have rep one */
-                Parrot_UInt2 *a_cursor = (Parrot_UInt2 *)
-                    ((ptrcast_t)a->strstart + a->bufused);
-                Parrot_UInt1 *b_cursor = (Parrot_UInt1 *)
-                    ((ptrcast_t)b->strstart);
-                Parrot_UInt1 *b_end = (Parrot_UInt1 *)
-                    ((ptrcast_t)b->strstart + b->bufused);
-
-                while (b_cursor < b_end) {
-                    *(a_cursor++) = *(b_cursor++);
-                }
-
-                a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
-                string_compute_strlen(interpreter, a);
-            }
-            else if (a->representation == enum_stringrep_four) {
-                Parrot_UInt4 *a_cursor = (Parrot_UInt4 *)
-                    ((ptrcast_t)a->strstart + a->bufused);
-
-                switch (b->representation) {
-                    case enum_stringrep_one:
-                    {
-                        Parrot_UInt1 *b_cursor = (Parrot_UInt1 *)
-                            ((ptrcast_t)b->strstart);
-                        Parrot_UInt1 *b_end = (Parrot_UInt1 *)
-                            ((ptrcast_t)b->strstart + b->bufused);
-
-                        while (b_cursor < b_end) {
-                            *(a_cursor++) = *(b_cursor++);
-                        }
-
-                        a->bufused = (ptrcast_t)a_cursor - (ptrcast_t)a->strstart;
-                        string_compute_strlen(interpreter, a);
-
-                        break;
-                    }
-                    case enum_stringrep_two:
-                    {
-                        Parrot_UInt2 *b_cursor = (Parrot_UInt2 *)
-                            ((ptrcast_t)b->strstart);
-                        Parrot_UInt2 *b_end = (Parrot_UInt2 *)
-                            ((ptrcast_t)b->strstart + b->bufused);
-
-                        while (b_cursor < b_end) {
-                            *(a_cursor++) = *(b_cursor++);
-                        }
-
-                        a->bufused = (ptrcast_t)a_cursor -
-                            (ptrcast_t)a->strstart;
-                        string_compute_strlen(interpreter, a);
-
-                        break;
-                    }
-                    default:
-                        /* trouble */
-                        break;
-                }
-            }
-            else
-            {
-                /* problem */
-            }
-        }
+        internal_exception(UNIMPLEMENTED, "Cross-type string appending (%s/%s) (%s/%s) unsupported", ((ENCODING *)(a->encoding))->name, ((CHARSET *)(a->charset))->name, ((ENCODING *)(b->encoding))->name, ((CHARSET *)(b->charset))->name);
     }
 
     return a;
@@ -659,9 +504,11 @@ STRING *
 string_from_cstring(Interp *interpreter,
     const void *buffer, UINTVAL len)
 {
-    return string_make(interpreter, buffer, len ? len :
+    return string_make_direct(interpreter, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
-                       "iso-8859-1", 0); /* make this utf-8 eventually? */
+                              PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                              0); /* Force an 8-bit encoding at some
+                                     point? */
 }
 
 /*
@@ -681,9 +528,9 @@ STRING *
 string_from_const_cstring(Interp *interpreter,
     const void *buffer, UINTVAL len)
 {
-    return string_make(interpreter, buffer, len ? len :
+    return string_make_direct(interpreter, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
-                       "iso-8859-1", 0); /* make this utf-8 eventually? */
+                              PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0); /* make this utf-8 eventually? */
 }
 
 /*
@@ -709,12 +556,6 @@ string_primary_encoding_for_representation(Interp *interpreter,
         case enum_stringrep_one:
             return "iso-8859-1";
             break;
-        case enum_stringrep_two:
-            return "ucs-2";
-            break;
-        case enum_stringrep_four:
-            return "utf-32";
-            break;
         default:
             internal_exception(INVALID_STRING_REPRESENTATION,
                 "string_primary_encoding_for_representation: "
@@ -739,8 +580,9 @@ STRING *
 const_string(Interp *interpreter, const char *buffer)
 {
     /* TODO cache the strings */
-    return string_make(interpreter, buffer, strlen(buffer),
-        "iso-8859-1", PObj_external_FLAG|PObj_constant_FLAG);
+    return string_make_direct(interpreter, buffer, strlen(buffer),
+                       PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                       PObj_external_FLAG|PObj_constant_FLAG);
 }
 
 /*
@@ -773,6 +615,26 @@ STRING *
 string_make(Interp *interpreter, const void *buffer,
     UINTVAL len, const char *encoding_name, UINTVAL flags)
 {
+    ENCODING *encoding;
+    CHARSET *charset;
+    if (!encoding_name) {
+        internal_exception(MISSING_ENCODING_NAME,
+            "string_make: no encoding name specified");
+    }
+
+    if (strcmp(encoding_name, "iso-8859-1") == 0 ) {
+        encoding = Parrot_fixed_8_encoding_ptr;
+        charset = Parrot_iso_8859_1_charset_ptr;
+    }
+    else {
+        internal_exception(UNIMPLEMENTED, "Can't make non-iso-8859-1 strings");
+    }
+    return string_make_direct(interpreter, buffer, len, encoding, charset, flags);
+
+}
+
+STRING *
+string_make_direct(Interp *interpreter, const void *buffer, UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags) {
     STRING *s = NULL;
     union {
         const void * __c_ptr;
@@ -787,16 +649,12 @@ string_make(Interp *interpreter, const void *buffer,
             "string_make: buffer pointer NULL, but length nonzero");
     }
 
-    if (!encoding_name) {
-        internal_exception(MISSING_ENCODING_NAME,
-            "string_make: no encoding name specified");
-    }
-    else {
-        s = new_string_header(interpreter, flags);
-        s->representation = enum_stringrep_unknown;
 
-        if (strcmp(encoding_name, "iso-8859-1") == 0 ) {
-            s->representation = enum_stringrep_one;
+        s = new_string_header(interpreter, flags);
+    s->encoding = encoding;
+    s->charset = charset;
+
+    if (encoding == Parrot_fixed_8_encoding_ptr && charset == Parrot_iso_8859_1_charset_ptr) {
             /*
              * fast path for external (constant) strings - don't allocate
              * and copy data
@@ -814,17 +672,7 @@ string_make(Interp *interpreter, const void *buffer,
                 return s;
             }
         }
-        else if (strcmp(encoding_name, "ucs-2") == 0 ) {
-            /* worry about endian-ness */
-            s->representation = enum_stringrep_two;
-        }
-        else if (strcmp(encoding_name, "utf-32") == 0 ) {
-            s->representation = enum_stringrep_four;
-        }
 
-        if (s->representation != enum_stringrep_unknown) {
-            /* fast encodings */
-            /* decide in here on the size to use, and transcode.... */
             Parrot_allocate_string(interpreter, s, len);
 
             if (buffer) {
@@ -835,11 +683,6 @@ string_make(Interp *interpreter, const void *buffer,
             else {
                 s->strlen = s->bufused = 0;
             }
-        }
-        else {
-            string_fill_from_buffer(interpreter, buffer, len, encoding_name, s);
-        }
-    }
 
     return s;
 }
@@ -888,30 +731,6 @@ string_length(Interp * interpreter, const STRING *s)
 {
     return s ? s->strlen : 0;
 }
-
-/* XXX Is this right? */
-void *
-string_pointer_to_index(Interp * interpreter,
-    const STRING *s, UINTVAL idx)
-{
-    switch (s->representation) {
-        case enum_stringrep_one:
-            return ((Parrot_UInt1*)s->strstart + idx);
-            break;
-        case enum_stringrep_two:
-            return ((Parrot_UInt2*)s->strstart + idx);
-            break;
-        case enum_stringrep_four:
-            return ((Parrot_UInt4*)s->strstart + idx);
-            break;
-        default:
-            internal_exception(INVALID_STRING_REPRESENTATION,
-                "string_pointer_to_index: invalid string representation");
-            return NULL; /* make compiler happy */
-            break;
-    }
-}
-
 /*
 
 =item C<INTVAL
@@ -932,159 +751,8 @@ Note that this is not range-checked.
 INTVAL
 string_index(Interp * interpreter, const STRING *s, UINTVAL idx)
 {
-    switch (s->representation) {
-        case enum_stringrep_one:
-            return *((Parrot_UInt1*)s->strstart + idx);
-            break;
-        case enum_stringrep_two:
-            return *((Parrot_UInt2*)s->strstart + idx);
-            break;
-        case enum_stringrep_four:
-            return *((Parrot_UInt4*)s->strstart + idx);
-            break;
-        default:
-            internal_exception(INVALID_STRING_REPRESENTATION,
-                "string_index: invalid string representation");
-            return -1; /* make compiler happy */
-            break;
-    }
-}
-
-/*
-
-=item C<static INTVAL
-string_str_index_twobyte(Interp *interpreter,
-        const STRING *str, const STRING *find, UINTVAL start)>
-
-Helper function for C<string_str_index()>. This is optimized for the
-simple case where both strings are in UCS-2 (C<enum_stringrep_two>). It
-implements the Boyer-Moore string search algorithm.
-
-=cut
-
-*/
-
-static INTVAL
-string_str_index_twobyte(Interp *interpreter,
-        const STRING *str, const STRING *find, UINTVAL start)
-{
-    const Parrot_UInt2* const find_strstart = find->strstart;
-    const Parrot_UInt2* const str_strstart  = str->strstart;
-    const UINTVAL find_strlen = find->strlen;
-    const UINTVAL str_strlen = str->strlen;
-    const Parrot_UInt2* const lastmatch = str_strstart + str_strlen;
-    UINTVAL* p;
-    const Parrot_UInt2* cp;
-    UINTVAL endct, pos;
-    UINTVAL badshift[256];
-
-    /* Prepare the bad shift buffer */
-
-    for (p = &badshift[0] ; p < &badshift[256] ; p++) {
-        *p = find_strlen;
-    }
-
-    endct = 1;
-    cp = find_strstart + find_strlen - 2; /* why "- 2" ? */
-    for (; cp >= find_strstart ; cp--, endct++) {
-        UINTVAL offset = (256 & *cp);
-
-        if (endct < badshift[offset]) { /* or find_strlen != badshift[offset] */
-            badshift[offset] = endct;
-        }
-    }
-
-    /* Perform the match */
-
-    pos = start;
-    cp = str_strstart + start + find_strlen;
-    while (cp <= lastmatch) {
-        register const Parrot_UInt2* sp = cp;
-        register const Parrot_UInt2* fp = find_strstart + find_strlen;
-
-        while (fp > find_strstart) {
-            if (*--fp != *--sp)
-                break;
-        }
-        if (*fp == *sp) {
-            return pos;
-        }
-        else {
-            register UINTVAL bsi = badshift[256 & *(cp-1)];
-            cp  += bsi;
-            pos += bsi;
-        }
-    }
-
-    return -1;
-}
-
-/*
-
-=item C<static INTVAL
-string_str_index_singlebyte(Interp *interpreter,
-        const STRING *str, const STRING *find, UINTVAL start)>
-
-Helper function for C<string_str_index()>. This is optimized for the
-simple case where both strings are in ISO-8859-1
-(C<enum_stringrep_one>). It implements the Boyer-Moore string search
-algorithm.
-
-=cut
-
-*/
-
-static INTVAL
-string_str_index_singlebyte(Interp *interpreter,
-        const STRING *str, const STRING *find, UINTVAL start)
-{
-    const unsigned char* const find_strstart = find->strstart;
-    const unsigned char* const str_strstart = str->strstart;
-    const UINTVAL find_strlen = find->strlen;
-    const UINTVAL str_strlen = str->strlen;
-    const unsigned char* const lastmatch = str_strstart + str_strlen;
-    UINTVAL* p;
-    const unsigned char* cp;
-    UINTVAL endct, pos;
-    UINTVAL badshift[256];
-
-    /* Prepare the bad shift buffer */
-
-    for (p = &badshift[0] ; p < &badshift[256] ; p++) {
-        *p = find_strlen;
-    }
-
-    endct = 1;
-    cp = find_strstart + find_strlen - 2;
-    for (; cp >= find_strstart ; cp--, endct++) {
-        if (endct < badshift[*cp]) {
-            badshift[*cp] = endct;
-        }
-    }
-
-    /* Perform the match */
-
-    pos = start;
-    cp = str_strstart + start + find_strlen;
-    while (cp <= lastmatch) {
-        register const unsigned char* sp = cp;
-        register const unsigned char* fp = find_strstart + find_strlen;
-
-        while (fp > find_strstart) {
-            if (*--fp != *--sp)
-                break;
-        }
-        if (*fp == *sp) {
-            return pos;
-        }
-        else {
-            register UINTVAL bsi = badshift[*(cp-1)];
-            cp  += bsi;
-            pos += bsi;
-        }
-    }
-
-    return -1;
+    saneify_string(s);
+    return (INTVAL)CHARSET_GET_CODEPOINT(interpreter, s, idx);
 }
 
 /*
@@ -1116,6 +784,17 @@ string_str_index(Interp *interpreter, const STRING *s,
     if (!s2 || !string_length(interpreter, s2))
         return -1;
 
+    saneify_string(s);
+#if 0
+    /* At startup we sometimes get empty strings. Not yet tracked down */
+    if (!s->charset) {
+        s->charset = Parrot_iso_8859_1_charset_ptr;
+    }
+    if (!s2->charset) {
+        s2->charset = Parrot_iso_8859_1_charset_ptr;
+    }
+#endif
+
 /* here, check of the search string has a different rep than the target
    string. if so, up- or down-size the search string. upsizing is easy.
    for downsizing, need to check if there are any characters which won't
@@ -1127,28 +806,7 @@ string_str_index(Interp *interpreter, const STRING *s,
    with search string smaller rep, and size mismatched with search string
    larger rep. */
 
-    if (s->representation == s2->representation) {
-        switch (s->representation) {
-            case enum_stringrep_one:
-                return string_str_index_singlebyte(interpreter, s, s2, start);
-                break;
-            case enum_stringrep_two:
-                return string_str_index_twobyte(interpreter, s, s2, start);
-                break;
-            default:
-                internal_exception(UNIMPLEMENTED,
-                    "string_str_index: case not implemented yet");
-                return -1;
-            break;
-                break;
-        }
-    }
-    else
-    {
-        internal_exception(UNIMPLEMENTED,
-            "string_str_index: case not implemented yet");
-    }
-    return -1;
+    return CHARSET_INDEX(interpreter, s, s2, start);
 }
 
 /*
@@ -1216,21 +874,7 @@ TODO - Allow this to take an array of characters?
 STRING *
 string_chr(Interp *interpreter, UINTVAL character)
 {
-    if (character <= 0xFF) {
-        Parrot_UInt1 c = (Parrot_UInt1)character;
-        return string_make(interpreter,
-            &c, (UINTVAL)sizeof(Parrot_UInt1), "iso-8859-1", 0);
-    }
-    else if (character <= 0xFFFF) {
-        Parrot_UInt2 c = (Parrot_UInt2)character;
-        return string_make(interpreter,
-            &c, (UINTVAL)sizeof(Parrot_UInt2), "ucs-2", 0);
-    }
-    else {
-        Parrot_UInt4 c = (Parrot_UInt4)character;
-        return string_make(interpreter,
-            &c, (UINTVAL)sizeof(Parrot_UInt4), "utf-32", 0);
-    }
+    return Parrot_iso_8859_1_charset_ptr->string_from_codepoint(interpreter, character);
 }
 
 
@@ -1248,7 +892,7 @@ Creates and returns a copy of the specified Parrot string.
 STRING *
 string_copy(Interp *interpreter, STRING *s)
 {
-    return make_COW_reference(interpreter, s);
+    return Parrot_make_COW_reference(interpreter, s);
 }
 
 
@@ -1274,8 +918,7 @@ INTVAL
 string_compute_strlen(Interp *interpreter, STRING *s)
 {
     /* taking advantage of int value of the enum */
-    s->strlen = ((ptrcast_t)PObj_bufstart(s) + s->bufused -
-        (ptrcast_t)s->strstart) / (s->representation);
+    s->strlen = CHARSET_CODEPOINTS(interpreter, s);
 
     return s->strlen;
 }
@@ -1298,7 +941,10 @@ string_max_bytes(Interp *interpreter, STRING *s, INTVAL nchars)
 /* XXXX: here (and a couple of other places) we are taking advantage the
     numerical value of s->representation being equal to sizeof(relevant
     type), and we probably shouldn't */
-    return (nchars * (s->representation));
+    if (s->encoding) {
+        return (ENCODING_MAX_BYTES_PER_CODEPOINT(interpreter, s) * nchars);
+    }
+    return (nchars);
 }
 
 /*
@@ -1324,9 +970,7 @@ string_concat(Interp *interpreter,
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
             STRING *result =
-                string_make_empty(interpreter,
-                        (a->representation >= b->representation) ?
-                        a->representation : b->representation,
+                string_make_empty(interpreter, enum_stringrep_one,
                         a->strlen + b->strlen);
 
             string_append(interpreter, result, a, Uflags);
@@ -1369,7 +1013,7 @@ string_repeat(Interp *interpreter, const STRING *s,
     STRING *dest;
     UINTVAL i;
 
-    dest = string_make_empty(interpreter, s->representation, s->strlen * num);
+    dest = string_make_empty(interpreter, enum_stringrep_one, s->strlen * num);
 
     /* dest = string_make(interpreter, NULL, s->bufused * num, s->encoding, 0,
                        s->type); */
@@ -1414,6 +1058,7 @@ string_substr(Interp *interpreter, STRING *src,
     UINTVAL true_offset;
     UINTVAL true_length;
 
+    saneify_string(src);
     true_offset = (UINTVAL)offset;
 
     /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
@@ -1436,17 +1081,12 @@ string_substr(Interp *interpreter, STRING *src,
     }
 
     /* do in-place i.e. reuse existing header if one */
-    if (replace_dest)
-        dest = string_set(interpreter, *d, src);
+    if (replace_dest && *d) {
+        CHARSET_GET_CODEPOINTS_INPLACE(interpreter, src, *d, true_offset, true_length);
+        dest = *d;
+    }
     else
-        dest = make_COW_reference(interpreter, src);
-
-    dest->strstart = (char *)dest->strstart
-                        + string_max_bytes(interpreter, dest, true_offset);
-    dest->bufused = string_max_bytes(interpreter, dest, true_length);
-
-    dest->strlen = true_length;
-    dest->hashval = 0;
+        dest = CHARSET_GET_CODEPOINTS(interpreter, src, true_offset, true_length);
 
     if (d != NULL) {
         *d = dest;
@@ -1497,8 +1137,8 @@ string_replace(Interp *interpreter, STRING *src,
     true_length = (UINTVAL)length;
 
     /* may have different reps..... */
-    if (rep->representation < src->representation) {
-        _string_upscale(interpreter, rep, src->representation, 0);
+    if (src->encoding != rep->encoding || src->charset != rep->charset) {
+        internal_exception(UNIMPLEMENTED, "Can't handle mixed types yet");
     }
 
     /* abs(-offset) may not be > strlen-1 */
@@ -1524,7 +1164,7 @@ string_replace(Interp *interpreter, STRING *src,
     if (d != NULL) {
         UINTVAL length_bytes = string_max_bytes(interpreter, src, true_length);
 
-        dest = string_make_empty(interpreter, src->representation, true_length);
+        dest = string_make_empty(interpreter, enum_stringrep_one, true_length);
 
         mem_sys_memcopy(dest->strstart,
                 (char *)src->strstart
@@ -1539,21 +1179,6 @@ string_replace(Interp *interpreter, STRING *src,
 
     /* Now do the replacement */
 
-    /* this section could be more efficient, if we don't prescale the
-       whole string(s) */
-    if (rep->representation > src->representation) {
-        if ( _string_smallest_representation(interpreter, rep) <=
-                src->representation ) {
-            /* downsize replacement string */
-            _string_downscale(interpreter, rep, src->representation);
-        }
-        else {
-            /* must upsize target string; would be more efficient to do
-               such that the replacement is done at the same time */
-            _string_upscale(interpreter, src, rep->representation, 0);
-        }
-    }
-    /* either way, they now have the same rep */
 
     /* XXXX: make sure the rest of this method is correct, vis-a-vis byte v.
        character */
@@ -1682,64 +1307,6 @@ do { \
     } \
 } while(0)
 
-/*
-
-=item C<INTVAL
-string_compare(Interp *interpreter,
-    STRING *s1, STRING *s2)>
-
-Compares two Parrot strings, performing type and encoding conversions if
-necessary.
-
-Returns the standard -1, 0, 1 comparison result, indicating whether
-the first string was C<< < >>, C<==>, C<< > >> the second.
-
-=cut
-
-*/
-
-static INTVAL
-cmp_diff_repr(STRING *s1, STRING *s2)
-{
-
-    /* make this 3 more cases, rather than 6 */
-    INTVAL multiplier;
-    STRING *larger;
-    STRING *smaller;
-    INTVAL cmp;
-
-    if (s1->representation > s2->representation) {
-        larger = s1;
-        smaller = s2;
-        multiplier = 1;
-    }
-    else {
-        larger = s2;
-        smaller = s1;
-        multiplier = -1;
-    }
-
-    if (larger->representation == enum_stringrep_four) {
-        if (smaller->representation == enum_stringrep_two) {
-            COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt2,
-                    larger, smaller, cmp);
-        }
-        else {
-            /* smaller->representation == enum_stringrep_one */
-            COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt1,
-                    larger, smaller, cmp);
-        }
-    }
-    else {
-        /*
-         * larger->representation == enum_stringrep_two,
-         * smaller->representation == enum_stringrep_one
-         */
-        COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt1, larger, smaller, cmp);
-    }
-
-    return cmp * multiplier;
-}
 
 INTVAL
 string_compare(Interp *interpreter,
@@ -1757,34 +1324,15 @@ string_compare(Interp *interpreter,
         return -(s2->strlen != 0);
     }
 
+    saneify_string(s1);
+    saneify_string(s2);
+
 #  if ! DISABLE_GC_DEBUG
     /* It's easy to forget that string comparison can trigger GC */
     if (GC_DEBUG(interpreter))
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 #  endif
-
-    if (s1->representation == s2->representation) {
-        switch (s1->representation) {
-            case enum_stringrep_one:
-                /* could use memcmp in this one case; faster?? */
-                COMPARE_STRINGS(Parrot_UInt1, Parrot_UInt1, s1, s2, cmp);
-                break;
-            case enum_stringrep_two:
-                COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt2, s1, s2, cmp);
-                break;
-            case enum_stringrep_four:
-                COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt4, s1, s2, cmp);
-                break;
-            default:
-                /* trouble! */
-                break;
-        }
-
-        return cmp;
-    }
-    else {
-        return cmp_diff_repr(s1, s2);
-    }
+    return CHARSET_COMPARE(interpreter, s1, s2);
 }
 
 
@@ -1848,16 +1396,8 @@ string_equal(Interp *interpreter, STRING *s1, STRING *s2)
      * both strings are non-null
      * both strings have same length
      */
+    return CHARSET_COMPARE(interpreter, s1, s2);
 
-    if (s1->representation == s2->representation) {
-        return memcmp(s1->strstart, s2->strstart, s1->bufused);
-    }
-    else {
-        /* all the fast shortcuts have been taken
-         * now just left with compare
-         */
-        return cmp_diff_repr(s1, s2);
-    }
 }
 
 /*
@@ -1922,8 +1462,6 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
     /* think about case of dest string is one of the operands */
     if (s1 && s2) {
         minlen = s1->strlen > s2->strlen ? s2->strlen : s1->strlen;
-        maxrep = s1->representation >= s2->representation ?
-            s1->representation : s2->representation;
     }
 
     if (dest && *dest) {
@@ -1942,69 +1480,20 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
         return res;
     }
     else {
-        _string_upscale(interpreter, res, maxrep, 0);
+        if (s1->encoding != s2->encoding || s1->charset != s2->charset) {
+            internal_exception(UNIMPLEMENTED, "Can't do cross-type bitwwise and");
+        }
     }
-
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 #endif
 
-    make_writable(interpreter, &res, minlen, res->representation);
+    make_writable(interpreter, &res, minlen, enum_stringrep_one);
 
-    if (s1->representation == s2->representation) {
-        switch (s1->representation) {
-            case enum_stringrep_one:
                 BITWISE_AND_STRINGS(Parrot_UInt1, Parrot_UInt1,
                         Parrot_UInt1, s1, s2, res, minlen);
-                break;
-            case enum_stringrep_two:
-                BITWISE_AND_STRINGS(Parrot_UInt2, Parrot_UInt2,
-                        Parrot_UInt2, s1, s2, res, minlen);
-                break;
-            case enum_stringrep_four:
-                BITWISE_AND_STRINGS(Parrot_UInt4, Parrot_UInt4,
-                        Parrot_UInt4, s1, s2, res, minlen);
-                break;
-            default:
-                /* trouble! */
-                break;
-        }
-    }
-    else {
-        /* make this 3 more cases, rather than 6 */
-        STRING *larger;
-        STRING *smaller;
-
-        if (s1->representation > s2->representation) {
-            larger = s1;
-            smaller = s2;
-        }
-        else {
-            larger = s2;
-            smaller = s1;
-        }
-
-        if (larger->representation == enum_stringrep_four) {
-            if (smaller->representation == enum_stringrep_two) {
-                BITWISE_AND_STRINGS(Parrot_UInt4, Parrot_UInt2,
-                        Parrot_UInt4, larger, smaller, res, minlen);
-            }
-            else {
-                /* smaller->representation == enum_stringrep_one */
-                BITWISE_AND_STRINGS(Parrot_UInt4, Parrot_UInt1,
-                        Parrot_UInt4, larger, smaller, res, minlen);
-            }
-        }
-        else {
-            /* larger->representation == enum_stringrep_two,
-             * smaller->representation == enum_stringrep_one
-             */
-            BITWISE_AND_STRINGS(Parrot_UInt2, Parrot_UInt1,
-                    Parrot_UInt2, larger, smaller, res, minlen);
-        }
-    }
 
     res->strlen = minlen;
     res->bufused = string_max_bytes(interpreter, res, res->strlen);
@@ -2081,10 +1570,6 @@ string_bitwise_or(Interp *interpreter,
     if (s2 && s2->bufused > maxlen)
         maxlen = s2->bufused;
 
-    maxrep = s1 ? s1->representation: enum_stringrep_one;
-    if (s2 && s2->representation > maxrep)
-        maxrep = s2->representation;
-
     if (dest && *dest)
         res = *dest;
     else if (!s1 && !s2)
@@ -2104,61 +1589,10 @@ string_bitwise_or(Interp *interpreter,
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 #endif
 
-    make_writable(interpreter, &res, maxlen, res->representation);
+    make_writable(interpreter, &res, maxlen, enum_stringrep_one);
 
-    if (!s1 || !s2 || (s1->representation == s2->representation)) {
-        switch (maxrep) {
-            case enum_stringrep_one:
                 BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
                         s1, s2, res, maxlen, |);
-                break;
-            case enum_stringrep_two:
-                BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt2, Parrot_UInt2,
-                        s1, s2, res, maxlen, |);
-                break;
-            case enum_stringrep_four:
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt4, Parrot_UInt4,
-                        s1, s2, res, maxlen, |);
-                break;
-            default:
-                /* trouble! */
-                break;
-        }
-    }
-    else {
-        /* make this 3 more cases, rather than 6 */
-        STRING *larger;
-        STRING *smaller;
-
-        if (s1->representation > s2->representation) {
-            larger = s1;
-            smaller = s2;
-        }
-        else {
-            larger = s2;
-            smaller = s1;
-        }
-
-        if (larger->representation == enum_stringrep_four) {
-            if (smaller->representation == enum_stringrep_two) {
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt2, Parrot_UInt4,
-                        larger, smaller, res, maxlen, |);
-            }
-            else {
-                /* smaller->representation == enum_stringrep_one */
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt1, Parrot_UInt4,
-                        larger, smaller, res, maxlen, |);
-            }
-        }
-        else {
-            /* larger->representation == enum_stringrep_two,
-             * smaller->representation == enum_stringrep_one
-             */
-            BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt1, Parrot_UInt2,
-                    larger, smaller, res, maxlen, |);
-        }
-    }
-
     res->strlen = maxlen;
     res->bufused = string_max_bytes(interpreter, res, res->strlen);
 
@@ -2194,10 +1628,6 @@ string_bitwise_xor(Interp *interpreter,
     if (s2 && s2->bufused > maxlen)
         maxlen = s2->bufused;
 
-    maxrep = s1 ? s1->representation: enum_stringrep_one;
-    if (s2 && s2->representation > maxrep)
-        maxrep = s2->representation;
-
     if (dest && *dest)
         res = *dest;
     else if (!s1 && !s2)
@@ -2217,61 +1647,10 @@ string_bitwise_xor(Interp *interpreter,
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 #endif
 
-    make_writable(interpreter, &res, maxlen, res->representation);
+    make_writable(interpreter, &res, maxlen, enum_stringrep_one);
 
-    if (!s1 || !s2 || (s1->representation == s2->representation)) {
-        switch (maxrep) {
-            case enum_stringrep_one:
                 BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
                         s1, s2, res, maxlen, ^);
-                break;
-            case enum_stringrep_two:
-                BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt2, Parrot_UInt2,
-                        s1, s2, res, maxlen, ^);
-                break;
-            case enum_stringrep_four:
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt4, Parrot_UInt4,
-                        s1, s2, res, maxlen, ^);
-                break;
-            default:
-                /* trouble! */
-                break;
-        }
-    }
-    else {
-        /* make this 3 more cases, rather than 6 */
-        STRING *larger;
-        STRING *smaller;
-
-        if (s1->representation > s2->representation) {
-            larger = s1;
-            smaller = s2;
-        }
-        else
-        {
-            larger = s2;
-            smaller = s1;
-        }
-
-        if (larger->representation == enum_stringrep_four) {
-            if (smaller->representation == enum_stringrep_two) {
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt2, Parrot_UInt4,
-                        larger, smaller, res, maxlen, ^);
-            }
-            else {
-                /* smaller->representation == enum_stringrep_one */
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt1, Parrot_UInt4,
-                        larger, smaller, res, maxlen, ^);
-            }
-        }
-        else {
-            /* larger->representation == enum_stringrep_two,
-             * smaller->representation == enum_stringrep_one
-             */
-            BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt1, Parrot_UInt2,
-                    larger, smaller, res, maxlen, ^);
-        }
-    }
 
     res->strlen = maxlen;
     res->bufused = string_max_bytes(interpreter, res, res->strlen);
@@ -2305,14 +1684,12 @@ do { \
     { \
         const type *curr = (type *)s->strstart; \
         size_t length = s->strlen; \
-        Parrot_UInt4 *dp = (Parrot_UInt4 *)res->strstart; \
+        Parrot_UInt1 *dp = (Parrot_UInt1 *)res->strstart; \
  \
         for ( ; length ; --length, ++dp, ++curr) \
         { \
-            Parrot_UInt4 temp = *curr; \
-            if (temp <= (Parrot_UInt4)0xFF) *dp = 0xFF & ~ *curr; \
-            else if (temp <= (Parrot_UInt4)0xFFFF) *dp = 0xFFFF & ~ *curr; \
-            else *dp = 0xFFFFF & ~ *curr; \
+            Parrot_UInt1 temp = *curr; \
+            *dp = 0xFF & ~ *curr; \
         } \
     } \
 } while(0)
@@ -2340,15 +1717,12 @@ string_bitwise_not(Interp *interpreter,
     if (dest && *dest)
         res = *dest;
     else
-        res = string_make_empty(interpreter, enum_stringrep_four, len);
+        res = string_make_empty(interpreter, enum_stringrep_one, len);
 
     if (!s) {
         res->bufused = 0;
         res->strlen = 0;
         return res;
-    }
-    else {
-        _string_upscale(interpreter, res, enum_stringrep_four, 0);
     }
 
 #if ! DISABLE_GC_DEBUG
@@ -2357,26 +1731,12 @@ string_bitwise_not(Interp *interpreter,
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 #endif
 
-    make_writable(interpreter, &res, len, enum_stringrep_four);
+    make_writable(interpreter, &res, len, enum_stringrep_one);
 
     res->strlen = len;
     res->bufused = string_max_bytes(interpreter, res, len);
 
-    switch (s->representation) {
-        case enum_stringrep_one:
             BITWISE_NOT_STRING(Parrot_UInt1, s, res);
-            break;
-        case enum_stringrep_two:
-            BITWISE_NOT_STRING(Parrot_UInt2, s, res);
-            break;
-        case enum_stringrep_four:
-            BITWISE_NOT_STRING(Parrot_UInt4, s, res);
-            break;
-        default:
-            /* trouble */
-            break;
-    }
-
     if (dest)
         *dest = res;
 
@@ -2918,17 +2278,6 @@ string_unpin(Interp * interpreter, STRING * s) {
     mem_sys_free(memory);
 }
 
-#define HASH_STRING(TYPE, s, h) \
-do { \
-    TYPE *buffptr = (TYPE *)s->strstart; \
-    UINTVAL len = s->strlen; \
- \
-    while (len--) { \
-        h += h << 5; \
-        h += *buffptr++; \
-    } \
-} while(0)
-
 /*
 
 =item C<size_t
@@ -2946,27 +2295,14 @@ string_hash(Interp * interpreter, STRING *s)
 {
     register size_t h;
 
-    UNUSED(interpreter);
-
     if (!s)
         return 0;
 
-    h = 0;
-    switch (s->representation) {
-        case enum_stringrep_one:
-            HASH_STRING(Parrot_UInt1, s, h);
-            break;
-        case enum_stringrep_two:
-            HASH_STRING(Parrot_UInt2, s, h);
-            break;
-        case enum_stringrep_four:
-            HASH_STRING(Parrot_UInt4, s, h);
-            break;
-        default:
-            /* trouble */
-            break;
-    }
+    /* ZZZZZ workaround for something not setting up encodings right */
+    saneify_string(s);
 
+    h = 0;
+    h = CHARSET_COMPUTE_HASH(interpreter, s);
     s->hashval = h;
 
     return h;
@@ -2994,89 +2330,14 @@ Unescapes the specified C string. These sequences are covered:
 */
 
 
-static Parrot_UInt2
-char8_at(Parrot_Int4 offs, void* context)
-{
-    return ((char*)((STRING *)context)->strstart)[offs];
-
-}
-
-static Parrot_UInt2
-char16_at(Parrot_Int4 offs, void* context)
-{
-    return ((Parrot_UInt2*)((STRING *)context)->strstart)[offs];
-
-}
-
-static Parrot_UInt2
-char32_at(Parrot_Int4 offs, void* context)
-{
-    return ((Parrot_UInt4*)((STRING *)context)->strstart)[offs];
-
-}
-
-static void
-set_char8_at(Parrot_Int4 offs, STRING *s, Parrot_UInt4 c)
-{
-    ((char*)s->strstart)[offs] = c;
-}
-
-static void
-set_char16_at(Parrot_Int4 offs, STRING *s, Parrot_UInt4 c)
-{
-    ((Parrot_UInt2*)s->strstart)[offs] = c;
-}
-
-static void
-set_char32_at(Parrot_Int4 offs, STRING *s, Parrot_UInt4 c)
-{
-    ((Parrot_UInt4*)s->strstart)[offs] = c;
-}
-
-typedef void (*char_setter_func)(Parrot_Int4, STRING*, Parrot_UInt4);
-
-static char_setter_func
-set_char_setter(STRING *s)
-{
-    switch (s->representation) {
-        case enum_stringrep_one:
-            return set_char8_at;
-        case enum_stringrep_two:
-            return set_char16_at;
-        case enum_stringrep_four:
-            return set_char32_at;
-        default:
-            internal_exception(1, "Unhandled string representation");
-    }
-    return (char_setter_func)NULLfunc;
-}
-
-static Parrot_unescape_cb
-set_char_getter(STRING *s)
-{
-    switch (s->representation) {
-        case enum_stringrep_one:
-            return char8_at;
-        case enum_stringrep_two:
-            return char16_at;
-        case enum_stringrep_four:
-            return char32_at;
-        default:
-            internal_exception(1, "Unhandled string representation");
-    }
-    return (Parrot_unescape_cb)NULLfunc;
-}
-
 STRING *
 string_unescape_cstring(Interp * interpreter,
     const char *cstring, char delimiter, const char *charset)
 {
     size_t clength = strlen(cstring);
     STRING *result;
-    unsigned int offs, d;
+    UINTVAL offs, d;
     Parrot_UInt4 r;
-    Parrot_unescape_cb char_at;
-    char_setter_func set_char_at;
     UINTVAL flags;
 
     if (delimiter && clength)
@@ -3087,47 +2348,23 @@ string_unescape_cstring(Interp * interpreter,
     else
         flags |= PObj_private7_FLAG;  /* Pythonic unicode flag */
     result = string_make(interpreter, cstring, clength, charset, flags);
-    char_at     = set_char_getter(result);
-    set_char_at = set_char_setter(result);
 
     for (offs = d = 0; offs < clength; ++offs) {
-        r = (char_at)(offs, result);
+        r = CHARSET_GET_CODEPOINT(interpreter, result, offs);
         /* There cannot be any NULs within this string.  */
         assert(r != '\0');
         /* It's also a logic bug if we encounter the delimiter.  */
         assert(r != (Parrot_UInt4)delimiter);
         if (r == '\\') {
             ++offs;
-            r = string_unescape_one(char_at, &offs, result->strlen, result);
+            r = string_unescape_one(interpreter, &offs, result);
             --offs;
-            if (r > 0xff) {
-                parrot_string_representation_t needed_rep;
-
-                if (r == 0xffffffff)
-                    internal_exception(1, "Illegal escape sequence in '%s'",
-                            string_to_cstring(interpreter, result));
-                needed_rep = enum_stringrep_two;
-                if (r > 0xffff)
-                    needed_rep = enum_stringrep_four;
-                if (result->representation < needed_rep) {
-
-                    /* current result is this */
-                    result->strlen = clength;
-                    result->bufused = string_max_bytes(interpreter,
-                            result, clength);
-                    /* we need d + 1 + todo_length */
-                    _string_upscale(interpreter, result,
-                            needed_rep, d + clength - offs);
-                    char_at     = set_char_getter(result);
-                    set_char_at = set_char_setter(result);
-                }
-            }
         }
         if (d == offs) {
             ++d;
             continue;
         }
-        set_char_at(d++, result, r);
+        CHARSET_SET_CODEPOINT(interpreter, result, d++, r);
     }
     result->strlen = d;
     result->bufused = string_max_bytes(interpreter, result, d);
@@ -3181,20 +2418,10 @@ string_upcase_inplace(Interp *interpreter, STRING *s)
 {
     UINTVAL i;
     INTVAL o;
-    char_setter_func set_char_at;
 
     if (!s)
         return;
-    Parrot_unmake_COW(interpreter, s);
-    set_char_at = set_char_setter(s);
-    for (i = 0; i < s->strlen; ++i) {
-        o = string_ord(interpreter, s, i);
-        if (o >= 'a' && o <= 'z')
-            set_char_at(i, s, o - 32);
-        else if (o >= 0x80)
-            internal_exception(INTERNAL_NOT_IMPLEMENTED,
-                    "Case mangling for non-ASCII not yet implemented");
-    }
+    CHARSET_UPCASE(interpreter, s);
 }
 
 /*
@@ -3241,20 +2468,10 @@ string_downcase_inplace(Interp *interpreter, STRING *s)
 {
     UINTVAL i;
     INTVAL o;
-    char_setter_func set_char_at;
 
     if (!s)
         return;
-    Parrot_unmake_COW(interpreter, s);
-    set_char_at = set_char_setter(s);
-    for (i = 0; i < s->strlen; ++i) {
-        o = string_ord(interpreter, s, i);
-        if (o >= 'A' && o <= 'Z')
-            set_char_at(i, s, o + 32);
-        else if (o >= 0x80)
-            internal_exception(INTERNAL_NOT_IMPLEMENTED,
-                    "Case mangling for non-ASCII not yet implemented");
-    }
+    CHARSET_DOWNCASE(interpreter, s);
 }
 
 /*
@@ -3301,26 +2518,10 @@ string_titlecase_inplace(Interp *interpreter, STRING *s)
 {
     UINTVAL i;
     INTVAL o;
-    char_setter_func set_char_at;
 
     if (!s)
         return;
-    Parrot_unmake_COW(interpreter, s);
-    set_char_at = set_char_setter(s);
-    o = string_ord(interpreter, s, 0);
-    if (o >= 'a' && o <= 'z')
-        set_char_at(0, s, o - 32);
-    else if (o >= 0x80)
-        internal_exception(INTERNAL_NOT_IMPLEMENTED,
-                "Case mangling for non-ASCII not yet implemented");
-    for (i = 1; i < s->strlen; ++i) {
-        o = string_ord(interpreter, s, i);
-        if (o >= 'A' && o <= 'Z')
-            set_char_at(i, s, o + 32);
-        else if (o >= 0x80)
-            internal_exception(INTERNAL_NOT_IMPLEMENTED,
-                    "Case mangling for non-ASCII not yet implemented");
-    }
+    CHARSET_TITLECASE(interpreter, s);
 }
 
 /*

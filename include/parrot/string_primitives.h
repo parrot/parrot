@@ -26,8 +26,7 @@ void string_fill_from_buffer(Interp *interpreter,
 /* Utility method which knows how to uwind a single escape sequence */
 typedef Parrot_UInt2 (*Parrot_unescape_cb)(Parrot_Int4 offset, void *context);
 Parrot_UInt4
-string_unescape_one(Parrot_unescape_cb cb,
-    Parrot_UInt4 *offset, Parrot_UInt4 input_length, void *string);
+string_unescape_one(Interp *interpreter, UINTVAL *offset, STRING *string);
 
 UINTVAL
 Parrot_char_digit_value(Interp *interpreter, UINTVAL character);

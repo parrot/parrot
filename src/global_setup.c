@@ -24,10 +24,6 @@ I<What are these global variables?>
 #define INSIDE_GLOBAL_SETUP
 #include "parrot/parrot.h"
 
-#include "../encodings/fixed_8.h"
-#include "../charset/ascii.h"
-#include "../charset/binary.h"
-
 /* These functions are defined in the auto-generated file core_pmcs.c */
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 extern void Parrot_register_core_pmcs(Interp *interp, PMC *registry);
@@ -61,12 +57,6 @@ init_world(Interp *interpreter)
 #ifdef PARROT_HAS_PLATFORM_INIT_CODE
     Parrot_platform_init_code();
 #endif
-
-    /* Load in the basic encodings and charsets */
-    Parrot_encoding_fixed_8_init(interpreter);
-    Parrot_charset_binary_init(interpreter);
-    Parrot_charset_ascii_init(interpreter);
-
 
     /*
      * TODO allocate core vtable table only once - or per interpreter

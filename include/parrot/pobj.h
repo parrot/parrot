@@ -128,7 +128,7 @@ struct parrot_string_t {
     UINTVAL bufused;
     void *strstart;
     UINTVAL strlen;
-    parrot_string_representation_t representation;
+    /*    parrot_string_representation_t representation;*/
     void *encoding; /* These should be of type ENCODING * and CHARSET *
                      * respectively, but I'm not sure how to get them
                      * to do that without a whole lotta work right now */

@@ -17,6 +17,8 @@
 
 /* Declarations of accessors */
 
+void Parrot_reuse_COW_reference(Interp *, STRING *, STRING *);
+STRING *Parrot_make_COW_reference(Interp *, STRING *);
 void Parrot_unmake_COW(Interp *, STRING *);
 INTVAL string_compute_strlen(Interp *, STRING *);
 INTVAL string_max_bytes(Interp *, STRING*, INTVAL);
@@ -54,6 +56,7 @@ const char* string_primary_encoding_for_representation(Interp *,
 					parrot_string_representation_t representation);
 STRING *string_make(Interp *interpreter, const void *buffer,
             UINTVAL len, const char *encoding_name, UINTVAL flags);
+STRING *string_make_direct(Interp *interpreter, const void *buffer, UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags);
 STRING * string_make_empty(Interp *interpreter,
 					parrot_string_representation_t representation,
 					UINTVAL capacity);

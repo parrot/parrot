@@ -116,7 +116,8 @@ PIO_make_io_string(Interp *interpreter, STRING **buf, size_t default_len)
         PObj_buflen(s) = len;
         PObj_sysmem_SET(s);
         PObj_external_SET(s);
-        s->representation = enum_stringrep_one;
+        s->charset = Parrot_iso_8859_1_charset_ptr;
+        s->encoding = Parrot_fixed_8_encoding_ptr;
         /*
          * TODO encoding = raw
          */

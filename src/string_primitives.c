@@ -135,18 +135,195 @@ string_fill_from_buffer(Interp *interpreter, const void *buffer,
                 "string_fill_from_buffer: ICU error from ucnv_toUnicode()");
     }
 
-    s->representation = enum_stringrep_two;
+    internal_exception(UNIMPLEMENTED, "Can't do unicode yet");
+
     /* temporary; need to promote to rep 4 if has non-BMP characters*/
     s->bufused = (char *)target - (char *)s->strstart;
     string_compute_strlen(interpreter, s);
 }
 
 
+/* Unescape a single character. We assume that we're at the start of a
+   sequence, right after the \ */
 Parrot_UInt4
-string_unescape_one(Parrot_unescape_cb cb, Parrot_UInt4 *offset,
-        Parrot_UInt4 input_length, void *string)
+string_unescape_one(Interp *interpreter, UINTVAL *offset,
+        STRING *string)
 {
-    return u_unescapeAt(cb, (int32_t*) offset, input_length, string);
+    UINTVAL codepoint;
+    UINTVAL workchar = 0;
+    UINTVAL charcount = 0;
+    UINTVAL len = string_length(interpreter, string);
+    /* Well, not right now */
+    codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+    switch (codepoint) {
+    case 'x':
+        ++*offset;
+        codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+        if (codepoint >= '0' && codepoint <= '9') {
+            workchar = codepoint - '0';
+        } else if (codepoint >= 'a' && codepoint <= 'f') {
+            workchar = codepoint - 'a' + 10;
+        } else if (codepoint >= 'A' && codepoint <= 'F') {
+            workchar = codepoint - 'A' + 10;
+        } else {
+            internal_exception(UNIMPLEMENTED, "Illegal escape sequence in");
+        }
+        ++*offset;
+        if (*offset < len) {
+            workchar *= 16;
+            codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+            if (codepoint >= '0' && codepoint <= '9') {
+                workchar += codepoint - '0';
+            } else if (codepoint >= 'a' && codepoint <= 'f') {
+                workchar += codepoint - 'a' + 10;
+            } else if (codepoint >= 'A' && codepoint <= 'F') {
+                workchar += codepoint - 'A' + 10;
+            } else {
+                return workchar;
+            }
+        } else {
+            return workchar;
+        }
+        ++*offset;
+        return workchar;
+    case 'c':
+        ++*offset;
+        codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+        if (codepoint >= 'A' && codepoint <= 'Z') {
+            workchar = codepoint - 'A' + 1;
+        } else {
+            internal_exception(UNIMPLEMENTED, "Illegal escape sequence");
+        }
+        ++*offset;
+        return workchar;
+    case 'u':
+        ++*offset;
+        codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+        if (codepoint >= '0' && codepoint <= '9') {
+            workchar = codepoint - '0';
+        } else if (codepoint >= 'a' && codepoint <= 'f') {
+            workchar = codepoint - 'a' + 10;
+        } else if (codepoint >= 'A' && codepoint <= 'F') {
+            workchar = codepoint - 'A' + 10;
+        } else {
+            internal_exception(UNIMPLEMENTED, "Illegal escape sequence in");
+        }
+        ++*offset;
+        for (charcount = 1; charcount < 4; charcount++) {
+            if (*offset < len) {
+                workchar *= 16;
+                codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+                if (codepoint >= '0' && codepoint <= '9') {
+                    workchar += codepoint - '0';
+                } else if (codepoint >= 'a' && codepoint <= 'f') {
+                    workchar += codepoint - 'a' + 10;
+                } else if (codepoint >= 'A' && codepoint <= 'F') {
+                    workchar += codepoint - 'A' + 10;
+                } else {
+                    return workchar;
+                }
+            } else {
+                return workchar;
+            }
+            ++*offset;
+        }
+        return workchar;
+    case 'U':
+        ++*offset;
+        codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+        if (codepoint >= '0' && codepoint <= '9') {
+            workchar = codepoint - '0';
+        } else if (codepoint >= 'a' && codepoint <= 'f') {
+            workchar = codepoint - 'a' + 10;
+        } else if (codepoint >= 'A' && codepoint <= 'F') {
+            workchar = codepoint - 'A' + 10;
+        } else {
+            internal_exception(UNIMPLEMENTED, "Illegal escape sequence in");
+        }
+        ++*offset;
+        for (charcount = 1; charcount < 8; charcount++) {
+            if (*offset < len) {
+                workchar *= 16;
+                codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+                if (codepoint >= '0' && codepoint <= '9') {
+                    workchar += codepoint - '0';
+                } else if (codepoint >= 'a' && codepoint <= 'f') {
+                    workchar += codepoint - 'a' + 10;
+                } else if (codepoint >= 'A' && codepoint <= 'F') {
+                    workchar += codepoint - 'A' + 10;
+                } else {
+                    return workchar;
+                }
+            } else {
+                return workchar;
+            }
+            ++*offset;
+        }
+        return workchar;
+    case 'b':
+        internal_exception(UNIMPLEMENTED, "Illegal escape sequence in ");
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+        workchar = codepoint - '0';
+        ++*offset;
+        if (*offset < len) {
+            workchar *= 8;
+            codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+            if (codepoint >= '0' && codepoint <= '7') {
+                workchar += codepoint - '0';
+            } else {
+                return workchar;
+            }
+        } else {
+            return workchar;
+        }
+        ++*offset;
+        if (*offset < len) {
+            workchar *= 8;
+            codepoint = CHARSET_GET_CODEPOINT(interpreter, string, *offset);
+            if (codepoint >= '0' && codepoint <= '7') {
+                workchar += codepoint - '0';
+            } else {
+                return workchar;
+            }
+        } else {
+            return workchar;
+        }
+        ++*offset;
+        return workchar;
+    case 'a':
+        ++*offset;
+        return 7; /* bell */
+    case 't':
+        ++*offset;
+        return 9;
+    case 'n':
+        ++*offset;
+        return 10;
+    case 'f':
+        ++*offset;
+        return 12;
+    case 'r':
+        ++*offset;
+        return 13;
+    case 'e':
+        ++*offset;
+        return 27;
+    case 92:
+        ++*offset;
+        return 92;
+    case '"':
+        ++*offset;
+        return '"';
+    }
+
+    return 0;
 }
 
 /*

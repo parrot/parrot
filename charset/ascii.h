@@ -14,6 +14,7 @@
 #define PARROT_CHARSET_ASCII_H_GUARD
 
 static STRING *get_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
+static STRING *get_graphemes_inplace(Interp *interpreter, STRING *source_string, STRING *dest_string, UINTVAL offset, UINTVAL count);
 static void set_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
 static void to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset);
 static STRING *copy_to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset);
@@ -27,7 +28,7 @@ static void upcase_first(Interp *interpreter, STRING *source_string);
 static void downcase_first(Interp *interpreter, STRING *source_string);
 static void titlecase_first(Interp *interpreter, STRING *source_string);
 static INTVAL compare(Interp *interpreter, STRING *lhs, STRING *rhs);
-static INTVAL cs_index(Interp *interpreter, STRING *source_string, STRING *search_string, UINTVAL offset);
+static INTVAL cs_index(Interp *interpreter, const STRING *source_string, const STRING *search_string, UINTVAL offset);
 static INTVAL cs_rindex(Interp *interpreter, STRING *source_string, STRING *search_string, UINTVAL offset);
 static UINTVAL validate(Interp *interpreter, STRING *source_string);
 static INTVAL is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset);
@@ -46,6 +47,7 @@ static INTVAL is_newline(Interp *interpreter, STRING *source_string, UINTVAL off
 static INTVAL find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset);
 static INTVAL find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset);
 static INTVAL find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset);
+static size_t compute_hash(Interp *interpreter, STRING *source_string);
 CHARSET *Parrot_charset_ascii_init(Interp *interpreter);
 
 

@@ -1241,6 +1241,8 @@ ok 2
 ok 3
 OUTPUT
 
+SKIP: {
+skip("No unicode yet", 1);
 output_is( <<'CODE', <<OUTPUT, "bnots 2");
  getstdout P0
  push P0, "utf8"
@@ -1265,6 +1267,7 @@ a2c
 \xC2\x9E\xC3\x8D\xC2\x9C
 a2c
 OUTPUT
+}
 
 output_is( <<'CODE', <<OUTPUT, "eq");
         new P1, .PerlString

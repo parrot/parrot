@@ -41,7 +41,8 @@ void *Parrot_make_cpa(Interp *, PMC *);
 void Parrot_destroy_la(long *);
 void Parrot_destroy_cpa(char **);
 PMC* tm_to_array(Parrot_Interp interpreter, struct tm *tm);
-
+INTVAL Parrot_byte_index(Interp *interpreter, STRING *base, STRING *search, UINTVAL start_offset);
+INTVAL Parrot_byte_rindex(Interp *interpreter, STRING *base, STRING *search, UINTVAL start_offset);
 /*
  * misc.c
  */

@@ -225,7 +225,7 @@ defines or undefs PARROT_HAS_HEADER_XXX in F<include/parrot/has_header.h>
 
 =item C< HAS_(\w+) > features
 
-defines PARROT_HAS_XX in F<include/parrot/has_header.h>
+defines PARROT_HAS_XXX in F<include/parrot/has_header.h>
 
 =item C< TEMP_(\w+) > temporary settings
 
@@ -233,7 +233,6 @@ These settings are deleted before F<lib/Parrot/Config.pm> is written. These
 entries are only used e.g. for Makefile creation.
 
 =back
-
 
 =head1 SEE ALSO
 

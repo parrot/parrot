@@ -580,6 +580,7 @@ opcode_t*
 PF_store_string(opcode_t *cursor, STRING *s)
 {
     opcode_t padded_size = s->bufused;
+    opcode_t representation;
     char *charcursor;
     size_t i;
 
@@ -590,7 +591,7 @@ PF_store_string(opcode_t *cursor, STRING *s)
     }
 
     *cursor++ = PObj_get_FLAGS(s); /* only constant_FLAG and private7 */
-    *cursor++ = s->representation;
+    *cursor++ = enum_stringrep_one;
     *cursor++ = s->bufused;
 
     /* Switch to char * since rest of string is addressed by
