@@ -86,6 +86,7 @@ EOL		\r?\n
 ".sym"          return(SYM);
 ".arg"          return(ARG);
 ".sub"          return(SUB);
+".end"          return(ESUB);
 ".result"       return(RESULT);
 ".return"       return(RETURN);
 ".class"        return(CLASS);
@@ -109,9 +110,6 @@ EOL		\r?\n
 "string"        return(STRINGV);
 "call"          return(CALL);
 "print"         return(PRINT);
-"push"          return(PUSH);
-"pop"           return(POP);
-"ret"           return(RET);
 "saveall"       return(SAVEALL);
 "restoreall"    return(RESTOREALL);
 "<<"            return(SHIFT_LEFT);

@@ -1,10 +1,11 @@
-# Cola (0.0.7.1) generated
+# Cola (0.0.8.1) generated
 #
 .sub _MAIN
 	.arg ""
 	call Mandelbrot__Main
 	end
 	ret
+.end
 .sub Console__WriteLine
 	saveall
 	.param string	s
@@ -12,6 +13,7 @@
 	call __puts
 LBL0:	restoreall
 	ret
+.end
 .sub Mandelbrot__Main
 	saveall
 	.local int	k
@@ -87,6 +89,7 @@ LBL5:
 LBL4:
 LBL1:	restoreall
 	ret
+.end
 
 .emit
 

@@ -293,6 +293,11 @@ add_const_str(char *str) {
         l = unescape(buf);
         buf[--l] = '\0';
     }
+    else if (*buf == '\'') {
+        buf++;
+        l = strlen(buf);
+        buf[--l] = '\0';
+    }
     else {
         l = unescape(buf);
     }
@@ -439,6 +444,8 @@ static void add_1_const(SymReg *r)
         case 'I':
             if (r->name[0] == '0' && r->name[1] == 'x')
                 r->color = strtoul(r->name+2, 0, 16);
+            else if (r->name[0] == '0' && r->name[1] == 'b')
+                r->color = strtoul(r->name+2, 0, 2);
             else
                 r->color = atoi(r->name);
             break;

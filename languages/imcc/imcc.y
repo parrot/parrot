@@ -133,12 +133,12 @@ static Instruction * iINDEXFETCH(SymReg * r0, SymReg * r1, SymReg * r2) {
 
 /*
  * substr or P[key] = X
-        */
+ */
 
 static Instruction * iINDEXSET(SymReg * r0, SymReg * r1, SymReg * r2) {
     if(r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
         SymReg * r3 = mk_const("1", 'I');
-        MK_I("substr %s, %s, 1, %s", R4(r0, r1,r3, r2));
+        MK_I("substr %s, %s, %s, %s", R4(r0, r1,r3, r2));
     }
     else if (r0->set == 'P') {
         keyvec |= KEY_BIT(1);
@@ -444,19 +444,19 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
     Instruction *i;
 }
 
-%token <t> CALL GOTO ARG RET PRINT IF UNLESS NEW END SAVEALL RESTOREALL
-%token <t> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM PUSH POP INC DEC
+%token <t> CALL GOTO ARG PRINT IF UNLESS NEW END SAVEALL RESTOREALL
+%token <t> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM INC DEC
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
-%token <t> COMMA
+%token <t> COMMA ESUB
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO
 %token <s> PARROT_OP
 %type <t> type
 %type <i> program subs sub sub_start emit
-%type <s> classname relop
+%type <s> classname relop newtype
 %type <i> labels _labels label statements statement
 %type <i> instruction assignment if_statement labeled_inst
 %type <sr> target reg const var rc string
@@ -506,7 +506,7 @@ subs:	subs sub
     |   sub
     ;
 
-sub:	sub_start statements RET
+sub:	sub_start statements ESUB
         {
           $$ = 0; MK_I("ret", R0());
 	  allocate();
@@ -527,7 +527,7 @@ statements: statement
     |   statements statement
     ;
 
-statement:  {clear_state(); }
+statement:  {clear_state(); $$=0; }
         instruction
     ;
 
@@ -558,9 +558,7 @@ labeled_inst:
 		                            R1(mk_ident($3, $2)));}
     |   PARAM reg			{ $$ = MK_I("restore", R1($2)); }
     |   RESULT var			{ $$ = MK_I("restore", R1($2)); }
-    |   POP var				{ $$ = MK_I("restore", R1($2)); }
     |   ARG var				{ $$ = MK_I("save", R1($2)); }
-    |   PUSH var			{ $$ = MK_I("save", R1($2)); }
     |   RETURN var			{ $$ = MK_I("save", R1($2)); }
     |   CALL IDENTIFIER			{ $$ = MK_I("bsr",
                                               R1(mk_address($2, U_add_once)));}
@@ -618,6 +616,13 @@ assignment:
                                           R2($1, mk_address($4,U_add_once))); }
     |  target '=' GLOBAL string	{ $$ = MK_I("find_global",R2($1,$4)); }
     |  GLOBAL string '=' var	{ $$ = MK_I("store_global",R2($2,$4)); }
+    |  NEW                      { expect_pasm = 1; }
+        target COMMA newtype    { $$ = iNEW($3, $5, 1); }
+    |  DEFINED target COMMA var { $$ = MK_I("defined", R2($2, $4)); }
+    |  CLONE target COMMA var   { $$ = MK_I("clone", R2($2, $4)); }
+    ;
+
+newtype: MACRO                 { $$ = str_dup($1+1); free($1); }
     ;
 
 if_statement:
@@ -627,6 +632,11 @@ if_statement:
                                           mk_address($4, U_add_once))); }
     |  UNLESS var GOTO IDENTIFIER       {$$= MK_I("unless",R2($2,
                                           mk_address($4, U_add_once))); }
+    |  IF var COMMA IDENTIFIER          { $$= MK_I("if", R2($2,
+                                          mk_address($4, U_add_once))); }
+    |  UNLESS var COMMA IDENTIFIER      { $$= MK_I("unless", R2($2,
+                                          mk_address($4, U_add_once))); }
+
     ;
 
 relop:

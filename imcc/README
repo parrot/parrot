@@ -1,4 +1,4 @@
-IMCC 0.0.8.10
+IMCC 0.0.9.5
 
 imcc is the Intermediate Code Compiler for Parrot.
 The language it compiles is currently termed Parrot
@@ -13,7 +13,7 @@ common back-end for Parrot that does:
    Constant folding and expression evaluation
    Instruction selection.
    Optimization.
-   
+
 This way, language designers can get right to work on
 
    Tokenizing, parsing, type checking AST/DAG production
@@ -110,7 +110,7 @@ Directives
     so we refer to operands on the right side as rvals. lvals
     are also used on the right hand side to indicate that the
     item can be a const or non-const token.
-    
+
   These are tokens that might not directly translate to a specific
   opcode, and are intentionly left generic. Some of them aren't
   ops at all, but instructions to the compiler.
@@ -123,10 +123,12 @@ Directives
 
    .sub <IDENTIFIER>
 
+   .end
+
    .local <IDENTIFIER>
 
    .arg <lval>
- 
+
    .return <lval>
 
    .result <lval>
@@ -152,7 +154,7 @@ Instructions
    lval = rval - rval
 
    lval = rval * rval
- 
+
    lval = rval / rval
 
    lval = rval % rval

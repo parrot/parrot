@@ -140,5 +140,5 @@
 	print $I74
 	print "\n"
 	end
-ret
+.end
 
