@@ -220,7 +220,7 @@ Print $1 to standard error.
 =cut
 
 op printerr(in INT) {
-  PIO_eprintf(interpreter, INTVAL_FMT, (double)$1);
+  PIO_eprintf(interpreter, INTVAL_FMT, $1);
   goto NEXT();
 }
 

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "open/close");
@@ -239,4 +239,21 @@ output_is(<<'CODE', '012', 'standard file descriptors');
        print I2
        end
 CODE
-unlink("temp.file");
+
+output_is(<<'CODE', <<'OUTPUT', 'printerr');
+       new P0, .PerlString
+       set P0, "This is a test\n"
+       printerr 10
+       printerr "\n"
+       printerr 1.0
+       printerr "\n"
+       printerr "foo"
+       printerr "\n"
+       printerr P0
+       end
+CODE
+10
+1.000000
+foo
+This is a test
+OUTPUT
