@@ -416,7 +416,7 @@ build_key(SymReg *reg)
                         break;
                     case 'I':                       /* P[;42;..] */
                         *pc++ = PARROT_ARG_IC;      /* int constant */
-                        *pc++ = r->color;      /* value */
+                        *pc++ = r->color = atoi(r->name);   /* value */
                         debug(1, " keypart IC %s #%d\n", r->name, r->color);
                         break;
                     default:

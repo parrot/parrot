@@ -1,3 +1,10 @@
+- 2003-01-14	leo
+
+	* version 0.0.9.9.
+	* fix const integer multi keys
+	* recognize op_fullnames
+	* allow reserved word (i.e. parrot ops) as labels
+
 - 2002-12-12	leo
 
 	* version 0.0.9.8

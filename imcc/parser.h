@@ -17,7 +17,6 @@ EXTERN int is_def;
 EXTERN int IMCC_DEBUG;
 EXTERN int gc_off;
 EXTERN char* output;
-EXTERN FILE *yyin;
 EXTERN int yydebug;
 
 #define KEY_BIT(argnum) (1 << (argnum))

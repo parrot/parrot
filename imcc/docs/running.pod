@@ -22,6 +22,10 @@ This document describes imcc's command line options.
 
 =head2 Imcc options
 
+=item -a, --pasm
+
+Assume PASM input on stdin.
+
 =item -c, --create-pbc
 
 =item -d, --debug
@@ -65,6 +69,7 @@ imcc.
 If the file ends in B<.pbc> it will be interpreted.
 If the file ends in B<.pasm> it is parsed as PASM code else as PIR
 code.
+If the B<file> is a single dash, input from B<stdin> is read.
 
 =head2 Generated files
 

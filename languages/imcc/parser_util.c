@@ -81,7 +81,8 @@ int check_op(char *fullname, char *name, SymReg *regs[])
 
 int is_op(char *name)
 {
-    return interpreter->op_lib->op_code(name, 0) >= 0;
+    return interpreter->op_lib->op_code(name, 0) >= 0
+        || interpreter->op_lib->op_code(name, 1) >= 0;
 }
 
 /* make a instruction

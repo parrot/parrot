@@ -21,11 +21,13 @@
 
 
 static int pbc, write_pbc;
+FILE *yyin;
+
 static void usage(FILE *fp)
 {
     fprintf(fp, "imcc\t[-h|--help] [-V|--version] [-v|--verbose] "
 	    "[-<parrot-switch>] \n"
-	    "\t[-d|--debug] [-y|--yydebug]\n"
+	    "\t[-d|--debug] [-y|--yydebug] [-a|--pasm]\n"
 	    "\t[-c|--create-pbc] [-r|--run-pbc] [-O[012]]\n"
 	    "\t[-o outfile] infile [arguments ...]\n");
 }
@@ -99,6 +101,9 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             case '.':  /* Give Windows Parrot hackers an opportunity to
                         * attach a debuggger. */
                 fgetc(stdin);
+                break;
+            case 'a':
+                pasm_file = 1;
                 break;
             case 'h':
                 help();

@@ -165,7 +165,7 @@ EOL		\r?\n
         yylval.s = str_dup(yytext);
         return(INTC);
     }
-<emit>{BIN} {
+<emit,INITIAL>{BIN} {
         yylval.s = str_dup(yytext);
         return(INTC);
     }

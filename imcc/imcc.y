@@ -271,6 +271,8 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
 #endif
     op_fullname(fullname, name, regs, nargs);
     op = interpreter->op_lib->op_code(fullname, 1);
+    if (op < 0)         /* maybe we got a fullname */
+        op = interpreter->op_lib->op_code(name, 1);
     if (op >= 0) {
         op_info_t * info = &interpreter->op_info_table[op];
 	char format[128];
@@ -379,11 +381,11 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
 %token <s> PARROT_OP
 %type <t> type
 %type <i> program sub sub_start emit
-%type <s> classname relop newtype
+%type <s> classname relop
 %type <i> labels _labels label statements statement
 %type <i> instruction assignment if_statement labeled_inst
 %type <sr> target reg const var rc string
-%type <sr> key keylist _keylist
+%type <sr> key keylist _keylist newtype
 %type <sr> vars _vars var_or_i _var_or_i
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args lhs
@@ -538,14 +540,16 @@ assignment:
     |  target '=' GLOBAL string	{ $$ = MK_I("find_global",R2($1,$4)); }
     |  GLOBAL string '=' var	{ $$ = MK_I("store_global",R2($2,$4)); }
     |  NEW                              { expect_pasm = 1; }
-        target COMMA newtype            { $$ = iNEW($3, $5, 1); }
+        target COMMA newtype            { $$ = MK_I("new", R2($3, $5)); }
     |  DEFINED target COMMA var         { $$ = MK_I("defined", R2($2, $4)); }
     |  DEFINED target COMMA var '[' keylist ']'  { keyvec=KEY_BIT(2);
                                        $$ = MK_I("defined", R3($2, $4, $6));}
     |  CLONE target COMMA var           { $$ = MK_I("clone", R2($2, $4)); }
     ;
 
-newtype: MACRO
+newtype:
+     MACRO                             { $$ = macro($1); free($1); }
+    | const
     ;
 
 if_statement:
@@ -594,6 +598,7 @@ _var_or_i: var_or_i                     { regs[nargs++] = $1; }
     ;
 var_or_i:
        IDENTIFIER			{ $$ = mk_address($1, U_add_once); }
+    |  PARROT_OP                        { $$ = mk_address($1, U_add_once); }
     |  var
     | MACRO                             { $$ = macro($1); free($1); }
     ;
