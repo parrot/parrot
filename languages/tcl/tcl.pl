@@ -11,31 +11,19 @@ my $contents = <TEMPLATE>;
 close(TEMPLATE);
 
 my $command_dir = "lib/commands";
-opendir(CMDDIR,$command_dir) or die;
+opendir(CMDDIR,$command_dir);
 my @cmd_files = readdir(CMDDIR);
 closedir(CMDDIR);
 
-my $math_dir = "lib/functions";
-opendir(FUNCDIR,$math_dir);
-my @math_files = readdir(FUNCDIR);
-closedir(FUNCDIR);
+my $macro_dir = "lib/macros";
+opendir(CMDDIR,$command_dir);
+my @macro_files = readdir(CMDDIR);
+closedir(CMDDIR);
 
 my @cmd_includes = map {"$command_dir/$_"} grep {m/\.imc$/} @cmd_files;
-my @math_includes = map {"$math_dir/$_"} grep {m/\.imc$/} @math_files;
+my @macro_includes = map {"$macro_dir/$_"} grep {m/\.imc$/} @macro_files;
+
 my @commands = grep {s/\.imc$//} @cmd_files;
-my @functions = grep {s/\.imc$//} @math_files;
-
-#my $commands;
-#foreach my $command (@commands) {
-  #$commands .= "  newsub a_sub, .Sub, __cmd_$command\n";
-  #$commands .= "  commands[\"$command\"] = a_sub\n";
-#}
-
-my $functions;
-foreach my $function (@functions) {
-  $functions .= "  newsub a_sub, .Sub, __math_$function\n";
-  $functions .= "  math_funcs[\"$function\"] = a_sub\n";
-}
 
 my $lib_dir = "lib";
 opendir(LIBDIR,$lib_dir) or die;
@@ -43,13 +31,11 @@ my @libs = map {"$lib_dir/$_"} grep {m/\.imc$/} readdir(LIBDIR);
 closedir(LIBDIR);
 
 my $includes;
-foreach my $file (sort(@cmd_includes, @libs, @math_includes)) {
+foreach my $file (sort(@cmd_includes, @libs, @macro_includes)) {
   $includes .= "  .include \"languages/tcl/$file\"\n";
 }
 
-#$contents =~ s/\${COMMANDS}/$commands/g;
 $contents =~ s/\${INCLUDES}/$includes/g;
-$contents =~ s/\${FUNCTIONS}/$functions/g;
 $contents =~ s/\${HEADER}/This file automatically generated, do not edit./g;
 $contents =~s/\${XXX.*}//g;
 
