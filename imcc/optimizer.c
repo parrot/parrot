@@ -52,6 +52,8 @@
 static void if_branch(struct Parrot_Interp *);
 static void branch_branch(void);
 static void unused_label(void);
+static void strength_reduce(struct Parrot_Interp *interp);
+
 static int used_once(void);
 static int loop_optimization(struct Parrot_Interp *);
 static int clone_remove(void);
@@ -62,6 +64,7 @@ void pre_optimize(struct Parrot_Interp *interp) {
         branch_branch();
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
         unused_label();
+        strength_reduce(interp);
     }
 }
 
@@ -229,6 +232,28 @@ static void unused_label()
     }
 }
 
+static void strength_reduce(struct Parrot_Interp *interp)
+{
+    Instruction *ins, *tmp;
+    const char *ops[] = { "add", "sub", "mul", "div" };
+    int i;
+
+    for (ins = instructions; ins; ins = ins->next) {
+        /*
+         * sub Ix, Ix, Iy => sub Ix, Iy
+         */
+        for (i = 0; i < 4; i++)
+            if (!strcmp(ins->op, ops[i]) && ins->opsize == 4 &&
+                    ins->r[0] == ins->r[1]) {
+                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                ins->r[1] = ins->r[2];
+                tmp = INS(interp, ins->op, "", ins->r, 2, 0, 0);
+                debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                subst_ins(ins, tmp, 1);
+            }
+    }
+
+}
 /* optimizations with CFG built */
 int dead_code_remove(void)
 {

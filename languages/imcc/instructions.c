@@ -235,6 +235,24 @@ void insert_ins(Instruction *ins, Instruction * tmp)
         tmp->line = ins->line;
 }
 
+/*
+ * subst tmp for ins
+ */
+
+void subst_ins(Instruction *ins, Instruction * tmp, int needs_freeing)
+{
+    Instruction *prev = ins->prev;
+    if (prev)
+        prev->next = tmp;
+    tmp->prev = prev;
+    tmp->next = ins->next;
+    if (ins->next)
+        ins->next->prev = tmp;
+    if (!tmp->line)
+        tmp->line = ins->line;
+    if (needs_freeing)
+        free_ins(ins);
+}
 /* move instruction ins to to */
 Instruction *move_ins(Instruction *ins, Instruction *to)
 {

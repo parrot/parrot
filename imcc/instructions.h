@@ -86,6 +86,7 @@ char * ins_string(Instruction * ins);
 Instruction *delete_ins(Instruction *ins, int needs_freeing);
 void insert_ins(Instruction *ins, Instruction * tmp);
 Instruction *move_ins(Instruction *cur, Instruction *to);
+void subst_ins(Instruction *ins, Instruction * tmp, int);
 
 int get_branch_regno(Instruction * ins);
 SymReg *get_branch_reg(Instruction * ins);

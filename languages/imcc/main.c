@@ -216,7 +216,8 @@ int main(int argc, char * argv[])
         }
         ext = strrchr(sourcefile, '.');
         if (ext && strcmp (ext, ".pasm") == 0) {
-            pasm_file = 1;
+            if (*optimizer_opt == '0')
+                pasm_file = 1;
             if (output)
                 write_pbc = 1;
         }
@@ -260,7 +261,7 @@ int main(int argc, char * argv[])
         line = 1;
         emit_open(per_pbc, per_pbc ? (void*)interpreter : (void*)output);
 
-        debug(1, "Starting parse...\n");
+        info(1, "Starting parse...\n");
 
         yyparse((void *) interpreter);
         emit_close(interpreter);
