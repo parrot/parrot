@@ -515,7 +515,7 @@ sub parse
       # (available by passing $block in as an argument).
       #
 
-      if ($peer_block->kind eq 'while') {
+      if ($peer_block->kind eq 'while' or $peer_block->kind eq 'until') {
         my $parent_block = $peer_block->block;
         my $loop = Jako::Construct::Block::Loop::Continue->new($parent_block, $peer_block);
         $self->push_block($loop) if defined $cont;
@@ -532,7 +532,7 @@ sub parse
       # Continuation of 'if' blocks happens by $continue being 'else'.
       #
 
-      elsif ($peer_block->kind eq 'if') {
+      elsif ($peer_block->kind eq 'if' or $peer_block->kind eq 'unless') {
         my $parent_block = $peer_block->block;
         my $cond = Jako::Construct::Block::Conditional::Else->new($parent_block, $peer_block);
         $self->push_block($cond) if defined $cont;;
