@@ -56,6 +56,10 @@ Classes
 
 - To PerlClass or not to PerlClass, that is the question. The class
   hierarchy should be reworked (e.g. Boolean->PerlInt->Scalar).
+- You can add parents to a class with children and objects, and
+  attributes to a class with children or objects. This is silently
+  allowed and quietly corrupts the child classes and instantiated
+  objects.
 
 Undecided stuff
 
