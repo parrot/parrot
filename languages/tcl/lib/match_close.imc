@@ -5,6 +5,8 @@
 # return the position at which the leading { or " 
 # closes, including the last character.
 
+.namespace [ "_Tcl" ]
+
 .sub __match_close
   .param string buffer
   .param int start_pos

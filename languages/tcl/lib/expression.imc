@@ -1,6 +1,8 @@
 # XXX - Should we have an expression parser/compiler, just like we have a
 #        tcl parser/compiler?
 
+.namespace [ "_Tcl" ]
+
 .sub __expression
   .param string expr
 
@@ -11,7 +13,7 @@
   undef = new PerlUndef
 
   .local pmc global_ops
-   global_ops = global "operands"
+   global_ops = find_global "_Tcl", "operands"
   .local Sub op_sub
 
   .local pmc chunks
@@ -404,8 +406,8 @@ real_done:
   .local pmc precedences
   .local int precedence
 
-  ops = global "operands"
-  precedences = global "precedence"
+  ops = find_global "_Tcl", "operands"
+  precedences = find_global "_Tcl", "precedence"
 
   length expr_len, expr 
 
@@ -607,7 +609,7 @@ dd:
   len = start_paren_pos - start
 
   substr $S0, expr, start, len
-  $P1 = global "functions"
+  $P1 = find_global "_Tcl", "functions"
   
   func = $P1[$S0]
  

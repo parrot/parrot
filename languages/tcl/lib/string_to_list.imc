@@ -1,5 +1,7 @@
 # XXX move into a PMC vtable
 
+.namespace [ "_Tcl" ]
+
 .sub __stringToList
   .param string str
   # buffer contains the string we are working on.

@@ -5,6 +5,8 @@
 #
 # \<newline>whiteSpace into a single space.
 
+.namespace [ "_Tcl" ]
+
 .sub __backslash_newline_subst
   .param string buffer
 

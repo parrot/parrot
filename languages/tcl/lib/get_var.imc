@@ -5,10 +5,10 @@
 # (as with the [procs], the args are passed in as a
 # perlarray
 
+.namespace [ "_Tcl" ]
+
 .sub __get_var
   .param pmc argv
-
-  #_dumper("get var passed",argv)
 
   .local int argc
   argc = argv

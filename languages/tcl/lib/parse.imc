@@ -10,6 +10,8 @@ word, and whitespace encountered here is added into the string.
 
 =cut
 
+.namespace [ "_Tcl" ]
+
 .sub __parse
   .param string buffer
   .param int preserve_whitespace
@@ -17,12 +19,18 @@ word, and whitespace encountered here is added into the string.
   #print "BUFFER="
   #print buffer
   #print "\n"
+  #print "preserve_whitespace="
+  #print preserve_whitespace
+  #print "\n"
 
   # TclWord
   .local pmc word 
 
   .local int tclword
   tclword = find_type "TclWord"
+  #print "TYPE OF TCLWORD IS:"
+  #print tclword
+  #print "\n"
 
   # Keep track of the position of the current word
   .local int start_word
@@ -61,7 +69,6 @@ begin_command:
 begin_word:
   #print "begin_word:\n"
   word = new tclword
-
   end_of_word = 0
   # Skip any leading whitespace, unless we're preserving.
   if preserve_whitespace == 1 goto pre_middle
@@ -160,7 +167,6 @@ end_word:
 
   $S0 = substr buffer, start_word, word_length
   word.concat_const($S0)
-  #_dumper("ADDING WORD",word)
   push command, word
 
   start_word += word_length
@@ -210,7 +216,6 @@ end_command_0:
   #print "end_command_0:\n"
   $S0 = substr buffer, start_word, word_length
   word.concat_const($S0)
-  #_dumper("ADDING WORD",word)
   push command, word
   if preserve_whitespace == 1 goto preserve_end_scope
   #print "Added word to command, no?\n"
@@ -369,7 +374,7 @@ inner_done:
   word_length = 0
 
   if $I0 != 40 goto gotword
-
+  #print "ARRAY VAR\n"
   temppos = index buffer, ")", start_word
   if temppos == -1 goto bad_array
   # $S0($S1)
@@ -485,7 +490,6 @@ command_save:
   #print "START_WORD='"
   #print start_word
   #print "'\n"
-  #_dumper("WORD",word)
   word_length = 0
 
   goto middle_word
@@ -494,7 +498,6 @@ command_save:
 # return the single command
 
 preserve_end_scope:
-  #_dumper("preserve_end_scope",command)  
   .pcc_begin_return
     .return command
   .pcc_end_return
