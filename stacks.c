@@ -5,7 +5,7 @@
  *  Overview:
  *     Stack handling routines for Parrot
  *  Data Structure and Algorithms:
- *     The stack is stored as a circular, doubly-linked list of
+ *     The stack is stored as a doubly-linked list of
  *     chunks, where each chunk has room for STACK_CHUNK_DEPTH
  *     entries. The invariant maintained is that there is always room
  *     for another entry; if a chunk is filled, a new chunk is added
