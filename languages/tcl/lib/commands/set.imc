@@ -10,7 +10,9 @@
   .local pmc lexical
   .local int len
   .local int type
-  
+
+  .local int TclArray
+  TclArray = find_type "TclArray"  
 
   .local pmc ignore
   newsub ignore, .Exception_Handler, __default_handler
@@ -58,14 +60,16 @@ get_array:
   inc char
   substr key, arg0, char, len
 
-  $P1 = new PerlArray
+  $P1 = new FixedPMCArray
+  $P1 = 2
   $P1[0] = var
   $P1[1] = key
   (return_type,retval) = get_var($P1)
   goto done
 
 get_scalar:
-   $P1 = new PerlArray
+   $P1 = new FixedPMCArray
+   $P1 = 1
    $P1[0] = arg0
    (return_type,retval) = get_var($P1)
   goto done
@@ -97,11 +101,12 @@ set_array:
   
   typeof type, lexical 
   $S0 = typeof lexical
-  if type != .PerlHash goto set_array_bad
+  # XXX Too Tcl specific
+  if type != TclArray goto set_array_bad
   goto set_array_ok
 
 set_array_new:
-  lexical = new PerlHash
+  lexical = new TclArray
   goto set_array_ok
 
 set_array_bad:

@@ -25,12 +25,12 @@
 
   .local pmc parse
   .local pmc interpret
-  .local pmc expression
-  .local pmc expr_boolean
+  .local pmc expression_p
+  .local pmc expression_i
   parse = find_global "_Tcl", "__parse"
   interpret = find_global "_Tcl", "__interpret"
-  expression = find_global "_Tcl", "__expression"
-  expr_boolean = find_global "_Tcl", "__expr_boolean"
+  expression_p = find_global "_Tcl", "__expression_parse"
+  expression_i = find_global "_Tcl", "__expression_interpret"
 
   start = start_p
   next  = next_p
@@ -52,14 +52,20 @@ for_loop:
   if return_type != TCL_OK goto done
 
 continue:
+  #print "continue?\n"
   # then execute next
   (return_type,joe) = interpret(next_parsed)
   if return_type != TCL_OK goto done
   
   # then check condition
-  $P0 = expression(test_p)
-  $S0 = $P0[1]
-  $I0 = expr_boolean($S0)
+  #print "condition to check is"
+  #print test_p
+  #print "\n"
+  (return_type,retval) = expression_p(test_p)
+  if return_type == TCL_ERROR goto done_cleansed
+  (return_type,retval) = expression_i(retval)
+  if return_type == TCL_ERROR goto done_cleansed
+  .boolean(retval,$I0)
   if $I0 == 1 goto for_loop
   goto done
 
@@ -69,6 +75,8 @@ bad_args:
   goto done_cleansed
 
 done:
+  #print "done?\n"
+  retval = new String
   retval = ""
   # Propogate an error out, but not a break or continue.
   if return_type == TCL_RETURN goto done_cleansed
@@ -76,6 +84,13 @@ done:
   return_type = TCL_OK
 
 done_cleansed:
+  #print "done_cleansed\n"
+  #$S0 = typeof retval
+  #print "retval of if is '"
+  #print retval
+  #print "' ("
+  #print $S0
+  #print ")\n"
   .pcc_begin_return
     .return return_type
     .return retval

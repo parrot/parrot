@@ -4,6 +4,7 @@
 .namespace [ "Tcl" ]
 
 .sub _continue
+
   .local int return_type
 
   .local pmc retval

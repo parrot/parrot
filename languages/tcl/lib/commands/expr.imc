@@ -1,3 +1,5 @@
+.include "runtime/parrot/library/dumper.imc"
+
 ###
 # [expr]
 
@@ -16,8 +18,11 @@
 
   .local pmc retval
   .local int return_type
-  .local pmc expression
-  expression = find_global "_Tcl", "__expression"
+  return_type = TCL_OK
+  .local pmc expression_p
+  .local pmc expression_i
+  expression_p = find_global "_Tcl", "__expression_parse"
+  expression_i = find_global "_Tcl", "__expression_interpret"
 
   expr = ""
   looper = 0
@@ -34,35 +39,13 @@ loop:
   goto loop
 
 loop_done:
-  # XXX Assume happy case - we need to be able to get information
-  # out of __expression. Did an error occur? if it did, then we'd
-  # return something other than the TCL_OK
- 
-  $P2 = new String
-  $P2 = expr
-  $P1 = expression($P2)
-
-  $I0 = $P1[0]
-  return_type = $I0
-  retval = new Integer
-  retval = $P1[1] 
-  if $I0 == TCL_ERROR goto done
-  return_type = TCL_OK
-  # any other return types are going to be values...
-  if $I0 == INTEGER goto done
-  if $I0 != FLOAT goto die_horribly
-
-  goto done
-
-die_horribly:
-  # XXX this doesn't really belong here.
-  return_type = TCL_ERROR
-  retval = new String
-  retval = "Unknown type '" 
-  $S0 = return_type
-  retval = retval . $S0
-  retval = retval . "' returned by expression"
-
+  (return_type,retval) = expression_p(expr)
+  #_dumper(retval,"RETVAL")
+  #print "rt:"
+  #print return_type
+  #print "\n"
+  if return_type==TCL_ERROR goto done
+  (return_type,retval) = expression_i(retval) 
 done:
   .pcc_begin_return
     .return return_type

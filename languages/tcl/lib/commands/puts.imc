@@ -6,7 +6,7 @@
 .sub _puts
   .local pmc argv 
   argv = foldup
-
+ 
   .local int argc 
   argc = argv
   if argc == 0 goto error

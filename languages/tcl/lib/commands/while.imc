@@ -19,21 +19,22 @@
 
   .local pmc parse
   .local pmc interpret
-  .local pmc expression
-  .local pmc expr_boolean
+  .local pmc expression_p
+  .local pmc expression_i
   parse = find_global "_Tcl", "__parse"
   interpret = find_global "_Tcl", "__interpret"
-  expression = find_global "_Tcl", "__expression"
-  expr_boolean = find_global "_Tcl", "__expr_boolean"
+  expression_p = find_global "_Tcl", "__expression_parse"
+  expression_i = find_global "_Tcl", "__expression_interpret"
 
   code = body_p
 
 while_loop:
   parsed_code = parse(code,0,0)
-  $P0 = expression(cond_p)
-  # XXX Happy case - expression could have failed.
-  $S0 = $P0[1]
-  $I0 = expr_boolean($S0)
+  (return_type,retval) = expression_p(cond_p)
+  if return_type == TCL_ERROR goto done_done
+  (return_type,retval) = expression_i(retval)
+  if return_type == TCL_ERROR goto done_done
+  .boolean(retval,$I0)
   if $I0 == 0 goto done
   (return_type,retval) = interpret(parsed_code)
   if return_type == TCL_BREAK goto done

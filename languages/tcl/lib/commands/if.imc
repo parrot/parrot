@@ -6,12 +6,15 @@
 .sub _if
   .local pmc argv 
   argv = foldup
- 
+
   .local int argc 
   argc = argv
 
+  .local int TclList
+  TclList = find_type "TclList"
+
   .local pmc elseifs
-  elseifs = new PerlArray
+  elseifs = new TclList
   .local pmc retval
   .local string code
   .local pmc condition
@@ -23,12 +26,12 @@
 
   .local pmc parse
   .local pmc interpret
-  .local pmc expression
-  .local pmc expr_boolean
+  .local pmc expression_p
+  .local pmc expression_i
   parse = find_global "_Tcl", "__parse"
   interpret = find_global "_Tcl", "__interpret"
-  expression = find_global "_Tcl", "__expression"
-  expr_boolean = find_global "_Tcl", "__expr_boolean"
+  expression_p = find_global "_Tcl", "__expression_parse"
+  expression_i = find_global "_Tcl", "__expression_interpret"
  
   .local string temp_str
   temp_str ="" 
@@ -66,10 +69,12 @@ get_else:
 get_final:
   else = temp_str
 
-  $P0 = expression(condition)
-  # XXX happy case.
-  temp_str = $P0[1]
-  $I0 = expr_boolean(temp_str)
+  (return_type,retval) = expression_p(condition)
+  if return_type == TCL_ERROR goto done_final
+  (return_type,retval) = expression_i(retval)
+  if return_type == TCL_ERROR goto done_final
+
+  .boolean(retval,$I0)
 
   if $I0 == 0 goto do_elseifs 
   code = body 
@@ -83,10 +88,11 @@ elseif_loop:
   if $I2 == $I1 goto do_else
   $P1 = elseifs[$I2]
   condition = $P1[0]
-  $P0 = expression(condition)
-  #XXX happy case
-  temp_str = $P0[1]
-  $I0 = expr_boolean(temp_str)
+  (return_type,retval) = expression_p(condition)
+  if return_type == TCL_ERROR goto done_final
+  (return_type,retval) = expression_i(retval)
+  if return_type == TCL_ERROR goto done_final
+  .boolean(retval,$I0)
   if $I0 == 1 goto done_elseifs
   inc $I2
   goto elseif_loop  
@@ -99,12 +105,10 @@ do_else:
   code = else
 
 done:
-  #print "CODE='"
-  #print code
-  #print "'\n"
   $P1 = parse(code,0,0)
   (return_type,retval) = interpret($P1)
 
+done_final:
   .pcc_begin_return
     .return return_type
     .return retval

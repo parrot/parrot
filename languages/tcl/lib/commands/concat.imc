@@ -14,8 +14,6 @@
   .local pmc retval
   .local int return_type
 
-  .include "languages/tcl/lib/macros/is_space.imc"
-
   .local int arg_num
   arg_num = 0
   .local string current_arg
