@@ -171,6 +171,7 @@ void rethrow_c_exception(Parrot_Interp interpreter);
  */
 void do_exception(Parrot_Interp, exception_severity severity, long error);
 void new_internal_exception(Parrot_Interp);
+void free_internal_exception(Parrot_Interp);
 
 /*
  * control stack marks and action

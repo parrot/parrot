@@ -92,11 +92,8 @@ Return attribute named C<name>.
         }
 
         if (!attr || !VTABLE_defined(INTERP, attr)) {
-            STRING *message;
-            message = Parrot_sprintf_c(INTERP, "AttributeError: %s",
-                string_to_cstring(INTERP, idx));
             real_exception(INTERP, NULL, E_AttributeError,
-                string_to_cstring(INTERP, message));
+                "AttributeError: %Ss", idx);
         }
 
         return attr;

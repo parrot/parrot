@@ -595,6 +595,26 @@ new_internal_exception(Interp * interpreter)
 /*
 
 =item C<void
+free_internal_exception(Interp * interpreter)>
+
+Place internal exception buffer back on the free list.
+
+=cut
+
+*/
+
+void
+free_internal_exception(Interp * interpreter)
+{
+    Parrot_exception *e = interpreter->exceptions;
+    interpreter->exceptions = e->prev;
+    e->prev = interpreter->exc_free_list;
+    interpreter->exc_free_list = e;
+}
+
+/*
+
+=item C<void
 do_exception(Interp * interpreter,
         exception_severity severity, long error)>
 

@@ -519,19 +519,21 @@ Return whether the object has an attribute with the given name.
 
     METHOD PMC* hasattr(PMC *object, PMC *name) {
         PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
+        VTABLE_set_integer_native(INTERP, ret, 0);
         new_internal_exception(INTERP);
         push_new_c_exception_handler(INTERP, INTERP->exceptions);
         if (!setjmp(INTERP->exceptions->destination)) {
-            VTABLE_get_attr_str(INTERP, object,
+            PMC *attr = VTABLE_get_attr_str(INTERP, object,
                 VTABLE_get_string(INTERP, name));
-            VTABLE_set_integer_native(INTERP, ret, 1);
+            if (attr && VTABLE_defined(INTERP, attr))
+                VTABLE_set_integer_native(INTERP, ret, 1);
         } else {
-            Parrot_exception *exception = INTERP->exceptions;
-            if (exception->error != E_AttributeError) {
-                rethrow_c_exception(INTERP);
+            if (INTERP->exceptions->error != E_AttributeError) {
+                handle_exception(INTERP);
             }
-            VTABLE_set_integer_native(INTERP, ret, 0);
         }
+        pop_exception(INTERP);
+        free_internal_exception(INTERP);
         return ret;
     }
 

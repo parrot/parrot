@@ -272,7 +272,7 @@ Returns the PMC value for the element at C<*key>.
                                         key);
         if (b == NULL) {
             real_exception(INTERP, NULL, E_KeyError,
-                "KeyError: %Ss", VTABLE_get_string(INTERP, key));
+                "KeyError: %Ss", VTABLE_get_repr(INTERP, key));
         }
         nextkey = key_next(INTERP, key);
         if (!nextkey)

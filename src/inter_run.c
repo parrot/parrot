@@ -85,10 +85,7 @@ runops(Interp *interpreter, size_t offs)
      * s. above
      */
     if (STACKED_EXCEPTIONS) {
-        Parrot_exception *e = interpreter->exceptions;
-        interpreter->exceptions = e->prev;
-        e->prev = interpreter->exc_free_list;
-        interpreter->exc_free_list = e;
+        free_internal_exception(interpreter);
     }
     interpreter->ctx.runloop_level--;
     /*
