@@ -1,7 +1,7 @@
-/* A Bison parser, made from cola.y, by GNU bison 1.75.  */
+/* A Bison parser, made by GNU Bison 1.875c.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,9 +22,6 @@
    Bison output file, you may use that output file without restriction.
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
-
-#ifndef BISON_PARSER_H
-# define BISON_PARSER_H
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -170,22 +167,23 @@
 
 
 
-#ifndef YYSTYPE
+#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
 #line 34 "cola.y"
-typedef union {
+typedef union YYSTYPE {
     int ival;
     Symbol * sym;
     Type * type;
     AST * ast;
     void * p;
-} yystype;
-/* Line 1281 of /usr/local/share/bison/yacc.c.  */
-#line 184 "parser.h"
-# define YYSTYPE yystype
+} YYSTYPE;
+/* Line 1275 of yacc.c.  */
+#line 181 "parser.h"
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
+# define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYSTYPE yylval;
 
 
-#endif /* not BISON_PARSER_H */
 

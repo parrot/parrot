@@ -67,7 +67,7 @@ public class Calc {
         string s, arg1, arg2, op;
         int i1, i2;
         while(1) {
-            puts("Parrot Calculator (type 'quit' to exit)>");
+            puts("Parrot Calculator (type 'quit' to exit)>\n");
             s = gets();
             if(s == "")
                 break;

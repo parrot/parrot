@@ -1053,9 +1053,10 @@ int main(int argc, char * argv[])
     printf("# Include standard API stuff\n");
     printf(".include \"core.imc\"\n\n");
     fflush(stdout);
-    fprintf(stderr, "%ld lines compiled.\n", line);
-    fprintf(stderr, "Execing Parrot (IMCC)\n");
+    fprintf(stderr, "%ld lines compiled to PIR.\n", line);
+    fprintf(stderr, "Generating PASM\n");
     system("../../parrot -o a.pasm a.imc");
+    fprintf(stderr, "Generating PBC (Bytecode)\n");
     system("../../parrot -o a.pbc a.imc");
     return 0;
 }
