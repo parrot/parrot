@@ -348,7 +348,7 @@ subst_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp, int needs_freeing
  * Move instruction ins from its current position to the position 
  * following instruction to. Returns the instruction following the
  * initial position of ins.
- *
+ */
 Instruction *
 move_ins(IMC_Unit * unit, Instruction *ins, Instruction *to)
 {
