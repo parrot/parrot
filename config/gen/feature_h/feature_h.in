@@ -8,14 +8,32 @@
 
 #perl - all below here gets evaled by perl, OUT is the filehandle
 
+	print OUT <<EOP;
+/* from config/auto/memalign */
+EOP
+if (${memalign}) {
+	print OUT <<EOP;
+#include <malloc.h>
+#define Parrot_memalign(a, s) memalign((a), (s))
+EOP
+} else {
+	print OUT <<EOP;
+#define Parrot_memalign(a, s) mem_sys_allocate(s)
+EOP
+}
 
 if (${jit_i386} && ${jit_i386} eq 'fcomip') {
-	print OUT "#ifdef I386\n";
-	print OUT "#  define HAS_JIT_FCOMIP\n";
-	print OUT "#endif\n";
+    print OUT <<'END';
+
+/* from config/auto/jit */
+#ifdef I386
+#  define HAS_JIT_FCOMIP
+#endif
+END
 }
 
     print OUT <<'END';
+
 #define VA_TO_VAPTR(x) (&(x))
 END
 

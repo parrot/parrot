@@ -63,6 +63,8 @@ config/auto/headers.pl
 config/auto/headers/test_c.in
 config/auto/jit.pl
 config/auto/jit/test_c.in
+config/auto/memalign.pl
+config/auto/memalign/test_c.in
 config/auto/pack.pl
 config/auto/sizes.pl
 config/auto/sizes/test_c.in

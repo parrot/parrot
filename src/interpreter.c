@@ -191,7 +191,8 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
     if (!interpreter->prederef_code) {
         size_t N = interpreter->code->cur_cs->base.size;
         size_t i;
-        void **temp = (void **)mem_sys_allocate(N * sizeof(void *));
+        /* void **temp = (void **)mem_sys_allocate(N * sizeof(void *)); */
+        void **temp = (void **)Parrot_memalign(256, N * sizeof(void *));
 
         for (i = 0; i < N; i++) {
             temp[i] = (void *)(ptrcast_t)prederef;

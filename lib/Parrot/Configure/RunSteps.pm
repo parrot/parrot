@@ -27,6 +27,7 @@ use vars qw(@steps);
 	auto/funcptr.pl
 	auto/cgoto.pl
 	auto/gc.pl
+	auto/memalign.pl
 	gen/config_h.pl
 	gen/feature_h.pl
 	gen/config_pm.pl
