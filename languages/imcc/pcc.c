@@ -796,7 +796,7 @@ void
 pcc_optimize(Parrot_Interp interpreter)
 {
     Instruction *ins, *tmp;
-    info(2, "\tpcc_optimize\n");
+    info(interpreter, 2, "\tpcc_optimize\n");
     for (ins = instructions; ins; ins = ins->next) {
         if (ins->opsize == 3 &&
                 ins->r[1]->type == VTCONST &&

@@ -1,5 +1,9 @@
 - 2003-08-23	leo
 
+	* start moving globals tointerpreter->imcc_info
+
+- 2003-08-23	leo
+
 	* REMOVE THE DEPRECATED NESTED SUBS FEATURE.
 
 	  All code must be contained now in .sub/.pcc_sub/.emit blocks.

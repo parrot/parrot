@@ -15,9 +15,9 @@
 
 void fatal(int code, const char *func, const char *fmt, ...);
 void fataly(int code, const char *func, int line, const char *fmt, ...);
-void warning(const char *func, const char *fmt, ...);
+void warning(Parrot_Interp interpreter, const char *func, const char *fmt, ...);
 void debug(int level, const char *fmt, ...);
-void info(int level, const char *fmt, ...);
+void info(Parrot_Interp interpreter, int level, const char *fmt, ...);
 
 void dump_instructions(void);
 void dump_cfg(void);

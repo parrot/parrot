@@ -190,7 +190,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'w':
                 Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
-                IMCC_WARN = 1;
+                IMCC_INFO(interp)->imcc_warn = 1;
                 break;
             case 'G':
                 gc_off = 1;
@@ -220,7 +220,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 run_pbc = 2;
                 break;
             case 'v':
-                IMCC_VERBOSE++;
+                IMCC_INFO(interp)->verbose++;
                 break;
             case 'y':
                 yydebug = 1;
@@ -380,6 +380,8 @@ int main(int argc, char * argv[])
     struct Parrot_Interp *interpreter = Parrot_new();
 
     Parrot_init(interpreter, (void*)&stacktop);
+    IMCC_INFO(interpreter) = mem_sys_allocate_zeroed(sizeof(imcc_info_t));
+
     interpreter->DOD_block_level++;
 
     sourcefile = parseflags(interpreter, &argc, &argv);
@@ -437,15 +439,15 @@ int main(int argc, char * argv[])
             fatal(1, "main", "outputfile is sourcefile\n");
     }
 
-    if (IMCC_VERBOSE) {
-        info(1,"debug = 0x%x\n", IMCC_DEBUG);
-        info(1,"Reading %s", yyin == stdin ? "stdin":sourcefile);
+    if (IMCC_INFO(interpreter)->verbose) {
+        info(interpreter, 1,"debug = 0x%x\n", IMCC_DEBUG);
+        info(interpreter, 1,"Reading %s", yyin == stdin ? "stdin":sourcefile);
         if (run_pbc)
-            info(1, ", executing");
+            info(interpreter, 1, ", executing");
         if (write_pbc)
-            info(1, " and writing %s\n", output);
+            info(interpreter, 1, " and writing %s\n", output);
         else
-            info(1,"\n");
+            info(interpreter, 1,"\n");
     }
     if (run_pbc == 2) {
         pf = Parrot_readbc(interpreter, sourcefile);
@@ -456,7 +458,7 @@ int main(int argc, char * argv[])
     }
     else {
         int per_pbc = write_pbc | run_pbc;
-        info(1, "using optimization '%s' (%x) \n", optimizer_opt,
+        info(interpreter, 1, "using optimization '%s' (%x) \n", optimizer_opt,
                 optimizer_level);
         pf = PackFile_new(0);
         Parrot_loadbc(interpreter, pf);
@@ -464,13 +466,13 @@ int main(int argc, char * argv[])
         line = 1;
         emit_open(per_pbc, per_pbc ? (void*)interpreter : (void*)output);
 
-        info(1, "Starting parse...\n");
+        info(interpreter, 1, "Starting parse...\n");
 
         yyparse((void *) interpreter);
         emit_close(interpreter);
         fclose(yyin);
 
-        info(1, "%ld lines compiled.\n", line);
+        info(interpreter, 1, "%ld lines compiled.\n", line);
     }
     if (write_pbc) {
         size_t size;
@@ -478,7 +480,7 @@ int main(int argc, char * argv[])
         FILE *fp;
 
         size = PackFile_pack_size(interpreter->code) * sizeof(opcode_t);
-        info(1, "packed code %d bytes\n", size);
+        info(interpreter, 1, "packed code %d bytes\n", size);
         packed = (opcode_t*) mem_sys_allocate(size);
         if (!packed)
             fatal(1, "main", "Out of mem\n");
@@ -491,17 +493,17 @@ int main(int argc, char * argv[])
         if ((1 != fwrite(packed, size, 1, fp)) )
             fatal(1, "main", "Couldn't write %s\n", output);
         fclose(fp);
-        info(1, "%s written.\n", output);
+        info(interpreter, 1, "%s written.\n", output);
         free(packed);
     }
     if (run_pbc) {
-        if (IMCC_WARN)
+        if (IMCC_INFO(interpreter)->imcc_warn)
             PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
         else
             PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
         if (!gc_off)
             interpreter->DOD_block_level--;
-        info(1, "Running...\n");
+        info(interpreter, 1, "Running...\n");
         if (run_pbc == 1)
             PackFile_fixup_subs(interpreter);
         Parrot_runcode(interpreter, argc, argv);
@@ -510,6 +512,7 @@ int main(int argc, char * argv[])
     Parrot_destroy(interpreter);
     if (output)
         free(output);
+    mem_sys_free(IMCC_INFO(interpreter));
     Parrot_exit(0);
 
     return 0;

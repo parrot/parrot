@@ -149,6 +149,7 @@ typedef struct Parrot_Interp {
      * in the byte_code_segment, that is currently executed */
     void **prederef_code;       /* The predereferenced code */
     void *jit_info;             /* JITs data */
+    void *imcc_info;            /* imcc data */
     size_t current_line;        /* Which line we're executing in the
                                  * source */
     String *current_file;       /* The file we're currently in */

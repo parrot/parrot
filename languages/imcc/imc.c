@@ -31,7 +31,7 @@
 
 static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
-static void print_stat(void);
+static void print_stat(Parrot_Interp);
 static void allocate_wanted_regs(void);
 
 extern int pasm_file;
@@ -55,7 +55,7 @@ void allocate(struct Parrot_Interp *interpreter) {
     debug(DEBUG_IMC, "\n------------------------\n");
     debug(DEBUG_IMC, "processing sub %s\n", function);
     debug(DEBUG_IMC, "------------------------\n\n");
-    if (IMCC_VERBOSE || (IMCC_DEBUG & DEBUG_IMC))
+    if (IMCC_INFO(interpreter)->verbose || (IMCC_DEBUG & DEBUG_IMC))
         imc_stat_init();
 
     /* consecutive labels, if_branch, unused_labels ... */
@@ -69,7 +69,7 @@ void allocate(struct Parrot_Interp *interpreter) {
     todo = first = 1;
     while (todo) {
         find_basic_blocks(interpreter, first);
-        build_cfg();
+        build_cfg(interpreter);
 
         if (first && (IMCC_DEBUG & DEBUG_CFG))
             dump_cfg();
@@ -81,15 +81,15 @@ void allocate(struct Parrot_Interp *interpreter) {
     while (todo) {
         if (!first) {
             find_basic_blocks(interpreter, 0);
-            build_cfg();
+            build_cfg(interpreter);
         }
         first = 0;
 
-        compute_dominators();
-        find_loops();
+        compute_dominators(interpreter);
+        find_loops(interpreter);
 
-        build_reglist();
-        life_analysis();
+        build_reglist(interpreter);
+        life_analysis(interpreter);
         /* optimize, as long as there is something to do */
         if (dont_optimize)
             todo = 0;
@@ -126,9 +126,9 @@ void allocate(struct Parrot_Interp *interpreter) {
              */
 #if DOIT_AGAIN_SAM
             find_basic_blocks(interpreter, 0);
-            build_cfg();
-            build_reglist();
-            life_analysis();
+            build_cfg(interpreter);
+            build_reglist(interpreter);
+            life_analysis(interpreter);
 #endif
         }
         else {
@@ -140,8 +140,8 @@ void allocate(struct Parrot_Interp *interpreter) {
         pcc_optimize(interpreter);
     if (IMCC_DEBUG & DEBUG_IMC)
         dump_instructions();
-    if (IMCC_VERBOSE  || (IMCC_DEBUG & DEBUG_IMC))
-        print_stat();
+    if (IMCC_INFO(interpreter)->verbose  || (IMCC_DEBUG & DEBUG_IMC))
+        print_stat(interpreter);
     imcstack_free(nodeStack);
 }
 
@@ -189,25 +189,25 @@ static void imc_stat_init() {
 }
 
 /* and final */
-static void print_stat()
+static void print_stat(Parrot_Interp interpreter)
 {
     int sets[4] = {0,0,0,0};
     int cols[4] = {-1,-1,-1,-1};
 
     make_stat(sets, cols);
-    info(1, "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
+    info(interpreter, 1, "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
             function, imcsets[0], imcsets[1], imcsets[2], imcsets[3]);
-    info(1, "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
+    info(interpreter, 1, "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
             ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
             ostat.branch_branch);
-    info(1, "\t%d used once deleted\n",
+    info(interpreter, 1, "\t%d used once deleted\n",
             ostat.used_once);
-    info(1, "\t%d invariants_moved\n", ostat.invariants_moved);
-    info(1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
+    info(interpreter, 1, "\t%d invariants_moved\n", ostat.invariants_moved);
+    info(interpreter, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
             sets[0], sets[1], sets[2], sets[3]);
-    info(1, "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
+    info(interpreter, 1, "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
             cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1, n_spilled);
-    info(1, "\t%d basic_blocks, %d edges\n",
+    info(interpreter, 1, "\t%d basic_blocks, %d edges\n",
             n_basic_blocks, edge_count());
 
 }
@@ -233,10 +233,10 @@ static void sort_reglist(void)
 }
 /* make a linear list of IDENTs and VARs, set n_symbols */
 
-void build_reglist(void) {
+void build_reglist(Parrot_Interp interp) {
     int i, count, unused;
 
-    info(2, "build_reglist\n");
+    info(interp, 2, "build_reglist\n");
     /* count symbols */
     if (reglist)
         free_reglist();
@@ -250,7 +250,7 @@ void build_reglist(void) {
     if (count == 0)
         return;
     if (n_symbols >= HASH_SIZE)
-        warning("build_reglist", "probably too small HASH_SIZE"
+        warning(interp, "build_reglist", "probably too small HASH_SIZE"
                 " (%d symbols)\n");
     reglist = calloc(n_symbols, sizeof(SymReg*));
     if (reglist == NULL) {

@@ -46,9 +46,9 @@
  */
 static void if_branch(struct Parrot_Interp *);
 
-static int branch_branch(void);
-static int unused_label(void);
-static int dead_code_remove(void);
+static int branch_branch(struct Parrot_Interp *interp);
+static int unused_label(struct Parrot_Interp *interp);
+static int dead_code_remove(struct Parrot_Interp *interp);
 
 static void strength_reduce(struct Parrot_Interp *interp);
 static void subst_constants_mix(struct Parrot_Interp *interp);
@@ -64,7 +64,7 @@ static int clone_remove(void);
 
 void pre_optimize(struct Parrot_Interp *interp) {
     if (optimizer_level & OPT_PRE) {
-        info(2, "pre_optimize\n");
+        info(interp, 2, "pre_optimize\n");
         subst_constants_mix(interp);
         subst_constants_umix(interp);
         subst_constants(interp);
@@ -81,13 +81,13 @@ int cfg_optimize(struct Parrot_Interp *interp) {
     if (dont_optimize)
         return 0;
     if (optimizer_level & OPT_PRE) {
-        info(2, "cfg_optimize\n");
-        if (branch_branch())
+        info(interp, 2, "cfg_optimize\n");
+        if (branch_branch(interp))
             return 1;
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
-        if (unused_label())
+        if (unused_label(interp))
             return 1;
-        if (dead_code_remove())
+        if (dead_code_remove(interp))
             return 1;
     }
     return 0;
@@ -97,7 +97,7 @@ int optimize(struct Parrot_Interp *interp) {
 
     int any = 0;
     if (optimizer_level & OPT_CFG) {
-        info(2, "optimize\n");
+        info(interp, 2, "optimize\n");
         any = constant_propagation(interp);
         if (clone_remove())
             return 1;
@@ -146,7 +146,7 @@ static void if_branch(struct Parrot_Interp *interp)
     last = instructions;
     if (!last->next)
         return;
-    info(2, "\tif_branch\n");
+    info(interp, 2, "\tif_branch\n");
     for (ins = last->next; ins; ) {
         if ((last->type & ITBRANCH) &&          /* if ...L1 */
                 (ins->type & IF_goto) &&        /* branch L2*/
@@ -194,7 +194,7 @@ static void strength_reduce(struct Parrot_Interp *interp)
     int i, found;
     SymReg *r;
 
-    info(2, "\tstrength_reduce\n");
+    info(interp, 2, "\tstrength_reduce\n");
     for (ins = instructions; ins; ins = ins->next) {
         /*
          * add Ix, Ix, Iy => add Ix, Iy
@@ -310,7 +310,7 @@ constant_propagation(struct Parrot_Interp *interp)
     SymReg *c, *old, *o;
     int any = 0;
 
-    info(2, "\tconstant_propagation\n");
+    info(interp, 2, "\tconstant_propagation\n");
     for (ins = instructions; ins; ins = ins->next) {
         if (!strcmp(ins->op, "set") &&
                 ins->opsize == 3 &&             /* no keyed set */
@@ -376,7 +376,7 @@ subst_constants_mix(struct Parrot_Interp *interp)
     char b[128];
     SymReg *r;
 
-    info(2, "\tsubst_constants_mix\n");
+    info(interp, 2, "\tsubst_constants_mix\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO compare ins->opnum with a list of instructions
@@ -415,7 +415,7 @@ subst_constants_umix(struct Parrot_Interp *interp)
     char b[128];
     SymReg *r;
 
-    info(2, "\tsubst_constants_umix\n");
+    info(interp, 2, "\tsubst_constants_umix\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO compare ins->opnum with a list of instructions
@@ -518,7 +518,7 @@ subst_constants(struct Parrot_Interp *interp)
     int found;
 
     /* save interpreter ctx */
-    info(2, "\tsubst_constants\n");
+    info(interp, 2, "\tsubst_constants\n");
     ctx = mem_sys_allocate(sizeof(struct Parrot_Context));
     mem_sys_memcopy(ctx, &interp->ctx, sizeof(struct Parrot_Context));
     /* construct a FLOATVAL_FMT with needed precision */
@@ -530,7 +530,7 @@ subst_constants(struct Parrot_Interp *interp)
             strcpy(fmt, "%0.18Lg");
             break;
         default:
-            warning("subs_constants", "used default FLOATVAL_FMT\n");
+            warning(interp, "subs_constants", "used default FLOATVAL_FMT\n");
             strcpy(fmt, FLOATVAL_FMT);
             break;
     }
@@ -600,7 +600,7 @@ subst_constants_c(struct Parrot_Interp *interp)
     size_t i;
     int res;
 
-    info(2, "\tsubst_constants_c\n");
+    info(interp, 2, "\tsubst_constants_c\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO s. above */
@@ -739,7 +739,7 @@ subst_constants_if(struct Parrot_Interp *interp)
     size_t i;
     int res;
 
-    info(2, "\tsubst_constants_if\n");
+    info(interp, 2, "\tsubst_constants_if\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO s. above */
@@ -803,13 +803,13 @@ do_res:
  * branch L2
  *
  */
-static int branch_branch()
+static int branch_branch(struct Parrot_Interp *interp)
 {
     Instruction *ins, *next;
     SymReg * r;
     int changed = 0;
 
-    info(2, "\tbranch_branch\n");
+    info(interp, 2, "\tbranch_branch\n");
     /* reset statistic globals */
     for (ins = instructions; ins; ins = ins->next) {
         if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
@@ -833,14 +833,14 @@ static int branch_branch()
     return changed;
 }
 
-static int unused_label()
+static int unused_label(struct Parrot_Interp *interp)
 {
     Instruction *ins;
     int used;
     int i;
     int changed = 0;
 
-    info(2, "\tunused_label\n");
+    info(interp, 2, "\tunused_label\n");
     for (i=1; i < n_basic_blocks; i++) {
 	ins = bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
@@ -895,7 +895,7 @@ static int unused_label()
     return changed;
 }
 
-static int dead_code_remove(void)
+static int dead_code_remove(struct Parrot_Interp *interp)
 {
     Basic_block *bb;
     int i;
@@ -905,7 +905,7 @@ static int dead_code_remove(void)
     /* this could be a separate level, now it's done with -O1 */
     if (!(optimizer_level & OPT_PRE))
         return 0;
-    info(2, "\tdead_code_remove\n");
+    info(interp, 2, "\tdead_code_remove\n");
     for (i=1; i < n_basic_blocks; i++) {
 	bb = bb_list[i];
         if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')
@@ -1179,7 +1179,7 @@ loop_one(struct Parrot_Interp *interp, int bnr)
     int changed = 0;
 
     if (bnr == 0) {
-        warning("loop_one", "wrong loop depth in block 0\n");
+        warning(interp, "loop_one", "wrong loop depth in block 0\n");
         return 0;
     }
     debug(DEBUG_OPT2, "loop_one blk %d\n", bnr);

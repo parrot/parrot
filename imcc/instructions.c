@@ -485,10 +485,10 @@ static int e_file_open(void *param)
 }
 
 static int e_file_close(void *param) {
-    UNUSED(param);
+    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
     printf("\n\n");
     fclose(stdout);
-    info(1, "assembly module %s written.\n", output);
+    info(interpreter, 1, "assembly module %s written.\n", output);
     return 0;
 
 }

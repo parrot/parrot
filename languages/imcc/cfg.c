@@ -54,7 +54,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
     int nu = 0;
     int i;
 
-    info(2, "find_basic_blocks\n");
+    info(interpreter, 2, "find_basic_blocks\n");
     init_basic_blocks();
     for(i = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
@@ -186,13 +186,13 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
 /* Once the basic blocks have been computed, build_cfg computes
    the dependences between them. */
 
-void build_cfg() {
+void build_cfg(Parrot_Interp interpreter) {
     int i, j;
     SymReg * addr;
     Basic_block *last = NULL, *bb;
     Edge *pred;
 
-    info(2, "build_cfg\n");
+    info(interpreter, 2, "build_cfg\n");
     for (i = 0; i < n_basic_blocks; i++) {
         bb = bb_list[i];
 
@@ -433,10 +433,10 @@ static void propagate_alias(void)
 }
 #endif
 
-void life_analysis() {
+void life_analysis(Parrot_Interp interpreter) {
     int i;
 
-    info(2, "life_analysis\n");
+    info(interpreter, 2, "life_analysis\n");
 #ifdef ALIAS
     propagate_alias();
 #endif
@@ -621,7 +621,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i) {
  * s. gcc:flow.c compute_dominators
  */
 
-void compute_dominators () {
+void compute_dominators (Parrot_Interp interpreter) {
 #define USE_BFS 1
 
 #if !USE_BFS
@@ -634,7 +634,7 @@ void compute_dominators () {
 
     Edge *edge;
 
-    info(2, "compute_dominators\n");
+    info(interpreter, 2, "compute_dominators\n");
     dominators = malloc(sizeof(Set*) * n_basic_blocks);
 
 
@@ -775,12 +775,13 @@ sort_loops(void)
  * go from a node to one of its dominators.
  */
 
-void find_loops () {
+void
+find_loops (Parrot_Interp interpreter) {
     int i, succ_index;
     Set* dom;
     Edge* edge;
 
-    info(2, "find_loops\n");
+    info(interpreter, 2, "find_loops\n");
     for (i = 0; i < n_basic_blocks; i++) {
 	dom = dominators[i];
 

@@ -42,7 +42,7 @@
  */
 #define MAX_COLOR NUM_REGISTERS
 
-void build_reglist(void);
+void build_reglist(Parrot_Interp);
 void compute_du_chain(void);
 int interferes(SymReg * r0, SymReg * r1);
 int map_colors(int x, SymReg ** graph, int colors[], int typ);
@@ -79,8 +79,6 @@ char *str_cat(const char *, const char *);
 /* globals */
 
 EXTERN int IMCC_DEBUG;
-EXTERN int IMCC_VERBOSE;
-EXTERN int IMCC_WARN;
 
 EXTERN int n_spilled;
 EXTERN SymReg** interference_graph;
@@ -115,5 +113,21 @@ struct imcc_ostat {
 
 EXTERN struct imcc_ostat ostat;
 
+typedef struct {
+    int imcc_warn;
+    int verbose;
+} imcc_info_t;
 
+#define IMCC_INFO(i) ((imcc_info_t*) (i)->imcc_info)
 #endif
+
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

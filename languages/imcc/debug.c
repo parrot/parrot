@@ -31,10 +31,10 @@ void fataly(int code, const char *func, int lin, const char *fmt, ...)
 }
 
 
-void warning(const char *func, const char *fmt, ...)
+void warning(Parrot_Interp interpreter, const char *func, const char *fmt, ...)
 {
     va_list ap;
-    if (!IMCC_WARN)
+    if (IMCC_INFO(interpreter)->imcc_warn)
         return;
 
     va_start(ap, fmt);
@@ -43,11 +43,11 @@ void warning(const char *func, const char *fmt, ...)
     va_end(ap);
 }
 
-void info(int level, const char *fmt, ...)
+void info(Parrot_Interp interpreter, int level, const char *fmt, ...)
 {
     va_list ap;
 
-    if(level > IMCC_VERBOSE)
+    if(level > IMCC_INFO(interpreter)->verbose)
 	return;
 
     va_start(ap, fmt);
