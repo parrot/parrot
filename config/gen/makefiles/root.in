@@ -166,6 +166,7 @@ GEN_SOURCES = \
     $(SRC)/core_ops.c \
     $(SRC)/core_ops_prederef.c  \
     $(SRC)/fingerprint.c \
+    $(SRC)/parrot_config.c \
     $(SRC)/nci.c \
     $(SRC)/core_ops_switch.c \
     $(SRC)/jit_cpu.c \
@@ -339,6 +340,7 @@ INTERP_O_FILES = \
     $(SRC)/spf_vtable$(O) \
     $(SRC)/datatypes$(O) \
     $(SRC)/fingerprint$(O) \
+    $(SRC)/parrot_config$(O) \
     $(SRC)/nci$(O) \
     $(SRC)/cpu_dep$(O) \
     $(SRC)/tsq$(O) \
@@ -711,6 +713,9 @@ lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOL)/ops2pm.pl \
 
 $(SRC)/fingerprint.c : $(BUILD_TOOL)/fingerprint_c.pl PBC_COMPAT
 	$(PERL) $(BUILD_TOOL)/fingerprint_c.pl > $(SRC)/fingerprint.c
+
+$(SRC)/parrot_config.c : $(BUILD_TOOL)/parrot_config_c.pl config_lib.pasm
+	$(PERL) $(BUILD_TOOL)/parrot_config_c.pl > $(SRC)/parrot_config.c
 
 ###############################################################################
 #

@@ -160,6 +160,12 @@ STRING *Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat,
                                   STRING *pat, SPRINTF_OBJ * obj);
 
 #endif /* IN_SPF_SYSTEM */
+
+/*
+ * generated src/parrot_config.c
+ */
+const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
+
 #endif /* PARROT_MISC_H_GUARD */
 
 /*
