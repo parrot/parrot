@@ -128,6 +128,97 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
 
 ###############################################################################
 
+=head2 Non-flow control comparison ops
+
+These ops do comparisons and truth testing without doing flow control
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<istrue>(out INT, in PMC)
+
+Sets $1 to 1 or 0, depending on whether $2 is true or not
+
+=cut
+
+inline op istrue(out INT, in PMC) {
+    $1 = VTABLE_get_bool(interpreter, $2);
+    goto NEXT();
+}
+
+=item B<isgt>(out INT, in PMC, in PMC)
+
+Sets $1 to 1 if $2 is greater than $3
+
+=cut
+
+inline op isgt(out INT, in PMC, in PMC) {
+  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) > 0);
+  goto NEXT();
+}
+
+=item B<isge>(out INT, in PMC, in PMC)
+
+Sets $1 to 1 if $2 is greater than or equal to $3
+
+=cut
+
+inline op isge(out INT, in PMC, in PMC) {
+  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) >= 0);
+  goto NEXT();
+}
+
+=item B<isle>(out INT, in PMC, in PMC)
+
+Sets $1 to 1 if $2 is less than or equal to $3
+
+=cut
+
+inline op isle(out INT, in PMC, in PMC) {
+  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) <= 0);
+  goto NEXT();
+}
+
+=item B<islt>(out INT, in PMC, in PMC)
+
+Sets $1 to 1 if $2 is less than $3
+
+=cut
+
+inline op islt(out INT, in PMC, in PMC) {
+  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) < 0);
+  goto NEXT();
+}
+
+=item B<iseq>(out INT, in PMC, in PMC)
+
+Sets $1 to 1 if $2 is equal to $3
+
+=cut
+
+inline op iseq(out INT, in PMC, in PMC) {
+  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) == 0);
+  goto NEXT();
+}
+
+=item B<isne>(out INT, in PMC, in PMC)
+
+Sets $1 to 1 if $2 is not equal to $3
+
+=cut
+
+inline op isne(out INT, in PMC, in PMC) {
+  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) != 0);
+  goto NEXT();
+}
+
+=cut
+
+###############################################################################
+
 =head2 random number operations
 
 Implementations of various random number operations
