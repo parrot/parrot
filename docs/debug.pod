@@ -49,16 +49,15 @@ the probability that any newborn objects will run afoul of the garbage
 collector if they are improperly coded.)
 
 Within the --gc-debug mode, there is another tool to help narrow down
-the problem. If you edit include/parrot/parrot.h and #define the
-C<GC_VERBOSE> flag to 1, then after the garbage collector has traced
-all objects to find which ones are still alive, it will scan through
-all of the dead objects to see if any of them believe they are alive
-(which will happen for infants, since they come into existence marked
-live.) If it finds any, it will print them out. You can then re-run
-the program with a breakpoint set on the routine that allocated the
-object (e.g. C<get_free_object> in C<smallobject.c>). You'll probably
-want to make the breakpoint conditional on the object having the
-version number that was reported, because the same memory location
+the problem. If you edit F<dod.c> and #define the C<GC_VERBOSE> flag to 
+1, then after the garbage collector has traced all objects to find which 
+ones are still alive, it will scan through all of the dead objects to see 
+if any of them believe they are alive (which will happen for infants, since 
+they come into existence marked live.) If it finds any, it will print them 
+out. You can then re-run the program with a breakpoint set on the routine 
+that allocated the object (e.g. C<get_free_object> in F<smallobject.c>). 
+You'll probably want to make the breakpoint conditional on the object having 
+the version number that was reported, because the same memory location
 will probably hold many different objects over the lifetime of the
 program.
 
