@@ -184,6 +184,9 @@ D: Win32 patches
 N: Peter Gibbs
 D: String subsystem
 
+N: Philip Taylor
+D: Win32 ICC support
+
 N: Piers Cawley
 D: The Second Perl 6 Summarizer after Bryan C. Warnock
 E: pdcawley@bofh.org.uk
@@ -196,6 +199,9 @@ D: Keeps us running
 
 N: Sean O'Rourke
 D: Original Perl6 compiler
+
+N: Ron Blaschke
+D: Win32 patches
 
 N: Simon Cozens
 D: Release pumpking for 0.0.1-0.0.4

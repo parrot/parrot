@@ -537,13 +537,12 @@ void Parrot_call(Parrot_INTERP interpreter, Parrot_PMC sub,
         /* Nope, so we need an overflow array */
         Parrot_PMC overflow;
         Parrot_Int ocount;
-        overflow = Parrot_PMC_new(interpreter,
+        REG_PMC(3) = overflow = Parrot_PMC_new(interpreter,
                                   Parrot_PMC_typenum(interpreter, "Array"));
         Parrot_PMC_set_intval(interpreter, overflow, argcount - 11);
         for (inreg = 0; inreg < 11; inreg++) {
             REG_PMC(inreg + 5) = va_arg(ap, Parrot_PMC);
         }
-        REG_PMC(3) = overflow;
         for (ocount = 0; ocount < argcount - 11; ocount++) {
             VTABLE_set_pmc_keyed_int(interpreter, overflow, ocount,
                                      (Parrot_PMC)va_arg(ap, Parrot_PMC));
@@ -706,7 +705,7 @@ void Parrot_set_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_PMC 
                                 const char * const encoding_name,
                                 Parrot_Int flags)>
 
-Create a new Parrot string from a passed-in buffer. Pass in a 0 for 
+Create a new Parrot string from a passed-in buffer. Pass in a 0 for
 flags for right now.
 
 A copy of the buffer is made.
