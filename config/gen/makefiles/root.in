@@ -149,6 +149,8 @@ IMCC_O_FILES = \
 	$(IMCC_DIR)/pbc$(O) 	\
 	$(IMCC_DIR)/parser_util$(O)	\
 	$(IMCC_DIR)/jit$(O) 	\
+	$(IMCC_DIR)/sub$(O) 	\
+	$(IMCC_DIR)/fastcall$(O) 	\
 	$(IMCC_DIR)/pcc$(O)
 
 GENERAL_H_FILES = $(NONGEN_HEADERS) $(GEN_HEADERS) ${cg_h}
