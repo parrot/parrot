@@ -431,7 +431,12 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
                             pool->mem_pool)->possibly_reclaimable += b->buflen;
                 }
 #endif
-                if (object_size > sizeof(Buffer))
+                /* clean memory for buffer_likes, no need to clean
+                 * strings - a slight optimization would be to have
+                 * a separate flag for buffer_likes
+                 */
+                if (!(b->flags & BUFFER_strstart_FLAG) &&
+                        object_size > sizeof(Buffer))
                     memset(b + 1, 0, object_size - sizeof(Buffer));
                 add_free_buffer(interpreter, pool, b);
             }
