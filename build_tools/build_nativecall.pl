@@ -187,7 +187,7 @@ print NCI <<'HEAD';
 #if defined(HAS_JIT) && defined(I386)
 #  include "parrot/exec.h"
 #  include "parrot/jit.h"
-#  define CAN_BUILD_CALL_FRAMES
+/*#  define CAN_BUILD_CALL_FRAMES*/
 #endif
 
 /* All our static functions that call in various ways. Yes, terribly
