@@ -8,7 +8,7 @@
 #include "parrot/parrot.h"
 
 #ifdef HAS_HEADER_DLFCN
-#   include <dlfcn.h>
+#  include <dlfcn.h>
 #endif
 
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY
