@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -50,4 +50,18 @@ if __name__ == '__main__':
     print `"ab"`, "ab"
     print `u"ab"`, u"ab"
 CODE
+
+test(<<'CODE', 'array slice');
+if __name__ == '__main__':
+    a = [0,1,2,3,5,6,7][2:4]
+    print a[0], a[1]
+CODE
+
+test(<<'CODE', 'string slice');
+if __name__ == '__main__':
+    a = "abcdef" [2:4]
+    print a[0], a[1]
+CODE
+
+
 

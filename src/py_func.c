@@ -660,6 +660,87 @@ Parrot_py_init(Interp *interpreter)
 }
 
 /*
+ * XXX create slice.h
+ */
+typedef struct {
+    INTVAL i;
+    STRING *s;
+} RUnion;
+
+#define RVal_int(u) u.i
+#define RVal_str(u) u.s
+
+typedef struct _range_t {
+    int type;                   /* enum_type_INTVAL or STRING */
+    RUnion start;             /* start of this range */
+    RUnion end;               /* end of this range */
+    RUnion step;              /* step of this range */
+    RUnion cur;               /* current value */
+    struct _range_t *next;       /* next in chain */
+} range_t;
+
+PMC*
+Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
+{
+    INTVAL i, n, type;
+    range_t *range;
+    PMC *res, *slice, *item;
+    INTVAL start, end, iitem;
+
+    type = self->vtable->base_type;
+    /*
+     * key is a keychaing PMC
+     */
+    slice = pmc_new_init(interpreter, enum_class_Slice, key);
+    range = PMC_struct_val(slice);
+    /*
+     * fprintf(stderr, "range %d - %d\n", RVal_int(range->start),
+     *    RVal_int(range->end));
+     */
+    res = pmc_new(interpreter, type);
+    start = RVal_int(range->start);
+    end   = RVal_int(range->end);
+    n = VTABLE_elements(interpreter, self);
+    if (!n) {
+        /* slice of empty is empty
+         */
+        return res;
+    }
+    if (start < 0)
+        start += n;
+    if (end < 0)
+        end += n;
+    if (start < 0)
+        start = 0;
+    else if (start > n)
+        start = n;
+    if (start > end)
+        end = start;
+    else if (end > n)
+        end = n;
+    for (i = start; i <= end; ++i) {
+        switch (type) {
+            case enum_class_Array:
+            case enum_class_PerlArray:
+                item = VTABLE_get_pmc_keyed_int(interpreter, self, i);
+                VTABLE_set_pmc_keyed_int(interpreter, res, i-start, item);
+                break;
+            case enum_class_String:
+            case enum_class_PerlString:
+                string_substr(interpreter, PMC_str_val(self), start,
+                        end - start + 1, &PMC_str_val(res), 1);
+                return res;
+            case enum_class_IntList:
+                iitem = VTABLE_get_integer_keyed_int(interpreter, self, i);
+                VTABLE_set_integer_keyed_int(interpreter, res, i-start, iitem);
+                break;
+            default:
+                internal_exception(1, "Parrot_py_get_slice: unim tpye");
+        }
+    }
+    return res;
+}
+/*
 
 =back
 

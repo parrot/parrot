@@ -702,9 +702,11 @@ C<offset>.
 
 =over 4
 
-=item C<PMC* slice (PMC *key)>
+=item C<PMC* slice (PMC *key, INTVAL f)>
 
-Return a new iterator for the slice PMC C<key>
+Return a new iterator for the slice PMC C<key> if f==0.
+
+Return a new pythonic slice if f == 1.
 
 =item C<PMC* get_iter (PMC *key)>
 
@@ -724,10 +726,20 @@ Return length of the string.
 	return string_length(INTERP, PMC_str_val(SELF));
     }
 
-    PMC* slice (PMC* key) {
-	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
-        PMC_struct_val(iter) = key;
-        return iter;
+    PMC* slice (PMC* key, INTVAL f) {
+        switch (f) {
+            case 0:
+                {
+                    PMC *iter = pmc_new_init(interpreter,
+                            enum_class_Iterator, SELF);
+                    PMC_struct_val(iter) = key;
+                    return iter;
+                }
+            case 1:
+                return Parrot_py_get_slice(INTERP, SELF, key);
+        }
+        internal_exception(1, "PerlString: Unknown slice type");
+        return NULL;
     }
 
     PMC* get_iter () {

@@ -149,10 +149,11 @@ sub decode_line {
     if ($l =~ /^\s+	     # intial space
 	(?:(\d+)\s+)?   # optional line
 	(\d+)\s+        # PC
-	(\w+)\s+        # opcode
+	([\w+]+)\s+      # opcode e.g. SLICE+3
 	(?:(\d+)(?:\s+\((.*)\))?)? # oparg rest
 	/x) {
 	($line, $pc, $opcode, $arg, $rest) = ($1, $2, $3, $4, $5);
+	$opcode =~ s/\+/_plus_/;
 	## print STDERR "Op: '$opcode'\n";
 	if ($line) {
 	    $source = $source[$line-1];
@@ -1266,4 +1267,42 @@ sub LOAD_ATTR
 	 $attr = getattribute $tos->[1], "$c" $cmt
 EOC
     push @stack, ["obj $tos->[1] attr $c", $attr, 'P'];
+}
+
+sub Slice
+{
+    my ($n, $c, $cmt, $sl_n) = @_;
+    my ($v, $w, $vv, $ww);
+    $vv = $ww = 0;
+    if ($sl_n & 2) {
+	$w = pop @stack;
+	$ww = $w->[1];
+	if ($w->[2] eq 'P') {
+	   $ww = temp('I');
+	   print <<EOC;
+	$ww = $w->[1]
+EOC
+       }
+    }
+    if ($sl_n & 1) {
+	$v = pop @stack;
+	$vv = $v->[1];
+	if ($v->[2] eq 'P') {
+	   $vv = temp('I');
+	   print <<EOC;
+	$vv = $v->[1]
+EOC
+       }
+    }
+    my $ag = promote(pop @stack);
+    my $a = temp('P');
+    print <<EOC;
+	\t $cmt
+	$a = slice $ag\[ $vv .. $ww ], 1
+EOC
+    push @stack, [-1, $a, 'P'];
+}
+
+sub SLICE_plus_3 {
+    return Slice(@_, 3);
 }

@@ -58,7 +58,7 @@ PMC* get_pmc()
 PMC* get_pmc_keyed(PMC* key)
 PMC* get_pmc_keyed_int(INTVAL key)
 PMC* get_pmc_keyed_str(STRING* key)
-PMC* slice(PMC* key)
+PMC* slice(PMC* key, INTVAL flag)
 
 void* get_pointer()
 void* get_pointer_keyed(PMC* key)

@@ -261,10 +261,16 @@ This is used for implementing Pythons xrange()
 
 */
 
-    PMC* slice(PMC *key) {
-	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
-        PMC_struct_val(iter) = key;
-        return iter;
+    PMC* slice(PMC *key, INTVAL f) {
+        if (f) {
+            internal_exception(1, "Slice: Unknown slice type");
+            return NULL;
+        }
+        else {
+            PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+            PMC_struct_val(iter) = key;
+            return iter;
+        }
     }
 
     PMC* get_iter() {
