@@ -43,8 +43,10 @@
 			ld_shared_flags=> '-def:libparrot.def',
 			ld_out     => '-out:',
 			ldflags    => '-nologo',
-			blib_lib_libparrot_a => '',
+			blib_lib_libparrot_a => 'blib/lib/libparrot_s$(A)',
 			cp         => 'copy',
+			ar_flags   => '',
+			ar_out     => '-out:',
 			slash      => '\\',
 			ccflags    => $ccflags
 		);

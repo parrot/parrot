@@ -12,7 +12,7 @@ SO = ${so}
 A = ${a}
 RM_F = ${rm_f}
 RM_RF = ${rm_rf}
-AR_CR = ${ar} cr
+AR_CR = ${ar} ${ar_flags}
 RANLIB = ${ranlib}
 LINK = ${link}
 LD = ${ld}
@@ -137,7 +137,7 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 
 CFLAGS = ${ccflags} ${cc_warn} ${cc_inc} ${cc_hasjit} ${cg_flag} ${gc_flag}
 
-LINKFLAGS = ${linkflags}
+LINKFLAGS = ${linkflags} ${ld_debug}
 LDFLAGS = ${ldflags} ${ld_debug}
 
 C_LIBS = ${libs}
@@ -211,17 +211,17 @@ blib/lib : blib
 	-mkdir blib${slash}lib
 
 shared : $(GEN_HEADERS) blib/lib blib/lib/libparrot$(SO) ${blib_lib_libparrot_a}
+static : $(GEN_HEADERS) ${blib_lib_libparrot_a}
 
-# XXX Unix-only for now
-blib/lib/libparrot$(A) : blib/lib $(O_DIRS) $(O_FILES)
-	$(AR_CR) $@ $(O_FILES)
+${blib_lib_libparrot_a} : blib/lib $(O_DIRS) $(O_FILES)
+	$(AR_CR) ${ar_out}$@ $(O_FILES)
 	$(RANLIB) $@
 
 blib/lib/libparrot$(SO) : blib/lib $(O_DIRS) $(O_FILES)
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)
 
 $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
-	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) test_main$(O) blib/lib/libparrot$(A) $(C_LIBS)
+	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) test_main$(O) ${blib_lib_libparrot_a} $(C_LIBS)
 
 # XXX The dependancies on SO.MAJOR.MINOR and SO.VERSION are removed
 #     because those should be done at "make install" and not "make shared"
@@ -334,7 +334,7 @@ examples/mops/mops$(O) : examples/mops/mops.c
 
 examples/mops/mops${exe} : examples/mops/mops$(O)
 	$(LINK) $(LINKFLAGS) ${ld_out}examples/mops/mops${exe} \
-	examples/mops/mops$(O) blib/lib/libparrot$(A) $(C_LIBS)
+	examples/mops/mops$(O) ${blib_lib_libparrot_a} $(C_LIBS)
 
 
 ###############################################################################

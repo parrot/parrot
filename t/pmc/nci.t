@@ -1,5 +1,4 @@
 use Parrot::Test tests => 11;
-use Test::More qw/skip/;
 use Parrot::Config;
 
 SKIP: {

@@ -3,7 +3,6 @@
 use Parrot::Test tests => 4;
 
 TODO: {
-    local $TODO="t/src doesn't work on Windows" if $^O =~ /Win32/;
     $TODO=$TODO;  #warnings
 
     c_output_is(<<'CODE', <<'OUTPUT', "creation");
@@ -294,6 +293,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "yoyo");
             }
 
             printf("Done.\n");
+            return 0;
         }
 CODE
 Done.

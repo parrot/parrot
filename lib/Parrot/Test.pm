@@ -9,10 +9,12 @@ use Env qw($TEST_PROG_ARGS);
 
 require Exporter;
 require Test::Builder;
+require Test::More;
 my $Builder = Test::Builder->new;
 
 @EXPORT = ( qw(output_is   output_like   output_isnt),
-            qw(c_output_is c_output_like c_output_isnt) );
+            qw(c_output_is c_output_like c_output_isnt),
+            qw(skip) );
 @ISA = qw(Exporter);
 
 sub import {
@@ -31,11 +33,11 @@ sub _run_command {
 
   while( my @dup = each %redir ) {
     my( $from, $to ) = @dup;
-    if( $to eq 'STDERR' ) { $to = "qq{>&STDERR}" }
-    elsif( $to eq 'STDOUT' ) { $to = "qq{>&STDOUT}" }
+    if( $to eq 'STDERR' ) { $to = "q{>&STDERR}" }
+    elsif( $to eq 'STDOUT' ) { $to = "q{>&STDOUT}" }
     elsif( $to eq '/dev/null' ) { $to = ( $^O eq 'MSWin32' ) ?
-                                      'qq{> NUL:}' : "qq{> $to}" }
-    else { $to = "qq{> $to}" }
+                                      'q{> NUL:}' : "q{> $to}" }
+    else { $to = "q{> $to}" }
 
     $redir_string .= "open $from, $to;"
   }
@@ -95,11 +97,13 @@ my %Test_Map = ( output_is   => 'is_eq',
 
 my $count = 0;
 
+*skip = \&Test::More::skip;
+
 sub generate_functions {
   my ($package, $pbc_generator, $directory) = @_;
 
   sub slurp_file {
-    open SLURP, "< $_[0]";
+    open SLURP, "< $_[0]" or die "open '$_[0]': $!";
     local $/ = undef;
     my $file = <SLURP> . '';
     $file =~ s/\cM\cJ/\n/g;
@@ -182,8 +186,11 @@ sub generate_functions {
       print SOURCE $source;
       close SOURCE;
 
+      my $libparrot = $PConfig{blib_lib_libparrot_a};
+      $libparrot =~ s/\$\(A\)/$PConfig{a}/;
+
       _run_command("$PConfig{cc} $PConfig{ccflags} -I./include -c $PConfig{cc_o_out}$obj_f $source_f", 'STDOUT' => $build_f, 'STDERR' => $build_f);
-      _run_command("$PConfig{link} $PConfig{linkflags} $obj_f $PConfig{ld_out}$exe_f blib/lib/libparrot$PConfig{a} $PConfig{libs}", 'STDOUT' => $build_f, 'STDERR' => $build_f);
+      _run_command("$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} $obj_f $PConfig{ld_out}$exe_f $libparrot $PConfig{libs}", 'STDOUT' => $build_f, 'STDERR' => $build_f);
 
       if (! -e $exe_f) {
 	$Builder->diag("Failed to build '$exe_f': " . slurp_file($build_f));
@@ -205,6 +212,7 @@ sub generate_functions {
   }
 }
 
-Parrot::Test::generate_functions(__PACKAGE__,\&generate_pbc_for,"./");
+Parrot::Test::generate_functions(__PACKAGE__,\&generate_pbc_for,
+                                 $^O eq 'MSWin32' ? '.\\' : "./");
 
 1;

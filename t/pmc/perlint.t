@@ -1,7 +1,6 @@
 #! perl -w
 
 use Parrot::Test tests => 5;
-use Test::More qw(skip);
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';

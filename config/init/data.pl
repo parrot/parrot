@@ -68,6 +68,8 @@ sub runstep {
     rm_f          => 'rm -f',
     rm_rf         => 'rm -rf',
     ar            => $Config{ar},
+    ar_flags      => 'cr',
+    ar_out        => '',                  # for Win32
     ranlib        => $Config{ranlib},
     make          => $Config{make},
     make_set_make => $Config{make_set_make},
