@@ -338,6 +338,9 @@ else {
     copy("platforms/generic.c", "platform.c");
 }
 
+my $now = time;
+utime $now, $now, "include/parrot/platform.h", "platform.c";
+
 unless( $c{debugging} ) {
     $c{ld_debug} = ' ';
     $c{cc_debug} = ' ';
