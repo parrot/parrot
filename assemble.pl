@@ -112,9 +112,9 @@ BEGIN {
   $hex_re = qr([-+]?0[xX][0-9a-fA-F]+);
   $flt_re = qr{[-+]?\d+ (?:(?:\.\d+(?:[eE][-+]?\d+)?)
                             | (?:[Ee][+-]?\d+))}x;
-  $str_re = qr(\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
-               \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
-              )x;
+  $str_re = qr{" (?: \\. | (?>[^\\"]+) )* " |
+               ' (?: \\. | (?>[^\\']+) )* '
+              }x;
   $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
   $num_re   = qr([-+]?\d+(\.\d+([eE][-+]?\d+)?)?);
 
@@ -125,7 +125,7 @@ BEGIN {
 
 package Macro;
 
-use Syntax qw($label_re $num_re);
+use Syntax qw($label_re $num_re $str_re $reg_re);
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Parrot::PMC qw(%pmc_types);
@@ -271,7 +271,7 @@ sub preprocess {
 
     if(/^\.constant \s+
         ($label_re) \s+
-        ([INSP]\d+)/xo) { # .constant {name} {register}
+        ($reg_re)/xo) { # .constant {name} {register}
       $self->{constants}{$1} = $2;
     }
     elsif(/^\.constant \s+
@@ -281,9 +281,7 @@ sub preprocess {
     }
     elsif(/^\.constant \s+
           ($label_re)  \s+
-          (\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
-           \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
-          )/xo) {                               # .constant {name} {string}
+          ($str_re)/xo) { # .constant {name} {string}
       $self->{constants}{$1} = $2;
     }
     elsif(/^\.include \s+
@@ -403,17 +401,6 @@ use lib "$FindBin::Bin/lib";
 use Parrot::Types; # For pack_op()
 use Parrot::OpLib::core;
 use Parrot::Config;
-
-my $reg_re = qr([INPS]\d+);
-my $bin_re = qr([-+]?0[bB][01]+);
-my $dec_re = qr([-+]?\d+);
-my $hex_re = qr([-+]?0[xX][0-9a-fA-F]+);
-my $flt_re = qr{[-+]?\d+ (?:(?:\.\d+(?:[eE][-+]?\d+)?)
-                          | (?:[Ee][+-]?\d+))}x;
-my $str_re = qr(\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
-                \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
-                )x;
-my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
 
 =head2 Assembler class
 
