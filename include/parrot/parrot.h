@@ -90,33 +90,33 @@ typedef void BIGNUM;
     A. D. Aug. 6, 2002.
 */
 #if (INTVAL_SIZE == PTR_SIZE) && (UINTVAL_SIZE == PTR_SIZE)
-#  define INTVAL2PTR(any,d)	(any)(d)
-#  define UINTVAL2PTR(any,d)	(any)(d)
+#  define INTVAL2PTR(any,d)    (any)(d)
+#  define UINTVAL2PTR(any,d)    (any)(d)
 #else
 #  if PTR_SIZE == LONG_SIZE
-#    define INTVAL2PTR(any,d)	(any)(unsigned long)(d)
-#    define UINTVAL2PTR(any,d)	(any)(unsigned long)(d)
+#    define INTVAL2PTR(any,d)    (any)(unsigned long)(d)
+#    define UINTVAL2PTR(any,d)    (any)(unsigned long)(d)
 #  else
-#    define INTVAL2PTR(any,d)	(any)(unsigned int)(d)
-#    define UINTVAL2PTR(any,d)	(any)(unsigned int)(d)
+#    define INTVAL2PTR(any,d)    (any)(unsigned int)(d)
+#    define UINTVAL2PTR(any,d)    (any)(unsigned int)(d)
 #  endif
 #endif
-#define PTR2INTVAL(p)	INTVAL2PTR(INTVAL,p)
-#define PTR2UINTVAL(p)	UINTVAL2PTR(UINTVAL,p)
+#define PTR2INTVAL(p)    INTVAL2PTR(INTVAL,p)
+#define PTR2UINTVAL(p)    UINTVAL2PTR(UINTVAL,p)
 
 /* Use similar macros for casting between pointers and opcode_t.
    (We can't assume that sizeof(opcode_t) == sizeof(intval).
 */
 #if (OPCODE_T_SIZE == PTR_SIZE)
-#  define OPCODE_T2PTR(any,d)	(any)(d)
+#  define OPCODE_T2PTR(any,d)    (any)(d)
 #else
 #  if PTR_SIZE == LONG_SIZE
-#    define OPCODE_T2PTR(any,d)	(any)(unsigned long)(d)
+#    define OPCODE_T2PTR(any,d)    (any)(unsigned long)(d)
 #  else
-#    define OPCODE_T2PTR(any,d)	(any)(unsigned int)(d)
+#    define OPCODE_T2PTR(any,d)    (any)(unsigned int)(d)
 #  endif
 #endif
-#define PTR2OPCODE_T(p)	OPCODE_T2PTR(opcode_t,p)
+#define PTR2OPCODE_T(p)    OPCODE_T2PTR(opcode_t,p)
 
 /* define some shortcuts for dealing with function pointers */
 /* according to ANSI C, casting between function and non-function pointers is
