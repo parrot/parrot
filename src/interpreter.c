@@ -251,6 +251,11 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code, size_t offset
           runops_prederef(interpreter, pc, interpreter->prederef_code + offset);
         }
         else if ((interpreter->flags & PARROT_JIT_FLAG) != 0) {
+          if (!JIT_CAPABLE) {
+            fprintf(stderr, "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
+            exit(1);
+          }
+
           runops_jit(interpreter, pc);
         }
         else {

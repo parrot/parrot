@@ -100,28 +100,33 @@ main(int argc, char **argv) {
 
 
     if (debugging) {
-         fprintf(stderr, "Parrot VM: Debugging enabled.\n");
-         flags |= PARROT_DEBUG_FLAG;
+        fprintf(stderr, "Parrot VM: Debugging enabled.\n");
+        flags |= PARROT_DEBUG_FLAG;
     }
 
     if (bounds_checking) {
-         flags |= PARROT_BOUNDS_FLAG;
+        flags |= PARROT_BOUNDS_FLAG;
     }
 
     if (jit) {
-         flags |= PARROT_JIT_FLAG;
+        if (!JIT_CAPABLE) {
+            fprintf(stderr, "%s: Cannot use the '-j' JIT-enabling flag on this architecture: %s\n",
+                argv[0], JIT_ARCHNAME);
+            exit(1);
+        }
+        flags |= PARROT_JIT_FLAG;
     }
 
     if (profiling) {
-         flags |= PARROT_PROFILE_FLAG;
+        flags |= PARROT_PROFILE_FLAG;
     }
 
     if (predereferencing) {
-         flags |= PARROT_PREDEREF_FLAG;
+        flags |= PARROT_PREDEREF_FLAG;
     }
 
     if (tracing) {
-         flags |= PARROT_TRACE_FLAG;
+        flags |= PARROT_TRACE_FLAG;
     }
 
     interpreter = make_interpreter(flags);

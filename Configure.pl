@@ -63,14 +63,21 @@ check_manifest();
 #XXX Figure out better defaults
 
 my ($archname,    $cpuarch,    $osname);
-my ($jitarchname, $jitcpuarch, $jitosname);
+my ($jitarchname, $jitcpuarch, $jitosname, $jitcapable);
 
 $archname                 =  $Config{archname};
 ($cpuarch, $osname)       =  split('-', $archname);
 
 $jitarchname              =  $archname;
 $jitarchname              =~ s/-(net|free|open)bsd$/-bsd/i;
-$jitarchname              =  'i386-nojit' unless -e "Parrot/Jit/$jitarchname.pm";
+
+if (-e "Parrot/Jit/$jitarchname.pm") {
+    $jitcapable  = 1;
+}
+else {
+    $jitcapable  = 0;
+    $jitarchname = 'i386-nojit';
+}
 
 ($jitcpuarch, $jitosname) =  split('-', $jitarchname);
 
@@ -117,6 +124,7 @@ my(%c)=(
     jitcpuarch  => $jitcpuarch,
     jitosname   => $jitosname,
     jitarchname => $jitarchname,
+    jitcapable  => $jitcapable,
 
 	cp =>		'cp',
 	slash =>	'/',
