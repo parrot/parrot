@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 85;
+use Parrot::Test tests => 87;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2216,6 +2216,75 @@ Themistocles
 1234.567890
 Hash
 Array
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "arithmetic with PerlUndef and native ints");
+        new P0, .PerlUndef
+        add P0, 10
+        set I1, P0
+        print I1
+        print "\n"
+
+        new P0, .PerlUndef
+        sub P0, 20
+        set I1, P0
+        print I1
+        print "\n"
+
+        new P0, .PerlUndef
+        mul P0, 30
+        set I1, P0
+        print I1
+        print "\n"
+
+        new P0, .PerlUndef
+        div P0, 40
+        set I1, P0
+        print I1
+        print "\n"
+        end
+CODE
+10
+-20
+0
+0
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "arithmetic with PerlUndef and native floats");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlUndef
+        add P0, 10.0
+        set N1, P0
+        .fp_ne(N1, 10.0, ERROR)
+        print "ok 1\\n" 
+
+        new P0, .PerlUndef
+        sub P0, 2.345
+        set N1, P0
+        .fp_ne(N1, -2.345, ERROR)
+        print "ok 2\\n" 
+
+        new P0, .PerlUndef
+        mul P0, 32.5
+        set N1, P0
+        .fp_ne(N1, 0.000, ERROR)
+        print "ok 3\\n" 
+
+        new P0, .PerlUndef
+        div P0, 0.5
+        set N1, P0
+        .fp_ne(N1, 0.000, ERROR)
+        print "ok 4\\n" 
+        branch DONE
+ERROR:  print "not ok\\n"
+        print N1
+DONE:
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT
 
 1;
