@@ -29,7 +29,7 @@ syn keyword imcPMC		PerlUndef Pointer Scratchpad Sub UnManagedStruct
 
 syn keyword imcOp		call goto if unless global clone addr
 
-syn match imcDirective      /\.\(sub\|pcc_sub\|end\|emit\|eom\)/
+syn match imcDirective      /\.\(sub\|pcc_sub\|macro\|endm\|end\|emit\|eom\)/
 syn match imcDirective      /\.\(local\|sym\|const\)/
 syn match imcDirective      /\.\(namespace\|endnamespace\)/
 syn match imcDirective      /\.\(param\|result\|arg\|return\)/
