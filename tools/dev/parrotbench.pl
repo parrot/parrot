@@ -6,6 +6,7 @@ use Getopt::Long;
 use Pod::Usage;
 use IO::File;
 use File::Find;
+use File::Spec;
 
 $|++;
 
@@ -39,11 +40,12 @@ as parrotbench.pl or otherwise explicitly specified with the
 
 Here is an example parrotbench.conf:
 
-    parrot: /home/sri/parrot/parrot: .pasm .imc
-    perl: /usr/bin/perl -w: .pl
-    python: /usr/local/bin/python: .py
-    python-j: /usr/local/bin/python -j: .py
-    ruby: /opt/ruby/bin/ruby: .rb
+  parrot: ./parrot:	.pasm .imc
+  parrotj: ./parrot -j:	.pasm .imc
+  parrotC: ./parrot -C:	.pasm .imc
+  perl: /usr/bin/perl58-th:	.pl
+  python: /usr/local/bin/python:	.py
+  ruby: /usr/local/bin/ruby:	.rb
 
 =cut
 
@@ -105,6 +107,7 @@ find sub {
         }
     }
 }, $directory;
+die "No benchmarks found" unless keys %list;
 
 # Print list
 if ($list) {
@@ -121,24 +124,29 @@ if ($list) {
 }
 
 # Benchmark
+print "WARNING: Falling back to results in cpu seconds,"
+  . " specify more executables!\n"
+  and $time++ unless $#names;
+$time
+  ? print "Numbers are cpu times in seconds. (lower is better)\n"
+  : print "Numbers are relative to the first one. (lower is better)\n";
 foreach my $i ( 0 .. $#names ) {
-    foreach my $j ( 0 .. $#{ $suffixes[$i] } ) {
-        print "\t$names[$i]($suffixes[$i][$j])";
-    }
+    print "\t$names[$i]";
 }
 print "\n";
+my $null = File::Spec->devnull;
 foreach my $benchmark ( sort keys %list ) {
     print "$benchmark";
     my $base = 0;
     foreach my $i ( 0 .. $#names ) {
+        my $found = 0;
         foreach my $j ( 0 .. $#{ $suffixes[$i] } ) {
             if (   $tree{ $names[$i] }{ $suffixes[$i][$j] }{$benchmark}
                 && $pathes{ $names[$i] } )
             {
                 my ( $scuser, $scsys ) = (times)[ 2, 3 ];
                 system "$pathes{$names[$i]} $directory/"
-                  . "$benchmark.$suffixes[$i][$j]"
-                  . '>/dev/null';
+                  . "$benchmark.$suffixes[$i][$j] > $null";
                 my ( $ecuser, $ecsys ) = (times)[ 2, 3 ];
                 my $used = ( $ecuser - $scuser ) + ( $ecsys - $scsys );
                 $base ||= $used;
@@ -148,11 +156,11 @@ foreach my $benchmark ( sort keys %list ) {
                 else {
                     printf "\t%d%%", $used / ( $base / 100 );
                 }
-            }
-            else {
-                print "\t-";
+                $found++;
+                last;
             }
         }
+        print "\t-" unless $found;
     }
     print "\n";
 }
