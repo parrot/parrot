@@ -1,3 +1,17 @@
+- 2003-08-22	leo
+
+	* HLL line and file information.
+	  The lexer parses now:
+
+	    #line\s(\d+)\s"([^"]*)"
+	    setfile\s+"([^"])*"
+	    setline\s+(\d+)
+
+	  as HLL file/line information.
+	  The setline and setfile opcodes are *not* emitted.
+
+	  This information will go into some debug segment.
+
 - 2003-08-12	leo
 
 	* lexer: enable macros for PIR parsing mode

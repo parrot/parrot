@@ -484,6 +484,10 @@ int main(int argc, char * argv[])
         free(packed);
     }
     if (run_pbc) {
+        if (IMCC_WARN)
+            PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
+        else
+            PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
         if (!gc_off)
             interpreter->DOD_block_level--;
         info(1, "Running...\n");

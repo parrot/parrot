@@ -1338,7 +1338,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Fetching undefined values (with warnings)");
+output_like(<<"CODE", <<'OUTPUT', "Fetching undefined values (with warnings)");
 @{[ $fp_equality_macro ]}
       warningson 1
       new P0, .PerlArray
@@ -1361,14 +1361,15 @@ OK3:  print "ok 3\\n"
 OK4:  print "ok 4\\n"
       end
 CODE
-Use of uninitialized value at (unknown file) line 0.
+/Use of uninitialized value at .*
 ok 1
-Use of uninitialized value at (unknown file) line 0.
+Use of uninitialized value at .*
 ok 2
-Use of uninitialized value at (unknown file) line 0.
+Use of uninitialized value at .*
 ok 3
-Use of uninitialized value at (unknown file) line 0.
+Use of uninitialized value at .*
 ok 4
+/
 OUTPUT
 
 1;

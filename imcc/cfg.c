@@ -593,7 +593,10 @@ propagate_need(Basic_block *bb, SymReg* r, int i) {
                  * is emitted, there seems always to be a code path
                  * where the var is not initialized, so this might
                  * even be correct :)
+                 *
+                 * XXX subroutines
                  */
+#if 0
                 if (pred->index == 0) {
                     Instruction *ins = r->life_info[i]->first_ins;
                     int bbi = ins->bbindex;
@@ -604,7 +607,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i) {
                             "'%s' might be used uninitialized in %s:%d\n",
                             r->name, function, ins->line);
                 }
-
+#endif
 	        propagate_need(pred, r, i);
 	    }
 	}

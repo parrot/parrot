@@ -348,6 +348,10 @@ iANY(struct Parrot_Interp *interpreter, char * name,
         if (!strcmp(name, "end")) {
             ins->type |= ITBRANCH | IF_goto;
         }
+        else if (!strcmp(name, "warningson")) {
+            /* emit a debug seg, if this op is seen */
+            PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
+        }
         if (!strcmp(name, "load_pmc")) {
             SymReg *r0 = r[0];   /* lib name */
             STRING *lib = string_from_cstring(interpreter, r0->name + 1,
@@ -442,6 +446,8 @@ static char * inv_op(char *op) {
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args lhs
 %token <sr> VAR
+%token <t> LINECOMMENT
+%token <s> FILECOMMENT
 
 %pure_parser
 
@@ -463,6 +469,8 @@ pasmcode: pasmline
 
 pasmline: labels  pasm_inst '\n'  { $$ = 0; }
     | MACRO '\n'                  { $$ = 0; }
+    | FILECOMMENT                 { $$ = 0; }
+    | LINECOMMENT                 { $$ = 0; }
     ;
 
 pasm_inst: {clear_state();}
@@ -641,6 +649,8 @@ statement:  { clear_state(); }
         | pcc_sub_call                { $$ = 0; }
         | pcc_ret
         | pcc_yield
+        | FILECOMMENT                 { $$ = 0; }
+        | LINECOMMENT                 { $$ = 0; }
     ;
 
 labels:	/* none */         { $$ = NULL; }
@@ -822,6 +832,8 @@ const: INTC				{ $$ = mk_const($1, 'I'); }
 string: SREG				{ $$ = mk_symreg($1, 'S'); }
     |  STRINGC				{ $$ = mk_const($1, 'S'); }
     ;
+
+
 %%
 
 

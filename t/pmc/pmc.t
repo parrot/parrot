@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 89;
+use Parrot::Test tests => 90;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2363,4 +2363,13 @@ ok 3
 ok 4
 OUTPUT
 
+output_like(<<"CODE", <<OUTPUT, "undef warning");
+	.include "warnings.pasm"
+	warningson .PARROT_WARNINGS_UNDEF_FLAG
+	new P0, .PerlUndef
+	print P0
+	end
+CODE
+/Use of uninitialized.*pasm/i
+OUTPUT
 1;

@@ -59,6 +59,7 @@ static int read_macro (YYSTYPE *valp, void *interp);
 static int expand_macro (YYSTYPE *valp, void *interp, const char *name);
 static void include_file (const char *file_name);
 static int in_pod;
+static int prev_state;
 
 #define YY_DECL int yylex(YYSTYPE *valp, struct Parrot_Interp *interp)
 
@@ -76,11 +77,12 @@ static int in_pod;
 
 LETTER          [a-zA-Z_]
 DIGIT           [0-9]
+DIGITS          {DIGIT}+
 HEX		0x[0-9A-Fa-f]+
 BIN             0b[01]+
 DOT		[.]
 SIGN            [-+]
-FLOATNUM        {SIGN}?{DIGIT}+{DOT}{DIGIT}*([eE]{SIGN}?{DIGIT}+)?
+FLOATNUM        {SIGN}?{DIGITS}{DOT}{DIGIT}*([eE]{SIGN}?{DIGITS})?
 LETTERDIGIT     [a-zA-Z0-9_]
 ID              {LETTER}{LETTERDIGIT}*
 STRINGCONSTANT  \"(\\\"|[^"\n]*)*\"
@@ -88,10 +90,15 @@ CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
 EOL		\r?\n
 WS              [\t\f\r ]
+SP              [ ]
 
 %x emit
 %x macro
 %x pod
+%x cmt1
+%x cmt2
+%x cmt3
+%x cmt4
 
 %%
         /* for emacs "*/
@@ -106,6 +113,25 @@ WS              [\t\f\r ]
 	    }
             return 0;
         }
+
+<*>^"#line"{SP}{DIGITS}{SP}["] { prev_state = YYSTATE; BEGIN(cmt2);
+                       valp->t = atoi(yytext+6);
+                       return LINECOMMENT;
+               }
+<cmt2>[^"]+    { BEGIN(cmt3);
+                      valp->s = strdup(yytext);
+                      return FILECOMMENT;
+               }
+<cmt3>["]{EOL}    { BEGIN(prev_state) ; line++; }
+
+<*>setfile{SP}+["]   { prev_state = YYSTATE; BEGIN(cmt2); }
+<*>setline{SP}+      { prev_state = YYSTATE; BEGIN(cmt1); }
+<cmt1>{DIGITS}       {
+                       valp->t = atoi(yytext);
+                       BEGIN(cmt4);
+                       return LINECOMMENT;
+               }
+<cmt4>{WS}*{EOL}  { BEGIN(prev_state) ; line++; }
 
 <INITIAL,emit>{EOL} {
         if (expect_pasm == 2)
