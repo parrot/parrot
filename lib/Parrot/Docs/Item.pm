@@ -30,14 +30,14 @@ package Parrot::Docs::Item;
 use strict;
 use Parrot::Docs::Directory;
 
-=item C<new($text, @paths)>
+=item C<new($text, @content)>
 
 Returns a new item. If there is no descriptive text then C<$text> should
 be an empty string.
 
-The paths will be interpreted as being relative to the C<$target>
-argument in C<write_html()>. There should be at least one path otherwise
-an exception is raised.
+The paths in C<@content> will be interpreted as being relative to the
+C<$target> argument in C<write_html()>. There should be at least one
+path otherwise an exception is raised.
 
 =cut
 
@@ -100,17 +100,24 @@ sub write_html
 				my $file_html = $file->pod_as_html;
 
 				# TODO This is messy. 
-				# There may be a bug in relative_path().
+				# Make the CSS and images local.
 				
 				my $name = $target->name;
-				$rel_path = $file->relative_path($target->path);
-				$rel_path =~ s|/([^/]+$)||;
+				
+				$rel_path = $docs_file->parent->relative_path($target->parent_path);
 
-				$file_html =~ s|href="">Contents|href="../$rel_path/$name/index.html">Contents|s;
-				$file_html =~ s|http://dev.perl.org|../$rel_path/resources|s;
-				$file_html =~ s|http://www.parrotcode.org/images|../$rel_path/resources|s;
+				$file_html =~ s|href="">Contents|href="$rel_path/$name/index.html">Contents|s;
+				$file_html =~ s|http://dev.perl.org|$rel_path/resources|s;
+				$file_html =~ s|http://www.parrotcode.org/images|$rel_path/resources|sg;
 
-				$docs_file->write($file_html);				
+				$docs_file->write($file_html);
+				
+				# If it's a single file we can use its text.
+				
+				if ( @rel_paths == 1 and ! $self->{TEXT} )
+				{
+					$self->{TEXT} = $file->short_description;
+				}		
 			}
 			elsif ( $file->is_docs_link )
 			{

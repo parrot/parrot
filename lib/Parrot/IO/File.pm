@@ -26,6 +26,21 @@ use Parrot::IO::Path;
 @Parrot::IO::File::ISA = qw(Parrot::IO::Path);
 
 use FileHandle;
+use Parrot::IO::Directory;
+
+=item C<tmp_file($path)>
+
+Returns the file for C<$path> relative to the default temporary
+directory.
+
+=cut
+
+sub tmp_file
+{
+	my $self = shift;
+	
+	return $self->new(File::Spec->catfile(File::Spec->tmpdir, @_));
+}
 
 =item C<new($path)>
 
@@ -65,6 +80,20 @@ sub create_path
 	}
 	
 	return -f $self->path;
+}
+
+=item C<parent($path)>
+
+Returns the file's parent directory.	
+	
+=cut
+
+sub parent
+{
+	my $self = shift;
+	my $path = shift;
+	
+	return Parrot::IO::Directory->new($self->parent_path);
 }
 
 =item C<read()>
@@ -139,7 +168,7 @@ sub is_executable
 {
 	my $self = shift;
 	
-	return $self->status->mode & 0111;
+	return $self->stat->mode & 0111;
 }
 
 =item C<modified_since($time)>
@@ -155,12 +184,12 @@ sub modified_since
 	my $self = shift;
 	my $time = shift;
 	
-	return $self->status->mtime > $time;
+	return $self->stat->mtime > $time;
 }
 
 =item cvs_id
 
-Returns the CVS $id string.
+Returns the CVS $Id string.
 
 =cut
 
@@ -176,7 +205,7 @@ sub cvs_id
 
 =item has_cvs_id
 
-Returns whether the file has a CVS $id string.
+Returns whether the file has a CVS $Id string.
 
 =cut
 
@@ -192,7 +221,7 @@ sub has_cvs_id
 
 =item cvs_version
 
-Returns the CVS $id string.
+Returns the CVS version number of the file.
 
 =cut
 
@@ -207,17 +236,19 @@ sub cvs_version
 
 =item C<delete()>
 
-Deletes the file.
+Deletes the file, removes the instance from the cache, and undefines it.
+
+Raises an exception if the delete fails.
 
 =cut
 
 sub delete
 {
-	my $self = shift;
+	# Use $_[0] so that we can undef the instance in SUPER::delete().
 	
-	unlink($self->path) or die 'Failed to unlink ' . $self->path . ": $!";
+	unlink($_[0]->path) or die 'Failed to unlink ' . $_[0]->path . ": $!";
 	
-	$self->SUPER::delete;
+	$_[0]->SUPER::delete;
 }
 
 =back

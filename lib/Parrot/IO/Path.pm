@@ -25,22 +25,10 @@ use strict;
 use warnings;
 use File::Path;
 use File::Spec;
-use File::stat;
+# qw() to avoid the export because we have a stat() method.
+use File::stat qw();
 
 my %instance_for_path = ();
-
-=item C<tmp($path)>
-
-Returns C<$path> with the default temporary directory path prepended.
-
-=cut
-
-sub tmp
-{
-	my $self = shift;
-	
-	return File::Spec->catfile(File::Spec->tmpdir, @_);
-}
 
 =item C<new($path)>
 
@@ -58,14 +46,31 @@ sub new
 	
 	$path = File::Spec->rel2abs($path);
 	
-	return $instance_for_path{$path} if exists $instance_for_path{$path};
+	# Clean up any /foo/../ stuff.
+	while ( $path =~ s|/[^/]+/\.\.|| ) {}
+
+	if ( exists $instance_for_path{$path} )
+	{
+		if ( ref($instance_for_path{$path}) ne $self )
+		{
+			bless $instance_for_path{$path}, $self;
+		}
+		
+		return $instance_for_path{$path};
+	}
 	
 	my ($volume, $directories, $name) = File::Spec->splitpath($path);
-
+	
+	# Needs '' to avoid a warning.
+	my $parent_path = File::Spec->catpath($volume, $directories, '');
+	
+	# To remove the trailing slash.
+	$parent_path = File::Spec->canonpath($parent_path);
+	
 	$self = bless {
 		PATH => $path,
 		NAME => $name,
-		PARENT_PATH => File::Spec->catpath($volume, $directories, ''),
+		PARENT_PATH => $parent_path,
 	}, $self;
 	
 	return undef unless $self->create_path;
@@ -195,65 +200,33 @@ sub parent_path
 	return $self->{PARENT_PATH};
 }
 
-=item C<relative_path($path)>
+=item C<stat()>
 
-Returns a relative path. This is primarily intended for situations where
-a Directory is asked for the relative path for a file somewhere below
-it.
-
-=cut
-
-sub relative_path
-{
-	my $self = shift;
-	my $path = shift;
-	
-	return File::Spec->abs2rel($path, $self->path);
-}
-
-=item C<relative_path_no_suffix($path)>
-
-Returns a relative path with any .xyz suffix removed.
-
-=cut
-
-sub relative_path_no_suffix
-{
-	my $self = shift;
-	my $path = shift;
-	
-	$path = $self->relative_path($path);
-	
-	$path =~ s/\.[^\.]*$//o;
-
-	return $path;
-}
-
-=item C<status()>
-
-Returns the File::stat object. Used by subclasses to get information
+Returns the C<File::stat> object. Used by subclasses to get information
 about the path.
 
 =cut
 
-sub status
+sub stat
 {
 	my $self = shift;
 	
-	return stat($self->path);
+	return File::stat::stat($self->path);
 }
 
 =item C<delete()>
 
-Removes the instance from the cache.
+Removes the instance from the cache, and undefines it.
 
 =cut
 
 sub delete
 {
-	my $self = shift;
-	
-	delete($instance_for_path{$self->path});
+	# Use $_[0] so that we can undef the instance.
+
+	delete($instance_for_path{$_[0]->path});
+
+	undef $_[0];
 }
 
 =back

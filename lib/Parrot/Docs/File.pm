@@ -317,7 +317,31 @@ sub is_docs_link
 {
 	my $self = shift;
 
+	# TODO This needs more thought.
+	
 	return $self->type =~ /Licence|info|docu|Text|TODO|status|MANIFEST|README/;
+}
+
+=item C<short_description()>
+
+Returns a short description of the file extracted from the C<NAME> section
+of the POD documentation, if it exists.
+
+=cut
+
+sub short_description
+{
+	my $self = shift;
+
+	return '' unless $self->contains_pod;
+	
+	my $text = $self->read;
+	
+	return '' unless $text =~ /\n=head1\s+NAME\n+([^\n]+)/s;
+	
+	my ($path, $desc) = split /\s*-\s*/, $1;
+	
+	return $desc;
 }
 
 =back

@@ -28,7 +28,35 @@ use Parrot::IO::Path;
 use DirHandle;
 use File::Path;
 use File::Spec;
-use Parrot::Docs::File;
+use Parrot::IO::File;
+
+=item C<file_class()>
+
+Returns the class used in the various file creation methods. This default
+implementation returns C<Parrot::IO::File>.
+
+=cut
+
+sub file_class
+{
+	my $self = shift;
+	
+	return 'Parrot::IO::File';
+}
+
+=item C<tmp_directory($path)>
+
+Returns the directory for C<$path> relative to the default temporary
+directory.
+
+=cut
+
+sub tmp_directory
+{
+	my $self = shift;
+	
+	return $self->new(File::Spec->catdir(File::Spec->tmpdir, @_));
+}
 
 =item C<new($path)>
 
@@ -67,6 +95,34 @@ sub create_path
 	return -d $self->path;
 }
 
+=item C<relative_path($path)>
+
+Returns C<$path> relative to the directory.	
+
+=cut
+
+sub relative_path
+{
+	my $self = shift;
+	my $path = shift;
+	
+	return File::Spec->abs2rel($path, $self->path);
+}
+
+=item C<parent($path)>
+
+Returns the directory's parent directory.	
+	
+=cut
+
+sub parent
+{
+	my $self = shift;
+	my $path = shift;
+	
+	return Parrot::IO::Directory->new($self->parent_path);
+}
+
 =item C<file_and_directory_names()>
 
 These are the names of all the files and subdirectories in the
@@ -93,7 +149,9 @@ sub file_and_directory_paths()
 {
 	my $self = shift;
 	
-	return map  {"$self->{PATH}/$_"} $self->file_and_directory_names;
+	return map  {
+		File::Spec->catfile($self->{PATH}, $_)
+	} $self->file_and_directory_names;
 }
 
 =item C<file_paths()>
@@ -137,7 +195,7 @@ sub files
 	my $self = shift;
 	my $recursive = shift;
 	my $ignore = shift;
-	my @files = map {Parrot::Docs::File->new($_)} $self->file_paths;
+	my @files = map {$self->file_class->new($_)} $self->file_paths;
 	
 	if ( $recursive )
 	{
@@ -162,7 +220,7 @@ sub directories
 {
 	my $self = shift;
 
-	return map {Parrot::Docs::Directory->new($_)} $self->directory_paths;
+	return map {Parrot::IO::Directory->new($_)} $self->directory_paths;
 }
 
 =item C<file_suffixes($recursive, $ignore)>
@@ -230,42 +288,18 @@ sub files_with_suffix
 	return @files;
 }
 
-=item C<files_of_type($type, $recursive, $ignore)>
+=item C<directory_with_name($name)>
 
-Use this to get a list of the files of a particular type.
-
-C<$recursive> and C<$ignore> function as specified above for C<files()>.
+Returns a directory with the specified name in the directory.
 
 =cut
 
-sub files_of_type
+sub directory_with_name
 {
 	my $self = shift;
-	my $type = shift;
+	my $name = shift;
 	
-	return () unless defined $type;
-	
-	my $recursive = shift;
-	my $ignore = shift;
-	my @files = ();
-	
-	foreach my $file ($self->files)
-	{
-		next unless $file->is_of_type($type);
-		push @files, $file;
-	}
-	
-	if ( $recursive )
-	{
-		foreach my $dir ($self->directories)
-		{
-			next if defined $ignore and $dir->name =~ /$ignore/;
-			
-			push @files, $dir->files_of_type($type, 1, $ignore);
-		}
-	}
-	
-	return @files;
+	return Parrot::IO::Directory->new(File::Spec->catdir($self->path, $name));
 }
 
 =item C<file_with_name($name)>
@@ -279,7 +313,7 @@ sub file_with_name
 	my $self = shift;
 	my $name = shift;
 	
-	return Parrot::Docs::File->new(File::Spec->catfile($self->path, $name));
+	return $self->file_class->new(File::Spec->catfile($self->path, $name));
 }
 
 =item C<relative_path_is_directory($path)>
@@ -329,7 +363,7 @@ sub directory_with_relative_path
 	
 	$path = File::Spec->catdir($self->path, $directories, $name);
 	
-	return Parrot::Docs::Directory->new($path);
+	return Parrot::IO::Directory->new($path);
 }
 
 =item C<file_with_relative_path($path)>
@@ -346,27 +380,33 @@ sub file_with_relative_path
 	
 	$directories = File::Spec->catdir($self->path, $directories);
 	
-	return Parrot::Docs::File->new(File::Spec->catfile($directories, $name));
+	return $self->file_class->new(File::Spec->catfile($directories, $name));
 }
 
 =item C<delete()>
 
-Removes the instance from the cache.
+Deletes the directory and all its contents, removes the instance from
+the cache, and undefines it.
+
+Raises an exception if the delete fails.
 
 =cut
 
 sub delete
 {
-	my $self = shift;
+	# Use $_[0] so that we can undef the instance in SUPER::delete().
 	
-	rmtree($self->path) or die 'Failed to rmtree ' . $self->path . ": $!";
+	$_[0]->delete_contents;
+	rmdir($_[0]->path) or die 'Failed to rmdir ' . $_[0]->path . ": $!";
 	
-	$self->SUPER::delete;
+	$_[0]->SUPER::delete;
 }
 
 =item C<delete_contents()>
 
 Deletes the contents of the directory.
+
+Raises an exception if the delete fails.
 
 =cut
 

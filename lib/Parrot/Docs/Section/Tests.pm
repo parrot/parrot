@@ -53,7 +53,7 @@ sub new
 			$self->item('', 't/src'),
 		),
 		$self->group('Stress Tests', '',
-			$self->item('', 't/src'),
+			$self->item('', 't/stress'),
 		),
 	);
 }

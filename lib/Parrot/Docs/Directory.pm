@@ -31,21 +31,55 @@ use Parrot::IO::Directory;
 
 use Parrot::Docs::File;
 
-=item C<files($recursive, $ignore)>
+=item C<file_class()>
 
-This gives you an array of C<Parrot::Docs::File> instances.
-
-Set C<$recursive> to true if you want all files in subdirectories to be
-included. To ignore everything below particular directories use a regex
-in C<$ignore>.
+Returns C<Parrot::Docs::File>.
 
 =cut
 
-sub files
+sub file_class
 {
 	my $self = shift;
 	
-	return map {bless $_, 'Parrot::Docs::File'} $self->SUPER::files(@_);
+	return 'Parrot::Docs::File';
+}
+
+=item C<files_of_type($type, $recursive, $ignore)>
+
+Use this to get a list of the files of a particular type.
+
+C<$recursive> and C<$ignore> function as specified above for C<files()>.
+
+=cut
+
+sub files_of_type
+{
+	my $self = shift;
+	my $type = shift;
+	
+	return () unless defined $type;
+	
+	my $recursive = shift;
+	my $ignore = shift;
+	my @files = ();
+	
+	foreach my $file ($self->files)
+	{
+		next unless $file->is_of_type($type);
+		push @files, $file;
+	}
+	
+	if ( $recursive )
+	{
+		foreach my $dir ($self->directories)
+		{
+			next if defined $ignore and $dir->name =~ /$ignore/;
+			
+			push @files, $dir->files_of_type($type, 1, $ignore);
+		}
+	}
+	
+	return @files;
 }
 
 =back
