@@ -110,6 +110,7 @@ sub Assemble($) {
 
     write_as($assembler,TMP_AS);
     assemble(TMP_AS, TMP_OBJ);
+    unlink TMP_AS or warn "Could not unlink " . TMP_AS . ": $!";
     return disassemble(TMP_OBJ,\@special_arg,\@special,$ln);
 }
             

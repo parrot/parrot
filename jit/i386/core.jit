@@ -122,8 +122,13 @@ Parrot_print_ic {
     pushl $0x0
     lea 0x4(%esp,1),%ebx
     subl $0x1,(%ebx)
-    movl &INT_CONST[1],%eax
     pushl $0xa
+    movl &INT_CONST[1],%eax
+    cmp $0,%eax
+    mov $0,%esi
+    jge again
+    neg %eax
+    movl $1,%esi
 again:    movl %esp,%ecx
     addl $0x1,0x4(%ecx)
     cmp $0xa,%eax
@@ -139,8 +144,14 @@ next:    subl $0x1,(%ebx)
     mov (%ebx),%ecx
     addb $0x30,%al
     movb %al,(%ecx)
-    mov %esp,%ecx
-    mov 0x4(%ecx),%ecx
+    cmp $1,%esi
+    jne print
+    movl %esp,%ecx
+    addl $0x1,0x4(%ecx)
+    subl $0x1,(%ebx)
+    mov (%ebx),%ecx
+    movb $0x2d,(%ecx)
+print:    mov 0x4(%esp),%ecx
     movl %ecx,&TEMP_INT[0]
     mov (%ebx),%ecx
     mov %ecx, &TEMP_INT[1]
@@ -153,8 +164,13 @@ Parrot_print_i {
     pushl $0x0
     lea 0x4(%esp,1),%ebx
     subl $0x1,(%ebx)
-    movl &INT_REG[1],%eax
     pushl $0xa
+    movl &INT_REG[1],%eax
+    cmp $0,%eax
+    mov $0,%esi
+    jge again
+    neg %eax
+    movl $1,%esi
 again:    movl %esp,%ecx
     addl $0x1,0x4(%ecx)
     cmp $0xa,%eax
@@ -170,13 +186,43 @@ next:    subl $0x1,(%ebx)
     mov (%ebx),%ecx
     addb $0x30,%al
     movb %al,(%ecx)
-    mov %esp,%ecx
-    mov 0x4(%ecx),%ecx
+    cmp $1,%esi
+    jne print
+    movl %esp,%ecx
+    addl $0x1,0x4(%ecx)
+    subl $0x1,(%ebx)
+    mov (%ebx),%ecx
+    movb $0x2d,(%ecx)
+print:    mov 0x4(%esp),%ecx
     movl %ecx,&TEMP_INT[0]
     mov (%ebx),%ecx
     mov %ecx, &TEMP_INT[1]
     movl $1,&TEMP_INT[2]
-    SYSTEMCALL(WRITE,3, A&TEMP_INT[2] A&TEMP_INT[1] A&TEMP_INT[0]) 
+    SYSTEMCALL(WRITE,3, A&TEMP_INT[2] A&TEMP_INT[1] A&TEMP_INT[0])
+}
+
+Parrot_neg_i_i {
+    movl &INT_REG[2],%eax
+    neg %eax
+    movl %eax,&INT_REG[1]
+}
+
+Parrot_neg_i_ic {
+    movl *INT_CONST[2],%eax
+    neg %eax
+    movl %eax,&INT_REG[1]
+}
+
+Parrot_neg_n_n {
+    fldl &NUM_REG[2]
+    fchs
+    fstpl &NUM_REG[1]
+}
+
+Parrot_neg_n_nc {
+    fldl &NUM_CONST[2]
+    fchs
+    fstpl &NUM_REG[1]
 }
 
 ;

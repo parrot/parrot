@@ -107,6 +107,32 @@ Parrot_if_i_ic {
     JUMP(INT_CONST[2])
 }
 
+Parrot_neg_i_i {
+    ldq $3 , &INT_REG[2]
+    neg $3 , $3
+    stq $3 , &INT_REG[1]
+}
+
+Parrot_neg_i_ic {
+    ldah $3 , 1($27)
+    ldq $3 , &INT_CONST[2]
+    neg $3 , $3
+    stq $3 , &INT_REG[1]
+}
+
+Parrot_neg_n_n {
+    ldt $f0 , &NUM_REG[2]
+    fneg $f0,$f0
+    stt $f0 , &NUM_REG[1]
+}
+
+Parrot_neg_n_nc {
+    ldah $7 , 1($27)
+    ldt $f0 , &NUM_CONST[2]
+    fneg $f0,$f0
+    stt $f0 , &NUM_REG[1]
+}
+
 #Parrot_print_sc {
 #    lda $16 , 1
 #    SYSTEMCALL(WRITE,3, V*CPU_REG[16] V&STRING_CONST_bufstart[1] A&STRING_CONST_strlen[1])

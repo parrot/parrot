@@ -1340,6 +1340,25 @@ inline op mul(out NUM, in NUM, in NUM) {
 
 ########################################
 
+=item B<not>(out INT, in INT)
+
+Set $1 to the negative of $2.
+
+=cut
+
+inline op neg(out INT, in INT) {
+  $1 = -($2);
+  goto NEXT();
+}
+
+inline op neg(out NUM, in NUM) {
+  $1 = -($2);
+  goto NEXT();
+}
+
+
+########################################
+
 =item B<pow>(out NUM, in INT, in INT)
 
 =item B<pow>(out NUM, in INT, in NUM)
