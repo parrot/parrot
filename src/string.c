@@ -72,7 +72,6 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
  */
 STRING *
 string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
-    void * newbuf;
     INTVAL copysize = s->bufused;
     if(addlen < 0)
         copysize += addlen;
