@@ -1,0 +1,145 @@
+=head1 NAME
+
+docs/pdds/pdd18_security.pod - Parrot's security infrastructure
+
+=head1 ABSTRACT
+
+This PDD describes the safety, security, and quota infrastructure of
+Parrot.
+
+=head1 DESCRIPTION
+
+There are three basic subsystems in parrot's security system. They
+are:
+
+=over 4
+
+=item Quotas
+
+To ensure that an interpreter doesn't use more CPU time, memory, or
+system resources than is allowed.
+
+=item Privilege checks
+
+To restrict access to what an interpreter can do.
+
+=item Parameter checks
+
+To double-check bytecode parameters for basic sanity
+
+=back
+
+Each of these can be enabled or disabled separately, and each has a
+particular purpose. Often two or more systems will be engaged at
+once, but this isn't required.
+
+=head2 Quotas
+
+The purpose of a quota system is to ensure that an interpreter
+doesn't use up too many resources -- usually memory and CPU, but
+there may be other scarce resources, such as files, that need
+managing. In a shared environment it prevents an interpreter from
+hogging too many resources, either explicitly (as in a DOS attack) or
+implicitly (through poor programming or poorly scheduled runs), and
+preventing other interpreters from running.
+
+=head2 Privilege checks
+
+A privilege system is used to restrict code from performing certain
+actions. When privilege checking is in force you may need a
+particular privilege to load a library, or open a file.
+
+Each interpreter has three sets of privileges -- the I<current>
+privilege set, which is the set of privileges currently in force. The
+second set is the I<authorized> privileges. These are the privileges
+that can be put into the current set. The third set are the I<sub>
+privileges. These are the privileges that a sub has intrinsic to
+itself, regardless of what the interpreter privileges currently
+are. (Subs with privileges attached to them are called I<privileged
+subs>, oddly enough)
+
+An interpreter may drop any privilege it likes from the current
+set. It may also at any time enable a privilege which is in the
+authorized set but not in the current set. It is possible for a sub
+to have a privilege in its current set which isn't in its authorized
+set. Those privileges are, once dropped, gone.
+
+Subroutines may also have a set of I<required privileges> attached to
+them. The current interpreter must have those privileges in its
+current or sub set to call a subroutine so tagged. If the interpreter
+doesn't have the privileges then a privilege violation exception is
+thrown.
+
+=head2 Parameter checking
+
+In normal operation the interpreter assumes that the bytecode that it
+executes is valid -- that is, any parameters to opcodes are sane,
+data structures are intact, and the world, generally, is a good
+place. When parameter checking is enabled, however, we assume that
+bytecode is not necessarily valid. The interpreter then, at runtime,
+makes sure that all specified register numbers are within valid
+range, and string and PMC structures used are valid.
+
+=head2 Feature usage
+
+Each of the three features has a separate use. Parameter checking is
+most useful when executing code which may come from an unsafe source,
+for example from the network. Quotas are most useful when running
+code in a managed environment such as a web, database, or game server where
+no one interpreter is allowed to consume too many resources and
+impact the system too badly. Privileges are used when running
+untrusted code in a trusted environment, again such as a database or
+game server, where Parrot can't disable certain features, but must
+limit their use to trusted code.
+
+It's unlikely that any one of these features will be enabled
+individually, though there are certainly reasons to do so. Each
+feature is separately implemented, however, and as such can be taken
+singly and discussed.
+
+=head1 IMPLEMENTATION
+
+
+=head1 ATTACHMENTS
+
+
+=head1 FOOTNOTES
+
+
+=head1 REFERENCES
+
+
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internal
+    PDD Number: 18
+    Version: 1.0
+    Status: Developing
+    Last Modified: 29 Aug 2004
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.0
+
+None. First version
+
+=back
+
