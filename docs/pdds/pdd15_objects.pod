@@ -214,8 +214,8 @@ class. (This doesn't mean that non-ParrotClass things can be
 subclassed or treated as an OO class. Neither is that forbidden. Just
 unimplemented)
 
-It's important to note that I<all> 'standard' classes are 
-ParrotClass PMC instances, and I<all> 'standard' objects are 
+It's important to note that I<all> 'standard' classes are
+ParrotClass PMC instances, and I<all> 'standard' objects are
 ParrotObject PMCs. We do I<not> create a brand new PMC class for each
 OO class, and they all share the ParrotClass or ParrotObject vtable,
 respectively. This distinction is mostly an artifact of the
@@ -225,7 +225,7 @@ While the internals of the class and object PMCs should be considered
 black boxes, here's some documentation as to what they are for
 implementation purposes.
 
-The ParrotClass PMC holds a 5 element array, which is:
+The ParrotClass PMC holds a 6 element array, which is:
 
 =over 4
 
@@ -323,7 +323,7 @@ Set the attribute Iy of object Px to Pz
 
 Set the attribute of object Px with the fully qualified name Sy to Pz
 
-=item fetchmethod Px, Py, Sz
+=item fetchmethod Px, Py, Sz (Unimplemented)
 
 Find the PMC for method Sz of object Py, and put it in Px. Note that how
 the method PMC returned behaves if it goes out of scope or if the
@@ -348,9 +348,9 @@ a method name is passed in we look up the method PMC for the object
 and put it in the method slot. If a method name isn't provided then we
 assume that things are already properly set up.
 
-=item tailcallmethod
+=item tailcallmethod (Unimplemented)
 
-=item tailcallmethod Sx
+=item tailcallmethod Sx (Unimplemented)
 
 Make a tailcall to method Sx. If no method name is given, we assume
 everything is already set up properly.
@@ -361,7 +361,7 @@ Create a new base class named Sy, and put the PMC for it in Px
 
 =item subclass Px, Py, Sz
 
-Create a new class, named Sz, which has Py as its immediate parent. 
+Create a new class, named Sz, which has Py as its immediate parent.
 
 =item addparent Px, Py
 
@@ -388,7 +388,7 @@ all objects of a child of class Px.
 
 =item instantiate Px, Py, Sz (Unimplemented)
 
-Instantiate a brand new class, based on the metadata in Py, named Sz. 
+Instantiate a brand new class, based on the metadata in Py, named Sz.
 
 =back
 
@@ -463,7 +463,7 @@ be transparent as well.
 =head1 EXAMPLES
 
 The following examples all assume we're working with basic
-ParrotObject objects and ParrotClass classes. 
+ParrotObject objects and ParrotClass classes.
 
 =head2 Creating a new class
 
@@ -477,7 +477,7 @@ To create a class C<Foo> with the parents C<A> and C<B>, the code
 would be:
 
    findclass $P0, "A"
-   findclass $P1
+   findclass $P1, "B"
    subclass $P2, $P0, "Foo"
    addparent $P2, $P1
 
@@ -503,16 +503,22 @@ Assuming we want an object of class C<Foo>:
 Calling the method C<Xyzzy> on an object, assuming the PDD03 calling
 conventions are respected:
 
-  callmethod "Xyzzy"
+  callmethod "Xyzzy" (Unimplemented)
+
+  set S0, "Xyzzy"
+  callmethod
 
 Or, if a return continuation needs constructing:
 
-  callmethodcc "Xyzzy"
+  callmethodcc "Xyzzy" (Unimplemented)
+
+  set S0, "Xyzzy"
+  callmethodcc
 
 =head2 Accessing attributes from within a class
 
 Assuming we've an object that has class C<Foo> in it somewhere and
-want to get attribute C<b> out of it:
+want to get the second attribute C<b> out of it:
 
   .local int BaseOffset
   .local int BOffset
