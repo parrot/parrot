@@ -811,6 +811,20 @@ Look for NCI methods and propertys.
 
 /*
 
+=item C<void add_parent(PMC *parent)>
+
+Add class C<parent> to the list of our parents.
+
+=cut
+
+*/
+
+    void add_parent(PMC *parent) {
+        Parrot_add_parent(interpreter, SELF, parent);
+    }
+
+/*
+
 =item C<void visit(visit_info *info)>
 
 Used by DOD to mark the PMC.

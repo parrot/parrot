@@ -120,6 +120,11 @@ Returns whether the class can perform C<*method>.
 
 Return SELF.
 
+=item C<STRING* namespace_name()>
+
+Return the name of the namespace, which is the classname of ParrotClass
+classes.
+
 =cut
 
 */
@@ -130,6 +135,13 @@ Return SELF.
 
     PMC* get_class() {
         return SELF;
+    }
+
+    STRING* namespace_name() {
+        PMC **class_data;
+        class_data = (PMC **)PMC_data(SELF);
+
+        return VTABLE_get_string(INTERP, class_data[PCD_CLASS_NAME]);
     }
 
 /*

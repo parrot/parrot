@@ -344,7 +344,7 @@ Add class $2 to the list of parent classes for $1.
 =cut
 
 inline op addparent(in PMC, in PMC) :object_classes {
-    Parrot_add_parent(interpreter, $1, $2);
+    VTABLE_add_parent(interpreter, $1, $2);
     goto NEXT();
 }
 
