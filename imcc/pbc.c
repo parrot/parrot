@@ -323,8 +323,8 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
      */
     *src_lines = 0;
     for (code_size = 0, ins = instructions; ins ; ins = ins->next) {
-        (*src_lines)++;
         if (ins->op && *ins->op) {
+            (*src_lines)++;
             if (ins->opnum < 0)
                 fatal(1, "e_pbc_emit", "no opnum ins#%d %s\n",
                         ins->index, ins_string(ins));
@@ -850,7 +850,8 @@ e_pbc_emit(void *param, Instruction * ins)
         pc = (opcode_t*) interpreter->code->byte_code + oldsize;
         npc = 0;
         /* add debug if necessary */
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG) ||
+            PARROT_WARNINGS_test(interpreter, PARROT_WARNINGS_ALL_FLAG)) {
             /* FIXME length and multiple subs */
             debug_seg = Parrot_new_debug_seg(interpreter,
                     interpreter->code->cur_cs, sourcefile,
@@ -894,7 +895,7 @@ e_pbc_emit(void *param, Instruction * ins)
             }
         }
         /* add debug line info */
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        if (debug_seg) {
             debug_seg->base.data[ins_line++] = (opcode_t) ins->line;
         }
         /* Start generating the bytecode */

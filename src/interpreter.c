@@ -662,9 +662,9 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
         offset = handle_exception(interpreter);
     }
     if (interpreter->profile &&
-            interpreter->profile->lastpc == (opcode_t*)&interpreter->op_count &&
+            interpreter->cur_pc == (opcode_t*)&interpreter->op_count &&
             Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        interpreter->profile->data[*interpreter->profile->lastpc].time +=
+        interpreter->profile->data[*interpreter->cur_pc].time +=
             Parrot_floatval_time() - interpreter->profile->starttime;
     }
 #endif

@@ -112,9 +112,9 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
 
     while (pc && pc >= code_start && pc < code_end) {
+        interpreter->cur_pc = pc;
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
             interpreter->profile->data[*pc].numcalls++;
-            interpreter->profile->lastpc = pc;
             interpreter->profile->starttime = Parrot_floatval_time();
         }
 
@@ -130,7 +130,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
         }
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-            interpreter->profile->data[*interpreter->profile->lastpc].time +=
+            interpreter->profile->data[*interpreter->cur_pc].time +=
                 Parrot_floatval_time() - interpreter->profile->starttime;
         }
     }

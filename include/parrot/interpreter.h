@@ -82,7 +82,6 @@ typedef struct ProfData {
 } ProfData;
 
 typedef struct RunProfile {
-    opcode_t *lastpc;
     FLOATVAL starttime;
     ProfData *data;
 } RunProfile;
@@ -140,6 +139,7 @@ typedef struct Parrot_Interp {
 
     RunProfile *profile;        /* The structure and array where we keep the
                                  * profile counters */
+    opcode_t *cur_pc;           /* for profile and warnings */
 
     INTVAL resume_flag;
     size_t resume_offset;

@@ -14,10 +14,11 @@ use Test::Harness qw(runtests);
 
 use Getopt::Std;
 my %opts;
-getopts('gjPbvdc?hO:', \%opts);
+getopts('wgjPbvdc?hO:', \%opts);
 if ($opts{'?'} || $opts{h}) {
 	print <<"EOF";
 perl t/harness [options] [testfiles]
+        -w ... warnings on
 	-g ... disable CGoto
 	-j ... run JIT
 	-P ... run Prederef or CGP

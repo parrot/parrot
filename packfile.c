@@ -1412,7 +1412,6 @@ byte_code_new (struct PackFile *pf, const char * name, int add)
     byte_code->jit_info = NULL;
     byte_code->prev = NULL;
     byte_code->debugs = NULL;
-    byte_code->debugs = NULL;
     byte_code->consts = NULL;
     byte_code->fixups = NULL;
     return (struct PackFile_Segment *) byte_code;
