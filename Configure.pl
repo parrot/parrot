@@ -139,11 +139,11 @@ my(%c)=(
     test_prog     => 'test_parrot' . $Config{_exe},
     debugging     => $opt_debugging,
     rm_f          => 'rm -f',
-    stacklow      => '(~0xfff)',
-    intlow        => '(~0xfff)',
-    numlow        => '(~0xfff)',
-    strlow        => '(~0xfff)',
-    pmclow        => '(~0xfff)',
+    stacklow      => '(~0xfff)U',
+    intlow        => '(~0xfff)U',
+    numlow        => '(~0xfff)U',
+    strlow        => '(~0xfff)U',
+    pmclow        => '(~0xfff)U',
     make          => $Config{make},
     make_set_make => $Config{make_set_make},
         
@@ -698,7 +698,7 @@ sub lowbitmask {
         my $vector = unpack("b*", pack("V", $_));
         my $offset = rindex($vector, "1")+1;
         my $mask = 2**$offset - 1;
-        push @returns, "(~0x".sprintf("%x", $mask).")";
+        push @returns, "(~0x".sprintf("%x", $mask)."U)";
     }
 
     return @returns;

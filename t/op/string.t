@@ -25,8 +25,8 @@ output_is( <<'CODE', <<OUTPUT, "chopn_s_i|ic" );
 	set	S4, "JAPHxyzw"
 	set	S5, "japhXYZW"
  set S3, S4
- set S1  "\n"
- set I1  4
+	set	S1, "\n"
+	set	I1, 4
 	chopn	S4, 3
 	chopn	S4, 1
  chopn S5, I1
@@ -673,7 +673,7 @@ output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, from 
 	end
 CODE
 
-output_is(<<'CODE','Cannot get character past end of string','3-param ord, multi-character string register, from end, OOB');
+output_is(<<'CODE','Cannot get character before beginning of string','3-param ord, multi-character string register, from end, OOB');
  set S0,"ab"
  ord I0,S0,-3
  print I0

@@ -14,10 +14,10 @@
 #define PARROT_MEMORY_H_GUARD
 
 void *
-mem_allocate_aligned(INTVAL);
+mem_allocate_aligned(UINTVAL);
 
 void *
-mem_sys_allocate(INTVAL);
+mem_sys_allocate(UINTVAL);
 
 void
 mem_setup_allocator(struct Parrot_Interp *);

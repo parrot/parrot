@@ -355,7 +355,7 @@ inline op read(n, i|ic) {
 
 op read(s, i|ic, i|ic) {
   STRING *s;
-  INTVAL len = $3;
+  UINTVAL len = $3;
 
   string_destroy($1);
   s = string_make(interpreter, NULL, len, NULL, 0, NULL);
@@ -422,7 +422,7 @@ op write(i|ic, n|nc) {
 
 op write(i|ic, s|sc) {
   STRING * s = $2;
-  INTVAL count = string_length(s);
+  UINTVAL count = string_length(s);
   write($1, s->bufstart, count);
   goto NEXT();
 }
@@ -1574,7 +1574,10 @@ Repeats string $2 $3 times and stores result in $1.
 =cut
 
 inline op repeat(s, s|sc, i|ic) {
-  $1 = string_repeat(interpreter, $2, $3, NULL);
+  if ($3 < 0) {
+      INTERNAL_EXCEPTION(NEG_REPEAT, "Cannot repeat with negative arg");
+  }
+  $1 = string_repeat(interpreter, $2, (UINTVAL)$3, NULL);
   goto NEXT();
 }
 
@@ -2551,7 +2554,10 @@ Sleep for $1 seconds
 =cut
 
 inline op sleep(i|ic) {
-  Parrot_sleep($1);
+  if ($1 < 0) {
+      INTERNAL_EXCEPTION(NEG_SLEEP, "Cannot go back in time");
+  }
+  Parrot_sleep((UINTVAL)$1);
   goto NEXT();
 }
 

@@ -359,7 +359,7 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code,
         core = which ? runops_slow_core : runops_fast_core;
 
         if ((interpreter->flags & PARROT_PROFILE_FLAG) != 0) {
-            int i;
+            unsigned int i;
 
             if (interpreter->profile == NULL) {
                 interpreter->profile = (INTVAL *)

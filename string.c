@@ -32,7 +32,7 @@ string_init(void) {
  */
 STRING *
 string_make(struct Parrot_Interp *interpreter, const void *buffer,
-            INTVAL buflen, const ENCODING *encoding, INTVAL flags,
+            UINTVAL buflen, const ENCODING *encoding, UINTVAL flags,
             const CHARTYPE *type) {
     STRING *s;
 
@@ -79,7 +79,7 @@ string_destroy(STRING *s) {
 /*=for api string string_length
  * return the length of the string
  */
-INTVAL
+UINTVAL
 string_length(const STRING* s) {
     return s->strlen;
 }
@@ -91,7 +91,7 @@ string_length(const STRING* s) {
  * functions are fleshed out, this function can DTRT.
  */
 INTVAL
-string_index(const STRING* s, INTVAL index) {
+string_index(const STRING* s, UINTVAL index) {
     return s->encoding->decode(s->encoding->skip_forward(s->bufstart, index));
 }
 
@@ -100,27 +100,36 @@ string_index(const STRING* s, INTVAL index) {
  */
 INTVAL
 string_ord(const STRING* s, INTVAL index) {
-    if((s == NULL) || (string_length(s) == 0)) {
+    UINTVAL len = 0;
+
+    if (s != NULL) {
+        len = string_length(s);
+    }
+
+    if((s == NULL) || (len == 0)) {
         INTERNAL_EXCEPTION(ORD_OUT_OF_STRING,
                            "Cannot get character of empty string");
     }
     else {
-        int len = string_length(s);
-	if((index > (len - 1)) ||
-	   (index < 0 && -index > len)
-          )
-        {
+        UINTVAL true_index;
+        true_index = (UINTVAL) index;
+
+        if (index < 0) {
+            if ((INTVAL)(index + len) < 0) {
+            INTERNAL_EXCEPTION(ORD_OUT_OF_STRING,
+                                   "Cannot get character before beginning of string");
+        }
+        else {
+                true_index = (UINTVAL)(len + index);
+            }
+            }
+
+	if (true_index > (len - 1)) {
             INTERNAL_EXCEPTION(ORD_OUT_OF_STRING,
                                "Cannot get character past end of string");
         }
-        else {
-	    if(index < 0) {
-		return string_index(s,len+index);
-            }
-            else {
-		return string_index(s,index);
-            }
-        }
+
+        return string_index(s, true_index);
     }
     return -1;
 }
@@ -210,7 +219,7 @@ string_compute_strlen(STRING* s) {
  */
 STRING*
 string_concat(struct Parrot_Interp *interpreter, const STRING* a,
-              const STRING* b, INTVAL flags) {
+              const STRING* b, UINTVAL Uflags) {
     STRING *result;
 
     if (a != NULL && a->strlen != 0) {
@@ -253,13 +262,9 @@ string_concat(struct Parrot_Interp *interpreter, const STRING* a,
  * Allocates I<d> if needed, also returns d.
 */
 STRING*
-string_repeat(struct Parrot_Interp *interpreter, const STRING* s, INTVAL num, STRING** d) {
+string_repeat(struct Parrot_Interp *interpreter, const STRING* s, UINTVAL num, STRING** d) {
     STRING* dest;
-    INTVAL i;
-
-    if (num < 0) {
-        INTERNAL_EXCEPTION(NEG_REPEAT, "Cannot repeat with negative arg");
-    }
+    UINTVAL i;
 
     dest = string_make(interpreter, NULL, s->bufused*num, s->encoding, 0,
                        s->type);
@@ -291,26 +296,37 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     STRING *dest;
     char *substart;
     char *subend;
+    UINTVAL true_offset;
+    UINTVAL true_length;
+
+    true_offset = (UINTVAL)offset;
     if (offset < 0) {
-        offset = src->strlen + offset;
+        true_offset = (UINTVAL) (src->strlen + offset);
     }
-    if (offset < 0 || offset > src->strlen-1) { /* 0 based... */
+    if (true_offset > src->strlen-1) { /* 0 based... */
         INTERNAL_EXCEPTION(SUBSTR_OUT_OF_STRING,
                            "Cannot take substr outside string")
     }
+    true_length = (UINTVAL) length;
     if (length < 0) {
-        length = 0;
+        true_length = 0;
     }
-    if (length > (src->strlen - offset) ) {
-        length = src->strlen - offset;
+    if (true_length > (src->strlen - true_offset) ) {
+        true_length = (UINTVAL)(src->strlen - true_offset);
     }
-    dest = string_make(interpreter, NULL, length*src->encoding->max_bytes,
+    dest = string_make(interpreter, NULL, true_length*src->encoding->max_bytes,
                        src->encoding, 0, src->type);
-    substart = src->encoding->skip_forward(src->bufstart, offset);
-    subend = src->encoding->skip_forward(substart, length);
-    mem_sys_memcopy(dest->bufstart, substart, subend - substart);
+    substart = src->encoding->skip_forward(src->bufstart, true_offset);
+    subend = src->encoding->skip_forward(substart, true_length);
+
+    if (subend < substart) {
+        INTERNAL_EXCEPTION(SUBSTR_OUT_OF_STRING,
+                           "subend somehow is less than substart");
+    }   
+
+    mem_sys_memcopy(dest->bufstart, substart, (unsigned)(subend - substart));
     dest->bufused = subend - substart;
-    dest->strlen = length;
+    dest->strlen = true_length;
     memset((char *)dest->bufstart+dest->bufused,0,1);
 
     if (d != NULL) {
@@ -326,15 +342,20 @@ STRING*
 string_chopn(STRING* s, INTVAL n) {
     char *bufstart = s->bufstart;
     char *bufend = bufstart + s->bufused;
-    if (n > s->strlen) {
-        n = s->strlen;
-    }
+    UINTVAL true_n;
+
+    true_n = (UINTVAL) n;
     if (n < 0) {
-        n = 0;
+        true_n = 0;
     }
-    bufend = s->encoding->skip_backward(bufend, n);
+    if (true_n > s->strlen) {
+        true_n = s->strlen;
+    }
+
+    bufend = s->encoding->skip_backward(bufend, true_n);
+
     s->bufused = bufend - bufstart;
-    s->strlen = s->strlen - n;
+    s->strlen = s->strlen - true_n;
     memset((char *)s->bufstart+s->bufused,0,1);
     return s;
 }

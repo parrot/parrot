@@ -35,6 +35,9 @@ runops_fast_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
  * With bounds checking.
  */
 
+void trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start, 
+              opcode_t * code_end, opcode_t *pc);
+
 opcode_t *
 runops_slow_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;

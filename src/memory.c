@@ -39,7 +39,7 @@
    cheaper, though. 
 */
 void *
-mem_allocate_aligned(INTVAL size) {
+mem_allocate_aligned(UINTVAL size) {
     ptrcast_t max_to_alloc = 0;
     ptrcast_t mask = 0;
     ptrcast_t i;
@@ -68,7 +68,7 @@ mem_allocate_aligned(INTVAL size) {
    uses malloc to allocate system memory
 */
 void *
-mem_sys_allocate(INTVAL size) {
+mem_sys_allocate(UINTVAL size) {
     return malloc((size_t)size);
 }
 

@@ -47,7 +47,7 @@ struct Parrot_Interp {
                                           /* interpreter's arena */
 
     op_lib_t *  op_lib;                   /* Opcode library */
-    INTVAL      op_count;                 /* The number of ops */
+    UINTVAL      op_count;                 /* The number of ops */
     op_info_t * op_info_table;            /* Opcode info table (name, nargs, arg types) */
 
     op_func_t *  op_func_table;

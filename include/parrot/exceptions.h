@@ -23,6 +23,10 @@
 #define MALFORMED_UTF32 1
 #define INVALID_CHARACTER 1
 #define NEG_REPEAT 1
+#define NEG_SUBSTR 1
+#define NEG_SLEEP 1
+#define NEG_CHOP 1
+#define ARG_OP_NOT_HANDLED 1
 
 #endif
 

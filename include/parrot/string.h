@@ -17,10 +17,10 @@
 
 typedef struct {
     void *bufstart;
-    INTVAL buflen;
-    INTVAL flags;
-    INTVAL bufused;
-    INTVAL strlen;
+    UINTVAL buflen;
+    UINTVAL flags;
+    UINTVAL bufused;
+    UINTVAL strlen;
     const ENCODING *encoding;
     const CHARTYPE *type;
     INTVAL language;
@@ -33,9 +33,9 @@ INTVAL
 string_compute_strlen(STRING*);
 STRING*
 string_concat(struct Parrot_Interp *interpreter, const STRING*, const STRING*,
-              INTVAL);
+              UINTVAL);
 STRING*
-string_repeat(struct Parrot_Interp *interpreter, const STRING* , INTVAL,
+string_repeat(struct Parrot_Interp *interpreter, const STRING* , UINTVAL,
               STRING**);
 STRING*
 string_chopn(STRING*, INTVAL);
@@ -48,7 +48,7 @@ BOOLVAL
 string_bool(const STRING*);
 
 /* Declarations of other functions */
-INTVAL
+UINTVAL
 string_length(const STRING*);
 INTVAL
 string_ord(const STRING* s, INTVAL index);
@@ -60,7 +60,7 @@ void
 string_destroy(STRING* s);
 STRING*
 string_make(struct Parrot_Interp *interpreter, const void *buffer,
-            INTVAL buflen, const ENCODING *encoding, INTVAL flags,
+            UINTVAL buflen, const ENCODING *encoding, UINTVAL flags,
             const CHARTYPE *type);
 STRING*
 string_copy(struct Parrot_Interp *interpreter, const STRING *i);
@@ -70,7 +70,7 @@ string_transcode(struct Parrot_Interp *interpreter, const STRING *src,
 void
 string_init(void);
 INTVAL
-string_index(const STRING* s, INTVAL index);
+string_index(const STRING* s, UINTVAL index);
 
 #endif
 

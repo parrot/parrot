@@ -140,7 +140,7 @@ main(int argc, char **argv) {
     /* Otherwise load in the program they gave and try that */
     else {
         opcode_t *program_code;        
-        long program_size;
+        size_t program_size;
         struct stat file_stat;
         int fd;
         struct PackFile * pf;
@@ -188,7 +188,7 @@ main(int argc, char **argv) {
         */
 
         if (interpreter->profile != NULL) {
-            int i;
+            unsigned int j;
             int op_count   = 0;
             int call_count = 0;
 
@@ -197,14 +197,14 @@ main(int argc, char **argv) {
             printf("  CODE   OP FULL NAME  CALLS\n");
             printf("  -----  ------------  ------------\n");
 
-            for (i = 0; i < interpreter->op_count; i++) {
-                if(interpreter->profile[i] > 0) {
+            for (j = 0; j < interpreter->op_count; j++) {
+                if(interpreter->profile[j] > 0) {
                     op_count++;
-                    call_count += interpreter->profile[i];
+                    call_count += interpreter->profile[j];
 
-                    printf("  %5d  %-12s  %12ld\n", i, 
-                           interpreter->op_info_table[i].full_name,
-                           interpreter->profile[i]);
+                    printf("  %5d  %-12s  %12ld\n", j, 
+                           interpreter->op_info_table[j].full_name,
+                           interpreter->profile[j]);
                 }
 
             }

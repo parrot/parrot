@@ -22,7 +22,7 @@
 */
 
 typedef struct {
-    char *      name;
+    const char *name;
     INTVAL      major_version;
     INTVAL      minor_version;
     INTVAL      patch_version;

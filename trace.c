@@ -68,6 +68,12 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                     fprintf(stderr, "S%ld=(null)", (long) *(pc + i));
                 }
                 break;
+            case PARROT_ARG_OP:
+                /* this isn't handled, so at least report the error
+                   instead of silently ignoring the problem */
+                INTERNAL_EXCEPTION(ARG_OP_NOT_HANDLED,
+                                   "PARROT_ARG_OP in enumeration not handled in switch");
+                break;
             }
         }
         fprintf(stderr, ")");
