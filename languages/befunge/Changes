@@ -1,5 +1,9 @@
 Revision history for a Befunge interpreter written for Parrot.
 
+0.1.2 Thu Jan  2 17:50:25 CET 2003
+        - new debugger instruction: "delete", that allows to clear
+          breakpoints (those created by the "break" instruction)
+
 0.1.1 Mon Dec 30 18:12:34 CET 2002
         - debugger now accepts breakpoints: either on instructions
           (characters), or on a specified location (x,y), or on a

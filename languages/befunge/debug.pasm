@@ -85,6 +85,7 @@ DEBUG_INTERACT:
         substr S11, S10, 0, 5
         eq S11, "break", DEBUG_INTERACT_BREAK
         substr S11, S10, 0, 6
+        eq S11, "delete", DEBUG_INTERACT_DELETE
         eq S11, "status", DEBUG_INTERACT_STATUS
         substr S11, S10, 0, 7
         eq S11, "restart", DEBUG_INTERACT_RESTART
@@ -102,6 +103,13 @@ DEBUG_INTERACT_BREAK:
 DEBUG_INTERACT_CONTINUE:
         set P3[0], 0        # do not stop at next instruction
         branch DEBUG_INTERACT_END
+DEBUG_INTERACT_DELETE:
+        substr S11, S10, 0, 7, ""
+        pushp
+        set P4, P3[1]
+        delete P4[S10]
+        popp
+        branch DEBUG_INTERACT
 DEBUG_INTERACT_DUMP:
         bsr DEBUG_DUMP_PLAYFIELD
         branch DEBUG_INTERACT
@@ -113,6 +121,10 @@ DEBUG_INTERACT_HELP:
         print " break x,y     - set a breakpoint at coords (x,y)\n"
         print " break c:x     - set a breakpoint on column x\n"
         print " break r:y     - set a breakpoint on row y\n"
+        print " delete c      - delete breakpoint on character c\n"
+        print " delete x,y    - delete breakpoint at coords (x,y)\n"
+        print " delete c:x    - delete breakpoint on column x\n"
+        print " delete r:y    - delete breakpoint on row y\n"
         print " list          - list breakpoints\n"
         print " next          - step one befunge instruction\n"
         print " continue      - resume execution\n"

@@ -1,6 +1,6 @@
 DESCRIPTION
 -----------
-This is a Befunge interpreter written in Parrot assembler, version 0.1.1
+This is a Befunge interpreter written in Parrot assembler, version 0.1.2
 
 This interpreter should be Befunge-93 compliant. This means the
 playfield is limited to 80x25. This should also mean that the torus
