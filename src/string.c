@@ -317,65 +317,102 @@ string_index(const STRING *s, UINTVAL idx)
     }
 }
 
-/* This is a helper function for string_str_index.  It is based on the
- * failure function (a lightweight sort of DFA), and runs in O(m + n)
- * instead of O(m n).
+/* string_str_index_multibyte:  Helper function for string_str_index.
+ * This implements a naive substring search, but one that is guaranteed to
+ * work for all encodings. 
  */
 static INTVAL
-string_str_index_internal(struct Parrot_Interp *interp, const STRING *str2,
-        const STRING *str, UINTVAL start)
+string_str_index_multibyte(struct Parrot_Interp *interpreter,
+        const STRING *str, const STRING *find, UINTVAL start)
 {
-    Buffer* failure = NULL;
-    UINTVAL s, i, t, len, len2;
-    
-    len  = string_length(str);
-    len2 = string_length(str2);
-    
-    /* Check whether we need the failure function */
-    for (s = 1; s < len; s++) {
-        if (string_ord(str, s) == string_ord(str, 0))
-            break;
+    const void* const lastmatch = 
+        str->encoding->skip_backward((char*)str->strstart + str->strlen,
+                            find->encoding->characters(find, find->strlen));
+    const void* const lastfind  = (char*)find->strstart + find->strlen;
+    const void* sp;
+    const void* fp;
+    const void* ip;
+    INTVAL pos = start;
+
+    sp = str->encoding->skip_forward(str->strstart, start);
+    while (sp < lastmatch) {
+        fp = find->strstart;
+        ip = sp;
+        
+        for (; fp < lastfind; fp = find->encoding->skip_forward(fp, 1),
+                              ip =  str->encoding->skip_forward(ip, 1)) {
+            if (find->encoding->decode(fp) != str->encoding->decode(ip))
+                break;
+        }
+        
+        if (fp == lastfind) {
+            return pos;
+        }
+        
+        sp = str->encoding->skip_forward(sp, 1);
+        pos++;
     }
     
-    /* We only allocate the failure buffer if we need it */
-    if (s < len) {
-        Parrot_block_DOD(interp);
-        failure = new_buffer_header(interp);
-        Parrot_allocate_zeroed(interp, failure, sizeof(UINTVAL) * (len + 1));
-        Parrot_unblock_DOD(interp);
+    return -1;
+}
+
+/* string_str_index_singlebyte: Helper function for string_str_index.
+ * This is optimized for the simple case where both strings are in 
+ * encoding_singlebyte.  It implements the Boyer-Moore string search
+ * algorithm.
+ */
+static INTVAL
+string_str_index_singlebyte(struct Parrot_Interp *interpreter,
+        const STRING *str, const STRING *find, UINTVAL start)
+{
+    const unsigned char* const find_strstart = find->strstart;
+    const unsigned char* const str_strstart  = str->strstart;
+    const UINTVAL              find_strlen   = find->strlen;
+    const UINTVAL              str_strlen    = str->strlen;
+    const unsigned char* const lastmatch     = 
+                                   str_strstart + str_strlen - find_strlen;
+    UINTVAL* p;
+    const unsigned char* cp;
+    UINTVAL endct, pos;
+    UINTVAL badshift[256];
+
+    /* Prepare the bad shift buffer */
+
+    for (p = &badshift[0] ; p < &badshift[256] ; p++) {
+        *p = find_strlen;
     }
-    
-    /* Compute the rest of the failure function (if we ended up needing it) */
-    t = 0;
-    for (; s < len; s++) {
-        while (t > 0 && string_ord(str, s) != string_ord(str, t))
-            t = ((UINTVAL*)failure->bufstart)[t];
-        if (string_ord(str, s) == string_ord(str, t)) {
-            ((UINTVAL*)failure->bufstart)[s + 1] = ++t;
+
+    endct = 1;
+    cp = find_strstart + find_strlen - 2;
+    for (; cp >= find_strstart ; cp--, endct++) {
+        if (endct < badshift[*cp]) {
+            badshift[*cp] = endct;
+        }
+    }
+
+    /* Perform the match */
+
+    pos = start;
+    cp = str_strstart + start;
+    while (cp <= lastmatch) {
+        register const unsigned char* sp = cp + find_strlen;
+        register const unsigned char* fp = find_strstart + find_strlen;
+
+        while (fp > find_strstart) {
+            if (*--fp != *--sp)
+                break;
+        }
+        if (*fp == *sp) {
+            return pos;
         }
         else {
-            ((UINTVAL*)failure->bufstart)[s + 1] = 0;
-        }       
+            register UINTVAL bsi = badshift[*sp];
+            cp  += bsi;
+            pos += bsi;
+        }
     }
 
-    /* Perform match */
-    s = 0;
-    for (i = start; i < len2; i++) {
-        if (s == len)
-            break;
-        while (s > 0 && string_ord(str2, i) != string_ord(str, s))
-            if (failure)
-                s = ((UINTVAL*)failure->bufstart)[s];
-            else
-                s = 0;
-        if (string_ord(str2, i) == string_ord(str, s))
-            s++;
-    }
-
-    if (s == len)
-        return i - s;
-    else 
-        return -1;
+    return -1;
 }
 
 /*=for api string string_str_index
@@ -398,12 +435,20 @@ string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
     if (!s2 || !string_length(s2))
         return -1;
 
+#if 0
     /* if different transcode to s */
     if (s->encoding != s2->encoding || s->type != s2->type)
         s2 = string_transcode(interpreter, const_cast(s2), s->encoding,
                 s->type, NULL);
+#endif
 
-    return string_str_index_internal(interpreter, s, s2, start);
+    if (s->encoding->index == enum_encoding_singlebyte &&
+       s2->encoding->index == enum_encoding_singlebyte) {
+        return string_str_index_singlebyte(interpreter, s, s2, start);
+    }
+    else {
+        return string_str_index_multibyte(interpreter, s, s2, start);
+    }
 }
 
 

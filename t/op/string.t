@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 99;
+use Parrot::Test tests => 100;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1233,6 +1233,30 @@ output_is(<<'CODE',<<OUTPUT,"index, big strings");
 CODE
 0
 1234
+-1
+OUTPUT
+
+output_is(<<'CODE',<<OUTPUT,"index, big, hard to match strings");
+# Builds a 24th iteration fibonacci string (approx. 100K)    
+      set S1, "a"
+      set S2, "b"
+      set I0, 0
+LOOP:
+      set S3, S1
+      concat S1, S2, S3
+      set S2, S3
+      inc I0
+      lt I0, 24, LOOP
+
+      index I1, S1, S2
+      print I1
+      print "\n"
+
+      index I1, S1, S2, 50000
+      print I1
+      print "\n"
+CODE
+46368
 -1
 OUTPUT
 
