@@ -133,6 +133,10 @@ Parrot_mul_i_i {
     Parrot_binop_x_x s/<op>/mul/ s/<_N>/_i/
 }
 
+Parrot_div_i_i {
+    Parrot_binop_x_x s/<op>/div/ s/<_N>/_i/
+}
+
 Parrot_add_i_i {
     Parrot_binop_x_x s/<op>/add/ s/<_N>/_i/
 }
@@ -240,6 +244,10 @@ Parrot_mul_i_ic {
     Parrot_binop_x_xc s/<_N>/_i/ s/<op>/mul/ s/<typ>/*INT/
 }
 
+Parrot_div_i_ic {
+    Parrot_binop_x_xc s/<_N>/_i/ s/<op>/div/ s/<typ>/*INT/
+}
+
 Parrot_add_n_nc {
     Parrot_binop_x_xc s/<_N>/_n/ s/<op>/add/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
@@ -250,6 +258,10 @@ Parrot_sub_i_ic {
 
 Parrot_bor_i_ic {
     Parrot_binop_x_xc s/<_N>/_i/ s/<op>/bor/ s/<typ>/*INT/
+}
+
+Parrot_band_i_ic {
+    Parrot_binop_x_xc s/<_N>/_i/ s/<op>/band/ s/<typ>/*INT/
 }
 
 Parrot_bxor_i_ic {
@@ -264,6 +276,9 @@ Parrot_mul_n_nc {
     Parrot_binop_x_xc s/<_N>/_n/ s/<op>/mul/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
+Parrot_div_n_nc {
+    Parrot_binop_x_xc s/<_N>/_n/ s/<op>/div/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
+}
 
 TEMPLATE Parrot_binop_i_ic_ic {
     if (MAP[1]) {
@@ -1063,7 +1078,171 @@ Parrot_ne_nc_nc_ic {
     Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/!=/
 }
 
+; string funcs
+;
+Parrot_set_s_sc {
+    emitm_pushl_i(NATIVECODE, CONST(2)->u.string)
+    emitm_pushl_i(NATIVECODE, interpreter);
+#if 1
+    call_func(jit_info, (void*) string_copy);
+#else
+; this works with 99% tests and break t/pmc/coroutine_3 ?why?
+    emitm_calll(NATIVECODE, (char*)string_copy - NATIVECODE - 4);
+#endif
+    emitm_addb_i_r(NATIVECODE, 8, emit_ESP);
+    jit_emit_mov_mr_i(NATIVECODE, &STRING_REG[1], emit_EAX );
+}
+
+TEMPLATE Parrot_eq_sx_sx_ic {
+# define push_r(i) \
+    jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &SREG(i)); \
+    emitm_pushl_r(NATIVECODE, emit_EAX)
+# define push_c(i) emitm_pushl_i(NATIVECODE, CONST(i)->u.string)
+
+    push_<typ2>(2);
+    push_<typ1>(1);
+    emitm_pushl_i(NATIVECODE, interpreter);
+    emitm_calll(NATIVECODE, (char*)string_compare - NATIVECODE - 4);
+    emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
+    jit_emit_test_r_i(NATIVECODE, emit_EAX);
+    jit_emit_jcc(jit_info, <op>, *INT_CONST[3]);
+
+#undef push_r
+#undef push_c
+}
+
+Parrot_eq_s_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jz/
+}
+
+Parrot_eq_s_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jz/
+}
+
+Parrot_eq_sc_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jz/
+}
+
+Parrot_eq_sc_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jz/
+}
+
+Parrot_ne_s_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jnz/
+}
+
+Parrot_ne_s_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jnz/
+}
+
+Parrot_ne_sc_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jnz/
+}
+
+Parrot_ne_sc_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jnz/
+}
+
+Parrot_le_s_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jle/
+}
+
+Parrot_le_s_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jle/
+}
+
+Parrot_le_sc_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jle/
+}
+
+Parrot_le_sc_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jle/
+}
+
+Parrot_lt_s_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jl/
+}
+
+Parrot_lt_s_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jl/
+}
+
+Parrot_lt_sc_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jl/
+}
+
+Parrot_lt_sc_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jl/
+}
+
+
+Parrot_ge_s_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jnl/
+}
+
+Parrot_ge_s_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jnl/
+}
+
+Parrot_ge_sc_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jnl/
+}
+
+Parrot_ge_sc_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jnl/
+}
+
+Parrot_gt_s_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jg/
+}
+
+Parrot_gt_s_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jg/
+}
+
+Parrot_gt_sc_s_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jg/
+}
+
+Parrot_gt_sc_sc_ic {
+    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jg/
+}
+
+
+TEMPLATE Parrot_ifunless_sx_ic {
+# define push_r(i) \
+    jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &SREG(i)); \
+    emitm_pushl_r(NATIVECODE, emit_EAX)
+# define push_c(i) emitm_pushl_i(NATIVECODE, CONST(i)->u.string)
+
+    push_<typ>(1);
+    emitm_calll(NATIVECODE, (char*)string_bool - NATIVECODE - 4);
+    emitm_addb_i_r(NATIVECODE, 4, emit_ESP);
+    jit_emit_test_r_i(NATIVECODE, emit_EAX);
+    jit_emit_jcc(jit_info, <op>, *INT_CONST[2]);
+
+#undef push_r
+#undef push_c
+}
+
+Parrot_if_s_ic {
+    Parrot_ifunless_sx_ic s/<typ>/r/ s/<op>/emitm_jnz/
+}
+
+Parrot_if_sc_ic {
+    Parrot_ifunless_sx_ic s/<typ>/c/ s/<op>/emitm_jnz/
+}
+
+Parrot_unless_s_ic {
+    Parrot_ifunless_sx_ic s/<typ>/r/ s/<op>/emitm_jz/
+}
+
+Parrot_unless_sc_ic {
+    Parrot_ifunless_sx_ic s/<typ>/c/ s/<op>/emitm_jz/
+}
+
 ; TODO or,and,not
+
 
 /*
  * Local variables:
