@@ -70,9 +70,9 @@ Probably many others that I've forgotten about.
 How do I get going?  Quickstart?
 	1. Edit "testrun.pl" and change the pathname at the beginning of the
 	   script to wherever parrot is.
-	2. Type   "compile.pl wumpus2.bas"
-	   This produces "TARG_test.pasm" and "TARG_localfuncs.pasm"
-	3. Type   "testrun.pl"  and enjoy.
+	2. Type   "perl compile.pl samples/wumpus2.bas"
+	   This produces "TARG_test.imc" and "TARG_localfuncs.imc"
+	3. Type   "perl testrun.pl"  and enjoy.
 eliza2 and wumpus2 are simply ports from the Parrot BASIC 1.0 version.  All
 that had to be done were to add DIM statements and a RANDOMIZE.
 

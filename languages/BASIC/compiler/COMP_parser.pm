@@ -62,8 +62,6 @@ sub runtime_shutdown {
 	# ###################
 	# Program Termination
 	# ###################
-	restoreall
-	ret	# back to _main
 
 SHUTDOWN
 }
@@ -90,7 +88,7 @@ sub parse {
 	my($result, $type, @code);
 
 	if ($debug) {
-		push @{$code{$seg}->{code}},"\tcall _DEBUG_INIT\n";
+		push @{$code{$seg}->{code}},"\t_DEBUG_INIT()\n";
 		debug();
 	}
 
@@ -250,7 +248,7 @@ CODE
 			print CODE "CASE_$s->{jump}_FIN:\n";
 			goto PARSE;
 		}
-		push @{$code{$seg}->{code}}, "\tcall _platform_shutdown\n\tend\n";
+		push @{$code{$seg}->{code}}, "\t_platform_shutdown()\n\tend\n";
 		goto PARSE;
 	}
 	die "Unkown keyword $syms[CURR]/$type[CURR] source line $sourceline";
@@ -368,8 +366,7 @@ PARSEERR:
 }
 sub debug {
 	push @{$code{$seg}->{code}}, <<DEBUG;
-	.arg $sourceline
-	call ${seg}_debug
+	${seg}_debug($sourceline)
 DEBUG
 }
 

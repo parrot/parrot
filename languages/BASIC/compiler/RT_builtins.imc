@@ -2,25 +2,29 @@
 #
 .const int FLOAT = 2
 .const int STRING = 3
-.sub _BUILTIN_DISPLAY		 	# void display(....)
-	saveall
-	.local string buf
-	call _BUILTIN_DISPLAY_WORK
-	.result buf
-	print buf
-	restoreall
-	ret
-.end
+#.sub _BUILTIN_DISPLAY		 	# void display(....)
+	#.param int argc
+	#.param string display
+	#.local string buf
+         
+        # XXX pass along whatever arguments were given.
+
+	#buf = _BUILTIN_DISPLAY_WORK(showme)
+	#print buf
+#.end
 # Prepares stuff for printing.  Side effect: edits the global PRINTCOL
 #  for the current column.
 #
-.sub _BUILTIN_DISPLAY_WORK	 	# string display_work(string|float thingy[, string|float thingy2])
-	saveall
+.sub _BUILTIN_DISPLAY  #_WORK	 	# string display_work(string|float thingy[, string|float thingy2])
 	.param int argc
+
 	.local string buf
 	.local int intver
 	.local string s
 	.local int PRINTCOL
+
+        # XXX Used to use entrytype.  our naive fix here will eventually
+	#   fail, because of the two variable type arguments.
 
 	find_global $P0, "PRINTCOL"
 	set PRINTCOL, $P0["value"]
@@ -28,19 +32,15 @@
 	set buf, ""
 NEXT:	eq argc, 0, END_DISPLAY
 	dec argc
-	entrytype $I0, 0
-	eq $I0, STRING, DISPSTRING
-	ne $I0, FLOAT, DISPERR
+	eq I2, 1, DISPSTRING
+	ne I4, 1, DISPERR
 	
 	# Now, do floats
-	.param float number
-	set intver, number
+	set intver, N5
 	set $N0, intver
-	eq $N0, number, DISPINT	# Nope, it's an integer.
-	.arg number
-	call _NORMALIZE_FLOAT
-	.result s
-	lt number, 0.0, NEGFLO
+	eq $N0, N5, DISPINT	# Nope, it's an integer.
+	s = _NORMALIZE_FLOAT(N5)
+	lt N5, 0.0, NEGFLO
 	concat buf, " "
 NEGFLO:	concat buf, s
 	concat buf, " "
@@ -56,11 +56,10 @@ NEGINT: concat buf, $S0
 	branch NEXT
 
 DISPSTRING:
-	.param string str
-	length $I0, str
-	eq str, "\t", DISPTAB
-	concat buf, str
-	eq str, "\n", DISPNL
+	length $I0, S5
+	eq S5, "\t", DISPTAB
+	concat buf, S5
+	eq S5, "\n", DISPNL
 	add PRINTCOL, PRINTCOL, $I0
 	branch NEXT
 DISPTAB:
@@ -76,17 +75,15 @@ DISPTAB:
 DISPNL:	set PRINTCOL, 0
 	branch NEXT
 END_DISPLAY:
-	.return buf
 	set $P0["value"], PRINTCOL
 	store_global "PRINTCOL", $P0
-	restoreall
-	ret
+	print buf
+	.return(buf)
 DISPERR:print "Unknown type on stack to print\n"
 	end
 .end
 
 .sub _NORMALIZE_FLOAT	# string normalize_flo(float number)
-	saveall
 	.param float number	# INTERNAL, no argc!
 	set $S0, number
 FLO_NORM:
@@ -102,27 +99,21 @@ FLO_CHOP:
 	substr $S0, $S0, 0, $I0
 	branch FLO_NORM
 FLO_END:
-	.return $S0
-	restoreall
-	ret
+	.return($S1)
 .end
 
 #  Builtin functions for BASIC
 #
 .sub _BUILTIN_ABS   		# float abs(float arg)
-	saveall
 	.param int argc
 	.param float arg
 	.local float res
 	abs res, arg
-	.return res
-	restoreall
-	ret
+	.return(res)
 .end
 # INT - a math function that returns the largest integer less than
 #       or equal to a numeric-expression
 .sub _BUILTIN_INT   		# float int(float arg)
-	saveall
 	.param int argc
 	.param float arg
 	.local float res
@@ -131,68 +122,50 @@ FLO_END:
 	set res, truncate
 	ge arg, 0.0, ENDINT
 	dec res
-ENDINT:	.return res
-	restoreall
-	ret
+ENDINT:	.return(res)
 .end
 .sub _BUILTIN_CHR_STRING	# string chr(float arg)
-	saveall
 	.param int argc
 	.param float arg
 	.local string res
 	.local int truncate
 	set truncate, arg
 	chr res, truncate
-	.return res
-	restoreall
-	ret
+	.return(res)
 .end
 .sub _BUILTIN_ASC 		# float asc(string arg)
-	saveall
 	.param int argc
 	.param string arg
 	.local int conv
 	.local float res
 	ord conv, arg
 	set res, conv
-	.return res
-	restoreall
-	ret
+	.return(res)
 .end
 .sub _BUILTIN_STR_STRING	# string str(float arg)
-	saveall
 	.param int argc
 	.param float arg
 	.local string res
 	set res, arg
-	.return res
-	restoreall
-	ret
+	.return(res)
 .end
 .sub _BUILTIN_VAL 		# float val(string arg)
-	saveall
 	.param int argc
 	.param string arg
 	.local float res
 	set res, arg
-	.return res
-	restoreall
-	ret
+	.return(res)
 .end
 .sub _BUILTIN_LEN 		# float len(string arg)
-	saveall
 	.param int argc
 	.param string arg
 	.local float res
 	.local int conv
 	length conv, arg
 	set res, conv
-	.return res
-	restoreall
-	ret
+	.return(res)
 .end
 .sub _BUILTIN_MID_STRING	# string mid(string targ, float start [, float extent])
-	saveall
 	.param int argc
 	.param string target
 	.param float start
@@ -215,7 +188,7 @@ MIDLOOP:ge pos, strlen, MIDDONE
 
 MID3ARG:
 	.local float count
-	.param float extent
+	.local float extent
 	set count, 0.0
 MID3L:
 	ge pos, strlen, MIDDONE
@@ -227,27 +200,18 @@ MID3L:
 	branch MID3L
 	
 MIDDONE:
-	.return res
-	restoreall
-	ret
+	.return(res)
 .end
 .sub _BUILTIN_LEFT_STRING	# string left(string targ, float extent)
-	saveall
 	.param int argc
 	.param string targ
 	.param float extent
 	.local string res
 	
-	.arg extent
-	.arg 1.0
-	.arg targ
-	.arg 3
-	call _BUILTIN_MID_STRING
-	restoreall
-	ret
+	res = _BUILTIN_MID_STRING(3, targ, 1.0, extent)
+	.return(res)
 .end
 .sub _BUILTIN_RIGHT_STRING	# string right(string targ, float extent)
-	saveall
 	.param int argc
 	.param string targ
 	.param float extent
@@ -260,24 +224,18 @@ MIDDONE:
 	inc $I0
 	set $N0, $I0
 
-	.arg extent
-	.arg $N0
-	.arg targ
-	.arg 3
-	call _BUILTIN_MID_STRING
-	restoreall
-	ret
+	res = _BUILTIN_MID_STRING(3,targ,$N0,extent)
+	.return(res)
 .end
 # Modifies the system-wide RANDSEED
 # Produces 16-bit pseudo-random numbers.
 .sub _BUILTIN_RND	# float rnd([float seed])
-	saveall
-	.local int RANDSEED
 	.param int argc
+	.local int RANDSEED
 	find_global $P0, "RANDSEED"
 	set RANDSEED, $P0["value"]
 	eq argc, 0, RND_GEN
-	.param float repeat
+	.local float repeat
 
 	eq repeat, 0.0, RND_REPEAT
 RND_GEN:
@@ -291,67 +249,52 @@ RND_REPEAT:
 	set $N0, RANDSEED
 	div $N0, $N0, 65536.0
 RND_BAIL:
-	.return $N0
 
 	set $P0["value"], RANDSEED
 	store_global "RANDSEED", $P0
 
-	restoreall
-	ret
+	.return($N0)
 .end
 .sub _BUILTIN_TIMER	# float timer()
-	saveall
 	.param int argc
 	time $N0
-	.return $N0
-	restoreall
-	ret 
+	.return($N0)
 .end
 .sub _BUILTIN_INSTR	# float instr([float start,] string full, string substr);
-	saveall
 	.param int argc
 	.local int start
 	set start, 1
 	eq argc, 2, NOSTART
-	.param float startf
+	.local float startf
 	set start, startf
 NOSTART:
 	dec start		# BASIC starts at 1.
-	.param string full
-	.param string substr
+	.local string full
+	.local string substr
 	length $I0, substr
 	eq $I0, 0, ENDINSTR
 	index $I0, full, substr, start
 	set $N0, $I0
 	
 ENDINSTR:inc $N0
-	.return $N0
-	restoreall
-	ret
+	.return($N0)
 .end
 .sub _BUILTIN_UCASE_STRING	# string ucase$(string targ)
-	saveall
 	.param int argc
-	.arg 122
-	.arg 97
-	.arg 32
-	call _XCASE
-	restoreall
-	ret
+        .param string targ
+        .local string res
+	res = _XCASE(32,97,122,targ)
+	.return(res)
 .end
 .sub _BUILTIN_LCASE_STRING	# string lcase$(string targ)
-	saveall
 	.param int argc
-	.arg 90
-	.arg 65
-	.arg -32
-	call _XCASE
-	restoreall
-	ret
+        .param string targ
+        .local string res
+	res = _XCASE(-32,65,90,targ)
+	.return(res)
 .end
 			# For internal use only.  No ARGC!
 .sub _XCASE		# string xcase(string targ, int offset, int lower, int upper
-	saveall
 	.param int offset
 	.param int lower
 	.param int upper
@@ -377,12 +320,9 @@ XCASE_INSERT:
 	inc $I0
 	branch XCASE_LOOP
 XCASE_DONE:
-	.return $S3
-	restoreall
-	ret
+	.return($S3)
 .end
 .sub _BUILTIN_SGN	# float sgn(float number)
-	saveall
 	.param int argc
 	.param float number
 	set $N0, 0.0
@@ -391,14 +331,12 @@ XCASE_DONE:
 	lt number, 0.0, FINISHED
 	set $N0, 1.0
 FINISHED:
-	.return $N0
-	restoreall
-	ret
+	.return($N0)
 .end
 .sub _BUILTIN_STRING_STRING	# string string(float repeat, float ascii)
-	saveall		# string string(float repeat, string string)
 	.param int argc
 	.param float repeatf
+
 	.local int repeat
 	set repeat, repeatf
 	.local string repeater
@@ -407,97 +345,66 @@ FINISHED:
 	set target, ""
 	entrytype $I0, 0
 	eq $I0, FLOAT, FLOATB
-	.param string thing
+	.local string thing
 	set repeater, thing
 	branch REP
-FLOATB:	.param float ascii
+FLOATB:	.local float ascii
 	set $I0, ascii
 	chr repeater, $I0
 REP: 	ge $I1, repeat, BAIL
 	concat target, repeater
 	inc $I1
 	branch REP
-BAIL:	.return target
-	restoreall
-	ret
-.end
-.sub _TRIG_IN
-	saveall
-	.param int argc
-	.param float op
-	set $N0, op
-	ret
-.end
-.sub _TRIG_OUT
-	.return $N0
-	restoreall
-	ret
+BAIL:	.return(target)
 .end
 .sub _BUILTIN_LOG		# float log(float op)
-	call _TRIG_IN
-	ln $N0, $N0
-	call _TRIG_OUT
-	ret
+	.param int argc
+	.param float op
+	ln op, op
+	.return(op)
 .end
 .sub _BUILTIN_EXP		# float exp(float op)
-	call _TRIG_IN
-	exp $N0, $N0
-	call _TRIG_OUT
-	ret
+	.param int argc
+	.param float op
+	exp op, op
+	.return(op)
 .end
 .sub _BUILTIN_SIN		# float sin(float op)
-	call _TRIG_IN
-	sin $N0, $N0
-	call _TRIG_OUT
-	ret
+	.param int argc
+	.param float op
+	sin op, op
+	.return(op)
 .end
 .sub _BUILTIN_COS		# float cos(float op)
-	call _TRIG_IN
-	cos $N0, $N0
-	call _TRIG_OUT
-	ret
+	.param int argc
+	.param float op
+	cos op, op
+	.return(op)
 .end
 .sub _BUILTIN_TAN		# float tan(float op)
-	call _TRIG_IN
-	tan $N0, $N0
-	call _TRIG_OUT
-	ret
+	.param int argc
+	.param float op
+	tan op, op
+	.return(op)
 .end
 .sub _BUILTIN_ATN		# float atn(float op)
-	call _TRIG_IN
-	atan $N0, $N0
-	call _TRIG_OUT
-	ret
+	.param int argc
+	.param float op
+	atan op, op
+	.return(op)
 .end
 .const float EPSILON = 0.000001
 .sub _BUILTIN_SQR		# float sqr(float operand)
-	saveall
 	.param int argc
-	.param float operand
-	lt operand, 0.0, ERR_RANGE
-	eq operand, 0.0, END
-	div $N1, operand, 3.0	# First guess
-AGAIN:	div $N2, operand, $N1	# Newton's method
-	add $N2, $N2, $N1
-	mul $N2, $N2, 0.5
-	sub $N3, $N2, $N1
-	gt $N3, 0.0, INV
-	mul $N3, $N3, -1.0
-INV:	set $N1, $N2
-	gt $N3, EPSILON, AGAIN
-	set operand, $N1
-END:	.return operand
-	restoreall
-	ret
-
+	.param float op
+        if op < 0 goto ERR_RANGE
+	sqrt op, op
+	.return(op)
 ERR_RANGE:
 	print "Number out of range\n"
-	.return -1.0
-	restoreall
-	ret
+	.return(-1.0)
 .end
 .sub _BUILTIN_TAB_STRING		# string tab(float cols)
-	saveall
 	.param int argc
 	.param float cols
 	.local int PRINTCOL
@@ -519,12 +426,9 @@ TAB_SP: eq $I1, $I0, TAB_RET
 	concat $S0, " "
 	inc $I1
 	branch TAB_SP
-TAB_RET:.return $S0
-	restoreall
-	ret
+TAB_RET:.return($S0)
 .end
 .sub _BUILTIN_LTRIM_STRING	# string ltrim(string oldstring)
-	saveall
 	.param int argc
 	.param string oldstring
 	set $S0, oldstring
@@ -537,12 +441,9 @@ BI_LTRIM:
 	substr $S0, $S0, 1, $I0
 	branch BI_LTRIM
 LTRIM_END:
-	.return $S0
-	restoreall
-	ret
+	.return($S0)
 .end
 .sub _BUILTIN_RTRIM_STRING	# string rtrim(string oldstring)
-	saveall
 	.param int argc
 	.param string oldstring
 	set $S0, oldstring
@@ -555,34 +456,29 @@ BI_RTRIM:
 	substr $S0, $S0, 0, $I0
 	branch BI_RTRIM
 RTRIM_END:
-	.return $S0
-	restoreall
-	ret
+	.return($S0)
 .end
 .sub _BUILTIN_INPUT_STRING 	# string input$(float numchars[, string fdinfo])
-	saveall
 	.param int argc
 	.param float numcharsf
 	.local int numchars
+	.local string res
 	set numchars, numcharsf
 	.local int fd
 	set fd, 0		# Stdin
 	eq argc, 1, DOREAD
-	.param string fdinfo
+	.local string fdinfo
 	length $I0, fdinfo
 	dec $I0
 	substr fdinfo, fdinfo, 1, $I0
 	set fd, fdinfo
-DOREAD:	.arg fd
-	.arg numchars
-	call _READCHARS
-	restoreall
-	ret
+DOREAD: res = _READCHARS(numchars,fd)
+	.return(res)
 .end
 .sub _BUILTIN_INKEY_STRING	# string inkey$(void)
 	.param int argc		
-	call _scan_read		# Put terminal in char-at-a-time mode
-	call _inkey_string
-	ret
+	.local string res
+	_scan_read()		# Put terminal in char-at-a-time mode
+	res = _inkey_string()
+	.return(res)
 .end
-

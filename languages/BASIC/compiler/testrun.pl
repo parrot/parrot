@@ -1,11 +1,10 @@
 #! perl -w
 
 no warnings 'once';
-$parpath='../../../languages/imcc/';
-if (! -d $parpath) {
-	$parpath='../../..';
-}
+$parpath='../../../';
 
 unlink "_test.pbc";
 
-$a=system("$parpath/imcc.exe TARG_test.imc");
+# XXX - This file should be generated at config time, so as to get
+# the appropriate path and executable name.
+$a=system("$parpath/parrot TARG_test.imc");

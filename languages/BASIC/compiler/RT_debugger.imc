@@ -1,7 +1,6 @@
 .sub _DEBUGGER_STOP_FOR_REAL	# void Debugger_stop(int line, PerlHash local_values)
-	saveall
 	.param int line
-	.param PerlHash locals
+	.param pmc locals
 	find_global $P25, "DEBUGGER"
 
 	set $P0, $P25["code"]
@@ -27,20 +26,15 @@ DEBUGGER_COMMAND:
 	print line
 	print "->"
 
-	.arg 0
-	call _READLINE
-	call _CHOMP
-	.result $S0
+	$S0 = _READLINE(0)
+	$S0 = _CHOMP($S0)
 
 	length $I0, $S0
 	set $I1, $P25["step"]
 	add $I0, $I0, $I1
 	eq $I0, 0, DEBUGGER_COMMAND  # If no step mode, and no input, re-prompt
 
-	.arg 1
-	.arg $S0
-	call _SPLITLINE	# P1 will have array of values
-	.result $P1
+	$P1 = _SPLITLINE($S0,1)	# P1 will have array of values
 
 	set $I0, $P1
 	add $I0, $I0, $I1
@@ -206,6 +200,5 @@ DEBUG_PRINTEND:
 
 DEBUGGER_DONE:
 	store_global "DEBUGGER", $P25
-	restoreall
 	ret
 .end

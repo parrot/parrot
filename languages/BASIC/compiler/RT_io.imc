@@ -4,7 +4,6 @@
 	#
 	# Not a lot of error handling here yet
 .sub _READCHARS 	# string readchars(int numchar, int fd)
-	saveall
 	.param int numchar
 	.param int fd
 	ne fd, 0, NORESET
@@ -13,12 +12,9 @@ NORESET:find_global $P0, "FDS"
 	$P1=$P0[fd]
 	set $S0, ""
 	read $S0, $P1, numchar
-	.return $S0
-	restoreall
-	ret
+	.return($S0)
 .end
 .sub _OPEN		# void open(string filename, string mode, int fd)
-	saveall
 	.param string filename
 	.param string mode
 	.param int fd
@@ -34,11 +30,8 @@ OPEN_OK:
 	find_global $P0, "FDS"
 	$P0[fd]=$P1
 	store_global "FDS", $P0
-	restoreall
-	ret
 .end
 .sub _CLOSE		# void close(int fd)
-	saveall
 	.param int fd
 	.local int error
 	find_global $P0, "FDS"
@@ -52,19 +45,15 @@ OPEN_OK:
 	end
 CLOSE_OK:
 	store_global "FDS", $P0
-	restoreall
-	ret
 .end
 .sub _WRITE		# void writestring(int fd, 1, string stuff)
-	saveall
 	.param int fd
 	.local string buffer
 	.local int oldprintcol
 
 	find_global $P1, "PRINTCOL"
 	oldprintcol=$P1["value"]
-	call _BUILTIN_DISPLAY_WORK
-	.result buffer
+	buffer = _BUILTIN_DISPLAY(fd, buffer) #_WORK()
 	find_global $P1, "PRINTCOL"
 	$P1["value"]=oldprintcol
 	store_global "PRINTCOL", $P1
@@ -72,8 +61,6 @@ CLOSE_OK:
 	find_global $P0, "FDS"
 	set $P1, $P0[fd]
 	print $P1, buffer
-	restoreall
-	ret
 .end
 
 #
@@ -86,28 +73,22 @@ CLOSE_OK:
 #        # Returns:
 #        #       I0   Error?
 .sub _READLINE		# string readline(int fd)
-	saveall
 	.param int fd
 	find_global $P0, "FDS"
 	$P1=$P0[fd]
 	set $S0, ""
 	readline $S0, $P1
-	.return $S0
-	restoreall
-	ret
+	.return($S0)
 .end
 #	# ###########################
 #	# SPLITLINE	Splits a line into parts
 #	# Outputs:
 #	# 	P1	Array of strings
 .sub _SPLITLINE		# PerlArray splitline (string line, int splitflag)
-	saveall
 	.param string line
 	.param int splitflag
 	.local string token
-	.arg line
-	call _CHOMP
-	.result line
+	line  = _CHOMP(line)
 
 	$P1=new PerlArray
 	eq splitflag, 0, SPLITSINGLE
@@ -115,10 +96,7 @@ CLOSE_OK:
 SPLITAGAIN:
 	length $I0, line
 	eq $I0, 0, SPLITEND
-	.arg line
-	call _REMOVETOK
-	.result line
-	.result token
+	(line,token) =  _REMOVETOK(line)
 	push $P1, token
 	branch SPLITAGAIN
 
@@ -132,10 +110,7 @@ SPLITSINGLE:
 	push $P1, line
 
 SPLITGONE:
-	.return $P1
-	restoreall
-
-	ret
+	.return($P1)
 .end
 #
 #	# ############################
@@ -145,7 +120,6 @@ SPLITGONE:
 #	#    Leading/trailing spaces ignored and removed.
 #	#    Quotes can surround part of a token w/commas and spaces
 .sub _REMOVETOK		# (string token, string neworiginal) removetok(string original)
-	saveall
 	.param string original
 	set $I1, 0	# Inquote
 	set $S1, ""	# Base string
@@ -172,15 +146,12 @@ QUOTE:	eq $I1, 0, STARTQ
 	branch TOKLOOP
 STARTQ: set $I1, 1
 	branch TOKLOOP
-EOTOK:	.return $S1	# The token
-	.return original# The original, w/o the token
-	restoreall
+EOTOK:	.return(original,$S1)
 .end
 
 #        # ###########################
 #        # CHOMP      Remove trailing \r\n thingies from S0
 .sub _CHOMP	# string chomp(string line)
-	saveall
 	.param string line
 	length $I0, line
 	dec $I0
@@ -195,9 +166,7 @@ CHOMPIT:substr line, line, 0, $I0
 	dec $I0
 	le $I0, 0, CHOMPOK
 	branch CHOMPLOOK
-CHOMPOK:.return line
-	restoreall
-	ret
+CHOMPOK:.return(line)
 .end
 
 #

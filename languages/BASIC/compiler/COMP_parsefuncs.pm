@@ -28,9 +28,7 @@ sub parse_keys {
 	$targ.=$seg;
 	$source.=$seg;
 	push @{$code{$seg}->{code}}, <<KEYS;
-	.arg "$targ"
-	.arg "$source"
-	call _ARRAY_KEYS
+	_ARRAY_KEYS("$source","$targ")
 KEYS
 }
 sub parse_common {
@@ -147,13 +145,8 @@ sub input_read_assign {
 	$sf=0 if ($filedesc);
 
 	push @{$code{$seg}->{code}},<<INP1;
-	.arg $filedesc
-	call _READLINE
-	.result \$S0
-	.arg $sf
-	.arg \$S0
-	call _SPLITLINE
-	.result \$P99
+	\$S0 = _READLINE($filedesc)
+	\$P99 = _SPLITLINE(\$S0,$sf)
 	set \$I0, \$P99
 INP1
 
@@ -244,7 +237,7 @@ sub parse_on {
 	branch ONOK_${ons}
 ONERR_${ons}:
 	print "On...goto/gosub out of range at $sourceline\\n"
-	call _platform_shutdown
+	_platform_shutdown()
 	end
 ONOK_${ons}:
 ON
@@ -310,19 +303,17 @@ sub parse_locate {	# locate x,y   | locate x   | locate ,y
 	set \$N100, $resulty
 @codex	
 	set \$N101, $resultx
-	.arg \$N100
-	.arg \$N101
-	call _screen_locate
+	_screen_locate(\$N101,\$N100)
 XANDY
 	} elsif (@codey and not @codex) {
 	push @{$code{$seg}->{code}},<<YNOTX;
-@codey	.arg $resulty			# Broke!
-	call _screen_locate
+@codey	noop			# Broke!
+	_screen_locate($resulty)
 YNOTX
 	} elsif (@codex and not @codey) {
 	push @{$code{$seg}->{code}},<<XNOTY;
-@codex	.arg $resultx			# Broke!
-	call _screen_locate
+@codex	noop		# Broke!
+	_screen_locate($resultx)
 XNOTY
 	}
 }
@@ -345,19 +336,17 @@ sub parse_color {
 		push @{$code{$seg}->{code}},<<FANDB;
 @codeb	set \$N100, $resultb
 @codef	set \$N101, $resultf
-	.arg \$N100
-	.arg \$N101
-	call _screen_color
+	_screen_color(\$N101,\$N100)
 FANDB
 	} elsif (@codeb and not @codef) {
 		push @{$code{$seg}->{code}},<<BNOTF;
-@codeb  .arg $resultb
-	call _screen_color	# Broke!
+@codeb  noop
+	_screen_color($resultb)	# Broke!
 BNOTF
 	} elsif (@codef and not @codeb) {
 		push @{$code{$seg}->{code}},<<FNOTB;
-@codef	.arg $resultf
-	call _screen_color	# Broke!
+@codef	noop
+	_screen_color($resultf)	# Broke!
 FNOTB
 	}
 }
@@ -366,7 +355,7 @@ sub parse_cls {
 		@e=EXPRESSION();
 	}
 	push @{$code{$seg}->{code}},<<CLS;
-	call _screen_clear
+	_screen_clear()
 CLS
 	feedme();
 }
@@ -392,10 +381,8 @@ sub parse_open {
 	feedme();
 	$fd=$syms[CURR];
 	push @{$code{$seg}->{code}},<<OPEN;
-@code	.arg $fd
-	.arg "$mode"
-	.arg $result
-	call _OPEN
+@code	noop
+	_OPEN($result,"$mode",$fd)
 OPEN
 }
 sub parse_close {
@@ -404,25 +391,19 @@ sub parse_close {
 	feedme();
 	$fd=$syms[CURR];
 	push @{$code{$seg}->{code}},<<CLOSE;
-	.arg $fd
-	call _CLOSE
+	_CLOSE($fd)
 CLOSE
 }
 sub fdprint {	
 	my($fd, $string)=@_;
 	if ($fd) {
 		push @{$code{$seg}->{code}}, <<PRINT;
-	.arg "$string"
-	.arg 1
-	.arg $fd
-	call _WRITE
+	_WRITE($fd,1,"$string")
 PRINT
 	} else {
 		if ($string ne "\\n") {
 			push @{$code{$seg}->{code}}, <<PRINT;
-	.arg "$string"
-	.arg 1
-	call _BUILTIN_DISPLAY
+	_BUILTIN_DISPLAY(1,"$string")
 PRINT
 		} else {
 			push @{$code{$seg}->{code}}, <<PRINT;
@@ -485,16 +466,13 @@ sub parse_print {
 		feedme();
 		if ($fd) { 
 			push @{$code{$seg}->{code}}, <<PRINT;
-@code	.arg $result
-	.arg 1
-	.arg $fd
-	call _WRITE
+@code	noop
+	_WRITE($fd,1,$result)
 PRINT
 		} else {
 			push @{$code{$seg}->{code}}, <<PRINT;
-@code	.arg $result
-	.arg 1
-	call _BUILTIN_DISPLAY
+@code	noop
+	_BUILTIN_DISPLAY(1,$result)
 PRINT
 		}
 		#print "After Expression have $type[CURR] $syms[CURR]\n";
@@ -510,8 +488,7 @@ PRINT
 sub parse_read {
 	while($type[CURR] !~ /COMP|COMM|STMT/) {
 		push @{$code{$seg}->{code}}, <<EOASS;
-	call _READ
-	.result \$S99
+	\$S99 = _READ()
 	set \$N99, \$S99
 EOASS
 	($result, $type, @code)=EXPRESSION({ stuff => '$X99', choose => 1 });
@@ -546,7 +523,7 @@ sub parse_stop {
 	print "Stopped at source line "
 	print I11
 	print "\\n"
-	call _platform_shutdown
+	_platform_shutdown()
 	end
 STOP
 }
@@ -590,15 +567,16 @@ OUTDATA:while($type[CURR] !~ /COMP|COMM|STMT/) {
 	push(@data, { line => $currline, data => \@ld });
 }
 sub parse_restore {
+ 	my @args;
 	if ($type[NEXT] eq "BARE" or $type[NEXT] eq "INT") {
 		feedme();
 		create_label();
-		push @{$code{$seg}->{code}}, qq{\t.arg "$labels{$syms[CURR]}"\n};
+		push @args, qq{"$labels{$syms[CURR]}"};
 	} else {
-		push @{$code{$seg}->{code}}, qq{\t.arg ""\n};
+		push @args, qq{""};
 	}
 	feedme();
-	push @{$code{$seg}->{code}}, "\tcall _RESTORE\n";
+	push @{$code{$seg}->{code}}, "\t_RESTORE(" . join(",",@args) . ")\n";
 }
 
 
@@ -1274,7 +1252,7 @@ sub CALL_BODY {
 	print "Function $englishname received "
 	print argc
 	print " arguments expected $_\\n"
-	call _platform_shutdown
+	_platform_shutdown()
 	end
 ${englishname}_ARGOK:
 EOH
@@ -1383,7 +1361,7 @@ DISP
 	print "Structure type of "
 	print S0
 	print " not found\\n"
-	call _platform_shutdown
+	_platform_shutdown()
 	end
 DISP2
 
@@ -1403,7 +1381,7 @@ DISP
 	print "Structure type of "
 	print S0
 	print " not found\\n"
-	call _platform_shutdown
+	_platform_shutdown()
 	end
 DISP2
 RTJUMP:
@@ -1422,7 +1400,7 @@ RTB
 	print "Runtime branch of "
 	print JUMPLABEL
 	print " not found\\n"
-	call _platform_shutdown
+	_platform_shutdown()
 	end
 RTBE
 }

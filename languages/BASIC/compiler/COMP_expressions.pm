@@ -480,9 +480,9 @@ sub pushargs {
 		my $a1=pushthing($code, $optype, @$item);
 		push @args, [ $a1, @$item ];
 	}
-	foreach(@args) {
-		push @$code, qq{\t.arg $_->[0]\t\t# $_->[0]};
-	}
+	#foreach(@args) {
+		#push @$code, qq{\t.arg $_->[0]\t\t# $_->[0]};
+	#}
 	pop @$work;  # REmove startarg tag...
 	return(scalar @args, @args);
 }
@@ -513,43 +513,36 @@ sub generate_code {   # Will return a result register, or something.
 			next;
 		}
 		next if ($sym eq ",");  # Commas get ignored, args to stack
-		my($ac, @args, $extern);
+		my($ac, @args, $extern, $pir_args);
 		if (isarray($sym) and $lhs) {
 			($ac,@args)=pushargs(\@code, \$optype, \@work);
+			$pir_args = join(",", map {$_->[0]} @args);
+			$pir_args = ",$pir_args" if $pir_args;
 			$extern=$sym;
 			$optype=optype_of($extern);
 			goto NEST_ARRAY_ASSIGN if (@work); # Ugly, yeah sue me.
-			push @code, qq{\t.arg $ac\t\t\t# argc};
-			push @code, qq{\tINSERT NEW VALUE HERE};
-			push @code, qq{\t.arg "$extern$seg"\t\t# array name};
-			push @code, "\tcall _ARRAY_ASSIGN";
+			push @code, qq{\t_ARRAY_ASSIGN("$extern$seg",INSERT NEW VALUE HERE,$ac$pir_args)};
 			return("~Array", "$optype", @code);
 		} elsif (hasargs($sym)) {
 			($ac,@args)=pushargs(\@code, \$optype, \@work);
+			$pir_args = join(",", map {$_->[0]} @args);
+			$pir_args = ",$pir_args" if $pir_args;
 			$extern=$sym;
 			$optype=optype_of($extern);
 			if (isarray($sym)) {
-NEST_ARRAY_ASSIGN:		push @code, qq{\t.arg $ac\t\t\t# argc};
-				push @code, qq{\t.arg "$extern$seg"\t\t# array name};
-				push @code, "\tcall _ARRAY_LOOKUP_$optype";
+NEST_ARRAY_ASSIGN:
 				if ($ac == 0) {
 					$optype="P";
 				}
-				push @code, "\t.result \$$optype$retcount";
+				push @code, qq{\t\$$optype$retcount = _ARRAY_LOOKUP_$optype("$extern$seg",$ac$pir_args)};
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 			} elsif (isbuiltin($sym)) {
 				$extern=~s/\$/_string/g; $extern=~tr/a-z/A-Z/;
-				push @code, qq{\t.arg $ac\t\t\t# argc};
-				push @code, qq{\tcall  _BUILTIN_$extern};
-				push @code, "\t.result \$$optype$retcount";
+				push @code, qq{\$$optype$retcount = _BUILTIN_$extern($ac$pir_args)};
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 			} else {
 				$extern=~s/\$/_string/g; $extern=~tr/a-z/A-Z/;
-				push @code, qq{#SAVECOMMON};
-				push @code, qq{\t.arg $ac\t\t\t# argc};
-				push @code, qq{\tcall  _USERFUNC_${extern}_run};
-				push @code, qq{#RESTORECOMMON};
-				push @code, "\t.result \$$optype$retcount";
+				push @code, qq{\$$optype$retcount = _USERFUNC_${extern}_run($ac$pir_args)};
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 				$retcount++;
 				# External functions return their arguments, 
@@ -621,7 +614,7 @@ sub build_assignment {
 			);
 		}
 	} else {
-		s/INSERT NEW VALUE HERE/.arg $right\t\t\t# Value to receive/g for @$leftexpr;
+		s/INSERT NEW VALUE HERE/$right/g for @$leftexpr;
 		s/--TYPE--/$righttype/g for @$leftexpr;
 
 		@ass=(

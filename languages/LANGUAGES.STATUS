@@ -7,8 +7,9 @@ description, (S) status, (M) maintained, (V) minimum Parrot version required.
 
 N: BASIC/compiler
 A: Clint Pierce
+A: Will Coleda (work with parrot 0.1.0+)
 D: BASIC Compiler
-S: Broken [perl #30084]
+S: Cautiously Optimistic - wumpus example seems to work again.
 M: Yes
 V: 0.0.11
 

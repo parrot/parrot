@@ -9,7 +9,7 @@ use Getopt::Std;
 use vars qw( @tokens @tokdsc);
 use vars qw(%code %options @basic %common);
 use vars qw( @syms @type );
-use vars qw( %labels $runtime_jump $debug  $sourceline);
+use vars qw( %labels $runtime_jump $debug $sourceline);
 use COMP_toker;
 use COMP_parser;
 use COMP_assignments;
@@ -45,7 +45,6 @@ parse(@ARGV);
 
 open(CODE, ">TARG_test.imc") || die;
 
-print CODE qq{.include "RT_initialize.imc"\n};
 foreach my $seg ("_main", "_basicmain", keys %code) {
 	next unless exists $code{$seg};
 	my @debdecl=();
@@ -54,6 +53,8 @@ foreach my $seg ("_main", "_basicmain", keys %code) {
 	print CODE ".sub $seg\n";
 	if (exists $code{$seg}->{declarations}) {
 		print CODE "\t.local PerlHash _GLOBALS\n";
+		print CODE "\t.local string JUMPLABEL\n";
+		print CODE "\tset JUMPLABEL, \"\"\n";
 		foreach my $var (sort keys %{$code{$seg}->{declarations}}) {
 			if ($var=~/_string$/) {
 				print CODE "\t.local string $var\n";
@@ -67,14 +68,14 @@ foreach my $seg ("_main", "_basicmain", keys %code) {
 
 		}
 	}
-	print CODE<<INIT;
-	.sub ${seg}_run			# Always jump here.
-		call ${seg}_main
-		ret
-	.end
-INIT
+	#print CODE<<INIT;
+	#.sub ${seg}_run			# Always jump here.
+		#${seg}_main()
+		#ret
+	#.end
+#INIT
 	my($edit,@saves);
-	print CODE "\t.sub ${seg}_main\n\t\tsaveall\n";
+	#print CODE "\t.sub ${seg}_main\n\t\tsaveall\n";
 
 	# If any "common" declared variables are in scope, set them up.
 	@saves=();
@@ -144,8 +145,6 @@ INIT
 		}
 		print CODE qq{\t\tstore_global "COMMON", _GLOBALS\n\t};
 	}
-	print CODE "\t\trestoreall\n\t\tret\n";
-	print CODE "\t.end\t# main segment\n";
 	delete $code{$seg};
 	if (! $debug) {
 		print CODE ".end\t# outer segment\n";
@@ -168,11 +167,8 @@ INIT
 		\$P1=new PerlHash
 @debdecl		.arg \$P1
 		.arg debline
-		call _DEBUGGER_STOP_FOR_REAL
-	DEBUGGER_DONE:
-		restoreall
-		ret
-	
+		_DEBUGGER_STOP_FOR_REAL()
+	DEBUGGER_DONE: noop
 	.end	# End debug segment
 .end 	# End outer segment
 EOD
@@ -197,8 +193,6 @@ FOO
 	\$P0=new PerlArray
 	set \$P1["watch"], \$P0  # Watch
 	store_global "DEBUGGER", \$P1
-	restoreall
-	ret
 .end
 FOO
 }
@@ -206,6 +200,7 @@ print CODE<<RUNTIMESHUTDOWN;
 	#
 	# Pull in the runtime libraries
 	#
+.include "RT_initialize.imc"
 .include "RT_aggregates.imc"
 .include "RT_builtins.imc"
 .include "RT_debugger.imc"

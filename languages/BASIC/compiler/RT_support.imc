@@ -25,8 +25,7 @@
 #	branch GEN_ERROR
 
 .sub _READ		# PerlArray READ(void)
-	saveall
-	.local PerlArray READDATA
+	.local pmc READDATA
 	.local int READPOINTER
 	find_global READDATA, "READDATA"
 	find_global $P0, "READPOINTER"
@@ -38,22 +37,19 @@
 
 	set $S1, READDATA[READPOINTER]
 	inc READPOINTER
-	.return $S1
 
 	set $P0["value"], READPOINTER
 	store_global "READPOINTER", $P0
 
-	restoreall
-	ret
+	.return($S1)
 ERR_READ:
 	print "Out of data"
 	end
 .end
 .sub _RESTORE		# void RESTORE(string where)
-	saveall
 	.param string where
 	.local int READPOINTER
-	.local PerlHash RESTOREINFO
+	.local pmc RESTOREINFO
 	find_global RESTOREINFO, "RESTOREINFO"
 	find_global $P0, "READPOINTER"
 	set READPOINTER, $P0["value"]
@@ -62,13 +58,10 @@ ERR_READ:
 	
 	set $P0["value"], READPOINTER
 	store_global "READPOINTER", $P0
-	restoreall
-	ret
 .end
 
 .sub _get_little_endian # int get_little_endian(struct, offset, bytes)
-	saveall
-	.param ManagedStruct 	struct
+	.param pmc		struct
 	.param int		offset
 	.param int		bytes
 	.local int 		target
@@ -81,13 +74,10 @@ LOOP:   lt $I6, offset, END
 	add target, target, $I3
 	dec $I6
 	branch LOOP
-END:    .return target
-	restoreall
-	ret
+END:    .return(target)
 .end
 .sub _set_little_endian	# void set_little_endian(struct, offset, bytes, value)
-	saveall
-	.param ManagedStruct struct
+	.param pmc           struct
 	.param int 	     offset
 	.param int 	     bytes
 	.param int 	     value
@@ -99,7 +89,5 @@ LOOP2:  eq offset, $I6, END2
 	set struct[offset], $I1
 	inc offset
 	branch LOOP2
-END2:   restoreall
-	ret
-
+END2:   noop
 .end

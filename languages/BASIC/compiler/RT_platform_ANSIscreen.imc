@@ -7,7 +7,6 @@
 .const int CYAN   = 6
 .const int WHITE  = 7
 .sub _ansi_setup
-	saveall
 	$P0=new PerlArray
 	set $P0[0], BLACK
 	set $P0[1], BLUE
@@ -41,21 +40,15 @@
 	$P0=new PerlHash
 	$P0["value"]=0
 	store_global "scankey", $P0
-
-	restoreall
-	ret
 .end
 .sub _ansi_screen_clear
 	print "\e[2J"
 	print "\e[H"
-	ret
 .end
 .sub _ansi_shutdown
-	call _TERMIO_normal
-	ret
+	_TERMIO_normal()
 .end
 .sub _ANSI_SCREEN_LOCATE	# void ansi_screen_locate (int x, int y)
-	saveall
 	.param int x
 	.param int y
 	print "\e["
@@ -63,8 +56,6 @@
 	print ";"
 	print y
 	print "H"
-	restoreall
-	ret
 .end
 ## These don't work exactly right.  ANSI would require that I send
 ## \e[6n and read the input stream for a \e[row;colR reply from the 
@@ -93,7 +84,6 @@
 ##     3 = cyan        7 = white        11 = light cyan       15 = bright white
 #
 .sub _ANSI_SCREEN_COLOR		#  void ansi_screen_color(int fg, int bg)
-	saveall
 	.param int fore
 	.param int back
 	print "\e"
@@ -115,11 +105,8 @@ ANSI_BG:find_global $P0, "ANSI_bgcolors"
 	print "4"
 	print $I3
 	print "m"
-	restoreall
-	ret
 .end
 .sub _set_noecho_cbreak
-	saveall
 	loadlib P1, ""
 	dlfunc P0, P1, "ioctl", "iiip"
 	set I0, 1
@@ -135,32 +122,21 @@ ANSI_BG:find_global $P0, "ANSI_bgcolors"
 	set I6, 0x5405
 	set P5, P10
 	invoke		# ioctl(0, TCGETA, &settty);
-	.arg 2
-	.arg 6
-	.arg P10
-	call _get_little_endian
-	.result I0
+	I0 = _get_little_endian(P10,6,2)
 	set I1, 2	# ICANON
 	bnot I1, I1 	# ~ICANON
 	band I0, I0, I1 # settty.c_lflag &= ~ICANON;
 	set I1, 8	# IECHO
 	bnot I1, I1 	# ~ICANON
 	band I0, I0, I1	# settty.c_lflag &= ~ECHO;
-	.arg I0
-	.arg 2
-	.arg 6
-	.arg P10
-	call _set_little_endian
+	_set_little_endian(P10,6,2,I10)
 	set I5, 0
 	set I6, 0x5408
 	set P5, P10
 	invoke		# ioctl(0, TCSETAF, &settty);
 	store_global "ioctl_mode", P9
-	restoreall
-	ret
 .end
 .sub _set_echo_nocbreak
-	saveall	
 	loadlib P1, ""
 	dlfunc P0, P1, "ioctl", "iiip"
 	find_global P9, "ioctl_mode"
@@ -168,12 +144,9 @@ ANSI_BG:find_global $P0, "ANSI_bgcolors"
 	set I6, 0x5408
 	set P5, P9
 	invoke		# ioctl(0, TCSETAF, &savetty)
-	restoreall
-	ret
 .end
 
 .sub _set_nonblock	# void _set_nonblock
-	saveall
 	set I11, 0
 	loadlib P1, ""
 	dlfunc P0, P1, "fcntl", "iiii"
@@ -192,11 +165,8 @@ ANSI_BG:find_global $P0, "ANSI_bgcolors"
 	$P0=new PerlHash
 	set $P0["value"], I11
 	store_global "fcntl_mode", $P0
-	restoreall
-	ret
 .end
 .sub _unset_nonblock	# void _unset_nonblock
-	saveall
 	find_global P0, "fcntl_mode"
 	set I11, P0["value"]
 	loadlib P1, ""
@@ -205,11 +175,8 @@ ANSI_BG:find_global $P0, "ANSI_bgcolors"
 	set I5, 0
 	set I6, 4
 	invoke		# nmode=fcntl(0, F_SETFL, mode)
-	restoreall
-	ret
 .end
 .sub _TERMIO_scankey
-	saveall
 	find_global $P0, "scankey"
 	set I0, $P0["value"]
 	eq I0, 1, END
@@ -217,11 +184,8 @@ ANSI_BG:find_global $P0, "ANSI_bgcolors"
 	call _set_noecho_cbreak
 END:    set $P0["value"], 1
 	store_global "scankey", $P0
-	restoreall
-	ret
 .end
 .sub _TERMIO_normal
-	saveall
 	find_global $P0, "scankey"
 	set I0, $P0["value"]
 	eq I0, 0, END
@@ -229,19 +193,12 @@ END:    set $P0["value"], 1
 	call _set_echo_nocbreak
 END:    set $P0["value"], 0
 	store_global "scankey", $P0
-	restoreall
-	ret
 .end
 
 # For now, uses TERMIO calls directly and assumes you're on a
 # LITTLE ENDIAN machine.
 .sub _TERMIO_INKEY
-	saveall
-
 	read $S0, 1
-
-	.return $S0
-	restoreall
-	ret
+	.return($S0)
 .end
 
