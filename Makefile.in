@@ -26,8 +26,8 @@ INC=include/parrot
 GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile docs/Makefile \
 languages/jako/Makefile languages/miniperl/Makefile languages/scheme/Makefile
 
-GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h lib/Parrot/Config.pm \
-lib/Parrot/Types.pm platform.c
+GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
+			   lib/Parrot/Config.pm lib/Parrot/Types.pm platform.c
 
 STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) config.opt
 
@@ -76,20 +76,26 @@ classes/perlint$(O) classes/perlstring$(O) classes/perlnum$(O) \
 classes/perlarray$(O) classes/perlundef$(O) \
 classes/perlhash$(O) classes/parrotpointer$(O) classes/intqueue$(O)
 
-ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
-encodings/utf32$(O)
+ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) \
+				   encodings/utf16$(O) \
+			       encodings/utf32$(O)
 
 CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
 
 IO_O_FILES = io/io$(O) io/io_stdio$(O) io/io_unix$(O) io/io_win32$(O)
 
-INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
-core_ops$(O) core_ops_prederef$(O) memory$(O) packfile$(O) stacks$(O) \
-string$(O) encoding$(O) chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) \
-platform$(O) ${jit_o} resources$(O) rx$(O) rxstacks$(O) embed$(O) warnings$(O) \
-misc$(O)
+INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
+				 register$(O) core_ops$(O) core_ops_prederef$(O) memory$(O) \
+				 packfile$(O) stacks$(O) string$(O) encoding$(O) \
+				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) \
+				 platform$(O) ${jit_o} resources$(O) rx$(O) rxstacks$(O) \
+				 embed$(O) warnings$(O) misc$(O)
 
-O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) $(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
+O_FILES = $(INTERP_O_FILES) \
+	      $(IO_O_FILES) \
+		  $(CLASS_O_FILES) \
+		  $(ENCODING_O_FILES) \
+		  $(CHARTYPE_O_FILES)
 
 OPS_FILES = ${ops} $(GEN_OPSFILES)
 
@@ -109,7 +115,6 @@ LDFLAGS = ${ldflags} ${ld_debug}
 C_LIBS = ${libs}
 
 CC = ${cc}
-LD = ${ld}
 PERL = ${perl}
 
 
@@ -140,29 +145,29 @@ LINTFLAGS = -weak +showscan +showsummary +posixstrictlib -abstract +aliasunique 
 
 ${make_set_make}
 
-.c$(O):
+.c$(O) :
 	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
 all : $(TEST_PROG) docs
 
-mops: examples/assembly/mops${exe} examples/mops/mops${exe}
+mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
 # XXX Unix-only for now
 libparrot$(A) : $(O_FILES)
 	$(AR_CRS) $@ $(O_FILES)
 
-$(TEST_PROG): test_main$(O) $(GEN_HEADERS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
+$(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
 	$(LD) ${ld_out}$(TEST_PROG) $(LDFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
 
-lib_deps_object: $(O_FILES)
+lib_deps_object : $(O_FILES)
 	$(PERL) lib_deps.pl object $(O_FILES)
 
-lib_deps_source: $(GENERAL_H_FILES)
+lib_deps_source : $(GENERAL_H_FILES)
 	$(PERL) lib_deps.pl source all_source
 
-lib_deps: lib_deps_object lib_deps_source
+lib_deps : lib_deps_object lib_deps_source
 
-check_source: $(GENERAL_H_FILES)
+check_source : $(GENERAL_H_FILES)
 	$(PERL) check_source_standards.pl all_source
 
 ###############################################################################
@@ -173,45 +178,45 @@ check_source: $(GENERAL_H_FILES)
 #
 ###############################################################################
 
-blib:
+blib :
 	mkdir -p blib
 
-blib_lib:
+blib_lib :
 	mkdir -p blib/lib
 
-shared: blib_lib blib/lib/libparrot$(SO) blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO)
+shared : blib_lib blib/lib/libparrot$(SO) blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO)
 
-blib/lib/libparrot$(SO).${VERSION}: blib_lib $(O_FILES)
+blib/lib/libparrot$(SO).${VERSION} : blib_lib $(O_FILES)
 	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
 
-blib/lib/libparrot$(SO).${MAJOR}.${MINOR}: blib/lib/libparrot$(SO).${VERSION}
+blib/lib/libparrot$(SO).${MAJOR}.${MINOR} : blib/lib/libparrot$(SO).${VERSION}
 	$(RM_F) $@
 	cd blib/lib; ln -s libparrot$(SO).${VERSION} libparrot$(SO).${MAJOR}.${MINOR}
 
-blib/lib/libparrot$(SO).${MAJOR}: blib/lib/libparrot$(SO).${MAJOR}.${MINOR}
+blib/lib/libparrot$(SO).${MAJOR} : blib/lib/libparrot$(SO).${MAJOR}.${MINOR}
 	$(RM_F) $@
 	cd blib/lib; ln -s libparrot$(SO).${MAJOR}.${MINOR} libparrot$(SO).${MAJOR}
 
-blib/lib/libparrot$(SO): blib/lib/libparrot$(SO).${MAJOR}
+blib/lib/libparrot$(SO) : blib/lib/libparrot$(SO).${MAJOR}
 	$(RM_F) $@
 	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
 
-blib/lib/libcore_prederef$(SO).${VERSION}: blib_lib core_ops_prederef$(O)
+blib/lib/libcore_prederef$(SO).${VERSION} : blib_lib core_ops_prederef$(O)
 	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
 
-blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}: blib/lib/libcore_prederef$(SO).${VERSION}
+blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR} : blib/lib/libcore_prederef$(SO).${VERSION}
 	$(RM_F) $@
 	cd blib/lib; ln -s libcore_prederef$(SO).${VERSION} libcore_prederef$(SO).${MAJOR}.${MINOR}
 
-blib/lib/libcore_prederef$(SO).${MAJOR}: blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}
+blib/lib/libcore_prederef$(SO).${MAJOR} : blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}
 	$(RM_F) $@
 	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR}.${MINOR} libcore_prederef$(SO).${MAJOR}
 
-blib/lib/libcore_prederef$(SO): blib/lib/libcore_prederef$(SO).${MAJOR}
+blib/lib/libcore_prederef$(SO) : blib/lib/libcore_prederef$(SO).${MAJOR}
 	$(RM_F) $@
 	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR} libcore_prederef$(SO)
 
-$(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
+$(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
 	$(LD) $(LD_OUT)$(TEST_PROG) test_main$(O) $(LDFLAGS) $(C_LIBS) -L blib/lib -lparrot
 
 
@@ -219,7 +224,7 @@ $(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm 
 # Parrot Dump
 #
 
-#$(PDUMP): pdump$(O) packfile$(O)
+#$(PDUMP) : pdump$(O) packfile$(O)
 #	$(LD) ${ld_out}$(PDUMP) pdump$(O) packfile$(O) string$(O) chartype$(O) memory$(O) $(C_LIBS) $(LDFLAGS)
 
 
@@ -229,15 +234,15 @@ $(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm 
 #
 ###############################################################################
 
-test_main$(O): test_main.c $(GENERAL_H_FILES)
+test_main$(O) : test_main.c $(GENERAL_H_FILES)
 
-lib/Parrot/Jit.pm: lib/Parrot/Jit/${jitarchname}.pm lib/Parrot/Jit/${jitcpuarch}Generic.pm
-	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|lib/Parrot/Jit/${jitarchname}.pm|, q|lib/Parrot/Jit.pm|${PQ}
+lib/Parrot/Jit.pm : lib/Parrot/Jit/${jitarchname}.pm lib/Parrot/Jit/${jitcpuarch}Generic.pm
+	$(PERL) "-MFile::Copy=cp" -e ${PQ}cp q|lib/Parrot/Jit/${jitarchname}.pm|, q|lib/Parrot/Jit.pm|${PQ}
 
-lib/Parrot/OpLib/core.pm: $(OPS_FILES) ops2pm.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
+lib/Parrot/OpLib/core.pm : $(OPS_FILES) ops2pm.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2pm.pl $(OPS_FILES)
 
-lib/Parrot/PMC.pm: include/parrot/pmc.h pmc_pm.pl
+lib/Parrot/PMC.pm : include/parrot/pmc.h pmc_pm.pl
 	$(PERL) pmc_pm.pl 
 
 
@@ -247,22 +252,22 @@ lib/Parrot/PMC.pm: include/parrot/pmc.h pmc_pm.pl
 #
 ###############################################################################
 
-examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
+examples/assembly/mops.pbc : examples/assembly/mops.pasm assemble.pl
 	cd examples && cd assembly && $(MAKE) mops.pbc PERL=$(PERL) && cd .. && cd ..
 
-examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
+examples/assembly/mops.c : examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
-examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
+examples/assembly/mops${exe} : examples/assembly/mops$(O) $(O_FILES)
 	$(LD) $(LDFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
-examples/assembly/life.pbc: examples/assembly/life.pasm assemble.pl
+examples/assembly/life.pbc : examples/assembly/life.pasm assemble.pl
 	cd examples && cd assembly && $(MAKE) life.pbc PERL=$(PERL) && cd .. && cd ..
 
-examples/assembly/life.c: examples/assembly/life.pbc pbc2c.pl
+examples/assembly/life.c : examples/assembly/life.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/life.pbc > examples/assembly/life.c
 
-examples/assembly/life${exe}: examples/assembly/life$(O) $(O_FILES)
+examples/assembly/life${exe} : examples/assembly/life$(O) $(O_FILES)
 	$(LD) $(LDFLAGS) ${ld_out}examples/assembly/life${exe} examples/assembly/life$(O) $(O_FILES) $(C_LIBS)
 
 ###############################################################################
@@ -271,9 +276,9 @@ examples/assembly/life${exe}: examples/assembly/life$(O) $(O_FILES)
 #
 ###############################################################################
 
-examples/mops/mops$(O): examples/mops/mops.c
+examples/mops/mops$(O) : examples/mops/mops.c
 
-examples/mops/mops${exe}: examples/mops/mops$(O) platform$(O)
+examples/mops/mops${exe} : examples/mops/mops$(O) platform$(O)
 	$(LD) $(LDFLAGS) ${ld_out}examples/mops/mops${exe} examples/mops/mops$(O) platform$(O) $(C_LIBS)
 
 
@@ -283,103 +288,103 @@ examples/mops/mops${exe}: examples/mops/mops$(O) platform$(O)
 #
 ###############################################################################
 
-global_setup$(O): $(GENERAL_H_FILES)
+global_setup$(O) : $(GENERAL_H_FILES)
 
-pmc$(O): $(GENERAL_H_FILES)
+pmc$(O) : $(GENERAL_H_FILES)
 
-jit$(O): $(GENERAL_H_FILES) ${jit_struct_h}
+jit$(O) : $(GENERAL_H_FILES) ${jit_struct_h}
 
-key$(O): $(GENERAL_H_FILES)
+key$(O) : $(GENERAL_H_FILES)
 
-resources$(O): $(GENERAL_H_FILES)
+resources$(O) : $(GENERAL_H_FILES)
 
-platform$(O): $(GENERAL_H_FILES)
+platform$(O) : $(GENERAL_H_FILES)
 
-string$(O): $(GENERAL_H_FILES)
+string$(O) : $(GENERAL_H_FILES)
 
-chartype$(O): $(GENERAL_H_FILES)
+chartype$(O) : $(GENERAL_H_FILES)
 
-encoding$(O): $(GENERAL_H_FILES)
+encoding$(O) : $(GENERAL_H_FILES)
 
-chartype/usascii$(O): $(GENERAL_H_FILES)
+chartype/usascii$(O) : $(GENERAL_H_FILES)
 
-chartype/unicode$(O): $(GENERAL_H_FILES)
+chartype/unicode$(O) : $(GENERAL_H_FILES)
 
-exceptions$(O): $(GENERAL_H_FILES)
+exceptions$(O) : $(GENERAL_H_FILES)
 
-encoding/singlebyte$(O): $(GENERAL_H_FILES)
+encoding/singlebyte$(O) : $(GENERAL_H_FILES)
 
-encoding/utf8$(O): $(GENERAL_H_FILES)
+encoding/utf8$(O) : $(GENERAL_H_FILES)
 
-encoding/utf16$(O): $(GENERAL_H_FILES)
+encoding/utf16$(O) : $(GENERAL_H_FILES)
 
-encoding/utf32$(O): $(GENERAL_H_FILES)
+encoding/utf32$(O) : $(GENERAL_H_FILES)
 
-interpreter$(O): interpreter.c $(GENERAL_H_FILES)
+interpreter$(O) : interpreter.c $(GENERAL_H_FILES)
 
-io/io$(O): $(GENERAL_H_FILES)
+io/io$(O) : $(GENERAL_H_FILES)
 
-io/io_stdio$(O): $(GENERAL_H_FILES)
+io/io_stdio$(O) : $(GENERAL_H_FILES)
 
-io/io_unix$(O): $(GENERAL_H_FILES)
+io/io_unix$(O) : $(GENERAL_H_FILES)
 
-io/io_win32$(O): $(GENERAL_H_FILES)
+io/io_win32$(O) : $(GENERAL_H_FILES)
 
-memory$(O): $(GENERAL_H_FILES)
+memory$(O) : $(GENERAL_H_FILES)
 
-packfile$(O): $(GENERAL_H_FILES)
+packfile$(O) : $(GENERAL_H_FILES)
 
-packout$(O): $(GENERAL_H_FILES)
+packout$(O) : $(GENERAL_H_FILES)
 
-parrot$(O): $(GENERAL_H_FILES)
+parrot$(O) : $(GENERAL_H_FILES)
 
-register$(O): $(GENERAL_H_FILES)
+register$(O) : $(GENERAL_H_FILES)
 
-rx$(O): $(GENERAL_H_FILES)
+rx$(O) : $(GENERAL_H_FILES)
 
-rxstacks$(O): $(GENERAL_H_FILES)
+rxstacks$(O) : $(GENERAL_H_FILES)
 
-stacks$(O): $(GENERAL_H_FILES)
+stacks$(O) : $(GENERAL_H_FILES)
 
-embed$(O): $(GENERAL_H_FILES)
+embed$(O) : $(GENERAL_H_FILES)
 
-core_ops$(O): $(GENERAL_H_FILES) core_ops.c
+core_ops$(O) : $(GENERAL_H_FILES) core_ops.c
 
-core_ops.c $(INC)/oplib/core_ops.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
+core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2c.pl C $(OPS_FILES)
 
-core_ops_prederef$(O): $(GENERAL_H_FILES) core_ops_prederef.c
+core_ops_prederef$(O) : $(GENERAL_H_FILES) core_ops_prederef.c
 
-core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
+core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2c.pl CPrederef $(OPS_FILES)
 
-warnings$(O): $(H_FILES)
+warnings$(O) : $(H_FILES)
 
-misc$(O): $(H_FILES)
+misc$(O) : $(H_FILES)
 
-vtable.ops: make_vtable_ops.pl
+vtable.ops : make_vtable_ops.pl
 	$(PERL) make_vtable_ops.pl > vtable.ops
 
-$(STICKY_FILES): Configure.pl config_h.in
+$(STICKY_FILES) : Configure.pl config_h.in
 	$(PERL) Configure.pl
 
-$(INC)/vtable.h: vtable.tbl vtable_h.pl
+$(INC)/vtable.h : vtable.tbl vtable_h.pl
 	$(PERL) vtable_h.pl
 
-$(INC)/jit_struct.h: jit2h.pl lib/Parrot/OpLib/core.pm lib/Parrot/Jit.pm jit/${jitcpuarch}/core.jit jit/${jitcpuarch}/string.jit
+$(INC)/jit_struct.h : jit2h.pl lib/Parrot/OpLib/core.pm lib/Parrot/Jit.pm jit/${jitcpuarch}/core.jit jit/${jitcpuarch}/string.jit
 	$(PERL) jit2h.pl ${jitcpuarch} > $(INC)/jit_struct.h
 
-docs: docs/.dummy
+docs : docs/.dummy
 
-docs/.dummy:
+docs/.dummy :
 	cd docs && $(MAKE) && cd ..
 
-$(CLASS_O_FILES):
+$(CLASS_O_FILES) :
 	cd classes && $(MAKE) && cd ..
 
-languages: languages.dummy
+languages : languages.dummy
 
-languages.dummy:
+languages.dummy :
 	cd languages && $(MAKE) && cd ..
 
 
@@ -389,30 +394,30 @@ languages.dummy:
 #
 ###############################################################################
 
-test: $(TEST_PROG) assemble.pl .test_dummy
+test : $(TEST_PROG) assemble.pl test_dummy
 
-.test_dummy:
+test_dummy :
 	$(PERL) t/harness
 
-testp: $(TEST_PROG) assemble.pl blib/lib/libcore_prederef$(SO) blib/lib/libparrot$(SO) $(TEST_PROG_SO) .test_dummy_p
+testp : $(TEST_PROG) assemble.pl blib/lib/libcore_prederef$(SO) blib/lib/libparrot$(SO) $(TEST_PROG_SO) test_dummy_p
 
-.test_dummy_p:
+test_dummy_p :
 	$(PERL) t/harness -P
 
-testj: $(TEST_PROG) assemble.pl .test_dummy_j
+testj : $(TEST_PROG) assemble.pl test_dummy_j
 
-.test_dummy_j:
+test_dummy_j :
 	$(PERL) t/harness -j
 
-quicktest: $(TEST_PROG) assemble.pl .quicktest_dummy
+quicktest : $(TEST_PROG) assemble.pl quicktest_dummy
 
-.quicktest_dummy:
+quicktest_dummy :
 	$(PERL) t/harness quick
 
-mopstest: $(TEST_PROG) examples/assembly/mops.pbc
+mopstest : $(TEST_PROG) examples/assembly/mops.pbc
 	$(TEST_PROG) examples/assembly/mops.pbc
 
-lifetest: $(TEST_PROG) examples/assembly/life.pbc
+lifetest : $(TEST_PROG) examples/assembly/life.pbc
 	$(TEST_PROG) examples/assembly/life.pbc
 
 
@@ -422,7 +427,7 @@ lifetest: $(TEST_PROG) examples/assembly/life.pbc
 #
 ###############################################################################
 
-clean: testclean
+clean : testclean
 	$(RM_F) $(O_FILES)
 	$(RM_F) *.s
 	$(RM_F) $(FLUID_FILES)
@@ -436,23 +441,23 @@ clean: testclean
 	cd classes && $(MAKE) clean && cd ..
 	cd languages && $(MAKE) clean && cd ..
 
-testclean:
+testclean :
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
 
-realclean: clean
+realclean : clean
 	$(RM_F) $(STICKY_FILES)
 
-distclean:
-	$(PERL) -MExtUtils::Manifest=filecheck -le ${PQ}sub ExtUtils::Manifest::_maniskip{sub{0}};$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()${PQ}
+distclean :
+	$(PERL) "-MExtUtils::Manifest=filecheck" -le ${PQ}sub ExtUtils::Manifest::_maniskip{sub{0}};$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()${PQ}
 
-cvsclean:
-	$(PERL) -MExtUtils::Manifest=filecheck -le ${PQ}sub ExtUtils::Manifest::_maniskip{sub{0}};$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()${PQ}
+cvsclean :
+	$(PERL) "-MExtUtils::Manifest=filecheck" -le ${PQ}sub ExtUtils::Manifest::_maniskip{sub{0}};$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()${PQ}
 
-reconfig:
+reconfig :
 	$(MAKE) clean; $(PERL) Configure.pl --reconfig
 
-manitest:
-	$(PERL) -MExtUtils::Manifest=fullcheck -e fullcheck
+manitest :
+	$(PERL) "-MExtUtils::Manifest=fullcheck" -e fullcheck
 
 ###############################################################################
 #
@@ -460,13 +465,13 @@ manitest:
 #
 ###############################################################################
 
-update:
+update :
 	cvs -q update -dP
 
-status:
+status :
 	cvs -n -q upd -dP
 
-lint: ${test_prog}
-	$(LINT) ${cc_inc} ${cc_hasjit} -Iclasses $(LINTFLAGS) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
+lint : ${test_prog}
+	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
 	$(LINT) ${cc_inc} $(LINTFLAGS) test_main.c
 
