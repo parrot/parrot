@@ -34,7 +34,7 @@
  * Returns the position just past the current argument in a PASM
  * instruction. This is not the same as na(), above, which is intended
  * for debugger commands. This function is used for eval. */
-static const char* 
+static const char*
 nextarg(const char* command)
 {
     while (*command && (isalnum((int) *command) || *command == ',' ||
@@ -179,7 +179,7 @@ parse_command(const char* command, unsigned long* cmdP)
  *
  * Get a command from the user input to execute.
  *
- * It saves the last command executed (in pdb->last_command), so it first 
+ * It saves the last command executed (in pdb->last_command), so it first
  * frees the old one and updates it with the current one.
  *
  * Also prints the next line to run if the program is still active.
@@ -194,13 +194,13 @@ PDB_get_command(struct Parrot_Interp *interpreter)
     unsigned int i;
     char *c;
     PDB_t *pdb = interpreter->pdb;
-    PDB_line_t *line; 
+    PDB_line_t *line;
     int ch;
 
     /* flush the buffered data */
     fflush(stdout);
 
-    /* not used any more */ 
+    /* not used any more */
     if (pdb->last_command && *pdb->cur_command)
         mem_sys_free(pdb->last_command);
 
@@ -214,8 +214,8 @@ PDB_get_command(struct Parrot_Interp *interpreter)
 
         while (pdb->cur_opcode != line->opcode)
             line = line->next;
-        
-        PIO_eprintf(interpreter, "\n%li  ", line->number); 
+
+        PIO_eprintf(interpreter, "\n%li  ", line->number);
         c = pdb->file->source + line->source_offset;
         while (*c != '\n'  && c)
             PIO_eprintf(interpreter, "%c", *(c++));
@@ -244,7 +244,7 @@ PDB_get_command(struct Parrot_Interp *interpreter)
     if (ch == -1) strcpy(c, "quit");
     pdb->cur_command = c;
 }
-        
+
 /* PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
  *
  * Run a command.
@@ -341,9 +341,9 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
  *
  * Execute the next N operation(s).
  *
- * Inits the program if needed, runs the next N >= 1 operations and 
+ * Inits the program if needed, runs the next N >= 1 operations and
  * stops.
- * 
+ *
  */
 void
 PDB_next(struct Parrot_Interp *interpreter, const char *command)
@@ -354,7 +354,7 @@ PDB_next(struct Parrot_Interp *interpreter, const char *command)
     /* Init the program if it's not running */
     if (!(pdb->state & PDB_RUNNING))
         PDB_init(interpreter, command);
-    
+
     /* Get the number of operations to execute if any */
     if (command && isdigit((int) *command))
         n = atol(command);
@@ -383,21 +383,21 @@ PDB_trace(struct Parrot_Interp *interpreter,
 {
     PDB_t *pdb = interpreter->pdb;
     unsigned long n = 1;
- 
+
     if (!(pdb->state & PDB_RUNNING))
     {
         PDB_init(interpreter, command);
     }
-   
+
     if (command && isdigit((int) *command))
         n = atol(command);
 
     pdb->state &= ~PDB_STOPPED;
 
     for ( ; n && pdb->cur_opcode; n--) {
-        trace_op(interpreter, 
+        trace_op(interpreter,
                 interpreter->code->byte_code,
-                interpreter->code->byte_code + 
+                interpreter->code->byte_code +
                 interpreter->code->byte_code_size / sizeof(opcode_t),
                 interpreter->pdb->cur_opcode);
         DO_OP(pdb->cur_opcode,interpreter);
@@ -473,7 +473,7 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
             else if (*(command + 1) == ' ')
                 condition->type |= PDB_cond_gt;
             else
-                goto INV_COND;     
+                goto INV_COND;
             break;
         case '<':
             if (*(command + 1) == '=')
@@ -481,19 +481,19 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
             else if (*(command + 1) == ' ')
                 condition->type |= PDB_cond_lt;
             else
-                goto INV_COND;     
+                goto INV_COND;
             break;
         case '=':
             if (*(command + 1) == '=')
                 condition->type |= PDB_cond_eq;
             else
-                goto INV_COND;     
+                goto INV_COND;
             break;
         case '!':
             if (*(command + 1) == '=')
                 condition->type |= PDB_cond_ne;
             else
-                goto INV_COND;     
+                goto INV_COND;
             break;
         default:
 INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
@@ -531,7 +531,7 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
     else if (condition->type & PDB_cond_str) {
         for (i = 1; ((command[i] != '"') && (i < 255)); i++)
             str[i - 1] = command[i];
-        str[i - 1] = '\0'; 
+        str[i - 1] = '\0';
         condition->value = string_make(interpreter,
             str, i - 1, NULL, BUFFER_external_FLAG, NULL);
         condition->type |= PDB_cond_const;
@@ -539,7 +539,7 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
 
     return condition;
 }
-  
+
 /* PDB_watchpoint
  * set a watchpoint.
  */
@@ -557,7 +557,7 @@ PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)
         condition->next = pdb->watchpoint;
     pdb->watchpoint = condition;
 }
- 
+
 /* PDB_set_break
  * set a break point, the source code file must be loaded.
  */
@@ -572,12 +572,12 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
     /* If no line number was specified set it at the current line */
     if (command && *command) {
         ln = atol(command);
-        
+
         /* Move to the line where we will set the break point */
         line = pdb->file->line;
         for (i = 1; ((i < ln) && (line->next)); i++)
             line = line->next;
-   
+
         /* Abort if the line number provided doesn't exists */
         if (!line->next) {
             PIO_eprintf(interpreter, "Can't set a breakpoint at line number %li\n",ln);
@@ -590,14 +590,14 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
         while (line->opcode != pdb->cur_opcode)
             line = line->next;
     }
-       
+
     /* Skip lines that are not related to an opcode */
     while (!line->opcode)
         line = line->next;
 
     /* Search if we got a breakpoint at that line  */
     i = 0;
-    sbreak = pdb->breakpoint; 
+    sbreak = pdb->breakpoint;
     while (sbreak && sbreak->pc != line->opcode) {
         sbreak = sbreak->next;
         i++;
@@ -614,7 +614,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Breakpoint %li already at line %li\n",i,line->number);
         return;
     }
-        
+
     /* Allocate the new break point */
     newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
 
@@ -627,7 +627,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
         if (!(newbreak->condition = PDB_cond(interpreter, command)))
             return;
     }
- 
+
     /* Set the address where to stop */
     newbreak->pc = line->opcode;
     /* No next breakpoint */
@@ -664,7 +664,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
     unsigned long i;
     char c[256];
     void* stacktop = interpreter->lo_var_ptr;
-    
+
     /* The bytecode is readonly, right? */
     code = interpreter->code;
     /* Destroy the old interpreter FIXME */
@@ -722,7 +722,7 @@ PDB_continue(struct Parrot_Interp *interpreter,
         PDB_skip_breakpoint(interpreter,ln);
     }
     /* Run while no break point is reached */
-    while (!PDB_break(interpreter))     
+    while (!PDB_break(interpreter))
         DO_OP(pdb->cur_opcode,interpreter);
 }
 
@@ -778,7 +778,7 @@ PDB_program_end(struct Parrot_Interp *interpreter)
  * Returns TRUE if the condition was met.
  */
 char
-PDB_check_condition(struct Parrot_Interp *interpreter, 
+PDB_check_condition(struct Parrot_Interp *interpreter,
     PDB_condition_t *condition)
 {
     INTVAL i,j;
@@ -821,7 +821,7 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
             n = (STRING *)condition->value;
         else
             n = interpreter->ctx.string_reg.registers[*(int *)condition->value];
-        if (((condition->type & PDB_cond_gt) && 
+        if (((condition->type & PDB_cond_gt) &&
                 (string_compare(interpreter, m, n) > 0)) ||
             ((condition->type & PDB_cond_ge) &&
                 (string_compare(interpreter, m, n) >= 0)) ||
@@ -885,13 +885,13 @@ PDB_break(struct Parrot_Interp *interpreter)
                 (!PDB_check_condition(interpreter, breakpoint->condition)))
                     return 0;
 
-            /* Add the STOPPED state and stop */ 
+            /* Add the STOPPED state and stop */
             pdb->state |= PDB_STOPPED;
             return 1;
         }
         breakpoint = breakpoint->next;
     }
-        
+
     return 0;
 }
 
@@ -901,8 +901,11 @@ PDB_break(struct Parrot_Interp *interpreter)
 char *
 PDB_escape(const char *string, INTVAL length)
 {
-    const char *end = string + length;
+    const char *end;
     char *new,*fill;
+
+    length = length > 20 ? 20 : length;
+    end = string + length;
 
     /* Return if there is no string to escape*/
     if (!string || !*string)
@@ -1083,7 +1086,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
             snprintf(buf, sizeof(buf), "P" INTVAL_FMT, op[j]);
 #else
             /* XXX buffer overflow! */
-            sprintf(buf, "P" INTVAL_FMT, op[j]);  
+            sprintf(buf, "P" INTVAL_FMT, op[j]);
 #endif
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1118,7 +1121,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                     break;
                 case KEY_string_FLAG:
                     dest[size++] = '"';
-                    strcpy(&dest[size], 
+                    strcpy(&dest[size],
                            string_to_cstring(interpreter,k->cache.string_val));
                     size += string_length(k->cache.string_val);
                     dest[size++] = '"';
@@ -1227,11 +1230,11 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
 
     pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
     pline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
-    
+
     /* If we already got a source, free it */
     if (pdb->file)
         PDB_free_file(interpreter);
-        
+
     pfile->source = (char *)mem_sys_allocate(32768);
     pfile->line = pline;
     pline->number = 1;
@@ -1258,7 +1261,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
         newline->number = pline->number + 1;
         pline->next = newline;
         pline = newline;
-        pline->source_offset = pfile->size; 
+        pline->source_offset = pfile->size;
     }
 
     /* Add labels to the lines they belong to */
@@ -1331,7 +1334,7 @@ PDB_free_file(struct Parrot_Interp *interpreter)
         mem_sys_free(line);
         line = nline;
     }
- 
+
     /* while there is a label structure allocated, free it */
     while (label) {
         nlabel = label->next;
@@ -1343,16 +1346,16 @@ PDB_free_file(struct Parrot_Interp *interpreter)
     mem_sys_free(interpreter->pdb->file->source);
     /* Free the file structure */
     mem_sys_free(interpreter->pdb->file);
-        
+
 }
-    
+
 /* PDB_load_source
  * load a source code file
  */
 void
 PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
 {
-    FILE *file; 
+    FILE *file;
     char f[255], c;
     int i;
     unsigned long size = 0;
@@ -1361,7 +1364,7 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
     PDB_line_t *pline,*newline;
     opcode_t *pc = pdb->cur_opcode;
 
-    /* If there was a file already loaded or the bytecode was 
+    /* If there was a file already loaded or the bytecode was
        disassembled, free it */
     if (pdb->file)
         PDB_free_file(interpreter);
@@ -1381,7 +1384,7 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
 
     pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
     pline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
-    
+
     pfile->source = (char *)mem_sys_allocate(1024);
     pfile->line = pline;
     pline->number = 1;
@@ -1409,11 +1412,11 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
             newline->number = pline->number + 1;
             pline->next = newline;
             pline = newline;
-            pline->source_offset = pfile->size; 
+            pline->source_offset = pfile->size;
             pline->opcode = NULL;
             pline->label = NULL;
         }
-    }    
+    }
 
     pdb->state |= PDB_SRC_LOADED;
     pdb->file = pfile;
@@ -1423,7 +1426,7 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
  * return true if the line has an instruction
  * XXX TODO:
  *  1- This should take the line get an instruction, get
- *     the opcode for that instruction and check that is 
+ *     the opcode for that instruction and check that is
  *     the correct one.
  *  2- Decide what to do with macros if anything.
  */
@@ -1473,7 +1476,7 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
 
     i = 1;
     while (line->next) {
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"%li  ",pdb->file->list_line + i); 
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"%li  ",pdb->file->list_line + i);
         /* If it has a label print it */
         if (line->label)
             PIO_fprintf(interpreter, PIO_STDERR(interpreter),"L%li:\t",line->label->number);
@@ -1488,7 +1491,7 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
 
     if (--i != n)
         pdb->file->list_line = 0;
-    else 
+    else
         pdb->file->list_line += n;
 }
 
@@ -1507,7 +1510,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
     int op_number,i,k,l,j = 0;
 
     /* find_op needs a string with only the opcode name */
-    while (*command && !(isspace((int) *command))) 
+    while (*command && !(isspace((int) *command)))
         *(c++) = *(command++);
     *c = '\0';
     /* Find the opcode number */
@@ -1524,7 +1527,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
     /* handle the arguments */
     for (i = 1; i < op_info->arg_count; i++) {
         command = nextarg(command);
-        switch (op_info->types[i]) { 
+        switch (op_info->types[i]) {
             /* If it's a register skip the letter that
                presides the register number */
             case PARROT_ARG_I:
@@ -1539,7 +1542,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
                 k = PDB_extend_const_table(interpreter);
 
                 interpreter->code->const_table->constants[k]->type =PFC_NUMBER;
-                interpreter->code->const_table->constants[k]->number = 
+                interpreter->code->const_table->constants[k]->number =
                                                        (FLOATVAL)atof(command);
                 eval[j++] = (opcode_t)k;
                 break;
@@ -1586,7 +1589,7 @@ PDB_extend_const_table(struct Parrot_Interp *interpreter)
     /* Update the constant count and reallocate */
     k = ++interpreter->code->const_table->const_count;
     interpreter->code->const_table->constants =
-        mem_sys_realloc(interpreter->code->const_table->constants, 
+        mem_sys_realloc(interpreter->code->const_table->constants,
             k * sizeof(struct PackFile_Constant *));
 
     /* Allocate a new constant */
@@ -1653,7 +1656,7 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"There are only %li frames\n",i);
         return;
     }
-    
+
     PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Integer stack, frame %li, depth %li\n", i, depth);
 
     na(command);
@@ -1676,7 +1679,7 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"There are only %li frames\n",i);
         return;
     }
-    
+
     PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Float stack, frame %li, depth %li\n", i, depth);
 
     na(command);
@@ -1699,7 +1702,7 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"There are only %li frames\n",i);
         return;
     }
-    
+
     PIO_fprintf(interpreter, PIO_STDERR(interpreter),"String stack, frame %li, depth %li\n", i, depth);
 
     na(command);
@@ -1722,12 +1725,12 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"There are only %li frames\n",i);
         return;
     }
-    
+
     PIO_fprintf(interpreter, PIO_STDERR(interpreter),"PMC stack, frame %li, depth %li\n", i, depth);
 
     na(command);
     PDB_print_pmc(interpreter,&chunk->PReg[depth], atoi(command), NULL);
-} 
+}
 
 static void
 dump_string(struct Parrot_Interp *interpreter, STRING* s)
@@ -1755,7 +1758,7 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
     STRING *s;
 
     valid_chunk(chunk, command, depth, STACK_CHUNK_DEPTH, i);
-    
+
     entry = (Stack_Entry_t *)(chunk->buffer->bufstart) + depth;
 
     switch (entry->entry_type) {
@@ -1799,7 +1802,7 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
     unsigned long c = 0;
     PMC* key = NULL;
     int regnum = -1;
-  
+
     command = skip_ws(command);
     command = parse_command(command, &c);
     command = skip_ws(command);
@@ -1814,7 +1817,7 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
     if (*command == '[') {
         command = parse_key(interpreter, command, &key);
     }
- 
+
     switch (c) {
         case c_i:
         case c_int:
@@ -1910,7 +1913,7 @@ print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
             PIO_eprintf(interpreter, " [%S]\n", s);
         }
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Stringified: %PS\n", pmc);
-    } 
+    }
     else {
         PIO_eprintf(interpreter, "<null pmc>\n");
     }
@@ -1994,7 +1997,7 @@ List of commands:\n\
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
