@@ -18,7 +18,7 @@ endif
 
 syntax clear
 
-syn keyword imcType 		int float string
+syn keyword imcType 		int float string pmc object
 syn keyword imcPMC		Array Boolean Compiler Continuation Coroutine CSub
 syn keyword imcPMC 		Eval IntList Iterator Key ManagedStruct MultiArray
 syn keyword imcPMC		NCI PerlArray PerlHash PerlInt PerlNum PerlString
@@ -26,12 +26,14 @@ syn keyword imcPMC		PerlUndef Pointer Scratchpad Sub UnManagedStruct
 
 syn keyword imcOp		call goto if unless global clone addr
 
-syn match imcDirective      /\.\(sub\|end\|emit\|eom\)/
+syn match imcDirective      /\.\(sub\|pcc_sub\|end\|emit\|eom\)/
 syn match imcDirective      /\.\(local\|sym\|const\)/
 syn match imcDirective      /\.\(namespace\|endnamespace\)/
 syn match imcDirective      /\.\(param\|result\|arg\|return\)/
 syn match imcDirective      /\.\(include|pcc_begin|pcc_end\)/
-syn keyword imcDirective    non_prototyped prototyped
+syn match imcDirective      /\.\(pcc_begin_return|pcc_end_return\)/
+syn match imcDirective      /\.\(pcc_begin_yield|pcc_end_yield\)/
+syn keyword imcDirective    non_prototyped prototyped @LOAD @MAIN
 
 " imcWord before imcRegister
 " FIXME :: in identifiers and labels
@@ -75,4 +77,5 @@ endif
 
 let b:current_syntax = "imc"
 
+syn keyword imcOp newcont newclosure newcor
 " Ops -- dynamically generated from ops2vim.pl
