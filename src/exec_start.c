@@ -77,7 +77,9 @@ main(int argc, char **argv) {
     extern struct PackFile_Constant const_table;
     extern struct Parrot_Interp interpre;
 
+    /* s. exec.c */
     Parrot_exec_run = 1;
+    /* s. packfile.c (PackFile_ConstTable_unpack()) */
     exec_const_table = &const_table;
     interpreter = Parrot_new();
     if (!interpreter) {
@@ -98,6 +100,9 @@ main(int argc, char **argv) {
     Parrot_loadbc(interpreter, pf);
     setup_argv(interpreter, argc, argv);
 
+    /* opcode_map has the offset of each opcode in the compiled code
+     * this modifies it to be address of the opcode.
+     */
     opp = &opcode_map;
     for (i = 0; i < (int)interpre.code->cur_cs->base.size; i++) {
         opp[i] += (long)run_compiled;
