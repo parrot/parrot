@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 48;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -479,6 +479,37 @@ CODE
 ok 1
 OUTPUT
 
+# XXX - should test for appropriate warnings
+output_is(<<"CODE", <<OUTPUT, "add non-numeric string");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlString
+        set P0, "12"
+        new P1, .PerlString
+        set P1, "USC"
+        new P2, .PerlUndef
+        add P2, P0, P1
+        eq P2, 12, OK1
+        print "not "
+OK1:    print "ok 1\\n"
+        set P0, "12.5"
+        new P2, .PerlUndef
+        add P2, P0, P1
+        .fp_eq(P2, 12.5, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+        set P0, "Auburn"
+        new P2, .PerlUndef
+        add P2, P0, P1
+        eq P2, 0, OK3
+        print "not "
+OK3:    print "ok 3\\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
 output_is(<<'CODE', <<OUTPUT, "sub str_int, str_int");
 	new P0, .PerlString
 	set P0, "23"
@@ -554,6 +585,37 @@ EQ1:    print "ok 1\\n"
 	end
 CODE
 ok 1
+OUTPUT
+
+# XXX - should test for appropriate warnings
+output_is(<<"CODE", <<OUTPUT, "sub non-numeric string");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlString
+        set P0, "24"
+        new P1, .PerlString
+        set P1, "Oklahoma"
+        new P2, .PerlUndef
+        sub P2, P0, P1
+        eq P2, 24, OK1
+        print "not "
+OK1:    print "ok 1\\n"
+        set P0, "5.12"
+        new P2, .PerlUndef
+        sub P2, P0, P1
+        .fp_eq(P2, 5.12, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+        set P0, "Virginia Tech"
+        new P2, .PerlUndef
+        sub P2, P0, P1
+        eq P2, 0, OK3
+        print "not "
+OK3:    print "ok 3\\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concat must morph dest to a string");
