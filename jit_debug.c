@@ -11,6 +11,7 @@
  */
 
 #include <parrot/parrot.h>
+#include "parrot/exec.h"
 #include "parrot/jit.h"
 
 #define N_GSYM "32"     /* global variable */

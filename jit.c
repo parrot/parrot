@@ -6,6 +6,9 @@
 
 #include <parrot/parrot.h>
 #include <assert.h>
+#if PARROT_EXEC_CAPABLE
+#  include "parrot/exec.h"
+#endif
 #include "parrot/jit.h"
 #define JIT_EMIT 0
 #include "parrot/jit_emit.h"
@@ -781,14 +784,30 @@ optimize_imcc_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
 static char *
 reg_addr(struct Parrot_Interp * interpreter, int typ, int i)
 {
-    switch (typ) {
-        case 0:
-            return (char*)&interpreter->int_reg.registers[i];
-        case 3:
-            return (char*)&interpreter->num_reg.registers[i];
-        default:
-            return 0;   /* not currently */
-    }
+#ifdef I386
+    if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG))
+        switch (typ) {
+            case 0:
+                return (char*)
+                    (offsetof(struct Parrot_Interp, int_reg.registers)
+                        + sizeof(INTVAL) * i);
+            case 3:
+                return (char*)
+                    (offsetof(struct Parrot_Interp, num_reg.registers)
+                        + sizeof(FLOATVAL) * i);
+            default:
+                return 0;   /* not currently */
+        }
+    else
+#endif
+        switch (typ) {
+            case 0:
+                return (char*)&interpreter->int_reg.registers[i];
+            case 3:
+                return (char*)&interpreter->num_reg.registers[i];
+            default:
+                return 0;   /* not currently */
+        }
 }
 
 /* Load registers for the current section from parrot to
@@ -809,6 +828,10 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     maps[0] = jit_info->intval_map;
     maps[3] = jit_info->floatval_map;
 
+    if (jit_info->objfile) {
+        mov_f[0] = Parrot_exec_emit_mov_rm;
+        mov_f[3] = Parrot_exec_emit_mov_rm_n;
+    }
 
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ]) {
@@ -844,6 +867,11 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     char * maps[] = {0, 0, 0, 0};
     maps[0] = jit_info->intval_map;
     maps[3] = jit_info->floatval_map;
+
+    if (jit_info->objfile) {
+        mov_f[0] = Parrot_exec_emit_mov_mr;
+        mov_f[3] = Parrot_exec_emit_mov_mr_n;
+    }
 
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ])
@@ -899,7 +927,8 @@ Parrot_destroy_jit(void *ptr)
 
 jit_f
 build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
-          opcode_t *code_start, opcode_t *code_end)
+          opcode_t *code_start, opcode_t *code_end,
+          Parrot_exec_objfile_t *obj)
 {
     UINTVAL i;
     char *new_arena;
@@ -909,6 +938,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     struct PackFile_Segment *jit_seg;
     char *name;
     char *map;
+    Parrot_jit_fn_info_t *op_func;
 
 
     /* XXX assume, we restart */
@@ -919,6 +949,14 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     if (!interpreter->jit_info)
         jit_info = interpreter->jit_info =
             mem_sys_allocate(sizeof(Parrot_jit_info_t));
+
+    if (obj) {
+        op_func = op_exec;
+        jit_info->objfile = obj;
+    }
+    else
+        op_func = op_jit;
+
 
     name = malloc(strlen(interpreter->code->cur_cs->base.name) + 5);
     sprintf(name, "%s_JIT", interpreter->code->cur_cs->base.name);
@@ -953,6 +991,8 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         jit_info->arena.size = jit_info->arena.map_size * 10;
     jit_info->native_ptr = jit_info->arena.start =
         mem_sys_allocate_zeroed((size_t)jit_info->arena.size);
+    if (obj)
+        jit_info->objfile->text.code = jit_info->arena.start;
 #endif
 
     jit_info->op_i = 0;
@@ -1007,6 +1047,8 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
                 jit_info->native_ptr = new_arena +
                     (jit_info->native_ptr - jit_info->arena.start);
                 jit_info->arena.start = new_arena;
+                if (obj)
+                    obj->text.code = new_arena;
 #endif
             }
 
@@ -1029,7 +1071,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
             }
 
             /* Generate native code for current op */
-            (op_jit[cur_opcode_byte].fn) (jit_info, interpreter);
+            (op_func[cur_opcode_byte].fn) (jit_info, interpreter);
 
             /* Update the previous opcode */
             jit_info->prev_op = cur_op;
@@ -1075,17 +1117,20 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     Parrot_jit_dofixup(jit_info, interpreter);
 
     /* Convert offsets to pointers */
-    for (i = 0; i < jit_info->arena.map_size; i++) {
+    if (!obj)
+        for (i = 0; i < jit_info->arena.map_size; i++) {
 
-        /* Assuming native code chunks contain some initialization code,
-         * the first op (and every other op) is at an offset > 0
-         */
-        if (jit_info->arena.op_map[i].offset) {
-            jit_info->arena.op_map[i].ptr = (char *)jit_info->arena.start +
-                jit_info->arena.op_map[i].offset;
+            /* Assuming native code chunks contain some initialization code,
+             * the first op (and every other op) is at an offset > 0
+             */
+            if (jit_info->arena.op_map[i].offset) {
+                jit_info->arena.op_map[i].ptr = (char *)jit_info->arena.start +
+                    jit_info->arena.op_map[i].offset;
+            }
         }
-    }
 
+    jit_info->arena.size = 
+        (ptrdiff_t)(jit_info->native_ptr - jit_info->arena.start);
 #if JIT_DEBUG
     PIO_eprintf(interpreter, "\nTotal size %u bytes\n",
             (unsigned int)(jit_info->native_ptr - jit_info->arena.start));

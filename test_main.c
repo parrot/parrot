@@ -28,6 +28,7 @@ static struct longopt_opt_decl options[] = {
     { 'd', 'd', 0,       { "--debug" } },
     { 'h', 'h', 0,       { "--help" } },
     { 'j', 'j', 0,       { "--jit" } },
+    { 'o', 'o', 0,       { "--output-file" } },
     { 'p', 'p', 0,       { "--profile" } },
     { 'P', 'P', 0, { "--prederefrenced-core" } },
     { 'S', 'S', 0,       { "--switched-core" } },
@@ -106,6 +107,9 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             break;
         case 'j':
             setopt(PARROT_JIT_FLAG);
+            break;
+        case 'o':
+            setopt(PARROT_EXEC_FLAG);
             break;
         case 'p':
             setopt(PARROT_PROFILE_FLAG);

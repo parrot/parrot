@@ -10,7 +10,8 @@
 typedef void (*jit_f)(struct Parrot_Interp *interpreter, opcode_t *pc);
 
 jit_f build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
-                opcode_t *code_start, opcode_t *code_end);
+                opcode_t *code_start, opcode_t *code_end,
+                Parrot_exec_objfile_t *obj);
 
 void Parrot_destroy_jit(void *);
 
@@ -187,6 +188,11 @@ typedef struct {
     Parrot_jit_constant_pool_t      *constant_pool;
     char                            *intval_map;
     char                            *floatval_map;
+#  if EXEC_CAPABLE
+    Parrot_exec_objfile_t           *objfile;
+#  else
+    void                            *objfile;
+#  endif
 } Parrot_jit_info_t;
 
 #define Parrot_jit_fixup_target(jit_info, fixup) \
@@ -210,6 +216,7 @@ typedef struct {
 } Parrot_jit_fn_info_t;
 
 extern Parrot_jit_fn_info_t op_jit[];
+extern Parrot_jit_fn_info_t op_exec[];
 
 void Parrot_jit_newfixup(Parrot_jit_info_t *jit_info);
 
@@ -223,6 +230,12 @@ void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp *interpreter);
 
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
+                          struct Parrot_Interp *interpreter);
+
+void Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
+                        struct Parrot_Interp *interpreter);
+
+void Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp *interpreter);
 
 void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,

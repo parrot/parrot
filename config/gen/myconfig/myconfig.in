@@ -4,6 +4,7 @@ Summary of my parrot ${VERSION} configuration:
     osname=${osname}, archname=${archname}
     jitcapable=${jitcapable}, jitarchname=${jitarchname},
     jitosname=${jitosname}, jitcpuarch=${jitcpuarch}
+    execcapable=${execcapable}
     perl=${perl}
   Compiler:
     cc='${cc}', ccflags='${ccflags}',

@@ -165,7 +165,7 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
     }
 
     /* modrm disp32 */
-    if (!base && !(i && scale) && !emit_is8bit(disp)) {
+    if (!base && !(i && scale) && (!emit_is8bit(disp) || 1)) {
         *(pc++) = emit_Mod_b00 | reg_opcode | emit_rm_b101;
         *(long *)pc = disp;
         return pc + 4;
@@ -285,6 +285,12 @@ emit_shift_r_m(char *pc, int opcode, int reg,
 #  define emitm_pushl_i(pc, imm) { \
     *(pc++) = 0x68; \
     *(long *)pc = (long)imm; \
+    (pc) += 4; }
+
+#  define emitm_pushl_m(pc, mem) { \
+    *(pc++) = 0xff; \
+    *(pc++) = 0x35; \
+    *(long *)pc = (long)mem; \
     (pc) += 4; }
 
 static char *
@@ -1701,56 +1707,26 @@ emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp)
     emitm_jumpl(jit_info->native_ptr, 0xc0def00d);
 }
 
-void
-Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                   struct Parrot_Interp * interpreter)
-{
-    Parrot_jit_fixup_t *fixup, *next;
-    char *fixup_ptr;
-
-    fixup = jit_info->arena.fixups;
-
-    while (fixup) {
-        switch (fixup->type) {
-        /* This fixes-up a branch to a known opcode offset -
-           32-bit displacement only */
-            case JIT_X86BRANCH:
-                fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup) + 2;
-                *(long *)(fixup_ptr) =
-                    jit_info->arena.op_map[fixup->param.opcode].offset
-                        - (fixup->native_offset + 6) + fixup->skip;
-                break;
-            case JIT_X86JUMP:
-                fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup) + 1;
-                *(long *)(fixup_ptr) =
-                    jit_info->arena.op_map[fixup->param.opcode].offset
-                        - (fixup->native_offset + 5) + fixup->skip;
-                break;
-            case JIT_X86CALL:
-                fixup_ptr = jit_info->arena.start + fixup->native_offset + 1;
-                *(long *)(fixup_ptr) = (long)fixup->param.fptr -
-                    (long)fixup_ptr - 4;
-                break;
-            default:
-                internal_exception(JIT_ERROR, "Unknown fixup type:%d\n",
-                    fixup->type);
-            break;
-        }
-        next = fixup->next;
-        free(fixup);
-        fixup = next;
-    }
-    jit_info->arena.fixups = NULL;
-}
-
 static void
 Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
-    /* This calculates (INDEX into op_map * 4) */
-    emitm_subl_i_r(jit_info->native_ptr,interpreter->code->byte_code,emit_EAX);
-    /* This jumps to the address in op_map[EDX + sizeof(void *) * INDEX] */
-    jit_emit_mov_ri_i(jit_info->native_ptr, emit_EDX, jit_info->arena.op_map);
+    if (!jit_info->objfile) {
+        /* This calculates (INDEX into op_map * 4) */
+        emitm_subl_i_r(jit_info->native_ptr,
+            interpreter->code->byte_code,emit_EAX);
+        /* This jumps to the address in op_map[EDX + sizeof(void *) * INDEX] */
+        jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX,jit_info->arena.op_map);
+    }
+    else {
+        emitm_subl_i_r(jit_info->native_ptr, 0x0 ,emit_EAX);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_DATA, "program_code", -4);
+        jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX,
+            Parrot_exec_add_text_rellocation_reg(jit_info->objfile,
+                jit_info->native_ptr, "opcode_map", 0, 0));
+    }
+
     emitm_jumpm(jit_info->native_ptr, emit_EDX, emit_EAX,
                         sizeof(*jit_info->arena.op_map) / 4, 0);
 }
@@ -1766,81 +1742,6 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
 } while(0)
 
 static void call_func(Parrot_jit_info_t *jit_info, void *addr);
-
-
-#ifndef JIT_CGP
-void
-Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 struct Parrot_Interp * interpreter)
-{
-
-    /* the generated code gets called as:
-     * (jit_code)(interpreter, pc)
-     * jumping to pc is the same code as used in Parrot_jit_cpcf_op()
-     */
-
-    /* Maintain the stack frame pointer for the sake of gdb */
-    jit_emit_stack_frame_enter(jit_info->native_ptr);
-    /* stack:
-     * 12   pc
-     *  8   interpreter
-     *  4   retaddr
-     *  0   ebp <----- ebp
-     */
-
-    /* Save all callee-saved registers (cdecl)
-     */
-    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
-    emitm_pushl_r(jit_info->native_ptr, emit_ESI);
-    emitm_pushl_r(jit_info->native_ptr, emit_EDI);
-
-    /* Cheat on op function calls by writing the interpreter arg on the stack
-     * just once. If an op function ever modifies the interpreter argument on
-     * the stack this will stop working !!! */
-    emitm_pushl_i(jit_info->native_ptr, interpreter);
-
-    /* get the pc from stack:  mov 12(%ebp), %eax */
-    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 12);
-
-    /* jump to restart pos or first op */
-    Parrot_emit_jump_to_eax(jit_info, interpreter);
-}
-#endif
-
-
-void
-Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem,int reg)
-{
-    jit_emit_mov_mr_n(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
-}
-
-void
-Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
-{
-    jit_emit_mov_mr_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
-}
-
-void
-Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
-{
-    jit_emit_mov_rm_n(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
-}
-
-void
-Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
-{
-    jit_emit_mov_rm_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
-}
-
-static void
-Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
-{
-    jit_emit_finit(jit_info->native_ptr);
-}
 
 #  if !defined(INT_REG)
 #    define INT_REG(x) interpreter->int_reg.registers[x]
@@ -1883,6 +1784,14 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 #    undef Parrot_jit_vtable_unlessp_op
 #    undef Parrot_jit_vtable_newp_ic_op
 
+#define EXR(m, s) (int *)(offsetof(struct Parrot_Interp, m) + s)
+#define IREG(i) EXR(ctx.int_reg.registers, jit_info->cur_op[i] * sizeof(INTVAL))
+#define NREG(i) EXR(ctx.num_reg.registers, jit_info->cur_op[i] * sizeof(FLOATVAL))
+#define PREG(i) EXR(ctx.pmc_reg.registers, jit_info->cur_op[i] * sizeof(PMC *))
+#define SREG(i) EXR(ctx.string_reg.registers, jit_info->cur_op[i] * sizeof(STRING *))
+#define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 4)
+#define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \
+emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 /* emit a call to a vtable func
  * $X->vtable(interp, $X [, $Y...] )
  */
@@ -2272,8 +2181,170 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
         emitm_popl_r(jit_info->native_ptr, emit_EDX);
 }
 
+#  undef IREG
+#  undef NREG
+#  undef SREG
+#  undef PREG
+#  undef CALL
+
 #  endif /* NO_JIT_VTABLE_OPS */
 
+#  ifdef JIT_CGP
+#   define exec_emit_end(pc) { \
+      jit_emit_mov_ri_i(pc, emit_ESI, \
+        (int)((ptrcast_t)((op_func_t*)interpreter->op_lib->op_func_table) [0]) \
+          - (int)cgp_core); \
+      Parrot_exec_add_text_rellocation(jit_info->objfile, \
+        jit_info->native_ptr, RTYPE_COM, "cgp_core", -4); \
+      emitm_jumpr(pc, emit_ESI); \
+    }
+#   define jit_emit_end(pc) { \
+      jit_emit_mov_ri_i(pc, emit_ESI, \
+        (ptrcast_t)((op_func_t*)interpreter->op_lib->op_func_table) [0]); \
+      emitm_jumpr(pc, emit_ESI); \
+    }
+
+#  else /* JIT_CGP */
+
+#  define jit_emit_end(pc) { \
+    jit_emit_add_ri_i(pc, emit_ESP, 4); \
+    emitm_popl_r(pc, emit_EDI); \
+    emitm_popl_r(pc, emit_EBX); \
+    emitm_popl_r(pc, emit_ESI); \
+    emitm_popl_r(pc, emit_EBP); \
+    emitm_ret(pc); \
+}
+
+#  define exec_emit_end(pc) jit_emit_end(pc) 
+
+#  endif /* JIT_CGP */
+
+#endif /* JIT_EMIT */
+
+#if JIT_EMIT > 1
+
+void
+Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
+                   struct Parrot_Interp * interpreter)
+{
+    Parrot_jit_fixup_t *fixup, *next;
+    char *fixup_ptr;
+
+    fixup = jit_info->arena.fixups;
+
+    while (fixup) {
+        switch (fixup->type) {
+        /* This fixes-up a branch to a known opcode offset -
+           32-bit displacement only */
+            case JIT_X86BRANCH:
+                fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup) + 2;
+                *(long *)(fixup_ptr) =
+                    jit_info->arena.op_map[fixup->param.opcode].offset
+                        - (fixup->native_offset + 6) + fixup->skip;
+                break;
+            case JIT_X86JUMP:
+                fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup) + 1;
+                *(long *)(fixup_ptr) =
+                    jit_info->arena.op_map[fixup->param.opcode].offset
+                        - (fixup->native_offset + 5) + fixup->skip;
+                break;
+            case JIT_X86CALL:
+                fixup_ptr = jit_info->arena.start + fixup->native_offset + 1;
+                *(long *)(fixup_ptr) = (long)fixup->param.fptr -
+                    (long)fixup_ptr - 4;
+                break;
+            default:
+                internal_exception(JIT_ERROR, "Unknown fixup type:%d\n",
+                    fixup->type);
+            break;
+        }
+        next = fixup->next;
+        free(fixup);
+        fixup = next;
+    }
+    jit_info->arena.fixups = NULL;
+}
+
+#  ifndef JIT_CGP
+void
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
+                 struct Parrot_Interp * interpreter)
+{
+
+    /* the generated code gets called as:
+     * (jit_code)(interpreter, pc)
+     * jumping to pc is the same code as used in Parrot_jit_cpcf_op()
+     */
+
+    /* Maintain the stack frame pointer for the sake of gdb */
+    jit_emit_stack_frame_enter(jit_info->native_ptr);
+    /* stack:
+     * 12   pc
+     *  8   interpreter
+     *  4   retaddr
+     *  0   ebp <----- ebp
+     */
+
+    /* Save all callee-saved registers (cdecl)
+     */
+    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
+    emitm_pushl_r(jit_info->native_ptr, emit_ESI);
+    emitm_pushl_r(jit_info->native_ptr, emit_EDI);
+
+    /* Cheat on op function calls by writing the interpreter arg on the stack
+     * just once. If an op function ever modifies the interpreter argument on
+     * the stack this will stop working !!! */
+    if (!jit_info->objfile) {
+        emitm_pushl_i(jit_info->native_ptr, interpreter);
+    } 
+    else {
+        emitm_pushl_i(jit_info->native_ptr, 0x0);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+    }
+
+    /* get the pc from stack:  mov 12(%ebp), %eax */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 12);
+
+    /* jump to restart pos or first op */
+    Parrot_emit_jump_to_eax(jit_info, interpreter);
+}
+#  endif
+
+
+void
+Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem,int reg)
+{
+    jit_emit_mov_mr_n(
+        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
+}
+
+void
+Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
+{
+    jit_emit_mov_mr_i(
+        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
+}
+
+void
+Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
+{
+    jit_emit_mov_rm_n(
+        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
+}
+
+void
+Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
+{
+    jit_emit_mov_rm_i(
+        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
+}
+
+static void
+Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
+{
+    jit_emit_finit(jit_info->native_ptr);
+}
 #  ifdef JIT_CGP
 
 #include <parrot/oplib/core_ops_cgp.h>
@@ -2318,12 +2389,25 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     /* get the pc from stack:  mov 12(%ebp), %ebx */
     emitm_movl_m_r(jit_info->native_ptr, emit_EBX, emit_EBP, emit_None, 1, 12);
     /* emit cgp_core(1, interpreter) */
-    emitm_pushl_i(jit_info->native_ptr, interpreter);
+    if (!jit_info->objfile) {
+        emitm_pushl_i(jit_info->native_ptr, interpreter);
+    }
+    else {
+        emitm_pushl_i(jit_info->native_ptr, 0x0);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+    }
     emitm_pushl_i(jit_info->native_ptr, 1);
     /* use EAX as flag, when jumping back on init, EAX==1 */
     jit_emit_mov_ri_i(jit_info->native_ptr, emit_EAX, 1);
     /* TODO restart code */
-    call_func(jit_info, (void (*)(void))cgp_core);
+    if (!jit_info->objfile)
+        call_func(jit_info, (void (*)(void))cgp_core);
+    else {
+        Parrot_exec_add_text_rellocation_func(jit_info->objfile,
+            jit_info->native_ptr, "cgp_core");
+        emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
+    }
     /* when cur_opcode == 1, cgp_core jumps back here
      * when EAX == 0, the official return from HALT was called */
     jit_emit_test_r_i(jit_info->native_ptr, emit_EAX);
@@ -2407,21 +2491,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     }
 }
 
-#  define jit_emit_end(pc) { \
-    jit_emit_mov_ri_i(pc, emit_ESI, (ptrcast_t)((op_func_t*)interpreter->op_lib->op_func_table) [0]); \
-    emitm_jumpr(pc, emit_ESI); \
-}
-
-#  else
-
-#  define jit_emit_end(pc) { \
-    jit_emit_add_ri_i(pc, emit_ESP, 4); \
-    emitm_popl_r(pc, emit_EDI); \
-    emitm_popl_r(pc, emit_EBX); \
-    emitm_popl_r(pc, emit_ESI); \
-    emitm_popl_r(pc, emit_EBP); \
-    emitm_ret(pc); \
-}
+#  else /* JIT_CGP */
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -2434,7 +2504,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 }
 
-#  endif
+#endif /* JIT_CGP */
 
 static void Parrot_end_jit(Parrot_jit_info_t *, struct Parrot_Interp * );
 
@@ -2708,7 +2778,8 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     return (jit_f)D2FPTR(jit_info.arena.start);
 }
 
-#else /* JIT_EMIT */
+#endif /* JIT_EMIT */
+#if JIT_EMIT == 0
 #  define REQUIRES_CONSTANT_POOL 0
 #  define INT_REGISTERS_TO_MAP 5
 #  define FLOAT_REGISTERS_TO_MAP 4

@@ -18,6 +18,7 @@
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/runops_cores.h"
 #ifdef HAS_JIT
+#  include "parrot/exec.h"
 #  include "parrot/jit.h"
 #endif
 #ifdef HAVE_COMPUTED_GOTO
@@ -31,6 +32,8 @@
 #define PREDEREF_NORMAL         0
 #define PREDEREF_FOR_CGP        1
 #define PREDEREF_FOR_SWITCH     2
+
+struct Parrot_Interp interpre;
 
 static void setup_default_compreg(Parrot_Interp interpreter);
 
@@ -201,8 +204,13 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
     if (!interpreter->prederef_code) {
         size_t N = interpreter->code->cur_cs->base.size;
         size_t i;
+/* Parrot_memalign_if_possible in OpenBSD allocates 256 if you ask for 312 */
+#if 1
+        void **temp = (void **)mem_sys_allocate_zeroed(N * sizeof(void *));
+#else
         void **temp = (void **)Parrot_memalign_if_possible(256,
                 N * sizeof(void *));
+#endif
 
         for (i = 0; i < N; i++) {
             temp[i] = (void *)(ptrcast_t)prederef;
@@ -250,6 +258,153 @@ stop_prederef(struct Parrot_Interp *interpreter)
     (void) PARROT_CORE_PREDEREF_OPLIB_INIT(0);
 }
 
+static void **
+exec_prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
+{
+    size_t offset = pc_prederef - interpreter->prederef_code;
+    opcode_t *pc = ((opcode_t *)interpreter->code->byte_code) + offset;
+    op_info_t *opinfo = &interpreter->op_info_table[*pc];
+    op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
+    int i;
+
+    for (i = 0; i < opinfo->arg_count; i++) {
+        switch (opinfo->types[i]) {
+        case PARROT_ARG_OP:
+            if ((int)pc_prederef[i] == 1)
+                pc_prederef[i] = ((op_func_t*)interpreter->op_lib->op_func_table)[2];
+            else
+                pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[pc[i]];
+            break;
+
+        case PARROT_ARG_KI:
+        case PARROT_ARG_I:
+            pc_prederef[i] = (void *)&interpreter->int_reg.registers[pc[i]];
+            break;
+
+        case PARROT_ARG_N:
+            pc_prederef[i] = (void *)&interpreter->num_reg.registers[pc[i]];
+            break;
+
+        case PARROT_ARG_K:
+        case PARROT_ARG_P:
+            pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[pc[i]];
+            break;
+
+        case PARROT_ARG_S:
+            pc_prederef[i] =
+                (void *)&interpreter->string_reg.registers[pc[i]];
+            break;
+
+        case PARROT_ARG_KIC:
+        case PARROT_ARG_IC:
+            pc_prederef[i] = (void *)&pc[i];
+            break;
+
+        case PARROT_ARG_NC:
+            pc_prederef[i] = (void *)
+                &interpreter->code->const_table->constants[pc[i]]->u.number;
+            break;
+
+        case PARROT_ARG_PC:
+/*        pc_prederef[i] = (void *)
+                 &interpreter->code->const_table->constants[pc[i]]->pmc; */
+            internal_exception(ARG_OP_NOT_HANDLED,
+                               "PMC constants not yet supported!\n");
+            break;
+
+        case PARROT_ARG_SC:
+            pc_prederef[i] = (void *)
+                &interpreter->code->const_table->constants[pc[i]]->u.string;
+            break;
+
+        case PARROT_ARG_KC:
+            pc_prederef[i] = (void *)
+                &interpreter->code->const_table->constants[pc[i]]->u.key;
+            break;
+        default:
+            internal_exception(ARG_OP_NOT_HANDLED,
+                               "Unhandled argtype %d\n",opinfo->types[i]);
+            break;
+        }
+
+        if (pc_prederef[i] == 0) {
+            internal_exception(INTERP_ERROR,
+                    "Prederef generated a NULL pointer for arg of type %d!\n",
+                    opinfo->types[i]);
+        }
+    }
+
+    return pc_prederef;
+}
+
+/*=for api interpreter init_prederef
+ *
+ * interpreter->op_lib = prederefed oplib
+ *
+ * the "normal" op_lib has a copy in the interpreter structure
+ * - but get the op_code lookup function from standard core
+ *   prederef has no op_info_table
+ */
+void
+exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
+{
+    oplib_init_f init_func = PARROT_CORE_CGP_OPLIB_INIT;
+
+    interpreter->op_lib = init_func(1);
+    interpreter->op_lib->op_code = PARROT_CORE_OPLIB_INIT(1)->op_code;
+    if (interpreter->op_lib->op_count != interpreter->op_count)
+        internal_exception(PREDEREF_LOAD_ERROR,
+                "Illegal op count (%d) in prederef oplib\n",
+                (int)interpreter->op_lib->op_count);
+    if (!interpreter->prederef_code) {
+        size_t N = interpreter->code->cur_cs->base.size;
+        size_t i;
+        size_t n;
+        void **temp = prederef_arena;
+        opcode_t *pc = interpreter->code->cur_cs->base.data;
+
+        for (i = 0; i < N; i++)
+            if (temp[i])
+                temp[i] = (void *)1;
+            else
+                temp[i] = (void *)(ptrcast_t)exec_prederef;
+
+        interpreter->prederef_code = temp;
+        interpreter->code->cur_cs->prederef_code = temp;
+        for (i = 0; i < N; ) {
+            exec_prederef(temp, interpreter);
+            n = interpreter->op_info_table[*pc].arg_count;
+            pc += n;
+            i += n;
+            temp += n;
+        }
+    }
+}
+
+
+static opcode_t *
+runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+    opcode_t *code_start;
+    UINTVAL code_size;          /* in opcodes */
+    opcode_t *code_end;
+
+    code_start = interpreter->code->byte_code;
+    code_size = interpreter->code->cur_cs->base.size;
+    code_end = interpreter->code->byte_code + code_size;
+#  ifdef HAVE_COMPUTED_GOTO
+#    ifdef __GNUC__
+#      ifdef I386
+    init_prederef(interpreter, PREDEREF_FOR_CGP);
+#      endif
+#    endif
+#  endif
+
+    Parrot_exec(interpreter, pc, code_start, code_end);
+    return NULL;
+}
+
+
 static opcode_t *
 runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
@@ -270,7 +425,7 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 #    endif
 #  endif
 
-    jit_code = build_asm(interpreter, pc, code_start, code_end);
+    jit_code = build_asm(interpreter, pc, code_start, code_end, NULL);
     interpreter->code->cur_cs->jit_info = interpreter->jit_info;
     (jit_code) (interpreter, pc);
 #endif
@@ -400,6 +555,14 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
 #endif
             core = runops_jit;
         }
+        else if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG)) {
+#if !EXEC_CAPABLE
+            internal_exception(EXEC_UNAVAILABLE,
+                    "Error: PARROT_EXEC_FLAG is set, "
+                    "but interpreter is not EXEC_CAPABLE!\n");
+#endif
+            core = runops_exec;
+        }
         else if (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG)) {
             core = runops_cgoto_core;
             /* clear stacktop, it gets set in runops_cgoto_core beyond the
@@ -489,9 +652,13 @@ struct Parrot_Interp *
 make_interpreter(Interp_flags flags)
 {
     struct Parrot_Interp *interpreter;
+    extern int Parrot_exec_run;
 
     /* Get an empty interpreter from system memory */
-    interpreter = mem_sys_allocate_zeroed(sizeof(struct Parrot_Interp));
+    if (!Parrot_exec_run)
+        interpreter = mem_sys_allocate_zeroed(sizeof(struct Parrot_Interp));
+    else
+        interpreter = &interpre;
 
     /* must be set after if this is not the first interpreter */
     SET_NULL(interpreter->parent_interpreter);

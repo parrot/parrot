@@ -29,7 +29,8 @@ typedef enum {
     PARROT_GC_DEBUG_FLAG = 0x80,  /* We're debugging memory management */
     PARROT_EXTERN_CODE_FLAG = 0x100,    /* reusing anothers interps code */
     PARROT_SWITCH_FLAG   = 0x200, /* We're using the switched runops */
-    PARROT_DESTROY_FLAG  = 0x400  /* the last interpreter shall cleanup */
+    PARROT_DESTROY_FLAG  = 0x400, /* the last interpreter shall cleanup */
+    PARROT_EXEC_FLAG  = 0x800  /* We're emiting a native executable */
 } Parrot_Interp_flag;
 
 /* &end_gen */
@@ -233,6 +234,8 @@ VAR_SCOPE opcode_t *(*run_native)(struct Parrot_Interp * interpreter,
 void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func);
 INTVAL sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted);
 STRING *sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted);
+void exec_init_prederef(struct Parrot_Interp *interpreter,
+    void *prederef_arena);
 
 #endif   /* Parrot core */
 

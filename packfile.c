@@ -457,7 +457,6 @@ Returns one (1) if everything is OK, else zero (0).
 =cut
 
 ***************************************/
-
 opcode_t
 PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 opcode_t *packed, size_t packed_size)
@@ -1759,6 +1758,8 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
+struct PackFile_Constant *exec_const_table;
+
 opcode_t *
 PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
         struct PackFile_Segment *seg,
@@ -1767,6 +1768,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
     opcode_t i;
     struct PackFile_ConstTable *self = (struct PackFile_ConstTable *)seg;
     struct PackFile * pf = seg->pf;
+    extern int Parrot_exec_run;
 
     PackFile_ConstTable_clear(self);
 
@@ -1799,7 +1801,11 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
                 "PackFile_ConstTable_unpack(): Unpacking constant %ld\n", i);
 #endif
 
-        self->constants[i] = PackFile_Constant_new();
+        if (!Parrot_exec_run)
+            self->constants[i] = PackFile_Constant_new();
+        else
+            self->constants[i] = &exec_const_table[i];
+
         cursor = PackFile_Constant_unpack(interpreter, pf, self->constants[i],
                     cursor);
     }

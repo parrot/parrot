@@ -19,6 +19,7 @@
 #define PARROT_PATCH_VERSION    ${PATCH}
 #define PARROT_ARCHNAME        "${jitarchname}"
 #define PARROT_JIT_CAPABLE      ${jitcapable}
+#define PARROT_EXEC_CAPABLE     ${execcapable}
 #define PARROT_DLL_EXTENSION   "${so}"
 
 typedef ${iv}                   Parrot_Int;
@@ -96,6 +97,8 @@ typedef SYNC     Sync;
 #define JIT_OSNAME   "${jitosname}"
 #define JIT_ARCHNAME "${jitarchname}"
 #define JIT_CAPABLE  ${jitcapable}
+#define EXEC_CAPABLE ${execcapable}
+#define EXEC_OS      ${execos}
 
 /*
  * Switches to turn on/off new code so people can compile

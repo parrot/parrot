@@ -323,12 +323,10 @@ Parrot_div_n_nc {
 
 TEMPLATE Parrot_binop_i_ic_ic {
     if (MAP[1]) {
-        jit_emit_mov_ri_i(NATIVECODE, MAP[1],
-        (INTVAL)((uicast)*INT_CONST[2] <op> *INT_CONST[3]));
+        jit_emit_mov_ri_i(NATIVECODE, MAP[1], (INTVAL)((uicast)*INT_CONST[2] <op> *INT_CONST[3]));
     }
     else {
-        jit_emit_mov_mi_i(NATIVECODE, &INT_REG[1],
-        (INTVAL)((uicast)*INT_CONST[2] <op> *INT_CONST[3]));
+        jit_emit_mov_mi_i(NATIVECODE, &INT_REG[1], (INTVAL)((uicast)*INT_CONST[2] <op> *INT_CONST[3]));
     }
 }
 Parrot_mul_i_ic_ic {

@@ -42,6 +42,7 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define ARG_OP_NOT_HANDLED 1
 #define KEY_NOT_FOUND 1
 #define JIT_UNAVAILABLE 1
+#define EXEC_UNAVAILABLE 1
 #define INTERP_ERROR 1
 #define PREDEREF_LOAD_ERROR 1
 #define PARROT_USAGE_ERROR 1

@@ -207,8 +207,12 @@ foreach my $op ($ops->ops) {
 	case $index:	$comment
 END_C
     }
+    elsif ($suffix eq '') {
+        $definition = "$opsarraytype * $func_name ($args);\n";
+        $definition .= "$opsarraytype *\n$func_name ($args)";
+    }
     else {
-	$definition = "static $opsarraytype *\n$func_name ($args)";
+        $definition = "static $opsarraytype *\n$func_name ($args)";
     }
     my $source     = $op->source($trans);
 

@@ -31,6 +31,7 @@ for(@$Parrot::OpLib::core::ops) {
 }
 
 my $cpuarch = shift @ARGV;
+my $genfile = shift @ARGV;
 
 my ($i,$j,$k,$n);
 
@@ -40,6 +41,46 @@ my ($asm, $precompiled);
 
 my %core_ops;
 my %templates;
+
+my @jit_funcs;
+my $func_end;
+my $normal_op;
+my $cpcf_op;
+my %argmaps;
+my $jit_cpu;
+
+if ($genfile eq "jit_cpu.c") {
+    $jit_cpu = 1;
+    push @jit_funcs, "Parrot_jit_fn_info_t op_jit[$core_numops] = {\n";
+    $func_end = "_jit";
+    $normal_op = "Parrot_jit_normal_op";
+    $cpcf_op = "Parrot_jit_cpcf_op";
+    %argmaps = %Parrot::OpTrans::C::arg_maps;
+}
+else {
+    $jit_cpu = ($cpuarch eq 'i386') ? 0 : 1;
+    push @jit_funcs, "Parrot_jit_fn_info_t op_exec[$core_numops] = {\n";
+    $func_end = "_exec";
+    $normal_op = "Parrot_exec_normal_op";
+    $cpcf_op = "Parrot_exec_cpcf_op";
+    %argmaps = (
+        'op' => "cur_opcode[%ld]",
+
+        'i'  => "IREG(%ld)",
+        'n'  => "NREG(%ld)",
+        'p'  => "PREG(%ld)",
+        's'  => "SREG(%ld)",
+        'k'  => "PREG(%ld)",
+        'ki' => "IREG(%ld)",
+
+        'ic' => "cur_opcode[%ld]",
+        'nc' => "CONST(%ld)",
+        'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
+        'sc' => "CONST(%ld)",
+        'kc' => "CONST(%ld)",
+        'kic' => "cur_opcode[%ld]"
+    );
+}
 
 sub readjit($) {
     my $file = shift;
@@ -103,9 +144,30 @@ sub readjit($) {
             $asm =~ s/CUR_OPCODE/jit_info->cur_op/g;
             $asm =~ s/cur_opcode/jit_info->cur_op/g;
             $asm =~ s/MAP\[(\d)\]/MAP($1)/g;
+            unless ($jit_cpu) {
+                $asm =~ s/&([INSP])REG/$1REG/g;
+                $asm =~ s/&CONST/CONST/g;
+                $asm =~ s/call_func\(\s*jit_info\s*,\s*\(void\*\)\s*(.*)\)/CALL("$1")/g;
+                $asm =~ s/interpreter/Parrot_exec_add_text_rellocation_reg(jit_info->objfile, jit_info->native_ptr, "interpre", 0, 0)/g;
+                $asm =~ s/\)->u\.(\w+)/)/g;
+                foreach my $op (qw(jit_emit_mov_ri_ni jit_emit_mov_rm_n jit_emit_mov_ri_n jit_emit_mov_mi_ni)) {
+                    $asm =~ s/(\n[^\n]*$op[^\n]*CONST[^\n]*)\n/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "const_table", -6);\n/g;
+                }
+                $asm =~ s/([^\n]*CONST[^\n]*)\n[^\t]/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "const_table", -4);\n/g;
+                $asm =~ s/jit_emit_end/exec_emit_end/;
+            }
             $asm =~ s/PUSH_MAPPED_REG\((\d)\)/Parrot_jit_push_registers(jit_info,$1)/g;
             $ops{$function} = [ $asm , $extern ];
             $function = undef;
+        }
+        unless ($jit_cpu) {
+            my $disp = -4;
+            if ($line =~ /jit_emit_mov_ri_ni/ || $line =~ /jit_emit_mov_rm_n/ || $line =~ /jit_emit_mov_ri_n/ || $line =~ /jit_emit_mov_mi_ni/) {
+                $disp -= 2 
+            }
+            $line =~ s/(.*[TGC]_REG[^\\]*(\\?))/$1\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "interpre", $disp);$2\n/g;
+            $line =~ s/(.*[INSP]REG[^\\]*(\\?))/$1\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "interpre", $disp);$2/g;
+            $line =~ s/emitm_pushl_i/emitm_pushl_m/ if ($line =~ /string/);
         }
         $asm .= $line;
     }
@@ -129,7 +191,9 @@ sub vtable_num($) {
     die("vtable not found for $meth\n");
 }
 
-open JITCPU, ">$ARGV[0]" or die;
+my $jit_emit_n = ($genfile eq "jit_cpu.c") ? 2 : 1;
+
+open JITCPU, ">$genfile" or die;
 
 print JITCPU<<END_C;
 /*
@@ -143,8 +207,10 @@ print JITCPU<<END_C;
  */
 
 #include<parrot/parrot.h>
+#include<parrot/oplib/core_ops_cgp.h>
+#include"parrot/exec.h"
 #include"parrot/jit.h"
-#define JIT_EMIT 1
+#define JIT_EMIT $jit_emit_n
 
 /*
  *define default jit_funcs, if architecture doesn't have these optimizations
@@ -173,23 +239,36 @@ print JITCPU<<END_C;
 #include"parrot/jit_emit.h"
 
 #undef CONST
-#define IREG(i) interpreter->int_reg.registers[jit_info->cur_op[i]]
-#define NREG(i) interpreter->num_reg.registers[jit_info->cur_op[i]]
-#define PREG(i) interpreter->pmc_reg.registers[jit_info->cur_op[i]]
-#define SREG(i) interpreter->string_reg.registers[jit_info->cur_op[i]]
-#define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
 #ifndef MAP
 # define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
 #endif
 END_C
 
+if ($jit_cpu) {
+    print JITCPU<<END_C;
+#define IREG(i) interpreter->int_reg.registers[jit_info->cur_op[i]]
+#define NREG(i) interpreter->num_reg.registers[jit_info->cur_op[i]]
+#define PREG(i) interpreter->pmc_reg.registers[jit_info->cur_op[i]]
+#define SREG(i) interpreter->string_reg.registers[jit_info->cur_op[i]]
+#define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
+END_C
+}
+else {
+    print JITCPU<<END_C;
+#define EXR(m, s) (int *)(offsetof(struct Parrot_Interp, m) + s)
+#define IREG(i) EXR(int_reg.registers, jit_info->cur_op[i] * sizeof(INTVAL))
+#define NREG(i) EXR(num_reg.registers, jit_info->cur_op[i] * sizeof(FLOATVAL))
+#define PREG(i) EXR(pmc_reg.registers, jit_info->cur_op[i] * sizeof(PMC *))
+#define SREG(i) EXR(string_reg.registers, jit_info->cur_op[i] * sizeof(STRING *))
+#define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 4)
+#define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \\
+    emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
+END_C
+}
 
 %core_ops = readjit("jit/$cpuarch/core.jit");
 
 print JITCPU $header if ($header);
-
-my @jit_funcs;
-push @jit_funcs, "Parrot_jit_fn_info_t op_jit[$core_numops] = {\n";
 
 my $njit = scalar keys(%core_ops);
 
@@ -336,18 +415,18 @@ for ($i = 0; $i < $core_numops; $i++) {
 	    $jit_func = "Parrot_jit_restart_op";
         }
 	elsif ($op->jump) {
-	    $jit_func = "Parrot_jit_cpcf_op";
+	    $jit_func = $cpcf_op;
 	} else {
-	    $jit_func = "Parrot_jit_normal_op";
+	    $jit_func = $normal_op;
 	}
     }
     else
     {
-        $jit_func = "$core_opfunc[$i]_jit";
+        $jit_func = "$core_opfunc[$i]$func_end";
     }
 
     unless($precompiled){
-    print JITCPU "\nstatic $jit_fn_retn " . $core_opfunc[$i] . "_jit" . $jit_fn_params . "{\n$body}\n";
+    print JITCPU "\nstatic $jit_fn_retn " . $core_opfunc[$i] . $func_end . $jit_fn_params . "{\n$body}\n";
     }
     push @jit_funcs, "{ $jit_func, $extern }, \t" .
 	    "/* op $i: $core_opfunc[$i] */\n";
@@ -358,5 +437,5 @@ print JITCPU @jit_funcs, "};\n";
 print("jit2h: $njit (+ $vjit vtable) of $core_numops ops are JITed.\n");
 sub make_subs {
     my ($ptr, $type, $index) = @_;
-    return(($ptr eq '&' ? '&' : '') . sprintf($Parrot::OpTrans::C::arg_maps{$type_to_arg{$type}}, $index));
+    return(($ptr eq '&' ? '&' : '') . sprintf($argmaps{$type_to_arg{$type}}, $index));
 }
