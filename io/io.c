@@ -428,42 +428,54 @@ PIO_parse_open_flags(const char *flagstr)
     s = flagstr;
     /* Set mode flags - <, >, >>, +<, +> */
     switch (*s++) {
-    case '+':
-        flags |= (PIO_F_WRITE | PIO_F_READ);
-        switch (*s++) {
+        case '+':
+            flags |= (PIO_F_WRITE | PIO_F_READ);
+            switch (*s++) {
+                case '<':
+                    break;
+                case '>':
+                    flags |= PIO_F_TRUNC;
+                    break;
+                default:
+                    return 0;
+            }
+            break;
         case '<':
+            flags |= PIO_F_READ;
             break;
         case '>':
-            flags |= PIO_F_TRUNC;
+            flags |= PIO_F_WRITE;
+            if (*s == '>') {
+                flags |= PIO_F_APPEND;
+                s++;
+            }
+            else {
+                flags |= PIO_F_TRUNC;
+            }
+            break;
+        case '-':       /* -| read from pipe */
+            if (*s == '|') {
+                flags |= PIO_F_PIPE | PIO_F_READ;
+                s++;
+            }
+            break;
+        case '|':       /* |- write to pipe */
+            if (*s == '-') {
+                flags |= PIO_F_PIPE | PIO_F_WRITE;
+                s++;
+            }
             break;
         default:
             return 0;
-        }
-        break;
-    case '<':
-        flags |= PIO_F_READ;
-        break;
-    case '>':
-        flags |= PIO_F_WRITE;
-        if (*s == '>') {
-            flags |= PIO_F_APPEND;
-            s++;
-        }
-        else {
-            flags |= PIO_F_TRUNC;
-        }
-        break;
-    default:
-        return 0;
     }
 
     /* TODO: add ? and ! for block/non-block */
     switch (*s++) {
-    case '\0':
-        /* No extra arguments */
-        break;
-    default:
-        return 0;
+        case '\0':
+            /* No extra arguments */
+            break;
+        default:
+            return 0;
     }
 
     return flags;

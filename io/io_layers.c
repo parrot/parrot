@@ -210,6 +210,7 @@ PIO_pop_layer(theINTERP, PMC *pmc)
         layer = io->stack;
         if (layer) {
             io->stack = layer->down;
+            PMC_struct_val(pmc) = io->stack;
             io->stack->up = 0;
             layer->up = 0;
             layer->down = 0;

@@ -64,6 +64,8 @@ static PIOOFF_T  PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 static INTVAL    PIO_unix_isatty(PIOHANDLE fd);
+static ParrotIO * PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char*cmd, int flags);
+
 
 
 /*
@@ -165,6 +167,9 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
 
     type = PIO_TYPE_FILE;
     mode = DEFAULT_OPEN_MODE;
+
+    if (flags & PIO_F_PIPE)
+        return PIO_unix_pipe(interpreter, layer, spath, flags);
 
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
         return NULL;
@@ -1008,6 +1013,7 @@ AGAIN:
     }
 }
 
+#endif
 /*
 
 =item C<static ParrotIO *
@@ -1021,55 +1027,89 @@ XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
 
 */
 
+
+
 static ParrotIO *
-PIO_unix_pipe(theINTERP, ParrotIOLayer *l, STRING *cmd, int flags)
+PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char *cmd, int flags)
 {
 #if defined (linux) || defined (solaris)
     ParrotIO *io;
     int pid, err, fds[2];
-    char *ccmd;
 
     UNUSED(interpreter);
     UNUSED(l);
     UNUSED(flags);
 
     if ((err = pipe(fds)) < 0) {
-        perror("pipe:");
+        perror("pipe");
         return NULL;
     }
 
     /* Parent - return IO stream */
     if ((pid = fork()) > 0) {
-        io = PIO_new(interpreter, PIO_F_PIPE, 0, PIO_F_READ|PIO_F_WRITE);
-        io->fd = fds[0];
-        io->fd2 = fds[1];
+        io = PIO_new(interpreter, PIO_F_PIPE, 0,
+                flags & (PIO_F_READ|PIO_F_WRITE));
+        if (flags & PIO_F_READ) {
+            /* close this writer's end of pipe */
+            close(fds[1]);
+            io->fd = fds[0];
+            io->fd2 = 0;
+        }
+        else {  /* assume write only for now */
+            /* close this reader's end */
+            close(fds[0]);
+            io->fd = fds[1];
+            io->fd2 = 0;
+        }
         return io;
     }
 
     /* Child - exec process */
     if (pid == 0) {
-        close(STDIN_FILENO);
-        close(STDOUT_FILENO);
-        close(STDERR_FILENO);
-        if ( dup(fds[0]) != STDIN_FILENO || dup(fds[1]) != STDOUT_FILENO
-               || dup(fds[1]) != STDERR_FILENO )
-        {
-            exit(0);
-        }
-        ccmd = string_to_cstring(interpreter, cmd);
+        char *argv[10], *p, *c;
+        int n;
 
-        execl(ccmd, ccmd, (char*)0);
+        if (flags & PIO_F_WRITE) {
+            /* the other end is writing - we read from the pipe */
+            close(STDIN_FILENO);
+            close(fds[1]);
+            if ( dup(fds[0]) != STDIN_FILENO) {
+                exit(0);
+            }
+        }
+        else {
+            /* XXX redirect stdout, stderr to pipe */
+            close(STDIN_FILENO);
+            close(STDOUT_FILENO);
+            close(STDERR_FILENO);
+            if ( dup(fds[0]) != STDIN_FILENO || dup(fds[1]) != STDOUT_FILENO
+                    || dup(fds[1]) != STDERR_FILENO )
+            {
+                exit(0);
+            }
+        }
+        /*
+         * XXX ugly hack to be able to pass some arguments
+         *     split cmd at blanks
+         */
+        c = strdup(cmd);
+        for (n = 0, p = strtok(c, " "); n < 9 && p; p = strtok(NULL, " ")) {
+            if (n == 0)
+                cmd = p;
+            argv[n++] = p;
+        }
+        argv[n] = NULL;
+        execv(cmd, argv);       /* XXX use execvp ? */
         /* Will never reach this unless exec fails. */
-        perror("execvp:");
-        return NULL;
+        perror("execvp");
+        exit(1);
     }
 
-    perror("fork:");
+    perror("fork");
 #endif
     return NULL;
 }
 
-#endif
 
 
 

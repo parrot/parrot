@@ -443,6 +443,8 @@ examples/io/echo_client.imc                       [main]doc
 examples/io/http.imc                              [main]doc
 examples/io/net_smtp.pasm                         [main]doc
 examples/io/pioctl.pasm                           [main]doc
+examples/io/pipe2.imc                             [main]doc
+examples/io/pipe3.imc                             [main]doc
 examples/japh/README                              [main]doc
 examples/japh/japh1.pasm                          [main]doc
 examples/japh/japh10.pasm                         [main]doc
