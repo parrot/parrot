@@ -77,9 +77,12 @@ bigint_get_long(Interp *interpreter, PMC *self) {
 
 static int
 bigint_get_bool(Interp *interpreter, PMC *self) {
-    if (mpz_fits_slong_p(BN(self)))
-        return mpz_get_si(BN(self)) != 0;
-    return 0;
+    if (mpz_sgn(BN(self)) != 0) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 static char *
 bigint_get_string(Interp *interpreter, PMC *self, int base) {
