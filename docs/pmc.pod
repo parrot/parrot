@@ -1,0 +1,115 @@
+=head1 TITLE
+
+docs/pmc.pod - PMC (PMC Makers Compendium)
+
+=head1 PMC Structure Items Access
+
+Don't use PMC structure items directly, always use the macros, which are
+defined in F<include/parrot/pobj.h>.
+
+=head1 PMC Storage
+
+The PMC structure contains two places of data storage: the B<union UnionVal>
+and the B<PMC_data> pointer.
+
+=head2 Storage memory washing
+
+During PMC recycling the B<UnionVal> data members are B<not> cleared.
+B<PMC_data> or B<pmc_ext> is set to NULL. The flags are set to their default
+value, especially the private flags are 0.
+
+=head2 UnionVal usage
+
+There are no special rules, where to store what: use whatever fits best. If
+your PMC points to a B<STRING *>, hang it off the B<PMC_str_val()>, if it's an
+B<INTVAL>, place it in B<PMC_int_val()>. If you need to store two items, try
+to use union members that have distinct storage like B<PObj_bustart()> /
+B<PObj_buf_len()> or B<PMC_struct_val()> / B<PMC_pmc_val()> in parallel with
+B<PMC_num_val()>.
+
+=head2 PMC_data()
+
+If your PMC contains other PMCs that possibly would allow the creation of
+self-referential or arbitrary deeply nested containers, you have to allocate
+the B<PMC_EXT> structure by specifying the B<need_ext> flag on the B<pmclass>
+definition line. The B<PMC_data()> pointer is currently located in the
+B<PMC_EXT> structure too. Using B<PMC_data()> therefore adds one more
+indirection to access these data.
+
+=head1 PMC flags
+
+Each PMC has 8 private flags B<PObj_private0_FLAG> -  B<PObj_private7_FLAG>,
+which can be used for storing 8 bits.
+
+=head1 PMCs and DOD
+
+=head2 Overview
+
+The DOD system doesn't make any assumptions about your PMC's layout. Whenever
+a PMC is found in the root set, B<pobject_lives()> is called with that PMC.
+The PMC is responsible to mark all contained or referenced active Parrot
+objects (Buffers or other PMCs).
+
+=head2 DOD related flags
+
+=over 4
+
+=item PObj_is_buffer_ptr_FLAG
+
+=item PObj_is_PMC_ptr_FLAG
+
+B<PMC_data> points to a B<PObj> object. This PMC or Buffer gets marked
+automatically. (Since the unification of PMCs and Buffers, these two flags
+are the same).
+
+=item PObj_is_buffer_of_PMCs_ptr_FLAG
+
+B<PMC_data> points to a buffer holding an array of B<PObj*>s.
+
+=item PObj_custom_mark_FLAG
+
+If your PMC refers to any Parrot objects and above standard flags don't cover
+this usage, a custom B<mark> vtable has to be implemented, which has to call
+B<pobject_lives()> for all contained B<PObj>s.
+
+=back
+
+=head1 PMCs and System Resources
+
+Whenever a PMC B<malloc()>s system memory or opens a file or a database
+connection, it has to take care of freeing or closing these system resources.
+
+=head2 Flags for PMC destruction
+
+=over 4
+
+=item PObj_active_destroy_FLAG
+
+The PMC's B<destroy> vtable is called, when this PMC is found to be dead
+during DOD.
+
+=item PObj_needs_early_DOD_FLAG
+
+Set this flag too, if the PMC needs timely destruction, e.g. to close a file
+handle at the end of a block scope, if the PMC isn't alive any more.
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/pobj.h>, F<src/dod.c>, F<docs/pdds/pdd02_vtables.pod>
+
+=head1 AUTHOR
+
+Leopold Toetsch E<lt>lt@toetsch.atE<gt>
+
+=head1 VERSION
+
+=over 4
+
+=item 0.1
+
+2004.06.14 - Initial
+
+=back
+
