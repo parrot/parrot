@@ -10,16 +10,11 @@ RM_F = ${rm_f}
 DIR=languages/jako
 TOOL_DIR=../..
 ASM=$(PERL) -I ../../lib ../../assemble.pl
+IMCC=imcc
 JAKOC=$(PERL) jakoc
 INTERP=../../${test_prog}
 
-.SUFFIXES: .jako .pasm .pbc
-
-.jako.pasm:
-	$(JAKOC) $< > $@
-
-.pasm.pbc:
-	$(ASM) $< > $@
+.SUFFIXES: .jako .imc .pasm .pbc
 
 
 #
@@ -34,23 +29,56 @@ mandelbrot.pbc mandelzoom.pbc mops.pbc primes.pbc queens.pbc sub.pbc
 # Compilation:
 #
 
-bench.pasm: bench.jako jakoc
-euclid.pasm: euclid.jako jakoc
-fact.pasm: fact.jako jakoc
-fib.pasm: fib.jako jakoc
-hello.pasm: hello.jako jakoc
-leibniz.pasm: leibniz.jako jakoc
-mandelbrot.pasm: mandelbrot.jako jakoc
-mandelzoom.pasm: mandelzoom.jako jakoc
-mops.pasm: mops.jako jakoc
-primes.pasm: primes.jako jakoc
-queens.pasm: queens.jako jakoc
-sub.pasm: sub.jako jakoc
+.jako.imc:
+	$(JAKOC) $< > $@ || (rm -f $@ && false)
+
+bench.imc: bench.jako jakoc
+euclid.imc: euclid.jako jakoc
+fact.imc: fact.jako jakoc
+fib.imc: fib.jako jakoc
+hello.imc: hello.jako jakoc
+leibniz.imc: leibniz.jako jakoc
+mandelbrot.imc: mandelbrot.jako jakoc
+mandelzoom.imc: mandelzoom.jako jakoc
+mops.imc: mops.jako jakoc
+primes.imc: primes.jako jakoc
+queens.imc: queens.jako jakoc
+sub.imc: sub.jako jakoc
+
+
+#
+# Intermediate Compilation:
+#
+
+.imc.pasm:
+	$(IMCC) -o $@ $< || (rm -f $@ && false)
+
+../imcc/imcc:
+	@cd ../imcc make
+
+imcc: ../imcc/imcc
+	ln -s ../imcc/imcc imcc
+
+bench.pasm: bench.imc imcc
+euclid.pasm: euclid.imc imcc
+fact.pasm: fact.imc imcc
+fib.pasm: fib.imc imcc
+hello.pasm: hello.imc imcc
+leibniz.pasm: leibniz.imc imcc
+mandelbrot.pasm: mandelbrot.imc imcc
+mandelzoom.pasm: mandelzoom.imc imcc
+mops.pasm: mops.imc imcc
+primes.pasm: primes.imc imcc
+queens.pasm: queens.imc imcc
+sub.pasm: sub.imc imcc
 
 
 #
 # Assembly:
 #
+
+.pasm.pbc:
+	$(ASM) $< > $@
 
 bench.pbc: bench.pasm
 euclid.pbc: euclid.pasm
@@ -71,7 +99,7 @@ sub.pbc: sub.pasm
 #
 
 clean:
-	$(RM_F) *.pasm *.list *.pbc
+	$(RM_F) imcc *.imc *.pasm *.list *.pbc
 
 over:
 	@$(MAKE) clean

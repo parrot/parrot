@@ -1,4 +1,7 @@
+*.imc
+*.list
 *.pasm
 *.pbc
 *.tmp
+imcc
 Makefile

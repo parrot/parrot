@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w
+#!/usr/bin/perl -w
 #
 # compile.pl - compile a Jako source file Parrot assembly file.
 #
@@ -49,6 +49,8 @@ my %types = (
  'S' => 'str',
 );
 
+
+my $anon_block_count = 0;
 
 ###############################################################################
 ###############################################################################
@@ -377,7 +379,7 @@ sub emit_code
   #
 
   if (defined $args and @$args) {
-    printf " %-25s", join(", ", @$args);
+    printf " %-25s", join(", ", map { s/^\$//; $_ } @$args);
   } else {
     printf " %-25s", '';
   }
@@ -408,11 +410,12 @@ sub emit_code
 ###############################################################################
 ###############################################################################
 
+
 #
-# int_q()
+# int_lit_q()
 #
 
-sub int_q
+sub int_lit_q
 {
   my ($value) = @_;
   return $value =~ m/^-?\d+$/;
@@ -420,10 +423,10 @@ sub int_q
 
 
 #
-# num_q()
+# num_lit_q()
 #
 
-sub num_q
+sub num_lit_q
 {
   my ($value) = @_;
   return $value =~ m/^-?\d+\.\d+$/;
@@ -431,36 +434,35 @@ sub num_q
 
 
 #
-# int_or_num_q()
+# int_or_num_lit_q()
 #
 
-sub int_or_num_q
+sub int_or_num_lit_q
 {
   my ($value) = @_;
-  return $value =~ m/^-?\d+(\.\d+)?$/;
+  return int_lit_q($value) || num_lit_q($value);
 }
 
 
 #
-# str_q()
+# str_lit_q()
 #
 
-sub str_q
+sub str_lit_q
 {
   my ($value) = @_;
   return $value =~ m/^"/;
 }
 
 
-
 #
-# reg_q()
+# lit_q()
 #
 
-sub reg_q
+sub lit_q
 {
   my ($value) = @_;
-  return $value =~ m/^[INPS]\d+$/;
+  return str_lit_q($value) || int_lit_q($value) || num_lit_q($value);
 }
 
 
@@ -508,6 +510,75 @@ sub str_reg_q
 }
 
 
+#
+# reg_q()
+#
+
+sub reg_q
+{
+  my ($value) = @_;
+  return $value =~ m/^[INPS]\d+$/;
+}
+
+
+#
+# var_q()
+#
+
+sub var_q
+{
+  my ($value) = @_;
+  return $value =~ m/^\$/;
+}
+
+
+
+#
+# class_of()
+#
+
+sub class_of
+{
+  my $value = shift;
+
+  return 'reg' if reg_q($value);
+  return 'var' if var_q($value);
+  return 'lit' if lit_q($value);
+
+  confess "Cannot determine class of '$value'!";
+}
+
+
+#
+# type_of()
+#
+
+sub type_of
+{
+  my $value = shift;
+
+  return substr($value, 0, 1) if reg_q($value);
+
+  return 'S' if str_lit_q($value);
+  return 'N' if num_lit_q($value);
+  return 'I' if int_lit_q($value);
+
+  if ($value =~ m/^\$/) {
+    my $ident = find_ident(substr($value, 1, ));
+    confess "Cannot find identifier '$value' to determine type!" unless defined $ident;
+    return $ident->{IDENT}{TYPE};
+  }
+
+  confess "Cannot determine type of '$value'!";
+}
+
+sub int_q { return type_of(shift) eq 'I'; }
+sub num_q { return type_of(shift) eq 'N'; }
+sub str_q { return type_of(shift) eq 'S'; }
+
+sub int_or_num_q { my $type = type_of(shift); return $type eq 'I' or $type eq 'N'; }
+
+
 ###############################################################################
 ###############################################################################
 ##
@@ -515,6 +586,7 @@ sub str_reg_q
 ##
 ###############################################################################
 ###############################################################################
+
 
 #
 # op_comp()
@@ -566,7 +638,7 @@ sub op_comp
   # OPTIMIZE const-const comparisons to unconditional branches:
   #
 
-  if (int_or_num_q($a) and int_or_num_q($b)) {
+  if (int_or_num_lit_q($a) and int_or_num_lit_q($b)) {
     if (&{$comp_ops{$op}}($a, $b)) {
       emit_code('branch', [$true]);
     } else {
@@ -582,39 +654,16 @@ sub op_comp
   # We do this by reversing the operand order and inverting the comparison.
   #
 
-  if (int_or_num_q($a) and reg_q($b)) {
+  if (int_or_num_lit_q($a) and reg_q($b)) {
     ($a, $op, $b) = ($b, $comp_ops{"!$op"}, $a);
   }
-
-=no
-  #
-  # CONVERT const-reg and reg-const comparisons to reg-reg comparisons:
-  #
-
-  if (int_q($a)) {
-    emit_code('set', [int_reg_q($b) ? 'I0' : 'N0', $a]);
-    $a = 'I0';
-  } elsif (num_q($a)) {
-    emit_code('set', ['N0', $a]);
-    $a = 'N0';
-  } elsif (!reg_q($a)) {
-    printf STDERR "jakoc: Syntax error in comparison on line %d!\n", $line;
-  }
-
-  if (int_q($b)) {
-    emit_code('set', [int_reg_q($a) ? 'I0' : 'N0', $b]);
-    $b = 'I0';
-  } elsif (num_q($b)) {
-    emit_code('set', ['N0', $b]);
-    $b = 'N0';
-  } elsif (!reg_q($b)) {
-    printf STDERR "jakoc: Syntax error in comparison on line %d!\n", $line;
-  }
-=cut
 
   #
   # CONVERT num-int and int-num comparisons to num-num comparisons:
   #
+
+  my $a_type = type_of($a);
+  my $b_type = type_of($b);
 
   if (int_or_num_q($b)) {
     #
@@ -624,7 +673,7 @@ sub op_comp
     # in the case of num-reg-to-int-const comparisons.
     #
 
-    if (substr($a, 0, 1) eq 'I' and num_q($b)) {
+    if ($a_type eq 'I' and num_q($b)) {
       emit_code('set', ['N0', $a]);
       $a = 'N0';
     }
@@ -633,11 +682,11 @@ sub op_comp
     # reg-reg comparisons:
     #
 
-    if (substr($a, 0, 1) ne substr($b, 0, 1)) {
-      if ($a =~ m/^I/) {
+    if ($a_type ne $b_type) {
+      if ($a_type eq 'I') {
         emit_code('set', ['N0', $a]);
         $a = 'N0';
-      } elsif ($b =~ m/^I/) {
+      } elsif ($b_type eq 'I') {
         emit_code('set', ['N0', $b]);
         $b = 'N0';
       } else {
@@ -812,10 +861,11 @@ sub op_gt
 #
 # Assign a register to the identifier within the scope of the current block.
 #
+# Class is one of 'const', 'param', 'local'.
 
 sub declare_var
 {
-  my ($ident, $type) = @_;
+  my ($ident, $type, $class) = @_;
 
   #
   # Check for a few bad conditions.
@@ -825,6 +875,9 @@ sub declare_var
   #
 
   my $type_name = $types{$type};
+
+  confess "jakoc: Internal error: Variable declaration involves undefined class!"
+    unless defined $class;
 
   confess "jakoc: Internal error: Variable declaration involves undefined type code!"
     unless defined $type;
@@ -866,17 +919,33 @@ sub declare_var
 
   my $block = top_block();
 
-  my $reg_num = scalar @{$regs{$type}};
+  my $num;
+  my $reg;
+  my $value;
+
+  if ($class eq 'param') {
+    $num   = undef;
+    $reg   = undef;
+    $value = "\$$ident";
+  }
+  else {
+    my $reg_num = scalar @{$regs{$type}};
+
+    $regs{$type}[$reg_num]{LINE}  = $line;
+    $regs{$type}[$reg_num]{NAME}  = $ident;
+    $regs{$type}[$reg_num]{BLOCK} = $block;
+
+    $num   = $reg_num;
+    $reg   = "$type$reg_num";
+    $value = "$type$reg_num";
+  }
 
   $block->{IDENT}{$ident}{LINE}  = $line;
   $block->{IDENT}{$ident}{TYPE}  = $type;
-  $block->{IDENT}{$ident}{NUM}   = $reg_num;
-  $block->{IDENT}{$ident}{REG}   = "$type$reg_num";
-  $block->{IDENT}{$ident}{VALUE} = "$type$reg_num";
-
-  $regs{$type}[$reg_num]{LINE}  = $line;
-  $regs{$type}[$reg_num]{NAME}  = $ident;
-  $regs{$type}[$reg_num]{BLOCK} = $block;
+  $block->{IDENT}{$ident}{CLASS} = $class;
+  $block->{IDENT}{$ident}{NUM}   = $num;
+  $block->{IDENT}{$ident}{REG}   = $reg;
+  $block->{IDENT}{$ident}{VALUE} = $value;
 
   #
   # Push the source comment about the variable declaration.
@@ -1189,25 +1258,29 @@ sub void_func
     # saved.
     #
 
-    foreach my $arg (reverse @args) {
-      if (reg_q($arg)) {
-        emit_code('save', [ $arg ]);
-      } elsif (int_q($arg)) {
-        emit_code('save', [ $arg ]);
-      } elsif (num_q($arg)) {
-        emit_code('save', [ $arg ]);
-      } elsif (str_q($arg)) {
-        emit_code('save', [ $arg ]);
-      } else {
-        confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
-      }
+#    foreach my $arg (reverse @args) {
+    foreach my $arg (@args) {
+      emit_code('.arg', [ $arg ]);
+
+#      if (reg_q($arg)) {
+#        emit_code('save', [ $arg ]);
+#      } elsif (int_q($arg)) {
+#        emit_code('save', [ $arg ]);
+#      } elsif (num_q($arg)) {
+#        emit_code('save', [ $arg ]);
+#      } elsif (str_q($arg)) {
+#        emit_code('save', [ $arg ]);
+#      } else {
+#        confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
+#      }
     }
 
-    emit_code 'save', [  scalar(@args) ]; # Push the arg count.
+#    emit_code 'save', [  scalar(@args) ]; # Push the arg count.
 
-    emit_code "bsr", [ $name ];
+#    emit_code "bsr", [ $name ];
+     emit_code "call", [ "_$name" ];
 
-    emit_code 'restore', [ 'I0' ]; # Pop off the result count.
+#    emit_code 'restore', [ 'I0' ]; # Pop off the result count.
   } else {
     printf(STDERR "jakoc: Call to unrecognized void function '%s' on line %d (Not in {%s}).\n",
       $name, $line, join(", ", sort keys %subs));
@@ -1251,35 +1324,42 @@ sub assign_func
     # saved.
     #
 
-    foreach my $arg (reverse @args) {
-      if (reg_q($arg)) {
-        emit_code('save', [ $arg ]);
-      } elsif (int_q($arg)) {
-        emit_code('save', [ $arg ]);
-      } elsif (num_q($arg)) {
-        emit_code('save', [ $arg ]);
-      } elsif (str_q($arg)) {
-        emit_code('save', [ $arg ]);
-      } else {
-        confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
-      }
+#    foreach my $arg (reverse @args) {
+    foreach my $arg (@args) {
+      emit_code('.arg', [ $arg ]);
+
+#      if (reg_q($arg)) {
+#        emit_code('save', [ $arg ]);
+#      } elsif (int_q($arg)) {
+#        emit_code('save', [ $arg ]);
+#      } elsif (num_q($arg)) {
+#        emit_code('save', [ $arg ]);
+#      } elsif (str_q($arg)) {
+#        emit_code('save', [ $arg ]);
+#      } else {
+#        confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
+#      }
     }
 
-    emit_code('save', [ scalar(@args) ]); # Save the arg count.
+#    emit_code('save', [ scalar(@args) ]); # Save the arg count.
 
     #
     # Now, we can jump to the subroutine's entry point:
     #
 
-    emit_code('bsr', [ $name ]);
+#    emit_code('bsr', [ $name ]);
+
+    emit_code('call', [ "_$name" ]);
 
     #
     # Our calling convention dictates that upon return from the subroutine,
     # the result will be on the top of the stack.
     #
 
-    emit_code('restore', [ 'I0' ]);     # Pop off the result count
-    emit_code('restore', [ $dest ]);
+#    emit_code('restore', [ 'I0' ]);     # Pop off the result count
+#    emit_code('restore', [ $dest ]);
+
+    emit_code('.result', [ $dest ]);
   } else {
     printf(STDERR "jakoc: Call to unrecognized assign function '%s' on line %d (Not in {%s}).\n",
       $name, $line, join(", ", sort keys %assign_funcs));
@@ -1380,14 +1460,18 @@ sub begin_sub_block
   #
 
   push_label "${name}_BEFORE";
-  emit_code 'branch', [ "${name}_AFTER" ];
+  emit_code 'branch', [ "__ANON_BLOCK__$anon_block_count" ];
+
+  emit_code(".end");
 
   #
   # Here we have the actual subroutine entry point:
   #
 
-  push_label $name;
+  emit_code '.sub', [ "_$name" ];
+#  push_label $name;
   push_label "${name}_ENTER";
+  emit_code();
 
   #
   # As part of the subroutine calling convention, the subroutine is
@@ -1399,10 +1483,10 @@ sub begin_sub_block
   # TODO: Enable the 'P' regs when we start doing PMCs.
   #
 
-  emit_code 'pushi', [ ];
-  emit_code 'pushn', [ ];
+#  emit_code 'pushi', [ ];
+#  emit_code 'pushn', [ ];
 #  emit_code 'pushp', [ ];
-  emit_code 'pushs', [ ];
+#  emit_code 'pushs', [ ];
 
   #
   # Record the subroutine information.
@@ -1436,7 +1520,7 @@ sub begin_sub_block
   foreach my $formal_arg (@formal_args) {
     my ($arg_type, $arg_name) = @$formal_arg;
 
-    declare_var($arg_name, uc substr($arg_type, 0, 1));
+    declare_var($arg_name, uc substr($arg_type, 0, 1), 'param');
   }
 
   #
@@ -1453,7 +1537,7 @@ sub begin_sub_block
   # TODO: Should we bother checking that argc is what we expected?
   #
 
-  emit_code 'restore', [ 'I0' ]; # Pop off the arg count.
+#  emit_code 'restore', [ 'I0' ]; # Pop off the arg count.
 
   foreach my $formal_arg (@formal_args) {
     my ($arg_type, $arg_name) = @$formal_arg;
@@ -1463,7 +1547,8 @@ sub begin_sub_block
 
     push_comment "(argument " . $arg_name . ")";
 
-    emit_code 'restore', [ $ident_info->{REG} ];
+#    emit_code 'restore', [ $ident_info->{REG} ];
+     emit_code '.param', [ "$arg_type $arg_name" ];
   }
 }
 
@@ -1655,12 +1740,12 @@ sub end_block
     # very unhappy later...)
     #
 
-    emit_code "save", [ defined($block->{RETURN}) ? 1 : 0 ]; # Push the result count.
+#    emit_code "save", [ defined($block->{RETURN}) ? 1 : 0 ]; # Push the result count.
 
-    emit_code 'popi', [ ];
-    emit_code 'popn', [ ];
+#    emit_code 'popi', [ ];
+#    emit_code 'popn', [ ];
 #    emit_code 'popp', [ ];
-    emit_code 'pops', [ ];
+#    emit_code 'pops', [ ];
 
     #
     # Now, actually return.
@@ -1669,7 +1754,10 @@ sub end_block
     emit_code "ret", [ ];
 
     push_label "${prefix}_AFTER";
-    emit_code;
+    emit_code('noop'); # XXX: Needed by IMCC
+
+    emit_code('.end');
+    emit_code('.sub', [ "__ANON_BLOCK__" . $anon_block_count++ ]);
   }
 
   #
@@ -1827,17 +1915,7 @@ sub do_return
   #
 
   if (defined $arg_type and $arg_type eq '*') {
-    if ($arg =~ m/^([INPS])\d+$/) {
-      $arg_type = $1;
-    } elsif ($arg =~ m/^-?\d+$/) {
-      $arg_type = 'i';
-    } elsif ($arg =~ m/^->\d+\.\d+$/) {
-      $arg_type = 'n';
-    } elsif ($arg =~ m/^"$/) {
-      $arg_type = 's';
-    } else {
-      confess "Couldn't determine argument type!";
-    }
+    $arg_type = type_of($arg);
   }
 
   #
@@ -1856,7 +1934,8 @@ sub do_return
   #
 
   if (defined $return) {
-    emit_code('save', [ $arg ]); # Push the result. Result count comes later.
+#    emit_code('save', [ $arg ]); # Push the result. Result count comes later.
+     emit_code('.return', [ $arg ]);
   }
 
   #
@@ -1889,12 +1968,12 @@ sub do_add
 
   ($dest, $a, $b) = map_args($dest, $a, $b);
 
-  if (int_or_num_q($a)) {
-    if (int_or_num_q($b)) {
+  if (int_or_num_lit_q($a)) {
+    if (int_or_num_lit_q($b)) {
       my $temp = $a + $b;
       $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
       emit_code('set', [$dest, $temp]);
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       if ($dest eq $b && int_q($a)) {
         emit_code('add', [$dest, $a]);
       } else {
@@ -1905,8 +1984,8 @@ sub do_add
     } else {
       printf(STDERR "jakoc: Syntax error in addition on line %d!\n", $line);
     }
-  } elsif (reg_q($a)) {
-    if (int_or_num_q($b)) {
+  } elsif (reg_q($a) or var_q($a)) {
+    if (int_or_num_lit_q($b)) {
       if ($dest eq $a && int_q($b)) {
         emit_code('add', [$dest, $b]);
       } else {
@@ -1914,7 +1993,7 @@ sub do_add
         emit_code('set', [$temp, $b]);
         emit_code('add', [$dest, $a, $temp]);
       }
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       emit_code('add', [$dest, $a, $b]);
     } else {
       printf(STDERR "jakoc: Syntax error in addition on line %d!\n", $line);
@@ -1961,12 +2040,12 @@ sub do_sub
 
   ($dest, $a, $b) = map_args($dest, $a, $b);
 
-  if (int_or_num_q($a)) {
-    if (int_or_num_q($b)) {
+  if (int_or_num_lit_q($a)) {
+    if (int_or_num_lit_q($b)) {
       my $temp = $a - $b;
       $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
       emit_code('set', [$dest, $temp]);
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       if ($dest eq $b && int_q($a)) {
         emit_code('sub', [$dest, $a]);
       } else {
@@ -1977,8 +2056,8 @@ sub do_sub
     } else {
       printf(STDERR "jakoc: Syntax error in subtraction on line %d!\n", $line);
     }
-  } elsif (reg_q($a)) {
-    if (int_or_num_q($b)) {
+  } elsif (reg_q($a) or var_q($a)) {
+    if (int_or_num_lit_q($b)) {
       if ($dest eq $a && int_q($b)) {
         emit_code('sub', [$dest, $b]);
       } else {
@@ -1986,7 +2065,7 @@ sub do_sub
         emit_code('set', [$temp, $b]);
         emit_code('sub', [$dest, $a, $temp]);
       }
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       emit_code('sub', [$dest, $a, $b]);
     } else {
       printf(STDERR "jakoc: Syntax error in subtraction on line %d!\n", $line);
@@ -2033,24 +2112,24 @@ sub do_mul
 
   ($dest, $a, $b) = map_args($dest, $a, $b);
 
-  if (int_or_num_q($a)) {
-    if (int_or_num_q($b)) {
+  if (int_or_num_lit_q($a)) {
+    if (int_or_num_lit_q($b)) {
       my $temp = $a * $b;
       $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
       emit_code('set', [$dest, $temp]);
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       my $temp = int_q($a) ? 'I0' : 'N0';
       emit_code('set', [$temp, $a]);
       emit_code('mul', [$dest, $temp, $b]);
     } else {
       printf(STDERR "jakoc: Syntax error in multiplication on line %d!\n", $line);
     }
-  } elsif (reg_q($a)) {
-    if (int_or_num_q($b)) {
+  } elsif (reg_q($a) or var_q($a)) {
+    if (int_or_num_lit_q($b)) {
       my $temp = int_q($b) ? 'I0' : 'N0';
       emit_code('set', [$temp, $b]);
       emit_code('mul', [$dest, $a, $temp]);
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       emit_code('mul', [$dest, $a, $b]);
     } else {
       printf(STDERR "jakoc: Syntax error in multiplication on line %d!\n", $line);
@@ -2073,24 +2152,24 @@ sub do_div
 
   ($dest, $a, $b) = map_args($dest, $a, $b);
 
-  if (int_or_num_q($a)) {
-    if (int_or_num_q($b)) {
+  if (int_or_num_lit_q($a)) {
+    if (int_or_num_lit_q($b)) {
       my $temp = $a / $b;
       $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
       emit_code('set', [$dest, $temp]);
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       my $temp = int_q($a) ? 'I0' : 'N0';
       emit_code('set', [$temp, $a]);
       emit_code('div', [$dest, $temp, $b]);
     } else {
       printf(STDERR "jakoc: Syntax error in division on line %d!\n", $line);
     }
-  } elsif (reg_q($a)) {
-    if (int_or_num_q($b)) {
+  } elsif (reg_q($a) or var_q($a)) {
+    if (int_or_num_lit_q($b)) {
       my $temp = int_q($b) ? 'I0' : 'N0';
       emit_code('set', [$temp, $b]);
       emit_code('div', [$dest, $a, $temp]);
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       emit_code('div', [$dest, $a, $b]);
     } else {
       printf(STDERR "jakoc: Syntax error in division on line %d!\n", $line);
@@ -2118,22 +2197,22 @@ sub do_mod
 
   ($dest, $a, $b) = map_args($dest, $a, $b);
 
-  if (int_q($a)) {
-    if (int_q($b)) {
+  if (int_lit_q($a)) {
+    if (int_lit_q($b)) {
       emit_code('set', [$dest, $a % $b]);
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       my $temp = 'I0';
       emit_code('set', [$temp, $a]);
       emit_code('mod', [$dest, $temp, $b]);
     } else {
       printf(STDERR "jakoc: Syntax error in modulo on line %d!\n", $line);
     }
-  } elsif (reg_q($a)) {
-    if (int_q($b)) {
+  } elsif (reg_q($a) or var_q($a)) {
+    if (int_lit_q($b)) {
       my $temp = 'I0';
       emit_code('set', [$temp, $b]);
       emit_code('mod', [$dest, $a, $temp]);
-    } elsif (reg_q($b)) {
+    } elsif (reg_q($b) or var_q($b)) {
       emit_code('mod', [$dest, $a, $b]);
     } else {
       printf(STDERR "jakoc: Syntax error in modulo on line %d!\n", $line);
@@ -2257,10 +2336,12 @@ sub parse_args
 ###############################################################################
 
 print "###############################################################################\n";
-print "# This Parrot assembler file was produced by the Jako compiler.               #\n";
+print "# This Parrot intermediate code file was produced by the Jako compiler.       #\n";
 print "# Initial comments from the source code are reproduced below.                 #\n";
 print "###############################################################################\n";
 print "\n";
+
+emit_code('.sub', [ "__ANON_BLOCK__" . $anon_block_count++ ]);
 
 my $code_lines = 0;
 
@@ -2308,7 +2389,7 @@ while(<>) {
       (m/^var\s+(n)um\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+(\.\d+)))?$/) ||
       (m/^var\s+(s)tr\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
   ) { 
-    declare_var($2, uc($1));
+    declare_var($2, uc($1), 'local');
     assign_var($2, uc($1), $4) if defined $4;
     next;
   }
@@ -2331,7 +2412,7 @@ while(<>) {
       (m/^var\s+(s)tr\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
   ) {
     foreach my $var (split(/\s*,\s*/, $2)) {
-      declare_var($var, uc($1));
+      declare_var($var, uc($1), 'local');
       assign_var($var, uc($1), $6) if defined $6;
     }
     next;
@@ -2344,7 +2425,7 @@ while(<>) {
   #
 
   if (m/^var\s+poly\s+([A-Za-z][A-Za-z0-9_]*)$/) {
-    declare_var($2, 'P');
+    declare_var($2, 'P', 'local');
     next;
   }
 
@@ -2939,6 +3020,8 @@ while(<>) {
 }
 
 emit_code('end') unless $last_op eq 'end';
+
+emit_code(".end");
 
 exit 0;
 
