@@ -24,9 +24,9 @@
  * We should probably move this to Configure
  */
 void
-endian_matrix(char * buf) {
+endian_matrix(unsigned char * buf) {
     unsigned long l;
-    char * c = (char *)&l;
+    unsigned char * c = (unsigned char *)&l;
     /* Expect the following to generate warning on 32 bit.*/
     if(sizeof(long) > 4)
         l = (0x07060504L << 32) | (0x03020100);    
@@ -57,7 +57,7 @@ INTVAL
 endian_fetch_intval(INTVAL w, unsigned char * o) {
     unsigned char * b = (unsigned char *)&w;
     INTVAL r;
-    char * rb = (unsigned char *)&r;
+    unsigned char * rb = (unsigned char *)&r;
     int nibbles = sizeof(INTVAL) / sizeof(char);
 
     if(!o)

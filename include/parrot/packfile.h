@@ -162,11 +162,11 @@ opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t *stream);
 /*
 ** Byte Ordering Functions (byteorder.c)
 */
-void endian_matrix(char * buf);
+void endian_matrix(unsigned char * buf);
 INTVAL endian_fetch_intval(INTVAL w, unsigned char * o);
 void endian_fetch_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
                         int wsize);
-void endian_put_intval(unsigned char * rb, INTVAL w, char * o);
+void endian_put_intval(unsigned char * rb, INTVAL w, unsigned char * o);
 
 
 #endif /* PACKFILE_H */
