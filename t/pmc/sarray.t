@@ -334,7 +334,7 @@ string
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "iterator");
-
+    .include "iterator.pasm"
 	new P0, .SArray		# empty array
 	new P2, .SArray		# array with 2 elements
 	set P2, 2
@@ -348,13 +348,13 @@ output_is(<<'CODE', <<'OUTPUT', "iterator");
 	print "not "
 ok2:	print "ok 2\n"
 	new P1, .Iterator, P0
-	set P1, 0		# reset PIter
+	set P1, .ITERATE_FROM_START
 	print "ok 3\n"
 	unless P1, ok4		# if(iter) == false on empty
 	print "not "
 ok4:	print "ok 4\n"
 	new P1, .Iterator, P2
-	set P1, 0		# reset PIter
+	set P1, .ITERATE_FROM_START
 	if P1, ok5		# if(iter) == true on non empty
 	print "not "
 ok5:	print "ok 5\n"
@@ -375,7 +375,7 @@ ok7:	print "ok 7\n"
 ok8:	print "ok 8\n"
 
 	# now iterate from end
-	set P1, 3		# reset PIter
+	set P1, .ITERATE_FROM_END
 	if P1, ok9		# if(iter) == true on non empty
 	print "not "
 ok9:	print "ok 9\n"

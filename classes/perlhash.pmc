@@ -359,6 +359,7 @@ pmclass PerlHash {
 	PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
 	switch (what) {
 	    case ITERATE_FROM_START:	/* reset key */
+            case ITERATE_FROM_START_KEYS:
 		ret->cache.int_val = 0;
 		if (!n)
 		    ret->cache.int_val = -1;

@@ -36,6 +36,7 @@ typedef enum {
 /* &gen_from_enum(iterator.pasm) */
 typedef enum {
     ITERATE_FROM_START,
+    ITERATE_FROM_START_KEYS,
     ITERATE_GET_NEXT,
     ITERATE_GET_PREV,
     ITERATE_FROM_END

@@ -12,6 +12,15 @@
  *     (list in data) and a PerlHash (hash in struct_val).
  *     The list holds the PMC values, the hash keys point to
  *     the index of the value in the list.
+ *
+ *     There are 2 iterator interfaces:
+ *     - retrieve value (in creation order)
+ *     - retrieve key (no special order)
+ *     s. t/pmc/ordereredhash.t
+ *
+ *     If values are set by numeric index only, there is no hash
+ *     key. Iterating over the hash doesn't show these values.
+ *
  *  References:
  *     pdd08_keys.pod
  */
@@ -79,6 +88,24 @@ pmclass OrderedHash extends PerlArray need_ext {
             PerlHash.SUPER(key);
             DYNSELF.delete_keyed_int(n);
         }
+    }
+
+    PMC* nextkey_keyed (PMC* key, INTVAL what) {
+        switch (what) {
+            case ITERATE_FROM_START_KEYS:
+                PObj_get_FLAGS(SELF) |= PObj_private0_FLAG;
+                break;
+            case ITERATE_FROM_START:
+                PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
+                break;
+        }
+        if ((PObj_get_FLAGS(SELF) & PObj_private0_FLAG))
+            return PerlHash.SUPER(key, what);
+        return SUPER(key, what);
+    }
+
+    STRING* get_string_keyed (PMC* key) {
+        return PerlHash.SUPER(key);
     }
 }
 

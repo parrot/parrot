@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 output_is(<<'CODE', <<OUT, "init");
@@ -252,4 +252,58 @@ ok 1
 ok 3
 ok 3
 OUT
+
+output_like(<<'CODE', '/[axj]/', "iterate over keys");
+    .include "iterator.pasm"
+    new P0, .OrderedHash
+    new P1, .PerlString
+    set P1, "ok 1\n"
+    set P0["x"], P1
+    new P1, .PerlString
+    set P1, "ok 2\n"
+    set P0["a"], P1
+    new P1, .PerlString
+    set P1, "ok 3\n"
+    set P0["j"], P1
+
+    new P2, .Iterator, P0
+    set P2, .ITERATE_FROM_START_KEYS
+iter_loop:
+    unless P2, end_iter
+    shift S3, P2
+    print S3
+    branch iter_loop
+end_iter:
+    end
+CODE
+
+output_like(<<'CODE', <<'OUT', "iterate over keys, get value");
+    .include "iterator.pasm"
+    new P0, .OrderedHash
+    new P1, .PerlString
+    set P1, "ok 1\n"
+    set P0["x"], P1
+    new P1, .PerlString
+    set P1, "ok 2\n"
+    set P0["a"], P1
+    new P1, .PerlString
+    set P1, "ok 3\n"
+    set P0["j"], P1
+
+    new P2, .Iterator, P0
+    set P2, .ITERATE_FROM_START_KEYS
+iter_loop:
+    unless P2, end_iter
+    shift S3, P2
+    set P3, P2[S3]
+    print P3
+    branch iter_loop
+end_iter:
+    end
+CODE
+/ok \d
+ok \d
+ok \d/
+OUT
+
 

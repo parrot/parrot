@@ -443,22 +443,22 @@ pmclass SArray const_too need_ext {
         end_index   = e[1].val.int_val;
 
 	switch (what) {
-	    case 0:	/* reset key, iterate from start */
+	    case ITERATE_FROM_START:	/* reset key, iterate from start */
 		ret->cache.int_val = start_index;
 		break;
-	    case 1:	/* next key */
+	    case ITERATE_GET_NEXT:
 		if (ret->cache.int_val < end_index - 1)
 		    ++ret->cache.int_val;
 		else
 		    ret->cache.int_val = -1;
 		break;
-	    case 2:	/* prev key */
+	    case ITERATE_GET_PREV:
 		if (ret->cache.int_val >= start_index)
 		    --ret->cache.int_val;
 		else
 		    ret->cache.int_val = -1;
 		break;
-	    case 3:	/* reset key, iterate from end */
+	    case ITERATE_FROM_END:
 		ret->cache.int_val = end_index - 1;
 		break;
 	}

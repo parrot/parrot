@@ -12,25 +12,23 @@
 
 #include "parrot/parrot.h"
 
-pmclass Iterator need_ext {
-/* TODO switch to the pmc ptr */
+pmclass Iterator {
 
     void init () {
 	internal_exception(1, "Iterator init without aggregate\n");
     }
 
     void init_pmc (PMC* initializer) {
-	PMC_data(SELF) = initializer; /* the aggregate itself */
+	PMC_ptr2p(SELF) = initializer; /* the aggregate itself */
         SELF->cache.struct_val = NULL;
         PObj_custom_mark_SET(SELF);
     }
 
     void mark () {
-        pobject_lives(INTERP, (PObj *)PMC_data(SELF));
 	if (SELF->cache.struct_val) /* the KEY */
 	     pobject_lives(INTERP, (PObj *) SELF->cache.struct_val);
-	if (PMC_data(SELF))		/* the aggregate */
-	     pobject_lives(INTERP, (PObj *) PMC_data(SELF));
+	if (PMC_ptr2p(SELF))		/* the aggregate */
+	     pobject_lives(INTERP, (PObj *) PMC_ptr2p(SELF));
     }
 
     void clone (PMC* dest) {
@@ -38,41 +36,41 @@ pmclass Iterator need_ext {
     }
 
     INTVAL get_integer () {
-        return VTABLE_get_integer(INTERP, (PMC *)PMC_data(SELF));
+        return VTABLE_get_integer(INTERP, (PMC *)PMC_ptr2p(SELF));
     }
 
     INTVAL get_integer_keyed (PMC* key) {
-        return VTABLE_get_integer_keyed(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_integer_keyed(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     INTVAL get_integer_keyed_int (INTVAL key) {
 	/* XXX adjust index */
-        return VTABLE_get_integer_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_integer_keyed_int(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     FLOATVAL get_number_keyed (PMC* key) {
-        return VTABLE_get_number_keyed(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_number_keyed(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
 	/* XXX adjust index */
-        return VTABLE_get_number_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_number_keyed_int(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     BIGNUM* get_bignum_keyed (PMC* key) {
-        return VTABLE_get_bignum_keyed(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_bignum_keyed(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     BIGNUM* get_bignum_keyed_int (INTVAL key) {
-        return VTABLE_get_bignum_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_bignum_keyed_int(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     STRING* get_string_keyed (PMC* key) {
-        return VTABLE_get_string_keyed(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_string_keyed(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     STRING* get_string_keyed_int (INTVAL key) {
-        return VTABLE_get_string_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_string_keyed_int(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     INTVAL get_bool () {
@@ -81,15 +79,15 @@ pmclass Iterator need_ext {
     }
 
     INTVAL elements () {
-        return VTABLE_elements(INTERP, (PMC *)PMC_data(SELF));
+        return VTABLE_elements(INTERP, (PMC *)PMC_ptr2p(SELF));
     }
 
     PMC* get_pmc_keyed (PMC* key) {
-        return VTABLE_get_pmc_keyed(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_pmc_keyed(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     PMC* get_pmc_keyed_int (INTVAL key) {
-        return VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
+        return VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     void set_integer_native (INTVAL value) {
@@ -102,12 +100,12 @@ pmclass Iterator need_ext {
 	}
 	key = SELF->cache.struct_val;
 	SELF->cache.struct_val =
-	    VTABLE_nextkey_keyed(INTERP, (PMC*) PMC_data(SELF), key, value);
+	    VTABLE_nextkey_keyed(INTERP, (PMC*) PMC_ptr2p(SELF), key, value);
     }
 
     INTVAL pop_integer () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
@@ -116,7 +114,7 @@ pmclass Iterator need_ext {
 
     FLOATVAL pop_float () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	FLOATVAL ret = VTABLE_get_number_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
@@ -125,7 +123,7 @@ pmclass Iterator need_ext {
 
     BIGNUM* pop_bignum () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	BIGNUM *ret = VTABLE_get_bignum_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
@@ -134,7 +132,7 @@ pmclass Iterator need_ext {
 
     STRING* pop_string () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	STRING *ret = VTABLE_get_string_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
@@ -143,7 +141,7 @@ pmclass Iterator need_ext {
 
     PMC* pop_pmc () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	PMC *ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
@@ -152,7 +150,7 @@ pmclass Iterator need_ext {
 
     INTVAL shift_integer () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
@@ -162,7 +160,7 @@ pmclass Iterator need_ext {
 
     FLOATVAL shift_float () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	FLOATVAL ret = VTABLE_get_number_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
@@ -171,7 +169,7 @@ pmclass Iterator need_ext {
 
     BIGNUM* shift_bignum () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	BIGNUM *ret = VTABLE_get_bignum_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
@@ -180,7 +178,7 @@ pmclass Iterator need_ext {
 
     STRING* shift_string () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	STRING * ret = VTABLE_get_string_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
@@ -189,7 +187,7 @@ pmclass Iterator need_ext {
 
     PMC* shift_pmc () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = PMC_data(SELF);
+	PMC *agg = PMC_ptr2p(SELF);
 	PMC *ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
@@ -197,26 +195,26 @@ pmclass Iterator need_ext {
     }
 
     INTVAL exists_keyed (PMC* key) {
-	return VTABLE_exists_keyed(INTERP, (PMC *)PMC_data(SELF), key);
+	return VTABLE_exists_keyed(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     INTVAL exists_keyed_int (INTVAL key) {
-	return VTABLE_exists_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
+	return VTABLE_exists_keyed_int(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     INTVAL defined () {
-        return (INTVAL) (PMC_data(SELF) != 0);
+        return (INTVAL) (PMC_ptr2p(SELF) != 0);
     }
 
     INTVAL defined_keyed (PMC* key) {
-	return VTABLE_defined_keyed(INTERP, (PMC *)PMC_data(SELF), key);
+	return VTABLE_defined_keyed(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     INTVAL defined_keyed_int (INTVAL key) {
-	return VTABLE_defined_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
+	return VTABLE_defined_keyed_int(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 
     INTVAL type_keyed (PMC* key) {
-	return VTABLE_type_keyed(INTERP, (PMC *)PMC_data(SELF), key);
+	return VTABLE_type_keyed(INTERP, (PMC *)PMC_ptr2p(SELF), key);
     }
 }
