@@ -23,6 +23,7 @@ Reading and writing state files. Invoced with the command line parameters
 Dump a state file.
 
 =cut
+
 .sub _produce_frozen_state prototyped             
   .param PerlHash   state
   .param string     frozen_file    
@@ -77,6 +78,7 @@ For now we just read the whole file into a string.
 For now we just worry about the flags 'F', 'T' and 'V'.
 
 =cut
+
 .sub _reload_frozen_state prototyped             
   .param PerlHash   state    
   .param string     frozen_file    

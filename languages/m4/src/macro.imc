@@ -17,6 +17,7 @@ Loop through some input files.
 TODO: read files in next_token()
 
 =cut
+
 .sub _expand_input prototyped             
   .param PerlHash  state    
 
@@ -90,6 +91,7 @@ the text are just copied to the output.
 TODO: get rid of workaround TOKEN_DEFINE
 
 =cut
+
 .sub _expand_token prototyped            
   .param PerlHash  state    
   .param string    token_type
@@ -269,6 +271,7 @@ TODO: get rid of workaround TOKEN_DEFINE
 Apply macro to a token.
 
 =cut
+
 .sub _expand_macro prototyped            
   # receive arguments from left to right
   .param PerlArray macro 

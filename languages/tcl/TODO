@@ -54,7 +54,7 @@ a partial version of "expr" and "proc" must happen RSN.
   unknown history
 
   * isn't a recent distro of tcl
-  
+
   And, here are more from a more recent tcl in no order.
 
   after bgerror binary case clock dde
@@ -94,6 +94,6 @@ it twice (once for determining where the word ends, once for finding it so I
 can execute it.) Could save a bit of time, I'm sure, if someone clued up the
 parser.
 
-=back 4
+=back
 
 =cut

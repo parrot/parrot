@@ -25,6 +25,7 @@ Initialize the state hash.
 TODO: recognize nested quoted strings
 
 =cut
+
 .sub _input_init prototyped             
   .param PerlHash state 
 
@@ -175,6 +176,7 @@ Stores a filename on a stack
 TODO: open these files and complain when they don't or pass filehandles
 
 =cut
+
 .sub _push_file prototyped             
   .param PerlHash state 
   .param string   filename    
@@ -195,6 +197,7 @@ TODO: open these files and complain when they don't or pass filehandles
 Uses regular expressions for finding tokens.
 
 =cut
+
 .sub _next_token prototyped            
   .param PerlHash state 
 

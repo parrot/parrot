@@ -17,6 +17,7 @@ References: http://www.gnu.org/software/m4/m4.html
 Looks at the command line arguments and acts accordingly.
 
 =cut
+
 .sub _main prototyped
   .param PerlArray argv
 
@@ -336,6 +337,7 @@ There are no return values.
 TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 =cut
+
 .sub _usage prototyped             
   .param string program_name
 

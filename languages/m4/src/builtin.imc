@@ -19,6 +19,7 @@ expansion of user defined macros.
 Initialise all builtin and predefined macros.
 
 =cut
+
 .sub _builtin_init prototyped             
   .param PerlHash state
 
@@ -42,6 +43,7 @@ Initialise all builtin and predefined macros.
 Add a builtin macro to the symbol table 
 
 =cut
+
 .sub _define_builtin prototyped            
   .param PerlHash  state
   .param string    name     
@@ -79,6 +81,7 @@ Add a builtin macro to the symbol table
 Add a user defined or predefined macro.
 
 =cut
+
 .sub _define_user_macro prototyped             
   .param PerlHash  state
   .param string    name     

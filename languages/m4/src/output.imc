@@ -19,6 +19,7 @@ Does only a simple print rightnow.
 TODO: Support for sync lines.
 
 =cut
+
 .sub _shipout_text prototyped             
   .param PerlHash state 
   .param string   text 

@@ -12,11 +12,11 @@ use vars qw(@ISA @EXPORT $AppVersion);
   Archive CC Link Link_Shared Perl Target
 );
 
-=head2 NAME
+=head1 NAME
 
 Make.pm - Main make module for Parrot
 
-=head2 SYNOPSIS
+=head1 SYNOPSIS
 
 Cross-platform make for Parrot.
 
@@ -387,5 +387,9 @@ sub Target {
 }
 
 #------------------------------------------------------------------------------
+
+=back
+
+=cut
 
 1;
