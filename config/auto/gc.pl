@@ -55,7 +55,7 @@ EOF
       $gc = 'gc';
     Configure::Data->set(
       gc_c          => <<"EOF",
-$(SRC)/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC)/resources.c
+\$(SRC)/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC)/resources.c
 EOF
       gc_o          => "\$(SRC)/resources\$(O)",
       gc_flag  => '',
