@@ -30,8 +30,6 @@
 #include <stdio.h>
 /*#include <types.h> */
 
-#include "parrot/platform.h"
-
 #ifdef WIN32
 #	include <io.h>
 #endif
@@ -78,6 +76,7 @@ typedef void* BIGFLOAT;
    used to make an empty block.  */
 #define UNUSED(a) if (a) {}
 
+#include "parrot/platform.h"
 #include "parrot/global_setup.h"
 #include "parrot/interpreter.h"
 #include "parrot/encoding.h"
