@@ -74,6 +74,7 @@ interpreter.c
 jit/i386/core.jit
 jit/i386/string.jit
 jit2h.pl
+jit.c
 key.c
 languages/jako/bench.jako
 languages/jako/euclid.jako
