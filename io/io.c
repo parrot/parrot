@@ -174,8 +174,17 @@ PIO_destroy(theINTERP, PMC *pmc)
         return;
     if (io->b.startb && (io->b.flags & PIO_BF_MALLOC)) {
         mem_sys_free(io->b.startb);
-        io->b.startb = NULL;
-        io->b.flags &= ~PIO_BF_MALLOC;
+    }
+    if ((io->stack->flags & PIO_L_LAYER_COPIED)) {
+        ParrotIOLayer *p, *down;
+        for (p = io->stack; p; ) {
+            /* if top got copied, all have to be malloced */
+            assert(p->flags & PIO_L_LAYER_COPIED);
+            down = p->down;
+            if (p->api->Delete)
+                (*p->api->Delete) (p);
+            p = down;
+        }
     }
     mem_sys_free(io);
     PMC_data(pmc) = NULL;
@@ -268,7 +277,6 @@ PIO_finish(theINTERP)
         down = p->down;
         if (p->api->Delete)
             (*p->api->Delete) (p);
-        /* mem_sys_free(p); */ /* XXX ??? */
         p = down;
     }
     mem_sys_free(interpreter->piodata->table);

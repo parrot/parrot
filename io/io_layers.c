@@ -56,7 +56,6 @@ PIO_base_new_layer(ParrotIOLayer *proto)
         new_layer->flags = 0;
         new_layer->api = NULL;
     }
-    new_layer->flags |= PIO_L_LAYER_COPIED;
     new_layer->self = 0;
     new_layer->up = NULL;
     new_layer->down = NULL;
@@ -172,6 +171,7 @@ PIO_push_layer_str(Interp *interpreter, PMC *pmc, STRING *ls)
 
     /* make private copy */
     l = PIO_base_new_layer(*t);
+    l->flags |= PIO_L_LAYER_COPIED;
     PIO_push_layer(interpreter, l, pmc);
 }
 
@@ -270,6 +270,7 @@ PIO_copy_stack(ParrotIOLayer *stack)
     ptr_ptr_new = &ptr_new;
     while (stack) {
         *ptr_ptr_new = PIO_base_new_layer(stack);
+        (*ptr_ptr_new)->flags |= PIO_L_LAYER_COPIED;
         (*ptr_ptr_new)->up = ptr_last;
         stack = stack->down;
         ptr_last = *ptr_ptr_new;
