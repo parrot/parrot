@@ -1122,8 +1122,13 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /*
      * wait for threads to complete if needed
      */
-    if (!interpreter->parent_interpreter)
+    if (!interpreter->parent_interpreter) {
         pt_join_threads(interpreter);
+        /*
+         * and terminate the event loop
+         */
+        Parrot_kill_event_loop();
+    }
     /* if something needs destruction (e.g. closing PIOs)
      * we must destroy it now:
      * no DOD run, so everything is considered dead

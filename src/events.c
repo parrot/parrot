@@ -199,6 +199,18 @@ Parrot_new_terminate_event(Parrot_Interp interpreter)
     Parrot_schedule_event(interpreter, ev);
 }
 
+/*
+ * schedule event-loop terminate event
+ */
+void
+Parrot_kill_event_loop(void)
+{
+    parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    ev->type = EVENT_TYPE_EVENT_TERMINATE;
+    ev->data = NULL;
+    Parrot_schedule_event(NULL, ev);
+}
+
 void
 Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
 {
@@ -253,8 +265,10 @@ event_thread(void *data)
             queue_timedwait(event_q, &abs_time);
         }
         else {
-            /* we shouldn't get here probably */
-            internal_exception(1, "Spurious event in event queue");
+            /* we shouldn't get here probably
+             * - the event queue terminating event is seen here
+             */
+
         }
         /*
          * one or more entries arrived - we hold the mutex again
@@ -303,6 +317,10 @@ event_thread(void *data)
                 mem_sys_free(entry);
                 continue;
             }
+            else if (event->type == EVENT_TYPE_EVENT_TERMINATE) {
+                mem_sys_free(entry);
+                goto out;
+            }
             /*
              * now insert entry in interpreter task queue
              */
@@ -313,15 +331,20 @@ event_thread(void *data)
                 /*
                  * TODO broadcast or deliver to first interp
                  */
+                mem_sys_free(entry);
             }
         } /* while events */
 again:
         ;
-    } /* forever */
+    } /* event loop */
+out:
     /*
-     * not reached yet
+     * the main interpreter is dying
      */
+    mem_sys_free(event);
     UNLOCK(event_q->queue_mutex);
+    queue_destroy(event_q);
+    return NULL;
 }
 
 /*
