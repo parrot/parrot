@@ -348,7 +348,11 @@ exec_prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 void
 exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 {
+#if HAVE_CGOTO
     oplib_init_f init_func = PARROT_CORE_CGP_OPLIB_INIT;
+#else  /* HAVE_CGOTO */
+    oplib_init_f init_func = PARROT_CORE_OPLIB_INIT;
+#endif /* HAVE_CGOTO */
 
     interpreter->op_lib = init_func(1);
     interpreter->op_lib->op_code = PARROT_CORE_OPLIB_INIT(1)->op_code;

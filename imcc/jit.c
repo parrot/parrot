@@ -17,6 +17,10 @@
  */
 #include <string.h>
 #include <assert.h>
+#include "parrot/parrot.h"
+#if EXEC_CAPABLE
+#  include "parrot/exec.h"
+#endif /* EXEC_CAPABLE */
 #include "imc.h"
 #include "pbc.h"
 
