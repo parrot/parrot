@@ -183,7 +183,7 @@ here for completeness of the interface.
 
 ***************************************/
 
-void 
+void
 PackFile_set_magic(struct PackFile * self, opcode_t magic) {
     self->magic = magic;
 }
@@ -330,7 +330,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char 
 #if TRACE_PACKFILE
     printf("PackFile_unpack(): Unpacking %ld bytes for fixup table...\n", segment_size);
 #endif
-    
+
     if (segment_size % sizeof(opcode_t)) {
         fprintf(stderr, "PackFile_unpack: Illegal fixup table segment size %d (must be multiple of %d)!\n",
             segment_size, sizeof(opcode_t));
@@ -355,13 +355,13 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char 
 #if TRACE_PACKFILE
     printf("PackFile_unpack(): Unpacking %ld bytes for constant table...\n", segment_size);
 #endif
-    
+
     if (segment_size % sizeof(opcode_t)) {
         fprintf(stderr, "PackFile_unpack: Illegal constant table segment size %d (must be multiple of %d)!\n",
             segment_size, sizeof(opcode_t));
         return 0;
     }
-    
+
     if (!PackFile_ConstTable_unpack(interpreter, self->const_table, cursor, segment_size)) {
         fprintf(stderr, "PackFile_unpack: Error reading constant table segment!\n");
         return 0;
@@ -391,7 +391,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char 
             self->byte_code_size = 0;
             return 0;
         }
-     
+
         mem_sys_memcopy(self->byte_code, cursor, self->byte_code_size);
     }
 
@@ -486,7 +486,7 @@ PackFile_pack(struct PackFile * self, char * packed) {
     op_ptr = (opcode_t *)cursor;
     *op_ptr = const_table_size;
     cursor += sizeof(opcode_t);
-    
+
     PackFile_ConstTable_pack(self->const_table, cursor);
     cursor += const_table_size;
 
@@ -932,7 +932,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_Co
 #if TRACE_PACKFILE
     printf("PackFile_ConstTable_unpack(): Unpacking %ld constants...\n", self->const_count);
 #endif
-    
+
     if (self->const_count == 0) {
         return 1;
     }
@@ -956,7 +956,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_Co
 
         cursor += PackFile_Constant_pack_size(self->constants[i]);
     }
-    
+
     return 1;
 }
 
@@ -1027,7 +1027,7 @@ PackFile_ConstTable_pack(struct PackFile_ConstTable * self, char * packed) {
 
         cursor += PackFile_Constant_pack_size(self->constants[i]);
     }
-    
+
     return;
 }
 
@@ -1055,7 +1055,7 @@ PackFile_ConstTable_dump(struct PackFile_ConstTable * self) {
         printf("    # %d:\n", i);
         PackFile_Constant_dump(self->constants[i]);
     }
-    
+
     return;
 }
 
@@ -1483,7 +1483,15 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter, struct PackFi
 #endif
 
     self->type   = PFC_STRING;
-    self->string = string_make(interpreter, cursor, size, encoding, flags, type);
+    if (encoding == 0) {
+        self->string = string_make(interpreter, cursor, size, NULL, flags, NULL); /* fixme */
+    }
+    else if (encoding == 3) {
+        self->string = string_make(interpreter, cursor, size, encoding_lookup("utf32"), flags, chartype_lookup("unicode")); /* fixme */
+    }
+    else {
+      return 0;
+    }
 
     return 1;
 }
@@ -1514,15 +1522,15 @@ PackFile_Constant_pack_size(struct PackFile_Constant * self) {
         case PFC_NONE:
             packed_size = 0;
             break;
- 
+
         case PFC_INTEGER:
             packed_size = sizeof(opcode_t);
             break;
- 
+
         case PFC_NUMBER:
             packed_size = sizeof(FLOATVAL);
             break;
- 
+
         case PFC_STRING:
             padded_size = self->string->bufused;
 
@@ -1629,11 +1637,18 @@ PackFile_Constant_pack(struct PackFile_Constant * self, char * packed) {
             cursor += sizeof(opcode_t);
 
             op_ptr  = (opcode_t *)cursor;
-            *op_ptr = self->string->encoding->which;
+            if (strcmp(self->string->type->name, "usascii") == 0 &&
+                strcmp(self->string->encoding->name, "singlebyte") == 0 ) {
+                *op_ptr = 0; /* fixme */
+            }
+            else if (strcmp(self->string->type->name, "unicode") == 0 &&
+                     strcmp(self->string->encoding->name, "utf32") == 0 ) {
+                *op_ptr = 3; /* fixme */
+            }
             cursor += sizeof(opcode_t);
 
             op_ptr  = (opcode_t *)cursor;
-            *op_ptr = self->string->type;
+            *op_ptr = 0; /* fixme */
             cursor += sizeof(opcode_t);
 
             op_ptr  = (opcode_t *)cursor;
@@ -1695,15 +1710,15 @@ PackFile_Constant_dump(struct PackFile_Constant * self) {
         case PFC_STRING:
             printf("    [ 'PFC_STRING', {\n");
             printf("        FLAGS    => 0x%04x,\n", self->string->flags);
-            printf("        ENCODING => %ld,\n", 
-                    (long) self->string->encoding->which);
-            printf("        TYPE     => %ld,\n",  
-                    (long) self->string->type);
-            printf("        SIZE     => %ld,\n",  
+            printf("        ENCODING => %s,\n",
+                    (long) self->string->encoding->name);
+            printf("        TYPE     => %s,\n",
+                    (long) self->string->type->name);
+            printf("        SIZE     => %ld,\n",
                     (long) self->string->bufused);
             /* TODO: Won't do anything reasonable for most encodings */
-            printf("        DATA     => '%.*s'\n",  
-                    self->string->bufused, (char *) self->string->bufstart); 
+            printf("        DATA     => '%.*s'\n",
+                    self->string->bufused, (char *) self->string->bufstart);
             printf("    } ],\n");
             break;
 
@@ -1729,7 +1744,7 @@ PackFile_Constant_dump(struct PackFile_Constant * self) {
 * Local variables:
 * c-indentation-style: bsd
 * c-basic-offset: 4
-* indent-tabs-mode: nil 
+* indent-tabs-mode: nil
 * End:
 *
 * vim: expandtab shiftwidth=4:

@@ -11,9 +11,10 @@ $(INC)/runops_cores.h $(INC)/trace.h $(INC)/oplib/vtable_ops.h \
 $(INC)/pmc.h $(INC)/resources.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
-core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) strnative$(O) \
-strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) runops_cores$(O) \
-trace$(O) vtable_ops$(O) classes/intclass$(O) resources$(O)
+core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) encoding$(O) \
+chartype$(O) runops_cores$(O) trace$(O) vtable_ops$(O) classes/intclass$(O) \
+encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
+encodings/utf32$(O) chartypes/unicode$(O) chartypes/usascii$(O) resources$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -69,15 +70,21 @@ resources$(O): $(H_FILES)
 
 string$(O): $(H_FILES)
 
-strnative$(O): $(H_FILES)
+chartype$(O): $(H_FILES)
 
-strutf8$(O): $(H_FILES)
+encoding$(O): $(H_FILES)
 
-strutf16$(O): $(H_FILES)
+chartype/usascii$(O): $(H_FILES)
 
-strutf32$(O): $(H_FILES)
+chartype/unicode$(O): $(H_FILES)
 
-transcode$(O): $(H_FILES)
+encoding/singlebyte$(O): $(H_FILES)
+
+encoding/utf8$(O): $(H_FILES)
+
+encoding/utf16$(O): $(H_FILES)
+
+encoding/utf32$(O): $(H_FILES)
 
 classes/intclass$(O): $(H_FILES)
 

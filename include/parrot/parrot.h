@@ -3,7 +3,7 @@
  *  CVS Info
  *     $Id$
  *  Overview:
- *     General header file includes for the parrot interpreter    
+ *     General header file includes for the parrot interpreter
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
@@ -14,7 +14,7 @@
 #define PARROT_PARROT_H_GUARD
 
 #if defined(INSIDE_GLOBAL_SETUP)
-#define VAR_SCOPE 
+#define VAR_SCOPE
 #else
 #define VAR_SCOPE extern
 #endif
@@ -62,8 +62,9 @@ typedef void REGEX;
 
 #include "parrot/global_setup.h"
 #include "parrot/interpreter.h"
+#include "parrot/encoding.h"
+#include "parrot/chartype.h"
 #include "parrot/string.h"
-#include "parrot/transcode.h"
 #include "parrot/vtable.h"
 #include "parrot/register.h"
 #include "parrot/exceptions.h"
@@ -81,7 +82,7 @@ typedef void REGEX;
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

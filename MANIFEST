@@ -1,5 +1,8 @@
 assemble.pl
 ChangeLog
+chartype.c
+chartypes/unicode.c
+chartypes/usascii.c
 classes/genclass.pl
 classes/intclass.c
 classes/scalarclass.c
@@ -15,6 +18,11 @@ docs/parrot_assembly.pod
 docs/parrotbyte.pod
 docs/strings.pod
 docs/vtables.pod
+encoding.c
+encodings/singlebyte.c
+encodings/utf8.c
+encodings/utf16.c
+encodings/utf32.c
 examples/assembly/bsr.pasm
 examples/assembly/call.pasm
 examples/assembly/euclid.pasm
@@ -30,6 +38,8 @@ examples/assembly/trace.pasm
 global_setup.c
 hints/mswin32.pl
 hints/vms.pl
+include/parrot/chartype.h
+include/parrot/encoding.h
 include/parrot/events.h
 include/parrot/exceptions.h
 include/parrot/global_setup.h
@@ -46,11 +56,6 @@ include/parrot/resources.h
 include/parrot/runops_cores.h
 include/parrot/stacks.h
 include/parrot/string.h
-include/parrot/strnative.h
-include/parrot/strutf16.h
-include/parrot/strutf32.h
-include/parrot/strutf8.h
-include/parrot/transcode.h
 include/parrot/trace.h
 include/parrot/unicode.h
 interpreter.c
@@ -108,10 +113,6 @@ resources.c
 runops_cores.c
 stacks.c
 string.c
-strnative.c
-strutf16.c
-strutf32.c
-strutf8.c
 test_c.in
 test_main.c
 Test/More.pm
@@ -129,7 +130,6 @@ t/op/string.t
 t/op/time.t
 t/op/trans.t
 trace.c
-transcode.c
 Types_pm.in
 vtable_h.pl
 vtable.tbl

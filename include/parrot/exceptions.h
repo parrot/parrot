@@ -20,6 +20,7 @@
 #define MALFORMED_UTF8 1
 #define MALFORMED_UTF16 1
 #define MALFORMED_UTF32 1
+#define INVALID_CHARACTER 1
 
 #endif
 
@@ -27,7 +28,7 @@
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

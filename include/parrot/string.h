@@ -15,48 +15,16 @@
 
 #include "parrot/parrot.h"
 
-typedef struct parrot_string STRING;
-typedef struct string_vtable STRING_VTABLE;
-
-typedef enum {
-    enc_native,
-    enc_utf8,
-    enc_utf16,
-    enc_utf32,
-    enc_foreign,
-    enc_max
-} encoding_t;
-
-
-/* String vtable functions */
-
-typedef INTVAL (*string_to_iv_t)(STRING *);
-typedef STRING* (*string_iv_to_string_t)(STRING *, INTVAL);
-typedef STRING* (*two_strings_iv_to_string_t)(struct Parrot_Interp *, STRING *, STRING *, INTVAL);
-typedef STRING* (*substr_t)(STRING*, INTVAL, INTVAL, STRING*);
-typedef INTVAL (*iv_to_iv_t)(INTVAL);
-typedef INTVAL (*two_strings_to_iv_t)(STRING*, STRING*);
-
-struct string_vtable {
-    encoding_t which;                   /* What sort of encoding is this? */
-    string_to_iv_t compute_strlen;      /* How long is a piece of string? */
-    iv_to_iv_t max_bytes;               /* I have n characters - how many bytes should I allocate? */
-    two_strings_iv_to_string_t concat;  /* Append string b to the end of string a */
-    string_iv_to_string_t chopn;        /* Remove n characters from the end of a string */
-    substr_t substr;                    /* Substring operation */
-    two_strings_to_iv_t compare;        /* Compare operation */
-};
-
-struct parrot_string {
+typedef struct {
     void *bufstart;
     INTVAL buflen;
     INTVAL bufused;
     INTVAL flags;
     INTVAL strlen;
-    STRING_VTABLE* encoding;
-    INTVAL type;
+    const ENCODING *encoding;
+    const CHARTYPE *type;
     INTVAL lanugage;
-};
+} STRING;
 
 
 /* Declarations of accessors */
@@ -82,18 +50,14 @@ string_grow(STRING* s, INTVAL newsize);
 void
 string_destroy(STRING* s);
 STRING*
-string_make(struct Parrot_Interp *interpreter, void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type);
+string_make(struct Parrot_Interp *interpreter, void *buffer, INTVAL buflen, const ENCODING *encoding, INTVAL flags, const CHARTYPE *type);
 STRING*
 string_copy(struct Parrot_Interp *interpreter, STRING *i);
+STRING*
+string_transcode(struct Parrot_Interp *interpreter, STRING *src, const ENCODING *encoding, const CHARTYPE *type, STRING *dest);
 void
 string_init(void);
 
-VAR_SCOPE STRING_VTABLE Parrot_string_vtable[enc_max];
-
-#include "parrot/strnative.h"
-#include "parrot/strutf8.h"
-#include "parrot/strutf16.h"
-#include "parrot/strutf32.h"
 #endif
 
 /*
