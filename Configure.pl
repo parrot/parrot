@@ -47,6 +47,10 @@ Run C<--verbose=2> for step number C<N> or matching description.
 
 Tells Configure.pl not to run the MANIFEST check.
 
+=item C<--prefix>
+
+Sets the location where parrot will be installed.
+
 =item C<--ask>
 
 This turns on the user prompts.
@@ -300,6 +304,7 @@ General Options:
    --verbose-step=N     Set verbose for step N only
    --verbose-step=regex Set verbose for step matching description
    --nomanicheck        Don't check the MANIFEST
+   --prefix             Set the installation prefix
 
    --ask                Have Configure ask for commonly-changed info
 

@@ -11,7 +11,7 @@ VERSION     = ${VERSION}${DEVEL}
 # Override at least PREFIX with the install location if you're going
 # to be using this outside of your build area.
 BUILDPREFIX =
-PREFIX      = /usr/local/parrot-$(VERSION)
+PREFIX      = ${prefix}
 EXEC_PREFIX = $(PREFIX)
 BINDIR      = $(EXEC_PREFIX)/bin
 LIBDIR      = $(EXEC_PREFIX)/lib

@@ -24,10 +24,10 @@ use Parrot::Configure::Step;
 
 $description="Setting up Configure's data structures...";
 
-@args=('debugging', 'optimize', 'profile', 'verbose');
+@args=('debugging', 'optimize', 'profile', 'verbose', 'prefix');
 
 sub runstep {
-  my ($debugging, $optimize, $profile,  $verbose) = @_;
+  my ($debugging, $optimize, $profile,  $verbose, $prefix) = @_;
 
   package Configure::Data;
   use Config;
@@ -143,6 +143,9 @@ sub runstep {
     ncilib_link_extra => '',              # Extra flags needed for libnci.so
 
   );
+
+  $prefix = "/usr/local/parrot-$c{VERSION}$c{DEVEL}" unless defined $prefix;
+  $c{prefix} = $prefix;
 
   my (%triggers);
 
