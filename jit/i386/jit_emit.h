@@ -1468,15 +1468,27 @@ static unsigned char *lastpc;
 #  define emitm_jle 14
 #  define emitm_jg  15
 
-/* Shortcuts */
+/*
+ * core.jit interface
+ *
+ * The new offset based versions have uppercase RM or MR inside
+ * That's probably only during transition time
+ */
+
 #  define jit_emit_mov_mi_i(pc, dest, immediate) \
     emitm_movl_i_m(pc, immediate, emit_None, emit_None, emit_None, dest)
 
 #  define jit_emit_mov_rm_i(pc, reg, address) \
     emitm_movl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
+#  define jit_emit_mov_RM_i(pc, reg, offs) \
+    emitm_movl_m_r(pc, reg, emit_EBX, emit_None, 1, offs)
+
 #  define jit_emit_mov_mr_i(pc, address, reg) \
     emitm_movl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
+
+#  define jit_emit_mov_MR_i(pc, offs, reg) \
+    emitm_movl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_mul_rm_i(pc, reg, address) \
     emitm_smull_r_m(pc, reg, emit_None, emit_None, emit_None, address)
@@ -1513,8 +1525,8 @@ static unsigned char *lastpc;
  */
 
 /* ST(i) <- numvar */
-#  define jit_emit_mov_rm_n(pc, r, d) { \
-    jit_emit_fload_m_n((pc), d); \
+#  define jit_emit_mov_RM_n(pc, r, d) { \
+    jit_emit_fload_mb_n((pc), emit_EBX, d); \
     emitm_fstp((pc), (r+1)); \
 }
 
@@ -1544,6 +1556,11 @@ static unsigned char *lastpc;
 #  define jit_emit_mov_mr_n(pc, d, r) { \
     emitm_fld((pc), r); \
     jit_emit_fstore_m_n((pc), d); \
+}
+
+#  define jit_emit_mov_MR_n(pc, d, r) { \
+    emitm_fld((pc), r); \
+    jit_emit_fstore_mb_n((pc), emit_EBX, d); \
 }
 
 /* ST(r1) <= ST(r2) */
@@ -2471,26 +2488,6 @@ Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem,int reg)
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
 }
 
-void
-Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
-{
-    jit_emit_mov_mr_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
-}
-
-void
-Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
-{
-    jit_emit_mov_rm_n(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
-}
-
-void
-Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
-{
-    jit_emit_mov_rm_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
-}
 
 void
 Parrot_jit_emit_mov_mr_n_offs(Interp *interpreter,

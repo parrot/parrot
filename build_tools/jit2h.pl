@@ -30,10 +30,12 @@ my %type_to_arg = (
     INT_CONST => 'ic',
     NUM_CONST => 'nc',
     STRING_CONST => 'sc',
+    STR_CONST => 'sc',
     INT_REG => 'i',
     NUM_REG => 'n',
     PMC_REG => 'p',
     STRING_REG => 's',
+    STR_REG => 's',
 );
 
 my $core_numops = scalar(@$Parrot::OpLib::core::ops);
@@ -272,6 +274,10 @@ print JITCPU<<END_C;
 #ifndef MAP
 # define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
 #endif
+
+extern char **Parrot_exec_rel_addr;
+extern int Parrot_exec_rel_count;
+
 END_C
 
 if ($jit_cpu) {
@@ -439,8 +445,9 @@ for ($i = 0; $i < $core_numops; $i++) {
     }
 
     unless($precompiled){
-    print JITCPU "\nstatic $jit_fn_retn " . $core_opfunc[$i] . $func_end . $jit_fn_params . "{\n" .
-        "extern char **Parrot_exec_rel_addr;\nextern int Parrot_exec_rel_count;\n" . $body . "}\n";
+    print JITCPU "\nstatic $jit_fn_retn\n" .$core_opfunc[$i] . $func_end .
+	$jit_fn_params . "\n{\n" .
+	$body . "}\n";
     }
     push @jit_funcs, "{ $jit_func, $extern }, \t" .
 	    "/* op $i: $core_opfunc[$i] */\n";
