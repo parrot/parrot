@@ -17,3 +17,11 @@ packfile-c.pod: ../src/packfile.c
 clean:
 	$(RM_F) packfile-c.pod $(POD)
 
+html:
+	$(MKDIR) html
+	$(PERL) -e "chdir '..';system 'perl tools/docs/write_docs.pl -s -d'"
+
+html-clean:
+	$(PERL) -I../lib -MParrot::IO::Directory -e "Parrot::IO::Directory->new('html')->delete"
+
+

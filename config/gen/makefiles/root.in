@@ -838,6 +838,12 @@ docs.dummy :
 docs-clean :
 	$(MAKE_C) docs clean
 
+html :
+	$(MAKE_C) docs html
+
+html-clean :
+	$(MAKE_C) docs html-clean
+
 ###############################################################################
 #
 # language implementation targets:
