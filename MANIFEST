@@ -1517,6 +1517,7 @@ languages/perl6/t/compiler/8.t
 languages/perl6/t/compiler/9.t
 languages/perl6/t/compiler/a.t
 languages/perl6/t/compiler/b.t
+languages/perl6/t/compiler/c.t
 languages/perl6/t/compiler/qsort.t
 languages/perl6/t/harness
 languages/perl6/t/parser/Makefile

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 2;
+use P6C::TestCompiler tests => 6;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "string interpolation 1");
@@ -53,4 +53,57 @@ we are testing
 3 3
 3 + 3
 on both sides
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "string interpolation 3");
+sub main() {
+    print "\x0a"; # Hex
+    print "\0x010\n";  # Number
+}
+CODE
+
+16
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "string interpolation 3");
+sub main() {
+    print "\c[^J]"; # Control-Char
+    print "\c[REVERSE SOLIDUS]\n"; # Named Unicode
+    print "\c[INVERTED EXCLAMATION MARK;CENT SIGN]\n"; # Named-Unicode m-block
+    print "\0[0x010]\n"; # Number block
+    print "\x[40;50]\n";
+}
+CODE
+
+\
+¡¢
+16
+@P
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "string interpolation 4");
+sub main() {
+    print "\ux\n"; # Uppercase Single
+    print "\lX\n"; # Lowercase Single
+    print "\U[xxx]\n";   # Uppercase block
+    print "\L[XXX]\n";   # Lowercase block
+}
+CODE
+X
+x
+XXX
+xxx
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "string interpolation 6");
+sub main() {
+    @code = ("hi");
+    print "@code\Q[0]\n"; # Stop interpolation
+}
+CODE
+hi0
 OUT
