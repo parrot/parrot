@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -290,6 +290,408 @@ ok 16
 ok 17
 ok 18
 ok 19
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Bracketed access test suite");
+      new P0, .PerlArray
+
+      #
+      # Make sure an uninitialized PerlArray has a length of 0
+      #
+      set   I0, P0
+      eq    I0, 0, OK_1
+      print "not "
+OK_1: print "ok 1\n"
+
+#---------------------------------------------
+#
+# Integer constants
+#
+
+      #
+      # Set index zero to 7
+      #
+      set   P0[0], 7
+
+      #
+      # Make sure the length is 1
+      #
+      set   I0, P0
+      eq    I0, 1, OK_2
+      print "not "
+OK_2: print "ok 2\n"
+
+      #
+      # Make sure index zero is indeed 7
+      set   I0, P0[0]
+      eq    I0, 7, OK_3
+      print "not "
+OK_3: print "ok 3\n"
+
+      #
+      # Set index zero to -15
+      #
+      set   P0[0], -15
+
+      #
+      # Make sure the length is 1
+      #
+      set   I0, P0
+      eq    I0, 1, OK_4
+      print "not "
+OK_4: print "ok 4\n"
+
+      #
+      # Make sure index zero is indeed 7
+      set   I0, P0[0]
+      eq    I0, -15, OK_5
+      print "not "
+OK_5: print "ok 5\n"
+
+      #
+      # Set index zero to 3.7
+      #
+      set   P0[0], 3.7
+
+      #
+      # Make sure the length is 1
+      #
+      set   I0, P0
+      eq    I0, 1, OK_6
+      print "not "
+OK_6: print "ok 6\n"
+
+      #
+      # Make sure index zero is indeed 3.7
+      #
+      set   N0, P0[0]
+      eq    N0, 3.700000, OK_7
+      print "not "
+OK_7: print "ok 7\n"
+
+      #
+      # Set index zero to "foo"
+      #
+      set   P0[0], "foo"
+
+      #
+      # Make sure the length is 1
+      #
+      set   I0, P0
+      eq    I0, 1, OK_8
+      print "not "
+OK_8: print "ok 8\n"
+
+      #
+      # Make sure index zero is indeed "foo"
+      #
+      set   S0, P0[0]
+      eq    S0, "foo", OK_9
+      print "not "
+OK_9: print "ok 9\n"
+
+#---------------------------------------------
+#
+# Integer register
+#
+       set I31,0
+
+       #
+       # Set index zero to 7
+       #
+       set   P0[I31], 7
+
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_10
+       print "not "
+OK_10: print "ok 10\n"
+
+       #
+       # Make sure index zero is indeed 7
+       #
+       set   I0, P0[I31]
+       eq    I0, 7, OK_11
+       print "not "
+OK_11: print "ok 11\n"
+
+       #
+       # Set index zero to -15
+       #
+       set   P0[I31], -15
+
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_12
+       print "not "
+OK_12: print "ok 12\n"
+
+       #
+       # Make sure index zero is indeed 7
+       #
+       set   I0, P0[I31]
+       eq    I0, -15, OK_13
+       print "not "
+OK_13: print "ok 13\n"
+
+       #
+       # Set index zero to 3.7
+       #
+       set   P0[I31], 3.7
+ 
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_14
+       print "not "
+OK_14: print "ok 14\n"
+
+       #
+       # Make sure index zero is indeed 3.7
+       #
+       set   N0, P0[I31]
+       eq    N0, 3.700000, OK_15
+       print "not "
+OK_15: print "ok 15\n"
+
+       #
+       # Set index zero to "foo"
+       #
+       set   P0[I31], "foo"
+ 
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_16
+       print "not "
+OK_16: print "ok 16\n"
+
+       #
+       # Make sure index zero is indeed "foo"
+       #
+       set   S0, P0[I31]
+       eq    S0, "foo", OK_17
+       print "not "
+OK_17: print "ok 17\n"
+
+#---------------------------------------------
+#
+# String constant
+#
+       #
+       # Set index zero to 7
+       #
+       set   P0["bar"], 7
+
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_18
+       print "not "
+OK_18: print "ok 18\n"
+
+       #
+       # Make sure index zero is indeed 7
+       #
+       set   I0, P0["bar"]
+       eq    I0, 7, OK_19
+       print "not "
+OK_19: print "ok 19\n"
+
+       #
+       # Set index zero to -15
+       #
+       set   P0["bar"], -15
+
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_20
+       print "not "
+OK_20: print "ok 20\n"
+
+       #
+       # Make sure index zero is indeed 7
+       #
+       set   I0, P0["bar"]
+       eq    I0, -15, OK_21
+       print "not "
+OK_21: print "ok 21\n"
+
+       #
+       # Set index zero to 3.7
+       #
+       set   P0["bar"], 3.7
+ 
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_22
+       print "not "
+OK_22: print "ok 22\n"
+
+       #
+       # Make sure index zero is indeed 3.7
+       #
+       set   N0, P0["bar"]
+       eq    N0, 3.700000, OK_23
+       print "not "
+OK_23: print "ok 23\n"
+
+       #
+       # Set index zero to "foo"
+       #
+       set   P0["bar"], "foo"
+ 
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_24
+       print "not "
+OK_24: print "ok 24\n"
+
+       #
+       # Make sure index zero is indeed "bar"
+       #
+       set   S0, P0["bar"]
+       eq    S0, "foo", OK_25
+       print "not "
+OK_25: print "ok 25\n"
+
+#---------------------------------------------
+#
+# String register
+#
+       set S31,"qux"
+       #
+       # Set index zero to 7
+       #
+       set   P0[S31], 7
+
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_26
+       print "not "
+OK_26: print "ok 26\n"
+
+       #
+       # Make sure index zero is indeed 7
+       #
+       set   I0, P0[S31]
+       eq    I0, 7, OK_27
+       print "not "
+OK_27: print "ok 27\n"
+
+       #
+       # Set index zero to -15
+       #
+       set   P0[S31], -15
+
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_28
+       print "not "
+OK_28: print "ok 28\n"
+
+       #
+       # Make sure index zero is indeed 7
+       #
+       set   I0, P0[S31]
+       eq    I0, -15, OK_29
+       print "not "
+OK_29: print "ok 29\n"
+
+       #
+       # Set index zero to 3.7
+       #
+       set   P0[S31], 3.7
+ 
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_30
+       print "not "
+OK_30: print "ok 30\n"
+
+       #
+       # Make sure index zero is indeed 3.7
+       #
+       set   N0, P0[S31]
+       eq    N0, 3.700000, OK_31
+       print "not "
+OK_31: print "ok 31\n"
+
+       #
+       # Set index zero to "foo"
+       #
+       set   P0[S31], "foo"
+ 
+       #
+       # Make sure the length is 1
+       #
+       set   I0, P0
+       eq    I0, 1, OK_32
+       print "not "
+OK_32: print "ok 32\n"
+
+       #
+       # Make sure index zero is indeed "bar"
+       #
+       set   S0, P0[S31]
+       eq    S0, "foo", OK_33
+       print "not "
+OK_33: print "ok 33\n"
+
+       end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+ok 11
+ok 12
+ok 13
+ok 14
+ok 15
+ok 16
+ok 17
+ok 18
+ok 19
+ok 20
+ok 21
+ok 22
+ok 23
+ok 24
+ok 25
+ok 26
+ok 27
+ok 28
+ok 29
+ok 30
+ok 31
+ok 32
+ok 33
 OUTPUT
 
 1;

@@ -918,7 +918,7 @@ inline op set_keyed_integer (out PMC, in INT, in NUM)  {
 
     MAKE_KEY(key, $2, enum_key_int, int_val);
 
-    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
+    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
@@ -931,7 +931,7 @@ inline op set_keyed_integer (out NUM, in PMC, in INT)  {
 
     MAKE_KEY(key, $3, enum_key_int, int_val);
 
-    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
     goto NEXT();
 }
 
@@ -953,6 +953,84 @@ inline op set_keyed_integer (out PMC, in INT, in STR)  {
 =cut
 
 inline op set_keyed_integer (out STR, in PMC, in INT)  {
+    KEY key;
+
+    MAKE_KEY(key, $3, enum_key_int, int_val);
+
+    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+=item B<set_keyed_integer>(out PMC, in KEY, in INT)
+
+=cut
+
+inline op set_keyed_integer (out PMC, in KEY, in INT)  {
+    KEY key;
+
+    MAKE_KEY(key, $2, enum_key_string, int_val);
+
+    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+=item B<set_keyed_integer>(out INT, in PMC, in KEY)
+
+=cut
+
+inline op set_keyed_integer (out INT, in PMC, in KEY)  {
+    KEY key;
+
+    MAKE_KEY(key, $3, enum_key_int, int_val);
+
+    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+=item B<set_keyed_integer>(out PMC, in KEY, in NUM)
+
+=cut
+
+inline op set_keyed_integer (out PMC, in KEY, in NUM)  {
+    KEY key;
+
+    MAKE_KEY(key, $2, enum_key_string, int_val);
+
+    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+=item B<set_keyed_integer>(out NUM, in PMC, in KEY)
+
+=cut
+
+inline op set_keyed_integer (out NUM, in PMC, in KEY)  {
+    KEY key;
+
+    MAKE_KEY(key, $3, enum_key_int, int_val);
+
+    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+=item B<set_keyed_integer>(out PMC, in KEY, in STR)
+
+=cut
+
+inline op set_keyed_integer (out PMC, in KEY, in STR)  {
+    KEY key;
+
+    MAKE_KEY(key, $2, enum_key_string, int_val);
+
+    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+=item B<set_keyed_integer>(out STR, in PMC, in KEY)
+
+=cut
+
+inline op set_keyed_integer (out STR, in PMC, in KEY)  {
     KEY key;
 
     MAKE_KEY(key, $3, enum_key_int, int_val);
@@ -996,7 +1074,7 @@ inline op set_keyed (out PMC, in KEY, in NUM)  {
 
     MAKE_KEY(key, $2, enum_key_string, int_val);
 
-    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
+    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
@@ -1009,7 +1087,7 @@ inline op set_keyed (out NUM, in PMC, in KEY)  {
 
     MAKE_KEY(key, $3, enum_key_string, int_val);
 
-    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
     goto NEXT();
 }
 

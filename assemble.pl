@@ -767,6 +767,16 @@ sub to_bytecode {
         _to_keyed($_);
         push @{$_->[0]}, ['s',$1];
       }
+      elsif($temp=~s/^\[(I\d+)\]//) { # The only key register should be Sn
+        my $reg_idx = substr($1,1);
+        unless($reg_idx >= 0 and $reg_idx <= 31) {
+          print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
+          last;
+        }
+        $suffixes .= "_k";
+        _to_keyed_integer($_);
+        push @{$_->[0]}, ['s',$1];
+      }
       elsif($temp=~s/^($flt_re)//) {
         $suffixes .= "_nc";
         push @{$_->[0]}, $self->_numeric_constant($1);
