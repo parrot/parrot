@@ -11,9 +11,9 @@ Parrot Assembly Language
     PDD Number: 6
     Version: 1.6
     Status: Developing
-    Last Modified: 05 November 2001
+    Last Modified: 29 November 2001
     PDD Format: 1
-    Language:English
+    Language: English
 
 =head2 HISTORY
 
