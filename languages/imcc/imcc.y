@@ -303,28 +303,19 @@ iANY(struct Parrot_Interp *interpreter, char * name,
         for (i = 0; i < op_info->arg_count-1; i++) {
             switch (op_info->dirs[i+1]) {
                 case PARROT_ARGDIR_INOUT:
-                    /* inout is actually in for imcc, the PMC has to exist
-                     * previously, so:
-                     * goon
-                     *     except: set_p_p_k? keyed fetch
-                     */
-                     if (i == 0 && r[i]->set == 'P' && (keyvec & KEY_BIT(2))) {
-                        dirs |= 1 << (16 + i);
-                        break;
-                     }
-                     if (r[i]->set != 'P')
-                        dirs |= 1 << (16 + i);
-	    case PARROT_ARGDIR_IN:
-                    dirs |= 1 << i ;
-		break;
-
-	    case PARROT_ARGDIR_OUT:
                     dirs |= 1 << (16 + i);
-		break;
+                    /* goon */
+                case PARROT_ARGDIR_IN:
+                    dirs |= 1 << i ;
+                    break;
 
-	    default:
-		assert(0);
-	    };
+                case PARROT_ARGDIR_OUT:
+                    dirs |= 1 << (16 + i);
+                    break;
+
+                default:
+                    assert(0);
+            };
             if (keyvec & KEY_BIT(i)) {
                 len = strlen(format);
                 len -= 2;

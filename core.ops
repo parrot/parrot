@@ -366,13 +366,13 @@ op exchange(inout STR, inout STR) {
 
 =item B<set>(out NUM, in STR)
 
-=item B<set>(inout PMC, in INT)
+=item B<set>(in PMC, in INT)
 
-=item B<set>(inout PMC, in NUM)
+=item B<set>(in PMC, in NUM)
 
 =item B<set>(out PMC, in PMC)
 
-=item B<set>(inout PMC, in STR)
+=item B<set>(in PMC, in STR)
 
 =item B<set>(out STR, in INT)
 
@@ -451,17 +451,17 @@ inline op set(out PMC, in PMC) {
   goto NEXT();
 }
 
-inline op set(inout PMC, in INT) {
+inline op set(in PMC, in INT) {
   $1->vtable->set_integer_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op set(inout PMC, in NUM) {
+inline op set(in PMC, in NUM) {
   $1->vtable->set_number_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op set(inout PMC, in STR) {
+inline op set(in PMC, in STR) {
   $1->vtable->set_string_native(interpreter, $1, $2);
   goto NEXT();
 }
@@ -475,41 +475,41 @@ inline op set(out INT, in PMC) {
 
 =head2 PMC assignment operations: Px = x
 
-=item B<assign>(inout PMC, in INT)
+=item B<assign>(in PMC, in INT)
 
-=item B<assign>(inout PMC, in NUM)
+=item B<assign>(in PMC, in NUM)
 
-=item B<assign>(inout PMC, in PMC)
+=item B<assign>(in PMC, in PMC)
 
-=item B<assign>(inout PMC, in STR)
+=item B<assign>(in PMC, in STR)
 
 Assign a new value to a string by reusing the string header.
 
-=item B<assign>(inout STR, in STR)
+=item B<assign>(out STR, in STR)
 
 =cut
 
-inline op assign(inout PMC, in PMC) {
+inline op assign(in PMC, in PMC) {
   $1->vtable->set_pmc(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op assign(inout PMC, in INT) {
+inline op assign(in PMC, in INT) {
   $1->vtable->set_integer_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op assign(inout PMC, in NUM) {
+inline op assign(in PMC, in NUM) {
   $1->vtable->set_number_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op assign(inout PMC, in STR) {
+inline op assign(in PMC, in STR) {
   $1->vtable->set_string_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op assign(inout STR, in STR) {
+inline op assign(out STR, in STR) {
   $1 = string_set(interpreter, $1, $2);
   goto NEXT();
 }
@@ -517,35 +517,35 @@ inline op assign(inout STR, in STR) {
 
 =head2 Keyed set operations: Px[ INTKEY ] = Bx
 
-=item B<set>(inout PMC, in INTKEY, in INT)
+=item B<set>(in PMC, in INTKEY, in INT)
 
-=item B<set>(inout PMC, in INTKEY, in NUM)
+=item B<set>(in PMC, in INTKEY, in NUM)
 
-=item B<set>(inout PMC, in INTKEY, in STR)
+=item B<set>(in PMC, in INTKEY, in STR)
 
-=item B<set>(inout PMC, in INTKEY, in PMC)
+=item B<set>(in PMC, in INTKEY, in PMC)
 
 =cut
 
-inline op set (inout PMC, in INTKEY, in INT)  {
+inline op set (in PMC, in INTKEY, in INT)  {
     INTVAL key = $2;
     $1->vtable->set_integer_keyed_int(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
-inline op set (inout PMC, in INTKEY, in NUM)  {
+inline op set (in PMC, in INTKEY, in NUM)  {
     INTVAL key = $2;
     $1->vtable->set_number_keyed_int(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
-inline op set (inout PMC, in INTKEY, in STR)  {
+inline op set (in PMC, in INTKEY, in STR)  {
     INTVAL key = $2;
     $1->vtable->set_string_keyed_int(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
-inline op set (inout PMC, in INTKEY, in PMC)  {
+inline op set (in PMC, in INTKEY, in PMC)  {
     INTVAL key = $2;
     $1->vtable->set_pmc_keyed_int(interpreter, $1, &key, $3, NULL);
     goto NEXT();
@@ -561,7 +561,7 @@ inline op set (inout PMC, in INTKEY, in PMC)  {
 
 =item B<set>(out STR, in PMC, in INTKEY)
 
-=item B<set>(inout PMC, in PMC, in INTKEY)
+=item B<set>(out PMC, in PMC, in INTKEY)
 
 =cut
 
@@ -583,7 +583,7 @@ inline op set (out STR, in PMC, in INTKEY)  {
     goto NEXT();
 }
 
-inline op set (inout PMC, in PMC, in INTKEY) {
+inline op set (out PMC, in PMC, in INTKEY) {
     INTVAL key = $3;
     $1 = $2->vtable->get_pmc_keyed_int(interpreter, $2, &key);
     goto NEXT();
@@ -592,32 +592,32 @@ inline op set (inout PMC, in PMC, in INTKEY) {
 
 =head2 Keyed set operations: Px[ KEY ] = Bx
 
-=item B<set>(inout PMC, in KEY, in INT)
+=item B<set>(in PMC, in KEY, in INT)
 
-=item B<set>(inout PMC, in KEY, in NUM)
+=item B<set>(in PMC, in KEY, in NUM)
 
-=item B<set>(inout PMC, in KEY, in STR)
+=item B<set>(in PMC, in KEY, in STR)
 
-=item B<set>(inout PMC, in KEY, in PMC)
+=item B<set>(in PMC, in KEY, in PMC)
 
 =cut
 
-inline op set (inout PMC, in KEY, in INT)  {
+inline op set (in PMC, in KEY, in INT)  {
     $1->vtable->set_integer_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set (inout PMC, in KEY, in NUM)  {
+inline op set (in PMC, in KEY, in NUM)  {
     $1->vtable->set_number_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set (inout PMC, in KEY, in STR)  {
+inline op set (in PMC, in KEY, in STR)  {
     $1->vtable->set_string_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
-inline op set (inout PMC, in KEY, in PMC)  {
+inline op set (in PMC, in KEY, in PMC)  {
     $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3, NULL);
     goto NEXT();
 }
@@ -630,7 +630,7 @@ inline op set (inout PMC, in KEY, in PMC)  {
 
 =item B<set>(out STR, in PMC, in KEY)
 
-=item B<set>(inout PMC, in PMC, in KEY)
+=item B<set>(out PMC, in PMC, in KEY)
 
 =cut
 
@@ -649,18 +649,18 @@ inline op set (out STR, in PMC, in KEY)  {
     goto NEXT();
 }
 
-inline op set (inout PMC, in PMC, in KEY)  {
+inline op set (out PMC, in PMC, in KEY)  {
     $1 = $2->vtable->get_pmc_keyed(interpreter, $2, $3);
     goto NEXT();
 }
 
 =head2 Keyed set operations: Px[ KEY ] = Px[ KEY ]
 
-=item B<set>(inout PMC, in KEY, in PMC, in KEY)
+=item B<set>(in PMC, in KEY, in PMC, in KEY)
 
 =cut
 
-inline op set (inout PMC, in KEY, in PMC, in KEY)  {
+inline op set (in PMC, in KEY, in PMC, in KEY)  {
     $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3, $4);
     goto NEXT();
 }
@@ -1156,11 +1156,11 @@ inline op abs(out NUM, in NUM) {
 
 =item B<add>(inout NUM, in NUM)
 
-=item B<add>(inout PMC, in INT)
+=item B<add>(in PMC, in INT)
 
-=item B<add>(inout PMC, in NUM)
+=item B<add>(in PMC, in NUM)
 
-=item B<add>(inout PMC, in PMC)
+=item B<add>(in PMC, in PMC)
 
 Increase $1 by the amount in $2.
 
@@ -1170,11 +1170,11 @@ Increase $1 by the amount in $2.
 
 =item B<add>(out NUM, in NUM, in NUM)
 
-=item B<add>(inout PMC, in PMC, in INT)
+=item B<add>(in PMC, in PMC, in INT)
 
-=item B<add>(inout PMC, in PMC, in NUM)
+=item B<add>(in PMC, in PMC, in NUM)
 
-=item B<add>(inout PMC, in PMC, in PMC)
+=item B<add>(in PMC, in PMC, in PMC)
 
 Set $1 to the sum of $2 and $3.
 
@@ -1195,17 +1195,17 @@ inline op add(inout NUM, in NUM) {
   goto NEXT();
 }
 
-inline op add(inout PMC, in INT) {
+inline op add(in PMC, in INT) {
   $1->vtable->add_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op add(inout PMC, in NUM) {
+inline op add(in PMC, in NUM) {
   $1->vtable->add_float(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op add(inout PMC, in PMC) {
+inline op add(in PMC, in PMC) {
   $1->vtable->add(interpreter, $1, $2, $1);
   goto NEXT();
 }
@@ -1225,17 +1225,17 @@ inline op add(out NUM, in NUM, in NUM) {
   goto NEXT();
 }
 
-inline op add(inout PMC, in PMC, in INT) {
+inline op add(in PMC, in PMC, in INT) {
   $2->vtable->add_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op add(inout PMC, in PMC, in NUM) {
+inline op add(in PMC, in PMC, in NUM) {
   $2->vtable->add_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op add (inout PMC, in PMC, in PMC) {
+inline op add (in PMC, in PMC, in PMC) {
   $2->vtable->add(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -1333,7 +1333,7 @@ inline op cmod(out NUM, in NUM, in NUM) {
 
 =item B<dec>(inout NUM)
 
-=item B<dec>(inout PMC)
+=item B<dec>(in PMC)
 
 Decrease $1 by one.
 
@@ -1349,7 +1349,7 @@ inline op dec(inout NUM) {
   goto NEXT();
 }
 
-inline op dec(inout PMC) {
+inline op dec(in PMC) {
   $1->vtable->decrement(interpreter, $1);
   goto NEXT();
 }
@@ -1362,11 +1362,11 @@ inline op dec(inout PMC) {
 
 =item B<div>(inout NUM, in NUM)
 
-=item B<div>(inout PMC, in INT)
+=item B<div>(in PMC, in INT)
 
-=item B<div>(inout PMC, in NUM)
+=item B<div>(in PMC, in NUM)
 
-=item B<div>(inout PMC, in PMC)
+=item B<div>(in PMC, in PMC)
 
 Divide $1 by $2.
 
@@ -1376,11 +1376,11 @@ Divide $1 by $2.
 
 =item B<div>(out NUM, in NUM, in NUM)
 
-=item B<div>(inout PMC, in PMC, in INT)
+=item B<div>(in PMC, in PMC, in INT)
 
-=item B<div>(inout PMC, in PMC, in NUM)
+=item B<div>(in PMC, in PMC, in NUM)
 
-=item B<div>(inout PMC, in PMC, in PMC)
+=item B<div>(in PMC, in PMC, in PMC)
 
 Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
 result is truncated (NOT rounded or floored).
@@ -1402,12 +1402,12 @@ inline op div(inout NUM, in NUM) {
   goto NEXT();
 }
 
-inline op div (inout PMC, in INT) {
+inline op div (in PMC, in INT) {
   $1->vtable->divide_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op div (inout PMC, in NUM) {
+inline op div (in PMC, in NUM) {
   $1->vtable->divide_float(interpreter, $1, $2, $1);
   goto NEXT();
 }
@@ -1427,17 +1427,17 @@ inline op div(out NUM, in NUM, in NUM) {
   goto NEXT();
 }
 
-inline op div (inout PMC, in PMC, in INT) {
+inline op div (in PMC, in PMC, in INT) {
   $2->vtable->divide_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op div (inout PMC, in PMC, in NUM) {
+inline op div (in PMC, in PMC, in NUM) {
   $2->vtable->divide_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op div (inout PMC, in PMC, in PMC) {
+inline op div (in PMC, in PMC, in PMC) {
   $2->vtable->divide(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -1448,7 +1448,7 @@ inline op div (inout PMC, in PMC, in PMC) {
 
 =item B<inc>(inout NUM)
 
-=item B<inc>(inout PMC)
+=item B<inc>(in PMC)
 
 Increase $1 by one.
 
@@ -1464,7 +1464,7 @@ inline op inc(inout NUM) {
   goto NEXT();
 }
 
-inline op inc(inout PMC) {
+inline op inc(in PMC) {
   $1->vtable->increment(interpreter, $1);
   goto NEXT();
 }
@@ -1492,11 +1492,11 @@ References:
   [2] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
       Mathematics*, Second Edition. Addison-Wesley, 1994.
 
-=item B<mod>(inout PMC, in PMC, in PMC)
+=item B<mod>(in PMC, in PMC, in PMC)
 
 Sets $1 to the modulus of $2 and $3.
 
-=item B<mod>(inout PMC, in INT)
+=item B<mod>(in PMC, in INT)
 
 Sets $1 to the modulus of $1 and $2.
 
@@ -1529,12 +1529,12 @@ op mod(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op mod (inout PMC, in PMC, in PMC) {
+inline op mod (in PMC, in PMC, in PMC) {
   $2->vtable->modulus(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op mod ( inout PMC, in INT ) {
+inline op mod ( in PMC, in INT ) {
   $1->vtable->modulus_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
@@ -1586,11 +1586,11 @@ op mod(out NUM, in NUM, in NUM) {
 
 =item B<mul>(inout NUM, in NUM)
 
-=item B<mul>(inout PMC, in INT)
+=item B<mul>(in PMC, in INT)
 
-=item B<mul>(inout PMC, in NUM)
+=item B<mul>(in PMC, in NUM)
 
-=item B<mul>(inout PMC, in PMC)
+=item B<mul>(in PMC, in PMC)
 
 Set $1 to the product of $1 and $2.
 
@@ -1600,11 +1600,11 @@ Set $1 to the product of $1 and $2.
 
 =item B<mul>(out NUM, in NUM, in NUM)
 
-=item B<mul>(inout PMC, in PMC, in INT)
+=item B<mul>(in PMC, in PMC, in INT)
 
-=item B<mul>(inout PMC, in PMC, in NUM)
+=item B<mul>(in PMC, in PMC, in NUM)
 
-=item B<mul>(inout PMC, in PMC, in PMC)
+=item B<mul>(in PMC, in PMC, in PMC)
 
 Set $1 to the product of $2 and $3.
 
@@ -1625,17 +1625,17 @@ inline op mul(inout NUM, in NUM) {
   goto NEXT();
 }
 
-inline op mul ( inout PMC, in INT ) {
+inline op mul ( in PMC, in INT ) {
   $1->vtable->multiply_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op mul ( inout PMC, in NUM ) {
+inline op mul ( in PMC, in NUM ) {
   $1->vtable->multiply_float(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op mul (inout PMC, in PMC) {
+inline op mul (in PMC, in PMC) {
   $1->vtable->multiply(interpreter, $1, $2, $1);
   goto NEXT();
 }
@@ -1655,17 +1655,17 @@ inline op mul(out NUM, in NUM, in NUM) {
   goto NEXT();
 }
 
-inline op mul (inout PMC, in PMC, in INT) {
+inline op mul (in PMC, in PMC, in INT) {
   $2->vtable->multiply_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op mul (inout PMC, in PMC, in NUM) {
+inline op mul (in PMC, in PMC, in NUM) {
   $2->vtable->multiply_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op mul (inout PMC, in PMC, in PMC) {
+inline op mul (in PMC, in PMC, in PMC) {
   $2->vtable->multiply(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -1682,7 +1682,7 @@ Set $1 to its negative.
 
 =item B<neg>(out NUM, in NUM)
 
-=item B<neg>(inout PMC, in PMC)
+=item B<neg>(in PMC, in PMC)
 
 Set $1 to the negative of $2.
 
@@ -1708,7 +1708,7 @@ inline op neg(out NUM, in NUM) {
   goto NEXT();
 }
 
-inline op neg(inout PMC, in PMC) {
+inline op neg(in PMC, in PMC) {
   $2->vtable->neg(interpreter, $2, $1);
   goto NEXT();
 }
@@ -1756,11 +1756,11 @@ inline op pow(out NUM, in NUM, in NUM) {
 
 =item B<sub>(inout NUM, in NUM)
 
-=item B<sub>(inout PMC, in INT)
+=item B<sub>(in PMC, in INT)
 
-=item B<sub>(inout PMC, in NUM)
+=item B<sub>(in PMC, in NUM)
 
-=item B<sub>(inout PMC, in PMC)
+=item B<sub>(in PMC, in PMC)
 
 Decrease $1 by the amount in $2.
 
@@ -1770,11 +1770,11 @@ Decrease $1 by the amount in $2.
 
 =item B<sub>(out NUM, in NUM, in NUM)
 
-=item B<sub>(inout PMC, in PMC, in INT)
+=item B<sub>(in PMC, in PMC, in INT)
 
-=item B<sub>(inout PMC, in PMC, in NUM)
+=item B<sub>(in PMC, in PMC, in NUM)
 
-=item B<sub>(inout PMC, in PMC, in PMC)
+=item B<sub>(in PMC, in PMC, in PMC)
 
 Set $1 to $2 minus $3.
 
@@ -1795,17 +1795,17 @@ inline op sub(inout NUM, in NUM) {
   goto NEXT();
 }
 
-inline op sub(inout PMC, in INT) {
+inline op sub(in PMC, in INT) {
   $1->vtable->subtract_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op sub(inout PMC, in NUM) {
+inline op sub(in PMC, in NUM) {
   $1->vtable->subtract_float(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op sub(inout PMC, in PMC) {
+inline op sub(in PMC, in PMC) {
   $1->vtable->subtract(interpreter, $1, $2, $1);
   goto NEXT();
 }
@@ -1825,17 +1825,17 @@ inline op sub(out NUM, in NUM, in NUM) {
   goto NEXT();
 }
 
-inline op sub(inout PMC, in PMC, in INT) {
+inline op sub(in PMC, in PMC, in INT) {
   $2->vtable->subtract_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op sub(inout PMC, in PMC, in NUM) {
+inline op sub(in PMC, in PMC, in NUM) {
   $2->vtable->subtract_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op sub (inout PMC, in PMC, in PMC) {
+inline op sub (in PMC, in PMC, in PMC) {
   $2->vtable->subtract(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -1885,7 +1885,7 @@ inline op chopn(out STR, in STR, in INT) {
 
 =item B<concat>(out STR, in STR, in STR)
 
-=item B<concat>(inout PMC, in PMC, in PMC)
+=item B<concat>(in PMC, in PMC, in PMC)
 
 Append the string in $2 to the string in $1.
 
@@ -1904,7 +1904,7 @@ inline op concat(out STR, in STR, in STR) {
   goto NEXT();
 }
 
-inline op concat (inout PMC, in PMC, in PMC) {
+inline op concat (in PMC, in PMC, in PMC) {
   $2->vtable->concatenate(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -1913,7 +1913,7 @@ inline op concat (inout PMC, in PMC, in PMC) {
 
 =item B<repeat>(out STR, in STR, in INT)
 
-=item B<repeat>(inout PMC, in PMC, in PMC)
+=item B<repeat>(in PMC, in PMC, in PMC)
 
 Repeats string $2 $3 times and stores result in $1.
 
@@ -1927,7 +1927,7 @@ inline op repeat(out STR, in STR, in INT) {
   goto NEXT();
 }
 
-inline op repeat (inout PMC, in PMC, in PMC) {
+inline op repeat (in PMC, in PMC, in PMC) {
   $2->vtable->repeat(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -2669,17 +2669,17 @@ These operations apply  bitwise logical functions to their arguments.
 
 =item B<band>(inout INT, in INT)
 
-=item B<band>(inout PMC, in INT)
+=item B<band>(in PMC, in INT)
 
-=item B<band>(inout PMC, in PMC)
+=item B<band>(in PMC, in PMC)
 
 Set the bits of $1 according to the B<and> of the corresponding bits from $1 and $2.
 
 =item B<band>(out INT, in INT, in INT)
 
-=item B<band>(inout PMC, in PMC, in INT)
+=item B<band>(in PMC, in PMC, in INT)
 
-=item B<band>(inout PMC, in PMC, in PMC)
+=item B<band>(in PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
 
@@ -2690,12 +2690,12 @@ inline op band(inout INT, in INT) {
   goto NEXT();
 }
 
-inline op band(inout PMC, in INT) {
+inline op band(in PMC, in INT) {
   $1->vtable->bitwise_and_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op band(inout PMC, in PMC) {
+inline op band(in PMC, in PMC) {
   $1->vtable->bitwise_and(interpreter, $1, $2, $1);
   goto NEXT();
 }
@@ -2705,12 +2705,12 @@ inline op band(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op band(inout PMC, in PMC, in INT) {
+inline op band(in PMC, in PMC, in INT) {
   $2->vtable->bitwise_and_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op band(inout PMC, in PMC, in PMC) {
+inline op band(in PMC, in PMC, in PMC) {
   $2->vtable->bitwise_and(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -2719,7 +2719,7 @@ inline op band(inout PMC, in PMC, in PMC) {
 
 =item B<bnot>(out INT, in INT)
 
-=item B<bnot>(inout PMC, in PMC)
+=item B<bnot>(in PMC, in PMC)
 
 Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
@@ -2730,7 +2730,7 @@ inline op bnot(out INT, in INT) {
   goto NEXT();
 }
 
-inline op bnot(inout PMC, in PMC) {
+inline op bnot(in PMC, in PMC) {
   $2->vtable->bitwise_not(interpreter, $2, $1);
   goto NEXT();
 }
@@ -2739,17 +2739,17 @@ inline op bnot(inout PMC, in PMC) {
 
 =item B<bor>(inout INT, in INT)
 
-=item B<bor>(inout PMC, in INT)
+=item B<bor>(in PMC, in INT)
 
-=item B<bor>(inout PMC, in PMC)
+=item B<bor>(in PMC, in PMC)
 
 Set the bits of $1 according to the B<or> of the corresponding bits from $1 and $2.
 
 =item B<bor>(out INT, in INT, in INT)
 
-=item B<bor>(inout PMC, in PMC, in INT)
+=item B<bor>(in PMC, in PMC, in INT)
 
-=item B<bor>(inout PMC, in PMC, in PMC)
+=item B<bor>(in PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
 
@@ -2760,12 +2760,12 @@ inline op bor(inout INT, in INT) {
   goto NEXT();
 }
 
-inline op bor(inout PMC, in INT) {
+inline op bor(in PMC, in INT) {
   $1->vtable->bitwise_or_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bor(inout PMC, in PMC) {
+inline op bor(in PMC, in PMC) {
   $1->vtable->bitwise_or(interpreter, $1, $2, $1);
   goto NEXT();
 }
@@ -2775,12 +2775,12 @@ inline op bor(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op bor(inout PMC, in PMC, in INT) {
+inline op bor(in PMC, in PMC, in INT) {
   $2->vtable->bitwise_or_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op bor(inout PMC, in PMC, in PMC) {
+inline op bor(in PMC, in PMC, in PMC) {
   $2->vtable->bitwise_or(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -2789,7 +2789,7 @@ inline op bor(inout PMC, in PMC, in PMC) {
 
 =item B<shl>(out INT, in INT, in INT)
 
-=item B<shl>(inout PMC, in PMC, in PMC)
+=item B<shl>(in PMC, in PMC, in PMC)
 
 Set $1 to the value of $2 shifted left by $3 bits.
 
@@ -2800,7 +2800,7 @@ inline op shl(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op shl(inout PMC, in PMC, in PMC) {
+inline op shl(in PMC, in PMC, in PMC) {
   $2->vtable->bitwise_shl(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -2809,7 +2809,7 @@ inline op shl(inout PMC, in PMC, in PMC) {
 
 =item B<shr>(out INT, in INT, in INT)
 
-=item B<shr>(inout PMC, in PMC, in PMC)
+=item B<shr>(in PMC, in PMC, in PMC)
 
 Set $1 to the value of $2 shifted right by $3 bits.
 
@@ -2820,7 +2820,7 @@ inline op shr(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op shr(inout PMC, in PMC, in PMC) {
+inline op shr(in PMC, in PMC, in PMC) {
   $2->vtable->bitwise_shr(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -2842,17 +2842,17 @@ inline op lsr(out INT, in INT, in INT) {
 
 =item B<bxor>(inout INT, in INT)
 
-=item B<bxor>(inout PMC, in INT)
+=item B<bxor>(in PMC, in INT)
 
-=item B<bxor>(inout PMC, in PMC)
+=item B<bxor>(in PMC, in PMC)
 
 Set the bits of $1 according to the B<xor> of the corresponding bits from $1 and $2.
 
 =item B<bxor>(out INT, in INT, in INT)
 
-=item B<bxor>(inout PMC, in PMC, in INT)
+=item B<bxor>(in PMC, in PMC, in INT)
 
-=item B<bxor>(inout PMC, in PMC, in PMC)
+=item B<bxor>(in PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
 
@@ -2863,12 +2863,12 @@ inline op bxor(inout INT, in INT) {
   goto NEXT();
 }
 
-inline op bxor(inout PMC, in INT) {
+inline op bxor(in PMC, in INT) {
   $1->vtable->bitwise_xor_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
-inline op bxor(inout PMC, in PMC) {
+inline op bxor(in PMC, in PMC) {
   $1->vtable->bitwise_xor(interpreter, $1, $2, $1);
   goto NEXT();
 }
@@ -2878,12 +2878,12 @@ inline op bxor(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op bxor(inout PMC, in PMC, in INT) {
+inline op bxor(in PMC, in PMC, in INT) {
   $2->vtable->bitwise_xor_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
-inline op bxor(inout PMC, in PMC, in PMC) {
+inline op bxor(in PMC, in PMC, in PMC) {
   $2->vtable->bitwise_xor(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -2908,7 +2908,7 @@ These operations apply logical functions to their arguments.
 
 =item B<and>(out INT, in INT, in INT)
 
-=item B<and>(inout PMC, in PMC, in PMC)
+=item B<and>(in PMC, in PMC, in PMC)
 
 Short-circuiting logical and.  Returns $2 if it's false, else returns $3.
 
@@ -2919,7 +2919,7 @@ inline op and(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op and(inout PMC, in PMC, in PMC) {
+inline op and(in PMC, in PMC, in PMC) {
   $2->vtable->logical_and(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -2928,7 +2928,7 @@ inline op and(inout PMC, in PMC, in PMC) {
 
 =item B<not>(out INT, in INT)
 
-=item B<not>(inout PMC, in PMC)
+=item B<not>(in PMC, in PMC)
 
 Set the boolean state of $1 to the opposite of the boolean state from $2.
 
@@ -2939,7 +2939,7 @@ inline op not(out INT, in INT) {
   goto NEXT();
 }
 
-inline op not(inout PMC, in PMC) {
+inline op not(in PMC, in PMC) {
   $2->vtable->logical_not(interpreter, $2, $1);
   goto NEXT();
 }
@@ -2948,7 +2948,7 @@ inline op not(inout PMC, in PMC) {
 
 =item B<or>(out INT, in INT, in INT)
 
-=item B<or>(inout PMC, in PMC, in PMC)
+=item B<or>(in PMC, in PMC, in PMC)
 
 Short-circuiting logical or.  Returns $2 if it's true, else returns $3.
 
@@ -2959,7 +2959,7 @@ inline op or(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op or(inout PMC, in PMC, in PMC) {
+inline op or(in PMC, in PMC, in PMC) {
   $2->vtable->logical_or(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -2968,7 +2968,7 @@ inline op or(inout PMC, in PMC, in PMC) {
 
 =item B<xor>(out INT, in INT, in INT)
 
-=item B<xor>(inout PMC, in PMC, in PMC)
+=item B<xor>(in PMC, in PMC, in PMC)
 
 Logical xor.  Returns $2 if it's true and $3 isn't,
 returns $3 if it's true and $2 isn't, else returns false.
@@ -2980,7 +2980,7 @@ inline op xor(out INT, in INT, in INT) {
   goto NEXT();
 }
 
-inline op xor(inout PMC, in PMC, in PMC) {
+inline op xor(in PMC, in PMC, in PMC) {
   $2->vtable->logical_xor(interpreter, $2, $3, $1);
   goto NEXT();
 }
@@ -3032,7 +3032,7 @@ inline op exists(out INT, in PMC, in KEY) {
 
 =cut
 
-=item B<delete>(inout PMC, in KEY)
+=item B<delete>(in PMC, in KEY)
 
 Delete the specified entry $2 from aggregate $1.
 
@@ -3040,7 +3040,7 @@ Delete the specified entry $2 from aggregate $1.
 
 =cut
 
-inline op delete(inout PMC, in KEY) {
+inline op delete(in PMC, in KEY) {
   $1->vtable->delete_keyed(interpreter, $1, $2);
   goto NEXT();
 }
@@ -3726,135 +3726,135 @@ The fast access ops are shortcuts to common operations implemented in PMCs.
 
 ########################################
 
-=item B<push>(inout PMC, in INT)
+=item B<push>(in PMC, in INT)
 
-=item B<push>(inout PMC, in NUM)
+=item B<push>(in PMC, in NUM)
 
-=item B<push>(inout PMC, in STR)
+=item B<push>(in PMC, in STR)
 
-=item B<push>(inout PMC, in PMC)
+=item B<push>(in PMC, in PMC)
 
 Push $2 onto the end of the aggregate PMC $1, if that operation is defined.
 
 =cut
 
-inline op push (inout PMC, in INT) {
+inline op push (in PMC, in INT) {
     $1->vtable->push_integer(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op push (inout PMC, in NUM) {
+inline op push (in PMC, in NUM) {
     $1->vtable->push_float(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op push (inout PMC, in STR) {
+inline op push (in PMC, in STR) {
     $1->vtable->push_string(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op push (inout PMC, in PMC) {
+inline op push (in PMC, in PMC) {
     $1->vtable->push_pmc(interpreter, $1, $2);
     goto NEXT();
 }
 
-=item B<pop>(out INT, inout PMC)
+=item B<pop>(out INT, in PMC)
 
-=item B<pop>(out NUM, inout PMC)
+=item B<pop>(out NUM, in PMC)
 
-=item B<pop>(out STR, inout PMC)
+=item B<pop>(out STR, in PMC)
 
-=item B<pop>(out PMC, inout PMC)
+=item B<pop>(out PMC, in PMC)
 
 Pop off last entry in the aggregate $2, placing the result in $1.
 
 =cut
 
-inline op pop (out INT, inout PMC) {
+inline op pop (out INT, in PMC) {
     $1 = $2->vtable->pop_integer(interpreter, $2);
     goto NEXT();
 }
 
-inline op pop (out NUM, inout PMC) {
+inline op pop (out NUM, in PMC) {
     $1 = $2->vtable->pop_float(interpreter, $2);
     goto NEXT();
 }
 
-inline op pop (out STR, inout PMC) {
+inline op pop (out STR, in PMC) {
     $1 = $2->vtable->pop_string(interpreter, $2);
     goto NEXT();
 }
 
-inline op pop (out PMC, inout PMC) {
+inline op pop (out PMC, in PMC) {
     $1 = $2->vtable->pop_pmc(interpreter, $2);
     goto NEXT();
 }
 
-=item B<unshift>(inout PMC, in INT)
+=item B<unshift>(in PMC, in INT)
 
-=item B<unshift>(inout PMC, in NUM)
+=item B<unshift>(in PMC, in NUM)
 
-=item B<unshift>(inout PMC, in STR)
+=item B<unshift>(in PMC, in STR)
 
-=item B<unshift>(inout PMC, in PMC)
+=item B<unshift>(in PMC, in PMC)
 
 Unshift $2 onto the end of the aggregate PMC $1, if that operation is defined.
 
 =cut
 
-inline op unshift (inout PMC, in INT) {
+inline op unshift (in PMC, in INT) {
     $1->vtable->unshift_integer(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op unshift (inout PMC, in NUM) {
+inline op unshift (in PMC, in NUM) {
     $1->vtable->unshift_float(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op unshift (inout PMC, in STR) {
+inline op unshift (in PMC, in STR) {
     $1->vtable->unshift_string(interpreter, $1, $2);
     goto NEXT();
 }
 
-inline op unshift (inout PMC, in PMC) {
+inline op unshift (in PMC, in PMC) {
     $1->vtable->unshift_pmc(interpreter, $1, $2);
     goto NEXT();
 }
 
-=item B<shift>(out INT, inout PMC)
+=item B<shift>(out INT, in PMC)
 
-=item B<shift>(out NUM, inout PMC)
+=item B<shift>(out NUM, in PMC)
 
-=item B<shift>(out STR, inout PMC)
+=item B<shift>(out STR, in PMC)
 
-=item B<shift>(out PMC, inout PMC)
+=item B<shift>(out PMC, in PMC)
 
 Shift off last entry in the aggregate $2, placing the result in $1.
 
 =cut
 
-inline op shift (out INT, inout PMC) {
+inline op shift (out INT, in PMC) {
     $1 = $2->vtable->shift_integer(interpreter, $2);
     goto NEXT();
 }
 
-inline op shift (out NUM, inout PMC) {
+inline op shift (out NUM, in PMC) {
     $1 = $2->vtable->shift_float(interpreter, $2);
     goto NEXT();
 }
 
-inline op shift (out STR, inout PMC) {
+inline op shift (out STR, in PMC) {
     $1 = $2->vtable->shift_string(interpreter, $2);
     goto NEXT();
 }
 
-inline op shift (out PMC, inout PMC) {
+inline op shift (out PMC, in PMC) {
     $1 = $2->vtable->shift_pmc(interpreter, $2);
     goto NEXT();
 }
 
-=item B<splice>(inout PMC, in PMC, in INT, in INT)
+=item B<splice>(in PMC, in PMC, in INT, in INT)
 
 Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
 The values are put into the aggregate by a shallow copy. If the values would
@@ -3862,7 +3862,7 @@ be reused, they have to be B<clone>d.
 
 =cut
 
-inline op splice(inout PMC, in PMC, in INT, in INT) {
+inline op splice(in PMC, in PMC, in INT, in INT) {
     $1->vtable->splice(interpreter, $1, $2, $3, $4);
     goto NEXT();
 }
@@ -4280,14 +4280,14 @@ op collecton() {
   goto NEXT();
 }
 
-item B<needs_destroy>(inout PMC)
+item B<needs_destroy>(in PMC)
 
 Mark the PMC wanting destruction as soon as possible, i.e.
 when unused during the lazy sweep, triggered by "sweep 0".
 
 =cut
 
-op needs_destroy(inout PMC) {
+op needs_destroy(in PMC) {
    PObj_needs_early_DOD_SET($1);
    interpreter->has_early_DOD_PMCs = 1;
   goto NEXT();
@@ -4466,13 +4466,13 @@ op newinterp(out PMC, in INT) {
 }
 
 
-=item B<runinterp>(inout PMC, in INT)
+=item B<runinterp>(in PMC, in INT)
 
 Take a built interpreter and run the code starting at offset $2.
 
 =cut
 
-op runinterp(inout PMC, in INT) {
+op runinterp(in PMC, in INT) {
   struct Parrot_Interp * new_interp =
       (struct Parrot_Interp *)PMC_data($1);
   Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
