@@ -53,6 +53,21 @@ void
 PackFile_clear(PackFile * self);
 
 IV
+PackFile_get_magic(PackFile * self);
+
+void 
+PackFile_set_magic(PackFile * self, IV magic);
+
+IV
+PackFile_get_byte_code_size(PackFile * self);
+
+char *
+PackFile_get_byte_code(PackFile * self);
+
+void
+PackFile_set_byte_code(PackFile * self, IV byte_code_size, char * byte_code);
+
+IV
 PackFile_unpack(PackFile * self, char * packed, IV packed_size);
 
 IV
@@ -105,6 +120,15 @@ void
 PackFile_ConstTable_clear(PackFile_ConstTable * self);
 
 IV
+PackFile_ConstTable_get_const_count(PackFile_ConstTable * self);
+
+void
+PackFile_ConstTable_push_constant(PackFile_ConstTable * self, PackFile_Constant * constant);
+
+PackFile_Constant *
+PackFile_ConstTable_constant(PackFile_ConstTable * self, IV index);
+
+IV
 PackFile_ConstTable_unpack(PackFile_ConstTable * self, char * packed, IV packed_size);
 
 IV
@@ -129,6 +153,33 @@ PackFile_Constant_DELETE(PackFile_Constant * self);
 
 void
 PackFile_Constant_clear(PackFile_Constant * self);
+
+IV
+PackFile_Constant_get_flags(PackFile_Constant * self);
+
+void
+PackFile_Constant_set_flags(PackFile_Constant * self, IV flags);
+
+IV
+PackFile_Constant_get_encoding(PackFile_Constant * self);
+
+void
+PackFile_Constant_set_encoding(PackFile_Constant * self, IV encoding);
+
+IV
+PackFile_Constant_get_type(PackFile_Constant * self);
+
+void
+PackFile_Constant_set_type(PackFile_Constant * self, IV type);
+
+IV
+PackFile_Constant_get_size(PackFile_Constant * self);
+
+char *
+PackFile_Constant_get_data(PackFile_Constant * self);
+
+void
+PackFile_Constant_set_data(PackFile_Constant * self, IV size, char * data);
 
 IV
 PackFile_Constant_unpack(PackFile_Constant * self, char * packed, IV packed_size);

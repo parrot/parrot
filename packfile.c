@@ -47,6 +47,8 @@ frozen bycode.
 
 Allocate a new empty PackFile.
 
+NOTE: The PackFile's magic is automatically set to PARROT_MAGIC.
+
 =cut
 
 ***************************************/
@@ -121,6 +123,8 @@ PackFile_DELETE(PackFile * self) {
 
 Clear a PackFile.
 
+NOTE: The PackFile's magic is set to PARROT_MAGIC, not to zero (0).
+
 =cut
 
 ***************************************/
@@ -132,7 +136,7 @@ PackFile_clear(PackFile * self) {
         return;
     }
 
-    self->magic = 0;
+    self->magic = PARROT_MAGIC;
 
     PackFile_FixupTable_clear(self->fixup_table);
     PackFile_ConstTable_clear(self->const_table);
@@ -143,6 +147,112 @@ PackFile_clear(PackFile * self) {
     }
 
     self->byte_code_size = 0;
+
+    return;
+}
+
+
+/***************************************
+
+=item get_magic
+
+Get the PackFile's magic. You really should not need to use this, but it is
+here for completeness of the interface.
+
+=cut
+
+***************************************/
+
+IV
+PackFile_get_magic(PackFile * self) {
+    return self->magic;
+}
+
+
+/***************************************
+
+=item set_magic
+
+Set the PackFile's magic. You really should not need to use this, but it is
+here for completeness of the interface.
+
+=cut
+
+***************************************/
+
+void 
+PackFile_set_magic(PackFile * self, IV magic) {
+    self->magic = magic;
+}
+
+
+/***************************************
+
+=item get_byte_code_size
+
+Get the size of the byte code.
+
+=cut
+
+***************************************/
+
+IV
+PackFile_get_byte_code_size(PackFile * self) {
+    return self->byte_code_size;
+}
+
+
+/***************************************
+
+=item get_byte_code
+
+Get the byte code.
+
+NOTE: The memory is owned by the PackFile.
+
+=cut
+
+***************************************/
+
+char *
+PackFile_get_byte_code(PackFile * self) {
+    return self->byte_code;
+}
+
+
+/***************************************
+
+=item set_byte_code
+
+Set the byte code.
+
+NOTE: The PackFile makes its own copy of the byte code, so you still
+own the memory for the input byte code.
+
+=cut
+
+***************************************/
+
+void
+PackFile_set_byte_code(PackFile * self, IV byte_code_size, char * byte_code) {
+    if (self->byte_code) {
+        mem_sys_free(self->byte_code);
+        self->byte_code = NULL;
+        self->byte_code_size = 0;
+    }
+
+    if (byte_code_size > 0 && byte_code) {
+        self->byte_code = mem_sys_allocate(byte_code_size);
+
+        if (!self->byte_code) {
+            fprintf(stderr, "Could not allocate buffer to copy byte code!\n");
+            return;
+        }
+
+        mem_sys_memcopy(self->byte_code, byte_code, byte_code_size);
+
+        self->byte_code_size = byte_code_size;
+    }
 
     return;
 }
@@ -628,6 +738,79 @@ PackFile_ConstTable_clear(PackFile_ConstTable * self) {
 
 /***************************************
 
+=item get_const_count
+
+Get the number of constants in the ConstTable.
+
+=cut
+
+***************************************/
+
+IV
+PackFile_ConstTable_get_const_count(PackFile_ConstTable * self) {
+    return self->const_count;
+}
+
+
+/***************************************
+
+=item push_constant
+
+Push a new Constant onto the ConstTable. Note: the Constant now belongs
+to the ConstTable.
+
+=cut
+
+***************************************/
+
+void
+PackFile_ConstTable_push_constant(PackFile_ConstTable * self, PackFile_Constant * constant) {
+    PackFile_Constant ** temp;
+    IV                   i;
+
+    if (!constant) {
+        return;
+    }
+
+    temp = mem_sys_allocate((self->const_count + 1) * sizeof(PackFile_Constant *));
+
+    if (!temp) {
+        fprintf(stderr, "Unable to reallocate Constant array to push a new Constant!\n");
+        return;
+    }
+
+    for (i = 0; i < self->const_count; i++) {
+        temp[i] = self->constants[i];
+    }
+
+    temp[self->const_count++] = constant;
+
+    return;
+}
+
+
+/***************************************
+
+=item constant
+
+Retrieve a Constant from the ConstTable.
+
+=cut
+
+***************************************/
+
+PackFile_Constant *
+PackFile_ConstTable_constant(PackFile_ConstTable * self, IV index) {
+    if (index < 0 || index >= self->const_count) {
+        return NULL;
+    }
+
+    return self->constants[index];
+}
+
+
+/***************************************
+
 =item unpack
 
 Unpack a PackFile ConstTable from a block of memory. The format is:
@@ -822,6 +1005,31 @@ PackFile_Constant_DELETE(PackFile_Constant * self) {
         return;
     }
 
+    PackFile_Constant_clear(self);
+
+    mem_sys_free(self);
+
+    return;
+}
+
+
+/***************************************
+
+=item clear
+
+Clear a PackFile Constant.
+
+=cut
+
+***************************************/
+
+void
+PackFile_Constant_clear(PackFile_Constant * self) {
+    if (!self) {
+        fprintf(stderr, "PackFile_Constant_clear: self == NULL!\n");
+        return;
+    }
+
     self->flags    = 0;
     self->encoding = 0;
     self->type     = 0;
@@ -832,7 +1040,166 @@ PackFile_Constant_DELETE(PackFile_Constant * self) {
         self->data = NULL;
     }
 
-    mem_sys_free(self);
+    return;
+}
+
+
+/***************************************
+
+=item get_flags
+
+Clear a PackFile Constant.
+
+=cut
+
+***************************************/
+
+IV
+PackFile_Constant_get_flags(PackFile_Constant * self) {
+    return self->flags;
+}
+
+
+/***************************************
+
+=item set_flags
+
+Set the flags.
+
+=cut
+
+***************************************/
+
+void
+PackFile_Constant_set_flags(PackFile_Constant * self, IV flags) {
+    self->flags = flags;
+}
+
+
+/***************************************
+
+=item get_encoding
+
+Get the encoding for the Constant.
+
+=cut
+
+***************************************/
+
+IV
+PackFile_Constant_get_encoding(PackFile_Constant * self) {
+    return self->encoding;
+}
+
+/***************************************
+
+=item set_encoding
+
+Set the encoding for the Constant.
+
+=cut
+
+***************************************/
+
+void
+PackFile_Constant_set_encoding(PackFile_Constant * self, IV encoding) {
+    self->encoding = encoding;
+}
+
+
+/***************************************
+
+=item get_type
+
+Get the Constant type.
+
+=cut
+
+***************************************/
+
+IV
+PackFile_Constant_get_type(PackFile_Constant * self) {
+    return self->type;
+}
+
+
+/***************************************
+
+=item set_type
+
+Set the type of the Constant.
+
+=cut
+
+***************************************/
+
+void
+PackFile_Constant_set_type(PackFile_Constant * self, IV type) {
+    self->type = type;
+}
+
+
+/***************************************
+
+=item get_size
+
+Get the size of the Constant's data.
+
+=cut
+
+
+***************************************/
+
+IV
+PackFile_Constant_get_size(PackFile_Constant * self) {
+    return self->size;
+}
+
+
+/***************************************
+
+=item get_data
+
+Retrieve the Constant's data.
+
+=cut
+
+***************************************/
+
+char *
+PackFile_Constant_get_data(PackFile_Constant * self) {
+    return self->data;
+}
+
+
+/***************************************
+
+=item set_data
+
+Set the Constant's data.
+
+=cut
+
+***************************************/
+
+void
+PackFile_Constant_set_data(PackFile_Constant * self, IV size, char * data) {
+    if (self->data) {
+        mem_sys_free(self->data);
+        self->data = NULL;
+        self->size = 0;
+    }
+
+    self->data = mem_sys_allocate(size);
+
+    if (!self->data) {
+        fprintf(stderr, "Unable to allocate memory to copy PackFile Constant data!\n");
+        return;
+    }
+
+    self->size = size;
+
+    mem_sys_memcopy(self->data, data, size);
 
     return;
 }
