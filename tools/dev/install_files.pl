@@ -111,8 +111,12 @@ F<tools/dev/mk_manifests.pl>
 ################################################################################
 
 use File::Basename qw(dirname);
+use File::Copy;
+use File::Spec;
 use strict;
 
+# When run from the makefile, which is probably the only time this
+# script will ever be used, all of these defaults will get overridden.
 my %options = ( buildprefix => '',
                 prefix => '/usr',
                 exec_prefix => '/usr',
@@ -148,26 +152,37 @@ while(<>) {
     $meta{$_} = 1 for (keys %meta); # Laziness
 
     if ($meta{lib}) {
-        $dest = "$options{libdir}/$dest";
+        $dest = File::Spec->catdir($options{libdir}, $dest);
     } elsif ($meta{bin}) {
-        $dest = "$options{bindir}/$dest";
+        $dest = File::Spec->catdir($options{bindir}, $dest);
     } elsif ($meta{include}) {
-        $dest = "$options{includedir}/$dest";
+        $dest = File::Spec->catdir($options{includedir}, $dest);
     } else {
-        $dest = "$options{prefix}/$dest";
+        $dest = File::Spec->catdir($options{prefix}, $dest);
     }
 
-    $dest = "$options{buildprefix}/$dest" if $options{buildprefix};
+    $dest = File::Spec->catdir($options{buildprefix}, $dest)
+      if $options{buildprefix};
 
     $directories{dirname($dest)} = 1;
     push(@files, [ $src => $dest ]);
 }
 
-foreach (sort keys %directories) {
-    print "install -d $_\n";
+for my $dir (keys %directories) {
+    unless (-d $dir) {
+        # Make full path to the directory $dir
+        my @dirs;
+        while (! -d $dir) { # Scan up to nearest existing ancestor
+            unshift @dirs, $dir;
+            $dir = dirname($dir);
+        }
+        foreach (@dirs) {
+            mkdir($_, 0777) or die "mkdir $_: $!";
+        }
+    }
 }
 
 foreach (@files) {
     my ($src, $dest) = @$_;
-    print "install -c $src $dest\n";
+    copy($src, $dest) or die "copy $src to $dest: $!";
 }
