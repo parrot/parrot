@@ -37,6 +37,19 @@ extern UINTVAL ld(UINTVAL);
 #  define ISR1 emit_EAX
 #  define FSR1 0
 
+/* Register the address of a rellocation. */
+#  if EXEC_CAPABLE
+#   define EXEC_RA(addr) \
+      if (Parrot_exec_rel_addr) \
+        Parrot_exec_rel_addr[Parrot_exec_rel_count++] = addr;
+#   define EXEC_RD \
+      if (Parrot_exec_rel_addr && Parrot_exec_rel_count) \
+        Parrot_exec_rel_count--;
+#  else
+#   define EXEC_RA(addr) {}
+#   define EXEC_RD(addr) {}
+#  endif
+
 
 #  define emit_b00 0
 #  define emit_b01 1
@@ -95,12 +108,16 @@ emit_is8bit(long disp)
 static char *
 emit_disp8_32(char *pc, int disp)
 {
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
+
     if(emit_is8bit(disp)) {
         *(pc++) = (char)disp;
         return pc;
     }
     else {
         *(long *)pc = disp;
+        EXEC_RA(pc);
         return pc + 4;
     }
 }
@@ -135,6 +152,9 @@ emit_sib(char *pc, int scale, int i, int base)
 static char *
 emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
 {
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
+
     if (i && !scale) {
         internal_exception(JIT_ERROR,
                             "emit_r_X passed invalid scale+index combo\n");
@@ -168,6 +188,7 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
     if (!base && !(i && scale) && (!emit_is8bit(disp) || 1)) {
         *(pc++) = emit_Mod_b00 | reg_opcode | emit_rm_b101;
         *(long *)pc = disp;
+        EXEC_RA(pc);
         return pc + 4;
     }
 
@@ -291,6 +312,7 @@ emit_shift_r_m(char *pc, int opcode, int reg,
     *(pc++) = 0xff; \
     *(pc++) = 0x35; \
     *(long *)pc = (long)mem; \
+    EXEC_RA(pc); \
     (pc) += 4; }
 
 static char *
@@ -603,6 +625,9 @@ opt_div_rm(Parrot_jit_info_t *jit_info, int dest, void * mem, int is_div)
 {
     char *pc = jit_info->native_ptr;
     int saved = 0;
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
+
     if (dest != emit_EAX) {
         jit_emit_mov_rr_i(pc, emit_EAX, dest);
     }
@@ -628,7 +653,8 @@ opt_div_rm(Parrot_jit_info_t *jit_info, int dest, void * mem, int is_div)
     jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
     pc = emit_shift_i_r(pc, emit_b111, 31, emit_EDX); /* SAR 31 */
 #endif
-    emitm_sdivl_m(pc, 0,0,0, (long)(mem)); \
+    //EXEC_RA(pc);
+    emitm_sdivl_m(pc, 0,0,0, (long)(mem));
 
     if (is_div) {
         /* result = quotient in EAX */
@@ -674,6 +700,7 @@ opt_div_rm(Parrot_jit_info_t *jit_info, int dest, void * mem, int is_div)
 #  define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
     *(pc++) = 0x69; \
     *(pc++) = 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
+    EXEC_RA(pc); \
     *(long *)(pc) = (long)imm; \
     pc += 4
 #else
@@ -681,6 +708,8 @@ static char *
 opt_mul(char *pc, int dest, INTVAL imm, int src)
 {
     UINTVAL ld2 = ld((UINTVAL) imm);
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
 
     if (imm == 0) {
         jit_emit_mov_ri_i(pc, dest, 0);
@@ -939,23 +968,23 @@ opt_shift_rm(Parrot_jit_info_t *jit_info, int dest, void * count, int op)
 /* interface, shift r1 by r2 bits */
 
 #  define jit_emit_shl_rr_i(pc, r1, r2) \
-        pc = opt_shift_rr(jit_info, r1, r2, emit_b100)
+    pc = opt_shift_rr(jit_info, r1, r2, emit_b100)
 
 #  define jit_emit_shl_rm_i(pc, r1, m)  \
-        pc = opt_shift_rm(jit_info, r1, m, emit_b100)
+    pc = opt_shift_rm(jit_info, r1, m, emit_b100)
 
 /* shr seems to be the arithmetic shift */
 #  define jit_emit_shr_rr_i(pc, r1, r2)  \
-        pc = opt_shift_rr(jit_info, r1, r2, emit_b111)
+    pc = opt_shift_rr(jit_info, r1, r2, emit_b111)
 
 #  define jit_emit_shr_rm_i(pc, r1, m)  \
-        pc = opt_shift_rm(jit_info, r1, m, emit_b111)
+    pc = opt_shift_rm(jit_info, r1, m, emit_b111)
 
 #  define jit_emit_lsr_rr_i(pc, r1, r2)  \
-        pc = opt_shift_rr(jit_info, r1, r2, emit_b101)
+    pc = opt_shift_rr(jit_info, r1, r2, emit_b101)
 
 #  define jit_emit_lsr_rm_i(pc, r1, m)  \
-        pc = opt_shift_rm(jit_info, r1, m, emit_b101)
+    pc = opt_shift_rm(jit_info, r1, m, emit_b101)
 
 /* MOV (reg),reg */
 #  define emit_movm_r_r(pc, src, dest) \
@@ -1303,7 +1332,8 @@ static unsigned char *lastpc;
 
 #  define emitm_callm(pc, b, i, s, d) { \
  *((pc)++) = 0xff; \
- (pc) = emit_r_X(pc, emit_reg(emit_b010), b, i, s, d); }
+ (pc) = emit_r_X(pc, emit_reg(emit_b010), b, i, s, d);\
+ EXEC_RD }
 
 #  define emitm_jumps(pc, disp) { \
     *((pc)++) = 0xeb; \
@@ -1319,7 +1349,8 @@ static unsigned char *lastpc;
 
 #  define emitm_jumpm(pc, b, i, s, d) { \
     *((pc)++) = 0xff; \
-    (pc) = emit_r_X(pc, emit_reg(emit_b100), b, i, s, d); }
+    (pc) = emit_r_X(pc, emit_reg(emit_b100), b, i, s, d); \
+    EXEC_RD }
 
 /* Conditional jumps */
 
@@ -1711,6 +1742,9 @@ static void
 Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
+
     if (!jit_info->objfile) {
         /* This calculates (INDEX into op_map * 4) */
         emitm_subl_i_r(jit_info->native_ptr,
@@ -1812,6 +1846,9 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     int st = 0;         /* stack pop correction */
     int saved = 0;
     Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
+
     /* this is not callee saved, emit_EDX is 4th in intval_map
      * should also save floating regs back?
      */
@@ -1957,9 +1994,20 @@ store:
                      * so save mapped regs back to parrot regs */
                     for (j = 0; j < ru[0].registers_used; j++) {
                         int us = ru[0].reg_usage[j];
-                        jit_emit_mov_mr_i(jit_info->native_ptr,
+#if EXEC_CAPABLE
+                        if (jit_info->objfile) {
+                            jit_emit_mov_mr_i(jit_info->native_ptr,
+                                IREG(us), jit_info->intval_map[j]);
+                            Parrot_exec_add_text_rellocation(jit_info->objfile,
+                                jit_info->native_ptr, RTYPE_COM,
+                                    "interpre", -4);
+                        }
+                        else
+#endif
+ 
+                            jit_emit_mov_mr_i(jit_info->native_ptr,
                                 &INT_REG(us),
-                                jit_info->intval_map[j]);
+                                    jit_info->intval_map[j]);
                     }
 #if EXEC_CAPABLE
                     if (jit_info->objfile) {
@@ -2026,8 +2074,8 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
             else
 #if EXEC_CAPABLE
                 if (jit_info->objfile) {
-                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                        IREG(p1));
+                    jit_emit_mov_mr_i(jit_info->native_ptr, IREG(p1),
+                        emit_EAX);
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
                         jit_info->native_ptr, RTYPE_COM, "interpre", -4);
                 }
@@ -2039,8 +2087,8 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
         case PARROT_ARG_S:
 #if EXEC_CAPABLE
             if (jit_info->objfile) {
-                jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                    SREG(p1));
+                jit_emit_mov_mr_i(jit_info->native_ptr, SREG(p1),
+                    emit_EAX);
                 Parrot_exec_add_text_rellocation(jit_info->objfile,
                     jit_info->native_ptr, RTYPE_COM, "interpre", -4);
             }
@@ -2051,8 +2099,8 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
         case PARROT_ARG_P:
 #if EXEC_CAPABLE
             if (jit_info->objfile) {
-                jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                    PREG(p1));
+                jit_emit_mov_mr_i(jit_info->native_ptr, PREG(p1),
+                    emit_EAX);
                 Parrot_exec_add_text_rellocation(jit_info->objfile,
                     jit_info->native_ptr, RTYPE_COM, "interpre", -4);
             }
@@ -2239,6 +2287,9 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     int nvtable = op_jit[*jit_info->cur_op].extcall;
     int saved = 0;
     Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
+
     /* this is not callee saved, emit_EDX is 4th in intval_map
      * should also save floating regs back?
      */
@@ -2561,6 +2612,8 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         jit_info->optimizer->cur_section;
     int last_is_branch = 0;
     void ** offset;
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
 
     assert(op_jit[*jit_info->cur_op].extcall == 1);
     if (cur_section->done == 1)
@@ -2714,6 +2767,8 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     int next_i = 5;
     int st = 0;
     int size = 100 + signature->bufused * 20;
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
 
     /* this ought to be enough - the caller of this function
      * should free the function pointer returned here

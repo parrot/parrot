@@ -46,6 +46,7 @@ my @jit_funcs;
 my $func_end;
 my $normal_op;
 my $cpcf_op;
+my $restart_op;
 my %argmaps;
 my $jit_cpu;
 
@@ -55,6 +56,7 @@ if ($genfile eq "jit_cpu.c") {
     $func_end = "_jit";
     $normal_op = "Parrot_jit_normal_op";
     $cpcf_op = "Parrot_jit_cpcf_op";
+    $restart_op = "Parrot_jit_restart_op";
     %argmaps = %Parrot::OpTrans::C::arg_maps;
 }
 else {
@@ -63,6 +65,7 @@ else {
     $func_end = "_exec";
     $normal_op = "Parrot_exec_normal_op";
     $cpcf_op = "Parrot_exec_cpcf_op";
+    $restart_op = "Parrot_exec_restart_op";
     %argmaps = (
         'op' => "cur_opcode[%ld]",
 
@@ -154,11 +157,12 @@ sub readjit($) {
                 $asm =~ s/interpreter/Parrot_exec_add_text_rellocation_reg(jit_info->objfile, jit_info->native_ptr, "interpre", 0, 0)/g;
                 # The ->u.(string|float) is unnecessary.
                 $asm =~ s/\)->u\.(\w+)/)/g;
-                $asm =~ s/(\n(\s*)[^\n]*((rm|mr|mi|ri)_(ni|n|i))[^\n]*[INSP]REG[^\n]*)/$1\n$2Parrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "interpre", DISP_INTERP_$3);/g;
-                $asm =~ s/(\n(\s*)[^\n]*((rm|mr|mi|ri)_(ni|n|i))[^\n]*CONST[^\n]*)/\n$2Parrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_DATA, "const_table", DISP_CONST_$3);$1/g;
+                $asm =~ s/CONST\((\d)\)\s*([><=!]=?)\s*CONST\((\d)\)/RCONST($1)->u.number $2 RCONST($3)->u.number/ if ($asm =~ /CONST.*CONST/);
+                $asm =~ s/(jit_emit_mov_([mr]i_ni).*)&jit_info->cur_op\[(\d)\]\);/$1(int)&jit_info->cur_op[$3] - (int)interpreter->code->src);\n\tParrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "program_code", 0);/g;
+                $asm =~ s/(\n(\s*)[^\n]*((rm|mr|mi|ri)_(ni|n|i))[^\n]*[INSP]REG[^\n]*)/$1\n$2Parrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_COM, "interpre", 0);/g;
+                $asm =~ s/(\n(\s*)[^\n]*((rm|mr|mi|ri)_(ni|n|i))[^\n]*CONST[^\n]*)/$1\n$2Parrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "const_table", 0);/g;
                 $asm =~ s/(\\\n\s*Parrot_exec_add_text_rellocation[^\n]*)/$1\\/g;
-                $asm =~ s/(jit_emit_mov_([mr]i_ni).*)&jit_info->cur_op\[(\d)\]\);/$1(int)&jit_info->cur_op[$3] - (int)interpreter->code->src);\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_DATA, "program_code", DISP_PC_$2);/g;
-                $asm =~ s/(emitm_pushl_m[^\n]*CONST[^\n]*)/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_DATA, "const_table", DISP_CONST_push);/g;
+                $asm =~ s/(emitm_pushl_m[^\n]*CONST[^\n]*)/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "const_table", 0);/g;
                 $asm =~ s/jit_emit_end/exec_emit_end/;
             }
             if (($cpuarch eq 'ppc') && ($genfile ne "jit_cpu.c")) {
@@ -266,6 +270,7 @@ else {
 #define PREG(i) EXR(pmc_reg.registers, jit_info->cur_op[i] * sizeof(PMC *))
 #define SREG(i) EXR(string_reg.registers, jit_info->cur_op[i] * sizeof(STRING *))
 #define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 4)
+#define RCONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
 #define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \\
     emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 
@@ -315,141 +320,141 @@ for ($i = 0; $i < $core_numops; $i++) {
 
     $precompiled = 0;
     if (!defined $body) {
-	$precompiled = 1;
-	$extern = 1;
-	my $opbody = $op->body;
-	if ($op->full_name eq 'new_p_ic') {
-	    $jit_func = "Parrot_jit_vtable_newp_ic_op";
-	    $opbody =~ /vtable->(\w+)/;
-	    $extern = vtable_num($1);
-	    #print "$jit_func $extern\n";
-	}
-	# jitable vtable funcs:
-	# *) $1->vtable->{vtable}(interp, $1)
-	elsif ($opbody =~ /
-	^(?:.*\.ops")?\s+
-	{{\@1}}->vtable->
-	(\w+)
-	\(interpreter,
-	\s*
-	{{\@1}}
-	\);
-	\s+{{\+=\d}}/xm) {
-	    $jit_func = "Parrot_jit_vtable1_op";
-	    $extern = vtable_num($1);
-	    #print $op->full_name .": $jit_func $extern\n";
-	}
-	# *) $1 = $2->vtable->{vtable}(interp, $2)
-	elsif ($opbody =~ /
-	^(?:.*\.ops")?\s+
-	{{\@1}}\s*=\s*
-	{{\@2}}->vtable->
-	(\w+)
-	\(interpreter,
-	\s*
-	{{\@2}}
-	\);
-	\s+{{\+=\d}}/xm) {
-	    $jit_func = "Parrot_jit_vtable1r_op";
-	    $extern = vtable_num($1);
-	    #print $op->full_name .": $jit_func $extern\n";
-	}
-	# *) $1 = $2->vtable->{vtable}(interp, $2, &key)
-	elsif ($opbody =~ /
-	^(?:.*\.ops")?\s+
-	(?:INTVAL\s+key\s+=\s+{{\@3}};\s+)
-	{{\@1}}\s*=\s*
-	{{\@2}}->vtable->
-	(\w+)
-	\(interpreter,
-	\s*
-	{{\@2}},\s*&key
-	\);
-	\s+{{\+=\d}}/xm) {
-	    $jit_func = "Parrot_jit_vtable2rk_op";
-	    $extern = vtable_num($1);
-	    #print $op->full_name .": $jit_func $extern\n";
-	}
-	# *) $X->vtable->{vtable}(interp, $Y, $Z)
-	elsif ($opbody =~ /
-	^(?:.*\.ops")?\s+
-	{{\@(\d)}}->vtable->
-	(\w+)
-	\(interpreter,
-	\s*
-	{{\@(\d)}},\s*{{\@(\d)}}
-	\);
-	\s+{{\+=\d}}/xm) {
-	    $jit_func = "Parrot_jit_vtable_$1$3$4_op";
-	    $extern = vtable_num($2);
-	    #print $op->full_name .": $jit_func $extern\n";
-	}
-	# *) $R = $X->vtable->{vtable}(interp, $Y, $Z)
-	elsif ($opbody =~ /
-	^(?:.*\.ops")?\s+
-	{{\@(\d)}}\s*=\s*
-	{{\@(\d)}}->vtable->
-	(\w+)
-	\(interpreter,
-	\s*
-	{{\@(\d)}},\s*{{\@(\d)}}
-	\);
-	\s+{{\+=\d}}/xm) {
-	    $jit_func = "Parrot_jit_vtable_$1r$2$4$5_op";
-	    $extern = vtable_num($3);
-	    #print $op->full_name .": $jit_func $extern\n";
-	}
-	# *) $X->vtable->{vtable}(interp, $Y, $Z, $A)
-	elsif ($opbody =~ /
-	^(?:.*\.ops")?\s+
-	{{\@(\d)}}->vtable->
-	(\w+)
-	\(interpreter,
-	\s*
-	{{\@(\d)}},\s*{{\@(\d)}},\s*{{\@(\d)}}
-	\);
-	\s+{{\+=\d}}/xm) {
-	    $jit_func = "Parrot_jit_vtable_$1$3$4$5_op";
-	    $extern = vtable_num($2);
-	    #print $op->full_name .": $jit_func $extern\n";
-	}
-	# *) $1->vtable->{vtable}(interp, $1, &key, $3)
-	elsif ($opbody =~ /
-	^(?:.*\.ops")?\s+
-	(?:INTVAL\s+key\s+=\s+{{\@2}};\s+)
-	{{\@1}}->vtable->
-	(\w+)
-	\(interpreter,
-	\s*
-	{{\@1}},\s*&key,\s*{{\@3}}
-	\);
-	\s+{{\+=\d}}/xm) {
-	    $jit_func = "Parrot_jit_vtable3k_op";
-	    $extern = vtable_num($1);
-	    #print $op->full_name .": $jit_func $extern\n";
-	}
-	# some specials
-	elsif ($op->full_name eq 'if_p_ic') {
-	    $jit_func = "Parrot_jit_vtable_ifp_op";
-	    $opbody =~ /vtable->(\w+)/;
-	    $extern = vtable_num($1);
-	    #print "$jit_func $extern\n";
-	}
-	elsif ($op->full_name eq 'unless_p_ic') {
-	    $jit_func = "Parrot_jit_vtable_unlessp_op";
-	    $opbody =~ /vtable->(\w+)/;
-	    $extern = vtable_num($1);
-	    #print "$jit_func $extern\n";
-	}
-
-	elsif ($op->jump =~ /JUMP_RESTART/ ) {
-	    $jit_func = "Parrot_jit_restart_op";
+        $precompiled = 1;
+        $extern = 1;
+        my $opbody = $op->body;
+        if ($op->full_name eq 'new_p_ic') {
+            $jit_func = "Parrot_jit_vtable_newp_ic_op";
+            $opbody =~ /vtable->(\w+)/;
+            $extern = vtable_num($1);
+            #print "$jit_func $extern\n";
         }
-	elsif ($op->jump) {
-	    $jit_func = $cpcf_op;
-	} else {
-	    $jit_func = $normal_op;
-	}
+        # jitable vtable funcs:
+        # *) $1->vtable->{vtable}(interp, $1)
+        elsif ($opbody =~ /
+        ^(?:.*\.ops")?\s+
+        {{\@1}}->vtable->
+        (\w+)
+        \(interpreter,
+        \s*
+        {{\@1}}
+        \);
+        \s+{{\+=\d}}/xm) {
+            $jit_func = "Parrot_jit_vtable1_op";
+            $extern = vtable_num($1);
+            #print $op->full_name .": $jit_func $extern\n";
+        }
+        # *) $1 = $2->vtable->{vtable}(interp, $2)
+        elsif ($opbody =~ /
+        ^(?:.*\.ops")?\s+
+        {{\@1}}\s*=\s*
+        {{\@2}}->vtable->
+        (\w+)
+        \(interpreter,
+        \s*
+        {{\@2}}
+        \);
+        \s+{{\+=\d}}/xm) {
+            $jit_func = "Parrot_jit_vtable1r_op";
+            $extern = vtable_num($1);
+            #print $op->full_name .": $jit_func $extern\n";
+        }
+        # *) $1 = $2->vtable->{vtable}(interp, $2, &key)
+        elsif ($opbody =~ /
+        ^(?:.*\.ops")?\s+
+        (?:INTVAL\s+key\s+=\s+{{\@3}};\s+)
+        {{\@1}}\s*=\s*
+        {{\@2}}->vtable->
+        (\w+)
+        \(interpreter,
+        \s*
+        {{\@2}},\s*&key
+        \);
+        \s+{{\+=\d}}/xm) {
+            $jit_func = "Parrot_jit_vtable2rk_op";
+            $extern = vtable_num($1);
+            #print $op->full_name .": $jit_func $extern\n";
+        }
+        # *) $X->vtable->{vtable}(interp, $Y, $Z)
+        elsif ($opbody =~ /
+        ^(?:.*\.ops")?\s+
+        {{\@(\d)}}->vtable->
+        (\w+)
+        \(interpreter,
+        \s*
+        {{\@(\d)}},\s*{{\@(\d)}}
+        \);
+        \s+{{\+=\d}}/xm) {
+            $jit_func = "Parrot_jit_vtable_$1$3$4_op";
+            $extern = vtable_num($2);
+            #print $op->full_name .": $jit_func $extern\n";
+        }
+        # *) $R = $X->vtable->{vtable}(interp, $Y, $Z)
+        elsif ($opbody =~ /
+        ^(?:.*\.ops")?\s+
+        {{\@(\d)}}\s*=\s*
+        {{\@(\d)}}->vtable->
+        (\w+)
+        \(interpreter,
+        \s*
+        {{\@(\d)}},\s*{{\@(\d)}}
+        \);
+        \s+{{\+=\d}}/xm) {
+            $jit_func = "Parrot_jit_vtable_$1r$2$4$5_op";
+            $extern = vtable_num($3);
+            #print $op->full_name .": $jit_func $extern\n";
+        }
+        # *) $X->vtable->{vtable}(interp, $Y, $Z, $A)
+        elsif ($opbody =~ /
+        ^(?:.*\.ops")?\s+
+        {{\@(\d)}}->vtable->
+        (\w+)
+        \(interpreter,
+        \s*
+        {{\@(\d)}},\s*{{\@(\d)}},\s*{{\@(\d)}}
+        \);
+        \s+{{\+=\d}}/xm) {
+            $jit_func = "Parrot_jit_vtable_$1$3$4$5_op";
+            $extern = vtable_num($2);
+            #print $op->full_name .": $jit_func $extern\n";
+        }
+        # *) $1->vtable->{vtable}(interp, $1, &key, $3)
+        elsif ($opbody =~ /
+        ^(?:.*\.ops")?\s+
+        (?:INTVAL\s+key\s+=\s+{{\@2}};\s+)
+        {{\@1}}->vtable->
+        (\w+)
+        \(interpreter,
+        \s*
+        {{\@1}},\s*&key,\s*{{\@3}}
+        \);
+        \s+{{\+=\d}}/xm) {
+            $jit_func = "Parrot_jit_vtable3k_op";
+            $extern = vtable_num($1);
+            #print $op->full_name .": $jit_func $extern\n";
+        }
+        # some specials
+        elsif ($op->full_name eq 'if_p_ic') {
+            $jit_func = "Parrot_jit_vtable_ifp_op";
+            $opbody =~ /vtable->(\w+)/;
+            $extern = vtable_num($1);
+            #print "$jit_func $extern\n";
+        }
+        elsif ($op->full_name eq 'unless_p_ic') {
+            $jit_func = "Parrot_jit_vtable_unlessp_op";
+            $opbody =~ /vtable->(\w+)/;
+            $extern = vtable_num($1);
+            #print "$jit_func $extern\n";
+        }
+
+        elsif ($op->jump =~ /JUMP_RESTART/ ) {
+            $jit_func = $restart_op;
+        }
+        elsif ($op->jump) {
+            $jit_func = $cpcf_op;
+        } else {
+            $jit_func = $normal_op;
+        }
     }
     else
     {
@@ -457,7 +462,8 @@ for ($i = 0; $i < $core_numops; $i++) {
     }
 
     unless($precompiled){
-    print JITCPU "\nstatic $jit_fn_retn " . $core_opfunc[$i] . $func_end . $jit_fn_params . "{\n$body}\n";
+    print JITCPU "\nstatic $jit_fn_retn " . $core_opfunc[$i] . $func_end . $jit_fn_params . "{\n" .
+        "extern char **Parrot_exec_rel_addr;\nextern int Parrot_exec_rel_count;\n" . $body . "}\n";
     }
     push @jit_funcs, "{ $jit_func, $extern }, \t" .
 	    "/* op $i: $core_opfunc[$i] */\n";

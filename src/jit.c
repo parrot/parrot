@@ -57,6 +57,9 @@
 void Parrot_jit_debug(struct Parrot_Interp* interpreter);
 #endif
 
+char **Parrot_exec_rel_addr;
+int Parrot_exec_rel_count;
+
 /* look at fixups, mark all fixup entries as branch target
  * TODO: actually this is wrong: fixups belong only to one
  *       code segment. The code below doesn't check, for which

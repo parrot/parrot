@@ -24,6 +24,8 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
         jit_info->optimizer->cur_section;
     int i, j, last_is_branch = 0;
     void ** offset;
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
 
     assert(op_jit[*jit_info->cur_op].extcall == 1);
     if (cur_section->done == 1)
@@ -121,6 +123,30 @@ Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
     Parrot_exec_normal_op(jit_info, interpreter);
+    Parrot_emit_jump_to_eax(jit_info, interpreter);
+}
+
+void
+Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
+                   struct Parrot_Interp * interpreter)
+{
+    char *jmp_ptr, *sav_ptr;
+
+    Parrot_exec_normal_op(jit_info, interpreter);
+    /* test eax, if zero (e.g after trace), return from JIT */
+    jit_emit_test_r_i(jit_info->native_ptr, emit_EAX);
+    /* remember PC */
+    jmp_ptr = jit_info->native_ptr;
+    /* emit jump past exit code, dummy offset
+     * this assumes exit code is not longer then a short jump (126 bytes) */
+    emitm_jxs(jit_info->native_ptr, emitm_jnz, 0);
+    exec_emit_end(jit_info->native_ptr);
+    /* fixup above jump */
+    sav_ptr = jit_info->native_ptr;
+    jit_info->native_ptr = jmp_ptr;
+    emitm_jxs(jit_info->native_ptr, emitm_jnz, (long)(sav_ptr - jmp_ptr) - 2);
+    /* restore PC */
+    jit_info->native_ptr = sav_ptr;
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 

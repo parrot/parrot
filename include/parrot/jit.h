@@ -232,13 +232,16 @@ void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp *interpreter);
 
+void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
+                          struct Parrot_Interp *interpreter);
+
 void Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp *interpreter);
 
 void Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp *interpreter);
 
-void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
+void Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp *interpreter);
 
 void Parrot_jit_emit_mov_mr_n(

@@ -389,32 +389,6 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 }
 #endif
 
-
-static opcode_t *
-runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
-{
-#if EXEC_CAPABLE
-    opcode_t *code_start;
-    UINTVAL code_size;          /* in opcodes */
-    opcode_t *code_end;
-
-    code_start = interpreter->code->byte_code;
-    code_size = interpreter->code->cur_cs->base.size;
-    code_end = interpreter->code->byte_code + code_size;
-#  ifdef HAVE_COMPUTED_GOTO
-#    ifdef __GNUC__
-#      ifdef I386
-    init_prederef(interpreter, PREDEREF_FOR_CGP);
-#      endif
-#    endif
-#  endif
-
-    Parrot_exec(interpreter, pc, code_start, code_end);
-#endif
-    return NULL;
-}
-
-
 static opcode_t *
 runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
@@ -438,6 +412,41 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     jit_code = build_asm(interpreter, pc, code_start, code_end, NULL);
     interpreter->code->cur_cs->jit_info = interpreter->jit_info;
     (jit_code) (interpreter, pc);
+#endif
+    return NULL;
+}
+
+static opcode_t *
+runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+#if EXEC_CAPABLE
+    opcode_t *code_start;
+    UINTVAL code_size;          /* in opcodes */
+    opcode_t *code_end;
+    extern int Parrot_exec_run;
+
+    code_start = interpreter->code->byte_code;
+    code_size = interpreter->code->cur_cs->base.size;
+    code_end = interpreter->code->byte_code + code_size;
+#  ifdef HAVE_COMPUTED_GOTO
+#    ifdef __GNUC__
+#      ifdef I386
+    init_prederef(interpreter, PREDEREF_FOR_CGP);
+#      endif
+#    endif
+#  endif
+    if (Parrot_exec_run == 2) {
+        Parrot_exec_run = 0;
+        Interp_flags_CLEAR(interpreter, PARROT_EXEC_FLAG);
+        runops_jit(interpreter, pc);
+        Interp_flags_SET(interpreter, PARROT_EXEC_FLAG);
+    }
+    else if (Parrot_exec_run == 1) {
+        Parrot_exec(interpreter, pc, code_start, code_end);
+    }
+    else
+        run_native(interpreter, pc, code_start);
+
 #endif
     return NULL;
 }

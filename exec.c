@@ -34,7 +34,6 @@ static int symbol_list_find(Parrot_exec_objfile_t *obj, const char *func_name);
 
 int Parrot_exec_run = 0;
 
-
 /* Parrot_exec
  *
  *  Call the jit to get the program code.
@@ -52,9 +51,12 @@ Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
     long bhs;
     Parrot_exec_objfile_t *obj;
     Parrot_jit_info_t *jit_info;
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
 
     obj = mem_sys_allocate_zeroed(sizeof(Parrot_exec_objfile_t));
     exec_init(obj);
+    Parrot_exec_rel_addr = (char **)mem_sys_allocate_zeroed(4 * sizeof(char *));
     obj->bytecode_header_size = (int)interpreter->code->byte_code -
         (int)interpreter->code->src;
     (void) build_asm(interpreter, pc, code_start, code_end, obj);
@@ -228,7 +230,10 @@ Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
     int type, const char *symbol, int disp)
 {
     int symbol_number;
+    char *addr;
     Parrot_exec_rellocation_t *new_relloc;
+    extern char **Parrot_exec_rel_addr;
+    extern int Parrot_exec_rel_count;
 
     new_relloc = mem_sys_realloc(obj->text_rellocation_table,
         (size_t)(obj->text_rellocation_count + 1)
@@ -248,8 +253,12 @@ Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
             symbol_number = Parrot_exec_add_symbol(obj, symbol, STYPE_GDATA);
             break;
     }
-            
-    new_relloc->offset = (int)(nptr - obj->text.code + disp);
+
+    if (Parrot_exec_rel_count)
+        addr = Parrot_exec_rel_addr[--Parrot_exec_rel_count];
+    else
+        addr = nptr + disp;
+    new_relloc->offset = (int)(addr - obj->text.code);
     new_relloc->symbol_number = symbol_number;
     new_relloc->type = type;
 }

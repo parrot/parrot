@@ -367,11 +367,20 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 
 #endif
 
-
     /* Set up @ARGS (or whatever this language calls it).
        XXX Should this be Array or PerlArray?             */
 
     setup_argv(interpreter, argc, argv);
+
+#if EXEC_CAPABLE
+
+    /* s. runops_exec interpreter.c */
+    if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG)) {
+        extern int Parrot_exec_run;
+        Parrot_exec_run = 1;
+    }
+
+#endif
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     runops(interpreter,  0);

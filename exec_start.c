@@ -19,7 +19,43 @@
 #include "parrot/jit_emit.h"
 #include "parrot/embed.h"
 
-opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode);
+opcode_t* run_compiled(struct Parrot_Interp *interpreter,
+    opcode_t *cur_opcode, opcode_t *code_start);
+
+/* Stolen from embed.c */
+static void
+setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
+{
+    INTVAL i;
+    PMC *userargv;
+
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        PIO_eprintf(interpreter,
+                "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
+                argc);
+    }
+
+    userargv = pmc_new_noinit(interpreter, enum_class_SArray);
+    /* immediately anchor pmc to root set */
+    interpreter->pmc_reg.registers[0] = userargv;
+    VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
+            (INTVAL)IGLOBALS_ARGV_LIST, userargv);
+    VTABLE_init(interpreter, userargv);
+    VTABLE_set_integer_native(interpreter, userargv, argc);
+
+    for (i = 0; i < argc; i++) {
+        /* Run through argv, adding everything to @ARGS. */
+        STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
+                                  0, PObj_external_FLAG, 0);
+
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+            PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);
+        }
+
+        VTABLE_push_string(interpreter, userargv, arg);
+    }
+}
+
 
 int
 main(int argc, char **argv) {
@@ -33,13 +69,14 @@ main(int argc, char **argv) {
     extern char *program_code;
     extern long opcode_map;
     extern int bytecode_offset;
-#if I386 && defined(JIT_CGP)
+#if defined(JIT_CGP)
     extern void * exec_prederef_code;
 #endif
     extern int Parrot_exec_run;
     extern struct PackFile_Constant *exec_const_table;
     extern struct PackFile_Constant const_table;
     extern struct Parrot_Interp interpre;
+    extern Parrot_exception the_exception;
 
     Parrot_exec_run = 1;
     exec_const_table = &const_table;
@@ -49,7 +86,7 @@ main(int argc, char **argv) {
     }
     Parrot_init(interpreter, (void*) &dummy_var);
 
-    //run_native = run_compiled;
+    run_native = run_compiled;
     /* TODO make also a shared variant of PackFile_new */
     pf          = PackFile_new(0);
 
@@ -59,33 +96,30 @@ main(int argc, char **argv) {
 	return 1;
     }
     Parrot_loadbc(interpreter, pf);
-
-    /* setup P0, stolen from embed.c */
-    userargv = pmc_new(interpreter, enum_class_PerlArray);
-    /* immediately anchor pmc to root set */
-    interpreter->pmc_reg.registers[0] = userargv;
-
-    for (i = 0; i < argc; i++) {
-        /* Run through argv, adding everything to @ARGS. */
-        STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
-                                  0, PObj_external_FLAG, 0);
-
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-            fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
-        }
-
-        userargv->vtable->push_string(interpreter, userargv, arg);
-    }
+    setup_argv(interpreter, argc, argv);
 
     opp = &opcode_map;
     for (i = 0; i < (int)interpre.code->cur_cs->base.size; i++) {
         opp[i] += (long)run_compiled;
     }
-    Parrot_exec_run = 0;
 
-#if I386 && defined(JIT_CGP)
+#if defined(JIT_CGP)
     exec_init_prederef(interpreter, &exec_prederef_code);
 #endif
-    run_compiled(interpreter, (opcode_t *)&((&program_code)[bytecode_offset]));
+    Parrot_setflag(interpreter, PARROT_EXEC_FLAG, &Parrot_exec_run);
+    interpreter->code->byte_code = (opcode_t *)&((&program_code)[bytecode_offset]);
+    Parrot_exec_run = 0;
+    runops(interpreter, 0);
+    /*run_compiled(interpreter, (opcode_t *)&((&program_code)[bytecode_offset])); */
     exit(0);
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
