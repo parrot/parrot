@@ -264,6 +264,11 @@ typedef enum PObj_enum {
      ((PTR2UINTVAL(o) - PTR2UINTVAL((arena)->start_objects)) \
           / (arena)->object_size)
 
+# define DOD_flag_TEST(flag, o) \
+      GET_ARENA(o)->dod_flags[ GET_OBJ_N(GET_ARENA(o), o) >> \
+      ARENA_FLAG_SHIFT ] & ((d_PObj_ ## flag ## _FLAG << \
+      (( GET_OBJ_N(GET_ARENA(o), o) & ARENA_FLAG_MASK ) << 2)))
+
 # define DOD_flag_SET(flag, o) \
   do { \
       struct Small_Object_Arena *_arena = GET_ARENA(o); \

@@ -741,7 +741,9 @@ interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
     switch (what) {
         case TOTAL_MEM_ALLOC:
 #ifdef GC_IS_MALLOC
+#if 0
             interpreter->memory_allocated = mallinfo().uordblks;
+#endif
 #endif
             ret = interpreter->memory_allocated;
             break;
