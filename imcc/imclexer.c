@@ -1187,7 +1187,7 @@ struct macro_frame_t {
     struct params_t *params;
     struct params_t expansion;
     int label;
-    char *file;
+    const char *file;
     int line;
     int pasm_file;      /* pasm_file mode of previous frame */
     int is_macro;
