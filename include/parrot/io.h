@@ -304,7 +304,6 @@ extern INTVAL           PIO_unix_getblksize(PIOHANDLE fd);
 #endif
 
 #ifdef PIO_OS_STDIO
-extern INTVAL           PIO_stdio_isatty(PIOHANDLE fd);
 extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 #  define PIO_sockaddr_in(i,p,a)
 #  define PIO_getblksize(x)   PIO_stdio_getblksize(x)

@@ -19,7 +19,6 @@
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-extern INTVAL           PIO_stdio_isatty(PIOHANDLE fd);
 extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 
 /* Defined at bottom */
@@ -182,7 +181,7 @@ PIO_stdio_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 }
 
 
-INTVAL
+static INTVAL
 PIO_stdio_isatty(PIOHANDLE fptr)
 {
     /* no obvious way to check for this with STDIO */
