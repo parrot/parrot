@@ -137,11 +137,10 @@ sub P6C::Binop::ctx_right {
 	$x->r->ctx_right($opctx);
 
     } else {
-	# We know nothing about the context.  Say so, and propagate
-	# the surrounding context.
-	my $opctx = new P6C::Context;
-	$x->l->ctx_right($opctx);
-	$x->r->ctx_right($opctx);
+	# We know nothing about the context, so propagate
+	# the surrounding context (works for logical ops).
+	$x->l->ctx_right($ctx);
+	$x->r->ctx_right($ctx);
     }
 
     # Store away our context.
