@@ -521,11 +521,12 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
                     case enum_class_Closure:
                     case enum_class_Continuation:
                     case enum_class_Coroutine:
-                        rel = (INTVAL) sub_pmc->cache.struct_val;
+                        rel = (INTVAL) sub_pmc->cache.struct_val *
+                            sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
                         sub_pmc->cache.struct_val = (void*) rel;
                         sub = (struct Parrot_Sub*) PMC_data(sub_pmc);
-                        rel = (INTVAL) sub->end;
+                        rel = (INTVAL) sub->end * sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
                         sub->end = (opcode_t *) rel;
                         break;
@@ -2289,11 +2290,12 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     pmcs = PackFile_fetch_cstring(pf, &cursor);
     /*
      * TODO use serialize api if that is done
+     *
+     * TODO first get classname, then get rest according to PMC type
      */
     rc = sscanf(pmcs, "%31s %127s %d %d)", class, name, &start, &end);
     if (rc != 4) {
         fprintf(stderr, "PMC_CONST ERR RC '%d'\n", rc);
-        /* my sscanf returns 1 :-( */
     }
 
 #if TRACE_PACKFILE_PMC

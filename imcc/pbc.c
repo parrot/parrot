@@ -870,7 +870,8 @@ e_pbc_emit(void *param, Instruction * ins)
         }
         /* if item is a PCC_SUB entry then store it constants */
         if (ins->r[1] && ins->r[1]->pcc_sub) {
-            add_const_pmc_sub(interpreter, ins->r[1], oldsize, code_size);
+            add_const_pmc_sub(interpreter, ins->r[1], oldsize,
+                    oldsize+code_size);
         }
     }
     if (ins->op && *ins->op) {
