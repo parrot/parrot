@@ -50,7 +50,7 @@ for (@{$vtbl}) {
 
     print "    $retval $methname ($args) {\n";
 	print "        internal_exception(NULL_REG_ACCESS, \"Fatal exception: Null PMC access (PMC::$methname)!\\n\");\n";
-    if($retval !~ /void /) {
+    if($retval ne 'void') {
         print "        return ($retval)0;\n";
     }
     print "    }\n\n";
