@@ -72,11 +72,11 @@ static void copy_string_header(struct Parrot_Interp *interpreter,
 {
 #if ! DISABLE_GC_DEBUG
     UINTVAL vers;
-    vers= dest->version;
+    vers= dest->pobj_version;
 #endif
     memcpy(dest, src, sizeof(String));
 #if ! DISABLE_GC_DEBUG
-    dest->version = vers;
+    dest->pobj_version = vers;
 #endif
 }
 

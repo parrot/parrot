@@ -55,7 +55,7 @@ typedef struct pobj_t {
     UnionVal u;
     Parrot_UInt flags;
 #if ! DISABLE_GC_DEBUG
-    UINTVAL version;
+    UINTVAL pobj_version;
 #endif
 } pobj_t;
 
@@ -70,7 +70,7 @@ typedef Buffer PObj;
 #define bufstart obj.u.b.bufstart
 #define buflen   obj.u.b.buflen
 #if ! DISABLE_GC_DEBUG
-#  define version obj.version
+#  define pobj_version obj.pobj_version
 #endif
 
 struct parrot_string_t {

@@ -141,7 +141,7 @@ get_free_object(struct Parrot_Interp *interpreter,
          ~((PObj_on_free_list_FLAG << (( n & ARENA_FLAG_MASK ) << 2)));
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter))
-        ((Buffer*)ptr)->version++;
+        ((Buffer*)ptr)->pobj_version++;
 #endif
     return ptr;
 }
@@ -172,7 +172,7 @@ get_free_object(struct Parrot_Interp *interpreter,
     pool->free_list = *(void **)ptr;
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter))
-        ((Buffer*)ptr)->version++;
+        ((Buffer*)ptr)->pobj_version++;
 #endif
     return ptr;
 }

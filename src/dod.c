@@ -80,7 +80,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
         fprintf(stderr, "GC Warning! Unanchored %s %p version " INTVAL_FMT
                 " found in system areas \n",
                 PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer",
-                obj, obj->version);
+                obj, obj->pobj_version);
     }
 #  endif
 #endif
