@@ -86,9 +86,17 @@ Win32, Tru64, OpenVMS (Alpha), Solaris (Sparc), FreeBSD (x86).
 =head2 Authors
 
 Parrot is developed and maintained by the members of the
-C<perl6-internals@perl.org> mailing list. Dan Sugalski
-(C<dan@sidhe.org>) is the chief architect, and Simon Cozens
-(C<simon@netthink.co.uk>) is the current release manager.
+C<perl6-internals@perl.org> mailing list. 
+
+=over 4
+
+=item * Dan Sugalski (C<dan@sidhe.org>) is the chief architect.
+
+=item * Simon Cozens (C<simon@netthink.co.uk>) was the release manager for releases 0.0.1 through 0.0.4.
+
+=item * Jeff Goff (C<drforr@hargray.com>) is the current release manager.
+
+=back
 
 =head2 Web pages
 
