@@ -536,7 +536,7 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
              * was a sub call, and the symbol is live/use here, it needs
              * allocation in the non-volatile register range
              */
-            if (ins->prev && (ins->prev->type & ITPCCSUB))
+            if (ins->prev && (ins->prev->type & (ITPCCSUB|ITPCCYIELD)))
                 r->usage |= U_NON_VOLATILE;
 
 	    /* This block uses r, so it must be live at
@@ -579,6 +579,7 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
 {
     Instruction* ins, *special;
     Life_range* l;
+    int is_alias;
 
     UNUSED(interpreter);
     l = make_life_range(r, bb->index);
@@ -586,25 +587,41 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
     special = NULL;
     for (ins = bb->start; ins ; ins = ins->next) {
         if (ins==NULL) {
-		fatal(1,"analyse_life_block",
-                        "Index %i of %i has NULL instruction\n",
-				ins->index, bb->end->index);
-	}
+            fatal(1,"analyse_life_block",
+                    "Index %i of %i has NULL instruction\n",
+                    ins->index, bb->end->index);
+        }
         if (ins->opnum == -1) {
             if (ins == bb->end)
                 break;
             continue;
         }
+        /*
+         * if we have a setp_ind opcode, it may write all PMC
+         * registers from 5..15
+         */
+        if (ins->opnum == 921 && r->set == 'P') {
+            assert(strcmp(ins->op, "setp_ind") == 0);
+            r->usage |= U_NON_VOLATILE;
+        }
+
         /* restoreall and such */
         if (ins_writes2(ins, r->set))
             special = ins;
 
-	if (instruction_reads(ins, r)) {
+        /*
+         * set p,p is basically a read - both are LF_use
+         *
+         * TODO live range coalescing
+         */
+        is_alias = (ins->type & ITALIAS) && ins->r[0] == r;
+
+        if (instruction_reads(ins, r) || is_alias) {
             /* if instruction gets read after a special, consider
              * the first read of this instruction, like if a write
              * had happened at special, so that the reg doesn't pop into
              * life */
-	    if (! (l->flags & LF_def) ) {
+            if (! (l->flags & LF_def) ) {
                 if (special) {
                     l->first_ins = special;
                     l->flags |= LF_def;
@@ -616,21 +633,21 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
                     l->first_ins = bb->start;
                     l->flags |= LF_use;
                 }
-	    }
-	    l->last_ins = ins;
-	}
+            }
+            l->last_ins = ins;
+        }
 
-	if (instruction_writes(ins, r)) {
+        if (!is_alias && instruction_writes(ins, r)) {
 
-	    l->flags |= LF_def;
+            l->flags |= LF_def;
 
-	    if (!l->first_ins) {
-		l->first_ins = ins;
-	    }
-	    l->last_ins = ins;
-	}
-	if (ins == bb->end)
-	    break;
+            if (!l->first_ins) {
+                l->first_ins = ins;
+            }
+            l->last_ins = ins;
+        }
+        if (ins == bb->end)
+            break;
     }
 
     if (!l->last_ins)

@@ -15,10 +15,9 @@ enum VARTYPE {		/* variable type can be */
     VTADDRESS	= 1 << 3,	/* address */
     VTREGKEY	= 1 << 4,	/* parrot [key;key..], including registers */
     VTPASM	= 1 << 5,	/* parrot register, colored from .emit */
-    VT_REGP	= 1 << 6,	/* pointer to register */
-    VT_CONSTP	= 1 << 7,	/* pointer to constant value */
-    VT_PCC_SUB  = 1 << 8,	/* PCC subroutine call */
-    VT_FLATTEN  = 1 << 9,	/* .flatten_arg IDENT | VTIDENT ... */
+    VT_CONSTP	= 1 << 6,	/* pointer to constant value */
+    VT_PCC_SUB  = 1 << 7,	/* PCC subroutine call */
+    VT_FLATTEN  = 1 << 8,	/* .flatten_arg IDENT | VTIDENT ... */
     /* include/parrot/packfile.h */
     VT_START_SLICE = PF_VT_START_SLICE ,   /* x .. y slice range */
     VT_END_SLICE   = PF_VT_END_SLICE   ,
@@ -29,7 +28,7 @@ enum VARTYPE {		/* variable type can be */
 };
 
 /* this VARTYPE needs register allocation and such */
-#define VTREGISTER (VTREG | VTIDENTIFIER | VTREGKEY | VTPASM | VT_REGP)
+#define VTREGISTER (VTREG | VTIDENTIFIER | VTREGKEY | VTPASM)
 
 enum LIFEFLAG {    /* The status of a var inside a basic block can be */
     LF_use       = 1 << 0, /* block uses the the var before defining it */

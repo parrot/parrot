@@ -178,7 +178,6 @@ pcc_get_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
              * returns and args might conflict.
              */
             if (call) {
-                /* arg->reg->want_regno = next[set]; */
 move_reg:
                 regs[0] = arg;
                 sprintf(buf, "%c%d", arg->set, next[set]++);
@@ -231,7 +230,7 @@ pcc_put_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         PIO_eprintf(NULL, "    arg(%c%s)%s\n", arg->set,
                 (arg->type & (VTCONST|VT_CONSTP)) ? "c":"", arg->name);
 #endif
-        arg_reg = arg->reg;
+        arg_reg = arg;
         for (j = 0; j < REGSET_MAX; j++) {
             set = j;
             /*
@@ -965,11 +964,10 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     if (meth_call) {
         /* set S0, meth */
         regs[0] = get_pasm_reg("S0");;
-        if ((arg->type & VT_REGP) &&
-                (arg->reg->type == VTIDENTIFIER ||
-                 arg->reg->type == VTPASM ||
-                 arg->reg->type == VTREG))
-            s0 = arg->reg;
+        if ( (arg->type == VTIDENTIFIER ||
+                 arg->type == VTPASM ||
+                 arg->type == VTREG))
+            s0 = arg;
         else
             s0 = mk_const(str_dup(arg->name), 'S');
         /* ins = insINS(interp, unit, ins, "set", regs, 2); */
@@ -984,13 +982,13 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     }
     else {
         /* plain sub call */
-        if (arg->reg->type & VTPASM) {
+        if (arg->type & VTPASM) {
 move_sub:
-            if (arg->reg->color != 0) {
+            if (arg->color != 0) {
                 reg = get_pasm_reg("P0");
                 regs[0] = reg;
                 regs[1] = arg;
-                arg->reg->want_regno = 0;
+                arg->want_regno = 0;
                 ins = insINS(interp, unit, ins, "set", regs, 2);
             }
         }
@@ -1015,13 +1013,12 @@ move_sub:
     arg = sub->pcc_sub->cc;
     need_cc = 0;
     if (arg) {
-        if (arg->reg->type & VTPASM) {
+        if (arg->type & VTPASM) {
 move_cc:
-            if (arg->reg->color != 1) {
+            if (arg->color != 1) {
                 reg = get_pasm_reg("P1");
                 regs[0] = reg;
                 regs[1] = arg;
-                arg->reg->want_regno = 1;
                 ins = insINS(interp, unit, ins, "set", regs, 2);
             }
         }
@@ -1134,10 +1131,6 @@ pcc_sub_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
                 !strcmp(ins->op, "set")) {
             SymReg *r0 = ins->r[0];
             SymReg *r1 = ins->r[1];
-            if (r0->type & VT_REGP)
-                r0 = r0->reg;
-            if (r1->type & VT_REGP)
-                r1 = r1->reg;
             if (r0->set == r1->set && r0->color == r1->color &&
                     r0->type == r1->type) {
                 debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
@@ -1214,7 +1207,7 @@ pcc_sub_reads(Instruction* ins, SymReg* r)
     assert(sub && sub->pcc_sub);
     pcc = sub->pcc_sub;
     if ( (arg = pcc->cc) )
-        if (arg->reg == r)
+        if (arg == r)
             return 1;
     if (r->set == 'I' && r->color <= 4 && r->color >= 0)
         return 1;

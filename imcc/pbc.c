@@ -991,7 +991,7 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
                 case PARROT_ARG_NC:
                 case PARROT_ARG_PC:
                     r = ins->r[i];
-                    if (r->type & (VT_REGP | VT_CONSTP))
+                    if (r->type & VT_CONSTP)
                         r = r->reg;
                     *pc++ = (opcode_t) r->color;
                     debug(interpreter, DEBUG_PBC," %d", r->color);

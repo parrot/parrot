@@ -173,8 +173,6 @@ instruction_reads(Instruction* ins, SymReg* r) {
 	if (f & (1<<i)) {
             if (ri == r)
                 return 1;
-            if ((ri->type & VT_REGP) && ri->reg == r)
-                return 1;
             /* this additional test for _kc ops seems to slow
              * down instruction_reads by a huge amount compared to the
              * _writes below
@@ -204,8 +202,6 @@ instruction_writes(Instruction* ins, SymReg* r) {
     for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
 	if (f & (1<<(16+i))) {
             if (ins->r[i] == r)
-                return 1;
-            if ((ins->r[i]->type & VT_REGP) && ins->r[i]->reg == r)
                 return 1;
         }
 
@@ -402,7 +398,7 @@ ins_print(FILE *fd, Instruction * ins)
         p = ins->r[i];
         if (!p)
             continue;
-        if (p->type & (VT_REGP | VT_CONSTP))
+        if (p->type & VT_CONSTP)
             p = p->reg;
 	if (p->color >= 0 && (p->type & VTREGISTER)) {
 	    sprintf(regb[i], "%c%d", p->set, (int)p->color);

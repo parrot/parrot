@@ -106,7 +106,6 @@ symreg_to_str(SymReg * s)
     if (t & VTADDRESS)    { strcat(buf, "VTADDRESS ");    }
     if (t & VTREGKEY)     { strcat(buf, "VTREGKEY ");     }
     if (t & VTPASM)       { strcat(buf, "VTPASM ");       }
-    if (t & VT_REGP)      { strcat(buf, "VT_REGP ");      }
     if (t & VT_CONSTP)    { strcat(buf, "VT_CONSTP ");    }
     if (t & VT_PCC_SUB)   { strcat(buf, "VT_PCC_SUB ");   }
     if (t & VT_FLATTEN)   { strcat(buf, "VT_FLATTEN ");   }
@@ -158,9 +157,7 @@ add_namespace(Parrot_Interp interpreter, IMC_Unit *unit)
 }
 
 /*
- * Add make a pointer to a register or constant
- * and add to the subroutine structure arg list.
- * If arg is a pointer, deref the symbol first.
+ * Add a register or constant to the function arg list
  */
 void
 add_pcc_arg(SymReg *r, SymReg * arg)
@@ -170,28 +167,7 @@ add_pcc_arg(SymReg *r, SymReg * arg)
     PIO_eprintf(NULL, "add_pcc_arg(%s)\n", arg->name);
 #endif
     r->pcc_sub->args = realloc(r->pcc_sub->args, (n + 1) * sizeof(SymReg *));
-    if (arg->type & (VTCONST)) {
-        r->pcc_sub->args[n] = dup_sym(arg);
-        r->pcc_sub->args[n]->reg = arg;
-        r->pcc_sub->args[n]->type = VT_CONSTP;
-    }
-    else if (arg->type & (VTREGISTER)) {
-        r->pcc_sub->args[n] = dup_sym(arg);
-        r->pcc_sub->args[n]->reg = arg;
-        r->pcc_sub->args[n]->type = VT_REGP;
-    }
-    /* If this is already a pointer, dup the symbol
-     * that it point to, not the pointer itself.
-     */
-    else if (arg->type & (VT_CONSTP)) {
-        r->pcc_sub->args[n] = dup_sym(arg->reg);
-        r->pcc_sub->args[n]->reg = arg->reg;
-        r->pcc_sub->args[n]->type = VT_CONSTP;
-    }
-    else
-        fataly(EX_SOFTWARE, sourcefile, line,
-            "sub argument is not a valid arg (const, constp or reg) '%s'\n%s",
-                     arg->name, symreg_to_str(arg));
+    r->pcc_sub->args[n] = arg;
     r->pcc_sub->nargs++;
 }
 
@@ -206,20 +182,7 @@ add_pcc_result(SymReg *r, SymReg * arg)
 {
     int n = r->pcc_sub->nret;
     r->pcc_sub->ret = realloc(r->pcc_sub->ret, (n + 1) * sizeof(SymReg *));
-    r->pcc_sub->ret[n] = dup_sym(arg);
-    if (arg->type & VTREGISTER) {
-        r->pcc_sub->ret[n]->reg = arg;
-        r->pcc_sub->ret[n]->type = VT_REGP;
-    }
-    else if (arg->type & VTCONST) {
-        r->pcc_sub->ret[n]->reg = arg;
-        r->pcc_sub->ret[n]->type = VT_CONSTP;
-    }
-#if 0
-    else
-        fataly(EX_SOFTWARE, sourcefile, line,
-                "result is not a variable '%s'\n", arg->name);
-#endif
+    r->pcc_sub->ret[n] = arg;
     r->pcc_sub->nret++;
 }
 
@@ -232,17 +195,13 @@ add_pcc_return(SymReg *r, SymReg * arg)
 void
 add_pcc_sub(SymReg *r, SymReg * arg)
 {
-    r->pcc_sub->sub = dup_sym(arg);
-    r->pcc_sub->sub->reg = arg;
-    r->pcc_sub->sub->type = VT_REGP;
+    r->pcc_sub->sub = arg;
 }
 
 void
 add_pcc_cc(SymReg *r, SymReg * arg)
 {
-    r->pcc_sub->cc = dup_sym(arg);
-    r->pcc_sub->cc->reg = arg;
-    r->pcc_sub->cc->type = VT_REGP;
+    r->pcc_sub->cc = arg;
 }
 
 SymReg *
@@ -581,23 +540,10 @@ free_sym(SymReg *r)
 {
     free(r->name);
     if (r->pcc_sub) {
-        int i;
-        for (i = 0; i < r->pcc_sub->nargs; i++)
-            free_sym(r->pcc_sub->args[i]);
         if (r->pcc_sub->args)
             free(r->pcc_sub->args);
-        for (i = 0; i < r->pcc_sub->nret; i++)
-            free_sym(r->pcc_sub->ret[i]);
         if (r->pcc_sub->ret)
             free(r->pcc_sub->ret);
-        if (r->pcc_sub->cc)
-            free_sym(r->pcc_sub->cc);
-    /* multilpe freed
-        if (r->pcc_sub->cc_sym)
-            free_sym(r->pcc_sub->cc_sym);
-    */
-        if (r->pcc_sub->sub)
-            free_sym(r->pcc_sub->sub);
         free(r->pcc_sub);
     }
     /* TODO free keychain */

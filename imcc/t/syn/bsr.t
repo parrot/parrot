@@ -279,11 +279,10 @@ output_is(<<'CODE', <<'OUT', "coroutine");
 .end
 .sub _routine
    .local pmc co
-    co = P0
     print " "
-    invoke co
+    .yield()
     print "."
-    invoke co
+    .yield()
 
 .end
 CODE

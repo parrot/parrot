@@ -401,7 +401,8 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         }
         else if (!strcmp(name, "set") && n == 2) {
             /* set Px, Py: both PMCs have the same address */
-            if (r[0]->set == 'P' && r[1]->set == 'P')
+            if (r[0]->set == r[1]->set &&
+                    (r[1]->type & VTREGISTER))
                 ins->type |= ITALIAS;
         }
         else if (!strcmp(name, "compile"))

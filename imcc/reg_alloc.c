@@ -371,7 +371,7 @@ allocate_non_interfering(Parrot_Interp interpreter, IMC_Unit *unit, int n)
                     /*
                      * register set must match and not already allocated
                      */
-                    if (r->set != typ || (r->type & VT_REGP) ||
+                    if (r->set != typ ||
                             r->want_regno >= 0 || r->color >= 0)
                         continue;
                     if (r->color == first_color) {
@@ -440,8 +440,6 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     for (i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = unit->hash[i];
         for (; r; r = r->next) {
-            if (r->type & VT_REGP)
-                count++;
 #ifdef ALLOCATE_HACK
             if (r->color >= 28)
                 continue;
@@ -465,13 +463,10 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
         /* Add each symbol to reglist  */
         for (; r; r = r->next) {
             if (r->type & VTREGISTER) {
-                if (r->type & VT_REGP)
-                    unit->reglist[count++] = r->reg;
-                else
 #ifdef ALLOCATE_HACK
-                    if (r->color < 28)
+                if (r->color < 28)
 #endif
-                        unit->reglist[count++] = r;
+                    unit->reglist[count++] = r;
                 /* rearange I/N registers
                  * XXX not here, do it, when reading the source
                  * .nciarg, ... !!!1 */
