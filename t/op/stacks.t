@@ -1,5 +1,7 @@
 #! perl -w
 
+use Parrot::Test tests => 15;
+
 # Tests for stack operations, currently push*, push_*_c and pop*
 # where * != p.
 
@@ -8,7 +10,57 @@
 # Still to write: tests for (push|pop)_p(_c)?
 #                 tests for warp, unwarp and set_warp
 
-use Parrot::Test tests => 14;
+
+# This defines two macros:
+# fp_eq N, N, LABEL
+# fp_ne N, N, LABEL
+# which will conditionally branch
+# to LABEL if abs(n,n) < epsilon
+
+my $fp_equality_macro = <<'ENDOFMACRO';
+fp_eq	macro	J,K,L
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, J
+	set	N1, K
+	sub	N2, N1,N0
+	abs	N2, N2
+	gt	N2, 0.000001, $FPEQNOK
+
+	restore N2
+	restore	N1
+	restore	N0
+	branch	L
+$FPEQNOK:
+	restore N2
+	restore	N1
+	restore	N0
+endm
+fp_ne	macro	J,K,L
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, J
+	set	N1, K
+	sub	N2, N1,N0
+	abs	N2, N2
+	lt	N2, 0.000001, $FPNENOK
+
+	restore	N2
+	restore	N1
+	restore	N0
+	branch	L
+$FPNENOK:
+	restore	N2
+	restore	N1
+	restore	N0
+endm
+ENDOFMACRO
+
+###############     Tests   ##################
 
 output_is( <<"CODE", <<'OUTPUT', "pushi & popi" );
 @{[ set_int_regs( sub { $_[0]} )]}
@@ -249,6 +301,77 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 3');
 CODE
 213
 OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "save, restore");
+@{[ $fp_equality_macro ]}
+	set	I0, 1
+	save	I0
+	set	I0, 2
+	print	I0
+	print	"\\n"
+	restore	I0
+	print	I0
+	print	"\\n"
+
+	set	N0, 1.0
+	save	N0
+	set	N0, 2.0
+	fp_eq	N0, 2.0, EQ1
+	print	"not "
+EQ1:	print	"equal to 2.0\\n"
+	restore	N0
+	fp_eq	N0, 1.0, EQ2
+	print	"not "
+EQ2:	print	"equal to 1.0\\n"
+
+	set	S0, "HONK\\n"
+	save	S0
+	set	S0, "HONK HONK\\n"
+	print	S0
+	restore	S0
+	print	S0
+
+	save	123
+	restore	I0
+	print	I0
+	print	"\\n"
+
+	save	3.14159
+	restore	N0
+	fp_eq	N0, 3.14159, EQ3
+	print	"<kansas> not "
+EQ3:	print	"equal to PI\\n"
+
+	save	"All the world's people\\n"
+	restore	S0
+	print	S0
+
+	new	P0, PerlString
+	set	P0, "never to escape\\n"
+	save	P0
+	new	P0, PerlString
+	set	P0, "find themselves caught in a loop\\n"
+	print	P0
+	restore	P0
+	print	P0
+
+	end
+CODE
+2
+1
+equal to 2.0
+equal to 1.0
+HONK HONK
+HONK
+123
+equal to PI
+All the world's people
+find themselves caught in a loop
+never to escape
+OUTPUT
+
+
+##############################
 
 # set integer registers to some value given by $code...
 package main;
