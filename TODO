@@ -8,10 +8,5 @@ Automate string vtable generation
 
 Implement PMCs (!) [ This isn't actually that bad, just needs thought. ]
 
-Fix assembler to allow you to use something like:
-	add I4, I4, 3
-rather than:
-	add_i_ic I4, I4, 3
-
 Abstract out bytecode-reading/writing stuff to a separate Perl module so
 we can change the format without breaking the (dis)assembler.
