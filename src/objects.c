@@ -248,7 +248,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     /* Build a new vtable for this class
      * The child class PMC gets a ParrotClass vtable, which is a
      * good base to work from
-     * XXX we are leaking ths vtable
+     * XXX we are leaking this vtable
      */
     new_vtable = Parrot_clone_vtable(interpreter, new_class->vtable);
 
@@ -401,8 +401,6 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
        parent list and add them into the child if they're not already
        in the child list */
     if (!already_in) {
-        INTVAL current_size;
-
         /* First go put the new parent class on the search list */
         current_size = VTABLE_elements(interpreter,
                                        current_class_array);
@@ -431,7 +429,6 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
             }
             /* We found it. Yay us. Add the parent class to the list */
             if (!found) {
-                INTVAL current_size;
                 current_size = VTABLE_elements(interpreter,
                                                current_class_array);
                 VTABLE_set_integer_native(interpreter,
@@ -708,6 +705,7 @@ Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
     else {
         internal_exception(INTERNAL_NOT_IMPLEMENTED, "Can't get non-core object attribs yet");
     }
+    return NULL;
 }
 
 void
