@@ -370,7 +370,8 @@ $(PINFO) : pbc_info$(O) $(LIBPARROT)
 
 $(PARROT_MAIN)$(O) : $(PARROT_MAIN).c $(GENERAL_H_FILES)
 
-lib/Parrot/OpLib/core.pm : $(OPS_FILES) ops2pm.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
+lib/Parrot/OpLib/core.pm : $(OPS_FILES) ops2pm.pl \
+	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm ops.num
 	$(PERL) ops2pm.pl $(OPS_FILES)
 
 fingerprint.c : fingerprint_c.pl lib/Parrot/OpLib/core.pm

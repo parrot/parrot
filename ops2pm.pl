@@ -14,7 +14,7 @@
 # WARNING: Generating a combined Perl module for a set of .ops files that
 # you do not later turn into a combined opcode table with the same content
 # and order is a recipe for disaster.
-# 
+#
 # XXX: The original design of the .ops processing code was intended to be a
 # read-only representation of what was in a particular .ops file. It was
 # not originally intended that it was a mechanism for building a bigger
@@ -26,7 +26,7 @@
 # Perl modules are going to be used for modifying information read from .ops
 # files in addition to reading it, they should be changed to make the above
 # operations explicitly supported. Otherwise, the Parrot build and interpreter
-# start-up logic should be modified so that it doesn't need to concatenate 
+# start-up logic should be modified so that it doesn't need to concatenate
 # separate .ops files.
 #
 
@@ -89,17 +89,18 @@ for $file (@ARGV) {
 }
 
 
+# Renumber the ops based on ops.num
 #
-# Renumber the ops based on their new absolute positions (they started out
-# being numbered according to their relative position within their respective
-# .ops files):
-#
+
+&load_op_map_file;
 
 my $cur_code = 0;
 for(@{$ops->{OPS}}) {
-    $_->{CODE}=$cur_code++;
+    $_->{CODE} = find_op_number($_->full_name);
 }
 
+my @sorted = sort { $a->{CODE} <=> $b->{CODE} } (@{$ops->{OPS}} );
+@{$ops->{OPS}} = @sorted;
 
 #
 # Open the output file:
@@ -144,6 +145,49 @@ print MODULE <<END_C;
 
 1;
 END_C
+
+sub find_op_number {
+  my $opname = shift;
+  if (exists $ParrotOps::optable{$opname}) {
+    return $ParrotOps::optable{$opname};
+  } else {
+    my $n = $ParrotOps::optable{$opname} = ++$ParrotOps::max_op_num;
+    warn "$opname\t$n\tnot mentioned in ops.num\n";
+    return $n;
+  }
+}
+
+sub load_op_map_file {
+  my $file = shift;
+
+  if (!defined $file) {
+    $file = "ops.num";
+  }
+
+  my ($name, $number);
+
+  if (!defined $ParrotOps::max_op_num) {
+    $ParrotOps::max_op_num = 0;
+  }
+
+  local *OP;
+  open OP, "< $file" or die "Can't open $file, error $!";
+
+  while (<OP>) {
+    chomp;
+    s/#.*$//;
+    s/\s*$//;
+    s/^\s*//;
+    next unless $_;
+    ($name, $number) = split(/\s+/, $_);
+    $ParrotOps::optable{$name} = $number;
+    if ($number > $ParrotOps::max_op_num) {
+      $ParrotOps::max_op_num = $number;
+    }
+  }
+  close OP;
+  return;
+}
 
 exit 0;
 
