@@ -346,3 +346,20 @@
 	* Test-failures:
 	    - still compiler/{1_11,3_7}.
 
+2002-09-11
+
+	* Fixes:
+	    - slurp-parameters for subs with required params.
+	    - backslashes in strings
+	    - add more "unimp" warnings, so people stop calling them bugs ;).
+	    - infinite recursion in context::{ctx_right,val}
+	    - $x = f(foo) will return last element of return value (rather
+	      than array length).
+	    - named captures now require capturing groups, instead of
+	      creating them.
+	    - @x := [(keep_this) not_this]*
+	    - use normal string-parsing for /<"string">/.
+	    - range in void context is a warning, not a fatal error.
+
+	* Additions:
+	    - m:approx($n)//, if you've got it.

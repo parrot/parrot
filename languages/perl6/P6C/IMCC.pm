@@ -549,15 +549,11 @@ sub gensym(;*) {
 
 sub _gentmp(*) {		# uninitialized temporary (internal)
     '$' . $_[0] . ++$lasttmp
-#    'T_'.$_[0].++$lasttmp;
-#    my %typemap = (qw(P pmc I int N float S string));
-#    add_localvar($name, $typemap{$_[0]});
 }
 
 sub gentmp(;*) {			# uninitialized temporary
     my $t = $_[0] || 'PerlUndef';
     _gentmp(regtype($t));
-#    $funcs{$curfunc}->add_localvar($name, paramtype($t), 0);
 }
 
 sub genlabel(;$) {		# new label (optionally annotated)
@@ -570,7 +566,6 @@ sub newtmp(;*) {			# initialized temporary
     my $type = shift || 'PerlUndef';
     my $reg = regtype $type;
     my $name;
-#    my $name = gentmp $type;
     if ($reg eq 'S') {
   	$name = _gentmp S;
 	code(<<END);
@@ -612,6 +607,8 @@ C<$ctx>.
 
 =item B<tuple_in_context(\@vals, $ctx)>
 
+=item B<primitive_in_context($val, $primitive_type, $ctx)>
+
 =item B<do_flatten_array($vals)>
 
 Emit code to evaluate each item in C<@$vals>, which are assumed to be
@@ -627,11 +624,12 @@ sub gen_counted_loop {
     my $start = genlabel;
     my $end = genlabel;
     return <<END;
-$start:	if $count == 0 goto $end
+	goto $end
+$start:
 	dec $count
-	$body
-	goto $start
+$body
 $end:
+	if $count != 0 goto $start
 END
     return undef;
 }
@@ -651,7 +649,15 @@ sub scalar_in_context {
 END
 	return $a;
     } elsif ($ctx->is_tuple) {
-	return [$x];
+	if ($ctx->flatten && @{$ctx->type} == 1) {
+	    my $ptmp = newtmp 'PerlArray';
+	    code(<<END);
+	$ptmp\[0] = $x
+END
+	    return [$ptmp];
+	} else {
+	    return [$x];
+ 	}
     } else {
 	return $x;
     }
@@ -683,13 +689,34 @@ sub array_in_context {
 	my $len = gentmp 'int';
 	my $end = genlabel;
 	my @tuple = map { gentmp 'pmc' } 1..@{$ctx->type};
+	my $max = $#tuple - ($ctx->flatten ? 1 : 0);
 	code(<<END);
 	$len = $x
 END
-	for my $i (0..$#tuple) {
+	for my $i (0..$max) {
 	    code(<<END);
 	if $i == $len goto $end
 	$tuple[$i] = $x\[$i]
+END
+	}
+	if ($ctx->flatten) {
+	    my $j = gentmp 'int';
+	    my $k = gentmp 'int';
+	    my $endcp = genlabel;
+	    my $cploop = genlabel;
+	    my $ptmp = gentmp 'pmc';
+	    code(<<END);
+	$tuple[$max] = new PerlArray
+	$j = $max
+	$k = 0
+	goto $endcp
+$cploop:
+	$ptmp = $x\[$j]
+	$tuple[$max]\[$k] = $ptmp
+	inc $j
+	inc $k
+$endcp:
+	if $j < $len goto $cploop
 END
 	}
 	code(<<END);
@@ -713,7 +740,9 @@ sub tuple_in_context {
 	return undef;
     } elsif ($ctx->is_tuple) {
 	# Make sure we return enough items (XXX: is this necessary?)
-	if (@$x <= @{$ctx->type}) {
+	if ($ctx->flatten) {
+	    die;
+	} elsif (@$x <= @{$ctx->type}) {
 	    return @{$x}[0..$#{$ctx->type}];
 	} else {
 	    my @ret = @$x;
@@ -723,6 +752,7 @@ sub tuple_in_context {
 	    return [@ret];
 	}
     } elsif ($ctx->is_array) {
+	# XXX: do we need to flatten each element in flattening context?
 	my $res = newtmp 'PerlArray';
 	my $n = @$x;
 	my $ptmp = gentmp 'pmc';
@@ -766,7 +796,8 @@ sub undef_in_context {
 }
 
 sub do_flatten_array {
-    my $vals = shift;
+    my ($vals, $off) = @_;
+    $off ||= 0;
     my $tmp = newtmp 'PerlArray';
     my $len = gentmp 'int';
     my $offset = gentmp 'int';
@@ -776,7 +807,7 @@ sub do_flatten_array {
 # START array flattening.
 	$offset = 0
 END
-    for my $i (0..$#{$vals}) {
+    for my $i ($off .. $#{$vals}) {
 	if ($vals->[$i]->isa('P6C::sv_literal')) {
 	    my $itemval = $vals->[$i]->lval;
 	    code(<<END);
@@ -873,6 +904,7 @@ sub localvar {
 
 sub add_localvar {
     my ($x, $var, $type, $init) = @_;
+    $x->{scopelevel} ||= 0;
     my $scopename = mangled_name($var).$x->{scopelevel};
     if ($x->scopes->[0]{$var}) {
 	diag "Redeclaring lexical $var in $P6C::IMCC::curfunc";
@@ -1013,27 +1045,35 @@ sub val {
     my $x = shift;
     my $ctx = $x->{ctx};
 
-    if ($ctx->flatten) {
-	# XXX: flatten has to come first.
-	# In flattening context, we have to build a new array out of
-	# the values.  All the values should have been evaluated in
-	# array context, so they will all be PerlArrays.
-	return do_flatten_array($x->vals);
+    if ($ctx->is_tuple) {
+	# In N-tuple context, the list's value is its first N elements.
+	my @ret;
+	my $min = $ctx->nelem - ($ctx->flatten ? 1 : 0);
+	$min = @{$x->vals} if @{$x->vals} < $ctx->nelem;
+
+	for my $i (0..$min - 1) {
+	    $ret[$i] = $x->vals($i)->val;
+	}
+	if ($ctx->flatten) {
+	    # XXX: flatten has to come first.
+	    # In flattening context, we have to build a new array out of
+	    # the values.  All the values should have been evaluated in
+	    # array context, so they will all be PerlArrays.
+	    push @ret, do_flatten_array($x->vals, $min);
+	} else {
+	    for my $i ($min .. $#{$x->vals}) {
+		$x->vals($i)->val;
+	    }
+	}
+	return [@ret];
 
     } elsif ($ctx->is_array) {
 	# In array context, the list's value is an array of all its
 	# elements.
-	my $tmp = newtmp 'PerlArray';
-	code("# ValueList in array context\n\t$tmp = ".@{$x->vals}."\n");
-	for my $i (0..$#{$x->vals}) {
-	    my $item = $x->vals($i)->val;
-	    confess Data::Dumper::Dumper($x->vals($i)) unless $item;
-	    code(<<END);
-	$tmp\[$i] = $item
+	code(<<END);
+# ValueList in array context
 END
-	}
-	return $tmp;
-
+	return do_flatten_array($x->vals, 0);
     } elsif ($ctx->is_scalar || $ctx->type eq 'void') {
 	# The value of a list in scalar context is its last value, but
 	# we need to evaluate intermediate expressions for possible
@@ -1042,18 +1082,6 @@ END
 	    $_->val;
 	}
 	return $x->vals($#{$x->vals})->val;
-
-    } elsif ($ctx->is_tuple) {
-	# In N-tuple context, the list's value is its first N elements.
-	my @ret;
-	my $min = @{$x->vals} < $ctx->nelem ? @{$x->vals} : $ctx->nelem;
-	for my $i (0..$min - 1) {
-	    $ret[$i] = $x->vals($i)->val;
-	}
-	for my $i ($min .. $#{$x->vals}) {
-	    $x->vals($i)->val;
-	}
-	return [@ret];
 
     } else {
 	unimp "Can't handle context ".Dumper($ctx);
@@ -1530,17 +1558,16 @@ sub val {
 	$x->params($default_params);
     }
 
+    @params = @{$x->params->req};
     if (!defined $x->params->max) {
-	@params = $x->params->rest;
+	set_function_params(@params, $x->params->rest);
     } elsif ($x->params->min != $x->params->max) {
-	# Only support variable number of params if it's zero - Inf.
+	# Only support variable number of params if it's N - Inf.
 	unimp "Unsupported parameter arity: ",
 	    $x->params->min . ' - ' . $x->params->max;
     } else {
-	@params = @{$x->params->req};
+	set_function_params(@params);
     }
-
-    set_function_params(@params);
     if ($ctx->{noreturn}) {
 	# Do nothing.
     } elsif (UNIVERSAL::isa($x->block, 'P6C::rule')) {
@@ -1630,7 +1657,6 @@ sub val_in_context {
     }
 }
 
-# XXX: need to redo this when we get globals.
 sub val {
     my $x = shift;
     my $ctx = $x->{ctx};
@@ -1830,6 +1856,7 @@ END
 
     } elsif ($ctx->is_array || $ctx->flatten) {
 	# Slice in array context.
+	# XXX: slice in flattening context could be smarter?
 	$ret = newtmp 'PerlArray';
 	my $itmp = gentmp $temptype{$type};
 	my $ptmp = gentmp 'PerlUndef';
@@ -1995,7 +2022,7 @@ sub P6C::debug_info::val {
 ######################################################################
 sub P6C::context::val {
     my $x = shift;
-    my $v = $x->val;
+    my $v = $x->thing->val;
     my $type = $P6C::context::names{$x->ctx};
     if ($type eq 'PerlAray') {
 	return array_in_context($v, $x->{ctx});
@@ -2015,11 +2042,6 @@ require P6C::Util;
 sub prepare_match_object {
     my $r = shift;
     my $ret = newtmp 'PerlHash';
-    P6C::Util::map_preorder {
-	if (UNIVERSAL::isa($_, 'P6C::rx_hypo')) {
-	    $_->{ctx}{rx_matchobj} = $ret;
-	}
-    } $r;
     return $ret;
 }
 
@@ -2038,13 +2060,12 @@ END
     $x->{ctx}{rx_pos} = $rxpos;
     $x->{ctx}{rx_thing} = $rxstr;
     $x->{ctx}{rx_fail} = $fail;
-    my $ret = $x->prepare_match_object;
+    my $ret = $x->{ctx}{rx_matchobj} = $x->prepare_match_object;
     my $back = P6C::IMCC::rule::rx_val($x);
     my $end = genlabel 'end';
     fixup_label($fake_back, $back);
     code(<<END);
 	rx_pushindex $rxpos
-#	$ret = $rxpos
 	goto $end
 $fail:
 	$ret = new PerlUndef

@@ -32,7 +32,7 @@ Branch destination on failure, or C<undef> for fallthrough.
 package P6C::IMCC::rule;
 use strict;
 use P6C::IMCC ':all';
-use P6C::Util qw(unimp is_string map_preorder);
+use P6C::Util qw(unimp error is_string map_preorder);
 use P6C::IMCC::prefix 'gen_sub_call';
 
 # C<undef> means fallthrough, so use this to generate a jump to what
@@ -62,6 +62,7 @@ END
 # top-level regex
 sub P6C::IMCC::rule::rx_val {
     my $x = shift;
+    my $res = $x->{ctx}{rx_matchobj} or die;
     my $pos  = $x->{ctx}{rx_pos};
     my $thing = $x->{ctx}{rx_thing};
     my $fail = $x->{ctx}{rx_fail} || genlabel 'endrule_no';
@@ -80,7 +81,8 @@ sub P6C::IMCC::rule::rx_val {
     my $back = $x->pat->rx_val({ succ => undef,
 				 fail => $fail,
 				 pos => $pos,
-				 str => $thing });
+				 str => $thing,
+				 result => $x->{ctx}{rx_matchobj} });
     code(<<END) unless $x->{ctx}{rx_fail};
 $fail:
 END
@@ -145,6 +147,7 @@ END
     rxdebug $x, $ctx, 'alt start';
     code(<<END);
 	rx_pushindex $ctx->{pos}
+	$savepos = $ctx->{pos}
 END
     # setup -- push our index onto the intstack.
     for my $i (0..$#{$x->branches}) {
@@ -155,6 +158,7 @@ END
 	rx_pushindex $i
 	goto $ctx->{succ}
 $nextlabel[$i]:
+	$ctx->{pos} = $savepos
 END
     }
 
@@ -177,6 +181,7 @@ END
 $bt:
 	rx_popindex $which, $ctx->{fail}
 	rx_popindex $ctx->{pos}, $ctx->{fail}
+	$savepos = $ctx->{pos}
 	rx_pushindex $ctx->{pos}
 END
     rxdebug $x, $ctx, 'alt back';
@@ -249,7 +254,16 @@ $again:
 	if $which == $num goto $ctx->{fail}
 	$lit = $things\[$which]
 	inc $which
+END
+    if ($x->{ctx}{rx_mod}{approx}) {
+	$ctx->{fail} = $bt;
+	$bt = rx_approx_match($x->{ctx}{rx_mod}{approx}, $lit, $ctx);
+    } else {
+	code(<<END);
 	rx_literal $ctx->{str}, $ctx->{pos}, $lit, $again
+END
+    }
+    code(<<END);
 	rx_pushindex $start
 	rx_pushindex $which
 END
@@ -258,12 +272,11 @@ END
 }
 
 sub begin_capture {
-    my ($x, $ctx) = @_;
+    my ($var, $ctx) = @_;
     $ctx->{cap_pos} = gentmp 'int';
     $ctx->{cap_succ} = $ctx->{succ};
-    unless(localvar($x->var->name)) {
-	print STDERR "Declared capture var ", $x->var->name,"\n";
-	add_localvar($x->var->name, $x->var->type);
+    unless(localvar($var->name)) {
+	add_localvar($var->name, $var->type);
     }
     code(<<END);
 	$ctx->{cap_pos} = $ctx->{pos}
@@ -272,11 +285,11 @@ END
 }
 
 sub end_capture {
-    my ($x, $ctx, $bt, @vars) = @_;
+    my ($x, $ctx, $bt, $var) = @_;
     my $len = gentmp 'int';
     my $str = gentmp 'str';
     my $ptmp = gentmp 'PerlString';
-    my $hashname = $x->var->name;
+    my $hashname = $var->name;
     if ($hashname =~ /^\$([\w\d_]+)$/) {
 	$hashname = $1;
     }
@@ -285,15 +298,37 @@ sub end_capture {
 	substr $str, $ctx->{str}, $ctx->{cap_pos}, $len
 	$ptmp = new PerlString
 	$ptmp = $str
-	$x->{ctx}{rx_matchobj}\["$hashname"] = $ptmp
+	$ctx->{result}\["$hashname"] = $ptmp
 END
-    for my $var (@vars) {
-	my $reg = localvar($var->name) || add_localvar($var->name, $var->type);
-	code(<<END);
+    my $reg = localvar($var->name) || add_localvar($var->name, $var->type);
+    code(<<END);
 	$reg = $ptmp
 END
-    }
     maybe_fallthrough($ctx->{cap_succ});
+    return $bt;
+}
+
+sub rx_approx_match {
+    my ($amatch, $str, $ctx) = @_;
+    my $bt = genlabel 'amatch';
+    my $n;
+    if (!$amatch->args || @{$amatch->args} == 0) {
+	$n = 0.3;
+    } elsif (@{$amatch->args} == 1) {
+	my $v = $amatch->args(0)->val;
+	$n = gentmp 'float';
+	code(<<END);
+	$n = $v
+END
+    } else {
+	error 'too many arguments to m:approx';
+    }
+    code(<<END);
+	rx_amatch $ctx->{str}, $ctx->{pos}, $str, $n
+$bt:
+	rx_popindex $ctx->{pos}, $ctx->{fail}
+END
+    maybe_fallthrough($ctx->{succ});
     return $bt;
 }
 
@@ -335,6 +370,7 @@ END
 sub P6C::rx_atom::rx_val {
     my ($x, $ctx) = @_;
     my $startdepth;
+    my $bt;
     if ($x->{ctx}{rx_canfail}) {
 	$x->{ctx}{rx_fail_label} = genlabel 'failatom';
 	$startdepth = gentmp 'int';
@@ -348,16 +384,19 @@ END
 
     my %ctx = %$ctx;
     $ctx{fail} = $x->{ctx}{rx_fail_label} if $x->{ctx}{rx_canfail};
+
+    begin_capture($x->{rx_capture_var}, \%ctx) if $x->capture;
     if (UNIVERSAL::can($x->atom, 'rx_val')) {	# XXX: blech
-	return $x->atom->rx_val({ %ctx });
+	$bt = $x->atom->rx_val({ %ctx });
 
     } elsif (ref($x->atom) eq 'ARRAY') {
 	# codeblock
 	$_->val for @{$x->atom};
+	$bt = $ctx{fail};
 
     } elsif (UNIVERSAL::can($x->atom, 'type')
 	     && $x->atom->type eq 'PerlArray') {
-	return rx_alt_array($x, \%ctx);
+	$bt = rx_alt_array($x, \%ctx);
 
     } else {
 	my $lit;
@@ -372,12 +411,18 @@ END
 	$lit = $val
 END
 	}
-	code(<<END);
+	if ($x->{ctx}{rx_mod}{approx}) {
+	    return rx_approx_match($x->{ctx}{rx_mod}{approx}, $lit, \%ctx);
+	} else {
+	    code(<<END);
 	rx_literal $ctx->{str}, $ctx->{pos}, $lit, $ctx{fail}
 END
+	}
+	$bt = $ctx{fail};
     }
+    end_capture($x, \%ctx, $bt, $x->{rx_capture_var}) if $x->capture;
     maybe_fallthrough($ctx{succ});
-    return $ctx{fail};
+    return $bt;
 }
 
 # Greedy repeat <$n,$m>
@@ -418,11 +463,10 @@ sub do_var_repeat {
     my $zerocnt = genlabel 'zero';
     my %loopctx = %$ctx;	# context for min loop
     my ($cap_from, $cap_to, $arylen);
-    if ($x->{ctx}{rx_capture_array}) {
-	print STDERR "capture array\n";
+    if ($x->{rx_capture_array}) {
 	undef $loopctx{succ};
-	$cap_from = findvar $x->thing->var->name;
-	$cap_to = findvar $x->{ctx}{rx_capture_array}->name;
+	$cap_from = findvar $x->{rx_capture_source}{rx_capture_var}->name;
+	$cap_to = findvar $x->{rx_capture_array}->name;
 	$arylen = gentmp 'int';
     } else {
 	$loopctx{succ} = $loop;
@@ -520,11 +564,10 @@ sub do_frugal_rep {
     my $enough = genlabel 'enough';
     my %loopctx = %$ctx;	# context for min loop
     my ($cap_from, $cap_to, $arylen);
-    if ($x->{ctx}{rx_capture_array}) {
-	print STDERR "capture array\n";
+    if ($x->{rx_capture_array}) {
 	undef $loopctx{succ};
-	$cap_from = findvar $x->thing->var->name;
-	$cap_to = findvar $x->{ctx}{rx_capture_array}->name;
+	$cap_from = findvar $x->{rx_capture_source}{rx_capture_var}->name;
+	$cap_to = findvar $x->{rx_capture_array}->name;
 	$arylen = gentmp 'int';
     } else {
 	$loopctx{succ} = $loop;
@@ -625,17 +668,15 @@ sub P6C::rx_repeat::rx_val {
 	my $loop = genlabel 'star';
 	my $loopfail = genlabel 'star_infail';
 	my $loopfailex = genlabel 'star_back';
-	my $end = genlabel 'star_end';
 	my $itmp = gentmp 'int';
 	my $initdepth = gentmp 'int';
 
 	my %loopctx = %$ctx;
 	my ($cap_from, $cap_to, $arylen);
-	if ($x->{ctx}{rx_capture_array}) {
-	    print STDERR "capture array\n";
+	if ($x->{rx_capture_array}) {
 	    undef $loopctx{succ};
-	    $cap_from = findvar $x->thing->var->name;
-	    $cap_to = findvar $x->{ctx}{rx_capture_array}->name;
+	    $cap_from = findvar $x->{rx_capture_source}{rx_capture_var}->name;
+	    $cap_to = findvar $x->{rx_capture_array}->name;
 	    $arylen = gentmp 'int';
 	} else {
 	    $loopctx{succ} = $loop;
@@ -676,11 +717,14 @@ END
 	dec $arylen
 	$cap_to = $arylen
 END
+	my $foo = genlabel;
 	code(<<END);
 	if $itmp == 1 goto $bt
+	goto $foo
 $loopfail:
 	rx_popindex $ctx->{pos}, $ctx{fail}
 	rx_pushindex $ctx->{pos}
+$foo:
 END
 	$bt = $loopfailex;
 
@@ -931,7 +975,7 @@ END
 # - <{ code assertion }>
 sub P6C::rx_assertion::rx_val {
     my ($x, $ctx) = @_;
-    if ($x->thing->isa('P6C::sv_literal')) {
+    if ($x->thing->can('rx_val')) {
 	# Literal string result.
 	my $str = $x->thing->lval;
 	$str =~ s/^['"]//;
@@ -939,16 +983,13 @@ sub P6C::rx_assertion::rx_val {
 	$str =~ s/(?<!\\)"/\\"/g;
 	if ($x->negated) {
 	    # XXX: what's this supposed to do to the match pos?
+	    my $bt;
 	    rx_not($ctx, sub {
-		       code(<<END);
-	rx_literal $ctx->{str}, $ctx->{pos}, "$str", $ctx->{fail}
-END
+		       $bt = $x->thing->rx_val($ctx);
 		   });
-	} else {
-	    code(<<END);
-	rx_literal $ctx->{str}, $ctx->{pos}, "$str", $ctx->{fail}
-END
-	    maybe_fallthrough($ctx->{succ});
+	    return $bt;
+ 	} else {
+	    return $x->thing->rx_val($ctx);
 	}
     } else {
 	my $res = $x->thing->val;
@@ -979,12 +1020,14 @@ END
     if (ref $x->name) {
 	call_closure($x->name, $x->args);
     } else {
+	begin_capture($x->{rx_capture_var}, $ctx);
 	gen_sub_call($x);
     }
     code(<<END);
 	rx_popindex $ctx->{pos}, $ctx->{fail}
 END
     rxdebug $x, $ctx, "after call @{[$x->name]}";
+    end_capture($x, $ctx, $bt, $x->{rx_capture_var}) unless ref $x->name;
     maybe_fallthrough($ctx->{succ});
     return $bt;
 }
@@ -994,8 +1037,8 @@ sub P6C::rx_hypo::rx_val {
     my ($x, $ctx) = @_;
     if ($x->var->type eq 'PerlArray') {
 	# Array capture...
-	begin_capture($x, $ctx);
-	my $foo = $x->val->thing->var;
+	begin_capture($x->var, $ctx);
+	my $foo = $x->val->{rx_capture_source}{rx_capture_var};
 	unless (localvar($foo->name)) {
 	    # Declare capture var for repeated item. XXX: shouldn't be needed.
 	    add_localvar($foo->name, $foo->type);
@@ -1005,10 +1048,9 @@ sub P6C::rx_hypo::rx_val {
 	$array = 0
 END
 	my $bt = $x->val->rx_val($ctx);
-#	return end_capture($x, $ctx, $bt);
 	return $bt;
     } else {
-	begin_capture($x, $ctx);
+	begin_capture($x->var, $ctx);
 	my $bt = $x->val->rx_val($ctx);
 	return end_capture($x, $ctx, $bt, $x->var);
     }

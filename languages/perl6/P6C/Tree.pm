@@ -208,6 +208,7 @@ sub P6C::sv_literal::tree {
     if ($x->[1] eq '{') {
 	$type = 'PerlHash';
 	$val = $x->[3]->tree;
+	unimp 'Hash reference constructor';
     } elsif ($x->[1] eq '[') {
 	$type = 'PerlArray';
 	if (@{$x->[3]} > 0) {
@@ -215,6 +216,7 @@ sub P6C::sv_literal::tree {
 	} else {
 	    $val = undef;
 	}
+	unimp 'Array reference constructor';
     } elsif (!ref($x->[1])) {
 	$x->[1] =~ s/_//g;
 	if ($x->[1] =~ /\./) {
@@ -926,7 +928,7 @@ sub P6C::rx_atom::tree {
     if (@$x == 5) {
 	$atom = $x->[3]->tree;
 	if ($x->[1] eq '(') {
-	    return new P6C::rx_hypo(val => new P6C::rx_atom(atom => $atom));
+ 	    return new P6C::rx_atom(capture => 1, atom => $atom);
 	} elsif ($x->[1] eq '[') {
 	    return new P6C::rx_atom(atom => $atom);
 	} else {
@@ -971,7 +973,7 @@ sub P6C::rx_mod::tree {
     my $x = shift;
     my $ret = new P6C::rx_mod mod => substr($x->[1], 1);
     if (@{$x->[2]} > 0) {
-	$ret->args($x->[4][2]->tree);
+	$ret->args([flatten_leftop($x->[2][0][2]->tree, ',')]);
     }
     return $ret;
 }
@@ -1022,12 +1024,12 @@ sub P6C::rx_assertion::tree {
  	} elsif ($x->[1] eq '.') {
 	    # Single grapheme
 	    unimp "Logical grapheme";
-	} elsif ($x->[1] =~ /^'/) {
-	    return new P6C::rx_assertion
-		thing => P6C::sv_literal->new(type => 'str', lval => $x->[1]);
 	} else {
 	    die "internal error";
 	}
+    } elsif ($x->[1] eq '') {
+	# Literal string
+	return new P6C::rx_atom atom => concat_string([undef, $x->[3]]);
     } elsif ($x->[1] eq '-') {
 	# Negated assertion
 	my $thing = $x->[3]->tree;

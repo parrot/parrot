@@ -33,7 +33,6 @@ rule syntax :w {
     }
 
 my $which = @ARGS[0];
-my %rule;
 for @ARGS[1..@ARGS - 1] -> $str {
     my $no;
     if $which =~ /^r/ { $no = $str !~ m:w/^ <Rule> $/ }

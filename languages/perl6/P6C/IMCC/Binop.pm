@@ -1,4 +1,5 @@
 package P6C::IMCC::Binop;
+use strict;
 use SelfLoader;
 use Data::Dumper;
 use Carp 'confess';
@@ -194,6 +195,10 @@ $end:
 END
 	return [@ret];
 
+    } elsif ($ctx->type eq 'void') {
+	warning 'range in void context';
+	return undef;
+
     } else {
 	unimp "Unsupported range context ".Dumper($ctx->type);
     }
@@ -311,7 +316,7 @@ $adv:
 	inc $basepos
 $begin:
 END
-    my $ret = $r->prepare_match_object;
+    my $ret = $r->{ctx}{rx_matchobj} = $r->prepare_match_object;
     $r->{ctx}{rx_pos} = $pos;
     $r->{ctx}{rx_thing} = $str;
     $r->{ctx}{rx_fail} = $adv;

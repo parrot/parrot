@@ -122,7 +122,6 @@ sub P6C::Binop::ctx_right {
 
     } elsif ($op eq ',') {
 	# List of items.
-	# XXX: this is gross.
 	my @things = $x->flatten_leftop(',');
 	my $vl = P6C::ValueList->new(vals => \@things);
 	$vl->ctx_right($ctx);
@@ -195,21 +194,21 @@ sub P6C::indices::ctx_right {
 # C<PerlArray>, and the resulting indexing context is C<[int, int]>.
 
     if (defined($x->indices)) {
-	my $index_ctx;
+	my $index_ctx = $ctx->copy;
 	if ($x->type eq 'Sub') {
  	    $index_ctx = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
 
 	} elsif ($ctx->is_tuple) {
-	    $index_ctx = new P6C::Context
-		type => [($indextype{$x->type}) x @{$ctx->type}];
+	    $index_ctx->type([($indextype{$x->type}) x @{$ctx->type}]);
 
 	} elsif ($ctx->is_scalar || $ctx->type eq 'void') {
 	    # XXX: this causes problems with things like C<$x = @a[@i]>.
 	    # I don't know what that should do.
-	    $index_ctx = new P6C::Context type => $indextype{$x->type};
+	    $index_ctx->type($indextype{$x->type});
 
 	} elsif ($ctx->is_array) {
-	    $index_ctx = new P6C::Context type => 'PerlArray';
+	    $index_ctx->type('PerlArray');
+	    $index_ctx->flatten(1); # XXX: This probably isn't quite right.
 
 	} else {
 	    confess "index contest: ", Dumper($ctx);
@@ -555,9 +554,9 @@ sub P6C::decl::ctx_left {
     my ($x, $other, $ctx) = @_;
     if (ref $x->vars ne 'ARRAY') { # single-variable declaration.
  	my $ctx = new P6C::Context type => $x->vars->type;
-	if ($ctx->is_array) {
-	    $ctx->flatten(1);
-	}
+ 	if ($ctx->is_array) {
+ 	    $ctx->flatten(1);
+ 	}
 	$other->ctx_right($ctx);
     } else {
 	my @ctx = map { $_->type } @{$x->vars};
@@ -573,16 +572,20 @@ sub P6C::sub_def::ctx_right {
     }
 
     my $argctx;
-    if (!defined $x->closure->params
-	|| !defined $x->closure->params->max) {
+    if (!defined $x->closure->params) {
 	$argctx = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
-    } elsif ($x->closure->params->min != $x->closure->params->max) {
+    } elsif (defined($x->closure->params->max)
+	     && $x->closure->params->min != $x->closure->params->max) {
 	# Only support variable number of params if it's zero - Inf.
 	unimp "Unsupported parameter arity: ",
 	    $x->closure->params->min . ' - ' . $x->closure->params->max;
     } else {
 	my @types = map { $_->var->type } @{$x->closure->params->req};
 	$argctx = new P6C::Context type => [@types];
+	unless (defined $x->closure->params->max) {
+	    push @{$argctx->type}, $x->closure->params->rest->var->type;
+	    $argctx->flatten(1);
+	}
     }
     $P6C::Context::CONTEXT{$x->name} = $argctx;
     $x->{ctx} = $ctx->copy;
@@ -710,14 +713,19 @@ sub P6C::ValueList::ctx_right {
 
     if ($ctx->is_tuple) {
 	my $min = @{$ctx->type} < @{$x->vals} ? @{$ctx->type} : @{$x->vals};
+	--$min if $ctx->flatten;
 	my $newctx = $ctx->copy;
 	for my $i (0 .. $min - 1) {
 	    $newctx->type($ctx->type->[$i]);
 	    $x->vals($i)->ctx_right($newctx);
 	}
-	my $voidctx = new P6C::Context type => 'void';
+	if ($ctx->flatten) {
+	    $newctx->type('PerlArray');
+	} else {
+	    $newctx->type('void');
+	}
 	for my $i ($min .. $#{$x->vals}) {
-	    $x->vals($i)->ctx_right($voidctx);
+	    $x->vals($i)->ctx_right($newctx);
 	}
 
     } elsif ($ctx->is_array) {
@@ -775,14 +783,14 @@ BEGIN {
 			      $ PerlUndef
 			      _ PerlString
 			      ? bool
-			      + PerlInt);
+			      + PerlNum);
 }
 
 sub P6C::context::ctx_right {
     my ($x, $ctx) = @_;
     $x->{ctx} = $ctx->copy;
     $ctx->type($P6C::context::names{$x->ctx});
-    $x->ctx_right($ctx);
+    $x->thing->ctx_right($ctx);
 }
 
 ##############################
@@ -792,8 +800,9 @@ sub P6C::debug_info::ctx_right { }
 ##############################
 my %modmap;
 BEGIN {
-    %modmap = qw(w word
-		 word word);
+    %modmap = qw(w	word
+		 word	word
+		 approx approx);
 }
 
 sub P6C::rule::ctx_right {
@@ -853,27 +862,47 @@ sub P6C::rx_seq::ctx_right {
     }
 }
 
+sub find_capture {
+    my $x = shift;
+    eval {
+	map_preorder {
+	    if (UNIVERSAL::isa($_, 'P6C::rx_atom') && $_->capture
+		|| UNIVERSAL::isa($_, 'P6C::rx_call') && !ref($_->name)) {
+		die $_;
+	    }
+	} $x;
+    };
+    die $@ unless ref $@;
+    return $@;
+}
+
 sub P6C::rx_hypo::ctx_right {
     my ($x, $ctx) = @_;
     $x->{ctx} = $ctx->copy;
-    unless (defined $x->var) {
-	$x->var(new P6C::variable
-		name => '$'.(++$::capture_number),
-		type => 'PerlString');
-    }
     if ($x->var->type eq 'PerlArray') {
 	# Array capture
 	error 'Array capture on a non-repeating regex element.'
-	    unless $x->val->isa('P6C::rx_repeat');
-	unless ($x->val->thing->isa('P6C::rx_hypo')) {
-	    # Pretend the repeated item is a capture group.
-	    $x->val->thing(new P6C::rx_hypo(
-			   var => new P6C::variable(
-			    name => '$'.(++$::capture_number),
-			    type => 'PerlString'),
-			   val => $x->val->thing));
+	    unless ($x->val->isa('P6C::rx_repeat')
+		    && !($x->val->min == 0 && $x->val->max == 1));
+
+	error 'nothing to capture for '.$x->var->name
+	    unless $x->val->{rx_capture_source} = find_capture($x->val->thing);
+
+	$x->val->{rx_capture_array} = $x->var;
+    } elsif ($x->var->type eq 'PerlHash') {
+	unimp 'Hash capture.';
+    } else {
+	my $source;
+	if ($x->val->isa('P6C::rx_repeat')) {
+	    unimp 'array-reference capture to scalar'
+		unless $x->val->min == 0 && $x->val->max == 1;
+	    $source = $x->val->thing;
+	} else {
+	    $source = $x->val;
 	}
-	$ctx->{rx_capture_array} = $x->var;
+	error 'Nothing to capture for hypothetical '.$x->var->name
+	    unless $x->{bind_to} = find_capture($source);
+	$x->{bind_to}{rx_capture_var} = $x->var;
     }
     $x->var->ctx_left($x->val);
     $x->val->ctx_right($ctx);
@@ -896,6 +925,12 @@ sub P6C::rx_oneof::ctx_right {
 sub P6C::rx_atom::ctx_right {
     my ($x, $ctx) = @_;
     $x->{ctx} = $ctx->copy;
+
+    if ($x->capture && !exists $x->{rx_capture_var}) {
+	$x->{rx_capture_var} = new P6C::variable
+	    name => '$'.++$::capture_number,
+	    type => 'PerlUndef';
+    }
 
     if (ref($x->atom) eq 'ARRAY') {
 	P6C::Context::block_ctx($x->atom, $ctx);
@@ -938,7 +973,12 @@ sub P6C::rx_assertion::ctx_right {
 sub P6C::rx_call::ctx_right {
     my ($x, $ctx) = @_;
     if (ref $x->name) {
+	# <$rule(@args)>
 	$x->name->ctx_right(new P6C::Context type => 'PerlUndef');
+    } elsif (!exists $x->{rx_capture_var}) {
+	# Add implicit capture to $rulename
+	$x->{rx_capture_var} = new P6C::variable name => '$'.$x->name,
+	    type => 'PerlUndef';
     }
     $x->{ctx} = $ctx->copy;
     $x->args->ctx_right(arg_context($x->name, $ctx));

@@ -727,10 +727,9 @@ double_quoted_string_head:
 
 double_quoted_string_body:
 		  m/\\(?=q\{|Q\[)/ <commit> single_quoted_string { $item[-1] }
-		| m/\\./ { $item[1] }
 		| interpolated_value { $item[1] }
 		| variable str_subscript(s?) ...!/[\[\{\(]/ { [@item[1,2]] }
-		| m/[^\\\$\@\%\&$arg[0]]*/ { $item[1] }
+		| m/(?:[^\\\$\@\%\&$arg[0]]|\\(?!q\{|Q\[).)*/ { $item[1] }
 
 str_subscript:	  <skip:$Parse::RecDescent::skip> ...!/\s/ subscript
 			<skip:$item[1]> { $item[3] }
@@ -753,8 +752,8 @@ single_quoted_string_head:
 
 single_quoted_string_body:
 		  m/\\(?=qq\{)/ <commit> double_quoted_string { $item[-1] }
-		| m/\\./ { quotemeta($item[-1]) }
-		| m/[^\\$arg[0]]*/ { $item[-1] }
+		| m/(?:[^\\$arg[0]]|\\(?!qq\{).)*/ {
+			$item[-1] =~ s/\\'/'/g; quotemeta($item[-1]) }
 
 ##############################
 # Regexes:
@@ -802,7 +801,7 @@ _rx_repspec:	  _rx_repitem ',' _rx_repitem
 		| /\d+/
 
 rx_assertion:	  '.'
-		| /'(?:[^']|\\.)*'/
+		| /(?=["'])/ <commit> quoted_string
 		| '(' <commit> expr ')'
 		| '{' <commit> expr '}'
 		| rx_call
@@ -868,7 +867,7 @@ sub optional_last($) {
     if (ref($x->['.$n.']) && @{$x->['.$n.']} > 0) {
 	use P6C::Util;
 	my $commatree = $x->['.$n.'][0][2]->tree;
-	push @param, flatten_leftop($commatree, ",");
+	push @param, P6C::Util::flatten_leftop($commatree, ",");
     }';
 }
 

@@ -55,7 +55,7 @@ BEGIN {
 
 1;
 
-# __DATA__
+__DATA__
 
 package P6C::IMCC::prefix;
 
@@ -230,7 +230,26 @@ END
 	code(<<END);
 	.result $ret
 END
-	return array_in_context($ret, $ctx);
+	# XXX: this is not nice, but it's more useful than returning
+	# array-lengths.
+	if ($ctx->is_scalar) {
+	    my $itmp = gentmp 'int';
+	    my $blech = genlabel;
+	    my $end = genlabel;
+	    code(<<END);
+	$itmp = $ret
+	if $itmp == 0 goto $blech
+	dec $itmp
+	$ret = $ret\[$itmp]
+	goto $end
+$blech:
+	$ret = new PerlUndef
+$end:
+END
+	    return $ret;
+	} else {
+	    return array_in_context($ret, $ctx);
+	}
 
     } elsif (is_scalar($rettype)) {
 	my $ret = gentmp 'pmc';

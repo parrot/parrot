@@ -30,9 +30,14 @@ force the compiler to re-compile the grammar file.
 All the compiler test cases pass on my machine (except where noted in
 ChangeLog), and compile in less than five seconds each.
 
-Take a look at t/*/*.t for an idea of the kinds of operations
+Take a look at t/* and examples for an idea of the kinds of operations
 currently supported.  For more internal details, see the POD
 documentation in P6C/*.pm, especially P6C/Nodes.pm.
+
+Many functions are loaded on demand with SelfLoader, leading to
+uninformative error messages like "error in eval 267, line 3".  For
+more informative messages, you should comment out the "use SelfLoader"
+statement and the "__DATA__" marker in the candidate .pm file.
 
 Overview
 ========
