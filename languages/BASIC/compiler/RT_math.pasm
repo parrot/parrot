@@ -229,21 +229,19 @@ SETUPSTRING:
 	#    Type in S0
 	#    Results in N5/I5
 MATHOPEND:
-	new P5, .PerlHash
-	set P5["type"], S0
+	new P6, .PerlHash
+	set P6["type"], S0
 	eq S0, "INT", MATHOPENDINT
 	eq S0, "STRING", MATHOPENDSTRING
-	set P5["value"], N5
+	set P6["value"], N5
 	branch MATHOPEND2
 MATHOPENDINT:
-	set P5["value"], I5
+	set P6["value"], I5
 	branch MATHOPEND2
 MATHOPENDSTRING:
-	set P5["value"], S5
+	set P6["value"], S5
 MATHOPEND2:
-	set P6, P5
 	ret
-
 
 	# BOOL returns are INTs
 	#

@@ -478,44 +478,30 @@ ERRILLOP:
 	#    string / string -> string
 	# 
 	# Resulting type from the cast is in S0
-	# OH FUCK.  This is where the bug lies.... DAMNIT.
-	# I alter P6, P7 without changing their base type.
-CAST_UP:pushs
-	pushi
-	pushn
-	set S0, P6["type"]
+	#
+CAST_UP:set S0, P6["type"]
 	set S1, P7["type"]
 	eq S0, S1, CAST_UP_DONE
 	eq S0, "STRING", CAST_ERR
 	eq S1, "STRING", CAST_ERR
-
 	eq S1, "INT", CAST_TO_FLOAT1
 	eq S0, "INT", CAST_TO_FLOAT2
 	branch CAST_UP_DONE
 CAST_TO_FLOAT1:
 	set I1, P7["value"]
 	set N1, I1
-	set N0, P6["value"]  # Already a float
-	branch CAST_UP_NEW
-CAST_TO_FLOAT2:
-	set I0, P6["value"]
-	set N0, I0
-	set N1, P7["value"]  # Already a float
-	branch CAST_UP_NEW
-CAST_UP_NEW:
-	new P6, .PerlHash    # Create new values entirely!
-	set P6["type"], "FLO"
-	set P6["value"], N0
-	new P7, .PerlHash
 	set P7["type"], "FLO"
 	set P7["value"], N1
 	set S0, "FLO"
+	branch CAST_UP_DONE
+CAST_TO_FLOAT2:
+	set I0, P6["value"]
+	set N0, I0
+	set P6["type"], "FLO"
+	set P6["value"], N0
+	set S0, "FLO"
+	branch CAST_UP_DONE
 CAST_UP_DONE:
-	save S0
-	popn
-	popi
-	pops
-	restore S0  # Type of operation to perform
 	ret
 CAST_ERR:
 	print "Type mismatch in operator\n"
@@ -649,6 +635,8 @@ CTI_RET:ret
 	# Take the array in P8 and swap everything
 	# upside-down
 REVERSEARGS:
+	set I0, P8
+	lt I0, 2, NOREVERSE   # Not necessary..
 	new P0, .PerlArray
 REVERSEARGS2:
 	set I0, P8
@@ -658,4 +646,5 @@ REVERSEARGS2:
 	branch REVERSEARGS2
 ENDREVERSE:
 	set P8, P0
+NOREVERSE:
 	ret

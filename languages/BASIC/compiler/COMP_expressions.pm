@@ -338,7 +338,6 @@ sub generate_code {
 			pushargs(\@code, \@work);
 			if (isarray($sym)) {
 				push @code, qq{\tset S0, "$sym"};
-				push @code, "\tbsr REVERSEARGS";
 				push @code, "\tbsr ARRAY_LOOKUP";
 				push @work, [ "result of $sym()", "RESULT" ];
 				push @code, "\tpush P9, P0\t# Result of $sym()";
