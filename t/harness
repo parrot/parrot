@@ -1,0 +1,7 @@
+#! perl -w
+
+use strict;
+use Test::Harness qw(runtests);
+
+my @tests = map { glob( "t/$_/*.t" ) } ( qw(op misc) );
+runtests( @tests );
