@@ -34,7 +34,7 @@ struct Small_Object_Pool {
     size_t end_arena_memory;
 };
 
-int contained_in_pool(struct Parrot_Interp *,struct Small_Object_Pool *, void *);
+INTVAL contained_in_pool(struct Parrot_Interp *,struct Small_Object_Pool *, void *);
 size_t get_max_pool_address(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool);
 size_t get_min_pool_address(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool);
 
