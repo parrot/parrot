@@ -327,7 +327,7 @@ END_C
 } elsif ($suffix =~ /switch/) {
     print SOURCE <<END_C;
     default:
-        internal_exception(1, "illegal opcode\n");
+        internal_exception(1, "illegal opcode\\n");
 	break;
 } /* switch */
 } while (1);
