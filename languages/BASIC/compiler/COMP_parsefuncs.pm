@@ -17,6 +17,22 @@ my @dos=();
 @selects=();
 my $scopes=0;
 my @data=();
+sub parse_keys {
+	feedme();
+	my $targ=$syms[CURR];
+	feedme();
+	feedme() while($syms[CURR] =~ /[(),]/);
+	my $source=$syms[CURR];
+	feedme();	
+	feedme() while($syms[CURR] =~ /[(),]/);
+	$targ.=$seg;
+	$source.=$seg;
+	push @{$code{$seg}->{code}}, <<KEYS;
+	.arg "$targ"
+	.arg "$source"
+	call _ARRAY_KEYS
+KEYS
+}
 sub parse_common {
 	feedme();
 	while($type[CURR] !~ /COMP|COMM|STMT/) {
@@ -1088,8 +1104,12 @@ DIMTYPE
 			push @{$code{$seg}->{code}}, <<DIMARR;
 	# Set aside storage for Array $var
 	\$P0 = new PerlHash
+	\$P2 = new PerlArray
+	\$P3 = new PerlHash
+	\$P3["index"]=\$P2
+	\$P3["hash"]=\$P0
 	find_global \$P1, "BASICARR"
-	set \$P1["$var$seg"], \$P0
+	set \$P1["$var$seg"], \$P3
 	store_global "BASICARR", \$P1
 	#
 DIMARR

@@ -60,6 +60,7 @@ my $currentexpr;
 			uevent unlock until using
 			view
 			wait while wend width window write
+			keys
 		);
 
 sub dumpq {

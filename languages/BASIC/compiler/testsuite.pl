@@ -32,6 +32,32 @@ while(1) {
 }
 
 __DATA__
+' Expect 10
+sub second(b() )
+	b(5)=10
+end sub
+sub first(a() )
+	call second(a())
+end sub
+dim t(),f()
+call first(t())
+print t(5)
+
+' Keys test, "interesting"
+dim a$(),b$()
+b$("Key 1")="This is"
+b$("Key 2")="an"
+B$("Hi Mom!")="interesting"
+B$(0)="development.
+keys a$(), b$()
+i=0
+do
+	t$=a$(i)
+	print t$,
+	print tab$(10),b$(t$)
+	i=i+1
+loop while t$ <> ""
+
 ' 5 and PI
 dim a$(), m()
 a$(1)="5"
@@ -52,7 +78,6 @@ for i = 1 to 5
 next i
 close #5
 print
-
 
 ' Expect 5, 0, "Hello"
 common i, a$
