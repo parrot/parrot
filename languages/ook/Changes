@@ -1,5 +1,10 @@
 Revision history for a Ook! compiler written in Parrot and targeting Parrot.
 
+0.2.0 Tue Apr  5 20:35:49 CEST 2005
+        - fixed register usage to leave bottom half of register (0->15)
+          for parrot internal use.
+        - make test no longer core dumps.
+
 0.1.0 Thu Feb 19 21:31:28 CET 2004
         - use of eval to avoid temp file (courtesy of Leopold Toetsch)
         - updated (after 1 year...) the README to reflect this use of eval
