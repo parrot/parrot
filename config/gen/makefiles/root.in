@@ -110,6 +110,7 @@ LINTOPTS =
 ###############################################################################
 
 O               = ${o}
+EXE             = ${exe}
 SHARE_EXT       = ${share_ext}
 LOAD_EXT        = ${load_ext}
 A               = ${a}
@@ -427,12 +428,12 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 ###############################################################################
 
 # Executables
-PARROT          = ${test_prog}${exe}
-PARROT_SO       = ${test_prog}_so${exe}
-DIS             = disassemble${exe}
-PDUMP           = pdump${exe}
-PINFO           = pbc_info${exe}
-PDB             = pdb${exe}
+PARROT          = ${test_prog}$(EXE)
+PARROT_SO       = ${test_prog}_so$(EXE)
+DIS             = disassemble$(EXE)
+PDUMP           = pdump$(EXE)
+PINFO           = pbc_info$(EXE)
+PDB             = pdb$(EXE)
 
 # libs
 LIBPARROT       = ${blib_lib_libparrot_a}
@@ -543,6 +544,7 @@ help :
 	@echo "  install:           Install under '/usr/local/parrot' on Unix systems"
 	@echo ""
 	@echo "Documentation:"
+	@echo "  help:              Print this help message."
 	@echo "  docs:              Generate documentation from POD in the sources."
 	@echo "  html:              Generate HTML documentation from POD in the sources."
 	@echo "  html-clean:        Remove the HTML documentation."
@@ -559,6 +561,9 @@ help :
 	@echo "  fulltest:          Run test suite with various options."
 	@echo "  fulltest_imcc:     Run IMCC test suite with various options."
 	@echo "                     Try 'make -i fulltest' in case of failing tests."
+	@echo ""
+	@echo "Benchmarks:"
+	@echo "  mopsbench:         Million operations"
 	@echo ""
 	@echo "Creating reports:"
 	@echo "  ok:                Print a report."
@@ -592,16 +597,14 @@ help :
 	@echo ""
 	@echo "Development:"
 	@echo "  lint:              code checking with lint."
-	@echo "  lint2:             another code checking whit lint."
+	@echo "  lint2:             another code checking with lint."
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           create a TAR ball."
 	@echo "  rpm:               create RPMs."
 	@echo ""
-	@echo "Misc:"
-	@echo "  help:              Print this help message."
+	@echo "Examples:"
 	@echo "  hello:             'Hello World' as an executable."
-	@echo "  mops:              Currently not working???"
 	@echo ""
 
 world : all parrot_utils
@@ -621,10 +624,8 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(PARROT)
 	@echo If the next line prints $(VERSION), it did help.
 	./parrot parrot-config.imc VERSION DEVEL
 
-mops : test_prep examples/assembly/mops${exe} examples/mops/mops${exe}
-
 $(PARROT) : $(PARROT_MAIN)$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm $(LIBICUCORE) $(LIBICUDATA)
-	$(LINK) ${ld_out}$(PARROT) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(ALL_PARROT_LIBS)
+	$(LINK) $(LD_OUT)$(PARROT) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(ALL_PARROT_LIBS)
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -671,7 +672,7 @@ $(PARROT_SO) : $(PARROT_MAIN)$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLi
 $(SRC_DIR)/pdb$(O) : $(GENERAL_H_FILES)
 
 $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDB) $(SRC_DIR)/pdb$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) $(LD_OUT)$(PDB) $(SRC_DIR)/pdb$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Disassembler
@@ -680,19 +681,19 @@ $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
 $(SRC_DIR)/disassemble$(O) : $(GENERAL_H_FILES)
 
 $(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(DIS) $(SRC_DIR)/disassemble$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) $(LD_OUT)$(DIS) $(SRC_DIR)/disassemble$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Dump
 #
 
 $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) $(LD_OUT)$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
 # pbc_info
 $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PINFO) $(SRC_DIR)/pbc_info$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) $(LD_OUT)$(PINFO) $(SRC_DIR)/pbc_info$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 ###############################################################################
 #
@@ -718,35 +719,23 @@ $(SRC_DIR)/parrot_config.h : $(BUILD_TOOLS_DIR)/parrot_config_c.pl config_lib.pa
 #
 ###############################################################################
 
-examples/assembly/mops.pbc : examples/assembly/mops.pasm
-	$(MAKE_C) examples/assembly mops.pbc
+examples-clean: hello-clean 
 
-examples/assembly/mops.c : examples/assembly/mops.pbc $(BUILD_TOOLS_DIR)/pbc2c.pl
-	$(PERL) $(BUILD_TOOLS_DIR)/pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
+# hello
+hello:	test_prep examples/assembly/hello$(EXE)
+	./examples/assembly/hello$(EXE)
 
-examples/assembly/mops${exe} : examples/assembly/mops$(O) $(LIBPARROT)
-	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(LIBPARROT) $(C_LIBS)
+examples/assembly/hello.pbc: examples/assembly/hello.pasm
+	./$(PARROT) -o examples/assembly/hello.pbc examples/assembly/hello.pasm
 
-examples/assembly/life.pbc : examples/assembly/life.pasm
-	$(MAKE_C) examples/assembly life.pbc
+examples/assembly/hello$(O): examples/assembly/hello.pbc
+	./$(PARROT) -o examples/assembly/hello$(O) examples/assembly/hello.pbc
 
-examples/assembly/life.c : examples/assembly/life.pbc $(BUILD_TOOLS_DIR)/pbc2c.pl
-	$(PERL) $(BUILD_TOOLS_DIR)/pbc2c.pl examples/assembly/life.pbc > examples/assembly/life.c
+examples/assembly/hello$(EXE):	examples/assembly/hello$(O)
+	$(MAKE) EXEC=examples/assembly/hello exec
 
-examples/assembly/life${exe} : examples/assembly/life$(O) $(LIBPARROT)
-	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/life${exe} examples/assembly/life$(O) $(LIBPARROT) $(C_LIBS)
-
-###############################################################################
-#
-# Examples (MOPS) - Comparative:
-#
-###############################################################################
-
-examples/mops/mops$(O) : examples/mops/mops.c
-
-examples/mops/mops${exe} : examples/mops/mops$(O)
-	$(LINK) $(LINKFLAGS) ${ld_out}examples/mops/mops${exe} \
-    examples/mops/mops$(O) $(LIBPARROT) $(C_LIBS)
+hello-clean:
+	$(RM_F) examples/assembly/hello.pbc examples/assembly/hello$(O) examples/assembly/hello$(EXE)
 
 
 ###############################################################################
@@ -1092,7 +1081,8 @@ test : test_prep
 
 # Test various command line options
 fulltest : testb testC testf testg testj testr testS \
-    src_tests testbench 
+    src_tests \
+    testbench 
 
 # bounds checking, slow core
 testb : test_prep
@@ -1122,6 +1112,10 @@ testr : test_prep
 testS : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -S $(TEST_FILES)
 
+# test the EXEC stuff
+testexec: test_prep 
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) --run-exec $(TEST_FILES)
+
 # Test that need to be compiled by the C-compiler
 src_tests :
 	$(PERL) t/harness $(SRC_TEST_FILES)
@@ -1131,7 +1125,7 @@ testbench: test_prep
 	$(PERL) t/harness t/benchmarks.t
 
 # Running a benchmark
-mopstest : test_prep
+mopsbench : test_prep
 	$(PARROT) $(PARROT_ARGS) examples/assembly/mops.pasm
 
 # Running the game of live
@@ -1145,7 +1139,7 @@ test_imcc :
 
 # Run IMCC tests with various command line options
 fulltest_imcc : testb_imcc testC_imcc testf_imcc testg_imcc \
-    testj_imcc testr_imcc testS_imcc 
+    testj_imcc testr_imcc testS_imcc testexec_imcc 
 
 # slow core, bounds checking
 testb_imcc : test_prep
@@ -1175,6 +1169,10 @@ testr_imcc : test_prep
 testS_imcc : test_prep
 	$(PERL) t/harness -s $(IMCC_TEST_FILES)
 
+# run generated executable
+testexec_imcc : test_prep
+	$(PERL) t/harness --run-exec $(IMCC_TEST_FILES)
+
 
 ###############################################################################
 #
@@ -1201,12 +1199,12 @@ nokfile :
 ###############################################################################
 
 clean : test-clean progclean languages-clean docs-clean dynclasses-clean \
- hello-clean imcc-clean
+ examples-clean imcc-clean
 	${TEMP_cg_r}
 	$(RM_F) *.s *~ $(FLUID_FILES) \
-    examples/assembly/mops${exe} examples/assembly/mops.c \
+    examples/assembly/mops$(EXE) examples/assembly/mops.c \
     examples/assembly/mops$(O) examples/assembly/mops.pbc \
-    examples/mops/mops$(O) examples/mops/mops${exe}
+    examples/mops/mops$(O) examples/mops/mops$(EXE)
 
 progclean :
 	$(RM_F) $(O_FILES) \
@@ -1279,8 +1277,8 @@ distclean :
 cvsclean :
 	$(PERL) "-MExtUtils::Manifest=filecheck" -le ${PQ}sub ExtUtils::Manifest::_maniskip{sub{0}};$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()${PQ}
 
-reconfig :
-	$(MAKE) clean; $(PERL) Configure.pl --reconfig
+reconfig : clean
+	$(PERL) Configure.pl --reconfig
 
 manitest :
 	$(PERL) "-MExtUtils::Manifest=fullcheck" -e fullcheck
@@ -1304,11 +1302,11 @@ patch :
 	cvs -q diff -u
 
 
-lint : ${test_prog}
+lint : $(PARROT)
 	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
 	$(LINT) ${cc_inc} $(LINTFLAGS) $(LINTOPTS) $(PARROT_MAIN).c
 
-lint2 : ${test_prog}
+lint2 : $(PARROT)
 	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
 	$(LINT) ${cc_inc} $(LINTFLAGS2) $(LINTOPTS) $(PARROT_MAIN).c
 
@@ -1365,10 +1363,10 @@ miniparrot-update :
 ###############################################################################
 
 exec : $(SRC_DIR)/exec_start$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(ALL_PARROT_LIBS)
+	$(LINK) $(LD_OUT)$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(ALL_PARROT_LIBS)
 
 exec_so : $(SRC_DIR)/exec_start$(O) blib/lib/libparrot$(SHARE_EXT)
-	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) -lparrot $(C_LIBS)
+	$(LINK) $(LD_OUT)$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) -lparrot $(C_LIBS)
 
 ###### OS depend targets ##########
 
@@ -1390,22 +1388,4 @@ tags.dummy:
 # test the EXEC stuff
 
 testexec: hello 
-
-hello-clean:
-	$(RM_F) hello.pasm hello.pbc hello$(O) hello
-
-hello.pasm :
-	echo '# This is used for testing EXEC.' > hello.pasm
-	echo 'print "Hello World\n"'            >> hello.pasm
-	echo  'end'                             >> hello.pasm
-
-hello.pbc: hello.pasm
-	.${slash}$(PARROT) -o hello.pbc hello.pasm
-
-hello$(O): hello.pbc
-	.${slash}$(PARROT) -o hello$(O) hello.pbc
-
-hello:	test_prep hello$(O)
-	$(MAKE) EXEC=hello exec
-	./hello
 
