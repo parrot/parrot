@@ -143,6 +143,9 @@ sub runstep {
     ncilib_link_extra => '',              # Extra flags needed for libnci.so
 
   );
+
+  my (%triggers);
+
   # add profiling if needed
   # FIXME gcc syntax
   # we should have this in the hints files e.g. cc_profile
@@ -177,6 +180,12 @@ Set config values
 	print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n"
 	    if ($verbose);
         $c{$key}=$val;
+	if (defined $triggers{$key}) {
+	  while (my ($trigger, $cb) = each %{$triggers{$key}}) {
+	    print "\tcalling trigger $trigger for $key\n" if $verbose;
+	    &$cb($key, $val);
+	  }
+	}
       }
       print ");\n" if ($verbose);
     };
@@ -238,6 +247,63 @@ e.g. as file lists for Makefile generation.
 
   *clean=sub {
     delete $c{$_} for grep { /^TEMP_/ } keys %c;
+  };
+
+=item Configure::Data->settrigger($key, $trigger, $cb)
+
+Set a callback on C<$key> named C<$trigger>.  Multiple triggers can be
+set on a given key.  When the key is set via C<set> or C<add> then all
+callbacks that are defined will be called.  Triggers are passed the
+key and value that was set after it has been changed.
+
+=cut
+
+  *settrigger=sub {
+    my ($self, $var, $trigger, $cb) = @_;
+    if (defined $cb) {
+      if (defined $verbose and $verbose == 2) {
+	print "Setting trigger $trigger on configuration key $var\n";
+      }
+      $triggers{$var}{$trigger} = $cb;
+    }
+  };
+
+=item Configure::Data->gettriggers($key)
+
+Get the names of all triggers set for C<$key>.
+
+=cut
+
+  *gettriggers=sub {
+    my ($self, $key) = @_;
+    return keys %{$triggers{$key}};
+  };
+
+=item Configure::Data->gettrigger($key, $trigger)
+
+Get the callback set for C<$key> under the name C<$trigger>
+
+=cut
+
+  *gettrigger=sub {
+    my ($self, $key, $t) = @_;
+    return undef if !defined $triggers{$key} or !defined $triggers{$key}{$t};
+    $triggers{$key}{$t};
+  };
+
+=item Configure::Data->deltrigger($key, $trigger)
+
+Removes the trigger on C<$key> named by C<$trigger>
+
+=cut
+
+  *deltrigger=sub {
+    my ($self, $var, $t) = @_;
+    return if !defined $triggers{$var} or !defined $triggers{$var}{$t};
+    delete $triggers{$var}{$t};
+    if (defined $verbose and $verbose == 2) {
+      print "Removing trigger $t on configuration key $var\n";
+    }
   };
 }
 
