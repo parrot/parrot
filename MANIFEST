@@ -63,6 +63,8 @@ config/auto/gcc.pl
 config/auto/gcc/test_c.in
 config/auto/headers.pl
 config/auto/headers/test_c.in
+config/auto/isreg.pl
+config/auto/isreg/test_c.in
 config/auto/jit.pl
 config/auto/jit/test_c.in
 config/auto/memalign.pl
@@ -1320,6 +1322,8 @@ languages/BASIC/compiler/RT_expr.pasm
 languages/BASIC/compiler/RT_initialize.pasm
 languages/BASIC/compiler/RT_io.pasm
 languages/BASIC/compiler/RT_math.pasm
+languages/BASIC/compiler/RT_platform.pasm
+languages/BASIC/compiler/RT_platform_win32.pasm
 languages/BASIC/compiler/RT_support.pasm
 languages/BASIC/compiler/RT_userfunc.pasm
 languages/BASIC/compiler/RT_variables.pasm
@@ -1800,6 +1804,7 @@ t/pmc/boolean.t
 t/pmc/coroutine.t
 t/pmc/eval.t
 t/pmc/intlist.t
+t/pmc/managedstruct.t
 t/pmc/multiarray.t
 t/pmc/nci.t
 t/pmc/perlarray.t
