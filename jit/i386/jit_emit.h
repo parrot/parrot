@@ -1109,16 +1109,28 @@ opt_shift_rm(Parrot_jit_info_t *jit_info, int dest, void * count, int op)
 #    define jit_emit_fload_m_n(pc, address) \
       emitm_fldl(pc, emit_None, emit_None, emit_None, address)
 
+#    define jit_emit_fload_mb_n(pc, base, offs) \
+      emitm_fldl(pc, base, emit_None, 1, offs)
+
 #    define jit_emit_fstore_m_n(pc, address) \
       emitm_fstpl(pc, emit_None, emit_None, emit_None, address)
+
+#    define jit_emit_fstore_mb_n(pc, base, offs) \
+      emitm_fstpl(pc, base, emit_None, 1, offs)
 
 #  else /* NUMVAL_SIZE */
 
 #    define jit_emit_fload_m_n(pc, address) \
       emitm_fldt(pc, emit_None, emit_None, emit_None, address)
 
+#    define jit_emit_fload_mb_n(pc, base, offs) \
+      emitm_fldt(pc, base, emit_None, 1, offs)
+
 #    define jit_emit_fstore_m_n(pc, address) \
       emitm_fstpt(pc, emit_None, emit_None, emit_None, address)
+
+#    define jit_emit_fstore_mb_n(pc, base, offs) \
+      emitm_fstpt(pc, base, emit_None, 1, offs)
 
 #  endif /* NUMVAL_SIZE */
 
@@ -1912,6 +1924,13 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
  */
 #    define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
 
+/* see jit_begin */
+#  ifdef JIT_CGP
+#    define INTERP_BP_OFFS todo
+#  else
+#    define INTERP_BP_OFFS -16
+#  endif
+
 static void
 Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 Interp * interpreter, int n, int *args)
@@ -1919,13 +1938,14 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     int nvtable = op_jit[*jit_info->cur_op].extcall;
     size_t offset;
     op_info_t *op_info = &interpreter->op_info_table[*jit_info->cur_op];
-    int p[PARROT_MAX_ARGS];
+    int pi;
     int idx, i, j;
     int st = 0;         /* stack pop correction */
     int saved = 0;
     Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
     extern char **Parrot_exec_rel_addr;
     extern int Parrot_exec_rel_count;
+    int loaded_eax = 0;
 
     /* this is not callee saved, emit_EDX is 4th in intval_map
      * should also save floating regs back?
@@ -1938,42 +1958,58 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
         emitm_pushl_r(jit_info->native_ptr, emit_ECX);
         saved = 2;
     }
+    /*
+     * if we have key constants these might contain mapped integer
+     * registers. first scan for KC
+     */
+    for (idx = n; idx > 0; idx--) {
+        i = args[idx-1];
+        switch (op_info->types[i]) {
+            case PARROT_ARG_KC:
+                /*
+                 * check map[0] i.e. INTVALS
+                 */
+                for (j = 0; j < ru[0].registers_used; j++) {
+                    int us = ru[0].reg_usage[j];
+                    /* get interpreter */
+                    if (!loaded_eax) {
+                        emitm_movl_m_r(jit_info->native_ptr,
+                                emit_EAX, emit_EBP, emit_None, 1,
+                                INTERP_BP_OFFS);
+                        loaded_eax = 1;
+                    }
+                    Parrot_jit_emit_mov_mr_offs(interpreter, emit_EAX,
+                            REG_OFFS_INT(us),
+                            jit_info->intval_map[j]);
+                }
+        }
+    }
 
+    if (loaded_eax) {
+        jit_emit_mov_rr_i(jit_info->native_ptr, emit_ECX, emit_EAX);
+    }
+    else {
+        /* get interpreter into %ecx - mov offs(%ebp), %ecx */
+        emitm_movl_m_r(jit_info->native_ptr,
+                emit_ECX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+    }
     /* get the offset of the first vtable func */
     offset = offsetof(struct _vtable, init);
     offset += nvtable * sizeof(void *);
     /* get params $i, 0 is opcode */
     for (idx = n; idx > 0; idx--) {
         i = args[idx-1];
-        p[i] = *(jit_info->cur_op + i);
+        pi = *(jit_info->cur_op + i);
         switch (op_info->types[i]) {
             case PARROT_ARG_S:
-#    if EXEC_CAPABLE
-                if (jit_info->objfile) {
-                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                        SREG(p[i]));
-                    Parrot_exec_add_text_rellocation(jit_info->objfile,
-                        jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-                }
-                else
-#    endif
-                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                        &STR_REG(p[i]));
+                emitm_movl_m_r(jit_info->native_ptr,
+                        emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_STR(pi));
                 emitm_pushl_r(jit_info->native_ptr, emit_EAX);
                 break;
             case PARROT_ARG_K:
             case PARROT_ARG_P:
-#    if EXEC_CAPABLE
-                if (jit_info->objfile) {
-                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                        PREG(p[i]));
-                    Parrot_exec_add_text_rellocation(jit_info->objfile,
-                        jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-                }
-                else
-#    endif
-                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                        &PMC_REG(p[i]));
+                emitm_movl_m_r(jit_info->native_ptr,
+                        emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_PMC(pi));
                 /* push $i, the left most Pi stays in eax, which is used
                  * below, to call the vtable method
                  */
@@ -1984,17 +2020,8 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 if (MAP(i))
                     emitm_pushl_r(jit_info->native_ptr, MAP(i));
                 else {
-#    if EXEC_CAPABLE
-                    if (jit_info->objfile) {
-                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                            IREG(p[i]));
-                        Parrot_exec_add_text_rellocation(jit_info->objfile,
-                            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-                    }
-                    else
-#    endif
-                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                            &INT_REG(p[i]));
+                    emitm_movl_m_r(jit_info->native_ptr,
+                            emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_INT(pi));
                     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
                 }
                 break;
@@ -2003,7 +2030,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
             case PARROT_ARG_IC:
                 /* XXX INTVAL_SIZE */
                 /* push value */
-                emitm_pushl_i(jit_info->native_ptr, p[i]);
+                emitm_pushl_i(jit_info->native_ptr, pi);
                 break;
             case PARROT_ARG_N:
                 /* push num on st(0) */
@@ -2011,29 +2038,24 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                     emitm_fld(jit_info->native_ptr, MAP(i));
                 }
                 else
-#    if EXEC_CAPABLE
-                    if (jit_info->objfile) {
-                        jit_emit_fload_m_n(jit_info->native_ptr, NREG(i));
-                        Parrot_exec_add_text_rellocation(jit_info->objfile,
-                            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-                    }
-                    else
-#    endif
-                        jit_emit_fload_m_n(jit_info->native_ptr,
-                            &NUM_REG(p[i]));
+                    jit_emit_fload_mb_n(jit_info->native_ptr,
+                            emit_ECX, REG_OFFS_NUM(pi));
                 goto store;
             case PARROT_ARG_NC:
+                /*
+                 * TODO not all constants are shared between interpreters
+                 */
 #    if EXEC_CAPABLE
                 if (jit_info->objfile) {
                     jit_emit_fload_m_n(jit_info->native_ptr, CONST(i));
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
-                        jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
+                            jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
                 }
                 else
 #    endif
                     jit_emit_fload_m_n(jit_info->native_ptr,
-                        &interpreter->code->const_table->
-                            constants[p[i]]->u.number);
+                            &interpreter->code->const_table->
+                            constants[pi]->u.number);
 store:
 #    if NUMVAL_SIZE == 8
                 /* make room for double */
@@ -2053,49 +2075,28 @@ store:
                 if (jit_info->objfile) {
                     emitm_pushl_m(jit_info->native_ptr, CONST(i));
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
-                        jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
+                            jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
                 }
                 else
 #    endif
                     emitm_pushl_i(jit_info->native_ptr,
-                        interpreter->code->const_table->
-                            constants[p[i]]->u.string);
+                            interpreter->code->const_table->
+                            constants[pi]->u.string);
                 break;
 
             case PARROT_ARG_KC:
-                {
-                    /* a key constant may have multiple integer arguments,
-                     * so save mapped regs back to parrot regs */
-                    for (j = 0; j < ru[0].registers_used; j++) {
-                        int us = ru[0].reg_usage[j];
 #    if EXEC_CAPABLE
-                        if (jit_info->objfile) {
-                            jit_emit_mov_mr_i(jit_info->native_ptr,
-                                IREG(us), jit_info->intval_map[j]);
-                            Parrot_exec_add_text_rellocation(jit_info->objfile,
-                                jit_info->native_ptr, RTYPE_COM,
-                                    "interpre", -4);
-                        }
-                        else
-#    endif
-
-                            jit_emit_mov_mr_i(jit_info->native_ptr,
-                                &INT_REG(us),
-                                    jit_info->intval_map[j]);
-                    }
-#    if EXEC_CAPABLE
-                    if (jit_info->objfile) {
-                        emitm_pushl_m(jit_info->native_ptr, CONST(i));
-                        Parrot_exec_add_text_rellocation(jit_info->objfile,
+                if (jit_info->objfile) {
+                    emitm_pushl_m(jit_info->native_ptr, CONST(i));
+                    Parrot_exec_add_text_rellocation(jit_info->objfile,
                             jit_info->native_ptr, RTYPE_DATA,
-                                "const_table", -4);
-                    }
-                    else
-#    endif
-                        emitm_pushl_i(jit_info->native_ptr,
-                            interpreter->code->const_table->
-                                constants[p[i]]->u.key);
+                            "const_table", -4);
                 }
+                else
+#    endif
+                    emitm_pushl_i(jit_info->native_ptr,
+                            interpreter->code->const_table->
+                            constants[pi]->u.key);
                 break;
 
             default:
@@ -2106,22 +2107,14 @@ store:
         }
     }
     /* push interpreter */
-#    if EXEC_CAPABLE
-    if (jit_info->objfile) {
-        emitm_pushl_i(jit_info->native_ptr, 0);
-        Parrot_exec_add_text_rellocation(jit_info->objfile,
-            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-    }
-    else
-#    endif
-        emitm_pushl_i(jit_info->native_ptr, interpreter);
+    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
             offsetof(struct PMC, vtable));
     /* call *(offset)eax */
     emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
     emitm_addb_i_r(jit_info->native_ptr,
-                st + sizeof(void *) * (n + 1), emit_ESP);
+            st + sizeof(void *) * (n + 1), emit_ESP);
     if (saved == 2)
         emitm_popl_r(jit_info->native_ptr, emit_ECX);
     if (saved)
@@ -2598,13 +2591,8 @@ Parrot_jit_emit_mov_mr_n_offs(Interp *interpreter,
 {
     emitm_fld(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
             src_reg);
-#  if NUMVAL_SIZE == 8
-    emitm_fstpl(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
-            base_reg, emit_None, 1, offs);
-#  else
-    emitm_fstpt(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
-            base_reg, emit_None, 1, offs);
-#  endif
+    jit_emit_fstore_mb_n(((Parrot_jit_info_t *)(interpreter->jit_info))->
+            native_ptr, base_reg, offs);
 }
 
 void
@@ -2619,13 +2607,8 @@ void
 Parrot_jit_emit_mov_rm_n_offs(Interp *interpreter,
         int dst_reg, int base_reg, size_t offs)
 {
-#  if NUMVAL_SIZE == 8
-    emitm_fldl(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
-            base_reg, emit_None, 1, offs);
-#  else
-    emitm_fldt(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
-            base_reg, emit_None, 1, offs);
-#  endif
+    jit_emit_fload_mb_n(((Parrot_jit_info_t *)(interpreter->jit_info))->
+            native_ptr, base_reg,  offs);
     emitm_fstp(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
             (dst_reg+1));
 }
