@@ -2776,17 +2776,16 @@ Unpack a constant PMC (currently Subs only).
 
 static void
 store_sub_in_namespace(Parrot_Interp interpreter, struct PackFile *pf,
-        PMC* sub_pmc,
-        char *name, int ns)
+        PMC* sub_pmc, STRING* key, int ns)
 {
-    STRING *key = string_from_cstring(interpreter, name, 0);
     PMC * globals = interpreter->globals->stash_hash;
 
 #if TRACE_PACKFILE_PMC
-    fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %d\n", name, ns);
+    fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %d\n",
+            (char*)key->strstart, ns);
 #endif
     /*
-     * namespace is a const table entry indey
+     * namespace is a const table entry index
      * -1 ... no namespace or
      * type PFC_STRING .. a simple string
      *      PFC_KEY   ... a Key chain
@@ -2803,7 +2802,7 @@ global_ns:
         if (ns >= pf->const_table->const_count) {
             internal_exception(1,
                 "store_sub_in_namespace: sub '%s' namespace #%d too big",
-                name, ns);
+                (char*)key->strstart, ns);
         }
         pfc_const = pf->const_table->constants[ns];
         switch (pfc_const->type) {
@@ -2895,7 +2894,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     sub = PMC_sub(sub_pmc);
     sub->end = (opcode_t*)(long)end;
     sub->packed = pmcs;
-    sub->name = const_string(interpreter, name);
+    sub->name = string_from_cstring(interpreter, name, 0);
     /*
      * if the Sub has some special pragmas in flag (LOAD, MAIN...)
      * then set private flags of that PMC
@@ -2912,7 +2911,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     /*
      * finally place the sub in the global stash
      */
-    store_sub_in_namespace(interpreter, pf, sub_pmc, name, ns_const);
+    store_sub_in_namespace(interpreter, pf, sub_pmc, sub->name, ns_const);
 
     /*
      * restore interpreters packfile

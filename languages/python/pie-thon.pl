@@ -66,6 +66,9 @@ my %type_map = (
 
     iter  => 'Py_iter',
     xrange => 'Py_xrange',
+
+    object => 'Py_object',
+    type => 'Py_type',
 );
 my %rev_type_map;
 
@@ -231,8 +234,11 @@ EOC
 EOC
 	}
     }
+    # XXX classes are store in this pad because of name clash
+    #     namespace <=> classname
+    # TODO mange class namespace
     print <<EOC;
-	# new_pad -1
+	# new_pad 0
 	.local pmc None
 	None = new .None
 EOC
@@ -285,6 +291,7 @@ sub gen_code {
     .local pmc __name__
     __name__ = new $DEFVAR
     __name__ = '__main__'
+    global '__name__' = __name__
     .local pmc None
     None = new .None
 EOC
@@ -304,10 +311,13 @@ EOC
 		    $args =~ s/[\s']//g;
 		    $ar =~ s/'//g;
 		    $kw =~ s/'//g;
-		    print "# $cur_f: args='$args' ar= '$ar' kw='$kw'\n";
+		    print "# $cur_f: args='$args' ar='$ar' kw='$kw'\n";
 		    $func_info{$cur_f}{'args'} = $args;
 		    $func_info{$cur_f}{'ar'} = $ar;
 		    $func_info{$cur_f}{'kw'} = $kw;
+		    if ($cur_f =~ /^Build::(\w+)/) {
+			$classes{$cur_f} = 1;
+		    }
 		}
 		elsif (/# flags\s+(\S*)/) {
 		    my $f = eval($1);
@@ -490,6 +500,7 @@ sub STORE_NAME {
     my ($n, $c, $cmt) = @_;
     if ($make_f) {
 	$make_f = 0;
+	print_stack();
 	print "# make_f t$cmt\n";
 	return;
     }
@@ -987,7 +998,7 @@ EOC
 }
 sub print_stack {
     for $_ (@stack) {
-	print "# st $_->[2] : $_->[1]\n";
+	print "# STACK $_->[0] $_->[1] $_->[2]\n";
     }
 }
 
@@ -1502,9 +1513,13 @@ sub BUILD_CLASS
     my $parent_tuple = pop @stack;
     my $tos = pop @stack;
     my $cl = temp('P');
-    $classes{$tos->[1]} = 1;
+    my $name = $tos->[1];
+    $classes{$name} = 1;
+    $n = $name;
+    $n =~ s/["]//g;
     print <<EOC;
-	$cl = subclass $parent_tuple->[1], $tos->[1] $cmt
+	$cl = subclass $parent_tuple->[1], $name $cmt
+	# Build::$n()
 EOC
     push @stack, ["class $tos->[1]", $cl, 'P'];
 }

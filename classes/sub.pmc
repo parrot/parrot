@@ -62,8 +62,8 @@ print_sub_name(Parrot_Interp interpreter, PMC* sub)
                     }
             }
         }
-        print_pbc_location(interpreter);
     }
+    print_pbc_location(interpreter);
 }
 
 pmclass Sub {
@@ -223,6 +223,7 @@ Creates and returns a clone of the subroutine.
         PObj_active_destroy_SET(ret);
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
+        sub->name = string_copy(interpreter, sub->name);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         return ret;
     }

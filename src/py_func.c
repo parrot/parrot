@@ -579,6 +579,9 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *Py_iter  = CONST_STRING(interpreter, "Py_iter");
     STRING *Py_xrange = CONST_STRING(interpreter, "Py_xrange");
 
+    STRING *Py_object = CONST_STRING(interpreter, "Py_object");
+    STRING *Py_type   = CONST_STRING(interpreter, "Py_type");
+
     PMC* class;
     /*
      * new types interface, just place a class object as global
@@ -608,6 +611,12 @@ parrot_py_create_funcs(Interp *interpreter)
     Parrot_store_global(interpreter, NULL, Py_iter, class);
     class = Parrot_base_vtables[enum_class_Slice]->data;
     Parrot_store_global(interpreter, NULL, Py_xrange, class);
+
+    class = Parrot_base_vtables[enum_class_ParrotClass]->data;
+    Parrot_store_global(interpreter, NULL, Py_object, class);
+    class = Parrot_base_vtables[enum_class_ParrotClass]->data;
+    Parrot_store_global(interpreter, NULL, Py_type, class);  /* ??? */
+
 
     parrot_py_global(interpreter, F2DPTR(parrot_py_assert_e), assert_e, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);
