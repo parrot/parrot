@@ -1474,6 +1474,7 @@ OUTPUT
 
 my $checkTypes;
 while (my ($type, $id) = each %pmc_types) {
+    next if $type eq "Null";
     next if $type eq "Iterator";
     next if $type eq "Ref";
     my $set_ro = ($type =~ /^Const\w+/) ? <<EOPASM : '';
