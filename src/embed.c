@@ -86,7 +86,7 @@ Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
  * and do fixups.
  */
 struct PackFile *
-Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
+Parrot_readbc(struct Parrot_Interp *interpreter, const char *filename)
 {
 #if PARROT_HAS_HEADER_UNISTD
     off_t program_size, wanted;

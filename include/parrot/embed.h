@@ -33,7 +33,7 @@ void Parrot_set_run_core( Parrot_Interp, Parrot_Run_core_t core);
 
 void Parrot_setwarnings(Parrot_Interp, Parrot_warnclass);
 
-Parrot_PackFile Parrot_readbc(Parrot_Interp, char *);
+Parrot_PackFile Parrot_readbc(Parrot_Interp, const char *);
 
 void Parrot_loadbc(Parrot_Interp, Parrot_PackFile);
 
