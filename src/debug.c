@@ -151,6 +151,10 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
             na(command);
             PDB_eval(interpreter,command);
             break;
+        case c_info:
+            na(command);
+            PDB_info(interpreter);
+            break;
         case c_h:
         case c_help:
             na(command);
@@ -1368,6 +1372,26 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
     }
 }
 
+/* PDB_info
+ * print the interpreter info.
+ */
+void
+PDB_info(struct Parrot_Interp *interpreter)
+{
+    fprintf(stderr, "Total memory allocated = %d\n",
+            interpreter->memory_allocated);
+    fprintf(stderr, "DOD runs = %d\n", interpreter->dod_runs);
+    fprintf(stderr, "Collect runs = %d\n", interpreter->collect_runs);
+    fprintf(stderr, "Active PMCs = %d\n", interpreter->active_PMCs);
+    fprintf(stderr, "Active buffers = %d\n", interpreter->active_Buffers);
+    fprintf(stderr, "Total PMCs = %d\n", interpreter->total_PMCs);
+    fprintf(stderr, "Total buffers = %d\n", interpreter->total_Buffers);
+    fprintf(stderr, "Header allocations since last collect = %d\n",
+            interpreter->header_allocs_since_last_collect);
+    fprintf(stderr, "Memory allocations since last collect = %d\n",
+            interpreter->mem_allocs_since_last_collect);
+}
+
 /* PDB_help
  * print the help
  * TODO complete me.
@@ -1388,6 +1412,7 @@ PDB_help(const char *command)
     fprintf(stderr,"\ttrace (t) -- trace the next instruction\n");
     fprintf(stderr,"\tprint (p) -- print the interpreter registers\n");
     fprintf(stderr,"\tstack (s) -- examine the stack\n");
+    fprintf(stderr,"\tinfo -- print interpreter information\n");
     fprintf(stderr,"\tquit (q) -- exit the debugger\n");
     fprintf(stderr,"\thelp (h) -- print this help\n\n");
 }

@@ -138,6 +138,8 @@ void PDB_print_stack_string(struct Parrot_Interp *, const char *);
 
 void PDB_print_stack_pmc(struct Parrot_Interp *, const char *);
 
+void PDB_info(struct Parrot_Interp *);
+
 void PDB_help(const char *);
 
 #define valid_chunk(chunk,c,d,s,i) { \
@@ -172,6 +174,7 @@ void PDB_help(const char *);
 #define c_pmc           163455
 #define c_eval          277950
 #define c_help          282540
+#define c_info          281775
 #define c_list          295035
 #define c_load          268005
 #define c_next          297330
@@ -190,7 +193,7 @@ void PDB_help(const char *);
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
