@@ -1389,6 +1389,8 @@ languages/jako/examples/queens_array.jako
 languages/jako/examples/sub.jako
 languages/jako/jakoc
 languages/jako/lib/Jako/Compiler/Message.pm
+languages/jako/lib/Jako/Lexer.pm
+languages/jako/lib/Jako/Lexer/Token.pm
 languages/jako/lib/Jako/Parser/Identifier.pm
 languages/jako/lib/Jako/Parser/Element.pm
 languages/jako/lib/Jako/Parser/Block.pm
