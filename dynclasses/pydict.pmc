@@ -20,7 +20,6 @@ These are the vtable functions for the Python Dictionary class
 
 #include "parrot/parrot.h"
 
-static PMC* intret;
 STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
 /* cache of classes referenced */
@@ -46,7 +45,6 @@ Class initialization. Allocates the memory for the hash.
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
 
             make_bufferlike_pool(INTERP, sizeof(struct _hash));
-            intret = constant_pmc_new(INTERP, dynclass_PyInt);
         }
     }
 
@@ -202,14 +200,16 @@ Returns the PMC value for the element at C<*key>.
                  * check if we really have Hash_key_type_int
                  */
                 if (hash->key_type == Hash_key_type_int) {
+                    PMC *intret = pmc_new(INTERP, dynclass_PyInt);
                     INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
                     PMC_int_val(intret) = i;
                     return intret;
                 }
                 else {
+                    PMC *strret = pmc_new(INTERP, dynclass_PyString);
                     STRING *s = hash_get_idx(INTERP, hash, key);
-                    VTABLE_set_string_native(INTERP, intret, s);
-                    return intret;
+                    VTABLE_set_string_native(INTERP, strret, s);
+                    return strret;
                 }
            }
             default:

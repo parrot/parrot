@@ -37,7 +37,6 @@ static STRING *HEX;
 static STRING *OCT;
 
 extern PMC* Parrot_PerlHash_get_iter(Interp* interpreter, PMC* pmc);
-extern PMC* Parrot_delegate_get_iter(Interp* interpreter, PMC* pmc);
 
 #define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
 

@@ -23,10 +23,8 @@ These are the vtable functions for the Key PMC class.
 static int
 is_hash_iter(PMC *agg, PMC *key)
 {
-    if (agg->vtable->base_type == enum_class_PerlHash)
-        return 1;
-    if (agg->vtable->base_type == enum_class_OrderedHash &&
-            (PObj_get_FLAGS(key) & KEY_number_FLAG))
+    if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == 
+        (KEY_integer_FLAG | KEY_number_FLAG))
         return 1;
     return 0;
 }
