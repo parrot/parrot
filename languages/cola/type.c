@@ -168,7 +168,9 @@ void resolve_identifier(Symbol ** ps) {
         fprintf(stderr, "Internal error: resolve_identifier: NULL symbol\n");
         abort();
     }
+#if DEBUG
     fprintf(stderr, "!resolve[%s]\n", s->name);
+#endif
     t = lookup_symbol(s->name);
     if(!t) {
         fprintf(stderr, "Error: identifier [%s] undeclared.\n", s->name);

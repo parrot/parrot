@@ -67,7 +67,7 @@ void gen_bootstrap() {
     printf("\n__strlen:\npushs\npushi\nrestore S0\nlength I0, S0\nsave I0\npops\npopi\nret\n");
     printf("\n__strchop:\npushs\nrestore S0\nchopn S0, 1\nsave S0\npops\nret\n");
     printf("\n__strrep:\npushs\npushi\nrestore S30\nrestore I31\nrestore I30\nrestore S31\nsubstr S31, I30, I31, S30\nsave S31\npops\npopi\nret\n");
-    printf("\n__ord:\npushs\npushi\nrestore S0\n\nord I0, S0\nsave I0\npops\npopi\nret\n");
+    printf("\n__ord:\npushs\npushi\nrestore S0\nord I0, S0\nsave I0\npops\npopi\nret\n");
     printf("\n__gets:\npushs\nread S0, 512\nsave S0\npops\nret\n");
     printf("\n__sleep:\npushi\nrestore I0\nsleep I0\npopi\nret\n");
     printf("EOF\n");
@@ -237,7 +237,10 @@ void gen_method_decl(AST * p) {
     reset_temps();
     cur_method = p;
     p->end_label = make_label();
-    printf(".sub __%s\n", p->sym->name);
+    if(p->sym->namespace && p->sym->namespace != global_namespace)
+        printf(".sub %s__%s\n", p->sym->namespace->name, p->sym->name);
+    else
+        printf(".sub __%s\n", p->sym->name);
 #if 0
     check_id_redecl(global_symbol_table, p->sym->name);
 #endif
@@ -605,7 +608,14 @@ void gen_method_call(AST * p) {
      * if p is instance method, push implicit object reference onto
      * calling stack.
      */
-    printf("\tcall __%s\n", p->arg1->targ->name);
+    if(p->arg1->targ->namespace && p->arg1->targ->namespace != global_namespace) {
+        printf("\tcall %s__%s\n", p->arg1->targ->namespace->name,
+                    p->arg1->targ->name);
+    }
+    else {
+        printf("\tcall __%s\n", p->arg1->targ->name);
+    }
+
     if(p->arg1->targ->type == t_void) {
         if(p->targ != NULL) {
             /* If caller wants a return value, method can't be void. */

@@ -15,8 +15,9 @@ LIBS =
 HEADERS = cola.h parser.h
 
 default :
+	chmod 775 colac
 	$(MAKE) x
-	cp x colac
+	cp x colacc
 
 nogen : gen.o semant.o sym.o type.o
 	$(CC) $(DEBUG) -c parser.c
@@ -32,6 +33,9 @@ clean :
 
 publish :
 	perl publish.pl < MANIFEST
+
+dist :
+	perl distribution.pl < MANIFEST
 
 parser.c : cola.y
 	$(YACC) -d -o parser.c cola.y

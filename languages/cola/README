@@ -1,4 +1,4 @@
-"Cola" - A compiler for the Parrot VM
+"Cola" - A compiler for the Parrot/Perl6 VM
 
   V0.0.5.2
 
@@ -11,7 +11,7 @@
   To really start having fun with the Parrot runtime I wanted
   a language similar to C/C++/C#/Java.
 
-  The parser is developed with flex/bison, with
+  The parser is LALR, developed with flex/bison, with
   an intermediate code compiler written in Perl. The
   parser generates a simple intermediate code (more on that later)
   which is easier to read than Parrot assembly, and
@@ -19,6 +19,15 @@
   lacks. The parser leaves register allocation/spill control,
   optimization and a few other specifics to the intermediate
   compiler (int2pasm.pl).
+
+Where to Get the Latest Compiler
+
+  Currently Cola is included in the Parrot distribution,
+  see http://www.parrotcode.org or http://dev.perl.org/perl6
+  At some point the distributions may diverge for some reason
+  so you can grab the latest tarball from CPAN.
+
+    http://cpan.org/authors/id/M/ME/MELVIN
 
 
 The Syntax
@@ -96,9 +105,32 @@ Supported Constructs
 
   Boolean: The boolean ! operator isn't yet supported.
  
-  Methods:  
-    Classic C style, recursion supported. Return types supported.
+  Objects and Methods:  
+    Classic C++/Java style, recursion supported. Return types supported.
     Will be adding variable argument support per the C# spec.
+
+    Member variables or "fields" aren't yet supported. You
+    can use const definitions, but member variables
+    are incomplete pending a little more work on Parrot.
+    Its possible to do them now with PerlHash or PerlArray,
+    but I'm working on something faster for strictly typed,
+    non-dynamic languages.
+
+    Currently instance methods are the same as class methods. So
+    you could do:
+
+        Console.WriteLine("");
+
+    or  Console c = new Console();
+        c.WriteLine("");
+
+    The compiler doesn't yet differentiate between static or class
+    methods and instance methods, and whether you are calling them
+    as such.
+
+    OOP is really just faked for now, enough for people to write
+    in a high level language for Parrot. As everything, it is a work
+    in progress. All objects are simply PerlString references for now.
 
   Current Builtin Subroutines
 
@@ -147,6 +179,11 @@ Using the Compiler
 
         assemble.pl a.pasm > a.pbc
         parrot a.pbc
+
+  Currently colac is a short Perl pre-processor that includes
+  class for any import statements (using System;)
+  If you have trouble with colac you can just use colacc which
+  is the raw compiler which ignores 'using' directives.
 
   Also, if you look in "a.imc" you will see an intermediate
   language, delimited by tags (<program>....</program>) with some

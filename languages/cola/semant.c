@@ -36,7 +36,9 @@ void build_ast(AST * tree) {
 
 void build_class_decl(AST * c) {
     if(!c) return;
+#if DEBUG
     fprintf(stderr, "Pass 2: class [%s]\n", c->sym->name);
+#endif
     push_namespace(c->sym);
     if(c->Attr.Class.body)
 	build_class_body(c->Attr.Class.body);
@@ -48,9 +50,13 @@ void build_class_body(AST * b) {
     while(b) {
         switch(b->asttype) {
             case ASTT_METHOD_DECL:
+#if DEBUG
                 fprintf(stderr, "Pass 2: Method [%s]\n", b->sym->name);
+#endif
                 build_method_decl(b);
+#if DEBUG
                 fprintf(stderr, "Pass 2: End Method [%s]\n", b->sym->name);
+#endif
                 break;
             default:
                 fprintf(stderr, "build_class_body: Invalid asttype [%d]\n", b->asttype);
@@ -63,7 +69,9 @@ void build_class_body(AST * b) {
 void build_method_decl(AST * m) {
     /* Uses enclosing class's namespace, nested scope */
     /*push_namespace(m->sym);*/
+#if DEBUG
     fprintf(stderr, "build_method_decl\n");
+#endif
     push_scope();
     if(m->Attr.Method.params) {
         Symbol * s = m->Attr.Method.params;
@@ -95,7 +103,9 @@ void build_method_decl(AST * m) {
 
 void build_if(AST * i) {
     /* IF */
+#if DEBUG
     fprintf(stderr, "build_if\n");
+#endif
     build_expr(i->Attr.Conditional.condition);
     /* THEN */
     build_statement_list(i->arg1);
@@ -105,7 +115,9 @@ void build_if(AST * i) {
 
 void build_conditional(AST * c) {
     /* IF */
+#if DEBUG
     fprintf(stderr, "build_conditional\n");
+#endif
     build_expr(c->Attr.Conditional.condition);
     /* THEN */
     build_expr(c->arg1);
@@ -120,10 +132,12 @@ void build_conditional(AST * c) {
 }
 
 void build_field_decl(AST * d) {
+#if DEBUG
     if(d->asttype == ASTT_CONSTANT_DECL)
         fprintf(stderr, "Pass 2: Const [%s]\n", d->arg1->sym->name);
     else
         fprintf(stderr, "Pass 2: Field [%s]\n", d->arg1->sym->name);
+#endif
     declare_local(d->arg1->sym);
     d->arg1->type = d->arg1->sym->type;
     build_expr(d->arg2);
@@ -148,7 +162,9 @@ void build_new_expr(AST * n) {
 }
 
 void build_loop(AST * l) {
+#if DEBUG
     fprintf(stderr, "build_loop\n");
+#endif
     build_statement_list(l->Attr.Loop.init);
     build_statement_list(l->Attr.Loop.iteration);
     build_expr(l->Attr.Loop.condition);
@@ -169,7 +185,9 @@ void build_expr_list(AST * e) {
 }
 
 void build_expr(AST * e) {
+#if DEBUG
     fprintf(stderr, "build_expr\n");
+#endif
     if(!e) return;
     switch(e->asttype) {
         case ASTT_LITERAL:
@@ -219,7 +237,9 @@ void build_expr(AST * e) {
 void build_statement_list(AST * s) {
     static int statements;
     if(!s) return;
+#if DEBUG
     fprintf(stderr, "statements parsed [%d]\n", statements++);
+#endif
     if(s->kind == KIND_EXPR) {
         build_expr(s);
         goto END;

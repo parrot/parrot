@@ -11,7 +11,7 @@
 #ifndef _COLA_H
 #define _COLA_H
 
-#define COLA_VERSION "0.0.5.2"
+#define COLA_VERSION "0.0.6.0"
 
 #define DEBUG 0
 
@@ -65,6 +65,14 @@ enum TYPES {
     TYPE_CLASS  
 };
 
+#define MOD_PUBLIC    (1)
+#define MOD_PRIVATE   (1<<1)
+#define MOD_PROTECTED (1<<2)
+#define MOD_STATIC    (1<<3)
+#define MOD_VIRTUAL   (1<<4)
+
+
+
 /* Identifiers, etc. */
 typedef struct _SymbolTable SymbolTable;
 typedef struct _AST AST;
@@ -87,6 +95,7 @@ typedef struct _Symbol {
                     
     char            *name;
     int             scope;
+    int             flags;
     /* Symbol.class is initially IDENTIFIER if it is not resolved to
      * a type, variable, function, etc. Upon resolution it will be
      * one of TYPE, LITERAL, VARIABLE, METHOD, NAMESPACE
@@ -94,11 +103,10 @@ typedef struct _Symbol {
     int             kind;
     struct _Symbol  *typename;
     Type            *type;
-/*
-    AST *           init_expr;
-*/
     int             is_lval;
-    SymbolTable     *table;   /* For functions/procs */
+    struct _Symbol  *namespace; /* What namespace or class owns me */
+    SymbolTable     *table;     /* For functions/procs, redundant now */
+                                /* that I added namespace */
     struct _Symbol  *literal;
     int             line;
 } Symbol;
@@ -203,6 +211,11 @@ typedef struct _Array {
  * Symbol tables, scope stacks, for handling
  * classes, namespaces, etc.
  */
+
+/* This will be some static method, Main from a
+ * single class in the assembly, if it is executable.
+ */
+extern Symbol       *main_method;
 
 /* The static, global symbol table */
 extern Symbol       *global_namespace;

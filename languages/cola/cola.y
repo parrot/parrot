@@ -80,6 +80,7 @@ AST         *ast_start = NULL;
 %type <ast> unary_expr add_expr mult_expr
 %type <ast> equality_expr relational_expr
 %type <ast> method_call arg arg_list member_access
+%type <ival> class_modifier class_modifiers method_modifiers method_modifier
 %type <ival> relational_op
 %type <sym> rank_specifiers
 
@@ -123,7 +124,10 @@ using_directive:
     USING IDENTIFIER '=' IDENTIFIER ';'
         {    printf("using_alias_directive\n");    }
     |   USING IDENTIFIER ';'
-        {    printf("using_directive\n");    }
+        {
+            printf("using_directive\n");
+            /*load_module($2->name);*/
+        }
     ;
 
 attribute_list    :    /*NULL*/
@@ -203,25 +207,31 @@ namespace_member_decl:
 class_decl:
     class_modifiers class_scope_start class_body optional_semi
         {
-            /* Collect class members */
-            /*$2->members = pop_scope();*/
             pop_namespace();
             $$ = new_ast(KIND_DECL, ASTT_CLASS_DECL, NULL, NULL);
             $$->Attr.Class.body = $3;
             $$->sym = $2;
+            $$->sym->flags = $1;
         }
     ;
 
-class_modifiers:    /*NULL*/
-    |        class_modifiers class_modifier
+class_modifiers:
+        { $$ = 0; }
+    |   class_modifiers class_modifier
+        { $$ = $1 | $2; }
     ;
     
 class_modifier:
     PUBLIC
-    |    PRIVATE
-    |    PROTECTED
-    |    STATIC
-    |    VIRTUAL
+        { $$ = MOD_PUBLIC; }
+    |   PRIVATE
+        { $$ = MOD_PRIVATE; }
+    |   PROTECTED
+        { $$ = MOD_PROTECTED; }
+    |   STATIC
+        { $$ = MOD_STATIC; }
+    |   VIRTUAL
+        { $$ = MOD_VIRTUAL; }
     ;
 
 class_body:
@@ -359,13 +369,6 @@ method_decl:
         {
             $$ = $1;
             $$->Attr.Method.body = $2;
-/*
-            if($2 != NULL)
-                $$->locals = $2->locals;
-*/
-/*
-            pop_scope();
-*/
         }
     ;
 
@@ -376,31 +379,41 @@ method_header:
             $$ = new_statement(ASTT_METHOD_DECL, NULL, NULL);
             $3->kind = METHOD;
             $3->typename = $2;
+            $3->flags = $1;
             $$->sym = $3;
             $$->Attr.Method.params = $5;
             /* Methods/Fields stored at scope 0 of class namespace.
              * We can store these at parse time.
              */
             store_symbol(current_symbol_table, $$->sym);
-/*
-            push_scope();
-            for(param = $5; param; param = param->tnext) {
-                store_symbol(current_symbol_table, param);
+            if($1 & MOD_STATIC) {
+                if(!strcmp($3->name, "Main")) {
+                    if(main_method)
+                        fprintf(stderr,
+                        "Warning: multiple definitions of a static Main()\n");
+                    main_method = $3;
+                }
             }
-*/
         }
     ;
 
-method_modifiers:    /*NULL*/    
-    |    method_modifiers method_modifier
+method_modifiers:
+        { $$ = 0; }
+    |   method_modifiers method_modifier
+        { $$ = $1 | $2; }
     ;
 
 method_modifier:
-    STATIC
-    |    VIRTUAL
-    |    PUBLIC
-    |    PRIVATE
-    |    PROTECTED
+    PUBLIC
+        { $$ = MOD_PUBLIC; }
+    |   PRIVATE
+        { $$ = MOD_PRIVATE; }
+    |   PROTECTED
+        { $$ = MOD_PROTECTED; }
+    |   STATIC
+        { $$ = MOD_STATIC; }
+    |   VIRTUAL
+        { $$ = MOD_VIRTUAL; }
     ;
 
 formal_param_list:    /*NULL*/
@@ -1059,9 +1072,11 @@ int main(int argc, char * argv[])
     dump_namespace(current_namespace);
     printf("\n<program>\n");
     printf("# Cola (%s) generated\n#\n", COLA_VERSION);
-    printf("_START:\n\tpusharg \"\"\n\tcall __Main\n");
-    printf("__END:\n\tend\n\n");
-
+    if(main_method) {
+        printf("_START:\n\tpusharg \"\"\n\tcall %s__%s\n",
+            main_method->namespace->name, main_method->name);
+        printf("__END:\n\tend\n\n");
+    }
     fprintf(stderr, "Pass 4: Code generation...\n");
 
     if(ast_start) {

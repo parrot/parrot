@@ -14,6 +14,7 @@
 #include "cola.h"
 #include "parser.h"
 
+Symbol          *main_method;
 Symbol          *global_namespace;
 SymbolTable     *global_symbol_table;
 Symbol          *current_namespace;
@@ -403,6 +404,7 @@ AGAIN:
 	goto AGAIN;
     }
 }
+
 /*
  * Return first occurence of symbol in surrounding scopes.
  */
@@ -410,11 +412,17 @@ Symbol * lookup_symbol(const char * name) {
     Symbol * ns = current_namespace;
     Symbol * list = split(".", name);
     Symbol * s;
+#if DEBUG
     fprintf(stderr, "lookup_symbol: %s split to (%s,...)\n", name, list->name); 
+#endif
     for(ns = current_namespace; ns; ) {
+#if DEBUG
         fprintf(stderr, "lookup_symbol: searching namespace[%s] for [%s]\n", ns->name, list->name);
+#endif
         if((s = lookup_symbol_in_tab(ns->table, list->name))) {
+#if DEBUG
             fprintf(stderr, "lookup_symbol: found [%s] in namespace[%s]\n", list->name, ns->name);
+#endif
 	    if(s->kind == IDENTIFIER) {
                 ns = s->type->sym;
 	    }
@@ -498,6 +506,7 @@ Symbol * store_symbol(SymbolTable * tab, Symbol * sym) {
 #endif
     sym->scope = scope;
     sym->next = tab->table[index];
+    sym->namespace = current_namespace;
     tab->table[index] = sym;
 #ifdef DEBUG
     fprintf(stderr, "storing[%s] scope %d\n", sym->name, scope);
@@ -637,7 +646,7 @@ Symbol * pop_scope() {
     for(i = 0; i < HASH_SIZE; i++) {
         while(tab->table[i] && tab->table[i]->scope == scope) {
             Symbol * t;
-#ifdef DEBUG
+#if DEBUG
             printf("popping symbol %s: level %d\n", tab->table[i]->name, scope);
 #endif
             t = tab->table[i];

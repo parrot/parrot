@@ -3,56 +3,57 @@
 
 //namespace System {
 
-	public class Object {
-	}
+public class Object {
+}
 
-	public class Boolean {
-	
-	}
+public class Boolean {
+}
 
-	public class Sbyte {
-	}
+public class Sbyte {
+}
 
-	public class Byte {
-	}
+public class Byte {
+}
 
-	public class Char {
-	}
+public class Char {
+}
 
-	public class Int16 {
-	}
+public class Int16 {
+}
 
-	public class Int32 {
-	}
+public class Int32 {
+}
 
-	public class Int64 {
-	}
+public class Int64 {
+}
 
-	public class UInt16 {
-	}
+public class UInt16 {
+}
 
-	public class UInt32 {
-	}
+public class UInt32 {
+}
 
-	public class UInt64 {
-	}
+public class UInt64 {
+}
 
-	public class Single {
-	}
+public class Single {
+}
 
-	public class Double {
-	}
+public class Double {
+}
 
-	public class Decimal {
-	}
+public class Decimal {
+}
 
-	public class String {
-	}
+public class String {
+}
 
-	class Console {
-		void WriteLine(string s) {
-			puts(s);
-		}
-	}
+class Console {
+    public void WriteLine(string s) {
+        puts(s);
+    }
+}
+
+
 //}
 
