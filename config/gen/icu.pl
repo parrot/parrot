@@ -21,14 +21,54 @@ use Cwd qw(cwd);
 $description="Configuring ICU if requested...";
 
 @args=qw(buildicu verbose icudatadir icuplatform icuconfigureargs
-         icushared icuheaders);
+         icushared icuheaders icu-config);
 
 sub runstep {
   my ($buildicu, $verbose, $icudatadir, $icuplatform, $icuconfigureargs,
-           $icushared, $icuheaders) = @_;
+           $icushared, $icuheaders, $icuconfig) = @_;
   my $icu_configure_command;
   my @icu_headers = qw(ucnv.h utypes.h uchar.h);
 
+  print "\n" if $verbose;
+  
+  if (!defined $icuconfig || !$icuconfig) {
+    `icu-config --exists`;
+    if (($? == -1) || ($? >> 8) != 0 ) {
+      undef $icuconfig;
+      print "icu-config not found.\n" if $verbose;
+    } else {
+      $icuconfig = "icu-config";
+      print "icu-config found... good!\n" if $verbose;
+    }
+  }
+
+  if ($icuconfig && $icuconfig ne "none") {
+    my $slash = Configure::Data->get('slash');
+
+    # icu-config script to use
+    $icuconfig = "icu-config" if $icuconfig eq "1";
+  
+    # ldflags
+    $icushared = `$icuconfig --ldflags`;
+    chomp $icushared;
+
+    # location of header files
+    $icuheaders = `$icuconfig --prefix`;
+    chomp $icuheaders;
+    $icuheaders .= "${slash}include";
+    
+    # icu data dir
+    $icudatadir = `$icuconfig --icudatadir`;
+    chomp $icudatadir;
+  }
+
+  if ($verbose) {
+    print "icuconfig: $icuconfig\n" if defined $icuconfig;
+    print "icushared='$icushared'\n" if defined $icushared;
+    print "headers='$icuheaders'\n" if defined $icuheaders;
+    print "datadir='$icudatadir'\n" if defined $icudatadir;
+  }
+  
   if (defined($icushared) && defined($icuheaders)) {
     $icuheaders =~ s![\\/]$!!;
     my $c_libs = Configure::Data->get('libs');

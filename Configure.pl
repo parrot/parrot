@@ -181,6 +181,13 @@ ICU Options
 
 =over
 
+=item C<--icu-config=/path/to/icu-config>
+
+Use the specified icu-config script to determine the neccessary ICU options.
+
+Use --icu-config=none to disable the autodetect feature. Parrot will
+then be build with its own ICU.
+
 =item C<--icuplatform=(platform)>
 
 Use the given platform name to pass to ICU's runConfigureICU. (See icu/source/runConfigureICU for the list of available "platform" names, which specify both operating system and compiler.)
