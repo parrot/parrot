@@ -47,6 +47,7 @@ BEGIN {
  'try' => \&prefix_try,
  '+' => \&prefix_pos,
  '-' => \&prefix_neg,
+ '+^' => \&prefix_bitxor,
  'return' => \&prefix_return,
  'given' => \&prefix_given,
  'when' => \&prefix_when,
@@ -734,6 +735,23 @@ sub prefix_pos {
     my $res = newtmp;
     code(<<END);
 	$res = $tmp
+END
+    return scalar_in_context($res, $x->{ctx});
+}
+
+
+=item prefix_bitxor
+
+unary bitwise negation
+
+=cut
+
+sub prefix_bitxor {
+    my $x = shift;
+    my $tmp = $x->args->val;
+    my $res = newtmp;
+    code(<<END);
+	$res = ~ $tmp
 END
     return scalar_in_context($res, $x->{ctx});
 }
