@@ -7,7 +7,7 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
- *  References:
+ *  References: See also enums.h
  */
 
 #if !defined(PARROT_STACKS_H_GUARD)
