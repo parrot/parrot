@@ -103,6 +103,7 @@ exceptions.c
 global_setup.c
 hints/cygwin.pl
 hints/darwin.pl
+hints/dec_osf.pl
 hints/mswin32.pl
 hints/os2.pl
 hints/vms.pl
