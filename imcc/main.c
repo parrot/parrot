@@ -60,7 +60,7 @@ static void help(void)
     "    -b --bounds-checks\n"
     "    -j --jit\n"
     "    -p --profile\n"
-    "    -P --prederefrenced-core\n"
+    "    -P --predereferenced-core\n"
     "    -S --switched-core\n"
     "    -g --no-computed-goto\n"
     "    -t --trace\n"
@@ -115,7 +115,7 @@ static struct longopt_opt_decl options[] = {
     { 'E', 'E', 0, { "--pre-precess-only" } },
     { 'G', 'G', 0, { "--no-gc" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
-    { 'P', 'P', 0, { "--prederefrenced-core" } },
+    { 'P', 'P', 0, { "--predereferenced-core" } },
     { 'S', 'S', 0, { "--switched-core" } },
     { 'V', 'V', 0, { "--version" } },
     { '\0', OPT_DESTROY_FLAG, 0,   { "--leak-test", "--destroy-at-end" } },
@@ -349,14 +349,25 @@ do_pre_process(Parrot_Interp interpreter)
             case POW:           printf(" ** ");break;
             case COMMA:         printf(", ");break;
             case LABEL:         printf("%s:\t", val.s); break;
+            case PCC_BEGIN:     printf(".pcc_begin "); break;
+            case PCC_END:       printf(".pcc_end"); break;
+            case PCC_SUB:       printf(".pcc_sub "); break;
+            case PCC_CALL:      printf(".pcc_call "); break;
+            case PCC_BEGIN_RETURN:    printf(".pcc_begin_return"); break;
+            case PCC_END_RETURN:      printf(".pcc_end_return"); break;
+            case PCC_BEGIN_YIELD:     printf(".pcc_begin_yield"); break;
+            case PCC_END_YIELD:       printf(".pcc_end_yield"); break;
+            case PROTOTYPED:          printf("prototyped"); break;
+            case NON_PROTOTYPED:      printf("non_prototyped"); break;
+            case FILECOMMENT:   printf("setfile \"%s\"\n", val.s); break;
+            case LINECOMMENT:   printf("setline %d\n", val.t); break;
 
             default:
                      if (c < 255)
                          printf("%c", c);
-                     else {
+                     else
                          printf("%s ", val.s);
-                         break;
-                     }
+                     break;
         }
     }
 }

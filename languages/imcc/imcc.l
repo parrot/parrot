@@ -99,6 +99,7 @@ SP              [ ]
 %x cmt2
 %x cmt3
 %x cmt4
+%x cmt5
 
 %%
         /* for emacs "*/
@@ -141,9 +142,12 @@ SP              [ ]
         return '\n';
     }
 
-<INITIAL,emit>#.*{EOL} {
+<INITIAL,emit># { prev_state = YYSTATE; BEGIN(cmt5); }
+<cmt5>.*{EOL} {
         if (expect_pasm == 2)
 	  BEGIN(INITIAL);
+        else
+          BEGIN(prev_state);
         expect_pasm = 0;
         line++;
         return '\n';
