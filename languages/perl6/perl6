@@ -414,11 +414,22 @@ sub output_tree {
 	print OUT Dumper($x);
 	close OUT;
     } else {
+        # Create a default description of main, to be used only if the
+        # code doesn't create its own main() sub. The default will be
+        # sub main (@ARGS) { ... }, except it won't pass in a named
+        # argument hash. This is hopefully a temporary hack, until we
+        # can find a better place to put all the named arguments than
+        # in a magical extra hash arg.
+        my $sub_def = new P6C::sub_def name => 'main';
+        my ($default_sig) = P6C::Parser::parse_sig('@ARGS');
+        $sub_def->closure(new P6C::closure params => $default_sig);
+        $sub_def->closure->params->{no_named} = 1;
+
         # Add a default 'main' function, but allow it to be overridden
         # without warning by defining a main() in the Perl6 source.
-	P6C::IMCC::add_function('main', weak => 1);
+	my $func = P6C::IMCC::add_function('main', $sub_def, weak => 1);
+
 	P6C::IMCC::set_function('main');
-        P6C::IMCC::set_function_params(P6C::closure::default_signature());
 	my $x = $tree->tree;
 	verbose(2, "compiling tree");
         run_pass('compile', sub { P6C::IMCC::compile($x) }, $fw);

@@ -100,7 +100,7 @@ sub import {
 		  gentmp genlabel newtmp genlocal newlocal mangled_name
 		  code fixup_label
 		  add_function set_function exists_function_def
-		  exists_function_decl set_function_params set_function_return
+		  exists_function_decl
 		  gen_counted_loop scalar_in_context do_flatten_array
 		  array_in_context tuple_in_context undef_in_context
 		  primitive_in_context);
@@ -165,16 +165,10 @@ sub compile {			# compile input (don't emit)
 sub emit {
     die "Must define main" unless $funcs{main};
     print <<'END';
-.sub __main
+.sub __main @MAIN
 	new_pad 0
 	call __setup
 END
-
-    # emulate a sub main (@ARGS) { ... }, except don't pass in a named
-    # argument hash. This is hopefully a temporary hack, until we can
-    # find a better place to put all the named arguments.
-    $funcs{main}->params((P6C::Parser::parse_sig('@ARGS'))[0]);
-    $funcs{main}->params->{no_named} = 1;
 
     # XXX: This is hackish. The builtins should really be global multimethods,
     # and closures shouldn't be excluded by name. This'll do until it can be
@@ -238,7 +232,7 @@ sub code {			# add code to current function
     $funcs{$curfunc}->{code} .= $to_add;
 }
 
-=item B<add_function($name)>
+=item B<add_function($name, [$sub_def])>
 
 Create a new function stub for C<$name>.  If C<$name> exists, it will
 be overwritten.  In such cases, a warning will be omitted unless the
@@ -246,8 +240,8 @@ be overwritten.  In such cases, a warning will be omitted unless the
 
 =cut
 
-sub add_function($;@) {
-    my ($f, %opts) = @_;
+sub add_function($$;@) {
+    my ($f, $sub_def, %opts) = @_;
     if (exists $funcs{$f}) {
         # Do not override a non-weak function with a weak one.
         return 1 if ($opts{weak} && ! $funcs{$f}->{weak});
@@ -259,10 +253,11 @@ sub add_function($;@) {
               unless $funcs{$f}->{'weak'};
         }
     }
-    $funcs{$f} = new P6C::IMCC::Sub;
+    $funcs{$f} = new P6C::IMCC::Sub definition => $sub_def;
     $funcs{$f}->{'weak'} = 1 if $opts{'weak'};
+
     # NOTE: top-level closure will push a scope.
-    return 1;
+    return $funcs{$f};
 }
 
 =item B<exists_function_def($name)>
@@ -299,25 +294,6 @@ sub set_function($) {	       # switch to function, returning old one
     my $ofunc = $curfunc;
     $curfunc = $func;
     return $ofunc;
-}
-
-=item B<set_function_params($signature)>
-
-Set the parameter list for the current function.  The argument should
-be a C<P6C::signature> object.
-
-=cut
-
-sub set_function_params {
-    $funcs{$curfunc}->maybe_set_params(@_);
-}
-
-=item B<set_function_return($ret)>
-
-=cut
-
-sub set_function_return {
-    $funcs{$curfunc}->set_return(@_);
 }
 
 =back
@@ -397,9 +373,7 @@ Find parameter C<$var>.
 
 sub paramvar($) {
     my $var = shift;
-    my $mname = mangled_name($var);
-    return $mname if $funcs{$curfunc}->params->paramvar($var);
-    return;
+    return mangled_name($var) if $funcs{$curfunc}->paramvar($var);
 }
 
 =item B<$name = findvar($var)>
@@ -1572,7 +1546,7 @@ sub P6C::sub_def::val {
     if (exists_function_def($x)) {
 	diag "Redefining function ".$x->name;
     }
-    add_function($x->name);
+    add_function($x->name, $x);
     my $ofunc = set_function($x->name);
     $x->closure->val;
     set_function($ofunc);
@@ -1666,21 +1640,19 @@ sub val {
     if ($ctx->{is_anon_sub}) {
 	# We need to create an anonymous sub.
 	$name = genlabel 'closure';
-	add_function($name);
+	add_function($name, new P6C::sub_def closure => $x);
 	$ofunc = set_function($name);
     }
 
     # Figure out params:
     $x->params(get_params($x));
 
-    set_function_params($x->params);
-
     if ($x->is_rule) {
-        P6C::Rules::adjust_rule_return($IMCC::curfunc);
+        P6C::Rules::adjust_rule_return($x);
     } elsif ($ctx->{noreturn}) {
 	# Do nothing.
     } else {
-	set_function_return('PerlArray');
+        $x->rettype('PerlArray');
     }
 
     # If it's just a declaration, we're done:

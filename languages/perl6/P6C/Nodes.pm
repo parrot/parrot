@@ -481,6 +481,12 @@ Its traits.
 
 An initializer expression, or C<undef> if none.
 
+Private variable: 'no_named' means that named arguments are not used.
+For the caller, this means that the extra hash containing named
+arguments is not passed. For the callee, this means that the extra
+hash is not expected, and therefore is not read off of the passed-in
+arguments. Both of these had better agree!
+
 =back
 
 =cut
@@ -560,6 +566,10 @@ and body of a named subroutine -- or merely a bare block.
 The subroutine parameter list, or C<undef> if no parameter list was
 given.  The appropriate implicit parameter list then depends on context.
 
+=item B<rettype>
+
+The subroutine's return type.
+
 =item B<block>
 
 The sequence of statements making up the closure body.  This is a
@@ -586,7 +596,11 @@ A boolean flag saying whether the closure is a rule (as opposed to a sub).
 
 =cut
 
-use Class::Struct P6C::closure => { qw(params $ block $ bare $ is_rule $) };
+use Class::Struct P6C::closure => { qw(params $
+                                       rettype $
+                                       block $
+                                       bare $
+                                       is_rule $) };
 
 =item B<yadda>
 

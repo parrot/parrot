@@ -205,12 +205,12 @@ FIXME: this also heavily uses the P6C::IMCC::Sub object pulled out of
 # Args:
 #  $sub_name
 #
-# Returns: a P6C::IMCC::Sub object containing the parameters and
-# return value
+# Returns: a P6C::closure object containing the parameters and return
+# value
 #
 # In addition to looking up or creating an appropriate P6C::IMCC::Sub
-# object, set the Sub's return value and context.
-sub _get_sub {
+# object, set the closure's return value and context.
+sub _get_closure {
     my ($sub_name, $is_rule) = @_;
 
     my $func;
@@ -225,17 +225,21 @@ sub _get_sub {
     if (!defined($func)) {
         # Calling function without a prototype
         my $ftab = \%P6C::IMCC::funcs;
-        my ($sig, $ctx);
+        my $closure = new P6C::closure;
+        my ($sig, $rettype, $ctx);
         if ($is_rule) {
             $sig = P6C::Rules::default_signature();
             $ctx = P6C::Rules::default_arg_context();
-            $func = new P6C::IMCC::Sub params => $sig;
-            $func->rettype(['int','int']);
+            $func = new P6C::IMCC::Sub;
+            $rettype = ['int','int'];
         } else {
             ($sig, $ctx) = P6C::Parser::parse_sig('*@_');
-            $func = new P6C::IMCC::Sub params => $sig;
-            $func->rettype('PerlArray');
+            $func = new P6C::IMCC::Sub;
+            $rettype = 'PerlArray';
         }
+        $closure->params($sig);
+        $closure->rettype($rettype);
+        $func->definition(new P6C::sub_def closure => $closure);
         unless (ref $sub_name) {
             $P6C::Context::CONTEXT{$sub_name} = $ctx;
             $ftab->{$sub_name} = $func;
@@ -243,7 +247,7 @@ sub _get_sub {
         }
     }
 
-    return $func;
+    return $func->definition->closure;
 }
 
 # Generate code that fetches a PMC representing the subroutine to be
@@ -268,7 +272,7 @@ sub _make_sub_pmc {
 sub gen_sub_call {
     my ($sub_name, $args, $ctx_of_call, %options) = @_;
 
-    my $func = _get_sub($sub_name, $options{is_rule});
+    my $closure = _get_closure($sub_name, $options{is_rule});
     my $subpmc = _make_sub_pmc($sub_name);
 
     if (! $args) {
@@ -295,12 +299,12 @@ sub gen_sub_call {
     }
 
     my $slurpy_array;
-    if ($func->params->slurpy_array) {
+    if ($closure->params->slurpy_array) {
         $slurpy_array = newtmp('PerlArray', "# slurpy array arg");
     }
 
     # Split apart the arguments into their different roles
-    my $params = $func->params;
+    my $params = $closure->params;
     my ($positional, $named_known, $named_unknown) =
       categorize_args($args, $params);
 
@@ -448,9 +452,9 @@ sub gen_sub_call {
 
     # Now handle return value.
 
-    my $rettype = $func->rettype;
+    my $rettype = $closure->rettype;
     if (!defined($rettype)) {
-	warn 'XXX: probably shouldn\'t happen...';
+	warn "XXX: probably shouldn't happen... ($sub_name)";
 	$rettype = 'PerlArray';
     }
     if (ref($rettype) eq 'ARRAY') {
@@ -621,9 +625,6 @@ sub prefix_for {
     # XXX: apo 4 explicitly says this is lazy, but we take a greedy
     # approach here.
     my ($streams, $body) = @{$x->args->vals};
-    unless (ref $streams eq 'ARRAY') {
-	die Dumper($streams);
-    }
     my @bindings = map { [flatten_leftop($_, ',')] }
 	flatten_leftop($body->params, ';');
     die "for: internal error" unless @bindings == 1 || @bindings == @$streams;

@@ -1,10 +1,15 @@
 =head2 P6C::IMCC::Sub
 
-Stores IMCC code for a subroutine.
+The object representing the current compilation state, at least with
+respect to the subroutine being currently compiled. Includes the
+textual PIR code generated so far, a stack of scopes, and a pointer to
+the parse tree node for the subroutine definition.
 
-XXX: the fact that e.g. C<P6C::prefix> relies on this for argument
-information is just wrong.  This information should be retrieved from
-the parse tree structures instead.
+Note that many operations on this object are really performed by
+global subroutines defined in P6C::IMCC. They find the currently
+compiling object by keeping track of its name in C<$P6C::IMCC::curfunc>,
+and looking it up in a name -> P6C::IMCC::Sub map called
+C<%P6C::IMCC::funcs>.
 
 =over
 
@@ -24,14 +29,17 @@ Emit a complete function body, minus the C<.sub> directive.
 package P6C::IMCC::Sub;
 use Class::Struct 'P6C::IMCC::Sub'
     => { scopes => '@',		# scope stack
-	 params => '$',		# parameters passed
-	 rettype => '$',	# return type (scalar, array, tuple)
+         definition => 'P6C::sub_def', # subroutine definition
        };
-#	{scopelevel}		# current scope number
-#	{oldscopes}		# other closed scopes in this sub.
+# Private members:
+#  scopelevel : current scope number
+#  oldscopes  : other closed scopes in this sub (for generating a batch
+#               of local variables at the top of the sub)
 
 use P6C::Util qw(diag error);
 require P6C::IMCC;
+
+use strict;
 
 sub _find {
     my ($x, $thing) = @_;
@@ -61,6 +69,15 @@ sub add_localvar {
     }
     $x->scopes->[0]{$var} ||= [$scopename, $type, $init];
     return $scopename;
+}
+
+sub paramvar {
+    my ($self, $var) = @_;
+
+    my $params = $self->definition->closure->params;
+    return if ! $params;
+    return $var if $params->paramvar($var);
+    return;
 }
 
 sub label {
@@ -109,20 +126,6 @@ sub push_scope {
     unshift @{$x->scopes}, { };
 }
 
-sub maybe_set_params {
-    # XXX: hack to keep inner closures from mucking with our params.
-    my ($x, $signature) = @_;
-    unless ($x->{hasparam}) {
-        $x->params($signature);
-	$x->{hasparam} = 1;
-    }
-}
-
-sub set_return {
-    my ($x, $r) = @_;
-    $x->rettype($r);
-}
-
 sub pop_scope {
     my $x = shift;
     push @{$x->{oldscopes}}, shift @{$x->scopes};
@@ -140,7 +143,7 @@ sub pop_scope {
 #        ints and nums. Not sure for strings. Need tests.
 sub emit {
     my ($x, $prototyped) = @_;
-    my $params = $x->params;
+    my $params = $x->definition->closure->params;
 
     my $named_args = P6C::IMCC::gensym("unknown_named");
 

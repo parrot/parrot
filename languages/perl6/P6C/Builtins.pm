@@ -27,71 +27,73 @@ sub is_builtin {
     return exists $builtin_names{+shift};
 }
 
+sub _make_sub {
+    my ($sig, $rettype) = @_;
+    my $closure = new P6C::closure params => $sig, rettype => $rettype;
+    my $def = new P6C::sub_def closure => $closure;
+    return new P6C::IMCC::Sub definition => $def;
+}
+
 sub declare {
     my $hash = shift;
     for (qw(print1 exit sleep install_catch pop_catch)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('$a', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
-	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => [];
+        $hash->{$_} = _make_sub($sig, []);
 	$P6C::Parser::WANT{$_} = 'scalar_expr';
     }
 
     for (qw(time)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
-	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => 'PerlInt';
+        $hash->{$_} = _make_sub($sig, 'PerlInt');
 	$P6C::Parser::WANT{$_} = 'no_args';
     }
 
     for (qw(print warn die)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
-	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => [];
+        $hash->{$_} = _make_sub($sig, []);
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
     for (qw(join)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('$separator,*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
-	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
-                                         rettype => 'PerlString';
+        $hash->{$_} = _make_sub($sig, 'PerlString');
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
     for (qw(substr)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
-	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
-                                         rettype => 'PerlString';
+        $hash->{$_} = _make_sub($sig, 'PerlString');
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
 
     for (qw(index)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('$haystack,$needle,*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
-	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => 'PerlInt';
+        $hash->{$_} = _make_sub($sig, 'PerlInt');
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
 
     for (qw(length)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('$s', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
-	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
-                                         rettype => 'PerlInt';
+        $hash->{$_} = _make_sub($sig, 'PerlInt');
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
 
     for (qw(reverse)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
-	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
-                                         rettype => 'PerlArray';
+        $hash->{$_} = _make_sub($sig, 'PerlArray');
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
 
     for (qw(grep map)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('$condition,*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
-	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
-                                         rettype => 'PerlArray';
+        $hash->{$_} = _make_sub($sig, 'PerlArray');
 	$P6C::Parser::WANT{$_} = "want_for_$_";
     }
 }

@@ -14,8 +14,6 @@ Egad! You astound me, Brain!
 OUT
 
 ##############################
-SKIP: {
-skip 'broken parameter passing', 2;
 output_is(<<'CODE', <<'OUT', "simple subroutine with a single parameter");
 simple("Pinky");
 sub simple ($param) {
@@ -35,7 +33,6 @@ sub simple ($param1, $param2) {
 CODE
 Narf,Poit!
 OUT
-}
 
 ##############################
 SKIP: {

@@ -98,10 +98,8 @@ sub adjust_call {
 
 # Rules return their status result and the updated rx_pos
 sub adjust_rule_return {
-    my ($func) = @_;
-    return if $func->{rx_hasparams};
-    $func->{rx_hasparams} = 1;
-    P6C::IMCC::set_function_return([ 'int', 'int' ]);
+    my ($closure) = @_;
+    $closure->rettype([ 'int', 'int' ]);
 }
 
 1;
