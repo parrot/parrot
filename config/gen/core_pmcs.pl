@@ -89,10 +89,15 @@ void Parrot_initialize_core_pmcs(Interp *interp)
 {
     int pass;
     for (pass = 0; pass <= 1; ++pass) {
+	/* first the PMC with the highest enum
+	 * this reduces MMD table resize action
+ 	 */
 END
 
     print OUT "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
-      foreach (@pmcs);
+      foreach (@pmcs[-1..-1]);
+    print OUT "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
+      foreach (@pmcs[0..$#pmcs-1]);
     print OUT <<"END";
 	if (!pass) {
 	    /* Need an empty stash */

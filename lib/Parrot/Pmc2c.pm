@@ -130,6 +130,7 @@ PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
     STRING *whoami;
     PMC *pmc;
     INTVAL type;
+    int pass;
 
     /*
      * create a library PMC
@@ -145,8 +146,9 @@ PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
     whoami = string_from_cstring(interpreter, "$classname", 0);
     type = pmc_register(interpreter, whoami);
     /* do class_init code */
-    $call_class_init
-
+    for (pass = 0; pass <= 1; ++pass) {
+        $call_class_init
+    }
     return pmc;
 }
 
@@ -582,28 +584,17 @@ EOC
 
     $cout .= <<"EOC";
 
-    struct {
-        INTVAL func_nr;
-        INTVAL left, right;
-        funcptr_t func_ptr;
-    } _temp_mmd_init[] = {
+    const MMD_init _temp_mmd_init[] = {
         $mmd_list
     };
     /*  Dynamic classes need the runtime type
 	which is passed in entry to class_init.
     */
-    #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
-    int i;
-    if (!pass) {
-        for (i = 0; i < (int)N_MMD_INIT; ++i) {
-            _temp_mmd_init[i].left = entry;
-        }
 EOC
     $cout .= <<"EOC";
-
+    if (!pass) {
         /*
-         * parrotio calls some class_init functions during its class_init
-         * code, so some of the slots might already be allocated
+         * Parrot_base_vtables is a true global - register just once
          */
         if (!Parrot_base_vtables[entry]) {
             temp_base_vtable.whoami = string_make(interp,
@@ -621,20 +612,15 @@ EOC
         }
 EOC
     $cout .= <<"EOC";
-        /*
-         * register mmds
-         */
-        for (i = 0; i < (int)N_MMD_INIT; ++i) {
-            mmd_register(interp,
-                _temp_mmd_init[i].func_nr,
-                _temp_mmd_init[i].left,
-                _temp_mmd_init[i].right,
-                _temp_mmd_init[i].func_ptr);
-        }
     } /* pass */
 EOC
     $cout .= <<"EOC";
     $class_init_code
+    if (pass) {
+#define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
+        Parrot_mmd_register_parents(interp, entry,
+            _temp_mmd_init, N_MMD_INIT);
+    }
 } /* Parrot_${classname}_class_init */
 EOC
     if ($self->{flags}{dynpmc}) {

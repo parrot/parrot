@@ -37,6 +37,12 @@ typedef struct _MMD_table {
                                  in question */
 } MMD_table;
 
+typedef struct _MMD_init {
+        INTVAL func_nr;
+        INTVAL left, right;
+        funcptr_t func_ptr;
+} MMD_init;
+
 /* Need this for add, subtract, multiply, divide, mod, cmod, bitwise
    (and, or, xor, lshift, rshift), concat, logical (and, or, xor),
    repeat, eq, cmp */

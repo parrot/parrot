@@ -389,42 +389,18 @@ Divides the integer by C<*value> and returns the result in C<*dest>.
 
 */
     void divide (PMC* value, PMC* dest) {
-        INTVAL pmci;
-        int vtype = VTABLE_type(INTERP, value);
-        FLOATVAL valf;
-        FLOATVAL divf;
-
-        /* TODO: Is this the appropriate way to throw the exception? */
-
-        pmci = PMC_int_val(SELF);
-        if (vtype == enum_class_PerlUndef) {
+MMD_PerlUndef: {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
-            return;
         }
+MMD_DEFAULT: {
 
-        valf = VTABLE_get_number(INTERP, value);
+        FLOATVAL valf = VTABLE_get_number(INTERP, value);
             if (valf == 0.0) {
                 internal_exception(DIV_BY_ZERO, "division by zero!\n");
             return;
         }
 
-        divf = pmci / valf;
-        if (vtype == enum_class_PerlNum) {
-            VTABLE_set_number_native(INTERP, dest, divf);
-            return;
-        }
-        {
-            INTVAL vali = (INTVAL) valf;
-            INTVAL   divi = pmci / vali;
-            /* if result is an integer or zero yield an integer */
-            if (divf == divi || !pmci)
-                VTABLE_set_integer_native(INTERP, dest, divi);
-            else {
-                /* TODO BIG* promotion */
-                VTABLE_set_number_native(INTERP, dest, divf);
-            }
-            return;
-
+        VTABLE_set_number_native(INTERP, dest, PMC_int_val(SELF)/valf);
         }
     }
 
@@ -741,7 +717,7 @@ Returns the result of comparing the integer with C<*value>.
 
 */
     INTVAL cmp(PMC* value) {
-        if (value->vtable == Parrot_base_vtables[enum_class_PerlString]) {
+MMD_PerlString: {
             FLOATVAL fdiff = PMC_int_val(SELF)
                 - VTABLE_get_number(INTERP, value);
             if (fdiff == 0) {
@@ -752,13 +728,13 @@ Returns the result of comparing the integer with C<*value>.
                 return fdiff > 0 ? 1 : -1;
             }
         }
-        else if (value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
+MMD_PerlNum: {
             FLOATVAL diff;
             diff = (FLOATVAL)PMC_int_val(SELF)
                 - VTABLE_get_number(INTERP, value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }
-        else {
+MMD_DEFAULT: {
             /* int or undef */
             INTVAL diff = PMC_int_val(SELF)
                 - VTABLE_get_integer(INTERP, value);

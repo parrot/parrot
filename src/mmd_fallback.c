@@ -212,8 +212,8 @@ static void
 mmd_fallback_cmod_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_number_native(interp, dest,
-                             VTABLE_get_integer(interp, left) %
-                             VTABLE_get_integer(interp, right));
+                             fmod(VTABLE_get_number(interp, left),
+                                 VTABLE_get_number(interp, right)));
 }
 
 static void
@@ -504,16 +504,15 @@ mmd_fallback_lxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
     INTVAL left_truth, right_truth;
     PMC *true;
     left_truth = VTABLE_get_bool(interp, left);
-    right_truth = VTABLE_get_bool(interp, left);
-    /* Are they both false? That's the easy case */
-    if ((left_truth && right_truth) || (!left_truth && !right_truth)) {
-        true = constant_pmc_new_noinit(interp, enum_class_PerlUndef);
-    } else {
-        if (left_truth) {
+    right_truth = VTABLE_get_bool(interp, right);
+
+    if (left_truth && !right_truth)
             true = left;
-        } else {
+    else if (!left_truth && right_truth)
             true = right;
-        }
+    else {
+        VTABLE_set_integer_native(interp, dest, 0);
+        return;
     }
     VTABLE_set_pmc(interp, dest, true);
 }
@@ -584,7 +583,7 @@ and sets the result as an string in C<dest>.
 static INTVAL
 mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
-    if (string_compare(interp, VTABLE_get_string(interp, left),
+    if (0 == string_equal(interp, VTABLE_get_string(interp, left),
                 VTABLE_get_string(interp, right))) {
         return 1;
     } else {

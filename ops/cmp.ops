@@ -114,14 +114,14 @@ op eq (in PMC, in STR, labelconst INT) :base_core {
 }
 
 op eq_str (in PMC, in PMC, labelconst INT) :base_core {
-  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STREQ) == 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STREQ)) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
 op eq_num (in PMC, in PMC, labelconst INT) :base_core {
-  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMEQ) == 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMEQ)) {
     goto OFFSET($3);
   }
   goto NEXT();

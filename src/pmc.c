@@ -17,6 +17,8 @@ src/pmc.c - The base vtable calling functions
 */
 
 #include "parrot/parrot.h"
+#include <assert.h>
+
 static PMC* get_new_pmc_header(Parrot_Interp, INTVAL base_type, UINTVAL flags);
 
 
@@ -213,22 +215,6 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type,
     }
 
     pmc->vtable = vtable;
-    /*
-     * class interface - a PMC is it's own class
-     * XXX use a separate vtable entry?
-     * A ParrotObject has already the ParrotClass PMC in data
-     */
-    if (!vtable->data) {
-        /* can't put this PMC in: if it needs timely destruction
-         * it'll not get destroyed, so put in another PMC
-         *
-         * we should do that in pmc_register, but this doesn't
-         * work for dynamic PMCs, which don't have a vtable
-         * when they call pmc_register
-         */
-        PMC *class = vtable->data = new_pmc_header(interpreter, PObj_constant_FLAG);
-        class->vtable = vtable;
-    }
 
 #if GC_VERBOSE
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
@@ -459,6 +445,83 @@ pmc_type(Parrot_Interp interp, STRING *name)
 
 }
 
+/*
+
+=item C<void Parrot_mmd_register_parents(Interp*, INTVAL type,
+   MMD_init *, INTVAL)>
+
+Register MMD functions for this PMC type and for its parent
+
+=cut
+
+*/
+
+void
+Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
+        const MMD_init *mmd_table, INTVAL n)
+{
+    INTVAL i;
+    VTABLE *vtable = Parrot_base_vtables[type];
+    STRING *class_name;
+    INTVAL pos, len, parent_type;
+    /*
+     * class interface - a PMC is it's own class
+     * XXX use a separate vtable entry?
+     *
+     * put an instance of this PMC into data
+     */
+    PMC *class = vtable->data = new_pmc_header(interpreter,
+            PObj_constant_FLAG);
+    class->vtable = vtable;
+    /*
+     * register mmds for this type
+     */
+    for (i = 0; i < n; ++i) {
+        if (!mmd_table[i].right)
+            mmd_register(interpreter,
+                    mmd_table[i].func_nr, type,
+                    type, mmd_table[i].func_ptr);
+        mmd_register(interpreter,
+                mmd_table[i].func_nr, type,
+                mmd_table[i].right, mmd_table[i].func_ptr);
+    }
+    /*
+     * now check if this PMC has parents
+     */
+    class_name = vtable->whoami;
+    assert(string_str_index(interpreter, vtable->isa_str,
+                class_name, 0) == 0);
+    for (pos = 0; ;) {
+        len = string_length(interpreter, class_name);
+        pos += len + 1;
+        if (pos >= (INTVAL)string_length(interpreter, vtable->isa_str))
+            break;
+        len = string_str_index(interpreter, vtable->isa_str,
+                const_string(interpreter, " "), pos);
+        if (len == -1)
+            break;
+        class_name = string_substr(interpreter, vtable->isa_str, pos,
+                len - pos, NULL, 0);
+        /* abstract class? */
+        if (((char*)class_name->strstart)[0] >= 'a')
+            break;
+        /*
+         * parent_type = pmc_type(interpreter, class_name);
+         * the classname_hash isn't created yet
+         */
+        for (parent_type = -1, i = 1; i < enum_class_max; ++i)
+            if (string_equal(interpreter, class_name,
+                        Parrot_base_vtables[i]->whoami) == 0) {
+                parent_type = i;
+                break;
+            }
+        assert(parent_type > 0);
+        /*
+         * ok, we have the parent type
+         * remember the parent in TODO vtable->parent
+         */
+    }
+}
 /*
 
 =item C<static size_t

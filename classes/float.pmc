@@ -135,6 +135,407 @@ Returns a Parrot string representation of the number.
    STRING* get_string() {
         return string_from_num(INTERP, PMC_num_val(SELF));
    }
+/*
+
+=item C<void add(PMC *value, PMC *dest)>
+
+Adds C<*value> to the number and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void add (PMC* value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) +
+            VTABLE_get_number(INTERP, value)
+        );
+    }
+
+/*
+
+=item C<void add_int(INTVAL value, PMC *dest)>
+
+Adds C<value> to the number and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void add_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) + value);
+    }
+/*
+
+=item C<void add_float(FLOATVAL value, PMC *dest)>
+
+Adds C<value> to the number and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void add_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) + value);
+    }
+
+/*
+
+=item C<void subtract(PMC *value, PMC *dest)>
+
+Subtracts C<*value> from the number and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void subtract (PMC* value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) -
+            VTABLE_get_number(INTERP, value)
+        );
+    }
+
+/*
+
+=item C<void subtract_int(INTVAL value, PMC *dest)>
+
+Subtracts C<value> from the number and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void subtract_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) - (FLOATVAL)value
+        );
+    }
+/*
+
+=item C<void subtract_float(FLOATVAL value, PMC *dest)>
+
+Subtracts C<value> from the number and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void subtract_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) - value);
+    }
+
+/*
+
+=item C<void multiply(PMC *value, PMC *dest)>
+
+Multiplies the number by C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void multiply (PMC* value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) *
+            VTABLE_get_number(INTERP, value)
+        );
+    }
+
+/*
+
+=item C<void multiply_int(INTVAL value, PMC *dest)>
+
+Multiplies the number by C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void multiply_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) * value
+        );
+    }
+/*
+
+=item C<void multiply_float(FLOATVAL value, PMC *dest)>
+
+Multiplies the number by C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void multiply_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) * value);
+    }
+
+/*
+
+=item C<void divide(PMC *value, PMC *dest)>
+
+Divides the number by C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void divide (PMC* value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) /
+            VTABLE_get_number(INTERP, value)
+        );
+    }
+
+/*
+
+=item C<void divide_int(INTVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    void divide_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) / value
+        );
+    }
+
+/*
+
+=item C<void divide_float(FLOATVAL value, PMC *dest)>
+
+Divides the number by C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void divide_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) / value
+        );
+    }
+
+/*
+
+=item C<void cmodulus(PMC *value, PMC *dest)>
+
+Calculates the value of the number C-style C<mod> C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void cmodulus (PMC* value, PMC* dest) {
+        FLOATVAL f = VTABLE_get_number(INTERP, value);
+        VTABLE_set_number_native(INTERP, dest,
+            fmod(PMC_num_val(SELF), f));
+    }
+
+/*
+
+=item C<void cmodulus_float(FLOATVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    void cmodulus_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            fmod(PMC_num_val(SELF), value));
+    }
+
+/*
+
+=item C<void cmodulus_int(INTVAL value, PMC *dest)>
+
+Calculates the value of the number C-style C<mod> C<value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
+
+    void cmodulus_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            fmod(PMC_num_val(SELF), value));
+    }
+
+/*
+
+=item C<void modulus(PMC *value, PMC *dest)>
+
+Calculates the value of the number C<mod> C<*value> and returns the
+result in C<*dest>.
+
+=cut
+
+*/
+
+    void modulus (PMC* value, PMC* dest) {
+        FLOATVAL f = VTABLE_get_number(INTERP, value);
+        VTABLE_set_number_native(INTERP, dest,
+            floatval_mod(PMC_num_val(SELF), f));
+    }
+
+/*
+
+=item C<void modulus_float(FLOATVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    void modulus_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            floatval_mod(PMC_num_val(SELF), value));
+    }
+
+/*
+
+=item C<void modulus_int(INTVAL value, PMC *dest)>
+
+Calculates the value of the number C<mod> C<value> and returns the
+result in C<*dest>.
+
+=cut
+
+*/
+
+    void modulus_int (INTVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            floatval_mod(PMC_num_val(SELF), value));
+    }
+
+/*
+
+=item C<void neg(PMC *dest)>
+
+If C<dest> is true, then the negation of the number is returned in
+C<*dest>. Otherwise the number itself is negated.
+
+=cut
+
+*/
+
+    void neg (PMC * dest) {
+        if (!dest)
+            PMC_num_val(SELF) = -PMC_num_val(SELF);
+        else
+            VTABLE_set_number_native(INTERP, dest, -PMC_num_val(SELF));
+    }
+
+/*
+
+=item C<INTVAL is_equal(PMC* value)>
+
+The C<==> operation.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+        return (INTVAL)(PMC_num_val(SELF) == VTABLE_get_number(INTERP, value));
+    }
+
+/*
+
+=item C<INTVAL cmp(PMC* value)>
+
+
+
+=cut
+
+*/
+
+    INTVAL cmp(PMC* value) {
+        FLOATVAL diff;
+        diff = PMC_num_val(SELF) - VTABLE_get_number(INTERP, value);
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    }
+
+/*
+
+=item C<INTVAL cmp_num(PMC *value)>
+
+Returns the result of comparing the number with C<*value>.
+
+=cut
+
+*/
+
+    INTVAL cmp_num(PMC* value) {
+        FLOATVAL diff;
+        diff = PMC_num_val(SELF) - VTABLE_get_number(INTERP, value);
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    }
+
+/*
+
+=item C<void increment()>
+
+Increments the number.
+
+=cut
+
+*/
+
+    void increment () {
+        PMC_num_val(SELF) ++;
+    }
+
+/*
+
+=item C<void decrement()>
+
+Decrements the number.
+
+=cut
+
+*/
+
+    void decrement () {
+        PMC_num_val(SELF) --;
+    }
+/*
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the number.
+
+=cut
+
+*/
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_float(INTERP, io, PMC_num_val(SELF));
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the number.
+
+=cut
+
+*/
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL)
+            PMC_num_val(SELF) = io->vtable->shift_float(INTERP, io);
+    }
+
 }
 
 /*

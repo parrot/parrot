@@ -436,7 +436,7 @@ Compares the string with C<value>; returns FALSE if they match.
     INTVAL is_equal_str (PMC* value) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        return string_equal(INTERP, s, v);
+        return string_equal(INTERP, s, v) == 0;
     }
 
 /*

@@ -112,12 +112,16 @@ get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
      *     w/o the compare for equal types, mmd_fallback jumps in
      *     This just depends on *other* PMCs that use MMD
      */
+    /* XXX do this in table setup */
     if (left_type == enum_class_delegate)
         right_type = 0;
     if (left_type < x_funcs) {
         if (right_type < y_funcs) {
             offset = x_funcs * right_type + left_type;
             func = table->mmd_funcs[offset];
+            /* XXX do this in table setup */
+            if (func == table->default_func)
+                func = table->mmd_funcs[left_type];
         }
         else {
             func = table->mmd_funcs[left_type];

@@ -601,8 +601,6 @@ Returns whether the PMC is equal to C<*value>.
 
 /*
 
-/*
-
 =item C<INTVAL is_equal_num(PMC *value)>
 
 Returns whether the PMC is numerically equal to C<*value>.
@@ -612,7 +610,7 @@ Returns whether the PMC is numerically equal to C<*value>.
 */
 
     INTVAL is_equal_num (PMC* value) {
-        return (VTABLE_get_number(INTERP, SELF) != VTABLE_get_number(INTERP, value));
+        return (VTABLE_get_number(INTERP, SELF) == VTABLE_get_number(INTERP, value));
     }
 
 /*
@@ -626,7 +624,7 @@ Returns whether the PMC is numerically equal to C<*value>.
 */
 
     INTVAL is_equal_str (PMC* value) {
-        return (string_compare(INTERP, VTABLE_get_string(INTERP, SELF),
+        return (0 == string_equal(INTERP, VTABLE_get_string(INTERP, SELF),
                                        VTABLE_get_string(INTERP, value)));
     }
 

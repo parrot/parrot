@@ -1260,7 +1260,7 @@ CODE
 MyInt(42)
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overrid mmd methods");
+output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
 ##PIR##
 .sub main @MAIN
   .local pmc MyInt
@@ -1278,7 +1278,7 @@ output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overrid mmd methods");
   .local pmc add_sub
   add_sub = find_global "MyInt", "__add"
   .include "mmd.pasm"
-  mmdvtregister .MMD_ADD, $I0, 0, add_sub
+  mmdvtregister .MMD_ADD, $I0, $I0, add_sub
   k = i + j
   print k
   print "\n"
