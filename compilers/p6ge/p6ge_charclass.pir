@@ -73,7 +73,7 @@ where to start looking.
     .param int offset
 
     # XXX is it zeroed automatically?
-    if I1 > 0 goto dontzero
+    if argcI > 0 goto dontzero
     offset = 0
 dontzero:
 
@@ -95,6 +95,24 @@ continue:
 
 fail:
     .return(-1)
+.end
+
+.sub find_forward_inverted method
+    .param string source
+    .param int offset
+
+    if argcI > 0 goto dontzero
+    offset = 0
+dontzero:
+
+    .local pmc parent
+    find_type $I0, "P6GE::Class::Invert"
+    new parent, $I0
+
+    assign parent, self
+    $I1 = parent.find_forward(source, offset)
+    
+    .return($I1)
 .end
 
 =back
