@@ -504,12 +504,55 @@ dump_end:
     .param string indent
     
     print "\""
-    print str
+    _dump_escape_string(str,"\"")
     print "\""
     
     .pcc_begin_return
     .pcc_end_return
 .end
+
+#
+# Escape any characters in a string so we can re-use it as a literal.
+#
+.sub _dump_escape_string
+    .param pmc var
+    .param string char
+
+    .local string copy
+    copy = var
+
+    .local int last_index
+    last_index = 0
+    .local int string_len
+    length string_len, copy
+    .local int position
+    position = 0
+    .local int val
+
+escape_loop:
+    if position >= string_len goto escape_done
+    substr char, copy, position, 1
+    ord val, char
+
+    if val == 34 goto escape_escape
+    if val == 92 goto escape_escape
+    goto escape_next
+
+escape_escape:
+    print "\\"
+
+escape_next:
+    print char
+
+    inc position
+    goto escape_loop
+ 
+escape_done:
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+
 
 #
 # Dumps a Perl[Num,Int] pmc
