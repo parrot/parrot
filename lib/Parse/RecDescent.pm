@@ -1774,8 +1774,12 @@ sub DESTROY {}  # SO AUTOLOADER IGNORES IT
 
 sub Replace ($$)
 {
-	splice(@_, 2, 0, 1);
-	return _generate(@_);
+	# This splice hits an assertion failure in 5.005_03 when compiled
+	# with debugging:
+	# splice(@_, 2, 0, 1);
+	# return _generate(@_);
+	# Apart from modifying @_, they are equivalent to the rather ungainly:
+	return _generate($_[0], $_[1], 1, @_[2..$#_]);
 }
 
 sub Extend ($$)
