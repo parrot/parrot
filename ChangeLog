@@ -1,3 +1,46 @@
+2002-12-18 20:38  sfink: changes since 0.0.8
+
+	- Allow suppression of cgoto core to save memory during compile
+	* Native function calling interface
+	* Major rewrite of stack and list aggregates
+	- Scalar PMC added
+	* Scratchpads implemented
+	- Win32 libraries
+	- Internal memory subsystem documentation
+	* Preliminary DotGNU support
+	- Packfile fingerprinting
+	* Buffer/PMC unification (into PObjs)
+	* stabs debugging information support
+	* Major Jako overhaul, including:
+	  - imcc integration
+	  - native function calling
+	- Perl6 string interpolation
+	- languages/regex now targets IMCC
+	* Optional Lea memory allocator
+	* Full sprintf implementation
+	* Many, many new tests
+	* Miniparrot
+	- exchange ops
+	- runtime-controllable gc debugging
+	* PMC properties
+	- Crash info
+	* JIT: various improvements
+	  - register usage tracking
+	  - block register allocation
+	  - optimizations
+	  - more jitted ops
+	  - restartable
+	  - architecture abstraction layer
+	  - debugging via GDB
+	* Beginning support for extensible packfiles
+	* Much better key support, generally
+	* splice()
+	* Restructured PMC hierarchy with better functionality inheritance
+	* IMCC: many, many improvements. See languages/imcc/ChangeLog
+	* Perl6: index map grep join reverse defined
+	* Scheme with functions!
+	
+
 2002-03-19 22:54  nicholas
 
 	* docs/running.pod: Patch from Simon Glover <scog@amnh.org>:
