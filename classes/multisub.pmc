@@ -1,0 +1,80 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/multisub.pmc - A container for Perl6 mutli subs
+
+=head1 DESCRIPTION
+
+This class inherits from ResizablePMCArray and provides an Array of
+Sub PMCs with the same short name, but different long names.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+
+pmclass MultiSub extends ResizablePMCArray need_ext does array {
+
+    void push_pmc(PMC* value) {
+	STRING *_sub = CONST_STRING(interpreter, "Sub");
+	if (!VTABLE_isa(interpreter, value, _sub))
+	    internal_exception(1, "attempt to push non Sub PMC");
+	SUPER(value);
+    }
+
+    void set_pmc_keyed_int (INTVAL key, PMC* value) {
+	STRING *_sub = CONST_STRING(interpreter, "Sub");
+	if (!VTABLE_isa(interpreter, value, _sub))
+	    internal_exception(1, "attempt to set non Sub PMC");
+	SUPER(key, value);
+    }
+
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+	internal_exception(1, "attempt to set non Sub PMC");
+    }
+
+    void set_string_keyed_int (INTVAL key, STRING* value) {
+	internal_exception(1, "attempt to set non Sub PMC");
+    }
+
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+	internal_exception(1, "attempt to set non Sub PMC");
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/mmd.c>,
+F<$perl6/doc/trunk/design/apo/A12.pod>,
+F<$perl6/doc/trunk/design/syn/S12.pod>
+
+=head1 HISTORY
+
+Initial version                  - leo 14.03.2005
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
