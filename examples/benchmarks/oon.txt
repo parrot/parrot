@@ -1,0 +1,25 @@
+The oo?.p? oo benchmarks are as follows ('+' = has, '-' = has not,
+'?' = kind of has):
+
+		pasm	pl	py	rb
+oo1	new1e5	+	+	+	+
+oo2	new5e5	+	+	+	+
+oo3	get	+	+	?	?
+oo4	set	+	+	?	?
+oo5	get	+	+	+	+
+oo6	set	+	+	+	+
+
+The oo1-oo4 test creation of objects, the oo1 creating 1e5 objects
+and the oo2 creating 5e5 objects.
+The oo3 and oo5 test getters, 2 times 5e5 gets to a single object.
+The oo4 and oo6 test setters, 2 times 5e5 sets to a single object.
+The oo3 and oo4 are speed cheats for Perl because they directly
+manipulate the blessed reference.  No such cheats are used (or available?)
+for Python or Ruby objects: therefore for Python and Ruby the oo3 and oo5
+are identical, as are the oo4 and oo6.  For Parrot the oo3 and oo4 cheat
+similarly to Perl since object attributes are currently implemented
+only by offset, not by name. In the oo5 and oo6 the getters and setters
+go through "real" (named) method calls even in Perl.
+
+
+

@@ -45,6 +45,7 @@ cst_new_stack(Interp *interpreter, const char *name, size_t item_size,
     chunk->name = name;
     chunk->item_size = item_size;
     chunk->items_per_chunk = items_per_chunk;
+    chunk->used = 0;
 
     /* Block DOD from murdering our newly allocated stack buffer. */
     Parrot_block_DOD(interpreter);

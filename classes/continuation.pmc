@@ -54,7 +54,6 @@ Marks the continuation as live.
     void mark () {
         struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
         mark_context(INTERP, &cc->ctx);
-        SUPER();    /* mark pad_stack, warns in closure */
     }
 
 /*
