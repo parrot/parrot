@@ -1,0 +1,25 @@
+#! perl -w
+# $Id$
+
+#Blatantly stolen from parrot/t/harness by Mike Lambert
+#Then blatantly stolen from perl6/t/harness by leo ;-)
+
+use strict;
+use lib '../../lib';
+use Test::Harness qw(runtests);
+
+#
+# Suck the switches into the TEST_PROG_ARGS evar:
+#
+
+use Getopt::Std;
+my %opts;
+getopts('gjP', \%opts);
+$ENV{TEST_PROG_ARGS} = join(' ', map { "-$_" } keys %opts );
+
+$ENV{PARROT_QUICKTEST} = grep $_ eq 'quick', @ARGV;
+@ARGV = grep $_ ne 'quick', @ARGV;
+
+# Pass in a list of tests to run on the command line, else run all the tests.
+my @tests = @ARGV ? @ARGV : glob( "t/*/*.t" );
+runtests(@tests);
