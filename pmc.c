@@ -175,6 +175,46 @@ constant_pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type,
     return pmc;
 }
 
+/* This segment is made up of the 'fallback' functions -- the
+   functions we call if we have no clue as to how to do MMD for a
+   vtable function */
+
+void
+mmd_fallback_add_pmc(struct Parrot_Interp *interp, PMC *left, PMC *right, PMC *dest) {
+    FLOATVAL result = (VTABLE_get_number(interp, left) + VTABLE_get_number(interp, right));
+    VTABLE_set_number_native(interp, dest, result);
+
+}
+
+void
+mmd_fallback_subtract_pmc(struct Parrot_Interp *interp, PMC *left, PMC *right, PMC *dest) {
+    VTABLE_set_number_native(interp, dest, VTABLE_get_number(interp, left) - VTABLE_get_number(interp, right));
+
+}
+
+void
+mmd_fallback_multiply_pmc(struct Parrot_Interp *interp, PMC *left, PMC *right, PMC *dest) {
+    VTABLE_set_number_native(interp, dest, VTABLE_get_number(interp, left) * VTABLE_get_number(interp, right));
+
+}
+
+void
+mmd_fallback_divide_pmc(struct Parrot_Interp *interp, PMC *left, PMC *right, PMC *dest) {
+    VTABLE_set_number_native(interp, dest, VTABLE_get_number(interp, left) / VTABLE_get_number(interp, right));
+
+}
+
+void
+mmd_fallback_cmod_pmc(struct Parrot_Interp *interp, PMC *left, PMC *right, PMC *dest) {
+    VTABLE_set_number_native(interp, dest, VTABLE_get_integer(interp, left) % VTABLE_get_integer(interp, right));
+
+}
+
+void
+mmd_fallback_mod_pmc(struct Parrot_Interp *interp, PMC *left, PMC *right, PMC *dest) {
+    VTABLE_set_number_native(interp, dest, floatval_mod(VTABLE_get_number(interp, left), VTABLE_get_number(interp, right)));
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd
