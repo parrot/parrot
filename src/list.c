@@ -21,6 +21,7 @@
  *      1.8     21.10.2002 gc_debug stuff
  *      1.9     21.10.2002 splice
  *      1.10    22.10.2002 update comment WRT clone in splice
+ *      1.11    26.10.2002 user_data
  *
  *  Data Structure and Algorithms:
  *  ==============================
@@ -920,6 +921,7 @@ list_new(Interp *interpreter, INTVAL type)
 /*
  * list_new_init uses these initializers:
  * 0 ... size (set initial size of list)
+ * 1 ... array dimensions (multiarray)
  *
  */
 List *
@@ -944,6 +946,7 @@ list_new_init(Interp *interpreter, INTVAL type, PMC * init)
     }
     if (size)
         list_set_length(interpreter, list, size);
+    list->user_data = init;
     return list;
 }
 
@@ -1005,6 +1008,9 @@ list_clone(Interp *interpreter, List *other)
             }
         }
     }
+    if (other->user_data)
+        l->user_data = other->user_data->vtable->clone(interpreter,
+                other->user_data);
     rebuild_chunk_list(interpreter, l);
     interpreter->DOD_block_level--;
     interpreter->GC_block_level--;
@@ -1029,6 +1035,8 @@ list_mark(Interp* interpreter, List* list, PMC* last)
             }
     }
     buffer_lives(interpreter, (Buffer *) list);
+    if (list->user_data)
+        last = mark_used(list->user_data, last);
     return last;
 }
 

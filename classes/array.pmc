@@ -86,6 +86,12 @@ pmclass Array {
         SELF->flags |= PMC_custom_mark_FLAG;
     }
 
+    /*
+     * list_new_init uses these initializers:
+     * 0 ... size (set initial size of list)
+     * 1 ... array dimensions (multiarray)
+     *
+     */
     void init_pmc (PMC *init) {
         SELF->data = list_new_init(INTERP, enum_type_PMC, init);
         SELF->flags |= PMC_custom_mark_FLAG;

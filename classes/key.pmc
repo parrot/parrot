@@ -68,5 +68,9 @@ pmclass Key {
     void set_pmc (PMC* value) {
         key_set_pmc(INTERP, SELF, value);
     }
-    
+
+    void push_pmc (PMC * value) {
+	key_append(INTERP, SELF, value);
+    }
+
 }

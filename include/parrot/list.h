@@ -38,6 +38,7 @@ typedef struct List {
     int grow_policy;            /* fixed / variable len */
     UINTVAL collect_runs;       /* counter, when chunklist was built */
     UINTVAL n_chunks;           /* number of chunks */
+    PMC * user_data;		/* e.g. multiarray dimensions */
     List_chunk *first;	        /* first chunk holding data */
     List_chunk *last;	        /* last chunk */
 } List;
