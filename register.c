@@ -38,7 +38,6 @@ Parrot_push_i(struct Parrot_Interp *interpreter) {
         interpreter->int_reg_top->next = new_chunk;
         interpreter->int_reg_top = new_chunk;
     }
-    Parrot_clear_i(interpreter);
 }
 
 /*=for api register Parrot_pop_i
@@ -108,7 +107,6 @@ Parrot_push_s(struct Parrot_Interp *interpreter) {
         interpreter->string_reg_top->next = new_chunk;
         interpreter->string_reg_top = new_chunk;
     }
-    Parrot_clear_s(interpreter);
 }
 
 /*=for api register Parrot_pop_s
@@ -178,7 +176,6 @@ Parrot_push_n(struct Parrot_Interp *interpreter) {
         interpreter->num_reg_top->next = new_chunk;
         interpreter->num_reg_top = new_chunk;
     }
-    Parrot_clear_n(interpreter);
 }
 
 /*=for api register Parrot_pop_n
@@ -248,7 +245,6 @@ Parrot_push_p(struct Parrot_Interp *interpreter) {
         interpreter->pmc_reg_top->next = new_chunk;
         interpreter->pmc_reg_top = new_chunk;
     }
-    Parrot_clear_p(interpreter);
 }
 
 /*=for api register Parrot_pop_p

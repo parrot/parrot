@@ -2200,44 +2200,6 @@ inline op pushp() {
   goto NEXT();
 }
 
-########################################
-
-=item B<clonei>()
-
-=item B<clonen>()
-
-=item B<clonep>()
-
-=item B<clones>()
-
-Save all the registers of the type indicated in the name of the operation.
-
-=cut
-
-inline op clonei() {
-/*  XXX Parrot_clone_i(interpreter); */
-  goto NEXT();
-}
-
-inline op clonen() {
-/*  XXX Parrot_clone_n(interpreter); */
-  goto NEXT();
-}
-
-inline op clones() {
-/*  XXX Parrot_clone_s(interpreter); */
-  goto NEXT();
-}
-
-inline op clonep() {
-/*  XXX Parrot_clone_p(interpreter); */
-  goto NEXT();
-}
-
-=back
-
-=cut
-
 
 ###############################################################################
 
