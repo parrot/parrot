@@ -290,7 +290,7 @@ Resizes the array to C<size> elements.
         if (PMC_int_val(SELF) || size < 1)
             internal_exception(OUT_OF_BOUNDS, "FixedFloatArray: Can't resize!\n");
         PMC_int_val(SELF) = size;
-        PMC_data(SELF) = mem_sys_allocate(size * sizeof(INTVAL));
+        PMC_data(SELF) = mem_sys_allocate(size * sizeof(FLOATVAL));
         PObj_active_destroy_SET(SELF);
     }
 
