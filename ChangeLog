@@ -1,3 +1,18 @@
+2005-03-06    leo
+        * Released 0.1.2
+	* big rewrite of string code, not yet finished but ...
+	* partial implementation of a generational garbage collector
+	* indirect register frame addressing
+	* .return(args) PIR syntax
+	* moved most of the Python code to dynclasses
+	* a lot more Python functionality
+	* precalculate opcodes with all constants
+	* PGE - Parrot Grammar Engine
+	* scalar classes refactoring
+	* much more tests and big test system cleanup
+	* improved documentation
+	* and as always a lot more
+
 2004-10-09    leo
         * Released 0.1.1
 	* Need Perl 5.6 now for building

@@ -9,6 +9,6 @@ Release pumpking		Leopold "leo" Toetsch
 JIT				Daniel Grunblatt, Leopold Toetsch
 Configure			Brent Royal-Gordon
 Garbage Collector               ** volunteers?? **
-I/O				Melvin Smith, Juergen Boemmels
-IMCC & PIR                      Melvin Smith, Leopold Toetsch
+I/O				Juergen Boemmels
+IMCC & PIR                      Leopold Toetsch
 Misc core stuff                 Leopold Toetsch

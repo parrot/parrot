@@ -1,5 +1,5 @@
-LAST RELEASE:     Parrot 0.1.1,  2004.10.09
-PREVIOUS RELEASE: Parrot 0.1.0,  2004.02.29
+LAST RELEASE:     Parrot 0.1.2,  2005.03.06
+PREVIOUS RELEASE: Parrot 0.1.1,  2004.10.09
 
 This file should only exist in development distributions. Delete it
 (and its entry in the MANIFEST) before packaging Parrot up for a CPAN

@@ -20,7 +20,7 @@
 #include "pbc.h"
 #include "parser.h"
 
-#define IMCC_VERSION "0.1.1"
+#define IMCC_VERSION "0.1.2"
 
 static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;
 static char optimizer_opt[20];
@@ -98,7 +98,7 @@ imcc_version(void)
 {
     printf("This is parrot version " PARROT_VERSION " built for "
             PARROT_ARCHNAME ".\n\
-Copyright (C) 2001-2004 The Perl Foundation.  All Rights Reserved.\n\
+Copyright (C) 2001-2005 The Perl Foundation.  All Rights Reserved.\n\
 \n\
 Parrot may be copied only under the terms of either the Artistic License or the\n\
 GNU General Public License, which may be found in the Parrot source kit.\n\
@@ -436,8 +436,8 @@ main(int argc, char * argv[])
     }
 
     /* Read in the source and determine whether it's Parrot bytecode,
-       PASM or a Parrot abstract syntax tree (PAST) file. If it isn't 
-       any of these, then we assume that it is PIR. */       
+       PASM or a Parrot abstract syntax tree (PAST) file. If it isn't
+       any of these, then we assume that it is PIR. */
     if (!sourcefile || !*sourcefile) {
         IMCC_fatal(interp, 1, "main: No source file specified.\n" );
     }
@@ -503,7 +503,7 @@ main(int argc, char * argv[])
         IMCC_info(interp, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);
     }
 
-    /* If the input file is Parrot bytecode, then we simply read it 
+    /* If the input file is Parrot bytecode, then we simply read it
        into a packfile, which Parrot then loads */
     if (load_pbc) {
         pf = Parrot_readbc(interp, sourcefile);

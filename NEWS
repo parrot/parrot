@@ -1,3 +1,11 @@
+New in 0.1.2
+
+- New string handling code. Strings now have charset and encoding
+- Parts of a generation garbage collector
+- Better Python code, separated in dynclasses
+- Parrot Grammar Engine
+- Improved test coverage and documentation
+
 New in 0.1.1
 
 Parrot 0.1.1 is an intermediate release with tons of updates and fixes.

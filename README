@@ -1,4 +1,4 @@
-This is Parrot, version 0.1.1
+This is Parrot, version 0.1.2
 -----------------------------
 
 Parrot is Copyright (C) 2001-2005 The Perl Foundation. All Rights Reserved.
@@ -89,6 +89,9 @@ You can test parrot by running
 You can run the full test suite with
 
     make fulltest
+
+Note: due to string code changes some of the string tests fail with
+"make testr", which is part of "make fulltest".
 
 On some systems you can install parrot:
 

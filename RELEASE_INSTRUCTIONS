@@ -8,10 +8,9 @@ To prepare a release:
 
     2.  Update files with version-specific information:
 
-        a.  Increment the version number in VERSION,
+        a.  Increment the version number in:
+	    VERSION, parrot.spec, and docs/intro.pod,
 	    adjust IMCC_VERSION in imcc/main.c,
-            and update VERSION in languages/perl6/perl6,
-	    parrot.spec, and docs/intro.pod.
 
         b.  Change the information in DEVELOPING to reflect
             this release's version number and date.

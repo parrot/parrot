@@ -74,7 +74,7 @@ So let's get ourselves a copy of Parrot, so that we can start
 investigating how to program in the Parrot assembler.
 
 Periodic, numbered releases will appear on CPAN (we're currently on
-version 0.1.1), but at this stage of the project an awful lot is
+version 0.1.2), but at this stage of the project an awful lot is
 changing between releases. To really keep up to date with Parrot,
 we should get our copy from the CVS repository. Here's how we do that:
 
