@@ -78,8 +78,6 @@ void set_bignum_keyed_int(INTVAL* key, BIGNUM* value)
 
 void set_string(PMC* value)
 void set_string_native(STRING* value)
-void set_string_unicode(STRING* value)
-void set_string_other(STRING* value)
 void set_string_same(PMC* value)
 void set_string_keyed(KEY* key, STRING* value)
 void set_string_keyed_int(INTVAL* key, STRING* value)
@@ -254,8 +252,6 @@ void bitwise_shr_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest
 
 void concatenate(PMC* value, PMC* dest)
 void concatenate_native(STRING* value, PMC* dest)
-void concatenate_unicode(STRING* value, PMC* dest)
-void concatenate_other(STRING* value, PMC* dest)
 void concatenate_same(PMC* value, PMC* dest)
 void concatenate_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
 void concatenate_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)

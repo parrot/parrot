@@ -111,14 +111,6 @@ pmclass Pointer {
         POINTER_ERROR;
     }
 
-    void set_string_unicode (STRING* value) {
-        POINTER_ERROR;
-    }
-
-    void set_string_other (STRING* value) {
-        POINTER_ERROR;
-    }
-
     void set_string_same (PMC* value) {
         POINTER_ERROR;
     }

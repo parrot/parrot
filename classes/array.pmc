@@ -873,24 +873,6 @@ pmclass Array {
                      );
     }
 
-    void concatenate_unicode (STRING * value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                      SELF->cache.struct_val,
-                      value,
-                      0
-                     );
-    }
-
-    void concatenate_other (STRING * value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                      SELF->cache.struct_val,
-                      value,
-                      0
-                     );
-    }
-
     void concatenate_same (PMC * value, PMC* dest) {
         dest->cache.struct_val =
             string_concat(INTERP,

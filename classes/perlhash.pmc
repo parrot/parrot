@@ -290,14 +290,6 @@ pmclass PerlHash {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
     }
 
-    void set_string_unicode (STRING* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
-    }
-
-    void set_string_other (STRING* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
-    }
-
     void set_string_same (PMC* value) {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
     }
@@ -521,24 +513,6 @@ pmclass PerlHash {
     }
 
     void concatenate_native (STRING* value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                          SELF->cache.struct_val,
-                          value,
-                          0
-                         );
-    }
-
-    void concatenate_unicode (STRING* value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                          SELF->cache.struct_val,
-                          value,
-                          0
-                         );
-    }
-
-    void concatenate_other (STRING* value, PMC* dest) {
         dest->cache.struct_val =
             string_concat(INTERP,
                           SELF->cache.struct_val,

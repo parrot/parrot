@@ -352,14 +352,6 @@ pmclass default noinit {
         SELF->cache.struct_val = string_copy(INTERP, value);
     }
 
-    void set_string_unicode (STRING* value) {
-        SELF->cache.struct_val = string_copy(INTERP, value);
-    }
-
-    void set_string_other (STRING* value) {
-        SELF->cache.struct_val = string_copy(INTERP, value);
-    }
-
     void set_string_same (PMC* value) {
         SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
     }
@@ -1800,24 +1792,6 @@ pmclass default noinit {
     }
 
     void concatenate_native (STRING* value,  PMC* dest) {
-        /* dest = SELF (concat) value */
-        STRING* s = string_concat(INTERP,
-            SELF->vtable->get_string(INTERP, SELF),
-            value, 0);
-
-        dest->vtable->set_string_native(INTERP, dest, s);
-    }
-
-    void concatenate_unicode (STRING* value,  PMC* dest) {
-        /* dest = SELF (concat) value */
-        STRING* s = string_concat(INTERP,
-            SELF->vtable->get_string(INTERP, SELF),
-            value, 0);
-
-        dest->vtable->set_string_native(INTERP, dest, s);
-    }
-
-    void concatenate_other (STRING* value,  PMC* dest) {
         /* dest = SELF (concat) value */
         STRING* s = string_concat(INTERP,
             SELF->vtable->get_string(INTERP, SELF),
