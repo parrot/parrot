@@ -754,6 +754,8 @@ DoneWordIsNumber:
   restore .NumStack
   ret
 
+
+
 #------------------------------------------------------------------------------
 #
 # Test Interpret routine
@@ -1580,7 +1582,7 @@ DoneCollectWord:
 # CollectToQuote
 #
 CollectToQuote:
-    index .TempInt, .Commands, '"'
+    index .TempInt, .Commands, '"'                     # " Highlight fix
     eq .TempInt, -1, NoQuote
     substr .CurrentWord, .Commands, 0, .TempInt, ""
     branch DoneCollectToQuote
@@ -1836,7 +1838,7 @@ AddSpecialWord:
     branch EndSpecWord
 
   NotCompileComma:
-    ne .CurrentWord, 'p"', NotParrotString
+    ne .CurrentWord, 'p"', NotParrotString            # " Highlight fix
 
     # Okay, we need to yank the string out of the input stream
     bsr EatLeadingWhitespace
@@ -1859,7 +1861,7 @@ AddSpecialWord:
     branch EndSpecWord    
 
   NotRecurse:
-    ne .CurrentWord, '."', NotPrintString
+    ne .CurrentWord, '."', NotPrintString          #" darned highlighting...
 
     # Okay, we need to yank the string out of the input stream
     bsr EatLeadingWhitespace
@@ -1916,6 +1918,28 @@ AddPlainWord:
 
 AddControlStruct:
     ret
+
+#------------------------------------------------------------------------------
+#
+# External entry point
+#
+# This is where any sub call goes. All Forth exported words come here,
+# and this routine pulls out the information from the sub PMC,
+# as stored in P0, to figure out where  it should go. This bit handles
+# all the restoration of Forth's environment, dispatching off to the
+# word being called, and invoking the return continuation when its 
+# all done
+ExternalEntry:
+   save P1
+
+   find_global .CoreOps, "__forth::CoreOps"
+   find_global .UserOps, "__forth::UserOps"
+   
+# Magic happens
+
+   restore P0
+   invoke
+
 
 VeryEnd:
     end
