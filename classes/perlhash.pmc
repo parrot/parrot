@@ -43,6 +43,26 @@ int_compare(Parrot_Interp interp, void *a, void *b)
     UNUSED(interp);
     return a != b;
 }
+
+/* XXX duplicated from classes/slice.pmc */
+
+typedef struct {
+    INTVAL i;
+    STRING *s;
+} RUnion;
+
+#define RVal_int(u) u.i
+#define RVal_str(u) u.s
+
+typedef struct _range_t {
+    int type;                   /* enum_type_INTVAL or STRING */
+    RUnion start;             /* start of this range */
+    RUnion end;               /* end of this range */
+    RUnion step;              /* step of this range */
+    RUnion cur;               /* current value */
+    struct _range_t *next;       /* next in chain */
+} range_t;
+
 static void
 fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)
 {
@@ -72,36 +92,29 @@ fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)
             VTABLE_isa(interpreter, keys,
                 const_string(interpreter, "Iterator"))) {
         iter = keys;
-        if (PMC_struct_val(iter)) {
-            PMC *xr = PMC_struct_val(iter);
+        if (PMC_pmc_val(iter)) {
+            PMC *xr = PMC_pmc_val(iter);
             /* check, if we got an xrange iterator */
             if (PObj_is_PMC_TEST(xr) &&
-                    xr->vtable->base_type == enum_class_Slice &&
-                    PMC_data(xr)) {
-                PMC *range = PMC_data(xr);
-                if (((PObj_get_FLAGS(xr) &
-                                (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
-                            KEY_start_slice_FLAG &&
-                            ((PObj_get_FLAGS(range) &
-                              (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) ==
-                             KEY_end_slice_FLAG))) {
-                    INTVAL start, end, step = 1;
-                    Hash* hash;
-                    new_hash_x(interpreter, &hash, enum_type_ptr,
-                                0, Hash_key_type_int,
-                                int_compare, key_hash_int,
-                                (hash_mark_key_fn) NULL);
-                    PMC_struct_val(self) = hash;
-                    start = key_integer(interpreter, xr);
-                    end   = key_integer(interpreter, range);
-                    /* TODO step
-                     * TODO reversed range, negative step
-                     */
-                    for (i = start; i < end; i+= step) {
-                        hash_put(interpreter, hash, (void *)i, value);
-                    }
-                    goto done;
+                    xr->vtable->base_type == enum_class_Slice) {
+                INTVAL start, end, step;
+                Hash* hash;
+                range_t *range = PMC_struct_val(xr);
+                new_hash_x(interpreter, &hash, enum_type_ptr,
+                        0, Hash_key_type_int,
+                        int_compare, key_hash_int,
+                        (hash_mark_key_fn) NULL);
+                PMC_struct_val(self) = hash;
+                start = RVal_int(range->start);
+                end   = RVal_int(range->end);
+                step  = RVal_int(range->step);
+                /* TODO step
+                 * TODO reversed range, negative step
+                 */
+                for (i = start; i <= end; i+= step) {
+                    hash_put(interpreter, hash, (void *)i, value);
                 }
+                goto done;
             }
         }
     }

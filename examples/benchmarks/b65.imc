@@ -1,0 +1,31 @@
+.sub main @MAIN
+.include "iterator.pasm"
+    .local pmc d
+    .local pmc xr
+    d = new PerlHash
+    xr = new Slice[0 .. 1000000]
+    .local pmc sl
+    sl = new Iterator, xr
+    .local pmc value
+    null value
+    d."fromkeys"(sl, value)
+
+    .local pmc n
+    n = new PerlInt
+    n = 0
+    .local pmc iter_3
+    iter_3 = new Iterator, d
+#      for i in d:
+    iter_3 = .ITERATE_FROM_START
+    .local int i
+iter_3_lp:
+    unless iter_3, iter_3_end
+    i = shift iter_3
+#          n += i
+    n += i
+    goto iter_3_lp
+iter_3_end:
+    print n
+    print "\n"
+.end
+

@@ -52,6 +52,11 @@ bigint_set_double(Interp *interpreter, PMC *self, double value) {
     mpz_set_d(BN(self), value);
 }
 
+static void
+bigint_set_str(Interp *interpreter, PMC *self, char* value) {
+    mpz_set_str(BN(self), value, 10);
+}
+
 static BIGNUM*
 bigint_get_self(Interp *interpreter, PMC *self) {
     return PMC_struct_val(self);
@@ -86,11 +91,8 @@ static void
 bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    mpz_t v;
-    mpz_init_set_si(v, (long)value);
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
-    mpz_add(BN(dest), BN(self), v);
-    mpz_clear(v);
+    mpz_add_ui(BN(dest), BN(self), (long)value);
 }
 static void
 bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
@@ -103,17 +105,15 @@ static void
 bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    mpz_t v;
-    mpz_init_set_si(v, (long)value);
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
-    mpz_mul(BN(dest), BN(self), v);
-    mpz_clear(v);
+    mpz_mul_ui(BN(dest), BN(self), value);
 }
 
 static void
 bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    /* this is mpz_fdiv_q */
     mpz_div(BN(dest), BN(self), BN(value));
 }
 
@@ -121,11 +121,8 @@ static void
 bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    mpz_t v;
-    mpz_init_set_si(v, (long)value);
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
-    mpz_div(BN(dest), BN(self), v);
-    mpz_clear(v);
+    mpz_div_ui(BN(dest), BN(self), value);
 }
 static INTVAL
 bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
@@ -136,12 +133,7 @@ bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
 static INTVAL
 bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
 {
-    mpz_t v;
-    INTVAL r;
-    mpz_init_set_si(v, (long)value);
-    r = mpz_cmp(BN(self), v);
-    mpz_clear(v);
-    return r;
+    return mpz_cmp_ui(BN(self), value);
 }
 
 #else
@@ -156,6 +148,10 @@ bigint_set_long(Interp *interpreter, PMC *self, long value) {
 }
 static void
 bigint_set_double(Interp *interpreter, PMC *self, double value) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_set_str(Interp *interpreter, PMC *self, char* value) {
     internal_exception(1, "no bigint lib loaded");
 }
 static BIGNUM*
@@ -226,7 +222,7 @@ bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
 }
 #endif
 
-/* XXX derive from perlscalar becaus of moprh */
+/* XXX derive from perlscalar because of morph */
 pmclass BigInt extends perlscalar {
 
 /*
@@ -281,7 +277,9 @@ number.
 */
 
     void set_string_native(STRING* value) {
-
+        char *s = string_to_cstring(INTERP, value);
+        bigint_set_str(INTERP, SELF, s);
+        string_cstring_free(s);
     }
 
 /*
@@ -358,7 +356,8 @@ Returns the boolean value of the integer.
 
 =item C<STRING* get_string()>
 
-Returns the string representation of the integer.
+Returns the string representation of the integer with the letter 'L'
+appended.
 
 =cut
 
@@ -367,6 +366,7 @@ Returns the string representation of the integer.
     STRING* get_string() {
         char *s = bigint_get_string(INTERP, SELF);
         STRING *ps = string_from_cstring(INTERP, s, 0);
+        string_append(INTERP, ps, const_string(INTERP, "L"), 0);
         free(s);
         return ps;
     }

@@ -21,7 +21,7 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-   plan tests => 5;
+   plan tests => 9;
 }
 else {
    plan skip_all => "No BigInt Lib configured";
@@ -46,6 +46,26 @@ CODE
 999999
 OUT
 
+output_is(<<'CODE', <<'OUT', "set double, get str");
+   new P0, .BigInt
+   set P0, 1.23e12
+   print P0
+   print "\n"
+   end
+CODE
+1230000000000L
+OUT
+
+output_is(<<'CODE', <<'OUT', "set str, get str");
+   new P0, .BigInt
+   set P0, "1230000000000"
+   print P0
+   print "\n"
+   end
+CODE
+1230000000000L
+OUT
+
 output_is(<<'CODE', <<'OUT', "add");
    new P0, .BigInt
    set P0, 999999
@@ -58,7 +78,20 @@ output_is(<<'CODE', <<'OUT', "add");
    print "\n"
    end
 CODE
-1999999
+1999999L
+OUT
+
+output_is(<<'CODE', <<'OUT', "add_int");
+   new P0, .BigInt
+   set P0, 999999
+   new P2, .BigInt
+   add P2, P0, 1000000
+   set S0, P2
+   print S0
+   print "\n"
+   end
+CODE
+1999999L
 OUT
 
 output_is(<<'CODE', <<'OUT', "mul");
@@ -73,7 +106,19 @@ output_is(<<'CODE', <<'OUT', "mul");
    print "\n"
    end
 CODE
-999999000000
+999999000000L
+OUT
+
+output_is(<<'CODE', <<'OUT', "mul_int");
+   new P0, .BigInt
+   set P0, 999999
+   new P2, .BigInt
+   mul P2, P0, 1000000
+   print P2
+   print "\n"
+   end
+CODE
+999999000000L
 OUT
 
 output_is(<<'CODE', <<'OUT', "add overflow");
@@ -100,7 +145,7 @@ ex:
    end
 CODE
 2100000000 PerlInt
-2200000000 BigInt
-2300000000 BigInt
+2200000000L BigInt
+2300000000L BigInt
 ok
 OUT

@@ -1,0 +1,15 @@
+.sub main @MAIN
+    .local pmc d
+    .local pmc xr
+    d = new PerlHash
+    xr = new Slice[0 .. 1000000]
+    .local pmc sl
+    sl = new Iterator, xr
+    .local pmc value
+    null value
+    d."fromkeys"(sl, value)
+    $I0 = d
+    print $I0
+    print "\n"
+.end
+
