@@ -17,6 +17,7 @@
 #include "imcparser.h"
 
 extern long line;
+extern int expect_eol;
 int yyerror(char *);
 %}
 
@@ -32,7 +33,11 @@ CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
 
 %x emit2
+%s expecteol
 %%
+        /* for emacs: ' */
+        if (expect_eol)
+            BEGIN(expecteol);
 
 ^".emit\n"(.|\n)*".eom\n" {
         char * s = strstr(yytext, ".eom");
@@ -51,8 +56,22 @@ RANKSPEC        \[[,]*\]
 <emit2>^".eom"\n {
         BEGIN(INITIAL);
     }
- 
+
 <emit2>.|\n      ;
+
+<expecteol>[\n] {
+        BEGIN(INITIAL);
+        expect_eol = 0;
+        line++;
+        return '\n';
+    }
+
+<expecteol>#.*[\n] {
+        BEGIN(INITIAL);
+        expect_eol = 0;
+        line++;
+        return '\n';
+    }
 
 [\n]            line++;
 #.*\n           line++;
@@ -112,12 +131,12 @@ RANKSPEC        \[[,]*\]
         return(IDENTIFIER);
     }
 
-{SIGN}?{DIGIT}+"."{DIGIT}+ {    
+{SIGN}?{DIGIT}+"."{DIGIT}+ {
         yylval.s = str_dup(yytext);
         return(FLOATC);
     }
 
-{SIGN}?{DIGIT}+ {    
+{SIGN}?{DIGIT}+ {
         yylval.s = str_dup(yytext);
         return(INTC);
     }
@@ -165,13 +184,13 @@ int yywrap() {
     /* Add code here to open next source file and start scanning
        yywrap returns 0 if scanning is to continue
     */
+    yy_delete_buffer(YY_CURRENT_BUFFER);
     return 1;
 }
 
-#if 0 
+#if 0
 char * str_dup(const char * buf) {
     char * s = malloc(strlen(buf)+1);
-    strcpy(s, buf);
     return s;
 }
 #endif

@@ -74,7 +74,7 @@ imcstack_pop(IMCStack stack)
         /* Need to pop off the last entry */
         stack->prev = chunk->prev;
         stack->prev->next = stack;
-        /* MEMORY LEAK... */
+	free(chunk);
         chunk = stack->prev;
     }
 

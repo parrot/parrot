@@ -1,7 +1,17 @@
-#define IMCC_VERSION "0.0.4.0"
+#define IMCC_VERSION "0.0.4.5"
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifndef _MSC_VER
+#  include <sysexits.h>
+#else
+#  define EX_DATAERR 1
+#  define EX_SOFTWARE 1
+#  define EX_NOINPUT 1
+#  define EX_IOERR 1
+#  define EX_UNAVAILABLE 1
+#endif
 
 #include "symreg.h"
 #include "instructions.h"
@@ -38,6 +48,8 @@ char *str_dup(const char *);
 char *str_cat(const char *, const char *);
 
 int IMCC_DEBUG;
+int IMCC_LIFE_INFO;
+int IMCC_VERBOSE;
 int n_spilled;
 SymReg** interference_graph;
 

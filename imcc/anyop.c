@@ -1,15 +1,7 @@
-#ifndef _MSC_VER
-#  include <sysexits.h>
-#else
-#  define EX_DATAERR 1
-#  define EX_SOFTWARE 1
-#  define EX_NOINPUT 1
-#  define EX_IOERR 1
-#  define EX_UNAVAILABLE 1
-#endif
 #include <stdarg.h>
 
 #include "anyop.h"
+#include "imc.h"
 #include "../../include/parrot/platform.h"
 
 static void * dl_handles[16] = { NULL }; /* try in main first. */
@@ -33,6 +25,19 @@ op_load_file(const char * file) {
 	exit(EX_SOFTWARE);
     }
     dl_handles[lastdl_handle++] = handle;
+}
+
+void
+op_close_lib()
+{
+    int i;
+    for (i = 0; i < lastlib; i++) {
+	free(oplibs[i].name);
+    }
+    for (i = 0; i < lastdl_handle; i++) {
+	if (dl_handles[i])
+	    Parrot_dlclose(dl_handles[i]);
+    }
 }
 
 void

@@ -2,7 +2,7 @@
 /*
  * imcc.y
  *
- * Intermediate language compiler for Parrot. 
+ * Intermediate language compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
  *
@@ -11,16 +11,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h> 
-#ifndef _MSC_VER
-#  include <sysexits.h>
-#else
-#  define EX_DATAERR 1
-#  define EX_SOFTWARE 1
-#  define EX_NOINPUT 1
-#  define EX_IOERR 1
-#  define EX_UNAVAILABLE 1
-#endif
+#include <stdlib.h>
 #include <assert.h>
 #include "imc.h"
 #include "anyop.h"
@@ -31,21 +22,42 @@ int         yyerror(char *);
 int         yylex();
 extern char yytext[];
 long        line;
+int         expect_eol;
 
 /*
  * Choosing instructions for Parrot is pretty easy since
  * many are polymorphic.
  */
+
+
+static SymReg *regs[PARROT_MAX_ARGS];
+static SymReg ** RR(int n, ...)
+{
+    va_list ap;
+    int i = 0;
+
+    va_start(ap, n);
+    while (n--) {
+	regs[i++] = va_arg(ap, SymReg *);
+    }
+    while (i > PARROT_MAX_ARGS)
+	regs[i++] = 0;
+    return regs;
+}
+
+/* intermediate macros for registers */
+#define R2(r0,r1) RR(2,r0,r1)
+#define R regs[0],regs[1],regs[2],regs[3]
+
 SymReg * iMOVE(SymReg *r0, SymReg*r1) {
+    int flags = IF_unary;
+    R2(r0, r1);
     if (r0->set == 'P' && r1->set != 'P') {
 	/* r0 needs read access because set Px, Ax calls Px's set
 	 * method, instead of just clobbering it. */
-	emitb(mk_instruction("set %s, %s", r0, r1, NULL, NULL,
-			     IF_r0_write|IF_r0_read|IF_r1_read));
+	flags = IF_r0_write|IF_r0_read|IF_r1_read;
     }
-    else {
-	emitb(mk_instruction("set %s, %s", r0, r1, NULL, NULL, IF_unary));
-    }
+    emitb(mk_instruction("set %s, %s", R, flags));
     return r0;
 }
 
@@ -282,6 +294,7 @@ SymReg * iNEW(SymReg * r0, char * type) {
     strcpy(op, "new %s, .");
     strcat(op, type);
     emitb(mk_instruction(op, r0, NULL, NULL, NULL, IF_r0_write ));
+    free(type);
     return r0;
 }
 
@@ -297,6 +310,11 @@ SymReg * iDEFINED(SymReg * r0, SymReg * r1) {
     }
     return r0;
 }
+
+/* XXX -lt
+   the address may be the target of a jump
+   must we deal with this - think try/CATCH
+*/
 
 SymReg * iSET_ADDR(SymReg * r0, SymReg * r1) {
     if (r0->set == 'I') {
@@ -350,7 +368,8 @@ SymReg * iCLONE(SymReg * r0, SymReg * r1) {
 }
 
 SymReg * iEMIT(char * assembly) {
-    emitb(mk_instruction(assembly, NULL, NULL, NULL, NULL, 0)); 
+    emitb(mk_instruction(assembly, NULL, NULL, NULL, NULL, 0));
+    free(assembly);
     return 0;
 }
 
@@ -366,7 +385,7 @@ static void
 op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
     int i;
     int key_index = -1;
-    
+
     strcpy(dest, name);
     dest += strlen(name);
     if (strcmp(name, "set") == 0) {
@@ -387,7 +406,7 @@ op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
 	    set = 'I';
 	else
 	    set = args[i]->set;
-	
+
 	*dest++ = '_';
 	if (key_index == i)
 	    *dest++ = 'k';
@@ -397,7 +416,7 @@ op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
     }
     *dest = '\0';
 }
- 
+
 SymReg * iANY(char * name) {
     char fullname[64];
     int i;
@@ -445,7 +464,8 @@ SymReg * iANY(char * name) {
 	emitb(mk_instruction(format, args[0], args[1], args[2], args[3],
 			     dirs));
     } else {
-	fprintf(stderr, "NO Op %s (%s<%d>)\n", fullname, name, nargs);
+	fprintf(stderr, "line %ld: no op %s (%s<%d>)\n",
+		line, fullname, name, nargs);
 	exit(EX_SOFTWARE);
     }
     return NULL;
@@ -483,32 +503,30 @@ void relop_to_op(int relop, char * op) {
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC
 %type <i> type program subs sub sub_start relop
 %type <s> classname opname
-%type <sr> labels label statements statement
-%type <sr> instruction assignment if_statement
+%type <sr> labels _labels label statements statement
+%type <sr> instruction assignment if_statement labeled_inst
 %type <sr> target reg const var rc string
 %type <sr> vars _vars var_or_i
 
-%start program 
+%start program
+
+%expect 3
 
 %%
 
 program:
-    subs emit
-    { $$ = 0; }
+    subs emit				{ $$ = 0; }
     ;
 
 emit:
-    |   EMIT
-        { iEMIT($1); }
+    |   EMIT				{ iEMIT($1); }
     ;
 
-subs:
-        subs sub
+subs:	subs sub
     |   sub
     ;
 
-sub:
-        sub_start statements labels RET
+sub:	sub_start statements labels RET
         {
           $$ = 0; iRET();
 	  allocate();
@@ -517,52 +535,57 @@ sub:
         }
     ;
 
-sub_start:
-        SUB IDENTIFIER
+sub_start: SUB IDENTIFIER
         { $$ = 0;
           iSUBROUTINE(mk_address($2));
         }
     ;
 
-statements:
-        statement
+statements: statement
     |   statements statement
     ;
 
-statement:
-        instruction                      { $$ = $1; }
+statement:  instruction
     ;
 
-labels:
-        labels label
+labels:	/* none */         { $$ = NULL; }
+    |   _labels
+    ;
+
+_labels: _labels label
     |   label
     ;
 
-label:  /* Optional */
-        { $$ = 0; }
-    |   LABEL { $$ = iLABEL(mk_address($1)); }
+label:  LABEL				{ $$ = iLABEL(mk_address($1)); }
     ;
 
 instruction:
-        assignment
+	labels  { expect_eol = 1; } labeled_inst '\n'  { $$ = $3; }
+    ;
+labeled_inst:
+	assignment
     |   if_statement
-    |   labels SYM type IDENTIFIER              { mk_ident($4, $3); }
-    |   labels LOCAL type IDENTIFIER            { mk_ident($4, $3); }
-    |   labels PARAM type IDENTIFIER            { $$ = iPOP(mk_ident($4, $3));}
-    |   labels PARAM reg                        { $$ = iPOP($3); }
-    |   labels ARG var                          { $$ = iARG($3); }
-    |   labels RESULT var                       { $$ = iRESULT($3); }
-    |   labels RETURN var                       { $$ = iRETURN($3); }
-    |   labels CALL IDENTIFIER                  { $$ = iCALL(mk_address($3)); }
-    |   labels GOTO IDENTIFIER                  { $$ = iBRANCH(mk_address($3));}
-    |   labels PUSH var                         { $$ = iPUSH($3); }
-    |   labels POP var                          { $$ = iPOP($3); }
-    |   labels INC var                          { $$ = iINC($3); }
-    |   labels DEC var                          { $$ = iDEC($3); }
-    |   labels PRINT var                        { $$ = iPRINT($3); }
-    |   labels SAVEALL                          { iSAVEALL(); }
-    |   labels RESTOREALL                       { iRESTOREALL(); }
-    |   labels END                              { iEND(); }
+    |   SYM type IDENTIFIER		{ mk_ident($3, $2); }
+    |   LOCAL type IDENTIFIER		{ mk_ident($3, $2); }
+    |   PARAM type IDENTIFIER		{ $$ = iPOP(mk_ident($3, $2));}
+    |   PARAM reg			{ $$ = iPOP($2); }
+    |   ARG var				{ $$ = iARG($2); }
+    |   RESULT var			{ $$ = iRESULT($2); }
+    |   RETURN var			{ $$ = iRETURN($2); }
+    |   CALL IDENTIFIER			{ $$ = iCALL(mk_address($2)); }
+    |   GOTO IDENTIFIER			{ $$ = iBRANCH(mk_address($2));}
+    |   PUSH var			{ $$ = iPUSH($2); }
+    |   POP var				{ $$ = iPOP($2); }
+    |   INC var				{ $$ = iINC($2); }
+    |   DEC var				{ $$ = iDEC($2); }
+    |   PRINT var			{ $$ = iPRINT($2); }
+    |   SAVEALL				{ iSAVEALL(); }
+    |   RESTOREALL			{ iRESTOREALL(); }
+    |   END				{ iEND(); }
+    |  opname				{ nargs = 0;
+    					  memset(args, 0, sizeof(args));
+					}
+       vars 				{ $$ = iANY($1); }
     ;
 
 type:
@@ -577,111 +600,91 @@ classname:
     ;
 
 assignment:
-       labels target '=' var                    { $$ = iMOVE($2, $4); }
-    |  labels target '=' '!' var                { $$ = iNOT($2, $5); }
-    |  labels target '=' '-' var                { $$ = iNEG($2, $5); }
-    |  labels target '=' var '+' var            { $$ = iADD($2, $4, $6); } 
-    |  labels target '=' var '-' var            { $$ = iSUB($2, $4, $6); } 
-    |  labels target '=' var '*' var            { $$ = iMUL($2, $4, $6); } 
-    |  labels target '=' var POW var            { $$ = iPOW($2, $4, $6); }
-    |  labels target '=' var '/' var            { $$ = iDIV($2, $4, $6); } 
-    |  labels target '=' var '%' var            { $$ = iMOD($2, $4, $6); } 
-    |  labels target '=' var '.' var            { $$ = iCONCAT($2, $4, $6); } 
-    |  labels target '=' var SHIFT_LEFT var     { $$ = iSHL($2, $4, $6); } 
-    |  labels target '=' var SHIFT_RIGHT var    { $$ = iSHR($2, $4, $6); } 
-    |  labels target '=' var LOG_XOR var        { $$ = iXOR($2, $4, $6); }
-    |  labels target '=' var '&' var            { $$ = iBAND($2, $4, $6); } 
-    |  labels target '=' var '|' var            { $$ = iBOR($2, $4, $6); } 
-    |  labels target '=' var '~' var            { $$ = iBXOR($2, $4, $6); } 
-    |  labels target '=' var '[' var ']'        { $$ = iINDEXFETCH($2, $4, $6); }
-    |  labels var '[' var ']' '=' var           { $$ = iINDEXSET($2, $4, $7); }
-    |  labels target '=' NEW classname          { $$ = iNEW($2, $5); }
-    |  labels target '=' DEFINED var            { $$ = iDEFINED($2, $5); }
-    |  labels target '=' CLONE var              { $$ = iCLONE($2, $5); }
-    |  labels target '=' ADDR IDENTIFIER        { $$ = iSET_ADDR($2, mk_address($5)); }
-    |  labels target '=' GLOBAL string          { $$ = iGET_GLOBAL($2, $5); }
-    |  labels GLOBAL string '=' var             { $$ = iSET_GLOBAL($3, $5); }
-    |  labels opname { nargs = 0; memset(args, 0, sizeof(args)); }
-                                    vars        { $$ = iANY($2); }
+       target '=' var			{ $$ = iMOVE($1, $3); }
+    |  target '=' '!' var		{ $$ = iNOT($1, $4); }
+    |  target '=' '-' var		{ $$ = iNEG($1, $4); }
+    |  target '=' var '+' var		{ $$ = iADD($1, $3, $5); }
+    |  target '=' var '-' var		{ $$ = iSUB($1, $3, $5); }
+    |  target '=' var '*' var		{ $$ = iMUL($1, $3, $5); }
+    |  target '=' var POW var		{ $$ = iPOW($1, $3, $5); }
+    |  target '=' var '/' var		{ $$ = iDIV($1, $3, $5); }
+    |  target '=' var '%' var		{ $$ = iMOD($1, $3, $5); }
+    |  target '=' var '.' var		{ $$ = iCONCAT($1, $3, $5); }
+    |  target '=' var SHIFT_LEFT var	{ $$ = iSHL($1, $3, $5); }
+    |  target '=' var SHIFT_RIGHT var	{ $$ = iSHR($1, $3, $5); }
+    |  target '=' var LOG_XOR var	{ $$ = iXOR($1, $3, $5); }
+    |  target '=' var '&' var		{ $$ = iBAND($1, $3, $5); }
+    |  target '=' var '|' var		{ $$ = iBOR($1, $3, $5); }
+    |  target '=' var '~' var		{ $$ = iBXOR($1, $3, $5); }
+    |  target '=' var '[' var ']'	{ $$ = iINDEXFETCH($1, $3, $5); }
+    |  var '[' var ']' '=' var		{ $$ = iINDEXSET($1, $3, $6); }
+    |  target '=' NEW classname		{ $$ = iNEW($1, $4); }
+    |  target '=' DEFINED var		{ $$ = iDEFINED($1, $4); }
+    |  target '=' CLONE var		{ $$ = iCLONE($1, $4); }
+    |  target '=' ADDR IDENTIFIER	{ $$ = iSET_ADDR($1, mk_address($4)); }
+    |  target '=' GLOBAL string		{ $$ = iGET_GLOBAL($1, $4); }
+    |  GLOBAL string '=' var		{ $$ = iSET_GLOBAL($2, $4); }
     ;
 
 if_statement:
-       labels IF var relop var GOTO IDENTIFIER
-       { $$ = iIF($4, $3, $5, mk_address($7)); }
-    |  labels IF var GOTO IDENTIFIER
-       { $$ = iIF1("if",$3, mk_address($5)); }
-    |  labels UNLESS var GOTO IDENTIFIER
-       { $$ = iIF1("unless", $3, mk_address($5)); }
+       IF var relop var GOTO IDENTIFIER
+				{ $$ = iIF($3, $2, $4, mk_address($6)); }
+    |  IF var GOTO IDENTIFIER
+		       		{ $$ = iIF1("if",$2, mk_address($4)); }
+    |  UNLESS var GOTO IDENTIFIER
+				{ $$ = iIF1("unless", $2, mk_address($4)); }
     ;
 
 relop:
-       RELOP_EQ { $$ = RELOP_EQ; }
-    |  RELOP_NE { $$ = RELOP_NE; }
-    |  RELOP_GT { $$ = RELOP_GT; }
-    |  RELOP_GTE { $$ = RELOP_GTE; }
-    |  RELOP_LT { $$ = RELOP_LT; }
-    |  RELOP_LTE { $$ = RELOP_LTE; }
+       RELOP_EQ				{ $$ = RELOP_EQ; }
+    |  RELOP_NE				{ $$ = RELOP_NE; }
+    |  RELOP_GT				{ $$ = RELOP_GT; }
+    |  RELOP_GTE			{ $$ = RELOP_GTE; }
+    |  RELOP_LT				{ $$ = RELOP_LT; }
+    |  RELOP_LTE			{ $$ = RELOP_LTE; }
     ;
 
-opname:
-    IDENTIFIER { $$ = $1; }
+opname: IDENTIFIER
     ;
 
-target:
-       IDENTIFIER
-       { $$ = get_sym($1); }
-    |  reg 
+target: IDENTIFIER			{ $$ = get_sym($1); free($1) }
+    |  reg
     ;
 
-vars:  { $$ = NULL; }
-    |  _vars { $$ = $1; }
+vars:   { $$ = NULL; }
+    |  _vars  { $$ = $1; }
     ;
 
-_vars: _vars COMMA var_or_i { args[nargs++] = $3; $$ = args[0]; }
-    |  var_or_i { args[nargs++] = $1; $$ = $1; }
+_vars: _vars COMMA var_or_i		{ args[nargs++] = $3; $$ = args[0]; }
+    |  var_or_i				{ args[nargs++] = $1; $$ = $1; }
     ;
 
 var_or_i:
-       IDENTIFIER { $$ = mk_address($1); }
+       IDENTIFIER			{ $$ = mk_address($1); }
     |  rc
     ;
 
-var:
-       IDENTIFIER
-       { $$ = get_sym($1); }
+var:   IDENTIFIER		       { $$ = get_sym($1); free($1) }
     |  rc
     ;
 
-rc:
-       reg
-    |  const
+rc:	reg
+    |	const
     ;
 
-reg:
-       IREG
-       { $$ = mk_symreg($1, 'I'); }
-    |  NREG
-       { $$ = mk_symreg($1, 'N'); }
-    |  SREG
-       { $$ = mk_symreg($1, 'S'); }
-    |  PREG
-       { $$ = mk_symreg($1, 'P'); }
+reg:   IREG				{ $$ = mk_symreg($1, 'I'); }
+    |  NREG				{ $$ = mk_symreg($1, 'N'); }
+    |  SREG				{ $$ = mk_symreg($1, 'S'); }
+    |  PREG				{ $$ = mk_symreg($1, 'P'); }
     ;
 
-const:
-       INTC
-       { $$ = mk_const($1, 'I'); }
-    |  FLOATC
-       { $$ = mk_const($1, 'N'); }
-    |  STRINGC
-       { $$ = mk_const($1, 'S'); }
+const: INTC				{ $$ = mk_const($1, 'I'); }
+    |  FLOATC				{ $$ = mk_const($1, 'N'); }
+    |  STRINGC				{ $$ = mk_const($1, 'S'); }
     ;
- 
-string:
-       SREG
-       { $$ = mk_symreg($1, 'S'); }
-    |  STRINGC
-       { $$ = mk_const($1, 'S'); }
+
+string: SREG				{ $$ = mk_symreg($1, 'S'); }
+    |  STRINGC				{ $$ = mk_const($1, 'S'); }
     ;
 %%
 
@@ -691,13 +694,34 @@ int IMCC_DEBUG = 0;
 int main(int argc, char * argv[])
 {
     char* output;
-    
-    if( argc > 1 && ! strcmp (argv[1], "--debug")) {
-    	IMCC_DEBUG = 1;
-	argc--;
-	argv++;
+    while (argc > 1) {
+	if(! strcmp (argv[1], "--debug")) {
+	    IMCC_DEBUG = 1;
+	    argc--;
+	    argv++;
+	    continue;
+	}
+	if(! strcmp (argv[1], "--yydebug")) {
+	    yydebug = 1;
+	    argc--;
+	    argv++;
+	    continue;
+	}
+	if(! strcmp (argv[1], "--verbose")) {
+	    IMCC_VERBOSE = 1;
+	    argc--;
+	    argv++;
+	    continue;
+	}
+	if(! strcmp (argv[1], "--life-info")) {
+	    IMCC_LIFE_INFO = 1;
+	    argc--;
+	    argv++;
+	    continue;
+	}
+	break;
     }
-    
+
     if (argc <= 1) {
         fprintf(stderr, "No source file specified.\n" );
         exit(EX_NOINPUT);
@@ -707,16 +731,11 @@ int main(int argc, char * argv[])
         fprintf(stderr, "Error reading source file %s.\n", argv[1] );
         exit(EX_IOERR);
     }
-   
+
     if (IMCC_DEBUG)
 	fprintf(stderr, "loading libs...");
-#ifdef _MSC_VER
-    op_load_file("../../blib/lib/libparrot.dll");
-#else
     op_load_file("../../blib/lib/libparrot.so");
-#endif
-    op_load_lib("core", PARROT_MAJOR_VERSION, PARROT_MINOR_VERSION,
-                        PARROT_PATCH_VERSION);
+    op_load_lib("core", 0, 0, 7);
     if (IMCC_DEBUG)
 	fprintf(stderr, "done\n");
 
@@ -724,16 +743,16 @@ int main(int argc, char * argv[])
 
     if (IMCC_DEBUG)
     	fprintf(stderr, "Pass 1: Starting parse...\n");
-    
+
     if (argc > 2) {
         output = argv[2];
     }
     else {
         output = "a.pasm";
     }
-    
+
     freopen(output, "w", stdout);
-    
+
     yyparse();
 
     /* Flush any pending code such as .emits */
@@ -741,16 +760,19 @@ int main(int argc, char * argv[])
 
     fclose(yyin);
     fclose(stdout);
+    op_close_lib();
 
-    fprintf(stderr, "%ld lines compiled.\n", line);
-    fprintf(stderr, "Compiling assembly module %s\n", output);
+    if (IMCC_VERBOSE) {
+	fprintf(stderr, "%ld lines compiled.\n", line);
+	fprintf(stderr, "Compiling assembly module %s\n", output);
+    }
 
     return 0;
 }
 
 int yyerror(char * s)
 {
-    fprintf(stderr, "last token = [%s]\n", yylval.s); 
+    fprintf(stderr, "last token = [%s]\n", yylval.s);
     fprintf(stderr, "(error) line %ld: %s\n", line, s );
     fprintf(stderr, "Didn't create output asm.\n" );
     exit(EX_UNAVAILABLE);

@@ -24,5 +24,6 @@ op_t op_find(const char * name, int nargs, ...);
 void op_dump();
 op_info_t * op_info(op_t op);
 void print_op_info(FILE * file, op_info_t * info);
+void op_close_lib(void);
 
 #endif /* _anyop_h */

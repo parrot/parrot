@@ -5,9 +5,10 @@
 typedef struct _edge {
     struct _basic_block *from;
     struct _edge *pred_next;
-    
+
     struct _basic_block *to;
     struct _edge *succ_next;
+    struct _edge *next;
 } Edge;
 
 
@@ -17,7 +18,7 @@ typedef struct _basic_block {
     Edge *pred_list;
     Edge *succ_list;
     int loop_depth;
-    int index;                  /*on bb_list*/   
+    int index;                  /*on bb_list*/
 } Basic_block;
 
 /* Globals: */
@@ -47,3 +48,4 @@ void init_basic_blocks();
 Basic_block* make_basic_block(Instruction*);
 void clear_basic_blocks();
 Life_range* make_life_range(SymReg*, int);
+int blocks_are_connected(Basic_block *from, Basic_block *to);

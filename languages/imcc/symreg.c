@@ -11,23 +11,19 @@
 
 /* Code: */
 
-/* Makes a new SymReg from its varname and type */ 
-SymReg * mk_symreg(const char * name, char t) {
+/* Makes a new SymReg from its varname and type */
+SymReg * mk_symreg(char * name, char t) {
     SymReg * r;
-    if((r = get_sym(name)))
+    if((r = get_sym(name))) {
+	free(name);
         return r;
+    }
     r = calloc(1, sizeof(SymReg));
     if (r==NULL) {
 	fprintf(stderr, "Memory error at mk_symreg\n");
 	abort();
     }
-    r->name = str_dup(name);
-    r->reg = str_dup(name);
-    if(t == 'I') r->fmt = str_dup("I%d");
-    else if(t == 'N') r->fmt = str_dup("N%d");
-    else if(t == 'S') r->fmt = str_dup("S%d");
-    else if(t == 'P') r->fmt = str_dup("P%d");
-    r->first = -1;
+    r->name = name;
     r->color = -1;
     r->score = 0;
     r->set = t;
@@ -41,25 +37,33 @@ SymReg * mk_symreg(const char * name, char t) {
 }
 
 /* Makes a new identifier */
-SymReg * mk_ident(const char * name, char t) {
+SymReg * mk_ident(char * name, char t) {
     SymReg * r = mk_symreg(name, t);
     r->type = VTIDENTIFIER;
     return r;
 }
 
+void free_sym(SymReg *r)
+{
+    free(r->name);
+    if (r->life_info) {
+    }
+    free(r);
+}
+
 /* Makes a new constant*/
-SymReg * mk_const(const char * name, char t) {
+SymReg * mk_const(char * name, char t) {
     SymReg * r;
-    if((r = get_sym(name)))
+    if((r = get_sym(name))) {
+	free(name);
         return r;
+    }
     r = calloc(1, sizeof(SymReg));
     if (r==NULL) {
 	fprintf(stderr, "Memory error at mk_const\n");
 	abort();
     }
-    r->name = str_dup(name);
-    r->reg = str_dup(name);
-    r->first = -1;
+    r->name = name;
     r->color = -1;
     r->score = 0;
     r->set = t;
@@ -72,18 +76,18 @@ SymReg * mk_const(const char * name, char t) {
 }
 
 /* Makes a new address */
-SymReg * mk_address(const char * name) {
+SymReg * mk_address(char * name) {
     SymReg * r;
-    if((r = get_sym(name)))
+    if((r = get_sym(name))) {
+	free(name);
         return r;
+    }
     r = calloc(1, sizeof(SymReg));
     if (r==NULL) {
 	fprintf(stderr, "Memory error at mk_address\n");
 	abort();
     }
-    r->name = str_dup(name);
-    r->reg = str_dup(name);
-    r->first = -1;
+    r->name = name;
     r->color = -1;
     r->score = 0;
     r->type = VTADDRESS;
@@ -97,7 +101,7 @@ SymReg * mk_address(const char * name) {
 
 /*
  * This functions manipulate the hash of symbols.
- * 
+ *
  */
 
 /* Stores a symbol into the hash */
@@ -121,8 +125,13 @@ SymReg * get_sym(const char * name) {
 /* Deletes all symbols */
 void clear_tables() {
     int i;
+    SymReg * p, *next;
     for(i = 0; i < HASH_SIZE; i++) {
-	/* Memory leak */
+	for(p = hash[i]; p; ) {
+	    next = p->next;
+	    free_sym(p);
+	    p = next;
+	}
         hash[i] = NULL;
     }
 }
@@ -137,5 +146,5 @@ unsigned int hash_str(const char * str) {
     const char * s;
     for(s=str; *s; s++)
         key = key * 65599 + *s;
-    return key;    
+    return key;
 }
