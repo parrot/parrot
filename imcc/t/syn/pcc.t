@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 33;
+use TestCompiler tests => 34;
 
 ##############################
 # Parrot Calling Conventions
@@ -60,6 +60,42 @@ CODE
 5
 6
 7
+OUT
+
+output_is(<<'CODE', <<'OUT', "basic syntax - order of return values");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin prototyped
+    .pcc_call sub
+    ret:
+    .local int A
+    .local int B
+    .local int C
+    .result A
+    .result B
+    .result C
+    .pcc_end
+    print A
+    print "\n"
+    print B
+    print "\n"
+    print C
+    print "\n"
+    end
+.end
+.pcc_sub _sub prototyped
+    .pcc_begin_return
+    .return 10
+    .return 20
+    .return 30
+    .pcc_end_return
+    end
+.end
+CODE
+10
+20
+30
 OUT
 
 ##############################
