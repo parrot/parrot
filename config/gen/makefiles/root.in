@@ -182,16 +182,16 @@ check_source : $(GENERAL_H_FILES)
 blib :
 	-mkdir blib
 
-blib_lib : blib
+blib/lib : blib
 	-mkdir blib${slash}lib
 
-shared : blib_lib blib/lib/libparrot$(SO) ${blib_lib_libparrot_a} $(TEST_PROG_SO)
+shared : blib/lib blib/lib/libparrot$(SO) ${blib_lib_libparrot_a} $(TEST_PROG_SO)
 
 # XXX Unix-only for now
-blib/lib/libparrot$(A) : blib_lib $(O_DIRS) $(O_FILES)
+blib/lib/libparrot$(A) : blib/lib $(O_DIRS) $(O_FILES)
 	$(AR_CRS) $@ $(O_FILES)
 
-blib/lib/libparrot$(SO) : blib_lib $(O_DIRS) $(O_FILES)
+blib/lib/libparrot$(SO) : blib/lib $(O_DIRS) $(O_FILES)
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)
 
 $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
@@ -201,7 +201,7 @@ $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
 #     because those should be done at "make install" and not "make shared"
 #     It also makes the task of getting this working on win32 much easier. :)
 #
-#blib/lib/libparrot$(SO).${VERSION} : blib_lib $(O_DIRS) $(O_FILES)
+#blib/lib/libparrot$(SO).${VERSION} : blib/lib $(O_DIRS) $(O_FILES)
 #	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
 #
 #blib/lib/libparrot$(SO).${MAJOR}.${MINOR} : blib/lib/libparrot$(SO).${VERSION}
@@ -216,7 +216,7 @@ $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
 #	$(RM_F) $@
 #	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
 #
-#blib/lib/libcore_prederef$(SO).${VERSION} : blib_lib core_ops_prederef$(O)
+#blib/lib/libcore_prederef$(SO).${VERSION} : blib/lib core_ops_prederef$(O)
 #	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
 #
 #blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR} : blib/lib/libcore_prederef$(SO).${VERSION}
