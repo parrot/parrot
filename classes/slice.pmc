@@ -1,0 +1,84 @@
+/*
+Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/slice.pmc - Slice PMC
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the slice PMC class.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass Slice need_ext extends Key {
+
+    INTVAL get_integer() {
+        PMC *key = PMC_pmc_val(SELF);
+        /* TODO check range */
+        INTVAL v = key_integer(INTERP, key);
+        /* printf("Slice_get_integer %d\n", (int)v); */
+        return v;
+    }
+
+    PMC* nextkey_keyed (PMC* agg, INTVAL what) {
+        PMC *ret = SELF;
+        PMC *current_key;
+
+        /* printf("Slice_next what = %d\n", (int)what) */;
+        switch (what) {
+            case ITERATE_FROM_START:
+            case ITERATE_FROM_START_KEYS:    /* reset key */
+                /*
+                 * need a new Slice PMC that hold's the state
+                 * especially PMC_data() must be zero
+                 */
+                ret = pmc_new_noinit(INTERP, enum_class_Slice);
+                PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
+                PObj_get_FLAGS(ret) |= KEY_pmc_FLAG;
+
+                PMC_struct_val(ret) = NULL;
+                PMC_data(ret) = NULL;
+                /*
+                 * key_pmc needs this
+                 */
+                PMC_pmc_val(ret) = SELF;
+                break;
+            case ITERATE_GET_NEXT:
+                current_key = PMC_pmc_val(SELF);
+                /* TODO check range */
+                PMC_pmc_val(SELF) = PMC_data(current_key);
+                if (!PMC_pmc_val(SELF))
+                    PMC_int_val(SELF) = -1;
+                break;
+        }
+        return ret;
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
