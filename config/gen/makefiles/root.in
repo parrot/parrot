@@ -192,9 +192,9 @@ ${make_set_make}
 
 all : flags_dummy $(TEST_PROG) $(IMCC_PROG) docs
 
-world: all utils
+world: all parrot_utils
 
-utils: $(PDUMP) $(DIS) $(PINFO) $(PDB)
+parrot_utils: $(PDUMP) $(DIS) $(PINFO) $(PDB)
 
 flags_dummy:
 	echo Compiling with:

@@ -11,6 +11,7 @@
  * References:
  */
 
+#include <parrot/parrot.h>
 #include "parrot/embed.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +20,8 @@
 #define na(c) { \
     while(*c && !isspace(*c)) \
         c++; }
+
+static void do_dis(Parrot_Interp);
 
 int
 main(int argc, char *argv[])
@@ -33,6 +36,7 @@ main(int argc, char *argv[])
         return 1;
     }
 
+    interpreter->lo_var_ptr = &interpreter;
     Parrot_init(interpreter);
 
     if (argc != 2) {
@@ -51,13 +55,18 @@ main(int argc, char *argv[])
 
     Parrot_loadbc(interpreter, pf);
 
-    Parrot_disassemble(interpreter);
+    do_dis(interpreter);
 
-    Parrot_destroy(interpreter);
+    Parrot_exit(0);
 
     return 0;
 }
 
+static void
+do_dis(Parrot_Interp interpreter)
+{
+    Parrot_disassemble(interpreter);
+}
 /*
  * Local variables:
  * c-indentation-style: bsd
