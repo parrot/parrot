@@ -14,6 +14,7 @@
     print "Creating socket.\n"
     # create the socket handle 
     socket sock, 2, 1, 0
+    unless sock goto ERR
     # Pack a sockaddr_in structure with IP and port
     sockaddr address, 7, "127.0.0.1"
     print "Connecting to port 7 (ECHO)\n"
@@ -34,6 +35,9 @@ COMMAND:
     if ret < 0 goto END
     print buf 
     branch COMMAND
+ERR:
+    print "Socket error, you may not have compiled with PARROT_SOCKET_DEF (see io/io_private.h)\n"
+    end
 END:
     close sock 
     end
