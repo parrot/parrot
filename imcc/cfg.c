@@ -52,20 +52,24 @@ void find_basic_blocks () {
         /* invoke w/o arg implicitly uses P0, so mark it as doing so
          * XXX but in the parser
          */
-        if (ins->opsize == 1 && !strcmp(ins->op, "invoke")) {
-            SymReg * p0 = mk_pasm_reg(str_dup("P0"));
-            add_instruc_reads(ins, p0);
-            ins->type |= 1;      /* mark branch register */
-            dont_optimize = 1;  /* too complex, to follow */
-            optimizer_level &= ~OPT_PASM;
-            p0->use_count++;
+        if ( !strcmp(ins->op, "invoke")) {
+            if (ins->opsize == 1) {
+                SymReg * p0 = mk_pasm_reg(str_dup("P0"));
+                add_instruc_reads(ins, p0);
+                ins->type |= 1;      /* mark branch register */
+                dont_optimize = 1;  /* too complex, to follow */
+                optimizer_level &= ~OPT_PASM;
+                p0->use_count++;
+            }
+            ins->type |= IF_r0_branch | ITBRANCH;
         }
-        /* a LABEL starts a new basic block, but not, if we have
-         * a new one (last was a branch) */
         if ( (ins->type & ITLABEL)) {
             /* set the labels address (ins) */
             ins->r[0]->first_ins = ins;
         }
+        /* a LABEL starts a new basic block, but not, if we already have
+         * a new one (last was a branch)
+         */
         if (nu)
             nu = 0;
         else if ( (ins->type & ITLABEL)) {
@@ -163,6 +167,7 @@ void build_cfg() {
         if (addr)
             bb_findadd_edge(bb, addr);
         if (!strcmp(bb->end->op, "ret")) {
+            Instruction * sub;
             int found = 0;
             debug(DEBUG_CFG, "found ret in bb %d\n", i);
             /* now go back, find labels and connect these with
@@ -170,15 +175,15 @@ void build_cfg() {
              */
             for (pred = bb->pred_list; pred; pred=pred->next) {
                 if (!strcmp(pred->from->end->op, "bsr")) {
-                    Instruction * sub;
 
                     SymReg *r = pred->from->end->r[0];
 
-                    j = pred->from->index;
                     sub = pred->to->start;
                     if ((sub->type & ITLABEL) &&
                             (!strcmp(sub->r[0]->name, r->name)))
                         found = 1;
+invok:
+                    j = pred->from->index;
                     if (found) {
                         int saves = 0;
                         debug(DEBUG_CFG, "\tcalled from bb %d '%s'\n",
@@ -200,6 +205,11 @@ void build_cfg() {
                                 saves ? "yes" : "no");
                         break;
                     }
+                }
+                else if (!strcmp(pred->from->end->op, "invoke")) {
+                    found = 1;
+                    sub = pred->to->start;
+                    goto invok;
                 }
             }
             if (!found)
@@ -223,7 +233,7 @@ void bb_findadd_edge(Basic_block *from, SymReg *label) {
         debug(DEBUG_CFG, "register branch %s ",
                 ins_string(from->end));
         for (ins = from->end; ins; ins = ins->prev) {
-            if ((ins->type & ITBRANCH) && !strcmp(ins->op, "set_addr") &&
+            if (!strcmp(ins->op, "set_addr") &&
                     ins->r[1]->first_ins) {
                 bb_add_edge(from, bb_list[ins->r[1]->first_ins->bbindex]);
                 debug(DEBUG_CFG, "(%s) ", ins->r[1]->name);

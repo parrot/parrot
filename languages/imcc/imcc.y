@@ -348,34 +348,27 @@ iANY(struct Parrot_Interp *interpreter, char * name,
         /* fill iin oplib's info */
         ins->opnum = op;
         ins->opsize = op_info->arg_count;
+        /* mark end as absolute branch */
+        if (!strcmp(name, "end")) {
+            ins->type |= ITBRANCH | IF_goto;
+        }
         /* set up branch flags */
-        if (op_info->jump || !strcmp(name, "end")) {
+        if (op_info->jump) {
 
-#if 0
-            if (!strcmp(name, "bsr") || !strcmp(name, "ret")) {
-                /* ignore subcalls and ret
-                 * because they saveall
-                 */
-            }
+            /* XXX: assume the jump is relative and to the last arg.
+             * usually true.
+             */
+            if (op_info->jump & PARROT_JUMP_RESTART)
+                ins->type = ITBRANCH;
             else
-#endif
-            {
-
-                /* XXX: assume the jump is relative and to the last arg.
-                 * usually true.
-                 */
-                if (op_info->jump & PARROT_JUMP_RESTART)
-                    ins->type = ITBRANCH;
-                else
-                    ins->type = ITBRANCH | (1 << (nargs-1));
-                if (!strcmp(name, "branch") || !strcmp(name, "end"))
-                    ins->type |= IF_goto;
-                if (!strcmp(fullname, "jump_i") ||
-                        !strcmp(fullname, "jsr_i") ||
-                        !strcmp(fullname, "branch_i") ||
-                        !strcmp(fullname, "bsr_i"))
-                    dont_optimize = 1;
-            }
+                ins->type = ITBRANCH | (1 << (nargs-1));
+            if (!strcmp(name, "branch"))
+                ins->type |= IF_goto;
+            if (!strcmp(fullname, "jump_i") ||
+                    !strcmp(fullname, "jsr_i") ||
+                    !strcmp(fullname, "branch_i") ||
+                    !strcmp(fullname, "bsr_i"))
+                dont_optimize = 1;
         }
         else if (!strcmp(name, "set") && nargs == 2) {
             /* set Px, Py: both PMCs have the same address */
@@ -383,7 +376,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
                 ins->type |= ITALIAS;
         }
         else if (!strcmp(name, "set_addr")) {
-            /* XXX probably a CATCH block */
+            /* mark this as branch, because it needs fixup */
             ins->type = ITADDR | IF_r1_branch | ITBRANCH;
         }
         else if (!strcmp(name, "compile"))
