@@ -21,57 +21,38 @@ pmclass Sub {
    }
 
    void init () {
-       PMC_data(SELF) = new_sub(INTERP, (opcode_t*)0);
-       PObj_custom_mark_destroy_SETALL(SELF);
+       SELF->cache.struct_val = NULL;
    }
 
-   void mark () {
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
-        mark_stack(INTERP, sub->ctx.pad_stack);
-   }
-
-   void destroy () {
-       struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
-       stack_destroy(sub->ctx.pad_stack);
-       mem_sys_free(sub);
-   }
 
    void set_integer (PMC * value) {
-       ((struct Parrot_Sub*)PMC_data(SELF))->address =
-	       (opcode_t*)VTABLE_get_integer(INTERP, value);
+       SELF->cache.struct_val = (void *)VTABLE_get_integer(INTERP, value);
    }
 
    void set_integer_native (INTVAL value) {
-       ((struct Parrot_Sub*)PMC_data(SELF))->address = (opcode_t*)value;
+       SELF->cache.struct_val = (void *)value;
    }
 
    INTVAL defined () {
-       return ((struct Parrot_Sub*)PMC_data(SELF))->address != NULL;
+       return SELF->cache.struct_val != NULL;
    }
 
    void* invoke (void* next) {
-       struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
-       INTERP->ctx.pad_stack = sub->ctx.pad_stack;
-
-       return sub->address;
+       return SELF->cache.struct_val;
    }
 
    void clone (PMC *ret) {
-       struct Parrot_Sub * sub;
-       PObj_custom_mark_destroy_SETALL(ret);
-       sub = PMC_data(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
-       memcpy(sub, PMC_data(SELF), sizeof(struct Parrot_Sub));
-       stack_mark_cow(sub->ctx.pad_stack);
+       ret->cache.struct_val = SELF->cache.struct_val;
    }
 
     void set_same (PMC* value) {
-        PMC_data(SELF) = PMC_data(value);
+       SELF->cache.struct_val = value->cache.struct_val;
+
     }
 
     INTVAL is_equal (PMC* value) {
-        return (SELF->vtable == value->vtable
-                && memcmp(PMC_data(value), PMC_data(SELF),
-                          sizeof(struct Parrot_Sub)) == 0);
+        return SELF->vtable == value->vtable &&
+	       SELF->cache.struct_val == value->cache.struct_val;
     }
 
 }

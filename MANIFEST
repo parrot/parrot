@@ -23,6 +23,7 @@ chartypes/unicode.c
 chartypes/usascii.c
 classes/array.pmc
 classes/boolean.pmc
+classes/closure.pmc
 classes/compiler.pmc
 classes/continuation.pmc
 classes/coroutine.pmc

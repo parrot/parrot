@@ -14,14 +14,14 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass Coroutine extends Sub {
+pmclass Coroutine extends Closure {
 
     STRING* name () {
         return whoami;
     }
 
     void init () {
-        PMC_data(SELF) = new_coroutine(INTERP, NULL);
+        PMC_data(SELF) = new_coroutine(INTERP);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -46,8 +46,8 @@ pmclass Coroutine extends Sub {
 
     void* invoke (void* next) {
         struct Parrot_Coroutine* co = (struct Parrot_Coroutine*)PMC_data(SELF);
-        void * dest = co->address;
-        co->address = (opcode_t *)next;
+        void * dest = SELF->cache.struct_val;
+        SELF->cache.struct_val = next;
 	swap_context(interpreter, &co->ctx);
 
         return dest;

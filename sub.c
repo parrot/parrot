@@ -52,13 +52,13 @@ restore_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
     memcpy(&interp->ctx, ctx, sizeof(*ctx));
 }
 
-struct Parrot_Sub *
-new_sub(struct Parrot_Interp *interp, opcode_t *address)
+struct Parrot_Closure *
+new_closure(struct Parrot_Interp *interp)
 {
     /* Using system memory until I figure out GC issues */
-    struct Parrot_Sub *newsub = mem_sys_allocate(sizeof(struct Parrot_Sub));
+    struct Parrot_Closure *newsub =
+        mem_sys_allocate(sizeof(struct Parrot_Closure));
     PMC * pad = scratchpad_get_current(interp);
-    newsub->address = address;
     newsub->ctx.pad_stack = new_stack(interp);
     if (pad) {
         /* put the correct pad in place */
@@ -69,13 +69,12 @@ new_sub(struct Parrot_Interp *interp, opcode_t *address)
 }
 
 struct Parrot_Coroutine *
-new_coroutine(struct Parrot_Interp *interp, opcode_t *address)
+new_coroutine(struct Parrot_Interp *interp)
 {
     /* Using system memory until I figure out GC issues */
     PMC * pad = NULL;
     struct Parrot_Coroutine *newco =
         mem_sys_allocate(sizeof(struct Parrot_Coroutine));
-    newco->address = NULL;
     newco->ctx.user_stack = new_stack(interp);
     newco->ctx.control_stack = new_stack(interp);
     newco->ctx.pad_stack = new_stack(interp);
@@ -90,11 +89,10 @@ new_coroutine(struct Parrot_Interp *interp, opcode_t *address)
 }
 
 struct Parrot_Continuation *
-new_continuation(struct Parrot_Interp *interp, opcode_t *address)
+new_continuation(struct Parrot_Interp *interp)
 {
     struct Parrot_Continuation *cc =
         mem_sys_allocate(sizeof(struct Parrot_Continuation));
-    cc->address = address;
     save_context(interp, &cc->ctx);
     return cc;
 }
@@ -104,7 +102,7 @@ PMC *
 new_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)
 {
     PMC* continuation = pmc_new(interp, enum_class_Continuation);
-    ((struct Parrot_Continuation*)PMC_data(continuation))->address = address;
+    continuation->cache.struct_val = address;
     return continuation;
 }
 

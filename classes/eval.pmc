@@ -16,7 +16,7 @@
 #include "parrot/interp_guts.h"
 #include "parrot/packfile.h"
 
-pmclass Eval extends Sub {
+pmclass Eval extends Closure {
 
    STRING* name () {
 	return whoami;
@@ -43,7 +43,7 @@ pmclass Eval extends Sub {
        }
        /* restore ctx */
        interpreter->ctx.pad_stack =
-	       ((struct Parrot_Sub*) PMC_data(SELF))->ctx.pad_stack;
+	       ((struct Parrot_Closure*) PMC_data(SELF))->ctx.pad_stack;
        /* if code jumped to different code segment, go out of runloop
 	* which then actually will switch segments */
        if (interpreter->resume_flag & 2)

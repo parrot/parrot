@@ -218,7 +218,7 @@ main:
 foo:
     new_pad 0
     store_lex 0, "n", P5
-    new P5, .Sub	# P5 has now the lexical "n" in the pad
+    new P5, .Closure	# P5 has now the lexical "n" in the pad
     set_addr I3, f
     set P5, I3
     invoke P1		# ret
