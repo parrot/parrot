@@ -3530,7 +3530,13 @@ inline op clearp() {
 =item B<pops>()
 
 Restore all the registers of the type indicated in the name of the operation
-from the most recently B<push>ed copies.
+from the most recently B<push>ed register frames.
+
+A register frame holds only 16 registers, so we pop two frames from the 
+frame stack. We use the first frame to restore registers 16-31, and the 
+second frame to restore registers 0-15. By restoring in this order, we 
+ensure that a C<push> followed by a C<pop> returns the working set of 
+registers to their original state.
 
 =cut
 
@@ -3568,8 +3574,8 @@ inline op popp() {
 
 =item B<popbottoms>()
 
-Restores registers 0-15 of the type indicated in the name of the operation
-from the most recently B<push>ed copies.
+Restore registers 0-15 of the type indicated in the name of the operation
+from a register frame popped off the corresponding frame stack.
 
 =cut
 
@@ -3603,8 +3609,8 @@ inline op popbottomp() {
 
 =item B<poptops>()
 
-Restores registers 16-31 of the type indicated in the name of the operation
-from the most recently B<push>ed copies.
+Restore registers 16-31 of the type indicated in the name of the operation
+from a register frame popped off the corresponding frame stack.
 
 =cut
 
@@ -3639,7 +3645,12 @@ inline op poptopp() {
 
 =item B<pushs>()
 
-Save all the registers of the type indicated in the name of the operation.
+Save all the registers of the type indicated in the name of the operation
+on the appropriate register frame stack.
+
+A register frame holds only 16 registers, so we push two frames onto the 
+stack. The first frame holds the values from registers 0-15; the second
+frame holds the values from registers 16-31. 
 
 =cut
 
@@ -3669,6 +3680,7 @@ inline op pushp() {
 
 
 =cut
+
 ########################################
 
 =item B<pushtopi>()
@@ -3679,7 +3691,8 @@ inline op pushp() {
 
 =item B<pushtops>()
 
-Save registers 16-31 on the appropriate register stack
+Save registers 16-31 of the type indicated in the name of the operation
+on the appropriate register frame stack.
 
 =cut
 
@@ -3705,6 +3718,7 @@ inline op pushtopp() {
 
 
 =cut
+
 ########################################
 
 =item B<pushbottomi>()
@@ -3715,7 +3729,8 @@ inline op pushtopp() {
 
 =item B<pushbottoms>()
 
-Save all the registers of the type indicated in the name of the operation.
+Save registers 0-15 of the type indicated in the name of the operation
+on the appropriate register frame stack.
 
 =cut
 
@@ -4011,19 +4026,51 @@ inline op intdepth(out INT) {
 
 =item B<saveall>()
 
-Save all the registers.
+Save all of the registers onto the appropriate frame stacks.
+This op is equivalent to:
+
+        pushi
+        pushn
+        pushs
+        pushp
+
+(or some other permutation of these ops).
 
 =item B<restoreall>()
 
-Restore all the registers.
+Restore all the registers from the appropriate frame stacks.
+This op is equivalent to:
+
+        popi
+        popn
+        pops
+        popp
+
+(or some other permutation of these ops).
 
 =item B<savetop>()
 
-Save registers 16-31 of all the register sets
+Save registers 16-31 of all the register sets on the appropriate frame stacks.
+This op is equivalent to:
+
+        pushtopi
+        pushtopn
+        pushtops
+        pushtopp
+
+(or some other permutation of these ops).
 
 =item  B<restoretop>()
 
-Restore registers 16-31 of all the register sets
+Restore registers 16-31 of all the register sets from the appropriate frame 
+stacks. This op is equivalent to:
+
+        poptopi
+        poptopn
+        poptops
+        poptopp
+
+(or some other permutation of these ops).
 
 =cut
 

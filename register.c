@@ -13,7 +13,7 @@
 #include "parrot/parrot.h"
 
 /*=for api register Parrot_push_i
-  pushes 16 registers worth of int registers onto the int reg stack
+  pushes a new integer register frame onto the corresponding frame stack
 */
 void
 Parrot_push_i(struct Parrot_Interp *interpreter, void *where)
@@ -45,7 +45,7 @@ Parrot_push_i(struct Parrot_Interp *interpreter, void *where)
 }
 
 /*=for api register Parrot_pop_i
-  pops 16 integer registers worth of data from the int reg stack
+  pops an integer register frame from the corresponding frame stack
 */
 void
 Parrot_pop_i(struct Parrot_Interp *interpreter, void *where)
@@ -76,7 +76,7 @@ Parrot_pop_i(struct Parrot_Interp *interpreter, void *where)
 }
 
 /*=for api register Parrot_clear_i
-  sets each register in an integer register frame to 0
+  sets each integer register in the current set to 0
 */
 void
 Parrot_clear_i(struct Parrot_Interp *interpreter)
@@ -88,7 +88,7 @@ Parrot_clear_i(struct Parrot_Interp *interpreter)
 }
 
 /*=for api register Parrot_push_s
-  pushes a new string register frame on the frame stack
+  pushes a new string register frame onto the corresponding frame stack
 */
 void
 Parrot_push_s(struct Parrot_Interp *interpreter, void *where)
@@ -120,7 +120,7 @@ Parrot_push_s(struct Parrot_Interp *interpreter, void *where)
 }
 
 /*=for api register Parrot_pop_s
-  pops a string register frame off of the frame stack
+  pops a string register frame from the corresponding frame stack
 */
 void
 Parrot_pop_s(struct Parrot_Interp *interpreter, void *where)
@@ -151,7 +151,7 @@ Parrot_pop_s(struct Parrot_Interp *interpreter, void *where)
 }
 
 /*=for api register Parrot_clear_s
-  sets each register in a string register frame to NULL
+  sets each string register in the current set to NULL
 */
 void
 Parrot_clear_s(struct Parrot_Interp *interpreter)
@@ -163,7 +163,7 @@ Parrot_clear_s(struct Parrot_Interp *interpreter)
 }
 
 /*=for api register Parrot_push_n
-  pushes a new numeric register frame on the frame stack
+  pushes a new numeric register frame onto the corresponding frame stack
 */
 void
 Parrot_push_n(struct Parrot_Interp *interpreter, void *where)
@@ -195,7 +195,7 @@ Parrot_push_n(struct Parrot_Interp *interpreter, void *where)
 }
 
 /*=for api register Parrot_pop_n
-  pops a numeric register frame off of the frame stack
+  pops a numeric register frame from the corresponding frame stack
 */
 void
 Parrot_pop_n(struct Parrot_Interp *interpreter, void *where)
@@ -226,7 +226,7 @@ Parrot_pop_n(struct Parrot_Interp *interpreter, void *where)
 }
 
 /*=for api register Parrot_clear_n
-  sets each register in a numeric register frame to 0.0
+  sets each numeric register in the current set to 0.0
 */
 void
 Parrot_clear_n(struct Parrot_Interp *interpreter)
@@ -238,7 +238,7 @@ Parrot_clear_n(struct Parrot_Interp *interpreter)
 }
 
 /*=for api register Parrot_push_p
-  pushes a new PMC register frame on the frame stack
+  pushes a new PMC register frame onto the corresponding frame stack
 */
 void
 Parrot_push_p(struct Parrot_Interp *interpreter, void *where)
@@ -270,7 +270,7 @@ Parrot_push_p(struct Parrot_Interp *interpreter, void *where)
 }
 
 /*=for api register Parrot_pop_p
-  pops a pmc register frame off of the frame stack
+  pops a PMC register frame from the corresponding frame stack
 */
 void
 Parrot_pop_p(struct Parrot_Interp *interpreter, void *where)
@@ -301,7 +301,7 @@ Parrot_pop_p(struct Parrot_Interp *interpreter, void *where)
 }
 
 /*=for api register Parrot_clear_p
-  sets each pmc register in a pmc frame stack to NULL.
+  sets each pmc register in the current set to NULL
 */
 void
 Parrot_clear_p(struct Parrot_Interp *interpreter)
