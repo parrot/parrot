@@ -88,7 +88,7 @@ use_func:
 use_sub:
         run_core = INTERP->run_core;
         if (PMC_IS_NULL(cmp_func) ||
-                cmp_func == Parrot_base_vtables[enum_class_None]->data) {
+                cmp_func == Parrot_base_vtables[enum_class_None]->class) {
             /* a NULL or None PMC was passed
             */
             goto default_sort;

@@ -311,8 +311,8 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
         /*
          * XXX dynclasses groups have empty slots for abstract objects
          */
-        if (Parrot_base_vtables[i] && Parrot_base_vtables[i]->data)
-            pobject_lives(interpreter, (PObj*)Parrot_base_vtables[i]->data);
+        if (Parrot_base_vtables[i] && Parrot_base_vtables[i]->class)
+            pobject_lives(interpreter, (PObj*)Parrot_base_vtables[i]->class);
     }
 
     /* mark exception list */

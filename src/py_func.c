@@ -239,7 +239,7 @@ parrot_py_filter(Interp *interpreter, PMC *func, PMC *list)
     VTABLE_set_integer_native(interpreter, iter, 0);
     i = 0;
     none_func = PMC_IS_NULL(func) ||
-        func == Parrot_base_vtables[enum_class_None]->data;
+        func == Parrot_base_vtables[enum_class_None]->class;
     while (VTABLE_get_bool(interpreter, iter)) {
         PMC *item = VTABLE_shift_pmc(interpreter, iter);
         if (none_func) {
@@ -287,14 +287,14 @@ parrot_py_map(Interp *interpreter, PMC *func, PMC *list)
     VTABLE_set_integer_native(interpreter, iter, 0);
     i = 0;
     none_func = PMC_IS_NULL(func) ||
-        func == Parrot_base_vtables[enum_class_None]->data;
+        func == Parrot_base_vtables[enum_class_None]->class;
     while (VTABLE_get_bool(interpreter, iter)) {
         PMC *item = VTABLE_shift_pmc(interpreter, iter);
         if (!none_func) {
             /* run filter func -
              * TODO save registers once around loop
              */
-            if (func->vtable->data == func) {
+            if (func->vtable->class == func) {
                 REG_PMC(5) = item;
                 REG_INT(3) = 1;
                 VTABLE_invoke(interpreter, func, 0);
@@ -339,7 +339,7 @@ parrot_py_reduce(Interp *interpreter, PMC *func, PMC *list /*, PMC *init */)
     VTABLE_set_integer_native(interpreter, iter, 0);
     i = 0;
     none_func = PMC_IS_NULL(func) ||
-        func == Parrot_base_vtables[enum_class_None]->data;
+        func == Parrot_base_vtables[enum_class_None]->class;
     if (none_func) {
         /* TODO TypeError: 'NoneType' object is not callable  */
     }
@@ -597,43 +597,43 @@ parrot_py_create_funcs(Interp *interpreter)
      * new types interface, just place a class object as global
      * this is invocable and returns a new instance
      */
-    class = Parrot_base_vtables[enum_class_Boolean]->data;
+    class = Parrot_base_vtables[enum_class_Boolean]->class;
     Parrot_store_global(interpreter, NULL, Py_bool, class);
     class->vtable->get_repr = class->vtable->get_string;
 
-    class = Parrot_base_vtables[enum_class_Complex]->data;
+    class = Parrot_base_vtables[enum_class_Complex]->class;
     Parrot_store_global(interpreter, NULL, Py_complex, class);
     class->vtable->get_repr = class->vtable->get_string;
 
-    class = Parrot_base_vtables[enum_class_PerlNum]->data;
+    class = Parrot_base_vtables[enum_class_PerlNum]->class;
     Parrot_store_global(interpreter, NULL, Py_float, class);
-    class = Parrot_base_vtables[enum_class_PerlInt]->data;
+    class = Parrot_base_vtables[enum_class_PerlInt]->class;
     Parrot_store_global(interpreter, NULL, Py_int, class);
     class->vtable->get_repr = class->vtable->get_string;
 
-    class = Parrot_base_vtables[enum_class_BigInt]->data;
+    class = Parrot_base_vtables[enum_class_BigInt]->class;
     Parrot_store_global(interpreter, NULL, Py_long, class);
-    class = Parrot_base_vtables[enum_class_PerlString]->data;
+    class = Parrot_base_vtables[enum_class_PerlString]->class;
     Parrot_store_global(interpreter, NULL, Py_str, class);
 
-    class = Parrot_base_vtables[enum_class_FixedPMCArray]->data;
+    class = Parrot_base_vtables[enum_class_FixedPMCArray]->class;
     Parrot_store_global(interpreter, NULL, Py_tuple, class);
     class->vtable->get_repr = class->vtable->get_string;
 
-    class = Parrot_base_vtables[enum_class_ResizablePMCArray]->data;
+    class = Parrot_base_vtables[enum_class_ResizablePMCArray]->class;
     Parrot_store_global(interpreter, NULL, Py_list, class);
-    class = Parrot_base_vtables[enum_class_Hash]->data;
+    class = Parrot_base_vtables[enum_class_Hash]->class;
     Parrot_store_global(interpreter, NULL, Py_dict, class);
     class->vtable->get_repr = class->vtable->get_string;
 
-    class = Parrot_base_vtables[enum_class_Iterator]->data;
+    class = Parrot_base_vtables[enum_class_Iterator]->class;
     Parrot_store_global(interpreter, NULL, Py_iter, class);
-    class = Parrot_base_vtables[enum_class_Slice]->data;
+    class = Parrot_base_vtables[enum_class_Slice]->class;
     Parrot_store_global(interpreter, NULL, Py_xrange, class);
 
-    class = Parrot_base_vtables[enum_class_ParrotClass]->data;
+    class = Parrot_base_vtables[enum_class_ParrotClass]->class;
     Parrot_store_global(interpreter, NULL, Py_object, class);
-    class = Parrot_base_vtables[enum_class_ParrotClass]->data;
+    class = Parrot_base_vtables[enum_class_ParrotClass]->class;
     Parrot_store_global(interpreter, NULL, Py_type, class);  /* ??? */
 
 
@@ -712,7 +712,7 @@ parrot_py_create_vars(Interp *interpreter)
     PMC *p;
     STRING *s;
 
-    p = Parrot_base_vtables[enum_class_None]->data;
+    p = Parrot_base_vtables[enum_class_None]->class;
     s = CONST_STRING(interpreter, "None");
     Parrot_store_global(interpreter, NULL, s, p);
 }

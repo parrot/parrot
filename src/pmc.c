@@ -436,7 +436,7 @@ Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
      * put an instance of this PMC into data
      */
     class = get_new_pmc_header(interpreter, type, PObj_constant_FLAG);
-    vtable->data = class;
+    vtable->class = class;
     PMC_pmc_val(class)   = (void*)0xdeadbeef;
     PMC_struct_val(class)= (void*)0xdeadbeef;
     /*

@@ -34,8 +34,8 @@ PMC* Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc) {
     return lib_pmc;
 }
 
-static PMC* 
-make_type(Interp* interpreter, INTVAL class, STRING* name, 
+static PMC*
+make_type(Interp* interpreter, INTVAL class, STRING* name,
           PMC *parent, PMC *pad)
 {
     STRING *pmcname = Parrot_base_vtables[class]->whoami;
@@ -238,7 +238,7 @@ enter_nci_method should create these as locals to begin with.
         key = const_string(INTERP, "object");
         item = make_type(INTERP, PyBuiltin_PyClass, key, NULL, pad);
         item->vtable = Parrot_base_vtables[PyBuiltin_PyType];
-        Parrot_base_vtables[PyBuiltin_PyType]->data = item;
+        Parrot_base_vtables[PyBuiltin_PyType]->class = item;
 
         parent = make_type(INTERP, PyBuiltin_PyObject, key, NULL, NULL);
         parent->vtable = Parrot_base_vtables[PyBuiltin_PyProxyType];
@@ -302,7 +302,7 @@ enter_nci_method should create these as locals to begin with.
         PyBuiltin_PyString_class = item;
 
         key = const_string(INTERP, "xrange");
-        PyBuiltin_PySlice_class = 
+        PyBuiltin_PySlice_class =
             make_type(INTERP, PyBuiltin_PySlice, key, parent, pad);
 
         /* Begin main! */

@@ -757,7 +757,8 @@ Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
         $vtbl_flag, /* flags */
         NULL,   /* does_str */
         NULL,   /* isa_str */
-        NULL, /* extra data */
+        NULL,   /* class */
+        NULL,   /* mro */
         $methlist
     };
 EOC

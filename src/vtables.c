@@ -73,7 +73,7 @@ Parrot_vtable_set_type(Parrot_Interp interpreter, VTABLE *vtable, INTVAL type) {
 /*
 
 =item C<void
-Parrot_vtable_set_name(Parrot_Interp interpreter, VTABLE *vtable, 
+Parrot_vtable_set_name(Parrot_Interp interpreter, VTABLE *vtable,
                        STRING *whoami)>
 
 Sets the name of C<*vtable> to C<*whoami>.
@@ -100,7 +100,7 @@ Sets the data of C<*vtable> to C<*stuff>.
 
 void
 Parrot_vtable_set_data(Parrot_Interp interpreter, VTABLE *vtable, void *stuff) {
-    vtable->data = stuff;
+    vtable->class = stuff;
 }
 
 /*

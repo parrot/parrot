@@ -66,7 +66,7 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
         PIO_eprintf(interpreter, "<!!no vtable!!>");
         return;
     }
-    if (pmc->vtable->data == pmc) {
+    if (pmc->vtable->class == pmc) {
         STRING *name = trace_class_name(interpreter, pmc);
         PIO_eprintf(interpreter, "Class=%Ss:PMC(%#p)", name, pmc);
     }

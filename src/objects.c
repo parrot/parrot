@@ -284,7 +284,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     /*
      * ParrotClass is the baseclass anyway, so build just a new class
      */
-    if (base_class == Parrot_base_vtables[enum_class_ParrotClass]->data) {
+    if (base_class == Parrot_base_vtables[enum_class_ParrotClass]->class) {
         PMC* class = pmc_new(interpreter, enum_class_ParrotClass);
         Parrot_new_class(interpreter, class, child_class_name);
         if (is_python)
@@ -430,9 +430,9 @@ Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
                 (Hash*) PMC_struct_val(interpreter->class_hash), class_name);
     if (b) {
         INTVAL type = PMC_int_val((PMC*)b->value);
-        PMC *pmc = Parrot_base_vtables[type]->data;
+        PMC *pmc = Parrot_base_vtables[type]->class;
         if (!pmc) {
-            pmc = Parrot_base_vtables[type]->data =
+            pmc = Parrot_base_vtables[type]->class =
                 pmc_new_noinit(interpreter, type);
         }
         return pmc;
@@ -752,7 +752,7 @@ instantiate_object(Parrot_Interp interpreter, PMC *object,
     PMC *class_name;
     PMC *vtable_pmc;
 
-    class = object->vtable->data;
+    class = object->vtable->class;
     /*
      * put in the real vtable
      */

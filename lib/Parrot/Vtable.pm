@@ -142,8 +142,9 @@ struct _vtable {
     UINTVAL flags;           /* Flags. Duh */
     STRING* does_str;	     /* space separated list of interfaces */
     STRING* isa_str;	     /* space separated list of classes */
-    void *data;              /* To hang data off this vtable */
-
+    PMC *class;              /* for PMCs: a PMC of that type
+                                for objects: the class PMC */
+    PMC *mro;                /* array PMC of [class, parents ... ] */
     /* Vtable Functions */
 
 EOF
@@ -218,7 +219,8 @@ static const char * const Parrot_vtable_slot_names[] = {
     "",     /* Flags. Duh */
     "",	    /* space separated list of interfaces */
     "",	    /* space separated list of classes */
-    "",     /* To hang data off this vtable */
+    "",     /* class */
+    "",	    /* mro */
 
     /* Vtable Functions */
 EOM

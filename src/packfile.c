@@ -2926,7 +2926,7 @@ global_ns:
                     vtable = Parrot_base_vtables[type];
                     if (!vtable)
                         internal_exception(1, "empty vtable '%Ss'", names);
-                    class = (PMC*)vtable->data;
+                    class = vtable->class;
                     if (!class)
                         internal_exception(1, "empty class '%Ss'", names);
                     VTABLE_add_method(interpreter, class, key, sub_pmc);
