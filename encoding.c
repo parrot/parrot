@@ -53,7 +53,7 @@ encoding_lookup_index(INTVAL n)
 }
 
 const INTVAL
-encoding_by_encoding(ENCODING *encoding) {
+encoding_by_encoding(const ENCODING *encoding) {
     int i;
     for (i = 0; i < enum_encoding_MAX && encoding_array[i]; i++) {
         if (encoding_array[i] == encoding) {
@@ -81,7 +81,7 @@ encoding_find_encoding(const char *name)
     }
     else {
         internal_exception(INVALID_ENCODING, "Invalid encoding '%s'\n", name);
-        return NULL;
+        return 0;
     }
 }
 
