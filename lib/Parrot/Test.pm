@@ -122,7 +122,7 @@ sub generate_functions {
     *{$package.'::'.$func} = sub ($$;$) {
 	my( $assembly, $output, $desc ) = @_;
 
-	$count++;
+	$count = $Builder->current_test + 1;
 
 	#set up default description
 	(undef, my $file, my $line) = caller;
@@ -196,7 +196,7 @@ sub generate_functions {
     *{$package.'::'.$func} = sub ($$;$ ) {
       my( $source, $output, $desc ) = @_;
 
-      ++$count;
+      $count = $Builder->current_test + 1;
 
       $output =~ s/\cM\cJ/\n/g;
       local( *SOURCE );
