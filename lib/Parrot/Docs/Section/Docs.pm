@@ -42,6 +42,7 @@ sub new
 			$self->new_item('', 'docs/overview.pod'),
 			$self->new_item('', 'docs/intro.pod'),
 			$self->new_item('', 'docs/gettingstarted.pod'),
+			$self->new_item('', 'docs/submissions.pod'),
 			$self->new_item('', 'docs/glossary.pod'),
 			$self->new_item('', 'docs/faq.pod'),
 			$self->new_item('', 'docs/practical_notes.pod'),

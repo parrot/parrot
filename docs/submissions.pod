@@ -1,0 +1,158 @@
+=head1 NAME
+
+docs/submissions.pod - Parrot Submission Instructions
+
+=head1 ABSTRACT
+
+How to submit bug reports, patches and new files to Parrot.
+
+=head1 How To Submit A Bug Report
+
+If you encounter an error while working with Parrot, and don't
+understand what is causing it, then submit a bug report using
+the F<parrotbug> utility. The simplest way to use it is to run 
+
+    % ./parrotbug
+    
+in the distribution's root directory, and follow the prompts.
+
+However, if you do know how to fix the problem you encountered,
+then think about submitting a patch.
+
+=head1 How To Submit A Patch
+
+Try to keep your patches specific to a single change.
+
+=over
+
+=item 1
+
+If the change is small it will generally effect only one or two files,
+in which case supply a C<diff> for each file.
+
+If the change is more wide-ranging then create two identical copies of
+the latest check-out from CVS, and make your changes in one of them. Run
+a recursive C<diff> on the two directories to create your patch file.
+
+=over
+
+=item Single C<diff>
+
+C<diff -u> I<old-file> I<new-file> E<gt> I<patch-name>C<.patch>
+
+Win32 users will probably need C<-ub>.
+
+=item Recursive C<diff>
+
+C<diff -ur --exclude=CVS> I<old-directory> I<new-directory> E<gt>
+I<patch-name>C<.patch>
+
+OS X users should also include C<--exclude=.DS_Store>.
+
+=back
+
+=item 2
+
+Create a plain text email.
+
+=item 3
+
+Set the recipient to B<bugs-parrot> I<at> B<bugs6> I<dot> B<perl> I<dot>
+B<org>.
+
+=item 4
+
+Give the message a clear and concise subject.
+
+Prefix it with a C<[PATCH]> identifier.
+
+=item 5
+
+The message body should contain an explaination of the purpose of the
+patch, and a list of all files affected with summary of the changes made
+in each file.
+
+=item 6
+
+Attach the patch file(s).
+
+Double-check that you've actually done this, because it's easy to
+forget.
+
+B<DO NOT> paste the patch file content into the body of the message.
+
+=item 7
+
+Send the mail.
+
+=back
+
+=head1 How To Submit Something New
+
+If you have a new feature to add to Parrot, such as a new test.
+
+=over
+
+=item 1
+
+Create a plain text email.
+
+=item 2
+
+Set the recipient to B<bugs-parrot> I<at> B<bugs6> I<dot> B<perl> I<dot>
+B<org>.
+
+=item 3
+
+Give the message a clear and concise subject.
+
+Prefix it with a C<[NEW]> identifier.
+
+=item 4
+
+The message body should contain an explaination of the purpose of the
+feature you are adding.
+
+=item 5
+
+Attach the file(s).
+
+Double-check that you've actually done this, because it's easy to
+forget.
+
+B<DO NOT> paste the content of the new file or files into the body of
+the message.
+
+=item 6
+
+Send the mail.
+
+=back
+
+=head1 What Happens Next?
+
+RT creates a ticket for the submission, and you will receive an auto
+reply with details of the ticket identifier. This identifier should be
+used in all further correspondence concerning the submission.
+
+Everyone on the list sees the submission, and can comment on it. A
+developer with CVS commit authority will commit it to CVS once it is
+clear that it is the right thing to do.
+
+Even those developers with CVS commit authority stick to this scheme for
+all but the most trivial of their own patches, to allow time for peer
+review of their changes.
+
+You can check the progress of your submission at the Parrot bugs page
+L<http://bugs6.perl.org/>. If you have trouble logging in try username
+C<guest> with password C<guest>.
+
+
+A list of all the unresolved patches is at
+L<http://www.parrotcode.org/openpatches/>.
+
+=head1 HISTORY
+
+Adapted by Michael Scott from a tutorial submitted by Aldo Calpini, with
+some additional remarks from Bruce Gray.
+
