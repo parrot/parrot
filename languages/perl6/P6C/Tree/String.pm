@@ -56,65 +56,92 @@ sub interpolate_expand {
     my @flat;
     foreach my $item (@$list) {
         if (defined $item) {
-            if (ref $item eq 'ARRAY') {
-                push @flat, interpolate_expand($item)
+            if (ref $item ne 'ARRAY') {
+                push @flat, $item;
+            }
+            elsif (@$item == 2 && ref($item->[0]) eq 'P6C::variable') {
+                # Subscripted variable. Convert to the equivalent term.
+                # FIXME: This is a silly way to detect a subscripted variable!
+                push @flat, bless [ 'term', $item->[0], 1, $item->[1] ], "P6C::term";
             }
             else {
-                push @flat, $item
+                push @flat, interpolate_expand($item)
             }
         }
     }
     return @flat
 }
 
+sub interpolate_variable {
+    my ($var) = @_;
+
+    my $type = $var->type;
+
+    # XXX: @ context needs to join with .sep property
+    if ($type eq 'PerlArray') {
+        my $space = new P6C::sv_literal type => 'PerlString',
+          lval => '" "';
+        my $args  = new P6C::ValueList vals => [$space, $var];
+        return new P6C::prefix name => 'join', args => $args;
+    }
+
+    # XXX: Needs to stringify with proper properties
+    elsif ($type eq 'PerlHash') {
+        unimp qq("\%"\n)
+    }
+    elsif ($type eq 'PerlSub') {
+        return $var;
+    }
+    elsif ($type eq 'PerlUndef') {
+        return $var;
+    }
+    else {
+        error qq( attempted interpolation of unknown type $type.\n)
+    }
+}
+
 sub interpolate_concat_literal {
     my $list = shift;
     my (@short, $string);
-    foreach my $item (@$list)
-    {
+
+    while (@$list) {
+        my $item = shift(@$list);
         if (ref $item eq 'P6C::variable') {
             push (@short, escape($string)) if defined $string;
-            my $var = $item->tree;
-            my $sigil = $item->[1]->[1];
-
-            if ($sigil eq '$') {
-	            push @short, $var
-	        }
-
-            # XXX: @ context needs to join with .sep property
-            elsif ($sigil eq '@') {
-                my $space = new P6C::sv_literal type => 'PerlString',
-                    lval => '" "';
-                my $args  = new P6C::ValueList vals => [$space, $var];
-                push (@short, new P6C::prefix name => 'join', args => $args);
-            }
-
-            # XXX: Needs to stringify with proper properties
-            elsif ($sigil eq '%') {
-                unimp qq("\%"\n)
-            }
-            elsif ($sigil eq '&') {
-	            push @short, $var
-	        }
-            else {
-	            error qq( attempted interpolation of unknown type.\n)
-	        }
-
-            $string='';
+            push @short, interpolate_variable($item->tree);
+            undef $string;
         }
-        elsif (ref $item eq 'P6C::interpolated_value') {
+        elsif (ref($item) eq 'P6C::interpolated_value'
+               || ref($item) eq 'P6C::term')
+        {
             push (@short, escape($string)) if defined $string;
-            push @short, $item->tree;
-            $string='';
-
+            my $tree = $item->tree;
+            if (ref $tree eq 'P6C::variable') {
+                # FIXME: Should this be done by inserting a runtime
+                # string context node?
+                push @short, interpolate_variable($tree);
+            } else {
+                push @short, $tree;
+            }
+            undef $string;
         }
         elsif (ref $item eq 'P6C::backslashed_expr') {
-            push (@short, escape($string)) if defined $string;
-            push @short, $item->tree;
-            $string='';
-
+            unshift(@$list, $item->tree);
         }
-        else { $string.=$item }
+        elsif (ref $item eq 'P6C::sv_literal') {
+            my $piece = $item->lval;
+            if ($item->type eq 'PerlString') {
+                # XXX: This assumes that string values are always surrounded by
+                # double quotes. (Or any single character.)
+                $string .= substr($piece, 1, -1);
+            } else {
+                $string .= $piece;
+            }
+        }
+        elsif (ref $item) {
+            error "unexpected value in string concat: $item";
+        }
+        else { $string.=$item if length($item) }
     }
 
     push (@short, escape($string)) if defined $string;
@@ -237,9 +264,8 @@ use P6C::Util qw(unimp error);
 sub tree {
     my $x = shift;
     my $sigil = $x->[1]->tree;
-    my @values;
     if ($sigil eq '$') {
-        push (@values, $x->[5]->tree);
+        return $x->[5]->tree;
     }
 
 # XXX: @ context needs to join with $" (or its perl6 equiv)
@@ -249,10 +275,10 @@ sub tree {
             my $space = new P6C::sv_literal type => 'PerlString',
         lval => '" "';
             my $args  = new P6C::ValueList vals => [$space, $x->[5]->tree ];
-            push (@values, new P6C::prefix name => 'join', args => $args);
+            return new P6C::prefix name => 'join', args => $args;
         }
         else {
-            push (@values, $x->[5]->tree);
+            return $x->[5]->tree;
         }
     }
 
@@ -261,7 +287,6 @@ sub tree {
 
     elsif ($sigil eq '%') { unimp qq("%()"\n) }
     else { error qq( attempted interpolation of unknown type.\n) }
-    return @values;
 }
 
 

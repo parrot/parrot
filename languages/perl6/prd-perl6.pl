@@ -82,6 +82,7 @@ sub output_tree {
     if ($o{imc}) {
 	P6C::IMCC::add_function('main');
 	P6C::IMCC::set_function('main');
+        P6C::IMCC::set_function_params(P6C::closure::default_signature());
 	compile($x);
 	emit();
     } else {

@@ -4,7 +4,7 @@ use P6C::TestCompiler tests => 6;
 use Test::More;
 
 ##############################
-output_is(<<'CODE', <<'OUT', "string interpolation 1");
+output_is(<<'CODE', <<'OUT', "string interpolation 1 - single,double,embedded");
 sub main() {
     my $action="said"; #double
     my $person='Gimli.'; #single
@@ -21,7 +21,7 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "string interpolation 2");
+output_is(<<'CODE', <<'OUT', "string interpolation 2 - \$(), \@()");
 sub main() {
     my $x=3;
 
@@ -57,7 +57,7 @@ on both sides
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "string interpolation 3");
+output_is(<<'CODE', <<'OUT', "string interpolation 3 - hex escapes");
 sub main() {
     print "\x0a"; # Hex
     print "\0x010\n";  # Number
@@ -71,7 +71,7 @@ OUT
 SKIP: {
 skip("running on a perl without charnames", 2)
     unless eval "use charnames (); 1";
-output_is(<<'CODE', <<'OUT', "string interpolation 4");
+output_is(<<'CODE', <<'OUT', "string interpolation 4 - named chars");
 sub main() {
     print "\c[^J]"; # Control-Char
     print "\c[REVERSE SOLIDUS]\n"; # Named Unicode
@@ -88,7 +88,7 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "string interpolation 5");
+output_is(<<'CODE', <<'OUT', "string interpolation 5 - up- and down-casing");
 sub main() {
     print "\ux\n"; # Uppercase Single
     print "\lX\n"; # Lowercase Single
@@ -104,7 +104,7 @@ OUT
 
 }
 ##############################
-output_is(<<'CODE', <<'OUT', "string interpolation 6");
+output_is(<<'CODE', <<'OUT', "string interpolation 6 - stopping");
 sub main() {
     @code = ("hi");
     print "@code\Q[0]\n"; # Stop interpolation

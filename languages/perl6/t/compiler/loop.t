@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use P6C::TestCompiler tests => 6;
+use P6C::TestCompiler tests => 7;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "foreach 1");
@@ -104,4 +104,42 @@ CODE
 4
 6
 6
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', 'Loops and Guards');
+sub main() {
+    my $i = 3;
+    while $i > 0 {
+	--$i;
+	print1($i);
+    }
+    until $i > 3 {
+	++$i;
+	print1($i);
+    }
+    print1(--$i) until $i == 0;
+    print1(++$i) while $i != 3;
+    print1("ok") if $i eq '3';
+    print1("ok") unless $i ne '3';
+}
+
+
+CODE
+2
+1
+0
+1
+2
+3
+4
+3
+2
+1
+0
+1
+2
+3
+ok
+ok
 OUT

@@ -124,6 +124,13 @@ sub P6C::Binop::ctx_right {
 	# give incoming context to left side
 	$x->l->ctx_right($ctx);
 
+    } elsif ($op eq '=~') {
+        # LHS gets string context, since we're matching it against RHS regex
+        # FIXME: I don't know if this will handle $x =~ s/.../.../
+        $x->l->ctx_right(new P6C::Context type => 'str');
+        # RHS gets incoming context
+        $x->r->ctx_right($ctx);
+
     } elsif ($op eq ',') {
 	# List of items.
 	my @things = $x->flatten_leftop(',');
@@ -214,8 +221,17 @@ sub P6C::indices::ctx_right {
 	    $index_ctx->type('PerlArray');
 	    $index_ctx->flatten(1); # XXX: This probably isn't quite right.
 
+        } elsif ($ctx->is_sig) {
+            if ($ctx->type->slurpy_array) {
+                $index_ctx->type('PerlArray');
+                $index_ctx->flatten(1); # XXX: This probably isn't quite right.
+            } else {
+                my $max_positional = $ctx->type->max_nonslurpy_positional;
+                $index_ctx->type([($indextype{$x->type}) x $max_positional]);
+            }
+
 	} else {
-	    confess "index contest: ", Dumper($ctx);
+	    confess "index context: ", Dumper($ctx);
 	}
 
 	$x->indices->ctx_right($index_ctx);
@@ -581,16 +597,9 @@ sub P6C::sub_def::ctx_right {
 	$argctx = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
     } elsif (defined($x->closure->params->max)
 	     && $x->closure->params->min != $x->closure->params->max) {
-	# Only support variable number of params if it's zero - Inf.
-	unimp "Unsupported parameter arity: ",
-	    $x->closure->params->min . ' - ' . $x->closure->params->max;
+        $argctx = new P6C::Context type => $x->closure->params->arg_context;
     } else {
-	my @types = map { $_->var->type } @{$x->closure->params->req};
-	$argctx = new P6C::Context type => [@types];
-	unless (defined $x->closure->params->max) {
-	    push @{$argctx->type}, $x->closure->params->rest->var->type;
-	    $argctx->flatten(1);
-	}
+	$argctx = new P6C::Context type => $x->closure->params->arg_context;
     }
     $P6C::Context::CONTEXT{$x->name} = $argctx;
     $x->{ctx} = $ctx->copy;
@@ -733,6 +742,109 @@ sub P6C::ValueList::ctx_right {
 	    $x->vals($i)->ctx_right($newctx);
 	}
 
+    } elsif ($ctx->is_sig) {
+        # Separate out the named and unnamed args.
+        my (@named_args, @unnamed_args);
+        foreach my $arg (@{ $x->vals }) {
+            if ($arg->isa('P6C::pair')) {
+                push @named_args, $arg;
+            } else {
+                push @unnamed_args, $arg;
+            }
+        }
+
+        # Keep track of which params we haven't found bindings for
+        # yet. These are maps from the stringified params to the
+        # actual params.
+        my %positional;
+        @positional{@{ $ctx->type->positional }} = @{ $ctx->type->positional };
+
+        my %optional;
+        @optional{@{ $ctx->type->optional }} = @{ $ctx->type->optional };
+
+        my %named = %{ $ctx->type->named };
+
+        # Foreach named arg, go through each zone looking for a match.
+      ARG:
+        foreach my $arg (@named_args) {
+            if (ref($arg->l)) {
+                # If $arg is not constant, add to some sort of runtime
+                # set. We cannot match it here.
+                #
+                # FIXME: That hasn't been implemented yet.
+                $arg->l->ctx_right(new P6C::Context type => 'PerlScalar');
+                die "unimp: non-constant names for named params";
+            }
+
+            my $arg_name = $arg->l;
+
+            foreach my $param (values %positional) {
+                if ($arg_name eq substr($param->{name}, 1)) {
+                    $arg->r->ctx_right($param);
+                    keys %positional; # Reset the iterator (needed?)
+                    delete $positional{$param};
+                    next ARG;
+                }
+            }
+
+            foreach my $param (values %optional) {
+                if ($arg_name eq $param->{name}) {
+                    $arg->r->ctx_right($param);
+                    keys %optional; # Reset the iterator (needed?)
+                    delete $optional{$param};
+                    next ARG;
+                }
+            }
+
+            foreach my $param (values %named) {
+                if ($named{$arg_name}) {
+                    $arg->r->ctx_right($named{$arg_name});
+                    delete $named{$arg_name};
+                    next ARG;
+                }
+            }
+
+            if ($ctx->type->slurpy_named) {
+                $arg->r->ctx_right(new P6C::Context type => 'PerlUndef');
+                next ARG;
+            }
+
+            $DB::single = 1;
+            die "unwanted named param '$arg_name' given. Valid names are ", join(", ", map { $_->{name} } values %positional, values %optional, values %named);
+        }
+
+        # Okay, we've dealt with all the named args. Now handle all
+        # the regular args. But first, we'll need to reconstruct lists
+        # of the parameter zones remaining after the compile-time
+        # named bindings have been done.
+        my @positional = grep { $positional{$_} } @{ $ctx->type->positional };
+        my @optional = grep { $optional{$_} } @{ $ctx->type->optional };
+
+        # The positional parameters greedily bind to the first unnamed args.
+        foreach my $param (@positional) {
+            die "required argument '" . $param->{name} . "' not found"
+              if ! @unnamed_args;
+            shift(@unnamed_args)->ctx_right($param);
+        }
+
+        # The optional parameters bind to as many unnamed args as remain.
+        foreach my $param (@optional) {
+            last if ! @unnamed_args;
+            shift(@unnamed_args)->ctx_right($param);
+        }
+
+        # And any leftover unnamed args are put into the slurpy array
+        # parameter, if given.
+        if (@unnamed_args) {
+            use Data::Dumper;
+            die "too many unnamed arguments: ".Dumper($ctx)
+              if ! $ctx->type->slurpy_array;
+            foreach my $arg (@unnamed_args) {
+                $arg->ctx_right(new P6C::Context type => 'PerlArray',
+                                                 flatten => 1);
+            }
+        }
+
     } elsif ($ctx->is_array) {
 	my $actx = $ctx->copy;
 	if ($ctx->flatten) {
@@ -785,6 +897,7 @@ sub P6C::loop::ctx_right {
 BEGIN {
     %P6C::context::names = qw(% PerlHash
 			      @ PerlArray
+                              * PerlArray
 			      $ PerlUndef
 			      _ PerlString
 			      ? bool
@@ -795,6 +908,9 @@ sub P6C::context::ctx_right {
     my ($x, $ctx) = @_;
     $x->{ctx} = $ctx->copy;
     $ctx->type($P6C::context::names{$x->ctx});
+    if ($x->ctx eq '*') {
+        $ctx->flatten(1);
+    }
     $x->thing->ctx_right($ctx);
 }
 

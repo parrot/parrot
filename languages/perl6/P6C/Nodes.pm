@@ -359,7 +359,7 @@ The right-hand side.
 use Class::Struct P6C::but => { qw(buts @ thing $) };
 use Class::Struct P6C::adverb => { qw(adv $ thing $) };
 
-=item B<params>
+=item B<signature>
 
 A sub parameter list (not argument list).
 
@@ -424,7 +424,20 @@ The initialization expression.
 
 =cut
 
-use Class::Struct P6C::params => { qw(req @ opt @ rest $) };
+use Class::Struct P6C::signature => { qw(positional @
+                                         optional @
+                                         required_named @
+                                         slurpy_array $
+                                         slurpy_named $
+                                         optional_named @
+                                        ) };
+use Class::Struct P6C::sigparam => { qw(type $
+                                        zone $
+                                        var $
+                                        traits @
+                                        init $
+                                       ) };
+
 use Class::Struct P6C::param => { qw(qual $ var $ props @ init $) };
 use Class::Struct P6C::initializer => { qw(op $ expr $) };
 
@@ -622,21 +635,108 @@ a bit more developed.
 =cut
 
 use Class::Struct P6C::Register => { qw(reg $ type $) };
+use strict;
 
 ######################################################################
 # Misc per-node-class utility functions:
 
-sub P6C::params::min {
+sub P6C::signature::min {
     my $x = shift;
-    scalar @{$x->req};
+    return @{$x->positional} + @{$x->required_named};
 }
 
-sub P6C::params::max {
+sub P6C::signature::max {
     my $x = shift;
-    if ($x->rest) {
-	return undef;
+    return undef if ($x->slurpy_array || $x->slurpy_named);
+    return @{$x->positional}
+         + @{$x->optional}
+         + @{$x->required_named}
+         + @{$x->optional_named};
+}
+
+sub P6C::signature::max_nonslurpy_positional {
+    my $x = shift;
+    return @{$x->positional}
+         + @{$x->optional};
+}
+
+# Crazily wrongheaded
+sub P6C::sigparam::context {
+    my $param = shift;
+    my $type = 'PerlUndef';
+    if ($param->type =~ /^(PerlArray|PerlUndef|int|num|str)$/) {
+        $type = $param->type;
     }
-    return @{$x->req()} + @{$x->opt()};
+    my $ctx = new P6C::Context type => $type;
+    $ctx->{name} = $param->var->name;
+    $ctx->flatten(1) if $param->zone eq 'slurpy';
+    return $ctx;
+}
+
+sub P6C::signature::arg_context {
+    my $x = shift;
+    # FIXME: This discards the distinction between named params before
+    # or after a slurpy array param. (Exegesis 6 uses the difference)
+    my %named; # { param name => P6C::SigParam }
+    foreach (@{ $x->required_named || [] },
+             @{ $x->optional_named || [] })
+    {
+        my $name = $_->var->name;
+        $name = substr($name, 1); # Trim off sigil
+        $named{$name} = $_->context;
+    }
+
+    my $positional = [ map { $_->context } @{ $x->positional } ];
+    my $optional = [ map { $_->context } @{ $x->optional } ];
+    my $slurpy_array = $x->slurpy_array ? $x->slurpy_array->context : undef;
+    my $slurpy_named = $x->slurpy_named ? $x->slurpy_named->context : undef;
+
+    my $context = new P6C::SigContext positional => $positional,
+                                      optional => $optional,
+                                      slurpy_array => $slurpy_array,
+                                      slurpy_named => $slurpy_named,
+                                      named => \%named;
+    return $context;
+}
+
+# Return whether the named variable is in the parameter list. This is
+# used for figuring out whether a variable is a parameter, a local, or
+# whatever.
+sub P6C::signature::paramvar {
+    my ($sig, $var) = @_;
+    return 1 if grep { $_->var->name eq $var } @{ $sig->positional };
+    return 1 if grep { $_->var->name eq $var } @{ $sig->optional };
+    return 1 if grep { $_->var->name eq $var } @{ $sig->required_named };
+    return 1 if grep { $_->var->name eq $var } @{ $sig->optional_named };
+    return 1 if $sig->slurpy_array && $var eq $sig->slurpy_array->var->name;
+    return 1 if $sig->slurpy_named && $var eq $sig->slurpy_named->var->name;
+    return;
+}
+
+# Create a context for the ith positional argument, assuming that the
+# context object refers to a P6C::SigContext object.
+sub P6C::signature::indexed_param {
+    my ($sig, $i) = @_;
+
+    die "expected signature, got $sig"
+      if ! UNIVERSAL::isa($sig, 'P6C::signature');
+
+    if ($i < @{ $sig->positional }) {
+        return $sig->positional->[$i];
+    }
+    $i -= @{ $sig->positional };
+
+    if ($i < @{ $sig->optional }) {
+        return $sig->optional->[$i];
+    }
+    $i -= @{ $sig->optional };
+
+    if ($sig->slurpy_array) {
+        return $sig->slurpy_array;
+    } else {
+        warn "no parameter found";
+        return;
+    }
 }
 
 sub P6C::compare::size {

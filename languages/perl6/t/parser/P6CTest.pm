@@ -34,7 +34,7 @@ sub import {
 
     # Handle command line args
     my %opt;
-    GetOptions(\%opt,qw(grammar:s help dump verbose)) and !$opt{help}
+    GetOptions(\%opt,qw(force grammar:s help timeit dump verbose)) and !$opt{help}
         or die "Usage: $0 [--force] [--grammar NAME] [--timeit]".
 	                 "[--dump] [--verbose] [--help]";
 

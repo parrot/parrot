@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 7;
+use P6C::TestCompiler tests => 8;
 
 ##############################
 output_is(<<'CODE', <<'OUT', 'Initializers');
@@ -114,6 +114,19 @@ CODE
 -23 2
 1 1
 1 3
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Real flattening");
+
+sub main() {
+    my @a = 1..4;
+    my $b = 10;
+    my @c = (*@a, $b);
+    print "@c\n";
+}
+CODE
+1 2 3 4 10
 OUT
 
 ##############################

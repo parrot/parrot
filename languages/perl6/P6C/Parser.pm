@@ -136,6 +136,7 @@ sub Parse::RecDescent::set_error_handler {
 
 INIT {
 $FUNCTION_ARGS = 'bare_arglist';
+$DB::deep = 1000;
 
 # XXX: many of these need their own special want_* rules.  This is
 # just a hack to make the parser swallow the examples from the
@@ -604,24 +605,13 @@ expr:		  log_OR
 
 ##############################
 # Parameters
-params:		   <rulevar: local $no_comma>
-params:           '(' <commit> { $no_comma = 1 }
-			maybe_params opt_params rest_param ')'
-                | # nothing
 
-maybe_params:     _params { $no_comma = undef;
-			    bless([@item[0,1]], 'P6C::maybe_params') }
-                | # nothing
+signature:	  '(' <commit> sigparam(s? /,/) ')'
 
-opt_params:       ';' <commit> { $no_comma = 1 } maybe_params
-                | # nothing
+sigparam:	  class(?) zone(?) variable props['is'](?) initializer(?)
 
-rest_param:       { $no_comma } '*' <commit> '@' namepart
-                | ',' <commit> '*' '@' namepart
-                | # nothing
+zone:		  /[\?\*\+]/
 
-_params:	  <leftop: param ',' param>
-param:		  scope_class(?) variable props['is'] initializer(?)
 initializer:	  assign_op scalar_expr
 
 ##############################
@@ -691,13 +681,13 @@ stmt_sep:	  ';'
 
 stmt:		  label /:(?!:)/ { mark_end('label', $text);1 } ''
 		| directive <commit> name comma(?)
-		| /method\b/ <commit> name params props['is'] block
+		| /method\b/ <commit> name signature props['is'] block
 		| /loop\b/ <commit>
 			'(' comma(?)
 			';' comma(?)
 			';' comma(?) ')'
 			block
-		| scope(?) /(?:sub|rule)\b/ <commit> name params
+		| scope(?) /(?:sub|rule)\b/ <commit> name signature(?)
 			{ add_function(@item[4,5], $thisparser);1 }
 			props['is']
 		(...';' | <matchrule:@{[$arg[0] eq 'sub'?'block':'rule']}>)[$item[2]]
@@ -849,6 +839,7 @@ rx_element:	  scalar_var    ':=' <commit> rx_atom
 rx_atom:	  '(' <commit> rx_alt ')'
 		| '[' <commit> rx_alt ']'
 		| '<' <commit> /!?/ rx_assertion '>'
+                | '...'
 		| '.'
 		| /$RXESCAPED/o
 		| variable subscript(s?)
@@ -939,6 +930,8 @@ sub optional_last($) {
 }
 
 # Build an argument context from a parameter spec.
+# FIXME: This has not yet been ported to the new perl6 signature stuff.
+# It is currently some mangled mixture of the old and new.
 sub argument_context {
     my ($name, $params, $parser) = @_;
     if ($params->min == 0) {
@@ -962,7 +955,7 @@ sub P6C::'.$rulename.'::tree {
 
     # add required things
     my @req;
-    foreach (@{$params->req}) {
+    foreach (@{$params->positional}) {
 	push @req, argtype($_->var->type);
     }
     # XXX: we require commas even around closure args for the moment.
@@ -978,18 +971,18 @@ sub P6C::'.$rulename.'::tree {
     # now, though.
 
     # XXX: can this be cleaner?
-    if ($params->rest) {
+    if ($params->slurpy_array || $params->slurpy_named) {
 	$rule .= " (',' comma)(?)";
 	$code .= optional_last($lastparam);
-    } elsif (@{$params->opt}) {
+    } elsif (@{$params->optional}) {
 	# at least one optional.
-	if (@{$params->req}) {
+	if (@req) {
 	    # XXX: doesn't do argtypes.
-	    $rule .= " (',' scalar_expr)(0..".@{$params->opt}.')';
+	    $rule .= " (',' scalar_expr)(0..".@{$params->optional}.')';
 	    $code .= optional_last($lastparam);
-	} elsif (@{$params->opt} == 1) {
+	} elsif (@{$params->optional} == 1) {
 	    # No required, only one optional.
-	    $rule .= argtype($params->opt(0)->var->type).'(?)';
+	    $rule .= argtype($params->optional(0)->var->type).'(?)';
 	    $code .= '
     if (ref($x->[1]) && @{$x->[1]} > 0) {
 	push @param, $x->[1][0]->tree;
@@ -997,8 +990,8 @@ sub P6C::'.$rulename.'::tree {
 
 	} else {
 	    # No required, multiple optional.
-	    $rule .= argtype($params->opt(0)->var->type);
-	    $rule .= " (',' scalar_expr)(0..".(@{$params->opt} - 1).')';
+	    $rule .= argtype($params->optional(0)->var->type);
+	    $rule .= " (',' scalar_expr)(0..".(@{$params->optional} - 1).')';
 	    $rule .= "
 		| ...!'(' # nothing";
 	    $code .= '

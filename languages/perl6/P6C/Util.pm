@@ -46,6 +46,7 @@ parents after children.  The current node will be in C<$_>.
 
 =cut
 
+use Carp;
 use Data::Dumper;
 require Exporter;
 use vars qw(@EXPORT_OK %EXPORT_TAGS @ISA);
@@ -69,7 +70,7 @@ sub _info {
 
 sub unimp {
     _info 'not implemented', @_;
-    die;
+    croak;
 }
 
 sub diag {

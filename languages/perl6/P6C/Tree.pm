@@ -77,7 +77,7 @@ sub infix_left_seq {
     for (my $i = 1; $i < $#{$x}; $i += 2) {
 	my $op = ref($x[$i]) ? $x[$i]->tree : $x[$i];
 	unless (ref($x[$i + 1])) {
-	    die Dumper(\@x);
+	    die "[infix_left_seq: want ref]\n" . Dumper(\@x);
 	}
 	my $r = $x[$i + 1]->tree;
 	$l = new P6C::Binop l => $l, r => $r, op => $op;
@@ -350,7 +350,7 @@ sub P6C::hv_indices::tree {
 sub P6C::arglist::tree {
     my $x = shift;
     if (@{$x->[2]} > 0) {
-	return $x->[2][0]->tree;
+	return $x->[2][0]->tree; # P6C::ValueList
     }
     return undef;		# XXX: probably bad
 }
@@ -625,29 +625,95 @@ sub P6C::expr::tree {
 ######################################################################
 # Parameters
 
-sub P6C::params::tree {
-    my $x = shift;
-    if (@$x == 1) {
-	return undef;
+# signature: '(' <commit> sigparam(s? /,/) ')'
+# So all we care about is C<sigparam>
+#
+# This implementation is needlessly verbose, but this stuff is wacky
+# enough that I think I need the help in understanding what's going
+# on.
+#
+# Oh, and verbose or not, it's incorrect too. I haven't even figured
+# out how all of this is supposed to work yet, so there's no chance
+# that I did it right!
+#
+sub P6C::signature::tree {
+    my ($sig) = @_;
+    my ($selfname, undef, undef, $params, undef) = @$sig;
+    my @params = map { $_->tree } @$params;
+    my (@positional, @optional, @required_named,
+        $slurpy_array, $slurpy_named, @optional_named);
+
+    # I have no idea if this is actually correct
+    my %next_ok = ( required_positional => [ qw(optional required_named slurpy optional_named) ],
+                    optional => [ qw(required_named slurpy optional_named) ],
+                    required_named => [ qw(slurpy optional_named) ],
+                    slurpy => [ qw(optional_named) ] );
+
+    my %zone_lookup = ( 'required_positional' => 'required_positional',
+                        '?' => 'optional',
+                        '+' => 'named',
+                        '*' => 'slurpy' );
+
+    my $zone = 'required_positional';
+    foreach (@params) {
+        my $param_zone = $zone_lookup{$_->zone};
+        if ($param_zone eq 'named') {
+            # This can't possibly be right...
+            $param_zone = ($slurpy_array || $slurpy_named) ? 'optional_named' : 'required_named';
+        }
+        if ($param_zone ne $zone && ! grep { $_ eq $param_zone } @{ $next_ok{$zone} })
+        {
+            die "A $param_zone parameter cannot follow a $zone parameter\n";
+        }
+        $_->zone($zone = $param_zone);
+        if ($zone eq 'required_positional') {
+            push @positional, $_;
+        } elsif ($zone eq 'optional') {
+            push @optional, $_;
+        } elsif ($zone eq 'required_named') {
+            push @required_named, $_;
+        } elsif ($zone eq 'slurpy') {
+            if ($_->var->name =~ /^\@/) {
+                $slurpy_array = $_;
+            } else {
+                $slurpy_named = $_;
+            }
+        } elsif ($zone eq 'optional_named') {
+            push @optional_named, $_;
+        } else {
+            die "invalid zone \"$zone\"";
+        }
     }
-    my ($req, $opt);
-    if (ref($x->[4])) {
-	$req = $x->[4]->tree;
-    } else {
-	$req = [];
+
+    return new P6C::signature positional => \@positional,
+                              optional => \@optional,
+                              required_named => \@required_named,
+                              slurpy_array => $slurpy_array,
+                              slurpy_named => $slurpy_named,
+                              optional_named => \@optional_named;
+}
+
+# sigparam: class(?) zone(?) variable props['is'](?) default_val(?)
+#
+sub P6C::sigparam::tree {
+    my ($sigparam) = @_;
+    my ($selfname, $class, $zone, $variable, $traits, $init) = @$sigparam;
+    if (@$traits == 1) {
+        # Empty optional list
+        $traits = [];
     }
-    if (ref($x->[5])) {
-	$opt = $x->[5]->tree;
-    } else {
-	$opt = [];
-    }
-    if (ref($x->[6])) {
-	my $arg = new P6C::variable type => 'PerlArray',
-	    name => '@'.$x->[6][5]->tree;
-	return P6C::params->new(req => $req, opt => $opt,
-				rest => P6C::param->new(var => $arg));
-    }
-    return P6C::params->new(req => $req, opt => $opt);
+    my $var = $variable->tree;
+    return new P6C::sigparam type => maybe_tree($class) || $var->type,
+                             zone => maybe_tree($zone) || 'required_positional',
+                             var => $var,
+                             traits => maybe_tree($traits),
+                             init => maybe_tree($init);
+}
+
+sub P6C::zone::tree {
+    my ($zone) = @_;
+    my ($selfname, $zonetype) = @$zone;
+    return $zonetype;
 }
 
 ##############################

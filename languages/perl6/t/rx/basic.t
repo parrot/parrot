@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 6;
+use P6C::TestCompiler tests => 7;
 use Test::More qw(skip);
 
 ##############################
@@ -27,6 +27,28 @@ ok 6
 ok 7
 ok 8
 ok 9
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Character classes.");
+sub main() {
+    my $s = "hello";
+    print "ok 1\n" if $s =~ /<[asdfl]>/;
+    print "ok 2\n" if $s !~ /<[asdf]>/;
+    print "ok 3\n" if $s =~ /<[a-f]>/;
+    print "ok 4\n" if $s !~ /<[a-d]>/;
+    print "ok 5\n" if $s =~ /<[a-ee]>/;
+    print "ok 6\n" if $s !~ /<[a-df-g]>/;
+    print "ok 7\n" if $s =~ /<[a-dc-g]>/;
+}
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
 OUT
 
 ##############################
@@ -57,6 +79,9 @@ OUT
 output_is(<<'CODE', <<'OUT', "Greedy repetition.");
 sub main() {
     my $s = 'accaacaacaaba';
+    my $s4 = 'aaaa';
+    my $s5 = 'aaaaa';
+    my $s7 = 'aaaaaaa';
     print "ok 1\n" if $s =~ /aca*/;
     print "ok 2\n" if $s =~ /aca+/;
     print "ok 3\n" if $s =~ /aca?/;
@@ -69,6 +94,12 @@ sub main() {
     print "ok 9\n" if $s =~ /abb?/;
     print "ok 10\n" if $s !~ /abb+/;
     print "ok 11\n" if $s =~ /abb*/;
+    print "ok 12\n" if $s4 =~ /^ [ a<2,3> ]<1,2> $/;
+    print "ok 13\n" if $s5 =~ /^ [ a<2,3> ]<1,2> $/;
+    print "ok 14\n" if $s4 =~ /^ [ a<2,3>? ]<1,2>? $/;
+    print "ok 15\n" if $s5 =~ /^ [ a<2,3>? ]<1,2>? $/;
+    print "ok 16\n" if $s7 !~ /^ [ a<2,3> ]<1,2> $/;
+    print "ok 17\n" if $s5 !~ /^a<1,2>$/;
 }
 CODE
 ok 1
@@ -82,6 +113,12 @@ ok 8
 ok 9
 ok 10
 ok 11
+ok 12
+ok 13
+ok 14
+ok 15
+ok 16
+ok 17
 OUT
 
 ##############################
@@ -157,3 +194,4 @@ ok 1
 ok 2
 ok 3
 OUT
+

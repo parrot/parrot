@@ -20,6 +20,8 @@ Get or set the context type, which may be either:
 
 =item * an array of typenames representing a tuple.
 
+=item * a P6C::SigContext for complex contexts
+
 =item * undef, in cases where an operator is overloaded.
 
 It might be useful to allow multidimensional tuples by making the
@@ -68,7 +70,10 @@ tuple.
 
 =item B<is_array($ctx)>
 
-True if the type($ctx) is some kind of scalar, tuple, or array.
+=item B<is_sig($ctx)>
+
+True if the type($ctx) is some kind of scalar, tuple, array, or
+function signature.
 
 =item B<copy($ctx)>
 
@@ -107,6 +112,17 @@ use strict;
 use P6C::Util qw(diag unimp same_type);
 use Class::Struct 'P6C::Context' => { qw(type $ flatten $ hype $) };
 
+# A P6C::SigContext is *not* a type of P6C::Context; it is used in the
+# type field of a P6C::Context.
+#
+# FIXME: Need to add invocants
+use Class::Struct 'P6C::SigContext' => { qw(positional @
+                                            optional @
+                                            named %
+                                            slurpy_array $
+                                            slurpy_named $
+                                           ) };
+
 use vars qw(%CONTEXT $DEFAULT_ARGUMENT_CONTEXT);
 
 BEGIN {
@@ -136,6 +152,11 @@ sub is_tuple {
 sub is_array {
     my $type = shift->type;
     return $type eq 'PerlArray';
+}
+
+sub is_sig {
+    my $type = shift->type;
+    return UNIVERSAL::isa($type, 'P6C::SigContext');
 }
 
 sub copy {
@@ -178,6 +199,40 @@ sub block_ctx {
     $ctx->{label} = $voidctx->{label};
     $x->[-1]->ctx_right($ctx);
     delete $ctx->{last_stmt};
+}
+
+# Fetch the context for the ith positional argument, assuming that the
+# context object refers to a P6C::SigContext object.
+sub indexed_context {
+    my ($ctx, $i) = @_;
+
+    die "expected sig context" if ! is_sig($ctx);
+    my $sigctx = $ctx->type;
+
+    if ($i < @{ $sigctx->positional }) {
+        return $sigctx->positional->[$i];
+    }
+    $i -= @{ $sigctx->positional };
+
+    if ($i < @{ $sigctx->optional }) {
+        return $sigctx->optional->[$i];
+    }
+    $i -= @{ $sigctx->optional };
+
+    if ($sigctx->slurpy_array) {
+        return $sigctx->slurpy_array;
+    } else {
+        warn "no context found for positional arg";
+        return;
+    }
+}
+
+# What is the maximum number of positional arguments possible,
+# ignoring the slurpy array (if any)?
+sub P6C::SigContext::max_nonslurpy_positional {
+    my $x = shift;
+    return @{$x->positional}
+         + @{$x->optional};
 }
 
 1;

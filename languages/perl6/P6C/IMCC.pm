@@ -89,12 +89,13 @@ sub paramtype(*) {
 
 sub import {
     my ($class, $type) = @_;
+    return 1 if @_ == 1; # use IMCC ();
     my @syms = qw(globalvar localvar paramvar findvar
 		  add_localvar add_globalvar
 		  declare_label goto_label emit_label
 		  push_scope pop_scope
 		  set_topic topic
-		  gentmp genlabel newtmp mangled_name
+		  gentmp genlabel newtmp genlocal newlocal mangled_name
 		  code fixup_label
 		  add_function set_function exists_function_def
 		  exists_function_decl set_function_params set_function_return
@@ -158,13 +159,21 @@ sub compile {			# compile input (don't emit)
     }
 }
 
-sub emit {			# emit all code
+# P6C::IMCC::emit - emit all code
+sub emit {
     die "Must define main" unless $funcs{main};
     print <<'END';
 .sub __main
 	new_pad 0
 	call __setup
 END
+
+    # emulate a sub main (@ARGS) { ... }, except don't pass in a named
+    # argument hash. This is hopefully a temporary hack, until we can
+    # find a better place to put all the named arguments.
+    $funcs{main}->params((P6C::Builtins::parse_sig('@ARGS'))[0]);
+    $funcs{main}->params->{no_named} = 1;
+
     # XXX: This is hackish. The builtins should really be global multimethods,
     # and closures shouldn't be excluded by name. This'll do until it can be
     # refactored to use imcc lexicals and globals everywhere.
@@ -182,6 +191,7 @@ END
     }
     print <<'END';
 	.pcc_begin non_prototyped
+        .arg P5
 	.pcc_call main_sub
 main_ret_label:
 	.pcc_end
@@ -239,12 +249,10 @@ Set the code insertion point to the end of function C<$name>,
 returning the name of the previously active function.  Function
 C<$name> should exist before this is called.
 
-=item B<set_function_params(@params)>
+=item B<set_function_params($signature)>
 
-Set the parameter list for the current function.  The arguments should
-be a list of C<P6C::param> objects.  XXX: there is currently no way to
-handle variable parameter lists.  This is a limitation of the current
-parameter-passing scheme, not just this interface.
+Set the parameter list for the current function.  The argument should
+be a C<P6C::signature> object.
 
 =item B<set_function_return($ret)>
 
@@ -268,7 +276,11 @@ sub fixup_label {
 sub add_function($) {
     my $f = shift;
     if (exists $funcs{$f}) {
-	diag "Redefining function $f";
+        if ($funcs{$f}->{'autodeclared'}) {
+            diag "$f called too early to check prototype";
+        } else {
+            diag "Redefining function $f";
+        }
     }
     $funcs{$f} = new P6C::IMCC::Sub;
     # NOTE: top-level closure will push a scope.
@@ -466,10 +478,8 @@ sub add_localvar {
 sub paramvar($) {
     my $var = shift;
     my $mname = mangled_name($var);
-    return $mname if grep {
-	$_->[1] eq $var;
-    } @{$funcs{$curfunc}->args};
-    return undef;
+    return $mname if $funcs{$curfunc}->params->paramvar($var);
+    return;
 }
 
 sub findvar($) {
@@ -494,8 +504,12 @@ sub pop_scope {
     $funcs{$curfunc}->pop_scope;
 }
 
+# Convert names like $foo to _SV_foo. If the name is prefixed with an
+# equals sign, then just pass the rest of the string through untouched
+# (so the mangled form of "=$#@!!" is "$#@!!".
 sub mangled_name($) {
     my $name = shift;
+    return substr($name, 1) if $name =~ /^=/; # Passthru char
     my %mangle = (qw(! _BANG_
 		     ^ IMPL_
 		     $ SV_
@@ -542,27 +556,10 @@ sub topic {
 
 =over
 
-=item C<gensym([$str])>
+=item B<gensym([$str])>
 
 Generate a unique identifier.  If C<$str> is given, include it as part
 of the identifier.
-
-=item C<genlabel([$str])>
-
-Generate a unique label containing C<$str>.
-
-=item C<newtmp([$type])>
-
-Create a new temporary register to hold a value of type C<$type>,
-which should be "int", "num", "str", or some PMC type.  If C<$type> is
-a PMC type, the register will be initialized with a new value.  If
-C<$type> is omitted, it default to C<PerlUndef>.
-
-=item C<gentmp([$type])>
-
-Generate an uninitialized temporary register.
-
-=back
 
 =cut
 
@@ -574,10 +571,34 @@ sub _gentmp(*) {		# uninitialized temporary (internal)
     '$' . $_[0] . ++$lasttmp
 }
 
+=item B<gentmp([$type])>
+
+Generate an uninitialized temporary register.
+
+=cut
+
 sub gentmp(;*) {			# uninitialized temporary
     my $t = $_[0] || 'PerlUndef';
     _gentmp(regtype($t));
 }
+
+=item B<genlocal($type,$name)>
+
+Generate an uninitialized local variable with the given type and name.
+
+=cut
+
+sub genlocal ($$) {
+    my ($type, $name) = @_;
+    code(".local ".paramtype($type)." $name");
+    return $name;
+}
+
+=item B<genlabel([$str])>
+
+Generate a unique label containing C<$str>.
+
+=cut
 
 sub genlabel(;$) {		# new label (optionally annotated)
     my $n = shift;
@@ -585,28 +606,62 @@ sub genlabel(;$) {		# new label (optionally annotated)
     'L_'.$n. ++$lastlabel
 }
 
-sub newtmp(;*) {			# initialized temporary
+=item B<newtmp([$type,[$comment]])>
+
+Create a new temporary register to hold a value of type C<$type>,
+which should be "int", "num", "str", or some PMC type.  If C<$type> is
+a PMC type, the register will be initialized with a new value.  If
+C<$type> is omitted, it default to C<PerlUndef>.
+
+=cut
+
+sub newtmp(;*$) {			# initialized temporary
     my $type = shift || 'PerlUndef';
+    my $comment = shift || "";
+    $comment = " $comment" if length $comment > 0;
     my $reg = regtype $type;
     my $name;
     if ($reg eq 'S') {
   	$name = _gentmp S;
 	code(<<END);
-	$name = ""
+	$name = ""$comment
 END
     } elsif ($reg eq 'I' || $reg eq 'N') {
  	$name = _gentmp $reg;
 	code(<<END);
-	$name = 0
+	$name = 0$comment
 END
     } else {
 	$name = _gentmp P;
 	code(<<END);
-	$name = new $type
+	$name = new $type$comment
 END
     }
     return $name;
 }
+
+=item B<newlocal([$type])>
+
+Generate a new local variable initialized with the default value for
+its type.
+
+=cut
+
+sub newlocal($$) {			# initialized local var
+    my ($type, $name) = @_;
+    my $reg = regtype $type;
+    code(".local ".paramtype($type)." $name");
+    if ($reg eq 'S') {
+	code(qq[\t$name = ""]);
+    } elsif ($reg eq 'I' || $reg eq 'N') {
+	code("\t$name = 0");
+    } else {
+	code("\t$name = new $type");
+    }
+    return $name;
+}
+
+=back
 
 =head2 Code generation functions
 
@@ -620,25 +675,6 @@ Generate a counted loop using C<$counter> as the repetition count.
 The loop will iterate over values between 0 and $counter - 1,
 inclusive.  C<$counter> will be used as the iteration variable, so it
 can be used in indexing expressions in the loop body.
-
-=item B<scalar_in_context($val, $ctx)>
-
-Emit the code to return a scalar C<$val> in the right way for context
-C<$ctx>.
-
-=item B<array_in_context($val, $ctx)>
-
-=item B<tuple_in_context(\@vals, $ctx)>
-
-=item B<primitive_in_context($val, $primitive_type, $ctx)>
-
-=item B<do_flatten_array($vals)>
-
-Emit code to evaluate each item in C<@$vals>, which are assumed to be
-in list context.  The results are concatenated into a single array,
-whose name is returned.
-
-=back
 
 =cut
 
@@ -657,6 +693,14 @@ END
     return undef;
 }
 
+=item B<scalar_in_context($val, $ctx)>
+
+Emit the code to return a scalar C<$val> in the right way for context
+C<$ctx>. In array context, that means create a single-element array
+containing the scalar.
+
+=cut
+
 sub scalar_in_context {
     my ($x, $ctx) = @_;
     if ($ctx->type eq 'void') {
@@ -664,11 +708,12 @@ sub scalar_in_context {
 	return $x; # XXX:
     } elsif ($ctx->is_array) {
 	my $a = newtmp 'PerlArray';
-	my $id = 'scalar_in_context from '.((caller 1)[3]);
+	my $id = "scalar_in_context(array) from ".((caller 1)[3]);
 	code(<<END);
-# $id
+# $id START
 	$a = 1
 	$a\[0] = $x
+# $id END
 END
 	return $a;
     } elsif ($ctx->is_tuple) {
@@ -686,6 +731,10 @@ END
     }
 }
 
+=item B<primitive_in_context($val, $primitive_type, $ctx)>
+
+=cut
+
 sub primitive_in_context {
     my ($x, $type, $ctx) = @_;
     if ($type eq $ctx->type) {
@@ -693,13 +742,18 @@ sub primitive_in_context {
     } else {
 	my $tmp = newtmp 'PerlUndef';
 	my $id = 'primitive_in_context from '.((caller 1)[3]);
-	code(<<END);
-# $id
-	$tmp = $x
-END
+	code("\t$tmp = $x # $id");
 	return scalar_in_context($tmp, $ctx);
     }
 }
+
+=item B<array_in_context($val, $ctx)>
+
+Convert an array to the appropriate type for the given context. In
+tuple context, pull out as many values as needed from the array. In
+scalar context, return the length of the array.
+
+=cut
 
 sub array_in_context {
     my ($x, $ctx) = @_;
@@ -757,6 +811,15 @@ END
     }
 }
 
+=item B<tuple_in_context(\@vals, $ctx)>
+
+Convert a tuple to the appropriate type for the given context. In
+tuple context, pad with PerlUndefs or truncate the array. In array
+context, construct an array out of all of the values in the tuple. In
+scalar context, return the first element in the tuple.
+
+=cut
+
 sub tuple_in_context {
     my ($x, $ctx) = @_;
     if ($ctx->type eq 'void') {
@@ -803,6 +866,14 @@ END
     }
 }
 
+=item B<undef_in_context($ctx)>
+
+Convert an undefined value to the appropriate type for the given
+context. For example, an undefined value is an empty PerlArray. For
+most types, it is a PerlUndef object.
+
+=cut
+
 sub undef_in_context {
     my $ctx = shift;
     if (!defined($ctx) || $ctx->type eq 'void') {
@@ -817,6 +888,14 @@ sub undef_in_context {
 	unimp "Return type ".$ctx->type;
     }
 }
+
+=item B<do_flatten_array($vals)>
+
+Emit code to evaluate each item in C<@$vals>, which are assumed to be
+in list context.  The results are concatenated into a single array,
+whose name is returned.
+
+=cut
 
 sub do_flatten_array {
     my ($vals, $off) = @_;
@@ -857,14 +936,52 @@ END
     return $tmp;
 }
 
+=item B<do_append_array($dest, $src)>
+
+Append one array to another. I would vastly prefer having an 'append'
+opcode, but that can wait.
+
+=cut
+
+sub do_append_array {
+    my ($dest, $src) = @_;
+    my $len = gentmp 'int';
+    my $tmp = newtmp 'PerlUndef';
+    my $i = gentmp 'int';
+    my $looptop = genlabel 'append_loop_top';
+    my $loopend = genlabel 'append_loop_end';
+    my $est = substr($dest, 1);
+    my $rc = substr($src, 1);
+    code(<<"END");
+# append $src to the end of $dest ('push \@$est, *\@$rc')
+	$i = 0
+        $len = $src
+$looptop:
+        if $i >= $len goto $loopend
+        $tmp = $src\[$i]
+        push $dest, $tmp
+        inc $i
+        goto $looptop
+$loopend:
+END
+}
+
+=back
+
+=cut
+
+# FIXME: This completely ignores the new signature-based calling
+# stuff.
 sub call_closure {
     my ($thing, $args) = @_;
     my $argval = $args ? $args->val : newtmp('PerlArray');
     my $func = $thing->val;
+    my $dummy_named = newtmp 'PerlHash';
     my $ret_label = genlabel 'ret_label';
     my $ret = gentmp 'pmc';
     code(<<END);
-	.pcc_begin non_prototyped
+	.pcc_begin non_prototyped # closure
+	.arg	$dummy_named
 	.arg	$argval
 	.pcc_call $func
 $ret_label:
@@ -884,10 +1001,10 @@ the parse tree structures instead.
 
 =over
 
-=item B<$sub->{code}>
+=item B<< $sub->{code} >>
 
 The code (not including C<.local> definitions, etc).  Should be
-appended to like C<$func->{code} .= $thing>.
+appended to like C<< $func->{code} .= $thing >>.
 
 =item B<emit($sub)>
 
@@ -900,7 +1017,7 @@ Emit a complete function body, minus the C<.sub> directive.
 package P6C::IMCC::Sub;
 use Class::Struct 'P6C::IMCC::Sub'
     => { scopes => '@',		# scope stack
-	 args => '@',		# arguments, in order passed
+	 params => '$',		# parameters passed
 	 rettype => '$',	# return type (scalar, array, tuple)
        };
 #	{scopelevel}		# current scope number
@@ -987,12 +1104,9 @@ sub push_scope {
 
 sub maybe_set_params {
     # XXX: hack to keep inner closures from mucking with our params.
-    my $x = shift;
+    my ($x, $signature) = @_;
     unless ($x->{hasparam}) {
-	my $params = $x->args;
-	for my $p (@_) {
-	    push @$params, [$p->var->type, $p->var->name];
-	}
+        $x->params($signature);
 	$x->{hasparam} = 1;
     }
 }
@@ -1007,16 +1121,90 @@ sub pop_scope {
     push @{$x->{oldscopes}}, shift @{$x->scopes};
 }
 
+# P6C::IMCC::Sub::emit - print out the code for a subroutine body
+#
+# 1. Grab the parameters from the passed-in registers
+# 2. Implement the subroutine code
+# 3. call the continuation to "return"
+#
+# FIXME: Non-PMC arguments/params are not yet handled.
+# FIXME: Pass-by-value only implemented
 sub emit {
-    my $x = shift;
-    foreach (@{$x->args}) {
-	my ($t, $pname) = @$_;
-	my $ptype = P6C::IMCC::paramtype($t);
-	$pname = P6C::IMCC::mangled_name($pname);
-	print <<END;
-	.param $ptype	$pname
-END
+    my ($x, $prototyped) = @_;
+    my $params = $x->params;
+
+    # $positional_args is a PerlArray containing all of the non-named
+    # args (including all positional args and the slurpy array, if
+    # any) in the unprototyped case. In the prototyped case, the
+    # required and positional args are passed directly.
+    my $positional_args;
+    if (! $prototyped || $params->slurpy_array) {
+        $positional_args = P6C::IMCC::gensym("positionals");
     }
+    my $known_named_args = P6C::IMCC::gensym("known_named");
+    my $named_args = P6C::IMCC::gensym("unknown_named");
+
+    print "\t.param PerlHash $named_args # named args\n"
+      unless $params->{no_named};
+
+    foreach my $param (@{ $params->positional }, @{ $params->optional }) {
+        my ($ptype, $pvar) = ($param->type, $param->var);
+        my $pname = $pvar->name;
+        my $pname_mangled = P6C::IMCC::mangled_name($pname);
+        print "\t.param $ptype $pname_mangled # Positional param $pname\n";
+    }
+
+    # The slurpy array, if any, is passed as an array PMC
+    if ($params->slurpy_array) {
+        my $slurpy = $params->slurpy_array->var->name;
+        my $slurpy_name = mangled_name($slurpy);
+        print "\t.param object $slurpy_name # slurpy array $slurpy_name\n";
+    }
+
+    # Create local variables for all the named arguments
+    foreach my $param (@{ $params->required_named },
+                       @{ $params->optional_named })
+    {
+        my ($ptype, $pvar) = ($param->type, $param->var);
+        my $pname = $pvar->name;
+        my $pname_mangled = P6C::IMCC::mangled_name($pname);
+        print "\t.sym $ptype $pname_mangled # Named param $pname\n";
+    }
+
+    my $tmp = P6C::IMCC::gentmp 'int';
+    my $got_params = genlabel "got_params";
+    unless ($params->{no_named}) {
+        print "# Argument handling\n";
+        print "  if I0 goto $got_params\n";
+        my $min_count = 2;
+        foreach my $param (@{ $params->positional }) {
+            my ($ptype, $pvar) = ($param->type, $param->var);
+            my $pname = $pvar->name;
+            my $pname_base = substr($pname, 1);
+            my $pname_mangled = P6C::IMCC::mangled_name($pname);
+            my $label = genlabel "skip_param_$pname_mangled";
+            print "  if I1 >= $min_count goto $label\n";
+            print "  exists $tmp, $named_args\[\"$pname_base\"]\n";
+            print "  unless $tmp goto $label\n";
+            print "  $pname_mangled = $named_args\[\"$pname_base\"]\n";
+            print "  delete $named_args\[\"$pname_base\"]\n";
+            print "$label:\n";
+            $min_count++;
+        }
+        print "$got_params:\n";
+    }
+
+    # Grab out the named params
+    foreach my $param (@{ $params->required_named },
+                       @{ $params->optional_named })
+    {
+        my ($ptype, $pvar) = ($param->type, $param->var);
+        my $pname = $pvar->name;
+        my $pname_base = substr($pname, 1);
+        my $pname_mangled = P6C::IMCC::mangled_name($pname);
+        print "  $pname_mangled = $named_args\[\"$pname_base\"\]\n";
+    }
+
     print "# Named locals:\n";
     for (@{$x->scopes}, @{$x->{oldscopes}}) {
 	for my $v (values %$_) {
@@ -1037,8 +1225,14 @@ END
     }
     print $x->{code};
     print <<END;
-	end
+        .pcc_begin_return
+        .pcc_end_return
 END
+#    print <<END;
+#	restoreall
+#	invoke $saved_continuation
+#	end
+#END
 }
 
 ######################################################################
@@ -1095,6 +1289,35 @@ sub val {
 # ValueList in array context
 END
 	return do_flatten_array($x->vals, 0);
+    } elsif ($ctx->is_sig) {
+        my $type = $ctx->type;
+	# FIXME: In signature context, for now we'll do something very
+	# similar to tuple context. This has many gaps, but hopefully
+	# we'll cover an interesting subset of cases.
+	my @ret;
+	my $min = @{ $type->positional };
+        die "not enough args: need $min, have " . @{$x->vals}
+          if @{$x->vals} < $min; # Should be runtime exception?
+
+	for my $i (0..$min - 1) {
+	    push @ret, $x->vals($i)->val;
+	}
+	if ($type->slurpy_array) {
+	    # In flattening context, we have to build a new array out of
+	    # the values.  All the values should have been evaluated in
+	    # array context, so they will all be PerlArrays.
+	    push @ret, do_flatten_array($x->vals, $min);
+	} else {
+            my $opt = @{ $type->optional };
+	    for my $i ($min .. $#{$x->vals}) {
+                if ($i - $min < $opt) {
+                    push @ret, $x->vals($i)->val;
+                } else {
+                    $x->vals($i)->val;
+                }
+	    }
+	}
+	return \@ret;
     } elsif ($ctx->is_scalar || $ctx->type eq 'void') {
 	# The value of a list in scalar context is its last value, but
 	# we need to evaluate intermediate expressions for possible
@@ -1377,7 +1600,7 @@ sub val {
 
     # XXX: these are actually _references_.  But we don't support them
     # anyways.
-    die "Don't support ".$type if $type =~ /Perl(Hash|Array)/;
+    unimp "Don't support ".$type if $type =~ /Perl(Hash|Array)/;
     return primitive_in_context($x->lval, $type, $x->{ctx});
 }
 
@@ -1400,7 +1623,8 @@ sub val {
     } elsif (exists $prefix_ops{$x->name}) {
 	return $prefix_ops{$x->name}->($x, @_);
     } else {
-	unimp "Prefix operator ".$x->name();
+	return gen_sub_call($x, @_);
+#	unimp "Prefix operator ".$x->name();
     }
 }
 
@@ -1551,15 +1775,14 @@ use P6C::IMCC ':all';
 
 # A sub with no explicit parameter list gets @_.
 
-# NOTE: This parallels what's done in Addcontext.pm.  These things
-# should be integrated.
-use vars '$default_params';
-BEGIN {
-    my $underscore = P6C::variable->new(name => '@_', type => 'PerlArray');
-    $default_params = new P6C::params req => [], opt => [],
-	rest => P6C::param->new(var => $underscore);
+sub default_signature {
+    return $P6C::IMCC::DEFAULT_SIGNATURE ||=
+      (P6C::Builtins::parse_sig('*@_'))[0];
 }
 
+# Generate the code to implement the body of a subroutine (or anything
+# else that contains a closure). That includes grabbing arguments and
+# binding them to parameters.
 sub val {
     my $x = shift;
     my $ctx = $x->{ctx};
@@ -1576,19 +1799,11 @@ sub val {
 
     # Figure out params:
     unless ($x->params) {
-	$x->params($default_params);
+	$x->params(P6C::closure::default_signature());
     }
 
-    @params = @{$x->params->req};
-    if (!defined $x->params->max) {
-	set_function_params(@params, $x->params->rest);
-    } elsif ($x->params->min != $x->params->max) {
-	# Only support variable number of params if it's N - Inf.
-	unimp "Unsupported parameter arity: ",
-	    $x->params->min . ' - ' . $x->params->max;
-    } else {
-	set_function_params(@params);
-    }
+    set_function_params($x->params);
+
     if ($ctx->{noreturn}) {
 	# Do nothing.
     } elsif (UNIVERSAL::isa($x->block, 'P6C::rule')) {
@@ -1643,7 +1858,7 @@ END
 	unless ($ctx->{noreturn}) {
 	    code(<<END);
 	.pcc_begin_return
-	.return $ret
+	.return $ret # regular (non-rule) sub return
 	.pcc_end_return
 END
 	    emit_label type => 'return' unless $ctx->{noreturn};
@@ -2050,7 +2265,7 @@ sub P6C::context::val {
     my $x = shift;
     my $v = $x->thing->val;
     my $type = $P6C::context::names{$x->ctx};
-    if ($type eq 'PerlAray') {
+    if ($type eq 'PerlArray') {
 	return array_in_context($v, $x->{ctx});
     } elsif ($type eq 'PerlHash') {
 	unimp 'hash context';
