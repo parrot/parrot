@@ -1565,6 +1565,8 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
     type = *cursor;
     cursor++;
 
+    UNUSED(type);
+
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack_string(): type is %ld...\n", type);
 #endif
