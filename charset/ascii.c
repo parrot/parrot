@@ -51,7 +51,7 @@ ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
 {
 
     for (; start < string->strlen; start++) {
-        if (table[ENCODING_GET_CODEPOINT(interpreter, string, start)] == type) {
+        if (table[ENCODING_GET_CODEPOINT(interpreter, string, start)] & type) {
             return start;
         }
     }
@@ -66,7 +66,8 @@ ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
     INTVAL found = 0;
 
     for (; start < string->strlen; start++) {
-        if (table[ENCODING_GET_CODEPOINT(interpreter, string, start)] != type) {
+        if (!(table[ENCODING_GET_CODEPOINT(interpreter, string, start)]
+                    &type)) {
             found = 1;
             break;
         }
@@ -393,7 +394,7 @@ ascii_find_word_boundary(Interp *interpreter, STRING *string,
     int is_wc1, is_wc2;
 
     len = string->strlen;
-    if (!len)
+    if (!len || offset >= len)
         return -1;
     c = ENCODING_GET_CODEPOINT(interpreter, string, offset);
     is_wc1 = (table[c] & WORDCHAR) ? 1 : 0;

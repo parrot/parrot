@@ -703,6 +703,62 @@ op is_newline(out INT, in STR, in INT) {
 }
 
 
+=item B<find_whitespace>(out INT, in STR, in INT)
+
+Set $1 to the offset of the next whitespace codepoint or to -1.
+
+=item B<find_wordchar>(out INT, in STR, in INT)
+
+Set $1 to the offset of the next wordchar codepoint or to -1.
+
+=item B<find_digit>(out INT, in STR, in INT)
+
+Set $1 to the offset of the next digit codepoint or to -1.
+
+=item B<find_punctuation>(out INT, in STR, in INT)
+
+Set $1 to the offset of the next punctuation codepoint or to -1.
+
+=item B<find_newline>(out INT, in STR, in INT)
+
+Set $1 to the offset of the next newline codepoint or to -1.
+
+=item B<find_word_boundary>(out INT, in STR, in INT)
+
+Set $1 to the offset of the next word boundary or to -1.
+
+=cut
+
+op find_whitespace(out INT, in STR, in INT) {
+  $1 = Parrot_string_find_whitespace(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op find_wordchar(out INT, in STR, in INT) {
+  $1 = Parrot_string_find_wordchar(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op find_digit(out INT, in STR, in INT) {
+  $1 = Parrot_string_find_digit(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op find_punctuation(out INT, in STR, in INT) {
+  $1 = Parrot_string_find_punctuation(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op find_newline(out INT, in STR, in INT) {
+  $1 = Parrot_string_find_newline(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op find_word_boundary(out INT, in STR, in INT) {
+  $1 = Parrot_string_find_word_boundary(interpreter, $2, $3);
+  goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

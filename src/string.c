@@ -2543,6 +2543,54 @@ Parrot_string_is_newline(Interp *interpreter, STRING *s, INTVAL offset)
     return CHARSET_IS_NEWLINE(interpreter, s, offset);
 }
 
+INTVAL
+Parrot_string_find_whitespace(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return -1;
+    return CHARSET_FIND_WHITESPACE(interpreter, s, offset);
+}
+
+INTVAL
+Parrot_string_find_digit(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return -1;
+    return CHARSET_FIND_DIGIT(interpreter, s, offset);
+}
+
+INTVAL
+Parrot_string_find_wordchar(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return -1;
+    return CHARSET_FIND_WORDCHAR(interpreter, s, offset);
+}
+
+INTVAL
+Parrot_string_find_punctuation(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return -1;
+    return CHARSET_FIND_PUNCTUATION(interpreter, s, offset);
+}
+
+INTVAL
+Parrot_string_find_newline(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return -1;
+    return CHARSET_FIND_NEWLINE(interpreter, s, offset);
+}
+
+INTVAL
+Parrot_string_find_word_boundary(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return -1;
+    return CHARSET_FIND_WORD_BOUNDARY(interpreter, s, offset);
+}
+
 /*
 
 =back

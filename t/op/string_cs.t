@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 16;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -179,4 +179,69 @@ CODE
 01
 OUTPUT
 
+output_is( <<'CODE', <<OUTPUT, "find_wordchar");
+    set S0, "_ ab 09"
+    set I0, 0
+lp:
+    find_wordchar I0, S0, I0
+    print I0
+    print " "
+    eq I0, -1, done
+    inc I0
+    branch lp
+done:
+    print "ok\n"
+    end
+CODE
+0 2 3 5 6 -1 ok
+OUTPUT
 
+output_is( <<'CODE', <<OUTPUT, "find_digit");
+    set S0, "_ ab 09"
+    set I0, 0
+lp:
+    find_digit I0, S0, I0
+    print I0
+    print " "
+    eq I0, -1, done
+    inc I0
+    branch lp
+done:
+    print "ok\n"
+    end
+CODE
+5 6 -1 ok
+OUTPUT
+output_is( <<'CODE', <<OUTPUT, "find_punctuation");
+    set S0, "_ .b ,9"
+    set I0, 0
+lp:
+    find_punctuation I0, S0, I0
+    print I0
+    print " "
+    eq I0, -1, done
+    inc I0
+    branch lp
+done:
+    print "ok\n"
+    end
+CODE
+2 5 -1 ok
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "find_word_boundary");
+    set S0, "_ab 09z"
+    set I0, 0
+lp:
+    find_word_boundary I0, S0, I0
+    print I0
+    print " "
+    eq I0, -1, done
+    inc I0
+    branch lp
+done:
+    print "ok\n"
+    end
+CODE
+0 2 3 6 -1 ok
+OUTPUT

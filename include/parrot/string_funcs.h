@@ -108,6 +108,14 @@ INTVAL Parrot_string_is_wordchar(Interp *, STRING *, INTVAL offset);
 INTVAL Parrot_string_is_punctuation(Interp *, STRING *, INTVAL offset);
 INTVAL Parrot_string_is_newline(Interp *, STRING *, INTVAL offset);
 
+INTVAL Parrot_string_find_whitespace(Interp *, STRING *, INTVAL offset);
+INTVAL Parrot_string_find_digit(Interp *, STRING *, INTVAL offset);
+INTVAL Parrot_string_find_wordchar(Interp *, STRING *, INTVAL offset);
+INTVAL Parrot_string_find_punctuation(Interp *, STRING *, INTVAL offset);
+INTVAL Parrot_string_find_newline(Interp *, STRING *, INTVAL offset);
+INTVAL Parrot_string_find_word_boundary(Interp *, STRING *, INTVAL offset);
+
+
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_FUNCS_H_GUARD */
 
