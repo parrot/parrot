@@ -84,7 +84,12 @@ static QUEUE* event_queue;
 #ifndef SIGINT
 #  define SIGINT -4711
 #endif
-static sig_atomic_t sig_int;
+
+/*
+ * XXX need a configure test
+ * should be sig_atomic_t
+ */
+static int sig_int;
 
 /*
  * a pipe is used to send messages to the IO thread
@@ -233,8 +238,14 @@ init_events_first(Parrot_Interp interpreter)
      * we use a message pipe to send IO related stuff to the
      * IO thread
      */
+#ifndef WIN32
+    /*
+     * pipes on WIN32 don't support select
+     * s. p6i: "event.c - of signals and pipes"
+     */
     if (pipe(pipe_fds))
         internal_exception(1, "Couldn't create message pipe");
+#endif
     /*
      * now set some sig handlers before any thread is started, so
      * that all threads inherit the signal block mask
@@ -249,7 +260,9 @@ init_events_first(Parrot_Interp interpreter)
     /*
      * and a signal and IO handler thread
      */
+#ifndef WIN32
     THREAD_CREATE_DETACHED(io_handle, io_thread, event_queue);
+#endif
 }
 
 /*
@@ -602,6 +615,7 @@ the wait sets.
 
 */
 
+#ifndef WIN32
 static void*
 io_thread(void *data)
 {
@@ -682,6 +696,7 @@ io_thread(void *data)
     close(PIPE_WRITE_FD);
     return NULL;
 }
+#endif
 
 /*
 
@@ -704,8 +719,10 @@ stop_io_thread(void)
     buf[0] = 'e';
     buf[1] = -1;
     buf[2] = '\n';
+#ifndef WIN32
     if (write(PIPE_WRITE_FD, buf, MSG_SIZE) != MSG_SIZE)
         internal_exception(1, "msg pipe write failed");
+#endif
 }
 
 /*
