@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -220,8 +220,6 @@ clear physics
 You can't teach an old dog new...clear physics
 OUTPUT
 
-SKIP: {
-skip("Pending new version of concat_p_p_s",1);
 output_is(<<CODE, <<OUTPUT, "ensure that concat pps copies strings");
 	new P0, .PerlString
 	new P1, .PerlString
@@ -243,8 +241,6 @@ Grunties
 fnargh
 fnarghGrunties
 OUTPUT
-warn "# We're no longer pregenerating concat_p_p_s -- Test is a TODO\n";
-}
 
 output_is(<<CODE, <<OUTPUT, "Setting string copies");
 	new P0, .PerlString
@@ -300,6 +296,25 @@ zzz
 
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "repeat_int");
+	new P0, .PerlString
+	set P0, "x"
+	set I1, 12
+	new P2, .PerlString
+	repeat P2, P0, I1
+        print P2
+        print "\n"
+
+        set P0, "za"
+        set I1, 3
+        repeat P2, P0, I1
+        print P2
+        print "\n"
+	end
+CODE
+xxxxxxxxxxxx
+zazaza
+OUTPUT
 
 
 output_is(<<CODE, <<OUTPUT, "if(PerlString)");

@@ -2043,14 +2043,15 @@ inline op chopn(out STR, in STR, in INT) {
 
 =item B<concat>(inout STR, in STR)
 
+Append the string in $2 to the string in $1.
+
 =item B<concat>(out STR, in STR, in STR)
 
 =item B<concat>(in PMC, in PMC, in PMC)
 
-Append the string in $2 to the string in $1.
+=item B<concat>(in PMC, in PMC, in STR)
 
-The three argument version appends the string $3 to $2 and places the result
-into $1.
+Append the string $3 to $2 and places the result into $1.
 
 =cut
 
@@ -2069,11 +2070,17 @@ inline op concat (in PMC, in PMC, in PMC) {
   goto NEXT();
 }
 
+inline op concat (in PMC, in PMC, in STR) {
+  $2->vtable->concatenate_native(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 #######################################
 
 =item B<repeat>(out STR, in STR, in INT)
 
 =item B<repeat>(in PMC, in PMC, in PMC)
+
+=item B<repeat>(in PMC, in PMC, in INT)
 
 Repeats string $2 $3 times and stores result in $1.
 
@@ -2089,6 +2096,11 @@ inline op repeat(out STR, in STR, in INT) {
 
 inline op repeat (in PMC, in PMC, in PMC) {
   $2->vtable->repeat(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op repeat (in PMC, in PMC, in INT) {
+  $2->vtable->repeat_int(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
