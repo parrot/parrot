@@ -561,13 +561,15 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     jit_emit_addis(pc, D, r15, (long)disp >> 16); \
     jit_emit_add_rri_i(pc, D, D, (long)disp & 0xffff)
 
-#  define load_nc(pc, D, disp) \
-    jit_emit_oris(pc, D, r31, (long)disp >> 16); \
-    Parrot_exec_add_text_rellocation(jit_info->objfile, \
+#  if EXEC_CAPABLE
+#   define load_nc(pc, D, disp) \
+      jit_emit_oris(pc, D, r31, (long)disp >> 16); \
+      Parrot_exec_add_text_rellocation(jit_info->objfile, \
         pc, RTYPE_DATA, "const_table", -2); \
-    jit_emit_ori(jit_info->native_ptr, D, D, (long)disp & 0xffff); \
-    Parrot_exec_add_text_rellocation(jit_info->objfile, \
+      jit_emit_ori(jit_info->native_ptr, D, D, (long)disp & 0xffff); \
+      Parrot_exec_add_text_rellocation(jit_info->objfile, \
         pc, RTYPE_DATA1, "const_table", -2);
+#endif /* EXEC_CAPABLE */
 
 #endif /* JIT_EMIT */
 #if JIT_EMIT == 2
