@@ -237,11 +237,16 @@ interpinfo(Interp *interpreter, INTVAL what)
 PMC*
 interpinfo_p(Interp *interpreter, INTVAL what)
 {
+    PMC *cont;
     switch (what) {
         case CURRENT_SUB:
             return interpreter->ctx.current_sub;
         case CURRENT_CONT:
-            return interpreter->ctx.current_cont;
+            cont = interpreter->ctx.current_cont;
+            if (!PMC_IS_NULL(cont) && cont->vtable->base_type ==
+                    enum_class_RetContinuation)
+                return VTABLE_clone(interpreter, cont);
+            return cont;
         case CURRENT_OBJECT:
             return interpreter->ctx.current_object;
         case CURRENT_NAMESPACE_ROOT: /* XXX */

@@ -407,7 +407,8 @@ the_end:
      new_pad 1
      find_lex $P0, "fail"
      store_lex 1, "old_fail", $P0
-     $P1 = clone P1
+     .include "interpinfo.pasm"
+     $P1 = interpinfo .INTERPINFO_CURRENT_CONT
      store_lex 1, "cc", $P1
      newsub our_try, .Closure, _try
      store_lex 1, "try", our_try
@@ -440,16 +441,11 @@ have_choices:
 new_fail:
      .local pmc our_try
      .local pmc our_cc
-     save P1
      #print "In new_fail\n"
      our_cc = find_lex "cc"
      our_try = find_lex "try"
      $P2 = find_lex "choices"
      $P3 = our_try($P2)
-     restore P1
-     unless our_cc == P1 goto do_return
-     print "Something's very wrong with continuations!\n"
-do_return:
      our_cc($P3)
 .end
 
