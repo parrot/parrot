@@ -116,15 +116,15 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code) {
  *  Create the Parrot interpreter.  Allocate memory and clear the registers.
  */
 struct Parrot_Interp *
-make_interpreter() {
+make_interpreter(INTVAL flags) {
     struct Parrot_Interp *interpreter;
     /* Get an empty interpreter from system memory */
     interpreter = mem_sys_allocate((INTVAL)sizeof(struct Parrot_Interp));
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
-    /* Blank out the interpreter's flags */
-    interpreter->flags = 0;
+    /* Initialize interpreter's flags */
+    interpreter->flags = flags;
     
     /* Set up the initial register chunks */
     interpreter->int_reg_base = mem_allocate_aligned(sizeof(struct IRegChunk));

@@ -92,7 +92,7 @@ main(int argc, char **argv) {
 
     init_world();
   
-    interpreter = make_interpreter();
+    interpreter = make_interpreter(0);
     pf          = PackFile_new();
 
     interpreter->code = pf;

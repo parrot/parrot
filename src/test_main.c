@@ -17,6 +17,7 @@
 int
 main(int argc, char **argv) {
     int i;
+    int flags;
     int bounds_checking;
     int profiling;
     int tracing;
@@ -25,15 +26,14 @@ main(int argc, char **argv) {
     struct Parrot_Interp *interpreter;
     init_world();
   
-    interpreter = make_interpreter();
-    
     /*
-    ** Look for the '-b' bounds checking, '-p' profiling and '-t' tracing
-    ** switches.
+    ** Look for the '-d' debugging, '-b' bounds checking,
+    **          '-p' profiling and '-t' tracing switches.
     **
     ** We really should use getopt, but are we allowed?
     */
 
+    flags           = 0;
     bounds_checking = 0;
     profiling       = 0;
     tracing         = 0;
@@ -68,8 +68,32 @@ main(int argc, char **argv) {
             }
             argc--;
         }
+        else {
+            fprintf(stderr, "%s: Invalid switch: %s\n", argv[0], argv[1]);
+            exit(1);
+        } 
     }
 
+
+    if (debugging) {
+         fprintf(stderr, "Parrot VM: Debugging enabled.\n");
+         flags |= PARROT_DEBUG_FLAG;
+    }
+
+    if (bounds_checking) {
+         flags |= PARROT_BOUNDS_FLAG;
+    }
+
+    if (profiling) {
+         flags |= PARROT_PROFILE_FLAG;
+    }
+
+    if (tracing) {
+         flags |= PARROT_TRACE_FLAG;
+    }
+
+    interpreter = make_interpreter(flags);
+    
     /* If we got only the program name, complain */
 
     if (argc == 1) {
@@ -112,22 +136,6 @@ main(int argc, char **argv) {
         if( !PackFile_unpack(interpreter, pf, (char *)program_code, program_size) ) {
             printf( "Can't unpack.\n" );
             return 1;
-        }
-
-        if (debugging) {
-            interpreter->flags |= PARROT_DEBUG_FLAG;
-        }
-
-        if (bounds_checking) {
-            interpreter->flags |= PARROT_BOUNDS_FLAG;
-        }
-
-        if (profiling) {
-            interpreter->flags |= PARROT_PROFILE_FLAG;
-        }
-
-        if (tracing) {
-            interpreter->flags |= PARROT_TRACE_FLAG;
         }
 
         /*

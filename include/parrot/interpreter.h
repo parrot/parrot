@@ -55,7 +55,7 @@ struct Parrot_Interp {
 #define PNCONST   PF_NCONST(interpreter->code)
 
 struct Parrot_Interp *
-make_interpreter();
+make_interpreter(INTVAL);
 
 void
 runops_generic();

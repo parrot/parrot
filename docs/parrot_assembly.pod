@@ -769,6 +769,57 @@ allows the interpreter to fire one off when it deems it necessary.
 
 =back
 
+=head2 Key operations
+
+Keys are used to get access to individual elements of an aggregate
+variable.  This is done to allow for opaque, packed, and
+multidimensional aggregate types.
+
+A key entry may be an integer, string, or PMC. Integers are used for
+array lookups, strings for hash lookups, and PMCs for either. 
+
+=over 4
+
+=item new_key Sx
+
+Create a new key structure and put a pointer to it in register X.
+
+=item clone_key Sx, ky
+
+Make a copy of the key Y and put a pointer to it in register X. Y may
+be either an S register or a constant.
+
+=item size_key Sx, iy
+
+Make the key structure X large enough to hold Y key entries
+
+=item key_size Ix, ky
+
+Put the number of elements in key Y into integer register X.
+
+=item toss_key Sx
+
+Nuke key X. Throws the structure away and invalidates the register.
+
+=item ke_type Ix, ky, iz
+
+Put the type of key Y's entry Z in register X. Current values are 0,
+1, and 2 for Integer, String, and PMC, respectively.
+
+=item ke_value tx, ky, iz
+
+Put the value from key Y, entry Z into register X.
+
+=item chop_key Sx
+
+Toss the topmost entry from key X.
+
+=item inc_key Sx, iy
+
+Increment entry Y of key X by one.
+
+=back
+
 =head1 ATTACHMENTS
 
 =head1 REFERENCES
