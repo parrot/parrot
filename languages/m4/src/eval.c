@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 typedef int boolean;
 typedef int eval_t;
@@ -67,21 +69,23 @@ eval_error;
 
 
 /* declarations */
-static eval_error logical_or_term( eval_token, eval_t * );
-static eval_error logical_and_term( eval_token, eval_t * );
-static eval_error or_term( eval_token, eval_t * );
-static eval_error xor_term( eval_token, eval_t * );
-static eval_error and_term( eval_token, eval_t * );
-static eval_error not_term( eval_token, eval_t * );
-static eval_error logical_not_term( eval_token, eval_t * );
-static eval_error cmp_term( eval_token, eval_t * );
-static eval_error shift_term( eval_token, eval_t * );
-static eval_error add_term( eval_token, eval_t * );
-static eval_error mult_term( eval_token, eval_t * );
-static eval_error exp_term( eval_token, eval_t * );
-static eval_error unary_term( eval_token, eval_t * );
-static eval_error simple_term( eval_token, eval_t * );
-boolean           evaluate (const char *, eval_t *);
+static eval_error          logical_or_term( eval_token, eval_t * );
+static eval_error          logical_and_term( eval_token, eval_t * );
+static eval_error          or_term( eval_token, eval_t * );
+static eval_error          xor_term( eval_token, eval_t * );
+static eval_error          and_term( eval_token, eval_t * );
+static eval_error          not_term( eval_token, eval_t * );
+static eval_error          logical_not_term( eval_token, eval_t * );
+static eval_error          cmp_term( eval_token, eval_t * );
+static eval_error          shift_term( eval_token, eval_t * );
+static eval_error          add_term( eval_token, eval_t * );
+static eval_error          mult_term( eval_token, eval_t * );
+static eval_error          exp_term( eval_token, eval_t * );
+static eval_error          unary_term( eval_token, eval_t * );
+static eval_error          simple_term( eval_token, eval_t * );
+boolean                    evaluate (const char *, eval_t *);
+void *                     m4_eval_compiler(Parrot_Interp interpreter, const char *);
+void                       Parrot_lib_m4_eval_compiler_init(Parrot_Interp , PMC* );
 
 /*--------------------.
 | Lexical functions.  |
@@ -781,10 +785,6 @@ $ make -C examples/compilers/
 
 */
 
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-void* m4_eval_compiler(Parrot_Interp interpreter, const char *s);
 
 /*
  * loadlib calls the load and init hooks
@@ -800,35 +800,6 @@ Parrot_lib_m4_eval_compiler_init(Parrot_Interp interpreter, PMC* lib)
     Parrot_compreg(interpreter, cmp, (PMC*)F2DPTR(m4_eval_compiler));
 }
 
-/*
- * some code almost duplicated from imcc/pbc.c
- * XXX should make some public util functions
- */
-static struct PackFile_Segment *
-create_seg(struct PackFile_Directory *dir, pack_file_types t, const char *name)
-{
-    struct PackFile_Segment *seg;
-    seg = PackFile_Segment_new_seg(dir, t, name, 1);
-
-    return seg;
-}
-
-static struct PackFile *
-create_pf_segs(Parrot_Interp interpreter)
-{
-    struct PackFile *pf = PackFile_new(0);
-    struct PackFile_Segment *seg;
-    struct PackFile_ByteCode *cur_cs;
-
-    seg = create_seg(&pf->directory, PF_BYTEC_SEG, "JaPHc_bc");
-    cur_cs = pf->cur_cs = (struct PackFile_ByteCode*)seg;
-
-    seg = create_seg(&pf->directory, PF_CONST_SEG, "JaPHc_const");
-    cur_cs->consts = pf->const_table = (struct PackFile_ConstTable*) seg;
-    cur_cs->consts->code = cur_cs;
-
-    return pf;
-}
 
 static int
 unescape(char *string)
@@ -853,47 +824,6 @@ unescape(char *string)
     return p - start;
 }
 
-/* add constant string to constant_table */
-static int
-add_const_str(Parrot_Interp interpreter,
-	struct PackFile_ConstTable *consts, const char *str)
-{
-    int k, l;
-    char *o;
-    char *buf = o = strdup(str);
-
-    /*
-     * TODO strip delimiters in lexer, this needs adjustment in printint strings
-     */
-    if (*buf == '"') {
-        buf++;
-        l = unescape(buf);
-        if (l)
-        buf[--l] = '\0';
-    }
-    else if (*buf == '\'') {
-        buf++;
-        l = strlen(buf);
-        if (l)
-            buf[--l] = '\0';
-    }
-    else {
-        l = unescape(buf);
-    }
-
-    /* Update the constant count and reallocate */
-    k = ++consts->const_count;
-    consts->constants = mem_sys_realloc(consts->constants,
-            k * sizeof(struct PackFile_Constant *));
-
-    /* Allocate a new constant */
-    consts->constants[--k] = PackFile_Constant_new();
-    consts->constants[k]->type = PFC_STRING;
-    consts->constants[k]->u.string =
-        string_make(interpreter, buf, (UINTVAL) l, "iso-8859-1", 0 );
-    free(o);
-    return k;
-}
 
 /*
  * simple compiler - no error checking
@@ -901,12 +831,12 @@ add_const_str(Parrot_Interp interpreter,
 void*
 m4_eval_compiler( Parrot_Interp interpreter, const char *program )
 {
-    eval_t value;
+    eval_t value;  /* will be returned to caller */
 
-    struct PackFile *pf;
-    struct PackFile_ByteCode *cur_cs;
-    struct PackFile_ConstTable *consts;
+    struct PackFile_ByteCode *cur_cs, *old_cs;
     opcode_t* pc;
+    PMC *sub;
+    parrot_sub_t sub_data;
 
 
     /*
@@ -915,16 +845,15 @@ m4_eval_compiler( Parrot_Interp interpreter, const char *program )
     evaluate( program, &value );
 
     /*
-     * need some packfile segments
+     * need a packfile segment
      */
-    pf = create_pf_segs(interpreter);
-    cur_cs = pf->cur_cs;
+    cur_cs = (struct PackFile_ByteCode*)PackFile_Segment_new_seg(&interpreter->code->directory, PF_BYTEC_SEG, "m4_eval_bc", 1);
+    old_cs = Parrot_switch_to_cs(interpreter, cur_cs, 0);
     /*
      * alloc byte code mem
      */
     cur_cs->base.data = mem_sys_allocate(CODE_SIZE * sizeof(opcode_t));
     cur_cs->base.size = CODE_SIZE;
-    consts = cur_cs->consts;
 
     /*
      * Generate some bytecode
@@ -952,10 +881,24 @@ m4_eval_compiler( Parrot_Interp interpreter, const char *program )
     *pc++ = 0;
     /* no numeric return values */
     *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
-    *pc++ = 3;
+    *pc++ = 4;
     *pc++ = 0;
     /* do something else now */
-    *pc++ = interpreter->op_lib->op_code("end", 1);
+    *pc++ = interpreter->op_lib->op_code("invoke_p", 1);
+    *pc++ = 1;
 
-    return pf;
+    if (old_cs) {
+        /* restore old byte_code, */
+        (void)Parrot_switch_to_cs(interpreter, old_cs, 0);
+    }
+    /*
+     * create sub PMC
+     */
+    sub = pmc_new(interpreter, enum_class_Eval);
+    sub_data = PMC_sub(sub);
+    sub_data->seg = cur_cs;
+    sub_data->address = cur_cs->base.data;
+    sub_data->end = cur_cs->base.data + cur_cs->base.size;
+    sub_data->name = string_from_cstring(interpreter, "m4 eval", 0);
+    return sub;
 }

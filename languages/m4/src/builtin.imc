@@ -480,9 +480,7 @@ TODO: This is broken when the path seperator is not '/'
   .local string current_file
   current_file = state['current_file']
 
-  .pcc_begin_return
-    .return current_file
-  .pcc_end_return
+  .return ( current_file )
 .end
 
 
@@ -527,9 +525,7 @@ Define a user defined macro.
 
   define_macro( state, arg0, arg1 )
 
-  .pcc_begin_return
-    .return ''
-  .pcc_end_return
+  .return ( '' )
 .end
 
 
@@ -564,9 +560,7 @@ FIRST_OR_OTHER_ARG:
   goto ITER_LOOP
 END_ITER:
 
-  .pcc_begin_return
-    .return ''
-  .pcc_end_return
+  .return ( '' )
 .end
 
 
@@ -593,9 +587,8 @@ Integer arithmetics.
   ( evaluated_expression ) = compiled_code()
   .local string ret
   ret = evaluated_expression
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+
+  .return ( ret )
 .end
 
 
@@ -615,9 +608,7 @@ Frontend for printf like formatting.
   .local string ret
   ret = sprintf arg0, arguments
 
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+  .return ( ret )
 .end
 
 
@@ -648,9 +639,7 @@ SYMBOL_DOES_NOT_EXIST:
   ret = arguments[2]
 
 FINISH_M4_IFDEF:
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+  .return ( ret )
 .end
 
 
@@ -686,9 +675,7 @@ IS_NOT_EQUAL:
 
 USED_AS_BLOCK_QUOTE:
 FINISH_M4_IFELSE:
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+  .return ( ret )
 .end
 
 
@@ -710,9 +697,7 @@ Increase a number.
   .local string ret
   ret = arg0
 
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+  .return ( ret )
 .end
 
 
@@ -738,9 +723,7 @@ in the first argument.
   .local string ret
   ret = index_int
 
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+  .return ( ret )
 .end
 
 
@@ -763,9 +746,7 @@ Expand to the length of the first argument.
   .local string ret
   ret = len
 
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+  .return ( ret )
 .end
 
 
@@ -806,9 +787,7 @@ LENGTH_PASSED:
   goto FINISH_SUBSTR
 
 FINISH_SUBSTR:
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+  .return ( ret )
 .end
 
 
@@ -837,9 +816,7 @@ Execute a shell command and don't return the return code.
   exit_status_as_pmc  = exit_status
   store_global 'exit_status', exit_status_as_pmc
 
-  .pcc_begin_return
-    .return ''
-  .pcc_end_return
+  .return ( '' )
 .end
 
 
@@ -860,9 +837,7 @@ Return the exit status of the last syscmd.
   .local string ret
   ret = exit_status_as_pmc
 
-  .pcc_begin_return
-    .return ret
-  .pcc_end_return
+  .return ( ret )
 .end
 
 
@@ -884,9 +859,7 @@ Define a user defined macro.
 
   delete symtab[arg0]
  
-  .pcc_begin_return
-    .return ''
-  .pcc_end_return
+  .return ( '' )
 .end
 
 
@@ -900,7 +873,5 @@ A placeholder for unimplemented functions.
   .param PerlHash  state
   .param PerlArray arguments
 
-  .pcc_begin_return
-    .return 'not implemented yet'
-  .pcc_end_return
+  .return ( 'not implemented yet' )
 .end

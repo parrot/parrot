@@ -188,9 +188,7 @@ TOKEN_FUNC:
   .pcc_end
 
 FINISH_CALL_MACRO:
-  .pcc_begin_return
-    .return text
-  .pcc_end_return
+  .return ( text )
 .end
 
 

@@ -190,7 +190,8 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
 		}
 		break;
 	    case 'e':	/* end */
-		*pc++ = interpreter->op_lib->op_code("end", 1);
+		*pc++ = interpreter->op_lib->op_code("invoke_p", 1);
+		*pc++ = 1;
 		break;
 	}
     }

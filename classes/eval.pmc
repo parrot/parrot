@@ -62,8 +62,8 @@ pmclass Eval extends Closure {
         if (!cur_cs)
             return;
 
-        seg = (struct PackFile_Segment *)cur_cs->consts;
-        PackFile_Segment_destroy(seg);
+        if (cur_cs->consts)
+            PackFile_ConstTable_clear(cur_cs->consts);
         seg = (struct PackFile_Segment *)cur_cs->debugs;
         if (seg)
             PackFile_Segment_destroy(seg);

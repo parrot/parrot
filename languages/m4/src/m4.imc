@@ -87,7 +87,7 @@ Looks at the command line arguments and acts accordingly.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "Parrot m4 0.0.9\n"
+    print "Parrot m4 0.0.10\n"
     end
 NO_VERSION_FLAG: 
 

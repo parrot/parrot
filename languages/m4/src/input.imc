@@ -241,8 +241,6 @@ Uses regular expressions for finding tokens.
   FINISH_NEXT_TOKEN: 
   input_block['string'] = input_string
   push input_stack, input_block
-  .pcc_begin_return
-    .return token_type
-    .return token_data
-  .pcc_end_return
+
+  .return ( token_type, token_data )
 .end

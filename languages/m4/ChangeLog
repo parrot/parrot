@@ -1,6 +1,13 @@
 # $Id$
 
-2004-09-31     Bernhard Schmalhofer
+2004-11-16     Bernhard Schmalhofer
+        * yank it up to revision 0.0.10
+        * The 'm4_eval Compiler' now returns an Eval PMC
+
+2004-11-06     Bernhard Schmalhofer
+        * Use the new oneline ".return ( ret1, ret2 )" syntax
+
+2004-10-31     Bernhard Schmalhofer
         * yank it up to revision 0.0.9
         * Added macro 'printerr'
         * Started with implementing macro '__file__'
