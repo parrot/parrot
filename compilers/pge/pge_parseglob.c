@@ -24,9 +24,6 @@ that can be converted to a subroutine by PGE's rule generator.
 #include <stdlib.h>
 #include <string.h>
 
-int pge_ctype[256];
-int pge_cmeta[256];
-
 
 /* Build a regular expression tree from the glob string given by s. */
 static PGE_Exp*
