@@ -130,6 +130,10 @@ PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
     /* Try opening the file- note that this can't really handle O_EXCL, etc. */
     fptr = fopen(spath, oflags);
 
+    if (fptr == NULL && errno == ENOENT && (flags & PIO_F_WRITE)) {
+        fptr = fopen(spath, "w+b");
+    }
+
     /* File open */
     if (fptr != NULL) {
         if (PIO_isatty(fptr))

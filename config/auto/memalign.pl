@@ -6,7 +6,17 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining if your C library supports memalign...";
 
+@args=qw(miniparrot);
+
 sub runstep {
+    my ($miniparrot) = @_;
+
+    if ($miniparrot) {
+        Configure::Data->set(memalign => '');
+	print "(skipped) ";
+	return;
+    }
+
     my $test = 0;
 
     if (Configure::Data->get('i_malloc')) {

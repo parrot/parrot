@@ -16,7 +16,6 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-
 struct Parrot_Interp *
 Parrot_new(void)
 {
@@ -68,7 +67,11 @@ Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
 struct PackFile *
 Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 {
+#if HAS_HEADER_UNISTD
     off_t program_size, wanted;
+#else
+    size_t program_size, wanted;
+#endif
     char *program_code;
     struct PackFile *pf;
     PMC * io = NULL;
