@@ -6,13 +6,13 @@ IMCC - running
 
 =over 4
 
-=item 0.1 intital
+=item 0.1 initial
 
 =back
 
 =head1 OVERVIEW
 
-This document describes imccs command line option.
+This document describes imcc's command line options.
 
 =head1 SYNOPSIS
 
