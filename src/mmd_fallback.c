@@ -543,6 +543,16 @@ mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                              string_repeat(interp, base, count, NULL));
 }
 
+static void
+mmd_fallback_repeat_int(Parrot_Interp interp, PMC *left, INTVAL count, PMC *dest)
+{
+    STRING *base;
+
+    base = VTABLE_get_string(interp, left);
+
+    VTABLE_set_string_native(interp, dest,
+                             string_repeat(interp, base, count, NULL));
+}
 /*
 
 =item C<INTVAL
@@ -744,10 +754,14 @@ mmd_fallback_stringxor_str(Parrot_Interp interp, PMC *left, STRING *right,
 
 void
 register_fallback_methods(Parrot_Interp interp) {
+    INTVAL i;
+
     /* Yeah, this first one's out of order logically, but it means
        the table doesn't have to keep being re-malloc'd */
-    mmd_add_function(interp, MMD_SXOR_STR,
-            (funcptr_t)mmd_fallback_stringxor_str);
+    assert(MMD_REPEAT_INT == MMD_USER_FIRST - 1);
+    mmd_add_function(interp, MMD_REPEAT_INT,
+            (funcptr_t)mmd_fallback_repeat_int);
+
     mmd_add_function(interp, MMD_ADD, (funcptr_t)mmd_fallback_add_pmc);
     mmd_add_function(interp, MMD_ADD_INT, (funcptr_t)mmd_fallback_add_int);
     mmd_add_function(interp, MMD_SUBTRACT,
@@ -803,6 +817,8 @@ register_fallback_methods(Parrot_Interp interp) {
     mmd_add_function(interp, MMD_SAND_STR,
             (funcptr_t)mmd_fallback_stringand_str);
     mmd_add_function(interp, MMD_SXOR, (funcptr_t)mmd_fallback_stringxor_pmc);
+    mmd_add_function(interp, MMD_SXOR_STR,
+            (funcptr_t)mmd_fallback_stringxor_str);
 }
 
 /*

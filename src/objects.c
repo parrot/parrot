@@ -242,6 +242,25 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
 
 /*
 
+=item C<const char* Parrot_MMD_methode_name(Interp*, INTVAL)>
+
+Return the method name for the given MMD enum.
+
+=cut
+
+*/
+const char*
+Parrot_MMD_methode_name(Interp* interpreter, INTVAL idx)
+{
+    assert(idx >= 0);
+
+    if (idx >= MMD_USER_FIRST)
+        return NULL;
+    return Parrot_mmd_func_names[idx];
+}
+
+/*
+
 =item C<PMC *
 Parrot_single_subclass(Parrot_Interp ointerpreter, PMC *base_class,
                        STRING *child_class_name)>

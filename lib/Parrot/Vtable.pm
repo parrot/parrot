@@ -233,8 +233,44 @@ EOM
     $macros .= <<"EOM";
     NULL
 };
-#endif
 
+#endif /* PARROT_IN_OBJECTS_C */
+
+/* Need this for add, subtract, multiply, divide, mod, cmod, bitwise
+   (and, or, xor, lshift, rshift), concat, logical (and, or, xor),
+   repeat, eq, cmp */
+
+/* &gen_from_enum(mmd.pasm) */
+
+typedef enum {
+EOM
+    for my $entry (@{$vtable}) {
+	next unless ($entry->[4] =~ /MMD_/);
+	$macros .= <<"EOM";
+        $entry->[4],
+EOM
+    }
+    $macros .=<<"EOM";
+        MMD_USER_FIRST
+} parrot_mmd_func_enum;
+
+/* &end_gen */
+
+#ifdef PARROT_IN_OBJECTS_C
+static const char * const Parrot_mmd_func_names[] = {
+EOM
+
+    for my $entry (@{$vtable}) {
+	next unless ($entry->[4] =~ /MMD_/);
+	$macros .= <<"EOM";
+        \"__$entry->[1]\",
+EOM
+    }
+    $macros .= <<"EOM";
+    NULL
+};
+
+#endif
 EOM
 
     $macros;

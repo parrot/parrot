@@ -1339,6 +1339,18 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
         const MMD_init *mmd_table, INTVAL n)
 {
     INTVAL i;
+    MMD_table *table;
+
+    table = interpreter->binop_mmd_funcs;
+    if (table->x < type && type < enum_class_core_max) {
+        /*
+         * pre-alloacte the function table
+         */
+        for (i = 0; i < MMD_USER_FIRST; ++i) {
+            mmd_register(interpreter, i, enum_class_core_max - 1,
+                    enum_class_core_max - 1, NULL);
+        }
+    }
     /*
      * register default mmds for this type
      */
