@@ -136,6 +136,7 @@ docs/.dummy:
 
 clean:
 	$(RM_F) *$(O) classes/*$(O) chartypes/*$(O) encodings/*$(O)
+	$(RM_F) classes/*.c
 	$(RM_F) *.s core_ops.c $(TEST_PROG) $(PDISASM) $(PDUMP)
 	$(RM_F) $(INC)/vtable.h
 	$(RM_F) $(INC)/oplib/core_ops.h
