@@ -1914,12 +1914,18 @@ PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, int regnu
 {
     int i,j = 0, k = NUM_REGISTERS;
 
-    if (regnum != -1) {
+    if (regnum >= NUM_REGISTERS || regnum < -1) {
+        PIO_eprintf(interpreter, "No such register I%d", regnum);
+        return;
+    }
+    else if (regnum != -1) {
         j = regnum;
         k = regnum + 1;
     }
+    else {
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Integer Registers:\n");
+    }
 
-    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Integer Registers:\n");
     for (i = j; i < k; i++) {
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"I%i =\t",i);
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"%11vi\n",int_reg->registers[i]);
@@ -1934,12 +1940,18 @@ PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, int regnu
 {
     int i,j = 0, k = NUM_REGISTERS;
 
-    if (regnum != -1) {
+    if (regnum >= NUM_REGISTERS || regnum < -1) {
+        PIO_eprintf(interpreter, "No such register N%d", regnum);
+        return;
+    }
+    else if (regnum != -1) {
         j = regnum;
         k = regnum + 1;
     }
+    else {
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Float Registers:\n");
+    }
 
-    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Float Registers:\n");
     for (i = j; i < k; i++) {
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"N%i =\t",i);
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"%20.4f\n",num_reg->registers[i]);
@@ -1955,12 +1967,18 @@ PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
 {
     int i,j = 0, k = NUM_REGISTERS;
 
-    if (regnum != -1) {
+    if (regnum >= NUM_REGISTERS || regnum < -1) {
+        PIO_eprintf(interpreter, "No such register S%d", regnum);
+        return;
+    }
+    else if (regnum != -1) {
         j = regnum;
         k = regnum + 1;
     }
+    else {
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"String Registers:\n");
+    }
 
-    PIO_fprintf(interpreter, PIO_STDERR(interpreter),"String Registers:\n");
     for (i = j; i < k; i++) {
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"S%i =\n",i);
         dump_string(interpreter, string_reg->registers[i]);
@@ -1988,13 +2006,17 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
 {
     int i,j = 0, k = NUM_REGISTERS;
 
-    if (regnum != -1) {
+    if (regnum >= NUM_REGISTERS || regnum < -1) {
+        PIO_eprintf(interpreter, "No such register P%d", regnum);
+        return;
+    }
+    else if (regnum != -1) {
         j = regnum;
         k = regnum + 1;
     }
-
-    if (regnum == -1)
+    else {
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"PMC Registers:\n");
+    }
 
     for (i = j; i < k; i++) {
         PMC* pmc = pmc_reg->registers[i];
