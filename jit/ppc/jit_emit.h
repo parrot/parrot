@@ -262,19 +262,19 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #define jit_emit_neg_rr(pc, D, A) \
   jit_emit_3reg(pc, 31, D, A, 0, 0, 104, 0);
 
-#define jit_emit_mullw(pc, D, A, B) \
+#define jit_emit_mul_rrr(pc, D, A, B) \
   jit_emit_3reg(pc, 31, D, A, B, 0, 235, 0);
 
-#define jit_emit_divw(pc, D, A, B) \
+#define jit_emit_div_rrr(pc, D, A, B) \
   jit_emit_3reg(pc, 31, D, A, B, 0, 491, 0);
 
-#define jit_emit_and(pc, D, A, B) \
+#define jit_emit_and_rrr(pc, D, A, B) \
   jit_emit_3reg_x(pc, 31, A, D, B, 28, 0)
 
 #define jit_emit_or_rrr(pc, D, A, B) \
   jit_emit_3reg_x(pc, 31, A, D, B, 444, 0)
 
-#define jit_emit_xor(pc, D, A, B) \
+#define jit_emit_xor_rrr(pc, D, A, B) \
   jit_emit_3reg_x(pc, 31, A, D, B, 316, 0)
 
 /* 2 register and immediate operation.
@@ -375,9 +375,9 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
   *(pc++) = (char)(C << 6 | type << 1 | Rc)
 
 #define jit_emit_fadd_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 21, 0)
-#define jit_emit_fsub(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
+#define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
 #define jit_emit_fmul(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)
-#define jit_emit_fdiv(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
+#define jit_emit_fdiv_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
 
 #define jit_emit_fabs_rrr(pc, D, A)    jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
 #define jit_emit_fneg_rrr(pc, D, A)    jit_emit_3reg_x(pc, 63, D, 0, A, 40, 0)
@@ -430,7 +430,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
   *(pc++) = simm >> 8; \
   *(pc++) = (char)simm
 
-#define jit_emit_cmpi(pc, ra, simm) \
+#define jit_emit_cmp_ri(pc, ra, simm) \
   _emit_cmpi(pc, 11, 0, ra, simm);
 
 /* Branch conditional to immediate
@@ -528,7 +528,7 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
   jit_emit_stw(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
-#define jit_emit_stfd_r(pc, reg, addr) \
+#define jit_emit_fstore_rd_n(pc, reg, addr) \
   jit_emit_stfd(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
@@ -682,7 +682,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     while (i--)
       if (cur_se->float_reg_dir[cur_se->float_reg_usage[i]] &
         PARROT_ARGDIR_OUT) {
-            jit_emit_stfd_r(jit_info->native_ptr, jit_info->floatval_map[i],
+            jit_emit_fstore_rd_n(jit_info->native_ptr, jit_info->floatval_map[i],
               &interpreter->ctx.num_reg.registers[cur_se->float_reg_usage[i]]);
       }
 }
