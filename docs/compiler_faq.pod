@@ -31,6 +31,14 @@ Parrot.
 
 =head2 How do I fetch a variable from the global namespace?
 
+There are to possible ways:
+
+You can either use the special PIR syntax:
+    $P0 = global "name_of_the_global"
+    
+or the find_global OP:
+    find_global $P0, "name_of_the_global"
+    
 =head2 How do I use lexical pads to have both a function scope and a global scope?
 
 =head2 How do I fetch a variable from the current lexical pad?
@@ -41,7 +49,77 @@ Parrot.
 
 =head2 How do I create a class?
 
+With the C<newclass> op:
+
+    newclass $P0, "ClassA"
+
+=head2 How do I create a class that is a subclass of another class?
+
+You first have to get the class PMC of the class you want to subclass.
+Either you use the PMC returned by the C<newclass> op if you created
+the class, or use the C<getclass> op:
+
+    getclass $P0, "ClassA"
+    
+Then you can use the C<subclass> op to create a new class that is a subclass
+of this class:
+
+    subclass $P1, $P0, "classname"
+
+This stores the newly created class PMC in $P1, but you can use $P0 as the
+first and second argument if you do not need the parent class PMC anymore.
+
+=head2 How do I create a class that has more than one parent class?
+
+First, create a class without a parent class using C<newclass> (or with only
+one subclass,
+see previous question). Then add the other parent classes to it. Please refer
+to the next question for an example.
+
+=head2 How do I add another parent class to my class?
+
+If you have a class PMC (created with C<newclass> or by C<subclass>), you can
+add more parent classes to it with the C<addparent> op:
+
+    newclass $P0, "Foo" # create a class Foo
+    getclass $P1, "Bar" # get Bar's class PMC
+    addparent $P0, $P1  # make Foo a subclass of Bar
+    getclass $P1, "Qux" # get Qux's class PMC
+    addparent $P0, $P1  # make Foo also a subclass of Qux
+    
 =head2 How do I instantiate a class?
+
+First, you have to retive the type id of class you want to instantiate:
+    
+    find_type $I0, "Foo"
+
+Then, you can create an instance of Foo with the new op:
+    
+    new $P0, $I0    # creates a Foo object and stores it in register $P0
+
+=head2 How can I specify the constructor of a class?
+
+You can specify the constructor method by setting the BUILD property of
+the class PMC:
+
+    newclass $P0, "Foo"         # create a class named Foo
+    new $P1, .PerlString        # create a string
+    set $P1, "initialise"       # set it to the name of the constructor method
+    setprop $P0, "BUILD", $P1   # set the BUILD property
+
+=head2 How can I pass arguments to an constructor?
+
+You can pass only a single argument to a constructor.
+By convention, a hash PMC is a passed to the constructor that contains
+the arguments as key/value pairs:
+
+    new $P0, .PerlHash
+    set $P0["greeting"], "hello"
+    set $P0["size"], 1.23
+    
+    find_type $I0, "Alien"
+    new $P1, $I0, $P0		# create an Alien object and pass
+                                # the hash to the constructor
 
 =head2 How do I access module/class variables?
 
