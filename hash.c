@@ -164,7 +164,7 @@ expand_hash(Interp *interpreter, HASH *hash)
     UINTVAL new_size = (hash->hash_size ? hash->hash_size << 1
                         : INITIAL_BUCKETS);
     UINTVAL new_max_chain = new_size - 1;
-    UINTVAL new_loc;
+    HashIndex new_loc;
     
     HashIndex hi;
     BucketIndex bi;
@@ -224,10 +224,10 @@ expand_hash(Interp *interpreter, HASH *hash)
     hash->max_chain = new_max_chain;
 }
 
-UINTVAL
+static BucketIndex
 new_bucket(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
 {
-    UINTVAL bucket_index;
+    BucketIndex bucket_index;
     
     if (key == NULL) {
         internal_exception(INTERNAL_PANIC, "NULL key\n");
@@ -333,7 +333,7 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
 {
     BucketIndex* table;
     UINTVAL hashval;
-    UINTVAL bucket_index; 
+    BucketIndex bucket_index; 
     BucketIndex chain;
     HASHBUCKET* bucket;
 
@@ -379,6 +379,9 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
          bucket = getBucket(hash, bucket->next))
     {
         if (string_compare(interpreter, key, bucket->key) == 0) {
+            /* FIXME: If string_compare triggers a collection, both
+             * bucket and prev will end up pointing to junk memory.
+             * They need to be BucketIndexes or refetched. */
             if (prev)
                 prev->next = bucket->next;
             else {
@@ -391,7 +394,7 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
         prev = bucket;
     }
 
-    fprintf(stderr, "*** hash_delete given nonexistent key\n");
+    PANIC("hash_delete given nonexistent key");
 }
 
 HASH *
