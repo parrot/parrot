@@ -589,6 +589,11 @@ int e_pbc_emit(Instruction * ins) {
                 debug(1, "branch label %d jump %d %s %d\n",
                         npc, label->color, addr->name,addr->color);
             }
+            else if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr")) {
+                /* TODO make intersegment branch */
+                fatal(1, "e_pbc_emit", "label not found for '%s'\n",
+                            addr->name);
+            }
         }
         /* add debug line info */
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 2;
+use TestCompiler tests => 3;
 use Test::More qw(skip);
 
 ##############################
@@ -37,3 +37,34 @@ CODE
 42
 back
 OUT
+
+SKIP: {
+  skip("not yet: jump to different code seg", 1);
+output_is(<<'CODE', <<'OUT', "intersegment branch");
+# #!/usr/bin/perl -w
+# my $i= 5;
+# LAB:
+#    $i++;
+#    eval("goto LAB if ($i==6)");
+#    print "$i\n";
+#
+# 7
+#####
+
+.sub _test
+    I1 = 5
+    $S0 = ".sub _e\nif I1 == 6 goto LAB\nend\n.end\n"
+    compreg P2, "PIR"
+    compile P0, P2, $S0
+LAB:
+    inc I1
+    invoke
+    print I1
+    print "\n"
+    end
+.end
+CODE
+7
+OUT
+}
+
