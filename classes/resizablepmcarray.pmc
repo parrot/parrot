@@ -1,0 +1,129 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/resizablepmcarray.pmc - resizable size array for PMCs only
+
+=head1 DESCRIPTION
+
+This class, ResizablePMCArray, implements an array of resizable size, which stores PMCs,
+it puts things into Integer, Float, or String PMCs as appropriate
+TODO currently this uses PerlString instead of String PMCs.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass ResizablePMCArray extends FixedPMCArray need_ext does array {
+    
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+Returns the PMC value of the element at index C<key>.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        PMC **data;
+        PMC *res;
+        if (key < 0) 
+            internal_exception(OUT_OF_BOUNDS, 
+                "ResizablePMCArray: index out of bounds!\n");
+        if(key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+        
+        data = (PMC **)PMC_data(SELF);
+        if(data[key] == PMCNULL)
+            data[key] = pmc_new(INTERP, enum_class_Undef);
+        return data[key];
+    }
+
+
+/*
+
+=item C<void set_integer_native(INTVAL size)>
+
+Resizes the array to C<size> elements.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL size) {
+        int i;
+        PMC **data;
+        
+        if (size < 0)
+            internal_exception(OUT_OF_BOUNDS, "ResizablePMCArray: Can't resize!\n");
+        
+        data = (PMC**)mem_sys_realloc(PMC_data(SELF), size*sizeof(PMC*));
+        for(i = PMC_int_val(SELF); i < size; i++)
+            data[i] = PMCNULL;
+
+        PMC_int_val(SELF) = size;
+        PMC_data(SELF) = data;
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+
+/*
+
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *src)>
+
+Sets the PMC value of the element at index C<key> to C<*src>.
+
+=cut
+
+*/
+
+    void set_pmc_keyed_int (INTVAL key, PMC* src) {
+        PMC **data;
+        if (key < 0) 
+            internal_exception(OUT_OF_BOUNDS, 
+                "ResizablePMCArray: index out of bounds!\n");
+        if(key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+
+        data = (PMC**)PMC_data(SELF);
+        data[key] = src;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head1 HISTORY
+
+Initial version 2004.06.11 by Matt Fowles
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

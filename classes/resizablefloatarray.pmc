@@ -1,0 +1,117 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/resizablefloatarray.pmc - resizable size array for floating point numbers only
+
+=head1 DESCRIPTION
+
+This class, ResizableFloatArray, implements an array of resizable size, which stored FLOATVALs,
+it uses Float PMCs to do all necessary conversions
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass ResizableFloatArray extends FixedFloatArray need_ext does array {
+    
+
+/*
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
+Returns the floating-point value of the element at index C<key>.
+
+=cut
+
+*/
+
+    FLOATVAL get_number_keyed_int (INTVAL key) {
+        FLOATVAL *data;
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS, 
+                "ResizableFloatArray: index out of bounds!\n");
+        if (key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+        
+        data = (FLOATVAL *)PMC_data(SELF);
+        return data[key];
+    }
+
+
+/*
+
+=item C<void set_integer_native(INTVAL size)>
+
+Resizes the array to C<size> elements.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL size) {
+        if (size < 0)
+            internal_exception(OUT_OF_BOUNDS, "ResizableFloatArray: Can't resize!\n");
+        PMC_int_val(SELF) = size;
+        PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF), size*sizeof(FLOATVAL));
+        PObj_active_destroy_SET(SELF);
+    }
+
+/*
+
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
+
+Sets the floating-point value of the element at index C<key> to
+C<value>.
+
+=cut
+
+*/
+
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+        FLOATVAL *data;
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS, 
+                "ResizableFloatArray: index out of bounds!\n");
+        if(key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+
+        data = (FLOATVAL*)PMC_data(SELF);
+        data[key] = value;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head1 HISTORY
+
+Initial version 2004.06.11 by Matt Fowles
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

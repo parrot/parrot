@@ -1,0 +1,123 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/resizablestringarray.pmc - resizable size array for strings only
+
+=head1 DESCRIPTION
+
+This class, ResizableStringArray, implements an array of resizable size, which stored STRING*
+TODO: it uses PerlString's internally to perform conversion, but it should use String PMCs
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass ResizableStringArray extends FixedStringArray need_ext does array {
+    
+/*
+
+=item C<STRING *get_string_keyed_int(INTVAL key)>
+
+Returns the Parrot string value of the element at index C<key>.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed_int (INTVAL key) {
+        STRING **data;
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS, 
+                "ResizableStringArray: index out of bounds!\n");
+        if(key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+        
+        data = (STRING **)PMC_data(SELF);
+        return data[key];
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL size)>
+
+Resizes the array to C<size> elements.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL size) {
+        int i;
+        STRING **data;
+        if (size < 0)
+            internal_exception(OUT_OF_BOUNDS, 
+                    "ResizableStringArray: Can't resize!\n");
+
+        data = mem_sys_realloc(PMC_data(SELF), size*sizeof(STRING*));
+        for(i = PMC_int_val(SELF); i < size; i++) 
+            data[i] = NULL;
+
+        PMC_int_val(SELF) = size;
+        PMC_data(SELF) = data;
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    
+/*
+
+=item C<void set_string_keyed_int(INTVAL key, STRING *value)>
+
+Sets the Parrot string value of the element at index C<key> to C<value>.
+
+=cut
+
+*/
+
+    void set_string_keyed_int (INTVAL key, STRING* value) {
+        STRING **data;
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS, 
+                "ResizableStringArray: index out of bounds!\n");
+        if(key >= PMC_int_val(SELF))
+            DYNSELF.set_integer_native(key+1);
+
+        data = (STRING**)PMC_data(SELF);
+        data[key] = value;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head1 HISTORY
+
+Initial version 2004.06.11 by Matt Fowles
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
