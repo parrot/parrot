@@ -215,16 +215,21 @@ inline op set(out INT, in PMC) :base_core {
 
 =item B<assign>(in PMC, in NUM)
 
+Assign a new value $2, to PMC $1. Same as the equivalent B<set> opcodes.
+
 =item B<assign>(in PMC, in STR)
 
 =item B<assign>(in PMC, in PMC)
 
-Assign a new value $2, to PMC $1. Only the last operation is different
-to the equivalent B<set> opcodes.
+Assign a new value $2, to PMC $1 by copying the value.
 
 =item B<assign>(out STR, in STR)
 
 Assign a new value to a string by reusing the string header.
+
+=item B<setref>(in PMC, in PMC)
+
+Make $1 refer to $2 by calling C<set_pmc>.
 
 =item B<deref>(out PMC, in PMC)
 
@@ -234,7 +239,7 @@ reference PMC $2 refers to.
 =cut
 
 inline op assign(in PMC, in PMC) :base_core {
-  $1->vtable->set_pmc(interpreter, $1, $2);
+  $1->vtable->assign_pmc(interpreter, $1, $2);
   goto NEXT();
 }
 
@@ -249,7 +254,7 @@ inline op assign(in PMC, in NUM) :base_core {
 }
 
 inline op assign(in PMC, in STR) :base_core {
-  $1->vtable->set_string_native(interpreter, $1, $2);
+  $1->vtable->assign_string_native(interpreter, $1, $2);
   goto NEXT();
 }
 
@@ -258,12 +263,13 @@ inline op assign(out STR, in STR) :base_core {
   goto NEXT();
 }
 
+inline op setref(in PMC, in PMC) :base_core {
+  $1->vtable->set_pmc(interpreter, $1, $2);
+  goto NEXT();
+}
+
 inline op deref(out PMC, in PMC) :base_ref {
-  PMC *ref = $2;
-  /* TODO if we have more refs check if $2 does "ref" */
-  if (ref->vtable->base_type != enum_class_Ref)
-    internal_exception(1, "Not a reference PMC");
-  $1 = PMC_pmc_val($2);
+  $1 = $2->vtable->get_pmc(interpreter, $2);
   goto NEXT();
 }
 

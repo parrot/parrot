@@ -12,11 +12,11 @@ t/pmc/ref.t - Reference PMC
 
 =head1 DESCRIPTION
 
-Tests that method delegation works on a C<Ref> PMC.
+Tests that vtable method delegation works on a C<Ref> PMC.
 
 =cut
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new ref");
@@ -58,6 +58,30 @@ Ref
 PerlInt
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "setref ref");
+	new P2, .PerlInt
+	new P3, .PerlNum
+	set P3, 0.5
+	new P1, .Ref, P2
+	inc P1
+	print P1
+	print "\n"
+	setref P1, P3
+	inc P1
+	print P1
+	print "\n"
+	print P2
+	print "\n"
+	print P3
+	print "\n"
+	end
+CODE
+1
+1.500000
+1
+1.500000
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "assign ref");
 	new P2, .PerlInt
 	new P3, .PerlNum
@@ -70,6 +94,8 @@ output_is(<<'CODE', <<'OUTPUT', "assign ref");
 	inc P1
 	print P1
 	print "\n"
+	print P2
+	print "\n"
 	print P3
 	print "\n"
 	end
@@ -77,6 +103,7 @@ CODE
 1
 1.500000
 1.500000
+0.500000
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "typeof SharedRef");
@@ -112,5 +139,5 @@ output_like(<<'CODE', <<'OUTPUT', "deref SharedRef");
 	end
 CODE
 /ok 1
-Not a reference PMC/
+deref not allowed/
 OUTPUT

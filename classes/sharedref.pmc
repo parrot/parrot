@@ -38,18 +38,9 @@ we can relax that a bit.
 
 pmclass SharedRef does ref need_ext is_shared extends Ref {
 
-/*
 
-=item C<>
-
-
-
-=cut
-
-*/
-
-void init () {
-    internal_exception(1, "SharedRef init without PMC\n");
+    void init () {
+        internal_exception(1, "SharedRef init without PMC\n");
     }
 
 /*
@@ -125,6 +116,10 @@ Marks the reference as live.
 
     void mark () {
         SUPER();
+    }
+
+    PMC* get_pmc () {
+        internal_exception(1, "deref not allowed");
     }
 
 /*

@@ -187,7 +187,7 @@ Return the name of the class for the PMC.
 
 =item PMC* clone(INTERP, PMC* self)
 
-Return a clone of yourself. 
+Return a clone of yourself.
 
 =item PMC* find_method(INTERP, PMC* self, STRING* method_name)
 
@@ -291,7 +291,7 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 =item void* get_pointer_keyed_str(INTERP, PMC* self, STRING* key)
 
 Return a pointer to some data. The details of the data (type, location
-etc.) depend on the PMC. 
+etc.) depend on the PMC.
 
 =item void set_integer_native(INTERP, PMC* self, INTVAL value)
 
@@ -354,6 +354,10 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 
 Sets the PMC to the passed in string value.
 
+=item void assign_string_native(INTERP, PMC* self, STRING* value)
+
+Sets the PMC to the copied string value.
+
 =item void set_string_same(INTERP, PMC* self, PMC* value)
 
 Sets the PMC to the string value of B<value>.
@@ -374,27 +378,33 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 Sets the boolean state of the PMC to TRUE if B<value> is TRUE, or FALSE if
 B<value> is FALSE.
 
-Note that this is currently unimplemented for any PMC, and it is not clear 
+Note that this is currently unimplemented for any PMC, and it is not clear
 how it will work in practice.
 
 =item void set_bool_keyed(INTERP, PMC* self, PMC* key, INTVAL value)
 =item void set_bool_keyed_int(INTERP, PMC* self, INTVAL key, INTVAL value)
 =item void set_bool_keyed_str(INTERP, PMC* self, STRING* key, INTVAL value)
 
-Keyed versions of set_bool. The B<key> parameter is guaranteed not to be 
+Keyed versions of set_bool. The B<key> parameter is guaranteed not to be
 NULL for this method.
 
 =item void set_pmc(INTERP, PMC* self, PMC* value)
 
 Sets the value of the PMC in B<self> to the value of the PMC in B<value>.
 
-=item void set_pmc_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key)
+=item void assign_pmc(INTERP, PMC* self, PMC* value)
 
-=item void set_pmc_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key)
+Sets the value of the PMC in B<self> to the value of the PMC in B<value> by
+copying the value.
+
+=item void set_pmc_keyed(INTERP, PMC* self, PMC* key, PMC* value)
+
+=item void set_pmc_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value)
+
+=item void set_pmc_keyed_str(INTERP, PMC* self, STRING* key, PMC* value)
 
 Sets the value of the PMC keyed by B<key> to the value of the PMC
-in B<value> keyed by B<value_key>.  At least one of the two keys
-is guaranteed not to be NULL.
+in B<value>.
 
 =item void set_pointer(INTERP, PMC* self, void* value)
 
@@ -787,7 +797,7 @@ go away.
 Divide B<self> by B<value> and store the remainder in B<dest>.  Note that
 B<dest> may be equal to B<self>; in that case optimizations I<may> be made.
 
-B<Note>: C<modulus> uses the Knuth's "corrected mod" algorithm, as 
+B<Note>: C<modulus> uses the Knuth's "corrected mod" algorithm, as
 implemented in F<src/utils.c>, while C<cmodulus> uses the C-style fmod
 function.
 
@@ -852,24 +862,24 @@ At least one of the keys is guaranteed to be non-NULL.
 
 =item void bitwise_ors_str(INTERP, PMC* self, STRING* value, PMC* dest)
 
-Calculate the bitwise-OR of the strings in B<self> and B<value> and store 
-the result in B<dest>. Note that B<dest> may be equal to B<self>; in that 
+Calculate the bitwise-OR of the strings in B<self> and B<value> and store
+the result in B<dest>. Note that B<dest> may be equal to B<self>; in that
 case optimizations I<may> be made.
 
 =item void bitwise_ands(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_ands_str(INTERP, PMC* self, STRING* value, PMC* dest)
 
-Calculate the bitwise-AND of the strings in B<self> and B<value> and store 
-the result in B<dest>. Note that B<dest> may be equal to B<self>; in that 
+Calculate the bitwise-AND of the strings in B<self> and B<value> and store
+the result in B<dest>. Note that B<dest> may be equal to B<self>; in that
 case optimizations I<may> be made.
 
 =item void bitwise_xors(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void bitwise_xors_str(INTERP, PMC* self, STRING* value, PMC* dest)
 
-Calculate the bitwise-XOR of the strings in B<self> and B<value> and store 
-the result in B<dest>. Note that B<dest> may be equal to B<self>; in that 
+Calculate the bitwise-XOR of the strings in B<self> and B<value> and store
+the result in B<dest>. Note that B<dest> may be equal to B<self>; in that
 case optimizations I<may> be made.
 
 =item void bitwise_not(INTERP, PMC* self, PMC* dest)
@@ -1124,8 +1134,8 @@ guaranteed to be non-NULL.
 
 Only valid for keyed access.
 
-Returns TRUE if the key exists in the aggregate being queried; otherwise, 
-return FALSE. 
+Returns TRUE if the key exists in the aggregate being queried; otherwise,
+return FALSE.
 
 The key is guaranteed to be non-NULL.
 

@@ -185,14 +185,21 @@ Morphs the string to a C<PerlNum> and sets its value to C<value>.
 
 Sets the string's value to the value of the specified Parrot string.
 
+=item C<void assign_string_native(STRING *value)>
+
+Assign a copy of the passed string value.
+
 =cut
 
 */
 
     void set_string_native (STRING * value) {
-        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF), value);
+        PMC_str_val(SELF) = value;
     }
 
+    void assign_string_native (STRING * value) {
+	PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF), value);
+    }
 /*
 
 =item C<void set_string_same(PMC *value)>
@@ -234,7 +241,7 @@ Adds C<*value> to the string and returns the result in C<*dest>.
             INTVAL pmci = VTABLE_get_integer(INTERP, SELF);
             FLOATVAL valf = VTABLE_get_number(INTERP, value);
             INTVAL vali = VTABLE_get_integer(INTERP, value);
-    
+
             if (pmcf == pmci && valf == vali)
                 VTABLE_set_integer_native(INTERP, dest, pmci + vali);
             else
@@ -667,7 +674,7 @@ C<what>.
             const void * __c_ptr;
             void * __ptr;
         } __ptr_u;
-    
+
         PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
         PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
         switch (what) {
@@ -690,14 +697,14 @@ C<what>.
                 PMC_int_val(ret) = n-1;
                 break;
         }
-        
+
         if (!n)
             ret->cache.int_val = -1;
-    
+
         if (ret->cache.int_val > 0)
             PMC_data(key) = string_pointer_to_index(INTERP, s, ret->cache.int_val);
          /* else do what? */
-    
+
         return ret;
     }
 
@@ -713,10 +720,10 @@ Returns the string value for C<*key>.
 
     STRING* get_string_keyed(PMC* key) {
         STRING *s = PMC_str_val(SELF);
-    
+
         return string_substr(INTERP, s, PMC_int_val(key), 1, NULL, 0);
     }
-        
+
 /*
 
 =item C<INTVAL get_integer_keyed(PMC *key)>
@@ -729,7 +736,7 @@ Returns the integer value for C<*key>.
 
     INTVAL get_integer_keyed(PMC* key) {
         STRING *s = PMC_str_val(SELF);
-        
+
         return string_ord(INTERP, s, PMC_int_val(key));
     }
 

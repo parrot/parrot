@@ -113,7 +113,7 @@ does_isa (Parrot_Interp interp, STRING *method, STRING *what)
             continue;
         }
 
-        if (pos+len < (INTVAL)string_length(interp, what) && 
+        if (pos+len < (INTVAL)string_length(interp, what) &&
             string_index(interp, what, pos + len) != 32) {
             pos += len;
             continue;
@@ -446,19 +446,6 @@ C<elements_keyed()> with it.
         return DYNSELF.elements_keyed(r_key);
     }
 
-/*
-
-=item C<PMC* get_pmc()>
-
-Returns the PMC itself.
-
-=cut
-
-*/
-
-    PMC* get_pmc () {
-        return SELF;
-    }
 
 /*
 
@@ -490,6 +477,25 @@ Returns whether the PMC is numerically equal to C<value>.
         return SELF == value;
     }
 
+/*
+
+=item C<void assign_pmc (PMC* value)>
+
+=item C<void assign_string_native (PMC* value)>
+
+Default falbacks that call C<set_pmc> and C<set_string_native>.
+
+=cut
+
+*/
+
+    void assign_pmc (PMC* value) {
+        DYNSELF.set_pmc(value);
+    }
+
+    void assign_string_native (STRING* value) {
+        DYNSELF.set_string_native(value);
+    }
 /*
 
 =item C<void set_integer_keyed_int (INTVAL key, INTVAL value)>

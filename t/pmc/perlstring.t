@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -258,10 +258,26 @@ fnargh
 fnarghGrunties
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "Setting string copies");
+output_is(<<CODE, <<OUTPUT, "Setting string references");
 	new P0, .PerlString
 	set S0, "C2H5OH + 10H20"
 	set P0, S0
+	chopn S0, 8
+
+	print S0
+	print "\\n"
+	print P0
+	print "\\n"
+	end
+CODE
+C2H5OH
+C2H5OH
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "Assigning string copies");
+	new P0, .PerlString
+	set S0, "C2H5OH + 10H20"
+	assign P0, S0
 	chopn S0, 8
 
 	print S0

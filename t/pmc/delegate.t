@@ -99,13 +99,13 @@ CODE
 47.110000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "delegate set_pmc");
+output_is(<<'CODE', <<'OUTPUT', "delegate assign_pmc");
     new P0, .delegate
     new P1, .PerlInt
     set P1, 42
     assign P0, P1
     end
-.pcc_sub __set_pmc:
+.pcc_sub __assign_pmc:
     print P5
     print "\n"
     # just return
