@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 # It would be very embarrassing if these didn't work...
 output_is(<<'CODE', '', "noop, end");
@@ -64,6 +64,18 @@ FOO:   print "Jump succeeded\n"
        end
 CODE
 Jump succeeded
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "multiple labels");
+     if 0,FOO
+     if 1,BAR
+     print "not "
+FOO:
+BAR:
+     print "ok 1\n"
+     end
+CODE
+ok 1
 OUTPUT
 
 1; # HONK

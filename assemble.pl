@@ -133,19 +133,20 @@ sub _expand_macro {
   my ($self,$macro_name,$macro_args) = @_;
   my %args;
   my @temp = @{$self->{macros}{$macro_name}{contents}};
+  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
 
   @args{@{$self->{macros}{$macro_name}{arguments}}} = @$macro_args;
   $self->{macros}{$macro_name}{gensym}++;
 
   for(@temp) {
-    s{\.local\s+\$(\w+):}
+    s{\.local\s+\$($label_re):}
      {local__${macro_name}__${1}__$self->{macros}{$macro_name}{gensym}:}gx;
 
-    s{\.\$(\w+)}
+    s{\.\$($label_re)}
      {local__${macro_name}__${1}__$self->{macros}{$macro_name}{gensym}}gx;
-    s{\.(\w+)}
+    s{\.($label_re)}
      {exists $self->{constants}{$1} ? $self->{constants}{$1} : ".$1"}gex;
-    s{\.(\w+)}
+    s{\.($label_re)}
      {exists $args{$1} ? $args{$1} : ".$1"}gex;
   }
   @temp;
@@ -204,6 +205,7 @@ sub preprocess {
   my $self = shift;
   my $line = 0;
   my $in_macro;
+  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
 
   for(@{$self->{cur_contents}}) {
     $line++;
@@ -222,12 +224,12 @@ sub preprocess {
     }
 
     if(/^\.constant \s+
-        (\w+)       \s+
+        ($label_re) \s+
         ([-+]?\d+(\.\d+([eE][-+]?\d+)?)?)/x) { # .constant {name} {number}
       $self->{constants}{$1} = $2;
     }
     elsif(/^\.constant \s+
-          (\w+)        \s+
+          ($label_re)  \s+
           (\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
            \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
           )/x) {                               # .constant {name} {string}
@@ -247,8 +249,8 @@ sub preprocess {
 #        print STDERR "Couldn't open '$1' for inclusion at line $line: $!.\n";
 #      }
     }
-    elsif(/^\.macro \s+
-           (\w+)   \s*
+    elsif(/^\.macro    \s+
+           ($label_re) \s*
            \(([^)]*)\)
          /x) {            # .{name} (...
       if($in_macro) {
@@ -284,7 +286,7 @@ sub preprocess {
 #       {global.$1.$self->{global}{gensym}}gx;
 #      push @{$self->{contents}},$_;
 #    }
-    elsif(/\.(\w+) \s*
+    elsif(/\.($label_re) \s*
            \(([^)]*)\)/x) {                    # .{name} (...
       if(defined $self->{macros}{$1}) {
         my @arguments = split /,/,$2;
@@ -297,7 +299,7 @@ sub preprocess {
         print STDERR "Couldn't find macro '.$1' at line $line.\n";
       }
     }
-    elsif(/\.(\w+)/) {                         # .{name}
+    elsif(/\.($label_re)/) {                         # .{name}
       if(defined $self->{constants}{$1}) {
         push @{$self->{contents}},$_;
         $self->{contents}[-1] =~ s/\.(\w+)/$self->{constants}{$1}/g;
@@ -446,23 +448,20 @@ Local labels aren't given special treatment yet.
 sub _collect_labels {
   my $self = shift;
 
-  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]+);
+  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
 
   #
   # Collect label definition points first
   #
   for(@{$self->{contents}}) {
-    #
-    # If there's a local label, collect it
-    #
-    if($_->[0]=~s/^(\$$label_re)\s*:\s*,?//) {
-      push @{$self->{local_labels}{$1}},$_->[1];
-    }
-    #
-    # Same for a global label
-    #
-    elsif($_->[0]=~s/^($label_re)\s*:\s*,?//) {
-      $self->{global_labels}{$1} = $_->[1];
+    while($_->[0] =~ s/^(\$?$label_re)\s*:\s*,?//) {
+      my $label = $1;
+      if($label=~/^\$/) {
+        push @{$self->{local_labels}{$1}},$_->[1]; # Local label
+      }
+      else {
+        $self->{global_labels}{$1} = $_->[1]; # Global label
+      }
     }
   }
 }
