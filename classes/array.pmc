@@ -39,7 +39,7 @@ static PMC* undef(struct Parrot_Interp* interpreter)
 
 =item C<static PMC* retval(Interp *interp, void *ret)>
 
-Processes C<*ret>, returning the apporpriate PMC, or raising an
+Processes C<*ret>, returning the appropriate PMC, or raising an
 exception if necessary.
 
 =cut
@@ -51,7 +51,7 @@ static PMC* retval(Interp *interp, void *ret)
     PMC *value;
     if (ret == 0)
     internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
-    /* XXX getting non existant value, exception or undef?
+    /* XXX getting non existent value, exception or undef?
      * current is for perlarray */
     if (ret == (void*) -1)
     	value = undef(interp);
