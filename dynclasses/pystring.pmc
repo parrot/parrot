@@ -502,7 +502,6 @@ downcase this string
 
 =item C<PMC* "find"(PMC *haystack, PMC *needle)>
 
-downcase this string
 
 =cut
 
@@ -511,10 +510,11 @@ downcase this string
     METHOD PMC* find(PMC *haystack, PMC *needle, PMC *start) {
         INTVAL istart = 0;
         INTVAL pos;
+        PMC *ret;
         if (REG_INT(3) > 2) istart = VTABLE_get_integer(INTERP, start);
         pos = string_str_index(INTERP, VTABLE_get_string(INTERP, haystack),
             VTABLE_get_string(INTERP, needle), istart);
-        PMC *ret = pmc_new(INTERP, PyBuiltin_PyInt);
+        ret = pmc_new(INTERP, PyBuiltin_PyInt);
         VTABLE_set_integer_native(INTERP, ret, pos);
         return ret;
     }
