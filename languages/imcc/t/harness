@@ -14,7 +14,7 @@ use Test::Harness qw(runtests);
 
 use Getopt::Std;
 my %opts;
-getopts('wgjPbvdc?hO:', \%opts);
+getopts('wgjPSbvdr?hO:', \%opts);
 if ($opts{'?'} || $opts{h}) {
 	print <<"EOF";
 perl t/harness [options] [testfiles]
@@ -22,10 +22,11 @@ perl t/harness [options] [testfiles]
 	-g ... disable CGoto
 	-j ... run JIT
 	-P ... run Prederef or CGP
+	-S ... run Switched
 	-b ... run bounds checked
 	-v ... run verbose
 	-d ... run debug
-	-c ... assemble to PBC run PBC
+	-r ... assemble to PBC run PBC
 	-O[012] optimize
 EOF
 	exit;

@@ -173,7 +173,9 @@ opcode_t *
 $cg_func$base(opcode_t *cur_opcode, struct Parrot_Interp *interpreter)
 {
     do {
-    SWITCH_AGAIN:
+SWITCH_AGAIN:
+    if (!cur_opcode)
+        break;
     switch (*cur_opcode) {
 END_C
 }

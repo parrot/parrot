@@ -15,6 +15,7 @@ clean:	testclean
 	        imcparser.output
 
 realclean: clean
+	$(RM_F) Makefile
 
 test:
 	$(PERL) t/harness
@@ -27,4 +28,10 @@ testP:
 
 testb:
 	$(PERL) t/harness -b
+
+testS:
+	$(PERL) t/harness -S
+
+testr:
+	$(PERL) t/harness -r
 

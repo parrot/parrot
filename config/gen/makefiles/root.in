@@ -638,35 +638,46 @@ $(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(NONGEN_HEADERS)
 # The --running-make-test argument is currently used by long-running tests
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS = --gc-debug --running-make-test
+TEST_FILES = t/op/*.t t/pmc/*.t t/native_pbc/*.t
+SRC_TEST_FILES = t/src/*.t
 
-test : $(TEST_PROG) test_prep test_dummy test_imcc
+test : $(TEST_PROG) test_prep src_tests testg test_imcc
 
 fulltest : $(TEST_PROG) test_prep fulltest_dummy fulltest_imcc
 
 .PHONY: fulltest_dummy
-fulltest_dummy :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS)
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -j $(TEST_PROG_ARGS)
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -P $(TEST_PROG_ARGS)
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS)
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) --run-pbc $(TEST_PROG_ARGS)
+fulltest_dummy : src_tests testg testP testj testS testb testr
 
 # Common prep for all test targets
 test_prep : $(LIBPARROT) $(TEST_PROG)
 
-test_dummy :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS)
+# src tests
+src_tests :
+	$(PERL) t/harness $(SRC_TEST_FILES)
 
-testp : $(TEST_PROG) test_prep blib/lib/libcore_prederef$(SO) blib/lib/libparrot$(SO) $(TEST_PROG_SO) test_dummy_p
+# normal (cgoto) runloop
+testg :
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) $(TEST_FILES)
 
-test_dummy_p :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -P
+# prederef / CGP runloop
+testP :
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -P $(TEST_FILES)
 
-testj : $(TEST_PROG) test_prep test_dummy_j
+# JIT core
+testj :
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -j $(TEST_FILES)
 
-test_dummy_j :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -j
+# switched core
+testS :
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -S $(TEST_FILES)
 
+# bounds checking slow core
+testb :
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -b $(TEST_FILES)
+
+# normal core, write and run pbc
+testr :
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) --run-pbc $(TEST_FILES)
 mopstest :
 	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/mops.pasm
 
@@ -680,7 +691,9 @@ fulltest_imcc :
 	$(MAKE_C) $(IMCC_DIR) test
 	$(MAKE_C) $(IMCC_DIR) testj
 	$(MAKE_C) $(IMCC_DIR) testP
+	$(MAKE_C) $(IMCC_DIR) testS
 	$(MAKE_C) $(IMCC_DIR) testb
+	$(MAKE_C) $(IMCC_DIR) testr
 
 # For reporting success or failure with different configurations
 ok:
@@ -726,6 +739,7 @@ testclean :
 	        t/stress/*.pasm t/stress/*.pbc t/stress/*.out t/stress/*.o t/stress/*.stabs.s \
 	        t/src/*_* \
 		t/op/*.imc t/pmc/*.imc
+	$(MAKE_C) $(IMCC_DIR) testclean
 
 realclean : clean
 	$(RM_F) $(STICKY_FILES)
