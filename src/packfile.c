@@ -507,10 +507,8 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      */
     if (header->magic != PARROT_MAGIC) {
         PIO_eprintf(NULL, "PackFile_unpack: Not a Parrot PackFile!\n");
-#if TRACE_PACKFILE
         PIO_eprintf(NULL, "Magic number was [%x] not [%x]\n",
                 header->magic, PARROT_MAGIC);
-#endif
         return 0;
     }
 
