@@ -176,6 +176,9 @@ interpinfo(Interp *interpreter, INTVAL what)
         case DOD_RUNS:
             ret = arena_base->dod_runs;
             break;
+        case LAZY_DOD_RUNS:
+            ret = arena_base->lazy_dod_runs;
+            break;
         case COLLECT_RUNS:
             ret = arena_base->collect_runs;
             break;

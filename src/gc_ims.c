@@ -338,9 +338,27 @@ a sleep opcode.
 
 #include "parrot/parrot.h"
 
+/*
+ * size of one arena
+ */
 #define ALLOCATION_BLOCK_SIZE 8192
+
+/*
+ * each ALLOCATIONS_INIT allocations of any object an incremental
+ * step is triggered
+ */
 #define ALLOCATIONS_INIT      1024
+
+/*
+ * a mark step does allocations * throttle work
+ */
 #define THROTTLE              1.2
+
+/*
+ * if we have at the end total * refill free objects
+ * we just do nothing
+ */
+#define REFILL_FACTOR         0.5
 
 typedef enum {          /* these states have to be in execution order */
     GC_IMS_INITIAL,     /* memory subsystem setup */
@@ -349,7 +367,8 @@ typedef enum {          /* these states have to be in execution order */
     GC_IMS_MARKING,     /* mark children */
     GC_IMS_SWEEP,       /* sweep buffers */
     GC_IMS_COLLECT,     /* collect buffer memory */
-    GC_IMS_FINISHED     /* update statistics */
+    GC_IMS_FINISHED,    /* update statistics */
+    GC_IMS_CONSUMING    /* when we have plenty of free objects */
 } gc_ims_state_enum;
 
 typedef struct {
@@ -612,8 +631,9 @@ static void
 parrot_gc_ims_run_increment(Interp* interpreter)
 {
     Gc_ims_private *g_ims;
+    struct Arenas *arena_base = interpreter->arena_base;
 
-    g_ims = interpreter->arena_base->gc_private;
+    g_ims = arena_base->gc_private;
     g_ims->allocations = 0;
     ++g_ims->increments;
 
@@ -643,7 +663,13 @@ parrot_gc_ims_run_increment(Interp* interpreter)
             break;
         case GC_IMS_FINISHED:
             ++interpreter->arena_base->dod_runs;
-            g_ims->state = GC_IMS_RE_INIT;
+            g_ims->state = GC_IMS_CONSUMING;
+            /* fall through */
+        case GC_IMS_CONSUMING:
+            if (arena_base->pmc_pool->num_free_objects <
+                    arena_base->pmc_pool->total_objects * REFILL_FACTOR) {
+                g_ims->state = GC_IMS_RE_INIT;
+            }
             break;
         default:
             PANIC("Unknown state in gc_ims");
@@ -705,6 +731,8 @@ Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags)
         if (g_ims->state >= GC_IMS_COLLECT)
             break;
     }
+    if (g_ims->state < GC_IMS_COLLECT)
+        ++arena_base->lazy_dod_runs;
     g_ims->lazy = 0;
 }
 

@@ -95,6 +95,8 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
         hi_prio = 0;
 
     if (obj->pmc_ext) {
+        PMC* tptr = arena_base->dod_trace_ptr;
+
         ++arena_base->num_extended_PMCs;
         /*
          * XXX this basically invalidates the high-priority marking
@@ -106,8 +108,7 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
          *     use a second pointer chain, which is, when not empty,
          *     processed first
          */
-        if (1 || hi_prio) {
-            PMC* tptr = arena_base->dod_trace_ptr;
+        if (tptr || hi_prio) {
             if (PMC_next_for_GC(tptr) == tptr) {
                 PMC_next_for_GC(obj) = obj;
             }
@@ -261,7 +262,6 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 {
 
     struct Arenas *arena_base = interpreter->arena_base;
-    PMC *current;
 
     /* Pointer to the currently being processed PMC
      *
@@ -279,7 +279,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     if (interpreter->profile)
         profile_dod_start(interpreter);
     /* We have to start somewhere, the interpreter globals is a good place */
-    arena_base->dod_trace_ptr = arena_base->dod_mark_ptr = current =
+    arena_base->dod_mark_start = arena_base->dod_mark_ptr =
         interpreter->iglobals;
 
     /* mark it as used  */
@@ -383,7 +383,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
     struct Arenas *arena_base = interpreter->arena_base;
     INTVAL i = 0;
     UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
-    PMC *current = arena_base->dod_trace_ptr;
+    PMC *current = arena_base->dod_mark_start;
 
     int lazy_dod = arena_base->lazy_dod;
 
@@ -444,14 +444,14 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
             }
         }
 
-        prev = current;
         if (--how_many == 0) {
             if (current != PMC_next_for_GC(current))
                 current = PMC_next_for_GC(current);
             break;
         }
+        prev = current;
     }
-    arena_base->dod_trace_ptr = current;
+    arena_base->dod_mark_start = current;
     if (interpreter->profile)
         profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
     return 1;
@@ -1168,6 +1168,10 @@ parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)
             profile_dod_end(interpreter, PARROT_PROF_DOD_cb);
     }
     else {
+        /*
+         * successfull lazy DOD count
+         */
+        ++arena_base->lazy_dod_runs;
         /* it was an aborted lazy dod run - we should clear
          * the live bits, but e.g. t/pmc/timer_7 succeeds w/o this
          */

@@ -92,6 +92,7 @@ struct Arenas {
     UINTVAL num_early_DOD_PMCs; /* how many PMCs want immediate destruction */
     UINTVAL num_early_PMCs_seen;/* how many such PMCs has DOD seen */
     UINTVAL num_extended_PMCs;  /* active PMCs having pmc_ext */
+    PMC* dod_mark_start;        /* first PMC marked during a DOD run */
     PMC* dod_mark_ptr;          /* last PMC marked during a DOD run */
     PMC* dod_trace_ptr;         /* last PMC trace_children was called on */
     int lazy_dod;               /* flag that indicates whether we should stop
@@ -116,6 +117,7 @@ struct Stash {
 #define MEM_ALLOCS_SINCE_COLLECT 9
 #define TOTAL_COPIED 10
 #define IMPATIENT_PMCS 11
+#define LAZY_DOD_RUNS 12
 
 /* &end_gen */
 

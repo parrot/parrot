@@ -2738,6 +2738,8 @@ PDB_info(Interp *interpreter)
             interpinfo(interpreter, TOTAL_MEM_ALLOC));
     PIO_eprintf(interpreter, "DOD runs = %d\n",
             interpinfo(interpreter, DOD_RUNS));
+    PIO_eprintf(interpreter, "Lazy DOD runs = %d\n",
+            interpinfo(interpreter, LAZY_DOD_RUNS));
     PIO_eprintf(interpreter, "Collect runs = %d\n",
             interpinfo(interpreter, COLLECT_RUNS));
     PIO_eprintf(interpreter, "Collect memory = %d\n",
