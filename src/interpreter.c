@@ -24,7 +24,7 @@
  * TODO: Not really part of the API, but here's the docs.
  * Check the bytecode's opcode table fingerprint.
  */
-void
+static void
 check_fingerprint(struct Parrot_Interp *interpreter) {
 /*    if (PNCONST == 0) { */
 
@@ -58,7 +58,7 @@ check_fingerprint(struct Parrot_Interp *interpreter) {
  * TODO: Not really part of the API, but here's the docs.
  * Generic runops, which takes a function pointer for the core.
  */
-void
+static void
 runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *), 
                 struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
@@ -89,7 +89,7 @@ static INTVAL       prederef_op_count     = 0;
 static op_info_t *  prederef_op_info      = NULL;
 static op_func_t *  prederef_op_func      = NULL;
 
-void
+static void
 init_prederef(struct Parrot_Interp * interpreter)
 {
   char file_name[50];
@@ -119,7 +119,7 @@ init_prederef(struct Parrot_Interp * interpreter)
   ** Look up the init function:
   */
 
-  prederef_oplib_init   = Parrot_dlsym(prederef_oplib_handle, func_name);
+  prederef_oplib_init   = (oplib_init_f)Parrot_dlsym(prederef_oplib_handle, func_name);
 
   if (!prederef_oplib_init) {
     fprintf(stderr, "No exported symbol for oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
@@ -149,7 +149,7 @@ init_prederef(struct Parrot_Interp * interpreter)
 
   if (prederef_op_count <= 0) {
     fprintf(stderr, "Illegal op count (%d) from oplib file '%s' for oplib '%s_prederef' version %s!\n",
-      prederef_op_count, file_name,
+      (int)prederef_op_count, file_name,
       PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
     exit(1);
   }
@@ -184,7 +184,7 @@ init_prederef(struct Parrot_Interp * interpreter)
 /*=for api interpreter stop_prederef
  */
 
-void
+static void
 stop_prederef(void)
 {
   prederef_op_func      = NULL;
@@ -201,7 +201,7 @@ stop_prederef(void)
 /*=for api interpreter prederef
  */
 
-void **
+static void **
 prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
 {
   size_t      offset = pc_prederef - interpreter->prederef_code;
@@ -269,7 +269,7 @@ prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
 
 /*=for api interpreter runops_jit
  */
-void
+static void
 runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
     INTVAL     code_size;
@@ -291,7 +291,7 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
 
 /*=for api interpreter runops_prederef
  */
-void
+static void
 runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc, 
                  void ** pc_prederef) {
     opcode_t * code_start;
@@ -370,7 +370,7 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code,
         }
 
         if ((interpreter->flags & PARROT_PREDEREF_FLAG) != 0) {
-          size_t offset = pc - (opcode_t *)interpreter->code->byte_code;
+          offset = pc - (opcode_t *)interpreter->code->byte_code;
 
           if (!interpreter->prederef_code) {
             size_t N = interpreter->code->byte_code_size;

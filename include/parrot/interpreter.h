@@ -18,6 +18,16 @@
 #include "parrot/op.h"
 #include "parrot/oplib.h"
 
+
+
+
+#if 0
+typedef STRING_FUNCS * (str_func_t)();
+
+    opcode_t     *(**op_func_table)();    /* Opcode function table */
+    STRING_FUNCS *(**string_funcs)();     /* String function table */
+#endif
+
 struct Parrot_Interp {
     struct IReg *int_reg;            /* Current top of int reg stack */
     struct NReg *num_reg;            /* Current top of the float reg stack */
@@ -39,9 +49,13 @@ struct Parrot_Interp {
     op_lib_t *  op_lib;                   /* Opcode library */
     INTVAL      op_count;                 /* The number of ops */
     op_info_t * op_info_table;            /* Opcode info table (name, nargs, arg types) */
-    opcode_t     *(**op_func_table)();    /* Opcode function table */
 
-    STRING_FUNCS *(**string_funcs)();     /* String function table */
+    op_func_t *  op_func_table;
+
+#if 0
+    str_func_t * string_funcs;
+#endif
+
     INTVAL flags;				          /* Various interpreter flags
                                              that signal that runops
                                              should do something */
@@ -70,8 +84,10 @@ struct Parrot_Interp {
 struct Parrot_Interp *
 make_interpreter(INTVAL);
 
+#if 0
 void
 runops_generic();
+#endif
 
 void
 runops(struct Parrot_Interp *, struct PackFile *, size_t offset);
