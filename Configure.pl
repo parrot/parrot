@@ -188,10 +188,6 @@ if ($^O eq 'VMS' || $^O =~ /MSWin/i) {
 
 my $ccname = $Config{ccname} || $Config{cc};
 
-if ($ccname eq "gcc") {
-   $c{cc_warn} = " -Wall -ansi -pedantic -Wtraditional -Wstrict-prototypes -Wmissing-prototypes -Winline -Wredundant-decls -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline";
-}
-
 # Add the -DHAS_JIT if we're jitcapable
 if ($jitcapable) {
     $c{cc_hasjit} = " -DHAS_JIT";
@@ -233,6 +229,101 @@ prompt("How big would you like integers to be?", 'iv');
 prompt("And your floats?", 'nv');
 prompt("What is your native opcode type?", 'opcode_t');
 
+print <<"END";
+
+Determining if your C compiler is actually gcc (this could take a while):
+
+END
+
+{
+    my %gnuc;
+
+    compiletestc("test_gnuc");
+    %gnuc=eval(runtestc()) or die "Can't run the test program: $!";
+    unlink("test_siz$c{exe}", "test$c{o}");
+
+    unless (exists $gnuc{__GNUC__}) {
+        print << 'END';
+
+The test program didn't give the expected result - assuming your compiler is
+not gcc.
+
+END
+
+    } else {
+	my $major = $gnuc{__GNUC__};
+        my $minor = $gnuc{__GNUC_MINOR__};
+        unless (defined $major) {
+            print << 'END';
+
+Your C compiler is not gcc.
+
+END
+        } else {
+	    print "Your C compiler reports itself as gcc, major version $major";
+            print ", minor version $minor" if defined $minor;
+	}
+        print ".\n\n";
+        if ($major =~ tr/0-9//c) {
+            print "major version '$major' is not an integer",
+                " - I don't think that this is gcc.";
+            undef $major; # Don't use it
+        }
+        if (defined $minor and $minor =~ tr/0-9//c) {
+            print "minor version '$minor' is not an integer.";
+            undef $minor; # Don't use it
+        }
+        if (defined $major) {
+            $c{gccversion} = $major;
+            $c{gccversion} .= ".$minor" if defined $minor;
+        }
+    }
+
+}
+
+if ($c{gccversion}) {
+    # If using gcc, crank up its warnings as much as possible and make it
+    # behave  ansi-ish.
+    # Here's an attempt at a list of nasty things we can use for a given
+    # version of gcc. The earliest documentation I currently have access to is
+    # for 2.95, so I don't know what version everything came in at. If it turns
+    # out that you're using 2.7.2 and -Wfoo isn't recognised there, move it up
+    # into the next version becone (2.8)
+
+    
+    my @opt_and_vers = 
+        (0 => "-Wall -ansi -pedantic -Wstrict-prototypes -Wmissing-prototypes -Winline -Wredundant-decls -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline -W -Wsign-compare",
+        # others; ones we might like marked with ?
+        # ? -Wundef for undefined idenfiers in #if
+        # ? -Wbad-function-cast
+        #   Warn whenever a function call is cast to a non-matching type
+        # ? -Wmissing-declarations
+        #   Warn if a global function is defined without a previous declaration
+        # -Wmissing-noreturn
+        # ? -Wredundant-decls
+        #    Warn if anything is declared more than once in the same scope,
+        # ? -Wnested-externs
+        #    Warn if an `extern' declaration is encountered within an function.
+        # -Wlong-long
+        # Ha. this is the default! with -pedantic.
+        # -Wno-long-long for the nicest bit of C99
+         2.7 => "",
+         2.8 => "",
+         2.95 => "",
+         3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked -Wpadded -Wdisabled-optimization",
+        # -Wsequence-point is part of -Wall
+        # -Wfloat-equal may not be what we want
+        # We shouldn't be using __packed__, but I doubt -Wpacked will harm us
+        # -Wpadded may prove interesting, or even noisy.
+        # -Wunreachable-code might be useful in a non debugging version
+    );
+    while (my ($vers, $opt) = splice @opt_and_vers, 0, 2) {
+        last if $vers > $c{gccversion};
+        next unless $opt; # Ignore blank lines
+        $c{cc_warn} .= " $opt";
+    }
+    prompt("What gcc warning flags do you want to use?", 'cc_warn');
+}
 
 #
 # Copy the appropriate platform-specific file over
