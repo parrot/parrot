@@ -429,12 +429,15 @@ main(int argc, char * argv[])
     if (Interp_flags_TEST(interp, PARROT_PYTHON_MODE))
         Parrot_py_init(interp);
 
-    /* default optimizations, s. optimizer.c, imc.h */
+    /* Default optimization level is zero; see optimizer.c, imc.h */
     if (!*optimizer_opt) {
         strcpy(optimizer_opt, "0");
         IMCC_INFO(interp)->optimizer_level = 0;
     }
 
+    /* Read in the source and determine whether it's Parrot bytecode,
+       PASM or a Parrot abstract syntax tree (PAST) file. If it isn't 
+       any of these, then we assume that it is PIR. */       
     if (!sourcefile || !*sourcefile) {
         IMCC_fatal(interp, 1, "main: No source file specified.\n" );
     }
@@ -468,6 +471,7 @@ main(int argc, char * argv[])
         Parrot_exit(0);
     }
 
+    /* Do we need to produce an output file? If so, what type? */
     obj_file = 0;
     if (interp->imc_info->output) {
         char *ext;
@@ -498,6 +502,9 @@ main(int argc, char * argv[])
         IMCC_info(interp, 1,"debug = 0x%x\n", interp->imc_info->debug);
         IMCC_info(interp, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);
     }
+
+    /* If the input file is Parrot bytecode, then we simply read it 
+       into a packfile, which Parrot then loads */
     if (load_pbc) {
         pf = Parrot_readbc(interp, sourcefile);
         if (!pf)
@@ -506,6 +513,7 @@ main(int argc, char * argv[])
         Parrot_loadbc(interp, pf);
     }
     else {
+        /* Otherwise, we need to compile our input to bytecode. */
         int per_pbc = (write_pbc | run_pbc) != 0;
         IMCC_info(interp, 1, "using optimization '%s' (%x) \n", optimizer_opt,
                 IMCC_INFO(interp)->optimizer_level);
@@ -535,6 +543,8 @@ main(int argc, char * argv[])
 
         IMCC_info(interp, 1, "%ld lines compiled.\n", line);
     }
+
+    /* Produce a PBC output file, if one was requested */
     if (write_pbc) {
         size_t size;
         opcode_t *packed;
@@ -561,7 +571,8 @@ main(int argc, char * argv[])
         if (run_pbc != 2)
             PackFile_fixup_subs(interp, PBC_POSTCOMP);
     }
-    /* load the file written above */
+
+    /* If necessary, load the file written above */
     if (run_pbc == 2 && write_pbc && strcmp(output, "-")) {
         IMCC_info(interp, 1, "Loading %s\n", output);
         pf = Parrot_readbc(interp, output);
@@ -571,6 +582,8 @@ main(int argc, char * argv[])
         Parrot_loadbc(interp, pf);
         load_pbc = 1;
     }
+
+    /* Run the bytecode */
     if (run_pbc) {
 
         if (interp->imc_info->imcc_warn)
@@ -590,6 +603,8 @@ main(int argc, char * argv[])
         Parrot_runcode(interp, argc, argv);
         /* XXX no return value :-( */
     }
+
+    /* Clean-up after ourselves */
     Parrot_destroy(interp);
     if (output)
         free(output);
