@@ -98,6 +98,7 @@ print F <<'EOF';
    ret
 .end
 EOF
+close F;
 
 output_is(<<'CODE', <<'OUT', "subroutine in external file");
 .sub _main
