@@ -129,6 +129,8 @@ These operations load registers from constants or other registers.
 
 =item B<set>(s, sc)
 
+=item B<set>(s, s)
+
 Set $1 to $2.
 
 =cut
@@ -154,6 +156,9 @@ AUTO_OP set(s, sc) {
   $1 = $2;
 }
 
+AUTO_OP set(s, s) {
+  $1 = string_copy($2);
+}
 
 =back
 
