@@ -386,7 +386,7 @@ _EOF_
 # designed to work with this grammar.
 #
 
-=pod
+=begin commented_out
 our $grammar = <<'_EOF_';
 kDEFINED	: 'defined'	{[@item]}
 

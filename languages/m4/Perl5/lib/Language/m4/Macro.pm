@@ -46,6 +46,7 @@ BEGIN
 See Also   : 
 
 =cut
+
 sub expand_input
 {
   my ( $state, $symtab ) = @_;
@@ -71,6 +72,7 @@ sub expand_input
 See Also   : 
 
 =cut
+
 sub _expand_token
 {
   my ( $symtab, $token ) = @_;

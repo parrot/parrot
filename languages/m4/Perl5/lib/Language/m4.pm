@@ -62,6 +62,7 @@ BEGIN
 See Also   : GNU m4 
 
 =cut
+
 sub main
 {
   my $version_flag = 0;
@@ -134,6 +135,7 @@ sub main
  Comments  : TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 =cut
+
 sub _usage
 {             
   print "Usage: %s [OPTION]... FILE\n";

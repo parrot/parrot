@@ -44,6 +44,7 @@ Dose some stuff with reading input.
 See Also   : 
 
 =cut
+
 sub input_init
 {
   my ($state) = @_;
@@ -76,6 +77,7 @@ sub push_file
 See Also   : 
 
 =cut
+
 sub next_token
 {
   my ( $state ) = @_;
