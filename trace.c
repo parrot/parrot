@@ -15,11 +15,12 @@
 
 /*
  *=for api interpreter trace_op_dump
- * TODO: This isn't really part of the API, but here's its documentation. Prints the PC, OP
- * and ARGS. Used by trace_op
+ * TODO: This isn't really part of the API, but here's its documentation. 
+ * Prints the PC, OP and ARGS. Used by trace_op
  */
 void
-trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t *pc) {
+trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, 
+              opcode_t *pc) {
     INTVAL i;
 
     fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc,
@@ -34,20 +35,25 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t 
                 fprintf(stderr, "%ld", (long) *(pc + i));
                 break;
             case PARROT_ARG_NC:
-                fprintf(stderr, "%f", interpreter->code->const_table->constants[*(pc + i)]->number);
+                fprintf(stderr, "%f", interpreter->code->const_table->
+                                       constants[*(pc + i)]->number);
                 break;
             case PARROT_ARG_PC:
                 /* what is a PMC constant look like? */
                 fprintf(stderr, "%ld", (long) *(pc + i));
                 break;
             case PARROT_ARG_SC:
-                fprintf(stderr, "\"%s\"", (char*)interpreter->code->const_table->constants[*(pc + i)]->string->bufstart);
+                fprintf(stderr, "\"%s\"", 
+                    (char *) interpreter->code->const_table->
+                              constants[*(pc + i)]->string->bufstart);
                 break;
             case PARROT_ARG_I:
-                fprintf(stderr, "I%ld=%ld", (long) *(pc + i), (long) interpreter->int_reg->registers[*(pc + i)]);
+                fprintf(stderr, "I%ld=%ld", (long) *(pc + i), 
+                    (long) interpreter->int_reg->registers[*(pc + i)]);
                 break;
             case PARROT_ARG_N:
-                fprintf(stderr, "N%ld=%f", (long) *(pc + i), interpreter->num_reg->registers[*(pc + i)]);
+                fprintf(stderr, "N%ld=%f", (long) *(pc + i), 
+                    interpreter->num_reg->registers[*(pc + i)]);
                 break;
             case PARROT_ARG_P:
                 /* what does a PMC constant look like? */
@@ -55,7 +61,9 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t 
                 break;
             case PARROT_ARG_S:
                 if(interpreter->string_reg->registers[*(pc + i)]) {
-                    fprintf(stderr, "S%ld=\"%s\"", (long) *(pc + i), (char*)interpreter->string_reg->registers[*(pc + i)]->bufstart);
+                    fprintf(stderr, "S%ld=\"%s\"", (long) *(pc + i), 
+                        (char *) interpreter->string_reg->
+                                  registers[*(pc + i)]->bufstart);
                 } else {
                     fprintf(stderr, "S%ld=(null)", (long) *(pc + i));
                 }
@@ -71,13 +79,14 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t 
 
 /*
  *=for api interpreter trace_op
- * TODO: This isn't really part of the API, but here's its documentation. Prints the PC, OP
- * and ARGS. Used by runops_trace.
+ * TODO: This isn't really part of the API, but here's its documentation. 
+ * Prints the PC, OP and ARGS. Used by runops_trace.
  *
  * With bounds checking.
  */
 void
-trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
+trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start, 
+         opcode_t * code_end, opcode_t *pc) {
 
     if (!pc) {
         return;
@@ -90,8 +99,9 @@ trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t * co
     else if (pc) {
         fprintf(stderr, "PC=%ld; OP=<err>\n", (long)(pc - code_start));
     }
-
-    (void)fflush(stderr); /* Flush *stderr* now that we've output the trace info */
+    
+    /* Flush *stderr* now that we've output the trace info */
+    (void)fflush(stderr); 
 }
 
 

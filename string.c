@@ -31,7 +31,8 @@ string_init(void) {
  * and compute its string length
  */
 STRING *
-string_make(struct Parrot_Interp *interpreter, void *buffer, INTVAL buflen, const ENCODING *encoding, INTVAL flags, const CHARTYPE *type) {
+string_make(struct Parrot_Interp *interpreter, void *buffer, INTVAL buflen, 
+            const ENCODING *encoding, INTVAL flags, const CHARTYPE *type) {
     STRING *s = new_string_header(interpreter);
 
     if (!type) {
@@ -129,14 +130,17 @@ string_ord(STRING* s, INTVAL index) {
  */
 STRING*
 string_copy(struct Parrot_Interp *interpreter, STRING *s) {
-    return string_make(interpreter, s->bufstart, s->bufused, s->encoding, s->flags, s->type);
+    return string_make(interpreter, s->bufstart, s->bufused, s->encoding, 
+                       s->flags, s->type);
 }
 
 /*=for api string string_transcode
  * create a transcoded copy of the argument passed in
  */
 STRING*
-string_transcode(struct Parrot_Interp *interpreter, STRING *src, const ENCODING *encoding, const CHARTYPE *type, STRING *dest) {
+string_transcode(struct Parrot_Interp *interpreter, STRING *src, 
+                 const ENCODING *encoding, const CHARTYPE *type, 
+                 STRING *dest) {
     if (!dest) {
         dest = string_make(interpreter, NULL, 0, encoding, 0, type);
     }
@@ -163,8 +167,10 @@ string_transcode(struct Parrot_Interp *interpreter, STRING *src, const ENCODING 
         if (src->type != dest->type) {
             transcoder1 = chartype_lookup_transcoder(src->type, dest->type);
             if (!transcoder1) {
-                transcoder1 = chartype_lookup_transcoder(src->type, string_unicode_type);
-                transcoder2 = chartype_lookup_transcoder(string_unicode_type, dest->type);
+                transcoder1 = chartype_lookup_transcoder(src->type, 
+                                  string_unicode_type);
+                transcoder2 = chartype_lookup_transcoder(string_unicode_type, 
+                                  dest->type);
             }
         }
 
@@ -215,7 +221,8 @@ string_max_bytes(STRING* s, INTVAL iv) {
  * concatenate two strings
  */
 STRING*
-string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL flags) {
+string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b,
+              INTVAL flags) {
     if(a != NULL) {
         if (b == NULL || b->strlen == 0) {
             return a;
@@ -224,7 +231,8 @@ string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL fl
             b = string_transcode(interpreter, b, a->encoding, a->type, NULL);
         }
         string_grow(a, a->strlen + b->strlen);
-        mem_sys_memcopy((void*)((ptrcast_t)a->bufstart + a->bufused), b->bufstart, b->bufused);
+        mem_sys_memcopy((void*)((ptrcast_t)a->bufstart + a->bufused), 
+                          b->bufstart, b->bufused);
         a->strlen = a->strlen + b->strlen;
         a->bufused = a->bufused + b->bufused;
     }
@@ -243,7 +251,8 @@ string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL fl
  * Allocates I<d> if needed, also returns d.
 */
 STRING*
-string_repeat(struct Parrot_Interp *interpreter, STRING* s, INTVAL num, STRING** d) {
+string_repeat(struct Parrot_Interp *interpreter, STRING* s, INTVAL num, 
+              STRING** d) {
     STRING* dest;
     INTVAL i;
 
@@ -287,7 +296,8 @@ string_repeat(struct Parrot_Interp *interpreter, STRING* s, INTVAL num, STRING**
  * Allocate memory for d if necessary.
  */
 STRING*
-string_substr(struct Parrot_Interp *interpreter, STRING* src, INTVAL offset, INTVAL length, STRING** d) {
+string_substr(struct Parrot_Interp *interpreter, STRING* src, INTVAL offset, 
+              INTVAL length, STRING** d) {
     STRING *dest;
     char *substart;
     char *subend;
@@ -350,8 +360,10 @@ string_compare(struct Parrot_Interp *interpreter, STRING* s1, STRING* s2) {
     INTVAL cmp = 0;
 
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
-        s1 = string_transcode(interpreter, s1, NULL, string_unicode_type, NULL);
-        s2 = string_transcode(interpreter, s2, NULL, string_unicode_type, NULL);
+        s1 = 
+            string_transcode(interpreter, s1, NULL, string_unicode_type, NULL);
+        s2 = 
+            string_transcode(interpreter, s2, NULL, string_unicode_type, NULL);
     }
 
     s1start = s1->bufstart;

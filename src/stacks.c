@@ -26,7 +26,8 @@ stack_depth(struct Parrot_Interp *interpreter, struct StackChunk *chunk) {
 }
 
 struct Stack_Entry *
-stack_entry(struct Parrot_Interp *interpreter, struct StackChunk *chunk, INTVAL depth) {
+stack_entry(struct Parrot_Interp *interpreter, struct StackChunk *chunk, 
+            INTVAL depth) {
     while (chunk->next) {
       chunk = chunk->next;
     }
@@ -39,7 +40,8 @@ stack_entry(struct Parrot_Interp *interpreter, struct StackChunk *chunk, INTVAL 
 }
 
 /* Rotate the top N entries by one */
-void rotate_entries(struct Parrot_Interp *interpreter, struct StackChunk *base_chunk, struct Stack_Entry *top, INTVAL depth) {
+void rotate_entries(struct Parrot_Interp *interpreter, 
+       struct StackChunk *base_chunk, struct Stack_Entry *top, INTVAL depth) {
     struct Stack_Entry temp;
     INTVAL i;
 
@@ -58,7 +60,8 @@ void rotate_entries(struct Parrot_Interp *interpreter, struct StackChunk *base_c
     temp = *(top);
 
     for(i = 0; i < depth - 1; i++) {
-      *stack_entry(interpreter, base_chunk, i) = *stack_entry(interpreter, base_chunk, i + 1);
+      *stack_entry(interpreter, base_chunk, i) = 
+                              *stack_entry(interpreter, base_chunk, i + 1);
     }
 
     *stack_entry(interpreter, base_chunk, depth - 1) = temp;
@@ -72,7 +75,9 @@ void rotate_entries(struct Parrot_Interp *interpreter, struct StackChunk *base_c
    place when an entry is removed, such as when you push a lexical
    lock onto the call stack, or localize (or tempify, or whatever
    we're calling it)  variable or something */
-struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, void *thing, INTVAL type,  void (*cleanup)(struct Stack_Entry *)) {
+struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, 
+        struct Stack_Entry **top, void *thing, INTVAL type,  
+        void (*cleanup)(struct Stack_Entry *)) {
     struct StackChunk *chunk_base;
     
     chunk_base = STACK_CHUNK_BASE(*top);
@@ -109,7 +114,8 @@ struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, struct
         chunk_base->entry[chunk_base->used-1].entry.int_val = *(INTVAL *)thing;
         break;
     case STACK_ENTRY_FLOAT:
-        chunk_base->entry[chunk_base->used-1].entry.num_val = *(FLOATVAL *)thing;
+        chunk_base->entry[chunk_base->used-1].entry.num_val = 
+                                                     *(FLOATVAL *)thing;
         break;
     case STACK_ENTRY_PMC:
         chunk_base->entry[chunk_base->used-1].entry.pmc_val = thing;
@@ -140,7 +146,8 @@ void *pop_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **
     }
     /* Types of 0 mean we don't care */
     if (type && (*top)->entry_type != type) {
-        INTERNAL_EXCEPTION(ERROR_BAD_STACK_TYPE, "Wrong type on top of stack!\n");
+        INTERNAL_EXCEPTION(ERROR_BAD_STACK_TYPE, 
+                           "Wrong type on top of stack!\n");
     }
 
     /* Snag the value */
@@ -188,7 +195,8 @@ void *pop_dest(struct Parrot_Interp *interpreter) {
 #if 0
     /* If we didn't mind the extra call, we'd do this: */
     void * dest;
-    pop_generic_entry(interpreter, &interpreter->control_stack_top, &dest, STACK_ENTRY_DESTINATION)
+    pop_generic_entry(interpreter, &interpreter->control_stack_top, 
+                      &dest, STACK_ENTRY_DESTINATION)
     return dest;
 #endif
 
@@ -203,7 +211,8 @@ void *pop_dest(struct Parrot_Interp *interpreter) {
     }
 
     if ((*top)->entry_type != STACK_ENTRY_DESTINATION) {
-        INTERNAL_EXCEPTION(ERROR_BAD_STACK_TYPE, "Wrong type on top of stack!\n");
+        INTERNAL_EXCEPTION(ERROR_BAD_STACK_TYPE, 
+                           "Wrong type on top of stack!\n");
     }
 
     dest = (*top)->entry.generic_pointer;
@@ -228,13 +237,15 @@ void *pop_dest(struct Parrot_Interp *interpreter) {
 }
 
 /* Pop off an entry and throw it out */
-void toss_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, INTVAL type) {
+void toss_generic_entry(struct Parrot_Interp *interpreter, 
+                        struct Stack_Entry **top, INTVAL type) {
     void *foo;
     pop_generic_entry(interpreter, top, &foo, type);
 }
 
 /* get the type of  the topmost stack entry */
-INTVAL get_entry_type(struct Parrot_Interp *interpreter, struct Stack_Entry *entry) {
+INTVAL get_entry_type(struct Parrot_Interp *interpreter, 
+                      struct Stack_Entry *entry) {
     return( entry->entry_type);
 }
 

@@ -126,7 +126,8 @@ return the type of element <index> of KEY <key>
 =cut
 */
 
-INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key, INTVAL index) {
+INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key, 
+                        INTVAL index) {
   if(key != NULL) {
     if((index >= 0) || (index < key->size)) {
       KEY_PAIR* pair = &key->keys[index];
@@ -148,7 +149,8 @@ return the value of index <index> of KEY <key>
 =cut
 */
 
-KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key, INTVAL index) {
+KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key, 
+                              INTVAL index) {
   if(key != NULL) {
     if((index >= 0) || (index < key->size)) {
       KEY_PAIR* pair = &key->keys[index];
@@ -167,7 +169,8 @@ KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key, INTVA
   return NULL;
 }
 
-KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, STRING* index) {
+KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, 
+                              STRING* index) {
   if(key != NULL) {
 /*
     if((index >= 0) || (index < key->size)) {
@@ -195,13 +198,15 @@ Set the value of index <index> of key <key> to integer <value>
 =cut
 */
 
-void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key, INTVAL index, KEY_PAIR* value) {
+void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key, 
+                             INTVAL index, KEY_PAIR* value) {
   if(key != NULL) {
     if((index >= 0) || (index < key->size)) {
       memcpy(&key->keys[index],value,sizeof(KEY_PAIR));
     }
     else {
-      fprintf(stderr,"*** key_set_element_value_i setting value out of bounds\n");
+      fprintf(stderr,
+          "*** key_set_element_value_i setting value out of bounds\n");
     }
   }
   else {
@@ -216,7 +221,8 @@ Set the value of index <index> of key <key> to string <value>
 =cut
 */
 
-void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key, STRING* index, KEY_PAIR* value) {
+void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key, 
+                             STRING* index, KEY_PAIR* value) {
   if(key != NULL) {
 /*
     if((index >= 0) || (index < key->size)) {

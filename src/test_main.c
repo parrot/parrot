@@ -161,7 +161,8 @@ main(int argc, char **argv) {
         program_code = (opcode_t*)mem_sys_allocate(program_size);
         read(fd, (void*)program_code, program_size);
 #else
-        program_code = (opcode_t*)mmap(0, program_size, PROT_READ, MAP_SHARED, fd, 0);
+        program_code = 
+            (opcode_t *) mmap(0, program_size, PROT_READ, MAP_SHARED, fd, 0);
 #endif
 
         if (!program_code) {
@@ -170,7 +171,8 @@ main(int argc, char **argv) {
         }
         
         pf = PackFile_new();
-        if( !PackFile_unpack(interpreter, pf, (char *)program_code, program_size) ) {
+        if( !PackFile_unpack(interpreter, pf, (char *)program_code, 
+                              program_size) ) {
             printf( "Can't unpack.\n" );
             return 1;
         }
@@ -200,8 +202,9 @@ main(int argc, char **argv) {
                     op_count++;
                     call_count += interpreter->profile[i];
 
-                    printf("  %5d  %-12s  %12ld\n",i, interpreter->op_info_table[i].full_name,
-                        interpreter->profile[i]);
+                    printf("  %5d  %-12s  %12ld\n", i, 
+                           interpreter->op_info_table[i].full_name,
+                           interpreter->profile[i]);
                 }
 
             }
