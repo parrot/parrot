@@ -813,8 +813,8 @@ PackFile_new(INTVAL is_mapped)
         PackFile_Segment_new_seg(&pf->directory,
             PF_DIR_SEG, DIRECTORY_SEGMENT_NAME, 0);
     pf->directory = *pf->dirp;
-    pf->fetch_op = (opcode_t (*)(opcode_t)) NULLfunc;
-    pf->fetch_iv = (INTVAL (*)(INTVAL)) NULLfunc;
+    pf->fetch_op = (opcode_t (*)(unsigned char*)) NULLfunc;
+    pf->fetch_iv = (INTVAL (*)(unsigned char*)) NULLfunc;
     pf->fetch_nv = (void (*)(unsigned char *, unsigned char *)) NULLfunc;
     return pf;
 }

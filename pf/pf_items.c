@@ -114,12 +114,28 @@ cvt_num12_num8_le(unsigned char *dest, unsigned char *src)
     cvt_num12_num8(b, src);
     fetch_buf_le_8(dest, b);
 }
+static opcode_t
+fetch_op_test(unsigned char *b)
+{
+    union {
+        unsigned char buf[4];
+        opcode_t o;
+    } u;
+    fetch_buf_le_4(u.buf, b);
+    return u.o;
+}
 
 /*
  * opcode fetch helper function
+ *
+ * This is mostly wrong
+ *
+ * - it doesn't consider the endianess of the packfile
+ * - should be separated into several different fetch functions
+ *
  */
 static opcode_t
-fetch_op_mixed(opcode_t b)
+fetch_op_mixed(unsigned char *b)
 {
 #if OPCODE_T_SIZE == 4
     union {
@@ -127,6 +143,10 @@ fetch_op_mixed(opcode_t b)
         opcode_t o[2];
     } u;
 #else
+    union {
+        unsigned char buf[4];
+        opcode_t o;
+    } u;
     opcode_t o;
 #endif
 
@@ -145,8 +165,10 @@ fetch_op_mixed(opcode_t b)
      fetch_buf_be_8(u.buf, (unsigned char *) b);
      return u.o[0]; /* or u.o[1] */
 #  else
-     o = fetch_op_be(b);
-     return o & 0xffffffff;
+     /* fetch 4 bytes from a LE pbc, result 8 byte LE opcode_t */
+     u.o = 0;
+     fetch_buf_le_4(u.buf, b);
+     return u.o;
 #  endif
 
 #endif
@@ -171,7 +193,7 @@ PF_fetch_opcode(struct PackFile *pf, opcode_t **stream) {
 #if TRACE_PACKFILE == 2
     PIO_eprintf(NULL, "PF_fetch_opcode: Reordering.\n");
 #endif
-    o = (pf->fetch_op)(**stream);
+    o = (pf->fetch_op)(*((unsigned char **)stream));
     *((unsigned char **) (stream)) += pf->header->wordsize;
     return o;
 }
@@ -231,7 +253,7 @@ PF_fetch_integer(struct PackFile *pf, opcode_t **stream) {
     INTVAL i;
     if (!pf || pf->fetch_iv == NULL)
         return *(*stream)++;
-    i = (pf->fetch_iv)(**stream);
+    i = (pf->fetch_iv)(*((unsigned char **)stream));
     /* XXX assume sizeof(opcode_t) == sizeof(INTVAL) on the
      * machine producing this PBC
      */
@@ -566,7 +588,7 @@ PackFile_assign_transforms(struct PackFile *pf) {
     if(pf->header->byteorder != PARROT_BIGENDIAN) {
         pf->need_endianize = 1;
         if (pf->header->wordsize == sizeof(opcode_t))
-            pf->fetch_op = fetch_op_le;
+            pf->fetch_op = (opcode_t (*)unsigned char*)fetch_op_le;
         else {
             pf->need_wordsize = 1;
             pf->fetch_op = fetch_op_mixed;
@@ -582,13 +604,13 @@ PackFile_assign_transforms(struct PackFile *pf) {
     if(pf->header->byteorder != PARROT_BIGENDIAN) {
         pf->need_endianize = 1;
         if (pf->header->wordsize == sizeof(opcode_t)) {
-            pf->fetch_op = fetch_op_be;
+            pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_be;
         }
         else {
             pf->need_wordsize = 1;
             pf->fetch_op = fetch_op_mixed;
         }
-        pf->fetch_iv = fetch_iv_be;
+        pf->fetch_iv = (opcode_t (*)(unsigned char*))fetch_iv_be;
         if (pf->header->floattype == 0)
             pf->fetch_nv = fetch_buf_be_8;
         else if (pf->header->floattype == 1)

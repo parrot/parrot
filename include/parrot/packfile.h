@@ -203,8 +203,8 @@ struct PackFile {
     INTVAL                       eval_nr;   /* nr. of eval cs */
     INTVAL                       need_wordsize;
     INTVAL                       need_endianize;
-    opcode_t                     (*fetch_op)(opcode_t);
-    INTVAL                       (*fetch_iv)(INTVAL);
+    opcode_t                     (*fetch_op)(unsigned char *);
+    INTVAL                       (*fetch_iv)(unsigned char *);
     void                         (*fetch_nv)(unsigned char *, unsigned char *);
 };
 
