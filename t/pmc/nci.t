@@ -7,7 +7,8 @@ if ($PConfig{jitcpuarch} eq 'i386' && -e "libnci" . $PConfig{so}) {
     $ENV{LD_LIBRARY_PATH} = '.';
 }
 else {
-    skip('needs jit/i386 and libnci'.$PConfig{so}, 9);
+    skip('needs jit/i386 and libnci'.$PConfig{so},
+         Test::Builder->expected_tests());
 }
 
 sub gen_test($) {
@@ -302,8 +303,6 @@ ok worked
 ok 2
 OUTPUT
 
-}
-
 output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_d_d - stress test");
   loadlib P1, "libnci.so"
   print "loaded\n"
@@ -380,5 +379,7 @@ ok 2
 ok 3
 ok 4
 OUTPUT
-1;
 
+} # SKIP
+
+1;
