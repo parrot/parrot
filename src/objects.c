@@ -218,8 +218,8 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
         }
         else {
             /*
-             * if the method doesn't exist, put in the deleg_pmc vtable
-             * but only, it ParrotObject hasn't overriden the method
+             * if the method doesn't exist, put in the deleg_pmc vtable,
+             * but only if ParrotObject hasn't overridden the method
              */
             if (((void **)delegate_vtable)[i] == ((void**)object_vtable)[i])
                 LVALUE_CAST(void **,vtable)[i] = ((void**)deleg_pmc_vtable)[i];
@@ -333,7 +333,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     }
     else {
         /*
-         * we have 1 parent, that get's unshifted below
+         * we have 1 parent, that gets unshifted below
          */
         temp_pmc = pmc_new(interpreter, enum_class_Array);
         VTABLE_set_integer_native(interpreter, temp_pmc, 0);
@@ -486,8 +486,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     /* Set the vtable's type to the newly allocated type */
     Parrot_vtable_set_type(interpreter, new_vtable, new_type);
 
-    /* And cache our class PMC in the vtable so we can find it later
-    */
+    /* And cache our class PMC in the vtable so we can find it later */
     Parrot_vtable_set_data(interpreter, new_vtable, new_class);
 
     /* Reset the init method to our instantiation method */
@@ -564,7 +563,7 @@ do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
     if (nparents) {
         parent_class = VTABLE_get_pmc_keyed_int(interpreter,
                 classsearch_array, nparents - 1);
-        /* if its a PMC, we put one PMC of that type into
+        /* if it's a PMC, we put one PMC of that type into
          * the attribute slot #0.
          */
         if (!PObj_is_class_TEST(parent_class)) {
@@ -623,7 +622,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
     for (i = nparents - 1; i >= 0; --i) {
         parent_class = VTABLE_get_pmc_keyed_int(interpreter,
                 classsearch_array, i);
-        /* if its a PMC, we put one PMC of that type into
+        /* if it's a PMC, we put one PMC of that type into
          * the attribute slot #0 and call init() on that PMC
          */
         if (!PObj_is_class_TEST(parent_class)) {
@@ -1007,7 +1006,7 @@ Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl) {
             return 1;
     }
     else {
-        /* else get the objects class and the data array */
+        /* else get the object's class and the data array */
         t = GET_CLASS(object_array, pmc);
         object_array = PMC_data(t);
     }
@@ -1089,7 +1088,7 @@ init_object_cache(Parrot_Interp interpreter)
 #define TBL_SIZE (1 + TBL_SIZE_MASK)
 /*
  * quick'n'dirty method cache
- * TODO: integrae NCI meth lookup
+ * TODO: integrate NCI meth lookup
  * TODO: use a hash if method_name is not constant
  *       i.e. from obj.$Sreg(args)
  *       If this hash is implemented mark it during DOD
@@ -1211,7 +1210,7 @@ find_method_direct_1(Parrot_Interp interpreter, PMC *class,
                                 search */
 
     /*
-     * if its a non-ParrotClass PMC, then the namespace
+     * if it's a non-ParrotClass PMC, then the namespace
      * is the PMC's class name
      * see also enter_nci_method()
      */
