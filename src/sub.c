@@ -76,9 +76,7 @@ mark_context(Interp* interpreter, struct Parrot_Context* ctx)
     mark_register_stack(interpreter, ctx->num_reg_stack);
     mark_string_register_stack(interpreter, ctx->string_reg_stack);
     mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
-#if INDIRECT_REGS
     mark_reg_stack(interpreter, ctx->reg_stack);
-#endif
 }
 
 /*
@@ -156,9 +154,7 @@ swap_context(Interp *interpreter, struct PMC *sub)
     struct Parrot_coro* co = PMC_coro(sub);
     struct Parrot_Context *ctx = &co->ctx;
     struct Parrot_Context temp;
-#if INDIRECT_REGS
     struct parrot_regs_t *reg_p;
-#endif
 
     /*
      * Swap context structures
@@ -173,17 +169,11 @@ swap_context(Interp *interpreter, struct PMC *sub)
          * first time set current sub, cont, object
          */
         if (!interpreter->ctx.current_sub) {
-#if INDIRECT_REGS
             copy_regs(interpreter, ctx->bp);
             ctx->current_sub = interpreter->ctx.current_sub = sub;
             interpreter->ctx.current_cont = ctx->bp->pmc_reg.registers[1];
             REG_PMC(0) = sub;
             REG_PMC(1) = interpreter->ctx.current_cont;
-#else
-            interpreter->ctx.current_sub = REG_PMC(0);
-            interpreter->ctx.current_cont = REG_PMC(1);
-            interpreter->ctx.current_object = REG_PMC(2);
-#endif
         }
         /*
          * construct stacks that have the interpreterreter stack
@@ -197,9 +187,7 @@ swap_context(Interp *interpreter, struct PMC *sub)
         PObj_get_FLAGS(sub) &= ~PObj_private0_FLAG;
         restore_stack(&interpreter->ctx.control_stack, &ctx->control_stack,
                 &co->co_control_stack, co->co_control_base);
-#if INDIRECT_REGS
         copy_regs(interpreter, ctx->bp);
-#endif
     }
 }
 
@@ -361,7 +349,6 @@ new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
 }
 
 
-#if INDIRECT_REGS
 /*
 
 =item C<void copy_regs(Interp *, struct parrot_regs_t *caller_regs)>
@@ -408,7 +395,6 @@ copy_regs(Interp *interpreter, struct parrot_regs_t *caller_regs)
         REG_PMC(3) = caller_regs->pmc_reg.registers[3];
 }
 
-#endif
 
 /*
 

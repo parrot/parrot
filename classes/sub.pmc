@@ -217,9 +217,7 @@ Invokes the subroutine.
 
     void* invoke (void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
-#if INDIRECT_REGS
         struct parrot_regs_t *caller_regs;
-#endif
 
         if (++interpreter->ctx.recursion_depth >
                 interpreter->recursion_limit) {

@@ -82,18 +82,12 @@ Sets each register in the current set to C<REG_NULL>.
 
 */
 
-#if INDIRECT_REGS
-#  define BASE ctx.bp->
-#else
-#  define BASE
-#endif
-
 void
 REG_CLEAR(Interp *interpreter)
 {
     int i;
     for (i = 0; i < NUM_REGISTERS; i++) {
-        interpreter->BASE REG_TYPE.registers[i] = REG_NULL;
+        interpreter->ctx.bp->REG_TYPE.registers[i] = REG_NULL;
     }
 }
 

@@ -58,12 +58,10 @@ setup_register_stacks(Parrot_Interp interpreter, struct Parrot_Context *ctx)
     ctx->pmc_reg_stack = register_new_stack(interpreter,
             "PMCReg_", sizeof(struct PRegFrame));
 
-#if INDIRECT_REGS
     ctx->reg_stack = register_new_stack(interpreter,
             "Register_", sizeof(struct parrot_regs_t));
 
     ctx->bp = (struct parrot_regs_t *)STACK_DATAP(ctx->reg_stack);
-#endif
 
 }
 
@@ -113,7 +111,6 @@ mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
     }
 }
 
-#if INDIRECT_REGS
 void
 mark_reg_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
@@ -136,8 +133,6 @@ mark_reg_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
             break;
     }
 }
-
-#endif
 
 /*
 

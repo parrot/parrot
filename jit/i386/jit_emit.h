@@ -24,13 +24,9 @@
 /*
  * get the *runtime* interpreter
  */
-#if INDIRECT_REGS
+
 #  define Parrot_jit_emit_get_INTERP(pc, dest) \
     emitm_movl_m_r(pc, dest, emit_EBP, emit_None, 1, INTERP_BP_OFFS)
-#else
-#  define Parrot_jit_emit_get_INTERP(pc, dest) \
-    jit_emit_mov_rr_i(pc, dest, emit_EBX)
-#endif
 
 /*
  * if we have a delegated method like typeof_i_p, that returns an INTVAL
@@ -1989,11 +1985,9 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                 offsetof(Parrot_jit_info_t, arena));
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
                 offsetof(Parrot_jit_arena_t, op_map));
-#if INDIRECT_REGS
         /* get base pointer */
         emitm_movl_m_r(jit_info->native_ptr, emit_EBX, emit_EBX, 0, 1,
                 offsetof(Interp, ctx.bp));
-#endif
 
     }
 #  if EXEC_CAPABLE
@@ -2896,11 +2890,9 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
     emitm_pushl_r(pc, emit_EBX);
     /* get interp into %ebx */
     emitm_movl_m_r(pc, emit_EBX, emit_EBP, 0, 1, 8);
-#if INDIRECT_REGS
-        /* get base pointer */
-        emitm_movl_m_r(pc, emit_EBX, emit_EBX, 0, 1,
-                offsetof(struct parrot_interp_t, ctx.bp));
-#endif
+    /* get base pointer */
+    emitm_movl_m_r(pc, emit_EBX, emit_EBX, 0, 1,
+            offsetof(struct parrot_interp_t, ctx.bp));
 
     /* get rightmost param, assume ascii chars */
     sig = (char *)signature->strstart + signature->bufused - 1;

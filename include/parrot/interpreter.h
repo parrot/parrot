@@ -130,9 +130,11 @@ typedef struct _RunProfile {
 /* Forward decl for imc_info_t */
 struct _imc_info_t;
 
-#if INDIRECT_REGS
 /*
- * move regs out of interpreter - see what all breaks ;)
+ * Parrot registers are now accessed through interpreter->ctx.bp
+ * This structure is dynamically allocated in subroutine calls
+ * and restored on subroutine returns on more precisely on invokation
+ * of a continuation by restoring the interpreter context.
  */
 struct parrot_regs_t {
     struct IReg int_reg;
@@ -140,7 +142,6 @@ struct parrot_regs_t {
     struct SReg string_reg;
     struct PReg pmc_reg;
 };
-#endif
 
 typedef struct Parrot_Context {
     struct parrot_regs_t *bp;           /* indirect reg base pointer */
@@ -194,12 +195,6 @@ typedef struct _Prederef {
  * The actual interpreter structure
  */
 struct parrot_interp_t {
-#if !INDIRECT_REGS
-    struct IReg int_reg;
-    struct NReg num_reg;
-    struct SReg string_reg;
-    struct PReg pmc_reg;
-#endif
     struct Parrot_Context ctx;          /* All the registers and stacks that
                                            matter when context switching */
 
@@ -306,7 +301,6 @@ typedef enum {
 /*
  * Macros to make accessing registers more convenient/readable.
  */
-#if INDIRECT_REGS
 
 #define INTERP_REG_INT(i, x) i->ctx.bp->int_reg.registers[x]
 #define INTERP_REG_NUM(i, x) i->ctx.bp->num_reg.registers[x]
@@ -314,17 +308,6 @@ typedef enum {
 #define INTERP_REG_PMC(i, x) i->ctx.bp->pmc_reg.registers[x]
 
 #define REG_BASE struct parrot_regs_t
-
-#else
-
-#define INTERP_REG_INT(i, x) i->int_reg.registers[x]
-#define INTERP_REG_NUM(i, x) i->num_reg.registers[x]
-#define INTERP_REG_STR(i, x) i->string_reg.registers[x]
-#define INTERP_REG_PMC(i, x) i->pmc_reg.registers[x]
-
-#define REG_BASE Interp
-
-#endif
 
 /*
  * same with the default name interpreter
