@@ -11,6 +11,7 @@
  */
 #include "parrot/embed.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2);
 
