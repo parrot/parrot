@@ -5,7 +5,7 @@
 #    clintp@geeksalad.org
 #    Freely Redistributable
 #
-# This is a rudementary XML-ish parser in PASM. It currently handles
+# This is a rudimentary XML-ish parser in PASM. It currently handles
 # only well-formed XML, doesn't throw errors, etc...  Limitations:
 #
 #    * validation?  check for well formedness?  Dream on.
