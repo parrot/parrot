@@ -1787,11 +1787,12 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 #    undef Parrot_jit_vtable_newp_ic_op
 
 #define EXR(m, s) (int *)(offsetof(struct Parrot_Interp, m) + s)
-#define IREG(i) EXR(int_reg.registers, jit_info->cur_op[i] * sizeof(INTVAL))
-#define NREG(i) EXR(num_reg.registers, jit_info->cur_op[i] * sizeof(FLOATVAL))
-#define PREG(i) EXR(pmc_reg.registers, jit_info->cur_op[i] * sizeof(PMC *))
-#define SREG(i) EXR(string_reg.registers, jit_info->cur_op[i] * sizeof(STRING *))
+#define IREG(i) EXR(int_reg.registers, i * sizeof(INTVAL))
+#define NREG(i) EXR(num_reg.registers, i * sizeof(FLOATVAL))
+#define PREG(i) EXR(pmc_reg.registers, i * sizeof(PMC *))
+#define SREG(i) EXR(string_reg.registers, i * sizeof(STRING *))
 #define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 4)
+
 #define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \
 emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 /* emit a call to a vtable func
@@ -1835,13 +1836,32 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
         p[i] = *(jit_info->cur_op + i);
         switch (op_info->types[i]) {
             case PARROT_ARG_S:
-                jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+#if EXEC_CAPABLE
+                if (jit_info->objfile) {
+                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                        SREG(p[i]));
+                    Parrot_exec_add_text_rellocation(jit_info->objfile,
+                        jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+                }
+                else
+#endif
+                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                         &STR_REG(p[i]));
                 emitm_pushl_r(jit_info->native_ptr, emit_EAX);
                 break;
             case PARROT_ARG_K:
             case PARROT_ARG_P:
-                jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+#if EXEC_CAPABLE
+                if (jit_info->objfile) {
+                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                        PREG(p[i]));
+                    Parrot_exec_add_text_rellocation(jit_info->objfile,
+                        jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+                }
+                else
+#endif
+ 
+                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                         &PMC_REG(p[i]));
                 /* push $i, the left most Pi stays in eax, which is used
                  * below, to call the vtable method
@@ -1853,7 +1873,17 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 if (MAP(i))
                     emitm_pushl_r(jit_info->native_ptr, MAP(i));
                 else {
-                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+#if EXEC_CAPABLE
+                    if (jit_info->objfile) {
+                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                            IREG(p[i]));
+                        Parrot_exec_add_text_rellocation(jit_info->objfile,
+                            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+                    }
+                    else
+#endif
+ 
+                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                             &INT_REG(p[i]));
                     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
                 }
@@ -1892,9 +1922,18 @@ store:
                 break;
 
             case PARROT_ARG_SC:
-                emitm_pushl_i(jit_info->native_ptr,
+#if EXEC_CAPABLE
+                if (jit_info->objfile) {
+                    emitm_pushl_m(jit_info->native_ptr, CONST(i));
+                    Parrot_exec_add_text_rellocation(jit_info->objfile,
+                        jit_info->native_ptr, RTYPE_COM, "const_table", -4);
+                }
+                else
+#endif
+ 
+                    emitm_pushl_i(jit_info->native_ptr,
                         interpreter->code->const_table->
-                        constants[p[i]]->u.string);
+                            constants[p[i]]->u.string);
                 break;
 
             case PARROT_ARG_KC:
@@ -1922,7 +1961,16 @@ store:
         }
     }
     /* push interpreter */
-    emitm_pushl_i(jit_info->native_ptr, interpreter);
+#if EXEC_CAPABLE
+    if (jit_info->objfile) {
+        emitm_pushl_i(jit_info->native_ptr, 0);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+    }
+    else
+#endif
+ 
+        emitm_pushl_i(jit_info->native_ptr, interpreter);
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
             offsetof(struct PMC, vtable));
@@ -1932,7 +1980,7 @@ store:
         jit_emit_stack_frame_leave(jit_info->native_ptr);
     else
         emitm_addb_i_r(jit_info->native_ptr,
-                st+sizeof(void*)*(n+1), emit_ESP);
+                st + sizeof(void *) * (n + 1), emit_ESP);
     if (saved == 2)
         emitm_popl_r(jit_info->native_ptr, emit_ECX);
     if (saved)
@@ -1954,13 +2002,41 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                 jit_emit_mov_rr_i(jit_info->native_ptr, MAP(1), emit_EAX);
             }
             else
-                jit_emit_mov_mr_i(jit_info->native_ptr, &INT_REG(p1), emit_EAX);
+#if EXEC_CAPABLE
+                if (jit_info->objfile) {
+                    jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                        IREG(p1));
+                    Parrot_exec_add_text_rellocation(jit_info->objfile,
+                        jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+                }
+                else
+#endif
+                    jit_emit_mov_mr_i(jit_info->native_ptr, &INT_REG(p1),
+                        emit_EAX);
             break;
         case PARROT_ARG_S:
-            jit_emit_mov_mr_i(jit_info->native_ptr, &STR_REG(p1), emit_EAX);
+#if EXEC_CAPABLE
+            if (jit_info->objfile) {
+                jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                    SREG(p1));
+                Parrot_exec_add_text_rellocation(jit_info->objfile,
+                    jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+            }
+            else
+#endif
+                jit_emit_mov_mr_i(jit_info->native_ptr, &STR_REG(p1), emit_EAX);
             break;
         case PARROT_ARG_P:
-            jit_emit_mov_mr_i(jit_info->native_ptr, &PMC_REG(p1), emit_EAX);
+#if EXEC_CAPABLE
+            if (jit_info->objfile) {
+                jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                    PREG(p1));
+                Parrot_exec_add_text_rellocation(jit_info->objfile,
+                    jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+            }
+            else
+#endif
+                jit_emit_mov_mr_i(jit_info->native_ptr, &PMC_REG(p1), emit_EAX);
             break;
         case PARROT_ARG_N:
             if (MAP(1)) {
@@ -2162,14 +2238,35 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
         internal_exception(1, "Illegal PMC enum (%d) in new\n", i2);
     /* push pmc enum and interpreter */
     emitm_pushl_i(jit_info->native_ptr, i2);
-    emitm_pushl_i(jit_info->native_ptr, interpreter);
-    call_func(jit_info, (void (*)(void))pmc_new_noinit);
-    /* result = eax = PMC */
-    jit_emit_mov_mr_i(jit_info->native_ptr,
-            &interpreter->pmc_reg.registers[p1], emit_EAX);
-    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
-    /* push interpreter */
-    emitm_pushl_i(jit_info->native_ptr, interpreter);
+#if EXEC_CAPABLE
+    if (jit_info->objfile) {
+        emitm_pushl_i(jit_info->native_ptr, 0);
+	    Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+        CALL("pmc_new_noinit");
+        /* result = eax = PMC */
+        jit_emit_mov_mr_i(jit_info->native_ptr, PREG(p1), emit_EAX);
+	    Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+                
+        emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+        /* push interpreter */
+        emitm_pushl_i(jit_info->native_ptr, 0);
+	    Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+    }
+    else
+#endif
+    {
+        emitm_pushl_i(jit_info->native_ptr, interpreter);
+        call_func(jit_info, (void (*)(void))pmc_new_noinit);
+        /* result = eax = PMC */
+        jit_emit_mov_mr_i(jit_info->native_ptr,
+                &interpreter->pmc_reg.registers[p1], emit_EAX);
+        emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+        /* push interpreter */
+        emitm_pushl_i(jit_info->native_ptr, interpreter);
+    }
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
             offsetof(struct PMC, vtable));
@@ -2187,6 +2284,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 #  undef NREG
 #  undef SREG
 #  undef PREG
+#  undef CONST
 #  undef CALL
 
 #  endif /* NO_JIT_VTABLE_OPS */
