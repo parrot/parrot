@@ -326,13 +326,17 @@ sub parse_flags {
     my ($pre, $classname) = ($1, $2);
     my %has_value = ( does => 1, extends => 1, group => 1, lib => 1 );
 
-    my %flags;
+    my (%flags, $parent_nr);
     # look through the pmc declaration header for flags such as noinit
     while ($$c =~ s/^(?:\s*)(\w+)//s) {
 	if ($has_value{$1}) {
 	    my $what = $1;
 	    if (s/^(?:\s+)(\w+)//s) {
-		$flags{$what}{$1} = 1;
+                if ($what eq 'extends') {
+                    $flags{$what}{$1} = ++$parent_nr;
+                } else {
+                    $flags{$what}{$1} = 1;
+                }
 	    }
 	    else {
 		die "Parser error: no value for '$what'";
@@ -434,7 +438,9 @@ sub gen_parent_list {
         my $n = shift @todo;
         my $sub = $all->{$n};
         next if $n eq 'default';
-        foreach my $parent (keys %{$sub->{flags}{extends}}) {
+        my %parent_hash = %{$sub->{flags}{extends}};
+        foreach my $parent (sort {$parent_hash{$a} <=> $parent_hash{$b} }
+                (keys (%parent_hash) ) ) {
             next if exists $class->{has_parent}{$parent};
             if (!$all->{$parent}) {
                 my $pf = lc $parent;
