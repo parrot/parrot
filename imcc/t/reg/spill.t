@@ -233,3 +233,95 @@ CODE
 6165697377
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "spill 1");
+
+# Test the ability of the register allocator in
+# combination with PCC calling convention and overflow arguments.
+#
+
+.sub _MAIN
+  _foo(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40)
+  end
+.end
+.sub _foo
+  .param int i1
+  .param int i2
+  .param int i3
+  .param int i4
+  .param int i5
+  .param int i6
+  .param int i7
+  .param int i8
+  .param int i9
+  .param int i10
+  .param int i11
+  .param int i12
+  .param int i13
+  .param int i14
+  .param int i15
+  .param int i16
+  .param int i17
+  .param int i18
+  .param int i19
+  .param int i20
+  .param int i21
+  .param int i22
+  .param int i23
+  .param int i24
+  .param int i25
+  .param int i26
+  .param int i27
+  .param int i28
+  .param int i29
+  .param int i30
+  .param int i31
+  .param int i32
+  .param int i33
+  .param int i34
+  .param int i35
+  .param int i36
+  .param int i37
+  .param int i39
+  .param int i40
+  print i1
+  print "\n"
+  print i2
+  print "\n"
+  print i3
+  print "\n"
+  print i4
+  print "\n"
+  print i5
+  print "\n"
+  print i10
+  print "\n"
+  print i15
+  print "\n"
+  print i20
+  print "\n"
+  print i25
+  print "\n"
+  print i30
+  print "\n"
+  print i35
+  print "\n"
+  print i40
+  print "\n"
+  end
+.end
+CODE
+1
+2
+3
+4
+5
+10
+15
+20
+25
+30
+35
+40
+OUT
+
