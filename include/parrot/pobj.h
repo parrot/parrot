@@ -102,18 +102,18 @@ typedef Buffer PObj;
 #endif /* ! DISABLE_GC_DEBUG */
 
 typedef enum {
-		enum_stringrep_unknown = 0,
-		enum_stringrep_one = 1,
-		enum_stringrep_two = 2,
-		enum_stringrep_four = 4
-	} parrot_string_representation_t;
+    enum_stringrep_unknown = 0,
+    enum_stringrep_one = 1,
+    enum_stringrep_two = 2,
+    enum_stringrep_four = 4
+} parrot_string_representation_t;
 
 struct parrot_string_t {
     pobj_t obj;
     UINTVAL bufused;
     void *strstart;
     UINTVAL strlen;
-	parrot_string_representation_t representation;
+    parrot_string_representation_t representation;
     UINTVAL hashval; /* cached hash value computation; not yet used */
 };
 
@@ -504,14 +504,14 @@ typedef enum PObj_enum {
 
 #define PObj_is_external_TESTALL(o) (PObj_get_FLAGS(o) & \
             (UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
-		    PObj_external_FLAG|PObj_immobile_FLAG))
+                      PObj_external_FLAG|PObj_immobile_FLAG))
 
 #define PObj_is_external_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
             (UINTVAL)(PObj_external_FLAG|PObj_on_free_list_FLAG))
 
 #define PObj_is_external_CLEARALL(o) (PObj_get_FLAGS(o) &= \
             ~(UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
-		    PObj_external_FLAG|PObj_immobile_FLAG))
+                       PObj_external_FLAG|PObj_immobile_FLAG))
 
 #define PObj_is_live_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
         (PObj_live_FLAG | PObj_on_free_list_FLAG))

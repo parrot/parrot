@@ -204,6 +204,36 @@ EOM
 /* &end_gen */
 
 EOM
+
+    # finally the name mapping
+    $macros .= <<"EOM";
+/*
+ * vtable slot names
+ */
+#ifdef PARROT_IN_OBJECTS_C
+static const char * const Parrot_vtable_slot_names[] = {
+    "",     /* Pointer to package this vtable belongs to */
+    "",     /* 'type' value for MMD */
+    "",     /* Name of class this vtable is for */
+    "",     /* Flags. Duh */
+    "",	    /* space separated list of interfaces */
+    "",	    /* space separated list of classes */
+    "",     /* To hang data off this vtable */
+
+    /* Vtable Functions */
+EOM
+    for my $entry (@{$vtable}) {
+	$macros .= <<"EOM";
+        \"__$entry->[1]\",
+EOM
+    }
+    $macros .= <<"EOM";
+    NULL
+};
+#endif
+
+EOM
+
     $macros;
 }
 

@@ -18,6 +18,7 @@ Handles class and object manipulation.
 
 */
 
+#define PARROT_IN_OBJECTS_C
 #include "parrot/parrot.h"
 #include <assert.h>
 
@@ -91,7 +92,6 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
         if (parent_attr_count) {
             STRING *parent_name;
             INTVAL parent_offset;
-            STRING *FQ_name;
             STRING *partial_name;
 
             parent_name = VTABLE_get_string(interpreter,
@@ -163,6 +163,64 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
 
 /*
 
+=item C<static void create_deleg_pmc_vtable(Interp *, PMC *class, STRING *name)>
+
+Create a vtable that dispatches either to the contained PMC in the first
+attribute (deleg_pmc) or to an overridden method (delegate), depending
+on the existance of the method for this class.
+
+*/
+
+static void
+create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
+{
+    PMC *vtable_pmc;
+    VTABLE *vtable, *deleg_pmc_vtable, *delegate_vtable, *object_vtable;
+    int i;
+    const char *meth;
+    STRING meth_str;
+
+    vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), PCD_OBJECT_VTABLE);
+    vtable = PMC_struct_val(vtable_pmc);
+    deleg_pmc_vtable = Parrot_base_vtables[enum_class_deleg_pmc];
+    object_vtable = Parrot_base_vtables[enum_class_ParrotObject];
+    delegate_vtable = Parrot_base_vtables[enum_class_delegate];
+
+    memset(&meth_str, 0, sizeof(meth_str));
+    meth_str.representation = enum_stringrep_one;
+    for (i = 0; (meth = Parrot_vtable_slot_names[i]); ++i) {
+        if (!*meth)
+            continue;
+        meth_str.strstart = meth;
+        meth_str.strlen = strlen(meth);
+        meth_str.hashval = 0;
+        if (Parrot_find_global(interpreter, class_name, &meth_str)) {
+            /*
+             * if the method exists, keep the ParrotObject aka delegate vtable
+             * slot
+             */
+            LVALUE_CAST(void **,vtable)[i] = ((void**)object_vtable)[i];
+        }
+        else {
+            /*
+             * if the method doesn't exist, put in the deleg_pmc vtable
+             * but only, it ParrotObject hasn't overriden the method
+             */
+            if (((void **)delegate_vtable)[i] == ((void**)object_vtable)[i])
+                LVALUE_CAST(void **,vtable)[i] = ((void**)deleg_pmc_vtable)[i];
+            else
+                LVALUE_CAST(void **,vtable)[i] = ((void**)object_vtable)[i];
+        }
+    }
+    /*
+     * finally if the methods are changed dynamically
+     * this vtable must be changed too
+     * s. src/global.c:Parrot_store_global()
+     */
+}
+
+/*
+
 =item C<PMC *
 Parrot_single_subclass(Parrot_Interp ointerpreter, PMC *base_class,
                        STRING *child_class_name)>
@@ -184,8 +242,6 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     PMC *child_class_array;
     PMC *classname_pmc;
     PMC *parents, *temp_pmc;
-    VTABLE *new_vtable;
-    INTVAL new_class_number;
     int parent_is_class;
 
     parent_is_class = PObj_is_class_TEST(base_class);
@@ -229,11 +285,10 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     }
     else {
         /*
-         * we have 1 parent
+         * we have 1 parent, that get's unshifted below
          */
         temp_pmc = pmc_new(interpreter, enum_class_Array);
-        VTABLE_set_integer_native(interpreter, temp_pmc, 1);
-        VTABLE_set_pmc_keyed_int(interpreter, temp_pmc, 0, base_class);
+        VTABLE_set_integer_native(interpreter, temp_pmc, 0);
     }
     VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
     set_attrib_num(child_class_array, PCD_ALL_PARENTS, temp_pmc);
@@ -247,6 +302,16 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
 
     rebuild_attrib_stuff(interpreter, child_class);
 
+    if (!parent_is_class) {
+        /* we append one attribute to hold the PMC */
+        Parrot_add_attribute(interpreter, child_class,
+                CONST_STRING(interpreter, "__value"));
+        /*
+         * then create a vtable derived from ParrotObject and
+         * deleg_pmc - the ParrotObject vtable is already built
+         */
+        create_deleg_pmc_vtable(interpreter, child_class, child_class_name);
+    }
     return child_class;
 }
 
@@ -266,9 +331,6 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 {
     PMC *class_array;
     PMC *classname_pmc;
-    INTVAL new_class_number;
-    VTABLE *new_vtable;
-    PMC *temp_pmc;
 
     /* Hang an array off the data pointer, empty of course */
     class_array = PMC_data(class) = new_attrib_array();
@@ -395,16 +457,13 @@ static PMC*
 get_init_meth(Parrot_Interp interpreter, PMC *class,
           STRING *prop_str , STRING **meth_str)
 {
-    PMC *prop;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
     STRING *meth;
     HashBucket *b;
     PMC *props;
+
     *meth_str = NULL;
 #if 0
+    PMC *prop;
     prop = VTABLE_getprop(interpreter, class, prop_str);
     if (!VTABLE_defined(interpreter, prop))
         return NULL;
@@ -457,9 +516,17 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
     for (i = nparents - 1; i >= 0; --i) {
         parent_class = VTABLE_get_pmc_keyed_int(interpreter,
                 classsearch_array, i);
-        /* if its a PMC skip it for now */
-        if (!PObj_is_class_TEST(parent_class))
+        /* if its a PMC, we put one PMC of that type into
+         * the attribute slot #0 and call init() on that PMC
+         */
+        if (!PObj_is_class_TEST(parent_class)) {
+            PMC *attr = pmc_new_noinit(interpreter,
+                    parent_class->vtable->base_type);
+            SLOTTYPE *obj_data = PMC_data(object);
+            set_attrib_num(obj_data, POD_FIRST_ATTRIB, attr);
+            VTABLE_init(interpreter, attr);
             continue;
+        }
         meth = get_init_meth(interpreter, parent_class,
                 CONST_STRING(interpreter, "BUILD"), &meth_str);
         /* no method found and no BUILD property set? */
@@ -1074,7 +1141,6 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     SLOTTYPE *class_array;
     STRING *class_name;
     INTVAL idx;
-    PMC *offs_hash;
     PMC *attr_hash = NULL;
     PMC *attr_array;
     STRING *full_attr_name;
