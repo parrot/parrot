@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 58;
+use Parrot::Test tests => 61;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -816,7 +816,103 @@ CODE
 foo
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "set/get string value");
+	new P0, PerlInt
+        set P0, "foo"
+        set S0, P0
+        eq S0, "foo", OK1
+        print "not "
+OK1:    print "ok 1\n"
 
+        set P0, "\0"
+        set S0, P0
+        eq S0, "\0", OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+        set P0, ""
+        set S0, P0
+        eq S0, "", OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+        set P0, 0
+        set S0, P0
+        eq S0, "0", OK4
+        print "not "
+OK4:    print "ok 4\n"
+
+        set P0, 0.0
+        set S0, P0
+        eq S0, "0.000000", OK5
+        print "not "
+OK5:    print "ok 5\n"
+
+        set P0, "0b000001"
+        set S0, P0
+        eq S0, "0b000001", OK6
+        print "not "
+OK6:    print "ok 6\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+# The same for PerlNums...
+
+output_is(<<'CODE', <<'OUTPUT', "set/get string value");
+	new P0, PerlNum
+        set P0, "bar"
+        set S0, P0
+        eq S0, "bar", OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        set P0, "\0"
+        set S0, P0
+        eq S0, "\0", OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+        set P0, ""
+        set S0, P0
+        eq S0, "", OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+        set P0, -1
+        set S0, P0
+        eq S0, "-1", OK4
+        print "not "
+OK4:    print "ok 4\n"
+
+        set P0, -1.0
+        set S0, P0
+        eq S0, "-1.000000", OK5
+        print "not "
+OK5:    print "ok 5\n"
+
+        set P0, "1.23e23"
+        set S0, P0
+        eq S0, "1.23e23", OK6
+        print "not "
+OK6:    print "ok 6\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "if (P) - Int");
 	new	P0, PerlInt
@@ -1255,6 +1351,18 @@ CODE
 0
 0
 OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "undef-string");
+	new P0, PerlUndef
+        set S0, P0
+        eq S0, "", OK
+        print "not "
+OK:     print "ok\\n"        
+	end
+CODE
+ok
+OUTPUT
+
 
 output_is(<<CODE, <<OUTPUT, "IntQueue test");
 	new P0,IntQueue

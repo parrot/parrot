@@ -1,6 +1,54 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
+
+output_is(<<CODE, <<OUTPUT, "Set/get strings");
+        new P0, PerlString
+        set P0, "foo"
+        set S0, P0
+        eq S0, "foo", OK1
+        print "not "
+OK1:    print "ok 1\\n"
+
+        set P0, "\0"
+        set S0, P0
+        eq S0, "\0", OK2
+        print "not "
+OK2:    print "ok 2\\n"
+
+        set P0, ""
+        set S0, P0
+        eq S0, "", OK3
+        print "not "
+OK3:    print "ok 3\\n"
+
+        set P0, 123
+        set S0, P0
+        eq S0, "123", OK4
+        print "not "
+OK4:    print "ok 4\\n"
+
+        set P0, 1.234567
+        set S0, P0
+        eq S0, "1.234567", OK5
+        print "not "
+OK5:    print "ok 5\\n"
+
+        set P0, "0xFFFFFF"
+        set S0, P0
+        eq S0, "0xFFFFFF", OK6
+        print "not "
+OK6:    print "ok 6\\n"
+
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ensure that concat ppp copies strings");
 	new P0, PerlString
