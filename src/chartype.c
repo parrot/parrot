@@ -229,14 +229,18 @@ chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to)
 Parrot_Int
 chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c)
 {
-    return c >= type->digit_map->first_code
-        && c <= type->digit_map->last_code;
+    return c >= type->digit_map->first_code && c <= type->digit_map->last_code;
 }
 
 Parrot_Int
 chartype_get_digit_map1(const CHARTYPE* type, const UINTVAL c)
 {
-    return c - type->digit_map->first_code + type->digit_map->first_value;
+    if (c >= type->digit_map->first_code && c <= type->digit_map->last_code)
+        return c - type->digit_map->first_code + type->digit_map->first_value;
+    else {
+        /* XXX Should we throw an exception? */
+        return -1;
+    }
 }
 
 Parrot_Int
@@ -244,8 +248,10 @@ chartype_is_digit_mapn(const CHARTYPE* type, const UINTVAL c)
 {
     const struct chartype_digit_map_t *map = type->digit_map;
     while (map->first_value >= 0) {
-        if (c >= map->first_code && c <= map->last_code)
-            return 1;
+        if (c < map->first_code)
+            return 0;
+        if (c <= map->last_code)
+            return map->last_code;
         map++;
     }
     return 0;
@@ -256,11 +262,13 @@ chartype_get_digit_mapn(const CHARTYPE* type, const UINTVAL c)
 {
     const struct chartype_digit_map_t *map = type->digit_map;
     while (map->first_value >= 0) {
-        if (c >= map->first_code && c <= map->last_code)
+        if (c < map->first_code)
+            break;
+        if (c <= map->last_code)
             return c - map->first_code + map->first_value;
         map++;
     }
-    /* TODO should we throw an exception? */
+    /* XXX should we throw an exception? */
     return -1;
 }
 

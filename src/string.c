@@ -1350,11 +1350,16 @@ string_to_num(const STRING *s)
         INTVAL in_number = 0;
         FLOATVAL exponent = 0;
         INTVAL fake_exponent = 0;
+        INTVAL digit_family = 0;
 
         while (start < end) {
             UINTVAL c = s->encoding->decode(start);
+            INTVAL df = s->type->is_digit(s->type,c);
 
-            if (s->type->is_digit(s->type,c)) {
+            if (df && !digit_family)
+                digit_family = df;
+
+            if (df && df == digit_family) {
                 if (in_exp) {
                     exponent = exponent * 10 + s->type->get_digit(s->type,c);
                     if (!exp_sign) {
