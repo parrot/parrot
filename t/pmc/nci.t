@@ -20,18 +20,10 @@ i386 and the F<libnci.so> library is found.
 use Parrot::Test tests => 32;
 use Parrot::Config;
 
-print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
-print STDERR $PConfig{so}, " SO extension\n";
-
 SKIP: {
-if (-e "libnci" . $PConfig{so}) {
-    if ($PConfig{jitcpuarch} eq 'i386') {
-	$ENV{LD_LIBRARY_PATH} = '.';
-    }
-}
-else {
-    skip('Please make libnci'.$PConfig{so},
-         Test::Builder->expected_tests());
+unless ( -e "runtime/parrot/dynext/libnci" . $PConfig{so} ) {
+    skip( "Please make libnci$PConfig{so}", 
+          Test::Builder->expected_tests() );
 }
 
 output_is(<<'CODE', <<'OUTPUT', "nci_d_d");

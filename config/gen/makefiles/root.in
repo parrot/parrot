@@ -32,6 +32,9 @@ SRC = src
 # Ops dir
 OPS = ops
 
+# directory for packfile files
+PF  = pf
+
 # Build tools
 BUILD_TOOL = build_tools
 
@@ -280,7 +283,7 @@ INTERP_O_FILES = \
     $(SRC)/vtables$(O) \
     $(SRC)/mmd$(O) \
     $(SRC)/extend$(O) \
-    pf/pf_items$(O) \
+    $(PF)/pf_items$(O) \
     $(OPS)/core_ops$(O) \
     $(OPS)/core_ops_prederef$(O) \
     $(OPS)/core_ops_switch$(O) \
@@ -340,17 +343,23 @@ LINTOPTS =
 #
 ###############################################################################
 
-TEST_PROG = ${test_prog}${exe}
-TEST_PROG_SO = ${test_prog}_so${exe}
-LIBPARROT = ${blib_lib_libparrot_a}
-LIBICUCORE = ${blib_lib_libsicuuc_a}
-LIBICUDATA =  ${blib_lib_libsicudata_a}
+# Executables
+TEST_PROG       = ${test_prog}${exe}
+TEST_PROG_SO    = ${test_prog}_so${exe}
+DIS             = disassemble${exe}
+PDUMP           = pdump${exe}
+PINFO           = pbc_info${exe}
+PDB             = pdb${exe}
+
+# libs
+LIBPARROT       = ${blib_lib_libparrot_a}
+LIBICUCORE      = ${blib_lib_libsicuuc_a}
+LIBICUDATA      = ${blib_lib_libsicudata_a}
 ALL_PARROT_LIBS = $(LIBPARROT) $(LIBICUCORE) $(LIBICUDATA) $(C_LIBS)
-# utils
-DIS=disassemble${exe}
-PDUMP = pdump${exe}
-PINFO = pbc_info${exe}
-PDB = pdb${exe}
+
+# dynamic extensions
+DYNEXT_DIR      = runtime/parrot/dynext
+LIBNCI_SO       = $(DYNEXT_DIR)/libnci$(SO)
 
 ###############################################################################
 #
@@ -374,19 +383,19 @@ MAKE_C = ${make_c}
 #
 ###############################################################################
 
-all : flags_dummy $(TEST_PROG) library/config.fpmc docs
+all : flags_dummy $(TEST_PROG) library/config.fpmc docs $(LIBNCI_SO)
 
-.SUFFIXES: .c .h .pmc .dump $(O) .str
+.SUFFIXES : .c .h .pmc .dump $(O) .str
 
 # constant string support
-.c.str:
+.c.str :
 	$(PERL) build_tools/c2str.pl $< > $@
 
 STR_FILES = \
-	$(SRC)/interpreter.str \
-	$(SRC)/objects.str
+    $(SRC)/interpreter.str \
+    $(SRC)/objects.str
 
-$(INC)/string_private_cstring.h: $(STR_FILES) build_tools/c2str.pl
+$(INC)/string_private_cstring.h : $(STR_FILES) build_tools/c2str.pl
 	$(PERL) build_tools/c2str.pl --all
 
 # classes PMC build utils and rules
@@ -394,22 +403,22 @@ PMC2CD=$(PERL) classes/pmc2c2.pl --dump
 PMC2CC=$(PERL) classes/pmc2c2.pl --c --no-lines
 PMC2CV=$(PERL) classes/pmc2c2.pl --vt
 
-.pmc.dump:
+.pmc.dump :
 	$(PMC2CD) $<
 
-.pmc.c:
+.pmc.c :
 	$(PMC2CC) $<
 
 # not all makes might understant this, so the rules are generated
 #classes/pmc_%.h : classes/%.c
 #	$(PMC2CC) $<
 
-vtable.dump: vtable.tbl
+vtable.dump : vtable.tbl
 	$(PMC2CV)
 
 
 # This is a listing of all targets, that are meant to be called by users
-help:
+help :
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
@@ -420,7 +429,7 @@ help:
 	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO) and $(PDB)"
 	@echo "  $(PDUMP):             Parrot Dumper"
 	@echo "  $(DIS):       Parrot Disassembler"
-	@echo "  $(PINFO):          Information about Parrot Bypte Code"
+	@echo "  $(PINFO):          Information about Parrot Byte Code"
 	@echo "  $(PDB):               Parrot Debugger"
 	@echo ""
 	@echo "Installation:"
@@ -479,15 +488,15 @@ help:
 	@echo "  mops:              Currently not working???"
 	@echo ""
 
-world: all parrot_utils
+world : all parrot_utils
 
-parrot_utils: $(PDUMP) $(DIS) $(PINFO) $(PDB)
+parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB)
 
-flags_dummy:
+flags_dummy :
 	@echo Compiling with:
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) xx$(O) -c xx.c
 
-library/config.fpmc: myconfig config_lib.pasm $(TEST_PROG)
+library/config.fpmc : myconfig config_lib.pasm $(TEST_PROG)
 	@echo Invoking Parrot to generate library/config.fpmc--cross your fingers
 	./parrot config_lib.pasm
 	@echo If the next line prints $(VERSION), it did help.
@@ -611,7 +620,7 @@ $(PINFO) : $(SRC)/pbc_info$(O) $(LIBPARROT)
 $(PARROT_MAIN)$(O) : $(PARROT_MAIN).c $(GENERAL_H_FILES)
 
 lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOL)/ops2pm.pl \
-	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS)/ops.num
+    lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS)/ops.num
 	$(PERL) $(BUILD_TOOL)/ops2pm.pl $(OPS_FILES)
 
 $(SRC)/fingerprint.c : $(BUILD_TOOL)/fingerprint_c.pl PBC_COMPAT
@@ -651,7 +660,7 @@ examples/mops/mops$(O) : examples/mops/mops.c
 
 examples/mops/mops${exe} : examples/mops/mops$(O)
 	$(LINK) $(LINKFLAGS) ${ld_out}examples/mops/mops${exe} \
-	examples/mops/mops$(O) $(LIBPARROT) $(C_LIBS)
+    examples/mops/mops$(O) $(LIBPARROT) $(C_LIBS)
 
 
 ###############################################################################
@@ -678,11 +687,11 @@ $(SRC)/jit_debug$(O) : $(GENERAL_H_FILES) ${TEMP_jit_h}
 
 $(SRC)/jit_debug_xcoff$(O) : $(GENERAL_H_FILES) ${TEMP_jit_h}
 
-$(SRC)/jit_cpu$(O): $(GENERAL_H_FILES) ${TEMP_jit_h} $(INC)/jit_emit.h
+$(SRC)/jit_cpu$(O) : $(GENERAL_H_FILES) ${TEMP_jit_h} $(INC)/jit_emit.h
 
 $(SRC)/exec$(O) : $(GENERAL_H_FILES) ${TEMP_exec_h} ${TEMP_jit_h} $(INC)/jit_emit.h
 
-$(SRC)/exec_cpu$(O): $(GENERAL_H_FILES) ${TEMP_exec_h} ${TEMP_jit_h} $(INC)/jit_emit.h
+$(SRC)/exec_cpu$(O) : $(GENERAL_H_FILES) ${TEMP_exec_h} ${TEMP_jit_h} $(INC)/jit_emit.h
 
 $(SRC)/exec_start$(O) : $(GENERAL_H_FILES) ${TEMP_exec_h}
 
@@ -729,7 +738,7 @@ $(SRC)/thread$(O) : $(GENERAL_H_FILES)
 $(SRC)/extend$(O) : $(GENERAL_H_FILES) $(INC)/extend.h
 
 $(SRC)/interpreter$(O) : $(SRC)/interpreter.c $(GENERAL_H_FILES) \
-	${TEMP_jit_h} $(SRC)/interpreter.str
+    ${TEMP_jit_h} $(SRC)/interpreter.str
 
 io/io$(O) : $(GENERAL_H_FILES) io/io_private.h
 
@@ -751,7 +760,7 @@ $(SRC)/objects$(O) : $(GENERAL_H_FILES) $(SRC)/objects.str
 
 $(SRC)/packfile$(O) : $(GENERAL_H_FILES)
 
-pf/pf_items$(O) : $(GENERAL_H_FILES)
+$(PF)/pf_items$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/packout$(O) : $(GENERAL_H_FILES)
 
@@ -822,15 +831,15 @@ ${TEMP_pmc_build}
 $(INC)/vtable.h : vtable.tbl $(BUILD_TOOL)/vtable_h.pl
 	$(PERL) $(BUILD_TOOL)/vtable_h.pl
 
-$(INC)/jit_emit.h: jit/${jitcpuarch}/jit_emit.h
+$(INC)/jit_emit.h : jit/${jitcpuarch}/jit_emit.h
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|jit/${jitcpuarch}/jit_emit.h|, q|$(INC)/jit_emit.h|${PQ}
-$(INC)/exec_dep.h: jit/${jitcpuarch}/exec_dep.h
+$(INC)/exec_dep.h : jit/${jitcpuarch}/exec_dep.h
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|jit/${jitcpuarch}/exec_dep.h|, q|$(INC)/exec_dep.h|${PQ}
-$(SRC)/jit_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h \
-		jit/${jitcpuarch}/core.jit $(BUILD_TOOL)/jit2h.pl
+$(SRC)/jit_cpu.c : lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h \
+    jit/${jitcpuarch}/core.jit $(BUILD_TOOL)/jit2h.pl
 	$(PERL) $(BUILD_TOOL)/jit2h.pl ${jitcpuarch} $(SRC)/jit_cpu.c
-$(SRC)/exec_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h \
-		jit/${jitcpuarch}/core.jit ${TEMP_exec_h} $(INC)/exec_dep.h $(BUILD_TOOL)/jit2h.pl
+$(SRC)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h \
+    jit/${jitcpuarch}/core.jit ${TEMP_exec_h} $(INC)/exec_dep.h $(BUILD_TOOL)/jit2h.pl
 	$(PERL) $(BUILD_TOOL)/jit2h.pl ${jitcpuarch} $(SRC)/exec_cpu.c
 
 ######## imcc files deps
@@ -840,11 +849,11 @@ $(SRC)/exec_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h \
 # Note that YACC or LEX may be null commands, so we must `touch` all the
 # target files, instead of just the .flag files.
 
-$(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h: $(IMCC_DIR)/imcc.y
+$(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h : $(IMCC_DIR)/imcc.y
 	$(YACC) $(IMCC_DIR)/imcc.y -d -o $(IMCC_DIR)/imcparser.c
 	$(TOUCH) $(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h
 
-$(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c: $(IMCC_DIR)/imcc.l
+$(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c : $(IMCC_DIR)/imcc.l
 	$(LEX) -o$(IMCC_DIR)/imclexer.c $(IMCC_DIR)/imcc.l
 	$(TOUCH) $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c
 
@@ -958,22 +967,22 @@ lifetest : test_prep
 test_imcc :
 	$(PERL) t/harness $(IMCC_TEST_FILES)
 
-testj_imcc:
+testj_imcc :
 	$(PERL) t/harness -j $(IMCC_TEST_FILES)
 
-testP_imcc:
+testP_imcc :
 	$(PERL) t/harness -P $(IMCC_TEST_FILES)
 
-testC_imcc:
+testC_imcc :
 	$(PERL) t/harness -C $(IMCC_TEST_FILES)
 
-testb_imcc:
+testb_imcc :
 	$(PERL) t/harness -b $(IMCC_TEST_FILES)
 
-testS_imcc:
+testS_imcc :
 	$(PERL) t/harness -S $(IMCC_TEST_FILES)
 
-testr_imcc:
+testr_imcc :
 	$(PERL) t/harness -r $(IMCC_TEST_FILES)
 
 
@@ -981,16 +990,16 @@ fulltest_imcc : test_imcc testj_imcc testP_imcc testC_imcc testS_imcc \
                 testb_imcc testr_imcc
 
 # For reporting success or failure with different configurations
-ok:
+ok :
 	$(PERL) tools/dev/genrpt.pl --ok
 
-okfile:
+okfile :
 	$(PERL) tools/dev/genrpt.pl --ok --File parrot.ok
 
-nok:
+nok :
 	$(PERL) tools/dev/genrpt.pl --nok
 
-nokfile:
+nokfile :
 	$(PERL) tools/dev/genrpt.pl --nok --File parrot.nok
 
 ###############################################################################
@@ -1002,27 +1011,28 @@ nokfile:
 clean : testclean progclean languages-clean docs-clean
 	${TEMP_cg_r}
 	$(RM_F) *.s *~ $(FLUID_FILES) \
-	        examples/assembly/mops${exe} examples/assembly/mops.c \
-	        examples/assembly/mops$(O) examples/assembly/mops.pbc \
-	        examples/mops/mops$(O) examples/mops/mops${exe}
+    examples/assembly/mops${exe} examples/assembly/mops.c \
+    examples/assembly/mops$(O) examples/assembly/mops.pbc \
+    examples/mops/mops$(O) examples/mops/mops${exe}
 
-progclean:
+progclean :
 	$(RM_F) $(O_FILES) \
-	        $(TEST_PROG) $(PARROT_MAIN)$(O) \
-	        $(PDUMP) $(SRC)/pdump$(O) $(SRC)/packdump$(O) $(SRC)/pbc_info$(O) $(PINFO) \
-	        $(PDB) $(SRC)/pdb$(O) \
-	        $(DIS) $(SRC)/disassemble$(O)
+    $(TEST_PROG) $(PARROT_MAIN)$(O) \
+    $(PDUMP) $(SRC)/pdump$(O) $(SRC)/packdump$(O) \
+    $(SRC)/pbc_info$(O) $(PINFO) \
+    $(PDB) $(SRC)/pdb$(O) \
+    $(DIS) $(SRC)/disassemble$(O) \
+    $(DYNEXT_DIR)/$(LIBNCI_SO)
 	$(RM_F) $(LIBPARROT)
 	$(PERL) build_tools/c2str.pl --init
 	$(RM_F) $(STR_FILES) $(INC)/string_private_cstring.h
 	$(RM_F) classes/*.c classes/*.h classes/*.dump vtable.dump
 
 testclean :
-	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out t/op/*.o t/op/*.stabs.s \
-	        t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out t/pmc/*.o t/pmc/*.stabs.s \
-	        t/stress/*.pasm t/stress/*.pbc t/stress/*.out t/stress/*.o t/stress/*.stabs.s \
-	        t/src/*_* \
-		t/op/*.imc t/pmc/*.imc
+	$(RM_F) t/op/*.pasm t/op/*.imc t/op/*.pbc t/op/*.out t/op/*.o t/op/*.stabs.s \
+    t/pmc/*.pasm t/pmc/*.imc t/pmc/*.pbc t/pmc/*.out t/pmc/*.o t/pmc/*.stabs.s \
+    t/stress/*.pasm t/stress/*.pbc t/stress/*.out t/stress/*.o t/stress/*.stabs.s \
+    t/src/*_*
 	$(MAKE_C) $(IMCC_DIR) testclean
 
 realclean : clean
@@ -1131,11 +1141,11 @@ exec_so : $(SRC)/exec_start$(O) blib/lib/libparrot$(SO)
 
 $(SRC)/libnci$(O): $(SRC)/nci_test.c
 
-libnci.so: $(SRC)/nci_test$(O)
+$(DYNEXT_DIR)/libnci.so: $(SRC)/nci_test$(O)
 	$(LD) $(LD_SHARED) $(LDFLAGS) \
 	    $(LD_OUT)$@ $(SRC)/nci_test$(O)
 
-libnci.dll: $(SRC)/nci_test$(O)
+$(DYNEXT_DIR)/libnci.dll: $(SRC)/nci_test$(O)
 	$(LD) $(LD_SHARED) -def:libnci.def $(LDFLAGS) \
 	    $(LD_OUT)$@ $(SRC)/nci_test$(O)
 
