@@ -185,6 +185,8 @@ config/gen/platform/generic/memalign.c            []
 config/gen/platform/generic/memexec.c             []
 config/gen/platform/generic/signal.c              []
 config/gen/platform/generic/signal.h              []
+config/gen/platform/generic/stat.c                []
+config/gen/platform/generic/stat.h                []
 config/gen/platform/generic/threads.h             []
 config/gen/platform/generic/time.c                []
 config/gen/platform/ia64/asm.s                    []
@@ -1786,6 +1788,7 @@ include/parrot/rx.h                               [devel]include
 include/parrot/rxstacks.h                         [devel]include
 include/parrot/smallobject.h                      [devel]include
 include/parrot/stacks.h                           [devel]include
+include/parrot/stat.h			  	  [devel]include
 include/parrot/string.h                           [devel]include
 include/parrot/string_funcs.h                     [devel]include
 include/parrot/string_primitives.h		  [devel]include
