@@ -60,7 +60,7 @@ hello.pbc: hello.pasm ../assemble.pl
 all: bench.pbc euclid.pbc fact.pbc fib.pbc hello.pbc
 
 clean:
-	rm -f euclid.pasm euclid.pbc fact.pasm fact.pbc fib.pasm fib.pbc hello.pasm hello.pbc
+	rm -f bench.pasm euclid.pasm euclid.pbc fact.pasm fact.pbc fib.pasm fib.pbc hello.pasm hello.pbc
 
 over:
 	@make clean
