@@ -108,6 +108,50 @@ things.
 Melvin Smith <mrjoltcola@mindspring.com>
 Dan Sugalski <dan@sidhe.org>
 
+=head2 COW
+
+COW stands for Copy On Write. This is a pure speed-hack technique that
+copies strings without actually copying the string data until it's
+absolutely necessary.
+
+If you have a string A, and make a copy of it to get string B, the two
+strings should be identical, at least to start. With COW, they are,
+because string A and string B aren't actually two separate
+strings--they're the same string, marked COW. If either string A or
+string B are changed, the system notes it and only at that point does
+it make a copy of the string and change the copy.
+
+If the program never actually makes a copy, something that's fairly
+common, COW saves both memory and time. 
+
+=head2 DOD
+
+Dead Object Detection is the code that sweeps through all the objects,
+variables, and whatnot inside of Parrot and decides which ones are in
+use and which ones aren't. The ones that aren't in use are then freed
+back for later reuse. (After they're destroyed, if active destruction
+is warranted)
+
+See also: GC
+
+=head2 GC
+
+Garbage Collection is when the interpreter sweeps through all the
+active objects, variables, and structures, and marks the memory
+they're using as in use, and all other memory is freed up for later
+reuse. 
+
+Garbage Collection and Dead Object Detection are separate in Parrot,
+since we generally chew through memory segments faster than we chew
+through objects. (This is a characteristic peculiar to Perl and other
+languages that do string processing. Other languages chew through
+objects faster than memory)
+
+See also: DOD
+
+=head2 PMC
+
+PMC stands for Parrot Magic Cookie. (Or cracker, your choice) It's the 
 
 =head2 Vtable
 
