@@ -180,12 +180,12 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'd':
                 if (opt.opt_arg) {
-                    IMCC_DEBUG = strtoul(opt.opt_arg, 0, 16);
+                    IMCC_INFO(interp)->debug = strtoul(opt.opt_arg, 0, 16);
                 }
                 else {
-                    IMCC_DEBUG++;
+                    IMCC_INFO(interp)->debug++;
                 }
-                if (IMCC_DEBUG & 1)
+                if (IMCC_INFO(interp)->debug & 1)
                     setopt(PARROT_DEBUG_FLAG);
                 break;
             case 'w':
@@ -439,7 +439,7 @@ int main(int argc, char * argv[])
     }
 
     if (IMCC_INFO(interpreter)->verbose) {
-        info(interpreter, 1,"debug = 0x%x\n", IMCC_DEBUG);
+        info(interpreter, 1,"debug = 0x%x\n", IMCC_INFO(interpreter)->debug);
         info(interpreter, 1,"Reading %s", yyin == stdin ? "stdin":sourcefile);
         if (run_pbc)
             info(interpreter, 1, ", executing");

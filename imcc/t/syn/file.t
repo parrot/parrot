@@ -139,6 +139,7 @@ print FOO <<'ENDF';
     end
 .end
 ENDF
+close FOO;
 # compile it
 
 system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
@@ -171,6 +172,7 @@ print FOO <<'ENDF';
     end
 .end
 ENDF
+close FOO;
 # compile it
 
 system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
@@ -208,6 +210,7 @@ print FOO <<'ENDF';
     end
 .end
 ENDF
+close FOO;
 # compile it
 
 system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
@@ -240,6 +243,7 @@ print FOO <<'ENDF';
     end
 .end
 ENDF
+close FOO;
 # compile it
 
 output_is(<<'CODE', <<'OUT', "call sub in external imc, return");
@@ -272,6 +276,7 @@ print FOO <<'ENDF';
     end
 .end
 ENDF
+close FOO;
 # compile it
 
 SKIP:
@@ -356,6 +361,7 @@ print FOO <<'ENDF';
     end
 .end
 ENDF
+close FOO;
 # compile it
 
 system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");

@@ -46,12 +46,10 @@ EXTERN int n_loops;
 
 void find_basic_blocks (Parrot_Interp, int first);
 void build_cfg(Parrot_Interp);
-void bb_findadd_edge(Basic_block*, SymReg*);
 void bb_add_edge(Basic_block*, Basic_block*);
 
 void compute_dominators(Parrot_Interp interpreter);
 void find_loops(Parrot_Interp);
-void mark_loop(Edge*);
 void search_predecessors_not_in(Basic_block*, Set*);
 
 void life_analysis(Parrot_Interp interpreter);

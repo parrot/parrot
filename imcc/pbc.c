@@ -274,11 +274,12 @@ static void store_bsr(SymReg * r, int pc, int offset)
     bsr->score = offset;        /* bsr = 1, set_addr I,x = 2, newsub = 3 */
 }
 
-static void store_str_const(char * str, int idx)
+static void
+store_str_const(Parrot_Interp interpreter, char * str, int idx)
 {
     SymReg * c;
     c  = _mk_const(globals.str_consts, str_dup(str), 0);
-    debug(DEBUG_PBC_CONST, "store_str #%d »%s«\n", idx, str);
+    debug(interpreter, DEBUG_PBC_CONST, "store_str #%d »%s«\n", idx, str);
     c->color = idx;
 }
 
@@ -378,7 +379,7 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             /* XXX labels should be mangled with current subroutine name
              * they should only be reachable from eval's in current sub
              */
-            debug(DEBUG_PBC_FIXUP, "write fixup '%s' offs %d\n",
+            debug(interpreter, DEBUG_PBC_FIXUP, "write fixup '%s' offs %d\n",
                     ins->r[0]->name, ins->r[0]->color + oldsize);
             PackFile_FixupTable_new_entry(interpreter,
                     ins->r[0]->name, enum_fixup_label,
@@ -403,10 +404,10 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             SymReg *r[IMCC_MAX_REGS];
             char *glabel;
 
-            debug(DEBUG_PBC_FIXUP, "inter_cs found for '%s'\n", addr->name);
+            debug(interpreter, DEBUG_PBC_FIXUP, "inter_cs found for '%s'\n", addr->name);
             /* find symbol */
             if (!find_label_cs(interpreter, addr->name))
-                debug(DEBUG_PBC_FIXUP,
+                debug(interpreter, DEBUG_PBC_FIXUP,
                         "store_labels", "inter_cs label '%s' not found\n",
                         addr->name);
             glabel = addr->name;
@@ -467,7 +468,7 @@ void fixup_bsrs(struct Parrot_Interp *interpreter)
                 }
                 addr = jumppc + bsr->color;
                 /* patch the bsr __ instruction */
-                debug(DEBUG_PBC_FIXUP, "fixup %s pc %d fix %d\n",
+                debug(interpreter, DEBUG_PBC_FIXUP, "fixup %s pc %d fix %d\n",
                         bsr->name, addr, pc - addr);
                 interpreter->code->byte_code[addr+bsr->score] = pc - addr;
             }
@@ -574,7 +575,7 @@ add_const_str(struct Parrot_Interp *interpreter, char *str, int dup_sym) {
     interpreter->code->const_table->constants[k]->u.string =
         string_make(interpreter, buf, (UINTVAL) l, NULL,
                 PObj_constant_FLAG, NULL);
-    store_str_const(buf, k);
+    store_str_const(interpreter, buf, k);
     free(o);
     return k;
 }
@@ -606,7 +607,7 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
     opcode_t *rc;
     struct PackFile_Constant *pfc;
 
-    debug(DEBUG_PBC_CONST, "add_const_pmc_sub '%s'\n", r->name);
+    debug(interpreter, DEBUG_PBC_CONST, "add_const_pmc_sub '%s'\n", r->name);
     /*
      * TODO use serialize api if that is done
      *      for now:
@@ -654,8 +655,8 @@ add_const_key(struct Parrot_Interp *interpreter, opcode_t key[],
     interpreter->code->const_table->constants[k]->type = PFC_KEY;
     interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
     store_key_const(s_key, k);
-    debug(DEBUG_PBC_CONST, "\t=> %s #%d size %d\n", s_key, k, size);
-    debug(DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
+    debug(interpreter, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n", s_key, k, size);
+    debug(interpreter, DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
             key[0],key[1],key[2],key[3],key[4]);
     return k;
 }
@@ -711,7 +712,7 @@ build_key(struct Parrot_Interp *interpreter, SymReg *reg)
                 else
                     *pc++ = r->color;
                 sprintf(s+strlen(s), "%c%d", r->set, r->color);
-                debug(DEBUG_PBC_CONST, " keypart reg %s %c%d\n",
+                debug(interpreter, DEBUG_PBC_CONST, " keypart reg %s %c%d\n",
                         r->name, r->set, r->color);
                 break;
             case VTCONST:
@@ -719,13 +720,13 @@ build_key(struct Parrot_Interp *interpreter, SymReg *reg)
                     case 'S':                       /* P["key"] */
                         *pc++ = PARROT_ARG_SC;      /* str constant */
                         *pc++ = r->color;       /* constant idx */
-                        debug(DEBUG_PBC_CONST,
+                        debug(interpreter, DEBUG_PBC_CONST,
                                 " keypart SC %s #%d\n", r->name, r->color);
                         break;
                     case 'I':                       /* P[;42;..] */
                         *pc++ = PARROT_ARG_IC;      /* int constant */
                         *pc++ = r->color = atoi(r->name);   /* value */
-                        debug(DEBUG_PBC_CONST, " keypart IC %s #%d\n", r->name, r->color);
+                        debug(interpreter, DEBUG_PBC_CONST, " keypart IC %s #%d\n", r->name, r->color);
                         break;
                     default:
                         fatal(1,"build_key", "unknown set\n");
@@ -775,7 +776,7 @@ static void add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
             break;
     }
     if (r /*&& r->set != 'I' */)
-        debug(DEBUG_PBC_CONST,"const %s\tcolor %d use_count %d\n",
+        debug(interpreter, DEBUG_PBC_CONST,"const %s\tcolor %d use_count %d\n",
                 r->name, r->color, r->use_count);
 
 }
@@ -839,7 +840,7 @@ e_pbc_emit(void *param, Instruction * ins)
 
         oldsize = get_old_size(interpreter, &ins_line);
         code_size = store_labels(interpreter, &ins_size, oldsize);
-        debug(DEBUG_PBC, "code_size(ops) %d  oldsize %d\n", code_size, oldsize);
+        debug(interpreter, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n", code_size, oldsize);
         constant_folding(interpreter);
         store_sub_size(code_size, ins_size);
         bytes = (oldsize + code_size) * sizeof(opcode_t);
@@ -871,7 +872,7 @@ e_pbc_emit(void *param, Instruction * ins)
             /* maybe global */
             if (label) {
                 addr->color = label->color - npc;
-                debug(DEBUG_PBC_FIXUP, "branch label %d jump %d %s %d\n",
+                debug(interpreter, DEBUG_PBC_FIXUP, "branch label %d jump %d %s %d\n",
                         npc, label->color, addr->name,addr->color);
             }
             else if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
@@ -889,7 +890,7 @@ e_pbc_emit(void *param, Instruction * ins)
                 /* maybe global */
                 if (label) {
                     addr->color = label->color - npc;
-                    debug(DEBUG_PBC_FIXUP, "branch label %d jump %d %s %d\n",
+                    debug(interpreter, DEBUG_PBC_FIXUP, "branch label %d jump %d %s %d\n",
                             npc, label->color, addr->name,addr->color);
                 }
             }
@@ -902,7 +903,7 @@ e_pbc_emit(void *param, Instruction * ins)
         *pc++ = op = (opcode_t)ins->opnum;
         /* Get the info for that opcode */
         op_info = &interpreter->op_info_table[op];
-        debug(DEBUG_PBC, "%d %s", npc, op_info->full_name);
+        debug(interpreter, DEBUG_PBC, "%d %s", npc, op_info->full_name);
         for (i = 0; i < op_info->arg_count-1; i++) {
             switch (op_info->types[i+1]) {
                 case PARROT_ARG_I:
@@ -919,18 +920,18 @@ e_pbc_emit(void *param, Instruction * ins)
                     if (r->type & (VT_REGP | VT_CONSTP))
                         r = r->reg;
                     *pc++ = (opcode_t) r->color;
-                    debug(DEBUG_PBC," %d", r->color);
+                    debug(interpreter, DEBUG_PBC," %d", r->color);
                     break;
                 case PARROT_ARG_KC:
                     *pc++ = build_key(interpreter, ins->r[i]);
-                    debug(DEBUG_PBC," %d", pc[-1]);
+                    debug(interpreter, DEBUG_PBC," %d", pc[-1]);
                     break;
                 default:
                     fatal(1, "e-pbc_emit", "unknwon argtype\n");
                     break;
             }
         }
-        debug(DEBUG_PBC, "\t%s\n", ins_string(ins));
+        debug(interpreter, DEBUG_PBC, "\t%s\n", ins_string(ins));
         npc += ins->opsize;
     }
     return ok;

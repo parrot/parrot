@@ -88,30 +88,18 @@ _find_sym(Namespace * nspace, SymReg * hsh[], const char * name) {
     int n;
     SymReg *p;
 
+    UNUSED(hsh);
     for (n = n_comp_units - 1; n >= 0; n--) {
         for (ns = nspace; ns; ns = ns->parent) {
             char * fullname = _mk_fullname(ns, name);
             p = _get_sym(comp_unit[n].hash[0], fullname);
             free(fullname);
-            if (p) {
-        ret_p:
-                /* outer scope symbol */
-                if (hsh != comp_unit[n].hash[0] && (p->type & VTIDENTIFIER)) {
-                    SymReg *new = mk_ident(str_dup(p->name), p->set);
-                    new->type |= VT_REGP;
-                    new->reg = p;
-                    /* link in both dirs, so that usage can be determined */
-                    /* p->reg = new; */
-                    debug(DEBUG_LEXER, "found outer scope sym '%s'\n",
-                            p->name);
-                    return new;
-                }
+            if (p)
                 return p;
-            }
         }
         p = _get_sym(comp_unit[n].hash[0], name);
         if (p)
-            goto ret_p;
+            return p;
     }
     return 0;
 }

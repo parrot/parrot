@@ -33,6 +33,20 @@ static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
 static void print_stat(Parrot_Interp);
 static void allocate_wanted_regs(void);
+static void build_reglist(Parrot_Interp);
+static void build_interference_graph(Parrot_Interp);
+static void compute_du_chain(void);
+static int interferes(SymReg * r0, SymReg * r1);
+static int map_colors(int x, SymReg ** graph, int colors[], int typ);
+#ifdef DO_SIMPLIFY
+static int simplify (void);
+#endif
+static void compute_spilling_costs (Parrot_Interp);
+static void order_spilling (void);
+static void spill (struct Parrot_Interp *, int);
+static int try_allocate(Parrot_Interp);
+static void restore_interference_graph(void);
+static int neighbours(int node);
 
 extern int pasm_file;
 /* Globals: */
@@ -52,10 +66,11 @@ void allocate(struct Parrot_Interp *interpreter) {
     init_tables(interpreter);
     allocated = 0;
 
-    debug(DEBUG_IMC, "\n------------------------\n");
-    debug(DEBUG_IMC, "processing sub %s\n", function);
-    debug(DEBUG_IMC, "------------------------\n\n");
-    if (IMCC_INFO(interpreter)->verbose || (IMCC_DEBUG & DEBUG_IMC))
+    debug(interpreter, DEBUG_IMC, "\n------------------------\n");
+    debug(interpreter, DEBUG_IMC, "processing sub %s\n", function);
+    debug(interpreter, DEBUG_IMC, "------------------------\n\n");
+    if (IMCC_INFO(interpreter)->verbose ||
+            (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
         imc_stat_init();
 
     /* consecutive labels, if_branch, unused_labels ... */
@@ -71,7 +86,7 @@ void allocate(struct Parrot_Interp *interpreter) {
         find_basic_blocks(interpreter, first);
         build_cfg(interpreter);
 
-        if (first && (IMCC_DEBUG & DEBUG_CFG))
+        if (first && (IMCC_INFO(interpreter)->debug & DEBUG_CFG))
             dump_cfg();
         first = 0;
         todo = cfg_optimize(interpreter);
@@ -101,20 +116,22 @@ void allocate(struct Parrot_Interp *interpreter) {
     }
     todo = 1;
 #if !DOIT_AGAIN_SAM
-    build_interference_graph();
+    build_interference_graph(interpreter);
 #endif
     while (todo) {
 #if DOIT_AGAIN_SAM
-        build_interference_graph();
+        build_interference_graph(interpreter);
 #endif
         if (optimizer_level & OPT_SUB)
             allocate_wanted_regs();
-        compute_spilling_costs();
+        compute_spilling_costs(interpreter);
+#ifdef DO_SIMPLIFY
         /* simplify until no changes can be made */
-        /* while (simplify()) {} */
+        while (simplify()) {}
+#endif
         order_spilling();          /* put the remaining items on stack */
 
-        to_spill = try_allocate();
+        to_spill = try_allocate(interpreter);
         allocated = 1;
 
         if ( to_spill >= 0 ) {
@@ -138,9 +155,10 @@ void allocate(struct Parrot_Interp *interpreter) {
     }
     if (optimizer_level & OPT_SUB)
         pcc_optimize(interpreter);
-    if (IMCC_DEBUG & DEBUG_IMC)
+    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_instructions();
-    if (IMCC_INFO(interpreter)->verbose  || (IMCC_DEBUG & DEBUG_IMC))
+    if (IMCC_INFO(interpreter)->verbose  ||
+            (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
         print_stat(interpreter);
     imcstack_free(nodeStack);
 }
@@ -233,7 +251,8 @@ static void sort_reglist(void)
 }
 /* make a linear list of IDENTs and VARs, set n_symbols */
 
-void build_reglist(Parrot_Interp interp) {
+static void
+build_reglist(Parrot_Interp interp) {
     int i, count, unused;
 
     info(interp, 2, "build_reglist\n");
@@ -296,8 +315,8 @@ void build_reglist(Parrot_Interp interp) {
  * same time
  */
 
-void
-build_interference_graph()
+static void
+build_interference_graph(Parrot_Interp interpreter)
 {
     int x, y;
 
@@ -326,16 +345,15 @@ build_interference_graph()
         }
     }
 
-    if (IMCC_DEBUG & DEBUG_IMC) {
+    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_interference_graph();
-    }
 }
 
 
 static void compute_one_du_chain(SymReg * r);
 /* Compute a DU-chain for each symbolic
  */
-void compute_du_chain() {
+static void compute_du_chain() {
     Instruction * ins, *lastbranch;
     int i;
 
@@ -397,7 +415,8 @@ static void compute_one_du_chain(SymReg * r) {
 /* Computes the cost of spilling each symbol. This is estimated by the number
  * of times the symbol appears, weighted by X*loop_depth */
 
-void compute_spilling_costs () {
+static void
+compute_spilling_costs (Parrot_Interp interpreter) {
     int depth, i, j, k, max_depth;
     SymReg *r;
     Instruction * ins;
@@ -445,7 +464,7 @@ done:
         ; /* for MSVC 5 */
     }
 
-    if (IMCC_DEBUG & DEBUG_IMC)
+    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_symreg();
 
 }
@@ -455,7 +474,8 @@ done:
  * at the point of _definition_ of the other.
  */
 
-int interferes(SymReg * r0, SymReg * r1) {
+static int
+interferes(SymReg * r0, SymReg * r1) {
 
     int i;
 
@@ -537,8 +557,9 @@ int interferes(SymReg * r0, SymReg * r1) {
  *      - currently disabled
  *
  */
-
-int simplify (){
+#ifdef DO_SIMPLIFY
+static int
+simplify () {
     int changes = 0;
     int x;
     SymReg **g;
@@ -555,7 +576,7 @@ int simplify (){
 	}
 
 	if ( neighbours(x) < MAX_COLOR) {
-            debug(DEBUG_IMC, "#simplifying [%s]\n", g[x]->name);
+            debug(interpreter, DEBUG_IMC, "#simplifying [%s]\n", g[x]->name);
 
 	    imcstack_push(nodeStack, x);
 
@@ -567,6 +588,7 @@ int simplify (){
 
     return changes;
 }
+#endif
 
 /* Puts the remaining nodes on the stack, on the correct order.
  *
@@ -576,7 +598,8 @@ int simplify (){
  *
  */
 
-void order_spilling () {
+static void
+order_spilling () {
     int min_score = 0, total_score;
     int min_node;
     int x;
@@ -617,7 +640,8 @@ void order_spilling () {
 }
 
 
-void restore_interference_graph() {
+static void
+restore_interference_graph() {
     int i;
     for (i=0; i < n_symbols; i++) {
         if ((reglist[i]->type & VTPASM) && !(optimizer_level & OPT_PASM))
@@ -662,7 +686,8 @@ allocate_wanted_regs(void)
  * If we run out of colors, then we need to spill the top node.
  */
 
-int try_allocate() {
+static int
+try_allocate(Parrot_Interp interpreter) {
     int x = 0;
     int color, colors[MAX_COLOR];
     int free_colors, t;
@@ -682,7 +707,7 @@ int try_allocate() {
 			if (!colors[c]) {
 			    reglist[x]->color = c;
 
-                            debug(DEBUG_IMC, "#[%s] provisionally gets color [%d]"
+                            debug(interpreter, DEBUG_IMC, "#[%s] provisionally gets color [%d]"
                                      "(%d free colors, score %d)\n",
 					reglist[x]->name, c,
                                         free_colors, reglist[x]->score);
@@ -692,7 +717,7 @@ int try_allocate() {
 		}
 
 		if (reglist[x]->color == -1) {
-                    debug(DEBUG_IMC, "# no more colors free = %d\n", free_colors);
+                    debug(interpreter, DEBUG_IMC, "# no more colors free = %d\n", free_colors);
 
 		    /* It has been impossible to assign a color
                      * to this node, return it so it gets spilled
@@ -714,7 +739,8 @@ int try_allocate() {
 /*
  * map_colors: calculates what colors can be assigned to the x-th symbol.
  */
-int map_colors(int x, SymReg ** graph, int colors[], int typ) {
+static int
+map_colors(int x, SymReg ** graph, int colors[], int typ) {
     int y = 0;
     SymReg * r;
     int color, free_colors;
@@ -743,8 +769,8 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
  *
  */
 static void
-update_life(Instruction *ins, SymReg *r, int needs_fetch, int needs_store,
-        int add)
+update_life(Parrot_Interp interpreter, Instruction *ins,
+        SymReg *r, int needs_fetch, int needs_store, int add)
 {
     Life_range *l;
     int i;
@@ -783,7 +809,7 @@ update_life(Instruction *ins, SymReg *r, int needs_fetch, int needs_store,
     l = r->life_info[ins->bbindex];
     l->first_ins = r->first_ins;
     l->last_ins = r->last_ins;
-    if (IMCC_DEBUG & DEBUG_IMC) {
+    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC) {
         dump_instructions();
         dump_symreg();
     }
@@ -794,7 +820,7 @@ update_life(Instruction *ins, SymReg *r, int needs_fetch, int needs_store,
  */
 
 static void
-update_interference(SymReg *old, SymReg *new)
+update_interference(Parrot_Interp interpreter, SymReg *old, SymReg *new)
 {
     int x, y;
     if (old != new) {
@@ -826,7 +852,7 @@ update_interference(SymReg *old, SymReg *new)
             }
         }
     }
-    if (IMCC_DEBUG & DEBUG_IMC) {
+    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC) {
         dump_interference_graph();
     }
 }
@@ -836,7 +862,8 @@ update_interference(SymReg *old, SymReg *new)
  * of the symbol.
  */
 
-void spill(struct Parrot_Interp *interpreter, int spilled) {
+static void
+spill(struct Parrot_Interp *interpreter, int spilled) {
 
     Instruction * tmp, *ins;
     int i, n, dl;
@@ -850,7 +877,7 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
 	fatal(1, "spill","Out of mem\n");
     }
 
-    debug(DEBUG_IMC, "#Spilling [%s]:\n", reglist[spilled]->name);
+    debug(interpreter, DEBUG_IMC, "#Spilling [%s]:\n", reglist[spilled]->name);
 
     new_symbol = old_symbol = reglist[spilled];
     if (old_symbol->usage & U_SPILL)
@@ -913,10 +940,10 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
         if (needs_fetch || needs_store) {
 #if ! DOIT_AGAIN_SAM
             /* update life info of prev sym */
-            update_life(ins, new_symbol, needs_fetch, needs_store,
+            update_life(interpreter, ins, new_symbol, needs_fetch, needs_store,
                     old_symbol != new_symbol);
             /* and interference of both */
-            update_interference(old_symbol, new_symbol);
+            update_interference(interpreter, old_symbol, new_symbol);
 #endif
             /* if all symbols are in one basic_block, we need a new
              * symbol, so that the life_ranges are minimal
@@ -939,12 +966,13 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
 	ins->index = i++;
     }
 #endif
-    if (IMCC_DEBUG & DEBUG_IMC)
+    if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_instructions();
 
 }
 
-int neighbours(int node) {
+static int
+neighbours(int node) {
     int y, cnt;
     SymReg *r;
 
@@ -971,7 +999,7 @@ char * str_dup(const char * old) {
     }
     strcpy(copy, old);
 #ifdef MEMDEBUG
-    debug(1,"line %d str_dup %s [%x]\n", line, old, copy);
+    debug(interpreter, 1,"line %d str_dup %s [%x]\n", line, old, copy);
 #endif
     return copy;
 }

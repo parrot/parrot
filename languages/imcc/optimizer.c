@@ -46,64 +46,64 @@
  */
 static void if_branch(struct Parrot_Interp *);
 
-static int branch_branch(struct Parrot_Interp *interp);
-static int unused_label(struct Parrot_Interp *interp);
-static int dead_code_remove(struct Parrot_Interp *interp);
+static int branch_branch(struct Parrot_Interp *interpreter);
+static int unused_label(struct Parrot_Interp *interpreter);
+static int dead_code_remove(struct Parrot_Interp *interpreter);
 
-static void strength_reduce(struct Parrot_Interp *interp);
-static void subst_constants_mix(struct Parrot_Interp *interp);
-static void subst_constants_umix(struct Parrot_Interp *interp);
-static void subst_constants(struct Parrot_Interp *interp);
-static void subst_constants_c(struct Parrot_Interp *interp);
-static void subst_constants_if(struct Parrot_Interp *interp);
+static void strength_reduce(struct Parrot_Interp *interpreter);
+static void subst_constants_mix(struct Parrot_Interp *interpreter);
+static void subst_constants_umix(struct Parrot_Interp *interpreter);
+static void subst_constants(struct Parrot_Interp *interpreter);
+static void subst_constants_c(struct Parrot_Interp *interpreter);
+static void subst_constants_if(struct Parrot_Interp *interpreter);
 
-static int constant_propagation(struct Parrot_Interp *interp);
-static int used_once(void);
+static int constant_propagation(struct Parrot_Interp *interpreter);
+static int used_once(struct Parrot_Interp *);
 static int loop_optimization(struct Parrot_Interp *);
-static int clone_remove(void);
+static int clone_remove(struct Parrot_Interp *);
 
-void pre_optimize(struct Parrot_Interp *interp) {
+void pre_optimize(struct Parrot_Interp *interpreter) {
     if (optimizer_level & OPT_PRE) {
-        info(interp, 2, "pre_optimize\n");
-        subst_constants_mix(interp);
-        subst_constants_umix(interp);
-        subst_constants(interp);
-        subst_constants_c(interp);
-        subst_constants_if(interp);
-        strength_reduce(interp);
+        info(interpreter, 2, "pre_optimize\n");
+        subst_constants_mix(interpreter);
+        subst_constants_umix(interpreter);
+        subst_constants(interpreter);
+        subst_constants_c(interpreter);
+        subst_constants_if(interpreter);
+        strength_reduce(interpreter);
         if (!dont_optimize)
-            if_branch(interp);
+            if_branch(interpreter);
     }
 }
 
-int cfg_optimize(struct Parrot_Interp *interp) {
-    UNUSED(interp);
+int cfg_optimize(struct Parrot_Interp *interpreter) {
+    UNUSED(interpreter);
     if (dont_optimize)
         return 0;
     if (optimizer_level & OPT_PRE) {
-        info(interp, 2, "cfg_optimize\n");
-        if (branch_branch(interp))
+        info(interpreter, 2, "cfg_optimize\n");
+        if (branch_branch(interpreter))
             return 1;
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
-        if (unused_label(interp))
+        if (unused_label(interpreter))
             return 1;
-        if (dead_code_remove(interp))
+        if (dead_code_remove(interpreter))
             return 1;
     }
     return 0;
 }
 
-int optimize(struct Parrot_Interp *interp) {
+int optimize(struct Parrot_Interp *interpreter) {
 
     int any = 0;
     if (optimizer_level & OPT_CFG) {
-        info(interp, 2, "optimize\n");
-        any = constant_propagation(interp);
-        if (clone_remove())
+        info(interpreter, 2, "optimize\n");
+        any = constant_propagation(interpreter);
+        if (clone_remove(interpreter))
             return 1;
-        if (used_once())
+        if (used_once(interpreter))
             return 1;
-        if (loop_optimization(interp))
+        if (loop_optimization(interpreter))
             return 1;
     }
     return any;
@@ -138,7 +138,7 @@ const char * get_neg_op(char *op, int *n)
  * branch L2            ---
  * L1:                  L2:
  */
-static void if_branch(struct Parrot_Interp *interp)
+static void if_branch(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *last;
     int reg;
@@ -146,7 +146,7 @@ static void if_branch(struct Parrot_Interp *interp)
     last = instructions;
     if (!last->next)
         return;
-    info(interp, 2, "\tif_branch\n");
+    info(interpreter, 2, "\tif_branch\n");
     for (ins = last->next; ins; ) {
         if ((last->type & ITBRANCH) &&          /* if ...L1 */
                 (ins->type & IF_goto) &&        /* branch L2*/
@@ -160,13 +160,13 @@ static void if_branch(struct Parrot_Interp *interp)
                 SymReg * go = get_branch_reg(ins);
                 int args;
 
-                debug(DEBUG_OPT1,"if_branch %s ... %s\n",
+                debug(interpreter, DEBUG_OPT1,"if_branch %s ... %s\n",
                         last->op, br_dest->name);
                 /* find the negated op (e.g if->unless, ne->eq ... */
                 if ((neg_op = get_neg_op(last->op, &args)) != 0) {
                     Instruction * tmp;
                     last->r[reg] = go;
-                    tmp = INS(interp, (char*)neg_op, "", last->r, args, 0, 0);
+                    tmp = INS(interpreter, (char*)neg_op, "", last->r, args, 0, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
                     free(last->op);
@@ -187,14 +187,14 @@ static void if_branch(struct Parrot_Interp *interp)
 /* these are run after constant simplification, so it is
  * guaranteed, that one operand is non constant, if opsize == 4
  */
-static void strength_reduce(struct Parrot_Interp *interp)
+static void strength_reduce(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "add", "sub", "mul", "div" };
     int i, found;
     SymReg *r;
 
-    info(interp, 2, "\tstrength_reduce\n");
+    info(interpreter, 2, "\tstrength_reduce\n");
     for (ins = instructions; ins; ins = ins->next) {
         /*
          * add Ix, Ix, Iy => add Ix, Iy
@@ -207,10 +207,10 @@ static void strength_reduce(struct Parrot_Interp *interp)
                     ins->r[0] == ins->r[1] &&
                     (ins->r[0]->set == 'I' || ins->r[0]->set == 'N') &&
                     !strcmp(ins->op, ops[i])) {
-                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
                 ins->r[1] = ins->r[2];
-                tmp = INS(interp, ins->op, "", ins->r, 2, 0, 0);
-                debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                tmp = INS(interpreter, ins->op, "", ins->r, 2, 0, 0);
+                debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
                 subst_ins(ins, tmp, 1);
                 ins = tmp;
                 found = 1;
@@ -231,14 +231,14 @@ static void strength_reduce(struct Parrot_Interp *interp)
                      ins->r[2]->type == VTCONST &&
                      atof(ins->r[2]->name) == 0.0)) &&
                 !strcmp(ins->op, "mul")) {
-            debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
             r = mk_const(str_dup("0"), ins->r[0]->set);
             --ins->r[1]->use_count;
             if (ins->opsize == 4)
                 --ins->r[2]->use_count;
             ins->r[1] = r;
-            tmp = INS(interp, "set", "", ins->r, 2, 0, 0);
-            debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+            tmp = INS(interpreter, "set", "", ins->r, 2, 0, 0);
+            debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
             subst_ins(ins, tmp, 1);
             ins = tmp;
             continue;
@@ -256,12 +256,12 @@ static void strength_reduce(struct Parrot_Interp *interp)
                      atof(ins->r[2]->name) == 1.0)) &&
                 !strcmp(ins->op, "mul")) {
 set_it:
-            debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
             if (ins->opsize == 3) {
                 /* mul Ix, 1 */
                 ins = delete_ins(ins, 1);
                 ins = ins->prev ? ins->prev : instructions;
-                debug(DEBUG_OPT1, "deleted\n");
+                debug(interpreter, DEBUG_OPT1, "deleted\n");
                 continue;
             }
             if (ins->r[1]->type == VTCONST) {
@@ -271,8 +271,8 @@ set_it:
             else {
                 --ins->r[2]->use_count;
             }
-            tmp = INS(interp, "set", "", ins->r, 2, 0, 0);
-            debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+            tmp = INS(interpreter, "set", "", ins->r, 2, 0, 0);
+            debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
             subst_ins(ins, tmp, 1);
             ins = tmp;
             continue;
@@ -301,7 +301,7 @@ set_it:
  */
 
 static int
-constant_propagation(struct Parrot_Interp *interp)
+constant_propagation(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *ins2;
     int op;
@@ -310,7 +310,7 @@ constant_propagation(struct Parrot_Interp *interp)
     SymReg *c, *old, *o;
     int any = 0;
 
-    info(interp, 2, "\tconstant_propagation\n");
+    info(interpreter, 2, "\tconstant_propagation\n");
     for (ins = instructions; ins; ins = ins->next) {
         if (!strcmp(ins->op, "set") &&
                 ins->opsize == 3 &&             /* no keyed set */
@@ -319,7 +319,7 @@ constant_propagation(struct Parrot_Interp *interp)
             c = ins->r[1];
             o = ins->r[0];
 
-            debug(DEBUG_OPT1, "propagating constant %s => \n", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "propagating constant %s => \n", ins_string(ins));
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
                 if (ins2->type & ITSAVES ||
                     /* restrict to within a basic block */
@@ -333,21 +333,21 @@ constant_propagation(struct Parrot_Interp *interp)
                         if (instruction_writes(ins2,ins2->r[i]))
                             goto next_constant;
                         else if (instruction_reads(ins2,ins2->r[i])) {
-                            debug(DEBUG_OPT2,
+                            debug(interpreter, DEBUG_OPT2,
                                     "\tpropagating into %s register %i",
                                     ins_string(ins2), i);
                             old = ins2->r[i];
                             ins2->r[i] = c;
-                            op = check_op(interp, fullname, ins2->op, ins2->r);
+                            op = check_op(interpreter, fullname, ins2->op, ins2->r);
                             if (op < 0) {
                                 ins2->r[i] = old;
-                                debug(DEBUG_OPT2," - no %s\n", fullname);
+                                debug(interpreter, DEBUG_OPT2," - no %s\n", fullname);
                             }
                             else {
                                 --old->use_count;
                                 ins2->opnum = op;
                                 any = 1;
-                                debug(DEBUG_OPT2," -> %s\n", ins_string(ins2));
+                                debug(interpreter, DEBUG_OPT2," -> %s\n", ins_string(ins2));
                             }
                         }
                     }
@@ -366,7 +366,7 @@ next_constant:;
  * rewrite e.g. add_n_nc_ic => add_n_nc_nc
  */
 static void
-subst_constants_mix(struct Parrot_Interp *interp)
+subst_constants_mix(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
@@ -376,7 +376,7 @@ subst_constants_mix(struct Parrot_Interp *interp)
     char b[128];
     SymReg *r;
 
-    info(interp, 2, "\tsubst_constants_mix\n");
+    info(interpreter, 2, "\tsubst_constants_mix\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO compare ins->opnum with a list of instructions
@@ -387,13 +387,13 @@ subst_constants_mix(struct Parrot_Interp *interp)
                     ins->r[1]->set == 'N' &&
                     ins->r[2]->type == VTCONST &&
                     ins->r[2]->set == 'I') {
-                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
                 strcpy(b, ins->r[2]->name);
                 r = mk_const(str_dup(b), 'N');
                 --ins->r[2]->use_count;
                 ins->r[2] = r;
-                tmp = INS(interp, ins->op, "", ins->r, 3, 0, 0);
-                debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                tmp = INS(interpreter, ins->op, "", ins->r, 3, 0, 0);
+                debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
                 subst_ins(ins, tmp, 1);
                 ins = tmp;
             }
@@ -405,7 +405,7 @@ subst_constants_mix(struct Parrot_Interp *interp)
  * rewrite e.g. add_n_ic => add_n_nc
  */
 static void
-subst_constants_umix(struct Parrot_Interp *interp)
+subst_constants_umix(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
@@ -415,7 +415,7 @@ subst_constants_umix(struct Parrot_Interp *interp)
     char b[128];
     SymReg *r;
 
-    info(interp, 2, "\tsubst_constants_umix\n");
+    info(interpreter, 2, "\tsubst_constants_umix\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO compare ins->opnum with a list of instructions
@@ -426,13 +426,13 @@ subst_constants_umix(struct Parrot_Interp *interp)
                     ins->r[1]->type == VTCONST &&
                     ins->r[1]->set == 'I' &&
                     !strcmp(ins->op, ops[i])) {
-                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
                 strcpy(b, ins->r[1]->name);
                 r = mk_const(str_dup(b), 'N');
                 --ins->r[1]->use_count;
                 ins->r[1] = r;
-                tmp = INS(interp, ins->op, "", ins->r, 2, 0, 0);
-                debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                tmp = INS(interpreter, ins->op, "", ins->r, 2, 0, 0);
+                debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
                 subst_ins(ins, tmp, 1);
                 ins = tmp;
             }
@@ -497,7 +497,7 @@ eval_ins(struct Parrot_Interp *interpreter, Instruction *ins, size_t ops)
  *          or  abs_i_ic => set_i_ic
  */
 static void
-subst_constants(struct Parrot_Interp *interp)
+subst_constants(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
@@ -518,9 +518,9 @@ subst_constants(struct Parrot_Interp *interp)
     int found;
 
     /* save interpreter ctx */
-    info(interp, 2, "\tsubst_constants\n");
+    info(interpreter, 2, "\tsubst_constants\n");
     ctx = mem_sys_allocate(sizeof(struct Parrot_Context));
-    mem_sys_memcopy(ctx, &interp->ctx, sizeof(struct Parrot_Context));
+    mem_sys_memcopy(ctx, &interpreter->ctx, sizeof(struct Parrot_Context));
     /* construct a FLOATVAL_FMT with needed precision */
     switch (NUMVAL_SIZE) {
         case 8:
@@ -530,7 +530,7 @@ subst_constants(struct Parrot_Interp *interp)
             strcpy(fmt, "%0.18Lg");
             break;
         default:
-            warning(interp, "subs_constants", "used default FLOATVAL_FMT\n");
+            warning(interpreter, "subs_constants", "used default FLOATVAL_FMT\n");
             strcpy(fmt, FLOATVAL_FMT);
             break;
     }
@@ -559,20 +559,20 @@ subst_constants(struct Parrot_Interp *interp)
         }
         if (!found)
             continue;
-        debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+        debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
         /* we construct a parrot instruction
          * here and let parrot do the calculation in a
          * separate context and make a constant
          * from the result
          */
-        eval_ins(interp, ins, ins->opsize);
+        eval_ins(interpreter, ins, ins->opsize);
         /* result is in I0/N0 */
         switch (ins->r[0]->set) {
             case 'I':
-                sprintf(b, INTVAL_FMT, interp->int_reg.registers[0]);
+                sprintf(b, INTVAL_FMT, interpreter->int_reg.registers[0]);
                 break;
             case 'N':
-                sprintf(b, fmt, interp->num_reg.registers[0]);
+                sprintf(b, fmt, interpreter->num_reg.registers[0]);
                 break;
         }
         r = mk_const(str_dup(b), ins->r[0]->set);
@@ -580,12 +580,12 @@ subst_constants(struct Parrot_Interp *interp)
         if (ins->opsize == 4)
             --ins->r[2]->use_count;
         ins->r[1] = r;
-        tmp = INS(interp, "set", "", ins->r, 2, 0, 0);
-        debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+        tmp = INS(interpreter, "set", "", ins->r, 2, 0, 0);
+        debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
         subst_ins(ins, tmp, 1);
         ins = tmp;
     }
-    mem_sys_memcopy(&interp->ctx, ctx, sizeof(struct Parrot_Context));
+    mem_sys_memcopy(&interpreter->ctx, ctx, sizeof(struct Parrot_Context));
     mem_sys_free(ctx);
 }
 
@@ -593,14 +593,14 @@ subst_constants(struct Parrot_Interp *interp)
  * rewrite e.g. eq_ic_ic_ic => branch_ic/nothing
  */
 static void
-subst_constants_c(struct Parrot_Interp *interp)
+subst_constants_c(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "eq", "ne", "gt", "ge", "lt", "le" };
     size_t i;
     int res;
 
-    info(interp, 2, "\tsubst_constants_c\n");
+    info(interpreter, 2, "\tsubst_constants_c\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO s. above */
@@ -608,7 +608,7 @@ subst_constants_c(struct Parrot_Interp *interp)
                     ins->r[0]->type == VTCONST &&
                     ins->r[1]->type == VTCONST &&
                     !strcmp(ins->op, ops[i])) {
-                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
                 switch (i) {
                     case 0:     /* eq */
                         switch (ins->r[0]->set) {
@@ -620,14 +620,14 @@ do_res:
                                 --ins->r[1]->use_count;
                                 if (res) {
                                     ins->r[0] = ins->r[2];
-                                    tmp = INS(interp, "branch", "", ins->r,
+                                    tmp = INS(interpreter, "branch", "", ins->r,
                                             1, 0, 0);
-                                    debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                                    debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
                                     subst_ins(ins, tmp, 1);
                                     ins = tmp;
                                 }
                                 else {
-                                    debug(DEBUG_OPT1, "deleted\n");
+                                    debug(interpreter, DEBUG_OPT1, "deleted\n");
                                     ins = delete_ins(ins, 1);
                                     ins = ins->prev ? ins->prev : instructions;
                                 }
@@ -732,21 +732,21 @@ do_res:
  * rewrite e.g. if_ic_ic => branch_ic/nothing
  */
 static void
-subst_constants_if(struct Parrot_Interp *interp)
+subst_constants_if(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "if", "unless" };
     size_t i;
     int res;
 
-    info(interp, 2, "\tsubst_constants_if\n");
+    info(interpreter, 2, "\tsubst_constants_if\n");
     for (ins = instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO s. above */
             if (ins->opsize == 3 &&
                     ins->r[0]->type == VTCONST &&
                     !strcmp(ins->op, ops[i])) {
-                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
                 switch (i) {
                     case 0:     /* if */
                     case 1:     /* unless */
@@ -759,14 +759,14 @@ do_res:
                                     res = !res;
                                 if (res) {
                                     ins->r[0] = ins->r[1];
-                                    tmp = INS(interp, "branch", "", ins->r,
+                                    tmp = INS(interpreter, "branch", "", ins->r,
                                             1, 0, 0);
-                                    debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                                    debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
                                     subst_ins(ins, tmp, 1);
                                     ins = tmp;
                                 }
                                 else {
-                                    debug(DEBUG_OPT1, "deleted\n");
+                                    debug(interpreter, DEBUG_OPT1, "deleted\n");
                                     ins = delete_ins(ins, 1);
                                     ins = ins->prev ? ins->prev : instructions;
                                 }
@@ -803,13 +803,13 @@ do_res:
  * branch L2
  *
  */
-static int branch_branch(struct Parrot_Interp *interp)
+static int branch_branch(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *next;
     SymReg * r;
     int changed = 0;
 
-    info(interp, 2, "\tbranch_branch\n");
+    info(interpreter, 2, "\tbranch_branch\n");
     /* reset statistic globals */
     for (ins = instructions; ins; ins = ins->next) {
         if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
@@ -821,7 +821,7 @@ static int branch_branch(struct Parrot_Interp *interp)
                     break;
                 if ((next->type & IF_goto) &&
                         !strcmp(next->op, "branch")) {
-                    debug(DEBUG_OPT1, "found branch to branch '%s' %s\n",
+                    debug(interpreter, DEBUG_OPT1, "found branch to branch '%s' %s\n",
                             r->first_ins->r[0]->name, ins_string(next));
                     ostat.branch_branch++;
                     ins->r[0] = next->r[0];
@@ -833,14 +833,14 @@ static int branch_branch(struct Parrot_Interp *interp)
     return changed;
 }
 
-static int unused_label(struct Parrot_Interp *interp)
+static int unused_label(struct Parrot_Interp *interpreter)
 {
     Instruction *ins;
     int used;
     int i;
     int changed = 0;
 
-    info(interp, 2, "\tunused_label\n");
+    info(interpreter, 2, "\tunused_label\n");
     for (i=1; i < n_basic_blocks; i++) {
 	ins = bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
@@ -884,7 +884,7 @@ static int unused_label(struct Parrot_Interp *interp)
 #endif
             if (!used) {
                 ostat.deleted_labels++;
-                debug(DEBUG_OPT1, "block %d label %s deleted\n", i, lab->name);
+                debug(interpreter, DEBUG_OPT1, "block %d label %s deleted\n", i, lab->name);
                 ostat.deleted_ins++;
                 ins = delete_ins(ins, 1);
                 changed = 1;
@@ -895,7 +895,7 @@ static int unused_label(struct Parrot_Interp *interp)
     return changed;
 }
 
-static int dead_code_remove(struct Parrot_Interp *interp)
+static int dead_code_remove(struct Parrot_Interp *interpreter)
 {
     Basic_block *bb;
     int i;
@@ -905,7 +905,7 @@ static int dead_code_remove(struct Parrot_Interp *interp)
     /* this could be a separate level, now it's done with -O1 */
     if (!(optimizer_level & OPT_PRE))
         return 0;
-    info(interp, 2, "\tdead_code_remove\n");
+    info(interpreter, 2, "\tdead_code_remove\n");
     for (i=1; i < n_basic_blocks; i++) {
 	bb = bb_list[i];
         if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')
@@ -913,9 +913,9 @@ static int dead_code_remove(struct Parrot_Interp *interp)
         /* this block isn't entered from anywhere */
         if (!bb->pred_list) {
             int bbi = bb->index;
-            debug(DEBUG_OPT1, "found dead block %d\n", bb->index);
+            debug(interpreter, DEBUG_OPT1, "found dead block %d\n", bb->index);
             for (ins = bb->start; ins && ins->bbindex == bbi; ) {
-                debug(DEBUG_OPT1, "\tins deleted (dead block) %s\n",
+                debug(interpreter, DEBUG_OPT1, "\tins deleted (dead block) %s\n",
                     ins_string(ins));
                 ins = delete_ins(ins, 1);
                 ostat.deleted_ins++;
@@ -926,7 +926,7 @@ static int dead_code_remove(struct Parrot_Interp *interp)
     for (last = instructions, ins=last->next; last && ins; ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
                 !strcmp(last->op, "branch")) {
-            debug(DEBUG_OPT1, "unreachable ins deleted (after branch) %s\n",
+            debug(interpreter, DEBUG_OPT1, "unreachable ins deleted (after branch) %s\n",
                     ins_string(ins));
             ins = delete_ins(ins, 1);
             ostat.deleted_ins++;
@@ -939,7 +939,7 @@ static int dead_code_remove(struct Parrot_Interp *interp)
         if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
                 !strcmp(last->op, "branch") &&
                 !strcmp(last->r[0]->name, ins->r[0]->name)) {
-            debug(DEBUG_OPT1, "dead branch deleted %s\n",
+            debug(interpreter, DEBUG_OPT1, "dead branch deleted %s\n",
                     ins_string(ins));
             ins = delete_ins(last, 1);
             ostat.deleted_ins++;
@@ -953,7 +953,7 @@ static int dead_code_remove(struct Parrot_Interp *interp)
 }
 
 /* optimizations with CFG & life info built */
-static int used_once()
+static int used_once(Parrot_Interp interpreter)
 {
     Instruction *ins;
     SymReg * r;
@@ -966,7 +966,7 @@ static int used_once()
         if (!r)
             continue;
         if (r->use_count == 1 && r->lhs_use_count == 1) {
-            debug(DEBUG_OPT2, "used once »%s« deleted\n", ins_string(ins));
+            debug(interpreter, DEBUG_OPT2, "used once »%s« deleted\n", ins_string(ins));
             ins = delete_ins(ins, 1);
             ins = ins->prev ? ins->prev : instructions;
             ostat.deleted_ins++;
@@ -1079,19 +1079,20 @@ _is_ins_save(Instruction *check_ins, SymReg *r, int what)
     return what == CHK_CLONE ? 1 : (reason=10,0);
 }
 
-static int is_ins_save(Instruction *ins, SymReg *r, int what) {
+static int
+is_ins_save(Parrot_Interp interpreter, Instruction *ins, SymReg *r, int what) {
     int save;
 
     reason = 0;
     save = _is_ins_save(ins, r, what);
     if (!save && reason)
-        debug(DEBUG_OPT2, "ins not save var %s reason %d %s\n",
+        debug(interpreter, DEBUG_OPT2, "ins not save var %s reason %d %s\n",
                 r->name, reason, ins_string(ins));
     return save;
 }
 
 static int
-is_invariant(Instruction *ins)
+is_invariant(Parrot_Interp interpreter, Instruction *ins)
 {
     int ok = 0;
     int what = 0;
@@ -1108,7 +1109,7 @@ is_invariant(Instruction *ins)
         what = CHK_INV_SET;
     }
     if (ok)
-        return is_ins_save(ins, ins->r[0], what);
+        return is_ins_save(interpreter, ins, ins->r[0], what);
     return 0;
 }
 
@@ -1131,7 +1132,7 @@ find_outer(Basic_block * blk)
 
 /* move the instruction ins before loop in bb */
 static int
-move_ins_out(struct Parrot_Interp *interp, Instruction **ins, Basic_block *bb)
+move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *bb)
 {
     Basic_block *pred;
     Instruction * next, *out;
@@ -1145,23 +1146,23 @@ move_ins_out(struct Parrot_Interp *interp, Instruction **ins, Basic_block *bb)
     pred = bb_list[0];
 #endif
     if (!pred) {
-        debug(DEBUG_OPT2, "outer loop not found (CFG?)\n");
+        debug(interpreter, DEBUG_OPT2, "outer loop not found (CFG?)\n");
         return 0;
     }
     out = pred->end;
     next = (*ins)->next;
     (*ins)->bbindex = pred->index;
-    debug(DEBUG_OPT2, "inserting it in blk %d after %s\n", pred->index,
+    debug(interpreter, DEBUG_OPT2, "inserting it in blk %d after %s\n", pred->index,
             ins_string(out));
     *ins = move_ins(*ins, out);
-    if (0 && (DEBUG_OPT2 & IMCC_DEBUG)) {
+    if (0 && (DEBUG_OPT2 & IMCC_INFO(interpreter)->debug)) {
         char buf[256];
         SymReg * regs[IMCC_MAX_REGS];
         Instruction * tmp;
 
         regs[0] = 0;
         sprintf(buf, "# Invar moved: %s",ins_string(out->next));
-        tmp = INS(interp, "", buf, regs, 0, 0, 0);
+        tmp = INS(interpreter, "", buf, regs, 0, 0, 0);
         insert_ins((*ins)->prev, tmp);
     }
     ostat.invariants_moved++;
@@ -1172,22 +1173,22 @@ move_ins_out(struct Parrot_Interp *interp, Instruction **ins, Basic_block *bb)
 }
 
 static int
-loop_one(struct Parrot_Interp *interp, int bnr)
+loop_one(struct Parrot_Interp *interpreter, int bnr)
 {
     Basic_block *bb = bb_list[bnr];
     Instruction *ins;
     int changed = 0;
 
     if (bnr == 0) {
-        warning(interp, "loop_one", "wrong loop depth in block 0\n");
+        warning(interpreter, "loop_one", "wrong loop depth in block 0\n");
         return 0;
     }
-    debug(DEBUG_OPT2, "loop_one blk %d\n", bnr);
+    debug(interpreter, DEBUG_OPT2, "loop_one blk %d\n", bnr);
     for (ins = bb->start ; ins ; ins = ins->next) {
         reason = 0;
-        if (is_invariant(ins)) {
-            debug(DEBUG_OPT2, "found invariant %s\n", ins_string(ins));
-            if (move_ins_out(interp, &ins, bb)) {
+        if (is_invariant(interpreter, ins)) {
+            debug(interpreter, DEBUG_OPT2, "found invariant %s\n", ins_string(ins));
+            if (move_ins_out(interpreter, &ins, bb)) {
                 changed++;
                 ins = ins->prev;
             }
@@ -1200,7 +1201,7 @@ loop_one(struct Parrot_Interp *interp, int bnr)
 }
 
 static int
-loop_optimization(struct Parrot_Interp *interp)
+loop_optimization(struct Parrot_Interp *interpreter)
 {
     int l, bb, loop_depth;
     int changed = 0;
@@ -1208,19 +1209,19 @@ loop_optimization(struct Parrot_Interp *interp)
 
     loop_depth = prev_depth ? prev_depth : max_loop_depth();
     /* work from inside out */
-    debug(DEBUG_OPT2, "loop_optimization\n");
+    debug(interpreter, DEBUG_OPT2, "loop_optimization\n");
     for (l = loop_depth; l > 0; l--) {
-        debug(DEBUG_OPT2, "loop_depth %d\n", l);
+        debug(interpreter, DEBUG_OPT2, "loop_depth %d\n", l);
         for (bb = 0; bb < n_basic_blocks; bb++)
             if (bb_list[bb]->loop_depth == l) {
-                changed |= loop_one(interp, bb);
+                changed |= loop_one(interpreter, bb);
             }
         /* currently e.g. mandel.p6 breaks, if not only the most
          * inner loop is changed, but outer loops too */
         if (changed) {
             prev_depth = l-1;
-            debug(DEBUG_OPT2,"after loop_opt\n");
-            if (IMCC_DEBUG>1)
+            debug(interpreter, DEBUG_OPT2,"after loop_opt\n");
+            if (IMCC_INFO(interpreter)->debug>1)
                 dump_instructions();
             return changed;
         }
@@ -1229,13 +1230,14 @@ loop_optimization(struct Parrot_Interp *interp)
     return 0;
 }
 
-static int check_clone(Instruction *ins)
+static int
+check_clone(Parrot_Interp interpreter, Instruction *ins)
 {
     SymReg * rl = ins->r[0];
     SymReg * rr = ins->r[1];
-    if (0 && is_ins_save(ins, rl, CHK_CLONE) &&
-        is_ins_save(ins, rr, CHK_CLONE)) {
-        debug(DEBUG_OPT2, "clone %s removed\n", ins_string(ins));
+    if (0 && is_ins_save(interpreter, ins, rl, CHK_CLONE) &&
+        is_ins_save(interpreter, ins, rr, CHK_CLONE)) {
+        debug(interpreter, DEBUG_OPT2, "clone %s removed\n", ins_string(ins));
         free(ins->op);
         ins->op = str_dup("set");
         return 1;
@@ -1244,14 +1246,14 @@ static int check_clone(Instruction *ins)
 }
 
 static int
-clone_remove()
+clone_remove(Parrot_Interp interpreter)
 {
     Instruction *ins;
     int changes = 0;
-    debug(DEBUG_OPT2, "clone_remove\n");
+    debug(interpreter, DEBUG_OPT2, "clone_remove\n");
     for (ins = instructions; ins; ins = ins->next)
         if (!strcmp(ins->op, "clone"))
-            changes |= check_clone(ins);
+            changes |= check_clone(interpreter, ins);
     return changes;
 }
 

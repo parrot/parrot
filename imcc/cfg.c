@@ -17,6 +17,8 @@
 static void add_instruc_reads(Instruction *ins, SymReg *r0);
 static void add_instruc_writes(Instruction *ins, SymReg *r0);
 static void propagate_need(Basic_block *bb, SymReg* r, int i);
+static void bb_findadd_edge(Parrot_Interp, Basic_block*, SymReg*);
+static void mark_loop(Parrot_Interp, Edge*);
 
 /* Code: */
 
@@ -65,7 +67,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
 
     ins = instructions;
     if (first && ins->type == ITLABEL && ins->r[1]) {
-        debug(DEBUG_CFG, "pcc_sub %s nparams %d\n",
+        debug(interpreter, DEBUG_CFG, "pcc_sub %s nparams %d\n",
                 ins->r[0]->name, ins->r[1]->pcc_sub->nargs);
         expand_pcc_sub(interpreter, ins);
     }
@@ -147,7 +149,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
                 if (*ins->op == 'b') {  /* bsr */
                     Instruction * lab;
                     found = r != NULL && r->first_ins;
-                    debug(DEBUG_CFG, "bsr %s local:%s\n",
+                    debug(interpreter, DEBUG_CFG, "bsr %s local:%s\n",
                             name, found ? "yes": "no");
                     if (r) {
                         int j;
@@ -158,7 +160,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
                                 if (!strcmp(lab->op, "saveall")) {
                                     ins->type |= ITSAVES;
                                     lab->type |= ITSAVES;
-                                    debug(DEBUG_CFG, "\ttype saveall\n");
+                                    debug(interpreter, DEBUG_CFG, "\ttype saveall\n");
                                     break;
                                 }
                             }
@@ -177,7 +179,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
         }
     }
 
-    if (IMCC_DEBUG & DEBUG_CFG) {
+    if (IMCC_INFO(interpreter)->debug & DEBUG_CFG) {
         dump_instructions();
         dump_labels();
     }
@@ -202,7 +204,7 @@ void build_cfg(Parrot_Interp interpreter) {
         /* look if instruction is a branch */
         addr = get_branch_reg(bb->end);
         if (addr)
-            bb_findadd_edge(bb, addr);
+            bb_findadd_edge(interpreter, bb, addr);
         else if (!strcmp(bb->start->op, "invoke") ||
                 !strcmp(bb->start->op, "invokecc")) {
             if (check_invoke_type(bb->start) == INVOKE_SUB_LOOP)
@@ -210,7 +212,7 @@ void build_cfg(Parrot_Interp interpreter) {
         }
         if (!strcmp(bb->end->op, "ret")) {
             Instruction * sub;
-            debug(DEBUG_CFG, "found ret in bb %d\n", i);
+            debug(interpreter, DEBUG_CFG, "found ret in bb %d\n", i);
             /* now go back, find labels and connect these with
              * bsrs
              */
@@ -228,7 +230,7 @@ invok:
                     j = pred->from->index;
                     if (found) {
                         int saves = 0;
-                        debug(DEBUG_CFG, "\tcalled from bb %d '%s'\n",
+                        debug(interpreter, DEBUG_CFG, "\tcalled from bb %d '%s'\n",
                             j, ins_string(pred->from->end));
                         for (; sub && sub != bb->end; sub = sub->next) {
                             if (!strcmp(sub->op, "saveall"))
@@ -243,7 +245,7 @@ invok:
                         }
                         if (!saves)
                             bb_add_edge(bb, bb_list[j+1]);
-                        debug(DEBUG_CFG, "\tand does saevall %s\n",
+                        debug(interpreter, DEBUG_CFG, "\tand does saevall %s\n",
                                 saves ? "yes" : "no");
                     }
                 }
@@ -253,7 +255,7 @@ invok:
                     goto invok;
                 }
                 if (!found)
-                    debug(DEBUG_CFG, "\tcalled from unknown!\n");
+                    debug(interpreter, DEBUG_CFG, "\tcalled from unknown!\n");
             }
         }
 
@@ -264,14 +266,15 @@ invok:
 
 /* find the placement of the label, and link the two nodes */
 
-void bb_findadd_edge(Basic_block *from, SymReg *label) {
+static void
+bb_findadd_edge(Parrot_Interp interpreter, Basic_block *from, SymReg *label) {
     Instruction *ins;
     SymReg *r = find_sym(label->name);
 
     if (r && (r->type & VTADDRESS) && r->first_ins)
         bb_add_edge(from, bb_list[r->first_ins->bbindex]);
     else {
-        debug(DEBUG_CFG, "register branch %s ",
+        debug(interpreter, DEBUG_CFG, "register branch %s ",
                 ins_string(from->end));
         /* XXX is probably only ok, if the invoke is "near" the
          *     set_addr ins
@@ -280,11 +283,11 @@ void bb_findadd_edge(Basic_block *from, SymReg *label) {
             if ((ins->type & ITBRANCH) && !strcmp(ins->op, "set_addr") &&
                     ins->r[1]->first_ins) {
                 bb_add_edge(from, bb_list[ins->r[1]->first_ins->bbindex]);
-                debug(DEBUG_CFG, "(%s) ", ins->r[1]->name);
+                debug(interpreter, DEBUG_CFG, "(%s) ", ins->r[1]->name);
                 break;
             }
         }
-        debug(DEBUG_CFG, "\n");
+        debug(interpreter, DEBUG_CFG, "\n");
     }
 }
 
@@ -426,8 +429,8 @@ static void propagate_alias(void)
 	    }
 	}
     }
-    if (any && (IMCC_DEBUG & DEBUG_CFG)) {
-	debug(DEBUG_CFG, "\nAfter propagate_alias\n");
+    if (any && (IMCC_INFO(interpreter)->debug & DEBUG_CFG)) {
+	debug(interpreter, DEBUG_CFG, "\nAfter propagate_alias\n");
 	dump_instructions();
     }
 }
@@ -690,7 +693,7 @@ void compute_dominators (Parrot_Interp interpreter) {
 	}
     }
 #endif
-    if (IMCC_DEBUG & DEBUG_CFG)
+    if (IMCC_INFO(interpreter)->debug & DEBUG_CFG)
 	dump_dominators();
 #if USE_BFS
     free(q);
@@ -713,7 +716,7 @@ static void free_dominators(void)
 
 
 static void
-sort_loops(void)
+sort_loops(Parrot_Interp interpreter)
 {
     int i, j, changed;
     Loop_info *li;
@@ -754,13 +757,13 @@ sort_loops(void)
         for (j = i + 1; j < n_loops; j++) {
             if (set_contains(loop_info[i]->loop, first) &&
                     !set_contains(loop_info[i]->loop, last)) {
-                debug(DEBUG_CFG, "sort_loops",
+                debug(interpreter, DEBUG_CFG, "sort_loops",
                         "loop %d contains first but not"
                         "last of outer loop %d\n", j, i);
             }
             if (set_contains(loop_info[i]->loop, last) &&
                     !set_contains(loop_info[i]->loop, first)) {
-                debug(DEBUG_CFG, "sort_loops",
+                debug(interpreter, DEBUG_CFG, "sort_loops",
                         "loop %d contains last but not"
                         "first of outer loop %d\n", j, i);
             }
@@ -789,15 +792,14 @@ find_loops (Parrot_Interp interpreter) {
 	    succ_index = edge->to->index;
 
 	    if (set_contains(dom, succ_index) ) {
-		mark_loop(edge);
+		mark_loop(interpreter, edge);
 	    }
         }
     }
 
-    sort_loops();
-    if (IMCC_DEBUG & DEBUG_CFG) {
+    sort_loops(interpreter);
+    if (IMCC_INFO(interpreter)->debug & DEBUG_CFG)
         dump_loops();
-    }
 #if 0
     /* when a branch goes to the subroutine entry, this may happen
      * so its not an error
@@ -810,7 +812,8 @@ find_loops (Parrot_Interp interpreter) {
 
 /* Incresases the loop_depth of all the nodes in a loop */
 
-void mark_loop (Edge* e){
+static void
+mark_loop (Parrot_Interp interpreter, Edge* e){
     Set* loop;
     Basic_block *header, *footer, *enter;
     int i;
@@ -827,17 +830,17 @@ void mark_loop (Edge* e){
             i++;
         }
 
-    debug (DEBUG_CFG, "loop from %d to %d, entered from %d\n", footer->index,
-            header->index, enter ? enter->index : -1 );
+    debug(interpreter, DEBUG_CFG, "loop from %d to %d, entered from %d\n",
+            footer->index, header->index, enter ? enter->index : -1 );
     if (i != 1) {
         if (i==0) {
             if (header->index)
-                debug(DEBUG_CFG,"\tdead code\n");
+                debug(interpreter, DEBUG_CFG,"\tdead code\n");
             else
-                debug(DEBUG_CFG, "\tsub start\n");
+                debug(interpreter, DEBUG_CFG, "\tsub start\n");
         }
         else
-            debug(DEBUG_CFG,
+            debug(interpreter, DEBUG_CFG,
                     "\tcan't determine loop entry block (%d found)\n" ,i);
     }
 

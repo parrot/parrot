@@ -55,13 +55,13 @@ void info(Parrot_Interp interpreter, int level, const char *fmt, ...)
     va_end(ap);
 }
 
-void debug(int level, const char *fmt, ...)
+void
+debug(Parrot_Interp interpreter, int level, const char *fmt, ...)
 {
     va_list ap;
 
-    if ( !(level & IMCC_DEBUG))
+    if ( !(level & IMCC_INFO(interpreter)->debug))
 	return;
-
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
     va_end(ap);

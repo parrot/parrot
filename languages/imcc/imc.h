@@ -42,19 +42,8 @@
  */
 #define MAX_COLOR NUM_REGISTERS
 
-void build_reglist(Parrot_Interp);
-void compute_du_chain(void);
-int interferes(SymReg * r0, SymReg * r1);
-int map_colors(int x, SymReg ** graph, int colors[], int typ);
-void build_interference_graph(void);
 void allocate(struct Parrot_Interp *);
-int simplify (void);
-void order_spilling (void);
-void spill (struct Parrot_Interp *, int);
-int try_allocate(void);
-void restore_interference_graph(void);
 void free_reglist(void);
-int neighbours(int node);
 
 const char * get_neg_op(char *op, int *nargs);
 
@@ -78,7 +67,6 @@ char *str_cat(const char *, const char *);
 
 /* globals */
 
-EXTERN int IMCC_DEBUG;
 
 EXTERN int n_spilled;
 EXTERN SymReg** interference_graph;
@@ -116,6 +104,7 @@ EXTERN struct imcc_ostat ostat;
 typedef struct {
     int imcc_warn;
     int verbose;
+    int debug;
 } imcc_info_t;
 
 #define IMCC_INFO(i) ((imcc_info_t*) (i)->imcc_info)

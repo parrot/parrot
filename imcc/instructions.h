@@ -89,7 +89,6 @@ int instruction_writes(Instruction *, SymReg *);
 int ins_reads2(Instruction *, int);
 int ins_writes2(Instruction *, int);
 
-void compute_spilling_costs(void);
 void free_ins(Instruction *);
 char * ins_string(Instruction * ins);
 

@@ -151,8 +151,6 @@ SymReg * mk_pasm_reg(char * name) {
     if (r->color < 0 || r->color > 31)
         fataly(1, "mk_pasm_reg", line,
                 "register number out of range '%s'\n", name);
-    debug(DEBUG_PARSER, "mk_pasm_reg: name %s set %c color %d type 0x%x\n",
-            name, r->set, r->color, r->type);
     return r;
 }
 
