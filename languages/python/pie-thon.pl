@@ -789,6 +789,56 @@ EOC
     push @stack, [-1, $n, $t];
 }
 
+sub binary_word
+{
+    my ($op, $cmt) = @_;
+    my $r = pop @stack;
+    my $l = pop @stack;
+    my ($t, $n);
+    {
+	my $nl = promote($l);
+	$n = temp($t = 'P');
+	my $nr = $r->[1];
+#	$nr = promote($r) if $r->[2] eq 'S';
+	$nr = promote($r);
+	print <<"EOC";
+	$n = new $DEFVAR $cmt
+	$op $n, $nl, $nr
+EOC
+    }
+    push @stack, [-1, $n, $t];
+}
+
+sub BINARY_AND
+{
+    my ($n, $c, $cmt) = @_;
+    binary('&', $cmt);
+}
+
+sub BINARY_OR
+{
+    my ($n, $c, $cmt) = @_;
+    binary('|', $cmt);
+}
+
+sub BINARY_XOR
+{
+    my ($n, $c, $cmt) = @_;
+    binary_word('xor', $cmt);
+}
+
+sub BINARY_LSHIFT
+{
+    my ($n, $c, $cmt) = @_;
+    binary_word('shl', $cmt);
+}
+
+sub BINARY_RSHIFT
+{
+    my ($n, $c, $cmt) = @_;
+    binary_word('shr', $cmt);
+}
+
 sub BINARY_ADD
 {
     my ($n, $c, $cmt) = @_;
@@ -854,6 +904,21 @@ sub inplace
 	$l->[1] $op= $r->[1] $cmt
 EOC
     push @stack, [-1, $l->[1], $l->[2]];
+}
+sub inplace_word
+{
+    my ($op, $cmt) = @_;
+    my $r = pop @stack;
+    my $l = pop @stack;
+    print <<"EOC";
+	$op $l->[1], $r->[1] $cmt
+EOC
+    push @stack, [-1, $l->[1], $l->[2]];
+}
+sub INPLACE_MODULO
+{
+    my ($n, $c, $cmt) = @_;
+    inplace_word('mod', $cmt);
 }
 sub INPLACE_ADD
 {
@@ -1521,6 +1586,18 @@ EOC
     push @stack, $tos;
 }
 
+sub DUP_TOPX
+{
+    my ($n, $c, $cmt) = @_;
+    foreach (1..$n) {
+	my $thing = $stack[-$n];
+	push @stack, $thing;
+    print <<EOC;
+	$cmt
+EOC
+    }
+}
+
 sub ROT_THREE
 {
     my ($n, $c, $cmt) = @_;
@@ -1531,6 +1608,16 @@ sub ROT_THREE
     push @stack, $v;
     push @stack, $x;
     push @stack, $w;
+}
+
+sub ROT_TWO
+{
+    my ($n, $c, $cmt) = @_;
+    print "\t\t$cmt\n";
+    my $v = pop @stack;
+    my $w = pop @stack;
+    push @stack, $w;
+    push @stack, $v;
 }
 
 sub STORE_SUBSCR
