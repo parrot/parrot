@@ -102,7 +102,9 @@
      MACRO = 325,
      ENDM = 326,
      PARROT_OP = 327,
-     VAR = 328
+     VAR = 328,
+     LINECOMMENT = 329,
+     FILECOMMENT = 330
    };
 #endif
 #define CALL 258
@@ -176,12 +178,14 @@
 #define ENDM 326
 #define PARROT_OP 327
 #define VAR 328
+#define LINECOMMENT 329
+#define FILECOMMENT 330
 
 
 
 
 #ifndef YYSTYPE
-#line 409 "imcc.y"
+#line 413 "imcc.y"
 typedef union {
     int t;
     char * s;
@@ -189,7 +193,7 @@ typedef union {
     Instruction *i;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 193 "imcparser.h"
+#line 197 "imcparser.h"
 # define YYSTYPE yystype
 #endif
 
