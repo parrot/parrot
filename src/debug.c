@@ -20,9 +20,9 @@
 #include <stdlib.h>
 
 #define na(c) { \
-    while(*c && !isspace(*c)) \
+    while(*c && !isspace((int) *c)) \
         c++; \
-    while(*c && isspace(*c)) \
+    while(*c && isspace((int) *c)) \
         c++; }
 
 /* PDB_get_command
@@ -88,7 +88,7 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
     unsigned long c = 0;
 
     /* Skip trailing spaces */
-    while (*command && isspace(*command))
+    while (*command && isspace((int) *command))
         command++;
     /* get a number from what the user typed */
     for (i = 0; ((command[i] != 32) && command[i]) ; i++)
@@ -192,7 +192,7 @@ PDB_next(struct Parrot_Interp *interpreter,
         PDB_init(interpreter,command);
     }
     
-    if (command && isdigit(*command))
+    if (command && isdigit((int) *command))
         n = atol(command);
 
     pdb->state &= ~PDB_STOPPED;
@@ -222,7 +222,7 @@ PDB_trace(struct Parrot_Interp *interpreter,
         PDB_init(interpreter,command);
     }
    
-    if (command && isdigit(*command))
+    if (command && isdigit((int) *command))
         n = atol(command);
 
     pdb->state &= ~PDB_STOPPED;
@@ -359,7 +359,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 
     while (command && *command) {
         i = 0;
-        while (command[i] && !isspace(command[i])) {
+        while (command[i] && !isspace((int) command[i])) {
             c[i] = command[i];
             i++;
     }
@@ -417,7 +417,7 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
     PDB_line_t *line;
     long n;
 
-    if (isdigit(*command)) {
+    if (isdigit((int) *command)) {
         n = atol(command);
         breakpoint = interpreter->pdb->breakpoint;
         while (breakpoint && n--)
@@ -898,7 +898,7 @@ PDB_hasinstruction(char *c)
     char h = 0;
 
     while (*c && *c != '#' && *c != '\n') {
-        if (isalnum(*c) || *c == '"')
+        if (isalnum((int) *c) || *c == '"')
             h = 1;
         else if (*c == ':')
             h = 0;
@@ -920,13 +920,13 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
     PDB_line_t *line;
 
     /* set the list line if provided */
-    if (isdigit(*command)) {
+    if (isdigit((int) *command)) {
         pdb->file->list_line = atol(command) - 1;
         na(command);
     }
 
     /* set the number of lines to print */
-    if (isdigit(*command)) {
+    if (isdigit((int) *command)) {
         n = atol(command);
         na(command);
     }
@@ -974,7 +974,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
     int op_number,i,k,l,j = 0;
 
     /* find_op needs a string with only the opcode name */
-    while (command && !(isspace(*command))) 
+    while (command && !(isspace((int) *command))) 
         *(c++) = *(command++);
     *c = '\0';
     /* Find the opcode number */
@@ -1063,7 +1063,7 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
     unsigned long c = 0;
 
     /* Print from the user stack? */
-    if (!*command || isdigit(*command))
+    if (!*command || isdigit((int) *command))
         PDB_print_user_stack(interpreter,command);
     else {
         for (i = 0; ((command[i] != 32) && command[i]) ; i++)
