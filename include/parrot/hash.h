@@ -34,7 +34,7 @@ typedef struct _hash_entry {
 } HASH_ENTRY;
 
 void new_hash(Interp * interpreter, HASH **hash_ptr);
-void hash_clone(Interp * interpreter, HASH * src, HASH **clone);
+void hash_clone(Interp * interpreter, HASH * src, HASH **dest);
 INTVAL hash_size(Interp * interpreter, HASH *hash);
 void hash_set_size(Interp * interpreter, HASH *hash, UINTVAL size);
 void hash_destroy(Interp * interpreter, HASH *hash);

@@ -435,10 +435,10 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
 }
 
 void
-hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **clone)
+hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
 {
     HashIndex i;
-    new_hash(interp, clone);
+    new_hash(interp, dest);
     for (i = 0; i <= hash->max_chain; i++) {
         BucketIndex bi = lookupBucketIndex(hash, i);
         while (bi != NULLBucketIndex) {
@@ -472,7 +472,7 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **clone)
                 internal_exception(-1, "hash corruption: type = %d\n",
                                    b->value.type);
             };
-            hash_put(interp, *clone, b->key, &valtmp);
+            hash_put(interp, *dest, b->key, &valtmp);
             bi = b->next;
         }
     }
