@@ -73,11 +73,20 @@ environment.
 
 ########################################
 
+=item B<close>(p)
+
+Close IO stream $1.
+
 =item B<close>(i|ic)
 
 Close file opened on file descriptor $1.
 
 =cut
+
+inline op close(p) {
+  PIO_close(interpreter, (ParrotIO*)($1->data));
+  goto NEXT();
+}
 
 inline op close(i|ic) {
   fclose((FILE *)$1);
@@ -111,6 +120,10 @@ op err(s) {
 
 
 ########################################
+=item B<open>(p, s|sc, s|sc)
+
+Open file named $2 with Perl style mode string specified in $3, and
+create the IO stream PMC into $1.
 
 =item B<open>(i, s|sc)
 
@@ -123,6 +136,18 @@ Open file named $2 with flags $3 and mode 0644 (rw-r--r--), and save the file
 descriptor into $1.
 
 =cut
+
+inline op open(p, s|sc, s|sc) {
+  ParrotIO * io;
+  STRING *path = $2;
+  STRING *mode = $3;
+  io = PIO_open(interpreter, path->bufstart, mode->bufstart);
+  if(!io) {
+    /* FIXME: Handle error */
+  }
+  $1 = new_io_pmc(interpreter, io);
+  goto NEXT();
+}
 
 inline op open(i, s|sc) {
   if (! ($1 = (INTVAL)fopen(($2)->bufstart, "r+"))) {
@@ -222,6 +247,8 @@ Print $1 to standard output.
 
 =item B<print>(i|ic, p)
 
+=item B<print>(p, s|sc)
+
 Print $2 to the file on $1. (0, 1, and 2 correspond to stdin, stdout,
 and stderr)
 
@@ -243,6 +270,16 @@ op print(s|sc) {
   STRING *s = $1;
   if (s && string_length(s)) {
     printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+  }
+  goto NEXT();
+}
+
+op print(p, s|sc) {
+  ParrotIO * io;
+  STRING *s = $2;
+  io = (ParrotIO*)($1->data);
+  if (s && string_length(s) && io) {
+    PIO_puts(interpreter, io, (const char *)s->bufstart);
   }
   goto NEXT();
 }
@@ -322,6 +359,21 @@ op print(i|ic, p) {
   }
   if (s) {
     fprintf(file, "%.*s",(int)string_length(s),(char *) s->bufstart);
+  }
+  goto NEXT();
+}
+
+
+########################################
+
+=item B<puts>(s|sc)
+
+Print $1 to standard output stream
+
+op puts(s|sc) {
+  STRING *s = $1;
+  if (s && string_length(s)) {
+    PIO_puts(interpreter, pio_stdout, (const char *) s->bufstart);
   }
   goto NEXT();
 }

@@ -79,6 +79,8 @@ include/parrot/string.h
 include/parrot/trace.h
 include/parrot/unicode.h
 interpreter.c
+io/io.c
+io/io_os.c
 jit/i386/core.jit
 jit/i386/lib.jit
 jit/i386/string.jit
