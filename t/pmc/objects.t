@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -155,3 +155,32 @@ CODE
 0011
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "new object");
+    newclass P1, "Foo"
+    find_type I0, "Foo"
+    new P2, I0
+    print "ok 1\n"
+    end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "new object - type, isa");
+    newclass P1, "Foo"
+    find_type I0, "Foo"
+    new P2, I0
+    print "ok 1\n"
+    typeof I1, P2
+    eq I0, I1, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    isa I3, P2, "Foo"
+    print I3
+    print "\n"
+    end
+CODE
+ok 1
+ok 2
+1
+OUTPUT

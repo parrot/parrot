@@ -32,7 +32,7 @@ find_global(Parrot_Interp interpreter, STRING *globalname) {
  */
 PMC *
 Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
-                       STRING *child_class_name) 
+                       STRING *child_class_name)
 {
   PMC *child_class;
   PMC *child_class_array;
@@ -67,8 +67,8 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
   }
   else {
       VTABLE_set_string_native(interpreter, classname_pmc,
-                               string_make(interpreter, 
-                                           "\0\0anonymous", 
+                               string_make(interpreter,
+                                           "\0\0anonymous",
                                            11, NULL, 0, NULL));
   }
 
@@ -77,7 +77,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
   /* Our penultimate parent list is a clone of our parent's parent
      list, with our parent unshifted onto the beginning */
   temp_pmc = pmc_new_noinit(interpreter, enum_class_Array);
-  VTABLE_clone(interpreter, 
+  VTABLE_clone(interpreter,
                VTABLE_get_pmc_keyed_int(interpreter,
                                         (PMC *)PMC_data(base_class), 2),
                temp_pmc);
@@ -111,7 +111,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
  * Create a brand new class, named what we pass in.
  */
 PMC *
-Parrot_new_class(Parrot_Interp interpreter, STRING *class_name) 
+Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
 {
   PMC *new_class;
   PMC *new_class_array;
@@ -184,11 +184,11 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name, PMC *new_cl
       /* And cache our class PMC in the vtable so we can find it later
        */
       Parrot_vtable_set_data(interpreter, new_vtable, new_class);
-      
+
       /* Reset the init method to our instantiation method */
       new_vtable->init = Parrot_instantiate_object;
       new_class->vtable = new_vtable;
-      
+
       /* Put our new vtable in the global table */
       Parrot_base_vtables[new_type] = new_vtable;
 
@@ -199,14 +199,13 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name, PMC *new_cl
 
 /*=for api objects Parrot_instantiate_object
  *
- * Create a new parrot object. Takes a passed-in class PMC that has
+ * Create a  parrot object. Takes a passed-in class PMC that has
  * sufficient information to describe the layout of the object and,
  * well, makes the darned object.
  *
  */
-PMC *
+void
 Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
-    PMC *new_object;
     PMC *new_object_array;
     INTVAL attrib_count;
     PMC *class_array;
@@ -228,16 +227,13 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     VTABLE_set_pmc_keyed_int(interpreter, new_object_array, 1,
                              VTABLE_get_pmc_keyed_int(interpreter, class_array, 1));
 
-    /* Allocate the object itself */
-    new_object = pmc_new(interpreter, enum_class_ParrotObject);
     /* Note the number of used slots */
-    new_object->cache.int_val = 2;
-    
-    PMC_data(new_object) = new_object_array;
-    PObj_flag_SET(is_PMC_ptr, new_object);
-    
+    object->cache.int_val = 2;
+
+    PMC_data(object) = new_object_array;
+    PObj_flag_SET(is_PMC_ptr, object);
+
     /* We really ought to call the class init routines here... */
-    return new_object;
 }
 
 PMC *
@@ -349,7 +345,7 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
 
     for (searchoffset = 0; NULL == method && searchoffset < classcount; searchoffset++) {
         curclass = VTABLE_get_pmc_keyed_int(interpreter, classsearch_array, searchoffset);
-        
+
         FQ_method = string_concat(interpreter, VTABLE_get_string(interpreter, VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(curclass), 1)), shortcut_name, 0);
         method = find_global(interpreter, FQ_method);
     }

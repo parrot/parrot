@@ -42,5 +42,20 @@ pmclass ParrotClass need_ext {
     PObj_flag_SET(is_PMC_ptr, SELF);
   }
 
+    INTVAL isa(STRING * classname) {
+	PMC *class = Parrot_class_lookup(interpreter, classname);
+	if (PMC_IS_NULL(class))
+	    return 0;
+        return Parrot_object_isa(INTERP, SELF, class);
+    }
+
+    /* Figure out which method PMC we need. By default we just defer to the
+     * system method lookup code
+     */
+    PMC* find_method(STRING* name) {
+	PMC *class = VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), 0);
+	return Parrot_find_method_with_cache(INTERP, class, name);
+    }
+
 
 }

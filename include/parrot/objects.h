@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_OBJECTS_H_GUARD) 
+#if !defined(PARROT_OBJECTS_H_GUARD)
 #define PARROT_OBJECTS_H_GUARD
 
 #include "parrot/parrot.h"
@@ -25,7 +25,7 @@ void Parrot_class_register(Parrot_Interp, STRING *, PMC *);
 PMC *Parrot_add_parent(Parrot_Interp, PMC *, PMC *);
 PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);
 PMC *Parrot_multi_subclass(Parrot_Interp, PMC *, STRING *);
-PMC *Parrot_instantiate_object(Parrot_Interp, PMC *);
+void Parrot_instantiate_object(Parrot_Interp, PMC *);
 INTVAL Parrot_object_isa(Parrot_Interp interpreter, PMC *, PMC *);
 PMC *Parrot_new_method_cache(Parrot_Interp);
 PMC *Parrot_find_method_with_cache(Parrot_Interp, PMC *, STRING *);

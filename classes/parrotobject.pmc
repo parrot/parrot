@@ -29,22 +29,9 @@
 
 */
 
-pmclass ParrotObject need_ext {
+pmclass ParrotObject extends ParrotClass need_ext {
 
-    INTVAL type() {		/* pmc2c.pl doesn't like empty classes */
-	return SELF->vtable->base_type;
-    }
-
-    INTVAL isa(STRING * classname) {
-        return Parrot_object_isa(INTERP, SELF, classname);
-    }    
-
-    /* Figure out which method PMC we need. By default we just defer to the
-     * system method lookup code
-     */
-    PMC* find_method(STRING* name) {
-	PMC *class = VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), 0);
-	return Parrot_find_method_with_cache(INTERP, class, name);
+    void init() {
     }
 
 }
