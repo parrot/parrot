@@ -42,11 +42,14 @@ void Parrot_mmd_register_parents(Interp*, INTVAL, const MMD_init *, INTVAL);
 /*
  * DOD registry interface
  */
-void dod_register_pmc(Parrot_Interp, PMC*);
-void dod_unregister_pmc(Parrot_Interp, PMC*);
+void dod_register_pmc(Interp *, PMC*);
+void dod_unregister_pmc(Interp *, PMC*);
 
 /* multi method fallbacks */
-void register_fallback_methods(Parrot_Interp);
+void register_fallback_methods(Interp *);
+
+/* mro creation */
+void Parrot_create_mro(Interp *, INTVAL);
 
 #endif /* PARROT_PMC_H_GUARD */
 

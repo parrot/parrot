@@ -886,6 +886,9 @@ EOC
         int my_enum_class_$dynclass = Parrot_PMC_typenum(interp, "$dynclass");
 EOC
     }
+        $cout .= <<"EOC";
+        Parrot_create_mro(interp, entry);
+EOC
     # init MMD "right" slots with the dynpmc types
     foreach my $entry (@init_mmds) {
         if ($entry->[1] eq $classname) {

@@ -667,6 +667,18 @@ op hash(out INT, in PMC) {
   goto NEXT();
 }
 
+=item B<get_mro>(out PMC, in PMC)
+
+Set $1 to the mro array of the PMC $2. Please note that this is a
+direct reference so messing with it can do harm to the method lookup.
+
+=cut
+
+op get_mro(out PMC, in PMC) {
+  $1 = $2->vtable->mro;
+  goto NEXT();
+}
+
 =back
 
 

@@ -83,6 +83,7 @@ END
 
     print OUT <<"END";
 
+static void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 void Parrot_initialize_core_pmcs(Interp *interp)
 {
@@ -99,11 +100,16 @@ END
       foreach (@pmcs[0..$#pmcs-1]);
     print OUT <<"END";
 	if (!pass) {
+	    PMC *classname_hash;
 	    /* Need an empty stash */
 	    interp->globals = mem_sys_allocate(sizeof(struct Stash));
 	    interp->globals->stash_hash =
-		pmc_new(interp, enum_class_PerlHash);
+		pmc_new(interp, enum_class_Hash);
 	    interp->globals->parent_stash = NULL;
+            /* We need a class hash */
+            interp->class_hash = classname_hash =
+                pmc_new(interp, enum_class_Hash);
+	    Parrot_register_core_pmcs(interp, classname_hash);
 	}
     }
 }
@@ -114,8 +120,8 @@ static void register_pmc(Interp *interp, PMC* registry, int pmc_id)
     VTABLE_set_integer_keyed_str(interp, registry, key, pmc_id);
 }
 
-extern void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
-void Parrot_register_core_pmcs(Interp *interp, PMC* registry)
+static void
+Parrot_register_core_pmcs(Interp *interp, PMC* registry)
 {
 END
 

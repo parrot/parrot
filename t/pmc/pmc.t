@@ -17,7 +17,7 @@ Contains a lot of Perl PMC related tests.
 
 =cut
 
-use Parrot::Test tests => 97;
+use Parrot::Test tests => 98;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2652,5 +2652,24 @@ ok 2
 ok 3
 OUT
 
+output_is(<<'CODE', <<'OUT', "get_mro");
+    new P0, .PerlInt
+    get_mro P1, P0
+    print "ok 1\n"
+    elements I1, P1
+    null I0
+loop:
+    set P2, P1[I0]
+    classname S0, P2
+    print S0
+    print "\n"
+    inc I0
+    lt I0, I1, loop
+    end
+CODE
+ok 1
+PerlInt
+Integer
+OUT
 
 1;

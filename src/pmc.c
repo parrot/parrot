@@ -376,10 +376,11 @@ pmc_register(Parrot_Interp interp, STRING *name)
         Parrot_base_vtables = new_vtable_table;
         class_table_size = new_max;
     }
-
+    /* set entry in name->type hash */
     VTABLE_set_integer_keyed_str(interp, classname_hash, name, type);
 
     UNLOCK(class_count_mutex);
+
     return type;
 }
 
@@ -420,6 +421,48 @@ Register MMD functions for this PMC type and for its parent
 
 
 void
+Parrot_create_mro(Interp *interpreter, INTVAL type)
+{
+    VTABLE *vtable;
+    STRING *class_name;
+    INTVAL pos, len, parent_type;
+    PMC *class, *mro;
+
+    vtable = Parrot_base_vtables[type];
+    mro = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    vtable->mro = mro;
+    class_name = vtable->whoami;
+    for (pos = 0; ;) {
+        len = string_length(interpreter, class_name);
+        pos += len + 1;
+        parent_type = pmc_type(interpreter, class_name);
+        if (!parent_type)   /* abstract classes don't have a vtable */
+            break;
+        class = Parrot_base_vtables[parent_type]->class;
+        if (!class) {
+            /*
+             * class interface - a PMC is it's own class
+             * put an instance of this PMC into class
+             */
+            class = get_new_pmc_header(interpreter, parent_type,
+                    PObj_constant_FLAG);
+            Parrot_base_vtables[parent_type]->class = class;
+            PMC_pmc_val(class)   = (void*)0xdeadbeef;
+            PMC_struct_val(class)= (void*)0xdeadbeef;
+        }
+        VTABLE_push_pmc(interpreter, mro, class);
+        if (pos >= (INTVAL)string_length(interpreter, vtable->isa_str))
+            break;
+        len = string_str_index(interpreter, vtable->isa_str,
+                CONST_STRING(interpreter, " "), pos);
+        if (len == -1)
+            break;
+        class_name = string_substr(interpreter, vtable->isa_str, pos,
+                len - pos, NULL, 0);
+    }
+}
+
+void
 Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
         const MMD_init *mmd_table, INTVAL n)
 {
@@ -429,16 +472,6 @@ Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
     INTVAL pos, len, parent_type;
     PMC *class;
     UINTVAL func_nr;
-    /*
-     * class interface - a PMC is it's own class
-     * XXX use a separate vtable entry?
-     *
-     * put an instance of this PMC into data
-     */
-    class = get_new_pmc_header(interpreter, type, PObj_constant_FLAG);
-    vtable->class = class;
-    PMC_pmc_val(class)   = (void*)0xdeadbeef;
-    PMC_struct_val(class)= (void*)0xdeadbeef;
     /*
      * register default mmds for this type
      */

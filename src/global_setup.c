@@ -26,7 +26,6 @@ I<What are these global variables?>
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
 extern void Parrot_initialize_core_pmcs(Interp *interp);
-extern void Parrot_register_core_pmcs(Interp *interp, PMC *registry);
 
 /*
 
@@ -70,15 +69,6 @@ init_world(Interp *interpreter)
 
     /* Call base vtable class constructor methods */
     Parrot_initialize_core_pmcs(interpreter);
-
-    /* Now register the names of the PMCs */
-
-    /* We need a class hash */
-    interpreter->class_hash = classname_hash =
-        pmc_new(interpreter, enum_class_Hash);
-
-    /* Now fill the hash */
-    Parrot_register_core_pmcs(interpreter, classname_hash);
 
     /* init the interpreter globals array */
     iglobals = pmc_new(interpreter, enum_class_SArray);
