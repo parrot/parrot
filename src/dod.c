@@ -42,8 +42,19 @@ static int trace_children(struct Parrot_Interp *interpreter, PMC *current);
 static PARROT_INLINE void
 mark_special(Parrot_Interp interpreter, PMC* obj)
 {
+    int hi_prio;
+
+    if (PObj_needs_early_DOD_TEST(obj))
+        ++interpreter->num_early_PMCs_seen;
+    if (PObj_high_priority_DOD_TEST(obj) && interpreter->dod_trace_ptr) {
+        /* set obj's parent to high priority */
+        PObj_high_priority_DOD_SET(interpreter->dod_trace_ptr);
+        hi_prio = 1;
+    }
+    hi_prio = 0;
+
     if (obj->pmc_ext) {
-        if (PObj_high_priority_DOD_TEST(obj) && interpreter->dod_trace_ptr) {
+        if (hi_prio) {
             PMC* tptr = interpreter->dod_trace_ptr;
             if (tptr->next_for_GC == tptr) {
                 obj->next_for_GC = obj;
@@ -79,17 +90,15 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
     UINTVAL *dod_flags = arena->dod_flags + ns;
     if (*dod_flags & ((PObj_on_free_list_FLAG | PObj_live_FLAG) << nm))
         return;
-    if (PObj_high_priority_DOD_TEST(obj) && interpreter->dod_trace_ptr)
-        /* set obj's parent to high priority */
-        PObj_high_priority_DOD_SET(interpreter->dod_trace_ptr);
 
     ++arena->live_objects;
     *dod_flags |= PObj_live_FLAG << nm;
 
-    if (PObj_needs_early_DOD_TEST(obj))
-        ++interpreter->num_early_PMCs_seen;
-
     if (*dod_flags & (PObj_is_special_PMC_FLAG << nm)) {
+        /* all PMCs that need special treatment are handled here
+         * for normal PMCs, we don't touch the PMC memory itself
+         * so that caches stay clean
+         */
         mark_special(interpreter, (PMC*) obj);
     }
 }
@@ -115,12 +124,8 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
     }
 #  endif
 #endif
-    if (PObj_high_priority_DOD_TEST(obj) && interpreter->dod_trace_ptr)
-        PObj_high_priority_DOD_SET(interpreter->dod_trace_ptr);
     /* mark it live */
     PObj_live_SET(obj);
-    if (PObj_needs_early_DOD_TEST(obj))
-        ++interpreter->num_early_PMCs_seen;
 
     /* if object is a PMC and contains buffers or PMCs, then attach
      * the PMC to the chained mark list

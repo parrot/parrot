@@ -346,9 +346,6 @@ typedef enum PObj_enum {
 #define PObj_report_SET(o) PObj_flag_SET(report, o)
 #define PObj_report_CLEAR(o) PObj_flag_CLEAR(report, o)
 
-#define PObj_high_priority_DOD_TEST(o)   PObj_flag_TEST(high_priority_DOD, o)
-#define PObj_high_priority_DOD_SET(o)     PObj_flag_SET(high_priority_DOD, o)
-#define PObj_high_priority_DOD_CLEAR(o) PObj_flag_CLEAR(high_priority_DOD, o)
 
 #define PObj_on_free_list_TEST(o) DOD_flag_TEST(on_free_list, o)
 #define PObj_on_free_list_SET(o) DOD_flag_SET(on_free_list, o)
@@ -370,19 +367,21 @@ typedef enum PObj_enum {
 #define PObj_sysmem_SET(o) PObj_flag_SET(sysmem, o)
 #define PObj_sysmem_CLEAR(o) PObj_flag_CLEAR(sysmem, o)
 
-#define PObj_needs_early_DOD_TEST(o) PObj_flag_TEST(needs_early_DOD, o)
-#define PObj_needs_early_DOD_SET(o) PObj_flag_SET(needs_early_DOD, o)
-#define PObj_needs_early_DOD_CLEAR(o) PObj_flag_CLEAR(needs_early_DOD, o)
 
 #define PObj_special_SET(flag, o) do { \
     PObj_flag_SET(flag, o); \
     DOD_flag_SET(is_special_PMC, o); \
 } while(0)
+
 #define PObj_special_CLEAR(flag, o) do { \
     PObj_flag_CLEAR(flag, o); \
     if ((PObj_get_FLAGS(o) & \
-                (PObj_active_destroy_FLAG | PObj_is_PMC_ptr_FLAG | \
-                PObj_is_buffer_ptr_FLAG)) || \
+                (PObj_active_destroy_FLAG | \
+                 PObj_custom_mark_FLAG | \
+                 PObj_is_PMC_ptr_FLAG | \
+                 PObj_needs_early_DOD_FLAG | \
+                 PObj_is_buffer_of_PMCs_ptr_FLAG | \
+                 PObj_is_buffer_ptr_FLAG)) || \
             (PObj_is_PMC_TEST(o) && \
              ((struct PMC*)(o))->pmc_ext && \
              ((struct PMC*)(o))->metadata)) \
@@ -390,14 +389,25 @@ typedef enum PObj_enum {
     else \
         DOD_flag_CLEAR(is_special_PMC, o); \
 } while (0)
+
 #define PObj_is_special_PMC_TEST(o) DOD_flag_TEST(is_special_PMC, o)
 #define PObj_is_special_PMC_SET(o) DOD_flag_SET(is_special_PMC, o)
 
 #define PObj_is_buffer_ptr_SET(o) PObj_special_SET(is_buffer_ptr, o)
 #define PObj_is_buffer_ptr_CLEAR(o) PObj_special_CLEAR(is_buffer_ptr, o)
 
-#define PObj_is_buffer_of_PMCs_ptr_SET(o) PObj_flag_SET(is_buffer_of_PMCs_ptr, o)
-#define PObj_is_buffer_of_PMCs_ptr_CLEAR(o) PObj_flag_CLEAR(is_buffer_of_PMCs_ptr, o)
+#define PObj_is_buffer_of_PMCs_ptr_SET(o) \
+    PObj_special_SET(is_buffer_of_PMCs_ptr, o)
+#define PObj_is_buffer_of_PMCs_ptr_CLEAR(o) \
+    PObj_special_CLEAR(is_buffer_of_PMCs_ptr, o)
+
+#define PObj_needs_early_DOD_TEST(o) PObj_flag_TEST(needs_early_DOD, o)
+#define PObj_needs_early_DOD_SET(o) PObj_special_SET(needs_early_DOD, o)
+#define PObj_needs_early_DOD_CLEAR(o) PObj_special_CLEAR(needs_early_DOD, o)
+
+#define PObj_high_priority_DOD_TEST(o)   PObj_flag_TEST(high_priority_DOD, o)
+#define PObj_high_priority_DOD_SET(o)     PObj_special_SET(high_priority_DOD, o)
+#define PObj_high_priority_DOD_CLEAR(o) PObj_special_CLEAR(high_priority_DOD, o)
 
 #define PObj_custom_mark_SET(o)   PObj_special_SET(custom_mark, o)
 #define PObj_custom_mark_CLEAR(o)   PObj_special_CLEAR(custom_mark, o)
