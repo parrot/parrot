@@ -250,8 +250,6 @@ Note that language-agnostic utilities are at liberty to ignore this entry.
 
 =head2 Parrot Magic Cookies (PMCs)
 
-=over 4
-
 Parrot Magic Cookies, or PMCs, are the last of Parrot's basic datatypes,
 but are also potentially the most important. Their basic structure is
 as follows. All PMCs have the form:
