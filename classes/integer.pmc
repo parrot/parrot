@@ -18,4 +18,27 @@ pmclass Integer extends mmd_default {
     void init() {	/* pmc2c doesn't like empty classes */
 	SUPER();
     }
+    void set_integer_native(INTVAL value) {
+      SELF->cache.int_val = value;
+    } 
+
+    void set_number_native(FLOATVAL value) {
+      SELF->cache.int_val = value;
+    }
+
+    void set_string_native(STRING* value) {
+      SELF->cache.int_val = string_to_num(value);
+    }
+
+    FLOATVAL get_number() {
+      return SELF->cache.int_val;
+    }
+
+   INTVAL get_integer() {
+      return (INTVAL)SELF->cache.int_val;
+   }
+
+   STRING* get_string() {
+      return string_from_num(INTERP, SELF->cache.int_val);
+   }
 }
