@@ -43,8 +43,12 @@ All SDL::Surface objects have the following methods:
 .sub _initialize @LOAD
 	.local pmc   surface_class
 
+	$I0 = find_type 'SDL::Surface'
+	if $I0 > 1 goto END
+
 	newclass     surface_class, 'SDL::Surface'
 	addattribute surface_class, 'surface'
+END:
 
 .end
 
@@ -58,39 +62,36 @@ The name of this method may change, per discussion on p6i.
 
 =cut
 
-.sub _new method
+.sub create method
 	.param pmc args
 
-	.local pmc  fetch_layout
-	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
-
-	.local pmc layout
-	layout  = fetch_layout( 'Surface' )
-
-	.local pmc surface
-	surface = new ManagedStruct, layout
-
-	.local int height
+	if argcP != 0 goto OK
+	print "no surface parameters!\n"
+	branch END
+OK:
+	.local pmc SDL_CreateRGBSurface
+	.local int flags
 	.local int width
-	.local int x
-	.local int y
-
-	set height, args['height']
-	set surface['h'], height
-
-	set width, args['width']
-	set surface['w'], width
-
-	set x, args['x']
-	set surface['x'], x
-
-	set y, args['y']
-	set surface['y'], y
-
-	.local int offset
-	classoffset offset, self, 'SDL::Surface'
-	setattribute self, offset, surface
-
+	.local int height
+	.local int depth
+	.local int r
+	.local int g
+	.local int b
+	.local int a
+	
+	flags = args["flags"]
+	width = args["width"]
+	height = args["height"]
+	depth = args["depth"]
+	r = args["Rmask"]
+	g = args["Gmask"]
+	b = args["Bmask"]
+	a = args["Amask"]
+	
+	SDL_CreateRGBSurface = find_global 'SDL::NCI', 'CreateRGBSurface'
+	$P0 = SDL_CreateRGBSurface( flags, width, height, depth, r, g, b, a )
+	self."wrap_surface"( $P0 )
+END:
 .end
 
 =item new_from_surface( raw_surface )
@@ -359,6 +360,10 @@ understand.
 	.param pmc surface
 	.param pmc source
 	.param pmc dest
+
+	if argcP == 3 goto OK
+	print "SDL::Surface::blit: Warning: wrong parameter count\n"
+OK:
 
 	.local pmc SDL_BlitSurface
 	SDL_BlitSurface = find_global 'SDL::NCI', 'BlitSurface'
