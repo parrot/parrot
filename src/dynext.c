@@ -99,16 +99,13 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
 #ifndef RUNTIME_DYNEXT
 #  define RUNTIME_DYNEXT "runtime/parrot/dynext/"
 #endif
-#ifndef SO_EXTENSION
-#  define SO_EXTENSION ".so"
-#endif
 
     /*
      * first look in current dir
      */
     path = Parrot_sprintf_c(interpreter, "%Ss%s",
             lib,
-            SO_EXTENSION);
+            PARROT_DLL_EXTENSION);
     cpath = string_to_cstring(interpreter, path);
     *handle = Parrot_dlopen(cpath);
     if (!*handle) {
@@ -120,7 +117,7 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
         path = Parrot_sprintf_c(interpreter, "%s%Ss%s",
                 RUNTIME_DYNEXT,
                 lib,
-                SO_EXTENSION);
+                PARROT_DLL_EXTENSION);
         cpath = string_to_cstring(interpreter, path);
         *handle = Parrot_dlopen(cpath);
     }
