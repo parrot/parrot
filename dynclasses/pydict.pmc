@@ -152,7 +152,7 @@ is not specified, it defaults to C<None>.
 
         if (REG_INT(3) < 3) value = pmc_new(INTERP, PyBuiltin_PyNone);
 
-        while (VTABLE_get_bool(INTERP, iter)) {       
+        while (VTABLE_get_bool(INTERP, iter)) {
             PMC *key = VTABLE_shift_pmc(INTERP, iter);
             VTABLE_set_pmc_keyed(INTERP, ret, key, value);
         }
@@ -231,8 +231,9 @@ Returns the PMC value for the element at C<*key>.
             PMC *ret;
             STRING *s = hash_get_idx(INTERP, hash, key);
             if (s->obj.flags & KEY_integer_FLAG) {
+                INTVAL i;
                 ret = pmc_new(INTERP, PyBuiltin_PyInt);
-                INTVAL i = string_to_int(INTERP, s);
+                i = string_to_int(INTERP, s);
                 VTABLE_set_integer_native(INTERP, ret, i);
             }
             else {
@@ -299,7 +300,7 @@ Returns a string representation of the dictionary.
             PMC *key = VTABLE_shift_pmc(INTERP, iter);
             PMC *val = SELF.get_pmc_keyed(key);
 
-            res = string_append(INTERP, res, 
+            res = string_append(INTERP, res,
                     VTABLE_get_repr(INTERP, key), 0);
             res = string_append(INTERP, res,
                     const_string(INTERP, ": "), 0);
