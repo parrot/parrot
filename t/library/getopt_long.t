@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2004-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -21,9 +21,12 @@ use strict;
 use Parrot::Test tests => 1;
 
 # no. 1
-output_is(<<'CODE', <<'OUT', "basic long options");
-##PIR##
-.sub _main 
+pir_output_is( <<'CODE', <<'OUT', "basic long options" );
+
+# A dummy implementation of Getopt::Long
+.include "library/Getopt/Long.imc"
+
+.sub test @MAIN 
 
   # Assemble specification for get_options
   # in an array of format specifiers
@@ -120,12 +123,7 @@ output_is(<<'CODE', <<'OUT', "basic long options");
   CHECK_OTHER_ARG_LOOP:
   if cnt_other_args < num_other_args goto REDO_OTHER_ARG_LOOP
   print "All args have been parsed.\n"
-
-  end
 .end
-
-# A dummy implementation of Getopt::Long
-.include "library/Getopt/Long.imc"
 
 CODE
 getopt_long.t 0.01
@@ -140,8 +138,10 @@ OUT
 
 =head1 AUTHOR
 
-Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
+Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
 F<runtime/parrot/library/Getopt/Long.imc>
+
+=cut

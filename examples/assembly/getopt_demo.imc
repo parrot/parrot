@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2004-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -16,17 +16,20 @@ examples/assembly/getopt_demo.imc - demonstrating library/Getopt/Long.imc
 This demo program shows how to handle command line arguments with the
 PIR library F<runtime/parrot/library/Getopt/Long.imc>.
 
+=cut
+
+# A dummy implementation of Getopt::Long
+.include "library/Getopt/Long.imc"
+
 =head1 SUBROUTINES
 
-=over 4
-
-=item C<_main>
+=head2 main
 
 This is executed when you call F<getopt_demo.imc>.
 
 =cut
 
-.sub _main 
+.sub main @MAIN 
   .param pmc argv
 
   # Assemble specification for get_options
@@ -62,14 +65,14 @@ This is executed when you call F<getopt_demo.imc>.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "getopt_demo.imc version 0.02\n"
+    print "getopt_demo.imc 0.03\n"
     end
   NO_VERSION_FLAG:
 
   # Was '--help' passed ?
   is_defined = defined opt["help"]
   unless is_defined goto NO_HELP_FLAG
-    _usage( program_name )
+    usage( program_name )
     end
   NO_HELP_FLAG:
 
@@ -130,13 +133,9 @@ This is executed when you call F<getopt_demo.imc>.
   CHECK_OTHER_ARG_LOOP:
   if cnt_other_args < num_other_args goto REDO_OTHER_ARG_LOOP
   print "All args have been parsed.\n"
-
-  # Do a lot of useful stuff here
-
-  end
 .end
 
-=item C<_usage>
+=head2 usage
 
 Print the usage message.
 
@@ -144,7 +143,7 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 =cut
 
-.sub _usage prototyped
+.sub usage 
   .param string program_name
 
   print "Usage: ./parrot "
@@ -163,15 +162,12 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
   print "      --bool                   a boolean option\n"
 .end
 
-# A dummy implementation of Getopt::Long
-.include "library/Getopt/Long.imc"
-
-=back
-
 =head1 AUTHOR
 
-Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
+Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
 F<runtime/parrot/library/Getopt/Long.imc>
+
+=cut

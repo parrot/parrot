@@ -34,11 +34,14 @@ library/Getopt/Long.imc - parse long and short command line options
   .local string s
   s = opt["string"]
 
-
 =head1 DESCRIPTION
 
 This PIR library can be used for parsing command line options.
 A single subroutine, _get_options(), is provided.
+
+=cut
+
+.include "library/dumper.imc"
 
 =head1 SUBROUTINES
 
@@ -51,7 +54,7 @@ A Hash PMC is returned.
 
 =cut
 
-.sub _get_options prototyped
+.sub _get_options 
   .param pmc argv
   .param pmc spec
 
@@ -166,18 +169,17 @@ A Hash PMC is returned.
   FINISH_PARSE_ARGV:
   # Nothing to do here
 
-  .pcc_begin_return
-    .return opt
-  .pcc_end_return
+  .return ( opt )
 .end
-
-.include "library/dumper.imc"
 
 =head1 TODO
 
-Make it work for all cases, short options, long options and bundling
-Recognise type of return value: string, integer, binary, array, hash
-error reporting, more options
+- Put the code into the namespace 'Getopt::Long'.
+- Remove need to clone argument vector
+- Make it work for all cases, short options, long options and bundling.
+- Recognise type of return value: string, integer, binary, array, hash.
+- Get started on error reporting.
+- Provide more options
 
 =head1 AUTHOR
 
@@ -190,7 +192,7 @@ F<examples/assembly/getopt_demo.imc>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2003 The Perl Foundation.  All rights reserved.
+Copyright (C) 2003-2005 The Perl Foundation.  All rights reserved.
 This program is free software. It is subject to the same
 license as The Parrot Interpreter.
 
