@@ -132,6 +132,8 @@ typedef struct Parrot_Context {
 
 } parrot_context_t;
 
+struct _Thread_data;    /* in thread.h */
+
 /*
  * TODO: Parrot_Interp can use a Parrot_Context inline and we
  * can save/restore context with a single memcpy
@@ -233,6 +235,7 @@ typedef struct Parrot_Interp {
     int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
     struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
     struct QUEUE* task_queue;       /* per interpreter queue */
+    struct _Thread_data *thread_data;    /* thread specific items */
 } Interp;
 
 typedef enum {

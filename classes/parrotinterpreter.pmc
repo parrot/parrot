@@ -42,7 +42,8 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 	if (!PMC_IS_NULL(s->pmc_reg.registers[i])) {
 	    PMC *sp = s->pmc_reg.registers[i];
 	    /* special case, dont clone SELF again - ugly */
-	    if (sp->vtable->base_type == enum_class_ParrotInterpreter &&
+	    if ((sp->vtable->base_type == enum_class_ParrotInterpreter ||
+                 sp->vtable->base_type == enum_class_ParrotThread)     &&
 		    PMC_data(sp) == s)
 		d->pmc_reg.registers[i] = dest;
 	    else {
@@ -54,109 +55,30 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
     }
 }
 
-/*
- * copy / clone interpreter packfile / code
- * all resources are created in the destination interpreter
- */
-static void
-clone_code(Parrot_Interp d, Parrot_Interp s)
-{
-    Interp_flags_SET(d, PARROT_EXTERN_CODE_FLAG);
-    d->code = s->code;
-}
-
-/*
- * copied from parrotio.pmc - this ought to be a global
- * helper function
- */
-static void
-enter_nci_method(struct Parrot_Interp *interpreter, PMC *method_table,
-		 void *func, const char *name, const char *proto)
-{
-    PMC *method;
-
-    method = pmc_new(interpreter, enum_class_NCI);
-    VTABLE_set_string_keyed(interpreter, method, func,
-	    string_make(interpreter, proto, strlen(proto),
-		NULL, PObj_constant_FLAG|PObj_external_FLAG, NULL));
-    VTABLE_set_pmc_keyed_str(interpreter, method_table,
-	    string_make(interpreter, name,
-		strlen(name), NULL,
-		PObj_constant_FLAG|PObj_external_FLAG, NULL),
-	    method);
-}
-
-/*
- * the actual thread function
- */
-static void*
-thread_func(void *arg)
-{
-    PMC *self = (PMC*) arg;
-    Parrot_Interp interpreter = PMC_data(self);
-    runops(interpreter, (opcode_t *)self->cache.struct_val -
-			(opcode_t *)interpreter->code->byte_code);
-
-    return NULL;
-}
-
-static void
-thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
-{
-    PMC *ret_c;
-    clone_code(d, s);
-    /*
-     * provide a return continuation, so that CPS returns
-     * are working - create it in the new interpreters mem space
-     */
-    ret_c = pmc_new(d, enum_class_RetContinuation);
-    d->pmc_reg.registers[1] = ret_c;
-}
-
-/*
- * run the sub PMC in a separate thread using interpreter in dest_interp
- */
-static int
-thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
-{
-    Parrot_thread t;
-    Parrot_Interp interpreter = PMC_data(dest_interp);
-
-    dest_interp->cache.struct_val = sub->cache.struct_val;
-    thread_prepare_for_run(interpreter, interp);
-    /*
-     * for now create a detached thread - enough for testing
-     */
-    THREAD_CREATE_DETACHED(t, thread_func, dest_interp);
-    return 0;
-}
-
-void Parrot_NCI_class_init(Parrot_Interp, int);
-void Parrot_PerlHash_class_init(Parrot_Interp, int);
-void Parrot_PerlUndef_class_init(Parrot_Interp, int);
 
 pmclass ParrotInterpreter need_ext {
 
-    void class_init () {
-        PMC *method_table;
-
-        /* These classes are needed now so make sure they are inited */
-        Parrot_NCI_class_init(interp, enum_class_NCI);
-        Parrot_PerlHash_class_init(interp, enum_class_PerlHash);
-        Parrot_PerlUndef_class_init(interp, enum_class_PerlUndef);
-
-        method_table = pmc_new(INTERP, enum_class_PerlHash);
-
-        enter_nci_method(INTERP, method_table,
-                         F2DPTR(thread_run), "thread", "vIPP");
-        Parrot_base_vtables[enum_class_ParrotInterpreter]->method_table =
-	    method_table;
-    }
-
     void init () {
 	struct Parrot_Interp *new_interp;
-	new_interp = make_interpreter(INTERP, 0);
-	PMC_data(SELF) = new_interp;
+        /*
+         * init/init_pmc may be called internally (from thread reation in
+         * ParrotThread::init_pmc() or stand-alone
+         * so we check, if the interpreter is already setup
+         */
+        if (!PMC_data(SELF)) {
+            new_interp = make_interpreter(INTERP, 0);
+            PMC_data(SELF) = new_interp;
+        }
+	SELF->cache.struct_val = NULL;
+    }
+
+    void init_pmc (PMC *src) {
+	struct Parrot_Interp *new_interp;
+        struct Parrot_Interp *s = PMC_data(src);
+        if (!PMC_data(SELF)) {
+            new_interp = make_interpreter(s, 0);
+            PMC_data(SELF) = new_interp;
+        }
 	SELF->cache.struct_val = NULL;
     }
 
@@ -168,13 +90,18 @@ pmclass ParrotInterpreter need_ext {
 	return SELF->cache.struct_val;
     }
 
+    INTVAL get_integer () {
+        Parrot_Interp i = PMC_data(SELF);
+	return (INTVAL)i->thread_data->tid;
+    }
+
     void* invoke (void* next) {
 	struct Parrot_Interp * new_interp =
 	    (struct Parrot_Interp *)PMC_data(SELF);
 	/*
 	 * setup code
 	 */
-	thread_prepare_for_run(new_interp, interpreter);
+	pt_thread_prepare_for_run(new_interp, interpreter);
 	/* calculate offset and run */
 	runops(new_interp, (opcode_t *)SELF->cache.struct_val -
 		(opcode_t *)interpreter->code->byte_code);
@@ -224,18 +151,21 @@ pmclass ParrotInterpreter need_ext {
      * First attempt to make things running, and to see, where problmes
      * may arise.
      * Only minimal items are done yet
+     *
+     * XXX this should of course call Parrot_clone() and use freeze/thaw
      */
     void clone(PMC* dest) {
 	Parrot_Interp s = PMC_data(SELF);
 	Parrot_Interp d;
 
-	VTABLE_init(INTERP, dest);
+        /*
+         * clone may be called internally (from thread reation in
+         * ParrotThread::init_pmc() or stand-alone
+         * so we check, if the interpreter is already setup
+         */
+        if (!PMC_data(dest))
+            VTABLE_init_pmc(s, dest, SELF);
 	d = PMC_data(dest);
-	/*
-	 * first a sanity check
-	 */
-	if (d->parent_interpreter != s)
-	    internal_exception(1, "Wrong parent interpreter");
 
 	/*
 	 * copy register files
@@ -247,7 +177,7 @@ pmclass ParrotInterpreter need_ext {
 	 * profile, prederef, and JIT data
 	 */
 #if 0
-	clone_code(d, s);
+	pt_clone_code(d, s);
 #endif
 	/*
 	 * set flags and run core
@@ -256,3 +186,13 @@ pmclass ParrotInterpreter need_ext {
 	d->flags = s->flags;
     }
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

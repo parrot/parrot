@@ -276,6 +276,7 @@ INTERP_O_FILES = \
     $(SRC)/tsq$(O) \
     $(SRC)/longopt$(O) \
     $(SRC)/events$(O) \
+    $(SRC)/thread$(O) \
     $(SRC)/dynext$(O) \
     $(SRC)/utils$(O) \
     $(SRC)/vtables$(O) \
@@ -293,7 +294,7 @@ O_FILES = \
     $(ENCODING_O_FILES) \
     $(CHARTYPE_O_FILES) \
     $(IMCC_O_FILES)
-    
+
 OPS_FILES = ${ops} $(GEN_OPSFILES)
 
 ###############################################################################
@@ -378,10 +379,10 @@ help:
 	@echo "Following targets are available for the user:"
 	@echo ""
 	@echo "Executables:"
-	@echo "  all:               'parrot' and the documentation." 
+	@echo "  all:               'parrot' and the documentation."
 	@echo "                     This is the default."
-	@echo "  world:             'all' and 'parrot_utils'." 
-	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO) and $(PDB)" 
+	@echo "  world:             'all' and 'parrot_utils'."
+	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO) and $(PDB)"
 	@echo "  $(PDUMP):             Parrot Dumper"
 	@echo "  $(DIS):       Parrot Disassembler"
 	@echo "  $(PINFO):          Information about Parrot Bypte Code"
@@ -681,6 +682,8 @@ encoding/dbcs$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/events$(O) : $(GENERAL_H_FILES)
 
+$(SRC)/thread$(O) : $(GENERAL_H_FILES)
+
 $(SRC)/extend$(O) : $(GENERAL_H_FILES) $(INC)/extend.h
 
 $(SRC)/interpreter$(O) : $(SRC)/interpreter.c $(GENERAL_H_FILES) ${jit_h}
@@ -926,7 +929,7 @@ nokfile:
 #
 ###############################################################################
 
-clean : testclean progclean languages-clean docs-clean 
+clean : testclean progclean languages-clean docs-clean
 	${cg_r}
 	$(RM_F) *.s *~ $(FLUID_FILES) \
 	        examples/assembly/mops${exe} examples/assembly/mops.c \

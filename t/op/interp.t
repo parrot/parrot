@@ -252,12 +252,13 @@ output_is(<<'CODE', <<'OUTPUT', "thread 1");
 
     getinterp P2
     #
-    # set regs P5 = interp, P6 = sub
-    find_method P0, P2, "thread"
+    # set regs P5 = thread-interp, P6 = sub
     print "ok 1\n"
     find_global P6, "_foo"
     print "ok 2\n"
-    clone P5, P2
+    # create thread from interp P2
+    new P5, .ParrotThread, P2
+    find_method P0, P5, "thread"
     invoke	# start the thread
 
     print P7
@@ -270,16 +271,20 @@ output_is(<<'CODE', <<'OUTPUT', "thread 1");
     end
 
 .pcc_sub _foo:
-    set I5, 2
+    # check if vars a really separate
+    inc I5
     set S5, " thread\n"
     set P7, "hello from "
     print P7
     print I5
     print S5
-    typeof S0, P5
+    typeof S0, P2
     print S0
+    print " tid "
+    set I0, P2
+    print I0
     print "\n"
-    typeof S0, P6
+    typeof S0, P0
     print S0
     print "\n"
     invoke P1	# ret and be done with thread
@@ -290,7 +295,7 @@ ok 1
 ok 2
 from 1 interp
 hello from 2 thread
-ParrotInterpreter
+ParrotThread tid 1
 Sub
 from 1 interp
 OUTPUT

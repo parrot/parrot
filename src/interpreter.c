@@ -1018,6 +1018,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
      * the first or "master" interpreter is handling events and signals
      */
     SET_NULL_P(interpreter->task_queue, QUEUE*);
+    SET_NULL_P(interpreter->thread_data, _Thread_data *);
 
     Parrot_init_events(interpreter);
 

@@ -49,6 +49,9 @@
 #  define THREAD_CREATE_JOINABLE(t, func, arg) \
         pthread_create(&t, NULL, func, arg)
 
+#  define JOIN(t, ret) pthread_join(&t, &v)
+#  define DETACH(t)    pthread_detach(&t)
+
 typedef pthread_mutex_t Parrot_mutex;
 typedef pthread_cond_t Parrot_cond;
 typedef pthread_t Parrot_thread;

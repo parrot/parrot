@@ -1,0 +1,107 @@
+/* parrotthread.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     ParrotThread is a threaded ParrotInterpreter subclass
+ *  Data Structure and Algorithms:
+ *  History:
+ *     2003.12.18 leo initial rev
+ *  Notes:
+ *     Additionally to ParrotInterpreter a ParrotThread supports:
+ *
+ *     getinterp P2             # get current interpreter
+ *     new P0, .ParrotThread, P2        # create thread P0 from interp P2
+ *     set I0, P0               # get thread id
+ *
+ *     and these methods:
+ *
+ *     thread ()
+ *     join
+ *     detach
+ *     yield
+ *
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+#include <assert.h>
+
+/*
+ * copied from parrotio.pmc - this ought to be a global
+ * helper function
+ */
+static void
+enter_nci_method(struct Parrot_Interp *interpreter, PMC *method_table,
+		 void *func, const char *name, const char *proto)
+{
+    PMC *method;
+
+    method = pmc_new(interpreter, enum_class_NCI);
+    VTABLE_set_string_keyed(interpreter, method, func,
+	    string_make(interpreter, proto, strlen(proto),
+		NULL, PObj_constant_FLAG|PObj_external_FLAG, NULL));
+    VTABLE_set_pmc_keyed_str(interpreter, method_table,
+	    string_make(interpreter, name,
+		strlen(name), NULL,
+		PObj_constant_FLAG|PObj_external_FLAG, NULL),
+	    method);
+}
+
+void Parrot_NCI_class_init(Parrot_Interp, int);
+void Parrot_PerlHash_class_init(Parrot_Interp, int);
+void Parrot_PerlUndef_class_init(Parrot_Interp, int);
+
+pmclass ParrotThread extends ParrotInterpreter need_ext {
+
+    void class_init () {
+        PMC *method_table;
+
+        /* These classes are needed now so make sure they are inited */
+        Parrot_NCI_class_init(interp, enum_class_NCI);
+        Parrot_PerlHash_class_init(interp, enum_class_PerlHash);
+        Parrot_PerlUndef_class_init(interp, enum_class_PerlUndef);
+
+        method_table = pmc_new(INTERP, enum_class_PerlHash);
+
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(pt_thread_run), "thread", "vIPP");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(pt_thread_yield), "yield", "v");
+
+        Parrot_base_vtables[enum_class_ParrotThread]->method_table =
+	    method_table;
+    }
+
+    void init () {
+        /*
+         * protect interpreter creation and list handling
+         */
+        LOCK(interpreter_array_mutex);
+	SUPER();
+        pt_add_to_interpreters(interpreter, PMC_data(SELF));
+        UNLOCK(interpreter_array_mutex);
+    }
+
+    /*
+     * create a new thread by cloning the passed interpreter
+     */
+    void init_pmc (PMC *arg) {
+        LOCK(interpreter_array_mutex);
+        SUPER(arg);
+        pt_add_to_interpreters(PMC_data(arg), PMC_data(SELF));
+        UNLOCK(interpreter_array_mutex);
+        VTABLE_clone(INTERP, arg, SELF);
+    }
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

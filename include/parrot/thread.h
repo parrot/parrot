@@ -33,6 +33,9 @@
 #  define THREAD_CREATE_DETACHED(t, func, arg)
 #  define THREAD_CREATE_JOINABLE(t, func, arg)
 
+#  define JOIN(t, ret)
+#  define DETACH(t)
+
 #  define Parrot_mutex int
 #  define Parrot_cond int
 #  define Parrot_thread int
@@ -47,7 +50,46 @@ struct timespec {
 
 #endif
 
+#ifndef YIELD
+#  define YIELD
 #endif
+
+typedef enum {
+    THREAD_STATE_NEW,           /* initial after malloc */
+    THREAD_STATE_JOINABLE,      /* default */
+    THREAD_STATE_DETACHED,      /* i.e. non-joinable */
+    THREAD_STATE_JOINED,        /* JOIN was issued */
+    THREAD_STATE_FINISHED       /* the thread function has ended */
+} thread_state_enum;
+
+/*
+ * per interpreter thread data structure
+ */
+typedef struct _Thread_data {
+    Parrot_thread       thread;         /* pthread_t or such */
+    thread_state_enum   state;
+    UINTVAL             tid;            /* 0.. n-1 idx in interp array */
+} Thread_data;
+
+/*
+ * this global mutex protects the list of interpreters
+ */
+VAR_SCOPE Parrot_mutex                  interpreter_array_mutex;
+VAR_SCOPE struct Parrot_Interp          ** interpreter_array;
+VAR_SCOPE size_t                        n_interpreters;
+
+#endif
+
+/*
+ * thread.c interface functions
+ */
+int  pt_thread_run(Parrot_Interp, PMC* dest_interp, PMC* sub);
+void pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s);
+void pt_clone_code(Parrot_Interp d, Parrot_Interp s);
+void pt_add_to_interpreters(Parrot_Interp first, Parrot_Interp new_interp);
+void pt_thread_yield(void);
+void * pt_thread_join(UINTVAL);
+void pt_thread_detach(UINTVAL);
 
 /*
  * Local variables:
