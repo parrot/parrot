@@ -92,6 +92,7 @@ struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, void *
         new_chunk->prev = chunk_base;
         chunk_base->next = new_chunk;
         interpreter->stack_top = &new_chunk->entry[0];
+        chunk_base = new_chunk;
     }
 
     /* Remember the type */

@@ -8,7 +8,7 @@
 # Still to write: tests for (push|pop)_p(_c)?
 #                 tests for warp, unwarp and set_warp
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 output_is( <<"CODE", <<'OUTPUT', "pushi & popi" );
 @{[ set_int_regs( sub { $_[0]} )]}
@@ -143,6 +143,35 @@ Seem to have negative Nx
 Seem to have positive Nx after pop
 OUTPUT
 }
+
+# Test proper stack chunk handling
+output_is(<<CODE, <<'OUTPUT', 'save_i & restore_i');
+	set     I3, 1
+
+testloop:
+	set     I0, 0
+	set     I1, I3
+
+saveloop:
+	inc     I0
+	save    I0
+	ne      I0, I1, saveloop
+
+restoreloop:
+	restore I0
+	ne      I0, I1, error
+	dec	I1
+	ne      I1, 0, restoreloop
+	
+	add     I3, I3, 1
+	ne      I3, 769, testloop	# At least 3 stack chunks
+
+	print	"OK\\n"
+error:	end
+CODE
+OK
+OUTPUT
+
 
 # Now, to make it do BAD THINGS!
 output_is(<<"CODE",'No more I register frames to pop!','ENO I frames');
