@@ -105,7 +105,7 @@ prompt("What is your native opcode type?", 'opcode_t');
 
 unless( $c{debugging} ) {
 	$c{ld_debug} = ' ';
-	$c{cc_denug} = ' ';
+	$c{cc_debug} = ' ';
 }
 
 print <<"END";
