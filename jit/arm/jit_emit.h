@@ -959,31 +959,28 @@ void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     Parrot_jump_to_op_in_reg(jit_info, interpreter, r0);
 }
 
-/* Save registers for the current section */
+/* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-    struct Parrot_Interp * interpreter)
+Parrot_jit_emit_mov_mr(Parrot_jit_info_t *jit_info, char *mem, int reg)
 {
-    Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->int_registers_used;
-
-    while (i--)
-        if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_OUT) {
-        /* TODO complete this */
-        }
 }
 
+/* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-    struct Parrot_Interp *interpreter)
+Parrot_jit_emit_mov_rm(Parrot_jit_info_t *jit_info, int reg, char *mem)
 {
-    Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->int_registers_used;
+}
 
-    while (i--)
-        if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_IN) {
-        /* TODO complete this */
-        }
+/* move reg to mem (i.e. numreg) */
+void
+Parrot_jit_emit_mov_mr_n(Parrot_jit_info_t *jit_info, char *mem, int reg)
+{
+}
+
+/* move mem (i.e. numreg) to reg */
+void
+Parrot_jit_emit_mov_rm_n(Parrot_jit_info_t *jit_info, int reg, char *mem)
+{
 }
 
 #else

@@ -1615,6 +1615,7 @@ t/op/info.t
 t/op/integer.t
 t/op/interp.t
 t/op/jit.t
+t/op/jitn.t
 t/op/lexicals.t
 t/op/macro.t
 t/op/number.t

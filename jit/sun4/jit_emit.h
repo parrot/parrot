@@ -572,18 +572,28 @@ void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     emitm_nop(jit_info->native_ptr);
 }
 
+/* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-    struct Parrot_Interp *interpreter)
+Parrot_jit_emit_mov_mr(Parrot_jit_info_t *jit_info, char *mem, int reg)
 {
-/* TODO write me */
 }
 
+/* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-    struct Parrot_Interp * interpreter)
+Parrot_jit_emit_mov_rm(Parrot_jit_info_t *jit_info, int reg, char *mem)
 {
-/* TODO write me */
+}
+
+/* move reg to mem (i.e. numreg) */
+void
+Parrot_jit_emit_mov_mr_n(Parrot_jit_info_t *jit_info, char *mem, int reg)
+{
+}
+
+/* move mem (i.e. numreg) to reg */
+void
+Parrot_jit_emit_mov_rm_n(Parrot_jit_info_t *jit_info, int reg, char *mem)
+{
 }
 
 #else

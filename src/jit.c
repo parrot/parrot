@@ -253,6 +253,26 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
 
     /* While there is section */
     while (cur_section) {
+        /* for a reg_count of 1, we don't allocate a register, it's
+         * not worth the effort
+         */
+        /* XXX turning this code on breaks numerous tests because of wrong
+         * r_m directions ...
+         */
+#if 0
+        for (i = 0; i < NUM_REGISTERS; i++) {
+            if (cur_section->int_reg_count[i] == 1) {
+                cur_section->int_reg_count[i] = 0;
+                cur_section->int_reg_usage[i] = -1;
+            }
+#if FLOAT_REGISTERS_TO_MAP
+            if (cur_section->float_reg_count[i] == 1) {
+                cur_section->float_reg_count[i] = 0;
+                cur_section->float_reg_usage[i] = -1;
+            }
+#endif
+        }
+#endif
         /* Test register 0 first */
         if (cur_section->int_reg_count[0])
             cur_section->int_registers_used = 1;
@@ -295,7 +315,9 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                     /* Continue with the next register */
                     break;
                 }
+            }
 #if FLOAT_REGISTERS_TO_MAP
+            for (j = 0; j < i; j++) {
                 if (cur_section->float_reg_count[i] >
                     cur_section->float_reg_count[cur_section->
                                                  float_reg_usage[j]]) {
@@ -310,8 +332,8 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                     /* Continue with the next register */
                     break;
                 }
-#endif
             }
+#endif
         }
         /* Set the branch target of this section, that is the section where
          * the program execution continues, if it ends in a branch source we
@@ -403,10 +425,10 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
         for (i = 0; i < NUM_REGISTERS; i++)
             PIO_eprintf(interpreter, "%i ", cur_section->int_reg_count[i]);
         PIO_eprintf(interpreter, "\n\tInt register usage:\t");
-        for (i = 0; i < NUM_REGISTERS; i++)
+        for (i = 0; i < cur_section->int_registers_used; i++)
             PIO_eprintf(interpreter, "%i ", cur_section->int_reg_usage[i]);
         PIO_eprintf(interpreter, "\n\tInt register direction:\t");
-        for (i = 0; i < NUM_REGISTERS; i++)
+        for (i = 0; i < cur_section->int_registers_used; i++)
             PIO_eprintf(interpreter, "%i ", (int)cur_section->int_reg_dir[i]);
         PIO_eprintf(interpreter, "\n\tInt registers used:\t%i\n",
                     cur_section->int_registers_used);
@@ -414,10 +436,10 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
         for (i = 0; i < NUM_REGISTERS; i++)
             PIO_eprintf(interpreter, "%i ", cur_section->float_reg_count[i]);
         PIO_eprintf(interpreter, "\n\tFloat register usage:\t");
-        for (i = 0; i < NUM_REGISTERS; i++)
+        for (i = 0; i < cur_section->float_registers_used; i++)
             PIO_eprintf(interpreter, "%i ", cur_section->float_reg_usage[i]);
         PIO_eprintf(interpreter, "\n\tFloat register direction:\t");
-        for (i = 0; i < NUM_REGISTERS; i++)
+        for (i = 0; i < cur_section->float_registers_used; i++)
             PIO_eprintf(interpreter, "%i ",
                         (int)cur_section->float_reg_dir[i]);
         PIO_eprintf(interpreter, "\n\tFloat Registers used:\t%i\n",
@@ -433,6 +455,58 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
     return optimizer;
 }
 
+/* Load registers for the current section */
+static void
+Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
+                          struct Parrot_Interp * interpreter)
+{
+    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
+    int i;
+
+    for (i = sect->int_registers_used-1; i >= 0; --i)
+        if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_IN)
+            Parrot_jit_emit_mov_rm(jit_info, jit_info->intval_map[i],
+               (char*)&interpreter->ctx.int_reg.registers[
+               sect->int_reg_usage[i]]);
+#if FLOAT_REGISTERS_TO_MAP
+    for (i = sect->float_registers_used-1; i >= 0; --i)
+        if (sect->float_reg_dir[sect->float_reg_usage[i]] & PARROT_ARGDIR_IN)
+            Parrot_jit_emit_mov_rm_n(jit_info, jit_info->floatval_map[i],
+               (char*) &interpreter->ctx.num_reg.registers[
+               sect->float_reg_usage[i]]);
+#endif
+
+
+    /* The total size of the loads */
+    if (!sect->load_size)
+        sect->load_size =
+            jit_info->native_ptr -
+                (jit_info->arena.start +
+                    jit_info->arena.op_map[jit_info->op_i].offset);
+}
+
+/* Save registers for the current section */
+static void
+Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
+                          struct Parrot_Interp * interpreter)
+{
+    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
+    int i;
+
+    for (i = 0; i < sect->int_registers_used; ++i)
+        if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_OUT)
+            Parrot_jit_emit_mov_mr(jit_info,
+                (char*)&interpreter->ctx.int_reg.registers[
+                sect->int_reg_usage[i]], jit_info->intval_map[i]);
+#if FLOAT_REGISTERS_TO_MAP
+    for (i = 0; i < sect->float_registers_used; ++i)
+        if (sect->float_reg_dir[sect->float_reg_usage[i]] & PARROT_ARGDIR_OUT)
+            Parrot_jit_emit_mov_mr_n(jit_info,
+                (char*)&interpreter->ctx.num_reg.registers[
+                sect->float_reg_usage[i]], jit_info->floatval_map[i]);
+#endif
+
+}
 /*
 ** build_asm()
 */
@@ -444,41 +518,49 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     UINTVAL i;
     char *new_arena;
     void *prev_address;
-    /* FIXME allocate this for multiple interpreters */
-    static Parrot_jit_info_t jit_info;
+    Parrot_jit_info_t *jit_info;
     opcode_t cur_opcode_byte;
 
 
     /* XXX assume, we restart */
-    if (pc != code_start && interpreter->jit_info)
-        return (jit_f)D2FPTR(jit_info.arena.start);
+    if (pc != code_start && interpreter->jit_info) {
+        jit_info = interpreter->jit_info;
+        return (jit_f)D2FPTR(jit_info->arena.start);
+    }
+    if (!interpreter->jit_info)
+        jit_info = interpreter->jit_info =
+            mem_sys_allocate(sizeof(Parrot_jit_info_t));
 
-    interpreter->jit_info = &jit_info;
-    jit_info.optimizer = optimize_jit(interpreter, pc, code_start, code_end);
+    jit_info->optimizer = optimize_jit(interpreter, pc, code_start, code_end);
 
     /* Attach the register map to the jit_info structure */
-    jit_info.intval_map = intval_map;
+    jit_info->intval_map = intval_map;
 #if FLOAT_REGISTERS_TO_MAP
-    jit_info.floatval_map = floatval_map;
+    jit_info->floatval_map = floatval_map;
 #endif
 
 
     /* Byte code size in opcode_t's */
-    jit_info.arena.map_size = (code_end - code_start) + 1;
-    jit_info.arena.op_map =
+    jit_info->arena.map_size = (code_end - code_start) + 1;
+    jit_info->arena.op_map =
         (Parrot_jit_opmap_t *)mem_sys_allocate_zeroed(
-            jit_info.arena.map_size * sizeof(* (jit_info.arena.op_map)));
+            jit_info->arena.map_size * sizeof(* (jit_info->arena.op_map)));
 
 #if REQUIRES_CONSTANT_POOL
-    Parrot_jit_init_arenas(&jit_info);
+    Parrot_jit_init_arenas(jit_info);
 #else
-    jit_info.arena.size = 1024;
-    jit_info.native_ptr = jit_info.arena.start =
-        mem_sys_allocate_zeroed((size_t)jit_info.arena.size);
+    jit_info->arena.size = 1024;
+    /* estimate size needed
+     * 10 times pbc size seems to be enough for i386
+     */
+    if ((size_t)jit_info->arena.map_size * 10 > (size_t)jit_info->arena.size)
+        jit_info->arena.size = jit_info->arena.map_size * 10;
+    jit_info->native_ptr = jit_info->arena.start =
+        mem_sys_allocate_zeroed((size_t)jit_info->arena.size);
 #endif
 
-    jit_info.op_i = 0;
-    jit_info.arena.fixups = NULL;
+    jit_info->op_i = 0;
+    jit_info->arena.fixups = NULL;
 
     /*
      *   op_map holds the offset from arena.start
@@ -488,105 +570,105 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
      *  op_map:         3   0   0   15  0   0
      */
 
-    Parrot_jit_begin(&jit_info, interpreter);
+    Parrot_jit_begin(jit_info, interpreter);
 
     /* Set the offset of the first opcode */
-    jit_info.arena.op_map[jit_info.op_i].offset =
-        jit_info.native_ptr - jit_info.arena.start;
+    jit_info->arena.op_map[jit_info->op_i].offset =
+        jit_info->native_ptr - jit_info->arena.start;
 
     /* The first section */
-    jit_info.optimizer->cur_section = jit_info.optimizer->sections;
+    jit_info->optimizer->cur_section = jit_info->optimizer->sections;
 
-    while (jit_info.optimizer->cur_section) {
+    while (jit_info->optimizer->cur_section) {
         /* Load mapped registers for this section */
-        if (jit_info.optimizer->cur_section->type)
-            Parrot_jit_load_registers(&jit_info, interpreter);
+        if (jit_info->optimizer->cur_section->type)
+            Parrot_jit_load_registers(jit_info, interpreter);
 
         /* The first opcode for this section */
-        jit_info.cur_op = jit_info.optimizer->cur_section->begin;
+        jit_info->cur_op = jit_info->optimizer->cur_section->begin;
 
         /* The first opcode of each section doesn't have a previous one since
          * it's imposible to be sure which was it */
-        jit_info.prev_op = NULL;
+        jit_info->prev_op = NULL;
 
-        while (jit_info.cur_op <= jit_info.optimizer->cur_section->end) {
+        while (jit_info->cur_op <= jit_info->optimizer->cur_section->end) {
             /* Grow the arena early */
-            if (jit_info.arena.size <
-                (jit_info.arena.op_map[jit_info.op_i].offset + 100)) {
+            if (jit_info->arena.size <
+                (jit_info->arena.op_map[jit_info->op_i].offset + 100)) {
 #if REQUIRES_CONSTANT_POOL
-                Parrot_jit_extend_arena(&jit_info);
+                Parrot_jit_extend_arena(jit_info);
 #else
-                new_arena = mem_sys_realloc(jit_info.arena.start,
-                                            (size_t)jit_info.arena.size * 2);
-                jit_info.arena.size *= 2;
-                jit_info.native_ptr = new_arena +
-                    (jit_info.native_ptr - jit_info.arena.start);
-                jit_info.arena.start = new_arena;
+                new_arena = mem_sys_realloc(jit_info->arena.start,
+                                            (size_t)jit_info->arena.size * 2);
+                jit_info->arena.size *= 2;
+                jit_info->native_ptr = new_arena +
+                    (jit_info->native_ptr - jit_info->arena.start);
+                jit_info->arena.start = new_arena;
 #endif
             }
 
-            cur_opcode_byte = *jit_info.cur_op;
+            cur_opcode_byte = *jit_info->cur_op;
 
             /* Need to save the registers if there is a branch and is not to
              * the same section, I admit I don't like this, and it should be
              * really checking if the target section has the same registers
              * mapped too. */
-            if ((jit_info.optimizer->map_branch[jit_info.cur_op - code_start]
+            if ((jit_info->optimizer->map_branch[jit_info->cur_op - code_start]
                  == JIT_BRANCH_SOURCE) &&
-                (jit_info.optimizer->cur_section->branch_target !=
-                 jit_info.optimizer->cur_section))
-                Parrot_jit_save_registers(&jit_info, interpreter);
+                (jit_info->optimizer->cur_section->branch_target !=
+                 jit_info->optimizer->cur_section))
+                Parrot_jit_save_registers(jit_info, interpreter);
 
             /* Generate native code for current op */
-            (op_jit[cur_opcode_byte].fn) (&jit_info, interpreter);
+            (op_jit[cur_opcode_byte].fn) (jit_info, interpreter);
 
             /* Update the previous opcode */
-            jit_info.prev_op = jit_info.cur_op;
+            jit_info->prev_op = jit_info->cur_op;
 
             /* update op_i and cur_op accordingly */
-            jit_info.op_i +=
+            jit_info->op_i +=
                 interpreter->op_info_table[cur_opcode_byte].arg_count;
-            jit_info.cur_op +=
+            jit_info->cur_op +=
                 interpreter->op_info_table[cur_opcode_byte].arg_count;
 
             /* set the offset */
-            jit_info.arena.op_map[jit_info.op_i].offset =
-                jit_info.native_ptr - jit_info.arena.start;
+            jit_info->arena.op_map[jit_info->op_i].offset =
+                jit_info->native_ptr - jit_info->arena.start;
         }
 
         /* Save mapped registers back to the Parrot registers */
-        if (jit_info.optimizer->cur_section->type)
-            Parrot_jit_save_registers(&jit_info, interpreter);
+        if (jit_info->optimizer->cur_section->type)
+            Parrot_jit_save_registers(jit_info, interpreter);
 
         /* update the offset */
-        jit_info.arena.op_map[jit_info.op_i].offset =
-            jit_info.native_ptr - jit_info.arena.start;
+        jit_info->arena.op_map[jit_info->op_i].offset =
+            jit_info->native_ptr - jit_info->arena.start;
 
         /* Move to the next section */
-        jit_info.optimizer->cur_section =
-            jit_info.optimizer->cur_section->next;
+        jit_info->optimizer->cur_section =
+            jit_info->optimizer->cur_section->next;
     }
 
     /* Do fixups before converting offsets */
-    Parrot_jit_dofixup(&jit_info, interpreter);
+    Parrot_jit_dofixup(jit_info, interpreter);
 
     /* Convert offsets to pointers */
-    for (i = 0; i < jit_info.arena.map_size; i++) {
+    for (i = 0; i < jit_info->arena.map_size; i++) {
 
         /* Assuming native code chunks contain some initialization code,
          * the first op (and every other op) is at an offset > 0
          */
-        if (jit_info.arena.op_map[i].offset) {
-            jit_info.arena.op_map[i].ptr = (char *)jit_info.arena.start +
-                jit_info.arena.op_map[i].offset;
+        if (jit_info->arena.op_map[i].offset) {
+            jit_info->arena.op_map[i].ptr = (char *)jit_info->arena.start +
+                jit_info->arena.op_map[i].offset;
         }
     }
 
 #ifdef ARM
-    arm_sync_d_i_cache(jit_info.arena.start, jit_info.native_ptr);
+    arm_sync_d_i_cache(jit_info->arena.start, jit_info.native_ptr);
 #endif
 #ifdef PPC
-    ppc_sync_cache(jit_info.arena.start, jit_info.native_ptr);
+    ppc_sync_cache(jit_info->arena.start, jit_info.native_ptr);
 #endif
 
     /* assume gdb is available */
@@ -595,7 +677,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         Parrot_jit_debug(interpreter);
 #endif
 
-    return (jit_f)D2FPTR(jit_info.arena.start);
+    return (jit_f)D2FPTR(jit_info->arena.start);
 }
 
 /* Remember the current position in the native code for later update */

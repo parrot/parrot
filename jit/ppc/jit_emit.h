@@ -643,57 +643,32 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     }
 }
 
+/* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-    struct Parrot_Interp *interpreter)
+Parrot_jit_emit_mov_mr(Parrot_jit_info_t *jit_info, char *mem, int reg)
 {
-    Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->int_registers_used;
-
-    while (i--)
-        if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_IN) {
-            jit_emit_mov_rm_i(jit_info->native_ptr, jit_info->intval_map[i],
-                &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
-        }
-
-    i = cur_se->float_registers_used;
-    while (i--)
-      if (cur_se->float_reg_dir[cur_se->float_reg_usage[i]] &
-        PARROT_ARGDIR_IN) {
-            jit_emit_mov_rm_n(jit_info->native_ptr, jit_info->floatval_map[i],
-              &interpreter->ctx.num_reg.registers[cur_se->float_reg_usage[i]]);
-      }
-
-    /* The total size of the loads */
-    if (!jit_info->optimizer->cur_section->load_size)
-        jit_info->optimizer->cur_section->load_size = jit_info->native_ptr -
-            (jit_info->arena.start +
-                jit_info->arena.op_map[jit_info->op_i].offset);
+    jit_emit_mov_mr_i(jit_info->native_ptr, mem, reg);
 }
 
-/* Save registers for the current section */
+/* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-    struct Parrot_Interp * interpreter)
+Parrot_jit_emit_mov_rm(Parrot_jit_info_t *jit_info, int reg, char *mem)
 {
-    Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->int_registers_used;
+    jit_emit_mov_rm_i(jit_info->native_ptr, reg, mem);
+}
 
-    while (i--)
-        if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_OUT) {
-            jit_emit_mov_mr_i(jit_info->native_ptr,
-                &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]],
-                    jit_info->intval_map[i]);
-        }
+/* move reg to mem (i.e. numreg) */
+void
+Parrot_jit_emit_mov_mr_n(Parrot_jit_info_t *jit_info, char *mem, int reg)
+{
+    jit_emit_mov_mr_n(jit_info->native_ptr, mem, reg);
+}
 
-    i = cur_se->float_registers_used;
-    while (i--)
-      if (cur_se->float_reg_dir[cur_se->float_reg_usage[i]] &
-        PARROT_ARGDIR_OUT) {
-            jit_emit_mov_mr_n(jit_info->native_ptr,
-              &interpreter->ctx.num_reg.registers[cur_se->float_reg_usage[i]],
-                jit_info->floatval_map[i]);
-      }
+/* move mem (i.e. numreg) to reg */
+void
+Parrot_jit_emit_mov_rm_n(Parrot_jit_info_t *jit_info, int reg, char *mem)
+{
+    jit_emit_mov_rm_n(jit_info->native_ptr, reg, mem);
 }
 
 #else

@@ -26,6 +26,7 @@
 /* Scratch register. */
 
 #define ISR1 emit_EAX
+#define FSR1 0
 
 
 #define emit_b00 0
@@ -387,8 +388,8 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emitm_addb_i_r(pc, imm, reg) \
   emitm_alub_i_r(pc, 0x83, emit_b000, imm, reg)
 
-#define emitm_addl_r_r(pc, reg1, reg2) \
-  emitm_alul_r_r(pc, 0x01, reg1, reg2)
+#define jit_emit_add_rr(pc, reg1, reg2) \
+  emitm_alul_r_r(pc, 0x01, reg2, reg1)
 
 #define jit_emit_add_ri_i(pc, reg, imm)   \
   emitm_alul_i_r(pc, 0x81, emit_b000, imm, reg)
@@ -404,8 +405,8 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 /* SUBs */
 
-#define emitm_subl_r_r(pc, reg1, reg2) \
-  emitm_alul_r_r(pc, 0x29, reg1, reg2)
+#define jit_emit_sub_rr(pc, reg1, reg2) \
+  emitm_alul_r_r(pc, 0x29, reg2, reg1)
 
 #define emitm_subl_i_r(pc, imm, reg) \
   emitm_alul_i_r(pc, 0x81, emit_b101, imm, reg)
@@ -608,6 +609,8 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 /* Floating point ops */
 
 #define emitm_floatop 0xd8  /* 11011000 */
+#define jit_emit_dec_fsp(pc) { *((pc)++) = 0xD9; *((pc)++) = 0xF6; }
+#define jit_emit_inc_fsp(pc) { *((pc)++) = 0xD9; *((pc)++) = 0xF7; }
 
 #define emitm_fl_2(pc, mf, opa, opb, b, i, s, d) { \
   *((pc)++) = emitm_floatop | (mf << 1) | opa; \
@@ -635,23 +638,69 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emitm_fldl(pc, b, i, s, d) \
   emitm_fl_2(pc, emit_b10, 1, emit_b000, b, i, s, d)
 
+
 #define emitm_fstpl(pc, b, i, s, d) \
   emitm_fl_2(pc, emit_b10, 1, emit_b011, b, i, s, d)
 
 #define emitm_fstl(pc, b, i, s, d) \
   emitm_fl_2(pc, emit_b10, 1, emit_b010, b, i, s, d)
 
-/* Add ST(1) = ST(0) + ST(i); POP ST(0) */
+/* 0xD8 ops */
+#define emitm_fadd(pc, sti) emitm_fl_3(pc, emit_b000, emit_b000, sti)
+#define emitm_fmul(pc, sti) emitm_fl_3(pc, emit_b000, emit_b001, sti)
+/* Sub ST = ST - ST(i); */
+#define emitm_fsub(pc, sti) emitm_fl_3(pc, emit_b000, emit_b100, sti)
+
+/* 0xD9 ops */
+/* FLD ST,ST(i) */
+#define emitm_fld(pc, sti) emitm_fl_3(pc, emit_b001, emit_b000, sti)
+#define emitm_fldz(pc) { *((pc)++) = 0xd9; *((pc)++) = 0xee; }
+#define emitm_fld1(pc) { *((pc)++) = 0xd9; *((pc)++) = 0xe8; }
+
+/* FXCH ST,ST(i) */
+#define emitm_fxch(pc, sti) emitm_fl_3(pc, emit_b001, emit_b001, sti)
+
+/* 0xDA, 0xDB ops */
+/* FCMOV*, FCOMI PPRO */
+
+/* 0xDC like 0xD8 with reversed operands */
+
+/* 0xDD ops */
+/* FFree ST(i) */
+#define emitm_ffree(pc, sti) emitm_fl_3(pc, emit_b101, emit_b000, sti)
+
+/* FST ST(i) = ST */
+#define emitm_fst(pc, sti) emitm_fl_3(pc, emit_b101, emit_b010, sti)
+
+/* FSTP ST(i) = ST, POP */
+#define emitm_fstp(pc, sti) emitm_fl_3(pc, emit_b101, emit_b011, sti)
+
+/* FUCOM ST(i) <=> ST  unordered compares */
+#define emitm_fucom(pc, sti) emitm_fl_3(pc, emit_b101, emit_b100, sti)
+
+/* FUCOMP ST(i) <=> ST, POP */
+#define emitm_fucomp(pc, sti) emitm_fl_3(pc, emit_b101, emit_b101, sti)
+
+/* 0xDE ops */
+/* Add ST(i) = ST + ST(i); POP  */
 #define emitm_faddp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b000, sti)
 
-/* Add ST(1) = ST(0) - ST(i); POP ST(0) */
+/* Mul ST(i) = ST * ST(i); POP  */
+#define emitm_fmulp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b001, sti)
+
+/* SubR ST(i) = ST(i) / ST; POP  */
+#define emitm_fsubrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b100, sti)
+
+/* Sub ST(i) = ST - ST(i); POP  */
 #define emitm_fsubp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b101, sti)
 
-/* Add ST(1) = ST(0) * ST(i); POP ST(0) */
-#define emitm_fmulp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b001, sti)
+/* DivR ST(i) = ST(i) / ST(0); POP  */
+#define emitm_fdivrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b110, sti)
 
 /* Add ST(1) = ST(0) / ST(i); POP ST(0) */
 #define emitm_fdivp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b111, sti)
+
+/* 0xDF OPS: FCOMIP, FUCOMIP PPRO */
 
 /* Negate - called change sign */
 #define emitm_chs(pc) emitm_fl_4(pc, 0)
@@ -661,9 +710,11 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 /* Comparisions */
 
-#define emitm_fcom(pc, sti) emitm_fl_3(pc, emit_b010, emit_b010, sti)
+#define emitm_fcom(pc, sti) emitm_fl_3(pc, emit_b000, emit_b010, sti)
+#define emitm_fcomi(pc, sti) emitm_fl_3(pc, emit_b011, emit_b110, sti)
+#define emitm_fcomip(pc, sti) emitm_fl_3(pc, emit_b111, emit_b110, sti)
 
-#define emitm_fcomp(pc, sti) emitm_fl_3(pc, emit_b010, emit_b011, sti)
+#define emitm_fcomp(pc, sti) emitm_fl_3(pc, emit_b000, emit_b011, sti)
 
 #define emitm_fcompp(pc) { *((pc)++) = 0xde; *((pc)++) = 0xd9; }
 
@@ -673,14 +724,24 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emitm_fcomp_m(pc,b,i,s,d) \
   emitm_fl_2(pc, emit_b10, 0, emit_b011, b, i, s, d)
 
+/* ST -= real64 */
+#define emitm_fsub_m(pc,b,i,s,d) \
+  emitm_fl_2(pc, emit_b10, 0, emit_b100, b, i, s, d)
+#define emitm_fadd_m(pc,b,i,s,d) \
+  emitm_fl_2(pc, emit_b10, 0, emit_b000, b, i, s, d)
+
+/* ST *= real64 */
+#define emitm_fmul_m(pc,b,i,s,d) \
+  emitm_fl_2(pc, emit_b10, 0, emit_b001, b, i, s, d)
+
 /* Ops Needed to support loading EFLAGs for conditional branches */
 #define emitm_fstw(pc) emitm_fl_3(pc, emit_b111, emit_b100, emit_b000)
 
 #define emitm_sahf(pc) *((pc)++) = 0x9e
 
 /* Integer comparisions */
-#define emitm_cmpl_r_r(pc, reg1, reg2) \
-  emitm_alul_r_r(pc, 0x39, reg1, reg2)
+#define jit_emit_cmp_rr(pc, reg1, reg2) \
+  emitm_alul_r_r(pc, 0x39, reg2, reg1)
 
 #define emitm_cmpl_r_m(pc, reg, b, i, s, d) \
   emitm_alul_r_m(pc, 0x3b, reg, b, i, s, d)
@@ -755,41 +816,198 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define jit_emit_mov_mi_ii(pc, dest, immediate) \
   emitm_movl_i_m(pc, immediate, emit_None, emit_None, emit_None, dest)
 
-#define jit_emit_mov_rm_i(pc, reg, address) \
+#define jit_emit_mov_rm(pc, reg, address) \
   emitm_movl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_mov_mr_i(pc, address, reg) \
+#define jit_emit_mov_mr(pc, address, reg) \
   emitm_movl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_mul_rm_i(pc, reg, address) \
+#define jit_emit_mul_rm(pc, reg, address) \
   emitm_smull_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define emit_subl_r_m(pc, reg, address) \
-  emitm_subl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
+#define jit_emit_sub_rm(pc, reg, address) \
+  emitm_subl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
 #define emit_subl_m_r(pc, reg, address) \
   emitm_subl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define emit_addl_r_m(pc, reg, address) \
-  emitm_addl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
-
-#define emit_addl_m_r(pc, reg, address) \
+#define jit_emit_add_rm(pc, reg, address) \
   emitm_addl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define emit_cmpl_r_m(pc, reg, address) \
+#define jit_emit_cmp_rm(pc, reg, address) \
   emitm_cmpl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define emit_cmpl_m_r(pc, reg, address) \
+#define jit_emit_cmp_mr(pc, address, reg) \
   emitm_cmpl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
 #define jit_emit_fload_m_n(pc, address) \
   emitm_fldl(pc, emit_None, emit_None, emit_None, address)
 
-#define emit_fildl(pc, address) \
+#define jit_emit_fload_m_i(pc, address) \
   emitm_fildl(pc, emit_None, emit_None, emit_None, address)
 
 #define jit_emit_fstore_m_n(pc, address) \
   emitm_fstpl(pc, emit_None, emit_None, emit_None, address)
+
+/* high level routines, behave like real 2 register FP */
+
+/* mapped float registers numbers are ST(1)-ST(4).
+ * scratch register is ST(0)
+ */
+
+/* ST(i) <- numvar */
+#define jit_emit_mov_rm_n(pc, r, d) { \
+    emitm_fldl((pc), 0,0,0, d); \
+    emitm_fstp((pc), (r+1)); \
+}
+
+/* ST(i) <= INT_VAR */
+#define jit_emit_mov_ri_n(pc, r, i) { \
+    jit_emit_fload_m_i(pc, i); \
+    emitm_fstp((pc), (r+1)); \
+}
+/* NUM_REG(i) <= INT_CONST */
+#define jit_emit_mov_mi_ni(pc, mem, i) { \
+    jit_emit_fload_m_i(pc, i); \
+    jit_emit_fstore_m_n(pc, mem); \
+}
+
+/* numvar <- ST(i) */
+#define jit_emit_mov_mr_n(pc, d, r) { \
+    emitm_fld((pc), r); \
+    jit_emit_fstore_m_n((pc), d); \
+}
+
+/* ST(r1) <= ST(r2) */
+#define jit_emit_mov_rr_n(pc, r1, r2) \
+    if (r1 != r2) { \
+        if (r2) { \
+            emitm_fld((pc), r2); \
+            emitm_fstp((pc), (r1+1)); \
+        } \
+        else { \
+            emitm_fst((pc),r1); \
+        } \
+    }
+
+#define jit_emit_finit(pc) { *((pc)++) = 0xdb; *((pc)++) = 0xe3; }
+
+/* ST(i) += MEM */
+#define jit_emit_add_rm_n(pc, r, m) { \
+    if (r) { \
+        emitm_fxch(pc, r); \
+        emitm_fadd_m(pc, 0,0,0, m); \
+        emitm_fxch(pc, r); \
+    } else { \
+        emitm_fadd_m(pc, 0,0,0, m); \
+    } \
+}
+
+/* ST(r1) += ST(r2) */
+#define jit_emit_add_rr_n(pc, r1, r2) { \
+    if (r1 == r2) { \
+        emitm_fld(pc, r1); \
+        emitm_fadd(pc, 0); \
+        emitm_fstp(pc, (r1+1)); \
+    } \
+    else if (r1) { \
+        emitm_fxch(pc, r1); \
+        emitm_fadd(pc, r2); \
+        emitm_fxch(pc, r1); \
+    } \
+    else { \
+        emitm_fadd(pc, r2); \
+    } \
+}
+
+/* ST(i) -= MEM */
+#define jit_emit_sub_rm_n(pc, r, m) { \
+    if (r) { \
+        emitm_fxch(pc, r); \
+        emitm_fsub_m(pc, 0,0,0, m); \
+        emitm_fxch(pc, r); \
+    } else { \
+        emitm_fsub_m(pc, 0,0,0, m); \
+    } \
+}
+
+/* ST(r1) -= ST(r2) */
+#define jit_emit_sub_rr_n(pc, r1, r2) { \
+    if (r1 == r2) { \
+        emitm_fld(pc, r1); \
+        emitm_fsub(pc, 0); \
+        emitm_fstp(pc, (r1+1)); \
+    } \
+    else if (r1) { \
+        emitm_fxch(pc, r1); \
+        emitm_fsub(pc, r2); \
+        emitm_fxch(pc, r1); \
+    } \
+    else { \
+        emitm_fsub(pc, r2); \
+    } \
+}
+
+/* ST(i) *= MEM */
+#define jit_emit_mul_rm_n(pc, r, m) { \
+    if (r) { \
+        emitm_fxch(pc, r); \
+        emitm_fmul_m(pc, 0,0,0, m); \
+        emitm_fxch(pc, r); \
+    } else { \
+        emitm_fmul_m(pc, 0,0,0, m); \
+    } \
+}
+
+/* ST(r1) *= ST(r2) */
+#define jit_emit_mul_rr_n(pc, r1, r2) { \
+    if (r1 == r2) { \
+        emitm_fld(pc, r1); \
+        emitm_fmul(pc, 0); \
+        emitm_fstp(pc, (r1+1)); \
+    } \
+    else if (r1) { \
+        emitm_fxch(pc, r1); \
+        emitm_fmul(pc, r2); \
+        emitm_fxch(pc, r1); \
+    } \
+    else { \
+        emitm_fmul(pc, r2); \
+    } \
+}
+/* TODO config option, if fcomi* is available */
+/* compare ST(r) <-> mem */
+#define jit_emit_cmp_rm_n(pc, r, mem) { \
+    if (r) { \
+        emitm_fxch(pc, r); \
+        emitm_fcom_m(pc, emit_None, emit_None, emit_None, mem); \
+        emitm_fxch(pc, r); \
+    } \
+    else { \
+        emitm_fcom_m(pc, emit_None, emit_None, emit_None, mem); \
+    } \
+    emitm_fstw(pc); \
+    emitm_sahf(pc); \
+}
+
+/* compare ST(r1) <-> ST(r2) test FCOMI (=fcom,fstw,sahf) */
+#define jit_emit_cmp_rr_n(pc, r1, r2) { \
+    if (!r2 || (r1==r2)) { \
+        emitm_fld(pc, r1); \
+        emitm_fcomip(pc, (r2+1)); \
+    } \
+    else { \
+        if (r1) { \
+            emitm_fxch(pc, r1); \
+            emitm_fcomi(pc, r2); \
+            emitm_fxch(pc, r1); \
+        } \
+        else { \
+            emitm_fcomi(pc, r2); \
+        } \
+    } \
+}
+
 
 #define jit_emit_neg_m_i(pc, address) \
   emitm_negl_m(pc, emit_None, emit_None, emit_None, (long)address)
@@ -1000,6 +1218,32 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 
+#define jit_emit_end(pc) { \
+    jit_emit_add_ri_i(pc, emit_ESP, 4); \
+    emitm_popl_r(pc, emit_EDI); \
+    emitm_popl_r(pc, emit_EBX); \
+    emitm_popl_r(pc, emit_ESI); \
+    emitm_popl_r(pc, emit_EBP); \
+    emitm_ret(pc); \
+}
+
+
+void Parrot_jit_emit_mov_mr_n(Parrot_jit_info_t *jit_info, char *mem, int reg) {
+    jit_emit_mov_mr_n(jit_info->native_ptr, mem, reg);
+}
+void Parrot_jit_emit_mov_mr(Parrot_jit_info_t *jit_info, char *mem, int reg) {
+    jit_emit_mov_mr(jit_info->native_ptr, mem, reg);
+}
+void Parrot_jit_emit_mov_rm_n(Parrot_jit_info_t *jit_info, int reg, char *mem) {
+    jit_emit_mov_rm_n(jit_info->native_ptr, reg, mem);
+}
+void Parrot_jit_emit_mov_rm(Parrot_jit_info_t *jit_info, int reg, char *mem) {
+    jit_emit_mov_rm(jit_info->native_ptr, reg, mem);
+}
+static void Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info) {
+    jit_emit_finit(jit_info->native_ptr);
+}
+
 #ifndef NO_JIT_VTABLE_OPS
 
 #undef Parrot_jit_vtable1_op
@@ -1051,15 +1295,15 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 switch (op_info->types[i]) {
                     case PARROT_ARG_KI:
                     case PARROT_ARG_I:
-                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                        jit_emit_mov_rm(jit_info->native_ptr, emit_EAX,
                                 &interpreter->ctx.int_reg.registers[p[i]]);
                         break;
                     case PARROT_ARG_S:
-                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                        jit_emit_mov_rm(jit_info->native_ptr, emit_EAX,
                                 &interpreter->ctx.string_reg.registers[p[i]]);
                         break;
                     case PARROT_ARG_P:
-                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                        jit_emit_mov_rm(jit_info->native_ptr, emit_EAX,
                                 &interpreter->ctx.pmc_reg.registers[p[i]]);
                         break;
                     default:
@@ -1145,15 +1389,15 @@ Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info,
     /* return result is in EAX or ST(0) */
     switch (op_info->types[1]) {
         case PARROT_ARG_I:
-            jit_emit_mov_mr_i(jit_info->native_ptr,
+            jit_emit_mov_mr(jit_info->native_ptr,
                     &interpreter->ctx.int_reg.registers[p1], emit_EAX);
             break;
         case PARROT_ARG_S:
-            jit_emit_mov_mr_i(jit_info->native_ptr,
+            jit_emit_mov_mr(jit_info->native_ptr,
                     &interpreter->ctx.string_reg.registers[p1], emit_EAX);
             break;
         case PARROT_ARG_P:
-            jit_emit_mov_mr_i(jit_info->native_ptr,
+            jit_emit_mov_mr(jit_info->native_ptr,
                     &interpreter->ctx.pmc_reg.registers[p1], emit_EAX);
             break;
         case PARROT_ARG_N:
@@ -1244,7 +1488,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     jit_info->arena.fixups->param.fptr = (void (*)(void))pmc_new_noinit;
     emitm_calll(jit_info->native_ptr, 0xdeafc0de);
     /* result = eax = PMC */
-    jit_emit_mov_mr_i(jit_info->native_ptr,
+    jit_emit_mov_mr(jit_info->native_ptr,
             &interpreter->ctx.pmc_reg.registers[p1], emit_EAX);
     emit_pushl_r(jit_info->native_ptr, emit_EAX);
     /* push interpreter */
@@ -1302,52 +1546,22 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 }
 
 
-/* Load registers for the current section */
-void
-Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp * interpreter)
-{
-    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
-    int i;
-
-    for (i = sect->int_registers_used-1; i >= 0; --i)
-        if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_IN)
-            jit_emit_mov_rm_i(jit_info->native_ptr, jit_info->intval_map[i],
-               &interpreter->ctx.int_reg.registers[sect->int_reg_usage[i]]);
-
-    /* The total size of the loads */
-    if (!sect->load_size)
-        sect->load_size =
-            jit_info->native_ptr -
-                (jit_info->arena.start +
-                    jit_info->arena.op_map[jit_info->op_i].offset);
-}
-
-/* Save registers for the current section */
-void
-Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp * interpreter)
-{
-    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
-    int i;
-
-    for (i = sect->int_registers_used-1; i >= 0; --i)
-        if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_OUT)
-            jit_emit_mov_mr_i(jit_info->native_ptr,
-                &interpreter->ctx.int_reg.registers[sect->int_reg_usage[i]],
-                    jit_info->intval_map[i]);
-}
 
 #else /* JIT_EMIT */
 
 #  define REQUIRES_CONSTANT_POOL 0
 #  define INT_REGISTERS_TO_MAP 4
-#  define FLOAT_REGISTERS_TO_MAP 0
+#  define FLOAT_REGISTERS_TO_MAP 4
 
 char intval_map[INT_REGISTERS_TO_MAP] =
 /* we can't use ECX, shift ops need it, push ECX before shift doesn't
  * because, when ECX is mapped you get shrl %cl, %ecx */
     { emit_EDI, emit_EBX, emit_ESI, emit_EDX };
+
+/* ST(0) is used as a scratch register,
+ * using more then 4 registers breaks C<time N0>
+ */
+char floatval_map[] = { 1,2,3,4 };
 
 #endif /* JIT_EMIT */
 

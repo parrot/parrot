@@ -39,11 +39,13 @@ my ($function, $body, $line, $extern, $header);
 my ($asm, $precompiled);
 
 my %core_ops;
+my %templates;
 
 sub readjit($) {
     my $file = shift;
 
     my %ops;
+    my $template;
 
     open (IN,$file) or die "Can't open file $file: $!";
     while ($line = <IN>) {
@@ -54,14 +56,43 @@ sub readjit($) {
         }
 	# ignore comment and empty lines
         next if (($line =~ m/^;/) || ($line =~ m/^\s*$/));
-        if (!defined($function)) {
-            $line =~ m/(extern\s*)?([^\s]*)\s*{/;
-            $extern = (defined($1))? 1 : 0;
-            $function = $2;
-            $asm = "";
-            next;
+        if (!defined($function) && !defined($template)) {
+	    if ($line =~ m/TEMPLATE\s+([^\s]*)\s*{/) { #}
+		$template = $1;
+		$asm = "";
+		next;
+	    }
+	    else {
+		$line =~ m/(extern\s*)?([^\s]*)\s*{/; #}
+		$extern = (defined($1))? 1 : 0;
+		$function = $2;
+		$asm = "";
+		next;
+	    }
         }
-        if ($line =~ m/^}/) {
+        if ($line =~ m/^}/) { #{
+	    # end of template definition?
+	    if (defined($template)) {
+		$templates{$template} = $asm;
+		$template = undef;
+		next;
+	    }
+	    # no, end of function
+	    # 1. check templates
+	    while (my($t, $body) = each(%templates)) {
+		if ($asm =~ /$t\s+/){
+		    my $tbody = $body;
+		    while ($asm =~ s/(s(.).+?\2.*?\2)\s*//) {
+			eval "\$tbody =~ ${1}g";
+		    }
+		    $asm = $tbody;
+		    # reset iterator for next run
+		    keys(%templates);
+		    last;
+		}
+	    }
+
+	    # then do other substitutions
             $asm =~ s/([\&\*])([a-zA-Z_]+)\[(\d+)\]/make_subs($1,$2,$3)/ge;
             $asm =~ s/NEW_FIXUP/Parrot_jit_newfixup(jit_info)/g;
             $asm =~ s/CUR_FIXUP/jit_info->arena.fixups/g;
@@ -182,7 +213,7 @@ for ($i = 0; $i < $core_numops; $i++) {
 	\s+{{\+=\d}}/xm) {
 	    $jit_func = "Parrot_jit_vtable1r_op";
 	    $extern = vtable_num($1);
-	    print $op->full_name .": $jit_func $extern\n";
+	    #print $op->full_name .": $jit_func $extern\n";
 	}
 	# *) $1->vtable->{vtable}(interp, $1, $2)
 	elsif ($opbody =~ /
