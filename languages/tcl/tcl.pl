@@ -16,7 +16,7 @@ my @cmd_files = readdir(CMDDIR);
 closedir(CMDDIR);
 
 my $macro_dir = "lib/macros";
-opendir(CMDDIR,$command_dir);
+opendir(CMDDIR,$macro_dir);
 my @macro_files = readdir(CMDDIR);
 closedir(CMDDIR);
 
@@ -27,11 +27,11 @@ my @commands = grep {s/\.imc$//} @cmd_files;
 
 my $lib_dir = "lib";
 opendir(LIBDIR,$lib_dir) or die;
-my @libs = map {"$lib_dir/$_"} grep {m/\.imc$/} readdir(LIBDIR);
+my @libs = map {"$lib_dir/$_"} grep {m/\.imc$/} grep {! m/^tcl(lib|word).imc$/} readdir(LIBDIR);
 closedir(LIBDIR);
 
 my $includes;
-foreach my $file (sort(@cmd_includes, @libs, @macro_includes)) {
+foreach my $file (@macro_includes, @cmd_includes, @libs) {
   $includes .= "  .include \"languages/tcl/$file\"\n";
 }
 
