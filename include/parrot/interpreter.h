@@ -90,6 +90,8 @@ runops_generic();
 void
 runops(struct Parrot_Interp *, struct PackFile *, size_t offset);
 
+VAR_SCOPE opcode_t* (*run_native)(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code);
+
 #endif
 
 /*

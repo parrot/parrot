@@ -13,6 +13,13 @@ use Parrot::OpTrans;
 use vars qw(@ISA);
 @ISA = qw(Parrot::OpTrans);
 
+sub defines
+{
+  return <<END;
+#define CUR_OPCODE cur_opcode
+END
+}
+
 
 #
 # pc()
@@ -69,7 +76,7 @@ sub goto_address
 {
   my ($self, $addr) = @_;
 #print STDERR "pbcc: map_ret_abs($addr)\n";
-  return sprintf("goto PC_%d", $addr);
+  return "cur_opcode = $addr;\ngoto switch_label";
 }
 
 
@@ -92,9 +99,8 @@ sub goto_offset
 sub goto_pop
 {
   my ($self) = @_;
-  die "pbc2c.pl: Cannot handle 'goto POP()' ops!";
+  return sprintf("cur_opcode = pop_dest(interpreter);\ngoto switch_label");
 }
-
 
 #
 # access_arg()

@@ -18,6 +18,7 @@ use Parrot::PackFile;
 use Parrot::PackFile::ConstTable;
 use Parrot::OpsFile;
 use Parrot::OpTrans::CGoto;
+use Parrot::OpLib::core;
 
 my $trans = Parrot::OpTrans::CGoto->new;
 
@@ -67,88 +68,46 @@ sub dump_const_table {
 # compile_byte_code()
 #
 
-my $pc;
-my $new_pc = 1;
 my @args = ();
 
 sub compile_byte_code {
-    my ($pf) = @_;
-
-    my $nconst = $pf->const_table->const_count;
+    my ($pf, $file_name) = @_;
+    my ($byte_code);
+    my $pc;
+    my $new_pc = 0;
+    my $offset=0;
+    my $op_code;
+    my $op;
+    my %leaders;
+    my @pc_list;
+    my @blocks;
+    my %opcodes;
 
     print <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/string.h"
 END_C
 
+    print $trans->defines;
     print $ops->preamble;
 
-    print <<END_C;
-
-int
-main(int argc, char **argv) {
-    int                        i;
-    struct Parrot_Interp *     interpreter;
-    struct PackFile_Constant * c;
-    struct PackFile *          pf;
-
-    init_world();
-  
-    interpreter = make_interpreter(0);
-    pf          = PackFile_new();
-
-    interpreter->code = pf;
-
-END_C
-
-    for(my $i = 0; $i < $nconst; $i++) {
-      my $const = $pf->const_table->constant($i);
-      my $value = $const->value;
-
-      if      ($const->type eq Parrot::PackFile::Constant::type_code('PFC_INTEGER')) { # TODO: Don't hardocde these codes.
-        print <<END_C;
-    c = PackFile_Constant_new_integer($value);
-END_C
-      } elsif ($const->type eq Parrot::PackFile::Constant::type_code('PFC_NUMBER')) { # TODO: Don't hardocde these codes.
-        print <<END_C;
-    c = PackFile_Constant_new_number($value);
-END_C
-      } elsif ($const->type eq Parrot::PackFile::Constant::type_code('PFC_STRING')) { # TODO: Don't hardocde these codes.
-        my $type     = $value->type;
-        my $encoding = $value->encoding;
-        my $size     = $value->size;
-        my $flags    = $value->flags;
-        my $data     = Dumper($value->data);
-
-        $data = '"' . $data . '"' unless $data =~ m/^"/;
-
-        print <<END_C;
-    c = PackFile_Constant_new_string(interpreter, string_make(interpreter,
- $data, $size, $encoding, $flags, $type));
-END_C
-      } else {
-        die;
-      }
-
-      print <<END_C;
-    PackFile_ConstTable_push_constant(pf->const_table, c);
-
-END_C
-    }
-
-    my $cursor = 0;
     my $length = length($pf->byte_code);
 
-    my $offset=0;
+    # First instruction in bytecode must be the leader of a block
+    $leaders{$new_pc} = 1;
 
-    my $op_code;
-    my $op;
-
+    # This loop tries to identify instructions that may be the target
+    # of control flow changing opcodes including the possible targets of ret
+    # opcodes
     while ($offset + sizeof('op') <= $length) {
+	my ($src, $is_branch);
+
         $pc       = $new_pc;
 	$op_code  = unpack "x$offset l", $pf->byte_code;
         $op       = $ops->op($op_code) || die "Can't find an op for opcode $op_code\n";
 	$offset  += sizeof('op');
+	push @pc_list, $pc;
+	$opcodes{$pc}->{op} = $op;
         $new_pc   = $pc + $op->size;
 
         @args = ();
@@ -160,24 +119,154 @@ END_C
             $offset += sizeof('op');
             push @args, $arg;
         }
+	push @{$opcodes{$pc}->{args}}, @args;
 
-        $trans->pc($pc);
-        $trans->args(@args);
-        my $source = $op->source($trans);
+        $src = $op->full_body();
+	
+	# The regexes here correspond to the rewriting rules for the various
+	# forms of goto recognized by Parrot/OpsFile.pm and Parrot/Op.pm
 
-        $source =~ s/^\s*goto PC_$new_pc;\s*$//mg;
+	# absolute address goto 
+	while($src =~ /{{=(.*?)}}/g){
+	    my $offset = $1;
+	    $is_branch = 1;
+	}
+	# relative branch
+	while($src =~ /{{(\-|\+)=(.*?)}}/g){
+	    my $dir = $1;
+	    my $forward_off = $2;
 
-        printf("PC_%d: { /* %s */\n%s}\n\n", $pc, $op->full_name, $source);
+	    # Substitute constant branch values
+	    if($forward_off =~ /\@(\d+)/){
+		$forward_off = $args[$1 - 1]
+		    if $op->arg_type($1) eq 'ic';
+	    }
+
+	    if($forward_off =~ /^-?\d+$/){
+		$forward_off = -$forward_off if $dir eq '-';
+
+		if($forward_off != $op->size){
+		    $leaders{$forward_off + $pc} = 1;
+		    $is_branch = 1;
+		}
+	    }
+	    else {
+		$is_branch = 1;
+	    }
+	}
+
+	$leaders{$new_pc} = 1 if $is_branch;
     }
 
-    print <<END_C;
+    my $enternative; 
 
-PC_$new_pc:
-PC_0: {
-    exit(0);
+FINDENTERN:
+    foreach my $cur_op (@$Parrot::OpLib::core::ops) {
+	if($cur_op->full_name eq 'enternative'){
+	    $enternative = pack_op($cur_op->code);
+	    last FINDENTERN;
+	}
+    }
+    die "Could not locate enternative op!\n" unless defined $enternative;
+
+    # Copy original bytecode to edit it
+    $byte_code = $pf->byte_code;
+
+    # First block
+    push @blocks, [shift @pc_list ];
+
+    # change instructions at block leaders to enternative calls
+    substr($byte_code, 0, sizeof('op')) = $enternative;
+
+    while (@pc_list) {
+	my $instr_pc = shift @pc_list;
+	# block leader found, start new block
+	if(exists $leaders{$instr_pc}) {
+	    substr($byte_code, $instr_pc, sizeof('op')) = $enternative;
+	    push @blocks, [$instr_pc ];
+	}
+	else {
+	    push @{$blocks[-1]}, $instr_pc;
+	}
+    }
+
+    print<<END_C; 
+static opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code);
+
+static char program_code[] = {
+END_C
+
+    $pf->byte_code($byte_code);
+
+    # this is now packed PBC
+    $byte_code = $pf->pack();
+
+    $offset = 0;
+    while($offset < length($byte_code)){
+	print join(',', unpack("c*", substr($byte_code, $offset, 20)));
+	print ",\n";
+	$offset += 20;
+    }
+    print "};";
+
+    print <<'END_C';
+
+int
+main(int argc, char **argv) {
+    struct Parrot_Interp *     interpreter;
+    struct PackFile *          pf;
+
+    init_world();
+  
+    run_native = run_compiled;
+    interpreter = make_interpreter(0);
+    pf          = PackFile_new();
+
+    if( !PackFile_unpack(interpreter, pf, program_code,
+			    (opcode_t)sizeof(program_code)) ) {
+	printf( "Can't unpack.\n" );
+	return 1;
+    }
+    interpreter->code = pf;
+    runops(interpreter, pf, 0);
+    exit(1);
 }
 
-    return 0;
+static opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code){
+
+switch_label:
+    switch((ptrcast_t)cur_opcode - (ptrcast_t)start_code) {
+
+END_C
+
+
+    foreach my $cur_blk (@blocks) {
+	printf "case %d: PC_%d: {\n", $cur_blk->[0], $cur_blk->[0];
+
+	foreach $pc (@{$cur_blk}) {
+	    $op = $opcodes{$pc}->{op};
+	    $trans->pc($pc);
+	    $trans->args(@{$opcodes{$pc}->{args}});
+	    my $source = $op->source($trans);
+
+	    $new_pc = $pc + $op->size;
+	    $source =~ s/^\s*goto PC_$new_pc;\s*$//mg if defined($new_pc);
+	    $source =~ s/\n/\n    /mg;
+#	    $source =~ s/#line.*\n//mg;
+	    $source =~ s/CUR_OPCODE/(start_code + $pc)/mg;
+
+	    printf("\n    /* %s */\n    {\n%s}\n", $op->full_name, $source);
+	}
+
+	print "}\n\n";
+    }
+    print <<END_C;
+    break;
+
+default:
+    return cur_opcode;
+}
+    return(0);
 }
 END_C
 
@@ -196,13 +285,12 @@ sub compile_file {
     $pf->unpack_file($file_name);
 
 #    dump_const_table($pf);
-    compile_byte_code($pf);
+    compile_byte_code($pf, $file_name);
  
     undef $pf;
 
     return;
 }
-
 
 #
 # MAIN PROGRAM:

@@ -2475,6 +2475,10 @@ op runinterp(inout PMC, in INT) {
   goto NEXT();
 }
 
+op enternative() {
+  goto ADDRESS(run_native(interpreter, CUR_OPCODE, (opcode_t *)interpreter->code->byte_code));
+}
+
 ########################################
 
 =item B<new>(out PMC, in INT)
