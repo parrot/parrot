@@ -12,6 +12,7 @@
  */
 
 #include <string.h>
+#include <assert.h>
 #include "imc.h"
 #include "optimizer.h"
 #include "parrot/jit.h"
@@ -747,9 +748,13 @@ allocate_jit(struct Parrot_Interp *interpreter)
     int to_map[] = { 4, 0, 0, 4 };
     const char *types = "IPSN";
     Instruction * ins, *next, *last, *tmp, *prev;
-    SymReg * r, *cpu[4+4], *regs[IMCC_MAX_REGS];       /* XXX */
-    int reads[4+4], writes[4+4], nr, nw;
-    static SymReg *par[4+4];       /* XXX */
+    SymReg * r, *cpu[64], *regs[IMCC_MAX_REGS];       /* XXX */
+    /* TODO
+     * cpu, par, reads, writes may be more then the actual mapped registers
+     * because register get reused and may have the same color
+     */
+    int reads[64], writes[64], nr, nw;
+    static SymReg *par[64];       /* XXX */
     static int ncpu;
 
     for (j = 0; j < ncpu; j++)
@@ -767,6 +772,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
             }
         }
     }
+    assert(ncpu <= 64);
     /* generate a list of parrot registers */
     for (j = 0; j < ncpu; j++) {
         par[j] = malloc(sizeof(SymReg));
