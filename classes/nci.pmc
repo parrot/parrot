@@ -31,7 +31,7 @@ pmclass NCI need_ext {
 
     void destroy() {
 	if (PMC_data(SELF))
-	    mem_free_executable(PMC_data(SELF));
+	    mem_sys_free(PMC_data(SELF));
     }
 
     PMC* clone () {

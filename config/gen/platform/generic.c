@@ -206,67 +206,6 @@ Parrot_free_memalign(void *p)
 
 
 /*
-** mem_alloc_executable() 
-*/
-
-void *
-mem_alloc_executable(struct Parrot_Interp *interpreter, size_t size)
-{
-    void *ptr;
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-    static int dev_zero = -1;
-    if (dev_zero == -1) {
-        dev_zero = open("/dev/zero", O_RDONLY);
-        if (dev_zero == -1)
-            PANIC("Error during open /dev/zero");
-    }
-    ptr = mmap(0, size, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE,
-               dev_zero, 0);
-    if (ptr == MAP_FAILED)
-        PANIC("Error during mmap");
-    return ptr;
-#else
-    ptr = calloc(1, size);
-    if (!ptr)
-        PANIC("Out of mem");
-    return ptr;
-#endif
-}
-
-
-/*
-** mem_realloc_executable()
-*/
-
-void *
-mem_realloc_executable(struct Parrot_Interp *interpreter, 
-                       void* memblock, size_t size)
-{
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-  PANIC("Reallocation of mmap'd memory not yet implemented");
-  return NULL;
-#else
-	return mem_sys_realloc(memblock, size);
-#endif
-}
-
-
-/*
-** mem_free_executable() 
-*/
-
-void
-mem_free_executable(void *addr)
-{
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-  munmap(addr, 1);
-#else
-	mem_sys_free(addr);
-#endif
-}
-
-
-/*
  * signal handling
  */
 #ifdef PARROT_HAS_HEADER_SIGNAL
