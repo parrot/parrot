@@ -34,8 +34,8 @@ The suffix is C<'_cg'>.
 =cut
 
 sub suffix
-{ 
-    return "_cg"; 
+{
+    return "_cg";
 }
 
 =item C<core_prefix()>
@@ -55,7 +55,7 @@ The core type is C<PARROT_CGOTO_CORE>.
 
 =cut
 
-sub core_type 
+sub core_type
 {
     return 'PARROT_CGOTO_CORE';
 }
@@ -92,11 +92,11 @@ sub pc
 {
     my $self = shift;
 
-    if (@_) 
+    if (@_)
     {
         $self->{PC} = shift;
     }
-    else 
+    else
     {
         return $self->{PC};
     }
@@ -114,11 +114,11 @@ sub args
 {
     my $self = shift;
 
-    if (@_) 
+    if (@_)
     {
         $self->{ARGS} = [ @_ ];
     }
-    else 
+    else
     {
         return $self->{ARGS};
     }
@@ -150,11 +150,11 @@ sub goto_address
 
     #print STDERR "pbcc: map_ret_abs($addr)\n";
 
-    if ($addr eq '0') 
+    if ($addr eq '0')
     {
         return "return (0);"
     }
-    else 
+    else
     {
   	    return "if ((opcode_t *) $addr == 0)
 	  return 0;
@@ -169,7 +169,7 @@ relevant C code.
 
 =cut
 
-sub expr_offset 
+sub expr_offset
 {
     my ($self, $offset) = @_;
 
@@ -206,14 +206,14 @@ sub goto_pop
 
 my %arg_maps = (
     'op' => "cur_opcode[%ld]",
-    
+
     'i'  => "IREG(%ld)",
     'n'  => "NREG(%ld)",
     'p'  => "PREG(%ld)",
     's'  => "SREG(%ld)",
     'k'  => "PREG(%ld)",
     'ki' => "IREG(%ld)",
-    
+
     'ic' => "cur_opcode[%ld]",
     'nc' => "CONST(%ld)->u.number",
     'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
@@ -272,7 +272,7 @@ Returns the C code for the run core function declaration.
 
 =cut
 
-sub run_core_func_decl 
+sub run_core_func_decl
 {
     my ($self, $core) = @_;
 
@@ -287,7 +287,7 @@ Returns the C code for the ops address declaration.
 
 =cut
 
-sub ops_addr_decl 
+sub ops_addr_decl
 {
     my ($self, $bs) = @_;
 
@@ -300,10 +300,10 @@ Returns the C code prior to the run core function.
 
 =cut
 
-sub run_core_func_start 
+sub run_core_func_start
 {
     return <<END_C;
-#if defined(__GNUC__) && defined(I386) && defined(NO_DYNOPS)
+#if defined(__GNUC__) && defined(I386) /* && defined(NO_DYNOPS) */
     register opcode_t *cur_opcode asm ("esi") = cur_op;
 #else
     opcode_t *cur_opcode = cur_op;
@@ -319,7 +319,7 @@ Returns the run core C code for section after the address table.
 
 =cut
 
-sub run_core_after_addr_table 
+sub run_core_after_addr_table
 {
     my ($self, $bs) = @_;
 
@@ -350,7 +350,7 @@ Returns the C code following the run core function.
 
 =cut
 
-sub run_core_finish 
+sub run_core_finish
 {
     my ($self, $base) = @_;
 
@@ -363,7 +363,7 @@ Returns the C code for the init function.
 
 =cut
 
-sub init_func_init1 
+sub init_func_init1
 {
     my ($self, $base) = @_;
     my $cg_func = $self->core_prefix . $base;
@@ -382,7 +382,7 @@ initialization function.
 
 =cut
 
-sub init_set_dispatch 
+sub init_set_dispatch
 {
     my ($self, $bs) = @_;
 
