@@ -107,6 +107,6 @@ foreach my $option (@options) {
     } 
 } 
 
-#print "@ARGV\n";
-print "$cfile\n";
+print "@ARGV\n";
+# print "$cfile\n";
 exit system(@ARGV)/256;
