@@ -121,10 +121,30 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
   VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 1, classname_pmc);
 
   /* Add ourselves to the interpreter's class hash */
+  if(Parrot_class_lookup(interpreter, class_name)) {
+     internal_exception(1, "Class %s already registered!\n",
+                        string_to_cstring(interpreter, class_name));
+  }
+
+  Parrot_class_register(interpreter, class_name, new_class);
+
+  return new_class;
+}
+
+
+PMC *
+Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
+{
+  return VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash,
+                              key_new_string(interpreter, class_name));
+}
+
+void
+Parrot_class_register(Parrot_Interp interpreter, STRING *class_name, PMC *new_class)
+{
   VTABLE_set_pmc_keyed(interpreter, interpreter->class_hash,
                        key_new_string(interpreter,class_name), new_class);
 
-  return new_class;
 }
 
 
@@ -184,6 +204,21 @@ PMC *
 Parrot_multi_subclass(Parrot_Interp interpreter, PMC *base_class_array,
                       STRING *child_class_name) {
     return NULL;
+}
+
+/*=for api objects Parrot_object_is
+ *
+ * Is the object an instance of class.
+ * XXX: This should check parent classes as well, but it currently doesn't.
+ */
+INTVAL
+Parrot_object_isa(Parrot_Interp interpreter, PMC *obj, PMC *cl) {
+    PMC * t;
+    PMC * object_array = PMC_data(obj);
+    t = VTABLE_get_pmc_keyed_int(interpreter, object_array, 0);
+    if(t == cl)
+       return 1;
+    return 0;
 }
 
 /*=for api objects Parrot_new_method_cache
