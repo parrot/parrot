@@ -84,6 +84,17 @@ static void** opcode_to_prederef(Interp* interpreter,
 
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
 
+/*
+ * if we are using CHECK_EVENTS elsewhere this macro should (again)
+ * be in includes/parrot/event.h
+ *
+ * This gives +50 % performance
+ */
+
+#undef  CHECK_EVENTS
+#define CHECK_EVENTS(i, n)   \\
+	interpreter->task_queue->head ?  \\
+		Parrot_do_check_events(i, n) : n
 END
 }
 
