@@ -245,6 +245,9 @@ print JITCPU<<END_C;
 
 #define Parrot_jit_restart_op Parrot_jit_cpcf_op
 
+/* new_p_i_p_p seems to be missparsed */
+#define Parrot_jit_vtable_1134_op Parrot_jit_normal_op
+
 #include"parrot/jit_emit.h"
 
 #undef CONST

@@ -73,7 +73,13 @@ pmclass default abstract noinit {
     }
 
     void init_pmc_props (PMC* initializer, PMC* properties) {
-        DYNSELF.init();
+	if (!SELF->pmc_ext)
+	    add_pmc_ext(INTERP, SELF);
+	SELF->metadata = properties;
+	if (initializer)
+	    DYNSELF.init_pmc(initializer);
+	else
+	    DYNSELF.init();
     }
 
 
