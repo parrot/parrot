@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
@@ -946,6 +946,26 @@ CODE
 39916800.000000
 1.000000
 1.000000
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "exchange");
+    set N1, 1.234560
+    set N2, 9.876540
+    exchange N1, N2
+    print N1
+    print "\n"
+    print N2
+    print "\n"
+  
+    set N3, -100.200300
+    exchange N3, N3
+    print N3
+    print "\n"
+    end
+CODE
+9.876540
+1.234560
+-100.200300
 OUTPUT
 
 1;

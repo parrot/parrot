@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 79;
+use Parrot::Test tests => 80;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2017,5 +2017,46 @@ CODE
 0:0.000000::
 OUTPUT
 }
+
+output_is(<<'CODE', <<OUTPUT, "exchange");
+	new P0, .PerlInt
+        new P1, .PerlInt
+	set P0, 123
+	set P1, 246
+        exchange P0, P1
+        print P0
+	print "\n"
+        print P1
+	print "\n"
+
+        new P2, .PerlNum
+        new P3, .PerlString
+        set P2, 1234.567890
+        set P3, "Themistocles"
+        exchange P2, P3
+        print P2
+	print "\n"
+        print P3
+	print "\n"
+
+        new P4, .PerlArray
+        new P5, .PerlHash
+        new P6, .PerlString
+        set P4[2], "Array\n"
+        set P5["2"], "Hash\n"
+        exchange P4, P5
+        set S0, P4["2"]
+        print S0
+        set S0, P5[2]         
+        print S0
+	end
+CODE
+246
+123
+Themistocles
+1234.567890
+Hash
+Array
+OUTPUT
 
 1;

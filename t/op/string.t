@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 98;
+use Parrot::Test tests => 99;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1543,6 +1543,25 @@ CODE
 15 is 1111
 128 is 200
 OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "exchange");
+    set S0, "String #0\n"
+    set S1, "String #1\n"
+    exchange S0, S1
+    print S0
+    print S1
+
+    set S2, "String #2\n"
+    exchange S2, S2
+    print S2
+
+    end
+CODE
+String #1
+String #0
+String #2
+OUTPUT
+
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {
