@@ -16,7 +16,7 @@ Tests the Python Class PMC.
 
 =cut
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 output_is(<< 'CODE', << 'OUTPUT', "attribute");
 ##PIR##
@@ -70,3 +70,28 @@ output_is(<< 'CODE', << 'OUTPUT', "method");
 CODE
 1
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "classname");
+##PIR##
+.sub main @MAIN
+    loadlib $P0, "python_group"
+
+    getclass $P1, 'PyClass'
+    subclass $P2, $P1, 'c'
+
+    find_type $I2, "PyString"
+    new $P3, $I2
+    $P3 = 'c'
+    setprop $P2, '__name__', $P3
+
+    $P4=$P2()
+
+    getprop $P5, '__class__', $P4
+    getprop $P6, '__name__', $P5
+    print $P6
+    print "\n"
+.end
+CODE
+c
+OUTPUT
+
