@@ -22,6 +22,11 @@ interesting things with it.
 
 An overview of the Parrot architecture and design.
 
+=item F<running.pod>
+
+Brief descriptions of the different executables constructed and how to
+run them.
+
 =item F<core_ops.pod>
 
 A description of the core operations in the Parrot assembly language.

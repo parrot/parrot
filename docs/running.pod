@@ -1,0 +1,75 @@
+=head1 Running Parrot code
+
+This file briefly describes the current set of executables and what
+they're for. But mostly, it mentions all the restrictions and
+incomplete bits of these commands, in the hopes that people will fix
+them and modify this document accordingly.
+
+=over 3
+
+=item C<assemble.pl>
+
+Converts a Parrot Assembly file to Parrot ByteCode.
+
+  assemble.pl foo.pasm > foo.pbc
+
+Usage information: no usage message available. There is some amount of
+malformed POD visible by running C<perldoc -F Parrot/Assembler.pm>.
+
+=item C<test_parrot>
+
+Interprets a Parrot ByteCode file.
+
+  test_parrot <filename>.pbc
+
+C<test_parrot> has two alternate modes of operation: prederef mode
+(C<test_parrot -P>) and jit mode (C<test_parrot -j>).
+
+Jit mode works for the mops.pasm test, but doesn't work for many other
+things. The reason why is unknown.
+
+Prederef mode only works as a shared library. For example, on most
+Unix platforms:
+
+  make clean
+  make shared
+  LD_LIBRARY_PATH=blib/lib ./test_parrot -P <filename>.pbc
+
+You will not be able to use any of the automatic testing targets after
+running C<make shared>.
+
+C<test_parrot> also has several debugging and tracing flags; see the
+usage description (currently, a comment in test_main.c) for details.
+
+=item C<optimizer.pl>
+
+Does something. Use it by running
+
+  something
+
+Usage information: none available.
+
+=item C<pdump>
+
+Does something. Use it by running
+
+  something
+
+Usage information: none available.
+
+=item C<pbc2c.pl>
+
+Converts a bytecode file to a native .c file.
+
+  perl pbc2c.pl foo.pbc > foo.c
+
+Usage information: C<perldoc -F pbc2c.pl>
+
+No documentation is available for compiling the .c file to a binary.
+This works, but produces a binary that crashes:
+
+  ./assemble.pl examples/assembly/life.pasm > life.pbc
+  perl pbc2c.pl life.pbc > life.c
+  ls **/*.o | egrep -v 'pdump|test_main' | xargs gcc -Iinclude -o life life.c -lm -ldl
+
+=back

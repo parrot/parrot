@@ -57,6 +57,7 @@ docs/overview.pod
 docs/parrot.pod
 docs/parrot_assembly.pod
 docs/parrotbyte.pod
+docs/running.pod
 docs/strings.pod
 docs/tests.pod
 docs/vtables.pod
