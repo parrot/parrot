@@ -240,6 +240,10 @@ NEXT:
   inc pc
 
   if pc < maxpc goto INTERP
+  labelstr = pc
+  concat code,  "STEP"
+  concat code,  labelstr
+  concat code,  ":\n"
   concat code,  "end\n"
 
   # printerr code
