@@ -28,7 +28,12 @@ internal_exception(int exitcode, const char *format, ...)
 
 /* Panic handler */
 
-#define dumpcore() PIO_printf(interpreter, "Sorry, coredump is not yet implemented for this platform.\n\n");  exit(1);
+#ifndef dumpcore
+#define dumpcore() \
+  fprintf(stderr, "Sorry, coredump is not yet implemented " \
+          "for this platform.\n\n"); \
+          exit(1);
+#endif
 
 void
 do_panic(struct Parrot_Interp *interpreter, const char *message,
@@ -36,45 +41,47 @@ do_panic(struct Parrot_Interp *interpreter, const char *message,
 {
     /* Note: we can't format any floats in here--Parrot_sprintf
     ** may panic because of floats.
+    ** and we don't use Parrot_sprintf or such, because we are
+    ** already in panic --leo
     */
-    char flag_buffer[40];
-    if (interpreter)
-        Parrot_sprintf(interpreter, flag_buffer, "%#x", interpreter->flags);
-    else
-        strcpy(flag_buffer, "(null interpreter)");
-
-    PIO_printf(interpreter, "Parrot VM: PANIC: %s!\n",
+    fprintf(stderr, "Parrot VM: PANIC: %s!\n",
                message ? message : "(no message available)");
 
-    PIO_printf(interpreter, "C file %s, line %d\n",
+    fprintf(stderr, "C file %s, line %d\n",
                file ? file : "(not available)", line);
 
     if (interpreter) {
-        PIO_printf(interpreter, "Parrot file %Ss, line %d\n",
-                   interpreter->current_file, interpreter->current_line);
+        fprintf(stderr, "Parrot file %s, line %d\n",
+                   interpreter->current_file &&
+                   interpreter->current_file->strstart ?
+                   (char *)interpreter->current_file->strstart : "(null)",
+                   interpreter->current_line);
     }
     else {
-        PIO_printf(interpreter, "Parrot file (not available), ");
-        PIO_printf(interpreter, "line (not available)\n");
+        fprintf(stderr, "Parrot file (not available), ");
+        fprintf(stderr, "line (not available)\n");
     }
 
-    PIO_printf(interpreter, "\n\
+    fprintf(stderr, "\n\
 We highly suggest you notify the Parrot team if you have not been working on\n\
 Parrot.  Use bugs6.perl.org or send an e-mail to perl6-internals@perl.org.\n\
 Include the entire text of this error message and the text of the script that\n\
 generated the error.  If you've made any modifications to Parrot, please\n\
 describe them as well.\n\n");
 
-    PIO_printf(interpreter, "Version     : %s\n", PARROT_VERSION);
-    PIO_printf(interpreter, "Configured  : %s\n", PARROT_CONFIG_DATE);
-    PIO_printf(interpreter, "Architecture: %s\n", PARROT_ARCHNAME);
-    PIO_printf(interpreter, "JIT Capable : %s\n", JIT_CAPABLE ? "Yes" : "No");
-    PIO_printf(interpreter, "Interp Flags: %s\n", flag_buffer);
-    PIO_printf(interpreter, "Exceptions  : %s\n", "(missing from core)");
-    PIO_printf(interpreter, "\nDumping Core...\n");
-    
+    fprintf(stderr, "Version     : %s\n", PARROT_VERSION);
+    fprintf(stderr, "Configured  : %s\n", PARROT_CONFIG_DATE);
+    fprintf(stderr, "Architecture: %s\n", PARROT_ARCHNAME);
+    fprintf(stderr, "JIT Capable : %s\n", JIT_CAPABLE ? "Yes" : "No");
+    if (interpreter)
+        fprintf(stderr, "Interp Flags: %#x\n", interpreter->flags);
+    else
+        fprintf(stderr, "Interp Flags: (no interpreter)\n");
+    fprintf(stderr, "Exceptions  : %s\n", "(missing from core)");
+    fprintf(stderr, "\nDumping Core...\n");
+
     dumpcore();
-}  
+}
 
 /*
  * Local variables:

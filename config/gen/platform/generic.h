@@ -24,6 +24,16 @@
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY
 
 /*
+ * signal handling
+ */
+
+#if defined(HAS_HEADER_SIGNAL) && defined(HAS_HEADER_SYSTYPES)
+#  include <signal.h>
+#  include <sys/types.h>
+#  define dumpcore() kill(0, SIGQUIT)
+#endif
+
+/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
