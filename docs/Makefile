@@ -1,5 +1,5 @@
-RM_F=rm -f
-PERL=perl
+PERL = /usr/bin/perl
+RM_F = rm -f
 
 all: packfile-c.pod packfile-perl.pod core_ops.pod
 

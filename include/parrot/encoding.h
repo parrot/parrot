@@ -18,7 +18,7 @@ typedef struct {
     UINTVAL max_bytes;
     UINTVAL (*characters)(const void *ptr, UINTVAL bytes);
     UINTVAL (*decode)(const void *ptr);
-    void *(*encode)(const void *ptr, UINTVAL c);
+    void *(*encode)(void *ptr, UINTVAL c);
     void *(*skip_forward)(const void *ptr, UINTVAL n);
     void *(*skip_backward)(const void *ptr, UINTVAL n);
 } ENCODING;

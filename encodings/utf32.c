@@ -30,7 +30,7 @@ utf32_decode (const void *ptr) {
 }
 
 static void *
-utf32_encode (const void *ptr, UINTVAL c) {
+utf32_encode (void *ptr, UINTVAL c) {
     utf32_t *u32ptr = (utf32_t*)ptr;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {

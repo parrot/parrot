@@ -77,7 +77,7 @@ utf8_decode (const void *ptr) {
 }
 
 static void *
-utf8_encode (const void *ptr, UINTVAL c) {
+utf8_encode (void *ptr, UINTVAL c) {
     utf8_t *u8ptr = (utf8_t*)ptr;
     UINTVAL len = UNISKIP(c);
     utf8_t *u8end = u8ptr + len - 1;

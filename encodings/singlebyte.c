@@ -21,13 +21,11 @@ singlebyte_characters (const void *ptr, UINTVAL bytes) {
 
 static UINTVAL
 singlebyte_decode (const void *ptr) {
-    const byte_t *bptr = ptr;
-
-    return *bptr;
+    return *(const byte_t *)ptr;
 }
 
 static void *
-singlebyte_encode (const void *ptr, UINTVAL c) {
+singlebyte_encode (void *ptr, UINTVAL c) {
     byte_t *bptr = (byte_t*)ptr;
 
     if (c > 255) {
@@ -41,14 +39,14 @@ singlebyte_encode (const void *ptr, UINTVAL c) {
 }
 
 static void *
-singlebyte_skip_forward (void *ptr, UINTVAL n) {
+singlebyte_skip_forward (const void *ptr, UINTVAL n) {
     byte_t *bptr = (byte_t*)ptr;
 
     return bptr + n;
 }
 
 static void *
-singlebyte_skip_backward (void *ptr, UINTVAL n) {
+singlebyte_skip_backward (const void *ptr, UINTVAL n) {
     byte_t *bptr = (byte_t*)ptr;
 
     return bptr - n;

@@ -57,7 +57,7 @@ utf16_decode (const void *ptr) {
 }
 
 static void *
-utf16_encode (const void *ptr, UINTVAL c) {
+utf16_encode (void *ptr, UINTVAL c) {
     utf16_t *u16ptr = (utf16_t*)ptr;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
