@@ -361,7 +361,7 @@ Create a new base class named Sy, and put the PMC for it in Px
 
 =item subclass Px, Py, Sz
 
-Create a new class, named Sz, which has Py as its immediate parent.
+Create a new class, named Sz, which has Py as its immediate parent. 
 
 =item addparent Px, Py
 
@@ -525,6 +525,40 @@ want to get the second attribute C<b> out of it:
   classoffset BaseOffset, $P0, "Foo"
   BOffset = BaseOffset + 1
   getattribute $P1, $P0, BOffset
+
+=head1 Explanations
+
+To get a new class, you can do a C<newclass>, which creates a new
+class with no parents besides parrot's default super-ish parent
+class. (Which doesn't appear in the class list anywhere, though
+arguably it ought to)
+
+To get a new child class, you have two potential options:
+
+=over 4
+
+=item Subclass the parent
+
+=item Create a new standalone class and add a parent
+
+=back
+
+Both ways work. It is, however, more efficient to use the first
+method, and just subclass the immediate parent class of your new
+class.
+
+When adding in extra parents in a multiple-inheritance scenario,
+subclass the first class in the immediate parent list then use the
+C<addparent> op to add in the rest of the immediate parents.
+
+Do be aware that, right now, you should I<not> add attributes or
+parents to a class that's been subclassed or has had objects
+instantiated. This will leave the internal structures of the classses
+and objects in an inconsistent state and things won't work at all the
+way you want them to. At the moment parrot won't warn if you do this,
+but it will soon. The restriction on parent list changes and attribute
+addition will be lifted in future releases, though doing so will be an
+expensive operation.
 
 =head1 TRANSLATION AND GLOSSARY
 
