@@ -549,7 +549,7 @@ op rx_setprops(in pmc, in str, in int) {
 	rx->minlength=$3;
 
 	for(i=0; i < string_length($2); i++) {
-		switch(((char *)$2->bufstart)[i]) {
+		switch((char)string_ord($2, i)) {
 			case 'i':
 				RxCaseInsensitive_on(rx);
 				break;
@@ -564,7 +564,7 @@ op rx_setprops(in pmc, in str, in int) {
 				rx->index=rx->startindex=string_length(rx->string);
 				break;
 			default:
-				fprintf(stderr, "Unknown regular expression option '%c'.", ((char*)$2->bufstart)[i]);
+				fprintf(stderr, "Unknown regular expression option '%c'.", (char)string_ord($2, i));
 				HALT();
 		}
 	}

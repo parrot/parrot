@@ -59,8 +59,7 @@ BOOLVAL  rx_is_whitespace_character(char ch);
 STRING *rxP_get_substr(struct Parrot_Interp *, STRING *, INTVAL, INTVAL);
 
 #define RX_dUNPACK(pmc)				rxinfo *rx=(rxinfo *)pmc->data
-/* this one is really quite evil */
-#define RxCurChar(rx)				((char *)rx->string->bufstart)[rx->index]
+#define RxCurChar(rx)				(char)string_ord(rx->string, rx->index)
 #define RxCurCharS(rx)				rxP_get_substr(interpreter, rx->string, rx->index, 1)
 
 #define RxAdvance(rx)				RxAdvanceX(rx, 1)
