@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 64;
+use Parrot::Test tests => 76;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
 	set	S4, "JAPH\n"
@@ -164,6 +164,199 @@ output_is(<<'CODE', <<'OUTPUT', "len>strlen, -ve os");
 CODE
 A string of length 21
 length 21
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, replacement = length" );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S2, S0, 4, 3, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+abcdxyzhijk
+xyz
+efg
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, replacement > length" );
+  set S0, "abcdefghijk"
+  set S1, "xyz0123"
+  substr S2, S0, 4, 3, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+abcdxyz0123hijk
+xyz0123
+efg
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, replacement < length" );
+  set S0, "abcdefghijk"
+  set S1, "x"
+  substr S2, S0, 4, 3, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+abcdxhijk
+x
+efg
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, offset at end of string" );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S2, S0, 11, 3, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+abcdefghijkxyz
+xyz
+
+OUTPUT
+
+output_is( <<'CODE', 'Can only replace inside string or index after end of string', "5 arg substr, offset past end of string" );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S2, S0, 12, 3, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, -ve offset, repl=length" );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S2, S0, -3, 3, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+abcdefghxyz
+xyz
+ijk
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, -ve offset, repl>length" );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S2, S0, -6, 2, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+abcdexyzhijk
+xyz
+fg
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, -ve offset, repl<length" );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S2, S0, -6, 4, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+abcdexyzjk
+xyz
+fghi
+OUTPUT
+
+output_is( <<'CODE', 'Can only replace inside string or index after end of string', "5 arg substr, -ve offset out of string" );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S2, S0, -12, 4, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, length > strlen " );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S2, S0, 3, 11, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+abcxyz
+xyz
+defghijk
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, length > strlen, -ve offset" );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S2, S0, -3, 11, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+  end
+CODE
+abcdefghxyz
+xyz
+ijk
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "4-arg, replacement-only substr" );
+  set S0, "abcdefghijk"
+  set S1, "xyz"
+  substr S0, 3, 3, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  end
+CODE
+abcxyzghijk
+xyz
 OUTPUT
 
 output_is( <<'CODE', '<><', "concat_s_s|sc, null onto null" );
