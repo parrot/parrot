@@ -1421,7 +1421,7 @@ string_substr(Interp *interpreter, STRING *src,
         true_offset = (UINTVAL)(src->strlen + offset);
     }
 
-    if (true_offset > src->strlen - 1) {        /* 0 based... */
+    if (src->strlen == 0 || true_offset > src->strlen - 1) {   /* 0 based... */
         internal_exception(SUBSTR_OUT_OF_STRING,
                 "Cannot take substr outside string");
     }

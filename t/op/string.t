@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 135;
+use Parrot::Test tests => 144;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -511,6 +511,127 @@ output_is( <<'CODE', 'PH', "3-arg substr" );
   print S1
   end
 CODE
+
+output_like( <<'CODE', <<'OUTPUT', "substr, +ve offset, zero-length string" );
+  set S0, ""
+  substr S1, S0, 10, 3
+  print S1
+  end
+CODE
+/Cannot take substr outside string/
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "substr, offset 0, zero-length string" );
+  set S0, ""
+  substr S1, S0, 0, 1
+  print S1
+  print "_\n"
+  end
+CODE
+_
+OUTPUT
+
+output_like( <<'CODE', <<'OUTPUT', "substr, offset -1, zero-length string" );
+  set S0, ""
+  substr S1, S0, -1, 1
+  print S1
+  end
+CODE
+/Cannot take substr outside string/
+OUTPUT
+
+output_like( <<'CODE', <<'OUTPUT', "substr, -ve offset, zero-length string" );
+  set S0, ""
+  substr S1, S0, -10, 5
+  print S1
+  end
+CODE
+/Cannot take substr outside string/
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "zero-length substr, zero-length string" );
+  set S0, ""
+  substr S1, S0, 10, 0
+  print S1
+  print "_\n"
+  end
+CODE
+_
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "zero-length substr, zero-length string" );
+  set S0, ""
+  substr S1, S0, -10, 0
+  print S1
+  print "_\n"
+  end
+CODE
+_
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "3-arg substr, zero-length string" );
+  set S0, ""
+  substr S1, S0, 2
+  print S1
+  print "_\n"
+  end
+CODE
+_
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, zero-length string" );
+  set S0, ""
+  set S1, "xyz"
+  substr S2, S0, 0, 3, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  print S2
+  print "\n"
+
+  set S3, ""
+  set S4, "abcde"
+  substr S5, S3, 0, 0, S4
+  print S3
+  print "\n"
+  print S4
+  print "\n"
+  print S5
+  print "\n"
+  end
+CODE
+xyz
+xyz
+
+abcde
+abcde
+
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "4 arg substr replace, zero-length string" );
+  set S0, ""
+  set S1, "xyz"
+  substr S0, 0, 3, S1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+
+  set S2, ""
+  set S3, "abcde"
+  substr S2, 0, 0, S3
+  print S2
+  print "\n"
+  print S3
+  print "\n"
+  end
+CODE
+xyz
+xyz
+abcde
+abcde
+OUTPUT
 
 output_is( <<'CODE', '<><', "concat_s_s|sc, null onto null" );
  print "<>"
