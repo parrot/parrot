@@ -136,27 +136,15 @@ Set $1 to $2.
 =cut
 
   
-AUTO_OP set(i, i) {
+AUTO_OP set(i, i|ic) {
   $1 = $2;
 }
 
-AUTO_OP set(i, ic) {
+AUTO_OP set(n, n|nc) {
   $1 = $2;
 }
 
-AUTO_OP set(n, nc) {
-  $1 = $2;
-}
-
-AUTO_OP set(n, n) {
-  $1 = $2;
-}
-
-AUTO_OP set(s, sc) {
-  $1 = string_copy($2);
-}
-
-AUTO_OP set(s, s) {
+AUTO_OP set(s, s|sc) {
   $1 = string_copy($2);
 }
 
@@ -240,37 +228,19 @@ Branch if $1 is equal to $2.
 
 =cut
 
-AUTO_OP eq(i, i, ic) {
+AUTO_OP eq(i, i|ic, ic) {
   if ($1 == $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP eq(i, ic, ic) {
+AUTO_OP eq(n, n|nc, ic) {
   if ($1 == $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP eq(n, n, ic) {
-  if ($1 == $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP eq(n, nc, ic) {
-  if ($1 == $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP eq(s, s, ic) {
-  if (string_compare($1, $2) == 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP eq(s, sc, ic) {
+AUTO_OP eq(s, s|sc, ic) {
   if (string_compare($1, $2) == 0) {
     RETREL($3);
   }
@@ -295,37 +265,19 @@ Branch if $1 is not equal to $2.
 
 =cut
 
-AUTO_OP ne(i, i, ic) {
+AUTO_OP ne(i, i|ic, ic) {
   if ($1 != $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP ne(i, ic, ic) {
+AUTO_OP ne(n, n|nc, ic) {
   if ($1 != $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP ne(n, n, ic) {
-  if ($1 != $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ne(n, nc, ic) {
-  if ($1 != $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ne(s, s, ic) {
-  if (string_compare($1, $2) != 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ne(s, sc, ic) {
+AUTO_OP ne(s, s|sc, ic) {
   if (string_compare($1, $2) != 0) {
     RETREL($3);
   }
@@ -350,37 +302,19 @@ Branch if $1 is less than $2.
 
 =cut
 
-AUTO_OP lt(i, i, ic) {
+AUTO_OP lt(i, i|ic, ic) {
   if ($1 < $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP lt(i, ic, ic) {
+AUTO_OP lt(n, n|nc, ic) {
   if ($1 < $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP lt(n, n, ic) {
-  if ($1 < $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP lt(n, nc, ic) {
-  if ($1 < $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP lt(s, s, ic) {
-  if (string_compare($1, $2) < 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP lt(s, sc, ic) {
+AUTO_OP lt(s, s|sc, ic) {
   if (string_compare($1, $2) < 0) {
     RETREL($3);
   }
@@ -405,37 +339,19 @@ Branch if $1 is less than or equal to $2.
 
 =cut
 
-AUTO_OP le(i, i, ic) {
+AUTO_OP le(i, i|ic, ic) {
   if ($1 <= $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP le(i, ic, ic) {
+AUTO_OP le(n, n|nc, ic) {
   if ($1 <= $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP le(n, n, ic) {
-  if ($1 <= $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP le(n, nc, ic) {
-  if ($1 <= $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP le(s, s, ic) {
-  if (string_compare($1, $2) <= 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP le(s, sc, ic) {
+AUTO_OP le(s, s|sc, ic) {
   if (string_compare($1, $2) <= 0) {
     RETREL($3);
   }
@@ -460,37 +376,19 @@ Branch if $1 is greater than $2.
 
 =cut
 
-AUTO_OP gt(i, i, ic) {
+AUTO_OP gt(i, i|ic, ic) {
   if ($1 > $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP gt(i, ic, ic) {
+AUTO_OP gt(n, n|nc, ic) {
   if ($1 > $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP gt(n, n, ic) {
-  if ($1 > $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP gt(n, nc, ic) {
-  if ($1 > $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP gt(s, s, ic) {
-  if (string_compare($1, $2) > 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP gt(s, sc, ic) {
+AUTO_OP gt(s, s|sc, ic) {
   if (string_compare($1, $2) > 0) {
     RETREL($3);
   }
@@ -515,37 +413,19 @@ Branch if $1 is greater than or equal to $2.
 
 =cut
 
-AUTO_OP ge(i, i, ic) {
+AUTO_OP ge(i, i|ic, ic) {
   if ($1 >= $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP ge(i, ic, ic) {
+AUTO_OP ge(n, n|nc, ic) {
   if ($1 >= $2) {
     RETREL($3);
   }
 }
 
-AUTO_OP ge(n, n, ic) {
-  if ($1 >= $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ge(n, nc, ic) {
-  if ($1 >= $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ge(s, s, ic) {
-  if (string_compare($1, $2) >= 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ge(s, sc, ic) {
+AUTO_OP ge(s, s|sc, ic) {
   if (string_compare($1, $2) >= 0) {
     RETREL($3);
   }
@@ -608,35 +488,19 @@ Print $1 to standard output.
 
 =cut
 
-AUTO_OP print(i) {
+AUTO_OP print(i|ic) {
   /* TODO: Configure for format */
   printf("%li", (long) $1);
-}
-
-AUTO_OP print(ic) {
-  /* TODO: Configure for format */
-  printf("%li", (long) $1);
-}
-
-AUTO_OP print(n) {
-  /* TODO: Configure for format */
-  printf("%f", $1);
 }
  
-AUTO_OP print(nc) {
+AUTO_OP print(n|nc) {
   /* TODO: Configure for format */
   printf("%f", $1);
 }
 
-AUTO_OP print(s) {
+AUTO_OP print(s|sc) {
   STRING *s = $1; 
   if (s) printf("%.*s",(int)string_length(s),(char *) s->bufstart);
-}
-
-AUTO_OP print(sc) {
-  STRING *s = $1;
-  INTVAL l = string_length(s);
-  printf("%.*s", (int)l, (char *)s->bufstart);
 }
 
 
@@ -670,20 +534,12 @@ constants into their destination register, $1.
 Set $1 to the sum of $2 and $3.
 
 =cut
-
-AUTO_OP add(i, i, i) {
-  $1 = $2 + $3;
-}
-
-AUTO_OP add(i, i, ic) {
-  $1 = $2 + $3;
-}
   
-AUTO_OP add(n, n, n) {
+AUTO_OP add(i, i, i|ic) {
   $1 = $2 + $3;
 }
 
-AUTO_OP add(n, n, nc) {
+AUTO_OP add(n, n, n|nc) {
   $1 = $2 + $3;
 }
 
@@ -1071,19 +927,11 @@ Set $1 to the product of $2 and $3.
 
 =cut
 
-AUTO_OP mul(i, i, i) {
+AUTO_OP mul(i, i, i|ic) {
   $1 = $2 * $3;
 }
 
-AUTO_OP mul(i, i, ic) {
-  $1 = $2 * $3;
-}
-
-AUTO_OP mul(n, n, n) {
-  $1 = $2 * $3;
-}
-
-AUTO_OP mul(n, n, nc) {
+AUTO_OP mul(n, n, n|nc) {
   $1 = $2 * $3;
 }
 
@@ -1236,11 +1084,7 @@ TODO: Create a three-argument version of this? Don't force in-place modification
 
 =cut
 
-AUTO_OP chopn(s, ic) {
-   (void)string_chopn($1, $2);
-}
-
-AUTO_OP chopn(s, i) {
+AUTO_OP chopn(s, i|ic) {
    (void)string_chopn($1, $2);
 }
 
@@ -1264,12 +1108,7 @@ into $1.
 
 =cut
 
-AUTO_OP concat(s, s) {
-    STRING *s = string_concat($1, $2, 1);
-    $1 = s;
-}
-
-AUTO_OP concat(s, sc) {
+AUTO_OP concat(s, s|sc) {
     STRING *s = string_concat($1, $2, 1);
     $1 = s;
 }
@@ -1326,22 +1165,7 @@ length $4.
 
 =cut
 
-AUTO_OP substr(s, s, i, i) {
-    STRING *s = string_substr($2, $3, $4, &$1);
-    $1 = s;
-}
-
-AUTO_OP substr(s, s, i, ic) {
-    STRING *s = string_substr($2, $3, $4, &$1);
-    $1 = s;
-}
-
-AUTO_OP substr(s, s, ic, i) {
-    STRING *s = string_substr($2, $3, $4, &$1);
-    $1 = s;
-}
-
-AUTO_OP substr(s, s, ic, ic) {
+AUTO_OP substr(s, s, i|ic, i|ic) {
     STRING *s = string_substr($2, $3, $4, &$1);
     $1 = s;
 }
@@ -1389,12 +1213,8 @@ Set $1 to the arc cosine (in radians) of $2.
 
 =cut
 
-AUTO_OP acos(n, i) {
+AUTO_OP acos(n, i|n) {
    $1 = acos((FLOATVAL)$2);
-}
-
-AUTO_OP acos(n, n) {
-   $1 = acos($2);
 }
 
 
@@ -1408,12 +1228,8 @@ Set $1 to the arc secant (in radians) of $2.
 
 =cut
 
-AUTO_OP asec(n, i) {
+AUTO_OP asec(n, i|n) {
    $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
-}
-
-AUTO_OP asec(n, n) {
-   $1 = acos(((FLOATVAL)1.0) / $2);
 }
 
 
@@ -1427,12 +1243,8 @@ Set $1 to the arc sine (in radians) of $2.
 
 =cut
 
-AUTO_OP asin(n, i) {
+AUTO_OP asin(n, i|n) {
    $1 = asin((FLOATVAL)$2);
-}
-
-AUTO_OP asin(n, n) {
-   $1 = asin($2);
 }
 
 
@@ -1541,12 +1353,8 @@ Set $1 to the cosine of $2 (given in radians).
 
 =cut
 
-AUTO_OP cos(n, i) {
+AUTO_OP cos(n, i|n) {
    $1 = cos((FLOATVAL)$2);
-}
-
-AUTO_OP cos(n, n) {
-   $1 = cos($2);
 }
 
 
@@ -1560,12 +1368,8 @@ Set $1 to the hyperbolic cosine of $2 (given in radians).
 
 =cut
 
-AUTO_OP cosh(n, i) {
+AUTO_OP cosh(n, i|n) {
    $1 = cosh((FLOATVAL)$2);
-}
-
-AUTO_OP cosh(n, n) {
-   $1 = cosh($2);
 }
 
 
@@ -1579,12 +1383,8 @@ Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm
 
 =cut
 
-AUTO_OP exp(n, i) {
+AUTO_OP exp(n, i|n) {
    $1 = exp((FLOATVAL)$2);
-}
-
-AUTO_OP exp(n, n) {
-   $1 = exp($2);
 }
 
 
@@ -1598,12 +1398,8 @@ Set $1 to the natural (base I<e>) logarithm of $2.
 
 =cut
 
-AUTO_OP ln(n, i) {
+AUTO_OP ln(n, i|n) {
    $1 = log((FLOATVAL)$2);
-}
-
-AUTO_OP ln(n, n) {
-   $1 = log($2);
 }
 
 
@@ -1617,12 +1413,8 @@ Set $1 to the base 10 logarithm of $2.
 
 =cut
 
-AUTO_OP log10(n, i) {
+AUTO_OP log10(n, i|n) {
    $1 = log10((FLOATVAL)$2);
-}
-
-AUTO_OP log10(n, n) {
-   $1 = log10($2);
 }
 
 
@@ -1636,14 +1428,9 @@ Set $1 to the base 2 logarithm of $2.
 
 =cut
 
-AUTO_OP log2(n, i) {
+AUTO_OP log2(n, i|n) {
    FLOATVAL temp = log((FLOATVAL)2.0);
    $1 = log((FLOATVAL)$2) / temp;
-}
-
-AUTO_OP log2(n, n) {
-   FLOATVAL temp = log((FLOATVAL)2.0);
-   $1 = log($2) / temp;
 }
 
 
@@ -1658,12 +1445,8 @@ Set $1 to the secant of $2 (given in radians).
 =cut
 
 
-AUTO_OP sec(n, i) {
+AUTO_OP sec(n, i|n) {
    $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
-}
-
-AUTO_OP sec(n, n) {
-   $1 = ((FLOATVAL)1) / cos($2);
 }
 
 
@@ -1677,12 +1460,8 @@ Set $1 to the hyperbolic secant of $2 (given in radians).
 
 =cut
 
-AUTO_OP sech(n, i) {
+AUTO_OP sech(n, i|n) {
    $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
-}
-
-AUTO_OP sech(n, n) {
-   $1 = ((FLOATVAL)1.0) / cosh($2);
 }
 
 
@@ -1696,12 +1475,8 @@ Set $1 to the sine of $2 (given in radians).
 
 =cut
 
-AUTO_OP sin(n, i) {
+AUTO_OP sin(n, i|n) {
    $1 = sin((FLOATVAL)$2);
-}
-
-AUTO_OP sin(n, n) {
-   $1 = sin($2);
 }
 
 
@@ -1715,12 +1490,8 @@ Set $1 to the hyperbolic sine of $2 (given in radians).
 
 =cut
 
-AUTO_OP sinh(n, i) {
+AUTO_OP sinh(n, i|n) {
    $1 = sinh((FLOATVAL)$2);
-}
-
-AUTO_OP sinh(n, n) {
-   $1 = sinh($2);
 }
 
 
@@ -1733,12 +1504,8 @@ Set $1 to the tangent of $2 (given in radians).
 
 =cut
 
-AUTO_OP tan(n, i) {
+AUTO_OP tan(n, i|n) {
    $1 = tan((FLOATVAL)$2);
-}
-
-AUTO_OP tan(n, n) {
-   $1 = tan($2);
 }
 
 
@@ -1752,12 +1519,8 @@ Set $1 to the hyperbolic tangent of $2 (given in radians).
 
 =cut
 
-AUTO_OP tanh(n, i) {
+AUTO_OP tanh(n, i|n) {
    $1 = tanh((FLOATVAL)$2);
-}
-
-AUTO_OP tanh(n, n) {
-   $1 = tanh($2);
 }
 
 
@@ -1787,11 +1550,7 @@ Set the bits of $1 according to the B<and> of the corresponding bits from $2 and
 
 =cut
 
-AUTO_OP and(i, i, i) {
-  $1 = $2 & $3;
-}
-
-AUTO_OP and(i, i, ic) {
+AUTO_OP and(i, i, i|ic) {
   $1 = $2 & $3;
 }
 
@@ -1819,11 +1578,7 @@ Set the bits of $1 according to the B<or> of the corresponding bits from $2 and 
 
 =cut
 
-AUTO_OP or(i, i, i) {
-  $1 = $2 | $3;
-}
-
-AUTO_OP or(i, i, ic) {
+AUTO_OP or(i, i, i|ic) {
   $1 = $2 | $3;
 }
 
@@ -1837,11 +1592,7 @@ Set $1 to the value of $2 shifted left by $3 bits.
 
 =cut
 
-AUTO_OP shl(i, i, ic) {
-  $1 = $2 << $3;
-}
-
-AUTO_OP shl(i, i, i) {
+AUTO_OP shl(i, i, i|ic) {
   $1 = $2 << $3;
 }
 
@@ -1856,11 +1607,7 @@ Set $1 to the value of $2 shifted right by $3 bits.
 
 =cut
 
-AUTO_OP shr(i, i, ic) {
-  $1 = $2 >> $3;
-}
-
-AUTO_OP shr(i, i, i) {
+AUTO_OP shr(i, i, i|ic) {
   $1 = $2 >> $3;
 }
 
@@ -1875,11 +1622,7 @@ Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and
 
 =cut
 
-AUTO_OP xor(i, i, i) {
-  $1 = $2 ^ $3;
-}
-
-AUTO_OP xor(i, i, ic) {
+AUTO_OP xor(i, i, i|ic) {
   $1 = $2 ^ $3;
 }
 
@@ -2204,12 +1947,7 @@ stack for later returning.
 
 =cut
 
-MANUAL_OP bsr(i) {
-  push_generic_entry(interpreter, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
-  RETREL($1);
-}
-
-MANUAL_OP bsr(ic) {
+MANUAL_OP bsr(i|ic) {
   push_generic_entry(interpreter, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
   RETREL($1);
 }

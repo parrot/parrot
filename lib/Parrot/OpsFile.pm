@@ -84,22 +84,18 @@ sub read_ops
 
   my ($name, $footer);
   
-  my $in_comment = 0;
-  my $op;
-  my $code;
   my $type;
   my $body;
   my $short_name;
   my $args;
   my @args;
-  my $op_size;
-  my $full_name;
   my $seen_pod;
+  my $seen_op;
 
   while (<OPS>) {
     $seen_pod = 1 if m|^=|;
 
-    unless ($op or m|^AUTO_OP\s+| or m|^MANUAL_OP\s+|) {
+    unless ($seen_op or m|^AUTO_OP\s+| or m|^MANUAL_OP\s+|) {
       $self->{PREAMBLE} .= $_ unless $seen_pod or $count; # Lines up to first op def.
       next;
     };
@@ -133,20 +129,16 @@ sub read_ops
     #
 
     if (/^(AUTO|MANUAL)_OP\s+([a-zA-Z][a-zA-Z0-9]*)\s*\((.*)\)\s*{/) {
-      if ($op) {
+      if ($seen_op) {
         die "Parrot::OpsFile: Cannot define an op within an op definition!\n";
       }
 
-      $code       = $count++;
       $type       = lc $1;
       $short_name = lc $2;
       $args       = trim(lc $3);
-      @args       = ('op', split(/\s*,\s*/, $args)); # Prepend 'op' for opcode
-      $op_size    = scalar(@args);
-      $op         = Parrot::Op->new($code, $type, $short_name, @args);
-      $full_name  = $op->full_name;
+      @args       = split(/\s*,\s*/, $args);
       $body       = '';
-      $op_size    = $op->size;
+      $seen_op    = 1;
 
       next;
     }
@@ -160,14 +152,62 @@ sub read_ops
     #
 
     if (/^}\s*$/) {
-      $op->body($body);
-      $self->push_op($op);
-      undef $op;
+      $count += $self->make_op($count, $type, $short_name, $body, @args);
+
+      $seen_op = 0;
 
       next;
     }
   
     #
+    # Accummulate the code into the op's body:
+    #
+
+    if ($seen_op) {
+      $body .= $_;
+    } else {
+      die "Parrot::OpsFile: Unrecognized line: '$_'!\n";
+    }
+  }
+
+  if ($seen_op) {
+    die "Parrot::OpsFile: File ended with incomplete op definition!\n";
+  }
+
+  close OPS or die "Could not close ops file '$file' ($!)!";
+
+  return;
+}
+
+
+#
+# make_op()
+#
+
+sub make_op
+{
+  my ($self, $code, $type, $short_name, $body, @args) = @_;
+  my @fixedargs;
+
+  while (@args) {
+    my $arg = shift @args;
+    if ($arg =~ /\|/) {
+      my $count = 0;
+      foreach my $variant (split(/\s*\|\s*/, $arg)) {
+        $count += $self->make_op($code + $count, $type, $short_name, $body,
+        			 @fixedargs, $variant, @args);
+      }
+      return $count;
+    }
+    else {
+      push @fixedargs, $arg;
+    }
+  }
+
+  my $op = Parrot::Op->new($code, $type, $short_name, 'op', @fixedargs);
+  my $op_size = $op->size;
+
+  #
     # Macro substitutions:
     #
     # We convert the following notations:
@@ -189,36 +229,23 @@ sub read_ops
     # TODO: Complain about using, e.g. $3 in an op with only 2 args.
     #
 
-    s/HALT/{{=0}}/g;
+  $body =~ s/HALT/{{=0}}/mg;
 
-    s/RESTART\(\*\)/{{=0,+=$op_size}}/g;
-    s/RESTART\((.*)\)/{{=0,+=$1}}/g;
+  $body =~ s/RESTART\(\*\)/{{=0,+=$op_size}}/mg;
+  $body =~ s/RESTART\((.*)\)/{{=0,+=$1}}/mg;
 
-    s/RETREL\(\*\)/{{+=$op_size}}/g;
-    s/RETREL\((.*)\)/{{+=$1}}/g;
+  $body =~ s/RETREL\(\*\)/{{+=$op_size}}/mg;
+  $body =~ s/RETREL\((.*)\)/{{+=$1}}/mg;
 
-    s/RETABS\((.*)\)/{{=$1}}/g;
+  $body =~ s/RETABS\((.*)\)/{{=$1}}/mg;
 
-    s/\$(\d+)/{{\@$1}}/g;
+  $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
-    #
-    # Accummulate the code into the op's body:
-    #
-
-    if ($op) {
-      $body .= $_;
-    } else {
-      die "Parrot::OpsFile: Unrecognized line: '$_'!\n";
-    }
-  }
-
-  if ($op) {
-    die "Parrot::OpsFile: File ended with incomplete op definition!\n";
-  }
+  $op->body($body);
   
-  close OPS or die "Could not close ops file '$file' ($!)!";
+  $self->push_op($op);
 
-  return;
+  return 1;
 }
 
 
