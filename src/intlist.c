@@ -1,6 +1,11 @@
-#include <parrot/parrot.h>
-
-/* intlist emulation code, calls routines in list.c
+/* intlists.c
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     Regex stack handling routines for Parrot
+ *
+ * intlist emulation code, calls routines in list.c
  *
  * here is the original docu for intlist
  *
@@ -95,8 +100,14 @@
  * Of course, a check for valid pointers could be added here.
  */
 
+#include <parrot/parrot.h>
+
 PMC* intlist_mark(Interp*i, IntList*l, PMC* last) {
     return list_mark(i, (List*) l, last);
+}
+
+IntList *intlist_clone(Interp*i, IntList *list) {
+    return (IntList *) list_clone(i, (List *) list);
 }
 
 IntList *intlist_new(Interp*i){

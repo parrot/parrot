@@ -24,9 +24,14 @@ pmclass IntList {
         return whoami;
     }
 
-    PMC* clone () { 
-        THROW_UNSUPPORTED;
-        return NULL;
+    PMC* clone () {
+        PMC* dest;
+
+        dest = pmc_new(INTERP, enum_class_IntList);
+        dest->flags |= PMC_custom_mark_FLAG;
+        dest->vtable = SELF->vtable;
+        dest->data = intlist_clone(INTERP, (IntList *) SELF->data);
+        return dest;
     }
 
     void init () {

@@ -40,6 +40,8 @@ typedef IntList_Chunk IntList;
 
 PMC* intlist_mark(Interp*, IntList*, PMC* last);
 
+IntList *intlist_clone(Interp*i, IntList *list);
+
 IntList *intlist_new(Interp*);
 
 INTVAL intlist_length(Interp* interpreter, IntList* list);

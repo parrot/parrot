@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "creation");
@@ -413,6 +413,43 @@ err:
 	print I3
 	print " "
 	print I4
+	end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "clone");
+        new P0, .IntList
+	set P0[0], 100
+	set P0[5000], 200
+	clone P1, P0
+
+	set I0, P0[5000]
+	eq I0, 200, ok_1
+	print "nok 1 "
+ok_1:
+	pop I0, P0
+	eq I0, 200, ok_2
+	print "nok 2 "
+ok_2:
+	set I0, P0
+	eq I0, 5000, ok_3
+	print "nok 3 "
+ok_3:
+	set I0, P1[5000]
+	eq I0, 200, ok_4
+	print "nok 4 "
+ok_4:
+	pop I0, P1
+	eq I0, 200, ok_5
+	print "nok 5 "
+ok_5:
+	set I0, P1
+	eq I0, 5000, ok_6
+	print "nok 6 "
+	end
+ok_6:
+	print "ok\n"
 	end
 CODE
 ok

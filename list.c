@@ -15,6 +15,7 @@
  *                         cosmetics
  *      1.3     13.10.2002 put intlist_length into intlist.c
  *      1.4     16.10.2002 integrated list in parrot/arrays
+ *      1.5     17.10.2002 clone integral data (intlist)
  *
  *  Data Structure and Algorithms:
  *  ==============================
@@ -958,6 +959,11 @@ list_clone(Interp *interpreter, List *other)
                                 string_copy(interpreter, s);
                         }
                     }
+                    break;
+                default:
+                    mem_sys_memcopy(new_chunk->data.bufstart,
+                            chunk->data.bufstart,
+                            chunk->data.buflen);
                     break;
             }
         }
