@@ -1264,8 +1264,9 @@ Parrot_ne_nc_nc_ic {
 ; string funcs
 ;
 Parrot_set_s_sc {
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
     emitm_pushl_i(NATIVECODE, CONST(2)->u.string);
-    emitm_pushl_r(NATIVECODE, emit_EBX);
+    emitm_pushl_r(NATIVECODE, emit_ECX);
     call_func(jit_info, (void*) string_copy);
     emitm_addb_i_r(NATIVECODE, 8, emit_ESP);
     jit_emit_mov_MR_i(NATIVECODE, ROFFS_STR(1), emit_EAX );
@@ -1279,7 +1280,8 @@ TEMPLATE Parrot_cmp_sx_sx_ic {
 
     push_<typ2>(2);
     push_<typ1>(1);
-    emitm_pushl_r(NATIVECODE, emit_EBX);
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(NATIVECODE, emit_ECX);
     call_func(jit_info, (void*)string_compare);
     emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
@@ -1295,7 +1297,8 @@ TEMPLATE Parrot_eq_sx_sx_ic {
 # define push_c(i) emitm_pushl_i(NATIVECODE, CONST(i)->u.string)
     push_<typ2>(2);
     push_<typ1>(1);
-    emitm_pushl_r(NATIVECODE, emit_EBX);
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(NATIVECODE, emit_ECX);
     call_func(jit_info, (void*)string_equal);
     emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
@@ -1409,7 +1412,8 @@ TEMPLATE Parrot_ifunless_sx_ic {
 # define push_c(i) emitm_pushl_i(NATIVECODE, CONST(i)->u.string)
 
     push_<typ>(1);
-    emitm_pushl_r(NATIVECODE, emit_EBX);
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(NATIVECODE, emit_ECX);
     call_func(jit_info, (void*)string_bool);
     emitm_addb_i_r(NATIVECODE, 8, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
@@ -1444,7 +1448,8 @@ TEMPLATE Parrot_ord_i_sx {
 
     emitm_pushl_i(NATIVECODE, 0);
     push_<typ>(2);
-    emitm_pushl_r(NATIVECODE, emit_EBX);
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(NATIVECODE, emit_ECX);
     call_func(jit_info, (void*)string_ord);
     emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
     if (MAP[1]) {

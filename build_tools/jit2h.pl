@@ -165,6 +165,8 @@ sub readjit($) {
             $asm =~ s/CUR_OPCODE/jit_info->cur_op/g;
             $asm =~ s/cur_opcode/jit_info->cur_op/g;
             $asm =~ s/MAP\[(\d)\]/MAP($1)/g;
+	    # XXX set extern if the code calls a function
+	    $extern = 1 if $asm =~ /call_func/;
             unless ($jit_cpu) {
                 # no address of
                 $asm =~ s/&([INSP])REG/$1REG/g;

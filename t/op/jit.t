@@ -17,7 +17,7 @@ Tests JIT register allocation.
 =cut
 
 # test WRT JIT register allocation
-use Parrot::Test tests => 58;
+use Parrot::Test tests => 59;
 
 output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped");
 set I0,0
@@ -1151,6 +1151,30 @@ CODE
 output_is($code, <<OUTPUT, "large code" );
 hello
 done
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "volatile clobbered by function call");
+  add I4, I5, I6
+  add I4, I5, I6
+  add I4, I5, I6
+  add I4, I5, I3
+  add I4, I5, I3
+  add I4, I5, I3
+  set I3, 2
+  set I1, 2
+  set S0, "Hi"
+  mul I5, I1, 77
+  print I3
+  print "\n"
+  print I4
+  print "\n"
+  print I5
+  print "\n"
+  end
+CODE
+2
+0
+154
 OUTPUT
 
 1;

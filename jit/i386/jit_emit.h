@@ -16,6 +16,23 @@
 #endif
 
 /*
+ * get the register frame pointer
+ */
+#  define Parrot_jit_emit_get_base_reg_no(pc) \
+    emit_EBX
+
+/*
+ * get the *runtime* interpreter
+ */
+#if INDIRECT_REGS
+#  define Parrot_jit_emit_get_INTERP(pc, dest) \
+    emitm_movl_m_r(pc, dest, emit_EBP, emit_None, 1, INTERP_BP_OFFS)
+#else
+#  define Parrot_jit_emit_get_INTERP(pc, dest) \
+    jit_emit_mov_rr_i(pc, dest, emit_EBX)
+#endif
+
+/*
  * if we have a delegated method like typeof_i_p, that returns an INTVAL
  * and that is all in a sequence of JITted opcodes, and when these INTVAL
  * is MAPped, we got a problem. So the EXT_CALL flag is disabled - mapped
@@ -1972,6 +1989,11 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                 offsetof(Parrot_jit_info_t, arena));
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
                 offsetof(Parrot_jit_arena_t, op_map));
+#if INDIRECT_REGS
+        /* get base pointer */
+        emitm_movl_m_r(jit_info->native_ptr, emit_EBX, emit_EBX, 0, 1,
+                offsetof(Interp, ctx.bp));
+#endif
 
     }
 #  if EXEC_CAPABLE
@@ -2374,11 +2396,10 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     if (i2 <= 0 || i2 >= enum_class_max)
         internal_exception(1, "Illegal PMC enum (%d) in new\n", i2);
     /* get interpreter */
-    emitm_movl_m_r(jit_info->native_ptr,
-            emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
     /* push pmc enum and interpreter */
     emitm_pushl_i(jit_info->native_ptr, i2);
-    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
+    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
 #    if EXEC_CAPABLE
     if (jit_info->objfile) {
         CALL("pmc_new_noinit");
@@ -2394,7 +2415,8 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     emitm_movl_r_m(jit_info->native_ptr,
             emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_PMC(p1));
     /* push interpreter */
-    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
             offsetof(struct PMC, vtable));
@@ -2873,6 +2895,11 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
     emitm_pushl_r(pc, emit_EBX);
     /* get interp into %ebx */
     emitm_movl_m_r(pc, emit_EBX, emit_EBP, 0, 1, 8);
+#if INDIRECT_REGS
+        /* get base pointer */
+        emitm_movl_m_r(pc, emit_EBX, emit_EBX, 0, 1,
+                offsetof(struct parrot_interp_t, ctx.bp));
+#endif
 
     /* get rightmost param, assume ascii chars */
     sig = (char *)signature->strstart + signature->bufused - 1;
@@ -2996,7 +3023,8 @@ preg:
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'I':
-                emitm_pushl_r(pc, emit_EBX);
+                emitm_movl_m_r(pc, emit_ECX, emit_EBP, 0, 1, 8);
+                emitm_pushl_r(pc, emit_ECX);
                 break;
             default:
                 /*
@@ -3066,10 +3094,11 @@ preg:
             break;
         case 'p':   /* make a new unmanaged struct */
             /* save return value on stack */
+            emitm_movl_m_r(pc, emit_ECX, emit_EBP, 0, 1, 8);
             emitm_pushl_r(pc, emit_EAX);
             /* make new pmc */
             emitm_pushl_i(pc, enum_class_UnManagedStruct);
-            emitm_pushl_r(pc, emit_EBX);
+            emitm_pushl_r(pc, emit_ECX);
             emitm_calll(pc, (char*)pmc_new - pc - 4);
             emitm_addb_i_r(pc, 8, emit_ESP);
             /* eax = PMC, get return value into edx */
@@ -3091,8 +3120,9 @@ preg:
             break;
         case 'b':   /* (void *) = PObj_bufstart(new_buffer_header) */
             /* preserve return value */
+            emitm_movl_m_r(pc, emit_ECX, emit_EBP, 0, 1, 8);
             emitm_pushl_r(pc, emit_EAX);
-            emitm_pushl_r(pc, emit_EBX);
+            emitm_pushl_r(pc, emit_ECX);
             emitm_calll(pc, (char*)new_buffer_header - pc - 4);
             emitm_addb_i_r(pc, 4, emit_ESP);
             /* *eax = buffer_header */
@@ -3113,8 +3143,9 @@ preg:
         case 't':   /* string */
             /* EAX is char* */
             emitm_pushl_i(pc, 0);               /* len */
+            emitm_movl_m_r(pc, emit_ECX, emit_EBP, 0, 1, 8);
             emitm_pushl_r(pc, emit_EAX);        /* string */
-            emitm_pushl_r(pc, emit_EBX);        /* interpreter */
+            emitm_pushl_r(pc, emit_ECX);        /* interpreter */
             emitm_calll(pc, (char*)string_from_cstring - pc - 4);
             emitm_addb_i_r(pc, 12, emit_ESP);
             jit_emit_mov_MR_i(pc, REG_OFFS_STR(next_s++), emit_EAX);
@@ -3217,24 +3248,6 @@ char floatval_map[] = { 1,2,3,4 };
 #  else
 #    define INTERP_BP_OFFS -16
 #  endif
-
-/*
- * get the register frame pointer
- */
-#  define Parrot_jit_emit_get_base_reg_no(pc) \
-    emit_EBX
-
-/*
- * get the *runtime* interpreter
- */
-#if 0
-#  define Parrot_jit_emit_get_INTERP(pc) \
-    (emitm_movl_m_r(pc, emit_EAX, emit_EBP, emit_None, 1, INTERP_BP_OFFS), \
-    emit_EAX
-#else
-#  define Parrot_jit_emit_get_INTERP(pc) \
-    emit_EBX
-#endif
 
 
 #endif /* JIT_EMIT */
