@@ -142,9 +142,9 @@ Normally, you will want to alias these generic bit names to something
 more meaningful within your class:
 
     enum {
-	Foobynumber_is_bignum = PMC_private0_FLAG,
-	Foobynumber_is_bigint = PMC_private1_FLAG,
-	....
+        Foobynumber_is_bignum = PMC_private0_FLAG,
+        Foobynumber_is_bigint = PMC_private1_FLAG,
+        ....
     };
 
 You're quite at liberty to declare these in a separate header file, but I

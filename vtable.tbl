@@ -1,97 +1,327 @@
 # $Id$
-# This is the main vtable data
-# Lines have the following format:
-# [keyed] <method-type> <return-type> <method_name>([<type> <pname>[, <type> <pname>...]])
-#
-# <method-type> is either int, float, num, str, bitwise, bignum,
-# or unique if the method has a set of int entries, float entries, 
-# num entries, string entries, is a bitwise operator, has bignum
-# entries, or is a unique method.
-#
-# If keyed is specified, a keyed version will also be generated that
-# is keyed by a KEY* or an INTVAL.
-#
-# So, for instance, a function with two arguments where the second
-# argument is a string would look like this:
-# str void frob (INTVAL foo, STRING* bar)
-#
-# Note that we don't include the source "PMC* pmc" - that's done implicitly.
-#
-# A <pname> of "value" in non-unique methods (multimethods) is a magic name.
-# Its type will be replaced appropriately.
-#
-# A <method-name> that contains "keyed" will only generate a keyed version.  It
-# is not neccessary to specify keyed in that case.
 
-unique void init()
-unique void init_pmc(PMC* value)
-unique void morph(INTVAL type)
-unique PMC* mark(PMC* end_of_used_list)
-unique void destroy()
+void init()
+void init_pmc(PMC* initializer)
+void morph(INTVAL type)
+PMC* mark(PMC* tail)
+void destroy()
 
-keyed unique INTVAL type()
-keyed unique UINTVAL subtype(INTVAL type)
-keyed unique STRING* name()
-keyed unique PMC* clone()
-keyed unique PMC* find_method(STRING* method_name)
-keyed unique INTVAL get_integer()
-keyed unique FLOATVAL get_number()
-keyed unique BIGNUM* get_bignum()
-keyed unique STRING* get_string()
-keyed unique INTVAL get_bool()
-keyed unique INTVAL elements()
+INTVAL type() 
+INTVAL type_keyed(KEY* key)
+INTVAL type_keyed_int(INTVAL* key)
 
-keyed unique PMC* get_pmc()
+UINTVAL subtype(INTVAL type)
+UINTVAL subtype_keyed(KEY* key, INTVAL type)
+UINTVAL subtype_keyed_int(INTVAL* key, INTVAL type)
 
-keyed unique INTVAL is_same(PMC* pmc2)
+STRING* name() 
+STRING* name_keyed(KEY* key)
+STRING* name_keyed_int(INTVAL* key)
 
-keyed int void set_integer(INTVAL value)
-keyed float void set_number(FLOATVAL value)
-keyed bignum void set_bignum(BIGNUM* value)
-keyed str void set_string(STRING* value)
+PMC* clone()
+PMC* clone_keyed(KEY* key)
+PMC* clone_keyed_int(INTVAL* key)
 
-keyed unique void set_pmc(PMC* value)
-keyed unique void set_same(PMC* value)
+PMC* find_method(STRING* method_name) 
+PMC* find_method_keyed(KEY* key, STRING* method_name)
+PMC* find_method_keyed_int(INTVAL* key, STRING* method_name)
 
-keyed num void add(PMC* value,PMC* dest)
-keyed num void subtract(PMC* value,PMC* dest)
-keyed num void multiply(PMC* value,PMC* dest)
-keyed num void divide(PMC* value,PMC* dest)
-keyed num void modulus(PMC* value,PMC* dest)
-keyed unique void neg(PMC* dest)
+INTVAL get_integer()
+INTVAL get_integer_keyed(KEY* key)
+INTVAL get_integer_keyed_int(INTVAL* key)
 
-keyed bitwise void bitwise_or(PMC* value,PMC* dest)
-keyed bitwise void bitwise_and(PMC* value,PMC* dest)
-keyed bitwise void bitwise_xor(PMC* value,PMC* dest)
-keyed unique void bitwise_not(PMC* dest)
+FLOATVAL get_number()
+FLOATVAL get_number_keyed(KEY* key)
+FLOATVAL get_number_keyed_int(INTVAL* key)
 
-keyed bitwise void bitwise_shr(PMC* value,PMC* dest)
-keyed bitwise void bitwise_shl(PMC* value,PMC* dest)
+BIGNUM* get_bignum()
+BIGNUM* get_bignum_keyed(KEY* key)
+BIGNUM* get_bignum_keyed_int(INTVAL* key)
 
-keyed str void concatenate(PMC* value,PMC* dest)
+STRING* get_string()
+STRING* get_string_keyed(KEY* key)
+STRING* get_string_keyed_int(INTVAL* key)
 
-keyed unique INTVAL is_equal(PMC* value)
-keyed unique INTVAL cmp(PMC* value)
-keyed unique INTVAL cmp_num(PMC* value)
-keyed unique INTVAL cmp_string(PMC* value)
+INTVAL get_bool()
+INTVAL get_bool_keyed(KEY* key)
+INTVAL get_bool_keyed_int(INTVAL* key)
 
-keyed unique void logical_or(PMC* value, PMC* dest)
-keyed unique void logical_and(PMC* value, PMC* dest)
-keyed unique void logical_xor(PMC* value, PMC* dest)
-keyed unique void logical_not(PMC* dest)
+INTVAL elements()
+INTVAL elements_keyed(KEY* key)
+INTVAL elements_keyed_int(INTVAL* key)
 
-keyed unique void repeat(PMC* value, PMC* dest)
-keyed unique void repeat_int(INTVAL value, PMC* dest)
+PMC* get_pmc()
+PMC* get_pmc_keyed(KEY* key)
+PMC* get_pmc_keyed_int(INTVAL* key)
 
-keyed unique void increment()
-keyed unique void decrement()
+INTVAL is_same(PMC* value)
+INTVAL is_same_keyed(KEY* key, PMC* value, KEY* value_key)
+INTVAL is_same_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
 
-unique INTVAL exists_keyed()
+void set_integer(PMC* value)
+void set_integer_native(INTVAL value)
+void set_integer_same(PMC* value)
+void set_integer_keyed(KEY* key, INTVAL value)
+void set_integer_keyed_int(INTVAL* key, INTVAL value)
 
-keyed unique INTVAL defined()
+void set_number(PMC* value)
+void set_number_native(FLOATVAL value)
+void set_number_same(PMC* value)
+void set_number_keyed(KEY* key, FLOATVAL value)
+void set_number_keyed_int(INTVAL* key, FLOATVAL value)
 
-unique void delete_keyed()
-unique KEY* nextkey_keyed()
+void set_bignum(PMC* value)
+void set_bignum_native(BIGNUM* value)
+void set_bignum_same(PMC* value)
+void set_bignum_keyed(KEY* key, BIGNUM* value)
+void set_bignum_keyed_int(INTVAL* key, BIGNUM* value)
 
-keyed unique void substr(INTVAL offset,INTVAL length,PMC* dest)
-keyed unique STRING* substr_str(INTVAL offset,INTVAL length)
+void set_string(PMC* value)
+void set_string_native(STRING* value)
+void set_string_unicode(STRING* value)
+void set_string_other(STRING* value)
+void set_string_same(PMC* value)
+void set_string_keyed(KEY* key, STRING* value)
+void set_string_keyed_int(INTVAL* key, STRING* value)
+
+void set_pmc(PMC* value)
+void set_pmc_keyed(KEY* key, PMC* value, KEY* value_key)
+void set_pmc_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
+
+void set_same(PMC* value)
+void set_same_keyed(KEY* key, PMC* value, KEY* value_key)
+void set_same_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
+
+INTVAL pop_integer()
+INTVAL pop_integer_keyed(KEY* key)
+INTVAL pop_integer_keyed_int(INTVAL* key)
+
+FLOATVAL pop_float()
+FLOATVAL pop_float_keyed(KEY* key)
+FLOATVAL pop_float_keyed_int(INTVAL* key)
+
+BIGNUM* pop_bignum()
+BIGNUM* pop_bignum_keyed(KEY* key)
+BIGNUM* pop_bignum_keyed_int(INTVAL* key)
+
+STRING* pop_string()
+STRING* pop_string_keyed(KEY* key)
+STRING* pop_string_keyed_int(INTVAL* key)
+
+PMC* pop_pmc()
+PMC* pop_pmc_keyed(KEY* key)
+PMC* pop_pmc_keyed_int(INTVAL* key)
+
+void push_integer(INTVAL value)
+void push_integer_keyed(KEY* key, INTVAL value)
+void push_integer_keyed_int(INTVAL* key, INTVAL value)
+
+void push_float(FLOATVAL value)
+void push_float_keyed(KEY* key, FLOATVAL value)
+void push_float_keyed_int(INTVAL* key, FLOATVAL value)
+
+void push_bignum(BIGNUM* value)
+void push_bignum_keyed(KEY* key, BIGNUM* value)
+void push_bignum_keyed_int(INTVAL* key, BIGNUM* value)
+
+void push_string(STRING* value)
+void push_string_keyed(KEY* key, STRING* value)
+void push_string_keyed_int(INTVAL* key, STRING* value)
+
+void push_pmc(PMC* value)
+void push_pmc_keyed(KEY* key, PMC* value, KEY* value_key)
+void push_pmc_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
+
+INTVAL shift_integer()
+INTVAL shift_integer_keyed(KEY* key)
+INTVAL shift_integer_keyed_int(INTVAL* key)
+
+FLOATVAL shift_float()
+FLOATVAL shift_float_keyed(KEY* key)
+FLOATVAL shift_float_keyed_int(INTVAL* key)
+
+BIGNUM* shift_bignum()
+BIGNUM* shift_bignum_keyed(KEY* key)
+BIGNUM* shift_bignum_keyed_int(INTVAL* key)
+
+STRING* shift_string()
+STRING* shift_string_keyed(KEY* key)
+STRING* shift_string_keyed_int(INTVAL* key)
+
+PMC* shift_pmc()
+PMC* shift_pmc_keyed(KEY* key)
+PMC* shift_pmc_keyed_int(INTVAL* key)
+
+void unshift_integer(INTVAL value)
+void unshift_integer_keyed(KEY* key, INTVAL value)
+void unshift_integer_keyed_int(INTVAL* key, INTVAL value)
+
+void unshift_float(FLOATVAL value)
+void unshift_float_keyed(KEY* key, FLOATVAL value)
+void unshift_float_keyed_int(INTVAL* key, FLOATVAL value)
+
+void unshift_bignum(BIGNUM* value)
+void unshift_bignum_keyed(KEY* key, BIGNUM* value)
+void unshift_bignum_keyed_int(INTVAL* key, BIGNUM* value)
+
+void unshift_string(STRING* value)
+void unshift_string_keyed(KEY* key, STRING* value)
+void unshift_string_keyed_int(INTVAL* key, STRING* value)
+
+void unshift_pmc(PMC* value)
+void unshift_pmc_keyed(KEY* key, PMC* value, KEY* value_key)
+void unshift_pmc_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
+
+## void splice ???
+
+void add(PMC* value, PMC* dest)
+void add_int(INTVAL value, PMC* dest)
+void add_bignum(BIGNUM* value, PMC* dest)
+void add_float(FLOATVAL value, PMC* dest)
+void add_same(PMC* value, PMC* dest)
+void add_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void add_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void subtract(PMC* value, PMC* dest)
+void subtract_int(INTVAL value, PMC* dest)
+void subtract_bignum(BIGNUM* value, PMC* dest)
+void subtract_float(FLOATVAL value, PMC* dest)
+void subtract_same(PMC* value, PMC* dest)
+void subtract_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void subtract_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void multiply(PMC* value, PMC* dest)
+void multiply_int(INTVAL value, PMC* dest)
+void multiply_bignum(BIGNUM* value, PMC* dest)
+void multiply_float(FLOATVAL value, PMC* dest)
+void multiply_same(PMC* value, PMC* dest)
+void multiply_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void multiply_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void divide(PMC* value, PMC* dest)
+void divide_int(INTVAL value, PMC* dest)
+void divide_bignum(BIGNUM* value, PMC* dest)
+void divide_float(FLOATVAL value, PMC* dest)
+void divide_same(PMC* value, PMC* dest)
+void divide_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void divide_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void modulus(PMC* value, PMC* dest)
+void modulus_int(INTVAL value, PMC* dest)
+void modulus_bignum(BIGNUM* value, PMC* dest)
+void modulus_float(FLOATVAL value, PMC* dest)
+void modulus_same(PMC* value, PMC* dest)
+void modulus_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void modulus_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void neg(PMC* dest)
+void neg_keyed(KEY* key, PMC* dest, KEY* dest_key)
+void neg_keyed_int(INTVAL* key, PMC* dest, INTVAL* dest_key)
+
+void bitwise_or(PMC* value, PMC* dest)
+void bitwise_or_int(INTVAL value, PMC* dest)
+void bitwise_or_same(PMC* value, PMC* dest)
+void bitwise_or_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void bitwise_or_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void bitwise_and(PMC* value, PMC* dest)
+void bitwise_and_int(INTVAL value, PMC* dest)
+void bitwise_and_same(PMC* value, PMC* dest)
+void bitwise_and_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void bitwise_and_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void bitwise_xor(PMC* value, PMC* dest)
+void bitwise_xor_int(INTVAL value, PMC* dest)
+void bitwise_xor_same(PMC* value, PMC* dest)
+void bitwise_xor_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void bitwise_xor_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void bitwise_not(PMC* dest)
+void bitwise_not_keyed(KEY* key, PMC* dest, KEY* dest_key)
+void bitwise_not_keyed_int(INTVAL* key, PMC* dest, INTVAL* dest_key)
+
+void bitwise_shl(PMC* value, PMC* dest)
+void bitwise_shl_int(INTVAL value, PMC* dest)
+void bitwise_shl_same(PMC* value, PMC* dest)
+void bitwise_shl_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void bitwise_shl_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void bitwise_shr(PMC* value, PMC* dest)
+void bitwise_shr_int(INTVAL value, PMC* dest)
+void bitwise_shr_same(PMC* value, PMC* dest)
+void bitwise_shr_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void bitwise_shr_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void concatenate(PMC* value, PMC* dest)
+void concatenate_native(STRING* value, PMC* dest)
+void concatenate_unicode(STRING* value, PMC* dest)
+void concatenate_other(STRING* value, PMC* dest)
+void concatenate_same(PMC* value, PMC* dest)
+void concatenate_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void concatenate_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+INTVAL is_equal(PMC* value)
+INTVAL is_equal_keyed(KEY* key, PMC* value, KEY* value_key)
+INTVAL is_equal_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
+
+INTVAL cmp(PMC* value)
+INTVAL cmp_keyed(KEY* key, PMC* value, KEY* value_key)
+INTVAL cmp_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
+INTVAL cmp_num(PMC* value)
+INTVAL cmp_num_keyed(KEY* key, PMC* value, KEY* value_key)
+INTVAL cmp_num_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
+INTVAL cmp_string(PMC* value)
+INTVAL cmp_string_keyed(KEY* key, PMC* value, KEY* value_key)
+INTVAL cmp_string_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
+
+void logical_or(PMC* value, PMC* dest)
+void logical_or_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void logical_or_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void logical_and(PMC* value, PMC* dest)
+void logical_and_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void logical_and_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void logical_xor(PMC* value, PMC* dest)
+void logical_xor_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void logical_xor_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+void logical_not(PMC* dest)
+void logical_not_keyed(KEY* key, PMC* dest, KEY* dest_key)
+void logical_not_keyed_int(INTVAL* key, PMC* dest, INTVAL* dest_key)
+
+void repeat(PMC* value, PMC* dest)
+void repeat_int(INTVAL value, PMC* dest)
+void repeat_keyed(KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+void repeat_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+void repeat_int_keyed(KEY* key, INTVAL value, PMC* dest, KEY* dest_key)
+void repeat_int_keyed_int(INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key)
+
+void increment()
+void increment_keyed(KEY* key)
+void increment_keyed_int(INTVAL* key)
+
+void decrement()
+void decrement_keyed(KEY* key)
+void decrement_keyed_int(INTVAL* key)
+
+INTVAL exists_keyed(KEY* key)
+INTVAL exists_keyed_int(INTVAL* key)
+
+INTVAL defined()
+INTVAL defined_keyed(KEY* key)
+INTVAL defined_keyed_int(INTVAL* key)
+
+void delete_keyed(KEY* key)
+void delete_keyed_int(INTVAL* key)
+
+KEY* nextkey_keyed(KEY* key)
+KEY* nextkey_keyed_int(INTVAL* key)
+
+void substr(INTVAL offset, INTVAL length, PMC* dest)
+void substr_keyed(KEY* key, INTVAL offset, INTVAL length, PMC* dest, KEY* dest_key)
+void substr_keyed_int(INTVAL* key, INTVAL offset, INTVAL length, PMC* dest, INTVAL* dest_key)
+
+STRING* substr_str(INTVAL offset, INTVAL length)
+STRING* substr_str_keyed(KEY* key, INTVAL offset, INTVAL length)
+STRING* substr_str_keyed_int(INTVAL* key, INTVAL offset, INTVAL length)

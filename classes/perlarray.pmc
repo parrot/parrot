@@ -409,8 +409,8 @@ pmclass PerlArray {
     void add_same (PMC* value, PMC* dest) {
     }
 
-    void add_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
-                               PMC* dest_value, KEY* dest_value_key) {
+    void add_keyed (KEY* key, PMC* value, KEY* value_key,
+                               PMC* dest, KEY* dest_key) {
     }
 
     void subtract (PMC* value, PMC* dest) {
@@ -454,8 +454,8 @@ pmclass PerlArray {
     void subtract_same (PMC* value, PMC* dest) {
     }
 
-    void subtract_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
-                                    PMC* dest_value, KEY* dest_value_key) {
+    void subtract_keyed (KEY* key, PMC* value, KEY* value_key,
+                                    PMC* dest, KEY* dest_key) {
     }
 
     void multiply (PMC* value, PMC* dest) {
@@ -499,8 +499,8 @@ pmclass PerlArray {
     void multiply_same (PMC* value, PMC* dest) {
     }
 
-    void multiply_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
-                                    PMC* dest_value, KEY* dest_value_key) {
+    void multiply_keyed (KEY* key, PMC* value, KEY* value_key,
+                                    PMC* dest, KEY* dest_key) {
     }
 
     void divide (PMC* value, PMC* dest) {
@@ -544,8 +544,8 @@ pmclass PerlArray {
     void divide_same (PMC* value, PMC* dest) {
     }
 
-    void divide_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
-                                  PMC* dest_value, KEY* dest_value_key) {
+    void divide_keyed (KEY* key, PMC* value, KEY* value_key,
+                                  PMC* dest, KEY* dest_key) {
     }
 
     void modulus (PMC* value, PMC* dest) {
@@ -577,8 +577,8 @@ pmclass PerlArray {
     void modulus_same (PMC* value, PMC* dest) {
     }
 
-    void modulus_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
-                                   PMC* dest_value, KEY* dest_value_key) {
+    void modulus_keyed (KEY* key, PMC* value, KEY* value_key,
+                                   PMC* dest, KEY* dest_key) {
     }
 
     void concatenate (PMC* value, PMC* dest) {
@@ -626,8 +626,8 @@ pmclass PerlArray {
                          );
     }
 
-    void concatenate_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
-                                       PMC* dest_value, KEY* dest_value_key) {
+    void concatenate_keyed (KEY* key, PMC* value, KEY* value_key,
+                                       PMC* dest, KEY* dest_key) {
     }
 
     /* == operation */

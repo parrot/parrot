@@ -12,7 +12,7 @@ use lib "$FindBin::Bin/../lib";
 use Parrot::Vtable;
 use strict;
 
-my %default = parse_vtable("$FindBin::Bin/../vtable.tbl");
+my $default = parse_vtable("$FindBin::Bin/../vtable.tbl");
 my $signature_re = qr{
     ^
     (?:             #blank spaces and comments
@@ -99,8 +99,8 @@ sub scan_inheritance_tree {
         $class = $super;
     }
 
-    foreach my $method (@{ $default{order} }) {
-        $methods{$method} ||= 'default';
+    foreach my $method (@{$default}) {
+        $methods{$method->[1]} ||= 'default';
     }
 
     return \%methods;
@@ -230,7 +230,7 @@ EOC
      push @methods, $methodname;
   };
 
-  @methods = map { "Parrot_$methodloc->{$_}_$_" } @{ $default{order} };
+  @methods = map { "Parrot_$methodloc->{$_->[1]}_$_->[1]" } @{$default};
 
   my $methodlist = join (",\n        ", @methods);
   my $initname = "Parrot_$classname" . "_class_init";

@@ -4,7 +4,7 @@
 use lib 'lib';
 use Parrot::Vtable;
 
-my %vtable = parse_vtable();
+my $vtable = parse_vtable();
 
 open OUT, ">include/parrot/vtable.h" or die $!;
 
@@ -26,10 +26,11 @@ print OUT <<'EOF';
 
 EOF
 
-print OUT vtbl_struct(%vtable);
+print OUT vtbl_defs($vtable);
 
-#print OUT vtbl_defs(%vtable);
 print OUT "\n";
+
+print OUT vtbl_struct($vtable);
 
 print OUT "\n#endif\n";
 

@@ -87,7 +87,7 @@ pmclass ParrotSub {
    void set_integer_same (PMC * value) {
    }
 
-   void set_integer_keyed (KEY * key, INTVAL src_value) {
+   void set_integer_keyed (KEY * key, INTVAL value) {
    }
 
    void set_number (PMC * value) {
@@ -102,7 +102,7 @@ pmclass ParrotSub {
    void set_number_same (PMC * value) {
    }
 
-   void set_number_keyed (KEY * key, FLOATVAL src_value) {
+   void set_number_keyed (KEY * key, FLOATVAL value) {
    }
 
    void set_string (PMC * value) {
@@ -120,7 +120,7 @@ pmclass ParrotSub {
    void set_string_same (PMC * value) {
    }
 
-   void set_string_keyed (KEY * key, STRING* src_value) {
+   void set_string_keyed (KEY * key, STRING* value) {
    }
 
    void set_value (void* value) {
@@ -129,7 +129,7 @@ pmclass ParrotSub {
    void set_pmc (PMC* value) {
    }
 
-   void set_pmc_keyed (KEY * key, PMC* src_value, KEY * src_value_key) {
+   void set_pmc_keyed (KEY * key, PMC* value, KEY * value_key) {
    }
 
    void inc (PMC * value, PMC* dest) {
@@ -174,7 +174,7 @@ pmclass ParrotSub {
    void add_same (PMC * value, PMC* dest) {
    }
 
-   void add_keyed (KEY * key, PMC* src_value, KEY * src_value_key, PMC* dest_value, KEY * dest_value_key) {
+   void add_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
    }
 
    void subtract (PMC * value, PMC* dest) {
@@ -195,7 +195,7 @@ pmclass ParrotSub {
    void subtract_same (PMC * value, PMC* dest) {
    }
 
-   void subtract_keyed (KEY * key, PMC* src_value, KEY * src_value_key, PMC* dest_value, KEY * dest_value_key) {
+   void subtract_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
    }
 
    void multiply (PMC * value, PMC* dest) {
@@ -216,7 +216,7 @@ pmclass ParrotSub {
    void multiply_same (PMC * value, PMC* dest) {
    }
 
-   void multiply_keyed (KEY * key, PMC* src_value, KEY * src_value_key, PMC* dest_value, KEY * dest_value_key) {
+   void multiply_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
    }
 
    void divide (PMC * value, PMC* dest) {
@@ -237,7 +237,7 @@ pmclass ParrotSub {
    void divide_same (PMC * value, PMC* dest) {
    }
 
-   void divide_keyed (KEY * key, PMC* src_value, KEY * src_value_key, PMC* dest_value, KEY * dest_value_key) {
+   void divide_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
    }
 
    void modulus (PMC * value, PMC* dest) {
@@ -258,7 +258,7 @@ pmclass ParrotSub {
    void modulus_same (PMC * value, PMC* dest) {
    }
 
-   void modulus_keyed (KEY * key, PMC* src_value, KEY * src_value_key, PMC* dest_value, KEY * dest_value_key) {
+   void modulus_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
    }
 
    void concatenate (PMC * value, PMC* dest) {
@@ -276,7 +276,7 @@ pmclass ParrotSub {
    void concatenate_same (PMC * value, PMC* dest) {
    }
 
-   void concatenate_keyed (KEY * key, PMC* src_value, KEY * src_value_key, PMC* dest_value, KEY * dest_value_key) {
+   void concatenate_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
    }
 
    BOOLVAL is_equal (PMC* value) {

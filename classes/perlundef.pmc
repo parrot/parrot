@@ -83,9 +83,6 @@ pmclass PerlUndef {
         pmc->vtable->set_integer_native(interpreter, pmc, value);
     }
 
-    void set_integer_bignum (BIGNUM* value) {
-    }
-
     void set_integer_same (PMC* value) {
         /* Do nothing; Can't happen? */ 
     }
@@ -98,11 +95,6 @@ pmclass PerlUndef {
     void set_number_native (FLOATVAL value) {
         pmc->vtable = &Parrot_base_vtables[enum_class_PerlNum];
         pmc->vtable->set_number_native(interpreter, pmc, value);
-    }
-
-    void set_number_bignum (BIGNUM* value) {
-        pmc->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-        pmc->vtable->set_number_bignum(interpreter, pmc, value);
     }
 
     void set_number_same (PMC* value) {

@@ -1173,9 +1173,9 @@ The key is guaranteed to be not NULL.
 
 Place the value of the substring of B<self> into B<dest>.
 
-=item void substr_keyed(INTERP, PMC* self, KEY* key, INTVAL length, PMC* dest, KEY* dest_key)
+=item void substr_keyed(INTERP, PMC* self, KEY* key, INTVAL offset, INTVAL length, PMC* dest, KEY* dest_key)
 
-=item void substr_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL length, PMC* dest, INTVAL* dest_key)
+=item void substr_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL offset, INTVAL length, PMC* dest, INTVAL* dest_key)
 
 Place the value of the substring of B<self> keyed by B<key> into
 B<dest> keyed by B<dest_key>.
