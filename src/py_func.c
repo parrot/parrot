@@ -837,7 +837,7 @@ Parrot_py_exit(Interp *interpreter)
  * the aggregate.
  */
 PMC*
-parrot_py_make_slice(Interp *interpreter, PMC *self, PMC *key)
+Parrot_py_make_slice(Interp *interpreter, PMC *self, PMC *key)
 {
     parrot_range_t *range;
     PMC *slice;
@@ -885,7 +885,7 @@ Parrot_py_set_slice(Interp *interpreter, PMC *self, PMC *key, PMC *src)
     INTVAL start, end, iitem;
     INTVAL j, count, value_length;
 
-    slice = parrot_py_make_slice(interpreter, self, key);
+    slice = Parrot_py_make_slice(interpreter, self, key);
     range = PMC_struct_val(slice);
 
     type = self->vtable->base_type;
@@ -946,7 +946,7 @@ Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
     PMC *res, *slice, *item;
     INTVAL start, end, iitem;
 
-    slice = parrot_py_make_slice(interpreter, self, key);
+    slice = Parrot_py_make_slice(interpreter, self, key);
     range = PMC_struct_val(slice);
 
     type = self->vtable->base_type;

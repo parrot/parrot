@@ -23,8 +23,6 @@ C<PyString> extends C<PyObject> to provide Perl string behaviour.
 /* cache of classes referenced */
 static INTVAL dynclass_PyString;
 
-extern PMC* parrot_py_make_slice(Interp *interpreter, PMC *self, PMC *key);
-
 pmclass PyString extends PyObject dynpmc group python_group {
 
 /*
@@ -153,7 +151,7 @@ Extracts a given character from the string.
 
     PMC* get_pmc_keyed (PMC *key) {
         if (key->vtable->base_type == enum_class_Slice) {
-            PMC *slice = parrot_py_make_slice(INTERP, SELF, key);
+            PMC *slice = Parrot_py_make_slice(INTERP, SELF, key);
             parrot_range_t *range = PMC_struct_val(slice);
             INTVAL start = RVal_int(range->start);
             INTVAL end   = RVal_int(range->end);

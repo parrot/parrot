@@ -19,6 +19,7 @@ void Parrot_py_init(Interp *interpreter);
 void Parrot_py_exit(Interp *interpreter);
 PMC* Parrot_py_get_slice(Interp*, PMC*, PMC* key);
 PMC* Parrot_py_set_slice(Interp*, PMC*, PMC* key, PMC* src);
+PMC* Parrot_py_make_slice(Interp *interpreter, PMC *self, PMC *key);
 
 #endif   /* PARROT_PY_FUNC_H_GUARD */
 
