@@ -49,7 +49,7 @@ s. PDD02 for more.
 
 =item B<new>(out PMC, in INT, in PMC, in PMC)
 
-Like above. The forth argument is a proerty hash - it isn't copied in
+Like above. The forth argument is a property hash - it isn't copied in,
 only referended. The initializer may be NULL.
 
 =cut
