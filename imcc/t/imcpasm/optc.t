@@ -22,7 +22,6 @@ output_like(<<'CODE', <<'OUT', "in P param");
 .end
 CODE
 /_main:
-  set P\d+, P1
   new (P\d+), \d+ # \.PerlUndef
   set \1, 42
   set_p_pc (P\d+), foo
@@ -35,7 +34,6 @@ CODE
   null I4
   set P0, \2
   invokecc
-  set P1, P\d+
   noop
   end
 foo:

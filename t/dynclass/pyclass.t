@@ -110,7 +110,7 @@ output_is(<< 'CODE', << 'OUTPUT', "delprop");
     setprop $P2, 'x', $P3
 
     getattribute $P4, $P2, 'x'
-    print $P6
+    print $P4
     print "\n"
 
     delprop $P2, 'x'
@@ -123,12 +123,12 @@ output_is(<< 'CODE', << 'OUTPUT', "delprop");
     print "\n"
 
     clear_eh
-    end
-
 _handler:
     set S0, P5["_message"]
     print_item S0
     print_newline
+    end
+
 .end
 CODE
 1

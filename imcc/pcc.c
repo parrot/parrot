@@ -460,7 +460,7 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
      * if this sub references self, fetch it
      */
     if (unit->type & IMC_HAS_SELF) {
-        sub->pcc_sub->p2_sym = regs[0] = get_sym("self");
+        regs[0] = get_sym("self");
         assert(regs[0]);
 
         sprintf(buf, "%d", CURRENT_OBJECT);
@@ -468,23 +468,6 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         ins = insINS(interpreter, unit, ins, "interpinfo", regs, 2);
         regs[1] = get_pasm_reg("P2");
         ins = insINS(interpreter, unit, ins, "set", regs, 2);
-    }
-    /*
-     * if we call out, the return cc in P1 must be saved
-     */
-    if (sub->pcc_sub->calls_a_sub) {
-        /* but not, if this is main */
-        if (!(sub->pcc_sub->pragma & P_MAIN)) {
-            regs[0] = sub->pcc_sub->cc_sym = mk_temp_reg('P');
-            regs[1] = get_pasm_reg("P1");
-            insINS(interpreter, unit, ins, "set", regs, 2);
-        }
-        /* if its a coroutine, preserve the sub P0 */
-        if (sub->pcc_sub->calls_a_sub & ITPCCYIELD) {
-            regs[0] = sub->pcc_sub->p0_sym = mk_temp_reg('P');
-            regs[1] = get_pasm_reg("P0");
-            insINS(interpreter, unit, ins, "set", regs, 2);
-        }
     }
     /*
      * check if there is a return
@@ -559,15 +542,15 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
      * we have a pcc_begin_yield
      */
     if (arg_count == 0) {
+        char buf[16];
         /*
-         * preserve registers over coroutine invoke
+         * get current sub
          *
-         * TODO optimize this later
          */
-        /* get our subroutine */
         regs[0] = get_pasm_reg("P0");
-        regs[1] = unit->instructions->r[1]->pcc_sub->p0_sym;
-        ins = insINS(interpreter, unit, ins, "set", regs, 2);
+        sprintf(buf, "%d", CURRENT_SUB);
+        regs[1] = get_const(buf, 'I');
+        ins = insINS(interpreter, unit, ins, "interpinfo", regs, 2);
         ins = insINS(interpreter, unit, ins, "invoke", regs, 0);
     }
     else {
@@ -876,14 +859,12 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int tail_call;
     int proto;
     int meth_call = 0;
-    SymReg *p1, *p2, *s0 = NULL;
+    SymReg *s0 = NULL;
 
     /*
      * we must preserve P1, P2
      */
     reg = unit->instructions->r[1];   /* the  sub we are in */
-    p1 = reg->pcc_sub->cc_sym;
-    p2 = reg->pcc_sub->p2_sym;
 
 #if IMC_TRACE
     PIO_eprintf(NULL, "expand_pcc_sub_call\n");
@@ -960,7 +941,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 
 
     /*
-     * setup P0, P1
+     * setup P0, P2
      */
     arg = sub->pcc_sub->sub;
     if (meth_call) {
@@ -1082,16 +1063,6 @@ move_cc:
          */
         if (sub->pcc_sub->label && ins->next->type == ITLABEL) {
             ins = ins->next;
-        }
-        if (p1) {
-            regs[0] = get_pasm_reg("P1");
-            regs[1] = p1;
-            ins = insINS(interp, unit, ins, "set", regs, 2);
-        }
-        if (p2) {
-            regs[0] = get_pasm_reg("P2");
-            regs[1] = p2;
-            ins = insINS(interp, unit, ins, "set", regs, 2);
         }
     }
     /*

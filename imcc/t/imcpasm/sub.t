@@ -15,8 +15,7 @@ _sub1:
 .end
 CODE
 /^_main:
- set P(\d+), P1
- new P\1, \d+ # \.Sub
+ new P(\d+), \d+ # \.Sub
  set_addr I(\d+), _sub1
  set P\1, I\2
  invoke P\1
@@ -38,8 +37,7 @@ output_like(<<'CODE', <<'OUT', "nonlocal bsr");
 .end
 CODE
 /^_main:
- set P(\d+), P1
- new P\1, \d+ # \.Sub
+ new P(\d+), \d+ # \.Sub
  set_addr I(\d+), _f
  set P\1, I\2
  invoke P\1
