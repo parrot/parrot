@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 51;
+use Parrot::Test tests => 52;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -546,31 +546,6 @@ catched it
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - lexical 2");
-    print "main\n"
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
-
-    new P30, .Exception
-    new_pad 0
-    new P0, .PerlInt
-    set P0, 42
-    store_lex -1, "$a", P0
-    throw P30
-    print "not reached\n"
-    end
-_handler:
-    print "catched it\n"
-    find_lex P0, "$a"
-    print P0
-    print "\n"
-    end
-CODE
-main
-catched it
-42
-OUTPUT
-
 output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return");
     print "main\n"
     newsub P20, .Exception_Handler, _handler
@@ -595,15 +570,15 @@ something happend
 back again
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return, lexical");
+output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return, change lexical");
     print "main\n"
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
-
     new_pad 0
     new P0, .PerlInt
     set P0, 42
     store_lex -1, "$a", P0
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+
     new P30, .Exception
     set P30["_message"], "something happend"
     throw P30
@@ -643,6 +618,20 @@ something happend
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+    new P0, .Exception
+    clear_eh
+    throw P0
+    print "not reached\n"
+    end
+_handler:
+    end
+CODE
+No exception handler and no message
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
     new P0, .Exception
     throw P0
     print "not reached\n"
@@ -650,7 +639,6 @@ output_is(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
 CODE
 No exception handler and no message
 OUTPUT
-
 output_is(<<'CODE', <<'OUTPUT', "2 exception handlers");
     print "main\n"
     newsub P20, .Exception_Handler, _handler1
@@ -750,6 +738,36 @@ something happend
 catched it in 1
 something happend
 back in 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "throw from a sub");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+    newsub P0, .Sub, _sub
+    invokecc
+    print "back in main\n"
+    end
+
+_sub:
+    new P30, .Exception
+    set P30["_message"], "something happend"
+    throw P30
+    print "back in sub\n"
+    invoke P1
+_handler:
+    print "catched it\n"
+    set S0, P5["_message"]
+    print S0
+    print "\n"
+    set P2, P5["_invoke_cc"]	# the return continuation
+    invoke P2
+CODE
+main
+catched it
+something happend
+back in sub
+back in main
 OUTPUT
 
 1;

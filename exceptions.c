@@ -166,10 +166,7 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
         VTABLE_set_pmc_keyed(interpreter, exception, key,
                 new_continuation_pmc(interpreter, dest));
     }
-    /* TODO update the whole context */
-    cc->ctx.pad_stack = interpreter->ctx.pad_stack;
-    stack_mark_cow(cc->ctx.pad_stack);
-    /* put the continuation in the interpreter */
+    /* put the continuation ctx in the interpreter */
     restore_context(interpreter, &cc->ctx);
     /* put exception object in P5 */
     REG_PMC(5) = exception;
