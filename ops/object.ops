@@ -25,6 +25,8 @@ Parrot's library of object ops
 Call a method on an object as per Parrot's calling conventions. We assume
 that all the registers are properly set up.
 
+All calls assume P2 = objects, S0 = method.
+
 =cut
 
 =item B<callmethcc>
@@ -49,7 +51,7 @@ op callmeth() {
     /* Pitch a fit */
   }
   REG_PMC(0) = method_pmc;
-  dest = (opcode_t *)REG_PMC(0)->vtable->invoke(interpreter, REG_PMC(0), expr NEXT());
+  dest = (opcode_t *)VTABLE_invoke(interpreter, REG_PMC(0), expr NEXT());
   goto ADDRESS(dest);
 }
 
@@ -114,7 +116,8 @@ pointer for the new PMC is put in there).
 =cut
 
 inline op newclass(out PMC, in STR) {
-  $1 = Parrot_new_class(interpreter, $2);
+  PMC* class = $1 = pmc_new(interpreter, enum_class_ParrotClass);
+  Parrot_new_class(interpreter, class, $2);
   goto NEXT();
 }
 
@@ -211,9 +214,12 @@ Get the class PMC for the object in $2 and put it in $1.
 =cut
 
 inline op class(out PMC, in PMC) {
-  $1 = VTABLE_get_pmc_keyed_int(interpreter,
-                  (PMC *)PMC_data($2), 0);
-  goto NEXT();
+    if (PObj_is_class_TEST($2))
+	$1 = VTABLE_get_pmc_keyed_int(interpreter,
+		(PMC *)PMC_data($2), POD_CLASS);
+    else
+	$1 = $2;
+    goto NEXT();
 }
 
 =item B<classname>(out STR, in PMC)
@@ -226,7 +232,7 @@ inline op classname(out STR, in PMC) {
   PMC* classname_pmc;
 
   classname_pmc = VTABLE_get_pmc_keyed_int(interpreter,
-                  (PMC *)PMC_data($2), 1);
+                  (PMC *)PMC_data($2), POD_CLASS_NAME);
   if (classname_pmc) {
       $1 = VTABLE_get_string(interpreter, classname_pmc);
   }

@@ -18,8 +18,23 @@
 #define PARROT_NAMESPACE_SEPARATOR "\0"
 #define PARROT_NAMESPACE_SEPARATOR_LENGTH 1
 
+typedef enum {
+    PCD_PARENTS,        /* An array of immediate parents */
+    PCD_CLASS_NAME,     /* Perlstring */
+    PCD_ALL_PARENTS,    /* array in search order */
+    PCD_ATTRIB_OFFS,    /* class => offset hash */
+    PCD_ATTRIBUTES,      /* class::attrib => offset hash */
+    PCD_MAX
+} PARROT_CLASS_DATA_ENUM;
+
+typedef enum {
+    POD_CLASS,          /* class PMC of object */
+    POD_CLASS_NAME,     /* Perlstring */
+    POD_FIRST_ATTRIB    /* attributes start here */
+} PARROT_OBJECT_DATA_ENUM;
+
 PMC *Parrot_single_subclass(Parrot_Interp, PMC *, STRING *);
-PMC *Parrot_new_class(Parrot_Interp, STRING *);
+void Parrot_new_class(Parrot_Interp, PMC *, STRING *);
 PMC *Parrot_class_lookup(Parrot_Interp, STRING *);
 void Parrot_class_register(Parrot_Interp, STRING *, PMC *);
 PMC *Parrot_add_parent(Parrot_Interp, PMC *, PMC *);

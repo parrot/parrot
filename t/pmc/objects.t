@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 12;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -183,4 +183,99 @@ CODE
 ok 1
 ok 2
 1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "new object - classname");
+    newclass P1, "Foo"
+    find_type I0, "Foo"
+    new P2, I0
+    classname S0, P1	# class
+    print S0
+    print "\n"
+    classname S0, P2	# object
+    print S0
+    print "\n"
+    end
+CODE
+Foo
+Foo
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "isa subclass");
+    newclass P1, "Foo"
+    subclass P2, P1, "Bar"
+    isa I0, P1, "Foo"
+    if I0, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    isa I0, P2, "Bar"
+    if I0, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    isa I0, P2, "Foo"
+    if I0, ok3
+    print "not "
+ok3:
+    print "ok 3\n"
+    isa I0, P2, "ParrotClass"
+    if I0, ok4
+    print "not "
+ok4:
+    print "ok 4\n"
+    isa I0, P2, "ParrotObject"
+    unless I0, ok5
+    print "not "
+ok5:
+    print "ok 5\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "isa subclass - objects");
+    newclass P3, "Foo"
+    subclass P4, P3, "Bar"
+    find_type I0, "Foo"
+    new P1, I0
+    find_type I0, "Bar"
+    new P2, I0
+
+    isa I0, P1, "Foo"
+    if I0, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    isa I0, P2, "Bar"
+    if I0, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    isa I0, P2, "Foo"
+    if I0, ok3
+    print "not "
+ok3:
+    print "ok 3\n"
+    isa I0, P2, "ParrotObject"
+    if I0, ok4
+    print "not "
+ok4:
+    print "ok 4\n"
+    isa I0, P2, "ParrotClass"
+    if I0, ok5
+    print "not "
+ok5:
+    print "ok 5\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
 OUTPUT
