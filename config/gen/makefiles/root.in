@@ -109,6 +109,7 @@ GEN_CONFIGS = \
     include/parrot/core_pmcs.h \
     lib/Parrot/Config.pm \
     lib/Parrot/PMC.pm \
+    library/config.fpmc \
     $(SRC)/platform.c \
 #CONDITIONED_LINE(platform_asm):    $(SRC)/platform_asm.s \
     $(SRC)/core_pmcs.c \
@@ -377,7 +378,7 @@ MAKE_C = ${make_c}
 #
 ###############################################################################
 
-all : flags_dummy $(TEST_PROG) docs
+all : flags_dummy $(TEST_PROG) library/config.fpmc docs
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -456,6 +457,10 @@ parrot_utils: $(PDUMP) $(DIS) $(PINFO) $(PDB)
 flags_dummy:
 	@echo Compiling with:
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) xx$(O) -c xx.c
+
+library/config.fpmc: $(TEST_PROG) config_lib.pasm
+	@echo Invoking Parrot to generate library/config.fpmc--cross your fingers
+	./parrot config_lib.pasm
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 

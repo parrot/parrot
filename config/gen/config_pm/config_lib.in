@@ -1,0 +1,11 @@
+	new P0, .PerlHash
+	new P1, .PerlUndef
+	
+	<<HERE>>
+	
+	open P1, "library/config.fpmc", ">"
+	freeze S0, P0
+	print P1, S0
+	close P1
+	
+	end
