@@ -16,46 +16,58 @@
 
 
 void init_builtin_types() {
-	t_void		= store_type("void", 0);
-	t_string	= store_type("string", 4);	
-	t_int		= store_type("int", 4);
-	t_float		= store_type("float", 4);
+    t_void        = store_type("void", 0);
+    t_string    = store_type("string", 4);    
+    t_int        = store_type("int", 4);
+    t_float        = store_type("float", 4);
 }
 
 /* size is bytes or elements, depending on if type is variable or array */
 Symbol * store_type(const char * name, int size) {
-	Symbol * t = store_identifier(current_symbol_table, name, TYPE, NULL);
-	t->size = size;
-	return t;
+    Symbol * t = store_identifier(current_symbol_table, name, TYPE, NULL);
+    t->size = size;
+    return t;
 }
 
 /* Start at inner scope and work out, looking for a type name.
- * For this lanuage we don't check whether the Symbol is a type
- * because we don't allow declaring identifiers with the same
- * name of a type in the current namespace.
  * FIXME: Add support for member resolution (namespace.namespace.type, etc.)
  */
 Symbol * lookup_type(const char * name) {
-	Symbol * ns;
-	Symbol * s;
-	for(ns = current_namespace; ns; ns = ns->tnext) {
-		s = lookup_symbol(ns->table, name);
-		if(s != NULL)
-			return s;
-	}	
-	return NULL;
+    Symbol * ns;
+    Symbol * s;
+    for(ns = current_namespace; ns; ns = ns->tnext) {
+        s = lookup_symbol(ns->table, name);
+        if(s != NULL)
+            return s;
+    }    
+    return NULL;
+}
+
+/*
+ * identifier can be a list which would resolve it
+ * to nested namespace.
+ */
+Symbol * lookup_type_symbol(Symbol * identifier) {
+    Symbol * ns = current_namespace;
+    Symbol * p = identifier;
+    while(p->tnext) {
+        if((ns = lookup_namespace(ns->table, p->name)) == NULL)
+            return NULL;
+        p = p->tnext;
+    }
+    return lookup_symbol(ns->table, p->name);
 }
 
 const char * type_name(Symbol * s) {
-	if(s->class == TYPE)
-		return s->name;
-	else if(s->type)
-		return s->type->name;
-	else {
-		printf("type_name(%s) : Error, symbol not a type and has no associated type\n", s->name );
-		abort();
-	}
-	return "undef";
+    if(s->kind == TYPE)
+        return s->name;
+    else if(s->type)
+        return s->type->name;
+    else {
+        printf("type_name(%s) : Error, symbol not a type and has no associated type\n", s->name );
+        abort();
+    }
+    return "undef";
 }
 
 Type * new_type(int kind, const char * name, const char * parent_name) {

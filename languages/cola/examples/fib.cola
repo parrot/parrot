@@ -3,26 +3,26 @@
 //
 
 public class Fib {
-	static void Main() {
-		int n = 24, a = 1, b = 1, f = 1, i = 3;
+    static void Main() {
+        int n = 24, a = 1, b = 1, f = 1, i = 3;
 
-		puts("Algorithm F2 (Fibonacci's function)\n");
-		puts("  Calculating fib(");
-		puti(n);
-		puts(") = ...\n");
+        puts("Algorithm F2 (Fibonacci's function)\n");
+        puts("  Calculating fib(");
+        puti(n);
+        puts(") = ...\n");
 
-		while(i <= n) {
-			puti(i);
-			puts("\n");
-			f = a + b;
-			a = b;
-			b = f;
-			i++;
-		}
+        while(i <= n) {
+            puti(i);
+            puts("\n");
+            f = a + b;
+            a = b;
+            b = f;
+            i++;
+        }
 
-		puts("  ... = ");
-		puti(f);
-		puts("\n");
-	}
+        puts("  ... = ");
+        puti(f);
+        puts("\n");
+    }
 }
 

@@ -1,15 +1,57 @@
 //
-// My naive beginnings of the System namespace
+// My naive beginnings of the C# System namespace
 
 namespace System {
 
-	public class Int32 {
-
-		//__int32 i;
-		public string ToString() {
-			return "";
-		}
+	public class Object {
 	}
 
+	public class Boolean {
+	}
 
+	public class Sbyte {
+	}
+
+	public class Byte {
+	}
+
+	public class Char {
+	}
+
+	public class Int16 {
+	}
+
+	public class Int32 {
+	}
+
+	public class Int64 {
+	}
+
+	public class UInt16 {
+	}
+
+	public class UInt32 {
+	}
+
+	public class UInt64 {
+	}
+
+	public class Single {
+	}
+
+	public class Double {
+	}
+
+	public class Decimal {
+	}
+
+	public class String {
+	}
+
+	class Console {
+		void WriteLine(string s) {
+			puts(s);
+		}
+	}
 }
+
