@@ -71,10 +71,11 @@ typedef enum {
  */
 #ifdef _PARSER
 Instruction * _mk_instruction(const char *,const char *, SymReg **, int);
-Instruction * iANY(struct Parrot_Interp *, char * name, const char *fmt, SymReg **r, int emit);
+Instruction * iANY(Parrot_Interp, char *op, const char *fmt, int n,
+		SymReg **r, int emit);
 #else
 #define _mk_instruction(a,b,c,d) dont_use(a,b)
-#define iANY(i,a,b,c,d) dont_use(a,b)
+#define iANY(i,a,b,c,d,e) dont_use(a,b)
 #endif
 Instruction * INS(struct Parrot_Interp *, char * name,
 		char *fmt, SymReg **regs, int nargs, int keyv, int emit);

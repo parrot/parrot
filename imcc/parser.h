@@ -9,9 +9,7 @@
 
 #include "imcparser.h"
 
-EXTERN SymReg *regs[IMCC_MAX_REGS];
 EXTERN int keyvec;
-EXTERN int nargs;
 
 EXTERN int expect_pasm;
 EXTERN int pasm_file;

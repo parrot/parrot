@@ -34,9 +34,12 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
         SymReg *init, int emit)
 {
     char fmt[256];
+    SymReg *regs[IMCC_MAX_REGS];
     SymReg *pmc;
+    int i, nargs;
     int pmc_num = Parrot_get_pmc_num(interpreter,
             *type == '.' ?type+1:type);
+
     sprintf(fmt, "%d", pmc_num);
     pmc = mk_const(str_dup(fmt), 'I');
 
@@ -55,7 +58,10 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
     }
     else
         nargs = 2;
-    return iANY(interpreter, "new", fmt, regs, emit);
+    i = nargs;
+    while (i < IMCC_MAX_REGS)
+	regs[i++] = NULL;
+    return iANY(interpreter, "new", fmt, nargs, regs, emit);
 }
 
 /* TODO get rid of nargs */
@@ -123,9 +129,8 @@ Instruction *
 INS(struct Parrot_Interp *interpreter, char *name, char *fmt, SymReg **r,
         int n, int keys, int emit)
 {
-    nargs = n;
     keyvec = keys;
-    return iANY(interpreter, name, fmt, r, emit);
+    return iANY(interpreter, name, fmt, n, r, emit);
 }
 
 /* imcc_compile(interp*, const char*)
@@ -278,7 +283,7 @@ try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r, int n, int emit)
     char fullname[64];
     SymReg *s;
     int changed = 0;
-    if (n == 3 && regs[0]->set == 'N') {
+    if (n == 3 && r[0]->set == 'N') {
         if (r[1]->set == 'I' && r[2]->set == 'N') {
             if (!strcmp(name, "add") ||
                     !strcmp(name, "mul")
@@ -302,9 +307,7 @@ try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r, int n, int emit)
 
                 rr[0] = mk_temp_reg('N');
                 rr[1] = r[1];
-                nargs = 2;
                 INS(interpreter, "set", NULL, rr, 2, 0, 1);
-                nargs = 3;
                 r[1] = rr[0];
                 changed = 1;
             }
@@ -363,7 +366,6 @@ SymReg ** r, int nr, int emit)
             if (r[i]->set != 'P') {
                 fataly(EX_SOFTWARE, sourcefile, line,"not an aggregate\n");
             }
-            nargs = 3;
             /* don't emit LHS yet */
             if (i == 0) {
                 keyvec = 1 << 1;
@@ -371,7 +373,7 @@ SymReg ** r, int nr, int emit)
                 nreg[1] = r[i+1];
                 nreg[2] = preg[n];
                 /* set p_k px */
-                ins = iANY(interpreter, str_dup("set"), 0, nreg, 0);
+                ins = iANY(interpreter, str_dup("set"), 0, 3, nreg, 0);
             }
             else {
                 keyvec = 1 << 2;
@@ -379,34 +381,32 @@ SymReg ** r, int nr, int emit)
                 nreg[1] = r[i];
                 nreg[2] = r[i+1];
                 /* set py|z p_k */
-                iANY(interpreter, str_dup("set"), 0, nreg, 1);
+                iANY(interpreter, str_dup("set"), 0, 3, nreg, 1);
             }
             i++;
         }
         /* non keyed */
         else {
-            nargs = 2;
             keyvec = 0;
             if (i == 0) {
                 nreg[0] = r[i];
                 nreg[1] = preg[n];
                 /* set n, px */
-                ins = iANY(interpreter, str_dup("set"), 0, nreg, 0);
+                ins = iANY(interpreter, str_dup("set"), 0, 3, nreg, 0);
             }
             else {
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 /* set px, n */
-                iANY(interpreter, str_dup("set"), 0, nreg, 1);
+                iANY(interpreter, str_dup("set"), 0, 2, nreg, 1);
             }
         }
     }
     /* make a new undef */
     iNEW(interpreter, preg[0], str_dup("PerlUndef"), NULL, 1);
     /* emit the operand */
-    nargs = 3;
     keyvec = 0;
-    iANY(interpreter, name, 0, preg, 1);
+    iANY(interpreter, name, 0, 3, preg, 1);
     /* emit the LHS op */
     emitb(ins);
     return ins;
