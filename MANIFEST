@@ -274,6 +274,7 @@ packdump.c
 packfile.c
 packout.c
 parrot.c
+parrot_coverage.pl
 pbc2c.pl
 pdump.c
 platforms/generic.c
