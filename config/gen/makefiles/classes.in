@@ -28,7 +28,7 @@ all : $(O_FILES)
 ${pmc_build}
 
 clean:
-	$(RM_F) *.c *$(O) default.h
+	$(RM_F) *.c *$(O) *.h
 
 update:
 	cvs -q update -dP
