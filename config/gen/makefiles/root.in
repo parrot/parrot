@@ -577,7 +577,7 @@ parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB)
 
 flags_dummy :
 	@echo Compiling with:
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) xx$(O) -c xx.c
+	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) -I$(@D) ${cc_o_out} xx$(O) -c xx.c
 
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc $(TEST_PROG)
 	./parrot -o $@ runtime/parrot/library/parrotlib.imc

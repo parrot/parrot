@@ -20,15 +20,16 @@ use Parrot::Test;
 use Test::More;
 use strict;
 
-# actually more platforms should work - all POSIX compliant ones - but 
+# actually more platforms should work - all POSIX compliant ones - but
 # signals are currently not enabled for all in src/events.c
-# a second problem is to get the test doing the right thing: mainly figuring 
+# a second problem is to get the test doing the right thing: mainly figuring
 # out what PID to kill. The "ps" command isn't one of the portable ones.
 
 my %platforms = map {$_=>1} qw/
     darwin
     hpux
     linux
+    cygwin
 /;
 
 if ($platforms{$^O}) {
