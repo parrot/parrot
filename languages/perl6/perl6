@@ -42,17 +42,17 @@ $TEST_IMPORT = 'skip is';
 # glob pattern for test to run
 $TEST_GLOB = 't/{compiler,rx}/*.t';
 
-use vars '%o';
+use vars '%OPT';
 
 sub usage($) {
     my $fh = shift;
-    if ($o{'help-imcc'}) {
+    if ($OPT{'help-imcc'}) {
 	print $fh <<'END';
 IMCC options:
     --debug          write various debug messages to STDERR'
     --yydebug        debug bison
 END
-    } elsif ($o{'help-parrot'}) {
+    } elsif ($OPT{'help-parrot'}) {
 	print $fh <<'END';
 Parrot options:
     --shared         use dynamic parrot lib
@@ -60,7 +60,7 @@ Parrot options:
                      pass option(s) to parrot
 END
 	system("$PARROT -h");
-    } elsif ($o{'help-global'}) {
+    } elsif ($OPT{'help-global'}) {
 	print $fh <<'END';
 Global options:
     -h|--help        Print this message and exit
@@ -76,7 +76,7 @@ Global options:
     -c|--checksyntax Check syntax only, do not generate bytecode
     --clean          delete all possible produced files for all mentioned
 END
-    } elsif ($o{'help-output'}) {
+    } elsif ($OPT{'help-output'}) {
 	print $fh <<'END';
 Output options:
     -o|--output F    Write output to file F
@@ -93,7 +93,7 @@ Output options:
     -Ox              optimize flag (currently only gcc)
                      Note: these does not optimize parrot's obj file
 END
-    } elsif ($o{'help-test'}) {
+    } elsif ($OPT{'help-test'}) {
 	print $fh <<'END';
 Test options:
     --test           run tests like "make test"
@@ -101,7 +101,7 @@ Test options:
       --rm-exe       remove executable (mainly for testnative)
       -q|--quick     run .pbc directly, if present and newer then .p6
 END
-    } elsif ($o{'help-parser'}) {
+    } elsif ($OPT{'help-parser'}) {
 	print $fh <<'END';
 Parser options:
     --test-parser    interactive parser-testing mode
@@ -151,7 +151,7 @@ END
 }
 
 Getopt::Long::Configure(qw(bundling));
-GetOptions(\%o,qw{
+GetOptions(\%OPT,qw{
     test-parser test
     trace hitem tree raw-tree
     add-main rule=s grammar=s force-grammar
@@ -177,23 +177,23 @@ sub version {
 }
 
 ################
-usage(\*STDOUT) if grep /^help/, keys %o;
-version() if ($o{version});
+usage(\*STDOUT) if grep /^help/, keys %OPT;
+version() if ($OPT{version});
 
-$::RD_TRACE = $o{trace};
-$::RD_NO_HITEM = !$o{hitem};
-$::RD_NO_TRACE = !$o{trace};
-$::rule = $o{rule} || 'prog';
-$o{grammar} ||= 'Perl6grammar';
-$o{'parrot-options'} ||= '';
-$o{verbose} = 0 unless (defined $o{verbose});
-$o{tree} = 1 if $o{'test-parser'};
+$::RD_TRACE = $OPT{trace};
+$::RD_NO_HITEM = !$OPT{hitem};
+$::RD_NO_TRACE = !$OPT{trace};
+$::rule = $OPT{rule} || 'prog';
+$OPT{grammar} ||= 'Perl6grammar';
+$OPT{'parrot-options'} ||= '';
+$OPT{verbose} = 0 unless (defined $OPT{verbose});
+$OPT{tree} = 1 if $OPT{'test-parser'};
 
 my $filebase = 'a';		# basename for output files.
 
 ######## run parser and following steps
 
-if ($o{test}) {
+if ($OPT{test}) {
     run_tests();
 }
 else {
@@ -205,16 +205,16 @@ clean_temps();
 ###### utils
 #
 sub clean_temps {
-    return if ($o{'keep-all'});
+    return if ($OPT{'keep-all'});
     for my $f (@temp_files) {
 	my $ext;
 	($ext = $f) =~ s/.*\.//;
 	$f =~ s/$exe$//;
 	next unless (-e $f);
-	if ($o{verbose} > 1) {
-	    print STDERR "unlink($f)\n" unless ($o{"keep-$ext"});
+	if ($OPT{verbose} > 1) {
+	    print STDERR "unlink($f)\n" unless ($OPT{"keep-$ext"});
 	}
-	unlink($f) unless ($o{"keep-$ext"});
+	unlink($f) unless ($OPT{"keep-$ext"});
     }
 }
 
@@ -226,7 +226,7 @@ sub clean_files($) {
 
 sub verbose($@) {
     my ($level, @t) = @_;
-    if ($level <= $o{verbose}) {
+    if ($level <= $OPT{verbose}) {
 	print STDERR "@t\n";
     }
 }
@@ -238,7 +238,7 @@ my $wn = 0;
 sub warnings($$) {
     my ($sub, $file) = @_;
 
-    unless ($o{warnings}) {
+    unless ($OPT{warnings}) {
 	$wn++;
 
 	if ($wn == 1) {
@@ -286,7 +286,7 @@ sub mydie($$) {
 	print STDERR "\n\tdied with signal $sig (SIG",(split(' ',$Config{sig_name}))[$sig],")\n";
 	if ($dcore) {
 	    print STDERR "\tand dumped core\n";
-	    if ($o{verbose} > 1) {
+	    if ($OPT{verbose} > 1) {
 		my ($prog) = split(' ', $prog);
 		print STDERR "\tplease run 'gdb $prog core' and type 'bac' for reason\n";
 	    }
@@ -309,7 +309,7 @@ sub output_tree {
     my $tree = shift;
     my $file = shift;
     my $fw = shift || 0;
-    if ($o{tree}) {
+    if ($OPT{tree}) {
 	my $tf;
 	if ($file eq '-') {
 	    $tf = '&STDOUT';
@@ -318,12 +318,12 @@ sub output_tree {
 	}
 	verbose(2, "Dump tree to '$tf'");
 	open(OUT, ">$tf") or die("Can't write '$tf': $!");
-	print OUT Dumper($tree) if ($o{'raw-tree'});
+	print OUT Dumper($tree) if ($OPT{'raw-tree'});
 	my $x = $tree->tree;
 	print OUT Dumper($x);
 	close OUT;
     } else {
-	if ($o{'add-main'}) {
+	if ($OPT{'add-main'}) {
 	    P6C::IMCC::add_function('main');
 	    P6C::IMCC::set_function('main');
 	}
@@ -338,7 +338,7 @@ sub output_tree {
 	close(STDOUT);
 	open(STDOUT, '>&OOUT');
 	close(OOUT);
-	return if ($o{imc});
+	return if ($OPT{imc});
 	push(@temp_files, $f);
 	pass2($f, $fw);
     }
@@ -350,7 +350,7 @@ sub output_tree {
 sub get_parser() {
     my $parser;
     # load needed moduls
-    if (defined $o{tree}) {
+    if (defined $OPT{tree}) {
 	eval <<'END';
 	use Data::Dumper;
 	$Data::Dumper::Terse = 1;
@@ -361,21 +361,21 @@ END
 	eval 'use P6C::IMCC qw(:external)';
 	die $@ if $@;
     }
-    if (!$o{'force-grammar'} && eval("require $o{grammar}")) {
-	$parser = eval "new $o{grammar}" or die "$o{grammar}: $@";
+    if (!$OPT{'force-grammar'} && eval("require $OPT{grammar}")) {
+	$parser = eval "new $OPT{grammar}" or die "$OPT{grammar}: $@";
     } else {
 	warn $@ if $@;
-	verbose(1,"Constructing parser for $o{grammar}...");
-	if ($o{grammar}) {
-	    P6C::Parser->Precompile($o{grammar});
-	    eval "require $o{grammar}" or die $@;
-	    $parser = $o{grammar}->new;
+	verbose(1,"Constructing parser for $OPT{grammar}...");
+	if ($OPT{grammar}) {
+	    P6C::Parser->Precompile($OPT{grammar});
+	    eval "require $OPT{grammar}" or die $@;
+	    $parser = $OPT{grammar}->new;
 	} else {
 	    $parser = P6C::Parser->new();
 	}
 	verbose(1, "Done");
     }
-    if (defined $o{'debug-info'}) {
+    if (defined $OPT{'debug-info'}) {
 	if ($parser->can('Debug')) {
 	    $parser->Debug(1);
 	}
@@ -395,7 +395,7 @@ sub pass1($$$) {
     $in = <IN>;
     close(IN);
     verbose(2, "Parsing");
-    P6C::IMCC::init() unless $o{tree};
+    P6C::IMCC::init() unless $OPT{tree};
     my $result = warnings(sub {$parser->$::rule($in,0,$f)}, $fw);
     output_tree($result, $f, $fw);
 }
@@ -418,21 +418,21 @@ sub p6_is_newer($) {
 sub run {
     my $parser;
 
-    if ($o{'test-parser'}) {
+    if ($OPT{'test-parser'}) {
 	run_interactive();
 	return;
     }
     $ARGV[0] = '-' unless(@ARGV);
     while (@ARGV) {
     my $f = shift @ARGV;
-    print STDERR "processing file '$f'\n" if($o{verbose}>1);
+    print STDERR "processing file '$f'\n" if($OPT{verbose}>1);
     if ($f eq '-') {
 	$filebase = 'a';
     } else {
 	($filebase = $f) =~ s/\.[^.]*$//;
     }
 	# special, clean all generated files
-    if ($o{clean}) {
+    if ($OPT{clean}) {
 	    clean_files($filebase) if ($f =~ /\.p6$/ || $f eq '-');
 	next;
     }
@@ -441,7 +441,7 @@ sub run {
     # run next passes
     my $fw = "$filebase.warn";
     unlink($fw);
-    if ($o{quick} && -e "$filebase.pbc" && pbc_is_newer($filebase)) {
+    if ($OPT{quick} && -e "$filebase.pbc" && pbc_is_newer($filebase)) {
 	pass4("$filebase.pbc", $fw);
     }
     elsif ($f =~ /\.imc$/) {
@@ -479,7 +479,7 @@ sub run_tests {
 	my $file = "$filebase.p6";
 	my $outf = "$filebase.out";
 	$ARGV[0] = "> $outf";
-	if ($o{quick} && -e "$filebase.pbc" &&
+	if ($OPT{quick} && -e "$filebase.pbc" &&
 	    -e "$filebase.p6" &&
 	    p6_is_newer($filebase) &&
 	    pbc_is_newer($filebase)) {
@@ -594,7 +594,7 @@ END
 sub pass2($$) {
     my $file = shift;
     my $fw = shift;
-    my $debug = join(' ', map { defined $o{$_} && $o{$_} ? "--$_" : '' }
+    my $debug = join(' ', map { defined $OPT{$_} && $OPT{$_} ? "--$_" : '' }
 	qw(debug yydebug verbose life-info));
     my $outfile = "$filebase.pasm";
     my $cmd = "$IMCC $debug $file $outfile";
@@ -604,7 +604,7 @@ sub pass2($$) {
 	    mydie($?, $cmd);
 	}
     }, $fw);
-    return if $o{pasm};          # stop after generating pasm.
+    return if $OPT{pasm};          # stop after generating pasm.
     push(@temp_files, $outfile);
     pass3($outfile, $fw);
 }
@@ -618,8 +618,8 @@ sub pass3($$) {
 
     my $outfile = "$filebase.pbc";
     my $opt = '';
-    $opt .= ' -E' if ($o{E});
-    $opt .= ' -c' if ($o{checksyntax});
+    $opt .= ' -E' if ($OPT{E});
+    $opt .= ' -c' if ($OPT{checksyntax});
     my $cmd = "$ASM $opt $file -o $outfile";
     verbose(1, "assembling $cmd");
     warnings(sub {
@@ -627,7 +627,7 @@ sub pass3($$) {
 	    mydie($?, $cmd);
 	}
     }, $fw);
-    return if $o{pbc};         # stop after generating .pbc
+    return if $OPT{pbc};         # stop after generating .pbc
     pass4($outfile, $fw);
 }
 
@@ -639,7 +639,7 @@ sub pass4($$) {
     my $file = shift;
     my $fw = shift;
 
-    if ($o{'compile-pbc'}) {
+    if ($OPT{'compile-pbc'}) {
 	die $@ if $@;
 	my $cmd;
 	$cmd = "$PBC2C $HERE/$file";    # FIXME
@@ -654,7 +654,7 @@ sub pass4($$) {
 	open(C, ">$filebase.c") or die("Can't write '$filebase.c'");
 	print C $c;
 	close(C);
-	my $opt = $o{optimize} ? '-O'.$o{optimize} : '';
+	my $opt = $OPT{optimize} ? '-O'.$OPT{optimize} : '';
 	$cmd = "$CD $PConfig{cc} $PConfig{ccflags} $opt ".
 	"$PConfig{cg_flag} $PConfig{cc_inc} ".
 	"$PConfig{cc_warn} -c $HERE/$filebase.c $PConfig{'cc_o_out'} ".
@@ -669,7 +669,7 @@ sub pass4($$) {
 	#
 	# in advance
 	#
-	my $lib = !$o{shared} ? "libparrot$LIB" : '-L blib/lib -lparrot';
+	my $lib = !$OPT{shared} ? "libparrot$LIB" : '-L blib/lib -lparrot';
 	$cmd = "$CD $PConfig{link} $PConfig{linkflags} ".
 	"$PConfig{ld_out} $HERE/$filebase $HERE/$filebase$PConfig{'o'} ".
 	"$lib ".
@@ -680,22 +680,24 @@ sub pass4($$) {
 	}
 	$filebase = "./$filebase" if($filebase !~ m!/!); # XXX and unix
 	verbose(1, "running $filebase @ARGV");
-	if (system("$filebase @ARGV") && !$o{'ignore-exitcode'}) {
+	if (system("$filebase @ARGV") && !$OPT{'ignore-exitcode'}) {
 	    mydie($?, $filebase);
 	}
-	unlink($filebase) if (-e $filebase && $o{'rm-exe'});
+	unlink($filebase) if (-e $filebase && $OPT{'rm-exe'});
 
     }
     else {
-	my @opt = map { "-$_" } split(//, $o{'parrot-options'});
+	my @opt = map { "-$_" } split(//, $OPT{'parrot-options'});
 	my $cmd = "$PARROT @opt $file @ARGV";
 	verbose(1, "running: $cmd");
-	if (system($PARROT, @opt, $file, @ARGV) && !$o{'ignore-exitcode'}) {
+	if (system($PARROT, @opt, $file, @ARGV) && !$OPT{'ignore-exitcode'}) {
 	    mydie($?, $cmd);
 	}
     }
 }
+
 __END__
+
 =head1 NAME
 
 perl6 - perl6 driver program
