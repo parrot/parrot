@@ -4,6 +4,8 @@ use TestCompiler tests => 11;
 use lib '../../lib';
 use Parrot::Config;
 
+my $PARROT = "..$PConfig{slash}..$PConfig{slash}parrot$PConfig{exe}";
+
 # include file tests
 
 ##############################
@@ -142,7 +144,7 @@ ENDF
 close FOO;
 # compile it
 
-system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
+system("$PARROT -o temp.pbc temp.imc");
 
 output_is(<<'CODE', <<'OUT', "call sub in external pbc");
 .pcc_sub _sub1 prototyped
@@ -176,7 +178,7 @@ ENDF
 close FOO;
 # compile it
 
-system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
+system("$PARROT -o temp.pbc temp.imc");
 
 output_is(<<'CODE', <<'OUT', "call sub in external pbc, return");
 .pcc_sub _sub1 prototyped
@@ -215,7 +217,7 @@ ENDF
 close FOO;
 # compile it
 
-system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
+system("$PARROT -o temp.pbc temp.imc");
 
 output_is(<<'CODE', <<'OUT', "call sub in external pbc with 2 subs");
 .pcc_sub _sub1 prototyped
@@ -368,10 +370,10 @@ ENDF
 close FOO;
 # compile it
 
-system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
+system("$PARROT -o temp.pbc temp.imc");
 
 use Test::More;
-is(`.$PConfig{slash}imcc$PConfig{exe} temp.pbc`, <<OUT, "call internal sub like external, precompiled");
+is(`$PARROT temp.pbc`, <<OUT, "call internal sub like external, precompiled");
 sub1
 sub2
 back

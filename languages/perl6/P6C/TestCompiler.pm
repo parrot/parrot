@@ -6,7 +6,6 @@ require Test::Builder;
 @EXPORT = ( qw(output_is output_like output_isnt) );
 @ISA = qw(Exporter);
 
-
 $| = 1;
 
 sub dumperr {
@@ -37,7 +36,7 @@ sub import {
 
 sub generate_pbc_for {
     my ($code,$package,$count) = @_;
-    
+
     my $p6_f = Parrot::Test::per_test('.p6',$count);
     open P6, ">$p6_f";
     print P6 $code;
@@ -45,9 +44,10 @@ sub generate_pbc_for {
     my $imc_f = Parrot::Test::per_test('.imc',$count);
     my $err_f = Parrot::Test::per_test('.err',$count);
     my $pasm_f = Parrot::Test::per_test('.pasm',$count);
+    my $PARROT = "..$PConfig{slash}..$PConfig{slash}parrot$PConfig{exe}";
 
     Parrot::Test::_run_command("$PConfig{perl} prd-perl6.pl --batch=$p6_f --imc", 'STDOUT' => $imc_f, 'STDERR' => $err_f);
-    Parrot::Test::_run_command("../imcc/imcc -o $pasm_f $imc_f", 'STDERR' => $err_f);
+    Parrot::Test::_run_command("$PARROT -o $pasm_f $imc_f", 'STDERR' => $err_f);
     my $pasm;
     {
       open PASM, $pasm_f;

@@ -60,7 +60,7 @@ foreach my $i ( qw(is isnt like) ) {
     close SCHEME; # JMG
 
     _run_command("$PConfig{perl} schemec $scheme_f >$as_f"); # JMG
-    my $parrot = "../imcc/imcc";
+    my $parrot = "../../parrot";
     _run_command( "${parrot} $as_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
     my $prog_output;

@@ -64,7 +64,7 @@ imcc.y.flag imcparser.c imcparser.h: imcc.y
 	$(TOUCH) imcc.y.flag imcparser.c imcparser.h
 
 imcc.l.flag imclexer.c: imcc.l
-	$(LEX) imcc.l
+	$(LEX) -oimclexer.c imcc.l
 	$(TOUCH) imcc.l.flag imclexer.c
 
 .c$(O):
