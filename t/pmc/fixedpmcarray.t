@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -261,6 +261,76 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sort");
+##PIR##
+.sub main @MAIN
+     .local pmc compares
+     compares = new .PerlInt
+     compares = 0
+     global "compares" = compares
+     sort_ar()
+     sort_ar(1)
+.end
+.sub sort_ar prototyped
+    .local pmc cmp_fun
+    .local pmc compares
+    compares = global "compares"
+    compares = 0
+    if argcI goto s1
+       .local pmc none
+       null none
+       cmp_fun = none
+       goto sort_it
+s1:
+    cmp_fun = global "cmp_fun"
+sort_it:
+
+    .local pmc ar
+    new ar, .FixedPMCArray
+    ar = 5
+    ar[0] = 10
+    ar[1] = 2
+    ar[2] = 5
+    ar[3] = 9
+    ar[4] = 1
+    ar."sort"(cmp_fun)
+    print "ok 1\n"
+
+    .local pmc it
+    iter it, ar
+lp:
+    unless it goto done
+    $P0 = shift it
+    print $P0
+    print " "
+    goto lp
+done:
+    print "x\n"
+     print "compares: "
+     print compares
+     print "\n"
+.end
+
+.sub cmp_fun prototyped
+    .param pmc a
+    .param pmc b
+    $I0 = cmp a, b
+    .local pmc compares
+    compares = global "compares"
+    inc compares
+    .pcc_begin_return
+    .return $I0
+    .pcc_end_return
+.end
+CODE
+ok 1
+1 2 5 9 10 x
+compares: 0
+ok 1
+1 2 5 9 10 x
+compares: 8
 OUTPUT
 
 1;

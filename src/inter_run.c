@@ -273,6 +273,12 @@ save_regs(Parrot_Interp interpreter, PMC *sub)
     return save;
 }
 
+void *
+Parrot_save_register_frames(Parrot_Interp interpreter, PMC *sub)
+{
+    save_regs(interpreter, sub);
+}
+
 PARROT_INLINE static void
 restore_regs(Parrot_Interp interpreter, regsave *data)
 {
@@ -284,6 +290,12 @@ restore_regs(Parrot_Interp interpreter, regsave *data)
     rc->reg_save_top = data;
     assert(rc->reg_save_mark == data);
     rc->reg_save_mark = data->next;
+}
+
+void
+Parrot_restore_register_frames(Parrot_Interp interpreter, void *data)
+{
+    restore_regs(interpreter, data);
 }
 
 /*
