@@ -115,7 +115,7 @@ chartype_from_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to,
             }
         }
         internal_exception(INVALID_CHARACTER,
-                           "Invalid character for chartype\n");
+                           "Invalid character <%X> for chartype\n",c);
         return 0;
     }
 }

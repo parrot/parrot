@@ -1013,9 +1013,9 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
 INTVAL
 hash_string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
 {
-    const char *s1start, *s1end;
-    const char *s2start;
-    size_t len;
+    struct string_iterator_t i1;
+    struct string_iterator_t i2;
+
     /*
      * both strings aren't null
      */
@@ -1026,23 +1026,19 @@ hash_string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
     /*
      * both strings have equal amount of chars
      */
-    s1start = s1->strstart;
-    s2start = s2->strstart;
-    len = (size_t) s1->bufused;
 
     /* speed up ascii, slow down general case
      */
     if (s1->encoding->index == enum_encoding_singlebyte &&
         s2->encoding->index == enum_encoding_singlebyte) {
-        return memcmp(s1start, s2start, s1->bufused);
+        return memcmp(s1->strstart, s2->strstart, s1->bufused);
     }
 
-    s1end = s1start + len;
-    while (s1start < s1end) {
-        if (s1->encoding->decode(s1start) != s2->encoding->decode(s2start))
+    string_iterator_init(&i1, s1);
+    string_iterator_init(&i2, s2);
+    while (i1.charpos < s1->strlen) {
+        if (i1.decode_and_advance(&i1) != i2.decode_and_advance(&i2))
             return 1;
-        s1start = s1->encoding->skip_forward(s1start, 1);
-        s2start = s2->encoding->skip_forward(s2start, 1);
     }
     return 0;
 }
@@ -1651,6 +1647,15 @@ string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
     PObj_sysmem_CLEAR(s);
     /* Free up the memory */
     mem_sys_free(memory);
+}
+
+void
+string_iterator_init(struct string_iterator_t *i, STRING *s)
+{
+    i->str = s;
+    i->bytepos = 0;
+    i->charpos = 0;
+    i->decode_and_advance = s->encoding->decode_and_advance;
 }
 
 /*

@@ -131,6 +131,34 @@ utf16_skip_backward(const void *ptr, UINTVAL n)
     return u16ptr;
 }
 
+static UINTVAL
+utf16_decode_and_advance(struct string_iterator_t *i)
+{
+    const utf16_t *u16ptr = (char *)i->str->strstart + i->bytepos;
+    UINTVAL c = *u16ptr++;
+
+    if (UNICODE_IS_HIGH_SURROGATE(c)) {
+        utf16_t low = *u16ptr++;
+
+        if (!UNICODE_IS_LOW_SURROGATE(low)) {
+            internal_exception(MALFORMED_UTF16,
+                               "Malformed UTF-16 surrogate\n");
+        }
+
+        c = UNICODE_DECODE_SURROGATE(c, low);
+        i->bytepos += 4;
+    }
+    else if (UNICODE_IS_LOW_SURROGATE(c)) {
+        internal_exception(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
+    }
+    else {
+        i->bytepos += 2;
+    }
+
+    i->charpos++;
+    return c;
+}
+
 const ENCODING utf16_encoding = {
     enum_encoding_utf16,
     "utf16",
@@ -139,7 +167,8 @@ const ENCODING utf16_encoding = {
     utf16_decode,
     utf16_encode,
     utf16_skip_forward,
-    utf16_skip_backward
+    utf16_skip_backward,
+    utf16_decode_and_advance
 };
 
 /*

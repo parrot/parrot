@@ -64,6 +64,15 @@ utf32_skip_backward(const void *ptr, UINTVAL n)
     return u32ptr - n;
 }
 
+static UINTVAL
+utf32_decode_and_advance(struct string_iterator_t *i)
+{
+    const utf32_t *u32ptr = (utf32_t *)((char *)i->str->strstart + i->bytepos);
+    i->bytepos += 4;
+    i->charpos++;
+    return *u32ptr;
+}
+
 const ENCODING utf32_encoding = {
     enum_encoding_utf32,
     "utf32",
@@ -72,7 +81,8 @@ const ENCODING utf32_encoding = {
     utf32_decode,
     utf32_encode,
     utf32_skip_forward,
-    utf32_skip_backward
+    utf32_skip_backward,
+    utf32_decode_and_advance
 };
 
 /*

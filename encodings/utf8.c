@@ -133,6 +133,42 @@ utf8_skip_backward(const void *ptr, UINTVAL n)
     return u8ptr;
 }
 
+static UINTVAL
+utf8_decode_and_advance(struct string_iterator_t *i)
+{
+    const utf8_t *u8ptr = (char *)i->str->strstart + i->bytepos;
+    UINTVAL c = *u8ptr;
+
+    if (UTF8_IS_START(c)) {
+        UINTVAL len = UTF8SKIP(u8ptr);
+        UINTVAL count;
+
+        c &= UTF8_START_MASK(len);
+        i->bytepos += len;
+//      for (count = 1; count < len; count++) {
+        for (len--; len; len--) {
+            u8ptr++;
+            if (!UTF8_IS_CONTINUATION(*u8ptr)) {
+                internal_exception(MALFORMED_UTF8, "Malformed UTF-8 string\n");
+            }
+            c = UTF8_ACCUMULATE(c, *u8ptr);
+        }
+
+        if (UNICODE_IS_SURROGATE(c)) {
+            internal_exception(MALFORMED_UTF8, "Surrogate in UTF-8 string\n");
+        }
+    }
+    else if (!UNICODE_IS_INVARIANT(c)) {
+        internal_exception(MALFORMED_UTF8, "Malformed UTF-8 string\n");
+    }
+    else {
+        i->bytepos++;
+    }
+
+    i->charpos++;
+    return c;
+}
+
 const ENCODING utf8_encoding = {
     enum_encoding_utf8,
     "utf8",
@@ -141,7 +177,8 @@ const ENCODING utf8_encoding = {
     utf8_decode,
     utf8_encode,
     utf8_skip_forward,
-    utf8_skip_backward
+    utf8_skip_backward,
+    utf8_decode_and_advance
 };
 
 /*

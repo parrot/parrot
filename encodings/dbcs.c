@@ -90,15 +90,32 @@ dbcs_skip_backward(const void *ptr, UINTVAL n)
     return ptr;
 }
 
+static UINTVAL
+dbcs_decode_and_advance(struct string_iterator_t *i)
+{
+    const byte_t *ptr = (byte_t *)i->str->strstart + i->bytepos;
+    if (*ptr < 128) {
+        i->bytepos++;
+        i->charpos++;
+        return *ptr;
+    }
+    else {
+        i->bytepos += 2;
+        i->charpos++;
+        return (*ptr << 8) | *(ptr+1);
+    }
+}
+
 const ENCODING dbcs_encoding = {
     enum_encoding_dbcs,
     "dbcs",
-    1,
+    2,
     dbcs_characters,
     dbcs_decode,
     dbcs_encode,
     dbcs_skip_forward,
-    dbcs_skip_backward
+    dbcs_skip_backward,
+    dbcs_decode_and_advance
 };
 
 /*

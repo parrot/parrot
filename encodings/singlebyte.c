@@ -59,6 +59,15 @@ singlebyte_skip_backward(const void *ptr, UINTVAL n)
     return bptr - n;
 }
 
+static UINTVAL
+singlebyte_decode_and_advance(struct string_iterator_t *i)
+{
+    const byte_t *ptr = (byte_t *)i->str->strstart + i->bytepos;
+    i->bytepos++;
+    i->charpos++;
+    return *ptr;
+}
+
 const ENCODING singlebyte_encoding = {
     enum_encoding_singlebyte,
     "singlebyte",
@@ -67,7 +76,8 @@ const ENCODING singlebyte_encoding = {
     singlebyte_decode,
     singlebyte_encode,
     singlebyte_skip_forward,
-    singlebyte_skip_backward
+    singlebyte_skip_backward,
+    singlebyte_decode_and_advance
 };
 
 /*

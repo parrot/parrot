@@ -25,15 +25,18 @@ enum {
 
 /* &end_gen */
 
+struct string_iterator_t;
+
 struct parrot_encoding_t {
     INTVAL index;
     const char *name;
     Parrot_UInt max_bytes;
-     Parrot_UInt(*characters) (const void *ptr, Parrot_UInt bytes);
-     Parrot_UInt(*decode) (const void *ptr);
+    Parrot_UInt(*characters) (const void *ptr, Parrot_UInt bytes);
+    Parrot_UInt(*decode) (const void *ptr);
     void *(*encode) (void *ptr, Parrot_UInt c);
     const void *(*skip_forward) (const void *ptr, Parrot_UInt n);
     const void *(*skip_backward) (const void *ptr, Parrot_UInt n);
+    Parrot_UInt(*decode_and_advance) (struct string_iterator_t *i);
 };
 
 typedef struct parrot_encoding_t* Parrot_Encoding;
