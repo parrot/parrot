@@ -1,0 +1,159 @@
+#
+# queens.jako
+#
+# A program to find solutions to the 8-queens problem.
+#
+# Copyright (C) 2001-2003 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as the Parrot interpreter.
+#
+# $Id$
+#
+
+const int NO_QUEEN      = -1;
+
+const int NUM_FILES     = 8;
+const int NUM_RANKS     = 8;
+
+var obj board;
+board = new PerlArray;
+
+
+#
+# free_space()
+#
+# Determines whether or not the current space is free for placing a queen.
+#
+
+sub int free_space (int board, int rank, int file) {
+  var int i = 1;
+
+  while (i <= file) {
+    var int temp_file;
+    var int temp_rank;
+
+    temp_file = file - i;
+
+    temp_rank = rank;
+    return 0 if (board[temp_file] == temp_rank);
+
+    temp_rank = rank + i;
+    return 0 if (board[temp_file] == temp_rank);
+
+    temp_rank = rank - i;
+    return 0 if (board[temp_file] == temp_rank);
+
+    i++;
+  } 
+
+  return 1;
+}
+
+
+#
+# print_board()
+#
+
+sub print_board (int board) {
+  var int rank, file;
+  var int temp;
+
+  rank = 7;
+
+  print("  +---+---+---+---+---+---+---+---+\n");
+
+  while(rank >= 0) {
+    temp = rank + 1;
+    file = 0;
+
+    print("$temp |");
+
+    while(file < 8) {
+      if (board[file] == rank) {
+        print(" Q |");
+      } else {
+        temp = rank + file;
+        temp %= 2;
+ 
+        if (temp == 1) {
+          print("   |");
+        } else {
+          print(" * |");
+        }
+      }
+      file++;
+    }
+
+    print("\n");
+    print("  +---+---+---+---+---+---+---+---+\n");
+    rank--;
+  }
+
+  print("    A   B   C   D   E   F   G   H  \n");
+}
+
+
+#
+# main()
+#
+
+sub main() {
+  var int board;
+  var int rank;
+  var int file;
+
+  #
+  # Clear the files:
+  #
+
+  file = 0;
+
+  while(file < NUM_FILES) {
+    board[file] = NO_QUEEN;
+    file++;
+  }
+
+  #
+  # Scan over the files, placing queens:
+  #
+
+  file = 0;
+  rank = 0;
+
+  while (file < NUM_FILES) {
+    while (rank < NUM_RANKS) {
+      var int result;
+      result = free_space(board, rank, file);
+      last if (result == 1);
+      rank++;
+    }
+
+    if (rank == NUM_RANKS) {
+      file--;
+      rank = board[file];
+      board[file] = NO_QUEEN;
+      rank++
+    } else {
+      board[file] = rank;
+      file++;
+      rank = 0;
+    }
+
+    last if (file < 0);
+  }
+
+  #
+  # Print the result:
+  #
+
+  print_board(board);
+}
+
+
+#
+# MAIN PROGRAM:
+#
+
+main();
+end;
+
