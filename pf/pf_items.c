@@ -501,6 +501,7 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
     size_t size;
     STRING *s;
     int wordsize = pf ? pf->header->wordsize : sizeof(opcode_t);
+    const char *encoding_name = NULL;
 
     flags = PF_fetch_opcode(pf, cursor);
     /* don't let PBC mess our internals - only constant or not */
@@ -523,9 +524,31 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
         representation = enum_stringrep_one;
     }
     
-    s = string_make(interp, *cursor, size,
-           string_primary_encoding_for_representation(interp, representation),
-           flags);
+    /* check if we need to worry about byte order */
+    if( (representation == enum_stringrep_one) 
+        || (pf->header->byteorder == PARROT_BIGENDIAN) ) /* byte order ok*/
+    {
+        encoding_name = 
+            string_primary_encoding_for_representation(interp, 
+                                                    representation);
+    }
+    else /* byte order mismatch */
+    {
+        /* ICU has special encoding names to represent the byte-swapped
+           case, so we don't need to do that logic ourselves. That is,
+           ICU will figure out if we mean UTF-16BE or UTF-16LE, etc. */
+
+        if( representation == enum_stringrep_two )
+        {
+            encoding_name = "UTF16_OppositeEndian";
+        }
+        else // representation == enum_stringrep_four
+        {
+            encoding_name = "UTF32_OppositeEndian";
+        }
+    }
+    
+    s = string_make(interp, *cursor, size, encoding_name, flags);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PF_fetch_string(): string is: ");
