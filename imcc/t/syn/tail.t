@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 ##############################
 # Parrot Calling Conventions:  Tail call optimization.
@@ -269,5 +269,69 @@ CODE
 [doing _funcall]
 _floor returned 2 values, 6 and 2.
 [doing _funcall]
+_fib_step returned 3 values, 23, 20, and 3.
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', ".flatten_arg in return");
+
+.sub _main @MAIN
+
+	$P1 = new PerlInt
+	$P1 = 20
+	$P2 = new PerlInt
+	$P2 = 3
+	newsub $P98, .Sub, _fib_step
+	($P3, $P4, $P5) = _funcall($P98, $P1, $P2)
+	print "_fib_step returned "
+	print argcP
+	print " values, "
+	print $P3
+	print ", "
+	print $P4
+	print ", and "
+	print $P5
+	print ".\n"
+.end
+
+.sub _funcall non_prototyped
+	.param pmc function
+	.local pmc argv
+	argv = foldup 1
+
+	$I33 = defined function
+	unless $I33 goto bad_func
+doit:
+	.pcc_begin prototyped
+	.flatten_arg argv
+	.pcc_call function
+	.pcc_end
+	$P35 = foldup
+        $I35 = $P35
+        print "[got "
+        print $I35
+        print " results]\n"
+	.pcc_begin_return
+	.flatten $P35
+	.pcc_end_return
+bad_func:
+	printerr "_funcall:  Bad function.\n"
+	die
+.end
+
+## Return the sum and the two arguments as three integers.
+.sub _fib_step
+	.param pmc arg1
+	.param pmc arg2
+
+	$P1 = new PerlInt
+	$P1 = arg1 + arg2
+	.pcc_begin_return
+	.return $P1
+	.return arg1
+	.return arg2
+	.pcc_end_return
+.end
+CODE
+[got 3 results]
 _fib_step returned 3 values, 23, 20, and 3.
 OUT

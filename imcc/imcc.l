@@ -193,6 +193,7 @@ SP              [ ]
 
 ".sym"          return(LOCAL);
 ".arg"          return(ARG);
+".flatten"      return(FLATTEN);
 ".flatten_arg"  return(FLATTEN_ARG);
 ".sub"          return(SUB);
 ".end"          return(ESUB);

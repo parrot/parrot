@@ -332,7 +332,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %nonassoc <t> PARAM
 
 %token <t> PRAGMA
-%token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS END SAVEALL RESTOREALL
+%token <t> CALL GOTO ARG FLATTEN_ARG FLATTEN IF UNLESS END SAVEALL RESTOREALL
 %token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD DOT_METHOD
 %token <t> SUB SYM LOCAL CONST
@@ -719,6 +719,9 @@ pcc_args:
 
 pcc_arg:
      ARG var                           {  $$ = $2; }
+   | FLATTEN target                    { $2->type |= VT_FLATTEN; $$ = $2; }
+   /* .flatten is preferred, for symmetry with pcc_return, but .flatten_arg is
+      accepted for backwards compatibility. */
    | FLATTEN_ARG target                {  $2->type |= VT_FLATTEN; $$ = $2; }
    ;
 
@@ -765,6 +768,7 @@ pcc_returns:
 
 pcc_return:
      RETURN var    {  $$ = $2; }
+   | FLATTEN target                {  $2->type |= VT_FLATTEN; $$ = $2; }
    ;
 
 pcc_return_many:
@@ -1088,6 +1092,9 @@ arglist:
 arg:
      var
                    { $$ = $1; }
+   | FLATTEN target                    { $2->type |= VT_FLATTEN; $$ = $2; }
+   /* .flatten is preferred, for symmetry with pcc_return, but .flatten_arg is
+      accepted for backwards compatibility. */
    | FLATTEN_ARG target
                    { $2->type |= VT_FLATTEN; $$ = $2; }
    ;
