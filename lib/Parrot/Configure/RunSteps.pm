@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ use strict;
 use vars qw(@steps);
 
 # EDIT HERE TO ADD NEW TESTS
-@steps=qw(
+@steps = qw(
     init/manifest.pl
     init/data.pl
     init/miniparrot.pl
@@ -60,6 +60,7 @@ use vars qw(@steps);
     auto/gdbm.pl
     auto/snprintf.pl
     auto/perldoc.pl
+    auto/antlr.pl
     gen/icu.pl
     gen/config_h.pl
     gen/core_pmcs.pl
