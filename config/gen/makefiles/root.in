@@ -451,6 +451,11 @@ LIBNCI_SO       = $(DYNEXT_DIR)/libnci$(LOAD_EXT)
 ${make_set_make}
 MAKE_C = ${make_c}
 
+# These need to be above lines that define suffix rules to be portable
+# (certainly FreeBSD make doesn't grok the .imc.pbc rule otherwise)
+
+.SUFFIXES : .c .h .pmc .dump $(O) .str .imc .pbc
+
 # Passing an empty argument in @ARGV to cc_flags.pl to indicate where extra -Is
 # (etc) should go. Otherwise it will insert them after the first space, which
 # makes life go horribly wrong if $(CC) contains spaces but can't have -I
@@ -471,8 +476,6 @@ MAKE_C = ${make_c}
 ###############################################################################
 
 all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc runtime/parrot/include/config.fpmc docs $(LIBNCI_SO) $(GEN_LIBRARY)
-
-.SUFFIXES : .c .h .pmc .dump $(O) .str .imc .pbc
 
 # constant string support
 .c.str :
