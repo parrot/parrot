@@ -59,6 +59,7 @@ INTVAL key_size(struct Parrot_Interp *interpreter, KEY* key) {
   }
   else {
     fprintf(stderr,"*** key_size asked to check a NULL key\n");
+    return 0;
   }
 }
 

@@ -113,7 +113,6 @@ string_ord(STRING* s, INTVAL index) {
                                "Cannot get character past end of string");
         }
         else {
-            char *buf = s->bufstart;
 	    if(index < 0) {
 		return string_index(s,len+index);
             }

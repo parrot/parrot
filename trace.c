@@ -41,7 +41,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t 
                 fprintf(stderr, "%ld", (long) *(pc + i));
                 break;
             case PARROT_ARG_SC:
-                fprintf(stderr, "\"%s\"", interpreter->code->const_table->constants[*(pc + i)]->string->bufstart);
+                fprintf(stderr, "\"%s\"", (char*)interpreter->code->const_table->constants[*(pc + i)]->string->bufstart);
                 break;
             case PARROT_ARG_I:
                 fprintf(stderr, "I%ld=%ld", (long) *(pc + i), (long) interpreter->int_reg->registers[*(pc + i)]);
@@ -55,7 +55,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t 
                 break;
             case PARROT_ARG_S:
                 if(interpreter->string_reg->registers[*(pc + i)]) {
-                    fprintf(stderr, "S%ld=\"%s\"", (long) *(pc + i), interpreter->string_reg->registers[*(pc + i)]->bufstart);
+                    fprintf(stderr, "S%ld=\"%s\"", (long) *(pc + i), (char*)interpreter->string_reg->registers[*(pc + i)]->bufstart);
                 } else {
                     fprintf(stderr, "S%ld=(null)", (long) *(pc + i));
                 }
@@ -78,7 +78,6 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t 
  */
 void
 trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
-    INTVAL i;
 
     if (!pc) {
         return;

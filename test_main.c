@@ -181,7 +181,7 @@ main(int argc, char **argv) {
                     op_count++;
                     call_count += interpreter->profile[i];
 
-                    printf("  %5d  %-12s  %12d\n", i, core_opinfo[i].full_name,
+                    printf("  %5d  %-12s  %12ld\n",i, core_opinfo[i].full_name,
                         interpreter->profile[i]);
                 }
 

@@ -16,6 +16,7 @@ C_LIBS = ${libs}
 
 CC = ${cc}
 PERL = ${perl}
+MAKE_F=${make}
 
 .c$(O):
 	$(CC) $(CFLAGS) ${ld_out}$@ -c $<

@@ -193,7 +193,9 @@ AUTO_OP print(n|nc) {
 
 AUTO_OP print(s|sc) {
   STRING *s = $1;
-  if (s) printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+  if (s && string_length(s)) {
+    printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+  }
 }
 
 AUTO_OP print(p) {
