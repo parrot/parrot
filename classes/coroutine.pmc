@@ -1,0 +1,324 @@
+/* Coroutine.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the Coroutine base class
+ *  Data Structure and Algorithms:
+ *     Initial version by Melvin on 2002/06/6
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass Coroutine {
+
+   INTVAL type () {
+       return enum_class_Coroutine;
+   }
+
+   STRING* name () {
+	return whoami;
+   }
+
+   void init (INTVAL address) {
+       SELF->data = new_coroutine(INTERP, (opcode_t*)address);
+   }
+
+/*
+   void clone (PMC* dest) {
+   }
+
+   void morph (INTVAL type) {
+   }
+
+   INTVAL real_size () {
+   }
+
+   void destroy () {
+   }
+
+   PMC* mark (PMC* end_of_used_list) {
+   }
+
+   INTVAL get_integer () {
+   }
+
+   INTVAL get_integer_keyed (KEY * key) {
+   }
+
+   FLOATVAL get_number () {
+   }
+
+   FLOATVAL get_number_keyed (KEY * key) {
+   }
+
+   STRING* get_string () {
+   }
+
+   STRING* get_string_keyed (KEY * key) {
+   }
+
+   BOOLVAL get_bool () {
+   }
+
+   void* get_value () {
+   }
+
+   PMC* get_pmc_keyed (KEY * key) {
+   }
+
+   BOOLVAL is_same (PMC* pmc2) {
+   }
+*/
+   void set_integer (PMC * value) {
+       ((struct Parrot_Sub*)SELF->data)->init = (opcode_t*)value->vtable->get_integer(INTERP, value);
+   }
+
+   void set_integer_native (INTVAL value) {
+       ((struct Parrot_Sub*)SELF->data)->init = (opcode_t*)value;
+   }
+/*
+   void set_integer_bigint (BIGINT value) {
+   }
+
+   void set_integer_same (PMC * value) {
+   }
+
+   void set_integer_keyed (KEY * key, INTVAL value) {
+   }
+
+   void set_number (PMC * value) {
+   }
+
+   void set_number_native (FLOATVAL value) {
+   }
+
+   void set_number_bigfloat (BIGFLOAT value) {
+   }
+
+   void set_number_same (PMC * value) {
+   }
+
+   void set_number_keyed (KEY * key, FLOATVAL value) {
+   }
+
+   void set_string (PMC * value) {
+   }
+
+   void set_string_native (STRING * value) {
+   }
+
+   void set_string_unicode (STRING * value) {
+   }
+
+   void set_string_other (STRING * value) {
+   }
+
+   void set_string_same (PMC * value) {
+   }
+
+   void set_string_keyed (KEY * key, STRING* value) {
+   }
+
+   void set_value (void* value) {
+   }
+
+   void set_pmc (PMC* value) {
+   }
+
+   void set_pmc_keyed (KEY * key, PMC* value, KEY * value_key) {
+   }
+
+   void inc (PMC * value, PMC* dest) {
+   }
+
+   void inc_native (INTVAL value, PMC* dest) {
+   }
+
+   void inc_bigint (BIGINT value, PMC* dest) {
+   }
+
+   void inc_same (PMC * value, PMC* dest) {
+   }
+
+   void dec (PMC * value, PMC* dest) {
+   }
+
+   void dec_native (INTVAL value, PMC* dest) {
+   }
+
+   void dec_bigint (BIGINT value, PMC* dest) {
+   }
+
+   void dec_same (PMC * value, PMC* dest) {
+   }
+
+   void add (PMC * value, PMC* dest) {
+   }
+
+   void add_int (INTVAL value, PMC* dest) {
+   }
+
+   void add_bigint (BIGINT value, PMC* dest) {
+   }
+
+   void add_float (FLOATVAL value, PMC* dest) {
+   }
+
+   void add_bigfloat (BIGFLOAT value, PMC* dest) {
+   }
+
+   void add_same (PMC * value, PMC* dest) {
+   }
+
+   void add_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
+   }
+
+   void subtract (PMC * value, PMC* dest) {
+   }
+
+   void subtract_int (INTVAL value, PMC* dest) {
+   }
+
+   void subtract_bigint (BIGINT value, PMC* dest) {
+   }
+
+   void subtract_float (FLOATVAL value, PMC* dest) {
+   }
+
+   void subtract_bigfloat (BIGFLOAT value, PMC* dest) {
+   }
+
+   void subtract_same (PMC * value, PMC* dest) {
+   }
+
+   void subtract_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
+   }
+
+   void multiply (PMC * value, PMC* dest) {
+   }
+
+   void multiply_int (INTVAL value, PMC* dest) {
+   }
+
+   void multiply_bigint (BIGINT value, PMC* dest) {
+   }
+
+   void multiply_float (FLOATVAL value, PMC* dest) {
+   }
+
+   void multiply_bigfloat (BIGFLOAT value, PMC* dest) {
+   }
+
+   void multiply_same (PMC * value, PMC* dest) {
+   }
+
+   void multiply_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
+   }
+
+   void divide (PMC * value, PMC* dest) {
+   }
+
+   void divide_int (INTVAL value, PMC* dest) {
+   }
+
+   void divide_bigint (BIGINT value, PMC* dest) {
+   }
+
+   void divide_float (FLOATVAL value, PMC* dest) {
+   }
+
+   void divide_bigfloat (BIGFLOAT value, PMC* dest) {
+   }
+
+   void divide_same (PMC * value, PMC* dest) {
+   }
+
+   void divide_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
+   }
+
+   void modulus (PMC * value, PMC* dest) {
+   }
+
+   void modulus_int (INTVAL value, PMC* dest) {
+   }
+
+   void modulus_bigint (BIGINT value, PMC* dest) {
+   }
+
+   void modulus_float (FLOATVAL value, PMC* dest) {
+   }
+
+   void modulus_bigfloat (BIGFLOAT value, PMC* dest) {
+   }
+
+   void modulus_same (PMC * value, PMC* dest) {
+   }
+
+   void modulus_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
+   }
+
+   void concatenate (PMC * value, PMC* dest) {
+   }
+
+   void concatenate_native (STRING * value, PMC* dest) {
+   }
+
+   void concatenate_unicode (STRING * value, PMC* dest) {
+   }
+
+   void concatenate_other (STRING * value, PMC* dest) {
+   }
+
+   void concatenate_same (PMC * value, PMC* dest) {
+   }
+
+   void concatenate_keyed (KEY * key, PMC* value, KEY * value_key, PMC* dest, KEY * dest_key) {
+   }
+
+   BOOLVAL is_equal (PMC* value) {
+   }
+
+   void logical_or (PMC* value, PMC* dest) {
+   }
+
+   void logical_and (PMC* value, PMC* dest) {
+   }
+
+   void logical_not (PMC* value) {
+   }
+
+   void match (PMC * value, REGEX* re) {
+   }
+
+   void match_native (STRING * value, REGEX* re) {
+   }
+
+   void match_unicode (STRING * value, REGEX* re) {
+   }
+
+   void match_other (STRING * value, REGEX* re) {
+   }
+
+   void match_same (PMC * value, REGEX* re) {
+   }
+
+   void repeat (PMC * value, PMC* dest) {
+   }
+
+   void repeat_native (STRING * value, PMC* dest) {
+   }
+
+   void repeat_unicode (STRING * value, PMC* dest) {
+   }
+
+   void repeat_other (STRING * value, PMC* dest) {
+   }
+
+   void repeat_same (PMC * value, PMC* dest) {
+   }
+*/
+}
