@@ -393,7 +393,7 @@ if ($suffix =~ /cgp/) {
     else
       _check();
 #endif
-    goto **cur_opcode;
+    goto *((void *)*cur_opcode);
 
 END_C
 } elsif ($suffix =~ /cg/) {
