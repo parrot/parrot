@@ -16,8 +16,9 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 12;
 use Test::More qw(skip);
+
 output_is(<<'CODE', <<'OUTPUT', "new iter");
 	new P2, .PerlArray
 	new P1, .Iterator, P2
@@ -325,12 +326,180 @@ abcdefg
 reached end
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "Index access for Iterator on PerlString");
+##PIR##
+.include "iterator.pasm"
+.sub _main
+    .local pmc string_1
+    string_1 = new PerlString
+    string_1 = "abcd\x65\x66\x67"
+    print 'PerlString new: '
+    print string_1
+    print "\n"
+
+    .local pmc iter_1
+    iter_1 = new Iterator, string_1
+    iter_1 = .ITERATE_FROM_START
+
+    .local int    code_point_1
+    .local float  code_point_2
+    .local string code_point_3
+    .local pmc    code_point_4
+
+    print 'Iterator shift_integer: '
+    shift code_point_1, iter_1
+    print code_point_1
+    print "\n"
+
+    print 'Iterator get_integer_keyed_int 2: '
+    code_point_1 = iter_1[2]
+    print code_point_1
+    print "\n"
+
+    print 'Iterator get_integer_keyed_int 0: '
+    code_point_1 = iter_1[0]
+    print code_point_1
+    print "\n"
+
+    print 'Iterator get_integer_keyed_int -1: '
+    code_point_1 = iter_1[-1]
+    print code_point_1
+    print "\n"
+
+    end
+.end
+CODE
+PerlString new: abcdefg
+Iterator shift_integer: 97
+Iterator get_integer_keyed_int 2: 100
+Iterator get_integer_keyed_int 0: 98
+Iterator get_integer_keyed_int -1: 97
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
+##PIR##
+.include "iterator.pasm"
+.sub _main
+    .local pmc array_1
+    array_1 = new PerlArray
+    push array_1, 'a'
+    push array_1, 'b'
+    push array_1, 'c'
+    push array_1, 'd'
+    push array_1, 'e'
+    push array_1, 'f'
+    push array_1, '7'
+    push array_1, '-8.8'
+
+    print 'PerlArray get_string: '
+    print array_1
+    print "\n"
+
+    .local pmc iter_1
+    iter_1 = new Iterator, array_1
+    iter_1 = .ITERATE_FROM_START
+
+    print 'Iterator get_string: '
+    print iter_1
+    print "\n"
+
+    .local string elem_1
+
+    print 'Iterator shift_string: '
+    shift elem_1, iter_1
+    print elem_1
+    print "\n"
+
+    print 'Iterator get_string_keyed_int 2: '
+    elem_1 = iter_1[2]
+    print elem_1
+    print "\n"
+
+    print 'Iterator get_string_keyed_int -1: '
+    elem_1 = iter_1[-1]
+    print elem_1
+    print "\n"
+
+    print 'Iterator get_string_keyed_int 0: '
+    elem_1 = iter_1[0]
+    print elem_1
+    print "\n"
+
+    print 'Iterator get_pmc_keyed_int 3: '
+    .local pmc elem_2
+    elem_2 = iter_1[3]
+    print elem_2
+    print "\n"
+
+    .local int flag
+
+    print 'Iterator exists_keyed_int 3: '
+    flag = exists iter_1[3]
+    print flag
+    print "\n"
+
+    print 'Iterator exists_keyed_int 28: '
+    flag = exists iter_1[28]
+    print flag
+    print "\n"
+
+
+    print 'Iterator defined_keyed_int 3: '
+    flag = defined iter_1[3]
+    print flag
+    print "\n"
+
+    print 'Iterator defined_keyed_int -1278: '
+    flag = defined iter_1[-1278]
+    print flag
+    print "\n"
+
+    .local pmc iter_2
+    iter_2 = new Iterator, array_1
+    iter_2 = .ITERATE_FROM_END
+
+    print 'Iterator get_string: '
+    print iter_1
+    print "\n"
+
+    print 'Iterator shift_float: '
+    .local float elem_2
+    shift elem_2, iter_2
+    print elem_2
+    print "\n"
+
+    print 'Iterator get_integer: '
+    .local int elem_3
+    elem_3 = iter_2[-1]
+    print elem_3
+    print "\n"
+
+    end
+.end
+CODE
+PerlArray get_string: 8
+Iterator get_string: 8
+Iterator shift_string: a
+Iterator get_string_keyed_int 2: d
+Iterator get_string_keyed_int -1: a
+Iterator get_string_keyed_int 0: b
+Iterator get_pmc_keyed_int 3: e
+Iterator exists_keyed_int 3: 1
+Iterator exists_keyed_int 28: 0
+Iterator defined_keyed_int 3: 1
+Iterator defined_keyed_int -1278: 0
+Iterator get_string: 8
+Iterator shift_float: -8.800000
+Iterator get_integer: 7
+OUTPUT
+
+
 SKIP: {
-skip("N/Y: get_keyed_int gets rest of array", 1);
+skip("N/Y: length of rest of array ", 1);
 output_is(<<'CODE', <<'OUTPUT', "shift + index access");
     .include "iterator.pasm"
 
-	new P2, .PerlArray	# array with 2 elements
+	new P2, .PerlArray	# array with 4 elements
 	push P2, 10
 	push P2, 20
 	push P2, 30
@@ -349,22 +518,24 @@ ok1:	print "ok 1\n"
 	print "not "
 ok2:	print "ok 2\n"
 
-        set I0, P1[0]		# first element of iter = next
+	shift I0, P1		# get one
 	eq I0, 20, ok3
-	print I0
-	print " not "
+	print "not "
 ok3:	print "ok 3\n"
 
 	set I0, P1		# arr.length of rest
-	eq I0, 3, ok4
+	eq I0, 2, ok6
 	print I0
 	print " not "
-ok4:	print "ok 4\n"
+ok6:	print "ok 6\n"
+
+        print P1
 	end
 CODE
 ok 1
 ok 2
 ok 3
-ok 4
+ok 6
+2
 OUTPUT
 }

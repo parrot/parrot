@@ -88,12 +88,32 @@ Unimplemented. Calls the C<default> method.
 
 =item C<INTVAL get_integer()>
 
+Get number of remaining elements. Does not work for hashes yet.
+TODO: keep track of current position and direction
+
 =cut
 
 */
 
     INTVAL get_integer () {
-        return VTABLE_get_integer(INTERP, (PMC *)PMC_pmc_val(SELF));
+        PMC *agg = PMC_pmc_val(SELF);
+        return VTABLE_get_integer(INTERP, agg );
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns the number of remaining elements as a Parrot string.
+TODO: keep track of current position and direction
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        PMC *agg = PMC_pmc_val(SELF);
+        return string_from_int(INTERP, VTABLE_get_integer(INTERP, agg ) );
     }
 
 /*
@@ -110,15 +130,18 @@ Unimplemented. Calls the C<default> method.
 
 /*
 
-=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+=item C<INTVAL get_integer_keyed_int(INTVAL index)>
+
+Get integer value of current position plus index.
 
 =cut
 
 */
 
-    INTVAL get_integer_keyed_int (INTVAL key) {
-        /* XXX adjust index */
-        return VTABLE_get_integer_keyed_int(INTERP, (PMC *)PMC_pmc_val(SELF), key);
+    INTVAL get_integer_keyed_int (INTVAL index) {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *agg = PMC_pmc_val(SELF);
+        return VTABLE_get_integer_keyed_int(INTERP, agg, PMC_int_val(key) + index );
     }
 
 /*
@@ -130,20 +153,23 @@ Unimplemented. Calls the C<default> method.
 */
 
     FLOATVAL get_number_keyed (PMC* key) {
-        return VTABLE_get_number_keyed(INTERP, (PMC *)PMC_pmc_val(SELF), key);
+        return VTABLE_get_number_keyed(INTERP,(PMC *)PMC_pmc_val(SELF), key );
     }
 
 /*
 
-=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+=item C<FLOATVAL get_number_keyed_int(INTVAL index)>
+
+Get number value of current position plus index.
 
 =cut
 
 */
 
-    FLOATVAL get_number_keyed_int (INTVAL key) {
-        /* XXX adjust index */
-        return VTABLE_get_number_keyed_int(INTERP, (PMC *)PMC_pmc_val(SELF), key);
+    FLOATVAL get_number_keyed_int (INTVAL index) {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *agg = PMC_pmc_val(SELF);
+        return VTABLE_get_number_keyed_int(INTERP, agg, PMC_int_val(key) + index );
     }
 
 /*
@@ -160,16 +186,18 @@ Unimplemented. Calls the C<default> method.
 
 /*
 
-=item C<BIGNUM *get_bignum_keyed_int(INTVAL key)>
+=item C<BIGNUM *get_bignum_keyed_int(INTVAL index)>
 
-Returns the current index.
+Get bignum value of current position plus index.
 
 =cut
 
 */
 
-    BIGNUM* get_bignum_keyed_int (INTVAL key) {
-        return VTABLE_get_bignum_keyed_int(INTERP, (PMC *)PMC_pmc_val(SELF), key);
+    BIGNUM* get_bignum_keyed_int (INTVAL index) {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *agg = PMC_pmc_val(SELF);
+        return VTABLE_get_bignum_keyed_int(INTERP, agg, PMC_int_val(key) + index );
     }
 
 /*
@@ -186,16 +214,18 @@ Returns the current index.
 
 /*
 
-=item C<STRING *get_string_keyed_int(INTVAL key)>
+=item C<STRING *get_string_keyed_int(INTVAL index)>
 
-Returns the current key.
+Get string value of current position plus index.
 
 =cut
 
 */
 
-    STRING* get_string_keyed_int (INTVAL key) {
-        return VTABLE_get_string_keyed_int(INTERP, (PMC *)PMC_pmc_val(SELF), key);
+    STRING* get_string_keyed_int (INTVAL index) {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *agg = PMC_pmc_val(SELF);
+        return VTABLE_get_string_keyed_int(INTERP, agg, PMC_int_val(key) + index );
     }
 
 /*
@@ -251,8 +281,10 @@ Returns the element for C<key>.
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL key) {
-        return VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_pmc_val(SELF), key);
+    PMC* get_pmc_keyed_int (INTVAL index) {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *agg = PMC_pmc_val(SELF);
+        return VTABLE_get_pmc_keyed_int(INTERP, agg, PMC_int_val(key) + index );
     }
 
 /*
@@ -474,16 +506,18 @@ Returns whether an element for C<*key> exists in the aggregate.
 
 /*
 
-=item C<INTVAL exists_keyed_int(INTVAL key)>
+=item C<INTVAL exists_keyed_int(INTVAL index)>
 
-Returns whether an element for C<key> exists in the aggregate.
+Returns whether an element for C<index> exists in the aggregate.
 
 =cut
 
 */
 
-    INTVAL exists_keyed_int (INTVAL key) {
-        return VTABLE_exists_keyed_int(INTERP, (PMC *)PMC_pmc_val(SELF), key);
+    INTVAL exists_keyed_int (INTVAL index) {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *agg = PMC_pmc_val(SELF);
+        return VTABLE_exists_keyed_int(INTERP, agg, PMC_int_val(key) + index );
     }
 
 /*
@@ -522,8 +556,10 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
 
 */
 
-    INTVAL defined_keyed_int (INTVAL key) {
-        return VTABLE_defined_keyed_int(INTERP, (PMC *)PMC_pmc_val(SELF), key);
+    INTVAL defined_keyed_int (INTVAL index) {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *agg = PMC_pmc_val(SELF);
+        return VTABLE_defined_keyed_int(INTERP, agg, PMC_int_val(key) + index );
     }
 
 /*
@@ -538,6 +574,21 @@ Returns the result of calling C<type_keyed(key)> on the aggregate.
 
     INTVAL type_keyed (PMC* key) {
         return VTABLE_type_keyed(INTERP, (PMC *)PMC_pmc_val(SELF), key);
+    }
+
+
+=item C<INTVAL type_keyed_int(PMC *index)>
+
+Returns the result of calling C<type_keyed(key)> on the aggregate.
+
+=cut
+
+*/
+
+    INTVAL type_keyed_int (INTVAL index) {
+        PMC *key = PMC_struct_val(SELF);
+        PMC *agg = PMC_pmc_val(SELF);
+        return VTABLE_type_keyed_int(INTERP, agg, PMC_int_val(key) + index );
     }
 }
 
