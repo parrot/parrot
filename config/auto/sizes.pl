@@ -60,8 +60,8 @@ sub runstep {
   if($results{ptrsize} != $results{intvalsize}) {
     print <<"END";
 
-Hmm, I see your chosen INTVAL isn't the same size as your pointers.  Parrot should
-still compile and run, but you may see a ton of warnings.
+Hmm, I see your chosen INTVAL isn't the same size as your pointers.  Parrot
+should still compile and run, but you may see a ton of warnings.
 END
   }
 

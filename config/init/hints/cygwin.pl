@@ -3,6 +3,9 @@
 my $libs = Configure::Data->get('libs');
 $libs =~ s/-lutil\b//g;
 
+my @define = split ',', (Configure::Data->get('define') || '');
+push @define, 'inet_aton' unless grep { /^inet_[ap]ton$/ } @define;
+
 # A note about building shared libraries:  Perl5 uses the 'ld2' tool, which
 # is installed as part of the perl5 installation.  So far, it appears
 # parrot can get by with simply using gcc -shared, so we override the
@@ -15,7 +18,9 @@ Configure::Data->set(
   libs => $libs,
 );
 
-#$_[2] is the inet_aton argument to Configure.
-#XXX This is an evil, evil, evil hack.  If we ever have to duplicate it, it's
-# time to design some new interfaces into Configure.
-$_[2]=1 unless defined $_[2];
+unless($_[2]) {
+  $_[2]='inet_aton';
+}
+elsif($_[2] !~ /inet_[ap]ton/) {
+  $_[2]=join(',', 'inet_aton', $_[2]);
+}
