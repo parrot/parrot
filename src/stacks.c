@@ -8,6 +8,8 @@ src/stacks.c - Stack handling routines for Parrot
 
 =head1 DESCRIPTION
 
+TODO update pod
+
 The stack is stored as a doubly-linked list of chunks (C<Stack_Chunk>),
 where each chunk has room for C<STACK_CHUNK_DEPTH> entries. The
 invariant maintained is that there is always room for another entry; if
@@ -45,22 +47,6 @@ C<rotate_entries> will take care of COW semantics themselves.
 
 /*
 
-=item C<void stack_system_init(Interp *interpreter)>
-
-Called from C<make_interpreter()> to initialize the interpreter's
-register stacks.
-
-=cut
-
-*/
-
-void stack_system_init(Interp *interpreter)
-{
-    make_bufferlike_pool(interpreter, sizeof(Stack_Chunk_t));
-}
-
-/*
-
 =item C<Stack_Chunk_t *
 new_stack(Interp *interpreter, const char *name)>
 
@@ -75,8 +61,7 @@ Stack_Chunk_t *
 new_stack(Interp *interpreter, const char *name)
 {
 
-    return cst_new_stack(interpreter, name,
-            sizeof(Stack_Entry_t), STACK_CHUNK_DEPTH);
+    return cst_new_stack(interpreter, name, sizeof(Stack_Entry_t));
 }
 
 
@@ -99,29 +84,26 @@ mark_stack(struct Parrot_Interp *interpreter,
     Stack_Entry_t *entry;
     size_t i;
 
-    for (; chunk && chunk->prev; chunk = chunk->prev)
-        ;
-    for (; chunk; chunk = chunk->next) {
+    for (; ; chunk = chunk->prev) {
 
-        pobject_lives(interpreter, (PObj *)chunk);
-        entry = (Stack_Entry_t *)(chunk->bufstart);
-        for (i = 0; i < chunk->used; i++) {
-            switch (entry[i].entry_type) {
-                case STACK_ENTRY_PMC:
-                    if (entry[i].entry.pmc_val) {
-                        pobject_lives(interpreter,
-                                      (PObj *)entry[i].entry.pmc_val);
-                    }
-                    break;
-                case STACK_ENTRY_STRING:
-                    if (entry[i].entry.string_val) {
-                        pobject_lives(interpreter,
-                                      (PObj *)entry[i].entry.string_val);
-                    }
-                    break;
-                default:
-                    break;
-            }
+        if (chunk == chunk->prev)
+            break;
+        entry = (Stack_Entry_t *)STACK_DATAP(chunk);
+        switch (entry->entry_type) {
+            case STACK_ENTRY_PMC:
+                if (entry->entry.pmc_val) {
+                    pobject_lives(interpreter,
+                            (PObj *)entry->entry.pmc_val);
+                }
+                break;
+            case STACK_ENTRY_STRING:
+                if (entry->entry.string_val) {
+                    pobject_lives(interpreter,
+                            (PObj *)entry->entry.string_val);
+                }
+                break;
+            default:
+                break;
         }
     }
 }
@@ -154,15 +136,15 @@ Returns the height of the stack. The maximum "depth" is height - 1.
 */
 
 size_t
-stack_height(Interp *interpreter, Stack_Chunk_t *top)
+stack_height(Interp *interpreter, Stack_Chunk_t *chunk)
 {
-    Stack_Chunk_t *chunk;
-    size_t height = top->used;
+    size_t height = 0;
 
-    for (chunk = top->prev; chunk; chunk = chunk->prev)
-        height += chunk->used;
-    assert(height == (top->n_chunks - 1) * STACK_CHUNK_DEPTH +
-            top->used);
+    for (; ; chunk = chunk->prev) {
+        if (chunk == chunk->prev)
+            break;
+        ++height;
+    }
 
     return height;
 }
@@ -197,16 +179,15 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
         offset = (size_t)depth;
     }
     chunk = stack;          /* Start at top */
-    while (chunk != NULL && offset >= chunk->used) {
-        offset -= chunk->used;
+    while ( offset) {
+        if (chunk == chunk->prev)
+            break;
+        --offset;
         chunk = chunk->prev;
     }
-    if (chunk == NULL)
+    if (chunk == chunk->prev)
         return NULL;
-    if (offset < chunk->used) {
-        entry = (Stack_Entry_t *)PObj_bufstart(chunk) +
-            chunk->used - offset - 1;
-    }
+    entry = (Stack_Entry_t *)STACK_DATAP(chunk);
     return entry;
 }
 
@@ -235,13 +216,6 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
 
     if (num_entries >= -1 && num_entries <= 1) {
         return;
-    }
-
-    /* If stack is copy-on-write, copy it before we can execute on it */
-    if (PObj_COW_TEST( (Buffer *) stack)) {
-        stack_unmake_COW(interpreter, stack);
-        if (depth >= STACK_CHUNK_DEPTH)
-            internal_exception(1, "Unhandled deep rotate for COWed stack");
     }
 
 

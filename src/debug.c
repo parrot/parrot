@@ -2147,9 +2147,7 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.int_reg_stack;
 
-    valid_chunk(chunk, command, depth,
-                FRAMES_PER_INT_REG_CHUNK, i);
-
+    internal_exception(1, "TODO");
     if (!chunk) {
         i = depth / FRAMES_PER_INT_REG_CHUNK;
         PIO_eprintf(interpreter, "There are only %li frames\n",i);
@@ -2161,7 +2159,7 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
 
     na(command);
     PDB_print_int_frame(interpreter,
-                &((struct IRegChunkBuf*)chunk->bufstart)->IRegFrame[depth],
+                (struct IRegFrame*)STACK_DATAP(chunk),
                 atoi(command));
 }
 
@@ -2182,9 +2180,7 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.num_reg_stack;
 
-    valid_chunk(chunk, command, depth,
-                FRAMES_PER_NUM_REG_CHUNK, i);
-
+    internal_exception(1, "TODO");
     if (!chunk) {
         i = depth / FRAMES_PER_NUM_REG_CHUNK;
         PIO_eprintf(interpreter, "There are only %li frames\n",i);
@@ -2195,7 +2191,7 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
 
     na(command);
     PDB_print_num_frame(interpreter,
-                &((struct NRegChunkBuf*)chunk->bufstart)->NRegFrame[depth],
+                (struct NRegFrame*)STACK_DATAP(chunk),
                 atoi(command));
 }
 
@@ -2216,9 +2212,7 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.string_reg_stack;
 
-    valid_chunk(chunk, command, depth,
-                FRAMES_PER_STR_REG_CHUNK, i);
-
+    internal_exception(1, "TODO");
     if (!chunk) {
         i = depth / FRAMES_PER_STR_REG_CHUNK;
         PIO_eprintf(interpreter, "There are only %li frames\n",i);
@@ -2230,7 +2224,7 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
 
     na(command);
     PDB_print_string_frame(interpreter,
-                &((struct SRegChunkBuf*)chunk->bufstart)->SRegFrame[depth],
+                (struct SRegFrame*)STACK_DATAP(chunk),
                 atoi(command));
 }
 
@@ -2251,9 +2245,7 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.pmc_reg_stack;
 
-    valid_chunk(chunk, command, depth,
-                FRAMES_PER_PMC_REG_CHUNK, i);
-
+    internal_exception(1, "TODO");
     if (!chunk) {
         i = depth / FRAMES_PER_PMC_REG_CHUNK;
         PIO_eprintf(interpreter, "There are only %li frames\n",i);
@@ -2264,7 +2256,7 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
 
     na(command);
     PDB_print_pmc_frame(interpreter,
-                &((struct PRegChunkBuf*)chunk->bufstart)->PRegFrame[depth],
+                (struct PRegFrame*)STACK_DATAP(chunk),
                 atoi(command), NULL);
 }
 

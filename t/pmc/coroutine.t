@@ -16,8 +16,33 @@ Tests the C<Coroutine> PMC.
 
 =cut
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 10;
 use Test::More;
+
+output_is(<<'CODE', <<'OUTPUT', "Coroutine 1");
+_main:
+    newsub P0, .Coroutine, _coro
+    new P10, .PerlInt
+    set P10, 2
+    store_global "i", P10
+lp:
+    invoke
+    print "back "
+    print P10
+    print "\n"
+    if P10, lp
+    print "done\n"
+    end
+_coro:
+    find_global P11, "i"
+    dec P11
+    invoke P0
+    branch _coro
+CODE
+back 1
+back 0
+done
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutines");
     new P0, .Coroutine
@@ -82,7 +107,40 @@ back  1
 done
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals");
+output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 1");
+    new_pad 0
+
+    new P20, .PerlString
+    set P20, "main\n"
+    store_lex -1, "a", P20
+
+    newsub P0, .Coroutine, co1
+    invoke
+    find_lex P21, "a"
+    print P21
+    invoke
+    print P21
+    print "done\n"
+    end
+
+co1:
+    new_pad 1
+    new P22, .PerlString
+    set P22, "coro\n"
+
+    store_lex -1, "a", P22
+    invoke P0
+
+    print P22
+    invoke P0
+CODE
+main
+coro
+main
+done
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 2");
     new_pad 0
     new_pad 1
 
@@ -348,4 +406,163 @@ CODE
 10 0
 OUTPUT
 
-1;
+output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in main");
+_main:
+    newsub P0, .Coroutine, _coro
+    newsub P16, .Exception_Handler, _catchm
+    set_eh P16
+    new P16, .PerlInt
+    set P16, 2
+    store_global "i", P16
+lp:
+    pushtopp
+    invoke
+    poptopp
+    print "back "
+    print P16
+    print "\n"
+    find_global P17, "no_such"
+    if P16, lp
+    print "done\n"
+    end
+_coro:
+    newsub P16, .Exception_Handler, _catchc
+    set_eh P16
+corolp:
+    find_global P17, "i"
+    dec P17
+    pushtopp
+    invoke P0
+    poptopp
+    branch corolp
+_catchc:
+    print "catch coro\n"
+    end
+_catchm:
+    print "catch main\n"
+    end
+CODE
+back 1
+catch main
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro");
+_main:
+    newsub P0, .Coroutine, _coro
+    newsub P16, .Exception_Handler, _catchm
+    set_eh P16
+    new P16, .PerlInt
+    set P16, 2
+    store_global "i", P16
+lp:
+    pushtopp
+    invoke
+    poptopp
+    print "back "
+    print P16
+    print "\n"
+    if P16, lp
+    print "done\n"
+    end
+_coro:
+    newsub P16, .Exception_Handler, _catchc
+    set_eh P16
+corolp:
+    find_global P17, "i"
+    dec P17
+    pushtopp
+    invoke P0
+    poptopp
+    find_global P17, "no_such"
+    branch corolp
+_catchc:
+    print "catch coro\n"
+    end
+_catchm:
+    print "catch main\n"
+    end
+CODE
+back 1
+catch coro
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler");
+_main:
+    newsub P0, .Coroutine, _coro
+    newsub P16, .Exception_Handler, _catchm
+    set_eh P16
+    new P16, .PerlInt
+    set P16, 2
+    store_global "i", P16
+lp:
+    pushtopp
+    invoke
+    poptopp
+    print "back "
+    print P16
+    print "\n"
+    if P16, lp
+    print "done\n"
+    end
+_coro:
+corolp:
+    find_global P17, "i"
+    dec P17
+    pushtopp
+    invoke P0
+    poptopp
+    find_global P17, "no_such"
+    branch corolp
+_catchc:
+    print "catch coro\n"
+    end
+_catchm:
+    print "catch main\n"
+    end
+CODE
+back 1
+catch main
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow");
+_main:
+    newsub P0, .Coroutine, _coro
+    newsub P16, .Exception_Handler, _catchm
+    set_eh P16
+    new P16, .PerlInt
+    set P16, 2
+    store_global "i", P16
+lp:
+    pushtopp
+    invoke
+    poptopp
+    print "back "
+    print P16
+    print "\n"
+    if P16, lp
+    print "done\n"
+    end
+_coro:
+    newsub P16, .Exception_Handler, _catchc
+    set_eh P16
+corolp:
+    find_global P17, "i"
+    dec P17
+    pushtopp
+    invoke P0
+    poptopp
+    find_global P17, "no_such"
+    branch corolp
+_catchc:
+    print "catch coro\n"
+    rethrow P5
+    end
+_catchm:
+    print "catch main\n"
+    end
+CODE
+back 1
+catch coro
+catch main
+OUTPUT
+

@@ -1341,6 +1341,8 @@ ok 7
 ok 8
 OUTPUT
 
+SKIP: {
+  skip("no stack limit currently", 3);
 output_is(<<CODE, <<'OUTPUT', "check limit - User");
 lp:
 	save I0
@@ -1366,7 +1368,7 @@ lp:
 CODE
 Stack 'Control' too deep
 OUTPUT
-
+}
 ##############################
 
 # set integer registers to some value given by $code...

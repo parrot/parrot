@@ -11,15 +11,14 @@ src/stack_common.c - Common stack handling routines for Parrot
 Both the register stacks and stacks implemented in F<src/stacks.c>
 have a common funcionality, which is implemented in this file.
 
-These stacks all differ only in the size of items and items per chunk.
+These stacks all differ only in the size of items.
 
 =head2 Functions
 
 =over 4
 
 =item C<Stack_Chunk_t *
-cst_new_stack(Interp *interpreter, const char *name, size_t item_size,
-  size_t items_per_chunk)>
+cst_new_stack(Interp *interpreter, const char *name, size_t item_size)>
 
 Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
@@ -31,86 +30,62 @@ debugging/error reporting.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-Stack_Chunk_t *
-cst_new_stack(Interp *interpreter, const char *name, size_t item_size,
-		  size_t items_per_chunk)
-{
-    Stack_Chunk_t *chunk = new_bufferlike_header(interpreter,
-            sizeof(Stack_Chunk_t));
-
-    SET_NULL(chunk->next);
-    SET_NULL(chunk->prev);
-    chunk->n_chunks = 1;
-    chunk->chunk_limit = STACK_CHUNK_LIMIT;
-    chunk->name = name;
-    chunk->item_size = item_size;
-    chunk->items_per_chunk = items_per_chunk;
-    chunk->used = 0;
-
-    /* Block DOD from murdering our newly allocated stack buffer. */
-    Parrot_block_DOD(interpreter);
-    Parrot_allocate(interpreter, (Buffer *)chunk, item_size * items_per_chunk);
-    Parrot_unblock_DOD(interpreter);
-
-    return chunk;
-}
-
 /*
-
-=item C<Stack_Chunk_t *
-stack_copy(Parrot_Interp interpreter, Stack_Chunk_t *stack)>
-
-COW copy a stack. This is done by allocating a new stack buffer header,
-that points to possibly common next chunks and to common buffer memory.
-
-=cut
-
-*/
+ * s. also STACK_DATAP and mark routines in stacks.c and registers.c
+ *
+ * It'll be replaced very likely by some more macros in src/generic_register.c
+ */
 
 Stack_Chunk_t *
-stack_copy(Parrot_Interp interpreter, Stack_Chunk_t *stack)
+cst_new_stack(Interp *interpreter, const char *name, size_t item_size)
 {
-    Stack_Chunk_t *chunk = new_bufferlike_header(interpreter,
-            sizeof(Stack_Chunk_t));
     /*
-     * the private0_FLAG indiciates, that we might share the
-     * next stack_chunk too
+     * TODO cleanup in Parrot_really_destroy
      */
-    PObj_get_FLAGS((Buffer *) stack) |=
-	(PObj_COW_FLAG | PObj_private0_FLAG);
-    /* just copy the header, all pointers are shared now */
-    mem_sys_memcopy(chunk, stack, sizeof(*stack));
+    Stack_Chunk_t *chunk = mem_sys_allocate(item_size +
+            offsetof(Stack_Chunk_t, data));
+
+    chunk->prev = chunk;        /* mark the top of the stack */
+    chunk->item_size = item_size;
+    chunk->free_p = NULL;
+    chunk->name = name;
+
     return chunk;
 }
 
+
 /*
 
-=item C<void
-stack_unmake_COW(Parrot_Interp interpreter, Stack_Chunk_t *stack)>
+=item C<void stack_system_init(Interp *interpreter)>
 
-Make a COWed stack_chunk non-COWed.
+Called from C<make_interpreter()> to initialize the interpreter's
+register stacks.
 
 =cut
 
 */
+
+/*
+ * we have currently: NUM, {INT,PMC*,STRING*} frames and Stack_Entry_t
+ */
+#define N_CHUNK_CACHES 3
+
+typedef struct {
+    Stack_Chunk_t *free_list[N_CHUNK_CACHES];
+} Stack_cache;
 
 void
-stack_unmake_COW(Parrot_Interp interpreter, Stack_Chunk_t *stack)
+stack_system_init(Interp *interpreter)
 {
-    Buffer for_alloc;
+    int i;
+    Stack_cache *sc;
+
     /*
-     * allocate a dummy stacks memory
-     * also be sure not to allocate from the constant pool
+     * TODO cleanup in Parrot_really_destroy
      */
-    PObj_flags_CLEARALL(&for_alloc);
-    Parrot_allocate(interpreter, &for_alloc, stack->buflen);
-    /*
-     * copy over used items data
-     */
-    mem_sys_memcopy(for_alloc.bufstart, stack->bufstart,
-	    stack->item_size * stack->items_per_chunk);
-    stack->bufstart = for_alloc.bufstart;
-    PObj_COW_CLEAR((Buffer*)stack);
+    sc = interpreter->stack_chunk_cache = mem_sys_allocate(sizeof(Stack_cache));
+    for (i = 0; i < N_CHUNK_CACHES; ++i)
+        sc->free_list[i] = NULL;
 }
 
 
@@ -119,7 +94,7 @@ stack_unmake_COW(Parrot_Interp interpreter, Stack_Chunk_t *stack)
 =item C<void*
 stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)>
 
-Return a pointer, where new entries go for push. UnCOW if necessary
+Return a pointer, where new entries go for push.
 
 =cut
 
@@ -129,43 +104,42 @@ void*
 stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 {
     Stack_Chunk_t *chunk = *stack_p, *new_chunk;
+    Stack_cache *sc = interpreter->stack_chunk_cache;
+    int s;
+
     /*
-     * before any change unCOW if necessary
+     * XXX this should be all macroized to get rid of the switch,
+     * s. src/generic_register.c
      */
-    if (PObj_COW_TEST((Buffer*)chunk))
-	stack_unmake_COW(interpreter, chunk);
-    /*
-     * if this chunk is full, allocate a new one
-     */
-    if (chunk->used == chunk->items_per_chunk) {
-        if (chunk->next == NULL) {
-            new_chunk = cst_new_stack(interpreter, chunk->name,
-		    chunk->item_size, chunk->items_per_chunk);
-	    new_chunk->prev = chunk;
-	    chunk->next = new_chunk;
-            new_chunk->n_chunks = chunk->n_chunks + 1;
-            if (new_chunk->n_chunks == new_chunk->chunk_limit)
-                internal_exception(1, "Stack '%s' too deep\n",
-                        chunk->name);
-            *stack_p = chunk = new_chunk;
-	}
-	else {
-	    /*
-	     * we have a next chunk: this is either a spare chunk
-	     * kept during stack_pop to avoid thrashing or
-	     * a common next stack_chunk
-	     */
-	    if (PObj_get_FLAGS((Buffer*)chunk->next) & PObj_private0_FLAG) {
-		new_chunk = cst_new_stack(interpreter, chunk->name,
-		    chunk->item_size, chunk->items_per_chunk);
-                new_chunk->prev = chunk;
-		chunk->next = new_chunk;
-	    }
-            *stack_p = chunk = chunk->next;
-            assert(!PObj_COW_TEST( (Buffer *) chunk));
-	}
+    switch (STACK_ITEMSIZE(chunk)) {
+        case sizeof(struct IRegFrame):
+            s = 0;
+            break;
+        case sizeof(struct NRegFrame):
+            s = 1;
+            break;
+        case sizeof(Stack_Entry_t):
+            s = 2;
+            break;
+        default:
+            PANIC("Unhandled stack chunk size");
+            _exit(1); /* avoid warning */
     }
-    return (char*) chunk->bufstart + chunk->used++ * chunk->item_size;
+    if (sc->free_list[s]) {
+        new_chunk = sc->free_list[s];
+        sc->free_list[s] = new_chunk->free_p;
+        /*
+         * freeP- is used as a flag too to avoid tracing into
+         * the free list in mark_pmc_register_stack
+         */
+        new_chunk->free_p = NULL;
+    }
+    else
+        new_chunk = cst_new_stack(interpreter, chunk->name,
+                STACK_ITEMSIZE(chunk));
+    new_chunk->prev = chunk;
+    *stack_p = new_chunk;
+    return STACK_DATAP(new_chunk);
 }
 
 /*
@@ -173,7 +147,7 @@ stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 =item C<void*
 stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)>
 
-Return a pointer, where new entries are poped off. UnCOW if necessary.
+Return a pointer, where new entries are poped off.
 
 =cut
 
@@ -183,30 +157,35 @@ void*
 stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 {
     Stack_Chunk_t *chunk = *stack_p;
+    Stack_cache *sc = interpreter->stack_chunk_cache;
+    int s;
     /*
-     * before any change unCOW if necessary
+     * the first entry (initial top) refers to itself
      */
-    if (PObj_COW_TEST((Buffer*)chunk))
-	stack_unmake_COW(interpreter, chunk);
-    /*
-     * if this chunk is empty go to previous if any
-     */
-    if (chunk->used == 0 && chunk->prev) {
-        if (chunk->next) {
-            /* GC will collect it */
-            chunk->next = NULL;
-        }
-
-        /* Now back to the previous chunk - we'll keep the one we have
-         * just emptied around for now in case we need it again. */
-        *stack_p = chunk = chunk->prev;
-	assert(!PObj_COW_TEST( (Buffer *) chunk));
-    }
-    if (chunk->used == 0) {
+    if (chunk == chunk->prev) {
         internal_exception(ERROR_STACK_EMPTY, "No entries on %sStack!",
                 chunk->name);
     }
-    return (char*) chunk->bufstart + --chunk->used * chunk->item_size;
+    switch (STACK_ITEMSIZE(chunk)) {
+        case sizeof(struct IRegFrame):
+            s = 0;
+            break;
+        case sizeof(struct NRegFrame):
+            s = 1;
+            break;
+        case sizeof(Stack_Entry_t):
+            s = 2;
+            break;
+        default:
+            PANIC("Unhandled stack chunk size");
+            _exit(1); /* avoid warning */
+    }
+    *stack_p = chunk->prev;
+
+    chunk->free_p = sc->free_list[s];
+    sc->free_list[s] = chunk;
+
+    return STACK_DATAP(chunk);
 }
 
 /*

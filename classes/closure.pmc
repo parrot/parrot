@@ -89,8 +89,7 @@ Creates a clone of the closure and returns it.
         struct Parrot_Sub * sub;
         PMC* ret = SUPER();
         sub = PMC_sub(ret);
-        sub->ctx.pad_stack = stack_copy(interpreter,
-            PMC_sub(SELF)->ctx.pad_stack);
+        sub->ctx.pad_stack = PMC_sub(SELF)->ctx.pad_stack;
         return ret;
     }
 

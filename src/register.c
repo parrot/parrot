@@ -20,6 +20,8 @@ set.
 
 =head2 C Implementation
 
+TODO update pod
+
 As the registers and register frame stacks for the various types share
 essentially the same structure we'll take as our example the integer
 registers and their register frame stack.
@@ -76,39 +78,18 @@ void
 setup_register_stacks(Parrot_Interp interpreter, struct Parrot_Context *ctx)
 {
     ctx->int_reg_stack = cst_new_stack(interpreter,
-            "IntReg_", sizeof(struct IRegFrame), FRAMES_PER_CHUNK);
+            "IntReg_", sizeof(struct IRegFrame));
 
     ctx->string_reg_stack = cst_new_stack(interpreter,
-            "StringReg_", sizeof(struct SRegFrame), FRAMES_PER_CHUNK);
+            "StringReg_", sizeof(struct SRegFrame));
 
     ctx->num_reg_stack = cst_new_stack(interpreter,
-            "NumReg_", sizeof(struct NRegFrame), FRAMES_PER_CHUNK);
+            "NumReg_", sizeof(struct NRegFrame));
 
     ctx->pmc_reg_stack = cst_new_stack(interpreter,
-            "PMCReg_", sizeof(struct PRegFrame), FRAMES_PER_CHUNK);
+            "PMCReg_", sizeof(struct PRegFrame));
 }
 
-/*
-
-=item C<void
-mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* stack)>
-
-Marks the contents of the register stacks as live.
-
-=cut
-
-*/
-
-void
-mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
-{
-    /* go up to top */
-    for (; chunk && chunk->prev; chunk = chunk->prev)
-        ;
-    for (; chunk; chunk = chunk->next) {
-        pobject_lives(interpreter, (PObj*)chunk);
-    }
-}
 
 /*
 
@@ -124,19 +105,17 @@ Marks the PMC register stack as live.
 void
 mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
-    UINTVAL i, j;
-    for (; chunk && chunk->prev; chunk = chunk->prev)
-        ;
-    for ( ; chunk; chunk = chunk->next) {
-        struct PRegChunkBuf* pc = chunk->bufstart;
-        pobject_lives(interpreter, (PObj*)chunk);
-        for (i = 0; i < chunk->used; i++) {
-            struct PRegFrame *pf = &pc->PRegFrame[i];
-            for (j = 0; j < NUM_REGISTERS/2; j++) {
-                PObj* reg = (PObj*) pf->registers[j];
-                if (reg)
-                    pobject_lives(interpreter, reg);
-            }
+    UINTVAL j;
+    for ( ; ; chunk = chunk->prev) {
+        struct PRegFrame *pf = STACK_DATAP(chunk);
+
+        if (chunk == chunk->prev || chunk->free_p)
+            break;
+        /* TODO for variable sized chunks use buflen */
+        for (j = 0; j < NUM_REGISTERS/2; j++) {
+            PObj* reg = (PObj*) pf->registers[j];
+            if (reg)
+                pobject_lives(interpreter, reg);
         }
     }
 }
@@ -155,19 +134,16 @@ Mark the contents of the string register stack as live.
 void
 mark_string_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
-    UINTVAL i, j;
-    for (; chunk && chunk->prev; chunk = chunk->prev)
-        ;
-    for ( ; chunk; chunk = chunk->next) {
-        struct SRegChunkBuf* sc = chunk->bufstart;
-        pobject_lives(interpreter, (PObj*)chunk);
-        for (i = 0; i < chunk->used; i++) {
-            struct SRegFrame *sf = &sc->SRegFrame[i];
-            for (j = 0; j < NUM_REGISTERS/2; j++) {
-                PObj* reg = (PObj*) sf->registers[j];
-                if (reg)
-                    pobject_lives(interpreter, reg);
-            }
+    UINTVAL j;
+    for ( ; ; chunk = chunk->prev) {
+        struct SRegFrame *sf = STACK_DATAP(chunk);
+
+        if (chunk == chunk->prev || chunk->free_p)
+            break;
+        for (j = 0; j < NUM_REGISTERS/2; j++) {
+            PObj* reg = (PObj*) sf->registers[j];
+            if (reg)
+                pobject_lives(interpreter, reg);
         }
     }
 }

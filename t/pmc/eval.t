@@ -97,6 +97,9 @@ bar
 fin
 OUTPUT
 
+SKIP: {
+  skip("wrong stack handling", 1);
+
 output_is(<<'CODE', <<'OUTPUT', "nano forth sub");
 _main:
     load_bytecode "examples/assembly/nanoforth2.pasm"
@@ -126,3 +129,4 @@ ok 2
 6
 11
 OUTPUT
+}

@@ -935,16 +935,16 @@ move_cc:
     ins = set_I_const(interp, unit, ins, 4, 0);
 #endif
     /*
+     * emit a savetop for now
+     */
+    ins = insINS(interp, unit, ins, "savetop", regs, 0);
+    /*
      * if we reuse the continuation, update it
      */
     if (!sub->pcc_sub->nci)
         if (!need_cc)
             ins = insINS(interp, unit, ins, "updatecc", regs, 0);
-    /*
-     * emit a savetop for now
-     */
     /* restore self */
-    ins = insINS(interp, unit, ins, "savetop", regs, 0);
     if (meth_call) {
         regs[0] = s0;
         n = 0;

@@ -43,8 +43,8 @@ typedef struct Parrot_Coroutine {
     struct PackFile_ByteCode *seg;
     opcode_t *end;      /* end of bytecode in normal (bounds_check run loop */
     char *packed;       /* to simplify packing Constant Subs */
-    struct Stack_Chunk *co_pad_stack;      /* pad stack state of the cor. */
-    struct Stack_Chunk *co_control_stack;  /* control stack state of the cor.*/
+    struct Stack_Chunk *co_control_base;
+    struct Stack_Chunk *co_control_stack;  /* control stack top of the cor.*/
 } * parrot_coroutine_t;
 
 struct Parrot_Sub * new_sub(struct Parrot_Interp * interp, size_t);

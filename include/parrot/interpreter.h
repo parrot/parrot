@@ -172,6 +172,7 @@ typedef struct Parrot_Interp {
                                          * area */
     struct Arenas *arena_base;          /* Pointer to this interpreter's
                                          * arena */
+    void      *stack_chunk_cache;       /* stack chunk recycling */
     PMC *class_hash;                    /* Hash of classes */
     struct _ParrotIOData *piodata;              /* interpreter's IO system */
 

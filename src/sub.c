@@ -57,16 +57,8 @@ void
 cow_copy_context(struct Parrot_Interp *interp,
         struct Parrot_Context *dest, struct Parrot_Context *src)
 {
-    dest->int_reg_stack = stack_copy(interp, src->int_reg_stack);
-    dest->num_reg_stack = stack_copy(interp, src->num_reg_stack);
-    dest->string_reg_stack = stack_copy(interp, src->string_reg_stack);
-    dest->pmc_reg_stack = stack_copy(interp, src->pmc_reg_stack);
-    dest->pad_stack = stack_copy(interp, src->pad_stack);
-    dest->user_stack = stack_copy(interp, src->user_stack);
-    dest->control_stack = stack_copy(interp, src->control_stack);
-    dest->warns = src->warns;
-    dest->errors = src->errors;
-    buffer_mark_COW(dest->warns);
+    memcpy(dest, src, sizeof(*src));
+    buffer_mark_COW(dest->warns);  /* XXX */
     buffer_mark_COW(dest->errors);
 }
 
@@ -104,8 +96,6 @@ mark_context(struct Parrot_Interp* interpreter, struct Parrot_Context* ctx)
     mark_stack(interpreter, ctx->pad_stack);
     mark_stack(interpreter, ctx->user_stack);
     mark_stack(interpreter, ctx->control_stack);
-    mark_register_stack(interpreter, ctx->int_reg_stack);
-    mark_register_stack(interpreter, ctx->num_reg_stack);
     mark_string_register_stack(interpreter, ctx->string_reg_stack);
     mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
     pobject_lives(interpreter, ctx->warns);
@@ -130,59 +120,46 @@ static void coro_error(Stack_Entry_t *e)
 /*
 
 =item C<static void
-prepend_stack(struct Parrot_Interp *interp,
-                struct Stack_Chunk **interp_stack,
+prepend_stack( struct Stack_Chunk **interp_stack,
                 struct Stack_Chunk **ctx_stack,
-                struct Stack_Chunk *saved_stack)>
+                struct Stack_Chunk *saved_stack,
+                struct Stack_Chunk *saved_base)>
 
-The final C<ctx_stack> = C<interp_stack> + C<saved_stack>, which then
-gets swapped with the C<interp_stack>.
+The final C<ctx_stack> = C<interp_stack> + C<saved_stack>, which
+gets swapped with the C<interp_stack> during the prepend.
 
 =cut
 
 */
 
 static void
-prepend_stack(struct Parrot_Interp *interp,
-                struct Stack_Chunk **interp_stack,
+prepend_stack( struct Stack_Chunk **interp_stack,
                 struct Stack_Chunk **ctx_stack,
-                struct Stack_Chunk *saved_stack)
+                struct Stack_Chunk *saved_stack,
+                struct Stack_Chunk *saved_base)
 {
     size_t i;
 
     /*
-     * if the interp_stack is empty, just put the saved_stack in
+     * the coroutines context gets the interpreter stack
      */
-    if (stack_height(interp, *interp_stack) == 0) {
-        *interp_stack = saved_stack;
-        *ctx_stack = *interp_stack;
-        return;
-    }
-    /* save current interp stack */
-    *ctx_stack = stack_copy(interp, *interp_stack);
-    /* we push a mark on that stack, so if the coroutine pops
-     * beyond its own stack into the interpeter stack
-     * we can catch this
-     */
-    stack_push(interp, interp_stack, NULL, STACK_ENTRY_CORO_MARK,
-            coro_error);
+    *ctx_stack = *interp_stack;
     /*
-     * now append the coroutine stack
-     * TODO look if we can do some kind of chunk_copy here
+     * new interpreter stack is the saved coroutine stack top
+     * with the base pointing to the old top
      */
-    for (i = 0; i < stack_height(interp, saved_stack); i++) {
-        Stack_Entry_t *e = stack_entry(interp, saved_stack, -1 - i);
-        stack_push(interp, interp_stack, e, e->entry_type, STACK_CLEANUP_NULL);
-    }
+    saved_base->prev = *interp_stack;
+
+    *interp_stack = saved_stack;
 }
 
 /*
 
 =item C<static void
-restore_stack(struct Parrot_Interp *interp,
-                struct Stack_Chunk **interp_stack,
+restore_stack( struct Stack_Chunk **interp_stack,
                 struct Stack_Chunk **ctx_stack,
-                struct Stack_Chunk **saved_stack)>
+                struct Stack_Chunk **saved_stack,
+                struct Stack_Chunk *saved_base)>
 
 Swap C<**interp_stack> and C<**ctx_stack> and save the coroutine only
 parts of the stack in C<**saved_stack>, so effectively undoing
@@ -193,69 +170,20 @@ C<prepend_stack()>.
 */
 
 static void
-restore_stack(struct Parrot_Interp *interp,
-                struct Stack_Chunk **interp_stack,
+restore_stack( struct Stack_Chunk **interp_stack,
                 struct Stack_Chunk **ctx_stack,
-                struct Stack_Chunk **saved_stack)
+                struct Stack_Chunk **saved_stack,
+                struct Stack_Chunk *saved_base)
 {
-    size_t i, hi, hc, hs;
-    int mark_found = 0;
     /*
-     * if the interp_stack is empty, just restore the stack
+     * swap stacks back
      */
-    hi = stack_height(interp, *interp_stack);
-    if (hi == 0) {
-        *interp_stack = *ctx_stack;
-        return;
-    }
-    /*
-     * if the saved stack is empty just swap
-     */
-    hc = stack_height(interp, *ctx_stack);
-    if (hc == 0) {
-        *saved_stack = *interp_stack;
-        *interp_stack = *ctx_stack;
-        return;
-    }
-
-    /*
-     * find our mark, everything above the mark is the real coroutine
-     * stack
-     */
-    for (i = 0; i < hi; i++) {
-        Stack_Entry_t *e = stack_entry(interp, *interp_stack, i);
-        if (e->cleanup == coro_error) {
-            (void)stack_pop(interp, interp_stack, NULL, STACK_ENTRY_CORO_MARK);
-            mark_found = 1;
-            break;
-        }
-    }
-    if (!mark_found)
-        internal_exception(1, "The coroutine messed with the stack");
-    hi = stack_height(interp, *interp_stack);
-    hs = stack_height(interp, *saved_stack);
-    if (!i || (hi == hc + hs)) {
-        /* the coroutine didn't change the stack */
-        *interp_stack = *ctx_stack;
-        return;
-    }
-    /*
-     * walk up again
-     * if  interp_stack > ctx_stack + saved_stack
-     * the coroutine pushed something on the stack
-     * else it popped off items
-     */
-    for (i = hc; i < stack_height(interp, *interp_stack); i++) {
-        if (hi > hc + hs) {
-            Stack_Entry_t *e = stack_entry(interp, *interp_stack, -1 - i);
-            stack_push(interp, saved_stack, e, e->entry_type,
-                    STACK_CLEANUP_NULL);
-        }
-        else {
-            (void)stack_pop(interp, saved_stack, NULL, 0);
-        }
-    }
+    *saved_stack = *interp_stack;
     *interp_stack = *ctx_stack;
+    /*
+     * the coroutine stack ends here
+     */
+    saved_base->prev = saved_base;
 }
 
 /*
@@ -264,9 +192,6 @@ restore_stack(struct Parrot_Interp *interp,
 swap_context(struct Parrot_Interp *interp, struct PMC *sub)>
 
 Swaps the context.
-
-XXX: If this routine is specific to coroutine, we should change
-the C<*sub> argument to C<Parrot_Coroutine>.
 
 =cut
 
@@ -317,14 +242,14 @@ swap_context(struct Parrot_Interp *interp, struct PMC *sub)
          * construct stacks that have the interpreter stack
          * at bottom and the coroutine stack at top
          */
-        prepend_stack(interp, &interp->ctx.control_stack, &ctx->control_stack,
-                co->co_control_stack);
+        prepend_stack(&interp->ctx.control_stack, &ctx->control_stack,
+                co->co_control_stack, co->co_control_base);
         PObj_get_FLAGS(sub) |= PObj_private0_FLAG;
     }
     else {
         PObj_get_FLAGS(sub) &= ~PObj_private0_FLAG;
-        restore_stack(interp, &interp->ctx.control_stack, &ctx->control_stack,
-                &co->co_control_stack);
+        restore_stack(&interp->ctx.control_stack, &ctx->control_stack,
+                &co->co_control_stack, co->co_control_base);
     }
     /*
      * TODO FIXME swap the pad_stack or act like the control_stack
@@ -446,21 +371,24 @@ struct Parrot_Sub *
 new_coroutine(struct Parrot_Interp *interp)
 {
     PMC * pad;
-    struct Parrot_Coroutine *co = (struct Parrot_Coroutine *)new_sub(interp,
-            sizeof(struct Parrot_Coroutine));
-    struct Parrot_Context *ctx = &co->ctx;
+    struct Parrot_Context *ctx;
+    struct Parrot_Coroutine *co =
+        mem_sys_allocate_zeroed(sizeof(struct Parrot_Coroutine));
+
+    co->seg = interp->code->cur_cs;
+    ctx = &co->ctx;
     save_context(interp, ctx);
-    setup_register_stacks(interp, &interp->ctx);
-    /* put in a COWed copy of the user stack */
-    ctx->user_stack = stack_copy(interp, interp->ctx.user_stack);
-    /* create new pad and control stacks,
+
+    /* we have separate register stacks */
+    setup_register_stacks(interp, ctx);
+
+    /* create new (pad ??) and control stacks,
      * when invoking the coroutine the real stacks are
      * constructed in swap_context
      * XXX decide what to do with pad
      */
-    ctx->pad_stack = stack_copy(interp, interp->ctx.pad_stack);
-
-    co->co_control_stack = new_stack(interp, "Control");
+    co->co_control_base = co->co_control_stack =
+        new_stack(interp, "Coro_Control");
 
     /*
      * XXX probably in swap_context
