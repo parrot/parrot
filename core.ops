@@ -4082,6 +4082,20 @@ op sweep() {
   goto NEXT();
 }
 
+=item B<lazysweep>()
+
+Trigger a DOD run only if there are things that have flagged
+themselves as really needing to be collected.
+
+=cut
+
+op lazysweep() {
+  if (interpreter->impatient_things) {
+    Parrot_do_dod_run(interpreter);
+  }
+  goto NEXT();
+}
+
 
 =item B<collect>()
 
@@ -4135,6 +4149,28 @@ Re-enable GC.
 
 op collecton() {
   Parrot_unblock_GC(interpreter);
+  goto NEXT();
+}
+
+item B<impatient>(inout PMC)
+
+Mark the PMC as impatient, and wanting destruction as soon as
+possible. Note that this unconditionally sets the flag and increments
+the value, because it's faster that way--no checking or branching. We
+don't *care* if the flag is set, nor do we care what the impatient
+count is, we just care that the impatient count is non-zero.
+
+This can cause us a problem in the very rare case when something's
+called impatient exactly MAX_INT times in a tight loop, thus rolling
+the counter to zero, but that's rather rare. If it turns out to be an
+actual problem, we'll deal with it then. (Note that all it does is
+make an impatient PMC live until the next real DOD run)
+
+=cut
+
+op impatient(inout PMC) {
+   PObj_is_impatient_SET($1);
+   interpreter->impatient_things++;
   goto NEXT();
 }
 

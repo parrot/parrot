@@ -172,7 +172,9 @@ typedef enum PObj_enum {
      * - is_buffer_ptr_FLAG
      * - custom_mark_FLAG
      */
-    PObj_is_special_PMC_FLAG = 1 << 26
+    PObj_is_special_PMC_FLAG = 1 << 26,
+
+    PObj_is_impatient_FLAG = 1 << 27
 
 } PObj_flags;
 
@@ -231,6 +233,10 @@ typedef enum PObj_enum {
 #define PObj_sysmem_TEST(o) PObj_flag_TEST(sysmem, o)
 #define PObj_sysmem_SET(o) PObj_flag_SET(sysmem, o)
 #define PObj_sysmem_CLEAR(o) PObj_flag_CLEAR(sysmem, o)
+
+#define PObj_is_impatient_TEST(o) PObj_flag_TEST(is_impatient, o)
+#define PObj_is_impatient_SET(o) PObj_flag_SET(is_impatient, o)
+#define PObj_is_impatient_CLEAR(o) PObj_flag_CLEAR(is_impatient, o)
 
 #define PObj_special_SET(flag, o) do { \
     PObj_flag_SET(flag, o); \

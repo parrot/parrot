@@ -329,6 +329,9 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
     UINTVAL object_size = pool->object_size;
     UINTVAL wash_size = object_size - sizeof(Buffer);
 
+    /* We have no impatient things. Yet. */
+    interpreter->impatient_things = 0;
+
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -396,6 +399,9 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                 /* should be live then */
                 total_used++;
                 PObj_live_CLEAR(b);
+                if (PObj_is_impatient_TEST(b)) {
+                    interpreter->impatient_things++;
+                }
             }
             b = (Buffer *)((char *)b + object_size);
         }
