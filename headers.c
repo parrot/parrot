@@ -35,10 +35,9 @@ add_free_pmc(struct Parrot_Interp *interpreter,
              struct Small_Object_Pool *pool, void *pmc)
 {
     ((PMC *)pmc)->flags = PMC_on_free_list_FLAG;
-    /* Don't let it point to garbage memory */
-#ifdef GC_IS_MALLOC
     /* XXX custom destroy ?! */
-#endif /* GC_IS_MALLOC */
+
+    /* Don't let it point to garbage memory */
     ((PMC *)pmc)->data = NULL;
 
     /* Copied from add_free_object */
@@ -50,7 +49,7 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 {
     /* Copied from get_free_object */
     PMC *pmc;
-    if (!pool->free_list || GC_DEBUG(interpreter))
+    if (!pool->free_list)
         (*pool->more_objects)(interpreter, pool);
 
     pmc = pool->free_list;
@@ -101,13 +100,14 @@ add_free_buffer(struct Parrot_Interp *interpreter,
     *(void **)buffer = pool->free_list;
     pool->free_list = buffer;
 }
+
 void *
 get_free_buffer(struct Parrot_Interp *interpreter,
                 struct Small_Object_Pool *pool)
 {
     /* Copied from get_free_object */
     Buffer *buffer;
-    if (!pool->free_list || GC_DEBUG(interpreter))
+    if (!pool->free_list)
         (*pool->more_objects)(interpreter, pool);
     buffer = pool->free_list;
     pool->free_list = *(void **)buffer;
