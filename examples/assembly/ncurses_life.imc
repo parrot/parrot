@@ -11,7 +11,11 @@
 
 .sub _MAIN
 .include "library/ncurses.pasm"
-        .local int MAX_GEN
+	# First the generation count
+        .const int MAX_GEN = 5000
+	# kill the space ship
+        .const int COLLIDE = 1
+
 	.local int GEN_COUNT
 	.local float START_TIME
 	.local float CUR_TIME
@@ -37,12 +41,14 @@
 	.local int has_usleep
 	.local int sizef
 	.local int size
+	.local int stop
+	.local int sleep_lim
 
-	# First the generation count
-	MAX_GEN = 5000
 
 	# 15 * sizef is real size of world
-	sizef = 4
+	sizef = 5
+	# if sizef > sleep_lim then sleep
+	sleep_lim = 9
 
 	# Note the time
 	time START_TIME
@@ -109,9 +115,16 @@ nosize:
 	set S9,  "               "
 	set S10, "               "
 	set S11, "               "
+	if COLLIDE goto col
+	set S12, "               "
+	set S13, "               "
+	set S14, "               "
+	goto nocol
+col:
 	set S12, "             * "
 	set S13, "              *"
  	set S14, "            ***"
+nocol:
 	set S15, ""
 	concat S15, S0
 	concat S15, S16
@@ -153,6 +166,7 @@ nosize2:
 	GEN_COUNT = 0
 
 loop:	if GEN_COUNT >= MAX_GEN goto getout
+        if stop goto getout
 	inc GEN_COUNT
 	I31 = GEN_COUNT % 100
 	if I31 goto skip
@@ -175,13 +189,13 @@ getout:
 	TIME_DIFF = CUR_TIME - START_TIME
 
 	# sleeping invalidates these data
-	goto no_gps
+	if sizef > sleep_lim goto no_gps
 	print "\n"
 	print GEN_COUNT
 	print " generations in "
 	print TIME_DIFF
  	print " seconds. "
-	GPS = TIME_DIFF / MAX_GEN
+	GPS = GEN_COUNT / TIME_DIFF
 
 	print GPS
 	print " generations/sec\n"
@@ -231,7 +245,8 @@ no_gps:
 generate:
 	pushi
 	length I0, S15
-	S1 = ""
+	# allocate new world with all space
+	repeat S1, " ", I0
 	I1 = 0
 genloop:
 	I2 = 0
@@ -318,11 +333,10 @@ check_alive:
 	if I2 > 3 goto space
 	branch star
 
-space:
-	concat S1, " "
+space:	# is space already
 	branch iter_done
 star:
-	concat S1, "*"
+	substr S1, I1, 1, "*"
 iter_done:
 	inc I1
 	lt I1, I0, genloop
@@ -330,7 +344,7 @@ done:
 	popi
 	if  S1 != S15 goto dif
 	   sleep 2
-           GEN_COUNT = MAX_GEN
+           stop = 1
 dif:
 	S15 = S1
 	ret
@@ -383,7 +397,7 @@ incit:	CHARACTER_OFFSET = CHARACTER_OFFSET + 1
 	P5 = STDSCR
 	invoke
 
-	if sizef > 3 goto dumpend
+	if sizef <= sleep_lim goto dumpend
 	# as we gonna sleep here, lets burn some cycles to
 	# check if usleep is available
 	if has_usleep == 1 goto usleep
