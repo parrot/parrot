@@ -526,8 +526,6 @@ exegeses: http://dev.perl.org/perl6/exegesis/
 
 synopses: http://dev.perl.org/perl6/synopsis/
 
-cool kids: http://use.perl.org/~acme/journal
-
 Java bytecode to Parrot bytecode: http://archive.develooper.com/perl6-internals@perl.org/msg03864.html
 
 http://www.perl.com/pub/a/2000/10/23/soto2000.html
