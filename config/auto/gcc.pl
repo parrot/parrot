@@ -89,10 +89,12 @@ sub runstep {
     }
     # if the user overwrites the warnings remove it from $warns
     if ($ccwarn) {
+      my @warns =  split ' ', $warns;
       foreach my $w ( split ' ', $ccwarn ) {
 	$w =~ s/^-W(?:no-)?(.*)$/$1/;
-	$warns = join ' ' , grep !/^-W(?:no-)?$w/, split ' ', $warns;
+	@warns = grep !/^-W(?:no-)?$w/, @warns;
       }
+      $warns = join ' ', @warns;
     }
   }
 
