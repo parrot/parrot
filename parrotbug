@@ -55,8 +55,9 @@ exit;
 
 
 #------------------------------------------------------------#
-#                           Subs.                            #
+#                         Info subs.                         #
 
+#----
 # Explain what parrotbug is.
 sub explain_parrotbug {
     print <<EOF;
@@ -84,16 +85,7 @@ EOF
 }
 
 
-# Generate random filename to edit report.
-sub generate_filename {
-    my $dir = File::Spec->tmpdir();
-    my $filename = "bugrep0$$";
-    $filename++ while -e File::Spec->catfile($dir, $filename);
-    $filename = File::Spec->catfile($dir, $filename);
-    return $filename;
-}
-
-
+#----
 # Print synopsis + help message and exit.
 sub help {
     print <<EOF;
@@ -129,6 +121,60 @@ EOF
     exit;
 }
 
+
+#----
+# Print version information (of the parrotbug program) and exit.
+sub version {
+    print <<"EOF";
+
+This is $0, version $VERSION.
+
+EOF
+    exit;
+}
+
+
+
+
+#------------------------------------------------------------#
+#                        Utils subs.                         #
+
+#----
+# Generate random filename to edit report.
+sub generate_filename {
+    my $dir = File::Spec->tmpdir();
+    my $filename = "bugrep0$$";
+    $filename++ while -e File::Spec->catfile($dir, $filename);
+    $filename = File::Spec->catfile($dir, $filename);
+    return $filename;
+}
+
+
+#----
+# Check whether a subject is trivial. A subject is not considered
+# trivial if it's an ok or a nok report.
+# Return 1 if trivial, 0 otherwise (subject acceptable).
+sub trivial_subject {
+    my $subject = shift;
+
+    return 0 if $opt_o || $opt_f;
+    if ( $subject =~
+         /^(y(es)?|no?|help|parrot( (bug|problem))?|bug|problem)$/i ||
+         length($subject) < 4 ||
+         $subject !~ /\s/ ) {
+        return 1;
+    } else {
+	return 0;
+    }
+}
+
+
+
+
+#------------------------------------------------------------#
+#                         Init subs.                         #
+
+#----
 # Initialize prog:
 #  - get parrot information
 #  - process options
@@ -261,19 +307,23 @@ sub init {
 }
 
 
-# Query missing information in order to have a complete report.
-# The information collected are:
-#  
-sub query_info {
 
+#------------------------------------------------------------#
+#                       Querying subs.                       #
+
+#----
+# Query missing information in order to have a complete report.
+sub query_info {
     $subject = "" if trivial_subject( $subject );
     query_subject()        unless $subject;
     query_return_address() unless $from;
     query_body()           unless $use_file || $body;
 }
 
+
+#----
 # Prompt for body, through an external editor.
-sub query_body {
+sub ask_for_body {
     print <<EOF;
 Now you need to supply the bug report. Try to make the report concise
 but descriptive. Include any relevant detail. If you are reporting
@@ -298,16 +348,20 @@ EOF
 
 }
 
+
+#----
 # Prompt for editor to use.
-sub query_editor {
+sub ask_for_editor {
     print shift() . "Editor [$editor]: ";
     my $entry = <>;
     chomp $entry;
     $editor = $entry if $entry ne "";
 }
 
+
+#----
 # Prompt for return address.
-sub query_return_address {
+sub ask_for_return_address {
     print <<EOF;
 Your e-mail address will be useful if you need to be contacted. If the
 default shown below is not your full internet e-mail address, please
@@ -342,8 +396,9 @@ EOF
 }
 
 
+#----
 # Prompt for subject of message.
-sub query_subject {
+sub ask_for_subject {
     print <<EOF;
 First of all, please provide a subject for the message. It should be a
 concise description of the bug or problem. "parrot bug" or "parrot
@@ -362,6 +417,11 @@ EOF
     } while ( trivial_subject($subject) );
     print "\n\n\n";
 }
+
+
+
+#------------------------------------------------------------#
+#                        Sending subs.                       #
 
 sub send_msg {
     # Message has been accepted for transmission -- Send the message
@@ -415,32 +475,4 @@ EOF
     }
 }
 
-
-# Check whether a subject is trivial. A subject is not considered
-# trivial if it's an ok or a nok report.
-# Return 1 if trivial, 0 otherwise (subject acceptable).
-sub trivial_subject {
-    my $subject = shift;
-
-    return 0 if $opt_o || $opt_f;
-
-    if ( $subject =~
-         /^(y(es)?|no?|help|parrot( (bug|problem))?|bug|problem)$/i ||
-         length($subject) < 4 ||
-         $subject !~ /\s/ ) {
-        return 1;
-    } else {
-	return 0;
-    }
-}
-
-# Print version information (of the parrotbug program) and exit.
-sub version {
-    print <<"EOF";
-
-This is $0, version $VERSION.
-
-EOF
-
-    exit;
-}
+__END__
