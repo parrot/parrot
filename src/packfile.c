@@ -58,7 +58,7 @@ NOTE: The PackFile's magic is automatically set to PARROT_MAGIC.
 
 struct PackFile *
 PackFile_new(void) {
-    struct PackFile * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile));
+    struct PackFile * self = mem_sys_allocate((UINTVAL)sizeof(struct PackFile));
 
     if (!self) {
         fprintf(stderr, "PackFile_new: Unable to allocate!\n");
@@ -510,7 +510,7 @@ void
 PackFile_dump(struct PackFile * self) {
     size_t i;
 
-    printf("MAGIC => 0x%08lx,\n", (long) self->magic);
+    printf("MAGIC => 0x%08lx,\n", (unsigned long) self->magic);
 
     printf("FIXUP => {\n");
 
@@ -528,9 +528,9 @@ PackFile_dump(struct PackFile * self) {
 
     for (i = 0; i < self->byte_code_size / sizeof(opcode_t); i++) {
         if (i % 8 == 0) {
-            printf("\n    %08lx:  ", (long) i * sizeof(opcode_t));
+            printf("\n    %08lx:  ", (unsigned long) i * sizeof(opcode_t));
         }
-        printf("%08lx ", (long) self->byte_code[i]);
+        printf("%08lx ", (unsigned long) self->byte_code[i]);
     }
 
     printf("\n]\n");
@@ -571,7 +571,7 @@ Allocate a new empty PackFile FixupTable.
 
 struct PackFile_FixupTable *
 PackFile_FixupTable_new(void) {
-    struct PackFile_FixupTable * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_FixupTable));
+    struct PackFile_FixupTable * self = mem_sys_allocate((UINTVAL)sizeof(struct PackFile_FixupTable));
 
     self->dummy = 0;
 
@@ -731,7 +731,7 @@ Allocate a new empty PackFile ConstTable.
 
 struct PackFile_ConstTable *
 PackFile_ConstTable_new(void) {
-    struct PackFile_ConstTable * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_ConstTable));
+    struct PackFile_ConstTable * self = mem_sys_allocate((UINTVAL)sizeof(struct PackFile_ConstTable));
 
     self->const_count = 0;
     self->constants   = NULL;
@@ -910,6 +910,7 @@ opcode_t
 PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_ConstTable * self, opcode_t * packed, opcode_t packed_size) {
     opcode_t * cursor;
     opcode_t   i;
+    opcode_t   rc = 1;
 
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_unpack: self == NULL!\n");
@@ -945,14 +946,14 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_Co
 #endif
 
         self->constants[i] = PackFile_Constant_new();
-        PackFile_Constant_unpack(interpreter, self->constants[i], cursor, packed_size - (cursor - packed));
+        rc = PackFile_Constant_unpack(interpreter, self->constants[i], cursor, packed_size - (cursor - packed));
         /* NOTE: It would be nice if each of these had its own length first */
 
         cursor += 
 	    PackFile_Constant_pack_size(self->constants[i])/sizeof(opcode_t);
     }
 
-    return 1;
+    return rc;
 }
 
 
@@ -1088,7 +1089,7 @@ This is only here so we can make a new one and then do an unpack.
 
 struct PackFile_Constant *
 PackFile_Constant_new(void) {
-    struct PackFile_Constant * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_Constant));
+    struct PackFile_Constant * self = mem_sys_allocate((UINTVAL)sizeof(struct PackFile_Constant));
 
     self->type = PFC_NONE;
 
@@ -1108,7 +1109,7 @@ Allocate a new PackFile Constant containing an opcode_t.
 
 struct PackFile_Constant *
 PackFile_Constant_new_integer(opcode_t i) {
-    struct PackFile_Constant * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_Constant));
+    struct PackFile_Constant * self = mem_sys_allocate((UINTVAL)sizeof(struct PackFile_Constant));
 
     self->type    = PFC_INTEGER;
     self->integer = i;
@@ -1150,7 +1151,7 @@ Allocate a new PackFile Constant containing a string.
 
 struct PackFile_Constant *
 PackFile_Constant_new_string(struct Parrot_Interp *interpreter, STRING * s) {
-    struct PackFile_Constant * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_Constant));
+    struct PackFile_Constant * self = mem_sys_allocate((UINTVAL)sizeof(struct PackFile_Constant));
 
     self->type   = PFC_STRING;
     self->string = string_copy(interpreter, s);
@@ -1274,6 +1275,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Cons
     opcode_t * cursor;
     opcode_t     type;
     opcode_t     size;
+    opcode_t     rc = 1;
 
     UNUSED (packed_size);
 
@@ -1300,7 +1302,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Cons
     switch (type) {
         case PFC_NONE:
 #if TRACE_PACKFILE
-            printf("PackFile_Constant_unpack(): Unpacking no-type constant...\n");
+            rc = printf("PackFile_Constant_unpack(): Unpacking no-type constant...\n");
 #endif
             break;
 
@@ -1308,21 +1310,21 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Cons
 #if TRACE_PACKFILE
             printf("PackFile_Constant_unpack(): Unpacking integer constant...\n");
 #endif
-            PackFile_Constant_unpack_integer(self, cursor, size);
+            rc = PackFile_Constant_unpack_integer(self, cursor, size);
             break;
 
         case PFC_NUMBER:
 #if TRACE_PACKFILE
             printf("PackFile_Constant_unpack(): Unpacking number constant...\n");
 #endif
-            PackFile_Constant_unpack_number(self, cursor, size);
+            rc = PackFile_Constant_unpack_number(self, cursor, size);
             break;
 
         case PFC_STRING:
 #if TRACE_PACKFILE
             printf("PackFile_Constant_unpack(): Unpacking string constant...\n");
 #endif
-            PackFile_Constant_unpack_string(interpreter, self, cursor, size);
+            rc = PackFile_Constant_unpack_string(interpreter, self, cursor, size);
             break;
 
         default:
@@ -1331,7 +1333,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Cons
             break;
     }
 
-    return 1;
+    return rc;
 }
 
 

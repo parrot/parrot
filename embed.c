@@ -42,7 +42,6 @@ Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag, Parrot_flag_
 
 void
 Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc) {
-	char* msg=mem_sys_allocate(32);
 	PARROT_WARNINGS_on(interpreter, wc);
 }
 
@@ -212,7 +211,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
                 call_count += interpreter->profile[j].numcalls;
                 sum_time += interpreter->profile[j].time;
 
-                printf("  %5d  %-12s  %6ld  %10f  %10f\n", j, 
+                printf("  %5u  %-12s  %6ld  %10f  %10f\n", j, 
                        interpreter->op_info_table[j].full_name,
                        interpreter->profile[j].numcalls,
                        interpreter->profile[j].time,

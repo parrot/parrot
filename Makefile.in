@@ -123,9 +123,10 @@ TEST_PROG = ${test_prog}${exe}
 TEST_PROG_SO = ${test_prog}_so${exe}
 PDUMP = pdump${exe}
 LINT = lclint
-LINTFLAGS = +showscan +posixlib -weak +longintegral +matchanyintegral -formattype
 
-
+# note: +distinctinternalnames with +externalnamelen at 8 characters
+#       (the ANSI standard) is not going to fly for us.  
+LINTFLAGS = -weak +showscan +showsummary +posixstrictlib -abstract +aliasunique +ansireserved +ansireservedinternal +assignexpose +bitwisesigned +boolcompare +booltype BOOLVAL +casebreak -castfcnptr -charint +continuecomment +controlnestdepth 15 +cppnames +declundef +distinctinternalnames +evalorder +fielduse +forcehints -globs +imptype +includenest 8 +incondefs +incondefslib +linelen 9999 +longintegral +macroassign +macroempty +macroredef +matchanyintegral +nestedextern +noeffect +readonlystrings +realcompare +shadow -type
 ###############################################################################
 #
 # MAKE CONFIGURATION:
@@ -445,6 +446,6 @@ status:
 	cvs -n -q upd -dP
 
 lint: ${test_prog}
-	$(LINT) ${cc_inc} -Iclasses $(LINTFLAGS) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
+	$(LINT) ${cc_inc} ${cc_hasjit} -Iclasses $(LINTFLAGS) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
 	$(LINT) ${cc_inc} $(LINTFLAGS) test_main.c
 

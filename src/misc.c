@@ -241,7 +241,6 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 		STRING *string;
 		PMC *pmc;
 		double dbl;
-		FLOATVAL fv;
 		register HUGEINTVAL theint = 0;
 		register UHUGEINTVAL theuint = 0;
 

@@ -80,7 +80,6 @@ environment.
 
 =cut
 
-
 ########################################
 
 =item B<close>(inout INT)
@@ -2263,22 +2262,26 @@ Restore register $1 from the appropriate register stack.
 =cut
 
 inline op restore(out INT) {
-  stack_pop(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_INT);
+  (void)stack_pop(interpreter, interpreter->user_stack, &($1),
+                  STACK_ENTRY_INT);
   goto NEXT();
 }
 
 inline op restore(out NUM) {
-  stack_pop(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_FLOAT);
+  (void)stack_pop(interpreter, interpreter->user_stack, &($1),
+                  STACK_ENTRY_FLOAT);
   goto NEXT();
 }
 
 inline op restore(out PMC) {
-  stack_pop(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_PMC);
+  (void)stack_pop(interpreter, interpreter->user_stack, &($1), 
+                  STACK_ENTRY_PMC);
   goto NEXT();
 }
 
 inline op restore(out STR) {
-  stack_pop(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_STRING);
+  (void)stack_pop(interpreter, interpreter->user_stack, &($1),
+                  STACK_ENTRY_STRING);
   goto NEXT();
 }
 

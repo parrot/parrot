@@ -226,12 +226,12 @@ op rx_clearinfo(inout pmc, in str) {
 	rx->whichway=enum_rxdirection_forwards;
 	
 	while(rxstack_depth(interpreter, rx->stack)) {
-		rxstack_pop(interpreter, rx->stack);
+		(void)rxstack_pop(interpreter, rx->stack);
 	}
 	
 	rx->string=$2;
 	
-	string_transcode(interpreter, rx->string, encoding_lookup("utf32"), rx->string->type, &rx->string);
+	(void)string_transcode(interpreter, rx->string, encoding_lookup("utf32"), rx->string->type, &rx->string);
 	
 	goto NEXT();
 }
@@ -530,7 +530,7 @@ op rx_advance(in pmc, in int) {
 	rx->index=rx->startindex;
 	
 	while(rxstack_depth(interpreter, rx->stack)) {
-		rxstack_pop(interpreter, rx->stack);
+		(void)rxstack_pop(interpreter, rx->stack);
 	}
 	
 	goto NEXT();
