@@ -1,5 +1,7 @@
 
 =head1 The Parrot Byte Code / Pack File Format
 
-See the documentation for the Parrot::PackFile Perl module.
+See the documentation for Parrot::PackFile (duplicated as L<packfile-perl>).
+
+Also, for the C API, see L<packfile-c>.
 

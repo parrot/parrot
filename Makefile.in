@@ -67,8 +67,14 @@ $(INC)/op.h: opcode_table make_op_header.pl
 $(INC)/config.h: Configure.pl config_h.in
 	$(PERL) Configure.pl
 
+docs: docs/.dummy
+
+docs/.dummy:
+	cd docs; make
+
 clean:
 	$(RM_F) *$(O) *.s basic_opcodes.c $(INC)/interp_guts.h $(INC)/op.h $(TEST_PROG)
+	cd docs; make clean
 
 test:
 	$(PERL) t/harness
