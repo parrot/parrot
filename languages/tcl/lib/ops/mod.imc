@@ -1,4 +1,5 @@
 # [expr %]
+.namespace [ "_Tcl" ]
 
 .sub __operand_mod
   .param pmc argv
