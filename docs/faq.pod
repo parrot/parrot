@@ -230,6 +230,13 @@ The Glasgow Haskell Compiler is a pain to build on minor systems, and downright
 impossible on small systems. So by going with Pugs and GHC we'd be
 sacrificing portability.
 
+As well, other languages apart from Perl 6 are being targeted to Parrot.
+Significant parts of Python, TCL, Perl 5, and Basic have already been
+implemented and others are on the way. Running multiple languages on the
+same Parrot engine allows them to be cross-language compatible-- in other
+words, one targeted language could directly invoke the methods of another
+at the bytecode level.
+
 Finally there is a reason the Parrot design keeps talking about running
 bytecode direct from disk rather than relying on doing compiling (from Perl or
 with a JIT) in memory. It's all very well doing such operations when running
