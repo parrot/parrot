@@ -1811,6 +1811,7 @@
 []		t/pmc/prop.t
 []		t/pmc/scratchpad.t
 []		t/pmc/sub.t
+[]		t/pmc/unmanagedstruct.t
 []		t/src/basic.t
 []		t/src/exit.t
 []		t/src/intlist.t
