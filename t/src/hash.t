@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -235,7 +235,7 @@ int do_test(Interp *interpreter)
     HashEntry *value = &_value;
     char *big;
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -279,7 +279,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -328,7 +328,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -383,7 +383,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
@@ -399,7 +399,7 @@ int main(int argc, char* argv[]) {
 
     printf("%i\n", (int)VTABLE_get_integer(interpreter, value));
 
-    hash2 = hash_clone(interpreter, hash);
+    hash_clone(interpreter, hash, &hash2);
 
     value = hash_get(interpreter, hash2, key);
 
@@ -431,7 +431,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_init(interpreter);
 
-    hash = new_hash(interpreter);
+    new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
 	printf("hash creation failed\n");
