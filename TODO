@@ -58,7 +58,9 @@ Interpreter
 -----------
     Combine dynamic op lib cores.
     Make the MMD tables shareable between interpreters for faster
-    startup. (Though there are issues with this)
+     startup. (Though there are issues with this)
+    Have exec and spawn split up their command-line arguments, rather than
+     relying on the operating system shell to do this, which is unsafe
 
 Opcodes
 -------
