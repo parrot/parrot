@@ -5,7 +5,7 @@
  *  Overview:
  *     The Parrot embedding interface.
  *  Data Structure and Algorithms:
- *     See include/parrot/embed.h.
+ *     See include/parrot/embed.h and docs/embed.pod.
  *  History:
  *     Initial version by Brent Dax on 2002.1.28
  *  Notes:
@@ -21,17 +21,26 @@ static INTVAL world_inited = 0;
 struct Parrot_Interp *
 Parrot_new(void)
 {
+    /* global_setup.c:init_world sets up some vtable stuff.
+       We need it called before we make an interpreter, but 
+       it must only be called once.                         */
+
     if (!world_inited) {
         world_inited = 1;
         init_world();
     }
+    
+    /* interpreter.c:make_interpreter builds a new Parrot_Interp. */
     return make_interpreter(NO_FLAGS);
 }
 
 void
 Parrot_init(struct Parrot_Interp *interpreter)
 {
+    /* This function currently unused, but is here in case we need it later. */
+
     if (!world_inited) {
+        /* See comments in Parrot_new. */
         world_inited = 1;
         init_world();
     }
@@ -41,15 +50,20 @@ void
 Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag,
                Parrot_Interp_flag_val value)
 {
-    if (value)
+    /* These two macros (from interpreter.h) do exactly what they look like. */
+
+    if (value) {
         Interp_flags_SET(interpreter, flag);
-    else
+    }
+    else {
         Interp_flags_CLEAR(interpreter, flag);
+    }
 }
 
 void
 Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
 {
+    /* Activates the given warnings.  (Macro from warnings.h.) */
     PARROT_WARNINGS_on(interpreter, wc);
 }
 
@@ -60,9 +74,11 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     char *program_code;
     struct PackFile *pf;
     ParrotIO * io = NULL;
+
 #ifdef HAS_HEADER_SYSSTAT
     struct stat file_stat;
 #endif
+
 #ifdef HAS_HEADER_SYSMMAN
     int fd = -1;
 #endif    
@@ -73,6 +89,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         /* read 1k at a time */
         program_size = 0;
     } else {
+
 #ifdef HAS_HEADER_SYSSTAT
         /* if we have stat(), get the actual file size so we can read it
          * in one chunk. */
@@ -88,10 +105,13 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         }
 
         program_size = file_stat.st_size;
-#else
+
+#else   /* HAS_HEADER_SYSSTAT */
+
         /* otherwise, we will read it 1k at a time */
         program_size = 0;  
-#endif
+
+#endif  /* HAS_HEADER_SYSSTAT */
 
 #ifndef HAS_HEADER_SYSMMAN
         io = PIO_open(interpreter, filename, "<");
@@ -100,10 +120,14 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
                     errno);
             return NULL;
         }
-#else
+
+#else   /* HAS_HEADER_SYSMMAN */
+
         /* the file wasn't from stdin, and we have mmap available- use it */
         io = NULL;
-#endif        
+
+#endif  /* HAS_HEADER_SYSMMAN */
+
     }
 
     /* if we've opened a file (or stdin) with PIO, read it in */
@@ -115,11 +139,16 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         chunk_size = program_size > 0 ? program_size : 1024;
         program_code = (char *)malloc(chunk_size);
         program_size = 0;
+
         if (NULL == program_code) {
+            /* Whoops, out of memory. */
+
             fprintf(stderr,
                     "Parrot VM: Could not allocate buffer to read packfile from PIO.\n");
+
             return NULL;
         }
+
         cursor = (char *)program_code;
 
         while ((read_result = PIO_read(interpreter, io, cursor, chunk_size)) > 0) {
@@ -148,6 +177,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
          * use mmap */
         
 #ifdef HAS_HEADER_SYSMMAN
+
         fd = open(filename, O_RDONLY | O_BINARY);
         if (!fd) {
             fprintf(stderr, "Parrot VM: Can't open %s, code %i.\n", filename,
@@ -163,11 +193,17 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
                     filename, errno);
             return NULL;
         }
-#else
+
+#else   /* HAS_HEADER_SYSMMAN */
+
         fprintf(stderr, "Parrot VM: uncaught error occurred reading file or mmap not available.\n");
         return NULL;
-#endif
+
+#endif  /* HAS_HEADER_SYSMMAN */
+
     }
+
+    /* Now that we have the bytecode, let's unpack it. */
 
     pf = PackFile_new();
 
@@ -178,10 +214,12 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     }
 
 #ifdef HAS_HEADER_SYSMMAN
+    
     if (fd >= 0) {
         munmap(program_code, program_size);
         close(fd);
     }
+    
 #endif
 
     return pf;
@@ -200,6 +238,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     PMC *userargv;
     KEY key;
 
+    /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         fprintf(stderr, "*** Parrot VM: Debugging enabled. ***\n");
 
@@ -217,12 +256,16 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         }
     }
 
-#if !defined(JIT_CAPABLE) || !JIT_CAPABLE
+#if !defined(JIT_CAPABLE) || !JIT_CAPABLE 
+
+    /* No JIT here--make sure they didn't ask for it. */
+
     if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
         fprintf(stderr,
                 "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
         exit(1);
     }
+    
 #endif
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
@@ -230,7 +273,10 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
                 "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
                 argc);
     }
-
+    
+    /* Set up @ARGS (or whatever this language calls it).
+       XXX Should this be Array or PerlArray?             */
+    
     userargv = pmc_new(interpreter, enum_class_PerlArray);
     /* immediately anchor pmc to root set */
     interpreter->ctx.pmc_reg.registers[0] = userargv;
@@ -239,6 +285,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     key.next = NULL;
 
     for (i = 0; i < argc; i++) {
+        /* Run through argv, adding everything to @ARGS. */
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
                                   0, BUFFER_external_FLAG, 0);
 
@@ -249,7 +296,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         key.atom.val.int_val = i;
         userargv->vtable->set_string_keyed(interpreter, userargv, &key, arg);
     }
-
+    
+    /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     runops(interpreter, interpreter->code, 0);
 
     /*
@@ -293,6 +341,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     }
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        /* Give the souls brave enough to activate debugging an earful about GC. */
         fprintf(stderr, "\
 *** Parrot VM: Dumping GC info ***\n\
 \tTotal memory allocated: %u\n\

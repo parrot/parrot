@@ -207,3 +207,11 @@ Deallocates all memory associated with a Parrot interpreter.
 B<XXX> At the moment, it just leaks most of it.
 
 =back
+
+=head1 SEE ALSO
+
+F<embed.c> and F<embed.h> for the implementation.
+
+F<test_main.c> for Parrot's use of the embedding system.
+
+=cut

@@ -9,6 +9,7 @@
  *  History:
  *  Notes:
  *  References:
+ *      embed.c, docs/embed.pod.
  */
 
 #if !defined(PARROT_EMBED_H_GUARD)
