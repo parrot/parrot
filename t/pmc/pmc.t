@@ -556,31 +556,29 @@ CODE
 0
 OUTPUT
 
-SKIP: { skip("string->int not finished yet", 1);
-output_is(<<CODE, <<OUTPUT, "nasty string -> int");
+output_is(<<'CODE', <<OUTPUT, "nasty string -> int");
 	new	P0, .PerlInt
 	set	P0, "Z1"
 	set	I0, P0
 	print	I0
 	print	P0
-	print	"\\n"
+	print	"\n"
 
-	set	P0, "\0 1"
+	set	P0, "\x0 1"
 	set	I0, P0
 	print	I0
-	print	"\\n"
+	print	"\n"
 
 	set	P0, "1.23e2"
 	set	I0, P0
 	print	I0
-	print	"\\n"
+	print	"\n"
        end
 CODE
 1Z1
 1
 123
 OUTPUT
-}
 
 output_is(<<CODE, <<OUTPUT, "string to number conversion");
 @{[ $fp_equality_macro ]}
@@ -2024,7 +2022,6 @@ CODE
 12.098765
 OUTPUT
 
-SKIP: { skip("variable/value semantics being hashed out", 1);
 output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
     new P0, .PerlInt
     new P1, .PerlNum
@@ -2033,6 +2030,8 @@ output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
     set P0, 123
     set P1, 3.14
     set P2, "7.4x"
+    # setting a PerlUndef morphs it to an PerlInt
+    # so it should give a output similar to line 1 - XXX:leo
     set P3, 666
 
     new P10, .PerlInt
@@ -2097,9 +2096,8 @@ CODE
 123:123.000000:123:
 3:3.140000:3.140000:
 7:7.400000:7.4x:
-0:0.000000::
+666:666.000000:666:
 OUTPUT
-}
 
 output_is(<<'CODE', <<OUTPUT, "exchange");
 	new P0, .PerlInt

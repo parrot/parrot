@@ -1062,6 +1062,7 @@ string_nprintf(struct Parrot_Interp *interpreter,
 INTVAL
 string_to_int(const STRING *s)
 {
+#if 0
     INTVAL i = 0;
 
     if (s) {
@@ -1097,6 +1098,9 @@ string_to_int(const STRING *s)
     }
 
     return i;
+#else
+    return (INTVAL) string_to_num(s);
+#endif
 }
 
 FLOATVAL
