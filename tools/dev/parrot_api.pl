@@ -67,6 +67,11 @@ See L</"Data is not an API">.
 
 =head1 RULES
 
+You can sometimes use C preprocessor defines to shorten the API names
+but please do carefully contain the effect so that only the Parrot
+itself sees those shortened definitions, the defines must not leak
+to the outside world.
+
 =head2 Public or Private
 
 If the API is really meant to be public, prefix it with <Parrot_>,
@@ -93,6 +98,10 @@ Uses F<tools/dev/nm.pl> to list the symbols.
 
 =head1 TODO
 
+=over 4
+
+=item *
+
 There are a lot of warnings given from "core class" cases like
 
    Parrot_Array_class_init array.o
@@ -101,6 +110,15 @@ which are probably okay.  This tool should be taught about these
 cases: how to find out which APIs are B<supposed> to be found from
 such "core class" objects?  But in any case, even those objects should
 B<NOT> have any data symbols visible.
+
+=item *
+
+Write a pollution detector also for the C preprocessor: also in that
+namespace, Parrot should only present Parrot_ (and similar) symbols to
+the outside world.  Be careful to only scan Parrot's defines, not
+system's or third parties'.
+
+=back
 
 =head1 HISTORY
 
