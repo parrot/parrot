@@ -16,18 +16,21 @@
 pmclass PerlString extends perlscalar {
 
     void init () {
-        SELF->data = string_make(INTERP,NULL,0,NULL,0,NULL);
-        PObj_is_buffer_ptr_SET(SELF);
+        SELF->cache.string_val = string_make(INTERP,NULL,0,NULL,0,NULL);
+        PObj_custom_mark_SET(SELF);
     }
 
+    void mark () {
+	pobject_lives(INTERP, (PObj *)SELF->cache.string_val);
+    }
 
     STRING* name() {
         return whoami;
     }
 
     void clone (PMC *dest) {
-        PObj_is_buffer_ptr_SET(dest);
-        dest->data = string_copy(INTERP,SELF->data);
+        PObj_custom_mark_SET(dest);
+        dest->cache.string_val = string_copy(INTERP,SELF->cache.string_val);
     }
 
     void set_pmc (PMC* value) {
@@ -35,12 +38,12 @@ pmclass PerlString extends perlscalar {
     }
 
     INTVAL get_integer () {
-        STRING* s = (STRING*) SELF->data;
+        STRING* s = (STRING*) SELF->cache.string_val;
         return string_to_int(s);
     }
 
     FLOATVAL get_number () {
-        STRING* s = (STRING*) SELF->data;
+        STRING* s = (STRING*) SELF->cache.string_val;
         return string_to_num(s);
     }
 
@@ -50,16 +53,16 @@ pmclass PerlString extends perlscalar {
     }
 
     STRING* get_string () {
-        return (STRING*)SELF->data;
+        return (STRING*)SELF->cache.string_val;
     }
 
     INTVAL get_bool () {
-        return string_bool(SELF->data);
+        return string_bool(SELF->cache.string_val);
     }
 
     INTVAL is_same (PMC* other) {
-        STRING* s1 = (STRING*)SELF->data;
-        STRING* s2 = (STRING*)other->data;
+        STRING* s1 = (STRING*)SELF->cache.string_val;
+        STRING* s2 = (STRING*)other->cache.string_val;
         return (INTVAL)( other->vtable == SELF->vtable &&
                           s1->bufused   == s2->bufused  &&
             (memcmp(s1->strstart,s2->bufstart,(size_t)s1->bufused)==0));
@@ -96,15 +99,15 @@ pmclass PerlString extends perlscalar {
     }
 
     void set_string (PMC * value) {
-        SELF->data = string_copy(INTERP, (STRING*)value->data);
+        SELF->cache.string_val = string_copy(INTERP, (STRING*)value->cache.string_val);
     }
 
     void set_string_native (STRING * value) {
-        SELF->data = string_copy(INTERP, value);
+        SELF->cache.string_val = string_copy(INTERP, value);
     }
 
     void set_string_same (PMC * value) {
-        SELF->data = string_copy(INTERP, (STRING*)value->data);
+        SELF->cache.string_val = string_copy(INTERP, (STRING*)value->cache.string_val);
     }
 
     /* XXX -lt: only add done yet, others will follow, when
@@ -285,32 +288,32 @@ pmclass PerlString extends perlscalar {
     }
 
     void concatenate (PMC* value, PMC* dest) {
-        STRING* s = string_copy(INTERP, (STRING*)SELF->data);
-        dest->data =
+        STRING* s = string_copy(INTERP, (STRING*)SELF->cache.string_val);
+        dest->cache.string_val =
             string_concat(INTERP,
                           s,
                           VTABLE_get_string(INTERP, value),
                           0
                          );
-        /* don't destroy s, as it is dest->data */
+        /* don't destroy s, as it is dest->cache.string_val */
     }
 
     void concatenate_native (STRING* value, PMC* dest) {
-        STRING* s = string_copy(INTERP, (STRING*)SELF->data);
-        dest->data =
+        STRING* s = string_copy(INTERP, (STRING*)SELF->cache.string_val);
+        dest->cache.string_val =
             string_concat(INTERP,
                           s,
                           value,
                           0
                          );
-        /* don't destroy s, as it is dest->data */
+        /* don't destroy s, as it is dest->cache.string_val */
     }
 
     void concatenate_same (PMC* value, PMC* dest) {
-        dest->data =
+        dest->cache.string_val =
             string_concat(INTERP,
-                          SELF->data,
-                          value->data,
+                          SELF->cache.string_val,
+                          value->cache.string_val,
                           0
                          );
     }
@@ -318,27 +321,27 @@ pmclass PerlString extends perlscalar {
     /* == operation */
     INTVAL is_equal (PMC* value) {
         return (INTVAL)( 0 == string_compare(INTERP,
-                                             SELF->data,
+                                             SELF->cache.string_val,
                                              VTABLE_get_string(INTERP, value)
                                             ));
     }
 
     INTVAL cmp(PMC* value) {
-        return string_compare(INTERP, SELF->data,
+        return string_compare(INTERP, SELF->cache.string_val,
 			      VTABLE_get_string(INTERP, value));
     }
 
     void repeat (PMC* value, PMC* dest) {
 	DYNSELF.morph(enum_class_PerlString);
-        dest->data =
-           string_repeat(INTERP, SELF->data,
+        dest->cache.string_val =
+           string_repeat(INTERP, SELF->cache.string_val,
                          (UINTVAL)VTABLE_get_integer(INTERP, value), NULL
                         );
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
 	DYNSELF.morph(enum_class_PerlString);
-        dest->data = string_repeat(INTERP, SELF->data, (UINTVAL)value, NULL);
+        dest->cache.string_val = string_repeat(INTERP, SELF->cache.string_val, (UINTVAL)value, NULL);
     }
 
     void increment () {
@@ -351,10 +354,10 @@ pmclass PerlString extends perlscalar {
 
     void substr (INTVAL offset, INTVAL length, PMC* dest) {
 	DYNSELF.morph(enum_class_PerlString);
-        dest->data = string_substr(INTERP, SELF->data, offset, length, NULL);
+        dest->cache.string_val = string_substr(INTERP, SELF->cache.string_val, offset, length, NULL);
     }
 
     STRING* substr_str (INTVAL offset, INTVAL length) {
-        return string_substr(INTERP, SELF->data, offset, length, NULL);
+        return string_substr(INTERP, SELF->cache.string_val, offset, length, NULL);
     }
 }

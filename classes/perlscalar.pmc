@@ -18,10 +18,10 @@
 pmclass perlscalar abstract noinit extends scalar {
 
     void morph (INTVAL type) {
-	PObj_is_buffer_ptr_CLEAR(SELF);
+	PObj_custom_mark_CLEAR(SELF);
 	SELF->vtable = &Parrot_base_vtables[type];
 	if (type == enum_class_PerlString) {
-	    PObj_is_buffer_ptr_SET(SELF);
+	    PObj_custom_mark_SET(SELF);
 	}
     }
 }

@@ -258,6 +258,7 @@ typedef enum PObj_enum {
 #define PObj_is_buffer_ptr_CLEAR(o) PObj_special_CLEAR(is_buffer_ptr, o)
 
 #define PObj_custom_mark_SET(o)   PObj_special_SET(custom_mark, o)
+#define PObj_custom_mark_CLEAR(o)   PObj_special_CLEAR(custom_mark, o)
 
 #define PObj_active_destroy_SET(o) PObj_flag_SET(active_destroy, o)
 #define PObj_active_destroy_TEST(o) PObj_flag_TEST(active_destroy, o)

@@ -1,4 +1,4 @@
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -179,73 +179,6 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_p");
-  # here the nci_i_p prints (now to) stderr. To get things printed
-  # in order, this test prints to stderr too
-  loadlib P1, "libnci.so"
-  print 2, "loaded\n"
-  dlfunc P0, P1, "nci_ip", "ip"
-  print 2, "dlfunced\n"
-  set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
-  new P5, .PerlString
-  set P5, "ko\n"	# big HACK, broken with GC_IS_MALLOC
-  invoke
-  ne I5, 2, nok_1
-  ne I0, 0, nok_2	# test return value convention
-  ne I1, 1, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 0, nok_2
-  print 2, "ok 2\n"
-  end
-nok_1: print 2, "nok 1\n"
-  print 2, I5
-  print 2, "\n"
-  end
-nok_2: print 2, "nok 2\n"
-  end
-CODE
-loaded
-dlfunced
-ok
-ok 2
-OUTPUT
-
-output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_p_p");
-  loadlib P1, "libnci.so"
-  print 2, "loaded\n"
-  dlfunc P0, P1, "nci_pp", "pp"
-  print 2, "dlfunced\n"
-  set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
-  new P5, .PerlString
-  set P5, "ko\n"	# big HACK, broken with GC_IS_MALLOC
-  invoke	# cant test ret value yet, print it
-  dlfunc P0, P1, "nci_ip", "ip"
-  print 2, "dlfunced\n"
-  invoke
-  ne I5, 2, nok_1
-  ne I0, 0, nok_2	# test return value convention
-  ne I1, 1, nok_2
-  ne I2, 0, nok_2
-  ne I3, 0, nok_2
-  ne I4, 0, nok_2
-  print 2, "ok 2\n"
-  end
-nok_1: print 2, "nok 1\n"
-  print 2, I5
-  print 2, "\n"
-  end
-nok_2: print 2, "nok 2\n"
-  end
-CODE
-loaded
-dlfunced
-dlfunced
-ok
-ok 2
-OUTPUT
 
 output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_t");
   loadlib P1, "libnci.so"
