@@ -455,6 +455,23 @@ The bytecode is isolated from most of the internal details of the
 implementation. This allows both for flexibility in the implementation
 and forward compatibility, generally good things.
 
+=head1 EXAMPLES
+
+The following examples all assume we're working with basic
+ParrotObject objects and ParrotClass classes. 
+
+=head2 Creating a new class
+
+=head2 Creating a new class with multiple parents
+
+=head2 Creating a new class with attributes
+
+=head2 Instantiating an object
+
+=head2 Calling a method on an object
+
+=head2 Accessing attributes from within a class
+
 =head1 TRANSLATION AND GLOSSARY
 
 Since every object system on the planet shares a common set of terms
