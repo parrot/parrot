@@ -38,6 +38,7 @@ examples/assembly/stack.pasm
 examples/assembly/substr.pasm
 examples/assembly/trace.pasm
 global_setup.c
+hints/darwin.pl
 hints/mswin32.pl
 hints/vms.pl
 include/parrot/chartype.h
