@@ -732,7 +732,8 @@ int main(int argc, char * argv[])
 
     if (IMCC_DEBUG)
 	fprintf(stderr, "loading libs...");
-    op_load_file("../../blib/lib/libparrot.so");
+
+    op_load_file("../../blib/lib/libparrot" PARROT_DLL_EXTENSION);
     op_load_lib("core", PARROT_MAJOR_VERSION,
                         PARROT_MINOR_VERSION,
                         PARROT_PATCH_VERSION);

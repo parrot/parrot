@@ -19,6 +19,7 @@
 #define PARROT_PATCH_VERSION    ${PATCH}
 #define PARROT_ARCHNAME        "${jitarchname}"
 #define PARROT_JIT_CAPABLE      ${jitcapable}
+#define PARROT_DLL_EXTENSION   "${so}"
 
 typedef ${iv}                   Parrot_Int;
 typedef unsigned ${iv}          Parrot_UInt;

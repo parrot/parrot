@@ -190,8 +190,8 @@ main(int argc, char * argv[]) {
     char type[PARROT_MAX_ARGS];
     short dir[PARROT_MAX_ARGS];
     int nargs = 0;
-    op_load_file("../../blib/lib/libparrot.so");
-    op_load_file("../../rx_ops.so");
+    op_load_file("../../blib/lib/libparrot" PARROT_DLL_EXTENSION);
+    op_load_file("../../rx_ops" PARROT_DLL_EXTENSION);
     while ((c = getopt(argc, argv, "l:a:")) != -1) {
 	switch (c) {
 	case 'l':
