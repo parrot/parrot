@@ -159,7 +159,7 @@
 
 
 #ifndef YYSTYPE
-#line 396 "imcc.y"
+#line 399 "imcc.y"
 typedef union {
     int t;
     char * s;
@@ -176,4 +176,3 @@ typedef union {
 
 #endif /* not BISON_IMCPARSER_H */
 
-/* CHECKSUM: 1307619 */
