@@ -32,6 +32,20 @@
 pmclass ParrotObject extends ParrotClass need_ext {
 
     void init() {
+	/* make sure all users "new" the register class and not
+	 * the ParrotObject itself.
+	 * During Parrot_class_register this init() method
+	 * gets replaced by Parrot_instantiate_object
+	 */
+	internal_exception(1, "Can't create new ParrotObjects\n",
+		"use the registered class instead");
     }
 
+    void init_pmc(PMC* init) {
+	SELF.init();
+    }
+
+    void init_pmc_props(PMC* init, PMC* props) {
+	SELF.init();
+    }
 }
