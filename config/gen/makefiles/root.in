@@ -1375,7 +1375,7 @@ exec_so : $(SRC_DIR)/exec_start$(O) blib/lib/libparrot$(SHARE_EXT)
 # for use by t/pmc/nci.t
 $(LIBNCI_SO): $(SRC_DIR)/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) ${ncilib_link_extra} $(LDFLAGS) \
-	    $(LD_OUT)$@ $(SRC_DIR)/nci_test$(O)
+	    $(LD_OUT)$@ $(SRC_DIR)/nci_test$(O) $(C_LIBS)
 
 # vim ctags
 # this needs exuberant-ctags

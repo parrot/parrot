@@ -23,7 +23,7 @@ use File::Copy qw(copy);
 # Config stuff
 our $CC = qq[${cc} -c];
 our $LD = qq[${ld}];
-our $LDFLAGS = qq[${ldflags}];
+our $LDFLAGS = qq[${ldflags} ${ld_debug}];
 our $LD_LOAD_FLAGS = qq[${ld_load_flags}];
 our $PERL = q[${perl}];
 our $LOAD_EXT = qq[${load_ext}];

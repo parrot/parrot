@@ -27,7 +27,11 @@ sub runstep {
     my $libs = Configure::Data->get('libs');
     my $linkflags = Configure::Data->get('linkflags');
     my $ccflags = Configure::Data->get('ccflags');
+    if ($^O =~ /mswin32/i) {
+      Configure::Data->add(' ', 'libs', 'gmp.lib');
+    } else {
     Configure::Data->add(' ', 'libs', '-lgmp');
+    }
 
     my $archname = $Config{archname};
     my ($cpuarch, $osname) = split('-', $archname);
