@@ -27,6 +27,7 @@ pyobject \
   pymodule \
   pynone \
   pytype \
+  pyslice \
   pystring \
   pytuple \
 pyproxytype \
@@ -48,7 +49,7 @@ testclean :
 	$(RM_F) ../t/dynclass/*.imc
 
 clean : testclean
-	$(RM_F) *.c *.h *$(LOAD_EXT) *.dump lib-* *$(O)
+	$(RM_F) *.c pmc_*.h *_group.h *$(LOAD_EXT) *.dump lib-* *$(O)
 
 realclean: clean
 	$(RM_F) Makefile build.pl

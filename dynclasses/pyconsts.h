@@ -15,6 +15,7 @@ INTVAL PyBuiltin_PyNCI;
 INTVAL PyBuiltin_PyNone;
 INTVAL PyBuiltin_PyProxyClass;
 INTVAL PyBuiltin_PyProxyType;
+INTVAL PyBuiltin_PySlice;
 INTVAL PyBuiltin_PyString;
 INTVAL PyBuiltin_PyTuple;
 INTVAL PyBuiltin_PyType;
@@ -28,6 +29,7 @@ PMC *PyBuiltin_PyInt_class;
 PMC *PyBuiltin_PyFloat_class;
 PMC *PyBuiltin_PyList_class;
 PMC *PyBuiltin_PyLong_class;
+PMC *PyBuiltin_PySlice_class;
 PMC *PyBuiltin_PyTuple_class;
 
 /* constant strings */
