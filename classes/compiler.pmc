@@ -27,18 +27,29 @@ pmclass Compiler extends NCI {
 	PMC *code_seg;
         struct PackFile_ByteCode *eval_cs;
 
-        Parrot_push_i(interpreter);
-        Parrot_push_s(interpreter);
-        Parrot_push_p(interpreter);
+
+  	Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  	Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  	Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
+  	Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  	Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
+  	Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  	Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
+  	Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
         interpreter->ctx.string_reg.registers[5] = (String*) code_ptr;
         func(INTERP, SELF);
 	/* return value PMC is in P5 */
         stack_push(interpreter, &interpreter->ctx.user_stack,
         interpreter->ctx.pmc_reg.registers[5],
 		STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
-        Parrot_pop_p(interpreter);
-        Parrot_pop_s(interpreter);
-        Parrot_pop_i(interpreter);
+  	Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  	Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  	Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  	Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
+  	Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  	Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
+  	Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  	Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
 	(void)stack_pop(interpreter, &interpreter->ctx.user_stack, &code_seg,
                   STACK_ENTRY_PMC);
 	eval_cs = (struct PackFile_ByteCode *) PMC_data(code_seg);

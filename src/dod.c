@@ -161,10 +161,10 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     for (cur_chunk = interpreter->ctx.pmc_reg_top; cur_chunk;
             cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
-            for (i = 0; i < NUM_REGISTERS; i++) {
-                if (cur_chunk->PReg[j].registers[i]) {
+            for (i = 0; i < NUM_REGISTERS/2; i++) {
+                if (cur_chunk->PRegFrame[j].registers[i]) {
                     pobject_lives(interpreter,
-                            (PObj *)cur_chunk->PReg[j].registers[i]);
+                            (PObj *)cur_chunk->PRegFrame[j].registers[i]);
                 }
             }
         }
@@ -267,8 +267,8 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     for (cur_chunk = interpreter->ctx.string_reg_top;
             cur_chunk; cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
-            for (i = 0; i < NUM_REGISTERS; i++) {
-                Buffer *reg = (Buffer *)cur_chunk->SReg[j].registers[i];
+            for (i = 0; i < NUM_REGISTERS/2; i++) {
+                Buffer *reg = (Buffer *)cur_chunk->SRegFrame[j].registers[i];
 
                 if (reg)
                     pobject_lives(interpreter, reg);

@@ -3184,59 +3184,96 @@ from the most recently B<push>ed copies.
 =cut
 
 inline op popi() {
-  Parrot_pop_i(interpreter);
+  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
   goto NEXT();
 }
 
 inline op popn() {
-  Parrot_pop_n(interpreter);
+  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
   goto NEXT();
 }
 
 inline op pops() {
-  Parrot_pop_s(interpreter);
+  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
   goto NEXT();
 }
 
 inline op popp() {
-  Parrot_pop_p(interpreter);
+  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
   goto NEXT();
 }
 
 
 ########################################
+=item B<popbottomi>()
 
-=item B<halfpopi>()
+=item B<popbottomn>()
 
-=item B<halfpopn>()
+=item B<popbottomp>()
 
-=item B<halfpopp>()
+=item B<popbottoms>()
 
-=item B<halfpops>()
-
-Restores registers 16-31 of the type indicated in the name of the operation
-from the most recently B<push>ed copies. Registers 0-15 of the saved set are
-discarded.
+Restores registers 0-15 of the type indicated in the name of the operation
+from the most recently B<push>ed copies. 
 
 =cut
 
-inline op halfpopi() {
-  Parrot_half_pop_i(interpreter);
+inline op popbottomi() {
+  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
   goto NEXT();
 }
 
-inline op halfpopn() {
-  Parrot_half_pop_n(interpreter);
+inline op popbottomn() {
+  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
   goto NEXT();
 }
 
-inline op halfpops() {
-  Parrot_half_pop_s(interpreter);
+inline op popbottoms() {
+  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
   goto NEXT();
 }
 
-inline op halfpopp() {
-  Parrot_half_pop_p(interpreter);
+inline op popbottomp() {
+  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
+  goto NEXT();
+}
+
+
+########################################
+=item B<poptopi>()
+
+=item B<poptopn>()
+
+=item B<poptopp>()
+
+=item B<poptops>()
+
+Restores registers 16-31 of the type indicated in the name of the operation
+from the most recently B<push>ed copies. 
+
+=cut
+
+inline op poptopi() {
+  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op poptopn() {
+  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op poptops() {
+  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op poptopp() {
+  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
   goto NEXT();
 }
 
@@ -3256,22 +3293,100 @@ Save all the registers of the type indicated in the name of the operation.
 =cut
 
 inline op pushi() {
-  Parrot_push_i(interpreter);
+  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
   goto NEXT();
 }
 
 inline op pushn() {
-  Parrot_push_n(interpreter);
+  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
+  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
   goto NEXT();
 }
 
 inline op pushs() {
-  Parrot_push_s(interpreter);
+  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
+  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
   goto NEXT();
 }
 
 inline op pushp() {
-  Parrot_push_p(interpreter);
+  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
+  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  goto NEXT();
+}
+
+=back
+
+=cut
+########################################
+
+=item B<pushtopi>()
+
+=item B<pushtopn>()
+
+=item B<pushtopp>()
+
+=item B<pushtops>()
+
+Save registers 16-31 on the appropriate register stack
+
+=cut
+
+inline op pushtopi() {
+  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op pushtopn() {
+  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op pushtops() {
+  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  goto NEXT();
+}
+
+inline op pushtopp() {
+  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  goto NEXT();
+}
+
+=back
+
+=cut
+########################################
+
+=item B<pushbottomi>()
+
+=item B<pushbottomn>()
+
+=item B<pushbottomp>()
+
+=item B<pushbottoms>()
+
+Save all the registers of the type indicated in the name of the operation.
+
+=cut
+
+inline op pushbottomi() {
+  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op pushbottomn() {
+  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op pushbottoms() {
+  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
+  goto NEXT();
+}
+
+inline op pushbottomp() {
+  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
   goto NEXT();
 }
 
@@ -3556,18 +3671,26 @@ Restore all the registers.
 =cut
 
 inline op saveall() {
-  Parrot_push_i(interpreter);
-  Parrot_push_n(interpreter);
-  Parrot_push_s(interpreter);
-  Parrot_push_p(interpreter);
+  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  Parrot_push_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
+  Parrot_push_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
+  Parrot_push_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
+  Parrot_push_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
   goto NEXT();
 }
 
 inline op restoreall() {
-  Parrot_pop_i(interpreter);
-  Parrot_pop_n(interpreter);
-  Parrot_pop_s(interpreter);
-  Parrot_pop_p(interpreter);
+  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[16]);
+  Parrot_pop_i(interpreter, &interpreter->ctx.int_reg.registers[0]);
+  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[16]);
+  Parrot_pop_s(interpreter, &interpreter->ctx.string_reg.registers[0]);
+  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[16]);
+  Parrot_pop_n(interpreter, &interpreter->ctx.num_reg.registers[0]);
+  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[16]);
+  Parrot_pop_p(interpreter, &interpreter->ctx.pmc_reg.registers[0]);
   goto NEXT();
 }
 

@@ -84,11 +84,11 @@ CODE
 3031
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "halfpopi");
+output_is(<<"CODE", <<OUTPUT, "poptopi");
 @{[ set_int_regs( sub { $_[0]} )]}
 	pushi
 @{[ set_int_regs( sub {-$_[0]} )]}
-	halfpopi
+	poptopi
 @{[ print_int_regs() ]}
         end
 CODE
@@ -133,13 +133,13 @@ CODE
 01010101010101010101010101010101
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'halfpops');
+output_is(<<"CODE", <<'OUTPUT', 'poptopss');
 @{[ set_str_regs( sub {$_[0]%2} ) ]}
 	pushs
 @{[ set_str_regs( sub {($_[0]+1) %2} ) ]}
 @{[ print_str_regs() ]}
 	print "\\n"
-	halfpops
+	poptops
 @{[ print_str_regs() ]}
 	print "\\n"
 	end
@@ -182,11 +182,11 @@ Seem to have negative Nx
 Seem to have positive Nx after pop
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'halfpopn');
+output_is(<<"CODE", <<'OUTPUT', 'poptopn');
 @{[ set_num_regs( sub { "1.0".$_ } ) ]}
 	pushn
 @{[ set_num_regs( sub { "-1.0".$_} ) ]}
-	halfpopn
+	poptopn
 @{[ check_num_regs() ]}
 	print "all ok\\n"
 	branch ALLOK
@@ -210,13 +210,13 @@ CODE
 THERE'LL BE NO BUTTER IN HELL!
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'halfpopp');
+output_is(<<"CODE", <<'OUTPUT', 'poptopp');
 @{[ set_pmc_regs( sub {$_[0]%2} ) ]}
 	pushp
 @{[ set_pmc_regs( sub {($_[0]+1) %2} ) ]}
 @{[ print_pmc_regs() ]}
 	print "\\n"
-	halfpopp
+	poptopp
 @{[ print_pmc_regs() ]}
 	print "\\n"
 	end
@@ -225,7 +225,7 @@ CODE
 10101010101010100101010101010101
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'halfpopp, aggregate PMCs');
+output_is(<<"CODE", <<'OUTPUT', 'poptopp, aggregate PMCs');
         new     P15, .PerlHash
         new     P16, .PerlHash
         set     P15["two"], 2
@@ -235,7 +235,7 @@ output_is(<<"CODE", <<'OUTPUT', 'halfpopp, aggregate PMCs');
         new     P16, .PerlHash
         set     P15["two"], 3
         set     P16["three"], 2
-	halfpopp
+	poptopp
         set     I0, P15["two"]
         set     I1, P16["three"]
         print   I0

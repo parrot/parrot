@@ -1825,7 +1825,7 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
                 i, depth);
 
     na(command);
-    PDB_print_int(interpreter, &chunk->IReg[depth], atoi(command));
+    PDB_print_int(interpreter, &chunk->IRegFrame[depth], atoi(command));
 }
 
 /* PDB_print_stack_num
@@ -1848,7 +1848,7 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
     PIO_eprintf(interpreter, "Float stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_num(interpreter, &chunk->NReg[depth], atoi(command));
+    PDB_print_num(interpreter, &chunk->NRegFrame[depth], atoi(command));
 }
 
 /* PDB_print_stack_string
@@ -1872,7 +1872,7 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
                 i, depth);
 
     na(command);
-    PDB_print_string(interpreter,&chunk->SReg[depth], atoi(command));
+    PDB_print_string(interpreter,&chunk->SRegFrame[depth], atoi(command));
 }
 
 /* PDB_print_stack_pmc
@@ -1895,7 +1895,7 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
     PIO_eprintf(interpreter, "PMC stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_pmc(interpreter,&chunk->PReg[depth], atoi(command), NULL);
+    PDB_print_pmc(interpreter,&chunk->PRegFrame[depth], atoi(command), NULL);
 }
 
 static void
