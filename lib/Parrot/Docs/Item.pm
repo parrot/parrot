@@ -138,6 +138,7 @@ sub write_html
 	my $silent = shift;
 	my $index_html = '';
 	my @rel_paths = $self->contents_relative_to_source($source);
+	my @short_desc = ();
 	
 	foreach my $rel_path (@rel_paths)
 	{
@@ -155,13 +156,16 @@ sub write_html
 
 			$index_html .= sprintf("<a href= \"%s\">%s</a><br>\n",
 				$rel_path, $source->relative_path($file->path));
-					
-			# If it's a single file we can use its text.
+		
+			next if $self->{TEXT};
 			
-			if ( @rel_paths == 1 and ! $self->{TEXT} )
-			{
-				$self->{TEXT} = $file->short_description;
-			}		
+			my $short_desc = $file->short_description;
+			
+			next unless $short_desc;
+			
+			next if grep {$_ eq $short_desc} @short_desc;
+			
+			push @short_desc, $short_desc;
 		}
 		elsif ( $file->is_docs_link )
 		{
@@ -174,7 +178,16 @@ sub write_html
 		}
 	}
 	
-	if ( $index_html and $self->{TEXT} )
+	return '' unless $index_html;
+	
+	if ( ! $self->{TEXT} and @short_desc )
+	{
+		my $short_desc = join('. ', @short_desc) . '.';
+		
+		$self->{TEXT} = $short_desc;
+	}
+	
+	if ( $self->{TEXT} )
 	{
 		$index_html .= "$self->{TEXT}<br>\n";
 		$index_html = '<p>' . $index_html . "</p>\n";
