@@ -55,13 +55,13 @@ Leo how, if it's after 23 February 2004.
 
 .sub _init_SDL_Image prototyped
 	.sym pmc class
-	newclass class, 'SDL_Image'
-	addattrib $I0, class, 'image'
-	addattrib $I0, class, 'rect'
-	addattrib $I0, class, 'old_rect'
-	addattrib $I0, class, 'src_rect'
-	.pcc_begin_return
-	.pcc_end_return
+
+	newclass     class, 'SDL::Image'
+
+	addattribute class, 'image'
+	addattribute class, 'rect'
+	addattribute class, 'old_rect'
+	addattribute class, 'src_rect'
 .end
 
 =item _SDL_Image_new( filename )
@@ -96,14 +96,19 @@ Given the path to a file to load, creates and returns a new SDL_Image object.
 	set old_rect['height'], height
 
 	.sym int class_type
-	find_type class_type, 'SDL_Image' 
+	find_type class_type, 'SDL::Image' 
 
 	.sym pmc instance
 	new instance, class_type
-	set instance["SDL_Image\x00image"],    image
-	set instance["SDL_Image\x00old_rect"], old_rect
-	set instance["SDL_Image\x00src_rect"], src_rect
-	set instance["SDL_Image\x00rect"],     rect
+
+	# 'SDL::Image::image',    
+	setattribute instance, 0, image
+	# 'SDL::Image::rect',
+	setattribute instance, 1, rect
+	# 'SDL::Image::old_rect',
+	setattribute instance, 2, old_rect
+	# 'SDL::Image::src_rect',
+	setattribute instance, 3, src_rect
 
 	.pcc_begin_return
 		.return instance
@@ -132,10 +137,14 @@ Update the appropriate surface with these rects if you want to see the image.
 	.sym   pmc src_rect
 	.sym   pmc previous_rect
 
-	set rect,     image["SDL_Image\x00rect"]
-	set old_rect, image["SDL_Image\x00old_rect"]
-	set surface,  image["SDL_Image\x00image"]
-	set src_rect, image["SDL_Image\x00src_rect"]
+	# SDL::Image::image
+	getattribute surface,  image, 0
+	# SDL::Image::rect
+	getattribute rect,     image, 1
+	# SDL::Image::old_rect
+	getattribute old_rect, image, 2
+	# SDL::Image::src_rect
+	getattribute src_rect, image, 3
 
 	previous_rect = _new_SDL_Rect()
 
@@ -168,7 +177,9 @@ Update the appropriate surface with these rects if you want to see the image.
 
 	set old_rect['x'], x
 	set old_rect['y'], y
-	set image["SDL_Image\x00old_rect"], old_rect
+
+	# SDL::Image::rect
+	setattribute image, 1, rect
 
 	.pcc_begin prototyped
 		.arg surface
@@ -195,12 +206,12 @@ Sets the current x coordinate of the C<image> to the integer C<x>.
 	.param int x
 
 	.sym   pmc rect
-	set rect, image["SDL_Image\x00rect"] 
-	set rect['x'], x
-	set image["SDL_Image\x00rect"], rect
 
-	.pcc_begin_return
-	.pcc_end_return
+	# SDL::Image::rect
+	getattribute rect, image, 1
+	set rect['x'], x
+	setattribute image, 1, rect
+
 .end
 
 =item _SDL_Image_set_y( image, y )
@@ -214,9 +225,10 @@ Sets the current y coordinate of the C<image> to the integer C<y>.
 	.param int y
 
 	.sym   pmc rect
-	set rect, image["SDL_Image\x00rect"] 
+	# SDL::Image::rect
+	getattribute rect, image, 1
 	set rect['y'], y
-	set image["SDL_Image\x00rect"], rect
+	setattribute image, 1, rect
 
 	.pcc_begin_return
 	.pcc_end_return
@@ -233,7 +245,9 @@ Returns the current x coordinate of the C<image> as an integer.
 
 	.sym   int x
 	.sym   pmc rect
-	set rect, image["SDL_Image\x00rect"] 
+
+	# SDL::Image::rect
+	getattribute rect, image, 1
 	set x, rect['x']
 
 	.pcc_begin_return
@@ -249,15 +263,77 @@ Returns the current y coordinate of the C<image> as an integer.
 
 .sub _SDL_Image_get_y prototyped
 	.param pmc image
+
 	.sym   int y
 	.sym   pmc rect
 
-	set rect, image["SDL_Image\x00rect"] 
+	# SDL::Image::rect
+	getattribute rect, image, 1
 	set y, rect['y']
-	set image["SDL_Image\x00rect"], rect
 
 	.pcc_begin_return
 		.return y
+	.pcc_end_return
+.end
+
+=item _SDL_Image_width( image )
+
+Returns the current width of the C<image> as an integer.
+
+=cut
+
+.sub _SDL_Image_width prototyped
+	.param pmc image
+
+	.sym   pmc rect
+	.sym   int width
+
+	# SDL::Image::rect
+	getattribute rect, image, 1
+	set width, rect['width']
+
+	.pcc_begin_return
+		.return width
+	.pcc_end_return
+.end
+
+=item _SDL_Image_height( image )
+
+Returns the current height of the C<image> as an integer.
+
+=cut
+
+.sub _SDL_Image_height prototyped
+	.param pmc image
+
+	.sym   pmc rect
+	.sym   int height
+
+	# SDL::Image::rect
+	getattribute rect, image, 1
+	set height, rect['height']
+
+	.pcc_begin_return
+		.return height
+	.pcc_end_return
+.end
+
+=item _SDL_Image_surface( surface )
+
+Returns the current C<surface> of the C<image>.  You probably don't want to use
+this directly.
+
+=cut
+
+.sub _SDL_Image_surface prototyped
+	.param pmc image
+	.sym   pmc surface
+
+	# SDL::Image::image
+	getattribute surface, image, 0
+
+	.pcc_begin_return
+		.return surface
 	.pcc_end_return
 .end
 
