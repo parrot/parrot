@@ -491,7 +491,6 @@ INTVAL
 PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)
 {
 
-    /* Temporary arbitrary negative return vals for debugging */
     ParrotIO * io = PMC_data(pmc);
     ParrotIOBuf * b = &io->b;
     if(!io) return -1;
