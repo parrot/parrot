@@ -38,10 +38,10 @@ These operations affect entire sets of registers.
 Restore all the registers of the type indicated in the name of the operation
 from the most recently B<push>ed register frames.
 
-A register frame holds only 16 registers, so we pop two frames from the 
-frame stack. We use the first frame to restore registers 16-31, and the 
-second frame to restore registers 0-15. By restoring in this order, we 
-ensure that a C<push> followed by a C<pop> returns the working set of 
+A register frame holds only 16 registers, so we pop two frames from the
+frame stack. We use the first frame to restore registers 16-31, and the
+second frame to restore registers 0-15. By restoring in this order, we
+ensure that a C<push> followed by a C<pop> returns the working set of
 registers to their original state.
 
 =cut
@@ -154,9 +154,9 @@ inline op poptopp() {
 Save all the registers of the type indicated in the name of the operation
 on the appropriate register frame stack.
 
-A register frame holds only 16 registers, so we push two frames onto the 
+A register frame holds only 16 registers, so we push two frames onto the
 stack. The first frame holds the values from registers 0-15; the second
-frame holds the values from registers 16-31. 
+frame holds the values from registers 16-31.
 
 =cut
 
@@ -300,7 +300,7 @@ This op is equivalent to:
 
 =item  B<restoretop>()
 
-Restore registers 16-31 of all the register sets from the appropriate frame 
+Restore registers 16-31 of all the register sets from the appropriate frame
 stacks. This op is equivalent to:
 
         poptopi

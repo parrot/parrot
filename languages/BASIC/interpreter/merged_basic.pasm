@@ -30,7 +30,7 @@ MAINLOOPR:
 MAINLOOPNR:
 	set I20, 0    # Interactive mode
 	set S0, ""
-	
+
 	set S0, ""
 	read S0, 256
 	length I1, S0
@@ -64,7 +64,7 @@ DOLINE:
 	end
 
 ENDMAINLOOP:
-	branch MAINLOOPR 
+	branch MAINLOOPR
 ENDMAINLOOPNR:
 	branch MAINLOOPNR
 
