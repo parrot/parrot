@@ -2841,6 +2841,15 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     /* as long as there are params */
     while (sig > (char *)signature->strstart) {
         switch (*sig) {
+            /* I have no idea how to handle these */
+            case '2':
+                /* This might be right. Or not... */
+                emitm_movsbl_r_m(pc, emit_EAX, 0, 0, 2, &INT_REG(count_regs(sig, signature->strstart)));
+                emitm_pushl_r(pc, emit_EAX);
+                break;
+            case '3':
+            case '4':
+                abort();
             case 'f':
                 /* get a double from next num reg and push it on stack */
                 jit_emit_fload_m_n(pc,
@@ -2949,6 +2958,11 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     /* now place return value in registers */
     /* first in signature is the return value */
     switch (*sig) {
+        /* I have no idea how to handle these */
+        case '2':
+        case '3':
+        case '4':
+            abort();
         case 'f':
         case 'd':
             /* pop num from st(0) and mov to reg */
