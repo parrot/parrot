@@ -221,7 +221,7 @@ printloop:
 	print "\n"
 	add I0, I0, 15
 	dec I1
-	ge I1, 0 printloop
+	ge I1, 0, printloop
 	restore I1
 	restore I0
 	sleep 1

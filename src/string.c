@@ -624,7 +624,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
     }
 
     /* do in-place i.e. make a COW string */
-#if 1
+#if 0
     dest = string_set(interpreter, *d, src);
 #else
     dest = make_COW_reference(interpreter, src);
@@ -1112,7 +1112,7 @@ string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
 char *
 string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 {
-    
+
 #if 0
 
     if (s->buflen == s->bufused) {

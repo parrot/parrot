@@ -15,6 +15,11 @@ String subsystem
     Find a decent way of including Unicode properties tables. (Not for
     the faint of heart.)
 
+    Implement a readline function and move the "EEEEEEEVIL" out of core.ops:
+    String *readline(int fd, String **dest);
+    if (dest)
+	    *dest will be a string, append and reuse it.
+
 Vtables
 -------
     Fix vtable key support for hashes and arrays
@@ -31,14 +36,14 @@ Configure system
     Long term, should be replaced with a bootstrapping miniparrot system.
     Short term, fix the dependencies (eg, more needs to depend on classes/*)
     Platform-independent library creation for pbc2c.pl & extensions
-    
+
 IO
 --
     Async IO
     Full going-over to make sure it works
     Socket IO
     Docs!
-    
+
 
 Regular expression engine
 -------------------------
