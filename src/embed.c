@@ -261,7 +261,7 @@ again:
         wanted = program_size;
         program_size = 0;
 
-        if (NULL == program_code) {
+        if (!program_code) {
             /* Whoops, out of memory. */
 
             PIO_eprintf(interpreter,
@@ -281,7 +281,7 @@ again:
             program_code =
                 mem_sys_realloc(program_code, program_size + chunk_size);
 
-            if (NULL == program_code) {
+            if (!program_code) {
                 PIO_eprintf(interpreter,
                             "Parrot VM: Could not reallocate buffer while reading packfile from PIO.\n");
                 return NULL;
@@ -313,7 +313,7 @@ again:
         program_code =
             mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
-        if (!program_code) {
+        if (program_code == MAP_FAILED) {
             Parrot_warn(interpreter, PARROT_WARNINGS_IO_FLAG,
                     "Parrot VM: Can't mmap file %s, code %i.\n",
                     filename, errno);
