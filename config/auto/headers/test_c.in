@@ -1,0 +1,7 @@
+#include <stdio.h>
+#include <${testheader}>
+
+int main (int argc, char* argv[]) {
+    printf("${testheader} OK\n");
+    return 0;
+}
