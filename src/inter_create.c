@@ -116,6 +116,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
         SET_NULL(interpreter->lo_var_ptr);
     }
     interpreter->resume_flag = RESUME_INITIAL;
+    interpreter->recursion_limit = 1000;
 
     interpreter->DOD_block_level = 1;
     interpreter->GC_block_level = 1;

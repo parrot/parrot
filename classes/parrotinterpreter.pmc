@@ -241,6 +241,14 @@ create_interp(PMC *self, Parrot_Interp parent)
         (INTVAL) IGLOBALS_INTERPRETER, self);
 }
 
+static int
+recursion_limit(Parrot_Interp interpreter, int l)
+{
+    int ret = interpreter->recursion_limit;
+    interpreter->recursion_limit = l;
+    return ret;
+}
+
 pmclass ParrotInterpreter need_ext {
 
 /*
@@ -285,6 +293,12 @@ Class initialization.
                     F2DPTR(pt_thread_detach), "detach", "vi");
             enter_nci_method(INTERP, typ,
                     F2DPTR(pt_thread_kill), "kill", "vi");
+
+            /*
+             * misc functions
+             */
+            enter_nci_method(INTERP, typ,
+                    F2DPTR(recursion_limit), "recursion_limit", "iIi");
         }
 
     }

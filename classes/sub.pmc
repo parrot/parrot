@@ -200,6 +200,10 @@ Invokes the subroutine.
     void* invoke (void* next) {
         struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
         interpreter->ctx.warns = sub->ctx.warns;
+        if (++interpreter->ctx.recursion_depth > interpreter->recursion_limit) {
+            real_exception(interpreter, next, 100,
+                    "maximum recursion depth exceeded");
+        }
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
             print_sub_name(interpreter, SELF);
         }

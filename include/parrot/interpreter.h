@@ -143,6 +143,7 @@ typedef struct Parrot_Context {
     Buffer * errors;            /* fatals that can be turned off */
     UINTVAL current_class_offset; /* Offset into the class array of the
                                     currently found method */
+    UINTVAL recursion_depth;    /* Sub call resursion depth */
 
 } parrot_context_t;
 
@@ -276,6 +277,7 @@ typedef struct Parrot_Interp {
     struct parrot_exception_t *exceptions; /* internal exception stack */
     struct parrot_exception_t *exc_free_list; /* and free list */
     struct _Thread_data *thread_data;   /* thread specific items */
+    UINTVAL recursion_limit;    /* Sub call resursion limit */
 } Interp;
 
 typedef enum {
