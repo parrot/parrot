@@ -4,6 +4,21 @@
  * cc -shared -fpic nci_test.c -o libnci.so -g
  * export LD_LIBRARY_PATH=.
  */
+double nci_dd(double d);
+short nci_ssc(short l1, char l2);
+int nci_csc(short l1, char l2);
+int nci_isc(short l1, char l2);
+float nci_fff(float l1, float l2);
+int nci_ip(void *p);
+int nci_it(void *p);
+char *nci_tt(void *p);
+char *nci_tb(void *p);
+char *nci_tB(void **p);
+void * nci_pp(void *p);
+int nci_iiii(int i1, int i2, int i3);
+int nci_i4i(long * l, int i);
+int nci_ii3(int a, int *b);
+void * nci_pi(int test);
 
 double nci_dd(double d) {
     return d * 2.0;
@@ -70,9 +85,9 @@ int nci_i4i(long * l, int i) {
     return (int) (*l * i);
 }
 
-int nci_ii3(int a, int *b) {
-    int r = a * *b;
-    *b = 4711;
+int nci_ii3(int a, int *bp) {
+    int r = a * *bp;
+    *bp = 4711;
     return r;
 }
 
