@@ -121,28 +121,29 @@
      IMMEDIATE = 344,
      POSTCOMP = 345,
      METHOD = 346,
-     LABEL = 347,
-     EMIT = 348,
-     EOM = 349,
-     IREG = 350,
-     NREG = 351,
-     SREG = 352,
-     PREG = 353,
-     IDENTIFIER = 354,
-     REG = 355,
-     MACRO = 356,
-     ENDM = 357,
-     STRINGC = 358,
-     INTC = 359,
-     FLOATC = 360,
-     USTRINGC = 361,
-     PARROT_OP = 362,
-     VAR = 363,
-     LINECOMMENT = 364,
-     FILECOMMENT = 365,
-     DOT = 366,
-     CONCAT = 367,
-     POINTY = 368
+     ANON = 347,
+     LABEL = 348,
+     EMIT = 349,
+     EOM = 350,
+     IREG = 351,
+     NREG = 352,
+     SREG = 353,
+     PREG = 354,
+     IDENTIFIER = 355,
+     REG = 356,
+     MACRO = 357,
+     ENDM = 358,
+     STRINGC = 359,
+     INTC = 360,
+     FLOATC = 361,
+     USTRINGC = 362,
+     PARROT_OP = 363,
+     VAR = 364,
+     LINECOMMENT = 365,
+     FILECOMMENT = 366,
+     DOT = 367,
+     CONCAT = 368,
+     POINTY = 369
    };
 #endif
 #define LOW_PREC 258
@@ -234,28 +235,29 @@
 #define IMMEDIATE 344
 #define POSTCOMP 345
 #define METHOD 346
-#define LABEL 347
-#define EMIT 348
-#define EOM 349
-#define IREG 350
-#define NREG 351
-#define SREG 352
-#define PREG 353
-#define IDENTIFIER 354
-#define REG 355
-#define MACRO 356
-#define ENDM 357
-#define STRINGC 358
-#define INTC 359
-#define FLOATC 360
-#define USTRINGC 361
-#define PARROT_OP 362
-#define VAR 363
-#define LINECOMMENT 364
-#define FILECOMMENT 365
-#define DOT 366
-#define CONCAT 367
-#define POINTY 368
+#define ANON 347
+#define LABEL 348
+#define EMIT 349
+#define EOM 350
+#define IREG 351
+#define NREG 352
+#define SREG 353
+#define PREG 354
+#define IDENTIFIER 355
+#define REG 356
+#define MACRO 357
+#define ENDM 358
+#define STRINGC 359
+#define INTC 360
+#define FLOATC 361
+#define USTRINGC 362
+#define PARROT_OP 363
+#define VAR 364
+#define LINECOMMENT 365
+#define FILECOMMENT 366
+#define DOT 367
+#define CONCAT 368
+#define POINTY 369
 
 
 
@@ -273,7 +275,7 @@ typedef union {
     SymbolTable * symtab;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 277 "imcc/imcparser.h"
+#line 279 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
