@@ -267,6 +267,8 @@ typedef void (*funcptr_t)(void);
 #include "parrot/objects.h"
 #include "parrot/vtables.h"
 #include "parrot/mmd.h"
+#include "parrot/library.h"
+#include "parrot/global.h"
 
 #endif /* PARROT_PARROT_H_GUARD */
 
