@@ -10,7 +10,7 @@ t/op/00ff-dos.t - DOS File Format
 
 	% perl t/op/00ff-dos.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests file formats.
 
@@ -20,17 +20,12 @@ use strict;
 
 use Parrot::Test tests => 2;
 
-output_is(<<'CODE', <<'OUT', "fileformat dos");
-    print "ok\n"
-    end
-CODE
+my $code = qq(print "ok\\n"\r\nend\r\n);
+output_is($code, <<'OUT', "fileformat dos");
 ok
 OUT
 
-output_is(<<'CODE', <<'OUT', "fileformat dos w ctrl-z");
-    print "ok\n"
-    end
-
-CODE
+$code = qq(print "ok\\n"\r\nend\r\n\cZ\r\n);
+output_is($code, <<'OUT', "fileformat dos w ctrl-z");
 ok
 OUT

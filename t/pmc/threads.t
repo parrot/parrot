@@ -12,15 +12,25 @@ t/pmc/threads.t - Threads
 
 =head1 DECSRIPTION
 
-Tests running threads. All tests skipped unless running on Linux and
-Darwin.
+Tests running threads. All tests skipped unless running on known-good
+platform.
 
 =cut
 
 use Parrot::Test;
 use Test::More;
 
-if ($^O eq 'linux' or $^O eq 'darwin') {
+my %platforms = map {$_=>1} qw/
+    aix
+    darwin
+    freebsd
+    hpux
+    irix
+    linux
+    openbsd
+/;
+
+if ($platforms{$^O}) {
    plan tests => 11;
 }
 else {

@@ -20,7 +20,12 @@ use Parrot::Test;
 use Test::More;
 use strict;
 
-if ($^O eq 'linux') {
+my %platforms = map {$_=>1} qw/
+    hpux
+    linux
+/;
+
+if ($platforms{$^O}) {
     plan tests => 3 * 2;
 }
 else {

@@ -4,12 +4,14 @@ platforms:
 Platform                B8    Runloops      Feature   Compile  Tests
                            CGoto JIT EXEC   Thr Sig
 ---------------------------------------------------------------------
-aix                          -    Y    -     Y   -      Y       Y
+aix-pwr-xlc6            B    -    Y    -     Y   -      Y       Y
+aix-pwr64-xlc6          B8   -    -    -     Y   -      Y       Y/20
 darwin                  B    Y    Y    Y     Y   -      Y       Y
-freebsd
+freebsd5.2-i386              Y    Y    Y     Y   -      Y       Y
 hpux-pa_risc2.0-gcc2.9  B         -    -     Y   Y      Y*2     Y
 ?-ia64
 irix6.5                                      Y          Y       Y/2
+irix64                   8                              Y       Y/22
 linux-amd64              8
 linux-ppc-gcc2.95.3     B         Y    Y     Y   Y      Y       Y
 linux-ppc-gcc3.2.3      B         Y    Y     Y   Y      Y       Y
@@ -26,7 +28,7 @@ vms
 win32-bcc
 win32-cygwin
 win32-mingw
-win32-ms-cl_13.00.9466       Y*1  Y/2  -     -   -      Y       Y/2
+win32-ms-cl_13.00.9466       -    Y/2  -     -   -      Y       Y/2
 
 -   ... no
 Y   ... yes
@@ -46,6 +48,5 @@ Threads . Parrot is multi-threaded
 Signals . Parrot catches kind of a SIGINT (program termination) signal
 
 Remarks:
-*1 ~90% test failures with the CGP core, also 00ff-dos.t tests are failing
 *2 need s/inet_pton/inet_aton/ in io_unix.c:623
 *3 kernel 2.6.1 NPTL: signal_2 and _4 failing due to test script problems

@@ -371,6 +371,11 @@ static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
         offset = jit_info->arena.op_map[opcode].offset -
                     (jit_info->native_ptr - jit_info->arena.start);
 
+        if (jit_info->optimizer->cur_section->branch_target ==
+            jit_info->optimizer->cur_section)
+                offset +=
+                    jit_info->optimizer->cur_section->branch_target->load_size;
+
         if((offset > emitm_branch_max) || (offset < emitm_branch_min))
             internal_exception(JIT_ERROR,
                            "Branches beyond 8 Megabytes not yet supported\n");
@@ -382,6 +387,13 @@ static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
     Parrot_jit_newfixup(jit_info);
     jit_info->arena.fixups->type = JIT_BRANCH;
     jit_info->arena.fixups->param.opcode = opcode;
+
+    /* If the branch is to the current section, skip the load instructions. */
+    if (jit_info->optimizer->cur_section->branch_target ==
+        jit_info->optimizer->cur_section)
+            jit_info->arena.fixups->skip =
+                jit_info->optimizer->cur_section->branch_target->load_size;
+
     emitm_bicc(jit_info->native_ptr, annul, cond, 0);
 }
 
@@ -587,7 +599,7 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
             case JIT_BRANCH:
                 fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
                 fixup_val = (jit_info->arena.op_map[fixup->param.opcode].offset
-                                - fixup->native_offset) / 4;
+                                - fixup->native_offset + fixup->skip) / 4;
                 *(int *)(fixup_ptr) |= emitm_mask(22, fixup_val);
                 break;
 

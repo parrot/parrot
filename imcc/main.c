@@ -275,7 +275,12 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                     goto opt_t;
                 }
                 if (strchr(optimizer_opt, '2')) {
+                    /* FIXME -O2 is borken */
+#if 0
                     optimizer_level |= (OPT_CFG | OPT_PRE);
+#else
+                    optimizer_level |= OPT_PRE;
+#endif
                     goto opt_t;
                 }
                 if (strchr(optimizer_opt, 't')) {

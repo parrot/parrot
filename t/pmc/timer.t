@@ -20,6 +20,16 @@ C<Continuation> PMCs.
 use Parrot::Test tests => 7;
 use Test::More;
 
+my %platforms = map {$_=>1} qw/
+    aix
+    darwin
+    freebsd
+    hpux
+    irix
+    linux
+    openbsd
+/;
+
 output_is(<<'CODE', <<'OUT', "Timer setup");
 .include "timer.pasm"
     new P0, .Timer
@@ -83,7 +93,7 @@ ok 3
 OUT
 
 SKIP: {
-  skip("No thread config yet", 5) unless ($^O eq 'linux' or $^O eq 'darwin');
+  skip("No thread config yet", 5) unless ($platforms{$^O});
 
 output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start");
 .include "timer.pasm"
