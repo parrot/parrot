@@ -39,7 +39,8 @@ string B<error> and int B<errptr>.
     .sym pmc COMPILE
     COMPILE = global "pcre::compile"
     repeat error, " ", 500	# could be enough
-    .sym int errptr
+    .sym pmc errptr
+    errptr = new PerlInt
     null NULL
     .pcc_begin prototyped
     .arg pat
