@@ -1,6 +1,6 @@
 ####################################################################
 #
-#    This file was generated using Parse::Yapp version 1.04.
+#    This file was generated using Parse::Yapp version 1.05.
 #
 #        Don't edit this file, use source file instead.
 #
@@ -37,7 +37,7 @@ use strict;
 
 use vars qw ( $VERSION $COMPATIBLE $FILENAME );
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 $COMPATIBLE = '0.07';
 $FILENAME=__FILE__;
 
@@ -498,7 +498,7 @@ use constant FALSE => 0;
 sub tokenize {
     my $data = shift;
     my @tokens = split(//, $data);
-    my @types = map { /[a-zA-Z_]/ ? 'CHAR' : (/\d/ ? 'NUM' : $_) } @tokens;
+    my @types = map { /[a-zA-Z_ ]/ ? 'CHAR' : (/\d/ ? 'NUM' : $_) } @tokens;
     return \@tokens, \@types;
 }
 
@@ -513,7 +513,7 @@ sub new {
         ref($class)
     and $class=ref($class);
 
-    my($self)=$class->SUPER::new( yyversion => '1.04',
+    my($self)=$class->SUPER::new( yyversion => '1.05',
                                   yystates =>
 [
 	{#State 0
@@ -593,13 +593,13 @@ sub new {
 			"-" => 23,
 			"^" => 24
 		},
-		DEFAULT => -30,
+		DEFAULT => -31,
 		GOTOS => {
 			'classpieces' => 22
 		}
 	},
 	{#State 9
-		DEFAULT => -28
+		DEFAULT => -29
 	},
 	{#State 10
 		DEFAULT => -2
@@ -708,23 +708,24 @@ sub new {
 	},
 	{#State 22
 		ACTIONS => {
+			'NUM' => 37,
 			'CHAR' => 35,
-			"]" => 37
+			"]" => 38
 		},
 		GOTOS => {
 			'classpiece' => 36
 		}
 	},
 	{#State 23
-		DEFAULT => -30,
+		DEFAULT => -31,
 		GOTOS => {
-			'classpieces' => 38
+			'classpieces' => 39
 		}
 	},
 	{#State 24
-		DEFAULT => -30,
+		DEFAULT => -31,
 		GOTOS => {
-			'classpieces' => 39
+			'classpieces' => 40
 		}
 	},
 	{#State 25
@@ -735,7 +736,7 @@ sub new {
 			"." => 9
 		},
 		GOTOS => {
-			'expr' => 40,
+			'expr' => 41,
 			'charclass' => 6
 		}
 	},
@@ -749,7 +750,7 @@ sub new {
 			"|" => 18,
 			"*" => 19,
 			"[" => 8,
-			")" => 41,
+			")" => 42,
 			"." => 9
 		},
 		GOTOS => {
@@ -766,8 +767,9 @@ sub new {
 	},
 	{#State 29
 		ACTIONS => {
-			'NUM' => 43,
-			"," => 42
+			'NUM' => 45,
+			"}" => 43,
+			"," => 44
 		}
 	},
 	{#State 30
@@ -775,11 +777,11 @@ sub new {
 			'NUM' => 31
 		},
 		GOTOS => {
-			'number' => 44
+			'number' => 46
 		}
 	},
 	{#State 31
-		DEFAULT => -24
+		DEFAULT => -25
 	},
 	{#State 32
 		DEFAULT => -16
@@ -807,35 +809,43 @@ sub new {
 	},
 	{#State 35
 		ACTIONS => {
-			"-" => 45
+			"-" => 47
 		},
-		DEFAULT => -32
+		DEFAULT => -33
 	},
 	{#State 36
-		DEFAULT => -29
+		DEFAULT => -30
 	},
 	{#State 37
-		DEFAULT => -27
+		ACTIONS => {
+			"-" => 48
+		},
+		DEFAULT => -35
 	},
 	{#State 38
-		ACTIONS => {
-			'CHAR' => 35,
-			"]" => 46
-		},
-		GOTOS => {
-			'classpiece' => 36
-		}
+		DEFAULT => -28
 	},
 	{#State 39
 		ACTIONS => {
+			'NUM' => 37,
 			'CHAR' => 35,
-			"]" => 47
+			"]" => 49
 		},
 		GOTOS => {
 			'classpiece' => 36
 		}
 	},
 	{#State 40
+		ACTIONS => {
+			'NUM' => 37,
+			'CHAR' => 35,
+			"]" => 50
+		},
+		GOTOS => {
+			'classpiece' => 36
+		}
+	},
+	{#State 41
 		ACTIONS => {
 			"?" => 14,
 			'CHAR' => 1,
@@ -845,7 +855,7 @@ sub new {
 			"|" => 18,
 			"*" => 19,
 			"[" => 8,
-			")" => 48,
+			")" => 51,
 			"." => 9
 		},
 		GOTOS => {
@@ -854,57 +864,68 @@ sub new {
 			'range' => 17
 		}
 	},
-	{#State 41
+	{#State 42
 		DEFAULT => -18
 	},
-	{#State 42
-		ACTIONS => {
-			'NUM' => 31,
-			"}" => 49
-		},
-		GOTOS => {
-			'number' => 50
-		}
-	},
 	{#State 43
-		DEFAULT => -23
+		DEFAULT => -22
 	},
 	{#State 44
 		ACTIONS => {
-			'NUM' => 43,
-			"}" => 51
+			'NUM' => 31,
+			"}" => 52
+		},
+		GOTOS => {
+			'number' => 53
 		}
 	},
 	{#State 45
-		ACTIONS => {
-			'CHAR' => 52
-		}
+		DEFAULT => -24
 	},
 	{#State 46
-		DEFAULT => -26
-	},
-	{#State 47
-		DEFAULT => -25
-	},
-	{#State 48
-		DEFAULT => -19
-	},
-	{#State 49
-		DEFAULT => -22
-	},
-	{#State 50
 		ACTIONS => {
-			'NUM' => 43,
-			"}" => 53
+			'NUM' => 45,
+			"}" => 54
 		}
 	},
+	{#State 47
+		ACTIONS => {
+			'CHAR' => 55
+		}
+	},
+	{#State 48
+		ACTIONS => {
+			'NUM' => 56
+		}
+	},
+	{#State 49
+		DEFAULT => -27
+	},
+	{#State 50
+		DEFAULT => -26
+	},
 	{#State 51
-		DEFAULT => -21
+		DEFAULT => -19
 	},
 	{#State 52
-		DEFAULT => -31
+		DEFAULT => -23
 	},
 	{#State 53
+		ACTIONS => {
+			'NUM' => 45,
+			"}" => 57
+		}
+	},
+	{#State 54
+		DEFAULT => -21
+	},
+	{#State 55
+		DEFAULT => -32
+	},
+	{#State 56
+		DEFAULT => -34
+	},
+	{#State 57
 		DEFAULT => -20
 	}
 ],
@@ -959,7 +980,7 @@ sub
 		 'expr', 1,
 sub
 #line 45 "lib/Regex/Grammar.y"
-{ return op('charclass' => [ $_[1] ]); }
+{ return op('classpieces' => [ $_[1] ]); }
 	],
 	[#Rule 9
 		 'expr', 2,
@@ -1040,69 +1061,87 @@ sub
 { return { min => 0, max => $_[3] }; }
 	],
 	[#Rule 22
-		 'range', 4,
+		 'range', 3,
 sub
 #line 73 "lib/Regex/Grammar.y"
-{ return { min => $_[2], max => -1 }; }
+{ return { min => $_[2], max => $_[2] }; }
 	],
 	[#Rule 23
-		 'number', 2,
+		 'range', 4,
 sub
-#line 76 "lib/Regex/Grammar.y"
-{ return $_[1] * 10 + $_[2]; }
+#line 75 "lib/Regex/Grammar.y"
+{ return { min => $_[2], max => -1 }; }
 	],
 	[#Rule 24
-		 'number', 1,
+		 'number', 2,
 sub
-#line 77 "lib/Regex/Grammar.y"
-{ return $_[1]; }
+#line 78 "lib/Regex/Grammar.y"
+{ return $_[1] * 10 + $_[2]; }
 	],
 	[#Rule 25
-		 'charclass', 4,
+		 'number', 1,
 sub
-#line 80 "lib/Regex/Grammar.y"
-{ return [ 'neg', $_[3] ]; }
+#line 79 "lib/Regex/Grammar.y"
+{ return $_[1]; }
 	],
 	[#Rule 26
 		 'charclass', 4,
 sub
-#line 81 "lib/Regex/Grammar.y"
-{ push @{$_[3]}, '-'; return $_[3]; }
+#line 82 "lib/Regex/Grammar.y"
+{ return [ 'neg', $_[3] ]; }
 	],
 	[#Rule 27
-		 'charclass', 3,
-sub
-#line 82 "lib/Regex/Grammar.y"
-{ return $_[2]; }
-	],
-	[#Rule 28
-		 'charclass', 1,
+		 'charclass', 4,
 sub
 #line 83 "lib/Regex/Grammar.y"
-{ return [ 'neg', [] ]; }
+{ push @{$_[3]}, '-'; return $_[3]; }
+	],
+	[#Rule 28
+		 'charclass', 3,
+sub
+#line 84 "lib/Regex/Grammar.y"
+{ return $_[2]; }
 	],
 	[#Rule 29
-		 'classpieces', 2,
+		 'charclass', 1,
 sub
-#line 86 "lib/Regex/Grammar.y"
-{ push @{$_[1]}, $_[2]; return $_[1]; }
+#line 85 "lib/Regex/Grammar.y"
+{ return [ 'neg', [] ]; }
 	],
 	[#Rule 30
-		 'classpieces', 0,
+		 'classpieces', 2,
 sub
-#line 87 "lib/Regex/Grammar.y"
-{ return []; }
+#line 88 "lib/Regex/Grammar.y"
+{ push @{$_[1]}, $_[2]; return $_[1]; }
 	],
 	[#Rule 31
-		 'classpiece', 3,
+		 'classpieces', 0,
 sub
-#line 91 "lib/Regex/Grammar.y"
-{ return [ $_[1], $_[3] ] }
+#line 89 "lib/Regex/Grammar.y"
+{ return []; }
 	],
 	[#Rule 32
-		 'classpiece', 1,
+		 'classpiece', 3,
 sub
 #line 93 "lib/Regex/Grammar.y"
+{ return [ $_[1], $_[3] ] }
+	],
+	[#Rule 33
+		 'classpiece', 1,
+sub
+#line 95 "lib/Regex/Grammar.y"
+{ return $_[1]; }
+	],
+	[#Rule 34
+		 'classpiece', 3,
+sub
+#line 97 "lib/Regex/Grammar.y"
+{ return [ $_[1], $_[3] ] }
+	],
+	[#Rule 35
+		 'classpiece', 1,
+sub
+#line 99 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	]
 ],
@@ -1110,7 +1149,7 @@ sub
     bless($self,$class);
 }
 
-#line 96 "lib/Regex/Grammar.y"
+#line 102 "lib/Regex/Grammar.y"
 
 
 1;
