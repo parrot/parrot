@@ -24,6 +24,8 @@ import compiler
 import traceback
 from compiler import ast
 
+VERSION = '0.1'
+
 class imclist(list):
     def __init__(self):
 	self._verbose = False
@@ -712,12 +714,14 @@ def compile(src, fn, name="__main__", dump=False, debug=False,
     pir._print_source = source
     compiler.visitor.walk(ast, pir, vis, 1)
     pir.append("# end")
-    #@TODO: refactor this mess:
-    if name=="__main__":
-        lines = [ "Src_File(\"%s\")" % fn
-                ]
+    lines = [ "Parrot_AST(",
+	      "  version(Const('%s'))" % VERSION,
+              " _options(",
+	      " ) # _options",
+              " Src_File(\"%s\")" % fn
+	    ]
 
-        pir.lines = lines + pir.lines
+    pir.lines = lines + pir.lines + [") # Parrot_AST"]
     code =  pir.getCode()
     return code
 

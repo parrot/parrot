@@ -54,9 +54,8 @@ IMCC_ast_compile(Interp *interpreter, FILE *fp)
     top_node = interpreter->imc_info->top_node;
     top_node = IMCC_expand_nodes(interpreter, top_node);
     if (top_node) {
-        if (interpreter->imc_info->debug & 0x100) {
-            IMCC_dump_nodes(top_node); /* TODO commandline switches */
-            fprintf(stderr, "\n");
+        if (interpreter->imc_info->debug & DEBUG_AST) {
+            IMCC_dump_nodes(top_node);
         }
         IMCC_free_nodes(interpreter, top_node);
     }

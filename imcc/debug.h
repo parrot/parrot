@@ -9,6 +9,8 @@
 #define DEBUG_OPT1   0x0020
 #define DEBUG_OPT2   0x0040
 
+#define DEBUG_AST    0x0100
+
 #define DEBUG_PBC    0x1000
 #define DEBUG_PBC_CONST    0x2000
 #define DEBUG_PBC_FIXUP    0x4000

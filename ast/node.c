@@ -195,22 +195,9 @@ exp_Var(Interp* interpreter, nodeType *p)
     return p;
 }
 
-/*
- * create code for a sequence of nodes likes chained statements
- */
-static nodeType*
-exp_next(Interp* interpreter, nodeType *p)
-{
-    nodeType *next;
-    for (next = p->next; next; next = next->next) {
-        if (next->expand)
-            next->expand(interpreter, next);
-    }
-    return p;
-}
 
 /*
- * like above but expand child nodes
+ * create code by expanding child nodes
  */
 static nodeType*
 exp_default(Interp* interpreter, nodeType *p)
@@ -510,25 +497,6 @@ exp_Py_Print_nl(Interp* interpreter, nodeType *p)
     return NULL;
 }
 
-/*
- * TODO
- */
-static nodeType*
-exp_Src_File(Interp* interpreter, nodeType *p)
-{
-    return exp_next(interpreter, p);
-}
-
-/*
- * TODO
- */
-static nodeType*
-exp_Src_Lines(Interp* interpreter, nodeType *p)
-{
-    return exp_next(interpreter, p);
-}
-
-
 
 typedef struct {
     const char *name;
@@ -552,19 +520,24 @@ static node_names ast_list[] = {
     { "Const", 		NULL,     exp_Const, NULL, dump_Const },
     { "Defaults", 	create_1, exp_Defaults, NULL, NULL },
     { "Function", 	create_Func, exp_Function, NULL, NULL },
+    { "Line_no",        create_1,  NULL, NULL, NULL },
     { "Name",           create_Name, NULL, NULL, NULL },
     { "Op",             create_Name, NULL, NULL, NULL },
     { "Params", 	create_1, exp_Params, NULL, NULL },
+    { "Parrot_AST", 	create_1, exp_default, NULL, NULL },
     { "Py_Call", 	create_1, exp_Py_Call, NULL, NULL },
     { "Py_Local", 	create_Name, exp_Py_Local, NULL, NULL },
     { "Py_Module", 	create_1, exp_Py_Module, NULL, NULL },
     { "Py_Print" , 	create_1, exp_Py_Print, NULL, NULL },
     { "Py_Print_nl",	create_0, exp_Py_Print_nl, NULL, NULL },
-    { "Src_File",    	create_1, exp_Src_File, NULL, NULL },
-    { "Src_Line",    	create_1, exp_Src_Lines, NULL, NULL },
+    { "Src_File",    	create_1, NULL, NULL, NULL },
+    { "Src_Line",    	create_1, NULL, NULL, NULL },
     { "Stmts",          create_1, exp_default, NULL, NULL },
     { "Void",           create_1, exp_default, NULL, NULL },
-    { "_",              create_0, NULL, NULL, NULL }
+    { "_",              create_0, NULL, NULL, NULL },
+    { "_options",       create_1, NULL, NULL, NULL },
+    { "version",        create_1, exp_default, NULL, NULL }
+
 #define CONST_NODE 5
 };
 
@@ -820,12 +793,16 @@ void
 IMCC_dump_nodes(nodeType *p)
 {
     dump(p, 0);
-    printf("\n");
+    fprintf(stderr, "\n");
 }
 
 nodeType *
 IMCC_expand_nodes(Interp* interpreter, nodeType *p)
 {
+    /*
+     * TODO remove Src_Line, Src_File, Line_no
+     *      and convert this info to meta info for the node
+     */
     p = check_nodes(interpreter, p);
     return p->expand(interpreter, p);
 }
@@ -833,18 +810,15 @@ IMCC_expand_nodes(Interp* interpreter, nodeType *p)
 void
 IMCC_free_nodes(Interp* interpreter, nodeType *p)
 {
-    nodeType *child, *next, *dest;
-    if (p->flags & NODE_HAS_CHILD) {
-        child = CHILD(p);
-        IMCC_free_nodes(interpreter, child);
+    nodeType *child, *next;
+    for (next = p; next; ) {
+        if (p->flags & NODE_HAS_CHILD) {
+            child = CHILD(p);
+            IMCC_free_nodes(interpreter, child);
+        }
+        next = p->next;
+        mem_sys_free(p);
     }
-    dest = p->dest;
-    if (dest && dest->expand == exp_Temp)
-        mem_sys_free(dest);
-    next = p->next;
-    mem_sys_free(p);
-    if (next)
-        IMCC_free_nodes(interpreter, next);
 }
 
 /*

@@ -46,6 +46,7 @@ help_debug(void)
     "    0x0010    CFG\n"
     "    0x0020    optimization 1\n"
     "    0x0040    optimization 2\n"
+    "    0x0100    AST\n"
     "    0x1000    PBC\n"
     "    0x2000    PBC constants\n"
     "    0x4000    PBC fixups\n");
