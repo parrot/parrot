@@ -1,0 +1,46 @@
+If you submit a language compiler please write a one-liner below
+indicating roughly the state of your language. Does it have
+samples, do they work? Is there a README and an easy way
+to build it?
+
+
+BASIC
+
+befunge
+
+Befunge-93
+
+bf
+
+Cola		Functioning, all samples working, lacks IO routines
+		Status: Maintained
+
+forth
+
+IMCC		Functioning, all samples working
+		Status: Maintained but moving up to main directory soon
+
+Jako
+
+miniperl
+
+ook
+
+parrot_compiler
+
+Perl6
+
+plot
+
+Python
+
+regex
+
+Ruby
+
+Scheme
+
+Tcl
+
+urm
+
