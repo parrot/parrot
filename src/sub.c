@@ -3,7 +3,7 @@
  *  CVS Info
  *     $Id$
  *  Overview:
- *     Sub-routines, co-routines and other fun stuff...
+ *     Sub-routines, continuations, co-routines and other fun stuff...
  *  Data Structure and Algorithms:
  *  History:
  *     Initial version by Melvin on 2002/06/6
@@ -14,12 +14,21 @@
 #include "parrot/parrot.h"
 
 
+/*
+ * Save current "context" of interpreter.
+ */
 void
 save_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
     memcpy(ctx, &interp->ctx, sizeof(*ctx));
 }
 
+/*
+ * Save current context of interpreter and mark it copy-on-write
+ * We mark the pads and stacks, not the actual context struct.
+ * This is used for continuations. Stacks are COW marked to delay
+ * stack copying until continuation is activated.
+ */
 void
 cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
@@ -30,6 +39,9 @@ cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
     buffer_mark_COW(ctx->warns);
 }
 
+/*
+ * Set context of interpreter from a context buffer
+ */
 void
 restore_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
@@ -151,6 +163,10 @@ restore_stack(struct Parrot_Interp *interp,
     *interp_stack = *ctx_stack;
 }
 
+/*
+ * XXX: If this routine is specific to coroutine, we should change 
+ *      the argument to Parrot_Coroutine.
+ */
 void
 swap_context(struct Parrot_Interp *interp, struct PMC *sub)
 {
@@ -207,6 +223,9 @@ new_sub(struct Parrot_Interp *interp, size_t size)
     return newsub;
 }
 
+/*
+ * XXX: Need to document semantics in detail
+ */
 struct Parrot_Sub *
 new_closure(struct Parrot_Interp *interp)
 {
@@ -237,6 +256,9 @@ new_ret_continuation(struct Parrot_Interp *interp)
     return cc;
 }
 
+/*
+ * XXX: Need to document semantics in detail
+ */
 struct Parrot_Sub *
 new_coroutine(struct Parrot_Interp *interp)
 {

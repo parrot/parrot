@@ -27,6 +27,10 @@ void stack_system_init(Interp *interpreter)
     make_bufferlike_pool(interpreter, sizeof(Stack_Chunk_t));
 }
 
+/*
+ * Create a new stack and name it. stack->name is used
+ * for debugging/error reporting.
+ */
 Stack_Chunk_t *
 new_stack(Interp *interpreter, const char *name)
 {
@@ -391,6 +395,9 @@ pop_dest(Interp *interpreter)
     return dest;
 }
 
+/*
+ * Peek at stack and return pointer to entry and the type of the entry
+ */
 void *
 stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
            Stack_entry_type *type)
