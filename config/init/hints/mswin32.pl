@@ -34,7 +34,8 @@
 
 
 		Configure::Data->set(
-			so         => '.dll',
+			share_ext  => '.dll',
+			load_ext   => '.dll',
 			a          => '.lib',
 			o          => '.obj',
 			cc_o_out   => '-Fo',
@@ -67,7 +68,8 @@
 	    }
 	elsif( $is_intel ) {
 		Configure::Data->set(
-			so         => '.dll',
+			share_ext  => '.dll',
+			load_ext   => '.dll',
 			a          => '.lib',
 			o          => '.obj',
 			cc_o_out   => '-Fo',
@@ -105,7 +107,8 @@
 		Configure::Data->set(
 			o => '.obj',
                         a => '.lib',
-                        so => '.dll',
+			share_ext  => '.dll',
+			load_ext   => '.dll',
                         cc => ${cc},
 			ccflags => '-O2 -w-8066 -DWIN32 -DNO_STRICT -DNDEBUG -D_CONSOLE',
 			cc_o_out => '-o',
