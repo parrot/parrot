@@ -971,12 +971,16 @@ BN_round (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     }
     /* Rounding a BigNum or sdaNum*/
     if (bn->digits > context->precision) {
+        /* We're rounding, right... do we care? */
+        BN_nonfatal(PINT_ context, BN_ROUNDED, "Argument rounded");
         { /* Check for lost digits */
 	    INTVAL digit;
 	    for (digit = 0; digit < bn->digits - context->precision; digit++) {
 		if (BN_getd(bn, digit) != 0) {
                     BN_nonfatal(PINT_ context, BN_LOST_DIGITS,
                                 "digits lost while rounding");
+                    BN_nonfatal(PINT_ context, BN_INEXACT,
+                                "Loss of precision while rounding");
                     break;
 		}
 	    }
@@ -1202,7 +1206,8 @@ void
 BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 		 BN_CONTEXT *context, BN_SAVE_PREC* restore) {
     INTVAL i;
-    unsigned char lost_save;
+    unsigned char traps_save;
+    unsigned char flags_save;
     if (restore && one->digits != restore->one.digits) {
 	if (one->expn < restore->one.expn) {
 	    for (i=0; i<restore->one.digits; i++)
@@ -1219,11 +1224,16 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	}
 	two->digits = restore->two.digits;
     }
-    /* We don't raise lost_digits after an operation, only beforehand */
-    lost_save = context->traps;
+    /* We don't raise lost_digits after an operation, only beforehand,
+       so we mask off the lost_digits handler to stop the error, and
+       also clear any lost_digits flags*/
+    traps_save = context->traps;
+    flags_save = context->flags;
     context->traps &= ~(unsigned char)BN_F_LOST_DIGITS;
     BN_round(PINT_ result, context);
-    context->flags = lost_save;
+    context->traps = traps_save;
+    context->flags =  (context->flags & ~(unsigned char)BN_F_LOST_DIGITS)
+                    | (flags_save & BN_F_LOST_DIGITS);
 
     BN_strip_lead_zeros(PINT_ result);
     BN_really_zero(PINT_ result, context);
@@ -1633,30 +1643,48 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     /*XXX: write this rounding to cope with precision < 1 */
     if (context->rounding == ROUND_HALF_EVEN) {
 	if (result->digits > context->precision) {
+            BN_nonfatal(PINT_ context, BN_ROUNDED, "Rounded in divide");
 	    /* We collected precision + 1 digits... */
 	    BN_really_zero(PINT_ rem, context);
 	    if (BN_getd(result, 0) > 5) {
+                BN_nonfatal(PINT_ context, BN_INEXACT,
+                            "Loss of precision in divide");
 		BN_round_up(PINT_ result, context);
 	    }
 	    else if (BN_getd(result, 0) == 5) {
 		if (rem->digits == 1 && BN_getd(rem, 0)==0) {
 		    switch (BN_getd(result, 1)) {
-		    case 0:
 		    case 2:
 		    case 4:
 		    case 6:
 		    case 8:
+                        BN_nonfatal(PINT_ context, BN_INEXACT,
+                                    "Loss of precision in divide");
+                    case 0:
 			BN_round_down(PINT_ result, context);
 			break;
 		    default :
+                        BN_nonfatal(PINT_ context, BN_INEXACT,
+                                    "Loss of precision in divide");
 			BN_round_up(PINT_ result, context);
 		    }
 		}
 		else {
+                    BN_nonfatal(PINT_ context, BN_INEXACT,
+                                "Loss of precision in divide");
 		    BN_round_up(PINT_ result, context);
 		}
 	    }
 	    else {
+                INTVAL j;
+                /* We might have lots of zeros...*/
+                for (j=0; j<result->digits - context->precision; j++) {
+                    if (BN_getd(result, j) !=0) {
+                        BN_nonfatal(PINT_ context, BN_INEXACT,
+                                    "Loss of precision in divide");
+                        break;
+                    }
+                }
 		BN_round_down(PINT_ result, context);
 	    }
 	}
@@ -1664,13 +1692,24 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
     else { /* Other roundings just need digits to play with */
 	unsigned char save_lost;
+        unsigned char flags_save;
 	/* We don't warn on lost digits here, as is after an operation */
 	save_lost = context->traps;
 	context->traps &= ~(unsigned char)BN_F_LOST_DIGITS;
-
+        flags_save = context->flags;
 	BN_round(PINT_ result, context);
 
+        /* We need to check the remainder here, as we might have
+           passed "[digits we want]0[digits we've kept a secret]" into
+           the rounding without knowing it*/
+        if (!BN_is_zero(PINT_ rem, context)) {
+            BN_nonfatal(PINT_ context, BN_INEXACT,
+                        "Loss of precision in divide");
+        }
+        
 	context->traps = save_lost;
+        context->flags =  (context->flags & ~(unsigned char)BN_F_LOST_DIGITS)
+            | (flags_save & BN_F_LOST_DIGITS);
     }
 
     BN_really_zero(PINT_ result, context);
@@ -1715,7 +1754,7 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (result->expn >0 && context->precision > 0 &&
 	result->expn + result->digits > context->precision &&
 	!(rem->digits == 0 && BN_getd(rem, 0) == 0)) {
-	BN_EXCEPT(PINT_ BN_DIVISION_IMPOSSIBLE,
+	BN_nonfatal(PINT_ context, BN_DIVISION_IMPOSSIBLE,
 		  "divide-integer requires more precision than available");
     }
     BN_destroy(PINT_ rem);
@@ -1978,14 +2017,14 @@ void
 BN_rescale(PINTD_ BIGNUM* result, BIGNUM* one, BIGNUM* two,
 		BN_CONTEXT* context) {
     INTVAL expn;
-    unsigned char lost = context->flags;
-    context->flags &= ~(unsigned char)BN_F_LOST_DIGITS;
+    unsigned char lost = context->traps;
+    context->traps &= ~(unsigned char)BN_F_LOST_DIGITS;
 
     BN_arith_setup(PINT_ result, one, two, context, NULL);
 
     expn = BN_to_int(PINT_ two, context);
 
-    context->flags = lost;
+    context->traps = lost;
 
     BN_arith_cleanup(PINT_ result, one, two, context, NULL);
 }
@@ -2018,7 +2057,7 @@ BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
     /* if e>0, if we'll lose precision we'll also be too big, so lose
        above anyway.  On the other hand, with e<0, we can lose digits <
        . from this so need to check that we don't lose precision */
-    if (bn->expn<0 && context->flags & BN_F_LOST_DIGITS) {
+    if (bn->expn<0 && context->traps & BN_F_LOST_DIGITS) {
 	BN_EXCEPT(PINT_ BN_LOST_DIGITS, "digits lost in conv -> int");
     }
 

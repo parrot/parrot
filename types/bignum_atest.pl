@@ -13,6 +13,7 @@ $maxexp = 10000;
 while (<>) {
     chomp;
     next if /^\s*--/;
+    s/\s*--.*$//; # and hope it's not quoted
     next unless /\S/;
     /^precision:\s+(\d+)/ && do {
 	$precision = $1; next;
@@ -42,7 +43,8 @@ while (<>) {
     }
 
     if ($two eq '->') { # unary op
-	($two, $result, @conds) = ('0', $arrow, @conds);
+	unshift(@conds, $result) if defined $result;
+	($two, $result, @conds) = ('0', $arrow,@conds);
     }
 
     if (!defined($result)) {
@@ -62,46 +64,55 @@ while (<>) {
     $testsrun += 2;
     my ($output) = `perl bignum_test.pl $one $two $op $precision $round 0`;
     chomp($output);
-    if ($result eq $output || ($result eq '?' && $output =~ /except/i)) {
+    my @out = split(/\s+/, $output);
+    if ($result eq $out[0] || ($result eq '?')) {
 	print "$test ok\n";
 	$testspass++;
     }
     else {
 	print "$test not ok\n";
 	print "  $one $op $two\n    (p:$precision r:$round)\n";
-	print " => `$output'\n";
-	print " ex `$result'\n";
+	print " => `",join("'`",@out),"'\n";
+	print " ex `$result', ", (@conds ? join(" ", @conds):'-'), "\n";
 	$testsfail++;
     }
-
-    my ($ld_out) = `perl bignum_test.pl $one $two $op $precision $round 1`;
-    chomp($ld_out);
-
-    if (@conds && "@conds" =~ /Lost_digits/) {
-	if ($ld_out =~ /digits lost/) {
-	    print "$test lost_digits ok\n";
-	    $testspass++;
+    # check flag status
+    my (%conds, %outs);
+    my $tpass = 0;
+    if (@conds) {
+	# need to map conditions, as signals and conditions don't quite mesh
+	my %map = (Division_impossible => 'Invalid_operation',);
+	foreach (@conds) {
+	    if ($map{$_}) {
+		$_ = $map{$_};
+	    }
 	}
-	else {
-	    print "$test lost_digits not ok\n";
-	    print "  $one $op $two\n    (p:$precision r:$round)\n";
-	    print " => `$output'\n";
-	    print " ex `$result' (digits lost)\n";
-	    $testsfail++;
+	if (@out >1) {
+	    $conds{$_} = 1 foreach @conds;
+	    $outs{$_} = 1 foreach @out[1..(@out-1)];
+	    $tpass = 1;
+	    foreach (keys %conds) {
+		$tpass = 0 unless $outs{$_};
+	    }
+	    foreach (keys %outs) {
+		$tpass = 0 unless $conds{$_};
+	    }
 	}
     }
+    elsif (@out == 1) {
+	$tpass = 1;
+    }
+
+    if ($tpass) {
+	print "$test ok\n";
+	$testspass++;
+    }
     else {
-	if ($ld_out !~ /digits lost/) {
-	    print "$test lost_digits ok\n";
-	    $testspass++;
-	}
-	else {
-	    print "$test lost_digits not ok\n";
-	    print "  $one $op $two\n    (p:$precision r:$round)\n";
-	    print " => `$output'\n";
-	    print " ex `$result' ()\n";
-	    $testsfail++;
-	}
+	print "$test not ok\n";
+	print "  $one $op $two\n    (p:$precision r:$round)\n";
+	print " => `",join("'`",@out),"'\n";
+	print " ex `$result', ", (@conds ? join(" ", @conds):'-'), "\n";
+	$testsfail++;
     }
 
 }

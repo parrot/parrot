@@ -13,9 +13,12 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int lost) {
   BIGNUM *one, *two, *result;
   char *output;
   BN_CONTEXT context;
+  char *traps[7] = {"Lost_digits","Division_by_zero","Inexact",
+		    "Invalid_operation","Overflow","Rounded","Underflow"};
 
   context.precision = prec;
   context.extended = 0;
+  context.flags = 0;
   context.traps = lost ? BN_F_LOST_DIGITS : 0;
   switch (round) {
   case 1 : context.rounding = ROUND_HALF_UP;
@@ -62,7 +65,13 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int lost) {
   }
 
   BN_to_scientific_string(result, &output);
-  printf("%s\n", output);
+  printf("%s", output);
+  {
+      int i;
+      for (i=0; i< 7; i++)
+	  if ((1 << i) & context.flags) printf(" %s", traps[i]);
+  }
+  printf("\n");
   return 1;
 }
 END_OF_C_SECTION
