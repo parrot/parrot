@@ -278,3 +278,6 @@ v	IOPP
 v	IOPPP
 P	IOPPPP
 P	IOPPPPP
+
+# Added for Tcl
+l	IOSl
