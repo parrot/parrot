@@ -184,7 +184,7 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
     if (!*handle) {
         const char * err = Parrot_dlerror();
         fprintf(stderr, "Couldn't load '%s': %s\n",
-                cpath, err ? err : "unknow reason");
+                cpath, err ? err : "unknown reason");
         string_cstring_free(cpath);
         return NULL;
     }
