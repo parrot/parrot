@@ -16,7 +16,7 @@ Tests the Python Class PMC.
 
 =cut
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 output_is(<< 'CODE', << 'OUTPUT', "attribute");
 ##PIR##
@@ -175,4 +175,47 @@ output_is(<< 'CODE', << 'OUTPUT', "nested subclasses");
 CODE
 1
 2
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "overriding builtins");
+##PIR##
+.sub __main__ @MAIN
+    new_pad 0
+    loadlib P1, 'python_group'
+    find_global P0, 'PyBuiltin', '__load__'
+    invoke
+
+    find_lex $P1, 'int'
+    subclass $P0, $P1, 'TT'
+
+    find_type $I0, 'PyFunc'
+    newsub $P2, $I0, ___repr__
+    setprop $P0, '__repr__', $P2
+
+    find_type $I1, 'PyInt'
+    new $P3, $I1
+    $P3 = 5
+
+    $P4=$P0($P3)
+    print_item $P4
+
+    get_repr $S1, $P4
+    print_item $S1
+    print_newline
+
+    .return ()
+.end
+
+.sub ___repr__ @ANON, method
+    find_type $I0, 'PyObject'
+    new $P0, $I0
+    find_type $I1, 'PyString'
+    new $P1, $I1
+    $P1 = "T(%d)"
+    $P2 = self
+    $P0 = $P1 % $P2
+    .return ($P0)
+.end
+CODE
+5 T(5)
 OUTPUT
