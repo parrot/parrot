@@ -464,7 +464,7 @@ INTVAL
 PIO_setlinebuf(theINTERP, ParrotIO *io)
 {
     ParrotIOLayer *l = io->stack;
-    PIO_flush(interpreter, io);
+
     while (l) {
         if (l->api->SetLineBuf) {
             return (*l->api->SetLineBuf) (interpreter, l, io);

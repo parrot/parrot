@@ -113,38 +113,6 @@ op err(out STR) {
 
 ########################################
 
-=item B<readline>(out STR, in INT)
-
-Temporary hack op to read in a line from the file opened on the FILE *
-we've evilly put in the integer register $2. If $2 is 0, 1, or 2 we
-use stdin, stdout, or stderr respectively.
-
-BE AFRAID! THIS IS *EEEEEEEVIL* pure and simple. (From the 8th
-dimension, no less)
-
-If for some reason the line's longer than 64K you get only 64K
-
-=cut
-
-inline op readline(out STR, in INT) {
-  FILE *file;
-  switch ($2) {
-    case 0: file = stdin;
-                break;
-    case 1: file = stdout;
-                break;
-    case 2: file = stderr;
-                break;
-    default: file = OPCODE_T2PTR(FILE *, $2);
-  }
-
-  $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
-  memset(($1)->strstart, 0, 65535);
-  fgets(($1)->strstart, 65534, file);
-  ($1)->strlen = ($1)->bufused = strlen(($1)->strstart);
-  goto NEXT();
-}
-
 ########################################
 
 =item B<ord>(out INT, in STR)
@@ -1966,30 +1934,6 @@ Set $1 to the length (in characters) of the string in $2.
 
 inline op length(out INT, in STR) {
   $1 = string_length($2);
-  goto NEXT();
-}
-
-=item B<buflen>(out INT, in STR)
-
-Set $1 to the total size of the buffer (in bytes) of the string in
-$2. (Pulls from the buflen field)
-
-=cut
-
-inline op buflen(out INT, in STR) {
-  $1 = $2->buflen;
-  goto NEXT();
-}
-
-=item B<bufused>(out INT, in STR)
-
-Set $1 to the used size of the buffer (in bytes) of the string in
-$2. (Pulls from the bufused field)
-
-=cut
-
-inline op bufused(out INT, in STR) {
-  $1 = $2->bufused;
   goto NEXT();
 }
 
@@ -4254,7 +4198,7 @@ ask. They are:
 
 =item 4 The OS name
 
-This is something like "OS X", "MacOS", "Windows", or "VMS". 
+This is something like "OS X", "MacOS", "Windows", or "VMS".
 
 =item 5 The OS version string
 

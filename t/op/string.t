@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 103;
+use Parrot::Test tests => 102;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1245,7 +1245,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE',<<OUTPUT,"index, big, hard to match strings");
-# Builds a 24th iteration fibonacci string (approx. 100K)    
+# Builds a 24th iteration fibonacci string (approx. 100K)
       set S1, "a"
       set S2, "b"
       set I0, 0
@@ -1625,26 +1625,6 @@ String #0
 String #2
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "string introspection");
-      set S0, "Test string"
-
-      stringinfo I0, S0, 3  
-      buflen I1, S0
-      eq I0, I1, OK1
-      print "not "
-OK1:  print "ok 1\n"
-
-      stringinfo I0, S0, 5  
-      bufused I1, S0
-      eq I0, I1, OK2
-      print "not "
-OK2:  print "ok 2\n"
-      end
-CODE
-ok 1
-ok 2
-OUTPUT
-
 output_is(<<'CODE', <<OUTPUT, "find_encoding");
       find_encoding I0, "singlebyte"
       print I0
@@ -1669,31 +1649,31 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "string_encoding");
       set I0, 0
       new S0, 0, I0
-      string_encoding I1, S0 
+      string_encoding I1, S0
       eq I0, I1, OK1
       print "not "
-OK1:  print "ok 1\n" 
+OK1:  print "ok 1\n"
 
       set I0, 1
       new S0, 0, I0
-      string_encoding I1, S0 
+      string_encoding I1, S0
       eq I0, I1, OK2
       print "not "
-OK2:  print "ok 2\n" 
+OK2:  print "ok 2\n"
 
       set I0, 2
       new S0, 0, I0
-      string_encoding I1, S0 
+      string_encoding I1, S0
       eq I0, I1, OK3
       print "not "
-OK3:  print "ok 3\n" 
+OK3:  print "ok 3\n"
 
       set I0, 3
       new S0, 0, I0
-      string_encoding I1, S0 
+      string_encoding I1, S0
       eq I0, I1, OK4
       print "not "
-OK4:  print "ok 4\n" 
+OK4:  print "ok 4\n"
 
       end
 CODE

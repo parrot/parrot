@@ -50,6 +50,10 @@ INTVAL PIO_buf_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 INTVAL PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                       INTVAL hi, INTVAL lo, INTVAL whence);
 PIOOFF_T PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+size_t PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                            ParrotIOBuf *b);
+size_t PIO_buf_readline(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                        void *buffer, size_t len);
 
 
 /* Local util functions */
@@ -60,6 +64,9 @@ size_t PIO_buf_readthru(theINTERP, ParrotIOLayer *layer,
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+/* XXX: This is not portable */
+#define IS_EOL(c) ((*c) == '\n')
 
 INTVAL
 PIO_buf_init(theINTERP, ParrotIOLayer *layer)
@@ -145,8 +152,13 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
 INTVAL
 PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 {
-    /* Reuse setbuf call */
     int err;
+
+    /* already linebuffering */
+    if (io->flags & PIO_F_LINEBUF)
+        return 0;
+
+    /* Reuse setbuf call */
     if ((err = PIO_buf_setbuf(interpreter, l, io, PIO_LINEBUFSIZE)) >= 0) {
         /* Then switch to linebuf */
         io->flags &= ~PIO_F_BLKBUF;
@@ -232,6 +244,24 @@ PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return -1;
 }
 
+size_t
+PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+                     ParrotIOBuf *b)
+{
+    size_t got;
+    got = PIO_buf_readthru(interpreter, layer, io, b->startb, b->size);
+ 
+    /* nothing to get */
+    if (got == 0)
+        return 0;
+
+    b->endb = b->startb + got;
+    b->next = b->startb;
+
+    b->flags |= PIO_BF_READBUF;
+
+    return got;
+}
 
 size_t
 PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -239,7 +269,7 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 {
     ParrotIOLayer *l = layer;
     ParrotIOBuf *b;
-    char *out_buf = buffer;
+    unsigned char *out_buf = buffer;
     size_t current = 0;
 
     /* write buffer flush */
@@ -248,6 +278,11 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     }
 
     b = &io->b;
+
+    /* line buffered read */
+    if (io->flags & PIO_F_LINEBUF) {
+        return PIO_buf_readline(interpreter, layer, io, buffer, len);
+    }
 
     /* read Data from buffer */
     if (b->flags & PIO_BF_READBUF) {
@@ -278,16 +313,11 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     /* (re)fill the readbuffer */
     if (!(b->flags & PIO_BF_READBUF)) {
         size_t got;
-
         if (len >= io->b.size) {
             return current + PIO_buf_readthru(interpreter, l, io, buffer, len);
         }
 
-        got = PIO_buf_readthru(interpreter, l, io, b->startb, b->size);
-        b->endb = b->startb + got;
-        b->next = b->startb;
-
-        io->b.flags |= PIO_BF_READBUF;
+        got = PIO_buf_fill_readbuf(interpreter, l, io, b);
 
         len = MIN(len, got);
     }
@@ -325,6 +355,46 @@ PIO_buf_readthru (theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         /* XXX: Handle error here */
         return 0;
     }
+}
+
+size_t
+PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+                 void *buffer, size_t len)
+{
+    size_t l = 0;
+    unsigned char *out_buf = buffer;
+    unsigned char *buf_start;
+    ParrotIOBuf *b = &io->b;    
+
+    /* fill empty buffer */
+    if (!(b->flags & PIO_BF_READBUF)) {
+        if (PIO_buf_fill_readbuf(interpreter, layer, io, b) == 0) 
+            return 0;
+    }
+
+    buf_start = b->next;
+    while (l++ < len) {
+        if (IS_EOL(b->next++))
+            break;
+        /* buffer completed; copy out and refill */
+        if (b->next == b->endb) {
+            memcpy(out_buf, buf_start, b->endb - buf_start);
+            out_buf += b->endb - buf_start;
+            if (PIO_buf_fill_readbuf(interpreter, layer, io, b) == 0)
+                return l;
+            buf_start = b->startb;
+        }
+    }
+    memcpy(out_buf, buf_start, b->endb - buf_start);
+
+    /* check if buffer is finished */
+    if (b->next == b->endb) {
+        b->next = b->startb;
+        b->endb = NULL;
+        b->flags &= ~PIO_BF_READBUF;
+    }
+
+    return l;
 }
 
 size_t

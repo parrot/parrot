@@ -3,9 +3,6 @@
 use Parrot::Test tests => 9;
 use Test::More;
 
-SKIP: {
-  skip "readline not yet ported to PIO", 3;
-
 # It would be very embarrassing if these didn't work...
 open FOO, ">temp.file";
 print FOO "2\n1\n";
@@ -56,7 +53,7 @@ close FOO;
 
 # This one passes, but for the wrong reason
 output_is(<<'CODE', <<'OUTPUT', "3-arg open");
-       open I1, "temp.file", "w"
+       open I1, "temp.file", "<"
        print "Foobar\n"
        close I1
 
@@ -69,7 +66,7 @@ output_is(<<'CODE', <<'OUTPUT', "3-arg open");
 CODE
 Foobar
 OUTPUT
-}
+
 unlink("temp.file");
 
 output_is(<<'CODE', <<'OUTPUT', 'open and close');

@@ -369,6 +369,28 @@ op read(out STR, in PMC, in INT) {
   goto NEXT();
 }
 
+=item B<readline>(out STR, in INT)
+
+Read a line up to EOL from filehandle $2. 
+This switches the filehandle to linebuffer-mode.
+
+If for some reason the line's longer than 64K you get only 64K
+
+=cut
+
+inline op readline(out STR, in INT) {
+  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$2];
+  size_t len;
+  
+  $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
+  memset(($1)->strstart, 0, 65535);
+
+  PIO_setlinebuf(interpreter, io);
+  len = PIO_read(interpreter, io, ($1)->strstart, 65534);
+  ($1)->strlen = ($1)->bufused = len;
+  goto NEXT();
+}
+
 ##########################################
 
 =item B<seek>(out INT, in PMC, in INT, in INT)
