@@ -331,7 +331,7 @@ sub make_op
         $op->body(qq{#line $line "$file"\n}.$body); 
       }
 
-      $jumps = $branch;
+      $jumps |= 1 if ($branch);
       $jumps |= 2 if ($absolute);
       $jumps |= 4 if ($pop);
       $jumps |= 8 if ($next);
