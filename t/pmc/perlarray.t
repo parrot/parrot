@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 24;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -280,13 +280,13 @@ OK_26:  print "ok 26\n"
 
         set P2, P0[13]
         typeof S2, P2
-        eq S2, "PerlUndef", OK_27 
+        eq S2, "PerlUndef", OK_27
         print "not "
 OK_27:  print "ok 27\n"
 
         set P2, P0[-13]
         typeof S2, P2
-        eq S2, "PerlUndef", OK_28 
+        eq S2, "PerlUndef", OK_28
         print "not "
 OK_28:  print "ok 28\n"
 
@@ -1213,4 +1213,56 @@ CODE
 OUTPUT
 
 
+output_is(<<'CODE', <<OUT, "multikeyed access I arg");
+	new P0, .PerlArray
+	new P1, .PerlArray
+	set P0[10], P1
+	set P0[10;10], 20
+	set P2, P0[10]
+	typeof S0, P2
+	print S0
+	print "\n"
+	set I2, P0[10;10]
+	print I2
+	set I3, 10
+	set I2, P0[I3;10]
+	print I2
+	set I2, P0[10;I3]
+	print I2
+	set I2, P0[I3;I3]
+	print I2
+	print "\n"
+	end
+CODE
+PerlArray
+20202020
+OUT
+
+output_is(<<'CODE', <<OUT, "multikeyed access P arg");
+	new P0, .PerlArray
+	new P1, .PerlArray
+	new P3, .PerlInt
+	set P3, 20
+	set P0[10], P1
+	set P0[10;10], P3
+	set P2, P0[10]
+	typeof S0, P2
+	print S0
+	print "\n"
+	set I2, P0[10;10]
+	print I2
+	set I3, 10
+	set I2, P0[I3;10]
+	print I2
+	set I2, P0[10;I3]
+	print I2
+	set I2, P0[I3;I3]
+	print I2
+	print "\n"
+	end
+CODE
+PerlArray
+20202020
+OUT
+1;
 1;

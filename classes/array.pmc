@@ -105,10 +105,6 @@ pmclass Array {
         list_mark(INTERP, (List *) PMC_data(SELF));
     }
 
-    INTVAL type () {
-        return enum_class_Array;
-    }
-
     STRING* name() {
         return whoami;
     }

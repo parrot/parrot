@@ -38,10 +38,6 @@ Parrot_PerlArray_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
 
 pmclass PerlArray extends Array {
 
-    INTVAL type () {
-        return enum_class_PerlArray;
-    }
-
     STRING* name() {
         return whoami;
     }
@@ -50,34 +46,60 @@ pmclass PerlArray extends Array {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
 		(List *) PMC_data(SELF), key);
         VTABLE_set_integer_native(INTERP, ptr, value);
-    };
+    }
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        INTVAL ix;
+
+        ix = key_integer(INTERP, key);
+        if (ix >= DYNSELF.elements() || ix < -DYNSELF.elements())
+		list_set_length(INTERP, (List *) PMC_data(SELF), ix+1);
+	SUPER(key, value);
+    }
 
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
 		(List *) PMC_data(SELF), key);
         VTABLE_set_number_native(INTERP, ptr, value);
-    };
+    }
 
+    void set_number_keyed (PMC* key, FLOATVAL value) {
+        INTVAL ix;
+
+        ix = key_integer(INTERP, key);
+        if (ix >= DYNSELF.elements() || ix < -DYNSELF.elements())
+		list_set_length(INTERP, (List *) PMC_data(SELF), ix+1);
+	SUPER(key, value);
+    }
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
 		(List *) PMC_data(SELF), key);
         VTABLE_set_string_native(INTERP, ptr, value);
-    };
+    }
+
+    void set_string_keyed (PMC* key, STRING* value) {
+        INTVAL ix;
+
+        ix = key_integer(INTERP, key);
+        if (ix >= DYNSELF.elements() || ix < -DYNSELF.elements())
+		list_set_length(INTERP, (List *) PMC_data(SELF), ix+1);
+	SUPER(key, value);
+    }
 
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
 	list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
-    };
+    }
 
-    void set_pmc_keyed (PMC* key, PMC* src) {
+    void set_pmc_keyed (PMC* key, PMC* value) {
         INTVAL ix;
 
-        if (!key) return;
-
         ix = key_integer(INTERP, key);
-	list_assign(INTERP, (List *) PMC_data(SELF), ix, src, enum_type_PMC);
-    };
+        if (ix >= DYNSELF.elements() || ix < -DYNSELF.elements())
+		list_set_length(INTERP, (List *) PMC_data(SELF), ix+1);
+	SUPER(key, value);
+    }
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
