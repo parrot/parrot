@@ -172,7 +172,6 @@ encodings/utf32.c
 encodings/utf8.c
 examples/assembly/Makefile
 examples/assembly/bsr.pasm
-examples/assembly/call.pasm
 examples/assembly/cat.pasm
 examples/assembly/coroutine.pasm
 examples/assembly/euclid.pasm

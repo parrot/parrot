@@ -2,30 +2,30 @@
 #
 # Create 2 coroutines
 #
-set_addr I0, MYCOROUTINE 
+set_addr I0, MYCOROUTINE
 new P0, .Coroutine
-set P0, I0 
+set P0, I0
 save P0
 new P0, .Coroutine
-set P0, I0 
+set P0, I0
 # Calling convention says P0 will contain the sub so..
 print "Calling 1st co-routine\n"
-callco
-callco
-callco
+invoke
+invoke
+invoke
 restore P0
 print "Calling 2nd co-routine\n"
-callco
-callco
-callco
+invoke
+invoke
+invoke
 end
 
 # A coroutine
 MYCOROUTINE:
 print "Entry\n"
-yield
+invoke
 print "Resumed\n"
-yield
+invoke
 print "Done\n"
-ret
+invoke
 
