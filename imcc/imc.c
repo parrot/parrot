@@ -380,8 +380,16 @@ int interferes(SymReg * r0, SymReg * r1) {
     if(r0 == r1) return 0;
     else if(r0->set != r1->set) return 0;
 
-    if(r0->first > r1->last) return 0;
-    else if(r0->last < r1->first) return 0;
+    /* if the first time r0 appears is after (or in the same instruction)
+     * than the last appearance of r1, then they can't interfere.
+     *
+     * even if r0 and r1 are called in the same instruction, and even
+     * if this instrucion does modify r0, if it's value is never used 
+     * later, then they can share the same register
+     */
+     
+    if(r0->first >= r1->last) return 0;
+    else if(r0->last <= r1->first) return 0;
 
     /* If symbol was never used in a statment, it can't interfere */
     if(r0->first < 0 || r1->first < 0) return 0;
