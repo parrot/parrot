@@ -10,14 +10,18 @@ is also intended to be language-agnostic.
 
 =head2 Documentation
 
-The Parrot documentation is spread across the following files:
+The Parrot documentation is spread across a wide range of files.
+Good starting points are:
 
-=over 3
+=over 4
 
 =item F<intro.pod>
 
 An introductory article on what Parrot is and how to do some
 interesting things with it.
+
+(Note that this was originally written around the time of Parrot v0.0.2,
+and is in need of some updating).
 
 =item F<overview.pod>
 
@@ -32,16 +36,43 @@ run them.
 
 The Parrot FAQ.
 
-=item F<ops/*.pod>
+=item F<glossary.pod>
 
-Each opcode file in the main directory creates a correspoding documentation
-file in the ops subdirectory at build time. These files describe what each
+A guide to some of the jargon that crops up repeatedly in Parrot development
+(and in the documentation...)
+
+=back
+
+More detailed information on the design and implementation of Parrot can
+be found in:
+
+=over 4
+
+=item F<pdds/>
+
+This subdirectory contains all of the current Parrot Design Documents (PDDs).
+These are intended to be detailed guides to the design of the various
+Parrot subsystems; for instance, F<pdd03_calling_conventions.pod> specifies 
+Parrot's inter-routine calling conventions.
+
+=item F<ops/>
+
+This subdirectory contains documentation files that are created from the 
+corresponding opcode files at build time. These files describe what each
 opcode does and specify what arguments they take. 
 
-=item F<pmc/*.pod>
+=item F<pmc/>
 
-Documentation on several of the PMC types available to Parrot. Currently
-rather incomplete. (Patches welcome!)
+This subdirectory contains documentation on several of the PMC types 
+available to Parrot. Currently only a few of the available PMCs have 
+been documented. (Patches welcome!)
+
+=item F<dev/>
+
+This subdirectory contains a number of files discussing various implementation
+decisions made during the course of the development of Parrot. The intent is
+to keep discussion of implementation-specific issues separate from the 
+basic design issues discussed in the PDDs.
 
 =item F<parrot_assembly.pod>
 
@@ -49,9 +80,13 @@ The master list of Parrot assembly operations; not all of these have
 been implemented, so you should stick to those listed in the documentation
 in F<ops/> when writing Parrot assembly.
 
+There is significant overlap between this file and F<pdds/pdd06_pasm.pod>;
+they may well be merged at some point in the future
+
 =item F<vtables.pod>
 
-Describes what PMCs are and how they work.
+A brief introduction to the vtable at the heart of all PMCs, and how
+to implement your own PMC type.
 
 =item F<embed.pod>
 
@@ -60,6 +95,10 @@ Describes the embedding subsystem in excruciating detail.
 =item F<jit.pod>
 
 A brief description of Parrot's Just-In-Time compiler.
+
+=item F<memory_internals.pod>
+
+An introduction to the Parrot GC subsystem
 
 =item F<parrotbyte.pod>
 
@@ -98,7 +137,8 @@ Win32, Tru64, OpenVMS (Alpha), Solaris (Sparc), FreeBSD (x86).
 =head2 Authors
 
 Parrot is developed and maintained by the members of the
-C<perl6-internals@perl.org> mailing list. 
+C<perl6-internals@perl.org> mailing list. The list is archived at:
+C<http://nntp.perl.org/group/perl.perl6.internals> 
 
 =over 4
 
