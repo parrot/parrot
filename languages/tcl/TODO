@@ -2,8 +2,6 @@
 
 =over 4
 
-=item submit prs' one in email, other is regarding fixedpmcarray (and other's) use of Perl* pmcs.
-
 =item PMC based parser -
 
 Instead of the current PIR level parsing, we should instead use
