@@ -144,7 +144,7 @@ typedef struct Parrot_Interp {
     struct Parrot_Context ctx;          /* All the registers and stacks that
                                            matter when context switching */
 
-    struct Stash *perl_stash;           /* Pointer to the global variable
+    struct Stash *globals;              /* Pointer to the global variable
                                          * area */
     struct Arenas *arena_base;          /* Pointer to this interpreter's
                                          * arena */
