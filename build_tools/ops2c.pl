@@ -53,8 +53,7 @@ my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
 my $source  = "${base}_ops${suffix}.c";
 
-my $remembered_ops = { };
-
+my %hashed_ops;
 
 #
 # Read the input files:
@@ -86,7 +85,7 @@ my $cur_code = 0;
 for(@{$ops->{OPS}}) {
    $_->{CODE}=$cur_code++;
 
-   remember_op($_->full_name(), $_->{CODE});
+   hash_op($_->full_name(), $_->{CODE});
 }
 
 my $num_ops     = scalar $ops->ops;
@@ -265,15 +264,13 @@ print SOURCE <<END_C;
 ** Op lookup function:
 */
 
-static int find_op(const char * name) {
 END_C
 
 #print STDERR "Top level op chars: ", keys %$remembered_ops, "\n";
 
-generate_switch($remembered_ops);
+generate_hash(\%hashed_ops);
 
 print SOURCE <<END_C;
-}
 
 /*
 ** op lib descriptor:
@@ -298,74 +295,127 @@ END_C
 
 exit 0;
 
-
 #
-# remember_op()
+# Hash op to its code for the find_op() generation
 #
-
-sub remember_op
-{
-  my ($name, $code) = @_;
-  my $hash = $remembered_ops;
-
-#  print STDERR "Remembering [$code] $name...";
-
-  my @chars = (split(//, $name), "\0");
-
-  while (@chars) {
-    my $char = shift @chars;
-
-#    print "$char...";
-
-    if (@chars) {
-      if (!exists $hash->{$char}) {
-        $hash->{$char} = { };
-      }
-
-      $hash = $hash->{$char}
-    }
-    else {
-      $hash->{$char} = $code;
-#      print "$code.\n";
-    }
-  }
+sub hash_op {
+    my ($name, $code) = @_;
+    $hashed_ops{$name} = $code;    
 }
 
-
 #
-# generate_switch()
+# Generate the find_op() function
 #
+sub generate_hash {
+    my $hash = shift;
+    my @opnames = sort keys %$hash;
 
-sub generate_switch {
-  my ($hash, @so_far) = @_;
-  my $index = scalar(@so_far);
-  my $indent = "  " x $index;
+print SOURCE<<END_C;
+struct op_hash_node {
+    char name[32];
+    int opcode;
+};
 
-  print SOURCE <<END_C;
-#ifndef PARROT_NO_GIANT_SWITCH
-
-${indent}  switch (name[$index]) {
+static struct op_hash_node op_hash[] = {
 END_C
 
-  foreach my $key (sort keys %$hash) {
-    print SOURCE "${indent}    case '" . ($key eq "\0" ? "\\0" : $key) . "':\n";
-
-    if (ref $hash->{$key} eq 'HASH') {
-        generate_switch($hash->{$key}, @so_far, $key);
+    my $count = 0;
+    my %first;
+    my $bottom = 0xff;
+    my $top = 0;
+    my $bottom_ch;
+    my $bottom_sec = 0xff;
+    my $top_sec = 0;
+    my $bottom_sec_ch;
+    my ($f, $c1, $c2);
+    foreach my $opname (@opnames) {
+        $f = substr($opname, 0, 2);
+        $c1 = ord(substr($opname, 0, 1));
+        $c2 = ord(substr($opname, 1, 2));
+        if($c1 < $bottom) {
+        	$bottom = $c1;
+        }
+        if($c2 < $bottom_sec) {
+        	$bottom_sec = $c2;
+        }
+        if($top < $c1) {
+        	$top = $c1;
+        }
+        if($top_sec < $c2) {
+        	$top_sec = $c2;
+        }
+        if($first{$f}) {
+        	print SOURCE "{ \"$opname\", ", $hash->{$opname}, "},\n";
+        }
+        else {
+        	print SOURCE "{\"\", 0},\n";
+        	$count++;
+        	$first{$f} = $count;
+        	print SOURCE "{ \"$opname\", ", $hash->{$opname}, "},\n";
+        }	
+        $count++;
     }
-    else {
-        print SOURCE "${indent}      return " . $hash->{$key} . ";\n";
-    }
 
-    print SOURCE "${indent}      break;\n"; 
-  }
+    $bottom_ch = "'" . chr($bottom) . "'";
+    $bottom_sec_ch = "'" . chr($bottom_sec) . "'";
 
-  print SOURCE <<END_C;
-${indent}    default:
-${indent}      return -1;
-${indent}      break;
-${indent}  }
+print SOURCE<<END_C;
+    {"", 0}
+};
 
-#endif
+static int op_hash_jump[] = {
 END_C
+    for(my $c1 = $bottom; $c1 <= $top; $c1++) {
+    	for(my $c2 = $bottom_sec; $c2 <= $top_sec; $c2++) {
+    		if($first{chr($c1) . chr($c2)}) {
+    			print SOURCE $first{chr($c1) . chr($c2)} . ", /* " . chr($c1) . chr($c2) . " */ \n";
+    		}
+    		else {
+    			print SOURCE "0,\n";
+    		}
+    	}
+    }
+    print SOURCE "0};\n";
+
+    my $range1 = $top - $bottom + 1;
+    my $range2 = $top_sec - $bottom_sec + 1;
+
+print SOURCE<<END_C;
+
+/*
+ * If this hasher stinks blame it on Melvin.
+ * It achieves 40% of the Big Switch(tm) for the old find_op() which
+ * itself was approaching the 'mops' benchmark, but takes way less
+ * resources to compile and is 500k of generated source smaller.
+ * We generate a jump table for the 1st and 2nd characters of
+ * the opcode. Then, the hash is sorted so we just move cursor
+ * right and down through the sorted array until we either match
+ * the whole op or hit a null entry.
+ * When we write out the ops we compute the min and max char codes so we
+ * can compress the jump table. I expect this is still tunable.
+ */
+static int find_op(const char * name) {
+	/* Table compressed to first char */
+	int bucket = (name[0] - $bottom_ch) * $range2 + 
+			(name[1] - $bottom_sec_ch);
+	int op;
+	int i = 2;
+	if((op = op_hash_jump[bucket]) == 0) {
+		printf("Invalid bucket for %s\n", name);
+		exit(0);
+	}
+	for(;;) {
+		if(name[i] != op_hash[op].name[i]) {
+			op++;
+			if(op_hash[op].name[0] == 0)
+				return -1;
+			continue;
+		}
+		if(name[i] == 0)
+			return op_hash[op].opcode;
+		i++;
+	}
+}
+END_C
+    
 }
