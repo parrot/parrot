@@ -288,37 +288,114 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( <<"CODE", <<OUTPUT, "atan" );
+output_is( <<"CODE", <<OUTPUT, "atan2" );
 @{[ $fp_equality_macro]}
+        set N0, 0.0
+        set I0, 0
 	set N1, 1.0
 	set I1, 1
 	set N2, 1.0
 	set I2, 1
-	atan N3, N1, N2
-	fp_eq	N3, 0.785398, EQ1
+        set I3, -1
+        set N3, -1.0
+
+	atan N4, N1, N2
+	fp_eq	N4, 0.785398, EQ1
 	print "not "
 EQ1:	print "ok 1\\n"
 
-	atan N3, N1, I2
-	fp_eq	N3, 0.785398, EQ2
+	atan N4, N1, I2
+	fp_eq	N4, 0.785398, EQ2
 	print "not "
 EQ2:	print "ok 2\\n"
 
-	atan N3, I1, N2
-	fp_eq	N3, 0.785398, EQ3
+	atan N4, I1, N2
+	fp_eq	N4, 0.785398, EQ3
 	print "not "
 EQ3:	print "ok 3\\n"
 
-	atan N3, I1, I2
-	fp_eq	N3, 0.785398, EQ4
+	atan N4, I1, I2
+	fp_eq	N4, 0.785398, EQ4
 	print "not "
 EQ4:	print "ok 4\\n"
-	end
+	
+        atan N4, N3, 1.0
+        fp_eq   N4, -0.785398, EQ5
+	print "not "
+EQ5:	print "ok 5\\n"
+
+        atan N4, N1, 0
+        fp_eq   N4, 1.570796, EQ6
+	print "not "
+EQ6:	print "ok 6\\n"
+
+        atan N4, I3, 0.0
+        fp_eq   N4, -1.570796, EQ7
+	print "not "
+EQ7:	print "ok 7\\n"
+
+        atan N4, I3, -1
+        fp_eq   N4, -2.356194, EQ8
+	print "not "
+EQ8:	print "ok 8\\n"
+
+        atan N4, 1.0, N3
+        fp_eq   N4, 2.356194, EQ9
+	print "not "
+EQ9:	print "ok 9\\n"
+        
+        atan N4, 1.0, I0
+        fp_eq   N4, 1.570796, EQ10
+	print "not "
+EQ10:	print "ok 10\\n"
+
+        atan N4, 1, N1
+        fp_eq   N4, 0.785398, EQ11
+	print "not "
+EQ11:	print "ok 11\\n"
+
+        atan N4, 1, I1
+        fp_eq   N4, 0.785398, EQ12
+	print "not "
+EQ12:	print "ok 12\\n"
+
+        atan N4, 0.0, 1.0
+        fp_eq   N4, 0.000000, EQ13
+	print "not "
+EQ13:	print "ok 13\\n"
+
+        atan N4, -1.0, 0
+        fp_eq   N4, -1.570796, EQ14
+	print "not "
+EQ14:	print "ok 14\\n"
+
+        atan N4, 1, -1.0
+        fp_eq   N4, 2.356194, EQ15
+	print "not "
+EQ15:	print "ok 15\\n"
+
+        atan N4, 0, 1
+        fp_eq   N4, 0.000000, EQ16
+	print "not "
+EQ16:	print "ok 16\\n"
+        end
 CODE
 ok 1
 ok 2
 ok 3
 ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+ok 11
+ok 12
+ok 13
+ok 14
+ok 15
+ok 16
 OUTPUT
 
 output_is( <<"CODE", <<OUTPUT, "log2" );
@@ -405,32 +482,109 @@ output_is( <<"CODE", <<OUTPUT, "pow" );
 	set I1, 3
 	set N2, 5.0
 	set I2, 5
-	pow_n_n_n N3, N1, N2
+	pow N3, N1, N2
 	fp_eq	N3, 243.0, EQ1
 	print "not "
 EQ1:	print "ok 1\\n"
 
-	pow_n_n_i N3, N1, I2
+	pow N3, N1, I2
 	fp_eq	N3, 243.0, EQ2
 	print "not "
 EQ2:	print "ok 2\\n"
 
-	pow_n_i_n N3, I1, N2
+	pow N3, I1, N2
 	fp_eq	N3, 243.0, EQ3
 	print "not "
 EQ3:	print "ok 3\\n"
 
-	pow_n_i_i N3, I1, I2
+	pow N3, I1, I2
 	fp_eq	N3, 243.0, EQ4
 	print "not "
 EQ4:	print "ok 4\\n"
 
+        set N0, 0.0
+        set I0, 0
+        set N1, 1.0
+        set I1, 1
+        set N2, 4.0
+        set I2, 4
+	pow N3, N2, 2.5 
+	fp_eq	N3, 32.0, EQ5
+	print "not "
+EQ5:	print "ok 5\\n"
+
+	pow N3, N2, -2
+	fp_eq	N3, 0.0625, EQ6
+	print "not "
+EQ6:	print "ok 6\\n"
+
+	pow N3, I2, 0.5
+	fp_eq	N3, 2.0, EQ7
+	print "not "
+EQ7:	print "ok 7\\n"
+
+	pow N3, I2, 0
+	fp_eq	N3, 1.0, EQ8
+	print "not "
+EQ8:	print "ok 8\\n"
+
+	pow N3, 0.0, N2
+	fp_eq	N3, 0.0, EQ9
+	print "not "
+EQ9:	print "ok 9\\n"
+
+	pow N3, 2.5, 0.0
+	fp_eq	N3, 1.0, EQ10
+	print "not "
+EQ10:	print "ok 10\\n"
+
+	pow N3, 2.5, I2
+	fp_eq	N3, 39.0625, EQ11
+	print "not "
+EQ11:	print "ok 11\\n"
+
+	pow N3, 2.0, -4
+	fp_eq	N3, 0.0625, EQ12
+	print "not "
+EQ12:	print "ok 12\\n"
+
+	pow N3, 0, N2
+	fp_eq	N3, 0.0, EQ13
+	print "not "
+EQ13:	print "ok 13\\n"
+
+	pow N3, 4, -0.5
+	fp_eq	N3, 0.5, EQ14
+	print "not "
+EQ14:	print "ok 14\\n"
+
+	pow N3, 4, I2
+	fp_eq	N3, 256.0, EQ15
+	print "not "
+EQ15:	print "ok 15\\n"
+
+	pow N3, 4, -1
+	fp_eq	N3, 0.25, EQ16
+	print "not "
+EQ16:	print "ok 16\\n"
 	end
 CODE
 ok 1
 ok 2
 ok 3
 ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+ok 11
+ok 12
+ok 13
+ok 14
+ok 15
+ok 16
 OUTPUT
 
 1;
