@@ -155,6 +155,7 @@ make_COW_reference(Interp *interpreter, STRING *s)
         d = new_string_header(interpreter, PObj_get_FLAGS(s));
         PObj_COW_SET(s);
         copy_string_header(interpreter, d, s);
+        PObj_sysmem_CLEAR(d);
     }
     return d;
 }
