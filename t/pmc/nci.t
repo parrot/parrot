@@ -1,4 +1,4 @@
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -821,6 +821,66 @@ output_is(<<'CODE', <<'OUTPUT', "nci_v_P");
 CODE
 ok
 got null
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1");
+  bounds 1	# no JIT yet
+  sweepoff	# SEGV in dynext.c:235
+  # we need a flag if the call_back is already done
+  new P10, .PerlInt
+  store_global "cb_done", P10
+  # first attempt - create cb manually (this step will be hidden later)
+  newsub P5, .Sub, _call_back
+  null P1
+  dlfunc P0, P1, "Parrot_make_cb", "PIPP"
+  print "ok 1\n"
+  # prepare user data
+  new P6, .PerlInt
+  set P6, 42
+  # preserve the Sub
+  set P7, P5
+  # create callback (=> P5)
+  invoke
+  # now call the external sub, that takes a call_back and user_data
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_cb_C1", "vPP"
+  print "ok 2\n"
+  # P5 is the cb
+  # get user_data i.e. the Sub
+  set P6, P7
+  invoke
+  # call_back will be called at any time
+  # so spin a bit
+  set I20, 0
+loop:
+  inc I20
+  ## sleep 0.1 hangs sometimes in __select ## XXX ##
+  find_global P11, "cb_done"
+  if P11, fin
+  gt I20, 100000, err
+  branch loop
+fin:
+  print "done.\n"
+  end
+err:
+  print "cb didnt run\n"
+  end
+
+_call_back:
+  print "in callback\n"
+  print "user data: "
+  print P5
+  print "\n"
+  find_global P12, "cb_done"
+  inc P12
+  invoke P1
+
+CODE
+ok 1
+ok 2
+in callback
+user data: 42
+done.
 OUTPUT
 
 } # SKIP

@@ -20,6 +20,9 @@ int nci_ii3(int a, int *b);
 void * nci_pi(int test);
 void  nci_vP(void *pmc);
 
+typedef void (*cb_C1_func)(const char*, void*);
+void nci_cb_C1(cb_C1_func, void*);
+
 double nci_dd(double d) {
     return d * 2.0;
 }
@@ -220,6 +223,17 @@ void nci_vP(void *pmc)
         puts("ok");
     else
         puts("got null");
+}
+
+/*
+ * pdd16 tests
+ */
+void
+nci_cb_C1(cb_C1_func cb, void* user_data)
+{
+    const char *result = "succeded";
+    /* call the cb synchronously */
+    (cb)(result, user_data);
 }
 
 #ifdef TEST

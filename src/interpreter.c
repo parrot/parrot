@@ -1011,9 +1011,13 @@ Parrot_runops_fromc_save(Parrot_Interp interpreter, PMC *sub)
 Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)>
 
+=item C<void *
+Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)>
+
 Run parrot ops, called from C code, function arguments are passed as
 C<va_args> according to signature the C<sub> argument is an invocable
-C<Sub> PMC.
+C<Sub> PMC. The latter preserves registers.
 
 Signatures are similar to NCI:
 
@@ -1029,11 +1033,9 @@ Return value, if any is passed as C<(void *)ptr> or C<(void *)&val>.
 
 */
 
-void *
-Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
-        const char *sig, ...)
+static void *
+runops_args(Parrot_Interp interpreter, PMC *sub, const char* sig, va_list ap)
 {
-    va_list ap;
     /* *sig is retval like in NCI */
     int ret;
     int next[4];
@@ -1050,7 +1052,7 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
     REG_INT(4) = 0;     /* # of N params */
 
     ret = *sig++;
-    va_start(ap, sig);
+
     while (*sig) {
         switch (*sig++) {
             case 'v':       /* void func, no params */
@@ -1077,7 +1079,6 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
                         sig[-1]);
         }
     }
-    va_end(ap);
 
     Parrot_runops_fromc(interpreter, sub);
     /*
@@ -1101,6 +1102,222 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
                     ret);
     }
     return retval;
+}
+
+void *
+Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)
+{
+    va_list args;
+    void *ret;
+
+    va_start(args, sig);
+    ret = runops_args(interpreter, sub, sig, args);
+    va_end(args);
+    return ret;
+}
+
+void *
+Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)
+{
+    struct regsave *data = save_regs(interpreter);
+    va_list args;
+
+    va_start(args, sig);
+    (void) runops_args(interpreter, sub, sig, args);
+    va_end(args);
+    restore_regs(interpreter, data);
+    return NULL;
+}
+
+/*
+
+=item C<PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user)>
+
+Register a callback function according to pdd16
+
+=cut
+
+*/
+
+PMC*
+Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data)
+{
+    PMC* interp_pmc;
+    /*
+     * we stuff all the information into the Sub PMC and pass that
+     * on to the external sub
+     */
+    interp_pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
+            (INTVAL) IGLOBALS_INTERPRETER);
+    VTABLE_setprop(interpreter, sub,
+            string_make(interpreter, "_interpreter", 12, NULL,
+                PObj_external_FLAG, NULL), interp_pmc);
+    VTABLE_setprop(interpreter, sub,
+            string_make(interpreter, "_user_data", 10, NULL,
+                PObj_external_FLAG, NULL), user_data);
+    /*
+     * we are gonna passing this PMC to external code, the PMCs
+     * might get out of scope until the callback is called -
+     * we don't know, when the callback will be called
+     *
+     * so anchor the PMC
+     */
+    dod_register_pmc(interpreter, sub);
+
+    /*
+     * finally the external lib awaits a function pointer
+     * fake a PMC that points to Parrot_callback_C (or _D)
+     */
+
+    return F2DPTR(Parrot_callback_C);
+}
+
+/*
+
+=item C<static void verify_CD(void *external_data, PMC *callback_info)>
+
+Verify callback_info PMC then continue with callback_CD
+
+=cut
+
+*/
+
+static void callback_CD(Parrot_Interp, void *, PMC *callback_info);
+
+static void
+verify_CD(void *external_data, PMC *callback_info)
+{
+    Parrot_Interp interpreter = NULL;
+    size_t i;
+
+    /*
+     * 1.) callback_info is from external code so:
+     *     verify that we get a PMC that is one that we have passed in
+     *     as user data, when we prepared the callback
+     */
+
+    /* a NULL pointer or a pointer not aligned is very likely wrong */
+    if (!callback_info || ((UINTVAL)callback_info & 3))
+        PANIC("callback_info doesn't look like a pointer");
+
+    /*
+     * we don't have an interpreter yet, where this PMC might be
+     * located so run through interpreters and check their PMC pools
+     */
+    LOCK(interpreter_array_mutex);
+    for (i = 0; i < n_interpreters; ++i) {
+        if (interpreter_array[i] == NULL)
+            continue;
+        interpreter = interpreter_array[i];
+        if (interpreter)
+            if (contained_in_pool(interpreter,
+                        interpreter->arena_base->pmc_pool, callback_info))
+                break;
+    }
+    UNLOCK(interpreter_array_mutex);
+    if (!interpreter)
+        PANIC("interpreter not found for callback");
+
+    /*
+     * now we should have the interpreter where that callback
+     * did originate - do some further checks on the PMC
+     */
+
+    /* if that doesn't look like a PMC we are still lost */
+    if (!PObj_is_PMC_TEST(callback_info))
+        PANIC("callback_info isn't a PMC");
+
+    /*
+     * 2) some more checks: callback info is a Sub PMC
+     *    we have passed a Sub PMC as user_data so check that
+     */
+    if (!callback_info->vtable)
+        PANIC("callback_info hasn't a vtable");
+    if (callback_info->vtable->base_type != enum_class_Sub)
+        PANIC("callback_info isn't a Sub PMC");
+    /*
+     * ok fine till here
+     */
+    callback_CD(interpreter, external_data, callback_info);
+}
+
+/*
+
+=item C<static void
+callback_CD(Parrot_Interp, void *external_data, PMC *callback_info)>
+
+Common callback function handler s. pdd16
+
+=cut
+
+*/
+
+static void
+callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
+{
+
+    PMC *passed_interp;         /* the interp that originated the CB */
+    PMC *user_data;             /* user really intended to get that back */
+    int async = 1;              /* cb is hitting this sub somewhen inmidst */
+    /*
+     * 3) extract user_data, func signature, check interpreter ...
+     */
+    passed_interp = VTABLE_getprop(interpreter, callback_info,
+            string_from_cstring(interpreter, "_interpreter", 0));
+    if (PMC_data(passed_interp) != interpreter)
+        PANIC("callback gone to wrong interpreter");
+    user_data = VTABLE_getprop(interpreter, callback_info,
+            string_from_cstring(interpreter, "_user_data", 0));
+    /*
+     * 4) check if the call_back is synchronous:
+     *    - if yes we are inside the NCI call
+     *      we could run the Sub immediately now (I think)
+     *    - if no, and that's always safe, post a CALLBACK_EVENT
+     */
+
+    if (async) {
+        /*
+         * create a CB_EVENT, put Sub and data inside and finito
+         *
+         * *if* this function is finally no void, i.e. the calling
+         * C program awaits a return result from the callback,
+         * then wait for the CB_EVENT_xx to finish and return the
+         * result
+         */
+        Parrot_new_cb_event(interpreter, callback_info,
+                user_data, external_data);
+    }
+    else {
+        /*
+         * just call the sub
+         */
+    }
+}
+
+/*
+
+=item C<void Parrot_callback_C(void *external_data, PMC *callback_info)>
+
+=item C<void Parrot_callback_D(PMC *callback_info, void *external_data)>
+
+NCI callback functions s. ppd16
+
+=cut
+
+*/
+
+void
+Parrot_callback_C(void *external_data, PMC *callback_info)
+{
+    verify_CD(external_data, callback_info);
+}
+
+void
+Parrot_callback_D(PMC *callback_info, void *external_data)
+{
+    verify_CD(external_data, callback_info);
 }
 
 /*

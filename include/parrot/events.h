@@ -22,6 +22,7 @@ typedef enum {
     EVENT_TYPE_MSG,
     EVENT_TYPE_ASYNC_IO,
     EVENT_TYPE_TIMER,
+    EVENT_TYPE_CALL_BACK,
     EVENT_TYPE_SLEEP,
     EVENT_TYPE_TERMINATE,
     EVENT_TYPE_EVENT_TERMINATE,
@@ -40,14 +41,21 @@ typedef struct {
 } parrot_timer_event;
 
 typedef struct {
+    PMC*                        sub;
+    PMC*                        user_data;
+    void*                       external_data;
+} _call_back_info;
+
+typedef struct {
     parrot_event_type_enum      type;
     Parrot_Interp               interp;
-    event_func_t                event_func;
+    /* event_func_t                event_func; unused */
     void*                       data;
     union {
         STRING*                 msg;            /* for testing only */
         int                     signal;         /* for EVENT_TYPE_SIGNAL */
         parrot_timer_event      timer_event;    /* for EVENT_TYPE_TIMER */
+        _call_back_info         call_back;      /* CALL_BACKs */
     } u;
 } parrot_event;
 
@@ -70,6 +78,8 @@ void Parrot_del_timer_event(Parrot_Interp, PMC* timer);
 void Parrot_new_terminate_event(Parrot_Interp);
 void disable_event_checking(Parrot_Interp);
 void enable_event_checking(Parrot_Interp);
+
+void Parrot_new_cb_event(Parrot_Interp, PMC*sub, PMC*user, void*ext);
 
 void Parrot_kill_event_loop(void);
 void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);

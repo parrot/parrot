@@ -301,6 +301,7 @@ Parrot_schedule_event(Parrot_Interp interpreter, parrot_event* ev)
             entry->type = QUEUE_ENTRY_TYPE_TIMED_EVENT;
             insert_entry(event_queue, entry);
             break;
+        case EVENT_TYPE_CALL_BACK:
         case EVENT_TYPE_SIGNAL:
             entry->type = QUEUE_ENTRY_TYPE_EVENT;
             unshift_entry(event_queue, entry);
@@ -360,6 +361,28 @@ Parrot_new_timer_event(Parrot_Interp interpreter, PMC* timer, FLOATVAL diff,
     if (repeat && !interval)
         ev->u.timer_event.interval = diff;
     ev->u.timer_event.sub = sub;
+    Parrot_schedule_event(interpreter, ev);
+}
+
+/*
+
+=item C<void
+Parrot_new_cb_event(Parrot_Interp, PMC*sub, PMC*user, void*ext)>
+
+Prepare and schedul a callback event
+
+=cut
+
+*/
+
+void
+Parrot_new_cb_event(Parrot_Interp interpreter, PMC* sub, PMC* user, void* ext)
+{
+    parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    ev->type = EVENT_TYPE_CALL_BACK;
+    ev->u.call_back.sub = sub;
+    ev->u.call_back.user_data = user;
+    ev->u.call_back.external_data = ext;
     Parrot_schedule_event(interpreter, ev);
 }
 
@@ -453,6 +476,7 @@ Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
     /*
      * sleep checks events when it awakes
      */
+    edebug((stderr, "got entry - schedule_inter_qentry %d\n", event->type));
     if (event->type != EVENT_TYPE_SLEEP)
         enable_event_checking(interpreter);
     /*
@@ -463,6 +487,7 @@ Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
      * in front or at the end of the queue
      */
     switch (event->type) {
+        case EVENT_TYPE_CALL_BACK:
         case EVENT_TYPE_SIGNAL:
             unshift_entry(interpreter->task_queue, entry);
             break;
@@ -1015,6 +1040,13 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             /* run ops, save registers */
             Parrot_runops_fromc_save(interpreter,
                     event->u.timer_event.sub);
+            break;
+        case EVENT_TYPE_CALL_BACK:
+            edebug((stderr, "starting user cb\n"));
+            Parrot_runops_fromc_args(interpreter, event->u.call_back.sub,
+                    "PP",
+                    event->u.call_back.user_data,
+                    event->u.call_back.external_data);
             break;
         case EVENT_TYPE_SLEEP:
             break;
