@@ -24,7 +24,7 @@ sub new
     TOKEN => $token,
     CODE  => 'N',
     NAME  => 'num',
-    IMCC  => 'float'
+    IMCC  => 'num'
   }, $class;
 }
 
