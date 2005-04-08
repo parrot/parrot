@@ -17,6 +17,7 @@ Tests the Foo PMC.
 =cut
 
 use Parrot::Test tests => 2;
+use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer");
 
@@ -32,6 +33,8 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer");
 CODE
 42
 OUTPUT
+
+SKIP: { skip("No BigInt Lib configured", 1) if !$PConfig{gmp};
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "inherited add");
 .sub _main @MAIN
@@ -55,3 +58,5 @@ ok
 134217730
 BigInt
 OUTPUT
+
+}
