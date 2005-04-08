@@ -136,12 +136,12 @@ inline op add(inout NUM, in NUM) :base_core {
 }
 
 inline op add(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_ADD_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_ADD);
   goto NEXT();
 }
 
 inline op add(in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_ADD_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_ADD);
   goto NEXT();
 }
 
@@ -161,12 +161,12 @@ inline op add(out NUM, in NUM, in NUM) :base_core {
 }
 
 inline op add(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_ADD_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_ADD);
   goto NEXT();
 }
 
 inline op add(in PMC, in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_ADD_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_ADD);
   goto NEXT();
 }
 
@@ -231,12 +231,12 @@ inline op cmod(in PMC, in PMC, in PMC) :base_core {
 }
 
 inline op cmod(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_CMOD_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_CMOD);
   goto NEXT();
 }
 
 inline op cmod(in PMC, in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_CMOD_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_CMOD);
   goto NEXT();
 }
 
@@ -381,12 +381,12 @@ inline op div (in PMC, in PMC) :base_core {
 }
 
 inline op div (in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_DIVIDE_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_DIVIDE);
   goto NEXT();
 }
 
 inline op div (in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_DIVIDE_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_DIVIDE);
   goto NEXT();
 }
 
@@ -401,12 +401,12 @@ inline op div(out NUM, in NUM, in NUM) :base_core {
 }
 
 inline op div (in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_DIVIDE_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_DIVIDE);
   goto NEXT();
 }
 
 inline op div (in PMC, in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_DIVIDE_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_DIVIDE);
   goto NEXT();
 }
 
@@ -431,12 +431,12 @@ inline op fdiv (in PMC, in PMC) :base_core {
 }
 
 inline op fdiv (in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_FLOOR_DIVIDE_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_FLOOR_DIVIDE);
   goto NEXT();
 }
 
 inline op fdiv (in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_FLOOR_DIVIDE_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_FLOOR_DIVIDE);
   goto NEXT();
 }
 
@@ -451,12 +451,12 @@ inline op fdiv(out NUM, in NUM, in NUM) :base_core {
 }
 
 inline op fdiv (in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_FLOOR_DIVIDE_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_FLOOR_DIVIDE);
   goto NEXT();
 }
 
 inline op fdiv (in PMC, in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_FLOOR_DIVIDE_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_FLOOR_DIVIDE);
   goto NEXT();
 }
 
@@ -608,22 +608,22 @@ inline op mod (in PMC, in PMC) :base_core {
 }
 
 inline op mod(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_MOD_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_MOD);
   goto NEXT();
 }
 
 inline op mod(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_MOD_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_MOD);
   goto NEXT();
 }
 
 inline op mod(in PMC, in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_MOD_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_MOD);
   goto NEXT();
 }
 
 inline op mod(in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_MOD_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_MOD);
   goto NEXT();
 }
 
@@ -698,12 +698,12 @@ inline op mul(inout NUM, in NUM) :base_core {
 }
 
 inline op mul ( in PMC, in INT ) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_MULTIPLY_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_MULTIPLY);
   goto NEXT();
 }
 
 inline op mul ( in PMC, in NUM ) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_MULTIPLY_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_MULTIPLY);
   goto NEXT();
 }
 
@@ -723,12 +723,12 @@ inline op mul(out NUM, in NUM, in NUM) :base_core {
 }
 
 inline op mul (in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_MULTIPLY_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_MULTIPLY);
   goto NEXT();
 }
 
 inline op mul (in PMC, in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_MULTIPLY_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_MULTIPLY);
   goto NEXT();
 }
 
@@ -818,12 +818,12 @@ inline op pow(in PMC, in PMC, in PMC) :base_core {
 }
 
 inline op pow(in PMC, in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_POW_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_POW);
   goto NEXT();
 }
 
 inline op pow(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_POW_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_POW);
   goto NEXT();
 }
 
@@ -870,12 +870,12 @@ inline op sub(inout NUM, in NUM) :base_core {
 }
 
 inline op sub(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_SUBTRACT_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_SUBTRACT);
   goto NEXT();
 }
 
 inline op sub(in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_SUBTRACT_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_SUBTRACT);
   goto NEXT();
 }
 
@@ -895,12 +895,12 @@ inline op sub(out NUM, in NUM, in NUM) :base_core {
 }
 
 inline op sub(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_SUBTRACT_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_SUBTRACT);
   goto NEXT();
 }
 
 inline op sub(in PMC, in PMC, in NUM) :base_core {
-  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_SUBTRACT_FLOAT);
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_SUBTRACT);
   goto NEXT();
 }
 

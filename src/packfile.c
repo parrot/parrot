@@ -2875,7 +2875,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
                          struct PackFile_Constant *self,
                          opcode_t *cursor)>
 
-Unpack a constant PMC (currently Subs only).
+Unpack a constant PMC.
 
 =cut
 

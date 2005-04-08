@@ -37,7 +37,7 @@ void Parrot_mmd_register_table(Interp*, INTVAL, const MMD_init *, INTVAL);
 void Parrot_mmd_rebuild_table(Interp*, INTVAL class_enum, INTVAL func_nr);
 
 funcptr_t get_mmd_dispatch_type(Interp *interpreter,
-        INTVAL function, UINTVAL left_type, UINTVAL right_type, int *is_pmc);
+        INTVAL function, INTVAL left_type, INTVAL right_type, int *is_pmc);
 
 typedef struct _MMD_table {
     funcptr_t *mmd_funcs;     /* The functions for the MMD table */
@@ -45,14 +45,15 @@ typedef struct _MMD_table {
     UINTVAL y;               /* The y coord for each table */
     funcptr_t default_func;  /* The function we use if we can't find
                                  a function */
-    UINTVAL funcs_in_table;  /* How many functions are in the table
-                                 in question */
 } MMD_table;
 
 
 PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth, STRING *signature);
 PMC *Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *meth,
         STRING *signature);
+PMC *Parrot_MMD_search_default_infix(Interp *, STRING *meth,
+        INTVAL left_type, INTVAL right_type);
+
 /*
  * in src/objects.c :
  */

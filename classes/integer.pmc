@@ -416,7 +416,7 @@ two types.
         if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
-            overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
+            overflow(INTERP, SELF, b, dest, MMD_ADD);
     }
 
     void add (PMC* value, PMC* dest) {
@@ -442,7 +442,7 @@ MMD_Integer: {
         if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
-            overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
+            overflow(INTERP, SELF, b, dest, MMD_ADD);
     }
 MMD_Complex: {
         if (dest != SELF) {
@@ -493,7 +493,7 @@ MMD_Integer: {
         if ((c^a) >= 0 || (c^~b) >= 0)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
-            overflow(INTERP, SELF, b, dest, MMD_SUBTRACT_INT);
+            overflow(INTERP, SELF, b, dest, MMD_SUBTRACT);
     }
 MMD_Complex: {
         if (dest != SELF) {
@@ -542,7 +542,7 @@ Subtracts C<value> from the integer and returns the result in C<*dest>.
         if ((c^a) >= 0 || (c^~b) >= 0)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
-            overflow(INTERP, SELF, b, dest, MMD_SUBTRACT_INT);
+            overflow(INTERP, SELF, b, dest, MMD_SUBTRACT);
     }
 
 /*
@@ -556,14 +556,14 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
 */
     void multiply (PMC* value, PMC* dest) {
 MMD_Integer: {
-        INTVAL a = PMC_int_val(SELF);
-        INTVAL b = PMC_int_val(value);
+        INTVAL a = VTABLE_get_integer(INTERP, SELF);
+        INTVAL b = VTABLE_get_integer(INTERP, value);
         double cf = (double)a * (double)b;
         INTVAL c = a * b;
         if ((double) c == cf)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
-            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
+            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
     }
 MMD_BigInt:     {
         Parrot_BigInt_multiply_int(INTERP, value, PMC_int_val(SELF), dest);
@@ -576,7 +576,7 @@ MMD_String: {
         if ((double) c == cf)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
-            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
+            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
     }
 
 MMD_PerlUndef: {
@@ -603,7 +603,7 @@ Multiplies the integer by C<value> and returns the result in C<*dest>.
         VTABLE_set_integer_native(INTERP, dest, a);
         --b;
         for (i = 0; i < b; ++i) {
-            mmd_dispatch_v_pip(interpreter, dest, a, dest, MMD_MULTIPLY_INT);
+            mmd_dispatch_v_pip(interpreter, dest, a, dest, MMD_MULTIPLY);
         }
 
     }
@@ -624,7 +624,7 @@ Rise SELF to the C<value>th power.
         if ((double) c == cf)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
-            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
+            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
     }
 
 /*

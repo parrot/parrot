@@ -246,6 +246,9 @@ typedef enum {
 EOM
     for my $entry (@{$vtable}) {
 	next unless ($entry->[4] =~ /MMD_/);
+	next if ($entry->[4] =~ /_INT$/);
+	next if ($entry->[4] =~ /_STR$/);
+	next if ($entry->[4] =~ /_FLOAT$/);
 	$macros .= <<"EOM";
         $entry->[4],
 EOM
@@ -262,6 +265,9 @@ EOM
 
     for my $entry (@{$vtable}) {
 	next unless ($entry->[4] =~ /MMD_/);
+	next if ($entry->[4] =~ /_INT$/);
+	next if ($entry->[4] =~ /_STR$/);
+	next if ($entry->[4] =~ /_FLOAT$/);
 	$macros .= <<"EOM";
         \"__$entry->[1]\",
 EOM

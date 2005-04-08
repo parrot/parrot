@@ -98,6 +98,13 @@ make_type(Interp* interpreter, INTVAL class, STRING* name,
         item = VTABLE_get_pmc_keyed_str(interpreter, stash, key);
 
         if (item->vtable->base_type == enum_class_NCI) {
+            /* Parrots MMD system needs the origial NCI type
+             * make a clone of it
+             */
+            if (string_ord(interpreter, key, key->strlen - 1) != '_') {
+                /* convert __add__ keep __add */
+                item = VTABLE_clone(interpreter, item);
+            }
             nameprop = pmc_new(interpreter, PyBuiltin_PyString);
             VTABLE_set_string_native(interpreter, nameprop, key);
             VTABLE_setprop(interpreter, item, PyString_name, nameprop);

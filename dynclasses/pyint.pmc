@@ -176,7 +176,7 @@ MMD_PyInt: {
             if ((c^a) >= 0 || (c^b) >= 0)
                 VTABLE_set_integer_native(INTERP, dest, c);
             else
-                overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
+                overflow(INTERP, SELF, b, dest, MMD_ADD);
             }
 MMD_PyFloat: {
             INTVAL pmci = PMC_int_val(SELF);
@@ -217,7 +217,7 @@ Adds C<b> to the integer and returns the result in C<*dest>.
         if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
-            overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
+            overflow(INTERP, SELF, b, dest, MMD_ADD);
     }
 
 /*
@@ -548,7 +548,7 @@ Divides the integer by the C<*value> returns the result in C<*dest>.
 
     void floor_divide_int (INTVAL value, PMC* dest) {
 MMD_DEFAULT: {
-            mmd_dispatch_v_pip(INTERP, SELF, value, dest, MMD_DIVIDE_INT);
+            mmd_dispatch_v_pip(INTERP, SELF, value, dest, MMD_DIVIDE);
         }
     }
 
@@ -662,7 +662,7 @@ Create a new integer
                 VTABLE_morph(INTERP, ret, PyBuiltin_PyLong);
                 VTABLE_set_string_keyed_int(INTERP, ret, key,
                     VTABLE_get_string(INTERP, source));
-                mmd_dispatch_v_pip(INTERP, ret, 1, ret, MMD_DIVIDE_INT);
+                mmd_dispatch_v_pip(INTERP, ret, 1, ret, MMD_DIVIDE);
             }
             else {
                 INTVAL ivalue = VTABLE_get_integer(INTERP, source);
@@ -796,7 +796,7 @@ MMD_PyInt: {
             if ((double) c == cf)
                 VTABLE_set_integer_native(INTERP, dest, c);
             else
-                overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
+                overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
         }
 MMD_PyLong: {
             promote(INTERP, SELF, value, dest, MMD_MULTIPLY);
@@ -826,7 +826,7 @@ Multiplies C<*value> with the integer and returns the result in C<*dest>.
         if ((double) c == cf)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
-            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
+            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
     }
 
 /*
@@ -859,11 +859,11 @@ Raises C<SELF> to the power of C<*value> and returns the result.
     void pow (PMC *value, PMC *dest) {
 MMD_PyInt: {
             INTVAL vali = VTABLE_get_integer(INTERP, value);
-            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_POW_INT);
+            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_POW);
         }
 MMD_PyFloat: {
             FLOATVAL valf = VTABLE_get_number(INTERP, value);
-            mmd_dispatch_v_pnp(INTERP, SELF, valf, dest, MMD_POW_FLOAT);
+            mmd_dispatch_v_pnp(INTERP, SELF, valf, dest, MMD_POW);
         }
     }
 
@@ -895,15 +895,15 @@ Raises C<SELF> to the power of C<*value> and returns the result.
 
     void pow_int (INTVAL value, PMC *dest) {
         if (value < 0)
-            mmd_dispatch_v_pnp(INTERP, SELF, 
-                (FLOATVAL)value, dest, MMD_POW_FLOAT);
+            mmd_dispatch_v_pnp(INTERP, SELF,
+                (FLOATVAL)value, dest, MMD_POW);
         else {
             int i;
             INTVAL pmci = PMC_int_val(SELF);
             VTABLE_morph(INTERP, dest, PyBuiltin_PyInt);
             PMC_int_val(dest) = 1;
             for (i=1; i<=value; i++) {
-                mmd_dispatch_v_pip(INTERP, dest, pmci, dest, MMD_MULTIPLY_INT);
+                mmd_dispatch_v_pip(INTERP, dest, pmci, dest, MMD_MULTIPLY);
             }
         }
     }

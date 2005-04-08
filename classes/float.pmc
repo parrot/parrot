@@ -573,6 +573,15 @@ MMD_DEFAULT: {
         }
     }
 
+    INTVAL is_equal_num (PMC* value) {
+MMD_Float: {
+        return (INTVAL)(PMC_num_val(SELF) == PMC_num_val(value));
+        }
+MMD_DEFAULT: {
+        return (INTVAL)(PMC_num_val(SELF) == VTABLE_get_number(INTERP, value));
+        }
+    }
+
 /*
 
 =item C<INTVAL cmp(PMC* value)>

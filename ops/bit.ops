@@ -45,7 +45,7 @@ inline op band(inout INT, in INT) :base_core {
 }
 
 inline op band(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BAND_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BAND);
   goto NEXT();
 }
 
@@ -60,7 +60,7 @@ inline op band(out INT, in INT, in INT) :base_core {
 }
 
 inline op band(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BAND_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BAND);
   goto NEXT();
 }
 
@@ -93,7 +93,7 @@ inline op bands(inout STR, in STR) :base_core {
 }
 
 inline op bands(in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $1, $2, $1, MMD_SAND_STR);
+  mmd_dispatch_v_psp(interpreter, $1, $2, $1, MMD_SAND);
   goto NEXT();
 }
 
@@ -108,7 +108,7 @@ inline op bands(out STR, in STR, in STR) :base_core {
 }
 
 inline op bands(in PMC, in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $2, $3, $1, MMD_SAND_STR);
+  mmd_dispatch_v_psp(interpreter, $2, $3, $1, MMD_SAND);
   goto NEXT();
 }
 
@@ -181,7 +181,7 @@ inline op bor(inout INT, in INT) :base_core {
 }
 
 inline op bor(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BOR_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BOR);
   goto NEXT();
 }
 
@@ -196,7 +196,7 @@ inline op bor(out INT, in INT, in INT) :base_core {
 }
 
 inline op bor(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BOR_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BOR);
   goto NEXT();
 }
 
@@ -229,7 +229,7 @@ inline op bors(inout STR, in STR) :base_core {
 }
 
 inline op bors(in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $1, $2, $1, MMD_SOR_STR);
+  mmd_dispatch_v_psp(interpreter, $1, $2, $1, MMD_SOR);
   goto NEXT();
 }
 
@@ -244,7 +244,7 @@ inline op bors(out STR, in STR, in STR) :base_core {
 }
 
 inline op bors(in PMC, in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $2, $3, $1, MMD_SOR_STR);
+  mmd_dispatch_v_psp(interpreter, $2, $3, $1, MMD_SOR);
   goto NEXT();
 }
 
@@ -283,7 +283,7 @@ inline op shl(in PMC, in PMC) :base_core {
 }
 
 inline op shl(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BSL_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BSL);
   goto NEXT();
 }
 
@@ -298,7 +298,7 @@ inline op shl(in PMC, in PMC, in PMC) :base_core {
 }
 
 inline op shl(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BSL_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BSL);
   goto NEXT();
 }
 
@@ -333,7 +333,7 @@ inline op shr(in PMC, in PMC) :base_core {
 }
 
 inline op shr(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BSR_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BSR);
   goto NEXT();
 }
 
@@ -348,7 +348,7 @@ inline op shr(in PMC, in PMC, in PMC) :base_core {
 }
 
 inline op shr(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BSR_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BSR);
   goto NEXT();
 }
 
@@ -399,7 +399,7 @@ inline op bxor(inout INT, in INT) :base_core {
 }
 
 inline op bxor(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BXOR_INT);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BXOR);
   goto NEXT();
 }
 
@@ -414,7 +414,7 @@ inline op bxor(out INT, in INT, in INT) :base_core {
 }
 
 inline op bxor(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BXOR_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BXOR);
   goto NEXT();
 }
 

@@ -464,6 +464,9 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
     PMC *class, *mro;
 
     vtable = Parrot_base_vtables[type];
+    /* multithreaded: has already mro */
+    if (vtable->mro)
+        return;
     mro = pmc_new(interpreter, enum_class_ResizablePMCArray);
     vtable->mro = mro;
     class_name = vtable->whoami;

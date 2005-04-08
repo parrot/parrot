@@ -759,13 +759,15 @@ sub init_func() {
             $meth_name = "Parrot_${class}_$meth";
         }
         else {
+            $defaulted = 1;
             $meth_name = "Parrot_default_$meth";
         }
         # normal vtable method}
         unless ($method->{mmd} =~ /MMD_/) {
             push @meths, $meth_name;
         }
-        $defaulted = 1 if $meth_name =~ /_default_/;
+        $defaulted = 1 if $meth_name =~ /_default/;
+        $defaulted = 1 if $meth_name =~ /_delegate/;
         $defaulted = 1 if $class =~ /^[A-Z]/;
         # MMD method
         if ($method->{mmd} =~ /MMD_/ && !$defaulted) {
@@ -775,12 +777,13 @@ sub init_func() {
             # which is passed in entry to class_init
             $left = 0;  # set to 'entry' below in initialization loop.
             $right = 'enum_type_PMC';
-            $right = 'enum_type_INTVAL'   if ($func =~ /_INT$/);
-            $right = 'enum_type_FLOATVAL' if ($func =~ /_FLOAT$/);
+            $right = 'enum_type_INTVAL'   if ($func =~ s/_INT$//);
+            $right = 'enum_type_FLOATVAL' if ($func =~ s/_FLOAT$//);
+            $right = 'enum_type_STRING'   if ($func =~ s/_STR$//);
             push @mmds, [ $func, $left, $right, $meth_name ];
             foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
                 if ($self->pmc_is_dynpmc($variant->[0])) {
-                    $right = 'enum_class_default';
+                    $right = 0;
                     push @init_mmds, [$#mmds + 1, $variant->[0]];
                     $init_mmds{$variant->[0]} = 1;
                 }
@@ -1043,7 +1046,7 @@ EOH
 
 =item C<implements($method)>
 
-True if this class generates code for VTABLE method C<$method>.
+True if this class generates code for the method C<$method>.
 
 =cut
 
@@ -1054,6 +1057,21 @@ sub implements
     return 0 unless exists $self->{has_method}{$meth};
     my $n = $self->{has_method}{$meth};
     return $self->{methods}[$n]{'loc'} ne 'nci';
+}
+
+
+=item C<implements_vtable($method)>
+
+True if this class generates code for VTABLE method C<$method>.
+
+=cut
+
+sub implements_vtable
+{
+    my ($self, $meth) = @_;
+    return 1 if exists $self->{has_method}{$meth};
+    my $n = $self->{vtable}{has_method}{$meth};
+    return $self->{vtable}{methods}[$n]{mmd} =~ /MMD/ ? 0 : 1;
 }
 
 =back
@@ -1160,13 +1178,14 @@ import Parrot::Pmc2c qw( gen_ret );
 
 =item C<implements($method)>
 
-Always true.
+Always true for vtables.
 
 =cut
 
 sub implements
 {
-    return 1;
+    my ($self, $meth) = @_;
+    $self->implements_vtable($meth);
 }
 
 =item C<body($method, $line, $out_name)>
@@ -1225,13 +1244,14 @@ use base 'Parrot::Pmc2c';
 
 =item C<implements($method)>
 
-Always true.
+Always true for vtables.
 
 =cut
 
 sub implements
 {
-    1;
+    my ($self, $meth) = @_;
+    $self->implements_vtable($meth);
 }
 
 =item C<gen_ret($type)>
@@ -1375,13 +1395,15 @@ import Parrot::Pmc2c qw( gen_ret );
 
 =item C<implements($method)>
 
-Always true.
+True for vtable methods.
 
 =cut
 
 sub implements
 {
-    return 1;
+
+    my ($self, $meth) = @_;
+    $self->implements_vtable($meth);
 }
 
 =item C<body($method, $line, $out_name)>
@@ -1432,13 +1454,14 @@ use base 'Parrot::Pmc2c';
 
 =item C<implements($method)>
 
-Always true.
+True for vtables.
 
 =cut
 
 sub implements
 {
-    return 1;
+    my ($self, $meth) = @_;
+    $self->implements_vtable($meth);
 }
 
 =item C<trans($type)>
@@ -1554,13 +1577,14 @@ import Parrot::Pmc2c qw( gen_ret );
 
 =item C<implements($method)>
 
-Always true.
+Always true for vtables.
 
 =cut
 
 sub implements
 {
-    return 1;
+    my ($self, $meth) = @_;
+    $self->implements_vtable($meth);
 }
 
 =item C<body($method, $line, $out_name)>

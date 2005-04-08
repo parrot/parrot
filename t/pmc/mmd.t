@@ -269,9 +269,10 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL");
 .include "pmctypes.pasm"
+.include "datatypes.pasm"
 .include "mmd.pasm"
     find_global P10, "Integer_bxor_Intval"
-    mmdvtregister .MMD_BXOR_INT, .Integer, 0, P10
+    mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
     new P0, .Integer
     new P1, .Integer

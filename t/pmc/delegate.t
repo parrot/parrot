@@ -16,7 +16,7 @@ Tests method delegation.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 9;
 use Test::More;
 
 # basic functionality - setting and getting types
@@ -122,7 +122,8 @@ CODE
 OUTPUT
 
 # math
-output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
+pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
+.sub main
     new P0, .delegate
     set P0, 1
     new P2, .PerlInt
@@ -130,18 +131,24 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
     print P2	# yeah 1+1 = 3
     print "\n"
     end
+.end
 .namespace ["delegate"]
-.pcc_sub __set_integer_native:
+.sub __set_integer_native
     # cant keep state yet
     # just return
     print I5
     print "\n"
     returncc
-.pcc_sub __add_int:
+.end
+.sub __add @MULTI(pmc, int)
+    .param pmc l
+    .param int r
+    .param pmc d
     print I5
     print "\n"
-    set P5, 3
-    returncc
+    d =  3
+    .return(d)
+.end
 CODE
 1
 1
@@ -149,7 +156,8 @@ CODE
 OUTPUT
 
 # math
-output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
+pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
+.sub main
     new P0, .delegate
     set P0, 1
     new P1, .PerlInt
@@ -160,28 +168,31 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
     print P2	# yeah 1+1 = 3
     print "\n"
     end
+.end
 .namespace ["delegate"]
-.pcc_sub __set_integer_native:
+.sub __set_integer_native
     # cant keep state yet
     # just print arg and return
     print I5
     print "\n"
-    returncc
-.pcc_sub __add:
+.end
+.sub __add @MULTI(delegate, pmc)
+    .param pmc l
+    .param pmc r
+    .param pmc d
     print "in __add\n"
-.include "interpinfo.pasm"
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    print P2	# self - this triggers __get_string
+    print l
     print "\n"
-    print P5	# value
+    print r
     print "\n"
-    print P6	# dest
+    print d
     print "\n"
-    set P6, 3
-    returncc
-.pcc_sub __get_string:
-    set S5, "one"
-    returncc
+    d = 3
+    .return (d)
+.end
+.sub __get_string
+    .return("one")
+.end
 CODE
 1
 in __add
@@ -191,51 +202,3 @@ one
 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p - clobber regs");
-    set S5, "ok\n"
-    new P0, .delegate
-    set P0, 1
-    new P1, .PerlInt
-    set P1, 1
-    new P2, .PerlInt
-    set P2, 777
-    add P2, P0, P1
-    print P2	# yeah 1+1 = 3
-    print "\n"
-    print S5
-    end
-.namespace ["delegate"]
-.pcc_sub __set_integer_native:
-    # cant keep state yet
-    # just print arg and return
-    print I5
-    print "\n"
-    returncc
-.pcc_sub __add:
-    print "in __add\n"
-.include "interpinfo.pasm"
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    print P2	# self - this triggers __get_string
-    print "\n"
-    print P5	# value
-    print "\n"
-    print P6	# dest
-    print "\n"
-    set P6, 3
-    set S5, "nok"
-    returncc
-.pcc_sub __get_string:
-    set S5, "one"
-    null P2	# clobber registers these must be restored
-    null P5
-    null P6
-    returncc
-CODE
-1
-in __add
-one
-1
-777
-3
-ok
-OUTPUT

@@ -115,7 +115,7 @@ inline op concat (in PMC, in PMC, in PMC) :base_mem {
 }
 
 inline op concat (in PMC, in PMC, in STR) :base_mem {
-  mmd_dispatch_v_psp(interpreter, $2, $3, $1, MMD_CONCAT_STR);
+  mmd_dispatch_v_psp(interpreter, $2, $3, $1, MMD_CONCAT);
   goto NEXT();
 }
 #######################################
@@ -144,7 +144,7 @@ inline op repeat (in PMC, in PMC, in PMC) :base_mem {
 }
 
 inline op repeat (in PMC, in PMC, in INT) :base_mem {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_REPEAT_INT);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_REPEAT);
   goto NEXT();
 }
 

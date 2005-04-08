@@ -96,7 +96,7 @@ Add C<*value> to the integer and returns the result in C<*dest>.
     void add (PMC* value, PMC* dest) {
 MMD_PyInt: {
             INTVAL vali = VTABLE_get_integer(INTERP, value);
-            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_ADD_INT);
+            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_ADD);
         }
     }
 
@@ -165,7 +165,7 @@ Multiplies C<*value> with the integer and returns the result in C<*dest>.
     void multiply (PMC* value, PMC* dest) {
 MMD_PyInt: {
             INTVAL vali = VTABLE_get_integer(INTERP, value);
-            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_MULTIPLY_INT);
+            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_MULTIPLY);
         }
     }
 

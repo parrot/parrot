@@ -102,43 +102,51 @@ dump_mmd(Interp *interpreter, INTVAL function)
 
 
 funcptr_t
-get_mmd_dispatch_type(Interp *interpreter, INTVAL function, UINTVAL left_type,
-        UINTVAL right_type, int *is_pmc)
+get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,
+        INTVAL right_type, int *is_pmc)
 {
     funcptr_t func;
     UINTVAL offset, x_funcs, y_funcs;
-    MMD_table *table = interpreter->binop_mmd_funcs + function;
+    INTVAL r;
+    MMD_table *table = interpreter->binop_mmd_funcs + func_nr;
     x_funcs = table->x;
     y_funcs = table->y;
 
-    /*
-     * XXX quick hack for delegates
-     *     and something is broken with the tables
-     *     w/o the compare for equal types, mmd_fallback jumps in
-     *     This just depends on *other* PMCs that use MMD
-     */
-    /* XXX do this in table setup */
-    if (left_type == enum_class_delegate)
-        right_type = 0;
-    if (left_type < x_funcs) {
-        if (right_type < y_funcs) {
+    func = NULL;
+    assert(left_type >= 0);
+    assert(right_type >=0 ||
+            (right_type >= enum_type_INTVAL && right_type <= enum_type_PMC));
+    r = right_type;
+    if (right_type < 0)
+        right_type -= enum_type_INTVAL;
+    else
+        right_type += 4;
+    if ((UINTVAL)left_type < x_funcs && (UINTVAL)right_type < y_funcs) {
             offset = x_funcs * right_type + left_type;
             func = table->mmd_funcs[offset];
-            /* XXX do this in table setup */
-            if (func == table->default_func)
-                func = table->mmd_funcs[left_type];
+    }
+    if (!func) {
+        const char *meth_c = Parrot_MMD_methode_name(interpreter, func_nr);
+        STRING *meth_s = const_string(interpreter, meth_c);
+        PMC *method = Parrot_MMD_search_default_infix(interpreter,
+                meth_s, left_type, r);
+        if (!method)
+            real_exception(interpreter, 0, 1, "MMD function %s not found"
+                    "for types (%d, %d)", meth_c, left_type, r);
+        if (method->vtable->base_type == enum_class_NCI) {
+            /* C function is at struct_val */
+            func = D2FPTR(PMC_struct_val(method));
+            *is_pmc = 0;
+            mmd_register(interpreter, func_nr, left_type, r,
+                    PMC_struct_val(method));
         }
         else {
-            func = table->mmd_funcs[left_type];
+            *is_pmc = 1;
+            func = D2FPTR(method);
+            mmd_register_sub(interpreter, func_nr, left_type, r, method);
         }
-    } else {
-        func = table->default_func;
+        return func;
     }
-    /*
-     * empty slots are filled with the default function, so we really
-     * shouldn't have a NULL function pointer
-     */
-    assert(func);
 #ifdef PARROT_HAS_ALIGNED_FUNCPTR
     if ((UINTVAL)func & 1) {
         *is_pmc = 1;
@@ -246,7 +254,7 @@ mmd_dispatch_v_pip(Interp *interpreter,
 
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_pip)get_mmd_dispatch_type(interpreter,
-            function, left_type, 0, &is_pmc);
+            function, left_type, enum_type_INTVAL, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interpreter, sub, "vPIP",
@@ -268,7 +276,7 @@ mmd_dispatch_v_pnp(Interp *interpreter,
 
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_pnp)get_mmd_dispatch_type(interpreter,
-            function, left_type, 0, &is_pmc);
+            function, left_type, enum_type_FLOATVAL, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interpreter, sub, "vPNP",
@@ -290,7 +298,7 @@ mmd_dispatch_v_psp(Interp *interpreter,
 
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_psp)get_mmd_dispatch_type(interpreter,
-            function, left_type, 0, &is_pmc);
+            function, left_type, enum_type_STRING, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interpreter, sub, "vPSP",
@@ -399,7 +407,6 @@ mmd_expand_x(Interp *interpreter, INTVAL function, INTVAL new_x)
     funcptr_t *new_table;
     UINTVAL x;
     UINTVAL y;
-    funcptr_t default_func;
     UINTVAL i;
     MMD_table *table = interpreter->binop_mmd_funcs + function;
     char *src_ptr, *dest_ptr;
@@ -417,13 +424,12 @@ mmd_expand_x(Interp *interpreter, INTVAL function, INTVAL new_x)
 
     x = table->x;
     y = table->y;
-    default_func = table->default_func;
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
     new_table = mem_sys_allocate(sizeof(funcptr_t) * y * new_x);
     for (i = 0; i < y * new_x; i++) {
-        new_table[i] = default_func;
+        new_table[i] = NULL;
     }
 
     /* Then copy the old table over. We have to do this row by row,
@@ -462,20 +468,18 @@ mmd_expand_y(Interp *interpreter, INTVAL function, INTVAL new_y)
     funcptr_t *new_table;
     UINTVAL x;
     UINTVAL y;
-    funcptr_t default_func;
     UINTVAL i;
     MMD_table *table = interpreter->binop_mmd_funcs + function;
 
     x = table->x;
     assert(x);
     y = table->y;
-    default_func = table->default_func;
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
     new_table = mem_sys_allocate(sizeof(funcptr_t) * x * new_y);
     for (i = 0; i < x * new_y; i++) {
-        new_table[i] = default_func;
+        new_table[i] = NULL;
     }
 
     /* Then copy the old table over, if it existed in the first place. */
@@ -584,6 +588,13 @@ mmd_register(Interp *interpreter,
     MMD_table *table;
 
     assert(function < (INTVAL)interpreter->n_binop_mmd_funcs);
+    assert(left_type >= 0);
+    assert(right_type >=0 ||
+            (right_type >= enum_type_INTVAL && right_type <= enum_type_PMC));
+    if (right_type < 0)
+        right_type -= enum_type_INTVAL;
+    else
+        right_type += 4;
     table = interpreter->binop_mmd_funcs + function;
     if ((INTVAL)table->x <= left_type) {
         mmd_expand_x(interpreter, function, left_type + 1);
@@ -605,9 +616,6 @@ mmd_register_sub(Interp *interpreter,
 {
     PMC *fake = (PMC*)((UINTVAL) sub | 1);
     mmd_register(interpreter, func_nr, left_type, right_type, D2FPTR(fake));
-
-    mmd_create_builtin_multi_meth_2(interpreter,
-            func_nr, left_type, right_type, D2FPTR(sub));
 }
 
 /*
@@ -735,6 +743,20 @@ Parrot_MMD_search_default_func(Interp *interpreter, STRING *meth,
      */
     return mmd_search_default(interpreter, meth, arg_tuple);
 }
+
+PMC *
+Parrot_MMD_search_default_infix(Interp *interpreter, STRING *meth,
+        INTVAL left_type, INTVAL right_type)
+{
+    PMC* arg_tuple;
+
+    arg_tuple = pmc_new(interpreter, enum_class_FixedIntegerArray);
+    VTABLE_set_integer_native(interpreter, arg_tuple, 2);
+    VTABLE_set_integer_keyed_int(interpreter, arg_tuple, 0, left_type);
+    VTABLE_set_integer_keyed_int(interpreter, arg_tuple, 1, right_type);
+    return mmd_search_default(interpreter, meth, arg_tuple);
+}
+
 /*
 
 =item C<PMC* Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *signature)>
@@ -1074,7 +1096,7 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
         /* has to be a builtin multi method */
         multi_sig = PMC_pmc_val(pmc);
     }
-    else {
+    else if (pmc->vtable->base_type == enum_class_Sub) {
         multi_sig = PMC_sub(pmc)->multi_signature;
         if (!multi_sig) {
             /* some method */
@@ -1085,6 +1107,8 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
                 mmd_cvt_to_types(interpreter, multi_sig);
         }
     }
+    else
+        return MMD_BIG_DISTANCE;
     n = VTABLE_elements(interpreter, multi_sig);
     args = VTABLE_elements(interpreter, arg_tuple);
     /*
@@ -1355,7 +1379,7 @@ mmd_search_package(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
     PMC *name_space;
 
     current_sub = interpreter->ctx.current_sub;
-    if (!current_sub)
+    if (!current_sub || !VTABLE_defined(interpreter, current_sub))
         return 0;
     name_space = PMC_sub(current_sub)->name_space;
     if (!name_space)
@@ -1425,20 +1449,6 @@ mmd_create_builtin_multi_stub(Interp *interpreter, INTVAL func_nr)
     PMC *multi;
 
     name = Parrot_MMD_methode_name(interpreter, func_nr);
-    /*
-     * _int, _float, _str are just native variants of the base
-     * multi
-     */
-    len = strlen(name);
-    p = strstr(name, "_int");
-    if (p && (p - name) == len - 4)
-        return;
-    p = strstr(name, "_str");
-    if (p && (p - name) == len - 4)
-        return;
-    p = strstr(name, "_float");
-    if (p && (p - name) == len - 6)
-        return;
     ns = CONST_STRING(interpreter, "__parrot_core");
     s =  const_string(interpreter, name);
     /* create in constant pool */
@@ -1450,45 +1460,29 @@ static void
 mmd_create_builtin_multi_meth_2(Interp *interpreter,
         INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr)
 {
-    const char *name, *short_name;
+    const char *short_name;
     char signature[6], val_sig;
     STRING *meth_name, *ns, *_sub;
     int len;
     char *p;
     PMC *method, *multi, *class, *multi_sig;
 
-    if (type == enum_class_Null || type == enum_class_delegate ||
-            type == enum_class_Ref  || type == enum_class_SharedRef ||
-            type == enum_class_deleg_pmc || type == enum_class_ParrotClass ||
-            type == enum_class_ParrotObject) {
-        return;
-    }
-    name = short_name = Parrot_MMD_methode_name(interpreter, func_nr);
+    assert (type != enum_class_Null && type != enum_class_delegate &&
+            type != enum_class_Ref  && type != enum_class_SharedRef &&
+            type != enum_class_deleg_pmc && type != enum_class_ParrotClass &&
+            type != enum_class_ParrotObject);
+    short_name = Parrot_MMD_methode_name(interpreter, func_nr);
     /*
      * _int, _float, _str are just native variants of the base
      * multi
      */
     val_sig = 'P';
-    len = strlen(name);
-    p = strstr(name, "_int");
-    if (p && (p - name) == len - 4) {
-        short_name = Parrot_MMD_methode_name(interpreter, func_nr - 1);
+    if (right == enum_type_INTVAL)
         val_sig = 'I';
-    }
-    else {
-        p = strstr(name, "_str");
-        if (p && (p - name) == len - 4) {
-            short_name = Parrot_MMD_methode_name(interpreter, func_nr - 1);
-            val_sig = 'S';
-        }
-        else {
-            p = strstr(name, "_float");
-            if (p && (p - name) == len - 6) {
-                short_name = Parrot_MMD_methode_name(interpreter, func_nr - 2);
-                val_sig = 'N';
-            }
-        }
-    }
+    else if (right == enum_type_STRING)
+        val_sig = 'S';
+    else if (right == enum_type_FLOATVAL)
+        val_sig = 'N';
 
     /*
      * create NCI method in left class
@@ -1513,8 +1507,7 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter,
     else {
         _sub = CONST_STRING(interpreter, "Sub");
         /* multiple methods with that same name */
-        if (method->vtable->base_type == enum_class_NCI ||
-            VTABLE_isa(interpreter, method, _sub)) {
+        if (method->vtable->base_type == enum_class_NCI) {
             /* convert first to a multi */
             multi = constant_pmc_new(interpreter, enum_class_MultiSub);
             VTABLE_add_method(interpreter, class, meth_name, multi);
@@ -1598,86 +1591,13 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
      * register default mmds for this type
      */
     for (i = 0; i < n; ++i) {
-        if (mmd_table[i].right == enum_type_PMC) {
-            mmd_register(interpreter,
-                    mmd_table[i].func_nr, type,
-                    type, mmd_table[i].func_ptr);
-        }
+        mmd_register(interpreter,
+                mmd_table[i].func_nr, type,
+                mmd_table[i].right, mmd_table[i].func_ptr);
         mmd_create_builtin_multi_meth(interpreter, type, mmd_table + i);
     }
-    /*
-     * register specific mmds for this type
-     */
-    for (i = 0; i < n; ++i) {
-        INTVAL r = mmd_table[i].right < 0 ? 0 : mmd_table[i].right;
-        mmd_register(interpreter,
-                mmd_table[i].func_nr, type, r, mmd_table[i].func_ptr);
-    }
 }
 
-static void
-mmd_rebuild_1(Interp* interpreter, UINTVAL type, INTVAL func_nr)
-{
-    PMC *mro, *parent;
-    INTVAL c, nc;
-    UINTVAL offset, x_funcs, y_funcs, other, parent_type;
-    MMD_table *table;
-    funcptr_t func;
-
-    mro = Parrot_base_vtables[type]->mro;
-    nc = VTABLE_elements(interpreter, mro);
-
-    /*
-     * if class has no parents, nothing todo
-     */
-    if (nc <= 1)
-        return;
-    /*
-     * if the class doesn't provide func_nr, nothing can be
-     * inherited
-     */
-    table = interpreter->binop_mmd_funcs + func_nr;
-    x_funcs = table->x;
-    y_funcs = table->y;
-    /* preallocat slot, resize */
-    if (type >= x_funcs || type >= y_funcs)
-        mmd_register(interpreter, func_nr, type, type, table->default_func);
-    x_funcs = table->x;
-    y_funcs = table->y;
-    /*
-     * go through MRO and install functions
-     */
-    for (c = 1; c < nc; ++c) {
-        parent = VTABLE_get_pmc_keyed_int(interpreter, mro, c);
-        parent_type = parent->vtable->base_type;
-        if (parent_type >= type) {
-            /* XXX warning */
-            continue;
-        }
-        for (other = 0; other < type; ++other) {
-            /* (other, parent) */
-            offset = x_funcs * other + parent_type;
-            func = table->mmd_funcs[offset];
-            if (func != table->default_func) {
-                if (table->mmd_funcs[x_funcs * other + type] ==
-                        table->default_func) {
-                    if (other == parent_type)
-                        mmd_register(interpreter, func_nr, type, type, func);
-                    mmd_register(interpreter, func_nr, type, other, func);
-                }
-            }
-            /* now for (parent, other) */
-            offset = x_funcs * parent_type + other;
-            func = table->mmd_funcs[offset];
-            if (func == table->default_func)
-                continue;
-            if (table->mmd_funcs[x_funcs * type + other] ==
-                    table->default_func) {
-                mmd_register(interpreter, func_nr, other, type, func);
-            }
-        }
-    }
-}
 
 /*
 
@@ -1694,31 +1614,8 @@ negative all MMD functions are rebuilt.
 void
 Parrot_mmd_rebuild_table(Interp* interpreter, INTVAL type, INTVAL func_nr)
 {
-    INTVAL first_type, last_type, t;
-    INTVAL first_func, last_func, f;
-
-    if (type < 0) {
-        first_type = 1;
-        last_type = enum_class_max;
-    }
-    else {
-        first_type = type;
-        last_type = type + 1;
-    }
-    if (func_nr < 0) {
-        first_func = 0;
-        last_func = MMD_USER_FIRST;
-    }
-    else {
-        first_func = func_nr;
-        last_func = func_nr + 1;
-    }
-
-    for (f = first_func; f < last_func; ++f)
-        for (t = first_type; t < last_type; ++t) {
-            mmd_rebuild_1(interpreter, (UINTVAL)t, f);
-        }
-
+    /* TODO invalidate table */
+    return;
 }
 
 /*

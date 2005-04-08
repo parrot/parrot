@@ -1482,10 +1482,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
   k = new $I0
   i = 6
   j = 7
-  .local pmc add_sub
-  add_sub = find_global "MyInt", "__add"
-  .include "mmd.pasm"
-  mmdvtregister .MMD_ADD, $I0, $I0, add_sub
   k = i + j
   print k
   print "\n"
@@ -1497,7 +1493,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
 .end
 
 .namespace ["MyInt"]
-.sub __add
+.sub __add @MULTI(MyInt, MyInt)
    .param pmc self
    .param pmc right
    .param pmc dest
