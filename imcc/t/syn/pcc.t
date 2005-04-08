@@ -1202,7 +1202,7 @@ ok
 OUT
 
 SKIP: {
-  skip("cant do NCI on $^O", 1) unless ($^O =~ /linux/);
+  skip("cant do NCI on $^O", 1) unless ($^O =~ /linux/ || $^O =~ /darwin/);
 pir_output_is(<<'CODE', <<'OUT', "nci");
 .sub test @MAIN
     .sym pmc FABS
