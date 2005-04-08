@@ -154,20 +154,6 @@ if ( ! @{ $cfg{skip_bench} } ) {
     @{ $cfg{skip_bench} } = @regexes ? @regexes : '[^\d\D]';
 }
 
-# Move to the benchmark directory
-if ( defined $cfg{bench_path} ) {
-    chdir $cfg{bench_path} or die "Unable to cd to $cfg{bench_path}";
-}
-else {
-    chdir $FindBin::Bin or die "Unable to cd to directory of $0";
-    chdir File::Spec->catdir(
-        File::Spec->updir,
-        File::Spec->updir,
-        'examples',
-        'benchmarks'
-    ) or die "Unable to find the benchmark directory";
-}
-
 # Frequently Used Variables
 my %bench;
 my @section = sort $ini->GroupMembers( 'benchmark' );
@@ -197,7 +183,7 @@ find sub {
         next if ! $ext;
         $bench{ $name }{ $program[ $index ] } = $ext;
     }
-}, File::Spec->curdir();
+}, $cfg{bench_path};
 die "No benchmarks found" if ! keys %bench;
 
 # List Names Of Benchmarks With Pretty Output
@@ -227,7 +213,7 @@ if ( ! $cfg{use_times} && @program < 2 ) {
 }
 if ( $cfg{use_times} ) {
     my $type = $cfg{method} == 1 ? 'CPU' : 'wall-clock';
-    print "Times are in $type seconds.  (lower is better\n";
+    print "Times are in $type seconds.  (lower is better)\n";
 }
 else {
     print "Numbers are relative to the first one. (lower is better)\n";
@@ -253,7 +239,7 @@ for my $name ( sort keys %bench ) {
         if ( $bench{ $name }{ $prog } ) {
             my $start = $Get_Time{ $cfg{method} }->();
             system(
-                $ini->val($sect, 'exe') . " " . $name . $bench{$name}{$prog}
+                $ini->val($sect, 'exe') . " " . File::Spec->catdir( $cfg{bench_path}, $name . $bench{$name}{$prog})
             );
             my $stop = $Get_Time{ $cfg{method} }->();
             my $used = $stop - $start;
