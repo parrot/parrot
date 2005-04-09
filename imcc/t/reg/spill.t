@@ -635,8 +635,8 @@ sub repeat {
 }
     my $template2 = <<'TEMPLATE';
 .sub _main
-    new P3, .PerlInt
-    new P4, .PerlInt
+    new P3, .Integer
+    new P4, .Integer
     =LOCALS=
     =INITS=
     _sub(=ARGS=)
@@ -661,10 +661,10 @@ fail:
 TEMPLATE
 
 my $code = repeat($template2, 18,
-               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
                INITS => 'a<index> = <index>',
                ARGS => 'a<index>',
-               PARAMS => '.param PerlInt a<index>',
+               PARAMS => '.param Integer a<index>',
                TESTS => "set I0, a<index>\nne I0, <index>, fail",
                TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
 
@@ -673,10 +673,10 @@ all params ok
 OUT
 
 $code = repeat($template2, 22,
-               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
                INITS => 'a<index> = <index>',
                ARGS => 'a<index>',
-               PARAMS => '.param PerlInt a<index>',
+               PARAMS => '.param Integer a<index>',
                TESTS => "set I0, a<index>\nne I0, <index>, fail",
                TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
 
@@ -685,10 +685,10 @@ all params ok
 OUT
 
 $code = repeat($template2, 40,
-               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
                INITS => 'a<index> = <index>',
                ARGS => 'a<index>',
-               PARAMS => '.param PerlInt a<index>',
+               PARAMS => '.param Integer a<index>',
                TESTS => "set I0, a<index>\nne I0, <index>, fail",
                TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
 
@@ -697,10 +697,10 @@ all params ok
 OUT
 
 $code = repeat($template2, 60,
-               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
                INITS => 'a<index> = <index>',
                ARGS => 'a<index>',
-               PARAMS => '.param PerlInt a<index>',
+               PARAMS => '.param Integer a<index>',
                TESTS => "set I0, a<index>\nne I0, <index>, fail",
                TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
 

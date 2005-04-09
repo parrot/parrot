@@ -240,7 +240,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "non prototyped, P");
     .arg $P1
     .pcc_call sub
     ret:
-    .local PerlUndef k
+    .local Undef k
     .result k
     .pcc_end
     end
@@ -367,7 +367,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param"
     end
 .end
 .pcc_sub _sub
-    .param PerlUndef a
+    .param Undef a
     print a
     end
 .end

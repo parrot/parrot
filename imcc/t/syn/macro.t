@@ -147,7 +147,7 @@ pir_output_is( <<'CODE', <<OUTPUT, ".newid" );
     .sym .CLASS .ID
     .ID = new .CLASS
 .endm
-    .newid(var, PerlUndef)
+    .newid(var, Undef)
     var = 10
     print var
     print "\n"
@@ -164,7 +164,7 @@ pir_output_is( <<'CODE', <<OUTPUT, ".newlex" );
     .ID = new .CLASS
     # store_lex -1, .ID , .ID	# how to stringify .ID
 .endm
-    .newlex(var, PerlUndef)
+    .newlex(var, Undef)
     var = 10
     print var
     print "\n"

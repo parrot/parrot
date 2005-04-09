@@ -885,7 +885,7 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
     /* OP  _p_k    _p_k_p_k =>
      * set      py, p_k
      * set      pz,     p_k
-     * new px, .PerlUndef
+     * new px, .Undef
      * OP  px, py, pz
      * set _p_k_px
      */
@@ -944,7 +944,7 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
         }
     }
     /* make a new undef */
-    iNEW(interpreter, unit, preg[0], str_dup("PerlUndef"), NULL, 1);
+    iNEW(interpreter, unit, preg[0], str_dup("Undef"), NULL, 1);
     /* emit the operand */
     INS(interpreter, unit, name, 0, preg, 3, 0, 1);
     /* emit the LHS op */

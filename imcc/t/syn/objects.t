@@ -40,7 +40,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
     newclass class, "Foo"
     find_type $I0, "Foo"
     new obj, $I0
-    $P0 = new PerlString
+    $P0 = new String
     $P0 = "ok\n"
     obj._meth($P0)
     print "done\n"
@@ -66,7 +66,7 @@ pir_output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
     newclass class, "Foo"
     find_type $I0, "Foo"
     new obj, $I0
-    $P0 = new PerlString
+    $P0 = new String
     $P0 = "ok\n"
     $S0 = obj._meth($P0)
     print $S0

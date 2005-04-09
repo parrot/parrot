@@ -57,9 +57,9 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "new");
 .sub test @MAIN
-	$P1 = new PerlString
+	$P1 = new String
 	$P1 = "ok 1\n"
-	new P1, .PerlString
+	new P1, .String
 	set P1, "ok 2\n"
 	print $P1
 	print P1
@@ -73,10 +73,10 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "clone");
 .sub test @MAIN
-	$P1 = new PerlString
+	$P1 = new String
 	$P1 = "ok 1\n"
 	$P0 = clone $P1
-	new P1, .PerlString
+	new P1, .String
 	set P1, "ok 2\n"
 	clone P0, P1
 	print $P0

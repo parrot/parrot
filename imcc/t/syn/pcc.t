@@ -147,9 +147,9 @@ pir_output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, P param");
 .sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
-    $P0 = new PerlUndef
+    $P0 = new Undef
     $P0 = "ok 1\n"
-    $P1 = new PerlUndef
+    $P1 = new Undef
     $P1 = "ok 2\n"
     .pcc_begin prototyped
     .arg $P0
@@ -161,8 +161,8 @@ pir_output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, P param");
     end
 .end
 .pcc_sub _sub prototyped
-    .param PerlUndef a
-    .param PerlUndef b
+    .param Undef a
+    .param Undef b
     print a
     print b
    .pcc_begin_return
@@ -177,9 +177,9 @@ pir_output_is(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
 .sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
-    $P0 = new PerlUndef
+    $P0 = new Undef
     $P0 = "ok 1\n"
-    $P1 = new PerlUndef
+    $P1 = new Undef
     $P1 = "ok 2\n"
     .pcc_begin prototyped
     .arg $P0
@@ -191,8 +191,8 @@ pir_output_is(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
     end
 .end
 .pcc_sub _sub
-    .param PerlUndef a
-    .param PerlUndef b
+    .param Undef a
+    .param Undef b
     print a
     print b
    .pcc_begin_return
@@ -456,8 +456,8 @@ pir_output_is(<<'CODE', <<'OUT', "sub calling another sub, PRegs");
 .sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
-    $P0 = new PerlUndef
-    $P1 = new PerlUndef
+    $P0 = new Undef
+    $P1 = new Undef
     $P0 = "ok 1\n"
     $P1 = "ok 2\n"
     .pcc_begin prototyped
@@ -470,14 +470,14 @@ pir_output_is(<<'CODE', <<'OUT', "sub calling another sub, PRegs");
     end
 .end
 .pcc_sub _sub
-    .param PerlUndef a
-    .param PerlUndef b
+    .param Undef a
+    .param Undef b
     print a
     print b
     .local Sub sub
     newsub sub, .Sub, _sub2
-    $P0 = new PerlUndef
-    $P1 = new PerlUndef
+    $P0 = new Undef
+    $P1 = new Undef
     $P0 = "ok 3\n"
     $P1 = "ok 4\n"
     .pcc_begin prototyped
@@ -492,8 +492,8 @@ pir_output_is(<<'CODE', <<'OUT', "sub calling another sub, PRegs");
    .pcc_end_return
 .end
 .pcc_sub _sub2
-    .param PerlUndef a
-    .param PerlUndef b
+    .param Undef a
+    .param Undef b
     print a
     print b
    .pcc_begin_return
@@ -512,18 +512,18 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "in, out different P param, 2 subs");
 .sub test @MAIN
     .local Sub sub
-    .local PerlUndef x
-    x = new PerlUndef
+    .local Undef x
+    x = new Undef
     x = 42
     newsub sub, .Sub, _sub
     .pcc_begin prototyped
     .arg x
     .pcc_call sub
     ret:
-    .local PerlUndef y
+    .local Undef y
     .result y
     .pcc_end
-    .local PerlUndef z
+    .local Undef z
     z = y
     .pcc_begin prototyped
     .arg y
@@ -540,9 +540,9 @@ pir_output_is(<<'CODE', <<'OUT', "in, out different P param, 2 subs");
     end
 .end
 .pcc_sub _sub prototyped
-    .param PerlUndef a
-    .local PerlUndef res
-    res = new PerlUndef
+    .param Undef a
+    .local Undef res
+    res = new Undef
     res = a + 1
     .pcc_begin_return
     .return res
@@ -581,7 +581,7 @@ ret1:
 # g from line 1
 .pcc_sub _sub0 non_prototyped
     .local pmc res0               # (visitReturn:528)
-    res0 = new PerlInt            # (expressConstant:153)
+    res0 = new Integer            # (expressConstant:153)
     res0 = 42                     # (expressConstant:154)
     .pcc_begin_return             # (visitReturn:530)
     .return res0                  # (visitReturn:531)
@@ -630,8 +630,8 @@ pir_output_is(<<'CODE', <<'OUT', "coroutine generator throwing exception");
     .local pmc generator
 
     # call count and get the generator
-    .local PerlInt start
-    start = new PerlInt
+    .local Integer start
+    start = new Integer
     start = 3
     .pcc_begin non_prototyped
     .arg start
@@ -676,7 +676,7 @@ err:
 
 # here is count(), which returns the generator
 .pcc_sub _count non_prototyped
-   .param PerlInt start
+   .param Integer start
    .local pmc gen_fun
    .local pmc gen_obj
    store_lex -1, "start", start
@@ -689,7 +689,7 @@ err:
 # here is the generator itself
 # all it does is throw StopIteration
 .pcc_sub _count_g non_prototyped
-    .local PerlInt c
+    .local Integer c
 count_loop:
     find_lex c, -1, "start"
     lt c, 0, stop
@@ -707,7 +707,7 @@ stop:
     .local pmc ex0
     .local pmc msg0
     ex0 = new Exception
-    msg0 = new PerlString
+    msg0 = new String
     msg0 = 'StopIteration'
     ex0['_message'] = msg0
     throw ex0
@@ -788,10 +788,10 @@ all params ok
 OUT
 
 $code = repeat($template, 18,
-               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
                INITS => 'a<index> = <index>',
                ARGS => '.arg a<index>',
-               PARAMS => '.param PerlInt a<index>',
+               PARAMS => '.param Integer a<index>',
                TESTS => "set I0, a<index>\nne I0, <index>, fail");
 
 pir_output_is($code, <<'OUT', "overflow pmcs");
@@ -799,10 +799,10 @@ all params ok
 OUT
 
 $code = repeat($template, 40,
-               LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
+               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
                INITS => 'a<index> = <index>',
                ARGS => '.arg a<index>',
-               PARAMS => '.param PerlInt a<index>',
+               PARAMS => '.param Integer a<index>',
                TESTS => "set I0, a<index>\nne I0, <index>, fail");
 
 pir_output_is($code, <<'OUT', "overflow pmcs 40");
@@ -843,7 +843,7 @@ pir_output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 2");
     newsub sub, .Sub, _sub
     .local pmc ar
     .local pmc x
-    x = new PerlString
+    x = new String
     x = "first\n"
     ar = new PerlArray
     push ar, "ok 1\n"
@@ -874,10 +874,10 @@ pir_output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 3");
     newsub sub, .Sub, _sub
     .local pmc ar
     .local pmc x
-    x = new PerlString
+    x = new String
     x = "first\n"
     .local pmc y
-    y = new PerlString
+    y = new String
     y = "last\n"
     ar = new PerlArray
     push ar, "ok 1\n"
@@ -914,13 +914,13 @@ pir_output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 4");
     .local Sub sub
     newsub sub, .Sub, _sub
     .local pmc x
-    x = new PerlString
+    x = new String
     x = "first\n"
     .local pmc y
-    y = new PerlString
+    y = new String
     y = "middle\n"
     .local pmc z
-    z = new PerlString
+    z = new String
     z = "last\n"
     .local pmc ar
     ar = new PerlArray
@@ -981,13 +981,13 @@ pir_output_is(<<'CODE', <<'OUT', ".flatten_arg prototyped 1");
     .local Sub sub
     newsub sub, .Sub, _sub
     .local pmc x
-    x = new PerlString
+    x = new String
     x = "first\n"
     .local pmc y
-    y = new PerlString
+    y = new String
     y = "middle\n"
     .local pmc z
-    z = new PerlString
+    z = new String
     z = "last\n"
     .local pmc ar
     ar = new PerlArray
@@ -1052,13 +1052,13 @@ pir_output_is(<<'CODE', <<'OUT', ".flatten_arg - overflow");
     .local Sub sub
     newsub sub, .Sub, _sub
     .local pmc x
-    x = new PerlString
+    x = new String
     x = "first\n"
     .local pmc y
-    y = new PerlString
+    y = new String
     y = "middle\n"
     .local pmc z
-    z = new PerlString
+    z = new String
     z = "last\n"
     .local pmc ar
     ar = new PerlArray
@@ -1193,7 +1193,7 @@ ret:
 
 .pcc_sub _main non_prototyped
 #Positional parameters:
-	.param PerlArray command_line
+	.param Array command_line
         .pcc_begin_return
         .pcc_end_return
 .end
@@ -1294,7 +1294,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "P3 is NULL - 11 args");
 .sub test @MAIN
-    P3 = new .PerlArray
+    P3 = new .Array
     # call with 11 parameters
     _foo($P1, $P2, $P3, $P4, $P5, $P6, $P7, $P8, $P9, $P10, $P11)
     end

@@ -14,9 +14,9 @@ pir_output_is(<<'CODE', <<'OUT', "tail call optimization, final position");
 
 .sub _main @MAIN
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = 20
-	$P2 = new PerlInt
+	$P2 = new Integer
 	$P2 = 3
 	newsub $P99, .Sub, _floor
 	($P3, $P4) = _funcall($P99, $P1, $P2)
@@ -65,12 +65,12 @@ doit:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = arg1 / arg2
 	## truncate.
 	$I1 = $P1
 	$P1 = $I1
-	$P2 = new PerlInt
+	$P2 = new Integer
 	$P2 = arg1 % arg2
 	.pcc_begin_return
 	.return $P1
@@ -83,7 +83,7 @@ doit:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = arg1 + arg2
 	.pcc_begin_return
 	.return $P1
@@ -102,9 +102,9 @@ pir_output_is(<<'CODE', <<'OUT', "tail call optimization, intermediate position"
 
 .sub _main @MAIN
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = 20
-	$P2 = new PerlInt
+	$P2 = new Integer
 	$P2 = 3
 	newsub $P99, .Sub, _floor
 	($P3, $P4) = _funcall($P99, $P1, $P2)
@@ -153,12 +153,12 @@ bad_func:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = arg1 / arg2
 	## truncate.
 	$I1 = $P1
 	$P1 = $I1
-	$P2 = new PerlInt
+	$P2 = new Integer
 	$P2 = arg1 % arg2
 	.pcc_begin_return
 	.return $P1
@@ -171,7 +171,7 @@ bad_func:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = arg1 + arg2
 	.pcc_begin_return
 	.return $P1
@@ -190,9 +190,9 @@ pir_output_is(<<'CODE', <<'OUT', "tail call optimization, implicit final return"
 
 .sub _main @MAIN
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = 20
-	$P2 = new PerlInt
+	$P2 = new Integer
 	$P2 = 3
 	newsub $P99, .Sub, _floor
 	($P3, $P4) = _funcall($P99, $P1, $P2)
@@ -239,12 +239,12 @@ doit:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = arg1 / arg2
 	## truncate.
 	$I1 = $P1
 	$P1 = $I1
-	$P2 = new PerlInt
+	$P2 = new Integer
 	$P2 = arg1 % arg2
 	.pcc_begin_return
 	.return $P1
@@ -257,7 +257,7 @@ doit:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = arg1 + arg2
 	.pcc_begin_return
 	.return $P1
@@ -276,9 +276,9 @@ pir_output_is(<<'CODE', <<'OUT', ".flatten_arg in return");
 
 .sub _main @MAIN
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = 20
-	$P2 = new PerlInt
+	$P2 = new Integer
 	$P2 = 3
 	newsub $P98, .Sub, _fib_step
 	($P3, $P4, $P5) = _funcall($P98, $P1, $P2)
@@ -323,7 +323,7 @@ bad_func:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new PerlInt
+	$P1 = new Integer
 	$P1 = arg1 + arg2
 	.pcc_begin_return
 	.return $P1

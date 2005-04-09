@@ -73,13 +73,14 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "array/hash consts");
 .sub _MAIN
-   .local PerlArray ar
+   .local Array ar
    .local pmc ha
    .local string key1
    .const string key2 = "key2"
    .local int idx1
    .const int idx2 = 2
-   ar = new PerlArray
+   ar = new Array
+   ar = 3
    ha = new Hash
    key1 = "key1"
    idx1 = 1

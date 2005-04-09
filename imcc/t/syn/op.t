@@ -171,7 +171,7 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "x = clone");
 .sub test @MAIN
     .local pmc a
-    a = new PerlInt
+    a = new Integer
     a = 10
     .local pmc b
     b = clone a
@@ -221,7 +221,7 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "x = isa");
 .sub test @MAIN
-    $P0 = new PerlInt
+    $P0 = new Integer
     $I0 = isa $P0, "scalar"
     print $I0
     print "\n"

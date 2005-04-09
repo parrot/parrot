@@ -16,19 +16,19 @@ SKIP: {
 
 pir_2_pasm_like(<<'CODE', <<'OUT', "in P param");
 .sub _main
-    $P0 = new PerlUndef
+    $P0 = new Undef
     $P0 = 42
     foo($P0)
     noop
     end
 .end
 .sub foo prototyped
-    .param PerlUndef a
+    .param Undef a
     print a
 .end
 CODE
 /_main:
-  new (P\d+), \d+ # \.PerlUndef
+  new (P\d+), \d+ # \.Undef
   set \1, 42
   set_p_pc (P\d+), foo
 @pcc_sub_call_\d:
@@ -53,8 +53,8 @@ OUT
 pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param");
 .sub _main
     .local Sub sub
-    .local PerlUndef x
-    x = new PerlUndef
+    .local Undef x
+    x = new Undef
     x = 42
     newsub sub, .Sub, _sub
     .pcc_begin prototyped
@@ -67,7 +67,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param");
     end
 .end
 .pcc_sub _sub prototyped
-    .param PerlUndef a
+    .param Undef a
     a = a + 1
     .pcc_begin_return
     .return a
@@ -76,7 +76,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param");
 CODE
 /_main:
   set P16, P1
-  new P5, \d+ # \.PerlUndef
+  new P5, \d+ # \.Undef
   set P5, 42
   newsub P0, \d+, _sub
 @pcc_sub_call_\d:
@@ -102,11 +102,11 @@ OUT
 pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param, P var");
 .sub _main
     .local Sub sub
-    .local PerlUndef x
-    x = new PerlUndef
+    .local Undef x
+    x = new Undef
     x = 42
-    .local PerlUndef y
-    y = new PerlUndef
+    .local Undef y
+    y = new Undef
     y = 10
     newsub sub, .Sub, _sub
     .pcc_begin prototyped
@@ -120,7 +120,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param, P var");
     end
 .end
 .pcc_sub _sub prototyped
-    .param PerlUndef a
+    .param Undef a
     a = a + 1
     .pcc_begin_return
     .return a
@@ -129,9 +129,9 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param, P var");
 CODE
 /_main:
   set P16, P1
-  new P5, \d+ # \.PerlUndef
+  new P5, \d+ # \.Undef
   set P5, 42
-  new P16, \d+ # \.PerlUndef
+  new P16, \d+ # \.Undef
   set P16, 10
   newsub P0, \d+, _sub
 @pcc_sub_call_\d+:
@@ -158,22 +158,22 @@ OUT
 pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param");
 .sub _main
     .local Sub sub
-    .local PerlUndef x
-    x = new PerlUndef
+    .local Undef x
+    x = new Undef
     x = 42
     newsub sub, .Sub, _sub
     .pcc_begin prototyped
     .arg x
     .pcc_call sub
     ret:
-    .local PerlUndef y
+    .local Undef y
     .result y
     .pcc_end
     print y
     end
 .end
 .pcc_sub _sub prototyped
-    .param PerlUndef a
+    .param Undef a
     a = a + 1
     .pcc_begin_return
     .return a
@@ -182,7 +182,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param");
 CODE
 /_main:
   set P16, P1
-  new P5, \d+ # \.PerlUndef
+  new P5, \d+ # \.Undef
   set P5, 42
   newsub P0, \d+, _sub
 @pcc_sub_call_\d:
@@ -208,15 +208,15 @@ OUT
 pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
 .sub _main
     .local Sub sub
-    .local PerlUndef x
-    x = new PerlUndef
+    .local Undef x
+    x = new Undef
     x = 42
     newsub sub, .Sub, _sub
     .pcc_begin prototyped
     .arg x
     .pcc_call sub
     ret:
-    .local PerlUndef y
+    .local Undef y
     .result y
     .pcc_end
     print x
@@ -224,7 +224,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
     end
 .end
 .pcc_sub _sub prototyped
-    .param PerlUndef a
+    .param Undef a
     a = a + 1
     .pcc_begin_return
     .return a
@@ -233,7 +233,7 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
 CODE
 /_main:
   set P16, P1
-  new P16, \d+ # \.PerlUndef
+  new P16, \d+ # \.Undef
   set P16, 42
   newsub P0, \d+, _sub
 @pcc_sub_call_\d:
