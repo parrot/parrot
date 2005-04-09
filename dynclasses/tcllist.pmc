@@ -153,7 +153,7 @@ Returns the list as a string
 
 
     STRING* get_string () {
-        STRING *res, *s, *vals;
+        STRING *res, *vals;
         INTVAL j, n;
         PMC *val;
 

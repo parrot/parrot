@@ -96,8 +96,7 @@ XXX: Skip the evaluate step, and just return an invokable.
       STRING *buffer = Parrot_PMC_get_string(INTERP, code);
       INTVAL preserve_whitespace = Parrot_PMC_get_intval(INTERP, psw);
       INTVAL block_interpolation = Parrot_PMC_get_intval(INTERP, bi);
-      STRING *Tcl;
-      PMC *retval,*word;
+      PMC *word;
       INTVAL I0,I1,I2;
       STRING *S0, *S1;
       PMC *P0,*P1,*P2,*P3,*P4;
@@ -162,7 +161,7 @@ space_loop:
     goto end_scope;
   }
 
-space_loop_cont:
+/* space_loop_cont: Unreferenced label commented out */
   I0 = string_index(INTERP, buffer, start_word);
   if (I0 < 33 && I0 != 10) {
     I1 = 1;
@@ -211,7 +210,7 @@ middle_word:
    goto end_command;
   }
 
-middle_word_0:
+/* middle_word_0: Unreferenced label commented out */
   character = string_index(INTERP, buffer, I0);
 
   if (preserve_whitespace == 1) {
@@ -265,7 +264,7 @@ check_bs:
     goto handle_backslash;
   }
 
-middle_continue:
+/* middle_continue: Unreferenced label commented out */
   last_character = character;
   word_length++;
   goto middle_word;
@@ -434,7 +433,7 @@ handle_variable_1:
     goto handle_variable_nobrace;
   }
 
-handle_variable_brace:
+/* handle_variable_brace: Unreferenced label commented out */
   /* Get the closing brace, but we don't have to have matched pairs here. */
   I1 = string_str_index(INTERP, buffer, cb, chunk_start);
   if (I1 > buffer_length) {
@@ -618,7 +617,7 @@ handle_command_block:
       Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
   }
 
-command_save:
+/* command_save: Unreferenced label commented out */
   /* Save this as a command (skip the []'s)*/
   I0 = chunk_start + 1;
   I1 = word_length - 2;

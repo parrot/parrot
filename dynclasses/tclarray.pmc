@@ -642,7 +642,6 @@ These two methods are unimplemented.
         STRING* keystr;
         PMC* nextkey;
         PMC* box;
-        PMC* val;
 
         if (!key) return;
         keystr = make_hash_key(INTERP, key);
