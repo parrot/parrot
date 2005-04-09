@@ -420,7 +420,7 @@ Return a representation of the hash contents.
     STRING* get_repr () {
         /* TODO use freeze */
         PMC *iter = VTABLE_get_iter(INTERP, SELF);
-        STRING *res, *s;
+        STRING *res;
         INTVAL j, n;
 
         res = string_from_cstring(INTERP, "{", 0);
@@ -611,7 +611,6 @@ Returns the PMC value for the element at C<*key>.
     }
 
     PMC* get_pmc_keyed (PMC* key) {
-        PMC* valpmc;
         STRING* keystr;
         Hash *hash = PMC_struct_val(SELF);
         HashBucket *b;
@@ -813,7 +812,6 @@ Sets C<value> as the value for C<*key>.
         STRING* keystr;
         PMC* nextkey;
         PMC* box;
-        PMC* val;
 
         if (!key) return;
         keystr = make_hash_key(INTERP, key);

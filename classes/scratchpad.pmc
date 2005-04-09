@@ -176,7 +176,6 @@ Deletes the lexical variable for C<*key>.
     void delete_keyed(PMC* key) {
         STRING * name = NULL;
         INTVAL position;
-        struct Parrot_Lexicals * lex;
 
         if (key_type(INTERP, key) == KEY_integer_FLAG) {
             position = key_integer(INTERP, key);

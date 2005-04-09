@@ -79,7 +79,6 @@ Marks all the threads in the queue as live.
     void mark () {
         QUEUE *queue = PMC_data(SELF);
         QUEUE_ENTRY *entry;
-        PMC *val;
 
         queue_lock(queue);
         entry = queue->head;

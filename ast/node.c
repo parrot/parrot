@@ -127,7 +127,7 @@ static context_type
 ctx_default(nodeType *p, context_type outer)
 {
     context_type inner = CTX_UNK;
-    nodeType *child, *next;
+    nodeType *child;
 
     for (; p; p = p->next) {
         p->up_ctx = outer;
@@ -503,7 +503,6 @@ exp_Assign(Interp* interpreter, nodeType *p)
         lr = rhs->expand(interpreter, rhs);
     }
     else if (rhs->expand == exp_Const) {
-        const char *pmc;
         /* need a new value, because the name might be aliased by
          * a = b
          */
@@ -556,7 +555,6 @@ exp_Binary(Interp* interpreter, nodeType *p)
     nodeType *op, *left, *right;
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS];
-    char buf[128];
     SymReg *lr, *rr, *dest;
 
     op = CHILD(p);
@@ -606,7 +604,6 @@ exp_Unary(Interp* interpreter, nodeType *p)
     nodeType *op, *arg;
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS];
-    char buf[128];
     SymReg *rr, *dest;
 
     op = CHILD(p);
@@ -810,7 +807,9 @@ exp_Py_Call(Interp* interpreter, nodeType *p)
 {
     nodeType *name, *args;
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS];
+/* TODO
+ * SymReg *regs[IMCC_MAX_REGS];
+ */
 
     name = CHILD(p);
     args = name->next;
@@ -857,7 +856,10 @@ exp_Py_Local(Interp* interpreter, nodeType *var)
 static SymReg*
 exp_PCC_Sub(Interp* interpreter, nodeType *p)
 {
-    nodeType *doc;
+/*
+ * TODO
+ * nodeType *doc;
+ */
     SymReg *sub;
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS];
@@ -889,7 +891,10 @@ exp_PCC_Sub(Interp* interpreter, nodeType *p)
 static SymReg*
 exp_Py_Module(Interp* interpreter, nodeType *p)
 {
-    nodeType *doc;
+/*
+ * TODO
+ * nodeType *doc;
+ */
     SymReg *sub;
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS];

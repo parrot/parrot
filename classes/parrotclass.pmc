@@ -197,7 +197,7 @@ Create the class from the thawed parents and attributes array.
          *
          * So here's the plan:
          * During thaw, we first extend the class_data by two,
-         * thaw parents and attribs into that new arrea, and
+         * thaw parents and attribs into that new area, and
          * then we see what to do.
          */
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
@@ -206,7 +206,6 @@ Create the class from the thawed parents and attributes array.
         else if (info->extra_flags == EXTRA_IS_NULL) {
             STRING *class_name;
             INTVAL new_type;
-            PMC *ar;
             PMC *real_class;
 
             /* thaw class name */

@@ -689,7 +689,7 @@ Divides the integer by C<value> and returns the result in C<*dest>.
 */
     void divide_int (INTVAL value, PMC* dest) {
         INTVAL pmci, divi;
-        FLOATVAL valf, divf;
+        FLOATVAL divf;
 
         pmci = PMC_int_val(SELF);
         /* TODO exception */

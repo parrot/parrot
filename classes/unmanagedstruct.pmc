@@ -115,7 +115,7 @@ sets the element type in C<*type>.
 static char *
 char_offset_key(Interp* interpreter, PMC *pmc, PMC *key, int *type)
 {
-    size_t offs, n, count, size, max;
+    size_t offs, count, size, max;
     PMC *next, *init, *outer_init;
     int ix;
     char *p;
@@ -325,8 +325,6 @@ Returns the element of type C<type> starting at C<*p> as a PMC.
 static PMC*
 ret_pmc(Interp* interpreter, PMC* pmc, char *p, int type, INTVAL idx)
 {
-    char *cstr;
-    size_t len;
     PMC *ret = NULL, *init, *ptr;
 
     switch (type) {

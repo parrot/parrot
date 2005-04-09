@@ -366,8 +366,6 @@ INTVAL
 ascii_cs_index(Interp *interpreter, STRING *source_string,
         STRING *search_string, UINTVAL offset)
 {
-    UINTVAL base_size, search_size;
-    char *base, *search;
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
         return mixed_cs_index(interpreter, source_string, search_string,
@@ -383,8 +381,6 @@ ascii_cs_index(Interp *interpreter, STRING *source_string,
 INTVAL
 ascii_cs_rindex(Interp *interpreter, STRING *source_string,
         STRING *search_string, UINTVAL offset) {
-    UINTVAL base_size, search_size;
-    char *base, *search;
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
         internal_exception(UNIMPLEMENTED, "Cross-charset index not supported");

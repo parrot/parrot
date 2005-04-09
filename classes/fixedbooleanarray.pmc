@@ -119,7 +119,6 @@ Creates and returns a copy of the array.
 */
 
     PMC* clone () {
-        INTVAL size;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_int_val(dest) = PMC_int_val(SELF);
     
@@ -309,7 +308,6 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native (INTVAL size) {
-        Parrot_UInt1 *sd;
         if (PMC_int_val(SELF) || size < 1)
             internal_exception(OUT_OF_BOUNDS, "FixedBooleanArray: Can't resize!");
 

@@ -340,7 +340,6 @@ Warning: This is a quick hack.
 =cut
 
 op read(out STR, in INT) :base_io {
-  UINTVAL n;
   $1 = PIO_reads(interpreter, PIO_STDIN(interpreter), (size_t)$2);
   goto NEXT();
 }

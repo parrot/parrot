@@ -2374,9 +2374,6 @@ Converts the specified Parrot string to upper case.
 void
 string_upcase_inplace(Interp *interpreter, STRING *s)
 {
-    UINTVAL i;
-    INTVAL o;
-
     if (!s)
         return;
     CHARSET_UPCASE(interpreter, s);
@@ -2420,9 +2417,6 @@ Converts the specified Parrot string to lower case.
 void
 string_downcase_inplace(Interp *interpreter, STRING *s)
 {
-    UINTVAL i;
-    INTVAL o;
-
     if (!s)
         return;
     CHARSET_DOWNCASE(interpreter, s);
@@ -2466,9 +2460,6 @@ Converts the specified Parrot string to title case.
 void
 string_titlecase_inplace(Interp *interpreter, STRING *s)
 {
-    UINTVAL i;
-    INTVAL o;
-
     if (!s)
         return;
     CHARSET_TITLECASE(interpreter, s);

@@ -240,7 +240,7 @@ TODO implement freeze/thaw and use that instead.
     }
 
     STRING* get_repr () {
-        STRING *res, *s;
+        STRING *res;
         INTVAL j, n;
         PMC *val;
 

@@ -53,7 +53,6 @@ Initializes the thread.
 */
 
     void init () {
-        PMC *parent;
         /*
          * protect interpreter creation and list handling
          */

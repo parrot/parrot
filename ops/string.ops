@@ -346,7 +346,6 @@ inline op pack(inout STR, in INT, in NUM) :base_core {
 inline op pack(inout STR, in INT, in STR) :base_core {
     STRING *t,*s = $3;
     UINTVAL len = (UINTVAL)$2;
-    char buf[3];
 
     if (s->strlen < len) { /* XXXX: what is this supposed to do? */
     	STRING *temp;
