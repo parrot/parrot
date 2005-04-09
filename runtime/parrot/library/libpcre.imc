@@ -1,132 +1,112 @@
 =head1 TITEL
 
-libpcre.imc - pcre interface
-
-=head1 SYNOPSIS
-
-  .include "library/pcre.imc"
-  .PCRE_INIT(lib)
-  .PCRE_COMPILE(pattern, options, regex, error, errptr)
-  .PCRE_MATCH(regex, string, nres, ovector)
-  .PCRE_DOLLAR(string, ok, ovector, n, match)
+libpcre.imc - NCI interface to Perl-Compatible Regular Expression library
 
 =head1 DESCRIPTION
 
-Above macros call functions in libpcre.imc.
-
-=over 4
-
-=item macro PCRE_INIT(var)
-
-Intialize the pcre library. The PMC B<var> is set to the library handle
-and additionally stored as global "pcre::lib".
-
-=item macro PCRE_COMPILE((pattern, options, regex, error, errptr)
-
-Compile the string B<pattern> with int B<options>. Returns var B<regex>
-string B<error> and int B<errptr>.
+See 'library/pcre.imc' for details on the user interface.
 
 =cut
 
 
-.pcc_sub _pcre_compile prototyped
+.namespace ['PCRE::NCI']
+
+
+.sub compile prototyped
     .param string pat
     .param int options
 
-    .sym pmc NULL
-    .sym pmc code
-    .sym string error
-    .sym pmc COMPILE
-    COMPILE = global "pcre::compile"
-    repeat error, " ", 500	# could be enough
-    .sym pmc errptr
-    errptr = new PerlInt
+    .local string error
+    .local pmc PCRE_NCI_compile
+	.local int error_size
+
+    .local pmc NULL
     null NULL
-    .pcc_begin prototyped
-    .arg pat
-    .arg options
-    .arg error
-    .arg errptr
-    .arg NULL
-    .nci_call COMPILE
-    .result code
-    .pcc_end
-    $I0 = defined code
-    unless $I0 goto nok
+
+    .local pmc errptr
+    errptr= new PerlInt
+
+	## error message string size
+	error_size= 500
+
+	## allocate space in string for error message
+    repeat error, " ", error_size
+
+	PCRE_NCI_compile= find_global 'PCRE::NCI', 'PCRE_compile'
+
+    .local pmc code
+
+	code= PCRE_NCI_compile( pat, options, error, errptr, NULL )
+
+	.local int is_code_defined
+    is_code_defined = defined code
+    unless is_code_defined goto RETURN
+
     error = ""
-nok:
-    .pcc_begin_return
-    .return code
-    .return error
-    .return errptr
-    .pcc_end_return
+
+RETURN:
+    .return( code, error, errptr )
 .end
-=item macro PCRE_MATCH(regex, str, start, options, ok, res)
 
-Match the var B<regex> against string B<str> from int B<start> with
-int B<options>. Returns the number of matches in int B<ok> and the
-ovector in var B<res>.
 
-=cut
-
-.pcc_sub _pcre_exec prototyped
+.sub exec prototyped
     .param pmc regex
     .param string s
     .param int start
     .param int options
-    .sym int len
-    length len, s
-    .sym pmc NULL
-    null NULL
-    .sym pmc ovector
-    ovector = new ManagedStruct
-    ovector = 120	# 1/(2/3) * 4  * 2 * 10 for 10 result pairs
-    .sym pmc EXEC	# on 32 bit systems
-    EXEC = global "pcre::exec"
 
-    .pcc_begin prototyped
-    .arg regex		# p code
-    .arg NULL		# P extra
-    .arg s		# t subject
-    .arg len		# i length
-    .arg start		# i start
-    .arg options
-    .arg ovector	# p ovector
-    .arg 10		# i ovecsize
-    .nci_call EXEC
-    .local int ok
-    .result ok
-    .pcc_end
-    .pcc_begin_return
-    .return ok
-    .return ovector
-    .pcc_end_return
+    .local int len
+    length len, s
+
+	.local pmc NULL
+    null NULL
+
+	## osize -- 1/(2/3) * 4 * 2
+	.local int osize
+	osize= 12
+
+	## number of result pairs
+	.local int num_result_pairs
+	num_result_pairs= 10
+
+	.local int ovector_length
+	ovector_length= osize * num_result_pairs
+
+	.local pmc ovector
+    ovector= new ManagedStruct
+    ovector= ovector_length
+
+	## on 32 bit systems
+    .local pmc PCRE_NCI_exec
+    PCRE_NCI_exec = find_global 'PCRE::NCI', 'PCRE_exec'
+
+	.local int ok
+
+	ok= PCRE_NCI_exec( regex, NULL, s, len, start, options, ovector, 10 )
+
+	.return( ok, ovector )
 .end
 
-=item macro PCRE_DOLLAR(str, ok, res, n, matched)
 
-Extract from string B<str> the int B<n>th result into string B<match>.
-
-=cut
-
-
-
-.pcc_sub _pcre_result prototyped
+.sub result prototyped
     .param string s
     .param int ok
     .param pmc ovector
     .param int n
 
-    .sym string match
-    match = ""
-    if ok <= 0 goto nomatch
+    .local string match
+    match= ""
+    if ok <= 0 goto NOMATCH
 
     .local int ovecs
     .local int ovece
-    .sym pmc struct
-    struct = new SArray
-    struct = 3
-.include "datatypes.pasm"
+
+	.local pmc struct
+    struct= new SArray
+    struct= 3
+
+	.include "datatypes.pasm"
+
     struct[0] = .DATATYPE_INT
     $I0 = ok * 2
     struct[1] = $I0
@@ -137,16 +117,14 @@ Extract from string B<str> the int B<n>th result into string B<match>.
     inc $I0
     ovece = ovector[0;$I0]
     $I0 = ovece - ovecs
-    if ovecs >= 0 goto m1
+    if ovecs >= 0 goto M1
     match = ""
-    goto m0
-m1:
+    goto M0
+M1:
     substr match, s, ovecs, $I0
-m0:
-nomatch:
-    .pcc_begin_return
-    .return match
-    .pcc_end_return
+M0:
+NOMATCH:
+    .return( match )
 .end
 
 =for todo
@@ -190,8 +168,10 @@ pcre.imc, libpcre.imc
 
 pcre(3)
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Leopold Toetsch
+Original code by Leo Toetsch, updated by Jerry Gay 
+E<lt>jerry dot gay at gmail dot com<gt>
 
+=cut
 

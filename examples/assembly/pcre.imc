@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-examples/assembly/pcre.imc - String matching
+examples/assembly/pcre.imc - perl-compatible regular expressions
 
 =head1 SYNOPSIS
 
@@ -12,73 +12,98 @@ examples/assembly/pcre.imc - String matching
 =head1 DESCRIPTION
 
 Experimental string matching with PCRE (L<http://www.pcre.org/>).
-
 Note that PCRE must be installed for this to work.
+
+=head1 AUTHORS
+
+Original code by Leo Toetsch, updated by Jerry Gay 
+E<lt>jerry dot gay at gmail dot com<gt>
 
 =cut
 
-.pcc_sub _main prototyped
-    .param pmc argv
-.include "library/pcre.imc"
-    .sym int argc
-    argc = argv
-    if argc != 3 goto usage
 
-    .sym string s
-    .sym string pat
-    s = argv[1]
-    pat = argv[2]
-    print s
-    print " =~ /"
-    print pat
-    print "/\n"
-    .sym pmc PCRE_LIB
-    .PCRE_INIT(PCRE_LIB)
-    .sym string error
-    .sym int errptr
-    .sym pmc code
-    .PCRE_COMPILE(pat, 0, code, error, errptr)
-    $I0 = defined code
-    unless $I0 goto match_err
+.include 'library/pcre.imc'
 
-    .sym int ok
-    .sym pmc result
-    .PCRE_MATCH(code, s, 0, 0, ok, result)
-    if ok < 0 goto nomatch
-    print ok
-    print " match(es):\n"
-    .sym int i
-    i = 0
-    .sym string match
-lp: .PCRE_DOLLAR(s, ok, result, i, match)
+
+.sub main @MAIN
+	.param pmc argv
+
+	.local int argc
+	argc= argv
+	if argc != 3 goto USAGE
+
+	.local pmc func
+	.local pmc lib
+
+	func= find_global 'PCRE', 'init'
+	lib= func()
+
+	.local string s
+	s= argv[1]
+	.local string pat
+	pat= argv[2]
+
+	print s
+	print " =~ /"
+	print pat
+	print "/\n"
+
+	.local pmc regex
+	.local string error
+	.local int errptr
+
+	func= find_global 'PCRE', 'compile'
+	( regex, error, errptr )= func( pat, 0 )
+
+	.local int is_regex_defined
+	is_regex_defined= defined regex
+	unless is_regex_defined goto MATCH_ERR
+
+	.local int ok
+	.local pmc result
+	
+	func= find_global 'PCRE', 'match'
+	( ok, result )= func( regex, s, 0, 0 )
+
+	if ok < 0 goto NOMATCH
+	print ok
+	print " match(es):\n"
+    .local int i
+    i= 0
+    .local string match
+
+LP: 
+	func= find_global 'PCRE', 'dollar'
+	match= func( s, ok, result, i )
     print match
     print "\n"
     inc i
-    if i < ok goto lp
+    if i < ok goto LP
     end
-nomatch:
+
+NOMATCH:
     print "no match\n"
-    end
-match_err:
+	end
+
+MATCH_ERR:
     print "error in regex: "
-    #print error
     print "at: '"
-    length $I0, pat
-    $I0 = $I0 - errptr
-    substr $S0, pat, errptr, $I0
-    print $S0
+	.local int pat_errloc
+    length pat_errloc, pat
+    pat_errloc = pat_errloc - errptr
+
+	.local string pattern_error
+    substr pattern_error, pat, errptr, pat_errloc
+    print pattern_error
     print "'\n"
     exit 1
-usage:
-    .sym string prog
-    prog = argv[0]
+
+USAGE:
+    .local string prog
+    prog= argv[0]
+	print 'usage: '
     print prog
     print " string pattern\n"
     exit 1
 .end
 
-=head1 SEE ALSO
-
-F<library/libpcre.imc>, F<library/pcre.imc>.
-
-=cut
