@@ -1130,7 +1130,9 @@ void
 Parrot_dod_ms_run_init(Interp *interpreter)
 {
     struct Arenas *arena_base = interpreter->arena_base;
+#if ARENA_DOD_FLAGS
     int j;
+#endif
 
     arena_base->dod_trace_ptr = NULL;
     arena_base->dod_mark_start = NULL;
@@ -1171,7 +1173,6 @@ void
 Parrot_dod_ms_run(Interp *interpreter, int flags)
 {
     struct Arenas *arena_base = interpreter->arena_base;
-    int j;
     /* XXX these should go into the interpreter */
     int total_free = 0;
 

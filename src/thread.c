@@ -424,7 +424,7 @@ pt_join_threads(Parrot_Interp interpreter)
         if (thread_interp->thread_data->state == THREAD_STATE_JOINABLE ||
             (thread_interp->thread_data->state & THREAD_STATE_FINISHED)) {
 
-            void *retval;
+            void *retval = NULL;
             thread_interp->thread_data->state |= THREAD_STATE_JOINED;
             UNLOCK(interpreter_array_mutex);
             JOIN(thread_interp->thread_data->thread, retval);

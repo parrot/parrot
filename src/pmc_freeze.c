@@ -1298,7 +1298,6 @@ Todo-list and seen handling is all in C<do_thaw()>.
 static void
 visit_todo_list_thaw(Parrot_Interp interpreter, PMC* old, visit_info* info)
 {
-    int seen;
     do_thaw(interpreter, old, info);
 }
 

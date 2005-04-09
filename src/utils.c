@@ -647,7 +647,7 @@ Parrot_byte_index(Interp *interpreter, const STRING *base,
         const STRING *search, UINTVAL start_offset)
 {
     INTVAL pos = -1;
-    char *base_start, *search_start, *current_pos;
+    char *base_start, *search_start;
     INTVAL current_offset;
     INTVAL max_possible_offset;
     INTVAL found = 0;
@@ -655,7 +655,6 @@ Parrot_byte_index(Interp *interpreter, const STRING *base,
     search_start = search->strstart;
     max_possible_offset = (base->strlen - search->strlen);
 
- checkloop:
     for (current_offset = start_offset; current_offset <= max_possible_offset;
             current_offset++) {
         base_start = (char *)base->strstart + current_offset;
@@ -676,7 +675,7 @@ Parrot_byte_rindex(Interp *interpreter, const STRING *base,
         const STRING *search, UINTVAL start_offset)
 {
     INTVAL pos = -1;
-    char *base_start, *search_start, *current_pos;
+    char *base_start, *search_start;
     INTVAL current_offset;
     UINTVAL max_possible_offset;
     INTVAL found = 0;
@@ -686,7 +685,6 @@ Parrot_byte_rindex(Interp *interpreter, const STRING *base,
     if (start_offset && start_offset < max_possible_offset) {
         max_possible_offset = start_offset;
     }
- checkloop:
     for (current_offset = max_possible_offset; current_offset >= 0;
             current_offset--) {
         base_start = (char *)base->strstart + current_offset;

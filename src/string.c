@@ -274,12 +274,14 @@ void
 string_init(Parrot_Interp interpreter)
 {
     size_t i;
+#if PARROT_HAS_ICU
     char *data_dir;
     int free_data_dir = 0;
     union {
         const void * __c_ptr;
         void * __ptr;
     } __ptr_u;
+#endif
 
     if (!interpreter->parent_interpreter) {
         /* Load in the basic encodings and charsets

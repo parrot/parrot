@@ -172,7 +172,6 @@ swap_context(Interp *interpreter, struct PMC *sub)
     struct Parrot_coro* co = PMC_coro(sub);
     struct Parrot_Context *ctx = &co->ctx;
     struct Parrot_Context temp;
-    struct parrot_regs_t *reg_p;
 
     /*
      * Swap context structures

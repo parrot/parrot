@@ -743,7 +743,6 @@ static int
 parrot_gc_ims_collect(Interp* interpreter, int check_only)
 {
     struct Arenas *arena_base = interpreter->arena_base;
-    struct Memory_Block *block;
     Gc_ims_private *g_ims;
     int ret;
 

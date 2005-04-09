@@ -47,8 +47,6 @@ C<Parrot_new(NULL)>.
 void
 init_world(Interp *interpreter)
 {
-    INTVAL i;
-
     PMC *iglobals;
     PMC *self;
 

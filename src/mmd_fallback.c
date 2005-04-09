@@ -589,8 +589,6 @@ mmd_fallback_stringxor_str(Parrot_Interp interp, PMC *left, STRING *right,
 
 void
 register_fallback_methods(Parrot_Interp interp) {
-    INTVAL i;
-
     /* Yeah, this first one's out of order logically, but it means
        the table doesn't have to keep being re-malloc'd */
     assert(MMD_REPEAT == MMD_USER_FIRST - 1);

@@ -70,7 +70,6 @@ pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
           UINTVAL flags)
 {
     INTVAL has_ext = 0, new_flags = 0;
-    PMC_EXT hold_ext;
 
     if (pmc->vtable->base_type == new_type)
         return pmc;

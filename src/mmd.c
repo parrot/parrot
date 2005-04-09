@@ -1444,8 +1444,6 @@ mmd_create_builtin_multi_stub(Interp *interpreter, INTVAL func_nr)
 {
     const char *name;
     STRING *s, *ns;
-    int len;
-    char *p;
     PMC *multi;
 
     name = Parrot_MMD_methode_name(interpreter, func_nr);
@@ -1463,8 +1461,6 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter,
     const char *short_name;
     char signature[6], val_sig;
     STRING *meth_name, *ns, *_sub;
-    int len;
-    char *p;
     PMC *method, *multi, *class, *multi_sig;
 
     assert (type != enum_class_Null && type != enum_class_delegate &&

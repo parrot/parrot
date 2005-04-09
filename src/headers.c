@@ -735,8 +735,6 @@ sweep_cb_pmc(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
 void
 Parrot_destroy_header_pools(Interp *interpreter)
 {
-    struct Small_Object_Pool *pool;
-    struct Small_Object_Arena *cur_arena, *next;
     int pass, start;
 
     /* const/non const COW strings life in different pools
