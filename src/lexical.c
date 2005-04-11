@@ -262,6 +262,8 @@ scratchpad_get_by_index(Interp * interp, PMC *pad, INTVAL depth, INTVAL pos)
         return NULL;
 
     ohash = scratchpad_index(interp, pad, depth);
+    if (pos >= VTABLE_elements(interp, ohash))
+        return NULL;
     return VTABLE_get_pmc_keyed_int(interp, ohash, pos);
 }
 

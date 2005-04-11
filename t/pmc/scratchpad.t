@@ -16,7 +16,7 @@ Tests using C<PerlInt> PMC on lexical scratchpads.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 output_is(<<CODE, <<OUTPUT, "direct set and get on scratchpad pmc");
 	new_pad P20, 0
@@ -226,7 +226,15 @@ Lexical 'foo' not found
 /
 OUTPUT
 
+output_like(<<'CODE', <<'OUTPUT', "find_lex -- non-existent pad");
+        find_lex P1, 1
+        end
+CODE
+/empty lexical pad/
+OUTPUT
+
 output_like(<<'CODE', <<'OUTPUT', "find_lex -- non-existent variable #1");
+ 	new_pad 0
         find_lex P1, 1
         end
 CODE
@@ -234,13 +242,15 @@ CODE
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "find_lex -- non-existent variable #2");
+ 	new_pad 0
         find_lex P1, 1, 2
         end
 CODE
-/Lexical #'2' not found/
+/Pad index out of range/
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "find_lex -- non-existent variable #3");
+ 	new_pad 0
         find_lex P1, 'wibble'
         end
 CODE
@@ -248,10 +258,11 @@ CODE
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "find_lex -- non-existent variable #4");
+ 	new_pad 0
         find_lex P1, 1, 'bibble'
         end
 CODE
-/Lexical 'bibble' not found/
+/Pad index out of range/
 OUTPUT
 
 1;

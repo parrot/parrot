@@ -447,7 +447,7 @@ CODE
 /main
 in coro
 back in main
-Lexical 'nix' not found
+empty lexical pad
 /
 OUTPUT
 
