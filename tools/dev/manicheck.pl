@@ -26,7 +26,7 @@ then any extra files are listed.
 use strict;
 
 # CVS built-in patterns
-my @base_patterns = qw(^CVS$ ^\.cvsignore$ ^core$ ^.*\.o$);
+my @base_patterns = qw(^\.svn$ ^\.cvsignore$ ^core$ ^.*\.o$);
 
 use ExtUtils::Manifest;
 
@@ -120,7 +120,7 @@ sub ignore
   my @path = split(/\//, $file);
   my $dir = "";
 
-  foreach my $element (@path) {  
+  foreach my $element (@path) {
     if ($ignore_dirs{$dir}) {
       foreach my $pattern (@{$ignore_dirs{$dir}}) {
 	return 1 if $element =~ m/$pattern/;
