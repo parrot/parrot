@@ -24,7 +24,7 @@ to ensure nothing is broken.
 =cut
 
 use lib 'lib';
-use Test::More 'tests' => 56;
+use Test::More 'tests' => 55;
 use File::Spec::Functions qw(:ALL);
     
 # Path is really only an abstract superclass but there's a few things we
@@ -163,7 +163,9 @@ ok($f3->modified_since($time), 'modified_since');
 $f = Parrot::IO::File->new(
 	catfile('lib', 'Parrot', 'IO', 'File.pm'));
 ok($f->has_cvs_id, 'has_cvs_id');
-ok($f->cvs_id =~ /File.pm,v/, 'cvs_id');
+
+# XXX doesn't work aftern switch to svn  
+#ok($f->cvs_id =~ /File.pm,v/, 'cvs_id');
 
 $f3->delete;
 @a = $d2->files;
