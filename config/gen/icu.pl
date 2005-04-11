@@ -16,85 +16,64 @@ package Configure::Step;
 use strict;
 use vars qw($description @args);
 use Cwd qw(cwd);
+use Parrot::Configure::Step qw(capture_output);
 
-$description="Configuring ICU if requested...";
+$description="Determining whether ICU is installed";
 
-@args=qw(buildicu verbose icudatadir icuplatform icuconfigureargs
-         icushared icuheaders icu-config without-icu);
+@args=qw(verbose icudatadir icushared icuheaders icu-config without-icu);
 
 sub runstep {
-  my ($buildicu, $verbose, $icudatadir, $icuplatform, $icuconfigureargs,
-           $icushared, $icuheaders, $icuconfig, $without) = @_;
-  my $icu_configure_command;
+  my ($verbose, $icudatadir, $icushared, $icuheaders, $icuconfig, $without) = @_;
   my @icu_headers = qw(ucnv.h utypes.h uchar.h);
   my $autodetect = !defined($icudatadir)
-                && !defined($icuplatform)
 	        && !defined($icushared)
 	        && !defined($icuheaders);
 
-  print "\n" if $verbose;
-  Configure::Data->set(
-    has_icu => ($without ? 0 : 1),
-    TEMP_icu_make => ""
-  );
-  if ($without) {
-    print "not using icu.\n" if $verbose;
-    return 0;
-  }
+  unless ($without) {
+    if (!$autodetect) {
+      print "specified a icu config parameter,\nICU autodetection disabled.\n" if $verbose;
+    } elsif (!defined $icuconfig || !$icuconfig) {
+      my (undef, $ret) = capture_output("icu-config", "--exists");
 
-  if (!$autodetect) {
-    print "specified a icu config parameter,\nICU autodetection disabled.\n"
-       if $verbose;
-  } elsif (!defined $icuconfig || !$icuconfig) {
-    my $notfound = 1;
-
-    {
-	# disable STDERR
-        open OLDERR, ">&STDERR";
-	open STDERR, ">d8e622ad2.log";
-
-	# check if ICU is installed
-        system("icu-config", "--exists");
-	$notfound = ($? == -1);
-	$notfound ||= ($? >> 8) != 0;
-
-	# reenable STDERR
-	close STDERR;
-        unlink "d8e622ad2.log";
-	open STDERR, ">&OLDERR";
+      if (($ret == -1) || (($ret >> 8) != 0)) {
+        undef $icuconfig;
+        $autodetect = 0;
+        $without = 1;
+      } else {
+        $icuconfig = "icu-config";
+        print "icu-config found... good!\n" if $verbose;
+      }
     }
+  
+    if (!$without && $autodetect && $icuconfig && $icuconfig ne "none") {
+      my $slash = Configure::Data->get('slash');
+  
+      # icu-config script to use
+      $icuconfig = "icu-config" if $icuconfig eq "1";
+  
+      # ldflags
+      $icushared = capture_output("$icuconfig --ldflags");
+      if (defined $icushared) {
+        chomp $icushared;
+        $icushared =~ s/-licui18n//;
+	# $icushared =~ s/-licudata//;
+      }
 
-    if ($notfound) {
-      undef $icuconfig;
-      print "icu-config not found.\n" if $verbose;
-    } else {
-      $icuconfig = "icu-config";
-      print "icu-config found... good!\n" if $verbose;
+      # location of header files
+      $icuheaders = capture_output("$icuconfig --prefix");
+      if (defined $icuheaders) {
+        chomp $icuheaders;
+        $icuheaders .= "${slash}include";
+      }
+
+      # icu data dir
+      $icudatadir = capture_output("$icuconfig --icudatadir");
+      if (defined $icudatadir) {
+        chomp $icudatadir;
+      }
     }
   }
-
-  if ($autodetect && $icuconfig && $icuconfig ne "none") {
-    my $slash = Configure::Data->get('slash');
-
-    # icu-config script to use
-    $icuconfig = "icu-config" if $icuconfig eq "1";
-
-    # ldflags
-    $icushared = `$icuconfig --ldflags`;
-    chomp $icushared;
-    $icushared =~ s/-licui18n//;
-    # $icushared =~ s/-licudata//;
-
-    # location of header files
-    $icuheaders = `$icuconfig --prefix`;
-    chomp $icuheaders;
-    $icuheaders .= "${slash}include";
-
-    # icu data dir
-    $icudatadir = `$icuconfig --icudatadir`;
-    chomp $icudatadir;
-  }
-
+    
   if ($verbose) {
     print "icuconfig: $icuconfig\n" if defined $icuconfig;
     print "icushared='$icushared'\n" if defined $icushared;
@@ -102,204 +81,65 @@ sub runstep {
     print "datadir='$icudatadir'\n" if defined $icudatadir;
   }
 
-  if (defined($icushared) && defined($icuheaders)) {
+  if ($without) {
+    Configure::Data->set(
+      has_icu => 0,
+    );
+    $Configure::Step::result = "no";
+    return;
+  }
+
+  my $ok = 1;
+  
+  unless (defined $icushared) {
+    warn "error: icushared not defined\n";
+    $ok = 0;
+  }
+
+  unless (defined $icuheaders and -d $icuheaders) {
+    warn "error: icuheaders not defined or invalid\n";
+    $ok = 0;
+  } else {
     $icuheaders =~ s![\\/]$!!;
-    my $c_libs = Configure::Data->get('libs');
-    $c_libs .= " $icushared";
-    my $localicudatadir = "";
-    $localicudatadir = $icudatadir if defined $icudatadir;
-    Configure::Data->set(
-        icu_headers => join(' ', map {"$icuheaders/unicode/$_"} @icu_headers),
-        blib_lib_libsicuuc_a => '',
-        blib_lib_libsicudata_a => '',
-	libs => $c_libs,
-        cc_inc => Configure::Data->get(qw(cc_inc))." -I$icuheaders",
-	icudatadir => $localicudatadir,
-	TEMP_icu_make => ''
-    );
-    return;
-  }
-
-  if( !defined $icudatadir )
-  {
-      Configure::Data->set(
-	  has_icu => 0,
-	  TEMP_icu_make => ""
-      );
-      print "not using icu.\n" if $verbose;
-      return 0;
-  }
-
-  if( defined $icuplatform )
-  {
-	  $icu_configure_command = "sh ./runConfigureICU $icuplatform";
-  }
-  else
-  {
-	# Try to build ICU with the same compiler as parrot.
-	# Also respect Configure.pl command-line arguments for c++.
-	$icu_configure_command = "sh ./configure";
-	my $cc = Configure::Data->get('cc');
-	if ($cc ne '') {
-	  $icu_configure_command = "CC='$cc' $icu_configure_command";
-	}
-	my $cxx = Configure::Data->get('cxx');
-	if ($cxx ne '') {
-	  $icu_configure_command = "CXX='$cxx' $icu_configure_command";
-	}
-  }
-
-  Configure::Data->set( icudatadir => $icudatadir );
-
-#  unless ($buildicu) {
-#    print " [Skipped] " if $verbose;
-#
-#    Configure::Data->set(
-#        icu_headers => '',
-#        blib_lib_libsicuuc_a => '',
-#        blib_lib_libsicudata_a => '',
-#						 );
-#    return;
-#  }
-
-#  print "\n";
-
-  # MS VC++ and Intel C++ (on Windows) require special treatment.
-  my ($cc) = Configure::Data->get(qw(cc));
-  my $is_msvc = grep { $cc eq $_ } ( qw(cl cl.exe icl icl.exe) );
-  if ($is_msvc && -e 'icu\source\allinone\allinone.dsw') {
-    # We build from MS VC++ Project Files. If these do not have Win32 line endings, it will
-    # not accept them. Thus we need to ensure they do.
-    my @dspfiles = ('icu\source\allinone\all\all.dsp', 'icu\source\common\common.dsp',
-                    'icu\source\tools\ctestfw\ctestfw.dsp', 'icu\source\tools\gencmn\decmn.dsp',
-                    'icu\source\tools\gencmn\gencmn.dsp', 'icu\source\tools\genrb\derb.dsp',
-                    'icu\source\tools\genrb\genrb.dsp', 'icu\source\tools\genbrk\genbrk.dsp',
-                    'icu\source\tools\genccode\genccode.dsp', 'icu\source\tools\gencnval\gencnval.dsp',
-                    'icu\source\tools\genidna\genidna.dsp', 'icu\source\tools\gennames\gennames.dsp',
-                    'icu\source\tools\gennorm\gennorm.dsp', 'icu\source\tools\genpname\genpname.dsp',
-                    'icu\source\tools\genprops\genprops.dsp', 'icu\source\tools\gentest\gentest.dsp',
-                    'icu\source\tools\gentz\gentz.dsp', 'icu\source\tools\genuca\genuca.dsp',
-                    'icu\source\tools\makeconv\makeconv.dsp', 'icu\source\tools\pkgdata\pkgdata.dsp',
-                    'icu\source\tools\toolutil\toolutil.dsp', 'icu\source\i18n\i18n.dsp',
-                    'icu\source\stubdata\stubdata.dsp', 'icu\source\data\makedata.dsp',
-                    'icu\source\allinone\allinone.dsw');
-    foreach (@dspfiles) {
-        open DSPFILE, "< $_" or die "Cannot open $_: $!\n";
-        my $file = join('', <DSPFILE>);
-        close DSPFILE;
-        $file =~ s/([^\r])\n/$1\r\n/g;
-        open DSPFILE, "> $_" or die "Cannot open $_: $!\n";;
-        print DSPFILE $file;
-        close DSPFILE;
+    foreach my $header ( @icu_headers ) {
+      $header = "$icuheaders/unicode/$header";
+      unless (-e $header) {
+        $ok = 0;
+        warn "error: ICU header '$header' not found\n";
+      }
     }
-
-    # Set up makefile entries.
-    Configure::Data->set(
-      buildicu => 1,
-      icu_headers => 'blib\include\unicode\ucnv.h blib\include\unicode\utypes.h blib\include\unicode\uchar.h',
-      blib_lib_libsicuuc_a => 'blib\lib\libicuuc$(A)',
-      blib_lib_libsicudata_a => 'blib\lib\libicudata$(A)',
-      cc_inc => Configure::Data->get(qw(cc_inc)).' -I.\blib\include',
-      TEMP_icu_make => <<'RULES',
-###############################################################################
-#
-# Build ICU:
-#
-###############################################################################
-
-icu : icu.dummy
-
-icu.dummy :
-
-icu.clean :
-	msdev icu\source\allinone\allinone.dsw /MAKE "ALL" /CLEAN
-
-$(ICU_H_FILES) : $(LIBICUCORE)
-
-$(LIBICUCORE) $(LIBICUDATA) :
-	msdev icu\source\allinone\allinone.dsw /MAKE "stubdata - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "common - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "i18n - Win32 Debug"
-	xcopy /S /Y "icu\source\common" "icu\include\"
-	msdev icu\source\allinone\allinone.dsw /MAKE "ctestfw - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "decmn - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "gencmn - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "derb - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "genrb - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "genbrk - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "genccode - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "gencnval - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "genidna - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "gennames - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "gennorm - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "genpname - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "genprops - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "gentest - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "gentz - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "genuca - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "makeconv - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "pkgdata - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "toolutil - Win32 Debug"
-	msdev icu\source\allinone\allinone.dsw /MAKE "makedata - Win32 Debug"
-	IF NOT EXIST blib\lib mkdir blib\lib
-	copy icu\lib\icuucd$(A) $(LIBICUCORE)
-	copy icu\lib\icudata$(A) $(LIBICUDATA)
-	IF NOT EXIST blib\include mkdir blib\include
-	IF NOT EXIST blib\include\unicode mkdir blib\include\unicode
-	copy icu\include\unicode\*.h blib\include\unicode
-	copy icu\bin\icuuc26d.dll .
-	copy icu\bin\*.dll .
-	IF NOT EXIST blib\lib\icu mkdir blib\lib\icu
-	IF NOT EXIST blib\lib\icu\2.6.1 mkdir blib\lib\icu\2.6.1
-	copy icu\source\data\out\*.dat blib\lib\icu\2.6.1
-RULES
-    );
-    return;
   }
 
-  if( !defined $icuconfigureargs )
-  {
-  my $cwd = cwd();
-
-      # Default to a configure line suggested by icu/README.parrot
-	  $icuconfigureargs = "--disable-layout --disable-tests --disable-samples --quiet '--prefix=$cwd/blib' --enable-static --disable-shared --disable-extras '--oldincludedir=$cwd/blib/old' --with-data-packaging=archive";
+  unless (defined $icudatadir and -d $icudatadir ) {
+    warn "error: icudatadir not defined or invalid\n";
+    $ok = 0;
+  } else {
+    $icudatadir =~ s![\\/]$!!;
   }
 
+  die <<"HELP" unless $ok; # this text is also in Configure.PL!
+Something is wrong with your ICU installation!
+   
+   If you do not have a full ICU installation:
+
+   --without-icu        Build parrot without ICU support
+   --icu-config=(file)  Location of icu-config
+   --icuheaders=(path)  Location of ICU headers without /unicode
+   --icushared=(flags)  Full linker command to create shared libraries
+   --icudatadir=(path)  Directory to locate ICU's data file(s)
+HELP
+#'
+  
   Configure::Data->set(
-    buildicu => 1,
-    icu_headers => 'blib/include/unicode/ucnv.h blib/include/unicode/utypes.h blib/include/unicode/uchar.h',
-	blib_lib_libsicuuc_a => 'blib/lib/libicuuc$(A)',
-    blib_lib_libsicudata_a => 'blib/lib/libicudata$(A)',
-    cc_inc => Configure::Data->get(qw(cc_inc)).' -I./blib/include',
-    TEMP_icu_make => <<"RULES",
-###############################################################################
-#
-# Build ICU:
-#
-###############################################################################
+    has_icu    => 1,
+    icu_shared  => $icushared,
+    icu_cflags  => "-I$icuheaders",
+    icu_headers => join( ' ', @icu_headers ),
+    icu_datadir => $icudatadir,
+  );
 
-icu : icu.dummy
+  $Configure::Step::result = "yes";
 
-icu.dummy :
-	\$(MAKE_C) icu/source
-
-icu.clean :
-	\$(MAKE_C) icu/source clean
-
-\$(ICU_H_FILES) : \$(LIBICUCORE)
-
-\$(LIBICUCORE) \$(LIBICUDATA) :
-	cd icu/source; $icu_configure_command $icuconfigureargs
-	\$(MAKE_C) icu/source/stubdata install
-	\$(MAKE_C) icu/source/common install
-	\$(MAKE_C) icu/source/i18n
-	\$(MAKE_C) icu/source/tools
-	\$(MAKE_C) icu/source/data install ENABLE_STATIC=
-	\$(RANLIB) \$(LIBICUCORE)
-	\$(RANLIB) \$(LIBICUDATA)
-
-RULES
-   );
 }
 
 1;

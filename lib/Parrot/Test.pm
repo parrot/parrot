@@ -459,9 +459,7 @@ sub generate_functions {
 
             my $iculibs = "";
 	    if ($PConfig{'has_icu'}) {
-		$iculibs = $PConfig{blib_lib_libsicuuc_a} . " " .
-		$PConfig{blib_lib_libsicudata_a};
-		$iculibs =~ s/\$\(A\)/$PConfig{a}/g;
+		$iculibs = $PConfig{icu_shared};
 	    }
 
             my ($cmd, $exit_code);

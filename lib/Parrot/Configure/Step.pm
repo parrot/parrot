@@ -34,7 +34,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT = ();
 
 @EXPORT_OK = qw(prompt genfile copy_if_diff move_if_diff integrate
-                cc_gen cc_build cc_run cc_clean cc_run_capture );
+                cc_gen cc_build cc_run cc_clean cc_run_capture capture_output);
 
 %EXPORT_TAGS = (
         inter => [qw(prompt integrate)],
@@ -417,6 +417,31 @@ sub cc_clean {
     unlink map "test$_",
                qw( .c .cco .ldo .out),
                Configure::Data->get( qw( o exe ) );
+}
+
+=item C<capture_output($command)>
+
+Executes the given command. The command's output and its return status is returned.
+B<STDERR> is redirected to F<test.out> during the execution.
+
+=cut
+
+sub capture_output {
+    my $command = join " ", @_;
+
+    # disable STDERR
+    open OLDERR, ">&STDERR";
+    open STDERR, ">test.out";
+
+    my $output = `$command`;
+    my $retval = ($? == -1) ? -1 : ($? >> 8);
+
+    # reenable STDERR
+    close STDERR;
+    open STDERR, ">&OLDERR";
+
+    return ($output, $retval) if wantarray;
+    return $output;
 }
 
 =back

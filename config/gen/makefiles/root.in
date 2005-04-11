@@ -440,10 +440,8 @@ PDB             = $(CUR_DIR)/pdb$(EXE)
 
 # libs
 LIBPARROT       = ${blib_lib_libparrot_a}
-#CONDITIONED_LINE(has_icu):LIBICUCORE      = ${blib_lib_libsicuuc_a}
-#CONDITIONED_LINE(has_icu):LIBICUDATA      = ${blib_lib_libsicudata_a}
-#CONDITIONED_LINE(has_icu):ALL_PARROT_LIBS = $(LIBPARROT) $(LIBICUCORE) $(LIBICUDATA) $(C_LIBS)
-#INVERSE_CONDITIONED_LINE(has_icu):ALL_PARROT_LIBS = $(LIBPARROT) $(C_LIBS)
+#CONDITIONED_LINE(has_icu):ICU_SHARED      = ${icu_shared}
+ALL_PARROT_LIBS = $(LIBPARROT) $(ICU_SHARED) $(C_LIBS)
 
 # dynamic extensions
 DYNEXT_DIR      = runtime/parrot/dynext
@@ -626,7 +624,7 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(PARROT)
 	@echo If the next line prints $(VERSION), it did help.
 	$(PARROT) parrot-config.imc VERSION DEVEL
 
-$(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm $(LIBICUCORE) $(LIBICUDATA)
+$(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
 	$(LINK) $(LD_OUT)$(PARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS)
 
 lib_deps_object : $(O_FILES)
@@ -1055,9 +1053,6 @@ languages-test :
 
 languages-clean :
 	$(MAKE_C) languages clean
-
-
-${TEMP_icu_make}
 
 ###############################################################################
 #

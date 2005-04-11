@@ -364,12 +364,6 @@ ICU Options:
    --icushared=(flags)  Full linker command to create shared libraries
    --icudatadir=(path)  Directory to locate ICU's data file(s)
 
-   If you want to use the ICU version bundled with parrot:
-
-   --icuplatform=(platform)   Platform name to pass to ICU's runConfigureICU
-   --icuconfigureargs=(args)  Arguments to pass to ICU's configuration script
-   --icudatadir=(path)        Directory to locate ICU's data file(s)
-
 Other Options (may not be implemented):
 
    --maintainer         Create imcc's parser and lexer files. Needs a working
