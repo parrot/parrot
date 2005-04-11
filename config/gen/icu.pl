@@ -29,6 +29,7 @@ sub runstep {
 	        && !defined($icushared)
 	        && !defined($icuheaders);
 
+  $Configure::Step::result = undef;
   unless ($without) {
     if (!$autodetect) {
       print "specified a icu config parameter,\nICU autodetection disabled.\n" if $verbose;
@@ -56,20 +57,28 @@ sub runstep {
       if (defined $icushared) {
         chomp $icushared;
         $icushared =~ s/-licui18n//;
-	# $icushared =~ s/-licudata//;
+        # $icushared =~ s/-licudata//;
+        $without = 1 if length $icushared == 0;
       }
 
       # location of header files
       $icuheaders = capture_output("$icuconfig --prefix");
       if (defined $icuheaders) {
         chomp $icuheaders;
+        $without = 1 unless -d $icuheaders;
         $icuheaders .= "${slash}include";
+        $without = 1 unless -d $icuheaders;
       }
 
       # icu data dir
       $icudatadir = capture_output("$icuconfig --icudatadir");
       if (defined $icudatadir) {
         chomp $icudatadir;
+        $without = 1 unless -d $icudatadir;
+      }
+      
+      if ($without) {
+        $Configure::Step::result = "failed";
       }
     }
   }
@@ -85,7 +94,7 @@ sub runstep {
     Configure::Data->set(
       has_icu => 0,
     );
-    $Configure::Step::result = "no";
+    $Configure::Step::result = "no" unless defined $Configure::Step::result;
     return;
   }
 
