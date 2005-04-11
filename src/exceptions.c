@@ -520,7 +520,8 @@ create_exception(Interp * interpreter)
      * if the exception number is in the range of our known exceptions
      * use the precreated exception
      */
-    if (the_exception->error <= E_LAST_PYTHON_E) {
+    if (the_exception->error <= E_LAST_PYTHON_E &&
+            the_exception->error >= 0) {
         exception = interpreter->exception_list[the_exception->error];
     }
     else {

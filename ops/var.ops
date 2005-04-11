@@ -138,18 +138,27 @@ by index can only be retrieved by this index.
 
 op store_lex(in STR, in PMC) {
     PMC *pad = scratchpad_get_current(interpreter);
+    if (!pad)
+        real_exception(interpreter, NULL, PAD_NOT_FOUND,
+		"empty lexical pad");
     scratchpad_store(interpreter, pad, $1, $2);
     goto NEXT();
 }
 
 op store_lex(in INT, in STR, in PMC) {
     PMC *pad = scratchpad_get_current(interpreter);
+    if (!pad)
+        real_exception(interpreter, NULL, PAD_NOT_FOUND,
+		"empty lexical pad");
     scratchpad_store_by_name(interpreter, pad, $1, $2, $3);
     goto NEXT();
 }
 
 op store_lex(in INT, in INT, in PMC) {
     PMC *pad = scratchpad_get_current(interpreter);
+    if (!pad)
+        real_exception(interpreter, NULL, PAD_NOT_FOUND,
+		"empty lexical pad");
     scratchpad_store_by_index(interpreter, pad, $1, $2, $3);
     goto NEXT();
 }
@@ -182,6 +191,9 @@ op find_lex(out PMC, in STR) {
     opcode_t * next = expr NEXT();
     PMC *pad = scratchpad_get_current(interpreter);
     $1 = scratchpad_find(interpreter, pad, $2);
+    if (!pad)
+        real_exception(interpreter, next, PAD_NOT_FOUND,
+		"empty lexical pad");
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical '%Ss' not found", $2);
@@ -191,6 +203,9 @@ op find_lex(out PMC, in STR) {
 op find_lex(out PMC, in INT) {
     opcode_t * next = expr NEXT();
     PMC *pad = scratchpad_get_current(interpreter);
+    if (!pad)
+        real_exception(interpreter, next, PAD_NOT_FOUND,
+		"empty lexical pad");
     $1 = scratchpad_get_by_index(interpreter, pad, -1, $2);
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
@@ -201,6 +216,9 @@ op find_lex(out PMC, in INT) {
 op find_lex(out PMC, in INT, in STR) {
     opcode_t * next = expr NEXT();
     PMC *pad = scratchpad_get_current(interpreter);
+    if (!pad)
+        real_exception(interpreter, next, PAD_NOT_FOUND,
+		"empty lexical pad");
     $1 = scratchpad_get_by_name(interpreter, pad, $2, $3);
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
@@ -211,6 +229,9 @@ op find_lex(out PMC, in INT, in STR) {
 op find_lex(out PMC, in INT, in INT) {
     opcode_t * next = expr NEXT();
     PMC *pad = scratchpad_get_current(interpreter);
+    if (!pad)
+        real_exception(interpreter, next, PAD_NOT_FOUND,
+		"empty lexical pad");
     $1 = scratchpad_get_by_index(interpreter, pad, $2, $3);
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,

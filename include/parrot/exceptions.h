@@ -114,6 +114,7 @@ typedef enum {
         NO_PREV_CS,
         NO_CLASS,
         LEX_NOT_FOUND,
+        PAD_NOT_FOUND,
         GLOBAL_NOT_FOUND,
         METH_NOT_FOUND,
         WRITE_TO_CONSTCLASS,
