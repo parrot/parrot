@@ -15,7 +15,7 @@ Revision history for a Befunge interpreter written for Parrot.
 0.1.1 Mon Dec 30 18:12:34 CET 2002
         - debugger now accepts breakpoints: either on instructions
           (characters), or on a specified location (x,y), or on a
-          given row, or on a given column.
+          given row, or on a given column
 
 0.1.0 Sat Dec 21 14:58:24 CET 2002
         - playfield now is an array of array (of integers) instead of
