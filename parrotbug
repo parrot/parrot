@@ -61,7 +61,7 @@ It is *NOT* intended for:
 
 It is *ONLY* a mean of reporting verifiable problems with the core
 parrot distribution, and any solutions to such problems, to parrot
-developpers.
+developers.
 
 If you're just looking for help with parrot, subscribe to the parrot
 mailing list, perl6-internals<at>perl.org.
