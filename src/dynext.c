@@ -215,6 +215,19 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
         string_cstring_free(file_name);
         return path;
     }
+    /*
+     * and on windows strip a leading "lib"
+     */
+#ifdef WIN32
+    if (memcmp(file_name, "lib", 3) == 0) {
+        *handle = Parrot_dlopen(file_name + 3);
+        if (*handle) {
+            path = string_from_cstring(interpreter, file_name + 3, 0);
+            string_cstring_free(file_name);
+            return path;
+        }
+    }
+#endif
     err = Parrot_dlerror();
     fprintf(stderr, "Couldn't load '%s': %s\n",
             file_name, err ? err : "unknown reason");
