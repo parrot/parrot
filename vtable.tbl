@@ -176,6 +176,9 @@ void pow(PMC* value, PMC* dest)        MMD_POW
 void pow_int(INTVAL value, PMC* dest) MMD_POW_INT
 void pow_float(FLOATVAL value, PMC* dest) MMD_POW_FLOAT
 
+void increment()
+void decrement()
+void absolute(PMC* dest)
 void neg(PMC* dest)
 
 [BITWISE]
@@ -232,11 +235,6 @@ void logical_not(PMC* dest)
 
 void repeat(PMC* value, PMC* dest)           MMD_REPEAT
 void repeat_int(INTVAL value, PMC* dest)     MMD_REPEAT_INT
-
-[MATH]
-void increment()
-void decrement()
-void absolute(PMC* dest)
 
 [EXISTS]
 INTVAL exists_keyed(PMC* key)

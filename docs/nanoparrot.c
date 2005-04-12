@@ -1,23 +1,27 @@
 /*
  * nanoparrot.c
  *
- * - demonstrates how the interpreter basically is working
+ * - demonstrates how the interpreter interprets bytecode
  *   its vastly simplified but the very basics are the same
- *   and it totally lacks any error checking
- *
- * - proof of concept of the new indirect register addressing scheme
  *
  * - compile with:
- *   -DMOPS  ... run mops main loop
- *   -DINDIRECT ... use indirect register pointer
- *   -TRACE ... turn on opcode tracing
+ *   -DTRACE ...    turn on opcode tracing (FUNC_CORE, SWITCH_CORE only)
+ *   -DFUNC_CORE    run function base opcodes
+ *   -DF            same
+ *   -DSWITCH_CORE  run switched opcode core
+ *   -DS            same
+ *                  else run CGOTO core
+ *
+ * The CGOTO run core works only for compilers like gcc that allow
+ * labels as values.
  *
  * e.g.:
- * cc -o nanoparrot -Wall nanoparrot.c -O3  -DMOPS && time ./nanoparrot
+ * cc -o nanoparrot -Wall nanoparrot.c -O3 && time ./nanoparrot mops
  */
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef int INTVAL;
 typedef int opcode_t;
@@ -26,8 +30,6 @@ typedef void PMC;
 typedef void STRING;
 
 #define NUM_REGISTERS 32
-
-#ifdef INDIRECT
 
 struct Reg {
     INTVAL int_reg;
@@ -38,26 +40,14 @@ struct Reg {
 
 #define REG_INT(x) interpreter->bp[x].int_reg
 
+#if defined(PREDEREF_CORE)
+#  define IREG(x)   (_reg_base + pc[x])
+#  define ICONST(x) *(INTVAL*)pc[x]
+#  define SCONST(x) *(STRING**)pc[x]
 #else
-
-struct IReg {
-    INTVAL registers[NUM_REGISTERS];
-};
-
-struct NReg {
-    FLOATVAL registers[NUM_REGISTERS];
-};
-
-struct SReg {
-    STRING *registers[NUM_REGISTERS];
-};
-
-struct PReg {
-    PMC *registers[NUM_REGISTERS];
-};
-
-#define REG_INT(x) interpreter->int_reg.registers[x]
-
+#  define IREG(x)   REG_INT(pc[x])
+#  define ICONST(x) pc[x]
+#  define SCONST(x) interpreter->code->const_table[pc[x]]
 #endif
 
 struct pf {
@@ -65,146 +55,236 @@ struct pf {
     char **const_table;
 };
 
-typedef Interp {
-#ifdef INDIRECT
+typedef struct Interp {
     struct Reg *bp;
-#else
-    struct IReg int_reg;
-    struct NReg num_reg;
-    struct SReg string_reg;
-    struct PReg pmc_reg;
-#endif
     struct pf *code;
-    opcode_t *(**op_func)(opcode_t *, Interp*);
+    opcode_t *(**op_func)(opcode_t *, struct Interp*);
     const char **op_info;
     int flags;
 } Interp;
 
-static opcode_t *
-end(opcode_t *pc, Interp *interpreter) {
-    return 0;
-}
+/*
+ * list of all opcodes
+ */
 
-static opcode_t *
-set_i_ic(opcode_t *pc, Interp *interpreter) {
-    REG_INT(pc[1]) = pc[2];
-    return pc + 3;
-}
+#define OPCODES OP(end),      OP(print_sc), OP(print_i),  \
+                OP(set_i_ic), OP(if_i_ic),  OP(sub_i_i_i), \
+                OP(MAX)
 
-static opcode_t *
-print_i(opcode_t *pc, Interp *interpreter) {
-    printf("%d", REG_INT(pc[1]));
-    return pc + 2;
-}
+/*
+ * some macros to get 3 different kinds of run loops
+ * you might skip this uglyness and continue
+ * at dispatch loop ~90 lines below
+ *
+ * or for the curious: look at the preprocessor output
+ */
 
-static opcode_t *
-add_bp_ic(opcode_t *pc, Interp *interpreter) {
-#ifdef INDIRECT
-    interpreter->bp += pc[1];
+#define OP(x) OP_ ## x
+typedef enum { OPCODES } opcodes;
+#undef OP
+
+#ifdef F
+#  define FUNC_CORE
 #endif
-    return pc + 2;
-}
+#ifdef S
+#  define SWITCH_CORE
+#endif
 
-static opcode_t *
-if_i_ic(opcode_t *pc, Interp *interpreter) {
-    if (REG_INT(pc[1]))
-	return pc + pc[2];
-    return pc + 3;
+#if defined(FUNC_CORE)
+#  ifdef TRACE
+#    define ENDRUN \
+static void \
+run(Interp *interpreter, opcode_t *pc) \
+{ \
+    while (pc) { \
+	printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
+		interpreter->op_info[*pc]); \
+	pc = interpreter->op_func[*pc](pc, interpreter); \
+    } \
 }
+#  else
+#    define ENDRUN \
+static void \
+run(Interp *interpreter, opcode_t *pc) \
+{ \
+    while (pc) { \
+	pc = interpreter->op_func[*pc](pc, interpreter); \
+    } \
+}
+#  endif
 
-static opcode_t *
-sub_i_i_i(opcode_t *pc, Interp *interpreter) {
-    REG_INT(pc[1]) = REG_INT(pc[2]) - REG_INT(pc[3]);
-    return pc + 4;
-}
+#  define DISPATCH
+#  define ENDDISPATCH
+#  define CASE(function) \
+static opcode_t * \
+function (opcode_t *pc, Interp *interpreter) {
 
-static opcode_t *
-print_sc(opcode_t *pc, Interp *interpreter) {
-    printf("%s", interpreter->code->const_table[pc[1]]);
-    return pc + 2;
-}
+#  define NEXT return pc; }
+#  define DONE            return 0; }
+
+#else   /* !FUNC_CORE */
+
+#  define ENDRUN  }
+
+#if defined(SWITCH_CORE)
+
+static void
+run(Interp *interpreter, opcode_t *pc)
+{
+#    ifdef TRACE
+#       define DISPATCH  \
+    for (;;) { \
+	printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
+		interpreter->op_info[*pc]); \
+        switch(*pc) {
+#    else
+#       define DISPATCH \
+    for (;;) { \
+        switch(*pc) {
+#    endif
+
+#    define CASE(x)         case OP_ ## x:
+#    define NEXT            continue;
+#    define DONE            return;
+#    define ENDDISPATCH     default : printf("illegal instruction"); \
+				  exit(1);                           \
+			}}
+# else  /* CGOTO */
+
+static void
+run(Interp *interpreter, opcode_t *pc)
+{
+#    define OP(x)          &&lOP_##x
+    static  void *labels[] = { OPCODES };
+#    undef OP
+#    define CASE(x)         lOP_##x:
+#    define NEXT            goto *labels[*pc];
+#    define DISPATCH        NEXT
+#    define ENDDISPATCH
+#    define DONE            return;
+
+#  endif        /* SWITCH or CGOTO */
+#endif  /* !FUNC_CORE */
+
+/*
+ * dispatch loop / opcode (function) bodies i.e. the .ops files
+ */
+
+    DISPATCH
+        CASE(end)
+            DONE
+        CASE(print_sc)
+            printf("%s", SCONST(1));
+            pc += 2;
+            NEXT
+        CASE(print_i)
+            printf("%d", IREG(1));
+            pc += 2;
+            NEXT
+        CASE(set_i_ic)
+            IREG(1) = ICONST(2);
+            pc += 3;
+            NEXT
+        CASE(if_i_ic)
+            if (IREG(1))
+                pc += ICONST(2);
+            else
+                pc += 3;
+            NEXT
+        CASE(sub_i_i_i)
+            IREG(1) = IREG(2) - IREG(3);
+            pc += 4;
+            NEXT
+        CASE(MAX)
+            printf("illegal opcode\n");
+            exit(1);
+            NEXT
+    ENDDISPATCH
+ENDRUN
+
+#ifdef FUNC_CORE
+#  define DEF_OP(op) \
+    interpreter->op_func[OP_ ## op] = op; \
+    interpreter->op_info[OP_ ## op] = #op
+#  else
+#  define DEF_OP(op) \
+    interpreter->op_info[OP_ ## op] = #op
+#endif
 
 static void
 init(Interp *interpreter, opcode_t *prog)
 {
-#ifdef INDIRECT
-    interpreter->bp = calloc(32, sizeof(struct Reg));
-#endif
-#define N_OPS 7
-#define N_CONSTS 2
-    interpreter->op_func = malloc(N_OPS * sizeof(void*));
-    interpreter->op_func[0] = end;
-    interpreter->op_func[1] = set_i_ic;
-    interpreter->op_func[2] = print_i;
-    interpreter->op_func[3] = add_bp_ic;
-    interpreter->op_func[4] = if_i_ic;
-    interpreter->op_func[5] = sub_i_i_i;
-    interpreter->op_func[6] = print_sc;
-    interpreter->op_info = malloc(N_OPS * sizeof(char*));
-    interpreter->op_info[0] = "end";
-    interpreter->op_info[1] = "set_i_ic";
-    interpreter->op_info[2] = "print_i";
-    interpreter->op_info[3] = "add_bp_ic";
-    interpreter->op_info[4] = "if_i_ic";
-    interpreter->op_info[5] = "sub_i_i_i";
-    interpreter->op_info[6] = "print_sc";
+    /*
+     * create 1 register frame
+     */
+    interpreter->bp = calloc(NUM_REGISTERS, sizeof(struct Reg));
+    /*
+     * and some space for opcodes
+     */
+    interpreter->op_func = malloc(OP_MAX * sizeof(void*));
+    interpreter->op_info = malloc(OP_MAX * sizeof(char*));
+    /*
+     * define opcode function and opcode info
+     */
+    DEF_OP(end);
+    DEF_OP(print_sc);
+    DEF_OP(print_i);
+    DEF_OP(set_i_ic);
+    DEF_OP(if_i_ic);
+    DEF_OP(sub_i_i_i);
+
+    /*
+     * the "packfile"
+     */
     interpreter->code = malloc(sizeof(struct pf));
     interpreter->code->byte_code = prog;
+
+    /*
+     * create a simplified constant table
+     */
+#define N_CONSTS 4
     interpreter->code->const_table = malloc(N_CONSTS * sizeof(char*));
     interpreter->code->const_table[0] = "\n";
     interpreter->code->const_table[1] = "done\n";
-}
-
-static void
-run(Interp *interpreter)
-{
-    opcode_t *pc = interpreter->code->byte_code;
-
-    while (pc) {
-#ifdef TRACE
-	printf("PC %2d %s\n", pc - interpreter->code->byte_code,
-		interpreter->op_info[*pc]);
-#endif
-	pc = interpreter->op_func[*pc](pc, interpreter);
-    }
+    interpreter->code->const_table[2] = "error\n";
+    interpreter->code->const_table[3] = "usage: ./nanoparrot mops\n";
 }
 
 int
 main(int argc, char *argv[]) {
-#ifdef MOPS
+    opcode_t *prog;
+
     /*
-     * run the mops main loop
+     * the mops main loop
      */
-    opcode_t prog[] =
-    	{ 1, 4, 100000000, 	/* set I4, n */
-	  2, 4, 	/* print I4 */
-	  6, 0, 	/* print "\n" */
-          1, 5, 1, 	/* set I5, 1 */
-	  5, 4, 4, 5,	/* L1: sub I4, I4, I5 */
-	  4, 4, -4,	/* if I4, L1 */
-	  6, 1, 	/* print "done\n" */
-	  0 		/* end */
+    opcode_t mops[] =
+    	{ OP_set_i_ic, 4, 100000000, 	/* set I4, n */
+	  OP_print_i, 4, 	/* print I4 */
+	  OP_print_sc, 0, 	/* print "\n" */
+          OP_set_i_ic, 5, 1, 	/* set I5, 1 */
+	  OP_sub_i_i_i, 4, 4, 5,	/* L1: sub I4, I4, I5 */
+	  OP_if_i_ic, 4, -4,	/* if I4, L1 */
+	  OP_print_sc, 1, 	/* print "done\n" */
+	  OP_end 		/* end */
 	};
-#else
-    /*
-     * show moving the register base pointer
-     */
-    opcode_t prog[] =
-    	{ 1, 4, 4, 	/* set I4, 4 */
-          1, 5, 5, 	/* set I5, 5 */
-	  2, 4, 	/* print I4 */
-	  6, 0, 	/* print "\n" */
-	  2, 5, 	/* print I5 */
-	  6, 0, 	/* print "\n" */
-	  3, 1,		/* add_pb 1 */
-	  2, 4, 	/* print I4 */
-	  6, 0, 	/* print "\n" */
-	  0 		/* end */
+    opcode_t usage[] =
+    	{
+          OP_set_i_ic, 0, 2, 	/* set I0, 2 */
+	  OP_if_i_ic, 0, 6,	/* if I0, L1 */
+	  OP_print_sc, 2,	/* print "error\n" */
+	  OP_end, 		/* end */
+	  OP_print_sc, 3,	/* L1: print "usage...\n" */
+	  OP_end 		/* end */
 	};
-#endif
     Interp *interpreter = malloc(sizeof(Interp));
+
+    prog = usage;
+    if (argc > 1) {
+        if (!strcmp(argv[1], "mops"))
+            prog = mops;
+    }
     init(interpreter, prog);
-    run(interpreter);
+    run(interpreter, prog);
     return 0;
 }
 
