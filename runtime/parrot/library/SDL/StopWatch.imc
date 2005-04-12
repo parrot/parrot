@@ -129,7 +129,8 @@ Starts the stopwatch.
     time $N0
     start = $N0
     
-    addWatch( self )
+    $P0 = find_global "SDL::StopWatch::Timer", "addWatch"
+    $P0( self )
 END:
 .end
 
@@ -167,7 +168,8 @@ Stops the stopwatch.
     total = $N0 
     start = 0
 
-    removeWatch( self )
+    $P0 = find_global "SDL::StopWatch::Timer", "removeWatch"
+    $P0( self )
 END:
 .end
 
