@@ -306,6 +306,7 @@ docs/dev/events.pod                               [devel]doc
 docs/dev/infant.dev                               [devel]doc
 docs/dev/jit_i386.dev                             [main]doc
 docs/dev/longopt.dev                              [main]doc
+docs/dev/nanoparrot.c                             [main]doc
 docs/dev/pmc_freeze.pod                           [devel]doc
 docs/dev/rx.dev                                   [main]doc
 docs/embed.pod                                    [main]doc
@@ -316,7 +317,6 @@ docs/intro.pod                                    [main]doc
 docs/jit.pod                                      [main]doc
 docs/memory_internals.pod                         [main]doc
 docs/mmd.pod                                      [main]doc
-docs/nanoparrot.c                                 [main]doc
 docs/native_exec.pod                              [main]doc
 docs/overview.pod                                 [main]doc
 docs/parrot.pod                                   [main]doc
@@ -908,6 +908,7 @@ languages/forth/README                            [forth]
 languages/jako/Curses.jako                        [jako]
 languages/jako/MAINTAINER                         [jako]
 languages/jako/README                             [jako]
+languages/jako/SDL.jako                           [jako]
 languages/jako/docs/future.pod                    [jako]
 languages/jako/docs/jako.pod                      [jako]
 languages/jako/elem.jako                          [jako]
