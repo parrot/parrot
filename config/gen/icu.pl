@@ -142,10 +142,29 @@ HELP
   Configure::Data->set(
     has_icu    => 1,
     icu_shared  => $icushared,
-    icu_cflags  => "-I$icuheaders",
     icu_headers => join( ' ', @icu_headers ),
     icu_datadir => $icudatadir,
   );
+
+  # Add -I $Icuheaders if necessary
+  my $header = "unicode/ucnv.h";
+  Configure::Data->set(testheaders =>"#include <$header>\n");
+  Configure::Data->set(testheader => "$header");
+  cc_gen('config/auto/headers/test_c.in');
+
+  Configure::Data->set(testheaders => undef);  # Clean up.
+  Configure::Data->set(testheader => undef);
+  eval { cc_build(); };
+  if (!$@ && cc_run() =~ /^$header OK/) {
+    # Ok, we don't need anything more.
+    print "Your compiler found the icu headers... good!\n" if $verbose;
+  }
+  else {
+    print "Adding -I $icuheaders to ccflags for icu headers.\n" if $verbose;
+    Configure::Data->add(' ',
+    ccflags    => "-I $icuheaders");
+  }
+  cc_clean();
 
   $Configure::Step::result = "yes";
 
