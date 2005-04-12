@@ -104,7 +104,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 
     list = list_new(interpreter, enum_type_PMC);
 
-    p1 = pmc_new(interpreter, enum_class_PerlString);
+    p1 = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, p1, s);
 
     list_push(interpreter, list, p1, enum_type_PMC);
@@ -117,7 +117,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     PIO_eprintf(interpreter, "len now %d\n", i);
 
     s = string_make(interpreter, "list\n", 5, "iso-8859-1",0);
-    p1 = pmc_new(interpreter, enum_class_PerlString);
+    p1 = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, p1, s);
     list_assign(interpreter, list, 0, p1, enum_type_PMC);
 
@@ -125,7 +125,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     list2 = list_clone(interpreter, list);
 
     s = string_make(interpreter, "list 2\n", 7, "iso-8859-1",0);
-    p1 = pmc_new(interpreter, enum_class_PerlString);
+    p1 = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, p1, s);
     list_assign(interpreter, list2, 0, p1, enum_type_PMC);
 

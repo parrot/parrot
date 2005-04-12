@@ -139,7 +139,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Continuation");
-    new P5, .PerlInt
+    new P5, .Integer
     set P5, 3
     store_global "foo", P5
     new P1, .Continuation
@@ -204,7 +204,7 @@ main:
     new P0, .Sub
     set_addr P0, foo
 
-    new P5, .PerlInt
+    new P5, .Integer
     set P5, 5
 
     set I0, 0	# non-proto
@@ -212,7 +212,7 @@ main:
     invokecc
     set P0, P5	# the closure
 
-    new P5, .PerlInt
+    new P5, .Integer
     set P5, 3
 
     set I0, 0	# non-proto
@@ -266,7 +266,7 @@ f:
     find_lex P2, "n"	# invoke-ing the Sub pushes the lexical pad
     			# of the closure on the pad stack
     add P2, P5		# n += shift, the lexical is incremented
-    new P5, .PerlInt
+    new P5, .Integer
     set P5, P2
     set I0, 0	# non-proto
     set I3, 1	# 1 retval

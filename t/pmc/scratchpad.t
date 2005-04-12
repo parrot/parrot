@@ -12,7 +12,7 @@ t/pmc/scratchpad.t - Lexical Scratchpads
 
 =head1 DESCRIPTION
 
-Tests using C<PerlInt> PMC on lexical scratchpads.
+Tests using C<Integer> PMC on lexical scratchpads.
 
 =cut
 
@@ -20,7 +20,7 @@ use Parrot::Test tests => 10;
 
 output_is(<<CODE, <<OUTPUT, "direct set and get on scratchpad pmc");
 	new_pad P20, 0
-	new P0, .PerlInt
+	new P0, .Integer
 	set P0, 12
 
         set P20[0;"foo"], P0
@@ -50,11 +50,11 @@ output_is(<<CODE, <<OUTPUT, "test nested pads");
         new_pad 1
         new_pad P10, 2
 
-	new P0, .PerlInt
+	new P0, .Integer
 	set P0, 100
-	new P1, .PerlInt
+	new P1, .Integer
 	set P1, 101
-	new P2, .PerlInt
+	new P2, .Integer
 	set P2, 102
 
         set P10[0;"a"], P0
@@ -121,17 +121,17 @@ output_is(<<CODE, <<OUTPUT, "name and position");
         new_pad 1
         new_pad P10, 2
 
-	new P0, .PerlInt
+	new P0, .Integer
 	set P0, 100
-	new P1, .PerlInt
+	new P1, .Integer
 	set P1, 101
-	new P2, .PerlInt
+	new P2, .Integer
 	set P2, 102
-	new P3, .PerlInt
+	new P3, .Integer
 	set P3, 200
-	new P4, .PerlInt
+	new P4, .Integer
 	set P4, 201
-	new P5, .PerlInt
+	new P5, .Integer
 	set P5, 202
 
         set P10[0;"a"], P0
@@ -183,9 +183,9 @@ OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "clone scratchpads");
 	new_pad P20, 0
-	new P0, .PerlInt
+	new P0, .Integer
 	set P0, 100
-	new P1, .PerlInt
+	new P1, .Integer
 	set P1, 101
 
         set P20[0;"var0"], P0
@@ -193,7 +193,7 @@ output_is(<<CODE, <<OUTPUT, "clone scratchpads");
 
         clone P21, P20
 
-        new P20, .PerlInt
+        new P20, .Integer
 
         set P22, P21[0;"var0"] # original pad should be gced
         set P23, P21[0;"var1"]
@@ -210,7 +210,7 @@ OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "delete");
  	new_pad 0
-	new P1, .PerlString
+	new P1, .String
 	set P1, "ok 1\n"
 	store_lex -1, "foo", P1
 	find_lex P2, "foo"

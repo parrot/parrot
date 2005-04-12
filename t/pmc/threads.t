@@ -106,7 +106,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "thread type 2");
     set I5, 10
     set S5, " interp\n"
-    new P6, .PerlString
+    new P6, .String
     set P6, "from "
 
     #
@@ -203,10 +203,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "join, get retval");
     Adder = global "_add"
     kid = new ParrotThread
     .sym pmc from
-    from = new PerlInt
+    from = new Integer
     from = 0
     .sym pmc to
-    to = new PerlInt
+    to = new Integer
     to = MAX
     .sym pmc Thread_new
     find_method Thread_new, kid, "thread3"
@@ -232,7 +232,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "join, get retval");
     print "\n"
     # sum = n * (n + 1)/2
     .sym pmc Mul
-    Mul = new PerlInt
+    Mul = new Integer
     assign Mul, to
     inc Mul
     Mul = to * Mul
@@ -247,7 +247,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "join, get retval");
    .param pmc from
    .param pmc to
    .sym   pmc sum
-   sum = new PerlInt
+   sum = new Integer
 loop:
     add sum, from
     inc from
@@ -283,7 +283,7 @@ wait:
 .pcc_sub _foo:
     print "thread\n"
     sleep 0.1
-    new P2, .PerlInt
+    new P2, .Integer
     push P6, P2		# push item on queue
     returncc
 CODE
@@ -294,7 +294,7 @@ output_is(<<'CODE', <<'OUTPUT', "share a PMC");
     find_global P5, "_foo"
     new P2, .ParrotThread
     find_method P0, P2, "thread3"
-    new P20, .PerlInt
+    new P20, .Integer
     new P6, .SharedRef, P20
     set P6, 20
     set I3, 2   # P5..P6
@@ -327,13 +327,13 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUT', "multi-threaded");
     new P10, .TQueue
-    new P6, .PerlInt
+    new P6, .Integer
     set P6, 1
     push P10, P6
-    new P6, .PerlInt
+    new P6, .Integer
     set P6, 2
     push P10, P6
-    new P6, .PerlInt
+    new P6, .Integer
     set P6, 3
     push P10, P6
     set P6, P10
@@ -375,15 +375,15 @@ OUT
 
 output_is(<<'CODE', <<'OUT', "multi-threaded strings via SharedRef");
     new P10, .TQueue
-    new P7, .PerlString
+    new P7, .String
     set P7, "ok 1\n"
     new P8, .SharedRef, P7
     push P10, P8
-    new P7, .PerlString
+    new P7, .String
     new P8, .SharedRef, P7
     set P7, "ok 2\n"
     push P10, P8
-    new P7, .PerlString
+    new P7, .String
     set P7, "ok 3\n"
     new P8, .SharedRef, P7
     push P10, P8
@@ -424,17 +424,17 @@ done main
 OUT
 
 SKIP: {
-skip("no shared PerlStrings yet", 2);
+skip("no shared Strings yet", 2);
 output_is(<<'CODE', <<'OUT', "thread safe queue strings 1");
     new P10, .TQueue
     print "ok 1\n"
     set I0, P10
     print I0
     print "\n"
-    new P7, .PerlString
+    new P7, .String
     set P7, "ok 2\n"
     push P10, P7
-    new P7, .PerlString
+    new P7, .String
     set P7, "ok 3\n"
     push P10, P7
     set I0, P10
@@ -456,13 +456,13 @@ OUT
 
 output_is(<<'CODE', <<'OUT', "multi-threaded strings");
     new P10, .TQueue
-    new P7, .PerlString
+    new P7, .String
     set P7, "ok 1\n"
     push P10, P7
-    new P7, .PerlString
+    new P7, .String
     set P7, "ok 2\n"
     push P10, P7
-    new P7, .PerlString
+    new P7, .String
     set P7, "ok 3\n"
     push P10, P7
     set P6, P10

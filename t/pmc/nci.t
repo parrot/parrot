@@ -728,7 +728,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "nci_i4i");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_i4i", "i4i"
-  new P5, .PerlInt
+  new P5, .Integer
   set P5, -6
   set I5, -7
   invoke
@@ -746,7 +746,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_ii3");
   dlfunc P0, P1, "nci_ii3", "ii3"
   set I5, -6
 
-  new P5, .PerlInt
+  new P5, .Integer
   set P5, -7
 
   set I0, 1
@@ -1049,7 +1049,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature");
   push P2, .DATATYPE_FUNC_PTR
   # attach function signature property to this type
   set P1, P2[-1]
-  new P3, .PerlString
+  new P3, .String
   set P3, "it"
   setprop P1, "_signature", P3
   push P2, 0
@@ -1321,7 +1321,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "nci_vP");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vP", "vP"
-  new P5, .PerlString
+  new P5, .String
   set P5, "ok\n"
   invoke
   null P5
@@ -1338,12 +1338,12 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM");
 
   # we need a flag if the call_back is already done
-  new P10, .PerlInt
+  new P10, .Integer
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   newsub P6, .Sub, _call_back
   # prepare user data
-  new P7, .PerlInt
+  new P7, .Integer
   set P7, 42
   new_callback P5, P6, P7, "tU"	# Z in pdd16
   print "ok 1\n"
@@ -1470,12 +1470,12 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2 - PASM");
   # we need a flag if the call_back is already done
-  new P10, .PerlInt
+  new P10, .Integer
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   newsub P6, .Sub, _call_back
   # prepare user data
-  new P7, .PerlInt
+  new P7, .Integer
   set P7, 42
   new_callback P5, P6, P7, "iU"	# Z in pdd16
   print "ok 1\n"
@@ -1617,12 +1617,12 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_D1 - PASM");
 
   # we need a flag if the call_back is already done
-  new P10, .PerlInt
+  new P10, .Integer
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   newsub P6, .Sub, _call_back
   # prepare user data
-  new P7, .PerlInt
+  new P7, .Integer
   set P7, 42
   new_callback P5, P6, P7, "Ut"	# Z in pdd16
   print "ok 1\n"
@@ -1675,12 +1675,12 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PASM");
   # we need a flag if the call_back is already done
-  new P10, .PerlInt
+  new P10, .Integer
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   newsub P6, .Sub, _call_back
   # prepare user data
-  new P7, .PerlInt
+  new P7, .Integer
   set P7, 42
   new_callback P5, P6, P7, "Ui"	# Z in pdd16
   print "ok 1\n"
@@ -2072,9 +2072,9 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values');
 
 .include "datatypes.pasm"
-  new P2, .PerlInt
+  new P2, .Integer
   set P2, 3
-  new P3, .PerlInt
+  new P3, .Integer
   set P3, 2
 
   set P5, P2

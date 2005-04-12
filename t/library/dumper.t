@@ -333,11 +333,11 @@ pir_output_is(<<'CODE', <<'OUT', "properties");
     push array, "test1"
     push array, "test2"
 
-    new str, .PerlString
+    new str, .String
     set str, "value1"
     setprop array, "key1", str
 
-    new str, .PerlString
+    new str, .String
     set str, "value2"
     setprop array, "key2", str
 
@@ -594,11 +594,11 @@ pir_output_is(<<'CODE', <<'OUT', "dumping 'null'");
     null temp
     push array, temp
 
-    new temp, .PerlInt
+    new temp, .Integer
     set temp, 0
     push array, temp
 
-    new temp, .PerlString
+    new temp, .String
     set temp, "0"
     push array, temp
 

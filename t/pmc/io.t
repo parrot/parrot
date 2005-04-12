@@ -207,7 +207,7 @@ output_is(<<'CODE', <<'OUTPUT', "open & print");
        set I0, -12
        set N0, 2.2
        set S0, "Foo"
-       new P0, .PerlString
+       new P0, .String
        set P0, "Bar\n"
 
        open P1, "temp.file"
@@ -311,7 +311,7 @@ ok 3
 OUT
 
 output_is(<<'CODE', <<'OUTPUT', 'printerr');
-       new P0, .PerlString
+       new P0, .String
        set P0, "This is a test\n"
        printerr 10
        printerr "\n"

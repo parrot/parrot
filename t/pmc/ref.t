@@ -20,7 +20,7 @@ use Parrot::Test tests => 12;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new ref");
-	new P2, .PerlInt
+	new P2, .Integer
 	new P1, .Ref, P2
 	print "ok 1\n"
 	end
@@ -29,7 +29,7 @@ ok 1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "inc ref");
-	new P2, .PerlInt
+	new P2, .Integer
 	new P1, .Ref, P2
 	inc P1
 	print P1
@@ -54,7 +54,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "deref");
-	new P2, .PerlInt
+	new P2, .Integer
 	new P1, .Ref, P2
 	print "ok 1\n"
 	deref P3, P1
@@ -68,12 +68,12 @@ output_is(<<'CODE', <<'OUTPUT', "deref");
 CODE
 ok 1
 Ref
-PerlInt
+Integer
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "setref ref");
-	new P2, .PerlInt
-	new P3, .PerlNum
+	new P2, .Integer
+	new P3, .Float
 	set P3, 0.5
 	new P1, .Ref, P2
 	inc P1
@@ -90,14 +90,14 @@ output_is(<<'CODE', <<'OUTPUT', "setref ref");
 	end
 CODE
 1
-1.500000
+1.5
 1
-1.500000
+1.5
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "assign ref");
-	new P2, .PerlInt
-	new P3, .PerlNum
+	new P2, .Integer
+	new P3, .Float
 	set P3, 0.5
 	new P1, .Ref, P2
 	inc P1
@@ -114,13 +114,13 @@ output_is(<<'CODE', <<'OUTPUT', "assign ref");
 	end
 CODE
 1
-1.500000
-1.500000
-0.500000
+1.5
+1.5
+0.5
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "typeof SharedRef");
-	new P2, .PerlInt
+	new P2, .Integer
 	new P1, .SharedRef, P2
 	print "ok 1\n"
 	set P1, 4711
@@ -138,13 +138,13 @@ output_is(<<'CODE', <<'OUTPUT', "typeof SharedRef");
 CODE
 ok 1
 4711
-PerlInt
-PerlString
+Integer
+String
 hello
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "deref SharedRef");
-	new P2, .PerlInt
+	new P2, .Integer
 	new P1, .SharedRef, P2
 	print "ok 1\n"
 	deref P3, P1

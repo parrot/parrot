@@ -255,7 +255,7 @@ output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
      set P0[25], 125
      set P0[128], 10.2
      set P0[513], "cow"
-     new P1, .PerlInt
+     new P1, .Integer
      set P1, 123456
      set P0[1023], P1
 
@@ -299,7 +299,7 @@ pir_output_like(<<'CODE',
      .local pmc compares
      # XXX doesnt work wit prederef of JIT
      bounds 1
-     compares = new .PerlInt
+     compares = new .Integer
      compares = 0
      global "compares" = compares
      sort_ar()

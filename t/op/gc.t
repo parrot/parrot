@@ -40,7 +40,7 @@ CODE
 
 output_is( <<'CODE', '1', "sweep 0, with object that need destroy" );
       interpinfo I1, 2   # How many DOD runs have we done already?
-      new P0, .PerlUndef
+      new P0, .Undef
       needs_destroy P0
       sweep 0
       interpinfo I2, 2   # Should be one more now
@@ -51,9 +51,9 @@ CODE
 
 output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy");
       interpinfo I1, 2   # How many DOD runs have we done already?
-      new P0, .PerlUndef
+      new P0, .Undef
       needs_destroy P0
-      new P0, .PerlUndef # kill object
+      new P0, .Undef # kill object
       sweep 0
       interpinfo I2, 2   # Should be one more now
       sub I3, I2, I1
@@ -126,7 +126,7 @@ output_is(<<'CODE', <<OUTPUT, "sweepoff with newpmcs");
     sweepoff
     set I0, 0
 
-LOOP: new P0, .PerlString
+LOOP: new P0, .String
     set P0, "ABC"
     save P0
     inc I0
@@ -182,7 +182,7 @@ output_is(<<'CODE', <<OUTPUT, "vanishing return continuation in method calls");
 .pcc_sub __init:
     print "init\n"
     sweep 1
-    new P6, .PerlString
+    new P6, .String
     set P6, "hi"
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
@@ -232,7 +232,7 @@ output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
     ne I12, .PerlUndef, buffer_ok
     find_type I12, "Source::Buffer"
     new P12, I12
-    new P14, .PerlString
+    new P14, .String
     set P14, "hello\n"
     setprop P12, "buf", P14
     setprop P2, "buffer", P12
@@ -335,7 +335,7 @@ pir_output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
      new_pad 0
      $P0 = new PerlArray
      store_lex 0, "*paths*", $P0
-     $P0 = new PerlString
+     $P0 = new String
      $P0 = "@"
      store_lex 0, "failsym", $P0
      store_lex 0, "choose", $P0
@@ -674,7 +674,7 @@ lp3:
     null I0
     set I1, 10
     new P5, .TQueue
-    new P0, .PerlInt
+    new P0, .Integer
     needs_destroy P0
     # force partial sweep
     # P5 should now be black
@@ -683,14 +683,14 @@ lp3:
     new P1, .TQueue
     push P5, P1
     null P1
-    new P0, .PerlInt
+    new P0, .Integer
     needs_destroy P0
     # force  sweep
     sweep 0
     shift P1, P5
     push P5, P1
 lp1:
-    new P0, .PerlInt
+    new P0, .Integer
     needs_destroy P0
     # force  sweep
     sweep 0

@@ -306,7 +306,7 @@ ok 2
 OUTPUT
 output_is(<<'CODE', <<OUTPUT, "string iteration forward");
     .include "iterator.pasm"
-	new P2, .PerlString
+	new P2, .String
 	set P2, "parrot"
 	new P1, .Iterator, P2
 	set P1, .ITERATE_FROM_START
@@ -327,7 +327,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration backward");
     .include "iterator.pasm"
-	new P2, .PerlString
+	new P2, .String
 	set P2, "parrot"
 	new P1, .Iterator, P2
 	set P1, .ITERATE_FROM_END
@@ -348,7 +348,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration forward get ord");
     .include "iterator.pasm"
-	new P2, .PerlString
+	new P2, .String
 	set P2, "ABC"
 	new P1, .Iterator, P2
 	set P1, .ITERATE_FROM_START
@@ -369,7 +369,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration backward get ord");
 .include "iterator.pasm"
-	new P2, .PerlString
+	new P2, .String
 	set P2, "ABC"
 	new P1, .Iterator, P2
 	set P1, .ITERATE_FROM_END
@@ -389,12 +389,12 @@ ABC
 OUTPUT
 
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "PerlString iterator in PIR");
+pir_output_is(<< 'CODE', << 'OUTPUT', "String iterator in PIR");
 
 .include "iterator.pasm"
 .sub _main
     .local pmc string_1
-    string_1 = new PerlString
+    string_1 = new String
     string_1 = "abcd\x65\x66\x67"
     print string_1
     print "\n"
@@ -426,14 +426,14 @@ abcdefg
 reached end
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Index access for Iterator on PerlString");
+pir_output_is(<<'CODE', <<'OUTPUT', "Index access for Iterator on String");
 
 .include "iterator.pasm"
 .sub _main
     .local pmc string_1
-    string_1 = new PerlString
+    string_1 = new String
     string_1 = "abcd\x65\x66\x67"
-    print 'PerlString new: '
+    print 'String new: '
     print string_1
     print "\n"
 
@@ -469,7 +469,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Index access for Iterator on PerlString");
     end
 .end
 CODE
-PerlString new: abcdefg
+String new: abcdefg
 Iterator shift_integer: 97
 Iterator get_integer_keyed_int 2: 100
 Iterator get_integer_keyed_int 0: 98
@@ -721,7 +721,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "slice iter string");
     .include "iterator.pasm"
-	new P2, .PerlString
+	new P2, .String
 	set P2, "parrot"
 	slice P1, P2[0,1,4,5]
 	set P1, .ITERATE_FROM_START
@@ -883,7 +883,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "slice iter string range");
     .include "iterator.pasm"
-	new P2, .PerlString
+	new P2, .String
 	set P2, "parrot rocks"
 	slice P1, P2[1 ..3 ,5, 8 ..9]
 	set P1, .ITERATE_FROM_START
@@ -904,7 +904,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "slice iter string range 2");
     .include "iterator.pasm"
-	new P2, .PerlString
+	new P2, .String
 	set P2, "parrot rocks"
 	slice P1, P2[ ..3 ,5, 8 ..]
 	set P1, .ITERATE_FROM_START
@@ -925,7 +925,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "slice iter string variable range");
     .include "iterator.pasm"
-	new P2, .PerlString
+	new P2, .String
 	set P2, "parrot rocks"
 	set I0, 1
 	set I1, 3
@@ -1219,7 +1219,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration with get_iter");
     .include "iterator.pasm"
-	new P2, .PerlString
+	new P2, .String
 	set P2, "parrot"
 	iter P1, P2
 iter_loop:

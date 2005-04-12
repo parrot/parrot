@@ -251,7 +251,7 @@ the_test(Interp *interpreter,
 
     h = pmc_new(interpreter, enum_class_Hash);
     hash = PMC_struct_val(h);
-    i = pmc_new(interpreter, enum_class_PerlInt);
+    i = pmc_new(interpreter, enum_class_Integer);
 
     if ( hash == NULL ) {
 	PIO_eprintf(interpreter, "hash creation failed\n");
@@ -344,17 +344,17 @@ the_test(Interp *interpreter,
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
-    value = pmc_new(interpreter, enum_class_PerlInt);
+    value = pmc_new(interpreter, enum_class_Integer);
     VTABLE_set_integer_native(interpreter, value, 42);
     hash_put(interpreter, hash, key, value);
 
     key = string_from_cstring(interpreter, "twocents", 0);
-    value = pmc_new(interpreter, enum_class_PerlNum);
+    value = pmc_new(interpreter, enum_class_Float);
     VTABLE_set_number_native(interpreter, value, 0.02);
     hash_put(interpreter, hash, key, value);
 
     key = string_from_cstring(interpreter, "blurb", 0);
-    value = pmc_new(interpreter, enum_class_PerlString);
+    value = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, value, key);
     hash_put(interpreter, hash, key, value);
 
@@ -395,7 +395,7 @@ the_test(Interp *interpreter,
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
-    value = pmc_new(interpreter, enum_class_PerlInt);
+    value = pmc_new(interpreter, enum_class_Integer);
     VTABLE_set_integer_native(interpreter, value, 42);
     hash_put(interpreter, hash, key, value);
 

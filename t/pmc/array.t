@@ -84,7 +84,7 @@ OK_2:	print "ok 2\n"
 	print "not "
 OK_3:	print "ok 3\n"
 
-        new P1, .PerlInt
+        new P1, .Integer
         set P1, 3
 	set P0,P1
 	set I0,P0
@@ -201,7 +201,7 @@ output_is(<<'CODE', <<OUTPUT, "defined");
     defined I0, P0[100]
     print I0
     print "\n"
-    new P1, .PerlUndef
+    new P1, .Undef
     set P0[2], P1
     defined I0, P0[2]
     print I0
@@ -241,7 +241,7 @@ output_is(<<'CODE', <<OUTPUT, "exists");
     exists I0, P0[100]
     print I0
     print "\n"
-    new P1, .PerlUndef
+    new P1, .Undef
     set P0[2], P1
     exists I0, P0[2]
     print I0
@@ -323,7 +323,7 @@ output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
      set P0[25], 125
      set P0[128], -9.9
      set P0[513], "qwertyuiopasdfghjklzxcvbnm"
-     new P1, .PerlInt
+     new P1, .Integer
      set P1, 123456
      set P0[1023], P1
 
@@ -393,7 +393,7 @@ output_is(<<'CODE', <<OUT, "multikeyed access P arg");
 	set P0, 1
 	new P1, .Array
 	set P1, 1
-	new P3, .PerlInt
+	new P3, .Integer
 	set P3, 20
 	set P0[0], P1
 	set P0[0;0], P3

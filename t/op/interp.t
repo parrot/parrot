@@ -142,7 +142,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "clone and runinterp");
     set I0, 1
     set S0, " interp\n"
-    new P0, .PerlString
+    new P0, .String
     set P0, "from "
 
     getinterp P2
@@ -171,7 +171,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp");
     set I0, 1
     set S0, " interp\n"
-    new P0, .PerlString
+    new P0, .String
     set P0, "from "
 
     getinterp P2
@@ -201,7 +201,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp - sweep");
     set I0, 1
     set S0, " interp\n"
-    new P0, .PerlString
+    new P0, .String
     set P0, "from "
 
     getinterp P2
@@ -236,7 +236,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp - ret via invoke");
     set I0, 1
     set S0, " interp\n"
-    new P0, .PerlString
+    new P0, .String
     set P0, "from "
 
     getinterp P2

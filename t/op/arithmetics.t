@@ -13,7 +13,7 @@ t/op/arithmetics.t - Arithmetic Ops
 =head1 DESCRIPTION
 
 Tests basic arithmetic on various combinations of Parrot integer and
-number types and C<PerlInt> and C<PerlNum>.
+number types.
 
 =cut
 

@@ -19,8 +19,8 @@ Tests the C<store_global> and C<find_global> operations.
 use Parrot::Test tests => 4;
 
 output_is(<<'CODE', '12', "Fetch and store");
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .Integer
+	new P1, .Integer
 	set P0, 12
 	set P1, 7
 	store_global "Integer", P0

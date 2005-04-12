@@ -1734,7 +1734,7 @@ MAIN:
     bsr PRINTF
 
     set S1, "1 == %Pd\n"
-    new P0, .PerlInt
+    new P0, .Integer
     set P0, 1
     bsr NEWARYP
     bsr PRINTF
@@ -1836,15 +1836,15 @@ PRINTF:
     ret
 
 MAIN:
-    new P3, .PerlString
+    new P3, .String
 
-    new P2, .PerlString
+    new P2, .String
     set P2, "15 is %b\n"
     new P1, .PerlArray
     set P1[0], 15
     bsr PRINTF
 
-    new P2, .PerlString
+    new P2, .String
     set P2, "128 is %o\n"
     new P1, .PerlArray
     set P1[0], 128

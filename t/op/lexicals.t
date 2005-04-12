@@ -20,8 +20,8 @@ use Parrot::Test tests => 14;
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad 0
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .Integer
+	new P1, .Integer
 	set P0, 12
 	set P1, 7
 	store_lex 0, "Integer", P0
@@ -39,8 +39,8 @@ OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "Repeated stores with the same key");
 	new_pad 0
-	new P0, .PerlInt
-	new P1, .PerlInt
+	new P0, .Integer
+	new P1, .Integer
         set I0, 0
 LOOP:
 	set P0, I0
@@ -65,10 +65,10 @@ CODE
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "nested scopes");
-  new P0, .PerlInt
-  new P1, .PerlInt
-  new P2, .PerlInt
-  new P3, .PerlInt
+  new P0, .Integer
+  new P1, .Integer
+  new P2, .Integer
+  new P3, .Integer
   set P0, 0
   set P1, 1
   set P2, 2
@@ -119,7 +119,7 @@ output_is(<<'CODE', <<'OUTPUT', "Replacing a scope at the same depth.");
 #     print $foo, $bar
 # }
 
-	new P3, .PerlInt
+	new P3, .Integer
 	set P3, 2
 	save P3
 	bsr sub1
@@ -129,7 +129,7 @@ sub2:
 	saveall
 	new_pad 1
 	restore P1
-	new P2, .PerlInt
+	new P2, .Integer
 	set P2, 0
 	clone P3, P1
 	dec P3
@@ -184,9 +184,9 @@ output_is(<<CODE, <<OUTPUT, "pad stack ops");
         new_pad P11, 0
         new_pad P12, 0
 
-	new P0, .PerlInt
-	new P1, .PerlInt
-	new P2, .PerlInt
+	new P0, .Integer
+	new P1, .Integer
+	new P2, .Integer
 	set P0, 12
 	set P1, 7
 	set P2, 46
@@ -281,12 +281,12 @@ output_is(<<CODE, <<OUTPUT, "access by position");
         new_pad 1
         new_pad 2
 
-	new P0, .PerlInt
-	new P1, .PerlInt
-	new P2, .PerlInt
-	new P3, .PerlInt
-	new P4, .PerlInt
-	new P5, .PerlInt
+	new P0, .Integer
+	new P1, .Integer
+	new P2, .Integer
+	new P3, .Integer
+	new P4, .Integer
+	new P5, .Integer
 	set P0, 10
 	set P1, 11
 	set P2, 12
@@ -369,13 +369,13 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "store by name, get by idx");
 	new_pad 0
-	new P0, .PerlString
+	new P0, .String
 	set P0, "ok 1\n"
 	store_lex -1, "a", P0
-	new P0, .PerlString
+	new P0, .String
 	set P0, "ok 2\n"
 	store_lex -1, "b", P0
-	new P0, .PerlString
+	new P0, .String
 	set P0, "ok 3\n"
 	store_lex -1, "c", P0
 	find_lex P1, 0

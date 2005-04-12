@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
-    type = Parrot_PMC_typenum(interpreter, "PerlInt");
+    type = Parrot_PMC_typenum(interpreter, "Integer");
     testpmc = Parrot_PMC_new(interpreter, type);
 
     value = 101010;
@@ -228,7 +228,7 @@ int main(int argc, char* argv[]) {
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
-    type = Parrot_PMC_typenum(interpreter, "PerlInt");
+    type = Parrot_PMC_typenum(interpreter, "Integer");
     testpmc = Parrot_PMC_new(interpreter, type);
 
     value = -123;
@@ -265,7 +265,7 @@ int main(int argc, char* argv[]) {
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
-    type = Parrot_PMC_typenum(interpreter, "PerlNum");
+    type = Parrot_PMC_typenum(interpreter, "Float");
     testpmc = Parrot_PMC_new(interpreter, type);
 
     value = 3.1415927;
@@ -298,7 +298,7 @@ int main(int argc, char* argv[]) {
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
-    type = Parrot_PMC_typenum(interpreter, "PerlString");
+    type = Parrot_PMC_typenum(interpreter, "String");
     testpmc = Parrot_PMC_new(interpreter, type);
 
     value = Parrot_new_string(interpreter, "Pumpking", 8, "iso-8859-1", 0);
@@ -331,7 +331,7 @@ int main(int argc, char* argv[]) {
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
-    type = Parrot_PMC_typenum(interpreter, "PerlString");
+    type = Parrot_PMC_typenum(interpreter, "String");
     testpmc = Parrot_PMC_new(interpreter, type);
 
     Parrot_PMC_set_cstring(interpreter, testpmc, "Wibble");
@@ -366,7 +366,7 @@ int main(int argc, char* argv[]) {
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
-    type = Parrot_PMC_typenum(interpreter, "PerlString");
+    type = Parrot_PMC_typenum(interpreter, "String");
     testpmc = Parrot_PMC_new(interpreter, type);
 
     length = 6;
@@ -448,7 +448,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     key = key_new_cstring(interpreter, "_sub2");
     sub = VTABLE_get_pmc_keyed(interpreter,
 			       interpreter->globals->stash_hash, key);
-    arg = pmc_new(interpreter, enum_class_PerlString);
+    arg = pmc_new(interpreter, enum_class_String);
     VTABLE_set_string_native(interpreter, arg,
 			     string_from_cstring(interpreter, "hello ", 0));
     Parrot_call_sub(interpreter, sub, "vP", arg);

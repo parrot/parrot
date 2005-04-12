@@ -20,8 +20,8 @@ use Test::More;
 
 END { unlink "temp.fpmc"; };
 
-output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
-    new P1, .PerlInt
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Integer");
+    new P1, .Integer
     set P1, 777
     freeze S0, P1
 
@@ -33,11 +33,11 @@ output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
     print "\n"
     end
 CODE
-PerlInt 777
+Integer 777
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlString");
-    new P1, .PerlString
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a String");
+    new P1, .String
     set P1, "foo"
     freeze S0, P1
 
@@ -49,11 +49,11 @@ output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlString");
     print "\n"
     end
 CODE
-PerlString foo
+String foo
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlNum");
-    new P1, .PerlNum
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Float");
+    new P1, .Float
     set P1, 3.14159
     freeze S0, P1
 
@@ -65,15 +65,15 @@ output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlNum");
     print "\n"
     end
 CODE
-PerlNum 3.141590
+Float 3.14159
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlArray");
     new P0, .PerlArray
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 666
     push P0, P1
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 777
     push P0, P1
     freeze S0, P0
@@ -100,7 +100,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "freeze PerlArray self-ref");
     new P0, .PerlArray
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 666
     push P0, P1
     push P0, P0
@@ -112,11 +112,11 @@ ok
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw PerlArray self-ref");
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 666
     new P0, .PerlArray
     push P0, P1
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 777
     push P0, P1
     push P0, P0
@@ -148,16 +148,16 @@ PerlArray 3
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw PerlArray self-ref, contained Arrray");
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 666
     new P0, .PerlArray
     push P0, P1
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 777
     push P0, P1
 
     new P2, .PerlArray
-    new P4, .PerlInt
+    new P4, .Integer
     set P4, 4
     push P2, P4
     push P2, P0
@@ -200,42 +200,12 @@ PerlArray 4
 777
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlHash");
-    new P1, .PerlInt
-    set P1, 666
-    new P0, .PerlHash
-    set P0["k1"], P1
-    new P1, .PerlInt
-    set P1, 777
-    set P0["k2"], P1
-    freeze S0, P0
-
-    thaw P10, S0
-    typeof S10, P10
-    print S10
-    print " "
-    set I11, P10
-    print I11
-    print "\n"
-    set P12, P10["k1"]
-    print P12
-    print "\n"
-    set P12, P10["k2"]
-    print P12
-    print "\n"
-    end
-CODE
-PerlHash 2
-666
-777
-OUTPUT
-
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Hash");
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 666
     new P0, .Hash
     set P0["k1"], P1
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 777
     set P0["k2"], P1
     freeze S0, P0
@@ -260,10 +230,40 @@ Hash 2
 777
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt with prop");
-    new P1, .PerlInt
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Hash");
+    new P1, .Integer
     set P1, 666
-    new P2, .PerlInt
+    new P0, .Hash
+    set P0["k1"], P1
+    new P1, .Integer
+    set P1, 777
+    set P0["k2"], P1
+    freeze S0, P0
+
+    thaw P10, S0
+    typeof S10, P10
+    print S10
+    print " "
+    set I11, P10
+    print I11
+    print "\n"
+    set P12, P10["k1"]
+    print P12
+    print "\n"
+    set P12, P10["k2"]
+    print P12
+    print "\n"
+    end
+CODE
+Hash 2
+666
+777
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Integer with prop");
+    new P1, .Integer
+    set P1, 666
+    new P2, .Integer
     set P2, 42
     setprop P1, "answer", P2
     freeze S0, P1
@@ -280,19 +280,19 @@ output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt with prop");
     print "\n"
     end
 CODE
-PerlInt 666
+Integer 666
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "freeze/thaw Array w PerlInt with prop");
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw Array w Integer with prop");
     new P0, .PerlArray
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 666
     push P0, P1
-    new P2, .PerlInt
+    new P2, .Integer
     set P2, 777
     push P0, P2
-    new P3, .PerlInt
+    new P3, .Integer
     set P3, 42
     setprop P1, "answer", P3
 
@@ -339,7 +339,7 @@ output_is(<<'CODE', <<'OUTPUT', "freeze/thaw array w NULL pmc");
     new P0, .PerlArray
     null P1
     push P0, P1
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 10
     push P0, P1
 
@@ -390,13 +390,13 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray");
     new P0, .FixedPMCArray
     set P0, 3
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 666
     set P0[0], P1
-    new P2, .PerlInt
+    new P2, .Integer
     set P2, 777
     set P0[1], P2
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 666
     set P0[2], P1
     freeze S0, P0
@@ -432,10 +432,10 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray");
     new P0, .FixedPMCArray
     set P0, 3
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 666
     set P0[0], P1
-    new P2, .PerlInt
+    new P2, .Integer
     set P2, 777
     set P0[1], P2
     set P0[2], P1
@@ -574,7 +574,7 @@ ok1:
     new P5, I4
     print "ok 3\n"
     classoffset I5, P5, S10
-    new P6, .PerlString
+    new P6, .String
     set P6, "ok 5\n"
     setattribute P5, I5, P6
     print "ok 4\n"
@@ -615,10 +615,10 @@ output_is(<<'CODE', <<'OUTPUT', "thaw class w attr same interp");
     new P5, I4
     print "ok 3\n"
     classoffset I5, P5, S10
-    new P6, .PerlString
+    new P6, .String
     set P6, "ok 5\n"
     setattribute P5, "Foo\0.aa", P6
-    new P6, .PerlString
+    new P6, .String
     set P6, "ok 6\n"
     setattribute P5, "Foo\0.bb", P6
     print "ok 4\n"
@@ -662,10 +662,10 @@ output_is(<<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter");
 
     print "ok 3\n"
     classoffset I5, P5, S10
-    new P6, .PerlString
+    new P6, .String
     set P6, "ok 5\n"
     setattribute P5, "Foo\0.aa", P6
-    new P6, .PerlString
+    new P6, .String
     set P6, "ok 6\n"
     setattribute P5, "Foo\0.bb", P6
     print "ok 4\n"
@@ -705,10 +705,10 @@ ok1:
 
     print "ok 3\n"
     classoffset I5, P5, S10
-    new P6, .PerlString
+    new P6, .String
     set P6, "ok 5\n"
     setattribute P5, "Foo\0.aa", P6
-    new P6, .PerlString
+    new P6, .String
     set P6, "ok 6\n"
     setattribute P5, "Foo\0.bb", P6
     print "ok 4\n"

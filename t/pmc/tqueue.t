@@ -25,10 +25,10 @@ output_is(<<'CODE', <<'OUT', "thread safe queue 1");
     set I0, P10
     print I0
     print "\n"
-    new P7, .PerlInt
+    new P7, .Integer
     set P7, 2
     push P10, P7
-    new P7, .PerlInt
+    new P7, .Integer
     set P7, 3
     push P10, P7
     set I0, P10

@@ -226,10 +226,10 @@ output_is(<<'CODE', <<'OUT', "Timer setup - timer in array destroy");
     sweep 0
     # hide timer in array
     set P1[0], P0
-    new P0, .PerlUndef
+    new P0, .Undef
     sweep 0
     # un-anchor the array
-    new P1, .PerlUndef
+    new P1, .Undef
     # do a lazy DOD run
     sweep 0
     sleep 1

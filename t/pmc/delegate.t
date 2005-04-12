@@ -107,7 +107,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "delegate assign_pmc");
     new P0, .delegate
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 42
     assign P0, P1
     end
@@ -126,7 +126,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
 .sub main
     new P0, .delegate
     set P0, 1
-    new P2, .PerlInt
+    new P2, .Integer
     add P2, P0, 1
     print P2	# yeah 1+1 = 3
     print "\n"
@@ -160,9 +160,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
 .sub main
     new P0, .delegate
     set P0, 1
-    new P1, .PerlInt
+    new P1, .Integer
     set P1, 1
-    new P2, .PerlInt
+    new P2, .Integer
     set P2, 777
     add P2, P0, P1
     print P2	# yeah 1+1 = 3

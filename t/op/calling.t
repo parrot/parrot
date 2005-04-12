@@ -21,21 +21,21 @@ use Test::More;
 
 # Test calling convention operations
 output_is(<<'CODE', <<OUTPUT, "foldup");
-    new P19, .PerlString
-    new P18, .PerlString
-    new P17, .PerlString
-    new P16, .PerlString
-    new P21, .PerlString
-    new P20, .PerlString
-    new P22, .PerlString
-    new P24, .PerlString
-    new P28, .PerlString
-    new P29, .PerlString
-    new P30, .PerlString
-    new P27, .PerlString
-    new P26, .PerlString
-    new P25, .PerlString
-    new P23, .PerlString
+    new P19, .String
+    new P18, .String
+    new P17, .String
+    new P16, .String
+    new P21, .String
+    new P20, .String
+    new P22, .String
+    new P24, .String
+    new P28, .String
+    new P29, .String
+    new P30, .String
+    new P27, .String
+    new P26, .String
+    new P25, .String
+    new P23, .String
     set P20,"Foobar!"
     set P23,"Baxman!"
     newsub P0, .Sub, _foo
@@ -84,21 +84,21 @@ Baxman!
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "foldup_p_i w. skip");
-    new P19, .PerlString
-    new P18, .PerlString
-    new P17, .PerlString
-    new P16, .PerlString
-    new P21, .PerlString
-    new P20, .PerlString
-    new P22, .PerlString
-    new P24, .PerlString
-    new P28, .PerlString
-    new P29, .PerlString
-    new P30, .PerlString
-    new P27, .PerlString
-    new P26, .PerlString
-    new P25, .PerlString
-    new P23, .PerlString
+    new P19, .String
+    new P18, .String
+    new P17, .String
+    new P16, .String
+    new P21, .String
+    new P20, .String
+    new P22, .String
+    new P24, .String
+    new P28, .String
+    new P29, .String
+    new P30, .String
+    new P27, .String
+    new P26, .String
+    new P25, .String
+    new P23, .String
     set P20,"Foobar!"
     set P23,"Baxman!"
     newsub P0, .Sub, _foo

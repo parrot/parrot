@@ -313,7 +313,7 @@ output_is(<<'CODE', <<'OUTPUT', "multiply");
 	new P0, .Complex
 	new P1, .Complex
 	new P2, .Float
-        new P3, .PerlInt
+        new P3, .Integer
 
     set P0, "2 + 3i"
     mul P0, P0, P0

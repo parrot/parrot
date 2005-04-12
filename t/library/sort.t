@@ -348,7 +348,7 @@ x
 y
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sorting PerlString letters");
+pir_output_is(<<'CODE', <<'OUT', "sorting String letters");
 
 .sub _main
     .local pmc array
@@ -357,19 +357,19 @@ pir_output_is(<<'CODE', <<'OUT', "sorting PerlString letters");
     .local pmc tmp, sort
 
     new array, .PerlArray
-    new tmp, .PerlString
+    new tmp, .String
     set tmp, "w"
     push array, tmp
 
-    new tmp, .PerlString
+    new tmp, .String
     set tmp, "x"
     push array, tmp
 
-    new tmp, .PerlString
+    new tmp, .String
     set tmp, "h"
     push array, tmp
 
-    new tmp, .PerlString
+    new tmp, .String
     set tmp, "y"
     push array, tmp
 
@@ -403,7 +403,7 @@ pir_output_is(<<'CODE', <<'OUT', "sorting strings");
     .local pmc tmp, sort
 
     new array, .PerlArray
-    new tmp, .PerlString
+    new tmp, .String
     push array, "hello"
     push array, "hash2"
     push array, "hello2"

@@ -35,13 +35,13 @@ OUT
 
 output_is(<<'CODE', <<OUT, "set keys, get idx");
     new P0, .OrderedHash
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 1\n"
     set P0["x"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 2\n"
     set P0["a"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 3\n"
     set P0["j"], P1
 
@@ -77,13 +77,13 @@ OUT
 output_is(<<'CODE', <<OUT, "iterate");
     .include "iterator.pasm"
     new P0, .OrderedHash
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 1\n"
     set P0["x"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 2\n"
     set P0["a"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 3\n"
     set P0["j"], P1
 
@@ -115,10 +115,10 @@ OUT
 
 output_is(<<'CODE', <<OUT, "idx only");
     new P0, .OrderedHash
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 2\n"
     set P0[1], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 1\n"
     set P0[0], P1
 
@@ -134,13 +134,13 @@ OUT
 
 output_is(<<'CODE', <<OUT, "set keys, get idx - cloned");
     new P10, .OrderedHash
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 1\n"
     set P10["x"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 2\n"
     set P10["a"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 3\n"
     set P10["j"], P1
 
@@ -188,7 +188,7 @@ OUT
 
 output_is(<<'CODE', <<OUT, "exists_keyed");
     new P0, .OrderedHash
-    new P1, .PerlInt
+    new P1, .Integer
     set P0["key"], P1
     exists I0, P0["key"]
     print I0
@@ -213,7 +213,7 @@ OUT
 
 output_is(<<'CODE', <<OUT, "defined_keyed");
     new P0, .OrderedHash
-    new P1, .PerlUndef
+    new P1, .Undef
     set P0["key"], P1
     defined I0, P0["key"]
     print I0
@@ -252,13 +252,13 @@ OUT
 output_is(<<'CODE', <<OUT, "delete");
     .include "iterator.pasm"
     new P0, .OrderedHash
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 1\n"
     set P0["x"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 2\n"
     set P0["a"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 3\n"
     set P0["j"], P1
 
@@ -321,13 +321,13 @@ OUTPUT
 output_like(<<'CODE', '/[axj]/', "iterate over keys");
     .include "iterator.pasm"
     new P0, .OrderedHash
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 1\n"
     set P0["x"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 2\n"
     set P0["a"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 3\n"
     set P0["j"], P1
 
@@ -345,13 +345,13 @@ CODE
 output_like(<<'CODE', <<'OUT', "iterate over keys, get value");
     .include "iterator.pasm"
     new P0, .OrderedHash
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 1\n"
     set P0["x"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 2\n"
     set P0["a"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "ok 3\n"
     set P0["j"], P1
 
@@ -377,7 +377,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash in PIR with PMC value");
     .local pmc hash1
     hash1 = new OrderedHash
     .local pmc val_in
-    val_in = new PerlString
+    val_in = new String
     val_in = "U"
     hash1["X"] = val_in
 
@@ -531,10 +531,10 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "delete and access remaining");
     new P0, .OrderedHash
-    new P1, .PerlString
+    new P1, .String
     set P1, "A"
     set P0["a"], P1
-    new P1, .PerlString
+    new P1, .String
     set P1, "B"
     set P0["b"], P1
 

@@ -226,7 +226,7 @@ output_is(<<'CODE', <<'OUTPUT', "mixed indexed");
 	set P0[1], N0
 	set S0, "string\n"
 	set P0[2], S0
-	new P1, .PerlUndef
+	new P1, .Undef
 	set P1, 42
 	set P0[3], P1
 
@@ -259,7 +259,7 @@ output_is(<<'CODE', <<'OUTPUT', "mixed push");
 	push P0, N0
 	set S0, "string\n"
 	push P0, S0
-	new P1, .PerlUndef
+	new P1, .Undef
 	set P1, 42
 	push P0, P1
 
@@ -292,7 +292,7 @@ output_is(<<'CODE', <<'OUTPUT', "mixed push - clone");
 	push P2, N0
 	set S0, "string\n"
 	push P2, S0
-	new P1, .PerlUndef
+	new P1, .Undef
 	set P1, 42
 	push P2, P1
 
@@ -367,7 +367,7 @@ output_is(<<'CODE', <<'OUTPUT', "mixed shift");
 	push P0, N0
 	set S0, "string\n"
 	push P0, S0
-	new P1, .PerlUndef
+	new P1, .Undef
 	set P1, 42
 	push P0, P1
 
@@ -472,7 +472,7 @@ OUTPUT
 output_like(<<'CODE', <<'OUTPUT', "const SArray 1");
     new P0, .ConstSArray
     set P0, 10
-    new P1, .PerlInt
+    new P1, .Integer
     inc P1
     setprop P0, "_ro", P1
     set P0, 20
@@ -485,7 +485,7 @@ output_like(<<'CODE', <<'OUTPUT', "const SArray 2");
     new P0, .ConstSArray
     set P0, 2
     push P0, 10
-    new P1, .PerlInt
+    new P1, .Integer
     inc P1
     setprop P0, "_ro", P1
     set P2, P0[0]
@@ -505,7 +505,7 @@ OUTPUT
 output_like(<<'CODE', <<'OUTPUT', "const SArray try to unset _ro");
     new P0, .ConstSArray
     set P0, 10
-    new P1, .PerlInt
+    new P1, .Integer
     inc P1
     setprop P0, "_ro", P1
     printerr "ok\n"

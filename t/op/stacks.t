@@ -511,10 +511,10 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', 'pushp & popp');
-	new	P0, .PerlString
+	new	P0, .String
 	set	P0, "BUTTER IN HELL!\\n"
 	pushp
-	new	P0, .PerlString
+	new	P0, .String
 	set	P0, "THERE'LL BE NO "
 	print	P0
 	popp
@@ -648,8 +648,8 @@ OUTPUT
 
 ($code, $output) = ();
 for (0..1024) {
-   $code .= "   new P0, .PerlString\n";
-   $code .= "   new P31, .PerlString\n";
+   $code .= "   new P0, .String\n";
+   $code .= "   new P31, .String\n";
    $code .= "   set P0, \"$_\"\n";
    $code .= "   set P31, \"" . (1024-$_) . "\"\n";
    $code .= "   pushp\n";
@@ -997,10 +997,10 @@ EQ3:	print	"equal to PI\\n"
 	restore	S0
 	print	S0
 
-	new	P0, .PerlString
+	new	P0, .String
 	set	P0, "never to escape\\n"
 	save	P0
-	new	P0, .PerlString
+	new	P0, .String
 	set	P0, "find themselves caught in a loop\\n"
 	print	P0
 	restore	P0
@@ -1025,7 +1025,7 @@ output_is(<<CODE, <<OUTPUT, "entrytype");
 	set	I0, 12
 	set	N0, 0.1
 	set	S0, "Difference Engine #2"
-	new	P0, .PerlString
+	new	P0, .String
 	set	P0, "Shalmaneser"
 
 	save	P0
@@ -1418,12 +1418,12 @@ sub print_str_regs {
   return $rt;
 }
 
-# Create a PerlString in each PMC reg, with value given by &$_[0](reg num)
+# Create a String in each PMC reg, with value given by &$_[0](reg num)
 sub set_pmc_regs {
   my $code = shift;
   my $rt;
   for (0..31) {
-    $rt .= "\tnew P$_, .PerlString\n";
+    $rt .= "\tnew P$_, .String\n";
     $rt .= "\tset P$_, \"".&$code($_)."\"\n";
   }
   return $rt;

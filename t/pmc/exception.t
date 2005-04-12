@@ -76,7 +76,7 @@ output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - message, check P5");
 
     new P30, .Exception
     set P30["_message"], "something happend"
-    new P5, .PerlUndef
+    new P5, .Undef
     set P5, "a string\n"
     throw P30
     print "not reached\n"
@@ -101,7 +101,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - lexical");
     print "main\n"
     new_pad 0
-    new P0, .PerlInt
+    new P0, .Integer
     set P0, 42
     store_lex -1, "$a", P0
     newsub P20, .Exception_Handler, _handler
@@ -150,7 +150,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return, change lexical");
     print "main\n"
     new_pad 0
-    new P0, .PerlInt
+    new P0, .Integer
     set P0, 42
     store_lex -1, "$a", P0
     newsub P20, .Exception_Handler, _handler
@@ -397,7 +397,7 @@ output_is(<<'CODE', <<'OUTPUT', "clear_eh, set_eh again");
 	set_eh P10
 	find_lex P13,"a"
 	clear_eh
-	new P13, .PerlNum
+	new P13, .Float
 	store_lex -1,"a",P13
 	set P13, I12
 	find_lex P14,"a"

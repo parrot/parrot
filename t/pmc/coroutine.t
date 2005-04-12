@@ -22,7 +22,7 @@ use Test::More;
 output_is(<<'CODE', <<'OUTPUT', "Coroutine 1");
 _main:
     newsub P0, .Coroutine, _coro
-    new P10, .PerlInt
+    new P10, .Integer
     set P10, 2
     store_global "i", P10
 lp:
@@ -121,7 +121,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 1");
     new_pad 0
 
-    new P20, .PerlString
+    new P20, .String
     set P20, "main\n"
     store_lex -1, "a", P20
 
@@ -136,7 +136,7 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 1");
 
 co1:
     new_pad 1
-    new P22, .PerlString
+    new P22, .String
     set P22, "coro\n"
 
     store_lex -1, "a", P22
@@ -155,9 +155,9 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 2");
     new_pad 0
     new_pad 1
 
-    new P20, .PerlInt
+    new P20, .Integer
     set P20, 20
-    new P21, .PerlInt
+    new P21, .Integer
     set P21, 21
 
     store_lex -1, "a", P20
@@ -201,7 +201,7 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 2");
 co1:
     new_pad 2
 
-    new P22, .PerlInt
+    new P22, .Integer
     set P22, 22
 
     store_lex -1, "b", P22  # hides
@@ -376,7 +376,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example");
     newsub itr, .Coroutine, _iterator
 
     .local object zero
-    zero = new PerlInt
+    zero = new Integer
     zero = 0
 
     newsub return, .Continuation, return_here
@@ -399,7 +399,7 @@ return_here:
 
 .pcc_sub _iterator prototyped
     .local object x
-    x = new PerlInt
+    x = new Integer
     x = 0
     iloop:
         .pcc_begin_yield
@@ -428,7 +428,7 @@ _main:
     newsub P0, .Coroutine, _coro
     newsub P16, .Exception_Handler, _catchm
     set_eh P16
-    new P16, .PerlInt
+    new P16, .Integer
     set P16, 2
     store_global "i", P16
 lp:
@@ -468,7 +468,7 @@ _main:
     newsub P0, .Coroutine, _coro
     newsub P16, .Exception_Handler, _catchm
     set_eh P16
-    new P16, .PerlInt
+    new P16, .Integer
     set P16, 2
     store_global "i", P16
 lp:
@@ -508,7 +508,7 @@ _main:
     newsub P0, .Coroutine, _coro
     newsub P16, .Exception_Handler, _catchm
     set_eh P16
-    new P16, .PerlInt
+    new P16, .Integer
     set P16, 2
     store_global "i", P16
 lp:
@@ -546,7 +546,7 @@ _main:
     newsub P0, .Coroutine, _coro
     newsub P16, .Exception_Handler, _catchm
     set_eh P16
-    new P16, .PerlInt
+    new P16, .Integer
     set P16, 2
     store_global "i", P16
 lp:
@@ -594,7 +594,7 @@ pir_output_is(<<'CODE', 'Coroutine', "Coro new - type");
 .end
 .sub coro
     .local pmc x
-    x = new PerlInt
+    x = new Integer
     x = 0
     iloop:
         .pcc_begin_yield
@@ -619,7 +619,7 @@ ex:
 .end
 .sub coro
     .local pmc x
-    x = new PerlInt
+    x = new Integer
     x = 0
     iloop:
         .pcc_begin_yield

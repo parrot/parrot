@@ -1,5 +1,5 @@
 	new P0, .Hash
-	new P1, .PerlUndef
+	new P1, .Undef
 	
 	<<HERE>>
 	

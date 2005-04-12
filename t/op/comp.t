@@ -160,8 +160,8 @@ output_is(<<'CODE', <<OUTPUT, "cmp");
         cmp I2, -2.4, N0
         set S0, "Bruhaha"
         cmp I3, S0, "Crumbum"
-        new P0, .PerlInt
-        new P1, .PerlInt
+        new P0, .Integer
+        new P1, .Integer
         set P0, 452
         set P1, -15
         cmp I4, P0, P1
@@ -183,9 +183,9 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "eq_num");
-        new P0, .PerlNum
+        new P0, .Float
         set P0, -1.2
-        new P1, .PerlString
+        new P1, .String
         set P1, "-1.2"
         eq_num P0, P1, OK
         print "not "

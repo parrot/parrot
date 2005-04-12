@@ -22,7 +22,7 @@ use Parrot::PMC qw(%pmc_types);
 
 output_is(<<'CODE', <<'OUTPUT', "arraystress");
 	print "starting\n"
-	new P0, .PerlInt
+	new P0, .Integer
 	print "ending\n"
 	end
 CODE

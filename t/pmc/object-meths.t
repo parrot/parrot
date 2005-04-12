@@ -138,7 +138,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "disabling the constructor");
     newclass P1, "Foo"
-    new P0, .PerlString
+    new P0, .String
     setprop P1, "BUILD", P0
     find_type I1, "Foo"
     new P3, I1
@@ -154,7 +154,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "specified constructor method does not exist");
     newclass P1, "Foo"
-    new P0, .PerlString
+    new P0, .String
     set P0, "bar"
     setprop P1, "BUILD", P0
 
@@ -194,7 +194,7 @@ output_is(<<'CODE', <<'OUTPUT', "constructor - init attr");
 .namespace ["Foo"]
 .pcc_sub __init:
     print "ok 1\n"
-    new P10, .PerlInt
+    new P10, .Integer
     set P10, 42
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
@@ -652,7 +652,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
-    new P10, .PerlString
+    new P10, .String
     set P10, "_new"
     newclass P1, "Foo"
     setprop P1, "BUILD", P10

@@ -303,7 +303,7 @@ output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
      set P0[25], 125
      set P0[128], 10.2
      set P0[513], "cow"
-     new P1, .PerlInt
+     new P1, .Integer
      set P1, 123456
      set P0[1023], P1
 
@@ -371,11 +371,11 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "append method");
     .local pmc temp
     ar = new ResizablePMCArray
 
-    temp = new PerlInt
+    temp = new Integer
     set temp, 4
     ar.append(temp)
 
-    temp = new PerlInt
+    temp = new Integer
     set temp, 2
     ar.append(temp)
 

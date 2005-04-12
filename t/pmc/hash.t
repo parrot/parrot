@@ -424,8 +424,8 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Setting & getting scalar PMCs");
       new P0, .Hash
-      new P1, .PerlInt
-      new P2, .PerlInt
+      new P1, .Integer
+      new P2, .Integer
 
       set S0, "non-PMC key"
 
@@ -450,11 +450,11 @@ OK2:  print "ok 2\n"
       print "not "
 OK3:  print "ok 3\n"
 
-      new P1, .PerlUndef
+      new P1, .Undef
       set P0[S0], P1
       set P2, P0[S0]
       typeof S1, P2
-      eq S1, "PerlUndef", OK4
+      eq S1, "Undef", OK4
       print "not "
 OK4:  print "ok 4\n"
 
@@ -468,7 +468,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Setting scalar PMCs & getting scalar values");
       new P0, .Hash
-      new P1, .PerlInt
+      new P1, .Integer
 
       set S0, "A rather large key"
 
@@ -679,7 +679,7 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "Getting PMCs from compound keys");
     new P0, .Hash
     new P1, .Hash
-    new P2, .PerlInt
+    new P2, .Integer
     set P2, 12
     set P1["b"], P2
     set P0["a"], P1
@@ -694,7 +694,7 @@ OUTPUT
 output_is(<< 'CODE', << 'OUTPUT', "Getting PMCs from string;int compound keys");
     new P0, .Hash
     new P1, .Hash
-    new P2, .PerlInt
+    new P2, .Integer
     set P2, 4
     set P1[9], P2
     set I0, P1[9]
@@ -732,7 +732,7 @@ OK2:  print "ok 2\n"
       print "not "
 OK3:  print "ok 3\n"
 
-      new P1, .PerlUndef
+      new P1, .Undef
       set P0["key"], P1
       if P0, OK4
       print "not "
@@ -767,7 +767,7 @@ OK2:
 BAD3: print "not ok 3"
 OK3:
 
-      new P1, .PerlUndef
+      new P1, .Undef
       set P0["key"], P1
       unless P0, BAD4
       print "ok 4\n"
@@ -798,7 +798,7 @@ output_is(<<'CODE', <<OUTPUT, "defined");
     defined I0, P0["b"]
     print I0
     print "\n"
-    new P1, .PerlUndef
+    new P1, .Undef
     set P0["c"], P1
     defined I0, P0["c"]
     print I0
@@ -822,7 +822,7 @@ output_is(<<'CODE', <<OUTPUT, "exists");
     exists I0, P0["b"]
     print I0
     print "\n"
-    new P1, .PerlUndef
+    new P1, .Undef
     set P0["c"], P1
     exists I0, P0["c"]
     print I0
@@ -875,10 +875,10 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Cloning PMC vals");
     new P10, .Hash
-    new P1, .PerlUndef
+    new P1, .Undef
     set P1, "value\n"
     set P10["str"], P1
-    new P1, .PerlUndef
+    new P1, .Undef
     set P1, 42
     set P10["int"], P1
     clone P2, P10
@@ -1075,7 +1075,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
 
     # setting and retrieving a PMC in an inner PerlArray
     .local pmc in_pmc
-    in_pmc = new PerlString
+    in_pmc = new String
     in_pmc = 'inner_array:132'
     inner_array[132] = in_pmc
     outer_hash['inner_array'] = inner_array
