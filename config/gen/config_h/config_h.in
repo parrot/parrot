@@ -16,6 +16,7 @@
 */
 
 #define PARROT_VERSION         "${VERSION}${DEVEL}"
+#define PARROT_REVISION        ${revision}
 #define PARROT_CONFIG_DATE     "${configdate}"
 #define PARROT_MAJOR_VERSION    ${MAJOR}
 #define PARROT_MINOR_VERSION    ${MINOR}

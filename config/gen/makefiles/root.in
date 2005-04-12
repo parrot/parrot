@@ -172,6 +172,7 @@ GEN_CONFIGS = \
     lib/Parrot/PMC.pm \
     runtime/parrot/include/config.fpmc \
     $(SRC_DIR)/platform.c \
+    $(SRC_DIR)/revision.c \
 #CONDITIONED_LINE(platform_asm):    $(SRC_DIR)/platform_asm.s \
     $(SRC_DIR)/core_pmcs.c \
     CFLAGS \
@@ -406,6 +407,7 @@ INTERP_O_FILES = \
     $(SRC_DIR)/builtin$(O) \
     $(SRC_DIR)/mmd_fallback$(O) \
     $(SRC_DIR)/extend$(O) \
+    $(SRC_DIR)/revision$(O) \
     $(PF_DIR)/pf_items$(O) \
     $(OPS_DIR)/core_ops$(O) \
     $(OPS_DIR)/core_ops_switch$(O) \
@@ -712,6 +714,9 @@ $(SRC_DIR)/fingerprint.c : $(BUILD_TOOLS_DIR)/fingerprint_c.pl PBC_COMPAT
 
 $(SRC_DIR)/parrot_config.h : $(BUILD_TOOLS_DIR)/parrot_config_c.pl config_lib.pasm
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > $(SRC_DIR)/parrot_config.h
+
+$(SRC_DIR)/revision.c : .svn/entries $(BUILD_TOOLS_DIR)/revision_c.pl $(SRC_DIR)/parrot_config.h
+	$(PERL) -Ilib $(BUILD_TOOLS_DIR)/revision_c.pl > $(SRC_DIR)/revision.c
 
 ###############################################################################
 #

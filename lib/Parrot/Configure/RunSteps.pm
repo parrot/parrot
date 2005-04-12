@@ -64,6 +64,7 @@ use vars qw(@steps);
     auto/antlr.pl
     auto/bc.pl
     gen/icu.pl
+    gen/revision.pl
     gen/config_h.pl
     gen/core_pmcs.pl
     gen/parrot_include.pl

@@ -169,6 +169,11 @@ STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
  */
 const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
 
+/*
+ * generated src/revision.c
+ */
+int Parrot_config_revision(void);
+
 #endif /* PARROT_MISC_H_GUARD */
 
 /*

@@ -54,6 +54,8 @@ void Parrot_exit(int status);
 
 void Parrot_run_native(Parrot_Interp interpreter, native_func_t func);
 
+int Parrot_revision(void);
+
 #endif /* PARROT_EMBED_H_GUARD */
 
 /*

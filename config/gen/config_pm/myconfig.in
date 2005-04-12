@@ -1,4 +1,4 @@
-Summary of my parrot ${VERSION} configuration:
+Summary of my parrot ${VERSION} (r${revision}) configuration:
   configdate='${configdate}'
   Platform:
     osname=${osname}, archname=${archname}
