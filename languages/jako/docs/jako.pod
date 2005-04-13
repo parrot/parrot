@@ -227,7 +227,7 @@ compiler.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2003 Gregor N. Purdy. All rights reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 
 =head1 LICENSE
 

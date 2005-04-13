@@ -1,7 +1,7 @@
 #
 # Lexer.pm
 #
-# Copyright (C) 2001-2003 Gregor N. Purdy. All rights reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # This program is free software. It is subject to the same license
 # as the Parrot interpreter.
 #

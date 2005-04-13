@@ -1,7 +1,7 @@
 #
 # Suffix.pm
 #
-# Copyright (C) 2002-2003 Gregor N. Purdy. All rights reserved.
+# Copyright: 2002-2005 The Perl Foundation.  All Rights Reserved.
 # This program is free software. It is subject to the same license
 # as the Parrot interpreter.
 #

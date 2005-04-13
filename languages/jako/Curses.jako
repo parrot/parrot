@@ -3,7 +3,7 @@
 #
 # A Jako module for interfacing with the curses library.
 #
-# Copyright (C) 2003 Gregor N. Purdy. All rights reserved.
+# Copyright: 2003-2005 The Perl Foundation.  All Rights Reserved.
 # This program is free software. Its use is subject to the same
 # license as Parrot.
 #
@@ -13,16 +13,629 @@
 module Curses
   :fnlib = "libcurses"
 {
-  sub int initscr  :fn ();
-  sub int endwin   :fn ();
-  sub int curs_set :fn (int x);
 
-  sub int addstr   :fn (str s);
-  sub int refresh  :fn ();
-  sub int move     :fn (int x, int y);
+  #
+  # From curs_addch(3X):
+  #
+  #   int addch(const chtype ch);
+  #   int waddch(WINDOW * win, const chtype ch);
+  #   int mvaddch(int y, int x, const chtype ch);
+  #   int mvwaddch(WINDOW * win, int y, int x, const chtype ch);
+  #   int echochar(const chtype ch);
+  #   int wechochar(WINDOW * win, const chtype ch);
+  #
 
-  sub int getch    :fn ();
+
+  #
+  # From curs_addchstr(3X):
+  #
+  #   int addchstr(const chtype * chstr);
+  #   int addchnstr(const chtype * chstr, int n);
+  #   int waddchstr(WINDOW * win, const chtype * chstr);
+  #   int waddchnstr(WINDOW * win, const chtype * chstr, int n);
+  #   int mvaddchstr(int y, int x, const chtype * chstr);
+  #   int mvaddchnstr(int y, int x, const chtype * chstr, int n);
+  #   int mvwaddchstr(WINDOW * win, int y, int x, const chtype * chstr);
+  #   int  mvwaddchnstr(WINDOW  * win,  int y, int x, const chtype * chstr,
+  #     int n);
+  #
+
+
+  #
+  # From curs_addstr(3X):
+  #
+  #   int addstr(const char * str);
+  #   int addnstr(const char * str, int n);
+  #   int waddstr(WINDOW * win, const char * str);
+  #   int waddnstr(WINDOW * win, const char * str, int n);
+  #   int mvaddstr(int y, int x, const char * str);
+  #   int mvaddnstr(int y, int x, const char * str, int n);
+  #   int mvwaddstr(WINDOW * win, int y, int x, const char * str);
+  #   int mvwaddnstr(WINDOW * win, int y, int x, const char * str, int n);
+  #
+
+  sub int addstr     :fn (str s);
+# sub int addnstr    :fn (str s, int n);
+# sub int waddstr    :fn (int win, str s);
+# sub int waddnstr   :fn (int win, str s, int n);
+# sub int mvaddstr   :fn (int y, int x, str s);
+# sub int mvaddnstr  :fn (int y, int x, str s, int n);
+# sub int mvwaddstr  :fn (int win, int y, int x, str s);
+# sub int mvwaddnstr :fn (int win, int y, int x, str s, int n);
+
+
+  #
+  # From curs_addwstr(3X):
+  #
+  #   int addwstr(const wchar_t * wstr);
+  #   int addnwstr(const wchar_t * wstr, int n);
+  #   int waddwstr(WINDOW * win, const wchar_t * wstr);
+  #   int waddnwstr(WINDOW * win, const wchar_t * wstr, int n);
+  #   int mvaddwstr(int y, int x, const wchar_t * wstr);
+  #   int mvaddnwstr(int y, int x, const wchar_t * wstr, int n);
+  #   int mvwaddwstr(WINDOW * win, int y, int x, const wchar_t * wstr);
+  #   int mvwaddnwstr(WINDOW * win, int y, int x, const wchar_t * wstr,
+  #     int n);
+  #
+
+
+  #
+  # From curs_attr(3X):
+  #
+  #   int attroff(int attrs);
+  #   int wattroff(WINDOW * win, int attrs);
+  #   int attron(int attrs);
+  #   int wattron(WINDOW * win, int attrs);
+  #   int attrset(int attrs);
+  #   int wattrset(WINDOW * win, int attrs);
+  #   int color_set(short color_pair_number, void * opts);
+  #   int wcolor_set(WINDOW * win, short color_pair_number,
+  #     void * opts);
+  #   int standend(void);
+  #   int wstandend(WINDOW * win);
+  #   int standout(void);
+  #   int wstandout(WINDOW * win);
+  #   int attr_get(attr_t * attrs, short * pair, void * opts);
+  #   int wattr_get(WINDOW * win, attr_t * attrs, short * pair,
+  #     void * opts);
+  #   int attr_off(attr_t attrs, void * opts);
+  #   int wattr_off(WINDOW * win, attr_t attrs, void * opts);
+  #   int attr_on(attr_t attrs, void * opts);
+  #   int wattr_on(WINDOW * win, attr_t attrs, void * opts);
+  #   int attr_set(attr_t attrs, short pair, void * opts);
+  #   int wattr_set(WINDOW * win, attr_t attrs, short pair, void * opts);
+  #   int chgat(int n, attr_t attr, short color,
+  #     const void * opts)
+  #   int wchgat(WINDOW * win, int n, attr_t attr,
+  #     short color, const void * opts)
+  #   int mvchgat(int y, int x, int n, attr_t attr,
+  #     short color, const void * opts)
+  #   int mvwchgat(WINDOW * win, int y, int x, int n,
+  #     attr_t attr, short color, const void * opts)
+  #
+
+
+  #
+  # From curs_bkgd(3X):
+  #
+  #   void bkgdset(chtype ch);
+  #   void wbkgdset(WINDOW * win, chtype ch);
+  #   int bkgd(chtype ch);
+  #   int wbkgd(WINDOW * win, chtype ch);
+  #   chtype getbkgd(WINDOW * win);
+  #
+
+
+  #
+  # From curs_border(3X):
+  #
+  #   int border(chtype ls, chtype rs, chtype ts, chtype bs,
+  #     chtype tl, chtype tr, chtype bl, chtype br);
+  #   int wborder(WINDOW * win, chtype ls, chtype rs,
+  #     chtype ts, chtype bs, chtype tl, chtype tr,
+  #     chtype bl, chtype br);
+  #   int box(WINDOW * win, chtype verch, chtype horch);
+  #   int hline(chtype ch, int n);
+  #   int whline(WINDOW * win, chtype ch, int n);
+  #   int vline(chtype ch, int n);
+  #   int wvline(WINDOW * win, chtype ch, int n);
+  #   mvhline(int y, int x, chtype ch, int n);
+  #   mvwhline(WINDOW * win, int y, int x, chtype ch, int n);
+  #   int mvvline(int y, int x, chtype ch, int n);
+  #   int mvwvline(WINDOW * win, int y, int x, chtype ch, int n);
+  #
+
   sub int box      :fn (int screen, int v, int h);
   sub int hline    :fn (int ch, int n);
+
+
+  #
+  # From curs_border_set(3X):
+  #
+  #   int border_set(
+  #     const cchar_t * ls, const cchar_t * rs,
+  #     const cchar_t * ts, const cchar_t * bs,
+  #     const cchar_t * tl, const cchar_t * tr,
+  #     const cchar_t * bl, const cchar_t * br );
+  #   int wborder_set(
+  #     WINDOW * win,
+  #     const cchar_t * ls, const cchar_t * rs,
+  #     const cchar_t * ts, const cchar_t * bs,
+  #     const cchar_t * tl, const cchar_t * tr,
+  #     const cchar_t * bl, const cchar_t * br);
+  #   int box_set(
+  #     WINDOW * win,
+  #     const cchar_t * verch,
+  #     const cchar_t * horch);
+  #   int hline_set(
+  #     const cchar_t * wch, int n);
+  #   int whline_set(
+  #     WINDOW * win,
+  #     const cchar_t * wch, int n);
+  #   int mvhline_set(
+  #     int y, int x,
+  #     const cchar_t * wch, int n);
+  #   int mvwhline_set(
+  #     WINDOW * win,
+  #     int y, int x,
+  #     const cchar_t * wch, int n);
+  #   int vline_set(
+  #     const cchar_t * wch, int n);
+  #   int wvline_set(
+  #     WINDOW * win,
+  #     const cchar_t * wch, int n);
+  #   int mvvline_set(
+  #     int y, int x,
+  #     const cchar_t * wch, int n);
+  #   int mvwvline_set(
+  #     WINDOW * win,
+  #     int y, int x,
+  #     const cchar_t * wch, int n);
+  #
+
+
+  #
+  # From curs_clear(3X):
+  #
+  #   int erase(void);
+  #   int werase(WINDOW * win);
+  #   int clear(void);
+  #   int wclear(WINDOW * win);
+  #   int clrtobot(void);
+  #   int wclrtobot(WINDOW * win);
+  #   int clrtoeol(void);
+  #   int wclrtoeol(WINDOW * win);
+  #
+
+
+  #
+  # From curs_get_wch(3X):
+  #
+  #   int get_wch(wint_t * wch);
+  #   int wget_wch(WINDOW * win, wint_t * wch);
+  #   int mvget_wch(int y, int x, wint_t * wch);
+  #   int mvwget_wch(WINDOW * win, int y, int x, wint_t * wch);
+  #   int unget_wch(const wchar_t wch);
+  #
+
+
+  #
+  # From curs_getch(3X): [[ ncurses ]]
+  #
+  #   int getch(void);
+  #   int wgetch(WINDOW * win);
+  #   int mvgetch(int y, int x);
+  #   int mvwgetch(WINDOW * win, int y, int x);
+  #   int ungetch(int ch);
+  #   int has_key(int ch);
+  #
+
+  sub int getch    :fn ();
+# sub int wgetch   :fn (int win);
+# sub int mvgetch  :fn (int y, int x);
+# sub int mvwgetch :fn (int win, int y, int x);
+# sub int ungetch  :fn (int ch);
+# sub int has_key  :fn (int ch);
+
+
+  #
+  # From curs_in_wch(3X):
+  #
+  #   int in_wch(cchar_t * wcval);
+  #   int mvin_wch(int y, int x, cchar_t * wcval);
+  #   int mvwin_wch(WINDOW * win, int y, int x, cchar_t * wcval);
+  #   int win_wch(WINDOW * win, cchar_t * wcval);
+  #
+
+
+  #
+  # From curs_in_wchstr(3X):
+  #
+  #   int in_wchstr(cchar_t * wchstr);
+  #   int in_wchnstr(cchar_t * wchstr, int n);
+  #   int win_wchstr(WINDOW * win, cchar_t * wchstr);
+  #   int win_wchnstr(WINDOW * win, cchar_t * wchstr, int n);
+  #   int mvin_wchstr(int y, int x, cchar_t * wchstr);
+  #   int mvin_wchnstr(int y, int x, cchar_t * wchstr, int n);
+  #   int mvwin_wchstr(WINDOW * win, int y, int x, cchar_t * wchstr);
+  #   int mvwin_wchnstr(WINDOW * win, int y, int x, cchar_t * wchstr, int n);
+  #
+
+
+  #
+  # From curs_inch(3X):
+  #
+  #   chtype inch(void);
+  #   chtype winch(WINDOW * win);
+  #   chtype mvinch(int y, int x);
+  #   chtype mvwinch(WINDOW * win, int y, int x);
+  #
+
+
+  #
+  # From curs_initscr(3X):
+  #
+  #   WINDOW * initscr(void);
+  #   int endwin(void);
+  #   bool isendwin(void);
+  #   SCREEN * newterm(char * type, FILE * outfd, FILE * infd);
+  #   SCREEN * set_term(SCREEN * new);
+  #   void delscreen(SCREEN * sp);
+  #
+
+  sub int initscr   :fn ();
+  sub int endwin    :fn ();
+# sub int isendwin  :fn ();
+# sub int newterm   :fn (str type, int outfd, int infd);
+# sub int set_term  :fn (int new);
+# sub     delscreen :fn (int sp);
+
+
+  #
+  # From curs_kernel(3X):
+  #
+  #   int def_prog_mode(void);
+  #   int defshell_mode(void);
+  #   int reset_prog_mode(void);
+  #   int reset_shell_mode(void);
+  #   int resetty(void);
+  #   int savetty(void);
+  #   void getsyx(int y, int x);
+  #   void setsyx(int y, int x);
+  #   int ripoffline(int line, int (*init)(WINDOW *, int));
+  #   int curs_set(int visibility);
+  #   int napms(int ms);
+  #
+
+# sub int def_prog_mode    :fn ();
+# sub int def_shell_mode   :fn ();
+# sub int reset_prog_mode  :fn ();
+# sub int reset_shell_mode :fn ();
+# sub int resetty          :fn ();
+# sub int savetty          :fn ();
+# sub     getsyx           :fn (int y, int x);
+# sub     setsyx           :fn (int y, int x);
+# sub int ripoffline       :fn (int line, ...);
+  sub int curs_set         :fn (int visibility);
+# sub int napms            :fn (int ms);
+
+
+  #
+  # From curs_move(3X):
+  #
+  #   int move(int y, int x);
+  #   int wmove(WINDOW *win, int y, int x);
+  #
+
+  sub int move  :fn (int y, int x);
+# sub int wmove :fn (int win, int y, int x);
+
+
+  #
+  # From curs_outopts(3X):
+  #
+  #   int clearok(WINDOW * win, bool bf);
+  #   int idlok(WINDOW * win, bool bf);
+  #   void idcok(WINDOW * win, bool bf);
+  #   void immedok(WINDOW * win, bool bf);
+  #   int leaveok(WINDOW * win, bool bf);
+  #   int setscrreg(int top, int bot);
+  #   int wsetscrreg(WINDOW * win, int top, int bot);
+  #   int scrollok(WINDOW * win, bool bf);
+  #   int nl(void);
+  #   int nonl(void);
+  #
+
+
+  #
+  # From curs_printw(3X):
+  #
+  #   int printw(const char * fmt, ...);
+  #   int wprintw(WINDOW * win, const char * fmt, ...);
+  #   int mvprintw(int y, int x, const char * fmt, ...);
+  #   int mvwprintw(WINDOW * win, int y, int x, const char * fmt, ...);
+  #   int vwprintw(WINDOW * win, const char * fmt, va_list varglist);
+  #   int vw_printw(WINDOW * win, const char * fmt, va_list varglist);
+  #
+
+
+  #
+  # From curs_refresh(3X):
+  #
+  #   int refresh(void);
+  #   int wrefresh(WINDOW * win);
+  #   int wnoutrefresh(WINDOW * win);
+  #   int doupdate(void);
+  #   int redrawwin(WINDOW * win);
+  #   int wredrawln(WINDOW * win, int beg_line, int num_lines);
+
+  sub int refresh      :fn ();
+# sub int wrefresh     :fn (int win);
+# sub int wnoutrefresh :fn (int win);
+# sub int doupdate     :fn ();
+# sub int redrawwin    :fn (int win);
+# sub int wredrawln    :fn (int win, int beg_line, int num_lines);
+
+
+  #
+  # From curs_scroll(3X):
+  #
+  #   int scroll(WINDOW * win);
+  #   int scrl(int n);
+  #   int wscrl(WINDOW * win, int n);
+  # 
+
+
+  #
+  # From curs_termcap(3X):
+  #
+  #   extern char     PC;
+  #   extern char *   UP;
+  #   extern char *   BC;
+  #   extern unsigned ospeed;
+  #
+  #   int tgetent(char * bp, const char * name);
+  #   int tgetflag(char * id);
+  #   int tgetnum(char * id);
+  #   char * tgetstr(char * id, char ** area);
+  #   char * tgoto(const char *cap, int col, int row);
+  #   int tputs(const char * str, int affcnt, int (*putc)(int));
+  #
+
+
+  #
+  # From curs_window(3X):
+  #
+  #   WINDOW * newwin(int nlines, int ncols, int begin_y,
+  #     int begin_x);
+  #   int delwin(WINDOW * win);
+  #   int mvwin(WINDOW * win, int y, int x);
+  #   WINDOW * subwin(WINDOW * orig, int nlines, int ncols,
+  #     int begin_y, int begin_x);
+  #   WINDOW * derwin(WINDOW * orig, int nlines, int ncols,
+  #     int begin_y, int begin_x);
+  #   int mvderwin(WINDOW * win, int par_y, int par_x);
+  #   WINDOW * dupwin(WINDOW * win);
+  #   void wsyncup(WINDOW * win);
+  #   int syncok(WINDOW * win, bool bf);
+  #   void wcursyncup(WINDOW * win);
+  #   void wsyncdown(WINDOW * win);
+  #
+ 
+
+
+
+
+
+
+
+
+
+#####################################################################
+ 
+
+
+  #
+  # From curs_addchstr(3X):
+  #
+
+
+
+  #
+  # From curs_overlay(3X):
+  #
+
+
+  #
+  # From curs_color(3X):
+  #
+
+
+  #
+  # From curs_inopts(3X):
+  #
+
+
+
+  #
+  # From curs_inchstr(3X):
+  #
+
+
+  #
+  # From curs_instr(3X):
+  #
+
+
+  #
+  # From curs_inwstr(3X):
+  #
+
+
+  #
+  # From curs_touch(3X):
+  #
+
+
+  #
+  # From curs_ins_wstr(3X):
+  #
+
+
+  #
+  # From curs_ins_wch(3X):
+  #
+
+
+  #
+  # From curs_insch(3X):
+  #
+
+
+  #
+  # From curs_print(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From curs_scanw(3X):
+  #
+
+
+  #
+  # From curs_pad(3X):
+  #
+
+
+
+
+  #
+  # From curs_bkgrnd(3X):
+  #
+
+
+  #
+  # From curs_getcchar(3X):
+  #
+
+
+  #
+  # From curs_mouse(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From curs_get_wstr(3X):
+  #
+
+
+  #
+  # From curs_getstr(3X):
+  #
+
+
+  #
+  # From curs_beep(3X):
+  #
+
+
+  #
+  # From curs_add_wch(3X):
+  #
+
+
+  #
+  # From curs_add_wchstr(3X):
+  #
+
+
+  #
+  # From curs_termattrs(3X):
+  #
+
+
+  #
+  # From curs_terminfo(3X):
+  #
+
+
+  #
+  # From curs_util(3X):
+  #
+
+
+  #
+  # From curs_delch(3X):
+  #
+
+  #
+  # From curs_deleteln(3X):
+  #
+
+
+  #
+  # From curs_insstr(3X):
+  #
+
+
+  #
+  # From define_key(3X):
+  #
+
+
+  #
+  # From key_defined(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From curs_getyx(3X):
+  #
+
+
+  #
+  # From curs_scr_dump(3X):
+  #
+ 
+
+  #
+  # From curs_trace(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From default_colors(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From curs_extend(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From keybound(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From keyok(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From resizeterm(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From curs_slk(3X): [[ ncurses ]]
+  #
+
+
+  #
+  # From wresize(3X): [[ ncurses ]] 
+  #
+
 }
 
