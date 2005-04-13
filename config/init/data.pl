@@ -99,7 +99,7 @@ sub runstep {
 
     cc_ldflags    => '',                  # prefix for ldflags (necessary for Win32)
 
-    ld_out        => '-o ',               # ld output file
+    ld_out        => '-o ',               # ld output file.  Keep the trailing space.
     ld_debug      => '-g ',               # include debug info in executable
 
     # should we have a dependancy upon arc to generate .a's?

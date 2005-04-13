@@ -121,7 +121,6 @@ EXE             = ${exe}
 SHARE_EXT       = ${share_ext}
 LOAD_EXT        = ${load_ext}
 A               = ${a}
-LD_OUT          = ${ld_out}
 LD_SHARE_FLAGS  = ${ld_share_flags}
 LD_LOAD_FLAGS   = ${ld_load_flags}
 
@@ -627,7 +626,7 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(PARROT)
 	$(PARROT) parrot-config.imc VERSION DEVEL
 
 $(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
-	$(LINK) $(LD_OUT)$(PARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(PARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS)
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -662,10 +661,10 @@ $(LIBPARROT) : $(O_FILES)
 
 blib/lib/libparrot$(SHARE_EXT) : $(O_FILES)
 	$(MKDIR) blib blib/lib
-	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SHARE_EXT) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
+	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) ${ld_out}blib/lib/libparrot$(SHARE_EXT) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
 
 $(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
-	$(LINK) $(LINKFLAGS) $(LD_OUT)$(PARROT) $(IMCC_DIR)/main$(O) -Lblib/lib -lparrot $(C_LIBS)
+	$(LINK) $(LINKFLAGS) ${ld_out}$(PARROT) $(IMCC_DIR)/main$(O) -Lblib/lib -lparrot $(C_LIBS)
 
 #
 # Parrot Debugger
@@ -674,7 +673,7 @@ $(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/Op
 $(SRC_DIR)/pdb$(O) : $(GENERAL_H_FILES)
 
 $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
-	$(LINK) $(LD_OUT)$(PDB) $(SRC_DIR)/pdb$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(PDB) $(SRC_DIR)/pdb$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Disassembler
@@ -683,19 +682,19 @@ $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
 $(SRC_DIR)/disassemble$(O) : $(GENERAL_H_FILES)
 
 $(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
-	$(LINK) $(LD_OUT)$(DIS) $(SRC_DIR)/disassemble$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(DIS) $(SRC_DIR)/disassemble$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Dump
 #
 
 $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
-	$(LINK) $(LD_OUT)$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
 # pbc_info
 $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
-	$(LINK) $(LD_OUT)$(PINFO) $(SRC_DIR)/pbc_info$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(PINFO) $(SRC_DIR)/pbc_info$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 ###############################################################################
 #
@@ -1366,17 +1365,17 @@ miniparrot-update :
 ###############################################################################
 
 exec : $(SRC_DIR)/exec_start$(O) $(LIBPARROT)
-	$(LINK) $(LD_OUT)$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(ALL_PARROT_LIBS)
 
 exec_so : $(SRC_DIR)/exec_start$(O) blib/lib/libparrot$(SHARE_EXT)
-	$(LINK) $(LD_OUT)$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) -lparrot $(C_LIBS)
+	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) -lparrot $(C_LIBS)
 
 ###### OS depend targets ##########
 
 # for use by t/pmc/nci.t
 $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) ${ncilib_link_extra} $(LDFLAGS) \
-	    $(LD_OUT)$@ $(SRC_DIR)/nci_test$(O) $(C_LIBS)
+	    ${ld_out}$@ $(SRC_DIR)/nci_test$(O) $(C_LIBS)
 
 # vim ctags
 # this needs exuberant-ctags
