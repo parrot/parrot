@@ -78,7 +78,7 @@ Any items which have been implemented but don't work as expected.
 =head2 PORTABILITY
 
 Any items which are specific to a particular platform or require special
-attention for cross-platform compatibilty.
+attention for cross-platform compatibility.
 
 =head2 DOCUMENTATION
 
@@ -301,7 +301,7 @@ C<rx_compile> op is documented but unimplemented. L<ops/rx.ops>
 
 =item *
 
-There is no way to do a case insenstive match. L<ops/rx.ops>
+There is no way to do a case-insensitive match. L<ops/rx.ops>
 
 =back
 

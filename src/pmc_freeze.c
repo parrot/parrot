@@ -322,7 +322,7 @@ shift_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
 =item C<static PARROT_INLINE void
 op_check_size(Parrot_Interp interpreter, STRING *s, size_t len)>
 
-Checks the size of the "stream" buffer to see if it can accomodate
+Checks the size of the "stream" buffer to see if it can accommodate
 C<len> more bytes. If not then the buffer is expanded.
 
 =cut
@@ -1259,7 +1259,7 @@ visit_next_for_GC(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
 =item C<static void
 visit_todo_list(Parrot_Interp interpreter, PMC* pmc, visit_info* info)>
 
-Chescks the seen PMC via the todo list.
+Checks the seen PMC via the todo list.
 
 =cut
 

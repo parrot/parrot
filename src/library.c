@@ -154,7 +154,7 @@ Parrot_library_fallback_locate(Parrot_Interp interp, const char *file_name, cons
         enum_runtime_ft type)>
 
 Locate the full patch for C<file_name> and the given file type(s). If
-successfull returns a mem_sys_allocate()ed string or NULL otherwise.
+successful, returns a mem_sys_allocate()ed string or NULL otherwise.
 
 The C<enum_runtime_ft type> is one or more of the types defined in
 F<include/parrot/library.h>.

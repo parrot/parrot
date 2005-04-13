@@ -858,7 +858,7 @@ Check if two hashes hold the same keys and values.
         PMC *iter = VTABLE_get_iter(INTERP, SELF);
         INTVAL j, n;
 
-        /* TODO: comparing Hash and PerlHash should propable be possible */
+        /* TODO: comparing Hash and PerlHash should probably be possible */
         if (value->vtable->base_type != SELF->vtable->base_type)
             return 0;
         n = SELF.elements();

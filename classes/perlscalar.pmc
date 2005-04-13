@@ -48,7 +48,7 @@ Morphs the scalar to the specified type.
             /*
              * if we morph to a string, first clear str_val
              * so that after changing the vtable a parallel
-             * reader doesn't get a gargabe pointer
+             * reader doesn't get a garbage pointer
              */
             PMC_str_val(SELF) = NULL;
             PObj_custom_mark_SET(SELF);

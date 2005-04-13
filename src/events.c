@@ -12,7 +12,7 @@ An event_thread handles async events for all interpreters. When events
 are due, they are placed in per interpreter task_queues, where they are
 handled then by the C<check_event*> opcodes.
 
-IO events and signals are catched in the io_thread, which again
+IO events and signals are caught in the io_thread, which again
 dispatches these to one or all interpreters.
 
 =cut
@@ -1041,7 +1041,7 @@ Parrot_sleep_on_event(Parrot_Interp interpreter, FLOATVAL t, void* next)
 =item C<void*
 Parrot_do_check_events(Parrot_Interp interpreter, void *next)>
 
-Explicitely C<sync> called by the check_event opcode from run loops.
+Explicitly C<sync> called by the check_event opcode from run loops.
 
 =cut
 

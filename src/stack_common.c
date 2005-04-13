@@ -9,7 +9,7 @@ src/stack_common.c - Common stack handling routines for Parrot
 =head1 DESCRIPTION
 
 Both the register stacks and stacks implemented in F<src/stacks.c>
-have a common funcionality, which is implemented in this file.
+have a common functionality, which is implemented in this file.
 
 These stacks all differ only in the size of items.
 

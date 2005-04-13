@@ -70,7 +70,7 @@ static void setup_default_compreg(Parrot_Interp interpreter)
 {
     STRING *pasm1 = string_from_cstring(interpreter, "PASM1", 0);
 
-    /* register the nci ccompiler object */
+    /* register the nci compiler object */
     Parrot_compreg(interpreter, pasm1, (Parrot_compiler_func_t)PDB_compile);
 }
 
@@ -395,7 +395,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /* intstack */
     intstack_free(interpreter, interpreter->ctx.intstack);
 
-    /* predefined excpetions */
+    /* predefined exceptions */
     mem_sys_free(interpreter->exception_list);
     if (interpreter->evc_func_table)
         mem_sys_free(interpreter->evc_func_table);

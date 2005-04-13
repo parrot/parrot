@@ -160,7 +160,7 @@ Calls the delegated C<__instantiate> method if it exists.
 
 XXX Actually the PMC compiler should emit different code, if a method is
 present in classes/default.pmc. Some defaulted methods like this one have
-useful defaults and don't throw exceptiions.
+useful defaults and don't throw exceptions.
 
 =cut
 

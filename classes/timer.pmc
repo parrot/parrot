@@ -137,7 +137,7 @@ Initializes the timer.
 
 =item C<void init_pmc(PMC *init)>
 
-See F<docs/pdds/pdd02_vtables.pod> for intializers.
+See F<docs/pdds/pdd02_vtables.pod> for initializers.
 
 =cut
 

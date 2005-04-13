@@ -74,7 +74,7 @@ set or only by the young generation, the algoritm is correct and
 complete.
 
 But there is of course the possibilty that a young object is
-stored into an aggregate of an older gneration. This case is tracked
+stored into an aggregate of an older generation. This case is tracked
 by the write barrier, which remembers all such operations in the IGP
 (inter generational pointer) list. When now generation 1 is marked,
 the IGP list can be considered as an extension to the root set, so
@@ -137,7 +137,7 @@ A chained list of headers used e.g. for the IGP list.
  *
  * A scope_enter happens on a subroutine call *and' with new_pad /
  * push_pad opcodes. Each lexical scope must have its distinct register
- * frame, else timely detruction can't work.
+ * frame, else timely destruction can't work.
  * If the frame needs active destruction, the old frame should be
  * converted to the (new-1) generation, the inner frame is the nursery.
  * On scope exit the newest (nursery) generation is collected and the
@@ -1338,7 +1338,7 @@ parrot_gc_gms_run(Interp *interpreter, int flags)
     }
     else {
         /*
-         * successfull lazy DOD run
+         * successful lazy DOD run
          */
         ++arena_base->lazy_dod_runs;
     }

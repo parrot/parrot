@@ -324,7 +324,7 @@ PackFile_Constant_pack(Interp* interpreter,
 Rework by Melvin; new bytecode format, make bytecode portable. (Do
 endian conversion and wordsize transforms on the fly.)
 
-leo: rewrite to use new dirctory based format.
+leo: rewrite to use new directory-based format.
 
 =cut
 

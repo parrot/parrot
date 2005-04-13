@@ -8,7 +8,7 @@ classes/csub.pmc - C Subroutine PMC
 
 =head1 DESCRIPTION
 
-This class has been superceeded by C<NCI>.
+This class has been superseded by C<NCI>.
 
 =cut
 

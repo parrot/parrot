@@ -1279,7 +1279,7 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
         }
     }
     list = list_new(interpreter, type);
-    if (list->item_type == enum_type_sized) { /* overridde item_size */
+    if (list->item_type == enum_type_sized) { /* override item_size */
         if (!item_size)
             internal_exception(1, "No item_size for type_sized list\n");
         list->item_size = item_size;
@@ -1420,7 +1420,7 @@ mark_chunk(Interp *interpreter, List_chunk *chunk, int obj_size)
     i = 0;
     if (p && next && (( dist = (char*)next - (char*)p ) == obj_size ||
                 -dist == obj_size)) {
-        /* we have a first object and a nexz one - calculate it's
+        /* we have a first object and a next one - calculate its
          * arena values see also src/dod.c
          */
         struct Small_Object_Arena *arena = GET_ARENA(p);

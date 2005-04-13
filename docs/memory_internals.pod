@@ -225,7 +225,7 @@ these buffers are therefore not allowed to hold pointers to buffers over
 pieces of code that might trigger a GC run, like C<Parrot_allocate()> or
 C<string_compare()>.
 
-=head2 Defragmentating allocator
+=head2 Defragmenting allocator
 
 An alternative to the above is to use a memory allocator, which is as fast
 as the above and does reuse C<free()>ed items in a memory conserving way.

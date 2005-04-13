@@ -31,7 +31,7 @@ implementation found in F<src/malloc.c>.
 =item C<void
 Parrot_go_collect(Interp *interpreter)>
 
-Does nothing other than increment the iterpreter's C<collect_runs>
+Does nothing other than increment the interpreter's C<collect_runs>
 count.
 
 =cut

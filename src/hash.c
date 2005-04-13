@@ -646,7 +646,7 @@ new_pmc_hash_x(Interp *interpreter, PMC *container,
         hash_comp_fn compare, hash_hash_key_fn keyhash,
         hash_mark_key_fn mark)>
 
-Like above but w/o the decribed problems. The passed in C<container> PMC gets
+Like above but w/o the described problems. The passed in C<container> PMC gets
 stored in the Hash end the newly created Hash is in PMC_struct_val(container).
 
 =cut
@@ -746,7 +746,7 @@ hash_size(Interp *interpreter, Hash *hash)
 =item C<STRING *
 hash_get_idx(Interp *interpreter, Hash *hash, PMC * key)>
 
-Called by interator.
+Called by iterator.
 
 =cut
 

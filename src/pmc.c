@@ -418,7 +418,7 @@ create_class_pmc(Interp *interpreter, INTVAL type)
 {
     PMC *class;
     /*
-     * class interface - a PMC is it's own class
+     * class interface - a PMC is its own class
      * put an instance of this PMC into class
      *
      * create a constant PMC

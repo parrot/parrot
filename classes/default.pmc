@@ -10,7 +10,7 @@ head1 DESCRIPTION
 
 These are the vtable functions for the default PMC class.
 
-All methods which are not defined here get a default implementaion
+All methods which are not defined here get a default implementation
 generated from F<vtable.tbl> by F<classes/pmc2c2.pl>.
 
 =head2 Functions
@@ -523,7 +523,7 @@ Returns whether the PMC is numerically equal to C<value>.
 
 =item C<void assign_string_native (PMC* value)>
 
-Default falbacks that call C<set_pmc> and C<set_string_native>.
+Defaults fall back to C<set_pmc> and C<set_string_native>.
 
 =cut
 

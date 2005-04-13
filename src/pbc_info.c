@@ -32,7 +32,7 @@ over the main directory.
 =item C<static INTVAL iter(Interp*, struct PackFile_Segment *seg, void *user_data)>
 
 This function is passed the callback to C<PackFile_map_segments()> to
-print out the name of each segment in the directoty.
+print out the name of each segment in the directory.
 
 =cut
 

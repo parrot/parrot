@@ -142,7 +142,7 @@ push_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
 =item C<void
 unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
 
-Does a syncronized insertion of C<entry> into the head of the queue.
+Does a synchronized insertion of C<entry> into the head of the queue.
 
 =cut
 
@@ -223,7 +223,7 @@ nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
 =item C<void
 insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
 
-Does a syncronized insert of C<entry>.
+Does a synchronized insert of C<entry>.
 
 =cut
 

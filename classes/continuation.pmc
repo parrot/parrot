@@ -37,7 +37,7 @@ See the L<Glossary|docs/glossary.pod> for more information.
 */
 
 /*
- * A Continuation (and RetContinuation, Exeception_Handler) has in it's
+ * A Continuation (and RetContinuation, Exception_Handler) has in its
  * context a pointer to the register frame, which contains active objects.
  * Additionally ct->current_cont has he continuation of the caller.
  * To avoid deep recusrion during marking of nested subroutines, we
@@ -62,7 +62,7 @@ Initializes the continuation.
         PObj_custom_mark_destroy_SETALL(SELF);
         /*
          * Whenever we create a continuation, all return continuations
-         * up the call chain maybe reuesed due to invoking the
+         * up the call chain maybe reused due to invoking the
          * continuation. To avoid that all return continuations are
          * converted to true continuations.
          */

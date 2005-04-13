@@ -68,7 +68,7 @@ Parrot_unmake_COW(Interp *interpreter, STRING *s)
         STRING for_alloc;
 
         /* Create new pool data for this header to use,
-         * independant of the original COW data */
+         * independent of the original COW data */
         PObj_constant_CLEAR(s);
         /*
          * allocate a dummy strings memory
@@ -2140,7 +2140,7 @@ string_cstring_free(void *ptr) {
 =item C<void
 string_pin(Interp * interpreter, STRING * s)>
 
-Replace the apecified Parrot string's managed buffer memory by system
+Replace the specified Parrot string's managed buffer memory by system
 memory.
 
 =cut

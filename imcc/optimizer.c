@@ -951,7 +951,7 @@ _is_ins_save(IMC_Unit * unit, Instruction *check_ins,
                 if (!strcmp(ins->op, ""))
                     set_bl=bb;
             }
-            /* this is the instruction, to check, it's save */
+            /* this is the instruction, to check, it's safe */
             if (check_ins == ins)
                 continue;
 

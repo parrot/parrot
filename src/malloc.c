@@ -1,7 +1,7 @@
 /*
   This is a version (aka dlmalloc) of malloc/free/realloc written by
   Doug Lea and released to the public domain.  Use, modify, and
-  redistribute this code without permission or acknowledgement in any
+  redistribute this code without permission or acknowledgment in any
   way you wish.  Send questions, comments, complaints, performance
   data, etc to dl@cs.oswego.edu
 
@@ -1891,7 +1891,7 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     the malloc code, but "mem" is the pointer that is returned to the
     user.  "Nextchunk" is the beginning of the next contiguous chunk.
 
-    Chunks always begin on even word boundries, so the mem portion
+    Chunks always begin on even word boundaries, so the mem portion
     (which is returned to the user) is also on an even word boundary, and
     thus at least double-word aligned.
 
@@ -3682,7 +3682,7 @@ Void_t* mALLOc(size_t bytes)
     
     We require that av->top always exists (i.e., has size >=
     MINSIZE) after initialization, so if it would otherwise be
-    exhuasted by current request, it is replenished. (The main
+    exhausted by the current request, it is replenished. (The main
     reason for ensuring it exists is that we may need MINSIZE space
     to put in fenceposts in sysmalloc.)
   */
@@ -5497,10 +5497,10 @@ History:
         Wolfram Gloger (Gloger@lrz.uni-muenchen.de).
       * Use last_remainder in more cases.
       * Pack bins using idea from  colin@nyx10.cs.du.edu
-      * Use ordered bins instead of best-fit threshhold
+      * Use ordered bins instead of best-fit threshold
       * Eliminate block-local decls to simplify tracing and debugging.
       * Support another case of realloc via move into top
-      * Fix error occuring when initial sbrk_base not word-aligned.
+      * Fix error occurring when initial sbrk_base not word-aligned.
       * Rely on page size for units instead of SBRK_UNIT to
         avoid surprises about sbrk alignment conventions.
       * Add mallinfo, mallopt. Thanks to Raymond Nijssen

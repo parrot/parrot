@@ -26,11 +26,11 @@ Further we might try this optimization
 
 =head1 Drawbacks of the current mark and sweep collector.
 
- * can take arbitray time to complete (1s for 1 Meg objects)
+ * can take arbitrary time to complete (1s for 1 Meg objects)
  * can't be used in multi-threaded Parrot
  * works fast for plain (non-aggregate) objects but suffers badly
    for nested aggregates or HLL objects
- * the sweep phase takes time proportional to the allocated storeage
+ * the sweep phase takes time proportional to the allocated storage
 
 =head1 INCREMENTAL GARBAGE COLLECTION
 
@@ -205,7 +205,7 @@ To keep the memory usage limited k > 1 must hold.
 
 =item c) near the end of a DOD cycle
 
-The rest of the root set is scanned i.e. the registers. By defering
+The rest of the root set is scanned, i.e. the registers. By deferring
 scanning of registers all temporaries that might have exist somewhen
 just stay unscanned - they will be collected in this DOD cycle, if
 we allocate new objects white or in the next DOD cycle.
@@ -232,7 +232,7 @@ all free-lists.
 
 Finally, we might trigger a collect run on string and buffer memory if
 there is an impending shortage of resources. While the copying compactor
-is rather independend of the collector that cleans object headers, its
+is rather independent of the collector that cleans object headers, it's
 more efficient to collect buffer memory when the live information is
 accurate. This avoids copying of dead buffer memory.
 
@@ -267,7 +267,7 @@ Notes:
 =item the object graph
 
 The MS and IMS scheme use the next_for_GC pointer for keeping track of
-references. This interfers with the freeze functionality, which can use
+references. This interferes with the freeze functionality, which can use
 the same pointer to keep track of visited objects.
 
 IMIR has a dedicated pointer pair to build the object graph.
@@ -282,7 +282,7 @@ to the right of the object that gets blackened.
 =item big aggregates
 
 Greying has to be done in increments. Big aggregates can't have a mark
-vtable that oould run arbitrarly long. This means that the DOD system
+vtable that could run arbitrarily long. This means that the DOD system
 must know the layout of arrays, hashes, and objects. This is currently
 true for arrays and objects but not for hashes. But the latter need some
 refactoring of internals anyway.

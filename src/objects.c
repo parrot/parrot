@@ -52,7 +52,7 @@ clone_array(Interp* interpreter, PMC *source_array)
     return new_array;
 }
 
-/* Take the class and completely rebuild the atttribute stuff for
+/* Take the class and completely rebuild the attribute stuff for
    it. Horribly destructive, and definitely not a good thing to do if
    there are instantiated objects for the class */
 static void
@@ -173,7 +173,7 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
 
 Create a vtable that dispatches either to the contained PMC in the first
 attribute (deleg_pmc) or to an overridden method (delegate), depending
-on the existance of the method for this class.
+on the existence of the method for this class.
 
 =cut
 
@@ -446,7 +446,7 @@ Parrot_class_lookup(Interp* interpreter, STRING *class_name)
 parrot_class_register(Interp* interpreter, STRING *class_name,
         PMC *new_class, PMC *mro)>
 
-This is the way to register a new Parrot class as an instantiatable
+This is the way to register a new Parrot class as an instantiable
 type. Doing this involves putting it in the class hash, setting its
 vtable so that the C<init> method initializes objects of the class rather than
 the class itself, and adding it to the interpreter's base type table so
@@ -1192,7 +1192,7 @@ Adds the attribute C<attr> to the class.
 
 */
 
-/* Life is ever so much easiser if a class keeps its attributes at the
+/* Life is ever so much easier if a class keeps its attributes at the
    end of the attribute array, since we don't have to insert and
    reorder attributes. Inserting's no big deal, especially since we're
    going to break horribly if you insert into a class that's been

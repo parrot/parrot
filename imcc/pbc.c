@@ -369,7 +369,7 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
         /* if no jump */
         if ((addr = get_branch_reg(ins)) == 0)
             continue;
-        /* it's kind of a register */
+        /* it's a kind of register */
         if (addr->type & VTREGISTER)
             continue;
         /* branch found */

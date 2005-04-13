@@ -23,7 +23,7 @@ There are 2 iterator interfaces:
 
 =back
 
-See F<t/pmc/ordereredhash.t>.
+See F<t/pmc/orderedhash.t>.
 
 If values are set by numeric index only, there is no hash key. Iterating
 over the hash doesn't show these values.

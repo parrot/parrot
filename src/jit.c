@@ -176,7 +176,7 @@ make_branch_list(Interp *interpreter,
      *      Things get a little tricky since it's not 100% true that the
      *      target is unpredictable because of the set_addr opcode, we
      *      need to find a solution for this, in the mean time, we will
-     *      make each section have it's own arena and try to avoid
+     *      make each section have its own arena and try to avoid
      *      going in and out from them as much as posible.
      *
      *  PARROT_JUMP_RESTART
@@ -1353,7 +1353,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
     /*
      * from C's ABI all the emitted code here is one (probably big)
      * function. So we have to generate an appropriate function
-     * prolog, that makes all this look like a normal fuction ;)
+     * prologue, that makes all this look like a normal function ;)
      */
     Parrot_jit_begin(jit_info, interpreter);
     /*
@@ -1455,7 +1455,7 @@ build_asm(Interp *interpreter, opcode_t *pc,
             if (CALLS_C_CODE(cur_opcode_byte)) {
                 /*
                  * restore volatiles only - and TODO only if next
-                 *      whouldn't load registers anyway
+                 *      wouldn't load registers anyway
                  */
                 Parrot_jit_load_registers(jit_info, interpreter, 1);
             }

@@ -17,7 +17,7 @@ Per default the C<parrot> binary is being built with
 debugging symbols. This means that you can run C<parrot> under 
 an debugger like C<gdb>. 
 
-Debugging support can be explictly enabled with: 
+Debugging support can be explicitly enabled with: 
 
     shell> perl Configure.pl --debugging
     shell> make

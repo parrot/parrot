@@ -279,7 +279,7 @@ Invokes the subroutine.
          *    return C(...)
          *    # end of B
          *
-         * that is the sub B() returns in it's last statement whatever
+         * that is the sub B() returns in its last statement whatever
          * C() returns.
          *
          * We are just calling the sub C().

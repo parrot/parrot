@@ -102,7 +102,7 @@ To repeat a string, (ie, turn 'xyz' into 'xyzxyzxyz') use:
 Which will repeat string I<s> n times and store the result into I<d>, which it
 also returns.  If I<*d> or I<**d> is NULL, a new string will be allocated
 to hold the result.  I<s> is not modified by this operation.  If I<d> is
-not of the same type as I<s>, it will be upgraded appropiately.
+not of the same type as I<s>, it will be upgraded appropriately.
 
 Chopping C<n> characters off the end of a string is achieved with the
 unlikely-sounding
@@ -239,7 +239,7 @@ machine.
 
 =head2 C<type>
 
-This specifes the character set for the string. There are currently two
+This specifies the character set for the string. There are currently two
 character sets in Parrot: US ASCII and Unicode. Each character set has
 a default encoding. The default character set is US ASCII.
 
@@ -278,7 +278,7 @@ To grow a string to a specified size, use
     void string_grow(Interp *, STRING *s, INTVAL newsize)
 
 The size is given in characters; C<string_max_bytes()> is called to turn
-this into a size in bytes, and then the buffer is grown to accomodate
+this into a size in bytes, and then the buffer is grown to accommodate
 (at least) that many bytes.
 
 =head1 Transcoding

@@ -475,7 +475,7 @@ rethrow_c_exception(Interp * interpreter)
 dest2offset(Interp * interpreter, opcode_t *dest)>
 
 Translate an absolute bytecode location to an offset used for resuming
-after an exception had occured.
+after an exception had occurred.
 
 =cut
 
@@ -486,7 +486,7 @@ dest2offset(Interp * interpreter, opcode_t *dest)
 {
     size_t offset;
     /* translate an absolute location in byte_code to an offset
-     * used for resuming after an exception had occured
+     * used for resuming after an exception had occurred
      */
     switch (interpreter->run_core) {
         case PARROT_SWITCH_CORE:

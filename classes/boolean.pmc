@@ -11,7 +11,7 @@ classes/boolean.pmc - Boolean PMC
 This class implements a boolean value variable.
 
 Albeit the C<Boolean PMC> is derived from the C<Integer PMC>,
-it doesn't morph to other types. Only it's value is changed.
+it doesn't morph to other types. Only its value is changed.
 
 =head2 Methods
 

@@ -360,7 +360,7 @@ do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)
 
 /*
  * while the PMCs should be constant, there possible contents like
- * a property isn't conctructed const so we have to mark them
+ * a property isn't constructed const so we have to mark them
  */
 static void
 mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)

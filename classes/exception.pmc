@@ -112,12 +112,12 @@ Initializes the exception with default values.
 
 =item C<STRING* get_string_keyed(PMC* key)>
 
-Returns the Parrot string value for C<*key>. The only current recogniced
+Returns the Parrot string value for C<*key>. The only current recognized
 C<key> is "_message".
 
 =item C<STRING* get_string()>
 
-Return the excpetion message.
+Return the exception message.
 
 =cut
 

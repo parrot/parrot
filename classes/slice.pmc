@@ -359,8 +359,8 @@ This is used for implementing Pythons xrange()
 
 =item C<PMC* nextkey_keyed (PMC* agg, INTVAL what)>
 
-Prepate slice PMC SELF for iteration over the passed aggregate or
-advance to next position in the range, dpending on what.
+Prepare slice PMC SELF for iteration over the passed aggregate or
+advance to next position in the range, depending on what.
 
 =cut
 

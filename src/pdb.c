@@ -200,7 +200,7 @@ it bang now, try listing the source before loading or disassembling it.
 =item * Print the interpreter info.
 
 =item * Make the user interface better (add comands
-history/completition).
+history/completion).
 
 =item * Some other things I don't remember now because it's late.
 

@@ -8,7 +8,7 @@ classes/bigint.pmc - BigInt PMC class
 
 =head1 DESCRIPTION
 
-C<BigInt> provides arbitray precision integer mathematic functions.
+C<BigInt> provides arbitrary precision integer mathematic functions.
 
 =head2 Functions
 
