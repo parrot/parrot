@@ -499,7 +499,7 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
     UINTVAL flags;
     opcode_t charset_nr;
     size_t size;
-    STRING *s, *cs;
+    STRING *s;
     int wordsize = pf ? pf->header->wordsize : sizeof(opcode_t);
     const char *charset_name;
 
@@ -553,7 +553,6 @@ opcode_t*
 PF_store_string(opcode_t *cursor, STRING *s)
 {
     opcode_t padded_size = s->bufused;
-    opcode_t representation;
     char *charcursor;
     size_t i;
 

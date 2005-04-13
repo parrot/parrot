@@ -473,7 +473,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                         case '*':
                             info.flags |= FLAG_WIDTH;
                             info.width *= 10;
-                            info.width += obj->getint(interpreter,
+                            info.width += (UINTVAL)obj->getint(interpreter,
                                                       SIZE_XVAL, obj);
                             continue;
 
@@ -506,7 +506,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                         case '*':
                             info.flags |= FLAG_PREC;
                             info.prec *= 10;
-                            info.prec += obj->getint(interpreter,
+                            info.prec += (UINTVAL)obj->getint(interpreter,
                                                      SIZE_XVAL, obj);
                             continue;
 

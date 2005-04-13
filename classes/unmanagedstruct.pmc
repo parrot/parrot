@@ -390,7 +390,7 @@ set_int(char *p, int type, INTVAL value)
         case enum_type_int8:
         case enum_type_char:
         case enum_type_uchar:
-            *(char*) p = value & 0xff;
+            *(char*) p = (char)value & 0xff;
             break;
         case enum_type_INTVAL:
             *(INTVAL*) p = value;

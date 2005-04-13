@@ -97,8 +97,8 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
     yk = ykp1;
   }
   $1 = r1;
-  $2 = xk * pow( -1, n );
-  $3 = yk * pow( -1, n+1 );
+  $2 = (INTVAL)( xk * pow( -1, n ) );
+  $3 = (INTVAL)( yk * pow( -1, n+1 ) );
 
   x = $2 * $4;
   y = $3 * $5;

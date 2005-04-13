@@ -416,7 +416,7 @@ inline op div (in PMC, in PMC, in PMC) :base_core {
 }
 
 inline op fdiv(inout INT, in INT) :base_core {
-  $1 = floor($1 / $2);
+  $1 = (INTVAL)floor($1 / $2);
   goto NEXT();
 }
 
@@ -441,7 +441,7 @@ inline op fdiv (in PMC, in NUM) :base_core {
 }
 
 inline op fdiv(out INT, in INT, in INT) :base_core {
-  $1 = floor($2 / $3);
+  $1 = (INTVAL)floor($2 / $3);
   goto NEXT();
 }
 

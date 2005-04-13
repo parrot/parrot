@@ -346,7 +346,7 @@ static STRING *
 string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 {
     STRING *return_string = NULL;
-    char real_codepoint = codepoint;
+    char real_codepoint = (char)codepoint;
     return_string = string_make(interpreter, &real_codepoint, 1,
             "iso-8859-1", 0);
     return return_string;

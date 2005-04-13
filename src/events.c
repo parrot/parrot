@@ -225,7 +225,10 @@ Init event system for first interpreter.
 static void
 init_events_first(Parrot_Interp interpreter)
 {
-    Parrot_thread    ev_handle, io_handle;
+    Parrot_thread    ev_handle;
+#ifndef WIN32
+    Parrot_thread    io_handle;
+#endif
 
     /*
      * be sure all init is done only once
@@ -916,7 +919,7 @@ event_thread(void *data)
             event = (parrot_event* )entry->data;
             when = event->u.timer_event.abs_time;
             abs_time.tv_sec = (time_t) when;
-            abs_time.tv_nsec = (when - abs_time.tv_sec) *
+            abs_time.tv_nsec = (long)(when - abs_time.tv_sec) *
                 (1000L*1000L*1000L);
             queue_timedwait(event_q, &abs_time);
         }

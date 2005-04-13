@@ -209,7 +209,7 @@ Returns the timer info for C<key>.
             case PARROT_TIMER_SEC:
                 return (INTVAL)t->abs_time;
             case PARROT_TIMER_USEC:
-                return (t->abs_time - (INTVAL)t->abs_time) *1000000.0;
+                return (INTVAL)( (t->abs_time - (INTVAL)t->abs_time) *1000000.0 );
             case PARROT_TIMER_REPEAT:
                 return (INTVAL) t->repeat;
             case PARROT_TIMER_RUNNING:

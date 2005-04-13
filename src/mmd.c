@@ -1047,8 +1047,8 @@ mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple,
 static INTVAL
 distance_cmp(Interp *interpreter, INTVAL a, INTVAL b)
 {
-    short da = a & 0xffff;
-    short db = b & 0xffff;
+    short da = (short)a & 0xffff;
+    short db = (short)b & 0xffff;
     return da > db ? 1 : da < db ? -1 : 0;
 }
 

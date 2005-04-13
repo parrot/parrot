@@ -415,7 +415,7 @@ PIO_stdio_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
     errno = 0;
 
-    if ((pos = fseek((FILE*)io->fd, offset, whence)) >= 0) {
+    if ((pos = fseek((FILE*)io->fd, (long)offset, whence)) >= 0) {
         io->lpos = io->fpos;
         io->fpos = pos;
     }

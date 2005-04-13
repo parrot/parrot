@@ -150,7 +150,7 @@ ascii_to_unicode(Interp *interpreter, STRING *src, STRING *dest)
         for (offs = 0; offs < src->strlen; ++offs) {
             c = ENCODING_GET_BYTE(interpreter, src, offs);
             if (iter.bytepos >= PObj_buflen(dest) - 4) {
-                UINTVAL need = (src->strlen - offs) * 1.5;
+                UINTVAL need = (UINTVAL)( (src->strlen - offs) * 1.5 );
                 if (need < 16)
                     need = 16;
                 Parrot_reallocate_string(interpreter, dest,
@@ -568,7 +568,7 @@ static STRING *
 string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 {
     STRING *return_string = NULL;
-    char real_codepoint = codepoint;
+    char real_codepoint = (char)codepoint;
     return_string = string_make(interpreter, &real_codepoint, 1, "ascii", 0);
     return return_string;
 }

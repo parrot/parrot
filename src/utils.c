@@ -364,8 +364,8 @@ static void
 _srand48(long seed)
 {
     last_rand[0] = SEED_LO;
-    last_rand[1] = seed & 0xffff;
-    last_rand[2] = (seed >> 16) & 0xffff;
+    last_rand[1] = (unsigned short)seed & 0xffff;
+    last_rand[2] = (unsigned short)(seed >> 16) & 0xffff;
     /*
      * reinit a, c if changed by lcong48()
      */
@@ -464,7 +464,7 @@ C<how_random> is ignored.
 INTVAL
 Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 {
-    return (INTVAL) from + ((double)(to - from)) * Parrot_float_rand(how_random);
+    return (INTVAL)( from + ((double)(to - from)) * Parrot_float_rand(how_random) );
 }
 
 /*
