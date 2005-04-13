@@ -927,8 +927,8 @@ ig_find_color(Interp* interpreter, IMC_Unit *unit, int x, char *avail)
             if (avail[c] && assignable[t][c - 1])
                 return c;
     }
-    /* 2) try upper non-volatiles, 16...31 */
-    for (c = 17; c <= 32; c++)
+    /* 2) try upper non-volatiles, 16...NUM_REGISTERS-1 */
+    for (c = 17; c <= NUM_REGISTERS; c++)
         if (avail[c])
             return c;
     return 0;
