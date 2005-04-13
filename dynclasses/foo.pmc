@@ -10,5 +10,14 @@ pmclass Foo dynpmc does scalar extends Integer {
     INTVAL get_integer() {
 	return 42;
     }
+
+    void subtract (PMC* value, PMC* dest) {
+MMD_Integer: {
+	VTABLE_set_integer_native(INTERP, dest, 144);
+	}
+MMD_DEFAULT: {
+	VTABLE_set_integer_native(INTERP, dest, 244);
+	}
+    }
 }
 

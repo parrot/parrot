@@ -188,6 +188,8 @@ The name of this method may change.
 	.local int offset
 	classoffset offset, self, 'SDL::Color'
 
+	color = 0
+
 	# red
 	inc offset
 	getattribute component, self, offset

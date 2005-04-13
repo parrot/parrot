@@ -759,7 +759,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
     print "\n"
     print r
     print "\n"
-    # this works only by calling the mmd_fallback
+    # dispatches to Parrot_Integer_add_Integer
     add d, l, r
     print d
     print "\n"

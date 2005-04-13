@@ -16,7 +16,7 @@ Tests the Foo PMC.
 
 =cut
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer");
@@ -60,3 +60,20 @@ BigInt
 OUTPUT
 
 }
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Foo subclass isa Integer");
+.sub main @MAIN
+    .local pmc F, f, d, r
+    loadlib F, "foo"
+    f = new "Foo"
+    f = 1
+    d = new Integer
+    r = new Integer
+    r = 2
+    d = f - r
+    print d
+    print "\n"
+.end
+CODE
+144
+OUTPUT

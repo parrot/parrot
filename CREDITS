@@ -167,6 +167,9 @@ D: parrotbug, befunge interpreter, ook compiler.
 E: jquelin@cpan.org
 S: Lyon, France
 
+N: Jerry Gay
+D: remove Win32 compile warnings; pcre update
+
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
 
