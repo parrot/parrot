@@ -202,8 +202,10 @@ char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
 
     /* use absolute paths as is */
 #ifdef WIN32
-    if (file_name[0] == '\\' || (isalpha(file_name[0]) &&
-                strncmp(file_name+1, ":\\", 2) == 0)) {
+    if (file_name[0] == '\\' || file_name[0] == '/' ||
+        (isalpha(file_name[0]) &&
+            (strncmp(file_name+1, ":\\", 2) == 0 ||
+             strncmp(file_name+1, ":/",  2) == 0))) {
 #else
     if (file_name[0] == '/') {
 #endif
