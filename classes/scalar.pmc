@@ -87,7 +87,6 @@ Returns the big number value of the scalar.
 =item C<STRING *get_string()>
 
 
-
 =cut
 
 */
@@ -477,10 +476,7 @@ Set C<dest> to the negated value of C<SELF>.
 */
 
     void neg (PMC* dest) {
-        if (dest == SELF)
-            PMC_int_val(SELF) = -DYNSELF.get_integer();
-        else
-            VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());
+        VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());
     }
 
 /*
@@ -931,33 +927,6 @@ Returns in C<*dest> the result of repeating the scalar C<value> times.
                 (UINTVAL)value, NULL) );
     }
 
-/*
-
-=item C<void increment()>
-
-Increments the scalar.
-
-=cut
-
-*/
-
-    void increment () {
-        PMC_int_val(SELF) = DYNSELF.get_integer() + 1;
-    }
-
-/*
-
-=item C<void decrement()>
-
-Decrements the scalar.
-
-=cut
-
-*/
-
-    void decrement () {
-        PMC_int_val(SELF) = DYNSELF.get_integer() - 1;
-    }
 
 /*
 
