@@ -38,7 +38,8 @@ http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe
 or
 ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
 
-MinGW works with its GNU "make" (v 3.80) port and its name is 'mingw32-make.exe'.
+MinGW works with its GNU "make" (v 3.80) port and its name is
+'mingw32-make.exe'.
 
 =item Command Shell
 
@@ -46,20 +47,32 @@ The surest way to build it is on Windows NT/2000/XP, using the cmd shell.
 
 =item ICU
 
-Though Parrot comes with ICU, the build system is rather fragile, and
-will not work for most people.  Currently, the best way to use ICU is
-to download the binary distribution from
-L<http://oss.software.ibm.com/icu/download/2.8/index.html>, unpack
-it (say, into C:\usr\lib), add the bin directory to PATH, and tell
+Parrot no longer comes with its own ICU, thus you need to install it on your
+system if you want to use it.  Note that ICU is now optional, you can
+build Parrot without it, by not installing it or asking Parrot to
+ignore it (C<--without-icu>).  
+
+If you want to use ICU, download it from
+L<http://www-306.ibm.com/software/globalization/icu/downloads.jsp>.
+
+If you want to use precompiled binaries, do the following.
+Download the package matching your compiler, unpack it (say, into
+C:\usr\lib), add the F<bin> directory to C<PATH>, and tell
 Configure.pl to use it.
 
     mkdir C:\usr\lib
-    unzip icu-2.8-Win32_msvc7.zip -d C:\usr\lib
+    unzip icu-3.2-Win32-msvc7.1.zip -d C:\usr\lib
+    mkdir C:\usr\lib\data
     set PATH=%PATH%;C:\usr\lib\icu\bin
     cd <parrot directory>
-    perl Configure.pl --icushared="C:\usr\lib\icu\lib\icudata.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include"
+    perl Configure.pl --icushared="C:\usr\lib\icu\lib\icudata.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include" --icudatadir="C:\usr\local\icu\data"
 
-With MinGW32, use icu-2.8-Win32_msvc6.zip . 
+With MinGW32, use icu-3.2-Win32-msvc6.zip.
+
+Note the step of creating the F<C:\usr\lib\data> directory, as Parrot
+really wants it and the binary packages don't contain it.  It doesn't
+need to contain anything though, as the data is pulled in from
+F<lib/icudt.lib>, which contains the standard data in binary form.
 
 =item Inno Setup
 
@@ -99,7 +112,7 @@ The HomePage is on L<http://www.mingw.org/>.
 
 With the ActiveState Perl distribution, tell Configure.pl to use gcc :
 
-    perl Configure.pl --cc=gcc --icushared="C:\usr\lib\icu\lib\icudata.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include"
+    perl Configure.pl --cc=gcc --icushared="C:\usr\lib\icu\lib\icudata.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include" --icudatadir="C:\usr\local\icu\data"
 
 Nota: Use only the ICU binary distribution. 
 
@@ -134,8 +147,17 @@ directories.
 
 =head1 BUGS AND CAVEATS
 
-See L<TODO.win32> for things that are known to broken, or are not
-implemented yet.
+=over
+
+=item Dynclasses
+
+Dynclasses are currently broken due to linkage.
+
+=item Features
+
+Threads, Events, and Signals are missing.
+
+=back
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -145,21 +167,21 @@ XXX
 
 =over
 
-=item XXX Your Name Here XXX
+=item Ron Blaschke E<lt>ron@rblasch.orgE<gt>
 
 =back
 
-This document is maintained by XXX Your Name Here XXX.
+This document is maintained by The Parrot Developers
+(E<lt>perl6-internals@perl.orgE<gt>).
 
 =head1 SEE ALSO
 
     L<parrot>
-    L<TODO.win32>
 
 =head1 HISTORY
 
-This document borrows heavily from perl's README.win32.
+This document borrows heavily from Perl's README.win32.
 
-Last updated: 31 March 2005
+Last updated: 14 April 2005
 
 =cut
