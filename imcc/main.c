@@ -96,14 +96,16 @@ static void
 imcc_version(void)
 {
     int rev = PARROT_REVISION;
-    printf("This is parrot version " PARROT_VERSION " (r%d) built for "
-          PARROT_ARCHNAME ".\n", rev);
+    printf("This is parrot version " PARROT_VERSION);
+    if (rev != 0)
+	printf(" (r%d)", rev);
+    printf(" built for " PARROT_ARCHNAME ".\n");
     rev = Parrot_revision();
-    if( PARROT_REVISION != rev ) {
+    if (PARROT_REVISION != rev) {
 	printf( "Warning: runtime has revision %d!\n", rev );
     }
     rev = Parrot_config_revision();
-    if( PARROT_REVISION != rev ) {
+    if (PARROT_REVISION != rev) {
 	printf( "Warning: used Configure.pl revision %d!\n", rev );
     }
     printf("Copyright (C) 2001-2005 The Perl Foundation.  All Rights Reserved.\n\

@@ -21,11 +21,18 @@ $description="Determining Parrot's revision";
 
 sub runstep {
     my $revision = $Parrot::Revision::current;
+    my $entries  = $Parrot::Revision::svn_entries;
 
     Configure::Data->set(
 	revision => $revision,
+	SVN_ENTRIES => $entries
     );
-    $Configure::Step::result = "r$revision";
+    
+    if ($revision >= 1) {
+	$Configure::Step::result = "r$revision";
+    } else {
+	$Configure::Step::result = "failed";
+    }
 }
 
 1;

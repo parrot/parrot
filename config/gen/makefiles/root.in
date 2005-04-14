@@ -58,6 +58,9 @@ PF_DIR          = pf
 # source directory
 SRC_DIR         = src
 
+# revision control
+#CONDITIONED_LINE(SVN_ENTRIES):SVN_ENTRIES=${SVN_ENTRIES}
+#INVERSE_CONDITIONED_LINE(SVN_ENTRIES):SVN_ENTRIES=
 
 ###############################################################################
 #
@@ -714,7 +717,7 @@ $(SRC_DIR)/fingerprint.c : $(BUILD_TOOLS_DIR)/fingerprint_c.pl PBC_COMPAT
 $(SRC_DIR)/parrot_config.h : $(BUILD_TOOLS_DIR)/parrot_config_c.pl config_lib.pasm
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > $(SRC_DIR)/parrot_config.h
 
-$(SRC_DIR)/revision.c : .svn/entries $(BUILD_TOOLS_DIR)/revision_c.pl $(SRC_DIR)/parrot_config.h
+$(SRC_DIR)/revision.c : $(SVN_ENTRIES) $(BUILD_TOOLS_DIR)/revision_c.pl $(SRC_DIR)/parrot_config.h
 	$(PERL) -Ilib $(BUILD_TOOLS_DIR)/revision_c.pl > $(SRC_DIR)/revision.c
 
 ###############################################################################

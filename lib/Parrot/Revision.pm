@@ -21,10 +21,18 @@ Get parrot's current and configure time revision.
 package Parrot::Revision;
 use strict;
 
-sub __get_revision {
-    # code taken from pugs/util/version_h.pl rev 859
-    my $svn_entries = ".svn/entries";
+our $svn_entries = undef;
 
+sub __get_revision {
+    foreach my $entry ( qw[.svn/entries .svk/entries] ) {
+	if (-e $entry) {
+	    $svn_entries = $entry;
+	    last;
+	}
+    }
+    return 0 unless defined $svn_entries;
+    
+    # code taken from pugs/util/version_h.pl rev 859
     if (-r $svn_entries) {
         open FH, $svn_entries or die $!;
         while (<FH>) {
