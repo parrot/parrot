@@ -578,6 +578,11 @@ opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
 {
     char *pc = jit_info->native_ptr;
     int saved = 0;
+    int div_ecx = 0;
+    Parrot_jit_register_usage_t *ru;
+
+    assert(src != emit_EAX);
+
     if (dest != emit_EAX) {
         jit_emit_mov_rr_i(pc, emit_EAX, dest);
     }
@@ -585,55 +590,73 @@ opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
         /* all ok, we can globber it */
     }
     else {
-        /* if ECX is mapped, push EDX on stack */
-        if (jit_info->optimizer->cur_section->ru[0].registers_used ==
-                INT_REGISTERS_TO_MAP) {
-            emitm_pushl_r(pc, emit_EDX);
-            saved = 2;
-        }
-        /* if EDX is mapped, save it in ECX */
-        else if (jit_info->optimizer->cur_section->ru[0].registers_used ==
-                INT_REGISTERS_TO_MAP - 1) {
-            saved = 1;
+        ru = jit_info->optimizer->cur_section->ru + 0;
+        /* if ECX is not mapped use it */
+        if (ru->registers_used < INT_REGISTERS_TO_MAP && src == emit_EDX) {
             jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+            div_ecx = 1;
         }
+        else
+            /* if EDX is mapped, preserve EDX on stack */
+            if (ru->registers_used >= INT_REGISTERS_TO_MAP - 1) {
+                emitm_pushl_r(pc, emit_EDX);
+                saved = 1;
+                /* if EDX is the src, we need another temp register: ECX */
+                if (src == emit_EDX) {
+                    /* if ECX is mapped save it, but not if it's dest */
+                    if (ru->registers_used == INT_REGISTERS_TO_MAP &&
+                            dest != emit_ECX) {
+                        emitm_pushl_r(pc, emit_ECX);
+                        saved = 2;
+                    }
+                    /* else just use it */
+                    jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+                    div_ecx = 1;
+                }
+            }
     }
 #  if 0
     jit_emit_cdq(pc);
 #  else
     /* this sequence allows 2 other instructions to run parallel */
-    jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
+    if (dest != emit_EDX) {
+        jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
+    }
     pc = emit_shift_i_r(pc, emit_b111, 31, emit_EDX); /* SAR 31 */
 #  endif
-    if (src == emit_EDX) {
-        assert(saved == 1);
+    if (div_ecx) {
         emitm_sdivl_r(pc, emit_ECX);
     }
     else {
         emitm_sdivl_r(pc, src);
     }
+    if (saved == 2) {
+        emitm_popl_r(pc, emit_ECX);
+    }
     if (is_div) {
         /* result = quotient in EAX */
-        if (saved == 1) {
-            jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
+        if (saved) {
+            emitm_popl_r(pc, emit_EDX);
         }
         if (dest != emit_EAX) {
             jit_emit_mov_rr_i(pc, dest, emit_EAX);
         }
-        if (saved == 2) {
-            emitm_popl_r(pc, emit_EDX);
-        }
     }
     else {
         /* result = remainder in EDX */
-        if (dest != emit_EDX) {
+        if (saved) {
+            emitm_popl_r(pc, emit_EAX);
             jit_emit_mov_rr_i(pc, dest, emit_EDX);
-            if (saved == 1) {
-                jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
-            }
-            else if (saved == 2)
-                emitm_popl_r(pc, emit_EDX);
+            jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
         }
+        else {
+            if (dest != emit_EDX)
+                jit_emit_mov_rr_i(pc, dest, emit_EDX);
+        }
+    }
+    if (!saved && div_ecx) {
+        /* restore EDX */
+        jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
     }
     return pc;
 }

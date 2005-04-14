@@ -23,7 +23,7 @@ should just be the same.
 =cut
 
 # test WRT JIT register allocation
-use Parrot::Test tests => 59;
+use Parrot::Test tests => 60;
 
 output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped");
 set I0,0
@@ -1184,4 +1184,16 @@ CODE
 154
 OUTPUT
 
-1;
+output_is(<<'CODE', <<'OUTPUT', "div bug");
+    set I1, 1
+    set I2, 2
+    set I3, 4
+    set I4, 4
+    mul I3, I1
+    div I3, I2
+    print I3
+    print "\n"
+    end
+CODE
+2
+OUTPUT
