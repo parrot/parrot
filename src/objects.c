@@ -1281,7 +1281,7 @@ Parrot_get_attrib_by_num(Interp* interpreter, PMC *object, INTVAL attrib)
     attrib_array = PMC_data(object);
     attrib_count = ATTRIB_COUNT(object);
     if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
-        internal_exception(OUT_OF_BOUNDS,
+        real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute #%d", (int)attrib);
     }
     return get_attrib_num(attrib_array, attrib);
@@ -1294,7 +1294,10 @@ attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
     PMC *attr_hash;
     SLOTTYPE *class_array;
     HashBucket *b;
-    char *cattr, *cobj;
+    STRING *delimit;
+    STRING *attr_name;
+    STRING *obj_name;
+    int index, length;
 
     if (!PObj_is_object_TEST(object))
         internal_exception(INTERNAL_NOT_IMPLEMENTED,
@@ -1307,12 +1310,22 @@ attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
                 (Hash*) PMC_struct_val(attr_hash), attr);
     if (b)
         return VTABLE_get_integer(interpreter, (PMC*)b->value);
-    /* escape the NUL char */
-    cobj = string_to_cstring(interpreter, attr);
-    cattr = cobj + strlen(cobj) + 1;
-    internal_exception(1, "No such attribute '%s\\0%s'",
-            cobj, cattr);
-    string_cstring_free(cattr);
+
+    /* Create a delimiter for splitting up the Class\0attribute syntax. */
+    delimit = string_from_cstring(interpreter, "\0", 1);
+
+    /* Calculate the offset and the length of the attribute string. */
+    index  = string_str_index(interpreter, attr, delimit, 0) + 1;
+    length = string_length(interpreter, attr) - index;
+
+    /* Extract the attribute and object name. */
+    attr_name = string_substr(interpreter, attr, index, length, 0, 0);
+    obj_name = string_substr(interpreter, attr, 0, index-1, 0, 0);
+
+    real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
+	    "No such attribute '%Ss\\0%Ss'",
+	    obj_name, attr_name);
+
     return 0;
 }
 
@@ -1353,7 +1366,7 @@ Parrot_set_attrib_by_num(Interp* interpreter, PMC *object,
     attrib_array = PMC_data(object);
     attrib_count = ATTRIB_COUNT(object);
     if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
-        internal_exception(OUT_OF_BOUNDS,
+        real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute #%d", (int)attrib);
     }
     set_attrib_num(object, attrib_array, attrib, value);
