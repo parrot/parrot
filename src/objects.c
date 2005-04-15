@@ -1046,6 +1046,8 @@ Parrot_find_method_with_cache(Interp* interpreter, PMC *class,
     UINTVAL bits, i;
     Meth_cache_entry *e, *old;
 
+    assert(method_name != 0);
+
 #if DISABLE_METH_CACHE
     return find_method_direct(interpreter, class, method_name);
 #endif

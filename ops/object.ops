@@ -108,6 +108,8 @@ op callmethodcc() :object_base {
   REG_PMC(1) = new_ret_continuation_pmc(interpreter, next);
   interpreter->ctx.current_object = object = REG_PMC(2);
   interpreter->ctx.current_method = meth;
+  assert(!PMC_IS_NULL(object));
+  assert(meth!=0);
   method_pmc = VTABLE_find_method(interpreter, object, meth);
   if (!method_pmc) {
     real_exception(interpreter, next, METH_NOT_FOUND,
