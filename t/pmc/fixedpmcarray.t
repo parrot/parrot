@@ -388,7 +388,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Getting unitialized elements");
+pir_output_like(<<'CODE', <<'OUTPUT', "Getting unitialized elements");
 
 .sub main @MAIN
     .local pmc arr1
@@ -401,5 +401,5 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Getting unitialized elements");
     print type_1956
 .end
 CODE
-Null PMC access in name()
+/^Null PMC access in name()/
 OUTPUT

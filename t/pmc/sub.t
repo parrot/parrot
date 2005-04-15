@@ -1260,14 +1260,14 @@ tb_end:
 CODE
 main foo
 Bar bar
-subname: bar
+subname: Bar :: bar
 Bar foo
-caller 0 foo
-caller 1 bar
+caller 0 Bar :: foo
+caller 1 Bar :: bar
 caller 2 foo
 caller 3 main
 Bar foo
-caller 0 foo
+caller 0 Bar :: foo
 caller 1 main
 ok
 OUTPUT

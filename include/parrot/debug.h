@@ -280,6 +280,7 @@ void PDB_info(Interp *interpreter);
 
 void PDB_help(Interp *interpreter, const char *command);
 
+void PDB_backtrace(Interp *interpreter);
 
 #define c_b             25245
 #define c_c             25500

@@ -1433,6 +1433,7 @@ sub body
     return <<EOC;
 $l
 ${decl} {
+	Parrot_on_exit(show_backtrace, interpreter);
 	internal_exception(NULL_REG_ACCESS,
 		"Null PMC access in $meth()");
         $ret

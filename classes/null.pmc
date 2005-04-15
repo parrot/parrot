@@ -21,6 +21,12 @@ really slowing down the bytecode execution.
 
 #include "parrot/parrot.h"
 
+static void
+show_backtrace(int ret, void *interp)
+{
+    PDB_backtrace( (Interp*)interp );
+}
+
 pmclass Null singleton {
 
 /*

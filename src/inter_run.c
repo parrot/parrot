@@ -185,8 +185,8 @@ Parrot_run_meth_fromc_args_retf(Parrot_Interp interpreter, PMC *sub,
         PMC* obj, STRING* meth, const char *sig, ...)>
 
 Run parrot ops, called from C code, function arguments are passed as
-C<va_args> according to signature the C<sub> argument is an invocable
-C<Sub> PMC.
+C<va_args> according to the signature. The C<sub> argument is an
+invocable C<Sub> PMC.
 
 Signatures are similar to NCI:
 

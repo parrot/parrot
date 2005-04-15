@@ -205,8 +205,7 @@ destination to continue execution.
             PMC *sub = INTERP->ctx.current_sub;
             STRING *unk = CONST_STRING(INTERP, "(unknown");
             PIO_eprintf(INTERP, "# Back in sub '%Ss'\n",
-                sub && PMC_sub(sub) && PMC_sub(sub)->name ?
-                PMC_sub(sub)->name : unk);
+                Parrot_full_sub_name(INTERP, sub));
         }
         if (cc->address)
             copy_regs(INTERP, caller_regs);
@@ -242,7 +241,7 @@ Experimental: return caller info as a STRING.
                 PMC_sub(caller)->seg->base.data;
             s = Parrot_sprintf_c(INTERP,
                     "called from Sub '%Ss' pc %d\n",
-                    PMC_sub(caller)->name, (int)offs);
+                    Parrot_full_sub_name(INTERP, caller), (int)offs);
         }
         return s;
     }

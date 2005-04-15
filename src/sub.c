@@ -518,6 +518,36 @@ invalidate_retc_context(Interp *interpreter, struct Parrot_Context *ctx)
 
 /*
 
+=item C<Parrot_full_sub_name>
+
+Print name and location of subroutine, This should finally use the label
+name of the frozen C<Sub> PMC image for now locate the C<Sub> name in
+the globals.
+
+=cut
+
+*/
+
+STRING*
+Parrot_full_sub_name(Interp* interpreter, PMC* sub)
+{
+    struct Parrot_sub * s = PMC_sub(sub);
+
+    if (PMC_IS_NULL(s->name_space)) {
+        return s->name;
+    } else {
+        STRING* ns = VTABLE_get_string(interpreter, s->name_space);
+
+        ns = string_concat(interpreter, ns, string_from_cstring(interpreter, " :: ", 4), 0);
+        if (s->name) {
+            return string_concat(interpreter, ns, s->name, 0);
+        }
+    }
+    return NULL;
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

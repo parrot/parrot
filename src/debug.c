@@ -2927,6 +2927,46 @@ Type \"help\" followed by a command name for full documentation.\n\n");
 
 /*
 
+=item C<void
+PDB_backtrace(Interp *interpreter)>
+
+Prints a backtrace of the interpreter's call chain.
+
+=cut
+
+*/
+
+void
+PDB_backtrace(Interp *interpreter)
+{
+    STRING *str;
+    PMC *sub;
+
+    /* information about the current sub */
+    sub = interpinfo_p(interpreter, CURRENT_SUB);
+    if (!PMC_IS_NULL(sub)) {
+	str = VTABLE_get_string(interpreter, sub);
+	PIO_eprintf(interpreter, "current instr.: '%Ss' pc %d\n",
+	    str,
+	    interpreter->ctx.current_pc - PMC_sub(sub)->address
+	);
+    }
+    
+    sub = interpinfo_p(interpreter, CURRENT_CONT);
+    while (!PMC_IS_NULL(sub) && sub->vtable->base_type == enum_class_Continuation) {
+	str = VTABLE_get_string(interpreter, sub);
+	if (!str)
+	    break;
+	PIO_eprintf(interpreter, "%Ss",
+	    str
+	);
+	/* get the next Continuation */
+        sub = PMC_cont(sub)->ctx.current_cont;
+    }
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

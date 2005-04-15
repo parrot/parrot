@@ -103,6 +103,7 @@ void mark_reg_stack(Interp *, Stack_Chunk_t *);
 void invalidate_retc_context(Interp *interpreter, struct Parrot_Context *);
 void add_to_retc_cache(Interp *interpreter, PMC *pmc);
 void mark_retc_cache(Interp *);
+STRING* Parrot_full_sub_name(Interp* interpreter, PMC* sub);
 
 #endif /* PARROT_SUB_H_GUARD */
 

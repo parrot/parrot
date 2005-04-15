@@ -21,29 +21,6 @@ These are the vtable functions for the Sub (subroutine) base class
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/*
-
-=item C<sub_name>
-
-Print name and location of subroutine, This should finally use the label
-name of the frozen C<Sub> PMC image for now locate the C<Sub> name in
-the globals.
-
-=cut
-
-*/
-
-static STRING*
-sub_name(Interp* interpreter, PMC* sub)
-{
-    struct Parrot_sub * s = PMC_sub(sub);
-
-    if (s->name) {
-        return s->name;
-    }
-    return NULL;
-}
-
 static void
 clear_fixup(Interp* interpreter, PMC* self)
 {
@@ -79,7 +56,7 @@ print_sub_name(Interp* interpreter, PMC* sub)
 
         /* sub was located via globals */
     PIO_eprintf(interpreter, "# Calling sub '%Ss'\n#",
-        sub_name(interpreter, sub));
+        Parrot_full_sub_name(interpreter, sub));
     print_pbc_location(interpreter);
 }
 
@@ -143,7 +120,7 @@ Destroys the subroutine.
             return;
 #if 0
         {
-            STRING *n = sub_name(INTERP, SELF);
+            STRING *n = Parrot_full_sub_name(INTERP, SELF);
             fprintf(stderr, "DESTROY sub %p %s\n", SELF,
                     n && n->strstart ? (char*)n->strstart : "???");
         }
@@ -164,7 +141,7 @@ Returns the name of the subroutine.
 */
 
     STRING* get_string () {
-        return sub_name(INTERP, SELF);
+        return Parrot_full_sub_name(INTERP, SELF);
     }
 
 /*
