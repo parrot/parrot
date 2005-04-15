@@ -339,11 +339,11 @@ C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
 
 /*
 
-=item C<void add (PMC* value, PMC* dest)>
+=item C<PMC* add (PMC* value, PMC* dest)>
 
-=item C<void add_int (INTVAL value, PMC* dest)>
+=item C<PMC* add_int (INTVAL value, PMC* dest)>
 
-=item C<void add_float (FLOATVAL value, PMC* dest)>
+=item C<PMC* add_float (FLOATVAL value, PMC* dest)>
 
 Adds C<value> to the ending offset of the match range, placing the
 result in C<dest>.
@@ -352,25 +352,30 @@ result in C<dest>.
 
 */
 
-    void add (PMC* value, PMC* dest) {
+    PMC* add (PMC* value, PMC* dest) {
         INTVAL v = VTABLE_get_integer(INTERP, dest);
-        SELF.add_int(v, dest);
+        return SELF.add_int(v, dest);
     }
 
-    void add_int (INTVAL value, PMC* dest) {
-        VTABLE_morph(INTERP, dest, MatchRange_type_id);
+    PMC* add_int (INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, MatchRange_type_id);
+        else
+            dest = pmc_new(INTERP,  MatchRange_type_id);
         if (RANGE_END(SELF) == -2) {
             if (RANGE_START(SELF) == -2) {
-                internal_exception(1, "MatchRange: cannot add to nonexistent range");
+                internal_exception(1,
+                    "MatchRange: cannot add to nonexistent range");
                 return;
             }
             RANGE_END(SELF) = RANGE_START(SELF);
         }
         RANGE_END(dest) = RANGE_END(SELF) + value;
+        return dest;
     }
 
-    void add_float (FLOATVAL value, PMC* dest) {
-        SELF.add_int((INTVAL) value, dest);
+    PMC* add_float (FLOATVAL value, PMC* dest) {
+        return SELF.add_int((INTVAL) value, dest);
     }
 
 /*

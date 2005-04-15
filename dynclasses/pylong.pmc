@@ -83,22 +83,6 @@ Create a new long.
         return ret;
     }
 
-/*
-
-=item C<void add(PMC *value, PMC *dest)>
-
-Add C<*value> to the integer and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void add (PMC* value, PMC* dest) {
-MMD_PyInt: {
-            INTVAL vali = VTABLE_get_integer(INTERP, value);
-            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_ADD);
-        }
-    }
 
 /*
 

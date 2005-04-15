@@ -40,7 +40,7 @@ Marks the string as live.
 
 /*
 
-=item C<PMC* "__getitem__"(PMC *self, PMC *index)>
+=item C<PMC* "__getitem__"(PMC *self, PMC *idx)>
 
 Returns the PMC value of the element at index C<key>.
 
@@ -48,22 +48,22 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    METHOD PMC* __getitem__(PMC *self, PMC *index) {
-        return VTABLE_get_pmc_keyed(INTERP, self, index);
+    METHOD PMC* __getitem__(PMC *self, PMC *idx) {
+        return VTABLE_get_pmc_keyed(INTERP, self, idx);
     }
 
 /*
 
-=item C<PMC* "__setitem__"(PMC *self, PMC *index, PMC *value)>
+=item C<PMC* "__setitem__"(PMC *self, PMC *idx, PMC *value)>
 
-Sets the PMC at element C<index> to C<*value>.
+Sets the PMC at element C<idx> to C<*value>.
 
 =cut
 
 */
 
-    METHOD void __setitem__(PMC *self, PMC *index, PMC *value) {
-        VTABLE_set_pmc_keyed(INTERP, self, index, value);
+    METHOD void __setitem__(PMC *self, PMC *idx, PMC *value) {
+        VTABLE_set_pmc_keyed(INTERP, self, idx, value);
     }
 
 /*
@@ -91,7 +91,7 @@ Create a new string
 
 /*
 
-=item C<void add(PMC *value, PMC *dest)>
+=item C<PMC* add(PMC *value, PMC *dest)>
 
 Concatenates C<*value> to the string and returns the result in C<*dest>.
 
@@ -99,8 +99,9 @@ Concatenates C<*value> to the string and returns the result in C<*dest>.
 
 */
 
-    void add (PMC * value, PMC* dest) {
+    PMC* add (PMC * value, PMC* dest) {
         SELF.concatenate(value, dest);
+        return dest;
     }
 
 /*

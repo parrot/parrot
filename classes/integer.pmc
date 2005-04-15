@@ -349,9 +349,9 @@ Morphs the integer to a C<String> and sets the value from C<value>.
 
 /*
 
-=item C<void add_int(INTVAL value, PMC *dest)>
+=item C<PMC* add(PMC *value, PMC *dest)>
 
-=item C<void add(PMC *value, PMC *dest)>
+=item C<PMC* add_int(INTVAL value, PMC *dest)>
 
 Adds C<value> to the integer and returns the result in C<*dest>.
 
@@ -363,70 +363,117 @@ two types.
 =cut
 
 */
-    void add_int (INTVAL b, PMC* dest) {
+    PMC* add (PMC* value, PMC* dest) {
+MMD_Integer: {
+            /*
+             * SELF and value can both be PMCs that inherit
+             * from Integer:
+             *   cl = subclass "Integer", "MyInt"
+             * so we can't used PMC_int_val(SELF) in any of these
+             * Integer methods
+             *
+             * TODO
+             *   check for exact Integer type
+             *   e.g. MMD_Integer_EXACT
+             */
+
+            INTVAL a = VTABLE_get_integer(INTERP, SELF);
+            INTVAL b = VTABLE_get_integer(INTERP, value);
+            INTVAL c = a + b;
+            if ((c^a) >= 0 || (c^b) >= 0) {
+                if (!dest)
+                    dest = pmc_new(INTERP, SELF->vtable->base_type);
+                VTABLE_set_integer_native(INTERP, dest, c);
+                return dest;
+            }
+            else
+                return overflow(INTERP, SELF, b, dest, MMD_ADD);
+        }
+MMD_Complex: {
+            INTVAL a = DYNSELF.get_integer();
+            if (dest)
+                VTABLE_morph(INTERP, dest, value->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, value->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                    a + VTABLE_get_number_keyed_int(INTERP, value, 0));
+            VTABLE_set_number_keyed_int(INTERP, dest, 1,
+                    VTABLE_get_number_keyed_int(INTERP, value, 1));
+            return dest;
+        }
+MMD_BigInt: {
+            return overflow_p(INTERP, SELF, value, dest, MMD_ADD);
+        }
+MMD_DEFAULT: {
+            if (!dest)
+                dest = pmc_new(INTERP, value->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                DYNSELF.get_integer() + VTABLE_get_number(INTERP, value));
+            return dest;
+        }
+    }
+
+    PMC* add_int (INTVAL b, PMC* dest) {
         /* INTVAL a = PMC_int_val(SELF); */
         INTVAL a = VTABLE_get_integer(INTERP, SELF);
         INTVAL c = a + b;
-        if ((c^a) >= 0 || (c^b) >= 0)
+        if ((c^a) >= 0 || (c^b) >= 0) {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_integer_native(INTERP, dest, c);
+            return dest;
+        }
         else
-            overflow(INTERP, SELF, b, dest, MMD_ADD);
+            return overflow(INTERP, SELF, b, dest, MMD_ADD);
     }
 
-    void add (PMC* value, PMC* dest) {
+/*
+
+=item C<void i_add(PMC *value)>
+
+=item C<void i_add(INTVAL value)>
+
+=item C<void i_add(FLOATVAL value)>
+
+Adds C<value> to C<SELF> inplace.
+
+=cut
+
+*/
+
+    void i_add (PMC* value) {
 MMD_Integer: {
-        /*
-         * SELF and value can both be PMCs that inherit
-         * from Integer:
-         *   cl = subclass "Integer", "MyInt"
-         * so we can't used PMC_int_val(SELF) in any of these
-         * Integer methods
-         *
-         * TODO
-         *   check for exact Integer type
-         *   e.g. MMD_Integer_EXACT
-         */
-
-        INTVAL a = VTABLE_get_integer(INTERP, SELF);
-        INTVAL b = VTABLE_get_integer(INTERP, value);
-        INTVAL c = a + b;
-        if ((c^a) >= 0 || (c^b) >= 0)
-            VTABLE_set_integer_native(INTERP, dest, c);
-        else
-            overflow(INTERP, SELF, b, dest, MMD_ADD);
-    }
+            SELF.i_add_int(VTABLE_get_integer(INTERP, value));
+        }
 MMD_Complex: {
-        if (dest != SELF) {
-            VTABLE_morph(INTERP, dest, enum_class_Complex);
-            VTABLE_set_number_native(INTERP, dest,
-                    PMC_int_val(SELF) +
+            INTVAL a = DYNSELF.get_integer();
+            VTABLE_morph(INTERP, SELF, value->vtable->base_type);
+            VTABLE_set_number_native(INTERP, SELF,
+                    (FLOATVAL)a +
                     VTABLE_get_number_keyed_int(INTERP, value, 0));
-            VTABLE_set_number_keyed_int(INTERP, dest, 1,
+            VTABLE_set_number_keyed_int(INTERP, SELF, 1,
                     VTABLE_get_number_keyed_int(INTERP, value, 1));
-
-        }
-        else {
-            internal_exception(1, "Complex: unimp add self");
-        }
-    }
-MMD_BigInt: {
-            overflow_p(INTERP, SELF, value, dest, MMD_ADD);
-        }
-MMD_PerlUndef: {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-            "Use of uninitialized value in integer context");
-        VTABLE_set_integer_native(INTERP, dest, PMC_int_val(SELF));
-        }
-MMD_Float: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_int_val(SELF) + PMC_num_val(value));
         }
 MMD_DEFAULT: {
-        VTABLE_set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, SELF,
             PMC_int_val(SELF) + VTABLE_get_number(INTERP, value));
         }
     }
 
+    void i_add_int (INTVAL b) {
+        INTVAL a = DYNSELF.get_integer();
+        INTVAL c = a + b;
+        if ((c^a) >= 0 || (c^b) >= 0) {
+            VTABLE_set_integer_native(INTERP, SELF, c);
+        }
+        else
+            overflow(INTERP, SELF, b, SELF, MMD_SUBTRACT);
+    }
+
+    void i_add_float (FLOATVAL value) {
+        INTVAL a = DYNSELF.get_integer();
+        VTABLE_set_number_native(INTERP, SELF, a + value);
+    }
 /*
 
 =item C<PMC* subtract(PMC *value, PMC *dest)>

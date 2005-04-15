@@ -101,7 +101,6 @@ bigint_get_double(Interp *interpreter, PMC *self) {
 static void
 bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_add(BN(dest), BN(self), BN(value));
 }
 
@@ -109,7 +108,6 @@ static void
 bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_add_ui(BN(dest), BN(self), (long)value);
 }
 static void
@@ -609,17 +607,58 @@ Decrements the integer.
         bigint_sub_bigint_int(INTERP, SELF, 1, SELF);
     }
 
-    void add(PMC* value, PMC* dest) {
+    PMC* add(PMC* value, PMC* dest) {
 MMD_BigInt: {
+                if (dest)
+                    VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                else
+                    dest = pmc_new(INTERP, SELF->vtable->base_type);
                 bigint_add_bigint(INTERP, SELF, value, dest);
+                return dest;
             }
 MMD_Integer: {
+                if (dest)
+                    VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                else
+                    dest = pmc_new(INTERP, SELF->vtable->base_type);
                 bigint_add_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+                return dest;
             }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp add");
+                internal_exception(1, "unimp add");
+                return dest;
              }
     }
+
+    PMC* add_int(INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        bigint_add_bigint_int(INTERP, SELF, value, dest);
+        return dest;
+    }
+
+    void i_add (PMC* value) {
+MMD_BigInt: {
+                bigint_add_bigint(INTERP, SELF, value, SELF);
+            }
+MMD_Integer: {
+                bigint_add_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
+             }
+MMD_DEFAULT: {
+                internal_exception(1, "unimp add");
+             }
+    }
+
+    void i_add_int (INTVAL value) {
+        bigint_add_bigint_int(INTERP, SELF, value, SELF);
+    }
+
+    void i_add_float (FLOATVAL value) {
+        internal_exception(1, "unimp add");
+    }
+
 
     PMC* subtract(PMC* value, PMC* dest) {
 MMD_BigInt: {
@@ -671,10 +710,6 @@ MMD_DEFAULT: {
 
     void i_subtract_float (FLOATVAL value) {
         internal_exception(1, "unimp sub");
-    }
-
-    void add_int(INTVAL value, PMC* dest) {
-        bigint_add_bigint_int(INTERP, SELF, value, dest);
     }
 
 

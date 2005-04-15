@@ -84,6 +84,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "1+1=3");
     $I2 = $I0 + $I1
     inc $I2
     lhs = $I2
+    .return (lhs)
 .end
 CODE
 3

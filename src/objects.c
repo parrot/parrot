@@ -1299,7 +1299,7 @@ attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
     STRING *delimit;
     STRING *attr_name;
     STRING *obj_name;
-    int index, length;
+    int idx, length;
 
     if (!PObj_is_object_TEST(object))
         internal_exception(INTERNAL_NOT_IMPLEMENTED,
@@ -1317,12 +1317,12 @@ attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
     delimit = string_from_cstring(interpreter, "\0", 1);
 
     /* Calculate the offset and the length of the attribute string. */
-    index  = string_str_index(interpreter, attr, delimit, 0) + 1;
-    length = string_length(interpreter, attr) - index;
+    idx  = string_str_index(interpreter, attr, delimit, 0) + 1;
+    length = string_length(interpreter, attr) - idx;
 
     /* Extract the attribute and object name. */
-    attr_name = string_substr(interpreter, attr, index, length, 0, 0);
-    obj_name = string_substr(interpreter, attr, 0, index-1, 0, 0);
+    attr_name = string_substr(interpreter, attr, idx, length, 0, 0);
+    obj_name = string_substr(interpreter, attr, 0, idx-1, 0, 0);
 
     real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
 	    "No such attribute '%Ss\\0%Ss'",

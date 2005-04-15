@@ -21,12 +21,12 @@ These are the vtable functions for the PyList base class
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 
-static void quicksort(Interp* interpreter, List *list, PMC *cmpsub, 
-    INTVAL left, INTVAL right) 
+static void quicksort(Interp* interpreter, List *list, PMC *cmpsub,
+    INTVAL left, INTVAL right)
 {
     /* XXX: I don't understand why, but unless this statement is present,
-     * the scratchpad is corrupt (segfault in scratchpad_find) on exit 
-     * from quicksort on the first icmp test in t/pie/b3.t test #9 
+     * the scratchpad is corrupt (segfault in scratchpad_find) on exit
+     * from quicksort on the first icmp test in t/pie/b3.t test #9
      */
     PMC *pad = scratchpad_get_current(interpreter);
 
@@ -171,7 +171,7 @@ Sets the PMC at element C<index> to C<*value>.
 
 /*
 
-=item C<void add(PMC *value, PMC *dest)>
+=item C<PMC* add(PMC *value, PMC *dest)>
 
 Adds C<*value> to the integer and returns the result in C<*dest>.
 
@@ -179,12 +179,14 @@ Adds C<*value> to the integer and returns the result in C<*dest>.
 
 */
 
-    void add (PMC* value, PMC* dest) {
+    PMC* add (PMC* value, PMC* dest) {
 MMD_PyList: {
             PMC *iter;
             INTVAL j;
 
-            if (dest != SELF) {
+            if (!dest)
+                dest = pmc_new(INTERP, PyBuiltin_PyList);
+            else if (dest != SELF) {
                 VTABLE_morph(INTERP, dest, PyBuiltin_PyList);
 
                 iter = VTABLE_get_iter(INTERP, SELF);
@@ -199,6 +201,7 @@ MMD_PyList: {
                 PMC *item = VTABLE_shift_pmc(INTERP, iter);
                 VTABLE_push_pmc(INTERP, dest, item);
             }
+            return dest;
         }
     }
 /*
@@ -356,12 +359,12 @@ Returns the PMC value of the element at index C<key>.
             PMC * ret = pmc_new(INTERP, PyBuiltin_PyList);
             INTVAL n = end-start;
             INTVAL j;
-    
+
             for (j=0; j<n; j++) {
                 PMC *item = VTABLE_get_pmc_keyed_int(INTERP, SELF, start+j);
                 VTABLE_set_pmc_keyed_int(INTERP, ret, j, item);
             }
-    
+
             VTABLE_set_integer_native(INTERP, ret, n);
             return ret;
         }
@@ -648,7 +651,7 @@ Sort this array, optionally using the provided cmp_func
 
 METHOD void sort(PMC *self, PMC *cmp_func) {
     INTVAL n;
-    if (REG_INT(3) < 2 || !VTABLE_get_bool(INTERP, cmp_func)) 
+    if (REG_INT(3) < 2 || !VTABLE_get_bool(INTERP, cmp_func))
         cmp_func = NULL;
     n = VTABLE_elements(INTERP, self);
     quicksort(INTERP, (List *) PMC_data(self), cmp_func, 0, n-1);

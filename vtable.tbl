@@ -139,16 +139,18 @@ void unshift_pmc(PMC* value)
 void splice(PMC* value, INTVAL offset, INTVAL count)
 
 [MATH]
-void add(PMC* value, PMC* dest)             MMD_ADD
-void add_int(INTVAL value, PMC* dest)       MMD_ADD_INT
-void add_float(FLOATVAL value, PMC* dest)   MMD_ADD_FLOAT
+PMC* add(PMC* value, PMC* dest)             MMD_ADD
+PMC* add_int(INTVAL value, PMC* dest)       MMD_ADD_INT
+PMC* add_float(FLOATVAL value, PMC* dest)   MMD_ADD_FLOAT
 
-# one for a test first
+void i_add(PMC* value)                      MMD_I_ADD
+void i_add_int(INTVAL value)                MMD_I_ADD_INT
+void i_add_float(FLOATVAL value)            MMD_I_ADD_FLOAT
+
 PMC* subtract(PMC* value, PMC* dest)        MMD_SUBTRACT
 PMC* subtract_int(INTVAL value, PMC* dest)  MMD_SUBTRACT_INT
 PMC* subtract_float(FLOATVAL value, PMC* dest)  MMD_SUBTRACT_FLOAT
 
-# and inplace
 void i_subtract(PMC* value)                 MMD_I_SUBTRACT
 void i_subtract_int(INTVAL value)           MMD_I_SUBTRACT_INT
 void i_subtract_float(FLOATVAL value)       MMD_I_SUBTRACT_FLOAT

@@ -157,41 +157,43 @@ Sets the Parrot string value.
 
 =over 4
 
-=item C<void add_int(INTVAL value, PMC *dest)>
+=item C<PMC* add_int(INTVAL value, PMC *dest)>
 
 Adds C<value> to the scalar and returns the result in C<*dest>.
-
-TODO - overflow detection, bigint promotion?
 
 =cut
 
 */
 
-    void add_int (INTVAL value, PMC* dest) {
+    PMC* add_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
         result = DYNSELF.get_integer() + value;
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
     }
 
 /*
 
-=item C<void add_float(FLOATVAL value, PMC *dest)>
+=item C<PMC* add_float(FLOATVAL value, PMC *dest)>
 
 Adds C<value> to the scalar and returns the result in C<*dest>.
-
-TODO - overflow detection, bigint promotion?
 
 =cut
 
 */
 
-    void add_float (FLOATVAL value, PMC* dest) {
+    PMC* add_float (FLOATVAL value, PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number() + value;
 
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest, result);
+        return dest;
     }
 
 /*

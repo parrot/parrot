@@ -331,7 +331,7 @@ is_op(Interp *interpreter, char *name)
 
 /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
 static char *
-to_infix(Interp *interpreter, char *name, SymReg **r, int *n)
+to_infix(Interp *interpreter, char *name, SymReg **r, int *n, int mmd_op)
 {
     SymReg *mmd;
     char buf[10];
@@ -340,7 +340,7 @@ to_infix(Interp *interpreter, char *name, SymReg **r, int *n)
     if (r[0]->set != 'P')
         return name;
     if (*n == 3 && r[0] == r[1]) {       /* cvt to inplace */
-        sprintf(buf, "%d", MMD_I_SUBTRACT);  /* XXX */
+        sprintf(buf, "%d", mmd_op + 1);  /* XXX */
         mmd = mk_const(interpreter, str_dup(buf), 'I');
     }
     else {
@@ -348,15 +348,26 @@ to_infix(Interp *interpreter, char *name, SymReg **r, int *n)
         for (i = *n; i > 0; --i)
             r[i] = r[i - 1];
         if (*n == 2)
-            sprintf(buf, "%d", MMD_I_SUBTRACT);  /* XXX */
+            sprintf(buf, "%d", mmd_op + 1);  /* XXX */
         else
-            sprintf(buf, "%d", MMD_SUBTRACT);  /* XXX */
+            sprintf(buf, "%d", mmd_op);  /* XXX */
         mmd = mk_const(interpreter, str_dup(buf), 'I');
         (*n)++;
     }
     r[0] = mmd;
     return "infix";
 }
+
+static int
+is_infix(char *name)
+{
+    if (strcmp(name, "add") == 0)
+        return MMD_ADD;
+    if (strcmp(name, "sub") == 0)
+        return MMD_SUBTRACT;
+    return -1;
+}
+
 
 /* make a instruction
  * name ... op name
@@ -381,9 +392,9 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     char format[128];
     int len;
 
-    if (strcmp(name, "sub") == 0) {     /* XXX is_infix */
+    if ( (op = is_infix(name)) >= 0) {
         /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
-        name = to_infix(interpreter, name, r, &n);
+        name = to_infix(interpreter, name, r, &n, op);
     }
 
 

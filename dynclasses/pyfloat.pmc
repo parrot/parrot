@@ -52,22 +52,6 @@ Create a new floating point number
         return ret;
     }
 
-/*
-
-=item C<void add(PMC *value, PMC *dest)>
-
-Adds C<*value> to the number and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void add (PMC* value, PMC* dest) {
-MMD_PyFloat: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) + PMC_num_val(value));
-        }
-    }
 
 /*
 

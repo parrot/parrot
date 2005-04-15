@@ -231,50 +231,85 @@ Morphs the scalar to the specified type.
 
 =item C<void add(PMC *value, PMC *dest)>
 
-Adds C<*value> to the number and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void add (PMC* value, PMC* dest) {
-MMD_Float: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) + PMC_num_val(value));
-        }
-MMD_DEFAULT: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) + VTABLE_get_number(INTERP, value));
-        }
-    }
-
-/*
-
 =item C<void add_int(INTVAL value, PMC *dest)>
-
-Adds C<value> to the number and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void add_int (INTVAL value, PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) + value);
-    }
-/*
 
 =item C<void add_float(FLOATVAL value, PMC *dest)>
 
 Adds C<value> to the number and returns the result in C<*dest>.
 
+=item C<void i_add(PMC *value)>
+
+=item C<void i_add(INTVAL value)>
+
+=item C<void i_add(FLOATVAL value)>
+
+Adds C<value> to C<SELF> inplace.
+
 =cut
 
 */
 
-    void add_float (FLOATVAL value, PMC* dest) {
+    PMC* add (PMC* value, PMC* dest) {
+MMD_Complex: {
+            FLOATVAL a = DYNSELF.get_number();
+            if (dest)
+                VTABLE_morph(INTERP, dest, value->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, value->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                    a + VTABLE_get_number_keyed_int(INTERP, value, 0));
+            VTABLE_set_number_keyed_int(INTERP, dest, 1,
+                    VTABLE_get_number_keyed_int(INTERP, value, 1));
+            return dest;
+        }
+MMD_DEFAULT: {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                    DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
+            return dest;
+        }
+    }
+
+    PMC* add_int (INTVAL value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) + value);
+                DYNSELF.get_number() + (FLOATVAL)value);
+        return dest;
+    }
+
+    PMC* add_float (FLOATVAL value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                DYNSELF.get_number() + value);
+        return dest;
+    }
+
+    void i_add (PMC* value) {
+MMD_Complex: {
+            FLOATVAL a = DYNSELF.get_number();
+            VTABLE_morph(INTERP, SELF, value->vtable->base_type);
+            VTABLE_set_number_native(INTERP, SELF,
+                    a + VTABLE_get_number_keyed_int(INTERP, value, 0));
+            VTABLE_set_number_keyed_int(INTERP, SELF, 1,
+                    VTABLE_get_number_keyed_int(INTERP, value, 1));
+        }
+MMD_DEFAULT: {
+            VTABLE_set_number_native(INTERP, SELF,
+                DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
+        }
+    }
+
+    void i_add_int (INTVAL value) {
+        VTABLE_set_number_native(INTERP, SELF,
+            DYNSELF.get_number() + (FLOATVAL)value);
+    }
+
+    void i_add_float (FLOATVAL value) {
+        VTABLE_set_number_native(INTERP, SELF,
+            DYNSELF.get_number() + value);
     }
 
 /*

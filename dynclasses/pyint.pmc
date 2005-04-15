@@ -175,68 +175,6 @@ Sets C<dest> to the absolute value of SELF.
 
 /*
 
-=item C<void add(PMC *value, PMC *dest)>
-
-Adds C<*value> to the integer and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void add (PMC* value, PMC* dest) {
-MMD_PyInt: {
-            INTVAL a = PMC_int_val(SELF);
-            INTVAL b = PMC_int_val(value);
-            INTVAL c = a + b;
-            if ((c^a) >= 0 || (c^b) >= 0)
-                VTABLE_set_integer_native(INTERP, dest, c);
-            else
-                overflow(INTERP, SELF, b, dest, MMD_ADD);
-            }
-MMD_PyFloat: {
-            INTVAL pmci = PMC_int_val(SELF);
-            FLOATVAL valf = VTABLE_get_number(INTERP, value);
-            VTABLE_morph(INTERP, dest, PyBuiltin_PyFloat);
-            VTABLE_set_number_native(INTERP, dest, pmci + valf);
-        }
-MMD_PyLong: {
-            promote(INTERP, SELF, value, dest, MMD_ADD);
-        }
-MMD_PyComplex: {
-            INTVAL pmci = PMC_int_val(SELF);
-            FLOATVAL valf = VTABLE_get_number_keyed_int(INTERP, value, 0);
-            VTABLE_morph(INTERP, dest, PyBuiltin_PyComplex);
-            VTABLE_set_number_keyed_int(INTERP, dest, 0, pmci + valf);
-            valf = VTABLE_get_number_keyed_int(INTERP, value, 1);
-            VTABLE_set_number_keyed_int(INTERP, dest, 1, valf);
-        }
-MMD_PyString: {
-            real_exception(INTERP, NULL, E_TypeError,
-               "TypeError: unsupported operand type(s) for +: 'int' and 'str'");
-        }
-    }
-
-/*
-
-=item C<void add_int(INTVAL b, PMC* dest)>
-
-Adds C<b> to the integer and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void add_int (INTVAL b, PMC* dest) {
-        INTVAL a = PMC_int_val(SELF);
-        INTVAL c = a + b;
-        if ((c^a) >= 0 || (c^b) >= 0)
-            VTABLE_set_integer_native(INTERP, dest, c);
-        else
-            overflow(INTERP, SELF, b, dest, MMD_ADD);
-    }
-
-/*
-
 =item C<void bitwise_and(INTVAL value, PMC *dest)>
 
 Calculates the bitwise C<AND> of the integer and C<*value> and returns

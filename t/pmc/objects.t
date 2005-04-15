@@ -1048,6 +1048,8 @@ output_is(<<'CODE', <<'OUTPUT', "overridden vtables");
     new P12, .Integer
     add P12, P10, P11
     setattribute P7, I0, P12
+    set P5, P7
+    set I3, 1
     returncc
 .pcc_sub get_s:
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
@@ -1504,6 +1506,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
    $I1 = right
    $I2 = $I0 + $I1
    dest = $I2
+   .return(dest)
 .end
 CODE
 in add
