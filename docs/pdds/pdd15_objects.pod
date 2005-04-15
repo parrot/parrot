@@ -627,12 +627,6 @@ Return the floating-point value of the object
 
 Return the extended precision numeric value of the PMC
 
-=item __get_bignum_keyed
-
-=item __get_bignum_keyed_int
-
-=item __get_bignum_keyed_str
-
 =item __get_string
 
 Return the string value of the PMC
@@ -695,17 +689,9 @@ Set the floating-point value of this PMC
 
 =item __set_number_keyed_str
 
-=item __set_bignum_native
+=item __set_bignum_int
 
 Set the extended-precision value of this PMC
-
-=item __set_bignum_same
-
-=item __set_bignum_keyed
-
-=item __set_bignum_keyed_int
-
-=item __set_bignum_keyed_str
 
 =item __set_string_native
 
@@ -723,15 +709,13 @@ Set the string value of this PMC
 
 Set the true/false value of this PMC
 
-=item __set_bool_keyed
+=item __assign_pmc
 
-=item __set_bool_keyed_int
-
-=item __set_bool_keyed_str
+Set the value to the value of the passed in
 
 =item __set_pmc
 
-Set the PMC to the PMC passed in
+Make the PMC refer to the PMC passed in
 
 =item __set_pmc_keyed
 
@@ -756,8 +740,6 @@ aggregate.
 
 =item __pop_float
 
-=item __pop_bignum
-
 =item __pop_string
 
 =item __pop_pmc
@@ -765,8 +747,6 @@ aggregate.
 =item __push_integer
 
 =item __push_float
-
-=item __push_bignum
 
 =item __push_string
 
@@ -776,8 +756,6 @@ aggregate.
 
 =item __shift_float
 
-=item __shift_bignum
-
 =item __shift_string
 
 =item __shift_pmc
@@ -785,8 +763,6 @@ aggregate.
 =item __unshift_integer
 
 =item __unshift_float
-
-=item __unshift_bignum
 
 =item __unshift_string
 
@@ -798,15 +774,11 @@ aggregate.
 
 =item __add_int
 
-=item __add_bignum
-
 =item __add_float
 
 =item __subtract
 
 =item __subtract_int
-
-=item __subtract_bignum
 
 =item __subtract_float
 
@@ -814,15 +786,11 @@ aggregate.
 
 =item __multiply_int
 
-=item __multiply_bignum
-
 =item __multiply_float
 
 =item __divide
 
 =item __divide_int
-
-=item __divide_bignum
 
 =item __divide_float
 
@@ -830,15 +798,11 @@ aggregate.
 
 =item __modulus_int
 
-=item __modulus_bignum
-
 =item __modulus_float
 
 =item __cmodulus
 
 =item __cmodulus_int
-
-=item __cmodulus_bignum
 
 =item __cmodulus_float
 

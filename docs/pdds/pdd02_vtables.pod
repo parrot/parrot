@@ -222,18 +222,9 @@ Return the native floating-point value of the PMC.
 Return the native floating-point value of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
-=item BIGNUM* get_bignum(INTERP, PMC* self)
+=item PMC* get_bignum(INTERP, PMC* self)
 
-Return the value of the PMC as a bignum.
-
-=item BIGNUM* get_bignum_keyed(INTERP, PMC* self, PMC* key)
-
-=item BIGNUM* get_bignum_keyed_int(INTERP, PMC* self, INTVAL key)
-
-=item BIGNUM* get_bignum_keyed_str(INTERP, PMC* self, STRING* key)
-
-Return the bignum value of the PMC indexed by B<key>.
-The B<key> parameter is guaranteed not to be NULL for this method.
+Return the value of the PMC as a new bignum PMC.
 
 =item STRING* get_string(INTERP, PMC* self)
 
@@ -255,16 +246,6 @@ Return the constant TRUE if the PMC is true, or FALSE if the PMC is
 false. The definition of truth for a given PMC will depend on the type
 of the PMC: for a scalar, it may be as simple as 0 or "" being false,
 and any other value being true.
-
-=item INTVAL get_bool_keyed(INTERP, PMC* self, PMC* key)
-
-=item INTVAL get_bool_keyed_int(INTERP, PMC* self, INTVAL key)
-
-=item INTVAL get_bool_keyed_str(INTERP, PMC* self, STRING* key)
-
-Return the constant TRUE if the PMC indexed by B<key> is true,
-or FALSE if the PMC indexed by B<key> is false.
-The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item PMC* get_pmc(INTERP, PMC* self)
 
@@ -331,24 +312,9 @@ as B<self> so optimizations may be made.
 Sets the PMC indexed by B<key> to the floating-point value passed in B<value>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
-=item void set_bignum_native(INTERP, PMC* self, BIGNUM* value)
+=item void set_bignum_int(INTERP, PMC* self, INTVAL value)
 
-Sets the PMC to the passed in bignum value.
-
-=item void set_bignum_same(INTERP, PMC* self, PMC* value)
-
-Sets the PMC to the bignum value of B<value>.
-In this case, B<value> is guaranteed to be of the same type
-as B<self> so optimizations may be made.
-
-=item void set_bignum_keyed(INTERP, PMC* self, PMC* key, BIGNUM* value)
-
-=item void set_bignum_keyed_int(INTERP, PMC* self, INTVAL key, BIGNUM* value)
-
-=item void set_bignum_keyed_str(INTERP, PMC* self, STRING* key, BIGNUM* value)
-
-Sets the PMC indexed by B<key> to the bignum value passed in B<value>.
-The B<key> parameter is guaranteed not to be NULL for this method.
+Morph the PMC to a BIGNUM PMC with value being the passed in value.
 
 =item void set_string_native(INTERP, PMC* self, STRING* value)
 
@@ -378,21 +344,9 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 Sets the boolean state of the PMC to TRUE if B<value> is TRUE, or FALSE if
 B<value> is FALSE.
 
-Note that this is currently unimplemented for any PMC, and it is not clear
-how it will work in practice.
-
-=item void set_bool_keyed(INTERP, PMC* self, PMC* key, INTVAL value)
-
-=item void set_bool_keyed_int(INTERP, PMC* self, INTVAL key, INTVAL value)
-
-=item void set_bool_keyed_str(INTERP, PMC* self, STRING* key, INTVAL value)
-
-Keyed versions of set_bool. The B<key> parameter is guaranteed not to be
-NULL for this method.
-
 =item void set_pmc(INTERP, PMC* self, PMC* value)
 
-Sets the value of the PMC in B<self> to the value of the PMC in B<value>.
+Make the PMC B<self> refer to the PMC B<value>.
 
 =item void assign_pmc(INTERP, PMC* self, PMC* value)
 
@@ -431,11 +385,6 @@ Return the integer value of the last item on the list, removing that item.
 Return the floating-point value of the last item on the list,
 removing that item.
 
-=item BIGNUM* pop_bignum(INTERP, PMC* self)
-
-Return the bignum value of the last item on the list,
-removing that item.
-
 =item STRING* pop_string(INTERP, PMC* self)
 
 Return the string value of the last item on the list,
@@ -454,10 +403,6 @@ Add the passed in integer value to the end of the list.
 
 Add the passed in floating-point number to the end of the list.
 
-=item void push_bignum(INTERP, PMC* self, BIGNUM* value)
-
-Add the passed in bignum to the end of the list.
-
 =item void push_string(INTERP, PMC* self, STRING* value)
 
 Add the passed in string to the end of the list.
@@ -473,11 +418,6 @@ Return the integer value of the first item on the list, removing that item.
 =item FLOATVAL shift_float(INTERP, PMC* self)
 
 Return the floating-point value of the first item on the list,
-removing that item.
-
-=item BIGNUM* shift_bignum(INTERP, PMC* self)
-
-Return the bignum value of the first item on the list,
 removing that item.
 
 =item STRING* shift_string(INTERP, PMC* self)
@@ -498,10 +438,6 @@ Add the passed in integer value to the beginning of the list.
 
 Add the passed in floating-point number to the beginning of the list.
 
-=item void unshift_bignum(INTERP, PMC* self, BIGNUM* value)
-
-Add the passed in bignum to the beginning of the list.
-
 =item void unshift_string(INTERP, PMC* self, STRING* value)
 
 Add the passed in string to the beginning of the list.
@@ -515,30 +451,33 @@ B<self> with the PMCs in the aggregate B<value>.
 
 =item void add_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-=item void add_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
-
 =item void add_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
 Add B<self> to B<value> and store the result in B<dest>.  Note that
 B<dest> may be equal to B<self>; in that case optimizations I<may> be
 made.
 
-=item void subtract(INTERP, PMC* self, PMC* value, PMC* dest)
+=item PMC* subtract(INTERP, PMC* self, PMC* value, PMC* dest)
 
-=item void subtract_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+=item PMC* subtract_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-=item void subtract_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
+=item PMC* subtract_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
-=item void subtract_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
-
+If B<dest> is NULL create a result PMC of an appropriate type.
 Subtract B<value> from B<self> and store the result in B<dest>.  Note that
 B<dest> may be equal to B<self>; in that case optimizations I<may> be made.
+
+=item void i_subtract(INTERP, PMC* self, PMC* value)
+
+=item void i_subtract_int(INTERP, PMC* self, INTVAL value)
+
+=item void i_subtract_float(INTERP, PMC* self, FLOATVAL value)
+
+Inplace operation B<self -= value>.
 
 =item void multiply(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void multiply_int(INTERP, PMC* self, INTVAL value, PMC* dest)
-
-=item void multiply_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
 
 =item void multiply_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
@@ -550,8 +489,6 @@ made.
 
 =item void divide_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-=item void divide_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
-
 =item void divide_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
 Divide B<self> by B<value> and store the result in B<dest>.  Note that
@@ -562,8 +499,6 @@ made.
 
 =item void modulus_int(INTERP, PMC* self, INTVAL value, PMC* dest)
 
-=item void modulus_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
-
 =item void modulus_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
 Divide B<self> by B<value> and store the remainder in B<dest>.  Note that
@@ -573,8 +508,6 @@ made.
 =item void cmodulus(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void cmodulus_int(INTERP, PMC* self, INTVAL value, PMC* dest)
-
-=item void cmodulus_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
 
 =item void cmodulus_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
