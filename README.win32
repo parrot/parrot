@@ -65,7 +65,7 @@ Configure.pl to use it.
     mkdir C:\usr\lib\data
     set PATH=%PATH%;C:\usr\lib\icu\bin
     cd <parrot directory>
-    perl Configure.pl --icushared="C:\usr\lib\icu\lib\icudata.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include" --icudatadir="C:\usr\local\icu\data"
+    perl Configure.pl --icushared="C:\usr\lib\icu\lib\icudt.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include" --icudatadir="C:\usr\local\icu\data"
 
 With MinGW32, use icu-3.2-Win32-msvc6.zip.
 
@@ -112,9 +112,9 @@ The HomePage is on L<http://www.mingw.org/>.
 
 With the ActiveState Perl distribution, tell Configure.pl to use gcc :
 
-    perl Configure.pl --cc=gcc --icushared="C:\usr\lib\icu\lib\icudata.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include" --icudatadir="C:\usr\local\icu\data"
-
-Nota: Use only the ICU binary distribution. 
+    perl Configure.pl --cc=gcc --icushared="C:\usr\lib\icu\lib\icudt.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include" --icudatadir="C:\usr\local\icu\data"
+or
+    perl Configure.pl --cc=gcc --without-icu
 
 =item Intel C++
 
