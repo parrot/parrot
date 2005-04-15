@@ -41,7 +41,7 @@ typedef enum {
 
 
 /*
- * Sub and Closure share a Parrot_Sub structure, Closure has additionally
+ * Sub and Closure share a Parrot_sub structure, Closure has additionally
  * a lexical pad stack
  */
 typedef struct Parrot_sub {

@@ -113,7 +113,7 @@ Initializes the subroutine.
      * see also the enum in include/parrot/sub.h
      *
      * Data used:
-     *   PMC_struct_val ... Parrot_Sub structure
+     *   PMC_struct_val ... Parrot_sub structure
      *   PMC_pmc_val    ... unused / bound object in Bound_Meth PMC
      */
     void init () {
@@ -123,7 +123,7 @@ Initializes the subroutine.
 #if 0
         if (Interp_flags_TEST(INTERP, PARROT_DEBUG_FLAG))
             printf("Address of base segment is %p\n",
-                ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
+                ((struct Parrot_sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
 #endif
     }
 
