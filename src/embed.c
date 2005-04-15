@@ -753,7 +753,7 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
 
     /*
      * If any profile information was gathered, print it out
-     * before exiting, then print debug infos if turned on
+     * before exiting, then print debug infos if turned on.
      */
     Parrot_on_exit(print_debug,   interpreter);
     Parrot_on_exit(print_profile, interpreter);

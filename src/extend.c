@@ -991,7 +991,7 @@ Parrot_register_pmc(Parrot_INTERP interp, Parrot_PMC pmc)
 =item C<void
 Parrot_unregister_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)>
 
-Remove a reference of the PMC from the interpreters DOD registry If the
+Remove a reference of the PMC from the interpreters DOD registry. If the
 reference count reaches zero, the PMC will be destroyed during the next
 DOD run.
 

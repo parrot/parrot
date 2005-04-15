@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -97,13 +97,13 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
         ++arena_base->num_extended_PMCs;
         /*
          * XXX this basically invalidates the high-priority marking
-         *     of PMCs by putting all PMCs onto the front of the list
+         *     of PMCs by putting all PMCs onto the front of the list.
          *     The reason for this is the by far better cache locality
-         *     when aggregates and their contents are marked "together"
+         *     when aggregates and their contents are marked "together".
          *
          *     To enable high priority marking again we should probably
          *     use a second pointer chain, which is, when not empty,
-         *     processed first
+         *     processed first.
          */
         if (tptr || hi_prio) {
             if (PMC_next_for_GC(tptr) == tptr) {
@@ -177,7 +177,7 @@ pobject_lives(Interp *interpreter, PObj *obj)
     if (*dod_flags & (PObj_is_special_PMC_FLAG << nm)) {
         /* All PMCs that need special treatment are handled here.
          * For normal PMCs, we don't touch the PMC memory itself
-         * so that caches stay clean
+         * so that caches stay clean.
          */
 #if GC_VERBOSE
         if (PObj_report_TEST(obj)) {
@@ -210,7 +210,7 @@ void pobject_lives(Interp *interpreter, PObj *obj)
     PObj_live_SET(obj);
 
     /* if object is a PMC and contains buffers or PMCs, then attach
-     * the PMC to the chained mark list
+     * the PMC to the chained mark list.
      */
     if (PObj_is_special_PMC_TEST(obj)) {
         mark_special(interpreter, (PMC*) obj);
@@ -305,7 +305,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
      * but t/library/dumper* fails w/o this marking.
      *
      * It seems that the Class PMC gets DODed - these should
-     * get created as constant PMCs
+     * get created as constant PMCs.
      */
     for (i = 1; i < (unsigned int)enum_class_max; i++) {
         VTABLE *vtable;
@@ -404,10 +404,10 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
      * First phase of mark is finished. Now if we are the owner
      * of a shared pool, we must run the mark phase of other
      * interpreters in our pool, so that live shared PMCs in that
-     * interpreter are appended to our mark_ptrs chain
+     * interpreter are appended to our mark_ptrs chain.
      *
      * If there is a count of shared PMCs and we have already seen
-     * all these, we could skip that
+     * all these, we could skip that.
      */
     if (interpreter->profile)
         Parrot_dod_profile_start(interpreter);
@@ -441,7 +441,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
         }
         /* Start by checking if there's anything at all. This assumes that the
          * largest percentage of PMCs won't have anything in their data
-         * pointer that we need to trace */
+         * pointer that we need to trace. */
         if (bits) {
             if (bits == PObj_data_is_PMC_array_FLAG) {
                 /* malloced array of PMCs */
@@ -495,7 +495,7 @@ trace_active_buffers(Interp *interpreter)
 
     /* First mark the current set. We assume that all pointers in S registers
      * are pointing to valid buffers. This is not a good assumption, but it'll
-     * do for now */
+     * do for now. */
     for (i = 0; i < NUM_REGISTERS; i++) {
         Buffer *reg = (Buffer *)REG_STR(i);
 
@@ -633,7 +633,7 @@ clear_live_counter(Interp *interpreter,
  * count free objects per arena
  * - if we find more then one totally unused arena
  *   free all but one arena - this is the only possibility to
- *   reduce the amount of free objects
+ *   reduce the amount of free objects.
  *
  * doesn't really work or speed things up - disabled
  */
@@ -925,8 +925,8 @@ find_common_mask(size_t val1, size_t val2)
     int bound = sizeof(size_t) * 8;
 
     /* Shifting a value by its size (in bits) or larger is undefined behaviour.
-       so need an explicit check to return 0 if there is no prefix, rather than
-       attempting to rely on (say) 0xFFFFFFFF << 32 being 0  */
+       So need an explict check to return 0 if there is no prefix, rather than
+       attempting to rely on (say) 0xFFFFFFFF << 32 being 0.  */
     for (i = 0; i < bound; i++) {
         if (val1 == val2) {
             return ~(size_t)0 << i;

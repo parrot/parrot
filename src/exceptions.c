@@ -439,7 +439,7 @@ rethrow_exception(Interp * interpreter, PMC *exception)
 rethrow_c_exception(Interp * interpreter)>
 
 Return back to runloop, assumes exception is still in C<REG_PMC(5)> and
-that this is called from within a handler setup with C<new_c_exception>
+that this is called from within a handler setup with C<new_c_exception>.
 
 =cut
 

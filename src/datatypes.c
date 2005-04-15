@@ -1,5 +1,5 @@
 /*
-Copyright: (c) 2002 Leopold Toetsch <lt@toetsch.at>
+Copyright: (c) 2002-2005 Leopold Toetsch <lt@toetsch.at>
 License:  Artistic/GPL, see README and LICENSES for details
 $Id$
 
@@ -10,7 +10,7 @@ src/datatypes.c - Parrot and native data types functions
 =head1 DESCRIPTION
 
 The functions in this file are used in .ops files to access the C<enum>
-and C string constants for Parrot and native data types defined iin
+and C string constants for Parrot and native data types defined in
 F<include/parrot/datatypes.h>.
 
 =head2 Functions

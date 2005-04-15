@@ -199,9 +199,9 @@ void
 Parrot_init_signals(void)
 {
     /*
-     * SIGFPE is architecture specific - some signal an error
+     * SIGFPE is architecture specific - some signal an error,
      * some don't, so we have to use direct checks if we are dividing
-     * by zero
+     * by zero.
      */
     Parrot_sigaction(SIGHUP, sig_handler);
 }
@@ -412,7 +412,7 @@ Parrot_new_timer_event(Parrot_Interp interpreter, PMC* timer, FLOATVAL diff,
 =item C<void
 Parrot_new_cb_event(Parrot_Interp, PMC*cbi, void*ext)>
 
-Prepare and schedul a callback event
+Prepare and schedule a callback event.
 
 =cut
 

@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/builtin.c - Bultin Methods
+src/builtin.c - Builtin Methods
 
 =head1 SYNOPSIS
 

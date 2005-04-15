@@ -749,7 +749,7 @@ PDB_set_break(Interp *interpreter, const char *command)
     PDB_line_t *line;
     long ln,i;
 
-    /* If no line number was specified set it at the current line */
+    /* If no line number was specified, set it at the current line */
     if (command && *command) {
         ln = atol(command);
 
@@ -944,7 +944,7 @@ PDB_continue(Interp *interpreter,
 /* PDB_find_breakpoint
  *
  * Find breakpoint number N; returns NULL if the breakpoint doesn't
- * exist or if no breakpoint was specified
+ * exist or if no breakpoint was specified.
  *
  */
 /*
@@ -1470,8 +1470,8 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
             dest[size++] = 'P';
             goto INTEGER;
         case PARROT_ARG_IC:
-            /* If the opcode jumps and this is the last argument
-               means this is a label */
+            /* If the opcode jumps and this is the last argument,
+               that means this is a label */
             if ((j == info->arg_count - 1) &&
                 (info->jump & PARROT_JUMP_RELATIVE))
             {
@@ -1888,7 +1888,7 @@ XXX TODO:
 
 =over 4
 
-=item * This should take the line get an instruction, get the opcode for
+=item * This should take the line, get an instruction, get the opcode for
 that instruction and check that is the correct one.
 
 =item * Decide what to do with macros if anything.
@@ -2265,7 +2265,8 @@ PDB_print_stack_pmc(Interp *interpreter, const char *command)
 =item C<static void
 dump_string(Interp *interpreter, STRING* s)>
 
-Description.
+Dumps the buflen, flags, bufused, strlen, offset associated
+with a string and the string itself.
 
 =cut
 
