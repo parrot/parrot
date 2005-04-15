@@ -253,45 +253,45 @@ Morphs to a C<PerlString> with the value of C<*value>.
 
 /*
 
-=item C<void multiply(PMC *value, PMC *dest)>
+=item C<PMC* multiply(PMC *value, PMC *dest)>
 
 =cut
 
 */
 
-    void multiply (PMC* value,  PMC* dest) {
+    PMC* multiply (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in multiplication");
-        VTABLE_set_integer_native(INTERP, dest, 0);
+                "Use of uninitialized value in multiplication");
+        return SUPER(value, dest);
     }
 
 /*
 
-=item C<void multiply_int(INTVAL value, PMC *dest)>
+=item C<PMC* multiply_int(INTVAL value, PMC *dest)>
 
 =cut
 
 */
 
-    void multiply_int (INTVAL value,  PMC* dest) {
+    PMC* multiply_int (INTVAL value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in integer multiplication");
-        VTABLE_set_integer_native(INTERP, dest, 0);
+                "Use of uninitialized value in integer multiplication");
+        return SUPER(value, dest);
     }
 
 
 /*
 
-=item C<void multiply_float(FLOATVAL value, PMC *dest)>
+=item C<PMC* multiply_float(FLOATVAL value, PMC *dest)>
 
 =cut
 
 */
 
-    void multiply_float (FLOATVAL value,  PMC* dest) {
+    PMC* multiply_float (FLOATVAL value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in numeric multiplication");
-        VTABLE_set_integer_native(INTERP, dest, 0);
+                "Use of uninitialized value in numeric multiplication");
+        return SUPER(value, dest);
     }
 
 /*

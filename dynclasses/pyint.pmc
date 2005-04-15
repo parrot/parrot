@@ -730,57 +730,6 @@ the result in C<*dest>.
         VTABLE_set_integer_native(INTERP, dest, xmody);
     }
 
-/*
-
-=item C<void multiply(PMC *value, PMC *dest)>
-
-Multiplies C<*value> with the integer and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void multiply (PMC* value, PMC* dest) {
-MMD_PyInt: {
-            INTVAL a = PMC_int_val(SELF);
-            INTVAL b = PMC_int_val(value);
-            double cf = (double)a * (double)b;
-            INTVAL c = a * b;
-            if ((double) c == cf)
-                VTABLE_set_integer_native(INTERP, dest, c);
-            else
-                overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
-        }
-MMD_PyLong: {
-            promote(INTERP, SELF, value, dest, MMD_MULTIPLY);
-        }
-MMD_PyFloat: {
-            INTVAL pmci = PMC_int_val(SELF);
-            FLOATVAL valf = VTABLE_get_number(INTERP, value);
-            /* XXX: Morph? */
-            VTABLE_set_number_native(INTERP, dest, pmci * valf);
-        }
-    }
-
-/*
-
-=item C<void multiply_int(INTVAL value, PMC *dest)>
-
-Multiplies C<*value> with the integer and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void multiply_int (INTVAL b, PMC* dest) {
-        INTVAL a = PMC_int_val(SELF);
-        double cf = (double)a * (double)b;
-        INTVAL c = a * b;
-        if ((double) c == cf)
-            VTABLE_set_integer_native(INTERP, dest, c);
-        else
-            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
-    }
 
 /*
 

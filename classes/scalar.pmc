@@ -256,9 +256,7 @@ TODO - overflow detection, bigint promotion?
     PMC* subtract_float (FLOATVAL value,  PMC* dest) {
         FLOATVAL result;
 
-        result = DYNSELF.get_number()
-            - value;
-
+        result = DYNSELF.get_number() - value;
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest, result);
@@ -267,65 +265,62 @@ TODO - overflow detection, bigint promotion?
 
 /*
 
-=item C<void multiply (PMC* value,  PMC* dest)>
+=item C<PMC* multiply (PMC* value,  PMC* dest)>
 
 Multiplies the scalar by C<*value> and returns the result in C<*dest>.
 
-TODO - overflow detection, bigint promotion?
-
 =cut
 
 */
 
-    void multiply (PMC* value,  PMC* dest) {
+    PMC* multiply (PMC* value,  PMC* dest) {
         FLOATVAL result;
 
-        result = DYNSELF.get_number()
-            * VTABLE_get_number(INTERP, value);
-
+        result = DYNSELF.get_number() * VTABLE_get_number(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest, result);
+        return dest;
     }
 
 /*
 
-=item C<void multiply_int(INTVAL value,  PMC *dest)>
+=item C<PMC* multiply_int(INTVAL value,  PMC *dest)>
 
 Multiplies the scalar by C<value> and returns the result in C<*dest>.
-
-TODO - overflow detection, bigint promotion?
 
 =cut
 
 */
 
-    void multiply_int (INTVAL value,  PMC* dest) {
+    PMC* multiply_int (INTVAL value,  PMC* dest) {
         FLOATVAL result;
 
-        result = DYNSELF.get_number()
-            * value;
-
+        result = DYNSELF.get_number() * value;
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest, result);
+        return dest;
     }
 
 /*
 
-=item C<void multiply_float(FLOATVAL value, PMC *dest)>
+=item C<PMC* multiply_float(FLOATVAL value, PMC *dest)>
 
 Multiplies the scalar by C<value> and returns the result in C<*dest>.
-
-TODO - overflow detection, bigint promotion?
 
 =cut
 
 */
 
-    void multiply_float (FLOATVAL value,  PMC* dest) {
+    PMC* multiply_float (FLOATVAL value,  PMC* dest) {
         FLOATVAL result;
 
-        result = DYNSELF.get_number()
-            * value;
-
+        result = DYNSELF.get_number() * value;
         VTABLE_set_number_native(INTERP, dest, result);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        return dest;
     }
 
 /*

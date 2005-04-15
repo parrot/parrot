@@ -150,7 +150,7 @@ Subtracts C<*value> from the string and returns the result in C<*dest>.
 
 /*
 
-=item C<void multiply(PMC *value, PMC *dest)>
+=item C<PMC* multiply(PMC *value, PMC *dest)>
 
 Multiplies the string by C<*value> and returns the result in C<*dest>.
 
@@ -158,33 +158,13 @@ Multiplies the string by C<*value> and returns the result in C<*dest>.
 
 */
 
-    void multiply (PMC* value, PMC* dest) {
-MMD_PerlString: {
-            /* work around MMD setup bug */
-	     VTABLE_set_number_native(INTERP, dest,
-		     VTABLE_get_number(INTERP, SELF) *
-		     VTABLE_get_number(INTERP, value));
-        }
-MMD_PerlNum: {
-	     VTABLE_set_number_native(INTERP, dest,
-		     VTABLE_get_number(INTERP, SELF) *
-		     PMC_num_val(value)
-		     );
-	 }
-MMD_DEFAULT: {
-	     FLOATVAL pmcf, valf;
-	     INTVAL  pmci, vali;
-
-	     pmcf = VTABLE_get_number(INTERP, SELF);
-	     pmci = VTABLE_get_integer(INTERP, SELF);
-	     valf = VTABLE_get_number(INTERP, value);
-	     vali = VTABLE_get_integer(INTERP, value);
-
-	     if (pmcf == pmci && valf == vali)
-		 VTABLE_set_integer_native(INTERP, dest, pmci * vali);
-	     else
-		 VTABLE_set_number_native(INTERP, dest, pmcf * valf);
-	 }
+    PMC* multiply (PMC* value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+         VTABLE_set_number_native(INTERP, dest,
+                 VTABLE_get_number(INTERP, SELF) *
+                 VTABLE_get_number(INTERP, value));
+         return dest;
     }
 
 /*

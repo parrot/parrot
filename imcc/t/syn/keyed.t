@@ -7,7 +7,7 @@ use Parrot::Test tests => 1;
 
 ##############################
 SKIP: {
-  skipe("experimental", 1);
+  skip("experimental", 1);
 
 pir_output_is(<<'CODE', <<'OUTPUT', "add_keyed");
 .sub test @MAIN

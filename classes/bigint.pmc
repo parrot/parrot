@@ -125,7 +125,6 @@ bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
 static void
 bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_mul(BN(dest), BN(self), BN(value));
 }
 
@@ -133,7 +132,6 @@ static void
 bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_mul_ui(BN(dest), BN(self), value);
 }
 
@@ -713,20 +711,56 @@ MMD_DEFAULT: {
     }
 
 
-    void multiply(PMC* value, PMC* dest) {
+    PMC* multiply(PMC* value, PMC* dest) {
 MMD_BigInt: {
-                bigint_mul_bigint(INTERP, SELF, value, dest);
+            if (dest)
+                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            bigint_mul_bigint(INTERP, SELF, value, dest);
+            return dest;
+        }
+MMD_Integer: {
+            if (dest)
+                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            return dest;
+         }
+MMD_DEFAULT: {
+             internal_exception(1, "unimp mul");
+            return dest;
+         }
+    }
+
+    PMC* multiply_int(INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+        else
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+        bigint_mul_bigint_int(INTERP, SELF, value, dest);
+        return dest;
+    }
+
+    void i_multiply (PMC* value) {
+MMD_BigInt: {
+                bigint_mul_bigint(INTERP, SELF, value, SELF);
             }
 MMD_Integer: {
-            bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+                bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
              }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp mul");
+                internal_exception(1, "unimp mul");
              }
     }
 
-    void multiply_int(INTVAL value, PMC* dest) {
-        bigint_mul_bigint_int(INTERP, SELF, value, dest);
+    void i_multiply_int (INTVAL value) {
+        bigint_mul_bigint_int(INTERP, SELF, value, SELF);
+    }
+
+    void i_multiply_float (FLOATVAL value) {
+        internal_exception(1, "unimp mul");
     }
 
     void divide(PMC* value, PMC* dest) {

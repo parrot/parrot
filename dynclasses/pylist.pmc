@@ -32,13 +32,13 @@ static void quicksort(Interp* interpreter, List *list, PMC *cmpsub,
 
     while (right > left) {
         INTVAL cursor = left;
-        INTVAL index = (left + right) / 2;
-        PMC *pivot = *(PMC**)list_get(interpreter, list, index, enum_type_PMC);
+        INTVAL idx = (left + right) / 2;
+        PMC *pivot = *(PMC**)list_get(interpreter, list, idx, enum_type_PMC);
         PMC *temp = *(PMC**)list_get(interpreter, list, right, enum_type_PMC);
-        list_assign(interpreter, list, index, temp, enum_type_PMC);
+        list_assign(interpreter, list, idx, temp, enum_type_PMC);
 
-        index = right;
-        while (cursor != index) {
+        idx = right;
+        while (cursor != idx) {
             INTVAL cmp;
             temp = *(PMC**)list_get(interpreter, list, cursor, enum_type_PMC);
 
@@ -61,18 +61,18 @@ static void quicksort(Interp* interpreter, List *list, PMC *cmpsub,
             }
 
             if (cmp <= 0) {
-               if (cursor > index) {
-                   INTVAL swap = index;
-                   index = cursor;
+               if (cursor > idx) {
+                   INTVAL swap = idx;
+                   idx = cursor;
                    cursor = swap;
                    list_assign(interpreter, list, cursor, temp, enum_type_PMC);
                }
                cursor++;
             }
             else {
-               if (cursor < index) {
-                   INTVAL swap = index;
-                   index = cursor;
+               if (cursor < idx) {
+                   INTVAL swap = idx;
+                   idx = cursor;
                    cursor = swap;
                    list_assign(interpreter, list, cursor, temp, enum_type_PMC);
                }
@@ -80,15 +80,15 @@ static void quicksort(Interp* interpreter, List *list, PMC *cmpsub,
             }
         }
 
-        list_assign(interpreter, list, index, pivot, enum_type_PMC);
+        list_assign(interpreter, list, idx, pivot, enum_type_PMC);
 
-        if (index*2 < left + right) {
-            quicksort(interpreter, list, cmpsub, left, index-1);
-            left = index+1;
+        if (idx*2 < left + right) {
+            quicksort(interpreter, list, cmpsub, left, idx-1);
+            left = idx+1;
         }
         else {
-            quicksort(interpreter, list, cmpsub, index+1, right);
-            right = index-1;
+            quicksort(interpreter, list, cmpsub, idx+1, right);
+            right = idx-1;
         }
     }
 }
@@ -143,7 +143,7 @@ Create a new list.
 
 /*
 
-=item C<PMC* "__getitem__"(PMC *self, PMC *index)>
+=item C<PMC* "__getitem__"(PMC *self, PMC *idx)>
 
 Returns the PMC value of the element at index C<key>.
 
@@ -151,22 +151,22 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    METHOD PMC* __getitem__(PMC *self, PMC *index) {
-        return VTABLE_get_pmc_keyed(INTERP, self, index);
+    METHOD PMC* __getitem__(PMC *self, PMC *idx) {
+        return VTABLE_get_pmc_keyed(INTERP, self, idx);
     }
 
 /*
 
-=item C<PMC* "__setitem__"(PMC *self, PMC *index, PMC *value)>
+=item C<PMC* "__setitem__"(PMC *self, PMC *idx, PMC *value)>
 
-Sets the PMC at element C<index> to C<*value>.
+Sets the PMC at element C<idx> to C<*value>.
 
 =cut
 
 */
 
-    METHOD void __setitem__(PMC *self, PMC *index, PMC *value) {
-        VTABLE_set_pmc_keyed(INTERP, self, index, value);
+    METHOD void __setitem__(PMC *self, PMC *idx, PMC *value) {
+        VTABLE_set_pmc_keyed(INTERP, self, idx, value);
     }
 
 /*
@@ -255,9 +255,9 @@ Delete a (range of) elements from the list
         }
         else if (key->vtable->base_type == PyBuiltin_PyInt) {
             List *list = (List *)PMC_data(SELF);
-            INTVAL index = VTABLE_get_integer(INTERP, key);
-            if (index<0) index = VTABLE_elements(INTERP, SELF) + index;
-            list_delete(INTERP, list, index, 1);
+            INTVAL idx = VTABLE_get_integer(INTERP, key);
+            if (idx<0) idx = VTABLE_elements(INTERP, SELF) + idx;
+            list_delete(INTERP, list, idx, 1);
         }
         else
             SUPER(key);
@@ -478,7 +478,7 @@ The C<==> operation. Compares two array to hold equal elements.
 
 /*
 
-=item C<void multiply_int(INTVAL value,  PMC *dest)>
+=item C<PMC* multiply_int(INTVAL value,  PMC *dest)>
 
 Build a list by duplicating the passed list N times.
 
@@ -486,7 +486,7 @@ Build a list by duplicating the passed list N times.
 
 */
 
-    void multiply_int (INTVAL value,  PMC* dest) {
+    PMC* multiply_int (INTVAL value,  PMC* dest) {
         INTVAL k = DYNSELF.elements();
         INTVAL i;
         PMC *elem;
@@ -494,7 +494,10 @@ Build a list by duplicating the passed list N times.
 
         if (k == 1) {
             elem = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
-            VTABLE_morph(INTERP, dest, PyBuiltin_PyList);
+            if (dest)
+                VTABLE_morph(INTERP, dest, PyBuiltin_PyList);
+            else
+                dest = pmc_new(INTERP, PyBuiltin_PyList);
             list = PMC_data(dest);
             list_set_length(INTERP, list, value);
             for (i = 0; i < value; ++i)
@@ -503,6 +506,7 @@ Build a list by duplicating the passed list N times.
         else {
             internal_exception(1, "multiply_int: unimplemented list size");
         }
+        return dest;
     }
 
 /*
@@ -601,7 +605,8 @@ Sets the PMC at element C<key> to C<*value>.
             INTVAL start = RVal_int(range->start);
             INTVAL end   = RVal_int(range->end);
 
-            list_splice(INTERP, list, value, start, end-start);
+            list_splice(INTERP, list, (List*)PMC_data(value),
+                    start, end-start);
         }
         else {
             INTVAL ix = key_integer(INTERP, key);

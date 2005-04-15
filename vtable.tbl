@@ -155,9 +155,13 @@ void i_subtract(PMC* value)                 MMD_I_SUBTRACT
 void i_subtract_int(INTVAL value)           MMD_I_SUBTRACT_INT
 void i_subtract_float(FLOATVAL value)       MMD_I_SUBTRACT_FLOAT
 
-void multiply(PMC* value, PMC* dest)        MMD_MULTIPLY
-void multiply_int(INTVAL value, PMC* dest)  MMD_MULTIPLY_INT
-void multiply_float(FLOATVAL value, PMC* dest)  MMD_MULTIPLY_FLOAT
+PMC* multiply(PMC* value, PMC* dest)        MMD_MULTIPLY
+PMC* multiply_int(INTVAL value, PMC* dest)  MMD_MULTIPLY_INT
+PMC* multiply_float(FLOATVAL value, PMC* dest)  MMD_MULTIPLY_FLOAT
+
+void i_multiply(PMC* value)                 MMD_I_MULTIPLY
+void i_multiply_int(INTVAL value)           MMD_I_MULTIPLY_INT
+void i_multiply_float(FLOATVAL value)       MMD_I_MULTIPLY_FLOAT
 
 void divide(PMC* value, PMC* dest)           MMD_DIVIDE
 void divide_int(INTVAL value, PMC* dest)     MMD_DIVIDE_INT

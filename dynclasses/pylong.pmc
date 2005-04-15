@@ -138,23 +138,6 @@ Morphs the scalar to the specified type.
 
 /*
 
-=item C<void multiply(PMC *value, PMC *dest)>
-
-Multiplies C<*value> with the integer and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void multiply (PMC* value, PMC* dest) {
-MMD_PyInt: {
-            INTVAL vali = VTABLE_get_integer(INTERP, value);
-            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_MULTIPLY);
-        }
-    }
-
-/*
-
 =item C<INTVAL hash()>
 
 Returns a unique hash for this value

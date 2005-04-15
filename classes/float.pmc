@@ -400,52 +400,66 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<void multiply(PMC *value, PMC *dest)>
+=item C<PMC* multiply(PMC *value, PMC *dest)>
 
-Multiplies the number by C<*value> and returns the result in C<*dest>.
+=item C<PMC* multiply_int(INTVAL value, PMC *dest)>
+
+=item C<PMC* multiply_float(FLOATVAL value, PMC *dest)>
+
+Multiplies the number by C<value> and returns the result in C<*dest>.
 
 =cut
 
 */
 
-    void multiply (PMC* value, PMC* dest) {
-MMD_Float: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) * PMC_num_val(value));
+    PMC* multiply (PMC* value, PMC* dest) {
+MMD_Complex: {
+            internal_exception(1, "TODO mul<Float, Complex>");
+            return dest;
         }
 MMD_DEFAULT: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) * VTABLE_get_number(INTERP, value));
-         }
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
+            return dest;
+        }
     }
 
-/*
-
-=item C<void multiply_int(INTVAL value, PMC *dest)>
-
-Multiplies the number by C<value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void multiply_int (INTVAL value, PMC* dest) {
+    PMC* multiply_int (INTVAL value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) * value);
+            DYNSELF.get_number() * value);
+        return dest;
     }
-/*
 
-=item C<void multiply_float(FLOATVAL value, PMC *dest)>
-
-Multiplies the number by C<value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void multiply_float (FLOATVAL value, PMC* dest) {
+    PMC* multiply_float (FLOATVAL value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) * value);
+            DYNSELF.get_number() * value);
+        return dest;
+    }
+
+    void i_multiply (PMC* value) {
+MMD_Complex: {
+            internal_exception(1, "TODO i_mul<Float, Complex>");
+        }
+MMD_DEFAULT: {
+            VTABLE_set_number_native(INTERP, SELF,
+                DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
+        }
+    }
+
+    void i_multiply_int (INTVAL value) {
+        VTABLE_set_number_native(INTERP, SELF,
+            DYNSELF.get_number() * (FLOATVAL)value);
+    }
+
+    void i_multiply_float (FLOATVAL value) {
+        VTABLE_set_number_native(INTERP, SELF,
+            DYNSELF.get_number() * value);
     }
 
 /*

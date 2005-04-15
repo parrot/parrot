@@ -723,13 +723,21 @@ MMD_DEFAULT: {
     }
 /*
 
-=item C<void multiply (PMC* value, PMC* dest)>
+=item C<PMC* multiply (PMC* value, PMC* dest)>
 
-=item C<void multiply_int (INTVAL value, PMC* dest)>
+=item C<PMC* multiply_int (INTVAL value, PMC* dest)>
 
-=item C<void multiply_float (FLOATVAL value, PMC* dest)>
+=item C<PMC* multiply_float (FLOATVAL value, PMC* dest)>
 
 Multiplies the complex number with C<value>, placing the result in C<dest>.
+
+=item C<void i_multiply (PMC* value)>
+
+=item C<void i_multiply_int (INTVAL value)>
+
+=item C<void i_multiply_float (FLOATVAL value)>
+
+Multiplies the complex number SELF inplace with C<value>.
 
 =cut
 
@@ -742,40 +750,76 @@ Multiplies the complex number with C<value>, placing the result in C<dest>.
   (a+ib)(c+id)=(ac-bd)+i((a+b)(c+d)-ac-bd).
 
 */
-    void multiply (PMC* value, PMC* dest) {
-MMD_Integer: {
-        FLOATVAL re = RE(SELF) * PMC_int_val(value);
-        FLOATVAL im = IM(SELF) * PMC_int_val(value);
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        RE(dest) = re;
-        IM(dest) = im;
-        }
+    PMC* multiply (PMC* value, PMC* dest) {
 MMD_Complex: {
-        FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
-        FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        RE(dest) = re;
-        IM(dest) = im;
+            FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
+            FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
+            if (dest)
+                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+            else {
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            }
+            RE(dest) = re;
+            IM(dest) = im;
+            return dest;
         }
 MMD_DEFAULT: {
-        FLOATVAL re = RE(SELF) * VTABLE_get_number(INTERP, value);
-        FLOATVAL im = IM(SELF) * VTABLE_get_number(INTERP, value);
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        RE(dest) = re;
-        IM(dest) = im;
+            FLOATVAL re = RE(SELF) * VTABLE_get_number(INTERP, value);
+            FLOATVAL im = IM(SELF) * VTABLE_get_number(INTERP, value);
+            if (dest)
+                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+            else {
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            }
+            RE(dest) = re;
+            IM(dest) = im;
+            return dest;
         }
     }
 
-    void multiply_int (INTVAL value, PMC* dest) {
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+    PMC* multiply_int (INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else {
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        }
         RE(dest) = RE(SELF) * value;
         IM(dest) = IM(SELF) * value;
+        return dest;
     }
 
-    void multiply_float (FLOATVAL value, PMC* dest) {
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+    PMC* multiply_float (FLOATVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else {
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        }
         RE(dest) = RE(SELF) * value;
         IM(dest) = IM(SELF) * value;
+        return dest;
+    }
+
+    void i_multiply (PMC* value) {
+MMD_Complex: {
+            FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
+            FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
+            RE(SELF) = re;
+            IM(SELF) = im;
+        }
+MMD_DEFAULT: {
+            RE(SELF) *= VTABLE_get_number(INTERP, value);
+            IM(SELF) *= VTABLE_get_number(INTERP, value);
+        }
+    }
+
+    void i_multiply_int (INTVAL value) {
+        RE(SELF) *= value;
+        IM(SELF) *= value;
+    }
+
+    void i_multiply_float (FLOATVAL value) {
+        RE(SELF) *= value;
+        IM(SELF) *= value;
     }
 
 /*

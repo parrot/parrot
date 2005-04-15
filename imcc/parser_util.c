@@ -365,6 +365,8 @@ is_infix(char *name)
         return MMD_ADD;
     if (strcmp(name, "sub") == 0)
         return MMD_SUBTRACT;
+    if (strcmp(name, "mul") == 0)
+        return MMD_MULTIPLY;
     return -1;
 }
 
@@ -398,7 +400,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     }
 
 
-#if 1
+#if 0
     ins = multi_keyed(interpreter, unit, name, r, n, keyvec, emit);
     if (ins)
         return ins;

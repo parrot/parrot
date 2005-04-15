@@ -25,7 +25,7 @@ register.
 
 /* XXX create MMD headers to in Pmc2c.pm */
 extern INTVAL Parrot_BigInt_is_equal_BigInt(Interp*, PMC*, PMC*);
-extern void Parrot_BigInt_multiply_int(Interp* interpreter,
+extern PMC* Parrot_BigInt_multiply_int(Interp* interpreter,
         PMC* pmc, INTVAL value, PMC* dest) ;
 
 static PMC*
@@ -597,50 +597,114 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<void multiply(PMC *value, PMC *dest)>
+=item C<PMC* multiply(PMC *value, PMC *dest)>
+
+=item C<PMC* multiply_int(INTVAL value, PMC *dest)>
 
 Multiplies the integer by C<*value> and returns the result in C<*dest>.
 
 =cut
 
 */
-    void multiply (PMC* value, PMC* dest) {
+    PMC* multiply (PMC* value, PMC* dest) {
 MMD_Integer: {
-        INTVAL a = VTABLE_get_integer(INTERP, SELF);
-        INTVAL b = VTABLE_get_integer(INTERP, value);
-        double cf = (double)a * (double)b;
-        INTVAL c = a * b;
-        if ((double) c == cf)
-            VTABLE_set_integer_native(INTERP, dest, c);
-        else
-            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
-    }
+            INTVAL a = VTABLE_get_integer(INTERP, SELF);
+            INTVAL b = VTABLE_get_integer(INTERP, value);
+            double cf = (double)a * (double)b;
+            INTVAL c = a * b;
+            if ((double) c == cf) {
+                if (!dest)
+                    dest = pmc_new(INTERP, SELF->vtable->base_type);
+                VTABLE_set_integer_native(INTERP, dest, c);
+                return dest;
+            }
+            else
+                return overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
+        }
+MMD_Complex: {
+                internal_exception(1, "TODO mul<Integer, Complex>");
+                return dest;
+            }
 MMD_BigInt:     {
-        Parrot_BigInt_multiply_int(INTERP, value, PMC_int_val(SELF), dest);
+            return Parrot_BigInt_multiply_int(INTERP, value,
+                    DYNSELF.get_integer(), dest);
         }
 MMD_String: {
-        INTVAL a = PMC_int_val(SELF);
-        INTVAL b = VTABLE_get_integer(INTERP, value);
-        double cf = (double)a * (double)b;
-        INTVAL c = a * b;
-        if ((double) c == cf)
-            VTABLE_set_integer_native(INTERP, dest, c);
-        else
-            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
+            return Parrot_Integer_multiply_Integer(INTERP, SELF, value, dest);
+        }
+MMD_DEFAULT: {
+            FLOATVAL valf = VTABLE_get_number(INTERP, value);
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest, valf * PMC_int_val(SELF));
+            return dest;
+        }
     }
 
-MMD_PerlUndef: {
-        VTABLE_set_integer_native(INTERP, dest, 0);
-    }
-MMD_DEFAULT: {
-        FLOATVAL valf = VTABLE_get_number(INTERP, value);
-        VTABLE_set_number_native(INTERP, dest, valf * PMC_int_val(SELF));
-    }
+    PMC* multiply_int (INTVAL b, PMC* dest) {
+        INTVAL a = PMC_int_val(SELF);
+        double cf = (double)a * (double)b;
+        INTVAL c = a * b;
+        if ((double) c == cf) {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_integer_native(INTERP, dest, c);
+            return dest;
+        }
+        else
+            return overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
     }
 
 /*
 
-=item C<void multiply_int(INTVAL value, PMC *dest)>
+=item C<void i_multiply(PMC *value)>
+
+=item C<void i_multiply_int(INTVAL value)>
+
+=item C<void i_multiply_float(FLOATVAL value)>
+
+Multiply C<value> with C<SELF> inplace.
+
+=cut
+
+*/
+
+    void i_multiply (PMC* value) {
+MMD_Integer: {
+            SELF.i_multiply_int(VTABLE_get_integer(INTERP, value));
+        }
+MMD_BigInt: {
+            Parrot_BigInt_multiply_int(INTERP, value,
+                    DYNSELF.get_integer(), SELF);
+        }
+MMD_Complex: {
+                internal_exception(1, "TODO i_mul<Integer, Complex>");
+        }
+MMD_DEFAULT: {
+        VTABLE_set_number_native(INTERP, SELF,
+            PMC_int_val(SELF) * VTABLE_get_number(INTERP, value));
+        }
+    }
+
+    void i_multiply_int (INTVAL b) {
+        INTVAL a = PMC_int_val(SELF);
+        double cf = (double)a * (double)b;
+        INTVAL c = a * b;
+        if ((double) c == cf) {
+            DYNSELF.set_integer_native(c);
+        }
+        else
+            overflow(INTERP, SELF, b, SELF, MMD_MULTIPLY);
+    }
+
+    void i_multiply_float (FLOATVAL value) {
+        INTVAL a = DYNSELF.get_integer();
+        VTABLE_set_number_native(INTERP, SELF, a * value);
+    }
+
+
+/*
+
 
 Multiplies the integer by C<value> and returns the result in C<*dest>.
 
@@ -667,15 +731,6 @@ Rise SELF to the C<value>th power.
 =cut
 
 */
-    void multiply_int (INTVAL b, PMC* dest) {
-        INTVAL a = PMC_int_val(SELF);
-        double cf = (double)a * (double)b;
-        INTVAL c = a * b;
-        if ((double) c == cf)
-            VTABLE_set_integer_native(INTERP, dest, c);
-        else
-            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY);
-    }
 
 /*
 

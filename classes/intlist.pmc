@@ -241,41 +241,6 @@ Removes and returns the first element in the list.
             PMC_int_val(key) = -1;
         return iter;
     }
-/*
-
-=item C<void multiply_int(INTVAL value,  PMC *dest)>
-
-Python (b6.main):
-
- # L = [1] * 1000000
-
-  4           0 LOAD_CONST               1 (1)
-              3 BUILD_LIST               1
-              6 LOAD_CONST               2 (1000000)
-              9 BINARY_MULTIPLY
-             10 STORE_FAST               2 (L)
-
-Build a list by duplicating the passed list N times. Only implemented for
-list.elements == 1.
-
-=cut
-
-*/
-
-    void multiply_int (INTVAL value,  PMC* dest) {
-        INTVAL k = DYNSELF.elements();
-        INTVAL i, elem;
-        IntList *l = PMC_struct_val(SELF);
-        List *n;
-        if (k != 1)
-            internal_exception(1, "multiply_int: unimplemented list size");
-        elem = intlist_get(INTERP, l, 0);
-        n = list_new(INTERP, enum_type_INTVAL);
-        PMC_struct_val(SELF) = n;
-        list_set_length(INTERP, n, value);
-        for (i = 0; i < value; ++i)
-            list_assign(INTERP, n, i, INTVAL2PTR(void *, elem), enum_type_INTVAL);
-    }
 
 }
 

@@ -16,7 +16,7 @@ Tests the C<IntList> PMC.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 10;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "creation");
@@ -518,22 +518,6 @@ BAD2:   print "not ok 2\n"
 CODE
 ok 1
 ok 2
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "intlist mul = repeat");
-    new P0, .IntList
-    set P0[0], 1
-    mul P0, 100
-    set I0, P0
-    print I0
-    print "\n"
-    set I0, P0[99]
-    print I0
-    print "\n"
-    end
-CODE
-100
-1
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
