@@ -2,10 +2,11 @@
 
 use strict;
 
-use Data::Dumper;
+package Parrot::Test::m4;
+
+require Parrot::Test;
 use File::Basename;
 
-package Parrot::Test::m4;
 
 =head1 NAME
 
@@ -48,16 +49,24 @@ sub output_is
   my $gnu_m4_out_f    = Parrot::Test::per_test( '.gnu_out', $count );
 
   my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
-  my $parrot_m4      = "(cd $self->{relpath} && $self->{parrot} languages/m4/m4.pbc ${test_prog_args} languages/${lang_f})";
-  my $gnu_m4         = "(cd $self->{relpath} && m4 ${test_prog_args} languages/${lang_f})";
+  my $parrot_m4      = "$self->{parrot} languages/m4/m4.pbc ${test_prog_args} languages/${lang_f}";
+  my $gnu_m4         = "m4 ${test_prog_args} languages/${lang_f}";
 
   # This does nor create byte code, but m4 code
-  my $parrotdir       = File::Basename::dirname( $self->{parrot} );
+  my $parrotdir       = dirname( $self->{parrot} );
   Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_f );
 
   # STDERR is written into same output file
-  my $parrot_exit_code = Parrot::Test::_run_command( $parrot_m4, STDOUT => $parrot_m4_out_f, STDERR => $parrot_m4_out_f );
-  my $gnu_exit_code    = Parrot::Test::_run_command( $gnu_m4,    STDOUT => $gnu_m4_out_f,    STDERR => $gnu_m4_out_f );
+  my $parrot_exit_code = Parrot::Test::run_command( 
+      $parrot_m4, 
+      CD => $self->{relpath}, 
+      STDOUT => $parrot_m4_out_f, STDERR => $parrot_m4_out_f 
+  );
+  my $gnu_exit_code    = Parrot::Test::run_command( 
+      $gnu_m4,
+      CD => $self->{relpath},
+      STDOUT => $gnu_m4_out_f,    STDERR => $gnu_m4_out_f 
+  );
   
   my $pass = $self->{builder}->is_eq( Parrot::Test::slurp_file($parrot_m4_out_f) . Parrot::Test::slurp_file($gnu_m4_out_f),
                                       $output . $output,

@@ -45,11 +45,11 @@ sub output_is() {
     # For some reason, if you redirect both STDERR and STDOUT here,
     # you get a 38M file of garbage. We'll temporarily assume everything
     # works and ignore stderr.
-    $exit_code = Parrot::Test::_run_command($pycmd, STDOUT => $py_out_f);
+    $exit_code = Parrot::Test::run_command($pycmd, STDOUT => $py_out_f);
     my $py_file = Parrot::Test::slurp_file($py_out_f);
     my $pirate_file;
 
-    $exit_code |= Parrot::Test::_run_command($cmd,
+    $exit_code |= Parrot::Test::run_command($cmd,
 	    STDOUT => $pirate_out_f);
 	$pirate_file = Parrot::Test::slurp_file($pirate_out_f);
     $pass = $self->{builder}->is_eq( $pirate_file, $py_file, $desc );

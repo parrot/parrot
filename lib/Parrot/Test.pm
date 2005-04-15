@@ -125,6 +125,22 @@ output with the unexpected result is false.
 Use within a C<SKIP: { ... }> block to indicate why and how many test
 are being skipped. Just like in Test::More.
 
+=item C<run_command($command, %options)>
+
+Run the given $command in a cross-platform manner.  
+
+%options include...
+
+    STDOUT	filehandle to redirect STDOUT to
+    STDERR     	filehandle to redirect STDERR to
+    CD		directory to run the command in
+
+For example:
+
+    # equivalent to "cd some_dir && make test"
+    run_command("make test", CD => "some_dir");
+
+
 =back
 
 =cut
@@ -136,6 +152,7 @@ use vars qw(@EXPORT @ISA);
 use Parrot::Config;
 use File::Spec;
 use Data::Dumper;
+use Cwd;
 
 require Exporter;
 require Test::Builder;
@@ -149,7 +166,9 @@ require Test::More;
               pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
               c_output_is        c_output_like        c_output_isnt
               language_output_is
-              skip );
+              skip 
+	      run_command
+	    );
 @ISA = qw(Exporter);
 
 # tell parrot it's being tested.  this disables searching of installed libraries
@@ -170,8 +189,11 @@ sub import {
 # this kludge is an hopefully portable way of having
 # redirections ( tested on Linux and Win2k )
 # An alternative is using Test::Output
-sub _run_command {
+sub run_command {
     my($command, %redir) = @_;
+
+    # To run the command in a different directory.
+    my $chdir = delete $redir{CD};
 
     foreach (keys %redir) {
         m/^STD(OUT|ERR)$/ or die "I don't know how to redirect '$_' yet! ";
@@ -198,7 +220,17 @@ sub _run_command {
     open  STDERR, ">$err"    or die "Can't redirect stderr" if $err;
 
     $command = "$ENV{VALGRIND} $command" if defined $ENV{VALGRIND};
+
+    my $orig_dir;
+    if( $chdir ) {
+	$orig_dir = cwd;
+	chdir $chdir;
+    }
     system( $command );
+
+    if( $chdir ) {
+	chdir $orig_dir;
+    }
 
     my $exit_code = $? >> 8;
 
@@ -319,16 +351,19 @@ sub generate_functions {
             if ( $args =~ s/--run-exec// ) {
                 $run_exec = 1;
                 my $pbc_f = per_test('.pbc', $test_no);
-                my $cmd = qq{(cd $path_to_parrot && $parrot ${args} -o $pbc_f "$code_f")};
-                _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
+                my $cmd = qq{$parrot ${args} -o $pbc_f "$code_f"};
+                run_command($cmd, CD => $path_to_parrot,
+			    STDOUT => $out_f, STDERR => $out_f);
 
                 my $o_f = per_test('.o', $test_no);
-                $cmd = qq{(cd $path_to_parrot && $parrot ${args} -o $o_f "$pbc_f")};
-                _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
+                $cmd = qq{$parrot ${args} -o $o_f "$pbc_f"};
+                run_command($cmd, CD => $path_to_parrot,
+			    STDOUT => $out_f, STDERR => $out_f);
 
                 my $noext_f = per_test('', $test_no);
-                $cmd = qq{(cd $path_to_parrot && make EXEC=$noext_f exec)};
-                _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
+                $cmd = qq{make EXEC=$noext_f exec};
+                run_command($cmd, CD => $path_to_parrot,
+			    STDOUT => $out_f, STDERR => $out_f);
             }
             if ( $func =~ /^pbc_output_/ && $args =~ /-r / ) {
                 # native tests with --run-pbc don't make sense
@@ -353,8 +388,9 @@ sub generate_functions {
                     my $pbc_f = per_test('.pbc', $test_no);
                     $args = qq{$args -o "$pbc_f" -r -r};
                 }
-                $cmd = qq{(cd $path_to_parrot && $parrot $args "$code_f")};
-                $exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
+                $cmd = qq{$parrot $args "$code_f"};
+                $exit_code = run_command($cmd, CD => $path_to_parrot,
+					 STDOUT => $out_f, STDERR => $out_f);
             }
 
             my $meth = $parrot_test_map{$func};
@@ -466,7 +502,7 @@ sub generate_functions {
             $cmd = "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} " .
 	           " -I./include -c " .
                    "$PConfig{cc_o_out}$obj_f $source_f";
-            $exit_code = _run_command($cmd,
+            $exit_code = run_command($cmd,
 		    'STDOUT' => $build_f,
 		    'STDERR' => $build_f);
             $builder->diag("'$cmd' failed with exit code $exit_code")
@@ -483,7 +519,7 @@ sub generate_functions {
             $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} " .
 		   "$obj_f $PConfig{ld_out}$exe_f " .
 		   "$libparrot $iculibs $PConfig{libs}";
-            $exit_code = _run_command($cmd,
+            $exit_code = run_command($cmd,
 		'STDOUT' => $build_f,
 		'STDERR' => $build_f);
             $builder->diag("'$cmd' failed with exit code $exit_code")
@@ -499,7 +535,7 @@ sub generate_functions {
             }
 
             $cmd       = ".$PConfig{slash}$exe_f";
-            $exit_code = _run_command($cmd, 'STDOUT' => $out_f, 'STDERR' => $out_f);
+            $exit_code = run_command($cmd, 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
             my $meth = $c_test_map{$func};
             my $pass = $builder->$meth(slurp_file($out_f), $expected, $desc);

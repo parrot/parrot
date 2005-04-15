@@ -42,12 +42,13 @@ sub output_is() {
   my $exit_code = 0;
   my $pass = 0;
 
-  $cmd = "(cd " . $self->{relpath} . " && " . $self->{parrot} . " ${args} languages/tcl/tcl.pbc $lang_f)";
+  $cmd = "$self->{parrot} $args languages/tcl/tcl.pbc $lang_f";
 
   # For some reason, if you redirect both STDERR and STDOUT here, 
   # you get a 38M file of garbage. We'll temporarily assume everything
   # works and ignore stderr.
-  $exit_code = Parrot::Test::_run_command($cmd, STDOUT => $out_f);
+  $exit_code = Parrot::Test::run_command($cmd, CD => $self->{relpath},
+					 STDOUT => $out_f);
   
   unless ($pass) {
     my $file = Parrot::Test::slurp_file($out_f);

@@ -47,14 +47,17 @@ sub gen_output
   my $out_f    = Parrot::Test::per_test( '.out', $test_no );
 
   my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
-  my $cmd = "(cd $self->{relpath} && $self->{parrot} languages/parrot_compiler/$test_prog_args < languages/$code_f)";
+  my $cmd = "$self->{parrot} languages/parrot_compiler/$test_prog_args < languages/$code_f";
 
   my $parrotdir       = File::Basename::dirname( $self->{parrot} );
   Parrot::Test::generate_code( $code, $parrotdir, $test_no, $code_f );
 
   # STDERR is written into same output file
   my $diag = '';
-  my $parrot_exit_code = Parrot::Test::_run_command( $cmd, STDOUT => $out_f, STDERR => $out_f );
+  my $parrot_exit_code = Parrot::Test::run_command( $cmd, 
+						    CD     => $self->{relpath},
+						    STDOUT => $out_f, 
+						    STDERR => $out_f );
   $diag .= "'$cmd' failed with exit code $parrot_exit_code." if $parrot_exit_code;
   $self->{builder}->diag( $diag ) if $diag;
   
