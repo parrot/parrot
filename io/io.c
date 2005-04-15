@@ -216,7 +216,7 @@ the pointers from the PMC.
 void
 PIO_destroy(theINTERP, PMC *pmc)
 {
-    ParrotIO *io = PMC_data2(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     UNUSED(interpreter);
 
     if(!io)
