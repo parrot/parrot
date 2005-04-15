@@ -194,8 +194,11 @@ typedef struct PMC_EXT PMC_EXT;
 #endif /* NDEBUG */
 #if PMC_DATA_IN_EXT
 #  define PMC_data(pmc)       PMC_ext_checked(pmc)->data
+#  define PMC_data0(pmc)      ((pmc)->pmc_ext ? pmc->pmc_ext->data : 0)
 #else
 #  define PMC_data(pmc)       (pmc)->data
+/* do not allow PMC_data2 as lvalue */
+#  define PMC_data0(pmc)      (1 ? (pmc)->data : 0)
 #endif /* PMC_DATA_IN_EXT */
 #define PMC_metadata(pmc)     PMC_ext_checked(pmc)->_metadata
 #define PMC_next_for_GC(pmc)  PMC_ext_checked(pmc)->_next_for_GC

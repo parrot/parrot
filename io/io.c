@@ -216,7 +216,7 @@ the pointers from the PMC.
 void
 PIO_destroy(theINTERP, PMC *pmc)
 {
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data2(pmc);
     UNUSED(interpreter);
 
     if(!io)
@@ -556,7 +556,7 @@ INTVAL
 PIO_peek(theINTERP, PMC *pmc, STRING **buffer)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     if(!io)
         return -1;
     return PIO_peek_down(interpreter, l, io, buffer);
@@ -587,9 +587,10 @@ INTVAL
 PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)
 {
 
-    ParrotIO * io = PMC_data(pmc);
-    ParrotIOBuf * b = &io->b;
+    ParrotIO * io = PMC_data0(pmc);
+    ParrotIOBuf * b;
     if(!io) return -1;
+    b = &io->b;
 
     switch(cmd) {
        case PIOCTL_CMDSETRECSEP: io->recsep = arg;
@@ -638,7 +639,7 @@ INTVAL
 PIO_setbuf(theINTERP, PMC *pmc, size_t bufsize)
 {
     ParrotIOLayer *layer = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     if(!io)
         return -1;
     PIO_flush(interpreter, pmc);
@@ -661,7 +662,7 @@ INTVAL
 PIO_setlinebuf(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     if(!io)
         return -1;
 
@@ -757,7 +758,7 @@ PIO_close(theINTERP, PMC *pmc)
 {
     INTVAL res;
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     if(!io)
         return -1;
     PIO_flush(interpreter, pmc); /* XXX boe: is this neccessary here? */
@@ -782,7 +783,7 @@ void
 PIO_flush(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     if(!io)
         return;
 
@@ -811,7 +812,7 @@ PIO_reads(theINTERP, PMC *pmc, size_t len)
 {
     STRING *res = NULL;
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
 
     res = PIO_make_io_string(interpreter, &res, len );
 
@@ -828,7 +829,7 @@ INTVAL
 PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     STRING *res = new_string_header(interpreter,
             PObj_bufstart_external_FLAG|PObj_external_FLAG);
     if (!io)
@@ -854,7 +855,7 @@ INTVAL
 PIO_write(theINTERP, PMC *pmc, const void *buffer, size_t len)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     STRING fake;
     union {
         const void * __c_ptr;
@@ -891,7 +892,7 @@ PIOOFF_T
 PIO_seek(theINTERP, PMC *pmc, PIOOFF_T offset, INTVAL w)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     if(!io)
         return -1;
 
@@ -913,7 +914,7 @@ PIOOFF_T
 PIO_tell(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     if(!io)
         return -1;
 
@@ -935,7 +936,7 @@ position is C<EOF>.
 INTVAL
 PIO_eof(theINTERP, PMC *pmc)
 {
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
 
     UNUSED(interpreter);
 
@@ -982,7 +983,9 @@ INTVAL
 PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
+    assert((int)l != 0xdeadbeef);
+    assert(io != 0);
     return PIO_write_down(interpreter, l, io, s);
 }
 
@@ -1097,7 +1100,7 @@ Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 PIOHANDLE
 PIO_getfd(theINTERP, PMC *pmc)
 {
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
 
     UNUSED(interpreter);
 
@@ -1292,7 +1295,7 @@ INTVAL
 PIO_poll(theINTERP, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
-    ParrotIO *io = PMC_data(pmc);
+    ParrotIO *io = PMC_data0(pmc);
     return PIO_poll_down(interpreter, l, io, which, sec, usec);
 }
 
