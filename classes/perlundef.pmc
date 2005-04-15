@@ -210,45 +210,47 @@ Morphs to a C<PerlString> with the value of C<*value>.
 
 /*
 
-=item C<void subtract(PMC *value,  PMC *dest)>
+=item C<PMC* subtract(PMC *value,  PMC *dest)>
 
 =cut
 
 */
 
-    void subtract (PMC* value,  PMC* dest) {
+    PMC* subtract (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in subtraction");
-        SUPER(value, dest);
+        return SUPER(value, dest);
     }
 
 /*
 
-=item C<void subtract_int(INTVAL value,  PMC *dest)>
+=item C<PMC* subtract_int(INTVAL value,  PMC *dest)>
 
 =cut
 
 */
 
-    void subtract_int (INTVAL value,  PMC* dest) {
+    PMC* subtract_int (INTVAL value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in integer subtraction");
         VTABLE_set_integer_native(INTERP, dest, 0-value);
+        return dest;    /* XXX */
     }
 
 
 /*
 
-=item C<void subtract_float(FLOATVAL value, PMC *dest)>
+=item C<PMC* subtract_float(FLOATVAL value, PMC *dest)>
 
 =cut
 
 */
 
-    void subtract_float (FLOATVAL value,  PMC* dest) {
+    PMC* subtract_float (FLOATVAL value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in numeric subtraction");
         VTABLE_set_number_native(INTERP, dest, 0-value);
+        return dest;    /* XXX */
     }
 
 /*

@@ -23,7 +23,7 @@
 
 
 
-pmclass TclFloat extends TclObject dynpmc group tcl_group {
+pmclass TclFloat extends TclObject extend Float dynpmc group tcl_group {
 
     void init () {
         PMC_num_val(SELF) = 0.0;
@@ -31,11 +31,6 @@ pmclass TclFloat extends TclObject dynpmc group tcl_group {
 
     INTVAL get_integer () {
         return (INTVAL)PMC_num_val(SELF);
-    }
-
-    BIGNUM* get_bignum () {
-        /* XXX */
-        return NULL;
     }
 
 
@@ -51,7 +46,7 @@ pmclass TclFloat extends TclObject dynpmc group tcl_group {
         sprintf(buff,FLOATVAL_FMT,PMC_num_val(SELF));  /* XXX buffer overflow! */
 #endif
         check_flag = 1;
-        checklen = buflen = strlen(buff); 
+        checklen = buflen = strlen(buff);
         while (check_flag && buflen) {
                if (buff[buflen-1] == 48) {  /* 0 */
                        buflen--;
@@ -91,14 +86,6 @@ pmclass TclFloat extends TclObject dynpmc group tcl_group {
         PMC_num_val(SELF) = PMC_num_val(value);
     }
 
-    void set_bignum_native (BIGNUM* value) {
-      /* XXX */
-    }
-
-    void set_bignum_same (PMC* value) {
-      /* XXX */
-    }
-
     void set_string_native (STRING * value) {
         DYNSELF.morph(TclString_type);
         DYNSELF.set_string_native(value);
@@ -123,28 +110,6 @@ pmclass TclFloat extends TclObject dynpmc group tcl_group {
     void add_float (FLOATVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
             PMC_num_val(SELF) + value);
-    }
-
-    void subtract (PMC* value, PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) -
-            VTABLE_get_number(INTERP, value)
-        );
-    }
-
-    void subtract_int (INTVAL value, PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) - (FLOATVAL)value
-        );
-    }
-
-    void subtract_bignum (BIGNUM* value, PMC* dest) {
-        /* XXX */
-    }
-
-    void subtract_float (FLOATVAL value, PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) - value);
     }
 
     void multiply (PMC* value, PMC* dest) {

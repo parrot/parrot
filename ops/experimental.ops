@@ -246,6 +246,68 @@ inline op exec(in STR) {
   goto NEXT();
 }
 
+=item C<infix(inconst INT, in PMC, in INT)>
+
+=item C<infix(inconst INT, in PMC, in NUM)>
+
+=item C<infix(inconst INT, in PMC, in STR)>
+
+=item C<infix(inconst INT, in PMC, in PMC)>
+
+General inplace infix dispatch opcode. $1 is the MMD function number.
+
+=item C<infix(inconst INT, out PMC, in PMC, in INT)>
+
+=item C<infix(inconst INT, out PMC, in PMC, in NUM)>
+
+=item C<infix(inconst INT, out PMC, in PMC, in STR)>
+
+=item C<infix(inconst INT, out PMC, in PMC, in PMC)>
+
+General infix dispatch opcode. $1 is the MMD function number.
+
+=cut
+
+inline op infix(inconst INT, in PMC, in INT) :base_core {
+  mmd_dispatch_v_pi(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op infix(inconst INT, in PMC, in NUM) :base_core {
+  mmd_dispatch_v_pn(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op infix(inconst INT, in PMC, in STR) :base_core {
+  mmd_dispatch_v_ps(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op infix(inconst INT, in PMC, in PMC) :base_core {
+  mmd_dispatch_v_pp(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op infix(inconst INT, out PMC, in PMC, in INT) :base_core {
+  $2 = mmd_dispatch_p_pip(interpreter, $3, $4, $2, $1);
+  goto NEXT();
+}
+
+inline op infix(inconst INT, out PMC, in PMC, in NUM) :base_core {
+  $2 = mmd_dispatch_p_pnp(interpreter, $3, $4, $2, $1);
+  goto NEXT();
+}
+
+inline op infix(inconst INT, out PMC, in PMC, in STR) :base_core {
+  $2 = mmd_dispatch_p_psp(interpreter, $3, $4, $2, $1);
+  goto NEXT();
+}
+
+inline op infix(inconst INT, out PMC, in PMC, in PMC) :base_core {
+  $2 = mmd_dispatch_p_ppp(interpreter, $3, $4, $2, $1);
+  goto NEXT();
+}
+
 =back
 
 ###############################################################################

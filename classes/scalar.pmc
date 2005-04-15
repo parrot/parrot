@@ -68,19 +68,6 @@ Returns the floating-point value of the scalar.
         return PMC_num_val(SELF);
     }
 
-/*
-
-=item C<BIGNUM *get_bignum()>
-
-Returns the big number value of the scalar.
-
-=cut
-
-*/
-
-    BIGNUM* get_bignum () {
-        return (BIGNUM*) PMC_struct_val(SELF);
-    }
 
 /*
 
@@ -147,19 +134,6 @@ Sets the floating-point value.
         PMC_num_val(SELF) = value;
     }
 
-/*
-
-=item C<void set_bignum_native(BIGNUM *value)>
-
-Sets the big number value.
-
-=cut
-
-*/
-
-    void set_bignum_native (BIGNUM* value) {
-        PMC_struct_val(SELF) = (DPOINTER*)value;
-    }
 
 /*
 
@@ -222,24 +196,27 @@ TODO - overflow detection, bigint promotion?
 
 /*
 
-=item C<void subtract(PMC *value, PMC *dest)>
+=item C<PMC* subtract(PMC *value, PMC *dest)>
 
 =cut
 
 */
 
-    void subtract (PMC* value,  PMC* dest) {
+    PMC* subtract (PMC* value,  PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
             - VTABLE_get_number(INTERP, value);
 
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest, result);
+        return dest;
     }
 
 /*
 
-=item C<void subtract_int(INTVAL value, PMC *dest)>
+=item C<PMC* subtract_int(INTVAL value, PMC *dest)>
 
 Subtracts C<value> from the scalar and returns the result in C<*dest>.
 
@@ -249,19 +226,22 @@ TODO - overflow detection, bigint promotion?
 
 */
 
-    void subtract_int (INTVAL value,  PMC* dest) {
+    PMC* subtract_int (INTVAL value,  PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
             - value;
 
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest, result);
+        return dest;
     }
 
 
 /*
 
-=item C<void subtract_float (FLOATVAL value,  PMC* dest)>
+=item C<PMC* subtract_float (FLOATVAL value,  PMC* dest)>
 
 Subtracts C<value> from the scalar and returns the result in C<*dest>.
 
@@ -271,13 +251,16 @@ TODO - overflow detection, bigint promotion?
 
 */
 
-    void subtract_float (FLOATVAL value,  PMC* dest) {
+    PMC* subtract_float (FLOATVAL value,  PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
             - value;
 
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest, result);
+        return dest;
     }
 
 /*

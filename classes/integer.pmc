@@ -28,7 +28,7 @@ extern INTVAL Parrot_BigInt_is_equal_BigInt(Interp*, PMC*, PMC*);
 extern void Parrot_BigInt_multiply_int(Interp* interpreter,
         PMC* pmc, INTVAL value, PMC* dest) ;
 
-static void
+static PMC*
 overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
 {
     PMC *temp;
@@ -42,16 +42,15 @@ overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
         /* TODO preserve type system */
         VTABLE_morph(interpreter, self, enum_class_BigInt);
         VTABLE_set_integer_native(interpreter, self, a);
-        mmd_dispatch_v_pip(interpreter, self, b, dest, mmd);
+        return mmd_dispatch_p_pip(interpreter, self, b, dest, mmd);
     }
     else {
-        temp = pmc_new(interpreter, enum_class_BigInt);
-        VTABLE_set_integer_native(interpreter, temp, a);
-        mmd_dispatch_v_pip(interpreter, temp, b, dest, mmd);
+        temp = VTABLE_get_bignum(interpreter, self);
+        return mmd_dispatch_p_pip(interpreter, temp, b, dest, mmd);
     }
 }
 
-static void
+static PMC*
 overflow_p(Interp *interpreter, PMC *self, PMC *val, PMC *dest, int mmd)
 {
     PMC *temp;
@@ -64,12 +63,11 @@ overflow_p(Interp *interpreter, PMC *self, PMC *val, PMC *dest, int mmd)
     if (self == dest) {
         VTABLE_morph(interpreter, self, enum_class_BigInt);
         VTABLE_set_integer_native(interpreter, self, a);
-        mmd_dispatch_v_ppp(interpreter, self, val, dest, mmd);
+        return mmd_dispatch_p_ppp(interpreter, self, val, dest, mmd);
     }
     else {
-        temp = pmc_new(interpreter, enum_class_BigInt);
-        VTABLE_set_integer_native(interpreter, temp, a);
-        mmd_dispatch_v_ppp(interpreter, temp, val, dest, mmd);
+        temp = VTABLE_get_bignum(interpreter, self);
+        return mmd_dispatch_p_ppp(interpreter, temp, val, dest, mmd);
     }
 }
 
@@ -195,16 +193,18 @@ Returns the floating-point value of the integer.
 
 /*
 
-=item C<BIGNUM *get_bignum()>
+=item C<PMC *get_bignum()>
 
-Unimplemented. Returns C<NULL>.
+Return a new BigInt PMC with the value of C<SELF>.
 
 =cut
 
 */
-    BIGNUM* get_bignum () {
-        /* XXX */
-        return NULL;
+    PMC* get_bignum () {
+        INTVAL val = DYNSELF.get_integer();
+        PMC *ret = pmc_new(INTERP, enum_class_BigInt);
+        VTABLE_set_integer_native(INTERP, ret, val);
+        return ret;
     }
 
 /*
@@ -254,7 +254,7 @@ Morphs the scalar to the specified type.
     }
 /*
 
-=item C<void set_pmc(PMC *value)>
+=item C<void assign_pmc(PMC *value)>
 
 Sets the PMC C<*value>, calling the appropriate C<set_*> method
 according to the type of C<*value>.
@@ -263,7 +263,9 @@ according to the type of C<*value>.
 
 */
 
-    void set_pmc (PMC* value) {
+    void assign_pmc (PMC* value) {
+        if (SELF == value)
+            return;
         DYNSELF.morph(value->vtable->base_type);
         switch (value->vtable->base_type) {
             case enum_class_Integer:
@@ -279,7 +281,7 @@ according to the type of C<*value>.
                 (void) VTABLE_get_pmc(INTERP, value);
                 break;
             default:
-                DYNSELF.set_pmc(value);
+                SUPER(value);
                 break;
         }
     }
@@ -303,25 +305,24 @@ Sets the value of the integer to the value of the C<Integer> C<*value>.
     }
 
 
-/*
-
-=item C<void set_number(PMC *value)>
-
-Morphs the integer to a C<Float> and sets the value from C<*value>.
-
-=cut
-
-*/
-    void set_number (PMC* value) {
-        DYNSELF.morph(enum_class_Float);
-        DYNSELF.set_number(value);
-    }
 
 /*
 
 =item C<void set_number_native(FLOATVAL value)>
 
 Morphs the integer to a C<Float> and sets the value from C<value>.
+
+=item C<void set_bool(INTVAL value)>
+
+Morphs the integer to a C<Boolean> and sets the value from C<value>.
+
+=item C<void set_bigint_int(INTVAL value)>
+
+Morphs the integer to a C<BigInt> and sets the value from C<value>.
+
+=item C<void set_string_native(STRING *value)>
+
+Morphs the integer to a C<String> and sets the value from C<value>.
 
 =cut
 
@@ -331,63 +332,16 @@ Morphs the integer to a C<Float> and sets the value from C<value>.
         DYNSELF.set_number_native(value);
     }
 
-/*
-
-=item C<void set_bignum(PMC *value)>
-
-=cut
-
-*/
-    void set_bignum (PMC* value) {
-        DYNSELF.morph(enum_class_BigInt);
-        DYNSELF.set_bignum(value);
-    }
-
-/*
-
-=item C<void set_bool(INTVAL value)>
-
-=cut
-
-*/
     void set_bool (INTVAL value) {
         DYNSELF.morph(enum_class_Boolean);
         DYNSELF.set_bool(value);
     }
 
-/*
-
-=item C<void set_bignum_native(BIGNUM *value)>
-
-=cut
-
-*/
-    void set_bignum_native (BIGNUM* value) {
+    void set_bignum_int (INTVAL value) {
         DYNSELF.morph(enum_class_BigInt);
-        DYNSELF.set_bignum_native(value);
+        DYNSELF.set_integer_native(value);
     }
 
-/*
-
-=item C<void set_string (PMC *value)>
-
-=cut
-
-*/
-    void set_string (PMC* value) {
-        DYNSELF.morph(enum_class_tring);
-        DYNSELF.set_string(value);
-    }
-
-/*
-
-=item C<void set_string_native(STRING *value)>
-
-Sets the value of the integer to C<*value>.
-
-=cut
-
-*/
     void set_string_native (STRING* value) {
         DYNSELF.morph(enum_class_String);
         DYNSELF.set_string_native(value);
@@ -428,12 +382,9 @@ MMD_Integer: {
          * so we can't used PMC_int_val(SELF) in any of these
          * Integer methods
          *
-         * TODO one of
-         *   a) remember MMD distance of this call
-         *      (works only for dynamic dispatch)
-         *   b) check for exact Integer type
-         *   c) create MMD_Any_Integer MMD
-         *   d) or dispatch to MMD_DEFAULT
+         * TODO
+         *   check for exact Integer type
+         *   e.g. MMD_Integer_EXACT
          */
 
         INTVAL a = VTABLE_get_integer(INTERP, SELF);
@@ -478,71 +429,123 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<void subtract(PMC *value, PMC *dest)>
+=item C<PMC* subtract(PMC *value, PMC *dest)>
 
 Subtracts C<*value> from the integer and returns the result in C<*dest>.
+If C<dest> is NULL, a new int PMC is created.
+
+Please note: as C<SELF> or C<value> maybe be subclassed, we have to
+call C<get_integer> and C<set_integer_native> always.
 
 =cut
 
 */
-    void subtract (PMC* value, PMC* dest) {
+    PMC* subtract (PMC* value, PMC* dest) {
 MMD_Integer: {
-        INTVAL a = PMC_int_val(SELF);
-        INTVAL b = PMC_int_val(value);
-        INTVAL c = a - b;
-        if ((c^a) >= 0 || (c^~b) >= 0)
-            VTABLE_set_integer_native(INTERP, dest, c);
-        else
-            overflow(INTERP, SELF, b, dest, MMD_SUBTRACT);
-    }
+            INTVAL a = DYNSELF.get_integer();
+            INTVAL b = VTABLE_get_integer(INTERP, value);
+            INTVAL c = a - b;
+            if ((c^a) >= 0 || (c^~b) >= 0) {
+                if (!dest)
+                    dest = pmc_new(INTERP, SELF->vtable->base_type);
+                VTABLE_set_integer_native(INTERP, dest, c);
+                return dest;
+            }
+            else
+                return overflow(INTERP, SELF, b, dest, MMD_SUBTRACT);
+        }
 MMD_Complex: {
-        if (dest != SELF) {
-            VTABLE_morph(INTERP, dest, enum_class_Complex);
+            INTVAL a = DYNSELF.get_integer();
+            if (dest)
+                VTABLE_morph(INTERP, dest, value->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, value->vtable->base_type);
             VTABLE_set_number_native(INTERP, dest,
-                    PMC_int_val(SELF) -
-                    VTABLE_get_number_keyed_int(INTERP, value, 0));
+                    a - VTABLE_get_number_keyed_int(INTERP, value, 0));
             VTABLE_set_number_keyed_int(INTERP, dest, 1,
-                    VTABLE_get_number_keyed_int(INTERP, value, 1));
-
+                    -VTABLE_get_number_keyed_int(INTERP, value, 1));
+            return dest;
         }
-        else {
-            internal_exception(1, "Complex: unimp sub self");
-        }
-    }
 MMD_BigInt: {
-            overflow_p(INTERP, SELF, value, dest, MMD_SUBTRACT);
-        }
-MMD_PerlUndef: {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-            "Use of uninitialized value in integer context");
-        VTABLE_set_integer_native(INTERP, dest, PMC_int_val(SELF));
-        }
-MMD_Float: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_int_val(SELF) - PMC_num_val(value));
+            return overflow_p(INTERP, SELF, value, dest, MMD_SUBTRACT);
         }
 MMD_DEFAULT: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_int_val(SELF) - VTABLE_get_number(INTERP, value));
+            if (!dest)
+                dest = pmc_new(INTERP, value->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                DYNSELF.get_integer() - VTABLE_get_number(INTERP, value));
+            return dest;
         }
     }
 
 /*
 
-=item C<void subtract_int(INTVAL value, PMC *dest)>
+=item C<PMC* subtract_int(INTVAL value, PMC *dest)>
 
 Subtracts C<value> from the integer and returns the result in C<*dest>.
 
 =cut
 
 */
-    void subtract_int (INTVAL b, PMC* dest) {
-        INTVAL a = PMC_int_val(SELF);
+    PMC* subtract_int (INTVAL b, PMC* dest) {
+        INTVAL a = DYNSELF.get_integer();
         INTVAL c = a - b;
-        if ((c^a) >= 0 || (c^~b) >= 0)
+        if ((c^a) >= 0 || (c^~b) >= 0) {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_integer_native(INTERP, dest, c);
+            return dest;
+        }
         else
-            overflow(INTERP, SELF, b, dest, MMD_SUBTRACT);
+            return overflow(INTERP, SELF, b, dest, MMD_SUBTRACT);
+    }
+
+/*
+
+=item C<void i_subtract(PMC *value)>
+
+=item C<void i_subtract_int(INTVAL value)>
+
+=item C<void i_subtract_float(FLOATVAL value)>
+
+Subtracts C<value> from C<SELF> inplace.
+
+=cut
+
+*/
+
+    void i_subtract (PMC* value) {
+MMD_Integer: {
+            SELF.i_subtract_int(VTABLE_get_integer(INTERP, value));
+        }
+MMD_Complex: {
+            INTVAL a = DYNSELF.get_integer();
+            VTABLE_morph(INTERP, SELF, value->vtable->base_type);
+            VTABLE_set_number_native(INTERP, SELF,
+                    (FLOATVAL)a -
+                    VTABLE_get_number_keyed_int(INTERP, value, 0));
+            VTABLE_set_number_keyed_int(INTERP, SELF, 1,
+                    -VTABLE_get_number_keyed_int(INTERP, value, 1));
+        }
+MMD_DEFAULT: {
+        VTABLE_set_number_native(INTERP, SELF,
+            PMC_int_val(SELF) - VTABLE_get_number(INTERP, value));
+        }
+    }
+
+    void i_subtract_int (INTVAL b) {
+        INTVAL a = DYNSELF.get_integer();
+        INTVAL c = a - b;
+        if ((c^a) >= 0 || (c^~b) >= 0) {
+            VTABLE_set_integer_native(INTERP, SELF, c);
+        }
+        else
+            overflow(INTERP, SELF, b, SELF, MMD_SUBTRACT);
+    }
+
+    void i_subtract_float (FLOATVAL value) {
+        INTVAL a = DYNSELF.get_integer();
+        VTABLE_set_number_native(INTERP, SELF, a - value);
     }
 
 /*

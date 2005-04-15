@@ -51,6 +51,17 @@ typedef void    (*mmd_f_v_ppp)(Interp *, PMC *, PMC *, PMC *);
 typedef void    (*mmd_f_v_pip)(Interp *, PMC *, INTVAL, PMC *);
 typedef void    (*mmd_f_v_pnp)(Interp *, PMC *, FLOATVAL, PMC *);
 typedef void    (*mmd_f_v_psp)(Interp *, PMC *, STRING *, PMC *);
+
+typedef PMC*    (*mmd_f_p_ppp)(Interp *, PMC *, PMC *, PMC *);
+typedef PMC*    (*mmd_f_p_pip)(Interp *, PMC *, INTVAL, PMC *);
+typedef PMC*    (*mmd_f_p_pnp)(Interp *, PMC *, FLOATVAL, PMC *);
+typedef PMC*    (*mmd_f_p_psp)(Interp *, PMC *, STRING *, PMC *);
+
+typedef void    (*mmd_f_v_pp)(Interp *, PMC *, PMC *);
+typedef void    (*mmd_f_v_pi)(Interp *, PMC *, INTVAL);
+typedef void    (*mmd_f_v_pn)(Interp *, PMC *, FLOATVAL);
+typedef void    (*mmd_f_v_ps)(Interp *, PMC *, STRING *);
+
 typedef INTVAL  (*mmd_f_i_pp) (Interp *, PMC *, PMC *);
 
 #ifndef NDEBUG
@@ -306,6 +317,182 @@ mmd_dispatch_v_psp(Interp *interpreter,
     }
     else {
         (*real_function)(interpreter, left, right, dest);
+    }
+}
+
+/*
+ * return possibly new dstination
+ */
+PMC*
+mmd_dispatch_p_ppp(Interp *interpreter,
+		 PMC *left, PMC *right, PMC *dest, INTVAL function)
+{
+    mmd_f_p_ppp real_function;
+    PMC *sub;
+    int is_pmc;
+
+    real_function = (mmd_f_p_ppp)get_mmd_dispatcher(interpreter,
+            left, right, function, &is_pmc);
+
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        return Parrot_runops_fromc_args(interpreter, sub, "PPPP",
+                left, right, dest);
+    }
+    else {
+        return (*real_function)(interpreter, left, right, dest);
+    }
+}
+
+PMC*
+mmd_dispatch_p_pip(Interp *interpreter,
+		 PMC *left, INTVAL right, PMC *dest, INTVAL function)
+{
+    mmd_f_p_pip real_function;
+    PMC *sub;
+    int is_pmc;
+    UINTVAL left_type;
+
+    left_type = left->vtable->base_type;
+    real_function = (mmd_f_p_pip)get_mmd_dispatch_type(interpreter,
+            function, left_type, enum_type_INTVAL, &is_pmc);
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        return Parrot_runops_fromc_args(interpreter, sub, "PPIP",
+                left, right, dest);
+    }
+    else {
+        return (*real_function)(interpreter, left, right, dest);
+    }
+}
+
+PMC*
+mmd_dispatch_p_pnp(Interp *interpreter,
+		 PMC *left, FLOATVAL right, PMC *dest, INTVAL function)
+{
+    mmd_f_p_pnp real_function;
+    PMC *sub;
+    int is_pmc;
+    UINTVAL left_type;
+
+    left_type = left->vtable->base_type;
+    real_function = (mmd_f_p_pnp)get_mmd_dispatch_type(interpreter,
+            function, left_type, enum_type_FLOATVAL, &is_pmc);
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        return Parrot_runops_fromc_args(interpreter, sub, "PPNP",
+                left, right, dest);
+    }
+    else {
+        return (*real_function)(interpreter, left, right, dest);
+    }
+}
+
+PMC*
+mmd_dispatch_p_psp(Interp *interpreter,
+		 PMC *left, STRING *right, PMC *dest, INTVAL function)
+{
+    mmd_f_p_psp real_function;
+    PMC *sub;
+    int is_pmc;
+    UINTVAL left_type;
+
+    left_type = left->vtable->base_type;
+    real_function = (mmd_f_p_psp)get_mmd_dispatch_type(interpreter,
+            function, left_type, enum_type_STRING, &is_pmc);
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        return Parrot_runops_fromc_args(interpreter, sub, "PPSP",
+                left, right, dest);
+    }
+    else {
+        return (*real_function)(interpreter, left, right, dest);
+    }
+}
+
+/*
+ * inplace variants
+ */
+void
+mmd_dispatch_v_pp(Interp *interpreter,
+		 PMC *left, PMC *right, INTVAL function)
+{
+    mmd_f_v_pp real_function;
+    PMC *sub;
+    int is_pmc;
+
+    real_function = (mmd_f_v_pp)get_mmd_dispatcher(interpreter,
+            left, right, function, &is_pmc);
+
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        Parrot_runops_fromc_args(interpreter, sub, "vPP", left, right);
+    }
+    else {
+        (*real_function)(interpreter, left, right);
+    }
+}
+
+void
+mmd_dispatch_v_pi(Interp *interpreter,
+		 PMC *left, INTVAL right, INTVAL function)
+{
+    mmd_f_v_pi real_function;
+    PMC *sub;
+    int is_pmc;
+    UINTVAL left_type;
+
+    left_type = left->vtable->base_type;
+    real_function = (mmd_f_v_pi)get_mmd_dispatch_type(interpreter,
+            function, left_type, enum_type_INTVAL, &is_pmc);
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        Parrot_runops_fromc_args(interpreter, sub, "vPI", left, right);
+    }
+    else {
+        (*real_function)(interpreter, left, right);
+    }
+}
+
+void
+mmd_dispatch_v_pn(Interp *interpreter,
+		 PMC *left, FLOATVAL right, INTVAL function)
+{
+    mmd_f_v_pn real_function;
+    PMC *sub;
+    int is_pmc;
+    UINTVAL left_type;
+
+    left_type = left->vtable->base_type;
+    real_function = (mmd_f_v_pn)get_mmd_dispatch_type(interpreter,
+            function, left_type, enum_type_FLOATVAL, &is_pmc);
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        Parrot_runops_fromc_args(interpreter, sub, "vPN", left, right);
+    }
+    else {
+        (*real_function)(interpreter, left, right);
+    }
+}
+
+void
+mmd_dispatch_v_ps(Interp *interpreter,
+		 PMC *left, STRING *right, INTVAL function)
+{
+    mmd_f_v_ps real_function;
+    PMC *sub;
+    int is_pmc;
+    UINTVAL left_type;
+
+    left_type = left->vtable->base_type;
+    real_function = (mmd_f_v_ps)get_mmd_dispatch_type(interpreter,
+            function, left_type, enum_type_STRING, &is_pmc);
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        Parrot_runops_fromc_args(interpreter, sub, "vPS", left, right);
+    }
+    else {
+        (*real_function)(interpreter, left, right);
     }
 }
 

@@ -375,11 +375,11 @@ result in C<dest>.
 
 /*
 
-=item C<void subtract (PMC* value, PMC* dest)>
+=item C<PMC* subtract (PMC* value, PMC* dest)>
 
-=item C<void subtract_int (INTVAL value, PMC* dest)>
+=item C<PMC* subtract_int (INTVAL value, PMC* dest)>
 
-=item C<void subtract_float (FLOATVAL value, PMC* dest)>
+=item C<PMC* subtract_float (FLOATVAL value, PMC* dest)>
 
 Subtracts C<value> from the ending offset of the match range, placing
 the result in C<dest>.
@@ -388,20 +388,24 @@ the result in C<dest>.
 
 */
 
-    void subtract (PMC* value, PMC* dest) {
+    PMC* subtract (PMC* value, PMC* dest) {
         INTVAL v = VTABLE_get_integer(INTERP, dest);
-        SELF.subtract_int(v, dest);
+        return SELF.subtract_int(v, dest);
     }
 
-    void subtract_int (INTVAL value, PMC* dest) {
-        VTABLE_morph(INTERP, dest, MatchRange_type_id);
+    PMC* subtract_int (INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, MatchRange_type_id);
+        else
+            dest = pmc_new(INTERP,  MatchRange_type_id);
         RANGE_END(dest) = RANGE_END(SELF) - value;
         if (RANGE_END(dest) <= -2 || RANGE_END(dest) < RANGE_START(dest) - 1)
             RANGE_END(dest) = -2;
+        return dest;
     }
 
-    void subtract_float (FLOATVAL value, PMC* dest) {
-        SELF.subtract_int((INTVAL) value, dest);
+    PMC* subtract_float (FLOATVAL value, PMC* dest) {
+        return SELF.subtract_int((INTVAL) value, dest);
     }
 
 /*

@@ -43,20 +43,6 @@ Sets the value of the number to the value in C<*value>.
 
 /*
 
-=item C<void set_number(PMC *value)>
-
-Morphs the integer to a C<PerlNum> and sets the value from C<*value>.
-
-=cut
-
-*/
-    void set_number (PMC* value) {
-        DYNSELF.morph(enum_class_PerlNum);
-        DYNSELF.set_number(value);
-    }
-
-/*
-
 =item C<void set_number_native(FLOATVAL value)>
 
 Morphs the integer to a C<PerlNum> and sets the value from C<value>.
@@ -69,41 +55,6 @@ Morphs the integer to a C<PerlNum> and sets the value from C<value>.
         DYNSELF.set_number_native(value);
     }
 
-/*
-
-=item C<void set_bignum(PMC *value)>
-
-=cut
-
-*/
-    void set_bignum (PMC* value) {
-        DYNSELF.morph(enum_class_BigInt);
-        DYNSELF.set_bignum(value);
-    }
-
-/*
-
-=item C<void set_bignum_native(BIGNUM *value)>
-
-=cut
-
-*/
-    void set_bignum_native (BIGNUM* value) {
-        DYNSELF.morph(enum_class_BigInt);
-        DYNSELF.set_bignum_native(value);
-    }
-
-/*
-
-=item C<void set_string (PMC *value)>
-
-=cut
-
-*/
-    void set_string (PMC* value) {
-        DYNSELF.morph(enum_class_PerlString);
-        DYNSELF.set_string(value);
-    }
 
 /*
 

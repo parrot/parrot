@@ -49,8 +49,23 @@ promote(Interp *interpreter, PMC *self, PMC *b, PMC *dest, int mmd)
     mmd_dispatch_v_ppp(interpreter, temp, b, dest, mmd);
 }
 
-pmclass PyInt extends PyObject dynpmc group python_group {
+pmclass PyInt extends PyObject extends Integer dynpmc group python_group {
 
+/*
+
+=item C<PMC *get_bignum()>
+
+Return a new PyLong PMC with the value of C<SELF>.
+
+=cut
+
+*/
+    PMC* get_bignum () {
+        INTVAL val = DYNSELF.get_integer();
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyLong);
+        VTABLE_set_integer_native(INTERP, ret, val);
+        return ret;
+    }
 /*
 
 =item C<PMC* clone()>
@@ -955,46 +970,6 @@ according to the type of C<*value>.
             DYNSELF.morph(value->vtable->base_type);
             DYNSELF.set_pmc(value);
         }
-    }
-
-/*
-
-=item C<void subtract(PMC *value, PMC *dest)>
-
-Subtracts C<*value> from the integer and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void subtract (PMC* value, PMC* dest) {
-MMD_PyInt: {
-            INTVAL pmci = PMC_int_val(SELF);
-            INTVAL vali = VTABLE_get_integer(INTERP, value);
-            VTABLE_set_integer_native(INTERP, dest, pmci - vali);
-        }
-MMD_PyFloat: {
-            INTVAL pmci = PMC_int_val(SELF);
-            FLOATVAL valf = VTABLE_get_number(INTERP, value);
-            /* XXX: Morph? */
-            VTABLE_set_number_native(INTERP, dest, pmci - valf);
-        }
-    }
-
-/*
-
-=item C<void subtract_int(INTVAL value, PMC *dest)>
-
-Subtracts C<value> from the integer and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void subtract_int (INTVAL value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            PMC_int_val(SELF) - value
-        );
     }
 
 /*

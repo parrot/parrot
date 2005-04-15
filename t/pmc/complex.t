@@ -16,7 +16,7 @@ Tests the Complex PMC.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 26;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -306,7 +306,7 @@ CODE
 2-2i
 1.8+1i
 -1024-3i
-1024-3i
+1024+3i
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "multiply");
@@ -735,3 +735,53 @@ ok 1
 ok 2
 ok 3
 OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "sub");
+.sub main @MAIN
+    .local pmc d, f, c
+    d = new Undef
+    f = new Float
+    c = new Complex
+    f = 2.2
+    c = "5+2j"
+    d = c - f
+    print d
+    print "\n"
+    typeof $S0, d
+    print $S0
+    print "\n"
+    d = f - c
+    print d
+    print "\n"
+    typeof $S0, d
+    print $S0
+    print "\n"
+.end
+CODE
+2.8+2i
+Complex
+-2.8-2i
+Complex
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "i_sub");
+.sub main @MAIN
+    .local pmc f, c
+    f = new Float
+    f = 2.2
+    c = new Complex
+    c = "5+2j"
+    c -= f
+    print c
+    print "\n"
+    c = new Complex
+    c = "5+2j"
+    f -= c
+    print f
+    print "\n"
+.end
+CODE
+2.8+2i
+-2.8-2i
+OUTPUT
+

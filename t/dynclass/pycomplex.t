@@ -17,7 +17,7 @@ Tests the Python Integer PMC.
 
 =cut
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "eq");
 
@@ -36,3 +36,32 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "eq");
 CODE
 1
 OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "sub");
+.sub main @MAIN
+    .local pmc d, i, c
+    d = new "PyObject"
+    i = new "PyInt"
+    c = new "PyComplex"
+    i = 2
+    c = "5+2j"
+    d = c - i
+    print d
+    print "\n"
+    typeof $S0, d
+    print $S0
+    print "\n"
+    d = i - c
+    print d
+    print "\n"
+    typeof $S0, d
+    print $S0
+    print "\n"
+.end
+CODE
+(3+2j)
+PyComplex
+(-3-2j)
+PyComplex
+OUTPUT
+

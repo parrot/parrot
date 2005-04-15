@@ -151,7 +151,7 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<void subtract(PMC *value, PMC *dest)>
+=item C<PMC* subtract(PMC *value, PMC *dest)>
 
 Subtracts C<*value> from the string and returns the result in C<*dest>.
 
@@ -159,18 +159,20 @@ Subtracts C<*value> from the string and returns the result in C<*dest>.
 
 */
 
-    void subtract (PMC* value, PMC* dest) {
+    PMC* subtract (PMC* value, PMC* dest) {
 MMD_PerlString: {
             /* work around MMD setup bug */
 	     VTABLE_set_number_native(INTERP, dest,
 		     VTABLE_get_number(INTERP, SELF) -
 		     VTABLE_get_number(INTERP, value));
+            return dest;        /* XXX */
         }
 MMD_PerlNum: {
 	     VTABLE_set_number_native(INTERP, dest,
 		     VTABLE_get_number(INTERP, SELF) -
 		     PMC_num_val(value)
 		     );
+            return dest;        /* XXX */
 	 }
 MMD_DEFAULT: {
 	     FLOATVAL pmcf, valf;
@@ -185,6 +187,7 @@ MMD_DEFAULT: {
 		 VTABLE_set_integer_native(INTERP, dest, pmci - vali);
 	     else
 		 VTABLE_set_number_native(INTERP, dest, pmcf - valf);
+            return dest;        /* XXX */
 	 }
     }
 

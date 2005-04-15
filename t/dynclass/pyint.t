@@ -16,7 +16,7 @@ Tests the Python Integer PMC.
 
 =cut
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "abs");
 
@@ -471,7 +471,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "pow");
 
     set $P0, 31
     set $P1, 2
-    set $P2, -1 
+    set $P2, -1
 
     new $P3, $I0
     $P3 = $P0 ** $P1
@@ -615,4 +615,35 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "xor");
 .end
 CODE
 -20 -20 -20
+OUTPUT
+
+pir_output_like(<< 'CODE', << 'OUTPUT', "sub - propagate to PyLong");
+.sub main @MAIN
+    .include "sysinfo.pasm"
+    .local pmc d, l, r
+    .local int b, i
+    d = new "PyObject"
+    l = new "PyInt"
+    r = new "PyInt"
+    b = sysinfo .SYSINFO_PARROT_INTSIZE
+    b *= 8  # CHAR_BITS
+    dec b
+    i = 1 << b
+    dec i   # sys.maxint
+    print i
+    print "\n"
+    r = i
+    neg i
+    l = i
+    d = l - r
+    print d
+    print "\n"
+    typeof $S0, d
+    print $S0
+    print "\n"
+.end
+CODE
+/^\d+
+-\d+
+PyLong/
 OUTPUT

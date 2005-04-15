@@ -329,6 +329,35 @@ is_op(Interp *interpreter, char *name)
         || Parrot_is_builtin(interpreter, name, NULL) >= 0;
 }
 
+/* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
+static char *
+to_infix(Interp *interpreter, char *name, SymReg **r, int *n)
+{
+    SymReg *mmd;
+    char buf[10];
+
+    assert(*n >= 2);
+    if (r[0]->set != 'P')
+        return name;
+    if (*n == 3 && r[0] == r[1]) {       /* cvt to inplace */
+        sprintf(buf, "%d", MMD_I_SUBTRACT);  /* XXX */
+        mmd = mk_const(interpreter, str_dup(buf), 'I');
+    }
+    else {
+        int i;
+        for (i = *n; i > 0; --i)
+            r[i] = r[i - 1];
+        if (*n == 2)
+            sprintf(buf, "%d", MMD_I_SUBTRACT);  /* XXX */
+        else
+            sprintf(buf, "%d", MMD_SUBTRACT);  /* XXX */
+        mmd = mk_const(interpreter, str_dup(buf), 'I');
+        (*n)++;
+    }
+    r[0] = mmd;
+    return "infix";
+}
+
 /* make a instruction
  * name ... op name
  * fmt ... optional format
@@ -351,6 +380,12 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     op_info_t * op_info;
     char format[128];
     int len;
+
+    if (strcmp(name, "sub") == 0) {     /* XXX is_infix */
+        /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
+        name = to_infix(interpreter, name, r, &n);
+    }
+
 
 #if 1
     ins = multi_keyed(interpreter, unit, name, r, n, keyvec, emit);

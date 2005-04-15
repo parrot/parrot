@@ -610,11 +610,11 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<void subtract (PMC* value, PMC* dest)>
+=item C<PMC* subtract (PMC* value, PMC* dest)>
 
-=item C<void subtract_int (INTVAL value, PMC* dest)>
+=item C<PMC* subtract_int (INTVAL value, PMC* dest)>
 
-=item C<void subtract_float (FLOATVAL value, PMC* dest)>
+=item C<PMC* subtract_float (FLOATVAL value, PMC* dest)>
 
 Subtracts C<value> from the complex number, placing the result in C<dest>.
 
@@ -622,31 +622,67 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 
 */
 
-    void subtract (PMC* value, PMC* dest) {
+    PMC* subtract (PMC* value, PMC* dest) {
 MMD_Complex: {
-        VTABLE_morph(INTERP, dest, enum_class_Complex);
+        if (dest)
+            VTABLE_morph(INTERP, dest, enum_class_Complex);
+        else {
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        }
         RE(dest) = RE(SELF) - RE(value);
         IM(dest) = IM(SELF) - IM(value);
-        }
+        return dest;
+    }
 MMD_DEFAULT: {
-        VTABLE_morph(INTERP, dest, enum_class_Complex);
+        if (dest)
+            VTABLE_morph(INTERP, dest, enum_class_Complex);
+        else {
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        }
         RE(dest) = RE(SELF) - VTABLE_get_number(INTERP, value);
         IM(dest) = IM(SELF);
+        return dest;
+    }
+    }
+
+    PMC* subtract_int (INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, enum_class_Complex);
+        else {
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        }
+        RE(dest) = RE(SELF) - value;
+        IM(dest) = IM(SELF);
+        return dest;
+    }
+
+    PMC* subtract_float (FLOATVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, enum_class_Complex);
+        else {
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        }
+        RE(dest) = RE(SELF) - value;
+        IM(dest) = IM(SELF);
+        return dest;
+    }
+
+    void i_subtract (PMC* value) {
+MMD_Complex: {
+            RE(SELF) -= RE(value);
+            IM(SELF) -= IM(value);
+        }
+MMD_DEFAULT: {
+            RE(SELF) -= VTABLE_get_number(INTERP, value);
         }
     }
 
-    void subtract_int (INTVAL value, PMC* dest) {
-        VTABLE_morph(INTERP, dest, enum_class_Complex);
-        RE(dest) = RE(SELF) - value;
-        IM(dest) = IM(SELF);
+    void i_subtract_int (INTVAL value) {
+        RE(SELF) -= (FLOATVAL)value;
     }
-
-    void subtract_float (FLOATVAL value, PMC* dest) {
-        VTABLE_morph(INTERP, dest, enum_class_Complex);
-        RE(dest) = RE(SELF) - value;
-        IM(dest) = IM(SELF);
+    void i_subtract_float (FLOATVAL value) {
+        RE(SELF) -= value;
     }
-
 /*
 
 =item C<void multiply (PMC* value, PMC* dest)>

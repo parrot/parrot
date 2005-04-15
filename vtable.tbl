@@ -48,7 +48,7 @@ FLOATVAL get_number_keyed(PMC* key)
 FLOATVAL get_number_keyed_int(INTVAL key)
 FLOATVAL get_number_keyed_str(STRING* key)
 
-BIGNUM* get_bignum()
+PMC* get_bignum()
 
 STRING* get_string()
 STRING* get_repr()
@@ -57,9 +57,6 @@ STRING* get_string_keyed_int(INTVAL key)
 STRING* get_string_keyed_str(STRING* key)
 
 INTVAL get_bool()
-INTVAL get_bool_keyed(PMC* key)
-INTVAL get_bool_keyed_int(INTVAL key)
-INTVAL get_bool_keyed_str(STRING* key)
 
 PMC* get_pmc()
 PMC* get_pmc_keyed(PMC* key)
@@ -85,8 +82,9 @@ void set_number_keyed(PMC* key, FLOATVAL value)
 void set_number_keyed_int(INTVAL key, FLOATVAL value)
 void set_number_keyed_str(STRING* key, FLOATVAL value)
 
-void set_bignum_native(BIGNUM* value)
-void set_bignum_same(PMC* value)
+void set_bignum_int(INTVAL value)
+void set_bignum_num(FLOATVAL value)
+void set_bignum_str(STRING* value)
 
 void set_string_native(STRING* value)
 void assign_string_native(STRING* value)
@@ -96,9 +94,6 @@ void set_string_keyed_int(INTVAL key, STRING* value)
 void set_string_keyed_str(STRING* key, STRING* value)
 
 void set_bool(INTVAL value)
-void set_bool_keyed(PMC* key, INTVAL value)
-void set_bool_keyed_int(INTVAL key, INTVAL value)
-void set_bool_keyed_str(STRING* key, INTVAL value)
 
 void set_pmc(PMC* value)
 void assign_pmc(PMC* value)
@@ -148,9 +143,15 @@ void add(PMC* value, PMC* dest)             MMD_ADD
 void add_int(INTVAL value, PMC* dest)       MMD_ADD_INT
 void add_float(FLOATVAL value, PMC* dest)   MMD_ADD_FLOAT
 
-void subtract(PMC* value, PMC* dest)        MMD_SUBTRACT
-void subtract_int(INTVAL value, PMC* dest)  MMD_SUBTRACT_INT
-void subtract_float(FLOATVAL value, PMC* dest)  MMD_SUBTRACT_FLOAT
+# one for a test first
+PMC* subtract(PMC* value, PMC* dest)        MMD_SUBTRACT
+PMC* subtract_int(INTVAL value, PMC* dest)  MMD_SUBTRACT_INT
+PMC* subtract_float(FLOATVAL value, PMC* dest)  MMD_SUBTRACT_FLOAT
+
+# and inplace
+void i_subtract(PMC* value)                 MMD_I_SUBTRACT
+void i_subtract_int(INTVAL value)           MMD_I_SUBTRACT_INT
+void i_subtract_float(FLOATVAL value)       MMD_I_SUBTRACT_FLOAT
 
 void multiply(PMC* value, PMC* dest)        MMD_MULTIPLY
 void multiply_int(INTVAL value, PMC* dest)  MMD_MULTIPLY_INT

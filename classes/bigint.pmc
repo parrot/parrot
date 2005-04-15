@@ -115,7 +115,6 @@ bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
 static void
 bigint_sub_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_sub(BN(dest), BN(self), BN(value));
 }
 
@@ -123,7 +122,6 @@ static void
 bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
         PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_sub_ui(BN(dest), BN(self), (long)value);
 }
 static void
@@ -521,16 +519,16 @@ Returns the value of the integer.
 
 /*
 
-=item C<BIGNUM* get_bignum()>
+=item C<PMC* get_bignum()>
 
-Returns the BIGNUM.
+Returns SELF
 
 =cut
 
 */
 
-    BIGNUM* get_bignum() {
-        return bigint_get_self(INTERP, SELF);
+    PMC* get_bignum() {
+        return SELF;
     }
 
 /*
@@ -623,24 +621,60 @@ MMD_DEFAULT: {
              }
     }
 
-    void subtract(PMC* value, PMC* dest) {
+    PMC* subtract(PMC* value, PMC* dest) {
 MMD_BigInt: {
+                if (dest)
+                    VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                else
+                    dest = pmc_new(INTERP, SELF->vtable->base_type);
                 bigint_sub_bigint(INTERP, SELF, value, dest);
+                return dest;
             }
 MMD_Integer: {
+                if (dest)
+                    VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+                else
+                    dest = pmc_new(INTERP, SELF->vtable->base_type);
                 bigint_sub_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+                return dest;
             }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp sub");
+                internal_exception(1, "unimp sub");
+                return dest;
              }
+    }
+
+    PMC* subtract_int(INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        bigint_sub_bigint_int(INTERP, SELF, value, dest);
+        return dest;
+    }
+
+    void i_subtract (PMC* value) {
+MMD_BigInt: {
+                bigint_sub_bigint(INTERP, SELF, value, SELF);
+            }
+MMD_Integer: {
+                bigint_sub_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
+             }
+MMD_DEFAULT: {
+                internal_exception(1, "unimp sub");
+             }
+    }
+
+    void i_subtract_int (INTVAL value) {
+        bigint_sub_bigint_int(INTERP, SELF, value, SELF);
+    }
+
+    void i_subtract_float (FLOATVAL value) {
+        internal_exception(1, "unimp sub");
     }
 
     void add_int(INTVAL value, PMC* dest) {
         bigint_add_bigint_int(INTERP, SELF, value, dest);
-    }
-
-    void subtract_int(INTVAL value, PMC* dest) {
-        bigint_sub_bigint_int(INTERP, SELF, value, dest);
     }
 
 

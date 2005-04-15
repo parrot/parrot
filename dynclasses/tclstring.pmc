@@ -68,13 +68,9 @@ pmclass TclString extends TclObject dynpmc group tcl_group {
         return string_to_num(INTERP, s);
     }
 
-    BIGNUM* get_bignum () {
-	/* XXX */
-        return NULL;
-    }
 
     INTVAL get_bool () {
- 
+
         STRING* s = (STRING*) PMC_str_val(SELF);
         if (!string_compare(INTERP,s,true)) {
           return 1;

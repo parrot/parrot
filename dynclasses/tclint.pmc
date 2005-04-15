@@ -17,7 +17,7 @@ static INTVAL dynclass_TclString;
 static INTVAL dynclass_TclFloat;
 static INTVAL dynclass_TclInt;
 
-pmclass TclInt extends TclObject dynpmc group tcl_group {
+pmclass TclInt extends TclObject extends Integer dynpmc group tcl_group {
 
     void class_init() {
       if (pass) {
@@ -49,14 +49,10 @@ pmclass TclInt extends TclObject dynpmc group tcl_group {
         return (FLOATVAL)PMC_int_val(SELF);
     }
 
-    BIGNUM* get_bignum () {
-        /* XXX */
-        return NULL;
-    }
 
     INTVAL get_bool() {
       return (PMC_int_val(SELF))?1:0;
-    } 
+    }
 
     STRING* get_string () {
         return string_from_int(INTERP, PMC_int_val(SELF));
@@ -74,16 +70,6 @@ pmclass TclInt extends TclObject dynpmc group tcl_group {
     void set_number_native (FLOATVAL value) {
         DYNSELF.morph(dynclass_TclFloat);
         DYNSELF.set_number_native(value);
-    }
-
-    void set_bignum (PMC* value) {
-	/* XXX */
-        PMC_struct_val(SELF) = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
-    }
-
-    void set_bignum_native (BIGNUM* value) {
-        /* XXX */
-        PMC_struct_val(SELF) = value; /* Maybe we need a copy */
     }
 
     void set_string (PMC* value) {
@@ -122,41 +108,6 @@ pmclass TclInt extends TclObject dynpmc group tcl_group {
             return;
 
         }
-    }
-
-    void subtract (PMC* value, PMC* dest) {
-        INTVAL pmci;
-        int vtype = VTABLE_type(INTERP, value);
-        FLOATVAL valf;
-        FLOATVAL diff;
-
-        pmci = PMC_int_val(SELF);
-        valf = VTABLE_get_number(INTERP, value);
-        diff = pmci - valf;
-
-        if (vtype == dynclass_TclFloat) {
-            VTABLE_set_number_native(INTERP, dest, diff);
-            return;
-        }
-
-        {
-            INTVAL vali = (INTVAL) valf;
-            INTVAL   difi = pmci - vali;
-            if (diff == difi)
-                VTABLE_set_integer_native(INTERP, dest, difi);
-            else {
-                /* TODO BIG* promotion */
-                VTABLE_set_number_native(INTERP, dest, diff);
-            }
-            return;
-
-        }
-    }
-
-    void subtract_int (INTVAL value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            PMC_int_val(SELF) - value
-        );
     }
 
     void multiply (PMC* value, PMC* dest) {

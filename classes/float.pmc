@@ -279,52 +279,88 @@ Adds C<value> to the number and returns the result in C<*dest>.
 
 /*
 
-=item C<void subtract(PMC *value, PMC *dest)>
+=item C<PMC* subtract(PMC *value, PMC *dest)>
 
-Subtracts C<*value> from the number and returns the result in C<*dest>.
+=item C<PMC* subtract_int(INTVAL value, PMC *dest)>
+
+=item C<PMC* subtract_float(FLOATVAL value, PMC *dest)>
+
+Subtracts C<value> from the number and returns the result in C<*dest>.
+If C<dest> doesn't exist a new C<Float> is created.
+
+=item C<void i_subtract(PMC *value)>
+
+=item C<void i_subtract_int(INTVAL value)>
+
+=item C<void i_subtract_float(FLOATVAL value)>
+
+Subtracts C<value> from C<SELF> inplace.
 
 =cut
 
 */
 
-    void subtract (PMC* value, PMC* dest) {
-MMD_Float: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) - PMC_num_val(value));
+    PMC* subtract (PMC* value, PMC* dest) {
+MMD_Complex: {
+            FLOATVAL a = DYNSELF.get_number();
+            if (dest)
+                VTABLE_morph(INTERP, dest, value->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, value->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                    a - VTABLE_get_number_keyed_int(INTERP, value, 0));
+            VTABLE_set_number_keyed_int(INTERP, dest, 1,
+                    -VTABLE_get_number_keyed_int(INTERP, value, 1));
+            return dest;
         }
 MMD_DEFAULT: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) - VTABLE_get_number(INTERP, value));
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest,
+                    DYNSELF.get_number() - VTABLE_get_number(INTERP, value));
+            return dest;
         }
     }
 
-/*
-
-=item C<void subtract_int(INTVAL value, PMC *dest)>
-
-Subtracts C<value> from the number and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void subtract_int (INTVAL value, PMC* dest) {
+    PMC* subtract_int (INTVAL value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) - (FLOATVAL)value);
+                DYNSELF.get_number() - (FLOATVAL)value);
+        return dest;
     }
-/*
 
-=item C<void subtract_float(FLOATVAL value, PMC *dest)>
-
-Subtracts C<value> from the number and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void subtract_float (FLOATVAL value, PMC* dest) {
+    PMC* subtract_float (FLOATVAL value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) - value);
+                DYNSELF.get_number() - value);
+        return dest;
+    }
+
+    void i_subtract (PMC* value) {
+MMD_Complex: {
+            FLOATVAL a = DYNSELF.get_number();
+            VTABLE_morph(INTERP, SELF, value->vtable->base_type);
+            VTABLE_set_number_native(INTERP, SELF,
+                    a - VTABLE_get_number_keyed_int(INTERP, value, 0));
+            VTABLE_set_number_keyed_int(INTERP, SELF, 1,
+                    -VTABLE_get_number_keyed_int(INTERP, value, 1));
+        }
+MMD_DEFAULT: {
+            VTABLE_set_number_native(INTERP, SELF,
+                DYNSELF.get_number() - VTABLE_get_number(INTERP, value));
+        }
+    }
+
+    void i_subtract_int (INTVAL value) {
+        VTABLE_set_number_native(INTERP, SELF,
+            DYNSELF.get_number() - (FLOATVAL)value);
+    }
+
+    void i_subtract_float (FLOATVAL value) {
+        VTABLE_set_number_native(INTERP, SELF,
+            DYNSELF.get_number() - value);
     }
 
 /*

@@ -63,6 +63,17 @@ v	JPPP	 # infix MMD
 v	JPIP
 v	JPSP
 v	JPNP
+
+v	JPP	 # inplace infix MMD
+v	JPI
+v	JPS
+v	JPN
+
+P	JPPP	 # infix MMD new
+P	JPIP
+P	JPSP
+P	JPNP
+
 I	JPP      # MMD compare
 
 f                # t/pmc/nci.t
@@ -213,7 +224,6 @@ i	JPt
 # Py_func signatures
 P	JP
 P	JPP
-P	JPPP
 P	JO
 S	JO
 i       P

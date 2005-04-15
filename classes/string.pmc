@@ -123,18 +123,19 @@ Returns the floating-point representation of the string.
 
 /*
 
-=item C<BIGNUM* get_bignum()>
+=item C<PMC* get_bignum()>
 
 Returns the big numbers representation of the string.
-(unimplemented, returns NULL)
 
 =cut
 
 */
 
-    BIGNUM* get_bignum () {
-        /* XXX */
-        return (BIGNUM*)0;
+    PMC* get_bignum () {
+	STRING *s = DYNSELF.get_string();
+        PMC *ret = pmc_new(INTERP, enum_class_BigInt);
+        VTABLE_set_string_native(INTERP, ret, s);
+        return ret;
     }
 
 /*
@@ -194,20 +195,6 @@ Sets the value of the string to the floating-point C<value>.
         PMC_str_val(SELF) = string_from_num(INTERP, value);
     }
 
-/*
-
-=item C<VOID set_bignum_native(BIGNUM* value)>
-
-Sets the value of the string to the big number C<value>.
-(unimplemented, no-op)
-
-=cut
-
-*/
-
-    void set_bignum_native (BIGNUM* value) {
-        /* XXX */
-    }
 
 /*
 

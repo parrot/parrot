@@ -42,7 +42,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "inherited add");
     $P0 = loadlib "foo"
     print "ok\n"
     l = new "Foo"
-    l = 3
+    l = 42
     r = new BigInt
     r = 0x7ffffff
     d = new Undef
@@ -55,7 +55,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "inherited add");
 .end
 CODE
 ok
-134217730
+134217769
 BigInt
 OUTPUT
 
