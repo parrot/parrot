@@ -58,6 +58,7 @@ d                # t/pmc/nci.t
 d	d
 d	JOd      # Parrot builtins
 d	v
+I	JI	 # Parrot_is_char_*
 
 v	JPPP	 # infix MMD
 v	JPIP

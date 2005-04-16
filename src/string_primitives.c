@@ -596,6 +596,15 @@ Parrot_char_is_punct(Interp *interpreter, UINTVAL character)
 =item C<INTVAL
 Parrot_char_is_space(Interp *interpreter, UINTVAL character)>
 
+=item C<INTVAL
+Parrot_char_is_UWhiteSpace(Interp *interpreter, UINTVAL character)>
+
+=item C<INTVAL
+Parrot_char_is_Whitespace(Interp *interpreter, UINTVAL character)>
+
+=item C<INTVAL
+Parrot_char_is_JavaSpaceChar(Interp *interpreter, UINTVAL character)>
+
 Returns whether the specified character is a space character.
 
 =cut
@@ -607,6 +616,36 @@ Parrot_char_is_space(Interp *interpreter, UINTVAL character)
 {
 #if PARROT_HAS_ICU
     return u_isspace(character);
+#else
+    return isspace(character);
+#endif
+}
+
+INTVAL
+Parrot_char_is_UWhiteSpace(Interp *interpreter, UINTVAL character)
+{
+#if PARROT_HAS_ICU
+    return u_isUWhiteSpace(character);
+#else
+    return isspace(character);
+#endif
+}
+
+INTVAL
+Parrot_char_is_Whitespace(Interp *interpreter, UINTVAL character)
+{
+#if PARROT_HAS_ICU
+    return u_isWhitespace(character);
+#else
+    return isspace(character);
+#endif
+}
+
+INTVAL
+Parrot_char_is_JavaSpaceChar(Interp *interpreter, UINTVAL character)
+{
+#if PARROT_HAS_ICU
+    return u_isJavaSpaceChar(character);
 #else
     return isspace(character);
 #endif

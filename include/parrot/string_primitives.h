@@ -43,7 +43,10 @@ INTVAL Parrot_char_is_lower(Interp *interpreter, UINTVAL character);
 INTVAL Parrot_char_is_print(Interp *interpreter, UINTVAL character);
 INTVAL Parrot_char_is_punct(Interp *interpreter, UINTVAL character);
 INTVAL Parrot_char_is_space(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_UWhiteSpace(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_Whitespace(Interp *interpreter, UINTVAL character);
 INTVAL Parrot_char_is_upper(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_JavaSpaceChar(Interp *interpreter, UINTVAL character);
 INTVAL Parrot_char_is_xdigit(Interp *interpreter, UINTVAL character);
 
 #endif /* PARROT_IN_CORE */
