@@ -34,7 +34,7 @@ ok 3
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "charset name" );
-    set S0, ascii:"ok 1\n"
+    set S0, "ok 1\n"
     charset I0, S0
     charsetname S1, I0
     print S1
@@ -66,7 +66,7 @@ CODE
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "downcase" );
-    set S0, "AEIOU_ÄÖÜ\n"
+    set S0, iso-8859-1:"AEIOU_ÄÖÜ\n"
     downcase S1, S0
     print S1
     end
@@ -75,7 +75,7 @@ aeiou_äöü
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "upcase" );
-    set S0, "aeiou_äöüß\n"
+    set S0, iso-8859-1:"aeiou_äöüß\n"
     upcase S1, S0
     print S1
     end
@@ -84,7 +84,7 @@ AEIOU_ÄÖÜß
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "titlecase" );
-    set S0, "zAEIOU_ÄÖÜ\n"
+    set S0, iso-8859-1:"zAEIOU_ÄÖÜ\n"
     titlecase S1, S0
     print S1
     end
@@ -93,7 +93,7 @@ Zaeiou_äöü
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "is_whitespace");
-    set S0, "a\t\n \xa0"
+    set S0, iso-8859-1:"a\t\n \xa0"
     is_whitespace I0, S0, 0
     is_whitespace I1, S0, 1
     is_whitespace I2, S0, 2
@@ -248,7 +248,7 @@ OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i");
     set S0, "abc"
-    find_charset I0, "ascii"
+    find_charset I0, "iso-8859-1"
     trans_charset S1, S0, I0
     print S1
     print "\n"
@@ -259,12 +259,12 @@ output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i");
     end
 CODE
 abc
-ascii
+iso-8859-1
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i");
     set S1, "abc"
-    find_charset I0, "ascii"
+    find_charset I0, "iso-8859-1"
     trans_charset S1, I0
     print S1
     print "\n"
@@ -275,12 +275,12 @@ output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i");
     end
 CODE
 abc
-ascii
+iso-8859-1
 OUTPUT
 
 
 output_like( <<'CODE', <<OUTPUT, "trans_charset_s_i - lossy");
-    set S1, "abcä"
+    set S1, iso-8859-1:"abcä"
     find_charset I0, "ascii"
     trans_charset S1, I0
     print "never\n"
@@ -306,7 +306,7 @@ ascii
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to binary");
-    set S0, "abc"
+    set S0, iso-8859-1:"abc"
     find_charset I0, "binary"
     trans_charset S1, S0, I0
     print S1
@@ -322,7 +322,7 @@ binary
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i iso-8859-1 to binary");
-    set S1, "abc"
+    set S1, iso-8859-1:"abc"
     find_charset I0, "binary"
     trans_charset S1, I0
     print S1
@@ -402,7 +402,7 @@ iso-8859-1
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to unicode");
-    set S0, "abc_ä_"
+    set S0, iso-8859-1:"abc_ä_"
     find_charset I0, "unicode"
     trans_charset S1, S0, I0
     print S1

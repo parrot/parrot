@@ -80,7 +80,7 @@ check_set_std_props(Interp* interpreter, PMC *pmc, STRING *key, PMC *value)
      */
     static STRING *ro;
     if (!ro)
-        ro = string_make(interpreter, "_ro", 3, "iso-8859-1",
+        ro = string_make(interpreter, "_ro", 3, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
     if (!string_compare(interpreter, key, ro)) {
 #else

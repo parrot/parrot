@@ -548,10 +548,8 @@ IMCC_string_from_reg(Interp *interpreter, SymReg *r)
     char *buf = r->name;
     STRING *s = NULL;
     char *charset = NULL;
-    /*
-     * VT_UNICODE should better be VT_CHARSET
-     */
-    if (r->type & VT_UNICODE) {
+
+    if (r->type & VT_ENCODED) {
         char *p;
         p = strchr(r->name, ':');
         assert(p);
@@ -566,7 +564,7 @@ IMCC_string_from_reg(Interp *interpreter, SymReg *r)
     }
     else if (*buf == '\'') {   /* TODO handle python raw strings */
         buf++;
-        s = string_make(interpreter, buf, strlen(buf) - 1, "iso-8859-1",
+        s = string_make(interpreter, buf, strlen(buf) - 1, "ascii",
                 PObj_constant_FLAG);
     }
     else {

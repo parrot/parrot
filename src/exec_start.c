@@ -68,7 +68,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
-                                  "iso-8859-1", PObj_external_FLAG);
+                                  NULL, PObj_external_FLAG);
 
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
             PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);

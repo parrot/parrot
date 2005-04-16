@@ -514,13 +514,13 @@ $put_pointer
       see which signature has an unknown type. I am sure someone can come up
       with a neater way to do this.
      */
-    ns = string_make(interpreter, " is an unknown signature type", 29, "iso-8859-1", 0);
+    ns = string_make(interpreter, " is an unknown signature type", 29, "ascii", 0);
     message = string_concat(interpreter, signature, ns, 0);
 
 #if defined(CAN_BUILD_CALL_FRAMES)
-    ns = string_make(interpreter, ".\\nCAN_BUILD_CALL_FRAMES is enabled, this should not happen", 58, "iso-8859-1", 0);
+    ns = string_make(interpreter, ".\\nCAN_BUILD_CALL_FRAMES is enabled, this should not happen", 58, "ascii", 0);
 #else
-    ns = string_make(interpreter, ".\\nCAN_BUILD_CALL_FRAMES is disabled, add the signature to src/call_list.txt", 75, "iso-8859-1", 0);
+    ns = string_make(interpreter, ".\\nCAN_BUILD_CALL_FRAMES is disabled, add the signature to src/call_list.txt", 75, "ascii", 0);
 #endif
     message = string_concat(interpreter, message, ns, 0);
 

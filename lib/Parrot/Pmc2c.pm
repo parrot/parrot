@@ -854,13 +854,13 @@ EOC
         $cout .= <<"EOC";
             vt_clone->base_type = entry;
             vt_clone->whoami = string_make(interp,
-                "$classname", @{[length($classname)]}, "iso-8859-1",
+                "$classname", @{[length($classname)]}, "ascii",
                 PObj_constant_FLAG|PObj_external_FLAG);
             vt_clone->isa_str = string_make(interp,
-                "$isa", @{[length($isa)]}, "iso-8859-1",
+                "$isa", @{[length($isa)]}, "ascii",
                 PObj_constant_FLAG|PObj_external_FLAG);
             vt_clone->does_str = string_make(interp,
-                "$does", @{[length($does)]}, "iso-8859-1",
+                "$does", @{[length($does)]}, "ascii",
                 PObj_constant_FLAG|PObj_external_FLAG);
 EOC
     }

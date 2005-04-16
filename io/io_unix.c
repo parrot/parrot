@@ -662,7 +662,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     sa.sin_port = htons(port);
 
     return string_make(interpreter, &sa, sizeof(struct sockaddr),
-            "iso-8859-1", 0);
+            "binary", 0);
 }
 
 
@@ -934,7 +934,7 @@ AGAIN:
         else {
             close(io->fd);
         }
-        *s = string_make(interpreter, buf, bytesread, "iso-8859-1", 0);
+        *s = string_make(interpreter, buf, bytesread, "binary", 0);
         if (!*s) {
             PANIC("PIO_recv: Failed to allocate string");
         }

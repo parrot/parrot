@@ -87,7 +87,7 @@ Parrot_vsprintf_c(Interp *interpreter, const char *pat,
     STRING *realpat, *ret;
 
     realpat = string_make(interpreter, pat, strlen(pat),
-                                  "iso-8859-1", PObj_external_FLAG);
+                                  NULL, PObj_external_FLAG);
 
     ret = Parrot_vsprintf_s(interpreter, realpat, args);
 

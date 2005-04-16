@@ -83,16 +83,23 @@ A local B<identifier> or a B<reg> or a constant (when allowed).
 =item "string constants"
 
 Are delimited by B<">. A B<"> inside a string must be escaped by
-B<\">.
+B<\">.  Only 7-bit ASCII is accepted in string constants; to use
+characters outside thar range, specify an encoding in the way below.
 
 =item charset:"string constant"
 
-Like above with a charset attached to the string. Valid charset are
-currently: C<ascii>, C<binary>, and the default C<iso-8859-1>.
+Like above with a chracter set attached to the string. Valid character
+sets are currently: C<ascii> (the default), C<binary>, C<unicode>
+(with UTF-8 as the default encoding), and C<iso-8859-1>.
+
+=item charset:encoding:"string constant"
+
+Like above with an extra encoding attached to the string.
+Currently unimplemented.
 
 =item 'char constant'
 
-Are delimited by B<'>.
+Are delimited by B<'>. They are taken to be C<ascii> encoded.
 
 =item numeric constants
 

@@ -152,7 +152,7 @@ parse_string(Interp *interpreter,
             str++;
     }
 
-    *strP = string_make(interpreter, string, str - string, "iso-8859-1", 0);
+    *strP = string_make(interpreter, string, str - string, NULL, 0);
 
     if (*str)
         str++;
@@ -685,7 +685,7 @@ WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
             str[i - 1] = command[i];
         str[i - 1] = '\0';
         condition->value = string_make(interpreter,
-            str, i - 1, "iso-8859-1", PObj_external_FLAG);
+            str, i - 1, NULL, PObj_external_FLAG);
         condition->type |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_pmc) {
@@ -892,7 +892,7 @@ PDB_init(Interp *interpreter, const char *command)
         c[i] = '\0';
         na(command);
 
-        arg = string_make(interpreter, c, i, "iso-8859-1", 0);
+        arg = string_make(interpreter, c, i, NULL, 0);
         VTABLE_push_string(interpreter, userargv, arg);
     }
 
@@ -2952,7 +2952,7 @@ PDB_backtrace(Interp *interpreter)
 	    interpreter->ctx.current_pc - PMC_sub(sub)->address
 	);
     }
-    
+
     sub = interpinfo_p(interpreter, CURRENT_CONT);
     while (!PMC_IS_NULL(sub) && sub->vtable->base_type == enum_class_Continuation) {
 	str = VTABLE_get_string(interpreter, sub);

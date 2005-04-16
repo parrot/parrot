@@ -227,7 +227,7 @@ debug_file(Interp *interpreter, STRING *file, const char *ext)
     STRING *ret;
     ret = string_copy(interpreter, file);
     ret = string_append(interpreter, ret,
-            string_make(interpreter, ext, strlen(ext), "iso-8859-1",
+            string_make(interpreter, ext, strlen(ext), NULL,
                 PObj_external_FLAG),
             0);
     return ret;
@@ -258,7 +258,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     if (interpreter->code->cur_cs->debugs) {
         char *ext;
         char *src = interpreter->code->cur_cs->debugs->filename;
-        pasmfile = string_make(interpreter, src, strlen(src), "iso-8859-1",
+        pasmfile = string_make(interpreter, src, strlen(src), NULL,
                 PObj_external_FLAG);
         file = string_copy(interpreter, pasmfile);
         /* chop pasm/imc */
@@ -270,7 +270,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
             file = string_chopn(interpreter, file, 3);
         else if (!ext) /* EVAL_n */
             file = string_append(interpreter, file,
-                    string_make(interpreter, ".", 1, "iso-8859-1", PObj_external_FLAG),
+                    string_make(interpreter, ".", 1, NULL, PObj_external_FLAG),
                     0);
     }
     else {

@@ -342,7 +342,7 @@ _mk_const(SymReg *hsh[], char * name, int t)
     if (t == 'U') {
         /* charset:"string" */
         r->set = 'S';
-        r->type |= VT_UNICODE;
+        r->type |= VT_ENCODED;
     }
     r->use_count++;
     return r;

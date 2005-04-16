@@ -54,13 +54,13 @@ inline op err(out INT) {
 
 op err(out STR) {
   const char *tmp = strerror(errno);
-  $1 = string_make(interpreter, tmp, strlen(tmp), "iso-8859-1", 0);
+  $1 = string_make(interpreter, tmp, strlen(tmp), "ascii", 0);
   goto NEXT();
 }
 
 op err(out STR, in INT) {
   const char *tmp = strerror($2);
-  $1 = string_make(interpreter, tmp, strlen(tmp), "iso-8859-1", 0);
+  $1 = string_make(interpreter, tmp, strlen(tmp), "ascii", 0);
   goto NEXT();
 }
 

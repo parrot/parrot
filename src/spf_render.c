@@ -66,7 +66,7 @@ uint_to_str(Interp *interpreter,
     } while (num /= base);
     if (minus)
         *--p = '-';
-    return string_make(interpreter, p, tail - p, "iso-8859-1", 0);
+    return string_make(interpreter, p, tail - p, "ascii", 0);
 }
 
 /*
@@ -696,7 +696,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             if (obj->getstring == pmc_core.getstring) {
                                 PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
                                     ((PMC *)obj->data), (obj->index));
-                               
+
                                 obj->index++;
                                 string = (VTABLE_get_repr(interpreter, tmp));
 

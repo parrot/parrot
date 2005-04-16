@@ -327,7 +327,7 @@ inline op pack(inout STR, in INT, in INT) :base_core {
     char *c = (char *)&$3;
     STRING *s;
 
-    s = string_make(interpreter, c, (UINTVAL)$2, "iso-8859-1", 0);
+    s = string_make(interpreter, c, (UINTVAL)$2, "binary", 0);
     $1 = string_concat(interpreter, $1, s, 1);
 
     goto NEXT();
@@ -337,7 +337,7 @@ inline op pack(inout STR, in INT, in NUM) :base_core {
     char *c = (char *)&$3;
     STRING *s;
 
-    s = string_make(interpreter, c, (UINTVAL)$2, "iso-8859-1", 0);
+    s = string_make(interpreter, c, (UINTVAL)$2, "binary", 0);
     $1 = string_concat(interpreter, $1, s, 1);
 
     goto NEXT();
@@ -372,7 +372,7 @@ inline op pack(inout STR, in INT, in INT, in INT) :base_core {
     char *t;
     int i;
 
-    s = string_make(interpreter, c, (UINTVAL)$2, "iso-8859-1", 0);
+    s = string_make(interpreter, c, (UINTVAL)$2, "binary", 0);
     ln = string_length(interpreter, $1);
     if (ln < $4 + $2)
     {

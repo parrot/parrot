@@ -221,9 +221,6 @@ Parrot_register_charset(Interp *interpreter, const char *charsetname,
     }
     if (!strcmp("iso-8859-1", charsetname)) {
         Parrot_iso_8859_1_charset_ptr = charset;
-        if (!Parrot_default_charset_ptr) {
-            Parrot_default_charset_ptr = charset;
-        }
         return register_charset(interpreter, charsetname, charset);
     }
     if (!strcmp("unicode", charsetname)) {
@@ -231,7 +228,9 @@ Parrot_register_charset(Interp *interpreter, const char *charsetname,
         return register_charset(interpreter, charsetname, charset);
     }
     if (!strcmp("ascii", charsetname)) {
-
+        if (!Parrot_default_charset_ptr) {
+            Parrot_default_charset_ptr = charset;
+        }
         Parrot_ascii_charset_ptr = charset;
         return register_charset(interpreter, charsetname, charset);
     }
@@ -243,14 +242,14 @@ Parrot_charsets_encodings_init(Interp *interpreter)
 {
     /* the order is crucial here:
      * 1) encodings, default = fixed_8
-     * 2) charsets   default = iso-8859-1
+     * 2) charsets   default = ascii
      */
     Parrot_encoding_fixed_8_init(interpreter);
     Parrot_encoding_utf8_init(interpreter);
 
+    Parrot_charset_ascii_init(interpreter);
     Parrot_charset_iso_8859_1_init(interpreter);
     Parrot_charset_binary_init(interpreter);
-    Parrot_charset_ascii_init(interpreter);
     Parrot_charset_unicode_init(interpreter);
     /*
      * now install charset converters

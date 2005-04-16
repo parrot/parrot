@@ -229,7 +229,7 @@ Parrot_readbc(Interp *interpreter, const char *filename)
             return NULL;
         }
         fs = interpreter->current_file = string_make(interpreter, fullname,
-                strlen(fullname), "iso-8859-1", 0);
+                strlen(fullname), NULL, 0);
         if (!Parrot_stat_info_intval(interpreter, fs, STAT_EXISTS)) {
             PIO_eprintf(interpreter, "Parrot VM: Can't stat %s, code %i.\n",
                     fullname, errno);
@@ -409,7 +409,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
-                                  "iso-8859-1", PObj_external_FLAG);
+                                  NULL, PObj_external_FLAG);
 
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
             PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);

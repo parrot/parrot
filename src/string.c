@@ -402,6 +402,20 @@ string_make_empty(Interp *interpreter,
     return s;
 }
 
+CHARSET *
+string_rep_compatible (Interp *interpreter, STRING *a, const STRING *b)
+{
+    if (a->encoding != b->encoding)     /* XXX utf8 ascii */
+        return NULL;
+    if (a->charset == b->charset)
+        return a->charset;
+    if (b->charset == Parrot_ascii_charset_ptr)
+        return a->charset;
+    if (a->charset == Parrot_ascii_charset_ptr)
+        return b->charset;
+    return NULL;
+}
+
 /*
 
 =item C<STRING *
@@ -420,6 +434,8 @@ string_append(Interp *interpreter,
 {
     UINTVAL a_capacity, b_len;
     UINTVAL total_length;
+    CHARSET *cs;
+
     UNUSED(Uflags);
 
     /* If B isn't real, we just bail */
@@ -456,8 +472,9 @@ string_append(Interp *interpreter,
 
     /* A is now ready to receive the contents of B */
 
-    /* if same rep, can memcopy */
-    if (a->encoding == b->encoding && a->charset == b->charset) {
+    /* if compatible rep, can memcopy */
+    if ( (cs = string_rep_compatible(interpreter, a, b))) {
+        a->charset = cs;
         /* Tack B on the end of A */
         mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
                 b->strstart, b->bufused);
@@ -546,7 +563,7 @@ string_primary_encoding_for_representation(Interp *interpreter,
 {
     switch (representation) {
         case enum_stringrep_one:
-            return "iso-8859-1";
+            return "ascii";
             break;
         default:
             internal_exception(INVALID_STRING_REPRESENTATION,
@@ -593,7 +610,7 @@ The currently recognised values are:
     'ascii'
     'binary'
 
-If C<charset> is unspecified the default charset 'iso-8859-1' will be
+If C<charset> is unspecified the default charset 'ascii' will be
 used.
 
 The value of C<flags> is optionally one or more C<PObj_*> flags C<OR>-ed
@@ -609,11 +626,10 @@ string_make(Interp *interpreter, const void *buffer,
 {
     ENCODING *encoding;
     CHARSET *charset;
-    if (!charset_name) {
-        internal_exception(MISSING_ENCODING_NAME,
-            "string_make: no charset name specified");
-    }
 
+    if (!charset_name) {
+        charset_name = "ascii";
+    }
     charset = Parrot_find_charset(interpreter, charset_name);
     if (!charset) {
         internal_exception(UNIMPLEMENTED,
@@ -648,7 +664,7 @@ string_make_direct(Interp *interpreter, const void *buffer,
     s->charset = charset;
 
     if (encoding == Parrot_fixed_8_encoding_ptr &&
-            charset == Parrot_iso_8859_1_charset_ptr) {
+            charset == Parrot_ascii_charset_ptr) {
         /*
          * fast path for external (constant) strings - don't allocate
          * and copy data
@@ -1108,13 +1124,19 @@ string_replace(Interp *interpreter, STRING *src,
     UINTVAL true_offset;
     UINTVAL true_length;
     INTVAL diff;
+    CHARSET *cs;
 
     true_offset = (UINTVAL)offset;
     true_length = (UINTVAL)length;
 
     /* may have different reps..... */
-    if (src->encoding != rep->encoding || src->charset != rep->charset) {
-        internal_exception(UNIMPLEMENTED, "Can't handle mixed types yet");
+    if ( !(cs = string_rep_compatible(interpreter, src, rep))) {
+        internal_exception(UNIMPLEMENTED,
+                "Cross-type string replace (%s/%s) (%s/%s) unsupported",
+                ((ENCODING *)(src->encoding))->name,
+                ((CHARSET *)(src->charset))->name,
+                ((ENCODING *)(rep->encoding))->name,
+                ((CHARSET *)(rep->charset))->name);
     }
 
     /* abs(-offset) may not be > strlen-1 */
@@ -1141,6 +1163,7 @@ string_replace(Interp *interpreter, STRING *src,
         UINTVAL length_bytes = string_max_bytes(interpreter, src, true_length);
 
         dest = string_make_empty(interpreter, enum_stringrep_one, true_length);
+        dest->charset = src->charset;
 
         mem_sys_memcopy(dest->strstart,
                 (char *)src->strstart
@@ -1153,6 +1176,7 @@ string_replace(Interp *interpreter, STRING *src,
         *d = dest;
     }
 
+    src->charset = cs;
     /* Now do the replacement */
 
 
@@ -1401,6 +1425,7 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
     STRING *res = NULL;
     size_t minlen = 0;
     parrot_string_representation_t maxrep = enum_stringrep_one;
+    CHARSET *cs;
 
     /* think about case of dest string is one of the operands */
     if (s1 && s2) {
@@ -1422,11 +1447,13 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
         res->strlen = 0;
         return res;
     }
-    else {
-        if (s1->encoding != s2->encoding || s1->charset != s2->charset) {
-            internal_exception(UNIMPLEMENTED,
-                    "Can't do cross-type bitwwise and");
-        }
+    if ( !(cs = string_rep_compatible(interpreter, s1, s2))) {
+        internal_exception(UNIMPLEMENTED,
+                "Cross-type string bitwise_and (%s/%s) (%s/%s) unsupported",
+                ((ENCODING *)(s1->encoding))->name,
+                ((CHARSET *)(s1->charset))->name,
+                ((ENCODING *)(s2->encoding))->name,
+                ((CHARSET *)(s2->charset))->name);
     }
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
@@ -1435,6 +1462,7 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
 #endif
 
     make_writable(interpreter, &res, minlen, enum_stringrep_one);
+    res->charset = cs;
 
     BITWISE_AND_STRINGS(Parrot_UInt1, Parrot_UInt1,
             Parrot_UInt1, s1, s2, res, minlen);
@@ -1509,6 +1537,7 @@ string_bitwise_or(Interp *interpreter,
     STRING *res = NULL;
     size_t maxlen = 0;
     parrot_string_representation_t maxrep = enum_stringrep_one;
+    CHARSET *cs;
 
     maxlen = s1 ? s1->bufused: 0;
     if (s2 && s2->bufused > maxlen)
@@ -1527,6 +1556,20 @@ string_bitwise_or(Interp *interpreter,
         return res;
     }
 
+    if (!s1)
+        cs = s2->charset;
+    else if (!s2)
+        cs = s1->charset;
+    else {
+        if ( !(cs = string_rep_compatible(interpreter, s1, s2))) {
+            internal_exception(UNIMPLEMENTED,
+                    "Cross-type string bitwise_or (%s/%s) (%s/%s) unsupported",
+                    ((ENCODING *)(s1->encoding))->name,
+                    ((CHARSET *)(s1->charset))->name,
+                    ((ENCODING *)(s2->encoding))->name,
+                    ((CHARSET *)(s2->charset))->name);
+        }
+    }
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
@@ -1534,6 +1577,7 @@ string_bitwise_or(Interp *interpreter,
 #endif
 
     make_writable(interpreter, &res, maxlen, enum_stringrep_one);
+    res->charset = cs;
 
     BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
             s1, s2, res, maxlen, |);
@@ -1567,6 +1611,7 @@ string_bitwise_xor(Interp *interpreter,
     STRING *res = NULL;
     size_t maxlen = 0;
     parrot_string_representation_t maxrep = enum_stringrep_one;
+    CHARSET *cs;
 
     maxlen = s1 ? s1->bufused: 0;
     if (s2 && s2->bufused > maxlen)
@@ -1585,6 +1630,20 @@ string_bitwise_xor(Interp *interpreter,
         return res;
     }
 
+    if (!s1)
+        cs = s2->charset;
+    else if (!s2)
+        cs = s1->charset;
+    else {
+        if ( !(cs = string_rep_compatible(interpreter, s1, s2))) {
+            internal_exception(UNIMPLEMENTED,
+                    "Cross-type string bitwise_xor (%s/%s) (%s/%s) unsupported",
+                    ((ENCODING *)(s1->encoding))->name,
+                    ((CHARSET *)(s1->charset))->name,
+                    ((ENCODING *)(s2->encoding))->name,
+                    ((CHARSET *)(s2->charset))->name);
+        }
+    }
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
@@ -1592,6 +1651,7 @@ string_bitwise_xor(Interp *interpreter,
 #endif
 
     make_writable(interpreter, &res, maxlen, enum_stringrep_one);
+    res->charset = cs;
 
     BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
             s1, s2, res, maxlen, ^);
@@ -2289,7 +2349,7 @@ string_unescape_cstring(Interp * interpreter,
         --clength;
     flags = PObj_constant_FLAG;
     if (!charset)
-        charset = "iso-8859-1";
+        charset = "ascii";
     else
         flags |= PObj_private7_FLAG;  /* Pythonic unicode flag */
     result = string_make(interpreter, cstring, clength, charset, flags);
