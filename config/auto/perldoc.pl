@@ -15,14 +15,14 @@ package Configure::Step;
 
 use strict;
 use vars qw($description @args);
-use Parrot::Configure::Step ':auto';
+use Parrot::Configure::Step ':auto', 'capture_output';
 
 $description = "Determining whether perldoc is installed...";
 
 @args = qw(verbose);
 
 sub runstep {
-    my $a = `perldoc perldoc` || '';
+    my $a = capture_output( 'perldoc perldoc' ) || '';
     my $has_perldoc = ($a =~ m/perldoc/) ? 1 : 0;
 
     Configure::Data->set(has_perldoc => $has_perldoc);

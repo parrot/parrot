@@ -27,7 +27,7 @@ $description = "Determining whether python is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    my $a = `python -V 2>&1` || '';
+    my $a = capture_output( 'python -V' ) || '';
     my ($python, $major, $minor, $revision) = 
         $a =~ m/(Python)\s+(\d+).(\d+)(?:.(\d+))?/;
     $revision = 0 unless defined $revision;

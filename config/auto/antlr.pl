@@ -12,7 +12,7 @@ Is so, then check whether there is support for Python output.
 
 When antlr is not found, then something like
 
-  export CLASSPATH=/home/bernhard/devel/antlr/antlr-2.7.5:/home/bernhard/devel/antlr/antlr-2.7.5/antlr-2.7.5.jar
+  export CLASSPATH=/home/myself/devel/antlr/antlr-2.7.5:/home/myself/devel/antlr/antlr-2.7.5/antlr-2.7.5.jar
 
 might help.
 
@@ -22,15 +22,14 @@ package Configure::Step;
 
 use strict;
 use vars qw($description @args);
-use Parrot::Configure::Step ':auto';
+use Parrot::Configure::Step ':auto', 'capture_output';
 
 $description = "Determining whether antlr is installed...";
 
 @args = qw(verbose);
 
 sub runstep {
-    my $a = `antlr -h 2>&1`;
-    $a = 'nada' unless defined $a;
+    my $a = capture_output( 'antlr -h' ) || '';
     my $has_antlr = ($a =~ m/ANTLR Parser Generator/) ? 1 : 0;
 
     Configure::Data->set(has_antlr => $has_antlr);
@@ -38,7 +37,7 @@ sub runstep {
     my $has_antlr_with_python = 0;
     if ( $has_antlr ) {
         unlink <config/auto/antlr/*.py>;
-        my $a = `antlr -o config/auto/antlr config/auto/antlr/test_python.g 2>&1`;
+        my $a = capture_output( 'antlr -o config/auto/antlr config/auto/antlr/test_python.g' ) || '';
         $has_antlr_with_python = 1 if -e 'config/auto/antlr/test_python_l.py';
         $Configure::Step::result = $has_antlr_with_python ?
                                        'yes, with python' :
