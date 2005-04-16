@@ -1,4 +1,4 @@
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -18,16 +18,17 @@ use vars qw($description @args);
 use Cwd qw(cwd);
 use Parrot::Configure::Step qw(capture_output);
 
-$description="Determining whether ICU is installed";
+$description = "Determining whether ICU is installed";
 
-@args=qw(verbose icudatadir icushared icuheaders icu-config without-icu);
+@args = qw(verbose icudatadir icushared icuheaders icu-config without-icu);
 
 sub runstep {
   my ($verbose, $icudatadir, $icushared, $icuheaders, $icuconfig, $without) = @_;
+
   my @icu_headers = qw(ucnv.h utypes.h uchar.h);
-  my $autodetect = !defined($icudatadir)
-	        && !defined($icushared)
-	        && !defined($icuheaders);
+  my $autodetect =    !defined($icudatadir)
+                   && !defined($icushared)
+                   && !defined($icuheaders);
 
   $Configure::Step::result = undef;
   unless ($without) {
@@ -92,7 +93,8 @@ sub runstep {
 
   if ($without) {
     Configure::Data->set(
-      has_icu => 0,
+      has_icu     => 0,
+      icu_shared  => '',     # This is used for generating dynclasses/Makefile
     );
     $Configure::Step::result = "no" unless defined $Configure::Step::result;
     return;
@@ -140,7 +142,7 @@ HELP
 #'
   
   Configure::Data->set(
-    has_icu    => 1,
+    has_icu     => 1,
     icu_shared  => $icushared,
     icu_headers => join( ' ', @icu_headers ),
     icu_datadir => $icudatadir,
