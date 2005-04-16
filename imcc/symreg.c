@@ -307,12 +307,26 @@ mk_pmc_const_2(Parrot_Interp interp, IMC_Unit *unit, SymReg *left, SymReg *rhs)
     INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
     return NULL;
 }
+
 /* Makes a new identifier constant with value val */
 SymReg *
 mk_const_ident(Interp *interp,
         char *name, int t, SymReg *val, int global)
 {
     SymReg *r;
+
+    /*
+     * Forbid assigning a string to anything other than a string
+     * or PMC constant
+     */
+    if (t == 'N' || t == 'I') {
+        if (val->set == 'S') {
+            IMCC_fataly(interp, E_TypeError,
+                    "bad const initialisation");
+        }
+        /* Cast value to const type */
+        val->set = t;
+    }
 
     if (global) {
         if (t == 'P') {

@@ -413,6 +413,10 @@ string_rep_compatible (Interp *interpreter, STRING *a, const STRING *b)
         return a->charset;
     if (a->charset == Parrot_ascii_charset_ptr)
         return b->charset;
+    if (a->charset == Parrot_binary_charset_ptr)
+        return a->charset;
+    if (b->charset == Parrot_binary_charset_ptr)
+        return b->charset;
     return NULL;
 }
 

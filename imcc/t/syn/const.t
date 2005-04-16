@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 
 pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
 
@@ -148,3 +148,37 @@ ok 1
 ok 2
 ok 3
 OUT
+
+output_is(<<'CODE', <<'OUT', "const I/N mismatch");
+    set I0, 2.0
+    print I0
+    print "\n"
+    set N0, 2
+    print N0
+    print "\nok\n"
+    end
+CODE
+2
+2.000000
+ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "const I/N mismatch 2");
+.sub main
+    .const int i = 2.0
+    print i
+    print "\n"
+    .const float n = 2
+    print n
+    print "\nok\n"
+    .const string s = ascii:"ok 2\n"
+    print s
+    end
+.end
+CODE
+2
+2.000000
+ok
+ok 2
+OUT
+
