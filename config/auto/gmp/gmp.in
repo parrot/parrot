@@ -7,21 +7,17 @@
 
 int main(int argc, char *argv[])
 {
-    mpz_t i, j, k;
+    mpz_t prime;
     char *s; int y;
 
-    mpz_init(i);
-    mpz_set_si(i, 999999);
-    mpz_init(j);
-    mpz_set_si(j, 1000000);
-    mpz_init(k);
-    mpz_mul(k, i, j);
-    mpz_set_si(i, 2);
-    mpz_div(k, k, i);
+    /* Calculate the 13th Mersenne prime 2^521 - 1 */
+    mpz_init(prime);
+    mpz_ui_pow_ui(prime, 2, 521);
+    mpz_sub_ui(prime, prime, 1);
 
-    y = mpz_fits_slong_p(k);
+    y = mpz_fits_slong_p(prime);
 
-    s = mpz_get_str(NULL, 10, k);
+    s = mpz_get_str(NULL, 10, prime);
     printf("%s %d\n", s, y);
     free(s);
     return 0;
