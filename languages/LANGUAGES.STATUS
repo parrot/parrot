@@ -150,10 +150,9 @@ V: 0.0.11
 
 N: tcl ("partcl")
 A: Will Coleda
-S: all tests pass, but not feature-complete
-S: under active development
+S: 100% test failure due to recent parrot changes.
 M: Yes
-V: 0.1.0
+V: N/A
 
 N: URM
 A: Marcus Thiesen
