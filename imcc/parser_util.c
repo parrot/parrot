@@ -371,6 +371,12 @@ is_infix(char *name)
         return MMD_DIVIDE;
     if (strcmp(name, "fdiv") == 0)
         return MMD_FLOOR_DIVIDE;
+    if (strcmp(name, "mod") == 0)
+        return MMD_MOD;
+    if (strcmp(name, "cmod") == 0)
+        return MMD_CMOD;
+    if (strcmp(name, "pow") == 0)
+        return MMD_POW;
     return -1;
 }
 

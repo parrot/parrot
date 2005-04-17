@@ -873,88 +873,261 @@ MMD_DEFAULT: {
         VTABLE_set_integer_native(INTERP, SELF,
                 floor(DYNSELF.get_number() / value));
     }
+
 /*
 
-=item C<void pow_int(INTVAL value, PMC *dest)>
+=item C<PMC* cmodulus(PMC *value, PMC *dest)>
+
+=item C<PMC* cmodulus(INTVAL value, PMC *dest)>
+
+=item C<PMC* cmodulus(FLOATVAL value, PMC *dest)>
+
+Calculates the value of the number C-style C<mod> C<value> and returns
+the result in C<dest>.
+
+=item C<void i_cmodulus(PMC *value)>
+
+=item C<void i_cmodulus(INTVAL value)>
+
+=item C<void i_cmodulus(FLOATVAL value)>
+
+Calculates the value of the number C-style C<mod> C<value> and returns
+the result in C<dest>.
+
+=cut
+
+*/
+
+    PMC* cmodulus (PMC* value, PMC* dest) {
+MMD_BigInt: {
+            return overflow_p(INTERP, SELF, value, dest, MMD_CMOD);
+        }
+MMD_DEFAULT: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+
+            if (d == 0.0)
+                real_exception(INTERP, NULL, E_ZeroDivisionError,
+                        "int cmodulus by zero");
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_integer_native(INTERP, dest,
+                    DYNSELF.get_integer() % d);
+            return dest;
+        }
+    }
+
+    PMC* cmodulus_float (FLOATVAL value, PMC* dest) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "int cmodulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest,
+                fmod(DYNSELF.get_integer(), value));
+        return dest;
+    }
+
+    PMC* cmodulus_int (INTVAL value, PMC* dest) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "int cmodulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest,
+                DYNSELF.get_integer() % value);
+        return dest;
+    }
+
+    void i_cmodulus (PMC* value) {
+MMD_BigInt: {
+             overflow_p(INTERP, SELF, value, SELF, MMD_CMOD);
+        }
+MMD_DEFAULT: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+
+            if (d == 0.0)
+                real_exception(INTERP, NULL, E_ZeroDivisionError,
+                        "int cmodulus by zero");
+            VTABLE_set_integer_native(INTERP, SELF,
+                    DYNSELF.get_integer() % d);
+        }
+    }
+
+    void i_cmodulus_int (INTVAL value) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "int cmodulus by zero");
+        VTABLE_set_integer_native(INTERP, SELF,
+                DYNSELF.get_integer() % value);
+    }
+
+    void i_cmodulus_float (FLOATVAL value) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "int cmodulus by zero");
+        VTABLE_set_integer_native(INTERP, SELF,
+                fmod(DYNSELF.get_integer(), value));
+    }
+
+/*
+
+=item C<PMC* modulus(PMC *value, PMC *dest)>
+
+=item C<PMC* modulus(INTVAL value, PMC *dest)>
+
+=item C<PMC* modulus(FLOATVAL value, PMC *dest)>
+
+Calculates the value of corrected C<mod> C<value> and returns
+the result in C<dest>. See also ops/math.ops.
+
+=item C<void i_modulus(PMC *value)>
+
+=item C<void i_modulus(INTVAL value)>
+
+=item C<void i_modulus(FLOATVAL value)>
+
+Calculates modulus inplace
+
+=cut
+
+*/
+
+    PMC* modulus (PMC* value, PMC* dest) {
+MMD_BigInt: {
+            return overflow_p(INTERP, SELF, value, dest, MMD_MOD);
+        }
+MMD_DEFAULT: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+
+            if (d == 0)
+                real_exception(INTERP, NULL, E_ZeroDivisionError,
+                        "int modulus by zero");
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_integer_native(INTERP, dest,
+                    intval_mod(DYNSELF.get_integer(), d));
+            return dest;
+        }
+    }
+
+    PMC* modulus_int (INTVAL value, PMC* dest) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "int modulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest,
+                intval_mod(DYNSELF.get_integer(), value));
+        return dest;
+    }
+
+    PMC* modulus_float (FLOATVAL value, PMC* dest) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "int modulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest,
+                intval_mod(DYNSELF.get_integer(), value));
+        return dest;
+    }
+    void i_modulus (PMC* value) {
+MMD_BigInt: {
+             overflow_p(INTERP, SELF, value, SELF, MMD_MOD);
+        }
+MMD_DEFAULT: {
+            INTVAL d = VTABLE_get_integer(INTERP, value);
+
+            if (d == 0.0)
+                real_exception(INTERP, NULL, E_ZeroDivisionError,
+                        "int modulus by zero");
+            VTABLE_set_integer_native(INTERP, SELF,
+                    intval_mod(DYNSELF.get_integer() , d));
+        }
+    }
+
+    void i_modulus_int (INTVAL value) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "int modulus by zero");
+        VTABLE_set_integer_native(INTERP, SELF,
+                intval_mod(DYNSELF.get_integer() , value));
+    }
+
+    void i_modulus_float (FLOATVAL value) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "int modulus by zero");
+        VTABLE_set_integer_native(INTERP, SELF,
+                intval_mod(DYNSELF.get_integer() , value));
+    }
+
+/*
+
+=item C<PMC* pow(PMC* value, PMC *dest)>
+
+=item C<PMC* pow_int(INTVAL value, PMC *dest)>
+
+Return SELF to the C<value>th power and return result in C<dest>.
+
+=item C<void i_pow(PMC* value)>
+
+=item C<void i_pow_int(INTVAL value)>
 
 Rise SELF to the C<value>th power.
 
+TODO Complex and BigInt rhs.
+
 =cut
 
 */
+    PMC* pow (PMC* value, PMC* dest) {
+        INTVAL v = VTABLE_get_integer(INTERP, value);
+        return SELF.pow_int(v, dest);
+    }
 
-    void pow_int (INTVAL b, PMC* dest) {
-        INTVAL a = PMC_int_val(SELF);
-        INTVAL i;
-        VTABLE_set_integer_native(INTERP, dest, a);
-        --b;
-        for (i = 0; i < b; ++i) {
-            mmd_dispatch_v_pip(interpreter, dest, a, dest, MMD_MULTIPLY);
+    PMC* pow_int (INTVAL b, PMC* dest) {
+        INTVAL a = DYNSELF.get_integer();
+        INTVAL prev, temp, r;
+
+        if (b < 0)
+            return SUPER(b, dest);
+        r = 1;
+        if (a) {
+            temp = a;
+            while (b > 0) {
+                prev = r;
+                if (b & 1) {
+                    r *= temp;
+                    if (r / temp != prev) {
+                        return overflow(INTERP, SELF, b, dest, MMD_POW);
+                    }
+                }
+                b >>= 1;
+                if (!b)
+                    break;
+                prev = temp;
+                temp *= temp;
+	 	if (prev != 0 && temp / prev != prev) {
+                    return overflow(INTERP, SELF, b, dest, MMD_POW);
+                }
+            }
         }
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, r);
+        return dest;
 
     }
 
-/*
-
-=item C<void cmodulus(PMC *value, PMC *dest)>
-
-Calculates the value of the integer C-style C<mod> C<*value> and returns
-the result in C<*dest>.
-
-=cut
-
-*/
-    void cmodulus (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-                                  PMC_int_val(SELF) %
-                                  VTABLE_get_integer(INTERP, value));
+    void i_pow(PMC* value) {
+        SELF.pow(value, SELF);
     }
 
-/*
-
-=item C<void cmodulus_int(INTVAL value, PMC *dest) >
-
-Calculates the value of the integer C-style C<mod> C<value> and returns
-the result in C<*dest>.
-
-=cut
-
-*/
-    void cmodulus_int (INTVAL value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            PMC_int_val(SELF) % value);
+    void i_pow_int(INTVAL value) {
+        SELF.pow_int(value, SELF);
     }
 
-/*
-
-=item C<void modulus(PMC *value, PMC *dest)>
-
-Calculates the value of the integer C<mod> C<*value> and returns the
-result in C<*dest>.
-
-=cut
-
-*/
-    void modulus (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            intval_mod(PMC_int_val(SELF),
-            VTABLE_get_integer(INTERP, value)));
-    }
-
-/*
-
-=item C<void modulus_int(INTVAL value, PMC *dest)>
-
-Calculates the value of the integer C<mod> C<value> and returns the
-result in C<*dest>.
-
-=cut
-
-*/
-    void modulus_int (INTVAL value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            intval_mod(PMC_int_val(SELF), value));
-    }
 
 /*
 

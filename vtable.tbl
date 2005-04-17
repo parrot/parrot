@@ -179,17 +179,29 @@ void i_floor_divide(PMC* value)              MMD_I_FLOOR_DIVIDE
 void i_floor_divide_int(INTVAL value)        MMD_I_FLOOR_DIVIDE_INT
 void i_floor_divide_float(FLOATVAL value)    MMD_I_FLOOR_DIVIDE_FLOAT
 
-void modulus(PMC* value, PMC* dest)         MMD_MOD
-void modulus_int(INTVAL value, PMC* dest)   MMD_MOD_INT
-void modulus_float(FLOATVAL value, PMC* dest) MMD_MOD_FLOAT
+PMC* modulus(PMC* value, PMC* dest)         MMD_MOD
+PMC* modulus_int(INTVAL value, PMC* dest)   MMD_MOD_INT
+PMC* modulus_float(FLOATVAL value, PMC* dest) MMD_MOD_FLOAT
 
-void cmodulus(PMC* value, PMC* dest)        MMD_CMOD
-void cmodulus_int(INTVAL value, PMC* dest)  MMD_CMOD_INT
-void cmodulus_float(FLOATVAL value, PMC* dest) MMD_CMOD_FLOAT
+void i_modulus(PMC* value)                  MMD_I_MOD
+void i_modulus_int(INTVAL value)            MMD_I_MOD_INT
+void i_modulus_float(FLOATVAL value)        MMD_I_MOD_FLOAT
 
-void pow(PMC* value, PMC* dest)        MMD_POW
-void pow_int(INTVAL value, PMC* dest) MMD_POW_INT
-void pow_float(FLOATVAL value, PMC* dest) MMD_POW_FLOAT
+PMC* cmodulus(PMC* value, PMC* dest)        MMD_CMOD
+PMC* cmodulus_int(INTVAL value, PMC* dest)  MMD_CMOD_INT
+PMC* cmodulus_float(FLOATVAL value, PMC* dest) MMD_CMOD_FLOAT
+
+void i_cmodulus(PMC* value)                 MMD_I_CMOD
+void i_cmodulus_int(INTVAL value)           MMD_I_CMOD_INT
+void i_cmodulus_float(FLOATVAL value)       MMD_I_CMOD_FLOAT
+
+PMC* pow(PMC* value, PMC* dest)             MMD_POW
+PMC* pow_int(INTVAL value, PMC* dest)       MMD_POW_INT
+PMC* pow_float(FLOATVAL value, PMC* dest)   MMD_POW_FLOAT
+
+void i_pow(PMC* value)                      MMD_I_POW
+void i_pow_int(INTVAL value)                MMD_I_POW_INT
+void i_pow_float(FLOATVAL value)            MMD_I_POW_FLOAT
 
 void increment()
 void decrement()

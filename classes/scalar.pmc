@@ -454,61 +454,238 @@ Divides C<SELF> by C<value> inplace.
     }
 
 
-
-
 /*
 
-=item C<void modulus(PMC* value, PMC* dest)>
+=item C<PMC* cmodulus(PMC *value, PMC *dest)>
 
-This does perl-like modulus.
+=item C<PMC* cmodulus(INTVAL value, PMC *dest)>
 
-Returns in C<*dest> the value of the scalar C<mod> the integer value of
-C<*value>.
+=item C<PMC* cmodulus(FLOATVAL value, PMC *dest)>
+
+Calculates the value of the number C-style C<mod> C<value> and returns
+the result in C<dest>.
+
+=item C<void i_cmodulus(PMC *value)>
+
+=item C<void i_cmodulus(INTVAL value)>
+
+=item C<void i_cmodulus(FLOATVAL value)>
+
+Calculates the value of the number C-style C<mod> C<value> and returns
+the result in C<dest>.
 
 =cut
 
 */
 
-    void modulus (PMC* value,  PMC* dest) {
-        INTVAL result;
+    PMC* cmodulus (PMC* value, PMC* dest) {
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
-        result = DYNSELF.get_integer()
-            % VTABLE_get_integer(INTERP, value);
+        if (d == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float cmodulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                fmod(DYNSELF.get_number(), d));
+        return dest;
+    }
 
-        VTABLE_set_integer_native(INTERP, dest, result);
+    PMC* cmodulus_float (FLOATVAL value, PMC* dest) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float cmodulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                fmod(DYNSELF.get_number(), value));
+        return dest;
+    }
+
+    PMC* cmodulus_float (FLOATVAL value, PMC* dest) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float cmodulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                fmod(DYNSELF.get_number(), value));
+        return dest;
+    }
+    void i_cmodulus (PMC* value) {
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+        if (d == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float cmodulus by zero");
+        VTABLE_set_number_native(INTERP, SELF,
+                fmod(DYNSELF.get_number() , d));
+    }
+
+    void i_cmodulus_int (INTVAL value) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float cmodulus by zero");
+        VTABLE_set_number_native(INTERP, SELF,
+                fmod(DYNSELF.get_number() , value));
+    }
+
+    void i_cmodulus_float (FLOATVAL value) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float cmodulus by zero");
+        VTABLE_set_number_native(INTERP, SELF,
+                fmod(DYNSELF.get_number() , value));
     }
 
 /*
 
-=item C<void modulus_int(INTVAL value, PMC* dest)>
+=item C<PMC* modulus(PMC *value, PMC *dest)>
 
-Returns in C<*dest> the value of the scalar C<mod> C<value>.
+=item C<PMC* modulus(INTVAL value, PMC *dest)>
+
+=item C<PMC* modulus(FLOATVAL value, PMC *dest)>
+
+Calculates the value of corrected C<mod> C<value> and returns
+the result in C<dest>. See also ops/math.ops.
+
+=item C<void i_modulus(PMC *value)>
+
+=item C<void i_modulus(INTVAL value)>
+
+=item C<void i_modulus(FLOATVAL value)>
+
+Calculates modulus inplace
 
 =cut
 
 */
 
-    void modulus_int (INTVAL value,  PMC* dest) {
-        INTVAL result;
+    PMC* modulus (PMC* value, PMC* dest) {
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
-        result = DYNSELF.get_integer()
-            % value;
+        if (d == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float modulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                floatval_mod(DYNSELF.get_number(), d));
+        return dest;
+    }
 
-        VTABLE_set_integer_native(INTERP, dest, result);
+    PMC* modulus_int (INTVAL value, PMC* dest) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float modulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                floatval_mod(DYNSELF.get_number(), value));
+        return dest;
+    }
+
+    PMC* modulus_float (FLOATVAL value, PMC* dest) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float modulus by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                floatval_mod(DYNSELF.get_number(), value));
+        return dest;
+    }
+
+    void i_modulus (PMC* value) {
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+        if (d == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float modulus by zero");
+        VTABLE_set_number_native(INTERP, SELF,
+                floatval_mod(DYNSELF.get_number() , d));
+    }
+
+    void i_modulus_int (INTVAL value) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float modulus by zero");
+        VTABLE_set_number_native(INTERP, SELF,
+                floatval_mod(DYNSELF.get_number() , value));
+    }
+
+    void i_modulus_float (FLOATVAL value) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float modulus by zero");
+        VTABLE_set_number_native(INTERP, SELF,
+                floatval_mod(DYNSELF.get_number() , value));
     }
 
 /*
 
-=item C<void modulus_float(FLOATVAL value, PMC *dest)>
+=item C<PMC* pow(PMC *value, PMC *dest)>
 
-Calls the superclass implementation.
+=item C<PMC* pow_int(INTVAL value, PMC *dest)>
+
+=item C<PMC* pow_float(FLOATVAL value, PMC *dest)>
+
+Calculates  C<SELF pow value> and returns
+the result in C<dest>. See also ops/math.ops.
+
+=item C<void i_pow(PMC *value)>
+
+=item C<void i_pow_int(INTVAL value)>
+
+=item C<void i_pow_float(FLOATVAL value)>
+
+Calculates pow inplace
 
 =cut
 
 */
 
-    void modulus_float (FLOATVAL value,  PMC* dest) {
-        SUPER(value, dest);
+    PMC* pow (PMC* value, PMC* dest) {
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                pow(DYNSELF.get_number(), d));
+        return dest;
+    }
+
+    PMC* pow_int (INTVAL value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                pow(DYNSELF.get_number(), value));
+        return dest;
+    }
+
+    PMC* pow_float (FLOATVAL value, PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_number_native(INTERP, dest,
+                pow(DYNSELF.get_number(), value));
+        return dest;
+    }
+
+    void i_pow (PMC* value) {
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+        VTABLE_set_number_native(INTERP, SELF,
+                pow(DYNSELF.get_number(), d));
+    }
+
+    void i_pow_int (INTVAL value) {
+        VTABLE_set_number_native(INTERP, SELF,
+                pow(DYNSELF.get_number(), value));
+    }
+
+    void i_pow_float (FLOATVAL value) {
+        VTABLE_set_number_native(INTERP, SELF,
+                pow(DYNSELF.get_number(), value));
     }
 
 /*
@@ -522,7 +699,7 @@ Set C<dest> to the negated value of C<SELF>.
 */
 
     void neg (PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());
+        VTABLE_set_number_native(INTERP, dest, -DYNSELF.get_number());
     }
 
 /*

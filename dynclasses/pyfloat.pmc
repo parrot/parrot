@@ -163,18 +163,6 @@ Returns a unique hash for this value
         return VTABLE_get_integer(INTERP, SELF);
     }
 
-/*
-
-=item C<void modulus_float(FLOATVAL value, PMC *dest)>
-
-=cut
-
-*/
-
-    void modulus_float (FLOATVAL value, PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest,
-            floatval_mod(PMC_num_val(SELF), value));
-    }
 
 /*
 

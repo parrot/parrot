@@ -568,7 +568,7 @@ downcase this string
 
 /*
 
-=item C<void modulus(PMC *value, PMC *dest)>
+=item C<PMC* modulus(PMC *value, PMC *dest)>
 
 Interpolates a formatstring with a set of values.
 
@@ -576,7 +576,7 @@ Interpolates a formatstring with a set of values.
 
 */
 
-    void modulus (PMC* value, PMC* dest) {
+    PMC* modulus (PMC* value, PMC* dest) {
         PMC *ar = value;
         /*
          * SELF is formatstring, value = argument array or item
@@ -588,8 +588,11 @@ Interpolates a formatstring with a set of values.
             VTABLE_set_integer_native(INTERP, ar, 1);
             VTABLE_set_pmc_keyed_int( INTERP, ar, 0, value);
         }
+        if (!dest)
+            dest = pmc_new(INTERP, PyBuiltin_PyString);
         VTABLE_set_string_native(INTERP, dest,
                 Parrot_psprintf(INTERP, PMC_str_val(SELF), ar));
+        return dest;
     }
 
 /*
