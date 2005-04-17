@@ -138,51 +138,26 @@ bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
 static void
 bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
     /* this is mpz_fdiv_q */
     mpz_div(BN(dest), BN(self), BN(value));
-    if (mpz_fits_slong_p(BN(dest))) {
-        long iresult = mpz_get_si(BN(dest));
-        VTABLE_morph(interpreter, dest, enum_class_Integer);
-        VTABLE_set_integer_native(interpreter, dest, iresult);
-    }
 }
 static void
 bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
     /* this is mpz_fdiv_q */
     mpz_div_ui(BN(dest), BN(self), value);
-    if (mpz_fits_slong_p(BN(dest))) {
-        long iresult = mpz_get_si(BN(dest));
-        VTABLE_morph(interpreter, dest, enum_class_Integer);
-        VTABLE_set_integer_native(interpreter, dest, iresult);
-    }
 }
 static void
 bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
-    /* this is mpz_fdiv_q */
     mpz_fdiv_q(BN(dest), BN(self), BN(value));
-    if (mpz_fits_slong_p(BN(dest))) {
-        long iresult = mpz_get_si(BN(dest));
-        VTABLE_morph(interpreter, dest, enum_class_Integer);
-        VTABLE_set_integer_native(interpreter, dest, iresult);
-    }
 }
 static void
 bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
 {
-    VTABLE_morph(interpreter, dest, enum_class_BigInt);
-    /* this is mpz_fdiv_q */
     mpz_fdiv_q_ui(BN(dest), BN(self), value);
-    if (mpz_fits_slong_p(BN(dest))) {
-        long iresult = mpz_get_si(BN(dest));
-        VTABLE_morph(interpreter, dest, enum_class_Integer);
-        VTABLE_set_integer_native(interpreter, dest, iresult);
-    }
 }
+
 static void
 bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
@@ -763,34 +738,108 @@ MMD_DEFAULT: {
         internal_exception(1, "unimp mul");
     }
 
-    void divide(PMC* value, PMC* dest) {
+    PMC* divide(PMC* value, PMC* dest) {
 MMD_BigInt: {
-                bigint_div_bigint(INTERP, SELF, value, dest);
+            if (dest)
+                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            bigint_div_bigint(INTERP, SELF, value, dest);
+#if 0
+            /* to downgrade or not that's the question */
+            if (mpz_fits_slong_p(BN(dest))) {
+                long iresult = mpz_get_si(BN(dest));
+                VTABLE_morph(interpreter, dest, enum_class_Integer);
+                VTABLE_set_integer_native(interpreter, dest, iresult);
             }
+#endif
+            return dest;
+        }
 MMD_Integer: {
-                bigint_div_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
-            }
+            if (dest)
+                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            bigint_div_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            return dest;
+        }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp fdiv");
-             }
+            internal_exception(1, "unimp div");
+            return dest;
+         }
     }
 
-    void divide_int(INTVAL value, PMC* dest) {
+    PMC* divide_int(INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_div_bigint_int(INTERP, SELF, value, dest);
+        return dest;
     }
-    void floor_divide(PMC* value, PMC* dest) {
+
+    void i_divide(PMC* value) {
 MMD_BigInt: {
-                bigint_fdiv_bigint(INTERP, SELF, value, dest);
-            }
+            bigint_div_bigint(INTERP, SELF, value, SELF);
+        }
 MMD_Integer: {
-                bigint_fdiv_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
-            }
+            bigint_div_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
+        }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp fdiv");
-             }
+             internal_exception(1, "unimp fdiv");
+        }
     }
-    void floor_divide_int(INTVAL value, PMC* dest) {
+
+    void i_divide_int(INTVAL value) {
+        bigint_div_bigint_int(INTERP, SELF, value, SELF);
+    }
+
+    PMC* floor_divide(PMC* value, PMC* dest) {
+MMD_BigInt: {
+            if (dest)
+                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            bigint_fdiv_bigint(INTERP, SELF, value, dest);
+            return dest;
+        }
+MMD_Integer: {
+            if (dest)
+                VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+            else
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            bigint_fdiv_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            return dest;
+        }
+MMD_DEFAULT: {
+            internal_exception(1, "unimp fdiv");
+            return dest;
+        }
+    }
+
+    PMC* floor_divide_int(INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(interpreter, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_fdiv_bigint_int(INTERP, SELF, value, dest);
+        return dest;
+    }
+
+    void i_floor_divide(PMC* value) {
+MMD_BigInt: {
+            bigint_fdiv_bigint(INTERP, SELF, value, SELF);
+        }
+MMD_Integer: {
+            bigint_fdiv_bigint_int(INTERP, SELF, PMC_int_val(value), SELF);
+        }
+MMD_DEFAULT: {
+            internal_exception(1, "unimp fdiv");
+        }
+    }
+
+    void i_floor_divide_int(INTVAL value) {
+        bigint_fdiv_bigint_int(INTERP, SELF, value, SELF);
     }
 
     void modulus(PMC* value, PMC* dest) {

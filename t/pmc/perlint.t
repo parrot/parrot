@@ -654,7 +654,7 @@ CODE
 1.500000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "division by zero, #1");
+output_like(<<'CODE', <<'OUTPUT', "division by zero, #1");
     new P0, .PerlInt
     new P1, .PerlInt
     new P2, .PerlUndef
@@ -663,10 +663,10 @@ output_is(<<'CODE', <<'OUTPUT', "division by zero, #1");
     div P2, P0, P1
     end
 CODE
-division by zero!
+/division by zero/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "division by zero, #2");
+output_like(<<'CODE', <<'OUTPUT', "division by zero, #2");
     new P0, .PerlInt
     new P1, .PerlUndef
     new P2, .PerlUndef
@@ -674,10 +674,10 @@ output_is(<<'CODE', <<'OUTPUT', "division by zero, #2");
     div P2, P0, P1
     end
 CODE
-division by zero!
+/division by zero/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "division by zero, #3");
+output_like(<<'CODE', <<'OUTPUT', "division by zero, #3");
     new P0, .PerlInt
     new P1, .PerlNum
     new P2, .PerlUndef
@@ -686,7 +686,7 @@ output_is(<<'CODE', <<'OUTPUT', "division by zero, #3");
     div P2, P0, P1
     end
 CODE
-division by zero!
+/division by zero/
 OUTPUT
 
 #

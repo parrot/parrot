@@ -180,6 +180,32 @@ Class method to construct an Integer according to passed arguments.
 
 /*
 
+=item C<INTVAL get_integer()>
+
+Returns the integer value of the Integer.
+
+=cut
+
+*/
+    INTVAL get_integer () {
+        return PMC_int_val(SELF);
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the Integer.
+
+=cut
+
+*/
+    INTVAL get_bool () {
+        return PMC_int_val(SELF) ? 1 : 0;
+    }
+
+/*
+
 =item C<FLOATVAL get_number()>
 
 Returns the floating-point value of the integer.
@@ -702,26 +728,151 @@ MMD_DEFAULT: {
         VTABLE_set_number_native(INTERP, SELF, a * value);
     }
 
-
 /*
 
+=item C<PMC* divide(PMC *value, PMC *dest)>
 
-Multiplies the integer by C<value> and returns the result in C<*dest>.
+=item C<PMC* divide_int(INTVAL value, PMC *dest)>
+
+=item C<PMC* divide_float(FLOATVAL value, PMC *dest)>
+
+Divides the number by C<value> and returns the result in C<*dest>.
+
+=item C<void i_divide(PMC *value)>
+
+=item C<void i_divide_int(INTVAL value)>
+
+=item C<void i_divide_float(FLOATVAL value)>
+
+Divides C<SELF> by C<value> inplace.
 
 =cut
 
 */
-    void pow_int (INTVAL b, PMC* dest) {
-        INTVAL a = PMC_int_val(SELF);
-        INTVAL i;
-        VTABLE_set_integer_native(INTERP, dest, a);
-        --b;
-        for (i = 0; i < b; ++i) {
-            mmd_dispatch_v_pip(interpreter, dest, a, dest, MMD_MULTIPLY);
-        }
 
+    PMC* divide (PMC* value, PMC* dest) {
+MMD_BigInt:     {
+            return overflow_p(INTERP, SELF, value, dest, MMD_DIVIDE);
+        }
+MMD_DEFAULT: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+            if (d == 0.0)
+                real_exception(INTERP, NULL, E_ZeroDivisionError,
+                        "float division by zero");
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_number_native(INTERP, dest, DYNSELF.get_number() / d);
+            return dest;
+        }
     }
 
+    void i_divide (PMC* value) {
+MMD_BigInt:     {
+             overflow_p(INTERP, SELF, value, SELF, MMD_DIVIDE);
+        }
+MMD_DEFAULT: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+            if (d == 0.0)
+                real_exception(INTERP, NULL, E_ZeroDivisionError,
+                        "float division by zero");
+            VTABLE_set_number_native(INTERP, SELF, DYNSELF.get_number() / d);
+        }
+    }
+
+/*
+
+=item C<PMC* floor_divide(PMC *value, PMC *dest)>
+
+=item C<PMC* floor_divide_int(INTVAL value, PMC *dest)>
+
+=item C<PMC* floor_divide_float(FLOATVAL value, PMC *dest)>
+
+Divides the number by C<value> and returns the result in C<*dest>.
+
+=item C<void i_floor_divide(PMC *value)>
+
+=item C<void i_floor_divide_int(INTVAL value)>
+
+=item C<void i_floor_divide_float(FLOATVAL value)>
+
+Divides C<SELF> by C<value> inplace.
+
+=cut
+
+*/
+
+    PMC* floor_divide (PMC* value, PMC* dest) {
+MMD_BigInt:     {
+            return overflow_p(INTERP, SELF, value, dest, MMD_FLOOR_DIVIDE);
+        }
+MMD_DEFAULT: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+            if (d == 0.0)
+                real_exception(INTERP, NULL, E_ZeroDivisionError,
+                        "float division by zero");
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_integer_native(INTERP, dest,
+                    floor(DYNSELF.get_number() / d));
+            return dest;
+        }
+    }
+
+    PMC* floor_divide_int (INTVAL value, PMC* dest) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float division by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest,
+                floor(DYNSELF.get_number() / value));
+        return dest;
+    }
+
+    PMC* floor_divide_float (FLOATVAL value, PMC* dest) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float division by zero");
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest,
+                floor(DYNSELF.get_number() / value));
+        return dest;
+    }
+
+    void i_floor_divide (PMC* value) {
+MMD_BigInt:     {
+            overflow_p(INTERP, SELF, value, SELF, MMD_FLOOR_DIVIDE);
+        }
+MMD_DEFAULT: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+
+            if (d == 0.0)
+                real_exception(INTERP, NULL, E_ZeroDivisionError,
+                        "float division by zero");
+            VTABLE_set_integer_native(INTERP, SELF,
+                    floor(DYNSELF.get_number() / d));
+        }
+    }
+
+    void i_floor_divide_int (INTVAL value) {
+        if (value == 0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float division by zero");
+        VTABLE_set_integer_native(INTERP, SELF,
+                floor(DYNSELF.get_number() / value));
+    }
+
+    void i_floor_divide_float (FLOATVAL value) {
+        if (value == 0.0)
+            real_exception(INTERP, NULL, E_ZeroDivisionError,
+                    "float division by zero");
+        VTABLE_set_integer_native(INTERP, SELF,
+                floor(DYNSELF.get_number() / value));
+    }
 /*
 
 =item C<void pow_int(INTVAL value, PMC *dest)>
@@ -732,93 +883,15 @@ Rise SELF to the C<value>th power.
 
 */
 
-/*
-
-=item C<void divide(PMC *value, PMC *dest)>
-
-=item C<void floor_divide(PMC *value, PMC *dest)>
-
-Divides the integer by C<*value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-    void divide (PMC* value, PMC* dest) {
-MMD_PerlUndef: {
-            internal_exception(DIV_BY_ZERO, "division by zero!");
-        }
-MMD_BigInt:     {
-            overflow_p(INTERP, SELF, value, dest, MMD_DIVIDE);
-        }
-MMD_DEFAULT: {
-
-        FLOATVAL valf = VTABLE_get_number(INTERP, value);
-        FLOATVAL d;
+    void pow_int (INTVAL b, PMC* dest) {
+        INTVAL a = PMC_int_val(SELF);
         INTVAL i;
-        if (valf == 0.0) {
-                internal_exception(DIV_BY_ZERO, "division by zero!");
-            return;
+        VTABLE_set_integer_native(INTERP, dest, a);
+        --b;
+        for (i = 0; i < b; ++i) {
+            mmd_dispatch_v_pip(interpreter, dest, a, dest, MMD_MULTIPLY);
         }
-        d = PMC_int_val(SELF)/valf;
-        i = (INTVAL) d;
-        if ((FLOATVAL)(i) == d)
-            VTABLE_set_integer_native(INTERP, dest, i);
-        else
-            VTABLE_set_number_native(INTERP, dest, d);
-        }
-    }
 
-    void floor_divide (PMC* value, PMC* dest) {
-MMD_PerlUndef: {
-            internal_exception(DIV_BY_ZERO, "division by zero!");
-        }
-MMD_BigInt:     {
-            overflow_p(INTERP, SELF, value, dest, MMD_DIVIDE);
-        }
-MMD_DEFAULT: {
-        FLOATVAL valf = VTABLE_get_number(INTERP, value);
-
-        FLOATVAL d = floor(PMC_int_val(SELF)/valf);
-        VTABLE_set_integer_native(INTERP, dest, (INTVAL)d);
-    }
-    }
-
-/*
-
-=item C<void divide_int(INTVAL value, PMC *dest)>
-
-Divides the integer by C<value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-    void divide_int (INTVAL value, PMC* dest) {
-        INTVAL pmci, divi;
-        FLOATVAL divf;
-
-        pmci = PMC_int_val(SELF);
-        /* TODO exception */
-        divf = (FLOATVAL)pmci / value;
-        divi = pmci / value;
-        if (divf == divi || !pmci)
-            VTABLE_set_integer_native(INTERP, dest, divi);
-        else {
-            /* TODO BIG* promotion */
-            VTABLE_set_number_native(INTERP, dest, divf);
-        }
-    }
-/*
-
-=item C<void floor_divide_int(INTVAL value, PMC *dest)>
-
-Divides the integer by C<value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-    void floor_divide_int (INTVAL value, PMC* dest) {
-        FLOATVAL d = floor(PMC_int_val(SELF)/value);
-        VTABLE_set_integer_native(INTERP, dest, (INTVAL) d);
     }
 
 /*

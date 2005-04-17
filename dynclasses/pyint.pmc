@@ -51,6 +51,35 @@ promote(Interp *interpreter, PMC *self, PMC *b, PMC *dest, int mmd)
 
 pmclass PyInt extends PyObject extends Integer dynpmc group python_group {
 
+    void class_init() {
+        if (pass) {
+            /*
+             * Python uses either integer divide := floor_divide
+             * or true_divide := divide for integer division
+             * depending on Python version and __future__ import
+             */
+            INTVAL real_divide;
+            MMD_init *e = _temp_mmd_init;
+            int i, n, is_pmc;
+            funcptr_t func;
+
+            n = (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]));
+            /*
+             * if we find a DIVIDE, install FLOOR_DIVIDE
+             */
+            real_divide = MMD_FLOOR_DIVIDE;    /* XXX settings */
+            for (i = 0; i < n; ++i, ++e) {
+                if (e->func_nr == MMD_DIVIDE) {
+                    func = get_mmd_dispatch_type(interp,
+                            real_divide, enum_class_Integer,
+                            e->right, &is_pmc);
+                    e->func_ptr = func;
+                }
+            }
+        }
+    }
+
+
 /*
 
 =item C<PMC *get_bignum()>
@@ -80,6 +109,26 @@ Return a clone of the integer.
         PMC* ret = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_int_val(ret) = PMC_int_val(SELF);
         return ret;
+    }
+
+/*
+
+=item C<PMC* divide(PMC *value, PMC *dest)>
+
+=item C<PMC* divide_int(INTVAL value, PMC *dest)>
+
+=item C<PMC* divide_float(FLOATVAL value, PMC *dest)>
+
+Divides the number by C<value> and returns the result in C<*dest>.
+
+*/
+    PMC* divide (PMC* value, PMC* dest) {
+MMD_BigInt:     {
+            return SUPER(value, dest);
+        }
+MMD_DEFAULT: {
+            return SUPER(value, dest);
+        }
     }
 
 /*
@@ -399,109 +448,6 @@ MMD_PyLong: {
         }
 MMD_DEFAULT: {
             return -1;
-        }
-    }
-
-/*
-
-=item C<void divide(PMC *value, PMC *dest)>
-
-Divides the integer by the C<*value> returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void divide (PMC* value, PMC* dest) {
-MMD_PyInt: {
-            INTVAL pmci = PMC_int_val(SELF);
-            INTVAL vali = VTABLE_get_integer(INTERP, value);
-            INTVAL xdivy = pmci / vali;
-            INTVAL xmody = pmci - xdivy * vali;
-            if (xmody && ((vali ^ xmody) < 0) /* i.e. and signs differ */) {
-                    --xdivy;
-            }
-            VTABLE_set_integer_native(INTERP, dest, xdivy);
-        }
-MMD_PyLong: {
-            promote(INTERP, SELF, value, dest, MMD_DIVIDE);
-        }
-MMD_PyFloat: {
-            INTVAL pmci = PMC_int_val(SELF);
-            FLOATVAL valf = VTABLE_get_number(INTERP, value);
-            /* XXX: Morph? */
-            VTABLE_set_number_native(INTERP, dest, pmci / valf);
-        }
-    }
-
-/*
-
-=item C<void divide_float(FLOAT value, PMC *dest)>
-
-Divides the integer by C<value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void divide_float (FLOATVAL value, PMC* dest) {
-        FLOATVAL pmcn = VTABLE_get_number(INTERP, SELF);
-        VTABLE_morph(INTERP, dest, PyBuiltin_PyFloat);
-        VTABLE_set_number_native(INTERP, dest, pmcn / value);
-    }
-
-/*
-
-=item C<void divide_int(INTVAL value, PMC *dest)>
-
-Divides the integer by C<value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void divide_int (INTVAL value, PMC* dest) {
-        INTVAL pmci = PMC_int_val(SELF);
-        INTVAL xdivy = pmci / value;
-        INTVAL xmody = pmci - xdivy * value;
-        if (xmody && ((value ^ xmody) < 0) /* i.e. and signs differ */) {
-                --xdivy;
-        }
-        VTABLE_set_integer_native(INTERP, dest, xdivy);
-    }
-
-/*
-
-=item C<void floor_divide(PMC *value, PMC *dest)>
-
-Divides the integer by the C<*value> returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void floor_divide (PMC* value, PMC* dest) {
-MMD_PyLong: {
-            promote(INTERP, SELF, value, dest, MMD_FLOOR_DIVIDE);
-        }
-MMD_DEFAULT: {
-            mmd_dispatch_v_ppp(INTERP, SELF, value, dest, MMD_DIVIDE);
-        }
-    }
-
-/*
-
-=item C<void floor_divide_int(PMC *value, PMC *dest)>
-
-Divides the integer by the C<*value> returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void floor_divide_int (INTVAL value, PMC* dest) {
-MMD_DEFAULT: {
-            mmd_dispatch_v_pip(INTERP, SELF, value, dest, MMD_DIVIDE);
         }
     }
 

@@ -824,51 +824,108 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<void divide (PMC* value, PMC* dest)>
+=item C<PMC* divide (PMC* value, PMC* dest)>
 
-=item C<void divide_int (INTVAL value, PMC* dest)>
+=item C<PMC* divide_int (INTVAL value, PMC* dest)>
 
-=item C<void divide_float (FLOATVAL value, PMC* dest)>
+=item C<PMC* divide_float (FLOATVAL value, PMC* dest)>
 
 Divide the complex number by C<value>, placing the result in C<dest>.
+
+=item C<void i_divide (PMC* value, PMC* dest)>
+
+=item C<void i_divide_int (INTVAL value, PMC* dest)>
+
+=item C<void i_divide_float (FLOATVAL value, PMC* dest)>
+
+Divide the complex number C<SELF> by C<value> inplace.
+
+TODO divide by zero exception
 
 =cut
 
 */
 
-    void divide (PMC* value, PMC* dest) {
+    PMC* divide (PMC* value, PMC* dest) {
 MMD_Complex: {
-        FLOATVAL mod, re, im;
+            FLOATVAL mod, re, im;
 
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        /* a little speed optimisation: cache an intermediate number;
-            I'm not sure the compiler does this */
-        mod = (RE(value) * RE(value) + IM(value) * IM(value));
-
-        re = (RE(SELF) * RE(value) + IM(SELF) * IM(value)) / mod;
-
-        im = (IM(SELF) * RE(value) - RE(SELF) * IM(value)) / mod;
-
-        RE(dest) = re;
-        IM(dest) = im;
+            if (dest)
+                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+            else {
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            }
+            /* a little speed optimisation: cache an intermediate number;
+                I'm not sure the compiler does this */
+            mod = (RE(value) * RE(value) + IM(value) * IM(value));
+            re = (RE(SELF) * RE(value) + IM(SELF) * IM(value)) / mod;
+            im = (IM(SELF) * RE(value) - RE(SELF) * IM(value)) / mod;
+            RE(dest) = re;
+            IM(dest) = im;
+            return dest;
         }
 MMD_DEFAULT: {
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        RE(dest) = RE(SELF) / VTABLE_get_number(INTERP, value);
-        IM(dest) = IM(SELF) / VTABLE_get_number(INTERP, value);
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (dest)
+                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+            else {
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            }
+            RE(dest) = RE(SELF) / d;
+            IM(dest) = IM(SELF) / d;
+            return dest;
         }
     }
 
-    void divide_int (INTVAL value, PMC* dest) {
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+    PMC* divide_int (INTVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else {
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        }
         RE(dest) = RE(SELF) / value;
         IM(dest) = IM(SELF) / value;
+        return dest;
     }
 
-    void divide_float (FLOATVAL value, PMC* dest) {
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+    PMC* divide_float (FLOATVAL value, PMC* dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else {
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        }
         RE(dest) = RE(SELF) / value;
         IM(dest) = IM(SELF) / value;
+        return dest;
+    }
+
+    void i_divide (PMC* value) {
+MMD_Complex: {
+            FLOATVAL mod, re, im;
+
+            /* a little speed optimisation: cache an intermediate number;
+                I'm not sure the compiler does this */
+            mod = (RE(value) * RE(value) + IM(value) * IM(value));
+            re = (RE(SELF) * RE(value) + IM(SELF) * IM(value)) / mod;
+            im = (IM(SELF) * RE(value) - RE(SELF) * IM(value)) / mod;
+            RE(SELF) = re;
+            IM(SELF) = im;
+        }
+MMD_DEFAULT: {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            RE(SELF) /= d;
+            IM(SELF) /= d;
+        }
+    }
+
+    void i_divide_int (INTVAL value) {
+        RE(SELF) /= value;
+        IM(SELF) /= value;
+    }
+
+    void i_divide_float (FLOATVAL value) {
+        RE(SELF) /= value;
+        IM(SELF) /= value;
     }
 
 

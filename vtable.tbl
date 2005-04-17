@@ -163,13 +163,21 @@ void i_multiply(PMC* value)                 MMD_I_MULTIPLY
 void i_multiply_int(INTVAL value)           MMD_I_MULTIPLY_INT
 void i_multiply_float(FLOATVAL value)       MMD_I_MULTIPLY_FLOAT
 
-void divide(PMC* value, PMC* dest)           MMD_DIVIDE
-void divide_int(INTVAL value, PMC* dest)     MMD_DIVIDE_INT
-void divide_float(FLOATVAL value, PMC* dest) MMD_DIVIDE_FLOAT
+PMC* divide(PMC* value, PMC* dest)           MMD_DIVIDE
+PMC* divide_int(INTVAL value, PMC* dest)     MMD_DIVIDE_INT
+PMC* divide_float(FLOATVAL value, PMC* dest) MMD_DIVIDE_FLOAT
 
-void floor_divide(PMC* value, PMC* dest)           MMD_FLOOR_DIVIDE
-void floor_divide_int(INTVAL value, PMC* dest)     MMD_FLOOR_DIVIDE_INT
-void floor_divide_float(FLOATVAL value, PMC* dest) MMD_FLOOR_DIVIDE_FLOAT
+void i_divide(PMC* value)                    MMD_I_DIVIDE
+void i_divide_int(INTVAL value)              MMD_I_DIVIDE_INT
+void i_divide_float(FLOATVAL value)          MMD_I_DIVIDE_FLOAT
+
+PMC* floor_divide(PMC* value, PMC* dest)           MMD_FLOOR_DIVIDE
+PMC* floor_divide_int(INTVAL value, PMC* dest)     MMD_FLOOR_DIVIDE_INT
+PMC* floor_divide_float(FLOATVAL value, PMC* dest) MMD_FLOOR_DIVIDE_FLOAT
+
+void i_floor_divide(PMC* value)              MMD_I_FLOOR_DIVIDE
+void i_floor_divide_int(INTVAL value)        MMD_I_FLOOR_DIVIDE_INT
+void i_floor_divide_float(FLOATVAL value)    MMD_I_FLOOR_DIVIDE_FLOAT
 
 void modulus(PMC* value, PMC* dest)         MMD_MOD
 void modulus_int(INTVAL value, PMC* dest)   MMD_MOD_INT

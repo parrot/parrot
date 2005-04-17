@@ -366,7 +366,7 @@ result in C<dest>.
             if (RANGE_START(SELF) == -2) {
                 internal_exception(1,
                     "MatchRange: cannot add to nonexistent range");
-                return;
+                return NULL;
             }
             RANGE_END(SELF) = RANGE_START(SELF);
         }

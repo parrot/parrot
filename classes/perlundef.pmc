@@ -302,57 +302,39 @@ Morphs to a C<PerlString> with the value of C<*value>.
 
 */
 
-    void divide (PMC* value,  PMC* dest) {
+    PMC* divide (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in division");
-        if(value->vtable == Parrot_base_vtables[enum_class_PerlUndef]) {
-            internal_exception(DIV_BY_ZERO, "division by zero!");
-        }
-        else if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
-            if(VTABLE_get_integer(INTERP, value) == 0) {
-                internal_exception(DIV_BY_ZERO, "division by zero!");
-            }
-        }
-        else if(VTABLE_get_number(INTERP, value) == 0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!");
-        }
-
-        VTABLE_set_integer_native(INTERP, dest, 0);
+            "Use of uninitialized value in division");
+        return SUPER(value, dest);
     }
 
 /*
 
-=item C<void divide_int(INTVAL value, PMC *dest)>
+=item C<PMC* divide_int(INTVAL value, PMC *dest)>
 
 =cut
 
 */
 
-    void divide_int (INTVAL value,  PMC* dest) {
+    PMC* divide_int (INTVAL value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in integer division");
-        if(value == 0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!");
-        }
-        VTABLE_set_integer_native(INTERP, dest, 0);
+            "Use of uninitialized value in integer division");
+        return SUPER(value, dest);
     }
 
 
 /*
 
-=item C<void divide_float(FLOATVAL value, PMC *dest)>
+=item C<PMC* divide_float(FLOATVAL value, PMC *dest)>
 
 =cut
 
 */
 
-    void divide_float (FLOATVAL value,  PMC* dest) {
+    PMC* divide_float (FLOATVAL value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in numeric division");
-        if(value == 0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!");
-        }
-        VTABLE_set_integer_native(INTERP, dest, 0);
+            "Use of uninitialized value in numeric division");
+        return SUPER(value, dest);
     }
 
 /*

@@ -367,6 +367,10 @@ is_infix(char *name)
         return MMD_SUBTRACT;
     if (strcmp(name, "mul") == 0)
         return MMD_MULTIPLY;
+    if (strcmp(name, "div") == 0)
+        return MMD_DIVIDE;
+    if (strcmp(name, "fdiv") == 0)
+        return MMD_FLOOR_DIVIDE;
     return -1;
 }
 

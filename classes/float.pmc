@@ -20,6 +20,9 @@ C<Float> extends C<scalar> to provide floating-point number operations.
 
 #include "parrot/parrot.h"
 
+PMC* Parrot_scalar_subtract_Complex(Interp* , PMC* pmc, PMC* value, PMC* dest);
+void Parrot_scalar_i_subtract_Complex(Interp* , PMC* pmc, PMC* value);
+
 pmclass Float extends scalar {
 
 /*
@@ -227,293 +230,26 @@ Morphs the scalar to the specified type.
         }
         SELF->vtable = Parrot_base_vtables[type];
     }
-/*
 
-=item C<void add(PMC *value, PMC *dest)>
-
-=item C<void add_int(INTVAL value, PMC *dest)>
-
-=item C<void add_float(FLOATVAL value, PMC *dest)>
-
-Adds C<value> to the number and returns the result in C<*dest>.
-
-=item C<void i_add(PMC *value)>
-
-=item C<void i_add(INTVAL value)>
-
-=item C<void i_add(FLOATVAL value)>
-
-Adds C<value> to C<SELF> inplace.
-
-=cut
-
-*/
-
-    PMC* add (PMC* value, PMC* dest) {
-MMD_Complex: {
-            FLOATVAL a = DYNSELF.get_number();
-            if (dest)
-                VTABLE_morph(INTERP, dest, value->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, value->vtable->base_type);
-            VTABLE_set_number_native(INTERP, dest,
-                    a + VTABLE_get_number_keyed_int(INTERP, value, 0));
-            VTABLE_set_number_keyed_int(INTERP, dest, 1,
-                    VTABLE_get_number_keyed_int(INTERP, value, 1));
-            return dest;
-        }
-MMD_DEFAULT: {
-            if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
-            VTABLE_set_number_native(INTERP, dest,
-                    DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
-            return dest;
-        }
-    }
-
-    PMC* add_int (INTVAL value, PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_number_native(INTERP, dest,
-                DYNSELF.get_number() + (FLOATVAL)value);
-        return dest;
-    }
-
-    PMC* add_float (FLOATVAL value, PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_number_native(INTERP, dest,
-                DYNSELF.get_number() + value);
-        return dest;
-    }
-
-    void i_add (PMC* value) {
-MMD_Complex: {
-            FLOATVAL a = DYNSELF.get_number();
-            VTABLE_morph(INTERP, SELF, value->vtable->base_type);
-            VTABLE_set_number_native(INTERP, SELF,
-                    a + VTABLE_get_number_keyed_int(INTERP, value, 0));
-            VTABLE_set_number_keyed_int(INTERP, SELF, 1,
-                    VTABLE_get_number_keyed_int(INTERP, value, 1));
-        }
-MMD_DEFAULT: {
-            VTABLE_set_number_native(INTERP, SELF,
-                DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
-        }
-    }
-
-    void i_add_int (INTVAL value) {
-        VTABLE_set_number_native(INTERP, SELF,
-            DYNSELF.get_number() + (FLOATVAL)value);
-    }
-
-    void i_add_float (FLOATVAL value) {
-        VTABLE_set_number_native(INTERP, SELF,
-            DYNSELF.get_number() + value);
-    }
-
-/*
-
-=item C<PMC* subtract(PMC *value, PMC *dest)>
-
-=item C<PMC* subtract_int(INTVAL value, PMC *dest)>
-
-=item C<PMC* subtract_float(FLOATVAL value, PMC *dest)>
-
-Subtracts C<value> from the number and returns the result in C<*dest>.
-If C<dest> doesn't exist a new C<Float> is created.
-
-=item C<void i_subtract(PMC *value)>
-
-=item C<void i_subtract_int(INTVAL value)>
-
-=item C<void i_subtract_float(FLOATVAL value)>
-
-Subtracts C<value> from C<SELF> inplace.
-
-=cut
-
-*/
 
     PMC* subtract (PMC* value, PMC* dest) {
 MMD_Complex: {
-            FLOATVAL a = DYNSELF.get_number();
-            if (dest)
-                VTABLE_morph(INTERP, dest, value->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, value->vtable->base_type);
-            VTABLE_set_number_native(INTERP, dest,
-                    a - VTABLE_get_number_keyed_int(INTERP, value, 0));
-            VTABLE_set_number_keyed_int(INTERP, dest, 1,
-                    -VTABLE_get_number_keyed_int(INTERP, value, 1));
-            return dest;
+            return Parrot_scalar_subtract_Complex(interpreter,
+                    SELF, value, dest);  /* XXX inheritance problem */
         }
 MMD_DEFAULT: {
-            if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
-            VTABLE_set_number_native(INTERP, dest,
-                    DYNSELF.get_number() - VTABLE_get_number(INTERP, value));
-            return dest;
+            return SUPER(value, dest);  /* XXX inheritance problem */
         }
-    }
-
-    PMC* subtract_int (INTVAL value, PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_number_native(INTERP, dest,
-                DYNSELF.get_number() - (FLOATVAL)value);
-        return dest;
-    }
-
-    PMC* subtract_float (FLOATVAL value, PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_number_native(INTERP, dest,
-                DYNSELF.get_number() - value);
-        return dest;
     }
 
     void i_subtract (PMC* value) {
 MMD_Complex: {
-            FLOATVAL a = DYNSELF.get_number();
-            VTABLE_morph(INTERP, SELF, value->vtable->base_type);
-            VTABLE_set_number_native(INTERP, SELF,
-                    a - VTABLE_get_number_keyed_int(INTERP, value, 0));
-            VTABLE_set_number_keyed_int(INTERP, SELF, 1,
-                    -VTABLE_get_number_keyed_int(INTERP, value, 1));
+            Parrot_scalar_i_subtract_Complex(interpreter, SELF, value);
         }
 MMD_DEFAULT: {
-            VTABLE_set_number_native(INTERP, SELF,
-                DYNSELF.get_number() - VTABLE_get_number(INTERP, value));
+            return SUPER(value);  /* XXX inheritance problem */
         }
     }
-
-    void i_subtract_int (INTVAL value) {
-        VTABLE_set_number_native(INTERP, SELF,
-            DYNSELF.get_number() - (FLOATVAL)value);
-    }
-
-    void i_subtract_float (FLOATVAL value) {
-        VTABLE_set_number_native(INTERP, SELF,
-            DYNSELF.get_number() - value);
-    }
-
-/*
-
-=item C<PMC* multiply(PMC *value, PMC *dest)>
-
-=item C<PMC* multiply_int(INTVAL value, PMC *dest)>
-
-=item C<PMC* multiply_float(FLOATVAL value, PMC *dest)>
-
-Multiplies the number by C<value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    PMC* multiply (PMC* value, PMC* dest) {
-MMD_Complex: {
-            internal_exception(1, "TODO mul<Float, Complex>");
-            return dest;
-        }
-MMD_DEFAULT: {
-            if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
-            VTABLE_set_number_native(INTERP, dest,
-                DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
-            return dest;
-        }
-    }
-
-    PMC* multiply_int (INTVAL value, PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_number_native(INTERP, dest,
-            DYNSELF.get_number() * value);
-        return dest;
-    }
-
-    PMC* multiply_float (FLOATVAL value, PMC* dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_number_native(INTERP, dest,
-            DYNSELF.get_number() * value);
-        return dest;
-    }
-
-    void i_multiply (PMC* value) {
-MMD_Complex: {
-            internal_exception(1, "TODO i_mul<Float, Complex>");
-        }
-MMD_DEFAULT: {
-            VTABLE_set_number_native(INTERP, SELF,
-                DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
-        }
-    }
-
-    void i_multiply_int (INTVAL value) {
-        VTABLE_set_number_native(INTERP, SELF,
-            DYNSELF.get_number() * (FLOATVAL)value);
-    }
-
-    void i_multiply_float (FLOATVAL value) {
-        VTABLE_set_number_native(INTERP, SELF,
-            DYNSELF.get_number() * value);
-    }
-
-/*
-
-=item C<void divide(PMC *value, PMC *dest)>
-
-Divides the number by C<*value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void divide (PMC* value, PMC* dest) {
-MMD_Float: {
-        /* TODO zero divide */
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) / PMC_num_val(value));
-        }
-MMD_DEFAULT: {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) / VTABLE_get_number(INTERP, value));
-        }
-    }
-
-/*
-
-=item C<void divide_int(INTVAL value, PMC *dest)>
-
-=cut
-
-*/
-
-    void divide_int (INTVAL value, PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) / value
-        );
-    }
-
-/*
-
-=item C<void divide_float(FLOATVAL value, PMC *dest)>
-
-Divides the number by C<value> and returns the result in C<*dest>.
-
-=cut
-
-*/
-
-    void divide_float (FLOATVAL value, PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest,
-            PMC_num_val(SELF) / value
-        );
-    }
-
 /*
 
 =item C<void cmodulus(PMC *value, PMC *dest)>

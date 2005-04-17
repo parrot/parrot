@@ -48,6 +48,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
     $I1 = right
     $I2 = $I0/$I1   # don't call divide Integer/PerlInt here
     lhs = $I2       # '
+    .return(lhs)
 .end
 CODE
 3
@@ -117,6 +118,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide - override builtin");
     .param pmc right
     .param pmc lhs
     lhs = 42
+    .return(lhs)
 .end
 CODE
 42
@@ -237,6 +239,7 @@ print S <<'EOF';
     .param pmc right
     .param pmc lhs
     lhs = 42
+    .return(lhs)
 .end
 EOF
 close S;
