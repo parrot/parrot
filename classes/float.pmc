@@ -474,7 +474,7 @@ Divides the number by C<*value> and returns the result in C<*dest>.
 
     void divide (PMC* value, PMC* dest) {
 MMD_Float: {
-        /* TODO zero dividde */
+        /* TODO zero divide */
         VTABLE_set_number_native(INTERP, dest,
             PMC_num_val(SELF) / PMC_num_val(value));
         }
@@ -527,7 +527,7 @@ the result in C<*dest>.
 
     void cmodulus (PMC* value, PMC* dest) {
 MMD_Float: {
-        /* TODO zero dividde */
+        /* TODO zero divide */
         FLOATVAL f = PMC_num_val(value);
         VTABLE_set_number_native(INTERP, dest,
             fmod(PMC_num_val(SELF), f));
@@ -581,7 +581,7 @@ result in C<*dest>.
 
     void modulus (PMC* value, PMC* dest) {
 MMD_Float: {
-        /* TODO zero dividde */
+        /* TODO zero divide */
         FLOATVAL f = PMC_num_val(value);
         VTABLE_set_number_native(INTERP, dest,
             floatval_mod(PMC_num_val(SELF), f));

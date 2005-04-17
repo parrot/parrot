@@ -15,7 +15,7 @@ python.ops - Python Operations
 
 =head1 DESCRIPTION
 
-Currently included in main - will be splitted.
+Currently included in main - will be split.
 
 =cut
 
@@ -42,7 +42,7 @@ space is inserted.
 
 =item B<print_newline>()
 
-Print a newline char to standar output.
+Print a newline char to standard output.
 
 =cut
 

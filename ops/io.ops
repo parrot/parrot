@@ -120,7 +120,7 @@ inline op getstderr(out PMC) :base_io {
 
 Perform an operation an an IO object. This is a general purpose
 hook for setting various flags, modes, etc.
-Examples: setting the record seperator or setting the buffering
+Examples: setting the record separator or setting the buffering
 
 =cut
 

@@ -228,7 +228,7 @@ Returns the number of elements in the array as a Parrot string. (??? -leo)
 
 =item C<STRING *get_repr()>
 
-Returns a string representaion of the array contents.
+Returns a string representation of the array contents.
 TODO implement freeze/thaw and use that instead.
 
 =cut

@@ -1115,7 +1115,7 @@ mmd_arg_tuple_func(Interp *interpreter, STRING *signature)
     }
     /*
      * XXX invalidate S1
-     * this is needed for this seqeuence:
+     * this is needed for this sequence:
      * "__add"(l, r, d)             # multi sub call - create S1
      * m = getattribute l, "__add"  # create bound method
      * m(r, d)
@@ -1209,7 +1209,7 @@ mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple,
     type1 = VTABLE_get_integer_keyed_int(interpreter, arg_tuple, 0);
     if (type1 < 0) {
         return;
-        internal_exception(1, "unimplemted native MMD type");
+        internal_exception(1, "unimplemented native MMD type");
         /* TODO create some class namespace */
     }
     else {

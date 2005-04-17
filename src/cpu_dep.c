@@ -16,7 +16,7 @@ Register windowing is a technique which avoids having to empty registers
 by moving a virtual window up/down the register stack restricting the
 number of registers which are visible.
 
-Remember you read somethng about it in F<docs/infant.dev>?
+Remember you read something about it in F<docs/infant.dev>?
 
 =head2 Functions
 

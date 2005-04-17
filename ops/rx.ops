@@ -527,7 +527,7 @@ This ops will not increment the value of start_index if the pattern matches
 at the current position of the string. So when the overall match fails,
 you\'ll have to increment start_index by hand before calling them.
 
-Additonally, this ops can be used to optimize matches of the type:
+Additionally, this op can be used to optimize matches of the type:
 
 	.*? <pattern>  # non-greedy repetition of dot, followed by
 		       # a known pattern
@@ -835,7 +835,7 @@ Saves the current position in the string.
 As we will see, most of the rx opcodes read or modify at least one of
 this registers. Sometimes, the compiler can decide to use some other
 registers, to save temporary information about the match (like the
-position of the begining of a group, for example).
+position of the beginning of a group, for example).
 
 Let's start with a really simple regex. Imagine that we want to
 compile the code
@@ -858,7 +858,7 @@ to put the string contents of $_ into S0, the code would be:
 Let's look at this instructions one at-a-time.
 
   start:
-	  ## we start matching from the begining of the match
+	  ## we start matching from the beginning of the match
 	  set I0, 0
 
 	  ## match the string "foobar" at the current position, or branch to end
@@ -898,12 +898,12 @@ fails, is branches to rx_advance, where it will increase the
 start-of-match position by one and try again. When there are no
 characters left, rx_advance branches to $fail.
 
-This is the scheleton of how regexes work in general. The main loop
+This is the skeleton of how regexes work in general. The main loop
 iterates over I0 (start-of-match) while the inner ops update I1
 (match-position).
 
 For this particular case, Rx4 offers an specialized op that can be used
-to optimize the computation. C<rx_search> merges the funcionality of
+to optimize the computation. C<rx_search> merges the functionality of
 C<rx_advance> and C<rx_literal> in one op.
 
 Using this new op, the code to match would look like:
@@ -1011,7 +1011,7 @@ The list below gives simple templates for common quantifiers operations.
 =item C<x|y|z>
 
   start:
-	  set I2, I1	 #I2  the begining of the group
+	  set I2, I1	 #I2  the beginning of the group
 	  set I3, -6       #I3  next alternation in the group, expressed
 			   #as an offset from the branch point
 
@@ -1081,7 +1081,7 @@ hypothetical variables has not been resolved.
 
 =item *
 
-There are undoubtably many more in code this complicated.
+There are undoubtedly many more in code this complicated.
 
 =back
 

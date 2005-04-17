@@ -372,7 +372,7 @@ schedule_signal_event(int signum)
     ev->u.signal = signum;
     entry->data = ev;
     /*
-     * deliver to all intrepreters
+     * deliver to all interpreters
      */
     Parrot_schedule_broadcast_qentry(entry);
 }

@@ -62,7 +62,7 @@ which automatically sets the top of stack pointer.
 Like above. Additionally sets the stack top, so that Parrot objects created
 in inner stack frames will be visible during DODs stack walking code.
 B<stack_top> should be the address of an automatic variable in the callers
-stack frame. All unachored Parrot objects (PMCs) must live in inner stack
+stack frame. All unanchored Parrot objects (PMCs) must live in inner stack
 frames so that they are not destroyed during DOD runs.
 
 Use this function, when you call into Parrot before entering a run loop.
@@ -646,8 +646,8 @@ set_current_sub(Interp *interpreter)
     size_t offs;
 
     /*
-     * walk the fixup table, the first Sub-like entry should be our
-     * entry point with the address at our resoume_offset
+     * Walk the fixup table.  The first Sub-like entry should be our
+     * entry point with the address at our resume_offset.
      */
 
     pf = interpreter->code;

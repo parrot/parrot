@@ -73,7 +73,7 @@ typedef struct Interp {
 
 /*
  * some macros to get 3 different kinds of run loops
- * you might skip this uglyness and continue
+ * you might skip this ugliness and continue
  * at dispatch loop ~90 lines below
  *
  * or for the curious: look at the preprocessor output

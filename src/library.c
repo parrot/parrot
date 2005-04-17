@@ -81,7 +81,7 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     sub = Parrot_find_global(interpreter, str, name);
     if (!sub) {
         interpreter->resume_flag = resume;
-	internal_exception(1, "unkown parrotlib method '%s'", func_name);
+	internal_exception(1, "unknown parrotlib method '%s'", func_name);
 	abort();
     }
 

@@ -806,7 +806,7 @@ Returns SELF. A PMC is it's own class.
 
 =item C<PMC* get_attr_str(STRING* attr)>
 
-Look for NCI methods and propertys.
+Look for NCI methods and properties.
 
 =cut
 

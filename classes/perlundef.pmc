@@ -60,7 +60,7 @@ Warns of the use of an unitialized value, and returns C<0.0>.
 
 =item C<STRING *get_string()>
 
-Warns of the use of an unitialized value, and returns an empty Parrot
+Warns of the use of an initialized value and returns an empty Parrot
 string.
 
 =cut
@@ -77,7 +77,7 @@ string.
 
 =item C<PMC *get_pmc()>
 
-Warns of the use of an unitialized value, and returns itself.
+Warns of the use of an initialized value and returns itself.
 
 =cut
 
@@ -535,7 +535,7 @@ Morphs to a C<PerlString> with the value of C<*value>.
 
 =item C<void concatenate_str(STRING *value, PMC *dest)>
 
-All these methods warn of the use of an unitialized value, and return
+All these methods warn of the use of an uninitialized value and return
 the calculated result in C<*dest>.
 
 In the division methods exceptions are raised for division by zero,

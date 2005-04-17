@@ -232,7 +232,7 @@ find_exception_handler(Interp * interpreter, PMC *exception)
         if (e->entry_type == STACK_ENTRY_ACTION) {
             /*
              * Clear automatic cleanup routine run in stack_pop
-             * and run the action sburoutine with an INTVAL argument
+             * and run the action subroutine with an INTVAL argument.
              * of 1
              */
             PMC *sub = UVal_pmc(e->entry);

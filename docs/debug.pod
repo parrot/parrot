@@ -57,7 +57,7 @@ afoul of the garbage collector.
 
 Within the C<--gc-debug> mode, there is another tool to help narrow down the
 problem. You can edit F<src/dod.c> and C<#define> the C<GC_VERBOSE> flag to 1.
-After recompiling C<parrot>, the garbage collecter will perform additional
+After recompiling C<parrot>, the garbage collector will perform additional
 checks. After the garbage collector has traced all objects to find which 
 ones are still alive, it will scan through all of the dead objects to see 
 if any of them believe they are alive (which will happen for infants, since 

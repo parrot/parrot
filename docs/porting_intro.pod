@@ -7,7 +7,7 @@ docs/porting_intro.pod - Parrot Subsystem Porting Introduction
 
 =head1 OVERVIEW
 
-This document is an introduction to porting the optional subsytems of Parrot
+This document is an introduction to porting the optional subsystems of Parrot
 onto a new architecture once the core successfully builds.  It assumes passing
 familiarity with common VM techniques but relatively little knowledge of Parrot
 internals.  For each feature, a brief description of its purpose, hints on

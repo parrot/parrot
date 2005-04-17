@@ -1161,7 +1161,7 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
   if (p == NULL) {
       const char * err = Parrot_dlerror();
       Parrot_warn(interpreter, PARROT_WARNINGS_UNDEF_FLAG,
-	 "Symbol '%s' not found: %s\n", name, err ? err : "unkown reason");
+	 "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
       $1 = pmc_new(interpreter, enum_class_Undef);
   }
   else {
@@ -1180,7 +1180,7 @@ op dlvar (out PMC, in PMC, in STR) {
   if (p == NULL) {
       const char * err = Parrot_dlerror();
       Parrot_warn(interpreter, PARROT_WARNINGS_UNDEF_FLAG,
-	 "Symbol '%s' not found: %s\n", name, err ? err : "unkown reason");
+	 "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
       $1 = pmc_new(interpreter, enum_class_Undef);
   }
   else {

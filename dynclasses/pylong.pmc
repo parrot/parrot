@@ -8,7 +8,7 @@ classes/pylong.pmc - Python BigInt PMC class
 
 =head1 DESCRIPTION
 
-C<PyLong> provides arbitray precision integer mathematic functions.
+C<PyLong> provides arbitrary precision integer mathematic functions.
 
 =head2 Functions
 

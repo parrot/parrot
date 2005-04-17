@@ -198,7 +198,7 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                         workchar += codepoint - 'A' + 10;
                     } else {
                         internal_exception(UNIMPLEMENTED,
-                                "Illegal escape sequence insidde {}");
+                                "Illegal escape sequence inside {}");
                     }
                 }
                 if (*offset == len)

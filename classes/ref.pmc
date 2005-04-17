@@ -110,7 +110,7 @@ Sets the referenced PMC to C<*initializer>.
 */
 
     void init_pmc (PMC* initializer) {
-        PMC_pmc_val(SELF) = initializer; /* the refered PMC itself */
+        PMC_pmc_val(SELF) = initializer; /* the referred PMC itself */
 	PObj_custom_mark_SET(SELF);
         if (initializer) {
             /*

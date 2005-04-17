@@ -87,7 +87,7 @@ Returns a random integer in the range C<-2^31..2^31>.
 
 =item C<INTVAL get_integer_keyed_int(INTVAL max)>
 
-Returns a ramdom integer in the range C<0..max>.
+Returns a random integer in the range C<0..max>.
 
 =cut
 
@@ -101,7 +101,7 @@ Returns a ramdom integer in the range C<0..max>.
 
 =item C<FLOATVAL get_number()>
 
-Returns a ramdom floating-point number in the range C<0.0..1.0>.
+Returns a random floating-point number in the range C<0.0..1.0>.
 
 =cut
 

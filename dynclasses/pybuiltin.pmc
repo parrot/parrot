@@ -98,7 +98,7 @@ make_type(Interp* interpreter, INTVAL class, STRING* name,
         item = VTABLE_get_pmc_keyed_str(interpreter, stash, key);
 
         if (item->vtable->base_type == enum_class_NCI) {
-            /* Parrots MMD system needs the origial NCI type
+            /* Parrot's MMD system needs the original NCI type
              * make a clone of it
              */
             if (string_ord(interpreter, key, key->strlen - 1) != '_') {
@@ -195,7 +195,7 @@ they will be used frequently here.
 =item C<PMC* "__load__"()>
 
 This is unabashed hackery scaffolding.  It copies all the builtins
-functions from globals to lexicaly scoped variables.
+functions from globals to lexically scoped variables.
 
 =cut
 

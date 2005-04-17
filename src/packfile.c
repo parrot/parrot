@@ -2732,7 +2732,7 @@ PackFile_Constant_destroy(Interp*, struct PackFile_Constant *self)>
 
 Delete the C<PackFile_Constant> C<self>.
 
-Dont't delete C<PMC>s or C<STRING>s, they are destroyed via DOD/GC.
+Don't delete C<PMC>s or C<STRING>s, they are destroyed via DOD/GC.
 
 =cut
 

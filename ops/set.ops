@@ -245,7 +245,7 @@ Make $1 refer to $2 by calling C<set_pmc>.
 
 =item B<deref>(out PMC, in PMC)
 
-Not strictly an assigment operation: Get the PMC into $1, that the
+Not strictly an assignment operation: Put into $1 the PMC that the
 reference PMC $2 refers to.
 
 =cut

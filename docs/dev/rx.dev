@@ -180,7 +180,7 @@ definitions.
 This section describes the use of bitmaps in rx.[ch] and briefly 
 describes the other possible choices and why bitmaps are used over them.  
 The advantage to using bitmaps is both in speed and storage.  After 
-bitmaps started being used, there was a noticable speed increase.
+starting to use bitmaps, there was a noticeable speed increase.
 
 =over 4
 
@@ -224,7 +224,7 @@ that map to a number in the range 0-31.  We note that 2^3=8, and thus if
 we ignore the 3 least significant bits of each number in the range 0-255, 
 than for every number, there will be 7 others that are the same as it 
 (since for each permutation of the 5 most significant bits, there are 8 
-possibilites for the 3 least significant bits).  Now all we need to do is 
+possibilities for the 3 least significant bits).  Now all we need to do is 
 ignore the 3 least significant digits, and at the same time produce a 
 number in the range 0-31.  The quickest way to do this is just to right 
 shift a number 3 places, making the 3 least significant digits "fall 

@@ -1025,7 +1025,7 @@ int      public_mALLOPt();
   arena:     current total non-mmapped bytes allocated from system 
   ordblks:   the number of free chunks 
   smblks:    the number of fastbin blocks (i.e., small chunks that
-               have been freed but not use resused or consolidated)
+               have been freed but not use, reused, or consolidated)
   hblks:     current number of mmapped regions 
   hblkhd:    total bytes held in mmapped regions 
   usmblks:   the maximum total allocated space. This will be greater

@@ -124,7 +124,7 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         trace_i = make_interpreter(interpreter, NO_FLAGS);
         Parrot_init(trace_i);
-        /* remeber old context */
+        /* remember old context */
         trace_ctx = mem_sys_allocate(sizeof(struct Parrot_Context));
         mem_sys_memcopy(trace_ctx, &trace_i->ctx,
                 sizeof(struct Parrot_Context));

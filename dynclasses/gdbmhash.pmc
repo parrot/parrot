@@ -24,13 +24,13 @@ On inserted and fetch, keys are converted to STRINGs.
 
 =head2 store
 
-PMC insert values are convered to STRINGs.
+PMC insert values are converted to STRINGs.
 TODO: Integer insert values are converted to STRINGs.
 TODO: Number insert values are converted to STRINGs.
 
 =head2 fetch
 
-get_integer_keyed() and get_number_keyed() make propably no sense,
+get_integer_keyed() and get_number_keyed() probably don't make any sense,
 as integers usually can't be converted.
 
 When a PMC is requested, a String PMC is returned.

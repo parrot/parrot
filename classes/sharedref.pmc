@@ -185,7 +185,7 @@ Sets the referenced PMC to C<*other>.
 
 =item C<PMC* get_pmc()>
 
-Catch dereferencing. This would unshare the refered PMC.
+Catch dereferencing. This would unshare the referred PMC.
 
 =cut
 
@@ -205,8 +205,8 @@ Catch dereferencing. This would unshare the refered PMC.
 
 =item C<void destroy()>
 
-Destroys the refered object and itself. This probably nees destroy oderdering
-or at least a detection if the refered PMC is already destroyed.
+Destroys the referred object and itself. This probably needs destroy ordering
+or at least a detection if the referred PMC is already destroyed.
 
 =cut
 

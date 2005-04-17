@@ -319,7 +319,7 @@ objects can be done in parallel by atomically handling a bunch of
 objects to another thread. After doing some increments of marking, these
 objects then get returned to the shared to-space. The parallel
 collection is finished when the last object is blackened and all threads
-have reached the thread barrier rendevous point. (Please note the very
+have reached the thread barrier rendezvous point. (Please note the very
 different meaning of barrier here).
 
 But also a single-threaded Parrot can vastly take advantage by running
