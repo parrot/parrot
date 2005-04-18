@@ -155,7 +155,7 @@ Global options:
     -h|--help        Print this message and exit
     --help-(imcc|parrot|test|parser|output|global)
                      Print detailed help for one subpart
-    -v|--verbose     Print mesages about compile stages (repeat for
+    -v|--verbose     Print messages about compile stages (repeat for
                          more verbosity)
     -V|--version     Print versions and exit
     -w|--warnings    Print warnings (repeat for more warnings)
@@ -1054,7 +1054,7 @@ Print this message and exit
 
 =item -v|--verbose
 
-Print mesages about compile stages
+Print messages about compile stages
 
 =item -vv
 

@@ -65,7 +65,7 @@ command:
 
   defined I0, P0["a"]
 
-TODO: Steve Fink sayd:
+TODO: Steve Fink said:
 
   And if there were a keys() method, then 'defined' and 'exists' are
   very different. (And there ought to be, and would be if we weren't

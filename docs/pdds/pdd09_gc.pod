@@ -132,7 +132,7 @@ arena creation and DOD routines.
 
 Currently only one GC system is active (selected at configure or
 compile time). But future versions might support switching GC systems
-during runtime to accomodate for different work loads.
+during runtime to accommodate for different work loads.
 
 =over 4
 

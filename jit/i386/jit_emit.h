@@ -1267,7 +1267,7 @@ static unsigned char *lastpc;
 /* ABS - ST(0) = ABS(ST(0)) */
 #  define emitm_fabs(pc) emitm_fl_4(pc, 1)
 
-/* Comparisions */
+/* Comparisons */
 
 #  define emitm_fcom(pc, sti) emitm_fl_3(pc, emit_b000, emit_b010, sti)
 
@@ -1420,7 +1420,7 @@ static unsigned char *lastpc;
      jit_emit_fstore_m_n(pc, mem); \
    }
 
-/* Integer comparisions */
+/* Integer comparisons */
 #  define jit_emit_cmp_rr(pc, reg1, reg2) \
     emitm_alul_r_r(pc, 0x39, reg2, reg1)
 #  define jit_emit_cmp_rr_i(pc, r1, r2) jit_emit_cmp_rr(pc, r1, r2)
@@ -2797,7 +2797,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         cur_op = CORE_OPS_wrapper__;
     }
     /*
-     * op functions have the signature (cur_op, intepreter)
+     * op functions have the signature (cur_op, interpreter)
      * we use the interpreter already on stack and only push the
      * cur_op
      */
@@ -3192,7 +3192,7 @@ preg:
 #endif /* JIT_EMIT */
 #if JIT_EMIT == 0
 #  define REQUIRES_CONSTANT_POOL 0
-/* #  define INT_REGISTERS_TO_MAP 4 definiton at top */
+/* #  define INT_REGISTERS_TO_MAP 4 definition at top */
 #  define FLOAT_REGISTERS_TO_MAP 4
 
 #  ifndef JIT_IMCC

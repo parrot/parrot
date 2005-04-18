@@ -44,7 +44,7 @@ Integer PMCs take on a value of 1 if a boolean true is assigned, and
 a value of 0 if a boolean false is assigned.
 
 If an out-of-range value is assigned to an Integer PMC, the PMC will
-throw an exception if exact math is enaabled.
+throw an exception if exact math is enabled.
 
 =item Float
 

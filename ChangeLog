@@ -21,7 +21,7 @@
 	* Complex PMC
 	* Dynamic loading improved including bundles of PMC classes
 	* Experimental support for "make install"
-	* IA64 and hppa JIT supprt
+	* IA64 and hppa JIT support
 	* ICU unicode support
 	* IO layer handling code
 	* IO readline and buffered IO fixes
@@ -64,7 +64,7 @@
         * String iterators
         * String bitwise vtables
         * Many new opcodes
-        * Suppport for JIT, where malloced memory isn't executable
+        * Support for JIT, where malloced memory isn't executable
         * Priority DOD scheme for objects that need timely destruction
         * Improved bytecode loading (e.g. onLoad functions)
         * Language updates: forth, Perl6/P6C, m4
@@ -3372,7 +3372,7 @@
 2002-01-06 02:17  gregor
 
 	* interpreter.c:
-	Removed unneccessary include.
+	Removed unnecessary include.
 
 2002-01-05 12:37  simon
 
@@ -4276,7 +4276,7 @@
 	Some changes to the strings docs, but not yet complete.
 
 	Also, PerlString was copying pointers to strings, rather than
-	strings themselves, so some action-at-a-distance bugs were creaping
+	strings themselves, so some action-at-a-distance bugs were creeping
 	in, I think I've fixed this so everything works nicely.
 
 2001-12-28 04:56  gregor
@@ -4986,7 +4986,7 @@
 	part), so we call the prederef() function with sufficient args that
 	it can go look up opfunc pointers and op arg types and put the
 	opfunc and arg pointers at cur_opcode[0] .. cur_opcode[N - 1],
-	where N is the number of args (counding the op itself as one arg).
+	where N is the number of args (counting the op itself as one arg).
 
 	We assume that sizeof(INTVAL) <= sizeof(void *), so we can continue
 	to have inline INTVAL constants.
@@ -6548,7 +6548,7 @@
 2001-10-17 22:08  gregor
 
 	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm:
-	  * Now handles label-and-commment-only lines.
+	  * Now handles label-and-comment-only lines.
 
 2001-10-17 22:04  bdwheele
 
@@ -6616,7 +6616,7 @@
 2001-10-16 20:43  gregor
 
 	* Makefile.in:
-	  * Fixed dependancies for building Parrot/OpLib/core.pm
+	  * Fixed dependencies for building Parrot/OpLib/core.pm
 
 2001-10-16 19:35  bdwheele
 
@@ -8197,7 +8197,7 @@
 	global_setup.h, interpreter.h, io.h, memory.h, parrot.h,
 	process_opfunc.pl, register.h, stacks.h, string.h, strnative.h:
 	Committed some files that were missed in the last *.h moving
-	commmit.
+	commit.
 
 2001-09-18 02:17  gregor
 

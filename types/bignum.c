@@ -684,7 +684,7 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
         }
         break;
     default:
-        BN_EXCEPT(PINT_ BN_INVALID_OPERATION, "An unknown error occured");
+        BN_EXCEPT(PINT_ BN_INVALID_OPERATION, "An unknown error occurred");
     }
     
 }
@@ -1204,7 +1204,7 @@ BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
 =item C<int
 BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero)>
 
-Sets any number which should be zero to a cannonical zero.
+Sets any number which should be zero to a canonical zero.
 
 To check if a number is equal to zero, use C<BN_is_zero()>.
 
@@ -1844,7 +1844,7 @@ BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
     /* Do the numbers overlap (within precision (and a bit) digits)?
        If not, we can simply use the first and round given the second
-       by catenating `01' to the result... Remember that we also know
+       by concatenating `01' to the result... Remember that we also know
        that neither is zero */
 
     if (context->precision > -1 &&
@@ -2376,7 +2376,7 @@ BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in multiplication");
     }
     if (i < -context->elimit) {
-        BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in multipliaction");
+        BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in multiplication");
     }
     result->expn = i;
   
@@ -2836,7 +2836,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     /* We assume we've been given something to divide */
 
     /* Make some temporaries, set all signs to positive for simplicity */
-    /* We use result as a tempory, and store the reversed result in t2 */
+    /* We use result as a temporary and store the reversed result in t2 */
     div = BN_new(PINT_ 1);
     BN_copy(PINT_ div, one);
     BN_copy(PINT_ rem, div); /* In case doing int-div and don't div*/

@@ -167,7 +167,7 @@ is_symmetric(char *op)
 {
     /*
      * Python abuses add as concat and mul as repeat
-     * so only arithmethic PMCs are symmetric
+     * so only arithmetic PMCs are symmetric
      */
     return 0;   /* if python */
 

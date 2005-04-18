@@ -41,7 +41,7 @@ You can retrieve the size of the array using
   set I0, P0
 
 This will put the size of the array in register C<P0> into C<I0>. In the
-same way, assigning an integer driectly to the array sets the size of the 
+same way, assigning an integer directly to the array sets the size of the 
 array. For instance: 
 
   new P0, .Array

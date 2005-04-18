@@ -56,8 +56,8 @@ everything is already set up properly.
 
 Find the method $3 for object $2 and put it in $1.
 Throws a Method_Not_Found_Exception for a non-existent method.
-The returned PMC may be outdatet, when the call is actually performed and
-changes to the underlaying classes where made.
+The returned PMC may be outdated, when the call is actually performed and
+changes to the underlying classes where made.
 
 =cut
 

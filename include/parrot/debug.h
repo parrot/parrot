@@ -76,7 +76,7 @@ typedef struct PDB_label {
 /*  PDB_line_t
  *      A line in the source file.
  *
- *  opcode:         A pointer to the opcode in the bytecode correspoinding to
+ *  opcode:         A pointer to the opcode in the bytecode corresponding to
  *                  this line.
  *  source_offset:  Offset from the source file start.
  *  number:         Line number.

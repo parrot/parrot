@@ -16,7 +16,7 @@ and C<rxstacks.h>.
 
 =over 4
 
-=item B<rx_alloacate_info>
+=item B<rx_allocate_info>
 
 Initializes a regular expression object and allocates the memory.
 
@@ -122,7 +122,7 @@ Here is the definition for rxinfo (all comments are mine)
 			 	 //handle their own substitutions (s///).  Now this
 				 //is not the case.  This can probably be removed.
 
-	    IntStack stack;	//Sets up an intstack for internal use (backtrackig purposes)
+	    IntStack stack;	//Sets up an intstack for internal use (backtracking purposes)
 	} rxinfo;
 
 

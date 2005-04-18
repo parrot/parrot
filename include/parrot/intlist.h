@@ -29,7 +29,7 @@ struct IntList_chunk_t {
     Buffer chunk_list;          /* holding list of chunks for fast access (1) */
     size_t n_chunks;            /* number of used chunks in chunk_list (1) */
     /* all above items, marked (1) are only valid in the head junk
-     * s. intlist.c for a detailled description */
+     * s. intlist.c for a detailed description */
     INTVAL start;
     INTVAL end;
     IntList_Chunk* next;

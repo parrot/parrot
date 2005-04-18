@@ -34,7 +34,7 @@ the struct element to consist of an array of the given data type.
 The third initializer is the byte offset of the data item in the structure.
 This entry can be 0 if packing of the structure is aligned to the item's sizes
 or the alignment is the item's size. Otherwise these offsets must be set
-correctly as Parrot doesn't know, how your C compiler packs arbitray data.
+correctly as Parrot doesn't know how your C compiler packs arbitrary data.
 Parrot only knows the size of each item.
 
 =back

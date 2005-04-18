@@ -41,7 +41,7 @@ New in 0.1.0
  - String iterators
  - String bitwise vtables
  - Many new opcodes
- - Suppport for JIT, where malloced memory isn't executable
+ - Support for JIT, where malloced memory isn't executable
  - Priority DOD scheme for objects that need timely destruction
  - Improved byte code loading (e.g. onLoad functions)
  - Language updates: forth, Perl6/P6C, m4

@@ -31,7 +31,7 @@ build scripts.
 
 For most of the platforms that we are supporting initially,
 Parrot should build out of the box.
-The list of targetted platforms can be found in PLATFORMS.
+The list of targeted platforms can be found in PLATFORMS.
 
 The current configure system is primitive, as it's only
 a temporary solution. It will be happy with most any answers

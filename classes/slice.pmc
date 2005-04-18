@@ -151,7 +151,7 @@ set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
 {
     parrot_range_t *r = PMC_struct_val(self);
     if (!r || (INTVAL) r == -1)
-        real_exception(interpreter, NULL, E_StopIteration, "StopIteratrion");
+        real_exception(interpreter, NULL, E_StopIteration, "StopIteration");
     if (r->type == enum_type_INTVAL) {
         RVal_int(r->cur) += RVal_int(r->step);
         if (RVal_int(r->step) > 0) {
@@ -290,7 +290,7 @@ Get the next string key from the current slice range.
     INTVAL get_integer() {
         parrot_range_t *r = PMC_struct_val(SELF);
         if (!r || (INTVAL) r == -1)
-            real_exception(INTERP, NULL, E_StopIteration, "StopIteratrion");
+            real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
         return RVal_int(r->cur);
     }
 

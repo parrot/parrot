@@ -321,7 +321,7 @@ mmd_dispatch_v_psp(Interp *interpreter,
 }
 
 /*
- * return possibly new dstination
+ * return possible new destination
  */
 PMC*
 mmd_dispatch_p_ppp(Interp *interpreter,
@@ -1129,7 +1129,7 @@ mmd_arg_tuple_func(Interp *interpreter, STRING *signature)
 =item C<static PMC* mmd_search_default(Interp *, STRING *meth, PMC *arg_tuple)>
 
 Default implementation of MMD search. Search scopes for candidates, walk the
-class hierarchy, sort all candidates by their manhattan distance, and return
+class hierarchy, sort all candidates by their Manhattan distance, and return
 result
 
 =cut
@@ -1759,7 +1759,7 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
     table = interpreter->binop_mmd_funcs;
     if ((INTVAL)table->x < type && type < enum_class_core_max) {
         /*
-         * pre-alloacte the function table
+         * pre-allocate the function table
          */
         for (i = 0; i < MMD_USER_FIRST; ++i) {
             mmd_register(interpreter, i, enum_class_core_max - 1,

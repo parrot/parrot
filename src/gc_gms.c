@@ -70,7 +70,7 @@ into generations, e.g.:
 
 A mark phase now processes the root set and only objects from the
 young generation. When all objects are either referenced by the root
-set or only by the young generation, the algoritm is correct and
+set or only by the young generation, the algorithm is correct and
 complete.
 
 But there is of course the possibilty that a young object is

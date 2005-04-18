@@ -214,7 +214,7 @@ we allocate new objects white or in the next DOD cycle.
 
 The current sweep of the whole arena is done, or with implicit reclamation:
 
-Garbage gets appened to the free-list by merging the unscanned
+Garbage gets appended to the free-list by merging the unscanned
 from-space with the free-list, these objects are all considered white.
 All other items are in the to-space and are black. These objects
 constitute the from-space of the new collection cycle.
@@ -365,7 +365,7 @@ a sleep opcode.
  * we run the copying collector, if memory pool statistics indicate
  * that this amount of the total size could be freed
  *
- * This factor also depends on the allocatio color of buffer headers,
+ * This factor also depends on the allocation color of buffer headers,
  * which is set to black now. So we are always one DOD cycle behind
  * and the statistics are rather wrong.
  */
@@ -933,8 +933,8 @@ parrot_gc_ims_run(Interp *interpreter, int flags)
 
 =item C<void Parrot_dod_ims_wb(Interp*, PMC *agg, PMC *new)>
 
-Write barriere called by the DOD_WRITE_BARRIER macro. Always when a
-white object gets store into a black aggregate, either the object must
+Write barrier called by the DOD_WRITE_BARRIER macro. Always when storing
+a white object into a black aggregate, either the object must
 be greyed or the aggregate must be rescanned - by greying it.
 
 =cut

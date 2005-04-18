@@ -102,7 +102,7 @@ need_reg(Parrot_Interp s, int i, int i3)
 =item C<static void
 clone_regs_thread(Parrot_Interp d, Parrot_Interp s, PMC *dest)>
 
-Copy/clone thread start paramaters. All resources are created in the
+Copy/clone thread start parameters. All resources are created in the
 destination interpreter.
 
 =cut

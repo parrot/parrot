@@ -52,7 +52,7 @@ s. PDD02 for more.
 =item B<new>(out PMC, in INT, in PMC, in PMC)
 
 Like above. The fourth argument is a property hash - it isn't copied in,
-only referended. The initializer may be NULL.
+only referenced. The initializer may be NULL.
 
 =cut
 
@@ -203,7 +203,7 @@ op valid_type(out INT, in INT) {
 
 =item B<get_repr>(out STR, in PMC)
 
-Set $1 to a string reprentation of $2
+Set $1 to a string representation of $2
 
 =cut
 

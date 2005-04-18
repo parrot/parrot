@@ -346,7 +346,7 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
              * clone the PMC into caller, if its not a shared PMC
              * the PMC is not in the parents root set nor in the
              * stack so block DOD during clone
-             * XXX should probably aquire the parent's interpreter mutex
+             * XXX should probably acquire the parent's interpreter mutex
              */
             Parrot_block_DOD(parent);
             if (PObj_is_PMC_shared_TEST((PObj*)retval))

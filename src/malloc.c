@@ -345,7 +345,7 @@ extern "C" {
   checking is fairly extensive, and will slow down execution
   noticeably. Calling malloc_stats or mallinfo with DEBUG set will
   attempt to check every non-mmapped allocated and free chunk in the
-  course of computing the summmaries. (By nature, mmapped regions
+  course of computing the summaries. (By nature, mmapped regions
   cannot be checked very much automatically.)
 
   Setting DEBUG may also be helpful if you are trying to modify
@@ -2091,7 +2091,7 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     and consolidated sets of chunks, which is what these bins hold, so
     they can be found quickly.  All procedures maintain the invariant
     that no consolidated chunk physically borders another one, so each
-    chunk in a list is known to be preceeded and followed by either
+    chunk in a list is known to be preceded and followed by either
     inuse chunks or the ends of memory.
 
     Chunks in bins are kept in size order, with ties going to the
