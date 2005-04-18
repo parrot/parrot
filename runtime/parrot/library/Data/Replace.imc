@@ -46,8 +46,6 @@ Replaces every "old" with "new" inside the aggregate "where".
     
     new cache, .PerlArray
     __do_replace( where, oldVal, newVal, cache )
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 
@@ -83,38 +81,36 @@ IS:
     .local string name
     
     isnull where, END
-    can I0, where, "__replace"
-    if I0 goto CAN_REPLACE
-    typeof name, where
     
+    # call __replace if the PMC supports it
+    can $I0, where, "__replace"
+    unless $I0 goto CANT_REPLACE
+    where."__replace"( oldVal, newVal, cache )
+    branch REPLACE_PROPS
+CANT_REPLACE:
+
+    # find a Data::Replace method with the name of the type to replace
+    typeof name, where
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
     find_global temp, "Data::Replace", name
     errorson .PARROT_ERRORS_GLOBALS_FLAG
-
-    typeof I0, temp
-    if I0 == .PerlUndef goto PROP
+    # invoke it if found
+    typeof $I0, temp
+    if $I0 == .Undef goto REPLACE_PROPS
     temp( where, oldVal, newVal, cache )
-    branch PROP
-CAN_REPLACE:
-    where."__replace"( oldVal, newVal, cache )
-PROP:
+
+REPLACE_PROPS:
     prophash temp, where
-    set I0, temp
-    if I0 == 0 goto END
+    set $I0, temp
+    if $I0 == 0 goto END
     __do_replace( temp, oldVal, newVal, cache )
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
-.sub PMCArray
-    find_global P0, "Data::Replace", "PerlArray"
-    invoke
-.end
-
-.sub StringArray
-    find_global P0, "Data::Replace", "PerlArray"
-    invoke
+.sub __onload @LOAD
+    $P0 = find_global "Data::Replace", "PerlArray"
+    store_global "Data::Replace", "PMCArray", $P0
+    store_global "Data::Replace", "StringArray", $P0
 .end
 
 .sub PerlArray
