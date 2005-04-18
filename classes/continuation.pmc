@@ -230,20 +230,7 @@ Experimental: return caller info as a STRING.
 */
 
     STRING* get_string() {
-        struct Parrot_cont * cc = PMC_cont(SELF);
-        PMC *caller;
-        STRING *s;
-
-        caller = cc->ctx.current_sub;
-        s = NULL;
-        if (caller && PMC_sub(caller)->address) {
-            size_t offs = cc->ctx.current_pc -
-                PMC_sub(caller)->seg->base.data;
-            s = Parrot_sprintf_c(INTERP,
-                    "called from Sub '%Ss' pc %d\n",
-                    Parrot_full_sub_name(INTERP, caller), (int)offs);
-        }
-        return s;
+	return Parrot_Context_infostr(INTERP, &PMC_cont(SELF)->ctx);
     }
 
 /*

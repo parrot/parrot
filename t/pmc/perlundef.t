@@ -326,8 +326,8 @@ output_like(<<"CODE", <<'OUTPUT', "undef warning");
 	print P0
 	end
 CODE
-/Use of uninitialized.*
-\s+in file .*pasm/i
+/^Use of uninitialized.*
+current instr\.: '\(null\)' pc (\d+|-1) /
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "bor undef");

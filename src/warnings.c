@@ -22,46 +22,6 @@ messages.
 
 /*
 
-=head2 Internal Functions
-
-=over 4
-
-=item C<static int
-find_line(Interp *interpreter, struct PackFile_Debug * debug)>
-
-Find the line number.
-
-Returns -2 if the interpreter has no current profile counter.
-
-I<What does returning -1 mean?>
-
-=cut
-
-*/
-
-static int
-find_line(Interp *interpreter, struct PackFile_Debug * debug)
-{
-    size_t offs, i, n;
-    op_info_t *op_info;
-    opcode_t *pc;
-
-    if (!interpreter->ctx.current_pc)
-        return -2;
-    pc = interpreter->code->cur_cs->base.data;
-    offs = interpreter->ctx.current_pc - pc;
-    for (i = n = 0; n < interpreter->code->cur_cs->base.size; i++) {
-        op_info = &interpreter->op_info_table[*pc];
-        if (n >= offs)
-            return (int) debug->base.data[i];
-        n += op_info->arg_count;
-        pc += op_info->arg_count;
-    }
-    return -1;
-}
-
-/*
-
 =item C<void
 print_pbc_location(Parrot_Interp interpreter)>
 
@@ -72,50 +32,9 @@ Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 */
 
 void
-print_pbc_location(Parrot_Interp interpreter)
+print_pbc_location(Parrot_Interp inter)
 {
-    const char *file;
-    int line;
-    struct PackFile_Debug * debugs = interpreter->code->cur_cs->debugs;
-    if (debugs) {
-        file = debugs->filename;
-        line = find_line(interpreter, debugs);
-    }
-    else {
-        file = "(unknown file)";
-        line = -1;
-    }
-    PIO_eprintf(interpreter, "\tin file '%s' near line %d\n", file, line);
-}
-
-/*
-
-=item C<void
-print_pbc_location_stdio(Parrot_Interp interpreter)>
-
-Prints the bytecode location of the warning or error to C<stderr>.
-
-Uses C<fprintf()> only. This may be called from exceptions.
-
-=cut
-
-*/
-
-void
-print_pbc_location_stdio(Parrot_Interp interpreter)
-{
-    const char *file;
-    int line;
-    struct PackFile_Debug * debugs = interpreter->code->cur_cs->debugs;
-    if (debugs) {
-        file = debugs->filename;
-        line = find_line(interpreter, debugs);
-    }
-    else {
-        file = "(unknown file)";
-        line = -1;
-    }
-    fprintf(stderr, "\tin file '%s' near line %d\n", file, line);
+    PIO_eprintf(inter, "%Ss", Parrot_Context_infostr(inter, &inter->ctx));
 }
 
 /*

@@ -270,7 +270,7 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     if (m)
         string_cstring_free(m);
     if (print_location)
-        print_pbc_location_stdio(interpreter);
+        PDB_backtrace(interpreter);
     /*
      * returning NULL from here returns resume address NULL to the
      * runloop, which will terminate the thread function finally

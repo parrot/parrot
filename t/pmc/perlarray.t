@@ -1377,23 +1377,22 @@ OK3:  print "ok 3\\n"
 OK4:  print "ok 4\\n"
       end
 CODE
-/Use of uninitialized value
-\s+in file.*
+/^Use of uninitialized value
+current instr\.: '\(null\)' pc (\d+|-1) .*?
 ok 1
 Use of uninitialized value
-\s+in file.*
+current instr\.: '\(null\)' pc (\d+|-1) .*?
 ok 2
 Use of uninitialized value
-\s+in file.*
+current instr\.: '\(null\)' pc (\d+|-1) .*?
 ok 3
 Use of uninitialized value
-\s+in file.*
+current instr\.: '\(null\)' pc (\d+|-1) .*?
 ok 4
-/
+$/
 OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-
 .sub _main
     .local pmc pmc1
     pmc1 = new PerlArray

@@ -379,7 +379,8 @@ _func:
     returncc
 CODE
 /^main:Use of uninitialized value in integer context
-\s+in file.*:back$/s
+current instr\.: '\(null\)' pc (\d+|-1) \(.*?:(\d+|-1)\)
+:back$/s
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2");
@@ -402,7 +403,8 @@ _func:
     returncc
 CODE
 /^Use of uninitialized value in integer context
-\s+in file.*:main:back:Use of un.*$/sm
+current instr\.: '\(null\)' pc (\d+|-1) .*?
+:main:back:Use of un.*$/sm
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2 - updatecc");
@@ -430,7 +432,8 @@ _func:
     returncc
 CODE
 /^Use of uninitialized value in integer context
-\s+in file.*:main:back:Use of un.*$/sm
+current instr\.: '\(null\)' pc (\d+|-1) .*?
+:main:back:Use of un.*$/sm
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "pcc sub");
@@ -1070,7 +1073,6 @@ OUTPUT
 
 
 pir_output_like(<<'CODE', <<'OUTPUT', "warn on in main");
-
 .sub _main @MAIN
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
@@ -1085,7 +1087,6 @@ CODE
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
-
 .sub _main @MAIN
 .include "warnings.pasm"
     _f1()
@@ -1101,7 +1102,6 @@ ok
 OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
-
 .sub _main @MAIN
 .include "warnings.pasm"
     _f1()
@@ -1191,7 +1191,6 @@ ok 2
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "sub names w newsub");
-
 .sub main @MAIN
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
@@ -1215,7 +1214,6 @@ mainfoobarfoo
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "caller introspection");
-
 .sub main @MAIN
 .include "interpinfo.pasm"
     # this test will fail when run with -Oc
@@ -1290,7 +1288,7 @@ initial
 main
 OUTPUT
     my $descr = '@IMMEDIATE, @POSTCOMP';
-    if ( $ENV{TEST_PROG_ARGS} =~ m/-r / )
+    if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r / )
     {
         TODO: 
         {

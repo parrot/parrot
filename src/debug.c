@@ -2942,27 +2942,44 @@ PDB_backtrace(Interp *interpreter)
 {
     STRING *str;
     PMC *sub;
-
+    PMC *old = PMCNULL;
+    int rec_level = 0;
+    
     /* information about the current sub */
     sub = interpinfo_p(interpreter, CURRENT_SUB);
     if (!PMC_IS_NULL(sub)) {
-	str = VTABLE_get_string(interpreter, sub);
-	PIO_eprintf(interpreter, "current instr.: '%Ss' pc %d\n",
-	    str,
-	    interpreter->ctx.current_pc - PMC_sub(sub)->address
-	);
+	str = Parrot_Context_infostr(interpreter, &interpreter->ctx);
+	if (str)
+	    PIO_eprintf(interpreter, "%Ss", str);
     }
 
+    /* backtrace: follow the continuation chain */
     sub = interpinfo_p(interpreter, CURRENT_CONT);
-    while (!PMC_IS_NULL(sub) && sub->vtable->base_type == enum_class_Continuation) {
-	str = VTABLE_get_string(interpreter, sub);
-	if (!str)
-	    break;
-	PIO_eprintf(interpreter, "%Ss",
-	    str
-	);
+    while (!PMC_IS_NULL(sub) &&
+	    sub->vtable->base_type == enum_class_Continuation &&
+	    NULL != (str = Parrot_Context_infostr(interpreter,
+		    &PMC_cont(sub)->ctx)) ) {
+
+	/* recursion detection */
+	if (!PMC_IS_NULL(old) && PMC_cont(old) &&
+	    PMC_cont(old)->ctx.current_pc == PMC_cont(sub)->ctx.current_pc &&
+	    PMC_cont(old)->ctx.current_sub == PMC_cont(sub)->ctx.current_sub) {
+	    ++rec_level;
+	} else if (rec_level != 0) {
+	    PIO_eprintf(interpreter, "... call repeated %d times\n", rec_level);
+	    rec_level = 0;
+	}
+
+	/* print the context description */
+	if (rec_level == 0)
+	    PIO_eprintf(interpreter, "%Ss", str);
+
 	/* get the next Continuation */
-        sub = PMC_cont(sub)->ctx.current_cont;
+	old = sub;
+	sub = PMC_cont(sub)->ctx.current_cont;
+    }
+    if (rec_level != 0) {
+        PIO_eprintf(interpreter, "... call repeated %d times\n", rec_level);
     }
 }
 

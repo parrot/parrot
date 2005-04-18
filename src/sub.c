@@ -539,12 +539,115 @@ Parrot_full_sub_name(Interp* interpreter, PMC* sub)
     if (PMC_IS_NULL(s->name_space)) {
         return s->name;
     } else {
-        STRING* ns = VTABLE_get_string(interpreter, s->name_space);
-
-        ns = string_concat(interpreter, ns, string_from_cstring(interpreter, " :: ", 4), 0);
         if (s->name) {
-            return string_concat(interpreter, ns, s->name, 0);
-        }
+	    STRING* ns = VTABLE_get_string(interpreter, s->name_space);
+
+    	    ns = string_concat(interpreter, ns,
+		string_from_cstring(interpreter, " :: ", 4), 0);
+	    return string_concat(interpreter, ns, s->name, 0);
+        } else {
+	    STRING* ns = string_from_cstring(interpreter, "??? :: ", 7);
+	    return string_concat(interpreter, ns, s->name, 0);
+	}
+    }
+    return NULL;
+}
+
+int
+Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
+	struct Parrot_Context_info *info)
+{
+    struct Parrot_sub *sub;
+
+    /* set file/line/pc defaults */
+    info->file = "(unknown file)";
+    info->line = -1;
+    info->pc = -1;
+        
+    /* is the current sub of the specified context valid? */
+    if (PMC_IS_NULL(ctx->current_sub)) {
+	info->subname = string_from_cstring(interpreter, "???", 3);
+	info->nsname = info->subname;
+	info->fullname = string_from_cstring(interpreter, "??? :: ???", 10);
+	info->pc = -1;
+	return 0;
+    }
+
+    /* make sure there is a sub (not always the case, e.g in pasm code) */
+    if (ctx->current_sub->vtable->base_type == enum_class_Undef ||
+	    PMC_sub(ctx->current_sub)->address == 0) {
+	info->nsname = NULL;
+	info->subname = NULL;
+	info->fullname = NULL;
+	/* XXX: is this correct? (try with load_bytecode) */
+	/* use the current interpreter's bytecode as start address */
+	if (ctx->current_pc != NULL)
+	    info->pc = ctx->current_pc - interpreter->code->byte_code;
+	return 1;
+    }
+
+    /* fetch struct Parrot_sub of the current sub in the given context */
+    sub = PMC_sub(ctx->current_sub);
+
+    /* set the sub name */
+    info->subname = sub->name;
+    
+    /* set the namespace name and fullname of the sub */
+    if (PMC_IS_NULL(sub->name_space)) {
+	info->nsname = string_from_cstring(interpreter, "", 0);
+	info->fullname = info->subname;
+    } else {
+	info->nsname = VTABLE_get_string(interpreter, sub->name_space);
+	info->fullname = string_concat(interpreter, info->nsname, 
+		string_from_cstring(interpreter, " :: ", 4), 0);
+	info->fullname = string_concat(interpreter, info->fullname,
+		info->subname, 1);
+    }
+
+    /* return here if there is no current pc */
+    if (ctx->current_pc == NULL)
+	return 1;
+
+    /* calculate the current pc */
+    info->pc = ctx->current_pc - sub->seg->base.data;
+
+    /* determine the current source file/line */
+    if (interpreter->ctx.current_pc) {
+	size_t offs = info->pc;
+	size_t i, n;
+	/* XXX: interpreter->code->cur_cs is not correct, is it? */
+	opcode_t *pc = interpreter->code->cur_cs->base.data;
+	struct PackFile_Debug *debug = interpreter->code->cur_cs->debugs;
+
+	/*assert(pc == sub->seg->base.data);*/
+	/* set source file */
+	info->file = debug->filename;
+	for (i = n = 0; n < interpreter->code->cur_cs->base.size; i++) {
+	    op_info_t *op_info = &interpreter->op_info_table[*pc];
+	    if (n >= offs) {
+		/* set source line */
+		info->line = debug->base.data[i];
+		break;
+	    }
+	    n += op_info->arg_count;
+	    pc += op_info->arg_count;
+	}
+    }    
+    return 1;
+}
+
+STRING*
+Parrot_Context_infostr(Interp *interpreter, struct Parrot_Context *ctx)
+{
+    struct Parrot_Context_info info;
+    const char* msg = (&interpreter->ctx == ctx) ?
+	"current instr.:":
+	"called from Sub";
+
+    if (Parrot_Context_info(interpreter, ctx, &info)) {
+	return Parrot_sprintf_c(interpreter,
+		"%s '%Ss' pc %d (%s:%d)\n", msg,
+		info.fullname, info.pc, info.file, info.line);
     }
     return NULL;
 }

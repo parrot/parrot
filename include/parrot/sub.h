@@ -84,6 +84,16 @@ typedef struct Parrot_cont {
 
 #define PMC_cont(pmc) LVALUE_CAST(parrot_cont_t, PMC_struct_val(pmc))
 
+struct Parrot_Context_info {
+    STRING* subname;
+    STRING* nsname;
+    STRING* fullname;
+    int pc;
+    const char *file;
+    int line;
+    opcode_t *address;
+};
+
 struct Parrot_sub * new_sub(Interp * interp);
 struct Parrot_sub * new_closure(Interp * interp);
 struct Parrot_coro * new_coroutine(Interp * interp);
@@ -104,6 +114,8 @@ void invalidate_retc_context(Interp *interpreter, struct Parrot_Context *);
 void add_to_retc_cache(Interp *interpreter, PMC *pmc);
 void mark_retc_cache(Interp *);
 STRING* Parrot_full_sub_name(Interp* interpreter, PMC* sub);
+int Parrot_Context_info(Interp *interpreter, struct Parrot_Context *, struct Parrot_Context_info *);
+STRING* Parrot_Context_infostr(Interp *interpreter, struct Parrot_Context *);
 
 #endif /* PARROT_SUB_H_GUARD */
 
