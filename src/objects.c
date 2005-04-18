@@ -243,15 +243,21 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
 
 /*
 
-=item C<const char* Parrot_MMD_methode_name(Interp*, INTVAL)>
+=item C<const char* Parrot_MMD_method_name(Interp*, INTVAL)>
 
 Return the method name for the given MMD enum.
+
+=item C<INTVAL Parrot_MMD_method_idx(Interp*, STRING *)>
+
+Return the MMD function number for method name or -1 on failure.
+
+TODO allow dynamic expansion at runtime.
 
 =cut
 
 */
 const char*
-Parrot_MMD_methode_name(Interp* interpreter, INTVAL idx)
+Parrot_MMD_method_name(Interp* interpreter, INTVAL idx)
 {
     assert(idx >= 0);
 
@@ -259,6 +265,19 @@ Parrot_MMD_methode_name(Interp* interpreter, INTVAL idx)
         return NULL;
     return Parrot_mmd_func_names[idx];
 }
+
+INTVAL
+Parrot_MMD_method_idx(Interp* interpreter, char *name)
+{
+    INTVAL i;
+
+    for (i = 0; i < MMD_USER_FIRST; ++i) {
+        if (!strcmp(Parrot_mmd_func_names[i], name))
+            return i;
+    }
+    return -1;
+}
+
 
 /*
 
@@ -1006,7 +1025,7 @@ invalidate_all_caches(Interp *interpreter)
 }
 
 void
-Parrot_invalidate_method_cache(Interp *interpreter, STRING *class)
+Parrot_invalidate_method_cache(Interp *interpreter, STRING *class, STRING *meth)
 {
     INTVAL type;
 

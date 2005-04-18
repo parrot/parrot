@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -804,6 +804,41 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses, n_add");
     $P0 = new Integer
     $P0 = 2
     .return($P0)
+.end
+CODE
+62
+2
+OUTPUT
+
+## my $temp = "temp.imc";
+## END { unlink $temp; };
+
+open P, ">$temp" or die "can't write $temp";
+print P <<'EOF';
+.namespace ["__parrot_core"]
+.sub __add @MULTI(Integer, Integer)
+    .param pmc l
+    .param pmc r
+    print l
+    print r
+    print "\n"
+    $P0 = new Integer
+    $P0 = 2
+    .return($P0)
+.end
+EOF
+
+pir_output_is(<<'CODE', <<'OUTPUT', "override builtin n_add");
+.sub main
+    load_bytecode "temp.imc"
+    $P0 = new Integer
+    $P1 = new Integer
+    set $P0, 6
+    set $P1, 2
+
+    $P2 = n_add  $P0, $P1
+    print $P2
+    print "\n"
 .end
 CODE
 62

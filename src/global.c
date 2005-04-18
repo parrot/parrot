@@ -292,7 +292,7 @@ Parrot_store_global(Interp *interpreter, STRING *class,
     else
         stash = globals;
     VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
-    Parrot_invalidate_method_cache(interpreter, class);
+    Parrot_invalidate_method_cache(interpreter, class, globalname);
 }
 
 static void
@@ -398,6 +398,8 @@ Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
     STRING* sub_name;
     PMC *multi_sig;
     PMC *name_space;
+    INTVAL func_nr;
+    char *c_meth;
 
     sub_name = PMC_sub(sub_pmc)->name;
     name_space = PMC_sub(sub_pmc)->name_space;
@@ -418,6 +420,12 @@ Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
         VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
         long_name = Parrot_multi_long_name(interpreter, sub_pmc);
         store_sub_in_namespace(interpreter, sub_pmc, name_space, long_name);
+
+        c_meth = string_to_cstring(interpreter, sub_name);
+        if ( (func_nr = Parrot_MMD_method_idx(interpreter, c_meth))  >= 0) {
+            Parrot_mmd_rebuild_table(interpreter, -1, func_nr);
+        }
+        string_cstring_free(c_meth);
     }
 }
 

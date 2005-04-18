@@ -67,7 +67,8 @@ PMC *Parrot_MMD_search_default_infix(Interp *, STRING *meth,
 /*
  * in src/objects.c :
  */
-const char* Parrot_MMD_methode_name(Interp* i, INTVAL idx);
+const char* Parrot_MMD_method_name(Interp* i, INTVAL idx);
+INTVAL Parrot_MMD_method_idx(Interp* interpreter, char *name);
 
 #endif /* PARROT_MMD_H_GUARD */
 

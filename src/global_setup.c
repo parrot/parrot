@@ -66,8 +66,6 @@ init_world(Interp *interpreter)
 
     /* Call base vtable class constructor methods */
     Parrot_initialize_core_pmcs(interpreter);
-    /* Create MMD_table for all MMD functions */
-    Parrot_mmd_rebuild_table(interpreter, -1, -1);
 
     iglobals = interpreter->iglobals;
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,

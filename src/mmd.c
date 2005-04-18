@@ -137,7 +137,7 @@ get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,
             func = table->mmd_funcs[offset];
     }
     if (!func) {
-        const char *meth_c = Parrot_MMD_methode_name(interpreter, func_nr);
+        const char *meth_c = Parrot_MMD_method_name(interpreter, func_nr);
         STRING *meth_s = const_string(interpreter, meth_c);
         PMC *method = Parrot_MMD_search_default_infix(interpreter,
                 meth_s, left_type, r);
@@ -1649,7 +1649,7 @@ mmd_create_builtin_multi_stub(Interp *interpreter, INTVAL func_nr)
     STRING *s, *ns;
     PMC *multi;
 
-    name = Parrot_MMD_methode_name(interpreter, func_nr);
+    name = Parrot_MMD_method_name(interpreter, func_nr);
     ns = CONST_STRING(interpreter, "__parrot_core");
     s =  const_string(interpreter, name);
     /* create in constant pool */
@@ -1670,7 +1670,7 @@ mmd_create_builtin_multi_meth_2(Interp *interpreter,
             type != enum_class_Ref  && type != enum_class_SharedRef &&
             type != enum_class_deleg_pmc && type != enum_class_ParrotClass &&
             type != enum_class_ParrotObject);
-    short_name = Parrot_MMD_methode_name(interpreter, func_nr);
+    short_name = Parrot_MMD_method_name(interpreter, func_nr);
     /*
      * _int, _float, _str are just native variants of the base
      * multi
@@ -1813,8 +1813,21 @@ negative all MMD functions are rebuilt.
 void
 Parrot_mmd_rebuild_table(Interp* interpreter, INTVAL type, INTVAL func_nr)
 {
-    /* TODO invalidate table */
-    return;
+    MMD_table *table;
+    UINTVAL i;
+
+    if (!interpreter->binop_mmd_funcs)
+        return;
+    table = interpreter->binop_mmd_funcs + func_nr;
+    if (!table)
+        return;
+
+    /* TODO specific parts of table
+     * the type and it's mro and
+     * all classes that inherit from type
+     */
+    for (i = 0; i < table->x * table->y; ++i)
+        table->mmd_funcs[i] = NULL;
 }
 
 /*
