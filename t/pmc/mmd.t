@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -780,4 +780,32 @@ CODE
 39
 42
 42
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses, n_add");
+.sub main @MAIN
+    $P0 = subclass "Integer", "AInt"
+    $P0 = new "AInt"
+    $P1 = new Integer
+    set $P0, 6
+    set $P1, 2
+
+    $P2 = n_add  $P0, $P1
+    print $P2
+    print "\n"
+.end
+.namespace ["AInt"]
+.sub __add @MULTI(AInt, Integer)
+    .param pmc l
+    .param pmc r
+    print l
+    print r
+    print "\n"
+    $P0 = new Integer
+    $P0 = 2
+    .return($P0)
+.end
+CODE
+62
+2
 OUTPUT

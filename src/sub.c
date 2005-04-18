@@ -531,8 +531,11 @@ the globals.
 STRING*
 Parrot_full_sub_name(Interp* interpreter, PMC* sub)
 {
-    struct Parrot_sub * s = PMC_sub(sub);
+    struct Parrot_sub * s;
 
+    if (!sub || !VTABLE_defined(interpreter, sub))
+        return NULL;
+    s = PMC_sub(sub);
     if (PMC_IS_NULL(s->name_space)) {
         return s->name;
     } else {

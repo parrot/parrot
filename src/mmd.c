@@ -336,8 +336,12 @@ mmd_dispatch_p_ppp(Interp *interpreter,
 
     if (is_pmc) {
         sub = (PMC*)real_function;
-        return Parrot_runops_fromc_args(interpreter, sub, "PPPP",
-                left, right, dest);
+        if (dest)
+            return Parrot_runops_fromc_args(interpreter, sub, "PPPP",
+                    left, right, dest);
+        else
+            return Parrot_runops_fromc_args(interpreter, sub, "PPP",
+                    left, right);
     }
     else {
         return (*real_function)(interpreter, left, right, dest);
@@ -358,8 +362,12 @@ mmd_dispatch_p_pip(Interp *interpreter,
             function, left_type, enum_type_INTVAL, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
-        return Parrot_runops_fromc_args(interpreter, sub, "PPIP",
-                left, right, dest);
+        if (dest)
+            return Parrot_runops_fromc_args(interpreter, sub, "PPIP",
+                    left, right, dest);
+        else
+            return Parrot_runops_fromc_args(interpreter, sub, "PPI",
+                    left, right);
     }
     else {
         return (*real_function)(interpreter, left, right, dest);
@@ -380,8 +388,12 @@ mmd_dispatch_p_pnp(Interp *interpreter,
             function, left_type, enum_type_FLOATVAL, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
-        return Parrot_runops_fromc_args(interpreter, sub, "PPNP",
-                left, right, dest);
+        if (dest)
+            return Parrot_runops_fromc_args(interpreter, sub, "PPNP",
+                    left, right, dest);
+        else
+            return Parrot_runops_fromc_args(interpreter, sub, "PPN",
+                    left, right);
     }
     else {
         return (*real_function)(interpreter, left, right, dest);
@@ -402,8 +414,12 @@ mmd_dispatch_p_psp(Interp *interpreter,
             function, left_type, enum_type_STRING, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
-        return Parrot_runops_fromc_args(interpreter, sub, "PPSP",
-                left, right, dest);
+        if (dest)
+            return Parrot_runops_fromc_args(interpreter, sub, "PPSP",
+                    left, right, dest);
+        else
+            return Parrot_runops_fromc_args(interpreter, sub, "PPS",
+                    left, right);
     }
     else {
         return (*real_function)(interpreter, left, right, dest);

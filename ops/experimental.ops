@@ -266,6 +266,17 @@ General inplace infix dispatch opcode. $1 is the MMD function number.
 
 General infix dispatch opcode. $1 is the MMD function number.
 
+=item C<n_infix(inconst INT, out PMC, in PMC, in INT)>
+
+=item C<n_infix(inconst INT, out PMC, in PMC, in NUM)>
+
+=item C<n_infix(inconst INT, out PMC, in PMC, in STR)>
+
+=item C<n_infix(inconst INT, out PMC, in PMC, in PMC)>
+
+General infix dispatch opcode. $1 is the MMD function number.
+These opcodes return a new result PMC $2.
+
 =cut
 
 inline op infix(inconst INT, in PMC, in INT) :base_core {
@@ -305,6 +316,26 @@ inline op infix(inconst INT, out PMC, in PMC, in STR) :base_core {
 
 inline op infix(inconst INT, out PMC, in PMC, in PMC) :base_core {
   $2 = mmd_dispatch_p_ppp(interpreter, $3, $4, $2, $1);
+  goto NEXT();
+}
+
+inline op n_infix(inconst INT, out PMC, in PMC, in INT) :base_core {
+  $2 = mmd_dispatch_p_pip(interpreter, $3, $4, NULL, $1);
+  goto NEXT();
+}
+
+inline op n_infix(inconst INT, out PMC, in PMC, in NUM) :base_core {
+  $2 = mmd_dispatch_p_pnp(interpreter, $3, $4, NULL, $1);
+  goto NEXT();
+}
+
+inline op n_infix(inconst INT, out PMC, in PMC, in STR) :base_core {
+  $2 = mmd_dispatch_p_psp(interpreter, $3, $4, NULL, $1);
+  goto NEXT();
+}
+
+inline op n_infix(inconst INT, out PMC, in PMC, in PMC) :base_core {
+  $2 = mmd_dispatch_p_ppp(interpreter, $3, $4, NULL, $1);
   goto NEXT();
 }
 

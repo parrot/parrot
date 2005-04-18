@@ -17,7 +17,7 @@ Tests the Integer PMC.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "basic math");
 
@@ -67,7 +67,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "truth and definedness");
     print "A newly created Integer is "
     if int_1 goto LABEL_1
     print "not "
-LABEL_1: 
+LABEL_1:
     print "true.\n"
 
     .local int is_defined
@@ -76,7 +76,7 @@ LABEL_1:
     print "A newly created Integer is "
     if is_defined goto LABEL_2
     print " not "
-LABEL_2: 
+LABEL_2:
     print "defined.\n"
 
     int_1 = -999999999
@@ -85,7 +85,7 @@ LABEL_2:
     print " is "
     if is_defined goto LABEL_3
     print "not "
-LABEL_3: 
+LABEL_3:
     print "true.\n"
 
     is_defined = defined int_1
@@ -94,7 +94,7 @@ LABEL_3:
     print " is "
     if is_defined goto LABEL_4
     print "not "
-LABEL_4: 
+LABEL_4:
     print "defined.\n"
     end
 .end
@@ -306,3 +306,41 @@ ok 3
 ok 4
 OUTPUT
 
+pir_output_is(<< 'CODE', << 'OUTPUT', "n_<oper>");
+.sub main @MAIN
+    $P0 = new Integer
+    $P1 = new Integer
+    set $P0, 6
+    set $P1, 2
+
+    n_add $P2, $P0, $P1
+    print $P2
+    print "\n"
+    $P2 = n_add $P0, $P1
+    print $P2
+    print "\n"
+    n_sub $P2, $P0, $P1
+    print $P2
+    print "\n"
+    n_mul $P2, $P0, $P1
+    print $P2
+    print "\n"
+    n_div $P2, $P0, $P1
+    print $P2
+    print "\n"
+    n_mod $P2, $P0, $P1
+    print $P2
+    print "\n"
+    n_pow $P2, $P0, $P1
+    print $P2
+    print "\n"
+.end
+CODE
+8
+8
+4
+12
+3
+0
+36
+OUTPUT

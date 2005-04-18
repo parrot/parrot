@@ -324,8 +324,13 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
 int
 is_op(Interp *interpreter, char *name)
 {
-    return interpreter->op_lib->op_code(name, 0) >= 0
-        || interpreter->op_lib->op_code(name, 1) >= 0
+    int (*op_lookup)(const char *, int full) =
+        interpreter->op_lib->op_code;
+    return op_lookup(name, 0) >= 0
+        || op_lookup(name, 1) >= 0
+        || ((name[0] == 'n' && name[1] == '_')
+                && (op_lookup(name + 2, 0) >= 0
+                   || op_lookup(name + 2, 1) >= 0))
         || Parrot_is_builtin(interpreter, name, NULL) >= 0;
 }
 
@@ -337,8 +342,6 @@ to_infix(Interp *interpreter, char *name, SymReg **r, int *n, int mmd_op)
     char buf[10];
 
     assert(*n >= 2);
-    if (r[0]->set != 'P')
-        return name;
     if (*n == 3 && r[0] == r[1]) {       /* cvt to inplace */
         sprintf(buf, "%d", mmd_op + 1);  /* XXX */
         mmd = mk_const(interpreter, str_dup(buf), 'I');
@@ -355,12 +358,18 @@ to_infix(Interp *interpreter, char *name, SymReg **r, int *n, int mmd_op)
         (*n)++;
     }
     r[0] = mmd;
-    return "infix";
+    if (name[0] == 'n' && name[1] == '_')
+        return "n_infix";
+    else
+        return "infix";
 }
 
 static int
-is_infix(char *name)
+is_infix(char *name, int n, SymReg **r)
 {
+    if (n < 2 || r[0]->set != 'P')
+        return -1;
+
     if (strcmp(name, "add") == 0)
         return MMD_ADD;
     if (strcmp(name, "sub") == 0)
@@ -377,6 +386,10 @@ is_infix(char *name)
         return MMD_CMOD;
     if (strcmp(name, "pow") == 0)
         return MMD_POW;
+
+    /* now try n_<op> */
+    if (name[0] == 'n' && name[1] == '_')
+        return is_infix(name + 2, n, r);
     return -1;
 }
 
@@ -404,7 +417,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     char format[128];
     int len;
 
-    if ( (op = is_infix(name)) >= 0) {
+    if ( (op = is_infix(name, n, r)) >= 0) {
         /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
         name = to_infix(interpreter, name, r, &n, op);
     }
