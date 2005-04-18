@@ -32,6 +32,8 @@ static STRING *ConcatChar, *ConcatCommand;
 pmclass TclParser dynpmc group tcl_group {
 
     void class_init() {
+      PMC *just_a_hack;      
+      INTVAL fixedstringarray_typenum;
       if (pass) {
           TclList = Parrot_PMC_typenum(INTERP, "TclList");
           StringClass = Parrot_PMC_typenum(INTERP, "String");
@@ -46,6 +48,23 @@ pmclass TclParser dynpmc group tcl_group {
           ConcatVariable = string_from_const_cstring(INTERP, "concat_variable",15);
           ConcatChar = string_from_const_cstring(INTERP, "concat_char",11);
           ConcatCommand = string_from_const_cstring(INTERP, "concat_command", 14);
+
+          /* Hack to avoid having these ``constant'' strings GC'd. */
+          fixedstringarray_typenum = 
+            Parrot_PMC_typenum(INTERP, "FixedStringArray");
+          just_a_hack = pmc_new(INTERP,fixedstringarray_typenum);
+          VTABLE_set_integer_native(INTERP,just_a_hack,10);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,0,bs_nl);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,1,nl);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,2,cb);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,3,cp);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,4,space);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,5,ConcatWords);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,6,ConcatConst);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,7,ConcatVariable);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,8,ConcatChar);
+          VTABLE_set_string_keyed_int(INTERP,just_a_hack,9,ConcatCommand);
+          dod_register_pmc(INTERP,just_a_hack);
       }
     }
 
