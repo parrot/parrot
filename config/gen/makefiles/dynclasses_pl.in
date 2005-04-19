@@ -47,7 +47,7 @@ if ($^O eq 'MSWin32') {
 }
 
 # PMC2C Config
-our $PMC2C = "$PERL $PATHQUOTE" . q[${build_dir}${slash}classes${slash}pmc2c2.pl] . $PATHQUOTE;
+our $PMC2C = "$PERL $PATHQUOTE" . q[${build_dir}${slash}build_tools${slash}pmc2c.pl] . $PATHQUOTE;
 
 # Actual commands
 sub compile_cmd {

@@ -12,7 +12,7 @@ Parrot::Pmc2c - PMC to C Code Generation
 =head1 DESCRIPTION
 
 C<Parrot::Pmc2c> (and the L<subclasses|/SUBCLASSES> defined in this
-file) is used by F<classes/pmc2c2.pl> to generate C code from PMC files.
+file) is used by F<build_tools/pmc2c.pl> to generate C code from PMC files.
 
 =head2 Functions
 

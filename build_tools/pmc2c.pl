@@ -4,30 +4,30 @@
 
 =head1 NAME
 
-classes/pmc2c2.pl - PMC compiler (Version 2)
+build_tools/pmc2c.pl - PMC compiler (Version 2)
 
 =head1 SYNOPSIS
 
 Create F<classes/foo.dump>:
 
-    % perl classes/pmc2c2.pl --dump classes/foo.pmc ...
+    % perl build_tools/pmc2c.pl --dump classes/foo.pmc ...
 
 Create F<vtable.dump>:
 
-    % perl classes/pmc2c2.pl --vtable
+    % perl build_tools/pmc2c.pl --vtable
 
 Print a class tree for the specified PMCs:
 
-    % perl classes/pmc2c2.pl --tree classes/*.pmc
+    % perl build_tools/pmc2c.pl --tree classes/*.pmc
 
 Create F<classes/foo.c> and C<pmc_foo.h> from F<classes/foo.dump>:
 
-    % perl classes/pmc2c2.pl -c classes/foo.pmc ...
+    % perl build_tools/pmc2c.pl -c classes/foo.pmc ...
 
 Create fooX.c and pmc_fooX.h from fooX.dump files, also create libfoo.c
 containing the initialization function for all fooX PMCs.
 
-    % perl classes/pmc2c2.pl --library libfoo -c \
+    % perl build_tools/pmc2c.pl --library libfoo -c \
            classes/foo1.pmc classes/foo2.pmc ...
 
 =head1 DESCRIPTION
@@ -71,7 +71,7 @@ after libname and will initialize all PMCs in the library.
 
 To see the internal data structures please run:
 
-    % perl classes/pmc2c2.pl --c --deb --deb sarray.pmc | less
+    % perl build_tools/pmc2c.pl --c --deb --deb sarray.pmc | less
 
 =head2 Compiling PMCs
 
@@ -730,7 +730,7 @@ sub main {
         "verbose+"      => \$opt{verbose},
         "library=s"     => \$opt{library},
     );
-    unshift @include, ".", "$FindBin::Bin/..", $FindBin::Bin;
+    unshift @include, ".", "$FindBin::Bin/..", "$FindBin::Bin/../classes/";
 
     dump_default()                  and exit if $default;
     dump_pmc(\@include, @ARGV)      and exit if $dump;

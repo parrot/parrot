@@ -11,7 +11,7 @@ head1 DESCRIPTION
 These are the vtable functions for the default PMC class.
 
 All methods which are not defined here get a default implementation
-generated from F<vtable.tbl> by F<classes/pmc2c2.pl>.
+generated from F<vtable.tbl> by F<build_tools/pmc2c.pl>.
 
 =head2 Functions
 

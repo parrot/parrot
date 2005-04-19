@@ -136,7 +136,7 @@ N: Ibotty
 D: parrotbench ruby benchmarks
 
 N: Ilya Martynov
-D: Patch to let pmc2c2.pl run from any directory
+D: Patch to let pmc2c.pl run from any directory
 D: Minor documentation updates
 
 N: Ion Alexandru Morega
@@ -218,6 +218,7 @@ D: URM language, bugfixes
 
 N: Matt Diephouse
 D: Turn off buffering layer in forth.pasm
+D: Various patches for pmc2c.pl
 
 N: Matt Fowles
 D: Resizable*Array classes

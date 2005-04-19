@@ -168,7 +168,7 @@ EOC
 
 =over 4
 
-=item F<classes/pmc2c2.pl>
+=item F<build_tools/pmc2c.pl>
 
 =back
 

@@ -86,8 +86,9 @@ beautifully non-existent Fooby language:
     % perl -I../lib genclass.pl FoobyNumber > foobynumber.pmc
 
 This will produce a skeleton C file (to be preprocessed by the
-F<pmc2c2.pl> program) with stubs for all the methods you need to fill in.
-The function C<init> allows you to set up anything you need to set up.
+F<build_tools/pmc2c.pl> program) with stubs for all the methods you need
+to fill in. The function C<init> allows you to set up anything you need
+to set up.
 
 Now you'll have to do something a little different depending on whether
 you're writing a built-in class or an extension class. If you're writing
@@ -310,6 +311,6 @@ example:
 
   pmclass PackedArray extends Array { ...
 
-See the POD documentation in F<classes/pmc2c2.pl> for a list of useful
-keywords that you may use in the .pmc file. (Run
-C<perldoc -F pmc2c2.pl> to view the POD.)
+See the POD documentation in F<build_tools/pmc2c.pl> for a list of
+useful keywords that you may use in the .pmc file. (Run
+C<perldoc -F pmc2c.pl> to view the POD.)
