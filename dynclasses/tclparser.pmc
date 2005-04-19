@@ -26,7 +26,7 @@ allows us to more easily handle [parser]
 
 static INTVAL TclList,StringClass,IntegerClass,TclWord;
 static STRING *bs_nl, *nl, *cb, *cp, *space;
-static STRING *ConcatWords, *ConcatConst, *ConcatConst, *ConcatVariable;
+static STRING *ConcatWords, *ConcatConst, *ConcatVariable;
 static STRING *ConcatChar, *ConcatCommand;
 
 pmclass TclParser dynpmc group tcl_group {
