@@ -54,7 +54,7 @@ all unimplemented messages.
 static void
 cant_do_method(Interp* interpreter, PMC * pmc, const char *methname)
 {
-    internal_exception(ILL_INHERIT,
+    real_exception(interpreter, NULL, ILL_INHERIT,
                        "%s() not implemented in class '%s'", methname,
         	       caller(interpreter, pmc));
 }

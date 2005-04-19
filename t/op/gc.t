@@ -18,7 +18,7 @@ DOD/GC related bugs.
 
 =cut
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -731,4 +731,47 @@ ok:
 
 CODE
 ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "verify deleg_pmc object marking");
+.sub main @MAIN
+    .local pmc cl, s, t
+    cl = subclass "String", "X"
+    addattribute cl, "o3"
+    addattribute cl, "o4"
+    s = new "X"
+    $P0 = new String
+    $S0 = "ok" . " 3\n"
+    $P0 = $S0
+    setattribute s, "X\0o3", $P0
+    $P0 = new String
+    $S0 = "ok" . " 4\n"
+    $P0 = $S0
+    setattribute s, "X\0o4", $P0
+    null $P0
+    null $S0
+    null cl
+    sweep 1
+    s = "ok 1\n"
+    print s
+    .local int i
+    i = 0
+lp:
+    t = new "X"
+    inc i
+    if i < 1000 goto lp
+    t = "ok 2\n"
+    print s
+    print t
+    $P0 = getattribute s, "X\0o3"
+    print $P0
+    $P0 = getattribute s, "X\0o4"
+    print $P0
+.end
+CODE
+ok 1
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT

@@ -215,6 +215,17 @@ void pobject_lives(Interp *interpreter, PObj *obj)
     if (PObj_is_special_PMC_TEST(obj)) {
         mark_special(interpreter, (PMC*) obj);
     }
+#ifndef NDEBUG
+    else {
+        if (PObj_is_PMC_TEST(obj)) {
+            PMC *p = (PMC*)obj;
+            if (p->pmc_ext && PMC_metadata(p)) {
+                fprintf(stderr, "GC: error obj %p (%s) has properties\n",
+                        p, (char*)p->vtable->whoami->strstart);
+            }
+        }
+    }
+#endif
 #if GC_VERBOSE
     /* buffer GC_DEBUG stuff */
     if (! GC_DEBUG(interpreter))

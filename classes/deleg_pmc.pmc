@@ -96,17 +96,17 @@ pmclass deleg_pmc {
 */
 
     void init () {
-        PObj_custom_mark_SET(SELF);
     }
 
     void init_pmc (PMC* class) {
-        PObj_custom_mark_SET(SELF);
     }
 
     void mark() {
-        SLOTTYPE *attrib_array = PMC_data(SELF);
-        PMC *attr = get_attrib_num(attrib_array, POD_FIRST_ATTRIB);
-        pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
+        /* don't pass that on
+         *
+         * NB objects have the flag PObj_data_is_PMC_array_FLAG set,
+         * marking is done internally in src/dod.c
+         */
     }
 
     void destroy() {
