@@ -157,7 +157,7 @@ XXX: Skip the evaluate step, and just return an invokable.
   start_word = 0;
 
   commands = pmc_new(INTERP,TclList);
-
+  
   /*
    * (Do this after the newline_subst since this could change the
    *  size of the buffer.)  ... don't fall off the end
@@ -205,27 +205,86 @@ space_loop_end:
 
   character = string_index(INTERP, buffer, start_word);
 
-  /* brace-encrusted block */
   if (character == 123) {
-    goto handle_brace;
-  }
+    /* brace-encrusted block */
 
-  /* "string" */
-  if (character == 34) {
-    goto handle_quote;
+    word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
+    if (word_length < 0) {
+      real_exception(INTERP, NULL, E_Exception, "missing close-brace");
+    }
+    end_of_word = 1;
+
+    /* figure out where the new word is going to start.*/
+    I1 = start_word + word_length;
+
+    /* This gets added as a constant.*/
+    start_word++;
+    word_length-=2;
+  
+    S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
+    P1 = VTABLE_find_method(INTERP, word, ConcatConst);
+    Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
+    start_word = I1;
+    word_length = 0;
+    goto middle_word;
+  } else if (character == 34) {
+    /* "string" */
+
+    word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
+
+    if (word_length < 0) {
+      real_exception(INTERP, NULL, E_Exception, "missing \"");
+    }
+    end_of_word = 1 ;
+
+    /*figure out where the new word is going to start.*/
+    I1 = start_word + word_length;
+
+    /*
+     * Since we could have embedded things in our string,
+     * recall the parser, but tell it to preserve the whitespace in
+     * this quote.
+     * (There could be embedded vars, commands, etc.)
+     */
+
+    start_word++;
+    word_length-=2;
+    S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
+
+    /* XXX Really need to switch parse to not need PMC's passed in,
+         basic types are really what we need - GC may be an issue */
+
+    P1 = pmc_new(INTERP, StringClass);
+    Parrot_PMC_set_string(INTERP, P1, S0);
+    P2 = pmc_new(INTERP, IntegerClass);
+    VTABLE_set_integer_native(INTERP,P2,1);
+    P3 = pmc_new(INTERP, IntegerClass);
+    VTABLE_set_integer_native(INTERP,P3,0);
+
+    P0 = Parrot_TclParser_parse(INTERP, SELF, P1, P2, P3);
+    P4 = VTABLE_find_method(INTERP, word, ConcatWords);
+    /* XXX This method on the object currently causes a bus error */
+    Parrot_call_method(INTERP, P4, word, ConcatWords, "vP", P0);
+    start_word = I1;
+    word_length = 0;
+    goto middle_word;
   }
 
   /* #comment */
-  if (character != 35) {
-    goto pre_middle;
-  }
-  if (Parrot_PMC_get_intval(INTERP,command) == 0) {
-    goto handle_comment;
+  if (character == 35 && Parrot_PMC_get_intval(INTERP,command) == 0) {
+    I0 = string_str_index(INTERP, buffer, nl, start_word);
+    if (I0 == -1) {
+      /* If the comment is all that's left, quit. */
+      goto end_command;
+    } else {
+      /*  otherwise, stop at the next newline. */
+      start_word = I0 + 1;
+      goto begin_command;
+    }
   }
 
 pre_middle:
-  word_length = 0;
-  word_trailing_length = 0;
+  word_length = word_trailing_length = 0;
   last_character = -1;
 
 middle_word:
@@ -263,18 +322,45 @@ middle_word_2:
     goto middle_word_1;
   }
 
-  /* If we've gotten this far and we're in a "" or brace-block, barf. */
+  /* If we've gotten this far and we're in a brace-block, die */
+  /* XXX gives wrong exception on quoted string */
   if (end_of_word == 1) {
     real_exception(INTERP, NULL, E_Exception,
       "extra characters after close-brace");
   }
 
-  /* [ ] */
   if (block_interpolation) {
     goto check_bs;
   }
+
   if (character == 91) {
-    goto handle_command_block;
+    /* command block */
+    old_length = word_length;
+    chunk_start = start_word + word_length;
+    word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,chunk_start);
+
+    if (word_length < 0) {
+      real_exception(INTERP, NULL, E_Exception, "missing close-bracket");
+    }
+
+    if (old_length) {
+      /* if there's any word so far, save it*/
+      S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
+      P1 = VTABLE_find_method(INTERP, word, ConcatConst);
+      Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
+    }
+
+    /* Save this as a command (skip the []'s)*/
+    I0 = chunk_start + 1;
+    I1 = word_length - 2;
+    S0 = string_substr(INTERP, buffer, I0, I1, NULL, 0);
+    P1 = VTABLE_find_method(INTERP, word, ConcatCommand);
+    Parrot_call_method(INTERP, P1, word, ConcatCommand, "vS", S0);
+
+    start_word = chunk_start + word_length;
+    word_length = 0;
+
+    goto middle_word;
   }
 
   /* $ */
@@ -301,22 +387,9 @@ end_word:
 
   VTABLE_push_pmc(INTERP, command, word);
 
-  start_word += word_length;
-  start_word += word_trailing_length;
-  start_word++;
+  start_word += word_length + word_trailing_length + 1;
 
   goto begin_word;
-
-handle_comment:
-  /* If the comment is all that's left, quit. */
-  I0 = string_str_index(INTERP, buffer, nl, start_word);
-  if (I0 == -1) {
-    goto end_command;
-  }
-
-  /*  otherwise, stop at the next newline. */
-  start_word = I0 + 1;
-  goto begin_command;
 
 end_command:
   /*
@@ -375,66 +448,7 @@ end_command_2:
   start_word += word_trailing_length;
   goto begin_command;
 
-handle_brace:
-  word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
-  if (word_length < 0) {
-    real_exception(INTERP, NULL, E_Exception, "missing close-brace");
-  }
-  end_of_word = 1;
 
-  /* figure out where the new word is going to start.*/
-  I1 = start_word + word_length;
-
-  /* This gets added as a constant.*/
-  start_word++;
-  word_length-=2;
-
-  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
-  P1 = VTABLE_find_method(INTERP, word, ConcatConst);
-  Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
-  start_word = I1;
-  word_length = 0;
-  goto middle_word;
-
-handle_quote:
-  word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
-
-  if (word_length < 0) {
-    real_exception(INTERP, NULL, E_Exception, "missing \"");
-  }
-  end_of_word = 1 ;
-
-  /*figure out where the new word is going to start.*/
-  I1 = start_word + word_length;
-
-  /*
-   * Since we could have embedded things in our string,
-   * recall the parser, but tell it to preserve the whitespace in
-   * this quote.
-   * (There could be embedded vars, commands, etc.)
-   */
-
-  start_word++;
-  word_length-=2;
-  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
-
-  /* XXX Really need to switch parse to not need PMC's passed in,
-         basic types are really what we need */
-
-  P1 = pmc_new(INTERP, StringClass);
-  Parrot_PMC_set_string(INTERP, P1, S0);
-  P2 = pmc_new(INTERP, IntegerClass);
-  VTABLE_set_integer_native(INTERP,P2,1);
-  P3 = pmc_new(INTERP, IntegerClass);
-  VTABLE_set_integer_native(INTERP,P3,0);
-
-  P0 = Parrot_TclParser_parse(INTERP, SELF, P1, P2, P3);
-  P4 = VTABLE_find_method(INTERP, word, ConcatWords);
-  /* XXX This method on the object currently causes a bus error */
-  Parrot_call_method(INTERP, P4, word, ConcatWords, "vP", P0);
-  start_word = I1;
-  word_length = 0;
-  goto middle_word;
 
 handle_variable:
   /* First, save off anything we've gotten so far as a constant.*/
@@ -483,35 +497,12 @@ inner:
   }
 
   I0 = string_index(INTERP, buffer, temppos);
-  /* A */
-  if (I0 < 65) {
-    goto check2;
-  }
-  /* Z */
-  if (I0 <= 90) {
-    goto inner;
-  }
-check2:
-  /* a */
-  if (I0 < 97) {
-    goto check3;
-  }
-  /* z */
-  if (I0 <=122) {
-    goto inner;
-  }
-check3:
-  /* 0 */
-  if (I0 <48) {
-    goto check4;
-  }
-  /* 9 */
-  if (I0 <=57) {
-    goto inner;
-  }
-check4:
-  /* _ */
-  if (I0 == 95) {
+  if (
+       (I0 >= 65 && I0 <= 90)  || /* A-Z */
+       (I0 >= 97 && I0 <= 122) || /* a-z */
+       (I0 >= 48 && I0 <= 57)  || /* 0-9 */
+       (I0 == 95)                 /* _   */
+     ) {
     goto inner;
   }
 
@@ -612,8 +603,8 @@ backslash_escape_v:
   Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 11);
   goto escape_done;
 
-/* XXX - here is where the \o, \x, \u escapes would go.
-     - You have to twiddle escape_length */
+/* XXX - here is where the \o, \x, \u escapes will go, pending more
+   trans-charset joy */
 
 backslash_escape_not:
   Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", I0);
@@ -623,55 +614,17 @@ escape_done:
   start_word = start_word + escape_length;
   goto middle_word;
 
-handle_command_block:
-  old_length = word_length;
-  chunk_start = start_word + word_length;
-  word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,chunk_start);
-
-  if (word_length < 0) {
-    real_exception(INTERP, NULL, E_Exception, "missing close-bracket");
-  }
-
-  if (old_length) {
-      /* if there's any word so far, save it*/
-      S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
-      P1 = VTABLE_find_method(INTERP, word, ConcatConst);
-      Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
-  }
-
-  /* Save this as a command (skip the []'s)*/
-  I0 = chunk_start + 1;
-  I1 = word_length - 2;
-  S0 = string_substr(INTERP, buffer, I0, I1, NULL, 0);
-  P1 = VTABLE_find_method(INTERP, word, ConcatCommand);
-  Parrot_call_method(INTERP, P1, word, ConcatCommand, "vS", S0);
-
-  start_word = chunk_start + word_length;
-  word_length = 0;
-
-  goto middle_word;
-
   /* if we're preserving whitespace, just return the single command */
 
 preserve_end_scope:
   return(command);
 
 end_scope:
-  /* If we have a command in progress, save it!*/
-  I0 = Parrot_PMC_get_intval(INTERP, command);
-  if (I0 == 0) {
-    goto end_scope_2;
-  }
-  VTABLE_push_pmc(INTERP, commands, command);
-
-  /* At this point, we have parsed the string into an array of commands.*/
-
-end_scope_2:
-  return(commands);
-
-end:
-  exit(1); /* XXX this needs to go away. */
-
+    /* If we have a command in progress, save it!*/
+    if (Parrot_PMC_get_intval(INTERP, command)) {
+      VTABLE_push_pmc(INTERP, commands, command);
+    }
+    return(commands);
   }
 
   /* Given a string and a beginning position in the string, return
