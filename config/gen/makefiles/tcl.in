@@ -66,7 +66,7 @@ lib${slash}tclword.pbc: lib${slash}tclword.imc
 	(cd $(RELPATH) && $(PARROT) --output=$(LIBPATH)tclword.pbc $(LIBPATH)tclword.imc)
 
 test:	tcl.pbc
-	cd t && $(PERL) -MTest::Harness -e 'runtests(glob("*.t"))' && cd ..
+	$(PERL) t/harness
 
 devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
