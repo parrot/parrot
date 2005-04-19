@@ -52,9 +52,9 @@ $expected = "\\";
 language_output_is("tcl",$tcl,$expected,"backslash");
 
 $tcl = <<'EOTCL';
-puts -nonewline "\1"
+puts -nonewline "\q"
 EOTCL
-$expected = "1";
+$expected = "q";
 language_output_is("tcl",$tcl,$expected,"normal character");
 
 $tcl = <<'EOTCL';
