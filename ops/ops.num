@@ -1433,3 +1433,4 @@ bytelength_i_sc                1402
 get_mro_p_p                    1403
 find_name_p_s                  1404
 find_name_p_sc                 1405
+backtrace                      1406

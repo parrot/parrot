@@ -134,6 +134,16 @@ op debug_print() :base_debug {
     goto NEXT();
 }
 
+=item B<backtrace>()
+
+Print a backtrace.
+
+=cut
+
+op backtrace() :base_debug {
+    PDB_backtrace(interpreter);
+    goto NEXT();
+}
 
 =back
 
