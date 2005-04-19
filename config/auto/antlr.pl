@@ -29,21 +29,24 @@ $description = "Determining whether antlr is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    my $a = capture_output( 'antlr -h' ) || '';
-    my $has_antlr = ($a =~ m/ANTLR Parser Generator/) ? 1 : 0;
+    my ( $out, $err ) = capture_output( 'antlr', '-h' );
+    my $output = join( '', $out || '', $err || '' );
+    my ($python, $major, $minor, $revision) = 
+        $output =~ m/(Python)\s+(\d+).(\d+)(?:.(\d+))?/;
+    my $has_antlr = ($output =~ m/ANTLR Parser Generator/) ? 1 : 0;
 
     Configure::Data->set(has_antlr => $has_antlr);
 
     my $has_antlr_with_python = 0;
     if ( $has_antlr ) {
         unlink <config/auto/antlr/*.py>;
-        my $a = capture_output( 'antlr -o config/auto/antlr config/auto/antlr/test_python.g' ) || '';
+        capture_output( 'antlr', '-o', 'config/auto/antlr', 'config/auto/antlr/test_python.g' );
         $has_antlr_with_python = 1 if -e 'config/auto/antlr/test_python_l.py';
         $Configure::Step::result = $has_antlr_with_python ?
                                        'yes, with python' :
                                        'yes, no python';
     } else {
-        $Configure::Step::result = ($a =~ m/NoClassDefFoundError/) ?
+        $Configure::Step::result = ($output =~ m/NoClassDefFoundError/) ?
                                      'no, NoClassDefFoundError' :
                                      'no';
     }

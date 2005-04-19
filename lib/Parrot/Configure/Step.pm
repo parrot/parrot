@@ -421,8 +421,8 @@ sub cc_clean {
 
 =item C<capture_output($command)>
 
-Executes the given command. The command's output and its return status is returned.
-B<STDERR> is redirected to F<test.out> during the execution.
+Executes the given command. The command's output (both stdout and stderr), and its return status is returned as a 3-tuple.
+B<STDERR> is redirected to F<test.err> during the execution, and deleted after the command's run.
 
 =cut
 
@@ -431,7 +431,7 @@ sub capture_output {
 
     # disable STDERR
     open OLDERR, ">&STDERR";
-    open STDERR, ">test.out";
+    open STDERR, ">test.err";
 
     my $output = `$command`;
     my $retval = ($? == -1) ? -1 : ($? >> 8);
@@ -440,7 +440,19 @@ sub capture_output {
     close STDERR;
     open STDERR, ">&OLDERR";
 
-    return ($output, $retval) if wantarray;
+    # slurp stderr
+    my $out_err;
+    {
+      local $/ = undef;
+      open IN, "<test.err";
+      $out_err = <IN>;
+      close IN;
+    }
+
+    # cleanup
+    unlink "test.err";
+
+    return ($output, $out_err, $retval) if wantarray;
     return $output;
 }
 

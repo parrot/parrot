@@ -35,7 +35,7 @@ sub runstep {
     if (!$autodetect) {
       print "specified a icu config parameter,\nICU autodetection disabled.\n" if $verbose;
     } elsif (!defined $icuconfig || !$icuconfig) {
-      my (undef, $ret) = capture_output("icu-config", "--exists");
+      my (undef, undef, $ret) = capture_output("icu-config", "--exists");
 
       if (($ret == -1) || (($ret >> 8) != 0)) {
         undef $icuconfig;

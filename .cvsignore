@@ -10,6 +10,7 @@ parrot.ilk
 parrot.pdb
 test
 test.c
+test.err
 test.o
 test.cco
 test.ilk
