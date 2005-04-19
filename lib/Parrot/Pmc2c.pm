@@ -1143,7 +1143,7 @@ $decl {
 EOC
     if ($meth eq 'morph') {
         $cout .= <<EOC;
-    if (Parrot_is_const_pmc(interpreter, pmc))
+    if (1 || Parrot_is_const_pmc(interpreter, pmc))
 	internal_exception(WRITE_TO_CONSTCLASS,
 		"$meth() in $classname");
     else

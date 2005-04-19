@@ -40,7 +40,7 @@ output_is(<<'CODE', <<'OUTPUT', "call subs in evaled code ");
     concat S5, "print \"foo\\n\"\n"
     concat S5, "returncc\n"
     compreg P1, "PASM"
-    compile P0, P1, S5
+    compile P20, P1, S5     # keep it anchored
     find_global P0, "_foo"
     invokecc
     print "back\n"

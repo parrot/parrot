@@ -46,7 +46,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "IO on some invalid types");
 .sub test
     .param pmc io
     .param string name
-    
+
     print name
     read $S0, io, 1
     length $I0, $S0
@@ -103,14 +103,9 @@ output_is(<<'CODE', <<'OUTPUT', "timely destruction");
 	open P0, "temp.file", "<"
 	read S0, P0, 20
 	print S0
-	interpinfo I1, 2	# DOD runs
-	sub I1, I0
-	print I1
-	print "\n"
 	end
 CODE
 a line
-1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "getfd/fdopen");

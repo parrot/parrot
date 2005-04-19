@@ -193,7 +193,15 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type,
          * This assumes that a constant PMC enum is one bigger then
          * the normal one.
          */
+
+        /*
+         * XXX not yet we can't assure that all contents in the
+         * const PMC is const too
+         * see e.g. t/pmc/sarray_13.imc
+         */
+#if 0
         flags = PObj_constant_FLAG;
+#endif
         --base_type;
         vtable = Parrot_base_vtables[base_type];
     }
