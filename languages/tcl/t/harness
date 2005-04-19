@@ -21,7 +21,7 @@ my @files;
 
 # Per Leo on 18APR2005, run the test suite with --gc-debug
 
-if ($ENV{TEST_PROG_ARGS} !~ /\b--gc-debug\b/) {
+if ($ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} !~ /\b--gc-debug\b/) {
   $ENV{TEST_PROG_ARGS} .= " --gc-debug"; 
 }
 
