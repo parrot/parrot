@@ -194,7 +194,7 @@ Clean up [expr]. MUUUUCH room for improvement there. [expr] is the source
 of most of our abysmal performance in bench.tcl.
 
 the expr AST could use a rework. Be nice if it just passed around something
-invokable, neh?
+invokable.
 
 clean up expr so that it's not passing around
 type indicators. - just use PMCs everywhere. (Though we may still need
