@@ -594,9 +594,9 @@ help :
 	@echo "  languages-clean:   Proxy for target 'clean' of languages/Makefile"
 	@echo ""
 	@echo "fetch from source repository:"
-	@echo "  update:            cvs update."
-	@echo "  status:            cvs status."
-	@echo "  patch:             create a patc for sending to bugs-parrot."
+	@echo "  update:            svn update."
+	@echo "  status:            svn status."
+	@echo "  patch:             create a patch for sending to bugs-parrot."
 	@echo "  rsync:             update with rsync."
 	@echo ""
 	@echo "Development:"
@@ -1292,21 +1292,21 @@ manitest :
 
 ###############################################################################
 #
-# CVS Targets:
+# SVN Targets:
 #
 ###############################################################################
 
 update :
-	cvs -q update -dP
+	svn -q update
 
 rsync :
 	rsync -av cvs.perl.org::parrot-HEAD $(CUR_DIR)
 
 status :
-	cvs -n -q upd -dP
+	svn -q status
 
 patch :
-	cvs -q diff -u
+	svn diff
 
 
 lint : $(PARROT)
