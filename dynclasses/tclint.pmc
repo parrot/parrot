@@ -71,10 +71,29 @@ pmclass TclInt extends TclObject extends Integer dynpmc group tcl_group {
         DYNSELF.morph(dynclass_TclString);
         DYNSELF.set_string_native(value);
     }
+
+    /*
+     * MMD Override:
+     *   TclInt doesn't automatically promote division to float. 
+     */
+    PMC* divide (PMC* value, PMC* dest) {
+      INTVAL n = PMC_int_val(SELF);
+      INTVAL d = PMC_int_val(value);
+
+      if (d == 0)
+          real_exception(INTERP, NULL, E_ZeroDivisionError, "divide by zero");
+
+      if (!dest)
+          dest = pmc_new(INTERP, SELF->vtable->base_type);
+
+      PMC_int_val(dest) = n / d;
+      return dest;
+    }
 }
 
 
 /*
+
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
