@@ -7,10 +7,6 @@ parrot directory:
 
  perl Configure.pl && make
 
-Then, build the PGE library: (also from the top level parrot directory)
-
- (cd compilers/pge && make)
-
 Then, type C<make> in this directory. This will
 generate the file C<tcl.pbc> which can then be used to run tcl programs.
 
@@ -27,7 +23,7 @@ cd'ing to the proper directory to run.
 
 =head2 Test Suite
 
-To run the test suite, type "make test". Note - if I<any> tests fail, try
+To run the test suite, type C<make test>. Note - if I<any> tests fail, try
 setting the environment variable C<TEST_PROG_ARGS> to C<-G> and retry.
 
 If the tests now pass, there's a GC bug that needs to be reported to

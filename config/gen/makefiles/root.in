@@ -493,7 +493,7 @@ MAKE_C = ${make_c}
 #
 ###############################################################################
 
-all : flags_dummy $(PARROT) runtime/parrot/include/parrotlib.pbc runtime/parrot/include/config.fpmc docs $(LIBNCI_TEST_SO) $(GEN_LIBRARY) dynclasses
+all : flags_dummy $(PARROT) runtime/parrot/include/parrotlib.pbc runtime/parrot/include/config.fpmc docs $(LIBNCI_TEST_SO) $(GEN_LIBRARY) dynclasses compilers
 
 # constant string support
 .c.str :
@@ -588,6 +588,7 @@ help :
 	@echo "  dynclasses-clean:  Proxy for target 'clean' of dynclasses/Makefile"
 	@echo ""
 	@echo "Language implementations:"
+	@echo "  compilers:         Proxy for default target of compilers/pge"
 	@echo "  languages:         Proxy for default target of languages/Makefile"
 	@echo "  languages-test:    Proxy for target 'test' of languages/Makefile"
 	@echo "  languages-clean:   Proxy for target 'clean' of languages/Makefile"
@@ -1049,6 +1050,11 @@ dynclasses-clean :
 # language implementation targets:
 #
 ###############################################################################
+
+compilers : compilers.dummy
+
+compilers.dummy :
+	$(MAKE_C) compilers/pge
 
 languages : languages.dummy
 
