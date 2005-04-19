@@ -148,11 +148,11 @@ S: but many functions are missing implementation.
 M: Yes
 V: 0.0.11
 
-N: tcl ("partcl")
+N: Tcl ("partcl")
 A: Will Coleda
-S: 100% test failure due to recent parrot changes.
+S: Partial test failure, in progress
 M: Yes
-V: N/A
+V: Current
 
 N: URM
 A: Marcus Thiesen
