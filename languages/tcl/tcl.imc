@@ -9,7 +9,7 @@
 
   load_bytecode "languages/tcl/lib/tcllib.pbc"
 
-  .local pmc filename,retval,math_funcs,source
+  .local pmc filename,retval,source
   .local string mode,chunk,contents
   .local int argc,retcode
 
@@ -18,13 +18,39 @@
 
   source = find_global "Tcl", "source"
 
-  # If no file was specified, read from stdin.
   argc = argv
   if argc > 1 goto open_file
-  getstdin $P1
-  (retcode,retval) = source($P1)
-  close $P1
-  goto done
+
+  # If no file was specified, read from stdin.
+
+  .local string input_line 
+  .local pmc STDIN,STDOUT
+  STDIN = getstdin
+  STDOUT = getstdout
+  .local pmc parser,interpret
+  parser = find_global "_Tcl", "parser"
+  interpret = find_global "_Tcl", "__interpret"
+  .local pmc input_line_PMC
+  .local pmc zero
+  zero = new Integer
+  zero = 0
+  
+input_loop:
+  print "% " # XXX Doesn't respect a set tcl_prompt1
+  STDOUT."flush"()
+  input_line = readline STDIN
+  input_line_PMC = new String
+  input_line_PMC = input_line
+  $P2 = parser."parse"(input_line_PMC,zero,zero)
+  (retcode,retval) = interpret($P1)
+  # print out the result of the evaluation.
+  print retval
+  print "\n"
+  goto input_loop
+
+  #goto done
+
+
 
 open_file: 
   filename = new String
