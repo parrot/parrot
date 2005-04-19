@@ -19,6 +19,12 @@ If I'm called with no args, I run the suite.
 
 my @files;
 
+# Per Leo on 18APR2005, run the test suite with --gc-debug
+
+if ($ENV{TEST_PROG_ARGS} !~ /\b--gc-debug\b/) {
+  $ENV{TEST_PROG_ARGS} .= " --gc-debug"; 
+}
+
 if ( grep { /^-files$/ } @ARGV ) {
     # I must be running out of languages/
     my $dir = File::Spec->catfile( $language, "t" );
