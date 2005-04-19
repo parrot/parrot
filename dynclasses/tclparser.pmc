@@ -125,6 +125,8 @@ XXX: Skip the evaluate step, and just return an invokable.
 
       /* backslash/newline substitution */
       buffer_length = string_length(INTERP, buffer);
+
+      /* Possible regression here if we do the bs_nl substitution >1 */
       bs_pos = string_str_index(INTERP, buffer, bs_nl, bs_marker);
 
       /* bs_loop_outer: */
@@ -180,7 +182,6 @@ space_loop:
     goto end_scope;
   }
 
-/* space_loop_cont: Unreferenced label commented out */
   I0 = string_index(INTERP, buffer, start_word);
   if (I0 < 33 && I0 != 10) {
     I1 = 1;
@@ -195,9 +196,13 @@ space_loop:
   goto space_loop;
 
 space_loop_end:
-  /* at this point, we know start_word is correct. Now to figure out where the word ends. */
+  /* 
+   * At this point, we know start_word is correct.
+   * Now to figure out where the word ends.
+   */
 
   /* If the first character is special, then DTRT */
+
   character = string_index(INTERP, buffer, start_word);
 
   /* brace-encrusted block */
@@ -229,7 +234,6 @@ middle_word:
    goto end_command;
   }
 
-/* middle_word_0: Unreferenced label commented out */
   character = string_index(INTERP, buffer, I0);
 
   if (preserve_whitespace == 1) {
@@ -261,7 +265,8 @@ middle_word_2:
 
   /* If we've gotten this far and we're in a "" or brace-block, barf. */
   if (end_of_word == 1) {
-    goto invalid_word;
+    real_exception(INTERP, NULL, E_Exception,
+      "extra characters after close-brace");
   }
 
   /* [ ] */
@@ -283,7 +288,6 @@ check_bs:
     goto handle_backslash;
   }
 
-/* middle_continue: Unreferenced label commented out */
   last_character = character;
   word_length++;
   goto middle_word;
@@ -374,7 +378,7 @@ end_command_2:
 handle_brace:
   word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
   if (word_length < 0) {
-    goto bad_block;
+    real_exception(INTERP, NULL, E_Exception, "missing close-brace");
   }
   end_of_word = 1;
 
@@ -396,7 +400,7 @@ handle_quote:
   word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
 
   if (word_length < 0) {
-    goto bad_block;
+    real_exception(INTERP, NULL, E_Exception, "missing \"");
   }
   end_of_word = 1 ;
 
@@ -452,11 +456,10 @@ handle_variable_1:
     goto handle_variable_nobrace;
   }
 
-/* handle_variable_brace: Unreferenced label commented out */
   /* Get the closing brace, but we don't have to have matched pairs here. */
   I1 = string_str_index(INTERP, buffer, cb, chunk_start);
   if (I1 > buffer_length) {
-    goto invalid_variable;
+    real_exception(INTERP, NULL, E_Exception, "XXX invalid variable");
   }
   /* Save the new start word for when we go to middle word.*/
   I1++;
@@ -525,7 +528,7 @@ inner_done:
   }
   temppos = string_str_index(INTERP, buffer, cp, start_word);
   if (temppos == -1) {
-    goto bad_array;
+    real_exception(INTERP, NULL, E_Exception, "XXX bad array");
   }
   /* $S0($S1) */
   start_word++;
@@ -626,7 +629,7 @@ handle_command_block:
   word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,chunk_start);
 
   if (word_length < 0) {
-    goto bad_block;
+    real_exception(INTERP, NULL, E_Exception, "missing close-bracket");
   }
 
   if (old_length) {
@@ -636,7 +639,6 @@ handle_command_block:
       Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
   }
 
-/* command_save: Unreferenced label commented out */
   /* Save this as a command (skip the []'s)*/
   I0 = chunk_start + 1;
   I1 = word_length - 2;
@@ -669,25 +671,6 @@ end_scope_2:
 
 end:
   exit(1); /* XXX this needs to go away. */
-
- /*
-  * XXX these really should generate compile-time tcl errors.
-  * (perhaps even compile to code that generates an [error]?)
-  * (redo this once "error" is working.)
-  */
-
-bad_array:
-  printf("XXX - invalid array, no close ) found\n");
-  goto end;
-bad_block:
-  printf("XXX - invalid word, no closing <mumble> found\n");
-  goto end;
-invalid_word:
-  printf("XXX - invalid word, should have ended after block\n");
-  goto end;
-invalid_variable:
-  printf("missing close-brace for variable name\n");
-  goto end;
 
   }
 
