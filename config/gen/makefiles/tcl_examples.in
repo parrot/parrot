@@ -4,9 +4,13 @@ DOWN_PATH = languages${slash}tcl${slash}
 
 default:
 	@echo "to run <foo>.tcl, type 'make <foo>'"
+	@echo "to run an interactive tclsh, type 'make tclsh'"
 
 %:%.tcl
 	cd $(UP_PATH) && $(PARROT) --gc-debug $(DOWN_PATH)tcl.pbc $(DOWN_PATH)examples${slash}$@.tcl
+
+tclsh:
+	cd $(UP_PATH) && $(PARROT) --gc-debug $(DOWN_PATH)tcl.pbc
 
 # (for development testing)
 test:

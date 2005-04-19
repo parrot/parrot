@@ -21,6 +21,8 @@ static STRING *true, *false, *yes, *no;
 pmclass TclString extends TclObject dynpmc group tcl_group {
 
     void class_init () {
+        PMC *string_anchor;
+        INTVAL fixedstringarray_typenum;
         if (pass) {
             dynclass_TclString = Parrot_PMC_typenum(INTERP,"TclString");
             dynclass_TclInt    = Parrot_PMC_typenum(INTERP,"TclInt");
@@ -29,6 +31,14 @@ pmclass TclString extends TclObject dynpmc group tcl_group {
             false = string_from_const_cstring(INTERP, "false",5);
             yes   = string_from_const_cstring(INTERP, "yes",3);
             no    = string_from_const_cstring(INTERP, "no",2);
+            fixedstringarray_typenum =
+              Parrot_PMC_typenum(INTERP, "FixedStringArray");
+            string_anchor = pmc_new(INTERP,fixedstringarray_typenum);
+            VTABLE_set_integer_native(INTERP,string_anchor,4);
+            VTABLE_set_string_keyed_int(INTERP,string_anchor,0,true);
+            VTABLE_set_string_keyed_int(INTERP,string_anchor,1,false);
+            VTABLE_set_string_keyed_int(INTERP,string_anchor,2,yes);
+            VTABLE_set_string_keyed_int(INTERP,string_anchor,3,no);
         }
     }
 

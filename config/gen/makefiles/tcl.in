@@ -47,7 +47,6 @@ lib${slash}expression.imc \
 lib${slash}get_var.imc \
 lib${slash}interpret.imc \
 lib${slash}list.imc \
-lib${slash}macros${slash}boolean.imc \
 lib${slash}macros${slash}is_space.imc \
 lib${slash}string_to_list.imc \
 tcl.imc_template \
@@ -64,6 +63,9 @@ lib${slash}tcllib.pbc: lib${slash}tcllib.imc
 
 lib${slash}tclword.pbc: lib${slash}tclword.imc
 	(cd $(RELPATH) && $(PARROT) --output=$(LIBPATH)tclword.pbc $(LIBPATH)tclword.imc)
+
+tclsh: tcl.pbc
+	(cd $(RELPATH) && $(PARROT) --gc-debug $(MYPATH)tcl.pbc)
 
 test:	tcl.pbc
 	$(PERL) t/harness

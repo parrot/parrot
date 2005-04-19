@@ -33,8 +33,7 @@ while_loop:
   if return_type == TCL_ERROR goto done_done
   (return_type,retval) = expression_i(retval)
   if return_type == TCL_ERROR goto done_done
-  .boolean(retval,$I0)
-  if $I0 == 0 goto done
+  unless retval goto done
   (return_type,retval) = interpret(parsed_code)
   if return_type == TCL_BREAK goto done
   if return_type == TCL_RETURN goto done

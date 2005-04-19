@@ -72,9 +72,7 @@ get_final:
   (return_type,retval) = expression_i(retval)
   if return_type == TCL_ERROR goto done_final
 
-  .boolean(retval,$I0)
-
-  if $I0 == 0 goto do_elseifs 
+  unless retval goto do_elseifs
   code = body 
   goto done
  
@@ -90,8 +88,7 @@ elseif_loop:
   if return_type == TCL_ERROR goto done_final
   (return_type,retval) = expression_i(retval)
   if return_type == TCL_ERROR goto done_final
-  .boolean(retval,$I0)
-  if $I0 == 1 goto done_elseifs
+  if retval goto done_elseifs
   inc $I2
   goto elseif_loop  
 
