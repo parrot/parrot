@@ -1,6 +1,5 @@
 #! perl -w
-
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -63,7 +62,13 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 output_is(<<'CODE', <<'OUTPUT', "set/get string value");
-	new P0, .PerlString
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+	new P0, I25
         set P0, "bar"
         set S0, P0
         eq S0, "bar", OK1
@@ -111,29 +116,35 @@ ok 6
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "assign number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-    new P0, .PerlInt
+    new P0, I23
     assign P0, 42.21
     .fp_eq(P0, 42.21, OK1)
     print  "not "
 OK1:
     print  "ok 1\\n"
 
-    new P1, .PerlNum
+    new P1, I24
     assign P1, 21.01
     .fp_eq(P1, 21.01, OK2)
     print  "not "
 OK2:
     print  "ok 2\\n"
 
-    new P2, .PerlString
+    new P2, I25
     assign P2, 7.65
     .fp_eq(P2, 7.65, OK3)
     print  "not "
 OK3:
     print  "ok 3\\n"
 
-    new P3, .PerlUndef
+    new P3, I26
     assign P3, 1.23
     .fp_eq(P3, 1.23, OK4)
     print  "not "
@@ -149,7 +160,13 @@ ok 4
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "if (P) - Num");
-	new	P0, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+	new	P0, I24
 
 	set	P0, 1.1
 	if	P0, OK1
@@ -169,7 +186,13 @@ ok 2
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "unless (P) - Num");
-	new	P0, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+	new	P0, I24
 
 	set	P0, 0.0
 	unless	P0, OK1
@@ -189,8 +212,14 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "inc, PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-     new P3, .PerlNum
+     new P3, I24
 
      set P3, -0.999
      inc P3
@@ -210,8 +239,14 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "dec, PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-     new P3, .PerlNum
+     new P3, I24
 
      set P3, 1.001
      dec P3
@@ -231,9 +266,15 @@ ok 2
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "mul_p_p, PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-        new P0,.PerlNum
-        new P1,.PerlNum
+        new P0,I24
+        new P1,I24
         set P0,-2.5
         set P1,2.5
         mul P0,P1
@@ -242,7 +283,7 @@ output_is(<<CODE, <<OUTPUT, "mul_p_p, PerlNum");
 EQ1:   print "ok 1"
        print "\\n"
 
-        new P2, .PerlInt
+        new P2, I23
         set P2, 2
         mul P0, P2
         .fp_eq(P0,-12.5,EQ2)
@@ -257,9 +298,15 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string integer");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlString
+	new P0, I24
+	new P1, I25
 	set P0, 6.1
 	set P1, "7"
 	add P0,P0,P1
@@ -273,9 +320,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlString
+	new P0, I24
+	new P1, I25
 	set P0, 6.1
 	set P1, "ab"
 	add P0,P0,P1
@@ -289,9 +342,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to string number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlString
+	new P0, I24
+	new P1, I25
 	set P0, 6.1
 	set P1, "7.5"
 	add P0,P0,P1
@@ -305,8 +364,14 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to self");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
+	new P0, I24
 	set P0, 123.123
 	add P0, P0, P0
 	.fp_eq( P0, 246.246, EQ1)
@@ -319,8 +384,14 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "sub number from self");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
+	new P0, I24
 	set P0, 456.456
 	sub P0, P0, P0
 	.fp_eq( P0, 0, EQ1)
@@ -333,8 +404,14 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply number by self");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
+	new P0, I24
 	set P0, 124.124
 	mul P0, P0, P0
 	.fp_eq( P0, 15406.767376, EQ1)
@@ -347,8 +424,14 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide number by self");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
+	new P0, I24
 	set P0, 23.23
 	div P0, P0, P0
 	.fp_eq( P0, 1, EQ1)
@@ -364,9 +447,15 @@ OUTPUT
 # Number vs. number
 #
 output_is(<<"CODE", <<OUTPUT, "add number to other");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
+	new P0, I24
+	new P1, I24
 	set P0, 123.123
 	set P1, 321.321
 	add P1, P1, P0
@@ -380,9 +469,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract number from other");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
+	new P0, I24
+	new P1, I24
 	set P0, 123.123
 	set P1, 321.321
 	sub P1, P1, P0
@@ -396,9 +491,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply number by other");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
+	new P0, I24
+	new P1, I24
 	set P0, 123.123
 	set P1, 321.321
 	mul P1, P1, P0
@@ -412,9 +513,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide number by other");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
+	new P0, I24
+	new P1, I24
 	set P0, 123.123
 	set P1, 246.246
 	div P1, P1, P0
@@ -431,9 +538,15 @@ OUTPUT
 # Number vs. integer
 #
 output_is(<<"CODE", <<OUTPUT, "add integer to number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
+	new P0, I23
+	new P1, I24
 	set P0, 123
 	set P1, 321.321
 	add P1, P1, P0
@@ -447,9 +560,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract integer from number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
+	new P0, I23
+	new P1, I24
 	set P0, 123
 	set P1, 321.321
 	sub P1, P1, P0
@@ -463,9 +582,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply integer by number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
+	new P0, I23
+	new P1, I24
 	set P0, 123
 	set P1, 321.321
 	mul P1, P1, P0
@@ -479,9 +604,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide integer by number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
+	new P0, I23
+	new P1, I24
 	set P0, 123
 	set P1, 246.246
 	div P1, P1, P0
@@ -498,9 +629,15 @@ OUTPUT
 # Number vs. integer
 #
 output_is(<<"CODE", <<OUTPUT, "add integer to number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
+	new P0, I23
+	new P1, I24
 	set P0, 123
 	set P1, 321.321
 	add P1, P0, P1
@@ -514,9 +651,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract integer from number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
+	new P0, I23
+	new P1, I24
 	set P0, 123
 	set P1, 321.321
 	sub P1, P0, P1
@@ -530,9 +673,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply integer by number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
+	new P0, I23
+	new P1, I24
 	set P0, 123
 	set P1, 321.321
 	mul P1, P0, P1
@@ -546,9 +695,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide integer by number");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlInt
-	new P1, .PerlNum
+	new P0, I23
+	new P1, I24
 	set P0, 123
 	set P1, 246.246
 	div P1, P0, P1
@@ -562,8 +717,14 @@ ok 1
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "add number  number gives int");
-	new P0, .PerlNum
-	new P1, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+	new P0, I24
+	new P1, I24
 	set P0, 4.2
 	set P1, 2.8
 	add P0, P1
@@ -575,8 +736,14 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "sub number  number gives int");
-	new P0, .PerlNum
-	new P1, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+	new P0, I24
+	new P1, I24
 	set P0, 4.2
 	set P1, 2.2
 	sub P0, P1
@@ -588,8 +755,14 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "mul number  number gives int");
-	new P0, .PerlNum
-	new P1, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+	new P0, I24
+	new P1, I24
 	set P0, 4.5
 	set P1, 2.0
 	mul P0, P1
@@ -601,8 +774,14 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "divide number by number gives int");
-	new P0, .PerlNum
-	new P1, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+	new P0, I24
+	new P1, I24
 	set P0, 4.2
 	set P1, 2.1
 	div P0, P1
@@ -614,9 +793,15 @@ CODE
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add PerlNum to PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
+	new P0, I24
+	new P1, I24
 	set P1, 4000.04
 	set P0, 123
 	add P0, P0, P1
@@ -630,9 +815,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract PerlNum from PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
+	new P0, I24
+	new P1, I24
 	set P1, 4000.04
 	set P0, 123
 	sub P0, P0, P1
@@ -640,9 +831,9 @@ output_is(<<"CODE", <<OUTPUT, "subtract PerlNum from PerlNum");
 	print "not "
 EQ1:	print "ok 1"
 	print "\\n"
-        new P2, .PerlNum
-        new P3, .PerlNum
-        new P4, .PerlNum
+        new P2, I24
+        new P3, I24
+        new P4, I24
         set P2, 12.7
         set P3, 12.6
         sub P3, P2
@@ -657,8 +848,14 @@ ok 2
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "multiply PerlNum with PerlNum");
-	new P0, .PerlNum
-	new P1, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+	new P0, I24
+	new P1, I24
 	set P1, 4000.04
 	set P0, 123
 	mul P0, P0, P1
@@ -670,9 +867,15 @@ CODE
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide PerlNum by PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new P0, .PerlNum
-	new P1, .PerlNum
+	new P0, I24
+	new P1, I24
 	set P1, 4000
 	set P0, 123
 	div P0, P0, P1
@@ -688,9 +891,15 @@ ok 1
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add INTVAL to PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-        new P0, .PerlNum
-        new P1, .PerlNum
+        new P0, I24
+        new P1, I24
 
         set P0, 12.5
         add P1, P0, 12
@@ -710,9 +919,15 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add FLOATVAL to PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-        new P0, .PerlNum
-        new P1, .PerlNum
+        new P0, I24
+        new P1, I24
 
         set P0, 12.5
         add P1, P0, 12.6
@@ -731,9 +946,15 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract INTVAL from PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-        new P0, .PerlNum
-        new P1, .PerlNum
+        new P0, I24
+        new P1, I24
 
         set P0, 12.5
         sub P1, P0, 12
@@ -753,9 +974,15 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "subtract FLOATVAL from PerlNum");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-        new P0, .PerlNum
-        new P1, .PerlNum
+        new P0, I24
+        new P1, I24
 
         set P0, 12.5
         sub P1, P0, 12.6
@@ -774,9 +1001,15 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply PerlNum by INTVAL");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-        new P0, .PerlNum
-        new P1, .PerlNum
+        new P0, I24
+        new P1, I24
 
         set P0, 12.5
         mul P1, P0, 5
@@ -796,9 +1029,15 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "multiply PerlNum by FLOATVAL");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-        new P0, .PerlNum
-        new P1, .PerlNum
+        new P0, I24
+        new P1, I24
 
         set P0, 12.5
         mul P1, P0, 12.5
@@ -817,9 +1056,15 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide PerlNum by INTVAL");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-        new P0, .PerlNum
-        new P1, .PerlNum
+        new P0, I24
+        new P1, I24
 
         set P0, 12.5
         div P1, P0, 5
@@ -839,9 +1084,15 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "divide PerlNum by FLOATVAL");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-        new P0, .PerlNum
-        new P1, .PerlNum
+        new P0, I24
+        new P1, I24
 
         set P0, 12.5
         div P1, P0, 0.35
@@ -861,7 +1112,13 @@ OUTPUT
 
 
 output_is(<<"CODE", <<OUTPUT, "eq_p_n");
-        new P0, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+        new P0, I24
 
         set P0, 12.5
         eq P0, 12.5, OK1
@@ -880,7 +1137,13 @@ OUTPUT
 
 
 output_is(<<"CODE", <<OUTPUT, "ne_p_n");
-        new P0, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+        new P0, I24
 
         set P0, 12.5
         ne P0, 12.0, OK1
@@ -898,8 +1161,14 @@ ok 2
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "eq_num");
-        new P0, .PerlNum
-        new P1, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+        new P0, I24
+        new P1, I24
 
         set N0, 12.5
         set P0, N0
@@ -915,7 +1184,7 @@ OK1:    print "ok 1\\n"
 BAD2:   print "not "
 OK2:    print "ok 2\\n"
 
-        new P2, .PerlInt
+        new P2, I23
         set P2, N0
         eq_num P0, P2, OK3
         print "not "
@@ -928,11 +1197,17 @@ ok 3
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "p =  fmod(p,p)");
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-	new 	P0, .PerlNum
-	new	P1, .PerlNum
-	new	P2, .PerlNum
-        new     P3, .PerlInt
+	new 	P0, I24
+	new	P1, I24
+	new	P2, I24
+        new     P3, I23
 	set	P0, 13.4
 	set	P1, 6.0
 	cmod	P2, P0, P1
@@ -959,7 +1234,13 @@ OUTPUT
 # s. config/gen/platform/generic/math.h
 #
 output_is(<<'CODE', <<'OUTPUT', "+- zero");
-  new P0, .PerlNum
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
+  new P0, I24
   set P0, 0.0
   print P0
   print "\n"
@@ -975,6 +1256,12 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive float");
 
 .sub _main
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
     .local pmc float_1
     float_1 = new Float
     float_1 = 123.123
@@ -993,6 +1280,12 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative float");
 
 .sub _main
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
     .local pmc float_1
     float_1 = new Float
     float_1 = -123.123
@@ -1011,6 +1304,12 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive integer");
 
 .sub _main
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
     .local pmc float_1
     float_1 = new Float
     float_1 = 1
@@ -1029,6 +1328,12 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative integer");
 
 .sub _main
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
     .local pmc float_1
     float_1 = new Float
     float_1 = -1
@@ -1047,6 +1352,12 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0");
 
 .sub _main
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
     .local pmc float_1
     float_1 = new Float
     float_1 = 0
@@ -1065,6 +1376,12 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0.000");
 
 .sub _main
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
     .local pmc float_1
     float_1 = new Float
     float_1 = 0.000
@@ -1083,6 +1400,12 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
 .sub _main
+    find_type I21, "PerlArray"
+    find_type I22, "PerlHash"
+    find_type I23, "PerlInt"
+    find_type I24, "PerlNum"
+    find_type I25, "PerlString"
+    find_type I26, "PerlUndef"
     .local pmc pmc1
     pmc1 = new PerlNum
     .local int bool1
