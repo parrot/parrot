@@ -63,13 +63,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0,I21
+    new P0,.PerlArray
     set P0,0
     set I0,P0
     print I0
@@ -93,13 +87,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set/get by index");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0,I21
+    new P0,.PerlArray
     set P0[0],3
     set I1,P0[0]
     print I1
@@ -118,7 +106,7 @@ output_is(<<'CODE', <<'OUTPUT', "set/get by index");
     print "\n"
 
     set P0, 4
-    new P1, I23
+    new P1, .PerlInt
     set P1, 42
     set P0[3],P1
     set P2,P0[3]
@@ -134,13 +122,7 @@ hey
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "same, but with implicit resizing");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0,I21
+    new P0,.PerlArray
     set P0[0],3
     set I1,P0[0]
     print I1
@@ -156,7 +138,7 @@ output_is(<<'CODE', <<'OUTPUT', "same, but with implicit resizing");
     print S1
     print "\n"
 
-    new P1, I23
+    new P1, .PerlInt
     set P1, 42
     set P0[3],P1
     set P2,P0[3]
@@ -172,13 +154,7 @@ hey
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "If P");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
     if P0, TR
     print "false\n"
     branch NEXT
@@ -190,7 +166,7 @@ NEXT:   set P0[0], 1
     branch NEXT2
 TR2:    print "true\n"
 
-NEXT2:  new P1, I21
+NEXT2:  new P1, .PerlArray
     set P1, 1
     if P1, TR3
     print "false\n"
@@ -212,13 +188,7 @@ false
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Negative and Positive array accesses");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0,I21
+    new P0,.PerlArray
 
     set I0,P0
     eq I0,0,OK_1
@@ -412,13 +382,7 @@ ok 28
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Bracketed access test suite");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
 
     #
     # Make sure an uninitialized PerlArray has a length of 0
@@ -627,13 +591,7 @@ ok 17
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PerlArray integer access, two locations");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
 
     set P0[0],37
     set P0[1],-15
@@ -669,13 +627,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PerlArray integer/register access, two locations");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
 
     set I0,0
     set P0[I0],37
@@ -713,13 +665,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PerlArray string register/access, two locations");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
 
     set I0,0
     set P0[I0],"foo"
@@ -757,13 +703,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PerlArray string access, two locations");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
 
     set P0[0],"foo"
     set P0[1],"bar"
@@ -799,13 +739,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PerlArray numeric access, two locations");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
 
     set P0[0],3.100000
     set P0[1],-7.200000
@@ -841,13 +775,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PerlArray numeric/register access, two locations");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
 
     set I0,0
     set P0[I0],3.100000
@@ -885,13 +813,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Resize negative index");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
     set P0[-1], 55
     set I0, P0[0]
     eq I0,55,ok1
@@ -910,13 +832,7 @@ ok 2
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Testing clone");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
     set P0[0], 1
     set P0[1], 2
 
@@ -958,18 +874,12 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Testing multi-level fetch");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
-    new P1, I21
+    new P0, .PerlArray
+    new P1, .PerlArray
     set P1[0], "0;0"
     set P1[1], "0;1"
     set P0[0], P1
-    new P1, I21
+    new P1, .PerlArray
     set P1[0], "1;0"
     set P1[1], "1;1"
     set P0[1], P1
@@ -1023,14 +933,8 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "push/pop");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
-    new P1, I23
+    new P0, .PerlArray
+    new P1, .PerlInt
     set P1, 42
     push P0, P1
     set I0, 43
@@ -1071,14 +975,8 @@ ok
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "unshift/shift");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
-    new P1, I23
+    new P0, .PerlArray
+    new P1, .PerlInt
     set P1, 42
     unshift P0, P1
     set I0, 43
@@ -1119,17 +1017,11 @@ ok
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set intial size");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P1, I21
+    new P1, .PerlArray
     set P1[0], 0    # size key
     set I1, 100000    # value
     set P1[1], I1
-    new P0, I21, P1
+    new P0, .PerlArray, P1
     set I0, P0
     eq I0, I1, ok
     print "nok: "
@@ -1143,14 +1035,8 @@ ok
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "splice");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
-    new P1, I21
+    new P0, .PerlArray
+    new P1, .PerlArray
     push P0, 100
     push P1, 200
     push P1, 300
@@ -1281,13 +1167,7 @@ ok 7
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "defined");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
     defined I0, P0
     print I0
     print "\n"
@@ -1305,7 +1185,7 @@ output_is(<<'CODE', <<OUTPUT, "defined");
     defined I0, P0[100]
     print I0
     print "\n"
-    new P1, I26
+    new P1, .PerlUndef
     set P0[2], P1
     defined I0, P0[2]
     print I0
@@ -1322,13 +1202,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "exists");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
+    new P0, .PerlArray
     set P0, 5
     set P0[0], 1
     exists I0, P0[0]
@@ -1340,7 +1214,7 @@ output_is(<<'CODE', <<OUTPUT, "exists");
     exists I0, P0[100]
     print I0
     print "\n"
-    new P1, I26
+    new P1, .PerlUndef
     set P0[2], P1
     exists I0, P0[2]
     print I0
@@ -1355,21 +1229,15 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "set_integer_keyed - nested #19328");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
-    new P1, I21
+    new P0, .PerlArray
+    new P1, .PerlArray
     push P1, 9
     push P1, 8
     push P1, 7
     push P1, 6
     push P1, 5
     push P0, P1
-    new P1, I21
+    new P1, .PerlArray
     push P1, 4
     push P1, 3
     push P1, 2
@@ -1405,14 +1273,8 @@ OUTPUT
 
 
 output_is(<<'CODE', <<OUT, "multikeyed access I arg");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
-    new P1, I21
+    new P0, .PerlArray
+    new P1, .PerlArray
     set P0[10], P1
     set P0[10;10], 20
     set P2, P0[10]
@@ -1436,15 +1298,9 @@ PerlArray
 OUT
 
 output_is(<<'CODE', <<OUT, "multikeyed access P arg");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I21
-    new P1, I21
-    new P3, I23
+    new P0, .PerlArray
+    new P1, .PerlArray
+    new P3, .PerlInt
     set P3, 20
     set P0[10], P1
     set P0[10;10], P3
@@ -1470,15 +1326,9 @@ OUT
 
 
 output_is(<<"CODE", <<OUTPUT, "Fetching undefined values (no warnings)");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
     warningsoff 1
-    new P0, I21
+    new P0, .PerlArray
     set I0, P0[0]
     eq I0, 0, OK1
     print "not "
@@ -1506,14 +1356,8 @@ OUTPUT
 
 output_like(<<"CODE", <<'OUTPUT', "Fetching undefined values (with warnings)");
 @{[ $fp_equality_macro ]}
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
     warningson 1
-    new P0, I21
+    new P0, .PerlArray
     set I0, P0[0]
     eq I0, 0, OK1
     print "not "
@@ -1550,14 +1394,8 @@ OUTPUT
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 .sub _main
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
     .local pmc pmc1
-    pmc1 = new I21
+    pmc1 = new PerlArray
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -1577,14 +1415,8 @@ CODE
 OUTPUT
 
 output_is(<< "CODE", << 'OUTPUT', "Keyed access");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
 @{[ $fp_equality_macro ]}
-    new P0, I21
+    new P0, .PerlArray
     new P1, .Key
     set P1, 10
     set P0[P1], 2

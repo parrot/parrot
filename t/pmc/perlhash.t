@@ -22,13 +22,7 @@ use Parrot::Test tests => 37;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new    P0, I22
+    new    P0, .PerlHash
 
     set    P0["foo"], -7
     set    P0["bar"], 3.5
@@ -81,17 +75,11 @@ ok 6
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "more than one PerlHash");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set S0, "key"
     set P0[S0], 1
 
-    new P1, I22
+    new P1, .PerlHash
     set S1, "another_key"
     set P1[S1], 2
 
@@ -109,13 +97,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "hash keys with nulls in them");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set S0, "parp\0me"
     set S1, "parp\0you"
 
@@ -136,13 +118,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "nearly the same hash keys");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set S0, "a\0"
     set S1, "\0a"
 
@@ -164,13 +140,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "The same hash keys");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set S0, "Happy"
     set S1, "Happy"
 
@@ -195,13 +165,7 @@ OUTPUT
 # the current algorithm; if the algorithm changes, change the test!
 
 output_is(<<'CODE', <<OUTPUT, "key that hashes to zero");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set S0, "key2"
     set P0[S0], 1
     set I0, P0[S0]
@@ -213,13 +177,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "size of the hash");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
 
     set P0["0"], 1
     set I0, P0
@@ -244,13 +202,7 @@ CODE
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "stress test: loop(set, check)");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new    P0, I22
+    new    P0, .PerlHash
 
     set I0, 200
     set S0, "mikey"
@@ -322,13 +274,7 @@ OUTPUT
 
 # Check all values after setting all of them
 output_is(<<CODE, <<OUTPUT, "stress test: loop(set), loop(check)");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new    P0, I22
+    new    P0, .PerlHash
 
     set I0, 200
     set S0, "mikey"
@@ -364,13 +310,7 @@ done
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with integers at a time");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
 
     set P0["foo"],37
     set P0["bar"],-15
@@ -406,13 +346,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with numbers at a time");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
 
     set P0["foo"],37.100000
     set P0["bar"],-15.100000
@@ -448,13 +382,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with strings at a time");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
 
     set P0["foo"],"baz"
     set P0["bar"],"qux"
@@ -494,15 +422,9 @@ OUTPUT
 # and/or keys. Now we try PMCs.
 
 output_is(<<'CODE', <<OUTPUT, "Setting & getting scalar PMCs");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
-    new P1, I23
-    new P2, I23
+    new P0, .PerlHash
+    new P1, .PerlInt
+    new P2, .PerlInt
 
     set S0, "non-PMC key"
 
@@ -527,7 +449,7 @@ OK2:  print "ok 2\n"
     print "not "
 OK3:  print "ok 3\n"
 
-    new P1, I26
+    new P1, .PerlUndef
     set P0[S0], P1
     set P2, P0[S0]
     typeof S1, P2
@@ -544,14 +466,8 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Setting scalar PMCs & getting scalar values");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
-    new P1, I23
+    new P0, .PerlHash
+    new P1, .PerlInt
 
     set S0, "A rather large key"
 
@@ -587,13 +503,7 @@ ok 3
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Getting values from undefined keys");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P2, I22
+    new P2, .PerlHash
 
     set I0, P2["qwerty"]
     set N0, P2["asdfgh"]
@@ -625,15 +535,9 @@ ok 4
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "Setting & getting non-scalar PMCs");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0,I22
-    new P1,I21
-    new P2,I21
+    new P0, .PerlHash
+    new P1, .PerlArray
+    new P2, .PerlArray
     set P1[4],"string"
     set P0["one"],P1
     set P2,P0["one"]
@@ -646,16 +550,10 @@ string
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Testing clone");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set S0, "a"
     set P0[S0], S0
-    new P2, I21
+    new P2, .PerlArray
     set P2, 2
     set P0["b"], P2
 
@@ -721,15 +619,9 @@ ok 5
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Compound keys");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
-    new P1, I22
-    new P2, I21
+    new P0, .PerlHash
+    new P1, .PerlHash
+    new P2, .PerlArray
     set P1["b"], "ab"
     set P0["a"], P1
     set S0, P0["a";"b"]
@@ -784,15 +676,9 @@ ok 6
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Getting PMCs from compound keys");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
-    new P1, I22
-    new P2, I23
+    new P0, .PerlHash
+    new P1, .PerlHash
+    new P2, .PerlInt
     set P2, 12
     set P1["b"], P2
     set P0["a"], P1
@@ -805,15 +691,9 @@ CODE
 OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "Getting PMCs from string;int compound keys");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
-    new P1, I22
-    new P2, I23
+    new P0, .PerlHash
+    new P1, .PerlHash
+    new P2, .PerlInt
     set P2, 4
     set P1[9], P2
     set I0, P1[9]
@@ -833,13 +713,7 @@ OUTPUT
 # A hash is only false if it has size 0
 
 output_is(<<'CODE', <<OUTPUT, "if (PerlHash)");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
 
     if P0, BAD1
     print "ok 1\n"
@@ -857,7 +731,7 @@ OK2:  print "ok 2\n"
     print "not "
 OK3:  print "ok 3\n"
 
-    new P1, I26
+    new P1, .PerlUndef
     set P0["key"], P1
     if P0, OK4
     print "not "
@@ -872,13 +746,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "unless (PerlHash)");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
 
     unless P0, OK1
     print "not "
@@ -898,7 +766,7 @@ OK2:
 BAD3: print "not ok 3"
 OK3:
 
-    new P1, I26
+    new P1, .PerlUndef
     set P0["key"], P1
     unless P0, BAD4
     print "ok 4\n"
@@ -915,13 +783,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "defined");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     defined I0, P0
     print I0
     print "\n"
@@ -935,7 +797,7 @@ output_is(<<'CODE', <<OUTPUT, "defined");
     defined I0, P0["b"]
     print I0
     print "\n"
-    new P1, I26
+    new P1, .PerlUndef
     set P0["c"], P1
     defined I0, P0["c"]
     print I0
@@ -951,13 +813,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "exists");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set P0["a"], 1
     exists I0, P0["a"]
     print I0
@@ -965,7 +821,7 @@ output_is(<<'CODE', <<OUTPUT, "exists");
     exists I0, P0["b"]
     print I0
     print "\n"
-    new P1, I26
+    new P1, .PerlUndef
     set P0["c"], P1
     exists I0, P0["c"]
     print I0
@@ -979,13 +835,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "delete");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set P0["a"], 1
     exists I0, P0["a"]
     print I0
@@ -1001,13 +851,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Cloning keys");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P10, I22
+    new P10, .PerlHash
     new P1, .Key
 
     set P1, "Bar"
@@ -1029,17 +873,11 @@ Sheep
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Cloning PMC vals");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P10, I22
-    new P1, I26
+    new P10, .PerlHash
+    new P1, .PerlUndef
     set P1, "value\n"
     set P10["str"], P1
-    new P1, I26
+    new P1, .PerlUndef
     set P1, 42
     set P10["int"], P1
     clone P2, P10
@@ -1053,19 +891,13 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
 .include "pmctypes.pasm"
-    new P1, I22
+    new P1, .PerlHash
 
-    new P2, I23
+    new P2, .PerlInt
     set P1["PerlInt"], P2
     typeof I0, P1["PerlInt"]
-    eq I0, I23, ok1
+    eq I0, .PerlInt, ok1
     print "not "
 ok1:print "PerlInt\n"
 
@@ -1078,19 +910,19 @@ ok2:print "Integer\n"
 
     set P1["native int"], -123456
     typeof I0, P1["native int"]
-    eq I0, I23, ok3
+    eq I0, .PerlInt, ok3
     print "not "
 ok3:print "PerlInt\n"
 
     set P1["native float"], -123.456
     typeof I0, P1["native float"]
-    eq I0, I24, ok4
+    eq I0, .PerlNum, ok4
     print "not "
 ok4:print "PerlNum\n"
 
     set P1["native string"], "hello world\n"
     typeof I0, P1["native string"]
-    eq I0, I25, ok5
+    eq I0, .PerlString, ok5
     print "not "
 ok5:print "PerlString\n"
 
@@ -1104,17 +936,11 @@ PerlString
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "delete and free_list");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
     set I2, 10
     set I1, 1
     new P0, .SArray
     set P0, 1
-    new P1, I22
+    new P1, .PerlHash
 outer:
     set P0[0], I1
     sprintf S0, "ok %vd\n", P0
@@ -1150,13 +976,7 @@ ok 10
 OUTPUT
 
 output_is(<<'CODE', '', "reusing the undef");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set P1, P0["no"]
     print P1
     set P1, "one"
@@ -1166,13 +986,7 @@ output_is(<<'CODE', '', "reusing the undef");
 CODE
 
 output_is(<<'CODE', <<OUTPUT, "exists with constant string key");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P16, I22
+    new P16, .PerlHash
     set P16["key1"], "value for key1\n"
     set S16, P16["key1"]
     print S16
@@ -1197,12 +1011,6 @@ OUTPUT
 SKIP: {
 skip("no more chartype", 1);
 output_is(<<'CODE', <<OUTPUT, "compare keys with different type");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
     set S0, "\xA4"    # currency/euro depending on type
     clone S1, S0
     find_chartype I0, "8859-1"
@@ -1222,7 +1030,7 @@ output_is(<<'CODE', <<OUTPUT, "compare keys with different type");
 equal:
     print "equal\n"
 
-    new P0, I22
+    new P0, .PerlHash
     set P0[S0], "currency"
     set P0[S1], "euro"
     set S2, P0[S0]
@@ -1260,18 +1068,12 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
 
 .sub test @MAIN
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
     .local pmc outer_hash
-    outer_hash = new I22
+    outer_hash = new PerlHash
     .local pmc inner_hash
-    inner_hash = new I22
+    inner_hash = new PerlHash
     .local pmc inner_array
-    inner_array = new I21
+    inner_array = new PerlArray
     .local string elem_string
     .local int    elem_int
     .local pmc    elem_pmc
@@ -1323,7 +1125,7 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
 
     # setting and retrieving a PMC in an inner PerlArray
     .local pmc in_pmc
-    in_pmc = new I25
+    in_pmc = new .PerlString
     in_pmc = 'inner_array:132'
     inner_array[132] = in_pmc
     outer_hash['inner_array'] = inner_array
@@ -1393,13 +1195,7 @@ changed inner_hash:133
 OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "mutating the lookup string");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set P0["a"], "one"
     set P0["ab"], "two"
     set P0["abc"], "three"
@@ -1429,14 +1225,8 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 
 .sub test @MAIN
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
     .local pmc pmc1
-    pmc1 = new I22
+    pmc1 = new PerlHash
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -1458,13 +1248,7 @@ OUTPUT
 pir_output_is(<< 'CODE', << 'OUTPUT', "iter");
 
 .sub test @MAIN
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I22
+    new P0, .PerlHash
     set P0['a'], 'x'
     iter P1, P0
     if P1 goto ok1

@@ -62,15 +62,9 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 pasm_output_is(<< "CODE", <<'OUTPUT', "undef-logical");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I23
-    new P1, I26
-    new P2, I23
+    new P0, .PerlInt
+    new P1, .PerlUndef
+    new P2, .PerlInt
 
 # undef or undef = 0
     or P0, P1, P1
@@ -117,24 +111,18 @@ OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-add");
 @{[ $fp_equality_macro ]}
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P1, I26
+    new P1, .PerlUndef
 
 # undef + perlundef
-    new P0, I26
+    new P0, .PerlUndef
     add P0, P1, P1
     print P0
     print "\\n"
 
 # undef + perlint
 
-    new P0, I26
-    new P2, I23
+    new P0, .PerlUndef
+    new P2, .PerlInt
     set P2, 947
     add P0, P1, P2
     print P0
@@ -142,8 +130,8 @@ output_is(<<"CODE", <<'OUTPUT', "undef-add");
 
 # undef + perlnum
 
-    new P0, I26
-    new P2, I24
+    new P0, .PerlUndef
+    new P2, .PerlNum
     set P2, 385.623
     add P0, P1, P2
     .fp_eq( P0, 385.623, OK)
@@ -161,14 +149,8 @@ OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
 @{[ $fp_equality_macro ]}
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I23
-    new P1, I26
+    new P0, .PerlInt
+    new P1, .PerlUndef
 
 # undef - undef
     sub P0, P1, P1
@@ -176,7 +158,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
     print "\\n"
 
 # undef - perlint
-    new P2, I23
+    new P2, .PerlInt
     set P2, 947
     sub P0, P1, P2
     print P0
@@ -184,7 +166,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
 
 # undef - perlnum
 
-    new P2, I24
+    new P2, .PerlNum
     set P2, 385.623
     sub P0, P1, P2
     .fp_eq( P0, -385.623, OK2)
@@ -203,15 +185,9 @@ OUTPUT
 output_is(<<"CODE", <<'OUTPUT', "undef-multiply");
 @{[ $fp_equality_macro ]}
 
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I23
-    new P1, I26
-    new P2, I23
+    new P0, .PerlInt
+    new P1, .PerlUndef
+    new P2, .PerlInt
 
 # Undef * Undef
     mul P0, P1, P1
@@ -225,7 +201,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-multiply");
     print "\\n"
 
 # Undef * PerlNum
-    new P2, I24
+    new P2, .PerlNum
     set P2, 983.3
     mul P0, P1, P2
     print P0
@@ -239,15 +215,9 @@ CODE
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-divide");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I23
-    new P1, I26
-    new P2, I23
+    new P0, .PerlInt
+    new P1, .PerlUndef
+    new P2, .PerlInt
 
 # Undef / PerlInt
     set P2, 19
@@ -256,7 +226,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-divide");
     print "\\n"
 
 # Undef / PerlNum
-    new P2, I24
+    new P2, .PerlNum
     set P2, 343.8
     div P0, P1, P2
     print P0
@@ -269,48 +239,36 @@ CODE
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-string");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I26
+    new P0, .PerlUndef
     set S0, P0
     eq S0, "", OK
     print "not "
-OK:     print "ok\\n"
+OK:    print "ok\\n"
     end
 CODE
 ok
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "arithmetic with PerlUndef and native ints");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I26
+    new P0, .PerlUndef
     add P0, 10
     set I1, P0
     print I1
     print "\n"
 
-    new P0, I26
+    new P0, .PerlUndef
     sub P0, 20
     set I1, P0
     print I1
     print "\n"
 
-    new P0, I26
+    new P0, .PerlUndef
     mul P0, 30
     set I1, P0
     print I1
     print "\n"
 
-    new P0, I26
+    new P0, .PerlUndef
     div P0, 40
     set I1, P0
     print I1
@@ -325,31 +283,25 @@ OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "arithmetic with PerlUndef and native floats");
 @{[ $fp_equality_macro ]}
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I26
+    new P0, .PerlUndef
     add P0, 10.0
     set N1, P0
     .fp_ne(N1, 10.0, ERROR)
     print "ok 1\\n"
 
-    new P0, I26
+    new P0, .PerlUndef
     sub P0, 2.345
     set N1, P0
     .fp_ne(N1, -2.345, ERROR)
     print "ok 2\\n"
 
-    new P0, I26
+    new P0, .PerlUndef
     mul P0, 32.5
     set N1, P0
     .fp_ne(N1, 0.000, ERROR)
     print "ok 3\\n"
 
-    new P0, I26
+    new P0, .PerlUndef
     div P0, 0.5
     set N1, P0
     .fp_ne(N1, 0.000, ERROR)
@@ -368,14 +320,8 @@ OUTPUT
 
 output_like(<<"CODE", <<'OUTPUT', "undef warning");
     .include "warnings.pasm"
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
-    new P0, I26
+    new P0, .PerlUndef
     print P0
     end
 CODE
@@ -384,19 +330,13 @@ current instr\.: '\(null\)' pc (\d+|-1) /
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "bor undef");
-    find_type I21, "PerlArray"
-    find_type I22, "PerlHash"
-    find_type I23, "PerlInt"
-    find_type I24, "PerlNum"
-    find_type I25, "PerlString"
-    find_type I26, "PerlUndef"
-    new P0, I26
+    new P0, .PerlUndef
     bor P0, 0b00001111
     print  P0
     print "\n"
 
-    new P0, I26
-    new P1, I23
+    new P0, .PerlUndef
+    new P1, .PerlInt
     set P1, 0b11110000
     bor P0, P1
     print P0
