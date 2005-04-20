@@ -6,6 +6,15 @@ let me know, and I'll work on clarifying.
 
 =over 4
 
+=item interactive tclsh
+
+simple interactive mode now exists. 
+
+ o Should catch any real_exceptions thrown.
+ o respect tcl_prompt1, tcl_prompt2 (Depends on true global support)
+ o deal with incomplete input
+ o give invalid commands to the system.
+
 =item [interpinfo name]
 
 how to do this from inside parrot?
@@ -59,13 +68,7 @@ hex.
 
 Right now, globals are done with lexicals. get_var/set_var needs to be 
 updated to check the call_level - if we're at 0, then use a global. [global]
-and [upvar] may need attention once this is done.
-
-=item interactive tclsh
-
-interactive tclsh mode currently only waits for EOF and then runs all
-commands entered. should have sane defaults for tcl_prompt1, tcl_prompt2
-and respect them, and process intermediate input.
+and [upvar] will need attention once this is done.
 
 =item implement default globals, etc.
 
@@ -78,9 +81,10 @@ source per-user settings. L<tclsh>
 =item misc
 
 hex & unicode escapes are not currently supported in 
-C<dynclasses/tclparser.pmc>'s C<parse>.
+C<dynclasses/tclparser.pmc>'s C<parse>. - I have a version of this in my
+sandbox, but it requires more work from parrot guts.
 
-=item unimplemented commands/subcommands
+=item unimplemented commands/subcommands 
 
 [after] [array get] [array names] [array unset] 
 [array statistics] [array anymore] [array donesearch]
@@ -117,20 +121,13 @@ tclword.imc, PMCs, the macros, expr's precedence and parens,
 
 [uplevel] [upvar] [lrange] [inline] [string repeat] 
 
-=item pass tcl test suite
+=item pass any test in the tcl test suite ^_^
 
 =back
 
 =head1 Uncategorized Issues
 
 =over 4
-
-=item From leo - cleanup of tcl objects.
-
-C<tclobject> is an abstract object, it doesn't have a vtable. But the
-bundling code *does* C<pmc_register> this PMC. This leads to an empty
-vtable slot, dereferencing that NULL is an operation, which many systems
-don't like.
 
 =item Remove Perl*
 
@@ -139,11 +136,14 @@ converted to the internal types. PerlUndef removal will probably result
 (finally) in the use of null checks where it's being used for that, and
 TclObject where it's being used for shimmering.
 
-=item Freeze/Thaw of TclWord would ...
+Left in:
 
-allow us to build a braindead compile
-option - given a chunk of tcl, generate a chunk of PIR that we can 
-emit to be saved, compiled, and then run again.
+./lib/commands/inline.imc
+./lib/commands/open.imc
+./lib/commands/source.imc
+./lib/expression.imc
+./lib/get_var.imc
+./lib/tclword.imc
 
 =item tail call optimizations
 
@@ -152,17 +152,6 @@ and save myself a call. Possible to do right now with PASM - wait for
 PIR support before welding in.
 
 =item provide a way to access existing library PIR from Tcl.
-
-=item add benchmarks?
-
-=item given freeze/thaw for objects...
-
-Once freeze/thaw is working for tclwords (currently waiting on parrot
-support), rewrite proc to preparse
-once and cache the result in the generated sub rather than reparsing
-each time.
-
-(Though this seems evil, too. There must be a better way.)
 
 =item TclWord
 
@@ -178,10 +167,9 @@ Move TclWord namespace into _Tcl::Word, less clutter?
 =item compiler vs. interpreter
 
 it should be possible to further extend our interpreter
-this to make an actual compiler,
-where the _compiler emits PIR. 
+this to make an actual compiler, where the compiler emits PIR. 
 
-And now that we have the pir_code, we can either emit the necessary
+And once we have the pir_code, we can either emit the necessary
 PIR (ala parrot's -o option) or we can compile and run it.
 
 Caveat: how to support -o with user defined procs - right now, proc is defining
@@ -198,7 +186,7 @@ invokable.
 
 clean up expr so that it's not passing around
 type indicators. - just use PMCs everywhere. (Though we may still need
-to have CONST vs. VARIABLE types.
+to have CONST vs. VARIABLE types.)
 
 The type indicator is also used to disambiguate operators and function calls
 from operands. We can easily remove it for operands, but how to cleanly
@@ -217,8 +205,8 @@ TBD: functions that take > 1 arg.
 
 TBD: Argument type requirements - Currently works ONLY on bitand - esp need
 to get any that require int-only args, as we can now /generate/ floats,
-even if we cannot specify them. {This probably requires switching to Tcl*
-PMCs and putting the logic in there hidden under MMD}
+even if we cannot specify them. This is all supportable by MMD - we just
+need to specify the correct errors to throw.
 
 =item misc
 
