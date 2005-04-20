@@ -41,7 +41,7 @@ input_loop:
   input_line = readline STDIN
   input_line_PMC = new String
   input_line_PMC = input_line
-  $P2 = parser."parse"(input_line_PMC,zero,zero)
+  $P1 = parser."parse"(input_line_PMC,zero,zero)
   (retcode,retval) = interpret($P1)
   # print out the result of the evaluation.
   print retval
