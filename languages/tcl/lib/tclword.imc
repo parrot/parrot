@@ -62,7 +62,7 @@ Initialize the attributes for an instance of the class
 
 =cut
 
-.sub __init
+.sub __init method
   .local pmc emptyArray
   .local pmc constant
   .local int TclList
@@ -70,13 +70,10 @@ Initialize the attributes for an instance of the class
   TclList = find_type "TclList" 
   emptyArray = new TclList
 
-  .local pmc me
-  me = interpinfo 16 #INTERPINFO_CURRENT_OBJECT
-
-  setattribute me, "TclWord\x00chunks", emptyArray
+  setattribute self, "TclWord\x00chunks", emptyArray
   constant = new Integer
   constant = 1
-  setattribute me, "TclWord\x00constant", constant
+  setattribute self, "TclWord\x00constant", constant
 .end
 
 =head2 concat_words
