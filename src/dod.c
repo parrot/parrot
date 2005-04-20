@@ -823,6 +823,14 @@ Parrot_dod_sweep(Interp *interpreter,
                         ext_pool->add_free_object(interpreter, ext_pool,
                                 ((PMC *)b)->pmc_ext);
                     }
+#ifndef NDEBUG
+                    /*
+                     * invalidate the PMC
+                     */
+                    PMC_struct_val((PMC*)b) = (void*)0xdeadbeef;
+                    PMC_pmc_val((PMC*)b) = (void*)0xdeadbeef;
+                    ((PMC*)b)->pmc_ext = (void*)0xdeadbeef;
+#endif
                 }
                 /* else object is a buffer(like) */
                 else if (PObj_sysmem_TEST(b) && PObj_bufstart(b)) {

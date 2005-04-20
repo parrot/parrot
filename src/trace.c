@@ -70,7 +70,8 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
         STRING *name = trace_class_name(interpreter, pmc);
         PIO_eprintf(interpreter, "Class=%Ss:PMC(%#p)", name, pmc);
     }
-    else if (pmc->vtable->base_type == enum_class_PerlString) {
+    else if (pmc->vtable->base_type == enum_class_PerlString ||
+             pmc->vtable->base_type == enum_class_String) {
         STRING *s = VTABLE_get_string(interpreter, pmc);
         if (!s)
             PIO_eprintf(interpreter, "%S=PMC(%#p Str:(NULL))",

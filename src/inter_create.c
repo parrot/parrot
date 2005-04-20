@@ -317,7 +317,12 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      *
      * Be sure that an async collector hasn't live bits set now, so
      * trigger a finish run
+     *
+     * Need to turn off DOD blocking, else things stay alive and IO
+     * handles aren't closed
      */
+    interpreter->arena_base->DOD_block_level =
+        interpreter->arena_base->GC_block_level = 0;
     Parrot_do_dod_run(interpreter, DOD_finish_FLAG);
 
     /*
@@ -336,7 +341,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      * so terminate the event loop
      */
     if (!interpreter->parent_interpreter) {
-	PIO_internal_shutdown(interpreter);
+        PIO_internal_shutdown(interpreter);
         Parrot_kill_event_loop();
     }
 
@@ -381,9 +386,9 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 
     if (interpreter->profile) {
         mem_sys_free(interpreter->profile->data);
-	interpreter->profile->data = NULL;
+        interpreter->profile->data = NULL;
         mem_sys_free(interpreter->profile);
-	interpreter->profile = NULL;
+        interpreter->profile = NULL;
     }
 
     /* deinit op_lib */
@@ -423,8 +428,8 @@ Parrot_really_destroy(int exit_code, void *vinterp)
                     (interpreter->thread_data->state & THREAD_STATE_JOINED))) {
             if (interpreter->thread_data ) {
                 mem_sys_free(interpreter->thread_data);
-		interpreter->thread_data = NULL;
-	    }
+                interpreter->thread_data = NULL;
+            }
             mem_sys_free(interpreter);
         }
     }
