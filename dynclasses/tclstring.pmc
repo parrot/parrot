@@ -39,6 +39,7 @@ pmclass TclString extends TclObject dynpmc group tcl_group {
             VTABLE_set_string_keyed_int(INTERP,string_anchor,1,false);
             VTABLE_set_string_keyed_int(INTERP,string_anchor,2,yes);
             VTABLE_set_string_keyed_int(INTERP,string_anchor,3,no);
+	    dod_register_pmc(INTERP, string_anchor);
         }
     }
 
