@@ -141,8 +141,7 @@ pmclass Hash need_ext does hash {
 
 =item C<void class_init()>
 
-Class initialization. Allocates the memory for the hash.
-Sets up some global variables.
+Class initialization. Creates a buffer-like memory pool for the hash.
 
 =cut
 
@@ -156,8 +155,7 @@ Sets up some global variables.
 
 =item C<void init()>
 
-Initializes the instance. Creates a global C<Undef> if it doesn't
-already exist.
+Initializes the instance.
 
 =cut
 

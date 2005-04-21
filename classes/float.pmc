@@ -247,7 +247,7 @@ MMD_Complex: {
             Parrot_scalar_i_subtract_Complex(interpreter, SELF, value);
         }
 MMD_DEFAULT: {
-            return SUPER(value);  /* XXX inheritance problem */
+            SUPER(value);  /* XXX inheritance problem */
         }
     }
 

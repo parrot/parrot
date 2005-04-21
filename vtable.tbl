@@ -237,10 +237,6 @@ void bitwise_shl_int(INTVAL value, PMC* dest)  MMD_BSL_INT
 void bitwise_shr(PMC* value, PMC* dest)        MMD_BSR
 void bitwise_shr_int(INTVAL value, PMC* dest)  MMD_BSR_INT
 
-[STRING]
-void concatenate(PMC* value, PMC* dest)        MMD_CONCAT
-void concatenate_str(STRING* value, PMC* dest) MMD_CONCAT_STR
-
 [CMP]
 INTVAL is_equal(PMC* value)                  MMD_EQ
 INTVAL is_equal_num(PMC* value)              MMD_NUMEQ
@@ -260,8 +256,15 @@ void logical_xor(PMC* value, PMC* dest)      MMD_LXOR
 
 void logical_not(PMC* dest)
 
+[STRING]
+void concatenate(PMC* value, PMC* dest)        MMD_CONCAT
+void concatenate_str(STRING* value, PMC* dest) MMD_CONCAT_STR
+
 void repeat(PMC* value, PMC* dest)           MMD_REPEAT
 void repeat_int(INTVAL value, PMC* dest)     MMD_REPEAT_INT
+
+void substr(INTVAL offset, INTVAL length, PMC* dest)
+STRING* substr_str(INTVAL offset, INTVAL length)
 
 [EXISTS]
 INTVAL exists_keyed(PMC* key)
@@ -285,11 +288,6 @@ PMC* nextkey_keyed_int(INTVAL key, INTVAL what)
 PMC* nextkey_keyed_str(STRING* key, INTVAL what)
 PMC* get_iter()
 
-[STRING]
-void substr(INTVAL offset, INTVAL length, PMC* dest)
-STRING* substr_str(INTVAL offset, INTVAL length)
-
-[MAIN]
 void* invoke(void* next)
 
 INTVAL can(STRING* method)

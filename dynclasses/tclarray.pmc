@@ -89,8 +89,9 @@ Initializes the instance.
 */
 
     void init () {
+        PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_SET(SELF);
-        new_hash(INTERP, (Hash**)&PMC_struct_val(SELF));
+        new_pmc_hash(INTERP, SELF);
     }
 
 /*

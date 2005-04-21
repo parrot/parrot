@@ -37,23 +37,18 @@ pmclass TclObject dynpmc group tcl_group {
     void morph (INTVAL type) {
         if (SELF->vtable->base_type == type)
             return;
-        if (SELF->vtable->base_type == TclString_type) {
-            PObj_custom_mark_CLEAR(SELF);
-            SELF->vtable = Parrot_base_vtables[type];
-            return;
-        }
-        if (type == TclString_type) {
-            /*
-             * if we morph to a string, first clear str_val
-             * so that after changing the vtable a parallel
-             * reader doesn't get a garbage pointer
-             */
-            PMC_str_val(SELF) = NULL;
-            PObj_custom_mark_SET(SELF);
-            SELF->vtable = Parrot_base_vtables[type];
-            return;
-        }
-        SELF->vtable = Parrot_base_vtables[type];
+	switch (type) {
+	    case enum_class_String:
+		type = TclString_type;
+		break;
+	    case enum_class_Integer:
+		type = TclInt_type;
+		break;
+	    case enum_class_Float:
+		type = TclFloat_type;
+		break;
+	}
+	pmc_reuse(INTERP, SELF, type, 0);
     }
 
     void set_pmc (PMC* value) {

@@ -571,7 +571,7 @@ C<length>, and places it in C<dest>.
 
 /*
 
-=item C<void substr(INTVAL offset, INTVAL length)>
+=item C<STRING* substr(INTVAL offset, INTVAL length)>
 
 Extracts the substring starting at C<offset>, with size
 C<length>, and returns it.
