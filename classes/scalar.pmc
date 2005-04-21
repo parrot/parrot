@@ -1048,40 +1048,103 @@ Inplace shift left.
 
 =over 4
 
-=item C<void concatenate(PMC *value, PMC *dest)>
+=item C<PMC* concatenate(PMC *value, PMC *dest)>
+
+=item C<PMC* concatenate_str(STRING *value, PMC *dest)>
 
 Returns in C<*dest> the result of concatenating the scalar and C<*value>.
+
+=item C<void concatenate(PMC *value)>
+
+=item C<void concatenate_str(STRING *value)>
+
+Concatenate the string C<value> in place.
 
 =cut
 
 */
 
-    void concatenate (PMC* value,  PMC* dest) {
+    PMC* concatenate (PMC* value,  PMC* dest) {
         STRING* s = string_concat(INTERP,
             DYNSELF.get_string(),
             VTABLE_get_string(INTERP, value), 0);
-
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_string_native(INTERP, dest, s);
+        return dest;
+    }
+
+    PMC* concatenate_str (STRING* value,  PMC* dest) {
+        STRING* s = string_concat(INTERP,
+            DYNSELF.get_string(), value, 0);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(INTERP, dest, s);
+        return dest;
+    }
+
+    void i_concatenate (PMC* value) {
+        STRING* s = DYNSELF.get_string();
+        STRING* v = VTABLE_get_string(INTERP, value);
+        DYNSELF.set_string_native(string_append(INTERP, s, v, 1));
+    }
+
+    void i_concatenate_str (STRING* value) {
+        STRING* s = DYNSELF.get_string();
+        DYNSELF.set_string_native( string_append(INTERP, s, value, 1));
     }
 
 /*
 
-=item C<void concatenate_str(STRING *value, PMC *dest)>
+=item C<PMC* repeat(PMC *value, PMC *dest)>
 
-Returns in C<*dest> the result of concatenating the scalar and C<*value>.
+=item C<PMC* repeat_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the result of repeating the scalar C<value> times.
+
+=item C<void i_repeat(PMC *value)>
+
+=item C<void i_repeat_int(INTVAL value)>
+
+Repeat the string C<SELF> in place C<value> times.
 
 =cut
 
 */
 
-    void concatenate_str (STRING* value,  PMC* dest) {
-        /* dest = SELF (concat) value */
-        STRING* s = string_concat(INTERP,
-            DYNSELF.get_string(),
-            value, 0);
-
-        VTABLE_set_string_native(INTERP, dest, s);
+    PMC* repeat (PMC* value,  PMC* dest) {
+        STRING* s = DYNSELF.get_string();
+        UINTVAL n = (UINTVAL)VTABLE_get_integer(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(INTERP, dest,
+            string_repeat(INTERP, s, n, NULL));
+        return dest;
     }
+
+    PMC* repeat_int (INTVAL value, PMC* dest) {
+        STRING* s = DYNSELF.get_string();
+        UINTVAL n = value;
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_string_native(INTERP, dest,
+            string_repeat(INTERP, s, n, NULL));
+        return dest;
+    }
+
+
+    void i_repeat (PMC* value) {
+        STRING* s = DYNSELF.get_string();
+        UINTVAL n = (UINTVAL)VTABLE_get_integer(INTERP, value);
+        DYNSELF.set_string_native(string_repeat(INTERP, s, n, NULL));
+    }
+
+    void i_repeat_int (INTVAL value) {
+        STRING* s = DYNSELF.get_string();
+        UINTVAL n = value;
+        DYNSELF.set_string_native(string_repeat(INTERP, s, n, NULL));
+    }
+
 
 
 /*
@@ -1216,39 +1279,6 @@ C<*value>.
         /* XXX - Need a better way to set boolean state */
         VTABLE_set_integer_native(INTERP, dest,
             ! DYNSELF.get_bool());
-    }
-
-/*
-
-=item C<void repeat(PMC *value, PMC *dest)>
-
-Returns in C<*dest> the result of repeating the scalar C<*value> times.
-
-
-=cut
-
-*/
-
-    void repeat (PMC* value,  PMC* dest) {
-        VTABLE_set_string_native(INTERP, dest,
-            string_repeat(INTERP, VTABLE_get_string(INTERP,SELF),
-                (UINTVAL)VTABLE_get_integer(INTERP, value), NULL) );
-    }
-
-/*
-
-=item C<void repeat_int(INTVAL value, PMC *dest)>
-
-Returns in C<*dest> the result of repeating the scalar C<value> times.
-
-=cut
-
-*/
-
-    void repeat_int (INTVAL value, PMC* dest) {
-        VTABLE_set_string_native(INTERP, dest,
-            string_repeat(INTERP, VTABLE_get_string(INTERP,SELF),
-                (UINTVAL)value, NULL) );
     }
 
 

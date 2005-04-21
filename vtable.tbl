@@ -287,11 +287,17 @@ void logical_xor(PMC* value, PMC* dest)      MMD_LXOR
 void logical_not(PMC* dest)
 
 [STRING]
-void concatenate(PMC* value, PMC* dest)        MMD_CONCAT
-void concatenate_str(STRING* value, PMC* dest) MMD_CONCAT_STR
+PMC* concatenate(PMC* value, PMC* dest)        MMD_CONCAT
+PMC* concatenate_str(STRING* value, PMC* dest) MMD_CONCAT_STR
 
-void repeat(PMC* value, PMC* dest)           MMD_REPEAT
-void repeat_int(INTVAL value, PMC* dest)     MMD_REPEAT_INT
+void i_concatenate(PMC* value)               MMD_I_CONCAT
+void i_concatenate_str(STRING* value)        MMD_I_CONCAT_STR
+
+PMC* repeat(PMC* value, PMC* dest)           MMD_REPEAT
+PMC* repeat_int(INTVAL value, PMC* dest)     MMD_REPEAT_INT
+
+void i_repeat(PMC* value)                    MMD_I_REPEAT
+void i_repeat_int(INTVAL value)              MMD_I_REPEAT_INT
 
 void substr(INTVAL offset, INTVAL length, PMC* dest)
 STRING* substr_str(INTVAL offset, INTVAL length)

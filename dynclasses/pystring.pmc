@@ -21,23 +21,37 @@ C<PyString> extends C<PyObject> to provide Python string behaviour.
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 
-pmclass PyString extends PyObject dynpmc group python_group {
+pmclass PyString extends PyObject extends String dynpmc group python_group {
 
-/*
+    void class_init() {
+        if (pass) {
+            /*
+             * redirect add to concatenate
+             */
+            MMD_init *e = _temp_mmd_init;
+            int i, n, is_pmc;
+            funcptr_t func;
 
-=item C<void mark()>
-
-Marks the string as live.
-
-=cut
-
-*/
-
-    void mark () {
-        if(PMC_str_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
+            n = (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]));
+            /*
+             * if we find a ADD, install CONCAT
+             */
+            for (i = 0; i < n; ++i, ++e) {
+                if (e->func_nr == MMD_ADD && e->right == enum_class_String) {
+                    func = get_mmd_dispatch_type(interp,
+                            MMD_CONCAT, enum_class_String,
+                            e->right, &is_pmc);
+                    e->func_ptr = func;
+                }
+                if (e->func_nr == MMD_I_ADD && e->right == enum_class_String) {
+                    func = get_mmd_dispatch_type(interp,
+                            MMD_I_CONCAT, enum_class_String,
+                            e->right, &is_pmc);
+                    e->func_ptr = func;
+                }
+            }
+        }
     }
-
 /*
 
 =item C<PMC* "__getitem__"(PMC *self, PMC *idx)>
@@ -100,8 +114,14 @@ Concatenates C<*value> to the string and returns the result in C<*dest>.
 */
 
     PMC* add (PMC * value, PMC* dest) {
-        SELF.concatenate(value, dest);
-        return dest;
+MMD_String: {
+            /* MMD is overridden in class_init */
+            return dest;
+        }
+MMD_DEFAULT: {
+            /* TODO through exception */
+            return dest;
+        }
     }
 
 /*
@@ -119,37 +139,7 @@ Returns the result of comparing the string with C<*value>.
                   VTABLE_get_string(INTERP, value));
     }
 
-/*
 
-=item C<void concatenate(PMC *value, PMC *dest)>
-
-Concatenates the string and the stringified form of C<*value> and
-return the result in C<*dest>, morphing it to a PyString if required.
-
-=cut
-
-*/
-
-    void concatenate (PMC* value, PMC* dest) {
-        STRING* s = PMC_str_val(SELF);
-        VTABLE_morph(INTERP, dest, PyBuiltin_PyString);
-        PMC_str_val(dest) =
-            string_concat(INTERP, s, VTABLE_get_string(INTERP, value), 0);
-    }
-
-/*
-
-=item C<INTVAL elements ()>
-
-Return length of the string.
-
-=cut
-
-*/
-
-    INTVAL elements () {
-        return string_length(INTERP, PMC_str_val(SELF));
-    }
 
 /*
 

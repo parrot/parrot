@@ -591,7 +591,8 @@ void
 register_fallback_methods(Parrot_Interp interp) {
     /* Yeah, this first one's out of order logically, but it means
        the table doesn't have to keep being re-malloc'd */
-    assert(MMD_REPEAT == MMD_USER_FIRST - 1);
+    mmd_add_function(interp, MMD_USER_FIRST - 1, (funcptr_t)0);
+
     mmd_add_function(interp, MMD_REPEAT, (funcptr_t)mmd_fallback_repeat_pmc);
 
     mmd_add_function(interp, MMD_ADD, (funcptr_t)mmd_fallback_add_pmc);

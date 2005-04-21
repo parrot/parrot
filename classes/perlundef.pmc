@@ -381,40 +381,6 @@ Morphs to a C<PerlString> with the value of C<*value>.
     }
 
 
-/*
-
-=item C<void concatenate(PMC *value, PMC *dest)>
-
-=cut
-
-*/
-
-    void concatenate (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in concatenation");
-        VTABLE_set_string_native(INTERP, dest,
-            VTABLE_get_string(INTERP, value));
-    }
-
-/*
-
-=item C<void concatenate_str(STRING *value, PMC *dest)>
-
-All these methods warn of the use of an uninitialized value and return
-the calculated result in C<*dest>.
-
-In the division methods exceptions are raised for division by zero,
-if appropriate.
-
-=cut
-
-*/
-
-    void concatenate_str (STRING* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in concatenation");
-        VTABLE_set_string_native(INTERP, dest, value);
-    }
 
 /*
 
@@ -499,43 +465,6 @@ All these methods simply return undef itself.
 
     void logical_not (PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest, 1);
-    }
-
-/*
-
-=item C<void repeat(PMC *value, PMC *dest)>
-
-=cut
-
-*/
-
-    void repeat (PMC* value,  PMC* dest) {
-        STRING * empty_string;
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in repeat");
-
-        empty_string = string_make_empty(INTERP,enum_stringrep_one,0);
-        VTABLE_set_string_native(INTERP, dest, empty_string);
-    }
-
-/*
-
-=item C<void repeat_int(INTVAL value, PMC *dest)>
-
-Warns of the use of an undefined value and returns an empty
-C<PerlString> in C<*dest>.
-
-=cut
-
-*/
-
-    void repeat_int (INTVAL value, PMC* dest) {
-        STRING * empty_string;
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in repeat");
-
-        empty_string = string_make_empty(INTERP,enum_stringrep_one,0);
-        VTABLE_set_string_native(INTERP, dest, empty_string);
     }
 
 /*

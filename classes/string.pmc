@@ -408,38 +408,6 @@ strings in place.
 
 /*
 
-=item C<VOID concatenate(PMC* value, PMC* dest)>
-
-Concatenates the string with C<value> and places the result in C<dest>.
-
-=cut
-
-*/
-    void concatenate (PMC* value, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
-        STRING *v = VTABLE_get_string(INTERP, value);
-        STRING *o = string_concat(INTERP, s, v, 0);
-        VTABLE_set_string_native(
-            INTERP, dest, o);
-    }
-
-/*
-
-=item C<VOID concatenate_str(STRING* value, PMC* dest)>
-
-Concatenates the string with C<value> and places the result in C<dest>.
-
-=cut
-
-*/
-    void concatenate_str (STRING* value, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
-        STRING *o = string_concat(INTERP, s, value, 0);
-        VTABLE_set_string_native(INTERP, dest, o);
-    }
-
-/*
-
 =item C<INTVAL is_equal(PMC* value)>
 
 Compares the string with C<value>; returns true if
@@ -562,37 +530,6 @@ is smaller.
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
         return string_compare(INTERP, s, v);
-    }
-
-/*
-
-=item C<void repeat(PMC* value, PMC* dest)>
-
-Repeats the string C<value> times and places the result in C<dest>.
-
-=cut
-
-*/
-    void repeat (PMC* value, PMC* dest) {
-        INTVAL n = VTABLE_get_integer(INTERP, value);
-        STRING *s = PMC_str_val(SELF);
-        STRING *s2 = string_repeat(INTERP, s, n, NULL);
-        VTABLE_set_string_native(INTERP, dest, s2);
-    }
-
-/*
-
-=item C<void repeat_int(INTVAL value, PMC* dest)>
-
-Repeats the string C<value> times and places the result in C<dest>.
-
-=cut
-
-*/
-    void repeat_int (INTVAL value, PMC* dest) {
-        STRING *s = PMC_str_val(SELF);
-        STRING *s2 = string_repeat(INTERP, s, value, NULL);
-        VTABLE_set_string_native(INTERP, dest, s2);
     }
 
 /*

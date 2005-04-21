@@ -18,7 +18,7 @@ static INTVAL dynclass_TclFloat;
 static INTVAL dynclass_TclInt;
 static STRING *true, *false, *yes, *no;
 
-pmclass TclString extends TclObject dynpmc group tcl_group {
+pmclass TclString extends TclObject extends String dynpmc group tcl_group {
 
     void class_init () {
         PMC *string_anchor;
@@ -43,23 +43,6 @@ pmclass TclString extends TclObject dynpmc group tcl_group {
         }
     }
 
-    void init () {
-        PMC_str_val(SELF) = string_make_empty(INTERP,enum_stringrep_one,0);
-        PObj_custom_mark_SET(SELF);
-    }
-
-    void mark () {
-        if (PMC_str_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
-    }
-
-    PMC* clone () {
-        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_SET(dest);
-        PMC_str_val(dest) = string_copy(INTERP,PMC_str_val(SELF));
-        return dest;
-
-    }
 
    STRING* get_repr() {
      return SELF.get_string();
@@ -121,64 +104,6 @@ pmclass TclString extends TclObject dynpmc group tcl_group {
     void set_string_same (PMC * value) {
         PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF),
         PMC_str_val(value));
-    }
-
-    # math ops? keep or kill?
-    # bitwise ops
-
-    void concatenate (PMC* value, PMC* dest) {
-        STRING* s = PMC_str_val(SELF);
-        VTABLE_morph(INTERP, dest, TclString_type);
-        PMC_str_val(dest) =
-            string_concat(INTERP, s, VTABLE_get_string(INTERP, value), 0);
-    }
-
-
-    voiid concatenate_native (STRING* value, PMC* dest) {
-        STRING* s = PMC_str_val(SELF);
-        VTABLE_morph(INTERP, dest, TclString_type);
-        PMC_str_val(dest) = string_concat(INTERP, s, value, 0);
-    }
-
-    INTVAL is_equal (PMC* value) {
-        return (INTVAL)( 0 == string_compare(INTERP,
-                                             PMC_str_val(SELF),
-                                             VTABLE_get_string(INTERP, value)
-                                            ));
-    }
-
-    INTVAL cmp(PMC* value) {
-        return string_compare(INTERP, PMC_str_val(SELF),
-                  VTABLE_get_string(INTERP, value));
-    }
-
-    void repeat (PMC* value, PMC* dest) {
-        DYNSELF.morph(TclString_type);
-        VTABLE_morph(INTERP, dest, TclString_type);
-        PMC_str_val(dest) =
-           string_repeat(INTERP, PMC_str_val(SELF),
-                         (UINTVAL)VTABLE_get_integer(INTERP, value), NULL
-                        );
-    }
-
-    void repeat_int (INTVAL value, PMC* dest) {
-        DYNSELF.morph(TclString_type);
-        VTABLE_morph(INTERP, dest, TclString_type);
-        PMC_str_val(dest) = string_repeat(INTERP,
-        PMC_str_val(SELF), (UINTVAL)value, NULL);
-    }
-
-
-    void substr (INTVAL offset, INTVAL length, PMC* dest) {
-        DYNSELF.morph(TclString_type);
-        VTABLE_morph(INTERP, dest, TclString_type);
-        PMC_str_val(dest) = string_substr(INTERP,
-            PMC_str_val(SELF), offset, length, NULL, 0);
-    }
-
-    STRING* substr_str (INTVAL offset, INTVAL length) {
-        return string_substr(INTERP, PMC_str_val(SELF), offset,
-            length, NULL, 0);
     }
 
 }
