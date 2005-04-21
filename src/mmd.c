@@ -1252,6 +1252,14 @@ distance_cmp(Interp *interpreter, INTVAL a, INTVAL b)
 {
     short da = (short)a & 0xffff;
     short db = (short)b & 0xffff;
+    /* sort first by distance */
+    if (da > db)
+        return 1;
+    if (da < db)
+        return -1;
+    /* end then by index in candidate list */
+    da = a >> 16;
+    db = b >> 16;
     return da > db ? 1 : da < db ? -1 : 0;
 }
 
@@ -1385,6 +1393,8 @@ mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
      * create a helper structure:
      * bits 0..15  = distance
      * bits 16..31 = idx in candidate list
+     *
+     * TODO use half of available INTVAL bits
      */
     sort = pmc_new(interpreter, enum_class_FixedIntegerArray);
     VTABLE_set_integer_native(interpreter, sort, n);

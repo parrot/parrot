@@ -305,7 +305,6 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUT', "first dynamic MMD call");
 
-.namespace ["Main"]
 .sub main @MAIN
     .local pmc F, B, f, b, m, s
     newclass F, "Foo"
@@ -313,27 +312,25 @@ pir_output_is(<<'CODE', <<'OUT', "first dynamic MMD call");
     newclass B, "Bar"
     b = B."instantiate"()
     # create a multi the hard way
-    m = new MultiSub
-    s = find_global "Foo", "foo"
-    push m, s
-    s = find_global "Bar", "foo"
-    push m, s
-    global "foo" = m
+    ## m = new MultiSub
+    ## s = find_global "Foo", "foo"
+    ## push m, s
+    ## s = find_global "Bar", "foo"
+    ## push m, s
+    ## global "foo" = m
     print "calling foo(f, b)\n"
     foo(f, b)
     print "calling foo(b, f)\n"
     foo(b, f)
 .end
 
-.namespace ["Foo"]
-.sub foo method
+.sub foo method, @MULTI(Foo, Bar)
     .param pmc x
     .param pmc y
     print "  Foo::foo\n"
 .end
 
-.namespace ["Bar"]
-.sub foo method
+.sub foo method, @MULTI(Bar, Foo)
     .param pmc x
     .param pmc y
     print "  Bar::foo\n"
@@ -815,7 +812,6 @@ OUTPUT
 
 open P, ">$temp" or die "can't write $temp";
 print P <<'EOF';
-.namespace ["__parrot_core"]
 .sub __add @MULTI(Integer, Integer)
     .param pmc l
     .param pmc r

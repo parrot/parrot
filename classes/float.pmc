@@ -20,9 +20,6 @@ C<Float> extends C<scalar> to provide floating-point number operations.
 
 #include "parrot/parrot.h"
 
-PMC* Parrot_scalar_subtract_Complex(Interp* , PMC* pmc, PMC* value, PMC* dest);
-void Parrot_scalar_i_subtract_Complex(Interp* , PMC* pmc, PMC* value);
-
 pmclass Float extends scalar {
 
 /*
@@ -209,47 +206,10 @@ Morphs the scalar to the specified type.
 */
 
     void morph (INTVAL type) {
-        if (SELF->vtable->base_type == type)
-            return;
-        if (type == enum_class_String) {
-            /*
-             * if we morph to a string, first clear str_val
-             * so that after changing the vtable a parallel
-             * reader doesn't get a garbage pointer
-             */
-            PMC_str_val(SELF) = NULL;
-            PObj_custom_mark_SET(SELF);
-            SELF->vtable = Parrot_base_vtables[type];
-            return;
-        }
-        if (type == enum_class_BigInt || type == enum_class_Complex) {
-            PMC_str_val(SELF) = NULL;
-            SELF->vtable = Parrot_base_vtables[type];
-            DYNSELF.init();
-            return;
-        }
-        SELF->vtable = Parrot_base_vtables[type];
+        pmc_reuse(INTERP, SELF, type, 0);
     }
 
 
-    PMC* subtract (PMC* value, PMC* dest) {
-MMD_Complex: {
-            return Parrot_scalar_subtract_Complex(interpreter,
-                    SELF, value, dest);  /* XXX inheritance problem */
-        }
-MMD_DEFAULT: {
-            return SUPER(value, dest);  /* XXX inheritance problem */
-        }
-    }
-
-    void i_subtract (PMC* value) {
-MMD_Complex: {
-            Parrot_scalar_i_subtract_Complex(interpreter, SELF, value);
-        }
-MMD_DEFAULT: {
-            SUPER(value);  /* XXX inheritance problem */
-        }
-    }
 
 /*
 

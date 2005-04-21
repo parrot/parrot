@@ -206,19 +206,6 @@ EOC
     }
     $cout .= <<"EOC";
     }
-
-    /*
-     * force rebuilding of the static MMD_table
-     * TODO only for classes that have mmds
-     */
-EOC
-    while (my ($class, $info) = each %classes) {
-	next if $info->{flags}->{noinit};
-        $cout .= <<"EOC";
-    Parrot_mmd_rebuild_table(interpreter, type$class, -1);
-EOC
-    }
-    $cout .= <<"EOC";
     return pmc;
 }
 
@@ -637,8 +624,10 @@ sub body
             my $sub_meth_name = $1;
             my $sub_meth =  $sub_meth_decl;   # no "static ." ...
             $sub_meth =~ s/\(/_$right_type(/;
-            $header_decls .= <<EOH;
-$sub_meth;
+            $sub_meth_decl = $sub_meth;
+            $sub_meth_decl =~ s/\n/ /g;
+            $self->{hdecls} .= <<EOH;
+$sub_meth_decl;
 EOH
             $additional_bodies .= $sub_meth;
             $additional_bodies .= "{$body_part\n}";
@@ -647,7 +636,7 @@ EOH
         }
 
     }
-    $cout .= $header_decls;
+    ## $cout .= $header_decls;
     $cout .= $self->decl($classname, $method, 0);
     # This is the part that comes from the PMC file.
     $cout .= $self->line_directive($method->{line}, $self->{file});
@@ -718,6 +707,38 @@ sub pmc_is_dynpmc {
     return exists($pmc_types{$_[1]}) ? 0 : 1;
 }
 
+# XXX quick hack - to get MMD variants
+sub get_super_mmds {
+    my ($self, $meth, $right, $func) = @_;
+    ## use Data::Dumper;
+    ## printf "******* $meth_name **********\n";
+    ## print Dumper($self);
+    ## exit 0;
+    my (@mmds, $found);
+    for my $super_mmd (@{ $self->{super_mmd} }) {
+        my ($super, $variants);
+        $found = 0;
+        @mmds = ();
+        while (($super, $variants) = each %{ $super_mmd }) {
+            if ($super eq 'meth' && $variants eq $meth) {
+                $found = 1;
+            }
+            elsif (ref($variants) eq 'ARRAY') {
+                for my $class (@{ $variants }) {
+                    next if $class eq 'DEFAULT';
+                    my $r = $class eq 'DEFAULT' ? 'enum_type_PMC' :
+                    "enum_class_$class";
+                    my $super_name = "Parrot_${super}_$meth";
+                    $super_name .= "_$class" if $class ne 'DEFAULT';
+                    push @mmds, [ $func, 0, $r, $super_name ];
+                }
+            }
+        }
+        last if $found;
+    }
+    return $found ? @mmds : ();
+}
+
 =item C<init_func()>
 
 Returns the C code for the PMC's initialization method, or an empty
@@ -780,6 +801,9 @@ sub init_func() {
             $right = 'enum_type_INTVAL'   if ($func =~ s/_INT$//);
             $right = 'enum_type_FLOATVAL' if ($func =~ s/_FLOAT$//);
             $right = 'enum_type_STRING'   if ($func =~ s/_STR$//);
+            if (exists $self->{super}{$meth}) {
+                push @mmds, $self->get_super_mmds($meth, $right, $func);
+            }
             push @mmds, [ $func, $left, $right, $meth_name ];
             foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
                 if ($self->pmc_is_dynpmc($variant->[0])) {
@@ -793,6 +817,7 @@ sub init_func() {
                 $meth_name = $variant->[1] . '_' .$variant->[0];
                 push @mmds, [ $func, $left, $right, $meth_name];
             }
+            $self->{mmds} = @mmds;
         }
     }
     my $methlist = join(",\n        ", @meths);
@@ -1008,7 +1033,8 @@ sub hdecls() {
     $hout .= <<"EOC";
 void Parrot_${classname}_class_init(Parrot_Interp, int, int);
 EOC
-    $hout;
+    $self->{hdecls} .= $hout;
+    $self->{hdecls};
 }
 
 =item C<gen_h($out_name)>

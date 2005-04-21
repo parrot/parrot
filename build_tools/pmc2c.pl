@@ -257,12 +257,12 @@ my %opt;
 
 main();
 
-# 
+#
 #   my $path = find_file( [$dir1, $dir2], $file, $die_unless_found_flag );
-# 
+#
 # Return the full path to $file (search in the given directories).
 # Optionally, die with an error message if that file cannot be found.
-# 
+#
 sub find_file {
     my ($include, $file, $die_unless_found) = @_;
 
@@ -277,21 +277,21 @@ sub find_file {
     undef;
 }
 
-# 
+#
 #   dump_default();
-# 
+#
 # Create a .dump file for the default vtable (from which all PMCs
 # inherit).
-# 
+#
 sub dump_default {
     my $file    = "$FindBin::Bin/../vtable.tbl";
     my $default = parse_vtable($file);
     my $dump    = $file;
     $dump =~ s/\.\w+$/\.dump/;
-    
+
     print "Writing $dump\n" if $opt{verbose};
     open VTD, ">", $dump or die "Can't write '$dump'";
-    
+
     my %vtable = (
         flags   => {},
         pre     => '',
@@ -311,25 +311,25 @@ sub dump_default {
             };
     }
     $vtable{'has_method'} = \%meth_hash;
-    
+
     my $Dumper = Data::Dumper->new([\%vtable], ['class']);
     $Dumper->Indent(3);
     print VTD $Dumper->Dump();
     close VTD;
 }
 
-# 
+#
 #   my ($balanced, $remaining) = extract_balanced($code);
-# 
+#
 # Remove a balanced {} construct from the beginning of $code.
 # Return it and the remaining code.
-# 
+#
 sub extract_balanced {
     my $code    = shift;
     my $balance = 0;
-    
+
     $code =~ s/^\s+//;
-    
+
     # create a copy and remove strings and comments so that
     # unbalanced {} can be used in them in PMCs, being careful to
     # preserve string length.
@@ -340,9 +340,9 @@ sub extract_balanced {
         | /\* .*? \*/ )             # remove C comments
     ]
     [ "-" x length $1 ]sexg;
-    
+
     /^\{/ or die "bad block open: ", substr($code,0,10), "...";
-    
+
     while (/ (\{) | (\}) /gx) {
         if($1) {
             $balance++;
@@ -355,20 +355,20 @@ sub extract_balanced {
     die "Badly balanced" if $balance;
 }
 
-# 
+#
 #   my ($pre, $class_name, $flags) = parse_flags(\$code);
-# 
+#
 # Extract a class signature from the code ref and return (a) the
 # code found before the signature, (b) the name of the class, and
 # (c) a hash ref containing the flags associated with the class
 # (such as 'extends' and 'does').
-# 
+#
 sub parse_flags {
     my $c = shift;
 
     $$c =~ s/^(.*?^\s*)pmclass ([\w]*)//ms;
     my ($pre, $classname) = ($1, $2);
-    
+
     # flags that have values passed with them
     my %has_value = map { $_ => 1 } qw(does extends group lib);
 
@@ -379,7 +379,7 @@ sub parse_flags {
         if ($has_value{$flag}) {
             $$c =~ s/^\s+(\w+)//s
                 or die "Parser error: no value for '$flag'";
-            
+
             $flags{$flag}{$1} =
                 $flag eq 'extends' ? ++$parent_nr : 1;
         }
@@ -387,22 +387,22 @@ sub parse_flags {
             $flags{$flag} = 1;
         }
     }
-    
+
     # setup some defaults
     if ($classname ne 'default') {
         $flags{extends}{default} = 1 unless $flags{extends};
         $flags{does}{scalar}     = 1 unless $flags{does};
     }
-    
+
     return $pre, $classname, \%flags;
 }
 
-# 
+#
 #   my ($name, $attributes) = parse_pmc($code);
-# 
+#
 # Parse PMC code and return the class name and a hash ref of
 # attributes.
-# 
+#
 sub parse_pmc {
     my $code = shift;
 
@@ -414,7 +414,7 @@ sub parse_pmc {
     )*
 
     (METHOD\s+)?        #method flag
-    
+
     (\w+\**)            #type
       \s+
         (\w+)           #method name
@@ -424,7 +424,7 @@ sub parse_pmc {
 
     my ($pre, $classname, $flags)   = parse_flags(\$code);
     my ($classblock, $post)         = extract_balanced($code);
-  
+
     my $lineno  = 1 + count_newlines($pre);
     $classblock = substr($classblock, 1,-1); # trim out the { }
 
@@ -434,7 +434,7 @@ sub parse_pmc {
         $lineno += count_newlines($1);
         my ($flag, $type, $methodname, $parameters) = ($2,$3,$4,$5);
         my ($methodblock, $rema)                    = extract_balanced($classblock);
-        
+
         $methodblock = "" if $opt{nobody};
         if ($methodname eq 'class_init') {
             $class_init = {
@@ -449,6 +449,7 @@ sub parse_pmc {
         else {
             # name => method idx mapping
             $meth_hash{$methodname} = scalar @methods;
+            my @mmds = ($methodblock =~ /MMD_(\w+):/g);
             push @methods,
                 {
                     meth        => $methodname,
@@ -456,13 +457,14 @@ sub parse_pmc {
                     line        => $lineno,
                     type        => $type,
                     parameters  => $parameters,
-                    loc         => $flag ? "nci" : "vtable"
+                    loc         => $flag ? "nci" : "vtable",
+                    mmds        => [ @mmds ],
                 };
         }
         $classblock = $rema;
         $lineno += count_newlines($methodblock);
     }
-    
+
     if ($class_init) {
         $meth_hash{'class_init'} = scalar @methods;
         push @methods, $class_init;
@@ -480,33 +482,33 @@ sub parse_pmc {
            };
 }
 
-# 
+#
 #   gen_parent_list( [$dir1, $dir2], $class, $classes );
-# 
+#
 # Generate an ordered list of parent classes to put in the
 # $classes->{class}->{parents} array, using the given directories
 # to find parents.
-# 
+#
 sub gen_parent_list {
     my ($include, $this, $all) = @_;
 
     my @todo  = ($this);
     my $class = $all->{$this};
-    
+
     while (@todo) {
         my $n   = shift @todo;
         my $sub = $all->{$n};
         next if $n eq 'default';
-        
+
         my %parent_hash = %{$sub->{flags}{extends}};
         my @parents     = sort { $parent_hash{$a} <=> $parent_hash{$b} }
 		    keys %parent_hash;
         for my $parent (@parents) {
             next if exists $class->{has_parent}{$parent};
-            
+
             $all->{$parent} = read_dump($include, lc("$parent.pmc"))
                 if not $all->{$parent};
-            
+
             $class->{has_parent}{$parent} = { %{$all->{$parent}{has_method} }};
             push @todo, $parent;
             push @{ $class->{parents} }, $parent;
@@ -515,15 +517,15 @@ sub gen_parent_list {
 }
 
 
-# 
+#
 #   my $class = dump_1_pmc($file);
-# 
+#
 # Generate the class structure from $file for a .dump file.
-# 
+#
 sub dump_1_pmc {
     my $file = shift;
     $file =~ s/\.\w+$/.pmc/;
-    
+
     print "Reading $file\n" if $opt{verbose};
     open my $fh, "<", $file
         or die "Can't read '$file'";
@@ -531,22 +533,30 @@ sub dump_1_pmc {
     return parse_pmc($contents);
 }
 
-# 
+#
 #   gen_super_meths($class, $vtable)
-# 
+#
 # Generate a list of inherited methods for $class by searching the
 # inheritence tree. The method list is found in $vtable.
-# 
+#
 sub gen_super_meths {
-    my ($self, $vt) = @_;
+    my ($self, $vt, $all) = @_;
 
     # look through all meths in class and locate the nearest parent
     foreach my $entry (@{ $vt->{methods} } ) {
         my $meth = $entry->{meth};
         next if exists $self->{super}{$meth};
         foreach my $pname (@{ $self->{parents} } ) {
-            if (exists $self->{has_parent}{$pname}{$meth} ) {
+            if (exists ($self->{has_parent}{$pname}{$meth} )) {
                 $self->{super}{$meth} = $pname;
+                my $n = $self->{has_parent}{$pname}{$meth};
+                my $super_mmd = $all->{$pname}{methods}[$n]{mmds};
+                if ($super_mmd && scalar @{ $super_mmd }) {
+                    ##print "** @{ $super_mmd } **\n";
+                    push @{ $self->{super_mmd} },
+                        { $pname => $super_mmd,
+                          'meth' => $meth};
+                }
                 last;
             }
         }
@@ -569,13 +579,13 @@ sub gen_super_meths {
     }
 }
 
-# 
+#
 #   add_defaulted($class_structure, $vtable);
-# 
+#
 # Add methods to the class structure for each method found in the
 # vtable. This is used to determine all of the 'default' methods
 # from the vtable.dump.
-# 
+#
 sub add_defaulted {
     my ($class, $vt) = @_;
 
@@ -585,30 +595,30 @@ sub add_defaulted {
     }
 }
 
-# 
+#
 #   my $newer = dump_is_newer($file);
-# 
+#
 # Return whether the dump of a file is newer than the PMC file.
 # (If it's not, then the PMC file has changed and the dump has
 # not been updated.)
-# 
+#
 sub dump_is_newer {
     my $pmc = my $file = shift;
     $pmc =~ s/\.\w+$/.pmc/;
-    
+
     my $pmc_dt  = (stat $pmc)[9];
     my $dump_dt = (stat $file)[9];
-    
+
     return $dump_dt > $pmc_dt;
 }
 
-# 
+#
 #   dump_pmc( [$dir1, $dir2], $file1, $file2, ... );
-# 
+#
 # Create a .dump file for each of the passed files (which can be
 # found in the given directories). A '*.pmc' glob may also be passed
 # to emulate a proper shell in the presence of a dump one.
-# 
+#
 sub dump_pmc {
     my ($include, @files) = @_;
     # help these dumb 'shells' that are no shells
@@ -623,25 +633,25 @@ sub dump_pmc {
 
     $all{default} = read_dump($include, "classes/default.pmc")
         if not $all{default};
-    
+
     my $vt = read_dump($include, "vtable.pmc");
     add_defaulted($all{default}, $vt);
 
     foreach my $name (keys %all) {
         my $file = $all{$name}->{file};
         $file =~ s/\.\w+$/\.dump/;
-        
+
         # XXX write default.dump only once
         my $existing = find_file($include, $file);
         next if $existing && -e $existing && dump_is_newer($existing);
-        
+
         my $class = $all{$name};
         gen_parent_list($include, $name, \%all);
-        gen_super_meths($class, $vt);
-        
+        gen_super_meths($class, $vt, \%all);
+
         my $Dumper = Data::Dumper->new([$class], ['class']);
         $Dumper->Indent(1);
-        
+
         print "Writing $file\n" if $opt{verbose};
         open my $fh, ">", $file or die "Can't write '$file'";
         print $fh $Dumper->Dump;
@@ -649,25 +659,25 @@ sub dump_pmc {
     }
 }
 
-# 
+#
 #   my $class = read_dump( [$dir1, $dir2], $file );
-# 
+#
 # Read in the class definition found in $file (which is found in one
 # of the given directories) and recreate the data structure.
-# 
+#
 sub read_dump {
     my ($include, $file) = @_;
-    
+
     $file =~ s/\.\w+$/.dump/;
     $file = find_file($include, $file, 1);
-    
+
     print "Reading $file\n" if $opt{verbose};
     open my $fh, "<", $file or die "Can't read '$file'";
-    
+
     my $class;
     eval do { local $/; <$fh> };
     die $@ if $@;
-    
+
     close $fh;
     $class;
 }
@@ -679,45 +689,45 @@ sub read_dump {
 # given directories to search for all of correct PMCs. The middle
 # argument is the display depth, which is used for the recursive
 # definition of this function.
-# 
+#
 sub print_tree {
     my ($include,$depth, @files) = @_;
 
     for my $file (@files) {
         my $class = read_dump($include, $file);
-        
+
         print "    " x $depth, $class->{class}, "\n";
         print_tree($include, $depth + 1, lc("$_.pmc"))
             for keys %{$class->{flags}{extends}};
     }
 }
 
-# 
+#
 #   gen_c( [$dir1, $dir2], $file1, $file2, ... );
-# 
+#
 # Generate the c source code file for each of the files passed in,
 # using the directories passed in to search for the PMC dump files.
-# 
+#
 sub gen_c {
     my ($include, @files) = @_;
     my %pmcs = map { $_, read_dump($include, $_) } @files;
-    
+
     Parrot::Pmc2c::Library
         ->new( \%opt, read_dump($include, "vtable.pmc"), %pmcs )
         ->write_all_files;
 }
 
-# 
+#
 #   main()
-# 
+#
 # Get and set the correct options and execute the runmode
 # specified in @ARGS.
-# 
+#
 sub main {
     my ($default, $dump, $gen_c, $tree, @include);
     # initialization to prevent warnings
     %opt = map { $_ => 0 } qw(nobody nolines debug verbose);
-    
+
     my $result = GetOptions(
         "vtable"        => \$default,
         "dump"          => \$dump,
