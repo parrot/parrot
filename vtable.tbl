@@ -209,33 +209,63 @@ void absolute(PMC* dest)
 void neg(PMC* dest)
 
 [BITWISE]
-void bitwise_or(PMC* value, PMC* dest)       MMD_BOR
-void bitwise_or_int(INTVAL value, PMC* dest) MMD_BOR_INT
+PMC* bitwise_or(PMC* value, PMC* dest)          MMD_BOR
+PMC* bitwise_or_int(INTVAL value, PMC* dest)    MMD_BOR_INT
 
-void bitwise_and(PMC* value, PMC* dest)         MMD_BAND
-void bitwise_and_int(INTVAL value, PMC* dest)   MMD_BAND_INT
+void i_bitwise_or(PMC* value)                   MMD_I_BOR
+void i_bitwise_or_int(INTVAL value)             MMD_I_BOR_INT
 
-void bitwise_xor(PMC* value, PMC* dest)        MMD_BXOR
-void bitwise_xor_int(INTVAL value, PMC* dest)  MMD_BXOR_INT
+PMC* bitwise_and(PMC* value, PMC* dest)         MMD_BAND
+PMC* bitwise_and_int(INTVAL value, PMC* dest)   MMD_BAND_INT
 
-void bitwise_ors(PMC* value, PMC* dest)         MMD_SOR
-void bitwise_ors_str(STRING* value, PMC* dest)  MMD_SOR_STR
+void i_bitwise_and(PMC* value)                  MMD_I_BAND
+void i_bitwise_and_int(INTVAL value)            MMD_I_BAND_INT
 
-void bitwise_ands(PMC* value, PMC* dest)        MMD_SAND
-void bitwise_ands_str(STRING* value, PMC* dest) MMD_SAND_STR
+PMC* bitwise_xor(PMC* value, PMC* dest)         MMD_BXOR
+PMC* bitwise_xor_int(INTVAL value, PMC* dest)   MMD_BXOR_INT
 
-void bitwise_xors(PMC* value, PMC* dest)        MMD_SXOR
-void bitwise_xors_str(STRING* value, PMC* dest) MMD_SXOR_STR
+void i_bitwise_xor(PMC* value)                  MMD_I_BXOR
+void i_bitwise_xor_int(INTVAL value)            MMD_I_BXOR_INT
+
+PMC* bitwise_ors(PMC* value, PMC* dest)         MMD_SOR
+PMC* bitwise_ors_str(STRING* value, PMC* dest)  MMD_SOR_STR
+
+void i_bitwise_ors(PMC* value)                  MMD_I_SOR
+void i_bitwise_ors_str(STRING* value)           MMD_I_SOR_STR
+
+PMC* bitwise_ands(PMC* value, PMC* dest)        MMD_SAND
+PMC* bitwise_ands_str(STRING* value, PMC* dest) MMD_SAND_STR
+
+void i_bitwise_ands(PMC* value)                 MMD_I_SAND
+void i_bitwise_ands_str(STRING* value)          MMD_I_SAND_STR
+
+PMC* bitwise_xors(PMC* value, PMC* dest)        MMD_SXOR
+PMC* bitwise_xors_str(STRING* value, PMC* dest) MMD_SXOR_STR
+
+void i_bitwise_xors(PMC* value)                 MMD_I_SXOR
+void i_bitwise_xors_str(STRING* value)          MMD_I_SXOR_STR
 
 void bitwise_not(PMC* dest)
 
 void bitwise_nots(PMC* dest)
 
-void bitwise_shl(PMC* value, PMC* dest)        MMD_BSL
-void bitwise_shl_int(INTVAL value, PMC* dest)  MMD_BSL_INT
+PMC* bitwise_shl(PMC* value, PMC* dest)         MMD_BSL
+PMC* bitwise_shl_int(INTVAL value, PMC* dest)   MMD_BSL_INT
 
-void bitwise_shr(PMC* value, PMC* dest)        MMD_BSR
-void bitwise_shr_int(INTVAL value, PMC* dest)  MMD_BSR_INT
+void i_bitwise_shl(PMC* value)                  MMD_I_BSL
+void i_bitwise_shl_int(INTVAL value)            MMD_I_BSL_INT
+
+PMC* bitwise_shr(PMC* value, PMC* dest)         MMD_BSR
+PMC* bitwise_shr_int(INTVAL value, PMC* dest)   MMD_BSR_INT
+
+void i_bitwise_shr(PMC* value)                  MMD_I_BSR
+void i_bitwise_shr_int(INTVAL value)            MMD_I_BSR_INT
+
+PMC* bitwise_lsr(PMC* value, PMC* dest)         MMD_LSR
+PMC* bitwise_lsr_int(INTVAL value, PMC* dest)   MMD_LSR_INT
+
+void i_bitwise_lsr(PMC* value)                  MMD_I_LSR
+void i_bitwise_lsr_int(INTVAL value)            MMD_I_LSR_INT
 
 [CMP]
 INTVAL is_equal(PMC* value)                  MMD_EQ

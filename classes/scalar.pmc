@@ -710,116 +710,161 @@ Set C<dest> to the negated value of C<SELF>.
 
 =over 4
 
-=item C<void bitwise_or(PMC *value, PMC *dest)>
+=item C<PMC* bitwise_or(PMC *value, PMC *dest)>
 
-Returns in C<*dest> the bitwise C<OR> of the scalar and C<*value>.
-
-=cut
-
-*/
-
-    void bitwise_or (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            | VTABLE_get_integer(INTERP, value);
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
-/*
-
-=item C<void bitwise_or_int(INTVAL value, PMC *dest)>
+=item C<PMC* bitwise_or_int(INTVAL value, PMC *dest)>
 
 Returns in C<*dest> the bitwise C<OR> of the scalar and C<value>.
 
-=cut
+=item C<void i_bitwise_or(PMC *value)>
 
-*/
+=item C<void i_bitwise_or_int(INTVAL value)>
 
-    void bitwise_or_int (INTVAL value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            | value;
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
-/*
-
-=item C<void bitwise_and(PMC *value, PMC *dest)>
-
-Returns in C<*dest> the bitwise C<AND> of the scalar and C<*value>.
+Inplace bitwise or.
 
 =cut
 
 */
 
-    void bitwise_and (PMC* value, PMC* dest) {
+    PMC* bitwise_or (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = DYNSELF.get_integer()
-            & VTABLE_get_integer(INTERP, value);
-
+        result = DYNSELF.get_integer() | VTABLE_get_integer(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+
+    PMC* bitwise_or_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() | value;
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    void i_bitwise_or (PMC* value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() | VTABLE_get_integer(INTERP, value);
+        DYNSELF.set_integer_native(result);
+    }
+
+
+    void i_bitwise_or_int (INTVAL value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() | value;
+        DYNSELF.set_integer_native(result);
     }
 
 /*
 
-=item C<void bitwise_and_int(INTVAL value, PMC *dest)>
+=item C<PMC* bitwise_and(PMC *value, PMC *dest)>
+
+=item C<PMC* bitwise_and_int(INTVAL value, PMC *dest)>
 
 Returns in C<*dest> the bitwise C<AND> of the scalar and C<value>.
 
+=item C<void i_bitwise_and(PMC *value)>
+
+=item C<void i_bitwise_and_int(INTVAL value)>
+
+Inplace bitwise and.
+
 =cut
 
 */
 
-    void bitwise_and_int (INTVAL value, PMC* dest) {
+    PMC* bitwise_and (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = DYNSELF.get_integer()
-            & value;
-
+        result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    PMC* bitwise_and_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() & value;
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    void i_bitwise_and (PMC* value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
+        DYNSELF.set_integer_native(result);
+    }
+
+
+    void i_bitwise_and_int (INTVAL value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() & value;
+        DYNSELF.set_integer_native(result);
     }
 
 /*
 
 =item C<void bitwise_xor(PMC *value, PMC *dest)>
 
-Returns in C<*dest> the bitwise C<XOR> of the scalar and C<*value>.
-
-=cut
-
-*/
-
-    void bitwise_xor (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            ^ VTABLE_get_integer(INTERP, value);
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
-/*
-
 =item C<void bitwise_xor_int(INTVAL value, PMC *dest)>
 
-Returns in C<*dest> the bitwise C<XOR> of the scalar and C<value>.
+Returns in C<*dest> the bitwise C<XOR> of the scalar and C<*value>.
+
+=item C<void i_bitwise_xor(PMC *value)>
+
+=item C<void i_bitwise_xor_int(INTVAL value)>
+
+Inplace bitwise and.
 
 =cut
 
 */
 
-    void bitwise_xor_int (INTVAL value, PMC* dest) {
+    PMC* bitwise_xor (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = DYNSELF.get_integer()
-            ^ value;
-
+        result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    PMC* bitwise_xor_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() ^ value;
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    void i_bitwise_xor (PMC* value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
+        DYNSELF.set_integer_native(result);
+    }
+
+    void i_bitwise_xor_int (INTVAL value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() ^ value;
+        DYNSELF.set_integer_native(result);
     }
 
 /*
@@ -839,78 +884,160 @@ Returns in C<*dest> the bitwise negation of the scalar and C<value>.
 
 /*
 
-=item C<void bitwise_shr(PMC *value, PMC *dest)>
+=item C<PMC* bitwise_shr(PMC *value, PMC *dest)>
 
-Returns in C<*dest> the shift right of the scalar by C<*value>.
+=item C<PMC* bitwise_shr_int(INTVAL value, PMC *dest)>
 
-=cut
+Returns in C<*dest> the arithmetic shift right of the scalar by C<value>.
 
-*/
+=item C<void i_bitwise_shr(PMC *value)>
 
-    void bitwise_shr (PMC* value, PMC* dest) {
-        INTVAL result;
+=item C<void i_bitwise_shr_int(INTVAL value)>
 
-        result = DYNSELF.get_integer()
-            >> VTABLE_get_integer(INTERP, value);
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
-/*
-
-=item C<void bitwise_shr_int(INTVAL value, PMC *dest)>
-
-Returns in C<*dest> the shift right of the scalar by C<value>.
+Inplace shift right.
 
 =cut
 
 */
 
-    void bitwise_shr_int (INTVAL value, PMC* dest) {
+    PMC* bitwise_shr (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = DYNSELF.get_integer()
-            >> value;
-
+        result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    PMC* bitwise_shr_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() >> value;
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    void i_bitwise_shr (PMC* value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
+        DYNSELF.set_integer_native(result);
+    }
+
+    void i_bitwise_shr_int (INTVAL value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() >> value;
+        DYNSELF.set_integer_native(result);
     }
 
 /*
 
-=item C<void bitwise_shl(PMC *value, PMC *dest)>
+=item C<PMC* bitwise_lsr(PMC *value, PMC *dest)>
+
+=item C<PMC* bitwise_lsr_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the logical shift right of the scalar by C<*value>.
+
+=item C<void i_bitwise_lsr(PMC *value)>
+
+=item C<void i_bitwise_lsr_int(INTVAL value)>
+
+Inplace shift right.
+
+=cut
+
+*/
+
+    PMC* bitwise_lsr (PMC* value, PMC* dest) {
+        INTVAL result;
+
+        result = (UINTVAL)DYNSELF.get_integer() >>
+            VTABLE_get_integer(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    PMC* bitwise_lsr_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+
+        result = (UINTVAL)DYNSELF.get_integer() >> value;
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    void i_bitwise_lsr (PMC* value) {
+        INTVAL result;
+
+        result = (UINTVAL)DYNSELF.get_integer() >>
+                VTABLE_get_integer(INTERP, value);
+        DYNSELF.set_integer_native(result);
+    }
+
+    void i_bitwise_lsr_int (INTVAL value) {
+        INTVAL result;
+
+        result = (UINTVAL)DYNSELF.get_integer() >> value;
+        DYNSELF.set_integer_native(result);
+    }
+
+/*
+
+=item C<PMC* bitwise_shl(PMC *value, PMC *dest)>
+
+=item C<PMC* bitwise_shl_int(INTVAL value, PMC *dest)>
 
 Returns in C<*dest> the shift left of the scalar by C<*value>.
 
+=item C<void i_bitwise_shl(PMC *value)>
+
+=item C<void i_bitwise_shl_int(INTVAL value)>
+
+Inplace shift left.
+
 =cut
 
 */
 
-    void bitwise_shl (PMC* value, PMC* dest) {
+    PMC* bitwise_shl (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = DYNSELF.get_integer()
-            << VTABLE_get_integer(INTERP, value);
-
+        result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, value);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
     }
 
-/*
-
-=item C<void bitwise_shl_int(INTVAL value, PMC *dest)>
-
-Returns in C<*dest> the shift left of the scalar by C<value>.
-
-=cut
-
-*/
-
-    void bitwise_shl_int (INTVAL value, PMC* dest) {
+    PMC* bitwise_shl_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
-        result = DYNSELF.get_integer()
-            << value;
-
+        result = DYNSELF.get_integer() << value;
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest, result);
+        return dest;
+    }
+
+    void i_bitwise_shl (PMC* value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, value);
+        DYNSELF.set_integer_native(result);
+    }
+
+    void i_bitwise_shl_int (INTVAL value) {
+        INTVAL result;
+
+        result = DYNSELF.get_integer() << value;
+        DYNSELF.set_integer_native(result);
     }
 
 /*
@@ -956,40 +1083,14 @@ Returns in C<*dest> the result of concatenating the scalar and C<*value>.
         VTABLE_set_string_native(INTERP, dest, s);
     }
 
+
 /*
 
 =back
 
-=head2 Comparison Methods
+=head2 Compare Methods
 
 =over 4
-
-=item C<INTVAL is_equal(PMC *value)>
-
-Returns whether the scalar is equal to C<*value>.
-
-=cut
-
-*/
-
-    INTVAL is_equal (PMC* value) {
-        /* I think we need to check everything, do the easiest first... */
-        if (DYNSELF.get_integer()
-                == VTABLE_get_integer(INTERP, value)
-            && DYNSELF.get_number()
-                == VTABLE_get_number(INTERP, value)
-            && 0 == string_compare(INTERP,
-                DYNSELF.get_string(),
-                VTABLE_get_string(INTERP, value))
-            )
-        {
-            return 1;
-        }
-        return 0;
-    }
-
-
-/*
 
 =item C<INTVAL cmp_num(PMC *value)>
 

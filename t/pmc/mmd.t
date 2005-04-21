@@ -295,7 +295,9 @@ output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL");
     print "ok\n"
     set I10, P5
     bxor I11, I10, I5
-    set P6, I11
+    new P5, .Integer
+    set P5, I11
+    set I3, 1
     returncc
 CODE
 ok

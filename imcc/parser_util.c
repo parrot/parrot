@@ -387,6 +387,26 @@ is_infix(char *name, int n, SymReg **r)
     if (strcmp(name, "pow") == 0)
         return MMD_POW;
 
+    if (strcmp(name, "bor") == 0)
+        return MMD_BOR;
+    if (strcmp(name, "band") == 0)
+        return MMD_BAND;
+    if (strcmp(name, "bxor") == 0)
+        return MMD_BXOR;
+    if (strcmp(name, "bors") == 0)
+        return MMD_SOR;
+    if (strcmp(name, "bands") == 0)
+        return MMD_SAND;
+    if (strcmp(name, "bxors") == 0)
+        return MMD_SXOR;
+
+    if (strcmp(name, "shl") == 0)
+        return MMD_BSL;
+    if (strcmp(name, "shr") == 0)
+        return MMD_BSR;
+    if (strcmp(name, "lsr") == 0)
+        return MMD_LSR;
+
     /* now try n_<op> */
     if (name[0] == 'n' && name[1] == '_')
         return is_infix(name + 2, n, r);

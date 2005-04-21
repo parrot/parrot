@@ -515,7 +515,7 @@ $(INC_DIR)/string_private_cstring.h : $(STR_FILES) build_tools/c2str.pl
 
 # classes PMC build utils and rules
 PMC2CD=$(PERL) build_tools/pmc2c.pl --dump
-PMC2CC=$(PERL) build_tools/pmc2c.pl --c --no-lines
+PMC2CC=$(PERL) build_tools/pmc2c.pl --c
 PMC2CV=$(PERL) build_tools/pmc2c.pl --vt
 
 .pmc.dump :

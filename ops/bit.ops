@@ -353,11 +353,20 @@ inline op shr(in PMC, in PMC, in INT) :base_core {
 }
 
 ########################################
+
 =item B<lsr>(inout INT, in INT)
 
-Logically shift $1 right by $2.
+=item B<lsr>(in PMC, in INT)
+
+=item B<lsr>(in PMC, in PMC)
+
+Shift $1 logically shifted right by $2 bits.
 
 =item B<lsr>(out INT, in INT, in INT)
+
+=item B<lsr>(out PMC, in PMC, in INT)
+
+=item B<lsr>(out PMC, in PMC, in PMC)
 
 Set $1 to the value of $2 logically shifted right by $3 bits.
 
