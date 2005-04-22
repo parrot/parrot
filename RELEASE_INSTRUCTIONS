@@ -57,6 +57,7 @@ To prepare a release:
 | 	svn copy $SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c \
             -m"tagged release a.b.c"
 `--------------------------------------------------------
+        See also below [1]
 
     8.  upload to CPAN.
 
@@ -75,3 +76,29 @@ assembled releases--usually when someone forgot to delete
 DEVELOPING, but at least once where the MANIFEST check failed.
 The intent of this file is to document what must be done to
 release so that such mistakes don't happen again.
+
+--------------
+
+Appendix [1] parrot repository layout as of end of Apr 2004:
+
+$ svn ls $SVNPARROT
+branches/
+tags/
+trunk/
+
+$ svn ls $SVNPARROT/tags
+PRE_REL_0_0_8/
+RELEASE_0_0_10/
+RELEASE_0_0_11/
+RELEASE_0_0_13/
+RELEASE_0_0_6/
+RELEASE_0_0_8/
+RELEASE_0_0_9/
+RELEASE_0_1_0/
+RELEASE_0_1_1/
+RELEASE_0_1_2/
+REL_0_0_5/
+V1/
+file_move_031023/
+help/
+ponie-PRE-P5_592/
