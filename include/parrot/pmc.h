@@ -44,9 +44,6 @@ INTVAL pmc_type(Interp *, STRING *);
 void dod_register_pmc(Interp *, PMC*);
 void dod_unregister_pmc(Interp *, PMC*);
 
-/* multi method fallbacks */
-void register_fallback_methods(Interp *);
-
 /* mro creation */
 void Parrot_create_mro(Interp *, INTVAL);
 

@@ -150,7 +150,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     interpreter->binop_mmd_funcs = NULL;
 
     /* Go and init the MMD tables */
-    register_fallback_methods(interpreter);
+    mmd_add_function(interpreter, MMD_USER_FIRST - 1, (funcptr_t)0);
 
     /* create caches structure */
     init_object_cache(interpreter);

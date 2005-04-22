@@ -75,11 +75,6 @@ dump_mmd(Interp *interpreter, INTVAL function)
 
     x_funcs = table->x;
     y_funcs = table->y;
-    def = table->default_func;
-    if (!def) {
-        printf("default for %d not registered\n", (int)function);
-        return;
-    }
     printf("    ");
     for (x = 0; x < x_funcs; ++x) {
         if (! (x % 10))
@@ -558,10 +553,9 @@ mmd_add_function(Interp *interpreter,
         INTVAL funcnum, funcptr_t function)>
 
 Add a new binary MMD function to the list of functions the MMD system knows
-of. C<func_num> is the number of the new function, while C<default_func> is
-the function to be called when the system doesn't know which function it
-should call. (Because, for example, there hasn't been a function
-installed that matches the left and right types for a call).
+of. C<func_num> is the number of the new function. C<function> is ignored.
+
+TODO change this to a MMD register interface that takes a function *name*.
 
 =cut
 
@@ -586,14 +580,9 @@ mmd_add_function(Interp *interpreter,
             MMD_table *table = interpreter->binop_mmd_funcs + i;
             table->x = table->y = 0;
             table->mmd_funcs = NULL;
-            table->default_func = NULL;
         }
         interpreter->n_binop_mmd_funcs = func_nr + 1;
     }
-
-    /* We mark the new function by adding in the default function
-       pointer */
-    interpreter->binop_mmd_funcs[func_nr].default_func = function;
 
 }
 

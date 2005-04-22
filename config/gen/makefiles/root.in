@@ -407,7 +407,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/pic$(O) \
     $(SRC_DIR)/mmd$(O) \
     $(SRC_DIR)/builtin$(O) \
-    $(SRC_DIR)/mmd_fallback$(O) \
     $(SRC_DIR)/extend$(O) \
     $(SRC_DIR)/revision$(O) \
     $(PF_DIR)/pf_items$(O) \
@@ -874,8 +873,6 @@ $(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/mmd$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/mmd.str
 
 $(SRC_DIR)/builtin$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/builtin.str
-
-$(SRC_DIR)/mmd_fallback$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/objects$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/objects.str
 

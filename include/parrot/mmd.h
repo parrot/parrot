@@ -53,8 +53,6 @@ typedef struct _MMD_table {
     funcptr_t *mmd_funcs;     /* The functions for the MMD table */
     UINTVAL x;               /* The x coord for each table */
     UINTVAL y;               /* The y coord for each table */
-    funcptr_t default_func;  /* The function we use if we can't find
-                                 a function */
 } MMD_table;
 
 
