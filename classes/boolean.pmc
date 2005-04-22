@@ -103,9 +103,6 @@ Return "1" or "0".
         PMC_int_val(SELF) = (value != 0);
     }
 
-    void set_pmc (PMC* value) {
-        PMC_int_val(SELF) = VTABLE_get_bool(INTERP, value);
-    }
 /*
 
 =item C<void set_number_native (FLOATVAL value)>

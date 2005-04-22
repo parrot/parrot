@@ -39,62 +39,14 @@ Morphs the scalar to the specified type.
     void morph (INTVAL type) {
         if (SELF->vtable->base_type == type)
             return;
-        if (SELF->vtable->base_type == enum_class_PerlString) {
-            PObj_custom_mark_CLEAR(SELF);
-            SELF->vtable = Parrot_base_vtables[type];
-            return;
+        switch (type) {
+            case enum_class_Integer: type = enum_class_PerlInt; break;
+            case enum_class_Float:   type = enum_class_PerlNum; break;
+            case enum_class_String:  type = enum_class_PerlString; break;
+            case enum_class_Undef:
+            case enum_class_None:    type = enum_class_PerlUndef; break;
         }
-        if (type == enum_class_PerlString) {
-            /*
-             * if we morph to a string, first clear str_val
-             * so that after changing the vtable a parallel
-             * reader doesn't get a garbage pointer
-             */
-            PMC_str_val(SELF) = NULL;
-            PObj_custom_mark_SET(SELF);
-            SELF->vtable = Parrot_base_vtables[type];
-            return;
-        }
-        if (type == enum_class_BigInt || type == enum_class_Complex) {
-            PMC_str_val(SELF) = NULL;
-            SELF->vtable = Parrot_base_vtables[type];
-            DYNSELF.init();
-            return;
-        }
-        SELF->vtable = Parrot_base_vtables[type];
-    }
-
-/*
-
-=item C<void set_pmc(PMC *value)>
-
-Sets the PMC C<*value>, calling the appropriate C<set_*> method
-according to the type of C<*value>.
-
-=cut
-
-*/
-
-    void set_pmc (PMC* value) {
-        DYNSELF.morph(value->vtable->base_type);
-        switch (value->vtable->base_type) {
-            case enum_class_Boolean:
-            case enum_class_PerlInt:
-                DYNSELF.set_integer_same(value);
-                break;
-            case enum_class_PerlNum:
-                DYNSELF.set_number_same(value);
-                break;
-            case enum_class_PerlString:
-                DYNSELF.set_string_same(value);
-                break;
-            case enum_class_PerlUndef:
-                (void) VTABLE_get_pmc(INTERP, value);
-                break;
-            default:
-                DYNSELF.set_pmc(value);
-                break;
-        }
+        pmc_reuse(INTERP, SELF, type, 0);
     }
 
 }

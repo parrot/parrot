@@ -21,7 +21,6 @@ These are the vtable functions for the PerlNum base class
 #include "parrot/parrot.h"
 
 void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
-void Parrot_perlscalar_set_pmc(Interp* , PMC* pmc, PMC* value);
 
 pmclass PerlNum extends Float {
 
@@ -44,19 +43,6 @@ Returns the number as a Parrot string.
         return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
     }
 
-/*
-
-=item C<void set_pmc(PMC *value)>
-
-Sets the value of the number to the value in C<*value>.
-
-=cut
-
-*/
-
-    void set_pmc (PMC* value) {
-        perlscalar.SELF.set_pmc(value);
-    }
 
 /*
 

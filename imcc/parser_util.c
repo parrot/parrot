@@ -407,6 +407,12 @@ is_infix(char *name, int n, SymReg **r)
     if (strcmp(name, "lsr") == 0)
         return MMD_LSR;
 
+    if (strcmp(name, "or") == 0)
+        return MMD_LOR;
+    if (strcmp(name, "and") == 0)
+        return MMD_LAND;
+    if (strcmp(name, "xor") == 0)
+        return MMD_LXOR;
     /* now try n_<op> */
     if (name[0] == 'n' && name[1] == '_')
         return is_infix(name + 2, n, r);

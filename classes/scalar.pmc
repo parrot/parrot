@@ -24,6 +24,64 @@ pmclass scalar abstract noinit {
 
 /*
 
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+        pmc_reuse(INTERP, SELF, type, 0);
+    }
+/*
+
+=item C<void assign_pmc(PMC *value)>
+
+Sets the PMC C<*value>, calling the appropriate C<set_*> method
+according to the type of C<*value>.
+
+=cut
+
+*/
+
+    void assign_pmc (PMC* value) {
+        STRING *s_int = CONST_STRING(INTERP, "Integer");
+        STRING *s_num = CONST_STRING(INTERP, "Float");
+        STRING *s_str = CONST_STRING(INTERP, "String");
+        if (SELF->vtable->base_type == enum_class_Boolean) {
+            /* doesn't morph */
+            DYNSELF.morph(value->vtable->base_type);
+        }
+        if (value->vtable->base_type == enum_class_PerlUndef ||
+                value->vtable->base_type == enum_class_Undef) {
+            DYNSELF.morph(value->vtable->base_type);
+            return;
+        }
+        if (VTABLE_isa(INTERP, value, s_int)) {
+            INTVAL v = VTABLE_get_integer(INTERP, value);
+            DYNSELF.set_integer_native(v);
+            return;
+        }
+        if (VTABLE_isa(INTERP, value, s_num)) {
+            FLOATVAL v = VTABLE_get_number(INTERP, value);
+            DYNSELF.set_number_native(v);
+            return;
+        }
+        if (VTABLE_isa(INTERP, value, s_str)) {
+            STRING* v = VTABLE_get_string(INTERP, value);
+            DYNSELF.set_string_native(v);
+            return;
+        }
+        DYNSELF.morph(value->vtable->base_type);
+        SUPER(value);
+    }
+
+/*
+
 =item C<PMC *clone()>
 
 Creates and returns a clone of the scalar.
@@ -1201,69 +1259,124 @@ C<*value>.
 Returns in C<*dest> the result of the logical C<OR> of the scalar and
 C<*value>.
 
+=item C<void i_logical_or(PMC *value)>
+
+Inplace logical or.
+
 =cut
 
 */
 
-    void logical_or (PMC* value,  PMC* dest) {
+    PMC* logical_or (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
-            VTABLE_set_pmc(INTERP, dest, SELF);
+            if (!dest)
+                return VTABLE_clone(INTERP, SELF);
+            VTABLE_assign_pmc(INTERP, dest, SELF);
         }
         else {
-            VTABLE_set_pmc(INTERP, dest, value);
+            if (!dest)
+                return VTABLE_clone(INTERP, value);
+            VTABLE_assign_pmc(INTERP, dest, value);
+        }
+        return dest;
+    }
+
+    void i_logical_or (PMC* value) {
+        if (!DYNSELF.get_bool()) {
+            VTABLE_assign_pmc(INTERP, SELF, value);
         }
     }
 
 /*
 
-=item C< void logical_and(PMC *value, PMC *dest)>
+=item C< PMC* logical_and(PMC *value, PMC *dest)>
 
 Returns in C<*dest> the result of the logical C<AND> of the scalar and
 C<*value>.
 
+=item C< void i_logical_and(PMC *value)>
+
+Inplace logical and.
+
 =cut
 
 */
 
-    void logical_and (PMC* value,  PMC* dest) {
+    PMC* logical_and (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
-            VTABLE_set_pmc(INTERP, dest, value);
+            if (!dest)
+                return VTABLE_clone(INTERP, value);
+            VTABLE_assign_pmc(INTERP, dest, value);
         }
         else {
-            VTABLE_set_pmc(INTERP, dest, SELF);
+            if (!dest)
+                return VTABLE_clone(INTERP, SELF);
+            VTABLE_assign_pmc(INTERP, dest, SELF);
+        }
+        return dest;
+    }
+
+    void i_logical_and (PMC* value) {
+        if (DYNSELF.get_bool()) {
+            VTABLE_assign_pmc(INTERP, SELF, value);
         }
     }
 
 /*
 
-=item C<void logical_xor(PMC *value, PMC *dest)>
+=item C<PMC* logical_xor(PMC *value, PMC *dest)>
 
 Returns in C<*dest> the result of the logical C<XOR> of the scalar and
 C<*value>.
+
+=item C<void i_logical_xor(PMC *value)>
+
+Inplace logical and.
 
 =cut
 
 */
 
-    void logical_xor (PMC* value,  PMC* dest) {
-
+    PMC* logical_xor (PMC* value,  PMC* dest) {
         INTVAL my_bool, value_bool;
 
         my_bool = DYNSELF.get_bool();
         value_bool = VTABLE_get_bool(INTERP, value);
 
         if (my_bool && ! value_bool) {
-            VTABLE_set_pmc(INTERP, dest, SELF);
+            if (!dest)
+                return VTABLE_clone(INTERP, SELF);
+            VTABLE_assign_pmc(INTERP, dest, SELF);
         }
         else if (value_bool && ! my_bool) {
-            VTABLE_set_pmc(INTERP, dest, value);
+            if (!dest)
+                return VTABLE_clone(INTERP, value);
+            VTABLE_assign_pmc(INTERP, dest, value);
         }
         else {
-            /* XXX - Need a better way to set FALSE */
-            VTABLE_set_integer_native(INTERP, dest, 0);
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_bool(INTERP, dest, 0);
         }
+        return dest;
     }
 
+    void i_logical_xor (PMC* value) {
+        INTVAL my_bool, value_bool;
+
+        my_bool = DYNSELF.get_bool();
+        value_bool = VTABLE_get_bool(INTERP, value);
+
+        if (my_bool && ! value_bool) {
+            ; /* ok */
+        }
+        else if (value_bool && ! my_bool) {
+            VTABLE_assign_pmc(INTERP, SELF, value);
+        }
+        else {
+            VTABLE_set_bool(INTERP, SELF, 0);
+        }
+    }
 /*
 
 =item C<void logical_not(PMC *dest)>
@@ -1276,9 +1389,7 @@ C<*value>.
 */
 
     void logical_not (PMC* dest) {
-        /* XXX - Need a better way to set boolean state */
-        VTABLE_set_integer_native(INTERP, dest,
-            ! DYNSELF.get_bool());
+        VTABLE_set_bool(INTERP, dest, ! DYNSELF.get_bool());
     }
 
 

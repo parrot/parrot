@@ -128,6 +128,8 @@ Returns a Parrot string representation of the number.
 
 =item C<void set_integer_native(INTVAL value)>
 
+=item C<void set_bool(INTVAL value)>
+
 =cut
 
 */
@@ -135,6 +137,11 @@ Returns a Parrot string representation of the number.
     void set_integer_native (INTVAL value) {
         DYNSELF.morph(enum_class_Integer);
         DYNSELF.set_integer_native(value);
+    }
+
+    void set_bool (INTVAL value) {
+        DYNSELF.morph(enum_class_Boolean);
+        DYNSELF.set_bool(value);
     }
 
 /*

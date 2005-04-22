@@ -406,50 +406,92 @@ value of C<*value> is false.
 
 /*
 
-=item C<void logical_or(PMC *value, PMC *dest)>
+=item C<PMC* logical_or(PMC *value, PMC *dest)>
+
+=item C<void i_logical_or(PMC *value)>
 
 =cut
 
 */
 
-    void logical_or (PMC* value,  PMC* dest) {
-        VTABLE_set_pmc(INTERP, dest, value);
+    PMC* logical_or (PMC* value,  PMC* dest) {
+        if (!dest)
+            return VTABLE_clone(INTERP, value);
+        VTABLE_assign_pmc(INTERP, dest, value);
+        return dest;
+    }
+
+    void i_logical_or (PMC* value) {
+        VTABLE_assign_pmc(INTERP, SELF, value);
+    }
+/*
+
+=item C<PMC* logical_and(PMC *value, PMC *dest)>
+
+=item C<void i_logical_and(PMC *value)>
+
+=cut
+
+*/
+
+    PMC* logical_and (PMC* value,  PMC* dest) {
+        if (!dest)
+            return DYNSELF.clone();
+        VTABLE_assign_pmc(INTERP, dest, SELF);
+        return dest;
+    }
+
+    void i_logical_and (PMC* value) {
     }
 
 /*
 
-=item C<void logical_and(PMC *value, PMC *dest)>
+=item C<PMC* logical_xor(PMC *value, PMC *dest)>
+
+=item C<void i_logical_xor(PMC *value, PMC *dest)>
 
 =cut
 
 */
 
-    void logical_and (PMC* value,  PMC* dest) {
-        VTABLE_set_pmc(INTERP, dest, SELF);
-    }
-
-/*
-
-=item C<void logical_xor(PMC *value, PMC *dest)>
-
-=cut
-
-*/
-
-    void logical_xor (PMC* value,  PMC* dest) {
+    PMC* logical_xor (PMC* value,  PMC* dest) {
 MMD_PerlUndef: {
-            VTABLE_set_integer_native(INTERP, dest, 0);
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            VTABLE_set_bool(INTERP, dest, 0);
+            return dest;
+        }
+MMD_DEFAULT: {
+
+            INTVAL value_bool = VTABLE_get_bool(INTERP, value);
+            if (value_bool) {
+                if (!dest)
+                    return VTABLE_clone(INTERP, value);
+                VTABLE_assign_pmc(INTERP, dest, value);
+                return dest;
+            }
+            else {
+                if (!dest)
+                    dest = pmc_new(INTERP, SELF->vtable->base_type);
+                VTABLE_set_bool(INTERP, dest, 0);
+            }
+            return dest;
+        }
+    }
+
+    void i_logical_xor (PMC* value) {
+MMD_PerlUndef: {
+            VTABLE_set_bool(INTERP, SELF, 0);
         }
 MMD_DEFAULT: {
 
         INTVAL value_bool = VTABLE_get_bool(INTERP, value);
         if (value_bool)
-            VTABLE_set_pmc(INTERP, dest, value);
+            VTABLE_assign_pmc(INTERP, SELF, value);
         else
-            VTABLE_set_integer_native(INTERP, dest, 0);
+            VTABLE_set_bool(INTERP, SELF, 0);
         }
     }
-
 /*
 
 =item C<void logical_not(PMC *dest)>

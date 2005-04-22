@@ -171,6 +171,8 @@ Returns the boolean value of the string.
 
 =item C<VOID set_integer_native(INTVAL value)>
 
+=item C<VOID set_bool(INTVAL value)>
+
 Sets the value of the string to the integer C<value>.
 
 =cut
@@ -178,6 +180,10 @@ Sets the value of the string to the integer C<value>.
 */
 
     void set_integer_native (INTVAL value) {
+        PMC_str_val(SELF) = string_from_int(INTERP, value);
+    }
+
+    void set_bool (INTVAL value) {
         PMC_str_val(SELF) = string_from_int(INTERP, value);
     }
 
@@ -253,21 +259,6 @@ the specified C<PMC>.
 */
     void set_pmc (PMC* value) {
         PMC_str_val(SELF) = VTABLE_get_string(INTERP, value);
-    }
-
-/*
-
-=item C<VOID assign_pmc(PMC* value)>
-
-Sets the value of the string to the string value of
-the specified C<PMC>.
-
-=cut
-
-*/
-    void assign_pmc (PMC* value) {
-        STRING *s = VTABLE_get_string(INTERP, value);
-        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF), s);
     }
 
 /*

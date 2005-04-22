@@ -658,7 +658,7 @@ Returns the string representation of the integer.
 
 /*
 
-=item C<void logical_and(PMC *value, PMC *dest)>
+=item C<PMC* logical_and(PMC *value, PMC *dest)>
 
 Returns in C<*dest> the result of the logical C<AND> of the scalar and
 C<*value>.
@@ -667,12 +667,23 @@ C<*value>.
 
 */
 
-    void logical_and (PMC* value,  PMC* dest) {
+    PMC* logical_and (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
+            if (!dest)
+                dest = pmc_new(INTERP, value->vtable->base_type);
             VTABLE_set_pmc(INTERP, dest, value);
         }
         else {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_pmc(INTERP, dest, SELF);
+        }
+        return dest;
+    }
+
+    void i_logical_and (PMC* value) {
+        if (DYNSELF.get_bool()) {
+            VTABLE_set_pmc(INTERP, SELF, value);
         }
     }
 
@@ -692,7 +703,7 @@ Returns in C<*dest> the result of the logical not of the scalar.
 
 /*
 
-=item C<void logical_or(PMC *value, PMC *dest)>
+=item C<PMC* logical_or(PMC *value, PMC *dest)>
 
 Returns in C<*dest> the result of the logical C<OR> of the scalar and
 C<*value>.
@@ -701,12 +712,23 @@ C<*value>.
 
 */
 
-    void logical_or (PMC* value,  PMC* dest) {
+    PMC* logical_or (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
+            if (!dest)
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_pmc(INTERP, dest, SELF);
         }
         else {
+            if (!dest)
+                dest = pmc_new(INTERP, value->vtable->base_type);
             VTABLE_set_pmc(INTERP, dest, value);
+        }
+        return dest;
+    }
+
+    void i_logical_or (PMC* value) {
+        if (!DYNSELF.get_bool()) {
+            VTABLE_set_pmc(INTERP, SELF, value);
         }
     }
 

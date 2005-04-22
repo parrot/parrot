@@ -21,25 +21,10 @@ C<PerlInt> extends C<Integer> to provide a Perl integer.
 #include "parrot/parrot.h"
 
 void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
-void Parrot_perlscalar_set_pmc(Interp* , PMC* pmc, PMC* value);
 
 /* TODO extends PerlAny or perlscalar or whatever */
 pmclass PerlInt extends Integer {
 
-/*
-
-=item C<void set_pmc(PMC *value)>
-
-Sets the value of the number to the value in C<*value>.
-
-=cut
-
-*/
-
-
-    void set_pmc (PMC* value) {
-        perlscalar.SELF.set_pmc(value);
-    }
 
 /*
 

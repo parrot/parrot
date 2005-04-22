@@ -9,7 +9,7 @@ classes/perlstring.pmc - Perl String
 =head1 DESCRIPTION
 
 C<PerlString> extends C<String> to provide Perl-specific string behaviour.
-Note that the C<morph> and C<set_pmc> methods come from C<PerlScalar>,
+Note that the C<morph> method comes from C<PerlScalar>,
 not from C<String>.
 
 =head2 Methods
@@ -23,7 +23,6 @@ not from C<String>.
 #include "parrot/parrot.h"
 
 void Parrot_perlscalar_morph(Interp* , PMC* pmc, INTVAL type);
-void Parrot_perlscalar_set_pmc(Interp* , PMC* pmc, PMC* value);
 
 pmclass PerlString extends String {
 
@@ -80,21 +79,6 @@ Morphs the string to a C<PerlNum> and sets its value to C<value>.
     void set_number_native (FLOATVAL value) {
         DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number_native(value);
-    }
-
-
-/*
-
-=item C<void set_pmc(PMC *value)>
-
-Sets the value of the PMC to the value in C<*value>.
-
-=cut
-
-*/
-
-    void set_pmc (PMC* value) {
-        perlscalar.SELF.set_pmc(value);
     }
 
 /*

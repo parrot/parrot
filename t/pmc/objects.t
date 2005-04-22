@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 60;
+use Parrot::Test tests => 61;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1911,4 +1911,33 @@ output_is(<<'CODE', <<'OUTPUT', "multpile anon classes - #33103");
      end
 CODE
 ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "subclassed Integer bug");
+.sub _main @MAIN
+   .local pmc class
+   .local pmc a
+   .local pmc b
+
+    subclass class, "Integer", "LispInteger"
+
+    a = new "LispInteger"
+    b = new "LispInteger"
+
+    a = 1
+    b = 1
+
+    print a
+    print " * "
+    print b
+    print " = "
+
+    a = a * b
+
+    print a
+    print "\n"
+   end
+.end
+CODE
+1 * 1 = 1
 OUTPUT

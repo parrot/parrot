@@ -32,7 +32,7 @@ static PMC*
 overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
 {
     PMC *temp;
-    INTVAL a = PMC_int_val(self);
+    INTVAL a = VTABLE_get_integer(interpreter, self);
 
     if (PARROT_ERRORS_test(interpreter,PARROT_ERRORS_OVERFLOW_FLAG)) {
         real_exception(interpreter, NULL, ERR_OVERFLOW,
@@ -54,7 +54,7 @@ static PMC*
 overflow_p(Interp *interpreter, PMC *self, PMC *val, PMC *dest, int mmd)
 {
     PMC *temp;
-    INTVAL a = PMC_int_val(self);
+    INTVAL a = VTABLE_get_integer(interpreter, self);
 
     if (PARROT_ERRORS_test(interpreter,PARROT_ERRORS_OVERFLOW_FLAG)) {
         real_exception(interpreter, NULL, ERR_OVERFLOW,
@@ -246,71 +246,6 @@ Returns the string value of the integer.
         return string_from_int(INTERP, PMC_int_val(SELF));
     }
 
-/*
-
-=item C<void morph(INTVAL type)>
-
-Morphs the scalar to the specified type.
-
-=cut
-
-*/
-
-    void morph (INTVAL type) {
-        if (SELF->vtable->base_type == type)
-            return;
-        if (type == enum_class_String) {
-            /*
-             * if we morph to a string, first clear str_val
-             * so that after changing the vtable a parallel
-             * reader doesn't get a garbage pointer
-             */
-            PMC_str_val(SELF) = NULL;
-            PObj_custom_mark_SET(SELF);
-            SELF->vtable = Parrot_base_vtables[type];
-            return;
-        }
-        if (type == enum_class_BigInt || type == enum_class_Complex) {
-            PMC_str_val(SELF) = NULL;
-            SELF->vtable = Parrot_base_vtables[type];
-            DYNSELF.init();
-            return;
-        }
-        SELF->vtable = Parrot_base_vtables[type];
-    }
-/*
-
-=item C<void assign_pmc(PMC *value)>
-
-Sets the PMC C<*value>, calling the appropriate C<set_*> method
-according to the type of C<*value>.
-
-=cut
-
-*/
-
-    void assign_pmc (PMC* value) {
-        if (SELF == value)
-            return;
-        DYNSELF.morph(value->vtable->base_type);
-        switch (value->vtable->base_type) {
-            case enum_class_Integer:
-                DYNSELF.set_integer_same(value);
-                break;
-            case enum_class_Float:
-                DYNSELF.set_number_same(value);
-                break;
-            case enum_class_String:
-                DYNSELF.set_string_same(value);
-                break;
-            case enum_class_PerlUndef:
-                (void) VTABLE_get_pmc(INTERP, value);
-                break;
-            default:
-                SUPER(value);
-                break;
-        }
-    }
 /*
 
 =item C<void set_integer_same(PMC *value)>
@@ -668,7 +603,7 @@ MMD_DEFAULT: {
     }
 
     PMC* multiply_int (INTVAL b, PMC* dest) {
-        INTVAL a = PMC_int_val(SELF);
+        INTVAL a = DYNSELF.get_integer();
         double cf = (double)a * (double)b;
         INTVAL c = a * b;
         if ((double) c == cf) {
@@ -713,7 +648,7 @@ MMD_DEFAULT: {
     }
 
     void i_multiply_int (INTVAL b) {
-        INTVAL a = PMC_int_val(SELF);
+        INTVAL a = DYNSELF.get_integer();
         double cf = (double)a * (double)b;
         INTVAL c = a * b;
         if ((double) c == cf) {
@@ -1249,20 +1184,6 @@ MMD_DEFAULT: {
                 - VTABLE_get_integer(INTERP, value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }
-    }
-
-/*
-
-=item C<void logical_not(PMC *value)>
-
-Calculates the logical negation of the integer and returns the result in
-C<*value>.
-
-=cut
-
-*/
-    void logical_not (PMC* value) {
-        VTABLE_set_integer_native(INTERP, value, !PMC_int_val(SELF));
     }
 
 /*
