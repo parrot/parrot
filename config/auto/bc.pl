@@ -15,20 +15,21 @@ package Configure::Step;
 
 use strict;
 use vars qw($description @args);
-use Parrot::Configure::Step ':auto';
+use Parrot::Configure::Step ':auto', 'capture_output';
 
-$description = "Determining whether bc is installed...";
+$description = "Determining whether GNU bc is installed...";
 
 @args = qw(verbose);
 
 sub runstep {
-    my $a = `bc -v` || '';
     # This seems to work for GNU bc 1.06
-    my $has_bc = ($a =~ m/^bc /) ? 1 : 0;
+    my $a = capture_output( 'bc', '-v' ) || '';
+    my $has_gnu_bc = ( $a =~ m/^bc / &&
+                       $a =~ m/Free Software Foundation/ ) ? 1 : 0;
 
-    Configure::Data->set(has_bc => $has_bc);
+    Configure::Data->set(has_gnu_bc => $has_gnu_bc);
 
-    $Configure::Step::result = $has_bc ? 'yes' : 'no';
+    $Configure::Step::result = $has_gnu_bc ? 'yes' : 'no';
 }
 
 1;
