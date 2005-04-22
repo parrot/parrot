@@ -80,7 +80,7 @@ Returns the absolute value of C<self>.
 
 Adds C<*value> to C<self> and returns the result.
 
-TODO: install this method directly as ans alias to the existing
+TODO: install this method directly as an alias to the existing
 NCI method. This can be done for all similar methods.
 
 Additional note: get rid of the extra self argument. SELF is already there.
