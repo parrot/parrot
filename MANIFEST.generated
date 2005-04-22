@@ -1,4 +1,8 @@
 parrot                                            [main]bin
+pdump                                             [main]bin
+pdb                                               [main]bin
+pbc_info                                          [main]bin
+disassemble                                       [main]bin
 blib/lib/libparrot.a                              [devel]lib
 runtime/parrot/library/Data/Dumper/Base.pbc       [main]
 runtime/parrot/library/Data/Dumper/Default.pbc    [main]
@@ -7,7 +11,6 @@ runtime/parrot/library/Data/Escape.pbc            [main]
 runtime/parrot/library/Data/Sort.pbc              [main]
 runtime/parrot/library/Getopt/Long.pbc            [main]
 runtime/parrot/library/Stream/Base.pbc            [main]
-runtime/parrot/library/Stream/Buffer.pbc          [main]
 runtime/parrot/library/Stream/Combiner.pbc        [main]
 runtime/parrot/library/Stream/Coroutine.pbc       [main]
 runtime/parrot/library/Stream/Filter.pbc          [main]
@@ -45,5 +48,3 @@ runtime/parrot/include/timer.pasm                 [main]
 runtime/parrot/include/tm.pasm                    [main]
 runtime/parrot/include/vtable_methods.pasm        [main]
 runtime/parrot/include/warnings.pasm              [main]
-blib/lib/icu/2.6.1/icudt26l.dat                   [main]
-blib/lib/icu/2.6.1/icudt26b.dat                   [main]
