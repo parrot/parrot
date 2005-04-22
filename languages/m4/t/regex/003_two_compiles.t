@@ -7,19 +7,29 @@ use Parrot::Test tests => 3;
 {
   my $pir = << 'END_PIR';
 .include "library/pcre.imc"
-.sub _main 
-  print	"\n"
-  .local pmc lib
-  .PCRE_INIT(lib)
-  .local string error
-  .local int errptr
-  .local string pat
 
-  .local pmc regex
-  pat = 'as'
-  .PCRE_COMPILE(pat, 0, regex, error, errptr)
-  $I0 = defined regex
-  unless $I0 goto match_err
+.sub test @MAIN
+    .local pmc pcre_lib
+    .local pmc init_func
+    init_func    = find_global 'PCRE', 'init'
+    .local pmc compile_func
+    compile_func = find_global 'PCRE', 'compile'
+    .local pmc match_func
+    match_func= find_global 'PCRE', 'match'
+    .local pmc dollar_func
+    dollar_func = find_global 'PCRE', 'dollar'
+
+    print	"\n"
+    pcre_lib = init_func()
+
+    .local string error
+    .local int errptr
+    .local string pat
+    .local pmc regex
+    pat = 'as'
+    ( regex, error, errptr )= compile_func( pat, 0 )
+    $I0 = defined regex
+    unless $I0 goto match_err
 
   .local pmc regex_2
   #pat = 'df'
@@ -27,36 +37,35 @@ use Parrot::Test tests => 3;
   #$I0 = defined regex_2
   #unless $I0 goto match_err
 
-  .local int ok
-  .local pmc result
-  .local string s
-  s = "asdf"
-  .PCRE_MATCH(regex, s, 0, 0, ok, result)
-  if ok < 0 goto nomatch
-  print ok
-  print " match(es):\n"
-  .local int i
-  i = 0
-  .local string match
-  .local string s
+    .local int ok
+    .local pmc result
+    .local string s
+    s = "asdf"
+    ( ok, result )= match_func( regex, s, 0, 0 )
+    if ok < 0 goto nomatch
+    print ok
+    print " match(es):\n"
+    .local int i
+    i = 0
+    .local string match
+    .local string s
 lp: .PCRE_DOLLAR(s, ok, result, i, match)
-  print match
-  print "\n"
-  inc i
-  if i < ok goto lp
-  end
+    print match
+    print "\n"
+    inc i
+    if i < ok goto lp
+    end
 nomatch:
-  print "no match\n"
-  end
+    print "no match\n"
+    end
 match_err:
-  print "error in regex: "
-  print "at: '"
-  length $I0, pat
-  $I0 = $I0 - errptr
-  substr $S0, pat, errptr, $I0
-  print $S0
-  print "'\n"
-  exit 1
+    print "error in regex: "
+    print "at: '"
+    length $I0, pat
+    $I0 = $I0 - errptr
+    substr $S0, pat, errptr, $I0
+    print $S0
+    print "'\n"
 .end
 END_PIR
 
@@ -68,7 +77,7 @@ OUTPUT
 }
 {
   my $pir = << 'END_PIR';
-.sub _main 
+.sub test @MAIN 
 
   # Loading shared lib
   .local pmc pcre_lib
@@ -187,7 +196,7 @@ OUTPUT
 # Macros for accessing libpcre
 .include "library/pcre.imc"
 
-.sub _main 
+.sub test @MAIN 
 
   # Loading shared lib
   .local pmc pcre_lib
@@ -292,7 +301,7 @@ if ( 0 )
 {
   my $pir = << 'END_PIR';
 .include "library/pcre.imc"
-.sub _main prototyped
+.sub test @MAIN 
   print	"\n"
   .local pmc lib
   .PCRE_INIT(lib)
@@ -357,7 +366,7 @@ if ( 0 )
 {
   my $pir = << 'END_PIR';
 .include "library/pcre.imc"
-.sub _main prototyped
+.sub test @MAIN
   print	"\n"
   .local pmc lib
   .PCRE_INIT(lib)

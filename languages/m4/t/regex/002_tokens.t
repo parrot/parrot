@@ -8,64 +8,76 @@ use Parrot::Test::PGE;
 #p6rule_is  ($str, '^abc', 'BOS abc');
 #p6rule_isnt($str, '^bc', 'BOS bc');
 #p6rule_like('zzzabcdefzzz', '(a.)..(..)', qr/1: <ab @ 3>/, 'basic $1');
-# Assemble PIR for simple pattern matching
+
+
+# Assemble PIR for simple pattern matching with PCRE
 sub get_pir_pcre
 {
   my ( $string, $token ) = @_;
 
   my %regex = ( name     => q{[_a-zA-Z][_a-zA-Z0-9]*},
-                quoted   => q{^`[^`]*'},
-              );
+                quoted   => q{^`[^`]*'} );
   return q{
 .include "library/pcre.imc"
-.sub _main
-  print	"\n"
-  .local pmc lib
-  .PCRE_INIT(lib)
-  .local string error
-  .local int errptr
-  .local pmc code
-  .local string pat
-  pat = "} . $regex{$token} . q{"
-  .PCRE_COMPILE(pat, 0, code, error, errptr)
-  $I0 = defined code
-  unless $I0 goto match_err
 
-  .local int ok
-  .local pmc result
-  .local string s
-  s = "} . $string . q{"
-  .PCRE_MATCH(code, s, 0, 0, ok, result)
-  if ok < 0 goto nomatch
-  print ok
-  print " match(es):\n"
-  .local int i
-  i = 0
-  .local string match
-  .local string s
-lp: .PCRE_DOLLAR(s, ok, result, i, match)
-  print match
-  print "\n"
-  inc i
-  if i < ok goto lp
-  end
+.sub test @MAIN
+    .local pmc pcre_lib
+    .local pmc init_func
+    init_func    = find_global 'PCRE', 'init'
+    .local pmc compile_func
+    compile_func = find_global 'PCRE', 'compile'
+    .local pmc match_func
+    match_func= find_global 'PCRE', 'match'
+    .local pmc dollar_func
+    dollar_func = find_global 'PCRE', 'dollar'
+
+    print	"\n"
+    pcre_lib = init_func()
+
+    .local string error
+    .local int errptr
+    .local pmc regex
+    .local string pat
+    pat = "} . $regex{$token} . q{"
+    ( regex, error, errptr )= compile_func( pat, 0 )
+    $I0 = defined regex
+    unless $I0 goto match_err
+
+    .local int ok
+    .local pmc result
+    .local string s
+    s = "} . $string . q{"
+    ( ok, result )= match_func( regex, s, 0, 0 )
+    if ok < 0 goto nomatch
+    print ok
+    print " match(es):\n"
+    .local int i
+    i = 0
+    .local string match
+    .local string s
+lp: match = dollar_func( s, ok, result, i )
+    print match
+    print "\n"
+    inc i
+    if i < ok goto lp
+    end
 nomatch:
-  print "no match\n"
-  end
+    print "no match\n"
+    end
 match_err:
-  print "error in regex: "
-  print "at: '"
-  length $I0, pat
-  $I0 = $I0 - errptr
-  substr $S0, pat, errptr, $I0
-  print $S0
-  print "'\n"
-  exit 1
+    print "error in regex: "
+    print "at: '"
+    length $I0, pat
+    $I0 = $I0 - errptr
+    substr $S0, pat, errptr, $I0
+    print $S0
+    print "'\n"
 .end
   }
 }
 
-# Assemble PIR for simple pattern matching
+# Assemble PIR for simple pattern matching with PGE
+# This is not used yet
 sub get_pir_pge
 {
   my ( $string, $token ) = @_;
@@ -118,18 +130,18 @@ match_fail:
   .PCRE_INIT(lib)
   .local string error
   .local int errptr
-  .local pmc code
+  .local pmc regex
   .local string pat
   pat = "$regex{$token}"
-  .PCRE_COMPILE(pat, 0, code, error, errptr)
-  \$I0 = defined code
+  .PCRE_COMPILE(pat, 0, regex, error, errptr)
+  \$I0 = defined regex
   unless \$I0 goto match_err
 
   .local int ok
   .local pmc result
   .local string s
   s = "$string"
-  .PCRE_MATCH(code, s, 0, 0, ok, result)
+  .PCRE_MATCH(regex, s, 0, 0, ok, result)
   if ok < 0 goto nomatch
   print ok
   print " match(es):\\n"
@@ -154,7 +166,6 @@ match_err:
   substr \$S0, pat, errptr, \$I0
   print \$S0
   print "'\\n"
-  exit 1
 .end
 END_PIR
 }
@@ -224,7 +235,7 @@ my %regex = ( word          => q{^(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w
   foreach my $target ( q{`quoted'}, q{`'} )
   {
     my $code = get_pir_pge( $target, 'quoted_string' );
-  pir_output_is( $code, << "OUTPUT", "'$target' is a quoted string" );
+    pir_output_is( $code, << "OUTPUT", "'$target' is a quoted string" );
 
 1 match(es):
 $target
