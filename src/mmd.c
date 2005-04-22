@@ -244,6 +244,7 @@ mmd_dispatch_v_ppp(Interp *interpreter,
     real_function = (mmd_f_v_ppp)get_mmd_dispatcher(interpreter,
             left, right, function, &is_pmc);
 
+    printf("************* unused\n");
     if (is_pmc) {
         sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interpreter, sub, "vPPP",
@@ -263,6 +264,7 @@ mmd_dispatch_v_pip(Interp *interpreter,
     int is_pmc;
     UINTVAL left_type;
 
+    printf("************* unused\n");
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_pip)get_mmd_dispatch_type(interpreter,
             function, left_type, enum_type_INTVAL, &is_pmc);
@@ -285,6 +287,7 @@ mmd_dispatch_v_pnp(Interp *interpreter,
     int is_pmc;
     UINTVAL left_type;
 
+    printf("************* unused\n");
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_pnp)get_mmd_dispatch_type(interpreter,
             function, left_type, enum_type_FLOATVAL, &is_pmc);
@@ -307,6 +310,7 @@ mmd_dispatch_v_psp(Interp *interpreter,
     int is_pmc;
     UINTVAL left_type;
 
+    printf("************* unused\n");
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_psp)get_mmd_dispatch_type(interpreter,
             function, left_type, enum_type_STRING, &is_pmc);

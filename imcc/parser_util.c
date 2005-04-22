@@ -369,7 +369,9 @@ is_infix(char *name, int n, SymReg **r)
 {
     if (n < 2 || r[0]->set != 'P')
         return -1;
-
+    /* TODO use a generic Parrot interface function,
+     *      which handles user infix extensions too
+     */
     if (strcmp(name, "add") == 0)
         return MMD_ADD;
     if (strcmp(name, "sub") == 0)
@@ -406,6 +408,11 @@ is_infix(char *name, int n, SymReg **r)
         return MMD_BSR;
     if (strcmp(name, "lsr") == 0)
         return MMD_LSR;
+
+    if (strcmp(name, "concat") == 0)
+        return MMD_CONCAT;
+    if (strcmp(name, "repeat") == 0)
+        return MMD_REPEAT;
 
     if (strcmp(name, "or") == 0)
         return MMD_LOR;

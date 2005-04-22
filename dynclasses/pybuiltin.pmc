@@ -453,12 +453,11 @@ Returns both the floordiv and mod of C<*value1> with C<*value2>).
         ret = pmc_new(INTERP, PyBuiltin_PyTuple);
         VTABLE_set_integer_native(INTERP, ret, 2);
 
-        temp = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, value1, value2, temp, MMD_FLOOR_DIVIDE);
+        temp = mmd_dispatch_p_ppp(INTERP, value1, value2, NULL,
+                MMD_FLOOR_DIVIDE);
         VTABLE_set_pmc_keyed_int(INTERP, ret, 0, temp);
 
-        temp = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, value1, value2, temp, MMD_MOD);
+        temp = mmd_dispatch_p_ppp(INTERP, value1, value2, NULL, MMD_MOD);
         VTABLE_set_pmc_keyed_int(INTERP, ret, 1, temp);
         return ret;
     }

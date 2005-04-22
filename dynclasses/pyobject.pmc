@@ -80,14 +80,18 @@ Returns the absolute value of C<self>.
 
 Adds C<*value> to C<self> and returns the result.
 
+TODO: install this method directly as ans alias to the existing
+NCI method. This can be done for all similar methods.
+
+Additional note: get rid of the extra self argument. SELF is already there.
+MMD infix functions are not methods (no "P2" object is used in the signature).
+
 =cut
 
 */
 
     METHOD PMC* __add__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_ADD);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_ADD);
     }
 
 /*
@@ -101,9 +105,7 @@ Returns the result of the logical C<AND> of C<self> and C<*value>.
 */
 
     METHOD PMC* __and__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BAND);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_BAND);
     }
 
 /*
@@ -148,9 +150,7 @@ Divides C<self> by C<*value> and returns the result.
 */
 
     METHOD PMC* __div__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_DIVIDE);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_DIVIDE);
     }
 
 /*
@@ -164,9 +164,7 @@ Divides C<self> by C<*value> and returns the remainder.
 */
 
     METHOD PMC* __divmod__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_MOD);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_MOD);
     }
 
 /*
@@ -197,9 +195,7 @@ Floor divides C<self> by C<*value> and returns the result.
 */
 
     METHOD PMC* __floordiv__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_DIVIDE);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_FLOOR_DIVIDE);
     }
 
 /*
@@ -264,9 +260,7 @@ returns the result.
 */
 
     METHOD PMC* __lshift__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BSL);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_BSL);
     }
 
 /*
@@ -280,9 +274,7 @@ Return the modulus of C<self> with C<*value>.
 */
 
     METHOD PMC* __mod__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_MOD);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_MOD);
     }
 
 /*
@@ -296,9 +288,7 @@ Return the value of C<self> multiplied by C<*value>.
 */
 
     METHOD PMC* __mul__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_MULTIPLY);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_MULTIPLY);
     }
 
 /*
@@ -345,9 +335,7 @@ Returns the result of the logical C<OR> of C<self> and C<*value>.
 */
 
     METHOD PMC* __or__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BOR);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_BOR);
     }
 
 /*
@@ -361,9 +349,7 @@ Raise the number to the specified power and return the result.
 */
 
     METHOD PMC* __pow__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_POW);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_POW);
     }
 
 /*
@@ -537,9 +523,7 @@ returns the result.
 */
 
     METHOD PMC* __rshift__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BSR);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_BSR);
     }
 
 /*
@@ -598,9 +582,7 @@ Subtracts C<*value> from C<self> and returns the result.
 */
 
     METHOD PMC* __sub__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_SUBTRACT);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_SUBTRACT);
     }
 
 /*
@@ -614,9 +596,7 @@ Returns the result of the bitwise C<XOR> of C<self> and C<*value>.
 */
 
     METHOD PMC* __xor__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
-        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BXOR);
-        return ret;
+        return mmd_dispatch_p_ppp(INTERP, self, value, NULL, MMD_BXOR);
     }
 
 /*

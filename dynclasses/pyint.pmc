@@ -21,34 +21,6 @@ C<PyInt> extends C<PyObject> to provide a Python integer.
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 
-static void
-overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
-{
-    PMC *temp;
-    INTVAL a = PMC_int_val(self);
-
-    if (self == dest) {
-        VTABLE_morph(interpreter, self, PyBuiltin_PyLong);
-        VTABLE_set_integer_native(interpreter, self, a);
-        mmd_dispatch_v_pip(interpreter, self, b, dest, mmd);
-    }
-    else {
-        temp = pmc_new(interpreter, PyBuiltin_PyLong);
-        VTABLE_set_integer_native(interpreter, temp, a);
-        mmd_dispatch_v_pip(interpreter, temp, b, dest, mmd);
-    }
-}
-
-static void
-promote(Interp *interpreter, PMC *self, PMC *b, PMC *dest, int mmd)
-{
-    PMC *temp;
-    INTVAL a = PMC_int_val(self);
-    temp = pmc_new(interpreter, PyBuiltin_PyLong);
-    VTABLE_set_integer_native(interpreter, temp, a);
-    mmd_dispatch_v_ppp(interpreter, temp, b, dest, mmd);
-}
-
 pmclass PyInt extends PyObject extends Integer dynpmc group python_group {
 
     void class_init() {
@@ -372,7 +344,7 @@ Create a new integer
                 VTABLE_morph(INTERP, ret, PyBuiltin_PyLong);
                 VTABLE_set_string_keyed_int(INTERP, ret, key,
                     VTABLE_get_string(INTERP, source));
-                mmd_dispatch_v_pip(INTERP, ret, 1, ret, MMD_DIVIDE);
+                mmd_dispatch_p_pip(INTERP, ret, 1, ret, MMD_DIVIDE);
             }
             else {
                 INTVAL ivalue = VTABLE_get_integer(INTERP, source);
