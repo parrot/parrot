@@ -23,7 +23,7 @@ V: 0.0.11
 N: bc
 A: Bernhard Schmalhofer
 D: Needs antlr and Python
-S: Not working
+S: Not working and not yet in Parrot SVN
 M: Yes
 V: 0.1.2
 
@@ -45,6 +45,13 @@ D: operators planned.
 S: Functioning, all samples working, lacks IO routines
 M: Yes
 V: 0.0.11
+
+N: Common Lisp
+A: Cory Spencer
+D: a significant subset of the Common Lisp language
+D: See http://www.sprocket.org/pcl/
+M: Yes
+V: o.1.2
 
 N: forth
 A: Dan Sugalski
@@ -127,6 +134,8 @@ S: Working but fairly minimal
 M: Yes
 
 N: Ruby
+D: See http://rubyforge.org/projects/cardinal/
+M: Last update was in August 2004
 
 N: Span
 A: Matt Kennedy
