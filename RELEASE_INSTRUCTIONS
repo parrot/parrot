@@ -79,7 +79,7 @@ release so that such mistakes don't happen again.
 
 --------------
 
-Appendix [1] parrot repository layout as of end of Apr 2004:
+Appendix [1] parrot repository layout as of end of Apr 2005:
 
 $ svn ls $SVNPARROT
 branches/
