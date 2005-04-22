@@ -563,7 +563,7 @@ Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
     info->file = "(unknown file)";
     info->line = -1;
     info->pc = -1;
-        
+
     /* is the current sub of the specified context valid? */
     if (PMC_IS_NULL(ctx->current_sub)) {
 	info->subname = string_from_cstring(interpreter, "???", 3);
@@ -591,14 +591,14 @@ Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
 
     /* set the sub name */
     info->subname = sub->name;
-    
+
     /* set the namespace name and fullname of the sub */
     if (PMC_IS_NULL(sub->name_space)) {
 	info->nsname = string_from_cstring(interpreter, "", 0);
 	info->fullname = info->subname;
     } else {
 	info->nsname = VTABLE_get_string(interpreter, sub->name_space);
-	info->fullname = string_concat(interpreter, info->nsname, 
+	info->fullname = string_concat(interpreter, info->nsname,
 		string_from_cstring(interpreter, " :: ", 4), 0);
 	info->fullname = string_concat(interpreter, info->fullname,
 		info->subname, 1);
@@ -624,6 +624,8 @@ Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
 	info->file = debug->filename;
 	for (i = n = 0; n < interpreter->code->cur_cs->base.size; i++) {
 	    op_info_t *op_info = &interpreter->op_info_table[*pc];
+            if (i >= debug->base.size)
+                return 0;
 	    if (n >= offs) {
 		/* set source line */
 		info->line = debug->base.data[i];
@@ -632,7 +634,7 @@ Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
 	    n += op_info->arg_count;
 	    pc += op_info->arg_count;
 	}
-    }    
+    }
     return 1;
 }
 
