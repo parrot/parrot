@@ -1,12 +1,10 @@
 # $Id$
 # [MAIN] #default section name
 
-# if there are native MMD variants be sure that:
-#   n   := PMC
-#   n+1 := _INT or _STR
-#   n+2 := _FLOAT
 # MMD_EQ ... MMD_STRCMP must be in one block
 # see src/mmd.c
+
+# INPLACE MMD variant must always be normal op + 1
 
 void init()
 # init must be first for JITed vtable meths
@@ -279,11 +277,12 @@ INTVAL cmp_num(PMC* value)                   MMD_NUMCMP
 INTVAL cmp_string(PMC* value)                MMD_STRCMP
 
 PMC* logical_or(PMC* value, PMC* dest)       MMD_LOR
-PMC* logical_and(PMC* value, PMC* dest)      MMD_LAND
-PMC* logical_xor(PMC* value, PMC* dest)      MMD_LXOR
-
 void i_logical_or(PMC* value)                MMD_I_LOR
+
+PMC* logical_and(PMC* value, PMC* dest)      MMD_LAND
 void i_logical_and(PMC* value)               MMD_I_LAND
+
+PMC* logical_xor(PMC* value, PMC* dest)      MMD_LXOR
 void i_logical_xor(PMC* value)               MMD_I_LXOR
 
 void logical_not(PMC* dest)

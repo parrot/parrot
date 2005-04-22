@@ -697,11 +697,6 @@ inline op and(out INT, in INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op and(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_LAND);
-  goto NEXT();
-}
-
 ########################################
 
 =item B<not>(out INT, in INT)
@@ -737,11 +732,6 @@ inline op or(out INT, in INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op or(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_LOR);
-  goto NEXT();
-}
-
 ########################################
 
 =item B<xor>(out INT, in INT, in INT)
@@ -755,11 +745,6 @@ returns $3 if it's true and $2 isn't, else returns false.
 
 inline op xor(out INT, in INT, in INT) :base_core {
   $1 = ($2 && ! $3) ? $2 : ($3 && ! $2) ? $3 : 0;
-  goto NEXT();
-}
-
-inline op xor(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_LXOR);
   goto NEXT();
 }
 

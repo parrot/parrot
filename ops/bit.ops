@@ -44,28 +44,8 @@ inline op band(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op band(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BAND);
-  goto NEXT();
-}
-
-inline op band(in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BAND);
-  goto NEXT();
-}
-
 inline op band(out INT, in INT, in INT) :base_core {
   $1 = $2 & $3;
-  goto NEXT();
-}
-
-inline op band(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BAND);
-  goto NEXT();
-}
-
-inline op band(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BAND);
   goto NEXT();
 }
 
@@ -92,28 +72,8 @@ inline op bands(inout STR, in STR) :base_core {
   goto NEXT();
 }
 
-inline op bands(in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $1, $2, $1, MMD_SAND);
-  goto NEXT();
-}
-
-inline op bands(in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_SAND);
-  goto NEXT();
-}
-
 inline op bands(out STR, in STR, in STR) :base_core {
   $1 = string_bitwise_and(interpreter, $2, $3, NULL);
-  goto NEXT();
-}
-
-inline op bands(in PMC, in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $2, $3, $1, MMD_SAND);
-  goto NEXT();
-}
-
-inline op bands(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_SAND);
   goto NEXT();
 }
 
@@ -180,28 +140,8 @@ inline op bor(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op bor(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BOR);
-  goto NEXT();
-}
-
-inline op bor(in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BOR);
-  goto NEXT();
-}
-
 inline op bor(out INT, in INT, in INT) :base_core {
   $1 = $2 | $3;
-  goto NEXT();
-}
-
-inline op bor(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BOR);
-  goto NEXT();
-}
-
-inline op bor(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BOR);
   goto NEXT();
 }
 
@@ -228,30 +168,11 @@ inline op bors(inout STR, in STR) :base_core {
   goto NEXT();
 }
 
-inline op bors(in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $1, $2, $1, MMD_SOR);
-  goto NEXT();
-}
-
-inline op bors(in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_SOR);
-  goto NEXT();
-}
-
 inline op bors(out STR, in STR, in STR) :base_core {
   $1 = string_bitwise_or(interpreter, $2, $3, NULL);
   goto NEXT();
 }
 
-inline op bors(in PMC, in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $2, $3, $1, MMD_SOR);
-  goto NEXT();
-}
-
-inline op bors(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_SOR);
-  goto NEXT();
-}
 ########################################
 
 =item B<shl>(inout INT, in INT)
@@ -277,28 +198,8 @@ inline op shl(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op shl(in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BSL);
-  goto NEXT();
-}
-
-inline op shl(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BSL);
-  goto NEXT();
-}
-
 inline op shl(out INT, in INT, in INT) :base_core {
   $1 = $2 << $3;
-  goto NEXT();
-}
-
-inline op shl(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BSL);
-  goto NEXT();
-}
-
-inline op shl(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BSL);
   goto NEXT();
 }
 
@@ -327,28 +228,8 @@ inline op shr(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op shr(in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BSR);
-  goto NEXT();
-}
-
-inline op shr(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BSR);
-  goto NEXT();
-}
-
 inline op shr(out INT, in INT, in INT) :base_core {
   $1 = $2 >> $3;
-  goto NEXT();
-}
-
-inline op shr(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BSR);
-  goto NEXT();
-}
-
-inline op shr(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BSR);
   goto NEXT();
 }
 
@@ -407,28 +288,8 @@ inline op bxor(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op bxor(in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BXOR);
-  goto NEXT();
-}
-
-inline op bxor(in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BXOR);
-  goto NEXT();
-}
-
 inline op bxor(out INT, in INT, in INT) :base_core {
   $1 = $2 ^ $3;
-  goto NEXT();
-}
-
-inline op bxor(in PMC, in PMC, in INT) :base_core {
-  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BXOR);
-  goto NEXT();
-}
-
-inline op bxor(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BXOR);
   goto NEXT();
 }
 
@@ -455,28 +316,8 @@ inline op bxors(inout STR, in STR) :base_core {
   goto NEXT();
 }
 
-inline op bxors(in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $1, $2, $1, MMD_SXOR);
-  goto NEXT();
-}
-
-inline op bxors(in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_SXOR);
-  goto NEXT();
-}
-
 inline op bxors(out STR, in STR, in STR) :base_core {
   $1 = string_bitwise_xor(interpreter, $2, $3, NULL);
-  goto NEXT();
-}
-
-inline op bxors(in PMC, in PMC, in STR) :base_core {
-  mmd_dispatch_v_psp(interpreter, $2, $3, $1, MMD_SXOR);
-  goto NEXT();
-}
-
-inline op bxors(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_SXOR);
   goto NEXT();
 }
 

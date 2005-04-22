@@ -47,11 +47,6 @@ not highest type in table.
 static void mmd_create_builtin_multi_meth_2(Interp *,
         INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr);
 
-typedef void    (*mmd_f_v_ppp)(Interp *, PMC *, PMC *, PMC *);
-typedef void    (*mmd_f_v_pip)(Interp *, PMC *, INTVAL, PMC *);
-typedef void    (*mmd_f_v_pnp)(Interp *, PMC *, FLOATVAL, PMC *);
-typedef void    (*mmd_f_v_psp)(Interp *, PMC *, STRING *, PMC *);
-
 typedef PMC*    (*mmd_f_p_ppp)(Interp *, PMC *, PMC *, PMC *);
 typedef PMC*    (*mmd_f_p_pip)(Interp *, PMC *, INTVAL, PMC *);
 typedef PMC*    (*mmd_f_p_pnp)(Interp *, PMC *, FLOATVAL, PMC *);
@@ -191,137 +186,56 @@ get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC * right,
 
 /*
 
-=item C<void
-mmd_dispatch_v_ppp(Interp *interpreter,
+=item C<PMC*
+mmd_dispatch_p_ppp(Interp *,
 		 PMC *left, PMC *right, PMC *dest, INTVAL function)>
 
-Dispatch to a multimethod that "returns" a PMC. C<left>, C<right>, and
+Dispatch to a multimethod that returns a PMC. C<left>, C<right>, and
 C<dest> are all PMC pointers, while C<func_num> is the MMD table that
 should be used to do the dispatching.
+If the C<dest> pointer is NULL, it dispatches two a two-argument function
+that returns a new C<dest> always.
 
 The MMD system will figure out which function should be called based on
 the types of C<left> and C<right> and call it, passing in C<left>,
-C<right>, and C<dest> like any other binary vtable function.
+C<right>, and possibly C<dest> like any other binary vtable function.
 
-This function has a C<void> return type, like all the "take two PMCs,
-return a PMC" vtable functions do.
-
-=item C<void
-mmd_dispatch_v_pip(Interp *interpreter,
+=item C<PMC*
+mmd_dispatch_p_pip(Interp *,
 		 PMC *left, INTVAL right, PMC *dest, INTVAL function)>
 
 Like above, right argument is a native INTVAL.
 
-=item C<void
-mmd_dispatch_v_pnp(Interp *interpreter,
+=item C<PMC*
+mmd_dispatch_p_pnp(Interp *,
 		 PMC *left, FLOATVAL right, PMC *dest, INTVAL function)>
 
 Like above, right argument is a native FLOATVAL.
 
-=item C<void
-mmd_dispatch_v_psp(Interp *interpreter,
+=item C<PMC*
+mmd_dispatch_p_psp(Interp *,
 		 PMC *left, STRING *right, PMC *dest, INTVAL function)>
 
 Like above, right argument is a native STRING *.
 
 =cut
 
+=item C<void
+mmd_dispatch_v_pp(Interp *, PMC *left, PMC *right, INTVAL function)>
+
+=item C<void
+mmd_dispatch_v_pi(Interp *, PMC *left, INTVAL right, INTVAL function)>
+
+=item C<void
+mmd_dispatch_v_pn(Interp *, PMC *left, FLOATVAL right, INTVAL function)>
+
+=item C<void
+mmd_dispatch_v_ps(Interp *, PMC *left, STRING *right, INTVAL function)>
+
+Inplace dispatch functions for C<< left <op=> right >>.
+
 */
 
-void
-mmd_dispatch_v_ppp(Interp *interpreter,
-		 PMC *left, PMC *right, PMC *dest, INTVAL function)
-{
-    mmd_f_v_ppp real_function;
-    PMC *sub;
-    int is_pmc;
-
-    real_function = (mmd_f_v_ppp)get_mmd_dispatcher(interpreter,
-            left, right, function, &is_pmc);
-
-    printf("************* unused\n");
-    if (is_pmc) {
-        sub = (PMC*)real_function;
-        Parrot_runops_fromc_args(interpreter, sub, "vPPP",
-                left, right, dest);
-    }
-    else {
-        (*real_function)(interpreter, left, right, dest);
-    }
-}
-
-void
-mmd_dispatch_v_pip(Interp *interpreter,
-		 PMC *left, INTVAL right, PMC *dest, INTVAL function)
-{
-    mmd_f_v_pip real_function;
-    PMC *sub;
-    int is_pmc;
-    UINTVAL left_type;
-
-    printf("************* unused\n");
-    left_type = left->vtable->base_type;
-    real_function = (mmd_f_v_pip)get_mmd_dispatch_type(interpreter,
-            function, left_type, enum_type_INTVAL, &is_pmc);
-    if (is_pmc) {
-        sub = (PMC*)real_function;
-        Parrot_runops_fromc_args(interpreter, sub, "vPIP",
-                left, right, dest);
-    }
-    else {
-        (*real_function)(interpreter, left, right, dest);
-    }
-}
-
-void
-mmd_dispatch_v_pnp(Interp *interpreter,
-		 PMC *left, FLOATVAL right, PMC *dest, INTVAL function)
-{
-    mmd_f_v_pnp real_function;
-    PMC *sub;
-    int is_pmc;
-    UINTVAL left_type;
-
-    printf("************* unused\n");
-    left_type = left->vtable->base_type;
-    real_function = (mmd_f_v_pnp)get_mmd_dispatch_type(interpreter,
-            function, left_type, enum_type_FLOATVAL, &is_pmc);
-    if (is_pmc) {
-        sub = (PMC*)real_function;
-        Parrot_runops_fromc_args(interpreter, sub, "vPNP",
-                left, right, dest);
-    }
-    else {
-        (*real_function)(interpreter, left, right, dest);
-    }
-}
-
-void
-mmd_dispatch_v_psp(Interp *interpreter,
-		 PMC *left, STRING *right, PMC *dest, INTVAL function)
-{
-    mmd_f_v_psp real_function;
-    PMC *sub;
-    int is_pmc;
-    UINTVAL left_type;
-
-    printf("************* unused\n");
-    left_type = left->vtable->base_type;
-    real_function = (mmd_f_v_psp)get_mmd_dispatch_type(interpreter,
-            function, left_type, enum_type_STRING, &is_pmc);
-    if (is_pmc) {
-        sub = (PMC*)real_function;
-        Parrot_runops_fromc_args(interpreter, sub, "vPSP",
-                left, right, dest);
-    }
-    else {
-        (*real_function)(interpreter, left, right, dest);
-    }
-}
-
-/*
- * return possible new destination
- */
 PMC*
 mmd_dispatch_p_ppp(Interp *interpreter,
 		 PMC *left, PMC *right, PMC *dest, INTVAL function)
@@ -517,7 +431,8 @@ mmd_dispatch_v_ps(Interp *interpreter,
 mmd_dispatch_i_pp(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)>
 
-Like C<mmd_dispatch_v_ppp()>, only it returns an C<INTVAL>.
+Like C<mmd_dispatch_p_ppp()>, only it returns an C<INTVAL>. This is used
+by MMD compare functions.
 
 =cut
 

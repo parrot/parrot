@@ -13,22 +13,21 @@
 #if !defined(PARROT_MMD_H_GUARD)
 #define PARROT_MMD_H_GUARD
 
-void mmd_dispatch_v_ppp(Parrot_Interp, PMC *, PMC *, PMC *, INTVAL);
-void mmd_dispatch_v_pip(Parrot_Interp, PMC *, INTVAL, PMC *, INTVAL);
-void mmd_dispatch_v_pnp(Parrot_Interp, PMC *, FLOATVAL, PMC *, INTVAL);
-void mmd_dispatch_v_psp(Parrot_Interp, PMC *, STRING *, PMC *, INTVAL);
-
+/* inplace */
 void mmd_dispatch_v_pp(Parrot_Interp, PMC *, PMC *, INTVAL);
 void mmd_dispatch_v_pi(Parrot_Interp, PMC *, INTVAL, INTVAL);
 void mmd_dispatch_v_pn(Parrot_Interp, PMC *, FLOATVAL, INTVAL);
 void mmd_dispatch_v_ps(Parrot_Interp, PMC *, STRING *, INTVAL);
 
+/* return result */
 PMC* mmd_dispatch_p_ppp(Parrot_Interp, PMC *, PMC *, PMC *, INTVAL);
 PMC* mmd_dispatch_p_pip(Parrot_Interp, PMC *, INTVAL, PMC *, INTVAL);
 PMC* mmd_dispatch_p_pnp(Parrot_Interp, PMC *, FLOATVAL, PMC *, INTVAL);
 PMC* mmd_dispatch_p_psp(Parrot_Interp, PMC *, STRING *, PMC *, INTVAL);
 
+/* compare */
 INTVAL mmd_dispatch_i_pp(Parrot_Interp, PMC *, PMC *, INTVAL);
+
 void mmd_add_by_class(Parrot_Interp, INTVAL, STRING *, STRING *, funcptr_t);
 void mmd_register(Parrot_Interp, INTVAL, INTVAL, INTVAL, funcptr_t);
 void mmd_register_sub(Parrot_Interp, INTVAL, INTVAL, INTVAL, PMC*);
