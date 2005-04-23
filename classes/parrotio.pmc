@@ -26,6 +26,15 @@ These are the vtable functions for Parrot IO.
 
 pmclass ParrotIO need_ext {
 
+    METHOD INTVAL say(STRING *s) {
+        PMC *p2  = interpreter->ctx.current_object;
+        PMC *out = p2 == Parrot_base_vtables[enum_class_ParrotIO]->class ?
+            PIO_STDOUT(INTERP) : p2;
+        INTVAL r = PIO_putps(INTERP, out, s);
+        r  += PIO_puts(INTERP, out, "\n");
+        return r;
+    }
+
 /*
 
 =item C<void class_init()>

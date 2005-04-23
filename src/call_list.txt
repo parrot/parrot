@@ -57,6 +57,7 @@ c	v
 d                # t/pmc/nci.t
 d	d
 d	JOd      # Parrot builtins
+I       JOS
 d	v
 I	JI	 # Parrot_is_char_*
 

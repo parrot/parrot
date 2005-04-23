@@ -36,7 +36,9 @@ static Builtins builtins[] = {
     { "index",  "I!SS.I",       "String",       0, 0 },
     { "lower", 	"P!O",	        "String", 	0, 0 },
     { "open", 	"P!S.S",	"ParrotIO", 	0, 0 },
-    { "puts", 	"I!OS",         "ParrotIO", 	0, 0 }
+    { "puts", 	"I!OS",         "ParrotIO", 	0, 0 },
+    { "say", 	"I!S",          "ParrotIO", 	0, 0 },
+    { "say", 	"I!OS",         "ParrotIO", 	0, 0 }
 };
 
 /*
@@ -140,13 +142,25 @@ check_builtin_sig(Interp *interpreter, size_t i, char *sig)
 int
 Parrot_is_builtin(Interp *interpreter, char *func, char *sig)
 {
-    int i;
+    int i, n;
 
     i = find_builtin(interpreter, func);
     if (i < 0)
         return -1;
-    if (sig && !check_builtin_sig(interpreter, i, sig))
-        return -1;
+    if (!sig)
+        return i;
+    n = sizeof(builtins) / sizeof(builtins[0]);
+    while (!check_builtin_sig(interpreter, i, sig)) {
+        if (i < n - 1) {
+            /* try next with same name */
+            ++i;
+            if (strcmp(func, builtins[i].c_name))
+                return -1;
+        }
+        else
+            return -1;
+    }
+
     return i;
 }
 
