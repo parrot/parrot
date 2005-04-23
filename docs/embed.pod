@@ -149,7 +149,7 @@ This flags control the threading behavior. With
 C<PARROT_THR_TYPE_1>, threads runs without sharing variables and
 do not communicate, With C<PARROT_THR_TYPE_2>, threads shares no
 variables and communicate by sending messages. With
-C<PARROT_THR_TYPE_3>, threads share variables See
+C<PARROT_THR_TYPE_3>, threads share variables. See
 F<t/pmc/threads.t> for examples.
 
 =back

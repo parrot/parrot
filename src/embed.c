@@ -54,18 +54,18 @@ extern void Parrot_initialize_core_pmcs(Interp *interp);
 =item C<void Parrot_init(Interp *interpreter)>
 
 Initializes the new interpreter. This function only has effect the first
-time it is called. Use this function, when you intend to enter the run loop,
+time it is called. Use this function when you intend to enter the run loop,
 which automatically sets the top of stack pointer.
 
 =item C<void Parrot_init_stacktop(Interp *interpreter, void *stack_top)>
 
 Like above. Additionally sets the stack top, so that Parrot objects created
 in inner stack frames will be visible during DODs stack walking code.
-B<stack_top> should be the address of an automatic variable in the callers
+B<stack_top> should be the address of an automatic variable in the caller's
 stack frame. All unanchored Parrot objects (PMCs) must live in inner stack
 frames so that they are not destroyed during DOD runs.
 
-Use this function, when you call into Parrot before entering a run loop.
+Use this function when you call into Parrot before entering a run loop.
 
 =cut
 
@@ -98,6 +98,14 @@ Parrot_init_stacktop(Interp *interpreter, void *stack_top)
 =item C<void
 Parrot_set_flag(Interp *interpreter, Parrot_Interp_flag flag)>
 
+Sets a flag in the interpreter specified by C<flag>, any of
+C<PARROT_DEBUG_FLAG>, C<PARROT_TRACE_FLAG>, or C<PARROT_BOUNDS_FLAG>, or
+C<PARROT_PROFILE_FLAG> to enable debugging, tracing, profiling, and bounds
+checking respectively or C<PARROT_THR_TYPE_1>, C<PARROT_THR_TYPE_2>, or
+C<PARROT_THR_TYPE_3> to disable thread communication and variable sharing,
+disable variable sharing but enable thread communication, or to enable variable
+sharing.
+
 =cut
 
 */
@@ -124,6 +132,8 @@ Parrot_set_flag(Interp *interpreter, Parrot_Interp_flag flag)
 =item C<void
 Parrot_clear_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)>
 
+Clears a flag in the interpreter.
+
 =cut
 
 */
@@ -139,7 +149,7 @@ Parrot_clear_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)
 =item C<Parrot_Int
 Parrot_test_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)>
 
-Set, clear or test the interpreter flags specified in C<flag>.
+Set, clear, or test the interpreter flags specified in C<flag>.
 
 =cut
 
@@ -191,7 +201,7 @@ Parrot_setwarnings(Interp *interpreter, Parrot_warnclass wc)
 =item C<struct PackFile *
 Parrot_readbc(Interp *interpreter, const char *filename)>
 
-Read in a bytecode, unpack it into a C<PackFile> structure and do fixups.
+Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
 =cut
 
@@ -436,7 +446,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
 Parrot_setup_opt(Interp *interpreter, int n, char *argv)>
 
 XXX This allows a command line option to be visible from inside the
-Parrot core, this is done using the pointers in the interpreter
+Parrot core. This is done using the pointers in the interpreter
 structure, and the subsystems using this arguments must clear them
 before running.
 
@@ -511,7 +521,7 @@ op_name(Parrot_Interp interpreter, int k)
 =item C<static FLOATVAL
 calibrate(Parrot_Interp interpreter)>
 
-With this calibration reported times of C<parrot -p> match almost these
+With this calibration, reported times of C<parrot -p> almost match those
 measured with time C<parrot -b>.
 
 =cut
@@ -614,7 +624,7 @@ print_profile(int status, void *p)
 
 =item C<static void print_debug(int status, void *p)>
 
-Prints out GC info.
+Prints GC info.
 
 =cut
 
