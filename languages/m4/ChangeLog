@@ -1,6 +1,9 @@
 # $Id$
 
 2005-04-08     Bernhard Schmalhofer
+        * Adapt the PCRE tests to changes in 'library/pcre.imc'
+
+2005-04-08     Bernhard Schmalhofer
         * The packfile functions now take a 'Interp *' as first argument
 
 2005-02-19     Bernhard Schmalhofer

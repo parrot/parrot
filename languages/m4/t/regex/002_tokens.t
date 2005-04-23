@@ -18,10 +18,10 @@ sub get_pir_pcre
   my %regex = ( name     => q{[_a-zA-Z][_a-zA-Z0-9]*},
                 quoted   => q{^`[^`]*'} );
   return q{
-.include "library/pcre.imc"
 
 .sub test @MAIN
-    .local pmc pcre_lib
+    load_bytecode "library/pcre.imc"
+
     .local pmc init_func
     init_func    = find_global 'PCRE', 'init'
     .local pmc compile_func
@@ -30,8 +30,7 @@ sub get_pir_pcre
     match_func= find_global 'PCRE', 'match'
     .local pmc dollar_func
     dollar_func = find_global 'PCRE', 'dollar'
-
-    print	"\n"
+    .local pmc pcre_lib
     pcre_lib = init_func()
 
     .local string error
@@ -121,7 +120,7 @@ match_fail:
     print "match failed\\n"   
     .return()
 .end
-.include "library/pcre.imc"
+load_bytecode "library/pcre.imc"
 .sub _main \@MAIN
   load_bytecode "pge.pir"
   pge( "$string", "$regex{$token}" ) 
@@ -174,7 +173,6 @@ END_PIR
 {
   my $code = get_pir_pcre( 'foo', 'name' );
   pir_output_is( $code, << 'OUTPUT', "'foo' is a name" );
-
 1 match(es):
 foo
 OUTPUT
@@ -182,7 +180,6 @@ OUTPUT
 {
   my $code = get_pir_pcre( '_tmp', 'name' );
   pir_output_is( $code, << 'OUTPUT', "'_tmp' is a name" );
-
 1 match(es):
 _tmp
 OUTPUT
@@ -190,7 +187,6 @@ OUTPUT
 {
   my $code = get_pir_pcre( 'name2', 'name' );
   pir_output_is( $code, << 'OUTPUT', "'name2' is a name" );
-
 1 match(es):
 name2
 OUTPUT
@@ -198,7 +194,6 @@ OUTPUT
 {
   my $code = get_pir_pcre( "`quoted'", 'quoted' );
   pir_output_is( $code, << 'OUTPUT', "'`quoted'' is a quoted string" );
-
 1 match(es):
 `quoted'
 OUTPUT
@@ -206,7 +201,6 @@ OUTPUT
 {
   my $code = get_pir_pcre( "`'", 'quoted' );
   pir_output_is( $code, << 'OUTPUT', "'`'' is a quoted string" );
-
 1 match(es):
 `'
 OUTPUT

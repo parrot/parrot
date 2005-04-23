@@ -1,20 +1,23 @@
+# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 TITLE
 
 pcre.imc - user interface to Perl-Compatible Regular Expression library
 
 =head1 SYNOPSIS
 
-	.include 'library/pcre.imc'
-	lib= pcre_init()
+    load_bytecode 'library/pcre.imc'
+    lib = pcre_init()
 
-	func= find_global 'PCRE', 'compile'
-	( regex, error, errptr )= func( pat, options )
+    func = find_global 'PCRE', 'compile'
+    ( regex, error, errptr )= func( pat, options )
 
-	func= find_global 'PCRE', 'match'
-	( ok, result )= func( regex, string, start, options )
+    func = find_global 'PCRE', 'match'
+    ( ok, result )= func( regex, string, start, options )
 
-	func= find_global 'PCRE', 'dollar'
-	match= func( string, ok, result, i )
+    func = find_global 'PCRE', 'dollar'
+    match = func( string, ok, result, i )
 
 =head1 DESCRIPTION
 
@@ -40,47 +43,47 @@ and is additionally stored as global 'PCRE', 'lib'.
 =cut
 
 .sub init
-	.local pmc libpcre
-	.local pmc pcre_function
-	.local pmc config
-	.local string osname
+    .local pmc libpcre
+    .local pmc pcre_function
+    .local pmc config
+    .local string osname
 
-	config= _config()
-	osname= config['osname']
+    config = _config()
+    osname = config['osname']
 
-	if 'MSWin32' == osname goto LIB_WIN32
+    if 'MSWin32' == osname goto LIB_WIN32
 
 LIB_DEFAULT:
-	loadlib libpcre, 'libpcre'
-	branch LIB_LOADED
+    loadlib libpcre, 'libpcre'
+    branch LIB_LOADED
 
 LIB_WIN32:
-	loadlib libpcre, 'pcre'
+    loadlib libpcre, 'pcre'
 
 LIB_LOADED:
-	store_global 'PCRE', 'lib', libpcre
+    store_global 'PCRE', 'lib', libpcre
 
-	load_bytecode 'library/libpcre.imc'
+    load_bytecode 'library/libpcre.imc'
 
-	# pcre *pcre_compile(const char *pattern, int options,
-	#            const char **errptr, int *erroffset,
-	#            const unsigned char *tableptr
-	dlfunc pcre_function, libpcre, 'pcre_compile', 'ptiB3P'
-	store_global 'PCRE::NCI', 'PCRE_compile', pcre_function
+    # pcre *pcre_compile(const char *pattern, int options,
+    #            const char **errptr, int *erroffset,
+    #            const unsigned char *tableptr
+    dlfunc pcre_function, libpcre, 'pcre_compile', 'ptiB3P'
+    store_global 'PCRE::NCI', 'PCRE_compile', pcre_function
 
     #int pcre_exec(const pcre *code, const pcre_extra *extra,
     #        const char *subject, int length, int startoffset,
     #        int options, int *ovector, int ovecsize);
-	dlfunc pcre_function, libpcre, 'pcre_exec', 'ipPtiiipi'
-	store_global 'PCRE::NCI', 'PCRE_exec', pcre_function
+    dlfunc pcre_function, libpcre, 'pcre_exec', 'ipPtiiipi'
+    store_global 'PCRE::NCI', 'PCRE_exec', pcre_function
 
     #int pcre_copy_substring(const char *subject, int *ovector,
     #        int stringcount, int stringnumber, char *buffer,
     #        int buffersize);
-	dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiibi'
-	store_global 'PCRE::NCI', 'PCRE_copy_substring', pcre_function
+    dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiibi'
+    store_global 'PCRE::NCI', 'PCRE_copy_substring', pcre_function
 
-	.return( libpcre )
+    .return( libpcre )
 .end
 
 
@@ -92,19 +95,19 @@ Returns pmc B<regex>, string B<error> and int B<errptr>.
 =cut
 
 .sub compile prototyped
-	.param string pattern
-	.param int options
-	.local pmc pcre_function
+    .param string pattern
+    .param int options
+    .local pmc pcre_function
 
-	pcre_function= find_global 'PCRE::NCI', 'compile'
+    pcre_function= find_global 'PCRE::NCI', 'compile'
 
-	.local pmc regex
-	.local string error
-	.local int errptr
+    .local pmc regex
+    .local string error
+    .local int errptr
 
-	( regex, error, errptr )= pcre_function( pattern, options )
+    ( regex, error, errptr )= pcre_function( pattern, options )
 
-	.return( regex, error, errptr )
+    .return( regex, error, errptr )
 .end
 
 
@@ -118,20 +121,20 @@ in pmc B<result>.
 =cut
 
 .sub match prototyped
-	.param pmc regex
-	.param string str
-	.param int start
-	.param int options
-	.local pmc pcre_function
+    .param pmc regex
+    .param string str
+    .param int start
+    .param int options
+    .local pmc pcre_function
 
-	pcre_function= find_global 'PCRE::NCI', 'exec'
+    pcre_function= find_global 'PCRE::NCI', 'exec'
 
-	.local int ok
-	.local pmc res
+    .local int ok
+    .local pmc res
 
-	( ok, res )= pcre_function( regex, str, start, options )
+    ( ok, res )= pcre_function( regex, str, start, options )
 
-	.return( ok, res )
+    .return( ok, res )
 .end
 
 
@@ -143,19 +146,19 @@ Returns the match.
 =cut
 
 .sub dollar prototyped
-	.param string str
-	.param int ok
-	.param pmc res
-	.param int n
-	.local pmc pcre_function
+    .param string str
+    .param int ok
+    .param pmc res
+    .param int n
+    .local pmc pcre_function
 
-	pcre_function= find_global 'PCRE::NCI', 'result'
+    pcre_function= find_global 'PCRE::NCI', 'result'
 
-	.local string matched
+    .local string matched
 
-	matched= pcre_function( str, ok, res, n )
+    matched= pcre_function( str, ok, res, n )
 
-	.return( matched )
+    .return( matched )
 .end
 
 

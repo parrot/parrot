@@ -51,8 +51,13 @@ TODO: recognize nested quoted strings
   .local pmc NULL
   NULL = null
 
-  .local pmc pcre_lib
-  pcre_lib = loadlib "libpcre"
+  .local pmc init_func, compile_func, match_func, dollar_func, pcre_lib
+  init_func    = find_global 'PCRE', 'init'
+  compile_func = find_global 'PCRE', 'compile'
+  dollar_func  = find_global 'PCRE', 'dollar'
+  match_func   = find_global 'PCRE', 'match'
+  state['pcre_match_func'] = match_func
+  pcre_lib     = init_func()
 
   .local pmc err_decl
   .local pmc err  

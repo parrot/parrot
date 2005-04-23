@@ -1,3 +1,6 @@
+# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 TITEL
 
 libpcre.imc - NCI interface to Perl-Compatible Regular Expression library
@@ -18,7 +21,7 @@ See 'library/pcre.imc' for details on the user interface.
 
     .local string error
     .local pmc PCRE_NCI_compile
-	.local int error_size
+    .local int error_size
 
     .local pmc NULL
     null NULL
@@ -26,19 +29,19 @@ See 'library/pcre.imc' for details on the user interface.
     .local pmc errptr
     errptr= new PerlInt
 
-	## error message string size
-	error_size= 500
+    ## error message string size
+    error_size= 500
 
-	## allocate space in string for error message
+    ## allocate space in string for error message
     repeat error, " ", error_size
 
-	PCRE_NCI_compile= find_global 'PCRE::NCI', 'PCRE_compile'
+    PCRE_NCI_compile= find_global 'PCRE::NCI', 'PCRE_compile'
 
     .local pmc code
 
-	code= PCRE_NCI_compile( pat, options, error, errptr, NULL )
+    code= PCRE_NCI_compile( pat, options, error, errptr, NULL )
 
-	.local int is_code_defined
+    .local int is_code_defined
     is_code_defined = defined code
     unless is_code_defined goto RETURN
 
@@ -58,33 +61,33 @@ RETURN:
     .local int len
     length len, s
 
-	.local pmc NULL
+    .local pmc NULL
     null NULL
 
-	## osize -- 1/(2/3) * 4 * 2
-	.local int osize
-	osize= 12
+    ## osize -- 1/(2/3) * 4 * 2
+    .local int osize
+    osize= 12
 
-	## number of result pairs
-	.local int num_result_pairs
-	num_result_pairs= 10
+    ## number of result pairs
+    .local int num_result_pairs
+    num_result_pairs= 10
 
-	.local int ovector_length
-	ovector_length= osize * num_result_pairs
+    .local int ovector_length
+    ovector_length= osize * num_result_pairs
 
-	.local pmc ovector
+    .local pmc ovector
     ovector= new ManagedStruct
     ovector= ovector_length
 
-	## on 32 bit systems
+    ## on 32 bit systems
     .local pmc PCRE_NCI_exec
     PCRE_NCI_exec = find_global 'PCRE::NCI', 'PCRE_exec'
 
-	.local int ok
+    .local int ok
 
-	ok= PCRE_NCI_exec( regex, NULL, s, len, start, options, ovector, 10 )
+    ok= PCRE_NCI_exec( regex, NULL, s, len, start, options, ovector, 10 )
 
-	.return( ok, ovector )
+    .return( ok, ovector )
 .end
 
 
@@ -101,11 +104,11 @@ RETURN:
     .local int ovecs
     .local int ovece
 
-	.local pmc struct
+    .local pmc struct
     struct= new SArray
     struct= 3
 
-	.include "datatypes.pasm"
+    .include "datatypes.pasm"
 
     struct[0] = .DATATYPE_INT
     $I0 = ok * 2

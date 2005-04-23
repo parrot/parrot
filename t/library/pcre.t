@@ -8,7 +8,7 @@ t/library/pcre.t - testing library/pcre.imc
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/library/pcre.t
+    % perl -Ilib t/library/pcre.t
 
 =head1 DESCRIPTION
 
@@ -31,71 +31,71 @@ SKIP: {
 ## 1
 pir_output_is( <<'CODE', <<'OUT', 'soup to nuts' );
 
-.include 'library/pcre.imc'
 
 .sub main @MAIN
-	.local pmc func
-	.local pmc lib
+    load_bytecode "library/pcre.imc"
+    .local pmc func
+    .local pmc lib
 
 
-	find_global func, 'PCRE', 'init'
-	isnull func, NOK1
-	branch OK1
+    find_global func, 'PCRE', 'init'
+    isnull func, NOK1
+    branch OK1
 NOK1:
-	print 'not '
+    print 'not '
 OK1:
-	print "ok 1\n"
+    print "ok 1\n"
 
-	lib= func()
-	isnull lib, NOK2
-	branch OK2
+    lib= func()
+    isnull lib, NOK2
+    branch OK2
 NOK2:
-	print 'not '
+    print 'not '
 OK2:
-	print "ok 2\n"
+    print "ok 2\n"
 
 
-	.local string s
-	.local string pat
+    .local string s
+    .local string pat
 
-	s= '--a--'
-	pat= 'a'
+    s= '--a--'
+    pat= 'a'
 
-	.local pmc code
-	.local string error
-	.local int errptr
+    .local pmc code
+    .local string error
+    .local int errptr
 
-	func= find_global 'PCRE', 'compile'
-	( code, error, errptr )= func( pat, 0 )
+    func= find_global 'PCRE', 'compile'
+    ( code, error, errptr )= func( pat, 0 )
 
-	.local int is_code_defined
-	is_code_defined= defined code
-	if is_code_defined goto OK3
-	print 'not '
+    .local int is_code_defined
+    is_code_defined= defined code
+    if is_code_defined goto OK3
+    print 'not '
 OK3:
-	print "ok 3\n"
+    print "ok 3\n"
 
-	.local int ok
-	.local pmc result
+    .local int ok
+    .local pmc result
 
-	func= find_global 'PCRE', 'match'
-	( ok, result )= func( code, s, 0, 0 )
+    func= find_global 'PCRE', 'match'
+    ( ok, result )= func( code, s, 0, 0 )
 
-	unless ok < 0 goto OK4
-	print 'not '
+    unless ok < 0 goto OK4
+    print 'not '
 OK4:
-	print "ok 4\n"
+    print "ok 4\n"
 
     .local int i
     i= 0
     .local string match
 
-	func= find_global 'PCRE', 'dollar'
-	match= func( s, ok, result, i )
-	if 'a' == match goto OK5
-	print 'not '
+    func= find_global 'PCRE', 'dollar'
+    match= func( s, ok, result, i )
+    if 'a' == match goto OK5
+    print 'not '
 OK5:
-	print "ok 5\n"
+    print "ok 5\n"
 
 .end
 CODE

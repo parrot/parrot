@@ -6,10 +6,10 @@ use Parrot::Test tests => 1;
 
 # Test loading of pcre library, Perl compatible regular expressions
 pir_output_is( << 'END_PIR', << 'OUTPUT', "call parrot and do something" );
-.include "library/pcre.imc"
 
 .sub test @MAIN
-    .local pmc pcre_lib
+    load_bytecode "library/pcre.imc"
+
     .local pmc init_func
     init_func    = find_global 'PCRE', 'init'
     .local pmc compile_func
@@ -18,8 +18,7 @@ pir_output_is( << 'END_PIR', << 'OUTPUT', "call parrot and do something" );
     match_func= find_global 'PCRE', 'match'
     .local pmc dollar_func
     dollar_func = find_global 'PCRE', 'dollar'
-
-    print	"\n"
+    .local pmc pcre_lib
     pcre_lib = init_func()
 
     .local string error
@@ -62,7 +61,6 @@ match_err:
     print "'\n"
 .end
 END_PIR
-
 1 match(es):
 asdf
 OUTPUT

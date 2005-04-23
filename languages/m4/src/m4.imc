@@ -52,6 +52,8 @@ Looks at the command line arguments and acts accordingly.
 .sub m4 @MAIN 
   .param pmc argv
 
+  load_bytecode "library/pcre.imc"
+
   # name of the program
   .local string program_name
   program_name = shift argv
