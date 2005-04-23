@@ -33,6 +33,7 @@ typedef struct _builtin {
 
 static Builtins builtins[] = {
     { "cos", 	"P!O", 		"Float", 	0, 0 },
+    { "index",  "I!SS.I",       "String",       0, 0 },
     { "lower", 	"P!O",	        "String", 	0, 0 },
     { "open", 	"P!S.S",	"ParrotIO", 	0, 0 },
     { "puts", 	"I!OS",         "ParrotIO", 	0, 0 }

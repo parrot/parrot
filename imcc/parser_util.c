@@ -297,6 +297,7 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
         sub = ins->r[0];
         IMCC_itcall_sub(interpreter, meth);
         sub->pcc_sub->object = ns_sym;
+        sub->pcc_sub->nci = 1;
         for (i = 1; i < n; ++i) {
             add_pcc_arg(sub, rr[i]);
         }
@@ -309,6 +310,7 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
         sub = ins->r[0];
         IMCC_itcall_sub(interpreter, meth);
         sub->pcc_sub->object = rr[1];
+        sub->pcc_sub->nci = 1;
         for (i = 2; i < n; ++i) {
             add_pcc_arg(sub, rr[i]);
         }

@@ -217,21 +217,35 @@ void
 trace_op_dump(Interp *interpreter, opcode_t *code_start,
               opcode_t *pc)
 {
-    INTVAL i;
+    INTVAL i, s;
     char *escaped;
     int more = 0;
     op_info_t *info = &interpreter->op_info_table[*pc];
 
-    PIO_eprintf(interpreter, "%6vu %s", (UINTVAL)(pc - code_start), info->name);
+    s = 1;
+    PIO_eprintf(interpreter, "%6vu ", (UINTVAL)(pc - code_start));
+    if (strcmp(info->name, "infix") == 0) {
+            PIO_eprintf(interpreter, "%s",
+                    Parrot_MMD_method_name(interpreter, pc[1]) + 2);
+            s = 2;
+    }
+    else if (strcmp(info->name, "n_infix") == 0) {
+            PIO_eprintf(interpreter, "n_%s",
+                    Parrot_MMD_method_name(interpreter, pc[1]) + 2);
+            s = 2;
+    }
+    else
+        PIO_eprintf(interpreter, "%s", info->name);
 
     if (info->arg_count > 1) {
         PIO_eprintf(interpreter, " ");
         /* pass 1 print arguments */
-        for (i = 1; i < info->arg_count; i++) {
+        for (i = s; i < info->arg_count; i++) {
             opcode_t o = *(pc + i);
-            if (i > 1 &&
+            if (i > s &&
                     info->types[i] != PARROT_ARG_KC &&
                     info->types[i] != PARROT_ARG_KIC &&
+                    info->types[i] != PARROT_ARG_KI &&
                     info->types[i] != PARROT_ARG_K
                     ) {
                 PIO_eprintf(interpreter, ", ");
@@ -260,6 +274,10 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                 case PARROT_ARG_KIC:
                     PIO_eprintf(interpreter, "[%vd]", o);
                     break;
+                case PARROT_ARG_KI:
+                    PIO_eprintf(interpreter, "[I%vd]", o);
+                    more = 1;
+                    break;
                 case PARROT_ARG_K:
                     PIO_eprintf(interpreter, "[P%vd]",o);
                     more = 1;
@@ -280,10 +298,6 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                     PIO_eprintf(interpreter, "S%vd", o);
                     more = 1;
                     break;
-                case PARROT_ARG_KI:
-                    PIO_eprintf(interpreter, "I%vd", o);
-                    more = 1;
-                    break;
                 default:
                     internal_exception(1, "unhandled type in trace");
                     break;
@@ -295,7 +309,7 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
         /* pass 2 print argument details if needed */
         for (i = 1; i < info->arg_count; i++) {
             opcode_t o = *(pc + i);
-            if (i > 1) {
+            if (i > s) {
                 PIO_eprintf(interpreter, ", ");
             }
             switch (info->types[i]) {

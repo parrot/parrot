@@ -932,17 +932,24 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 
     /*
      * setup P0, and P2, S0 if method
+     *
+     * Due to implicit call arguments (call opcodes that
+     * either take a Sub/P0, method/S2, return continuation/P1,
+     * object/P2 or not)
+     * this is really a mess
      */
     arg = sub->pcc_sub->sub;
     if (meth_call) {
         /* set S0, meth */
         regs[0] = get_pasm_reg(interp, "S0");;
-        if ( (arg->type == VTIDENTIFIER ||
-                 arg->type == VTPASM ||
-                 arg->type == VTREG))
-            s0 = arg;
-        else
-            s0 = mk_const(interp, str_dup(arg->name), 'S');
+        if (arg->set != 'P') {
+            if ( (arg->type == VTIDENTIFIER ||
+                        arg->type == VTPASM ||
+                        arg->type == VTREG))
+                s0 = arg;
+            else
+                s0 = mk_const(interp, str_dup(arg->name), 'S');
+        }
 
         /* set P2, obj */
         if (sub->pcc_sub->object->color != 2) {
@@ -953,7 +960,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             else
                 ins = insINS(interp, unit, ins, "set", regs, 2);
         }
-        if (sub->pcc_sub->nci)
+        if (sub->pcc_sub->nci && (!meth_call || arg->set == 'P'))
             goto move_sub;
     }
     else {
@@ -1010,7 +1017,7 @@ move_sub:
      *
      * so convert to opcode and await the returned PMC as P5
      */
-    if (meth_call && strcmp(s0->name, "\"instantiate\"") == 0) {
+    if (meth_call && s0 && strcmp(s0->name, "\"instantiate\"") == 0) {
         SymReg *p5 = get_pasm_reg(interp, "P5");
         regs[0] = p5;
         ins = insINS(interp, unit, ins, "instantiate", regs, 1);
@@ -1023,7 +1030,7 @@ move_sub:
             if (!need_cc)
                 ins = insINS(interp, unit, ins, "updatecc", regs, 0);
         /* insert the call */
-        if (meth_call && !sub->pcc_sub->nci) {
+        if (meth_call && sub->pcc_sub->sub->set != 'P') {
             regs[0] = s0;
             n = 0;
             if (s0)
