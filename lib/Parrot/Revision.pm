@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot::Pmc2c - PMC to C Code Generation
+Parrot::Revision - SVN Revision
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ sub __get_revision {
 	}
     }
     return 0 unless defined $svn_entries;
-    
+
     # code taken from pugs/util/version_h.pl rev 859
     if (-r $svn_entries) {
         open FH, $svn_entries or die $!;

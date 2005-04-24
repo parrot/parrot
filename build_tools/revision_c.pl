@@ -7,7 +7,15 @@ build_tools/revision_c.pl
 
 =head1 DESCRIPTION
 
-creates F<src/revision.c>
+Creates F<src/revision.c> with current rev number taken from
+F<.svn/entries> or F<.svk/entries> and config rev number of last
+Parrot configure run.
+
+=head1 SEE ALSO
+
+F<config/gen/revision.pl>,
+F<lib/Parrot/Revision.pm>,
+F<include/parrot/config.h>
 
 =cut
 
