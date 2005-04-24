@@ -515,7 +515,7 @@ Sets the length of the array to the number of elements in C<*value>.
 */
 
     void set_integer_same (PMC* value) {
-        INTVAL size = DYNSELF.elements();
+        INTVAL size = VTABLE_elements(INTERP, value);
         list_set_length(INTERP, (List *) PMC_data(SELF) ,size);
     }
 

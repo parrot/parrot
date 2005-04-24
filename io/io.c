@@ -984,7 +984,7 @@ PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data0(pmc);
-    assert((int)l != 0xdeadbeef);
+    assert((unsigned int)l != 0xdeadbeefU);
     assert(io != 0);
     return PIO_write_down(interpreter, l, io, s);
 }
