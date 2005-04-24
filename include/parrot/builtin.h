@@ -18,6 +18,7 @@ int  Parrot_is_builtin(Interp *, char *func, char *sig);
 PMC* Parrot_find_builtin(Interp *interpreter, STRING *func);
 const char * Parrot_builtin_get_c_namespace(Interp *, int bi);
 int Parrot_builtin_is_class_method(Interp *, int bi);
+int Parrot_builtin_is_void(Interp *, int bi);
 
 #endif /* PARROT_BUILTIN_H_GUARD */
 

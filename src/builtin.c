@@ -32,13 +32,15 @@ typedef struct _builtin {
 } Builtins;
 
 static Builtins builtins[] = {
-    { "cos", 	"P!O", 		"Float", 	0, 0 },
-    { "index",  "I!SS.I",       "String",       0, 0 },
-    { "lower", 	"P!O",	        "String", 	0, 0 },
-    { "open", 	"P!S.S",	"ParrotIO", 	0, 0 },
-    { "puts", 	"I!OS",         "ParrotIO", 	0, 0 },
-    { "say", 	"I!S",          "ParrotIO", 	0, 0 },
-    { "say", 	"I!OS",         "ParrotIO", 	0, 0 }
+    { "cos", 	"PJO", 		"Float", 	0, 0 },
+    { "index",  "IJSS.I",       "String",       0, 0 },
+    { "lower", 	"PJO",	        "String", 	0, 0 },
+    { "open", 	"PJS.S",	"ParrotIO", 	0, 0 },
+    { "puts", 	"IJOS",         "ParrotIO", 	0, 0 },
+    { "say", 	"IJS",          "ParrotIO", 	0, 0 },
+    { "say", 	"IJOS",         "ParrotIO", 	0, 0 },
+    { "say", 	"vJS",          "ParrotIO", 	0, 0 },
+    { "say", 	"vJOS",         "ParrotIO", 	0, 0 }
 };
 
 /*
@@ -119,12 +121,15 @@ check_builtin_sig(Interp *interpreter, size_t i, char *sig)
     const char *p;
     int opt = 0;
 
-    for (p = b->signature ; *p && *sig; ++sig, ++p) {
+    p = b->signature;
+    if (*p != *sig && *p == 'v')
+        ++p;
+    for (; *p && *sig; ++sig, ++p) {
         switch (*p) {
             case '.':   /* optional start */
                 opt = 1;
                 /* fall through */
-            case '!':   /* interpreter */
+            case 'J':   /* interpreter */
                 ++p;
         }
         if (*p == 'O' && *sig == 'P')
@@ -200,6 +205,16 @@ Parrot_builtin_is_class_method(Interp *interpreter, int bi)
     n = sizeof(builtins) / sizeof(builtins[0]);
     assert(bi >= 0 && bi < n);
     return builtins[bi].signature[2] != 'O';
+}
+
+int
+Parrot_builtin_is_void(Interp *interpreter, int bi)
+{
+    int n;
+
+    n = sizeof(builtins) / sizeof(builtins[0]);
+    assert(bi >= 0 && bi < n);
+    return builtins[bi].signature[0] == 'v';
 }
 
 /*

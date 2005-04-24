@@ -271,6 +271,7 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
     char sig[16];
     int i, bi, is_class_meth;
     SymReg *sub, *meth, *rr[10];
+    int first_arg, is_void;
 
     assert(n < 15);
     UNUSED(unit);
@@ -287,37 +288,35 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
      * cos Px, Py  => Px = Py.cos()
      */
     is_class_meth = Parrot_builtin_is_class_method(interpreter, bi);
+    is_void = Parrot_builtin_is_void(interpreter, bi);
+    meth = mk_sub_address(interpreter, str_dup(name));
     if (is_class_meth) {    /* ParrotIO.open() */
         const char *ns = Parrot_builtin_get_c_namespace(interpreter, bi);
         SymReg *ns_sym;
 
         ns_sym = mk_const(interpreter, str_dup(ns), 'S');
-        meth = mk_sub_address(interpreter, str_dup(name));
         ins = IMCC_create_itcall_label(interpreter);
         sub = ins->r[0];
         IMCC_itcall_sub(interpreter, meth);
         sub->pcc_sub->object = ns_sym;
-        sub->pcc_sub->nci = 1;
-        for (i = 1; i < n; ++i) {
-            add_pcc_arg(sub, rr[i]);
-        }
-        add_pcc_result(sub, rr[0]);
-        return ins;
+        first_arg = 1;
     }
     else {    /* method y = x."cos"() */
-        meth = mk_sub_address(interpreter, str_dup(name));
         ins = IMCC_create_itcall_label(interpreter);
         sub = ins->r[0];
         IMCC_itcall_sub(interpreter, meth);
-        sub->pcc_sub->object = rr[1];
-        sub->pcc_sub->nci = 1;
-        for (i = 2; i < n; ++i) {
-            add_pcc_arg(sub, rr[i]);
-        }
-        add_pcc_result(sub, rr[0]);
-        return ins;
+        sub->pcc_sub->object = rr[is_void ? 0 : 1];
+        first_arg = 2;
     }
-    return NULL;
+    sub->pcc_sub->nci = 1;
+    if (is_void)
+        first_arg--;
+    for (i = first_arg; i < n; ++i) {
+        add_pcc_arg(sub, rr[i]);
+    }
+    if (!is_void)
+        add_pcc_result(sub, rr[0]);
+    return ins;
 }
 
 /*

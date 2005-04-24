@@ -92,10 +92,14 @@ pir_output_is(<<'CODE', <<'OUT', "say");
     $I0 = say "ok 1"
     io = getstdout
     $I0 = say io, "ok 2"
+    say "ok 3"
+    say io, "ok 4"
 .end
 CODE
 ok 1
 ok 2
+ok 3
+ok 4
 OUT
 
 
