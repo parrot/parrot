@@ -94,7 +94,8 @@ sub runstep {
   if ($without) {
     Configure::Data->set(
       has_icu     => 0,
-      icu_shared  => '',     # This is used for generating dynclasses/Makefile
+      icu_shared  => '',  # used for generating dynclasses/Makefile
+      icu_datadir => '',  # used for generation Makefile
     );
     $Configure::Step::result = "no" unless defined $Configure::Step::result;
     return;
