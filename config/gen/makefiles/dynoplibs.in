@@ -13,15 +13,15 @@ CFLAGS = ${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}
 # add your dynamic oplibs here
 
 all: myops_ops$(LOAD_EXT) myops_ops_cg$(LOAD_EXT) myops_ops_cgp$(LOAD_EXT) \
-     myops_ops_prederef$(LOAD_EXT) myops_ops_switch$(LOAD_EXT) \
+     myops_ops_switch$(LOAD_EXT) \
      \
      dan_ops$(LOAD_EXT) dan_ops_cg$(LOAD_EXT) dan_ops_cgp$(LOAD_EXT) \
-     dan_ops_prederef$(LOAD_EXT) dan_ops_switch$(LOAD_EXT)
+     dan_ops_switch$(LOAD_EXT)
 
 .SUFFIXES: .ops .c $(LOAD_EXT)
 
 # preserve .c if needed
-.PRECIOUS: %_ops.c %_ops_cgp.c %_ops_cg.c %_ops_prederef.c %_ops_switch.c
+.PRECIOUS: %_ops.c %_ops_cgp.c %_ops_cg.c %_ops_switch.c
 
 %_ops.c  : %.ops
 	$(PERL) $(OPS2C) C --dynamic $<
@@ -31,9 +31,6 @@ all: myops_ops$(LOAD_EXT) myops_ops_cg$(LOAD_EXT) myops_ops_cgp$(LOAD_EXT) \
 
 %_ops_cg.c  : %.ops
 	$(PERL) $(OPS2C) CGoto --dynamic $<
-
-%_ops_prederef.c  : %.ops
-	$(PERL) $(OPS2C) CPrederef --dynamic $<
 
 %_ops_switch.c  : %.ops
 	$(PERL) $(OPS2C) CSwitch --dynamic $<

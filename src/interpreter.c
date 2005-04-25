@@ -827,8 +827,12 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     op_info_t *new_info_table;
     size_t i, n_old, n_new, n_tot;
 
-    interpreter->all_op_libs = mem_sys_realloc(interpreter->all_op_libs,
-            sizeof(op_lib_t *) * (interpreter->n_libs + 1));
+    if (!interpreter->all_op_libs)
+        interpreter->all_op_libs = mem_sys_allocate(
+                sizeof(op_lib_t *) * (interpreter->n_libs + 1));
+    else
+        interpreter->all_op_libs = mem_sys_realloc(interpreter->all_op_libs,
+                sizeof(op_lib_t *) * (interpreter->n_libs + 1));
 
     init_func = get_op_lib_init(0, 0, lib_pmc);
     lib = init_func(1);
@@ -855,7 +859,7 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     core = PARROT_CORE_OPLIB_INIT(1);
 
     assert(interpreter->op_count == core->op_count);
-    new_evc_func_table = mem_sys_realloc(interpreter->evc_func_table,
+    new_evc_func_table = mem__sys_realloc(interpreter->evc_func_table,
             sizeof (void *) * n_tot);
     if (core->flags & OP_FUNC_IS_ALLOCATED) {
         new_func_table = mem_sys_realloc(core->op_func_table,
@@ -944,12 +948,33 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
         for (i = 0; i < n_old; ++i)
             ops_addr[i] = ((void **)cg_lib->op_func_table)[i];
     }
+    /*
+     * XXX running CG and CGP ops currently works only via the wrapper
+     *
+     * the problem is:
+     *  The actual runcores cg_core and cgp_core are very big functions.
+     *  The C compiler usually addresses "spilled" registers in the C stack.
+     *  The loaded opcode lib is another possibly big function, but with
+     *  a likely different stack layout. Directly jumping around between
+     *  code locations in these two opcode functions works, but access
+     *  to stack-ed (or spilled) variables fails badly.
+     *
+     *  We would need to prepare the assembly source of the opcode
+     *  lib so that all variable access on the stack has the same
+     *  layout and compile the prepared assembly to ops_cgp?.o
+     *
+     *  The switched core is different anyway, as we can't extend the
+     *  compiled big switch statement with the new cases. We have
+     *  always to use the wrapper__ opcode called from the default case.
+     */
+#if 0
     /* check if the lib_pmc exists with a _xx flavor */
     new_init_func = get_op_lib_init(0, 0, lib_pmc);
     new_lib = new_init_func(1);
     op_variant = Parrot_sprintf_c(interpreter, "%s_ops%s",
             new_lib->name, cg_lib->suffix);
     lib_variant = Parrot_load_lib(interpreter, op_variant, NULL);
+#endif
     /*
      * XXX running CG and CGP ops currently works only via the wrapper
      */
