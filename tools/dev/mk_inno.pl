@@ -26,6 +26,10 @@ The install prefix.
 
 The parrot version.
 
+=item C<icudatadir>
+
+The directory to locate ICU's data file(s).
+
 =back
 
 =head1 SEE ALSO
@@ -36,9 +40,12 @@ http://www.jrsoftware.org/
 
 ################################################################################
 
+use strict;
+
 my %options = (
 		version => 'x.y.z',
 		prefix => '\usr\local\parrot',
+		icudatadir => '',
 );
 
 foreach (@ARGV) {
@@ -48,6 +55,17 @@ foreach (@ARGV) {
 }
 
 $options{prefix} =~ s/\//\\/g;
+$options{icudatadir} =~ s/\//\\/g;
+
+my $icu_section = '';
+if ($options{icudatadir}) {
+	my $icuroot = $options{icudatadir};
+	$icuroot =~ s/\\\w+$//;
+	$icu_section = qq{
+Source: "$icuroot\\share\\icu\\3.2\\license.html"; DestDir: "{app}\\icu"; Flags:
+Source: "$icuroot\\lib\\icu*.dll"; DestDir: "{app}\\bin"; Flags:
+};
+}
 
 open OUT, "> parrot.iss" or die "Can't open parrot.iss";
 
@@ -73,6 +91,7 @@ ChangesAssociations=yes
 
 [Files]
 Source: "$options{prefix}\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+${icu_section}
 
 [Icons]
 Name: "{group}\\{cm:UninstallProgram,parrot}"; Filename: "{uninstallexe}"

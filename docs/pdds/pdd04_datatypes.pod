@@ -267,9 +267,10 @@ C<data> is a generic data pointer, as described above.
 C<_metadata> holds internal PMC metadata. The specification for this has not
 yet been finalized.
 
-XXX: what does C<_synchronize> do?
+C<_synchronize> is for access synchronization between shared PMCs.
 
-XXX:  ditto C<_next_for_GC>...
+C<_next_for_GC> determines the next PMC in the 'used' list during dead object 
+detection in the GC. 
 
 PMCs are not required to have a C<PMC_EXT> structure (i.e. C<pmc_ext> can
 be null).

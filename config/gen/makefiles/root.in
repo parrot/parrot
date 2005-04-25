@@ -1343,8 +1343,8 @@ rpms : release
 	sudo cp parrot.spec /usr/src/*/SPECS
 	cd /usr/src/*/SPECS ${make_and} sudo rpm -ba parrot.spec
 
-win32-inno-installer : install
-	$(PERL) tools/dev/mk_inno.pl --version=$(VERSION) --prefix=$(PREFIX)
+win32-inno-installer : world install
+	$(PERL) tools/dev/mk_inno.pl --version=$(VERSION) --prefix=$(PREFIX) --icudatadir=${icu_datadir}
 	$(INNO_SETUP) /Q parrot.iss
 
 ###############################################################################
