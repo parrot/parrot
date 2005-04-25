@@ -32,7 +32,7 @@ static STRING *ConcatChar, *ConcatCommand;
 pmclass TclParser dynpmc group tcl_group {
 
     void class_init() {
-      PMC *just_a_hack;      
+      PMC *string_anchor;    
       INTVAL fixedstringarray_typenum;
       if (pass) {
           TclList = Parrot_PMC_typenum(INTERP, "TclList");
@@ -52,19 +52,19 @@ pmclass TclParser dynpmc group tcl_group {
           /* Hack to avoid having these ``constant'' strings GC'd. */
           fixedstringarray_typenum = 
             Parrot_PMC_typenum(INTERP, "FixedStringArray");
-          just_a_hack = pmc_new(INTERP,fixedstringarray_typenum);
-          VTABLE_set_integer_native(INTERP,just_a_hack,10);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,0,bs_nl);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,1,nl);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,2,cb);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,3,cp);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,4,space);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,5,ConcatWords);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,6,ConcatConst);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,7,ConcatVariable);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,8,ConcatChar);
-          VTABLE_set_string_keyed_int(INTERP,just_a_hack,9,ConcatCommand);
-          dod_register_pmc(INTERP,just_a_hack);
+          string_anchor = pmc_new(INTERP,fixedstringarray_typenum);
+          VTABLE_set_integer_native(INTERP,string_anchor,10);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,0,bs_nl);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,1,nl);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,2,cb);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,3,cp);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,4,space);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,5,ConcatWords);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,6,ConcatConst);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,7,ConcatVariable);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,8,ConcatChar);
+          VTABLE_set_string_keyed_int(INTERP,string_anchor,9,ConcatCommand);
+          dod_register_pmc(INTERP,string_anchor);
       }
     }
 
