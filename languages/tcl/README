@@ -15,6 +15,14 @@ in the root development directory.>
 
  ./parrot languages/tcl/tcl.pbc foo.tcl
 
+=head2 Interactive tclsh
+
+To run ParTcl interactively, simply type:
+
+ make tclsh
+
+in this directory.
+
 =head2 Examples
 
 To run an example, change to the C<examples>, and type C<make>
