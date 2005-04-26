@@ -1,11 +1,10 @@
 #! perl -w
-
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
 
-t/library/dumper.t - Data Dumping
+t/library/dumper.t - test dumping of data
 
 =head1 SYNOPSIS
 
@@ -19,12 +18,13 @@ Tests data dumping.
 
 use strict;
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 26;
 
 # no. 1
 pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
 
-.sub _main
+.include "library/dumper.imc"
+.sub test @MAIN
     .local pmc array
 
     new array, .PerlArray
@@ -40,9 +40,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
     push array, 9
 
     _dumper( "array", array )
-    end
 .end
-.include "library/dumper.imc"
 CODE
 "array" => PerlArray (size:10) [
     0,
@@ -59,9 +57,10 @@ CODE
 OUT
 
 # no. 2
-pir_output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
 
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
+.include "library/dumper.imc"
+.sub test @MAIN
     .local pmc array
 
     new array, .PerlArray
@@ -77,9 +76,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
     push array, 5
 
     _dumper( "array", array )
-    end
 .end
-.include "library/dumper.imc"
 CODE
 "array" => PerlArray (size:10) [
     6,
@@ -98,7 +95,8 @@ OUT
 # no. 3
 pir_output_is(<<'CODE', <<'OUT', "dumping sorted strings");
 
-.sub _main
+.include "library/dumper.imc"
+.sub test @MAIN
     .local pmc array
 
     new array, .PerlArray
@@ -112,9 +110,7 @@ pir_output_is(<<'CODE', <<'OUT', "dumping sorted strings");
     push array, "hotel"
 
     _dumper( "strings", array )
-    end
 .end
-.include "library/dumper.imc"
 CODE
 "strings" => PerlArray (size:8) [
     "alpha",
@@ -131,7 +127,7 @@ OUT
 # no. 4
 pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
 
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .PerlArray
@@ -145,7 +141,6 @@ pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
     push array, "echo"
 
     _dumper( "strings", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -164,7 +159,7 @@ OUT
 # no. 5
 pir_output_is(<<'CODE', <<'OUT', "dumping different types");
 
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .PerlArray
@@ -190,7 +185,6 @@ pir_output_is(<<'CODE', <<'OUT', "dumping different types");
     push array, "echo"
 
     _dumper( "array", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -221,7 +215,7 @@ OUT
 # no. 6
 pir_output_is(<<'CODE', <<'OUT', "dumping complex data");
 
-.sub _main
+.sub test @MAIN
     .local pmc hash1
     .local pmc hash2
     .local pmc hash3
@@ -277,7 +271,6 @@ pir_output_is(<<'CODE', <<'OUT', "dumping complex data");
 
     _dumper( "hash1", hash1 )
 
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -325,7 +318,7 @@ OUT
 # no.7
 pir_output_is(<<'CODE', <<'OUT', "properties");
 
-.sub _main
+.sub test @MAIN
     .local pmc str
     .local pmc array
 
@@ -343,7 +336,6 @@ pir_output_is(<<'CODE', <<'OUT', "properties");
 
     _dumper( array )
 
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -359,7 +351,7 @@ OUT
 # no. 8
 pir_output_is(<<'CODE', <<'OUT', "indent string");
 
-.sub _main
+.sub test @MAIN
     .local pmc hash1
     .local pmc hash2
     .local pmc array1
@@ -389,7 +381,6 @@ pir_output_is(<<'CODE', <<'OUT', "indent string");
     print "'\nindent = '"
     print indent
     print "'\n"
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -428,7 +419,7 @@ OUT
 # no. 9
 pir_output_is(<<'CODE', <<'OUT', "back-referencing properties");
 
-.sub _main
+.sub test @MAIN
     .local pmc hash
 
     new hash, .PerlHash
@@ -436,7 +427,6 @@ pir_output_is(<<'CODE', <<'OUT', "back-referencing properties");
     set hash["hello"], "world"
     setprop hash, "backref", hash
     _dumper( hash )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -450,7 +440,7 @@ OUT
 # no. 10
 pir_output_is(<<'CODE', <<'OUT', "self-referential properties (1)");
 
-.sub _main
+.sub test @MAIN
     .local pmc hash
     .local pmc prop
 
@@ -460,7 +450,6 @@ pir_output_is(<<'CODE', <<'OUT', "self-referential properties (1)");
     prophash prop, hash
     setprop hash, "self", prop
     _dumper( hash )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -474,7 +463,7 @@ OUT
 # no. 11
 pir_output_is(<<'CODE', <<'OUT', "self-referential properties (2)");
 
-.sub _main
+.sub test @MAIN
     .local pmc array
     .local pmc hash1
     .local pmc hash2
@@ -495,7 +484,6 @@ pir_output_is(<<'CODE', <<'OUT', "self-referential properties (2)");
     prophash prop, hash2
     push array, prop
     _dumper( array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -518,7 +506,7 @@ OUT
 # no. 12
 pir_output_is(<<'CODE', <<'OUT', "dumping objects");
 
-.sub _main
+.sub test @MAIN
     .local pmc temp
     .local pmc array
 
@@ -532,7 +520,6 @@ pir_output_is(<<'CODE', <<'OUT', "dumping objects");
     push array, temp
 
     _dumper( array )
-    end
 .end
 
 .namespace ["TestClass"]
@@ -581,7 +568,7 @@ OUT
 # no. 13
 pir_output_is(<<'CODE', <<'OUT', "dumping 'null'");
 
-.sub _main
+.sub test @MAIN
     .local pmc array
     .local pmc temp
 
@@ -603,7 +590,6 @@ pir_output_is(<<'CODE', <<'OUT', "dumping 'null'");
     push array, temp
 
     _dumper( "array", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -639,7 +625,6 @@ pir_output_is( << 'CODE', << 'OUT', "dumping strings");
     push array, string_1
 
     _dumper( "array of various strings", array )
-    end
 .end
 CODE
 "array of various strings" => PerlArray (size:3) [
@@ -652,7 +637,7 @@ OUT
 # no. 15
 pir_output_is(<<'CODE', <<'OUT', "dumping complex data in Hash");
 
-.sub _main
+.sub test @MAIN
     .local pmc hash1
     .local pmc hash2
     .local pmc hash3
@@ -707,7 +692,6 @@ pir_output_is(<<'CODE', <<'OUT', "dumping complex data in Hash");
 
     _dumper( "hash1", hash1 )
 
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -755,13 +739,12 @@ OUT
 # no. 16
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping Integer PMC");
 
-.sub _main
+.sub test @MAIN
     .local pmc int1
 
     new int1, .Integer
     int1 = 12345
     _dumper( "Int:", int1 )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -771,13 +754,12 @@ OUTPUT
 # no. 17
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping Float PMC");
 
-.sub _main
+.sub test @MAIN
     .local pmc float1
 
     new float1, .Float
     float1 = 12345.678
     _dumper( "Float:", float1 )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -786,14 +768,13 @@ OUTPUT
 
 # no. 18
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizablePMCArray PMC");
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .ResizablePMCArray
     push array, 12345
     push array, "hello"
     _dumper( "array:", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -805,14 +786,13 @@ OUTPUT
 
 # no. 19
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableStringArray PMC");
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .ResizableStringArray
     push array, "hello"
     push array, "world"
     _dumper( "array:", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -824,14 +804,13 @@ OUTPUT
 
 # no. 20
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableIntegerArray PMC");
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .ResizableIntegerArray
     push array, 12345
     push array, 67890
     _dumper( "array:", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -843,14 +822,13 @@ OUTPUT
 
 # no. 21
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableFloatArray PMC");
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .ResizableFloatArray
     push array, 123.45
     push array, 67.89
     _dumper( "array:", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -862,7 +840,7 @@ OUTPUT
 
 # no. 22
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC");
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .FixedPMCArray
@@ -870,7 +848,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC");
     array[0] = 12345
     array[1] = "hello"
     _dumper( "array:", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -882,7 +859,7 @@ OUTPUT
 
 # no. 23
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC");
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .FixedStringArray
@@ -890,7 +867,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC");
     array[0] = "hello"
     array[1] = "world"
     _dumper( "array:", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -902,7 +878,7 @@ OUTPUT
 
 # no. 24
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC");
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .FixedIntegerArray
@@ -910,7 +886,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC");
     array[0] = 12345
     array[1] = 67890
     _dumper( "array:", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -922,7 +897,7 @@ OUTPUT
 
 # no. 25
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC");
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .FixedFloatArray
@@ -930,7 +905,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC");
     array[0] = 123.45
     array[1] = 67.89
     _dumper( "array:", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE
@@ -941,34 +915,14 @@ CODE
 OUTPUT
 
 # no. 26
-pir_output_is(<<'CODE', <<'OUTPUT', "dumping PMCArray PMC");
-.sub _main
-    .local pmc array
-
-    new array, .PMCArray
-    push array, 12345
-    push array, "hello"
-    _dumper( "array:", array )
-    end
-.end
-.include "library/dumper.imc"
-CODE
-"array:" => PMCArray (size:2) [
-    12345,
-    "hello"
-]
-OUTPUT
-
-# no. 27
 pir_output_is(<<'CODE', <<'OUTPUT', "dumping StringArray PMC");
-.sub _main
+.sub test @MAIN
     .local pmc array
 
     new array, .StringArray
     push array, "hello"
     push array, "world"
     _dumper( "array:", array )
-    end
 .end
 .include "library/dumper.imc"
 CODE

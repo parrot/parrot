@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Stream::Replay - replayable Stream
@@ -179,7 +181,7 @@ END:
     setattribute self, $I0, temp
     
     inc $I0
-    temp = new PMCArray
+    temp = new ResizablePMCArray
     setattribute self, $I0, temp
 .end
 

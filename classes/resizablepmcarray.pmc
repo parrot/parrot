@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -76,6 +76,37 @@ Resizes the array to C<size> elements.
             PMC_int_val(SELF) = size;
         }
     }
+
+
+/*
+
+=item C<PMC* shift_pmc()>
+
+Removes and returns a PMC from the start of the array.
+
+=cut
+
+TODO: The does always moves the array memory, which is not very performant
+TODO: Check whether there is already an element that can be shifted
+
+*/
+
+    PMC* shift_pmc () {
+        PMC *item;
+        PMC **data;
+        INTVAL cur, size;
+        item = SELF.get_pmc_keyed_int(0);
+        size = PMC_int_val(SELF);
+        cur  = PMC_int_val2(SELF);
+        PMC_int_val(SELF) = --size;
+        data = PMC_data(SELF);
+        mem_sys_memmove( data, data+1, size * sizeof(PMC*) );
+        data[size] = PMCNULL;
+
+        return item;
+    }
+
+
 /*
 
 =item C<PMC *get_pmc_keyed_int(INTVAL key)>

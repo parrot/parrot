@@ -81,7 +81,7 @@ END:
 
     # reset includes
     inc $I0
-    new temp, .PMCArray
+    new temp, .ResizablePMCArray
     setattribute self, $I0, temp
 .end
 

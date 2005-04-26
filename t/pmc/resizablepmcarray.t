@@ -1,11 +1,10 @@
 #! perl -w
-
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
 
-t/pmc/resizablepmcarray.t - ResizablePMCArray PMC
+t/pmc/resizablepmcarray.t - testing the ResizablePMCArray PMC
 
 =head1 SYNOPSIS
 
@@ -18,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -505,6 +504,68 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "push string");
 CODE
 10001
 123asdf
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "shift integer");
+
+.sub test @MAIN
+    .local pmc pmc_arr, elem
+    pmc_arr = new ResizablePMCArray
+    push pmc_arr, 4
+    push pmc_arr, 3
+    push pmc_arr, 2
+    push pmc_arr, 1
+    push pmc_arr, 0
+
+    .local int elements
+
+    elements = pmc_arr
+    print elements
+    print "\n"
+
+    elem = shift pmc_arr
+    print elem
+    print ' '
+    elements = pmc_arr
+    print elements
+    print "\n"
+
+    elem = shift pmc_arr
+    print elem
+    print ' '
+    elements = pmc_arr
+    print elements
+    print "\n"
+
+    elem = shift pmc_arr
+    print elem
+    print ' '
+    elements = pmc_arr
+    print elements
+    print "\n"
+
+    elem = shift pmc_arr
+    print elem
+    print ' '
+    elements = pmc_arr
+    print elements
+    print "\n"
+
+    elem = shift pmc_arr
+    print elem
+    print ' '
+    elements = pmc_arr
+    print elements
+    print "\n"
+
+.end
+CODE
+5
+4 4
+3 3
+2 2
+1 1
+0 0
 OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "unshift pmc");

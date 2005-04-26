@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Stream::Combiner - combines different streams to a single stream.
@@ -58,7 +60,7 @@ END:
     newsub temp, .Sub, _default_combiner
     self."combiner"( temp )
     
-    temp = new .PMCArray
+    temp = new .ResizablePMCArray
     self."setSource"( temp )
 .end
 

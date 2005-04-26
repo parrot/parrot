@@ -57,10 +57,6 @@ my %outputs = (
         \n
         1\s\*\s1000\s=\s1000\n
         1000\s\*\s1000\s=\s1000000\n
-        PMCArray:\s\d+\.\d+s\n
-        \n
-        1\s\*\s1000\s=\s1000\n
-        1000\s\*\s1000\s=\s1000000\n
         ResizableFloatArray:\s\d+\.\d+s\n
         \n
         1\s\*\s1000\s=\s1000\n

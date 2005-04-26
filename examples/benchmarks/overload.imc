@@ -1,4 +1,6 @@
-.sub _main @MAIN
+# $Id$
+
+.sub bench @MAIN
 .include "pmctypes.pasm"
 .include "mmd.pasm"
    .local pmc my_mul
@@ -22,6 +24,8 @@ loop:
    print "\n"
    end
 .end
+
+
 .sub my_mul
    .param pmc left
    .param pmc right
@@ -31,5 +35,3 @@ loop:
    $I2 = $I0 * $I1
    dest = $I2
 .end
-
-

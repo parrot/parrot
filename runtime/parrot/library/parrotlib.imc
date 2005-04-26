@@ -42,7 +42,7 @@ OKAY:
     push paths, root
 
     # create includes array
-    includes = new .PMCArray
+    includes = new .ResizablePMCArray
     store_global "_parrotlib", "include_paths", includes
 
     # get the directory handler

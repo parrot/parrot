@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -49,7 +49,6 @@ Inspired by computer language shootout.
     _bench( .IntList, arr_size )
     _bench( .OrderedHash, arr_size )
     _bench( .PerlArray, arr_size )
-    _bench( .PMCArray, arr_size )
     _bench( .ResizableFloatArray, arr_size )
     _bench( .ResizableIntegerArray, arr_size )
     _bench( .ResizablePMCArray, arr_size )
