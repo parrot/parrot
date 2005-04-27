@@ -1,4 +1,4 @@
-# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -87,7 +87,6 @@ sub c_source_file_directories
 	my $self = shift;
 	
 	return $self->directory_with_name('src'),
-		$self->directory_with_name('chartypes'),
 		$self->directory_with_name('encodings'),
 		$self->directory_with_name('io'),
 		$self->directory_with_name('pf'),
