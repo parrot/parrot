@@ -749,6 +749,7 @@ include/parrot/oplib.h                            [devel]include
 include/parrot/packfile.h                         [devel]include
 include/parrot/parrot.h                           [devel]include
 include/parrot/perltypes.h                        [devel]include
+include/parrot/pic.h                              [devel]include
 include/parrot/pmc.h                              [devel]include
 include/parrot/pmc_freeze.h                       [devel]include
 include/parrot/pobj.h                             [devel]include

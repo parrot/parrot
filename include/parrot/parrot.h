@@ -248,6 +248,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/exceptions.h"
 #include "parrot/warnings.h"
 #include "parrot/memory.h"
+#include "parrot/pic.h"
 #include "parrot/packfile.h"
 #include "parrot/io.h"
 #include "parrot/op.h"

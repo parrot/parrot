@@ -172,6 +172,8 @@ struct PackFile_ByteCode {
     struct PackFile_Segment     base;
     Prederef prederef;          /* The predereferenced code and info */
     void *jit_info;             /* JITs data */
+    Parrot_PIC_store * pic_store;      /* PIC storage */
+    struct PackFile_Segment   * pic_index; /* segment of indices into store */
     struct PackFile_ByteCode  * prev;   /* was executed previous */
     struct PackFile_Debug     * debugs;
     struct PackFile_ConstTable *const_table;
