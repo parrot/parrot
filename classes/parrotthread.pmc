@@ -40,6 +40,20 @@ and these methods:
 #include "parrot/embed.h"
 #include <assert.h>
 
+/*
+ * can't do multi-threaded DOD/GC yet
+ * XXX a quick hack to pass the few tests
+ */
+static void
+stop_GC(Interp* parent, Interp *thread)
+{
+    Parrot_block_DOD(parent);
+    Parrot_block_DOD(thread);
+    Parrot_block_GC(parent);
+    Parrot_block_GC(thread);
+}
+
+
 pmclass ParrotThread extends ParrotInterpreter need_ext {
 
 /*
@@ -60,6 +74,10 @@ Initializes the thread.
         SUPER();
         pt_add_to_interpreters(INTERP, PMC_data(SELF));
         UNLOCK(interpreter_array_mutex);
+        /*
+         * can't allow DOD runs for now
+         */
+        stop_GC(INTERP, PMC_data(SELF));
     }
 
 /*
@@ -77,6 +95,10 @@ Create a new thread by cloning the passed interpreter.
         SUPER(parent);
         pt_add_to_interpreters(PMC_data(parent), PMC_data(SELF));
         UNLOCK(interpreter_array_mutex);
+        /*
+         * can't allow DOD runs for now
+         */
+        stop_GC(INTERP, PMC_data(SELF));
     }
 }
 

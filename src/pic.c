@@ -69,6 +69,7 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
                  * an INTVAL holding the type
                  *
                  * TODO if beyond limit use a malloced array
+                 *      or just C<break> instead w/o rewriting the op
                  */
                 pmc_type_numbers[type] = type;
                 pc_pred[2] = pmc_type_numbers + type;

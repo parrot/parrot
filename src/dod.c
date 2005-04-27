@@ -807,29 +807,37 @@ Parrot_dod_sweep(Interp *interpreter,
 #endif
                 /* if object is a PMC and needs destroying */
                 if (PObj_is_PMC_TEST(b)) {
+                    PMC *p = (PMC*)b;
+                    /*
+                     * XXX
+                     * for now don't mess around with shared objects
+                     */
+                    if (p->vtable->flags & VTABLE_IS_SHARED_FLAG)
+                        goto next;
+
                     /* then destroy it here
                     */
-                    if (PObj_needs_early_DOD_TEST(b))
+                    if (PObj_needs_early_DOD_TEST(p))
                         --arena_base->num_early_DOD_PMCs;
-                    if (PObj_active_destroy_TEST(b))
-                        VTABLE_destroy(interpreter, (PMC *)b);
+                    if (PObj_active_destroy_TEST(p))
+                        VTABLE_destroy(interpreter, p);
 
-                    if (PObj_is_PMC_EXT_TEST(b)) {
+                    if (PObj_is_PMC_EXT_TEST(p)) {
                         /* if the PMC has a PMC_EXT structure,
                          * return it to the pool/arena
                          */
                         struct Small_Object_Pool *ext_pool =
                             arena_base->pmc_ext_pool;
                         ext_pool->add_free_object(interpreter, ext_pool,
-                                ((PMC *)b)->pmc_ext);
+                                p->pmc_ext);
                     }
 #ifndef NDEBUG
                     /*
                      * invalidate the PMC
                      */
-                    PMC_struct_val((PMC*)b) = (void*)0xdeadbeef;
-                    PMC_pmc_val((PMC*)b) = (void*)0xdeadbeef;
-                    ((PMC*)b)->pmc_ext = (void*)0xdeadbeef;
+                    PMC_struct_val(p) = (void*)0xdeadbeef;
+                    PMC_pmc_val(p) = (void*)0xdeadbeef;
+                    p->pmc_ext = (void*)0xdeadbeef;
 #endif
                 }
                 /* else object is a buffer(like) */
@@ -884,6 +892,7 @@ Parrot_dod_sweep(Interp *interpreter,
 #endif
                 pool->add_free_object(interpreter, pool, b);
             }
+next:
             b = (Buffer *)((char *)b + object_size);
         }
 #if ARENA_DOD_FLAGS
