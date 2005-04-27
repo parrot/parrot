@@ -1,5 +1,8 @@
 # $Id$
 
+2005-04-27     Bernhard Schmalhofer
+        * Adapt to changes in Packfile management
+
 2005-04-08     Bernhard Schmalhofer
         * Adapt the PCRE tests to changes in 'library/pcre.imc'
 
