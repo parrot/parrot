@@ -115,9 +115,9 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
 #  undef code_end
 #endif
 
-#define  code_start interpreter->code->byte_code
-#define  code_end   (interpreter->code->byte_code + \
-        interpreter->code->cur_cs->base.size)
+#define  code_start interpreter->code->base.data
+#define  code_end   (interpreter->code->base.data + \
+        interpreter->code->base.size)
 
 
 #ifdef USE_TRACE_INTERP

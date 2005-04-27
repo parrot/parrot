@@ -181,10 +181,9 @@ make_code_pointers(struct PackFile_Segment *seg)
             }
             break;
         case PF_CONST_SEG:
-            if (!pf->const_table) {
-                pf->cur_cs->consts = pf->const_table =
-                    (struct PackFile_ConstTable*)seg;
-                pf->const_table->code = pf->cur_cs;
+            if (!pf->cur_cs->const_table) {
+                pf->cur_cs->const_table = (struct PackFile_ConstTable*)seg;
+                pf->cur_cs->const_table->code = pf->cur_cs;
             }
         default:
             break;
@@ -195,7 +194,7 @@ make_code_pointers(struct PackFile_Segment *seg)
 /*
 
 =item C<static int
-sub_pragma(Parrot_Interp interpreter, struct PackFile *pf,
+sub_pragma(Parrot_Interp interpreter,
         int action, PMC *sub_pmc)>
 
 Handle @LOAD, @MAIN ... pragmas for B<sub_pmc>
@@ -205,8 +204,7 @@ Handle @LOAD, @MAIN ... pragmas for B<sub_pmc>
 */
 
 static int
-sub_pragma(Parrot_Interp interpreter, struct PackFile *pf,
-        int action, PMC *sub_pmc)
+sub_pragma(Parrot_Interp interpreter, int action, PMC *sub_pmc)
 {
     int pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK;
     int todo = 0;
@@ -330,15 +328,15 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
 }
 
 static void
-do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)
+do_sub_pragmas(Interp* interpreter, struct PackFile_ByteCode *self, int action)
 {
     opcode_t i, ci;
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
     PMC *sub_pmc;
 
-    ft = self->cur_cs->fixups;
-    ct = self->cur_cs->consts;
+    ft = self->fixups;
+    ct = self->const_table;
     for (i = 0; i < ft->fixup_count; i++) {
         switch (ft->fixups[i]->type) {
             case enum_fixup_sub:
@@ -369,7 +367,7 @@ mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
     struct PackFile_ConstTable *ct;
     PMC *pmc;
 
-    ct = cs->consts;
+    ct = cs->const_table;
     if (!ct)
         return;
     /* fprintf(stderr, "mark %s\n", cs->base.name); */
@@ -403,7 +401,7 @@ mark_const_subs(Parrot_Interp interpreter)
     struct PackFile *self;
     struct PackFile_Directory *dir;
 
-    self = interpreter->code;
+    self = interpreter->initial_pf;
     if (!self || !self->cur_cs)
         return;
     /*
@@ -422,7 +420,7 @@ mark_const_subs(Parrot_Interp interpreter)
 /*
 
 =item C<static void
-fixup_subs(Interp *interpreter, struct PackFile *self,
+fixup_subs(Interp *interpreter, struct PackFile_Bytecode *self,
    int action)>
 
 Fixes up the constant subroutine objects. B<action> is one of
@@ -433,7 +431,7 @@ B<PBC_PBC>, B<PBC_LOADED>, or B<PBC_MAIN>.
 */
 
 static void
-fixup_subs(Interp *interpreter, struct PackFile *self, int action)
+fixup_subs(Interp *interpreter, struct PackFile_ByteCode *self, int action)
 {
     opcode_t i, ci;
     struct PackFile_FixupTable *ft;
@@ -445,8 +443,8 @@ fixup_subs(Interp *interpreter, struct PackFile *self, int action)
     PIO_eprintf(NULL, "PackFile: fixup_subs\n");
 #endif
 
-    ft = self->cur_cs->fixups;
-    ct = self->cur_cs->consts;
+    ft = self->fixups;
+    ct = self->const_table;
     for (i = 0; i < ft->fixup_count; i++) {
         switch (ft->fixups[i]->type) {
             case enum_fixup_sub:
@@ -468,7 +466,7 @@ fixup_subs(Interp *interpreter, struct PackFile *self, int action)
                             /*
                              * private4-7 are sub pragmas LOAD ...
                              */
-                            again |= sub_pragma(interpreter, self,
+                            again |= sub_pragma(interpreter,
                                     action, sub_pmc);
                         }
                         break;
@@ -476,7 +474,7 @@ fixup_subs(Interp *interpreter, struct PackFile *self, int action)
                 /* goon */
             case enum_fixup_label:
                 /* fill in current bytecode seg */
-                ft->fixups[i]->seg = self->cur_cs;
+                ft->fixups[i]->seg = self;
                 break;
         }
     }
@@ -654,12 +652,10 @@ PackFile_unpack(Interp *interpreter, struct PackFile *self,
     cursor = PackFile_Segment_unpack(interpreter,
                                      &self->directory.base, cursor);
     Parrot_unblock_DOD(interpreter);
-    /* shortcut */
-    self->byte_code = self->cur_cs->base.data;
     /*
      * fixup constant subroutine objects
      */
-    fixup_subs(interpreter, self, PBC_PBC);
+    fixup_subs(interpreter, self->cur_cs, PBC_PBC);
     /*
      * JITting and/or prederefing the sub/the bytecode is done
      * in switch_to_cs before actual usage of the segment
@@ -930,9 +926,7 @@ PackFile_new(Interp* interpreter, INTVAL is_mapped)
     PackFile_set_header(pf);
 
     /* Other fields empty for now */
-    pf->byte_code = NULL;
     pf->cur_cs = NULL;
-    pf->const_table = NULL;
     pf_register_standard_funcs(interpreter, pf);
     /* create the master directory, all subirs go there */
     pf->directory.base.pf = pf;
@@ -1206,7 +1200,7 @@ struct PackFile_ByteCode *
 PF_create_default_segs(Interp* interpreter, const char *file_name, int add)
 {
     struct PackFile_Segment *seg;
-    struct PackFile *pf = interpreter->code;
+    struct PackFile *pf = interpreter->initial_pf;
     struct PackFile_ByteCode *cur_cs;
 
     seg = create_seg(interpreter, &pf->directory,
@@ -1220,8 +1214,8 @@ PF_create_default_segs(Interp* interpreter, const char *file_name, int add)
 
     seg = create_seg(interpreter, &pf->directory,
             PF_CONST_SEG, CONSTANT_SEGMENT_NAME, file_name, add);
-    cur_cs->consts = pf->const_table = (struct PackFile_ConstTable*) seg;
-    cur_cs->consts->code = cur_cs;
+    cur_cs->const_table = (struct PackFile_ConstTable*) seg;
+    cur_cs->const_table->code = cur_cs;
 
     return cur_cs;
 }
@@ -1896,7 +1890,7 @@ byte_code_new (Interp* interpreter, struct PackFile *pf,
     byte_code->jit_info = NULL;
     byte_code->prev = NULL;
     byte_code->debugs = NULL;
-    byte_code->consts = NULL;
+    byte_code->const_table = NULL;
     byte_code->fixups = NULL;
     return (struct PackFile_Segment *) byte_code;
 }
@@ -2064,9 +2058,17 @@ Parrot_new_debug_seg(Interp *interpreter,
         len = strlen(cs->base.name) + 4;
         name = mem_sys_allocate(len);
         sprintf(name, "%s_DB", cs->base.name);
-        debug = (struct PackFile_Debug *)
-            PackFile_Segment_new_seg(interpreter,
-            &interpreter->code->directory, PF_DEBUG_SEG, name, 1);
+        if (interpreter->code->base.dir) {
+            debug = (struct PackFile_Debug *)
+                PackFile_Segment_new_seg(interpreter,
+                interpreter->code->base.dir, PF_DEBUG_SEG, name, 1);
+        }
+        else {
+            /* used by eval - don't register the segment */
+            debug = (struct PackFile_Debug *)
+                PackFile_Segment_new_seg(interpreter,
+                &interpreter->initial_pf->directory, PF_DEBUG_SEG, name, 0);
+        }
         mem_sys_free(name);
         debug->base.data = mem_sys_allocate(size * sizeof(opcode_t));
         debug->filename = mem_sys_allocate(strlen(filename) + 1);
@@ -2092,7 +2094,7 @@ Switch to byte code segment number C<seg>.
 void
 Parrot_switch_to_cs_by_nr(Interp *interpreter, opcode_t seg)
 {
-    struct PackFile_Directory *dir = &interpreter->code->directory;
+    struct PackFile_Directory *dir = interpreter->code->base.dir;
     size_t i, num_segs;
     opcode_t n;
 
@@ -2127,7 +2129,7 @@ struct PackFile_ByteCode *
 Parrot_switch_to_cs(Interp *interpreter,
     struct PackFile_ByteCode *new_cs, int really)
 {
-    struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
+    struct PackFile_ByteCode *cur_cs = interpreter->code;
 
     if (!new_cs) {
         internal_exception(NO_PREV_CS, "No code segment to switch to\n");
@@ -2138,17 +2140,8 @@ Parrot_switch_to_cs(Interp *interpreter,
     if (really && Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))
         PIO_eprintf(interpreter, "*** switching to %s\n",
                 new_cs->base.name);
-    if (new_cs->base.pf != interpreter->code)
-        interpreter->code = new_cs->base.pf;
-    interpreter->code->cur_cs = new_cs;
+    interpreter->code = new_cs;
     new_cs->prev = cur_cs;
-    interpreter->code->byte_code = new_cs->base.data;
-    interpreter->code->const_table = new_cs->consts;
-    interpreter->prederef.code       = new_cs->prederef.code;
-    interpreter->prederef.branches   = new_cs->prederef.branches;
-    interpreter->prederef.n_branches = new_cs->prederef.n_branches;
-    interpreter->prederef.n_allocated= new_cs->prederef.n_allocated;
-    interpreter->jit_info = new_cs->jit_info;
     if (really)
         prepare_for_run(interpreter);
     return cur_cs;
@@ -2168,10 +2161,10 @@ Remove current byte code segment from directory and switch to previous.
 void
 Parrot_pop_cs(Interp *interpreter)
 {
-    struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
+    struct PackFile_ByteCode *cur_cs = interpreter->code;
     struct PackFile_ByteCode *new_cs = cur_cs->prev;
 
-    Parrot_switch_to_cs(interpreter, new_cs, 1);
+    interpreter->code = new_cs;
     PackFile_remove_segment_by_name (interpreter,
             cur_cs->base.dir, cur_cs->base.name);
     /* FIXME delete returned segment */
@@ -2414,16 +2407,16 @@ I<What does this do?>
 void PackFile_FixupTable_new_entry(Interp *interpreter,
         char *label, enum_fixup_t type, opcode_t offs)
 {
-    struct PackFile_FixupTable *self = interpreter->code->cur_cs->fixups;
+    struct PackFile_FixupTable *self = interpreter->code->fixups;
     opcode_t i;
 
     if (!self) {
         self = (struct PackFile_FixupTable  *) PackFile_Segment_new_seg(
                 interpreter,
-                &interpreter->code->directory, PF_FIXUP_SEG,
+                interpreter->code->base.dir, PF_FIXUP_SEG,
                 FIXUP_TABLE_SEGMENT_NAME, 1);
-        interpreter->code->cur_cs->fixups = self;
-        self->code = interpreter->code->cur_cs;
+        interpreter->code->fixups = self;
+        self->code = interpreter->code;
     }
     i = self->fixup_count;
     self->fixup_count++;
@@ -2519,15 +2512,15 @@ PackFile_find_fixup_entry(Interp *interpreter, enum_fixup_t type,
         char * name)
 {
     /* TODO make a hash of all fixups */
-    struct PackFile_Directory *dir = &interpreter->code->directory;
+    struct PackFile_Directory *dir = interpreter->code->base.dir;
     struct PackFile_FixupEntry *ep, e;
     int found;
 
     /*
      * XXX when in eval, the dir is in cur_cs->prev
      */
-    if (interpreter->code->cur_cs->prev)
-        dir = &interpreter->code->cur_cs->prev->base.pf->directory;
+    if (interpreter->code->prev)
+        dir = interpreter->code->prev->base.dir;
 
     e.type = type;
     e.name = name;
@@ -2888,14 +2881,15 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
                          opcode_t *cursor)
 {
     struct PackFile *pf = constt->base.pf;
-    struct PackFile *pf_save;
+    struct PackFile_ByteCode *cs_save;
     STRING *image, *_sub;
     PMC *pmc;
+
     /*
      * thawing the PMC needs the real packfile in place
      */
-    pf_save = interpreter->code;
-    interpreter->code = pf;
+    cs_save = interpreter->code;
+    interpreter->code = pf->cur_cs;
 
     image = PF_fetch_string(interpreter, pf, &cursor);
     /*
@@ -2922,9 +2916,9 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
         }
     }
     /*
-     * restore packfile
+     * restore code
      */
-    interpreter->code = pf_save;
+    interpreter->code = cs_save;
     return cursor;
 }
 
@@ -3042,7 +3036,7 @@ PackFile_append_pbc(Interp *interpreter, const char *filename)
     struct PackFile * pf = Parrot_readbc(interpreter, filename);
     if (!pf)
         return NULL;
-    PackFile_add_segment(interpreter, &interpreter->code->directory,
+    PackFile_add_segment(interpreter, &interpreter->initial_pf->directory,
             &pf->directory.base);
     return pf;
 }
@@ -3070,6 +3064,7 @@ void
 Parrot_load_bytecode(Interp *interpreter, const char *filename)
 {
     const char *ext;
+    struct PackFile_ByteCode * cs;
     struct PackFile * pf;
 
 #if TRACE_PACKFILE
@@ -3079,7 +3074,7 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
     ext = strrchr(filename, '.');
     if (ext && strcmp (ext, ".pbc") == 0) {
         pf = PackFile_append_pbc(interpreter, filename);
-        do_sub_pragmas(interpreter, pf, PBC_LOADED);
+        do_sub_pragmas(interpreter, pf->cur_cs, PBC_LOADED);
     }
     else {
 #if 0
@@ -3103,16 +3098,13 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
         code = VTABLE_invoke(interpreter, compiler, file);
         pf = VTABLE_get_pointer(interpreter, code);
 #else
-        pf = IMCC_compile_file(interpreter, filename);
+        cs = IMCC_compile_file(interpreter, filename);
 #endif
-        if (pf) {
-            if (pf != interpreter->code)
-                PackFile_add_segment(interpreter,
-                        &interpreter->code->directory, &pf->directory.base);
-            fixup_subs(interpreter, pf, PBC_LOADED);
+        if (cs) {
+            fixup_subs(interpreter, cs, PBC_LOADED);
         }
         else
-            internal_exception(1, "compiler return NULL PackFile");
+            internal_exception(1, "compiler returned NULL ByteCode");
     }
 }
 

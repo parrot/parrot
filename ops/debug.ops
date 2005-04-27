@@ -45,7 +45,7 @@ op debug_init() :base_debug {
         pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
 
         interpreter->pdb = pdb;
-        pdb->cur_opcode = interpreter->code->byte_code;
+        pdb->cur_opcode = interpreter->code->base.data;
         pdb->state |= PDB_RUNNING;
     }
 

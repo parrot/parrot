@@ -373,7 +373,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     */
     emit_lda_b(jit_info->native_ptr, REG15_s6, -0x7ff8, REG15_s6);
     jit_emit_mov_ri_i(jit_info->native_ptr, REG10_s1,
-        interpreter->code->byte_code);
+        interpreter->code->base.data);
     jit_emit_mov_ri_i(jit_info->native_ptr, REG11_s2, jit_info->arena.op_map);
 }
 
@@ -481,7 +481,7 @@ void
 Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 {
     jit_emit_mov_mr_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, mem, reg);
 }
 
 /* move mem (i.e. intreg) to reg */
@@ -489,7 +489,7 @@ void
 Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
 {
     jit_emit_mov_rm_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, mem);
 }
 
 /* move reg to mem (i.e. numreg) */

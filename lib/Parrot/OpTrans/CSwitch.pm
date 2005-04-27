@@ -69,8 +69,8 @@ Returns the C C<#define> macros required by the ops.
 sub defines
 {
     return <<END;
-#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->prederef.code))
-#define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
+#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->code->prederef.code))
+#define CUR_OPCODE (interpreter->code->base.data + REL_PC)
 
 
 static void** opcode_to_prederef(Interp* interpreter,
@@ -78,8 +78,8 @@ static void** opcode_to_prederef(Interp* interpreter,
 {
     INTVAL offset_in_ops;
     if (opcode_addr == NULL) return NULL;
-    offset_in_ops = opcode_addr - (opcode_t*) interpreter->code->byte_code;
-    return interpreter->prederef.code + offset_in_ops;
+    offset_in_ops = opcode_addr - (opcode_t*) interpreter->code->base.data;
+    return interpreter->code->prederef.code + offset_in_ops;
 }
 
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])

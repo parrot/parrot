@@ -35,7 +35,7 @@ static STRING* __sub__;
 static STRING* __xor__;
 
 #define RIGHT(INTERP, SELF, OP, VALUE) \
-        opcode_t *next = INTERP->code->byte_code; \
+        opcode_t *next = INTERP->code->base.data; \
         PMC * method_pmc; \
         if (!OP) OP = const_string(INTERP, #OP); \
         method_pmc = VTABLE_find_method(interpreter, VALUE, OP); \

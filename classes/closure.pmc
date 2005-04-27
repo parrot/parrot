@@ -41,7 +41,7 @@ Initializes the closure.
 #if 0
         if (Interp_flags_TEST(INTERP, PARROT_DEBUG_FLAG))
             printf("Address of base segment is %p\n",
-                    (PMC_sub(SELF))->seg->base.pf->byte_code);
+                    (PMC_sub(SELF))->seg->base.pf->base.data);
 #endif
     }
 

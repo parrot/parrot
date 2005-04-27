@@ -852,7 +852,7 @@ Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
     jit_info->native_ptr
         = emit_word (jit_info->native_ptr,
                      ((int) jit_info->arena.op_map) -
-                     ((int) interpreter->code->byte_code));
+                     ((int) interpreter->code->base.code));
 }
 
 #endif /* JIT_EMIT */

@@ -76,7 +76,7 @@ typedef enum {
     f11,
     f12,
     f13,
-    FSR2 = f13, 
+    FSR2 = f13,
     f14,
     f15,
     f16,
@@ -582,13 +582,14 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     jit_emit_add_rrr(pc, D, r15, ISR1)
 
 #  define jit_emit_load_op_map(pc) \
-    jit_emit_lwz(pc, ISR1, offsetof(Interp, jit_info), r16); \
+    jit_emit_lwz(pc, ISR1, offsetof(Interp, code), r16); \
+    jit_emit_lwz(pc, ISR1, offsetof(struct PackFile_ByteCode, jit_info), ISR1); \
     jit_emit_lwz(pc, r14, (offsetof(Parrot_jit_arena_t, op_map) + \
                            offsetof(Parrot_jit_info_t, arena)), ISR1)
 
 #  define jit_emit_load_code_start(pc) \
     jit_emit_lwz(pc, ISR1, offsetof(Interp, code), r16); \
-    jit_emit_lwz(pc, r15,  offsetof(struct PackFile, byte_code), ISR1)
+    jit_emit_lwz(pc, r15,  offsetof(struct PackFile_Segment, data), ISR1)
 
 #  define jit_emit_branch_to_opcode(pc, D) \
     jit_emit_lwz(pc, r13, offsetof(Interp, ctx.bp), r16); \
@@ -641,7 +642,7 @@ void Parrot_ppc_jit_restore_nonvolatile_registers(void);
 /*
  * emit stack frame according to ABI
  * see also jit/ppc/core.jit for Parrot_end
- */ 
+ */
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
@@ -684,7 +685,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     add_disp(jit_info->native_ptr, r3,
-        ((long)jit_info->cur_op - (long)interpreter->code->byte_code));
+        ((long)jit_info->cur_op - (long)interpreter->code->base.data));
     jit_emit_mov_rr(jit_info->native_ptr, r4, r16); /* interp */
 
     /*
@@ -804,13 +805,13 @@ void
 Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 {
     jit_emit_mov_mr_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, mem, reg);
     /*
      * if we save registers, the last instruction isn't the ins that
      * sets condition codes, so the speed hack in Parrot_ifunless_i_ic
      * doesn't work.
      */
-    ((Parrot_jit_info_t *)(interpreter->jit_info))->prev_op = 0;
+    ((Parrot_jit_info_t *)(interpreter->code->jit_info))->prev_op = 0;
 }
 
 /* move mem (i.e. intreg) to reg */
@@ -818,7 +819,7 @@ void
 Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
 {
     jit_emit_mov_rm_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, mem);
 }
 
 /* move reg to mem (i.e. numreg) */
@@ -826,8 +827,8 @@ void
 Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem,int reg)
 {
     jit_emit_mov_mr_n(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
-    ((Parrot_jit_info_t *)(interpreter->jit_info))->prev_op = 0;
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, mem, reg);
+    ((Parrot_jit_info_t *)(interpreter->code->jit_info))->prev_op = 0;
 }
 
 /* move mem (i.e. numreg) to reg */
@@ -835,7 +836,7 @@ void
 Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
 {
     jit_emit_mov_rm_n(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, mem);
 }
 
 #endif /* JIT_EMIT == 2 */
@@ -849,14 +850,14 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
 #  endif
 #  define FLOAT_REGISTERS_TO_MAP 18
 
-/* 
+/*
  * Register usage
  * r0  special rA/0 not allocatable, not usable as ISR1
  * r1  SP
  * r2 TOC (AIX only) / allocated
  * r3 - r10 allocated
  * r11 ISR1
- * r12 ISR2 
+ * r12 ISR2
  * r13 Parrot register frame pointer
  * r14 op_map
  * r15 code_start
@@ -887,10 +888,10 @@ char intval_map[INT_REGISTERS_TO_MAP] =
  * f14 - f31 are not nonvolatile, and preserved in begin/end
  */
 char floatval_map[FLOAT_REGISTERS_TO_MAP] =
-    { 
+    {
       /* f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12 */
       f14, f15, f16, f17, f18, f19, f20, f21,
-      f22, f23, f24, f25, f26, f27, f28, f29, f30, f31 
+      f22, f23, f24, f25, f26, f27, f28, f29, f30, f31
     };
 
 void ppc_flush_line(char *_sync);

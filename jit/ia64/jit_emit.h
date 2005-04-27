@@ -1,14 +1,14 @@
 /*
  * jit_emit.h
- * 
+ *
  * IA64
  *
  * $Id$
  */
- 
+
 #if JIT_EMIT
 
-#  define NATIVE_PTR ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr
+#  define NATIVE_PTR ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr
 
 /* r0            Zero
  * r1            Special
@@ -32,7 +32,7 @@ typedef struct {
     int     it2;
     unsigned long    inst3;
     int     it3;
-} inst_tmp_t; 
+} inst_tmp_t;
 
 inst_tmp_t sit;
 
@@ -474,7 +474,7 @@ close_template(char *pc)
 }
 
 static char *
-loadinst(char *pc, long inst, int itype) 
+loadinst(char *pc, long inst, int itype)
 {
     char *pit = (char *)&inst;
     int i;
@@ -650,7 +650,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     emit_a4(NATIVE_PTR, R_BYTECODE,
-        ((long)jit_info->cur_op - (long)interpreter->code->byte_code),
+        ((long)jit_info->cur_op - (long)interpreter->code->base.data),
             (R_ARG1 + RSRV_REG));
     jit_emit_mov_rr(NATIVE_PTR, (R_ARG2 + RSRV_REG), R_INTREP);
     jit_emit_mov_rr(NATIVE_PTR, 32, 1);
@@ -704,7 +704,7 @@ void
 Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 {
     jit_emit_mov_mr_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, mem, reg);
     NATIVE_PTR = close_template(NATIVE_PTR);
 }
 
@@ -713,7 +713,7 @@ void
 Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
 {
     jit_emit_mov_rm_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, mem);
     NATIVE_PTR = close_template(NATIVE_PTR);
 }
 

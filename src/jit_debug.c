@@ -278,7 +278,7 @@ Writes the JIT debugging stabs.
 static void
 Parrot_jit_debug_stabs(Interp *interpreter)
 {
-    Parrot_jit_info_t *jit_info = interpreter->jit_info;
+    Parrot_jit_info_t *jit_info = interpreter->code->jit_info;
     STRING *file = interpreter->current_file;
     STRING *pasmfile, *stabsfile, *ofile, *cmd;
     FILE *stabs;
@@ -287,9 +287,9 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     opcode_t lc;
     struct PackFile_Debug *debug;
 
-    if (interpreter->code->cur_cs->debugs) {
+    if (interpreter->code->debugs) {
         char *ext;
-        char *src = interpreter->code->cur_cs->debugs->filename;
+        char *src = interpreter->code->debugs->filename;
         pasmfile = string_make(interpreter, src, strlen(src), NULL,
                 PObj_external_FLAG);
         file = string_copy(interpreter, pasmfile);
@@ -341,12 +341,12 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     fprintf(stabs, ".stabn " N_SLINE ",0,1,0\n");
     line = 1;
     lc = 0;
-    debug = interpreter->code->cur_cs->debugs;
+    debug = interpreter->code->debugs;
     for (i = 0; i < jit_info->arena.map_size; i++) {
         if (jit_info->arena.op_map[i].ptr) {
             op_info_t* op = &interpreter->op_info_table[
-                interpreter->code->byte_code[i]];
-            if (interpreter->code->cur_cs->debugs) {
+                interpreter->code->base.data[i]];
+            if (interpreter->code->debugs) {
                 if (lc >= (int)(debug->base.size))
                     break;
                 line = (int)debug->base.data[lc++];

@@ -524,7 +524,14 @@ Subtracts C<value> from C<SELF> inplace.
 
     void i_subtract (PMC* value) {
 MMD_Integer: {
-            SELF.i_subtract_int(VTABLE_get_integer(INTERP, value));
+            INTVAL a = DYNSELF.get_integer();
+            INTVAL b = VTABLE_get_integer(INTERP, value);
+            INTVAL c = a - b;
+            if ((c^a) >= 0 || (c^~b) >= 0) {
+                VTABLE_set_integer_native(INTERP, SELF, c);
+            }
+            else
+                overflow(INTERP, SELF, b, SELF, MMD_SUBTRACT);
         }
 MMD_Complex: {
             INTVAL a = DYNSELF.get_integer();
@@ -537,7 +544,7 @@ MMD_Complex: {
         }
 MMD_DEFAULT: {
         VTABLE_set_number_native(INTERP, SELF,
-            PMC_int_val(SELF) - VTABLE_get_number(INTERP, value));
+            DYNSELF.get_integer() - VTABLE_get_number(INTERP, value));
         }
     }
 

@@ -12,15 +12,15 @@ examples/assembly/mops_p.pasm - Calculate a benchmark
 =head1 DESCRIPTION
 
 Calculates a value for M ops/s (million operations per second) using
-C<PerlInt> PMCs.
+C<Integer> PMCs.
 
 =cut
 
-        new    P1, .PerlInt
-        new    P2, .PerlInt
-        new    P3, .PerlInt
-        new    P4, .PerlInt
-        new    P5, .PerlInt
+        new    P1, .Integer
+        new    P2, .Integer
+        new    P3, .Integer
+        new    P4, .Integer
+        new    P5, .Integer
 
         set    P2, 0
         set    P3, 1

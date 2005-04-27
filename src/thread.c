@@ -45,7 +45,7 @@ thread_func(void *arg)
 
     Parrot_Interp interpreter = PMC_data(self);
     runops(interpreter, (opcode_t *) PMC_struct_val(self) -
-            (opcode_t *)interpreter->code->byte_code);
+            (opcode_t *)interpreter->code->base.data);
     /*
      * thread is finito
      */

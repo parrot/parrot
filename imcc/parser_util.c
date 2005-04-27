@@ -20,6 +20,7 @@
 #include "parrot/method_util.h"
 #include "parrot/interp_guts.h"
 #include "parrot/dynext.h"
+#include "parrot/embed.h"
 #include "pbc.h"
 #include "parser.h"
 
@@ -641,7 +642,7 @@ extern SymReg *cur_namespace; /* s. imcc.y */
 PMC *
 imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
 {
-    /* imcc always compiles to interp->code->byte_code
+    /* imcc always compiles to interp->code
      * save old cs, make new
      */
     char name[64];
@@ -662,7 +663,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
         IMCC_INFO(interp) = imc_info;
     }
 
-    sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->eval_nr);
+    sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->base.pf->eval_nr);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
     cur_namespace = NULL;
@@ -733,8 +734,7 @@ imcc_compile_pir (Parrot_Interp interp, const char *s)
 void *
 imcc_compile_file (Parrot_Interp interp, const char *s)
 {
-    struct PackFile *pf_save = interp->code;
-    struct PackFile *pf;
+    struct PackFile_ByteCode *cs_save = interp->code, *cs;
     char *ext, *fullname = NULL;   /* gc uninit warning */
     FILE *fp;
     struct _imc_info_t *imc_info = NULL;
@@ -764,12 +764,17 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 
     cur_namespace = NULL;
     IMCC_INFO(interp)->cur_namespace = NULL;
-    pf = PackFile_new(interp, 0);
-    interp->code = pf;  /* put new packfile in place */
+    interp->code = NULL;
+
     IMCC_push_parser_state(interp);
     IMCC_INFO(interp)->state->file = s;
     ext = strrchr(fullname, '.');
     line = 1;
+    /*
+     * the string_compare() called from pmc_type() triggers DOD
+     * which can destroy packfiles under construction
+     */
+    Parrot_block_DOD(interp);
 
     if (ext && strcmp (ext, ".pasm") == 0) {
         IMCC_INFO(interp)->state->pasm_file = 1;
@@ -783,19 +788,21 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
         IMCC_INFO(interp)->state->pasm_file = 0;
         compile_file(interp, fp);
     }
+    Parrot_unblock_DOD(interp);
 
     imc_cleanup(interp);
     fclose(fp);
+    cs = interp->code;
 
-    if (pf_save)
-        (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
+    if (cs_save)
+        (void)Parrot_switch_to_cs(interp, cs_save, 0);
     string_cstring_free(fullname);
 
     if (imc_info) {
         IMCC_INFO(interp) = imc_info->prev;
         mem_sys_free(imc_info);
     }
-    return pf;
+    return cs;
 }
 
 void * IMCC_compile_file (Parrot_Interp interp, const char *s);

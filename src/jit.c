@@ -86,7 +86,7 @@ static void
 insert_fixup_targets(Interp* interpreter, char *branch,
         size_t limit)
 {
-    struct PackFile_FixupTable *ft = interpreter->code->cur_cs->fixups;
+    struct PackFile_FixupTable *ft = interpreter->code->fixups;
     int i;
 
     if (!ft)
@@ -1285,14 +1285,14 @@ build_asm(Interp *interpreter, opcode_t *pc,
 #endif
 
     /* XXX assume, we restart */
-    if (interpreter->jit_info) {
-        jit_info = interpreter->jit_info;
+    if (interpreter->code->jit_info) {
+        jit_info = interpreter->code->jit_info;
         return (jit_f)D2FPTR(jit_info->arena.start);
     }
-    if (!interpreter->jit_info)
-        jit_info = interpreter->jit_info =
+    else {
+        jit_info = interpreter->code->jit_info =
             mem_sys_allocate(sizeof(Parrot_jit_info_t));
-
+    }
     jit_info->objfile = NULL;
 #if EXEC_CAPABLE
     if (objfile) {
@@ -1308,10 +1308,10 @@ build_asm(Interp *interpreter, opcode_t *pc,
      * register allocation information inside.
      * See imcc/jit.c for more
      */
-    name = mem_sys_allocate(strlen(interpreter->code->cur_cs->base.name) + 5);
-    sprintf(name, "%s_JIT", interpreter->code->cur_cs->base.name);
+    name = mem_sys_allocate(strlen(interpreter->code->base.name) + 5);
+    sprintf(name, "%s_JIT", interpreter->code->base.name);
     jit_seg = PackFile_find_segment(interpreter,
-            interpreter->code->cur_cs->base.dir, name, 0);
+            interpreter->code->base.dir, name, 0);
     mem_sys_free(name);
     if (jit_seg)
         jit_info->optimizer =

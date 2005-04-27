@@ -135,7 +135,7 @@ main(int argc, char **argv) {
      * this modifies it to be address of the opcode.
      */
     opp = &opcode_map;
-    for (i = 0; i < (int)interpre.code->cur_cs->base.size; i++) {
+    for (i = 0; i < (int)interpre.code->base.size; i++) {
         opp[i] += (long)run_compiled;
     }
 
@@ -143,7 +143,7 @@ main(int argc, char **argv) {
     exec_init_prederef(interpreter, &exec_prederef_code);
 #endif
     Parrot_set_run_core(interpreter, PARROT_EXEC_CORE);
-    interpreter->code->byte_code =
+    interpreter->code->base.data =
         (opcode_t *)&((&program_code)[bytecode_offset]);
     Parrot_exec_run = 0;
     runops(interpreter, 0);

@@ -44,7 +44,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
             (INTVAL)cur_section->op_count >= 2 + last_is_branch) {
         int saved = 0;
         offset = (void **)((int)jit_info->cur_op -
-            (int)interpreter->code->byte_code);
+            (int)interpreter->code->base.data);
 
         jit_emit_mov_ri_i(jit_info->native_ptr, emit_ESI, offset);
         Parrot_exec_add_text_rellocation(jit_info->objfile,
@@ -54,8 +54,8 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
          * prederefed (non JIT) section
          */
         if (last_is_branch) {
-            offset = (cur_section->end - interpreter->code->byte_code) +
-                interpreter->code->cur_cs->prederef.code;
+            offset = (cur_section->end - interpreter->code->base.data) +
+                interpreter->code->prederef.code;
             cur_section->done = -1;
             /* ins to skip */
             cur_section->ins_count = cur_section->op_count - 1;
@@ -65,8 +65,8 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
              * or a JITed branch,
              * when the branch is non JIT, we are in the above case
              */
-            offset = (cur_section->next->begin - interpreter->code->byte_code)
-                + interpreter->code->cur_cs->prederef.code;
+            offset = (cur_section->next->begin - interpreter->code->base.data)
+                + interpreter->code->prederef.code;
             cur_section->done = 1;
         }
         i = (int)(((op_func_t*)interpreter->op_lib->op_func_table)[2]);

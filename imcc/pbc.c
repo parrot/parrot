@@ -130,8 +130,8 @@ e_pbc_open(Interp * interpreter, void *param)
     /*
      * we need some segments
      */
-    if (!interpreter->code->cur_cs) {
-        cs->seg = interpreter->code->cur_cs =
+    if (!interpreter->code) {
+        cs->seg = interpreter->code =
             PF_create_default_segs(interpreter,
                     IMCC_INFO(interpreter)->state->file, 1);
     }
@@ -165,7 +165,7 @@ make_jit_info(Interp *interpreter, IMC_Unit * unit)
         sprintf(name, "%s_JIT", globals.cs->seg->base.name);
         globals.cs->jit_info =
             PackFile_Segment_new_seg(interpreter,
-                    &interpreter->code->directory, PF_UNKNOWN_SEG, name, 1);
+                    interpreter->code->base.dir, PF_UNKNOWN_SEG, name, 1);
         free(name);
     }
     size = unit->n_basic_blocks + (old = old_blocks());
@@ -212,7 +212,7 @@ get_old_size(Interp *interpreter, int *ins_line)
     struct subs *s;
 
     size = *ins_line = 0;
-    if (!globals.cs || interpreter->code->byte_code == NULL)
+    if (!globals.cs || interpreter->code->base.data == NULL)
         return 0;
     for (s = globals.cs->subs; s; s = s->prev) {
         size += s->size;
@@ -498,14 +498,14 @@ fixup_bsrs(Interp *interpreter)
                         SymReg *nam;
                         op = interpreter->op_lib->op_code("find_name_p_sc", 1);
                         assert(op);
-                        interpreter->code->byte_code[addr] = op;
+                        interpreter->code->base.data[addr] = op;
                         nam = mk_const(interpreter, str_dup(bsr->name), 'S');
                         if (nam->color >= 0)
                             col = nam->color;
                         else {
                             col = nam->color = add_const_str(interpreter, nam);
                         }
-                        interpreter->code->byte_code[addr+2] = col;
+                        interpreter->code->base.data[addr+2] = col;
                         IMCC_debug(interpreter, DEBUG_PBC_FIXUP,
                                 "fixup const PMC"
                                 " find_name sub '%s' const nr: %d\n",
@@ -518,7 +518,7 @@ fixup_bsrs(Interp *interpreter)
                                 "couldn't find sub 2 '%s'\n",
                                 bsr->name);
                     }
-                    interpreter->code->byte_code[addr+bsr->score] =
+                    interpreter->code->base.data[addr+bsr->score] =
                         pmc_const;
                     IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "fixup const PMC"
                             " sub '%s' const nr: %d\n", bsr->name,
@@ -535,7 +535,7 @@ fixup_bsrs(Interp *interpreter)
                 /* patch the bsr __ instruction */
                 IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "fixup %s pc %d fix %d\n",
                         bsr->name, addr, pc - addr);
-                interpreter->code->byte_code[addr+bsr->score] = pc - addr;
+                interpreter->code->base.data[addr+bsr->score] = pc - addr;
             }
         }
         jumppc += s->size;
@@ -638,9 +638,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     int ns_const = -1;
     char *real_name;
     struct PackFile_ConstTable *ct;
-    struct PackFile *pf;
 
-    pf = interpreter->code;
     if (globals.cs->subs->unit->namespace) {
         ns = globals.cs->subs->unit->namespace->reg;
         if (ns->set == 'K')
@@ -1058,23 +1056,22 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         constant_folding(interpreter, unit);
         store_sub_size(code_size, ins_size);
         bytes = (oldsize + code_size) * sizeof(opcode_t);
-        if (interpreter->code->byte_code) {
-            interpreter->code->byte_code =
-                mem_sys_realloc(interpreter->code->byte_code, bytes);
+        if (interpreter->code->base.data) {
+            interpreter->code->base.data =
+                mem_sys_realloc(interpreter->code->base.data, bytes);
         } else {
-            interpreter->code->byte_code =
+            interpreter->code->base.data =
                 mem_sys_allocate(bytes);
         }
-        interpreter->code->cur_cs->base.size = oldsize + code_size;
-        interpreter->code->cur_cs->base.data = interpreter->code->byte_code;
-        pc = (opcode_t*) interpreter->code->byte_code + oldsize;
+        interpreter->code->base.size = oldsize + code_size;
+        pc = (opcode_t*) interpreter->code->base.data + oldsize;
         npc = 0;
         /* add debug if necessary */
         if (!IMCC_INFO(interpreter)->optimizer_level) {
             const char *sourcefile = IMCC_INFO(interpreter)->state->file;
             /* FIXME length and multiple subs */
             debug_seg = Parrot_new_debug_seg(interpreter,
-                    interpreter->code->cur_cs, sourcefile,
+                    interpreter->code, sourcefile,
                     (size_t) ins_line + ins_size + 1);
         }
         else

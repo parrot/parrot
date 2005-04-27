@@ -8,7 +8,7 @@ classes/pyclass.pmc - Python Class
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the Python Class base class (i.e., 
+These are the vtable functions for the Python Class base class (i.e.,
 methods you would expect to see on python objects).
 
 =head2 Methods
@@ -32,7 +32,7 @@ Parrot_PyClass_runops_fromc(Interp* interpreter, PMC *sub)
 
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         PIO_eprintf(interpreter, "# Invoking %Ss on %Ss\n",
-           REG_STR(0), REG_PMC(2)->vtable->whoami); 
+           REG_STR(0), REG_PMC(2)->vtable->whoami);
     }
 
     dest = VTABLE_invoke(interpreter, sub, NULL);
@@ -51,7 +51,7 @@ Parrot_PyClass_runops_fromc(Interp* interpreter, PMC *sub)
         if (bp_new != bp_save) copy_regs(interpreter, bp_save);
         interpreter->ctx.current_sub = sub;
 
-        offset = dest - interpreter->code->byte_code;
+        offset = dest - interpreter->code->base.data;
         runops(interpreter, offset);
     }
 
@@ -82,7 +82,7 @@ Parrot_PyClass_call_meth_fromc_P(Interp* interpreter, PMC *obj,
         ret = NULL;
     else {
         bp = Parrot_PyClass_runops_fromc(interpreter, sub);
-        ret = BP_REG_PMC(bp,5); 
+        ret = BP_REG_PMC(bp,5);
     }
 
     restore_context(interpreter, &ctx);
@@ -113,7 +113,7 @@ Parrot_PyClass_call_meth_fromc_P_P(Interp* interpreter, PMC *obj,
         ret = NULL;
     else {
         bp = Parrot_PyClass_runops_fromc(interpreter, sub);
-        ret = BP_REG_PMC(bp,5); 
+        ret = BP_REG_PMC(bp,5);
     }
 
     restore_context(interpreter, &ctx);
@@ -307,7 +307,7 @@ Return the representation of this object.
 */
 
     STRING* get_repr() {
-        PMC *repr = Parrot_PyClass_call_meth_fromc_P(INTERP, SELF, 
+        PMC *repr = Parrot_PyClass_call_meth_fromc_P(INTERP, SELF,
                 PyString_repr);
 
         if (!repr) internal_exception(1, "unable to locate object.__repr__");

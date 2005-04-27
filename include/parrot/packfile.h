@@ -174,7 +174,7 @@ struct PackFile_ByteCode {
     void *jit_info;             /* JITs data */
     struct PackFile_ByteCode  * prev;   /* was executed previous */
     struct PackFile_Debug     * debugs;
-    struct PackFile_ConstTable *consts;
+    struct PackFile_ConstTable *const_table;
     struct PackFile_FixupTable *fixups;
 };
 
@@ -204,11 +204,7 @@ struct PackFile {
     /* TODO make this reallocatable */
     struct PackFile_funcs      PackFuncs[PF_MAX_SEG];
 
-    /* the next pointers are shortcuts to the real thing in
-     * the current byte code segment, i.e. cur_cs->base.data */
-    struct PackFile_ByteCode   * cur_cs;   /* current byte code seg */
-    struct PackFile_ConstTable * const_table;
-    opcode_t *                   byte_code;
+    struct PackFile_ByteCode  * cur_cs;   /* used during PF loading */
 
     INTVAL                       eval_nr;   /* nr. of eval cs */
     INTVAL                       need_wordsize;

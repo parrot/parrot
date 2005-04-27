@@ -37,34 +37,6 @@ Parrot_lib_japhc_init(Parrot_Interp interpreter, PMC* lib)
     Parrot_compreg(interpreter, cmp, japh_compiler);
 }
 
-/*
- * some code almost duplicated from imcc/pbc.c
- * XXX should make some public util functions
- */
-static struct PackFile_Segment *
-create_seg(Interp* interpreter, struct PackFile_Directory *dir,
-		pack_file_types t, const char *name)
-{
-    struct PackFile_Segment *seg;
-    seg = PackFile_Segment_new_seg(interpreter, dir, t, name, 1);
-    return seg;
-}
-
-struct PackFile_ByteCode *
-create_pf_segs(Parrot_Interp interpreter)
-{
-    struct PackFile *pf = interpreter->code;
-    struct PackFile_Segment *seg;
-    struct PackFile_ByteCode *cur_cs;
-
-    seg = create_seg(interpreter, &pf->directory, PF_BYTEC_SEG, "JaPHc_bc");
-    cur_cs = (struct PackFile_ByteCode*)seg;
-
-    seg = create_seg(interpreter, &pf->directory, PF_CONST_SEG, "JaPHc_const");
-    cur_cs->consts = (struct PackFile_ConstTable*) seg;
-    cur_cs->consts->code = cur_cs;
-    return cur_cs;
-}
 
 static int
 unescape(char *string)
@@ -154,14 +126,14 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
     /*
      * need some packfile segments
      */
-    cur_cs = create_pf_segs(interpreter);
+    cur_cs = PF_create_default_segs(interpreter, "JAPHc", 1);
     old_cs = Parrot_switch_to_cs(interpreter, cur_cs, 0);
     /*
      * alloc byte code mem
      */
     cur_cs->base.data = mem_sys_allocate(CODE_SIZE * sizeof(opcode_t));
     cur_cs->base.size = CODE_SIZE;
-    consts = cur_cs->consts;
+    consts = cur_cs->const_table;
     /*
      * now start compiling
      */

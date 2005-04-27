@@ -213,7 +213,7 @@ destination to continue execution.
             /* no address and no segment */
             return NULL;
         }
-        if (INTERP->code->cur_cs != cc->seg) {
+        if (INTERP->code != cc->seg) {
             Parrot_switch_to_cs(INTERP, cc->seg, 1);
         }
         return cc->address;

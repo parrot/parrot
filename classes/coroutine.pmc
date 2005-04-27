@@ -101,14 +101,14 @@ Swaps the "context".
         if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             wanted_seg = sub->seg;
             /* remember segment of caller */
-            sub->caller_seg = INTERP->code->cur_cs;
+            sub->caller_seg = INTERP->code;
         }
         else {
             wanted_seg = sub->caller_seg;
         }
         swap_context(INTERP, SELF);
 
-        if (INTERP->code->cur_cs != wanted_seg) {
+        if (INTERP->code != wanted_seg) {
             Parrot_switch_to_cs(INTERP, wanted_seg, 1);
         }
         return dest;

@@ -70,16 +70,15 @@ Returns the C C<#define> macros required by the ops.
 sub defines
 {
     return <<END;
-#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->prederef.code))
-#define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
+#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->code->prederef.code))
+#define CUR_OPCODE (interpreter->code->base.data + REL_PC)
 
 
 PARROT_INLINE static void**
-opcode_to_prederef(Interp* interpreter,
-                                        opcode_t* opcode_addr)
+opcode_to_prederef(Interp* interpreter, opcode_t* opcode_addr)
 {
-    return interpreter->prederef.code +
-        (opcode_addr - (opcode_t*) interpreter->code->byte_code);
+    return interpreter->code->prederef.code +
+        (opcode_addr - (opcode_t*) interpreter->code->base.data);
 }
 
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])

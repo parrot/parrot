@@ -36,7 +36,7 @@ clear_fixups(Interp* interpreter, PMC* self)
     ft = seg->fixups;
     if (!ft)
         return;
-    ct = seg->consts;
+    ct = seg->const_table;
     if (!ct)
         return;
     for (i = 0; i < ft->fixup_count; i++) {
@@ -87,9 +87,9 @@ pmclass Eval extends Closure need_ext {
         if (!cur_cs)
             return;
 
-        if (cur_cs->consts)
-            PackFile_ConstTable_clear(INTERP, cur_cs->consts);
-        cur_cs->consts = NULL;
+        if (cur_cs->const_table)
+            PackFile_ConstTable_clear(INTERP, cur_cs->const_table);
+        cur_cs->const_table = NULL;
         seg = (struct PackFile_Segment *)cur_cs->debugs;
         if (seg)
             PackFile_Segment_destroy(INTERP, seg);

@@ -381,7 +381,8 @@ Loads the C<PackFile> returned by C<Parrot_readbc()>.
 void
 Parrot_loadbc(Interp *interpreter, struct PackFile *pf)
 {
-    interpreter->code = pf;
+    interpreter->initial_pf = pf;
+    interpreter->code = pf->cur_cs;
 }
 
 /*
@@ -647,7 +648,7 @@ static void
 set_current_sub(Interp *interpreter)
 {
     opcode_t i, ci;
-    struct PackFile *pf;
+    struct PackFile_ByteCode *cur_cs;
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
     struct Parrot_sub *sub;
@@ -660,16 +661,16 @@ set_current_sub(Interp *interpreter)
      * entry point with the address at our resume_offset.
      */
 
-    pf = interpreter->code;
-    ft = pf->cur_cs->fixups;
-    ct = pf->cur_cs->consts;
+    cur_cs = interpreter->code;
+    ft = cur_cs->fixups;
+    ct = cur_cs->const_table;
     for (i = 0; i < ft->fixup_count; i++) {
         switch (ft->fixups[i]->type) {
             case enum_fixup_sub:
                 ci = ft->fixups[i]->offset;
                 sub_pmc = ct->constants[ci]->u.key;
                 sub = PMC_sub(sub_pmc);
-                if (sub->seg != pf->cur_cs)
+                if (sub->seg != cur_cs)
                     continue;
                 code_start = (opcode_t*) sub->seg->base.data;
                 offs = sub->address - code_start;
@@ -831,7 +832,7 @@ Parrot_debug(Interp *interpreter, int argc, char ** argv)
     pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
 
     interpreter->pdb = pdb;
-    pdb->cur_opcode = interpreter->code->byte_code;
+    pdb->cur_opcode = interpreter->code->base.data;
 
     /* Parrot_setup_argv(interpreter, argc, argv); */
     PDB_init(interpreter, argv_join(argv));
@@ -866,7 +867,7 @@ Parrot_disassemble(Interp *interpreter)
     pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
 
     interpreter->pdb = pdb;
-    pdb->cur_opcode = interpreter->code->byte_code;
+    pdb->cur_opcode = interpreter->code->base.data;
 
     PDB_disassemble(interpreter, NULL);
     line = pdb->file->line;
@@ -911,7 +912,7 @@ Parrot_run_native(Parrot_Interp interpreter, native_func_t func)
     pf = PackFile_new(interpreter, 0);
     pf->cur_cs = (struct PackFile_ByteCode *)
 	(pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interpreter, pf, "code", 1);
-    pf->byte_code = pf->cur_cs->base.data = program_code;
+    pf->cur_cs->base.data = program_code;
     pf->cur_cs->base.size = 2;
     Parrot_loadbc(interpreter, pf);
     run_native = func;

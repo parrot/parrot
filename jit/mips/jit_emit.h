@@ -55,7 +55,7 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
 
 /*
  * R type
- * 
+ *
  *  +--------------------------------------------------------------------+
  *  |  Opcode  |    rs    |    rt    |    rd    |    re    |    funct    |
  *  +--------------------------------------------------------------------+
@@ -69,7 +69,7 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
 
 /*
  * I type
- * 
+ *
  *  +--------------------------------------------------------------------+
  *  |  Opcode  |     rs     |     rt     |            offset             |
  *  +--------------------------------------------------------------------+
@@ -79,11 +79,11 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
 
 #  define emit_i(pc, opcode, rs, rt, offset) \
     *(int *)((pc += 4) - 4) = \
-      opcode << 26 | rs << 21 | rt << 16 | ((long)offset & 0xffff); 
+      opcode << 26 | rs << 21 | rt << 16 | ((long)offset & 0xffff);
 
 /*
  * J type
- * 
+ *
  *  +--------------------------------------------------------------------+
  *  |  Opcode  |                       target                            |
  *  +--------------------------------------------------------------------+
@@ -92,7 +92,7 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
  */
 
 #  define emit_j(pc, opcode, target) \
-    *(int *)((pc += 4) - 4) = opcode << 26 | target; 
+    *(int *)((pc += 4) - 4) = opcode << 26 | target;
 
 #  define emit_nop(pc) emit_j(pc, 0, 0)
 
@@ -144,7 +144,7 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
 
 #  define emit_or(pc, rd, rs, rt) \
     emit_r(pc, 0, rs, rt, rd, 0, 0x25)
- 
+
 /*  XOR
  *
  *  To do a bitwise logical EXCLUSIVE OR.
@@ -153,7 +153,7 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
 
 #  define emit_xor(pc, rd, rs, rt) \
     emit_r(pc, 0, rs, rt, rd, 0, 0x26)
- 
+
 
 /*  ORI
  *
@@ -163,16 +163,16 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
 
 #  define emit_ori(pc, rs, rt, imm) \
     emit_i(pc, 0xd, rs, rt, imm)
-  
+
 /*  ADD
- * 
+ *
  *  To add 32 bit integers.
  *  rd = rs + rt
  */
 
 #  define emit_add(pc, rd, rs, rt) \
     emit_r(pc, 0, rs, rt, rd, 0, 0x20)
- 
+
 /*  ADDIU
  *
  *  To add a constant to a 32 bit integer.
@@ -180,10 +180,10 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
  */
 
 #  define emit_addiu(pc, rs, rt, imm) \
-    emit_i(pc, 9, rs, rt, imm) 
+    emit_i(pc, 9, rs, rt, imm)
 
 /*  SUB
- * 
+ *
  *  To substract 32 bit integers.
  *  rd = rs - rt
  */
@@ -251,9 +251,9 @@ enum { JIT_MIPS_CALL, JIT_MIPS_BRANCH };
  *
  *  To procedure call within the current 256 MB aligned region.
  */
- 
+
 #  define emit_jal(pc) \
-    emit_j(pc, 3, 0) 
+    emit_j(pc, 3, 0)
 
 /*  JALR
  *
@@ -309,7 +309,7 @@ emit_if(Parrot_jit_info_t *jit_info, char opcode, mips_register_t rs,
     }
     else {
         offset = 0;
-        Parrot_jit_newfixup(jit_info); 
+        Parrot_jit_newfixup(jit_info);
         jit_info->arena.fixups->type = JIT_MIPS_BRANCH;
         jit_info->arena.fixups->param.opcode = opcode;
 
@@ -317,7 +317,7 @@ emit_if(Parrot_jit_info_t *jit_info, char opcode, mips_register_t rs,
             jit_info->optimizer->cur_section)
                 jit_info->arena.fixups->skip =
                     jit_info->optimizer->cur_section->branch_target->load_size;
-    
+
     }
     emit_i(jit_info->native_ptr, opcode, rs, rt, offset);
 }
@@ -329,7 +329,7 @@ emit_if(Parrot_jit_info_t *jit_info, char opcode, mips_register_t rs,
  */
 
 #  define emit_beq(pc, rs, rt, imm) \
-    emit_if(pc, 4, rs, rt, imm) 
+    emit_if(pc, 4, rs, rt, imm)
 
 /*  BNE
  *
@@ -338,26 +338,26 @@ emit_if(Parrot_jit_info_t *jit_info, char opcode, mips_register_t rs,
  */
 
 #  define emit_bne(pc, rs, rt, imm) \
-    emit_if(pc, 5, rs, rt, imm) 
+    emit_if(pc, 5, rs, rt, imm)
 
-/*  BNEZ 
+/*  BNEZ
  *
  *  To compare GPRs then do a PC-relative conditional branch.
  *  if (rs != 0) branch
  */
 
 #  define emit_bnez(pc, rs, imm) \
-    emit_if(pc, 1, rs, 2, imm) 
+    emit_if(pc, 1, rs, 2, imm)
 
 
-/*  BEGZ 
+/*  BEGZ
  *
  *  To compare GPRs then do a PC-relative conditional branch.
  *  if (rs >= 0) branch
  */
 
 #  define emit_begz(pc, rs, imm) \
-    emit_if(pc, 1, rs, 1, imm) 
+    emit_if(pc, 1, rs, 1, imm)
 
 /*  SLT
  *
@@ -372,7 +372,7 @@ emit_if(Parrot_jit_info_t *jit_info, char opcode, mips_register_t rs,
  */
 #  define emit_ge(pc, rs, rt, imm) \
     emit_slt(pc, rs, rt, at); \
-    emit_beqz(pc, at, imm) 
+    emit_beqz(pc, at, imm)
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
@@ -383,8 +383,8 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     emit_sw(jit_info->native_ptr, fp, 28, sp);
     emit_mov(jit_info->native_ptr, s0, a0);
     emit_imm32(jit_info->native_ptr, s1, jit_info->arena.op_map);
-    emit_imm32(jit_info->native_ptr, s2, interpreter->code->byte_code);
-}    
+    emit_imm32(jit_info->native_ptr, s2, interpreter->code->base.data);
+}
 
 void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
@@ -415,14 +415,14 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
         fixup = fixup->next;
     }
 }
-   
+
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     Interp *interpreter)
 {
     emit_imm32(jit_info->native_ptr, a0, jit_info->cur_op);
     emit_mov(jit_info->native_ptr, a1, s0);
-    emit_imm32(jit_info->native_ptr, t9, 
+    emit_imm32(jit_info->native_ptr, t9,
         interpreter->op_func_table[*(jit_info->cur_op)]);
     emit_jalr(jit_info->native_ptr, t9, ra);
     emit_nop(jit_info->native_ptr);
@@ -437,7 +437,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     emit_add(jit_info->native_ptr, v0, v0, s1);
     emit_lw(jit_info->native_ptr, v0, 0, v0);
     emit_jr(jit_info->native_ptr, v0);
-} 
+}
 
 /* move reg to mem (i.e. intreg) */
 void
@@ -493,7 +493,7 @@ sync_cache (void *_start, void *_end)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

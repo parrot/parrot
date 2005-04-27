@@ -255,9 +255,9 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     int line;
     opcode_t lc;
 
-    if (interpreter->code->cur_cs->debugs) {
+    if (interpreter->code->debugs) {
         char *ext;
-        char *src = interpreter->code->cur_cs->debugs->filename;
+        char *src = interpreter->code->debugs->filename;
         pasmfile = string_make(interpreter, src, strlen(src), NULL,
                 PObj_external_FLAG);
         file = string_copy(interpreter, pasmfile);
@@ -314,9 +314,9 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     lc = 0;
     for (i = 0; i < jit_info->arena.map_size; i++) {
         if (jit_info->arena.op_map[i].ptr) {
-            op_info_t* op = &interpreter->op_info_table[interpreter->code->byte_code[i]];
-            if (interpreter->code->cur_cs->debugs) {
-                line = (int)interpreter->code->cur_cs->debugs->base.data[lc++];
+            op_info_t* op = &interpreter->op_info_table[interpreter->code->base.data[i]];
+            if (interpreter->code->debugs) {
+                line = (int)interpreter->code->debugs->base.data[lc++];
             }
             fprintf(stabs, ".line %d # 0x%p %s\n", line,
                     (int)((char *)jit_info->arena.op_map[i].ptr -

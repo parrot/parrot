@@ -70,7 +70,7 @@ sub defines
 {
     return <<END;
 #undef CONST
-#define REL_PC     ((size_t)(cur_opcode - interpreter->code->byte_code))
+#define REL_PC     ((size_t)(cur_opcode - interpreter->code->base.data))
 #define CUR_OPCODE cur_opcode
 #define IREG(i) REG_INT(cur_opcode[i])
 #define NREG(i) REG_NUM(cur_opcode[i])

@@ -366,7 +366,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /* packfile */
 
     if (!Interp_flags_TEST(interpreter, PARROT_EXTERN_CODE_FLAG))  {
-        struct PackFile *pf = interpreter->code;
+        struct PackFile *pf = interpreter->initial_pf;
         if (pf)
             PackFile_destroy(interpreter, pf);
     }

@@ -75,14 +75,15 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     exec_init(obj);
     Parrot_exec_rel_addr = (char **)mem_sys_allocate_zeroed(4 * sizeof(char *));
     obj->bytecode_header_size =
-        (interpreter->code->cur_cs->base.file_offset + 4) * sizeof(opcode_t);
+        (interpreter->code->base.file_offset + 4) * sizeof(opcode_t);
     (void) build_asm(interpreter, pc, code_start, code_end, obj);
-    jit_info = interpreter->jit_info;
+    jit_info = interpreter->code->jit_info;
 
     /* TODO Go zero the calls to jited opcodes. */
     /* Place the program code in the data section. */
     /* program_code */
-    add_data_member(obj, interpreter->code->src, interpreter->code->size);
+    add_data_member(obj, interpreter->code->base.pf->src,
+            interpreter->code->base.pf->size);
     /* opcode_map */
     add_data_member(obj, jit_info->arena.op_map, (jit_info->arena.map_size+1) *
         sizeof(opcode_t *));
@@ -93,13 +94,13 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     /* prederef_code */
     j = (int)cgp_core;
     j = (int)((op_func_t*)interpreter->op_lib->op_func_table)[2] - j;
-    k = (int *)interpreter->code->cur_cs->prederef.code;
-    for (i = 0; i < (int)interpreter->code->cur_cs->base.size; i++) {
+    k = (int *)interpreter->code->prederef.code;
+    for (i = 0; i < (int)interpreter->code->base.size; i++) {
         if (k[i] != j)
             k[i] = 0;
     }
-    add_data_member(obj, interpreter->code->cur_cs->prederef.code,
-        interpreter->code->cur_cs->base.size * sizeof(void *));
+    add_data_member(obj, interpreter->code->prederef.code,
+        interpreter->code->base.size * sizeof(void *));
 #endif /* JIT_CGP */
     /* bytecode_offset */
     bhs = obj->bytecode_header_size / sizeof(opcode_t);

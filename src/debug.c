@@ -497,9 +497,9 @@ PDB_trace(Interp *interpreter,
 
     for ( ; n && pdb->cur_opcode; n--) {
         trace_op(interpreter,
-                interpreter->code->byte_code,
-                interpreter->code->byte_code +
-                interpreter->code->cur_cs->base.size,
+                interpreter->code->base.data,
+                interpreter->code->base.data +
+                interpreter->code->base.size,
                 interpreter->pdb->cur_opcode);
         DO_OP(pdb->cur_opcode,interpreter);
     }
@@ -901,7 +901,7 @@ PDB_init(Interp *interpreter, const char *command)
         PIO_eprintf(interpreter, "Restarting\n");
 
     /* Get the bytecode start */
-    pdb->cur_opcode = interpreter->code->byte_code;
+    pdb->cur_opcode = interpreter->code->base.data;
     /* Add the RUNNING state */
     pdb->state |= PDB_RUNNING;
 }
@@ -1638,7 +1638,7 @@ PDB_disassemble(Interp *interpreter, const char *command)
     PDB_file_t *pfile;
     PDB_line_t *pline,*newline;
     PDB_label_t *label;
-    opcode_t *code_end,*pc = interpreter->code->byte_code;
+    opcode_t *code_end,*pc = interpreter->code->base.data;
 
     const unsigned int default_size = 32768;
     const unsigned int regrow_size  = 32668;
@@ -1657,7 +1657,7 @@ PDB_disassemble(Interp *interpreter, const char *command)
     pfile->size = 0;
     pline->number = 1;
 
-    code_end = pc + interpreter->code->cur_cs->base.size;
+    code_end = pc + interpreter->code->base.size;
     while (pc != code_end) {
         /* Grow it early*/
         if (pfile->size % default_size < regrow_size) {
@@ -2944,7 +2944,7 @@ PDB_backtrace(Interp *interpreter)
     PMC *sub;
     PMC *old = PMCNULL;
     int rec_level = 0;
-    
+
     /* information about the current sub */
     sub = interpinfo_p(interpreter, CURRENT_SUB);
     if (!PMC_IS_NULL(sub)) {

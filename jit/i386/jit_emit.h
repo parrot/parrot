@@ -1986,24 +1986,26 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
 
     if (!jit_info->objfile) {
         /* get interpreter
-         * emit interpreter->code->byte_code
+         * emit interpreter->code->base.data
          */
         emitm_movl_m_r(jit_info->native_ptr,
                 emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EBX, 0, 1,
                 offsetof(Interp, code));
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-                offsetof(struct PackFile, byte_code));
+                offsetof(struct PackFile_Segment, data));
         jit_emit_sub_rr_i(jit_info->native_ptr, emit_EAX, emit_EDX);
         /*
          * now we have the offset of the ins in EAX
          *
-         * interpreter->jit_info->arena->op_map
+         * interpreter->code->jit_info->arena->op_map
          *
          * TODO interleave these 2 calculations
          */
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EBX, 0, 1,
-                offsetof(Interp, jit_info));
+                offsetof(Interp, code));
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(struct PackFile_ByteCode, jit_info));
         emitm_lea_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
                 offsetof(Parrot_jit_info_t, arena));
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
@@ -2600,9 +2602,9 @@ void
 Parrot_jit_emit_mov_mr_n_offs(Interp *interpreter,
         int base_reg, size_t offs, int src_reg)
 {
-    emitm_fld(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+    emitm_fld(((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr,
             src_reg);
-    jit_emit_fstore_mb_n(((Parrot_jit_info_t *)(interpreter->jit_info))->
+    jit_emit_fstore_mb_n(((Parrot_jit_info_t *)(interpreter->code->jit_info))->
             native_ptr, base_reg, offs);
 }
 
@@ -2610,7 +2612,7 @@ void
 Parrot_jit_emit_mov_mr_offs(Interp *interpreter,
         int base_reg, size_t offs, int src_reg)
 {
-    emitm_movl_r_m(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+    emitm_movl_r_m(((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr,
             src_reg, base_reg, emit_None, 1, offs);
 }
 
@@ -2618,9 +2620,9 @@ void
 Parrot_jit_emit_mov_rm_n_offs(Interp *interpreter,
         int dst_reg, int base_reg, size_t offs)
 {
-    jit_emit_fload_mb_n(((Parrot_jit_info_t *)(interpreter->jit_info))->
+    jit_emit_fload_mb_n(((Parrot_jit_info_t *)(interpreter->code->jit_info))->
             native_ptr, base_reg,  offs);
-    emitm_fstp(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+    emitm_fstp(((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr,
             (dst_reg+1));
 }
 
@@ -2628,7 +2630,7 @@ void
 Parrot_jit_emit_mov_rm_offs(Interp *interpreter,
         int dst_reg, int base_reg, size_t offs)
 {
-    emitm_movl_m_r(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+    emitm_movl_m_r(((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr,
             dst_reg, base_reg, emit_None, 1, offs);
 }
 
@@ -2745,8 +2747,8 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     if (cur_section->done >= 0 &&
             (INTVAL)cur_section->op_count >= 2 + last_is_branch) {
         int saved = 0;
-        offset = (jit_info->cur_op - interpreter->code->byte_code) +
-            interpreter->code->cur_cs->prederef.code;
+        offset = (jit_info->cur_op - interpreter->code->base.data) +
+            interpreter->code->prederef.code;
 
         jit_emit_mov_ri_i(jit_info->native_ptr, emit_ESI, offset);
         emitm_callm(jit_info->native_ptr, emit_ESI, 0, 0, 0);
@@ -2754,8 +2756,8 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
          * prederefed (non JIT) section
          */
         if (last_is_branch) {
-            offset = (cur_section->end - interpreter->code->byte_code) +
-                interpreter->code->cur_cs->prederef.code;
+            offset = (cur_section->end - interpreter->code->base.data) +
+                interpreter->code->prederef.code;
             cur_section->done = -1;
             /* ins to skip */
             cur_section->ins_count = cur_section->op_count - 1;
@@ -2765,8 +2767,8 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
              * or a JITed branch,
              * when the branch is non JIT, we are in the above case
              */
-            offset = (cur_section->next->begin - interpreter->code->byte_code)
-                + interpreter->code->cur_cs->prederef.code;
+            offset = (cur_section->next->begin - interpreter->code->base.data)
+                + interpreter->code->prederef.code;
             cur_section->done = 1;
         }
         *offset = ((op_func_t*)interpreter->op_lib->op_func_table)[2];

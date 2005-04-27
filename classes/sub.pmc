@@ -33,7 +33,7 @@ clear_fixup(Interp* interpreter, PMC* self)
     ft = seg->fixups;
     if (!ft)
         return;
-    ct = seg->consts;
+    ct = seg->const_table;
     if (!ct)
         return;
     for (i = 0; i < ft->fixup_count; i++) {
@@ -100,7 +100,7 @@ Initializes the subroutine.
 #if 0
         if (Interp_flags_TEST(INTERP, PARROT_DEBUG_FLAG))
             printf("Address of base segment is %p\n",
-                ((struct Parrot_sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
+                ((struct Parrot_sub *)PMC_sub(SELF))->seg->base.pf->base.data);
 #endif
     }
 
@@ -188,8 +188,7 @@ now.> -DRS
 */
 
     INTVAL get_integer_keyed (PMC* key) {
-        return (INTVAL)
-            ((PMC_sub(SELF))->seg->base.pf->byte_code);
+        return (INTVAL) ((PMC_sub(SELF))->seg->base.data);
     }
 
 /*
@@ -232,7 +231,7 @@ Invokes the subroutine.
         if (Interp_flags_TEST(INTERP, PARROT_TRACE_FLAG)) {
             print_sub_name(INTERP, SELF);
         }
-        if (INTERP->code->cur_cs != sub->seg) {
+        if (INTERP->code != sub->seg) {
             Parrot_switch_to_cs(INTERP, sub->seg, 1);
         }
         /*

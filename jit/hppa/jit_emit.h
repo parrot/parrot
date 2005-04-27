@@ -1,11 +1,11 @@
 /*
  * jit_emit.h
- * 
+ *
  * HPPA
  *
  * $Id$
  */
- 
+
 /*
  *      r0          Zero
  *      r26         Argument 1
@@ -101,15 +101,15 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
 
 /* Load / Store.
  *
- * 
+ *
  *
  *  +--------------------------------------------------------------------+
  *  |    op    |     b      |    t/r    |  s  |         im14             |
  *  +--------------------------------------------------------------------+
  * 0          5 6         10 11       15 16 17 18                      31
- * 
+ *
  *  ldw (load word)
- *      op = 18    
+ *      op = 18
  *  ldo (load offset)
  *      op = 13
  *  stw (store word)
@@ -142,13 +142,13 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
 
 /* Load / Store Indexed.
  *
- * 
+ *
  *
  *  +--------------------------------------------------------------------+
  *  |    op    |     b      |     x     |  s  |u| 0 |cc|  2  |m|    t    |
  *  +--------------------------------------------------------------------+
  * 0          5 6         10 11       15 16 17 18 19 20 22   26 27     31
- * 
+ *
  */
 
 #  define emit_lsi(pc, op, b, x, tr) \
@@ -160,13 +160,13 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
 
 /*  21 bit immediates.
  *
- * 
+ *
  *
  *  +--------------------------------------------------------------------+
  *  |    op    |    t / r   |                   im21                     |
  *  +--------------------------------------------------------------------+
  * 0          5 6         10 11                                        31
- * 
+ *
  *  ldil
  *      op = 8
  */
@@ -188,7 +188,7 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  *  |    op    |    r2    |    r1    |  c  | f |   ext6   | 0 |    t     |
  *  +--------------------------------------------------------------------+
  * 0          5 6       10 11      15 16 18 19  20      25 26  27      31
- * 
+ *
  */
 
 #  define emit_arith(pc, op, ext6, s2, s1, t) \
@@ -219,7 +219,7 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  *  |    op    |    r     |    t     |  c  |  x  |     p     |   clen    |
  *  +--------------------------------------------------------------------+
  * 0          5 6       10 11      15 16 18 19 21 22       26 27       31
- * 
+ *
  */
 
 #  define emit_depext(pc, op, r, t, x, p, clen) \
@@ -255,7 +255,7 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
 
 /* Compare and branch.
  *
- * 
+ *
  *
  *  +--------------------------------------------------------------------+
  *  |    op    |     r2     |     r1    |  c  |      im11        | n | w |
@@ -279,13 +279,13 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
 
 /* Branch and link.
  *
- * 
+ *
  *
  *  +--------------------------------------------------------------------+
  *  |    op    |     t      |     w1    |  0  |       w2         | n | w |
  *  +--------------------------------------------------------------------+
  * 0          5 6         10 11       15 16 18 19              29  30  31
- * 
+ *
  * address is:
  *  w1 * 8192
  *  w2 = 10 . 0-9
@@ -304,20 +304,20 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
         0, ((disp >> 31) & 1));
 
 #  define emit_b(pc) \
-    _emit_bl(pc, 0x3A, r2, 0, 0, 0, 0) 
+    _emit_bl(pc, 0x3A, r2, 0, 0, 0, 0)
 
 /* Branch and Link Register.
  *
- * 
+ *
  *
  *  +--------------------------------------------------------------------+
  *  |   0x3A   |     t      |     x     |  2  |        0         | n | 0 |
  *  +--------------------------------------------------------------------+
  * 0          5 6         10 11       15 16 18 19              29  30  31
- * 
+ *
  * t = curret_ip
  * IP = curret_ip + (x << 3) + 8
- * if (n) execute_next_instruction 
+ * if (n) execute_next_instruction
  */
 
 #  define emit_blr(pc, t, x, n) \
@@ -347,13 +347,13 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
 
 /* Branch Vectored.
  *
- * 
+ *
  *
  *  +--------------------------------------------------------------------+
  *  |    op    |     b      |     x     |  6  |       0          | n | 0 |
  *  +--------------------------------------------------------------------+
  * 0          5 6         10 11       15 16 18 19              29  30  31
- * 
+ *
  *  IP = (b << 3) + x
  *
  *  No return address is saved.
@@ -375,7 +375,7 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  *  |    op    |    r     |    t     |  c  | f | 0 |       imm11         |
  *  +--------------------------------------------------------------------+
  * 0          5 6       10 11      15 16 18 19  20                     31
- * 
+ *
  *  imm11 is low_sign_ext ( ie. the sign bit is 0 )
  */
 
@@ -395,7 +395,7 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
  *  |    00    |    rv    | 0 |   rv   |  0  |        20       |    0    |
  *  +--------------------------------------------------------------------+
  * 0          5 6       10 11  12    15 16 18 19             26 27     31
- * 
+ *
  */
 
 #  define emit_sync(pc) \
@@ -473,7 +473,7 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
     emit_ldw(jit_info->native_ptr, BASE, CIR,
         (offsetof(Interp, code)));
     emit_ldw(jit_info->native_ptr, CIR, ISR2,
-        (offsetof(struct PackFile, byte_code)));
+	(offsetof(struct PackFile_Segment, data)));
     jit_emit_sub_rrr(jit_info->native_ptr, CIR, RET0, ISR2);
     /*
      * now we have the offset of the ins in CIR
@@ -490,7 +490,7 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
     emit_lsi(jit_info->native_ptr, 0x3, ISR1, CIR, ISR2);
     emit_bv(jit_info->native_ptr, ISR2, r0, 1);
     jit_emit_nop(jit_info->native_ptr);
-    
+
 }
 
 void
@@ -556,11 +556,11 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
  * specifically, we load the FDP (Function Descriptor Pointer) into ISR2,
  * get the address and r19 set, load the IP, and calculate the displacement
  * right shiff it by 3 and branch there.
- * The FDP will cointain the actual function address the second time it's 
+ * The FDP will cointain the actual function address the second time it's
  * called.
  * But for EXEC using BRANCH AND LINK, this is because the address of
- * the code generated in the JIT could (probably will) be 65535 * 4 bytes 
- * farest than the called procedure, and this is won't happend for EXEC 
+ * the code generated in the JIT could (probably will) be 65535 * 4 bytes
+ * farest than the called procedure, and this is won't happend for EXEC
  * (and if it does, it's ld's problem, not ours).
  */
 
@@ -570,7 +570,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 {
     jit_emit_mov_rr(jit_info->native_ptr, r25, BASE);
     jit_emit_mov_ri_i(jit_info->native_ptr, r26, ((int)(jit_info->cur_op)));
-    
+
     Parrot_jit_newfixup(jit_info);
 
     jit_info->arena.fixups->type = JIT_HPPA_CALL;
@@ -657,7 +657,7 @@ void
 Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 {
     jit_emit_mov_mr_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, mem, reg);
 }
 
 /* move mem (i.e. intreg) to reg */
@@ -665,7 +665,7 @@ void
 Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
 {
     jit_emit_mov_rm_i(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
+        ((Parrot_jit_info_t *)(interpreter->code->jit_info))->native_ptr, reg, mem);
 }
 
 /* move reg to mem (i.e. numreg) */

@@ -51,7 +51,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
         jit_info->native_ptr, RTYPE_DATA, "program_code", 0);
     jit_info->native_ptr
         = emit_word (jit_info->native_ptr, ((int)jit_info->cur_op) -
-            ((int)interpreter->code->byte_code) +
+            ((int)interpreter->code->base.data) +
                 (jit_info->objfile->bytecode_header_size));
     Parrot_exec_add_text_rellocation(jit_info->objfile,
         jit_info->native_ptr, RTYPE_FUNC,

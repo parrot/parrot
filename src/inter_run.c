@@ -131,7 +131,7 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
     if (!dest)
         internal_exception(1, "Subroutine retuned a NULL address");
     bp = interpreter->ctx.bp;
-    offset = dest - interpreter->code->byte_code;
+    offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
     REG_PMC(1) = p1;
     return bp;
@@ -338,7 +338,7 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     }
 
     bp = interpreter->ctx.bp;
-    offset = dest - interpreter->code->byte_code;
+    offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
     return bp;
 }
@@ -421,7 +421,7 @@ Parrot_run_meth_fromc(Parrot_Interp interpreter,
     if (!dest)
         internal_exception(1, "Subroutine retuned a NULL address");
     bp = interpreter->ctx.bp;
-    offset = dest - interpreter->code->byte_code;
+    offset = dest - interpreter->code->base.data;
     runops(interpreter, offset);
     REG_PMC(1) = p1;
     REG_PMC(2) = p2;

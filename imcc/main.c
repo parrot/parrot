@@ -552,10 +552,11 @@ main(int argc, char * argv[])
         FILE *fp;
         IMCC_info(interp, 1, "Writing %s\n", output);
 
-        size = PackFile_pack_size(interp, interp->code) * sizeof(opcode_t);
+        size = PackFile_pack_size(interp, interp->code->base.pf) *
+            sizeof(opcode_t);
         IMCC_info(interp, 1, "packed code %d bytes\n", size);
         packed = (opcode_t*) mem_sys_allocate(size);
-        PackFile_pack(interp, interp->code, packed);
+        PackFile_pack(interp, interp->code->base.pf, packed);
         if (strcmp (output, "-") == 0)
             fp = stdout;
         else if ((fp = fopen(output, "wb")) == 0)

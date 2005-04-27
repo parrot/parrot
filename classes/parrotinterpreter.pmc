@@ -406,7 +406,7 @@ Runs the interpreter's byte code.
         pt_thread_prepare_for_run(new_interp, interpreter);
         /* calculate offset and run */
         runops(new_interp, (opcode_t *)PMC_struct_val(SELF) -
-            (opcode_t *)interpreter->code->byte_code);
+            (opcode_t *)interpreter->code->base.data);
         return next;
     }
 

@@ -29,7 +29,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
                      Interp * interpreter)
 {
     add_disp(jit_info->native_ptr, r3,
-        ((long)jit_info->cur_op - (long)interpreter->code->byte_code));
+        ((long)jit_info->cur_op - (long)interpreter->code->base.data));
     jit_emit_mov_rr(jit_info->native_ptr, r4, r13);
 
     Parrot_exec_add_text_rellocation(jit_info->objfile,

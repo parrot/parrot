@@ -234,7 +234,7 @@ new_sub(Interp *interp)
     /* Using system memory until I figure out GC issues */
     struct Parrot_sub *newsub =
         mem_sys_allocate_zeroed(sizeof(struct Parrot_sub));
-    newsub->seg = interp->code->cur_cs;
+    newsub->seg = interp->code;
     return newsub;
 }
 
@@ -282,7 +282,7 @@ new_continuation(Interp *interp)
 {
     struct Parrot_cont *cc = mem_sys_allocate(sizeof(struct Parrot_cont));
     save_context(interp, &cc->ctx);
-    cc->seg = interp->code->cur_cs;
+    cc->seg = interp->code;
     cc->address = NULL;
     return cc;
 }
@@ -325,7 +325,7 @@ new_coroutine(Interp *interp)
     struct Parrot_coro *co =
         mem_sys_allocate_zeroed(sizeof(struct Parrot_coro));
 
-    co->seg = interp->code->cur_cs;
+    co->seg = interp->code;
     ctx = &co->ctx;
     save_context(interp, ctx);
     ctx->current_sub = NULL;
@@ -429,7 +429,7 @@ new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
         cc = PMC_cont(continuation);
         save_context(interpreter, &cc->ctx);
         /* set current segment */
-        cc->seg = interpreter->code->cur_cs;
+        cc->seg = interpreter->code;
     }
     else {
         continuation = pmc_new(interpreter, enum_class_RetContinuation);
@@ -582,7 +582,7 @@ Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
 	/* XXX: is this correct? (try with load_bytecode) */
 	/* use the current interpreter's bytecode as start address */
 	if (ctx->current_pc != NULL)
-	    info->pc = ctx->current_pc - interpreter->code->byte_code;
+	    info->pc = ctx->current_pc - interpreter->code->base.data;
 	return 1;
     }
 
@@ -616,13 +616,13 @@ Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
 	size_t offs = info->pc;
 	size_t i, n;
 	/* XXX: interpreter->code->cur_cs is not correct, is it? */
-	opcode_t *pc = interpreter->code->cur_cs->base.data;
-	struct PackFile_Debug *debug = interpreter->code->cur_cs->debugs;
+	opcode_t *pc = interpreter->code->base.data;
+	struct PackFile_Debug *debug = interpreter->code->debugs;
 
 	/*assert(pc == sub->seg->base.data);*/
 	/* set source file */
 	info->file = debug->filename;
-	for (i = n = 0; n < interpreter->code->cur_cs->base.size; i++) {
+	for (i = n = 0; n < interpreter->code->base.size; i++) {
 	    op_info_t *op_info = &interpreter->op_info_table[*pc];
             if (i >= debug->base.size)
                 return 0;
