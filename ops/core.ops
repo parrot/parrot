@@ -638,6 +638,8 @@ inline op rethrow(in PMC) {
 }
 
 inline op die_hard(in INT, in INT) {
+  if ($1 == EXCEPT_doomed)
+    _exit($2);
   do_exception(interpreter, $1, $2);
   restart NEXT();
 }
