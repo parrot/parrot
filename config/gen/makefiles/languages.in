@@ -97,6 +97,7 @@ jako.clean:
 
 lisp: lisp.dummy
 lisp.dummy:
+	$(MAKE_C) lisp
 lisp.test:
 	$(MAKE_C) lisp test
 lisp.clean:
