@@ -3,7 +3,7 @@
 PERL = ${perl}
 ${make_set_make}
 MAKE_C = ${make_c}
-LANGUAGES = BASIC befunge bf cola forth jako m4 miniperl ook parrot_compiler perl6 regex scheme tcl urm
+LANGUAGES = BASIC befunge bf cola forth jako lisp m4 miniperl ook parrot_compiler perl6 regex scheme tcl urm
 
 # the default target
 all: $(LANGUAGES)
@@ -38,7 +38,7 @@ test:
 update:
 	cvs -q update -dP
 
-clean: BASIC.clean befunge.clean bf.clean cola.clean forth.clean jako.clean m4.clean miniperl.clean ook.clean parrot_compiler.clean perl6.clean regex.clean scheme.clean tcl.clean urm.clean
+clean: BASIC.clean befunge.clean bf.clean cola.clean forth.clean jako.clean lisp.clean m4.clean miniperl.clean ook.clean parrot_compiler.clean perl6.clean regex.clean scheme.clean tcl.clean urm.clean
 
 
 #
@@ -94,6 +94,13 @@ jako.test:
 	$(MAKE_C) jako test
 jako.clean:
 	$(MAKE_C) jako clean
+
+lisp: lisp.dummy
+lisp.dummy:
+lisp.test:
+	$(MAKE_C) lisp test
+lisp.clean:
+	$(MAKE_C) lisp clean
 
 m4: m4.dummy
 m4.dummy:

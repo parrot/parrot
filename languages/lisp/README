@@ -1,0 +1,20 @@
+This is Parrot Common Lisp
+--------------------------
+
+Parrot Common Lisp is Copyright (C) 2004 - 2005 Cory Spencer.  All
+Rights Reserved.
+
+LICENSE INFORMATION
+-------------------
+
+This code is distributed under the same license as Perl 5; you can
+redistribute it and/or modify it under the terms of either:
+
+    a) the GNU General Public License as found in the directory "LICENSES"
+
+    b) the "Artistic License" which can be found in the directory "LICENSES"
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either
+the GNU General Public License or the Artistic License for more details.

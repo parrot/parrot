@@ -1,0 +1,166 @@
+
+.sub _eval
+  .param pmc args
+  .local string pkgname
+  .local string symname
+  .local string type
+  .local int special
+  .local pmc package
+  .local pmc symbol
+  .local int found
+  .local pmc form
+  .local pmc body
+  .local pmc retv
+
+  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
+  .CAR(form, args)
+
+  typeof type, form
+
+  if type == "LispSymbol"  goto SYMBOL
+  if type == "LispCons"    goto FUNCTION_FORM
+  if type == "LispInteger" goto SELF_EVALUATING_OBJECT
+  if type == "LispString"  goto SELF_EVALUATING_OBJECT
+  if type == "LispFloat"   goto SELF_EVALUATING_OBJECT
+
+  .ERROR_1("internal", "Unknown object type in eval: %s", type)
+
+FUNCTION_FORM:
+  .local pmc function
+  .local pmc funcargs
+  .local pmc funcptr
+  .local pmc funcarg
+  .local pmc test
+
+  .CAR(symbol, form)
+  .CDR(body, form)
+
+  .ASSERT_TYPE_AND_BRANCH(symbol, "symbol", FUNCTION_NOT_FOUND)
+
+  # Retrieve the function from the symbol.
+  function = symbol._get_function()
+
+  # If the function wasn't set for the symbol, throw an error.
+  defined found, function
+  unless found goto FUNCTION_NOT_FOUND
+
+  # Check to see if the function is a special form (which aren't subject to
+  # normal function evaluation rules).
+  typeof type, function
+  if type == "LispSpecialForm" goto SPECIAL_FORMS
+  if type == "LispMacro" goto MACRO_FORM
+
+  # Normal function - evaluate all arguments being passed into the function.
+  .NIL(funcargs)
+
+  funcptr = body
+
+FUNCTION_LOOP:
+  .NULL(funcptr, FUNCTION_CALL)		# Call the function if no args left.
+
+  .CAR(funcarg, funcptr)		# Pop the next arg off the list.
+
+  .local pmc evalarg			# Evaluate the argument.
+  .LIST_1(evalarg, funcarg)
+  funcarg = _eval(evalarg)
+
+  .APPEND(funcargs,funcargs,funcarg)    # Add the result to the args list.
+
+  .CDR(funcptr,funcptr)			# Move to the next arg in the list.
+
+  goto FUNCTION_LOOP
+
+FUNCTION_CALL:
+  _FUNCTION_CALL(function,funcargs)
+  goto DONE
+
+FUNCTION_NOT_FOUND:
+  .ERROR_1("undefined-function", "%s is not a function name", symbol)
+  goto DONE
+
+ERROR_NARGS:
+  .ERROR_0("program-error", "wrong number of arguments to EVAL")
+  goto DONE
+
+SPECIAL_FORMS:
+  # Special forms aren't subject to normal evaluation rules - keep the
+  # arguments as is and call the function.
+  funcargs = body
+  goto FUNCTION_CALL
+
+MACRO_FORM:
+  .local pmc macroexp
+  .local pmc macrosym
+  .local pmc macroenv
+
+   macrosym = _LOOKUP_SYMBOL("*MACROEXPAND-HOOK*")
+   isnull macrosym, MACRO_NOT_INITIALIZED
+
+   macroexp = macrosym._get_value()		# Get the expander function
+  .ASSERT_TYPE_AND_BRANCH(macroexp, "function", MACRO_NOT_INITIALIZED)
+
+   peek_pad macroenv				# Get current lexical scope
+
+  .LIST_3(funcargs, symbol, body, macroenv)
+   _FUNCTION_CALL(macroexp, funcargs)		# Call the macroexpand hook
+
+  goto DONE
+
+SYMBOL:
+  symbol = form
+  symname = symbol._get_name_as_string()
+
+  special = _IS_SPECIAL(symbol)			# Check if we're a dynamic
+  if special == 0 goto LEXICAL_SYMBOL		# variable
+  goto DYNAMIC_SYMBOL
+
+DYNAMIC_SYMBOL:
+  package = symbol._get_package()
+  pkgname = package._get_name_as_string()
+
+  symbol = _LOOKUP_GLOBAL(pkgname, symname)
+  goto CHECK_VALUE
+
+LEXICAL_SYMBOL:
+  retv = _LOOKUP_LEXICAL(symname)		# Check for a lexical shadow
+  isnull retv, CHECK_VALUE			# If not found, assume global
+  symbol = retv					# Use the lexical value
+  goto CHECK_VALUE
+
+CHECK_VALUE:
+  retv = symbol._get_value()			# Check for symbol's value
+
+  defined found, retv
+  unless found goto SYMBOL_NOT_FOUND
+
+DONE_SYMBOL:
+  argcP = 1					# One value returned
+  P5 = retv					# Return value
+
+  goto DONE
+
+SYMBOL_NOT_FOUND:
+  .ERROR_1("unbound-variable", "variable %s has no value", form)
+  goto DONE
+
+SELF_EVALUATING_OBJECT:
+  # Object is a primitive type (ie. a string, integer or float).
+  retv = form
+
+  argcP = 1					# One value returned
+  P5 = retv					# Return value
+
+  goto DONE
+
+MACRO_NOT_INITIALIZED:
+  .ERROR_0("internal","the macro system has not been initialized")
+  goto DONE
+
+DONE:
+  is_prototyped = 0				# Nonprototyped return
+  argcI = 0					# No integer values returned
+  argcN = 0					# No float values returned
+  argcS = 0					# No string values returned
+
+  returncc					# Call the return continuation
+.end

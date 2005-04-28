@@ -1,0 +1,11 @@
+
+Changes for version 0.1.1
+-------------------------
+  * Added BOUNDP function
+  * Added COPY-TREE function
+  * Added IDENTITY function
+  * Added ACONS function
+  * Added ZEROP function
+  * Added an EXPORT function stub
+  * Added an IN-PACKAGE function stub
+  * Split related functions out into separate files in lisp/

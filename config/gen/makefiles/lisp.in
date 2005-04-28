@@ -1,0 +1,14 @@
+RM_F = ${rm_f}
+PERL = ${perl}
+PARROT = ../../parrot
+
+all: build
+
+test: build
+	$(PARROT) -r lisp.pbc t/test.l
+
+build: lisp.imc
+	$(PARROT) -o lisp.pbc lisp.imc
+
+clean:
+	$(RM_F) core *.pbc *~
