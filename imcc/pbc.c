@@ -59,6 +59,7 @@ struct cs_t {
     struct cs_t *prev;                  /* previous code segment */
     struct cs_t *next;                  /* next code segment */
     SymReg * key_consts[HASH_SIZE];     /* cached key constants for this seg */
+    int pic_idx;                        /* next index of PIC */
 };
 
 static struct globals {
@@ -1056,14 +1057,24 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         constant_folding(interpreter, unit);
         store_sub_size(code_size, ins_size);
         bytes = (oldsize + code_size) * sizeof(opcode_t);
+        /*
+         * allocate code and pic_index
+         *
+         * pic_index is half the size of the code, as one PIC-cachable opcode
+         * is at least two opcodes wide - see below how to further decrease
+         * this storage
+         */
         if (interpreter->code->base.data) {
             interpreter->code->base.data =
                 mem_sys_realloc(interpreter->code->base.data, bytes);
+            interpreter->code->pic_index->data =
+                mem_sys_realloc(interpreter->code->pic_index->data, bytes/2);
         } else {
-            interpreter->code->base.data =
-                mem_sys_allocate(bytes);
+            interpreter->code->base.data = mem_sys_allocate(bytes);
+            interpreter->code->pic_index->data = mem_sys_allocate(bytes/2);
         }
         interpreter->code->base.size = oldsize + code_size;
+        interpreter->code->pic_index->size = (oldsize + code_size)/2;
         pc = (opcode_t*) interpreter->code->base.data + oldsize;
         npc = 0;
         /* add debug if necessary */
@@ -1131,8 +1142,23 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         if (debug_seg) {
             debug_seg->base.data[ins_line++] = (opcode_t) ins->line;
         }
+        op = (opcode_t)ins->opnum;
+        /* add PIC idx */
+        if (parrot_PIC_op_is_cached(interpreter, op)) {
+            size_t offs = pc - interpreter->code->base.data;
+            /*
+             * for pic_idx fitting into a short, we could
+             * further reduce the size by storing shorts
+             * the relation code_size / pic_index_size could
+             * indicate the used storage
+             *
+             * drawback: if we reach 0xffff, we'd have to resize again
+             */
+            interpreter->code->pic_index->data[offs / 2] =
+                ++globals.cs->pic_idx;
+        }
         /* Start generating the bytecode */
-        *pc++ = op = (opcode_t)ins->opnum;
+        *pc++ = op;
         /* Get the info for that opcode */
         op_info = &interpreter->op_info_table[op];
         IMCC_debug(interpreter, DEBUG_PBC, "%d %s", npc, op_info->full_name);

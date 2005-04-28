@@ -57,7 +57,7 @@ typedef struct Parrot_pic_store_t {
     struct Parrot_pic_store_t *prev;	/* prev pic_store */
     size_t usable;			/* size of usable memory: */
     Parrot_PIC *pic;		        /* from rear */
-    Parrot_MIC **mic;			/* idx access to allocated MICs */
+    Parrot_MIC *mic;			/* idx access to allocated MICs */
     size_t n_mics;			/* range check, debugging mainly */
 } Parrot_PIC_store;
 
@@ -68,6 +68,10 @@ void parrot_PIC_destroy(Interp *, struct PackFile_ByteCode *);
 int  parrot_PIC_op_is_cached(Interp *, int op_code);
 Parrot_MIC* parrot_PIC_alloc_mic(Interp*, size_t n);
 Parrot_PIC* parrot_PIC_alloc_pic(Interp*);
+
+void parrot_pic_find_infix_v_pp(Interp *, PMC *left, PMC *right,
+                Parrot_MIC *mic, opcode_t *cur_opcode);
+void * parrot_pic_opcode(Interp *, int op);
 
 #endif /* PARROT_PIC_H_GUARD */
 

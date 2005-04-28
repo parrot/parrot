@@ -337,8 +337,10 @@ init_prederef(Interp *interpreter, int which)
     load_prederef(interpreter, which);
     if (!interpreter->code->prederef.code) {
         size_t N = interpreter->code->base.size;
-        size_t i;
+        opcode_t *pc = interpreter->code->base.data;
+        size_t i, n, n_pics;
         void *pred_func;
+        op_info_t *opinfo;
 /* Parrot_memalign_if_possible in OpenBSD allocates 256 if you ask for 312
    -- Need to verify this, it may have been a bug elsewhere. If it works now,
    we can remove the mem_sys_allocate_zeroed line below. */
@@ -355,11 +357,23 @@ init_prederef(Interp *interpreter, int which)
         else
             pred_func = ((void **)
                     interpreter->op_lib->op_func_table)[CORE_OPS_prederef__];
-        for (i = 0; i < N; i++) {
+        for (i = n_pics = 0; i < N; ) {
+            opinfo = &interpreter->op_info_table[*pc];
             temp[i] = pred_func;
+            n = opinfo->arg_count;
+            pc += n;
+            i += n;
+            /* count ops that need a PIC */
+            if (parrot_PIC_op_is_cached(interpreter, *pc))
+                n_pics++;
         }
 
         interpreter->code->prederef.code = temp;
+        /* allocate pic store */
+        if (n_pics) {
+            /* pic_index is starting from 1 */
+            parrot_PIC_alloc_store(interpreter, interpreter->code, n_pics + 1);
+        }
     }
 }
 

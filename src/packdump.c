@@ -109,7 +109,7 @@ PackFile_Constant_dump(Interp *interpreter,
             STRING *a_key = const_string(interpreter, "(keyed)");
             STRING *null = const_string(interpreter, "(null)");
             opcode_t *code_start =
-                interpreter->code->cur_cs->base.data;
+                interpreter->code->base.data;
             switch (pmc->vtable->base_type) {
                 case enum_class_Sub:
                 case enum_class_Coroutine:

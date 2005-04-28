@@ -47,18 +47,6 @@ not highest type in table.
 static void mmd_create_builtin_multi_meth_2(Interp *,
         INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr);
 
-typedef PMC*    (*mmd_f_p_ppp)(Interp *, PMC *, PMC *, PMC *);
-typedef PMC*    (*mmd_f_p_pip)(Interp *, PMC *, INTVAL, PMC *);
-typedef PMC*    (*mmd_f_p_pnp)(Interp *, PMC *, FLOATVAL, PMC *);
-typedef PMC*    (*mmd_f_p_psp)(Interp *, PMC *, STRING *, PMC *);
-
-typedef void    (*mmd_f_v_pp)(Interp *, PMC *, PMC *);
-typedef void    (*mmd_f_v_pi)(Interp *, PMC *, INTVAL);
-typedef void    (*mmd_f_v_pn)(Interp *, PMC *, FLOATVAL);
-typedef void    (*mmd_f_v_ps)(Interp *, PMC *, STRING *);
-
-typedef INTVAL  (*mmd_f_i_pp) (Interp *, PMC *, PMC *);
-
 #ifndef NDEBUG
 static void
 dump_mmd(Interp *interpreter, INTVAL function)

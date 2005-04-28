@@ -263,13 +263,13 @@ main(int argc, char **argv)
         FILE *fp;
 
         size = PackFile_pack_size(interpreter,
-                interpreter->code) * sizeof(opcode_t);
+                interpreter->code->base.pf) * sizeof(opcode_t);
         pack = (opcode_t*) mem_sys_allocate(size);
         if (!pack) {
             printf("out of mem\n");
             exit(1);
         }
-        PackFile_pack(interpreter, interpreter->code, pack);
+        PackFile_pack(interpreter, interpreter->code->base.pf, pack);
         if (strcmp (file, "-") == 0)
             fp = stdout;
         else if ((fp = fopen(file, "wb")) == 0) {

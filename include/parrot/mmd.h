@@ -28,6 +28,19 @@ PMC* mmd_dispatch_p_psp(Parrot_Interp, PMC *, STRING *, PMC *, INTVAL);
 /* compare */
 INTVAL mmd_dispatch_i_pp(Parrot_Interp, PMC *, PMC *, INTVAL);
 
+/* function typedefs */
+typedef PMC*    (*mmd_f_p_ppp)(Interp *, PMC *, PMC *, PMC *);
+typedef PMC*    (*mmd_f_p_pip)(Interp *, PMC *, INTVAL, PMC *);
+typedef PMC*    (*mmd_f_p_pnp)(Interp *, PMC *, FLOATVAL, PMC *);
+typedef PMC*    (*mmd_f_p_psp)(Interp *, PMC *, STRING *, PMC *);
+
+typedef void    (*mmd_f_v_pp)(Interp *, PMC *, PMC *);
+typedef void    (*mmd_f_v_pi)(Interp *, PMC *, INTVAL);
+typedef void    (*mmd_f_v_pn)(Interp *, PMC *, FLOATVAL);
+typedef void    (*mmd_f_v_ps)(Interp *, PMC *, STRING *);
+
+typedef INTVAL  (*mmd_f_i_pp) (Interp *, PMC *, PMC *);
+
 void mmd_add_by_class(Parrot_Interp, INTVAL, STRING *, STRING *, funcptr_t);
 void mmd_register(Parrot_Interp, INTVAL, INTVAL, INTVAL, funcptr_t);
 void mmd_register_sub(Parrot_Interp, INTVAL, INTVAL, INTVAL, PMC*);

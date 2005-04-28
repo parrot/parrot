@@ -12,11 +12,60 @@ The PIC supports inline caching for MMD and object method lookups in
 prederefed run cores. Additionally opcodes that do some kind of lookup
 like C<new_p_sc> are changed to faster variants.
 
-TODO For non-prederefed run-cores there's a less efficient variant which
+For non-prederefed run-cores there's a less efficient variant which
 is basically:
 
- * the bytecode segment has an index per cached opcode
+ * the bytecode segment has an index per cached opcode (code->pic_index)
  * this index points into pic_store
+ * TODO use the cache in opcodes
+
+=head1 OPERATION SCHEME
+
+Given this bytecode:
+
+    0               1              2    3    4                5
+  +--------------+---------------+----+----+-----------------+----------+
+  | infix_ic_p_p | .MMD_SUBTRACT | P5 | P6 | callmethodcc_sc | "method" |
+  +--------------+---------------+----+----+-----------------+----------+
+
+In init_prederef the opcodes are replaced with prederef__, operands are
+replaced with their addresses:
+
+    0               1              2    3    4                5
+  +--------------+---------------+----+----+-----------------+----------+
+  | prederef__   |&.MMD_SUBTRACT | &P5| &P6| prederef__      |&"method" |
+  +--------------+---------------+----+----+-----------------+----------+
+
+we have code->pic_index with an index into pic_store - the pic_index is
+half the size of the bytecode and addressed with pc_offset/2:
+
+    0   1   2
+  +---+---+---+
+  | 1 |   | 2 |
+  +---+---+---+
+
+During predereferencing the opcode gets rewritten to the PIC variant,
+the constant infix operation number is replaced with a pointer to the MIC
+in the pic_store at the index pic_index:
+
+    0                    1     2    3
+  +--------------------+-----+----+----+-----------------------+-----+
+  | pic_infix___ic_p_p | MIC1|&P5 |&P6 | pic_callmethodcc___sc | MIC2|
+  +--------------------+-----+----+----+-----------------------+-----+
+
+This can be further optimized due to static inlining:
+
+    0                    1     2    3
+  +--------------------+-----+----+----+-----------------------+-----+
+  | pic_inline_sub_p_p | MIC1|&P5 |&P6 | pic_callmethodcc___sc | MIC2|
+  +--------------------+-----+----+----+-----------------------+-----+
+
+The opcode is an opcode number for the switched core or the actual code address
+for the direct-threaded CGP core. With a little help of the JIT system we could
+also dynamicall create inlined code.
+
+Runcores with r/o (mmaped) bytecode can't be rewritten in this way, the
+lookup of the cache has to be done in the opcode itself.
 
 =head2 Functions
 
@@ -29,8 +78,22 @@ is basically:
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include <assert.h>
+#ifdef HAVE_COMPUTED_GOTO
+#  include "parrot/oplib/core_ops_cgp.h"
+#endif
+
+/* needs a Makefile dependency */
+/* #include "../classes/pmc_integer.h" */
+
+extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
+
+/*
+ * hack to turn on inlining - just sub_p_p for mops done
+ */
+
+#define ENABLE_INLINING 1
 
 /*
 
@@ -73,7 +136,7 @@ parrot_PIC_alloc_store(Interp *interpreter,
 
     store->pic    = (Parrot_PIC*)((char *)store + size);
     store->usable = poly;
-    store->mic    = (Parrot_MIC**)((char*)store + sizeof(Parrot_PIC_store));
+    store->mic    = (Parrot_MIC*)((char*)store + sizeof(Parrot_PIC_store));
     store->n_mics = n;
 }
 
@@ -101,6 +164,9 @@ Return true, if the opcode needs a PIC slot.
 int
 parrot_PIC_op_is_cached(Interp *interpreter, int op_code)
 {
+    switch (op_code) {
+        case PARROT_OP_infix_ic_p_p: return 1;
+    }
     return 0;
 }
 /*
@@ -123,7 +189,7 @@ parrot_PIC_alloc_mic(Interp*interpreter, size_t n)
 
     store = interpreter->code->pic_store;
     assert(n < store->n_mics);
-    return store->mic[n];
+    return store->mic + n;
 }
 
 Parrot_PIC*
@@ -168,6 +234,22 @@ this opcode function is available. Called from C<do_prederef>.
 */
 
 
+void *
+parrot_pic_opcode(Interp *interpreter, int op)
+{
+    int core = interpreter->run_core;
+    op_lib_t *cg_lib;
+
+    if (core == PARROT_SWITCH_CORE)
+        return (void*) op;
+#ifdef HAVE_COMPUTED_GOTO
+    cg_lib = PARROT_CORE_CGP_OPLIB_INIT(1);
+    return ((void**)cg_lib->op_func_table)[op];
+#else
+    return NULL;
+#endif
+}
+
 #define N_STATIC_TYPES 500
 static INTVAL pmc_type_numbers[N_STATIC_TYPES];
 
@@ -206,14 +288,113 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
                 op = PARROT_OP_new_p_ic;
             }
             break;
+        case PARROT_OP_infix_ic_p_p:
+            {
+                Parrot_MIC *mic;
+                size_t n;
+                struct PackFile_ByteCode *cs = interpreter->code;
+
+                n = cur_opcode - (opcode_t*)cs->prederef.code;
+                /*
+                 * pic_index is half the size of the code
+                 */
+                n = cs->pic_index->data[n / 2];
+                mic = parrot_PIC_alloc_mic(interpreter, n);
+                mic->m.func_nr = *(INTVAL*) cur_opcode[1];
+                pc_pred[1] = (void*) mic;
+                op = PARROT_OP_pic_infix___ic_p_p;
+            }
+            break;
     }
     /*
-     * else set default prederef code address
+     * rewrite opcode
      */
     if (core == PARROT_SWITCH_CORE)
         *pc_pred = (void**) op;
     else
         *pc_pred = ((void **)prederef_op_func)[op];
+}
+
+static void
+parrot_pic_move(Interp* interpreter, Parrot_MIC *mic)
+{
+    Parrot_PIC* pic;
+
+    /*
+     * MIC slot is empty - use it
+     */
+    if (!mic->lru.lr_type)
+        return;
+    /*
+     * need more cache slots - allocate one PIC
+     */
+    if (!mic->pic) {
+        mic->pic = parrot_PIC_alloc_pic(interpreter);
+    }
+    else {
+        /*
+         * PIC was already used - shift slots up
+         */
+        pic = mic->pic;
+        pic->lru[2].lr_type = pic->lru[1].lr_type;
+        pic->lru[2].f.sub = pic->lru[1].f.sub;
+        pic->lru[1].lr_type = pic->lru[0].lr_type;
+        pic->lru[1].f.sub = pic->lru[0].f.sub;
+        pic->lru[0].lr_type = mic->lru.lr_type;
+        pic->lru[0].f.sub = mic->lru.f.sub;
+        mic->lru.lr_type = 0;
+    }
+}
+
+void
+parrot_pic_find_infix_v_pp(Interp *interpreter, PMC *left, PMC *right,
+                Parrot_MIC *mic, opcode_t *cur_opcode)
+{
+    funcptr_t func;
+    int is_pmc;
+    INTVAL left_type, right_type;
+    /*
+     * if 2 threads are entering here, there is a chance
+     * that one moves the lru structure under the other thread
+     * and vv - just lock in case
+     *
+     * TODO
+     *
+     * if (TRY_LOCK_INTERPRETER(i) == EBUSY)
+     *      return;  - reexec
+     */
+    LOCK_INTERPRETER(interpreter);
+    /*
+ * move entries back and set topmost entry
+ */
+    parrot_pic_move(interpreter, mic);
+    /*
+     * get real dispatch function
+     */
+    left_type = left->vtable->base_type;
+    right_type = right->vtable->base_type;
+    func = get_mmd_dispatch_type(interpreter,
+            mic->m.func_nr, left_type, right_type, &is_pmc);
+    if (is_pmc) {
+        /* set prederef code address to orig slot for now
+         */
+        ((void**)cur_opcode)[0] =
+            parrot_pic_opcode(interpreter, PARROT_OP_infix_ic_p_p);
+        mic->lru.f.sub = (PMC*)F2DPTR(func);
+    }
+    else {
+        int op = PARROT_OP_pic_infix___ic_p_p;
+
+#if ENABLE_INLINING
+        if (func == (funcptr_t)Parrot_Integer_i_subtract_Integer && !mic->pic)
+            op = PARROT_OP_pic_inline_sub___ic_p_p;
+#endif
+        ((void**)cur_opcode)[0] =
+            parrot_pic_opcode(interpreter, op);
+        mic->lru.f.real_function = func;
+    }
+    mic->lru.lr_type = (left_type << 16) | right_type;
+    UNLOCK_INTERPRETER(interpreter);
 }
 
 /*
@@ -227,7 +408,7 @@ Leopold Toetsch with many hints from Ken Fox.
 =head1 SEE ALSO
 
 F<src/mmd.c>, F<src/object.c>, F<src/interpreter.c>, F<ops/core_ops_cgp.c>,
-F<include/parrot/pic.h>
+F<include/parrot/pic.h>, F<ops/pic.ops>
 
 =cut
 

@@ -1,0 +1,141 @@
+/*
+** pic.ops
+*/
+
+#define DEPRECATED internal_exception(UNIMPLEMENTED, "you shouldn't see this")
+
+#include "parrot/oplib/ops.h"
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+pic.ops - PIC (Polymorphic Inline Cache) opcode variants
+
+=cut
+
+=head1 DESCRIPTION
+
+During predereferencing opcodes that allow caching are rewritten so that
+equivalent opcodes in this file are used. User code MUST never emit these
+opcodes directly.
+
+###############################################################################
+
+=head2 General infix operations
+
+These operations take an infix operation number and PMC arguments.
+
+=over 4
+
+########################################
+
+=cut
+
+=item C<pic_infix__(inconst INT, in PMC, in PMC)>
+
+One for fun and MOPS.
+
+=cut
+
+inline op pic_infix__(inconst INT, in PMC, in PMC) :pic {
+    Parrot_MIC *mic;
+    Parrot_PIC_lru *lru;
+    PMC *left, *right;
+    INTVAL lr_types;
+
+    mic = (Parrot_MIC *) cur_opcode[1];
+    left = $2;
+    right = $3;
+    lru = &mic->lru;
+    lr_types = (left->vtable->base_type << 16) | right->vtable->base_type;
+    if (lru->lr_type == lr_types) {
+runit_v_pp:
+	((mmd_f_v_pp)lru->f.real_function)(interpreter, left, right);
+	goto NEXT();
+    }
+    if (mic->pic) {
+	lru = mic->pic->lru;
+	if (lru->lr_type == lr_types)
+	    goto runit_v_pp;
+	if (++lru->lr_type == lr_types)
+	    goto runit_v_pp;
+	if (++lru->lr_type == lr_types)
+	    goto runit_v_pp;
+	mic->pic->miss_count++;
+	/*
+	 * TODO if we got too often here just do a dynamic lookup
+	 */
+    }
+    parrot_pic_find_infix_v_pp(interpreter, left, right, mic, cur_opcode);
+    /* rerun this opcode */
+    goto OFFSET(0);
+}
+
+=item C<pic_inline_sub__(inconst INT, in PMC, in PMC)>
+
+And for more fun an inlined variant too.
+
+=cut
+
+inline op pic_inline_sub__(inconst INT, in PMC, in PMC) :pic {
+    Parrot_MIC *mic;
+    Parrot_PIC_lru *lru;
+    PMC *left, *right;
+    INTVAL lr_types, lt, rt;
+
+    left = $2;
+    mic = (Parrot_MIC *) cur_opcode[1];
+    lt = left->vtable->base_type;
+    right = $3;
+    lru = &mic->lru;
+    rt = right->vtable->base_type;
+    lr_types = (lt << 16) | rt;
+    if (lru->lr_type == lr_types) {
+	INTVAL a = lt == enum_class_Integer ? PMC_int_val(left) :
+	    VTABLE_get_integer(interpreter, left);
+	INTVAL b = rt == enum_class_Integer ? PMC_int_val(right) :
+	    VTABLE_get_integer(interpreter, right);
+	INTVAL c = a - b;
+	if ((c^a) >= 0 || (c^~b) >= 0) {
+	    if (lt == enum_class_Integer)
+		PMC_int_val(left) = c;
+	    else
+		VTABLE_set_integer_native(interpreter, left, c);
+	}
+	else {
+	    if (PARROT_ERRORS_test(interpreter,PARROT_ERRORS_OVERFLOW_FLAG)) {
+		real_exception(interpreter, NULL, ERR_OVERFLOW,
+			"Integer overflow");
+	    }
+	    /* TODO preserve type system */
+	    VTABLE_morph(interpreter, left, enum_class_BigInt);
+	    VTABLE_set_integer_native(interpreter, left, a);
+	    mmd_dispatch_p_pip(interpreter, left, b, left, MMD_SUBTRACT);
+	}
+    }
+    else {
+        ((void**)cur_opcode)[0] =
+            parrot_pic_opcode(interpreter, PARROT_OP_pic_infix___ic_p_p);
+	goto OFFSET(0);
+    }
+    goto NEXT();
+}
+
+
+=back
+
+=cut
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005 The Perl Foundation.  All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut

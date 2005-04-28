@@ -1217,6 +1217,10 @@ PF_create_default_segs(Interp* interpreter, const char *file_name, int add)
     cur_cs->const_table = (struct PackFile_ConstTable*) seg;
     cur_cs->const_table->code = cur_cs;
 
+    seg = create_seg(interpreter, &pf->directory,
+            PF_UNKNOWN_SEG, "PIC_idx", file_name, add);
+    cur_cs->pic_index = seg;
+
     return cur_cs;
 }
 /*

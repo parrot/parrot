@@ -1328,3 +1328,5 @@ get_mro_p_p                    1297
 find_name_p_s                  1298
 find_name_p_sc                 1299
 backtrace                      1300
+pic_infix___ic_p_p             1301
+pic_inline_sub___ic_p_p        1302
