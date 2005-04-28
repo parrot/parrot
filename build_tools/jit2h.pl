@@ -258,6 +258,7 @@ print JITCPU<<END_C;
 #define Parrot_jit_vtable_2231_op Parrot_jit_normal_op
 #define Parrot_jit_vtable_1r223_op Parrot_jit_normal_op
 #define Parrot_jit_vtable_1r332_op Parrot_jit_normal_op
+#define Parrot_jit_vtable_1r221_op Parrot_jit_normal_op
 
 #define Parrot_jit_vtable_ifp_op Parrot_jit_cpcf_op
 #define Parrot_jit_vtable_unlessp_op Parrot_jit_cpcf_op

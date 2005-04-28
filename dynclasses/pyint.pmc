@@ -180,19 +180,6 @@ Divides C<self> by C<*value> and returns the result.
         return ret;
     }
 
-/*
-
-=item C<void absolute(dest)>
-
-Sets C<dest> to the absolute value of SELF.
-
-=cut
-
-*/
-
-    void absolute(PMC *dest) {
-        VTABLE_set_integer_native(INTERP, dest, abs(PMC_int_val(SELF)));
-    }
 
 /*
 
@@ -394,40 +381,6 @@ MMD_DEFAULT: {
             return (INTVAL)(PMC_int_val(SELF) ==
                 VTABLE_get_integer(INTERP, value));
         }
-    }
-
-/*
-
-=item C<void logical_not(PMC *value)>
-
-Calculates the logical negation of the integer and returns the result in
-C<*value>.
-
-=cut
-
-*/
-
-    void logical_not (PMC* value) {
-        VTABLE_set_integer_native(INTERP, value, !PMC_int_val(SELF));
-    }
-
-
-
-/*
-
-=item C<void neg(PMC *dest)>
-
-Set C<dest> to the negated value of C<SELF>.
-
-=cut
-
-*/
-
-    void neg (PMC* dest) {
-        if (dest == SELF)
-            PMC_int_val(SELF) = -PMC_int_val(SELF);
-        else
-            VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
     }
 
 /*

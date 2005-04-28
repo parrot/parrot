@@ -918,7 +918,9 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<void absolute()>
+=item C<PMC* absolute(PMC* dest)>
+
+=item C<void i_absolute()>
 
 Sets C<dest> to the absolute value of SELF.
 
@@ -926,13 +928,23 @@ Sets C<dest> to the absolute value of SELF.
 
 */
 
-    void absolute(PMC *dest) {
+    PMC* absolute(PMC *dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_abs(INTERP, SELF, dest);
+        return dest;
     }
+
+    void i_absolute() {
+        bigint_abs(INTERP, SELF, SELF);
+    }
+
 
 /*
 
-=item C<void neg(PMC *dest)>
+=item C<PMC* neg(PMC *dest)>
+
+=item C<void i_neg()>
 
 Set C<dest> to the negated value of C<SELF>.
 
@@ -940,8 +952,15 @@ Set C<dest> to the negated value of C<SELF>.
 
 */
 
-    void neg (PMC* dest) {
+    PMC* neg (PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         bigint_neg(INTERP, SELF, dest);
+        return dest;
+    }
+
+    void i_neg () {
+        bigint_neg(INTERP, SELF, SELF);
     }
 
 }

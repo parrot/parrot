@@ -494,7 +494,9 @@ MMD_DEFAULT: {
     }
 /*
 
-=item C<void logical_not(PMC *dest)>
+=item C<PMC logical_not(PMC *dest)>
+
+=item C<void i_logical_not()>
 
 Since we know that we're false, the logical ops are particularly
 simple, and there's no need to use the versions in C<PerlScalar>.
@@ -505,8 +507,14 @@ All these methods simply return undef itself.
 
 */
 
-    void logical_not (PMC* dest) {
+    PMC* logical_not (PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest, 1);
+        return dest;
+    }
+    void i_logical_not () {
+        VTABLE_set_integer_native(INTERP, SELF, 1);
     }
 
 /*

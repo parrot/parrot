@@ -203,8 +203,12 @@ void i_pow_float(FLOATVAL value)            MMD_I_POW_FLOAT
 
 void increment()
 void decrement()
-void absolute(PMC* dest)
-void neg(PMC* dest)
+
+PMC* absolute(PMC* dest)
+void i_absolute()
+
+PMC* neg(PMC* dest)
+void i_neg()
 
 [BITWISE]
 PMC* bitwise_or(PMC* value, PMC* dest)          MMD_BOR
@@ -243,9 +247,11 @@ PMC* bitwise_xors_str(STRING* value, PMC* dest) MMD_SXOR_STR
 void i_bitwise_xors(PMC* value)                 MMD_I_SXOR
 void i_bitwise_xors_str(STRING* value)          MMD_I_SXOR_STR
 
-void bitwise_not(PMC* dest)
+PMC* bitwise_not(PMC* dest)
+void i_bitwise_not()
 
-void bitwise_nots(PMC* dest)
+PMC* bitwise_nots(PMC* dest)
+void i_bitwise_nots()
 
 PMC* bitwise_shl(PMC* value, PMC* dest)         MMD_BSL
 PMC* bitwise_shl_int(INTVAL value, PMC* dest)   MMD_BSL_INT
@@ -285,7 +291,9 @@ void i_logical_and(PMC* value)               MMD_I_LAND
 PMC* logical_xor(PMC* value, PMC* dest)      MMD_LXOR
 void i_logical_xor(PMC* value)               MMD_I_LXOR
 
-void logical_not(PMC* dest)
+PMC* logical_not(PMC* dest)
+void i_logical_not()
+
 
 [STRING]
 PMC* concatenate(PMC* value, PMC* dest)        MMD_CONCAT

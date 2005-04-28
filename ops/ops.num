@@ -1330,3 +1330,14 @@ find_name_p_sc                 1299
 backtrace                      1300
 pic_infix___ic_p_p             1301
 pic_inline_sub___ic_p_p        1302
+n_abs_p_p                      1303
+n_neg_p_p                      1304
+bnot_i                         1305
+bnot_p                         1306
+n_bnot_p_p                     1307
+bnots_s                        1308
+bnots_p                        1309
+n_bnots_p_p                    1310
+not_i                          1311
+not_p                          1312
+n_not_p_p                      1313

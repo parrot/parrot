@@ -1073,37 +1073,6 @@ TODO Complex and BigInt rhs.
 
 /*
 
-=item C<void neg(PMC *dest)>
-
-Set C<dest> to the negated value of C<SELF>.
-
-=cut
-
-*/
-    void neg (PMC* dest) {
-        if (dest == SELF)
-            PMC_int_val(SELF) = -PMC_int_val(SELF);
-        else
-            VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
-    }
-
-
-/*
-
-=item C<void bitwise_not(PMC *dest)>
-
-Calculates the bitwise C<NOT> of the integer and returns the result in
-C<*dest>.
-
-=cut
-
-*/
-    void bitwise_not (PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest, ~PMC_int_val(SELF));
-    }
-
-/*
-
 =item C<INTVAL is_equal (PMC* value)>
 
 The C<==> operation.
@@ -1222,6 +1191,8 @@ Decrements the integer.
     }
 /*
 
+=item C<PMC* absolute(PMC* dest)>
+
 =item C<void absolute()>
 
 Sets C<dest> to the absolute value of SELF.
@@ -1230,8 +1201,19 @@ Sets C<dest> to the absolute value of SELF.
 
 */
 
-    void absolute(PMC *dest) {
-        VTABLE_set_integer_native(INTERP, dest, abs(PMC_int_val(SELF)));
+    PMC* absolute(PMC *dest) {
+        INTVAL a = abs(DYNSELF.get_integer());
+        /* XXX overlflow for -maxint */
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, a);
+        return dest;
+
+    }
+
+    void i_absolute() {
+        INTVAL a = abs(DYNSELF.get_integer());
+        VTABLE_set_integer_native(INTERP, SELF, a);
     }
 
 /*

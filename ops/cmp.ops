@@ -699,21 +699,44 @@ inline op and(out INT, in INT, in INT) :base_core {
 
 ########################################
 
+=item B<not>(out INT)
+
+=item B<not>(in PMC)
+
+Set the boolean state of $1 to the opposite of the boolean state from $1.
+
 =item B<not>(out INT, in INT)
 
-=item B<not>(in PMC, in PMC)
+=item B<not>(out PMC, in PMC)
+
+=item B<n_not>(out PMC, in PMC)
 
 Set the boolean state of $1 to the opposite of the boolean state from $2.
 
 =cut
+
+inline op not(inout INT) :base_core {
+  $1 = ! $1;
+  goto NEXT();
+}
 
 inline op not(out INT, in INT) :base_core {
   $1 = ! $2;
   goto NEXT();
 }
 
-inline op not(in PMC, in PMC) :base_core {
-  $2->vtable->logical_not(interpreter, $2, $1);
+inline op not(in PMC) :base_core {
+  $2->vtable->i_logical_not(interpreter, $1);
+  goto NEXT();
+}
+
+inline op not(out PMC, in PMC) :base_core {
+  $1 = $2->vtable->logical_not(interpreter, $2, $1);
+  goto NEXT();
+}
+
+inline op n_not(out PMC, in PMC) :base_core {
+  $1 = $2->vtable->logical_not(interpreter, $2, NULL);
   goto NEXT();
 }
 

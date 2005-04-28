@@ -79,39 +79,83 @@ inline op bands(out STR, in STR, in STR) :base_core {
 
 ########################################
 
+=item B<bnot>(inout INT)
+
+=item B<bnot>(in PMC)
+
+Sets $1 to C<bitwise not> $1 inplace.
+
 =item B<bnot>(out INT, in INT)
 
-=item B<bnot>(in PMC, in PMC)
+=item B<bnot>(out PMC, in PMC)
+
+=item B<n_bnot>(out PMC, in PMC)
 
 Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
 =cut
+
+inline op bnot(inout INT) :base_core {
+  $1 = ~ $1;
+  goto NEXT();
+}
 
 inline op bnot(out INT, in INT) :base_core {
   $1 = ~ $2;
   goto NEXT();
 }
 
-inline op bnot(in PMC, in PMC) :base_core {
-  $2->vtable->bitwise_not(interpreter, $2, $1);
+inline op bnot(in PMC) :base_core {
+  $1->vtable->i_bitwise_not(interpreter, $1);
   goto NEXT();
 }
 
+inline op bnot(out PMC, in PMC) :base_core {
+  $1 = $2->vtable->bitwise_not(interpreter, $2, $1);
+  goto NEXT();
+}
+
+inline op n_bnot(out PMC, in PMC) :base_core {
+  $1 = $2->vtable->bitwise_not(interpreter, $2, NULL);
+  goto NEXT();
+}
+
+=item B<bnots>(inout STR)
+
+=item B<bnots>(in PMC)
+
 =item B<bnots>(out STR, in STR)
 
-=item B<bnots>(in PMC, in PMC)
+=item B<bnots>(out PMC, in PMC)
+
+=item B<n_bnots>(out PMC, in PMC)
 
 Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
 =cut
+
+inline op bnots(inout STR) :base_core {
+  string_bitwise_not(interpreter, $1, &$1);
+  goto NEXT();
+}
 
 inline op bnots(out STR, in STR) :base_core {
   string_bitwise_not(interpreter, $2, &$1);
   goto NEXT();
 }
 
+inline op bnots(in PMC) :base_core {
+  $1->vtable->i_bitwise_nots(interpreter, $1);
+  goto NEXT();
+}
+
 inline op bnots(in PMC, in PMC) :base_core {
-  $2->vtable->bitwise_nots(interpreter, $2, $1);
+  $1 = $2->vtable->bitwise_nots(interpreter, $2, $1);
+  goto NEXT();
+}
+
+inline op n_bnots(in PMC, in PMC) :base_core {
+  $1 = $2->vtable->bitwise_nots(interpreter, $2, NULL);
   goto NEXT();
 }
 

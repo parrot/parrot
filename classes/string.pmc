@@ -292,7 +292,7 @@ strings, and place the result in C<dest>.
 
 =item C<void i_bitwise_xors_str(PMC* value)>
 
-=item C<void bitwise_nots(PMC* value)>
+=item C<void i_bitwise_nots(PMC* value)>
 
 These functions perform bitwise operations on entire
 strings in place.
@@ -391,10 +391,19 @@ strings in place.
         DYNSELF.set_string_native(string_bitwise_xor(INTERP, s, value, &s));
     }
 
-    void bitwise_nots (PMC* dest) {
+    PMC* bitwise_nots (PMC* dest) {
         STRING *s = PMC_str_val(SELF);
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_string_native(
             INTERP, dest, string_bitwise_not(INTERP, s, NULL));
+        return dest;
+    }
+
+    void i_bitwise_nots () {
+        STRING *s = PMC_str_val(SELF);
+        VTABLE_set_string_native(
+            INTERP, SELF, string_bitwise_not(INTERP, s, &s));
     }
 
 /*

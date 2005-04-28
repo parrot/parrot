@@ -133,6 +133,8 @@ MMD_DEFAULT: {
 
 /*
 
+=item C<PMC* logical_not(PMC* dest)>
+
 =item C<void logical_not()>
 
 Returns the negated value of the boolean.
@@ -141,10 +143,19 @@ Returns the negated value of the boolean.
 
 */
 
-    void logical_not (PMC *dest) {
-        VTABLE_morph(INTERP, dest, PyBuiltin_PyBoolean);
+    PMC* logical_not (PMC *dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, PyBuiltin_PyBoolean);
+        else
+            VTABLE_morph(INTERP, dest, PyBuiltin_PyBoolean);
         VTABLE_set_integer_native(INTERP, dest, PMC_int_val(SELF) == 0);
+        return dest;
     }
+
+    void i_logical_not () {
+        VTABLE_set_integer_native(INTERP, SELF, PMC_int_val(SELF) == 0);
+    }
+
 
 /*
 

@@ -931,7 +931,9 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<void neg(PMC *dest)>
+=item C<PMC* neg(PMC *dest)>
+
+=item C<void neg()>
 
 Set C<dest> to the negated value of C<SELF>.
 
@@ -939,10 +941,19 @@ Set C<dest> to the negated value of C<SELF>.
 
 */
 
-    void neg (PMC* dest) {
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+    PMC* neg (PMC* dest) {
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        else
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         RE(dest) = - RE(SELF);
         IM(dest) = - IM(SELF);
+        return dest;
+    }
+
+    void i_neg () {
+        RE(SELF) = - RE(SELF);
+        IM(SELF) = - IM(SELF);
     }
 
 /*
@@ -975,7 +986,9 @@ MMD_Float: {
 
 /*
 
-=item C<void absolute()>
+=item C<PMC* absolute(PMC* dest)>
+
+=item C<void i_absolute()>
 
 Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
 
@@ -995,9 +1008,18 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
 
 */
 
-    void absolute(PMC *dest) {
+    PMC* absolute(PMC *dest) {
         FLOATVAL d = sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF));
+        if (!dest)
+            dest = pmc_new(INTERP, enum_class_Float);   /* XXX */
         VTABLE_set_number_native(INTERP, dest, d);
+        return dest;
+    }
+
+    void i_absolute() {
+        FLOATVAL d = sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF));
+        VTABLE_morph(INTERP, SELF, enum_class_Float);   /* XXX */
+        VTABLE_set_number_native(INTERP, SELF, d);
     }
 }
 

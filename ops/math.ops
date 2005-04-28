@@ -151,9 +151,13 @@ Set $1 to its absolute value.
 
 =item B<abs>(out NUM, in NUM)
 
-=item B<abs>(in PMC, in PMC)
+=item B<abs>(out PMC, in PMC)
 
 Set $1 to absolute value of $2.
+
+=item B<n_abs>(out PMC, in PMC)
+
+Create new $1 as the absolute of $2.
 
 =cut
 
@@ -188,12 +192,17 @@ inline op abs(out NUM, in NUM) :base_core {
 }
 
 inline op abs(in PMC) :base_core {
-  $1->vtable->absolute(interpreter, $1, $1);
+  $1->vtable->i_absolute(interpreter, $1);
   goto NEXT();
 }
 
-inline op abs(in PMC, in PMC) :base_core {
-  $2->vtable->absolute(interpreter, $2, $1);
+inline op abs(out PMC, in PMC) :base_core {
+  $1 = $2->vtable->absolute(interpreter, $2, $1);
+  goto NEXT();
+}
+
+inline op n_abs(out PMC, in PMC) :base_core {
+  $1 = $2->vtable->absolute(interpreter, $2, NULL);
   goto NEXT();
 }
 
@@ -695,9 +704,13 @@ Set $1 to its negative.
 
 =item B<neg>(out NUM, in NUM)
 
-=item B<neg>(in PMC, in PMC)
+=item B<neg>(out PMC, in PMC)
 
 Set $1 to the negative of $2.
+
+=item B<n_neg>(out PMC, in PMC)
+
+Create $1 as the negative of $2.
 
 =cut
 
@@ -712,7 +725,7 @@ inline op neg(inout NUM) :base_core {
 }
 
 inline op neg(in PMC) :base_core {
-  $1->vtable->neg(interpreter, $1, $1);
+  $1->vtable->i_neg(interpreter, $1);
   goto NEXT();
 }
 
@@ -726,8 +739,13 @@ inline op neg(out NUM, in NUM) :base_core {
   goto NEXT();
 }
 
-inline op neg(in PMC, in PMC) :base_core {
-  $2->vtable->neg(interpreter, $2, $1);
+inline op neg(out PMC, in PMC) :base_core {
+  $1 = $2->vtable->neg(interpreter, $2, $1);
+  goto NEXT();
+}
+
+inline op n_neg(out PMC, in PMC) :base_core {
+  $1 = $2->vtable->neg(interpreter, $2, NULL);
   goto NEXT();
 }
 

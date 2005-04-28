@@ -748,7 +748,9 @@ Calculates pow inplace
 
 /*
 
-=item C<void neg(PMC *dest)>
+=item C<PMC* neg(PMC *dest)>
+
+=item C<void i_neg()>
 
 Set C<dest> to the negated value of C<SELF>.
 
@@ -756,8 +758,16 @@ Set C<dest> to the negated value of C<SELF>.
 
 */
 
-    void neg (PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest, -DYNSELF.get_number());
+    PMC* neg (PMC* dest) {
+        INTVAL a = -DYNSELF.get_integer();
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, a);
+        return dest;
+    }
+
+    void i_neg () {
+        VTABLE_set_integer_native(INTERP, SELF, -DYNSELF.get_integer());
     }
 
 /*
@@ -927,7 +937,9 @@ Inplace bitwise and.
 
 /*
 
-=item C<void bitwise_not(PMC *dest)>
+=item C<PMC* bitwise_not(PMC *dest)>
+
+=item C<void i_bitwise_not()>
 
 Returns in C<*dest> the bitwise negation of the scalar and C<value>.
 
@@ -935,8 +947,16 @@ Returns in C<*dest> the bitwise negation of the scalar and C<value>.
 
 */
 
-    void bitwise_not (PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest, ~DYNSELF.get_integer());
+    PMC* bitwise_not (PMC* dest) {
+        INTVAL a = ~DYNSELF.get_integer();
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_integer_native(INTERP, dest, a);
+        return dest;
+    }
+
+    void i_bitwise_not () {
+        VTABLE_set_integer_native(INTERP, SELF, ~DYNSELF.get_integer());
     }
 
 
@@ -1379,7 +1399,9 @@ Inplace logical and.
     }
 /*
 
-=item C<void logical_not(PMC *dest)>
+=item C<PMC* logical_not(PMC *dest)>
+
+=item C<void i_logical_not()>
 
 Returns in C<*dest> the result of the logical negation of the scalar and
 C<*value>.
@@ -1388,10 +1410,17 @@ C<*value>.
 
 */
 
-    void logical_not (PMC* dest) {
-        VTABLE_set_bool(INTERP, dest, ! DYNSELF.get_bool());
+    PMC* logical_not (PMC* dest) {
+        INTVAL a = ! DYNSELF.get_bool();
+        if (!dest)
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_bool(INTERP, dest, a);
+        return dest;
     }
 
+    void i_logical_not () {
+        VTABLE_set_bool(INTERP, SELF, ! DYNSELF.get_bool());
+    }
 
 /*
 
