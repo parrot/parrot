@@ -1,4 +1,4 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -44,24 +44,26 @@ actually means.
 =head2 String Constructors
 
 The most basic way of creating a string is through the function
-C<string_make>:
+C<string_make_direct>:
 
-    STRING* string_make(Interp *, const void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type)
+    STRING* string_make_direct(Interp *interpreter, const void *buffer, UINTVAL buflen, ENCODING *encoding, CHARSET *charset, UINTVAL flags)
 
 In here you pass a pointer to a buffer of a given encoding, and the
-number of bytes in that buffer to examine, the encoding, (see below for
-the C<enum> which defines the different encodings) and the initial
-values of the C<flags> and C<type> field. These should usually be zero.
+number of bytes in that buffer to examine, the encoding, the charset, and the initial
+values of the C<flags>. These should usually be zero.
 In return, you'll get a brand new Parrot string. This string will
 have its own private copy of the buffer, so you don't need to keep it.
 
+Additionally there several convenience functions, that are wrapping string_make_direct. 
+See F<src/string.c> for details.
+ 
 =over 3
 
 =item *
 
 I<Hint>: Nothing stops you doing
 
-    string_make(interpreter, NULL, 0, ...
+    string_make_direct(interpreter, NULL, 0, ...
 
 =back
 

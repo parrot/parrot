@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -10,7 +10,7 @@ src/string.c - Parrot Strings
 
 This file implements the non-ICU parts of the Parrot string subsystem.
 
-Note that C<bufstart> and C<buflen> are used by the memory subsystem The
+Note that C<bufstart> and C<buflen> are used by the memory subsystem. The
 string functions may only use C<buflen> to determine, if there is some
 space left beyond C<bufused>. This is the I<only> valid usage of these
 two data members, beside setting C<bufstart>/C<buflen> for external
@@ -602,12 +602,12 @@ const_string(Interp *interpreter, const char *buffer)
 
 =item C<STRING *
 string_make(Interp *interpreter, const void *buffer,
-    UINTVAL len, const char *charset, UINTVAL flags)>
+    UINTVAL len, const char *charset_name, UINTVAL flags)>
 
 Creates and returns a new Parrot string using C<len> bytes of string
 data read from C<buffer>.
 
-The value of C<charset> specifies the string's representation.
+The value of C<charset_name> specifies the string's representation.
 The currently recognised values are:
 
     'iso-8859-1'
