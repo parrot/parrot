@@ -563,6 +563,9 @@ Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
     info->file = "(unknown file)";
     info->line = -1;
     info->pc = -1;
+    info->nsname = NULL;
+    info->subname = NULL;
+    info->fullname = NULL;
 
     /* is the current sub of the specified context valid? */
     if (PMC_IS_NULL(ctx->current_sub)) {
@@ -576,9 +579,6 @@ Parrot_Context_info(Interp *interpreter, struct Parrot_Context *ctx,
     /* make sure there is a sub (not always the case, e.g in pasm code) */
     if (ctx->current_sub->vtable->base_type == enum_class_Undef ||
 	    PMC_sub(ctx->current_sub)->address == 0) {
-	info->nsname = NULL;
-	info->subname = NULL;
-	info->fullname = NULL;
 	/* XXX: is this correct? (try with load_bytecode) */
 	/* use the current interpreter's bytecode as start address */
 	if (ctx->current_pc != NULL)

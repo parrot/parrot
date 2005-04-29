@@ -656,7 +656,6 @@ void
 runops_int(Interp *interpreter, size_t offset)
 {
     int lo_var_ptr;
-    void *old_lo_var_ptr;
     opcode_t *(*core) (Interp *, opcode_t *) =
         (opcode_t *(*) (Interp *, opcode_t *)) 0;
 
@@ -681,7 +680,6 @@ runops_int(Interp *interpreter, size_t offset)
         opcode_t *pc = (opcode_t *)
             interpreter->code->base.data + interpreter->resume_offset;
 
-        old_lo_var_ptr = interpreter->lo_var_ptr;
         interpreter->resume_offset = 0;
         interpreter->resume_flag &= ~(RESUME_RESTART | RESUME_INITIAL);
         switch (interpreter->run_core) {
@@ -705,15 +703,6 @@ runops_int(Interp *interpreter, size_t offset)
                 break;
             case PARROT_CGOTO_CORE:
 #ifdef HAVE_COMPUTED_GOTO
-                /* clear stacktop, it gets set in runops_cgoto_core beyond the
-                 * opfunc table again, if the compiler supports nested funcs
-                 * - but only, if we are the top running loop
-                 */
-                /* #ifdef HAVE_NESTED_FUNC */
-#  ifdef __GNUC__
-                if (old_lo_var_ptr == interpreter->lo_var_ptr)
-                    interpreter->lo_var_ptr = 0;
-#  endif
                 core = runops_cgoto_core;
 #else
                 internal_exception(1, "Error: PARROT_CGOTO_CORE not available");
@@ -754,7 +743,6 @@ runops_int(Interp *interpreter, size_t offset)
          * the stacktop again to a sane value, so that restarting the runloop
          * is ok.
          */
-        interpreter->lo_var_ptr = old_lo_var_ptr;
         if (interpreter->resume_flag & RESUME_RESTART) {
             if ((int)interpreter->resume_offset < 0)
                 internal_exception(1, "branch_cs: illegal resume offset");

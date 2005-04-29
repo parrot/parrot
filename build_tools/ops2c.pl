@@ -365,8 +365,6 @@ if ($suffix =~ /cgp/) {
     else if (cur_opcode == (opcode_t *) 1)
 	asm ("jmp *4(%ebp)");	/* jump to ret addr, used by JIT */
 # endif
-    else
-      _check();
 #endif
     _reg_base = (char*)interpreter->ctx.bp;
     goto *((void *)*cur_opcode);
@@ -374,9 +372,6 @@ if ($suffix =~ /cgp/) {
 END_C
 } elsif ($suffix =~ /cg/) {
     print SOURCE <<END_C;
-#ifdef __GNUC__
-    _check();
-#endif
 goto *${bs}ops_addr[*cur_opcode];
 
 END_C

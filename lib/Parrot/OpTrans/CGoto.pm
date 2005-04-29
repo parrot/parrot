@@ -325,17 +325,6 @@ sub run_core_after_addr_table
 
     return <<END_C;
 
-/* #ifdef HAVE_NESTED_FUNC */
-#ifdef __GNUC__
-    static void _check(void);
-    static void _check(void) {
-	int lo_var_ptr;
-	if (!interpreter->lo_var_ptr)
-	    interpreter->lo_var_ptr = (void*)&lo_var_ptr;
-    }
-#endif
-/* #endif */
-
     if (!${bs}ops_addr)
 	${bs}ops_addr = l_ops_addr;
     if (cur_opcode == 0) {
