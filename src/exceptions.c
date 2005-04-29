@@ -172,8 +172,10 @@ run_cleanup_action(Interp *interpreter, Stack_Entry_t *e)
 void
 Parrot_push_action(Interp * interpreter, PMC *sub)
 {
-    if (sub->vtable->base_type != enum_class_Sub)
+    if (!VTABLE_isa(interpreter, sub,
+                const_string(interpreter, "Sub"))) {
         internal_exception(1, "Tried to push a non Sub PMC action");
+    }
     stack_push(interpreter, &interpreter->ctx.control_stack, sub,
             STACK_ENTRY_ACTION, run_cleanup_action);
 }
