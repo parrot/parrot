@@ -47,6 +47,11 @@ bigint_clear(Interp *interpreter, PMC *self) {
 }
 
 static void
+bigint_set(Interp *interpreter, PMC *dest, PMC *src) {
+    mpz_set(BN(dest), BN(src));
+}
+
+static void
 bigint_set_long(Interp *interpreter, PMC *self, long value) {
     mpz_set_si(BN(self), value);
 }
@@ -206,6 +211,10 @@ bigint_clear(Interp *interpreter, PMC *self) {
 }
 static void
 bigint_set_long(Interp *interpreter, PMC *self, long value) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_set(Interp *interpreter, PMC *dest, PMC *src) {
     internal_exception(1, "no bigint lib loaded");
 }
 static void
@@ -375,6 +384,13 @@ BigInt object.
     void init () {
         bigint_init(INTERP, SELF);
         PObj_active_destroy_SET(SELF);
+    }
+
+    PMC* clone() {
+        PMC *res;
+        res = pmc_new(INTERP, SELF->vtable->base_type);
+        bigint_set(INTERP, res, SELF);
+        return res;
     }
 
     void destroy () {

@@ -21,7 +21,7 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-    plan tests => 21;
+    plan tests => 22;
 }
 else {
     plan skip_all => "No BigInt Lib configured";
@@ -542,4 +542,118 @@ OK1: print "ok 1\\n"
      end
 CODE
 ok 1
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "pi() generator");
+.sub PI
+    .local pmc k, a, b, a1, b1
+    k = new Integer
+    k = 2
+    a = new Integer
+    a = 4
+    b = new Integer
+    b = 1
+    a1 = new Integer
+    a1 = 12
+    b1 = new Integer
+    b1 = 4
+forever:
+    .local pmc p, q
+    p = n_mul k, k
+    q = n_mul k, 2
+    inc q
+    inc k
+    .local pmc ta, tb, ta1, tb1
+    ta = clone a1
+    tb = clone b1
+    $P0 = n_mul p, a
+    $P1 = n_mul q, a1
+    ta1 =  n_add $P0, $P1
+    $P2 = n_mul p, b
+    $P3 = n_mul q, b1
+    tb1 =  n_add $P2, $P3
+    a = ta
+    b = tb
+    a1 = ta1
+    b1 = tb1
+    .local pmc d, d1
+    d = n_fdiv a, b
+    d1 = n_fdiv a1, b1
+yield_loop:
+    unless d == d1 goto end_yield
+	.yield(d)
+	$P4 = n_mod a, b
+	a = n_mul $P4, 10
+	$P5 = n_mod a1, b1
+	a1 = n_mul $P5, 10
+	d = n_fdiv a, b
+	d1 = n_fdiv a1, b1
+	goto yield_loop
+end_yield:
+    goto forever
+.end
+
+.sub main @MAIN
+    .local int i
+    .local pmc d
+loop:
+    d = PI()
+    print d
+    inc i
+    $I0 = i % 50
+    if $I0 goto no_nl
+	print "\n"
+no_nl:
+    if i < 1000 goto loop
+    print "\n"
+.end
+
+=pod
+class PI(object):
+    def __iter__(self):
+        k, a, b, a1, b1 = 2, 4, 1, 12, 4
+        while 1:
+            p, q, k = k*k, 2*k+1, k+1
+            a, b, a1, b1 = a1, b1, p*a+q*a1, p*b+q*b1
+            d, d1 = a//b, a1//b1
+            while d == d1:
+                yield d
+                a, a1 = 10*(a%b), 10*(a1%b1)
+                d, d1 = a//b, a1//b1
+
+pi = iter(PI())
+ds = ""
+for i in xrange(1, 1001):
+    d = pi.next()
+    ds += str(d)
+    im = i % 50
+    if im == 0:
+        print ds
+        ds = ""
+
+print ds
+
+=cut
+CODE
+31415926535897932384626433832795028841971693993751
+05820974944592307816406286208998628034825342117067
+98214808651328230664709384460955058223172535940812
+84811174502841027019385211055596446229489549303819
+64428810975665933446128475648233786783165271201909
+14564856692346034861045432664821339360726024914127
+37245870066063155881748815209209628292540917153643
+67892590360011330530548820466521384146951941511609
+43305727036575959195309218611738193261179310511854
+80744623799627495673518857527248912279381830119491
+29833673362440656643086021394946395224737190702179
+86094370277053921717629317675238467481846766940513
+20005681271452635608277857713427577896091736371787
+21468440901224953430146549585371050792279689258923
+54201995611212902196086403441815981362977477130996
+05187072113499999983729780499510597317328160963185
+95024459455346908302642522308253344685035261931188
+17101000313783875288658753320838142061717766914730
+35982534904287554687311595628638823537875937519577
+81857780532171226806613001927876611195909216420198
+
 OUTPUT
