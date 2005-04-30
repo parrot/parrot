@@ -24,6 +24,7 @@ retrieve arguments.
 #include "parrot/parrot.h"
 
 #include <stdarg.h>
+#include "spf_vtable.str"
 
 /*
 
@@ -239,7 +240,7 @@ getstring_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     case SIZE_PSTR:
         {
             STRING *s = (STRING *)va_arg(*arg, STRING *);
-            return s ? s : cstr2pstr("(null)");
+            return s ? s : CONST_STRING(interpreter, "(null)");
 
         }
 

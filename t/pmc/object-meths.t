@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -887,4 +887,35 @@ CODE
 Bound_NCI
 abc
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "tailcallmeth");
+.sub main @MAIN
+    .local pmc cl, o, n
+    cl = newclass "Foo"
+    addattribute cl, "n"
+    o = new "Foo"
+    n = new Integer
+    n = 2000
+    setattribute o, "Foo\0n", n
+    o.go()
+    n = getattribute o, "Foo\0n"
+    print n
+    print "\n"
+.end
+
+.namespace ["Foo"]
+.sub go method
+    .local pmc n
+    n = getattribute self, "Foo\0n"
+    dec n
+    unless n goto done
+    # XXX this is ugly
+    P2 = self
+    tailcallmethod "go"
+done:
+.end
+CODE
+0
+OUTPUT
+
 

@@ -84,8 +84,8 @@ STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
      */
 #  define PARROT_SPRINTF_MAX_PREC 3 * PARROT_SPRINTF_BUFFER_SIZE / 4
 
-#  define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), "iso-8859-1", PObj_external_FLAG)
-#  define char2pstr(ch)   string_make(interpreter, &ch , 1,            "iso-8859-1", PObj_external_FLAG)
+#  define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), "ascii", 0)
+#  define char2pstr(ch)   string_make(interpreter, &ch , 1, "ascii", 0)
 
     /* SPRINTF DATA STRUCTURE AND FLAGS */
 

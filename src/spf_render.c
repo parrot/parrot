@@ -22,6 +22,7 @@ and its utility functions.
 #define IN_SPF_SYSTEM
 
 #include "parrot/parrot.h"
+#include "spf_render.str"
 
 /* Per Dan's orders, we will not use sprintf if snprintf isn't
  * around for us.
@@ -112,39 +113,38 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
 static STRING *
 handle_flags(Interp *interpreter,
-             SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)
+             SpfInfo info, STRING *str, INTVAL is_int_type, STRING* prefix)
 {
     UINTVAL len = string_length(interpreter, str);
+    STRING *cs;
 
     if (is_int_type) {
         /* +, space */
         if (string_ord(interpreter, str, 0) != '-') {
             if (info->flags & FLAG_PLUS) {
-                str = string_concat(interpreter, cstr2pstr("+"), str, 0);
+                cs = CONST_STRING(interpreter, "+");
+                str = string_concat(interpreter, cs , str, 0);
                 len++;
             }
             else if (info->flags & FLAG_SPACE) {
-                str = string_concat(interpreter, cstr2pstr(" "), str, 0);
+                cs = CONST_STRING(interpreter, " ");
+                str = string_concat(interpreter, cs , str, 0);
                 len++;
             }
         }
-        /* XXX
-         * cstr2pstr mostly uses literal chars, which should generate a
-         * string with PObj_external_FLAG
-         * TODO make 2 versions of this if needed
-         */
 
-        /* # */
-        if ((info->flags & FLAG_SHARP) && prefix && prefix[0]) {
-            str = string_concat(interpreter, cstr2pstr(prefix), str, 0);
-            len += strlen(prefix);
+        /* # 0x ... */
+        if ((info->flags & FLAG_SHARP) && prefix) {
+            str = string_concat(interpreter, prefix, str, 0);
+            len += string_length(interpreter, prefix);
         }
         /* XXX sharp + fill ??? */
 
         /* precision */
         if (info->flags & FLAG_PREC) {
             info->flags |= FLAG_WIDTH;
-            if (string_ord(interpreter, str, 0) == '-' || string_ord(interpreter, str, 0) == '+') {
+            if (string_ord(interpreter, str, 0) == '-' ||
+                    string_ord(interpreter, str, 0) == '+') {
                 info->width = info->prec + 1;
             }
             else {
@@ -164,13 +164,13 @@ handle_flags(Interp *interpreter,
         STRING *fill;
 
         if (info->flags & FLAG_ZERO) {
-            fill = cstr2pstr("0");
+            fill = CONST_STRING(interpreter, "0");
         }
         else {
-            fill = cstr2pstr(" ");
+            fill = CONST_STRING(interpreter, " ");
         }
 
-        string_repeat(interpreter, fill, info->width - len, &fill);
+        fill = string_repeat(interpreter, fill, info->width - len, NULL);
 
         if (info->flags & FLAG_MINUS) { /* left-align */
             string_append(interpreter, str, fill, 0);
@@ -178,7 +178,8 @@ handle_flags(Interp *interpreter,
         else {                  /* right-align */
             /* signed and zero padded */
             if (info->flags & FLAG_ZERO
-                && (string_ord(interpreter, str,0) == '-' || string_ord(interpreter, str,0) == '+')) {
+                && (string_ord(interpreter, str,0) == '-' ||
+                    string_ord(interpreter, str,0) == '+')) {
                 STRING *temp = 0;
                 string_substr(interpreter, str, 1, len-1, &temp, 0);
                 string_chopn(interpreter, str, -1);
@@ -293,7 +294,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
      * tc is used as a temporary buffer by uint_to_string and
      * as a target by gen_sprintf_call.
      */
-    STRING *ts;
+    STRING *ts, *prefix;
     STRING *substr = NULL;
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
@@ -573,7 +574,9 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             theint = obj->getint(interpreter, info.type, obj);
                             ts = int_to_str(interpreter, tc, theint, 8);
 
-                            ts = handle_flags(interpreter, &info, ts, 1, "0");
+                            prefix = CONST_STRING(interpreter, "0");
+                            ts = handle_flags(interpreter, &info,
+                                    ts, 1, prefix);
 
                             string_append(interpreter, targ, ts, 0);
                             break;
@@ -582,7 +585,9 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             theuint = obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 16, 0);
 
-                            ts = handle_flags(interpreter, &info, ts, 1, "0x");
+                            prefix = CONST_STRING(interpreter, "0x");
+                            ts = handle_flags(interpreter, &info,
+                                    ts, 1, prefix);
 
                             string_append(interpreter, targ, ts, 0);
                             break;
@@ -592,7 +597,9 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                                 obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 16, 0);
 
-                            ts = handle_flags(interpreter, &info, ts, 1, "0X");
+                            prefix = CONST_STRING(interpreter, "0X");
+                            ts = handle_flags(interpreter, &info,
+                                    ts, 1, prefix);
 
                             string_append(interpreter, targ, ts, 0);
                             break;
@@ -602,7 +609,9 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                                 obj->getuint(interpreter, info.type, obj);
                             ts = uint_to_str(interpreter, tc, theuint, 2, 0);
 
-                            ts = handle_flags(interpreter, &info, ts, 1, "0b");
+                            prefix = CONST_STRING(interpreter, "0b");
+                            ts = handle_flags(interpreter, &info,
+                                    ts, 1, prefix);
 
                             string_append(interpreter, targ, ts, 0);
                             break;
@@ -611,7 +620,9 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             theint = obj->getint(interpreter, info.type, obj);
                             ts = int_to_str(interpreter, tc, theint, 2);
 
-                            ts = handle_flags(interpreter, &info, ts, 1, "0B");
+                            prefix = CONST_STRING(interpreter, "0B");
+                            ts = handle_flags(interpreter, &info,
+                                    ts, 1, prefix);
 
                             string_append(interpreter, targ, ts, 0);
                             break;
@@ -631,7 +642,9 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                             ts = uint_to_str(interpreter, tc,
                                        (HUGEINTVAL) (size_t) ptr, 16, 0);
 
-                            ts = handle_flags(interpreter, &info, ts, 1, "0x");
+                            prefix = CONST_STRING(interpreter, "0x");
+                            ts = handle_flags(interpreter, &info,
+                                    ts, 1, prefix);
 
                             string_append(interpreter, targ, ts, 0);
                             break;

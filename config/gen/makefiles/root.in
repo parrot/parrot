@@ -507,6 +507,8 @@ STR_FILES = \
     $(SRC_DIR)/mmd.str \
     $(SRC_DIR)/pmc.str \
     $(SRC_DIR)/objects.str \
+    $(SRC_DIR)/spf_render.str \
+    $(SRC_DIR)/spf_vtable.str \
     $(CLASS_STR_FILES)
 
 $(INC_DIR)/string_private_cstring.h : $(STR_FILES) build_tools/c2str.pl
@@ -919,9 +921,9 @@ $(SRC_DIR)/misc$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/utils$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/spf_render$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/spf_render$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/spf_render.str
 
-$(SRC_DIR)/spf_vtable$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/spf_vtable$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/spf_vtable.str
 
 $(SRC_DIR)/encoding$(O) : $(SRC_DIR)/encoding.c $(GENERAL_H_FILES)
 
