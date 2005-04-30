@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 144;
+use Parrot::Test tests => 145;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1461,6 +1461,60 @@ CODE
 46368
 -1
 OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT',"index with different charsets");
+
+.sub test @MAIN
+
+    print "default - default:\n"
+    set S0, "Parrot"
+    set S1, "rot"
+    index I1, S0, S1
+    print I1
+    print "\n"
+
+    print "ascii - ascii:\n"
+    set S0, ascii:"Parrot"
+    set S1, ascii:"rot"
+    index I1, S0, S1
+    print I1
+    print "\n"
+
+    print "default - ascii:\n"
+    set S0, "Parrot"
+    set S1, ascii:"rot"
+    index I1, S0, S1
+    print I1
+    print "\n"
+
+    print "ascii - default:\n"
+    set S0, ascii:"Parrot"
+    set S1, "rot"
+    index I1, S0, S1
+    print I1
+    print "\n"
+
+    print "binary - binary:\n"
+    set S0, binary:"Parrot"
+    set S1, binary:"rot"
+    index I1, S0, S1
+    print I1
+    print "\n"
+
+.end
+CODE
+default - default:
+3
+ascii - ascii:
+3
+default - ascii:
+3
+ascii - default:
+3
+binary - binary:
+-1
+OUTPUT
+
 
 SKIP: {
 skip("Pending rework of creating non-ascii literals",2);

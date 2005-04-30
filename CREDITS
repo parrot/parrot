@@ -52,7 +52,7 @@ N: Benjamin Goldberg
 D: Numerous improvements and proposals.
 
 N: Bernhard Schmalhofer
-D: Bugfixes, Getopt_Long.imc
+D: Bugfixes, m4, Getopt_Long.imc
 
 N: Bob Diertens
 D: patch regarding macro argument expansion
@@ -215,6 +215,9 @@ D: Many fixes
 
 N: Marcus Thiesen
 D: URM language, bugfixes
+
+N: Markus Amsler
+D: httpd.imc, bugfixes
 
 N: Matt Diephouse
 D: Turn off buffering layer in forth.pasm

@@ -1,3 +1,6 @@
+# Copyright (C) 2005 The Perl Foundation.  All rights reserved.
+# $Id$
+
 =head1 NAME
 
 examples/io/httpd.imc - HTTP server
@@ -16,42 +19,45 @@ in ./docs/html. Make sure you have built them with
 
     % make html
 
-After that you can browse the documenation with
+After that you can browse the documentation with
 
-    http://localhost:1234/html/index.html
+    http://localhost:1234
+
+which redirects to
+
+    http://localhost:1234/docs/html/index.html
 
 Currently the URL isn't decoded, so the docs get served only partially
 
 Be sure to set C<PARROT_NET_DEVEL> to 1 in F<io/io_private.h> and
 rebuild Parrot or the network layer won't exist.
 
-TODO
-    make it work on W32/IE
+=head1 TODO
 
+make it work on W32/IE
+
+Transcode the received to ascci, in order to have access to an implemented 'index' op.
+
+=head1 AUTHOR
+
+Markus Amsler - <markus.amsler@oribi.org> 
 
 =cut
 
 .sub main @MAIN
-    .local pmc sock
-    .local pmc work
-    .local pmc fp
+    .local pmc sock, work, fp
+    .local pmc fp               # read requested files from disk
     .local string address
     .local string buf
     .local string req
     .local string rep
     .local string temp
     .local int ret
-    .local int len
-    .local int pos
-    .local int occ1
-    .local int occ2
+    .local int len, pos, occ1, occ2
     .local string meth
     .local string url
     .local string doc_root
     .local string file_con
-
-    .local string tst
-    .local string tst2
 
     doc_root = "."
 
@@ -60,77 +66,89 @@ TODO
 
     # Pack a sockaddr_in structure with IP and port
     sockaddr address, 1234, "localhost"
-    print "Binding to port 1234.\n"
-    print "The Parrot documentation can now be accessed at http://localhost:1234 .\n"
+    print "Binding to port 1234 on localhost.\n"
     bind ret, sock, address
-
+    print "The Parrot documentation can now be accessed at http://localhost:1234 .\n"
 
 NEXT:
     listen ret, sock, 5
-
     accept work, sock
-
     req = ""
 MORE:
     recv ret, work, buf
+    # charset I0, buf
+    # charsetname S1, I0
+    # print "\nret: "
+    # print ret
+    # print "\ncharset of buf: "
+    # print S1
+    # print "\nbuf:"
+    # print buf
+    # print "\nafter buf"
+
     if ret <= 0 goto SERVE_REQ
     concat req, buf
-	index pos, req, "\r\n\r\n"
-	if pos >= 0 goto SERVE_REQ
-	index pos, req, "\n\n"
-	if pos >= 0 goto SERVE_REQ
-	index pos, req, "\r\r"
-	if pos >= 0 goto SERVE_REQ
-	goto MORE
+    index pos, req, "\r\n\r\n"
+    # print "\npos1:"
+    # print pos
+    if pos >= 0 goto SERVE_REQ
+    index pos, req, "\n\n"
+    # print "\npos2:"
+    # print pos
+    if pos >= 0 goto SERVE_REQ
+    index pos, req, "\r\r"
+    # print "\npos3:"
+    # print pos
+    if pos >= 0 goto SERVE_REQ
+    goto MORE
 
 SERVE_REQ:
 #    print "Request:\n"
 #    print req
 # split is not implemented, so parse it the old way
 # GET the method and file
-	index occ1, req, " "
-	add occ1, occ1, 1
-	index occ2, req, " ", occ1
-	sub len, occ1, 1
-	substr meth, req, 0, len
-	sub len, occ2, occ1
-	substr url, req, occ1, len
+    index occ1, req, " "
+    add occ1, occ1, 1
+    index occ2, req, " ", occ1
+    sub len, occ1, 1
+    substr meth, req, 0, len
+    sub len, occ2, occ1
+    substr url, req, occ1, len
 
-	if meth == "GET" goto SERVE_GET
+    if meth == "GET" goto SERVE_GET
 
-	print "unknown method:'"
-	print meth
-	print "'\n"
-	goto NEXT
-
+    print "unknown method:'"
+    print meth
+    print "'\n"
+    goto NEXT
 
 SERVE_GET:
     # decode the url
-	url = urldecode (url)
-	# open the file in url
-	if url == "/" goto SERVE_301
-	rep = "HTTP/1.x 301 OK\n"
-	concat url, doc_root, url
-	open fp, url, "<"
-	unless fp goto SERVE_404
+    url = urldecode (url)
+    # open the file in url
+    if url == "/" goto SERVE_301
+    rep = "HTTP/1.x 301 OK\n"
+    concat url, doc_root, url
+    open fp, url, "<"
+    unless fp goto SERVE_404
 
-	read file_con, fp, 65535
-	rep = "HTTP/1.x 200 OK\n"
-	concat rep, "Server: Parrot-httpd/0.1\n"
-#	concat rep, "Content-type: text/html\n"
-	concat rep, "Content-Length: "
-	length len, file_con
-	temp = to_string (len)
-	concat rep, temp
-	concat rep, "\n\n"
-	concat rep, file_con
-        SEND:
-	send ret, work, rep
+    read file_con, fp, 65535
+    rep = "HTTP/1.x 200 OK\n"
+    concat rep, "Server: Parrot-httpd/0.1\n"
+#    concat rep, "Content-type: text/html\n"
+    concat rep, "Content-Length: "
+    length len, file_con
+    temp = to_string (len)
+    concat rep, temp
+    concat rep, "\n\n"
+    concat rep, file_con
+SEND:
+    send ret, work, rep
 
-	print "served file '"
-	print url
-	print "'\n"
-	goto NEXT
+    print "served file '"
+    print url
+    print "'\n"
+    goto NEXT
 
 SERVE_301:
     rep = "HTTP1/1 301 Moved Permamently\nLocation: /docs/html/index.html\nContent-Length: "
@@ -161,158 +179,146 @@ END:
 
 
 .sub to_string
-	.param int n
+    .param int n
 
-	.local string ret
-	.local string char
-	.local int rest
-	ret = ""
+    .local string ret
+    .local string char
+    .local int rest
+    ret = ""
 NEXT_CHAR:
-	mod rest, n, 10
-	sub n, n, rest
-	div n, n, 10
-	add rest, 48, rest
-	chr char, rest
-	concat ret, char, ret
-	if n>0 goto	NEXT_CHAR
+    mod rest, n, 10
+    sub n, n, rest
+    div n, n, 10
+    add rest, 48, rest
+    chr char, rest
+    concat ret, char, ret
+    if n > 0 goto NEXT_CHAR
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return( ret )
 .end
 
 
-
-
 .sub urldecode
-	.param string in
+    .param string in
 
-	.local string out
-	.local string char_in
-	.local string char_out
-	.local int c_out
-	.local int pos_in
-	.local int len
-	.local string hex
+    .local string out, char_in, char_out
+    .local int    c_out, pos_in, len
+    .local string hex
 
-	length len, in
-	pos_in = 0
-	out = ""
+    len = length in
+    pos_in = 0
+    out = ""
 START:
-	if pos_in >= len goto END
-	substr char_in, in, pos_in, 1
-	char_out = char_in
-	if char_in != "%" goto INC_IN
-	# OK this was a escape character, next two are hexadecimal
-	add pos_in, 1, pos_in
-	substr hex, in, pos_in, 2
-	c_out = hex_to_int (hex)
-	chr char_out, c_out
-	add pos_in, 1, pos_in
+    if pos_in >= len goto END
+    substr char_in, in, pos_in, 1
+    char_out = char_in
+    if char_in != "%" goto INC_IN
+    # OK this was a escape character, next two are hexadecimal
+    add pos_in, 1, pos_in
+    substr hex, in, pos_in, 2
+    c_out = hex_to_int (hex)
+    chr char_out, c_out
+    add pos_in, 1, pos_in
 
 INC_IN:
-	concat out, char_out
-	add pos_in, 1, pos_in
-	goto START
+    concat out, char_out
+    add pos_in, 1, pos_in
+    goto START
 END:
-  .pcc_begin_return
-  .return out
-  .pcc_end_return
+   .return( out )
 .end
 
 
 .sub hex_to_int
-	.param string in
+    .param string in
 
-	.local string char
-	.local int ret
-	.local int pos
-	.local int factor
-	.local int temp
-	.local int len
+    .local string char
+    .local int ret
+    .local int pos
+    .local int factor
+    .local int temp
+    .local int len
 
-	ret = 0
-	factor = 1
-	length len, in
-	sub pos, len, 1
+    ret = 0
+    factor = 1
+    length len, in
+    sub pos, len, 1
 
 NEXT_CHAR:
-	substr char, in, pos, 1
+    substr char, in, pos, 1
 
-	if char=="0" goto CHAR0
-	if char=="1" goto CHAR1
-	if char=="2" goto CHAR2
-	if char=="3" goto CHAR3
-	if char=="4" goto CHAR4
-	if char=="5" goto CHAR5
-	if char=="6" goto CHAR6
-	if char=="7" goto CHAR7
-	if char=="8" goto CHAR8
-	if char=="9" goto CHAR9
-	if char=="A" goto CHARA
-	if char=="B" goto CHARB
-	if char=="C" goto CHARC
-	if char=="D" goto CHARD
-	if char=="E" goto CHARE
-	if char=="F" goto CHARF
+    if char=="0" goto CHAR0
+    if char=="1" goto CHAR1
+    if char=="2" goto CHAR2
+    if char=="3" goto CHAR3
+    if char=="4" goto CHAR4
+    if char=="5" goto CHAR5
+    if char=="6" goto CHAR6
+    if char=="7" goto CHAR7
+    if char=="8" goto CHAR8
+    if char=="9" goto CHAR9
+    if char=="A" goto CHARA
+    if char=="B" goto CHARB
+    if char=="C" goto CHARC
+    if char=="D" goto CHARD
+    if char=="E" goto CHARE
+    if char=="F" goto CHARF
 
 CHAR0:
-	temp = 0
-	goto CHAREND
+    temp = 0
+    goto CHAREND
 CHAR1:
-	temp = 1
-	goto CHAREND
+    temp = 1
+    goto CHAREND
 CHAR2:
-	temp = 2
-	goto CHAREND
+    temp = 2
+    goto CHAREND
 CHAR3:
-	temp = 3
-	goto CHAREND
+    temp = 3
+    goto CHAREND
 CHAR4:
-	temp = 4
-	goto CHAREND
+    temp = 4
+    goto CHAREND
 CHAR5:
-	temp = 5
-	goto CHAREND
+    temp = 5
+    goto CHAREND
 CHAR6:
-	temp = 6
-	goto CHAREND
+    temp = 6
+    goto CHAREND
 CHAR7:
-	temp = 7
-	goto CHAREND
+    temp = 7
+    goto CHAREND
 CHAR8:
-	temp = 8
-	goto CHAREND
+    temp = 8
+    goto CHAREND
 CHAR9:
-	temp = 9
-	goto CHAREND
+    temp = 9
+    goto CHAREND
 CHARA:
-	temp = 10
-	goto CHAREND
+    temp = 10
+    goto CHAREND
 CHARB:
-	temp = 11
-	goto CHAREND
+    temp = 11
+    goto CHAREND
 CHARC:
-	temp = 12
-	goto CHAREND
+    temp = 12
+    goto CHAREND
 CHARD:
-	temp = 13
-	goto CHAREND
+    temp = 13
+    goto CHAREND
 CHARE:
-	temp = 14
-	goto CHAREND
+    temp = 14
+    goto CHAREND
 CHARF:
-	temp = 15
-	goto CHAREND
+    temp = 15
+    goto CHAREND
 
 CHAREND:
-	mul temp, factor, temp
-	add ret, temp, ret
-	mul factor, factor, 16
-	sub pos, pos, 1
-	if pos>=0 goto	NEXT_CHAR
+    mul temp, factor, temp
+    add ret, temp, ret
+    mul factor, factor, 16
+    sub pos, pos, 1
+    if pos>=0 goto    NEXT_CHAR
 
-  .pcc_begin_return
-  .return ret
-  .pcc_end_return
+    .return( ret )
 .end

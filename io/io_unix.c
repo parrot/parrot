@@ -934,7 +934,10 @@ AGAIN:
         else {
             close(io->fd);
         }
-        *s = string_make(interpreter, buf, bytesread, "binary", 0);
+        /* The charset should propably be 'binary', but right now httpd.imc
+         * only workd with 'ascii'
+         */
+        *s = string_make(interpreter, buf, bytesread, "ascii", 0);
         if (!*s) {
             PANIC("PIO_recv: Failed to allocate string");
         }
