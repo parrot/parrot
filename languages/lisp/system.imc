@@ -71,6 +71,8 @@
 
   .DEFUN(symbol, package, "%STRING-EQUAL", _string_equal)
 
+  .DEFUN(symbol, package, "%MAKE-MACRO", _make_macro)
+
   # XXX - THESE SHOULD BE REMOVED AND CONVERTED TO PROPER LISP FUNCTIONS
   .DEFUN(symbol, package, "ERROR", _raise_error)
   .DEFUN(symbol, package, "LOAD", _load)
@@ -624,4 +626,39 @@ ERROR_NARGS:
 
 DONE:
   .return(retv)
+.end
+
+.sub _make_macro
+  .param pmc args
+  .local int type
+  .local pmc macro
+  .local pmc val
+  .local pmc form
+  .local pmc retv
+
+  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
+
+  .CAR(form, args)
+
+   # XXX - This is pretty hackish - should probably use the __morph method
+
+   macro = new "LispMacro"
+
+   val = form._get_args()
+   macro._set_args(val)
+
+   val = form._get_scope()
+   macro._set_scope(val)
+
+   val = form._get_body()
+   macro._set_body(val)
+
+   goto DONE
+
+ERROR_NARGS:
+  .ERROR_0("program-error", "wrong number of arguments to %MAKE-MACRO")
+   goto DONE
+
+DONE:
+  .return(macro)
 .end

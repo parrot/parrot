@@ -13,16 +13,13 @@
    addattribute class, "name"
    addattribute class, "scope"
 
+   subclass class, "LispFunction", "LispMacro"
+
    subclass class, "LispFunction", "LispSpecialForm"
 
    subclass class, "Hash", "LispHash"
 
    subclass class, "Integer", "LispInteger"
-
-   newclass class, "LispMacro"
-   addattribute class, "args"
-   addattribute class, "body"
-   addattribute class, "name"
 
    newclass class, "LispPackage"
    addattribute class, "external"
@@ -190,54 +187,6 @@ NAMED_FUNCTION:
 .end
 
 .namespace ["LispMacro"]
-
-.sub _get_body method
-  .local pmc retv
-
-   getattribute retv, self, "LispMacro\0body"
-
-  .return(retv)
-.end
-
-.sub _set_body method
-  .param pmc body
-
-   setattribute self, "LispMacro\0body", body
-
-  .return(body)
-.end
-
-.sub _get_args method
-  .local pmc retv
-
-   getattribute retv, self, "LispMacro\0args"
-
-  .return(retv)
-.end
-
-.sub _set_args method
-  .param pmc args
-
-   setattribute self, "LispMacro\0args", args
-
-  .return(args)
-.end
-
-.sub _get_name method
-  .local pmc retv
-
-   getattribute retv, self, "LispMacro\0name"
-
-  .return(retv)
-.end
-
-.sub _set_name method
-  .param pmc name
-
-   setattribute self, "LispMacro\0name", name
-
-  .return(name)
-.end
 
 .sub __get_string method
   .local pmc retv

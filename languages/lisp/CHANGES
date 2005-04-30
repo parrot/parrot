@@ -1,4 +1,13 @@
 
+Changes for version 0.1.2
+-------------------------
+  * Added basic macro support
+  * Added a basic DEFUN macro
+  * Added support for loading a file off the command line (based on a patch
+    from Leo)
+  * Speed ups in checking list lengths (courtesy Leo)
+  * Rewrote Lisp functions to use DEFUN
+
 Changes for version 0.1.1
 -------------------------
   * Added BOUNDP function

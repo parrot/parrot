@@ -21,6 +21,9 @@
 	     "HASH-TABLE-P" "INTEGERP" "KEYWORDP" "LISTP" "NUMBERP" "PACKAGEP"
 	     "STREAMP" "STRINGP" "SYMBOLP"
 
+	     ;; Macros
+	     "DEFUN"
+
 	     ;; Miscellaneous functions
 	     "APPLY" "ATOM" "EQ" "EQL" "EVAL" "FUNCTION" "GENSYM" "LET" "NOT"
 	     "NULL" "PACKAGE-NAME" "PRINT" "PROGN" "QUOTE" "READ"
@@ -29,10 +32,10 @@
 	     "IN-PACKAGE" 
 	     
 	     ;; Miscellaneous symbols
-	     "*GENSYM-COUNTER*" "*PACKAGE*" "*READ-EVAL*" "*READTABLE*"
-	     "*STANDARD-INPUT*" "*STANDARD-OUTPUT*" "BASE-CHAR" "FLOAT"
-	     "HASH-TABLE" "INTEGER" "MACRO" "NIL" "PACKAGE" "STREAM" "STRING"
-	     "SYMBOL" "T")
+	     "*GENSYM-COUNTER*" "*MACROEXPAND-HOOK*" "*PACKAGE*" "*READ-EVAL*"
+	     "*READTABLE*" "*STANDARD-INPUT*" "*STANDARD-OUTPUT*" "BASE-CHAR"
+	     "FLOAT" "HASH-TABLE" "INTEGER" "MACRO" "NIL" "PACKAGE" "STREAM"
+	     "STRING" "SYMBOL" "T")
 
 ;; Set the current package to SYSTEM so we don't have to prefix symbols.
 (cl:setq *package* (sys:%find-package "SYSTEM"))
@@ -78,6 +81,9 @@
 	  (function
 	   (lambda (stream char)
 	     (error "reader-error" "#) is invalid syntax"))))
+
+(setq *macroexpand-hook* #'(lambda (fn form env)
+			     (apply fn (list form env))))
 
 ;; Create the KEYWORD package.
 (sys:%make-package "KEYWORD")

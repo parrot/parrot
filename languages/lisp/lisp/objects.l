@@ -5,7 +5,7 @@
 		       "LispSymbol"
 		       "function"
 		       #'(lambda (s f)
-			  (%set-object-attribute s "LispSymbol" "function" f)))
+			   (%set-object-attribute s "LispSymbol" "function" f)))
 
 (set-symbol-function 'get-symbol-function
 		     #'(lambda (s)

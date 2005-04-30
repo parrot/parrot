@@ -80,7 +80,7 @@
 
   .DEFUN(symbol, package, "PRINT", _print)
 
-  .DEFUN(symbol, package, "PROGN", _progn)
+  .SPECIAL_FORM(symbol, package, "PROGN", _progn)
 
   .SPECIAL_FORM(symbol, package, "QUOTE", _quote)
 
@@ -754,7 +754,7 @@ DONE:
   .local pmc retv
 
   .NIL(retv)
-  lptr = args
+   lptr = args
 
 FORM_LOOP:
   .NULL(lptr, DONE)

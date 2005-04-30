@@ -92,6 +92,7 @@ MACRO_FORM:
   .local pmc macroexp
   .local pmc macrosym
   .local pmc macroenv
+  .local pmc macroarg
 
    macrosym = _LOOKUP_SYMBOL("*MACROEXPAND-HOOK*")
    isnull macrosym, MACRO_NOT_INITIALIZED
@@ -102,7 +103,10 @@ MACRO_FORM:
    peek_pad macroenv				# Get current lexical scope
 
   .LIST_3(funcargs, symbol, body, macroenv)
-   _FUNCTION_CALL(macroexp, funcargs)		# Call the macroexpand hook
+   retv = _FUNCTION_CALL(macroexp, funcargs)    # Call the macroexpand hook
+
+  .LIST_1(macroarg, retv)
+  _eval(macroarg)
 
   goto DONE
 
