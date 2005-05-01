@@ -338,12 +338,13 @@ MMD_Integer: {
              *   e.g. MMD_Integer_EXACT
              */
 
-            INTVAL a = VTABLE_get_integer(INTERP, SELF);
-            INTVAL b = VTABLE_get_integer(INTERP, value);
+            INTVAL a = PMC_int_val(SELF);
+            INTVAL b = PMC_int_val(value);
             INTVAL c = a + b;
             if ((c^a) >= 0 || (c^b) >= 0) {
                 if (!dest)
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
+                /* need this for e.g. PerlUndef */
                 VTABLE_set_integer_native(INTERP, dest, c);
                 return dest;
             }

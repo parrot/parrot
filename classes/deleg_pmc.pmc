@@ -54,6 +54,37 @@ pmclass deleg_pmc {
         /* don't pass that on */
     }
 
+    PMC* clone() {
+        PMC* res = pmc_new(INTERP, SELF->vtable->base_type);
+        INTVAL i;
+        SLOTTYPE *attrib_array = PMC_data(res);
+        for (i = POD_FIRST_ATTRIB; i < PMC_int_val(SELF); ++i)
+            attrib_array[i] = VTABLE_clone(INTERP, attrib_array[i]);
+        return res;
+    }
+
+    STRING* namespace_name() {
+        return SELF.name();
+    }
+
+    STRING* name() {
+        PMC **class_data;
+        class_data = (PMC **)PMC_data(SELF);
+
+        return VTABLE_get_string(INTERP, class_data[PCD_CLASS_NAME]);
+    }
+
+    INTVAL type() {
+        return SELF->vtable->base_type;
+    }
+
+    void add_method(STRING *method_name, PMC *sub_pmc) {
+        SUPER(method_name, sub_pmc);
+    }
+
+    PMC* find_method(STRING* method_name) {
+        return SUPER(method_name);
+    }
 }
 
 /*

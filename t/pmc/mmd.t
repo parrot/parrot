@@ -749,6 +749,9 @@ CODE
 42
 OUTPUT
 
+TODO: {
+  local $TODO = "ongoing changes to MMD - disabled";
+  $TODO .= '.'; # else used once warning
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
 .sub main @MAIN
     .local pmc d, l, r, cl
@@ -767,12 +770,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
     print d
     print "\n"
     # dispatches to Parrot_Integer_add_Integer
-    l."__add"(r, d)
+    d = l."__add"(r)
     print d
     print "\n"
 .end
-
-
 
 CODE
 3
@@ -780,6 +781,7 @@ CODE
 42
 42
 OUTPUT
+}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses, n_add");
 .sub main @MAIN

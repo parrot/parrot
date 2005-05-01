@@ -342,9 +342,12 @@ to_infix(Interp *interpreter, char *name, SymReg **r, int *n, int mmd_op)
 {
     SymReg *mmd;
     char buf[10];
+    int is_n;
 
     assert(*n >= 2);
-    if (*n == 3 && r[0] == r[1]) {       /* cvt to inplace */
+    is_n = (name[0] == 'n' && name[1] == '_');
+
+    if (*n == 3 && r[0] == r[1] && !is_n) {       /* cvt to inplace */
         sprintf(buf, "%d", mmd_op + 1);  /* XXX */
         mmd = mk_const(interpreter, str_dup(buf), 'I');
     }
@@ -360,7 +363,7 @@ to_infix(Interp *interpreter, char *name, SymReg **r, int *n, int mmd_op)
         (*n)++;
     }
     r[0] = mmd;
-    if (name[0] == 'n' && name[1] == '_')
+    if (is_n)
         return "n_infix";
     else
         return "infix";
