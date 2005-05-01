@@ -24,6 +24,8 @@ my %built_ins =
   ['',             'set', 'P5', 'P6[0]'],
   ['',             'save', 'P6'],
   ['',             'save', 'P1'],
+  ['',             '.include', '"interpinfo.pasm"'],
+  ['',             'interpinfo', 'P0', '.INTERPINFO_CURRENT_SUB'],
   ['',             'invokecc'],
   ['',             'restore', 'P1'],
   ['',             'restore', 'P6'],
@@ -38,7 +40,7 @@ my %built_ins =
   ['',             'invokecc'],
   ['',             'restore', 'P1'],
   ['write_KET',    'print', '")"'],
-  ['write_RET',    'invoke', 'P1'],
+  ['write_RET',    'returncc'],
  ],
  apply => 
  [['# Apply function'],

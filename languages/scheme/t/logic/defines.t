@@ -29,9 +29,9 @@ output_is (<<'CODE', '13', 'set! II');
 (write a)
 CODE
 
-output_is (<<'CODE', '(2 1)', 'define function');
+output_is (<<'CODE', '(18 17)', 'define function');
 (define (f a b) (list b a))
-(write (f 1 2))
+(write (f 17 18))
 CODE
 
 output_is (<<'CODE', '3', 'define via lambda');

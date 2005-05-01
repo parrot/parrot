@@ -1,4 +1,5 @@
 #! perl -w
+# $Id$
 
 use strict;
 use lib '.';
@@ -12,6 +13,6 @@ _EOF_
 }
 
 defined $ARGV[0] or Usage();
-$ARGV[0]=~/\.scheme$|\.scm$/i or Usage();
+$ARGV[0] =~ m/\.scheme$|\.scm$/i or Usage();
 
-Scheme->new($ARGV[0])->compile();
+print Scheme->new($ARGV[0])->compile();

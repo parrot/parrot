@@ -1,29 +1,49 @@
+# $Id$
+
 package Scheme;
 
 use strict;
 
 use Data::Dumper;
 
-use Scheme::Tokenizer qw(tokenize);
-use Scheme::Parser qw(parse);
-use Scheme::Generator qw(generate);
+use Scheme::Tokenizer();
+use Scheme::Parser();
+use Scheme::Generator();
 use Scheme::Builtins;
 
+=head1 SUBROUTINES
+
+=head2 new
+
+A constructor
+
+=cut
+
 sub new {
-  my ($class,$file) = @_;
+  my ($class, $file) = @_;
+
   bless { file => $file },$class;
 }
 
+
+=head2 link_functions
+
+Generate PASM.
+
+=cut
+
 sub link_functions {
-  my $main = shift;
+  my ( $main ) = @_;
 
   my @function = ( $main );
   my @missing = @{$main->{functions}};
   my @provides = keys %{$main->{scope}};
 
   my $code = $main->{code};
-
-  my $header = "# Header information\n        new_pad 0\n";
+  my $header = << 'END_HEADER';
+# Header information
+    new_pad 0
+END_HEADER
 
   while (@missing) {
     my $miss = shift @missing;
@@ -45,16 +65,24 @@ END
     $code .= $link->{code};
   }
 
-  $header . $code;
+  return $header . $code;
 }
+
+
+=head2 compile
+
+This is called in schemec.
+
+=cut
 
 sub compile {
   my $self = shift;
-  $self->{tokens} = tokenize($self->{file});
-  $self->{tree}   = parse($self->{tokens});
-  $self->{code}   = link_functions(generate($self->{tree}));
 
-  print $self->{code};
+  $self->{tokens} = Scheme::Tokenizer::tokenize($self->{file});
+  $self->{tree}   = Scheme::Parser::parse($self->{tokens});
+  $self->{code}   = link_functions(Scheme::Generator::generate($self->{tree}));
+
+  return $self->{code};
 }
 
 1;

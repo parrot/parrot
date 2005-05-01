@@ -1,3 +1,5 @@
+# $Id$
+
 package Scheme::Generator;
 
 use strict;
@@ -23,6 +25,7 @@ sub _add_inst {
 #------------------------------------
 
 sub _new_regs {
+     return
   {
     I => { map { $_ => 0 } (0..31) },
     N => { map { $_ => 0 } (0..31) },
@@ -32,9 +35,10 @@ sub _new_regs {
 };
 
 sub _save {
-  my $self = shift;
+  my $self  = shift;
   my $count = shift;
   my $type  = shift || 'I';
+
   die "No registers to save"
     unless $count and $count>0;
   die "Illegal register type"
@@ -382,7 +386,7 @@ sub _op_lambda {
   $self->_add_inst('', 'set', ['P5', $temp]);
 
   $self->_add_inst('', 'pop_pad');
-  $self->_add_inst('', 'invoke P1');
+  $self->_add_inst('', 'returncc');
   $self->_add_inst("DONE_$label");
 
   $self->{regs} = pop @{$self->{frames}};
@@ -1931,7 +1935,7 @@ sub _call_function_obj {
   my $func_obj = shift;
 
   my $return = $self->_save_1 ('P');
-  $self->_restore ($return); # dont need to save this
+  $self->_restore($return); # dont need to save this
   $self->_save_set;
 
   my $count = 5;
@@ -1960,9 +1964,11 @@ sub _call_function_obj {
     $count++;
   }
 
-  $self->_add_inst ('', 'set', ['P0', $func_obj]) unless $func_obj eq 'P0';
-  $self->_add_inst ('', 'invokecc');
-  $self->_add_inst ('', 'set', [$return,'P5']) unless $return eq 'P5';
+  $self->_add_inst('', 'set', ['P0', $func_obj]) unless $func_obj eq 'P0';
+  $self->_add_inst('', 'set', ['I0', 0]);        # Pass all args in Px registers
+  $self->_add_inst('', 'set', ['I3', $count-5]); # Tell about number of registers
+  $self->_add_inst('', 'invokecc');
+  $self->_add_inst('', 'set', [$return,'P5']) unless $return eq 'P5';
   $self->_restore_set;
 
   $return =~ /(\w)(\d+)/;
@@ -2021,6 +2027,7 @@ sub prettyprint {
 
 sub _generate {
   my ($self,$node) = @_;
+
   my $return;
 
   if (exists $node->{children}) {
@@ -2048,11 +2055,13 @@ sub _generate {
       $return = $self->_constant($node->{value});
     }
   }
+
   return $return;
 }
 
 sub generate {
   my $tree = shift;
+
   my $self = Scheme::Generator->new({});
   my $temp;
 

@@ -74,7 +74,7 @@ foreach my $i ( qw(is isnt like) ) {
     @_ = ( $prog_output, $output, $desc );
     #goto &{"Test::More::$i"};
     my $ok = &{"Test::More::$i"}( @_ );
-    if( $ok ) { foreach my $i ( $scheme_f, $as_f, $by_f, $out_f ) { unlink $i } } # JMG
+    # if( $ok ) { foreach my $i ( $scheme_f, $as_f, $by_f, $out_f ) { unlink $i } } # JMG
   }
 }
 

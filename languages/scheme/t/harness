@@ -1,8 +1,43 @@
 #! perl -w
 
+=head1 NAME
+
+scheme/t/harness - a harness for scheme
+
+=head1 DESCRIPTION
+
+If I'm called with a single
+argument of "-files", I just return a list of files to process.
+This list is one per line, and is relative to the languages dir.
+
+If I'm called with no args, I run the complete suite.
+
+Otherwise I run the tests that were passed on the command line.
+
+=cut
+
 use strict;
-use Test::Harness qw(runtests);
 use lib '../..';
 
-@ARGV = map { glob( "t/$_/*.t" ) } qw(io arith logic) unless @ARGV;
-runtests( @ARGV );
+use File::Spec;
+use Test::Harness qw(runtests);
+
+my $language = "scheme";
+
+my @files = map { glob( File::Spec->catfile( 't', $_, '*.t' ) ) } qw(io arith logic);
+if ( grep { /^-files$/ } @ARGV ) {
+    # I must be running out of languages/
+    my $dir = File::Spec->catfile( $language, "t" );
+    print join("\n", @files);
+    print "\n" if @files;
+    exit;
+} elsif (@ARGV) {
+    # Someone specified tests for me to run.
+    @files = grep {-f $_} @ARGV
+} else {
+    # I must be running out of languages/$language
+}
+
+
+exit unless scalar( @files );
+runtests(@files);
