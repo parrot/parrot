@@ -3,11 +3,13 @@
 
 =head1 NAME
 
-config/auto/bc - Check whether bc works
+config/auto/bc.pl - Check whether GNU bc works
 
 =head1 DESCRIPTION
 
-Determines whether bc, the basic calculator, exists on the system.
+Determines whether GNU bc, the basic calculator, exists on the system.
+It is OK when it doesn't exist. Currently GNU bc is only used for doublechecking
+Parrot bc.
 
 =cut
 

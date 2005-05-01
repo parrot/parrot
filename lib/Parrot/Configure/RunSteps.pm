@@ -63,6 +63,7 @@ use vars qw(@steps);
     auto/python.pl
     auto/antlr.pl
     auto/bc.pl
+    auto/m4.pl
     gen/icu.pl
     gen/revision.pl
     gen/config_h.pl
@@ -90,7 +91,7 @@ sub runsteps {
     my $verbose = $args{verbose};
     my $n = 0;
 
-    for(@steps) {
+    for (@steps) {
         undef $Configure::Step::result;
 
         die "No config/$_" unless -e "config/$_";
