@@ -660,12 +660,11 @@ OUT
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method");
 .sub main @MAIN
     .local pmc d, l, r
-    d = new Integer
     l = new Integer
     r = new Integer
     l = 3
     r = 39
-    l."__add"(r, d)
+    d = l."__add"(r)
     print d
     print "\n"
     end
@@ -677,12 +676,11 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - inherited");
 .sub main @MAIN
     .local pmc d, l, r
-    d = new PerlInt
     l = new PerlInt
     r = new PerlInt
     l = 3
     r = 39
-    l."__add"(r, d)
+    d = l."__add"(r)
     print d
     print "\n"
 .end
@@ -693,12 +691,11 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - Int, Float");
 .sub main @MAIN
     .local pmc d, l, r
-    d = new Integer
     l = new Integer
     r = new Float
     l = 3
     r = 39.42
-    l."__add"(r, d)
+    d = l."__add"(r)
     print d
     print "\n"
     end
@@ -749,9 +746,6 @@ CODE
 42
 OUTPUT
 
-TODO: {
-  local $TODO = "ongoing changes to MMD - disabled";
-  $TODO .= '.'; # else used once warning
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
 .sub main @MAIN
     .local pmc d, l, r, cl
@@ -759,8 +753,8 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
     d = new "AInt"
     l = new "AInt"
     r = new "AInt"
-    l = 3
-    r = 39
+    l = 4
+    r = 38
     print l
     print "\n"
     print r
@@ -773,15 +767,18 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
     d = l."__add"(r)
     print d
     print "\n"
+    l."__i_add"(r)
+    print l
+    print "\n"
 .end
 
 CODE
-3
-39
+4
+38
+42
 42
 42
 OUTPUT
-}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses, n_add");
 .sub main @MAIN

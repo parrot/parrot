@@ -140,6 +140,7 @@ get_mmd_dispatch_type(Interp *interpreter, INTVAL func_nr, INTVAL left_type,
                         Parrot_base_vtables[r]->isa_str, _isa, 0) >= 0)) {
                 /* TODO check dest too */
                 nci = pmc_new(interpreter, enum_class_Bound_NCI);
+                dod_register_pmc(interpreter, nci);     /* XXX */
                 *is_pmc = 2;
                 PMC_struct_val(nci) = func;
                 return D2FPTR(nci);
@@ -802,6 +803,72 @@ mmd_dispatch_i_pp(Interp *interpreter,
     return ret;
 }
 
+int
+Parrot_run_maybe_mmd_meth(Interp* interpreter, PMC *object,
+        STRING *meth, STRING *sig)
+{
+    INTVAL mmd_func;
+    char *c_meth, *c_sig;
+    int ret = 0, inplace, compare;
+    PMC *dest;
+
+
+    /*
+     * check if it's a known MMD function
+     */
+    c_meth = string_to_cstring(interpreter, meth);
+    c_sig = string_to_cstring(interpreter, sig);
+    if ( (mmd_func = Parrot_MMD_method_idx(interpreter, c_meth)) >= 0) {
+        /* yep - run it instantly */
+        ret = 1;
+        inplace = c_meth[2] == 'i' && c_meth[3] == '_';
+        compare = mmd_func >= MMD_EQ && mmd_func <= MMD_STRCMP;
+        assert(c_sig[0] == 'O');
+        switch (c_sig[1]) {
+            case 'P':
+                if (inplace)
+                    mmd_dispatch_v_pp(interpreter,
+                            object, REG_PMC(5), mmd_func);
+                else if (compare)
+                    REG_INT(5) = mmd_dispatch_i_pp(interpreter,
+                            object, REG_PMC(5), mmd_func);
+                else
+                    REG_PMC(5) = mmd_dispatch_p_ppp(interpreter,
+                            object, REG_PMC(5), NULL, mmd_func);
+                break;
+            case 'I':
+                if (inplace)
+                    mmd_dispatch_v_pi(interpreter,
+                            object, REG_INT(5), mmd_func);
+                else
+                    REG_PMC(5) = mmd_dispatch_p_pip(interpreter,
+                            object, REG_INT(5), NULL, mmd_func);
+                break;
+            case 'N':
+                if (inplace)
+                    mmd_dispatch_v_pn(interpreter,
+                            object, REG_NUM(5), mmd_func);
+                else
+                    REG_PMC(5) = mmd_dispatch_p_pnp(interpreter,
+                            object, REG_NUM(5), NULL, mmd_func);
+                break;
+            case 'S':
+                if (inplace)
+                    mmd_dispatch_v_ps(interpreter,
+                            object, REG_STR(5), mmd_func);
+                else
+                    REG_PMC(5) = mmd_dispatch_p_psp(interpreter,
+                            object, REG_STR(5), NULL, mmd_func);
+                break;
+        }
+
+    }
+    string_cstring_free(c_meth);
+    string_cstring_free(c_sig);
+    return ret;
+}
+
+
 /*
 
 =item C<void
@@ -1228,11 +1295,11 @@ Parrot_MMD_dispatch_func(Interp *interpreter, PMC *multi, STRING *meth,
     PMC* arg_tuple, *pmc;
     PMC *candidate_list;
     INTVAL n;
-
     /*
      * 1) create argument tuple
      */
     arg_tuple = mmd_arg_tuple_func(interpreter, signature);
+
     n = VTABLE_elements(interpreter, multi);
     if (!n)
         return NULL;

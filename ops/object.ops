@@ -123,13 +123,17 @@ op callmethodcc() :object_base {
 op callmethodcc(in STR) :object_base {
   opcode_t *dest;
   PMC *method_pmc, *object;
-  opcode_t *next = expr NEXT();
+  opcode_t *next;
   STRING *meth;
 
   meth = $1;
-  REG_PMC(1) = new_ret_continuation_pmc(interpreter, next);
+  object = REG_PMC(2);
+  if (Parrot_run_maybe_mmd_meth(interpreter, object, meth, REG_STR(1)))
+    goto NEXT();
 
-  interpreter->ctx.current_object = object = REG_PMC(2);
+  next = expr NEXT();
+  REG_PMC(1) = new_ret_continuation_pmc(interpreter, next);
+  interpreter->ctx.current_object = object;
   interpreter->ctx.current_method = meth;
   method_pmc = VTABLE_find_method(interpreter, object, meth);
   if (!method_pmc) {

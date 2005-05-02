@@ -74,6 +74,8 @@ PMC *Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *meth,
 PMC *Parrot_MMD_search_default_infix(Interp *, STRING *meth,
         INTVAL left_type, INTVAL right_type);
 
+int Parrot_run_maybe_mmd_meth(Interp*, PMC *object, STRING *meth, STRING *sig);
+int Parrot_run_maybe_mmd_func(Interp*, STRING *meth, STRING *sig);
 /*
  * in src/objects.c :
  */
