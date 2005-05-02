@@ -216,8 +216,8 @@ sub run_command {
     open  OLDOUT, ">&STDOUT" or die "Can't save     stdout" if $out;
     open  OLDERR, ">&STDERR" or die "Can't save     stderr" if $err;
 
-    open  STDOUT, ">$out"    or die "Can't redirect stdout" if $out;
-    open  STDERR, ">$err"    or die "Can't redirect stderr" if $err;
+    open  STDOUT, ">$out"    or die "Can't redirect stdout to $out" if $out;
+    open  STDERR, ">$err"    or die "Can't redirect stderr to $err" if $err;
 
     $command = "$ENV{VALGRIND} $command" if defined $ENV{VALGRIND};
 

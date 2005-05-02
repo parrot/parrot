@@ -70,7 +70,7 @@ over:
 	@$(MAKE) all
 
 test:
-	$(PERL) t/harness
+	cd .. && $(PERL) scheme/t/harness
 #	cd $(TOOL_DIR); $(INTERP) $(DIR)/test.pbc
 #	cd $(TOOL_DIR); $(INTERP) $(DIR)/and.pbc
 #	cd $(TOOL_DIR); $(INTERP) $(DIR)/foo.pbc

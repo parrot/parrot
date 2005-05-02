@@ -2,7 +2,7 @@
 # $Id$
 
 use strict;
-use lib '.';
+use lib 'languages/scheme';
 use Scheme;
 
 sub Usage {

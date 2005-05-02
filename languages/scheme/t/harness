@@ -1,8 +1,19 @@
 #! perl -w
+# $Id$
 
 =head1 NAME
 
 scheme/t/harness - a harness for scheme
+
+=head1 SYNOPSIS
+
+  cd languages && perl -I../lib scheme/t/harness -files
+
+  cd languages && perl -I../lib scheme/t/harness 
+
+  cd languages && perl -I../lib scheme/t/harness \
+                   scheme/t/logic/basic.t \
+                   scheme/t/logic/defines.t
 
 =head1 DESCRIPTION
 
@@ -17,27 +28,39 @@ Otherwise I run the tests that were passed on the command line.
 =cut
 
 use strict;
-use lib '../..';
+use lib '../lib', 'scheme';
 
+use Cwd();
 use File::Spec;
-use Test::Harness qw(runtests);
+use Test::Harness();
 
-my $language = "scheme";
+my $language = 'scheme';
 
-my @files = map { glob( File::Spec->catfile( 't', $_, '*.t' ) ) } qw(io arith logic);
-if ( grep { /^-files$/ } @ARGV ) {
-    # I must be running out of languages/
-    my $dir = File::Spec->catfile( $language, "t" );
-    print join("\n", @files);
-    print "\n" if @files;
-    exit;
-} elsif (@ARGV) {
-    # Someone specified tests for me to run.
-    @files = grep {-f $_} @ARGV
-} else {
-    # I must be running out of languages/$language
+if ( grep { m/^-files$/ } @ARGV ) {
+    # Only the Makefile in 'parrot/languages' uses -file
+    my $dir = File::Spec->catfile( $language, 't' );
+    my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
+    print join( "\n", @files );
+    print "\n" if scalar(@files);
+} else { 
+    my @files;
+    if ( scalar(@ARGV) ) {
+        # Someone specified tests for me to run.
+        @files = grep { -f $_ } @ARGV
+    } else {
+        ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
+        if ( $current_dir eq 'languages' ) {
+            @files = glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
+        }
+        elsif ( $current_dir eq $language ) {
+            @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
+        }
+    }
+    Test::Harness::runtests( @files ) if scalar( @files );
 }
 
+=head1 SEE ALSO
 
-exit unless scalar( @files );
-runtests(@files);
+  L<languages/m4/t/harness>
+
+=cut

@@ -16,56 +16,47 @@ languages/m4/t/harness - A harness for Parrot m4
 
 =head1 DESCRIPTION
 
-Conformant to a recent post on p6i, if I'm called with a single
+If I'm called with a single
 argument of "-files", I just return a list of files to process.
 This list is one per line, and is relative to the languages dir.
 
-If I'm called with no args, I run all tests.
+If I'm called with no args, I run the complete suite.
 
-Otherwise I try to run the list of passed tests.
+Otherwise I run the tests that were passed on the command line.
 
 =cut
 
 # pragmata
 use strict;
+use lib '..';
 
 use Cwd();
-use Data::Dumper;
 use File::Spec;
 use Test::Harness();
 
 my $language = 'm4';
 
-if ( grep { m/^-files$/ } @ARGV ) 
-{
-  # Only the Makefile in 'parrot/languages' uses -file
-  my $dir = File::Spec->catfile( $language, 't' );
-  my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
-  print join( "\n", @files );
-  print "\n" if scalar(@files);
-}
-else 
-{ 
-  my @files;
-  if ( scalar(@ARGV) ) 
-  {
-    # Someone specified tests for me to run.
-    @files = grep { -f $_ } @ARGV
-  }
-  else 
-  {
-    ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
-    if ( $current_dir eq 'languages' )
-    {
-      @files = glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
+if ( grep { m/^-files$/ } @ARGV ) {
+    # Only the Makefile in 'parrot/languages' uses -file
+    my $dir = File::Spec->catfile( $language, 't' );
+    my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
+    print join( "\n", @files );
+    print "\n" if scalar(@files);
+} else { 
+    my @files;
+    if ( scalar(@ARGV) ) {
+        # Someone specified tests for me to run.
+        @files = grep { -f $_ } @ARGV
+    } else {
+        ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
+        if ( $current_dir eq 'languages' ) {
+            @files = glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
+        }
+        elsif ( $current_dir eq $language ) {
+            @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
+        }
     }
-    elsif ( $current_dir eq $language )
-    {
-      @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
-    }
-  }
-  # die Dumper( \@files );
-  Test::Harness::runtests( @files ) if scalar( @files );
+    Test::Harness::runtests( @files ) if scalar( @files );
 }
 
 =head1 HISTORY
@@ -78,6 +69,6 @@ Mostly taken from tcl/t/harness.
 
 =head1 AUTHOR
 
-  Bernhard.Schmalhofer@gmx.de
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =cut
