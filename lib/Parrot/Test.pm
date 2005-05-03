@@ -33,32 +33,17 @@ The parameter C<$description> should describe the test.
 
 =over 4
 
-=item C<output_is($code, $expected, $description)>
+=item C<pasm_output_is($code, $expected, $description)> or C<output_is($code, $expected, $description)> 
 
 Runs the Parrot Assembler code and passes the test if a string comparison
 of the output with the expected result it true.
 
-=item C<pasm_output_is($code, $expected, $description)>
-
-Runs the Parrot Assembler code and passes the test if a string comparison
-of the output with the expected result it true.
-
-=item C<output_like($code, $expected, $description)>
+=item C<pasm_output_like($code, $expected, $description)> or C<output_like($code, $expected, $description)>
 
 Runs the Parrot Assembler code and passes the test if
 the  output matches the expected result.
 
-=item C<pasm_output_like($code, $expected, $description)>
-
-Runs the Parrot Assembler code and passes the test if
-the  output matches the expected result.
-
-=item C<output_isnt($code, $unexpected, $description)>
-
-Runs the Parrot Assembler code and passes the test
-if a string comparison of the output with the unexpected result is false.
-
-=item C<pasm_output_isnt($code, $unexpected, $description)>
+=item C<pasm_output_isnt($code, $unexpected, $description)> or C<output_isnt($code, $unexpected, $description)>
 
 Runs the Parrot Assembler code and passes the test
 if a string comparison of the output with the unexpected result is false.
@@ -66,7 +51,7 @@ if a string comparison of the output with the unexpected result is false.
 =item C<pir_output_is($code, $expected, $description)>
 
 Runs the PIR code and passes the test if a string comparison of output
-with the expected result it true.
+with the expected result is true.
 
 =item C<pir_output_like($code, $expected, $description)>
 
@@ -81,7 +66,7 @@ with the unexpected result is false.
 =item C<pbc_output_is($code, $expected, $description)>
 
 Runs the Parrot Bytecode and passes the test if a string comparison of output
-with the expected result it true.
+with the expected result is true.
 
 =item C<pbc_output_like($code, $expected, $description)>
 
@@ -96,14 +81,17 @@ with the unexpected result is false.
 =item C<pir_2_pasm_is($code, $expected, $description)>
 
 Compile the Parrot Intermediate Representation and generate Parrot Assembler Code.
+Pass if the generated PASM is $expected.
 
 =item C<pir_2_pasm_like($code, $expected, $description)>
 
 Compile the Parrot Intermediate Representation and generate Parrot Assembler Code.
+Pass if the generated PASM matches $expected.
 
 =item C<pir_2_pasm_isnt($code, $unexpected, $description)>
 
 Compile the Parrot Intermediate Representation and generate Parrot Assembler Code.
+Pass unless the generated PASM is $expected.
 
 =item C<c_output_is($code, $expected, $description)>
 
@@ -140,6 +128,9 @@ For example:
     # equivalent to "cd some_dir && make test"
     run_command("make test", CD => "some_dir");
 
+=item C<slurp_file($file_name)>
+
+Read the whole file $file_name and return the content as a string.
 
 =back
 
@@ -149,6 +140,7 @@ package Parrot::Test;
 
 use strict;
 use vars qw(@EXPORT @ISA);
+
 use Parrot::Config;
 use File::Spec;
 use Data::Dumper;
@@ -160,21 +152,21 @@ require Test::More;
 
 
 @EXPORT = qw( output_is          output_like          output_isnt
-              pbc_output_is      pbc_output_like      pbc_output_isnt
               pasm_output_is     pasm_output_like     pasm_output_isnt
               pir_output_is      pir_output_like      pir_output_isnt
               pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
+              pbc_output_is      pbc_output_like      pbc_output_isnt
               c_output_is        c_output_like        c_output_isnt
-              language_output_is
+              language_output_is language_output_like language_output_isnt
               skip 
+              slurp_file
 	      run_command
 	    );
 @ISA = qw(Exporter);
 
 # tell parrot it's being tested.  this disables searching of installed libraries
 # (see Parrot_get_runtime_prefix in src/library.c).
-$ENV{PARROT_TEST} = 1
-    unless defined($ENV{PARROT_TEST});
+$ENV{PARROT_TEST} = 1 unless defined($ENV{PARROT_TEST});
 
 my $builder = Test::Builder->new();
 
@@ -261,9 +253,11 @@ sub generate_code {
     binmode(CODE);
     print CODE $code;
     close( CODE );
+
+    return;
 }
 
-# Why can't we inherit from Test::More ?
+# We can inherit from Test::More, so we do it.
 *skip = \&Test::More::skip;
 
 # What about File::Slurp?
@@ -279,7 +273,7 @@ sub slurp_file {
     return $file;
 }
 
-sub generate_functions {
+sub _generate_functions {
     my ($package, $code_generator) = @_;
 
     my $path_to_parrot = $INC{"Parrot/Config.pm"};
@@ -419,16 +413,18 @@ sub generate_functions {
         }
     }
 
-    my %languages_test_map = (
-        language_output_is => 'is_eq',
+    my %language_test_map = (
+        language_output_is   => 'output_is',
+        language_output_like => 'output_like',
+        language_output_isnt => 'output_isnt',
                              );
 
-    foreach my $func ( keys %languages_test_map ) {
+    foreach my $func ( keys %language_test_map ) {
         no strict 'refs';
 
-        my $delegate_func = $func;
-        $delegate_func =~ s/^language_//;
         *{$package.'::'.$func} = sub ($$$;$) {
+            # TODO: $language should be the name of the test Module
+            #       that would open the door for Scheme::Test
             my $language = $_[0];
             $language = ucfirst($language) unless ( $language eq 'm4' );
 
@@ -445,16 +441,18 @@ sub generate_functions {
             $obj->{builder} = $builder;
             $obj->{relpath} = $path_to_parrot;
             $obj->{parrot}  = $parrot;
-            $obj->$delegate_func(@_[1..$#_]);
+            my $meth = $language_test_map{$func};
+            $obj->$meth(@_[1..$#_]);
 
             # restore prior level, just in case.
             $builder->level($level);
         }
     }
 
-    my %c_test_map = ( c_output_is   => 'is_eq',
-                       c_output_isnt => 'isnt_eq',
-                       c_output_like => 'like'
+    my %c_test_map = (
+         c_output_is   => 'is_eq',
+         c_output_isnt => 'isnt_eq',
+         c_output_like => 'like'
                      );
 
     foreach my $func ( keys %c_test_map ) {
@@ -553,7 +551,12 @@ sub generate_functions {
     }
 }
 
-Parrot::Test::generate_functions(__PACKAGE__, \&generate_code );
+Parrot::Test::_generate_functions(__PACKAGE__, \&generate_code );
+
+=head1 TODO
+
+C<generate_code> should be renamed and be published to everybody who needs
+to generate files.
 
 =head1 SEE ALSO
 

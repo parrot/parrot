@@ -5,6 +5,7 @@ package Scheme::Test;
 use strict;
 use vars qw(@EXPORT @ISA);
 use lib '../lib';
+
 use Parrot::Config;
 
 require Exporter;
@@ -23,15 +24,15 @@ sub import {
 
 my $count;
 
-foreach my $i ( qw(is isnt like) ) {
+foreach my $meth ( qw(is isnt like) ) {
     no strict 'refs';
 
-    *{"Scheme::Test::output_$i"} = sub ($$;$) {
+    *{"Scheme::Test::output_$meth"} = sub ($$;$) {
         my( $assembly, $output, $desc ) = @_;
 
         ++$count;
         my( $scheme_f, $as_f, $by_f, $out_f ) = map { # JMG
-            my $t = $0; $t =~ s/\.t$/$count\.$_/; $t
+            my $t = $0; $t =~ s/\.t$/_$count\.$_/; $t
         } ( qw(scheme pasm pbc out) ); # JMG
 
         # STDERR is written into same output file
@@ -53,9 +54,9 @@ foreach my $i ( qw(is isnt like) ) {
         my $prog_output = Parrot::Test::slurp_file( "$out_f" );
 
         @_ = ( $prog_output, $output, $desc );
-        #goto &{"Test::More::$i"};
-        my $ok = &{"Test::More::$i"}( @_ );
-        # if( $ok ) { foreach my $i ( $scheme_f, $as_f, $by_f, $out_f ) { unlink $i } } # JMG
+        #goto &{"Test::More::$meth"};
+        my $ok = &{"Test::More::$meth"}( @_ );
+        # if( $ok ) { foreach my $meth ( $scheme_f, $as_f, $by_f, $out_f ) { unlink $meth } } # JMG
     }
 }
 

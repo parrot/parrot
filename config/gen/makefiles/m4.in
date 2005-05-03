@@ -20,6 +20,8 @@ LD_SHARE_FLAGS = ${ld_share_flags} # e.g. -shared
 
 # some constants
 M4_EVAL_COMPILER_SO = ../../runtime/parrot/dynext/m4_eval_compiler.so
+#CONDITIONED_LINE(has_gnu_m4):USE_GNU_M4 = -use-gnu-m4
+#INVERSE_CONDITIONED_LINE(has_gnu_bc):USE_GNU_M4 = 
 
 # the default target
 all: build 
@@ -44,7 +46,7 @@ help:
 	@echo ""
 
 test: build
-	cd .. && $(PERL) -I../lib m4/t/harness
+	cd .. && $(PERL) -I../lib m4/t/harness $(USE_GNU_M4)
 
 build: runtime $(M4_EVAL_COMPILER_SO) m4.pbc 
 

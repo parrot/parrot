@@ -18,9 +18,9 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':gen';
 
-$description="Generating build files...";
+$description = "Generating build files...";
 
-@args=();
+@args = ();
 
 sub runstep {
   makefiles();
@@ -29,7 +29,7 @@ sub runstep {
 }
 
 sub cflags {
-  genfile('config/gen/makefiles/CFLAGS.in',      'CFLAGS',
+  genfile('config/gen/makefiles/CFLAGS.in' => 'CFLAGS',
           commentType => '#');
 
   open(CFLAGS, ">> CFLAGS") or die "open >> CFLAGS: $!";
@@ -48,46 +48,70 @@ EOF
 }
 
 sub makefiles {
-  genfile('config/gen/makefiles/root.in',      'Makefile',
-          commentType => '#', replace_slashes => 1, conditioned_lines => 1);
-  genfile('config/gen/makefiles/pge.in',      'compilers/pge/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/languages.in', 'languages/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/jako.in',      'languages/jako/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/miniperl.in',  'languages/miniperl/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/scheme.in',    'languages/scheme/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/m4.in',        'languages/m4/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/perl6.in',     'languages/perl6/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/bf.in',        'languages/bf/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/befunge.in',   'languages/befunge/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/cola.in',      'languages/cola/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/ook.in',       'languages/ook/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/lisp.in',       'languages/lisp/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/urm.in',       'languages/urm/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/tcl.in',       'languages/tcl/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/tcl_examples.in', 'languages/tcl/examples/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/dynclasses.in',   'dynclasses/Makefile',
-          commentType => '#', replace_slashes => 1, conditioned_lines => 1);
-  genfile('config/gen/makefiles/dynclasses_pl.in',   'dynclasses/build.pl',
-          commentType => '#', replace_slashes => 0, conditioned_lines => 1);
-  genfile('config/gen/makefiles/dynoplibs.in',   'dynoplibs/Makefile',
-          commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/parrot_compiler.in', 'languages/parrot_compiler/Makefile',
-          commentType => '#', replace_slashes => 1);
+  genfile('config/gen/makefiles/root.in'      => 'Makefile',
+          commentType       => '#', 
+          replace_slashes   => 1, 
+          conditioned_lines => 1);
+  genfile('config/gen/makefiles/pge.in'       => 'compilers/pge/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/languages.in' => 'languages/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/jako.in'      => 'languages/jako/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/miniperl.in'  => 'languages/miniperl/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/scheme.in'    => 'languages/scheme/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/m4.in'        => 'languages/m4/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1, 
+          conditioned_lines => 1);
+  genfile('config/gen/makefiles/perl6.in'     => 'languages/perl6/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/bf.in'        => 'languages/bf/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/befunge.in'   => 'languages/befunge/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/cola.in'      => 'languages/cola/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/ook.in'       => 'languages/ook/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/lisp.in'      => 'languages/lisp/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/urm.in'       => 'languages/urm/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/tcl.in'       => 'languages/tcl/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/tcl_examples.in' => 'languages/tcl/examples/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/dynclasses.in' => 'dynclasses/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1, 
+          conditioned_lines => 1);
+  genfile('config/gen/makefiles/dynclasses_pl.in' => 'dynclasses/build.pl',
+          commentType       => '#',
+          replace_slashes   => 0, 
+          conditioned_lines => 1);
+  genfile('config/gen/makefiles/dynoplibs.in'   => 'dynoplibs/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
+  genfile('config/gen/makefiles/parrot_compiler.in' => 'languages/parrot_compiler/Makefile',
+          commentType       => '#',
+          replace_slashes   => 1);
 
   if ( Configure::Data->get('has_perldoc') ) {
     # set up docs/Makefile, partly based on the .ops in the root dir

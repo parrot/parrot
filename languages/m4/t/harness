@@ -31,6 +31,7 @@ use strict;
 use lib '..';
 
 use Cwd();
+use Data::Dumper;
 use File::Spec;
 use Test::Harness();
 
@@ -44,6 +45,9 @@ if ( grep { m/^-files$/ } @ARGV ) {
     print "\n" if scalar(@files);
 } else { 
     my @files;
+    # TODO: use Getopt::Long or such
+    my $use_gnu_m4 = ( grep { m/^-use-gnu-m4$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^-use-gnu-m4$/ } @ARGV;
     if ( scalar(@ARGV) ) {
         # Someone specified tests for me to run.
         @files = grep { -f $_ } @ARGV
@@ -56,7 +60,16 @@ if ( grep { m/^-files$/ } @ARGV ) {
             @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
         }
     }
-    Test::Harness::runtests( @files ) if scalar( @files );
+
+    # Always test Parrot m4
+    {
+        $ENV{PARROT_M4_TEST_PROG} = '';
+        Test::Harness::runtests( @files ) if scalar( @files );
+    }
+    if ( $use_gnu_m4 ) {
+        $ENV{PARROT_M4_TEST_PROG} = 'm4';
+       Test::Harness::runtests( @files ) if scalar( @files );
+    }
 }
 
 =head1 HISTORY
