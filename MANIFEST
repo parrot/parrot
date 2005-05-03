@@ -127,10 +127,10 @@ classes/vtablecache.pmc				  []
 compilers/pge/README                              []
 compilers/pge/demo.pir                            []
 compilers/pge/PGE.pir                             []
-compilers/pge/PGE/Exp.pir                         [] 
-compilers/pge/PGE/Match.pir                       [] 
-compilers/pge/PGE/P6Rule.pir                      [] 
-compilers/pge/PGE/TokenHash.pir                   [] 
+compilers/pge/PGE/Exp.pir                         []
+compilers/pge/PGE/Match.pir                       []
+compilers/pge/PGE/P6Rule.pir                      []
+compilers/pge/PGE/TokenHash.pir                   []
 config/auto/aio.pl                                []
 config/auto/aio/aio.in                            []
 config/auto/alignptrs.pl                          []
@@ -770,6 +770,7 @@ include/parrot/string_funcs.h                     [devel]include
 include/parrot/string_primitives.h		  [devel]include
 include/parrot/sub.h                              [devel]include
 include/parrot/thr_pthread.h                      [devel]include
+include/parrot/thr_windows.h                      [devel]include
 include/parrot/thread.h                           [devel]include
 include/parrot/trace.h                            [devel]include
 include/parrot/tsq.h                              [devel]include
