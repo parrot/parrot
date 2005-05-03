@@ -30,6 +30,7 @@ my %platforms = map {$_=>1} qw/
     irix
     linux
     openbsd
+    MSWin32
 /;
 
 if ($^O eq "cygwin" ) {

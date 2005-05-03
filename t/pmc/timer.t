@@ -28,6 +28,7 @@ my %platforms = map {$_=>1} qw/
     irix
     linux
     openbsd
+    MSWin32
 /;
 
 output_is(<<'CODE', <<'OUT', "Timer setup");

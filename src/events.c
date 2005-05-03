@@ -919,8 +919,8 @@ event_thread(void *data)
             event = (parrot_event* )entry->data;
             when = event->u.timer_event.abs_time;
             abs_time.tv_sec = (time_t) when;
-            abs_time.tv_nsec = (long)(when - abs_time.tv_sec) *
-                (1000L*1000L*1000L);
+            abs_time.tv_nsec = (long)((when - abs_time.tv_sec)*1000.0f)
+                *1000L*1000L;
             queue_timedwait(event_q, &abs_time);
         }
         else {
