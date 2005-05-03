@@ -6,7 +6,7 @@ PGE::TokenHash - hash implementation to speed up Token lookups
 
 .namespace [ "PGE::TokenHash" ]
 
-.sub "__onload" @LOAD
+.sub "__onload" 
     .local pmc class
     class = newclass "PGE::TokenHash"
     addattribute class, ".ihash"

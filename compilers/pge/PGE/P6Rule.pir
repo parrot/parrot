@@ -18,41 +18,41 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
 
 =cut
 
-.namespace [ "PGE" ]
+.namespace [ "PGE::P6Rule" ]
 
 .const int PGE_INF    = 2147483647                # XXX: arbitrary limit
 
-.sub __onload @LOAD
+.sub "__onload"
     .local pmc p6meta
     .local pmc u
 
     u = new Undef
     $I0 = find_type "PGE::TokenHash"
     p6meta = new $I0
-    store_global "PGE", "%_p6meta", p6meta
+    store_global "PGE::P6Rule", "%_p6meta", p6meta
     p6meta['*'] = u
     p6meta['+'] = u
     p6meta['?'] = u
     p6meta[':'] = u
     p6meta['|'] = u
-    $P0 = find_global "PGE", "p6rule_parse_literal"
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_literal"
     p6meta['']  = $P0
-    $P0 = find_global "PGE", "p6rule_parse_dot"
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_dot"
     p6meta['.'] = $P0
-    $P0 = find_global "PGE", "p6rule_parse_anchor"
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_anchor"
     p6meta['^'] = $P0
     p6meta['^^'] = $P0
     p6meta['$'] = $P0
     p6meta['$$'] = $P0
-    $P0 = find_global "PGE", "p6rule_parse_group"
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_group"
     p6meta['['] = $P0
     p6meta[']'] = u
     p6meta['('] = $P0
     p6meta[')'] = u
-    # $P0 = find_global "PGE", "p6rule_parse_assert"      # XXX: TODO
+    # $P0 = find_global "PGE::P6Rule", "p6rule_parse_assert"      # XXX: TODO
     # p6meta['<'] = $P0
     # p6meta['>'] = u
-    $P0 = find_global "PGE", "p6rule_parse_charclass"
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_charclass"
     p6meta['\d'] = $P0
     p6meta['\D'] = $P0
     p6meta['\w'] = $P0
@@ -140,7 +140,7 @@ only to the last character (and we handle that below in C<p6rule_parse_quant>.
     .local int pos                         # current position
     .local pmc exp
 
-    p6meta = find_global "PGE", "%_p6meta"
+    p6meta = find_global "PGE::P6Rule", "%_p6meta"
     lit = ''
 
   literal:
@@ -340,7 +340,7 @@ characters.
     p6rule_parse_skip(pattern, lex, 0)             # skip to next token
     pos = lex["pos"]
 
-    p6meta = find_global "PGE", "%_p6meta"
+    p6meta = find_global "PGE::P6Rule", "%_p6meta"
     c = p6meta."lkey"(pattern, pos)
     $P0 = p6meta[c]
     (exp) = $P0(pattern, lex, c)
@@ -559,6 +559,8 @@ tree used to generate the rule (generally for debugging purposes).
 
 =cut
 
+.namespace [ "PGE" ]
+
 .sub "p6rule"
     .param string pattern
     .local pmc lex
@@ -571,7 +573,8 @@ tree used to generate the rule (generally for debugging purposes).
     lex["subp"] = 0
     $I0 = length pattern
     lex["plen"] = $I0
-    (exp) = "p6rule_parse_exp"(pattern, lex)
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_exp"
+    (exp) = $P0(pattern, lex)
 
     $P1 = find_global "PGE::Exp", "new"
     $P2 = $P1("PGE::Exp::End")

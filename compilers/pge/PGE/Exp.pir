@@ -28,7 +28,7 @@ functionality and correctness at the moment.
 
 .const int PGE_INF = 2147483647                    # XXX: arbitrary limit
 
-.sub __onload @LOAD
+.sub __onload 
     .local pmc hashclass
     .local pmc expclass
     .local pmc hash
@@ -498,14 +498,13 @@ register.
     if token == '$' goto eos
     emit(code, "if pos == 0 goto %s", next)
     unless token == '^^' goto end
-    emit(code, "$I0 = is_newline target, pos")
+    emit(code, "$I0 = pos - 1")
+    emit(code, "$I0 = is_newline target, $I0")
     emit(code, "if $I0 goto %s", next)
     goto end
   eos:
     emit(code, "if pos == lastpos goto %s", next)
     unless token == '$$' goto end
-    emit(code, "if pos == 0 goto fail")
-    emit(code, "$I0 = pos - 1")
     emit(code, "$I0 = is_newline target, $I0")
     emit(code, "if $I0 goto %s", next)
   end:

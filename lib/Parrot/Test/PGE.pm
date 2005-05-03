@@ -102,7 +102,7 @@ sub _generate_pir_for {
     return qq(
         .sub _PGE_Test
             .local pmc p6rule_compile
-            load_bytecode "runtime/parrot/library/PGE.pir"
+            load_bytecode "runtime/parrot/library/PGE.pbc"
             find_global p6rule_compile, "PGE", "p6rule"
 
             .local string target
