@@ -2,7 +2,7 @@
 
 =head1 NAME 
 
-input.imc - Setting up input and reading input
+input.pir - Setting up input and reading input
 
 =head1 DESCRIPTION
 

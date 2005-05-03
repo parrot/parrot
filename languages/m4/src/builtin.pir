@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-builtin.imc - builtin and user defined macros
+builtin.pir - builtin and user defined macros
 
 =head2 DESCRIPTION
 

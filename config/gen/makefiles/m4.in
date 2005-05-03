@@ -62,7 +62,7 @@ $(M4_EVAL_COMPILER_SO): src/eval.c
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) -o $@ eval.o
 
 
-src/m4.imc: src/builtin.imc src/freeze.imc src/input.imc src/macro.imc 
+src/m4.pir: src/builtin.pir src/freeze.pir src/input.pir src/macro.pir 
 	touch $@ 
 
 html: 
@@ -80,6 +80,7 @@ t/*/*.m4 \
 t/*/*.parrot_out \
 t/*/*.gnu_out \
 t/*/*.imc \
+t/*/*.pir \
 $(M4_EVAL_COMPILER_SO) 
 
 realclean: clean
@@ -87,6 +88,9 @@ realclean: clean
 Makefile
 
 distclean: realclean
+
+%.pbc: %.pir
+	$(PARROT) -o $@ $< 
 
 %.pbc: %.imc
 	$(PARROT) -o $@ $< 

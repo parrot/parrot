@@ -2,7 +2,7 @@
 
 =head1 NAME 
 
-output.imc - handle output for Parrot m4
+output.pir - handle output for Parrot m4
 
 =head1 DESCRIPTION
 

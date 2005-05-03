@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-freeze.imc - reading and writing of state files
+freeze.pir - reading and writing of state files
 
 =head1 DESCRIPTION
 

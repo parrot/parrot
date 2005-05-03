@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-src/macro.imc - does macro substitution
+src/macro.pir - does macro substitution
 
 =head1 DESCRIPTION
 

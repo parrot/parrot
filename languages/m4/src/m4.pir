@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-m4.imc - An implementation of GNU m4 in Parrot Immediate Representation
+m4.pir - An implementation of GNU m4 in Parrot Intermediate Representation
 
 =head1 DESCRIPTION
 
@@ -20,22 +20,22 @@ References: http://www.gnu.org/software/m4/m4.html
 # The names of these source files should be consistent with 'GNU m4'.
 
 # subs for reading in input
-.include "src/input.imc"
+.include "src/input.pir"
 
 # subs for writing output
-.include "src/output.imc"
+.include "src/output.pir"
 
 # This contains the initialization and execution of the builtin macros.
-.include "src/builtin.imc"
+.include "src/builtin.pir"
 
 # A dummy implementation of Getopt::Long
 .include "library/Getopt/Long.imc"
 
 # This contains reading and writing of frozen files
-.include "src/freeze.imc"
+.include "src/freeze.pir"
 
 # Macros are expanded in there.
-.include "src/macro.imc"
+.include "src/macro.pir"
 
 # Mainly for debug output
 # .include "library/dumper.imc"
@@ -136,7 +136,7 @@ NO_HELP_FLAG:
   .local pmc state
   state = new Hash
 
-  # Artificial limit for macro expansion in macro.imc
+  # Artificial limit for macro expansion in macro.pir
   # default setting of 'nesting_limit' max be overridden by
   # command line option '-L' or '--nesting-limit
   state['nesting_limit']   = 250
