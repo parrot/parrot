@@ -8,49 +8,23 @@ PARROT   = ..${slash}..${slash}parrot${exe}
 CP       = ${cp}
 
 # Where to put things
-PARROT_RUNTIME    = ..${slash}..${slash}runtime${slash}parrot${slash}dynext
-
-# Compile commands and flags
-CC        = ${cc}
-CC_SHARED = ${cc_shared} # e.g. -fpic
-DEBUG     = ${cc_debug}
-WARN      = ${ccwarn}
-CFLAGS    = ${ccflags} $(CC_SHARED) -I..${slash}..${slash}include $(DEBUG) $(WARN)
-O	  = ${o}
-
-# Linker command and flags
-LINK      = ${link}
-LINKFLAGS = ${linkflags}
-
-# Shared-library and dynamically-loadable module building
-# XXX Which one is this?
-LD        = ${ld}
-LDFLAGS   = ${ldflags}
-LD_SHARE_FLAGS = ${ld_share_flags} # e.g. -shared
-SO        = ${share_ext}
-LD_LOAD_FLAGS = ${ld_load_flags}
+PARROT_LIBRARY    = ..${slash}..${slash}runtime${slash}parrot${slash}library
 
 # the default target
-all: $(PARROT_RUNTIME)${slash}pge$(SO)
+all: $(PARROT_LIBRARY)${slash}PGE.pbc
 
-$(PARROT_RUNTIME)${slash}pge$(SO): pge$(SO)
-	$(CP) pge$(SO) $(PARROT_RUNTIME)
+$(PARROT_LIBRARY)${slash}PGE.pbc: PGE.pbc
+	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
-pge$(SO): pge_parse$(O) pge_gen$(O) pge_opt$(O) pge_parsep5$(O) pge_parseglob$(O)
-	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) -o pge$(SO) pge_parse$(O) pge_gen$(O) pge_opt$(O) pge_parsep5$(O) pge_parseglob$(O)
-
-pge_gen$(O): pge_gen.c pge.h
-pge_parse$(O): pge_parse.c pge.h
-pge_parsep5$(O): pge_parsep5.c pge.h
-pge_parseglob$(O): pge_parseglob.c pge.h
-pge_opt$(O): pge_opt.c pge.h
+PGE.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/P6Rule.pir PGE/TokenHash.pir
+	$(PARROT) --output-pbc PGE.pir >PGE.pbc
 
 # This is a listing of all targets, that are meant to be called by users
 help:
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  all:               pge.so"
+	@echo "  all:               PGE.pbc"
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
@@ -72,7 +46,7 @@ testclean:
 	$(RM_RF) ../../t/p6rules/*.imc ../../t/p6rules/*.pasm
 
 clean: testclean
-	$(RM_RF) *$(O) pge$(SO)
+	$(RM_RF) PGE.pbc
 
 realclean: clean
 	$(RM_RF) Makefile
