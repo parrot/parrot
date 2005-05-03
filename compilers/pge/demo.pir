@@ -1,26 +1,21 @@
 .sub _main
     .local string x
     .local string pattern
-    .local string rulepir
     .local int istraced
-    .local pmc rulesub
     .local pmc stdin
+    .local pmc rulesub
+    .local pmc pir
+    .local pmc exp
     .local pmc match
     .local pmc p6rule_compile
-    .local pmc p5re_compile
-    .local pmc glob_compile
-    .local pmc pge_set_trace
+    .local int istrace
 
-    load_bytecode "../../runtime/parrot/library/PGE.pir"
+    load_bytecode "../../runtime/parrot/library/PGE.pbc"
+    load_bytecode "../../runtime/parrot/library/PGE/Dumper.pir"
     find_global p6rule_compile, "PGE", "p6rule"
-    find_global p5re_compile, "PGE", "p5re"
-    find_global glob_compile, "PGE", "glob"
-    find_global pge_set_trace, "PGE", "set_trace"
+    istrace = 0
+    null rulesub
    
-    getstdin stdin
-    istraced = 0 
-    pge_set_trace(istraced)
-
   read_loop:
     print "\ninput \"rule <pattern>\", \"glob <pattern>\", \"pir\",\n"
     print "target string, \"trace\", or \"next\"\n"
@@ -36,9 +31,8 @@
     chopn x, 1
     if $S0 == "next" goto match_next
     if $S0 == "rule" goto make_p6rule
-    if $S0 == "glob" goto make_glob
-    if $S0 == "p5" goto make_p5re
     if $S0 == "pir" goto print_pir
+    if $S0 == "exp" goto print_exp
     if $S0 == "trace" goto toggle_trace
 
     isnull rulesub, match_nopattern
@@ -46,7 +40,7 @@
   match_result:
     unless match goto match_fail
     print "match succeeded\n"
-    match."_print"()
+    match."dump"("$/")
     goto read_loop
   match_fail:
     print "match failed\n"
@@ -56,38 +50,32 @@
     goto read_loop
 
   match_next:
-    match."_next"()
+    match."next"()
     goto match_result
 
   make_p6rule:
     pattern = substr x, 5
-    (rulesub, rulepir) = p6rule_compile(pattern)
+    (rulesub, pir, exp) = p6rule_compile(pattern)
     goto read_loop
   
-  make_glob:
-    pattern = substr x, 5
-    (rulesub, rulepir) = glob_compile(pattern)
-    goto read_loop
-
-  make_p5re:
-    pattern = substr x, 3
-    (rulesub, rulepir) = p5re_compile(pattern)
-    goto read_loop
-
   print_pir:
-    print rulepir
+    isnull rulesub, match_nopattern
+    print pir
+    goto read_loop
+
+  print_exp:
+    isnull rulesub, match_nopattern
+    exp."dump"(0)
     goto read_loop
 
   toggle_trace:
-    istraced = !istraced
-    pge_set_trace(istraced)
-    print "Tracing for new patterns is now "
-    if istraced goto toggle_trace_on
-    print "off\n"
+    istrace = not istrace
+    trace istrace
+    unless istrace goto trace_off
+    print "Tracing is now on\n"
     goto read_loop
-  toggle_trace_on:
-    print "on\n"
+  trace_off:
+    print "Tracing is now off\n"
     goto read_loop
-
   end_demo:
 .end

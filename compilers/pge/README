@@ -1,26 +1,29 @@
 =head1 Parrot Grammar Engine (PGE)
 
-This is an initial implementation of a regular expression/rules/grammar 
-engine designed to run in Parrot.  It's definitely a work in progress, 
-and much of the current implementation is designed simply to "bootstrap" 
+This is the second implementation of a regular expression/rules/grammar
+engine designed to run in Parrot.  It's still a work in progress, and
+some parts of the impelementation are designed simply to "bootstrap" 
 us along (i.e., some parts such as the parser and generator are 
 expected to be discarded).  The current work is also largely incomplete 
 -- although it has support for groups (capturing and non-capturing), 
 quantifiers, alterations, etc., many of the standard assertions and 
 character classes are not implemented yet but will be coming soon.
 
-In addition there's some experimental work here in being able to parse 
-and convert Perl *5* regular expressions into PIR subroutines, but the
-focus should be on building the perl6 capabilities first and we'll
-fold in perl 5 syntax a bit later.
+The previous version of PGE used a C-based parser and generator,
+but after the capture semantics were redesigned (Winter 2005) Pm
+decided that it would be better to just write the parser and generator
+in Parrot.  Thus, the current version.
+
+In addition we'll be looking at writing a parser and compiler for
+Perl *5* regular expressions, but the focus for the time being is
+(obviously) on Perl 6.
 
 =head1 Installation
 
 PGE assumes that it is part of the parrot distribution in the 
 F<compilers/pge> directory.   Simply type C<make> in this directory
-to build the F<pge.so> shared library it needs -- pge.so is
-then placed in F<runtime/parrot/dynext>.  In some environments you
-may need to set LD_LIBRARY_PATH to search this correctly.
+to build the various *.pbc files and install them into
+runtime/parrot/library.  
 
 The distribution comes with a small F<demo.pir> program that gives an
 example of using PGE.  To run the demo, simply do 
@@ -28,50 +31,46 @@ C<parrot demo.pir>.  The demo understands the following commands:
 
     rule <pattern>    - a perl 6 rule to be matched
     text              - a text string to match against previously entered rule
-    glob <pattern>    - a glob (wildcard) pattern to be matched
-    print             - display the PIR cod generated for current rule
+    pir               - display the PIR cod generated for current rule
+    exp               - display the expression tree for the current rule
     trace             - toggle pattern execution tracing
     next              - repeat last match on target string
 
-If you get errors about "cannot open shared object file", that usually
-means that Parrot was unable to locate the pge.so object file.
-
 =head1 Using PGE
 
-Because I couldn't find a lot of detailed information about writing a
-Parrot compiler in C, I went ahead and wrote this using Parrot's
-native call interface.  Essentially the library provides a 
-C<pge_p6rule_pir()> function that builds a PIR code string from a 
-given rule string, this PIR code string can then be sent to the PIR 
-compiler to get a final subroutine.  (Having the PIR code string 
-easily available and printable is also very handy for debugging as 
-we build the rest of the grammar engine.)
+Once PGE is compiled and installed, you generally load it using
+the load_bytecode operation, as in
 
-There's a PGE.pir library in F<runtime/parrot/library> that provides
-PIR-compatible calling interfaces to the compiler.  Here's a short
-example for compiling a regular expression and then matching it
-against another string:
+    load_bytecode "runtime/parrot/library/PGE.pbc"          
 
-    load_bytecode "library/PGE.pir"          
+This imports the C<PGE::p6rule> subroutine, which can be used to
+compile Perl 6 rules.  A sample compile sequence would be:
+
     .local pmc p6rule_compile
-    find_global p6rule_compile, "PGE", "p6rule"  # get the compiler
+    find_global p6rule_compile, "PGE", "p6rule"    # get the compiler
 
     .local string pattern       
     .local pmc rulesub                     
-    pattern = "^(From|Subject):"           # pattern to compile
-    rulesub = p6rule_compile(pattern)     # compile it to rulesub
+    pattern = "^(From|Subject):"                   # pattern to compile
+    rulesub = p6rule_compile(pattern)              # compile it to rulesub
+
+Then, to match a target string we simply call the subroutine
+to get back a C<PGE::Match> object:
 
     .local pmc match
-    $S0 = "From: pmichaud@pobox.com"       # target string
-    match = rulesub($S0)                   # execute rule on target string
+    $S0 = "From: pmichaud@pobox.com"               # target string
+    match = rulesub($S0)                           # execute rule
+
+The Match object is true if it successfully matched, and contains
+the strings and subpatterns that were matched as part of the capture.
+The C<dump> method can be used to quickly view the results of
+the match:
 
   match_loop:
-    unless match goto match_fail           # if match fails stop
+    unless match goto match_fail                   # if match fails stop
     print "match succeeded\n"
-
-    match."_print"()                       # display captures ($0, $1, etc.)
-
-    match."_next"()                        # find the next match
+    match."dump"()                                 # display matches
+    match."next"()                                 # find the next match
     goto match_loop
 
   match_fail:
@@ -86,14 +85,11 @@ and you can print/inspect the contents of $S0 to see the generated code.
 
 =head1 Known Limitations
 
-At the moment, PGE is not very aware of Unicode strings -- it's pretty 
-much limited to 8-bit Latin-1 characters in patterns.  This is because the
-PGE parser is still in C, and because support for character class 
-operations in Parrot is still being worked out.  Eventually these
-things will be resolved and we'll fix PGE up for Unicode then.
+Since the Parrot rewrite, PGE knows and uses as much of Unicode strings
+as Parrot does.  
 
-Most of the backslash sequences (\d, \D, \N, etc.) are unimplemented, 
-although backslashes do properly escape metacharacters in literals.
+Some backslashes aren't implemented yet, although the major ones
+are (\d, \s, \n, \D, \S, \N).
 
 PGE doesn't (yet) properly handle nested repetitions of zero-length 
 patterns in groups -- that's coming next.
@@ -114,17 +110,16 @@ Parrot.
 
 =head1 Implementation notes
 
-Basically, PGE consists of a parser and a PIR code generator written
-in C.  The parser takes a string representing a P6 rule and builds a
-parse tree for the rule.  The generator then produces a PIR subroutine
-(matching engine) that can match strings according to the components 
-of the rule.
+Basically, PGE is a compiler just like any other, except that its
+"language" is the Perl 6 rules syntax and its output is a subroutine
+that can match strings.  So, PGE consists of a series of parsers
+(for each pattern matching language), an intermediate expression
+format, and a code generator.
 
-The matching engine uses bsr/ret for its internal subroutine calls 
+The generated code uses bsr/ret for its internal subroutine calls
 (also optimized for tailcalls) and then uses Parrot calling 
-conventions for all interfaces with external callers/callees.  
-The compiler is designed such that we can switch the matching engine 
-to use PCC for its internal calls at some point in the future.
+conventions for all interfaces with external callers/callees.
+This should give some performance improvements.
 
 PGE also uses Parrot coroutines for the matching
 engine, so that after a successful match is found, the 
@@ -133,4 +128,15 @@ returning control to the matching coroutine (which then
 picks up from where it had previously left off until
 another match is discovered).
 
+The code still needs a fair amount of commenting.  In general,
+if you have a question about a particular section of code,
+send Pm an email and he'll write the comments for it.
+
+=head1 AUTHOR
+
+Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
+Patches and suggestions should be sent to the Perl 6 compiler list
+(perl6-compiler@perl.org).
+
 =cut
+
