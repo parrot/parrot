@@ -499,13 +499,13 @@ register.
     emit(code, "if pos == 0 goto %s", next)
     unless token == '^^' goto end
     emit(code, "$I0 = pos - 1")
-    emit(code, "$I0 = is_newline target, $I0")
-    emit(code, "if $I0 goto %s", next)
+    emit(code, "$I1 = is_newline target, $I0")
+    emit(code, "if $I1 goto %s", next)
     goto end
   eos:
     emit(code, "if pos == lastpos goto %s", next)
     unless token == '$$' goto end
-    emit(code, "$I0 = is_newline target, $I0")
+    emit(code, "$I0 = is_newline target, pos")
     emit(code, "if $I0 goto %s", next)
   end:
     emit(code, "goto fail")

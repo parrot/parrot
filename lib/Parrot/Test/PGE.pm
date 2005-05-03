@@ -94,7 +94,7 @@ sub _generate_pir_for {
     if ($captures) { 
         $captures = qq(
             print "\\n"
-            match."_print"()\n); 
+            match."dump"("mob"," ","")\n); 
     }
     else {
         $captures = "";
@@ -109,9 +109,11 @@ sub _generate_pir_for {
             .local string pattern
             .local pmc rulesub
             .local pmc match
+            .local pmc code
+            .local pmc exp
             target = "$target"
             pattern = "$pattern"
-            rulesub = p6rule_compile(pattern)
+            (rulesub, code, exp) = p6rule_compile(pattern)
             match = rulesub(target)
             unless match goto match_fail
           match_success:

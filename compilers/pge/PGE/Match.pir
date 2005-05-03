@@ -189,25 +189,30 @@ Produces a data dump of the match object and all of its subcaptures.
    
 .sub "dump" method
     .param string prefix
+    .param string b1
+    .param string b2
     .local pmc capt
     .local int spi, spc
     .local string prefix1, prefix2
     .local int matchidx
+    unless argcS < 3 goto start
+    b2 = "]"
+    unless argcS < 2 goto start
+    b1 = "["
+  start:
     print prefix
-    print ": "
+    print ":"
     $I0 = self
-    print $I0
     unless $I0 goto subpats
-    print " ["
+    print " <"
+    print self
+    print " @ "
     $I0 = self."from"()
     print $I0
-    print ".."
-    $I0 = self."to"()
-    print $I0
-    print "] «"
-    print self
-    print "»"
+    print "> "
   subpats:
+    $I0 = self
+    print $I0
     print "\n"
     capt = getattribute self, "PGE::Match\x0@:capt"
     isnull capt, subrules
@@ -215,10 +220,10 @@ Produces a data dump of the match object and all of its subcaptures.
     spc = elements capt
   subpats_1:
     unless spi < spc goto subrules
-    prefix1 = concat prefix, "["
+    prefix1 = concat prefix, b1
     $S0 = spi
     concat prefix1, $S0
-    concat prefix1, "]"
+    concat prefix1, b2
     $P0 = capt[spi]
     $I0 = 0
     $I1 = elements $P0
@@ -226,16 +231,16 @@ Produces a data dump of the match object and all of its subcaptures.
     $P1 = getprop "isarray", $P0
     if $P1 goto subpats_2
     $P1 = $P0[-1]
-    $P1."dump"(prefix1)
+    $P1."dump"(prefix1, b1, b2)
     goto subpats_3
   subpats_2:
     unless $I0 < $I1 goto subpats_3
     $P1 = $P0[$I0]
-    prefix2 = concat prefix1, "["
+    prefix2 = concat prefix1, b1
     $S0 = $I0
     concat prefix2, $S0
-    concat prefix2, "]"
-    $P1."dump"(prefix2)
+    concat prefix2, b2
+    $P1."dump"(prefix2, b1, b2)
     inc $I0
     goto subpats_2
   subpats_3:
