@@ -547,6 +547,82 @@ void Parrot_PMC_set_cstringn(Parrot_INTERP interp, Parrot_PMC pmc, const char *v
 /*
 
 =item C<void
+Parrot_PMC_push_intval(Parrot_INTERP interp, Parrot_PMC pmc,
+                            Parrot_Int value)>
+
+Push the passed-in Parrot integer onto the passed in PMC
+
+=cut
+
+*/
+
+void Parrot_PMC_push_intval(Parrot_INTERP interp, Parrot_PMC pmc,
+                            Parrot_Int value) {
+    PARROT_CALLIN_START(interp);
+    VTABLE_push_integer(interp, pmc, value);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
+=item C<void
+Parrot_PMC_push_numval(Parrot_INTERP interp, Parrot_PMC pmc,
+                            Parrot_Float value)>
+
+Push the passed-in Parrot number onto the passed in PMC
+
+=cut
+
+*/
+
+void Parrot_PMC_push_numval(Parrot_INTERP interp, Parrot_PMC pmc,
+                            Parrot_Float value) {
+    PARROT_CALLIN_START(interp);
+    VTABLE_push_float(interp, pmc, value);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
+=item C<void
+Parrot_PMC_push_string(Parrot_INTERP interp, Parrot_PMC pmc,
+                            Parrot_Int value)>
+
+Push the passed-in Parrot string onto the passed in PMC
+
+=cut
+
+*/
+
+void Parrot_PMC_push_string(Parrot_INTERP interp, Parrot_PMC pmc,
+                            Parrot_STRING value) {
+    PARROT_CALLIN_START(interp);
+    VTABLE_push_string(interp, pmc, value);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
+=item C<void
+Parrot_PMC_push_pmc(Parrot_INTERP interp, Parrot_PMC pmc,
+                    Parrot_PMC value)>
+
+Push the passed-in PMC onto the passed in PMC
+
+=cut
+
+*/
+
+void Parrot_PMC_push_pmc(Parrot_INTERP interp, Parrot_PMC pmc,
+                         Parrot_PMC value) {
+    PARROT_CALLIN_START(interp);
+    VTABLE_push_pmc(interp, pmc, value);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
+=item C<void
 Parrot_PMC_set_cstringn_intkey(Parrot_INTERP interp, Parrot_PMC pmc,
                                Parrot_Int key,
                                const char *value, Parrot_Int length)>
