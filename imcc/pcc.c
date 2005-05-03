@@ -862,13 +862,15 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     SymReg *s0 = NULL;
     Instruction *get_name;
 
-    tail_call = 0;
-#ifdef CREATE_TAIL_CALLS
-    tail_call = check_tail_call(interp, unit, ins);
-    if (tail_call)
-        IMCC_debug(interp, DEBUG_OPT1, "found tail call %I \n", ins);
-#endif
     sub = ins->r[0];
+    tail_call = (sub->pcc_sub->flags & isTAIL_CALL);
+#ifdef CREATE_TAIL_CALLS
+    if (!tail_call) {
+        tail_call = check_tail_call(interp, unit, ins);
+        if (tail_call)
+            IMCC_debug(interp, DEBUG_OPT1, "found tail call %I \n", ins);
+    }
+#endif
 
     if (sub->pcc_sub->object)
         meth_call = 1;
@@ -977,7 +979,6 @@ move_sub:
         }
     }
 
-#ifdef CREATE_TAIL_CALLS
     /*
      * if we have a tail call then
      * insert a tailcall opcode
@@ -988,7 +989,6 @@ move_sub:
             return;
         }
     }
-#endif
     /*
      * if an explicit return continuation is passed, set it to P1
      */

@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 ##############################
 # Parrot Calling Conventions:  Tail call optimization.
@@ -336,14 +336,15 @@ CODE
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "new tail call syntax parsing");
+pir_output_is(<<'CODE', <<'OUT', "new tail call syntax");
 .sub main @MAIN
-    foo()
-    print "ok\n"
+    $S0 = foo()
+    print $S0
 .end
 
 .sub foo
     .return bar()
+    print "never\n"
 .end
 
 .sub bar
@@ -351,4 +352,33 @@ pir_output_is(<<'CODE', <<'OUT', "new tail call syntax parsing");
 .end
 CODE
 ok
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "new tail method call syntax");
+.sub main @MAIN
+    .local pmc cl, o, n
+    cl = newclass "Foo"
+    addattribute cl, "n"
+    o = new "Foo"
+    n = new Integer
+    n = 2000   # beyond recursion limit of 1000
+    setattribute o, "Foo\0n", n
+    o."go"()
+    n = getattribute o, "Foo\0n"
+    print n
+    print "\n"
+.end
+
+.namespace ["Foo"]
+.sub go method
+    .local pmc n
+    n = getattribute self, "Foo\0n"
+    dec n
+    unless n goto done
+    .return self."go"()
+done:
+.end
+
+CODE
+0
 OUT
