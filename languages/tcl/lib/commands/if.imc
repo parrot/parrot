@@ -68,9 +68,9 @@ get_final:
   else = temp_str
 
   (return_type,retval) = expression_p(condition)
-  if return_type == TCL_ERROR goto done_final
+  if return_type == TCL_ERROR goto done_error
   (return_type,retval) = expression_i(retval)
-  if return_type == TCL_ERROR goto done_final
+  if return_type == TCL_ERROR goto done_error
 
   unless retval goto do_elseifs
   code = body 
@@ -85,9 +85,9 @@ elseif_loop:
   $P1 = elseifs[$I2]
   condition = $P1[0]
   (return_type,retval) = expression_p(condition)
-  if return_type == TCL_ERROR goto done_final
+  if return_type == TCL_ERROR goto done_error
   (return_type,retval) = expression_i(retval)
-  if return_type == TCL_ERROR goto done_final
+  if return_type == TCL_ERROR goto done_error
   if retval goto done_elseifs
   inc $I2
   goto elseif_loop  
@@ -107,8 +107,9 @@ done:
   pmcString = code
  
   $P1 = parser."parse"(pmcString,zero,zero)
-  (return_type,retval) = interpret($P1)
 
-done_final:
+  .return interpret($P1) #tailcall
+
+done_error:
   .return(return_type,retval)
 .end

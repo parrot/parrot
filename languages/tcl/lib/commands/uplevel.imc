@@ -60,5 +60,6 @@ loop_done:
   store_global "_Tcl", "call_level", old_call_level
 
 done:
-  .return($I0,$P0)
+  # XXX can't quite tailcall this at the moment due to the hackish call_level
+  .return($I0,$P0) 
 .end

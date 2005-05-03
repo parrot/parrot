@@ -42,8 +42,6 @@ loop_done:
   zero = new Integer
   zero = 0
   $P1 = parser."parse"(pmcString,zero,zero)
-  ($I0,$P0) = interpret($P1) 
 
-done:
-  .return($I0,$P0)
+  .return interpret($P1) #tailcall
 .end
