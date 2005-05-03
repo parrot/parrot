@@ -309,7 +309,7 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
         sub->pcc_sub->object = rr[is_void ? 0 : 1];
         first_arg = 2;
     }
-    sub->pcc_sub->nci = 1;
+    sub->pcc_sub->flags |= isNCI;
     if (is_void)
         first_arg--;
     for (i = first_arg; i < n; ++i) {

@@ -291,7 +291,7 @@ IMCC_itcall_sub(Interp* interp, SymReg* sub)
    /* FIXME use the default settings from .pragma */
    current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
    if (current_call->r[0]->pcc_sub->sub->pmc_type == enum_class_NCI)
-       current_call->r[0]->pcc_sub->nci = 1;
+       current_call->r[0]->pcc_sub->flags |= isNCI;
    if (cur_unit->type == IMC_PCCSUB)
         cur_unit->instructions->r[1]->pcc_sub->calls_a_sub |= 1;
 }
@@ -724,7 +724,7 @@ pcc_call:
    | NCI_CALL var '\n'
          {
             add_pcc_sub(current_call->r[0], $2);
-            current_call->r[0]->pcc_sub->nci = 1;
+            current_call->r[0]->pcc_sub->flags |= isNCI;
          }
    | METH_CALL target '\n'
          {  add_pcc_sub(current_call->r[0], $2); }
@@ -915,6 +915,10 @@ labeled_inst:
    | RESULT var                       { $$ = MK_I(interp, cur_unit, "restore", 1, $2); }
    | ARG var                          { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
    | RETURN var                       { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
+   | RETURN  sub_call   { $$ = NULL;
+                           current_call->r[0]->pcc_sub->flags |= isTAIL_CALL;
+                           current_call = NULL;
+                        }
    | CALL label_op                    { $$ = MK_I(interp, cur_unit, "bsr",  1, $2); }
    | GOTO label_op                    { $$ = MK_I(interp, cur_unit, "branch",1, $2); }
    | NEWSUB                           { expect_pasm = 1; }

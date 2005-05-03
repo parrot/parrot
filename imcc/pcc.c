@@ -960,7 +960,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             else
                 ins = insINS(interp, unit, ins, "set", regs, 2);
         }
-        if (sub->pcc_sub->nci && (!meth_call || arg->set == 'P'))
+        if ((sub->pcc_sub->flags & isNCI) && (!meth_call || arg->set == 'P'))
             goto move_sub;
     }
     else {
@@ -1002,7 +1002,7 @@ move_sub:
             ins = insINS(interp, unit, ins, "set", regs, 2);
         }
     }
-    else if (!sub->pcc_sub->nci)
+    else if (!(sub->pcc_sub->flags & isNCI))
         need_cc = 1;
 
 #if 0
@@ -1026,7 +1026,7 @@ move_sub:
         /*
          * if we reuse the continuation, update it
          */
-        if (!sub->pcc_sub->nci)
+        if (!(sub->pcc_sub->flags & isNCI))
             if (!need_cc)
                 ins = insINS(interp, unit, ins, "updatecc", regs, 0);
         /* insert the call */

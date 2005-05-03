@@ -144,6 +144,11 @@ typedef enum {
 	P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP
 } pragma_enum_t;
 
+typedef enum {
+    isNCI  =        0x01,
+    isTAIL_CALL =   0x02
+} pcc_flags_t;
+
 struct pcc_sub_t {
     SymReg ** args;
     int nargs;
@@ -155,7 +160,7 @@ struct pcc_sub_t {
     int nmulti;
     pragma_enum_t pragma;
     int calls_a_sub;
-    int nci;
+    int flags;	/* isNCI, isTAIL_CALL */
     int label;
     SymReg * object;
 };

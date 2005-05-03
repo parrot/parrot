@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 ##############################
 # Parrot Calling Conventions:  Tail call optimization.
@@ -334,4 +334,21 @@ bad_func:
 CODE
 [got 3 results]
 _fib_step returned 3 values, 23, 20, and 3.
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "new tail call syntax parsing");
+.sub main @MAIN
+    foo()
+    print "ok\n"
+.end
+
+.sub foo
+    .return bar()
+.end
+
+.sub bar
+    .return ("ok\n")
+.end
+CODE
+ok
 OUT
