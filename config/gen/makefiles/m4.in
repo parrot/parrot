@@ -2,7 +2,7 @@
 
 # Setup of some commands
 LN_SF          = ln -s -f
-PARROT         = ..${slash}..${slash}parrot${exe}
+PARROT         = ../../parrot${exe}
 PERL           = ${perl}
 RM_RF          = ${rm_rf}
 

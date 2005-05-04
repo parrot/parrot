@@ -1,4 +1,8 @@
 #! perl -w
+# $Id$
+
+use FindBin;
+use lib "$FindBin::Bin/../..";
 
 use Scheme::Test tests => 7;
 

@@ -1,15 +1,14 @@
 #! perl -w
-
-# Author: Will "Coke" Coleda
-#
-# Thanks to jq for portability issues.
+# Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
 use strict;
 
+use Data::Dumper;
 use File::Spec;
 use Test::Harness;
 
-=head1 language harness
+=head1 languages harness
 
 There are 3 ways to run a language test: 
 
@@ -29,6 +28,13 @@ e.g., C<cd languages/tcl && t/joe_test.t>
 
 =back
 
+=head1 AUTHOR
+
+  Will "Coke" Coleda
+  Jerome Quelin
+
+=cut
+
 =for comment
 
 We are assuming that we are running out of parrot/languages; we are being
@@ -38,26 +44,48 @@ have already been built.
 
 =cut
 
-# Step 1: find the harness files 
+# Step 1: find harness files for testable languages
 
-opendir(CUR,File::Spec->curdir()) or die "can't search for harnesses.\n";
+# These could all be tested:
+#
+# BASIC                No t/harness
+# befunge              No t/harness
+# bf                   No t/harness
+# cola                 No t/harness
+# conversion           No t/harness
+# forth                No t/harness
+# jako                 No t/harness
+# lisp                 No t/harness
+# miniperl             No t/harness
+# ook                  No t/harness
+# parakeet             No t/harness
+# parrot_compiler
+#my @unified_testable_languages = qw( parrot_compiler );
+# perl6                t/harness has no -files
+# python
+#my @unified_testable_languages = qw( python );
+# regex               No t/harness
+# ruby                No t/harness
+# tcl                 No t/harness
+#my @unified_testable_languages = qw( tcl );
+# urm                 No t/harness
 
+my @unified_testable_languages = qw( m4 scheme );
 my @harnesses =
-  grep {-f $_}
-    map { File::Spec->join($_,"t","harness") }
-     grep {$_ ne File::Spec->curdir() && $_ ne File::Spec->updir()}
-       (readdir(CUR));
-
-closedir(CUR);
+    grep {-f $_}
+        map { File::Spec->join($_,"t","harness") }
+            @unified_testable_languages;
 
 # Step 2: Get a listing of files from these harnesses.
 
 my @testfiles;
 foreach my $harness (@harnesses) {
-  my $perl = "$^X -I" . File::Spec->join(File::Spec->updir,"lib");
-  open (FILES, "$perl $harness -files|");  
-  chomp && push @testfiles, $_ while (<FILES>);
+    my $perl = "$^X -I" . File::Spec->join(File::Spec->updir,"lib");
+    open(FILES, "$perl $harness -files |");  
+    push @testfiles, <FILES>;
+    close(FILES);
 }
+chomp( @testfiles );
 
 # Step 3: test.
 
