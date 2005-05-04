@@ -136,12 +136,13 @@ current expression object.
     .return ($S0)
 .end
 
-=item C<analyze(isarray)>
+=item C<analyze(PMC next, int isarray)>
 
 The analyze method is used to walk an expression tree and perform
 a variety of optimizations and pre-processing in preparation for
-generating the rule code.  The C<isarray> parameter indicates if
-capture objects will produce an array of captures or a single
+generating the rule code.  The C<next> parameter identifies the
+expression that will come after this one.  The C<isarray> parameter 
+indicates if capture objects will produce an array of captures or a single
 capture.
 
 =cut
@@ -808,7 +809,10 @@ register.
     emit(code, "    $P0 = new $I0, $P1")
     emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:from\"")
     emit(code, "    $P1 = pos")
+    $I0 = self["cscope"]
+    unless $I0 goto subpat_2
     emit(code, "    cpad[-1] = $P0")
+  subpat_2:
     emit(code, "    push capt, $P0")
     emit(code, "    bsr %s_s1", sublabel)
     emit(code, "    $P0 = pop capt")
