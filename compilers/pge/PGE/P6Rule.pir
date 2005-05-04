@@ -606,6 +606,7 @@ tree used to generate the rule (generally for debugging purposes).
     exp = $P1("PGE::Exp::Start", exp)
 
     exp.analyze(0)
+    exp.serno(0)
 
     code = new String
     exp.gen(code, "R", "fail")

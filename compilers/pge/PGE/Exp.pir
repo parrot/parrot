@@ -56,6 +56,8 @@ functionality and correctness at the moment.
     hash['\N'] = "$I0=is_newline target, pos \n if $I0 goto %s_f"
     hash['\S'] = "$I0=is_whitespace target, pos \n if $I0 goto %s_f"
     hash['\W'] = "$I0=is_wordchar target, pos \n if $I0 goto %s_f"
+    $P0 = new Integer
+    store_global "PGE::Exp", "$_serno", $P0
 .end
 
 =head2 Functions
@@ -146,6 +148,34 @@ capture.
 
 .sub "analyze" method
 .end
+
+=item C<(INT, STR) = serno(INT start, STR prefix)>
+
+This method simply returns integers and labels usable for 
+serialization, e.g., for generating unique labels and identifiers 
+within generated code.  The C<start> parameter allows the serial
+number to be set to a given value.  XXX: I'm assuming overflow
+won't be a problem, but is the use of the start parameter thread-safe?  
+
+=cut
+
+.sub "serno" method
+    .param int start
+    .param string prefix
+    unless argcS < 1 goto serno_1
+    prefix = "R"
+  serno_1:
+    $P0 = find_global "PGE::Exp", "$_serno"
+    inc $P0
+    unless argcI > 0 goto serno_2
+    $P0 = start
+  serno_2:
+    $I0 = $P0
+    $S0 = $I0
+    concat prefix, $S0
+    .return ($I0, prefix)
+.end
+
 
 =item C<emit(PMC code, STR fmt, STR str1, STR str2, INT int1)>
 
@@ -554,8 +584,8 @@ register.
     .local pmc exp1, exp2
     emit = find_global "PGE::Exp", "emit"
     emit(code, "\n  %s:", label)
-    $S0 = concat label, "a"
-    $S1 = concat label, "b"
+    $S0 = self.serno()
+    $S1 = self.serno()
     exp1 = self["exp1"]
     exp1.gen(code, $S0, $S1)
     exp2 = self["exp2"]
@@ -601,8 +631,8 @@ register.
     .local pmc exp1, exp2
     emit = find_global "PGE::Exp", "emit"
     emit(code, "\n  %s:", label)
-    $S0 = concat label, "d"
-    $S1 = concat label, "e"
+    $S0 = self.serno()
+    $S1 = self.serno()
     self.emitsub(code, $S0, "pos")
     emit(code, "    goto %s", $S1)
     exp1 = self["exp1"]
@@ -641,9 +671,10 @@ register.
     .local string sublabel
     .local string captname, captattr, captattrtype
     .local string rname
+    .local int myserno
     emit = find_global "PGE::Exp", "emit"
     (min, max, isgreedy, iscut) = self."_getattributes"()
-    sublabel = concat label, "c"
+    (myserno, sublabel) = self.serno()
     iscapture = defined self["cname"]
     isarray = self["isarray"]
     rname = self["rname"]
@@ -666,10 +697,11 @@ register.
 
   init:
     emit(code, "\n  %s:", label)
-    emit(code, "    $S0 = gpad[-1]")
-    emit(code, "    if $S0 == '%s' goto %s_1", label, label)
-    unless iscapture goto init_1
+    emit(code, "    $I0 = gpad[-1]")
+    emit(code, "    if $I0 == %d goto %s_1", myserno, label)
     emit(code, "    $P0 = cpad[-1]")
+    emit(code, "    push cpad, $P0")
+    unless iscapture goto init_1
     emit(code, "    cobcapt = getattribute $P0, \"%s\"", captattr)
     emit(code, "    isnull cobcapt, %s_i1", label)
     emit(code, "    goto %s_i2", label)
@@ -691,15 +723,16 @@ register.
   init_1:
     emit(code, "    push gpad, capt")
     emit(code, "    push gpad, 0")
-    emit(code, "    push gpad, '%s'", label)
+    emit(code, "    push gpad, %d", myserno)
     emit(code, "    save iscreator")
     emit(code, "    save cobcapt")
     emit(code, "    bsr %s_1", label)
     emit(code, "    restore cobcapt")
     emit(code, "    restore iscreator")
-    emit(code, "    $S0 = pop gpad")
+    emit(code, "    $I0 = pop gpad")
     emit(code, "    $I0 = pop gpad")
     emit(code, "    $P0 = pop gpad")
+    emit(code, "    $P0 = pop cpad")
     unless iscapture goto init_2
     emit(code, "    unless iscreator goto fail")
     emit(code, "    delete cobcapt[%s]", captname)
@@ -730,7 +763,7 @@ register.
     emit(code, "    dec rep")
     emit(code, "  %s_g1:", label)
     emit(code, "    if rep < %d goto fail", min)
-    emit(code, "    $S0 = pop gpad")
+    emit(code, "    $I0 = pop gpad")
     emit(code, "    $I0 = pop gpad")
     emit(code, "    $P0 = pop gpad")
     emit(code, "    $P0 = pop cpad")
@@ -738,12 +771,12 @@ register.
     emit(code, "    push cpad, $P0")
     emit(code, "    push gpad, capt")
     emit(code, "    push gpad, -1")
-    emit(code, "    push gpad, '%s'", label)
+    emit(code, "    push gpad, %d", myserno)
     emit(code, "    goto fail")
     goto subpat
   lazy:
     emit(code, "    if rep < %d goto %s_l1", min, label)
-    emit(code, "    $S0 = pop gpad")
+    emit(code, "    $I0 = pop gpad")
     emit(code, "    $I0 = pop gpad")
     emit(code, "    $P0 = pop gpad")
     emit(code, "    $P0 = pop cpad")
@@ -751,7 +784,7 @@ register.
     emit(code, "    push cpad, $P0")
     emit(code, "    push gpad, capt")
     emit(code, "    push gpad, rep")
-    emit(code, "    push gpad, '%s'", label)
+    emit(code, "    push gpad, %d", myserno)
     unless iscut goto lazy_1
     emit(code, "    goto fail")
   lazy_1:
@@ -775,11 +808,10 @@ register.
     emit(code, "    $P0 = new $I0, $P1")
     emit(code, "    $P1 = getattribute $P0, \"PGE::Match\\x0$:from\"")
     emit(code, "    $P1 = pos")
-    emit(code, "    push cpad, $P0")
+    emit(code, "    cpad[-1] = $P0")
     emit(code, "    push capt, $P0")
     emit(code, "    bsr %s_s1", sublabel)
     emit(code, "    $P0 = pop capt")
-    emit(code, "    $P0 = pop cpad")
     emit(code, "    ret")
     exp1 = self["exp1"]
     concat sublabel, "_s1"
