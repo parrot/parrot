@@ -1440,12 +1440,12 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
 {
     int size = 0;
     int j;
-    char *p;
+    const char *p;
 
     /* Write the opcode name */
-    p = file ? &dest[file->size] : dest;
-    strcpy(p, full_name ? info->full_name : info->name);
-    size += strlen(dest);
+    p = full_name ? info->full_name : info->name;
+    strcpy(dest, p);
+    size += strlen(p);
 
     dest[size++] = ' ';
 
@@ -1456,6 +1456,7 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
         FLOATVAL f;
         PMC* k;
 
+        assert(size + 2 < space);
         switch (info->types[j]) {
         case PARROT_ARG_I:
             dest[size++] = 'I';
@@ -1521,6 +1522,13 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
             }
             dest[size++] = '"';
             break;
+        case PARROT_ARG_PC:
+            Parrot_snprintf(interpreter, buf, sizeof(buf),
+                            "PMC_CONST(%d)", op[j]);
+            strcpy(&dest[size], buf);
+            size += strlen(buf);
+            break;
+
         case PARROT_ARG_K:
             dest[size-1] = '[';
             Parrot_snprintf(interpreter, buf, sizeof(buf),
@@ -1609,7 +1617,7 @@ PDB_disassemble_op(Interp *interpreter, char* dest, int space,
             dest[size++] = ']';
             break;
         default:
-            break;
+            internal_exception(1, "Unknown opcode type");
         }
 
         if (j != info->arg_count - 1)
@@ -1641,8 +1649,8 @@ PDB_disassemble(Interp *interpreter, const char *command)
     opcode_t *code_end,*pc = interpreter->code->base.data;
 
     const unsigned int default_size = 32768;
-    const unsigned int regrow_size  = 32668;
-    int space = 0;  /* How much space do we have? */
+    size_t space;  /* How much space do we have? */
+    size_t size, alloced;
 
     pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
     pline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
@@ -1652,25 +1660,26 @@ PDB_disassemble(Interp *interpreter, const char *command)
         PDB_free_file(interpreter);
 
     pfile->source = (char *)mem_sys_allocate(default_size);
+    alloced = space = default_size;
     pfile->line = pline;
     pfile->label = NULL;
     pfile->size = 0;
     pline->number = 1;
+    pline->source_offset = 0;
 
     code_end = pc + interpreter->code->base.size;
     while (pc != code_end) {
         /* Grow it early*/
-        if (pfile->size % default_size < regrow_size) {
-            pfile->source = mem_sys_realloc(pfile->source,
-                                            (size_t)pfile->size
-                                            + default_size);
+        if (space < default_size) {
+            alloced += default_size;
             space += default_size;
+            pfile->source = mem_sys_realloc(pfile->source, alloced);
         }
 
-        pfile->size =
-            PDB_disassemble_op(interpreter, pfile->source, space,
-                               &interpreter->op_info_table[*pc], pc,
-                               pfile, NULL, 1);
+        size = PDB_disassemble_op(interpreter, pfile->source + pfile->size,
+                space, &interpreter->op_info_table[*pc], pc, pfile, NULL, 1);
+        space -= size;
+        pfile->size += size;
         pfile->source[pfile->size - 1] = '\n';
 
         /* Store the opcode of this line */
