@@ -101,7 +101,8 @@ Specify calling convention
 
 =item * @MAIN
 
-Define "main" entry point to start execution.
+Define "main" entry point to start execution. If multiple subroutines
+are marked as B<@MAIN>, the B<last> marked subroutine is entered.
 
 =item * @LOAD
 

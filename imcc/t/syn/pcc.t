@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 43;
 
 ##############################
 # Parrot Calling Conventions
@@ -1242,7 +1242,7 @@ OUT
   # The result of the code should depend on whether we run parrot with the
   # "-o code.pbc -r -r" command line params.
   # Strangely, the same output is written
-  my $output = $ENV{TEST_PROG_ARGS} =~ m/-r / ?
+  my $output = ($ENV{TEST_PROG_ARGS} || '') =~ m/-r / ?
                 qq{ok\n} :
                 qq{ok\n};
   pir_output_is(<<'CODE', $output, "more pragmas, syntax only");
@@ -1530,4 +1530,23 @@ pir_output_is(<<'CODE', <<'OUT', "multi 1");
 .end
 CODE
 ok 1
+OUT
+
+
+pir_output_is(<<'CODE', <<'OUT', "\@MAIN defined twice");
+.sub foo @MAIN
+	set S0, 'not ok'
+	print S0
+	print "\r\n"
+	end
+.end
+
+.sub bar @MAIN
+	set S0, 'ok'
+	print S0
+	print "\r\n"
+	end
+.end
+CODE
+ok
 OUT
