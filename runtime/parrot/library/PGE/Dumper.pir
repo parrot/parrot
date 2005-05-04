@@ -26,6 +26,10 @@ PGE::Dumper - various methods for displaying PGE structures
 .sub dump method
     .param int indent
     .local pmc exp1
+    $S0 = self["firstchars"]
+    print "firstchars: "
+    print $S0
+    print "\n"
     exp1 = self["exp1"]
     exp1."dump"(0)
 .end

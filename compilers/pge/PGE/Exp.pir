@@ -12,7 +12,7 @@ expressions.  The classes currently include
     PGE::End       - (successful) end of rule
     PGE::Literal   - match a literal string
     PGE::Dot       - match any character
-    PGE::CharClass - match of characters in various classes
+    PGE::CCShortcut - character class shortcuts (\d, \D, \w, etc.)
     PGE::Anchor    - matching of ^, ^^, $, $$, \b, \B anchors
     PGE::Cut       - :: and :::
     PGE::Concat    - concatenation of expressions
@@ -40,14 +40,14 @@ functionality and correctness at the moment.
     $P0 = subclass expclass, "PGE::Exp::End"
     $P0 = subclass expclass, "PGE::Exp::Literal"
     $P0 = subclass expclass, "PGE::Exp::Dot"
-    $P0 = subclass expclass, "PGE::Exp::CharClass"
+    $P0 = subclass expclass, "PGE::Exp::CCShortcut"
     $P0 = subclass expclass, "PGE::Exp::Anchor"
     $P0 = subclass expclass, "PGE::Exp::Cut"
     $P0 = subclass expclass, "PGE::Exp::Concat"
     $P0 = subclass expclass, "PGE::Exp::Alt"
     $P0 = subclass expclass, "PGE::Exp::Group"
     hash = new Hash
-    store_global "PGE::Exp::CharClass", "%slashcode", hash
+    store_global "PGE::Exp::CCShortcut", "%slashcode", hash
     hash['\d'] = "$I0=is_digit target, pos \n unless $I0 goto %s_f"
     hash['\n'] = "$I0=is_newline target, pos \n unless $I0 goto %s_f"
     hash['\s'] = "$I0=is_whitespace target, pos \n unless $I0 goto %s_f"
@@ -148,6 +148,34 @@ capture.
 =cut
 
 .sub "analyze" method
+    self["firstchars"] = ""
+.end
+
+
+=item C<firstchars(PMC exp1, PMC exp2)>
+
+The firstchars method sets the "firstchars" optimization hint
+based on the concatenation of the firstchars of any expressions
+provided.  If either of the expressions has an empty firstchars
+hint, then we have have no firstchars either.
+
+=cut
+
+.sub "firstchars" method
+    .param pmc exp1
+    .param pmc exp2
+    $S0 = ""
+    if argcP < 1 goto end
+    $S0 = exp1["firstchars"]
+    if argcP < 2 goto end
+    $S1 = exp2["firstchars"]
+    unless $S1 > "" goto exp_1
+    concat $S0, $S1
+    goto end
+  exp_1:
+    $S0 = ""
+  end:
+    self["firstchars"] = $S0
 .end
 
 =item C<(INT, STR) = serno(INT start, STR prefix)>
@@ -326,9 +354,11 @@ register.
 .namespace [ "PGE::Exp::Start" ]
 
 .sub analyze method
+    .param pmc next
     .param int isarray
     $P0 = self["exp1"]
-    $P0.analyze(isarray)
+    $P0.analyze(self, isarray)
+    self.firstchars($P0)
 .end
 
 .sub "gen" method
@@ -337,6 +367,7 @@ register.
     .param string next
     .local pmc emit
     .local pmc exp1
+    .local string firstchars
 
     emit = find_global "PGE::Exp", "emit"
     emit(code, ".sub _pge_rule")
@@ -374,9 +405,18 @@ register.
     emit(code, "    pos = 0")
     emit(code, "  try_match:")
     emit(code, "    if pos > lastpos goto fail_forever")
+    $I0 = exists self["firstchars"]
+    unless $I0 goto gen_1
+    firstchars = self["firstchars"]
+    unless firstchars > "" goto gen_1
+    emit(code, "    $S0 = substr target, pos, 1")
+    emit(code, "    $I0 = index \"%s\", $S0", firstchars)
+    emit(code, "    if $I0 < 0 goto try_again")
+  gen_1:
     emit(code, "    from = pos")
     self.emitsub(code, label, "pos", 0)
     emit(code, "    if cutting > 1 goto fail_forever")
+    emit(code, "  try_again:")
     emit(code, "    inc pos")
     emit(code, "    goto try_match")
     emit(code, "  fail_forever:")
@@ -407,6 +447,18 @@ register.
 .end
     
 .namespace [ "PGE::Exp::Literal" ]
+
+.sub "analyze" method
+    .param pmc next
+    .param int isarray
+    $S0 = self["literal"]                          # set up firstchars
+    $S0 = substr $S0, 0, 1
+    self["firstchars"] = $S0
+    $I0 = self["min"]                              # if we allow zero reps
+    unless $I0 < 1 goto end                        # then add firstchars
+    self.firstchars(self, next)                    # of the following exp
+  end:
+.end
 
 .sub "gen" method
     .param pmc code
@@ -479,7 +531,7 @@ register.
     emit(code, "    goto %s_3", label)
 .end
 
-.namespace [ "PGE::Exp::CharClass" ]
+.namespace [ "PGE::Exp::CCShortcut" ]
 
 .sub gen method
     .param pmc code
@@ -491,7 +543,7 @@ register.
     .local pmc hash
     .local string test
     (min, max, isgreedy, iscut) = self."_getattributes"()
-    hash = find_global "PGE::Exp::CharClass", "%slashcode"
+    hash = find_global "PGE::Exp::CCShortcut", "%slashcode"
     token = self["token"]
     test = hash[token]
     emit = find_global "PGE::Exp", "emit"
@@ -538,6 +590,12 @@ register.
 
 
 .namespace [ "PGE::Exp::Anchor" ]
+
+.sub "analyze" method
+    .param pmc next
+    .param int isarray 
+    self.firstchars(next)
+.end
 
 .sub "gen" method
     .param pmc code
@@ -587,12 +645,14 @@ register.
 .namespace [ "PGE::Exp::Concat" ]
 
 .sub "analyze" method
+    .param pmc next
     .param int isarray
     .local pmc exp1, exp2
     exp2 = self["exp2"]
-    exp2.analyze(isarray)
+    exp2.analyze(next, isarray)
     exp1 = self["exp1"]
-    exp1.analyze(isarray)
+    exp1.analyze(exp2, isarray)
+    self.firstchars(exp1)
 .end
    
 .sub "gen" method
@@ -612,6 +672,12 @@ register.
 .end
 
 .namespace [ "PGE::Exp::Cut" ]
+
+.sub "analyze" method
+    .param pmc next
+    .param int isarray
+    self.firstchars(next)
+.end
 
 .sub "gen" method
     .param pmc code
@@ -635,11 +701,14 @@ register.
 .namespace [ "PGE::Exp::Alt" ]
 
 .sub "analyze" method
+    .param pmc next
     .param int isarray
-    $P0 = self["exp1"]
-    $P0.analyze(isarray)
-    $P0 = self["exp2"]
-    $P0.analyze(isarray)
+    .local pmc exp1, exp2
+    exp1 = self["exp1"]
+    exp2 = self["exp2"]
+    exp1.analyze(next, isarray)
+    exp2.analyze(next, isarray)
+    self.firstchars(exp1, exp2)
 .end
 
 .sub "gen" method
@@ -664,9 +733,12 @@ register.
 .namespace [ "PGE::Exp::Group" ]
 
 .sub "analyze" method
+    .param pmc next
     .param int isarray
+    .local pmc exp1
 
-    $I0 = self["isarray"]
+    self["firstchars"] = ""
+    $I0 = self["isarray"]                          # see if this is an array
     isarray |= $I0
     self["isarray"] = isarray
     $I0 = self["cscope"]
@@ -674,10 +746,16 @@ register.
     isarray = 0
   isarray_1:
     $I0 = defined self["exp1"]
-    unless $I0 goto isarray_2
-    $P0 = self["exp1"]
-    $P0.analyze(isarray)
+    unless $I0 goto end
+    exp1 = self["exp1"]
+    exp1.analyze(next, isarray)
+    $I0 = self["min"]                              # set up firstchars
+    if $I0 > 0 goto isarray_2
+    self.firstchars(exp1, next)
+    goto end
   isarray_2:
+    self.firstchars(exp1)
+  end:
 .end
  
 .sub "gen" method

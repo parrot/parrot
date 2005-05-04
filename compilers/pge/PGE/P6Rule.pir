@@ -317,7 +317,7 @@ and related matches.
     .param string token
     .local pmc exp
     $P0 = find_global "PGE::Exp", "new"
-    exp = $P0("PGE::Exp::CharClass")
+    exp = $P0("PGE::Exp::CCShortcut")
     exp["token"] = token
     $I0 = length token
     p6rule_parse_skip(pattern, lex, $I0)
