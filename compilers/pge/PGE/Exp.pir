@@ -13,7 +13,7 @@ expressions.  The classes currently include
     PGE::Literal   - match a literal string
     PGE::Dot       - match any character
     PGE::CharClass - match of characters in various classes
-    PGE::Anchor    - matching of ^, ^^, $, $$ anchors
+    PGE::Anchor    - matching of ^, ^^, $, $$, \b, \B anchors
     PGE::Cut       - :: and :::
     PGE::Concat    - concatenation of expressions
     PGE::Alt       - alternations
@@ -548,19 +548,37 @@ register.
     emit = find_global "PGE::Exp", "emit"
     emit(code, "\n  %s:", label)
     token = self["token"]
+    if token == "\\b" goto word
+    if token == "\\B" goto word
     if token == '$$' goto eos
     if token == '$' goto eos
-    emit(code, "if pos == 0 goto %s", next)
+    emit(code, "    if pos == 0 goto %s", next)
     unless token == '^^' goto end
-    emit(code, "$I0 = pos - 1")
-    emit(code, "$I1 = is_newline target, $I0")
-    emit(code, "if $I1 goto %s", next)
+    emit(code, "    $I0 = pos - 1")
+    emit(code, "    $I1 = is_newline target, $I0")
+    emit(code, "    if $I1 goto %s", next)
     goto end
   eos:
-    emit(code, "if pos == lastpos goto %s", next)
+    emit(code, "    if pos == lastpos goto %s", next)
     unless token == '$$' goto end
-    emit(code, "$I0 = is_newline target, pos")
-    emit(code, "if $I0 goto %s", next)
+    emit(code, "    $I0 = is_newline target, pos")
+    emit(code, "    if $I0 goto %s", next)
+    goto end
+  word:
+    emit(code, "    $I0 = 0")
+    emit(code, "    unless pos > 0 goto %s_1", label)
+    emit(code, "    $I2 = pos - 1")
+    emit(code, "    $I0 = is_wordchar target, $I2")
+    emit(code, "  %s_1:", label)
+    emit(code, "    $I1 = 0")
+    emit(code, "    unless pos < lastpos goto %s_2", label)
+    emit(code, "    $I1 = is_wordchar target, pos")
+    emit(code, "  %s_2:", label)
+    unless token == "\\b" goto word_1
+    emit(code, "    if $I0 != $I1 goto %s", next)
+    goto end
+  word_1:
+    emit(code, "    if $I0 == $I1 goto %s", next)
   end:
     emit(code, "goto fail")
 .end

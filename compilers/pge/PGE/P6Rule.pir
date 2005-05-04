@@ -44,6 +44,8 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta['^^'] = $P0
     p6meta['$'] = $P0
     p6meta['$$'] = $P0
+    p6meta["\\B"] = $P0
+    p6meta["\\b"] = $P0
     $P0 = find_global "PGE::P6Rule", "p6rule_parse_cut"
     p6meta['::'] = $P0
     p6meta[':::'] = $P0
@@ -208,7 +210,6 @@ backreferences or variables.
     exp = $P0("PGE::Exp::Anchor")
     exp["token"] = token
     if token != '^' goto end
-    exp["isbos"] = 1
   end:
     .return (exp)
 .end
