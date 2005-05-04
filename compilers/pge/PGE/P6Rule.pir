@@ -44,6 +44,9 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta['^^'] = $P0
     p6meta['$'] = $P0
     p6meta['$$'] = $P0
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_cut"
+    p6meta['::'] = $P0
+    p6meta[':::'] = $P0
     $P0 = find_global "PGE::P6Rule", "p6rule_parse_group"
     p6meta['['] = $P0
     p6meta[']'] = u
@@ -314,6 +317,27 @@ and related matches.
     .local pmc exp
     $P0 = find_global "PGE::Exp", "new"
     exp = $P0("PGE::Exp::CharClass")
+    exp["token"] = token
+    $I0 = length token
+    p6rule_parse_skip(pattern, lex, $I0)
+    .return (exp)
+.end
+
+=item C<p6rule_parse_cut(STR pattern, PMC lex)>
+
+Parse one of the cut terms (::, :::) in a rule expression.
+The single-colon cut (cut previous expression) is actually
+handled as a special quantifier.
+
+=cut
+
+.sub p6rule_parse_cut
+    .param string pattern
+    .param pmc lex
+    .param string token
+    .local pmc exp
+    $P0 = find_global "PGE::Exp", "new"
+    exp = $P0("PGE::Exp::Cut")
     exp["token"] = token
     $I0 = length token
     p6rule_parse_skip(pattern, lex, $I0)
