@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 50;
+use Parrot::Test tests => 51;
 use Test::More;
 use Parrot::Config;
 
@@ -1290,7 +1290,7 @@ OUTPUT
     my $descr = '@IMMEDIATE, @POSTCOMP';
     if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r / )
     {
-        TODO: 
+        TODO:
         {
             local $TODO = "output from POSTCOMP is lost";
             output_is( $code, $output, $descr);
@@ -1325,4 +1325,57 @@ new
 ok
 1
 Global 'foo' not found/
+OUTPUT
+
+open S, ">test_l1.imc" or die "Can't write test_l1.imc";
+print S <<'EOF';
+.sub l11 @LOAD
+    print "l11\n"
+.end
+
+.sub l12 @LOAD
+    print "l12\n"
+.end
+EOF
+close S;
+
+open S, ">test_l2.imc" or die "Can't write test_l2.imc";
+print S <<'EOF';
+.sub l21 @LOAD
+    print "l21\n"
+.end
+
+.sub l22 @LOAD
+    print "l22\n"
+.end
+EOF
+close S;
+
+system(".$PConfig{slash}parrot$PConfig{exe} -o test_l1.pbc test_l1.imc");
+system(".$PConfig{slash}parrot$PConfig{exe} -o test_l2.pbc test_l2.imc");
+
+END { unlink(qw/ test_l1.imc test_l2.imc test_l1.pbc test_l2.pbc /); };
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'multiple @LOAD');
+.sub main @MAIN
+    print "main 1\n"
+    load_bytecode "test_l1.imc"
+    load_bytecode "test_l2.imc"
+    print "main 2\n"
+    load_bytecode "test_l1.pbc"
+    load_bytecode "test_l2.pbc"
+    print "main 3\n"
+.end
+CODE
+main 1
+l11
+l12
+l21
+l22
+main 2
+l11
+l12
+l21
+l22
+main 3
 OUTPUT
