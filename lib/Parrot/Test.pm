@@ -325,13 +325,13 @@ sub _generate_functions {
             # This depends on which kind of code we are testing.
             my $code_f;
             if ( $func =~ /^pir_output/ ) {
-                $code_f = per_test('.imc', $test_no);
+                $code_f = per_test('.pir', $test_no);
             }
             elsif ( $func =~ m/^output_/ || $func =~ m/^pasm_output_/ ) {
                 $code_f = per_test('.pasm', $test_no);
             }
             elsif ( $func =~ /^pir_2_pasm_/) {
-                $code_f = per_test('.imc', $test_no);
+                $code_f = per_test('.pir', $test_no);
             }
             elsif ( $func =~ /^pbc_output_/ ) {
                 $code_f = per_test('.pbc', $test_no);
