@@ -6,7 +6,7 @@ languages/m4/t/harness - A harness for Parrot m4
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib m4/t/harness -files
+  cd languages && perl -I../lib m4/t/harness --files
 
   cd languages && perl -I../lib m4/t/harness 
 
@@ -17,7 +17,7 @@ languages/m4/t/harness - A harness for Parrot m4
 =head1 DESCRIPTION
 
 If I'm called with a single
-argument of "-files", I just return a list of files to process.
+argument of "--files", I just return a list of files to process.
 This list is one per line, and is relative to the languages dir.
 
 If I'm called with no args, I run the complete suite.
@@ -26,7 +26,6 @@ Otherwise I run the tests that were passed on the command line.
 
 =cut
 
-# pragmata
 use strict;
 use lib '..';
 
@@ -37,8 +36,8 @@ use Test::Harness();
 
 my $language = 'm4';
 
-if ( grep { m/^-files$/ } @ARGV ) {
-    # Only the Makefile in 'parrot/languages' uses -file
+if ( grep { m/^--files$/ } @ARGV ) {
+    # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
     my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
@@ -78,7 +77,7 @@ Mostly taken from tcl/t/harness.
 
 =head1 SEE ALSO
 
-  L<languages/tcl/t/harness>, L<languages/python/t/harness>
+  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
 
 =head1 AUTHOR
 

@@ -1,13 +1,12 @@
-#! perl -w
 # $Id$
 
 =head1 NAME
 
-scheme/t/harness - a harness for scheme
+languages/scheme/t/harness - A harness for scheme
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib scheme/t/harness -files
+  cd languages && perl -I../lib scheme/t/harness --files
 
   cd languages && perl -I../lib scheme/t/harness 
 
@@ -18,7 +17,7 @@ scheme/t/harness - a harness for scheme
 =head1 DESCRIPTION
 
 If I'm called with a single
-argument of "-files", I just return a list of files to process.
+argument of "--files", I just return a list of files to process.
 This list is one per line, and is relative to the languages dir.
 
 If I'm called with no args, I run the complete suite.
@@ -36,8 +35,8 @@ use Test::Harness();
 
 my $language = 'scheme';
 
-if ( grep { m/^-files$/ } @ARGV ) {
-    # Only the Makefile in 'parrot/languages' uses -file
+if ( grep { m/^--files$/ } @ARGV ) {
+    # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
     my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
@@ -61,6 +60,6 @@ if ( grep { m/^-files$/ } @ARGV ) {
 
 =head1 SEE ALSO
 
-  L<languages/m4/t/harness>
+  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
 
 =cut

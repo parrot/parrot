@@ -59,9 +59,7 @@ have already been built.
 # miniperl             No t/harness
 # ook                  No t/harness
 # parakeet             No t/harness
-# parrot_compiler
-#my @unified_testable_languages = qw( parrot_compiler );
-# perl6                t/harness has no -files
+# perl6                t/harness has no --files
 # python
 #my @unified_testable_languages = qw( python );
 # regex               No t/harness
@@ -70,7 +68,7 @@ have already been built.
 #my @unified_testable_languages = qw( tcl );
 # urm                 No t/harness
 
-my @unified_testable_languages = qw( m4 scheme );
+my @unified_testable_languages = qw( m4 parrot_compiler scheme );
 my @harnesses =
     grep {-f $_}
         map { File::Spec->join($_,"t","harness") }
@@ -81,7 +79,7 @@ my @harnesses =
 my @testfiles;
 foreach my $harness (@harnesses) {
     my $perl = "$^X -I" . File::Spec->join(File::Spec->updir,"lib");
-    open(FILES, "$perl $harness -files |");  
+    open(FILES, "$perl $harness --files |");  
     push @testfiles, <FILES>;
     close(FILES);
 }
