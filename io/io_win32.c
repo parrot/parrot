@@ -691,7 +691,10 @@ AGAIN:
         else {
             close((SOCKET)io->fd);
         }
-        *s = string_make(interpreter, buf, bytesread, "binary", 0);
+        /* The charset should propably be 'binary', but right now httpd.imc
+         * only works with 'ascii'
+         */
+        *s = string_make(interpreter, buf, bytesread, "ascii", 0);
         if(!*s) {
             PANIC("PIO_recv: Failed to allocate string");
         }

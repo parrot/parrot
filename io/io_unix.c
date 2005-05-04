@@ -935,7 +935,7 @@ AGAIN:
             close(io->fd);
         }
         /* The charset should propably be 'binary', but right now httpd.imc
-         * only workd with 'ascii'
+         * only works with 'ascii'
          */
         *s = string_make(interpreter, buf, bytesread, "ascii", 0);
         if (!*s) {
