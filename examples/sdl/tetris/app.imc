@@ -350,7 +350,7 @@ This method returns the created palette.
     .local int color_id
 
     color_id = find_type "SDL::Color"
-    palette = new .PerlArray
+    palette = new PerlArray
     hash = new PerlHash
 
     set i, 0
