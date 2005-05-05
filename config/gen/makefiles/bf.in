@@ -2,15 +2,33 @@ RM_F = ${rm_f}
 PERL = ${perl}
 PARROT=../../parrot
 
-all: build
+default: build
+
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  build:             build bf.pbc and bfc.imc"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  test:              run the test suite,"
+	@echo ""
+	@echo "  clean:             clean up temporary files"
+	@echo ""
+	@echo "  realclean:         clean up generated files"
+	@echo ""
+	@echo "  help:              print this help message"
 
 test: build
-	$(PARROT) -r bf.pbc test.bf
-	$(PARROT) -r bfc.pbc test.bf
+	cd .. && $(PERL) scheme/t/harness
 
 build: bf.pasm
 	$(PARROT) -o bf.pbc bf.pasm
-	$(PARROT) -o bfc.pbc bfc.imc
+	$(PARROT) -o bfc.pbc bfc.pir
 
 clean:
 	$(RM_F) core *.pbc *~
+
+realclean: clean
+	$(RM_RF) Makefile
+

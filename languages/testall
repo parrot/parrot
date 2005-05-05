@@ -50,7 +50,6 @@ have already been built.
 #
 # BASIC                No t/harness
 # befunge              No t/harness
-# bf                   No t/harness
 # cola                 No t/harness
 # conversion           No t/harness
 # forth                No t/harness
@@ -60,14 +59,12 @@ have already been built.
 # ook                  No t/harness
 # parakeet             No t/harness
 # perl6                t/harness has no --files
-# python
-#my @unified_testable_languages = qw( python );
+# python               needs testing
 # regex               No t/harness
 # ruby                No t/harness
-# tcl                 No t/harness
-#my @unified_testable_languages = qw( tcl );
+# tcl                 needs testing
 
-my @unified_testable_languages = qw( m4 parrot_compiler scheme urm );
+my @unified_testable_languages = qw( bf m4 parrot_compiler scheme urm );
 my @harnesses =
     grep {-f $_}
         map { File::Spec->join($_,"t","harness") }

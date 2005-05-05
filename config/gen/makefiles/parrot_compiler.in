@@ -25,6 +25,8 @@ help :
 	@echo "  clean:             clean up temporary files"
 	@echo ""
 	@echo "  realclean:         clean up generated files"
+	@echo ""
+	@echo "  help:              print this help message"
 
 test :
 	cd .. && $(PERL) -I../lib parrot_compiler/t/harness
