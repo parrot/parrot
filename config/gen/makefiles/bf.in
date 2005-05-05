@@ -20,7 +20,7 @@ help :
 	@echo "  help:              print this help message"
 
 test: build
-	cd .. && $(PERL) scheme/t/harness
+	cd .. && $(PERL) bf/t/harness
 
 build: bf.pasm
 	$(PARROT) -o bf.pbc bf.pasm
