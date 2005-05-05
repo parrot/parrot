@@ -1,4 +1,4 @@
-Simple Perlstyle test script by Leon Brocard <acme@astray.com>
+Simple Perlstyle test script by Leon Brocard acme@astray DOT com
 +++++++++++++++++++++++++++++++++++++++++++++++++.
 ---.
 .
