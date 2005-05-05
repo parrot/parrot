@@ -85,7 +85,7 @@ Tell a Match object to continue the previous match from where it left off.
 
 =item C<from()>
 
-Returns the position in the target string of the first character
+Returns the offset in the target string of the first item
 this object matched.
 
 =cut
@@ -99,8 +99,7 @@ this object matched.
 
 =item C<to()>
 
-Returns the position in the target string of the last character
-this object matched.
+Returns the offset at the end of this match.
 
 =cut
 
@@ -108,7 +107,6 @@ this object matched.
     .local pmc to
     to = getattribute self, "PGE::Match\x0$:to"
     $I0 = to
-    dec $I0
     .return ($I0)
 .end
 

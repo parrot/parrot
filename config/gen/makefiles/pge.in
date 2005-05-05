@@ -43,7 +43,7 @@ test: all
 	cd ../..; $(PERL) -Ilib t/harness t/p6rules/*.t
 
 testclean:
-	$(RM_RF) ../../t/p6rules/*.imc ../../t/p6rules/*.pasm
+	$(RM_RF) ../../t/p6rules/*.pir ../../t/p6rules/*.pasm
 
 clean: testclean
 	$(RM_RF) PGE.pbc
