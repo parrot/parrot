@@ -1,0 +1,105 @@
+#! perl -w
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/src/compiler.t - Compile and run a PIR program from C.
+
+=head1 SYNOPSIS
+
+	% perl -Ilib t/src/compiler.t
+
+=head1 DESCRIPTION
+
+Show steps to run a program from C. Functionality should be
+gathered in some API calls..
+
+=cut
+
+use Parrot::Test tests => 1;
+
+c_output_is(<<'CODE', <<'OUTPUT', "compreg/compile");
+
+#include <stdio.h>
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+
+extern void imcc_init(Parrot_Interp interp);
+
+static opcode_t*
+run(Parrot_Interp interpreter, int argc, char *argv[])
+{
+    const char *c_src =
+	".sub main @MAIN\n"
+	"    print \"ok\\n\"\n"
+	".end\n";
+
+    STRING *src, *pir, *smain;
+    PMC *comp, *prog, *compreg, *entry;
+    opcode_t *dest;
+    /*
+     * get PIR compiler  - TODO API
+     */
+    compreg = VTABLE_get_pmc_keyed_int(interpreter,
+	    interpreter->iglobals, IGLOBALS_COMPREG_HASH);
+    pir = const_string(interpreter, "PIR");
+    comp = VTABLE_get_pmc_keyed_str(interpreter, compreg, pir);
+    if (PMC_IS_NULL(comp) || !VTABLE_defined(interpreter, comp)) {
+	PIO_eprintf(interpreter, "Pir compiler not loaded");
+	exit(1);
+    }
+    /*
+     * compile source
+     */
+    src = string_from_cstring(interpreter, c_src, 0);
+    prog = VTABLE_invoke(interpreter, comp, src);
+    if (PMC_IS_NULL(prog) || !VTABLE_defined(interpreter, prog)) {
+	PIO_eprintf(interpreter, "Pir compiler returned no prog");
+	exit(1);
+    }
+    /* keep eval PMC alive */
+    dod_register_pmc(interpreter, prog);
+    /* locate function to run */
+    smain  = const_string(interpreter, "main");
+    entry = Parrot_find_global(interpreter, NULL, smain);
+    /* location of the entry */
+    dest = VTABLE_invoke(interpreter, entry, NULL);
+    /* where to start */
+    interpreter->resume_offset = dest - interpreter->code->base.data;
+    /* and go */
+    Parrot_runcode(interpreter, argc, argv);
+    return NULL;
+}
+
+int main(int margc, char* margv[]) {
+    Parrot_Interp interpreter;
+    struct PackFile *pf;
+    int argc = 1;
+    char *argv[] = {"test", NULL};
+
+    struct PackFile_Segment *seg;
+
+    /* Interpreter set-up */
+    interpreter = Parrot_new(NULL);
+    if ( interpreter == NULL )
+	return 1;
+
+    Parrot_init(interpreter);
+    /* this registers the PIR compiler */
+    imcc_init(interpreter);
+    /* dummy pf and segment to get things started */
+    pf = PackFile_new(interpreter, 0);
+    seg = PackFile_Segment_new_seg(interpreter,
+	    &pf->directory, PF_BYTEC_SEG, "test_code", 1);
+    pf->cur_cs = (struct PackFile_ByteCode *)seg;
+    Parrot_loadbc(interpreter, pf);
+
+    /* Parrot_set_flag(interpreter, PARROT_TRACE_FLAG); */
+    run(interpreter, argc, argv);
+    Parrot_exit(0);
+    return 0;
+}
+CODE
+ok
+OUTPUT
