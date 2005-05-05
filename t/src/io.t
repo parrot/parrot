@@ -585,8 +585,6 @@ teardown();
 
 ###############################################################################
 
-SKIP: {
-    skip ("fdopen does not handle illegal modes correct", 1);
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_fdopen");
 static opcode_t*
 the_test(Interp *interpreter,
@@ -620,7 +618,6 @@ the_test(Interp *interpreter,
 CODE
 done
 OUTPUT
-}
 
 ###############################################################################
 

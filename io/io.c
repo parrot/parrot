@@ -730,6 +730,8 @@ PIO_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, const char *sflags)
     }
 
     flags = PIO_parse_open_flags(sflags);
+    if (!flags) return NULL;
+
     io = PIO_fdopen_down(interpreter, layer, fd, flags);
     /* io could be null here but we still have to
      * to create a PMC for the caller, no PMCNULL here
