@@ -84,7 +84,7 @@ providing a compreg-compatible method.
   $P0 = loadlib "tcl_group"
   load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "library/Data/Escape.pbc"
-  load_bytecode "library/PGE.pir"
+  load_bytecode "library/PGE.pbc"
  
   .local int TclArray
   TclArray = find_type "TclArray" # happy case.
