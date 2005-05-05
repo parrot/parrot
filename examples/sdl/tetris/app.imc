@@ -53,7 +53,7 @@ it parent classes nor is it subclassed.
     load_bytecode "examples/sdl/tetris/board.imc"
 
     newclass $P0, "Tetris::App"
-    
+
     addattribute $P0, "SDL"
     addattribute $P0, "EventHandler"
     addattribute $P0, "DebugFlags"
@@ -64,7 +64,7 @@ it parent classes nor is it subclassed.
     addattribute $P0, "Palette"
     addattribute $P0, "Boards"
 
-    # set the BUILD method name    
+    # set the BUILD method name
     $P1 = new .PerlString
     $P1 = 'BUILD'
     setprop $P0, 'BUILD', $P1
@@ -116,7 +116,7 @@ This method throws an exception if an error occurs.
 
     # create the app timer
     self."initTimer"()
-    
+
     # init the SDL event handler
     find_type $I0, "Tetris::EventHandler"
     $P0 = new $I0, self
@@ -149,9 +149,9 @@ The Tetris::App class provides the following methods:
 .sub SDL method
     classoffset $I0, self, "Tetris::App"
     add $I0, tSDL
-    
+
     getattribute $P0, self, $I0
-    
+
     .pcc_begin_return
     .return $P0
     .pcc_end_return
@@ -173,7 +173,7 @@ This method returns nothing.
 
     # XXX free data structures
     # ...
-    
+
     # shutdown the SDL system
     $P0 = self."SDL"()
     isnull $P0, END
@@ -198,14 +198,14 @@ An exeption is thrown if an error occurs.
 .sub run method
     .local pmc eh
     .local pmc loop
-    
+
     classoffset $I0, self, "Tetris::App"
     add $I0, tEventHandler
     getattribute eh, self, $I0
 
     find_type $I0, "SDL::Event"
     loop = new $I0
-    
+
     self."enableTimer"()
     loop."process_events"( 0.1, eh, self )
     self."disableTimer"()
@@ -228,7 +228,7 @@ An exeption is thrown if an error occurs.
     $P0[5] = -1
     $P0[6] = .PARROT_TIMER_RUNNING
     $P0[7] = 1
-    
+
     $P1 = new .Timer, $P0
 
     classoffset $I0, self, "Tetris::App"
@@ -272,7 +272,7 @@ An exeption is thrown if an error occurs.
     dec $P0
     if $P0 != 0 goto END
     self."setTimerStatus"( 1 )
-END:    
+END:
 .end
 
 =item app."disableTimer"()
@@ -300,7 +300,7 @@ Returns the specified color entry from the palette.
 
     palette = self."palette"()
     color = palette[number]
-    
+
     .pcc_begin_return
     .return color
     .pcc_end_return
@@ -320,7 +320,7 @@ Returns the color palette.
     getattribute palette, self, $I0
     isnull palette, CREATE
     branch RET
-    
+
 NULL:
     print "warning: no color palette found!\n"
 
@@ -348,11 +348,11 @@ This method returns the created palette.
     .local int b
     .local int l
     .local int color_id
-    
+
     color_id = find_type "SDL::Color"
-    palette = new .PMCArray
+    palette = new .PerlArray
     hash = new PerlHash
-    
+
     set i, 0
 GENLOOP:
     band l, i, 8
@@ -369,7 +369,7 @@ GENLOOP:
     add g, 64
     add b, 64
 NOT_BRIGHT:
-    
+
     hash["r"] = r
     hash["g"] = g
     hash["b"] = b
@@ -408,11 +408,11 @@ no board with the specified ID exists.
 .sub board method
     .param int boardID
     .local pmc board
-    
+
     classoffset $I0, self, "Tetris::App"
     add $I0, tBoards
     getattribute board, self, $I0
-    
+
     $I0 = board
     if boardID < $I0 goto OK
 ERR:
@@ -421,12 +421,12 @@ ERR:
     print boardID
     print " not found!\n"
     branch END
-    
+
 OK:
     board = board[boardID]
     defined $I0, board
     unless $I0 goto ERR
-    
+
 END:
     .pcc_begin_return
     .return board
@@ -452,7 +452,7 @@ Returns the block object, or NULL if the board was not found.
 .sub currentBlock method
     .param int boardID
     .local pmc temp
-    
+
     temp = self."board"( boardID )
     isnull temp, BLOCKISNULL
     temp = temp."currentBlock"()
@@ -490,7 +490,7 @@ Returns 1 if the rotation was possible, 0 otherwise.
     .param int dir
     .local pmc block
     .local int ret
-    
+
     self."disableTimer"()
 
     ret = 0
@@ -498,17 +498,17 @@ Returns 1 if the rotation was possible, 0 otherwise.
     # lookup the block
     block = self."currentBlock"( boardID )
     isnull block, END
-    
+
     # rotate the block
     ret = block."rotate"( dir )
     if ret == 0 goto END
-    
+
     # redraw the screen
     self."drawScreen"( 0 )
-    
+
 END:
     self."enableTimer"()
-    
+
     .pcc_begin_return
     .return ret
     .pcc_end_return
@@ -552,7 +552,7 @@ Returns 1 if the movement was possible, 0 otherwise.
     .param int yval
     .local int success
     .local pmc block
-    
+
     # disable the timer
     self."disableTimer"()
 
@@ -563,7 +563,7 @@ Returns 1 if the movement was possible, 0 otherwise.
     unless success goto END
     self."drawScreen"( 0 )
 
-END:    
+END:
     # reenable the timer
     self."enableTimer"()
 
@@ -607,7 +607,7 @@ This method returns the new falling block.
     print ") "
     print id
     print "\n"
-    
+
     # check the number of INT args
     if argcI >= 2 goto SKIP_ID
     # no INT arg => use a random next block
@@ -618,7 +618,7 @@ SKIP_ID:
     isnull temp, APP_NEXTBLOCK_END
     temp = temp."nextBlock"(id )
 
-APP_NEXTBLOCK_END:    
+APP_NEXTBLOCK_END:
     .pcc_begin_return
     .return temp
     .pcc_end_return
@@ -645,13 +645,13 @@ This method returns 1 if the board was found, 0 otherwise.
     .param int boardID
     .local pmc board
     .local int ret
-    
+
     ret = 0
     board = self."board"( boardID )
     isnull board, APP_FALL_END
     board."fall"()
     ret = 1
-    
+
 APP_FALL_END:
     .pcc_begin_return
     .return ret
@@ -679,7 +679,7 @@ This method returns 1 if the block is falling down fast, 0 otherwise.
     .param int boardID
     .local pmc board
     .local int ret
-    
+
     ret = 0
     board = self."board"( boardID )
     isnull board, APP_FALLING_END
@@ -712,12 +712,12 @@ to fall down one unit.
     .param int boardID
     .local pmc board
     .local num ret
-    
+
     ret = 0
     board = self."board"( boardID )
     isnull board, APP_INTERVAL_END
     ret = board."fallInterval"()
-    
+
 APP_INTERVAL_END:
     .pcc_begin_return
     .return ret
@@ -816,21 +816,21 @@ Returns 1 if the screen has been redrawn, 0 otherwise.
     add $I0, tTimerDisableCount
     getattribute $P0, self, $I0
     if $P0 > 0 goto END
-        
+
     classoffset $I0, self, "Tetris::App"
     add $I0, tInTimer
     getattribute inTimer, self, $I0
-    
+
     i = inTimer
     if i goto END
 
-    # XXX: fetch exceptions and reset this flag    
+    # XXX: fetch exceptions and reset this flag
     # we are in the timer handler function
     inc inTimer
 
     # get the boards array
     (boards, i) = self."boards"( self )
-    
+
 LOOP:
     dec i
     if i < 0 goto REDRAW
@@ -838,11 +838,11 @@ LOOP:
 
     # call the board's timer
     ret = board."timer"()
-    
+
     unless ret goto LOOP
     redraw = 1
     branch LOOP
-    
+
 REDRAW:
     unless redraw goto NOREDRAW
     self."drawScreen"( 0 )
@@ -880,10 +880,10 @@ This method returns nothing.
     .local pmc temp
 
     self."disableTimer"()
-    
+
     screen = self."SDL"()
     screen = screen."surface"()
-    
+
     # draw everything?
     $I0 = self."flag"( "show blocksize" )
     if $I0 goto FULL
@@ -897,7 +897,7 @@ NOT_FULL:
     #
     # draw the main background
     #
-    
+
     # to see the draw cache optimisation
     $I0 = self."flag"( "show optimisation" )
     if $I0 goto FORCE
@@ -906,7 +906,7 @@ FORCE:
     .local pmc rect
     .local pmc screen
     .local pmc color
-    
+
     rect = new PerlHash
     rect["width"] = 640
     rect["height"] = 480
@@ -923,7 +923,7 @@ NO_MAINBACKGROUND:
     #
     self."drawBoards"( screen, full )
 
-    #    
+    #
     # update the screen
     #
     # XXX: optimize screen updates
@@ -949,7 +949,7 @@ NO_MAINBACKGROUND:
     .local pmc boards
     .local pmc board
     .local int i
-    
+
     (boards, i) = self."boards"()
 
 LOOP:
@@ -958,7 +958,7 @@ LOOP:
     board = boards[i]
     board."draw"( screen, full )
     branch LOOP
-    
+
 END:
     .pcc_begin_return
     .pcc_end_return
@@ -974,14 +974,14 @@ the boards array.
 .sub boards method
     .local pmc boards
     .local int count
-        
+
     classoffset $I0, self, "Tetris::App"
     add $I0, tBoards
     getattribute boards, self, $I0
     count = 0
     isnull boards, END
     count = boards
-    
+
 END:
     .pcc_begin_return
     .return boards
@@ -1001,10 +1001,10 @@ the board has been added, which is used as the board ID.
     .param pmc board
     .local pmc boards
     .local int id
-    
+
     (boards, id) = self."boards"()
     set boards[id], board
-    
+
     .pcc_begin_return
     .return id
     .pcc_end_return
@@ -1040,15 +1040,15 @@ Returns the flag's (new) value.
     classoffset $I0, self, "Tetris::App"
     add $I0, tDebugFlags
     getattribute flag, self, $I0
-    
+
     # check the number of INT args
     if argcI <= 1 goto FLAG_GET
     # set a new value
     set flag[name], value
-        
+
 FLAG_GET:
     set ret, flag[name]
-    
+
     .pcc_begin_return
     .return ret
     .pcc_end_return
@@ -1074,14 +1074,14 @@ This method returns nothing.
     .param int players
     .local pmc temp
     .local int xpos
-    
+
     self."disableTimer"()
-    
+
     set xpos, 10
-    
+
     # check the number of INT args
     if argcI >= 1 goto SET
-    
+
     classoffset $I0, self, "Tetris::App"
     add $I0, tPlayers
     getattribute temp, self, $I0
@@ -1110,7 +1110,7 @@ END_SET:
     classoffset $I0, self, "Tetris::App"
     add $I0, tBoards
     setattribute self, $I0, temp
-    
+
 NEWGAME_NEW_BOARD:
     if players <= 0 goto NEWGAME_END
     find_type $I0, "Tetris::Board"
@@ -1121,12 +1121,12 @@ NEWGAME_NEW_BOARD:
     add xpos, 320
     dec players
     branch NEWGAME_NEW_BOARD
-    
+
 NEWGAME_END:
     self."drawScreen"( 1 )
 
     self."enableTimer"()
-    
+
     .pcc_begin_return
     .pcc_end_return
 .end
