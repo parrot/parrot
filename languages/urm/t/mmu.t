@@ -1,4 +1,13 @@
+# $Id$
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use URM::Test tests => 3;
+
 ## Ok, writing my own mmu
+
+output_is(<< 'CODE', << 'OUT', 'from testmmu.urm');
 
 out(r100);
 
@@ -198,3 +207,75 @@ out(r100);
 198: r198 <- 198
 199: r199 <- 199
 200: r200 <- 200
+CODE
+100
+OUT
+
+
+
+output_is(<< 'CODE', << 'OUT', 'from testmmu.urm');
+## Ok, testing my own mmu
+## The thing leo got me with
+
+out(r32);
+
+1: r40 <- r100 + r200 
+2: r32 <- 5 # should be I0
+3: r64 <- 3 # this too
+4: r128 <- 29 # and this too
+5: r32 <- r64 - 1
+CODE
+2
+OUT
+
+
+output_is(<< 'CODE', << 'OUT', 'from testmmu.urm');
+
+out(r5);
+
+5: r5 <- 5
+6: r6 <- 6
+7: r7 <- 7
+8: r8 <- 8
+9: r9 <- 9
+10: r10 <- 10
+11: r11 <- 11
+12: r12 <- 12
+13: r13 <- 13
+14: r14 <- 14
+15: r15 <- 15
+16: r16 <- 16
+17: r17 <- 17
+18: r18 <- 18
+19: r19 <- 19
+20: r20 <- 20
+21: r21 <- 21
+22: r22 <- 22
+23: r23 <- 23
+24: r24 <- 24
+25: r25 <- 25
+26: r26 <- 26
+27: r27 <- 27
+28: r28 <- 28
+29: r29 <- 29
+30: r30 <- 30
+31: r31 <- 31
+32: r32 <- 32
+33: r33 <- 33
+34: r34 <- 34
+35: r35 <- 35
+36: r36 <- 36
+37: r37 <- 37
+38: r38 <- 38
+39: r39 <- 39
+40: r40 <- 40
+41: r41 <- 41
+42: r42 <- 42
+43: r43 <- 43
+
+44: r5 <- r10 + r32
+55: r6 <- r20 + r30
+56: r5 <- r5 + r6
+CODE
+92
+OUT

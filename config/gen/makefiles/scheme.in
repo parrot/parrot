@@ -1,24 +1,32 @@
-#
-# Makefile
-#
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
 
+# Makefile for languages/scheme
+
+# Setup of some commands
 PERL = ${perl}
 RM_F = ${rm_f}
 
-DIR=languages/scheme
-TOOL_DIR=../..
-ASM = ../../parrot
-SCHEMEC=$(PERL) schemec
-INTERP=./${test_prog}
+DIR        = languages/scheme
+TOOL_DIR   = ../..
+ASM        = ../../parrot
+SCHEMEC    = $(PERL) schemec
+INTERP     = ./${test_prog}
 
-#
-# Default target:
-#
+default: build
 
-default: test
-#	echo "make: Makefile: no default target"
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  build:             Just check whether 'schemec' compiles"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  test:              run the test suite,"
+	@echo ""
+	@echo "  clean:             clean up temporary files"
+	@echo ""
+	@echo "  realclean:         clean up generated files"
 
 foo: foo.scheme schemec
 	$(SCHEMEC) foo.scheme > foo.pasm
@@ -29,6 +37,9 @@ foo: foo.scheme schemec
 #
 # Compilation:
 #
+
+build:
+	$(PERL) -c schemec
 
 test.pasm: test.scheme schemec
 	$(SCHEMEC) test.scheme > test.pasm
@@ -64,6 +75,9 @@ clean:
 	        t/*/*.pbc \
 	        t/*/*.scheme \
 	        t/*/*.out
+
+realclean: clean
+	$(RM_RF) Makefile
 
 over:
 	@$(MAKE) clean

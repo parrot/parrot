@@ -1,5 +1,7 @@
 # $Id$
 
+# Makefile for languages/m4
+
 # Setup of some commands
 LN_SF          = ln -s -f
 PARROT         = ../../parrot${exe}
@@ -23,10 +25,9 @@ M4_EVAL_COMPILER_SO = ../../runtime/parrot/dynext/m4_eval_compiler.so
 #CONDITIONED_LINE(has_gnu_m4):USE_GNU_M4 = -use-gnu-m4
 #INVERSE_CONDITIONED_LINE(has_gnu_bc):USE_GNU_M4 = 
 
-# the default target
+default: all
 all: build 
 
-# This is a listing of all targets, that are meant to be called by users
 help:
 	@echo ""
 	@echo "Following targets are available for the user:"
@@ -84,8 +85,7 @@ t/*/*.pir \
 $(M4_EVAL_COMPILER_SO) 
 
 realclean: clean
-	$(RM_RF) \
-Makefile
+	$(RM_RF) Makefile
 
 distclean: realclean
 

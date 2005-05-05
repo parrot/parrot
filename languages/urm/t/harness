@@ -2,21 +2,20 @@
 
 =head1 NAME
 
-languages/parrot_compiler/t/harness - A harness for parrot_compiler
+languages/urm/t/harness - A harness for urm
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib parrot_compiler/t/harness ---files
+  cd languages && perl -I../lib urm/t/harness ---files
 
-  cd languages && perl -I../lib parrot_compiler/t/harness 
+  cd languages && perl -I../lib urm/t/harness 
 
-  cd languages && perl -I../lib parrot_compiler/t/harness \
-                   parrot_compiler/t/hello.t
+  cd languages && perl -I../lib urm/t/harness urm/t/testmmu.t urm/t/testmmu2.t 
 
 =head1 DESCRIPTION
 
 If I'm called with a single argument of "--files",
-I just return a list of files to process.
+ I just return a list of files to process.
 This list is one per line, and is relative to the languages dir.
 
 If I'm called with no args, I run the complete suite.
@@ -26,18 +25,18 @@ Otherwise I run the tests that were passed on the command line.
 =cut
 
 use strict;
+use FindBin;
 
-use Cwd();
-use Data::Dumper;
-use File::Spec;
+use lib '../../lib';
+use Parrot::Config;
 use Test::Harness();
 
-my $language = 'parrot_compiler';
+my $language = 'urm';
 
 if ( grep { m/^--files$/ } @ARGV ) {
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
+    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
 } else { 
@@ -50,25 +49,11 @@ if ( grep { m/^--files$/ } @ARGV ) {
   {
       ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
       if ( $current_dir eq 'languages' ) {
-          @files = glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
+          @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
       }
       elsif ( $current_dir eq $language ) {
-          @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
+          @files = glob( File::Spec->catfile( 't', '*.t' ) );
       }
   }
   Test::Harness::runtests( @files ) if scalar( @files );
 }
-
-=head1 HISTORY
-
-Mostly taken from tcl/t/harness.
-
-=head1 SEE ALSO
-
-  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
-
-=head1 AUTHOR
-
-Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
-
-=cut

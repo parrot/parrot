@@ -66,9 +66,8 @@ have already been built.
 # ruby                No t/harness
 # tcl                 No t/harness
 #my @unified_testable_languages = qw( tcl );
-# urm                 No t/harness
 
-my @unified_testable_languages = qw( m4 parrot_compiler scheme );
+my @unified_testable_languages = qw( m4 parrot_compiler scheme urm );
 my @harnesses =
     grep {-f $_}
         map { File::Spec->join($_,"t","harness") }

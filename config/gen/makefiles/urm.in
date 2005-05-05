@@ -1,20 +1,37 @@
-RM_F = ${rm_f}
-PERL = ${perl}
+# $Id$
 
-PARROT = ..${slash}..${slash}parrot
+# Makefile for languages/urm
 
-all: build
+# Setup of some commands
+RM_F   = ${rm_f}
+PERL   = ${perl}
+PARROT = ../../parrot
+
+default: build
+
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  build:             Just check whether 'urmc' compiles"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  test:              run the test suite,"
+	@echo ""
+	@echo "  clean:             clean up temporary files"
+	@echo ""
+	@echo "  realclean:         clean up generated files"
 
 test: build
-	$(PERL) t${slash}t.pl
+	cd .. && $(PERL) -I../lib urm/t/harness 
 
 examples: build
-	$(PERL) urmc -c examples${slash}biggerzero.urm
-	$(PERL) urmc -c examples${slash}sub.urm
-	$(PERL) urmc -c examples${slash}sim.urm
-	$(PERL) urmc -c examples${slash}mult.urm    
-	$(PERL) urmc -c examples${slash}div.urm
-	$(PERL) urmc -c examples${slash}distance.urm
+	$(PERL) urmc -c examples/biggerzero.urm
+	$(PERL) urmc -c examples/sub.urm
+	$(PERL) urmc -c examples/sim.urm
+	$(PERL) urmc -c examples/mult.urm    
+	$(PERL) urmc -c examples/div.urm
+	$(PERL) urmc -c examples/distance.urm
 
 build: 
 	$(PERL) -c urmc
@@ -24,11 +41,11 @@ clean:
 	$(RM_F) *~ *.pasm 
 	$(RM_F) *~
 	$(RM_F) \#*
-	$(RM_F) examples${slash}*.pasm examples${slash}*.pbc
-	$(RM_F) examples${slash}*~
-	$(RM_F) examples${slash}\#*
-	$(RM_F) t${slash}*.pasm t${slash}*.pbc
+	$(RM_F) examples/*.pasm examples/*.pbc
+	$(RM_F) examples/*~
+	$(RM_F) examples/\#*
+	$(RM_F) t/*.pasm t/*.urm t/*.out
 
-distclean: clean
+realclean: clean
 	$(RM_F) Makefile
 	

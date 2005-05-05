@@ -1,7 +1,9 @@
-Not very much to do:
+# $Id$
+
+For installing URM there is fot very much to do:
 Try 
 	make test
-to see if your perl is capable of running urmc
+to see if your perl is capable of running urmc.
 Then try to build the examples:
 	make examples
 You'll end up with a bunch of pasm files in the 

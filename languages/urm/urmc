@@ -1,60 +1,69 @@
 #! perl -w
-# This is just another little language for Parrot
-# urmc - 2003 (c) by Marcus Thiesen
-# <marcus@cpan.org>
-# This code is under the GPL
+# urmc - 2003-2005 (c) by Marcus Thiesen
+# $Id$
 
-## See if we can do pasm:
+=head1 NAME
+
+urmc - This is just another little language for Parrot
+
+=head1 LICENSE
+
+This code is under the GPL
+
+=head1 AUTHOR
+
+Markus Thiessen - <marcus@cpan.org>
+
+=cut
 
 use strict;
-
-use Getopt::Long;
 use FindBin;
 use lib "$FindBin::RealBin/../../lib";
+
+use Data::Dumper;
+use Getopt::Long;
 use Parrot::Config;
-BEGIN { eval " use Time::HiRes qw(time); " }
 
-use vars qw($filename
-	    $compile
-	    $opti
-	    $silent);
-
+# $opti is localized later
+use vars qw( $opti );
 $opti = 1; # more a debug flag
 
+# globals
+my ( $filename, $silent );
 my $parrot = "$FindBin::RealBin$PConfig{slash}..$PConfig{slash}..$PConfig{slash}parrot$PConfig{exe}";
 
 sub filename {
     my $arg = shift;
     if (-e $arg) {
-	$filename = $arg;
+        $filename = $arg;
     }
 }
 
-GetOptions("compile"    => \$compile,
-	   "silent"     => \$silent,
-	   "<>"         => \&filename
-	   );
+GetOptions( "silent"     => \$silent,
+            "<>"         => \&filename
+          );
 
-my $version = "0.3";
+my $version = '0.4';
 my @pasm =
-    ("## Compiled by urmc $version\n",
-     "## 2003 (c) by Marcus Thiesen\n",
-     "## <marcus\@cpan.org> \n\n",
-     "_MAIN:\n",
-     "\tgetstdin P0 #filehandle to STDIN\n",
+    ("## Compiled by urmc $version",
+     '## 2003 (c) by Marcus Thiesen',
+     '## <marcus@cpan.org>',
+     '',
+     '_MAIN:',
+     "\tshift S1, P5        # we don't need the scriptname",
      );
 
 my $lp = qr/\s*(\d+)\s*\:/; #line prefix (1:)
 my (%lines, %jtarget);      # tcount lines and jump targets
-my $out;                    # save the output registers name
+my $out_reg;                # save the output registers name
 
 my @source;
 if ($filename) {
-    open SOURCE, $filename or die "Can't get sourcefile $filename :$!\n";
+    open SOURCE, $filename or die "Can't get sourcefile $filename :$!";
     @source = <SOURCE>;
     close SOURCE; ### if gnu would hear that... :-)
 } else {
-    die "$0 <file>\n"
+    die "$0 <file>"
 }
 
 sub warning{
@@ -85,64 +94,64 @@ sub dump_tables{
     print "lra_tbl:\n";
 }
 
-sub mmu{
+sub mmu {
     my $name = shift;
 
     ## lookup the register
     if ((defined $look_tbl{$name}) &&
-	($look_tbl{$name} =~ /^I(\d+)/)) {
-	return $1;
+        ($look_tbl{$name} =~ /^I(\d+)/)) {
+        return $1;
     }
 
     ## if not on stack: get a free one
     foreach my $reg (sort {$a <=> $b} keys %reg_tbl) {
-	unless ($reg_tbl{$reg}) {
-	    $reg_tbl{$reg} = $name;
-	    my $time = time();
-	    $lra_tbl{$time} = $reg;
-	    $look_tbl{$name} = "I$reg";
-	    return $reg;
-	}
+        unless ($reg_tbl{$reg}) {
+            $reg_tbl{$reg} = $name;
+            my $time = time();
+            $lra_tbl{$time} = $reg;
+            $look_tbl{$name} = "I$reg";
+            return $reg;
+        }
     }
 
     ### no free registers left or on stack
     # on stack
     if (defined $look_tbl{$name}) {
-	# get last recently allocated:
-	my @times = sort { $a <=> $b } keys %lra_tbl;
-	my $time = shift @times;
+        # get last recently allocated:
+        my @times = sort { $a <=> $b } keys %lra_tbl;
+        my $time = shift @times;
 
-	my $old = $lra_tbl{"$time"};
-	die "\$old undefined\n" unless defined $old;
-	delete $lra_tbl{$time};
-	# save register nr $old on stack
-	push @pasm, "\tsave I$old\n";
-	$look_tbl{$reg_tbl{$old}} = $stackcount;
-	$reg_tbl{$old} = 0;
-	$stackcount++;
-
-
-	# get requested register from stack
-	$stackcount--;
-	my $nr_on_stack = ($stackcount - $look_tbl{$name}) - 1;
-	my $rotate_more =  $stackcount - 1 - $nr_on_stack - 1;
-
-	for my $i (0..$nr_on_stack) {
-	    push @pasm,  "\trotate_up $stackcount\n";
-	}
-	push @pasm, "\trestore I$old\n";
-	for my $i (0..$rotate_more) {
-	    push @pasm,  "\trotate_up $stackcount\n";
-	}
+        my $old = $lra_tbl{"$time"};
+        die "\$old undefined\n" unless defined $old;
+        delete $lra_tbl{$time};
+        # save register nr $old on stack
+        push @pasm, "\tsave I$old";
+        $look_tbl{$reg_tbl{$old}} = $stackcount;
+        $reg_tbl{$old} = 0;
+        $stackcount++;
 
 
-#	push @pasm, "\tlookback I$old, $nr_on_stack\n";
+        # get requested register from stack
+        $stackcount--;
+        my $nr_on_stack = ($stackcount - $look_tbl{$name}) - 1;
+        my $rotate_more =  $stackcount - 1 - $nr_on_stack - 1;
 
-	$look_tbl{$name} = "I$old";
-	$lra_tbl{time()} = $old;
-	$reg_tbl{$old} = "$name";
+        for my $i (0..$nr_on_stack) {
+            push @pasm,  "\trotate_up $stackcount";
+        }
+        push @pasm, "\trestore I$old";
+        for my $i (0..$rotate_more) {
+            push @pasm,  "\trotate_up $stackcount";
+        }
 
-	return $old;
+
+#        push @pasm, "\tlookback I$old, $nr_on_stack";
+
+        $look_tbl{$name} = "I$old";
+        $lra_tbl{time()} = $old;
+        $reg_tbl{$old} = "$name";
+
+        return $old;
     }
 
     # no free register left
@@ -153,7 +162,7 @@ sub mmu{
     my $old = $lra_tbl{"$time"};
     delete $lra_tbl{$time};
     # save register nr $old on stack
-    push @pasm, "\tsave I$old\n";
+    push @pasm, "\tsave I$old";
     $look_tbl{$reg_tbl{$old}} = $stackcount;
     $reg_tbl{$old} = 0;
     $stackcount++;
@@ -163,90 +172,91 @@ sub mmu{
 ### The parser
 foreach my $line (@source) {
     next unless defined $line;
-    next if $line =~ /^\#/; #comments and spacy lines
-    next if $line =~ /^\s+$/;
-    $line =~ s/\#.+//; # stip in line comments;
+    next if $line =~ /^\#/;    # comments 
+    next if $line =~ /^\s+$/;  # spacy lines
+    $line =~ s/\#.+//;         # stip in line comments;
     chomp $line;
-    #parse in(r1,r2,...)
-    if ($line =~ /\s*in\(/) {
-	while ($line =~ /(r(\d+))/g) {
-	    my $rn = "I" . (mmu $2);
-	    push @pasm, "\t#get input for $1\n";
-	    push @pasm, "\tprint \"$1: \"\n";
-	    push @pasm, "\treadline S0, P0\n";
-	    push @pasm, "\tset $rn, S0\n";
-	}
-	next;
-    }
-    #parse out(r3)
-    elsif ($line =~ /\s*out\(r(\d+)\)/) {
-	$out = $1;
-	next;
+    # parse in(r1,r2); out(r3); or out(r3);  or in(r34);
+    if ( ( undef, my $in, undef, my $out ) =
+             $line =~ m/^(\s*in\(([0-9r\ ,]*?)\);)?  # optional input registers
+                        (\s*out\(r(\d+)\);)?         # optional output register 
+                        \s*$                         # insignificant lines are already skipped
+                       /x ) {
+        $in ||= '';
+        $out_reg = $out if defined $out;
+        foreach ( split( /\s*,\s*/, $in ) ) {
+            my ( $in_reg ) = m/r(\d+)/;
+            my $rn = "I" . (mmu $in_reg);
+            push @pasm, "\t#get input for $_";
+            push @pasm, "\tshift S0, P5";
+            push @pasm, "\tset $rn, S0";
+        }
+        next;
     }
     #parse 0: r3 <- 0
     elsif ($line =~ /$lp\s*r(\d+)\s*<-\s*(\d+)\s*$/o) {
-	$lines{$1} = 1;
-	if ($3 != 0) {
-	    local $opti = 0;
-	    warning("Assigning not 0 to a register", $1);
-	}
-	## parrot does the work for us....
-	if ($opti <= 1) {
-	push @pasm, "L$1:\n";
-	push @pasm, "\tset I" . (mmu($2)) . ", $3\t\#$line\n";
-	next;
+        $lines{$1} = 1;
+        if ($3 != 0) {
+            local $opti = 0;
+            warning("Assigning not 0 to a register", $1);
+        }
+        ## parrot does the work for us....
+        if ($opti <= 1) {
+        push @pasm, "L$1:";
+        push @pasm, "\tset I" . (mmu($2)) . ", $3\t\#$line";
+        next;
         }
     }
     #parse 3: if r2 = 0 goto 7
     elsif ($line =~ /$lp\s*if\sr(\d+)\s*=\s*0\s*goto\s*(\d+)/o) {
-	$lines{$1} = 1;
-	push @pasm, "L$1:\n";
-	push @pasm, "\teq I" . (mmu $2) . ", 0, L$3\t\#$line\n";
-	$jtarget{$3} = 1;
-	next;
+        $lines{$1} = 1;
+        push @pasm, "L$1:";
+        push @pasm, "\teq I" . (mmu $2) . ", 0, L$3\t\#$line";
+        $jtarget{$3} = 1;
+        next;
     }
     elsif ($line =~ /^inline_pasm:/) {
-	$line =~ s/^inline_pasm://;
-	push @pasm, $line . "\n";
-	next;
+        $line =~ s/^inline_pasm://;
+        push @pasm, $line;
+        next;
     }
     #parse 4: r2 <- r2 +|- 1
     elsif ($line =~
-	   /$lp\s*r(\d+)\s*<-\s*r(\d+)\s*(\+|-)\s*(?:(r(\d+))|(\d+))/o ) {
-	$lines{$1} = 1;
-	if ($2 != $3) {
-	    warning("Assigning one register to another", $1);
-	}
-	my $rn3;
-	if (defined $6) {
-	    warning("Assigning sum of two registers", $1);
-	    $rn3 = "I" . (mmu $6);
-	}
-	elsif ((defined $6) && ($6 != 1)) {
-	    warning("Adding more than one", $1);
-	}
+           /$lp\s*r(\d+)\s*<-\s*r(\d+)\s*(\+|-)\s*(?:(r(\d+))|(\d+))/o ) {
+        $lines{$1} = 1;
+        if ($2 != $3) {
+            warning("Assigning one register to another", $1);
+        }
+        my $rn3;
+        if (defined $6) {
+            warning("Assigning sum of two registers", $1);
+            $rn3 = "I" . (mmu $6);
+        }
+        elsif ((defined $6) && ($6 != 1)) {
+            warning("Adding more than one", $1);
+        }
 
-	push @pasm, "L$1:\n";
-	my $rn1 = "I" . (mmu $2);
-	my $rn2 = "I" . (mmu $3);
-	$rn3 = 1 unless defined $rn3;
-	if ($4 eq "+") {
-	    push @pasm, "\tadd $rn1, $rn2, $rn3\t\#$line\n";
-	} else {
-	    push @pasm, "\tsub $rn1, $rn2, $rn3\t\#$line\n";
-	}
-	next;
+        push @pasm, "L$1:";
+        my $rn1 = "I" . (mmu $2);
+        my $rn2 = "I" . (mmu $3);
+        $rn3 = 1 unless defined $rn3;
+        if ($4 eq "+") {
+            push @pasm, "\tadd $rn1, $rn2, $rn3\t\#$line";
+        } else {
+            push @pasm, "\tsub $rn1, $rn2, $rn3\t\#$line";
+        }
+        next;
     }
     #parse 5: goto 5
     elsif ($line =~ /$lp\s*goto\s*(\d+)/) {
-	$lines{$1} = 1;
-	push @pasm, "L$1:\n";
-	push @pasm, "\tbranch L$2\t\#$line\n";
-	$jtarget{$2} = 1;
-	next;
+        $lines{$1} = 1;
+        push @pasm, "L$1:";
+        push @pasm, "\tbranch L$2\t\#$line";
+        $jtarget{$2} = 1;
+        next;
     }
     else {
-	die "SYNTAX ERROR:\n$line\nCan't parse line\n";
+        die "SYNTAX ERROR:\n$line\nCan't parse line\n";
     }
 
 }
@@ -256,47 +266,34 @@ my @newpasm;
 ## clean up the labels
 if ($opti > 0) {
     for my $line (@pasm) {
-	if ($line =~ /^L(\d+)/) {
-	    push @newpasm, $line if exists $jtarget{$1};
-	    next;
-	}
-	push @newpasm, $line;
+        if ($line =~ /^L(\d+)/) {
+            push @newpasm, $line if exists $jtarget{$1};
+            next;
+        }
+        push @newpasm, $line;
     }
     @pasm = @newpasm;
 }
 
 if (scalar %jtarget) {
     foreach my $key (keys %jtarget) {
-	next if exists $lines{$key};
-	if (defined $out) {
-	    $out = mmu($out);
-	    push @pasm, "L$key:\n";
-	    push @pasm, "\tprint I$out\n";
-	    push @pasm, "\tprint \"\\n\"\n";
-	}
-	push @pasm, "\tend\n";
+        next if exists $lines{$key};
+        if (defined $out_reg) {
+            $out_reg = mmu($out_reg);
+            push @pasm, "L$key:";
+            push @pasm, "\tprint I$out_reg";
+            push @pasm, "\tprint \"\\n\"";
+        }
+        push @pasm, "\tend";
     }
 } else {
-    if (defined $out) {
-	$out = mmu($out);
-	push @pasm, "\tprint I$out\n";
-	push @pasm, "\tprint \"\\n\"\n";
-	push @pasm, "end\n";
+    if (defined $out_reg) {
+        $out_reg = mmu($out_reg);
+        push @pasm, "\tprint I$out_reg";
+        push @pasm, "\tprint \"\\n\"";
     }
+    push @pasm, "end";
 }
 
-if ($compile) {
-    $filename =~ s/\.urm/.pasm/;
-    open OUT, ">$filename";
-    print OUT @pasm;
-    close OUT;
-    } else {
-	$filename = ".$$." . time() . ".pasm" ;
-	open OUT, ">$filename";
-	print OUT @pasm;
-	close OUT;
-	system ("$parrot $filename");
-	unlink $filename;
-}
-
-
+# Consider this as a treewalker of an degenerate tree
+print join("\n", @pasm), "\n";
