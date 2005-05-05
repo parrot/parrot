@@ -376,10 +376,14 @@ parrot_pic_find_infix_v_pp(Interp *interpreter, PMC *left, PMC *right,
     func = get_mmd_dispatch_type(interpreter,
             mic->m.func_nr, left_type, right_type, &is_pmc);
     if (is_pmc) {
+        size_t offs = cur_opcode - (opcode_t*)interpreter->code->prederef.code;
+        opcode_t* real_op = interpreter->code->base.data + offs + 1;
         /* set prederef code address to orig slot for now
          */
         ((void**)cur_opcode)[0] =
             parrot_pic_opcode(interpreter, PARROT_OP_infix_ic_p_p);
+        /* restore 1st operand i.e. .MMD_func_nr */
+        ((void**)cur_opcode)[1] = (void*)real_op;
         mic->lru.f.sub = (PMC*)F2DPTR(func);
     }
     else {
