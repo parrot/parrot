@@ -162,6 +162,9 @@ EOTCL
 $expected = "abcde";
 language_output_is("tcl",$tcl,$expected,"range, overextended");
 
+TODO: {
+local $TODO = "New version of PGE\n";
+
 language_output_is("tcl",<<TCL,<<OUT,"string match * only");
   puts [string match * foo]
 TCL
@@ -174,14 +177,11 @@ TCL
 1
 OUT
 
-TODO: {
-local $TODO = "[] doesn't work. PGE issue.\n";
 language_output_is("tcl",<<TCL,<<OUT,"string match charset");
   puts [string match {a[bc]c} abc]
 TCL
 1
 OUT
-}
 
 language_output_is("tcl",<<TCL,<<OUT,"string match charset, fail");
   puts [string match {a[ac]c} abc]
@@ -201,6 +201,19 @@ TCL
 1
 OUT
 
+language_output_is("tcl",<<TCL,<<OUT,"string match case failure");
+  puts [string match ABC abc]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string match nocase");
+  puts [string match -nocase ABC abc ]
+TCL
+1
+OUT
+}
+
 TODO: {
 local $TODO = "Parser error";
 language_output_is("tcl",<<TCL,<<OUT,"string match \[");
@@ -211,21 +224,6 @@ OUT
 
 language_output_is("tcl",<<TCL,<<OUT,"string match \]");
   puts [string match {\]} {]}]
-TCL
-1
-OUT
-}
-
-language_output_is("tcl",<<TCL,<<OUT,"string match case failure");
-  puts [string match ABC abc]
-TCL
-0
-OUT
-
-TODO: {
-local $TODO = "-nocase isn't implemented, pending PGE support";
-language_output_is("tcl",<<TCL,<<OUT,"string match nocase");
-  puts [string match -nocase ABC abc ]
 TCL
 1
 OUT
