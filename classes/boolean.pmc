@@ -42,11 +42,13 @@ XXX are these generally useful or should they be moved to src/py_func.c?
         if (pass) {
             PMC *t;
             STRING *s;
+
             t = pmc_new(INTERP, enum_class_Boolean);
             PMC_int_val(t)  = 1;
             s = CONST_STRING(INTERP, "True");
             Parrot_store_global(INTERP, NULL, s, t);
             t = pmc_new(INTERP, enum_class_Boolean);
+            s = CONST_STRING(INTERP, "False");
             Parrot_store_global(INTERP, NULL, s, t);
         }
     }
