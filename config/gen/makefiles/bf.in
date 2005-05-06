@@ -22,9 +22,16 @@ help :
 test: build
 	cd .. && $(PERL) bf/t/harness
 
-build: bf.pasm
+build: bf.pbc bfc.pbc bfco.pbc
+
+bf.pbc: bf.pasm
 	$(PARROT) -o bf.pbc bf.pasm
+
+bfc.pbc: bfc.pir
 	$(PARROT) -o bfc.pbc bfc.pir
+
+bfco.pbc: bfco.pir
+	$(PARROT) -o bfco.pbc bfco.pir
 
 clean:
 	$(RM_F) core *.pbc *~

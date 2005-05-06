@@ -35,9 +35,9 @@ SOURCE_LOOP:
 
   # Initialise
 
-  set I0, 0          # Our PC
-  new P0, .PerlArray # Our memory
-  set I1, 0          # Our pointer
+  set I0, 0                      # Our program counter
+  new P0, .ResizableIntegerArray # Our memory
+  set I1, 0                      # Our pointer
   getstdin P30
 
   # The main interpreter loop
