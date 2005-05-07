@@ -360,9 +360,6 @@ docs/submissions.pod                              [main]doc
 docs/tests.pod                                    [main]doc
 docs/vtables.pod                                  [main]doc
 dynclasses/README                                 [devel]
-dynclasses/dynfoo.pasm                            [devel]
-dynclasses/dynmatch.pasm                          [devel]
-dynclasses/dyntcl.pasm                            [devel]
 dynclasses/ext.imc                                [devel]
 dynclasses/foo.pmc                                [devel]
 dynclasses/gdbmhash.pmc                           [devel]
