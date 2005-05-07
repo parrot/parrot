@@ -173,6 +173,8 @@ my %func_call_assign =
 
 my $temp_cnt = 0;
 my @put_pointer;
+my %seen;
+
 while (<>) {
     chomp;
     s/#.*$//;             # comment till end of line
@@ -183,6 +185,7 @@ while (<>) {
     my @extra_preamble;
     my @extra_postamble;
     my ($ret, $args) = split /\s+/, $_;
+    next if $seen{"$ret$;$args"}++;
     my @arg;
     my %reg_count;
     @reg_count{qw(p i s n)} = (5, 5, 5, 5);
