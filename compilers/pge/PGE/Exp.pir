@@ -748,6 +748,11 @@ register.
     .local pmc exp1, exp2
     .local pmc creps
 
+    $I0 = exists pad["creps"]                      # create creps hash array
+    if $I0 goto creps_1                            # if not exists
+    $P0 = new Hash
+    pad["creps"] = $P0
+  creps_1:
     creps = pad["creps"]
     creps = clone creps
     exp1 = self["exp1"]
