@@ -3078,6 +3078,10 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
     ext = strrchr(filename, '.');
     if (ext && strcmp (ext, ".pbc") == 0) {
         pf = PackFile_append_pbc(interpreter, filename);
+        if (!pf) {
+            internal_exception(1, "Couldn't find PBC file");
+            return;
+        }
         do_sub_pragmas(interpreter, pf->cur_cs, PBC_LOADED);
     }
     else {
