@@ -156,6 +156,7 @@ GEN_MAKEFILES = \
     languages/befunge/Makefile \
     languages/bf/Makefile \
     languages/ook/Makefile \
+    languages/lisp/Makefile \
     languages/m4/Makefile \
     languages/perl6/Makefile \
     languages/urm/Makefile \

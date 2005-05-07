@@ -58,7 +58,7 @@ test : all
 	cd .. ; perl -Ilib t/harness t/dynclass/*.t
 
 testclean :
-	$(RM_F) ../t/dynclass/*.imc ../t/dynclass/*.pbc
+	$(RM_F) ../t/dynclass/*.pir ../t/dynclass/*.pbc
 
 dynext-clean :
 # win32 import library

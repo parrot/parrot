@@ -12,3 +12,6 @@ build: lisp.imc
 
 clean:
 	$(RM_F) core *.pbc *~
+
+realclean: clean
+	$(RM_F) Makefile
