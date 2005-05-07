@@ -54,6 +54,17 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta[']'] = u
     p6meta['('] = $P0
     p6meta[')'] = u
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_alias"
+    p6meta['$<'] = $P0
+    p6meta['$1'] = $P0
+    p6meta['$2'] = $P0
+    p6meta['$3'] = $P0
+    p6meta['$4'] = $P0
+    p6meta['$5'] = $P0
+    p6meta['$6'] = $P0
+    p6meta['$7'] = $P0
+    p6meta['$8'] = $P0
+    p6meta['$9'] = $P0
     # $P0 = find_global "PGE::P6Rule", "p6rule_parse_assert"      # XXX: TODO
     # p6meta['<'] = $P0
     # p6meta['>'] = u
@@ -85,6 +96,10 @@ scan until the next token is found in C<pattern>.
     plen = lex["plen"]
     pos = lex["pos"]
     pos += skip                      
+    lex["ws"] = 0
+    unless pos < plen goto end
+    $I0 = is_whitespace pattern, pos
+    lex["ws"] = $I0
   skipws:
     unless pos < plen goto end
     $I0 = is_whitespace pattern, pos 
@@ -105,6 +120,44 @@ scan until the next token is found in C<pattern>.
     .return (pos)
 .end
 
+=item C<p6rule_parse_string(STR pattern, PMC lex, STR stopat)>
+
+Grab a sequence of characters, processing backslash escapes,
+until one of the characters in C<stopat> is found.  Advances
+the C<lex["pos"]> pointer as it goes.
+
+=cut
+
+.sub p6rule_parse_string
+    .param string pattern
+    .param pmc lex
+    .param string stopat
+    .param int pos
+    .param int plen
+    .param string val
+    pos = lex["pos"]
+    plen = lex["plen"]
+    val = ""
+  string_1:
+    unless pos < plen goto end
+    $S0 = substr pattern, pos, 1
+    unless $S0 == "\\" goto string_2
+    inc pos
+    unless pos < plen goto end
+    $S0 = substr pattern, pos, 1
+    goto string_3
+  string_2:
+    $I0 = index stopat, $S0
+    if $I0 >= 0 goto end
+  string_3:
+    concat val, $S0
+    inc pos
+    goto string_1
+  end:
+    lex["pos"] = pos
+    .return (val)
+.end
+    
 =item C<p6rule_parse_error(STR pattern, PMC lex, STR message)>
 
 Generates error messages during parsing.  Gracefully recovering
@@ -209,7 +262,6 @@ backreferences or variables.
     $P0 = find_global "PGE::Exp", "new"
     exp = $P0("PGE::Exp::Anchor")
     exp["token"] = token
-    if token != '^' goto end
   end:
     .return (exp)
 .end
@@ -231,34 +283,41 @@ subcaptures.
     .local int pos
     .local string ket
     .local int subp
-    p6rule_parse_skip(pattern, lex, $I0)
-    $P0 = find_global "PGE::Exp", "new"
+    .local pmc cname
+    .local int isaliased
+
+    p6rule_parse_skip(pattern, lex, 1)             # skip '(' or ']'
+    $P0 = find_global "PGE::Exp", "new"            # create group exp object
     exp = $P0("PGE::Exp::Group")
-    if token == '(' goto group_1
-    ket = ']'
-    goto group_2
+    isaliased = exists lex["cname"]
+    unless isaliased goto group_1                  # are we aliased?
+    cname = lex["cname"]                           # yes, use that capture name
+    exp["cname"] = cname
+    delete lex["cname"]                            # and then remove it
   group_1:
-    ket = ')'
-    subp = lex["subp"]
-    exp["cname"] = subp
-    exp["cscope"] = 1
-    lex["subp"] = 0
+    subp = lex["subp"]                             # current subpattern count
+    unless token == '(' goto group_2               
+    exp["cscope"] = 1                              # '(' == scoped capture
+    lex["subp"] = 0                                # restart subpattern #'s
+    if isaliased goto group_2                      # if not aliased
+    exp["cname"] = subp                            # use subpattern number
+    inc subp                                       # and increase
   group_2:
-    $P1 = "p6rule_parse_exp"(pattern, lex)
-    exp["exp1"] = $P1
-    pos = lex['pos']
-    $S0 = substr pattern, pos, 1
-    if $S0 != ket goto error
-    p6rule_parse_skip(pattern, lex, 1)
-    unless token == '(' goto end
-    inc subp
-    lex["subp"] = subp
+    $P1 = "p6rule_parse_exp"(pattern, lex)         # parse subexpression
+    exp["exp1"] = $P1                              # store in group exp
+    pos = lex['pos']                               # update pattern pos
+    $S0 = substr pattern, pos, 1                   # get closing char
+    unless token == '(' goto group_3               # if scoped capture '('
+    lex["subp"] = subp                             # set next subpattern #
+    if $S0 == ')' goto group_4                     # check for closing char
+    p6rule_parse_error(pattern, lex, "group missing ')'")
     goto end
-  error:
-    $S0 = "missing '"
-    concat $S0, ket
-    concat $S0, "'"
-    p6rule_parse_error(pattern, lex, $S0)
+  group_3:                                         # unscoped capture
+    if $S0 == ']' goto group_4                     
+    p6rule_parse_error(pattern, lex, "group missing ']'")
+    goto end
+  group_4:
+    p6rule_parse_skip(pattern, lex, 1)             # skip closing token
   end:
     .return (exp)
 .end
@@ -303,6 +362,66 @@ Parses an assertion (such as a subrule).
     p6rule_parse_skip(pattern, lex, $I1)
     .return (exp)
 .end
+
+=item C<p6rule_parse_alias(STR pattern, PMC lex, STR token)>
+
+Parse an alias or backreference.
+
+=cut
+
+.sub p6rule_parse_alias
+    .param string pattern
+    .param pmc lex
+    .param string token
+    .local int pos, plen
+    .local int subp
+    .local pmc exp
+   
+
+    pos = lex["pos"]                               # get current position
+    inc pos                                        # skip past '$'
+    if token == '$<' goto name                     # $< == named capture
+    $I0 = pos                                      # aha, numeric capture
+    plen = lex["plen"]                             # now let's scan for digits
+  num_0:
+    if $I0 >= plen goto num_1            
+    $I1 = is_digit pattern, $I0
+    unless $I1 goto num_1
+    inc $I0
+    goto num_0
+  num_1:                                           # we have digits
+    lex["pos"] = $I0                               # save new scan position
+    $I0 -= pos                                     # get length of digit seq.
+    $S0 = substr pattern, pos, $I0                 # extract digit seq.
+    subp = $S0                                     # convert to integer
+    lex["subp"] = subp                             # store next subpattern #
+    dec subp                                       # compute index of
+    lex["cname"] = subp                            # this capture
+    p6rule_parse_skip(pattern, lex, 0)             # skip ws
+    goto alias
+  name:
+    inc pos                                        # skip over '<'
+    lex["pos"] = pos                               # set position
+    $S0 = p6rule_parse_string(pattern, lex, '>')   # now get named alias
+    lex["cname"] = $S0                             # capture to this alias
+    p6rule_parse_skip(pattern, lex, 1)             # skip closing '>'  (XXX)
+  alias:
+    pos = lex["pos"]                               # get current pos
+    $S0 = substr pattern, pos, 2                   # check for ':='
+    unless $S0 == ':=' goto backref                
+    p6rule_parse_skip(pattern, lex, 2)             # skip ':='
+    exp = p6rule_parse_term(pattern, lex)          # parse a term to capture
+    goto end
+  backref:
+    $P0 = find_global "PGE::Exp", "new"            # create a backreference
+    exp = $P0("PGE::Exp::Scalar")
+    $P0 = lex["cname"]
+    exp["cname"] = $P0
+  end:
+    delete lex["cname"]                            # destroy any capture name
+    .return (exp)
+.end
+
 
 =item C<p6rule_parse_charclass(STR pattern, PMC lex)>
 
@@ -606,7 +725,7 @@ tree used to generate the rule (generally for debugging purposes).
     exp = $P1("PGE::Exp::Concat", exp, $P2)
     exp = $P1("PGE::Exp::Start", exp)
 
-    exp.analyze(0)
+    exp.analyze()
     exp.serno(0)
 
     code = new String

@@ -11,6 +11,7 @@ expressions.  The classes currently include
     PGE::Start     - start of rule
     PGE::End       - (successful) end of rule
     PGE::Literal   - match a literal string
+    PGE::Scalar    - match a scalar
     PGE::Dot       - match any character
     PGE::CCShortcut - character class shortcuts (\d, \D, \w, etc.)
     PGE::Anchor    - matching of ^, ^^, $, $$, \b, \B anchors
@@ -39,6 +40,7 @@ functionality and correctness at the moment.
     $P0 = subclass expclass, "PGE::Exp::Start"
     $P0 = subclass expclass, "PGE::Exp::End"
     $P0 = subclass expclass, "PGE::Exp::Literal"
+    $P0 = subclass expclass, "PGE::Exp::Scalar"
     $P0 = subclass expclass, "PGE::Exp::Dot"
     $P0 = subclass expclass, "PGE::Exp::CCShortcut"
     $P0 = subclass expclass, "PGE::Exp::Anchor"
@@ -136,14 +138,16 @@ current expression object.
     .return ($S0)
 .end
 
-=item C<analyze(PMC next, int isarray)>
+=item C<analyze(PMC next, PMC pad)>
 
 The analyze method is used to walk an expression tree and perform
 a variety of optimizations and pre-processing in preparation for
 generating the rule code.  The C<next> parameter identifies the
-expression that will come after this one.  The C<isarray> parameter 
-indicates if capture objects will produce an array of captures or a single
-capture.
+expression that will come after this one.  The C<pad> parameter
+is a work pad hash that is carried from one object to the next.
+Typical entries in the pad include:
+    isarray: does this (group) object cause its subelements to repeat?
+    reps: a hash of lexically repeated capture names
 
 =cut
 
@@ -314,14 +318,14 @@ register.
   greedy:
     emit(code, "    rep = 0")
     unless isgreedy goto lazy
-    emit(code, "  %s_1:", label)
-    emit(code, "    if rep >= %d goto %s_2", max, label)
+    emit(code, "  %s_lit1:", label)
+    emit(code, "    if rep >= %d goto %s_lit2", max, label)
     emit(code, "    $S0 = substr target, pos, litlen")
-    emit(code, "    if $S0 != lit goto %s_2", label)
+    emit(code, "    if $S0 != lit goto %s_lit2", label)
     emit(code, "    inc rep")
     emit(code, "    pos += litlen")
-    emit(code, "    goto %s_1", label)
-    emit(code, "  %s_2:", label)
+    emit(code, "    goto %s_lit1", label)
+    emit(code, "  %s_lit2:", label)
     emit(code, "    if rep < %d goto fail", min)
     unless iscut goto greedy_1
     emit(code, "    goto %s", next)
@@ -330,12 +334,12 @@ register.
     self.emitsub(code, next, "pos", "rep", "litlen")
     emit(code, "    dec rep")
     emit(code, "    pos -= litlen")
-    emit(code, "    goto %s_2", label)
+    emit(code, "    goto %s_lit2", label)
     .return()
 
   lazy:
-    emit(code, "  %s_1:", label)
-    emit(code, "    if rep < %d goto %s_2", min, label)
+    emit(code, "  %s_lit1:", label)
+    emit(code, "    if rep < %d goto %s_lit2", min, label)
     unless iscut goto lazy_1
     emit(code, "    goto %s", next)
     goto lazy_2
@@ -343,22 +347,23 @@ register.
     emit(code, "    if rep >= %d goto %s", max, next)
     self.emitsub(code, next, "pos", "rep", "lit", "litlen")
   lazy_2:
-    emit(code, "  %s_2:", label)
+    emit(code, "  %s_lit2:", label)
     emit(code, "    $S0 = substr target, pos, litlen")
     emit(code, "    if $S0 != lit goto fail")
     emit(code, "    inc rep")
     emit(code, "    pos += litlen")
-    emit(code, "    goto %s_1", label)
+    emit(code, "    goto %s_lit1", label)
 .end
 
 .namespace [ "PGE::Exp::Start" ]
 
 .sub analyze method
     .param pmc next
-    .param int isarray
+    .param pmc pad
+    pad = new Hash                                 # create a new workpad
     $P0 = self["exp1"]
-    $P0.analyze(self, isarray)
-    self.firstchars($P0)
+    $P0.analyze(self, pad)                         # analyze our subexp
+    self.firstchars($P0)                           # set firstchars
 .end
 
 .sub "gen" method
@@ -450,7 +455,7 @@ register.
 
 .sub "analyze" method
     .param pmc next
-    .param int isarray
+    .param pmc pad
     $S0 = self["literal"]                          # set up firstchars
     $S0 = substr $S0, 0, 1
     self["firstchars"] = $S0
@@ -472,6 +477,43 @@ register.
     emit(code, "    lit = '%s'", $S1)
     self.genliteral(code, label, next)
 .end
+
+
+.namespace [ "PGE::Exp::Scalar" ]
+
+.sub "gen" method
+    .param pmc code
+    .param string label
+    .param string next
+    .local pmc emit
+    .local pmc cname
+    .local int subp
+    emit = find_global "PGE::Exp", "emit"
+    $S0 = self."quant"()
+    cname = self["cname"]
+    $I0 = isa cname, "Integer"
+    unless $I0 goto named
+    subp = cname
+    emit(code, "\n  %s:  # backref $%d %s", label, subp, $S0)
+    emit(code, "    lit = ''")
+    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0@:capt\"")
+    emit(code, "    isnull $P0, %s_1", label)
+    emit(code, "    $P1 = $P0[%d]", subp)
+    emit(code, "    lit = $P1[-1]")
+    emit(code, "  %s_1:", label)
+    .return self.genliteral(code, label, next)
+  named:
+    $S1 = cname
+    emit(code, "\n  %s:  # backref $<%s> %s", label, subp, $S1)
+    emit(code, "    lit = ''")
+    emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0%:capt\"")
+    emit(code, "    isnull $P0, %s_1", label)
+    emit(code, "    $P1 = $P0[\"%s\"]", $S1)       # XXX: quote $S1
+    emit(code, "    lit = $P1[-1]")
+    emit(code, "  %s_1:", label)
+    .return self.genliteral(code, label, next)
+.end
+
 
 .namespace [ "PGE::Exp::Dot" ]
 
@@ -593,7 +635,7 @@ register.
 
 .sub "analyze" method
     .param pmc next
-    .param int isarray 
+    .param pmc pad
     self.firstchars(next)
 .end
 
@@ -646,12 +688,12 @@ register.
 
 .sub "analyze" method
     .param pmc next
-    .param int isarray
+    .param pmc pad
     .local pmc exp1, exp2
     exp2 = self["exp2"]
-    exp2.analyze(next, isarray)
+    exp2.analyze(next, pad)
     exp1 = self["exp1"]
-    exp1.analyze(exp2, isarray)
+    exp1.analyze(exp2, pad)
     self.firstchars(exp1)
 .end
    
@@ -675,7 +717,7 @@ register.
 
 .sub "analyze" method
     .param pmc next
-    .param int isarray
+    .param int pad
     self.firstchars(next)
 .end
 
@@ -702,12 +744,17 @@ register.
 
 .sub "analyze" method
     .param pmc next
-    .param int isarray
+    .param pmc pad
     .local pmc exp1, exp2
+    .local pmc creps
+
+    creps = pad["creps"]
+    creps = clone creps
     exp1 = self["exp1"]
     exp2 = self["exp2"]
-    exp1.analyze(next, isarray)
-    exp2.analyze(next, isarray)
+    exp2.analyze(next, pad)
+    pad["creps"] = creps
+    exp1.analyze(next, pad)
     self.firstchars(exp1, exp2)
 .end
 
@@ -734,28 +781,60 @@ register.
 
 .sub "analyze" method
     .param pmc next
-    .param int isarray
+    .param pmc pad
     .local pmc exp1
+    .local int isarray
+    .local pmc creps
+    .local string cname
 
-    self["firstchars"] = ""
-    $I0 = self["isarray"]                          # see if this is an array
-    isarray |= $I0
+    self["firstchars"] = ""                        # no firstchars default
+
+    $I0 = exists pad["creps"]                      # create creps hash array
+    if $I0 goto creps_1                            # if not exists
+    $P0 = new Hash
+    pad["creps"] = $P0
+  creps_1:
+    creps = pad["creps"]                           # load creps hash
+    $I0 = exists self["cname"]
+    unless $I0 goto isarray_0                      # skip if no capture
+    $P0 = self["cname"]
+    cname = $P0
+    cname = concat "%", cname
+    $I0 = isa $P0, "Integer"                       # Integer = subpattern cap
+    if $I0 goto creps_2
+  creps_2:
+    $I0 = exists creps[cname]                      # have seen capture name?
+    unless $I0 goto creps_3                        #
+    $P0 = creps[cname]                             # yes, so prev is now 
+    $P0["isarray"] = 1                             # an array capture
+    self["isarray"] = 1                            # and so is self
+  creps_3:
+    creps[cname] = self                            # mark us for future ref
+
+  isarray_0:
+    isarray = pad["isarray"]                       # set group's isarray
+    $I0 = self["isarray"]                          # and pass along to
+    isarray |= $I0                                 # nested objects
     self["isarray"] = isarray
     $I0 = self["cscope"]
     unless $I0 goto isarray_1
-    isarray = 0
+    isarray = 0                                    # each capt obj is single
+    delete pad["creps"]                            # new lexical name scope
   isarray_1:
     $I0 = defined self["exp1"]
     unless $I0 goto end
     exp1 = self["exp1"]
-    exp1.analyze(next, isarray)
+    pad["isarray"] = isarray
+    exp1.analyze(next, pad)
+  fc:
     $I0 = self["min"]                              # set up firstchars
-    if $I0 > 0 goto isarray_2
+    if $I0 > 0 goto fc_2
     self.firstchars(exp1, next)
     goto end
-  isarray_2:
+  fc_2:
     self.firstchars(exp1)
   end:
+    pad["creps"] = creps
 .end
  
 .sub "gen" method
@@ -831,8 +910,9 @@ register.
     emit(code, "    $P0 = pop gpad")
     emit(code, "    $P0 = pop cpad")
     unless iscapture goto init_2
-    emit(code, "    unless iscreator goto fail")
+    emit(code, "    unless iscreator goto %s_i4", label)
     emit(code, "    delete cobcapt[%s]", captname)
+    emit(code, "  %s_i4:", label)
   init_2:
     emit(code, "    if cutting != 1 goto fail")
     emit(code, "    cutting = 0")
@@ -910,7 +990,9 @@ register.
     emit(code, "    cpad[-1] = $P0")
   subpat_2:
     emit(code, "    push capt, $P0")
+    emit(code, "    save capt")
     emit(code, "    bsr %s_s1", sublabel)
+    emit(code, "    restore capt")
     emit(code, "    $P0 = pop capt")
     emit(code, "    ret")
     exp1 = self["exp1"]

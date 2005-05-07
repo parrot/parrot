@@ -13,13 +13,54 @@ p6rule_like('abcd', '(a(b(c))(d))', qr/mob 0 0: <bc @ 1>/, 'nested match');
 p6rule_like('abcd', '(a(b(c))(d))', qr/mob 0 0 0: <c @ 2>/, 'nested match');
 p6rule_like('abcd', '(a(b(c))(d))', qr/mob 0 1: <d @ 3>/, 'nested match');
 
-# backreferences not implemented yet
-#p6rule_is  ('bookkeeper', '(((.)$3)+)', 'backreference');
-#p6rule_like('bookkeeper', '(((.)$3)+)', 
-#            qr/0: <ookkee @ 1>/, 'backref $0');
-#p6rule_like('bookkeeper', '(((.)$3)+)', 
-#            qr/1: <ookkee @ 1>/, 'backref $1');
-#p6rule_like('bookkeeper', '(((.)$3)+)', 
-#            qr/2: <oo @ 1> <kk @ 3> <ee @ 5>/, 'backref $2');
-#p6rule_like('bookkeeper', '(((.)$3)+)', 
-#            qr/3: <o @ 1> <k @ 3> <e @ 5>/, 'backref $2');
+p6rule_like('abcdefg', '(a) [ (bc) (d) | .* (ef) ] .* (g)',
+            qr/mob 0: <a @ 0>/, 'alt subpattern before group');
+p6rule_like('abcdefg', '(a) [ (bc) (d) | .* (ef) ] .* (g)',
+            qr/mob 1: <bc @ 1>/, 'alt subpattern in group');
+p6rule_like('abcdefg', '(a) [ (bc) (d) | .* (ef) ] .* (g)',
+            qr/mob 2: <d @ 3>/, 'alt subpattern in group');
+p6rule_like('abcdefg', '(a) [ (bc) (d) | .* (ef) ] .* (g)',
+            qr/mob 3: <g @ 6>/, 'alt subpattern after group');
+p6rule_like('abcdefg', '(a) [ (bc) (x) | .* (ef) ] .* (g)',
+            qr/mob 1: <ef @ 4>/, '2nd alt subpattern in group');
+p6rule_like('abcdefg', '(a) [ (bc) (x) | .* (ef) ] .* (g)',
+            qr/mob 3: <g @ 6>/, '2nd alt subpattern after group');
+
+p6rule_like('abc', '( (.) )*', qr/mob 0 1 0: <b @ 1>/,
+            'nested repeated captures');
+p6rule_like('abc', '[ (.) ]*', qr/mob 0 1: <b @ 1>/,
+            'nested repeated captures');
+p6rule_like('abc', '( [.] )*', qr/mob 0 1: <b @ 1>/,
+            'nested repeated captures');
+
+p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 0: <a @ 0>/,
+            'numbered aliases $1');
+p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 1: <b @ 1>/,
+            'numbered aliases $2');
+p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 6: <c @ 2>/,
+            'numbered aliases $7');
+p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 7: <d @ 3>/,
+            'numbered aliases $8');
+p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 3: <e @ 4>/,
+            'numbered aliases $4');
+
+
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 0: <abc @ 0>/,
+            'perl5 numbered captures $1');
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 1: <a @ 0>/,
+            'perl5 numbered captures $1');
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 2: <b @ 1>/,
+            'perl5 numbered captures $1');
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 3: <c @ 2>/,
+            'perl5 numbered captures $1');
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 4: <d @ 3>/,
+            'perl5 numbered captures $1');
+
+p6rule_is  ('bookkeeper', '[(.)$1]+', 'backreference');
+p6rule_like('bookkeeper', '[(.)$1]+', 
+            qr/mob 0 0: <o @ 1>/, 'backref $1');
+p6rule_like('bookkeeper', '[(.)$1]+', 
+            qr/mob 0 1: <k @ 3>/, 'backref $1');
+p6rule_like('bookkeeper', '[(.)$1]+', 
+            qr/mob 0 2: <e @ 5>/, 'backref $1');
+

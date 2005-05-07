@@ -17,7 +17,7 @@ $(PARROT_LIBRARY)${slash}PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
 PGE.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/P6Rule.pir PGE/TokenHash.pir
-	$(PARROT) --output-pbc PGE.pir >PGE.pbc
+	$(PARROT) -o PGE.pbc --output-pbc PGE.pir 
 
 # This is a listing of all targets, that are meant to be called by users
 help:

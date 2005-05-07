@@ -57,6 +57,21 @@ PGE::Dumper - various methods for displaying PGE structures
     print "\n"
 .end
 
+.namespace [ "PGE::Exp::Scalar" ]
+
+.sub "dump" method
+    .param int indent
+    .local pmc cname
+    cname = self["cname"]
+    self."dumpindent"(indent)
+    print "BACKREF «"
+    print cname
+    print "» "
+    $S0 = self."quant"()
+    print $S0
+    print "\n"
+.end
+
 .namespace [ "PGE::Exp::Dot" ]
 
 .sub "dump" method
