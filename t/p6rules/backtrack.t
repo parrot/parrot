@@ -4,8 +4,8 @@ use Parrot::Test::PGE;
 p6rule_is(  'bazaar', 'a* a', 'control');
 p6rule_isnt('bazaar', 'a*:a', 'basic');
 
-p6rule_is(  'abbabbababba', '[a|b]*  aba', 'control');
-p6rule_isnt('abbabbababba', '[a|b]*: aba', 'outside a group');
+p6rule_is(  'abbabbababba', '^[a|b]*  aba', 'control');
+p6rule_isnt('abbabbababba', '^[a|b]*: aba', 'outside a group');
 
 p6rule_is(  'verify', '[ if    not | ify ]', 'control');
 p6rule_isnt('verify', '[ if :: not | ify ]', 'inside a group');

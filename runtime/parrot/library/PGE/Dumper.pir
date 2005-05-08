@@ -83,6 +83,13 @@ PGE::Dumper - various methods for displaying PGE structures
     print "\n"
 .end
 
+.namespace [ "PGE::Exp::WS" ]
+
+.sub "dump" method
+    .param int indent
+    self."dumpindent"(indent)
+    print "<?ws>\n"
+.end
 
 .namespace [ "PGE::Exp::Anchor" ]
 
@@ -147,7 +154,7 @@ PGE::Dumper - various methods for displaying PGE structures
     print $S0
     $I0 = exists self["rname"]
     unless $I0 goto dump_0
-    print "subrule '"
+    print " subrule '"
     $S0 = self["rname"]
     print $S0
     print "'"

@@ -246,29 +246,10 @@ Produces a data dump of the match object and all of its subcaptures.
     concat prefix1, $S0
     concat prefix1, b2
     $I0 = defined capt[spi]
-    unless $I0 goto subpats_3
+    unless $I0 goto subpats_2
     $P0 = capt[spi]
-    $I0 = defined $P0
-    unless $I0 goto subpats_3
-    $I0 = 0
-    $I1 = elements $P0
-    unless $I0 < $I1 goto subpats_3
-    $P1 = getprop "isarray", $P0
-    if $P1 goto subpats_2
-    $P1 = $P0[-1]
-    $P1."dump"(prefix1, b1, b2)
-    goto subpats_3
+    bsr dumper
   subpats_2:
-    unless $I0 < $I1 goto subpats_3
-    $P1 = $P0[$I0]
-    prefix2 = concat prefix1, b1
-    $S0 = $I0
-    concat prefix2, $S0
-    concat prefix2, b2
-    $P1."dump"(prefix2, b1, b2)
-    inc $I0
-    goto subpats_2
-  subpats_3:
     inc spi
     goto subpats_1
 
@@ -286,16 +267,21 @@ Produces a data dump of the match object and all of its subcaptures.
     $I0 = defined capt[$S0]
     unless $I0 goto subrules_1
     $P0 = capt[$S0]
+    bsr dumper
+    goto subrules_1
+
+  dumper:
     $I0 = 0
     $I1 = elements $P0
-    unless $I0 < $I1 goto subrules_1
+    unless $I0 < $I1 goto dumper_1
     $P1 = getprop "isarray", $P0
-    if $P1 goto subrules_2
+    if $P1 goto dumper_2
     $P1 = $P0[-1]
     $P1."dump"(prefix1, b1, b2)
-    goto subrules_1
-  subrules_2:
-    unless $I0 < $I1 goto subrules_1
+  dumper_1:
+    ret
+  dumper_2:
+    unless $I0 < $I1 goto dumper_1
     $P1 = $P0[$I0]
     prefix2 = concat prefix1, b1
     $S0 = $I0
@@ -303,7 +289,7 @@ Produces a data dump of the match object and all of its subcaptures.
     concat prefix2, b2
     $P1."dump"(prefix2, b1, b2)
     inc $I0
-    goto subrules_2
+    goto dumper_2
   end:
 .end
 
