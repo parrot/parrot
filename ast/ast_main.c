@@ -72,6 +72,7 @@ ast_compile_past(Parrot_Interp interp, const char *src_string)
         IMCC_free_nodes(interp, top_node);
     }
 
+    emit_open(interp, 1, NULL);
     imc_compile_all_units_for_ast(interp);
     imc_compile_all_units(interp);
 

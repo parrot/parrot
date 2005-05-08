@@ -11,7 +11,7 @@ providing the Foo PMC class.
 
 =item 1
 
-Edit/create your foo.pmc source - For details on creating PMCs, see 
+Edit/create your foo.pmc source - For details on creating PMCs, see
 L<../classes/genclass.pl>
 
 There are some differences you have to be aware of when creating dynamic PMCs.
@@ -30,13 +30,19 @@ C<String> is -- for example:
 
 	if (type == enum_class_String) { ...
 
-a dynamic PMC such as C<TclObject> must instead perform a runtime lookup
+a dynamic PMC such as C<TclInt> must instead perform a runtime lookup
 of its corresponding C<TclString> PMC, resulting in the more complicated:
 
-	if (type == pmc_type(
-	        interpreter,
-	        string_from_cstring(interpreter, "TclString", 9))
-	   )
+  static INTVAL dynclass_TclString;
+
+  pmclass TclInt extends TclObject extends Integer dynpmc group tcl_group {
+
+    void class_init() {
+      if (pass) {
+	dynclass_TclString = Parrot_PMC_typenum(INTERP,"TclString");
+      }
+    }
+  }
 
 Finally, if you have a group of PMCs that are interdependent, use the
 C<group GROUPNAME> syntax to trigger a group library to be built. You
@@ -51,30 +57,15 @@ and then in your .imc or .pasm file:
 
 =item 2
 
-Edit C<../config/gen/makefiles/dynclasses.in> and append your PMC(s) to 
-the build target:
+Edit C<../config/gen/makefiles/dynclasses.in> and append your PMC(s) to
+the build target and:
 
 	$ make
-	$ make shared
-	$ cd dynclasses; make
 
 =item 3
 
-Try the sample dynamic class, Foo. Note that the numbers listed here will
-change over time.
-
-	$ ./parrot dynclasses/dynfoo.pasm
-	ok 1
-	41
-	ok 2
-	42
-
-=item 4
-
-There are two other similar test files: dynmatch.pasm and dyntcl.pasm.
-They do pretty much the same thing as dynfoo, but they load in PMC
-group libraries instead of a standalone PMC library.
-
 If anything changes inside parrot, be sure to:
 
-	$ cd dynclasses; make clean
+	$ make dynclasses-clean
+
+=back

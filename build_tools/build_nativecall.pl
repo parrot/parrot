@@ -185,7 +185,7 @@ while (<>) {
     my @extra_preamble;
     my @extra_postamble;
     my ($ret, $args) = split /\s+/, $_;
-    next if $seen{"$ret$;$args"}++;
+    ## next if $seen{"$ret$;$args"}++;
     my @arg;
     my %reg_count;
     @reg_count{qw(p i s n)} = (5, 5, 5, 5);

@@ -1238,20 +1238,17 @@ CODE
 ok
 OUT
 
-{
   # The result of the code should depend on whether we run parrot with the
   # "-o code.pbc -r -r" command line params.
   # Strangely, the same output is written
-  my $output = ($ENV{TEST_PROG_ARGS} || '') =~ m/-r / ?
-                qq{ok\n} :
-                qq{ok\n};
-  pir_output_is(<<'CODE', $output, "more pragmas, syntax only");
+pir_output_like(<<'CODE', <<'OUT', "more pragmas, syntax only");
 .sub _main prototyped, @MAIN, @LOAD, @POSTCOMP
     print "ok\n"
     end
 .end
 CODE
-}
+/(ok\n){1,2}/
+OUT
 
 pir_output_is(<<'CODE', <<'OUT', "_func() syntax");
 .sub test @MAIN

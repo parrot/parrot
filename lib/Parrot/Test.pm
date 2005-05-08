@@ -211,17 +211,26 @@ sub run_command {
     open  STDOUT, ">$out"    or die "Can't redirect stdout to $out" if $out;
     open  STDERR, ">$err"    or die "Can't redirect stderr to $err" if $err;
 
-    $command = "$ENV{VALGRIND} $command" if defined $ENV{VALGRIND};
+    # If $command isn't already an arrayref (because of a multi-command
+    # test), make it so now so the code below can treat everybody the
+    # same.
+    $command = [$command] unless (ref $command);
+
+    if (defined $ENV{VALGRIND}) {
+        $_ = "$ENV{VALGRIND} $_" for (@$command);
+    }
 
     my $orig_dir;
     if( $chdir ) {
-	$orig_dir = cwd;
-	chdir $chdir;
+        $orig_dir = cwd;
+        chdir $chdir;
     }
-    system( $command );
+
+    # Execute all commands
+    system $_ for (@$command);
 
     if( $chdir ) {
-	chdir $orig_dir;
+        chdir $orig_dir;
     }
 
     my $exit_code = $? >> 8;
@@ -380,11 +389,20 @@ sub _generate_functions {
                 if ( $func !~ /^pir_2_pasm_/ &&
                      ( $args =~ s/--run-pbc// || $args =~ s/-r //) ) {
                     my $pbc_f = per_test('.pbc', $test_no);
-                    $args = qq{$args -o "$pbc_f" -r -r};
+                    $args = qq{$args -o "$pbc_f"};
+
+                    # In this case, we need to execute more than one
+                    # command. Instead of a single scalar, build an
+                    # array of commands.
+                    $cmd = [
+                        qq{$parrot $args "$code_f"},
+                        qq{$parrot "$pbc_f"},
+                    ];
+                } else {
+                    $cmd = qq{$parrot $args "$code_f"};
                 }
-                $cmd = qq{$parrot $args "$code_f"};
                 $exit_code = run_command($cmd, CD => $path_to_parrot,
-					 STDOUT => $out_f, STDERR => $out_f);
+                    STDOUT => $out_f, STDERR => $out_f);
             }
 
             my $meth = $parrot_test_map{$func};
