@@ -53,9 +53,10 @@ get_byte(Interp *interpreter, const STRING *source_string, UINTVAL offset)
 {
     unsigned char *contents = source_string->strstart;
     if (offset >= source_string->bufused) {
-	internal_exception(0,
+/*	internal_exception(0,
 		"get_byte past the end of the buffer (%i of %i)",
-		offset, source_string->bufused);
+		offset, source_string->bufused);*/
+	return 0;
     }
     return contents[offset];
 }
