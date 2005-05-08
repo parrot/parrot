@@ -30,33 +30,11 @@ charset functionality for similar charsets like iso-8859-1.
 #define EXCEPTION(err, str) \
     real_exception(interpreter, NULL, err, str)
 
-#define WHITESPACE 1
-#define WORDCHAR 2
-#define PUNCTUATION 4
-#define DIGIT 8
-
-static const unsigned char typetable[256] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, /* 0-15 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 16-31 */
-    1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, /* 32-47 */
-    0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 4, 4, 4, 4, 4, 4, /*48.*/
-    4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 64-79 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 2, /* 80-95 */
-    4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 95-111 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 0, /* 112-127 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 128-143 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 144-159 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 160-175 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 176-191 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 192-207 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* 208-223 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* 224-239 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* 240-255 */
-};
+#include "tables.h"
 
 INTVAL
 ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
-        unsigned char type, const unsigned char *table)
+        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table)
 {
     for (; start < string->strlen; start++) {
         if (table[ENCODING_GET_BYTE(interpreter, string, start)] & type) {
@@ -68,7 +46,7 @@ ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
 
 INTVAL
 ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
-        unsigned char type, const unsigned char *table)
+        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table)
 {
     for (; start < string->strlen; start++) {
         if (!(table[ENCODING_GET_BYTE(interpreter, string, start)] & type)) {
@@ -413,21 +391,21 @@ is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] & WORDCHAR) ? 1 : 0;
+    return (Parrot_ascii_typetable[codepoint] & WORDCHAR) ? 1 : 0;
 }
 
 static INTVAL
 find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_thing(interpreter, source_string, offset, WORDCHAR,
-            typetable);
+            Parrot_ascii_typetable);
 }
 
 static INTVAL
 find_not_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_not_thing(interpreter, source_string, offset, WORDCHAR,
-            typetable);
+            Parrot_ascii_typetable);
 }
 
 static INTVAL
@@ -435,14 +413,14 @@ is_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] == WHITESPACE);
+    return (Parrot_ascii_typetable[codepoint] & WHITESPACE) == WHITESPACE;
 }
 
 static INTVAL
 find_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_thing(interpreter, source_string, offset, WHITESPACE,
-            typetable);
+            Parrot_ascii_typetable);
 }
 
 static INTVAL
@@ -450,7 +428,7 @@ find_not_whitespace(Interp *interpreter, STRING *source_string,
         UINTVAL offset)
 {
     return ascii_find_not_thing(interpreter, source_string, offset,
-            WHITESPACE, typetable);
+            WHITESPACE, Parrot_ascii_typetable);
 }
 
 static INTVAL
@@ -458,21 +436,21 @@ is_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] & DIGIT) ? 1 : 0;
+    return (Parrot_ascii_typetable[codepoint] & DIGIT) == DIGIT;
 }
 
 static INTVAL
 find_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_thing(interpreter, source_string, offset, DIGIT,
-            typetable);
+            Parrot_ascii_typetable);
 }
 
 static INTVAL
 find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_not_thing(interpreter, source_string, offset, DIGIT,
-            typetable);
+            Parrot_ascii_typetable);
 }
 
 static INTVAL
@@ -480,14 +458,14 @@ is_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] == PUNCTUATION);
+    return (Parrot_ascii_typetable[codepoint] & PUNCTUATION) == PUNCTUATION;
 }
 
 static INTVAL
 find_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_thing(interpreter, source_string, offset, PUNCTUATION,
-            typetable);
+            Parrot_ascii_typetable);
 }
 
 static INTVAL
@@ -495,7 +473,7 @@ find_not_punctuation(Interp *interpreter, STRING *source_string,
         UINTVAL offset)
 {
     return ascii_find_not_thing(interpreter, source_string, offset,
-            PUNCTUATION, typetable);
+            PUNCTUATION, Parrot_ascii_typetable);
 }
 
 INTVAL
@@ -531,7 +509,7 @@ ascii_find_not_newline(Interp *interpreter, STRING *string, UINTVAL start)
 
 INTVAL
 ascii_find_word_boundary(Interp *interpreter, STRING *string,
-        UINTVAL offset, const unsigned char *table)
+        UINTVAL offset, const PARROT_CCLASS_FLAGS *table)
 {
     UINTVAL c, len;
     int is_wc1, is_wc2;
@@ -561,7 +539,7 @@ static INTVAL
 find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
   return ascii_find_word_boundary(interpreter, source_string,
-          offset, typetable);
+          offset, Parrot_ascii_typetable);
 }
 
 static STRING *
@@ -571,6 +549,32 @@ string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
     char real_codepoint = (char)codepoint;
     return_string = string_make(interpreter, &real_codepoint, 1, "ascii", 0);
     return return_string;
+}
+
+static INTVAL
+is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
+{
+    UINTVAL codepoint;
+    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+
+    if (codepoint >= sizeof(Parrot_ascii_typetable) / sizeof(Parrot_ascii_typetable[0])) {
+        return 0;
+    }
+    return (Parrot_ascii_typetable[codepoint] & flags) ? 1 : 0;
+}
+
+static INTVAL
+find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+{
+    real_exception(interpreter, NULL, UNIMPLEMENTED, "unimplemented ascii:find_cclass");
+    return -1;
+}
+
+static INTVAL
+find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+{
+    real_exception(interpreter, NULL, UNIMPLEMENTED, "unimplemented ascii:find_not_cclass");
+    return -1;
 }
 
 /*
@@ -617,6 +621,9 @@ Parrot_charset_ascii_init(Interp *interpreter)
         ascii_cs_index,
         ascii_cs_rindex,
         validate,
+        is_cclass,
+        find_cclass,
+        find_not_cclass,
         is_wordchar,
         find_wordchar,
         find_not_wordchar,

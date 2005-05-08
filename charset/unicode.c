@@ -277,6 +277,27 @@ find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
     return 0;
 }
 
+static INTVAL
+is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
+{
+    UNIMPL;
+    return 0;
+}
+
+static INTVAL
+find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+{
+    UNIMPL;
+    return -1;
+}
+
+static INTVAL
+find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+{
+    UNIMPL;
+    return -1;
+}
+
 static STRING *
 string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 {
@@ -333,6 +354,9 @@ Parrot_charset_unicode_init(Interp *interpreter)
         mixed_cs_index,
         cs_rindex,
         validate,
+        is_cclass,
+        find_cclass,
+        find_not_cclass,
         is_wordchar,
         find_wordchar,
         find_not_wordchar,

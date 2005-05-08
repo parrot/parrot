@@ -19,10 +19,10 @@
 
 INTVAL
 ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
-        unsigned char type, const unsigned char *table);
+        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table);
 INTVAL
 ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
-        unsigned char type, const unsigned char *table);
+        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table);
 STRING *ascii_get_graphemes(Interp *, STRING *source_string,
         UINTVAL offset, UINTVAL count);
 STRING *ascii_get_graphemes_inplace(Interp *, STRING *source_string,
@@ -31,7 +31,7 @@ INTVAL ascii_is_newline(Interp *, STRING *source_string, UINTVAL offset);
 INTVAL ascii_find_newline(Interp *, STRING *source_string, UINTVAL offset);
 INTVAL ascii_find_not_newline(Interp *, STRING *source_string, UINTVAL offset);
 INTVAL ascii_find_word_boundary(Interp *, STRING *source_string,
-        UINTVAL offset, const unsigned char *typetable);
+        UINTVAL offset, const PARROT_CCLASS_FLAGS *typetable);
 INTVAL ascii_compare(Interp *, STRING *lhs, STRING *rhs);
 INTVAL ascii_compare(Interp *, STRING *lhs, STRING *rhs);
 INTVAL ascii_cs_index(Interp *, STRING *source_string,

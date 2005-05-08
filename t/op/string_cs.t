@@ -93,7 +93,7 @@ Zaeiou_הצü
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "is_whitespace");
-    set S0, iso-8859-1:"a\t\n \xa0"
+    set S0, iso-8859-1:"a\t\n \xa0" # is 0xa0 a whitespace in iso-8859-1??
     is_whitespace I0, S0, 0
     is_whitespace I1, S0, 1
     is_whitespace I2, S0, 2
@@ -111,15 +111,17 @@ output_is( <<'CODE', <<OUTPUT, "is_whitespace");
     is_whitespace I1, S0, 1
     is_whitespace I2, S0, 2
     is_whitespace I3, S0, 3
+    is_whitespace I4, S0, 4 # access past string boundary: not a whitespace
     print I0
     print I1
     print I2
     print I3
+    print I4
     print "\n"
     end
 CODE
-01111
-0111
+01110
+01110
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "is_wordchar");
@@ -164,7 +166,7 @@ lp:
     print "\n"
     end
 CODE
-000001110
+000001111
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "is_newline");
@@ -226,7 +228,7 @@ done:
     print "ok\n"
     end
 CODE
-2 5 -1 ok
+0 2 5 -1 ok
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "find_word_boundary");

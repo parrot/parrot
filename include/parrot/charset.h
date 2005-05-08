@@ -15,6 +15,7 @@
 
 
 #include "parrot/encoding.h"
+#include "parrot/cclass.h"
 
 struct _charset;
 typedef struct _charset CHARSET;
@@ -55,6 +56,9 @@ typedef INTVAL (*charset_compare_t)(Interp *, STRING *lhs, STRING *rhs);
 typedef INTVAL (*charset_index_t)(Interp *, STRING *source_string, STRING *search_string, UINTVAL offset);
 typedef INTVAL (*charset_rindex_t)(Interp *, STRING *source_string, STRING *search_string, UINTVAL offset);
 typedef UINTVAL (*charset_validate_t)(Interp *, STRING *source_string);
+typedef INTVAL (*charset_is_cclass_t)(Interp *, PARROT_CCLASS_FLAGS, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_cclass_t)(Interp *, PARROT_CCLASS_FLAGS, STRING *source_string, UINTVAL offset, UINTVAL count);
+typedef INTVAL (*charset_find_not_cclass_t)(Interp *, PARROT_CCLASS_FLAGS, STRING *source_string, UINTVAL offset, UINTVAL count);
 typedef INTVAL (*charset_is_wordchar_t)(Interp *, STRING *source_string, UINTVAL offset);
 typedef INTVAL (*charset_find_wordchar_t)(Interp *, STRING *source_string, UINTVAL offset);
 typedef INTVAL (*charset_find_not_wordchar_t)(Interp *, STRING *source_string, UINTVAL offset);
@@ -115,6 +119,9 @@ struct _charset {
     charset_index_t index;
     charset_rindex_t rindex;
     charset_validate_t validate;
+    charset_is_cclass_t is_cclass;
+    charset_find_cclass_t find_cclass;
+    charset_find_not_cclass_t find_not_cclass;
     charset_is_wordchar_t is_wordchar;
     charset_find_wordchar_t find_wordchar;
     charset_find_not_wordchar_t find_not_wordchar;
@@ -153,6 +160,9 @@ struct _charset {
 #define CHARSET_INDEX(interp, source, search, offset) ((CHARSET *)source->charset)->index(interpreter, source, search, offset)
 #define CHARSET_RINDEX(interp, source, search, offset) ((CHARSET *)source->charset)->rindex(interpreter, source, search, offset)
 #define CHARSET_VALIDATE(interp, source, offset) ((CHARSET *)source->charset)->validate(interpreter, source)
+#define CHARSET_IS_CCLASS(interp, flags, source, offset) ((CHARSET *)source->charset)->is_cclass(interpreter, flags, source, offset)
+#define CHARSET_FIND_CCLASS(interp, flags, source, offset, count) ((CHARSET *)source->charset)->find_cclass(interpreter, flags, source, offset, count)
+#define CHARSET_FIND_NOT_CCLASS(interp, flags, source, offset, count) ((CHARSET *)source->charset)->find_not_cclass(interpreter, flags, source, offset, count)
 #define CHARSET_IS_WORDCHAR(interp, source, offset) ((CHARSET *)source->charset)->is_wordchar(interpreter, source, offset)
 #define CHARSET_FIND_WORDCHAR(interp, source, offset) ((CHARSET *)source->charset)->find_wordchar(interpreter, source, offset)
 #define CHARSET_FIND_NOT_WORDCHAR(interp, source, offset) ((CHARSET *)source->charset)->find_not_wordchar(interpreter, source, offset)

@@ -29,31 +29,7 @@ This file implements the charset functions for iso-8859-1 data
 #define EXCEPTION(err, str) \
     real_exception(interpreter, NULL, err, str)
 
-#define WHITESPACE 1
-#define WORDCHAR 2
-#define PUNCTUATION 4
-#define DIGIT 8
-
-static const unsigned char typetable[256] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, /* 0-15 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 16-31 */
-    1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, /* 32-47 */
-    0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 4, 4, 4, 4, 4, 4, /* 48 */
-    4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 64-79 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 2, /* 80-95 */
-    4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 95-111 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 0, /* 112-127 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 128-143 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 144-159 */
-    1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, /* 160-175 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, /* 176-191 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 192-207 */
-    2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, /* 208-223 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 224-239 */
-    2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, /* 240-255 */
-};
-
-
+#include "tables.h"
 
 static void
 set_graphemes(Interp *interpreter, STRING *source_string,
@@ -244,21 +220,21 @@ is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] & WORDCHAR) ? 1 : 0;
+    return (Parrot_iso_8859_1_typetable[codepoint] & WORDCHAR) == WORDCHAR;
 }
 
 static INTVAL
 find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_thing(interpreter, source_string, offset, WORDCHAR,
-            typetable);
+            Parrot_iso_8859_1_typetable);
 }
 
 static INTVAL
 find_not_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_not_thing(interpreter, source_string, offset, WORDCHAR,
-            typetable);
+            Parrot_iso_8859_1_typetable);
 }
 
 static INTVAL
@@ -266,14 +242,14 @@ is_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] == WHITESPACE);
+    return (Parrot_iso_8859_1_typetable[codepoint] & WHITESPACE) == WHITESPACE;
 }
 
 static INTVAL
 find_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_thing(interpreter, source_string, offset, WHITESPACE,
-            typetable);
+            Parrot_iso_8859_1_typetable);
 }
 
 static INTVAL
@@ -281,7 +257,7 @@ find_not_whitespace(Interp *interpreter, STRING *source_string,
         UINTVAL offset)
 {
     return ascii_find_not_thing(interpreter, source_string, offset,
-            WHITESPACE, typetable);
+            WHITESPACE, Parrot_iso_8859_1_typetable);
 }
 
 static INTVAL
@@ -289,21 +265,21 @@ is_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] & DIGIT) ? 1 : 0;
+    return (Parrot_iso_8859_1_typetable[codepoint] & DIGIT) == DIGIT;
 }
 
 static INTVAL
 find_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_thing(interpreter, source_string, offset, DIGIT,
-            typetable);
+            Parrot_iso_8859_1_typetable);
 }
 
 static INTVAL
 find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_not_thing(interpreter, source_string, offset, DIGIT,
-            typetable);
+            Parrot_iso_8859_1_typetable);
 }
 
 static INTVAL
@@ -311,14 +287,14 @@ is_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] == PUNCTUATION);
+    return (Parrot_iso_8859_1_typetable[codepoint] & PUNCTUATION) == PUNCTUATION;
 }
 
 static INTVAL
 find_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     return ascii_find_thing(interpreter, source_string, offset, PUNCTUATION,
-            typetable);
+            Parrot_iso_8859_1_typetable);
 }
 
 static INTVAL
@@ -326,7 +302,7 @@ find_not_punctuation(Interp *interpreter, STRING *source_string,
         UINTVAL offset)
 {
     return ascii_find_not_thing(interpreter, source_string, offset,
-            PUNCTUATION, typetable);
+            PUNCTUATION, Parrot_iso_8859_1_typetable);
 }
 
 static INTVAL
@@ -339,8 +315,33 @@ static INTVAL
 find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
   return ascii_find_word_boundary(interpreter, source_string,
-          offset, typetable);
+          offset, Parrot_iso_8859_1_typetable);
 }
+
+static INTVAL
+is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
+{
+    UINTVAL codepoint;
+    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+
+    if (codepoint >= sizeof(Parrot_ascii_typetable) / sizeof(Parrot_ascii_typetable[0])) {
+        return 0;
+    }
+    return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
+}
+
+static INTVAL
+find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+{
+    return -1;
+}
+
+static INTVAL
+find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
+{
+    return -1;
+}
+
 
 static STRING *
 string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
@@ -377,6 +378,9 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
         ascii_cs_index,
         ascii_cs_rindex,
         validate,
+	is_cclass,
+	find_cclass,
+	find_not_cclass,
         is_wordchar,
         find_wordchar,
         find_not_wordchar,

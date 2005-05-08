@@ -246,6 +246,45 @@ inline op exec(in STR) {
   goto NEXT();
 }
 
+=item B<is_cclass>(out INT, in INT, in STR, in INT)
+
+Set $1 to 1 if the codepoint of $3 at position $4 is in
+the character class(es) given by $2.
+
+=cut
+
+inline op is_cclass(out INT, in INT, in STR, in INT) {
+  $1 = Parrot_string_is_cclass(interpreter, $2, $3, $4);
+  goto NEXT();
+}
+
+=item B<find_cclass>(out INT, in INT, in STR, in INT, in INT)
+
+Set $1 to the offset of the first codepoint matching
+the character class(es) given by $2 in string $3, starting
+at offset $4 for up to $5 codepoints.  If no matching
+character is found, set $1 to -1.
+
+=cut
+
+inline op find_cclass(out INT, in INT, in STR, in INT, in INT) {
+  $1 = Parrot_string_find_cclass(interpreter, $2, $3, $4, $5);
+  goto NEXT();
+}
+
+=item B<find_not_cclass>(out INT, in INT, in STR, in INT, in INT)
+
+Set $1 to the offset of the first codepoint not matching
+the character class(es) given by $2 in string $3, starting
+at offset $4 for up to $5 codepoints.  If the substring
+consists entirely of matching characters, set $1 to -1.
+
+=cut
+
+inline op find_not_cclass(out INT, in INT, in STR, in INT, in INT) {
+  $1 = Parrot_string_find_not_cclass(interpreter, $2, $3, $4, $5);
+  goto NEXT();
+}
 
 =back
 

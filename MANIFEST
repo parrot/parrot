@@ -44,8 +44,11 @@ charset/ascii.c					  []
 charset/ascii.h					  []
 charset/binary.c				  []
 charset/binary.h				  []
+charset/gen_tables.pl				  [devel]
 charset/iso-8859-1.c				  []
 charset/iso-8859-1.h				  []
+charset/tables.c				  []
+charset/tables.h				  []
 charset/unicode.c				  []
 charset/unicode.h				  []
 classes/array.pmc                                 []
@@ -708,6 +711,7 @@ imcc/unit.h                                       []
 include/parrot/autoprefix.h			  [devel]include
 include/parrot/builtin.h			  [devel]include
 include/parrot/caches.h                           [devel]include
+include/parrot/cclass.h                           [devel]include
 include/parrot/charset.h			  [devel]include
 include/parrot/datatypes.h                        [devel]include
 include/parrot/debug.h                            [devel]include
@@ -1716,6 +1720,7 @@ t/op/rx.t                                         []
 t/op/spawnw.t                                     []
 t/op/stacks.t                                     []
 t/op/string.t                                     []
+t/op/string_cclass.t				  []
 t/op/string_cs.t                                  []
 t/op/stringu.t                                    []
 t/op/time.t                                       []

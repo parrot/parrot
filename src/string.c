@@ -2645,6 +2645,30 @@ Parrot_string_find_word_boundary(Interp *interpreter, STRING *s, INTVAL offset)
     return CHARSET_FIND_WORD_BOUNDARY(interpreter, s, offset);
 }
 
+INTVAL
+Parrot_string_is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *s, UINTVAL offset)
+{
+    if (!s)
+        return -1;
+    return CHARSET_IS_CCLASS(interpreter, flags, s, offset);
+}
+
+INTVAL
+Parrot_string_find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *s, UINTVAL offset, UINTVAL count)
+{
+    if (!s)
+        return -1;
+    return CHARSET_FIND_CCLASS(interpreter, flags, s, offset, count);
+}
+
+INTVAL
+Parrot_string_find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *s, UINTVAL offset, UINTVAL count)
+{
+    if (!s)
+        return -1;
+    return CHARSET_FIND_NOT_CCLASS(interpreter, flags, s, offset, count);
+}
+
 STRING*
 Parrot_string_trans_charset(Interp *interpreter, STRING *src,
         INTVAL charset_nr, STRING *dest)

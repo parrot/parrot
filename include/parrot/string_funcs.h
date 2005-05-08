@@ -102,6 +102,9 @@ void string_upcase_inplace(Interp *, STRING *);
 void string_downcase_inplace(Interp *, STRING *);
 void string_titlecase_inplace(Interp *, STRING *);
 
+INTVAL Parrot_string_is_cclass(Interp *, PARROT_CCLASS_FLAGS, STRING *, UINTVAL offset);
+INTVAL Parrot_string_find_cclass(Interp *, PARROT_CCLASS_FLAGS, STRING *, UINTVAL offset, UINTVAL count);
+INTVAL Parrot_string_find_not_cclass(Interp *, PARROT_CCLASS_FLAGS, STRING *, UINTVAL offset, UINTVAL count);
 INTVAL Parrot_string_is_whitespace(Interp *, STRING *, INTVAL offset);
 INTVAL Parrot_string_is_digit(Interp *, STRING *, INTVAL offset);
 INTVAL Parrot_string_is_wordchar(Interp *, STRING *, INTVAL offset);
