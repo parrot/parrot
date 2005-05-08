@@ -34,4 +34,5 @@ loop:
    $I1 = right
    $I2 = $I0 * $I1
    dest = $I2
+   .return (dest)
 .end

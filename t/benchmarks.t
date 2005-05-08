@@ -80,17 +80,6 @@ my %outputs = (
         StringArray:\s\d+\.\d+s\n$/x,
     q(arriter.imc)    => qq(100000\n100000\n100000\n111111\n),
     q(arriter_o1.imc) => qq(100000\n100000\n100000\n111111\n),
-    q(b60.imc)        => qq(),
-    q(b61.imc)        => qq(1000041\n),
-    q(b62.imc)        => qq(0\n),
-    q(b63.imc)        => qq(499999500000\n),
-    q(b64.imc)        => qq(0\n),
-    q(b65.imc)        => qq(0\n),
-    q(b6t.imc)        => qq(42 == 42
-        1000041 == 1000041
-        999999 == 999999
-        499999500000 == 499999500000
-        0 == 499999500000),
     q(bench_newp.pasm) => qr/^\d+\.\d+\sseconds.\s\d+\.\d+\sloops\/sec\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
         A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
@@ -162,15 +151,12 @@ my %outputs = (
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
-    q(hash-utf8.pasm) => qq(???),
     q(mops.pasm)      => qr/^Iterations:\s\s\s\s10000000\n
         Estimated\sops:\s20000000\n
         done\n
         Elapsed\stime:\s\s\d+\.\d+\n
         M\sop\/s:\s\s\s\s\s\s\s\s\d+\.\d+\n$/x,
-    q(oo1-prop.pasm) => qq(10\n),
     q(oo1.pasm)      => qq(10\n),
-    q(oo2-prop.pasm) => qq(),
     q(oo2.pasm)      => qq(10\n),
     q(oo3.pasm)      => qq(10\n),
     q(oo4.pasm)      => qq(500000\n),
@@ -233,7 +219,7 @@ foreach ( sort keys %outputs ) {
             my $file = q(examples/benchmarks/) . $_;
             open( BENCH, qq(examples/benchmarks/$_) )
               or die qq(Couldn't open $_:  $!.\n);
-            while ( my $line = <BENCH> ) { $bench .= $line; } 
+            while ( my $line = <BENCH> ) { $bench .= $line; }
             close( BENCH );
 
             if ( exists $filters{ $_ } ) {
