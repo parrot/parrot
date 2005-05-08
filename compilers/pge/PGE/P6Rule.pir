@@ -65,9 +65,9 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta['$7'] = $P0
     p6meta['$8'] = $P0
     p6meta['$9'] = $P0
-    # $P0 = find_global "PGE::P6Rule", "p6rule_parse_assert"      # XXX: TODO
-    # p6meta['<'] = $P0
-    # p6meta['>'] = u
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_subrule"      # XXX: TODO
+    p6meta['<'] = $P0
+    p6meta['>'] = u
     $P0 = find_global "PGE::P6Rule", "p6rule_parse_charclass"
     p6meta['\d'] = $P0
     p6meta['\D'] = $P0
@@ -202,6 +202,8 @@ only to the last character (and we handle that below in C<p6rule_parse_quant>.
     lit = ''
 
   literal:
+    $I0 = lex["ws"]
+    if $I0 goto literal_end
     pos = lex["pos"]
     c = substr pattern, pos, 1             # get current character
     if c == "\\" goto isslashmeta          # possibly a \ escape
@@ -322,13 +324,13 @@ subcaptures.
     .return (exp)
 .end
 
-=item C<p6rule_parse_assert(STR pattern, PMC lex)>
+=item C<p6rule_parse_subrule(STR pattern, PMC lex)>
 
-Parses an assertion (such as a subrule).
+Parses subrules.
 
 =cut
 
-.sub p6rule_parse_assert
+.sub p6rule_parse_subrule
     .param string pattern
     .param pmc lex
     .param string token
@@ -337,29 +339,36 @@ Parses an assertion (such as a subrule).
     p6rule_parse_skip(pattern, lex, 1)
     pos = lex["pos"]
     $I0 = pos
-  assert_1:
+  subrule_1:
     $I1 = is_wordchar pattern, pos 
-    unless $I1 goto assert_2
+    unless $I1 goto subrule_2
     inc pos
-    goto assert_1
-  assert_2:
+    goto subrule_1
+  subrule_2:
     $I1 = pos - $I0
-    if $I1 > 0 goto assert_3
+    if $I1 > 0 goto subrule_3
     p6rule_parse_error(pattern, lex, "invalid subrule name")
-  assert_3:
+  subrule_3:
     $P0 = find_global "PGE::Exp", "new"
     $P1 = $P0("PGE::Exp")
     exp = $P0("PGE::Exp::Group", $P1)
     $S0 = substr pattern, $I0, $I1
     exp["rname"] = $S0
     exp["cname"] = $S0
+    $I0 = exists lex["cname"]
+    unless $I0 goto subrule_4
+    $P0 = lex["cname"]
+    exp["cname"] = $P0
+  subrule_4:
     $S0 = substr pattern, pos, 1
-    if $S0 == '>' goto assert_4
+    if $S0 == '>' goto subrule_5
     p6rule_parse_error(pattern, lex, "missing closing '>'")
-  assert_4:
+    goto subrule_6
+  subrule_5:
     inc pos
-    $I1 = pos - $I0
-    p6rule_parse_skip(pattern, lex, $I1)
+    lex["pos"] = pos
+    p6rule_parse_skip(pattern, lex, 0)
+  subrule_6:
     .return (exp)
 .end
 
@@ -376,7 +385,6 @@ Parse an alias or backreference.
     .local int pos, plen
     .local int subp
     .local pmc exp
-   
 
     pos = lex["pos"]                               # get current position
     inc pos                                        # skip past '$'
@@ -618,6 +626,7 @@ will be coming soon.
 
 Parse a concatenated sequence of rule expressions, terminated
 by a closing group character, an alternation, or a conjunction.
+We also generate <?ws> rules as needed here.
 XXX: We need to add an option here to allow other characters to
 terminate the expression.
 
@@ -628,17 +637,30 @@ terminate the expression.
     .param pmc lex
     .local pmc exp
     .local pmc p6meta
+    .local int words
 
+    $P0 = find_global "PGE::Exp", "new"
+    words = lex["words"]
+    unless words goto concat_1
+    $I0 = lex["ws"]
+    unless $I0 goto concat_1
+    (exp) = $P0("PGE::Exp::WS")
+    lex["ws"] = 0
+    goto concat_2
+  concat_1:  
     (exp) = "p6rule_parse_quant"(pattern, lex)
+    unless words goto concat_2
+    $I0 = lex["ws"]
+    if $I0 goto concat_3
+  concat_2:
     $I0 = lex["pos"]
     $S0 = substr pattern, $I0, 1
     if $S0 == '' goto end
     $I0 = index "])|&", $S0
     if $I0 >= 0 goto end
-  concat:
-    ($P0) = "p6rule_parse_concat"(pattern, lex)
-    $P1 = find_global "PGE::Exp", "new"
-    (exp) = $P1("PGE::Exp::Concat", exp, $P0)
+  concat_3:
+    ($P1) = "p6rule_parse_concat"(pattern, lex)
+    (exp) = $P0("PGE::Exp::Concat", exp, $P1)
   end:
     .return (exp)
 .end
@@ -688,9 +710,21 @@ C<p6rule_parse_group> above.
 .sub "p6rule_parse_exp"
     .param string pattern
     .param pmc lex
+    .local int words
+    .local int pos
     .local pmc exp
 
+    words = lex["words"]
+    $I0 = lex["ws"]
+    if $I0 goto exp_1
+    pos = lex["pos"]
+    $S0 = substr pattern, pos, 2
+    unless $S0 == ':w' goto exp_1                  # XXX: only does ':w'
+    lex["words"] = 1
+    p6rule_parse_skip(pattern, lex, 2)
+  exp_1:
     (exp) = "p6rule_parse_alt"(pattern, lex)
+    lex["words"] = words
     .return (exp)
 .end
 
@@ -717,6 +751,8 @@ tree used to generate the rule (generally for debugging purposes).
     lex["subp"] = 0
     $I0 = length pattern
     lex["plen"] = $I0
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_skip"
+    $P0(pattern, lex, 0)
     $P0 = find_global "PGE::P6Rule", "p6rule_parse_exp"
     (exp) = $P0(pattern, lex)
 

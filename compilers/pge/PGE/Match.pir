@@ -34,16 +34,17 @@ given by C<yield>.
 .sub "start"
     .param string target                           # target
     .param pmc yield                               # coroutine
+    .param int pos                                 # where to start
+    .param int lastpos                             # length of target
     .local pmc me                                  # newly created match obj
     .local int offset                              # offset for attributes
-    .local int lastpos                             # length of target
 
     $P0 = new String
     $P0 = target
     $I0 = find_type "PGE::Match"
     me = new $I0, $P0
     setattribute me, "PGE::Match\x0&:yield", yield
-    yield(me, target, 0, lastpos)                  # start match
+    yield(me, target, pos, lastpos)                  # start match
     .return (me)
 .end
 
@@ -159,7 +160,7 @@ Returns the portion of the target string matched by this object.
     .return ("")
 .end
 
-=item C<__get_pmc_keyed_integer(INT key)>
+=item C<__get_pmc_keyed_int(INT key)>
 
 Returns the subpattern capture associated with key.  Note that
 this will return either a single Match object or an array of
@@ -178,7 +179,28 @@ match objects depending on the rule.
   end:
     .return ($P1)
 .end
-    
+
+=item C<__get_pmc_keyed_str(STR key)>
+
+Returns the subrule capture associated with C<key>.  Note that
+this can return either a single Match object or an array of
+Match objects depending on the rule.
+
+=cut
+
+.sub "__get_pmc_keyed_str" method
+    .param int key
+    .local pmc capt
+    capt = getattribute self, "PGE::Match\x0%:capt"
+    $P0 = capt[key]
+    $P1 = getprop "isarray", $P0
+    unless $P1 goto end
+    $P1 = $P1[-1]
+  end:
+    .return ($P1)
+.end
+
+
 =item C<dump()>
 
 Produces a data dump of the match object and all of its subcaptures.
