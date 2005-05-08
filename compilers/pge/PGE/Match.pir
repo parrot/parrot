@@ -160,46 +160,34 @@ Returns the portion of the target string matched by this object.
     .return ("")
 .end
 
-=item C<__get_pmc_keyed_int(INT key)>
+=item C<__get_pmc_keyed(PMC key)>
 
-Returns the subpattern capture associated with key.  Note that
-this will return either a single Match object or an array of
-match objects depending on the rule.
+Returns the subpattern or subrule capture associated with C<key>.  
+If the first character of C<key> is a digit then return the
+subpattern, otherwise return the subrule.  Note that this will 
+return either a single Match object or an array of match objects 
+depending on the rule.
 
 =cut
 
-.sub "__get_pmc_keyed_int" method
-    .param int key
+.sub "__get_pmc_keyed" method
+    .param pmc key
     .local pmc capt
+    $S0 = key
+    $I0 = is_digit $S0, 0
+    unless $I0 goto keyed_1
     capt = getattribute self, "PGE::Match\x0@:capt"
-    $P0 = capt[key]
-    $P1 = getprop "isarray", $P0
-    unless $P1 goto end
-    $P1 = $P1[-1]
-  end:
-    .return ($P1)
-.end
-
-=item C<__get_pmc_keyed_str(STR key)>
-
-Returns the subrule capture associated with C<key>.  Note that
-this can return either a single Match object or an array of
-Match objects depending on the rule.
-
-=cut
-
-.sub "__get_pmc_keyed_str" method
-    .param int key
-    .local pmc capt
+    goto keyed_2
+  keyed_1:
     capt = getattribute self, "PGE::Match\x0%:capt"
+  keyed_2:
     $P0 = capt[key]
     $P1 = getprop "isarray", $P0
-    unless $P1 goto end
-    $P1 = $P1[-1]
+    if $P1 goto end
+    $P0 = $P0[-1]
   end:
-    .return ($P1)
+    .return ($P0)
 .end
-
 
 =item C<dump()>
 

@@ -29,7 +29,8 @@ The distribution comes with a small F<demo.pir> program that gives an
 example of using PGE.  To run the demo, simply do 
 C<parrot demo.pir>.  The demo understands the following commands:
 
-    rule <pattern>    - a perl 6 rule to be matched
+    rule pattern      - compile a Perl 6 rule from "pattern"
+    save name         - save the current rule as "name"
     text              - a text string to match against previously entered rule
     pir               - display the PIR cod generated for current rule
     exp               - display the expression tree for the current rule
@@ -95,7 +96,7 @@ PGE doesn't (yet) properly handle nested repetitions of zero-length
 patterns in groups -- that's coming next.
 
 This is just the first-cut framework for building the 
-remainder of the engine, so many items (assertions, lookaround, 
+remainder of the engine, so many items (lookaround, 
 conjunctions, closures, character classes, and hypotheticals)
 just aren't implemented yet.  They're on their way!
 

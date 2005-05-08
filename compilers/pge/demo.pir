@@ -15,9 +15,12 @@
     find_global p6rule_compile, "PGE", "p6rule"
     istrace = 0
     null rulesub
+
+    (rulesub, pir, exp) = p6rule_compile("\w+")
+    store_global "ident", rulesub
    
   read_loop:
-    print "\ninput \"rule <pattern>\", \"glob <pattern>\", \"pir\",\n"
+    print "\ninput \"rule <pattern>\", \"save <name>\", \"pir\", \"exp\", \n"
     print "target string, \"trace\", or \"next\"\n"
     getstdin stdin
     readline x, stdin
@@ -31,6 +34,7 @@
     chopn x, 1
     if $S0 == "next" goto match_next
     if $S0 == "rule" goto make_p6rule
+    if $S0 == "save" goto save_rule
     if $S0 == "pir" goto print_pir
     if $S0 == "exp" goto print_exp
     if $S0 == "trace" goto toggle_trace
@@ -57,6 +61,16 @@
     pattern = substr x, 5
     (rulesub, pir, exp) = p6rule_compile(pattern)
     goto read_loop
+
+  save_rule:
+    isnull rulesub, match_nopattern
+    x = substr x, 5
+    store_global x, rulesub
+    print "Saved as "
+    print x
+    print "\n"
+    goto read_loop
+    
   
   print_pir:
     isnull rulesub, match_nopattern

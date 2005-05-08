@@ -830,7 +830,7 @@ register.
     .param pmc next
     .param pmc pad
     .local pmc exp1
-    .local int isarray
+    .local int isarray, psave
     .local pmc creps
     .local string cname
 
@@ -846,9 +846,9 @@ register.
     unless $I0 goto isarray_0                      # skip if no capture
     $P0 = self["cname"]
     cname = $P0
-    cname = concat "%", cname
     $I0 = isa $P0, "Integer"                       # Integer = subpattern cap
     if $I0 goto creps_2
+    cname = concat "%", cname
   creps_2:
     $I0 = exists creps[cname]                      # have seen capture name?
     unless $I0 goto creps_3                        #
@@ -859,20 +859,23 @@ register.
     creps[cname] = self                            # mark us for future ref
 
   isarray_0:
-    isarray = pad["isarray"]                       # set group's isarray
-    $I0 = self["isarray"]                          # and pass along to
-    isarray |= $I0                                 # nested objects
-    self["isarray"] = isarray
-    $I0 = self["cscope"]
-    unless $I0 goto isarray_1
+    psave = pad["isarray"]                         # get current isarray status
+    isarray = self["isarray"]                      # combine with group's
+    isarray |= psave                               # 
+    self["isarray"] = isarray                      # and pass to nested
+    pad["isarray"] = isarray
+    $I0 = self["cscope"]                           # new scope resets
+    unless $I0 goto isarray_1                      # array status
+    pad["isarray"] = 0
     isarray = 0                                    # each capt obj is single
     delete pad["creps"]                            # new lexical name scope
   isarray_1:
     $I0 = defined self["exp1"]
     unless $I0 goto end
     exp1 = self["exp1"]
-    pad["isarray"] = isarray
     exp1.analyze(next, pad)
+    pad["isarray"] = psave
+
   fc:
     $I0 = self["min"]                              # set up firstchars
     if $I0 > 0 goto fc_2
