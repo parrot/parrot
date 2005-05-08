@@ -33,7 +33,7 @@ To prepare a release:
 
 	i.  make realclean
 	    perl Configure.pl ...
-	    make -s all fulltest
+	    make -s all world fulltest
 
 	j.  [ leo: check that .skip-diffit is empty ]
 

@@ -74,24 +74,13 @@ So let's get ourselves a copy of Parrot, so that we can start
 investigating how to program in the Parrot assembler.
 
 Periodic, numbered releases will appear on CPAN (we're currently on
-version 0.1.2), but at this stage of the project an awful lot is
+version 0.2.0), but at this stage of the project an awful lot is
 changing between releases. To really keep up to date with Parrot,
-we should get our copy from the CVS repository. Here's how we do that:
+we should get our copy from the SVN repository. Here's how we do that:
 
- % cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public login
- (Logging in to anonymous@cvs.perl.org)
- CVS password: [ and here we just press return ]
- % cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public co parrot
- cvs server: Updating parrot
- U parrot/.cvsignore
- U parrot/Config_pm.in
- ....
+  svn co https://svn.perl.org/parrot/trunk parrot
 
-There's also a web interface to the CVS repository, available at
-http://cvs.perl.org/cvsweb/parrot/.
-
-For those of you who can't use CVS, there are CVS snapshots built every
-six hours which you can find at http://cvs.perl.org/snapshots/parrot/.
+You can find more instructions at: http://www.parrotcode.org/source.html
 
 Now we have downloaded Parrot, we need to build it; so:
 
@@ -422,17 +411,14 @@ your own PMC vtable classes.
 We've got a good number of people working away on Parrot, but we could
 always use a few more. To help out, you'll need a subscription to the
 perl6-internals mailing list, (C<perl6-internals@perl.org>), where all
-the development takes place. You should also keep up to date with the CVS
-version of Parrot; if you want to be alerted to CVS commits,
+the development takes place. You should also keep up to date with the SVN
+version of Parrot; if you want to be alerted to SVN commits,
 you can subscribe to the cvs-parrot mailing list (C<cvs-parrot@perl.org>).
-CVS commit access is given to those who take
+SVN commit access is given to those who take
 responsibility for a particular area of Parrot, or who often submit
 high-quality patches.
 
-A useful web page is L<http://cvs.perl.org>, which reminds you how to use CVS,
-and allows you to browse the CVS repository; the code page is a summary
-of this information and other resources about Parrot. Another good
-resource is L<http://www.parrotcode.org>.
+The projects home page is L<http://www.parrotcode.org>.
 
 So don't delay - pick up a Parrot today!
 

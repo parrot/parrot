@@ -1,3 +1,16 @@
+New in 0.2.0
+
+- parrot repository is now under subversion
+- MMD (Multi Method Dispatch) enhanced
+- new unary and infix opcodes that return new result PMCs
+- dynamic scalar PMCs inherit now almost all from Parrot core PMCs
+- more unification of PMCs and ParrotObjects
+- tailcalls for functions and methods
+- PGE (Parrot Grammar Engine) reworked
+- Pugs creates Parrot code and Pugs is a registered compiler now
+- new languages/lisp
+- the usual bug fixes and improvements
+
 New in 0.1.2
 
 - New string handling code. Strings now have charset and encoding

@@ -1,4 +1,4 @@
-This is Parrot, version 0.1.2
+This is Parrot, version 0.2.0
 -----------------------------
 
 Parrot is Copyright (C) 2001-2005 The Perl Foundation. All Rights Reserved.
@@ -21,10 +21,11 @@ the GNU General Public License or the Artistic License for more details.
 PREREQUISITES
 -------------
 
-You'll need a C compiler, a linker and a make program of course.  If you
-will be building the ICU library as part of parrot (this is the
-default), you will also need a C++ compiler and GNU make installed in
-your PATH as either 'gmake', 'make', or 'gnumake'.
+You'll need a C compiler, a linker and a make program of course. If you
+will be linking with the ICU library you have to download and install it
+before configuring Parrot.
+
+Get it from http://www-306.ibm.com/software/globalization/icu/downloads.jsp
 
 You'll also need Perl 5.6 or above to run various configure and
 build scripts.
@@ -62,7 +63,7 @@ For systems like HPUX that don't have inet_pton please run
 
 If you want to install Parrot into a non-standard location use
 
-    perl Configure.pl --prefix=/Users/foo/parrot-0.1.1
+    perl Configure.pl --prefix=/Users/foo/parrot-0.2.0
 
 Running Configure.pl will generate a config.h header, a Parrot::Config
 module, platform files and some Makefiles.
@@ -123,12 +124,7 @@ CHANGES
 -------
 
 For documentation on the user-visible changes between this version and
-previous versions, please see NEWS. The full changelog is (or should be)
-available as ChangeLog.
-
-CVS history can be browsed online at
-http://cvs.perl.org/viewcvs/cvs-public/parrot/ at
-http://bugs6.perl.org/cgi-bin/cvsmonitor/cvsmonitor.pl?cmd=viewBrowseModule&module=perlpublic.parrot .
+previous versions, please see NEWS.
 
 MAILING LISTS
 -------------
@@ -147,7 +143,6 @@ WEB SITES
 The following web sites have all the Parrot information you need:
     http://www.parrotcode.org/
     http://dev.perl.org/perl6/
-    http://cvs.perl.org/
     http://bugs6.perl.org/
     http://pugscode.org/
 
