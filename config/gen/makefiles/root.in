@@ -709,7 +709,10 @@ $(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/Op
 $(SRC_DIR)/pdb$(O) : $(GENERAL_H_FILES)
 
 $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDB) $(SRC_DIR)/pdb$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(PDB) \
+	$(SRC_DIR)/pdb$(O) \
+	$(SRC_DIR)/null_config$(O) \
+	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Disassembler
@@ -718,19 +721,28 @@ $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
 $(SRC_DIR)/disassemble$(O) : $(GENERAL_H_FILES)
 
 $(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(DIS) $(SRC_DIR)/disassemble$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(DIS) \
+	$(SRC_DIR)/disassemble$(O) \
+	$(SRC_DIR)/null_config$(O) \
+	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Dump
 #
 
 $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(PDUMP) \
+	$(SRC_DIR)/pdump$(O) \
+	$(SRC_DIR)/null_config$(O) \
+	$(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
 # pbc_info
 $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PINFO) $(SRC_DIR)/pbc_info$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+	$(LINK) ${ld_out}$(PINFO) \
+	$(SRC_DIR)/pbc_info$(O) \
+	$(SRC_DIR)/null_config$(O) \
+	$(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 ###############################################################################
 #
