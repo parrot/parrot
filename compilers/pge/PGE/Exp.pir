@@ -170,9 +170,9 @@ hint, then we have have no firstchars either.
 .sub "firstchars" method
     .param pmc exp1
     .param pmc exp2
-    $S0 = ""
-    if argcP < 1 goto end
+    if argcP < 1 goto exp_1
     $S0 = exp1["firstchars"]
+    unless $S0 > "" goto exp_1
     if argcP < 2 goto end
     $S1 = exp2["firstchars"]
     unless $S1 > "" goto exp_1
