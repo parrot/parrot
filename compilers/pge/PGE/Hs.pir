@@ -8,7 +8,7 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
         load_bytecode "PGE.pbc"
         $P0 = find_global "PGE::Hs", "match"
         $S0 = $P0("Hello", "(. $<named> := (.))")
-        print $S0   # Just (PGE_Match 0 2 [PGE_Match 0 2 [] [("named", PGE_Match 1 2 [] [])]] [])
+        print $S0   # PGE_Match 0 2 [PGE_Match 0 2 [] [("named", PGE_Match 1 2 [] [])]] []
     .end
 
 =head1 CAVEATS
@@ -18,14 +18,16 @@ whole thing may be taken out or refactored away at any moment.
 
 The Haskell-side data structure is defined thus:
 
-    data PGE = PGE_Match !Int !Int ![PGE] ![(String, PGE)]
+    data VMatch
+        = PGE_Match !Int !Int ![PGE] ![(String, PGE)]
+        | PGE_MatchFail
         deriving (Show, Eq, Ord, Read)
 
 =cut
 
 .namespace [ "PGE::Hs" ]
 
-.const string PGE_HS_UNDEF = "PGE_Match 0 0 [] []"
+.const string PGE_HS_FAIL = "PGE_MatchFail"
 
 .sub "__onload" 
     load_bytecode "library/Data/Escape.imc"
@@ -47,15 +49,14 @@ The Haskell-side data structure is defined thus:
     match = rulesub(x)
   match_result:
     unless match goto match_fail
-    out = "Just ("
     $S0 = match."dump_hs"()
     concat out, $S0
-    concat out, ")\n"
     goto end_match
   match_fail:
-    out = "Nothing\n"
+    out = PGE_HS_FAIL
     goto end_match
   end_match:
+    concat out, "\n"
     .return (out)
 .end
 
@@ -99,7 +100,7 @@ The Haskell-side data structure is defined thus:
     inc spi
     goto subpats_loop
   subpats_undef:
-    concat out, PGE_HS_UNDEF
+    concat out, PGE_HS_FAIL
     inc spi
     goto subpats_loop
 
@@ -127,7 +128,7 @@ The Haskell-side data structure is defined thus:
     concat out, ")"
     goto subrules_loop
   subrules_undef:
-    concat out, PGE_HS_UNDEF
+    concat out, PGE_HS_FAIL
     $S0 = shift iter
     goto subrules_loop
 
@@ -143,7 +144,7 @@ The Haskell-side data structure is defined thus:
   dumper_end:
     ret
   dumper_null:
-    concat out, PGE_HS_UNDEF
+    concat out, PGE_HS_FAIL
     ret
   dumper_array:
     concat out, "PGE_Match "
