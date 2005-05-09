@@ -1,14 +1,38 @@
-PERL = ${perl}
-RM_F = ${rm_f}
+# $Id$
+
+PERL   = ${perl}
+RM_F   = ${rm_f}
 PARROT = ../../parrot
+
+default: all
 
 all: build
 
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  build:             Create befunge.pbc"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  test:              run the test suite,"
+	@echo ""
+	@echo "  clean:             clean up temporary files"
+	@echo ""
+	@echo "  realclean:         clean up generated files"
+	@echo ""
+	@echo "  help:              print this help message"
+
 test: build
-	$(PARROT) befunge.pbc test.bef
+	cd .. && $(PERL) befunge/t/harness
+	# $(PARROT) befunge.pbc test.bef
 
 build: befunge.pasm debug.pasm flow.pasm io.pasm load.pasm maths.pasm stack.pasm
 	$(PARROT) -o befunge.pbc befunge.pasm
 
 clean:
 	$(RM_F) core *.pbc *~
+
+realclean: clean
+	$(RM_RF) Makefile
+

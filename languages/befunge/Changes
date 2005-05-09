@@ -1,6 +1,10 @@
 Revision history for a Befunge interpreter written for Parrot.
 
 0.2.0 Sat Oct 23 19:43:11 CEST 2004
+        Add t/harness and t/basic.t in order to be able to include
+        befunge in unified languages testing
+
+0.2.0 Sat Oct 23 19:43:11 CEST 2004
         Befunge-93 is now fully implemented!
         Thanks to Stepan Roh:
           - fixed input instruction (now that parrot does better i/o)

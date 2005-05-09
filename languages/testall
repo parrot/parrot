@@ -49,7 +49,6 @@ have already been built.
 # These could all be tested:
 #
 # BASIC                No t/harness
-# befunge              No t/harness
 # cola                 No t/harness
 # conversion           No t/harness
 # forth                No t/harness
@@ -64,7 +63,16 @@ have already been built.
 # ruby                No t/harness
 # tcl                 needs testing
 
-my @unified_testable_languages = qw( bf m4 parrot_compiler scheme urm );
+
+my @unified_testable_languages = 1 ?
+   qw( befunge
+       bf
+       m4
+       parrot_compiler
+       scheme
+       urm ) :
+   ( 'befunge' );
+
 my @harnesses =
     grep {-f $_}
         map { File::Spec->join($_,"t","harness") }

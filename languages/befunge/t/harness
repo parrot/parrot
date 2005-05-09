@@ -2,17 +2,16 @@
 
 =head1 NAME
 
-languages/scheme/t/harness - A harness for scheme
+languages/befunge/t/harness - A harness for befunge
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib scheme/t/harness --files
+  cd languages && perl -I../lib befunge/t/harness --files
 
-  cd languages && perl -I../lib scheme/t/harness 
+  cd languages && perl -I../lib befunge/t/harness 
 
-  cd languages && perl -I../lib scheme/t/harness \
-                   scheme/t/logic/basic.t \
-                   scheme/t/logic/defines.t
+  cd languages && perl -I../lib befunge/t/harness \
+                   befunge/t/basic.t
 
 =head1 DESCRIPTION
 
@@ -28,18 +27,18 @@ Otherwise I run the tests that were passed on the command line.
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin/..";;
+use lib "$FindBin::Bin/../../../lib";
 
 use Cwd();
 use File::Spec;
 use Test::Harness();
 
-my $language = 'scheme';
+my $language = 'befunge';
 
 if ( grep { m/^--files$/ } @ARGV ) {
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*', '*.t' ) );
+    my @files = glob( File::Spec->catfile( $dir, '*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
 } else { 
@@ -50,10 +49,10 @@ if ( grep { m/^--files$/ } @ARGV ) {
     } else {
         ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
         if ( $current_dir eq 'languages' ) {
-            @files = glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
+            @files = glob( File::Spec->catfile( $language, 't', '*.t' ) );
         }
         elsif ( $current_dir eq $language ) {
-            @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
+            @files = glob( File::Spec->catfile( 't', '*.t' ) );
         }
     }
     Test::Harness::runtests( @files ) if scalar( @files );
@@ -61,6 +60,6 @@ if ( grep { m/^--files$/ } @ARGV ) {
 
 =head1 SEE ALSO
 
-  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
+  F<languages/scheme/t/harness>
 
 =cut
