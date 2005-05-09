@@ -8,8 +8,13 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
         load_bytecode "PGE.pbc"
         $P0 = find_global "PGE::Hs", "match"
         $S0 = $P0("Hello\n", "H(.)llo(.)")
-        print $S0   # Just ((0, 2), [(0, 6), (1, 2), (5, 6)])
+        print $S0   # Just [(0, 6), (1, 2), (5, 6)]
     .end
+
+=head1 CAVEATS
+
+This is an initial skecth.  The dump format may change, and the
+whole thing may be taken out or refactored away at any moment.
 
 =cut
 
@@ -34,21 +39,10 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
     match = rulesub(x)
   match_result:
     unless match goto match_fail
-    out = "Just ((0, "
-    $I0 = match
-    capt = getattribute match, "PGE::Match\x0@:capt"
-    isnull capt, match_null
-    $I0 = elements capt
-    $S0 = $I0
-    concat out, $S0
-    goto match_dump
-  match_null:
-    concat out, "0"
-  match_dump:
-    concat out, "), ["
+    out = "Just ["
     $S0 = match."dump_hs"()
     concat out, $S0
-    concat out, "])\n"
+    concat out, "]\n"
     goto end_match
   match_fail:
     out = "Nothing\n"
