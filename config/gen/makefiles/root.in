@@ -224,6 +224,7 @@ GEN_SOURCES = \
     $(SRC_DIR)/jit_cpu.c \
     $(SRC_DIR)/parrot_config.c \
     $(SRC_DIR)/null_config.c \
+    $(SRC_DIR)/install_config.c \
     $(SRC_DIR)/exec_cpu.c
 
 GEN_MODULES = \
@@ -438,6 +439,7 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 # Executables
 PARROT          = $(CUR_DIR)/${test_prog}$(EXE)
 MINIPARROT      = $(CUR_DIR)/miniparrot$(EXE)
+INSTALLABLEPARROT      = $(CUR_DIR)/installable_parrot$(EXE)
 PARROT_SO       = $(CUR_DIR)/${test_prog}_so$(EXE)
 DIS             = $(CUR_DIR)/disassemble$(EXE)
 PDUMP           = $(CUR_DIR)/pdump$(EXE)
@@ -654,13 +656,32 @@ $(MINIPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	$(LINK) ${ld_out}$(MINIPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) \
 	    $(ALL_PARROT_LIBS) $(SRC_DIR)/null_config$(O)
 
+$(INSTALLABLEPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+		lib/Parrot/OpLib/core.pm $(SRC_DIR)/install_config$(O) \
+		$(PARROT)
+	$(LINK) ${ld_out}$(INSTALLABLEPARROT) $(LINKFLAGS) \
+		$(IMCC_DIR)/main$(O) \
+		$(ALL_PARROT_LIBS) $(SRC_DIR)/install_config$(O)
+
 $(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc
-	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > $(SRC_DIR)/parrot_config.c
+	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > \
+		$(SRC_DIR)/parrot_config.c
+
+$(SRC_DIR)/install_config.c :  install_config.fpmc
+	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --install > \
+		$(SRC_DIR)/install_config.c
 
 $(SRC_DIR)/null_config.c : myconfig
-	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --mini > $(SRC_DIR)/null_config.c
+	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --mini > \
+		$(SRC_DIR)/null_config.c
+
+install_config.fpmc : myconfig config_lib.pasm $(PARROT)
+	@echo Invoking Parrot to generate install_config.fpmc
+	$(PARROT) config_lib.pasm --install > $@
 
 $(SRC_DIR)/parrot_config$(O) : $(SRC_DIR)/parrot_config.c
+
+$(SRC_DIR)/install_config$(O) : $(SRC_DIR)/install_config.c
 
 $(SRC_DIR)/null_config.$(O) : $(SRC_DIR)/null_config.c
 
@@ -1252,7 +1273,10 @@ clean : \
 prog-clean :
 	$(RM_F) \
     $(O_FILES) \
-    $(PARROT) $(IMCC_DIR)/main$(O) \
+    $(PARROT) \
+    $(MINIPARROT) \
+    $(INSTALLABLEPARROT) \
+    $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/pdb$(O) \
@@ -1369,8 +1393,15 @@ lint2 : $(PARROT)
 #
 ###############################################################################
 
-install :
-	$(PERL) tools/dev/install_files.pl --buildprefix=$(BUILDPREFIX) --prefix=$(PREFIX) --exec-prefix=$(EXEC_PREFIX) --bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(INCLUDE_DIR) MANIFEST MANIFEST.generated
+install : $(INSTALLABLEPARROT)
+	$(PERL) tools/dev/install_files.pl \
+	    --buildprefix=$(BUILDPREFIX) \
+	    --prefix=$(PREFIX) \
+	    --exec-prefix=$(EXEC_PREFIX) \
+	    --bindir=$(BIN_DIR) \
+	    --libdir=$(LIB_DIR) \
+	    --includedir=$(INCLUDE_DIR) \
+	    MANIFEST MANIFEST.generated
 
 ###############################################################################
 #

@@ -173,6 +173,7 @@ while(<>) {
     if ($meta{lib}) {
         $dest = File::Spec->catdir($options{libdir}, $dest);
     } elsif ($meta{bin}) {
+	$dest =~ s/^installable_//;	# parrot with different config
         $dest = File::Spec->catdir($options{bindir}, $dest);
         if ($exe) {
            $src .= $exe;

@@ -1,4 +1,4 @@
-parrot                                            [main]bin
+installable_parrot                                [main]bin
 pdump                                             [main]bin
 pdb                                               [main]bin
 pbc_info                                          [main]bin

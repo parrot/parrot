@@ -12,6 +12,7 @@ build_tools/parrot_config_c.pl - Create src/parrot_config.c
 =head1 SYNOPSIS
 
     % perl build_tools/parrot_config_c.pl --mini > src/null_config.c
+    % perl build_tools/parrot_config_c.pl --install > src/install_config.c
     % perl build_tools/parrot_config_c.pl > src/parrot_config.c
 
 =head1 DESCRIPTION
@@ -26,8 +27,9 @@ For miniparrot a fake config file is written that contains just the interface.
 
 use strict;
 
-my ($mini_parrot);
+my ($mini_parrot, $install_parrot);
 $mini_parrot = 1 if (@ARGV && $ARGV[0] =~ /mini/);
+$install_parrot = 1 if (@ARGV && $ARGV[0] =~ /install/);
 
 print << "EOF";
 /*
@@ -48,7 +50,8 @@ if ($mini_parrot) {
     print "    0\n";
 }
 else {
-    my $image_file = 'runtime/parrot/include/config.fpmc';
+    my $image_file = $install_parrot ?
+	'install_config.fpmc' : 'runtime/parrot/include/config.fpmc';
     open F, $image_file or die "Can't read '$image_file': $!";
     my $image;
     local $/;
