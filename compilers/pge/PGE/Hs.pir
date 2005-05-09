@@ -115,7 +115,6 @@ whole thing may be taken out or refactored away at any moment.
     $S0 = $P1."dump_hs"()
     concat out, $S0
   dumper_end:
-    concat out, "]"
     ret
   dumper_null:
     concat out, "Match 0 0 []"
