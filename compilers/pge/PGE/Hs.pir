@@ -8,7 +8,7 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
         load_bytecode "PGE.pbc"
         $P0 = find_global "PGE::Hs", "match"
         $S0 = $P0("Hello\n", "H(.)llo(.)")
-        print $S0   # Just (Match 0 6 [Match 1 2 []], Match 5 6 []]])
+        print $S0   # Just (PGE_Match 0 6 [PGE_Match 1 2 []], PGE_Match 5 6 []]])
     .end
 
 =head1 CAVEATS
@@ -62,7 +62,7 @@ whole thing may be taken out or refactored away at any moment.
     out = ""
 
   start:
-    concat out, "Match "
+    concat out, "PGE_Match "
     $I0 = self."from"()
     $S0 = $I0
     concat out, $S0
@@ -119,7 +119,7 @@ whole thing may be taken out or refactored away at any moment.
     concat out, "]"
     ret
   dumper_array:
-    concat out, "Match "
+    concat out, "PGE_Match "
     $P1 = elm[0]
     $I0 = $P1."from"()
     $S0 = $I0
