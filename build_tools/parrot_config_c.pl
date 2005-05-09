@@ -1,29 +1,33 @@
 #! perl -w
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
+use strict;
+
+my ($svnid) = '$Id$' =~ /^\$[iI][dD]:\s(.*)\$$/;
 
 =head1 NAME
 
-build_tools/parrot_config_c.pl - Create parrot_config.c
+build_tools/parrot_config_c.pl - Create src/parrot_config.c
 
 =head1 SYNOPSIS
 
-    % perl build_tools/parrot_config_c.pl > src/parrot_config.h
+    % perl build_tools/parrot_config_c.pl --mini > src/null_config.c
+    % perl build_tools/parrot_config_c.pl > src/parrot_config.c
 
 =head1 DESCRIPTION
 
-Create F<src/parrot_config.h> with relevant runtime information like install
-prefix.
+Create F<src/parrot_config.c> with relevant runtime fro the config
+process. The created string contains a frozen image of the config hash.
+
+For miniparrot a fake config file is written that contains just the interface.
 
 =cut
 
 
 use strict;
-use lib 'lib';
-use Parrot::Config;
 
-my $prefix = $PConfig{'prefix'};
-$prefix = "" unless defined $prefix;
+my ($mini_parrot);
+$mini_parrot = 1 if (@ARGV && $ARGV[0] =~ /mini/);
 
 print << "EOF";
 /*
@@ -35,8 +39,41 @@ print << "EOF";
  *
  */
 
-static const char* runtime_prefix = \"$prefix\";
+#include "parrot/parrot.h"
 
+static const char parrot_config[] = {
+EOF
+
+if ($mini_parrot) {
+    print "    0\n";
+}
+else {
+    my $image_file = 'runtime/parrot/include/config.fpmc';
+    open F, $image_file or die "Can't read '$image_file': $!";
+    my $image;
+    local $/;
+    $_ = <F>;
+    close F;
+    my @c = split '';
+    printf '    ';
+    my $i;
+    for (@c) {
+	printf "0x%02x", ord($_);
+	++$i;
+	print ', ', if ($i < scalar(@c));
+	print "\n    " unless $i % 8;
+    }
+    print "\n";
+}
+
+print << "EOF";
+}; /* parrot_config */
+
+const char *
+parrot_get_config_cstring(Interp* interpreter)
+{
+    return parrot_config;
+}
 EOF
 
 

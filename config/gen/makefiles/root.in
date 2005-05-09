@@ -214,7 +214,6 @@ GEN_HEADERS = \
     $(INC_DIR)/vtable.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/oplib/ops.h \
-    $(SRC_DIR)/parrot_config.h \
     $(INC_DIR)/oplib/core_ops_switch.h
 
 GEN_SOURCES = \
@@ -223,6 +222,8 @@ GEN_SOURCES = \
     $(SRC_DIR)/nci.c \
     $(SRC_DIR)/core_ops_switch.c \
     $(SRC_DIR)/jit_cpu.c \
+    $(SRC_DIR)/parrot_config.c \
+    $(SRC_DIR)/null_config.c \
     $(SRC_DIR)/exec_cpu.c
 
 GEN_MODULES = \
@@ -436,6 +437,7 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 
 # Executables
 PARROT          = $(CUR_DIR)/${test_prog}$(EXE)
+MINIPARROT      = $(CUR_DIR)/miniparrot$(EXE)
 PARROT_SO       = $(CUR_DIR)/${test_prog}_so$(EXE)
 DIS             = $(CUR_DIR)/disassemble$(EXE)
 PDUMP           = $(CUR_DIR)/pdump$(EXE)
@@ -493,7 +495,15 @@ MAKE_C = ${make_c}
 #
 ###############################################################################
 
-all : flags_dummy $(PARROT) runtime/parrot/include/parrotlib.pbc runtime/parrot/include/config.fpmc docs $(LIBNCI_TEST_SO) $(GEN_LIBRARY) dynclasses compilers
+all :   flags_dummy \
+	$(PARROT) \
+	runtime/parrot/include/parrotlib.pbc \
+	runtime/parrot/include/config.fpmc \
+	docs \
+	$(LIBNCI_TEST_SO) \
+	$(GEN_LIBRARY) \
+	dynclasses \
+	compilers
 
 # constant string support
 .c.str :
@@ -625,14 +635,34 @@ flags_dummy :
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc $(PARROT)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.imc
 
-runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(PARROT)
+runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers
-	$(PARROT) config_lib.pasm
+	$(MINIPARROT) config_lib.pasm
 	@echo If the next line prints $(VERSION), it did help.
-	$(PARROT) parrot-config.imc VERSION DEVEL
+	$(MINIPARROT) parrot-config.imc VERSION DEVEL
 
-$(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
-	$(LINK) ${ld_out}$(PARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS)
+$(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+		lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
+		$(MINIPARROT)
+	$(LINK) ${ld_out}$(PARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) \
+	    $(ALL_PARROT_LIBS) $(SRC_DIR)/parrot_config$(O)
+#
+# TODO build the real miniparrot
+#
+$(MINIPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+		lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
+	$(LINK) ${ld_out}$(MINIPARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) \
+	    $(ALL_PARROT_LIBS) $(SRC_DIR)/null_config$(O)
+
+$(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc
+	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > $(SRC_DIR)/parrot_config.c
+
+$(SRC_DIR)/null_config.c :
+	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --mini > $(SRC_DIR)/null_config.c
+
+$(SRC_DIR)/parrot_config$(O) : $(SRC_DIR)/parrot_config.c
+
+$(SRC_DIR)/null_config.$(O) : $(SRC_DIR)/null_config.c
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -717,10 +747,8 @@ lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
 $(SRC_DIR)/fingerprint.c : $(BUILD_TOOLS_DIR)/fingerprint_c.pl PBC_COMPAT
 	$(PERL) $(BUILD_TOOLS_DIR)/fingerprint_c.pl > $(SRC_DIR)/fingerprint.c
 
-$(SRC_DIR)/parrot_config.h : $(BUILD_TOOLS_DIR)/parrot_config_c.pl config_lib.pasm
-	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > $(SRC_DIR)/parrot_config.h
 
-$(SRC_DIR)/revision.c : $(SVN_ENTRIES) $(BUILD_TOOLS_DIR)/revision_c.pl $(SRC_DIR)/parrot_config.h
+$(SRC_DIR)/revision.c : $(SVN_ENTRIES) $(BUILD_TOOLS_DIR)/revision_c.pl
 	$(PERL) -Ilib $(BUILD_TOOLS_DIR)/revision_c.pl > $(SRC_DIR)/revision.c
 
 ###############################################################################
@@ -776,7 +804,7 @@ $(SRC_DIR)/intlist$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/library$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/parrot_config.h
+$(SRC_DIR)/library$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) ${TEMP_jit_h} $(INC_DIR)/jit_emit.h
 

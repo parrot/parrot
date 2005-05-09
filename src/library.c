@@ -23,8 +23,6 @@ This file contains a C function to access parrot's bytecode library functions.
 #include <assert.h>
 #include "library.str"
 
-#include "parrot_config.h"
-
 #if 0
 /*
 
@@ -272,6 +270,8 @@ Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
     static const char *prefix;
     int free_env;
     char *env;
+
+    const char *runtime_prefix = "";   /* TODO */
 
     if (!*runtime_prefix)
 	return NULL;
