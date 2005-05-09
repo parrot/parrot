@@ -8,7 +8,7 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
         load_bytecode "PGE.pbc"
         $P0 = find_global "PGE::Hs", "match"
         $S0 = $P0("Hello\n", "H(.)llo(.)")
-        print $S0   # Just [(0, 6), (1, 2), (5, 6)]
+        print $S0   # Just (Match 0 6 [Match 1 2 []], Match 5 6 []]])
     .end
 
 =head1 CAVEATS
@@ -39,10 +39,10 @@ whole thing may be taken out or refactored away at any moment.
     match = rulesub(x)
   match_result:
     unless match goto match_fail
-    out = "Just ["
+    out = "Just ("
     $S0 = match."dump_hs"()
     concat out, $S0
-    concat out, "]\n"
+    concat out, ")\n"
     goto end_match
   match_fail:
     out = "Nothing\n"
@@ -54,79 +54,94 @@ whole thing may be taken out or refactored away at any moment.
 .namespace [ "PGE::Match" ]
 
 .sub "dump_hs" method
-    .local pmc capt
+    .local pmc capt, iter, elm
     .local int spi, spc
-    .local pmc iter
+    .local int ari, arc
     .local string out
 
     out = ""
 
-    unless argcS < 3 goto start
-    unless argcS < 2 goto start
   start:
-    $I0 = self
-    unless $I0 goto subpats
-    concat out, "("
+    concat out, "Match "
     $I0 = self."from"()
     $S0 = $I0
     concat out, $S0
-    concat out, ", "
+    concat out, " "
     $I0 = self."to"()
     $S0 = $I0
     concat out, $S0
-    concat out, ")"
+    concat out, " ["
 
   subpats:
     $I0 = self
     capt = getattribute self, "PGE::Match\x0@:capt"
-    isnull capt, subrules
+    isnull capt, end
     spi = 0
     spc = elements capt
-  subpats_1:
-    unless spi < spc goto subrules
+    goto subpats_body
+  subpats_loop:
+    unless spi < spc goto end
+    concat out, ", "
+  subpats_body:
     $S0 = spi
     $I0 = defined capt[spi]
     unless $I0 goto subpats_2
-    $P0 = capt[spi]
+    elm = capt[spi]
     bsr dumper
-  subpats_2:
     inc spi
-    goto subpats_1
+    goto subpats_loop
 
-  subrules:
-    capt = getattribute self, "PGE::Match\x0%:capt"
-    isnull capt, end
-    iter = new Iterator, capt
-    iter = 0
-  subrules_1:
-    unless iter goto end
-    $S0 = shift iter
-    $I0 = defined capt[$S0]
-    unless $I0 goto subrules_1
-    $P0 = capt[$S0]
-    bsr dumper
-    goto subrules_1
+# subrules:
+#   capt = getattribute self, "PGE::Match\x0%:capt"
+#   isnull capt, end
+#   iter = new Iterator, capt
+#   iter = 0
+# subrules_1:
+#   unless iter goto end
+#   $S0 = shift iter
+#   $I0 = defined capt[$S0]
+#   unless $I0 goto subrules_1
+#   $P0 = capt[$S0]
+#   bsr dumper
+#   goto subrules_1
 
   dumper:
-    $I0 = 0
-    $I1 = elements $P0
-    unless $I0 < $I1 goto dumper_1
-    $P1 = getprop "isarray", $P0
-    if $P1 goto dumper_2
-    $P1 = $P0[-1]
-    concat out, ", "
+    ari = 0
+    arc = elements elm
+    unless ari < arc goto dumper_end
+    $P1 = getprop "isarray", elm
+    if $P1 goto dumper_array
+    $P1 = elm[-1]
     $S0 = $P1."dump_hs"()
     concat out, $S0
-  dumper_1:
+    goto dumper_end
+  dumper_end:
+    concat out, "]"
     ret
-  dumper_2:
-    unless $I0 < $I1 goto dumper_1
-    $P1 = $P0[$I0]
+  dumper_array:
+    concat out, "Match "
+    $P1 = elm[0]
+    $I0 = $P1."from"()
+    $S0 = $I0
+    concat out, $S0
+    concat out, " "
+    $P1 = elm[-1]
+    $I0 = $P1."to"()
+    $S0 = $I0
+    concat out, $S0
+    concat out, " ["
+    goto dumper_array_body
+  dumper_array_loop:
+    unless ari < arc goto dumper_end
     concat out, ", "
+  dumper_array_body:
+    $P1 = elm[ari]
     $S0 = $P1."dump_hs"()
     concat out, $S0
-    inc $I0
-    goto dumper_2
+    inc ari
+    goto dumper_array_loop
+
   end:
+    concat out, "]"
     .return (out)
 .end
