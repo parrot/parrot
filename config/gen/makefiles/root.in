@@ -637,7 +637,7 @@ runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc $(PAR
 
 runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers
-	$(MINIPARROT) config_lib.pasm
+	$(MINIPARROT) config_lib.pasm > $@
 	@echo If the next line prints $(VERSION), it did help.
 	$(MINIPARROT) parrot-config.imc VERSION DEVEL
 
@@ -657,7 +657,7 @@ $(MINIPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 $(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > $(SRC_DIR)/parrot_config.c
 
-$(SRC_DIR)/null_config.c :
+$(SRC_DIR)/null_config.c : myconfig
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --mini > $(SRC_DIR)/null_config.c
 
 $(SRC_DIR)/parrot_config$(O) : $(SRC_DIR)/parrot_config.c

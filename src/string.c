@@ -274,7 +274,12 @@ void
 string_init(Parrot_Interp interpreter)
 {
     size_t i;
-#if PARROT_HAS_ICU
+    /*
+     * when string_init is called, the config hash isn't created
+     * so we can't get at the runtime path
+     * XXX do we still need this --leo
+     */
+#if 0
     char *data_dir;
     int free_data_dir = 0;
     union {
@@ -288,7 +293,7 @@ string_init(Parrot_Interp interpreter)
          */
         Parrot_charsets_encodings_init(interpreter);
 
-#if PARROT_HAS_ICU
+#if 0
         /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
            set through the $PARROT_ICU_DATA_DIR environment variable. Need
            a way to specify this via the command line as well. */

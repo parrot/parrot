@@ -159,15 +159,23 @@ F<include/parrot/library.h>.
 
 */
 
-char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
+char*
+Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
         enum_runtime_ft type)
 {
     char *full_name, *ext;
     const char **ptr;
     const char *prefix;
+    int free_prefix = 0;
     STRING *str;
     const char *include_paths[] = {
         "runtime/parrot/include/",
+        "runtime/parrot/",
+        "./",
+        NULL
+    };
+    const char *library_paths[] = {
+        "runtime/parrot/library/",
         "runtime/parrot/",
         "./",
         NULL
@@ -182,12 +190,17 @@ char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
 
     if (type & PARROT_RUNTIME_FT_DYNEXT)
         paths = dynext_paths;
+    else if (type & (PARROT_RUNTIME_FT_PBC | PARROT_RUNTIME_FT_SOURCE))
+        paths = library_paths;
     else
         paths = include_paths;
 
     prefix = Parrot_get_runtime_prefix(interpreter, NULL);
+    /* note: free prefix or better use the STRING interface */
     if (!prefix)
         prefix = "";
+    else
+        free_prefix = 1;
 
     ext = strchr(file_name, '.');
     /*
@@ -203,109 +216,107 @@ char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
     if (file_name[0] == '\\' || file_name[0] == '/' ||
         (isalpha(file_name[0]) &&
             (strncmp(file_name+1, ":\\", 2) == 0 ||
-             strncmp(file_name+1, ":/",  2) == 0))) {
+             strncmp(file_name+1, ":/",  2) == 0)))
 #else
-    if (file_name[0] == '/') {
+        if (file_name[0] == '/')
 #endif
-        length = strlen(file_name) + 1;
+        {
+            length = strlen(file_name) + 1;
+            full_name = mem_sys_allocate(length);
+            strcpy(full_name, file_name);
+            return full_name;
+        }
+
+        length = 0;
+        for (ptr = paths; *ptr; ++ptr) {
+            int len = strlen(*ptr);
+            length = (len > length) ? len : length;
+        }
+        length += strlen(prefix) + strlen(file_name) + 2;
         full_name = mem_sys_allocate(length);
-        strcpy(full_name, file_name);
-        return full_name;
-    }
 
-    length = 0;
-    for (ptr = paths; *ptr; ++ptr) {
-        int len = strlen(*ptr);
-        length = (len > length) ? len : length;
-    }
-    length += strlen(prefix) + strlen(file_name) + 2;
-    full_name = mem_sys_allocate(length);
-
-    for (ptr = paths; *ptr; ++ptr) {
-        strcpy(full_name, prefix);
-        if (*prefix) {
+        for (ptr = paths; *ptr; ++ptr) {
+            strcpy(full_name, prefix);
+            if (*prefix) {
 #ifdef WIN32
-            strcat(full_name, "\\");
+                strcat(full_name, "\\");
 #else
-            strcat(full_name, "/");
+                strcat(full_name, "/");
 #endif
-        }
-        strcat(full_name, *ptr);
-        strcat(full_name, file_name);
+            }
+            strcat(full_name, *ptr);
+            strcat(full_name, file_name);
 #ifdef WIN32
-        {
-            char *p;
-            while ( (p = strchr(full_name, '/')) )
-                *p = '\\';
-        }
+            {
+                char *p;
+                while ( (p = strchr(full_name, '/')) )
+                    *p = '\\';
+            }
 #endif
-        str = string_from_cstring(interpreter, full_name, strlen(full_name));
-        if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS))
-            return full_name;
-    }
-    /*
-     * finally if prefix is set, try current location
-     */
-    if (*prefix) {
-        strcpy(full_name, file_name);
+            str = string_from_cstring(interpreter, full_name, strlen(full_name));
+            if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
+                if (free_prefix)
+                    string_cstring_free(prefix);
+                return full_name;
+            }
+        }
+        /*
+         * finally if prefix is set, try current location
+         */
+        if (*prefix) {
+            strcpy(full_name, file_name);
 #ifdef WIN32
-        {
-            char *p;
-            while ( (p = strchr(full_name, '/')) )
-                *p = '\\';
-        }
+            {
+                char *p;
+                while ( (p = strchr(full_name, '/')) )
+                    *p = '\\';
+            }
 #endif
-        str = string_from_cstring(interpreter, full_name, strlen(full_name));
-        if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS))
-            return full_name;
-    }
-    return NULL;
+            str = string_from_cstring(interpreter, full_name, strlen(full_name));
+            if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS)) {
+                if (free_prefix)
+                    string_cstring_free(prefix);
+                return full_name;
+            }
+        }
+        if (free_prefix)
+            string_cstring_free(prefix);
+        return NULL;
 }
+
+/*
+
+=item C<const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix_str)>
+
+Returns a malloced string for the runtime prefix.
+
+=cut
+
+*/
 
 const char*
 Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
 {
-    static STRING *s;
-    static int init_done;
-    static const char *prefix;
-    int free_env;
-    char *env;
+    STRING *s, *key;
+    PMC *config_hash;
 
-    const char *runtime_prefix = "";   /* TODO */
+    config_hash = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
+            (INTVAL) IGLOBALS_CONFIG_HASH);
+    key = CONST_STRING(interpreter, "prefix");
+    if (!VTABLE_elements(interpreter, config_hash)) {
+        const char *pwd = "./";
+        char *ret;
 
-    if (!*runtime_prefix)
-	return NULL;
-    if (!init_done) {
-        /* stat()ing the top level directory doesn't work reliably as often
-           people create it before trying to run parrot, so it's empty
-           prior to install. Check that something has actually been installed
-           before deciding that this is where we're going to find ICU data
-           files etc. Currently we install the "TODO" file. So use that.
-           FIXME - this all needs revisiting, probably when the install is
-           tidied up. Really we should *always* be using the installed prefix,
-           and *always* overriding it during the make process to the local
-           copy. Other options are heuristics, and heuristics go wrong.
-        */
-        STRING *file_we_installed
-            = string_printf(interpreter, "%s/%s", runtime_prefix, "TODO");
-
-	init_done = 1;
-	prefix = runtime_prefix;
-	if (!Parrot_stat_info_intval(interpreter, file_we_installed,
-                                     STAT_EXISTS))
-	    prefix = NULL;
-        env = Parrot_getenv("PARROT_TEST", &free_env);
-        if (env) {
-            prefix = NULL;
-            if (free_env)
-                mem_sys_free(env);
-        }
-        if (prefix)
-            s = const_string(interpreter, runtime_prefix);
+        if (prefix_str)
+            *prefix_str = CONST_STRING(interpreter, pwd);
+        ret = mem_sys_allocate(3);
+        strcpy(ret, pwd);
+        return ret;
     }
+    s = VTABLE_get_string_keyed_str(interpreter, config_hash, key);
     if (prefix_str)
 	*prefix_str = s;
-    return prefix;
+    return string_to_cstring(interpreter, s);
 }
 
 /*

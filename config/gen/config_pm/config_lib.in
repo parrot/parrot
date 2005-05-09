@@ -1,12 +1,19 @@
+	set I10, P5     # argv
+	set I11, 0      # flag
+	le I10, 1, no_arg
+	set S10, P5[1]
+	ne S10, "--install", no_arg
+	set I11, 1      # install flag
+no_arg:
 	new P0, .Hash
 	new P1, .Undef
-	
+
 	<<HERE>>
-	
-	# XXX: this works only if parrot is run from its root directory
-	open P1, "runtime/parrot/include/config.fpmc", ">"
+
+	if I11, is_install
+	set S1, "<<PWD>>"
+	set P0["prefix"], S1
+is_install:
 	freeze S0, P0
-	print P1, S0
-	close P1
-	
+	print S0
 	end

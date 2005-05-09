@@ -27,6 +27,21 @@ I<What are these global variables?>
 /* These functions are defined in the auto-generated file core_pmcs.c */
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 
+static void
+create_config_hash(Interp *interpreter, PMC *iglobals)
+{
+    STRING *config = parrot_get_config_string(interpreter);
+    PMC *hash;
+
+    if (config) {
+        hash = Parrot_thaw(interpreter, config);
+    }
+    else
+        hash = pmc_new(interpreter, enum_class_Hash);
+    VTABLE_set_pmc_keyed_int(interpreter, iglobals,
+            (INTVAL) IGLOBALS_CONFIG_HASH, hash);
+
+}
 /*
 
 =item C<void init_world(Interp *interpreter)>
@@ -74,6 +89,10 @@ init_world(Interp *interpreter)
     PMC_data(self) = interpreter;
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,
             (INTVAL) IGLOBALS_INTERPRETER, self);
+    /*
+     * create runtime config hash
+     */
+    create_config_hash(interpreter, iglobals);
 }
 
 /*

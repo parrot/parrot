@@ -33,7 +33,7 @@ The parameter C<$description> should describe the test.
 
 =over 4
 
-=item C<pasm_output_is($code, $expected, $description)> or C<output_is($code, $expected, $description)> 
+=item C<pasm_output_is($code, $expected, $description)> or C<output_is($code, $expected, $description)>
 
 Runs the Parrot Assembler code and passes the test if a string comparison
 of the output with the expected result it true.
@@ -115,7 +115,7 @@ are being skipped. Just like in Test::More.
 
 =item C<run_command($command, %options)>
 
-Run the given $command in a cross-platform manner.  
+Run the given $command in a cross-platform manner.
 
 %options include...
 
@@ -158,7 +158,7 @@ require Test::More;
               pbc_output_is      pbc_output_like      pbc_output_isnt
               c_output_is        c_output_like        c_output_isnt
               language_output_is language_output_like language_output_isnt
-              skip 
+              skip
               slurp_file
 	      run_command
 	    );
@@ -532,8 +532,9 @@ sub _generate_functions {
                 return 0;
             }
 
+	    my $cfg = "src$PConfig{slash}parrot_config$PConfig{o}";
             $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} " .
-		   "$obj_f $PConfig{ld_out}$exe_f " .
+		   "$obj_f $cfg $PConfig{ld_out}$exe_f " .
 		   "$libparrot $iculibs $PConfig{libs}";
             $exit_code = run_command($cmd,
 		'STDOUT' => $build_f,

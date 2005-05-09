@@ -28,7 +28,8 @@ char* Parrot_locate_runtime_file(Interp *, const char *file_name,
         enum_runtime_ft);
 
 void Parrot_autoload_class(Interp *, STRING *class);
-const char * parrot_get_config_cstring(Interp* );
+STRING * parrot_get_config_string(Interp* );
+const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
 
 #endif /* PARROT_LIBRARY_H_GUARD */
 

@@ -69,10 +69,13 @@ else {
 print << "EOF";
 }; /* parrot_config */
 
-const char *
-parrot_get_config_cstring(Interp* interpreter)
+STRING*
+parrot_get_config_string(Interp* interpreter)
 {
-    return parrot_config;
+    if (!*parrot_config)
+	return NULL;
+    return string_from_const_cstring(interpreter,
+	parrot_config, sizeof(parrot_config));
 }
 EOF
 

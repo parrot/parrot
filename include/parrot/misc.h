@@ -164,10 +164,6 @@ STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
 
 #endif /* IN_SPF_SYSTEM */
 
-/*
- * generated src/parrot_config.c
- */
-const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
 
 /*
  * generated src/revision.c
