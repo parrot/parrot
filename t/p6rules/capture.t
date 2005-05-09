@@ -64,3 +64,5 @@ p6rule_like('bookkeeper', '[(.)$1]+',
 p6rule_like('bookkeeper', '[(.)$1]+', 
             qr/mob 0 2: <e @ 5>/, 'backref $1');
 
+p6rule_like('123x', '(.)*x',
+            qr/mob: <123x @ 0>/, 'repeated dot capture')
