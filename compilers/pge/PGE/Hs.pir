@@ -7,8 +7,8 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
     .sub _main
         load_bytecode "PGE.pbc"
         $P0 = find_global "PGE::Hs", "match"
-        $S0 = $P0("Hello", "(. $<named> := (.))")
-        print $S0   # PGE_Match 0 2 [PGE_Match 0 2 [] [("named", PGE_Match 1 2 [] [])]] []
+        $S0 = $P0("Hello", "(...)*$")
+        print $S0   # PGE_Match 2 5 "llo" [PGE_Array [PGE_Match 2 5 "llo" [] []]] []
     .end
 
 =head1 CAVEATS
@@ -19,15 +19,16 @@ whole thing may be taken out or refactored away at any moment.
 The Haskell-side data structure is defined thus:
 
     data VMatch
-        = PGE_Match !Int !Int ![VMatch] ![(String, VMatch)]
-        | PGE_MatchFail
+        = PGE_Match !Int !Int !String ![VMatch] ![(String, VMatch)]
+        | PGE_Array ![VMatch]
+        | PGE_Fail
         deriving (Show, Eq, Ord, Read)
 
 =cut
 
 .namespace [ "PGE::Hs" ]
 
-.const string PGE_HS_FAIL = "PGE_MatchFail"
+.const string PGE_FAIL = "PGE_Fail"
 
 .sub "__onload" 
     load_bytecode "library/Data/Escape.imc"
@@ -53,7 +54,7 @@ The Haskell-side data structure is defined thus:
     concat out, $S0
     goto end_match
   match_fail:
-    out = PGE_HS_FAIL
+    out = PGE_FAIL
     goto end_match
   end_match:
     concat out, "\n"
@@ -69,6 +70,7 @@ The Haskell-side data structure is defined thus:
     .local pmc capt, iter, elm, escape
 
     out = ""
+    escape = find_global "Data::Escape", "String"
 
   start:
     concat out, "PGE_Match "
@@ -79,7 +81,11 @@ The Haskell-side data structure is defined thus:
     $I0 = self."to"()
     $S0 = $I0
     concat out, $S0
-    concat out, " ["
+    concat out, " \""
+    $S0 = self
+    $S0 = escape($S0)
+    concat out, $S0
+    concat out, "\" ["
 
   subpats:
     $I0 = self
@@ -94,13 +100,13 @@ The Haskell-side data structure is defined thus:
   subpats_body:
     $S0 = spi
     $I0 = defined capt[spi]
-    unless $I0 goto subpats_undef
+    unless $I0 goto subpats_fail
     elm = capt[spi]
     bsr dumper
     inc spi
     goto subpats_loop
-  subpats_undef:
-    concat out, PGE_HS_FAIL
+  subpats_fail:
+    concat out, PGE_FAIL
     inc spi
     goto subpats_loop
 
@@ -110,7 +116,6 @@ The Haskell-side data structure is defined thus:
     isnull capt, end
     iter = new Iterator, capt
     iter = 0
-    escape = find_global "Data::Escape", "String"
     goto subrules_body
   subrules_loop:
     unless iter goto end
@@ -118,7 +123,7 @@ The Haskell-side data structure is defined thus:
   subrules_body:
     $S0 = shift iter
     $I0 = defined capt[$S0]
-    unless $I0 goto subrules_undef
+    unless $I0 goto subrules_fail
     elm = capt[$S0]
     concat out, "(\""
     $S0 = escape($S0)
@@ -127,40 +132,34 @@ The Haskell-side data structure is defined thus:
     bsr dumper
     concat out, ")"
     goto subrules_loop
-  subrules_undef:
-    concat out, PGE_HS_FAIL
+  subrules_fail:
+    concat out, PGE_FAIL
     $S0 = shift iter
     goto subrules_loop
 
   dumper:
     ari = 0
     arc = elements elm
-    unless ari < arc goto dumper_null
     $P1 = getprop "isarray", elm
     if $P1 goto dumper_array
+    unless ari < arc goto dumper_fail
     $P1 = elm[-1]
     $S0 = $P1."dump_hs"()
     concat out, $S0
   dumper_end:
     ret
-  dumper_null:
-    concat out, PGE_HS_FAIL
+  dumper_fail:
+    concat out, PGE_FAIL
+    ret
+  dumper_done:
+    concat out, "]"
     ret
   dumper_array:
-    concat out, "PGE_Match "
-    $P1 = elm[0]
-    $I0 = $P1."from"()
-    $S0 = $I0
-    concat out, $S0
-    concat out, " "
-    $P1 = elm[-1]
-    $I0 = $P1."to"()
-    $S0 = $I0
-    concat out, $S0
-    concat out, " ["
+    concat out, "PGE_Array ["
+    unless ari < arc goto dumper_done
     goto dumper_array_body
   dumper_array_loop:
-    unless ari < arc goto dumper_end
+    unless ari < arc goto dumper_done
     concat out, ", "
   dumper_array_body:
     $P1 = elm[ari]
