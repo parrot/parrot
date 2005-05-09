@@ -19,7 +19,7 @@ whole thing may be taken out or refactored away at any moment.
 The Haskell-side data structure is defined thus:
 
     data VMatch
-        = PGE_Match !Int !Int ![PGE] ![(String, PGE)]
+        = PGE_Match !Int !Int ![VMatch] ![(String, VMatch)]
         | PGE_MatchFail
         deriving (Show, Eq, Ord, Read)
 
