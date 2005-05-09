@@ -108,15 +108,17 @@ whole thing may be taken out or refactored away at any moment.
   dumper:
     ari = 0
     arc = elements elm
-    unless ari < arc goto dumper_end
+    unless ari < arc goto dumper_null
     $P1 = getprop "isarray", elm
     if $P1 goto dumper_array
     $P1 = elm[-1]
     $S0 = $P1."dump_hs"()
     concat out, $S0
-    goto dumper_end
   dumper_end:
     concat out, "]"
+    ret
+  dumper_null:
+    concat out, "Match 0 0 []"
     ret
   dumper_array:
     concat out, "PGE_Match "
