@@ -25,9 +25,12 @@ defined.
     load()
     load = find_global "PGE::P6Rule", "__onload"
     load()
+    load = find_global "PGE::Hs", "__onload"
+    load()
 .end
 
 .include "PGE/TokenHash.pir"
 .include "PGE/Exp.pir"
 .include "PGE/Match.pir"
 .include "PGE/P6Rule.pir"
+.include "PGE/Hs.pir"
