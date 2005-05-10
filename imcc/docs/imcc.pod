@@ -11,6 +11,8 @@ IMCC - documentation
 
 =item 0.1 initial
 
+=item 0.2 edited to specify .pir extension rather than .imc
+
 =back
 
 =head1 OVERVIEW
@@ -20,7 +22,7 @@ C<parrot> executable.
 
 IMCC compiles a language called Parrot Intermediate Representation (PIR).  PIR
 is the primary target of language implementations. PIR code files usually have
-the extension C<.imc>.
+the extension C<.pir>. At times in the past the extension C<.imc> was used as well, but C<.pir> is preferred.
 
 This document describes available IMCC documentation, located in
 F<parrot/imcc/docs> unless otherwise described. 
@@ -56,7 +58,7 @@ parrot's command line options.
 
 =head2 syntax.pod
 
-The syntax of C<.imc> files.
+The syntax of C<.pir> files.
 
 =head2 parrot/imcc/README
 

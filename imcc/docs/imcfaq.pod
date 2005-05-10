@@ -10,6 +10,10 @@ IMCC and Parrot Programming for Compiler Developers - Frequently Asked Questions
 
 Initial creation as of Parrot version 0.0.13 by Melvin Smith
 
+=item Revision 0.2 - 10 May 2005
+
+Edited to specify the .pir extension rather than .imc
+
 =back
 
 =head1 GENERAL QUESTIONS
@@ -26,10 +30,9 @@ The Parrot FAQ : http://www.parrotcode.org/faq/
 
 IMC stands for Intermediate Code; IMCC stands for Intermediate Code Compiler.
 You will also see the term PIR which is for Parrot Intermediate Representation
-and means the same as IMC, but for some each Parrot developer has his favorite
-term. PIR was the original term, where IMC seems to be the vernacular.
-It is an intermediate language that compiles either directly to Parrot Byte code,
-or translates to Parrot Assembly language. It is the preferred target language
+and means the same thing as IMC.
+
+It is an intermediate language that compiles either directly to Parrot Byte code, or translates to Parrot Assembly language. It is the preferred target language
 for compilers for the Parrot Virtual Machine. PIR is halfway between
 a High Level Language (HLL) and Parrot Assembly (PASM).
 
@@ -140,10 +143,10 @@ with no arguments or returns. Line comments are allowed in IMC using #.
 
 =head2 How do I compile and run an IMC module?
 
-Parrot uses the filename extension to detect whether the file is an IMC file (.imc),
+Parrot uses the filename extension to detect whether the file is an IMC file (.pir or the outdated .imc),
 a Parrot Assembly file (.pasm) or a pre-compiled bytecode file (.pbc).
 
-	parrot hello.imc
+	parrot hello.pir
 
 
 =head2 How do I see the assembly code that IMC generates?
@@ -158,15 +161,15 @@ Examples:
 
 =item Create the PASM source from IMC.
 
-	parrot -o hello.pasm hello.imc
+	parrot -o hello.pasm hello.pir
 
 =item Compile to bytecode from IMC.
 
-	parrot -o hello.pbc hello.imc
+	parrot -o hello.pbc hello.pir
 
 =item Dump PASM to screen (my favorite shortcut).
 
-	parrot -o - hello.imc
+	parrot -o - hello.pir
 
 =back
 
@@ -289,16 +292,16 @@ Parrot will fixup the symbol references at runtime.
 
 =head2 How can I make a library of IMC routines and include it in other Parrot/IMC programs?
 
-This one is very simple. Use the B<.include> directive to include other .imc source
+This one is very simple. Use the B<.include> directive to include other .pir source
 files. Do keep in mind that currently Parrot starts execution with the first
-sub it sees in the bytecode; so if your main includes external .imc files you need
+sub it sees in the bytecode; so if your main includes external .pir files you need
 to include them after your "main" start sub. If you .include them first (in
 typical C or Perl style), Parrot will execute the first sub in the first included
 source file. This is because B<.include> is a preprocessed directive and simply creates
-one huge .imc source module.
+one huge .pir source module.
 
 	#############################
-	# dynamic.imc
+	# dynamic.pir
 	#
 	.sub _dynamic
 	   print "_dynamic include and compilation\n"
@@ -310,7 +313,7 @@ one huge .imc source module.
 
 
 	#############################
-	# main.imc
+	# main.pir
 	#
 	# dynamic compilation with .include
 	#
@@ -320,7 +323,7 @@ one huge .imc source module.
 	   end
 	.end
 
-	.include "dynamic.imc"
+	.include "dynamic.pir"
 
 
 The C<.include> directive is not the long-term solution for working with
@@ -343,7 +346,7 @@ Parrot will support a cleaner way of doing this. For details of the Parrot calli
 conventions, see F<docs/pdds/pdd03_calling_conventions.pod>.
 
 	#######################################################
-	# main.imc
+	# main.pir
 	#
 	# External subs example
 	#
@@ -360,7 +363,7 @@ conventions, see F<docs/pdds/pdd03_calling_conventions.pod>.
 
 	   # _baz()      <-- this style doesn't work yet, but it will soon
 
-	   # Instead, retrieve the global sub that was defined in subs.imc by name
+	   # Instead, retrieve the global sub that was defined in subs.pir by name
 	   fun = global "_baz"
 
 	   # invokecc sets up the return continuation in P1 for the caller
@@ -380,7 +383,7 @@ conventions, see F<docs/pdds/pdd03_calling_conventions.pod>.
 
 
 	##################################
-	# subs.imc
+	# subs.pir
 	#
 	# Sample extern sub library
 	#

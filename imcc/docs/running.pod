@@ -21,6 +21,8 @@ Parrot - running
 
 =item 0.0.11 added runtime options
 
+=item 0.0.12 changed .imc to .pir
+
 =back
 
 =head1 OVERVIEW
@@ -222,12 +224,12 @@ assumed to know what to do with these.
 
  Command line		Action		Output
  ---------------------------------------------
- parrot x.imc		run
+ parrot x.pir		run
  parrot x.pasm		run
  parrot x.pbc		run
- -o x.pasm x.imc	ass		x.pasm
+ -o x.pasm x.pir	ass		x.pasm
  -o x.pasm y.pasm	ass		x.pasm
- -o x.pbc  x.imc	ass		x.pbc
+ -o x.pbc  x.pir	ass		x.pbc
  -o x.pbc  x.pasm	ass		x.pbc
  -o x.pbc -r x.pasm	ass/run pasm	x.pbc
  -o x.pbc -r -r x.pasm	ass/run pbc	x.pbc
