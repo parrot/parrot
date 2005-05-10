@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-dynclasses/build.pl - Build script for dynamic PMCs 
+build_tools/build_dynclasses.pl - Build script for dynamic PMCs 
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ our $LD_LOAD_FLAGS = qq[${ld_load_flags}];
 our $PERL = q[${perl}];
 our $LOAD_EXT = qq[${load_ext}];
 our $O = qq[${o}];
-our $LIBPARROT = qq[../src/extend${o}];
+our $LIBPARROT = qq[${build_dir}/src/extend${o}];
     # XXX: ultimately, this should be replaced with:
     #  $LIBPARROT = qq[-L../blib/lib -lparrot];
 our $CFLAGS = qq[${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}];

@@ -102,7 +102,7 @@ sub makefiles {
           commentType       => '#',
           replace_slashes   => 1, 
           conditioned_lines => 1);
-  genfile('config/gen/makefiles/dynclasses_pl.in' => 'dynclasses/build.pl',
+  genfile('config/gen/makefiles/dynclasses_pl.in' => 'build_tools/build_dynclasses.pl',
           commentType       => '#',
           replace_slashes   => 0, 
           conditioned_lines => 1);

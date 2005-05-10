@@ -36,17 +36,10 @@ PMCS = \
   pyproxytype \
   pyproxyclass \
   pyiter \
-  tclobject \
-  tclstring \
-  tclint \
-  tclfloat \
-  tcllist \
-  tclarray \
-  tclparser \
   subproxy \
   foo
 
-BUILD = ${perl} build.pl
+BUILD = $(PERL) ${build_dir}${slash}build_tools${slash}build_dynclasses.pl
 
 all :
 	@$(BUILD) generate $(PMCS)

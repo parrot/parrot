@@ -4,6 +4,19 @@ PARROT  = .${slash}parrot${exe}
 RELPATH = ..${slash}..${slash}
 MYPATH  = languages${slash}tcl${slash}
 LIBPATH  = $(MYPATH)lib${slash}
+BUILD   = $(PERL) ${build_dir}${slash}build_tools${slash}build_dynclasses.pl
+DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
+O       = ${o}
+CLASSDIR = classes${slash}
+
+PMCS = \
+ tclobject \
+ tclstring \
+ tclint \
+ tclfloat \
+ tcllist \
+ tclarray \
+ tclparser
 
 DEPS = $(RELPATH)$(PARROT) \
 lib${slash}commands${slash}append.imc \
@@ -52,8 +65,14 @@ lib${slash}string_to_list.imc \
 tcl.imc_template \
 tcl.pl
 
-tcl.pbc: lib${slash}tcllib.pbc lib${slash}tclword.pbc tcl.imc
+tcl.pbc: pmcs lib${slash}tcllib.pbc lib${slash}tclword.pbc tcl.imc
 	(cd $(RELPATH) && $(PARROT) --output=$(MYPATH)tcl.pbc $(MYPATH)tcl.imc)
+
+pmcs:
+	@cd $(CLASSDIR) && $(BUILD) generate $(PMCS)
+	@cd $(CLASSDIR) && $(BUILD) compile $(PMCS)
+	@cd $(CLASSDIR) && $(BUILD) linklibs $(PMCS)
+	@cd $(CLASSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
 lib${slash}tcllib.imc: $(DEPS)
 	$(PERL) tcl.pl > lib${slash}tcllib.imc
@@ -74,7 +93,7 @@ devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 clean:
-	$(RM_F) lib${slash}tcllib.imc tcl.pbc lib${slash}*.pbc
+	$(RM_F) lib${slash}tcllib.imc tcl.pbc lib${slash}*.pbc classes/*.c classes/*$(O)
 
 distclean: clean
 	$(RM_F) Makefile
