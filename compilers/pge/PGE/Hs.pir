@@ -55,6 +55,7 @@ The Haskell-side data structure is defined thus:
     find_global p6rule_compile, "PGE", "p6rule"
     null rulesub
 
+    push_eh match_error
     rulesub = p6rule_compile(pattern)
     match = rulesub(x)
   match_result:
@@ -65,6 +66,8 @@ The Haskell-side data structure is defined thus:
   match_fail:
     out = PGE_FAIL
     goto end_match
+  match_error:
+    out = P5
   end_match:
     concat out, "\n"
     .return (out)

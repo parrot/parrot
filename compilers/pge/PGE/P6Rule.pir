@@ -171,14 +171,19 @@ from errors in rule expressions still needs a fair amount of work
     .param pmc lex
     .param string message
 
-    print message
-    print " at offset "
+    $P0 = new Exception
+    $S0 = "PGE Parse error: "
+    $S0 .= message
+    $S0 .= " at offset "
     $I0 = lex["pos"]
-    print $I0
-    print " (found «"
-    $S0 = substr pattern, $I0, 1
-    print $S0
-    print "»)\n"
+    $S1 = $I0
+    $S0 .= $S1
+    $S0 .= " (found <<"
+    $S1 = substr pattern, $I0, 1
+    $S0 .= $S1
+    $S0 .= ">>)\n"
+    $P0["_message"] = $S0
+    throw $P0
 .end
 
 =item C<p6rule_parse_literal(STR pattern, PMC lex)>
