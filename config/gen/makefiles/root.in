@@ -438,7 +438,7 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 
 # Executables
 PARROT          = $(CUR_DIR)/${test_prog}$(EXE)
-MINIPARROT      = $(CUR_DIR)/miniparrot$(EXE)
+MINIPARROT      = $(CUR_DIR)${slash_exec}miniparrot$(EXE)
 INSTALLABLEPARROT      = $(CUR_DIR)/installable_parrot$(EXE)
 PARROT_SO       = $(CUR_DIR)/${test_prog}_so$(EXE)
 DIS             = $(CUR_DIR)/disassemble$(EXE)
@@ -1449,11 +1449,11 @@ miniparrot-update :
 #
 ###############################################################################
 
-exec : $(SRC_DIR)/exec_start$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(ALL_PARROT_LIBS)
+exec : $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(ALL_PARROT_LIBS)
 
 exec_so : $(SRC_DIR)/exec_start$(O) blib/lib/libparrot$(SHARE_EXT)
-	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) -lparrot $(C_LIBS)
+	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) -lparrot $(C_LIBS)
 
 ###### OS depend targets ##########
 
