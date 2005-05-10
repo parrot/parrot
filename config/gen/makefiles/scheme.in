@@ -4,8 +4,8 @@
 # Makefile for languages/scheme
 
 # Setup of some commands
-PERL = ${perl}
-RM_F = ${rm_f}
+PERL       = ${perl}
+RM_F       = ${rm_f}
 
 DIR        = languages/scheme
 TOOL_DIR   = ../..

@@ -1,12 +1,13 @@
 # $Id$
 
-PERL   = ${perl}
-RM_F   = ${rm_f}
-PARROT = ../../parrot
+# Makefile for languages/befunge
+
+# Setup of some commands
+PARROT     = ../../parrot
+PERL       = ${perl}
+RM_F       = ${rm_f}
 
 default: all
-
-all: build
 
 help :
 	@echo ""
@@ -23,16 +24,19 @@ help :
 	@echo ""
 	@echo "  help:              print this help message"
 
+
+all: build
+
 test: build
 	cd .. && $(PERL) befunge/t/harness
-	# $(PARROT) befunge.pbc test.bef
 
 build: befunge.pasm debug.pasm flow.pasm io.pasm load.pasm maths.pasm stack.pasm
 	$(PARROT) -o befunge.pbc befunge.pasm
 
 clean:
-	$(RM_F) core *.pbc *~
+	$(RM_F) core \
+    *.pbc \
+    *~
 
 realclean: clean
 	$(RM_RF) Makefile
-

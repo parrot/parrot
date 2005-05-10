@@ -101,7 +101,7 @@ LOOP_LINEFEED:
 LOOP_END:
         le I21, I20, LOOP
         concat S24, "\tend\n"
-        print S24
+        #print S24
         #end
         compreg P22, "PASM"
 	compile P0, P22, S24

@@ -55,7 +55,6 @@ have already been built.
 # jako                 No t/harness
 # lisp                 No t/harness
 # miniperl             No t/harness
-# ook                  No t/harness
 # parakeet             No t/harness
 # perl6                t/harness has no --files
 # python               needs testing
@@ -68,10 +67,11 @@ my @unified_testable_languages = 1 ?
    qw( befunge
        bf
        m4
+       ook
        parrot_compiler
        scheme
        urm ) :
-   ( 'befunge' );
+   ( 'ook' );
 
 my @harnesses =
     grep {-f $_}

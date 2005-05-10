@@ -1,14 +1,43 @@
-RM_F = ${rm_f}
-PERL = ${perl}
-PARROT = ../../parrot
+# $Id$
+
+# Makefile for languages/ook
+
+# Setup of some commands
+PARROT     = ../../parrot
+PERL       = ${perl}
+RM_F       = ${rm_f}
+
+default: all
+
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  build:             Create ook.pbc"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  test:              run the test suite,"
+	@echo ""
+	@echo "  clean:             clean up temporary files"
+	@echo ""
+	@echo "  realclean:         clean up generated files"
+	@echo ""
+	@echo "  help:              print this help message"
+
 
 all: build
 
 test: build
-	$(PARROT) -r ook.pasm test.ook
+	cd .. && $(PERL) ook/t/harness
 
 build: ook.pasm
 	$(PARROT) -o ook.pbc ook.pasm
 
 clean:
-	$(RM_F) core *.pbc *~ foo.p*
+	$(RM_F) core \
+    *.pbc \
+    *~ \
+    foo.p*
+
+realclean: clean
+	$(RM_RF) Makefile
