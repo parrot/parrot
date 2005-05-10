@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 47;
 
 ##############################
 # Parrot Calling Conventions
@@ -1547,3 +1547,63 @@ pir_output_is(<<'CODE', <<'OUT', "\@MAIN defined twice");
 CODE
 ok
 OUT
+
+pir_output_is(<<'CODE', <<'OUT', "\@ANON subpragma, syntax only");
+.sub anon @ANON
+    print "ok\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_like(<<'CODE', <<'OUT', "\@ANON doesn't install symbol 1");
+.sub main @MAIN
+    .local pmc result
+    result= find_global 'anon'
+    result()
+    print "\n"
+.end
+
+.sub anon @ANON
+    print "not ok\n"
+.end
+CODE
+/.*'anon'.*not found/
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "\@ANON doesn't install symbol 2");
+.sub main @MAIN
+    .local pmc result
+    result= find_global 'anon'
+    result()
+.end
+
+.sub anon
+    print "ok\n"
+.end
+
+.sub anon @ANON
+    print "not ok\n"
+.end
+CODE
+ok
+OUT
+
+pir_output_like(<<'CODE', <<'OUT', "multiple \@ANON subs with same name");
+.sub main @MAIN
+    .local pmc result
+    result= find_global 'anon'
+    result()
+.end
+
+.sub anon @ANON
+    print "nok 1\n"
+.end
+
+.sub anon @ANON
+    print "nok 2\n"
+.end
+CODE
+/.*'anon'.*not found/
+OUT
+

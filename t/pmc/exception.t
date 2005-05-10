@@ -447,7 +447,6 @@ CODE
 /main
 in coro
 back in main
-empty lexical pad
 /
 OUTPUT
 

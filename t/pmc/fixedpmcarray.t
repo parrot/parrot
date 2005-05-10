@@ -401,5 +401,5 @@ pir_output_like(<<'CODE', <<'OUTPUT', "Getting unitialized elements");
     print type_1956
 .end
 CODE
-/^Null PMC access in name()/
+/Null PMC access in name()/
 OUTPUT

@@ -110,6 +110,11 @@ Run this subroutine during the B<load_library> opcode.
 B<@LOAD> is ignored, if another subroutine in that file is marked with
 B<@MAIN>.
 
+=item * @ANON
+
+Do not install this subroutine in the namespace. Allows the subroutine
+name to be reused.
+
 =item * method
 
 Declare subroutine being a method.
