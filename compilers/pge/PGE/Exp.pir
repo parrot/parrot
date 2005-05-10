@@ -635,7 +635,7 @@ register.
     emit(code, test, label)
     emit(code, "    inc rep")
     emit(code, "    inc pos")
-    emit(code, "    goto %s_0")
+    emit(code, "    goto %s_0", label)
     emit(code, "  %s_f:", label)
     emit(code, "    goto fail")
 .end
