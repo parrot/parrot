@@ -1,7 +1,7 @@
 # Parrot md5sum; Nick Glencross <nickg@glencros.demon.co.uk>
 #                Improvements from Leo
 #
-# Harness for the library/Digest/MD5.imc library
+# Harness for the Digest/MD5.imc library
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ about ten-fold).
     .param pmc args
 
     .local int size
-    load_bytecode "library/Digest/MD5.imc"
+    load_bytecode "Digest/MD5.imc"
     # Argument count
     $I0 = args
     $I0 = $I0 - 1

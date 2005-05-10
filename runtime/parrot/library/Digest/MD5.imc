@@ -1,5 +1,5 @@
-# Parrot md5sum; Nick Glencross <nickg@glencros.demon.co.uk>
-#                Improvements from Leo and Jens Rieks
+# Parrot MD5 library; Nick Glencross <nickg@glencros.demon.co.uk>
+#                     Improvements from Leo and Jens Rieks
 #
 # Based on md5.c, from md5sum
 #           written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
@@ -10,30 +10,30 @@ MD5.imc - calculate MD5 checksums
 
 =head1 SYNOPSIS
 
-  load_bytecode "library/Digest/MD5.imc"
+  load_bytecode "Digest/MD5.imc"
   $P0 = _md5sum("foo")
   _md5_print($P0)
 
 or
 
-  load_bytecode "library/Digest/MD5.imc"
+  load_bytecode "Digest/MD5.imc"
   $P0 = _md5sum("bar")
   $S0 = _md5_hex($P0)
 
 =head1 DESCRIPTION
 
-This is a pure Parrot MD5 hash routine. Therefore you should run it
-with the JIT core if possible.
+This is a pure Parrot MD5 hash routine. You should run it with the JIT
+core if possible.
 
 =head1 SUBROUTINES
 
 =head2 _md5sum
 
-Pass in a string, returns an Integer array with the result
+Pass in a string, returns an Integer array with the result.
 
 =head2 _md5_hex
 
-Pass it the Integer array to get the checksum as string.
+Pass it the Integer array from _md5sum to get the checksum as string.
 
 =head2 _md5_print
 
@@ -41,13 +41,19 @@ Pass it the Integer array to print the checksum.
 
 =head1 BUGS
 
-Only tested so far on i386.
+This section provides a list of bugs.
 
 =over 4
 
-=item * Might work on 64 bit platforms
+=item *
 
-=item * Might not work on big endian systems (confirmed)
+By all accounts, doesn't seem to work on big endian systems, but I
+don't have access to investigate.
+
+=item *
+
+There is some scope to optimise things a little further, perhaps removing
+some of the 'and's (for 64-bit) which may be superflouous.
 
 =back
 
@@ -62,14 +68,6 @@ Only tested so far on i386.
     endian = 0
 
     $P0 = _config()
-
-#    $I0 = $P0["intvalsize"]
-#    if $I0 == 4 goto is_4byte_word
-#
-#    printerr "This doesn't seem to be a 32 bit processor: "
-#    printerr "Please verify the MD5 checksum\n"
-#
-#is_4byte_word:
 
     $I0 = $P0["bigendian"]
     unless $I0 goto is_little_endian
@@ -93,7 +91,7 @@ is_little_endian:
 .include "library/config.imc"
 
 ###########################################################################
-# Main entry point
+# Main backend entry point
 
 .namespace ["Digest"]
 
@@ -123,41 +121,41 @@ is_little_endian:
 
 # A parrot rol instruction might be good (as it can often be JIT'd)
 .macro rol (x,n,  out)
-    .out   = .x << .n
-    $I1000 = 32 - .n
-    $I1000 = .x >>> $I1000
-    .out  |= $I1000
+    .out  = .x << .n
+    tmp2  = 32 - .n
+    tmp2  = .x >>> tmp2
+    .out |= tmp2
 .endm
 
 .macro FF (b,c,d)
-    tmp = .c ~ .d
-    tmp = .b & tmp
-    tmp = .d ~ tmp
+    tmp1 = .c ~ .d
+    tmp1 = .b & tmp1
+    tmp1 = .d ~ tmp1
 .endm
 
 .macro FH (b,c,d)
-    tmp = .b  ~ .c
-    tmp = tmp ~ .d
+    tmp1 = .b   ~ .c
+    tmp1 = tmp1 ~ .d
 .endm
 
 .macro FI (b,c,d)
-    tmp = ~.d
-    tmp = .b | tmp
-    tmp = .c ~ tmp
+    tmp1 = ~.d
+    tmp1 = .b | tmp1
+    tmp1 = .c ~ tmp1
 .endm
 
 ###########################################################################
 # Higher level MD5 operations
 
 .macro common (a, b, k, s, T)
-    .a += tmp
+    .a += tmp1
     .a += .T
-    $I99 = .k + idx
-    tmp = buffer[$I99]
-    .a += tmp
+    tmp2 = .k + idx
+    tmp1 = buffer[tmp2]
+    .a += tmp1
     .a &= 0xffffffff
-    .rol (.a, .s, tmp)
-    .a  = .b + tmp
+    .rol (.a, .s, tmp1)
+    .a  = .b + tmp1
     .a &= 0xffffffff
 .endm
 
@@ -221,12 +219,12 @@ is_little_endian:
 .end
 
 ###########################################################################
-# Create a buffer from the requested buffer
+# Create an internal scratchpad buffer
 
 .sub _md5_create_buffer
     .param string str
-    .param pmc  buffer
-    .param int endian
+    .param pmc    buffer
+    .param int    endian
 
     .local int counter
     .local int subcounter
@@ -240,7 +238,7 @@ is_little_endian:
 
      # Work out how many words to allocate
      .local int words
-     words = len + 8
+     words = len   + 8
      words = words | 63
      words = words + 1
      words = words / 4
@@ -271,10 +269,10 @@ string_char:
 
      inc subcounter
      if subcounter != 4 goto md5_create_buffer_loop
-     if endian goto endian_ok
-     .swap (word)
-endian_ok:
 
+     if endian goto endian_ok1
+     .swap (word)
+endian_ok1:
 
      buffer[slow_counter] = word
 
@@ -294,6 +292,7 @@ md5_create_buffer_break:
      .local int shift
      shift = 8*subcounter
      word = word << shift
+
      if endian goto endian_ok2
      .swap (word)
 endian_ok2:
@@ -317,13 +316,13 @@ complete:
 ###########################################################################
 
 .sub _md5_process_buffer
-    .param pmc    context
+    .param pmc  context
     .param pmc  buffer
 
     .local int A, B, C, D
     .local int A_save, B_save, C_save, D_save
 
-    .local int tmp, idx, len
+    .local int tmp1, tmp2, idx, len
 
     idx = 0
     len = elements buffer
@@ -440,6 +439,7 @@ md5_loop:
 
     $P0 = new FixedIntegerArray
     $P0 = 4
+
     $P0[0] = A
     $P0[1] = B
     $P0[2] = C
@@ -451,7 +451,7 @@ md5_loop:
 
 ###########################################################################
 
-# Retrieve the final checksum
+# Retrieve the final checksum as a string
 
 .sub _md5_hex
     .param pmc context
@@ -477,7 +477,7 @@ dont_swap:
     .return($S0)
 .end
 
-# Convenience subroutine
+# Convenience subroutine to print the MD5 string
 
 .sub _md5_print
     .param pmc context

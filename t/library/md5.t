@@ -14,7 +14,6 @@ use Parrot::Test tests => 6;
 
 use Parrot::Config;
 
-my $intsize   = $PConfig{intsize};
 my $bigendian = $PConfig{bigendian};
 
 SKIP: {
