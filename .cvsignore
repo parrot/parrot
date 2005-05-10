@@ -1,8 +1,10 @@
+CFLAGS
+Makefile
 all_cstring.str
 blib
 config_lib.pasm
 libparrot.def
-Makefile
+miniparrot
 myconfig
 *.patch
 *.tmp
@@ -19,7 +21,6 @@ test.out
 test.pdb
 vc60.pdb
 vc70.pdb
-CFLAGS
 disassemble
 pbc_info
 pdb

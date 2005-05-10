@@ -1,4 +1,4 @@
 *.pasm
 *.pbc
 *.out
-*.imc
+*.pir

@@ -1,1 +1,3 @@
-testpars.pasm
+*.pasm
+*.out
+*.urm
