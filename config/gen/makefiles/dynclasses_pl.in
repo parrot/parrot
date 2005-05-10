@@ -40,7 +40,7 @@ if ($^O eq 'MSWin32') {
     $PATHQUOTE = '"';
     
     # Also need various libraries in the link line.
-    my $extraLibs = '${blib_lib_libparrot_a} ${libs} ${icu_shared}';
+    my $extraLibs = '${blib_lib_libparrot_a} ${libs} ${icu_shared} ..\\src\\parrot_config.obj';
     $extraLibs =~ s/blib/..\\blib/g;
     $extraLibs =~ s/\Q$(A)\E/.lib/g;
     $LD_LOAD_FLAGS =~ s/(-def:)/$extraLibs $1..\\/;
