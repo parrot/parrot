@@ -629,6 +629,7 @@ register.
     goto lazy_2
   lazy_1:
     emit(code, "    if rep >= %d goto %s", max, next)
+    emit(code, "    if pos >= lastpos goto fail")
     self.emitsub(code, next, "pos", "rep")
   lazy_2:
     emit(code, "  %s_1:", label)
