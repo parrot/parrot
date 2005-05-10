@@ -7,7 +7,8 @@ config/gen/revision.pl - Parrot's configure revision
 
 =head1 DESCRIPTION
 
-Determines parrot's revision.
+Determines parrot's SVN revision.  In a release, there
+are no .svn directories, so this field is empty.
 
 =cut
 
@@ -31,7 +32,7 @@ sub runstep {
     if ($revision >= 1) {
 	$Configure::Step::result = "r$revision";
     } else {
-	$Configure::Step::result = "failed";
+	$Configure::Step::result = "done";
     }
 }
 
