@@ -586,9 +586,6 @@ will be coming soon.
     goto quant_range_close
   quant_range_3:
     $S0 = substr pattern, pos, 2
-    print "SO="
-    print $S0
-    print "\n"
     unless $S0 == ".." goto quant_range_error
     pos = "p6rule_parse_skip"(pattern, lex, 2)
     $I0 = pos
