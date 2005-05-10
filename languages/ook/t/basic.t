@@ -27,4 +27,7 @@ is( Parrot::Test::slurp_file($out_f), << 'OUT', 'output from hello.ook' );
 Hello World!
 OUT
 
+# clean up
+unlink( $out_f );
+
 # TODO: test executing hello.ook

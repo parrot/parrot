@@ -26,3 +26,6 @@ my $exit_code = Parrot::Test::run_command(
 is( Parrot::Test::slurp_file($out_f), << 'OUT', 'output from test.bef' );
 If you can see a 4 here ->4 <- then everything is ok!
 OUT
+
+# clean up
+unlink( $out_f );
