@@ -45,7 +45,14 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
     return status;
 }
 
-void 
+INTVAL
+Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
+{
+    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
+	    "Parrot_Run_OS_Command_Argv not implemented");
+    return 0;
+}
+void
 Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command)
 {
 	int status;
@@ -56,7 +63,7 @@ Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command)
 	/* Grab string, extract command and parameters. */
 	char *curPos = in;
 	char *lastCommandStart = in;
-	char seekChar = 0; 
+	char seekChar = 0;
 	int argc = 1;
 	while (*curPos)
 	{
@@ -86,7 +93,7 @@ Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command)
 			tmp = mem_sys_allocate(1 + lenFound);
 			memcpy(tmp, lastCommandStart, lenFound);
 			*(tmp + lenFound) = 0;
-			
+
 			/* Is it command or argument? */
 			if (cmd == NULL)
 			{
