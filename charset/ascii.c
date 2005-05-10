@@ -555,6 +555,8 @@ static INTVAL
 is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
+
+    if (offset >= source_string->strlen) return 0;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
 
     if (codepoint >= sizeof(Parrot_ascii_typetable) / sizeof(Parrot_ascii_typetable[0])) {
@@ -566,14 +568,36 @@ is_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string,
 static INTVAL
 find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
 {
-    real_exception(interpreter, NULL, UNIMPLEMENTED, "unimplemented ascii:find_cclass");
+    UINTVAL pos = offset;
+    UINTVAL end = offset + count;
+    UINTVAL codepoint;
+
+    assert(source_string != 0);
+    end = source_string->strlen < end ? source_string->strlen : end;
+    for (; pos < end; ++pos) {
+	codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        if ((Parrot_ascii_typetable[codepoint] & flags) != 0) {
+            return pos;
+        }
+    }
     return -1;
 }
 
 static INTVAL
 find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_string, UINTVAL offset, UINTVAL count)
 {
-    real_exception(interpreter, NULL, UNIMPLEMENTED, "unimplemented ascii:find_not_cclass");
+    UINTVAL pos = offset;
+    UINTVAL end = offset + count;
+    UINTVAL codepoint;
+
+    assert(source_string != 0);
+    end = source_string->strlen < end ? source_string->strlen : end;
+    for (; pos < end; ++pos) {
+	codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, pos);
+        if ((Parrot_ascii_typetable[codepoint] & flags) == 0) {
+            return pos;
+        }
+    }
     return -1;
 }
 
