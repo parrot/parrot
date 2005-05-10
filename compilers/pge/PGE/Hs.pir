@@ -8,7 +8,7 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
         load_bytecode "PGE.pbc"
         $P0 = find_global "PGE::Hs", "match"
         $S0 = $P0("Hello", "(...)*$")
-        print $S0   # PGE_Match 2 5 "llo" [PGE_Array [PGE_Match 2 5 "llo" [] []]] []
+        print $S0   # PGE_Match 2 5 [PGE_Array [PGE_Match 2 5 [] []]] []
     .end
 
 =head1 CAVEATS
@@ -18,9 +18,9 @@ whole thing may be taken out or refactored away at any moment.
 
 The Haskell-side data structure is defined thus:
 
-    data VMatch
-        = PGE_Match !Int !Int !String ![VMatch] ![(String, VMatch)]
-        | PGE_Array ![VMatch]
+    data MatchPGE
+        = PGE_Match !Int !Int ![MatchPGE] ![(String, MatchPGE)]
+        | PGE_Array ![MatchPGE]
         | PGE_Fail
         deriving (Show, Eq, Ord, Read)
 
@@ -31,6 +31,15 @@ The Haskell-side data structure is defined thus:
 .const string PGE_FAIL = "PGE_Fail"
 
 .sub "__onload" @LOAD
+    .local pmc load
+    load = find_global "PGE::TokenHash", "__onload"
+    load()
+    load = find_global "PGE::Exp", "__onload"
+    load()
+    load = find_global "PGE::Match", "__onload"
+    load()
+    load = find_global "PGE::P6Rule", "__onload"
+    load()
     load_bytecode "library/Data/Escape.pbc"
 .end
 
@@ -81,11 +90,7 @@ The Haskell-side data structure is defined thus:
     $I0 = self."to"()
     $S0 = $I0
     concat out, $S0
-    concat out, " \""
-    $S0 = self
-    $S0 = escape($S0)
-    concat out, $S0
-    concat out, "\" ["
+    concat out, " ["
 
   subpats:
     $I0 = self
@@ -173,4 +178,7 @@ The Haskell-side data structure is defined thus:
     .return (out)
 .end
 
-.include "PGE.pir"
+.include "PGE/TokenHash.pir"
+.include "PGE/Exp.pir"
+.include "PGE/Match.pir"
+.include "PGE/P6Rule.pir"
