@@ -248,6 +248,10 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
 static char *
 emit_shift_i_r(char *pc, int opcode, int imm, int reg)
 {
+    if (opcode == emit_b000 && imm < 0) {
+        opcode = emit_b001;     /* -rol => 32 + ror */
+        imm = -imm;
+    }
     if(imm == 0)
     {
         /* noop */
@@ -987,6 +991,14 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 
 #  define emitm_sarl_r_m(pc, reg, b, i, s, d) \
     { pc = emit_shift_r_m(pc, emit_b111, reg, b, i, s, d); }
+
+/* rotate */
+
+#  define jit_emit_rol_ri_i(pc, reg, imm) \
+    { pc = emit_shift_i_r(pc, emit_b000, imm, reg); }
+
+#  define jit_emit_ror_ri_i(pc, reg, imm) \
+    { pc = emit_shift_i_r(pc, emit_b001, imm, reg); }
 
 static char *
 opt_shift_rr(Parrot_jit_info_t *jit_info, int dest, int count, int op)

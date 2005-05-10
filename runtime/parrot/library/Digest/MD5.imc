@@ -121,10 +121,11 @@ is_little_endian:
 
 # A parrot rol instruction might be good (as it can often be JIT'd)
 .macro rol (x,n,  out)
-    .out  = .x << .n
-    tmp2  = 32 - .n
-    tmp2  = .x >>> tmp2
-    .out |= tmp2
+    #.out  = .x << .n
+    #tmp2  = 32 - .n
+    #tmp2  = .x >>> tmp2
+    #.out |= tmp2
+    rot .out, .x, .n, 32
 .endm
 
 .macro FF (b,c,d)

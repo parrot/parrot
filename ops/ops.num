@@ -1342,3 +1342,6 @@ not_i                          1311
 not_p                          1312
 n_not_p_p                      1313
 spawnw_i_p                     1314
+rot_i_i_i_ic                   1315
+rot_i_ic_i_ic                  1316
+rot_i_i_ic_ic                  1317

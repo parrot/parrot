@@ -577,6 +577,10 @@ Parrot_lsr_i_i_ic {
     Parrot_binop_x_x_xc s/<_N>/_i/ s/<op>/lsr/ s/<typ>/*INT/
 }
 
+Parrot_rot_i_i_ic_ic {
+    Parrot_binop_x_x_xc s/<_N>/_i/ s/<op>/rol/ s/<typ>/*INT/
+}
+
 TEMPLATE Parrot_binop_x_xc_x {
     if (MAP[1] && MAP[3]) {
         if (MAP[1] == MAP[3]) {

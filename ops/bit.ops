@@ -307,6 +307,33 @@ inline op lsr(out INT, in INT, in INT) :base_core {
   goto NEXT();
 }
 
+=item B<rot>(out INT, in INT, in INT, inconst INT)
+
+Rotate $2 left or right by $3 and place result in $1.
+$4 is the amount of bits to rotate, 32 bit on a 32-bit CPU and 32 or 64
+on a 64-bit CPU. If the rotate count is negative a rotate right by ($3+$4)
+is performed.
+
+=cut
+
+inline op rot(out INT, in INT, in INT, inconst INT) {
+  INTVAL r = $2;
+  INTVAL s = $3;
+  INTVAL w = $4;
+  INTVAL d, t;
+  if (s < 0)
+    s += w;
+  d = r << s;
+  t = w - s;
+  t = (INTVAL)((UINTVAL)r >> t);
+  d |= t;
+  $1 = d;
+  goto NEXT();
+}
+
+
+}
+
 ########################################
 
 =item B<bxor>(inout INT, in INT)
