@@ -30,8 +30,8 @@ The Haskell-side data structure is defined thus:
 
 .const string PGE_FAIL = "PGE_Fail"
 
-.sub "__onload" 
-    load_bytecode "library/Data/Escape.imc"
+.sub "__onload" @LOAD
+    load_bytecode "library/Data/Escape.pbc"
 .end
 
 .sub "match" method
@@ -172,3 +172,5 @@ The Haskell-side data structure is defined thus:
     concat out, "]"
     .return (out)
 .end
+
+.include "PGE.pir"
