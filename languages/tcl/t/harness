@@ -25,7 +25,7 @@ if ($ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} !~ /\b--gc-debug\b/) {
   $ENV{TEST_PROG_ARGS} .= " --gc-debug"; 
 }
 
-if ( grep { /^-files$/ } @ARGV ) {
+if ( grep { /^--files$/ } @ARGV ) {
     # I must be running out of languages/
     my $dir = File::Spec->catfile( $language, "t" );
     my @files = glob( File::Spec->catfile( $dir, "*.t" ) );

@@ -60,7 +60,6 @@ have already been built.
 # python               needs testing
 # regex               No t/harness
 # ruby                No t/harness
-# tcl                 needs testing
 
 
 my @unified_testable_languages = 1 ?
@@ -70,8 +69,9 @@ my @unified_testable_languages = 1 ?
        ook
        parrot_compiler
        scheme
+       tcl
        urm ) :
-   ( 'ook' );
+   ( 'tcl' );
 
 my @harnesses =
     grep {-f $_}
