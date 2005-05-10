@@ -712,21 +712,32 @@ C<p6rule_parse_group> above.
 .sub "p6rule_parse_exp"
     .param string pattern
     .param pmc lex
-    .local int words
+    .local int words, ignorecase
     .local int pos
     .local pmc exp
 
     words = lex["words"]
+    ignorecase = lex["ignorecase"]
     $I0 = lex["ws"]
     if $I0 goto exp_1
+  exp_0:
     pos = lex["pos"]
     $S0 = substr pattern, pos, 2
-    unless $S0 == ':w' goto exp_1                  # XXX: only does ':w'
+    if $S0 == ':i' goto exp_i
+    if $S0 == ':w' goto exp_w
+    goto exp_1
+  exp_i:
+    lex["ignorecase"] = 1
+    p6rule_parse_skip(pattern, lex, 2)
+    goto exp_0
+  exp_w:
     lex["words"] = 1
     p6rule_parse_skip(pattern, lex, 2)
+    goto exp_0
   exp_1:
     (exp) = "p6rule_parse_alt"(pattern, lex)
     lex["words"] = words
+    lex["ignorecase"] = ignorecase
     .return (exp)
 .end
 
