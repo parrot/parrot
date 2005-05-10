@@ -17,7 +17,7 @@ type combinations.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Initialization, and integer tests");
@@ -280,4 +280,22 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 CODE
 1
 0
+OUTPUT
+
+pasm_output_is(<<'CODE', <<'OUTPUT', "True and False globals");
+        find_global P0, "True"
+        find_global P1, "False"
+
+        if P0, OK_1
+        print "not "
+OK_1:   print "ok 1\n"
+
+        unless P1, OK_2
+        print "not "
+OK_2:   print "ok 2\n"
+
+        end
+CODE
+ok 1
+ok 2
 OUTPUT
