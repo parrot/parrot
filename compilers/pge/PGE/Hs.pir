@@ -29,6 +29,8 @@ The Haskell-side data structure is defined thus:
 .namespace [ "PGE::Hs" ]
 
 .const string PGE_FAIL = "PGE_Fail"
+.const string PGE_SUB_POS = "PGE::Match\x0@:capt"
+.const string PGE_SUB_NAMED = "PGE::Match\x0%:capt"
 
 .sub "__onload" @LOAD
     .local pmc load
@@ -43,10 +45,23 @@ The Haskell-side data structure is defined thus:
     load_bytecode "library/Data/Escape.pbc"
 .end
 
+.sub "add_rule" method
+    .param string name
+    .param string pattern
+    .local pmc p6rule_compile, rulesub
+
+    find_global p6rule_compile, "PGE", "p6rule"
+    null rulesub
+    rulesub = p6rule_compile(pattern)
+    store_global name, rulesub
+
+    .return (name)
+.end
+
 .sub "match" method
     .param string x
     .param string pattern
-    .local string out
+    .local string out, tmps
     .local pmc rulesub
     .local pmc match
     .local pmc p6rule_compile
@@ -58,18 +73,23 @@ The Haskell-side data structure is defined thus:
     push_eh match_error
     rulesub = p6rule_compile(pattern)
     match = rulesub(x)
+
   match_result:
     unless match goto match_fail
-    $S0 = match."dump_hs"()
-    concat out, $S0
+    tmps = match."dump_hs"()
+    out .= tmps
     goto end_match
+
   match_fail:
     out = PGE_FAIL
     goto end_match
+
   match_error:
     out = P5
+
   end_match:
-    concat out, "\n"
+    out .= "\n"
+
     .return (out)
 .end
 
@@ -79,105 +99,104 @@ The Haskell-side data structure is defined thus:
     .local string out
     .local int spi, spc
     .local int ari, arc
-    .local pmc capt, iter, elm, escape
+    .local int tmpi, cond
+    .local string tmps, key
+    .local pmc capt, iter, elm, escape, is_array
 
     out = ""
     escape = find_global "Data::Escape", "String"
 
   start:
-    concat out, "PGE_Match "
-    $I0 = self."from"()
-    $S0 = $I0
-    concat out, $S0
-    concat out, " "
-    $I0 = self."to"()
-    $S0 = $I0
-    concat out, $S0
-    concat out, " ["
+    out .= "PGE_Match "
+    tmpi = self."from"()
+    tmps = tmpi
+    out .= tmps
+    out .= " "
+    tmpi = self."to"()
+    tmps = tmpi
+    out .= tmps
+    out .= " ["
 
   subpats:
-    $I0 = self
-    capt = getattribute self, "PGE::Match\x0@:capt"
+    capt = getattribute self, PGE_SUB_POS
     isnull capt, subrules
     spi = 0
     spc = elements capt
     goto subpats_body
   subpats_loop:
     unless spi < spc goto subrules
-    concat out, ", "
+    out .= ", "
   subpats_body:
-    $S0 = spi
-    $I0 = defined capt[spi]
-    unless $I0 goto subpats_fail
+    cond = defined capt[spi]
+    unless cond goto subpats_fail
     elm = capt[spi]
     bsr dumper
     inc spi
     goto subpats_loop
   subpats_fail:
-    concat out, PGE_FAIL
+    out .= PGE_FAIL
     inc spi
     goto subpats_loop
 
   subrules:
-    concat out, "] ["
-    capt = getattribute self, "PGE::Match\x0%:capt"
+    out .= "] ["
+    capt = getattribute self, PGE_SUB_NAMED
     isnull capt, end
     iter = new Iterator, capt
     iter = 0
     goto subrules_body
   subrules_loop:
     unless iter goto end
-    concat out, ", "
+    out .= ", "
   subrules_body:
-    $S0 = shift iter
-    $I0 = defined capt[$S0]
-    unless $I0 goto subrules_fail
-    elm = capt[$S0]
-    concat out, "(\""
-    $S0 = escape($S0)
-    concat out, $S0
-    concat out, "\", "
+    key = shift iter
+    cond = defined capt[key]
+    unless cond goto subrules_fail
+    elm = capt[key]
+    out .= '("'
+    tmps = escape(key)
+    out .= tmps
+    out .= '", '
     bsr dumper
-    concat out, ")"
+    out .= ")"
     goto subrules_loop
   subrules_fail:
-    concat out, PGE_FAIL
-    $S0 = shift iter
+    out .= PGE_FAIL
+    key = shift iter
     goto subrules_loop
 
   dumper:
     ari = 0
     arc = elements elm
-    $P1 = getprop "isarray", elm
-    if $P1 goto dumper_array
+    is_array = getprop "isarray", elm
+    if is_array goto dumper_array
     unless ari < arc goto dumper_fail
-    $P1 = elm[-1]
-    $S0 = $P1."dump_hs"()
-    concat out, $S0
-  dumper_end:
+    elm = elm[-1]
+    tmps = elm."dump_hs"()
+    out .= tmps
     ret
   dumper_fail:
-    concat out, PGE_FAIL
+    out .= PGE_FAIL
     ret
   dumper_done:
-    concat out, "]"
+    out .= "]"
     ret
   dumper_array:
-    concat out, "PGE_Array ["
+    out .= "PGE_Array ["
     unless ari < arc goto dumper_done
     goto dumper_array_body
   dumper_array_loop:
     unless ari < arc goto dumper_done
-    concat out, ", "
+    out .= ", "
   dumper_array_body:
-    $P1 = elm[ari]
-    $S0 = $P1."dump_hs"()
-    concat out, $S0
+    elm = elm[ari]
+    tmps = elm."dump_hs"()
+    out .= tmps
     inc ari
     goto dumper_array_loop
 
   end:
-    concat out, "]"
+    out .= "]"
     .return (out)
 .end
 
