@@ -194,7 +194,7 @@ Used to unarchive the object.
         (info->visit_pmc_now)(INTERP, *pos, info);
 
         /* 2) visit the attributes */
-        n = ATTRIB_COUNT(SELF);
+        n = PMC_int_val(SELF);
         for (i = POD_FIRST_ATTRIB; i < n; ++i) {
             info->thaw_ptr = class_data + i;
             (info->visit_pmc_now)(INTERP, class_data[i], info);
@@ -202,7 +202,7 @@ Used to unarchive the object.
     }
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        io->vtable->push_integer(INTERP, io, ATTRIB_COUNT(SELF));
+        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
     }
 
     void thaw(visit_info *info) {
@@ -213,7 +213,6 @@ Used to unarchive the object.
         else if (info->extra_flags == EXTRA_IS_NULL) {
             INTVAL n = io->vtable->shift_integer(INTERP, io);
             set_attrib_array_size(SELF, n);
-            ATTRIB_COUNT(SELF) = n;
         }
     }
 

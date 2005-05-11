@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 61;
+use Parrot::Test tests => 62;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1902,6 +1902,8 @@ CODE
 /Can't create new ParrotObject/
 OUTPUT
 
+#' for vim
+
 output_is(<<'CODE', <<'OUTPUT', "multpile anon classes - #33103");
      newclass P0, "City"
      subclass P1, P0
@@ -1940,4 +1942,58 @@ pir_output_is(<<'CODE', <<'OUTPUT', "subclassed Integer bug");
 .end
 CODE
 1 * 1 = 1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "short name attributes");
+    newclass P1, "Foo"
+    addattribute P1, "i"
+    addattribute P1, "j"
+    subclass P2, P1, "Bar"
+    addattribute P2, "k"
+    addattribute P2, "l"
+
+    find_type I0, "Bar"
+    new P2, I0
+
+    new P4, .Integer
+    set P4, 10
+    setattribute P2, "i", P4
+    new P4, .Integer
+    set P4, 11
+    setattribute P2, "j", P4
+    new P4, .Integer
+    set P4, 20
+    setattribute P2, "k", P4
+    new P4, .Integer
+    set P4, 21
+    setattribute P2, "l", P4
+
+    getattribute P6, P2, "i"
+    bsr l1
+    getattribute P6, P2, "j"
+    bsr l1
+
+    getattribute P6, P2, "k"
+    bsr l1
+    getattribute P6, P2, "l"
+    bsr l1
+
+    getattribute P6, P2, "Foo\0i"
+    bsr l1
+    getattribute P6, P2, "Bar\0k"
+    bsr l1
+    branch end
+l1:
+    print P6
+    print "\n"
+    ret
+end:
+    end
+CODE
+10
+11
+20
+21
+10
+20
 OUTPUT

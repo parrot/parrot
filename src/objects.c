@@ -58,87 +58,54 @@ clone_array(Interp* interpreter, PMC *source_array)
 static void
 rebuild_attrib_stuff(Interp* interpreter, PMC *class)
 {
-    INTVAL cur_offset = POD_FIRST_ATTRIB;
+    INTVAL cur_offset;
     SLOTTYPE *class_slots;
     PMC *attr_offset_hash;
     PMC *class_offset_hash;
-    PMC *parent_array;
-    PMC *a_parent_class;
+    PMC *mro;
     STRING *classname;
-    INTVAL class_offset;
-    INTVAL parent_class_count;
+    INTVAL n_class;
+    INTVAL n_mro;
+    PMC *attribs;
+    INTVAL attr_count;
+#ifndef NDEBUG
+    PMC *orig_class = class;
+#endif
 
     class_slots = PMC_data(class);
-    attr_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
+    attr_offset_hash = pmc_new(interpreter, enum_class_Hash);
+    set_attrib_num(class, class_slots, PCD_ATTRIBUTES, attr_offset_hash);
+
     class_offset_hash = pmc_new(interpreter, enum_class_Hash);
-    parent_array = class->vtable->mro;
-    parent_class_count = VTABLE_elements(interpreter, parent_array);
+    set_attrib_num(class, class_slots, PCD_ATTRIB_OFFS, class_offset_hash);
 
-    for (class_offset = 1; class_offset < parent_class_count; class_offset++) {
-        INTVAL parent_attr_count;
-        SLOTTYPE *parent_slots;
-        PMC *parent_attrib_array;
+    mro = class->vtable->mro;
+    n_mro = VTABLE_elements(interpreter, mro);
 
-        a_parent_class = VTABLE_get_pmc_keyed_int(interpreter,
-                parent_array, class_offset);
-        if (!PObj_is_class_TEST(a_parent_class)) {
-            /* this Class inherits from a PMC -
-             * no attributes there
-             */
-            break;
-        }
-        parent_slots = PMC_data(a_parent_class);
-        parent_attrib_array = get_attrib_num(parent_slots,
-                PCD_CLASS_ATTRIBUTES);
-        parent_attr_count = VTABLE_elements(interpreter,
-                parent_attrib_array);
-
-        /* If there are any parent attributes, then go add the
-           parent to this class' attribute info things */
-        if (parent_attr_count) {
-            STRING *parent_name;
-            INTVAL parent_offset;
-            STRING *partial_name;
-
-            parent_name = VTABLE_get_string(interpreter,
-                    get_attrib_num(parent_slots, PCD_CLASS_NAME));
-            /* Note the current offset as where this class'
-               attributes start */
-            VTABLE_set_integer_keyed_str(interpreter,
-                    class_offset_hash,
-                    parent_name, cur_offset);
-            partial_name = string_concat(interpreter, parent_name,
-                    string_from_cstring(interpreter, "\0", 1),
-                    0);
-            for (parent_offset = 0; parent_offset < parent_attr_count;
-                    parent_offset++) {
-                STRING *attr_name;
-                STRING *full_name;
-
-                attr_name = VTABLE_get_string_keyed_int(interpreter,
-                        parent_attrib_array, parent_offset);
-                full_name = string_concat(interpreter, partial_name,
-                        attr_name, 0);
-                VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash,
-                        full_name, cur_offset++);
-            }
+    /*
+     * walk from oldest parent downto n_class == 0 which is this class
+     */
+    cur_offset = 0;
+    for (n_class = n_mro - 1; n_class >= 0; --n_class) {
+        class = VTABLE_get_pmc_keyed_int(interpreter, mro, n_class);
+        if (!PObj_is_class_TEST(class)) {
+            /* this Class isa PMC - no attributes there
+            */
+            continue;
         }
 
-    }
-    /* Now append our own. To make things easier, we make sure we
-       always appear in the offset list, even if we don't have any
-       attributes. That way the append code for adding attributes to a
-       child class works better */
-    classname = VTABLE_get_string(interpreter, get_attrib_num(class_slots,
-                PCD_CLASS_NAME));
-    VTABLE_set_integer_keyed_str(interpreter, class_offset_hash, classname,
-            cur_offset);
-    {
-        PMC *attribs;
-        INTVAL attr_count;
-
+        class_slots = PMC_data(class);
+        classname = VTABLE_get_string(interpreter,
+                    get_attrib_num(class_slots, PCD_CLASS_NAME));
         attribs = get_attrib_num(class_slots, PCD_CLASS_ATTRIBUTES);
         attr_count = VTABLE_elements(interpreter, attribs);
+        /* Note the current offset as where this class'
+               attributes start */
+        if (attr_count || !n_class) {
+            VTABLE_set_integer_keyed_str(interpreter,
+                    class_offset_hash, classname,
+                    cur_offset + POD_FIRST_ATTRIB);
+        }
         if (attr_count) {
             STRING *partial_name;
             INTVAL offset;
@@ -154,17 +121,20 @@ rebuild_attrib_stuff(Interp* interpreter, PMC *class)
                         offset);
                 full_name = string_concat(interpreter, partial_name,
                         attr_name, 0);
+                /*
+                 * store this attribute with short and full name
+                 */
+                VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash,
+                        attr_name, cur_offset);
                 VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash,
                         full_name, cur_offset++);
             }
         }
     }
 
-    /* And replace what was in there with the new ones */
-    set_attrib_num(class, class_slots, PCD_ATTRIBUTES, attr_offset_hash);
-    set_attrib_num(class, class_slots, PCD_ATTRIB_OFFS, class_offset_hash);
+    assert(class == orig_class);
     /* And note the totals */
-    ATTRIB_COUNT(class) = cur_offset - POD_FIRST_ATTRIB;
+    ATTRIB_COUNT(class) = cur_offset;
 }
 
 /*
@@ -721,9 +691,6 @@ instantiate_object(Interp* interpreter, PMC *object, PMC *init)
     SET_CLASS(new_object_array, object, class);
     set_attrib_num(object, new_object_array, POD_CLASS_NAME, class_name);
 
-    /* Note the number of used slots */
-    ATTRIB_COUNT(object) = POD_FIRST_ATTRIB + attrib_count;
-
     /* We are an object now */
     PObj_is_object_SET(object);
 
@@ -1250,24 +1217,12 @@ Parrot_add_attribute(Interp* interpreter, PMC* class, STRING* attr)
      * while there are already child class attrs
      */
     idx = VTABLE_elements(interpreter, attr_hash);
-    assert(ATTRIB_COUNT(class) == idx);
-    /*
-     * attr_hash is an OrderedHash so the line below could be:
-     *
-     *   VTABLE_set_string_keyed_str(interpreter, attr_hash,
-     *        full_attr_name, attr);
-     *
-     * so that we have a mapping full_attr_name => attr_name
-     * the index is in the OrderedHash anyway
-     *
-     * if this isn't needed a plain hash is faster
-     *
-     * -leo
-     */
+    idx /= 2;
+    VTABLE_set_integer_keyed_str(interpreter, attr_hash,
+            attr, idx);
     VTABLE_set_integer_keyed_str(interpreter, attr_hash,
             full_attr_name, idx);
-    assert(idx + 1 == VTABLE_elements(interpreter, attr_hash));
-    ATTRIB_COUNT(class) = idx + 1;
+    ATTRIB_COUNT(class)++;
     return idx;
 }
 
@@ -1300,7 +1255,7 @@ Parrot_get_attrib_by_num(Interp* interpreter, PMC *object, INTVAL attrib)
      * object PMC
      */
     attrib_array = PMC_data(object);
-    attrib_count = ATTRIB_COUNT(object);
+    attrib_count = PMC_int_val(object);
     if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
         real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute #%d", (int)attrib);
@@ -1330,13 +1285,18 @@ attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
     b = hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(attr_hash), attr);
     if (b)
-        return VTABLE_get_integer(interpreter, (PMC*)b->value);
+        return PMC_int_val((PMC*)b->value);
 
     /* Create a delimiter for splitting up the Class\0attribute syntax. */
     delimit = string_from_cstring(interpreter, "\0", 1);
 
     /* Calculate the offset and the length of the attribute string. */
     idx  = string_str_index(interpreter, attr, delimit, 0) + 1;
+    if (!idx) {
+        real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
+                "No such attribute '%Ss'", attr_name);
+        return 0;
+    }
     length = string_length(interpreter, attr) - idx;
 
     /* Extract the attribute and object name. */
@@ -1385,7 +1345,7 @@ Parrot_set_attrib_by_num(Interp* interpreter, PMC *object,
     INTVAL attrib_count;
 
     attrib_array = PMC_data(object);
-    attrib_count = ATTRIB_COUNT(object);
+    attrib_count = PMC_int_val(object);
     if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
         real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute #%d", (int)attrib);
