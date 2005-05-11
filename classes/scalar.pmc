@@ -1274,14 +1274,10 @@ C<*value>.
 
 =over 4
 
-=item C<void logical_or(PMC *value, PMC *dest)>
+=item C<PMC* logical_or(PMC *value, PMC *dest)>
 
-Returns in C<*dest> the result of the logical C<OR> of the scalar and
-C<*value>.
-
-=item C<void i_logical_or(PMC *value)>
-
-Inplace logical or.
+Returns the result of the logical C<OR> of C<SELF> and C<value>, i.e. returns
+C<SELF> it is true or C<value>: C<dest> is alway ignored.
 
 =cut
 
@@ -1289,34 +1285,17 @@ Inplace logical or.
 
     PMC* logical_or (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
-            if (!dest)
-                return VTABLE_clone(INTERP, SELF);
-            VTABLE_assign_pmc(INTERP, dest, SELF);
+            return SELF;
         }
-        else {
-            if (!dest)
-                return VTABLE_clone(INTERP, value);
-            VTABLE_assign_pmc(INTERP, dest, value);
-        }
-        return dest;
-    }
-
-    void i_logical_or (PMC* value) {
-        if (!DYNSELF.get_bool()) {
-            VTABLE_assign_pmc(INTERP, SELF, value);
-        }
+        return value;
     }
 
 /*
 
 =item C< PMC* logical_and(PMC *value, PMC *dest)>
 
-Returns in C<*dest> the result of the logical C<AND> of the scalar and
-C<*value>.
-
-=item C< void i_logical_and(PMC *value)>
-
-Inplace logical and.
+Returns the result of the logical C<AND> of C<SELF> and C<value>, i.e.
+returns C<value> if C<SELF> is true else C<SELF>. C<dest> is always ignored.
 
 =cut
 
@@ -1324,34 +1303,16 @@ Inplace logical and.
 
     PMC* logical_and (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
-            if (!dest)
-                return VTABLE_clone(INTERP, value);
-            VTABLE_assign_pmc(INTERP, dest, value);
+            return value;
         }
-        else {
-            if (!dest)
-                return VTABLE_clone(INTERP, SELF);
-            VTABLE_assign_pmc(INTERP, dest, SELF);
-        }
-        return dest;
-    }
-
-    void i_logical_and (PMC* value) {
-        if (DYNSELF.get_bool()) {
-            VTABLE_assign_pmc(INTERP, SELF, value);
-        }
+        return SELF;
     }
 
 /*
 
 =item C<PMC* logical_xor(PMC *value, PMC *dest)>
 
-Returns in C<*dest> the result of the logical C<XOR> of the scalar and
-C<*value>.
-
-=item C<void i_logical_xor(PMC *value)>
-
-Inplace logical and.
+Returns the result of the logical C<XOR> of C<SELF> and C<*value>.
 
 =cut
 
@@ -1364,39 +1325,16 @@ Inplace logical and.
         value_bool = VTABLE_get_bool(INTERP, value);
 
         if (my_bool && ! value_bool) {
-            if (!dest)
-                return VTABLE_clone(INTERP, SELF);
-            VTABLE_assign_pmc(INTERP, dest, SELF);
+            return SELF;
         }
         else if (value_bool && ! my_bool) {
-            if (!dest)
-                return VTABLE_clone(INTERP, value);
-            VTABLE_assign_pmc(INTERP, dest, value);
+            return value;
         }
-        else {
-            if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
-            VTABLE_set_bool(INTERP, dest, 0);
-        }
+        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        VTABLE_set_bool(INTERP, dest, 0);
         return dest;
     }
 
-    void i_logical_xor (PMC* value) {
-        INTVAL my_bool, value_bool;
-
-        my_bool = DYNSELF.get_bool();
-        value_bool = VTABLE_get_bool(INTERP, value);
-
-        if (my_bool && ! value_bool) {
-            ; /* ok */
-        }
-        else if (value_bool && ! my_bool) {
-            VTABLE_assign_pmc(INTERP, SELF, value);
-        }
-        else {
-            VTABLE_set_bool(INTERP, SELF, 0);
-        }
-    }
 /*
 
 =item C<PMC* logical_not(PMC *dest)>

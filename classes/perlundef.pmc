@@ -408,40 +408,24 @@ value of C<*value> is false.
 
 =item C<PMC* logical_or(PMC *value, PMC *dest)>
 
-=item C<void i_logical_or(PMC *value)>
-
 =cut
 
 */
 
     PMC* logical_or (PMC* value,  PMC* dest) {
-        if (!dest)
-            return VTABLE_clone(INTERP, value);
-        VTABLE_assign_pmc(INTERP, dest, value);
-        return dest;
+        return value;
     }
 
-    void i_logical_or (PMC* value) {
-        VTABLE_assign_pmc(INTERP, SELF, value);
-    }
 /*
 
 =item C<PMC* logical_and(PMC *value, PMC *dest)>
-
-=item C<void i_logical_and(PMC *value)>
 
 =cut
 
 */
 
     PMC* logical_and (PMC* value,  PMC* dest) {
-        if (!dest)
-            return DYNSELF.clone();
-        VTABLE_assign_pmc(INTERP, dest, SELF);
-        return dest;
-    }
-
-    void i_logical_and (PMC* value) {
+        return SELF;
     }
 
 /*
@@ -456,8 +440,7 @@ value of C<*value> is false.
 
     PMC* logical_xor (PMC* value,  PMC* dest) {
 MMD_PerlUndef: {
-            if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_bool(INTERP, dest, 0);
             return dest;
         }
@@ -465,33 +448,16 @@ MMD_DEFAULT: {
 
             INTVAL value_bool = VTABLE_get_bool(INTERP, value);
             if (value_bool) {
-                if (!dest)
-                    return VTABLE_clone(INTERP, value);
-                VTABLE_assign_pmc(INTERP, dest, value);
-                return dest;
+                return value;
             }
             else {
-                if (!dest)
-                    dest = pmc_new(INTERP, SELF->vtable->base_type);
+                dest = pmc_new(INTERP, SELF->vtable->base_type);
                 VTABLE_set_bool(INTERP, dest, 0);
             }
             return dest;
         }
     }
 
-    void i_logical_xor (PMC* value) {
-MMD_PerlUndef: {
-            VTABLE_set_bool(INTERP, SELF, 0);
-        }
-MMD_DEFAULT: {
-
-        INTVAL value_bool = VTABLE_get_bool(INTERP, value);
-        if (value_bool)
-            VTABLE_assign_pmc(INTERP, SELF, value);
-        else
-            VTABLE_set_bool(INTERP, SELF, 0);
-        }
-    }
 /*
 
 =item C<PMC logical_not(PMC *dest)>

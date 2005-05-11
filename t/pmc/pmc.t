@@ -17,7 +17,7 @@ Contains a lot of Perl PMC related tests.
 
 =cut
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -523,4 +523,30 @@ output_is(<<'CODE', <<'OUT', "pmc constant PASM");
     end
 CODE
 42
+OUT
+
+output_is(<<'CODE', <<'OUT', "logical or, and, xor");
+    new P0, .Integer
+    set P0, 2
+    new P1, .Undef
+    or P2, P0, P1
+    eq_addr P2, P0, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    and P2, P0, P1
+    eq_addr P2, P1, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    xor P2, P0, P1
+    eq_addr P2, P0, ok3
+    print "not "
+ok3:
+    print "ok 3\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
 OUT

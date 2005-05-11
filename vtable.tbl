@@ -283,13 +283,10 @@ INTVAL cmp_num(PMC* value)                   MMD_NUMCMP
 INTVAL cmp_string(PMC* value)                MMD_STRCMP
 
 PMC* logical_or(PMC* value, PMC* dest)       MMD_LOR
-void i_logical_or(PMC* value)                MMD_I_LOR
 
 PMC* logical_and(PMC* value, PMC* dest)      MMD_LAND
-void i_logical_and(PMC* value)               MMD_I_LAND
 
 PMC* logical_xor(PMC* value, PMC* dest)      MMD_LXOR
-void i_logical_xor(PMC* value)               MMD_I_LXOR
 
 PMC* logical_not(PMC* dest)
 void i_logical_not()
