@@ -53,6 +53,8 @@ internal_exception(int exitcode, const char *format, ...)
     va_start(arglist, format);
     vfprintf(stderr, format, arglist);
     fprintf(stderr, "\n");
+    /* caution against output swap (with PDB_backtrace) */
+    fflush(stderr);
     va_end(arglist);
     Parrot_exit(exitcode);
 }
@@ -251,6 +253,10 @@ find_exception_handler(Interp * interpreter, PMC *exception)
             }
         }
     } while (1);
+    /* flush interpreter output to get things printed in order */
+    PIO_flush(interpreter, PIO_STDOUT(interpreter));
+    PIO_flush(interpreter, PIO_STDERR(interpreter));
+
     m = string_to_cstring(interpreter, message);
     exit_status = print_location = 1;
     if (m && *m) {
@@ -271,6 +277,8 @@ find_exception_handler(Interp * interpreter, PMC *exception)
     }
     if (m)
         string_cstring_free(m);
+    /* caution against output swap (with PDB_backtrace) */
+    fflush(stderr);
     if (print_location)
         PDB_backtrace(interpreter);
     /*
