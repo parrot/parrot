@@ -1,4 +1,4 @@
-use Parrot::Test 'no_plan';
+use Parrot::Test tests => 26;
 use Parrot::Test::PGE;
 
 $str = q{abc
@@ -36,3 +36,7 @@ p6rule_isnt($str, '\Babc', 'BOS nonword boundary');
 p6rule_isnt($str, 'ghi\B', 'EOS nonword boundary');
 p6rule_is  ($str, 'a\B',   '\w\w nonword boundary');
 p6rule_is  ($str, '-\B',   '\W\W nonword boundary');
+
+
+
+# dont forget to change the number of tests :-)

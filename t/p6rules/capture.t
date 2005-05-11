@@ -1,4 +1,4 @@
-use Parrot::Test 'no_plan';
+use Parrot::Test tests => 34;
 use Parrot::Test::PGE;
 
 p6rule_is  ('zzzabcdefzzz', '(a.)..(..)', 'basic match');
@@ -66,3 +66,7 @@ p6rule_like('bookkeeper', '[(.)$0]+',
 
 p6rule_like('123x', '(.)*x',
             qr/mob: <123x @ 0>/, 'repeated dot capture')
+
+
+
+# dont forget to change the number of test :-)
