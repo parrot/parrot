@@ -62,7 +62,7 @@ whole thing may be taken out or refactored away at any moment.
     load()
     load = find_global "PGE::P6Rule", "__onload"
     load()
-    load_bytecode "library/Data/Escape.pbc"
+    load_bytecode "library/Data/Escape.imc"
 .end
 
 .sub "add_rule" method
