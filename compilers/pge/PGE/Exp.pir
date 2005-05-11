@@ -14,6 +14,7 @@ expressions.  The classes currently include
     PGE::Scalar    - match a scalar
     PGE::Dot       - match any character
     PGE::CCShortcut - character class shortcuts (\d, \D, \w, etc.)
+    PGE::CharClass - character classes (<[abcde]>, <-[abcde]>)
     PGE::WS        - <?ws> rule
     PGE::Anchor    - matching of ^, ^^, $, $$, \b, \B anchors
     PGE::Cut       - :: and :::
@@ -44,6 +45,7 @@ functionality and correctness at the moment.
     $P0 = subclass expclass, "PGE::Exp::Scalar"
     $P0 = subclass expclass, "PGE::Exp::Dot"
     $P0 = subclass expclass, "PGE::Exp::CCShortcut"
+    $P0 = subclass expclass, "PGE::Exp::CharClass"
     $P0 = subclass expclass, "PGE::Exp::WS"
     $P0 = subclass expclass, "PGE::Exp::Anchor"
     $P0 = subclass expclass, "PGE::Exp::Cut"
@@ -639,6 +641,66 @@ register.
     emit(code, "    goto %s_0", label)
     emit(code, "  %s_f:", label)
     emit(code, "    goto fail")
+.end
+
+.namespace [ "PGE::Exp::CharClass" ]
+
+.sub gen method
+    .param pmc code
+    .param string label
+    .param string next
+    .local string token
+    .local int min, max, isgreedy, iscut
+    .local pmc emit
+    .local string charclass, charmatch
+    (min, max, isgreedy, iscut) = self."_getattributes"()
+    emit = find_global "PGE::Exp", "emit"
+    $P0 = find_global "Data::Escape", "String"
+    charclass = self["charclass"]
+    charclass = $P0(charclass, '"')
+    charmatch = self["charmatch"]
+    emit(code, "\n  %s:", label)
+    emit(code, "    rep = 0")
+    unless isgreedy goto lazy
+    emit(code, "  %s_1:", label)
+    emit(code, "    if pos >= lastpos goto %s_2", label)
+    emit(code, "    if rep >= %d goto %s_2", max, label)
+    emit(code, "    $S0 = substr target, pos, 1")
+    emit(code, "    $I0 = index \"%s\", $S0", charclass)
+    emit(code, "    %s $I0 == -1 goto %s_2", charmatch, label)
+    emit(code, "    inc pos")
+    emit(code, "    inc rep")
+    emit(code, "    goto %s_1", label)
+    emit(code, "  %s_2:", label)
+    emit(code, "    if rep < %d goto fail", min)
+    unless iscut goto greedy_1
+    emit(code, "    goto %s", next)
+    .return ()
+  greedy_1:
+    emit(code, "    if rep == %d goto %s", min, next)
+    self.emitsub(code, next, "pos", "rep")
+    emit(code, "    dec pos")
+    emit(code, "    dec rep")
+    emit(code, "    goto %s_2", label)
+    .return ()
+  lazy:
+    emit(code, "  %s_0:", label)
+    emit(code, "    if rep < %d goto %s_1", min, label)
+    unless iscut goto lazy_1
+    emit(code, "    goto %s", next)
+    goto lazy_2
+  lazy_1:
+    emit(code, "    if rep >= %d goto %s", max, next)
+    emit(code, "    if pos > lastpos goto fail")
+    self.emitsub(code, next, "pos", "rep")
+  lazy_2:
+    emit(code, "  %s_1:", label)
+    emit(code, "    $S0 = substr target, pos, 1")
+    emit(code, "    $I0 = index \"%s\", pos")
+    emit(code, "    %s $I0 == -1 goto fail", charmatch)
+    emit(code, "    inc rep")
+    emit(code, "    inc pos")
+    emit(code, "    goto %s_0", label) 
 .end
 
 .namespace [ "PGE::Exp::WS" ]

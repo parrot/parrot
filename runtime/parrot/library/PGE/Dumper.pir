@@ -83,6 +83,23 @@ PGE::Dumper - various methods for displaying PGE structures
     print "\n"
 .end
 
+.namespace [ "PGE::Exp::CharClass" ]
+
+.sub dump method
+    .param int indent
+    self."dumpindent"(indent)
+    print "CharClass "
+    $S0 = self["charmatch"]
+    print $S0
+    print " «"
+    $S0 = self["charclass"]
+    print $S0
+    print "» "
+    $S0 = self."quant"()
+    print $S0
+    print "\n"
+.end
+
 .namespace [ "PGE::Exp::WS" ]
 
 .sub "dump" method

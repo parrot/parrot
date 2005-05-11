@@ -17,6 +17,7 @@ defined.
 
 .sub "__onload" @LOAD
     .local pmc load
+    load_bytecode "Data/Escape.imc"
     load = find_global "PGE::TokenHash", "__onload"
     load()
     load = find_global "PGE::Exp", "__onload"

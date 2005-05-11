@@ -66,10 +66,10 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta['$7'] = $P0
     p6meta['$8'] = $P0
     p6meta['$9'] = $P0
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_subrule"      # XXX: TODO
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_subrule" 
     p6meta['<'] = $P0
     p6meta['>'] = u
-    $P0 = find_global "PGE::P6Rule", "p6rule_parse_charclass"
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_ccshortcut"
     p6meta['\d'] = $P0
     p6meta['\D'] = $P0
     p6meta['\w'] = $P0
@@ -78,6 +78,10 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta['\S'] = $P0
     p6meta['\n'] = $P0
     p6meta['\N'] = $P0
+    $P0 = find_global "PGE::P6Rule", "p6rule_parse_charclass"
+    p6meta['<['] = $P0
+    p6meta['<-['] = $P0
+    p6meta['<+['] = $P0
 .end
 
 =item C<p6rule_parse_skip(STR pattern, PMC lex, INT skip)>
@@ -437,14 +441,14 @@ Parse an alias or backreference.
 .end
 
 
-=item C<p6rule_parse_charclass(STR pattern, PMC lex)>
+=item C<p6rule_parse_ccshortcut(STR pattern, PMC lex)>
 
 Parses a character class of some sort, including the \n, \N, \s, \S,
 and related matches.
 
 =cut
 
-.sub p6rule_parse_charclass
+.sub p6rule_parse_ccshortcut
     .param string pattern
     .param pmc lex
     .param string token
@@ -454,6 +458,90 @@ and related matches.
     exp["token"] = token
     $I0 = length token
     p6rule_parse_skip(pattern, lex, $I0)
+    .return (exp)
+.end
+
+=item C<p6rule_parse_charclass(STR pattern, PMC lex, STR token)>
+
+Parse a character class in a rule expression.
+
+=cut
+
+.sub p6rule_parse_charclass
+    .param string pattern
+    .param pmc lex
+    .param string token
+    .local int pos, plen
+    .local string charclass
+    .local int range
+    .local pmc exp
+    pos = lex["pos"]
+    plen = lex["plen"]
+    $I0 = length token
+    pos += $I0
+    charclass = ''
+    range = 0
+  scan:
+    if pos >= plen goto no_close_err
+    $S0 = substr pattern, pos, 1
+    if $S0 == ']' goto end_class
+    if $S0 == '-' goto unescaped_hyphen
+    if $S0 == '.' goto start_range
+    unless $S0 == '\\' goto add_char
+  backslash:
+    inc pos
+    $S0 = substr pattern, pos, 1
+    $I0 = index "nrtfae0", $S0
+    if $I0 == -1 goto add_char
+    $S0 = substr "\n\r\t\f\a\e\0", $I0, 1
+  add_char:
+    inc pos
+    if range goto add_range
+    concat charclass, $S0
+    goto scan
+  add_range:
+    range = 0
+    $I2 = ord charclass, -1
+    $I0 = ord $S0
+  add_range_1:
+    inc $I2
+    if $I2 > $I0 goto scan
+    $S1 = chr $I2
+    concat charclass, $S1
+    goto add_range_1
+  start_range:
+    if range goto add_range
+    $S1 = substr pattern, pos, 2
+    unless $S1 == ".." goto add_char
+    pos += 2
+    range = 1
+    goto scan
+  end_class:
+    $S0 = substr pattern, pos, 2
+    unless $S0 == "]>" goto unescaped_bracket
+    pos += 2
+    lex["pos"] = pos
+    p6rule_parse_skip(pattern, lex, 0)
+    $P0 = find_global "PGE::Exp", "new"
+    exp = $P0("PGE::Exp::CharClass")
+    exp["charclass"] = charclass
+    $S0 = substr token, 1, 1
+    if $S0 == "-" goto charclass_negate
+    exp["charmatch"] = "if"
+    goto end
+  charclass_negate:
+    exp["charmatch"] = "unless"
+    goto end
+  unescaped_hyphen:
+    p6rule_parse_error(pattern, lex, "Unescaped '-' in charclass (use '..' or '\\-')")
+    goto end
+  no_close_err:
+    p6rule_parse_error(pattern, lex, "No closing ']>' for character class")
+    goto end
+  unescaped_bracket:
+    p6rule_parse_error(pattern, lex, "Unescaped ']' in character class")
+    goto end
+  end:
     .return (exp)
 .end
 
@@ -542,18 +630,18 @@ will be coming soon.
     exp = $P1("PGE::Exp::Concat", exp, qexp)       # and concat
   quant:                                           # qexp is the atom to quant
   quant_quest:
-    if c != '?' goto quant_plus
+    if c != "?" goto quant_plus
     pos = "p6rule_parse_skip"(pattern, lex, 1)
     qexp["min"] = 0
     goto quant_greedy
   quant_plus:
-    if c != '+' goto quant_star
+    if c != "+" goto quant_star
     pos = "p6rule_parse_skip"(pattern, lex, 1)
     qexp["max"] = PGE_INF
     qexp["isarray"] = 1
     goto quant_greedy
   quant_star:
-    if c != '*' goto quant_greedy
+    if c != "*" goto quant_greedy
     pos = "p6rule_parse_skip"(pattern, lex, 1)
     c = substr pattern, pos, 1
     if c == '*' goto quant_range
