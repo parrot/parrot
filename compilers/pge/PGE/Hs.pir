@@ -4,25 +4,45 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
 
 =head1 SYNOPSIS
 
+(You need to run C<make PGE-Hs.pbc> in F<compilers/pge> first.)
+
     .sub _main
-        load_bytecode "PGE.pbc"
+        load_bytecode "PGE-Hs.pbc"
         $P0 = find_global "PGE::Hs", "match"
         $S0 = $P0("Hello", "(...)*$")
         print $S0   # PGE_Match 2 5 [PGE_Array [PGE_Match 2 5 [] []]] []
     .end
 
-=head1 CAVEATS
-
-This is an initial sketch.  The dump format may change, and the
-whole thing may be taken out or refactored away at any moment.
+=head1 DESCRIPTION
 
 The Haskell-side data structure is defined thus:
 
     data MatchPGE
-        = PGE_Match !Int !Int ![MatchPGE] ![(String, MatchPGE)]
-        | PGE_Array ![MatchPGE]
+        = PGE_Match Int Int [MatchPGE] [(String, MatchPGE)]
+        | PGE_Array [MatchPGE]
         | PGE_Fail
         deriving (Show, Eq, Ord, Read)
+
+This F<PGE-Hs.pbc> is built separately (not by default).  The reason is
+because it's intended to be bundled with Pugs, so as to make Pugs usable
+with vanilla Parrot from 0.2.0 on, using either an external F<parrot>
+executable, or a linked F<libparrot>.
+
+In external F<parrot> mode, Parrot's include path looks into the
+F<.pbc> files inside the library tree first, then look into the current
+directory, F<.>.  Hence this file includes, rather than loads, the
+F<PGE.pbc> library, because if Pugs is shipped with its own copy
+of F<PGE.pbc>, Parrot would ignore that file and prefer to load
+the one in the Parrot tree instead.
+
+Granted, it is possible to pass in Pugs's own library path into an
+environment variable (maybe C<PARROT_LIBS>?), but as this was not in
+the 0.2.0 release, I (autrijus) decided to take the easy route. :-)
+
+=head1 CAVEATS
+
+This is an initial sketch.  The dump format may change, and the
+whole thing may be taken out or refactored away at any moment.
 
 =cut
 
