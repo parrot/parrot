@@ -1281,6 +1281,9 @@ prog-clean :
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/pdb$(O) \
     $(DIS) $(SRC_DIR)/disassemble$(O) \
+	$(SRC_DIR)/null_config$(O) \
+	$(SRC_DIR)/parrot_config$(O) \
+	$(SRC_DIR)/install_config$(O) \
     $(LIBNCI_TEST_SO) \
     $(LIBPARROT)
 	$(PERL) build_tools/c2str.pl --init
