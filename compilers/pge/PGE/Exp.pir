@@ -645,6 +645,10 @@ register.
 
 .namespace [ "PGE::Exp::CharClass" ]
 
+# Note:  The implementation interface for CharClass may change
+# in the near future, so don't rely on this too heavily just yet.
+# (pmichaud, 2005-05-11)
+
 .sub gen method
     .param pmc code
     .param string label

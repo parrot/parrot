@@ -465,6 +465,10 @@ and related matches.
 
 Parse a character class in a rule expression.
 
+Note: The interface for PGE::Exp::CharClass may change in the
+near future, so don't rely on this code too strongly just yet.
+(pmichaud, 2005-05-11)
+
 =cut
 
 .sub p6rule_parse_charclass
