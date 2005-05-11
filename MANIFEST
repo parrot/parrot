@@ -355,6 +355,7 @@ docs/pmc/struct.pod                               [main]doc
 docs/pmc/subs.pod                                 [main]doc
 docs/porting_intro.pod                            [main]doc
 docs/practical_notes.pod                          [main]doc
+docs/resources/favicon.ico                        [devel]
 docs/resources/parrot.small.png                   [devel]
 docs/resources/perl.css                           [devel]
 docs/resources/up.gif                             [devel]
@@ -1530,6 +1531,7 @@ runtime/parrot/library/Data/Dumper/Default.imc    [library]
 runtime/parrot/library/Digest/MD5.imc             [library]
 runtime/parrot/library/PGE/Class.pir              [library]
 runtime/parrot/library/PGE/Dumper.pir             [library]
+runtime/parrot/library/PGE/Glob.pir               [library]
 runtime/parrot/library/PGE/RegCounter.pir         [library]
 runtime/parrot/library/SDL.imc                    [library]
 runtime/parrot/library/SDL/App.imc                [library]

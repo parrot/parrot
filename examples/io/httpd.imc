@@ -11,8 +11,8 @@ examples/io/httpd.imc - HTTP server
 
 =head1 DESCRIPTION
 
-A very tiny HTTP-Server. Currently only understands GET method.
-It's a nice way of testing pretty all io funtions.
+A very tiny HTTP-Server. It currently only understands the GET method.
+It's a nice way of testing pretty much all io functions.
 
 By default it binds to localhost:1234, and serves the HTML Documentation
 in ./docs/html. Make sure you have built them with
@@ -27,16 +27,16 @@ which redirects to
 
     http://localhost:1234/docs/html/index.html
 
-Currently the URL isn't decoded, so the docs get served only partially
+Currently the URL isn't decoded, so the docs get served only partially.
 
-Be sure to set C<PARROT_NET_DEVEL> to 1 in F<io/io_private.h> and
-rebuild Parrot or the network layer won't exist.
+Make sure that C<PARROT_NET_DEVEL> is set to 1 in F<io/io_private.h> when
+parrot is built or the network layer won't exist.
 
 =head1 TODO
 
 make it work on W32/IE
 
-Transcode the received to ascci, in order to have access to an implemented 'index' op.
+Transcode the received string to ascci, in order to have access to an implemented 'index' op.
 
 =head1 AUTHOR
 
@@ -48,26 +48,21 @@ Markus Amsler - <markus.amsler@oribi.org>
     .local pmc sock, work, fp
     .local pmc fp               # read requested files from disk
     .local string address
-    .local string buf
-    .local string req
-    .local string rep
-    .local string temp
+    .local string buf, req, rep, temp
+    .local string meth, url, file_content
     .local int ret
     .local int len, pos, occ1, occ2
-    .local string meth
-    .local string url
-    .local string doc_root
-    .local string file_con
 
+    .local string doc_root
     doc_root = "."
 
     socket sock, 2, 1, 0
     unless sock goto ERR_NO_SOCKET
 
     # Pack a sockaddr_in structure with IP and port
-    sockaddr address, 1234, "localhost"
+    address = sockaddr 1234, "localhost"
     print "Binding to port 1234 on localhost.\n"
-    bind ret, sock, address
+    ret = bind sock, address
     print "The Parrot documentation can now be accessed at http://localhost:1234 .\n"
 
 NEXT:
@@ -124,43 +119,54 @@ SERVE_REQ:
 
 SERVE_GET:
     # decode the url
-    url = urldecode (url)
-    # open the file in url
-    if url == "/" goto SERVE_301
-    rep = "HTTP/1.x 301 OK\n"
+    url = urldecode(url)
+
+    # redirect instead of serving index.html
+    if url == "/" goto SERVE_docroot
+
+    # Those little pics in the URL field or in tabs
+    if url == "/favicon.ico" goto SERVE_favicon
+
+    # try to server a file
+    goto SERVE_file
+
+SERVE_file:
+    # try to open the file in url
     concat url, doc_root, url
-    open fp, url, "<"
+    fp = open url, "<"
     unless fp goto SERVE_404
 
-    read file_con, fp, 65535
+    read file_content, fp, 65535
     rep = "HTTP/1.x 200 OK\n"
     concat rep, "Server: Parrot-httpd/0.1\n"
-#    concat rep, "Content-type: text/html\n"
     concat rep, "Content-Length: "
-    length len, file_con
+    length len, file_content
     temp = to_string (len)
     concat rep, temp
     concat rep, "\n\n"
-    concat rep, file_con
-SEND:
+    concat rep, file_content
     send ret, work, rep
-
     print "served file '"
     print url
     print "'\n"
     goto NEXT
 
-SERVE_301:
+SERVE_docroot:
     rep = "HTTP1/1 301 Moved Permamently\nLocation: /docs/html/index.html\nContent-Length: "
-    file_con = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>." 
-    length len, file_con
+    file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>." 
+    length len, file_content
     temp = to_string (len)
     concat rep, temp
     concat rep, "\n\n"
-    concat rep, file_con
+    concat rep, file_content
     send ret, work, rep
     print "Redirect to 'docs/html/index.hmtl'\n"
     goto NEXT
+
+SERVE_favicon:
+    url = urldecode( '/docs/resources/favicon.ico')
+    goto SERVE_file
+
 SERVE_404:
     rep = "HTTP1/1 404 Not Found\nContent-Length: 3\n\n404\n"
     print "File not found: '"
@@ -168,6 +174,7 @@ SERVE_404:
     print "'\n"
     send ret, work, rep
     goto NEXT
+
 ERR_NO_SOCKET:
     print "Could not open socket.\n"
     print "Did you enable PARROT_NET_DEVEL in include/io_private.h?\n"
