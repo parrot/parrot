@@ -37,31 +37,31 @@ p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 0: <a @ 0>/,
             'numbered aliases $1');
 p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 1: <b @ 1>/,
             'numbered aliases $2');
-p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 6: <c @ 2>/,
+p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 7: <c @ 2>/,
             'numbered aliases $7');
-p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 7: <d @ 3>/,
+p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 8: <d @ 3>/,
             'numbered aliases $8');
-p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 3: <e @ 4>/,
+p6rule_like('abcdefg', '(.) (.) $7:=(.) (.) $4:=(.)', qr/mob 4: <e @ 4>/,
             'numbered aliases $4');
 
 
-p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 0: <abc @ 0>/,
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 1: <abc @ 0>/,
             'perl5 numbered captures $1');
-p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 1: <a @ 0>/,
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 2: <a @ 0>/,
             'perl5 numbered captures $1');
-p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 2: <b @ 1>/,
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 3: <b @ 1>/,
             'perl5 numbered captures $1');
-p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 3: <c @ 2>/,
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 4: <c @ 2>/,
             'perl5 numbered captures $1');
-p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 4: <d @ 3>/,
+p6rule_like('abcdefg', '$1:=[ (.) (.) (.) ] (.)', qr/mob 5: <d @ 3>/,
             'perl5 numbered captures $1');
 
-p6rule_is  ('bookkeeper', '[(.)$1]+', 'backreference');
-p6rule_like('bookkeeper', '[(.)$1]+', 
+p6rule_is  ('bookkeeper', '[(.)$0]+', 'backreference');
+p6rule_like('bookkeeper', '[(.)$0]+', 
             qr/mob 0 0: <o @ 1>/, 'backref $1');
-p6rule_like('bookkeeper', '[(.)$1]+', 
+p6rule_like('bookkeeper', '[(.)$0]+', 
             qr/mob 0 1: <k @ 3>/, 'backref $1');
-p6rule_like('bookkeeper', '[(.)$1]+', 
+p6rule_like('bookkeeper', '[(.)$0]+', 
             qr/mob 0 2: <e @ 5>/, 'backref $1');
 
 p6rule_like('123x', '(.)*x',

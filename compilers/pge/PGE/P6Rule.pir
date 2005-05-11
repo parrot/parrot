@@ -56,6 +56,7 @@ will be to use Perl 6 to write and compile a better (faster) rules parser.
     p6meta[')'] = u
     $P0 = find_global "PGE::P6Rule", "p6rule_parse_alias"
     p6meta['$<'] = $P0
+    p6meta['$0'] = $P0
     p6meta['$1'] = $P0
     p6meta['$2'] = $P0
     p6meta['$3'] = $P0
@@ -407,9 +408,9 @@ Parse an alias or backreference.
     $I0 -= pos                                     # get length of digit seq.
     $S0 = substr pattern, pos, $I0                 # extract digit seq.
     subp = $S0                                     # convert to integer
-    lex["subp"] = subp                             # store next subpattern #
-    dec subp                                       # compute index of
     lex["cname"] = subp                            # this capture
+    inc subp                                       # store next subpattern #
+    lex["subp"] = subp                             # 
     p6rule_parse_skip(pattern, lex, 0)             # skip ws
     goto alias
   name:
