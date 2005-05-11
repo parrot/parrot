@@ -269,7 +269,6 @@ PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
     INTVAL mode;
     mode = 0;
 
-    UNUSED(fdopen);
     UNUSED(layer);
 
     if (PIO_win32_isatty(fd))
