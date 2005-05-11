@@ -8,11 +8,14 @@
     .local pmc exp
     .local pmc match
     .local pmc p6rule_compile
+    .local pmc glob_compile
     .local int istrace
 
-    load_bytecode "../../runtime/parrot/library/PGE.pbc"
-    load_bytecode "../../runtime/parrot/library/PGE/Dumper.pir"
+    load_bytecode "PGE.pbc"
+    load_bytecode "PGE/Dumper.pir"
+    load_bytecode "PGE/Glob.pir"
     find_global p6rule_compile, "PGE", "p6rule"
+    find_global glob_compile, "PGE", "glob"
     istrace = 0
     null rulesub
 
@@ -20,8 +23,8 @@
     store_global "ident", rulesub
    
   read_loop:
-    print "\ninput \"rule <pattern>\", \"save <name>\", \"pir\", \"exp\", \n"
-    print "target string, \"trace\", or \"next\"\n"
+    print "\ninput \"rule <pattern>\", \"glob <pattern>\", \"save <name>\",\n"
+    print "target string, \"pir\", \"exp\", \"trace\", or \"next\"\n"
     getstdin stdin
     readline x, stdin
     length $I0, x 
@@ -34,6 +37,7 @@
     chopn x, 1
     if $S0 == "next" goto match_next
     if $S0 == "rule" goto make_p6rule
+    if $S0 == "glob" goto make_glob
     if $S0 == "save" goto save_rule
     if $S0 == "pir" goto print_pir
     if $S0 == "exp" goto print_exp
@@ -56,6 +60,11 @@
   match_next:
     match."next"()
     goto match_result
+
+  make_glob:
+    pattern = substr x, 5
+    (rulesub, pir, exp) = glob_compile(pattern)
+    goto read_loop
 
   make_p6rule:
     pattern = substr x, 5

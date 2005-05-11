@@ -42,7 +42,7 @@ C<parrot demo.pir>.  The demo understands the following commands:
 Once PGE is compiled and installed, you generally load it using
 the load_bytecode operation, as in
 
-    load_bytecode "runtime/parrot/library/PGE.pbc"          
+    load_bytecode "PGE.pbc"          
 
 This imports the C<PGE::p6rule> subroutine, which can be used to
 compile Perl 6 rules.  A sample compile sequence would be:
