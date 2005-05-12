@@ -29,6 +29,8 @@ functionality and correctness at the moment.
 
 =cut
 
+.include "cclass.pasm"
+
 .namespace [ "PGE::Exp" ]
 
 .const int PGE_INF = 2147483647                    # XXX: arbitrary limit
@@ -485,6 +487,8 @@ register.
     emit = find_global "PGE::Exp", "emit"
     $S0 = self."quant"()
     $S1 = self["literal"]
+    $P0 = find_global "Data::Escape", "String"
+    $S1 = $P0($S1, "'")
     emit(code, "\n  %s:  # literal %s", label, $S0)
     emit(code, "    lit = '%s'", $S1)
     self.genliteral(code, label, next)
@@ -515,8 +519,9 @@ register.
     emit(code, "  %s_1:", label)
     .return self.genliteral(code, label, next)
   named:
-    $S1 = cname
-    emit(code, "\n  %s:  # backref $<%s> %s", label, subp, $S1)
+    $P0 = find_global "Data::Escape", "String"
+    $S1 = $P0(cname)
+    emit(code, "\n  %s:  # backref $<%s> %s", label, $S1, $S0)
     emit(code, "    lit = ''")
     emit(code, "    $P0 = getattribute mob, \"PGE::Match\\x0%:capt\"")
     emit(code, "    isnull $P0, %s_1", label)
@@ -709,6 +714,20 @@ register.
 
 .namespace [ "PGE::Exp::WS" ]
 
+.sub "analyze" method
+    .param pmc next
+    .param pmc pad
+    .local string nextfc
+    self["firstchars"] = ""
+    nextfc = next["firstchars"]
+    unless nextfc > "" goto end
+    $I1 = length nextfc
+    $I0 = find_cclass .CCLASS_WHITESPACE, nextfc, 0, $I1
+    unless $I0 == $I1 goto end
+    self["iscut"] = 1
+  end:
+.end
+
 .sub "gen" method
     .param pmc code
     .param string label
@@ -719,24 +738,27 @@ register.
     emit(code, "    rep = 0")
     emit(code, "    if pos >= lastpos goto %s", next)
     emit(code, "    if pos < 1 goto %s_1", label)
-    emit(code, "    $I0 = is_wordchar target, pos")
+    emit(code, "    $I0 = is_cclass %d, target, pos", .CCLASS_WORD)
     emit(code, "    unless $I0 goto %s_1", label)
     emit(code, "    $I0 = pos - 1")
-    emit(code, "    $I0 = is_wordchar target, $I0")
+    emit(code, "    $I0 = is_cclass %d, target, $I0", .CCLASS_WORD)
     emit(code, "    if $I0 goto fail")
     emit(code, "  %s_1:", label)
-    emit(code, "    if pos >= lastpos goto %s_2", label)
-    emit(code, "    $I0 = is_whitespace target, pos")
-    emit(code, "    unless $I0 goto %s_2", label)
-    emit(code, "    inc rep")
-    emit(code, "    inc pos")
-    emit(code, "    goto %s", label)
+    $I0 = self["iscut"]
+    unless $I0 goto backtrack
+    emit(code, "    pos = find_not_cclass %d, target, pos, lastpos", .CCLASS_WHITESPACE)
+    emit(code, "    goto %s", next)
+    goto end
+  backtrack:
+    emit(code, "    rep = $I0 - pos")
+    emit(code, "    pos = $I0")
     emit(code, "  %s_2:", label)
     emit(code, "    if rep == 0 goto %s", next)
     self.emitsub(code, next, "pos", "rep")
     emit(code, "    dec rep")
     emit(code, "    dec pos")
     emit(code, "    goto %s_2", label)
+  end:
 .end
 
 

@@ -105,7 +105,10 @@ PGE::Dumper - various methods for displaying PGE structures
 .sub "dump" method
     .param int indent
     self."dumpindent"(indent)
-    print "<?ws>\n"
+    print "<?ws> "
+    $S0 = self."quant"()
+    print $S0
+    print "\n"
 .end
 
 .namespace [ "PGE::Exp::Anchor" ]
