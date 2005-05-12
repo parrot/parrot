@@ -1299,20 +1299,13 @@ TEMPLATE Parrot_ord_i_sx_i {
 }
 
 Parrot_ord_i_s_i {
-    int saved = 0;
     char *L1, *L2, *L3, *L4, *L5, *Lpos, *L3a;
-    /* if EDX is mapped, save it */
-    if (jit_info->optimizer->cur_section->ru[0].registers_used >=
-            INT_REGISTERS_TO_MAP - 1) {
-        emitm_pushl_r(NATIVECODE, emit_EDX);
-        saved = 1;
-    }
-    /* if ECX is mapped, save it */
-    if (jit_info->optimizer->cur_section->ru[0].registers_used ==
-            INT_REGISTERS_TO_MAP) {
-        emitm_pushl_r(NATIVECODE, emit_ECX);
-        saved = 2;
-    }
+    /*
+     * this opcode has a CALL_FUNCTION, so ext_call = -1
+     * in src/jit.cpu.c for such ext_call types volatile
+     * registers are stored back to Parrot registers: ecx, edx are usable
+     */
+
     /*
      * movl $2, %ecx         # %ecx := string
      * movl $3, %edx         # %edx := offset
@@ -1416,13 +1409,7 @@ Parrot_ord_i_s_i {
      * L5:
      */
     L5[1] = NATIVECODE - L5 - 2;
-    if (saved == 2) {
-        emitm_popl_r(NATIVECODE, emit_ECX);
-    }
-    if (saved) {
-        emitm_popl_r(NATIVECODE, emit_EDX);
-    }
-    if (MAP[1]) {
+    if (MAP[1] && MAP[1] != emit_ECX && MAP[1] != emit_EDX) {
         jit_emit_mov_rr_i(NATIVECODE, MAP[1], emit_EAX);
     }
     else {

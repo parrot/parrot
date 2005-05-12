@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 11;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -174,6 +174,26 @@ output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         set P0, 1
 
 	set I0, P0[1]
+	end
+CODE
+FixedIntegerArray: index out of bounds!
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, I");
+        new P0, .FixedIntegerArray
+        set P0, 1
+	set I1, 1
+	set I0, P0[I1]
+	end
+CODE
+FixedIntegerArray: index out of bounds!
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, -I");
+        new P0, .FixedIntegerArray
+        set P0, 1
+	set I1, -1
+	set I0, P0[I1]
 	end
 CODE
 FixedIntegerArray: index out of bounds!
