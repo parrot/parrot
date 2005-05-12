@@ -1299,7 +1299,135 @@ TEMPLATE Parrot_ord_i_sx_i {
 }
 
 Parrot_ord_i_s_i {
-    Parrot_ord_i_sx_i s/<typ>/r/
+    int saved = 0;
+    char *L1, *L2, *L3, *L4, *L5, *Lpos;
+    /* if EDX is mapped, save it */
+    if (jit_info->optimizer->cur_section->ru[0].registers_used >=
+            INT_REGISTERS_TO_MAP - 1) {
+        emitm_pushl_r(NATIVECODE, emit_EDX);
+        saved = 1;
+    }
+    /* if ECX is mapped, save it */
+    if (jit_info->optimizer->cur_section->ru[0].registers_used ==
+            INT_REGISTERS_TO_MAP) {
+        emitm_pushl_r(NATIVECODE, emit_ECX);
+        saved = 2;
+    }
+    /*
+     * movl $2, %ecx         # %eax := string_length
+     * movl %ecx, %eax       # %ecx := $2
+     * cmpl #0, %ecx
+     * je  L1
+     */
+    jit_emit_mov_RM_i(NATIVECODE, emit_ECX, ROFFS_STR(2));
+    jit_emit_mov_rr_i(NATIVECODE, emit_EAX, emit_ECX);
+    jit_emit_cmp_ri_i(NATIVECODE, emit_ECX, 0);
+    L1 = NATIVECODE;
+    emitm_jxs(NATIVECODE, emitm_jz, 0);
+    /*
+     * mov (strlen)%ecx, %eax
+     */
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_ECX, emit_None, 1,
+            offsetof(STRING, strlen));
+    /* L1: */
+    L1[1] = NATIVECODE - L1 - 2;
+    /*
+     * cmpl #0, %eax
+     * je  L2
+     */
+    jit_emit_cmp_ri_i(NATIVECODE, emit_EAX, 0);
+    L2 = NATIVECODE;
+    emitm_jxs(NATIVECODE, emitm_jz, 0);
+    /*
+     * mov $3, %edx
+     * cmp $edx, 0
+     * jge Lpos
+     * add %eax, %edx
+     * Lpos
+     * cmp %edx, %eax
+     * jge L3
+     */
+    if (MAP[3]) {
+        jit_emit_mov_rr_i(NATIVECODE, emit_EDX, MAP(3));
+    }
+    else {
+        jit_emit_mov_RM_i(NATIVECODE, emit_EDX, ROFFS_INT(3));
+    }
+    jit_emit_cmp_ri_i(NATIVECODE, emit_EDX, 0);
+    Lpos = NATIVECODE;
+    emitm_jxs(NATIVECODE, emitm_jnl, 0);
+    jit_emit_add_rr_i(NATIVECODE, emit_EDX, emit_EAX);
+    /* LPos: */
+    Lpos[1] = NATIVECODE - Lpos - 2;
+
+    jit_emit_cmp_rr_i(NATIVECODE, emit_EDX, emit_EAX);
+    L3 = NATIVECODE;
+    emitm_jxs(NATIVECODE, emitm_jnl, 0);
+
+    /*
+     * mov (encoding)%ecx, %eax
+     * cmp fixed8, %ecx
+     * jne L4
+     */
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_ECX, emit_None, 1,
+            offsetof(STRING, encoding));
+    jit_emit_cmp_ri_i(NATIVECODE, emit_EAX, Parrot_fixed_8_encoding_ptr);
+    L4 = NATIVECODE;
+    emitm_jxs(NATIVECODE, emitm_jnz, 0);
+    /*
+     * mov (strstart)%ecx, %ecx
+     * xor %eax, %eax
+     * movb (%ecx + %edx), %eax)
+     */
+    emitm_movl_m_r(NATIVECODE, emit_ECX, emit_ECX, emit_None, 1,
+            offsetof(STRING, strstart));
+    jit_emit_bxor_rr_i(NATIVECODE, emit_EAX, emit_EAX);
+    emitm_movb_m_r(NATIVECODE, emit_EAX, emit_ECX, emit_EDX, 1, 0);
+    /*
+     * branch L5
+     */
+    L5 = NATIVECODE;
+    emitm_jumps(NATIVECODE, 0);
+
+
+    /*
+     * L2:
+     * L3:
+     * L4:
+     */
+    L2[1] = NATIVECODE - L2 - 2;
+    L3[1] = NATIVECODE - L3 - 2;
+    L4[1] = NATIVECODE - L4 - 2;
+    if (MAP[3]) {
+        emitm_pushl_r(NATIVECODE, MAP[3]);
+    }
+    else {
+        jit_emit_mov_RM_i(NATIVECODE, emit_EAX, ROFFS_INT(3));
+        emitm_pushl_r(NATIVECODE, emit_EAX);
+    }
+    jit_emit_mov_RM_i(NATIVECODE, emit_EAX, ROFFS_STR(2));
+    emitm_pushl_r(NATIVECODE, emit_EAX);
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_EAX);
+    emitm_pushl_r(NATIVECODE, emit_EAX);
+    CALL_FUNCTION(jit_info, (void*)string_ord);
+    emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
+    /*
+     * L5:
+     */
+    L5[1] = NATIVECODE - L5 - 2;
+    if (saved == 2) {
+        emitm_popl_r(NATIVECODE, emit_ECX);
+    }
+    if (saved) {
+        emitm_popl_r(NATIVECODE, emit_EDX);
+    }
+    if (MAP[1]) {
+        jit_emit_mov_rr_i(NATIVECODE, MAP[1], emit_EAX);
+    }
+    else {
+        jit_emit_mov_MR_i(NATIVECODE, ROFFS_INT(1), emit_EAX);
+    }
+
 }
 
 Parrot_ord_i_sc_i {

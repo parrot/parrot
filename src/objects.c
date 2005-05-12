@@ -1294,7 +1294,7 @@ attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
     idx  = string_str_index(interpreter, attr, delimit, 0) + 1;
     if (!idx) {
         real_exception(interpreter, NULL, ATTRIB_NOT_FOUND,
-                "No such attribute '%Ss'", attr_name);
+                "No such attribute '%Ss'", attr);
         return 0;
     }
     length = string_length(interpreter, attr) - idx;
