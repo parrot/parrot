@@ -121,7 +121,7 @@ whole thing may be taken out or refactored away at any moment.
     .local int ari, arc
     .local int tmpi, cond
     .local string tmps, key
-    .local pmc capt, iter, elm, escape, is_array
+    .local pmc capt, iter, subelm, elm, escape, is_array
 
     out = ""
     escape = find_global "Data::Escape", "String"
@@ -191,8 +191,8 @@ whole thing may be taken out or refactored away at any moment.
     is_array = getprop "isarray", elm
     if is_array goto dumper_array
     unless ari < arc goto dumper_fail
-    elm = elm[-1]
-    tmps = elm."dump_hs"()
+    subelm = elm[-1]
+    tmps = subelm."dump_hs"()
     out .= tmps
     ret
   dumper_fail:
@@ -209,8 +209,8 @@ whole thing may be taken out or refactored away at any moment.
     unless ari < arc goto dumper_done
     out .= ", "
   dumper_array_body:
-    elm = elm[ari]
-    tmps = elm."dump_hs"()
+    subelm = elm[ari]
+    tmps = subelm."dump_hs"()
     out .= tmps
     inc ari
     goto dumper_array_loop
