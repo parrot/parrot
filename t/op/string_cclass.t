@@ -35,53 +35,21 @@ pir_output_is(<<'CODE', <<'OUT', "find_cclass, ascii");
     .param string str
     .param int flags
     $I0 = 0
+    $I2 = length str
 loop:
-    $I0 = find_cclass flags, str, $I0, 100
-    if $I0 == -1 goto end
-    print $I0
+    $I1 = find_cclass flags, str, $I0, 100
+    print $I1
     print ";"
     inc $I0
-    branch loop
+    if $I0 <= $I2 goto loop
 end:
     print "\n"
 .end
 CODE
-0;1;2;3;4;5;6;7;8;10;
-6;7;
-0;1;
-4;8;12;
-OUT
-
-pir_output_is(<<'CODE', <<'OUT', "find_cclass, iso-8859-1");
-.include "cclass.pasm"
-.sub main @MAIN
-    $S0 = iso-8859-1:"test_func(1)"
-    test( .CCLASS_WORD, $S0 )
-    
-    $S0 = iso-8859-1:"ab\nC_X34.\0 \t!"
-    test( .CCLASS_NUMERIC, $S0 )
-    test( .CCLASS_LOWERCASE, $S0 )
-    test( .CCLASS_PUNCTUATION, $S0 )
-.end
-.sub test
-    .param string str
-    .param int flags
-    $I0 = 0
-loop:
-    $I0 = find_cclass flags, str, $I0, 100
-    if $I0 == -1 goto end
-    print $I0
-    print ";"
-    inc $I0
-    branch loop
-end:
-    print "\n"
-.end
-CODE
-0;1;2;3;4;5;6;7;8;10;
-6;7;
-0;1;
-4;8;12;
+0;1;2;3;4;5;6;7;8;10;10;12;12;
+6;6;6;6;6;6;6;7;13;13;13;13;13;13;
+0;1;13;13;13;13;13;13;13;13;13;13;13;13;
+4;4;4;4;4;8;8;8;8;12;12;12;12;13;
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, ascii");
@@ -99,21 +67,53 @@ pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, ascii");
     .param string str
     .param int flags
     $I0 = 0
+    $I2 = length str
 loop:
-    $I0 = find_not_cclass flags, str, $I0, 100
-    if $I0 == -1 goto end
-    print $I0
+    $I1 = find_not_cclass flags, str, $I0, 100
+    print $I1
     print ";"
     inc $I0
-    branch loop
+    if $I0 <= $I2 goto loop
 end:
     print "\n"
 .end
 CODE
-9;11;
-0;1;2;3;4;5;8;9;10;11;12;
-2;3;4;5;6;7;8;9;10;11;12;
-0;1;2;3;5;6;7;9;10;11;
+9;9;9;9;9;9;9;9;9;9;11;11;12;
+0;1;2;3;4;5;8;8;8;9;10;11;12;13;
+2;2;2;3;4;5;6;7;8;9;10;11;12;13;
+0;1;2;3;5;5;6;7;9;9;10;11;13;13;
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "find_cclass, iso-8859-1");
+.include "cclass.pasm"
+.sub main @MAIN
+    $S0 = iso-8859-1:"test_func(1)"
+    test( .CCLASS_WORD, $S0 )
+    
+    $S0 = iso-8859-1:"ab\nC_X34.\0 \t!"
+    test( .CCLASS_NUMERIC, $S0 )
+    test( .CCLASS_LOWERCASE, $S0 )
+    test( .CCLASS_PUNCTUATION, $S0 )
+.end
+.sub test
+    .param string str
+    .param int flags
+    $I0 = 0
+    $I2 = length str
+loop:
+    $I1 = find_cclass flags, str, $I0, 100
+    print $I1
+    print ";"
+    inc $I0
+    if $I0 <= $I2 goto loop
+end:
+    print "\n"
+.end
+CODE
+0;1;2;3;4;5;6;7;8;10;10;12;12;
+6;6;6;6;6;6;6;7;13;13;13;13;13;13;
+0;1;13;13;13;13;13;13;13;13;13;13;13;13;
+4;4;4;4;4;8;8;8;8;12;12;12;12;13;
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, iso-8859-1");
@@ -131,21 +131,21 @@ pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, iso-8859-1");
     .param string str
     .param int flags
     $I0 = 0
+    $I2 = length str
 loop:
-    $I0 = find_not_cclass flags, str, $I0, 100
-    if $I0 == -1 goto end
-    print $I0
+    $I1 = find_not_cclass flags, str, $I0, 100
+    print $I1
     print ";"
     inc $I0
-    branch loop
+    if $I0 <= $I2 goto loop
 end:
     print "\n"
 .end
 CODE
-9;11;
-0;1;2;3;4;5;8;9;10;11;12;
-2;3;4;5;6;7;8;9;10;11;12;
-0;1;2;3;5;6;7;9;10;11;
+9;9;9;9;9;9;9;9;9;9;11;11;12;
+0;1;2;3;4;5;8;8;8;9;10;11;12;13;
+2;2;2;3;4;5;6;7;8;9;10;11;12;13;
+0;1;2;3;5;5;6;7;9;9;10;11;13;13;
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "is_cclass, ascii");

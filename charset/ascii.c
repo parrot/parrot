@@ -580,7 +580,7 @@ find_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_strin
             return pos;
         }
     }
-    return -1;
+    return end;
 }
 
 static INTVAL
@@ -598,7 +598,7 @@ find_not_cclass(Interp *interpreter, PARROT_CCLASS_FLAGS flags, STRING *source_s
             return pos;
         }
     }
-    return -1;
+    return end;
 }
 
 /*
