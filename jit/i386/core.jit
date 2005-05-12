@@ -1300,7 +1300,7 @@ TEMPLATE Parrot_ord_i_sx_i {
 
 Parrot_ord_i_s_i {
     int saved = 0;
-    char *L1, *L2, *L3, *L4, *L5, *Lpos;
+    char *L1, *L2, *L3, *L4, *L5, *Lpos, *L3a;
     /* if EDX is mapped, save it */
     if (jit_info->optimizer->cur_section->ru[0].registers_used >=
             INT_REGISTERS_TO_MAP - 1) {
@@ -1314,12 +1314,19 @@ Parrot_ord_i_s_i {
         saved = 2;
     }
     /*
-     * movl $2, %ecx         # %eax := string_length
-     * movl %ecx, %eax       # %ecx := $2
+     * movl $2, %ecx         # %ecx := string
+     * movl $3, %edx         # %edx := offset
+     * movl %ecx, %eax       # %eax := string_length
      * cmpl #0, %ecx
      * je  L1
      */
     jit_emit_mov_RM_i(NATIVECODE, emit_ECX, ROFFS_STR(2));
+    if (MAP[3]) {
+        jit_emit_mov_rr_i(NATIVECODE, emit_EDX, MAP(3));
+    }
+    else {
+        jit_emit_mov_RM_i(NATIVECODE, emit_EDX, ROFFS_INT(3));
+    }
     jit_emit_mov_rr_i(NATIVECODE, emit_EAX, emit_ECX);
     jit_emit_cmp_ri_i(NATIVECODE, emit_ECX, 0);
     L1 = NATIVECODE;
@@ -1339,24 +1346,20 @@ Parrot_ord_i_s_i {
     L2 = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_jz, 0);
     /*
-     * mov $3, %edx
      * cmp $edx, 0
      * jge Lpos
      * add %eax, %edx
-     * Lpos
+     * js  L3a
+     * Lpos:
      * cmp %edx, %eax
      * jge L3
      */
-    if (MAP[3]) {
-        jit_emit_mov_rr_i(NATIVECODE, emit_EDX, MAP(3));
-    }
-    else {
-        jit_emit_mov_RM_i(NATIVECODE, emit_EDX, ROFFS_INT(3));
-    }
     jit_emit_cmp_ri_i(NATIVECODE, emit_EDX, 0);
     Lpos = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_jnl, 0);
     jit_emit_add_rr_i(NATIVECODE, emit_EDX, emit_EAX);
+    L3a = NATIVECODE;
+    emitm_jxs(NATIVECODE, emitm_js, 0);
     /* LPos: */
     Lpos[1] = NATIVECODE - Lpos - 2;
 
@@ -1389,6 +1392,11 @@ Parrot_ord_i_s_i {
     L5 = NATIVECODE;
     emitm_jumps(NATIVECODE, 0);
 
+    L3a[1] = NATIVECODE - L3a - 2;
+    /*
+     * L3a:
+     */
+    jit_emit_sub_rr_i(NATIVECODE, emit_EDX, emit_EAX);
 
     /*
      * L2:
@@ -1398,19 +1406,12 @@ Parrot_ord_i_s_i {
     L2[1] = NATIVECODE - L2 - 2;
     L3[1] = NATIVECODE - L3 - 2;
     L4[1] = NATIVECODE - L4 - 2;
-    if (MAP[3]) {
-        emitm_pushl_r(NATIVECODE, MAP[3]);
-    }
-    else {
-        jit_emit_mov_RM_i(NATIVECODE, emit_EAX, ROFFS_INT(3));
-        emitm_pushl_r(NATIVECODE, emit_EAX);
-    }
-    jit_emit_mov_RM_i(NATIVECODE, emit_EAX, ROFFS_STR(2));
-    emitm_pushl_r(NATIVECODE, emit_EAX);
+    emitm_pushl_r(NATIVECODE, emit_EDX);        /* offs */
+    emitm_pushl_r(NATIVECODE, emit_ECX);        /* string */
     Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_EAX);
-    emitm_pushl_r(NATIVECODE, emit_EAX);
+    emitm_pushl_r(NATIVECODE, emit_EAX);        /* interp */
     CALL_FUNCTION(jit_info, (void*)string_ord);
-    emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
+    emitm_addb_i_r(NATIVECODE, 12, emit_ESP);   /* result in eax */
     /*
      * L5:
      */

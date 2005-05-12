@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 145;
+use Parrot::Test tests => 155;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2700,4 +2700,87 @@ CODE
 Abcd012yz
 Abcd012yz
 OUTPUT
+
+output_is(<<'CODE',ord('a'),'3-param ord, one-character string register, I');
+	set S0,"a"
+	set I1, 0
+	ord I0,S0,I1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('b'),'3-param ord, multi-character string, I');
+	set I1, 1
+	ord I0,"ab",I1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, I');
+	set I1, 1
+	set S0,"ab"
+	ord I0,S0,I1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE', <<'OUTPUT','3-param ord, multi-character string, I');
+	set I1, 2
+	ord I0,"ab",I1
+	print I0
+	end
+CODE
+Cannot get character past end of string
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT','3-param ord, multi-character string, I');
+	set I1, 2
+	set S0,"ab"
+	ord I0,S0,I1
+	print I0
+	end
+CODE
+Cannot get character past end of string
+OUTPUT
+
+output_is(<<'CODE',ord('a'),'3-param ord, one-character string, from end, I');
+	set I1, -1
+	ord I0,"a",I1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('a'),'3-param ord, one-character string register, from end, I');
+	set I1, -1
+	set S0,"a"
+	ord I0,S0,I1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('b'),'3-param ord, multi-character string, from end, I');
+	set I1, -1
+	ord I0,"ab",I1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, from end, I');
+	set I1, -1
+	set S0,"ab"
+	ord I0,S0,I1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',<<'OUTPUT','3-param ord, multi-character string register, from end, OOB, I');
+	set I1, -3
+	set S0,"ab"
+	ord I0,S0,I1
+	print I0
+        end
+CODE
+Cannot get character before beginning of string
+OUTPUT
+
 1;
