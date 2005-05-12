@@ -50,7 +50,8 @@ static PMC* retval(Interp *interp, void *ret)
 {
     PMC *value;
     if (ret == 0)
-    internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!");
+    real_exception(interp, NULL, E_IndexOutOfBoundsError,
+        "Array index out of bounds!");
     /* XXX getting non existent value, exception or undef?
      * current is for perlarray */
     if (ret == (void*) -1)
@@ -135,7 +136,8 @@ Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
     PMC *value;
 
     if (ret == 0)
-        internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!");
+        real_exception(interp, NULL, E_IndexOutOfBoundsError,
+            "Array index out of bounds!");
     /* assign into a sparse or not yet set value */
     if (ret == (void*) -1 || *(PMC**)ret == 0) {
         value = undef(interp);
@@ -675,7 +677,8 @@ Sets the PMC at element C<idx> to C<*src>.
         INTVAL length;
         length = ((List *) PMC_data(SELF))->length;
         if (idx >= length || -idx > length) {
-            internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!");
+            real_exception(INTERP, NULL, E_IndexOutOfBoundsError,
+                "Array index out of bounds!");
         }
 
         list_assign(INTERP, (List *) PMC_data(SELF), idx,
@@ -974,7 +977,8 @@ C<offset>.
 
     void splice(PMC* value, INTVAL offset, INTVAL count) {
         if (SELF->vtable->base_type != value->vtable->base_type)
-            internal_exception(1, "Type mismatch in splice");
+            real_exception(INTERP, NULL, E_TypeError,
+                "Type mismatch in splice");
         list_splice(INTERP, (List*) PMC_data(SELF),
             (List *) PMC_data(value), offset, count);
     }
@@ -1158,7 +1162,8 @@ Return a new iterator for SELF.
                     return iter;
                 }
         }
-        internal_exception(1, "Array: Unknown slice type");
+        real_exception(INTERP, NULL, E_TypeError,
+            "Array: Unknown slice type");
         return NULL;
     }
 
