@@ -1666,6 +1666,7 @@ PDB_disassemble(Interp *interpreter, const char *command)
     pfile->size = 0;
     pline->number = 1;
     pline->source_offset = 0;
+    pline->label = NULL;
 
     code_end = pc + interpreter->code->base.size;
     while (pc != code_end) {
