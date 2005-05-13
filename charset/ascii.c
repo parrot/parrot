@@ -117,9 +117,6 @@ from_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
 static STRING *
 to_unicode(Interp *interpreter, STRING *src, STRING *dest)
 {
-    UINTVAL offs, c;
-    String_iter iter;
-
     if (dest) {
         dest->charset = Parrot_unicode_charset_ptr;
         dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, dest);
