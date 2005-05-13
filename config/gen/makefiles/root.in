@@ -663,15 +663,17 @@ $(INSTALLABLEPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 		$(IMCC_DIR)/main$(O) \
 		$(ALL_PARROT_LIBS) $(SRC_DIR)/install_config$(O)
 
-$(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc
+$(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc \
+			$(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > \
 		$(SRC_DIR)/parrot_config.c
 
-$(SRC_DIR)/install_config.c :  install_config.fpmc
+$(SRC_DIR)/install_config.c :  install_config.fpmc \
+			$(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --install > \
 		$(SRC_DIR)/install_config.c
 
-$(SRC_DIR)/null_config.c : myconfig
+$(SRC_DIR)/null_config.c : myconfig $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --mini > \
 		$(SRC_DIR)/null_config.c
 
