@@ -57,8 +57,8 @@ sub runstep {
       $icushared = capture_output("$icuconfig --ldflags");
       if (defined $icushared) {
         chomp $icushared;
-        $icushared =~ s/-licui18n//;
-        # $icushared =~ s/-licudata//;
+        $icushared =~ s/-licui18n\w*//;     # "-licui18n32" too
+        # $icushared =~ s/-licudata\w*//;
         $without = 1 if length $icushared == 0;
       }
 
