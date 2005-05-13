@@ -163,24 +163,24 @@ pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "modify an entry");
 
     .local pmc    val_pmc
 
-    hash_1["Schlüssel"] = "Wert ursprünglich\n"
-    val_pmc = hash_1["Schlüssel"]
+    hash_1["Schluessel"] = "Wert urspruenglich\n"
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
-    hash_1["Schlüssel"] = "Wert geändert\n"
-    val_pmc = hash_1["Schlüssel"]
+    hash_1["Schluessel"] = "Wert geaendert\n"
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
-    hash_1["Schlüssel"] = "Wert nocheinmal geändert\n"
-    val_pmc = hash_1["Schlüssel"]
+    hash_1["Schluessel"] = "Wert nocheinmal geaendert\n"
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
-    hash_1["Schlüssel"] = "Wert ursprünglich\n"
-    val_pmc = hash_1["Schlüssel"]
+    hash_1["Schluessel"] = "Wert urspruenglich\n"
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
 .end
 CODE
-Wert ursprünglich
-Wert geändert
-Wert nocheinmal geändert
-Wert ursprünglich
+Wert urspruenglich
+Wert geaendert
+Wert nocheinmal geaendert
+Wert urspruenglich
 OUTPUT
 unlink( 'gdbm_hash_1' );
 
@@ -189,13 +189,13 @@ unlink( 'gdbm_hash_1' );
 pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "exists_keyed");
     hash_1 = "gdbm_hash_1"
 
-    hash_1["Schlüssel"] = "Wert\n"
+    hash_1["Schluessel"] = "Wert\n"
 
     .local int exist_flag
     exist_flag = exists hash_1["a"]
     print exist_flag
     print "\n"
-    exist_flag = exists hash_1["Schlüssel"]
+    exist_flag = exists hash_1["Schluessel"]
     print exist_flag
     print "\n"
 
@@ -205,7 +205,7 @@ pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "exists_keyed");
     exist_flag = exists hash_1[key_out]
     print exist_flag
     print "\n"
-    key_out = "Schlüssel"
+    key_out = "Schluessel"
     exist_flag = exists hash_1[key_out]
     print exist_flag
     print "\n"
@@ -223,18 +223,18 @@ unlink( 'gdbm_hash_1' );
 pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set STRING with STRING key");
     hash_1 = "gdbm_hash_1"
 
-    hash_1["Schlüssel"] = "Wert\n"
+    hash_1["Schluessel"] = "Wert\n"
 
     .local pmc    val_pmc
     .local string val_string
 
-    val_string = hash_1["Schlüssel"]
+    val_string = hash_1["Schluessel"]
     print val_string
-    val_pmc = hash_1["Schlüssel"]
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
     .local pmc key_out
     key_out = new String
-    key_out = "Schlüssel"
+    key_out = "Schluessel"
     val_string = hash_1[key_out]
     print val_string
     val_pmc = hash_1[key_out]
@@ -256,19 +256,19 @@ pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set STRING with a PMC key")
 
     .local pmc key_pmc
     key_pmc = new String
-    key_pmc = "Schlüssel"
+    key_pmc = "Schluessel"
     hash_1[key_pmc] = "Wert\n"
 
     .local pmc    val_pmc
     .local string val_string
 
-    val_string = hash_1["Schlüssel"]
+    val_string = hash_1["Schluessel"]
     print val_string
-    val_pmc = hash_1["Schlüssel"]
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
     .local pmc key2
     key2 = new String
-    key2 = "Schlüssel"
+    key2 = "Schluessel"
     val_string = hash_1[key2]
     print val_string
     val_pmc = hash_1[key2]
@@ -291,18 +291,18 @@ pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set PMC with STRING key");
     .local pmc val
     val = new String
     val = "Wert\n"
-    hash_1["Schlüssel"] = val
+    hash_1["Schluessel"] = val
 
     .local pmc    val_pmc
     .local string val_string
 
-    val_string = hash_1["Schlüssel"]
+    val_string = hash_1["Schluessel"]
     print val_string
-    val_pmc = hash_1["Schlüssel"]
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
     .local pmc key_out
     key_out = new String
-    key_out = "Schlüssel"
+    key_out = "Schluessel"
     val_string = hash_1[key_out]
     print val_string
     val_pmc = hash_1[key_out]
@@ -326,19 +326,19 @@ pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set PMC with a PMC key");
     val = "Wert\n"
     .local pmc key_pmc
     key_pmc = new String
-    key_pmc = "Schlüssel"
+    key_pmc = "Schluessel"
     hash_1[key_pmc] = val
 
     .local pmc    val_pmc
     .local string val_string
 
-    val_string = hash_1["Schlüssel"]
+    val_string = hash_1["Schluessel"]
     print val_string
-    val_pmc = hash_1["Schlüssel"]
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
     .local pmc key2
     key2 = new String
-    key2 = "Schlüssel"
+    key2 = "Schluessel"
     val_string = hash_1[key2]
     print val_string
     val_pmc = hash_1[key2]
@@ -358,20 +358,20 @@ unlink( 'gdbm_hash_1' );
 pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set INTVAL with STRING key");
     hash_1 = "gdbm_hash_1"
 
-    hash_1["Schlüssel"] = -11012005
+    hash_1["Schluessel"] = -11012005
 
     .local pmc    val_pmc
     .local string val_string
 
-    val_string = hash_1["Schlüssel"]
+    val_string = hash_1["Schluessel"]
     print val_string
     print "\n"
-    val_pmc = hash_1["Schlüssel"]
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
     print "\n"
     .local pmc key_out
     key_out = new String
-    key_out = "Schlüssel"
+    key_out = "Schluessel"
     val_string = hash_1[key_out]
     print val_string
     print "\n"
@@ -395,21 +395,21 @@ pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set FLOATVAL with a PMC key
 
     .local pmc key_pmc
     key_pmc = new String
-    key_pmc = "Schlüssel"
+    key_pmc = "Schluessel"
     hash_1[key_pmc] = -1101.2005
 
     .local pmc    val_pmc
     .local string val_string
 
-    val_string = hash_1["Schlüssel"]
+    val_string = hash_1["Schluessel"]
     print val_string
     print "\n"
-    val_pmc = hash_1["Schlüssel"]
+    val_pmc = hash_1["Schluessel"]
     print val_pmc
     print "\n"
     .local pmc key2
     key2 = new String
-    key2 = "Schlüssel"
+    key2 = "Schluessel"
     val_string = hash_1[key2]
     print val_string
     print "\n"
