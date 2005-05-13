@@ -3,27 +3,24 @@
 # Setup some commands
 LN_S     = ${lns}
 PERL     = ${perl}
-PARROT  = .${slash}parrot${exe}
-MYPATH  = compilers${slash}pge${slash}
-RELPATH = ..${slash}..${slash}
-TESTPATH = t${slash}p6rules${slash}
 RM_RF    = ${rm_rf}
+PARROT   = ..${slash_exec}..${slash_exec}parrot${exe}
 CP       = ${cp}
 
 # Where to put things
-PARROT_LIBRARY    = runtime${slash}parrot${slash}library
+PARROT_LIBRARY    = ..${slash}..${slash}runtime${slash}parrot${slash}library
 
 # the default target
-all: $(RELPATH)$(PARROT_LIBRARY)${slash}PGE.pbc
+all: $(PARROT_LIBRARY)${slash}PGE.pbc
 
-$(RELPATH)$(PARROT_LIBRARY)${slash}PGE.pbc: PGE.pbc
-	$(CP) PGE.pbc $(RELPATH)$(PARROT_LIBRARY)
+$(PARROT_LIBRARY)${slash}PGE.pbc: PGE.pbc
+	$(CP) PGE.pbc $(PARROT_LIBRARY)
 
 PGE.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/P6Rule.pir PGE/TokenHash.pir
-	(cd $(RELPATH) && $(PARROT) --output=$(MYPATH)PGE.pbc $(MYPATH)PGE.pir)
+	$(PARROT) -o PGE.pbc --output-pbc PGE.pir 
 
 PGE-Hs.pbc: PGE.pir PGE/Exp.pir PGE/Match.pir PGE/P6Rule.pir PGE/TokenHash.pir PGE/Hs.pir
-	(cd $(RELPATH) && $(PARROT) --output=$(MYPATH)PGE-Hs.pbc $(MYPATH)PGE/Hs.pir)
+	$(PARROT) -o PGE-Hs.pbc --output-pbc PGE/Hs.pir 
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -46,10 +43,10 @@ help:
 	@echo ""
 
 test: all
-	(cd $(RELPATH) && $(PERL) -Ilib t/harness $(TESTPATH)/*.t)
+	cd ../..; $(PERL) -Ilib t/harness t/p6rules/*.t
 
 testclean:
-	(cd $(RELPATH) && $(RM_RF) $(TESTPATH)/*.pir $(TESTPATH)/*.pasm)
+	$(RM_RF) ../../t/p6rules/*.pir ../../t/p6rules/*.pasm
 
 clean: testclean
 	$(RM_RF) PGE.pbc
