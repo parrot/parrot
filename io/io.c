@@ -225,6 +225,19 @@ PIO_destroy(theINTERP, PMC *pmc)
         mem_sys_free(io->b.startb);
 	io->b.startb = 0;
     }
+#if 0
+    /*
+     * PIO_destroy is called by PIO_close
+     * XXX can't munmap now
+     */
+    if (io->b.startb && (io->b.flags & PIO_BF_MMAP)) {
+#ifdef PARROT_HAS_HEADER_SYSMMAN
+        munmap((void*)io->b.startb, io->b.size);
+#endif
+        io->b.startb = io->b.endb = NULL;
+        io->b.size = 0;
+    }
+#endif
     if ((io->stack->flags & PIO_L_LAYER_COPIED)) {
         ParrotIOLayer *p, *down;
         for (p = io->stack; p; ) {
@@ -380,19 +393,19 @@ PIO_init_stacks(theINTERP)
      * call copy stack.
      */
 #ifdef PIO_OS_UNIX
-    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_unix_layer), PMCNULL);
+    PIO_push_layer(interpreter, PMCNULL, PIO_base_new_layer(&pio_unix_layer));
 #endif
 #ifdef PIO_OS_WIN32
-    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_win32_layer), PMCNULL);
+    PIO_push_layer(interpreter, PMCNULL, PIO_base_new_layer(&pio_win32_layer));
 #endif
 #ifdef PIO_OS_STDIO
-    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_stdio_layer), PMCNULL);
+    PIO_push_layer(interpreter, PMCNULL, PIO_base_new_layer(&pio_stdio_layer));
 #endif
-    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), PMCNULL);
+    PIO_push_layer(interpreter, PMCNULL, PIO_base_new_layer(&pio_buf_layer));
 
     fill = 0;
     if (!pio_registered_layers) {
-        n = 3;  /* 2 default layers for now + utf8 */
+        n = 4;  /* 2 default layers for now + utf8, mmap */
         pio_registered_layers = mem_sys_allocate(
                 sizeof(ParrotIOLayer *) * (n + 1));
         fill = 1;
@@ -425,7 +438,8 @@ PIO_init_stacks(theINTERP)
         assert(i == 2);
         assert(pio_registered_layers[2] == NULL);
         pio_registered_layers[2] = PIO_utf8_register_layer();
-        pio_registered_layers[3] = NULL;
+        pio_registered_layers[3] = PIO_mmap_register_layer();
+        pio_registered_layers[4] = NULL;
     }
 
     return 0;
@@ -816,10 +830,16 @@ PIO_reads(theINTERP, PMC *pmc, size_t len)
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data0(pmc);
 
-    res = PIO_make_io_string(interpreter, &res, len );
-
     if (!io)
-        return res;
+        return new_string_header(interpreter, 0);
+
+    if (io->b.flags & PIO_BF_MMAP) {
+        res = new_string_header(interpreter, 0);
+        res->charset = Parrot_iso_8859_1_charset_ptr;   /* XXX binary */
+        res->encoding = Parrot_fixed_8_encoding_ptr;
+    }
+    else
+        res = PIO_make_io_string(interpreter, &res, len );
 
     res->bufused = len;
     PIO_read_down(interpreter, l, io, &res);

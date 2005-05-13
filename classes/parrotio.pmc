@@ -26,13 +26,60 @@ These are the vtable functions for Parrot IO.
 
 pmclass ParrotIO need_ext {
 
+/*
+
+=item C<METHOD INTVAL say(STRING *s)>
+
+Print the string with newline appended to SELF or to stdout if used
+as class method
+
+=cut
+
+*/
+
     METHOD INTVAL say(STRING *s) {
-        PMC *p2  = interpreter->ctx.current_object;
+        PMC *p2  = INTERP->ctx.current_object;
         PMC *out = p2 == Parrot_base_vtables[enum_class_ParrotIO]->class ?
             PIO_STDOUT(INTERP) : p2;
         INTVAL r = PIO_putps(INTERP, out, s);
         r  += PIO_puts(INTERP, out, "\n");
         return r;
+    }
+/*
+
+=item C<METHOD PMC* open(STRING* file, STRING *mode, STRING* layer)>
+
+Open the file with the given mode and use the IO given layer.
+
+=cut
+
+*/
+
+    METHOD PMC* open(STRING* file, STRING *mode, STRING* layer) {
+        ParrotIOLayer *l;
+        const char *c_file, *c_mode, *c_layer;
+        PMC *pio;
+
+        c_file = string_to_cstring(INTERP, file);
+        c_mode = string_to_cstring(INTERP, mode);
+        c_layer = string_to_cstring(INTERP, layer);
+        l = PIO_get_layer(INTERP, c_layer);
+        pio = PIO_open(INTERP, l, c_file, c_mode);
+        if (!pio || !PMC_struct_val(pio))
+            return pmc_new(INTERP, enum_class_Undef);
+        if (l) {
+            ParrotIO *io = PMC_data(pio);
+            /* XXX layer is stored twice - which is used when
+             * XXX and move this into the open function of the layer
+             */
+            l = interpreter->piodata->default_stack;
+            if (!strcmp(l->name, "buf"))
+                l = l->down;
+            io->stack = PMC_struct_val(pio) = l;
+            /* push the layer */
+            PIO_push_layer_str(INTERP, pio, layer);
+        }
+        return pio;
     }
 
 /*
@@ -189,6 +236,7 @@ Pop a layer off the PIO's layer stack. Returns the layer name.
     STRING* pop_string () {
         return PIO_pop_layer_str(INTERP, SELF);
     }
+
 }
 
 /*

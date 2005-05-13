@@ -65,6 +65,7 @@ Some ideas from AT&T SFIO.
 #define PIO_BF_MALLOC   00000001        /* Buffer malloced              */
 #define PIO_BF_READBUF  00000002        /* Buffer is read-buffer        */
 #define PIO_BF_WRITEBUF 00000004        /* Buffer is write-buffer       */
+#define PIO_BF_MMAP     00000010        /* Buffer mmap()ed              */
 
 /*
  * Layer flags
@@ -246,7 +247,7 @@ struct _ParrotIOLayerAPI {
 #define PIO_null_open_async (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char *, const char *, DummyCodeRef *))0
 #define PIO_null_fdopen (ParrotIO * (*)(theINTERP, ParrotIOLayer *, PIOHANDLE, INTVAL))0
 #define PIO_null_close (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_write (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING*))0
+#define PIO_null_write (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING*))0
 #define PIO_null_write_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING *,DummyCodeRef *))0
 #define PIO_null_read (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING**))0
 #define PIO_null_read_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING **, DummyCodeRef *))0
@@ -266,6 +267,8 @@ struct _ParrotIOLayerAPI {
  */
 
 ParrotIOLayer * PIO_utf8_register_layer(void);
+ParrotIOLayer * PIO_mmap_register_layer(void);
+
 void PIO_push_layer_str(Interp *interpreter, PMC *pmc, STRING *ls);
 STRING* PIO_pop_layer_str(Interp *interpreter, PMC *pmc);
 

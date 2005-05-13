@@ -342,6 +342,7 @@ IO_O_FILES = \
     $(IO_DIR)/io_layers$(O) \
     $(IO_DIR)/io_unix$(O) \
     $(IO_DIR)/io_utf8$(O) \
+    $(IO_DIR)/io_mmap$(O) \
     $(IO_DIR)/io_win32$(O) \
     $(IO_DIR)/io_stdio$(O) \
     $(IO_DIR)/io_passdown$(O)
@@ -925,6 +926,8 @@ $(IO_DIR)/io_layers$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 $(IO_DIR)/io_unix$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
 $(IO_DIR)/io_utf8$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
+
+$(IO_DIR)/io_mmap$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
 $(IO_DIR)/io_win32$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 

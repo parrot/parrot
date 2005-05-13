@@ -84,7 +84,7 @@ PIO_base_delete_layer(ParrotIOLayer *layer)
 /*
 
 =item C<INTVAL
-PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)>
+PIO_push_layer(theINTERP,  PMC *pmc, ParrotIOLayer *layer)>
 
 Push a layer onto an IO object (C<*pmc>) or the default stack.
 
@@ -98,7 +98,7 @@ Push a layer onto an IO object (C<*pmc>).
 */
 
 INTVAL
-PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)
+PIO_push_layer(theINTERP,  PMC *pmc, ParrotIOLayer *layer)
 {
     ParrotIOLayer *t;
 
@@ -156,23 +156,33 @@ PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)
     }
     return -1;
 }
+ParrotIOLayer *
+PIO_get_layer(Interp *interpreter, const char *name)
+{
+    ParrotIOLayer **t;
+
+    UNUSED(interpreter);
+    for (t = pio_registered_layers; *t; ++t)
+        if (!strcmp(name, (*t)->name))
+            return *t;
+    return NULL;
+}
 
 void
 PIO_push_layer_str(Interp *interpreter, PMC *pmc, STRING *ls)
 {
-    ParrotIOLayer **t, *l;
+    ParrotIOLayer  *l;
     char *cls = string_to_cstring(interpreter, ls);
-    for (t = pio_registered_layers; *t; ++t)
-        if (!strcmp(cls, (*t)->name))
-            break;
+
+    l = PIO_get_layer(interpreter, cls);
     string_cstring_free(cls);
-    if (!*t)
+    if (!l)
         internal_exception(1, "Layer not found");
 
     /* make private copy */
-    l = PIO_base_new_layer(*t);
+    l = PIO_base_new_layer(l);
     l->flags |= PIO_L_LAYER_COPIED;
-    PIO_push_layer(interpreter, l, pmc);
+    PIO_push_layer(interpreter, pmc, l);
 }
 
 /*

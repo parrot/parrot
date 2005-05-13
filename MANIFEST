@@ -776,6 +776,7 @@ include/parrot/warnings.h                         [devel]include
 io/io.c                                           []
 io/io_buf.c                                       []
 io/io_layers.c                                    []
+io/io_mmap.c                                      []
 io/io_passdown.c                                  []
 io/io_private.h                                   []
 io/io_stdio.c                                     []

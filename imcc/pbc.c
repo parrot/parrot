@@ -552,11 +552,11 @@ IMCC_string_from_reg(Interp *interpreter, SymReg *r)
 
     if (r->type & VT_ENCODED) {
         char *p;
-        p = strchr(r->name, ':');
+        p = strchr(r->name, '"');
         assert(p);
-        *p = 0;
+        p[-1] = 0;
         charset = r->name;
-        buf = p + 2;        /* past delim */
+        buf = p + 1;        /* past delim */
         s = string_unescape_cstring(interpreter, buf, '"', charset);
     }
     else if (*buf == '"') {

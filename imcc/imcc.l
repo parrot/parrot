@@ -101,7 +101,7 @@ STRINGCONSTANT  \"(\\.|[^"\\\n])*\"
 ENCCHAR         {LETTER}|{DIGIT}|"-"
 ENCCHARS        {ENCCHAR}*
 ENC             {LETTER}{ENCCHARS}":"
-UNICODE         {ENC}{STRINGCONSTANT}
+UNICODE         {ENC}{ENC}?{STRINGCONSTANT}
 CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
 EOL		\r?\n

@@ -222,6 +222,7 @@ i	JPi
 i	JPii
 i	JPiii
 i	JPt
+P	JOSSS
 
 # Py_func signatures
 P	JP

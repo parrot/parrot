@@ -135,6 +135,7 @@ extern ParrotIOLayer pio_win32_layer;
 extern ParrotIOLayer pio_stdio_layer;
 #endif
 extern ParrotIOLayer pio_buf_layer;
+extern ParrotIOLayer pio_mmap_layer;
 
 
 
@@ -150,9 +151,10 @@ extern void PIO_finish(theINTERP);
 void PIO_internal_shutdown(theINTERP);
 extern INTVAL PIO_init_stacks(theINTERP);
 extern void PIO_atexit(theINTERP);
-extern INTVAL PIO_push_layer(theINTERP, ParrotIOLayer *, PMC *);
+extern INTVAL PIO_push_layer(theINTERP, PMC *, ParrotIOLayer *);
 extern ParrotIOLayer *PIO_pop_layer(theINTERP, PMC *);
 extern ParrotIOLayer *PIO_copy_stack(ParrotIOLayer *);
+ParrotIOLayer *PIO_get_layer(Interp *, const char *name);
 
 
 extern struct PMC *new_io_pmc(Interp *, ParrotIO *);
