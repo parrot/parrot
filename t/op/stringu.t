@@ -18,7 +18,7 @@ Tests Parrot's unicode string system.
 
 #'
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "angstrom" );
@@ -182,3 +182,12 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
+output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
+    set S0, unicode:"«"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+1
+OUTPUT
