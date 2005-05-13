@@ -18,7 +18,7 @@ Tests Parrot's unicode string system.
 
 #'
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "angstrom" );
