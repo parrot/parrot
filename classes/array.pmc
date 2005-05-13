@@ -50,7 +50,7 @@ static PMC* retval(Interp *interp, void *ret)
 {
     PMC *value;
     if (ret == 0)
-    real_exception(interp, NULL, E_IndexOutOfBoundsError,
+    real_exception(interp, NULL, E_IndexError,
         "Array index out of bounds!");
     /* XXX getting non existent value, exception or undef?
      * current is for perlarray */
@@ -136,7 +136,7 @@ Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
     PMC *value;
 
     if (ret == 0)
-        real_exception(interp, NULL, E_IndexOutOfBoundsError,
+        real_exception(interp, NULL, E_IndexError,
             "Array index out of bounds!");
     /* assign into a sparse or not yet set value */
     if (ret == (void*) -1 || *(PMC**)ret == 0) {
@@ -677,7 +677,7 @@ Sets the PMC at element C<idx> to C<*src>.
         INTVAL length;
         length = ((List *) PMC_data(SELF))->length;
         if (idx >= length || -idx > length) {
-            real_exception(INTERP, NULL, E_IndexOutOfBoundsError,
+            real_exception(INTERP, NULL, E_IndexError,
                 "Array index out of bounds!");
         }
 

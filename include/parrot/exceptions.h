@@ -57,7 +57,6 @@ typedef enum {
         E_AssertionError,
         E_LookupError,
           E_IndexError,
-            E_IndexOutOfBoundsError,
           E_KeyError,
         E_ArithmeticError,
           E_OverflowError,
