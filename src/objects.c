@@ -171,7 +171,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
 
     memset(&meth_str, 0, sizeof(meth_str));
     meth_str.encoding = Parrot_fixed_8_encoding_ptr;
-    meth_str.charset = Parrot_iso_8859_1_charset_ptr;
+    meth_str.charset = Parrot_default_charset_ptr;
     for (i = 0; (meth = Parrot_vtable_slot_names[i]); ++i) {
         if (!*meth)
             continue;
