@@ -28,7 +28,7 @@ defined.
     load()
 .end
 
-.include "PGE/TokenHash.pir"
-.include "PGE/Exp.pir"
-.include "PGE/Match.pir"
-.include "PGE/P6Rule.pir"
+.include "compilers/pge/PGE/TokenHash.pir"
+.include "compilers/pge/PGE/Exp.pir"
+.include "compilers/pge/PGE/Match.pir"
+.include "compilers/pge/PGE/P6Rule.pir"
