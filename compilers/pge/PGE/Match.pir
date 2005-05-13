@@ -127,16 +127,26 @@ Returns 1 if this object successfully matched the target string,
 
 =item C<__get_integer()>
 
-Returns 1 if this object successfully matched the target string,
-0 otherwise.
+Returns the integer value of this match.
 
 =cut
 
 .sub "__get_integer" method
-    $P0 = getattribute self, "PGE::Match\x0$:to"
-    $I0 = $P0
-    isge $I1, $I0, 0
-    .return ($I1)
+    $S0 = self
+    $I0 = $S0
+    .return ($I0)
+.end
+
+=item C<__get_number()>
+
+Returns the numeric value of this match.
+
+=cut
+
+.sub "__get_number" method
+    $S0 = self
+    $N0 = $S0
+    .return ($N0)
 .end
 
 =item C<__get_string()>
@@ -210,8 +220,7 @@ Produces a data dump of the match object and all of its subcaptures.
   start:
     print prefix
     print ":"
-    $I0 = self
-    unless $I0 goto subpats
+    unless self goto subpats
     print " <"
     print self
     print " @ "
