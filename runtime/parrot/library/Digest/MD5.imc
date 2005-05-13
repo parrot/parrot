@@ -130,19 +130,19 @@ is_little_endian:
 
 .macro FF (b,c,d)
     tmp1 = .c ~ .d
-    tmp1 = .b & tmp1
-    tmp1 = .d ~ tmp1
+    tmp1 &= .b
+    tmp1 ~= .d
 .endm
 
 .macro FH (b,c,d)
     tmp1 = .b   ~ .c
-    tmp1 = tmp1 ~ .d
+    tmp1 ~= .d
 .endm
 
 .macro FI (b,c,d)
     tmp1 = ~.d
-    tmp1 = .b | tmp1
-    tmp1 = .c ~ tmp1
+    tmp1 |= .b
+    tmp1 ~= .c
 .endm
 
 ###########################################################################
@@ -195,12 +195,12 @@ is_little_endian:
      $I12 = $I12 >>> 8
      $I13 = $I13 >>> 24
 
-     $I10 = $I10 | $I11
-     $I10 = $I10 | $I12
-     .w   = $I10 | $I13
+     $I10 |= $I11
+     $I10 |= $I12
+     .w   =  $I10 | $I13
 
      # For 64-bit architectures
-     .w   = .w & 0xffffffff
+     .w &= 0xffffffff
 
 .endm
 
@@ -239,10 +239,10 @@ is_little_endian:
 
      # Work out how many words to allocate
      .local int words
-     words = len   + 8
-     words = words | 63
-     words = words + 1
-     words = words / 4
+     words = len + 8
+     words |= 63
+     inc words
+     words /= 4
 
      buffer = words
 
@@ -265,8 +265,8 @@ md5_create_buffer_loop:
 
 string_char:
 
-     word = word << 8
-     word = word | $I4
+     word <<= 8
+     word |= $I4
 
      inc subcounter
      if subcounter != 4 goto md5_create_buffer_loop
@@ -278,7 +278,7 @@ endian_ok1:
      buffer[slow_counter] = word
 
      word         = 0
-     counter      = counter + 4
+     counter      +=  4
      subcounter   = 0
      inc slow_counter
 
@@ -292,7 +292,7 @@ md5_create_buffer_break:
      subcounter = 4 - subcounter
      .local int shift
      shift = 8*subcounter
-     word = word << shift
+     word <<= shift
 
      if endian goto endian_ok2
      .swap (word)
@@ -305,11 +305,11 @@ complete:
      # The number of bits in the string go into the last two words
 
      $I1 = len >>> 29
-     words = words - 1
+     dec words
      buffer[words] = $I1
 
      $I0 = len << 3
-     words = words - 1
+     dec words
      buffer[words] = $I0
 
 .end
