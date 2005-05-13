@@ -160,10 +160,19 @@ cs_rindex(Interp *interpreter, STRING *source_string,
 }
 
 static UINTVAL
-validate(Interp *interpreter, STRING *source_string)
+validate(Interp *interpreter, STRING *src)
 {
-    UNIMPL;
-    return 0;
+    UINTVAL codepoint, offset;
+
+    for (offset = 0; offset < string_length(interpreter, src); ++offset) {
+        codepoint = ENCODING_GET_CODEPOINT(interpreter, src, offset);
+        /* Check for Unicode non-characters */
+        if (codepoint >= 0xfdd0 &&
+            (codepoint <= 0xfdef || (codepoint & 0xfffe) == 0xfffe) &&
+                codepoint <= 0x10ffff)
+                    return 0;
+    }
+    return 1;
 }
 
 static INTVAL

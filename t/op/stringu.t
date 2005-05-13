@@ -191,3 +191,14 @@ output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
 CODE
 1
 OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
+    set S0, ascii:"«"
+    length I0, S0
+    print I0
+    print "\n"
+    end
+CODE
+Malformed string
+OUTPUT
+
