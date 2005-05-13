@@ -17,6 +17,7 @@ Tests the Python Integer PMC.
 =cut
 
 use Parrot::Test tests => 26;
+use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "abs");
 
@@ -617,6 +618,10 @@ CODE
 -20 -20 -20
 OUTPUT
 
+SKIP:
+{
+  skip("No bigint support", 1) unless $PConfig{gmp};
+
 pir_output_like(<< 'CODE', << 'OUTPUT', "sub - propagate to PyLong");
 .sub main @MAIN
     .include "sysinfo.pasm"
@@ -647,3 +652,4 @@ CODE
 -\d+
 PyLong/
 OUTPUT
+}
