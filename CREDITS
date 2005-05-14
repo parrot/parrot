@@ -52,7 +52,7 @@ N: Benjamin Goldberg
 D: Numerous improvements and proposals.
 
 N: Bernhard Schmalhofer
-D: Bugfixes, m4, Getopt_Long.imc
+D: Bugfixes, m4, Getopt_Long.pir
 
 N: Bob Diertens
 D: patch regarding macro argument expansion

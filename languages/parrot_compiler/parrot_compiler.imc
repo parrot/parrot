@@ -1,10 +1,12 @@
 # Copyright: 2002-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-.include "library/Getopt/Long.imc"
-
 .sub main @MAIN 
   .param pmc argv
+
+  load_bytecode "Getopt/Long.pbc"
+  .local pmc get_options
+  find_global get_options, "Getopt::Long", "get_options"
 
   # Assemble specification for get_options
   # in an array of format specifiers
@@ -22,7 +24,7 @@
   argv_clone = clone argv
 
   .local pmc opt
-  ( opt ) = _get_options( argv_clone, opt_spec )
+  ( opt ) = get_options( argv_clone, opt_spec )
 
   # Now we do what the passed options tell
   .local int is_defined

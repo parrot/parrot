@@ -158,10 +158,10 @@ OUT
 
 =head1 AUTHOR
 
-Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
-F<runtime/parrot/library/Getopt/Long.imc>
+F<runtime/parrot/library/YAML/Parser/Syck.imc>
 
 =cut

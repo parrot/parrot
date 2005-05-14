@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 bench_op - Benchmark one or more opcodes
@@ -64,17 +66,22 @@ Print program version.
 
 =cut
 
-.include "library/Getopt/Long.imc"
 .const string VERSION = "0.1.0"
 
-.sub _main @MAIN
+.sub main @MAIN
     .param pmc argv
-    .local pmc opt_spec
-    .local int times
-    .local int verbose
 
+    load_bytecode "Getopt/Long.pbc"
+    .local pmc get_options
+    find_global get_options, "Getopt::Long", "get_options"
+
+    .local int times
     times = 100000
+
+    .local int verbose
     verbose = 0
+
+    .local pmc opt_spec
     opt_spec = new PerlArray
     push opt_spec, "version=i"
     push opt_spec, "verbose"
@@ -89,7 +96,7 @@ Print program version.
     unless argc goto do_help
     .local pmc opt
     opt = new PerlUndef
-    opt = _get_options( argv, opt_spec )
+    opt = get_options( argv, opt_spec )
     .local int def
     def = defined opt
     unless def goto do_help

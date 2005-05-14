@@ -28,9 +28,6 @@ References: http://www.gnu.org/software/m4/m4.html
 # This contains the initialization and execution of the builtin macros.
 .include "src/builtin.pir"
 
-# A dummy implementation of Getopt::Long
-.include "library/Getopt/Long.imc"
-
 # This contains reading and writing of frozen files
 .include "src/freeze.pir"
 
@@ -53,13 +50,16 @@ Looks at the command line arguments and acts accordingly.
   .param pmc argv
 
   load_bytecode "library/pcre.imc"
+  load_bytecode "Getopt/Long.pbc"
+  .local pmc get_options
+  find_global get_options, "Getopt::Long", "get_options"
 
   # name of the program
   .local string program_name
   program_name = shift argv
 
   # Specification of known command line arguments.
-  # The args are parsed with library/Getopt/Long.imc which should work 
+  # The args are parsed with library/Getopt/Long.pir which should work 
   # somewhat like the Perl5 module Getopt::Long.
   .local pmc opt_spec      
   opt_spec = new ResizableStringArray
@@ -112,7 +112,7 @@ Looks at the command line arguments and acts accordingly.
   .local pmc cloned_argv
   cloned_argv = clone argv
   .local pmc opt
-  ( opt ) = _get_options( cloned_argv, opt_spec )
+  ( opt ) = get_options( cloned_argv, opt_spec )
 
   # Now dow what the options want
   .local int is_defined

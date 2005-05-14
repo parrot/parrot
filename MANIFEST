@@ -1595,7 +1595,7 @@ parrotbug					  []
 pf/pf_items.c                                     []
 runtime/parrot/dynext/README                      [main]doc
 runtime/parrot/include/DWIM.imc                   [main]doc
-runtime/parrot/library/Getopt/Long.imc            [main]doc
+runtime/parrot/library/Getopt/Long.pir            [main]doc
 runtime/parrot/include/README                     [main]doc
 runtime/parrot/library/parrotlib.imc              [runtime]
 src/builtin.c                                     []

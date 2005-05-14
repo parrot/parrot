@@ -1,8 +1,10 @@
+# $Id$
+
 =head1 Parrot Grammar Engine (PGE)
 
 This is the second implementation of a regular expression/rules/grammar
 engine designed to run in Parrot.  It's still a work in progress, and
-some parts of the impelementation are designed simply to "bootstrap" 
+some parts of the implementation are designed simply to "bootstrap" 
 us along (i.e., some parts such as the parser and generator are 
 expected to be discarded).  The current work is also largely incomplete 
 -- although it has support for groups (capturing and non-capturing), 

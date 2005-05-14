@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-examples/assembly/getopt_demo.imc - demonstrating library/Getopt/Long.imc
+examples/assembly/getopt_demo.imc - demonstrating library/Getopt/Long.pir
 
 =head1 SYNOPSIS
 
@@ -14,12 +14,9 @@ examples/assembly/getopt_demo.imc - demonstrating library/Getopt/Long.imc
 =head1 DESCRIPTION
 
 This demo program shows how to handle command line arguments with the
-PIR library F<runtime/parrot/library/Getopt/Long.imc>.
+PIR library F<runtime/parrot/library/Getopt/Long.pir>.
 
 =cut
-
-# A dummy implementation of Getopt::Long
-.include "library/Getopt/Long.imc"
 
 =head1 SUBROUTINES
 
@@ -31,6 +28,10 @@ This is executed when you call F<getopt_demo.imc>.
 
 .sub main @MAIN 
   .param pmc argv
+
+  load_bytecode "Getopt/Long.pbc"
+  .local pmc get_options
+  find_global get_options, "Getopt::Long", "get_options"
 
   # Assemble specification for get_options
   # in an array of format specifiers
@@ -57,7 +58,7 @@ This is executed when you call F<getopt_demo.imc>.
   argv_clone = clone argv
 
   .local pmc opt
-  ( opt ) = _get_options( argv_clone, opt_spec )
+  ( opt ) = get_options( argv_clone, opt_spec )
 
   # Now we do what the passed options tell
   .local int is_defined
@@ -168,6 +169,6 @@ Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
-F<runtime/parrot/library/Getopt/Long.imc>
+F<runtime/parrot/library/Getopt/Long.pir>
 
 =cut

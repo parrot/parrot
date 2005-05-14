@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-t/library/getopt_long.t - testing library/Getopt/Long.imc
+t/library/getopt_long.t - testing library/Getopt/Long.pir
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,7 @@ t/library/getopt_long.t - testing library/Getopt/Long.imc
 =head1 DESCRIPTION
 
 This test program tries to handle command line arguments with the
-library F<runtime/parrot/library/Getopt/Long.imc>.
+library F<runtime/parrot/library/Getopt/Long.pir>.
 
 =cut
 
@@ -23,10 +23,11 @@ use Parrot::Test tests => 1;
 # no. 1
 pir_output_is( <<'CODE', <<'OUT', "basic long options" );
 
-# A dummy implementation of Getopt::Long
-.include "library/Getopt/Long.imc"
-
 .sub test @MAIN 
+
+  load_bytecode "Getopt/Long.pbc"
+  .local pmc get_options
+  find_global get_options, "Getopt::Long", "get_options"    # get the relevant sub
 
   # Assemble specification for get_options
   # in an array of format specifiers
@@ -55,7 +56,7 @@ pir_output_is( <<'CODE', <<'OUT', "basic long options" );
   push argv, "thing"
 
   .local pmc opt
-  ( opt ) = _get_options( argv, opt_spec )
+  ( opt ) = get_options( argv, opt_spec )
 
   # Now we do what the passed options tell
   .local int is_defined
@@ -142,6 +143,6 @@ Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
-F<runtime/parrot/library/Getopt/Long.imc>
+F<runtime/parrot/library/Getopt/Long.pir>
 
 =cut

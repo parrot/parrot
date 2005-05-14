@@ -1,10 +1,16 @@
+# Copyright (C) 2003-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-library/Getopt/Long.imc - parse long and short command line options
+library/Getopt/Long.pir - parse long and short command line options
 
 =head1 SYNOPSIS
+
+  # get the relevant sub
+  load_bytecode "Getopt/Long.pbc"
+  .local pmc get_options
+  find_global get_options, "Getopt::Long", "get_options" 
 
   # Assemble option specification
   .local pmc opt_spec
@@ -23,7 +29,7 @@ library/Getopt/Long.imc - parse long and short command line options
 
   # Parse the command line params
   .local pmc opt
-  ( opt ) = _get_options( argv_clone, opt_spec )
+  ( opt ) = get_options( argv_clone, opt_spec )
 
   .local int is_defined
   is_defined = defined opt["bool"]
@@ -36,16 +42,25 @@ library/Getopt/Long.imc - parse long and short command line options
 
 =head1 DESCRIPTION
 
-This PIR library can be used for parsing command line options.
-A single subroutine, _get_options(), is provided.
+This Parrot library can be used for parsing command line options.
+The subroutine get_options() is exported into the namespace 'Getopt::Long'.
 
 =cut
 
 .include "library/dumper.imc"
 
+.sub "__onload" @LOAD
+
+  # Load dependant libraries
+  load_bytecode "PGE.pbc"
+
+.end
+ 
+.namespace [ "Getopt::Long" ]
+
 =head1 SUBROUTINES
 
-=head2 _get_options
+=head2 C<get_options> in C<Getopt::Long>
 
 This should work like the Perl5 module Getopt::Long.
 Takes an array of options and an array of specifications.
@@ -54,9 +69,13 @@ A Hash PMC is returned.
 
 =cut
 
-.sub _get_options 
+.sub get_options 
   .param pmc argv
   .param pmc spec
+
+  # TODO: actually us PGE
+  .local pmc p6rule_compile
+  find_global p6rule_compile, "PGE", "p6rule"
 
   # Loop over the array spec and build up two simple hashes
   .local pmc type                    # the type of the option: binary, string, integer
@@ -174,7 +193,7 @@ A Hash PMC is returned.
 
 =head1 TODO
 
-- Put the code into the namespace 'Getopt::Long'.
+- Use PGE
 - Remove need to clone argument vector
 - Make it work for all cases, short options, long options and bundling.
 - Recognise type of return value: string, integer, binary, array, hash.
